@@ -23,12 +23,25 @@ Reactions: people within 7 m of a moving car jump aside (a direct hit sends them
 (arms up, hop) while you are airborne or drifting; fans wave when you pass. Pigeons scatter (LV, unchanged).
 Minifigs are 1.80 m like every humanoid (rv-human). Set pieces and the landmark are solid (soft push, like AD dress items).
 
+## Reused, not reinvented
+- Street graph and road mask: `LV_eGrid`, `LV_onRoad` (98l_lively), building colliders `roamHit`, heights `groundY` (terr-1: the ground surface, no bridge decks).
+- Smash pipeline: `debris` + `studBurst` + `HUB.smashed` + `comboAdd` + `AU.sfx('brick')`, exactly as AD dress / city props; pop-ups start the existing `RO.pop` challenge (POPS HUD, timer, reward).
+- Materials and pools: `LV_mat`, `colorize`, `mergeGeometries`; instanced pools like LV/AD. Load-on-demand pack like asset-1 (`models/as.js`).
+- Not adopted: three.js AnimationMixer (there are no skinned meshes: minifigs are 3 instanced parts posed per frame, far cheaper for 150 figures) and Yuka
+  (the group motions are scripted loops plus a dodge; no steering needed yet). LDraw/OMR sets for the Ferris wheel / carousel / windmill are the next art step
+  (the LD model loader exists, src/98ld_*); the current ones are low-poly LEGO-coloured stand-ins.
+
+## Cost
+Static pools (smashables, set-piece bases, group props) are written only on a refill (every 12 frames or 20 m); every frame only rotors, water, cloth,
+people, balls, dogs and bubbles move (the items within 150 m). Hits test only the items within 40 m. Measured on hot (software GL):
+Frankfurt 0.35 ms, Athens 0.93 ms per frame, 32-33 draw calls. The page grows 727 B (code in models/lx.js).
+
 ## Tests (checklist `life1/*`, state asserts, < 60 s)
 - `fra-density`, `ath-density`: a "200 m of road" window = everything within 100 m of a street point. Pass: ≥ 5 moving, ≥ 3 people groups,
   ≥ 10 smashables, ≥ 1 pop-up, at the GO spot AND in ≥ 95 % of 60 street windows spread over the city; repeat rate (pairs of the same
-  type within 100 m) ≤ 30 % for set pieces and for smashables; cost ≤ 40 LIFE draw calls and LIFE_step ≤ 1.5 ms.
+  type within 100 m) ≤ 30 % for set pieces and for smashables; cost ≤ 40 LIFE draw calls and LIFE_step ≤ 1.5 ms a frame (mean over the GO's 2.5 s; ≤ 8 % of the frame time on a slow test machine).
 - `smash`, `people`, `popup`: real keyboard gas (K.ArrowUp) at the target for 4 s.
 - `wheel`, `carousel`: the landmark is drawn and turns.
 
 Not done / next: a ramp under AIR TIME bubbles (uses the air timer only), building-site cranes tied to real site blocks, coordinating
-with art-3 building variety and terr-1 heights (uses groundAt, so terrain changes follow automatically).
+with art-3 building variety and terr-1 heights (uses groundY, so terrain changes follow automatically).

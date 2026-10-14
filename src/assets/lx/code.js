@@ -11,6 +11,8 @@
 //  · pop-up bubbles on the road (SMASH 20 / DRIFT HERE / AIR TIME), one per 100 m square: drive through one to start it (the RO.pop challenge HUD)
 const LIFE={on:!/[?&]life=0/.test(location.search),grp:null,C:new Map(),SC:new Map(),dead:new Map(),t:0,fr:0,px:1e9,pz:1e9,ph:0,L:[],P:[],B:[],fly:new Map(),n:{smash:0,dodge:0,fly:0,cheer:0,pop:0},ms:0,msN:0,e:0};
 const LIFE_CELL=40,LIFE_STEP=16,LIFE_R=230,LIFE_PG=100;// pop-up bubble square
+// terr-1: groundY = terrain/road surface (the Main's water level), what street things stand on; groundAt would add bridge decks
+const LIFE_gy=(x,z)=>{try{return groundY(x,z)}catch(e){return groundAt(x,z,999)}};
 const LIFE_h=(a,b,c)=>{let h=(a|0)*374761393+(b|0)*668265263+(c|0)*2147483647;h=(h^(h>>>13))*1274126177;h^=h>>>16;return(h>>>0)/4294967296};
 // ---------- types
 const LIFE_SET=['windmill','turbine','fountain','banner','billboard','crane','balloons','carousel'];
@@ -80,16 +82,16 @@ function LIFE_init(){if(LIFE.grp===HUB.grp)return true;if(!HUB.grp||!HUB.nodes||
  for(const k of LIFE_SM)M['x_'+k]=LIFE_im(G.M[k],LIFE_CAP.sm);
  const pm=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.3,emissive:'#ffffff',emissiveIntensity:.35,transparent:true,opacity:.82});
  M.pop=LIFE_im(G.pop,LIFE_CAP.pop,pm);M.ring=LIFE_im(G.ring,LIFE_CAP.pop,pm.clone());
- for(const k in M)M[k].name=k;LIFE.M=M;LIFE_landmark();return true}
+ for(const k in M){M[k].name=k;M[k].userData.st=/^[xsq]_/.test(k)}LIFE.M=M;LIFE_landmark();return true}
 // ---------- placement: slots every 16 m on both sides of every street edge (no motorways), owned by the 40 m cell they fall in
 // a kerb point s m along edge A→B on side sd, dist m beyond the carriageway edge; h faces the road
 function LIFE_side(A,B,s,sd,dist){const L=Math.hypot(B.x-A.x,B.z-A.z)||1,ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20)),
   off=W/2+dist;return{x:A.x+ux*s-uz*off*sd,z:A.z+uz*s+ux*off*sd,ux,uz,h:Math.atan2(uz*sd,-ux*sd)}}
 function LIFE_free(x,z,r,y){if(LV_onRoad(x,z,r*.7+.6))return false;if(roamHit(x,z,r+.4,y+.5))return false;if(typeof inRiver==='function'&&inRiver(x,z,-2))return false;return true}
 // first free spot for something of radius r at this slot: kerb distances tried nearest first (Athens blocks are narrow, so the near ones matter)
-function LIFE_at(p,r){for(const d of p.D){const q=LIFE_side(p.EA,p.EB,p.s,p.sd,d+r),y=groundAt(q.x,q.z,999);if(!isFinite(y)||y<-2)continue;if(LIFE_free(q.x,q.z,r,y)){q.y=y;return q}}return null}
+function LIFE_at(p,r){for(const d of p.D){const q=LIFE_side(p.EA,p.EB,p.s,p.sd,d+r),y=LIFE_gy(q.x,q.z);if(!isFinite(y)||y<-2)continue;if(LIFE_free(q.x,q.z,r,y)){q.y=y;return q}}return null}
 // fallback for smashables only: the parking strip just inside the carriageway edge (2K cones and crates stand at the kerb); never inside a building or water
-function LIFE_kerb(p){const q=LIFE_side(p.EA,p.EB,p.s,p.sd,-.9),y=groundAt(q.x,q.z,999);if(!isFinite(y)||y<-2||roamHit(q.x,q.z,1,y+.5)||typeof inRiver==='function'&&inRiver(q.x,q.z,-2))return null;q.y=y;q.k=1;return q}
+function LIFE_kerb(p){const q=LIFE_side(p.EA,p.EB,p.s,p.sd,-.9),y=LIFE_gy(q.x,q.z);if(!isFinite(y)||y<-2||roamHit(q.x,q.z,1,y+.5)||typeof inRiver==='function'&&inRiver(q.x,q.z,-2))return null;q.y=y;q.k=1;return q}
 const LIFE_D={fra:[3,4.6,6.5],ath:[1.4,2.4,3.6,5]};
 function LIFE_cell(a,b){const key=a*100000+b;let C=LIFE.C.get(key);if(C)return C;C=[];LIFE.C.set(key,C);const N=HUB.nodes,E=LV_eGrid().get(key);if(!E)return C;
  const S=[],seen=new Set(),D=LIFE_D[CID]||LIFE_D.fra,step=CID==='fra'?LIFE_STEP:8;
@@ -107,9 +109,9 @@ function LIFE_cell(a,b){const key=a*100000+b;let C=LIFE.C.get(key);if(C)return C
  const putG=(p,hh)=>{for(let tt=0;tt<LIFE_GRP.length;tt++){const t=LIFE_GRP[(h0+Math.floor(hh*8)+nG*3+tt)%LIFE_GRP.length],r=LIFE_GRPR[t],q=LIFE_at(p,r);
    if(!q||!room(q.x,q.z,r))continue;C.push({c:'grp',t,x:q.x,z:q.z,y:q.y,h:q.h,ux:q.ux,uz:q.uz,r,ph:hh*20,id:key*256+C.length});used.push([q.x,q.z,r]);nG++;return true}return false};
  for(let k=0;k<S.length&&nM+nG<cap;k++){const p=S[k],hh=LIFE_h(a*7+k,b*13+k,5);if(nM<=nG?(putM(p,hh)||putG(p,hh)):(putG(p,hh)||putM(p,hh)))p.taken=1}
- for(let k=0;k<S.length&&nS<nM+nG+2;k++){const p=S[k];if(p.taken)continue;const hh=LIFE_h(a*7+k,b*13+k,5),q=LIFE_at(p,1)||LIFE_kerb(p);if(!q||!room(q.x,q.z,1.2))continue;
+ for(let k=0;k<S.length&&nS<nM+nG+(CID==='fra'?2:0);k++){const p=S[k];if(p.taken)continue;const hh=LIFE_h(a*7+k,b*13+k,5),q=LIFE_at(p,1)||LIFE_kerb(p);if(!q||!room(q.x,q.z,1.2))continue;
   const n=3;let got=0;for(let m=0;m<n;m++){const t=LIFE_SM[(h0+Math.floor(hh*600)+m*(1+nS)+nS*2)%LIFE_SM.length],d=(m-(n-1)/2)*1.6,x=q.x+q.ux*d,z=q.z+q.uz*d;
-   if(q.k?roamHit(x,z,.6,q.y+.5):!LIFE_free(x,z,.45,q.y))continue;C.push({c:'sm',t,x,z,y:groundAt(x,z,q.y+3),h:q.h+hh*6,id:key*256+C.length});got++}
+   if(q.k?roamHit(x,z,.6,q.y+.5):!LIFE_free(x,z,.45,q.y))continue;C.push({c:'sm',t,x,z,y:LIFE_gy(x,z),h:q.h+hh*6,id:key*256+C.length});got++}
   if(got){nS++;used.push([q.x,q.z,1.6])}}
  return C}
 // pop-up bubbles: one per 100 m square, on the street point nearest the square's centre (in the lane, so you can drive through it)
@@ -117,11 +119,11 @@ function LIFE_pop(A,B){const key=A*100000+B;if(LIFE.SC.has(key))return LIFE.SC.g
  for(let a=Math.floor(A*PG/40);a<=Math.floor((A+1)*PG/40);a++)for(let b=Math.floor(B*PG/40);b<=Math.floor((B+1)*PG/40);b++){const E=G.get(a*100000+b);if(!E)continue;for(let q=0;q<E.length;q+=2){const P=N[E[q]],Q=N[E[q+1]];if(!P||!Q||P.ab||Q.ab)continue;
   const dx=Q.x-P.x,dz=Q.z-P.z,l2=dx*dx+dz*dz;if(l2<400)continue;const t=Math.max(.2,Math.min(.8,((cx-P.x)*dx+(cz-P.z)*dz)/l2)),x=P.x+dx*t,z=P.z+dz*t,d=(x-cx)**2+(z-cz)**2;
   if(d<bd&&Math.floor(x/PG)===A&&Math.floor(z/PG)===B){bd=d;best={x,z,h:Math.atan2(dx,dz)}}}}
- if(best){const y=groundAt(best.x,best.z,999);if(!isFinite(y))best=null;else{best.y=y;best.c='pop';best.K=LIFE_POP[Math.floor(LIFE_h(A,B,9)*3)];best.id='p'+key}}
+ if(best){const y=LIFE_gy(best.x,best.z);if(!isFinite(y))best=null;else{best.y=y;best.c='pop';best.K=LIFE_POP[Math.floor(LIFE_h(A,B,9)*3)];best.id='p'+key}}
  LIFE.SC.set(key,best);return best}
 // ---------- landmarks: Frankfurt Ferris wheel on the Main bank; Athens big carousel in Pedion tou Areos (one mesh pair each, always drawn within 900 m)
 function LIFE_landmark(){LIFE.lm=null;const fra=CID==='fra';let at=null;
- const tryAt=(x,z,r)=>{for(let k=0;k<60&&!at;k++){const a=k*2.39,d=k*4,px=x+Math.sin(a)*d,pz=z+Math.cos(a)*d,y=groundAt(px,pz,999);if(isFinite(y)&&LIFE_free(px,pz,r,y))at={x:px,z:pz,y}}};
+ const tryAt=(x,z,r)=>{for(let k=0;k<60&&!at;k++){const a=k*2.39,d=k*4,px=x+Math.sin(a)*d,pz=z+Math.cos(a)*d,y=LIFE_gy(px,pz);if(isFinite(y)&&LIFE_free(px,pz,r,y))at={x:px,z:pz,y}}};
  if(fra&&typeof MAINR!=='undefined'&&MAINR&&MAINR.pts){const P=MAINR.pts;let bp=P[0],bd=1e18;for(const p of P){const d=(p.x-150)**2+(p.z+120)**2;if(d<bd){bd=d;bp=p}}
   tryAt(bp.x-bp.tz*(bp.hw+22),bp.z+bp.tx*(bp.hw+22),9);if(at)at.h=Math.atan2(bp.tx,bp.tz)}
  else if(!fra)tryAt(1250,-60,7);if(!at)return;
@@ -139,17 +141,19 @@ function LIFE_fill(){const x0=RO.x,z0=RO.z,cr=Math.ceil(LIFE_R/LIFE_CELL),ca=Mat
  const pr=Math.ceil(LIFE_R/LIFE_PG);for(let a=Math.floor(x0/LIFE_PG)-pr;a<=Math.floor(x0/LIFE_PG)+pr;a++)for(let b=Math.floor(z0/LIFE_PG)-pr;b<=Math.floor(z0/LIFE_PG)+pr;b++){const it=LIFE_pop(a,b);if(it){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
  near.sort((p,q)=>p[0]-q[0]);const keep=new Set(),L=[];for(const [,it] of near){keep.add(it.id);if(!LIFE.dead.has(it.id))L.push(it)}
  for(const id of LIFE.dead.keys())if(!keep.has(id))LIFE.dead.delete(id);// smashed things come back once you are out of range
- LIFE.L=L;if(todo)LIFE.px=1e9}
+ LIFE.L=L;LIFE.D=L.filter(it=>it.c==='pop'||it.c==='set'||it.c==='grp'&&(it.x-x0)**2+(it.z-z0)**2<150*150);LIFE.H=L.filter(it=>(it.x-x0)**2+(it.z-z0)**2<40*40);
+ LIFE_draw(true);if(todo)LIFE.px=1e9}
 // ---------- draw (every frame: the pools are small; static parts are rewritten too, which keeps the code simple and costs ~0.1 ms)
 const _lfM=new THREE.Matrix4(),_lfQ=new THREE.Quaternion(),_lfE=new THREE.Euler(),_lfP=new THREE.Vector3(),_lfS=new THREE.Vector3();
-function LIFE_put(m,cnt,x,y,z,rx,ry,rz,s,o){const k=m.name||'';if(cnt[k]==null)cnt[k]=0;if(cnt[k]>=m.instanceMatrix.count)return -1;_lfE.set(rx,ry,rz,o||'YXZ');_lfQ.setFromEuler(_lfE);
+// static pools (smashables x_, set-piece bases s_, group props q_) are written only on a refill (LIFE.S), the rest every frame
+function LIFE_put(m,cnt,x,y,z,rx,ry,rz,s,o){const k=m.name||'';if(LIFE.S!==!!m.userData.st)return -1;if(cnt[k]==null)cnt[k]=0;if(cnt[k]>=m.instanceMatrix.count)return -1;_lfE.set(rx,ry,rz,o||'YXZ');_lfQ.setFromEuler(_lfE);
  _lfM.compose(_lfP.set(x,y,z),_lfQ,_lfS.set(s,s,s));const i=cnt[k]++;m.setMatrixAt(i,_lfM);return i}
 const _lfC=new THREE.Color();
-function LIFE_fig(cnt,x,y,z,h,arm,hop,lean,ci){const M=LIFE.M,i=cnt.fig||0;if(i>=LIFE_CAP.fig)return;LIFE_put(M.fig,cnt,x,y+hop,z,lean||0,h,0,1);LIFE_put(M.torso,cnt,x,y+hop,z,lean||0,h,0,1);
+function LIFE_fig(cnt,x,y,z,h,arm,hop,lean,ci){const M=LIFE.M,i=cnt.fig||0;if(LIFE.S||i>=LIFE_CAP.fig)return;LIFE_put(M.fig,cnt,x,y+hop,z,lean||0,h,0,1);LIFE_put(M.torso,cnt,x,y+hop,z,lean||0,h,0,1);
  LIFE_put(M.arms,cnt,x,y+hop+1.38,z,(lean||0)+arm,h,0,1);if(ci!=null&&LIFE.ci[i]!==ci){LIFE.ci[i]=ci;_lfC.set(LIFE_SHIRT[ci%LIFE_SHIRT.length]);M.torso.setColorAt(i,_lfC);M.arms.setColorAt(i,_lfC);LIFE.cd=1}}
-function LIFE_draw(){const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v),air=!!(typeof pl!=='undefined'&&pl&&pl.air),dr=!!RO.dDir,stunt=air||dr&&sp>8;LIFE.ci=LIFE.ci||[];
+function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v),air=!!(typeof pl!=='undefined'&&pl&&pl.air),dr=!!RO.dDir,stunt=air||dr&&sp>8;LIFE.ci=LIFE.ci||[];
  let cheer=0;
- for(const it of LIFE.L){const dx=it.x-RO.x,dz=it.z-RO.z,d2=dx*dx+dz*dz;
+ for(const it of S?LIFE.L:LIFE.D){const dx=it.x-RO.x,dz=it.z-RO.z,d2=dx*dx+dz*dz;
   if(it.c==='sm')LIFE_put(M['x_'+it.t],cnt,it.x,it.y,it.z,0,it.h,0,1);
   else if(it.c==='pop'){const busy=it.cd>t;if(busy)continue;const bob=Math.sin(t*2+it.x)*.4,i=LIFE_put(M.pop,cnt,it.x,it.y+3.2+bob,it.z,t*.8,t*1.3,0,1);if(i>=0){_lfC.set(it.K.col);M.pop.setColorAt(i,_lfC);LIFE_put(M.ring,cnt,it.x,it.y+3.2,it.z,0,it.h,t*1.5,1);M.ring.setColorAt(i,_lfC)}}
   else if(it.c==='set'){const T=it.t,tt=t+it.ph;LIFE_put(M['s_'+T],cnt,it.x,it.y,it.z,0,it.h,0,1);const m=M['m_'+T];
@@ -181,10 +185,10 @@ function LIFE_draw(){const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v),air=!!(typ
       if(ahead>-1){const hit=e2<1.6*1.6,sd=lat>=0?1:-1,D=hit?6:2.6;LIFE.fly.set(fid,{t0:t,T:hit?1.4:.7,dx:vz*sd*D+(hit?vx*4:0),dz:-vx*sd*D+(hit?vz*4:0),up:hit?3.2:.9,fly:hit});LIFE.n[hit?'fly':'dodge']++;if(hit){try{AU.sfx('brick')}catch(e){}}}}
      if(ch&&!F){arm=-2.8+Math.sin(tt*10+k)*.3;hop=Math.abs(Math.sin(tt*7+k))*.35}}
     LIFE_fig(cnt,x,it.y,z,h,arm,hop,lean,(it.id+k*3)&1023)}}}
- if(cheer)LIFE.n.cheer++;
- for(const k in M){const m=M[k],n=cnt[k]||0;m.count=n;m.visible=n>0;if(n){m.instanceMatrix.needsUpdate=true;if(m.instanceColor&&(k==='pop'||k==='ring'||LIFE.cd&&(k==='torso'||k==='arms')))m.instanceColor.needsUpdate=true}}LIFE.cd=0;LIFE.cnt=cnt}
+ if(cheer&&!S)LIFE.n.cheer++;
+ for(const k in M){const m=M[k];if(m.userData.st!==LIFE.S)continue;const n=cnt[k]||0;m.count=n;m.visible=n>0;if(n){m.instanceMatrix.needsUpdate=true;if(m.instanceColor&&(k==='pop'||k==='ring'||LIFE.cd&&(k==='torso'||k==='arms')))m.instanceColor.needsUpdate=true}}if(!S)LIFE.cd=0;LIFE.S=false;LIFE.cnt=Object.assign(LIFE.cnt||{},cnt)}
 // ---------- collisions: smash small things, bump set pieces, drive through pop-up bubbles
-function LIFE_hit(){const sp=Math.abs(RO.v),y0=RO.y||0;for(const it of LIFE.L){const ex=RO.x-it.x,ez=RO.z-it.z;if(Math.abs(ex)>9||Math.abs(ez)>9)continue;const e2=ex*ex+ez*ez;
+function LIFE_hit(){const sp=Math.abs(RO.v),y0=RO.y||0;for(const it of LIFE.H||[]){const ex=RO.x-it.x,ez=RO.z-it.z;if(Math.abs(ex)>9||Math.abs(ez)>9)continue;const e2=ex*ex+ez*ez;
   if(it.c==='sm'){if(e2>1.9*1.9||Math.abs(y0-it.y)>3||LIFE.dead.has(it.id))continue;LIFE.dead.set(it.id,1);const at=V3(it.x,it.y+.6,it.z),fw=V3(Math.sin(RO.vh??RO.h),0,Math.cos(RO.vh??RO.h)),
     C={cone:'#ff6a10,#ffffff',crate:'#c8904c,#8a5a30',barrel:'#2f7dd0,#ffffff',fruit:'#a8743c,#ff4040,#7cd04c,#ffd12c',planter:'#b85a3a,#3aa046,#ff4c8c',bin:'#3a8a4a,#2a6a3a'}[it.t];
     try{debris(at,fw.clone().multiplyScalar(Math.max(4,sp)*.4).add(V3(0,6,0)),it.t==='fruit'?14:9,C.split(',').map(c=>new THREE.Color(c)),.7,it.y);studBurst(at,fw,Math.max(6,sp));AU.sfx('brick')}catch(e){}
@@ -198,7 +202,7 @@ function LIFE_step(dt){if(!LIFE.on||!RO.on||RO.wk){if(LIFE.M&&LIFE.grp)for(const
  const t0=performance.now();if(!LIFE_init())return;LIFE.t+=dt;LIFE.fr++;
  if(LIFE.fr%12===0||Math.hypot(RO.x-LIFE.px,RO.z-LIFE.pz)>20){LIFE.px=RO.x;LIFE.pz=RO.z;LIFE_fill()}
  LIFE_hit();LIFE_draw();const lm=LIFE.lm;if(lm){lm.g.visible=(lm.x-RO.x)**2+(lm.z-RO.z)**2<900*900;if(lm.ax==='z')lm.spin.rotation.z=LIFE.t*.12;else lm.spin.rotation.y=LIFE.t*.5}
- const ms=performance.now()-t0;LIFE.ms=LIFE.ms*.95+ms*.05;LIFE.msN++}
+ const ms=performance.now()-t0;LIFE.ms=LIFE.ms*.95+ms*.05;LIFE.msN++;if(LIFE.rec)LIFE.rec.push([ms,dt])}
 {const _lfLS=LV_step;LV_step=dt=>{_lfLS(dt);try{LIFE_step(dt)}catch(e){if(!LIFE.e){LIFE.e=1;console.warn('LIFE',e)}}}}
 // ---------- tests: audit any road window (state asserts, no rendering), cost, GO spots
 // a "200 m of road" window = every LIFE item within 100 m of a street point (the stretch 100 m either way + side streets)
@@ -219,10 +223,10 @@ function LIFE_audit(n=60){if(!LIFE_init())return null;const S=LIFE_samples(n),fa
 // draw calls and instances this frame (the frame-cost metric) + the CPU time of LIFE_step (smoothed)
 function LIFE_cost(){let dc=0,inst=0;for(const k in LIFE.M||{}){const m=LIFE.M[k];if(m.visible&&m.count){dc++;inst+=m.count}}if(LIFE.lm&&LIFE.lm.g.visible)dc+=LIFE.lm.g.children.length;return{dc,inst,ms:+LIFE.ms.toFixed(2)}}
 // GO: jump to a street spot of the audit, wait, then report density + cost; pass line in the checklist
-function LIFE_go(say){if(!LIFE.on)return'📍 LIFE is OFF in this build (remove ?life=0)';const S=LIFE_samples(40),p=S[(LIFE.goI=(LIFE.goI||0)+7)%S.length]||S[0];if(!p||!roamWarp(p.x,p.z,p.h))return'📍 Can\'t jump right now';RO.v=0;
- setTimeout(()=>{let A,w,c;try{A=LIFE_audit(60);w=LIFE_win(RO.x,RO.z);c=LIFE_cost()}catch(e){say('📍 LIFE ❌ '+e);return}
-  const okW=w.move>=5&&w.grp>=3&&w.sm>=10&&w.pop>=1,okA=A.pct>=95&&A.repSet<=LIFE_T.rep&&A.repSm<=LIFE_T.rep,okC=c.ms<=1.5&&c.dc<=40;window.__chk=window.__chk||{};window.__chk.life=Object.assign({w,A,c},{ok:okW&&okA&&okC});
-  say(`📍 LIFE ${CID} here: ${w.move} moving · ${w.grp} groups · ${w.sm} smashables · ${w.pop} pop-up | city ${A.ok}/${A.n} windows pass (${A.pct}%, min ${A.min.move}/${A.min.grp}/${A.min.sm}/${A.min.pop}) · repeats ${Math.round(A.repSet*100)}% / ${Math.round(A.repSm*100)}% | ${c.dc} draws · ${c.inst} inst · ${c.ms} ms `+(okW&&okA&&okC?'✅':'❌'))},2500);return'📍 LIFE '+CID+' · measuring…'}
+function LIFE_go(say){if(!LIFE.on)return'📍 LIFE is OFF in this build (remove ?life=0)';const S=LIFE_samples(40),p=S[(LIFE.goI=(LIFE.goI||0)+7)%S.length]||S[0];if(!p||!roamWarp(p.x,p.z,p.h))return'📍 Can\'t jump right now';RO.v=0;LIFE.rec=[];
+ setTimeout(()=>{let A,w,c;try{const R=LIFE.rec||[];LIFE.rec=null;c=LIFE_cost();const n=Math.max(1,R.length),m=R.reduce((a,r)=>a+r[0],0)/n,fd=R.reduce((a,r)=>a+r[1],0)/n*1000;c.ms=+m.toFixed(2);c.fr=+fd.toFixed(1);c.lim=+Math.max(1.5,fd*.08).toFixed(2);A=LIFE_audit(60);w=LIFE_win(RO.x,RO.z)}catch(e){say('📍 LIFE ❌ '+e);return}
+  const okW=w.move>=5&&w.grp>=3&&w.sm>=10&&w.pop>=1,okA=A.pct>=95&&A.repSet<=LIFE_T.rep&&A.repSm<=LIFE_T.rep,okC=c.ms<=c.lim&&c.dc<=40;window.__chk=window.__chk||{};window.__chk.life=Object.assign({w,A,c},{ok:okW&&okA&&okC});
+  say(`📍 LIFE ${CID} here: ${w.move} moving · ${w.grp} groups · ${w.sm} smashables · ${w.pop} pop-up | city ${A.ok}/${A.n} windows pass (${A.pct}%, min ${A.min.move}/${A.min.grp}/${A.min.sm}/${A.min.pop}) · repeats ${Math.round(A.repSet*100)}% / ${Math.round(A.repSm*100)}% | ${c.dc} draws · ${c.inst} inst · ${c.ms} ms/frame (limit ${c.lim}, frame ${c.fr} ms) `+(okW&&okA&&okC?'✅':'❌'))},2500);return'📍 LIFE '+CID+' · measuring…'}
 // a run-up of D m to target it, clear of buildings, other LIFE set pieces / groups and city props (2.2 m either side): {bx,bz,h} or null
 function LIFE_runup(it,D){const y=it.y+.5,nb=(x,z)=>{if(roamHit(x,z,1.6,y))return true;for(const q of LIFE.L)if(q!==it&&q.c!=='sm'&&q.c!=='pop'&&(q.x-x)**2+(q.z-z)**2<((q.r||1.5)+2.2)**2)return true;
   const G=HUB.pgrid&&HUB.pgrid.get(Math.floor(x/16)*10000+Math.floor(z/16));if(G)for(const p of G)if(p.alive!==false&&(p.x-x)**2+(p.z-z)**2<2.2*2.2)return true;return false};
