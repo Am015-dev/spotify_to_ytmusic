@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.39',date:'14 Oct 2026',items:[{t:'FIXED',s:'Camera re-fits when you switch vehicle; respawn on divided roads uses the right-hand lane; on-foot spawns avoid walls.'}]},
   {v:'v90m-beta.38',date:'14 Oct 2026',items:[{t:'FIXED',s:'Fewer props on roads; parked tyres sit exactly on the ground; NPC lanes stay clear.'}]},
   {v:'v90m-beta.37',date:'14 Oct 2026',items:[{t:'FIXED',s:'Parked cars no longer sink into the ground; sitting on benches fits the seat.'}]},
   {v:'v90m-beta.36',date:'14 Oct 2026',items:[{t:'CHANGED',s:'Two-level city race track has its own layout: downtown ring, viaduct over the lake, kicker shortcut.'}]},
