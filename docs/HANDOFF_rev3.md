@@ -7,3 +7,13 @@ Queue from rev-2 done. All pushed to alex/od-int2.
 4. Sweep of the newest build (HEAD after 44289ac): rv14/ 22 runs OK, rv15/ 16 runs OK, matrix --quick 2699 cases.
 Still open in --quick (not mine, owners): wheel_gap fra @-2161,1499 / -1921,149 ride t_v7612_1 phone (asset/terr); footsurf-B-penetrates-rides ath (art-6); hud_over_figure #roamPlate desktop @-5293,6438 t_v7612_1 (flaky, 1 case).
 Tip: matrix reads the QA kit from out/hot/models/qa.js: after editing src/assets/qa/code.js run `bash tools/qa/pack.sh out/hot`.
+
+## Later work (same session, all pushed)
+- Timing: rv-cam-refit 6-10 s, rv15/rv-stuck-* 1-3 s (wait on state). footsurf ticks the world until traffic exists. #roamPlate bottom:auto (was a 586 px dark column on desktop).
+- 🐞 BUG button (src/assets/qa/code.js, topBtn): 44 px on the HUD top bar, sheet with note + SEND -> claude.use('db').collection('bugs').add(record) (clipboard fallback). GOs rv16/bug-button, rv16/bug-typing. Keys typed in #qaNote are blocked from the game by an early capture guard in src/02_data_json.html (before the module script). My reports list: orderBy('at','desc').limit(10).onSnapshot, status Fixed in <fixedIn> > Assigned to <owner> > Received.
+- Alex's first report (windturbin): turbines/windmills only >=15 m from buildings (lx/code.js putM), freed GPU arrays return 0 from getX/Y/Z/W (98wb rel + 72 rel), foot camera near 0.4-1.1 m. GOs rv16/turbine-street, freed-array, foot-near.
+## NOT DONE (Alex's correction, dropped on the stop order)
+- The real windturbin bug is the ANIMATION: the 7747 turbine head/hub orbits the wrong pivot, blades offset from the rotor. Fix: parent the blades to a pivot at the hub bbox centre, spin only it about the rotor axis (src/assets/lx/code.js, LIFE_ldTurb ~line 197, put ~line 253 `LIFE_put(...,tt*2.2,1)`), nacelle static. Same check for windmill, Ferris wheel (3681), carousel (3668). GO: hub centre moves < 2 cm over 3 s while the blade tips move.
+- Athens grass lot (1724,131): simplify-1 owns it.
+- Open matrix fail: wheel_gap ride t_v7612_1 phone (asset/terr).
+- Sweep: rv14 22/22, rv15 16/16, rv16 10/10, matrix --quick only wheel_gap. Sweep wake-ups cancelled.
