@@ -10,7 +10,7 @@ let msgTimer=0;function say(a,b,t=1){const m=$('#msg'),sb=$('#sub'),rm=state==='
 let stIndEl=null;function drawStInd(v){stIndEl=stIndEl||document.querySelector('#stInd i');if(stIndEl)stIndEl.style.transform=`translateX(${(v*55).toFixed(1)}px)`}
 function buzz(ms){try{if(TOUCH.used&&navigator.vibrate)navigator.vibrate(ms)}catch(e){}}
 function flashHud(){buzz(35);const f=$('#flash');f.style.opacity=1;hitFx=1;setTimeout(()=>f.style.opacity=0,160)}
-const feedEl=$('#feed');function feed(label,pts,col){const d=document.createElement('div');d.style.color=col;d.innerHTML=label+(pts?`<small>+${pts}</small>`:'');feedEl.prepend(d);const mx=innerHeight<520?2:4;while(feedEl.children.length>mx)feedEl.lastChild.remove();setTimeout(()=>d.remove(),innerHeight<520?1400:2000)}
+const feedEl=$('#feed');function feed(label,pts,col){const f0=feedEl.firstChild;if(f0&&f0._l===label&&performance.now()-f0._t<1500)return;const d=document.createElement('div');d._l=label;d._t=performance.now();d.style.color=col;d.innerHTML=label+(pts?`<small>+${pts}</small>`:'');feedEl.prepend(d);const mx=innerHeight<520?2:4;while(feedEl.children.length>mx)feedEl.lastChild.remove();setTimeout(()=>d.remove(),innerHeight<520?1400:2000)}
 function feedClear(){feedEl.innerHTML=''}
 $('#boostCells').innerHTML='<i></i>'.repeat(10);$('#hullCells').innerHTML='<i></i>'.repeat(8);
 const hudEl={pos:$('#pos'),lap:$('#lap'),tLap:$('#tLap'),tBest:$('#tBest'),tRace:$('#tRace'),tGhost:$('#tGhost'),spd:$('#spd'),bar:$('#spdbar i'),chip:$('#itemChip'),sec:$('#sector'),obj:$('#obj'),bc:$('#boostCells'),hc:$('#hullCells')};let lastHud={};

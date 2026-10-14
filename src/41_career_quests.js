@@ -18,13 +18,14 @@ const OTG=[{id:'cp1',kind:'checkpoint',name:'Checkpoint Rush',d:'Fly through 6 h
  {id:'tk1',kind:'chase',name:'Takedown: Getaway Van',d:'Ram the getaway van 3 times before it escapes.'},{id:'tk2',kind:'chase',name:"Takedown: Kaiser's Courier",d:"Kaiser's courier is carrying stolen studs. Ram it 3 times."}];
 const OTG_GOAL={checkpoint:[22,27,34],longjump:[140,100,65],smash:[24,30,38],drift:[900,600,300],speed:[440,380,320],collect:[28,38,50],chase:[20,32,45]},OTG_HI={longjump:1,drift:1,speed:1},OTG_U={longjump:' m',drift:' pts',speed:' km/h',deliver:' crates'};
 // ---------- Side quests: characters around Mainhattan with their own little jobs (2K-style quests)
+const QV_RAMS=4;
 const QUESTS=[
  {id:'q_cider',kind:'deliver',npc:'Frau Schmitt',em:'🍎',col:'#36d17a',ch:1,name:'Ebbelwoi Express',
   hi:'Three crates of Ebbelwoi for the Römer festival! Drive <b>gently</b>: every hard bump smashes a crate.',win:'Wonderful! Not a single drop spilled. Well, almost.',lose:'Oh no… the pigeons will be very happy today.'},
  {id:'q_ball',kind:'ball',npc:'Paul (8)',em:'⚽',col:'#ffd12c',ch:1,name:'The Giant Ball',
   hi:'My giant LEGO ball rolled away! Push it back into the <b>goal in the park</b>. Pleeeease?',win:'GOOOAL! You are the best driver EVER!',lose:'It rolled away again… maybe try boosting it?'},
  {id:'q_thief',kind:'chase',npc:'Kommissar Becker',em:'👮',col:'#4ceaff',ch:1,name:'Stop, Thief!',
-  hi:'A thief grabbed the Christmas-market cash box! <b>Ram his van three times</b> before he escapes.',win:'Got him! The Glühwein stall thanks you.',lose:'He got away… Frankfurt traffic, what can you do.'},
+  hi:'Ram the thief’s van <b>'+QV_RAMS+'×</b> before he escapes!',win:'Got him! The Glühwein stall thanks you.',lose:'He got away… Frankfurt traffic, what can you do.'},
  {id:'q_pigeons',kind:'collect',npc:'Opa Klaus',em:'🐦',col:'#c46bff',ch:2,name:'Opa’s Golden Bricks',
   hi:'My golden bricks… don’t ask why… fell out of my bicycle basket. <b>Ten</b> of them. Find them for an old man.',win:'All ten! Now I can finally finish my golden bird house.',lose:'Hmm. I’ll find the rest next week. Or next year.'},
  {id:'q_wedding',kind:'escort',npc:'Lena & Jonas',em:'💍',col:'#ff7ac0',ch:2,name:'Wedding Convoy',
@@ -172,7 +173,7 @@ const QV_LEGS={deliver:[[900,2500,'Deliver the 3 crates to the festival stand in
 const QV_GEN={
   route:c=>{const e=c.e,legs=e.legs||QV_LEGS[e.kind]||QV_LEGS.taxi;let p=c.O;for(const[a,b,tx,ic,fl]of legs){const q=a==='o'?{...c.O,D:districtAt(c.O.x,c.O.z)}:qvPk(c,p,a,b);c.st.push({t:'go',x:q.x,z:q.z,stop:1,txt:tx.replace('{D}',q.D),ic,on:fl,carry:e.kind==='deliver'&&fl==='unload'});p=q}
     if(e.kind==='deliver'){const hv=c.L.tw==='heavy';c.L.load0=hv?4:3;c.L.hi=1;c.L.g=hv?[8,6,3]:[6,4,2];c.L.u=' crates'}if(e.fragile)c.L.fragile=1},
-  chase:c=>{const e=c.e,q=true,H=qvPk(c,c.O,q?1500:1800,q?2600:2800);c.st.push({t:'chase',x:H.x,z:H.z,rams:4,txt:`Ram the van 4× before it reaches its hideout in ${H.D}`,ic:'🚨',x2:25});
+  chase:c=>{const e=c.e,q=true,H=qvPk(c,c.O,q?1500:1800,q?2600:2800);c.st.push({t:'chase',x:H.x,z:H.z,rams:QV_RAMS,txt:`Ram the van ${QV_RAMS}× before it reaches its hideout in ${H.D}`,ic:'🚨',x2:25});
     if(e.grab)c.st.push({t:'go',x:H.x,z:H.z,van:1,stop:1,txt:'Grab the crate from the wrecked van',ic:'📦'});if(q){const S=qvPk(c,H,900,2000);c.st.push({t:'go',x:S.x,z:S.z,stop:1,txt:(e.ret||(e.npc?'Bring the cash box to the police station in {D}':'Return the stolen loot to the police station in {D}')).replace('{D}',S.D),ic:'🚓'})}},
   collect:c=>{let p=c.O;for(let k=0;k<3;k++){const Z=qvPk(c,p,k?600:500,k?1300:1000);c.st.push({t:'collect',x:Z.x,z:Z.z,items:qvAround(c,Z,30,170,4,28),txt:`Find 4 golden bricks in ${Z.D} (${k+1}/3)`,ic:'⭐',x2:16});p=Z}},
   smash:c=>{let p=c.O;for(let k=0;k<3;k++){const Z=qvPk(c,p,k?600:300,k?1200:700);c.st.push({t:'smash',x:Z.x,z:Z.z,items:qvAround(c,Z,8,60,5,9),txt:`Smash 5 brick piles in ${Z.D} (${k+1}/3)`,ic:'🧱',x2:10});p=Z}},
@@ -394,7 +395,7 @@ const QV_ENC=[{id:'e_strand',k:'route',em:'🛻',col:'#ff9a3c',w:3,legs:[[700,15
 // [npc, name, hi, win, lose] per city; unknown cities fall back to 'fra'
 const QV_TX={fra:{e_strand:['Tante Gerda','Stranded!','My old Opel died right here and the mechanic won’t pick up. Fetch him for me?','Thanks! You saved my Sunday.','Oh well, I’ll call the ADAC then.'],
   e_rescue:['Dr. Aylin','Rescue Run','A cyclist fell near the park! Pick up our medic, then the patient, and <b>no hard hits</b> on the way to the hospital.','Stable and smiling. Great driving!','We had to call the helicopter…'],
-  e_police:['Frankfurt Police','Police Chase','A van just robbed a kiosk! <b>Ram it three times</b> before it reaches its hideout, then bring the loot back.','Caught! Frankfurt says thank you.','He vanished into the side streets…'],
+  e_police:['Frankfurt Police','Police Chase','A van just robbed a kiosk! <b>Ram it '+QV_RAMS+' times</b> before it reaches its hideout, then bring the loot back.','Caught! Frankfurt says thank you.','He vanished into the side streets…'],
   e_race:['Mo','Street Race vs Mo','You think you’re fast? Race me through the gates, across town. Loser buys the Ebbelwoi.','Okay, okay, you’re fast.','Pfff. Come back when you can drive.'],e_spree:['Abriss-Andi','Smash Spree','I get paid by the brick! Chain some chaos, crush my giant brick, flatten the old tower.','Beautiful destruction!','Still too much standing.'],
   e_bricks:['Kim the Collector','Brick Hunt','Somebody scattered golden bricks across three districts. Find all twelve!','A full set! You have a good eye.','Some are still out there…'],
   e_smuggle:['Zoll Officer Brandt','Smuggler Crate','Smugglers are moving a hot crate. <b>Wreck their van</b>, grab the crate and bring it to customs.','Contraband secured. Nice work.','The smugglers got away.'],
@@ -406,7 +407,7 @@ const QV_TX={fra:{e_strand:['Tante Gerda','Stranded!','My old Opel died right he
   e_taxi:['Taxi Ali','Taxi Shift','My shift, my rules: three fares across town. Stop right next to each customer.','Five stars all round!','They called an Uber…']},
  ath:{e_strand:['Kyr Manolis','Stranded!','My scooter-van died on the hill. Bring the mechanic, then drive me home?','Thank you! You are a hero.','Oh well, I will walk then.'],
   e_rescue:['Dr. Eleni','Rescue Run','A tourist fainted in the heat! Medic first, then the patient, <b>no hard hits</b> to the hospital.','Safe and sound. Bravo!','We had to call another ambulance…'],
-  e_police:['Athens Police','Police Chase','A thief on four wheels! <b>Ram him three times</b> before his hideout, then bring the loot back.','Caught! Athens thanks you.','He disappeared into Plaka…'],
+  e_police:['Athens Police','Police Chase','A thief on four wheels! <b>Ram him '+QV_RAMS+' times</b> before his hideout, then bring the loot back.','Caught! Athens thanks you.','He disappeared into Plaka…'],
   e_race:['Nikos','Street Race vs Nikos','Race me through the gates across Athens. Loser buys the frappé!','Wow! You are fast.','Easy, easy… too slow.'],e_spree:['Demolition Dimitra','Smash Spree','Chain some chaos, crush the giant brick, flatten the old tower!','Yes! Beautiful!','Still standing…'],
   e_bricks:['Kyria Sofia','Brick Hunt','Golden bricks in three neighbourhoods! Find all twelve.','All twelve! Bravo!','Some are still hidden…'],
   e_smuggle:['Customs Officer Petros','Smuggler Crate','Smugglers with a hot crate! <b>Wreck their van</b>, grab the crate, bring it to customs.','Contraband secured.','They got away to Piraeus…'],
