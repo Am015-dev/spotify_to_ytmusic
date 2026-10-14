@@ -23,7 +23,7 @@ function CAM_eval(P,b,h,th,T){const pz=P.z1+CAM.ahead,py=P.g;let clr=1e9,smin=1e
 const CAM_ok=e=>e.clr>=CAM.m&&e.sP>=.42&&e.sP<=.82&&e.fill>=.17&&e.fill<=.33&&e.smax<=.95;
 function CAM_vfov(asp){const a=asp||camera.aspect||1.5,f=TUNE.fov+({narrow:-6,normal:0,wide:8}[SET.fov]||0);return(a<.9?Math.min(100,f*(1+.5*Math.min(1,(.9-a)/.45))):f)*Math.PI/180}
 function CAM_base(n){const k=SC_S&&SC_S.on?BC.D0.cam:1,C=SC_RC0[n];return{b:C.b*k,h:C.h*k,l:C.l*k,ly:C.ly*k,bk:C.bk*k,hk:C.hk*k,lk:C.lk*k}}
-function CAM_solve(P,n,asp){const C0=CAM_base(n),T=Math.tan(CAM_vfov(asp)/2);
+function CAM_solve(P,n,asp,C0x){const C0=C0x||CAM_base(n),T=Math.tan(CAM_vfov(asp)/2);
  const th0=Math.atan2(C0.h-C0.ly,C0.l+C0.b),e0=CAM_eval(P,C0.b,C0.h,th0,T);if(CAM_ok(e0))return Object.assign({keep:1,e:e0},C0);
  // perf (beta.12 "extremely slow": the full 0.25 m × 0.1 m grid = 58k evaluations, every 4 s, 4 modes): coarse 1 m × 0.5 m grid, then a fine pass around the best
  let best=null,bc=1e9;const bMin=Math.max(C0.b*.8,-P.z0+1.5),hMin=Math.max(1.2,C0.h*.8),aim=Math.atan(2*(CAM.sP-.5)*T);CAM.n.ev=0;
@@ -35,8 +35,20 @@ function CAM_solve(P,n,asp){const C0=CAM_base(n),T=Math.tan(CAM_vfov(asp)/2);
 function CAM_fit(){const t0=performance.now(),P=CAM_prof();if(!P)return;CAM.P=P;CAM.asp=camera.aspect;CAM.T={};const n0=SET.rcam||'chase';let kp=0;if(n0!=='high'){const s=CAM_solve(P,n0);CAM.T[n0]=s;kp=s.keep}CAM.ms=performance.now()-t0
  CAM.n.fit++;if(kp)CAM.n.keep++;CAM.log.push([RO.vsel||'',+P.L.toFixed(2),+P.H.toFixed(2),(CAM.T[SET.rcam||'chase']||{}).b,(CAM.T[SET.rcam||'chase']||{}).h]);if(CAM.log.length>20)CAM.log.shift()}
 // when: 30 sim frames after the ride (mesh / form) changes (the first frames still show stock parts), on a big aspect change (rotation) or a camera-mode change; never periodically (perf)
-function CAM_upd(){const ud=pl&&pl.mesh&&pl.mesh.userData;if(!ud||!ud.m||(pl.boatK||0)>.5)return;const key=ud.m.uuid+'|'+(ud.gbM?ud.gbM.length:0)+'|'+(RO.vsel||'')+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:''),now=++CAM.f;
- if(key!==CAM.k){CAM.k=key;CAM.due=now+30;CAM.pend=1;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05){CAM.due=Math.min(CAM.due,now);CAM.pend=1}if(!CAM.T[SET.rcam||'chase']&&(SET.rcam||'chase')!=='high'&&!CAM.pend&&CAM.P){CAM.due=now;CAM.pend=1}if(!CAM.pend||now<CAM.due)return;CAM_fit();CAM.pend=0}
+function CAM_upd(){const ud=pl&&pl.mesh&&pl.mesh.userData;if(!ud||!ud.m||(pl.boatK||0)>.5)return;const key=CAM_rkey(ud)+'|'+(RO.vsel||'')+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:''),now=++CAM.f;
+ if(key!==CAM.k){CAM.k=key;CAM.due=now+(CAM.snap?4:30);CAM.pend=1;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05){CAM.due=Math.min(CAM.due,now);CAM.pend=1}if(!CAM.T[SET.rcam||'chase']&&(SET.rcam||'chase')!=='high'&&!CAM.pend&&CAM.P){CAM.due=now;CAM.pend=1}if(!CAM.pend||now<CAM.due)return;CAM_fit();CAM.pend=0;if(CAM.snap){CAM.snap=0;CAM.cur=null}}
+// ride fingerprint: the player mesh is KEPT across rides (a garage pick rebuilds the gbM brick meshes on it; TAKE / ENTER swap the body children of ud.m), so the old key (mesh uuid + gbM.length)
+// missed same-count swaps: Athens never re-fitted, Frankfurt lagged one ride. Any change of the brick meshes or the body children now re-fits, whichever path changed the ride.
+function CAM_rkey(ud){const m=ud.m,g=ud.gbM,c=m.children,l=c[c.length-1],f=c[0];return m.uuid+'|'+(g?g.length+'.'+(g[0]?g[0].uuid:''):0)+'|'+c.length+'.'+(f?f.uuid:'')+'.'+(l?l.uuid:'')}
+// race camera (state 'race' = updateCam in 30_race3, not roamCam; it had no size fit: a truck put the camera inside it). Same solver with the race stock camera as the base;
+// the ride profile is measured in its own frame (heading = the track tangent). Returns multipliers for the stock back / up / look-ahead.
+function CAM_fwd(s){try{frameAt(TD,s.dist,F2);const l=Math.hypot(F2.t.x,F2.t.z)||1;return[F2.t.x/l,F2.t.z/l]}catch(e){return[0,1]}}
+function CAM_rbase(){const R=CAM.R||(CAM.R={}),tall=camera.aspect<1?1.3:1,cd={close:.85,normal:1,far:1.2}[SET.camd]||1;return R.C0={b:10.5*tall*cd,h:3.4*tall*cd,l:29,ly:1.66,bk:0,hk:0,lk:0}}
+function CAM_rk(s){const one={b:1,h:1,l:1};try{const ud=s&&s.mesh&&s.mesh.userData,host=ud&&ud.m;if(!CAM.on||!host)return one;const R=CAM.R||(CAM.R={}),key=CAM_rkey(ud)+'|'+(camera.aspect||0).toFixed(1)+'|'+SET.camd;
+ if(R.s===s&&R.k===key&&R.v)return R.v;host.updateMatrixWorld(true);const e=host.matrixWorld.elements,fw=CAM_fwd(s),P=CAM_prof(host,{x:e[12],y:e[13],z:e[14],h:Math.atan2(fw[0],fw[1])});if(!P)return one;
+ const sv=CAM_solve(P,'chase',null,CAM_rbase());R.s=s;R.k=key;R.P=P;R.v={b:clamp(sv.b/R.C0.b,.8,6),h:clamp(sv.h/R.C0.h,.8,6),l:clamp(sv.l/R.C0.l,.6,3)};R.n=(R.n||0)+1;return R.v}catch(e){return one}}
+// a garage close = the player just chose a ride: re-fit within a few frames and snap the camera to it (no 3 s crawl)
+gbClose=(f=>function(){const r=f.apply(this,arguments);try{CAM.snap=1;CAM.k=''}catch(e){}return r})(gbClose);
 const CAM_F=['b','h','l','ly','bk','hk','lk'];
 roamCam=(f=>function(dt){if(CAM.on&&state==='roam'&&(!RO.foot||RO.foot==='car')){try{CAM_upd();const n=SET.rcam||'chase',T=CAM.T[n],C=RCAM[n];
   const tn=performance.now(),rd=Math.min(dt,Math.max(0,Math.min(.1,(tn-(CAM.lt||tn))/1000)));CAM.lt=tn;
