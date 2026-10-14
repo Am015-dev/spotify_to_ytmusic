@@ -17,7 +17,7 @@
  {
   "date": "2026-10-14",
   "game": "cauldron-fair",
-  "title": "start screen: one Play button, small options",
+  "title": "start screen: Play plus table size",
   "items": [
    "Menus use one title font and one body font, no overlaps",
    "Icon buttons and buttons keep their content inside the frame art; one instruction line on the board",
