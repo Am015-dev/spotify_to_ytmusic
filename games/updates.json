@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-14",
+  "game": "thornbound",
+  "title": "Menus and board text",
+  "items": [
+   "Nothing covers text on the board or menus"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "sands-of-qamar",
   "title": "Menus tidied",
   "items": [
