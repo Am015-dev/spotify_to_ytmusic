@@ -179,7 +179,7 @@
  {
   "date": "2026-10-14",
   "game": "crown-city-smash",
-  "title": "readable on every screen size",
+  "title": "top bar, panels and dock cleaned up",
   "items": [
    "Buying a card, SMASH, rolling and ending the turn are now tested with real taps; energy chip fixed on small phones",
    "Painted button and dialog frames keep text inside them",
