@@ -2,7 +2,7 @@
  {
   "date": "2026-10-14",
   "game": "lantern-dive",
-  "title": "lantern-dive: readable on every screen size",
+  "title": "lantern-dive: new start screen, readable text, bigger cards on wide screens",
   "items": [
    "Menus use one title font and one body font, no overlaps",
    "Menu, help and tip text clear of frame art"
