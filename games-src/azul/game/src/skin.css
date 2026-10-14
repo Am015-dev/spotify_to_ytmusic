@@ -35,3 +35,23 @@ html.sk-row .gx-row{position:relative;isolation:isolate}
 html.sk-row .gx-row::before{content:'';position:absolute;inset:0 -4px 0 -10px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
 
 html.sk .sg-hero,html.sk.ph .sg-hero{margin:0;border-radius:0}
+
+/* ===== UI bar (14 Oct 2026): inset, text size, menu drawer, start screen ===== */
+.gx-drawer{border-width:18px}
+html.sk .gx-drawer{border-image:url(media/ui-panel-c.webp) 100 fill/18px stretch}
+.gx-drawer-head{padding:10px 16px}.gx-drawer-body{padding:16px}
+.menugrid{display:flex;flex-direction:column;gap:8px}
+.menugrid .gx-ibtn{width:100%;justify-content:flex-start;min-height:48px;gap:10px;padding:8px 16px;font-size:1rem}
+.menugrid .gx-ibtn span{display:inline!important;font-size:1rem}
+.src b{font-size:1rem}.info{font-size:1rem}
+.mbox.start .lede{margin:0;font-size:1.05rem}
+.mbox.start .acts{justify-content:stretch}.mbox.start .acts .btn{flex:1 1 auto;justify-content:center}
+.mbox.start .qrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.mbox.start .qrow>span{font-weight:800;font-size:1rem;min-width:84px}
+.mbox.start .seg button{min-width:56px;min-height:44px;font-size:1rem;text-transform:capitalize}
+.mbox.start details.more{margin-top:2px}.mbox.start summary{cursor:pointer;font-weight:800;font-size:1rem;min-height:44px;display:flex;align-items:center}
+.mbox.start details.more[open]{display:flex;flex-direction:column;gap:10px}
+.mbox .nrow .btn.sm{min-height:44px}
+.gxc-head .gxc-htitle{overflow:visible;padding:2px 0;line-height:1.3}
+#chip{z-index:5}
+@media (min-width:1024px){.mbox,.gx-drawer,.gx-dock{font-size:1rem}.mbox small,.gx-drawer small,.gx-dock small,.small{font-size:1rem}}
+#chip,.gx-dock .info{display:none!important}
