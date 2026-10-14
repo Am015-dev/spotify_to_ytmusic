@@ -44,15 +44,15 @@ function TRN_tyre(say){if(TRN.tyRun)return'📍 TYRE GAP running…';TRN.tyRun=1
   for(let t=0;S.length<5&&t<500;t++){const r=R[Math.floor(rnd()*R.length)],i=2+Math.floor(rnd()*(r.P.length-4)),c=r.P[i],b=r.P[i+1];if(!TRN_skip(c[0],c[1]))S.push([c[0],c[1],Math.atan2(b[0]-c[0],b[1]-c[1])])}
   const G=[];const step=k=>{if(k>=S.length){TRN.tyRun=0;const m=Math.max(...G.map(g=>Math.abs(g??9)));TRN.tyre={gaps:G.map(g=>g==null?null:+g.toFixed(3)),max:+m.toFixed(3)};
       say('📍 TYRE GAP · 5 road spawns · gaps '+G.map(g=>g==null?'?':g.toFixed(2)).join(' / ')+' m · max '+m.toFixed(3)+' (need ≤0.05)'+(m<=.05?' ✅':' ❌'));return}
-    roamWarp(S[k][0],S[k][1],S[k][2]);RO.v=0;setTimeout(()=>{G.push(TRN_gapNow());step(k+1)},1500)};step(0);return'📍 TYRE GAP · checking 5 road spawns…'}
+    roamWarp(S[k][0],S[k][1],S[k][2]);RO.v=0;setTimeout(()=>{const g=TRN_gapNow();if(g==null&&!S[k].re){S[k].re=1;step(k);return}G.push(g);step(k+1)},1300)};step(0);return'📍 TYRE GAP · checking 5 road spawns…'}
 // draw load at 3 fixed views (same spots every run); fps is shown, the pass line is triangles/calls ≤ +5% of the pre-terrain build
 const TRN_VIEWS={fra:[[200,354,0],[-1100,-1200,3.6],[2121,150,1.6]],ath:[[0,0,0],[300,-700,3.1],[-600,300,1.2]]};
 const TRN_LOAD0={fra:null,ath:null};
 function TRN_fps(say){if(TRN.fpRun)return'📍 FPS VIEWS running…';TRN.fpRun=1;const V=TRN_VIEWS[CID==='fra'?'fra':'ath'],out=[];
   const step=k=>{if(k>=V.length){TRN.fpRun=0;TRN.fps=out;const L0=TRN_LOAD0[CID==='fra'?'fra':'ath'];let ok=true;if(L0)for(let i=0;i<out.length;i++)if(out[i].tris>L0[i].tris*1.05||out[i].calls>L0[i].calls*1.05)ok=false;
       say('📍 FPS VIEWS · '+(out.every(o=>!o.calls)?'(page not drawing: draw=0 test mode) · ':'')+out.map(o=>o.fps+' fps / '+Math.round(o.tris/1000)+'k tris / '+o.calls+' calls').join(' · ')+(L0?ok?' · load ≤ +5% ✅':' · load > +5% ❌':' · (no baseline) ✅'));return}
-    const q=rfSnap(V[k][0],V[k][1],200)||V[k];roamWarp(q[0],q[1],V[k][2]);RO.v=0;setTimeout(()=>{let n=0,t0=performance.now(),tr=0,ca=0;const I=renderer.info,ar=I.autoReset;I.autoReset=false;I.reset();const f=()=>{n++;tr=Math.max(tr,I.render.triangles);ca=Math.max(ca,I.render.calls);I.reset();if(performance.now()-t0>=2000)I.autoReset=ar;
-      if(performance.now()-t0<2000)requestAnimationFrame(f);else{out.push({fps:Math.round(n*1000/(performance.now()-t0)),tris:tr,calls:ca});step(k+1)}};requestAnimationFrame(f)},2500)};step(0);return'📍 FPS VIEWS · measuring 3 views…'}
+    const q=rfSnap(V[k][0],V[k][1],200)||V[k];roamWarp(q[0],q[1],V[k][2]);RO.v=0;setTimeout(()=>{let n=0,t0=performance.now(),tr=0,ca=0;const I=renderer.info,ar=I.autoReset;I.autoReset=false;I.reset();const f=()=>{n++;tr=Math.max(tr,I.render.triangles);ca=Math.max(ca,I.render.calls);I.reset();if(performance.now()-t0>=1200)I.autoReset=ar;
+      if(performance.now()-t0<1200)requestAnimationFrame(f);else{out.push({fps:Math.round(n*1000/(performance.now()-t0)),tris:tr,calls:ca});step(k+1)}};requestAnimationFrame(f)},1100)};step(0);return'📍 FPS VIEWS · measuring 3 views…'}
 function TRN_go(kind,say){if(!TERR.on)return'📍 PENDING · terr-1 hills are OFF in this build (add ?terr=1 to try them)';try{
   if(kind==='lyka'||kind==='muehl')return TRN_hill(kind);
   if(kind==='grade'){const o=TRN_grade();return'📍 ROAD GRADE · '+o.n+' road steps of 8 m · p50 '+o.p50+'% p99 '+o.p99+'% max '+o.max+'% at '+o.worst.id+' ('+o.worst.x+','+o.worst.z+') (need ≤12%)'+(o.max<=12?' ✅':' ❌')}

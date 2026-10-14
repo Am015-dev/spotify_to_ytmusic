@@ -54,7 +54,7 @@ function LF_free(x,z,m){if(roamHit(x,z,m)||inRiver(x,z,-m))return false;const q=
 // 98cl_stream frees it when far (STR_lzFree, wrapped below to drop its mounds and grid entries). Only the tiles around the player exist.
 LF.keep=.6;// share of open cells that get a theme (Athens has 2.5× the open ground)
 // my grass mounds: OFF once art-1's terrain relief (TR raster) is merged, so ground height has one owner; ?lfm=0 turns them off now
-LF.mounds=!/[?&]lfm=0\b/.test(location.search);
+LF.mounds=!/[?&]lfm=0\b/.test(location.search)&&!(typeof TERR!=='undefined'&&TERR.on);  // terr-1: off whenever the terrain raster (TERR.on) owns the relief
 function LF_ctx(){if(LF.cx)return LF.cx;const fra=CID==='fra';const VS=new Map();let k=0;const put=(x,z,ux,uz,w)=>{if(x<HX0||x>HX1||z<HZS||z>HZN)return;const key=Math.floor(x/1000)+'|'+Math.floor(z/1000);let A=VS.get(key);if(!A)VS.set(key,A=[]);A.push([x,z,ux,uz,w,k++])};
  for(const S of CITY_S){const Pp=S.pts;if(!Pp||S.r.cls==='hill')continue;let acc=0;for(let i=1;i<Pp.length-1;i++){const p=Pp[i],q=Pp[i-1];acc+=Math.hypot(p.x-q.x,p.z-q.z);if(acc<LF.vs)continue;acc=0;put(p.x,p.z,p.tx,p.tz,S.r.w)}}
  for(const r of hubRoads())for(let d=8;d<r.L-8;d+=LF.vs)put(r.x0+r.ux*d,r.z0+r.uz*d,r.ux,r.uz,r.w);
