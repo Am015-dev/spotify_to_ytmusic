@@ -96,7 +96,7 @@ function AS_assign(L){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=ASSET.ag
   const h=Math.abs(Math.sin(p.x*12.9898+p.z*78.233)*43758.5453)%1;let best=null,bs=1e9;for(const v in pool){const s=((cnt[v]||0)+.5+h*.6)/pool[v];if(s<bs){bs=s;best=v}}
   p.av=best;const k=key(p.x,p.z);let A=G.get(k);if(!A)G.set(k,A=[]);A.push(p);n++}return n}
 // rebalance (local search): a tree takes the variant with the fewest same-variant trees within 45 m, nearer ones weigh more (its pool first, then the city pool)
-function AS_fix(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=ASSET.ag;let sw=0;const all={};for(const b in POOL)if(b!=='bush')Object.assign(all,POOL[b]);
+function AS_fix(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=ASSET.ag;let sw=0;const all={};for(const b in POOL)if(b!=='bush')Object.assign(all,POOL[b]);delete all.palm;
  for(let k=0;k<passes;k++){let ch=0;for(const p of L){if(!p.av||p.t==='bush')continue;const kx=Math.floor(p.x/30),kz=Math.floor(p.z/30),cnt={};
   for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const A=G.get((kx+a)*100000+kz+b);if(A)for(const q of A){if(q===p||q.t==="bush")continue;const d=Math.hypot(q.x-p.x,q.z-p.z);if(d<=60)cnt[q.av]=(cnt[q.av]||0)+(d<30?1.5:1)-d/80}}
   const c0=cnt[p.av]||0;if(!c0)continue;let best=p.av,bc=c0;for(const P of[POOL[p.t],all]){for(const v in P){const c=cnt[v]||0;if(c<bc-1e-6){bc=c;best=v}}if(bc===0)break}if(best!==p.av){p.av=best;ch++}}sw+=ch;if(!ch)break}return sw}
@@ -115,10 +115,12 @@ buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{AS_apply()}catc
 lzPropsG=(f=>function*(L){yield* f.apply(this,arguments);try{const P=HUB.props,n=L.nProps|0,T=P.slice(P.length-n);if(HUB.ptypes)AS_defs(HUB.ptypes);AS_assign(T);AS_fix(T);AS_far(T);ASSET.cx=1e9}catch(e){console.warn('AS lz',e)}})(lzPropsG);
 propRevive=(f=>function(p){f.apply(this,arguments);if(p.av&&p.im&&ASSET.V[p.av]){p.im.setMatrixAt(p.i,AS_farM(p,new THREE.Matrix4()));ASSET.cx=1e9}})(propRevive);
 hubCullStep=(f=>function(){f.apply(this,arguments);try{AS_step()}catch(e){if(!ASSET.err)console.warn('AS step',e);ASSET.err=e}})(hubCullStep);
-// near/mid instanced meshes, one pair per variant, parented to HUB.grp (follows the city's visibility)
-function AS_mk(){const V=ASSET.V;for(const M of[ASSET.nm,ASSET.mm])for(const n in M||{})M[n].parent&&M[n].parent.remove(M[n]);ASSET.mat=ASSET.mat||new THREE.MeshStandardMaterial({vertexColors:true,roughness:.32,metalness:0});ASSET.nm={};ASSET.mm={};
- for(const n in V)for(const[lod,g,M]of[['n',V[n].gn,ASSET.nm],['m',V[n].gm,ASSET.mm]]){const im=new THREE.InstancedMesh(g,ASSET.mat,lod==='n'?256:1024);im.count=0;im.visible=false;im.userData.asLod=lod;im.userData.as=n;im.frustumCulled=true;HUB.grp.add(im);M[n]=im}}
-function AS_step(){if(!HUB.pgrid||!HUB.props||!ASSET.nm||!camera)return;const cp=camera.position;if((ASSET.fr=(ASSET.fr+1)%4)&&Math.hypot(cp.x-ASSET.cx,cp.z-ASSET.cz)<6)return;
+// near/mid instanced meshes, one pair per variant, in their own group next to HUB.grp (visible while HUB.grp is; not in the hubCull list,
+// which snapshots HUB.grp's children and would cull these origin-centred meshes away from the origin)
+function AS_mk(){const V=ASSET.V;if(ASSET.grp&&ASSET.grp.parent)ASSET.grp.parent.remove(ASSET.grp);const gp=ASSET.grp=new THREE.Group(),hg=HUB.grp;gp.name='AS';
+ Object.defineProperty(gp,'visible',{get:()=>hg.visible&&!!hg.parent&&!ASSET.off,set(){}});(hg.parent||scene).add(gp);ASSET.mat=ASSET.mat||new THREE.MeshStandardMaterial({vertexColors:true,roughness:.32,metalness:0});ASSET.nm={};ASSET.mm={};
+ for(const n in V)for(const[lod,g,M]of[['n',V[n].gn,ASSET.nm],['m',V[n].gm,ASSET.mm]]){const im=new THREE.InstancedMesh(g,ASSET.mat,lod==='n'?256:1024);im.count=0;im.visible=false;im.userData.asLod=lod;im.userData.as=n;im.frustumCulled=true;gp.add(im);M[n]=im}}
+function AS_step(){if(ASSET.off||!HUB.pgrid||!HUB.props||!ASSET.nm||!camera)return;const cp=camera.position;if((ASSET.fr=(ASSET.fr+1)%4)&&Math.hypot(cp.x-ASSET.cx,cp.z-ASSET.cz)<6)return;
  if(Math.hypot(cp.x-ASSET.cx,cp.z-ASSET.cz)<1.5&&ASSET.fr)return;ASSET.cx=cp.x;ASSET.cz=cp.z;const t0=performance.now(),R=ASSET.mid,kx=Math.floor(cp.x/16),kz=Math.floor(cp.z/16),kr=Math.ceil(R/16)+1;
  const near={},mid={},now=new Set(),M=new THREE.Matrix4(),Z=new THREE.Matrix4().makeScale(0,0,0);
  for(let a=-kr;a<=kr;a++)for(let b=-kr;b<=kr;b++){const A=HUB.pgrid.get((kx+a)*10000+kz+b);if(!A)continue;for(const p of A){if(!p.im)continue;if(!p.av){if(AS_POOL[CID==='fra'?'fra':'ath'][p.t]&&HUB.ptypes[p.t]&&HUB.ptypes[p.t].asB){AS_assign([p]);AS_far([p])}if(!p.av)continue}
@@ -132,7 +134,22 @@ function AS_step(){if(!HUB.pgrid||!HUB.props||!ASSET.nm||!camera)return;const cp
   if(L.length){im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();draws++;tris+=L.length*im.geometry.userData.as.tris;inst[li]+=L.length}}
  ASSET.last={ms:+(performance.now()-t0).toFixed(2),draws,tris,near:inst[0],mid:inst[1],hidden:now.size}}
 // test hook: chk() = per-variant parts/studs/tris; lod() = every drawn instance on the right LOD for its distance; mix(r) = worst same-variant share within r m
-window.__as={A:ASSET,R:AS_R,build:AS_build,
+// ab(1): draw the old trees again (A/B shots and perf), ab(0): back to the LEGO builds
+function AS_ab(off){const D=HUB.ptypes,M=new THREE.Matrix4(),dirty=new Set();ASSET.off=!!off;for(const M2 of[ASSET.nm,ASSET.mm])for(const n in M2)M2[n].visible=!off&&M2[n].count>0;
+ for(const p of HUB.props||[]){if(!p.av||!p.im)continue;const d=D[p.t],im=p.im;if(!im.userData.asOld)im.userData.asOld=d.gAS0;im.geometry=off?im.userData.asOld:d.g;
+  if(p.alive){if(off)M.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));im.setMatrixAt(p.i,off?M:AS_farM(p,M))}
+  if(off&&im.instanceColor)im.setColorAt(p.i,new THREE.Color(d.tint?d.tint[(p.i*7)%d.tint.length]:'#ffffff'));dirty.add(im)}
+ for(const im of dirty){im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true}if(!off){AS_far(HUB.props);ASSET.hid.clear();ASSET.cx=1e9;AS_step()}return off?'old':'lego'}
+// checklist GO (src/99c_checklist.js as1/*): parks the car among the trees, then measures. kind: parts | mix | lod
+function AS_spot(){const T=HUB.props.filter(p=>p.av&&p.t!=='bush'&&Math.hypot(p.x-RO.x,p.z-RO.z)<1500),G=new Map();for(const p of T){const k=Math.floor(p.x/40)*100000+Math.floor(p.z/40);G.set(k,(G.get(k)||0)+1)}
+ let bk=null,bn=0;for(const[k,n]of G)if(n>bn&&!roamHit(Math.floor(k/100000)*40+20,(k%100000+100000)%100000*40+20,2)){bn=n;bk=k}if(bk!=null)roamWarp(Math.floor(bk/100000)*40+20,(bk%100000+100000)%100000*40+20,RO.h||0,performance.now());return bn}
+function AS_go(kind){const C=CID==='fra'?'fra':'ath',n=AS_spot(),st=AS_variants()&&ASSET.st,tree=Object.keys(st).filter(v=>AS_R[v].far!=='bush');let ok,msg;
+ if(kind==='parts'){const bad=Object.entries(st).filter(([v,o])=>o.parts<8||o.studs<1||o.ids.split(' ').some(i=>!AS_PD[i]));ok=!bad.length;
+  msg=`${Object.keys(st).length} types: parts ${Math.min(...Object.values(st).map(o=>o.parts))}-${Math.max(...Object.values(st).map(o=>o.parts))}, studs ≥ ${Math.min(...Object.values(st).map(o=>o.studs))}, real LDraw parts ${[...new Set(Object.values(st).flatMap(o=>o.ids.split(' ')))].join(' ')}${bad.length?' · BAD '+bad.map(b=>b[0]).join(' '):''}`}
+ else if(kind==='mix'){const m=__as.mix();ok=tree.length>=6&&m.variants>=6&&m.p95<=.3;msg=`${m.variants} tree variants placed (${tree.length} built) · most common variant in a 30 m disc: median ${m.p50*100|0}%, p95 ${m.p95*100|0}% (pass ≤ 30%), worst ${m.worst*100|0}% · ${m.trees} trees`}
+ else{const o=__as.lod();ok=!o.wrong&&!o.farShown&&o.near>0&&o.mid>0&&o.ms<=1.5;msg=`${n} trees in this 40 m cell · ${o.near} full (≤ ${ASSET.near} m) + ${o.mid} simplified (≤ ${ASSET.mid} m), ${o.wrong} on the wrong LOD, ${o.farShown} doubled · +${o.draws} draws, ${Math.round(o.tris/1000)}k tris · refresh ${o.ms} ms (pass ≤ 1.5)`}
+ return (ok?'PASS':'FAIL')+' · LEGO trees '+C+' · '+msg}
+window.__as={A:ASSET,R:AS_R,build:AS_build,ab:AS_ab,step:AS_step,go:AS_go,
  chk(){AS_variants();return ASSET.st},
  lod(){ASSET.cx=1e9;ASSET.fr=0;AS_step();const cp=camera.position,o={...ASSET.last,wrong:0,farShown:0};const e=new THREE.Matrix4(),v=new THREE.Vector3();
   for(const[MM,lo,hi]of[[ASSET.nm,0,ASSET.near],[ASSET.mm,ASSET.near,ASSET.mid]])for(const n in MM){const im=MM[n];for(let i=0;i<im.count;i++){im.getMatrixAt(i,e);v.setFromMatrixPosition(e);const d=Math.hypot(v.x-cp.x,v.z-cp.z);if(d>hi+.01||d<lo-.01)o.wrong++}}
