@@ -137,7 +137,7 @@ header.gx-bar [data-gx="dr-menu"]{font-size:1.15rem;min-width:44px}
 .menu{display:flex;flex-direction:column;gap:.45rem}
 .menu .mrow{text-align:left;justify-content:flex-start;display:block;width:100%}
 .menu .mrow small{display:block}
-.dlg.start .lede{font-size:1.02rem}
+.dlg.start .lede{font-size:1.02rem;line-height:1.45}.dlg.start .lede b{display:inline;white-space:nowrap}
 .dlg.start .btn.big{font-size:1.25rem;width:100%}
 .dlg.start details.custom{border:2.5px dashed #1a1320;border-radius:10px;padding:.35rem .6rem;margin:.5rem 0}
 .dlg.start details.custom summary{cursor:pointer;font-weight:900;min-height:36px;display:flex;align-items:center;gap:.4rem}
