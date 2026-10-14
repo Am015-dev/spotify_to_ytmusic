@@ -39,6 +39,26 @@
   });
 
   GXS.add({
+    id: 'sq-uibar', name: 'UI bar: bar, line, panels, text sizes', ask: 'Is every screen clean and readable?', seed: 10, when: booted, group: 'UI',
+    setup: function () { return table(10); },
+    checks: [
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), GXS.vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'one instruction line of 8 words or fewer', fn: function () { var t = ($('#line') || {}).innerText || ''; return (words(t) > 0 && words(t) <= 8) || 'line: ' + t; } },
+      { kind: 'fn', name: 'at most one primary button on the board', fn: function () { var n = [].filter.call(document.querySelectorAll('.btn.go'), GXS.vis).length; return n <= 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'board text >= 13 px (16 px at >= 1024 wide)', fn: function () { var min = innerWidth >= 1024 ? 16 : 13, bad = ''; [].forEach.call(document.querySelectorAll('body *'), function (e) { if (bad || e.children.length || !e.textContent.trim() || !GXS.vis(e) || e.closest('.gx-drawer, svg') || /^Test:/.test(e.textContent.trim())) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f > 0 && f < min - .05) bad = (e.className || e.tagName) + ' ' + f + 'px "' + e.textContent.trim().slice(0, 12) + '"'; }); return !bad || bad; } },
+      { kind: 'fn', name: 'no sideways scroll, no seat chip text cut', fn: function () { if (document.documentElement.scrollWidth > innerWidth + 1) return 'page scrolls sideways'; var bad = ''; [].forEach.call(document.querySelectorAll('.sch'), function (c) { if (c.scrollWidth > c.clientWidth + 2) bad = bad || 'seat chip ' + c.scrollWidth + '>' + c.clientWidth; }); return !bad || bad; } },
+      { kind: 'fn', name: 'pictures keep their natural shape', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (i) { if (bad || !GXS.vis(i) || !i.naturalWidth) return; var r = i.getBoundingClientRect(), q = (r.width / r.height) / (i.naturalWidth / i.naturalHeight); if (Math.abs(q - 1) > .08) bad = (i.className || 'img') + ' ' + q.toFixed(2); }); return !bad || bad; } },
+      { kind: 'fn', name: 'diary, players and menu panels fit their content with text >= 13/16 px', fn: function () {
+        var min = innerWidth >= 1024 ? 16 : 13, bad = '';
+        ['logd', 'plrd', 'menud'].forEach(function (id) { if (bad) return; try { GX.show(id); } catch (e) { return; } var d = $('#' + id), b = d && d.querySelector('.gx-drawer-body'); if (!b) return;
+          var last = b.lastElementChild; var empty = last ? b.getBoundingClientRect().bottom - last.getBoundingClientRect().bottom : 0;
+          if (id !== 'menud' && b.scrollHeight <= b.clientHeight && empty > 120) bad = id + ' has ' + Math.round(empty) + ' px empty space';
+          [].forEach.call(d.querySelectorAll('*'), function (e) { if (bad || e.children.length || !e.textContent.trim() || !GXS.vis(e) || e.closest('svg')) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f > 0 && f < min - .05) bad = id + ': ' + f + 'px "' + e.textContent.trim().slice(0, 12) + '"'; });
+          try { GX.close(); } catch (e) { } });
+        return !bad || bad; } },
+    ]
+  });
+  GXS.add({
     id: 'sq-zoom', name: 'Djinn card list', ask: 'Are the djinn cards readable?', seed: 6, when: booted,
     setup: function () { return table(6).then(function () { GX.show('djd'); try { renderDjPop(); } catch (e) { } return idle(900); }); },
     checks: [

@@ -9,13 +9,13 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .gx-main{display:block;grid-template-columns:none;position:relative;min-height:0}
 .gx-board{position:absolute;inset:0;display:flex;flex-direction:column;gap:3px;padding:4px 5px calc(5px + env(safe-area-inset-bottom,0px));box-sizing:border-box;background:radial-gradient(ellipse at 50% 30%,#f3d9a4 0%,#e3b878 60%,#c98f55 100%)}
 #seats{flex:0 0 auto;display:flex;gap:4px}
-.sch{flex:1 1 0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"sn ss" "s2 s2" "s3 s3";align-items:center;column-gap:4px;padding:2px 6px 3px;border-radius:10px;background:#fff9ea;border:2px solid var(--pc);box-shadow:0 1px 3px rgba(60,30,10,.3);font-size:11px;line-height:1.2;cursor:default;overflow:hidden;transition:background .2s}.sch.glow{cursor:pointer}
+.sch{flex:1 1 0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"sn ss" "s2 s2" "s3 s3";align-items:center;column-gap:4px;padding:2px 6px 3px;border-radius:10px;background:#fff9ea;border:2px solid var(--pc);box-shadow:0 1px 3px rgba(60,30,10,.3);font-size:13px;line-height:1.2;cursor:default;overflow:hidden;transition:background .2s}.sch.glow{cursor:pointer}
 .sch .sn{grid-area:sn;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2b1a10}.sch .sn small{font-size:9px;opacity:.6;margin-left:3px;font-weight:600}
 .sch .ss{grid-area:ss;font-size:15px;color:#5a1f08;font-family:var(--ff-h);display:inline-block}
 .sch .s2{grid-area:s2;display:flex;gap:6px;white-space:nowrap}.sch .s3{grid-area:s3;display:flex;gap:5px;white-space:nowrap;min-height:13px;align-items:center}
 .sch .pp{display:inline-flex;align-items:center;gap:1px;font-weight:700;font-size:11px}
 .sch.actnow{background:#fff0c0;box-shadow:0 0 0 3px #ffcf5a,0 0 12px rgba(255,190,60,.8)}
-#seats[data-n="4"] .sch,#seats[data-n="5"] .sch{padding:2px 4px 3px}#seats[data-n="5"] .sch .s2{gap:3px}#seats[data-n="5"] .sch .s3{gap:3px}#seats[data-n="5"] .sch{font-size:10px}
+#seats[data-n="4"] .sch,#seats[data-n="5"] .sch{padding:2px 4px 3px}#seats[data-n="5"] .sch .s2{gap:3px}#seats[data-n="5"] .sch .s3{gap:3px}#seats[data-n="5"] .sch{font-size:13px}
 #line{flex:0 0 auto;min-height:24px;line-height:24px;text-align:center;font:700 16px var(--ff-h);color:#4d2616;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #line.mine{color:#9a3a14}
 #table{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:3px}
@@ -35,9 +35,9 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .tile.blue{background:linear-gradient(#cfe6f6,#8fb7d8);border-color:#3b6a97}.tile.red{background:linear-gradient(#f9d3b3,#e29c6c);border-color:#9a4a28}
 .tile.owned{box-shadow:inset 0 0 0 4px var(--oc)}
 .tile .ti{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:calc(var(--cw)*.55);opacity:.2;pointer-events:none;font-style:normal;line-height:1}
-.tile .tn{position:relative;z-index:1;font-size:clamp(8px,calc(var(--cw)*.16),11px);font-weight:800;color:#3a2412;line-height:1.05;max-width:calc(100% - 17px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.tile .tv{position:absolute;z-index:2;top:2px;right:2px;min-width:16px;height:16px;padding:0 2px;box-sizing:border-box;border-radius:9px;background:#f4c04a;color:#4a2a05;font-size:11px;line-height:14px;text-align:center;border:1px solid #9a6b12}
-.tile .tc{position:absolute;left:3px;bottom:1px;font-size:8px;opacity:.55;font-style:normal;pointer-events:none}
+.tile .tn{position:relative;z-index:1;font-size:clamp(13px,calc(var(--cw)*.16),16px);font-weight:800;color:#3a2412;line-height:1.05;max-width:calc(100% - 17px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.tile .tv{position:absolute;z-index:2;top:2px;right:2px;min-width:16px;height:16px;padding:0 2px;box-sizing:border-box;border-radius:9px;background:#f4c04a;color:#4a2a05;font-size:13px;line-height:14px;text-align:center;border:1px solid #9a6b12}
+.tile .tc{display:none;position:absolute;left:3px;bottom:1px;font-size:8px;opacity:.55;font-style:normal;pointer-events:none}
 .tile .ms{position:relative;z-index:1;flex:1 1 auto;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:2px 2px;min-height:0;padding-bottom:11px}
 .tile .tk{position:absolute;z-index:2;right:2px;bottom:2px;display:flex;gap:2px;align-items:center}
 .tile.m7{--k:.82}.tile.m10{--k:.66}
@@ -172,3 +172,20 @@ html .mbox .btn.xs{min-height:44px}
 html:not(.tp) .tile .tc,html.tp .tile .tc{font-size:11px;line-height:13px}
 .gxh-bub .gxh-tt{display:none}
 body:has(.gxh-bub.on) #line{visibility:hidden}
+
+/* UI-BAR 6/1: small panels fit their content; chips and labels 13px phone / 16px desktop */
+.sch .sn,.sch .sn small,.sch .s2,.sch .s3,.pchip{font-size:13px}
+@media (min-width:1024px){.sch,.sch .sn,.sch .sn small,.sch .s2,.sch .s3,.pchip{font-size:16px}}
+#logd,#plrd,#setd,#musicd{bottom:auto;height:auto;max-height:calc(100dvh - var(--gx-bar-h) - 24px)}
+@media (max-width:700px){#logd,#plrd,#setd,#musicd{height:auto;max-height:88dvh}}
+.sch .sn small,.dcard .dv,.spot .ord,.spot .sp-c,.gx-drawer small,.gx-drawer .stat .st small,.gx-drawer .muted{font-size:13px}
+@media (min-width:1024px){.gx-bar h1,.sch .sn small,.dcard,.dcard b,.dcard .dv,.spot .ord,.spot .sp-c,.spot .sp-b,.tile .tv,.gx-drawer-body,.gx-drawer-body p,.gx-drawer-body small,.gx-drawer-body h4,.gx-drawer-body .tag,.gx-drawer-body .muted,.gx-drawer-body .stat *{font-size:16px}.tile .tv{min-width:22px;height:22px;line-height:20px}}
+.sch .sn small,.spot .ord{font-size:13px!important}
+@media (min-width:1024px){.gx-bar h1,.pchip,.sch .sn small,.spot .ord,.gx-drawer small,.gx-drawer h3 small,.gx-drawer h4 small,.gx-drawer li small,.sti{font-size:16px!important}}
+.tile .tn{font-size:13px!important}
+@media (min-width:1024px){.tile .tn,.gx-drawer .menu .btn,.gx-drawer .menu .seg button,.gx-drawer .menu *{font-size:16px!important}}
+.tile .tn{max-width:calc(100% - 24px)}
+@media (min-width:1024px){.tile .tn{max-width:calc(100% - 30px)}}
+.tile .tn{margin-top:16px;max-width:100%}
+@media (min-width:1024px){.tile .tn{margin-top:24px;max-width:100%}}
+@media (max-height:600px) and (max-width:420px){.tile .tn{display:none!important}}
