@@ -14,10 +14,10 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const 
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">${ICO.bomb}</svg><h1>Short Fuse</h1><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back</button>':''}</div>
   <div class="st-body"><div class="st-main">
    ${tutFirst?tutBtn('big go'):''}
-   <button class="big${tutFirst?'':' go'}" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
-   <button class="big blue" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small></button>
-   ${tutFirst?'':tutBtn('big')}
-   ${saved?`<button class="big" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
+   <button class="${tutFirst?'btn wide':'big go'}" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
+   <button class="btn wide" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small></button>
+   ${tutFirst?'':tutBtn('btn wide')}
+   ${saved?`<button class="btn wide" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
    <div class="jobrow"><button class="btn" data-a="jobprev" aria-label="Previous job">${ico('back')}</button><div class="jobcur"><b>${n}</b><span>${esc(M.nm)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?'<i class="t">⏱</i>':''}</div><button class="btn" data-a="jobnext" aria-label="Next job">${ico('fwd')}</button></div>
    <div class="seg" role="group" aria-label="Crew size">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div>
    <div class="seg" role="group" aria-label="Computer level">${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div>
@@ -86,7 +86,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.sel&&!GX.open){UI.sel=null;refresh()}});
 // ---------- boot ----------
 function boot(){GX.init({key:'sf'});paintIcons();loadSettings();
-  GX.onShow=id=>{sfx('open');if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML+GLOSS_HTML+'<h3>Credits</h3><p>Names, card text and art are original. <button class="btn small" data-gx="credd">Full credits</button></p>';if(id==='refd')renderRef();if(id==='musicd')renderMusic();if(id==='setd')renderSettings();if(G)renderOpenDrawer();else if(id==='logd'||id==='missiond'||id==='geard')$('#'+id+' .gx-drawer-body').innerHTML='<p>Start a job first.</p>'};
+  GX.onShow=id=>{sfx('open');if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML+GLOSS_HTML+'<h3>Credits</h3><p class="ctr"><button class="btn small" data-gx="credd">Full credits</button></p>';if(id==='refd')renderRef();if(id==='musicd')renderMusic();if(id==='setd')renderSettings();if(G)renderOpenDrawer();else if(id==='logd'||id==='missiond'||id==='geard')$('#'+id+' .gx-drawer-body').innerHTML='<p>Start a job first.</p>'};
   GX.onClose=()=>sfx('close');
   setInterval(clockTick,250);setInterval(()=>{if(G&&UI.started&&timedJob()&&!G.over){const p=document.querySelector('#timerpill span');if(p&&UI.V){const c=clockLeft(knowledge(Math.max(0,UI.V.seat)));if(c){p.textContent=fmt(c.left)+(UI.pause?' ⏸':'');const cl=p.parentNode;if(cl)cl.classList.toggle('low',c.real<30)}}}},1000);
   campInit();netInit();showStart();if(UI.netOpen)netRender()}

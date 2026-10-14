@@ -1,20 +1,7 @@
 {
 "phone": {
 "look": [],
-"axe": [
-[
-"sq-board-phone.json",
-"color-contrast",
-".bump",
-"\u260547"
-],
-[
-"sq-zoom-phone.json",
-"color-contrast",
-".bump",
-"\u260547"
-]
-],
+"axe": [],
 "axe_pages": [
 "menu-phone.json",
 "sq-art-phone.json",

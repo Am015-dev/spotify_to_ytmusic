@@ -26,12 +26,12 @@ function hAnyGlow(){const b=boardEl().getBoundingClientRect(),cx=b.left+b.width/
   for(const g of document.querySelectorAll('#world .glow')){if(g.style.visibility==='hidden')continue;const r=g.getBoundingClientRect(),d=Math.hypot(r.left+r.width/2-cx,r.top+r.height/2-cy);if(d<bd){bd=d;best=g}}return best}
 function hFig(f){return()=>{const l=(UI.figs||[]).filter(b=>b.isConnected&&f(b._m));return l[0]||null}}
 const HLP_STEPS={
- place:{target:hAnyGlow,title:'Place your tile',text:'Tap a glowing square to lay it there. Tap the tile below to turn it.',pic:()=>HP.tap()},
- river:{target:hAnyGlow,title:'Follow the river',text:'Lay this tile so the river carries on. Tap a glowing square.',pic:()=>HP.river()},
- bonus:{target:hAnyGlow,title:'Extra turn!',text:'Your mason earned another tile. Tap a glowing square to place it.',pic:()=>HP.mason()},
- fig:{target:hFig(m=>true),title:'Claim with a follower',text:'Tap a glowing circle to claim that road, town or field. Or tap Skip.',pic:()=>HP.meeple()},
- figx:{target:hFig(m=>m.k==='bld'||m.k==='pig'),title:'Mason or hog',text:'Your mason or hog can join a feature you already hold. Tap its circle.',pic:()=>HP.mason()},
- nofig:{target:hq('#hskip'),title:'Nothing to claim',text:'Every road, town and field here is taken. Tap Skip to go on.',pic:()=>HP.skip()}
+ place:{target:hAnyGlow,title:'Tip',text:'Tap a glow. Tap the tile to turn.',pic:()=>HP.tap()},
+ river:{target:hAnyGlow,title:'Follow the river',text:'Carry the river on. Tap a glow.',pic:()=>HP.river()},
+ bonus:{target:hAnyGlow,title:'Tip',text:'Mason bonus tile. Tap a glow.',pic:()=>HP.mason()},
+ fig:{target:hFig(m=>true),title:'Claim with a follower',text:'Tap a circle to claim it, or Skip.',pic:()=>HP.meeple()},
+ figx:{target:hFig(m=>m.k==='bld'||m.k==='pig'),title:'Mason or hog',text:'Add your mason or hog. Tap a circle.',pic:()=>HP.mason()},
+ nofig:{target:hq('#hskip'),title:'Nothing to claim',text:'Nothing free to claim. Tap Skip.',pic:()=>HP.skip()}
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES=[

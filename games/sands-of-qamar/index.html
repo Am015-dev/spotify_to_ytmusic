@@ -33,7 +33,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 /* popups */
 .gx-scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .18s}
 .gx-scrim.on{opacity:1;pointer-events:auto}
-.gx-drawer{position:fixed;z-index:41;top:calc(var(--gx-bar-h) + 8px + env(safe-area-inset-top,0px));right:8px;bottom:8px;width:min(520px,calc(100vw - 16px));display:flex;flex-direction:column;background:var(--gx-panel);color:var(--gx-ink);border-radius:var(--gx-radius);box-shadow:var(--gx-shadow);padding:31px;transform:translateX(calc(100% + 16px));transition:transform .22s ease;visibility:hidden}
+.gx-drawer{position:fixed;z-index:41;top:calc(var(--gx-bar-h) + 8px + env(safe-area-inset-top,0px));right:8px;bottom:8px;width:min(520px,calc(100vw - 16px));display:flex;flex-direction:column;background:var(--gx-panel);color:var(--gx-ink);border-radius:var(--gx-radius);box-shadow:var(--gx-shadow);padding:38px;transform:translateX(calc(100% + 16px));transition:transform .22s ease;visibility:hidden}
 .gx-drawer.on{transform:none;visibility:visible}
 .gx-drawer.wide{width:min(980px,calc(100vw - 16px))}
 .gx-drawer-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--gx-line);flex:0 0 auto}
@@ -50,7 +50,7 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
   .gx-app.gx-dock-min .gx-dock-body{display:none}
   .gx-reopen{display:none!important}
   .gx-grab{display:block;width:44px;height:5px;border-radius:3px;background:currentColor;opacity:.35;margin:0 auto}
-  .gx-drawer{top:auto;left:0;right:0;bottom:0;width:auto;max-height:88dvh;height:88dvh;border-radius:var(--gx-radius) var(--gx-radius) 0 0;transform:translateY(100%);padding-bottom:calc(31px + env(safe-area-inset-bottom,0px))}
+  .gx-drawer{top:auto;left:0;right:0;bottom:0;width:auto;max-height:88dvh;height:88dvh;border-radius:var(--gx-radius) var(--gx-radius) 0 0;transform:translateY(100%);padding-bottom:calc(38px + env(safe-area-inset-bottom,0px))}
   .gx-drawer.wide{width:auto}
   .gx-hide-narrow{display:none!important}
 }
@@ -113,7 +113,7 @@ li.good{color:var(--good)}li.bad{color:var(--bad)}li.step{font-weight:600}li.rou
 .tw{overflow-x:auto}table{border-collapse:collapse;font-variant-numeric:tabular-nums;width:100%}td,th{padding:3px 6px;border-bottom:1px solid var(--gx-line);text-align:right}td:first-child{text-align:left}tr.tot td{font-weight:800;color:var(--terra)}
 .sheet{border-left:6px solid var(--pc);background:rgba(255,255,255,.5);border-radius:10px;padding:8px 10px;margin-bottom:10px;display:flex;flex-direction:column;gap:5px}
 .sheet h3{display:flex;gap:8px;align-items:center}.sheet .tot{margin-left:auto;color:var(--terra)}
-.tag{display:inline-block;font-size:.78rem;background:rgba(90,46,26,.08);border-radius:6px;padding:1px 6px;color:var(--mut)}
+.tag{display:inline-block;font-size:.84rem;background:rgba(90,46,26,.08);border-radius:6px;padding:1px 6px;color:var(--mut)}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin:6px 0 14px}
 .card{background:#fffaf0;border:1px solid var(--sand2);border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:4px}
 .card h4{text-transform:none;letter-spacing:0;font-size:.98rem;color:var(--indigo);margin:0}.card h4 small{color:var(--mut);font-family:var(--ff)}.card p{font-size:.9rem}
@@ -200,7 +200,7 @@ ul.story{margin:4px 0 0;padding-left:18px;font-size:.9rem;line-height:1.35}ul.st
 .card h4 small{margin-left:auto;color:#f3cf7a;font-weight:700}
 .card.dj h4{background:linear-gradient(180deg,#4a2f7a,#2c1c4c)}
 .card .ca{display:block;width:calc(100% - 16px);height:74px;margin:8px 8px 0;border-radius:8px 8px 40px 40px/8px 8px 22px 22px;box-shadow:inset 0 0 0 2px rgba(138,90,24,.6),0 0 0 1px #fbe3a0}
-.card .tag{margin:8px 8px 0;border-radius:4px;background:linear-gradient(180deg,#efdcb4,#e3c893);color:#5a3a1c;font-weight:600;font-size:.78rem;letter-spacing:.03em;text-transform:uppercase;padding:2px 8px}
+.card .tag{margin:8px 8px 0;border-radius:4px;background:linear-gradient(180deg,#efdcb4,#e3c893);color:#5a3a1c;font-weight:600;font-size:.84rem;letter-spacing:.03em;text-transform:uppercase;padding:2px 8px}
 .card p{margin:6px 8px 10px;padding:6px 8px;background:rgba(255,255,255,.55);border-radius:6px;border:1px solid rgba(138,90,24,.2);font-size:.88rem}
 /* goods and djinn chips in the dock */
 .gc{background:linear-gradient(180deg,#fffdf6,#f1e0bc);border:1px solid var(--brass3);box-shadow:inset 0 0 0 2px #fbe3a0,0 2px 4px rgba(60,30,10,.2)}
@@ -220,6 +220,11 @@ body[data-gfx=high] .view::after{display:none}
 .mbox.lobby{position:relative;max-width:520px}.mbox.lobby h2{padding-right:36px}.mbox.lobby h3{margin:4px 0 0;font-size:1rem}.lobx.gx-x{position:absolute;top:8px;right:8px;color:var(--gx-ink)}.lobx.gx-x:hover{background:rgba(0,0,0,.06)}
 .plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}.plist li{display:flex;gap:7px;align-items:center}.plist i{width:12px;height:12px;border-radius:3px;background:var(--pc);flex:0 0 auto}
 .lobby .seg button:disabled{opacity:.4;cursor:default}.lobby .exs{flex-direction:row;flex-wrap:wrap;gap:4px 14px}.netst{margin:0}
+@media (min-width:1000px){html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .menu .btn.gxt-menu{min-height:48px!important;padding-top:6px;padding-bottom:6px}.gx-drawer-body.menu{display:grid;grid-template-columns:1fr 1fr;gap:4px;align-content:start}.gx-drawer-body.menu>div{grid-column:1/-1}}
+body:has(.gx-drawer.on) #modal{visibility:hidden}
+.setrow h4,.gx-drawer h4{font-size:.9rem}
+/* UI-BAR 4: bar keeps Djinns, Log, Rules, Menu; the rest live in Menu */
+.gx-bar #sndbtn,.gx-bar #musbtn,.gx-bar #speedbtn,.gx-bar [data-gx=plrd],.gx-bar [data-gx=refd],.gx-bar [data-gx=setd],.gx-bar [data-a=new]{display:none!important}
 
 /* ===== Sands of Qamar: the bazaar is the screen (board-first). Seat chips, one line, the grid + goods + djinns, buttons. ===== */
 :root{--gx-bar-h:40px}
@@ -233,7 +238,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 #seats{flex:0 0 auto;display:flex;gap:4px}
 .sch{flex:1 1 0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"sn ss" "s2 s2" "s3 s3";align-items:center;column-gap:4px;padding:2px 6px 3px;border-radius:10px;background:#fff9ea;border:2px solid var(--pc);box-shadow:0 1px 3px rgba(60,30,10,.3);font-size:11px;line-height:1.2;cursor:default;overflow:hidden;transition:background .2s}.sch.glow{cursor:pointer}
 .sch .sn{grid-area:sn;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2b1a10}.sch .sn small{font-size:9px;opacity:.6;margin-left:3px;font-weight:600}
-.sch .ss{grid-area:ss;font-size:15px;color:#b8532b;font-family:var(--ff-h);display:inline-block}
+.sch .ss{grid-area:ss;font-size:15px;color:#5a1f08;font-family:var(--ff-h);display:inline-block}
 .sch .s2{grid-area:s2;display:flex;gap:6px;white-space:nowrap}.sch .s3{grid-area:s3;display:flex;gap:5px;white-space:nowrap;min-height:13px;align-items:center}
 .sch .pp{display:inline-flex;align-items:center;gap:1px;font-weight:700;font-size:11px}
 .sch.actnow{background:#fff0c0;box-shadow:0 0 0 3px #ffcf5a,0 0 12px rgba(255,190,60,.8)}
@@ -281,7 +286,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .tok{font-size:15px;line-height:1;text-shadow:0 1px 2px rgba(255,255,255,.8)}.tok small{font-size:9px;font-weight:800}
 .popin{animation:popin .6s cubic-bezier(.3,1.6,.5,1)}@keyframes popin{0%{transform:scale(0)}70%{transform:scale(1.4)}100%{transform:scale(1)}}
 .newc{animation:slidein .5s ease}@keyframes slidein{0%{opacity:0;transform:translateX(14px) scale(.8)}100%{opacity:1;transform:none}}
-.bump{animation:bump .55s ease}@keyframes bump{40%{transform:scale(1.55)}}
+.bump{animation:bump .55s ease;background:#fff9ea;border-radius:8px}@keyframes bump{40%{transform:scale(1.55)}}
 /* things that glow = things you can tap now */
 .glow{cursor:pointer}.sch.glow,.mcard.glow,.dcard.glow,.chb.glow,.sp-b.glow{animation:glowb 1.15s ease-in-out infinite}
 @keyframes glowb{0%,100%{box-shadow:0 0 0 2px #ffd45a,0 0 8px 2px rgba(255,200,70,.7)}50%{box-shadow:0 0 0 3px #fff3b0,0 0 16px 5px rgba(255,205,80,.95)}}
@@ -306,7 +311,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 /* flying pieces, floating points, the ghost finger */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:45;overflow:hidden}
 .fl{position:absolute;pointer-events:none;will-change:transform;line-height:1}.fl .mi{font-size:24px}.fl.card{background:#fffdf6;border:1px solid #8a5a18;border-radius:7px;padding:3px 5px}
-.ft{position:absolute;font:800 24px var(--ff-h);color:#2f7d46;text-shadow:0 0 3px #fff,0 0 3px #fff,0 1px 0 #fff;animation:rise 1.4s ease-out forwards;white-space:nowrap}.ft.dn{color:#b3312a}
+.ft{position:absolute;font:800 24px var(--ff-h);color:#1f6a38;background:#fff9ea;border-radius:12px;padding:0 8px;text-shadow:none;animation:rise 1.4s ease-out forwards;white-space:nowrap}.ft.dn{color:#9c1f1a}
 @keyframes rise{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}15%{opacity:1;transform:translate(-50%,-70%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-200%) scale(1)}}
 #finger{position:fixed;left:0;top:0;z-index:60;pointer-events:none;width:34px;height:46px;margin:-5px 0 0 -13px;opacity:0}
 #finger svg{width:100%;height:100%;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55))}
@@ -783,6 +788,12 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+/* compact form: used by gx-help.js when no free spot exists on a crowded board */
+.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+.gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
+
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
    Everything the kit draws carries data-help. Override with --gxt-* (and the --gxh-* variables of the help kit). */
 :root{--gxt-z:90;--gxt-dim:rgba(8,4,10,.62)}
@@ -1229,6 +1240,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   function scrim(t) { for (var x = t; x && x !== document.body; x = x.parentElement) { var r = x.getBoundingClientRect(); if (r.width * r.height >= .6 * innerWidth * innerHeight && (x === t || getComputedStyle(x).position === 'fixed')) return true; } return false; }   // a modal / story layer on top legitimately covers what is below
   function coveredBy(e) { var b = box(e), r = b.r; if (r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return ''; if (getComputedStyle(e).pointerEvents === 'none') return '';
     var t = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, b.x)), Math.max(1, Math.min(innerHeight - 1, b.y)));
+    if (t && t.closest('.gx-drawer-head') && e.closest('.gx-drawer') && !e.closest('.gx-drawer-head')) return '';   // scrolled under the drawer's sticky head: clipped by the scroll, not covered
     if (!t || related(t, e) || t.closest(SKIPSEL) || scrim(t) || getComputedStyle(t).pointerEvents === 'none') return ''; return t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]; }
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
   function engineBad() {   // every element marked data-engine="<js expression>" must show that engine number
@@ -1251,7 +1263,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     for (var a = 0; a < rects.length; a++) for (var b = a + 1; b < rects.length; b++) { var A = rects[a], B = rects[b]; if (related(A.e, B.e)) continue;
       var w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left), h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
       if (w > 2 && h > 2 && w * h > .3 * Math.min(A.r.width * A.r.height, B.r.width * B.r.height)) add('text overlaps: "' + A.t + '" <' + who(A.e) + '> / "' + B.t + '" <' + who(B.e) + '>'); }
-    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '>'); });
+    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '> "' + (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 24) + '"'); });
     engineBad().forEach(add);
     return out;
   };
@@ -1529,8 +1541,23 @@ const GX={key:'gx',open:null,
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
+    return out;
+  }
+  // text the bubble must not cover (board svg labels, card names marked data-gxh-text): treated like a glowing core, hard first, soft last
+  function textRects() {
+    var out = [], v = vp(), rg;
+    try { rg = D.createRange(); var w = D.createTreeWalker(D.body, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode()) && out.length < 300) {
+        if (!/\S/.test(n.nodeValue)) continue;
+        var e = n.parentElement; if (!e || (e.closest && (e.closest('[data-help]') || e.closest('[hidden]') || e.closest('.gxh-bub,.gxh-ring,.gxh-finger,script,style')))) continue;
+        rg.selectNodeContents(n); var r = rg.getBoundingClientRect();
+        if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+        var cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0) continue;
+        out.push(infl(r, 2));
+      }
+    } catch (x) {}
     return out;
   }
   function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
@@ -1538,9 +1565,9 @@ const GX={key:'gx',open:null,
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
     var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
     var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
-    var ks = [CORE, 32];
+    var ks = [CORE, 32], txt = textRects();
     for (var ki = 0; ki < ks.length && !best; ki++) {
-      var av = avoidRects(ks[ki]);
+      var av = avoidRects(ks[ki]).concat(txt);
       for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
         var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
         if (hit(c, T)) continue;
@@ -1548,6 +1575,17 @@ const GX={key:'gx',open:null,
         var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
         if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
       }
+    }
+    if (!best && !b.dataset.gxhShrunk) {   // no free spot: narrow the bubble (taller, slimmer) and try again before covering anything
+      var ws = [236, 196, 164];
+      for (var wi = 0; wi < ws.length; wi++) {
+        b.dataset.gxhShrunk = '1'; b.style.maxWidth = ws[wi] + 'px';
+        var r2 = place(b, tr); if (r2.free) { delete b.dataset.gxhShrunk; return r2; }
+      }
+      b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
+      var cw = [350, 292, 236];
+      for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
+      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -1560,6 +1598,7 @@ const GX={key:'gx',open:null,
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
+    c2.free = !!best;
     return c2;
   }
   function ringAt(r, cls) {
@@ -5391,7 +5430,7 @@ document.addEventListener('pointerdown',e=>{const tp=document.getElementById('ti
 document.addEventListener('pointerdown',e=>{if(UI.chz&&!(e.target.closest&&e.target.closest('#chz,[data-tile],[data-seat],[data-dj],[data-th],[data-help]'))){UI.chz=null;if(G)render()}},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(UI.pendDj||UI.pendItem||UI.chz)){UI.pendDj=UI.pendItem=UI.chz=null;render()}});
 function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';render();return}if(a==='undodrop'&&isClient()){netSend({act:'undodrop'});return}if(a==='continue')return}
-  switch(a){case 'start':if(tutOffer('start'))return;beginGame();return;case 'quick':if(tutOffer('quick'))return;UI.setup.np=2;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'tutgo':UI.modal=null;tutStart();return;case 'tutplay':{const nx=UI.offerNext||'quick';UI.modal=null;uiAct(nx);return}case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();storyOpen()}return;
+  switch(a){case 'start':if(tutOffer('start'))return;beginGame();return;case 'quick':if(tutOffer('quick'))return;UI.setup.seats=['human','ai','ai','ai','ai'];beginGame();return;case 'tutgo':UI.modal=null;tutStart();return;case 'tutplay':{const nx=UI.offerNext||'quick';UI.modal=null;uiAct(nx);return}case 'continue':loadSaved();return;case 'new':openStart();return;case 'story':if(typeof GXC!=='undefined'&&window.CAMPAIGN){UI.modal=null;GX.close();render();storyOpen()}return;
   case 'again':UI.modal=null;beginGame();return;case 'closeover':UI.modal=null;render();return;
   case 'undodrop':{if(!UI.moveSnap||!UI.moveSteps)return;const steps=UI.moveSteps.slice(0,-1);G=JSON.parse(UI.moveSnap);UI.moveSteps=[];for(const m of steps){performMove(m,G.cur);UI.moveSteps.push(m)}if(!steps.length)UI.moveSnap=null;refresh();return}}}
 function openStart(){UI.modal='start';render()}
@@ -5544,11 +5583,12 @@ function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='offe
 UI.setup={np:2,seats:['human','ai','ai','ai','ai'],lv:['normal','normal','normal','normal','normal'],ex:{artisans:false,sultan:false,thieves:false,promos:false}};
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox start"><canvas id="opencv" width="640" height="220" aria-hidden="true"></canvas><h2>Sands of Qamar</h2><p class="lede">Lead the tribes. Rule the bazaar.</p>
-   <div class="acts big">${online()||typeof tutBtn!=='function'?'':tutBtn('btn big'+(firstTime()?' go':''))}${online()?'':'<button class="btn'+(firstTime()?'':' go')+' big" data-ui="quick">▶ Play vs computer</button>'}${window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="btn big" data-ui="story"><i class="ri" data-r="log">📜</i> Story mode</button>':''}${saved&&!online()?'<button class="btn big" data-ui="continue">Continue saved game</button>':''}</div>
-   <details class="exd"><summary><b>More ways to play</b></summary><div class="more"><div class="seg">${[2,3,4,5].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n} players</button>`).join('')}</div>
+   <div class="seg qrow">${[2,3,4,5].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n} players</button>`).join('')}</div>
+   <div class="acts big">${online()||typeof tutBtn!=='function'?'':tutBtn('btn')}${online()?'':'<button class="btn go big" data-ui="quick">▶ Play vs computer</button>'}${window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="btn" data-ui="story"><i class="ri" data-r="log">📜</i> Story mode</button>':''}${saved&&!online()?'<button class="btn big" data-ui="continue">Continue saved game</button>':''}</div>
+   <details class="exd"><summary><b>More ways to play</b></summary><div class="more">
    <div class="seats">${Array.from({length:o.np},(_,i)=>`<div class="seatrow" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b><button class="btn sm" data-seatset="${i}">${o.seats[i]==='human'?'🙂 person':'🤖 computer'}</button>${o.seats[i]==='ai'?`<button class="btn sm ghost" data-lv="${i}">${o.lv[i]}</button>`:''}</div>`).join('')}</div>
    <div class="exs">${[['artisans','The Crafters'],['sultan','Wonder Cities'],['thieves','Cutpurses'],['promos','Promo djinns']].map(([k,n])=>`<label class="chk"><input type="checkbox" data-ex="${k}" ${o.ex[k]||(k==='sultan'&&o.np===5)?'checked':''} ${k==='sultan'&&o.np===5?'disabled':''}> <b>${n}</b></label>`).join('')}</div>
-   <div class="acts">${online()?'':'<button class="btn go" data-ui="start">Begin ▶</button>'}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Card list</button></div>${typeof onlineBlock==='function'?onlineBlock():''}</div></details></div>`}
+   <div class="acts">${online()?'':'<button class="btn go" data-ui="start">Begin ▶</button>'}</div>${typeof onlineBlock==='function'?onlineBlock():''}</div></details></div>`}
 function overHtml(){const mp=viewP();const win=G.over.win;const won=mp&&win.includes(mp.i);
   return `<div class="mbox over"><h2>${mp?(won?(win.length>1?'You share the win':'You win!'):'You lose'):esc(G.winText)}</h2>${scoreTable()}<div class="acts"><button class="btn go" data-ui="again">Play again</button><button class="btn" data-ui="closeover">View the board</button></div></div>`}
 function renderSettings(){const el=$('#setbody');if(!el)return;const seg=(attr,cur,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button ${attr}="${v}" class="${String(cur)===String(v)?'on':''}">${l}</button>`).join('')}</div>`;

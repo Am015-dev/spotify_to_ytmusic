@@ -165,6 +165,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+/* compact form: used by gx-help.js when no free spot exists on a crowded board */
+.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+.gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
+
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
    Everything the kit draws carries data-help. Override with --gxt-* (and the --gxh-* variables of the help kit). */
 :root{--gxt-z:90;--gxt-dim:rgba(8,4,10,.62)}
@@ -242,7 +248,7 @@ html.sk .gxc-lab{font-size:13px;background:rgba(246,230,194,.94);color:#2a1d10}
 html.sk .gxc-node .gxc-stars{top:56px}
 html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
 html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
-html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:auto;min-height:46px;box-sizing:border-box;padding:3px 0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
 html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
 html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
@@ -263,7 +269,7 @@ html.sk{--sk-ink:#3a2410}
 .seat .fi{width:1.2em;height:1.2em;object-fit:contain;display:block}
 /* top strip: carved oak bar, name-peg pills for the seats */
 html.sk #top{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #2b1a0d;border-bottom:0;box-shadow:0 3px 8px rgba(0,0,0,.45);min-height:52px;gap:4px}
-html.sk .seat{border-style:solid;border-color:transparent;border-image:url(media/ui-score-pill.webp) 0 26 0 64 fill/0 8px 0 18px stretch;border-width:0 8px 0 18px;padding:3px 0;min-width:0;border-radius:0;background:none;color:#3a2410;gap:5px;position:relative;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk .seat{border-style:solid;border-color:transparent;border-image:url(media/ui-score-pill.webp) 0 26 0 64 fill/0 8px 0 18px stretch;border-width:0 8px 0 18px;padding:3px 10px 3px 0;min-width:0;border-radius:0;background:none;color:#3a2410;gap:5px;position:relative;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 html.sk .seat.cur{background:none;filter:drop-shadow(0 0 5px var(--c)) drop-shadow(0 0 2px #fff6d8) drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 html.sk .seat .dot{position:static;width:16px;height:16px;font-size:11px;line-height:1;flex:0 0 auto}html.sk .seat b{font-size:1.05rem}html.sk #seats{gap:0}html.sk .seat{gap:2px}html.sk .seat .nm{max-width:6ch;font-size:12px;overflow:visible}
 html.sk .seat .nm{opacity:1;color:#3a2410}
@@ -284,7 +290,7 @@ html.sk #hinfo .big{color:#2a3a14;font-size:1.35rem;padding:20px 54px;background
 html.sk #htile{border-radius:6px}
 html.sk #htile .rot{right:-1px;bottom:-1px;width:34px;height:34px;border-radius:0;background:url(media/ui-rotate-btn.webp) center/contain no-repeat;font-size:0;color:transparent;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
 /* buttons: terracotta / cream pills */
-html.sk .btn,html.sk #hskip{border-style:solid;border-color:transparent;border-image:url(media/ui-button-go-c.webp) 30 42 fill/14px 22px stretch;border-width:14px 22px;padding:0;min-height:48px;border-radius:0;background:#b5532f padding-box;box-shadow:none;color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));display:inline-flex;align-items:center}
+html.sk .btn,html.sk #hskip{border-style:solid;border-color:transparent;border-image:url(media/ui-button-go-c.webp) 30 42 fill/14px 22px stretch;border-width:14px 22px;padding:6px 6px;min-height:48px;border-radius:0;background:#b5532f padding-box;box-shadow:none;color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));display:inline-flex;align-items:center}
 html.sk .btn.alt{border-image-source:url(media/ui-button-cream-c.webp);color:#3a2410;text-shadow:none;background-color:#f3e3c3}
 html.sk #hskip{border-width:14px 30px;min-height:0;height:46px;box-sizing:border-box;justify-content:center}
 html.sk .btn:active,html.sk #hskip:active{transform:translateY(2px)}
@@ -307,6 +313,10 @@ html.sk .card[aria-label=Result] h2,html.sk .gxc-res h2{background:url(media/ui-
 /* the top-bar menu opens over the title: hide the title card under it so no button sits covered */
 body:has(#menu) #modal .scrim:has(.card[aria-label=Start]){visibility:hidden}
 html.sk .gxc-btn.go{background:#b5532f padding-box}
+@media(max-width:400px){html.sk .seat{flex:0 0 auto;padding-right:12px}html.sk .seat:not(.cur) .nm{display:none}html.sk .seat .nm{max-width:none;overflow:visible}}
+html.sk #hskip{padding:0}
+html.sk .seat .nm,html.sk .seat .fl{font-size:13px}html.sk .seat .dot{font-size:13px}
+@media(min-width:1024px){html.sk .seat .nm,html.sk .seat .fl,html.sk .seat .dot,html.sk .seat b,html.sk #left,html.sk #left b,html.sk #status,html.sk .opt,html.sk .sub,html.sk .gxh-tt,html.sk .gxh-tx,html.sk .gxh-ok,html.sk .btn{font-size:16px}html.sk .seat .dot{width:22px;height:22px}}
 
 :root{--gxh-btn:#b5532f;--gxh-accent:#e0a83a;--gxh-bg:#f6ead2;--gxh-font:var(--ff)}</style>
 <style>
@@ -858,6 +868,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   function scrim(t) { for (var x = t; x && x !== document.body; x = x.parentElement) { var r = x.getBoundingClientRect(); if (r.width * r.height >= .6 * innerWidth * innerHeight && (x === t || getComputedStyle(x).position === 'fixed')) return true; } return false; }   // a modal / story layer on top legitimately covers what is below
   function coveredBy(e) { var b = box(e), r = b.r; if (r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return ''; if (getComputedStyle(e).pointerEvents === 'none') return '';
     var t = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, b.x)), Math.max(1, Math.min(innerHeight - 1, b.y)));
+    if (t && t.closest('.gx-drawer-head') && e.closest('.gx-drawer') && !e.closest('.gx-drawer-head')) return '';   // scrolled under the drawer's sticky head: clipped by the scroll, not covered
     if (!t || related(t, e) || t.closest(SKIPSEL) || scrim(t) || getComputedStyle(t).pointerEvents === 'none') return ''; return t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]; }
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
   function engineBad() {   // every element marked data-engine="<js expression>" must show that engine number
@@ -880,7 +891,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     for (var a = 0; a < rects.length; a++) for (var b = a + 1; b < rects.length; b++) { var A = rects[a], B = rects[b]; if (related(A.e, B.e)) continue;
       var w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left), h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
       if (w > 2 && h > 2 && w * h > .3 * Math.min(A.r.width * A.r.height, B.r.width * B.r.height)) add('text overlaps: "' + A.t + '" <' + who(A.e) + '> / "' + B.t + '" <' + who(B.e) + '>'); }
-    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '>'); });
+    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '> "' + (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 24) + '"'); });
     engineBad().forEach(add);
     return out;
   };
@@ -1029,6 +1040,33 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     ]
   });
 
+
+  // UI-BAR rules 4-8 that the shared menu test cannot see (14 Oct 2026)
+  var vis = function (e) { var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 2 && r.height > 2 && c.visibility !== 'hidden' && c.display !== 'none'; };
+  var lim = function () { return innerWidth >= 1024 ? 16 : 13; };
+  var minFont = function (root) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || e.children.length || !vis(e) || !/\S/.test(e.textContent)) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < lim() - 0.01) bad = f + 'px "' + e.textContent.trim().slice(0, 14) + '" in ' + (e.id || e.className); }); return bad || true; };
+  GXS.add({
+    id: 'ui-bar', name: 'UI bar: top bar, one line, images', ask: 'Few buttons, one line, readable text?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { try { GXH.setEnabled(true); GXH.reset(); } catch (e) { } return idle(900); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 4: top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('#top button'), vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'rule 5: board line is 8 words or fewer', fn: function () { var t = ($('#status') || {}).textContent || ''; return words(t) <= 8 || words(t) + ' words'; } },
+      { kind: 'fn', name: 'rule 5: coach tip is 8 words or fewer and not a repeat', fn: function () { var x = $('.gxh-tx'), t = $('.gxh-tt'); if (!x || !vis(x)) return true; var st = ($('#status').textContent || '').trim().toLowerCase(); return words(x.textContent) > 8 ? words(x.textContent) + ' words in tip' : (t && t.textContent.trim().toLowerCase() === st) ? 'tip title repeats the status line' : true; } },
+      { kind: 'fn', name: 'rule 1: top bar, status and tip text at least 13/16 px', fn: function () { var a = minFont('#top'); if (a !== true) return a; var s = parseFloat(getComputedStyle($('#status')).fontSize); if (s < lim() - 0.01) return 'status ' + s + 'px'; return minFont('.gxh-bub'); } },
+      { kind: 'fn', name: 'rule 8: images keep their natural aspect', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (m) { if (bad || !vis(m) || !m.naturalWidth) return; var a = m.naturalWidth / m.naturalHeight, r = m.getBoundingClientRect(), b = r.width / r.height; if (Math.abs(a - b) / a > 0.15 && getComputedStyle(m).objectFit === 'fill') bad = m.src.split('/').pop() + ' ' + b.toFixed(2) + ' vs ' + a.toFixed(2); }); return bad || true; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-start', name: 'UI bar: start screen', ask: 'One big Play button, simple options?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { showStart(); return idle(600); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 7: exactly one big primary button', fn: function () { var n = [].filter.call(document.querySelectorAll('#modal .btn.big'), vis).length; return n === 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'rule 7: no character roster', fn: function () { return ![].some.call(document.querySelectorAll('#modal .seat'), vis) || 'roster visible'; } },
+      { kind: 'fn', name: 'rule 7: Continue only with a save', fn: function () { var c = $('#modal [data-a=cont]'); return (!!c === !!savedGame()) || 'Continue shown without a save'; } },
+      { kind: 'fn', name: 'rule 1: start text at least 13/16 px', fn: function () { return minFont('#modal'); } },
+      { kind: 'fn', name: 'rule 7: start card fits without scrolling', fn: function () { var m = $('#modal .card'); return m.scrollHeight - m.clientHeight <= 2 || 'start card scrolls'; } }
+    ]
+  });
 })();
 
 </script>
@@ -1154,8 +1192,23 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
+    return out;
+  }
+  // text the bubble must not cover (board svg labels, card names marked data-gxh-text): treated like a glowing core, hard first, soft last
+  function textRects() {
+    var out = [], v = vp(), rg;
+    try { rg = D.createRange(); var w = D.createTreeWalker(D.body, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode()) && out.length < 300) {
+        if (!/\S/.test(n.nodeValue)) continue;
+        var e = n.parentElement; if (!e || (e.closest && (e.closest('[data-help]') || e.closest('[hidden]') || e.closest('.gxh-bub,.gxh-ring,.gxh-finger,script,style')))) continue;
+        rg.selectNodeContents(n); var r = rg.getBoundingClientRect();
+        if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+        var cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0) continue;
+        out.push(infl(r, 2));
+      }
+    } catch (x) {}
     return out;
   }
   function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
@@ -1163,9 +1216,9 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
     var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
     var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
-    var ks = [CORE, 32];
+    var ks = [CORE, 32], txt = textRects();
     for (var ki = 0; ki < ks.length && !best; ki++) {
-      var av = avoidRects(ks[ki]);
+      var av = avoidRects(ks[ki]).concat(txt);
       for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
         var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
         if (hit(c, T)) continue;
@@ -1173,6 +1226,17 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
         var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
         if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
       }
+    }
+    if (!best && !b.dataset.gxhShrunk) {   // no free spot: narrow the bubble (taller, slimmer) and try again before covering anything
+      var ws = [236, 196, 164];
+      for (var wi = 0; wi < ws.length; wi++) {
+        b.dataset.gxhShrunk = '1'; b.style.maxWidth = ws[wi] + 'px';
+        var r2 = place(b, tr); if (r2.free) { delete b.dataset.gxhShrunk; return r2; }
+      }
+      b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
+      var cw = [350, 292, 236];
+      for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
+      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -1185,6 +1249,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
+    c2.free = !!best;
     return c2;
   }
   function ringAt(r, cls) {
@@ -3156,12 +3221,12 @@ function hAnyGlow(){const b=boardEl().getBoundingClientRect(),cx=b.left+b.width/
   for(const g of document.querySelectorAll('#world .glow')){if(g.style.visibility==='hidden')continue;const r=g.getBoundingClientRect(),d=Math.hypot(r.left+r.width/2-cx,r.top+r.height/2-cy);if(d<bd){bd=d;best=g}}return best}
 function hFig(f){return()=>{const l=(UI.figs||[]).filter(b=>b.isConnected&&f(b._m));return l[0]||null}}
 const HLP_STEPS={
- place:{target:hAnyGlow,title:'Place your tile',text:'Tap a glowing square to lay it there. Tap the tile below to turn it.',pic:()=>HP.tap()},
- river:{target:hAnyGlow,title:'Follow the river',text:'Lay this tile so the river carries on. Tap a glowing square.',pic:()=>HP.river()},
- bonus:{target:hAnyGlow,title:'Extra turn!',text:'Your mason earned another tile. Tap a glowing square to place it.',pic:()=>HP.mason()},
- fig:{target:hFig(m=>true),title:'Claim with a follower',text:'Tap a glowing circle to claim that road, town or field. Or tap Skip.',pic:()=>HP.meeple()},
- figx:{target:hFig(m=>m.k==='bld'||m.k==='pig'),title:'Mason or hog',text:'Your mason or hog can join a feature you already hold. Tap its circle.',pic:()=>HP.mason()},
- nofig:{target:hq('#hskip'),title:'Nothing to claim',text:'Every road, town and field here is taken. Tap Skip to go on.',pic:()=>HP.skip()}
+ place:{target:hAnyGlow,title:'Tip',text:'Tap a glow. Tap the tile to turn.',pic:()=>HP.tap()},
+ river:{target:hAnyGlow,title:'Follow the river',text:'Carry the river on. Tap a glow.',pic:()=>HP.river()},
+ bonus:{target:hAnyGlow,title:'Tip',text:'Mason bonus tile. Tap a glow.',pic:()=>HP.mason()},
+ fig:{target:hFig(m=>true),title:'Claim with a follower',text:'Tap a circle to claim it, or Skip.',pic:()=>HP.meeple()},
+ figx:{target:hFig(m=>m.k==='bld'||m.k==='pig'),title:'Mason or hog',text:'Add your mason or hog. Tap a circle.',pic:()=>HP.mason()},
+ nofig:{target:hq('#hskip'),title:'Nothing to claim',text:'Nothing free to claim. Tap Skip.',pic:()=>HP.skip()}
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES=[
@@ -3566,8 +3631,8 @@ function savedGame(){try{const g=JSON.parse(localStorage.getItem(SAVE));return g
 function showStart(){closeMenu();UI.endShown=false;const o=UI.setup,sv=savedGame();
   const chips=(k,vals)=>vals.map(v=>`<button class="opt" data-k="${k}" data-v="${v[0]}" aria-pressed="${o[k]===v[0]}">${v[1]}</button>`).join('');
   const tg=(k,t)=>`<button class="opt" data-t="${k}" aria-pressed="${!!o[k]}">${t}</button>`;
-  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Start"><h1>Rampart &amp; Vine</h1><p class="sub">Build the valley. Claim it.</p>${tutFirst()?tutBtn('btn big'):''}<button class="btn ${tutFirst()?'alt':'big'}" data-a="play">Play vs computer</button>
-    <button class="btn alt" data-a="story">Story</button>${sv?`<button class="btn alt" data-a="cont">Continue game</button>`:''}${tutFirst()?'':tutBtn('btn alt')}
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Start"><h1>Rampart &amp; Vine</h1><p class="sub">Build the valley. Claim it.</p><button class="btn big" data-a="play">Play vs computer</button>
+    <button class="btn alt" data-a="story">Story</button>${sv?`<button class="btn alt" data-a="cont">Continue game</button>`:''}${tutBtn('btn alt')}
     <div class="opts">${chips('rivals',[[1,'1 rival'],[2,'2 rivals'],[3,'3 rivals']])}</div><div class="opts">${chips('lv',[['easy','Easy'],['normal','Normal'],['hard','Hard']])}</div>
     <div class="opts">${tg('river','River')}${tg('ic','Taverns')}${tg('tb','Merchants')}</div></div></div>`;
   const m=$('#modal');m.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(b.dataset.k)o[b.dataset.k]=isNaN(+b.dataset.v)?b.dataset.v:+b.dataset.v;else o[b.dataset.t]=!o[b.dataset.t];showStart()});

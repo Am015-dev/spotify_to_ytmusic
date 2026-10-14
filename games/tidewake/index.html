@@ -432,6 +432,20 @@ html.ph .omark b{width:26px;height:26px;font-size:.85rem;border-width:2px}
 html.ph .gx-drawer{top:auto}
 body:has(.gx-drawer.on) .gxh-bub,body:has(.gx-drawer.open) .gxh-bub{display:none}
 @media (prefers-reduced-motion:reduce){html.ph .ppop.in,html.ph .pcard.in{animation:none}}
+/* ui-bar: readable sizes, panels stay inside the dock column */
+.otag,.opip,.opip b,.opip u,.omark span,.ostop span,.otag.ship,.otag.ship.me{font-size:max(13px,.72rem)}
+.otag.mon.hi{font-size:max(13px,.82rem)}
+.prompt .tiny,.prompt summary{opacity:1;color:#2a1c05;font-size:max(13px,.85rem)}
+@media (min-width:1000px){
+  .otag,.opip,.opip b,.opip u,.omark span,.ostop span,.otag.ship,.otag.ship.me,.otag.mon.hi{font-size:16px}
+  .opip{width:36px;height:36px;margin:-18px 0 0 -18px}.opip.best{width:44px;height:44px;margin:-22px 0 0 -22px}
+  .gx-drawer,.gx-drawer.wide{width:calc(var(--gx-dock-w) - 8px)}
+  body:has(.gx-drawer.on) .gx-dock{visibility:hidden}
+}
+.rs{font-size:max(13px,.78rem)}.startpick{font-size:max(13px,.8rem)}.startpick .btn{font-size:max(13px,.85rem)}
+body:has(.gxh-tx) #chip{display:none}
+@media (min-width:1000px){.gx-drawer{transition:none}body:has(.gx-drawer.on) :is(.gxh-bub,.gxh-finger,.gxh-ring,.gxh-arr,.gxh-bulb,.gxh-ar,.gxh-compact){visibility:hidden}}
+html.sk .gx-drawer{background:#f3e6bf;background-clip:padding-box}
 </style>
 <style>
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
@@ -638,6 +652,12 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+/* compact form: used by gx-help.js when no free spot exists on a crowded board */
+.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+.gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
+
 
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
    Everything the kit draws carries data-help. Override with --gxt-* (and the --gxh-* variables of the help kit). */
@@ -717,7 +737,7 @@ html.sk .gxc-lab{font-size:13px;background:rgba(246,230,194,.94);color:#2a1d10}
 html.sk .gxc-node .gxc-stars{top:56px}
 html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
 html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
-html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:auto;min-height:46px;box-sizing:border-box;padding:3px 0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
 html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
 html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
@@ -1513,8 +1533,23 @@ const GX={key:'gx',open:null,
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
+    return out;
+  }
+  // text the bubble must not cover (board svg labels, card names marked data-gxh-text): treated like a glowing core, hard first, soft last
+  function textRects() {
+    var out = [], v = vp(), rg;
+    try { rg = D.createRange(); var w = D.createTreeWalker(D.body, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode()) && out.length < 300) {
+        if (!/\S/.test(n.nodeValue)) continue;
+        var e = n.parentElement; if (!e || (e.closest && (e.closest('[data-help]') || e.closest('[hidden]') || e.closest('.gxh-bub,.gxh-ring,.gxh-finger,script,style')))) continue;
+        rg.selectNodeContents(n); var r = rg.getBoundingClientRect();
+        if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+        var cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0) continue;
+        out.push(infl(r, 2));
+      }
+    } catch (x) {}
     return out;
   }
   function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
@@ -1522,9 +1557,9 @@ const GX={key:'gx',open:null,
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
     var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
     var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
-    var ks = [CORE, 32];
+    var ks = [CORE, 32], txt = textRects();
     for (var ki = 0; ki < ks.length && !best; ki++) {
-      var av = avoidRects(ks[ki]);
+      var av = avoidRects(ks[ki]).concat(txt);
       for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
         var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
         if (hit(c, T)) continue;
@@ -1532,6 +1567,17 @@ const GX={key:'gx',open:null,
         var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
         if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
       }
+    }
+    if (!best && !b.dataset.gxhShrunk) {   // no free spot: narrow the bubble (taller, slimmer) and try again before covering anything
+      var ws = [236, 196, 164];
+      for (var wi = 0; wi < ws.length; wi++) {
+        b.dataset.gxhShrunk = '1'; b.style.maxWidth = ws[wi] + 'px';
+        var r2 = place(b, tr); if (r2.free) { delete b.dataset.gxhShrunk; return r2; }
+      }
+      b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
+      var cw = [350, 292, 236];
+      for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
+      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -1544,6 +1590,7 @@ const GX={key:'gx',open:null,
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
+    c2.free = !!best;
     return c2;
   }
   function ringAt(r, cls) {
@@ -5621,8 +5668,7 @@ function startHTML(d){const info=startInfo(d),K=knowledge(d),adv=startAdvice(K,d
   let g='';for(const ed of EDGES){const hor=ed==='top'||ed==='bottom';g+=`<span>${ed[0].toUpperCase()+ed.slice(1)}</span>`;for(let i=1;i<=6;i++){const l=by[ed+i]||[];
     g+=`<span style="display:flex;gap:2px">${[0,1].map(k=>{const o=l[k],lab=i+(hor?'LR':'UD')[k];return o?`<button class="btn small" style="min-width:0;flex:1" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}" aria-label="${ed} ${i}, ${o.sideWord} mark">${lab}</button>`:`<button class="btn small" style="min-width:0;flex:1" disabled>${lab}</button>`}).join('')}</span>`}}
   const you=d===viewSeat()||humans().length===1;
-  return `<div class="prompt"><h4>${you?'Choose your start':esc(nm(d))+': choose a start'}</h4><p>Tap one of the big pulsing gold marks on the edge of the board. Each number from 1 to 6 has two marks (<b>L</b> left and <b>R</b> right of the number; on the side edges <b>U</b> upper and <b>D</b> lower).</p>
-  <p class="tiny">Tip: a mark in the middle of an edge is safest. Next to a corner you may run out of room. The dice come later: they only decide when the leviathans (the sea monsters already on the board) move.</p>
+  return `<div class="prompt">
   <details><summary class="tiny">All marks as a list</summary><div class="startpick" style="grid-template-columns:auto repeat(6,1fr)">${g}</div></details></div>`}
 function questionHTML(d,K){const q=G.q;let extra='';const you=d===viewSeat()||humans().length===1;
   if(q.kind==='bonus'&&G.cur===d&&G.pool.length)extra=`<p class="tiny">Sunken crews' tiles (numbered):</p><div class="hand">${G.pool.map((c,j)=>isCur(c)?`<span class="hc"><span class="n">${j+1}</span><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid:'pl'+j,size:96})}"></span>`:`<span class="hc sp"><span class="n">${j+1}</span>${isGate(c)?gateArt():cannonArt()}</span>`).join('')}</div>`;
@@ -5695,7 +5741,7 @@ function mainHTML0(){
 // ===================== part 4: the rest of the dock, popups, start screen =====================
 function renderBar(){const el=$('#barstat');if(!el||!G)return;const L=G.mons.filter(m=>m.k==='L').length;const solo=G.variant==='solo',es=G.variant==='easysolo';
   const toRise=G.mdeck.filter(x=>x<10).length;const R=UI.lastRoll;
-  el.innerHTML=G.phase==='setup'?`<span class="lg">Choose start marks</span>`:`<span class="lg" title="Turns played">Turn <b>${G.turn}</b>${es?` of ${G.opts.goal}`:''}</span><span class="lg" title="Current tiles left in the draw pile">Tiles left <b>${G.deck.length}</b></span><span title="Leviathans (sea monsters) on the board now">Monsters<span class="lg2"> on board</span> <b>${L}</b></span>${solo?`<span title="Leviathans that have not risen yet. You win when they are all gone.">Still to rise <b>${toRise}</b></span>`:''}${R?`<span class="lg" title="Leviathans wake when the two dice total 6, 7 or 8">Wake roll <b>${R[0]}+${R[1]}=${R[0]+R[1]}</b> ${R[0]+R[1]>=6&&R[0]+R[1]<=8?'(stir)':'(calm)'}</span>`:''}`;
+  el.innerHTML=G.phase==='setup'?`<span class="lg">Setup</span>`:`<span class="lg" title="Turns played">Turn <b>${G.turn}</b>${es?` of ${G.opts.goal}`:''}</span><span class="lg" title="Current tiles left in the draw pile">Tiles left <b>${G.deck.length}</b></span><span title="Leviathans (sea monsters) on the board now">Monsters<span class="lg2"> on board</span> <b>${L}</b></span>${solo?`<span title="Leviathans that have not risen yet. You win when they are all gone.">Still to rise <b>${toRise}</b></span>`:''}${R?`<span class="lg" title="Leviathans wake when the two dice total 6, 7 or 8">Wake roll <b>${R[0]}+${R[1]}=${R[0]+R[1]}</b> ${R[0]+R[1]>=6&&R[0]+R[1]<=8?'(stir)':'(calm)'}</span>`:''}`;
   $('#dockt').textContent=G.over?'Game over':UI.busy?'Watch the sea':G.phase==='setup'?'Start marks':'What to do now'}
 function renderRoad(){const el=$('#road');if(!el||!G)return;const cur=UI.busy&&UI.curTurn!=null?UI.curTurn:G.q?G.q.who:G.phase==='setup'?G.order[G.sp]:G.cur;
   el.innerHTML=G.order.map(i=>{const s=G.ships[i];const me=viewSeat()===i;return `<span class="rs${i===cur&&!G.over?' cur':''}${s.alive?'':' dead'}${me?' me':''}" title="${esc(G.seats[i].human?'Human':'Computer ('+G.seats[i].lv+')')}">${dot(i)}${esc(nm(i))}${G.team?` <small>${'AB'[G.team[i]]}</small>`:''}${s.alive&&G.phase==='play'?` <small>${G.hands[i].length}t</small>`:''}</span>`}).join('')}
@@ -6375,7 +6421,7 @@ function hproj(wx,wz,wy){try{const P=ovMakeProj();const bd=$('#board');if(!P||!b
 function hlpPipExample(){try{const d=sideToAct();const info=startInfo(d);let best=null,bd=1e9;
   for(const o of info){const p=hproj(o.w[0],o.w[1]);if(!p)continue;const dd=Math.abs(p.x-innerWidth/2)*.6+Math.abs(p.y-innerHeight*.55);if(dd<bd){bd=dd;best=p}}return best}catch(e){return null}}
 const HLP_STEPS={
- start:{target:()=>hlpPipExample(),title:'Pick a start mark',text:'Tap a glowing gold mark.',pic:()=>HP.mark()},
+ start:{target:()=>hlpPipExample(),title:'Your start',text:'Tap a gold mark.',pic:()=>HP.mark()},
  lay:{target:hq('#ppop .ph-tiles','#ps .ps-tiles','#pin .hand'),title:'Lay a current',text:'Pick a tile, turn it, then tap Place. Your junk sails along the new line.',pic:()=>HP.tile()},
  nolay:{target:hq('#ps .ps-x .pb','#ps .ps-ctl .pb','#pin .row .btn','#main .row .btn'),title:'Nothing to lay',text:'No tile fits. Tap Pass, or use a Rift Gate or Deck Cannon if you have one.',pic:()=>HP.pass()},
  doom:{target:hq('#pc [data-qkind] h4','#main [data-qkind] h4'),title:'Junk in danger',text:'A leviathan is about to sink you. Pick a rescue below, or Accept.',pic:()=>HP.lev()},
@@ -6493,7 +6539,7 @@ const dismissMph=()=>{PH.mphHide=UI.mph;try{phAfter();phStrip()}catch(e){}};
 function tutSteps(){const L=[
  {id:'goal',title:'Last junk afloat',say:'Steer your junk with current tiles. Stay afloat longer than every rival. Leviathans and the chart\'s edge sink you.',target:tq('#board'),wait:null,
    ready:()=>!!G&&UI.started&&G.phase==='setup'&&sideToAct()===0&&!UI.busy},
- {id:'mark',title:'Pick a start mark',say:'Tap the glowing gold mark at the bottom. Your junk starts there.',target:tutPipRect,
+ {id:'mark',title:'Your start',say:'Tap the glowing gold mark.',target:tutPipRect,
    wait:{type:'tap',match:a=>(a.what==='sq'||a.what==='startmark'&&a.e===TS.myStart.e)&&a.x===TS.myStart.x&&a.y===TS.myStart.y},ready:()=>G.phase==='setup'&&!PH.pop&&sideToAct()===0&&!UI.busy&&!!tutPipRect()},
  {id:'mark2',title:'Set sail here',say:'Tap the glowing button to confirm this mark.',target:tq('#ppop [data-a=startmark][data-e="'+TS.myStart.e+'"]'),
    wait:{type:'tap',match:a=>a.what==='startmark'&&a.x===TS.myStart.x&&a.y===TS.myStart.y&&a.e===TS.myStart.e},ready:()=>PH.pop==='start'&&!!tq('#ppop [data-a=startmark][data-e="'+TS.myStart.e+'"]')()},

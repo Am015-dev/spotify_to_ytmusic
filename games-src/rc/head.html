@@ -702,4 +702,30 @@ html.ph .gx-bar .gxh-bulb,.gx-bar .gxh-bulb{min-width:40px}
 .mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid #8a6a43;background:#fbf4e2;color:#2a1a0a;font:inherit;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left;touch-action:manipulation}
 .mchip.on{background:#d9a53a;border-color:#7a5413;font-weight:700}.mchip.prev{border-style:dashed}
 </style>
+<style>/* UI bar: readable text at every size, panel opened over the start screen hides it */
+.rm-p span{font-size:13px;letter-spacing:0}
+@media (max-width:700px){.rm-p:not(.now) span{display:none}.rm-p.now span{white-space:normal;text-align:center}.rm-l{grid-template-columns:repeat(7,minmax(0,1fr))}.rm-p.now{grid-column:auto}}
+@media (min-width:1024px){.rm-p span{font-size:16px}.rm-h{font-size:16px}}
+#hud .rtrack span{font-size:13px;min-width:22px;height:22px}
+#hud .hk em{font-size:13px}
+#hud .rleg{font-size:13px}
+@media (min-width:1024px){#hud .hk em,#hud .rleg{font-size:16px}}
+.life i{font-size:13px;width:20px;height:20px}
+.tl em{font-size:13px}
+body:has(.gx-drawer.on) #modal{visibility:hidden}
+/* round 2 */
+@media (min-height:621px){.gxh-bub:not(.gxh-compact) .gxh-ok{margin:6px 0 0 auto!important;border:0!important;min-height:44px}}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
+#chip{z-index:30}
+@media (min-width:700px){#chip{pointer-events:auto}}
+.rm-p span{overflow:visible;text-overflow:clip}
+.rm-p:not(.now) span{display:none}
+.rm-p.now span{width:max-content;margin:0 -24px;font-size:13px}
+@media (min-width:1024px){.rm-p.now span{font-size:14px}}
+@media (max-width:400px){html.ph #phchip .c-x{display:none}}
+#musicpick,#speedbtn{width:auto;min-width:max-content;padding-left:16px;padding-right:16px;white-space:nowrap}
+.gx-bar .gxh-bulb{border-image:none;border:1px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(0,0,0,.25);padding:0}
+.gx-bar .gxh-bulb svg{width:20px;height:20px}
+@media (min-width:700px){body:has(.gx-drawer.on) .gx-dock{visibility:hidden}}
+</style>
 </head>
