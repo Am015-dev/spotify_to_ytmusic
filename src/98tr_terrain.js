@@ -17,7 +17,9 @@ function TRN_grade(){const G=[];let worst=null;for(const r of TRN_roads()){if(r.
 function TRN_edge(n=50){const R=TRN_roads().filter(r=>r.P.length>2),rnd=TRN_rng(CID==='fra'?7:11),out=[];let t=0;
   while(out.length<n&&t++<5000){const r=R[Math.floor(rnd()*R.length)],i=1+Math.floor(rnd()*(r.P.length-2)),a=r.P[i-1],b=r.P[i+1],c=r.P[i];if(TRN_skip(c[0],c[1]))continue;
     const l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l,nz=(b[0]-a[0])/l,y=groundY(c[0],c[1]),hw=Math.min(r.hw,8);if(TRN_skip(c[0]+nx*hw,c[1]+nz*hw)||TRN_skip(c[0]-nx*hw,c[1]-nz*hw))continue;
-    // intersections: across one road is along the other (its grade), not a cross-fall
+    // intersections: across one road is along the other (its grade), not a cross-fall; terr-4: also junction mouths (centre within one
+    // half-width of a terr-2 junction pad / disc / filler square: the pad plane carries the cross street's grade, blended over 20 m)
+    if(typeof TJ_inJunc==='function'&&TJ_inJunc(c[0],c[1],hw))continue;
     if([1,-1].some(sd=>{const x=c[0]+nx*hw*sd,z=c[1]+nz*hw*sd,q=cityAt(x,z);if(q&&q.S!==r.ref&&q.d<q.S.r.w/2+2)return true;try{const f=fillAt(x,z,r.ref);if(f&&f.d<f.r.w/2+2)return true}catch(e){}return false}))continue;
     const d=Math.max(Math.abs(groundY(c[0]+nx*hw,c[1]+nz*hw)-y),Math.abs(groundY(c[0]-nx*hw,c[1]-nz*hw)-y));out.push({d,x:Math.round(c[0]),z:Math.round(c[1]),id:r.id})}
   out.sort((a,b)=>b.d-a.d);const o={n:out.length,max:+out[0].d.toFixed(2),worst:out[0],over:out.filter(q=>q.d>.3).length};TRN.edge=o;return o}
@@ -95,3 +97,82 @@ function TRN_junc(){const L=[];for(const J of (typeof JUNC!=='undefined'?JUNC:[]
     const A=[[m,sx,sz],[sx,sxx,sxz],[sz,sxz,szz]],B=[sy,sxy,szy],det=M=>M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])-M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])+M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]),D=det(A);if(Math.abs(D)<1e-9)continue;
     const sol=[0,1,2].map(k=>det(A.map((r,i)=>r.map((v,j)=>j===k?B[i]:v)))/D);let e=0;for(const[x,z,y]of P)e=Math.max(e,Math.abs(y-(sol[0]+sol[1]*x+sol[2]*z)));if(e>mx){mx=e;w=[Math.round(x0),Math.round(z0)]}}
   const o={n,max:+mx.toFixed(3),worst:w};TRN.junc=o;return o}
+// terr-4 (Alex: "hills from more streets"): 50 street spots per city, eye 1.5 m over the road, 16 headings. Each ray marches the ground
+// 150 m .. TRN_VD (1500 m = the 'min' quality far plane: what every phone draws) and the building colliders (HUB.grid, top y = b.h) on the way;
+// a heading SEES A HILL when some ground point rises >= 20 m and > 1.5 deg above the eye, above every building / nearer ground in front of it
+// (a street climbing 6-10 m ahead is a slope, not a hill).
+const TRN_VD=1500,TRN_VA=1.5,TRN_VH=20;
+function TRN_ray(x0,z0,ey,a,tA,vh=TRN_VH,mg=0){const ux=Math.sin(a),uz=Math.cos(a);let occ=-1e9;const B=new Set();
+  for(let d=5;d<=TRN_VD;d+=d<300?5:10){const x=x0+ux*d,z=z0+uz*d,L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));
+    if(L)for(const b of L){if(B.has(b)||!b.h)continue;if(bHit(b,x,z,0)){B.add(b);occ=Math.max(occ,(b.h-ey)/d)}}
+    const gy=groundY(x,z),g=(gy-ey)/d;if(d>=150&&g>tA&&gy-ey>=vh&&g>occ+mg)return d;occ=Math.max(occ,g)}
+  // nothing on the ground: the backdrop ridge (Athens, terr-4 placement: stands on the ground under the eye, apparent height y/2300) if it clears everything
+  const T=TR_H4.on?TRN_ridgeTop():null;if(T){const deg=((Math.round(a*57.296)%360)+360)%360,y=T[deg];if(y>-1e8){const g=(y-1.5)/TRN_RD;if(g>tA&&g>occ+mg)return TRN_RD}}return 0}
+// the pass metric is the DRIVING view: the road direction (both ways) +-30 deg (5 rays each), what the chase camera shows; 16 headings = info
+function TRN_view(n=100,seed,opt={}){const va=opt.va??TRN_VA,vh=opt.vh??TRN_VH,mg=Math.tan((opt.mg??0)*Math.PI/180);const R=TRN_roads().filter(r=>r.cls!=='ab'&&r.cls!=='hill'&&r.P.length>2),rnd=TRN_rng(seed??(CID==='fra'?21:23)),S=[];
+  for(let t=0;S.length<n&&t<5000;t++){const r=R[Math.floor(rnd()*R.length)],i=1+Math.floor(rnd()*(r.P.length-2)),c=r.P[i],e=r.P[i+1];if(!TRN_skip(c[0],c[1])&&c[0]>HX0&&c[0]<HX1&&c[1]>HZS&&c[1]<HZN)S.push([c[0],c[1],Math.atan2(e[0]-c[0],e[1]-c[1])])}
+  const tA=Math.tan(va*Math.PI/180),out=[];
+  for(const[x0,z0,h0]of S){const ey=groundY(x0,z0)+1.5;let hits=0,fwd=null;
+    for(let k=0;k<16;k++)if(TRN_ray(x0,z0,ey,k/16*6.283,tA,vh,mg))hits++;
+    for(const s of[0,Math.PI])for(const da of[0,-.26,.26,-.52,.52]){const a=h0+s+da,d=TRN_ray(x0,z0,ey,a,tA,vh,mg);if(d&&(!fwd||d<fwd.d))fwd={d,a}}
+    out.push({x:Math.round(x0),z:Math.round(z0),hits,fwd})}
+  const sees=out.filter(o=>o.fwd).length,all=out.filter(o=>o.hits).length,o={n:out.length,sees,pct:Math.round(sees/out.length*100),all:Math.round(all/out.length*100),dirs:+(out.reduce((s,o)=>s+o.hits,0)/out.length).toFixed(1),L:out};TRN[opt.key||'view']=o;return o}
+const TRN_NEED_VIEW={fra:75,ath:45};  // terr-3 build (?trh=0): fra 64 %, ath 14 % (FAIL); terr-4: fra 77, ath 53 (seeds 5-7: 80-84, 56-62)
+function TRN_viewGo(){if(!TERR.on)return'📍 PENDING · terrain is OFF in this build';const o=TRN_view(),need=TRN_NEED_VIEW[CID==='fra'?'fra':'ath'],ok=o.pct>=need;
+  const s=o.L.filter(q=>q.fwd).sort((a,b)=>a.fwd.d-b.fwd.d)[0];if(s){roamWarp(s.x,s.z,s.fwd.a);RO.v=0}
+  return'📍 HILLS FROM STREETS · '+o.n+' street spots, 16 headings, ≤'+TRN_VD+' m: '+o.sees+' see a hill ahead or behind along the road (≥'+TRN_VH+' m up, >'+TRN_VA+'°, over the buildings, ±30°): '+o.pct+'% (need ≥'+need+'%) · all-round '+o.all+'%, avg '+o.dirs+'/16 headings'+(s?' · you face one ('+s.fwd.d+' m)':'')+(ok?' ✅':' ❌')}
+window.__trn.view=TRN_view;
+// terr-4: Athens backdrop mountains (athRidge, a ring 2300 m around the camera) were clipped on low/min quality (far plane 2000/1500 m, phones)
+// and stood on y 0, so from the higher streets (ground 100-250 m) they sank below the eye. Now the ring is scaled about the camera to fit
+// inside the far plane (same apparent size) and stands on the ground under the camera (apparent angles as seen from the street). ?trh=0 = old.
+const TRN_RD=2300;
+function TRN_ridgeFit(){if(!HUB.ridge&&CID==='fra'&&TRN_TAU&&HUB.grp){HUB.ridge=TRN_fraRidge();HUB.grp.add(HUB.ridge);TRN.rt=undefined}const R=HUB.ridge;if(!R||!TR_H4.on)return;if(TRN_RX!==1&&!R.userData.rc)TRN_athRecolor(R);const c=camera.position,s=Math.min(1,camera.far*.9/TRN_RD),g=groundY(c.x,c.z);R.scale.set(s,s*TRN_RX,s);R.position.set(c.x,c.y-s*(c.y-g),c.z)}
+if(typeof hubTrafficStep==='function')hubTrafficStep=(f=>function(dt){const r=f.apply(this,arguments);TRN_ridgeFit();return r})(hubTrafficStep);
+// apparent top of the ridge per whole degree of bearing (deg, 0 = +z, clockwise like atan2(x,z)), from the mesh's own vertices; null = no ridge there
+function TRN_ridgeTop(){if(TRN.rt!==undefined)return TRN.rt;const R=HUB.ridge;TRN.rt=null;if(!R)return null;const T=new Float32Array(360).fill(-1e9);
+  R.traverse(o=>{if(!o.isMesh||!o.userData.ridge)return;const p=o.geometry.attributes.position;for(let i=0;i+2<p.count;i+=3){const P=[0,1,2].map(k=>[p.getX(i+k),p.getY(i+k),p.getZ(i+k)]);
+    // each triangle: fill its bearing span with the linear top edge (vertices with y > -40 are on the ridge line)
+    const top=P.filter(v=>v[1]>-39);if(top.length<2)continue;const[a,b]=top,ba=Math.atan2(a[0],a[2])*57.3,bb=Math.atan2(b[0],b[2])*57.3;let d=bb-ba;if(d>180)d-=360;if(d<-180)d+=360;
+    const n=Math.max(1,Math.ceil(Math.abs(d)));for(let k=0;k<=n;k++){const t=k/n,deg=((Math.round(ba+d*t)%360)+360)%360,y=(a[1]+(b[1]-a[1])*t)*TRN_RX;if(y>T[deg])T[deg]=y}}});TRN.rt=T;return T}
+// terr-5: city ground on a mound crown is grass (per quadtree quad), so the crowns read as green hills over the pavement
+if(typeof gndBuild==='function')gndBuild=(f=>function(grp,x0,x1,z0,z1,o){const out=f(grp,x0,x1,z0,z1,o&&o.mats&&o.mats.g&&o.mats.w&&TR_GT.on?{...o,qcls:(x,z,k)=>k==='w'&&TR_onCrown(x,z)?'g':k}:o);return out})(gndBuild);
+// terr-5 (Alex must SEE hills; terr-4 lead 2): the Frankfurt Taunus backdrop, built like athRidge (ring TRN_RD around the camera, fitted
+// into the far plane by TRN_ridgeFit). Real bearings from the Römer: Großer Feldberg 310°, Altkönig 308°, Hohe Wurzel (Wiesbaden) 277°,
+// Winterstein 355°; real apparent heights are 1-2°, too small on a phone (and under the city's own hills, 3-4°), so x6.6 (Feldberg 14°, ?taux=<k> tunes). Two layers: blue-hazed main ridge, green
+// Vortaunus foothills in front. Tops are stepped in brick-like terraces (LEGO look). ?tau=0 = no backdrop.
+// terr-5: the Athens backdrop (Ymittos 6.2°, Parnitha 3.8°...) stood only 1-3° over the city roofs: x1.6 in height (?athx=<k>)
+const TRN_RX=CID==='fra'?1:+(new URLSearchParams(location.search).get('athx')||1.6);
+// ...and its pre-hazed violet/beige vertex colours matched the pale horizon sky (invisible in shots even where the test counted it):
+// slate blue at the ridge line, grey-blue at the foot
+function TRN_athRecolor(R){R.userData.rc=1;const top=new THREE.Color('#4f5d80'),low=new THREE.Color('#8a90a2');R.traverse(o=>{if(!o.isMesh||!o.userData.ridge)return;const p=o.geometry.attributes.position,c=o.geometry.attributes.color;if(!c)return;
+  for(let i=0;i<p.count;i++){const C=p.getY(i)>-39?top:low;c.setXYZ(i,C.r,C.g,C.b)}c.needsUpdate=true})}
+const TRN_TAUX=+(new URLSearchParams(location.search).get('taux')||2.2),TRN_TAU=(()=>{try{return TR_H4.on&&new URLSearchParams(location.search).get('tau')!=='0'}catch(e){return false}})();
+function TRN_fraRidge(){const g0=new THREE.Group(),r=mul(5150),pos=[],col=[],c=new THREE.Color(),c2=new THREE.Color(),Q=TRN_RD*Math.tan(.3*Math.PI/180);
+  const L=[{D:TRN_RD,top:'#3e7468',low:'#86a99a',k:[[256,0],[263,1.5],[272,2.3],[281,2.8],[292,3.5],[301,4.5],[307,5.8],[310,6.4],[314,5.4],[323,4.4],[333,4.9],[342,3.9],[351,3.3],[360,2.4],[368,1.4],[374,0]]},
+    {D:TRN_RD*.96,top:'#3f8a3a',low:'#7cab6c',k:[[270,0],[279,1.2],[291,2],[301,2.7],[311,2.3],[321,3],[332,2.3],[342,1.7],[353,0]]}];
+  for(const Y of L){const K=Y.k,top=new THREE.Color(Y.top),low=new THREE.Color(Y.low),at=b=>{for(let i=1;i<K.length;i++)if(b<=K[i][0]){const t=(b-K[i-1][0])/(K[i][0]-K[i-1][0]);return K[i-1][1]+(K[i][1]-K[i-1][1])*t}return 0};
+    for(let b=K[0][0],n=0;b<K[K.length-1][0];b+=1.5,n++){const deg=at(b+.75)*TRN_TAUX;if(deg<=.05)continue;const h=Math.max(Q,Math.round(Y.D*Math.tan(deg*Math.PI/180)*(.9+r()*.2)/Q)*Q),a0=b*Math.PI/180,a1=(b+1.5)*Math.PI/180;
+      const p=[-Math.sin(a0)*Y.D,Math.cos(a0)*Y.D],q=[-Math.sin(a1)*Y.D,Math.cos(a1)*Y.D],k=n%2?.93:1;c2.copy(low).lerp(top,.85).multiplyScalar(k);
+      for(const w of[[p[0],-40,p[1],0],[q[0],-40,q[1],0],[q[0],h,q[1],1],[p[0],-40,p[1],0],[q[0],h,q[1],1],[p[0],h,p[1],1]]){pos.push(w[0],w[1],w[2]);c.copy(w[3]?c2:low);col.push(c.r,c.g,c.b)}}}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+  const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,fog:false,side:THREE.DoubleSide}));m.frustumCulled=false;m.renderOrder=-1;m.userData.ridge=1;g0.add(m);g0.userData.tau=1;return g0}
+// terr-5 STRICT skyline test (Alex must SEE hills; terr-4 lead 3): same 100 street spots and driving view, but a hill counts only when its
+// silhouette clears the buildings and nearer ground by >= 1° (a band ~6 px tall on a phone) and stands >= 3° and >= 40 m above the eye
+// (or the backdrop ridge clears them by 1°). terr-4's test passed on a 0.01° sliver. GO terr5/terrain-sky-fra/-ath.
+const TRN_SKY={va:3,vh:40,mg:1,key:'sky'},TRN_NEED_SKY={fra:80,ath:55};
+function TRN_skyGo(){if(!TERR.on)return'📍 PENDING · terrain is OFF in this build';const o=TRN_view(100,undefined,TRN_SKY),need=TRN_NEED_SKY[CID==='fra'?'fra':'ath'],ok=o.pct>=need;
+  const s=o.L.filter(q=>q.fwd).sort((a,b)=>b.fwd.d-a.fwd.d)[0];if(s){roamWarp(s.x,s.z,s.fwd.a);RO.v=0}
+  return'📍 HILL SKYLINE · '+o.n+' street spots: '+o.sees+' see a hill or the backdrop ridge along the road (±30°) standing ≥'+TRN_SKY.va+'° and ≥'+TRN_SKY.vh+' m above the eye AND ≥'+TRN_SKY.mg+'° clear above every building in front: '+o.pct+'% (need ≥'+need+'%) · all-round '+o.all+'%'+(s?' · you face one ('+s.fwd.d+' m)':'')+(ok?' ✅':' ❌')}
+window.__trn.sky=()=>TRN_view(100,undefined,TRN_SKY);
+// terr-5 GO terrain-crown-fra: buildings (HUB.bld colliders) whose centre or corners lie on a crown = 0; ground class under 200 crown samples
+// = grass; park blocks exist. Parks you on a street crossing the biggest crown.
+function TRN_crownGo(){if(!TR_GT.on)return'📍 PENDING · green crowns are OFF (?tgt=0)';let onC=0;for(const b of HUB.bld||[]){if(b.y0||!b.h)continue;const hw=b.hw||0,hd=b.hd||0;if([[0,0],[hw,hd],[-hw,hd],[hw,-hd],[-hw,-hd]].some(([a,c])=>TR_onCrown(b.x+a*.8,b.z+c*.8)))onC++}
+  const rnd=TRN_rng(31),P=[];for(let t=0;P.length<200&&t<20000;t++){const x=HX0+rnd()*(HX1-HX0),z=HZS+rnd()*(HZN-HZS);if(TR_onCrown(x,z))P.push([x,z])}
+  let grass=0,road=0;for(const[x,z]of P){const q=cityAt(x,z);let f=null;try{f=fillAt(x,z)}catch(e){}if((q&&q.d<q.road.w/2+3)||(f&&f.d<f.r.w/2+3)){road++;continue}if(TRN_gmat(x,z)==='g')grass++}
+  const parks=ZONES.filter(Z=>Z.t==='grass'&&TR_onCrown((Z.x0+Z.x1)/2,(Z.z0+Z.z1)/2)).length,n=P.length-road,ok=onC===0&&n>0&&grass>=n*.95&&parks>0;
+  const S=TRN_roads().filter(r=>r.cls!=='ab'&&r.P.length>2);let best=null;for(const r of S)for(let i=1;i<r.P.length-1;i+=2){const c=r.P[i];if(!TR_onCrown(c[0],c[1]))continue;const e=r.P[i+1],m=TR_crown(c[0],c[1]);if(!best||m>best.m)best={x:c[0],z:c[1],a:Math.atan2(e[0]-c[0],e[1]-c[1]),m}}if(best){roamWarp(best.x,best.z,best.a);RO.v=0}
+  return'📍 GREEN CROWNS · buildings on a crown: '+onC+' (need 0) · crown ground off the roads: '+grass+'/'+n+' grass (need ≥95 %) · park blocks on crowns: '+parks+(ok?' ✅':' ❌')}
+// the city ground mesh actually drawn under a point (ray down onto gndBuild meshes, userData.trG): 'g' = grass texture, 'w' = other
+const TRN_RC=new THREE.Raycaster();
+function TRN_gmat(x,z){const G=TRN.gm||(TRN.gm=(()=>{const o=[];HUB.grp.traverse(m=>{if(m.isMesh&&m.userData.trG)o.push(m)});return o})());TRN_RC.set(new THREE.Vector3(x,3000,z),new THREE.Vector3(0,-1,0));TRN_RC.far=4000;
+  const h=TRN_RC.intersectObjects(G,false)[0];if(!h)return null;const M=h.object.material,mm=Array.isArray(M)?M[0]:M;return h.object.userData.gk==='g'?'g':'w'}

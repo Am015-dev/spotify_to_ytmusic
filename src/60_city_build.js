@@ -13,8 +13,10 @@ function gndVert(x,z,y0,f){const r=riverAt(x,z);if(!r)return[x,y0+tH(x,z),z,0];c
 function gndBuild(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1-x0)/cs),nz=Math.round((z1-z0)/cs),dx=(x1-x0)/nx,dz=(z1-z0)/nz;
   for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const ax=x0+i*dx,az=z0+j*dz,cx=ax+dx/2,cz=az+dz/2;if(o.hole&&o.hole(cx,cz))continue;
     let n=1,f=cs,Q=null;if(rivClear(cx,cz)<Math.hypot(dx,dz)/2+o.fine*1.5){n=Math.ceil(dx/o.fine);f=o.fine;if(o.hilly)Q=ART8_riv(ax,az,dx,dz,n)}else if(o.hilly){Q=[];ART7_quad(ax,az,dx,dz,Q)}
-    const k=o.cls(cx,cz),key=k+'|'+Math.floor((cx-x0)/o.tile)+'|'+Math.floor((cz-z0)/o.tile);let G=B.get(key);if(!G)B.set(key,G={k,p:[],u:[],c:[],n:[],i:[],m:new Map()});
+    const k0=o.cls(cx,cz),tk='|'+Math.floor((cx-x0)/o.tile)+'|'+Math.floor((cz-z0)/o.tile);let G=null;
     for(const[lx,lz,lw,lh,ln,sn]of Q||[[ax,az,dx,dz]]){if(Q){n=ln||1;f=lw/n}
+    // terr-5: o.qcls re-classes each quadtree quad (green mound crowns inside a pavement cell)
+    {const k=o.qcls?o.qcls(lx+lw/2,lz+lh/2,k0):k0,key=k+tk;G=B.get(key);if(!G)B.set(key,G={k,p:[],u:[],c:[],n:[],i:[],m:new Map()})}
     const V=[],sx=lw/n,sz=lh/n;for(let a=0;a<=n;a++)for(let b=0;b<=n;b++){const vx=lx+a*sx,vz=lz+b*sz;
       // hot-1: a quadtree corner already in this group's vertex map is re-used below without reading its height: skip its ground samples (same mesh, ~30% fewer TR_Y calls)
       V.push(n>1||sn?gndVert(vx,vz,o.y0,f):Q&&G.m.has(Math.round(vx*16)+','+Math.round(vz*16))?[vx,0,vz,0]:[vx,o.y0+tH(vx,vz)-ART8_dip(vx,vz),vz,0])}
@@ -22,7 +24,7 @@ function gndBuild(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1
       if(v[3])G.n.push(0,1,0);else{const e=2,hx=tH(v[0]+e,v[2])-tH(v[0]-e,v[2]),hz=tH(v[0],v[2]+e)-tH(v[0],v[2]-e),l=Math.hypot(hx,2*e,hz);G.n.push(-hx/l,2*e/l,-hz/l)}}
     for(let a=0;a<n;a++)for(let b=0;b<n;b++){const q=a*(n+1)+b;if(V[q][3]&&V[q+1][3]&&V[q+n+1][3]&&V[q+n+2][3])continue;G.i.push(ix[q],ix[q+1],ix[q+n+1],ix[q+1],ix[q+n+2],ix[q+n+1])}}}
   const out=[];for(const G of B.values()){if(!G.i.length)continue;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(G.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(G.n,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(G.u,2));if(o.col)g.setAttribute('color',new THREE.Float32BufferAttribute(G.c,3));g.setIndex(G.i);
-    const m=new THREE.Mesh(g,o.mats[G.k]);m.receiveShadow=true;grp.add(m);out.push(m)}return out}
+    const m=new THREE.Mesh(g,o.mats[G.k]);m.receiveShadow=true;m.userData.gk=G.k;grp.add(m);out.push(m)}return out}
 // the Main and the Osthafen basin: water ribbons (~1.2 km pieces so they cull) with the distance to the bank as a vertex attribute (quay foam)
 function waterBuild(grp,wm){HUB.water=[];for(const S of WATERS){const P=S.pts,n=P.length;let i0=0;while(i0<n-1){const c=P[i0],city=Math.abs(c.x)<HX1+600&&c.z>HZS-500&&c.z<HZN,st=city?2:4,i1=Math.min(n-1,i0+150),idx=[];for(let i=i0;i<i1;i+=st)idx.push(i);idx.push(i1);
     const K=8,pos=[],bank=[],ix=[];for(const i of idx){const p=P[i],e=p.hw+2;for(let k=0;k<=K;k++){const d=-e+2*e*k/K;pos.push(p.x+p.tz*d,HWY-.1,p.z-p.tx*d);bank.push(Math.max(0,p.hw-Math.abs(d)))}}

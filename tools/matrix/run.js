@@ -26,7 +26,7 @@ const up=()=>new Promise(r=>http.get('http://127.0.0.1:'+PORT+'/hot.html?probe=1
   const QAJ=ROOT+'/src/assets/qa/code.js';if(!A.includes('--no-qa')&&fs.existsSync(QAJ)){try{await H(fs.readFileSync(QAJ,'utf8'))}catch(e){log(tag+' qa kit not loaded: '+String(e).slice(0,80))}}
   const J=JSON.stringify,first=k===0,SHn=c==='ath'?+arg('--ath-shards',2):SH,second=SHn===1||k>0;
   const ride=await H('GAR_SETS.map(s=>s.id)');const step=Math.max(1,Math.floor(ride.length/NR)),rides=arg('--ids',null)?arg('--ids').split(','):ride.filter((_,i)=>i%step===0).slice(0,NR);
-  const setProf=async pr=>{await p.setViewportSize(VP[pr]);await H('MX.setProf('+J(pr)+')')};
+  /* rev-3: order matters. touch→desktop with the 1280×720 viewport but TOUCH.on still true gave phone-HUD qa-invariants (hud_over_controls #roamMini/#tL, hud_over_figure #roamPrompt) that no phone ever shows: leave touch before growing, enter touch after shrinking */const setProf=async pr=>{if(pr==='desktop'){await H('MX.setProf('+J(pr)+')');await p.setViewportSize(VP[pr])}else{await p.setViewportSize(VP[pr]);await H('MX.setProf('+J(pr)+')')}await p.waitForTimeout(120)};
   if(FAMS.includes('footsurf')&&first){try{const r=JSON.parse(await H(fs.readFileSync(ROOT+'/tools/hot/footSurf.js','utf8')));const f=[];if(!r.pass){if(r.A&&r.A.nBad)f.push('footsurf-A-feet-off-surface');if(r.B)for(const q of ['cars','props','bld','rides'])if(r.B[q]&&r.B[q].nBad)f.push('footsurf-B-penetrates-'+q);if(!f.length)f.push('footsurf-fail')}all.push({fam:'footsurf',tag:c,city:c,prof:'phone',fails:f,info:r})}catch(e){all.push({fam:'footsurf',tag:c,city:c,prof:'phone',fails:['footsurf-crash']})}}
   if(FAMS.includes('props')&&second)await H('MX.propScan()');
   // starts: shard k takes every SH-th street start
@@ -49,7 +49,7 @@ const up=()=>new Promise(r=>http.get('http://127.0.0.1:'+PORT+'/hot.html?probe=1
    }log(tag+' ride '+rid+' done')}
   // builder last: closing it leaves the page without the phone controls (the roam HUD is checked before)
   if(demos.length)for(const rid of rides){await H('MX.setRide('+J(rid)+')');for(const pr of PROFS){await setProf(pr);for(const d of demos)await H('MX.bxCase('+J(d)+','+J(pr)+','+J(rid)+')')}}
-  try{const bugs=await H('(window.__bugs||[]).map(b=>({name:b.name,x:b.x,z:b.z,ride:b.ride,n:b.n}))');for(const b of bugs)all.push({fam:'qa-invariant',tag:b.name+'@'+Math.round(b.x)+','+Math.round(b.z)+'|'+(b.ride||''),city:c,prof:'',fails:['qa-inv:'+b.name]})}catch(e){}
+  try{const bugs=await H('(window.__bugs||[]).map(b=>({name:b.name,x:b.x,z:b.z,ride:b.ride,vp:b.vp,d:b.d,n:b.n}))');for(const b of bugs)all.push({fam:'qa-invariant',tag:b.name+'@'+Math.round(b.x)+','+Math.round(b.z)+'|'+(b.ride||'')+'|'+(b.vp||''),city:c,prof:'',det:b.d,fails:['qa-inv:'+b.name]})}catch(e){}
   const res=await H('MX.R.slice()');for(const r of res){r.city=c;r.prof=r.prof||''}all.push(...res);errs.push(...E.map(e=>tag+' '+e));await ctx.close()})();break}catch(e){log(c+'#'+k+' attempt '+attempt+' failed: '+String(e).slice(0,100));errs.push(c+'#'+k+' JOB FAILED: '+String(e).slice(0,100));try{await ctx.close()}catch(x){}}}}}));
  await b.close();
  // ---- report: group FAILs by root cause (check id), one line per group with the case count
