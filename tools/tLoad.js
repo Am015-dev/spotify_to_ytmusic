@@ -19,7 +19,7 @@ http.createServer((q,r)=>{let u=decodeURIComponent(q.url.split('?')[0]);if(u.end
  const t=Date.now();const p0=await cdp.send('Runtime.evaluate',{expression:'1'});T0=null;
  const BASE=/^https?:/.test(process.argv[2]||'')?process.argv[2]:`http://127.0.0.1:${PORT}/index.html`,QS=process.env.QS??`test=${C}&draw=0`;
  await p.goto(BASE+(QS?(BASE.includes('?')?'&':'?')+QS:''),{waitUntil:'commit'});
- await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:200,timeout:240000});const wall=(Date.now()-t)/1000;tReady=Math.min(...[...R.values()].map(o=>o.t0))+wall;
+ await p.waitForFunction(()=>window.__tq&&(__tq.drv||__tq.ready),null,{polling:200,timeout:240000});const wall=(Date.now()-t)/1000;tReady=Math.min(...[...R.values()].map(o=>o.t0))+wall;
  const L=[...R.values()],t00=Math.min(...L.map(o=>o.t0)),nm=u=>u.replace(/^https?:\/\/[^/]+\//,'').replace(/\?.*$/,'').slice(-48);
  const before=L.filter(o=>o.t0-t00<wall),bytes=before.reduce((a,o)=>a+(o.bytes||0),0);
  const st=await p.evaluate(()=>__tq.st.map(x=>(x[0]/1000).toFixed(1)+' '+x[1]).join(' | ')).catch(()=>'');

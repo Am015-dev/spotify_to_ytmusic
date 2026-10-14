@@ -5,7 +5,9 @@
 10_core3.js
 10_core4.js
 10_core5.js
+10z_lazy.js
 10b_qt_data.js
+10c_qtc_blob.js
 20_race_world.js
 30_race.js
 30_race2.js
@@ -17,6 +19,8 @@
 50_kenney_data.js
 51_city_net.js
 52_terrain_data.js
+52f_terr_fra.js
+52a_terr_ath.js
 53_terrain_roads.js
 60_city_build.js
 60_city_build2.js
@@ -84,6 +88,7 @@
 98sh_shadow.js
 98lf_lively_fill.js
 98bv_build_var.js
+99rv_review.js
 99c_checklist.js
 98rf_race_fun.js
 98ro_open.js
@@ -96,10 +101,14 @@
 98b2_builder2.js
 98rd_roads.js
 98tq_test_quick.js
+98qa_loader.js
 98rs_road_seams.js
 98tr_terrain.js
 98lm_liveliness.js
+98lx_life.js
 98cam_size_cam.js
 98dmg_damage.js
 98gx_gfx.js
+98as_assets.js
+98xf_xform.js
 99_api.js

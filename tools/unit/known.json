@@ -17,9 +17,6 @@
  "models/ride-fill-v6581_1": "footprint fill 0.19 < 0.20 = hollow shell",
  "models/ride-bricks-v6609_1": "only 13 bricks (hollow?)",
  "models/ride-height-v7613_1": "height 5 < 6 plates: no roof/body",
- "tracks-demos/no-gaps-TWO-LEVEL CITY": "1 pieces start where no piece ends: 24:up@2,18,-1,2",
- "tracks-demos/above-sea-level-TWO-LEVEL CITY": "a piece at a negative height level",
- "tracks-demos/no-gaps-LAGOON SPLASH": "1 pieces start where no piece ends: 24:up@37,21,0,0",
  "ride-scale/length-in-any-class-v3056_1": "length 1.2 m outside 1.4..15.6 (bike..bus +-20%)",
  "ride-scale/not-wider-than-long-v3056_1": "W/L 1.40"
 }
