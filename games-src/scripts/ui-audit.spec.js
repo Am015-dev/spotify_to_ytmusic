@@ -43,7 +43,9 @@ const DOM_AUDIT = async ({ isBoard, isTitle }) => {
     if (top && top !== e && !e.contains(top) && !top.contains(e) && getComputedStyle(top).pointerEvents !== 'none') continue;   // covered by something else: judged where it is on top
     const cs = getComputedStyle(e), fs = parseFloat(cs.fontSize);
     if (fs < minFs) out.A.push({ msg: '"' + t.slice(0, 28) + '" ' + Math.round(fs * 10) / 10 + 'px (min ' + minFs + ')', sel: sel(e), fs });
-    const m = cs.color.match(/[\d.]+/g) || [0, 0, 0, 1];
+    const svgT = !!e.closest('svg'), col = svgT ? cs.fill : (cs.webkitTextFillColor || cs.color);   // spec fix: SVG text is painted by fill, gradient-clipped text by -webkit-text-fill-color; cs.color was wrong for both (1.0:1 artefacts)
+    if (/^(none|url)/.test(col) || /rgba\(.*,\s*0\)$|transparent/.test(col)) continue;
+    const m = col.match(/[\d.]+/g) || [0, 0, 0, 1];
     out.texts.push({ t: t.slice(0, 28), sel: sel(e), fs, bold: +cs.fontWeight >= 700, c: [+m[0], +m[1], +m[2], m[3] === undefined ? 1 : +m[3]], r: rs.map(q => [q.left, q.top, q.width, q.height]).slice(0, 3) });
   }
   // C: img + CSS backgrounds
@@ -74,11 +76,12 @@ const DOM_AUDIT = async ({ isBoard, isTitle }) => {
   }
   // F: top bar + big primary + instruction lines
   const btns = [].slice.call(document.querySelectorAll('button,[role=button]')).filter(b => !skip(b) && shown(b) && b.getBoundingClientRect().width > 3 && b.getBoundingClientRect().height > 3);
-  const bar = btns.filter(b => { const r = b.getBoundingClientRect(); return r.top < 72 && r.bottom < 100 && r.top > -4 && r.width < 140 && r.left < W && r.right > 0; });
+  const bar = btns.filter(b => { const r = b.getBoundingClientRect(); if (document.querySelector('header.gx-bar') ? !b.closest('header.gx-bar') : b.closest('.gxc,.gxt')) return false; return r.top < 72 && r.bottom < 100 && r.top > -4 && r.width < 140 && r.left < W && r.right > 0; });
   if (bar.length > 5) out.F.push({ msg: 'top bar has ' + bar.length + ' buttons (max 5): ' + bar.map(b => (b.getAttribute('aria-label') || b.textContent.trim() || b.id || '?').slice(0, 12)).join(', '), sel: sel(bar[0]) });
   if (isTitle) {
-    const big = btns.filter(b => { const r = b.getBoundingClientRect(); return r.width >= Math.min(220, W * 0.5) && r.height >= 44 && r.top >= 72; });
-    const primary = big.filter(b => parseFloat(getComputedStyle(b).fontSize) >= 18 || /primary|bigb|start|play/i.test(b.className + b.id));
+    const big = btns.filter(b => { const r = b.getBoundingClientRect(); return r.width >= Math.min(220, W * 0.4) && r.height >= 44 && r.top >= 72 && !b.closest('.gx-x'); });
+    const primary0 = big.filter(b => parseFloat(getComputedStyle(b).fontSize) >= 18 || /primary|bigb|start|play|\bgo\b|\bbig\b/i.test(b.className + b.id) || /^\W*play/i.test(b.textContent.trim()));   // spec fix: title buttons are .tbtn/.go at 13px; the old test (class start|play or font>=18) missed them
+    const primary = primary0.length ? primary0 : big;
     if (primary.length !== 1) out.F.push({ msg: 'title has ' + primary.length + ' big primary buttons (want 1): ' + primary.map(b => (b.textContent.trim() || b.id).slice(0, 14)).join(', '), sel: primary[0] ? sel(primary[0]) : 'body' });
   }
   if (isBoard && window.GXS && GXS.boardAudit) { const m = GXS.boardAudit().filter(s => /^instruction lines/.test(s)); m.forEach(s => out.F.push({ msg: s.slice(0, 160), sel: 'board' })); }
@@ -131,6 +134,7 @@ const THREE_AUDIT = () => {
     const bb = new THREE.Box3().setFromObject(o), mn = bb.min, mx = bb.max, ys = [];
     [mn.x, mx.x].forEach(x => [mn.y, mx.y].forEach(y => [mn.z, mx.z].forEach(z => { const v = new vec(x, y, z).project(cam); ys.push((1 - v.y) / 2 * H); })));
     const hh = (Math.max.apply(null, ys) - Math.min.apply(null, ys)) * frac; if (!(hh > 0)) return;
+    if (hh < 1) return;   // spec fix: degenerate / off-screen sprite (~0px), not legible text
     if (hh < minFs) { const nm = o.name || o.type, key = nm + Math.round(hh); if (!seen[key]) { seen[key] = 1; out.push({ msg: 'label "' + nm + '" text ~' + Math.round(hh * 10) / 10 + 'px tall on screen (min ' + minFs + ')', sel: 'three:label' }); } }
   });
   return { out, scenes: st.scenes.length };

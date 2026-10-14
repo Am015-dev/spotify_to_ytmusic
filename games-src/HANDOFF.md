@@ -322,19 +322,55 @@ Not fixed:
 - Shell: shell/gx-scenario.js:363 evaluates every [data-engine] value (three.js sets "three.js r158" on its canvas; worked around in three3d.js). Deploy gate now fails with "ui-audit: GXS.menuList is not a function" (new shared scenario, not this game's code); sunglaze cannot deploy until the shell side is fixed or ui-audit is adapted.
 - UI-BAR rules 3, 5, 6, 8 only partly machine-checked (see the earlier report).
 ## Independent UI audit (14 Oct)
-**Status: stopped early by owner order (09:26). Spec built, NOT run on the 15 games.** No game was edited, no screenshots saved.
+**Status: run on all 15 games x phone/pc/wide on 14 Oct 10:08-10:31 UTC (see Results).** No game was edited, no screenshots saved.
 - Built: `scripts/ui-audit.spec.js` (rules A-F, Playwright Test, reuses playwright.config.js projects + GXS.menuList/menuOpen/boardAudit) and `scripts/ui-audit-table.js` (results -> this table). Run: `GX_URL=https://am015-dev.github.io/spotify_to_ytmusic SCN_SLUGS=<slugs> UA_OUT=.staging/ui-audit node_modules/.bin/playwright test scripts/ui-audit.spec.js --project=phone ...` then `node scripts/ui-audit-table.js`.
 - Not verified: the pc/wide run (it crashed once on a bug I then fixed, the fixed re-run was cancelled); rule D (three.js hook via Object.prototype setter) only tried on sunglaze, which is 2D, so untested on a 3D game; E taps at pc may exceed the 420 s test timeout (lower UA_MAX_BTN or UA_E_SIZES).
 - Known spec quirk: the first sunglaze run used the pre-fix surface list (no real start screen); its F "title has 0 big buttons" is a spec artefact, ignore it.
 
-Results so far: only **sunglaze @ phone 390x763** (earlier spec version). All other games: not run.
-| game | A text size | B contrast/busy bg | C stretched | D 3D | E dead buttons | F bar/title/instr |
+Results: live run 14 Oct 2026, 10:08-10:31 UTC, all 15 games x phone 390x763, pc 1366x768, wide 1920x1080 (45 tests, no page errors). Cells = distinct failing items over the 3 sizes (same element/message at several sizes counts once). Rule E comes from the first run (older spec; E code unchanged by the fixes); A/B/C/D/F from the re-run with the spec fixes below. Raw JSON: `.staging/ui-audit-final` (not committed).
+| game | A | B | C | D | E | F |
 |---|---|---|---|---|---|---|
-| sunglaze (phone) | pass | FAIL 15 | pass | n/a (2D) | FAIL 17 | artefact, ignore |
-| other 14 games | not run | not run | not run | not run | not run | not run |
+| cauldron-fair (3 sizes) | FAIL 38 | FAIL 52 | pass | pass | FAIL 4 | FAIL 1 |
+| crown-city-smash (3 sizes) | FAIL 56 | FAIL 58 | pass | FAIL 5 | pass | FAIL 3 |
+| doorkick-dungeon (3 sizes) | FAIL 115 | FAIL 35 | FAIL 30 | pass | FAIL 3 | pass |
+| final-approach (3 sizes) | FAIL 34 | FAIL 13 | pass | pass | FAIL 1 | pass |
+| hollowbough (3 sizes) | FAIL 105 | FAIL 55 | FAIL 34 | pass | FAIL 3 | pass |
+| kaiten-kitchen (3 sizes) | FAIL 61 | FAIL 45 | pass | pass | FAIL 2 | FAIL 1 |
+| lantern-dive (3 sizes) | FAIL 28 | FAIL 19 | pass | pass | FAIL 3 | pass |
+| nebula-aces (3 sizes) | FAIL 106 | FAIL 51 | FAIL 6 | FAIL 6 | FAIL 11 | FAIL 1 |
+| rampart-and-vine (3 sizes) | FAIL 36 | FAIL 31 | pass | pass | FAIL 1 | pass |
+| sands-of-qamar (3 sizes) | FAIL 41 | FAIL 51 | FAIL 6 | pass | pass | pass |
+| shipwreck-isle (3 sizes) | FAIL 49 | FAIL 69 | pass | pass | pass | FAIL 3 |
+| short-fuse (3 sizes) | FAIL 89 | FAIL 47 | pass | pass | FAIL 8 | FAIL 1 |
+| sunglaze (3 sizes) | FAIL 36 | FAIL 55 | pass | FAIL 2 | FAIL 12 | FAIL 1 |
+| thornbound (3 sizes) | FAIL 18 | FAIL 17 | pass | pass | FAIL 4 | FAIL 1 |
+| tidewake (3 sizes) | FAIL 91 | FAIL 34 | pass | pass | FAIL 7 | FAIL 7 |
 
-sunglaze B worst 3: board/title floating score "−2/−3/−1" 3.06:1 `div.bf-fl>b.bf-c>span`; campaign node numbers "8","2","5" 1.0:1 against their disc `div.gxc-path>button.gxc-node>span.gxc-disc`; campaign "Act 1 · Wet Clay" 1.79:1 `div.gxc-path>div.gxc-act>b`.
-sunglaze E (likely partly false positives, unchecked): "Saffron/Obsidian/Cobalt" `div.bf-table>div.bf-k>i.bf-t` (board tiles exposed as buttons on the title; tap does nothing); the "covered" ones in the campaign list were modal-hidden buttons, now skipped by the spec.
+Triage (spec false positives fixed in `scripts/ui-audit.spec.js`):
+1. F top bar: counted the campaign overlay's buttons (Back, Replay, stars, Skip tutorial) as top-bar buttons. Now only `header.gx-bar` buttons (fallback: not inside `.gxc/.gxt`). Games still failing F have a real over-full bar: tidewake 6 (Hint, Crews, Log, Rules, Pieces, Menu, all sizes), shipwreck-isle 11-12 at pc/wide, crown-city-smash and cauldron-fair at some sizes.
+2. F title: "0 big primary buttons" was an artefact (title buttons are `.tbtn.go` at 13px; old test wanted font>=18 or class start|play). Now go/big/"Play..." count as primary and the width test is min(220, 40% of width). Remaining F = real: cauldron-fair, kaiten-kitchen, thornbound, short-fuse, tidewake titles have TWO big primary buttons (New here? Learn in 5 minutes + Play).
+3. D: label "Mesh" ~0px tall was a degenerate/off-screen sprite; now ignored below 1px.
+4. B: SVG text and gradient-clipped text were measured with `color` (wrong), now `fill` / `-webkit-text-fill-color`; transparent ones skipped.
+NOT triaged / treat with care: **B is unreliable**: ~40% of hits are 1.00-1.4:1 (text colour == background), implausible for visible text, so the hide-text step (`*{color:transparent!important}` changes backgrounds that use currentColor) is suspected; B real faults must be re-checked per element. **A on SVG text** (e.g. tidewake `g>g>text` "0.1px") is a spec artefact: computed font-size in SVG user units, not screen px. **E** is high false-positive: many are info/stateless buttons or style-only changes the spec ignores (opponent seats, "Hide panel", SVG `g` tiles in thornbound); E hits that look real: short-fuse campaign top-bar Hint/Menu/How to play dead, tidewake Rules/Pieces dead on phone campaign, nebula-aces Plan/Act phase buttons dead in guide, doorkick Music/Songs/Speed dead in How-to-play panel at phone.
+Real faults (from the cited elements): C hollowbough `div.strip` mat.webp aspect off 74-138% (334x314 vs 1200x291) and `.gxc-head` topbar 1.74x upscaled at phone; C doorkick `button.opp` ui-rival-chip.webp 22% off and `aside.gx-dock` 18% off; C sands-of-qamar `div.spot` ui-spot.webp 27% off and `div.gxc-path` story-map.webp 76% off; C nebula-aces 6. D sunglaze near-black untextured `CircleGeometry|`/`PlaneGeometry|` (15/78 planes have no map) = likely the owner's black square on the drying racks; D crown-city-smash near-black Lathe/Cylinder/Plane meshes; D nebula-aces untextured SphereGeometry + near-black BoxGeometry. A real: campaign node labels `span.gxc-lab` 13px at pc/wide in every game with a campaign (shared shell, min 16), doorkick `span.tag>small` "LV" 5px, short-fuse `i.cn12` 11px.
+
+Worst 3 per game (A smallest px, B lowest contrast [see caveat], then the worst of D/C/F/E), for briefing a fixer:
+- **cauldron-fair** worst 3: A [campaign/pc,wide] "First Bubbles" 13px (min 16) `div.gxc-path>button.gxc-node>span.gxc-lab` ;; B [panel How to play/wide] "1" contrast 1.21:1 (<4.5) `div.gxc-path>button.gxc-node>span.gxc-disc` ;; other [start/pc,phone,wide] title has 2 big primary buttons (want 1): New here? Lear, Playagainst th `div.ttl-in>div.tbtns>button.tbtn`
+- **crown-city-smash** worst 3: A [campaign/phone] "♥10" 12px (min 13) `button.pchip>span>em.h` ;; B [campaign/pc] "3" contrast 1.00:1 (<4.5) `svg>svg>text` ;; other [start/pc,phone,wide] near-black untextured mesh in "LatheGeometry|" `three:LatheGeometry|`
+- **doorkick-dungeon** worst 3: A [board/pc] "LV" 5px (min 16) `span.aw>span.tag>small` ;; B [panel Menu: sound, speed, hints, graphics, speed test, new game/pc] "Grub's Toll" contrast 1.05:1 (<4.5) `div.gxc-path>button.gxc-node>span.gxc-lab` ;; other [campaign/pc,wide] bg ui-rival-chip.webp aspect off 22% (196x60 vs 256x96) `div.tbl>div.opps>button.opp`
+- **final-approach** worst 3: A [panel How to play/pc] "Routine landing (6)" 13px (min 16) `div>div>div.band` ;; B [panel How to play/pc] "Castlemoor: A Quiet Alarm" contrast 1.06:1 (<4.5) `div.rcard>div.rt>b` ;; other [panel How to play/wide] dead button: ‹ Back `div.gxc-screen>div.gxc-head>button.gxc-ib`
+- **hollowbough** worst 3: A [panel Menu/pc] "×3" 13px (min 16) `div.its>span.it>b.bd` ;; B [panel Menu/phone] "The Long Winter of Hollowbou" contrast 1.07:1 (<4.5) `div.gxc-head>div.gxc-htitle>b` ;; other [panel Menu/pc,wide] bg mat.webp aspect off 74% (334x314 vs 1200x291) `main#board.gx-board>div#bd.wide>div.strip`
+- **kaiten-kitchen** worst 3: A [panel Menu/pc] "0" 13px (min 16) `button.sh>div.av>span.sc` ;; B [panel How to play/wide] "Online play uses Trystero (M" contrast 1.02:1 (<4.5) `div>section.credits-audio>p` ;; other [start/pc,phone,wide] title has 2 big primary buttons (want 1): New here? Lear, Playagainst th `div.ttl-in>div.tbtns>button.tbtn`
+- **lantern-dive** worst 3: A [campaign/pc,wide] "Training Day" 13px (min 16) `div.gxc-path>button.gxc-node>span.gxc-lab` ;; B [panel How to play/wide] "Online" contrast 1.42:1 (<4.5) `div.qg>div.qrow>button.qseg` ;; other [panel Menu/pc] dead button: Sumi, 10 cards `div#table.myturn>div#opp>button.seat`
+- **nebula-aces** worst 3: A [board/phone] "vs" 11px (min 13) `div#bf>div#bftop>span.vs` ;; B [start/wide] "How to play" contrast 1.00:1 (<4.5) `div.dlg>div.acts>button.btn` ;; other [start/pc,phone,wide] 1/3 "SphereGeometry|" meshes have no map while 2 siblings do `three:SphereGeometry|`
+- **rampart-and-vine** worst 3: A [panel menubtn/pc] "First Furrow" 13px (min 16) `div.gxc-path>button.gxc-node>span.gxc-lab` ;; B [panel menubtn/pc,phone] "The valley grows rich. Rival" contrast 1.25:1 (<4.5) `div.gxc-path>div.gxc-act>small` ;; other [campaign/pc,wide] dead button: 0 stars of 30. Show rewa `div.gxc-screen>div.gxc-head>button.gxc-ib`
+- **sands-of-qamar** worst 3: A [campaign/pc,wide] "The First Caravan" 13px (min 16) `div.gxc-path>button.gxc-node>span.gxc-lab` ;; B [start/wide] "free: your browsers connect " contrast 1.16:1 (<4.5) `details.exd>summary>small` ;; other [panel Rules/pc,wide] bg ui-spot.webp aspect off 27% (60x59 vs 128x160) `div#acts>div.bidt>div.spot`
+- **shipwreck-isle** worst 3: A [panel Rules/pc] "Driftwood Dawn" 13px (min 16) `div.gxc-path>button.gxc-node>span.gxc-lab` ;; B [panel Rules/wide] "Reset tips" contrast 1.00:1 (<4.5) `div.hlp-rules-set>div.gxh-set>button` ;; other [start/pc,wide] top bar has 11 buttons (max 5): Hint: what s, Camp: castaw, Log, Card list, Rule `div.gx-app>header.gx-bar>button#bulbbtn.gx-ibtn`
+- **short-fuse** worst 3: A [board/pc,phone,wide] "1" 11px (min 16) `div#track>div.trk>i.cn12` ;; B [panel How to play/wide] "Slow" contrast 1.01:1 (<4.5) `div>div.row>button.btn` ;; other [start/pc,phone,wide] title has 2 big primary buttons (want 1): New here? Lear, Play `div.st-body>div.st-main>button.big`
+- **sunglaze** worst 3: A [campaign/pc,wide] "The First Kiln" 13px (min 16) `div.gxc-path>button.gxc-node>span.gxc-lab` ;; B [start/pc,phone,wide] "choose where each tile goes;" contrast 1.01:1 (<4.5) `div.exs>label.chk>small` ;; other [start/pc,wide] near-black untextured mesh in "CircleGeometry|" `three:CircleGeometry|`
+- **thornbound** worst 3: A [campaign/pc] "First Muster" 13px (min 16) `div.gxc-path>button.gxc-node>span.gxc-lab` ;; B [campaign/phone] "The sharpest rivals, a boss " contrast 1.04:1 (<4.5) `div.gxc-path>div.gxc-act>small` ;; other [start/pc,phone,wide] title has 2 big primary buttons (want 1): New here? Lear, Playagainst th `div.ttl-in>div.tbtns>button.tbtn`
+- **tidewake** worst 3: A [campaign/pc,wide] "N" 0.1px (min 16) `g>g>text` ;; B [campaign/phone] "Act 2 · Open Water" contrast 1.22:1 (<4.5) `div.gxc-path>div.gxc-act>b` ;; other [start/phone] title has 2 big primary buttons (want 1): ⚓ Story: The L, Play now: you  `div.stcard>div.row>button#storybtn.btn`
+
 ## STOP 14 Oct 09:27 UTC (owner: "wrap up everything and deploy, make workers write down what they found and stop them")
 Last live times (UTC, games/<slug>/index.html): rampart 08:59, short-fuse 08:56, tidewake 08:56, nebula 09:01, final-approach 09:03, hollowbough 09:05, thornbound 09:05, kaiten 09:07, doorkick 09:10, crown 09:11, cauldron 09:15, shipwreck 09:15, lantern 09:20, sands 09:20, sunglaze 09:20.
 Open faults found by the owner (rampart and lantern workers report these fixed and deployed after 09:20, NOT independently verified; check against the list):
