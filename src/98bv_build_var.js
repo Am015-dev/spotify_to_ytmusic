@@ -28,7 +28,7 @@ BV.pass=m=>m.n>=40&&m.repeat<=20&&m.blk3>=95;
 // street-life line (near the GO spot only): ≥ 10 storefront pieces within 150 m, ≥ 4 kinds (shop, café, kiosk, billboard, mural)
 BV.lpass=l=>l.n>=10&&l.kinds>=4;
 // GO: the street node with the most buildings within 150 m, car on it facing along the road; measured over 600 m around it
-function BV_go(){const N=HUB.nodes||[];let best=null,bn=-1;for(let i=0;i<N.length;i+=2){const A=N[i];if(!A)continue;const n=Object.values(BV_near(A.x,A.z,150)).reduce((a,b)=>a+b,0);if(n>bn){bn=n;best=A}}
+function BV_go(){const N=HUB.nodes||[];let best=null,bn=-1;for(let i=0;i<N.length;i+=2){const A=N[i];if(!A||LF_count(A.x,A.z,10)>0||roamHit(A.x,A.z,4))continue;/* clean spawn: no prop to smash */const n=Object.values(BV_near(A.x,A.z,150)).reduce((a,b)=>a+b,0);if(n>bn){bn=n;best=A}}
   if(!best)return'📍 BV · no street node';const q=cityAt(best.x,best.z),h=q?Math.atan2(q.p.tx,q.p.tz):0;roamWarp(best.x,best.z,h);RO.v=0;camSnap=true;BV.last=null;
   setTimeout(()=>{const m=BV_measure(RO.x,RO.z,600),a=BV_measure(0,0,1e6);m.city=a;m.life=BV_lifeAt(RO.x,RO.z,150);m.pass=BV.pass(m)&&BV.pass(a)&&BV.lpass(m.life);BV.last=m;try{say('',(m.pass?'✅ PASS':'❌ FAIL')+` · same look ≤100 m ${m.repeat}% (city ${a.repeat}%) · blocks with ≥3 facades ${m.blk3}% (city ${a.blk3}%) · ${a.variants} looks · street life ${m.life.n} (${m.life.kinds} kinds)`,5)}catch(e){}},1500);
   return'📍 BUSIEST STREET · measuring building variety'}
