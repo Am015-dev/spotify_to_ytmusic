@@ -562,6 +562,14 @@
  ],
  "short-fuse": [
   {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "sf-board",
    "name": "Start of game board",
    "ask": "Are the wires and fuse clear?",
