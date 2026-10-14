@@ -4,7 +4,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
 const BASE=process.argv[2],OUT=process.argv[3]||'qa_trk4',sleep=ms=>new Promise(r=>setTimeout(r,ms));fs.mkdirSync(OUT,{recursive:true});
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const c=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});
  const p=await c.newPage();p.setDefaultTimeout(180000);const E=[];p.on('pageerror',e=>E.push(String(e).slice(0,160)));
- await p.goto(BASE+'?test=fra&draw=0&bxfast=1');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__bx,null,{polling:250,timeout:150000});await p.evaluate(()=>__tq.draw());
+ await p.goto(BASE+'?test=fra&draw=0&bxfast=1');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__bx,null,{polling:250,timeout:150000});await p.evaluate(()=>{__tq.o.draw=1});
  const shot=async f=>{await p.evaluate(()=>{__bx.BX.shotNow=1});await sleep(900);await p.screenshot({path:OUT+'/'+f,type:'jpeg',quality:80});console.log('shot',f)};
  const D=await p.evaluate(()=>Object.keys(__bx.demos()).filter(k=>!__bx.demos()[k].hide));
  for(const k of process.env.ONE?D.slice(0,1):D){const tag=k.split(' ')[0].toLowerCase();
