@@ -23,6 +23,7 @@ for f in "$OUT"/models/*.js; do node --check "$f" || { echo "BUILD FAIL: $f synt
 node --check "$OUT/models.js" || { echo "BUILD FAIL: models.js syntax"; exit 1; }
 bash tools/as/pack.sh "$OUT" || { echo "BUILD FAIL: models/as.js (asset-1 world assets)"; exit 1; }   # asset-1 trees/bushes, loaded only with ?asset=1
 bash tools/lx/pack.sh "$OUT" || { echo "BUILD FAIL: models/lx.js (life-1 LIFE)"; exit 1; }   # life-1 LIFE (on by default, ?life=0 off)
+bash tools/xf/pack.sh "$OUT" || { echo "BUILD FAIL: models/xf.js (xform-1 auto transform)"; exit 1; }   # xform-1 auto transform + body tilt (on by default, ?xf=0 off)
 bash tools/qa/pack.sh "$OUT" || { echo "BUILD FAIL: models/qa.js (qa-1 kit)"; exit 1; }   # qa-1 invariants + bug report, lazy chunk
 # published tuning (TUNE drawer, docs/TUNE.md): the page fetches ./tune.json next to itself; deploy.sh copies it when present
 [ -f src/assets/tune.json ] && cp src/assets/tune.json "$OUT/tune.json"
