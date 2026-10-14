@@ -153,15 +153,15 @@ function BX_gate(pc){const s=pc.S[0][Math.floor(pc.S[0].length/2)],g=new THREE.G
  g.children.forEach(o=>o.userData.pc=pc);BX.posts=BX.posts||[]}
 function BX_buildAll(){if(!BX.sc)return;for(const o of[...BX.gP.children]){BX.gP.remove(o);o.geometry&&o.geometry.dispose()}for(const pc of BX.pcs)if(!pc.dead){pc.meshes=[];BX_pcMesh(pc)}
  BX_hashAll();BX_terrMesh();BX_bld();BX_after()}
-// pillars (LEGO brick columns) under every deck that floats > 0.8 m over the ground; colliders = the same circles
+// pillars (LEGO brick columns) under every deck that floats > 0.8 m over the ground; colliders = the same circles; none within 9 m of a lower road (trk-2: 5.5 m put tan blocks on its edge)
 function BX_pillars(){const M=BX_mats(),P=[];for(const pc of BX.pcs){if(pc.dead)continue;for(const S of pc.S){let last=-99;for(const s of S){if(s.U.y<.8||s.d-last<9)continue;
   for(const sx of[-2.6,2.6]){const x=s.p.x+s.S.x*sx,z=s.p.z+s.S.z*sx,top=s.p.y-.8,g=BX_h(x,z);
-   if(top-g>.8&&!BX.samp.some(q=>q.pc!==pc&&q.s.p.y<top-1&&Math.abs(q.s.p.x-x)<5.5&&Math.abs(q.s.p.z-z)<5.5))P.push([x,z,g,top])}last=s.d}}}
+   if(top-g>.8&&!BX.samp.some(q=>q.pc!==pc&&q.s.p.y<top-1&&Math.hypot(q.s.p.x-x,q.s.p.z-z)<9))P.push([x,z,g,top])}last=s.d}}}
  BX.pil=P;if(BX.pilM){BX.sc.remove(BX.pilM);BX.pilM.dispose()}if(!P.length){BX.pilM=null;return}
  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1.6,1,1.6),M.pil,P.length),mt=new THREE.Matrix4();
  P.forEach(([x,z,g,t],i)=>{mt.makeScale(1,t-g+.3,1);mt.setPosition(x,(t+g)/2,z);im.setMatrixAt(i,mt)});im.castShadow=im.receiveShadow=true;BX.sc.add(im);BX.pilM=im}
 // ---------------------------------------------------------------- set dressing (coordinator after the 2K reference grid: "the mock-up is bare")
-// every ~9 m along the course, alternating sides: crowds of minifigs, banners, flags (flags stand on the rail on raised decks); glowing chevrons on BOOST pads;
+// every ~9 m along the course, alternating sides: crowds of minifigs, banners, flags (flags stand on the rail on raised decks); a glowing chevron tile on every BOOST pad;
 // one landmark per track (a giant LEGO minifig statue near the start). All instanced; no collision (they stand outside the rails).
 const BX_DC=['#c91a09','#0055bf','#f2cd37','#237841','#fe8a18','#ffffff','#a0a5a9'].map(bxCol);
 function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isInstancedMesh)o.dispose()})}const g=BX.drM=new THREE.Group();BX.sc.add(g);
@@ -169,7 +169,7 @@ function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isI
   inB=(x,z)=>(BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+2&&Math.abs(b.z-z)<b.d/2+2);let n=0,side=1,run=0,len=0,props=0;
  for(const pc of L){const S=pc.S[0];for(let k=1;k<S.length;k++){const s=S[k],d=s.d-S[k-1].d;len+=d;run+=d;if(pc.def.boost&&k%Math.max(1,S.length>>1)===0)chev.push(s);if(run<7)continue;run=0;side=-side;n++;
   const raised=s.p.y-BX_h(s.p.x,s.p.z)>2.5||pc.def.p.length>1;if(pc.def.p.length>1||pc.def.stick)continue;
-  if(raised){const x=s.p.x+s.S.x*side*6.8,z=s.p.z+s.S.z*side*6.8,y=s.p.y+s.S.y*side*6.8+1.4;pole.push([x,y,z,7]);flag.push([x,y+6.4,z,n,s]);props++;continue}
+  if(raised){const x=s.p.x+s.S.x*side*7.4,z=s.p.z+s.S.z*side*7.4,y=s.p.y+s.S.y*side*7.4+1.4;pole.push([x,y,z,3]);flag.push([x,y+2.2,z,n,s]);props++;continue} // trk-2 (Alex beta.22 "giant poles block the view"): 3 m rail pennants instead of 7 m poles
   const x=s.p.x+s.S.x*side*9.6,z=s.p.z+s.S.z*side*9.6,y=BX_h(x,z);if(y<-.4||near(x,z,pc)||inB(x,z))continue;props++;
   if(n%3===0){stand.push([x,y,z,s]);for(let f=-2;f<=2;f++){const fx=x+s.F.x*f*2.8,fz=z+s.F.z*f*2.8;legs.push([fx,y+1.7,fz]);body.push([fx,y+3.2,fz,n+f]);head.push([fx,y+4.55,fz])}}
   else if(n%3===1){ban.push([x,y,z,n,s]);for(const e of[-4.6,4.6])pole.push([x+s.F.x*e,y,z+s.F.z*e,3.2])}else{pole.push([x,y,z,10]);flag.push([x,y+8.6,z,n,s])}}}
@@ -187,11 +187,18 @@ function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isI
   c.fillRect(0,18,w,28);c.fillStyle='#fff';for(let i=0;i<8;i++){c.beginPath();c.arc(16+i*32,32,9,0,7);c.fill()}})});
  const bn=M(new THREE.BoxGeometry(.5,3,10),BX.banMat,ban,a=>{q.setFromUnitVectors(bxV(0,0,1),a[4].F.clone().setY(0).normalize());mt.compose(pos.set(a[0],a[1]+4.7,a[2]),q,sc.set(1,1,1))});
  if(bn)ban.forEach((a,i)=>bn.setColorAt(i,BX_DC[(a[3]>>1)%4]));
- // glowing chevrons on BOOST pads (pulse in BX_tick)
- const cm=BX.chevMat=BX.chevMat||new THREE.MeshStandardMaterial({color:0xffb000,emissive:0xff8a00,emissiveIntensity:1.4,roughness:.3}),cg=new THREE.BoxGeometry(.5,.08,4.6);
- const C=[];for(const s of chev)for(const sd of[-1,1])C.push([s,sd]);
- M(cg,cm,C,([s,sd])=>{const a=Math.atan2(s.F.x,s.F.z)+sd*.75;q.setFromAxisAngle(UP,a);mt.compose(pos.copy(s.p).addScaledVector(s.U,.08).addScaledVector(s.S,sd*1.6),q,sc.set(1,1,1))});
- BX.dressN={props,len,landmark:BX_landmark(g,L)}}
+ // BOOST pads: a glowing blue tile with three yellow chevrons (pulse in BX_tick). trk-2: the thin orange V-bars read as "tan cardboard wedges" (Alex beta.22)
+ const cm=BX.chevMat=BX.chevMat||(()=>{const t=BX_tex(128,128,(c,w,h)=>{c.fillStyle='#0b2f86';c.fillRect(0,0,w,h);
+   for(let k=0;k<3;k++){const y=24+k*36;c.beginPath();c.moveTo(18,y+26);c.lineTo(64,y);c.lineTo(110,y+26);c.lineTo(110,y+40);c.lineTo(64,y+14);c.lineTo(18,y+40);c.closePath();c.fillStyle='#ffb000';c.fill();c.strokeStyle='#7a4d00';c.lineWidth=2;c.stroke()}});
+   return new THREE.MeshStandardMaterial({map:t,emissiveMap:t,emissive:0xffffff,emissiveIntensity:.32,roughness:1,metalness:0,polygonOffset:true,polygonOffsetFactor:-2})})();
+ M(new THREE.PlaneGeometry(11,7.4),cm,chev,s=>{mt.makeBasis(s.S,s.F,s.U);mt.setPosition(pos.copy(s.p).addScaledVector(s.U,.05))});
+ // KICKERS read as jump ramps: a yellow/black striped band on the lip and on the 0.9 m drop face behind it (trk-2)
+ const km=BX.kickMat=BX.kickMat||new THREE.MeshStandardMaterial({roughness:.4,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,map:BX_tex(128,16,(c,w,h)=>{c.fillStyle='#ffd21a';c.fillRect(0,0,w,h);c.fillStyle='#1b1b1b';for(let x=-16;x<w;x+=16){c.beginPath();c.moveTo(x,h);c.lineTo(x+8,0);c.lineTo(x+16,0);c.lineTo(x+8,h);c.fill()}})});
+ const kk=L.filter(p=>p.def.jump).map(p=>p.S[0][p.S[0].length-1]);
+ M(new THREE.PlaneGeometry(13,1.6),km,kk,e=>{mt.makeBasis(e.S,e.F,e.U);mt.setPosition(pos.copy(e.p).addScaledVector(e.F,-.8).addScaledVector(e.U,.05))});
+ M(new THREE.PlaneGeometry(13,.9),km,kk,e=>{mt.makeBasis(e.S,e.U,e.F.clone().negate());mt.setPosition(pos.copy(e.p).addScaledVector(e.U,-.45).addScaledVector(e.F,.02))});
+ const block=pole.filter(([x,y,z,h])=>h>4&&BX.samp.some(({s})=>Math.hypot(s.p.x-x,s.p.z-z)<8&&Math.abs(s.p.y-y)<6)).length+(BX.pil||[]).filter(([x,z,g,t])=>BX.samp.some(({s})=>s.p.y<t-1&&Math.hypot(s.p.x-x,s.p.z-z)<8)).length;
+ BX.dressN={props,len,landmark:BX_landmark(g,L),block}}
 // landmark: a giant LEGO minifig (~16 m) on open ground 30-50 m from the course, as close to START as possible
 function BX_landmark(g,L){const st=L.find(p=>p.def.start)||L[0];if(!st||!BX.samp.length)return 0;const o=st.S[0][0].p,sF=st.S[0][0].F;let best=null,bd=1e9;
  for(const[cmin,dm]of[[.94,26],[.8,18]])if(!best)for(let a=0;a<64;a++)for(const r of[70,85,100,120,140]){const ca=Math.cos(a/64*6.283),sa=Math.sin(a/64*6.283),x=o.x+ca*r,z=o.z+sa*r;if(ca*sF.x+sa*sF.z<cmin)continue;/* ahead of the start grid */if(Math.abs(x)>150||Math.abs(z)>150)continue;const h0=BX_h(x,z),h=Math.max(h0,.6);if(h0>=.3&&BX_tn(x,z).y<.9)continue;
@@ -376,7 +383,7 @@ function BX_tick(now){const dt=BX.fast?1/60:Math.min(.05,(now-(BX.last||now))/10
   const V=BX.v;BX.car.position.copy(V.p);const S=bxV().crossVectors(V.F,V.U).normalize();BX.car.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(S.negate(),V.U,V.F));
   const gy=BX_h(V.p.x,V.p.z);BX.shM.visible=V.p.y-gy<14&&!V.boat;BX.shM.position.set(V.p.x,Math.max(gy,V.boat?0:gy)+.08,V.p.z);
   if(V.msgT>0)V.msgT-=dt;BX_camDrive(dt);BX_hud()}else BX_camBuild();
- BX_fxStep(dt);if(BX.chevMat)BX.chevMat.emissiveIntensity=1.1+.7*Math.sin(BX.t*7);if(BX.wM)BX.wM.material.map.offset.set(BX.t*.01,BX.t*.006);
+ BX_fxStep(dt);if(BX.chevMat)BX.chevMat.emissiveIntensity=.32+.18*Math.sin(BX.t*7);if(BX.wM)BX.wM.material.map.offset.set(BX.t*.01,BX.t*.006);
  BX.rf=(BX.rf||0)+1;if(BX.tfast&&BX.rf%6&&!BX.shotNow)return;BX.shotNow=0;const R=renderer;R.setRenderTarget(null);R.render(BX.sc,cam)}
 // ---------------------------------------------------------------- input (keys + touch buttons; gas is on by default on touch)
 addEventListener('keydown',e=>{if(!BX.on)return;BX.keys[e.code]=1;if(BX.mode==='drive'&&e.code==='KeyR')BX_respawn('key');if(e.code==='Escape')BX.mode==='drive'?BX_driveStop():BX_close();e.stopImmediatePropagation()},true);
@@ -548,7 +555,8 @@ function BX_data(){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+
   ['>=3 jumps',Math.min(R[0].kick,R[1].kick)>=3,`jumps ${R[0].kick}/${R[1].kick}`],['>=2 boosts',Math.min(R[0].boost,R[1].boost)>=2,`boosts ${R[0].boost}/${R[1].boost}`],
   ['shortcut',fk&&short>=50,`shortcut ${fk?'saves '+short.toFixed(0)+' m':'none'}`],['grade <=25 %',G.g<=.25,`max grade ${Math.round(G.g*100)} %`],
   ['lap 1.5-2.7 km',lo>=1500&&hi<=2700,`lap ${(lo/1000).toFixed(2)}-${(hi/1000).toFixed(2)} km`],
-  ['>=20 props/200 m',(BX.dressN||{}).props/((BX.dressN||{}).len/200)>=20,`props ${((BX.dressN||{}).props/((BX.dressN||{}).len/200)||0).toFixed(1)}/200 m`],['>=1 landmark',(BX.dressN||{}).landmark>=1,`landmarks ${(BX.dressN||{}).landmark||0}`]];
+  ['>=20 props/200 m',(BX.dressN||{}).props/((BX.dressN||{}).len/200)>=20,`props ${((BX.dressN||{}).props/((BX.dressN||{}).len/200)||0).toFixed(1)}/200 m`],['>=1 landmark',(BX.dressN||{}).landmark>=1,`landmarks ${(BX.dressN||{}).landmark||0}`],
+  ['0 view blockers',(BX.dressN||{}).block===0,`poles >4 m or pillars within 8 m of a road: ${(BX.dressN||{}).block}`]];
  return{ok:C.every(c=>c[1]),fails:C.filter(c=>!c[1]).map(c=>c[0]),msg:C.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(', ')}}
 // the bxT check: track data + the 3 s input check (GO -> GAS 3 s -> >=15 m forward, never backward)
 for(const k of['bx-t-cliff','bx-t-city','bx-t-canyon','bx-t-lagoon']){const T=BX_TESTS[k];T.chk=()=>{const m=BX.m,D=BX_data(),i=[['>=15 m forward in 3 s',m.fwd3>=15,`forward ${(m.fwd3||0).toFixed(0)} m in 3 s`],['0 backward',!(m.back0>0),`backward ${(m.back0||0).toFixed(1)} s`]];
