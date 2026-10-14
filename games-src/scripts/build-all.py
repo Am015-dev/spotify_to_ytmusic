@@ -119,7 +119,20 @@ def main():
     ap.add_argument("--full", action="store_true", help="run the game sweeps (they play whole games): only for engine/rules changes. Without it no sweep runs (owner, 13 Oct 2026)")
     ap.add_argument("--no-look", action="store_true", help="skip the look check gate (new severe visual findings block --deploy)")
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--visual", metavar="SLUG", help="visual baselines (scripts/visual.spec.js, machine-only): compare the DEPLOYED game's title / menu / board at phone, tablet, wide with the approved baselines; fails on a diff or a missing baseline. No build.")
+    ap.add_argument("--approve-visual", metavar="SLUG", help="owner approved this game's screens: (re)record its baselines and push them to the orphan branch ui-baselines. Never run it unasked.")
     a = ap.parse_args()
+    if a.visual or a.approve_visual:
+        slug = a.visual or a.approve_visual
+        if slug not in GAMES: sys.exit("unknown slug: " + slug)
+        subprocess.run(["bash", str(SCRIPTS / "baselines.sh"), "pull"], check=False)
+        env = dict(os.environ, VIS_SLUGS=slug, JOBS=os.environ.get("JOBS", "2")); env.pop("GX_URL", None)
+        cmd = [str(SRC / "node_modules" / ".bin" / "playwright"), "test", "scripts/visual.spec.js", "--project=phone", "--project=tablet", "--project=wide", "--reporter=line"] + (["--update-snapshots"] if a.approve_visual else [])
+        (SRC / ".staging").mkdir(exist_ok=True)
+        r = subprocess.run(cmd, cwd=SRC, env=env)
+        if r.returncode: sys.exit(f"[visual] {slug}: FAIL (diff or missing baseline; images are compared by the test, never opened)")
+        if a.approve_visual: sys.exit(subprocess.run(["bash", str(SCRIPTS / "baselines.sh"), "push", f"approve {slug}"]).returncode)
+        print(f"[visual] {slug}: PASS"); return 0
     if a.list:
         for s, (d, c, o) in GAMES.items(): print(f"{s:18} cd games-src/{d} && {c}  -> {o}")
         return 0

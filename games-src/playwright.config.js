@@ -15,6 +15,8 @@ module.exports = defineConfig({
   testDir: 'scripts', testMatch: '*.spec.js', outputDir: '.staging/.pw-results',
   fullyParallel: true, retries: 0, workers: +process.env.JOBS || 3, reporter: [['list'], ['json', { outputFile: process.env.PW_JSON || '.staging/.pw-results.json' }]],
   timeout: 90000, expect: { timeout: 5000 },
+  // visual.spec.js baselines: games-src/.baselines/<slug>/<step>-<project>.png (git-ignored; orphan branch ui-baselines via scripts/baselines.sh); a missing one fails, only --update-snapshots records
+  snapshotPathTemplate: path.join(__dirname, '.baselines', '{arg}-{projectName}{ext}'), updateSnapshots: 'none',
   use: { serviceWorkers: 'block', launchOptions: { args: ['--no-sandbox', '--force-color-profile=srgb'] } },
   projects: [
     { name: 'phone', use: phone(390, 763) },

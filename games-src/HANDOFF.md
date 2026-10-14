@@ -344,3 +344,6 @@ Open faults found by the owner (rampart and lantern workers report these fixed a
 - crown: start screen still 2 big buttons + Customise; tablet dock covers "IN DOWNTOWN"/"0 cards" (kot/art.js:146).
 - shipwreck: castaway choice (who/human-computer) removed from the start screen; restore under More ways to play.
 - all: per-game worker reports above ("rules pass") were NOT independently verified; see "Independent UI audit (14 Oct)" for the partial checker.
+
+## Visual baselines (14 Oct 2026, worker)
+Built: `scripts/visual.spec.js` (title/menu/board x phone/tablet/wide, `?scn=menu` seed, animations disabled, masks), `scripts/baselines.sh pull|push`, `build-all.py --visual|--approve-visual <slug>`, config `snapshotPathTemplate` -> `games-src/.baselines/<slug>-<step>-<project>.png`, `updateSnapshots: 'none'` (missing baseline = fail). Orphan branch `ui-baselines` holds the PNGs. Flake test: 2 consecutive runs of 9 shots, 0 diffs. Recorded: rampart-and-vine ONLY (desktop fixes); all other games have no baselines and `--visual` fails for them until the owner approves their screens. Not wired into `--deploy` yet (owner's call).

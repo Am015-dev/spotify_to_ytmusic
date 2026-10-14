@@ -165,3 +165,9 @@ blank canvases, small boards, overlapping or spilling cards, sideways scroll and
 ## LAB and test mode (owner, 13 Oct 2026)
 Every deployed game carries the 🧪 LAB (test mode only; `shell/LAB.md`): build-all inlines `gx-lab-core.js`, `gx-lab.js`, `gx-lab.css` into the staged page, so a game only needs `scn.js`. Per game: `<prefix>-board`, `<prefix>-zoom`, `<prefix>-help`, the shared `story-scene`, and a scenario for every item of its newest What's new entries (`scripts/set-scn.py <game-id> <date> 3=<scn-id>`).
 `build-all.py --quick/--deploy` also runs `scripts/lab-test.js` (off = no LAB element; on = LAB lists GXSLIST and every GO passes its checks; pinned checklist -> shelf -> `games/lab.html`), and after a deploy refreshes `games/scenarios.json` (`scripts/lab-index.js`) and `games/lab.html` (`scripts/lab-page.py`). Brief for a scenarios worker: `games-src/lab/BRIEF-scenarios.md`.
+
+## Visual baselines (owner, 14 Oct 2026; machine-only, NEVER open the images)
+- `build-all.py --visual <slug>`: compares the deployed game's title / menu / board (phone, tablet, wide) with the approved baselines (`scripts/visual.spec.js`); a diff or a missing baseline fails.
+- `build-all.py --approve-visual <slug>`: only after the owner approves that game's screens; re-records and pushes to the orphan branch `ui-baselines` (`scripts/baselines.sh pull|push`; files live in git-ignored `games-src/.baselines/`).
+- Masked: timers, dice, coach bubble, finger, pops; give any other volatile element `data-volatile`. Needs `npm i --no-save @playwright/test @axe-core/playwright` once per machine.
+- Recorded so far: rampart-and-vine only (mechanism proof). Never record a game unapproved.
