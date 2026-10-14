@@ -4,7 +4,7 @@
 // punched slots, a walnut table on a paved courtyard. High adds bloom, vignette and a colour grade in a small HDR pipeline.
 const V3={on:false,t:0,tiles:{},halos:[],ghosts:[],hits:[],boards:{},kilns:[],L:null,hover:null,zoom:1,orbit:{a:0,e:1.2},
   q:'high',qPref:'auto',mats:new Set(),pops:[],popQ:{},post:false,canPost:false,fontOK:0};
-const CP=1.08,TSZ=.94,TD=.26,BW=12.4,BH=9.4,KR=1.45;
+const LBLPX=52,CP=1.08,TSZ=.94,TD=.26,BW=12.4,BH=9.4,KR=1.45;
 // ---------- graphics quality: auto (medium on phones/small screens, high on desktop), high, medium, low ----------
 const GFX_KEY='sgz_gfx';
 const PH=typeof PerfHUD!=='undefined'?PerfHUD:null;
@@ -255,7 +255,7 @@ function makeSunToken(){const g=new THREE.Group();const brass=emat(new THREE.Mes
 // ---------- layout: kiln ring and player boards, chosen to fill the current board area ----------
 function focusSeat(){if(!G)return 0;if(NET.on&&NET.mySeat>=0&&P(NET.mySeat))return NET.mySeat;const s=sideToAct();if(s>=0&&P(s).human)return s;if(UI.lastHuman!=null&&P(UI.lastHuman)&&P(UI.lastHuman).human)return UI.lastHuman;const h=G.pl.find(p=>p.human);return h?h.i:(s>=0?s:0)}
 function ringGeom(n){const RR=Math.max(4.6,n*(2*KR+.5)/(2*Math.PI));return {RR,cr:RR-KR-.25,out:RR+KR}}
-function computeLayout(w,h){const n=G?G.fac.length:5,np=G?G.np:2;const ring=ringGeom(n);const R=ring.out+.4;const me=focusSeat();const gp=1.2;
+function computeLayout(w,h){const n=G?G.fac.length:5,np=G?G.np:2;const ring=ringGeom(n);const R=ring.out+.4;const me=focusSeat();const gp=w<1000?1.2:.7;
   const others=[];for(let k=1;k<np;k++)others.push((me+k)%np);const cands=[];const narrow=w<700;
   const mk=(name,boards)=>{let x0=-R,x1=R,z0=-R,z1=R;for(const b of boards){x0=Math.min(x0,b.x-BW/2);x1=Math.max(x1,b.x+BW/2);z0=Math.min(z0,b.z-BH/2);z1=Math.max(z1,b.z+BH/2)}
     const W=x1-x0,D=z1-z0;const e=V3.orbit.e;const sc=Math.min(w/W,h/(D*Math.sin(e)+1.2*Math.cos(e)));cands.push({name,boards,box:{x0,x1,z0,z1},sc,ring})};
@@ -287,7 +287,7 @@ function relayout(){if(V3.on&&!G){V3.L=computeLayout(V3.W||800,V3.H||600);if(!V3
 function fitCam(){const L=V3.L;if(!L)return;V3.dirty=3;if(PH)PH.wake();let b=L.box;const zb=!PHN.on&&V3.zoomBoard&&L.name==='focus'&&L.bp[V3.zoomBoard.p];if(PHN.on){const R=L.ring.out+.3;b={x0:-R,x1:R,z0:-R,z1:R}}if(zb)b={x0:zb.x-BW/2-.3,x1:zb.x+BW/2+.3,z0:zb.z-BH/2-(V3.zoomBoard.ring?L.ring.out*2+1.2:.3),z1:zb.z+BH/2+.3};const pts=[];for(const x of [b.x0,b.x1])for(const z of [b.z0,b.z1])for(const y of [0,.6])pts.push(new THREE.Vector3(x,y,z));
   const o=PHN.on?{a:0,e:1.53}:V3.orbit;const dir=new THREE.Vector3(Math.sin(o.a)*Math.cos(o.e),Math.sin(o.e),Math.cos(o.a)*Math.cos(o.e));const look=new THREE.Vector3((b.x0+b.x1)/2,0,(b.z0+b.z1)/2);
   const test=d=>{V3.cam.position.copy(look).addScaledVector(dir,d);V3.cam.lookAt(look);V3.cam.updateMatrixWorld();let mx=0,my0=1,my1=-1;for(const p of pts){const v=p.clone().project(V3.cam);mx=Math.max(mx,Math.abs(v.x));my0=Math.min(my0,v.y);my1=Math.max(my1,v.y)}return {mx,my0,my1}};
-  for(let it=0;it<3;it++){let lo=5,hi=400;for(let k=0;k<30;k++){const d=(lo+hi)/2;const r=test(d);const lim=PHN.on?.995:.97;const fits=r.mx<=lim&&r.my1<=lim&&r.my0>=-lim&&(r.my1-r.my0)<=lim*2;if(fits)hi=d;else lo=d}
+  for(let it=0;it<3;it++){let lo=5,hi=400;for(let k=0;k<30;k++){const d=(lo+hi)/2;const r=test(d);const lim=PHN.on?.995:.99;const fits=r.mx<=lim&&r.my1<=lim&&r.my0>=-lim&&(r.my1-r.my0)<=lim*2;if(fits)hi=d;else lo=d}
     const r=test(hi);const off=(r.my1+r.my0)/2;look.z-=off*(b.z1-b.z0)*.5;V3.dist=hi}
   const d=V3.dist*V3.zoom;V3.camTo={pos:look.clone().addScaledVector(dir,d),look:look.clone()};if(!V3.camNow||!ANIM||V3.drag){V3.camNow={pos:V3.camTo.pos.clone(),look:look.clone()}}V3.cam.position.copy(V3.camNow.pos);V3.cam.lookAt(V3.camNow.look);V3.look.copy(look);
   // tight shadow frustum around the whole layout
@@ -323,7 +323,7 @@ function buildStatic(){const sc=V3.scene;if(V3.stat)for(const m of V3.stat)sc.re
   // the clay sack and the shard box
   const bag=add(V3.sack||(V3.sack=sackMesh()));bag.position.set(L.bag.x,0,L.bag.z);
   const box=add(V3.sbox||(V3.sbox=shardBox()));box.position.set(L.lid.x,0,L.lid.z);V3.shardN=-1;
-  V3.bagLbl=add(V3.bagLbl||labelMesh('',2.6));V3.bagLbl.position.set(L.bag.x,.03,L.bag.z+1.55);V3.lidLbl=add(V3.lidLbl||labelMesh('',2.6));V3.lidLbl.position.set(L.lid.x,.03,L.lid.z+1.35);V3.lblKey='';if(PHN.on){V3.bagLbl.visible=false;V3.lidLbl.visible=false}else{V3.bagLbl.visible=true;V3.lidLbl.visible=true}
+  V3.bagLbl=add(V3.bagLbl||labelMesh('',5.2));V3.bagLbl.position.set(L.bag.x,.03,L.bag.z+1.55);V3.lidLbl=add(V3.lidLbl||labelMesh('',5.2));V3.lidLbl.position.set(L.lid.x,.03,L.lid.z+1.35);V3.lblKey='';if(PHN.on){V3.bagLbl.visible=false;V3.lidLbl.visible=false}else{V3.bagLbl.visible=true;V3.lidLbl.visible=true}
   // boards: a printed base with a punched top layer (47 slots)
   const bg=boardGeos();
   for(const bd of L.boards){const g=new THREE.Group();const tex=boardTexture(bd.p);tex.t.userData.own=1;const print=smat(new THREE.MeshStandardMaterial({map:tex.t,roughness:.8,normalMap:V3.linenB,normalScale:new THREE.Vector2(.35,.35),envMapIntensity:.4}));
@@ -371,7 +371,7 @@ function shardBox(){const g=new THREE.Group();const rb=(w,h,d)=>{const s=rrPath(
 function labelMesh(t,w){const c=mkCanvas(512,128);const tx=texOf(c,true);const m=new THREE.Mesh(new THREE.PlaneGeometry(w,w/4),emat(new THREE.MeshStandardMaterial({map:tx,transparent:true,roughness:.35,envMapIntensity:.7,depthWrite:false})));m.rotation.x=-Math.PI/2;m.userData.c=c;m.userData.t=tx;setLabel(m,t);return m}
 function setLabel(m,t){const c=m.userData.c,x=c.getContext('2d');x.clearRect(0,0,512,128);x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=10;x.shadowOffsetY=4;x.fillStyle='#f4ead2';rr2(x,10,14,492,96,46);x.fill();x.shadowColor='transparent';
   x.strokeStyle='#23407a';x.lineWidth=5;rr2(x,18,22,476,80,40);x.stroke();x.strokeStyle='#e0a53a';x.lineWidth=2;rr2(x,26,30,460,64,32);x.stroke();
-  x.fillStyle='#23407a';x.font='700 50px "Cormorant Garamond",Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText(t,256,64);m.userData.t.needsUpdate=true}
+  x.fillStyle='#23407a';x.font='700 58px "Cormorant Garamond",Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText(t,256,64);m.userData.t.needsUpdate=true}
 // ---------- the dual-layer player board ----------
 function boardSlots(){const S=[];for(let r=0;r<5;r++){const z=-3.2+.54+r*CP;for(let k=0;k<cap(r);k++)S.push([-.45-.54-k*CP,z,'l']);for(let k=0;k<5;k++)S.push([.45+.54+k*CP,z,'w'])}for(let k=0;k<7;k++)S.push([-5.31+k*CP,3.09,'x']);return S}
 function boardGeos(){if(V3.bgeo)return V3.bgeo;const outer=()=>rrPath(new THREE.Shape(),-BW/2,-BH/2,BW,BH,.38);const cuv=(x,y)=>[(x+BW/2)/BW,(y+BH/2)/BH];
@@ -392,24 +392,24 @@ function paintBoard(o,pi){const GG=G||{ex:{},pl:[{nm:PNAMES[0],score:0,human:1},
   x.lineWidth=28;x.strokeStyle='#213d74';rr2(x,24,24,W-48,H-48,24);x.stroke();x.lineWidth=2;x.strokeStyle='#d9a441';rr2(x,9,9,W-18,H-18,34);x.stroke();rr2(x,39,39,W-78,H-78,12);x.stroke();
   x.fillStyle='#e7b54e';for(let i=62;i<W-50;i+=44){star8(x,i,24,8);x.fill();star8(x,i,H-24,8);x.fill()}for(let j=66;j<H-50;j+=44){star8(x,24,j,8);x.fill();star8(x,W-24,j,8);x.fill()}
   // header banner in the player's colour
-  const hg=x.createLinearGradient(0,48,0,124);hg.addColorStop(0,pc);hg.addColorStop(1,shade(pc,-.22));x.fillStyle=hg;rr2(x,56,48,W-112,76,12);x.fill();
-  x.strokeStyle=act?'#ffe27a':'#d9a441';x.lineWidth=act?6:3;if(act){x.shadowColor='#ffd24a';x.shadowBlur=18}rr2(x,56,48,W-112,76,12);x.stroke();x.shadowBlur=0;
-  x.strokeStyle='rgba(255,248,230,.45)';x.lineWidth=1.5;rr2(x,64,56,W-128,60,8);x.stroke();
-  x.fillStyle='#fff8ea';x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=4;x.shadowOffsetY=2;x.font=`700 52px ${FH}`;x.textBaseline="middle";x.textAlign="left";
-  x.fillText(p.nm+(p.human?(G?(you?'  (you)':''):(GG.pl.filter(q=>q.human).length===1?'  (you)':'')):'  ·  '+p.lv+' computer'),88,88);x.shadowBlur=0;x.shadowOffsetY=0;
-  if(act){const sx=W-210,sy=86;x.fillStyle='#ffd24a';x.fill(new Path2D(rays(sx,sy,12,12,24,4)));x.beginPath();x.arc(sx,sy,11,0,7);x.fill()}
+  const hg=x.createLinearGradient(0,48,0,124);hg.addColorStop(0,pc);hg.addColorStop(1,shade(pc,-.22));x.fillStyle=hg;rr2(x,56,48,W-112,58,12);x.fill();
+  x.strokeStyle=act?'#ffe27a':'#d9a441';x.lineWidth=act?6:3;if(act){x.shadowColor='#ffd24a';x.shadowBlur=18}rr2(x,56,48,W-112,58,12);x.stroke();x.shadowBlur=0;
+  x.strokeStyle='rgba(255,248,230,.45)';x.lineWidth=1.5;rr2(x,64,56,W-128,42,8);x.stroke();
+  x.fillStyle='#fff8ea';x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=4;x.shadowOffsetY=2;x.font=`700 48px ${FH}`;x.textBaseline="middle";x.textAlign="left";
+  x.fillText(p.nm+(p.human?(G?(you?'  (you)':''):(GG.pl.filter(q=>q.human).length===1?'  (you)':'')):'  ·  '+p.lv+' computer'),88,78);x.shadowBlur=0;x.shadowOffsetY=0;
+  if(act){const sx=W-210,sy=77;x.fillStyle='#ffd24a';x.fill(new Path2D(rays(sx,sy,12,12,24,4)));x.beginPath();x.arc(sx,sy,11,0,7);x.fill()}
   // score medallion
-  const mx=W-118,my=86;const mg=x.createRadialGradient(mx-12,my-14,6,mx,my,52);mg.addColorStop(0,'#fff0b0');mg.addColorStop(.6,'#e0a53a');mg.addColorStop(1,'#9a6418');x.fillStyle=mg;x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=8;x.shadowOffsetY=3;x.beginPath();x.arc(mx,my,50,0,7);x.fill();x.shadowBlur=0;x.shadowOffsetY=0;
+  const mx=W-118,my=77;const mg=x.createRadialGradient(mx-12,my-14,6,mx,my,52);mg.addColorStop(0,'#fff0b0');mg.addColorStop(.6,'#e0a53a');mg.addColorStop(1,'#9a6418');x.fillStyle=mg;x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=8;x.shadowOffsetY=3;x.beginPath();x.arc(mx,my,50,0,7);x.fill();x.shadowBlur=0;x.shadowOffsetY=0;
   x.fillStyle='#fbf1d8';x.beginPath();x.arc(mx,my,39,0,7);x.fill();x.strokeStyle='#b07a24';x.lineWidth=2;x.stroke();x.fillStyle='#5a3413';x.textAlign='center';x.font=`700 ${p.score>99?36:44}px ${FH}`;x.fillText(String(p.score),mx,my+3);
   // section titles
-  x.fillStyle='#6b4a2a';x.textAlign='left';x.textBaseline='alphabetic';x.font=`italic 600 ${GG.ex.gray?19:25}px ${FH}`;x.fillText(GG.ex.gray?'unmarked mosaic · no glaze twice in a row or column':'mosaic',X(.45),147);x.font=`italic 600 25px ${FH}`;x.fillText('drying racks',X(-5.8),147);
-  x.fillText('breakage',X(-5.8),Z(3.09)-58);
+  x.fillStyle='#6b4a2a';x.textAlign='left';x.textBaseline='alphabetic';x.font=`italic 700 ${LBLPX}px ${FH}`;x.fillText(GG.ex.gray?'unmarked mosaic':'mosaic',X(.45),149);x.fillText('drying racks',X(-5.8),149);
+  x.fillText('breakage',X(-5.8),Z(3.09)-62);
   // mosaic surround: limestone with grout between the cut-outs
   x.fillStyle='#b9a584';rr2(x,X(.45)-2,Z(-3.2)+3,5*CP*S+6,5*CP*S+4,10);x.fill();
   // racks: a faint stepped backdrop and row medallions
   for(let r=0;r<5;r++){const zc=Z(-3.2+.54+r*CP);const x0=X(-.45-.54-(cap(r)-1)*CP)-54;x.fillStyle='rgba(160,120,70,.12)';rr2(x,x0,zc-54,X(-.45)-x0+6,108,12);x.fill();
-    x.fillStyle='#213d74';x.beginPath();x.arc(X(-.2),zc-14,16,0,7);x.fill();x.strokeStyle='#d9a441';x.lineWidth=2;x.stroke();x.fillStyle='#fbf1d8';x.font=`700 24px ${FH}`;x.textAlign='center';x.textBaseline='middle';x.fillText(String(r+1),X(-.2),zc-12);
-    x.fillStyle='rgba(138,90,43,.7)';x.beginPath();x.moveTo(X(-.3),zc+10);x.lineTo(X(-.08),zc+22);x.lineTo(X(-.3),zc+34);x.fill()}
+    x.fillStyle='#213d74';x.beginPath();x.arc(X(-.2),zc-14,25,0,7);x.fill();x.strokeStyle='#d9a441';x.lineWidth=2;x.stroke();x.fillStyle='#fbf1d8';x.font=`700 ${LBLPX-4}px ${FH}`;x.textAlign='center';x.textBaseline='middle';x.fillText(String(r+1),X(-.2),zc-12);
+    x.fillStyle='rgba(138,90,43,.7)';x.beginPath();x.moveTo(X(-.3),zc+16);x.lineTo(X(-.08),zc+28);x.lineTo(X(-.3),zc+40);x.fill()}
   // the recessed slots (seen through the top layer's cut-outs), with painted ambient occlusion at the walls
   const hs=49;const slot=(xc,zc,kind,glz)=>{x.save();rr2(x,xc-hs,zc-hs,2*hs,2*hs,9);x.clip();x.fillStyle=kind==='l'?'#cdb48a':kind==='x'?'#dcbcaa':GG.ex.gray?'#bdb5a6':'#f6efe0';x.fillRect(xc-hs,zc-hs,2*hs,2*hs);
       if(kind==='w'&&!GG.ex.gray)paintGlaze(x,glz,xc-42,zc-42,84,.3);if(kind==='x'){x.strokeStyle='rgba(160,48,42,.25)';x.lineWidth=3;x.beginPath();x.moveTo(xc-20,zc-20);x.lineTo(xc+20,zc+20);x.moveTo(xc+20,zc-20);x.lineTo(xc-20,zc+20);x.stroke()}
@@ -417,9 +417,8 @@ function paintBoard(o,pi){const GG=G||{ex:{},pl:[{nm:PNAMES[0],score:0,human:1},
       x.lineWidth=2;x.strokeStyle=kind==='x'?'rgba(160,48,42,.55)':'rgba(120,80,40,.45)';rr2(x,xc-hs-4,zc-hs-4,2*hs+8,2*hs+8,12);x.stroke()};
   for(const [sx,sz,kind] of boardSlots()){const r=Math.round((sz+3.2-.54)/CP),k=Math.round((sx-.45-.54)/CP);slot(X(sx),Z(sz),kind,kind==='w'?WALLC(r,k):null)}
   // breakage penalties in red medallions
-  const fz=Z(3.09);for(let k=0;k<7;k++){const xc=X(-5.31+k*CP);x.fillStyle='#a8322a';x.beginPath();x.arc(xc,fz+84,19,0,7);x.fill();x.fillStyle='#fbe9dc';x.font=`700 24px ${FH}`;x.textAlign='center';x.textBaseline='middle';x.fillText(String(FLOOR[k]),xc,fz+86)}
-  x.textAlign='left';x.textBaseline='alphabetic';x.fillStyle='#6b4a2a';x.font=`italic 600 24px ${FH}`;x.fillText('extra tiles go to the shard box, no penalty',X(1.9),fz-18);
-  x.fillStyle='#213d74';x.font=`700 26px ${FH}`;x.fillText(`at the end:  row +${BONUS.row}  ·  column +${BONUS.col}  ·  glaze +${BONUS.colour}`,X(1.9),fz+30);o.t.needsUpdate=true}
+  const fz=Z(3.09);for(let k=0;k<7;k++){const xc=X(-5.31+k*CP);x.fillStyle='#a8322a';x.beginPath();x.arc(xc,fz+86,28,0,7);x.fill();x.fillStyle='#fbe9dc';x.font=`700 ${LBLPX-4}px ${FH}`;x.textAlign='center';x.textBaseline='middle';x.fillText(String(FLOOR[k]),xc,fz+89)}
+  o.t.needsUpdate=true}
 function shade(h,k){const c=hx(h);const f=v=>Math.max(0,Math.min(255,Math.round(k<0?v*(1+k):v+(255-v)*k)));return `rgb(${f(c[0])},${f(c[1])},${f(c[2])})`}
 // ---------- dynamic pieces: tiles fly between slots ----------
 function wantTiles(){const w=[];G.fac.forEach((a,i)=>a.forEach((t,k)=>w.push({sl:`f${i}_${k}`,k:t})));V3.ctrN=G.ctr.length;G.ctr.forEach((t,k)=>w.push({sl:`c_${k}`,k:t}));
