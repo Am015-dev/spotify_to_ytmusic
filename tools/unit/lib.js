@@ -8,7 +8,8 @@ const memo=(k,f)=>k in cache?cache[k]:(cache[k]=f());
 const rd=f=>fs.readFileSync(path.join(SRCD,f),'utf8');
 const ORDER=()=>memo('order',()=>rd('ORDER').split('\n').map(s=>s.trim()).filter(Boolean));
 const MODS=()=>memo('mods',()=>{const o={};for(const f of ORDER())o[f]=rd(f);return o});
-const PAGE=()=>memo('page',()=>{let s=ORDER().map(f=>MODS()[f]).join('');if(SEED==='credits')s=s.replace(/by Alex/g,'by Bob');if(SEED==='allopen')s=s.replace('ALL_OPEN=true','ALL_OPEN=false');return s});
+const LAZYL=()=>memo('lazy',()=>{try{return rd('LAZY').split('\n').map(s=>s.trim().replace(/:.*/,'')).filter(s=>s&&s[0]!=='#')}catch(e){return[]}});   // split-1: modules built as xc/ chunks, not in the page
+const PAGE=()=>memo('page',()=>{let s=ORDER().filter(f=>!LAZYL().includes(f)).map(f=>MODS()[f]).join('');if(SEED==='credits')s=s.replace(/by Alex/g,'by Bob');if(SEED==='allopen')s=s.replace('ALL_OPEN=true','ALL_OPEN=false');return s});
 const JSCODE=()=>memo('js',()=>{let s=ORDER().filter(f=>f.endsWith('.js')).map(f=>MODS()[f]).join('\n');
   const M={'dmg-sqrt':['15*Math.sqrt((v-25)/25)','15*Math.sqrt((v-25)/9)'],'dmg-light':['if(v<25){','if(v<5){'],'traf-burst':['rel>60||','rel>20||'],'tyre':['const CR_TYRE_Y=.03','const CR_TYRE_Y=.12'],'cam-clear':['clr>=CAM.m&&','clr>=-9&&'],'track-grade':['p:[t=>[0,4*bxRamp(t),24*t]]','p:[t=>[0,9*bxRamp(t),24*t]]'],'track-rail':['const BX_RAIL=[[-7,.14,-7,1.4,-1,0,\'k\'],','const BX_RAIL=[[-7,.14,-7,.2,-1,0,\'k\'],'],'stick':['dm=TUNE.stAng/(1+sp/TUNE.stFall)','dm=TUNE.stAng*(1+sp/TUNE.stFall)']};
   const m=M[SEED];if(m){if(!s.includes(m[0]))throw new Error('seed anchor gone: '+SEED);s=s.replace(m[0],m[1])}return s});

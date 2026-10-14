@@ -16,16 +16,17 @@ if(TQ){
  if(TQ.nodraw){try{avatar=function(){return'data:,'}}catch(e){}}
  if(TQ.nodraw){const rr=renderer.render.bind(renderer);renderer.render=function(){if(!TQ.draw)return;return rr.apply(this,arguments)}}
  // &draw=0 (headless tools): no pictures at all except __tq.shot() (software GL needs ~10 s for the first frame's shaders)
- const TQS={ready:false,t0:performance.now(),tReady:0,log:[],st:[]};ldSet=(f=>function(a,lab){try{const L=TQS.st,l=lab||'';if(!L.length||L[L.length-1][1]!==l)L.push([Math.round(performance.now()-TQS.t0),l])}catch(e){}return f.apply(this,arguments)})(ldSet);
+ const TQS={ready:false,drv:false,t0:performance.now(),tReady:0,log:[],st:[]};ldSet=(f=>function(a,lab){try{const L=TQS.st,l=lab||'';if(!L.length||L[L.length-1][1]!==l)L.push([Math.round(performance.now()-TQS.t0),l])}catch(e){}return f.apply(this,arguments)})(ldSet);
  const skip=()=>{try{if(window.__m1&&__m1.cs&&__m1.cs()&&__m1.skip)__m1.skip()}catch(e){}
   for(const s of['#storyGo','#rcGo','.m1go','#tutSkip','#m1Cs']){const e=document.querySelector(s);if(e&&!e.hidden&&e.offsetWidth)try{e.click()}catch(er){}}};
  const ride=()=>new Promise(res=>{if(!TQ.car)return res();let S=null;try{S=GAR_set(TQ.car)}catch(e){}if(!S||S.id!==TQ.car){TQS.log.push('no ride '+TQ.car);return res()}
   try{gbOpen();GAR_select(TQ.car)}catch(e){TQS.log.push('ride: '+e);return res()}
   let n=0;const w=()=>{if((typeof LDL==='undefined'||!LDL.wait.size)||++n>150){try{gbClose(true)}catch(e){}setTimeout(res,300)}else setTimeout(w,200)};setTimeout(w,300)});
  const spot=()=>{if(!TQ.at)return;const[x,z]=TQ.at,q=rfSnap(x,z,120);if(!roamWarp(q?q[0]:x,q?q[1]:z,q&&q[2]!=null?q[2]:RO.h))TQS.log.push('at: warp refused')};
- const iv=setInterval(()=>{skip();if(TQS.busy||TQS.ready)return;let st='';try{st=state}catch(e){}if(st!=='roam'||!RO.on||!RO.built||LD.busy)return;TQS.busy=1;
+ const iv=setInterval(()=>{skip();if(TQS.busy||TQS.drv)return;let st='';try{st=state}catch(e){}if(st!=='roam'||!RO.on||!RO.built||LD.busy)return;TQS.busy=1;
   ride().then(()=>{const w2=()=>{let s2='';try{s2=state}catch(e){}if(s2!=='roam'||!RO.on||LD.busy)return setTimeout(w2,200);spot();skip();RO.v=0;
-   TQS.ready=true;TQS.tReady=Math.round(performance.now()-TQS.t0);TQS.home=[RO.x,RO.z,RO.h];if(TQ.go)setTimeout(()=>{try{TQS.goSaid=window.__chk&&__chk.go(TQ.go)}catch(e){TQS.log.push('go: '+e)}},300)};w2()})},250);
+   TQS.drv=true;TQS.tReady=Math.round(performance.now()-TQS.t0);TQS.home=[RO.x,RO.z,RO.h];  // drv = the player can drive; ready also waits for the lazy code chunks (src/LAZY, 10z_lazy.js: __chk etc.)
+   XC_go().then(()=>{TQS.ready=true;if(TQ.go)setTimeout(()=>{try{TQS.goSaid=window.__chk&&__chk.go(TQ.go)}catch(e){TQS.log.push('go: '+e)}},300)})};w2()})},250);
  setTimeout(()=>clearInterval(iv),120000);
  // warm page (dev-5): back to a clean roam at the boot spot WITHOUT a reload (~0.2 s instead of a 20-40 s city boot); the GO runner calls it between items
  const reset=()=>{const t=performance.now(),log=[];const T=(n,f)=>{try{f()}catch(e){log.push(n+': '+String(e).slice(0,60))}};

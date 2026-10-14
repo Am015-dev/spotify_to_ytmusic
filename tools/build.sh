@@ -11,7 +11,11 @@ cd "$(dirname "$0")/.."
 VER="${1:?usage: tools/build.sh <ver> [--local]}"; OUT="out/$VER"; mkdir -p "$OUT"
 for f in src/*.js src/*.html; do grep -qx "$(basename "$f")" src/ORDER src/MODELS || { echo "BUILD FAIL: $f not in src/ORDER or src/MODELS"; exit 1; }; done
 python3 tools/modmap.py || echo "WARN: modmap failed (docs/MODULES.md not refreshed)"   # keep docs/MODULES.md in step with src/
-( cd src && cat $(cat ORDER) ) > "$OUT/overdrive.html"
+# lazy code chunks (src/LAZY, split-1): modules that are still in ORDER (dev tools keep working) but are NOT in the page; packed to out/<ver>/xc/<name>.js, evaluated after drivable (src/10z_lazy.js)
+XC_ORDER=$(grep -vxF -f <(sed 's/:.*//;/^#/d;/^$/d' src/LAZY 2>/dev/null; echo __none__) src/ORDER)
+rm -rf "$OUT/xc"; XCV=$(node tools/lazy/pack.js "$OUT") || { echo "BUILD FAIL: lazy chunks"; exit 1; }
+for f in "$OUT"/xc/*.js; do [ -e "$f" ] && { node --check "$f" || { echo "BUILD FAIL: $f syntax"; exit 1; }; }; done
+( cd src && cat $XC_ORDER ) | XCV="$XCV" python3 tools/lazy/inject.py > "$OUT/overdrive.html"
 cp src/assets/km.js "$OUT/km.js"
 # LDraw model data (src/MODELS): out/<ver>/models.js = small index (presets, placements, chunk table; v89z) + out/<ver>/models/<id>.js, one chunk per model, loaded on demand
 python3 tools/ld/mkmodels.py "$OUT" || { echo "BUILD FAIL: models"; exit 1; }
@@ -34,6 +38,7 @@ import re,sys;s=open(sys.argv[1],encoding='utf8').read();m=re.search(r'<script t
 PY
 node --check /tmp/_od_chk.mjs || { echo "BUILD FAIL: syntax"; exit 1; }
 if [ "${2:-}" = "--local" ]; then   # dev pages: the deploy page + test-only modules (src/test/*.js, inert without their URL flag) before 99_api.js
-  ( cd src && for f in $(cat ORDER); do [ "$f" = 99_api.js ] && cat test/*.js 2>/dev/null; cat "$f"; done ) > overdrive.html
+  ( cd src && for f in $XC_ORDER; do [ "$f" = 99_api.js ] && cat test/*.js 2>/dev/null; cat "$f"; done ) | XCV="$XCV" python3 tools/lazy/inject.py > overdrive.html
+  rm -rf xc; [ -d "$OUT/xc" ] && cp -r "$OUT/xc" xc
   cp "$OUT/km.js" km.js;cp "$OUT/models.js" models.js;rm -rf models;cp -r "$OUT/models" models;[ -f "$OUT/tune.json" ] && cp "$OUT/tune.json" tune.json;[ -d "$OUT/music" ] && mkdir -p music && cp "$OUT"/music/*.mp3 music/; python3 -c "exec(open('P.py' if __import__('os').path.exists('P.py') else 'attic/P.py').read());save()"; node --check chk.mjs || { echo "BUILD FAIL: local syntax"; exit 1; }; fi
-echo "BUILD_OK $OUT  page $(wc -c <"$OUT/overdrive.html") B  km.js $(wc -c <"$OUT/km.js") B  models.js $(wc -c <"$OUT/models.js") B  models/ $(cat "$OUT"/models/*.js | wc -c) B  index.html $(wc -c <"$OUT/index.html") B"
+echo "BUILD_OK $OUT  page $(wc -c <"$OUT/overdrive.html") B  km.js $(wc -c <"$OUT/km.js") B  models.js $(wc -c <"$OUT/models.js") B  models/ $(cat "$OUT"/models/*.js | wc -c) B  xc/ $(cat "$OUT"/xc/*.js 2>/dev/null | wc -c) B  index.html $(wc -c <"$OUT/index.html") B"
