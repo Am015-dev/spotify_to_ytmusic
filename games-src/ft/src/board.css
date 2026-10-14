@@ -11,7 +11,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 #seats{flex:0 0 auto;display:flex;gap:4px}
 .sch{flex:1 1 0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"sn ss" "s2 s2" "s3 s3";align-items:center;column-gap:4px;padding:2px 6px 3px;border-radius:10px;background:#fff9ea;border:2px solid var(--pc);box-shadow:0 1px 3px rgba(60,30,10,.3);font-size:11px;line-height:1.2;cursor:default;overflow:hidden;transition:background .2s}.sch.glow{cursor:pointer}
 .sch .sn{grid-area:sn;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2b1a10}.sch .sn small{font-size:9px;opacity:.6;margin-left:3px;font-weight:600}
-.sch .ss{grid-area:ss;font-size:15px;color:#b8532b;font-family:var(--ff-h);display:inline-block}
+.sch .ss{grid-area:ss;font-size:15px;color:#5a1f08;font-family:var(--ff-h);display:inline-block}
 .sch .s2{grid-area:s2;display:flex;gap:6px;white-space:nowrap}.sch .s3{grid-area:s3;display:flex;gap:5px;white-space:nowrap;min-height:13px;align-items:center}
 .sch .pp{display:inline-flex;align-items:center;gap:1px;font-weight:700;font-size:11px}
 .sch.actnow{background:#fff0c0;box-shadow:0 0 0 3px #ffcf5a,0 0 12px rgba(255,190,60,.8)}
@@ -59,7 +59,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .tok{font-size:15px;line-height:1;text-shadow:0 1px 2px rgba(255,255,255,.8)}.tok small{font-size:9px;font-weight:800}
 .popin{animation:popin .6s cubic-bezier(.3,1.6,.5,1)}@keyframes popin{0%{transform:scale(0)}70%{transform:scale(1.4)}100%{transform:scale(1)}}
 .newc{animation:slidein .5s ease}@keyframes slidein{0%{opacity:0;transform:translateX(14px) scale(.8)}100%{opacity:1;transform:none}}
-.bump{animation:bump .55s ease}@keyframes bump{40%{transform:scale(1.55)}}
+.bump{animation:bump .55s ease;background:#fff9ea;border-radius:8px}@keyframes bump{40%{transform:scale(1.55)}}
 /* things that glow = things you can tap now */
 .glow{cursor:pointer}.sch.glow,.mcard.glow,.dcard.glow,.chb.glow,.sp-b.glow{animation:glowb 1.15s ease-in-out infinite}
 @keyframes glowb{0%,100%{box-shadow:0 0 0 2px #ffd45a,0 0 8px 2px rgba(255,200,70,.7)}50%{box-shadow:0 0 0 3px #fff3b0,0 0 16px 5px rgba(255,205,80,.95)}}
@@ -84,7 +84,7 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 /* flying pieces, floating points, the ghost finger */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:45;overflow:hidden}
 .fl{position:absolute;pointer-events:none;will-change:transform;line-height:1}.fl .mi{font-size:24px}.fl.card{background:#fffdf6;border:1px solid #8a5a18;border-radius:7px;padding:3px 5px}
-.ft{position:absolute;font:800 24px var(--ff-h);color:#2f7d46;text-shadow:0 0 3px #fff,0 0 3px #fff,0 1px 0 #fff;animation:rise 1.4s ease-out forwards;white-space:nowrap}.ft.dn{color:#b3312a}
+.ft{position:absolute;font:800 24px var(--ff-h);color:#1f6a38;background:#fff9ea;border-radius:12px;padding:0 8px;text-shadow:none;animation:rise 1.4s ease-out forwards;white-space:nowrap}.ft.dn{color:#9c1f1a}
 @keyframes rise{0%{opacity:0;transform:translate(-50%,-30%) scale(.6)}15%{opacity:1;transform:translate(-50%,-70%) scale(1.2)}100%{opacity:0;transform:translate(-50%,-200%) scale(1)}}
 #finger{position:fixed;left:0;top:0;z-index:60;pointer-events:none;width:34px;height:46px;margin:-5px 0 0 -13px;opacity:0}
 #finger svg{width:100%;height:100%;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55))}

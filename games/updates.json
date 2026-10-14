@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-14",
+  "game": "sands-of-qamar",
+  "title": "Readable on every screen size",
+  "items": [
+   "Menu and campaign text now sits inside the painted frames"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "doorkick-dungeon",
   "title": "New start screen",
   "items": [
@@ -218,21 +233,6 @@
   ],
   "ask": [
    null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "sands-of-qamar",
-  "title": "Menus tidied",
-  "items": [
-   "Menu and campaign text now sits inside the painted frames"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
    null
   ]
  },
