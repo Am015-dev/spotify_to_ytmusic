@@ -702,6 +702,47 @@ html.ph .gx-bar .gxh-bulb,.gx-bar .gxh-bulb{min-width:40px}
 .mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid #8a6a43;background:#fbf4e2;color:#2a1a0a;font:inherit;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left;touch-action:manipulation}
 .mchip.on{background:#d9a53a;border-color:#7a5413;font-weight:700}.mchip.prev{border-style:dashed}
 </style>
+<style>/* UI bar: readable text at every size, panel opened over the start screen hides it */
+.rm-p span{font-size:13px;letter-spacing:0}
+@media (max-width:700px){.rm-p:not(.now) span{display:none}.rm-p.now span{white-space:normal;text-align:center}.rm-l{grid-template-columns:repeat(7,minmax(0,1fr))}.rm-p.now{grid-column:auto}}
+@media (min-width:1024px){.rm-p span{font-size:16px}.rm-h{font-size:16px}}
+#hud .rtrack span{font-size:13px;min-width:22px;height:22px}
+#hud .hk em{font-size:13px}
+#hud .rleg{font-size:13px}
+@media (min-width:1024px){#hud .hk em,#hud .rleg{font-size:16px}}
+.life i{font-size:13px;width:20px;height:20px}
+.tl em{font-size:13px}
+body:has(.gx-drawer.on) #modal{visibility:hidden}
+/* round 2 */
+@media (min-width:1024px){.wz-t,.wz-t *,#step *,.mbox:not(.start) *{font-size:max(1em,16px)!important}}
+.daycard .dk,.dk{font-size:13px!important}.wz-s i{font-size:13px!important}
+@media (min-width:1024px){.daycard .dk,.dk,.wz-s i,.wz-s,.goal,.sk{font-size:16px!important}}
+#hud .phases span,#hud .phases *,#hud .hk *,#hud .fc *,.goal,.goal *,.gx-dock .goal{font-size:13px!important}
+@media (min-width:1024px){#hud *,.gx-dock *,#panel *{font-size:max(1em,16px)}#hud .phases span,#hud .phases *,#hud .hk *,#hud .fc *,.goal,.goal *{font-size:16px!important}}
+@media (min-width:1024px){.rm-p i,.rm-p.now span,#hud .rtrack span,.hud *{font-size:16px!important}}
+@media (max-width:1023px){#hud .rtrack span,.rm-p i{font-size:13px!important}}
+.gx-dock :is(i,b,small,span,em,u,summary,h3,h4),#panel :is(i,b,small,span,em,u,summary,h3,h4){font-size:max(1em,13px)}
+@media (min-width:1024px){.gx-dock :is(i,b,small,span,em,u,summary,h3,h4),#panel :is(i,b,small,span,em,u,summary,h3,h4){font-size:max(1em,16px)}}
+sub{font-size:13px!important}@media (min-width:1024px){.gx-dock i,#panel i,.gx-dock b,#panel b{font-size:16px}}
+.wz-s{font-size:13px}.wz-s i{font-size:13px}sub{font-size:13px}.rm-h b{font-size:15px}.rm-p i,.gx-dock i,#panel i{font-size:13px}
+@media (min-width:1024px){.rm-h b,.wz-s,.wz-s i{font-size:16px}.gx-dock,.gx-dock small,#panel small{font-size:16px}}
+.start .quick{margin:12px 0}.start .qrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0}.start .ql{min-width:92px;font-size:16px;font-weight:700;color:#2a2014}
+.start .seg{display:flex;flex-wrap:wrap;gap:6px}.start .sg{min-height:44px;padding:0 16px;font-size:16px;border-radius:10px;border:2px solid #b99f67;background:#fffaf0;color:#2a2014;cursor:pointer}.start .sg.on{background:#d9a53a;border-color:#7a5413;font-weight:800}
+.start .morep{margin:12px 0}.start .morep summary{min-height:44px;font-size:16px;cursor:pointer;display:flex;align-items:center}.start .lede{font-size:16px}
+@media (min-height:621px){.gxh-bub:not(.gxh-compact) .gxh-ok{margin:6px 0 0 auto!important;border:0!important;min-height:44px}}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
+#chip{z-index:30}
+@media (min-width:700px){#chip{pointer-events:auto}}
+.rm-p span{overflow:visible;text-overflow:clip}
+.rm-p:not(.now) span{display:none}
+.rm-p.now span{width:max-content;margin:0 -24px;font-size:13px}
+@media (min-width:1024px){.rm-p.now span{font-size:14px}}
+@media (max-width:400px){html.ph #phchip .c-x{display:none}}
+#musicpick,#speedbtn{width:auto;min-width:max-content;padding-left:16px;padding-right:16px;white-space:nowrap}
+.gx-bar .gxh-bulb{border-image:none;border:1px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(0,0,0,.25);padding:0}
+.gx-bar .gxh-bulb svg{width:20px;height:20px}
+@media (min-width:700px){body:has(.gx-drawer.on) .gx-dock{visibility:hidden}}
+</style>
 <style>
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
@@ -746,7 +787,7 @@ html.sk .gxc-lab{font-size:13px;background:rgba(246,230,194,.94);color:#2a1d10}
 html.sk .gxc-node .gxc-stars{top:56px}
 html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
 html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
-html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:auto;min-height:46px;box-sizing:border-box;padding:3px 0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
 html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
 html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
@@ -1014,6 +1055,13 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 @media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+/* compact form: used by gx-help.js when no free spot exists on a crowded board */
+.gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
+.gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
+
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
    Everything the kit draws carries data-help. Override with --gxt-* (and the --gxh-* variables of the help kit). */
 :root{--gxt-z:90;--gxt-dim:rgba(8,4,10,.62)}
@@ -1082,7 +1130,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden>⏸ Pause</button>
   <div id="hlpset" class="hlpset"></div>
   <div id="tutset" class="tutset"></div>
-  <button class="gx-ibtn" data-a="new" data-ico="plus"><span>New game</span></button>
+  <button class="gx-ibtn" data-a="new" data-ico="plus" aria-label="New game"><span>New game</span></button>
   </div>
 </header>
 <div class="gx-main">
@@ -1465,6 +1513,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   function scrim(t) { for (var x = t; x && x !== document.body; x = x.parentElement) { var r = x.getBoundingClientRect(); if (r.width * r.height >= .6 * innerWidth * innerHeight && (x === t || getComputedStyle(x).position === 'fixed')) return true; } return false; }   // a modal / story layer on top legitimately covers what is below
   function coveredBy(e) { var b = box(e), r = b.r; if (r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return ''; if (getComputedStyle(e).pointerEvents === 'none') return '';
     var t = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, b.x)), Math.max(1, Math.min(innerHeight - 1, b.y)));
+    if (t && t.closest('.gx-drawer-head') && e.closest('.gx-drawer') && !e.closest('.gx-drawer-head')) return '';   // scrolled under the drawer's sticky head: clipped by the scroll, not covered
     if (!t || related(t, e) || t.closest(SKIPSEL) || scrim(t) || getComputedStyle(t).pointerEvents === 'none') return ''; return t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]; }
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
   function engineBad() {   // every element marked data-engine="<js expression>" must show that engine number
@@ -1487,7 +1536,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     for (var a = 0; a < rects.length; a++) for (var b = a + 1; b < rects.length; b++) { var A = rects[a], B = rects[b]; if (related(A.e, B.e)) continue;
       var w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left), h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
       if (w > 2 && h > 2 && w * h > .3 * Math.min(A.r.width * A.r.height, B.r.width * B.r.height)) add('text overlaps: "' + A.t + '" <' + who(A.e) + '> / "' + B.t + '" <' + who(B.e) + '>'); }
-    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '>'); });
+    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '> "' + (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 24) + '"'); });
     engineBad().forEach(add);
     return out;
   };
@@ -1629,6 +1678,18 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
       { kind: 'text', sel: '.gxh-rules .gxh-rx', re: /\S/, name: 'card text' },
       { kind: 'visible', sel: '.gxh-rules .gxh-x', name: 'Close button' },
       { kind: 'tap', sel: '.gxh-rules .gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-rules'); }, expect: function (a, b) { return (a && !b) || 'help did not close'; } }
+    ]
+  });
+  // UI-BAR rules 4-8 as DOM checks (top bar, dock text size and height, start screen, wide layout)
+  var visT = function (sel) { return [].slice.call(document.querySelectorAll(sel)).filter(function (e) { return GXS.vis(e); }); };
+  GXS.add({
+    id: 'rc-uibar', name: 'UI bar: top bar, dock, start screen', ask: 'Is the top bar short, the dock calm and the start screen one button?', seed: 5, when: booted,
+    setup: function () { return table(5); },
+    checks: [
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var b = visT('.gx-bar button').filter(function (e) { return !e.closest('#moremenu') && e.id !== 'phchip'; }); return b.length <= 5 || b.length + ' buttons: ' + b.map(function (e) { return e.id || e.dataset.gx; }).join(','); } },
+      { kind: 'fn', name: 'dock text at least 13 px (16 px wide)', fn: function () { var min = innerWidth >= 1024 ? 16 : 13, bad = ''; visT('.gx-dock *, #panel *').forEach(function (e) { if (bad || !e.childNodes.length) return; var own = [].slice.call(e.childNodes).some(function (n) { return n.nodeType === 3 && /\S/.test(n.textContent); }); if (own && parseFloat(getComputedStyle(e).fontSize) > 0 && parseFloat(getComputedStyle(e).fontSize) < min - .2) bad = '"' + e.textContent.trim().slice(0, 20) + '" ' + getComputedStyle(e).fontSize; }); return !bad || bad; } },
+      { kind: 'fn', name: 'dock is not taller than the screen and shows at most one instruction line', fn: function () { var d = $('.gx-dock'); if (d && GXS.vis(d) && d.getBoundingClientRect().height > innerHeight) return 'dock taller than screen'; var l = visT('#dockmsg,#steptext,#phlabel').filter(function (e) { return /\S/.test(e.textContent); }); return l.length <= 1 || l.length + ' instruction lines'; } },
+      { kind: 'fn', name: 'start screen: one primary button, Quick game row, no roster', fn: function () { var m; try { UI.modal = 'start'; render(); } catch (e) { return 'cannot open start: ' + e.message; } m = $('#modal'); var go = visT('#modal .btn.go').length, roster = visT('#modal .cpick, #modal .chars').length, seg = visT('#modal .seg').length; UI.modal = null; try { render(); } catch (e) { } return (go === 1 && !roster && seg >= 3) || 'primary=' + go + ' roster=' + roster + ' segmented rows=' + seg; } }
     ]
   });
 })();
@@ -1787,8 +1848,23 @@ const GX={key:'gx',open:null,
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
+    return out;
+  }
+  // text the bubble must not cover (board svg labels, card names marked data-gxh-text): treated like a glowing core, hard first, soft last
+  function textRects() {
+    var out = [], v = vp(), rg;
+    try { rg = D.createRange(); var w = D.createTreeWalker(D.body, NodeFilter.SHOW_TEXT, null), n;
+      while ((n = w.nextNode()) && out.length < 300) {
+        if (!/\S/.test(n.nodeValue)) continue;
+        var e = n.parentElement; if (!e || (e.closest && (e.closest('[data-help]') || e.closest('[hidden]') || e.closest('.gxh-bub,.gxh-ring,.gxh-finger,script,style')))) continue;
+        rg.selectNodeContents(n); var r = rg.getBoundingClientRect();
+        if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+        var cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0) continue;
+        out.push(infl(r, 2));
+      }
+    } catch (x) {}
     return out;
   }
   function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
@@ -1796,9 +1872,9 @@ const GX={key:'gx',open:null,
     var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
     var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
     var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
-    var ks = [CORE, 32];
+    var ks = [CORE, 32], txt = textRects();
     for (var ki = 0; ki < ks.length && !best; ki++) {
-      var av = avoidRects(ks[ki]);
+      var av = avoidRects(ks[ki]).concat(txt);
       for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
         var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
         if (hit(c, T)) continue;
@@ -1806,6 +1882,17 @@ const GX={key:'gx',open:null,
         var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
         if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
       }
+    }
+    if (!best && !b.dataset.gxhShrunk) {   // no free spot: narrow the bubble (taller, slimmer) and try again before covering anything
+      var ws = [236, 196, 164];
+      for (var wi = 0; wi < ws.length; wi++) {
+        b.dataset.gxhShrunk = '1'; b.style.maxWidth = ws[wi] + 'px';
+        var r2 = place(b, tr); if (r2.free) { delete b.dataset.gxhShrunk; return r2; }
+      }
+      b.classList.add('gxh-compact');   // still crowded: drop the picture, one slim line, OK button in the corner
+      var cw = [350, 292, 236];
+      for (var ci = 0; ci < cw.length; ci++) { b.style.maxWidth = cw[ci] + 'px'; var r3 = place(b, tr); if (r3.free) { delete b.dataset.gxhShrunk; return r3; } }
+      b.classList.remove('gxh-compact'); delete b.dataset.gxhShrunk; b.style.maxWidth = '';
     }
     var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
     b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
@@ -1818,6 +1905,7 @@ const GX={key:'gx',open:null,
       else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
     }
     b.classList.add('on');
+    c2.free = !!best;
     return c2;
   }
   function ringAt(r, cls) {
@@ -7189,19 +7277,15 @@ function toggleMenu(){const m=$('#moremenu'),b=$('.menub');if(!m)return;const on
 function closeMenu(){const m=$('#moremenu');if(m&&m.classList.contains('open')){m.classList.remove('open');const b=$('.menub');if(b)b.setAttribute('aria-expanded','false')}}
 const SCEN_ORDER=['marooned','hexed','stranded','settlers'];
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
-  return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">A co-operative survival game for 1–4 castaways. Plan every day together, build a camp, explore the island and hold out against the weather until your goal is done.</p>
-   ${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb guided"><button class="btn go big" data-a="story">📖 Story: learn the island chapter by chapter ▶</button><small>New here? Start with chapter 1: survive three days. Each chapter adds one new idea. ${typeof campLine==='function'?campLine():''}</small></div>${typeof tutBlock==='function'?tutBlock('after'):''}
-   <h3 class="orfull">Or set up a full game</h3>
-   ${saved?`<div class="mb"><button class="btn go" data-a="continue">Continue the saved game</button></div>`:''}
-   ${typeof onlineBlock==='function'?onlineBlock():''}
-   <h3>Scenario</h3><div class="scens">${SCEN_ORDER.map((k,ix)=>{const S=SCENARIOS[k];return `<button class="scen ${o.scen===k?'on':''}" data-scen="${k}"><b>${ix+1}. ${esc(S.n)}</b><small>${S.rounds} rounds</small><span>${esc(S.x)}</span></button>`}).join('')}</div>
-   <h3>Castaways <small>(pick 1–4)</small></h3><div class="chars">${Object.keys(CHARS).filter(k=>!CHARS[k].npc).map(k=>{const on=o.chars.includes(k);const C=CHARS[k];return `<div class="cpick ${on?'on':''}"><button class="cp" data-char="${k}" aria-pressed="${on}"><b>${C.n}</b><small>❤ ${C.die} life · own invention: ${INVENTIONS[C.inv].n} (only they can make it)</small><span class="sks">${C.skills.map(s=>`<span title="${esc(s.x)}"><i>${esc(s.n)}</i> (${s.c}✊): ${esc(s.x)}</span>`).join('')}</span></button>${on?`<div class="ctl2" role="group" aria-label="Who plays the ${C.n}"><button data-ctl="${k}" data-v="h" class="${o.ai[k]?'':'on'}" aria-pressed="${!o.ai[k]}">🙂 You</button><button data-ctl="${k}" data-v="ai" class="${o.ai[k]?'on':''}" aria-pressed="${!!o.ai[k]}">🤖 Computer</button></div>`:''}</div>`}).join('')}</div>
-   <p class="muted small">✊ determination is earned by arranging the camp and failing rolls, and spent on skills.</p>
-   <div class="opts2"><label class="chk"><input type="checkbox" data-opt="friday" ${o.friday?'checked':''}> Friday helps (standard with 1–2 castaways)</label><label class="chk"><input type="checkbox" data-opt="dog" ${o.dog?'checked':''}> The dog helps (standard solo)</label>
-   <p class="muted small">Friday is a friendly islander who finds you on the beach: an extra pawn that works alone or helps, and never needs food or shelter (if he dies, the game goes on). The ship’s dog adds a pawn for hunting and exploring.</p>
-   <div class="diff" role="radiogroup" aria-label="Difficulty">${[['easy','Easier','the dog joins, 4 starting items, fewer book events'],['standard','Standard','2 starting items'],['hard','Harder','1 starting item, more book events']].map(([k,n,x])=>`<button class="dpick ${o.diff===k?'on':''}" role="radio" aria-checked="${o.diff===k}" data-diff="${k}"><b>${n}</b><small>${x}</small></button>`).join('')}</div></div>
-   <p class="muted small">${o.chars.length===1?'Solo: morale rises by 1 at the start of each morale phase.':o.chars.length===4?'Four castaways: arranging the camp gives 2 determination or morale +1, not both.':''} ${o.chars.length&&o.chars.every(k=>o.ai[k])?'Every castaway is a computer: you watch them play.':''}</p>
-   <div class="mb sticky"><button class="btn go" data-a="start" ${o.chars.length?'':'disabled'}>Play ▶</button><button class="btn" data-a="rulesstart">How to play</button></div></div>`}
+  const seg=(label,items)=>`<div class="qrow"><span class="ql">${label}</span><div class="seg" role="group" aria-label="${label}">${items.map(([a,v,t,on])=>`<button class="sg ${on?'on':''}" data-${a}="${v}" aria-pressed="${!!on}">${esc(t)}</button>`).join('')}</div></div>`;
+  const ALLC=Object.keys(CHARS).filter(k=>!CHARS[k].npc);
+  return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">Survive together on a wild island.</p>
+   <div class="mb"><button class="btn go big" data-a="start" ${o.chars.length?'':'disabled'}>${saved?'New game ▶':'Play ▶'}</button>${saved?`<button class="btn" data-a="continue">Continue</button>`:''}</div>
+   <div class="quick"><h3>Quick game</h3>
+   ${seg('Scenario',SCEN_ORDER.map(k=>['scen',k,SCENARIOS[k].n,o.scen===k]))}
+   ${seg('Players',[1,2,3,4].map(n=>['np',n,String(n),o.chars.length===n]))}
+   ${seg('Difficulty',[['easy','Easy'],['standard','Standard'],['hard','Hard']].map(([k,n])=>['diff',k,n,o.diff===k]))}</div>
+   <details class="morep"><summary>More ways to play</summary>${typeof tutBlock==='function'?tutBlock('top'):''}<div class="mb"><button class="btn" data-a="story">📖 Story chapters</button></div>${typeof tutBlock==='function'?tutBlock('after'):''}${typeof onlineBlock==='function'?onlineBlock():''}</details></div>`}
 function cardsHtml(){const t=UI.ctab||'events';const q=(UI.cq||'').toLowerCase();const tabs=[['events','Events'],['adv','Adventures'],['mys','Mysteries'],['beasts','Beasts'],['inv','Inventions'],['items','Items'],['tokens','Discovery tokens'],['tiles','Island tiles'],['scen','Scenarios']];
   let list=[];
   if(t==='events')list=EVENTS.concat(WRECKS).map(c=>({n:c.n,tag:c.k==='crates'||WRECKS.includes(c)?'wreckage':c.icon==='book'?'book event':c.icon+' event',cp:c.cp||1,x:cardText(c)}));
@@ -7265,6 +7349,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   if(d.disc!=null){const r=discUse(+d.disc);if(r)toast(r);return}
   if(d.tile!=null){on3DTile(+d.tile);return}
   if(d.scen){UI.setup.scen=d.scen;render();return}
+  if(d.np){const s=UI.setup,n=+d.np,all=Object.keys(CHARS).filter(k=>!CHARS[k].npc);s.chars=all.slice(0,n);s.friday=n<=2;s.dog=n===1||s.diff==='easy';render();return}
   if(d.char){const s=UI.setup;const i=s.chars.indexOf(d.char);if(i>=0)s.chars.splice(i,1);else if(s.chars.length<4)s.chars.push(d.char);s.friday=s.chars.length<=2;s.dog=s.chars.length===1||s.diff==='easy';render();return}
   if(d.ctl){UI.setup.ai[d.ctl]=d.v?d.v==='ai':!UI.setup.ai[d.ctl];render();return}
   if(d.ctab){UI.ctab=d.ctab;renderCards();return}

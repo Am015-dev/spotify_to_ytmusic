@@ -45,3 +45,18 @@ html.sk-row .mrow{position:relative;isolation:isolate}
 html.sk-row .mrow::before{content:'';position:absolute;inset:-4px -6px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
 @media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
 body:has(.gxh-bub.on) #fortchip>div,body:has(.gxh-bub.on) #fort>div,body:has(.gxh-bub.on) #toast{display:none}
+/* UI bar: text >= 16px on wide screens, panels fit their content */
+@media (min-width:1024px){
+body :where(#board,.gx-drawer,.gx-dock) *:not(svg):not(svg *):not(canvas){font-size:max(16px,1em)!important}
+#toast,.gx-bar .gx-ibtn span,#barstat .dayn,.logl .ll,.lt,#fort .fk,#fortchip .fk{font-size:16px}
+}
+#fortchip .fk,#fort .fk{font-size:13px}
+@media (min-width:1024px){#fortchip .fk,#fort .fk{font-size:16px}}
+.gx-drawer{bottom:auto;max-height:calc(100vh - var(--gx-bar-h) - 24px)}
+@media (min-width:1024px){.rc .ct i{white-space:normal;overflow-wrap:anywhere}.gx-dock{overflow-x:hidden}}
+/* start screen: one big primary button, one row of small secondary buttons */
+.tsec{display:flex;gap:10px;width:100%}
+.tsb{flex:1 1 0;appearance:none;border:2px solid #2a1c36;border-radius:14px;background:linear-gradient(180deg,#fff8e6,#efdfbd);color:var(--ink);min-height:48px;padding:6px 12px;font-weight:800;font-size:16px;line-height:1.1;font-family:inherit;cursor:pointer}
+html:not(.ph) .tbtns{flex-direction:column;align-items:center}html:not(.ph) .tbtns .tbtn{flex:0 0 auto;width:min(460px,100%)}html:not(.ph) .tsec{width:min(460px,100%)}
+.tbtn span{font-size:max(16px,.97rem)}@media (min-width:1024px){#start,#start *{font-size:max(16px,1em)}}
+.tseg{display:flex;align-items:center;justify-content:center;gap:8px;color:#fff6dc;font-weight:800}.tseg .chipb{min-height:44px;min-width:56px}

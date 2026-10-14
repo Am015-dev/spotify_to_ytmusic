@@ -137,3 +137,52 @@ html.dk-title:not(.ph) .gx-dock{visibility:hidden}
 @media (max-width:1000px){html:not(.ph) .recent,html:not(.ph) .pile .lbl{display:none}}
 body:has(.gxh-bub.on) .mine .str .muted{display:none}
 .bfdoor .bfboot{position:static;display:inline-block;margin-left:4px}
+
+/* Dungeon diary: one line style (24px avatar + text), 16px+ dark ink on calm parchment, 16px inset, panel as tall as its lines */
+#dkLog .gx-drawer-body{background:#f6ecd2;color:#2a1808;padding:16px;font-size:16px}
+#dkLog #log.dklog{list-style:none;margin:0;padding:0;font-size:16px;line-height:1.4;color:#2a1808}
+#dkLog #log.dklog li{display:flex;align-items:center;gap:10px;margin:0;padding:8px 0;border-bottom:1px solid rgba(58,36,16,.18);list-style:none;border-left:0}
+#dkLog #log.dklog li:last-child{border-bottom:0}
+#dkLog #log.dklog .ptoklog{flex:0 0 24px;width:24px;height:24px;font-size:14px;margin:0;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:#e4d3a8;overflow:hidden}
+#dkLog #log.dklog .dklt{flex:1 1 auto;min-width:0}
+html.ph #dkLog.gx-drawer{height:auto;max-height:88dvh}
+
+/* side dock (desktop/tablet): turn-order avatars 32px+, one instruction, main buttons one size, 16px text, height = content */
+html:not(.ph) .gx-dock{align-self:start;max-height:calc(100dvh - var(--gx-bar-h,52px) - 16px)}
+html:not(.ph) .gx-dock .gx-dock-body{padding:0 16px 16px}
+.order{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 10px;align-items:center}
+.order span{padding:2px;border:2px solid transparent;border-radius:50%;line-height:0;opacity:.7}
+.order span.on{opacity:1;border-color:var(--c);box-shadow:0 0 0 2px #fff6d8,0 0 0 4px var(--c)}
+.order .ordav{width:32px;height:32px;border-radius:50%;object-fit:cover;display:block;background:#2a170b}
+.order svg.ordav{overflow:hidden}
+html:not(.ph) #prompt .who{font-size:18px}
+html:not(.ph) #prompt .acts.main{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+html:not(.ph) #prompt .acts.main .btn{width:100%;min-height:52px;font-size:18px;justify-content:center;text-align:center;white-space:normal;flex:none}
+html:not(.ph) #prompt .since,html:not(.ph) #prompt .since li,html:not(.ph) .recent ol,html:not(.ph) .recent li,html:not(.ph) .recent .rl h3{font-size:16px}
+html:not(.ph) #prompt .since ul{margin:4px 0 0;padding-left:18px}
+html:not(.ph) .recent .btn{min-height:40px;font-size:16px;padding:2px 14px}
+html:not(.ph) #prompt .tip{font-size:16px}
+
+/* top bar: at most 5 buttons, text 16px+ on wide screens, the test-mode LAB badge never sits on the title */
+#gxlab-bar{top:auto!important;bottom:2px;left:2px}
+@media (min-width:1024px){.gx-bar .gx-ibtn .gx-lbl,.gx-bar .gx-ibtn{font-size:16px!important}.gx-bar h1,.gx-bar h1 span{font-size:24px!important}.gx-bar .gx-ibtn{font-size:16px;gap:6px}.gx-bar .ph-chip{font-size:16px}}
+@media (min-width:1024px){
+  html:not(.ph) .opp.seat{flex:0 0 auto;max-width:none;min-height:60px;padding:4px 24px 4px 10px;column-gap:10px}
+  html:not(.ph) .opp.seat .snm,html:not(.ph) .opp.seat .sbd{font-size:16px;line-height:1.2}
+  html:not(.ph) .opp.seat .lb{font-size:16px}
+  html:not(.ph) .opp.seat .slv{font-size:16px;min-width:24px;height:24px}
+  html:not(.ph) .opp.seat .sbd{gap:12px;overflow:visible}
+  html:not(.ph) .opps{gap:14px;flex-wrap:wrap}
+}
+
+/* wide screens: cards at their natural aspect, main card >= 20% of the board height, decks and discards whole and readable */
+@media (min-width:1024px){
+  html:not(.ph) .bfdoor.small{height:clamp(160px,calc(100cqh - 120px),420px);width:auto;aspect-ratio:100/142;max-width:none}
+  html:not(.ph) .bfstage .row .card,html:not(.ph) .arena .row .card{--w:clamp(170px,17vh,300px)}
+  html:not(.ph) .pile{--sw:clamp(100px,9vw,150px);gap:8px;padding:0 6px}
+  html:not(.ph) .pile .lbl{font-size:16px;white-space:nowrap}
+  html:not(.ph) .pile .stack .dn{font-size:16px;letter-spacing:.02em;bottom:4%}
+  html:not(.ph) .pile .stack .n{font-size:16px;min-width:30px;height:30px;top:-10px;right:-6px}
+  html:not(.ph) .pile .card.xs{--w:clamp(84px,7vw,120px)}
+  html:not(.ph) .bfcap,html:not(.ph) .bfcap.sm{font-size:20px}
+}

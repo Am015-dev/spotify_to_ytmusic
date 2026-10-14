@@ -22,7 +22,7 @@ html.sk-sheet #crewd .gx-x{color:var(--sk-ink)}
 html.sk-check .cr .ck{width:24px;height:24px;border-radius:0;background:url(media/ui-check.webp) center/contain no-repeat;color:#176b2e;border:0;font-size:15px}
 html.sk-check .cr .ck.no{color:#b3261e}
 /* goal / altitude strip */
-html.sk-alt .gstrip{background:url(media/ui-altbar-c.webp) 0 0/100% 100% no-repeat;border:0;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7);padding-left:8px;padding-right:8px}
+html.sk-alt .gstrip{border:2px solid #3b5268;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7);padding-left:8px;padding-right:8px}
 /* the aluminium icon buttons are light: dark ink; bar title gets a shadow over the busy teal strip */
 html.sk .gx-bar .gx-ibtn{color:#14202c;text-shadow:0 1px 0 rgba(255,255,255,.5)}
 html.sk .gx-bar h1,html.sk .gx-bar #barstat{text-shadow:0 1px 3px rgba(0,0,0,.85)}

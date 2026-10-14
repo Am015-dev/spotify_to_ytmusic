@@ -337,7 +337,7 @@ body.three #banner{top:auto}
 /* popups (drawers) */
 .gx-drawer{border:4px solid #1a1320;box-shadow:8px 8px 0 #1a1320}
 .gx-drawer-head{border-bottom:3px solid #1a1320}
-.gx-drawer-head h2{font-size:1.6rem;line-height:1;color:var(--red)}
+.gx-drawer-head h2{font-size:1.5rem;line-height:1;color:var(--red)}
 .gx-drawer #log{max-height:none;font-size:.9rem}
 .gx-drawer .market{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
 .gx-drawer .rules h3{margin:.8rem 0 .2rem}
@@ -435,6 +435,15 @@ header.gx-bar [data-gx="dr-menu"]{font-size:1.15rem;min-width:44px}
 details.custom:not([open])>*:not(summary){display:none}
 .dlg.start .acts .btn{margin-inline:-14px;width:calc(100% + 28px)}
 .dlg.start>h2,.dlg.start>p,.dlg.start>details.custom{padding-inline:24px}
+/* UI-BAR 1/6: text floor in panels and dock; panels fit their content */
+:root{--minfs:13px}@media (min-width:1024px){:root{--minfs:16px}}
+html body :is(.gx-drawer,.gx-dock){font-size:max(var(--minfs),1rem)}
+html body :is(.gx-drawer,.gx-dock) :is(small,.small,.muted,.chip,li,b,span,p,td,th,div,button,label){font-size:max(var(--minfs),1em)}
+html body .gx-drawer{height:auto;bottom:auto;max-height:calc(100dvh - var(--gx-bar-h,56px) - 16px)}
+@media (max-width:999px){html body .gx-drawer{height:auto;bottom:0;max-height:88dvh}}
+html body :is(#log li,#log small,.gx-dock .btn,.gx-dock .banner,#banner,#banner *,#youbox,.gx-drawer i,.gx-drawer em){font-size:max(var(--minfs),1em)!important}
+html body .gx-drawer-head{height:56px;box-sizing:border-box}html body .gx-drawer-head .gx-x{font-size:1.5rem;line-height:1}
+.die{min-width:44px;min-height:44px}
 
 /* ===== v10 polish: dusk neon chrome, printed card frames, enamel buttons, resin dice (visual only) ===== */
 :root{--hl:rgba(255,255,255,.55);--hl0:rgba(255,255,255,0);--lo:rgba(26,19,32,.07);--drop:0 10px 24px rgba(26,19,32,.18);
@@ -659,8 +668,8 @@ html.ph-l #pchips .pchip{min-height:44px}
 html.ph-l #preview{margin-top:4px;max-height:none}
 html.ph-l #dice{gap:8px 6px}
 /* draweres (Yours, Monsters, Log, Menu, Rules): bottom sheets, as before, but never taller than the screen */
-html.ph .gx-drawer{max-height:calc(100dvh - var(--ph-bar,48px));height:88dvh}
-html.ph-l .gx-drawer{height:calc(100dvh - 12px);max-height:none}
+html.ph .gx-drawer{max-height:calc(100dvh - var(--ph-bar,48px));height:auto}
+html.ph-l .gx-drawer{height:auto;max-height:calc(100dvh - 12px)}
 html.ph .gx-x{min-width:44px;min-height:44px}
 html.ph .gx-drawer-head h2{font-size:1.35rem}
 html.ph .dlg{max-height:calc(100dvh - 20px);overflow:auto}
@@ -732,6 +741,8 @@ html.ph #choice .acts:has(> .btn:nth-of-type(5)){position:static;margin-bottom:0
 @media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #preview{height:1.5em;max-height:1.5em}}
 @media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #dice{padding-top:0}html.ph-p .gx-dock[data-xa]{gap:3px}}
 @media (max-height:620px){html.ph .dlg.start .acts:has(>.btn.primary){position:static;margin:.4rem 0;padding:0;background:none}}
+html.ph-p #dr-menu{height:88dvh}
+html.ph-p #dr-mons{height:88dvh}
 
 /* ===== Board-first layer (board.js). Portrait phone: score strip on top, the city fills the screen, the tray at the bottom ===== */
 #bfx{position:fixed;left:0;top:0;width:0;height:0;z-index:60;pointer-events:none}
@@ -1185,7 +1196,6 @@ html.sk .btn.mrow{border-width:8px;border-image-width:8px;padding:1.5px 4px}
 html.sk header.gx-bar .gx-ibtn.btn{border-image-width:10px 14px;padding-inline:14px}
 html.sk.ph header.gx-bar .gx-ibtn.btn{padding-inline:0}
 html.sk .gx-dock #prompt.box,html.sk .gx-dock #youbox.box{border-image-width:12px;padding:14px}
-header.gx-bar .pzb span{display:none}
 #news .newsbtn{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
@@ -1423,7 +1433,8 @@ html.ph .bfintro .you img.mface{width:64px;height:64px;flex:none;object-fit:cont
 /* compact form: used by gx-help.js when no free spot exists on a crowded board */
 .gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
-.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
 .gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
 
 
@@ -1502,11 +1513,8 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   <h1>Crown City Smash</h1>
   <span class="gx-sp"></span>
   <button class="gx-ibtn btn" data-gx="dr-market" title="Power cards for sale"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="9" height="13" rx="1.6" transform="rotate(-12 7.5 10.5)" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><rect x="8" y="3" width="9" height="13" rx="1.6" fill="currentColor" opacity=".25"/><rect x="8" y="3" width="9" height="13" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M12.5 6.5l-1.6 2.9h2.2l-1.3 2.8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>Cards</button>
-  <button class="gx-ibtn btn" data-gx="dr-mine" id="minebtn" title="Your cards, evolutions and tokens"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 17c.6-3 3-4.6 6-4.6s5.4 1.6 6 4.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><circle cx="10" cy="7" r="3.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>Yours</button>
-  <button class="gx-ibtn btn" data-gx="dr-mons" title="Every monster's cards and stats"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 16V9a6 6 0 0 1 12 0v7l-2-1.6-2 1.6-2-1.6-2 1.6-2-1.6z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><circle cx="7.6" cy="9" r="1.3" fill="currentColor"/><circle cx="12.4" cy="9" r="1.3" fill="currentColor"/><path d="M5 4.5 3.5 2.5M15 4.5l1.5-2" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>Monsters</button>
   <button class="gx-ibtn btn" data-gx="dr-log" title="The Crown City chronicle (what happened)"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="3.5" width="12" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M15 7h2v8a1.5 1.5 0 0 1-3 0" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M6 7h6M6 10h6M6 13h4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg>Log</button>
   <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
-  <button class="gx-ibtn btn pzb" data-a="pause" id="pausebtn" title="Pause the computer (P)"><svg class="pz" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1" fill="currentColor"/></svg><span>Pause</span></button>
   <button class="gx-ibtn btn" data-gx="dr-menu" title="Rules, tips, sound, speed, new game" aria-label="Menu"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M10 2.5v2.2M10 15.3v2.2M2.5 10h2.2M15.3 10h2.2M4.7 4.7l1.6 1.6M13.7 13.7l1.6 1.6M4.7 15.3l1.6-1.6M13.7 6.3l1.6-1.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
 </header>
 <div class="gx-main">
@@ -1533,6 +1541,9 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   <div id="monswrap"><div id="score" class="score"></div></div>
   <div id="logwrap"><ol id="log"></ol></div>
   <div id="menuwrap"><div class="menu">
+    <button class="btn mrow" data-gx="dr-mine" id="minebtn">🃏 Your cards<small>Cards, evolutions and tokens you hold</small></button>
+    <button class="btn mrow" data-gx="dr-mons">👾 Monsters<small>Every monster's cards and stats</small></button>
+    <button class="btn mrow" data-a="pause" id="pausebtn"><span>⏸ Pause the computer</span></button>
     <button class="btn mrow" data-gx="dr-rules">❓ Rules<small>How to play and what each dice face does</small></button>
     <div id="gxhset"></div>
     <div id="gxtset"></div>
@@ -1923,6 +1934,7 @@ const MONS=[
   function scrim(t) { for (var x = t; x && x !== document.body; x = x.parentElement) { var r = x.getBoundingClientRect(); if (r.width * r.height >= .6 * innerWidth * innerHeight && (x === t || getComputedStyle(x).position === 'fixed')) return true; } return false; }   // a modal / story layer on top legitimately covers what is below
   function coveredBy(e) { var b = box(e), r = b.r; if (r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return ''; if (getComputedStyle(e).pointerEvents === 'none') return '';
     var t = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, b.x)), Math.max(1, Math.min(innerHeight - 1, b.y)));
+    if (t && t.closest('.gx-drawer-head') && e.closest('.gx-drawer') && !e.closest('.gx-drawer-head')) return '';   // scrolled under the drawer's sticky head: clipped by the scroll, not covered
     if (!t || related(t, e) || t.closest(SKIPSEL) || scrim(t) || getComputedStyle(t).pointerEvents === 'none') return ''; return t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]; }
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
   function engineBad() {   // every element marked data-engine="<js expression>" must show that engine number
@@ -1945,7 +1957,7 @@ const MONS=[
     for (var a = 0; a < rects.length; a++) for (var b = a + 1; b < rects.length; b++) { var A = rects[a], B = rects[b]; if (related(A.e, B.e)) continue;
       var w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left), h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
       if (w > 2 && h > 2 && w * h > .3 * Math.min(A.r.width * A.r.height, B.r.width * B.r.height)) add('text overlaps: "' + A.t + '" <' + who(A.e) + '> / "' + B.t + '" <' + who(B.e) + '>'); }
-    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '>'); });
+    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '> "' + (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 24) + '"'); });
     engineBad().forEach(add);
     return out;
   };
@@ -2152,6 +2164,32 @@ const MONS=[
       { kind: 'visible', sel: '#ob #dice .die[data-die="5"]', name: 'last die' },
       { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#ob *'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
       { kind: 'fn', name: 'painted skin moves no box', fn: function () { if (typeof GXSK === 'undefined') return true; var a = GXSK.audit(); return !a.moved.length || a.moved.slice(0, 2).join(' | '); } }
+    ]
+  });
+
+  /* UI-BAR 4-6, 8: top-bar button count, text size in the dock and every top-bar panel, empty parchment, image aspect */
+  var minPx = function () { return innerWidth >= 1024 ? 16 : 13; };
+  var smallText = function (root) { var bad = []; [].forEach.call(root.querySelectorAll('*'), function (e) { if (!GXS.vis(e) || e.closest('svg,canvas') || getComputedStyle(e).fontSize === '0px') return; var own = [].filter.call(e.childNodes, function (n) { return n.nodeType === 3 && /\S{2}/.test(n.textContent); }).length; if (!own) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < minPx() - .01) bad.push((e.id || e.className || e.tagName) + ' ' + f + 'px'); }); return bad; };
+  GXS.add({
+    id: 'cc-uibar', name: 'UI bar: top bar, dock and panels', ask: 'Are bar, dock and panels clean?', ls: LS, seed: 27, when: booted,
+    setup: function () { return table(27); },
+    checks: [
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('header.gx-bar .gx-ibtn'), GXS.vis).length; return n <= 5 || n + ' buttons in the top bar'; } },
+      { kind: 'fn', name: 'dock text is big enough', fn: function () { var d = document.querySelector('.gx-dock'); var b = d ? smallText(d) : []; return !b.length || b.slice(0, 4).join(' | '); } },
+      { kind: 'fn', name: 'every top-bar panel: text size, no tall empty parchment', fn: function () {
+        var out = [];
+        ['dr-market', 'dr-mine', 'dr-mons', 'dr-log', 'dr-menu', 'dr-rules'].forEach(function (id) {
+          try { GX.show(id); } catch (e) { out.push(id + ' will not open'); return; }
+          var el = document.getElementById(id); if (!el) { out.push(id + ' missing'); return; }
+          var bad = smallText(el); if (bad.length) out.push(id + ' small text: ' + bad.slice(0, 3).join(', '));
+          var body = el.querySelector('.gx-drawer-body,.gx-dbody') || el, top = body.getBoundingClientRect().top, bot = 0;
+          [].forEach.call(body.querySelectorAll('*'), function (c) { if (GXS.vis(c)) bot = Math.max(bot, c.getBoundingClientRect().bottom); });
+          var empty = body.getBoundingClientRect().bottom - Math.max(bot, top); if (empty > 220 && body.scrollHeight <= body.clientHeight + 2) out.push(id + ' empty space ' + Math.round(empty) + 'px');
+        });
+        try { GX.close(); } catch (e) { }
+        return !out.length || out.join(' | ');
+      } },
+      { kind: 'fn', name: 'board images keep their natural aspect', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('[data-board] img'), function (i) { if (!GXS.vis(i) || !i.naturalWidth) return; var r = i.getBoundingClientRect(), cs = getComputedStyle(i); if (cs.objectFit === 'fill' && Math.abs(r.width / r.height - i.naturalWidth / i.naturalHeight) > .08) bad.push((i.className || i.src.slice(-20)) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height)); }); return !bad.length || bad.slice(0, 3).join(' | '); } }
     ]
   });
 
@@ -6779,7 +6817,7 @@ function recapHTML(){const me=recapMe();if(me<0||!RECAP.snap)return '';
     if(d.length)parts[k===me?'unshift':'push'](`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
   const ev=G.log.filter(l=>l.n>RECAP.n).reverse().map(l=>`<li>${esc(l.t)}</li>`);
   if(!parts.length&&!ev.length)return '';
-  return `⏪ <b>While you waited:</b> ${parts.length?parts.join(' · '):'nothing changed'}${ev.length?` <span class="more">· tap: how</span><ol class="recap">${ev.join('')}</ol>`:''}`}
+  return `⏪ <b>While you waited:</b> ${parts.length?parts.join(' · '):'nothing changed'}${ev.length?`<ol class="recap">${ev.join('')}</ol>`:''}`}
 {const _st=startTurn;startTurn=function(){
   const me=recapMe();const nxt=G&&!G.winner?cur():null;
   if(me>=0&&nxt&&nxt.i!==me&&!RECAP.snap){RECAP.snap=G.pl.map((q,k)=>({hp:q.hp,vp:q.vp,en:q.en,alive:q.alive,city:G.city===k}));RECAP.n=G.lseq||0}

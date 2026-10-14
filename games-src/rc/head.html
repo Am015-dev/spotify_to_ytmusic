@@ -702,4 +702,45 @@ html.ph .gx-bar .gxh-bulb,.gx-bar .gxh-bulb{min-width:40px}
 .mchip{min-height:44px;padding:8px 14px;border-radius:22px;border:2px solid #8a6a43;background:#fbf4e2;color:#2a1a0a;font:inherit;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;text-align:left;touch-action:manipulation}
 .mchip.on{background:#d9a53a;border-color:#7a5413;font-weight:700}.mchip.prev{border-style:dashed}
 </style>
+<style>/* UI bar: readable text at every size, panel opened over the start screen hides it */
+.rm-p span{font-size:13px;letter-spacing:0}
+@media (max-width:700px){.rm-p:not(.now) span{display:none}.rm-p.now span{white-space:normal;text-align:center}.rm-l{grid-template-columns:repeat(7,minmax(0,1fr))}.rm-p.now{grid-column:auto}}
+@media (min-width:1024px){.rm-p span{font-size:16px}.rm-h{font-size:16px}}
+#hud .rtrack span{font-size:13px;min-width:22px;height:22px}
+#hud .hk em{font-size:13px}
+#hud .rleg{font-size:13px}
+@media (min-width:1024px){#hud .hk em,#hud .rleg{font-size:16px}}
+.life i{font-size:13px;width:20px;height:20px}
+.tl em{font-size:13px}
+body:has(.gx-drawer.on) #modal{visibility:hidden}
+/* round 2 */
+@media (min-width:1024px){.wz-t,.wz-t *,#step *,.mbox:not(.start) *{font-size:max(1em,16px)!important}}
+.daycard .dk,.dk{font-size:13px!important}.wz-s i{font-size:13px!important}
+@media (min-width:1024px){.daycard .dk,.dk,.wz-s i,.wz-s,.goal,.sk{font-size:16px!important}}
+#hud .phases span,#hud .phases *,#hud .hk *,#hud .fc *,.goal,.goal *,.gx-dock .goal{font-size:13px!important}
+@media (min-width:1024px){#hud *,.gx-dock *,#panel *{font-size:max(1em,16px)}#hud .phases span,#hud .phases *,#hud .hk *,#hud .fc *,.goal,.goal *{font-size:16px!important}}
+@media (min-width:1024px){.rm-p i,.rm-p.now span,#hud .rtrack span,.hud *{font-size:16px!important}}
+@media (max-width:1023px){#hud .rtrack span,.rm-p i{font-size:13px!important}}
+.gx-dock :is(i,b,small,span,em,u,summary,h3,h4),#panel :is(i,b,small,span,em,u,summary,h3,h4){font-size:max(1em,13px)}
+@media (min-width:1024px){.gx-dock :is(i,b,small,span,em,u,summary,h3,h4),#panel :is(i,b,small,span,em,u,summary,h3,h4){font-size:max(1em,16px)}}
+sub{font-size:13px!important}@media (min-width:1024px){.gx-dock i,#panel i,.gx-dock b,#panel b{font-size:16px}}
+.wz-s{font-size:13px}.wz-s i{font-size:13px}sub{font-size:13px}.rm-h b{font-size:15px}.rm-p i,.gx-dock i,#panel i{font-size:13px}
+@media (min-width:1024px){.rm-h b,.wz-s,.wz-s i{font-size:16px}.gx-dock,.gx-dock small,#panel small{font-size:16px}}
+.start .quick{margin:12px 0}.start .qrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0}.start .ql{min-width:92px;font-size:16px;font-weight:700;color:#2a2014}
+.start .seg{display:flex;flex-wrap:wrap;gap:6px}.start .sg{min-height:44px;padding:0 16px;font-size:16px;border-radius:10px;border:2px solid #b99f67;background:#fffaf0;color:#2a2014;cursor:pointer}.start .sg.on{background:#d9a53a;border-color:#7a5413;font-weight:800}
+.start .morep{margin:12px 0}.start .morep summary{min-height:44px;font-size:16px;cursor:pointer;display:flex;align-items:center}.start .lede{font-size:16px}
+@media (min-height:621px){.gxh-bub:not(.gxh-compact) .gxh-ok{margin:6px 0 0 auto!important;border:0!important;min-height:44px}}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
+#chip{z-index:30}
+@media (min-width:700px){#chip{pointer-events:auto}}
+.rm-p span{overflow:visible;text-overflow:clip}
+.rm-p:not(.now) span{display:none}
+.rm-p.now span{width:max-content;margin:0 -24px;font-size:13px}
+@media (min-width:1024px){.rm-p.now span{font-size:14px}}
+@media (max-width:400px){html.ph #phchip .c-x{display:none}}
+#musicpick,#speedbtn{width:auto;min-width:max-content;padding-left:16px;padding-right:16px;white-space:nowrap}
+.gx-bar .gxh-bulb{border-image:none;border:1px solid rgba(255,255,255,.3);border-radius:10px;background:rgba(0,0,0,.25);padding:0}
+.gx-bar .gxh-bulb svg{width:20px;height:20px}
+@media (min-width:700px){body:has(.gx-drawer.on) .gx-dock{visibility:hidden}}
+</style>
 </head>
