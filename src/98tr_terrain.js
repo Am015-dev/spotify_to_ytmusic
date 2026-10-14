@@ -66,4 +66,7 @@ window.__trn={TRN,go:TRN_go,grade:TRN_grade,edge:TRN_edge,ramp:TRN_ramp,base:TRN
 const TRN_C={dry:new THREE.Color(CID==='fra'?'#b3a85e':'#c2ae72'),dirt:new THREE.Color('#9a7a52'),rock:new THREE.Color('#8e8a82')};
 function TRN_slopeCol(c,x,z){if(!c||!c.isColor)return c;let s=0,h=0;try{h=groundY(x,z);const a=groundY(x+5,z)-groundY(x-5,z),b=groundY(x,z+5)-groundY(x,z-5);s=Math.hypot(a,b)/10}catch(e){return c}
   const ss=(a,b,v)=>{const t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t)};let d=ss(.12,.3,s)*.55;if(CID!=='fra')d=Math.max(d,ss(110,220,h)*.45);if(d>0)c.lerp(TRN_C.dry,d);const r=ss(.3,.55,s);if(r>0)c.lerp(TRN_C.dirt,r*.7);const k=ss(.55,.9,s);if(k>0)c.lerp(TRN_C.rock,k*.8);return c}
-if(TERR.on&&new URLSearchParams(location.search).get('trc')!=='0'){const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{if(o&&o.col&&!o.trc){const c0=o.col;o={...o,trc:1,col:(x,z)=>TRN_slopeCol(c0(x,z),x,z)}}return _g(grp,x0,x1,z0,z1,o)}}
+if(TERR.on&&new URLSearchParams(location.search).get('trc')!=='0'){const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{if(o&&o.col&&!o.trc){const c0=o.col;o={...o,trc:1,col:(x,z)=>TRN_slopeCol(c0(x,z),x,z)}}
+  // in-city ground (pavement + grass classes, no colours): the grass material gets a slope tint (white = untinted texture; walk/rock ignore colours)
+  else if(o&&o.mats&&o.mats.g&&!o.col&&!o.trc){const W=new THREE.Color(),g=o.mats.g.clone();g.vertexColors=true;o={...o,trc:1,mats:{...o.mats,g},col:(x,z)=>TRNinner(W.setRGB(1,1,1),x,z)}}return _g(grp,x0,x1,z0,z1,o)}}
+function TRNinner(c,x,z){TRN_slopeCol(c,x,z);return c}

@@ -42,7 +42,10 @@ function TR_relief(h,nx,nz,r){if(!TERR.on||new URLSearchParams(location.search).
     h[K]=Math.max(0,h[K]+(k-1)*m*c*Math.tanh(e/c))}
   // horizon ridges: the last 1.6 km before the world edge rises up to +70 m (Athens +50 m), uneven along the edge, so hills frame every view
   const RH=CID==='fra'?70:50,RD=1600;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const d=Math.min(i,nx-1-i,j,nz-1-j)*r;if(d>=RD)continue;const x=WX0+i*r,z=WZS+j*r,t=1-d/RD,
-      n=.55+.25*Math.sin(x/730+1.3)*Math.cos(z/910)+.2*Math.sin((x+z)/410);h[j*nx+i]+=RH*t*t*(3-2*t)*n}}
+      n=.55+.25*Math.sin(x/730+1.3)*Math.cos(z/910)+.2*Math.sin((x+z)/410);h[j*nx+i]+=RH*t*t*(3-2*t)*n}
+  // nearer ridges: a ring of hills rising from 0.4 to 1.6 km outside the city box (Frankfurt +55 m, Athens +40 m), so streets see hills ~3 km away
+  const RN=CID==='fra'?55:40;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=WX0+i*r,z=WZS+j*r,dx=Math.max(HX0-x,0,x-HX1),dz=Math.max(HZS-z,0,z-HZN),d=Math.hypot(dx,dz);if(d<=400)continue;
+      const t=Math.min(1,(d-400)/1200),n=.5+.3*Math.sin(x/610-.7)*Math.cos(z/770+.4)+.2*Math.sin((x-z)/350);h[j*nx+i]+=RN*t*t*(3-2*t)*n}}
 // road corridors baked into the raster: each street gets a smooth profile (<= 9.5 % grade, ends pinned at bridges), flat across its width
 // (+ a shoulder of one raster cell, so bilinear lookups on the road see only flat cells), feathered back to the terrain over 3x the cut/fill
 // height (12..40 m). Junctions average the profiles that meet there; 3 passes re-sample the merged surface. Frankfurt filler roads are

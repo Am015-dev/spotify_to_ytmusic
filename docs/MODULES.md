@@ -20,7 +20,7 @@ file | KB | purpose | first defines
 50_kenney_data.js | 78 | DATA: KM_IDX (model index), KM_TEX (atlas PNGs), KM_ | KM_IDX KM_TEX KM_BIN
 51_city_net.js | 47 | Kenney loader (kmGeo kmKit kmMat), real Frankfurt la | KMBUF kmBuf kmGeo
 52_terrain_data.js | 115 | DATA: TR_DATA (DEM rasters, one line) | TR_DATA
-53_terrain_roads.js | 73 | terrain TR_ (TR_real TR_G), hills/Taunus/Acropolis,  | TR_EX TR_GR TR_GJ
+53_terrain_roads.js | 74 | terrain TR_ (TR_real TR_G), hills/Taunus/Acropolis,  | TR_EX TR_GR TR_GJ
 60_city_build.js | 33 | build the free-roam map: ground gndBuild gndVert, wa | qGeo tH gndVert
 60_city_build2.js | 31 | part of 60_city_build.js: build the free-roam map: g | lmBuildAll stegBuild stegTower
 60_city_build3.js | 27 | part of 60_city_build.js: build the free-roam map: g | athBuildG athRoadD athConn
@@ -103,8 +103,9 @@ file | KB | purpose | first defines
 98lm_liveliness.js | 5 | LVM: LIVELINESS METER (art-1, 2026-10-13). Alex: "Al | LVM_SPOTS LVM_T LVM_HR
 98cam_size_cam.js | 16 | CAM (cam-1, 2026-10-13). Alex: "Camera should auto a | CAM _cmV _cmB
 98dmg_damage.js | 12 | DMG (cam-1, 2026-10-13). Alex: "city driving is frus | DMG _dmM _dmQ
-98gx_gfx.js | 8 | GFX (gfx-1, 2026-10-13): daytime lighting/rendering  | GFX GFX_SUN GFX_tier
+98gx_gfx.js | 10 | GFX (gfx-1, 2026-10-13): daytime lighting/rendering  | GFX GFX_SUN GFX_tier
 99_api.js | 49 | test API window.__mho={…} (state, roamSim, warp, gnd | __mho CR_RBX CR_raceHide
 test/fast.js | 5 | FAST · test-only fast mode, active only with ?fast=1 | FAST
 test/g9iter.js | 0 | test-only (local builds): eval in module scope for t | __g9ev
+test/gym.js | 3 | GYM · test-only small world (hot-1, 2026-10-14), act | GYM
 test/w8.js | 4 | W8 · test-only model viewer (local builds only). __w | __w8
