@@ -440,9 +440,9 @@ function OF_actStep(dt){for(const p of HUB.peds||[]){const S=p.ofS;if(!S)continu
 // sit pose fit (cam-2, 2026-10-14; Alex beta.25: the figure stood INSIDE the bench, hips below the seat top). The bench model (53 terrain_roads) in its own frame: seat box top y .625,
 // 2.2 × .6 m, backrest centre z +.28 (front face z +.22), seated minifig faces -z (away from the backrest). Measured on the real figure with the legs already at their seated angle:
 // lift so the lowest leg point rests ON the seat top, then slide along the bench z so the torso's back touches the backrest front face (2 cm gap).
-function OF_sitFit(S){try{const q=S.q,F=OF.fig;if(!q||!q.im||!F)return;const m=new THREE.Matrix4();q.im.getMatrixAt(q.i,m);q.im.updateMatrixWorld(true);const M4=m.premultiply(q.im.matrixWorld),sc=new THREE.Vector3().setFromMatrixScale(M4).y,M=F.M,legs=[M.lL,M.lR].filter(Boolean);
+function OF_sitFit(S){try{const q=S.q,F=OF.fig;if(!q||!q.im||!F)return;const m=new THREE.Matrix4();q.im.getMatrixAt(q.i,m);q.im.updateMatrixWorld(true);if(m.elements[0]*m.elements[0]+m.elements[1]*m.elements[1]+m.elements[2]*m.elements[2]<.01)m.compose(new THREE.Vector3(q.x,q.y??S.y,q.z),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),q.ry||0),new THREE.Vector3(1,1,1))/* streamed-out / LOD-hidden bench: zero-scale slot → its nominal placement (propRevive: scale 1) */;const M4=m.premultiply(q.im.matrixWorld),sc=new THREE.Vector3().setFromMatrixScale(M4).y,M=F.M,legs=[M.lL,M.lR].filter(Boolean);
   S.M4=M4;S.sc=sc;S.top=new THREE.Vector3(0,.625*sc,0).applyMatrix4(M4).y;for(const l of legs)l.rotation.x=-1.5;
-  const pose=()=>{F.g.position.set(S.x,S.y+(S.dy||0),S.z);F.g.rotation.y=S.h+Math.PI;F.g.updateMatrixWorld(true)};S.dy=0;pose();let mn=1e9;for(const l of legs)mn=Math.min(mn,OF_wbx.setFromObject(l).min.y);S.dy=S.top-mn;pose();
+  const pose=()=>{F.g.position.set(S.x,S.y+(S.dy||0),S.z);F.g.rotation.x=0;F.g.rotation.y=S.h+Math.PI;F.g.updateMatrixWorld(true)};S.dy=0;pose();let mn=1e9;for(const l of legs)mn=Math.min(mn,OF_wbx.setFromObject(l).min.y);S.dy=S.top-mn;pose();
   const inv=M4.clone().invert(),v=new THREE.Vector3();let zmax=-9;F.g.traverse(o=>{if(!o.isMesh)return;const P=o.geometry.attributes.position;for(let i=0;i<P.count;i++){v.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld);const wy=v.y-S.top;v.applyMatrix4(inv);if(wy>.1*sc&&wy<.6*sc)zmax=Math.max(zmax,v.z)}});
   if(zmax>-9){const dz=.20*sc-zmax,d=new THREE.Vector3(0,0,1).transformDirection(M4);S.x+=d.x*dz;S.z+=d.z*dz;S.dz=dz;pose()}}catch(e){if(!OF.e4){OF.e4=1;console.warn('OF sitFit',e)}}}
 // state check of the seated pose (every bench): legs rest on the seat top (±3 cm), nothing of the figure below the seat top over the seat, torso between the backrest front face and 8 cm in front of it, facing away from the backrest
@@ -456,7 +456,7 @@ function OF_sitStep(dt){const S=OF.sit,I=OF_input();if(Math.hypot(I.fx,I.fy)>.25
   S.t=Math.min(1,S.t+dt*4);const e=S.t*S.t*(3-2*S.t);OF.x=S.x0+(S.x-S.x0)*e;OF.z=S.z0+(S.z-S.z0)*e;OF.h+=angDiff(S.h,OF.h)*Math.min(1,dt*10);OF.y=S.y;OF.vx=OF.vz=0;OF.spd=0;return true}
 OF_walk=(f=>function(dt){if(OF.sit&&OF_sitStep(dt))return;return f.apply(this,arguments)})(OF_walk);
 OF_figPose=(f=>function(dt){f.apply(this,arguments);const F=OF.fig;if(!F)return;const M=F.M,S=OF.sit;
-  if(S){const k=S.t;for(const l of[M.lL,M.lR])if(l)l.rotation.x=-1.5*k;if(M.aL)M.aL.rotation.x=-.3*k;if(M.aR)M.aR.rotation.x=-.3*k;F.g.position.y=S.y+(S.dy!=null?S.dy:.42-.36*F.s)*k}
+  if(S){const k=S.t;F.g.rotation.x=0;OF.pit=0;/* cam-2/foot-2: seated = upright, no ground-pitch lean */for(const l of[M.lL,M.lR])if(l)l.rotation.x=-1.5*k;if(M.aL)M.aL.rotation.x=-.3*k;if(M.aR)M.aR.rotation.x=-.3*k;F.g.position.y=S.y+(S.dy!=null?S.dy:.42-.36*F.s)*k}
   else if(OF.wave>0&&M.aR)M.aR.rotation.x=-2.7+Math.sin(performance.now()/90)*.35})(OF_figPose);
 OF_step=(f=>function(dt){f.apply(this,arguments);try{OF_actStep(Math.min(dt||0,.05))}catch(e){if(!OF.e2){OF.e2=1;console.warn('OF act',e)}}})(OF_step);
 OF_actEnd=(f=>function(){f();OF_bubOff();OF.sit=null;OF.act=null;OF.wave=0})(OF_actEnd);
