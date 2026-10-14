@@ -99,6 +99,13 @@ function LF_resid(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,g0=g
 const LF_DT=(()=>{const V=[[0,0]],I=[];for(let i=0;i<9;i++)V.push(LF_PPOLY[i].map(v=>v*.5));for(let i=0;i<18;i++){const a=LF_PPOLY[i>>1],b=LF_PPOLY[((i>>1)+1)%9],t=(i&1)/2;V.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t])}
  const T=(a,b,c)=>{const u=V[b][0]-V[a][0],v=V[b][1]-V[a][1],w=V[c][0]-V[a][0],x=V[c][1]-V[a][1];/* (u,0,v)x(w,0,x).y = v*w-u*x must be > 0 (normal up) */if(v*w-u*x>0)I.push(a,b,c);else I.push(a,c,b)};
  for(let i=0;i<9;i++){const j=(i+1)%9,o=10+2*i;T(0,1+i,1+j);T(1+i,o,o+1);T(1+i,o+1,1+j);T(1+j,o+1,10+(2*i+2)%18)}return{V,I}})();
+// art-6: the drape matches the ground only AT its 28 vertices; on curved/steep ground a triangle between them floated or sank up to 2.4 m
+// (feet inside the patch, GO art/footsurf). A patch is draped only if every triangle's centroid and edge midpoints sit 1.2 cm above to 7 cm below ground + 3.5 cm (the feet walk on the ground,
+// so they stay within 5 cm of the grass they stand in);
+// a failing patch is tried at 0.7x and 0.5x its size (the error falls with size squared), then dropped.
+function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),V=LF_DT.V.map(q=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;return[x,gy(x,z),z]}),I=LF_DT.I;
+ for(let t=0;t<I.length;t+=3){const A=V[I[t]],B=V[I[t+1]],C=V[I[t+2]];for(const[u,v,w]of[[1/3,1/3,1/3],[.5,.5,0],[0,.5,.5],[.5,0,.5]]){const x=A[0]*u+B[0]*v+C[0]*w,z=A[2]*u+B[2]*v+C[2]*w;
+  const e=A[1]*u+B[1]*v+C[1]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
 function LF_drapeG(L,A,gy){const n=LF_DT.V.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),idx=[],C=new THREE.Color();if(!L.lfP)L.lfP=[];
  A.forEach((p,k)=>{const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
   LF_DT.V.forEach((q,i)=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=gy(x,z)+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b});
@@ -173,7 +180,7 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
  // art-4: uneven patches are DRAPED (Alex: "patches cut the figure in half"): a patch whose tilted-plane fit is off by > 8 cm becomes part of one merged
  // indexed mesh per tile, every vertex at groundY+3.5 cm (polygon offset against z-fight), walk height = terrain; even ones stay instanced planes. Ponds whose rim varies > 15 cm and beds on > 20 cm are dropped;
  // beds sit at their lowest corner (sink uphill, never float). ?lfd=0 = the old tilted planes.
- if(LF.drape){const DR=I.patch.filter(p=>LF_resid(p,gy)>.08);if(DR.length){const g=LF_drapeG(L,DR,gy);const S=new Set(DR);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield}}
+ if(LF.drape){const DR0=I.patch.filter(p=>LF_resid(p,gy)>.08),DR=DR0.filter(p=>{const sx=p.sx,sz=p.sz;for(const k of[1,.7,.5]){p.sx=sx*k;p.sz=sz*k;if(LF_drapeOk(p,gy))return true}p.sx=sx;p.sz=sz;return false});if(DR0.length){const g=DR.length?LF_drapeG(L,DR,gy):null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield}}
   I.pond=I.pond.filter(p=>{let lo=9e9,hi=-9e9;for(let k=0;k<12;k++){const a=k/12*6.283,y=gy(p.x+Math.cos(a)*p.sx,p.z+Math.sin(a)*p.sz);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.15)return false;p.y=(lo+hi)/2+.02;return true});
   I.bed=I.bed.filter(p=>{const c=Math.cos(p.ry||0),sn=Math.sin(p.ry||0);let lo=9e9,hi=-9e9;for(const[a,b]of[[-2,-1.2],[2,-1.2],[2,1.2],[-2,1.2]]){const u=a*p.sx,v=b*p.sz,y=gy(p.x+c*u+sn*v,p.z-sn*u+c*v);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.2)return false;p.y=lo;return true})}
  for(const t in I){const A=I[t];if(!A.length)continue;const m=new THREE.InstancedMesh(GE[t],t==='tuft'||t==='reed'?mat.tuft:t==='pond'?mat.pond:mat.def,A.length);

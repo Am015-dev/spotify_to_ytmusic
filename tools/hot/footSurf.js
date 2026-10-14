@@ -1,5 +1,5 @@
 // foot-2 state tests (hot page, sync, < 60 s): ground contact + collision of the ON-FOOT figure. Run: node tools/hot.js eval "$(cat tools/hot/footSurf.js)" --city fra|ath
-// A  feet vs the visible surface: 200 points per city: ~130 inside dirt/sand/grass patches (surface read off the patch MESH matrix, not the lookup) + the rest on bare ground
+// A  feet vs the visible surface (instanced patch planes + art-4 draped patch meshes): 200 points per city: ~130 inside dirt/sand/grass patches (surface read off the patch MESH matrix, not the lookup) + the rest on bare ground
 //    (terrain + mound); feet = OF.y after the real OF_walk physics settles. Pass: |feet - surface| <= 0.05 m.
 // B  push the figure (OF_walk with held run input) into 50 parked cars, 50 props, 20 building walls from a random side; penetration of the walker's circle into the visible
 //    footprint = max(0, OF_R - signed distance). Pass: <= 0.1 m.   Prints one JSON line.
@@ -11,7 +11,7 @@
  const sd=(b,x,z)=>{const dx=x-b.x,dz=z-b.z,lx=dx*b.c-dz*b.s,lz=dx*b.s+dz*b.c,ex=Math.abs(lx)-b.hw,ez=Math.abs(lz)-b.hd;return ex>0&&ez>0?Math.hypot(ex,ez):Math.max(ex,ez)};
  try{
  // ---- A ----
- const meshes=(LF.ms||[]).filter(m=>m.userData.lf==='patch'&&m.parent),M=new THREE.Matrix4(),V=new THREE.Vector3(),bad=[];
+ const pm=(LF.ms||[]).filter(m=>m.userData.lf==='patch'&&m.parent),meshes=pm.filter(m=>m.isInstancedMesh),drp=pm.filter(m=>!m.isInstancedMesh),M=new THREE.Matrix4(),V=new THREE.Vector3(),bad=[];
  let dropped=0,hov=0,bur=0,hmax=-9,hmin=9,rise=0,nP=0,nG=0,wP=0,wG=0,skipped=0,allP=0,allBad=0,allW=0;
  // every loaded patch: lookup plane vs mesh matrix at 9 points each (pure arithmetic)
  for(const m of meshes)for(let i=0;i<m.count;i++){m.getMatrixAt(i,M);if(!M.elements[0]&&!M.elements[8]){dropped++;continue}for(let k=0;k<9;k++){const q=LF_PPOLY[k];V.set(q[0]*.85,.04,q[1]*.85).applyMatrix4(M);const y=LF_patchY(V.x,V.z);allP++;const e=y==null?9:V.y-y;if(e>.02){allBad++;allW=Math.max(allW,e)}const tg=groundY(V.x,V.z)+LF_mound(V.x,V.z),dv=V.y-tg;if(dv>.3)hov++;if(dv<-.05)bur++;hmax=Math.max(hmax,dv);hmin=Math.min(hmin,dv)}}
@@ -28,6 +28,11 @@
   if(LF_patchY(x,z)!=null||roamHit(x,z,OF_R+.1,5)||inRiver(x,z,2)||onAnyDeck(x,z)||slipY(x,z)!=null||(RO.ramps&&RO.ramps.some(r=>Math.abs(r.x-x)<40&&Math.abs(r.z-z)<40))){skipped++;continue}
   const vis=groundY(x,z)+LF_mound(x,z),y=settle(x,z,vis+1.2);if(Math.hypot(OF.x-x,OF.z-z)>.05){skipped++;continue}
   const e=Math.abs(y-vis);nG++;wG=Math.max(wG,e);if(e>.05)bad.push(['ground',+x.toFixed(1),+z.toFixed(1),+(y-vis).toFixed(3)])}
+ // art-6: DRAPED patches (art-4: uneven ones are one merged Mesh per tile, every vertex at ground + 3.5 cm, walk height = terrain): 40 triangle centroids through the real foot physics
+ let nD=0,wD=0;{const pv=[];for(const m of drp){const P=m.geometry.attributes.position,I=m.geometry.index.array;for(let t=0;t<I.length;t+=15){const c=[0,1,2].map(k=>I[t+k]);pv.push([0,1,2].map(j=>(P.getComponent(c[0],j)+P.getComponent(c[1],j)+P.getComponent(c[2],j))/3))}}// triangle CENTROIDS (vertices always match)
+  for(let tr=0;nD<40&&pv.length&&tr<400;tr++){const[x,y,z]=pick(pv);if(roamHit(x,z,OF_R+.1,y+1)||inRiver(x,z,0)||LF_patchY(x,z)!=null){skipped++;continue}const f=settle(x,z,y+1.2);if(Math.hypot(OF.x-x,OF.z-z)>.05){skipped++;continue}
+   const e=Math.abs(f-y);nD++;wD=Math.max(wD,e);if(e>.05)bad.push(['drape',+x.toFixed(1),+z.toFixed(1),+(f-y).toFixed(3)])}}
+ out.A.drapeMeshes=drp.length;out.A.drapePts=nD;out.A.drapeWorst=+wD.toFixed(3);
  out.A.patchPts=nP;out.A.coveredByHigherPatch=rise;out.A.patchWorst=+wP.toFixed(3);out.A.groundPts=nG;out.A.groundWorst=+wG.toFixed(3);out.A.skipped=skipped;out.A.bad=bad.slice(0,6);out.A.nBad=bad.length;
  // ---- B ----
  const push=(tx,tz,hw0,start,y)=>{ // walk from `start` toward (tx,tz) at run speed for 3 s

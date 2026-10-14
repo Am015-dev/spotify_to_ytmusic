@@ -100,7 +100,7 @@ function OC_poolStep(n){const P=OC.pool;if(!P)return;P.material.opacity=.04*n;OC
   for(const p of OC.lamps){const dead=!p.alive;if(dead===OC.dead.has(p))continue;if(dead){OC.dead.add(p);P.getMatrixAt(p.ocP,OC.pm);p.ocM=OC.pm.clone();OC.pm.makeScale(0,0,0)}else{OC.dead.delete(p);OC.pm.copy(p.ocM)}P.setMatrixAt(p.ocP,OC.pm);ch=true}if(ch)P.instanceMatrix.needsUpdate=true}
 // ---------- 2 · props: nothing stands on a drivable surface (streets, filler roads, Autobahn, biome roads, trails, junctions); real heights;
 // ground-placed props sit on the lowest ground under their footprint (no floating edge on slopes)
-const OC_GAME=new Set(['bricks','tower','gold','cone','barrier','clight']);// smash pickups / roadworks deliberately placed on the lanes
+const OC_GAME=new Set(['cone','barrier','clight']);// roadworks deliberately placed on the lanes (art-6: brick piles, towers and gold bricks are block scatter in the block RECT, which diagonal roads cross, so they get the same push-off-the-road as any prop; GO art/props-road)
 const OC_fp=(t,D)=>t.startsWith('car')||/^CE_(car|taxi)/.test(t)?1.1:Math.min((D[t]?D[t].r:1)*.5,1.2);
 function OC_roadE(x,z){let e=1e9;const r=athRoadD(x,z,48);if(r)e=r.e;const f=fillAt(x,z);if(f)e=Math.min(e,f.d-f.r.w/2);const a=abAt(x,z);if(a)e=Math.min(e,a.d-a.road.w/2);
   e=Math.min(e,lzRoadD(x,z),OC_segE(x,z));for(const J of OC_junc(x,z))e=Math.min(e,Math.hypot(J.x-x,J.z-z)-J.r);return e}
