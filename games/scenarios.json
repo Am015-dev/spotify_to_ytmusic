@@ -853,6 +853,14 @@
    "mut": 0
   },
   {
+   "id": "rc-uibar",
+   "name": "UI bar: top bar, dock, start screen",
+   "ask": "Is the top bar short, the dock calm and the start screen one button?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",

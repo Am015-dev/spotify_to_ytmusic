@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-14",
+  "game": "shipwreck-isle",
+  "title": "simple start screen",
+  "items": [
+   "Rules text clears the frame; More menu readable"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "cauldron-fair",
   "title": "start screen: one Play button, small options",
   "items": [
@@ -133,21 +148,6 @@
   "check": "",
   "scn": [],
   "ask": []
- },
- {
-  "date": "2026-10-14",
-  "game": "shipwreck-isle",
-  "title": "readable on every screen size",
-  "items": [
-   "Rules text clears the frame; More menu readable"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
  },
  {
   "date": "2026-10-14",
