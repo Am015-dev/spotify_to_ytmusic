@@ -3,10 +3,49 @@
   "date": "2026-10-14",
   "game": "short-fuse",
   "title": "short-fuse: readable on every screen size",
-  "items": [],
+  "items": [
+   "Menus, panels and start screen readable at all 5 sizes"
+  ],
   "check": "",
-  "scn": [],
-  "ask": []
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "final-approach",
+  "title": "final-approach: readable on every screen size",
+  "items": [
+   "Menus use one title font and one body font, no overlaps"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "lantern-dive",
+  "title": "lantern-dive: readable on every screen size",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Menu, help and tip text clear of frame art"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu",
+   "menu"
+  ],
+  "ask": [
+   null,
+   null
+  ]
  },
  {
   "date": "2026-10-14",
@@ -151,24 +190,6 @@
  },
  {
   "date": "2026-10-14",
-  "game": "lantern-dive",
-  "title": "Menus tidied",
-  "items": [
-   "Menus use one title font and one body font, no overlaps",
-   "Menu, help and tip text clear of frame art"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu",
-   "menu"
-  ],
-  "ask": [
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
   "game": "doorkick-dungeon",
   "title": "Menu clean-up",
   "items": [
@@ -195,21 +216,6 @@
    null,
    null,
    "Do the menus and board look clean?"
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "final-approach",
-  "title": "Cleaner menus",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
   ]
  },
  {
