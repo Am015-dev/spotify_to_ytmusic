@@ -315,6 +315,8 @@ body:has(#menu) #modal .scrim:has(.card[aria-label=Start]){visibility:hidden}
 html.sk .gxc-btn.go{background:#b5532f padding-box}
 @media(max-width:400px){html.sk .seat{flex:0 0 auto;padding-right:12px}html.sk .seat:not(.cur) .nm{display:none}html.sk .seat .nm{max-width:none;overflow:visible}}
 html.sk #hskip{padding:0}
+html.sk .seat .nm,html.sk .seat .fl{font-size:13px}html.sk .seat .dot{font-size:13px}
+@media(min-width:1024px){html.sk .seat .nm,html.sk .seat .fl,html.sk .seat .dot,html.sk .seat b,html.sk #left,html.sk #left b,html.sk #status,html.sk .opt,html.sk .sub,html.sk .gxh-tt,html.sk .gxh-tx,html.sk .gxh-ok,html.sk .btn{font-size:16px}html.sk .seat .dot{width:22px;height:22px}}
 
 :root{--gxh-btn:#b5532f;--gxh-accent:#e0a83a;--gxh-bg:#f6ead2;--gxh-font:var(--ff)}</style>
 <style>
@@ -866,6 +868,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   function scrim(t) { for (var x = t; x && x !== document.body; x = x.parentElement) { var r = x.getBoundingClientRect(); if (r.width * r.height >= .6 * innerWidth * innerHeight && (x === t || getComputedStyle(x).position === 'fixed')) return true; } return false; }   // a modal / story layer on top legitimately covers what is below
   function coveredBy(e) { var b = box(e), r = b.r; if (r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return ''; if (getComputedStyle(e).pointerEvents === 'none') return '';
     var t = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, b.x)), Math.max(1, Math.min(innerHeight - 1, b.y)));
+    if (t && t.closest('.gx-drawer-head') && e.closest('.gx-drawer') && !e.closest('.gx-drawer-head')) return '';   // scrolled under the drawer's sticky head: clipped by the scroll, not covered
     if (!t || related(t, e) || t.closest(SKIPSEL) || scrim(t) || getComputedStyle(t).pointerEvents === 'none') return ''; return t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]; }
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
   function engineBad() {   // every element marked data-engine="<js expression>" must show that engine number
@@ -888,7 +891,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     for (var a = 0; a < rects.length; a++) for (var b = a + 1; b < rects.length; b++) { var A = rects[a], B = rects[b]; if (related(A.e, B.e)) continue;
       var w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left), h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
       if (w > 2 && h > 2 && w * h > .3 * Math.min(A.r.width * A.r.height, B.r.width * B.r.height)) add('text overlaps: "' + A.t + '" <' + who(A.e) + '> / "' + B.t + '" <' + who(B.e) + '>'); }
-    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '>'); });
+    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '> "' + (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 24) + '"'); });
     engineBad().forEach(add);
     return out;
   };
@@ -1037,6 +1040,33 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     ]
   });
 
+
+  // UI-BAR rules 4-8 that the shared menu test cannot see (14 Oct 2026)
+  var vis = function (e) { var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 2 && r.height > 2 && c.visibility !== 'hidden' && c.display !== 'none'; };
+  var lim = function () { return innerWidth >= 1024 ? 16 : 13; };
+  var minFont = function (root) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || e.children.length || !vis(e) || !/\S/.test(e.textContent)) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < lim() - 0.01) bad = f + 'px "' + e.textContent.trim().slice(0, 14) + '" in ' + (e.id || e.className); }); return bad || true; };
+  GXS.add({
+    id: 'ui-bar', name: 'UI bar: top bar, one line, images', ask: 'Few buttons, one line, readable text?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { try { GXH.setEnabled(true); GXH.reset(); } catch (e) { } return idle(900); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 4: top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('#top button'), vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'rule 5: board line is 8 words or fewer', fn: function () { var t = ($('#status') || {}).textContent || ''; return words(t) <= 8 || words(t) + ' words'; } },
+      { kind: 'fn', name: 'rule 5: coach tip is 8 words or fewer and not a repeat', fn: function () { var x = $('.gxh-tx'), t = $('.gxh-tt'); if (!x || !vis(x)) return true; var st = ($('#status').textContent || '').trim().toLowerCase(); return words(x.textContent) > 8 ? words(x.textContent) + ' words in tip' : (t && t.textContent.trim().toLowerCase() === st) ? 'tip title repeats the status line' : true; } },
+      { kind: 'fn', name: 'rule 1: top bar, status and tip text at least 13/16 px', fn: function () { var a = minFont('#top'); if (a !== true) return a; var s = parseFloat(getComputedStyle($('#status')).fontSize); if (s < lim() - 0.01) return 'status ' + s + 'px'; return minFont('.gxh-bub'); } },
+      { kind: 'fn', name: 'rule 8: images keep their natural aspect', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (m) { if (bad || !vis(m) || !m.naturalWidth) return; var a = m.naturalWidth / m.naturalHeight, r = m.getBoundingClientRect(), b = r.width / r.height; if (Math.abs(a - b) / a > 0.15 && getComputedStyle(m).objectFit === 'fill') bad = m.src.split('/').pop() + ' ' + b.toFixed(2) + ' vs ' + a.toFixed(2); }); return bad || true; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-start', name: 'UI bar: start screen', ask: 'One big Play button, simple options?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { showStart(); return idle(600); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 7: exactly one big primary button', fn: function () { var n = [].filter.call(document.querySelectorAll('#modal .btn.big'), vis).length; return n === 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'rule 7: no character roster', fn: function () { return ![].some.call(document.querySelectorAll('#modal .seat'), vis) || 'roster visible'; } },
+      { kind: 'fn', name: 'rule 7: Continue only with a save', fn: function () { var c = $('#modal [data-a=cont]'); return (!!c === !!savedGame()) || 'Continue shown without a save'; } },
+      { kind: 'fn', name: 'rule 1: start text at least 13/16 px', fn: function () { return minFont('#modal'); } },
+      { kind: 'fn', name: 'rule 7: start card fits without scrolling', fn: function () { var m = $('#modal .card'); return m.scrollHeight - m.clientHeight <= 2 || 'start card scrolls'; } }
+    ]
+  });
 })();
 
 </script>
@@ -3191,12 +3221,12 @@ function hAnyGlow(){const b=boardEl().getBoundingClientRect(),cx=b.left+b.width/
   for(const g of document.querySelectorAll('#world .glow')){if(g.style.visibility==='hidden')continue;const r=g.getBoundingClientRect(),d=Math.hypot(r.left+r.width/2-cx,r.top+r.height/2-cy);if(d<bd){bd=d;best=g}}return best}
 function hFig(f){return()=>{const l=(UI.figs||[]).filter(b=>b.isConnected&&f(b._m));return l[0]||null}}
 const HLP_STEPS={
- place:{target:hAnyGlow,title:'Place your tile',text:'Tap a glowing square to lay it there. Tap the tile below to turn it.',pic:()=>HP.tap()},
- river:{target:hAnyGlow,title:'Follow the river',text:'Lay this tile so the river carries on. Tap a glowing square.',pic:()=>HP.river()},
- bonus:{target:hAnyGlow,title:'Extra turn!',text:'Your mason earned another tile. Tap a glowing square to place it.',pic:()=>HP.mason()},
- fig:{target:hFig(m=>true),title:'Claim with a follower',text:'Tap a glowing circle to claim that road, town or field. Or tap Skip.',pic:()=>HP.meeple()},
- figx:{target:hFig(m=>m.k==='bld'||m.k==='pig'),title:'Mason or hog',text:'Your mason or hog can join a feature you already hold. Tap its circle.',pic:()=>HP.mason()},
- nofig:{target:hq('#hskip'),title:'Nothing to claim',text:'Every road, town and field here is taken. Tap Skip to go on.',pic:()=>HP.skip()}
+ place:{target:hAnyGlow,title:'Tip',text:'Tap a glow. Tap the tile to turn.',pic:()=>HP.tap()},
+ river:{target:hAnyGlow,title:'Follow the river',text:'Carry the river on. Tap a glow.',pic:()=>HP.river()},
+ bonus:{target:hAnyGlow,title:'Tip',text:'Mason bonus tile. Tap a glow.',pic:()=>HP.mason()},
+ fig:{target:hFig(m=>true),title:'Claim with a follower',text:'Tap a circle to claim it, or Skip.',pic:()=>HP.meeple()},
+ figx:{target:hFig(m=>m.k==='bld'||m.k==='pig'),title:'Mason or hog',text:'Add your mason or hog. Tap a circle.',pic:()=>HP.mason()},
+ nofig:{target:hq('#hskip'),title:'Nothing to claim',text:'Nothing free to claim. Tap Skip.',pic:()=>HP.skip()}
 };
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
 const HLP_RULES=[
@@ -3601,8 +3631,8 @@ function savedGame(){try{const g=JSON.parse(localStorage.getItem(SAVE));return g
 function showStart(){closeMenu();UI.endShown=false;const o=UI.setup,sv=savedGame();
   const chips=(k,vals)=>vals.map(v=>`<button class="opt" data-k="${k}" data-v="${v[0]}" aria-pressed="${o[k]===v[0]}">${v[1]}</button>`).join('');
   const tg=(k,t)=>`<button class="opt" data-t="${k}" aria-pressed="${!!o[k]}">${t}</button>`;
-  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Start"><h1>Rampart &amp; Vine</h1><p class="sub">Build the valley. Claim it.</p>${tutFirst()?tutBtn('btn big'):''}<button class="btn ${tutFirst()?'alt':'big'}" data-a="play">Play vs computer</button>
-    <button class="btn alt" data-a="story">Story</button>${sv?`<button class="btn alt" data-a="cont">Continue game</button>`:''}${tutFirst()?'':tutBtn('btn alt')}
+  $('#modal').innerHTML=`<div class="scrim"><div class="card" role="dialog" aria-label="Start"><h1>Rampart &amp; Vine</h1><p class="sub">Build the valley. Claim it.</p><button class="btn big" data-a="play">Play vs computer</button>
+    <button class="btn alt" data-a="story">Story</button>${sv?`<button class="btn alt" data-a="cont">Continue game</button>`:''}${tutBtn('btn alt')}
     <div class="opts">${chips('rivals',[[1,'1 rival'],[2,'2 rivals'],[3,'3 rivals']])}</div><div class="opts">${chips('lv',[['easy','Easy'],['normal','Normal'],['hard','Hard']])}</div>
     <div class="opts">${tg('river','River')}${tg('ic','Taverns')}${tg('tb','Merchants')}</div></div></div>`;
   const m=$('#modal');m.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(b.dataset.k)o[b.dataset.k]=isNaN(+b.dataset.v)?b.dataset.v:+b.dataset.v;else o[b.dataset.t]=!o[b.dataset.t];showStart()});
