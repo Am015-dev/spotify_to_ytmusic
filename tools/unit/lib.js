@@ -9,7 +9,9 @@ const rd=f=>fs.readFileSync(path.join(SRCD,f),'utf8');
 const ORDER=()=>memo('order',()=>rd('ORDER').split('\n').map(s=>s.trim()).filter(Boolean));
 const MODS=()=>memo('mods',()=>{const o={};for(const f of ORDER())o[f]=rd(f);return o});
 const PAGE=()=>memo('page',()=>{let s=ORDER().map(f=>MODS()[f]).join('');if(SEED==='credits')s=s.replace(/by Alex/g,'by Bob');if(SEED==='allopen')s=s.replace('ALL_OPEN=true','ALL_OPEN=false');return s});
-const JSCODE=()=>memo('js',()=>ORDER().filter(f=>f.endsWith('.js')).map(f=>MODS()[f]).join('\n'));
+const JSCODE=()=>memo('js',()=>{let s=ORDER().filter(f=>f.endsWith('.js')).map(f=>MODS()[f]).join('\n');
+  const M={'dmg-sqrt':['15*Math.sqrt((v-25)/25)','15*Math.sqrt((v-25)/9)'],'dmg-light':['if(v<25){','if(v<5){'],'traf-burst':['rel>60||','rel>20||'],'tyre':['const CR_TYRE_Y=.03','const CR_TYRE_Y=.12'],'cam-clear':['clr>=CAM.m&&','clr>=-9&&'],'stick':['dm=TUNE.stAng/(1+sp/TUNE.stFall)','dm=TUNE.stAng*(1+sp/TUNE.stFall)']};
+  const m=M[SEED];if(m){if(!s.includes(m[0]))throw new Error('seed anchor gone: '+SEED);s=s.replace(m[0],m[1])}return s});
 // ---- balanced extraction (strings, template literals, comments; regex literals are assumed absent inside data) ----
 function skipStr(s,i){const q=s[i];i++;while(i<s.length){const c=s[i];if(c==='\\'){i+=2;continue}if(c===q)return i+1;if(q==='`'&&c==='$'&&s[i+1]==='{'){i=bal(s,i+1)+1;continue}i++}return i}
 function bal(s,i){ // i at an opening ( [ { -> index of the matching closer
@@ -25,6 +27,7 @@ function constSrc(name,text){const t=text||JSCODE();const m=new RegExp('^(?:cons
   let j=i;while(j<t.length&&t[j]!==';'&&t[j]!=='\n')j++;return t.slice(i,j)}
 function fnSrc(name,text){const t=text||JSCODE();const m=new RegExp('(?:^|\\n)\\s*(?:async\\s+)?function\\s+'+name+'\\s*\\(','').exec(t);if(!m)throw new Error('no function '+name);
   const p=t.indexOf('(',m.index+m[0].length-1),pe=bal(t,p);let b=pe+1;while(/\s/.test(t[b]))b++;return t.slice(m.index+(t[m.index]==='\n'?1:0),bal(t,b)+1).trim()}
+const lineSrc=name=>{const m=new RegExp('^(?:const|let|var)\\s+'+name+'\\s*=.*$','m').exec(JSCODE());if(!m)throw new Error('no line '+name);return m[0]};
 const ev=(src,ctx)=>vm.runInNewContext('('+src+')',ctx||{},{timeout:2000});
 // ---- data ----
 const jsonBlock=id=>memo('j'+id,()=>{const m=new RegExp('<script type="application/json" id="'+id+'">(.*?)</script>','s').exec(MODS()['02_data_json.html']);return JSON.parse(m[1])});
@@ -39,4 +42,12 @@ function loadModels(){return memo('models',()=>{const d=modelsDir();if(!d)return
   const sb={__LDC:(id,M,D)=>{out[id]={M,D}}};vm.createContext(sb);
   for(const f of fs.readdirSync(path.join(d,'models')))if(f.endsWith('.js'))vm.runInContext(fs.readFileSync(path.join(d,'models',f),'utf8'),sb);
   return {dir:d,chunks:out}})}
-module.exports={ROOT,SRCD,SEED,ORDER,MODS,PAGE,JSCODE,constSrc,fnSrc,ev,bal,FRA,ATH,CHANGELOG,CHECKLIST,loadModels,modelsDir,rd,jsonBlock};
+// sandbox: run the REAL source of the named consts/functions in a fresh vm context with the given globals (THREE etc.) -> object of the named things
+function sandbox(names,globals,extraSrc){const parts=[];
+  for(const n of names){const isFn=n.startsWith('fn:'),nm=isFn?n.slice(3):n;
+    if(isFn)parts.push(fnSrc(nm));else parts.push('const '+nm+'='+constSrc(nm)+';')}
+  const ctx=vm.createContext(Object.assign({Math,JSON,Map,Set,Array,Object,Number,isFinite,console,performance:{now:()=>0}},globals||{}));
+  const out=names.map(n=>n.replace(/^fn:/,''));
+  vm.runInContext(parts.join('\n')+'\n'+(extraSrc||'')+'\n__out={'+out.join(',')+'};',ctx,{timeout:5000});return Object.assign(ctx.__out,{ctx})}
+let THREEp=null;const THREE=()=>THREEp||(THREEp=import(require('url').pathToFileURL(path.join(ROOT,'node_modules/three/build/three.module.js')).href));
+module.exports={lineSrc,sandbox,THREE,ROOT,SRCD,SEED,ORDER,MODS,PAGE,JSCODE,constSrc,fnSrc,ev,bal,FRA,ATH,CHANGELOG,CHECKLIST,loadModels,modelsDir,rd,jsonBlock};
