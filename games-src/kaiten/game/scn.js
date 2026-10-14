@@ -17,6 +17,14 @@
     return GXS.wait(function () { return UI.started && G.phase === 'pick' && document.querySelectorAll('#belt .hc[data-id]').length >= 5 && !UI.busy; }, 12000).then(function () { return idle(1500); });
   }
 
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () {
+    if (!booted()) return;
+    try { GX.close(); } catch (e) { }
+    UI.seed = 51; newGame('guided'); render();
+    return GXS.wait(function () { return UI.started && document.querySelectorAll('#belt .hc[data-id]').length >= 5; }, 12000).then(function () { return idle(800); });
+  };
+
   GXS.add({
     id: 'kk-board', name: 'Start of game board', ask: 'Are the belt and dishes clear?', seed: 5, when: booted,
     setup: function () { return table(5); },

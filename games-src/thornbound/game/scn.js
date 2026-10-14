@@ -10,6 +10,8 @@
     GXS.seed(seed); newGame('me', { np: 3, seed: seed, length: 'short', levels: ['normal', 'normal', 'easy'] }); UI.guide = 'off'; UI.speed = 8; try { GXH.setEnabled(false); } catch (e) { }
     return GXS.wait(function () { return UI.started && !UI.card && !UI.busy && G && G.q && whoActs().hum.length && document.querySelectorAll('#handw .hc').length; }, 15000).then(function () { return new Promise(function (r) { setTimeout(r, 700); }); });
   }
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () { if (!booted()) return; return table(51).then(function () { try { UI.guide = 'full'; GXH.reset(); GXH.setEnabled(true); } catch (e) { } try { hlpAfter(); } catch (e) { } renderAll(); return new Promise(function (r) { setTimeout(r, 600); }); }); };
   var inView = function (e) { var r = e.getBoundingClientRect(); return r.left >= -2 && r.right <= innerWidth + 2 && r.top >= -2 && r.bottom <= innerHeight + 2; };
   var words = function (t) { return String(t).trim().split(/\s+/).filter(Boolean).length; };
   var ext = function (sel) { var l = 1e9, r = -1e9; [].forEach.call(document.querySelectorAll(sel), function (e) { var b = e.getBoundingClientRect(); if (b.width) { l = Math.min(l, b.left); r = Math.max(r, b.right); } }); return [l, r]; };
