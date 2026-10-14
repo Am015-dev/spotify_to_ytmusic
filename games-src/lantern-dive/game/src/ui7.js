@@ -135,11 +135,11 @@ function pxResize(force) {
 function pxRect(el, B) { const r = el.getBoundingClientRect(); return { x: r.left - B.left, y: r.top - B.top, w: r.width, h: r.height }; }
 function pxDrawFelt(R) {
   const g = PX.mat; g.clear(); if (!R) return;
-  if (PADIMG) pxPad(R); else {
+  if (PADIMG && R.w <= 760 && R.h <= 520) pxPad(R); else {
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).fill({ color: 0x0d3b6e, alpha: .5 });
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).stroke({ color: 0x8fcdf5, alpha: .3, width: 2 });
   }
-  if (!PADIMG && PX.padS) PX.padS.visible = false;
+  if (!(PADIMG && R.w <= 760 && R.h <= 520) && PX.padS) PX.padS.visible = false;
   g.roundRect(R.x + 12, R.y + 9, R.w - 24, R.h - 18, 16).stroke({ color: 0xffd873, alpha: .16, width: 1.5 });
   PX.caus.x = R.x + 4; PX.caus.y = R.y + 2; PX.caus.width = Math.max(1, R.w - 8); PX.caus.height = Math.max(1, R.h - 4);
   PX.feltR = R;

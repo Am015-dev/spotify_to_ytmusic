@@ -50,3 +50,11 @@ body:has(.gxh-bub.on) #prompt{visibility:hidden}
 #logd .gx-drawer-body,#jobd .gx-drawer-body{height:auto;flex:0 1 auto;max-height:100%}
 /* UI-BAR 4: tablet top bar keeps room for the one line */
 @media (max-width:1023px){.gx-bar .gx-ibtn span{display:none}.gx-bar .gx-ibtn{min-width:44px}#barprompt{min-width:240px}.gx-bar .gx-sp{display:none}}
+/* UI-BAR 1/8 (owner, desktop): every text >= 16px at >= 1024px wide */
+@media (min-width:1024px){
+.jc,.seat .jc,.jc .t,.seat .jc .t,#lead,#lead span,#pile .pbtn span,#pile,#felttxt,#bossbar b,#bossbar span,.seat .bdg,.seat .bdg b,.me .bdg,.me .bdg b,#mine .bdg,#mine .bdg b,.gx-bar h1,.gx-bar .gx-ibtn span,#netst,#netst .nl{font-size:16px}
+.seat .jc .sm,.jc .sm{width:20px;height:20px}
+.jc{min-height:30px}
+.seat .nm,.me .nm{font-size:16px}
+}
+@media (min-width:1024px){.gxh-bub{max-width:min(400px,calc(100vw - 16px))}.gxh-bub .gxh-tt,.gxh-bub .gxh-tx,.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font-size:16px}}

@@ -118,7 +118,7 @@ function tableGeo() {
   const drone = G.players.findIndex(p => p.helper);
   const compact = side || small;
   const av = side ? 28 : (small ? 28 : 32), jr = Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))));
-  const seatW = side ? 132 : Math.round(Math.min(90, W * .23)), seatH = side ? 76 : (small ? 100 : 116);
+  const wideT = side && W >= 1100, seatW = side ? (wideT ? 190 : 132) : Math.round(Math.min(90, W * .23)), seatH = side ? (wideT ? 112 : 76) : (small ? 100 : 116);
   const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : 54;
   const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, seats: [], slots: [] };
   const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
@@ -127,7 +127,7 @@ function tableGeo() {
   let top, zl = 0, zr = W;
   if (side) { top = y0; zl = seatW + 12; zr = W - seatW - 12; if (drone >= 0) zr = W - droneW - 12; } else top = y0 + (drone >= 0 ? Math.max(seatH, geo.dh) : seatH) + 4;
   const zoneH = Math.max(80, H - top - bottom), cy = top + zoneH / 2, cx = side ? (zl + zr) / 2 : W / 2;
-  let cw = Math.floor(zoneH / (side ? 3.8 : 4.4)); const cwMax = ph ? 70 : 112;
+  let cw = Math.floor(zoneH / (side ? 3.8 : 4.4)); const cwMax = ph ? 70 : (W >= 1100 ? 176 : 112);
   if (!side && k >= 3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
   if (side) cw = Math.min(cw, Math.floor((zr - zl) / 4.6));
   cw = Math.max(30, Math.min(cwMax, cw)); const ch = Math.round(cw * 1.4);
