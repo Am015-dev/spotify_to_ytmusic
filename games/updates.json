@@ -1,19 +1,31 @@
 [
  {
   "date": "2026-10-14",
-  "game": "cauldron-fair",
-  "title": "Menus: icon buttons, buttons and tips inside their frames",
+  "game": "hollowbough",
+  "title": "Menu and board cleanup",
   "items": [
-   "Menus use one title font and one body font, no overlaps",
-   "Icon buttons and buttons keep their content inside the frame art; one instruction line on the board"
+   "Board tip bubble no longer covers cards and counts; the caption line says it"
   ],
-  "check": "Open the menus: text readable, nothing overlapping",
+  "check": "",
   "scn": [
-   "menu",
    "menu"
   ],
   "ask": [
-   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "sands-of-qamar",
+  "title": "Menus tidied",
+  "items": [
+   "Menu and campaign text now sits inside the painted frames"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
    null
   ]
  },
@@ -98,6 +110,21 @@
  {
   "date": "2026-10-14",
   "game": "kaiten-kitchen",
+  "title": "Cleaner menus",
+  "items": [
+   "Menus use one title font and one body font, no overlaps"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "cauldron-fair",
   "title": "Cleaner menus",
   "items": [
    "Menus use one title font and one body font, no overlaps"
