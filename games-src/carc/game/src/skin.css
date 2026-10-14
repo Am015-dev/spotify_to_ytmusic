@@ -39,7 +39,7 @@ html.sk .opt[aria-pressed=true]{background:#2f6a22 padding-box;border-image-sour
 html.sk .card,html.sk .menu,html.sk .gx-drawer,html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100/34px stretch;border-radius:0;background:var(--paper) padding-box;background-clip:padding-box;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a2410}
 html.sk .card{max-width:392px}
 html.sk .menu{padding:0;min-width:230px;border-image-width:22px;border-width:22px}
-html.sk .menu button{min-height:46px;background:url(media/ui-row.webp) center/100% 100% no-repeat;color:#3a2410}
+html.sk .menu button:not(.opt){min-height:46px;padding:11px 16px;background:url(media/ui-row-c.webp) 0 0/100% 100% no-repeat;color:#3a2410}
 /* coach bubble pointer: the painted tail (points down; turned for the other sides) */
 html.sk .gxh-arr{width:18px;height:18px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;margin:-3px}
 html.sk .gxh-a-top .gxh-arr{transform:rotate(180deg)}html.sk .gxh-a-left .gxh-arr{transform:rotate(90deg)}html.sk .gxh-a-right .gxh-arr{transform:rotate(-90deg)}
@@ -55,3 +55,8 @@ html.sk .gxc-btn.go{background:#b5532f padding-box}
 html.sk #hskip{padding:0}
 html.sk .seat .nm,html.sk .seat .fl{font-size:13px}html.sk .seat .dot{font-size:13px}
 @media(min-width:1024px){html.sk .seat .nm,html.sk .seat .fl,html.sk .seat .dot,html.sk .seat b,html.sk #left,html.sk #left b,html.sk #status,html.sk .opt,html.sk .sub,html.sk .gxh-tt,html.sk .gxh-tx,html.sk .gxh-ok,html.sk .btn{font-size:16px}html.sk .seat .dot{width:22px;height:22px}}
+html.sk .menu .srow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 16px;margin:2px 0;font-weight:700;font-size:1rem;color:#3a2410}
+html.sk .menu .srow>span:first-child{flex:1 1 auto}
+html.sk .menu .opt{min-height:38px;font:700 14px/1 var(--ff);padding:0}
+@media(min-width:1024px){html.sk .menu button,html.sk .menu .srow,html.sk .menu .srow span,html.sk .menu .opt,html.sk .menu .gxt-menu b,html.sk .menu .gxt-menu span{font-size:16px}
+#hand{align-self:center;width:fit-content;margin:0 auto 10px;padding:10px 44px;min-height:0}#htile{width:132px;height:132px}}

@@ -21,7 +21,7 @@ function tweenView(to,ms){cancelAnimationFrame(UI.tween);UI.tw=false;const a=Obj
   const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else{UI.tw=false;ensureGlowVisible()}};UI.tween=requestAnimationFrame(step)}
 function focusView(cx,cy,cell){const m=measure(),s=cell/100;return {s,x:m.W/2-cx*100*s,y:m.H/2+16-cy*100*s}}
 function fitCells(cells,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
-  const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2}}
+  const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(innerWidth>=1024?190:MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2}}
 function viewFor(f,m){const s=f.c/100;return {s,x:m.W/2-f.cx*100*s,y:m.H/2+16-f.cy*100*s}}
 function fitTarget(){const m=measure();if(!G.order.length)return {s:.4,x:0,y:0};const last=unkey(G.cur&&G.cur.k||G.order[G.order.length-1]);
   const gl=UI.legal.map(g=>[g.x,g.y]);let f=fitCells(G.order.map(unkey).concat(gl),m);if(f.fits)return viewFor(f,m);
@@ -167,7 +167,7 @@ function showStart(){closeMenu();UI.endShown=false;const o=UI.setup,sv=savedGame
   m.querySelector('[data-a=play]').onclick=()=>{if(tutOffer())showOffer();else beginGame()};m.querySelector('[data-a=story]').onclick=()=>{if(typeof campOpen==='function')campOpen()};
   const c=m.querySelector('[data-a=cont]');if(c)c.onclick=loadSaved}
 function openMenu(){if($('#menu'))return closeMenu();const d=document.createElement('div');d.id='menu';d.className='menu';d.setAttribute('role','dialog');
-  d.innerHTML=`<button data-a="fit">Show the whole valley</button><button data-a="rules">How to play</button><button data-a="snd">Sound: ${SND.on?'on':'off'}</button><button data-a="mus">Music: ${SND.music?'on':'off'}</button><button data-a="musicp">Choose music</button><button data-a="paint">Pictures: ${PAINT_ON?'painted':'simple'}</button><button data-a="spd">Computer speed: ${UI.speed>1?'fast':'normal'}</button><button data-a="story">Story</button>${tutBtn('')}<button data-a="new">New game</button>${typeof GXH!=='undefined'?GXH.settingsHTML():''}`;
+  d.innerHTML=`<button data-a="fit">Show the whole valley</button><button data-a="rules">How to play</button><button data-a="snd">Sound: ${SND.on?'on':'off'}</button><button data-a="mus">Music: ${SND.music?'on':'off'}</button><button data-a="musicp">Choose music</button><button data-a="paint">Pictures: ${PAINT_ON?'painted':'simple'}</button><button data-a="spd">Computer speed: ${UI.speed>1?'fast':'normal'}</button><button data-a="story">Story</button>${tutBtn('')}<button data-a="new">New game</button>${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'srow',btnClass:'opt'}):''}`;
   document.body.appendChild(d);d.onclick=e=>{const b=e.target.closest('button');if(!b||b.dataset.gxh||b.hasAttribute('data-gxt-open'))return;const a=b.dataset.a;closeMenu();
     if(a==='fit')refit(true);else if(a==='rules')showRules();else if(a==='snd')toggleSound();else if(a==='mus')toggleMusic();else if(a==='musicp')musicOpen();else if(a==='paint')paintToggle();else if(a==='spd'){UI.speed=UI.speed>1?1:3;try{localStorage.setItem('rv_fast',UI.speed>1?'1':'0')}catch(e){}}
     else if(a==='story'&&typeof campOpen==='function')campOpen();else if(a==='new'){UI.camp=null;showStart()}};
