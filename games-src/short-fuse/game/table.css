@@ -33,7 +33,7 @@
 @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
 @keyframes burn{0%{background:#fff;transform:scaleY(1.7)}100%{transform:none}}
 .trk{display:grid;grid-template-columns:repeat(6,13px);grid-auto-rows:13px;gap:2px;flex:none}
-.cn12{width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.35);font:700 7px/10px var(--fb);color:#d9e8f2;text-align:center;box-sizing:border-box;font-style:normal;display:block}
+.cn12{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.35);font:700 11px/10px var(--fb);color:#d9e8f2;text-align:center;box-sizing:border-box;font-style:normal;display:block}
 .cn12.done{background:#52c23a;border-color:#1b6a15;color:#fff}
 .cn12.flipc{animation:flipc .8s}
 @keyframes flipc{0%{transform:scale(2.2) rotate(180deg)}100%{transform:none}}

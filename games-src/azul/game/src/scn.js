@@ -20,6 +20,8 @@
     beginGame(); UI.modal = null; refresh(); try { GXH.setEnabled(false); GXH.hide(); } catch (e) { }
     return GXS.wait(function () { return G && G.phase === 'offer' && G.cur === 0 && (BF.on ? $('.bf-k .bf-t') && !BF.busy : $('#dockbody .pk')); }, 20000).then(function () { return idle(1500); });
   }
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () { if (!booted()) return; try { GXH.setEnabled(true); } catch (e) { } try { GX.close(); } catch (e) { } UI.modal = null; UI.setup.np = 2; UI.setup.seats = ['human', 'ai']; AIDELAY = 60; beginGame(); UI.modal = null; refresh(); try { GXH.setEnabled(true); } catch (e) { } return GXS.wait(function () { return G && G.phase === 'offer' && G.cur === 0 && (BF.on ? $('.bf-k .bf-t') && !BF.busy : $('#dockbody .pk')); }, 20000).then(function () { return idle(800); }); };
   var scoreOf = function (i) { return ph() ? GXS.num('[data-bfsc="' + i + '"]') : +([].slice.call($('#dockbody').textContent.match(/★(\d+)/g) || [])[i] || '').replace(/\D/g, ''); };
 
   GXS.add({

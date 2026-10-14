@@ -17,3 +17,6 @@ html.sk-seat .seat:not(.drone) .top .nm{background:url(media/ui-seat.webp) cente
 /* last paintings: menu rows on the sea-chart strip, coach-bubble pointer as the painted tail (same as Kaiten / Final Approach) */
 html.sk .btn.gxt-menu{border-image:url(media/ui-row-c.webp) 30 fill/12px 12px 12px 7px stretch;text-align:center;color:var(--sk-ink);text-shadow:none}
 html.sk .gxh-arr{pointer-events:none;width:20px;height:14px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:rotate(-20deg)}
+
+/* one instruction line: the help tip replaces the top line while it is showing */
+body:has(.gxh-bub.on) #prompt{visibility:hidden}

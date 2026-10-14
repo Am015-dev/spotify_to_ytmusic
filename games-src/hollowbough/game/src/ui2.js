@@ -302,7 +302,7 @@ function renderBoard() {
   } else { const strip = placeBox(h('div.strip.city'), cityBox); bd.appendChild(strip);
     const fit = R.strip.city, n = cityList.length;
     if (R.slots) for (let i = 0; i < fit.n; i++) { const sl = h('i.slot'); sl.style.cssText = `left:${fit.x0 + i * fit.step}px;top:${Math.max(1, (cityBox.h - fit.ch) / 2)}px;width:${fit.cw}px;height:${fit.ch}px`; strip.appendChild(sl); }
-    strip.appendChild(h('span.scount', (me.city.length) + '/15'));
+    strip.appendChild(h('span.scount', { 'data-a': 'city' }, (me.city.length) + '/15'));
     const open = h('button.cityopen', { 'data-a': 'city', type: 'button', 'aria-label': 'Open my city' }); placeBox(open, cityBox); open.appendChild(h('span.cx', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg>' })); bd.appendChild(open);
     cityList.forEach((it, i) => {
       const p = R.slots ? { x: fit.x0 + i * fit.step, y: Math.max(1, (cityBox.h - fit.ch) / 2) } : posStripCard(cityBox, fit, n, i);
