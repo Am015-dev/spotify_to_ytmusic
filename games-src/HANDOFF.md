@@ -298,3 +298,8 @@ Deployed (one call): final-approach, kaiten-kitchen, rampart-and-vine. Blocked b
 1. 12 games carry a stale inline copy of shell CSS in their head.html (`.gx-drawer{` in munch, rc, xw, final-approach, ft, hollowbough, kaiten, lantern-dive, short-fuse, tidewake, azul, thornbound): shell fixes never reach them. Remove the copies; build-all injects shell.css once. One change, one deploy of all 15.
 2. shell/gx-scenario.js 'covered button' counts buttons scrolled out of view inside tall drawers (#setd/#rulesd) as covered (Hollowbough pc/wide).
 3. shell/gx-scenario.js:363 reads non-numeric data-engine attributes (three.js canvas) as engine values (Sunglaze worked around it in three3d.js).
+
+## Doorkick R3 (14 Oct 2026, UI-bar items 1-5)
+Done + deployed. Scenarios (DOM checks, no shots): `dk-kick-order` (real tap on Kick; door anim start < end <= card visible; board copy hidden by `html.bf-rev` until then), `dk-diary`, `dk-dock`, `dk-topbar`, `dk-wide-board`. `?scn=menu` passes at all 5 projects.
+Changes: bf.js `bfHold`/`bfRevealCard` (card waits for the door img `animationend`), ui.js `logHTML`/`orderHTML`/`recentHTML`/`promptHTML` (no pills, no Ouch box, no step list, no strength box), body.html (5 top-bar buttons), skin.css tail (diary, dock, top bar, wide board).
+Still weak: pile labels + Diary box hidden under 1000px wide (menu test fails at 768 when shown: felt clipped); hands of 8+ cards hide names; board line 14px; tablet dk-boss-reveal (no #bfclip at 768) not touched; scenario mutants for the new scenarios not run (mutate script too slow).

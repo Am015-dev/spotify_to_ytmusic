@@ -80,8 +80,8 @@ function syncMenu(){const b=$('#dkMenuBody');if(!b)return;const so=typeof SND!==
   b.innerHTML=`<div class="menu">${typeof tutBtn==='function'?tutBtn('btn'):''}<button class="btn" data-a="snd">${ic(so?'sound':'mute')} Sound effects: ${so?'on':'off'}</button><button class="btn" data-a="mus">${ic('music')} Music: ${mu?'on':'off'}</button><button class="btn" data-a="music">${ic('music')} Pick the songs…</button><button class="btn" data-a="speed">${ic(sp)} Computer speed: ${sp}</button><button class="btn" data-a="pause">${ic(UI.pause?'play':'pause')} ${UI.pause?'Resume':'Pause'} the computer</button>${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):''}<button class="btn" data-a="gfx">${ic('gem')} Graphics: ${typeof GFX!=='undefined'?GFX.name():'High'}</button>${typeof PerfHUD!=='undefined'?PerfHUD.buttonsHTML('btn'):''}<button class="btn primary" data-a="new">New game</button></div>`}
 function syncGfxBtn(){const g=$('#gfxbtn');if(g&&typeof GFX!=='undefined')g.innerHTML=`${ic('gem')} ${GFX.name()}`;syncMenu()}
 function dockTitle(me){const s=sideToAct();if(G.winner)return 'Game over';if(s<0)return 'Turn '+G.turn;const p=P(s);return (s===me&&p.human?'Your move':p.human?p.nm+'’s move':p.nm+' is thinking…')+' · turn '+G.turn}
-function recentHTML(){if(!G||!G.log.length)return '';const o=G.out&&G.out.turn===G.turn&&!G.cb?G.out:null;const bk=(UI.barkLog||[]).filter(b=>G.ln-b.n<12).slice(0,2);
-  return `<div class="recent"><div class="rl"><h3>Just happened</h3><button class="btn" data-gx="dkLog" style="min-height:44px;padding:2px 10px;font-size:.85rem">📜 Diary</button></div><ol>${o?`<li class="story">📖 ${narrate(o)}</li>`:''}${bk.map(b=>`<li class="quote" style="border-left-color:${PCOL[b.s]}"><b>${esc(P(b.s).nm)}:</b> “${esc(b.t)}”</li>`).join('')}${G.log.slice(0,2).map(l=>`<li${l.s>=0?` style="border-left-color:${PCOL[l.s]}"`:''}>${esc(l.t)}</li>`).join('')}</ol></div>`}
+function recentHTML(){if(!G||!G.log.length)return '';const me=viewSeat();const told=typeof sinceHTML==='function'&&sinceHTML(me);
+  return `<div class="recent"><div class="rl"><h3>${told?'More':'Just happened'}</h3><button class="btn" data-gx="dkLog">Diary</button></div>${told?'':`<ol>${G.log.slice(0,3).map(l=>`<li>${esc(l.t)}</li>`).join('')}</ol>`}</div>`}
 function oppsHTML(me){const n=G.pl.length-(me>=0?1:0);return `<div class="opps n${n}" aria-label="Rivals">${G.pl.filter(p=>p.i!==me).map((p,k,a)=>{const act=p.i===G.active;const rv=me>=0&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]||null):null;const q=a.length>1?(k/(a.length-1))*2-1:0;
   return `<button class="opp seat paper ${act?'active':''}${p.dead?' dead':''}" data-opp="${p.i}" style="--c:${PCOL[p.i]};--q:${q.toFixed(2)}" title="${esc(heroTitle(p))}: level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play" aria-label="${esc(p.nm)}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items${act?', their turn':''}${rv&&rv.curse?`, has cursed you ${rv.curse} times`:''}. Hold for details."><span class="sav">${typeof bfAv==='function'?bfAv(p,'savi'):''}<b class="slv" aria-hidden="true">${p.lvl}</b>${p.dead?'<i class="sdead" aria-hidden="true">💀</i>':''}</span><span class="snm">${esc(p.nm.split(/[ ,]/)[0])}</span><span class="sbd" aria-hidden="true"><span class="sw">⚔${pStr(p)}<small class="lb">str</small></span><span class="sg"><i class="gi" data-s="gear">🪖</i>${p.eq.length}<small class="lb">gear</small></span>${p.curse.length?`<span class="sc"><i class="gi" data-s="curse">☁</i>${p.curse.length}</span>`:''}</span></button>`}).join('')}</div>`}
 // phone only (CSS shows it instead of the mini cards): one readable row per card, tap = the big card
@@ -146,10 +146,10 @@ function myMoves(me){if(!G||me<0)return[];if(!P(me).human)return[];return validM
 const STEPS=[['main','Get ready'],['kick','Kick the door'],['combat','Fight or flee'],['after','Trouble or loot'],['post','Tidy up'],['charity','Charity']];
 function stepIdx(){const ph=G.phase;return ph==='setup'||ph==='window'||ph==='main'?0:ph==='combat'?2:ph==='after'?3:ph==='post'?4:ph==='charity'?5:0}
 function orderHTML(me){const n=G.pl.length;const f=G.first!=null?G.first:0;const seats=[];for(let j=0;j<n;j++){const i=(f+j)%n;if(!P(i).gone)seats.push(i)}const round=Math.floor((G.turn-1)/Math.max(1,seats.length))+1;
-  return `<div class="order" aria-label="Turn order, round ${round}"><span class="rd">Round ${round}</span>${seats.map(i=>`<span class="${i===G.active?'on':''}" style="--c:${PCOL[i]}">${i===G.active?'▶ ':''}${esc(P(i).nm)}${isMe(i)?' (you)':''}</span>`).join('<i aria-hidden="true">→</i>')}</div>`}
+  return `<div class="order" role="list" aria-label="Turn order, round ${round}">${seats.map(i=>`<span role="listitem" class="${i===G.active?'on':''}" style="--c:${PCOL[i]}" title="${esc(P(i).nm)}${isMe(i)?' (you)':''}" aria-label="${esc(P(i).nm)}${i===G.active?', their turn':''}">${typeof bfAv==='function'?bfAv(P(i),'ordav'):''}</span>`).join('')}</div>`}
 function hintBox(co,extra){return '';const L=[];if(co.why)L.push(`<div class="hl">💡 ${co.why}</div>`);(co.lines||[]).forEach(x=>L.push(`<div class="hx">${x}</div>`));(extra||[]).forEach(x=>x&&L.push(`<div class="hx">${x}</div>`));return L.length?`<div class="hint" aria-label="Hint">${L.join('')}</div>`:''}
 function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me>=0&&s===me&&P(me).human;const vm=mine?validMoves(me):[];const si=stepIdx();
-  let h=`<div id="prompt">${me>=0&&P(me)&&P(me).human?toastHTML():''}<div class="steps" aria-label="Turn step ${si+1} of ${STEPS.length}: ${STEPS[si][1]}">${STEPS.map((x,i)=>`<span class="${i===si?'on':i<si?'done':''}" title="${x[1]}">${i+1}${i===si?' '+x[1]:''}</span>`).join('')}</div>${G.phase!=='setup'?orderHTML(me):''}`;
+  let h=`<div id="prompt">${G.phase!=='setup'?orderHTML(me):''}`;
   if(G.mode==='net'&&typeof netStatusHTML==='function')h+=netStatusHTML()+nwHTML(me);
   if(!p){return h+'</div>'}
   const warn=G.cb?winWarnHTML(me):'';h+=warn;
@@ -167,11 +167,11 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
     if(q.kind==='lawyer'){say='The lizards won’t sue a Thief. Swap 2 treasures from your hand for 2 new ones?';acts=btn({act:'opt',opt:'yes'},'Swap','good')+btn({act:'opt',opt:'no'},'Keep them')}
     if(q.kind==='fetch'){say=`Throw your ${esc(cname(q.card))} for the hound to escape automatically?`;acts=btn({act:'opt',opt:'yes'},'Throw it','good')+btn({act:'opt',opt:'no'},'Roll instead')}}
   else switch(G.phase){
-  case 'setup':say='Set up your hero before the first door.';ol=['Play a race or class card from your hand (tap it).','Play items: they go on automatically if you can use them.','Press Ready when done.'];acts=autoBtn(me,co)+btn({act:'ready'},'Ready',autoN(me,co)?'':'primary pulse');break;
+  case 'setup':say='Set up your hero before the first door.';acts=autoBtn(me,co)+btn({act:'ready'},'Ready',autoN(me,co)?'':'primary pulse');break;
   case 'window':say=`Before ${esc(curPl().nm)} kicks the door, you may play a curse or a level-up (tap it in your hand).`;acts=btn({act:'pass'},`Let ${esc(curPl().nm)} go on`,'primary');break;
-  case 'main':say='Get ready, then kick open the door.';ol=['Play races, classes and items; wear your best gear.','Sell items worth 1,000 gold for a level.','Kick open the door!'];acts=autoBtn(me,co)+btn({act:'kick'},'🚪 Kick open the door',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);tip=`Your combat strength is ${pStr(P(me))}.`+(by('resurrect').length?' As a Cleric you can instead take the top door discard: tap a card to discard for it.':'');break;
+  case 'main':say='Get ready, then kick open the door.';acts=autoBtn(me,co)+btn({act:'kick'},'🚪 Kick open the door',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);tip=by('resurrect').length?'As a Cleric you can instead take the top door discard: tap a card to discard for it.':'';break;
   case 'after':say='No monster behind the door.';ol=['Look for trouble: fight a monster from your hand, or','Loot the room: draw a face-down door card.'];acts=btn({act:'loot'},'Loot the room (free card)','primary')+by('trouble').filter(m=>!riskyCard(me,m.card)).slice(0,1).map(m=>btn(m,`⚔ Fight ${esc(cname(m.card))} (Lv ${cd(m.card).lvl})`,'good')).join('')+sellBtn(vm,me);extra.push(co.low);break;
-  case 'post':{const over=P(me).hand.length-handLimit(P(me));say='Tidy up, then end your turn.';ol=['Play or wear new items, sell for levels.',over>0?`End your turn: you hold ${over} card${plural(over)} too many and will give ${over===1?'it':'them'} away.`:'End your turn.'];acts=autoBtn(me,co)+btn({act:'end'},'End turn',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);break}
+  case 'post':{const over=P(me).hand.length-handLimit(P(me));say='Tidy up, then end your turn.'+(over>0?` You hold ${over} card${plural(over)} too many and will give ${over===1?'it':'them'} away.`:'');acts=autoBtn(me,co)+btn({act:'end'},'End turn',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);break}
   case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`You hold ${P(me).hand.length} cards but may keep only ${handLimit(P(me))}. ${t.length?`Tap ${ex} card${plural(ex)} to give to ${t.map(i=>esc(P(i).nm)).join(' or ')}: extra cards go to the lowest-level hero.`:`You are the lowest level, so tap ${ex} card${plural(ex)} to discard.`} Then your turn ends.`;acts=co.card!=null&&UI.hints?`<button class="btn primary pulse" data-a="autocharity">✨ Give away the suggested card${ex>1?'s':''} (${ex})</button>`:'';break}
   case 'combat':{const win=winning(cb);
     if(cb.stage==='act'){say=win?`You are winning, ${sideStr(cb)} to ${monStr(cb)}.`:`You are losing, ${sideStr(cb)} to ${monStr(cb)}.`;
@@ -183,7 +183,7 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
     break}}
   if(co.plan&&co.plan.length&&UI.hints){const pl=co.plan.map(x=>`<b>${x.label}</b>${x.why?` <span class="muted">(${x.why})</span>`:''}`);co.why=co.why||(co.plan.length>1?'Suggested: '+pl.join(' → '):'Suggested: '+pl[0])}
   if(co.catchup)extra.push('📉 '+co.catchup);
-  h+=`${UI.sell&&me>=0?sellBar(P(me)):''}${UI.menu&&UI.menu.ask?askHTML(me):''}${autoNoteHTML()}${sinceHTML(me)}${lessonHTML(me)}<p class="say">${say}</p>${acts?`<div class="acts main">${acts}</div>`:''}${co.threat?'':hintBox(co,extra)}${ol.length?`<ol>${ol.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}${G.cb?fightNote(G.cb):''}${tip?`<div class="tip">${tip}</div>`:''}</div>`;return h}
+  h+=`${UI.sell&&me>=0?sellBar(P(me)):''}${UI.menu&&UI.menu.ask?askHTML(me):''}${autoNoteHTML()}${sinceHTML(me)}${lessonHTML(me)}<p class="say">${say}</p>${acts?`<div class="acts main">${acts}</div>`:''}${co.threat?'':hintBox(co,extra)}${G.cb?fightNote(G.cb):''}${tip?`<div class="tip">${tip}</div>`:''}</div>`;return h}
 // one tap plays every card the suggestion would play now (races, classes, items, level-ups): the casual player's shortcut
 const AUTOACTS=['play','equip'];
 function autoN(me,co){if(!UI.hints||!co||!co.plan)return 0;let n=0;for(const x of co.plan){if(!x.m||!AUTOACTS.includes(x.m.act)||x.m.act==='play'&&(cd(x.m.card).t==='curse'||cd(x.m.card).t==='monster'))break;n++}return n}
@@ -198,7 +198,7 @@ function monTips(cb){const t=[];for(const m of cb.mons){const c=mdef(m);t.push(`
 function abilityBtns(vm,recK){const k=new Set(vm.map(m=>m.act));let h='';const b=m=>`<button class="btn${recK&&mvKey(m)===recK?' rec':''}" data-mv='${esc(JSON.stringify(m))}'>${moveLabel(m)}</button>`;vm.filter(m=>['skip','shoo','charm','bribe'].includes(m.act)).forEach(m=>h+=b(m));
   const pw=['berserk','turn','flight','backstab'].filter(a=>k.has(a));if(pw.length)h+=`<span class="small muted">Class power: tap a card in your hand to ${pw.map(a=>({berserk:'go berserk',turn:'turn undead',flight:'cast flight',backstab:'backstab'})[a]).join(' or ')}.</span>`;return h}
 function actsHTML(vm,me){return ''}
-function logHTML(){return `<ol id="log" reversed>${G.log.slice(0,200).map(l=>`<li${l.s>=0?` style="border-left:4px solid ${PCOL[l.s]};padding-left:6px;list-style:none;margin-left:-1rem"`:' style="list-style:none;margin-left:-1rem"'}>${l.s>=0&&G.pl[l.s]?dkPortrait(G.pl[l.s].nm,'ptok ptokp ptoklog'):''}${esc(l.t)}</li>`).join('')}</ol>`}
+function logHTML(){return `<ol id="log" class="dklog">${G.log.slice(0,200).map(l=>`<li>${l.s>=0&&G.pl[l.s]?dkPortrait(G.pl[l.s].nm,'ptok ptokp ptoklog'):'<span class="ptok ptokp ptoklog dklog-sp" aria-hidden="true">📜</span>'}<span class="dklt">${esc(l.t)}</span></li>`).join('')}</ol>`}
 // ---- card menu: everything this card can do right now ----
 function cardMoves(me,id){return myMoves(me).filter(m=>m.card===id)}
 function moveLabel(m){const c=m.card!=null?cd(m.card):null;const me=viewSeat();const cb=G.cb;const myFight=cb&&(cb.who===me||cb.help===me);switch(m.act){
@@ -262,8 +262,8 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='new'){G=null;UI.info=true;UI.menu=null;UI.zoom=null;UI.sell=null;GX.close();render();return}
   if(a==='load'){try{G=JSON.parse(localStorage.getItem(SAVE));UI.pass=null;UI.lastSeat=-1;refresh()}catch(e){G=null;render()}return}
   if(a==='gfx'&&typeof GFX!=='undefined'){GFX.cycle();syncGfxBtn();return}
-  if(a==='pause'){UI.pause=!UI.pause;$('#pausebtn').innerHTML=ic(UI.pause?'play':'pause');syncMenu();if(!UI.pause)schedule();return}
-  if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed4',UI.speed)}catch(e){};$('#speedbtn').innerHTML=SPEEDN(UI.speed);syncMenu();return}
+  if(a==='pause'){UI.pause=!UI.pause;syncMenu();if(!UI.pause)schedule();return}
+  if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed4',UI.speed)}catch(e){};syncMenu();return}
   if(a==='snd'&&typeof toggleSound==='function'){toggleSound();syncMenu();return}
   if(a==='quick'){UI.quick=!UI.quick;render();return}
   if(a==='music'){renderMusic();GX.show('dkMusic');return}
@@ -312,6 +312,6 @@ function renderMusic(){const b=$('#dkMusicBody');if(!b||typeof MSLOTS==='undefin
   setHTML(b,`<div class="music"><div class="mtop"><button class="mchip${on?' on':''}" data-a="mmus">${ic('music')} Music: ${on?'on':'off'}</button><label class="mvol">Volume <input type="range" id="mvol" min="0" max="1" step="0.05" value="${vol}" aria-label="Music volume"></label></div><div class="mtop"><button class="mchip${MLOOPS.every(k=>SND.pick[k]==='all')?' on':''}" data-a="mall">⇄ Shuffle all songs</button></div>${rows}</div>`)}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='mvol'&&window.GA)GA.setVolume('music',+e.target.value)});
 GX.drawer('dkNet','🌐 Online game',$('#dkNetBody'));
-$('#speedbtn').innerHTML=SPEEDN(UI.speed);if(typeof GFX!=='undefined'){GFX.init();syncGfxBtn()}
+if(typeof GFX!=='undefined'){GFX.init();syncGfxBtn()}
 GX.onClose=id=>{if(id==='dkCard'&&((UI.menu&&UI.menu.card!=null)||UI.zoom!=null)){UI.menu=null;UI.zoom=null;if(G)render()}};
 render();
