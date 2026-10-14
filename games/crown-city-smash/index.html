@@ -433,6 +433,8 @@ header.gx-bar [data-gx="dr-menu"]{font-size:1.15rem;min-width:44px}
 /* menu test v2: bare text sits 8px+ inside the column of the framed rows (monster picker, buttons) */
 .dlg.start>h2,.dlg.start>p,.dlg.start>details.custom{padding-inline:10px}
 details.custom:not([open])>*:not(summary){display:none}
+.dlg.start .acts .btn{margin-inline:-14px;width:calc(100% + 28px)}
+.dlg.start>h2,.dlg.start>p,.dlg.start>details.custom{padding-inline:24px}
 
 /* ===== v10 polish: dusk neon chrome, printed card frames, enamel buttons, resin dice (visual only) ===== */
 :root{--hl:rgba(255,255,255,.55);--hl0:rgba(255,255,255,0);--lo:rgba(26,19,32,.07);--drop:0 10px 24px rgba(26,19,32,.18);
@@ -729,6 +731,7 @@ html.ph-p .gx-dock[data-xa] #pacts>.btn:not([data-act="reroll"]):not([data-act="
 html.ph #choice .acts:has(> .btn:nth-of-type(5)){position:static;margin-bottom:0;padding-bottom:4px}
 @media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #preview{height:1.5em;max-height:1.5em}}
 @media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #dice{padding-top:0}html.ph-p .gx-dock[data-xa]{gap:3px}}
+@media (max-height:620px){html.ph .dlg.start .acts:has(>.btn.primary){position:static;margin:.4rem 0;padding:0;background:none}}
 
 /* ===== Board-first layer (board.js). Portrait phone: score strip on top, the city fills the screen, the tray at the bottom ===== */
 #bfx{position:fixed;left:0;top:0;width:0;height:0;z-index:60;pointer-events:none}
@@ -1178,6 +1181,12 @@ html.sk #modal .dlg:not(.paper){border-width:16px;border-image-width:16px;paddin
 html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.big,html.sk .btn.primary,html.sk .btn.camp,html.sk .btn.on{border-width:8px 10px;border-image-width:8px 10px;padding:0 4px}
 html.sk .btn.mini,html.sk .pcard .btn,html.sk .pc .btn,html.sk .bm .btn,html.sk #buymini h3 .btn,html.sk #youbox .btn,html.sk .btn.buy{border-width:6px 9px;border-image-width:6px 9px;padding:0 1px}
 html.sk .btn.mrow{border-width:8px;border-image-width:8px;padding:1.5px 4px}
+/* UI-BAR 2/9: text sits inside the painted frame, never on it */
+html.sk header.gx-bar .gx-ibtn.btn{border-image-width:10px 14px;padding-inline:14px}
+html.sk.ph header.gx-bar .gx-ibtn.btn{padding-inline:0}
+html.sk .gx-dock #prompt.box,html.sk .gx-dock #youbox.box{border-image-width:12px;padding:14px}
+header.gx-bar .pzb span{display:none}
+#news .newsbtn{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -6891,7 +6900,7 @@ function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try
   const pool=MONS.map((M,k)=>k).filter(k=>xp!=='base'||k<6);if(!pool.includes(UI.mon))UI.mon=0;
   const xpn={base:'classic rules',trial:'Brainjack Taster',exp:'Brainjack Full Set'}[xp];const lv={easy:'Easy',normal:'Normal',hard:'Hard'}[UI.lvl]||'Normal';
   return `<div class="dlg start" role="dialog" aria-modal="true"><h2>Crown City Smash</h2>
-   <p class="lede">Giant monsters brawl for Crown City. Roll dice, smash your rivals and hold Downtown. First to <b>20 ★</b>, or the <b>last monster standing</b>, is crowned.</p>
+   <p class="lede">Giant monsters brawl for Crown City. First to <b>20 ★</b> wins.</p>
    <div class="acts" style="margin:.5rem 0">
     ${typeof tutBtn==='function'&&tutFirst()?tutBtn('btn big'):''}
     <button class="btn primary big" data-start="solo">▶ Play now (recommended)<small>You are ${esc(MONS[UI.mon].n)} against ${UI.n-1} computer monster${UI.n>2?'s':''} · ${lv} · ${xpn}${UI.evo?' + evolutions':''}. Short tips guide your first game.</small></button>
@@ -6899,10 +6908,11 @@ function startScreen(){let saved=load();if(saved&&!saveOK(saved)){saved=null;try
     ${typeof tutBtn==='function'&&!tutFirst()?tutBtn('btn'):''}
     ${saved&&!saved.winner&&saved.pl?`<button class="btn" data-start="load">Continue saved game<small>Round ${saved.turn}, ${saved.pl.length} monsters</small></button>`:''}
    </div>
+   <details class="custom" ${UI.custOpen?'open':''}><summary>Customise ▸ <span class="small muted">rules, expansions, players, other ways to play</span></summary>
    <p style="margin:.3rem 0 .2rem"><b>Your monster</b> <span class="small muted">(tap to choose)</span></p>
    <div class="monpick">${pool.map(k=>`<button class="${UI.mon===k?'on':''}" data-mon="${k}" title="${esc(MONS[k].d)}">${monPic(k)}<span>${esc(MONS[k].n)}${MONS[k].x?' 🧠':''}</span></button>`).join('')}</div>
    <p class="small muted" style="margin:.2rem 0">${esc(MONS[UI.mon].n)}: ${esc(MONS[UI.mon].d)}.</p>
-   <details class="custom" ${UI.custOpen?'open':''}><summary>Customise ▸ <span class="small muted">rules, expansions, players, other ways to play</span></summary>
+
    <div class="row"><b>Game:</b>${[['base','Classic'],['trial','Brainjack Taster'],['exp','Brainjack Full Set']].map(([k,l])=>`<button class="btn ${xp===k?'on':''}" data-xp="${k}">${l}</button>`).join('')}</div>
    <p class="small muted" style="margin:.1rem 0 .3rem">${xp==='base'?'The classic game: best for a first game.':xp==='trial'?'Adds Brainjack tokens (steal another monster\'s roll), 3 new monsters and 24 new cards shuffled into the classic deck.':'Brainjack tokens and 3 new monsters, playing with only the 24 new cards.'}</p>
    <p style="margin:.35rem 0 .15rem"><b>Expansions</b> <span class="small muted">(tap to switch on or off)</span> <button class="btn mini" data-preset="none">None</button><button class="btn mini" data-preset="all">All</button></p>
