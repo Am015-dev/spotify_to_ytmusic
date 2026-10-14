@@ -113,8 +113,8 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
  // grass clumps always + the zone's theme (grove: a tree, garden: a flower bed + hedge bush, wild: a rock or dirt, meadow: flowers, pond zone: reeds)
  for(const[x,z,ux,uz,w,k]of C.VS.get(Math.floor(X0/1000)+'|'+Math.floor(Z0/1000))||[]){for(const sd of[-1,1]){const nx=uz*sd,nz=-ux*sd,u=LF_h(x+sd,z,k),o=w/2+5+u*15,px=x+nx*o,pz=z+nz*o;
    // kerb tufts (art-3): the 2-5 m strip next to the road was always bare green; two grass clumps there, no collider
-   if(LF.lite)for(let j=0;j<2;j++){const ko=w/2+2.2+j*2+LF_h(x,z,120+j+sd)*1.2,kx=x+nx*ko+ux*(j*5-2.5),kz=z+nz*ko+uz*(j*5-2.5);const q=cityAt(kx,kz);if(q&&q.d<q.road.w/2+1.8)continue;
-    if(!roamHit(kx,kz,1.5)&&!inRiver(kx,kz,-2)&&!onAnyDeck(kx,kz)){const s=.9+LF_h(kx,kz,3)*.9;di('tuft',kx,kz,LF_h(kx,kz,4)*6.28,s,s,s,GRN[(k+j)%GRN.length])}}
+   if(LF.lite)for(let j=0;j<4;j++){const ko=w/2+2.2+j*2.6+LF_h(x,z,120+j+sd)*1.2,kx=x+nx*ko+ux*(j*5-2.5),kz=z+nz*ko+uz*(j*5-2.5);const q=cityAt(kx,kz);if(q&&q.d<q.road.w/2+1.8)continue;
+    if(!roamHit(kx,kz,1.5)&&!inRiver(kx,kz,-2)&&!onAnyDeck(kx,kz)){const s=.9+LF_h(kx,kz,3)*.9;if(j===3&&LF_h(kx,kz,5)<.5)di('patch',kx,kz,LF_h(kx,kz,4)*6.28,2.5,1,1.6,DIRT[(k+j)%DIRT.length]);else di('tuft',kx,kz,LF_h(kx,kz,4)*6.28,s,s,s,GRN[(k+j)%GRN.length])}}
    if(roamHit(px,pz,4)||inRiver(px,pz,-3)||onAnyDeck(px,pz)||LF_count(px,pz,6)>0)continue;const q=cityAt(px,pz);if(q&&q.d<q.road.w/2+4)continue;const f=fillAt(px,pz);if(f&&f.d<f.r.w/2+4)continue;
    const a=abAt(px,pz);if(a&&a.d<a.road.w/2+8)continue;if(fra&&typeof biomeAt==='function'&&(biomeAt(px,pz)||{}).g==='air')continue;st.verge=(st.verge||0)+1;
    const zn=LF_n(px,pz),ry=Math.atan2(ux,uz),s=1.2+LF_h(px,pz,3)*1.6;for(let j=0;j<3;j++){const q2=LF_h(px,pz,40+j);di('tuft',px+ux*(q2-.5)*10+nx*(j-1)*3,pz+uz*(q2-.5)*10+nz*(j-1)*3,q2*6.28,s*(.7+q2*.5),s*(.7+q2*.5),s*(.7+q2*.5),GRN[(k+j)%GRN.length])}

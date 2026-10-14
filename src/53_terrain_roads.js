@@ -30,7 +30,7 @@ function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX
 // the tab (sessionStorage, so GO reloads keep it) or for good with localStorage mho_terr=0; ?terr=1 = on again. ?trx=0 / ?trg=0 / ?trc=0 switch one part off
 const TERR={on:(()=>{try{const q=new URLSearchParams(location.search).get('terr');if(q!=null)sessionStorage.setItem('mho_terr',q);return(q??sessionStorage.getItem('mho_terr')??localStorage.getItem('mho_terr'))!=='0'}catch(e){return true}})()};
 // the Athens ground-quadtree cache (10b) is fitted on the TERR raster (tools/qtdump.js after any height change): with ?terr=0 every cell is fitted live
-if(!TERR.on&&typeof QTC!=='undefined')QTC.ok=false;
+if((!TERR.on||window.__qtdump)&&typeof QTC!=='undefined')QTC.ok=false;
 const TR_RK=CID==="fra"?{k:3.6,c:200}:{k:1.4,c:200};
 function TR_relief(h,nx,nz,r){if(!TERR.on||new URLSearchParams(location.search).get('trx')==='0')return;const s=Math.max(1,Math.round(96/r)),cx=Math.ceil(nx/s),cz=Math.ceil(nz/s),C=new Float32Array(cx*cz),N=new Float32Array(cx*cz);
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=((j/s)|0)*cx+((i/s)|0);C[k]+=h[j*nx+i];N[k]++}for(let k=0;k<C.length;k++)C[k]/=N[k]||1;
@@ -39,7 +39,10 @@ function TR_relief(h,nx,nz,r){if(!TERR.on||new URLSearchParams(location.search).
   const A=CID!=='fra'&&typeof HILL_BY!=='undefined'?HILL_BY.akro:null,{k,c}=TR_RK;
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){let fx=Math.min(cx-1.001,Math.max(0,i/s-.5)),fz=Math.min(cz-1.001,Math.max(0,j/s-.5));const a=fx|0,b=fz|0,tx=fx-a,tz=fz-b,q=b*cx+a,
       F=(C[q]*(1-tx)+C[q+1]*tx)*(1-tz)+(C[q+cx]*(1-tx)+C[q+cx+1]*tx)*tz,K=j*nx+i,e=h[K]-F;let m=1;if(A){const v=athHill1(A,WX0+i*r,WZS+j*r);if(v>0)m=Math.max(0,1-v/A.H*3)}
-    h[K]=Math.max(0,h[K]+(k-1)*m*c*Math.tanh(e/c))}}
+    h[K]=Math.max(0,h[K]+(k-1)*m*c*Math.tanh(e/c))}
+  // horizon ridges: the last 1.6 km before the world edge rises up to +70 m (Athens +50 m), uneven along the edge, so hills frame every view
+  const RH=CID==='fra'?70:50,RD=1600;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const d=Math.min(i,nx-1-i,j,nz-1-j)*r;if(d>=RD)continue;const x=WX0+i*r,z=WZS+j*r,t=1-d/RD,
+      n=.55+.25*Math.sin(x/730+1.3)*Math.cos(z/910)+.2*Math.sin((x+z)/410);h[j*nx+i]+=RH*t*t*(3-2*t)*n}}
 // road corridors baked into the raster: each street gets a smooth profile (<= 9.5 % grade, ends pinned at bridges), flat across its width
 // (+ a shoulder of one raster cell, so bilinear lookups on the road see only flat cells), feathered back to the terrain over 3x the cut/fill
 // height (12..40 m). Junctions average the profiles that meet there; 3 passes re-sample the merged surface. Frankfurt filler roads are
