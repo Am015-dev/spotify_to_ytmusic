@@ -257,53 +257,68 @@
  ],
  "hollowbough": [
   {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "hb-hand-chips",
    "name": "Hand chips: readable, tappable",
    "ask": "Tap the glowing hand chip",
    "sizes": "all",
-   "group": "Cards"
+   "group": "Cards",
+   "mut": 0
   },
   {
    "id": "hb-board",
    "name": "Start of game board",
    "ask": "Is the board clear and filled?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
   },
   {
    "id": "hb-zoom",
    "name": "Card zoom",
    "ask": "Is the big card readable?",
    "sizes": "all",
-   "group": "Cards"
+   "group": "Cards",
+   "mut": 0
   },
   {
    "id": "hb-handtoggle",
    "name": "Hide and show the hand",
    "ask": "Tap the hand toggle. Does the row hide?",
    "sizes": "phone",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
   },
   {
    "id": "hb-help",
    "name": "Rules cards",
    "ask": "Can you read the rules card?",
    "sizes": "all",
-   "group": "UI"
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "hb-art",
    "name": "Painted art wired",
    "ask": "Are the resource icons painted?",
    "sizes": "all",
-   "group": "UI"
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
    "sizes": "all",
-   "group": "Story"
+   "group": "Story",
+   "mut": 0
   }
  ],
  "kaiten-kitchen": [
@@ -445,39 +460,60 @@
  ],
  "rampart-and-vine": [
   {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "rv-board",
    "name": "Start of game board",
    "ask": "Is the table clear with glowing spots?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
   },
   {
    "id": "rv-zoom",
    "name": "Tile zoom: place a follower",
    "ask": "Is the zoomed tile and its spots clear?",
    "sizes": "all",
-   "group": "Cards"
+   "group": "Cards",
+   "mut": 0
   },
   {
    "id": "rv-help",
    "name": "Help: how this works",
    "ask": "Can you read the help cards?",
    "sizes": "all",
-   "group": "UI"
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "rv-buttons",
    "name": "Painted buttons keep their labels",
    "ask": "Are the buttons readable?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "rv-art",
+   "name": "Painted pieces, rows and bubble tail",
+   "ask": "Are the pieces painted and coloured?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
    "sizes": "all",
-   "group": "Story"
+   "group": "Story",
+   "mut": 0
   }
  ],
  "sands-of-qamar": [
@@ -678,97 +714,142 @@
  ],
  "thornbound": [
   {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "tb-pc-hand",
    "name": "PC: hand and Great Road",
    "ask": "Do hand and road fill the panel?",
    "sizes": "pc",
-   "group": "Cards"
+   "group": "Cards",
+   "mut": 0
   },
   {
    "id": "tb-story-start",
    "name": "Story after Skip tutorial",
    "ask": "Skip tutorial: is the chapter map next?",
    "sizes": "all",
-   "group": "Story"
+   "group": "Story",
+   "mut": 0
   },
   {
    "id": "tb-board",
    "name": "Start of game board",
    "ask": "Is the board clear and filled?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
   },
   {
    "id": "tb-zoom",
    "name": "Card zoom",
    "ask": "Is the big card readable?",
    "sizes": "all",
-   "group": "Cards"
+   "group": "Cards",
+   "mut": 0
   },
   {
    "id": "tb-help",
    "name": "Help: how this works",
    "ask": "Can you read the help cards?",
    "sizes": "all",
-   "group": "UI"
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "tb-rivals",
    "name": "Rival strip with faction emblems",
    "ask": "Are the rival chips readable?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
   },
   {
    "id": "tb-buttons",
    "name": "Painted buttons keep their labels",
    "ask": "Are the action buttons readable?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "tb-art",
+   "name": "Painted art: menu row and speech tail",
+   "ask": "Do the menu row and tip tail look painted?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
    "sizes": "all",
-   "group": "Story"
+   "group": "Story",
+   "mut": 0
   }
  ],
  "tidewake": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
   {
    "id": "tw-board",
    "name": "Start of game board",
    "ask": "Is the sea chart clear with your tiles?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
   },
   {
    "id": "tw-zoom",
    "name": "Piece detail: your junk",
    "ask": "Is the ship card readable?",
    "sizes": "all",
-   "group": "Cards"
+   "group": "Cards",
+   "mut": 0
   },
   {
    "id": "tw-help",
    "name": "Help: how this works",
    "ask": "Can you read the help cards?",
    "sizes": "all",
-   "group": "UI"
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "tw-buttons",
    "name": "Brass buttons keep their labels",
    "ask": "Are Place and Help buttons readable?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "tw-art",
+   "name": "Painted art: frame, rings, tag, tail, rows",
+   "ask": "Is the board framed, with brass rings?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
    "sizes": "all",
-   "group": "Story"
+   "group": "Story",
+   "mut": 0
   }
  ]
 }
