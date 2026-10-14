@@ -42,8 +42,9 @@ function DMG_impact(v,o){if(!DMG.on||state!=='roam'||RO.wk||(RO.inv||0)>0)return
 DMG.wall=(kmh,deg)=>DMG_impact(kmh*Math.sin((deg??90)*Math.PI/180));
 // collisions → DMG_impact: walls (roamBounce knows the normal speed), traffic (the closing speed), the rest (falls, quest walls) keep their own amount
 roamBounce=(f=>function(ax,sp,nX,nZ){if(!DMG.on)return f.apply(this,arguments);const vx=Math.sin(RO.vh)*RO.v,vz=Math.cos(RO.vh)*RO.v;let X=nX,Z=nZ;if(X==null){if(ax==='x'){X=-(Math.sign(vx)||1);Z=0}else{X=0;Z=-(Math.sign(vz)||1)}}
- DMG.vn=Math.max(0,-(vx*X+vz*Z))*3.6;try{return f.apply(this,arguments)}finally{DMG.vn=null}})(roamBounce);
-roamDamage=(f=>function(d){if(!DMG.on)return f(d);if(DMG.vn!=null)return DMG_impact(DMG.vn);if(d===5||d===12)return DMG_impact(Math.abs(RO.v)*3.6*(d===12?1.3:.8));
+ DMG.vn=Math.max(0,-(vx*X+vz*Z))*3.6;if(nX==null&&!TUNE.terrDmg)DMG.vn=Math.min(DMG.vn,(TUNE.dmgGlance??32)-1);/* race-1: terrain banks / kerbs / water edge (no collider normal) scrub speed and spark but never cost health; buildings, props and traffic do */try{return f.apply(this,arguments)}finally{DMG.vn=null}})(roamBounce);
+roamDamage=(f=>function(d){if(!DMG.on)return f(d);if(DMG.vn!=null)return DMG_impact(DMG.vn);if(d===5&&TUNE.smashDmg!==1)return 0;/* race-1: smashing a car you overtake / clip costs no health (2K: smash = reward); only head-on (12) hurts */if(d===12&&TUNE.smashDmg!==1){if(RO.wk||(RO.inv||0)>0||state!=='roam')return 0;/* head-on traffic smash: flat 4 % scrape + 1.2 s grace (not a 'hit' for lastHit) */RO.hp=Math.max(1,(RO.hp??100)-4/DMG_cls());RO.inv=1.2;DMG.lastHit=performance.now();return 4}
+ if(d===5||d===12)return DMG_impact(Math.abs(RO.v)*3.6*(d===12?1.3:.8));
  if(RO.wk||(RO.inv||0)>0||d<1||state!=='roam')return;RO.hp=Math.max(0,(RO.hp??100)-d/DMG_cls());DMG.lastHit=performance.now();if(RO.hp<=0){DMG.n.boom++;DMG.tBoom=performance.now();DMG_panels(0);roamWreck()}})(roamDamage);
 // per frame (inside roamStep): debris, smoke/fire, repair, rebuilt detection, HUD
 function DMG_step(dt){DMG_debStep(dt);if(!DMG.on)return;const wk=!!RO.wk;if(DMG.wk0&&!wk){DMG.n.rebuilt++;DMG.tReb=performance.now();DMG_panels(0)}DMG.wk0=wk;if(wk)return;
