@@ -37,3 +37,16 @@ html.sk .row:hover{background:url(media/ui-row.webp) center/100% 100% no-repeat;
 html.sk .row.has{background:linear-gradient(rgba(255,236,190,.45),rgba(255,236,190,.45)),url(media/ui-row.webp) center/100% 100% no-repeat}
 
 html.sk.ph #phchip:not([hidden]){border-width:4px!important;padding:6px 8px!important;min-height:44px}
+html.sk .gx-drawer{padding:31px}
+@media (max-width:760px){html.sk .gx-drawer{padding-bottom:calc(31px + env(safe-area-inset-bottom,0px))}}
+html.sk.ph .more{background:#f1e4c4;border-color:#8a6a35}
+html.sk.ph .more .gx-ibtn{color:#2a1a0a}
+html.sk.ph .more .gx-ibtn span,html.sk.ph .more .gx-ibtn b{color:#2a1a0a;opacity:1}
+html.sk.ph .more .gxt-menu.gx-ibtn{padding:12px 16px!important}
+html:has(#moremenu.open) #phview,html:has(#moremenu.open) #phview *,html:has(#moremenu.open) #bfzoom,html:has(#moremenu.open) #bfzoom *{visibility:hidden!important}
+html:has(.gxh-bub.on) #phlabel{visibility:hidden}
+html.sk.ph .more .gxh-set,html.sk.ph .more .gxh-set>span,html.sk.ph .more .gxh-set button{color:#2a1a0a;border-color:#6b4a1a}
+html.sk.ph .more .gxh-set button[aria-pressed=true]{background:#e0a64a;color:#1b1208}
+html.sk .gx-drawer{background-color:#f1e6c8;background-clip:padding-box}
+html.sk .gx-drawer .gxh-set,html.sk .gx-drawer .gxh-set>span,html.sk .gx-drawer .gxh-set button{color:#2a1a0a;border-color:#6b4a1a}
+html.sk .gx-drawer .gxh-set button[aria-pressed=true]{background:#e0a64a;color:#1b1208}
