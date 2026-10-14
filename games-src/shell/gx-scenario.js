@@ -84,7 +84,7 @@
   }
   function MENU_FONTS_OK(f) { return S.MENU_FONTS.indexOf(f) >= 0; }
   S.menuAudit = function () {   // problems on the CURRENT screen
-    var out = [], seen = {}; function add(m) { if (!seen[m] && out.length < 12) { seen[m] = 1; out.push(m); } }
+    var out = [], seen = {}; function add(m) { if (!seen[m] && out.length < 60) { seen[m] = 1; out.push(m); } }
     S.audit().forEach(function (m) { if (!/^text under 11px/.test(m)) add(m); });   // overlap / clipped / covered button / engine
     [].slice.call(document.querySelectorAll('body *')).forEach(function (e) {
       if (/^(SCRIPT|STYLE|NOSCRIPT|OPTION|SVG|PATH)$/i.test(e.tagName) || e.closest(SKIPSEL) || !ownText(e) || !S.vis(e)) return;
@@ -106,10 +106,12 @@
   S.menuReport = {};
   function menuPass() {   // async: walk every surface once, record problems, end on the title
     var l = S.menuList(), chain = Promise.resolve(), seenMsg = {};
+    try { document.fonts.forEach(function (f) { f.load(); }); } catch (e) { }   // every declared face must be fetchable: wait for them all before judging
+    chain = chain.then(function () { return document.fonts && document.fonts.ready; }).catch(function () { });
     l.forEach(function (sf, i) { chain = chain.then(function () { var nm = S.menuOpen(i); return new Promise(function (r) { setTimeout(r, 700); }).then(function () { S.menuReport[sf.name] = S.menuAudit().filter(function (m) { if (seenMsg[m]) return false; seenMsg[m] = 1; return true; }); }); }); });
     return chain.then(function () { S.menuOpen(0); S.menuN = l.length; return new Promise(function (r) { setTimeout(r, 400); }); });
   }
-  function menuCheck(rx, name) { return { kind: 'fn', name: name, fn: function () { var bad = []; Object.keys(S.menuReport).forEach(function (k) { S.menuReport[k].filter(function (m) { return rx.test(m); }).slice(0, 3).forEach(function (m) { bad.push('[' + k + '] ' + m); }); }); return bad.length ? bad.slice(0, 4).join(' | ') + (bad.length > 4 ? ' (+' + (bad.length - 4) + ' more)' : '') : true; } }; }
+  function menuCheck(rx, name) { return { kind: 'fn', name: name, fn: function () { var bad = []; Object.keys(S.menuReport).forEach(function (k) { S.menuReport[k].filter(function (m) { return rx.test(m); }).forEach(function (m) { bad.push('[' + k + '] ' + m); }); }); return bad.length ? 'N=' + bad.length + ' ' + bad.slice(0, 14).join(' | ') : true; } }; }
   S.defs.push({
     id: 'menu', name: 'Menus: clean and readable', ask: 'Is every menu clean and readable?', group: 'UI',
     setup: function () { return menuPass(); },
