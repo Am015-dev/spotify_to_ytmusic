@@ -112,6 +112,10 @@
     var out = []; for (var n = e.firstChild; n; n = n.nextSibling) if (n.nodeType === 3 && /\S/.test(n.nodeValue)) { var r = document.createRange(); r.selectNodeContents(n); [].slice.call(r.getClientRects()).forEach(function (q) { if (q.width > 1 && q.height > 1) out.push(q); }); }
     return out;
   }
+  function scrolledOut(k, q) {   // text that sits outside the visible box of a scrolling ancestor is clipped (not on screen), so it is neither covered nor under the frame
+    for (var a = k; a && a !== document.body; a = a.parentElement) { if (a === k && !/(auto|scroll)/.test(getComputedStyle(a).overflowY)) continue; if (!/(auto|scroll|hidden|clip)/.test(getComputedStyle(a).overflowY)) continue; var r = a.getBoundingClientRect(); if (q.top < r.top - 1 || q.bottom > r.bottom + 1) return true; }
+    return false;
+  }
   function framePx(e, cs) {   // painted frame art (border-image): how far in from each side [top,right,bottom,left] the art reaches; null when the element has none
     if (!cs.borderImageSource || cs.borderImageSource === 'none') return null;
     var bw = [cs.borderTopWidth, cs.borderRightWidth, cs.borderBottomWidth, cs.borderLeftWidth].map(parseFloat), w = sides(cs, 'borderImageWidth'), o = sides(cs, 'borderImageOutset'), r = [];
@@ -130,7 +134,7 @@
         kids.forEach(function (k) {
           var rs = textRects(k); if (/^(IMG|SVG|CANVAS)$/i.test(k.tagName) && k !== e) rs.push(k.getBoundingClientRect());
           rs.forEach(function (q) {
-            if (q.top < r.top - 2 || q.bottom > r.bottom + 2) return;   // scrolled out of the box: not judged here
+            if (q.top < r.top - 2 || q.bottom > r.bottom + 2 || scrolledOut(k, q)) return;   // scrolled out of the box: not judged here
             var t = (k.textContent || k.tagName).trim().slice(0, 20);
             if (q.left < r.left + fr[3] - 1.5) bad.push('left ' + Math.round(r.left + fr[3] - q.left) + 'px: "' + t + '"');
             else if (q.right > r.right - fr[1] + 1.5) bad.push('right ' + Math.round(q.right - (r.right - fr[1])) + 'px: "' + t + '"');
@@ -175,7 +179,7 @@
     var cs = getComputedStyle(t); return !!(hasBg(cs) || (cs.borderImageSource && cs.borderImageSource !== 'none') || ownText(t));
   }
   function coverOf(e) {   // the visible element lying over the text at its left end, centre or right end ("Shady Cloa" cut by the next card), or null. elementFromPoint skips pointer-events:none overlays.
-    var tr = firstLine(e); if (!tr || tr.width < 2 || tr.left < 0 || tr.right > innerWidth || tr.top < 0 || tr.bottom > innerHeight) return null;
+    var tr = firstLine(e); if (!tr || tr.width < 2 || tr.left < 0 || tr.right > innerWidth || tr.top < 0 || tr.bottom > innerHeight || scrolledOut(e, tr)) return null;
     var xs = [tr.left + Math.min(3, tr.width / 4), tr.left + tr.width / 2, tr.right - Math.min(3, tr.width / 4)], y = tr.top + tr.height / 2;
     var sc = null; for (var a = e.parentElement; a && a !== document.body; a = a.parentElement) { var ac = getComputedStyle(a); if (/(auto|scroll)/.test(ac.overflowY) && a.scrollHeight > a.clientHeight + 4) { sc = a; break; } }   // text scrolled under the panel's sticky head is how scrolling works, not a fault
     for (var i = 0; i < 3; i++) { var top = document.elementFromPoint(xs[i], y); if (top && sc && !sc.contains(top)) { var pin = false; for (var z = top; z && z !== document.body; z = z.parentElement) if (/(sticky|fixed|absolute)/.test(getComputedStyle(z).position) && !z.contains(e)) pin = true; if (pin && sc.parentElement && sc.parentElement.contains(top)) continue; } if (top && sc && sc.contains(top) && !top.contains(e)) { var pin2 = false; for (var z2 = top; z2 && z2 !== sc; z2 = z2.parentElement) if (/(sticky|fixed)/.test(getComputedStyle(z2).position)) pin2 = true; if (pin2) continue; } if (top && !related(top, e) && !/^(HTML|BODY)$/.test(top.tagName) && S.vis(top) && !modalLayer(top, e) && paints(top) && !top.closest(SKIPSEL)) return top; }

@@ -15,12 +15,12 @@
 .gxc-small{font-size:13px;margin:6px 0 0;text-align:center}
 .gxc-row{display:flex;gap:8px;justify-content:center;margin-top:14px;width:100%}
 .gxc-row.wrap{flex-wrap:wrap}
-.gxc-btn{min-height:46px;min-width:88px;padding:8px 18px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
+.gxc-btn{min-height:46px;min-width:88px;padding:8px 21px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
 .gxc-btn.go{background:linear-gradient(#dc7a3a,var(--gxc-go));border-color:#8f4317;color:var(--gxc-go-ink);box-shadow:0 3px 0 #7a3712,0 6px 14px rgba(0,0,0,.25);flex:1 1 auto;max-width:220px}
 .gxc-btn.go:active{transform:translateY(2px);box-shadow:0 1px 0 #7a3712}
 .gxc-btn.soft{background:#f7e7b8;border-color:#c9a14a}
 .gxc-btn.ghost{background:rgba(255,255,255,.22)}
-.gxc-ib{min-height:44px;min-width:44px;padding:4px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap}
+.gxc-ib{min-height:44px;min-width:44px;padding:4px 21px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap;flex:0 0 auto}
 .gxc-tag{display:inline-block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
 /* portraits: image or emoji badge in a painted ring */
 .gxc-pt{--gxc-pt:64px;--gxc-ptc:#6b4a2b;width:var(--gxc-pt);height:var(--gxc-pt);flex:0 0 var(--gxc-pt);border-radius:50%;overflow:hidden;display:grid;place-items:center;
