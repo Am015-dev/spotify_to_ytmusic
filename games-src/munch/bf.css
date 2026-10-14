@@ -98,7 +98,7 @@ html.ph-l .hand{padding-top:14px}
 .bfbig{position:relative;display:grid;place-items:center;width:clamp(60px,min(52vw,calc(100cqh - 84px)),220px);aspect-ratio:1;border-radius:50%;border:4px solid var(--c);background:radial-gradient(#4a2412,#1a0904);box-shadow:0 0 0 3px #1a0904,0 10px 24px rgba(0,0,0,.6)}
 .bfbig .bfbav{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .bfbig .bfbstr{position:absolute;bottom:-12px;left:50%;translate:-50% 0;font:900 26px/1 var(--title);color:#ffd76a;background:#2a1208;border:2px solid #ffd76a;border-radius:20px;padding:4px 12px;text-shadow:0 2px 0 #000;white-space:nowrap}
-.bfbig .bfblv{position:absolute;top:-6px;right:-6px;font:800 15px/1 var(--title);color:#1a0d06;background:#ffd76a;border-radius:14px;padding:5px 8px}
+.bfbig .bfblv{position:absolute;top:2px;right:2px;font:800 15px/1 var(--title);color:#1a0d06;background:#ffd76a;border-radius:14px;padding:5px 8px}
 .bfbig[data-bfl]::after{top:auto;bottom:22%;translate:-50% 0}
 .bfcap{position:relative;z-index:3;white-space:normal;overflow-wrap:anywhere;padding:0 4px;font:700 15px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;margin-top:16px;text-align:center;max-width:100%}
 .bfdoor.small{cursor:default;height:clamp(60px,calc(100cqh - 90px),240px);max-width:40%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7)) brightness(.85)}
@@ -161,3 +161,4 @@ html.bf-clipping .arena .row.mons .mon{visibility:hidden}
 @keyframes bfD3{0%{transform:scale(.9);opacity:0}10%{transform:scale(1);opacity:1}24%{transform:scale(1.04) rotate(-1.6deg)}34%{transform:scale(.98) rotate(1.3deg)}46%{transform:scale(1.01) rotate(-.5deg)}100%{transform:rotateY(-82deg) scale(1.08);opacity:0}}
 .bfrev .bfdust{position:absolute;left:50%;bottom:8%;width:34%;aspect-ratio:1;translate:-50% 0;border-radius:50%;background:radial-gradient(circle,rgba(230,205,165,.8),rgba(190,160,120,.35) 55%,rgba(190,160,120,0) 72%);opacity:0;animation:bfDust .7s .3s ease-out both}
 @keyframes bfDust{0%{opacity:.9;transform:translate(0,0) scale(.3)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.5)}}
+.pile.pr .stack .n{right:0}

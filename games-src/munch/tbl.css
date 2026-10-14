@@ -11,6 +11,8 @@
 .opp.seat .snm{grid-column:2;grid-row:1;font:700 13px/1.15 var(--title);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 0 #000;min-width:0}
 .opp.seat .sbd{grid-column:2;grid-row:2;display:flex;gap:7px;font:700 13px/1.15 var(--hand);color:var(--cream2);white-space:nowrap;min-width:0}
 .opp.seat .sw{color:#ffd76a}
+.opp.seat .lb{font-size:11px;font-weight:700;margin-left:2px;opacity:.85;letter-spacing:0}
+html.ph .opp.seat .sbd{gap:5px}
 .opp.seat .sc{color:#c9b4ff}
 .opp.seat .sbd .ic{width:1em;height:1em;vertical-align:-.12em}
 .opp.seat.active{box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),inset 0 0 0 4px #ffd76a,0 0 0 2px #ffd76a,0 0 14px 4px rgba(255,190,70,.5)}
@@ -76,6 +78,7 @@ html.ph .mine .gear:not(:has(.gchip)){min-height:calc(var(--hero) + 4px)!importa
 html.ph .mine .hand{grid-area:hand;display:flex;justify-content:center;align-items:flex-end;overflow:visible;gap:0;padding:calc(var(--hw)*.12 + 12px) 0 4px;height:calc(var(--hw)*1.42 + var(--hw)*.12 + 16px);box-sizing:border-box;scroll-snap-type:none;-webkit-mask-image:none;mask-image:none;position:relative}
 html.ph .mine .hand .card{--w:var(--hw);rotate:var(--rot,0deg);translate:0 calc(var(--arc,0px) - 6px);transform-origin:50% 130%;flex:none;touch-action:none}
 html.ph .mine .hand .card+.card{margin-left:var(--ov,-18px)}
+html.ph .mine .hand .card:not(:last-child) .cn{width:var(--vis,100%);max-width:var(--vis,100%);box-sizing:border-box;margin:0 auto 0 0;padding-left:1px;padding-right:1px;overflow:hidden;overflow-wrap:normal;word-break:normal;hyphens:none;letter-spacing:-.02em}
 html.ph .mine .hand .card.play,html.ph .mine .hand .card.sug{translate:0 calc(var(--arc,0px) - 14px)}
 html.ph .mine .hand .card:hover{rotate:var(--rot,0deg);translate:0 calc(var(--arc,0px) - 6px)}
 html.ph .mine .hand .card.bf-picked{translate:0 -24px!important;rotate:0deg!important;z-index:8}
