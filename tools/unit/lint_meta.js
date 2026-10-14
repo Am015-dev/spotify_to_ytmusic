@@ -48,7 +48,7 @@ module.exports=T=>{
  const K=L.CHECKLIST(),goSrc=L.JSCODE();T.ok(K.length>=100,'count','only '+K.length+' items');
  const keyOf=q=>q.ver+'/'+q.id,keys=K.map(keyOf);
  const dup=keys.filter((k,i)=>keys.indexOf(k)!==i);T.ok(!dup.length,'unique-keys','duplicate '+dup.slice(0,3).join(','));
- let nGo=0;const explicit=new Set();{const re=/['"]([\w.-]+\/[\w.-]+)['"]\s*:\s*\[\s*\{/g;let m;const src=mods['99c_checklist.js'];while((m=re.exec(src)))explicit.add(m[1])}
+ let nGo=0;const explicit=new Set(),loopVer=new Set();{const re=/['"]([\w.-]+\/[\w.-]+)['"]\s*:\s*\[\s*\{/g;let m;const src=mods['99c_checklist.js'];while((m=re.exec(src)))explicit.add(m[1]);const lp=/GO\['([\w.-]+)\/'\+id\]/g;while((m=lp.exec(src)))loopVer.add(m[1])}
  const latest=K[0].ver;const recent=new Set(K.map(q=>q.ver).filter((v,i,a)=>a.indexOf(v)===i).slice(0,2));
  for(const q of K){const k=keyOf(q);
    T.ok(/^v\d+[a-z0-9.-]*$|^[a-z]{2,6}[A-Za-z0-9]*$/.test(q.ver||''),'ver-'+k,'bad ver');
@@ -56,7 +56,7 @@ module.exports=T=>{
    T.ok(typeof q.text==='string'&&q.text.length>=40,'passline-len-'+k,'pass line too short ('+(q.text||'').length+')');
    T.ok(!/\b(TODO|TBD|XXX|lorem)\b/i.test(q.text||''),'no-placeholder-'+k);
    if(q.go!==undefined)T.ok(Array.isArray(q.go),'go-shape-'+k,'go must be an array');
-   if(recent.has(q.ver)&&/📍|GO\b/.test(q.text))T.ok(explicit.has(k)||(q.go&&q.go.length),'go-explicit-'+k,'text promises a GO but no GO target is registered')}
+   if(recent.has(q.ver)&&/📍|GO\b/.test(q.text))T.ok(explicit.has(k)||loopVer.has(q.ver)||(q.go&&q.go.length),'go-explicit-'+k,'text promises a GO but no GO target is registered')}
  T.ok(/const GO=\{/.test(mods['99c_checklist.js']),'go-table-exists');
  T.ok(/for\(const it of OD_CHECKLIST\)\{if\(GO\[k\(it\)\]\)continue/.test(mods['99c_checklist.js']),'go-default-for-all','default GO fallback missing: items without a target would have no 📍');
  // rv: reviewer FAILs must carry an area + pass line

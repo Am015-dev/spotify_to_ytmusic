@@ -58,6 +58,8 @@ function LF_geos(){const g={};
  {const P=[];for(let i=0;i<=6;i++){const r=i/6,k=1-r*r;P.push(new THREE.Vector2(r,k*k))}P.reverse();const d=new THREE.LatheGeometry(P,12).toNonIndexed();d.translate(0,-.02,0);g.mound=colorize(d,new THREE.Color('#ffffff'));g.mound.computeVertexNormals()}
  return g}
 function LF_free(x,z,m){if(roamHit(x,z,m)||inRiver(x,z,-m))return false;const q=cityAt(x,z);if(q&&q.d<q.road.w/2+m)return false;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+m)return false;const a=abAt(x,z);return !(a&&a.d<a.road.w/2+m)&&trailDist(x,z)>=m}
+// every fill piece keeps m metres off the asphalt (street, filler road, Autobahn) and off bridge decks; true = too close (coordinator: bushes on road)
+function LF_offRoad(x,z,m){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+m)return true;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+m)return true;const a=abAt(x,z);return !!(a&&a.d<a.road.w/2+m)||onAnyDeck(x,z)}
 // lite cover needs no collider margin: road / river / Autobahn / trail clearance only (quay walls and plaza edges block LF_free's roamHit(5))
 function LF_liteOk(x,z){if(inRiver(x,z,-3.5))return false;const q=cityAt(x,z);if(q&&q.d<q.road.w/2+3.5)return false;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+3.5)return false;const a=abAt(x,z);return !(a&&a.d<a.road.w/2+6)&&trailDist(x,z)>=3.5}
 // ---- streamed: the fill is NOT built at boot (Athens boot was +5-7 s). Each 1 km tile of the city box is a LAZY region (60_city_build4 lzReg):
@@ -89,8 +91,8 @@ function LF_fit(L,p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,y0=p
 function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=CID==='fra',[X0,X1,Z0,Z1]=L.rect,I={tuft:[],bed:[],patch:[],pond:[],reed:[],mound:[]},st=LF.st;
  const has=t=>!!D[t],pk=a=>{const b=a.filter(has);return b.length?b[Math.floor(LF_h(a.length,b.length,L.props.length)*b.length)]:null},{TREES,ROCK,GRN,DIRT}=C;
  const gy=(x,z)=>groundY(x,z)+LF_mound(x,z),G16=(x,z)=>{const k=Math.floor(x/16)*10000+Math.floor(z/16),e=[x,z];let A=LF.G.get(k);if(!A)LF.G.set(k,A=[]);A.push(e);L.lfG.push([k,e])};
- const P=(t,x,z,ry,y)=>{if(!t||!has(t))return;const m=LF_mound(x,z);L.props.push([t,x,z,ry==null?LF_h(x,z,99)*6.28:ry,m>0?groundY(x,z)+m:y]);G16(x,z);st.props=(st.props||0)+1};
- const di=(t,x,z,ry,sx,sy,sz,c,y)=>{I[t].push({x,y:y==null?gy(x,z):y,z,ry,sx,sy,sz,c});st.n=(st.n||0)+1;if(t!=='tuft'&&t!=='patch'&&t!=='mound')G16(x,z)};
+ const P=(t,x,z,ry,y)=>{if(!t||!has(t)||LF_offRoad(x,z,2.5))return;const m=LF_mound(x,z);L.props.push([t,x,z,ry==null?LF_h(x,z,99)*6.28:ry,m>0?groundY(x,z)+m:y]);G16(x,z);st.props=(st.props||0)+1};
+ const di=(t,x,z,ry,sx,sy,sz,c,y)=>{if(t!=='mound'&&LF_offRoad(x,z,t==='patch'||t==='pond'?Math.max(sx,sz)*.9+.5:t==='bed'?2.6:1.2))return;I[t].push({x,y:y==null?gy(x,z):y,z,ry,sx,sy,sz,c});st.n=(st.n||0)+1;if(t!=='tuft'&&t!=='patch'&&t!=='mound')G16(x,z)};
  let t0=performance.now();const slice=()=>performance.now()-t0>1.2;
  // 1 · open cells of this tile
  const cs=40,cells=[],lite=[];for(let x=X0+cs/2;x<X1;x+=cs){for(let z=Z0+cs/2;z<Z1;z+=cs){if(x<HX0+cs||x>HX1-cs||z<HZS+cs||z>HZN-cs)continue;const jx=x+(LF_h(x,z,1)-.5)*10,jz=z+(LF_h(x,z,2)-.5)*10;
@@ -175,6 +177,15 @@ function LF_goSpot(id){const s=LF.SP[id];if(!s)return'no spot '+id;if(s.c!==CID)
  setTimeout(()=>{const m=LF_metrics(s);m.green=LF_green();m.id=id;m.pass=LF.pass(m);LF.last=m;try{say('',(m.pass?'✅ PASS':'❌ FAIL')+` · flat green ${m.green}% · ${m.props50} props ≤50 m · hills ${m.hRange} m`,4)}catch(e){}},2500);
  return'📍 '+s.n.toUpperCase()+' · measuring in 2.5 s'}
 Object.assign(window.__lvf,{goSpot:LF_goSpot,green:LF_green,SP:LF.SP});
+// road-clear check (coordinator 2026-10-14 "bushes on road"): every fill piece (decor instances + fill props) within r m of (cx,cz) that stands on a
+// road surface (street, filler road, Autobahn, bridge deck: inside the asphalt edge + 0.5 m). Pass = 0.
+function LF_onRoad(x,z){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+.5)return'street';const f=fillAt(x,z);if(f&&f.d<f.r.w/2+.5)return'filler';const a=abAt(x,z);if(a&&a.d<a.road.w/2+.5)return'autobahn';return onAnyDeck(x,z)?'deck':''}
+function LF_roadCheck(cx,cz,r){const M4=new THREE.Matrix4(),P=new THREE.Vector3(),bad=[];let n=0;const chk=(x,z,t)=>{if((x-cx)**2+(z-cz)**2>r*r)return;n++;const w=LF_onRoad(x,z);if(w)bad.push([t,Math.round(x),Math.round(z),w])};
+  for(const m of LF.ms||[]){if(!m.parent)continue;const t=m.userData.lf;if(t==='mound')continue;for(let i=0;i<m.count;i++){m.getMatrixAt(i,M4);P.setFromMatrixPosition(M4);chk(P.x,P.z,t)}}
+  for(const L of(typeof LAZY!=='undefined'?LAZY:[]))if(L.lf&&L.done)for(const p of L.props||[])chk(p[1],p[2],p[0]);return{n,bad:bad.length,ex:bad.slice(0,6)}}
+function LF_goRoad(){const s=LF.SP[CID==='fra'?'fra-2':'ath-1'];LF_go(s);LF_ensure(s.x,s.z,900);LF.lastR=null;setTimeout(()=>{const m=LF_roadCheck(RO.x,RO.z,900);m.pass=m.bad===0&&m.n>500;LF.lastR=m;
+  try{say('',(m.pass?'✅ PASS':'❌ FAIL')+` · ${m.bad} fill pieces on a road (of ${m.n} within 900 m)`,4)}catch(e){}},1500);return'📍 FILL OFF THE ROADS · checking 900 m around'}
+Object.assign(window.__lvf,{roadCheck:LF_roadCheck,goRoad:LF_goRoad});
 // mound GO: the nearest grass hill with a clear 50 m run-up (no building, road edge or water on the line); the car is parked 40 m before its centre
 // facing it. You (or the test) drive at it: PASS = the car climbs ≥ 60% of the hill's height, passes within r/3 of the top and never stalls (< 2 m/s after 1.5 s of gas).
 function LF_goMound(){LF_ensure(RO.x,RO.z,900);let best=null,bd=1e18;for(const m of LF.M){const d=(m.x-RO.x)**2+(m.z-RO.z)**2;if(d>=bd)continue;for(let k=0;k<8;k++){const a=k*Math.PI/4,sx=m.x-Math.sin(a)*(m.r+40),sz=m.z-Math.cos(a)*(m.r+40);let ok=true;

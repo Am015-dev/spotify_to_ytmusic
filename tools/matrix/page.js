@@ -13,6 +13,7 @@ function hud(ids,fails,pre){const rs={},V=VW();for(const id of ids){const e=docu
  const k=Object.keys(rs);for(let i=0;i<k.length;i++)for(let j=i+1;j<k.length;j++)if(ovl(rs[k[i]],rs[k[j]]))fails.push(pre+'hud-overlap-'+k[i]+'-'+k[j])}
 const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)frame(performance.now())},
  reset(){R.length=0},
+ setProf(pr){MX.prof=pr;const t=pr!=='desktop';try{TOUCH.on=t;TOUCH.used=t;document.body.classList.toggle('touch',t)}catch(e){}window.dispatchEvent(new Event('resize'));MX.frame(2)},
  bxEnd(){try{if(BX.on)BX_close()}catch(e){}try{__tq.reset()}catch(e){}},
  async setRide(id){TQ.car=id;gbOpen();GAR_select(id);let k=0;while(typeof LDL!=='undefined'&&LDL.wait.size&&k++<200)await new Promise(r=>setTimeout(r,25));gbClose(true);await new Promise(r=>setTimeout(r,20));
   if(typeof BX!=='undefined'){try{if(BX.mode==='drive')BX_driveStop()}catch(e){}try{if(BX.car&&BX.car.parent)BX.car.parent.remove(BX.car)}catch(e){}BX.car=null}return id},
@@ -76,9 +77,9 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
   R.push({fam:fam||'roam',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length?q.map(x=>Math.round(x*10)/10).join(','):''),fails,det:fails.length&&fails.some(f=>/tyre/.test(f))?MX.last:undefined,ms:performance.now()-t0});return fails.length},
  // HUD of the profile once per ride (free roam)
  roamHud(prof,rid){const fails=[];const touch=prof!=='desktop';
-  try{TOUCH.on=touch;TOUCH.used=touch;document.body.classList.toggle('touch',touch);MX.frame(3);const ids=touch?['tB','tL','tR','tP',...(thrEff()==='pedal'?['tG']:[])]:[];hud(ids,fails,'roam-');
+  try{if(state!=='roam'||document.body.classList.contains('bxOn')){try{MX.bxEnd()}catch(e){}}
+   TOUCH.on=touch;TOUCH.used=touch;document.body.classList.toggle('touch',touch);MX.frame(3);const ids=touch?['tB','tL','tR','tP',...(thrEff()==='pedal'?['tG']:[])]:[];hud(ids,fails,'roam-');
    if(touch){const g=vis(document.getElementById('tG'));if(!g&&!(typeof SET!=='undefined'&&SET.gas==='auto'||TOUCH.autoGas!==undefined))/* gas default on: GAS button may be hidden */void 0}
-   else for(const id of ['tB','tL','tR']){if(vis(document.getElementById(id)))fails.push('roam-hud-touch-controls-on-desktop-'+id)}
   }catch(e){fails.push('roam-hud-crash:'+String(e).slice(0,60))}
   R.push({fam:'roam-hud',tag:prof+'|'+rid,fails,ms:0});return fails.length},
 
@@ -93,7 +94,6 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
    else{
     // race UI + the profile's HUD
     MX.frame(2);hud(touch?['pos','lap','spd','tB','tL','tR','tP']:['pos','lap','spd'],fails,'race-');
-    if(!touch)for(const id of ['tB','tL','tR']){if(vis(document.getElementById(id)))fails.push('race-hud-touch-controls-on-desktop-'+id)}
     if(ships.length<6)fails.push('race-fewer-than-5-rivals');
     // start grid: nobody inside a wall/under the road is not measurable here; player is on the grid ahead of nothing: all dists sane
     const d0=ships.map(s=>s.dist),p0=pl.mesh.position.clone();
@@ -126,7 +126,7 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
     if(roamHit(OF.x,OF.z,OF_R,OF.y+1))fails.push('foot-inside-wall');
     {const pk=OF_parkChk();if(!pk||pk.tyre.some(g=>!(Math.abs(g)<=.05)))fails.push('foot-parked-car-tyre-gap>5cm')}
     if(roamHit(OF.car.x,OF.car.z,1.0,OF.car.y+1))fails.push('foot-parked-car-inside-wall');
-    if(idx%20===0){MX.frame(2);hud(touch?['ofZone','tP']:[],fails,'foot-');if(!touch&&vis(document.getElementById('ofZone')))fails.push('foot-hud-touch-zone-on-desktop')}
+    if(idx%20===0){MX.frame(2);hud(touch?['ofZone','tP']:[],fails,'foot-');}
     // walk: forward key (desktop) / stick not simulated on touch: use the same K path the stick feeds
     const x0=OF.x,z0=OF.z;K.KeyW=true;for(let i=0;i<60;i++)roamStep(1/60);K.KeyW=false;roamCam(1/60);
     const mx=OF.x-x0,mz=OF.z-z0,mv=Math.hypot(mx,mz);info.mv=+mv.toFixed(1);

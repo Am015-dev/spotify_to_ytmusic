@@ -221,8 +221,8 @@ function OF_settle(){const C=OF.car;if(!C||!C.own||!pl||!pl.mesh||(pl.boatK||0)>
   {const ud=pl.mesh.userData,f=new THREE.Vector3(Math.sin(C.h),0,Math.cos(C.h)),u=new THREE.Vector3(0,1,0);ud.m.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3().crossVectors(f,u),u,f.clone().negate()))}
   // real wheels (userData.r) when the ride has them: wheels back to rest height, pitch/roll from the ground under each tyre, lowest tyre bottom CR_TYRE_Y above the road, then each wheel drops/rises ≤ 4 cm onto the road (box corners only as a fallback)
   const ud=pl.mesh.userData,W=[];ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let v=true,q=w;while(q&&q!==ud.m){if(!q.visible)v=false;q=q.parent}if(v)W.push(w)});
-  // the tyre bottom is the wheel mesh's real world box (its geometry is not always centred on its origin: the Hot Rod's tyres hung 14 cm below origin − r·scale, so the old centre-minus-radius settle sank them into the road)
-  const tyre=()=>{pl.mesh.updateMatrixWorld(true);return W.map(w=>{const b=OF_wbx.setFromObject(w),p=b.getCenter(new THREE.Vector3()),sc=w.getWorldScale(new THREE.Vector3()).y,g=groundAt(p.x,p.z,b.min.y+1);return{w,p,sc,g,d:b.min.y-g}})};
+  // the tyre bottom is the wheel mesh's PRECISE world box (vertex-based: the default Box3 is the AABB of the rotated geometry box and reads up to 40 % too deep on a spun wheel)
+  const tyre=()=>{pl.mesh.updateMatrixWorld(true);return W.map(w=>{const b=OF_wbx.setFromObject(w,true),p=b.getCenter(new THREE.Vector3()),sc=w.getWorldScale(new THREE.Vector3()).y,g=groundAt(p.x,p.z,b.min.y+1);return{w,p,sc,g,d:b.min.y-g}})};
   if(W.length>=3){for(const w of W){if(w.userData.by!=null)w.position.y=w.userData.by}let T=tyre();const fx=Math.sin(C.h),fz=Math.cos(C.h);
    const lf=t=>(t.p.x-C.x)*fx+(t.p.z-C.z)*fz,ls=t=>(t.p.x-C.x)*fz-(t.p.z-C.z)*fx,F=T.filter(t=>lf(t)>0),Bk=T.filter(t=>lf(t)<=0),L=T.filter(t=>ls(t)>0),R=T.filter(t=>ls(t)<=0),av=(A,f)=>A.reduce((a,t)=>a+f(t),0)/A.length,gy=t=>t.g;// the road under each tyre (was p.y−d = road + tyre radius: bigger rear wheels pitched the parked car nose-down)
    
@@ -237,7 +237,7 @@ OF_exit=(f=>function(){const r=f.apply(this,arguments);OF.stT=0;OF_settle();setT
 // park check (v90k/park-sit): visible tyres' bottom − road, body (non-wheel) bottom − road at the 8 CR_bodyPts, and the car's pitch/roll minus the road's slope under it (degrees)
 function OF_parkChk(){if(!pl||!pl.mesh)return null;const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);const A=new THREE.Vector3(),S=new THREE.Vector3(),W=[];
   ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let v=true,q=w;while(q&&q!==ud.m){if(!q.visible)v=false;q=q.parent}if(v)W.push(w)});
-  const tyre=W.map(w=>{const b=OF_wbx.setFromObject(w);b.getCenter(A);return +(b.min.y-groundAt(A.x,A.z,b.min.y+1)).toFixed(3)});// real tyre bottom = the wheel mesh's world box (origin − r·scale was 14 cm off on the Hot Rod)
+  const tyre=W.map(w=>{const b=OF_wbx.setFromObject(w,true);b.getCenter(A);return +(b.min.y-groundAt(A.x,A.z,b.min.y+1)).toFixed(3)});// real tyre bottom = the wheel mesh's world box (origin − r·scale was 14 cm off on the Hot Rod)
   CR_PS.k='';let body=9;for(const p of CR_bodyPts(ud)){A.copy(p).applyMatrix4(ud.m.matrixWorld);body=Math.min(body,A.y-groundAt(A.x,A.z,A.y+1.5))}
   const C=OF.car||{x:RO.x,z:RO.z,h:RO.h,y:RO.y},h=C.h,fx=Math.sin(h),fz=Math.cos(h),g=(a,b)=>groundAt(C.x+fx*a+fz*b,C.z+fz*a-fx*b,(C.y||0)+1.5);
   const f=new THREE.Vector3(fx,0,fz),r=new THREE.Vector3(fz,0,-fx),up=new THREE.Vector3(0,1,0).applyQuaternion(ud.m.getWorldQuaternion(new THREE.Quaternion())),D=180/Math.PI;
@@ -379,9 +379,9 @@ function OF_propAt(x,z,y,r){const PG=HUB.pgrid,D=HUB.ptypes;if(!PG||!D)return nu
   for(const p of L){if(!p.alive)continue;const d=D[p.t];if(!d||Math.abs((p.y||0)-y)>2)continue;if(Math.hypot(x-p.x,z-p.z)<Math.max(.15,Math.min(1.1,d.r*.45))+r)return p}}return null}
 function OF_clear(x,z,y){return!roamHit(x,z,OF_R+.25,y+1)&&!(CID==='fra'&&inRiver(x,z))&&Math.abs(groundAt(x,z,y+1)-y)<.5&&!OF_propAt(x,z,y,.6)}
 function OF_pave(far){const N=HUB.nodes;if(!N)return null;const L=[];for(let i=0;i<N.length;i++){const A=N[i];if(!A||A.ab||!A.nb||!A.nb.length)continue;const d=Math.hypot(A.x-RO.x,A.z-RO.z);if(d<=(far||300))L.push([d,i])}L.sort((a,b)=>a[0]-b[0]);
-  for(const[,i]of L.slice(0,150)){const A=N[i];for(const j of A.nb){const B=N[j];if(!B||B.ab||A.g&&B.g)continue;const len=Math.hypot(B.x-A.x,B.z-A.z);if(len<40)continue;const dx=(B.x-A.x)/len,dz=(B.z-A.z)/len,W=Math.min(A.w||20,B.w||20);
-    for(const sd of[1,-1]){const off=sd*(W/2+(CID==='fra'?3.2:2.1)),t0=8/len,mx=A.x+(B.x-A.x)*t0,mz=A.z+(B.z-A.z)*t0,x=mx-dz*off,z=mz+dx*off,y=groundAt(x,z,99),rx=dz*sd,rz=-dx*sd;let ok=true;
-      for(let s=0;s<=16&&ok;s++)ok=OF_clear(x+dx*s,z+dz*s,groundAt(x+dx*s,z+dz*s,y+1));for(let s=1;s<=3&&ok;s++)ok=OF_clear(x+rx*s,z+rz*s,groundAt(x+rx*s,z+rz*s,y+1));
+  for(const[,i]of L.slice(0,150)){const A=N[i];for(const j of A.nb){const B=N[j];if(!B||B.ab||CID==='fra'&&A.g&&B.g)continue;/* every Athens node is g:1 (generic) */const len=Math.hypot(B.x-A.x,B.z-A.z);if(len<(CID==='fra'?40:6))continue;/* Athens nodes are ~10 m apart */const dx=(B.x-A.x)/len,dz=(B.z-A.z)/len,W=Math.min(A.w||20,B.w||20);
+    for(const sd of[1,-1]){const off=sd*(W/2+(CID==='fra'?3.2:2.1)),t0=Math.min(8/len,1),mx=A.x+(B.x-A.x)*t0,mz=A.z+(B.z-A.z)*t0,x=mx-dz*off,z=mz+dx*off,y=groundAt(x,z,99),rx=dz*sd,rz=-dx*sd;let ok=true;
+      /* foot-2: a hilly pavement must pass: each metre is compared with the previous one (≤ 0.5 m step), not with the start (a 4 % grade over 16 m failed every Athens street) */let py=y;for(let s=0;s<=16&&ok;s++){const gy=groundAt(x+dx*s,z+dz*s,py+1);ok=OF_clear(x+dx*s,z+dz*s,py);py=gy}py=y;for(let s=1;s<=3&&ok;s++){const gy=groundAt(x+rx*s,z+rz*s,py+1);ok=OF_clear(x+rx*s,z+rz*s,py);py=gy}
       if(ok)return{x,z,y,h:Math.atan2(dx,dz),rx,rz,cx:mx-dz*sd*W/4,cz:mz+dx*sd*W/4}}}}return null}
 // car parked at (cx,cz) heading h, minifig on foot at (x,z) heading fh (default h), camera behind
 function OF_spawn(P,fx,fz,fh){if(!roamWarp(P.cx,P.cz,P.h,true))return false;OF_poseCar(RO.x,RO.z,RO.y,RO.h);OF.idle=1;OF_exit();const T=OF.tw;RO.foot='walk';OF.tw=null;OF.x=fx??P.x;OF.z=fz??P.z;OF.y=groundAt(OF.x,OF.z,RO.y+2);OF.h=fh??P.h;
@@ -462,7 +462,7 @@ document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.cl
 // ---- sink audit (cam-2, 2026-10-14; Alex beta.25: the yellow semi cab and the dark-blue Hot Rod sat half under the asphalt after he stepped out in Hot Drop).
 // OF_sinkChk = the parked ride vs the road under every tyre: each real wheel mesh's WORLD BOX bottom (not origin − radius: the geometry is not centred on the origin) and the body box corners; gap > 0 = float, < 0 = sunk (m).
 function OF_sinkChk(){if(!pl||!pl.mesh)return null;const ud=pl.mesh.userData,W=[];ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;for(let q=w;q&&q!==ud.m;q=q.parent)if(!q.visible)return;W.push(w)});pl.mesh.updateMatrixWorld(true);
-  const g=[];for(const w of W){const b=new THREE.Box3().setFromObject(w),c=b.getCenter(new THREE.Vector3());g.push(b.min.y-groundAt(c.x,c.z,b.min.y+1))}
+  const g=[];for(const w of W){const b=new THREE.Box3().setFromObject(w,true),c=b.getCenter(new THREE.Vector3());g.push(b.min.y-groundAt(c.x,c.z,b.min.y+1))}
   const P=OF_corners(),c=P?P.map(p=>p.y-groundAt(p.x,p.z,p.y+1)):[],mx=a=>a.length?+Math.max(...a).toFixed(3):null,mn=a=>a.length?+Math.min(...a).toFixed(3):null;
   return{nW:W.length,wMax:mx(g),wMin:mn(g),cMax:mx(c),cMin:mn(c)}}
 const OF_sinkOk=r=>!r.err&&(r.wMax==null||(r.wMax<=.05&&r.wMin>=-.03))&&(r.cMin==null||r.cMin>=-.03)&&(r.nW>0||r.cMax!=null);
@@ -482,3 +482,14 @@ async function OF_sitAll(max){const W=ms=>new Promise(r=>setTimeout(r,ms));if(st
     const e=performance.now()+3000;while(performance.now()<e&&!(OF.sit&&OF.sit.t>=1))await W(50);await W(60);const r=OF_sitChk();n++;if(!r.ok)fails.push(Object.assign({x:Math.round(q.x),z:Math.round(q.z)},r));OF.sit=null}
   return{n,bad:fails.length,fails:fails.slice(0,8)}}
 window.OF_sitAll=OF_sitAll;
+// ---- checklist GOs (cam-2, 2026-10-14). sink: pick the ride in the garage, start Hot Drop (the cutscene skipped: M1.noScene runs its end(), the touchdown pose), drive 2 s, step out, and
+// check the parked ride's tyres (precise wheel boxes) 0..5 cm above the road and the body not below it. sit: SIT on the 3 nearest benches, OF_sitChk each.
+async function OF_pickRide(id){const W=ms=>new Promise(r=>setTimeout(r,ms));try{if(GAR_get().sel===id)return true;gbOpen();GAR_select(id)}catch(e){return false}await W(250);
+  const e=performance.now()+20000;while(performance.now()<e&&typeof LDL!=='undefined'&&LDL.wait.size)await W(60);try{gbClose(true)}catch(e){return false}await W(300);return true}
+async function OF_sinkRun(id){const W=ms=>new Promise(r=>setTimeout(r,ms));if(!await OF_pickRide(id))return'❌ FAIL '+id+': cannot pick the ride';try{OF_reset();if(RO.ch)chAbort()}catch(e){}
+  const ns=M1.noScene;M1.noScene=true;try{M1_startHotDrop()}finally{M1.noScene=ns}await W(1500);OF_exit();for(let i=0;i<50&&RO.foot!=='walk';i++)await W(100);await W(1200);
+  const p=OF_parkChk();try{OF_enter(OF_cars(false).find(k=>k.k==='cur'))}catch(e){}if(!p||!p.tyre.length)return'❌ FAIL '+id+': no wheels measured';const lo=Math.min(...p.tyre),hi=Math.max(...p.tyre),ok=lo>=-.02&&hi<=.05&&p.body>=-.02;
+  return(ok?'✅ PASS ':'❌ FAIL ')+'HOT DROP EXIT · '+id+' · '+p.tyre.length+' tyres '+lo+'..'+hi+' m above the road (0..0.05) · body '+p.body+' m'}
+function OF_sinkGo(id,say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sinkRun(id).then(say);return'📍 HOT DROP EXIT · '+id+' · starting…'}
+async function OF_sitRun(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';const r=await OF_sitAll(3);return r.err?'❌ FAIL '+r.err:(r.bad?'❌ FAIL ':'✅ PASS ')+'SIT · '+r.n+' benches: '+(r.bad?JSON.stringify(r.fails):'legs on the seat, back to the backrest, facing away')}
+function OF_sitGo(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sitRun().then(say);return'📍 SIT · the 3 nearest benches · running…'}
