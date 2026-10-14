@@ -1,14 +1,7 @@
 {
 "phone": {
 "look": [],
-"axe": [
-[
-"si-zoom-phone.json",
-"color-contrast",
-".cards > h2",
-"Card list"
-]
-],
+"axe": [],
 "axe_pages": [
 "menu-phone.json",
 "si-art-phone.json",
