@@ -114,63 +114,72 @@
    "name": "Tutorial: ask for help",
    "ask": "Can you read the Help button?",
    "sizes": "all",
-   "group": "UI"
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "dk-fight-bonus",
    "name": "Fight with bonuses",
    "ask": "Is YOU vs MONSTERS big and clear?",
    "sizes": "all",
-   "group": "UI"
+   "group": "UI",
+   "mut": 4
   },
   {
    "id": "dk-boss-reveal",
    "name": "Boss clip, then the card",
    "ask": "Boss clip, roar, then the monster card?",
    "sizes": "all",
-   "group": "Bosses"
+   "group": "Bosses",
+   "mut": 2
   },
   {
    "id": "dk-board",
    "name": "Start of game board",
    "ask": "Is the table clear, with Help and Run?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 2
   },
   {
    "id": "dk-zoom",
    "name": "Big card zoom",
    "ask": "Is the big card readable?",
    "sizes": "all",
-   "group": "Cards"
+   "group": "Cards",
+   "mut": 1
   },
   {
    "id": "dk-status-line",
    "name": "Short drag/tap status line",
    "ask": "Is the line short and does it match?",
    "sizes": "phone",
-   "group": "Board"
+   "group": "Board",
+   "mut": 1
   },
   {
    "id": "dk-tips",
    "name": "Lightbulb, tips, rules cards, Tips switch",
    "ask": "Do tips, bulb and rules cards work?",
    "sizes": "all",
-   "group": "UI"
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "dk-art",
    "name": "Painted icons and 3D heroes",
    "ask": "Are the new icons and hero figures in place?",
    "sizes": "all",
-   "group": "Art"
+   "group": "Art",
+   "mut": 3
   },
   {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
    "sizes": "all",
-   "group": "Story"
+   "group": "Story",
+   "mut": 0
   }
  ],
  "final-approach": [
