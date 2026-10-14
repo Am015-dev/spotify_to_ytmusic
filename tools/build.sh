@@ -17,6 +17,7 @@ cp src/assets/km.js "$OUT/km.js"
 python3 tools/ld/mkmodels.py "$OUT" || { echo "BUILD FAIL: models"; exit 1; }
 for f in "$OUT"/models/*.js; do node --check "$f" || { echo "BUILD FAIL: $f syntax"; exit 1; }; done
 node --check "$OUT/models.js" || { echo "BUILD FAIL: models.js syntax"; exit 1; }
+bash tools/as/pack.sh "$OUT" || { echo "BUILD FAIL: models/as.js (asset-1 world assets)"; exit 1; }   # asset-1 trees/bushes, loaded only with ?asset=1
 # published tuning (TUNE drawer, docs/TUNE.md): the page fetches ./tune.json next to itself; deploy.sh copies it when present
 [ -f src/assets/tune.json ] && cp src/assets/tune.json "$OUT/tune.json"
 # music tracks (98m_music.js streams music/<name>.mp3 next to the page; deploy.sh copies out/<ver>/music/)
