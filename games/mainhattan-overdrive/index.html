@@ -756,6 +756,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.49',date:'14 Oct 2026',items:[{t:'FIXED',s:'Athens loads faster; touch controls come back after the garage on hybrid devices.'}]},
   {v:'v90m-beta.48',date:'14 Oct 2026',items:[{t:'NEW',s:'Low-rise streets are lined with LEGO-set buildings on plinths.'}]},
   {v:'v90m-beta.47',date:'14 Oct 2026',items:[{t:'FIXED',s:'Sitting on a bench keeps you upright; the Hot Drop card closes when you park.'}]},
   {v:'v90m-beta.46',date:'14 Oct 2026',items:[{t:'FIXED',s:'The roam camera never dips under the terrain.'}]},
@@ -1533,7 +1534,7 @@ function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c
 // XCV = chunk name -> content hash, filled by tools/build.sh (empty in a raw src/ page: then nothing is lazy). A chunk may export top-level names
 // (module list "name:a,b" in src/LAZY): the page declares `let a,b;` stubs, the chunk's last expression is ({a,b}) and XC.apply[name] copies them over.
 // Eager code must not touch a chunk's names at boot; use XC.done / XC_need(name) first. Tests: __tq.ready also waits for XC.done.
-const XCV=/*XCV*/{"99c_checklist":"d99e7cba","10c_qtc_blob":"ede9840f","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"6e0146fc","10c_qtc_blob":"ede9840f","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -3112,7 +3113,7 @@ const bzEnd=e=>{for(const t of e.changedTouches)if(t.identifier===TOUCH.bz){TOUC
 addEventListener('touchstart',()=>{if(SET.touch==='tilt')tiltOn()},{passive:true});
 tb('#tP',()=>togglePause(),()=>{});
 tb('#tB',e=>{const n=e&&e.timeStamp||performance.now();if(TOUCH.park){parkSet(false);TOUCH.bT=n;return}if(state==='roam'&&n-(TOUCH.bT||-1e9)<320&&Math.abs(RO.v)<4.2){parkSet(true);TOUCH.bT=-1e9;return}TOUCH.bT=n;TOUCH.brake=true},()=>TOUCH.brake=false);tb('#tG',()=>{TOUCH.gas=true;if(TOUCH.park)parkSet(false)},()=>TOUCH.gas=false);tb('#tD',()=>TOUCH.hb=true,()=>TOUCH.hb=false);tb('#tF',()=>pressed.fire=true,()=>{});tb('#tN',()=>TOUCH.boost=true,()=>TOUCH.boost=false);
-addEventListener('touchstart',()=>{TOUCH.on=true;document.body.classList.add('touch')},{passive:true});
+addEventListener('touchstart',()=>{TOUCH.on=true;document.body.classList.add('touch');/* cam-3: the touch layer was hidden by a garage close / mission end while TOUCH.on was still false (first input = mouse/keys, then touch): show it again in free roam */try{if(state==='roam'&&RO.on&&!RO.card&&!RO.mapOpen&&!RO.story&&$('#gbx').hidden&&$('#touch').hidden)$('#touch').hidden=false}catch(e){}},{passive:true});
 {const unlock=()=>{try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}AU.init();const a=AU.a;if(!a)return;if(a.state!=='running')a.resume();try{const b=a.createBuffer(1,1,22050),s=a.createBufferSource();s.buffer=b;s.connect(a.destination);s.start(0)}catch(e){}if(!AU.tag){try{const t=AU.tag=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');t.setAttribute('playsinline','');t.play().catch(()=>{})}catch(e){}}if(a.state==='running'){removeEventListener('touchend',unlock,true);removeEventListener('click',unlock,true)}};addEventListener('touchend',unlock,true);addEventListener('click',unlock,true);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&AU.a&&AU.a.state!=='running'){addEventListener('touchend',unlock,true);addEventListener('click',unlock,true)}})}
 function parkSet(on){TOUCH.park=!!on;TOUCH.brake=false;document.body.classList.toggle('parked',TOUCH.park);const b=$('#tB');if(b)b.textContent=TOUCH.park?'GO ▶':'BRAKE';const c=$('#roamPark');if(c)c.hidden=!TOUCH.park;if(on)AU.sfx&&AU.sfx('pick')}
 function togglePause(force){if(state==='roam'){if(!$('#settings').hidden){closeSettings();return}if($('#roamPause')){if($('#roamPause').hidden)roamPauseOpen();else roamPauseClose();return}RO.frozen=true;openSettings();return}if(!(state==='race'||state==='countdown'||state==='finished'))return;paused=force===true?true:!paused;$('#pause').hidden=!paused;if(paused){AU.engine(pl,0,false);AU.scrape(false);$('#resBtn').focus()}}
@@ -8410,7 +8411,7 @@ function CV_put(E,U,x,z,ry,c,s,fr){const k=U.k,h0=CV_h(x,z),h1=CV_h(x,z,1),h2=CV
   kif=k==='poly'&&q&&q.d<q.road.w/2+32&&/kifis/i.test((q.road.name||'')+(q.road.id||'')),dn=districtAt(x,z)||'';let deco=0,pal=CV_AP[kif?'glass':k]||CV_AP.poly;
   // art-3 BV: facade texture + roof type, least used within 100 m (facade first, then the facade+roof combination)
   if(BV.on&&!kif){const F=k==='poly'?['','2','3','4']:k==='neo'?['','2']:['','2','3'],R=k==='poly'?['flat','garden','tank','pent']:k==='neo'?['corn','ped']:k==='villa'?['tile','tileB','flat']:['tile','tileB','terr'];
-    U.fv=BV_pick(F.map(f=>k+f),x,z,3,'fac').slice(k.length);U.rf=BV_pick(R.map(r=>k+U.fv+'/'+r),x,z,5).split('/')[1]}
+    const BC=BV_near2(x,z);U.fv=BV_pick(F.map(f=>k+f),x,z,3,'fac',null,BC.f).slice(k.length);U.rf=BV_pick(R.map(r=>k+U.fv+'/'+r),x,z,5,undefined,null,BC.k).split('/')[1]}
   if(k==='poly')U.fl=(f=>typeof OC_fix==='function'?OC_fix({...U,fl:f},x,z).fl:f)(kif?7+Math.floor(h0*6):Math.max(3,Math.min(9,U.fl+[-1,0,0,1,2][Math.floor(h0*5)])));else if(k==='neo'&&!/Plaka/.test(dn))U.fl=Math.max(2,Math.min(4,U.fl+(h0<.3?1:0)));
   let ci=Math.floor(h1*pal.length),P=CV.last;if(P&&Math.hypot(P[0]-x,P[1]-z)<30&&P[2]===U.fl&&P[3]===pal[ci])ci=(ci+1)%pal.length;U.cvc=hx(pal[ci]);
   const{w,d,fh}=U,fl=U.fl,h=fl*fh+(k==='villa'?.4:.6);
@@ -14934,6 +14935,16 @@ async function OF_rampRun(){const W=ms=>new Promise(r=>setTimeout(r,ms));if(!awa
 function OF_sinkGo(id,say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sinkRun(id).then(say);return'📍 HOT DROP EXIT · '+id+' · starting…'}
 async function OF_sitRun(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';const r=await OF_sitAll(3);return r.err?'❌ FAIL '+r.err:(r.bad?'❌ FAIL ':'✅ PASS ')+'SIT · '+r.n+' benches: '+(r.bad?JSON.stringify(r.fails):'legs on the seat, back to the backrest, facing away')}
 function OF_sitGo(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sitRun().then(say);return'📍 SIT · the 3 nearest benches · running…'}
+// cam-3: touch buttons after ride switches. Phone: 3 consecutive garage switches; hybrid: switch while TOUCH.on is still false (mouse/keys first), then the first real touch must bring the 5 buttons back.
+function OF_hudVis(){const o={};for(const id of['tB','tL','tR','tP','tG']){const e=document.getElementById(id);let ok=!!e;if(e){const r=e.getBoundingClientRect();for(let a=e;a;a=a.parentElement)if(a.hidden){ok=false;break}const cs=getComputedStyle(e);ok=ok&&cs.display!=='none'&&cs.visibility!=='hidden'&&r.width>=4}o[id]=ok}return o}
+async function OF_hudRun(){const W=ms=>new Promise(r=>setTimeout(r,ms)),bad=[],ids=['t_v7612_1','t_bus','rod'];
+  const miss=l=>{const v=OF_hudVis();for(const k in v)if(!v[k])bad.push(l+':'+k)};
+  try{OF_reset()}catch(e){}TOUCH.on=true;TOUCH.used=true;document.body.classList.add('touch');
+  for(const id of ids){if(!await OF_pickRide(id)){bad.push(id+':pick');continue}await W(300);miss('phone '+id)}
+  TOUCH.on=false;document.body.classList.remove('touch');
+  for(const id of['t_v7612_1','rod']){if(!await OF_pickRide(id)){bad.push(id+':pick');continue}await W(200)}
+  window.dispatchEvent(new TouchEvent('touchstart',{touches:[],changedTouches:[]}));await W(400);miss('hybrid after touch');
+  return(bad.length?'❌ FAIL ':'✅ PASS ')+'TOUCH BUTTONS AFTER RIDE SWITCHES · 3 phone switches + hybrid touch · '+(bad.length?'missing '+bad.join(', '):'all 5 visible every time')}
 // SHB (v90k): soft blob shadows on the ground under the player car, city traffic, people and trees. One InstancedMesh, depth-write off, ~1 draw call.
 // Cause of "no shadows": the sun shadow map only runs on HIGH quality (LK_shadow), auto-quality drops it on busy PCs, and v86v (ART6) replaced the car
 // blobs with tiny 45 % tyre patches. These blobs are cheap and always on in free roam. window.__sh = {n, pl} for the checklist test.
@@ -15214,11 +15225,15 @@ const BV_k=(x,z)=>Math.floor(x/BV.C)*100000+Math.floor(z/BV.C);
 function BV_reset(){BV.G=new Map();BV.RB=[]}
 function BV_add(x,z,key,fac,o){const k=BV_k(x,z);let A=BV.G.get(k);if(!A)BV.G.set(k,A=[]);A.push(Object.assign({x,z,key,fac},o))}
 // how many buildings within r m carry each key (or facade, by='fac')
-function BV_near(x,z,r,by){const n={},c=Math.ceil(r/BV.C),kx=Math.floor(x/BV.C),kz=Math.floor(z/BV.C);for(let a=-c;a<=c;a++)for(let b=-c;b<=c;b++){const A=BV.G.get((kx+a)*100000+kz+b);if(!A)continue;
-  for(const o of A)if((o.x-x)**2+(o.z-z)**2<r*r){const k=by==='fac'?o.fac:o.key;n[k]=(n[k]||0)+1}}return n}
+// terr-3 (Athens boot 2.2 s): only the cells the circle touches; r2 > 0 also counts within r2 into n2 (one scan for BV_pick's two radii)
+function BV_near(x,z,r,by,r2,n2){const n={},C=BV.C,rr=r*r,q2=r2?r2*r2:-1;for(let i=Math.floor((x-r)/C);i<=Math.floor((x+r)/C);i++)for(let j=Math.floor((z-r)/C);j<=Math.floor((z+r)/C);j++){const A=BV.G.get(i*100000+j);if(!A)continue;
+  for(const o of A){const d=(o.x-x)**2+(o.z-z)**2;if(d<rr){const k=by==='fac'?o.fac:o.key;n[k]=(n[k]||0)+1;if(d<q2)n2[k]=(n2[k]||0)+1}}}return n}
 const BV_h=(x,z,s)=>{const h=Math.sin(x*12.9898+z*78.233+(s||0)*37.719)*43758.5453;return h-Math.floor(h)};
 // least-used option near (x,z); W = optional weights (higher = preferred, e.g. the district's usual kind); 'by' picks facade or full key
-function BV_pick(opts,x,z,s,by,W){const n=BV_near(x,z,100,by),N=BV_near(x,z,45,by);let best=opts[0],bs=1e9;opts.forEach((o,i)=>{const sc=((n[o]||0)+3*(N[o]||0))/(W?W[i]:1)+BV_h(x,z,s+i)*.9;if(sc<bs){bs=sc;best=o}});return best}
+// both counts (key and facade, 100 m and 45 m) in one scan: CV_put's two picks per building (Athens boot)
+function BV_near2(x,z){const C=BV.C,f=[{},{}],k=[{},{}];for(let i=Math.floor((x-100)/C);i<=Math.floor((x+100)/C);i++)for(let j=Math.floor((z-100)/C);j<=Math.floor((z+100)/C);j++){const A=BV.G.get(i*100000+j);if(!A)continue;
+  for(const o of A){const d=(o.x-x)**2+(o.z-z)**2;if(d<1e4){f[0][o.fac]=(f[0][o.fac]||0)+1;k[0][o.key]=(k[0][o.key]||0)+1;if(d<2025){f[1][o.fac]=(f[1][o.fac]||0)+1;k[1][o.key]=(k[1][o.key]||0)+1}}}}return{f,k}}
+function BV_pick(opts,x,z,s,by,W,pre){let N={},n;if(pre){n=pre[0];N=pre[1]}else n=BV_near(x,z,100,by,45,N);let best=opts[0],bs=1e9;opts.forEach((o,i)=>{const sc=((n[o]||0)+3*(N[o]||0))/(W?W[i]:1)+BV_h(x,z,s+i)*.9;if(sc<bs){bs=sc;best=o}});return best}
 // the placed buildings: [{x,z,key,fac}]
 function BV_list(){const L=[];for(const A of BV.G.values())L.push(...A);return L}
 // repeat = mean over buildings of (same key within 100 m) / (all others within 100 m); blocks = 80 m cells with ≥ 4 buildings
@@ -15736,6 +15751,9 @@ function P2_warm(sc,cam){try{P2_compile(sc,cam)}catch(e){}}
 // ~3–30 samples. Same formula, same order, same ties: the answers are bit-identical (window.__bk.check() compares with the originals).
 // Whole-map lists use two levels (512 m cells → 64 m cells). Each cache is capped (cleared past BK_MAX cells) so memory stays bounded.
 const BK={on:/[?&]bk=0\b/.test(location.search)?0:1,st:{q:0,c:0},C:[]},BK_MAX=8000;
+// terr-3 (Athens boot): the Athens hub has ~23k 64 m cells, so building it cleared every cache at 8000 and re-baked 437k cells; while the hub
+// builds the cap is 30000 (~1.4 KB per cityAt cell), and hubEnter trims every cache back to BK_MAX
+let BK_boot=1;const BK_cap=()=>BK_boot?30000:BK_MAX;
 const BK0={trailDist,fillAt,cityAt,abAt,rivClear,mtnDist};
 const BK_cache=()=>{const M=new Map();BK.C.push(M);return M};
 // point candidates for cell [x0,x1]×[z0,z1]: P = flat [x,z,off,grp,payload…] (stride st), lim = initial best (squared when sq)
@@ -15746,8 +15764,8 @@ function BK_cand(P,st,x0,z0,x1,z1,sq,lim,grp=true){const n=P.length/st;let u1=li
   const U=grp?u2:u1,lim2=(sq?U*(1+1e-9)+1e-6:U+1e-6),keep=[];for(let j=0;j<n;j++)if(lb[j]<=lim2)keep.push(j);const out=new Float64Array(keep.length*st);keep.forEach((j,k)=>{for(let a=0;a<st;a++)out[k*st+a]=P[j*st+a]});return out}
 // whole-map point list → two-level lookup (512 m coarse, 64 m fine)
 function BK_two(P,st,sq,lim){const CO=BK_cache(),FI=BK_cache();return(x,z)=>{const fx=Math.floor(x/64),fz=Math.floor(z/64),fk=fx*100000+fz;let c=FI.get(fk);if(c)return c;
-  const cx=Math.floor(x/512),cz=Math.floor(z/512),ck=cx*100000+cz;let C=CO.get(ck);if(!C){if(CO.size>BK_MAX)CO.clear();C=BK_cand(P,st,cx*512,cz*512,cx*512+512,cz*512+512,sq,lim,false);CO.set(ck,C)}
-  if(FI.size>BK_MAX)FI.clear();c=BK_cand(C,st,fx*64,fz*64,fx*64+64,fz*64+64,sq,lim,false);FI.set(fk,c);BK.st.c++;return c}}
+  const cx=Math.floor(x/512),cz=Math.floor(z/512),ck=cx*100000+cz;let C=CO.get(ck);if(!C){if(CO.size>BK_cap())CO.clear();C=BK_cand(P,st,cx*512,cz*512,cx*512+512,cz*512+512,sq,lim,false);CO.set(ck,C)}
+  if(FI.size>BK_cap())FI.clear();c=BK_cand(C,st,fx*64,fz*64,fx*64+64,fz*64+64,sq,lim,false);FI.set(fk,c);BK.st.c++;return c}}
 // trails: min over every 2nd sample of (dx²+dz²), then sqrt
 let BK_tr=null;trailDist=function(x,z){if(!BK.on)return BK0.trailDist(x,z);BK.st.q++;if(!BK_tr){const P=[];for(const T of TRAILS)for(let i=0;i<T.pts.length;i+=2)P.push(T.pts[i].x,T.pts[i].z,0,0);BK_tr=BK_two(Float64Array.from(P),4,true,1e9)}
   const C=BK_tr(x,z);let b=1e9;for(let o=0;o<C.length;o+=4){const d=(C[o]-x)**2+(C[o+1]-z)**2;if(d<b)b=d}return Math.sqrt(b)};
@@ -15760,13 +15778,13 @@ let BK_mt=null;mtnDist=function(x,z){if(!BK.on)return BK0.mtnDist(x,z);if(x<TAU_
 // city streets: nearest sample in the 3×3 64 m neighbourhood (skip = a street index); payload = [si, i]
 const BK_ci=BK_cache();cityAt=function(x,z,skip=-1){if(!BK.on)return BK0.cityAt(x,z,skip);BK.st.q++;const kx=Math.floor(x/64),kz=Math.floor(z/64),k=kx*100000+kz;let C=BK_ci.get(k);
   if(!C){const P=[];for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=CITY_G.get((kx+a)*100000+kz+b);if(!L)continue;for(let j=0;j<L.length;j+=2){const p=CITY_S[L[j]].pts[L[j+1]];P.push(p.x,p.z,0,L[j],L[j+1])}}
-    if(BK_ci.size>BK_MAX)BK_ci.clear();C=BK_cand(P,5,kx*64,kz*64,kx*64+64,kz*64+64,true,1e12);BK_ci.set(k,C);BK.st.c++}
+    if(BK_ci.size>BK_cap())BK_ci.clear();C=BK_cand(P,5,kx*64,kz*64,kx*64+64,kz*64+64,true,1e12);BK_ci.set(k,C);BK.st.c++}
   let bd=1e12,bs=-1,bi=0;for(let o=0;o<C.length;o+=5){if(C[o+3]===skip)continue;const dx=C[o]-x,dz=C[o+1]-z,d=dx*dx+dz*dz;if(d<bd){bd=d;bs=C[o+3];bi=C[o+4]}}
   if(bs<0)return null;const S=CITY_S[bs],p=S.pts[bi];return{d:Math.sqrt(bd),lat:(x-p.x)*p.tz-(z-p.z)*p.tx,s:p.s,road:S.r,si:bs,i:bi,S,p}};
 // Autobahn: nearest sample within 60 m in the 3×3 100 m neighbourhood
 let BK_abG=null;const BK_ab=BK_cache();abAt=function(x,z){if(!BK.on)return BK0.abAt(x,z);if(!AB_G)BK0.abAt(0,0);if(BK_abG!==AB_G){BK_ab.clear();BK_abG=AB_G}BK.st.q++;const S0=abSamples(),kx=Math.floor(x/100),kz=Math.floor(z/100),k=kx*10000+kz;let C=BK_ab.get(k);
   if(!C){const P=[];for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=AB_G.get((kx+a)*10000+kz+b);if(!L)continue;for(let j=0;j<L.length;j+=2){const p=S0[L[j]].pts[L[j+1]];P.push(p.x,p.z,0,L[j],L[j+1])}}
-    if(BK_ab.size>BK_MAX)BK_ab.clear();C=BK_cand(P,5,kx*100,kz*100,kx*100+100,kz*100+100,true,3600,false);BK_ab.set(k,C);BK.st.c++}
+    if(BK_ab.size>BK_cap())BK_ab.clear();C=BK_cand(P,5,kx*100,kz*100,kx*100+100,kz*100+100,true,3600,false);BK_ab.set(k,C);BK.st.c++}
   let bd=3600,bs=-1,bi=0;for(let o=0;o<C.length;o+=5){const dx=C[o]-x,dz=C[o+1]-z,d=dx*dx+dz*dz;if(d<bd){bd=d;bs=C[o+3];bi=C[o+4]}}
   if(bs<0)return null;const S=S0[bs],p=S.pts[bi];return{d:Math.sqrt(bd),lat:(x-p.x)*p.tz-(z-p.z)*p.tx,s:p.s,road:S.r,i:bi,S,p}};
 // filler grid streets (segments): nearest segment in the 3×3 64 m neighbourhood; skip = a segment object
@@ -15775,7 +15793,7 @@ let BK_fiG=null;const BK_fi=BK_cache();fillAt=function(x,z,skip){if(!BK.on||!FIL
     const lb=[],ub=[],md=(px,pz)=>Math.hypot(Math.max(Math.abs(px-x0),Math.abs(px-x0-64)),Math.max(Math.abs(pz-z0),Math.abs(pz-z0-64)));let u1=1e9,g1=null,u2=1e9;
     for(const r of R){const ex=r.x0+r.ux*r.L,ez=r.z0+r.uz*r.L,t=clamp((cx-r.x0)*r.ux+(cz-r.z0)*r.uz,0,r.L),dc=Math.hypot(r.x0+r.ux*t-cx,r.z0+r.uz*t-cz),u=Math.min(md(r.x0,r.z0),md(ex,ez),md(r.x0+r.ux*t,r.z0+r.uz*t));lb.push(dc-hd);ub.push(u);
       if(u<u1){if(r!==g1)u2=u1;g1=r;u1=u}else if(u<u2&&r!==g1)u2=u}
-    C=R.filter((r,j)=>lb[j]<=u2+1e-6);if(BK_fi.size>BK_MAX)BK_fi.clear();BK_fi.set(k,C);BK.st.c++}
+    C=R.filter((r,j)=>lb[j]<=u2+1e-6);if(BK_fi.size>BK_cap())BK_fi.clear();BK_fi.set(k,C);BK.st.c++}
   let bd=1e9,br=null;for(const r of C){if(r===skip)continue;const t=clamp((x-r.x0)*r.ux+(z-r.z0)*r.uz,0,r.L),d=Math.hypot(r.x0+r.ux*t-x,r.z0+r.uz*t-z);if(d<bd){bd=d;br=r}}return br?{d:bd,r:br}:null};
 // check: N random points per function over the map + points near the samples; exact match required (objects compared by d, road/sample identity)
 window.__bk={BK,clear:()=>BK.C.forEach(M=>M.clear()),cells:()=>BK.C.reduce((a,M)=>a+M.size,0),check(N=4000,seed=7){let s=seed;const R=()=>(s=(s*16807)%2147483647)/2147483647;const out={},near=[];
@@ -15790,6 +15808,8 @@ window.__bk={BK,clear:()=>BK.C.forEach(M=>M.clear()),cells:()=>BK.C.reduce((a,M)
   out.cells=window.__bk.cells();return out}};
 // the caches only help while something is being built: 5 s without a query in roam → drop them (lazy regions rebuild them on demand)
 {let q0=-1;setInterval(()=>{if(BK.st.q===q0&&state==='roam'&&window.__bk.cells())window.__bk.clear();q0=BK.st.q},5000)}
+
+hubEnter=(f=>function(){BK_boot=0;for(const M of BK.C)if(M.size>BK_MAX)M.clear();return f.apply(this,arguments)})(hubEnter);
 // ===== FB (garage-17, Alex 2026-10-10: "the build guide and build does not work for the boats and off road").
 // Root cause: BUILD and the BUILD GUIDE only ever edit GB.d.bricks = the street car of the selected set. OFF-ROAD / WATER rides come straight from
 // S.off() / S.boat() (no edit path), their RIDES cards got no ✎ BUILD / ▶ GUIDE, and the BUILD tab on the WATER/OFF-ROAD tab opened the street car.
