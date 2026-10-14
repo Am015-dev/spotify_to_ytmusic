@@ -26,8 +26,9 @@ function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX
   OC_lyka(h,nx,nz,r);TR_W={r,nx,nz,h};TR_roadsInit(TR_W);return TR_W}
 // ---- terr-1 (Alex: "both cities are flat, not realistic"): real relief, exaggerated above a smooth valley floor (floor = 1.2 km box blur of
 // the DEM): Frankfurt 3.6x on the soft-capped part (~2.2x on the Sachsenhausen hills; cap +320 m on the Taunus), Athens 1.4x outside the Acropolis (plateau keeps its real height).
-// feature flag: ?terr=0 = the old flat raster (no relief, no graded corridors, no slope colours); ?trx=0 / ?trg=0 / ?trc=0 switch one part off
-const TERR={on:new URLSearchParams(location.search).get('terr')!=='0'};
+// feature flag (OFF until the lane passes): ?terr=1 = hills + graded road corridors + slope colours, kept for the tab (sessionStorage, so GO
+// reloads keep it) or for good with localStorage mho_terr=1; ?terr=0 clears it. ?trx=0 / ?trg=0 / ?trc=0 switch one part off
+const TERR={on:(()=>{try{const q=new URLSearchParams(location.search).get('terr');if(q!=null)sessionStorage.setItem('mho_terr',q);return(q??sessionStorage.getItem('mho_terr')??localStorage.getItem('mho_terr'))==='1'}catch(e){return false}})()};
 const TR_RK=CID==="fra"?{k:3.6,c:200}:{k:1.4,c:200};
 function TR_relief(h,nx,nz,r){if(!TERR.on||new URLSearchParams(location.search).get('trx')==='0')return;const s=Math.max(1,Math.round(96/r)),cx=Math.ceil(nx/s),cz=Math.ceil(nz/s),C=new Float32Array(cx*cz),N=new Float32Array(cx*cz);
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=((j/s)|0)*cx+((i/s)|0);C[k]+=h[j*nx+i];N[k]++}for(let k=0;k<C.length;k++)C[k]/=N[k]||1;
