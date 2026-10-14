@@ -14,7 +14,8 @@ const probe=()=>{const B=__bx.BX,V=B.v;let bd=1e9,bs=null;for(const{s}of B.samp)
   // on the START piece, mid-road (dry land, away from the rails, which already slide a car round), facing backwards at 8 m/s: the rescue must fire
   const tu0=await p.evaluate(()=>{const B=__bx.BX,V=B.v,st=B.pcs.find(q=>!q.dead&&q.def.start),bs=st.S[0][st.S[0].length>>1],fh=Math.hypot(bs.F.x,bs.F.z);
    V.p.set(bs.p.x,bs.p.y+.6,bs.p.z);V.F.set(-bs.F.x/fh,0,-bs.F.z/fh);V.U.set(0,1,0);V.v.copy(V.F).multiplyScalar(8);return B.m.turned||0});
-  let tw=0,q=null;for(;tw<16;tw++){await L.sleep(250);q=await p.evaluate(probe);if(q.hd>=.9)break}
-  if(tw>=16)F.push(`✘ still facing backwards 4 s after a wrong-way spin (heading ${q.hd.toFixed(2)})`);
-  console.log(id,F.length?'FAIL':'PASS',F.join(', '),process.env.V?r.msg+` | heading ok ${Math.round(ok20/n*100)} %, progress ${prog.toFixed(0)} m, recovered in ${(tw*.25).toFixed(2)} s`:'')}
+  // trk-3: 4 s of GAME time (m.t), not wall time: the headless page now simulates at ~1/4 speed, so 16 x 250 ms wall saw only ~1 s of game
+  let q=await p.evaluate(probe);const t0=q.t,w0=Date.now();let ok=false;while(q.t-t0<4&&Date.now()-w0<90000){await L.sleep(250);q=await p.evaluate(probe);if(q.hd>=.9){ok=true;break}}const tw=(q.t-t0)/.25;
+  if(!ok)F.push(`✘ still facing backwards 4 s after a wrong-way spin (heading ${q.hd.toFixed(2)})`);
+  console.log(id,F.length?'FAIL':'PASS',F.join(', '),process.env.V?r.msg+` | heading ok ${Math.round(ok20/n*100)} %, progress ${prog.toFixed(0)} m, recovered in ${(tw*.25).toFixed(2)} s (game time)`:'')}
  console.log('errors',E.length?E.slice(0,3).join(' / '):'none');await b.close()})();
