@@ -11,3 +11,11 @@ html.sk .gx-bar>*:not(.gx-ibtn):not(.gx-sp){color:#5a2d0a!important}
 html.sk .gx-drawer{border-width:0}
 html.sk .gx-bar #prompt,html.sk .gx-bar #prompt.mine{color:#6e3205}
 html.sk .gx-ibtn>span{padding:0}
+/* UI bar 2: no painted frame art under text; plain parchment panel with a 16px inset */
+html.sk .gx-drawer{border:2px solid #3a1f0a;border-image:none;background:#f6ecd6;color:#3a1f0a;border-radius:12px;filter:none;box-shadow:0 10px 28px rgba(0,0,0,.45)}
+html.sk .gx-drawer-body{padding:16px}
+html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
+/* UI bar 1/8/9: bigger bar text on wide screens, rules panel off the centred title, no clipped card names, no sub-11px svg text */
+@media (min-width:700px){html .gx-bar{min-height:68px}html #prompt{font-size:calc(16px*var(--gx-text,1));-webkit-line-clamp:2;overflow:visible}html .sc.hc .hcn{font-size:13px;line-height:1;-webkit-line-clamp:1;display:block;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:100%}}
+html.sk .gx-drawer.wide{width:min(620px,calc(100vw - 16px))}
+.sc svg text{display:none}
