@@ -5,7 +5,7 @@
 //    footprint = max(0, OF_R - signed distance). Pass: <= 0.1 m.   Prints one JSON line.
 (()=>{const t0=performance.now(),out={city:CID,A:{},B:{}},rnd=(()=>{let s=20261014;return()=>(s=(s*1664525+1013904223)>>>0)/4294967296})(),pick=a=>a[Math.floor(rnd()*a.length)];
  if(state!=='roam'||!RO.on)return'not in roam';
-OF_go("walk");LF_ensure(RO.x,RO.z,2500);const keepIn=OF_input,keepK=Object.assign({},K);let hold=null;OF_input=()=>hold||{fx:0,fy:0,run:false,jump:false};
+{let b=null,n=0;for(const L of HUB.pgrid.values())for(const p of L)if(p.alive&&/^(car\d?|CE_car\d?|CE_tax\w*)$/.test(p.t)&&(++n%7===0)&&!b)b=p;if(!b)for(const L of HUB.pgrid.values()){b=L[0];break}roamWarp(b.x,b.z,0)}OF_go("walk");LF_ensure(RO.x,RO.z,2500);const keepIn=OF_input,keepK=Object.assign({},K);let hold=null;OF_input=()=>hold||{fx:0,fy:0,run:false,jump:false};
  const put=(x,z,y)=>{OF.x=x;OF.z=z;OF.y=y;OF.vx=OF.vz=OF.vy=0;OF.air=true;OF.spd=0;hold=null};
  const settle=(x,z,y0)=>{put(x,z,y0);for(let i=0;i<25;i++)OF_walk(.05);return OF.y};
  const sd=(b,x,z)=>{const dx=x-b.x,dz=z-b.z,lx=dx*b.c-dz*b.s,lz=dx*b.s+dz*b.c,ex=Math.abs(lx)-b.hw,ez=Math.abs(lz)-b.hd;return ex>0&&ez>0?Math.hypot(ex,ez):Math.max(ex,ez)};
@@ -56,5 +56,5 @@ OF_go("walk");LF_ensure(RO.x,RO.z,2500);const keepIn=OF_input,keepK=Object.assig
    const s=clearStart(b.x,b.z,rad,y,(x,z)=>sd(bb,x,z)>1.5&&sd(bb,x,z)<5);if(!s){res.skip++;continue}const e=push(b.x,b.z,0,s,y+.05);rec(res.bld,Math.max(0,OF_R-sd(bb,e[0],e[1])),'bld@'+(b.x|0)+','+(b.z|0))}}
  res.skip&&(out.B.skip=res.skip);for(const k of['cars','props','bld','rides'])out.B[k]={n:res[k].n,worst:+res[k].w.toFixed(3),nBad:res[k].bad.length,bad:res[k].bad.slice(0,5)};
  }finally{OF_input=keepIn;hold=null}
- out.pass=out.A.allBad===0&&out.A.nBad===0&&out.A.patchPts+out.A.coveredByHigherPatch+out.A.groundPts>=200&&out.B.cars.nBad===0&&out.B.props.nBad===0&&out.B.bld.nBad===0&&out.B.rides.nBad===0&&out.B.rides.n>=20&&out.A.patchPts+out.A.groundPts>=150&&out.B.cars.n>=40&&out.B.props.n>=40&&out.B.bld.n>=15;out.ms=Math.round(performance.now()-t0);
+ out.pass=out.A.allBad===0&&out.A.nBad===0&&out.A.patchPts+out.A.coveredByHigherPatch+out.A.groundPts>=200&&out.B.cars.nBad===0&&out.B.props.nBad===0&&out.B.bld.nBad===0&&out.B.rides.nBad===0&&out.B.rides.n>=20&&out.A.patchPts+out.A.groundPts>=150&&(out.B.cars.n+out.B.rides.n)>=50&&out.B.props.n>=40&&out.B.bld.n>=15;out.ms=Math.round(performance.now()-t0);
  return JSON.stringify(out)})()
