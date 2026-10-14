@@ -99,4 +99,31 @@
     ]
   });
 
+
+  // UI-BAR rules 4-8 that the shared menu test cannot see (14 Oct 2026)
+  var vis = function (e) { var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 2 && r.height > 2 && c.visibility !== 'hidden' && c.display !== 'none'; };
+  var lim = function () { return innerWidth >= 1024 ? 16 : 13; };
+  var minFont = function (root) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || e.children.length || !vis(e) || !/\S/.test(e.textContent)) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < lim() - 0.01) bad = f + 'px "' + e.textContent.trim().slice(0, 14) + '" in ' + (e.id || e.className); }); return bad || true; };
+  GXS.add({
+    id: 'ui-bar', name: 'UI bar: top bar, one line, images', ask: 'Few buttons, one line, readable text?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { try { GXH.setEnabled(true); GXH.reset(); } catch (e) { } return idle(900); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 4: top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('#top button'), vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'rule 5: board line is 8 words or fewer', fn: function () { var t = ($('#status') || {}).textContent || ''; return words(t) <= 8 || words(t) + ' words'; } },
+      { kind: 'fn', name: 'rule 5: coach tip is 8 words or fewer and not a repeat', fn: function () { var x = $('.gxh-tx'), t = $('.gxh-tt'); if (!x || !vis(x)) return true; var st = ($('#status').textContent || '').trim().toLowerCase(); return words(x.textContent) > 8 ? words(x.textContent) + ' words in tip' : (t && t.textContent.trim().toLowerCase() === st) ? 'tip title repeats the status line' : true; } },
+      { kind: 'fn', name: 'rule 1: top bar, status and tip text at least 13/16 px', fn: function () { var a = minFont('#top'); if (a !== true) return a; var s = parseFloat(getComputedStyle($('#status')).fontSize); if (s < lim() - 0.01) return 'status ' + s + 'px'; return minFont('.gxh-bub'); } },
+      { kind: 'fn', name: 'rule 8: images keep their natural aspect', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (m) { if (bad || !vis(m) || !m.naturalWidth) return; var a = m.naturalWidth / m.naturalHeight, r = m.getBoundingClientRect(), b = r.width / r.height; if (Math.abs(a - b) / a > 0.15 && getComputedStyle(m).objectFit === 'fill') bad = m.src.split('/').pop() + ' ' + b.toFixed(2) + ' vs ' + a.toFixed(2); }); return bad || true; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-start', name: 'UI bar: start screen', ask: 'One big Play button, simple options?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { showStart(); return idle(600); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 7: exactly one big primary button', fn: function () { var n = [].filter.call(document.querySelectorAll('#modal .btn.big'), vis).length; return n === 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'rule 7: no character roster', fn: function () { return ![].some.call(document.querySelectorAll('#modal .seat'), vis) || 'roster visible'; } },
+      { kind: 'fn', name: 'rule 7: Continue only with a save', fn: function () { var c = $('#modal [data-a=cont]'); return (!!c === !!savedGame()) || 'Continue shown without a save'; } },
+      { kind: 'fn', name: 'rule 1: start text at least 13/16 px', fn: function () { return minFont('#modal'); } },
+      { kind: 'fn', name: 'rule 7: start card fits without scrolling', fn: function () { var m = $('#modal .card'); return m.scrollHeight - m.clientHeight <= 2 || 'start card scrolls'; } }
+    ]
+  });
 })();
