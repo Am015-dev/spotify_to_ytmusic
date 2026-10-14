@@ -16,6 +16,138 @@
  },
  {
   "date": "2026-10-14",
+  "game": "thornbound",
+  "title": "Menus and board text",
+  "items": [
+   "Nothing covers text on the board or menus"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "tidewake",
+  "title": "Menus tidied: button frames, title text, rules, icon buttons, one start line",
+  "items": [],
+  "check": "",
+  "scn": [],
+  "ask": []
+ },
+ {
+  "date": "2026-10-14",
+  "game": "nebula-aces",
+  "title": "Cleaner menus",
+  "items": [
+   "Buttons, panels and the battle board no longer cover or crowd their text"
+  ],
+  "check": "Open the menu and the battle: all text sits inside its frame",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "cauldron-fair",
+  "title": "Menus: icon buttons, buttons and tips inside their frames",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Icon buttons and buttons keep their content inside the frame art; one instruction line on the board"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu",
+   "menu"
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "short-fuse",
+  "title": "Menus: painted buttons keep their art shape",
+  "items": [],
+  "check": "",
+  "scn": [],
+  "ask": []
+ },
+ {
+  "date": "2026-10-14",
+  "game": "hollowbough",
+  "title": "Menu and board cleanup",
+  "items": [
+   "Board tip bubble no longer covers cards and counts; the caption line says it"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "sands-of-qamar",
+  "title": "Menus tidied",
+  "items": [
+   "Menu and campaign text now sits inside the painted frames"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "sunglaze",
+  "title": "Menus tidied",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art"
+  ],
+  "check": "Open Campaign: the three top buttons read cleanly",
+  "scn": [
+   "menu",
+   "menu"
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "lantern-dive",
+  "title": "Menus tidied",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Menu, help and tip text clear of frame art"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu",
+   "menu"
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "doorkick-dungeon",
   "title": "Hand names",
   "items": [
@@ -43,36 +175,6 @@
  },
  {
   "date": "2026-10-14",
-  "game": "sunglaze",
-  "title": "Cleaner menus",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "lantern-dive",
-  "title": "Cleaner menus",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
   "game": "final-approach",
   "title": "Cleaner menus",
   "items": [
@@ -89,21 +191,6 @@
  {
   "date": "2026-10-14",
   "game": "kaiten-kitchen",
-  "title": "Cleaner menus",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "cauldron-fair",
   "title": "Cleaner menus",
   "items": [
    "Menus use one title font and one body font, no overlaps"
