@@ -71,7 +71,7 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 html.ph-p{--ph-dock:calc(104px + env(safe-area-inset-bottom,0px))}
 html.ph-p:has(#prompt.bfq),html.ph-p:has(#prompt .sellbar){--ph-dock:auto}
 html.ph-p:has(#prompt.bfq) .gx-dock,html.ph-p:has(#prompt .sellbar) .gx-dock{max-height:52dvh!important;overflow:auto}
-html.ph .bfline{display:block;margin:0 0 6px!important;font:700 16px/1.25 var(--title)!important;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:20px}
+html.ph .bfline{display:block;margin:0 0 6px!important;font:700 14.5px/1.25 var(--title)!important;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:20px}
 html.ph #prompt{display:flex;flex-direction:column}
 html.ph #prompt>.bfline{order:1}html.ph #prompt>.acts.main{order:2}html.ph #prompt>*{order:3}
 html.ph #prompt:not(.bfq) p.say,html.ph #prompt>p:not(.bfline):not(.say),html.ph #prompt .hint,html.ph #prompt .lesson,html.ph #prompt>.tip,html.ph #prompt .since{display:none!important}

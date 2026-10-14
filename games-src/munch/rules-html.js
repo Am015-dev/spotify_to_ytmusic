@@ -7,7 +7,7 @@ const RULES_HTML=`
 <li><b>Get ready.</b> Play races, classes and items, change what you wear, and sell items worth 1,000 gold for one level. You can't sell your way to level 10.</li>
 <li><b>Kick open the door.</b> Turn over the top door card.
  <ul><li>A <b>monster</b>: you must fight it.</li><li>A <b>curse</b>: it hits you at once.</li><li>Anything else goes into your hand.</li></ul></li>
-<li><b>If you didn't fight a monster:</b> either <b>look for trouble</b> (fight a monster from your own hand) or <b>loot the room</b> (draw a door card face down).</li>
+<li><b>If you didn't fight a monster:</b> either <b style="white-space:nowrap">look for trouble</b> (fight a monster from your own hand) or <b>loot the room</b> (draw a door card face down).</li>
 <li><b>Charity.</b> If you hold more than 5 cards (6 for dwarves), give the extras to the lowest-level player. If that's you, discard them.</li>
 </ol>
 <h3>Fighting</h3>

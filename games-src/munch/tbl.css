@@ -5,7 +5,7 @@
 .opp.seat{flex:0 1 150px;min-width:0;min-height:0;max-width:200px;padding:3px 10px 3px 4px;border-radius:30px;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:7px;row-gap:0;align-content:center;align-items:center;position:relative;
   translate:0 calc((1 - var(--q,0)*var(--q,0))*8px)}
 .opp.seat .sav{grid-row:1/3;grid-column:1;position:relative;width:42px;height:42px;border-radius:50%;border:2.5px solid var(--c,#ffd76a);background:#2a1208;box-shadow:0 2px 0 #000;display:block}
-.opp.seat .savi{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.opp.seat .savi{position:absolute;left:0;top:0;width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
 .opp.seat .slv{position:absolute;right:-7px;bottom:-5px;min-width:21px;height:21px;padding:0 4px;border-radius:11px;display:grid;place-items:center;font:800 14px/1 var(--title);color:#2b1405;background:radial-gradient(circle at 35% 28%,#fff6d0,#f0c35a 55%,#9a6620);box-shadow:0 0 0 1.5px #2a170b,0 1px 0 rgba(0,0,0,.5)}
 .opp.seat .sdead{position:absolute;left:-4px;top:-6px;font-style:normal;font-size:16px}
 .opp.seat .snm{grid-column:2;grid-row:1;font:700 13px/1.15 var(--title);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 0 #000;min-width:0}
@@ -69,7 +69,7 @@ html.ph .mine.paper::before{display:none}
 html.ph .mine .top{grid-area:top;position:relative;display:block;width:calc(var(--hero) + 14px);height:calc(var(--hero) + 10px);gap:0;padding:0}
 html.ph .mine .top>:not(.bfhero):not(.lv){display:none}
 html.ph .mine .bfhero{position:absolute;left:0;top:0;display:block;width:var(--hero);height:var(--hero)}
-html.ph .mine .bfhero .bfav{width:var(--hero);height:var(--hero);border-width:3px;display:block}
+html.ph .mine .bfhero .bfav{position:absolute;left:0;top:0;width:var(--hero);height:var(--hero);border-width:3px;display:block}
 html.ph .mine .bfhero .bfstr{position:absolute;left:50%;bottom:-9px;translate:-50% 0;font:900 18px/1 var(--title);color:#ffd76a;background:#2a1208;border:2px solid #ffd76a;border-radius:14px;padding:3px 8px;text-shadow:0 1px 0 #000;white-space:nowrap}
 html.ph .mine .lv{position:absolute;right:0;top:-3px;margin:0;min-width:26px;height:26px;padding:0 5px;border-radius:13px;display:grid;place-items:center;grid-auto-flow:column;gap:2px;font:800 15px/1 var(--title);color:#2b1405;background:radial-gradient(circle at 35% 28%,#fff6d0,#f0c35a 55%,#9a6620);box-shadow:0 0 0 1.5px #2a170b,0 2px 0 rgba(0,0,0,.5);text-shadow:none}
 html.ph .mine .lv small{display:none}
@@ -248,3 +248,7 @@ html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sli
 html.ph .sline .n{min-width:.9em}
 /* PC: after a bonus card the fight rows outgrow the arena; Fight!/Run/Help stay pinned inside it instead of being cut off and unclickable (scenario dk-fight-bonus @1366x768) */
 html:not(.ph) .arena .fbtns{position:sticky;bottom:0;z-index:3}
+
+/* 9+ cards: slices under 44px, so a card's price tag hides and its name ends in an ellipsis instead of running under the next card */
+html.ph .mine .hand.tight .card:not(:last-child) :is(.gold,.aw){display:none}
+html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}

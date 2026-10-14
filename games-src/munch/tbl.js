@@ -4,13 +4,13 @@ const TB={lp:null,lpAt:0,fan:0};
 // the hand is a fan: overlap so every card shows a slice and nothing scrolls (scroll only when ~10+ cards would be too thin)
 function tbFan(){const hd=document.querySelector('.mine .hand');if(!hd)return;const cs=[...hd.querySelectorAll(':scope>.card')];hd.style.removeProperty('--hw');if(!cs.length){hd.classList.remove('scrolls');return}
   const ph=document.documentElement.classList.contains('ph');if(!ph){hd.classList.remove('scrolls');hd.style.removeProperty('--ov');return}
-  const w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0)return;
+  const MS=cs.length>=8?30:44,w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0)return;
   // keep every card's visible slice >= 44 px (a finger): shrink the cards a little when the hand is big, scroll when it still does not fit
-  let w=w0;if(n>1){const fit=avail-44*(n-1);w=Math.max(Math.min(w0,fit),Math.min(w0,56))}
-  const need=n>1?(avail-w)/(n-1):w,sc=n>1&&need<44,step=sc?44:Math.min(w*.8,need);
+  let w=w0;if(n>1){const fit=avail-MS*(n-1);w=Math.max(Math.min(w0,fit),Math.min(w0,56))}
+  const need=n>1?(avail-w)/(n-1):w,sc=n>1&&need<MS,step=sc?MS:Math.min(w*.8,need);
   if(w!==w0){hd.style.setProperty('--hw',w.toFixed(1)+'px')}
   hd.style.setProperty('--ov',(step-w).toFixed(1)+'px');hd.style.setProperty('--vis',(step-2).toFixed(1)+'px');
-  hd.classList.toggle('scrolls',sc);
+  hd.classList.toggle('scrolls',sc);hd.classList.toggle('tight',step<44);
   // each name sits on the visible strip of its card (the next card covers the rest): shrink the type until no word is cut
   cs.forEach((c,k)=>{const n=c.querySelector('.cn');if(!n)return;n.style.fontSize='';if(k===cs.length-1)return;let fs=parseFloat(getComputedStyle(n).fontSize)||8;for(let i=0;i<10&&n.scrollWidth>n.clientWidth+.5&&fs>5.5;i++){fs-=.5;n.style.fontSize=fs+'px'}})}
 // bring an element into view inside its OWN sideways scroller (the hand, the gear row) and nothing else: scrollIntoView also scrolls the clipped

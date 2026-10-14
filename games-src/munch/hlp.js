@@ -160,7 +160,7 @@ function hlpSuggest(){try{
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'doorkick-dungeon',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse,.bf-tgt'});
+  GXH.init({game:'doorkick-dungeon',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opps .opp,.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse,.bf-tgt'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});if(typeof syncMenu==='function')syncMenu()}
 function hlpClean(){try{const c=GXH.state().cur;if(!(c&&c.kind==='bulb'))document.querySelectorAll('[data-gxh-avoid]').forEach(x=>x.removeAttribute('data-gxh-avoid'))}catch(e){}}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;hlpClean();
