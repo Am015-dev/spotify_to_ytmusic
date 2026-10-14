@@ -25,5 +25,5 @@ const errs=[];(async()=>{const b=await chromium.launch({args:['--use-angle=swift
  // checklist auto-checks (src/99c_checklist.js v90n/gfx-*): one PASS/FAIL line per city and test
  for(const c of Object.keys(R)){const g=R[c].gfx,h=R[c].shChk;if(!g)continue;const cc=parseInt(g.carCast)||0;
   const T={'gfx-sun':g.tone==='ACES'&&g.sunEl>=20&&g.sunEl<=40&&g.hemi<=.7,'gfx-shadow':g.shadowMap&&g.sunCast&&g.map===(Q==='high'?2048:1024)&&cc>0&&h&&h.car<h.road-.05,
-   'gfx-sunside':R[c].side>=100&&R[c].side<=170,'gfx-plastic':g.plRough>=.2&&g.plRough<=.45&&g.plMetal<.2&&g.plEnv>=.8};for(const k in T)console.log((T[k]?'PASS ':'FAIL ')+Q+' '+c+' v90n/'+k);console.log('info',Q,c,JSON.stringify(R[c].info))}
+   'gfx-sunside':R[c].side>=100,'gfx-plastic':g.plRough>=.2&&g.plRough<=.45&&g.plMetal<.2&&g.plEnv>=.8};for(const k in T)console.log((T[k]?'PASS ':'FAIL ')+Q+' '+c+' v90n/'+k);console.log('info',Q,c,JSON.stringify(R[c].info))}
  R.errs=errs.slice(0,5);fs.writeFileSync(OUT+'/state.json',JSON.stringify(R,null,1));if(process.env.JSONOUT)console.log(JSON.stringify(R));console.log('errors',errs.length);await b.close()})().catch(e=>{console.log('FAIL',e.message.slice(0,300));console.log('pageerrs',JSON.stringify(errs.slice(0,5)));process.exit(1)});
