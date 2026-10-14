@@ -1,6 +1,39 @@
 [
  {
   "date": "2026-10-14",
+  "game": "doorkick-dungeon",
+  "title": "New start screen",
+  "items": [
+   "Kick, bonus card, Fight!, loot and end turn are tested with real taps; Fight! no longer cut off on PC",
+   "Menus use one title font and one body font, no overlaps",
+   "Menu rows keep text clear of the frame, Tips rows framed, last row reachable; hand names sit on their visible strip; one gear-up line; badges whole; rival numbers labelled",
+   "One instruction line, whole Lv and deck badges, labelled str/gear numbers",
+   "Card names fit the visible strip",
+   "Buttons, dialogs and rules no longer overlap",
+   "One column: Story, Quick game, Continue"
+  ],
+  "check": "Can you read every card name?",
+  "scn": [
+   "dk-fight-bonus",
+   "menu",
+   "dk-menu-rows",
+   "dk-gear-up",
+   "dk-hand-names",
+   "menu",
+   "menu"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "Do the menus and board look clean?",
+   "Is the start screen clean at every width?"
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "crown-city-smash",
   "title": "Menus: clean and readable",
   "items": [
@@ -165,36 +198,6 @@
   "ask": [
    null,
    null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "doorkick-dungeon",
-  "title": "Menu clean-up",
-  "items": [
-   "Kick, bonus card, Fight!, loot and end turn are tested with real taps; Fight! no longer cut off on PC",
-   "Menus use one title font and one body font, no overlaps",
-   "Menu rows keep text clear of the frame, Tips rows framed, last row reachable; hand names sit on their visible strip; one gear-up line; badges whole; rival numbers labelled",
-   "One instruction line, whole Lv and deck badges, labelled str/gear numbers",
-   "Card names fit the visible strip",
-   "Buttons, dialogs and rules no longer overlap"
-  ],
-  "check": "Can you read every card name?",
-  "scn": [
-   "dk-fight-bonus",
-   "menu",
-   "dk-menu-rows",
-   "dk-gear-up",
-   "dk-hand-names",
-   "menu"
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   "Do the menus and board look clean?"
   ]
  },
  {
