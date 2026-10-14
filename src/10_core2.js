@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.52',date:'14 Oct 2026',items:[{t:'FIXED',s:'Brushing a playground or fair piece or a street prop no longer stops your car dead; the tap-to-open bubble no longer covers your car.'}]},
   {v:'v90m-beta.51',date:'14 Oct 2026',items:[{t:'FIXED',s:'Mission markers sit on the road and face along it.'}]},
   {v:'v90m-beta.50',date:'14 Oct 2026',items:[{t:'FIXED',s:'LEGO-set buildings count as shops and landmarks in Athens and the visit checks.'}]},
   {v:'v90m-beta.49',date:'14 Oct 2026',items:[{t:'FIXED',s:'Athens loads faster; touch controls come back after the garage on hybrid devices.'}]},
