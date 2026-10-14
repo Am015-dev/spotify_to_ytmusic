@@ -1,7 +1,7 @@
 
 /* ===== Shipwreck Isle skin (facelift): painted kit over the shell (gx-skin.css does bar, drawers, icon buttons); this file holds the game's own buttons and icons ===== */
 html.sk{--sk-ink:#3a2410}
-html.sk .btn:not(.xs):not(.add):not(.opt):not(.sk),html.sk #modal .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .btn:not(.xs):not(.add):not(.opt):not(.sk),html.sk #modal .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/10px 16px stretch;border-width:4px;padding:6px 12px;border-radius:0;background:none;box-shadow:none;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .btn.go:not(.xs){border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn:not(.xs):not(.add):active{transform:translateY(2px)}
 html.sk .btn:disabled{opacity:.5}
@@ -35,3 +35,5 @@ html.sk .tl:not(.far)::after{background:url(media/ui-bubble-tail.webp) center/co
 html.sk .row{background:url(media/ui-row.webp) center/100% 100% no-repeat;border-bottom:0}
 html.sk .row:hover{background:url(media/ui-row.webp) center/100% 100% no-repeat;filter:brightness(1.06)}
 html.sk .row.has{background:linear-gradient(rgba(255,236,190,.45),rgba(255,236,190,.45)),url(media/ui-row.webp) center/100% 100% no-repeat}
+
+html.sk.ph #phchip:not([hidden]){border-width:4px!important;padding:6px 8px!important;min-height:44px}
