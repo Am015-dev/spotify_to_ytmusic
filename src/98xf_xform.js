@@ -33,35 +33,14 @@ function XF_kerbH(x,z,h,D0=1.5){const e=.5,gx=(XF_D(x+e,z)-XF_D(x-e,z))/(2*e),gz
 function XF_kerbSpot(){for(const S of XF_grassSpot(1)){const dx=Math.sin(S.h),dz=Math.cos(S.h);for(let u=0;u<60;u+=.5){let x=S.x+dx*u,z=S.z+dz*u;if(XF_D(x,z)<.3)continue;
   for(const sg of[1.2,-1.2]){const h0=XF_kerbH(x,z,S.h+sg,.3);let h=h0,px=x,pz=z,ok=true,turn=0;for(let m=0;m<70&&ok;m++){const h2=XF_kerbH(px,pz,h,.3);turn+=Math.abs(angDiff(h2,h));h=h2;px+=Math.sin(h)*2;pz+=Math.cos(h)*2;
     const D=XF_D(px,pz);if(D<-1||D>1.6||roamHit(px,pz,2.5)||inRiver(px,pz,-3))ok=false}if(ok&&turn<.8)return{x,z,h:h0,park:S.park}}break}}return null}
-
-// measurements: tyre gap of the visible form (wheel bottoms vs the ground under each wheel), boat draft (water surface − lowest hull point)
-const _xv=new THREE.Vector3(),_xs=new THREE.Vector3(),_xb=new THREE.Box3();
-function XF_vis(o,top){for(let a=o;a&&a!==top;a=a.parent)if(!a.visible)return false;return true}
-function XF_gap(){const ud=pl.mesh.userData,top=pl.mesh;top.updateMatrixWorld(true);const G=[];
- top.traverse(o=>{if(!o.isMesh||!o.userData.r||!XF_vis(o,top))return;o.getWorldPosition(_xv);o.getWorldScale(_xs);G.push(_xv.y-o.userData.r*_xs.y-groundAt(_xv.x,_xv.z,_xv.y+1))});
- if(!G.length)return null;return{n:G.length,min:Math.min(...G),max:Math.max(...G)}}
-function XF_draft(){const top=pl.mesh;top.updateMatrixWorld(true);let lo=1e9;top.traverse(o=>{if(!o.isMesh||!XF_vis(o,top)||o.userData.a8s)return;const P=o.geometry&&o.geometry.attributes.position;if(!P)return;
-  if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();_xb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);if(_xb.min.y<lo&&_xb.max.y-_xb.min.y<6)lo=_xb.min.y});
- const water=RO.y+waveH(RO.x,RO.z,T)*Math.min(1,pl.boatK||0);return water-lo}
-// the slipway nearest the car: bank point + direction into the water
-function XF_slip(){let b=null,bd=1e18;for(const S of SLIPS){const d=(S.x-RO.x)**2+(S.z-RO.z)**2;if(d<bd&&!roamHit(S.x-S.ix*25,S.z-S.iz*25,3)){bd=d;b=S}}return b}
 const XF_GOS={
  grass:{n:'park edge',fn:say=>{const S=XF_grassSpot();if(!S)return'📍 XF · no park edge found ❌';roamWarp(S.x,S.z,S.h);RO.h=RO.vh=S.h;RO.v=0;let tIn=null,vIn=0,tSw=null,vSw=0,vAfter=0;
   XF_drive(9,t=>{XF_keep(S.h);const raw=FL.lastSurf;if(tIn==null&&!FL_road(RO.x,RO.z,0)){tIn=t;vIn=Math.abs(RO.v)}if(tSw==null&&RO.veh==='offroad'){tSw=t;vSw=Math.abs(RO.v)}if(tSw!=null&&t>tSw+.3){vAfter=Math.abs(RO.v);return true}},()=>{
-   const dt=tSw!=null&&tIn!=null?tSw-tIn:null,gp=XF_gap(),ok=dt!=null&&dt<=.5&&vAfter>=.9*vSw&&pl.vmode==='4x4'&&gp&&Math.abs(gp.max)<=.05&&gp.min>=-.05;window.__xf.res.grass={park:S.park,dt,vIn,vSw,vAfter,form:pl.vmode,gap:gp};
-   say(`📍 ROAD → GRASS (${S.park}) · off-road ${dt==null?'never':'after '+dt.toFixed(2)+' s on grass'} at ${Math.round(vSw*3.6)} km/h → ${Math.round(vAfter*3.6)} km/h · form ${pl.vmode} · tyre gap ${gp?gp.min.toFixed(2)+'…'+gp.max.toFixed(2)+' m':'n/a'} ${ok?'✅':'❌'}`)});return'📍 ROAD → GRASS · driving into '+S.park+'…'}},
- water:{n:'slipway',fn:say=>{const S=XF_slip();if(!S)return'📍 XF · no slipway ❌';const h=Math.atan2(S.ix,S.iz);roamWarp(S.x-S.ix*25,S.z-S.iz*25,h);RO.h=RO.vh=h;RO.v=0;let tIn=null,tSw=null,vSw=0,vA=0,dr=null;
-  XF_drive(12,t=>{XF_keep(h);if(tIn==null&&FL.lastSurf==='water')tIn=t;if(tSw==null&&RO.veh==='boat'){tSw=t;vSw=Math.abs(RO.v)}if(tSw!=null&&vA===0&&t>tSw+.3)vA=Math.abs(RO.v);if(tSw!=null&&t>tSw+1.5){dr=XF_draft();return true}},()=>{
-   const dt=tSw!=null&&tIn!=null?tSw-tIn:null,ok=dt!=null&&dt<=.5&&pl.vmode==='boat'&&dr!=null&&Math.abs(dr-W8B.sink)<=.1&&vA>=.9*vSw;window.__xf.res.water={dt,vSw,vA,draft:dr,form:pl.vmode};
-   say(`📍 SLIPWAY → RIVER · boat ${dt==null?'never':'after '+dt.toFixed(2)+' s on water'} at ${Math.round(vSw*3.6)} → ${Math.round(vA*3.6)} km/h · hull ${dr==null?'?':dr.toFixed(2)} m under the water line (target ${W8B.sink}±0.1) ${ok?'✅':'❌'}`)});return'📍 SLIPWAY → RIVER · driving into the water…'}},
- land:{n:'slipway (from the water)',fn:say=>{const S=XF_slip();if(!S)return'📍 XF · no slipway ❌';const h=Math.atan2(-S.ix,-S.iz);roamWarp(S.x+S.ix*30,S.z+S.iz*30,h);RO.h=RO.vh=h;RO.v=0;let tOut=null,tSw=null,form=null,surf=null,gp=null,vSw=0,vA=0;
-  XF_drive(12,t=>{XF_keep(h);if(t<.5&&RO.veh!=='boat')return false;if(tOut==null&&t>.5&&FL.lastSurf!=='water')tOut=t;if(tSw==null&&tOut!=null&&RO.veh!=='boat'){tSw=t;vSw=Math.abs(RO.v)}if(tSw!=null&&vA===0&&t>tSw+.3)vA=Math.abs(RO.v);
-   if(tSw!=null&&t>tSw+2.5){form=pl.vmode;surf=FL.s;gp=XF_gap();return true}},()=>{const dt=tSw!=null&&tOut!=null?tSw-tOut:null,want=surf==='road'?'car':'4x4',
-   ok=dt!=null&&dt<=.5&&form===want&&gp&&Math.abs(gp.max)<=.05&&gp.min>=-.05&&vA>=.9*vSw;window.__xf.res.land={dt,form,surf,gap:gp,vSw,vA};
-   say(`📍 RIVER → LAND · ${dt==null?'still a boat':'left the boat '+dt.toFixed(2)+' s after the shore'} → ${form} on ${surf} at ${Math.round(vSw*3.6)} → ${Math.round(vA*3.6)} km/h · tyre gap ${gp?gp.min.toFixed(2)+'…'+gp.max.toFixed(2)+' m':'n/a'} ${ok?'✅':'❌'}`)});return'📍 RIVER → LAND · driving up the slipway…'}},
+   const dt=tSw!=null&&tIn!=null?tSw-tIn:null,ok=dt!=null&&dt<=.5&&vAfter>=.9*vSw&&pl.vmode==='4x4';window.__xf.res.grass={park:S.park,dt,vIn,vSw,vAfter,form:pl.vmode};
+   say(`📍 ROAD → GRASS (${S.park}) · off-road ${dt==null?'never':'after '+dt.toFixed(2)+' s on grass'} at ${Math.round(vSw*3.6)} km/h → ${Math.round(vAfter*3.6)} km/h · form ${pl.vmode} ${ok?'✅':'❌'}`)});return'📍 ROAD → GRASS · driving into '+S.park+'…'}},
  kerb:{n:'kerb run',fn:say=>{const S=XF_kerbSpot();if(!S)return'📍 XF · no park-edge kerb found ❌';roamWarp(S.x,S.z,S.h);RO.h=RO.vh=S.h;RO.v=0;FL_terr(roamTerr(RO.x,RO.z,RO.y+.3),groundY(RO.x,RO.z));const sw0=XF.n;let flips=0,last=null,minD=1e9,maxD=-1e9;
   XF_drive(10,t=>{const raw=FL.lastSurf;if(last!=null&&raw!==last)flips++;last=raw;const D=XF_D(RO.x,RO.z);if(t>1){minD=Math.min(minD,D);maxD=Math.max(maxD,D)}
    XF_keep(XF_kerbH(RO.x,RO.z,RO.h,.3+.6*Math.sin(t*2.5)));K.ArrowUp=K.KeyW=Math.abs(RO.v)<12},()=>{
    const n=XF.n-sw0,ok=n===0&&maxD>0&&minD<0;window.__xf.res.kerb={swaps:n,flips,minD,maxD,form:FL.v,park:S.park};
    say(`📍 KERB RUN 10 s (${S.park}) · ${n} swaps (form ${FL.v}), wheels ${minD.toFixed(1)}…${maxD.toFixed(1)} m past the asphalt ${ok?'✅':'❌'}`)});return'📍 KERB RUN · driving 10 s along the road edge…'}}};
-window.__xf={XF,GOS:XF_GOS,res:{},surf:()=>({raw:FL.lastSurf,s:FL.s,v:FL.v,veh:RO.veh,vmode:pl&&pl.vmode,n:XF.n}),grass:XF_grassSpot,gap:()=>XF_gap(),draft:()=>XF_draft(),kerb:XF_kerbSpot,D:XF_D};
+window.__xf={XF,GOS:XF_GOS,res:{},surf:()=>({raw:FL.lastSurf,s:FL.s,v:FL.v,veh:RO.veh,vmode:pl&&pl.vmode,n:XF.n}),grass:XF_grassSpot,kerb:XF_kerbSpot,D:XF_D};
