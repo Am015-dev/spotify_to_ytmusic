@@ -2,10 +2,12 @@
 // Minimal graphics (low quality, no shadow map, 1500 m far plane), story/cutscene/tutorial popups skipped, then &car=<ride id>, &at=x,z and
 // &go=<ver/id> (a checklist GO) are applied. window.__tq.ready turns true once you can drive. The checklist GO jumps to the other city through here.
 if(TQ){
- SET.q='low';LK.userQ='low';LK.drop=1;try{applyQuality()}catch(e){}
+ // &q=high|med (gfx-1): test at a real quality tier (shadows allowed); default stays low
+ TQ.q=new URLSearchParams(location.search).get('q');if(!/^(high|med)$/.test(TQ.q||''))TQ.q=null;
+ SET.q=TQ.q||'low';LK.userQ=SET.q;LK.drop=TQ.q?0:1;try{applyQuality()}catch(e){}
  // settings stay the player's: nothing in test mode writes mho_set
  {const s0=store.set;store.set=function(k,v){if(k==='mho_set')return;return s0.apply(this,arguments)}}
- LK_shadow=(f=>function(on){return f.call(this,false)})(LK_shadow);
+ LK_shadow=(f=>function(on){return f.call(this,TQ.q?on:false)})(LK_shadow);
  // boot speed: no shader/GPU warm-up passes (they only smooth the first seconds on a phone) and no picture while the loader is up
  try{menuTrack=ROAMCFG.track||'grand'}catch(e){}  // the menu backdrop builds the same track free roam needs: built once, not twice
  ldPrewarm=async function(){};SM_upload=async function(){};P2_warm=function(){};warmTextures=function(){};
