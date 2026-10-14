@@ -7,7 +7,7 @@
 // env 1.0) on everything that casts a shadow (buildings, cars, props; never the ground), deeper sky, subtle bloom on highlights.
 const GFX={on:(()=>{try{const q=new URLSearchParams(location.search).get('gfx');if(q!==null)return q!=='0';return store.get('mho_gfx',1)===1}catch(e){return true}})(),   // gfx-2 (2026-10-14): ON by default for everyone (coordinator); ?gfx=0 / store 0 = old look
  day:false,keyOrig:new Map(),mats:new WeakSet(),pm:[],gm:[],U:{value:1},G:{value:new THREE.Vector4(0,0,0,0)},t:0,n:0,tier:null};
-const GFX_SUN=[600,300,380];   // ~23° elevation (coordinator: shadows must read clearly, 2K-style long shadows under cars, buildings, trees)
+const GFX_SUN=[600,300,380];   // ~30° elevation (GFX_sunFollow; coordinator: shadows must read clearly, 2K-style long shadows under cars, buildings, trees)
 function GFX_tier(){try{const L=LK_lvl();return L==='high'?'high':L==='med'?'med':'off'}catch(e){return SET.q==='high'?'high':SET.q==='med'?'med':'off'}}
 function GFX_isDay(){return RO.on&&MOOD&&!(typeof FL!=='undefined'&&FL.n>.5)&&MOOD.id!=='night'&&MOOD.id!=='flnight'}
 // lights, tone mapping, sky, fog: applied after ART_light (which runs after every mood / day-cycle update while roaming)
@@ -16,7 +16,7 @@ function GFX_light(){if(!GFX.on)return;const day=GFX_isDay();GFX.day=day;
  if(!GFX.keyOrig.has(MOOD)){GFX.keyOrig.set(MOOD,MOOD.key[2]);MOOD.key[2]=GFX_SUN}moonL.position.copy(moonL.target.position).add(new THREE.Vector3(...GFX_SUN).setLength(400));   // relative to the shadow target (71_roam_drive), not world 0
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
  const ath=CID==='ath';moonL.color.set(ath?'#ffd9a8':'#ffe1b4');moonL.intensity=4.8;
- hemi.color.set('#86acff');hemi.groundColor.set(ath?'#5e4c32':'#3f5a2c');hemi.intensity=.34;   // gfx-2: .5 left shadows at ~65 % of sunlit; .34 = dark, cool-blue shadows
+ hemi.color.set('#86acff');hemi.groundColor.set(ath?'#5e4c32':'#4a5a4c');hemi.intensity=.4;   // gfx-2: .5 left shadows at ~65 % of sunlit; .4 = dark, cool-blue shadows (.34 + green-brown bounce read as mud)
  scene.environmentIntensity=.22;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
  const U=SKYU;U.uTop.value.set(.004,.045,.40);U.uMid.value.set(.025,.16,.72);U.uHor.value.set(ath?.62:.48,ath?.66:.68,ath?.78:.92);U.uSun.value.set(1.0,.8,.5);
  scene.fog.color.set(ath?'#cfd6e2':'#b9cff0');
@@ -91,7 +91,7 @@ LK_roamLook=(f=>function(){const r=f.apply(this,arguments);try{GFX.t=0;GFX_frame
 // sun follows the camera slowly from behind-left (gfx-2): a fixed world sun was backlit on half the headings (v90m Frankfurt start: we saw only
 // shaded faces, the car's shadow hid under it, sun glare greyed the sky). Now lit faces + shadows falling forward-right on screen, every heading.
 // Azimuth slews at most GFX_SLEW rad/s (smoothed), so shadows creep while turning instead of swinging.
-function GFX_sunFollow(dt){const GFX_EL=.42,GFX_AZ=2.45,GFX_SLEW=.35;   // elevation ~24°, sun 140° from the view direction (behind, to the left)
+function GFX_sunFollow(dt){const GFX_EL=.52,GFX_AZ=2.8,GFX_SLEW=.35;   // elevation ~30°, sun 160° from the view direction (behind, a little left): at 24°/140° Frankfurt's building rows shaded the whole road
  if(!GFX.on||!GFX.day||!camera)return;const d=GFX.cd||(GFX.cd=new THREE.Vector3());camera.getWorldDirection(d);
  const want=Math.atan2(d.z,d.x)-GFX_AZ;if(GFX.az===undefined||dt>1)GFX.az=want;let e=want-GFX.az;e=Math.atan2(Math.sin(e),Math.cos(e));
  GFX.az+=Math.sign(e)*Math.min(Math.abs(e),Math.max(GFX_SLEW,Math.abs(e)*.6)*Math.min(dt,.1));
