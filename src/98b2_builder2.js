@@ -344,14 +344,21 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
   const hp=h&&h.object.userData.pc;if(h&&h.face&&h.face.normal.dot(U)<.5&&!(hp&&!hp.def.in&&hp.def.p.length===1&&hp===V.on)){const nw=h.face.normal,vn=V.v.dot(nw);if(vn<0){V.v.addScaledVector(nw,-vn*1.3);m.wall++;V.p.addScaledVector(nw,.2)}}}}
  // barriers: on a railed piece the car's centre stays within 2.5 m of the deck centre line; the outward speed is taken away (it slides along the wall)
  {const q=V.on&&!V.on.def.in&&V.on.S.length===1&&!H.some(h=>h&&h.pc&&h.pc!==V.on)?V.on:null;if(q&&!V.boat){let b=null,bd=1e9;for(const s of q.S[0]){const d=s.p.distanceToSquared(V.p);if(d<bd){bd=d;b=s}}
-  const lat=_r1.copy(V.p).sub(b.p).dot(b.S),lim=5.4;if(Math.abs(lat)>lim&&Math.abs(lat)<8){const sg=Math.sign(lat);V.p.addScaledVector(b.S,(lim-Math.abs(lat))*sg);const vo=V.v.dot(b.S)*sg;if(vo>0){V.v.addScaledVector(b.S,-vo*sg);if(vo>4&&!V.rub)m.wall++;V.rub=.3}}}}if(V.rub>0)V.rub-=dt
+  const lat=_r1.copy(V.p).sub(b.p).dot(b.S),lim=5.4;if(Math.abs(lat)>lim&&Math.abs(lat)<8){const sg=Math.sign(lat);V.p.addScaledVector(b.S,(lim-Math.abs(lat))*sg);const vo=V.v.dot(b.S)*sg;if(vo>0){V.v.addScaledVector(b.S,-vo*sg);if(vo>4&&!V.rub)m.wall++;V.rub=.3}
+   // trk-2 (Alex beta.22 "the car drives backwards"): nose into the rail -> turn it along the course (yaw needs speed, the pinned car had none and ground round to face backwards)
+   if(F.dot(b.S)*sg>-.05){const tf=_r2.copy(b.F).addScaledVector(U,-b.F.dot(U)).normalize();F.lerp(tf,Math.min(1,dt*6)).normalize()}}}}if(V.rub>0)V.rub-=dt
  V.p.addScaledVector(V.v,dt);
  // respawn rules (the ONLY ones): below the terrain minimum, upside down >2 s (not in a loop), >40 m from the course >3 s (BX_farCheck)
  if(V.p.y<V.tMin-3)return BX_respawn('fall');
  if(U.y<0&&!(V.on&&V.on.def.stick)){V.stuck+=dt;if(V.stuck>2)return BX_respawn('stuck')}else V.stuck=0;
  m.t+=dt;m.dist+=V.v.length()*dt;{const vf=V.v.dot(F);if(vf<-1){m.backT=(m.backT||0)+dt;if(m.t<4)m.back0=(m.back0||0)+dt}}if(m.fwd3==null&&m.t>=3){const s0=BX.v.safe;m.fwd3=+V.p.clone().sub(s0.p).dot(s0.F).toFixed(1)}m.yMin=Math.min(m.yMin,V.p.y);m.yMax=Math.max(m.yMax,V.p.y);if(!grounded&&!V.boat||U.y<Math.cos(.07))m.off+=dt}
-function BX_farCheck(dt){const V=BX.v;if(!BX.samp.length)return;let best=1e9;for(const{s}of BX.samp){const dx=s.p.x-V.p.x,dz=s.p.z-V.p.z,d=dx*dx+dz*dz;if(d<best)best=d}best=Math.sqrt(best);V.dCourse=+best.toFixed(1);
+function BX_farCheck(dt){const V=BX.v;if(!BX.samp.length)return;let best=1e9,b3=1e9,bs=null;for(const{s}of BX.samp){const dx=s.p.x-V.p.x,dz=s.p.z-V.p.z,d=dx*dx+dz*dz,dy=s.p.y-V.p.y,e=d+4*dy*dy;if(d<best)best=d;if(e<b3){b3=e;bs=s}}best=Math.sqrt(best);V.dCourse=+best.toFixed(1);
+ BX_wrongWay(dt,bs,Math.sqrt(b3));
  if(best>40){V.far+=dt;if(V.far>3)BX_respawn('far')}else V.far=0}
+// trk-2: WRONG WAY (heading > 110° off the course) or STUCK (gas held, < 2 m/s) for 2.5 s -> the car is turned to face the course on the road (no lost checkpoints)
+function BX_wrongWay(dt,s,d){const V=BX.v,m=BX.m;if(!s||!V.g||V.boat||d>9){V.wrongT=0;return}const fh=Math.hypot(s.F.x,s.F.z)||1,c=(V.F.x*s.F.x+V.F.z*s.F.z)/fh,inp=BX.inp||{},slow=V.v.length()<2&&inp.g;
+ if(c<-.35||slow){V.wrongT=(V.wrongT||0)+dt;if(c<-.35&&V.wrongT>.6&&V.wrongT-dt<=.6)BX_say('WRONG WAY',1)}else V.wrongT=0;
+ if(V.wrongT>2.5){V.wrongT=0;V.p.set(s.p.x,s.p.y+.8,s.p.z);V.F.set(s.F.x/fh,0,s.F.z/fh);V.U.set(0,1,0);V.v.copy(V.F).multiplyScalar(6);V.g=false;m.turned=(m.turned||0)+1;BX_say('BACK ON TRACK',1)}}
 // checkpoints and laps: START then every CHECKPOINT (any order), back over START = lap
 function BX_course(pc){const V=BX.v,m=BX.m,cps=BX.pcs.filter(p=>!p.dead&&p.def.cp);if((pc.def.cp||pc.def.start)&&V.lastPc!==pc.id)V.lastCp={p:V.p.clone(),F:V.F.clone()};if(pc.def.cp&&!V.cps.has(pc.id)){V.cps.add(pc.id);BX_say('CHECKPOINT '+V.cps.size+'/'+cps.length,1)}
  if(pc.def.start&&V.lastPc!==pc.id){if(V.cps.size>=cps.length&&m.t-m.lap0>8){m.laps++;m.lapT.push(+(m.t-m.lap0).toFixed(2));m.lap0=m.t;V.cps=new Set();BX_say(m.laps>=BX_RACE_LAPS?'FINISH! '+m.lapT.reduce((a,b)=>a+b,0).toFixed(1)+' s':'LAP '+m.laps+' · '+m.lapT[m.lapT.length-1].toFixed(1)+' s',m.laps>=BX_RACE_LAPS?4:2)}}
@@ -365,7 +372,7 @@ function BX_camDrive(dt){const V=BX.v,cam=BX.cam,D=BX.camD,air=!V.g&&!V.boat&&V.
 function BX_sunAt(t){const s=BX.sun;s.position.set(t.x+60,t.y+120,t.z+40);s.target.position.copy(t);s.target.updateMatrixWorld()}
 // ---------------------------------------------------------------- frame
 function BX_tick(now){const dt=BX.fast?1/60:Math.min(.05,(now-(BX.last||now))/1000);BX.last=now;BX.t+=dt;const cam=BX.cam;cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
- if(BX.mode==='drive'&&BX.hold){BX_camDrive(0)}else if(BX.mode==='drive'){const inp=BX_input(dt);BX.acc+=dt;let n=0;while(BX.acc>=1/120&&n<10){BX_step(1/120,inp);BX.acc-=1/120;n++}BX_farCheck(dt);
+ if(BX.mode==='drive'&&BX.hold){BX_camDrive(0)}else if(BX.mode==='drive'){const inp=BX.inp=BX_input(dt);BX.acc+=dt;let n=0;while(BX.acc>=1/120&&n<10){BX_step(1/120,inp);BX.acc-=1/120;n++}BX_farCheck(dt);
   const V=BX.v;BX.car.position.copy(V.p);const S=bxV().crossVectors(V.F,V.U).normalize();BX.car.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(S.negate(),V.U,V.F));
   const gy=BX_h(V.p.x,V.p.z);BX.shM.visible=V.p.y-gy<14&&!V.boat;BX.shM.position.set(V.p.x,Math.max(gy,V.boat?0:gy)+.08,V.p.z);
   if(V.msgT>0)V.msgT-=dt;BX_camDrive(dt);BX_hud()}else BX_camBuild();
@@ -461,6 +468,7 @@ frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try
 
 // Race menu: the built-in builder tracks are listed after the city tracks (tap = open the builder on that track and drive it)
 const BX_DEMOS_SHOW=false,BX_RACE_LAPS=2; // trk-2: HIDDEN until fixed (Alex beta.22: car drives backwards, no race rules). trk-1: shown again (rails, 14 m road, shortcuts, props); a demo with hide:1 stays out of the menus (trk-2: TWO-LEVEL CITY redone and shown). Races are 2 laps (coordinator)function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){if(BX_DEMOS[k].hide)continue;const b=document.createElement('button');b.className='trk bxTrk';
+function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup').hidden)return;for(const k in BX_DEMOS){if(BX_DEMOS[k].hide)continue;const b=document.createElement('button');b.className='trk bxTrk';
  b.insertAdjacentHTML('beforeend',`<b>🏗 ${k}</b><em>builder track · 2 laps</em>`);b.title='Built with the TRACK BUILDER. Open it in the builder to edit.';
  b.onclick=e=>{e.stopPropagation();BX_open();BX_load(BX_DEMOS[k],k);BX.camGo=1;BX.seenAll=new Set();BX_driveStart()};tw.appendChild(b)}}
 buildMenu=(f=>function(){const r=f.apply(this,arguments);try{BX_raceMenu()}catch(e){console.warn(e)}return r})(buildMenu);
