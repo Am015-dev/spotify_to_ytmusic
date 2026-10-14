@@ -72,8 +72,9 @@ test was wrong; workers' "all rules pass" relayed as done and disproved by the o
   dead buttons (taps every button), clutter (bar <= 5, one primary, one instruction line).
 - Design system, not patches: one type scale, spacing and panel/button set as CSS variables in shell/ (games theme colours and
   board art only); text sits on flat calm surfaces, art never under words; wide screens get their own layout. UI-BAR.md lists the bar.
-- Game state hooks (GXS scenarios, boardOpen) drive tests; never AI eyes. Pending owner OK: Playwright toHaveScreenshot baselines
-  as a machine-only pixel gate (images compared by the test, never read by a model, stored outside the repo).
+- Game state hooks (GXS scenarios, boardOpen) drive tests; never AI eyes. Pixel baselines (owner OK, 14 Oct): Playwright
+  toHaveScreenshot baselines are a machine-only gate: images are compared by the test, NEVER opened/read by a model, and stored
+  on the orphan branch ui-baselines (not on the work branch). A baseline is (re)recorded only after the owner approves that screen.
 - Cost habits: Haiku for chores/relays, Sonnet for code; workers stop at 30 min or 150k; read line ranges only; keep this file short.
 
 ## Cost rules (about $4,000 was spent, mostly waste)
