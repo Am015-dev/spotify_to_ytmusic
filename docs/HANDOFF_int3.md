@@ -39,3 +39,5 @@ Push loop: commit (`git add -f out/<ver>` since out/ is ignored), fetch+merge, p
 
 ## Pending at handoff
 - terr-1 PUSHED 20b1a56 (TERR flag OFF by default, TAG=terrain, 14 GOs say PENDING when off): not yet built/tested by int-3. Run unit + full suite on the current head first.
+- trk-2 PUSHED 60f9cf0 (TWO-LEVEL CITY back as 4th race track; tData 4/4 per trk-2; new checklist item bxT/bx-t-city): not built/tested by int-3 (player-visible → BUILD line after green).
+- test-1 PUSHED 88cd07c8 (unit run.js --selftest).
