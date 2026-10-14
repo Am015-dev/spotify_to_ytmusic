@@ -42,6 +42,8 @@ import {ShaderPass} from 'three/addons/postprocessing/ShaderPass.js';
 import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 import {Reflector} from 'three/addons/objects/Reflector.js';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';   // gfx-1: stock studio env for LEGO plastic highlights
+import {GTAOPass} from 'three/addons/postprocessing/GTAOPass.js';             // gfx-1: stock ground-truth AO (PC high tier only)
 
 /* ============================================================ 0 · utils */
 const $=s=>document.querySelector(s);

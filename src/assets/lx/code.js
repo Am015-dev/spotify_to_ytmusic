@@ -69,7 +69,8 @@ function LIFE_geos(){const fra=CID==='fra',P=Math.PI;
  return{S,Q,ball,dog,fig,torso,arms,M,pop,ring}}
 // ---------- pools: name → InstancedMesh (count set per frame; invisible while empty, so an empty pool costs no draw call)
 const LIFE_CAP={set:14,setM:14,prop:18,ball:6,dog:6,fig:150,sm:44,pop:8};
-function LIFE_im(geo,n,mat){const m=new THREE.InstancedMesh(geo,mat||LV_mat(),n);m.frustumCulled=false;m.castShadow=false;m.receiveShadow=false;m.count=0;m.visible=false;LIFE.grp.add(m);return m}
+// dynamic usage + userData.keep: WB city batching (98wb WB_cand) otherwise freezes static instanced meshes into its merged tiles (they vanished in Athens)
+function LIFE_im(geo,n,mat){const m=new THREE.InstancedMesh(geo,mat||LV_mat(),n);m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.userData.keep=1;m.frustumCulled=false;m.castShadow=false;m.receiveShadow=false;m.count=0;m.visible=false;LIFE.grp.add(m);return m}
 function LIFE_init(){if(LIFE.grp===HUB.grp)return true;if(!HUB.grp||!HUB.nodes||!HUB.nodes.length||typeof LV_eGrid!=='function')return false;
  const G=LIFE_geos(),M={};LIFE.grp=HUB.grp;LIFE.C.clear();LIFE.SC.clear();LIFE.dead.clear();LIFE.fly.clear();LIFE.L=[];LIFE.px=1e9;
  for(const k of LIFE_SET){M['s_'+k]=LIFE_im(G.S[k][0],LIFE_CAP.set);M['m_'+k]=LIFE_im(G.S[k][1],LIFE_CAP.setM)}
@@ -131,7 +132,7 @@ function LIFE_landmark(){LIFE.lm=null;const fra=CID==='fra';let at=null;
  else{const base=LIFE_g([[LC(8,8,.6,24),'#c84060',0,.3,0],[LC(.6,.6,7,10),'#ffd12c',0,3.5,0],[LC(0,8.6,3,16),'#ffffff',0,8.6,0],[LC(8.6,8.6,.6,16),'#1f5fbf',0,7,0]]);
    const H=[];for(let i=0;i<12;i++){const a=i*P/6;H.push([LB(.7,1.8,2.2),LIFE_SHIRT[i%8],Math.sin(a)*6,2.2,Math.cos(a)*6,0,a,0]);H.push([LC(.08,.08,6,4),'#ffd12c',Math.sin(a)*6,3.6,Math.cos(a)*6])}
    const mb=new THREE.Mesh(base,LV_mat()),mh=new THREE.Mesh(LIFE_g(H),LV_mat());g.add(mb,mh);LIFE.lm={g,spin:mh,ax:'y',k:'big carousel',...at}}
- g.position.set(at.x,at.y,at.z);g.rotation.y=at.h||0;LIFE.grp.add(g);const r=fra?6:8.5;LIFE.lm.r=r}
+ g.traverse(o=>{o.userData.keep=1});/* not merged by WB city batching: the wheel turns */g.position.set(at.x,at.y,at.z);g.rotation.y=at.h||0;LIFE.grp.add(g);const r=fra?6:8.5;LIFE.lm.r=r}
 // ---------- fill: items within LIFE_R m, nearest first, into the pools (every 12 frames or 20 m)
 function LIFE_fill(){const x0=RO.x,z0=RO.z,cr=Math.ceil(LIFE_R/LIFE_CELL),ca=Math.floor(x0/LIFE_CELL),cb=Math.floor(z0/LIFE_CELL),near=[],t0=performance.now();let todo=false;
  for(let a=ca-cr;a<=ca+cr;a++)for(let b=cb-cr;b<=cb+cr;b++){if(!LIFE.C.has(a*100000+b)&&performance.now()-t0>3){todo=true;continue}for(const it of LIFE_cell(a,b)){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
