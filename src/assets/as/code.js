@@ -149,14 +149,37 @@ function AS_fix(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=AS
   const c0=cnt[p.av]||0;if(!c0)continue;let best=p.av,bc=c0;for(const P of[POOL[p.t],all]){for(const v in P){const c=cnt[v]||0;if(c<bc-1e-6){bc=c;best=v}}if(bc===0)break}if(best!==p.av){p.av=best;ch++}}sw+=ch;if(!ch)break}return sw}
 function AS_farM(p,m){const V=ASSET.V[p.av];return m.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),V.cls==='keep'?_ts.set(1,1,1):_ts.set(V.rx,V.H,V.rx))}
 // far instances of assigned props: variant scale + crown tint (+ debris colour)
-function AS_far(L){const M=new THREE.Matrix4(),dirty=new Set();for(const p of L){if(!p.av||!p.im)continue;const V=ASSET.V[p.av];if(V.cls==='keep')continue;if(p.alive)p.im.setMatrixAt(p.i,AS_farM(p,M));if(p.im.instanceColor)p.im.setColorAt(p.i,V.leaf);p.col=V.leaf.clone();dirty.add(p.im)}
+function AS_far(L){const M=new THREE.Matrix4(),dirty=new Set();for(const p of L){if(!p.av||!p.im)continue;const V=ASSET.V[p.av];if(V.cls==='keep')continue;if(p.alive)p.im.setMatrixAt(p.i,AS_farM(p,M));if(p.im.geometry.userData.asImp){p.im.setColorAt(p.i,_asC.setRGB(V.cell/255,0,0));if(p.im.material!==ASSET.imp.mat)p.im.material=ASSET.imp.mat;p.im.castShadow=false}else if(p.im.instanceColor)p.im.setColorAt(p.i,V.leaf);p.col=V.leaf.clone();dirty.add(p.im)}
  for(const im of dirty){im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.computeBoundingSphere()}}
+// far LOD = LEGO impostors (asset-2; Alex: replace the cone trees in the far distance): every tree/bush variant's simplified build is rendered once into
+// a 4x4 atlas (256 px cells, render target with mipmaps, cleared to the crown colour at alpha 0 so mips have no dark fringe) from 22° above (as the player sees far trees) under a fixed sun + sky,
+// and drawn as two crossed quads (4 tris instead of the ~40-tri lathe blob), alpha-tested. The atlas cell rides in the instance colour's red channel
+// (cell/255), so the city's per-tile prop meshes keep one geometry + one material per base type and AS_far just writes the cell per instance.
+const AS_IP=.04,AS_IE=22;// cell padding (uv); capture elevation (deg): from the side the flat leaf plates are edge-on slivers
+function AS_impAtlas(){const V=ASSET.V,L=Object.values(V).filter(v=>v.cls!=='keep');if(ASSET.imp&&ASSET.imp.city===ASSET.city&&ASSET.imp.n===L.length)return ASSET.imp;
+ const R=renderer,S=256,rt=new THREE.WebGLRenderTarget(S*4,S*4,{generateMipmaps:true,minFilter:THREE.LinearMipmapLinearFilter,magFilter:THREE.LinearFilter}),sc=new THREE.Scene(),cam=new THREE.OrthographicCamera(-1,1,1,0,-200,200);ASSET.mat=ASSET.mat||new THREE.MeshStandardMaterial({vertexColors:true,roughness:.32,metalness:0});
+ sc.add(new THREE.HemisphereLight(0xdfefff,0x55603a,1.6));const sun=new THREE.DirectionalLight(0xfff2dd,2.4);sun.position.set(.5,1,.9);sc.add(sun);const ms=new THREE.Mesh(undefined,ASSET.mat);sc.add(ms);
+ const pr=R.getRenderTarget(),cc=R.getClearColor(new THREE.Color()),ca=R.getClearAlpha(),ac=R.autoClear,sh=R.shadowMap.autoUpdate;R.autoClear=false;R.shadowMap.autoUpdate=false;const TD=typeof TQ!=='undefined'&&TQ?TQ:null,d0=TD&&TD.draw;if(TD)TD.draw=1;// &draw=0 test pages block renderer.render unless TQ.draw
+ L.forEach((v,i)=>{v.cell=i;const cx=(i%4)*S,cy=Math.floor(i/4)*S,p=Math.round(AS_IP*S);ms.geometry=v.gm;const e=AS_IE*Math.PI/180;cam.position.set(0,Math.sin(e)*50,Math.cos(e)*50);cam.lookAt(0,0,0);cam.updateMatrixWorld();let y0=1e9,y1=-1e9;
+  for(const x of[-v.rx,v.rx])for(const y of[0,v.H])for(const z of[-v.rx,v.rx]){const q=V3(x,y,z).applyMatrix4(cam.matrixWorldInverse);y0=Math.min(y0,q.y);y1=Math.max(y1,q.y)}cam.left=-v.rx;cam.right=v.rx;cam.top=y1;cam.bottom=y0;cam.updateProjectionMatrix();
+  rt.scissor.set(cx,cy,S,S);rt.scissorTest=true;rt.viewport.set(cx,cy,S,S);R.setRenderTarget(rt);R.setClearColor(v.leaf,0);R.clear();rt.viewport.set(cx+p,cy+p,S-2*p,S-2*p);R.setRenderTarget(rt);R.render(sc,cam)});
+ rt.scissorTest=false;rt.viewport.set(0,0,S*4,S*4);if(TD)TD.draw=d0;R.setRenderTarget(pr);R.setClearColor(cc,ca);R.autoClear=ac;R.shadowMap.autoUpdate=sh;
+ const m=new THREE.MeshBasicMaterial({map:rt.texture,alphaTest:.42,side:THREE.DoubleSide});m.onBeforeCompile=sh=>{sh.vertexShader=sh.vertexShader.replace('#include <uv_vertex>','#include <uv_vertex>\n#ifdef USE_INSTANCING_COLOR\n{float ci=floor(instanceColor.r*255.+.5);vMapUv=(vec2(mod(ci,4.),floor(ci/4.))+vMapUv)*.25;}\n#endif')
+  .replace('#include <color_vertex>','#include <color_vertex>\n#ifdef USE_INSTANCING_COLOR\nvColor=vec3(1.);\n#endif')};m.customProgramCacheKey=()=>'asImp';
+ const q=AS_IP,P=[],U=[];for(const[ax,az]of[[1,0],[0,1]]){const c=[[-1,0],[1,0],[1,1],[-1,0],[1,1],[-1,1]];for(const[x,y]of c){P.push(x*ax,y,x*az);U.push(q+(x+1)/2*(1-2*q),q+y*(1-2*q))}}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(U,2));g.computeVertexNormals();g.computeBoundingSphere();g.userData.asImp=1;
+ return ASSET.imp={city:ASSET.city,n:L.length,rt,mat:m,geo:g}}
+const _asC=new THREE.Color();
+// an InstancedMesh of impostors for a list of {x,y,z,ry,s,v} (v = variant name), e.g. the open race courses' trees and bushes (98ro_open)
+function AS_impMesh(L){const I=AS_impAtlas(),im=new THREE.InstancedMesh(I.geo,I.mat,L.length),M=new THREE.Matrix4(),Q=new THREE.Quaternion(),Y=V3(0,1,0),S=new THREE.Vector3();
+ L.forEach((a,i)=>{const V=ASSET.V[a.v];M.compose(V3(a.x,a.y,a.z),Q.setFromAxisAngle(Y,a.ry||0),S.set(V.rx*(a.s||1),V.H*(a.s||1),V.rx*(a.s||1)));im.setMatrixAt(i,M);im.setColorAt(i,_asC.setRGB(V.cell/255,0,0))});
+ im.computeBoundingSphere();im.userData.asImp=1;return im}
 // base types: far geometry = blob (also what LDS's tile LOD switches between, so both of its picks are the blob)
 function AS_defs(D){const C=CID==='fra'?'fra':'ath';AS_variants();ASSET.far=ASSET.far||{};for(const t in AS_POOL[C]){const d=D[t];if(!d)continue;const cls=AS_R[Object.keys(AS_POOL[C][t])[0]].far;
- const g=ASSET.far[cls]||(ASSET.far[cls]=AS_farGeo(cls));if(d.g!==g){d.gAS0=d.g;d.g=g;if(d.gFar)d.gFar=g;if(d.gOld)d.gOld=g;d.mat=d.mat&&d.mat.vertexColors?d.mat:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.42,metalness:0})}d.asB=1}}
+ const I=AS_impAtlas(),g=I.geo;if(d.g!==g){d.gAS0=d.gAS0||d.g;d.mAS0=d.mAS0||d.mat;d.g=g;if(d.gFar)d.gFar=g;if(d.gOld)d.gOld=g;d.mat=I.mat;d.mFar=null}d.asB=1}}
 // after the city's props are built (or when this file arrives later): far blobs, variants, rebalance, tints, near/mid meshes
 function AS_apply(){const D=HUB.ptypes;if(!D||!HUB.props||!HUB.grp)return;const C=CID==='fra'?'fra':'ath',old=new Map();for(const t in AS_POOL[C]){const d=D[t];if(d&&!d.asB)for(const g of[d.g,d.gFar,d.gOld])if(g)old.set(g,t)}
- AS_defs(D);if(old.size)scene.traverse(o=>{if(o.isInstancedMesh&&old.has(o.geometry))o.geometry=D[old.get(o.geometry)].g});ASSET.ag=new Map();ASSET.agId=(ASSET.agId|0)+1;ASSET.hid.clear();
+ AS_defs(D);if(old.size)scene.traverse(o=>{if(o.isInstancedMesh&&old.has(o.geometry)){const d=D[old.get(o.geometry)];o.geometry=d.g;o.material=d.mat;o.castShadow=false}});ASSET.ag=new Map();ASSET.agId=(ASSET.agId|0)+1;ASSET.hid.clear();
  ASSET.nA=AS_assign(HUB.props);ASSET.nFix=AS_fix(HUB.props);AS_far(HUB.props);AS_mk();ASSET.cx=1e9;AS_tufts()}
 // fill grass tufts (98lf, ~216k in Frankfurt, two open 5-sided cones = 10 tris each) -> a low-poly copy of LEGO 6255 Plant 1x1 Round with 3 Large Leaves:
 // 3 kite leaves 120° apart (centre r 4 -> sides r 28 ±16 -> tip r 54 LDU as measured on the LDraw part; tips arched up to 27-33 LDU so the tuft keeps the old ~0.9 m height), a second one turned 60° on a
@@ -191,7 +214,7 @@ function AS_step(){if(ASSET.off||!HUB.pgrid||!HUB.props||!ASSET.nm||!camera)retu
 // test hook: chk() = per-variant parts/studs/tris; lod() = every drawn instance on the right LOD for its distance; mix(r) = worst same-variant share within r m
 // ab(1): draw the old trees again (A/B shots and perf), ab(0): back to the LEGO builds
 function AS_ab(off){const D=HUB.ptypes,M=new THREE.Matrix4(),dirty=new Set();ASSET.off=!!off;{const GE=typeof LF!=='undefined'&&LF.geo;if(GE&&GE.tuftOld){const a=off?GE.tuft:GE.tuftOld,b=off?GE.tuftOld:GE.tuft;scene.traverse(o=>{if(o.isInstancedMesh&&o.geometry===a)o.geometry=b})}}for(const M2 of[ASSET.nm,ASSET.mm])for(const n in M2)M2[n].visible=!off&&M2[n].count>0;
- for(const p of HUB.props||[]){if(!p.av||!p.im)continue;const d=D[p.t],im=p.im;if(ASSET.V[p.av].cls==='keep'){if(off&&p.alive){M.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));im.setMatrixAt(p.i,M);dirty.add(im)}continue}if(!im.userData.asOld)im.userData.asOld=d.gAS0;im.geometry=off?im.userData.asOld:d.g;
+ for(const p of HUB.props||[]){if(!p.av||!p.im)continue;const d=D[p.t],im=p.im;if(ASSET.V[p.av].cls==='keep'){if(off&&p.alive){M.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));im.setMatrixAt(p.i,M);dirty.add(im)}continue}if(!im.userData.asOld){im.userData.asOld=d.gAS0;im.userData.asOldM=d.mAS0}im.geometry=off?im.userData.asOld:d.g;im.material=off?im.userData.asOldM:d.mat;
   if(p.alive){if(off)M.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));im.setMatrixAt(p.i,off?M:AS_farM(p,M))}
   if(off&&im.instanceColor)im.setColorAt(p.i,new THREE.Color(d.tint?d.tint[(p.i*7)%d.tint.length]:'#ffffff'));dirty.add(im)}
  for(const im of dirty){im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true}if(!off){AS_far(HUB.props);ASSET.hid.clear();ASSET.cx=1e9;AS_step()}return off?'old':'lego'}
@@ -204,6 +227,8 @@ function AS_go(kind){const C=CID==='fra'?'fra':'ath',n=AS_spot(kind==='street'?p
  if(kind==='parts'){const bad=Object.entries(st).filter(([v,o])=>o.parts<(AS_R[v].prop?5:8)||(o.studs<1&&!AS_R[v].prop)||o.ids.split(' ').some(i=>!AS_PD[i]));ok=!bad.length;
   msg=`${Object.keys(st).length} types: parts ${Math.min(...Object.values(st).map(o=>o.parts))}-${Math.max(...Object.values(st).map(o=>o.parts))}, studs ≥ ${Math.min(...Object.values(st).map(o=>o.studs))}, real LDraw parts ${[...new Set(Object.values(st).flatMap(o=>o.ids.split(' ')))].join(' ')}${bad.length?' · BAD '+bad.map(b=>b[0]).join(' '):''}`}
  else if(kind==='mix'){const m=__as.mix();ok=tree.length>=6&&m.variants>=6&&m.p95<=.3;msg=`${m.variants} tree variants placed (${tree.length} built) · most common variant in a 30 m disc: median ${m.p50*100|0}%, p95 ${m.p95*100|0}% (pass ≤ 30%), worst ${m.worst*100|0}% · ${m.trees} trees`}
+ else if(kind==='far'){const I=ASSET.imp,T=HUB.props.filter(p=>p.av&&p.im&&ASSET.V[p.av].cls!=='keep'),imp=T.filter(p=>I&&p.im.material===I.mat&&p.im.geometry===I.geo),cells=Object.values(ASSET.V).filter(v=>v.cls!=='keep'),noc=cells.filter(v=>v.cell==null).length;
+  ok=!!I&&imp.length>=T.length*.99&&!noc&&I.n<=16;msg=`${T.length} trees/bushes, ${imp.length} drawn far as LEGO impostors (4 tris, was a ~40-tri blob) · atlas ${I?I.n:0} variants${noc?' · '+noc+' without a cell':''} · near/mid LEGO builds unchanged`}
  else if(kind==='street'){const o=__as.lod(),k={};for(const v in ASSET.nm)if(AS_FURN.test(v)&&ASSET.nm[v].count)k[v.slice(2)]=ASSET.nm[v].count;for(const v in ASSET.mm)if(AS_FURN.test(v)&&ASSET.mm[v].count)k[v.slice(2)+'(mid)']=ASSET.mm[v].count;const kinds=new Set(Object.keys(k).map(x=>x.replace('(mid)','')));
   ok=kinds.size>=3&&!o.wrong&&!o.farShown&&o.ms<=1.5;msg=`${n} furniture pieces in this 40 m cell · LEGO near the car: ${Object.entries(k).map(([a,b])=>a+' '+b).join(', ')} · ${o.wrong} on the wrong LOD, ${o.farShown} doubled · +${o.draws} draws, ${Math.round(o.tris/1000)}k tris · refresh ${o.ms} ms`}
  else{const o=__as.lod();ok=!o.wrong&&!o.farShown&&o.near>0&&o.mid>0&&o.ms<=1.5;msg=`${n} trees in this 40 m cell · ${o.near} full (≤ ${ASSET.near} m) + ${o.mid} simplified (≤ ${ASSET.mid} m), ${o.wrong} on the wrong LOD, ${o.farShown} doubled · +${o.draws} draws, ${Math.round(o.tris/1000)}k tris · refresh ${o.ms} ms (pass ≤ 1.5)`}
@@ -215,7 +240,7 @@ function AS_lineup(L,d=9,old=1){const sc=scene;if(ASSET.lu){sc.remove(ASSET.lu);
  w.forEach(([geo,m],i)=>{x+=sp[i]/2;const px=RO.x+f.x*d+r.x*x,pz=RO.z+f.z*d+r.z*x,o=new THREE.Mesh(geo,m);o.position.set(px,groundY(px,pz),pz);o.rotation.y=Math.atan2(f.x,f.z)+(d<0?Math.PI:0);g.add(o);x+=sp[i]/2});sc.add(g);
  const cx=RO.x+f.x*d,cz=RO.z+f.z*d,cy=groundY(cx,cz),back=Math.max(11,tot*.55);const cam=()=>{const sg=d<0?-1:1;camera.position.set(cx+sg*f.x*back,cy+1.6,cz+sg*f.z*back);camera.lookAt(cx,cy+3.2,cz);camera.updateMatrixWorld()};
  if(window.__tq&&!ASSET.luD){ASSET.luD=__tq.draw;__tq.draw=()=>{ASSET.luCam&&ASSET.luCam();return ASSET.luD()}}ASSET.luCam=cam;return w.length+' meshes, shot camera '+back.toFixed(1)+' m back'}
-window.__as={A:ASSET,R:AS_R,build:AS_build,ab:AS_ab,step:AS_step,go:AS_go,lineup:AS_lineup,
+window.__as={impMesh:AS_impMesh,impAtlas:AS_impAtlas,A:ASSET,R:AS_R,build:AS_build,ab:AS_ab,step:AS_step,go:AS_go,lineup:AS_lineup,
  chk(){AS_variants();return ASSET.st},
  lod(){ASSET.cx=1e9;ASSET.fr=0;AS_step();const cp=camera.position,o={...ASSET.last,wrong:0,farShown:0};const e=new THREE.Matrix4(),v=new THREE.Vector3();
   for(const[MM,lo,hi]of[[ASSET.nm,0,ASSET.near],[ASSET.mm,ASSET.near,ASSET.mid]])for(const n in MM){const im=MM[n];for(let i=0;i<im.count;i++){im.getMatrixAt(i,e);v.setFromMatrixPosition(e);const d=Math.hypot(v.x-cp.x,v.z-cp.z);if(d>hi+.01||d<lo-.01)o.wrong++}}
