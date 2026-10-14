@@ -5,10 +5,10 @@
 //   Pass: >= 1 m walked over the patch (>= 4 samples; frame count depends on fps), feet within 0.05 m of the visible patch mesh (raycast), >= 2 m walked.
 const ARG_={};
 function ART_propsRoad(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';const D=HUB.ptypes||{},bad=[];let n=0,best=null;
- for(const p of HUB.props||[]){if(p.alive===false||!/^(bricks|tower|gold)$/.test(p.t))continue;n++;const e=OC_roadE(p.x,p.z),fp=OC_fp(p.t,D),q=cityAt(p.x,p.z);
+ for(const p of HUB.props||[]){if(p.alive===false)continue;if(/^(barrier|clight)$/.test(p.t)){/* art-6: roadworks lines stay off the main streets */const q=cityAt(p.x,p.z);if(q&&q.d<(q.S.r.w||8)/2-.5)bad.push([p.t,p.x|0,p.z|0]);continue}if(!/^(bricks|tower|gold)$/.test(p.t))continue;n++;const e=OC_roadE(p.x,p.z),fp=OC_fp(p.t,D),q=cityAt(p.x,p.z);
   if(e<fp||q&&q.d<(q.S.r.w||8)/2-.5)bad.push([p.t,p.x|0,p.z|0]);else if(e<fp+3){const d=Math.hypot(p.x-RO.x,p.z-RO.z);if(!best||d<best.d)best={p,d,e}}}
  if(best){const s=rfSnap(best.p.x,best.p.z,200);if(s){roamWarp(s[0],s[1],Math.atan2(best.p.x-s[0],best.p.z-s[1]))}}
- return`📍 PROPS OFF THE ROAD: ${bad.length} of ${n} brick piles / towers / gold bricks on a drivable surface (0)`+(bad.length?' e.g. '+bad.slice(0,2).map(b=>b.join(' ')).join(', '):'')+(best?`; the one ahead stands ${best.e.toFixed(1)} m off the road edge`:'')+' '+(bad.length||!n?'❌':'✅')}
+ return`📍 PROPS OFF THE ROAD: ${bad.length} of ${n} brick piles / towers / gold bricks on a drivable surface or roadworks barriers across a main street (0)`+(bad.length?' e.g. '+bad.slice(0,2).map(b=>b.join(' ')).join(', '):'')+(best?`; the one ahead stands ${best.e.toFixed(1)} m off the road edge`:'')+' '+(bad.length||!n?'❌':'✅')}
 function ART_footSurf(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';try{LF_ensure(RO.x,RO.z,600)}catch(e){}
  const ms=(LF.ms||[]).filter(m=>m.userData.lf==='patch'&&!m.isInstancedMesh&&m.parent);if(!ms.length)return'📍 No draped grass patch loaded · drive on and try again ❌';
  const E=[];for(const A of LF.PG.values())for(const e of A)if(e.d&&Math.min(e.sx,e.sz)>1.6)E.push(e);E.sort((a,b)=>Math.hypot(a.x-RO.x,a.z-RO.z)-Math.hypot(b.x-RO.x,b.z-RO.z));

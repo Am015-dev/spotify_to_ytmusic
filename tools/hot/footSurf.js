@@ -50,6 +50,7 @@
    const e=push(p.x,p.z,0,s,y+.05),d=v.circ?Math.hypot(e[0]-p.x,e[1]-p.z)-v.circ:sd(v.b,e[0],e[1]);rec(g,Math.max(0,OF_R-d),p.t+'@'+(p.x|0)+','+(p.z|0))}};
  doProps(cars,res.cars,50);doProps(others,res.props,50);
  // every ride CLASS (cars, vans, trucks, buses, scooters...): push into 4 cars per class from rear / front / both sides; visible box = the class's real model bbox (HUB.cim[k])
+ {const placed=()=>HUB.cars.filter(c=>!(c.dead>0)&&c.x!=null&&!(c.x===0&&c.z===0)).length;/* rev-3: after other matrix families no traffic is placed (rides.n 0 < 20 = footsurf-fail): tick the world until some is */try{for(let i=0;i<400&&placed()<14;i++)roamStep(1/30)}catch(e){}}
  {res.rides={n:0,w:0,bad:[]};const seen={};for(const c of HUB.cars){if(c.dead>0||c.x==null||c.x===0&&c.z===0)continue;/* art-6: pooled cars sit at (0,0) until placed (matrix ath k6@0,0) */(seen[c.k]=seen[c.k]||[]).push(c)}
   for(const k in seen){const m=HUB.cim&&HUB.cim[k];if(!m||!m.geometry)continue;m.geometry.computeBoundingBox();const bb=m.geometry.boundingBox,hw=(bb.max.x-bb.min.x)/2,hd=(bb.max.z-bb.min.z)/2,box={hw,hd};
    for(const c of seen[k].slice(0,4)){const h=OF_cH(c),ch=Math.cos(h),sh=Math.sin(h),y=c.y||groundY(c.x,c.z),b={x:c.x,z:c.z,hw,hd,c:ch,s:sh};

@@ -56,7 +56,7 @@ function buildHubProps(rnd,rr2,pick){const D=kmProps(propDefs());if(CID!=='fra')
   for(const B of HUB.blocks.filter(b=>b.t==='park')){for(let x=B.x0+4;x<B.x1-4;x+=12.5)for(const z of[B.z0+1.5,B.z1-1.5])if(rnd()<.85)add('fence',x,z,0);for(let z=B.z0+4;z<B.z1-4;z+=12.5)for(const x of[B.x0+1.5,B.x1-1.5])if(rnd()<.85)add('fence',x,z,Math.PI/2)}
   // roadworks: lines of barriers, cones and lamps across one lane, made to be ploughed through
   {const RR=hubRoads();for(let i=0;i<60;i++){const r=pick(RR);if(!r||r.L<140)continue;const d=rr2(60,r.L-60),sd=rnd()<.5?-1:1,bx=r.x0+r.ux*d,bz=r.z0+r.uz*d,nx=r.uz,nz=-r.ux,yaw=Math.atan2(r.ux,r.uz);if(RO.ramps&&RO.ramps.some(q=>Math.hypot(q.x-bx,q.z-bz)<40))continue;
-    for(let k=0;k<5;k++){const o=sd*(2.5+k*r.w*.09);add(k===4?'clight':'barrier',bx+nx*o,bz+nz*o,yaw+Math.PI/2)}for(let k=0;k<6;k++){const a=rr2(6,14),o=sd*rr2(2,r.w/2-2);add('cone',bx-r.ux*a+nx*o,bz-r.uz*a+nz*o)}
+    const mainSt=cityAt(bx,bz);/* art-6: no barrier line across a main street (matrix props-in-road: Zeil at the start); explicit yaw = no rnd() use, so the stream is unchanged */for(let k=0;k<5;k++){const o=sd*(2.5+k*r.w*.09);if(!mainSt)add(k===4?'clight':'barrier',bx+nx*o,bz+nz*o,yaw+Math.PI/2)}for(let k=0;k<6;k++){const a=rr2(6,14),o=sd*rr2(2,r.w/2-2);add('cone',bx-r.ux*a+nx*o,bz-r.uz*a+nz*o)}
     if(rnd()<.5)add('bricks',bx+nx*sd*r.w*.3+r.ux*8,bz+nz*sd*r.w*.3+r.uz*8)}}
   // crate stacks in courtyards
   for(const B of HUB.blocks.filter(b=>b.t==='city'||b.t==='yard'))for(let i=0;i<5;i++){const x=rr2(B.x0+45,B.x1-45),z=rr2(B.z0+45,B.z1-45);if(B.x1-B.x0<95||B.z1-B.z0<95)break;add('crate',x,z);add('crate',x+2.3,z);add('crate',x+1.1,z,rnd()*6,2.2)}
