@@ -36,3 +36,6 @@ Push loop: commit (`git add -f out/<ver>` since out/ is ignored), fetch+merge, p
 - The Athens ground quadtree is cached as bits in `src/10b_qt_data.js` (made by `tools/qtdump.js`; GO v90m/ath-boot re-fits 25 sampled cells live and compares). If roads/terrain change, the GO shows a mismatch → regenerate with `node tools/qtdump.js <url of a build with QTC.ok=false>` (see header of that file).
 - Lane flags: GFX (gfx-1) OFF by default; art-2 LF fill ON (`?lf=0` off); trk-1 builder tracks SHOWN (BX_DEMOS_SHOW=true: CLIFF RUN, CANYON SPLIT, NEW LAGOON SPLASH).
 - Old play/probe scripts live in `attic/`; do not run them.
+
+## Pending at handoff
+- terr-1 PUSHED 20b1a56 (TERR flag OFF by default, TAG=terrain, 14 GOs say PENDING when off): not yet built/tested by int-3. Run unit + full suite on the current head first.
