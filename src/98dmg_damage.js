@@ -34,15 +34,17 @@ function DMG_debStep(dt){const im=DMG.im;if(!im||!DMG.deb.length){if(im&&im.coun
  L.forEach((d,i)=>{const k=d.t>3.6?Math.max(.01,(4-d.t)/.4):1;_dmM.compose(d.p,d.q,_dmS.setScalar(d.s*k));im.setMatrixAt(i,_dmM);im.setColorAt(i,d.c)});im.count=L.length;im.instanceMatrix.needsUpdate=true;im.instanceColor.needsUpdate=true}
 // THE hit: v = relative normal speed in km/h. Returns the health lost (%).
 function DMG_impact(v,o){if(!DMG.on||state!=='roam'||RO.wk||(RO.inv||0)>0)return 0;const at=new THREE.Vector3(RO.x+Math.sin(RO.h)*1.8,RO.y+.8,RO.z+Math.cos(RO.h)*1.8);
- if(v<25){DMG.n.light++;if(v>8)try{burst(SPARK,at,8,6,.3,new THREE.Color(2,1.6,.9))}catch(e){}return 0}
- DMG.lastV=v;DMG.cls=DMG_cls();const d=15*Math.sqrt((v-25)/25)/DMG.cls;RO.hp=Math.max(0,(RO.hp??100)-d);RO.lastHit=0;DMG.lastHit=performance.now();DMG.n.hits++;
+ const GL=TUNE.dmgGlance??32;/* race-1: glancing hits (< 32 km/h along the normal) only spark */
+ if(v<GL){DMG.n.light++;if(v>8)try{burst(SPARK,at,8,6,.3,new THREE.Color(2,1.6,.9))}catch(e){}return 0}
+ DMG.lastV=v;DMG.cls=DMG_cls();const d=Math.min(TUNE.dmgCap??12,15*Math.sqrt((v-25)/25)/DMG.cls);RO.inv=Math.max(RO.inv||0,TUNE.dmgInv??1.2);/* race-1: per-hit cap 12 % + 1.2 s invulnerable after a hit */RO.hp=Math.max(0,(RO.hp??100)-d);RO.lastHit=0;DMG.lastHit=performance.now();DMG.n.hits++;
  const nb=clamp(Math.round(2+d/4),2,6),src=DMG_panels(1-RO.hp/100,nb);DMG_throw(nb,src,v);try{burst(SPARK,at,16,9,.4,new THREE.Color(2,1.6,.9))}catch(e){}
  DMG_hud(RO.hp);if(d>6)try{flashHud()}catch(e){}if(RO.hp<=0){DMG.n.boom++;DMG.tBoom=performance.now();try{fireball(V3(RO.x,RO.y+1.4,RO.z),26,3,1.1)}catch(e){}DMG_panels(0);roamWreck()}return d}
 DMG.wall=(kmh,deg)=>DMG_impact(kmh*Math.sin((deg??90)*Math.PI/180));
 // collisions → DMG_impact: walls (roamBounce knows the normal speed), traffic (the closing speed), the rest (falls, quest walls) keep their own amount
 roamBounce=(f=>function(ax,sp,nX,nZ){if(!DMG.on)return f.apply(this,arguments);const vx=Math.sin(RO.vh)*RO.v,vz=Math.cos(RO.vh)*RO.v;let X=nX,Z=nZ;if(X==null){if(ax==='x'){X=-(Math.sign(vx)||1);Z=0}else{X=0;Z=-(Math.sign(vz)||1)}}
- DMG.vn=Math.max(0,-(vx*X+vz*Z))*3.6;try{return f.apply(this,arguments)}finally{DMG.vn=null}})(roamBounce);
-roamDamage=(f=>function(d){if(!DMG.on)return f(d);if(DMG.vn!=null)return DMG_impact(DMG.vn);if(d===5||d===12)return DMG_impact(Math.abs(RO.v)*3.6*(d===12?1.3:.8));
+ DMG.vn=Math.max(0,-(vx*X+vz*Z))*3.6;if(nX==null&&!TUNE.terrDmg)DMG.vn=Math.min(DMG.vn,(TUNE.dmgGlance??32)-1);/* race-1: terrain banks / kerbs / water edge (no collider normal) scrub speed and spark but never cost health; buildings, props and traffic do */try{return f.apply(this,arguments)}finally{DMG.vn=null}})(roamBounce);
+roamDamage=(f=>function(d){if(!DMG.on)return f(d);if(DMG.vn!=null)return DMG_impact(DMG.vn);if(d===5&&TUNE.smashDmg!==1)return 0;/* race-1: smashing a car you overtake / clip costs no health (2K: smash = reward); only head-on (12) hurts */if(d===12&&TUNE.smashDmg!==1){if(RO.wk||(RO.inv||0)>0||state!=='roam')return 0;/* head-on traffic smash: flat 4 % scrape + 1.2 s grace (not a 'hit' for lastHit) */RO.hp=Math.max(1,(RO.hp??100)-4/DMG_cls());RO.inv=1.2;DMG.lastHit=performance.now();return 4}
+ if(d===5||d===12)return DMG_impact(Math.abs(RO.v)*3.6*(d===12?1.3:.8));
  if(RO.wk||(RO.inv||0)>0||d<1||state!=='roam')return;RO.hp=Math.max(0,(RO.hp??100)-d/DMG_cls());DMG.lastHit=performance.now();if(RO.hp<=0){DMG.n.boom++;DMG.tBoom=performance.now();DMG_panels(0);roamWreck()}})(roamDamage);
 // per frame (inside roamStep): debris, smoke/fire, repair, rebuilt detection, HUD
 function DMG_step(dt){DMG_debStep(dt);if(!DMG.on)return;const wk=!!RO.wk;if(DMG.wk0&&!wk){DMG.n.rebuilt++;DMG.tReb=performance.now();DMG_panels(0)}DMG.wk0=wk;if(wk)return;
