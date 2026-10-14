@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.32',date:'14 Oct 2026',items:[{t:'FIXED',s:'Walking on foot: ground surfaces and props fixed.'}]},
   {v:'v90m-beta.31',date:'14 Oct 2026',items:[{t:'NEW',s:'Street props (benches, bins, hydrants, stalls, cafe tables, fences) are built from LEGO parts near you.'}]},
   {v:'v90m-beta.30',date:'14 Oct 2026',items:[{t:'FIXED',s:'Athens birds, flags and street life were invisible; road and junction fixes.'}]},
   {v:'v90m-beta.29',date:'14 Oct 2026',items:[{t:'NEW',s:'Trees and bushes are now built from LEGO parts (?asset=0 for the old ones).'}]},
