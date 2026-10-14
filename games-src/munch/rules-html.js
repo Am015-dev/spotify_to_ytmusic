@@ -14,7 +14,7 @@ const RULES_HTML=`
 <ul>
 <li>Your <b>combat strength</b> is your level plus the bonuses of the items you wear. The monster's strength is its level plus any boosts.</li>
 <li>You win if your strength is <b>higher</b>. Ties go to the monster, unless you are a warrior.</li>
-<li>Anyone can join in: <b>one-shot</b> items (potions and so on) add to either side, and <b>monster boosts</b> make a monster tougher or weaker. <b>Wandering monsters</b> add another monster to the fight.</li>
+<li>Anyone can join in: <b style="white-space:nowrap">one-shot</b> items (potions and so on) add to either side, and <b style="white-space:nowrap">monster boosts</b> make a monster tougher or weaker. <b style="white-space:nowrap">Wandering monsters</b> add another monster to the fight.</li>
 <li>You may <b>ask one player for help</b> and promise them some of the treasure. Their strength adds to yours. You gain the levels; they get what you promised.</li>
 <li><b>Winning:</b> gain a level per monster (some big monsters give 2) and draw the treasures shown.</li>
 <li><b>Running away:</b> roll a die for each monster. On 5 or 6 you get away. Otherwise that monster's <b>Bad Stuff</b> happens to you. A helper has to run too.</li>

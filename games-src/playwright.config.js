@@ -20,6 +20,8 @@ module.exports = defineConfig({
     { name: 'phone', use: phone(390, 763) },
     { name: 'phone-s', use: phone(375, 553) },
     { name: 'pc', use: { viewport: { width: 1366, height: 768 } } },
+    { name: 'tablet', use: { viewport: { width: 768, height: 1024 }, hasTouch: true } },   // menu-width checks (run by hand: --project tablet / desk)
+    { name: 'desk', use: { viewport: { width: 1280, height: 800 } } },
   ],
   webServer: external ? undefined : { command: `node scripts/gx-serve.js ${process.env.GX_STAGE || '.staging'} ${PORT}`, port: PORT, reuseExistingServer: true },
 });
