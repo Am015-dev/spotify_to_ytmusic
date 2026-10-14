@@ -1,0 +1,18 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"cc-art-phone.json",
+"cc-board-phone.json",
+"cc-dice-end-phone.json",
+"cc-end-turn-phone.json",
+"cc-help-phone.json",
+"cc-market-phone.json",
+"cc-smash-phone.json",
+"cc-zoom-phone.json",
+"menu-phone.json",
+"story-scene-phone.json"
+]
+}
+}
