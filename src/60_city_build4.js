@@ -21,7 +21,7 @@ function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){hubRoad
   for(const r of hubRoads()){const{x0,z0,w,L,ux,uz}=r,cx=x0+ux*L/2,cz=z0+uz*L/2,yaw=Math.atan2(ux,uz);const g=new THREE.PlaneGeometry(w,L,...ART8_ps(x0,z0,ux,uz,w,L));g.rotateX(-Math.PI/2);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i),uv.getY(i)*L/32);g.rotateY(yaw);g.translate(cx,0,cz);ART_drape(g,.035);bt.add(g,M.road);
     for(const sd of[-1,1]){let a=null;const ox=uz*sd*w/2,oz=-ux*sd*w/2;for(let t=0;t<=L;t+=6){const x=x0+ux*t+ox,z=z0+uz*t+oz,q=cityAt(x,z),ok=t<L&&!(r.cross||[]).some(([tc,wc])=>Math.abs(t-tc)<wc/2+3)&&!(q&&q.d<q.road.w/2+1.5);
       if(ok&&a==null)a=t;else if(!ok&&a!=null){if(t-a>=6)kerb.push([x0+ux*(a+t)/2+ox,z0+uz*(a+t)/2+oz,t-a,yaw]);a=null}}}}
-  for(const X of FILL_X){const g=new THREE.PlaneGeometry(X.wa,X.wb,...ART8_pq(X.x,X.z,X.wa,X.wb));g.rotateX(-Math.PI/2);g.translate(X.x,0,X.z);ART_drape(g,.04);bt.add(g,jm)}
+  for(const X of FILL_X){if(TJ.conf){bt.add(TJ_padGeo(X.x,X.z,1,0,0,1,X.wa/2,X.wb/2,.04),jm);continue}/* terr-2: conformed pad */const g=new THREE.PlaneGeometry(X.wa,X.wb,...ART8_pq(X.x,X.z,X.wa,X.wb));g.rotateX(-Math.PI/2);g.translate(X.x,0,X.z);ART_drape(g,.04);bt.add(g,jm)}
   // terr-1: kerbs follow the ground (were one flat box at y .12 over up to 100s of m: buried 3 m deep / cutting across the asphalt on slopes):
   // pieces of ≤ 6 m, each at the ground under its centre and pitched along it
   for(const[x,z,L,yaw]of kerb){const n=Math.max(1,Math.ceil(L/6)),l=L/n,ux=Math.sin(yaw),uz=Math.cos(yaw);for(let k=0;k<n;k++){const o=-L/2+l*(k+.5),cx=x+ux*o,cz=z+uz*o,ya=groundY(cx-ux*l/2,cz-uz*l/2),yb=groundY(cx+ux*l/2,cz+uz*l/2);
