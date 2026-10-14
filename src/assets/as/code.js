@@ -60,6 +60,9 @@ const AS_R={
  palm:{H:9.5,far:'palm',leaf:'G',f:B=>{B.p('2563a','RB',0,0,0,0);let y=0;for(let i=0;i<6;i++){y+=32;B.p('2536a',i%2?'RB':'DB',(i%3)*1.5,y,0,i*50)}B.ring(2518,['G','BG'],5,4,y+30,0,22,'x',16);B.ring(6148,'BG',3,2,y+36,30,-30,'x',16)}},
  orange:{H:5,far:'round',leaf:'G',f:B=>{B.stack('3062b','RB',4,0,0,0);const k=B.L.length;B.ring(2423,'G',4,6,100,0,30,'z',12);B.ring(2423,['G','DG'],4,4,116,45,10,'z',12);B.ring(2423,'DG',3,2,130,0,0,'z',12);B.dress(k,6141,'O',10)}},
  plane:{H:11,far:'round',leaf:'BG',f:B=>{B.p(3941,'T',0,24,0,0);B.stack('3062b',['DT','T','MN','T'],4,0,0,24);B.p('3062b','DT',20,110,0,0);B.stack(3941,'G',4,0,0,120);B.ring(2417,['BG','G'],6,26,132,0,16,'z',12);B.ring(2417,['G','LI'],6,24,150,30,6,'z',12);B.ring(2417,'BG',5,12,168,18,-4,'z',12);B.ring(2423,'LI',4,6,184,0,0,'z',20)}},
+ // almond (Athens, 8th tree, asset-2): grey-brown forked trunk, open crown of 6x5 / 4x3 leaves, dressed with white and pink 5-petal flower plates (spring blossom)
+ almond:{H:6,far:'round',leaf:'BG',f:B=>{B.p(3941,'DT',0,24,0,0);B.stack('3062b',['DT','MN'],3,0,0,24);B.p('3062b','DT',14,84,4,0);B.p('3062b','DT',-12,90,-6,0);const k=B.L.length;
+  B.ring(2417,['BG','G'],5,16,104,15,10,'z',18);B.ring(2423,['BG','LI'],4,10,120,50,4,'z',18);B.ring(2423,'BG',3,4,134,0,0,'z',20);B.dress(k,24866,['W','PK','W','#FFC8DC'],16)}},
  bush:{H:1.5,far:'bush',leaf:'G',f:B=>{B.p(3941,'G',0,24,0,0);B.ring(2417,['G','BG'],4,4,30,0,-8,'z',20);B.ring(2423,['BG','G'],4,2,40,45,-4,'z',20);B.ring(2423,'G',3,1,48,0,0,'z',20);B.p(2423,'BG',0,52,0,60)}},
  bushFl:{H:1.4,far:'bush',leaf:'BG',f:B=>{B.p(3941,'G',0,24,0,0);const k=B.L.length;B.ring(2417,['BG','G'],4,4,30,20,-8,'z',20);B.ring(2423,'G',4,2,40,65,-4,'z',20);B.p(2423,'BG',0,48,0,0);B.dress(k,24866,['Y','PK','W','LV'],10)}},
  oleander:{H:1.8,far:'bush',leaf:'G',f:B=>{B.p(3941,'G',0,24,0,0);B.p(6255,'G',0,40,0,0);B.p(6255,'BG',6,58,4,60);B.p(6255,'G',-4,74,-4,120);const k=B.L.length;B.ring(2423,'G',4,3,46,30,-6,'z',20);B.p(2423,'BG',0,82,0,0);B.dress(k,24866,['PK','PK','W'],8)}},
@@ -100,8 +103,8 @@ const AS_R={
 // variants per city (≥ 6 trees each) and the bias each placed base type gives them (score = neighbours of that variant within 30 m / bias)
 const AS_POOL={fra:{tree:{oak:1,linden:1,chestnut:.8,oakAut:.7,maple:.6,birch:.5,plane:.4},tree2:{linden:1,birch:1,maple:.6,oakAut:.6,oak:.6,plane:.4},tree3:{fir:1,birch:.6,oak:.5,linden:.5,maple:.4,oakAut:.4},
   bush:{bush:1,bushFl:.8}},
- ath:{tree:{plane:1,orange:1,olive:.8,stonepine:.6,palm:.5,cypress:.4},tree2:{orange:1,olive:1,plane:.7,stonepine:.6,cypress:.5,palm:.4},tree3:{stonepine:1,aleppo:1,cypress:.6,olive:.5},
-  CE_pine:{stonepine:1,aleppo:1,cypress:.5,olive:.4},CE_olive:{olive:1,orange:.7,stonepine:.5,cypress:.5,aleppo:.4},CE_cypress:{cypress:1,stonepine:.6,olive:.6,aleppo:.5},
+ ath:{tree:{plane:1,orange:1,olive:.8,almond:.7,stonepine:.6,palm:.5,cypress:.4},tree2:{orange:1,olive:1,almond:.8,plane:.7,stonepine:.6,cypress:.5,palm:.4},tree3:{stonepine:1,aleppo:1,cypress:.6,olive:.5,almond:.4},
+  CE_pine:{stonepine:1,aleppo:1,cypress:.5,olive:.4},CE_olive:{olive:1,orange:.7,almond:.6,stonepine:.5,cypress:.5,aleppo:.4},CE_cypress:{cypress:1,stonepine:.6,olive:.6,aleppo:.5},
   bush:{oleander:1,bush:.8,bushFl:.6}}};
 const AS_PROPS={fra:['bench','bin','hydrant','post','planter','stall','parasol','table','fence','lamp','tlight','sign','stop'],ath:['bench','bin','hydrant','planter','stall','parasol','table','fence','lamp','tlight','sign','stop','post']};
 // prop type -> recipe when it is not p_<type> (Athens 'post' is the periptero kiosk), and the alternative variant in some 40 m runs (fence -> hedge)
