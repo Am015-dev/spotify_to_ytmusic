@@ -33,7 +33,9 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
     or hint text ≠ finger, on-screen scores ≠ engine, anything stuck >8 s, covered buttons, horizontal scroll.
     Deploy gate (owner, 13 Oct 2026: "fast tests, not hours of sweeps", Overdrive-style): `build-all.py --deploy`
     = phone-check + the change's `?scn=` GO scenario tests + look check; any failure blocks. NO game playing
-    (owner: "don't play the game"): sweeps run only with `--full`, for engine/rules changes. The owner checks via the
+    (owner: "don't play the game"): sweeps run only with `--full`, for engine/rules changes. The fast gate tests at
+    phone size only (390×763); all sizes + LAB test run with `--full`. Max 2 deploys at once per machine (4 cores; 5 at once
+    pushed the load to 17 and 3D games render in software). The owner checks via the
     ✔ Test checklist scenarios (one tap each), not by playing whole games.
   - The owner's bug reports go first into the fixer's brief, then into the sweep.
   - AI blind testers (`drive-serve.js`) only rate fun/clarity: one, once, at the end (~100k tokens each).
