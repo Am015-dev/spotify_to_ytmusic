@@ -133,8 +133,8 @@ html.ph-l #pchips .pchip{min-height:44px}
 html.ph-l #preview{margin-top:4px;max-height:none}
 html.ph-l #dice{gap:8px 6px}
 /* draweres (Yours, Monsters, Log, Menu, Rules): bottom sheets, as before, but never taller than the screen */
-html.ph .gx-drawer{max-height:calc(100dvh - var(--ph-bar,48px));height:88dvh}
-html.ph-l .gx-drawer{height:calc(100dvh - 12px);max-height:none}
+html.ph .gx-drawer{max-height:calc(100dvh - var(--ph-bar,48px));height:auto}
+html.ph-l .gx-drawer{height:auto;max-height:calc(100dvh - 12px)}
 html.ph .gx-x{min-width:44px;min-height:44px}
 html.ph .gx-drawer-head h2{font-size:1.35rem}
 html.ph .dlg{max-height:calc(100dvh - 20px);overflow:auto}
@@ -206,3 +206,5 @@ html.ph #choice .acts:has(> .btn:nth-of-type(5)){position:static;margin-bottom:0
 @media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #preview{height:1.5em;max-height:1.5em}}
 @media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #dice{padding-top:0}html.ph-p .gx-dock[data-xa]{gap:3px}}
 @media (max-height:620px){html.ph .dlg.start .acts:has(>.btn.primary){position:static;margin:.4rem 0;padding:0;background:none}}
+html.ph-p #dr-menu{height:88dvh}
+html.ph-p #dr-mons{height:88dvh}

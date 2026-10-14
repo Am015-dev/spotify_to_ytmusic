@@ -61,7 +61,7 @@ body.three #banner{top:auto}
 /* popups (drawers) */
 .gx-drawer{border:4px solid #1a1320;box-shadow:8px 8px 0 #1a1320}
 .gx-drawer-head{border-bottom:3px solid #1a1320}
-.gx-drawer-head h2{font-size:1.6rem;line-height:1;color:var(--red)}
+.gx-drawer-head h2{font-size:1.5rem;line-height:1;color:var(--red)}
 .gx-drawer #log{max-height:none;font-size:.9rem}
 .gx-drawer .market{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
 .gx-drawer .rules h3{margin:.8rem 0 .2rem}
@@ -159,3 +159,11 @@ header.gx-bar [data-gx="dr-menu"]{font-size:1.15rem;min-width:44px}
 details.custom:not([open])>*:not(summary){display:none}
 .dlg.start .acts .btn{margin-inline:-14px;width:calc(100% + 28px)}
 .dlg.start>h2,.dlg.start>p,.dlg.start>details.custom{padding-inline:24px}
+/* UI-BAR 1/6: text floor in panels and dock; panels fit their content */
+:root{--minfs:13px}@media (min-width:1024px){:root{--minfs:16px}}
+html body :is(.gx-drawer,.gx-dock){font-size:max(var(--minfs),1rem)}
+html body :is(.gx-drawer,.gx-dock) :is(small,.small,.muted,.chip,li,b,span,p,td,th,div,button,label){font-size:max(var(--minfs),1em)}
+html body .gx-drawer{height:auto;bottom:auto;max-height:calc(100dvh - var(--gx-bar-h,56px) - 16px)}
+@media (max-width:999px){html body .gx-drawer{height:auto;bottom:0;max-height:88dvh}}
+html body :is(#log li,#log small,.gx-dock .btn,.gx-dock .banner,#banner,#banner *,#youbox,.gx-drawer i,.gx-drawer em){font-size:max(var(--minfs),1em)!important}
+html body .gx-drawer-head{height:56px;box-sizing:border-box}html body .gx-drawer-head .gx-x{font-size:1.5rem;line-height:1}

@@ -123,6 +123,14 @@
    "mut": 0
   },
   {
+   "id": "cc-uibar",
+   "name": "UI bar: top bar, dock and panels",
+   "ask": "Are bar, dock and panels clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "cc-zoom",
    "name": "Big card zoom",
    "ask": "Is the big card readable?",
@@ -179,6 +187,46 @@
    "sizes": "all",
    "group": "UI",
    "mut": 4
+  },
+  {
+   "id": "dk-diary",
+   "name": "Diary: readable lines, one style",
+   "ask": "Diary lines big, dark, one style?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "dk-dock",
+   "name": "Side dock: each event once, one instruction",
+   "ask": "Dock short and readable?",
+   "sizes": "pc",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "dk-topbar",
+   "name": "Desktop top bar: 5 buttons, 16px, nothing on the title",
+   "ask": "Top bar tidy?",
+   "sizes": "pc",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "dk-wide-board",
+   "name": "Desktop board: natural cards, readable decks",
+   "ask": "Cards big, decks readable?",
+   "sizes": "pc",
+   "group": "Cards",
+   "mut": 1
+  },
+  {
+   "id": "dk-kick-order",
+   "name": "Kick: door opens first, then the card",
+   "ask": "Door swings open, THEN the card shows?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 1
   },
   {
    "id": "dk-boss-reveal",
@@ -478,6 +526,22 @@
    "id": "kk-help",
    "name": "Rules cards",
    "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "kk-uibar",
+   "name": "UI bar: top bar, panels, dock, art",
+   "ask": "Are the bar, panels and dock clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "kk-uibar-start",
+   "name": "UI bar: start screen",
+   "ask": "Is the start screen clean?",
    "sizes": "all",
    "group": "UI",
    "mut": 0

@@ -57,16 +57,24 @@ function bfKick(){const me=viewSeat();if(BF.kicking||!G||me<0||!validMoves(me).s
   if(typeof sfx==='function')sfx('smash');try{navigator.vibrate&&navigator.vibrate([25,40,60])}catch(e){}
   if(d)d.classList.add('bf-kicking');if(tb)tb.classList.add('bf-shake');
   setTimeout(()=>{if(typeof sfx==='function')sfx('door');if(tb)tb.classList.remove('bf-shake');BF.kicking=false;BF.mine=1;uiAct({act:'kick'})},520)}
-function bfReveal(id,who){if(cd(id).t==='monster'&&bfBossClip(id,who))return;bfRevealCard(id,who)}
+// the board's own copy of the drawn card stays hidden until the 3D door has finished opening (class bf-rev on <html>)
+function bfHold(on){const h=document.documentElement;clearTimeout(BF.holdT);if(on){h.classList.add('bf-rev');BF.holdT=setTimeout(()=>h.classList.remove('bf-rev'),9000)}else h.classList.remove('bf-rev')}
+function bfReveal(id,who){bfHold(1);BF.ev={door0:0,door1:0,card:0};if(cd(id).t==='monster'&&bfBossClip(id,who))return;bfRevealCard(id,who)}
 function bfRevealCard(id,who){const c=cd(id);const me=viewSeat();const mine=who===me&&G.mode!=='ai';const kind=c.t==='monster'?'mon':c.t==='curse'?'curse':'other';
   const ban=kind==='mon'?'A MONSTER!':kind==='curse'?'CURSED!':mine?'Into your hand':'Into '+P(who).nm+'’s hand';
   const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?esc(c.x||'').slice(0,60):'No monster this time';
   let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' mine':''}`;o.setAttribute('role','status');
   o.innerHTML=`<div class="bfburst"></div><div class="bfd3"><img src="models/door${innerWidth<700?'@512':''}.webp" alt="" draggable="false" onerror="this.remove()"><i class="bfdust" style="--dx:-90px;--dy:-10px"></i><i class="bfdust" style="--dx:90px;--dy:-24px"></i><i class="bfdust" style="--dx:-50px;--dy:-60px"></i><i class="bfdust" style="--dx:60px;--dy:-70px"></i><i class="bfdust" style="--dx:0px;--dy:-96px"></i></div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
-  document.body.appendChild(o);const dur=mine?1900:1050;
-  setTimeout(()=>{if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click')},mine?420:300);
-  const close=()=>{if(!o.isConnected)return;o.classList.add('out');setTimeout(()=>o.remove(),260)};BF.revClose=close;setTimeout(close,dur);
-  if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur);
+  document.body.appendChild(o);const dur=mine?1700:1000;let opened=false;
+  const E=BF.ev=BF.ev||{door0:0,door1:0,card:0};const dimg=o.querySelector('.bfd3 img');
+  const open=()=>{if(opened||!o.isConnected)return;opened=true;E.door1=E.door1||performance.now();E.card=performance.now();o.classList.add('open');
+    if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click');
+    const close=()=>{if(!o.isConnected)return;o.classList.add('out');bfHold(0);setTimeout(()=>o.remove(),260)};BF.revClose=close;setTimeout(close,dur);
+    if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur)};
+  BF.revClose=()=>{if(!o.isConnected)return;o.remove();bfHold(0)};
+  E.door0=performance.now();o.classList.add('door');
+  if(dimg){dimg.addEventListener('animationend',()=>{E.door1=performance.now();open()},{once:true});setTimeout(()=>{if(!opened&&dimg.isConnected&&!E.door1)open()},1400)}else{E.door1=performance.now();open()}
+  if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur+800);
 }
 // ---- boss reveal clip: six big monsters get a 6 s painted clip the first time they are kicked open in a game ----
 // The clip IS the reveal: the door card opens into the video, which fills the table (soft vignette edges, no box), the monster's name and level
@@ -82,7 +90,7 @@ function bfBossClip(id,who){const c=cd(id),k=c.k;if(!k||!BOSS_CLIPS[k]||!BF.moti
   const unduck=()=>{if(loud){loud=false;try{if(window.GA)GA.duckTo(1,.6)}catch(e){}}};
   const px=r=>({left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px'});
   const cleanup=()=>{clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);document.removeEventListener('keydown',key,true);document.removeEventListener('pointerdown',tap,true);
-    try{v.pause();v.removeAttribute('src');v.load()}catch(e){}unduck();document.documentElement.classList.remove('bf-clipping');if(box.parentNode)box.parentNode.removeChild(box);BF.clip=false;UI.hold=0;bfResched()};
+    try{v.pause();v.removeAttribute('src');v.load()}catch(e){}unduck();document.documentElement.classList.remove('bf-clipping');if(box.parentNode)box.parentNode.removeChild(box);BF.clip=false;UI.hold=0;bfHold(0);bfResched()};
   // fly the clip into the monster card's spot (FLIP), then it is the card
   const end=()=>{if(fin)return;fin=true;clearTimeout(t1);clearTimeout(t2);clearTimeout(t3);nm.classList.remove('on');
     const m=document.querySelector('.arena .row.mons .mon .card')||document.querySelector('.arena .row.mons .mon');const M=m&&m.getBoundingClientRect();
