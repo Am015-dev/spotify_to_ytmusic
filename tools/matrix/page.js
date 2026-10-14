@@ -2,15 +2,18 @@
 // each asserted from STATE in a few ms (no real time, no drawing). Every check has an id; a case result = {fam, tag, fails:[ids]}.
 (()=>{
 const D2R=Math.PI/180,ang=(ax,az,bx,bz)=>{const a=Math.hypot(ax,az),b=Math.hypot(bx,bz);if(a<1e-6||b<1e-6)return 180;return Math.acos(Math.max(-1,Math.min(1,(ax*bx+az*bz)/(a*b))))/D2R};
-const vis=e=>{if(!e)return null;const r=e.getBoundingClientRect(),cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity===0||r.width<2||r.height<2)return null;return r};
+const vis=e=>{if(!e)return null;const r=e.getBoundingClientRect(),cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||r.width<2||r.height<2)return null;return r};
+// the game's own rAF loop is stopped (it burns a core per page for nothing); MX.frame() runs exactly one real frame (sim + HUD update) when a check needs the DOM
+if(!window.__rafOrig){window.__rafOrig=window.requestAnimationFrame.bind(window);window.requestAnimationFrame=()=>0}
 const ovl=(a,b)=>!(a.right<=b.left+1||b.right<=a.left+1||a.bottom<=b.top+1||b.bottom<=a.top+1);
 const VW=()=>({w:innerWidth,h:innerHeight});
 // HUD: required controls for the profile exist, are visible, inside the viewport, not overlapping each other
 function hud(ids,fails,pre){const rs={},V=VW();for(const id of ids){const e=document.getElementById(id),r=vis(e);if(!r){fails.push(pre+'hud-missing-'+id);continue}
   rs[id]=r;if(r.left<-1||r.top<-1||r.right>V.w+1||r.bottom>V.h+1)fails.push(pre+'hud-offscreen-'+id)}
  const k=Object.keys(rs);for(let i=0;i<k.length;i++)for(let j=i+1;j<k.length;j++)if(ovl(rs[k[i]],rs[k[j]]))fails.push(pre+'hud-overlap-'+k[i]+'-'+k[j])}
-const R=[];const MX={R,prof:'phone',ang,hud,
+const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)frame(performance.now())},
  reset(){R.length=0},
+ bxEnd(){try{if(BX.on)BX_close()}catch(e){}try{__tq.reset()}catch(e){}},
  async setRide(id){TQ.car=id;gbOpen();GAR_select(id);let k=0;while(typeof LDL!=='undefined'&&LDL.wait.size&&k++<200)await new Promise(r=>setTimeout(r,25));gbClose(true);await new Promise(r=>setTimeout(r,20));
   if(typeof BX!=='undefined'){try{if(BX.mode==='drive')BX_driveStop()}catch(e){}try{if(BX.car&&BX.car.parent)BX.car.parent.remove(BX.car)}catch(e){}BX.car=null}return id},
  // ---------------- builder tracks ----------------
@@ -50,7 +53,10 @@ const R=[];const MX={R,prof:'phone',ang,hud,
  // ---------------- free roam ----------------
  starts(n){if(MX._st&&MX._st.length)return MX._st.slice(0,n);const S=new Map();for(let x=WX0+100;x<=WX1-100;x+=150)for(let z=WZS+100;z<=WZN-100;z+=150){const q=rfSnap(x,z,60);if(q)S.set(Math.round(q[0]/30)+','+Math.round(q[1]/30),q)}
   const all=[...S.values()].sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const step=Math.max(1,all.length/n),o=[];for(let i=0;i<n&&Math.floor(i*step)<all.length;i++)o.push(all[Math.floor(i*step)]);MX._st=o;return o},
- roamCase(prof,rid,q,idx,prog){const fails=[],t0=performance.now();
+ spotStarts(){const o=[];const add=(e,n)=>{if(!isFinite(e)||!isFinite(n))return;const w=WP(e,n),q=rfSnap(w[0],w[1],200);if(q)o.push(q)};
+  for(const k in RF.spots||{}){const v=RF.spots[k];if(Array.isArray(v)&&typeof v[0]==='number'&&typeof v[1]==='number')add(v[0],v[1])}
+  for(const t of RF.taxi||[])add(t[0],t[1]);for(const g of RF.garages||[])add(g[2],g[3]);for(const l of RF.lm||[])add(l[2],l[3]);return o},
+ roamCase(prof,rid,q,idx,prog,fam){const fails=[],t0=performance.now();
   try{
    if(!roamWarp(q[0],q[1],q[2]))fails.push('roam-warp-refused');
    else{
@@ -67,14 +73,69 @@ const R=[];const MX={R,prof:'phone',ang,hud,
      const mv=(RO.x-x0)*fx+(RO.z-z0)*fz;if(!(mv>5))fails.push('roam-no-forward-progress');if(minV<-1)fails.push('roam-reverses')}
    }
   }catch(e){fails.push('roam-crash:'+String(e).slice(0,70))}
-  R.push({fam:'roam',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length?q.map(x=>Math.round(x*10)/10).join(','):''),fails,det:fails.length&&fails.some(f=>/tyre/.test(f))?MX.last:undefined,ms:performance.now()-t0});return fails.length},
+  R.push({fam:fam||'roam',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length?q.map(x=>Math.round(x*10)/10).join(','):''),fails,det:fails.length&&fails.some(f=>/tyre/.test(f))?MX.last:undefined,ms:performance.now()-t0});return fails.length},
  // HUD of the profile once per ride (free roam)
  roamHud(prof,rid){const fails=[];const touch=prof!=='desktop';
-  try{TOUCH.on=touch;TOUCH.used=touch;document.body.classList.toggle('touch',touch);const ids=touch?['tB','tL','tR','tP',...(thrEff()==='pedal'?['tG']:[])]:[];hud(ids,fails,'roam-');
+  try{TOUCH.on=touch;TOUCH.used=touch;document.body.classList.toggle('touch',touch);MX.frame(3);const ids=touch?['tB','tL','tR','tP',...(thrEff()==='pedal'?['tG']:[])]:[];hud(ids,fails,'roam-');
    if(touch){const g=vis(document.getElementById('tG'));if(!g&&!(typeof SET!=='undefined'&&SET.gas==='auto'||TOUCH.autoGas!==undefined))/* gas default on: GAS button may be hidden */void 0}
    else for(const id of ['tB','tL','tR']){if(vis(document.getElementById(id)))fails.push('roam-hud-touch-controls-on-desktop-'+id)}
   }catch(e){fails.push('roam-hud-crash:'+String(e).slice(0,60))}
   R.push({fam:'roam-hud',tag:prof+'|'+rid,fails,ms:0});return fails.length},
+
+ // ---------------- city races ----------------
+ async raceCase(track,prof,rid){const fails=[],t0=performance.now();const touch=prof!=='desktop';let info={};
+  try{
+   if(state!=='roam'||!RO.on){try{__tq.reset()}catch(e){}}
+   TOUCH.on=touch;TOUCH.used=touch;TOUCH.gas=false;TOUCH.brake=false;for(const k in K)K[k]=false;
+   menuTab='quick';menuTrack=track;quickTraffic=false;RO.launching=true;roamSavePos();RO.on=false;$('#roam').hidden=true;RO.card=null;startRace();RO.launching=false;RO.fromRoam=true;
+   let k=0;while(state!=='countdown'&&k++<400)await new Promise(r=>setTimeout(r,25));
+   if(state!=='countdown'){fails.push('race-never-reached-countdown')}
+   else{
+    // race UI + the profile's HUD
+    MX.frame(2);hud(touch?['pos','lap','spd','tB','tL','tR','tP']:['pos','lap','spd'],fails,'race-');
+    if(!touch)for(const id of ['tB','tL','tR']){if(vis(document.getElementById(id)))fails.push('race-hud-touch-controls-on-desktop-'+id)}
+    if(ships.length<6)fails.push('race-fewer-than-5-rivals');
+    // start grid: nobody inside a wall/under the road is not measurable here; player is on the grid ahead of nothing: all dists sane
+    const d0=ships.map(s=>s.dist),p0=pl.mesh.position.clone();
+    if(!touch)K.ArrowUp=true;
+    __mho.sim(150);for(const s of ships)posShip(s,1/60);updateCam(1/60);
+    const p1=pl.mesh.position.clone(),mv=p1.clone().sub(p0);mv.y=0;const dd=pl.dist-d0[ships.indexOf(pl)];
+    info={dd:+dd.toFixed(1),mv:+mv.length().toFixed(1)};
+    if(!(dd>5))fails.push('race-no-forward-progress');if(pl.wrong)fails.push('race-wrong-way-flag');
+    if(mv.length()>3){const m=pl.mesh.userData.m||pl.mesh;m.updateMatrixWorld(true);const wd=new THREE.Vector3(0,0,-1).transformDirection(m.matrixWorld),wf=new THREE.Vector3(0,0,1).transformDirection(m.matrixWorld);
+     const a=ang(wd.x,wd.z,mv.x,mv.z),b=ang(wf.x,wf.z,mv.x,mv.z);if(Math.min(a,b)>20)fails.push('race-visual-facing-sideways');else if(b<a&&b<=20)info.faceBackwards=true}
+    {const c=camera.position,dx=c.x-p1.x,dz=c.z-p1.z,h=Math.hypot(dx,dz);if(mv.length()>3&&!(h>2&&(dx*mv.x+dz*mv.z)/(h*mv.length())<-.3))fails.push('race-camera-behind')}
+    const moving=ships.filter(s=>!s.isPlayer&&s.dist-d0[ships.indexOf(s)]>5).length;if(moving<5)fails.push('race-rivals-not-moving');
+    if(ships.some(s=>!s.isPlayer&&s.wrong))fails.push('race-rival-wrong-way');
+    for(const kk in K)K[kk]=false;
+   }
+  }catch(e){fails.push('race-crash:'+String(e).slice(0,70))}
+  try{__tq.reset()}catch(e){}
+  R.push({fam:'race',tag:track+'|'+prof+'|'+rid,fails,info,ms:performance.now()-t0});return fails.length},
+
+ // ---------------- on foot (get out of the car) ----------------
+ footCase(prof,rid,q,idx){const fails=[],t0=performance.now();const touch=prof!=='desktop';let info={};
+  try{
+   TOUCH.on=touch;TOUCH.used=touch;document.body.classList.toggle('touch',touch);for(const k in K)K[k]=false;
+   try{OF_reset()}catch(e){}
+   if(!roamWarp(q[0],q[1],q[2]))fails.push('foot-warp-refused');
+   else{roamStep(1/120);for(let i=0;i<4;i++)roamPose(pl,.25);OF_exit();for(let i=0;i<40;i++)roamStep(1/60);camSnap=true;roamCam(1/60);
+    if(RO.foot!=='walk')fails.push('foot-not-walking-after-exit');
+    const B=new THREE.Box3().setFromObject(OF.fig.g),hh=B.max.y-B.min.y;if(Math.abs(hh/1.8-1)>.03)fails.push('foot-figure-not-1.80m');
+    if(Math.abs(OF.y-groundAt(OF.x,OF.z,OF.y+2))>.35)fails.push('foot-not-on-ground');
+    if(roamHit(OF.x,OF.z,OF_R,OF.y+1))fails.push('foot-inside-wall');
+    {const pk=OF_parkChk();if(!pk||pk.tyre.some(g=>!(Math.abs(g)<=.05)))fails.push('foot-parked-car-tyre-gap>5cm')}
+    if(roamHit(OF.car.x,OF.car.z,1.0,OF.car.y+1))fails.push('foot-parked-car-inside-wall');
+    if(idx%20===0){MX.frame(2);hud(touch?['ofZone','tP']:[],fails,'foot-');if(!touch&&vis(document.getElementById('ofZone')))fails.push('foot-hud-touch-zone-on-desktop')}
+    // walk: forward key (desktop) / stick not simulated on touch: use the same K path the stick feeds
+    const x0=OF.x,z0=OF.z;K.KeyW=true;for(let i=0;i<60;i++)roamStep(1/60);K.KeyW=false;roamCam(1/60);
+    const mx=OF.x-x0,mz=OF.z-z0,mv=Math.hypot(mx,mz);info.mv=+mv.toFixed(1);
+    if(!(mv>1.5))fails.push('foot-no-walk-progress');
+    else{const c=camera.position,dx=OF.x-c.x,dz=OF.z-c.z;if(ang(dx,dz,mx,mz)>60)fails.push('foot-walks-toward-camera')}
+   }
+  }catch(e){fails.push('foot-crash:'+String(e).slice(0,70))}
+  try{OF_reset()}catch(e){}
+  R.push({fam:'foot',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length?q.map(x=>Math.round(x*10)/10).join(','):''),fails,info,ms:performance.now()-t0});return fails.length},
 
 };
 window.MX=MX;return 'MX ready'})()
