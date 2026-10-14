@@ -41,3 +41,8 @@ terr5_taunus_fra_before_after.jpg (3 NW streets), terr5_crowns_fra_before_after.
   mound keeps its 70/100 m; or lift crowns after grading where no road is within 40 m.
 - Athens: the strict sky metric is 63 %; avenue-end views show the mountains small. Possibly x2 and a nearer ring for the low quality.
 - A shot-based pixel test (ridge colour band above the roofline in the GO view).
+
+## Athens boot check (coordinator: beta.55 ath-boot 47 s vs 37 s), head cc9b8956, same box, back to back, 2 rounds (tChkGo v90m/ath-boot)
+default 32.7 / 30.4 s · ?tgt=0 33.4 / 29.6 · ?athx=1&tau=0 30.1 / 29.5 · ?trh=0 39.9 / 37.4 (slower: the Athens quadtree cache is
+fitted for the hills, so ?trh=0 fits every cell live). Green crowns and the backdrops add no measurable boot time; the 47 s is not terr-5.
+If Athens boot regresses after a height change: regenerate the cache (see HANDOFF_terr4.md, tools/qtdump.js).
