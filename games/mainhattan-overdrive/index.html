@@ -756,6 +756,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.40',date:'14 Oct 2026',items:[{t:'NEW',s:'Athens building facades and storefronts have more variety; fewer props on roads.'}]},
   {v:'v90m-beta.39',date:'14 Oct 2026',items:[{t:'FIXED',s:'Camera re-fits when you switch vehicle; respawn on divided roads uses the right-hand lane; on-foot spawns avoid walls.'}]},
   {v:'v90m-beta.38',date:'14 Oct 2026',items:[{t:'FIXED',s:'Fewer props on roads; parked tyres sit exactly on the ground; NPC lanes stay clear.'}]},
   {v:'v90m-beta.37',date:'14 Oct 2026',items:[{t:'FIXED',s:'Parked cars no longer sink into the ground; sitting on benches fits the seat.'}]},
@@ -15068,7 +15069,7 @@ BV.pass=m=>m.n>=40&&m.repeat<=20&&m.blk3>=95;
 // street-life line (near the GO spot only): ≥ 10 storefront pieces within 150 m, ≥ 4 kinds (shop, café, kiosk, billboard, mural)
 BV.lpass=l=>l.n>=10&&l.kinds>=4;
 // GO: the street node with the most buildings within 150 m, car on it facing along the road; measured over 600 m around it
-function BV_go(){const N=HUB.nodes||[];let best=null,bn=-1;for(let i=0;i<N.length;i+=2){const A=N[i];if(!A)continue;const n=Object.values(BV_near(A.x,A.z,150)).reduce((a,b)=>a+b,0);if(n>bn){bn=n;best=A}}
+function BV_go(){const N=HUB.nodes||[];let best=null,bn=-1;for(let i=0;i<N.length;i+=2){const A=N[i];if(!A||LF_count(A.x,A.z,10)>0||roamHit(A.x,A.z,4))continue;/* clean spawn: no prop to smash */const n=Object.values(BV_near(A.x,A.z,150)).reduce((a,b)=>a+b,0);if(n>bn){bn=n;best=A}}
   if(!best)return'📍 BV · no street node';const q=cityAt(best.x,best.z),h=q?Math.atan2(q.p.tx,q.p.tz):0;roamWarp(best.x,best.z,h);RO.v=0;camSnap=true;BV.last=null;
   setTimeout(()=>{const m=BV_measure(RO.x,RO.z,600),a=BV_measure(0,0,1e6);m.city=a;m.life=BV_lifeAt(RO.x,RO.z,150);m.pass=BV.pass(m)&&BV.pass(a)&&BV.lpass(m.life);BV.last=m;try{say('',(m.pass?'✅ PASS':'❌ FAIL')+` · same look ≤100 m ${m.repeat}% (city ${a.repeat}%) · blocks with ≥3 facades ${m.blk3}% (city ${a.blk3}%) · ${a.variants} looks · street life ${m.life.n} (${m.life.kinds} kinds)`,5)}catch(e){}},1500);
   return'📍 BUSIEST STREET · measuring building variety'}
