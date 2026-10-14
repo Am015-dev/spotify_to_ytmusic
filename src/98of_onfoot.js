@@ -494,6 +494,11 @@ async function OF_sinkRun(id){const W=ms=>new Promise(r=>setTimeout(r,ms));if(!a
   const ns=M1.noScene;M1.noScene=true;try{M1_startHotDrop()}finally{M1.noScene=ns}await W(1500);OF_exit();for(let i=0;i<50&&RO.foot!=='walk';i++)await W(100);await W(1200);
   const p=OF_parkChk();try{OF_enter(OF_cars(false).find(k=>k.k==='cur'))}catch(e){}if(!p||!p.tyre.length)return'❌ FAIL '+id+': no wheels measured';const lo=Math.min(...p.tyre),hi=Math.max(...p.tyre),ok=lo>=-.02&&hi<=.05&&p.body>=-.02;
   return(ok?'✅ PASS ':'❌ FAIL ')+'HOT DROP EXIT · '+id+' · '+p.tyre.length+' tyres '+lo+'..'+hi+' m above the road (0..0.05) · body '+p.body+' m'}
+// cam-3: the REAL Hot Drop (parachute scene, no skip): wait for the scene to end, drive nothing, measure the tyres in the car 2 s after touchdown (≤ 5 cm above the road, body not below it)
+async function OF_dropRun(id){const W=ms=>new Promise(r=>setTimeout(r,ms));if(!await OF_pickRide(id))return'❌ FAIL '+id+': cannot pick the ride';try{OF_reset();if(RO.ch)chAbort()}catch(e){}
+  M1_startHotDrop();let t0=performance.now();while(performance.now()-t0<20000&&!M1.cs)await W(50);t0=performance.now();while(performance.now()-t0<20000&&(M1.cs||RO.story||RO.frozen))await W(50);
+  if(M1.cs||RO.frozen)return'❌ FAIL '+id+': parachute scene did not end';await W(2000);const r=OF_sinkChk();if(!r||!r.nW)return'❌ FAIL '+id+': no wheels measured';
+  const ok=r.wMin>=-.02&&r.wMax<=.05;return(ok?'✅ PASS ':'❌ FAIL ')+'HOT DROP LANDING · '+id+' · '+r.nW+' tyres '+r.wMin+'..'+r.wMax+' m above the road (0..0.05)'}
 function OF_sinkGo(id,say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sinkRun(id).then(say);return'📍 HOT DROP EXIT · '+id+' · starting…'}
 async function OF_sitRun(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';const r=await OF_sitAll(3);return r.err?'❌ FAIL '+r.err:(r.bad?'❌ FAIL ':'✅ PASS ')+'SIT · '+r.n+' benches: '+(r.bad?JSON.stringify(r.fails):'legs on the seat, back to the backrest, facing away')}
 function OF_sitGo(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sitRun().then(say);return'📍 SIT · the 3 nearest benches · running…'}
