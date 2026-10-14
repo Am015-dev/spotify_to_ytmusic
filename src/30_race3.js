@@ -3,6 +3,12 @@ const active=s=>!s.eliminated;
 function stepSim(){const racing=state==='race'||state==='menu'||state==='finished';
   for(const s of ships){if(s.eliminated)continue;if(s.dead>0){s.dead-=H;if(s.dead<=0&&RC.type==='arena'&&s.lives<=0){eliminate(s,true);continue}if(s.dead<=0){s.dead=0;s.wreck=null;restoreParts(s);s.hull=s.hull<=0?100:Math.max(s.hull,60);s.v=s.stats.top*.35;s.x=0;s.yaw=s.beta=s.yawRate=0;s.inv=2}continue}
     s.turbo=Math.max(0,s.turbo-H);s.boost=Math.max(0,s.boost-H);s.shield=Math.max(0,s.shield-H);s.inv=Math.max(0,s.inv-H);
+    /* race-1: a player who is pinned (v<2.5) or facing backwards for 2.5 s is put back on the road at 35 % speed, so a race never soft-locks */
+    if(s.isPlayer&&state==='race'&&!s.finished&&raceT>5&&TUNE.rcUnstick!==0){const bad=!s.air&&(s.v<2.5||Math.abs(Math.atan2(Math.sin(s.yaw),Math.cos(s.yaw)))>1.9);s.stkT=bad?(s.stkT||0)+H:0;
+      if(s.stkT>2.5){s.stkT=0;s.v=s.stats.top*.35;s.x=clamp(s.x*.2,-3,3);s.yaw=s.beta=s.yawRate=0;s.inv=2;feed('BACK ON THE ROAD',0,'#ffd12c');AU.sfx('pick')}}
+    /* race-1: DNF - 40 s after the first rival finishes, or at 235 s, the race ends for the player */
+    if(s.isPlayer&&state==='race'&&!s.finished&&RC.type!=='arena'&&RC.type!=='zone'&&TUNE.rcDnf!==0){if(!RC.firstFin&&ships.some(o=>!o.isPlayer&&o.finished))RC.firstFin=raceT;
+      if((RC.firstFin&&raceT-RC.firstFin>40)||raceT>235){pl.finished=true;pl.finishTime=raceT;pl.dnf=1;state='finished';finishT=1.5;AU.sfx('finish');say('DNF','TIME UP',2.5)}}
     if(s.stormT>0){s.stormT-=H;s.v=Math.min(s.v,s.stats.top*.72)}
     if(s.magnet>0){s.magnet-=H;let tgt=null,bd=320;for(const o of ships){if(o===s||o.dead>0||o.eliminated)continue;const dd=tdd(o.dist,s.dist);if(dd>4&&dd<bd){bd=dd;tgt=o}}
       if(tgt){s.v=Math.max(s.v,Math.min(tgt.v+30,s.stats.top*1.25));s.x+=clamp(tgt.x-s.x,-9*H,9*H);if(s.mesh&&R()<.4){const at=s.mesh.position.clone().add(s.mesh.userData.m.position);emit(SPARK,at,V3(rr(-3,3),rr(0,3),rr(-3,3)),.3,new THREE.Color(2.6,.5,1))}

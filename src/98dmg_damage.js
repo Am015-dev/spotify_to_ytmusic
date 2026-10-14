@@ -34,8 +34,9 @@ function DMG_debStep(dt){const im=DMG.im;if(!im||!DMG.deb.length){if(im&&im.coun
  L.forEach((d,i)=>{const k=d.t>3.6?Math.max(.01,(4-d.t)/.4):1;_dmM.compose(d.p,d.q,_dmS.setScalar(d.s*k));im.setMatrixAt(i,_dmM);im.setColorAt(i,d.c)});im.count=L.length;im.instanceMatrix.needsUpdate=true;im.instanceColor.needsUpdate=true}
 // THE hit: v = relative normal speed in km/h. Returns the health lost (%).
 function DMG_impact(v,o){if(!DMG.on||state!=='roam'||RO.wk||(RO.inv||0)>0)return 0;const at=new THREE.Vector3(RO.x+Math.sin(RO.h)*1.8,RO.y+.8,RO.z+Math.cos(RO.h)*1.8);
- if(v<25){DMG.n.light++;if(v>8)try{burst(SPARK,at,8,6,.3,new THREE.Color(2,1.6,.9))}catch(e){}return 0}
- DMG.lastV=v;DMG.cls=DMG_cls();const d=15*Math.sqrt((v-25)/25)/DMG.cls;RO.hp=Math.max(0,(RO.hp??100)-d);RO.lastHit=0;DMG.lastHit=performance.now();DMG.n.hits++;
+ const GL=TUNE.dmgGlance??32;/* race-1: glancing hits (< 32 km/h along the normal) only spark */
+ if(v<GL){DMG.n.light++;if(v>8)try{burst(SPARK,at,8,6,.3,new THREE.Color(2,1.6,.9))}catch(e){}return 0}
+ DMG.lastV=v;DMG.cls=DMG_cls();const d=Math.min(TUNE.dmgCap??12,15*Math.sqrt((v-25)/25)/DMG.cls);RO.inv=Math.max(RO.inv||0,TUNE.dmgInv??1.2);/* race-1: per-hit cap 12 % + 1.2 s invulnerable after a hit */RO.hp=Math.max(0,(RO.hp??100)-d);RO.lastHit=0;DMG.lastHit=performance.now();DMG.n.hits++;
  const nb=clamp(Math.round(2+d/4),2,6),src=DMG_panels(1-RO.hp/100,nb);DMG_throw(nb,src,v);try{burst(SPARK,at,16,9,.4,new THREE.Color(2,1.6,.9))}catch(e){}
  DMG_hud(RO.hp);if(d>6)try{flashHud()}catch(e){}if(RO.hp<=0){DMG.n.boom++;DMG.tBoom=performance.now();try{fireball(V3(RO.x,RO.y+1.4,RO.z),26,3,1.1)}catch(e){}DMG_panels(0);roamWreck()}return d}
 DMG.wall=(kmh,deg)=>DMG_impact(kmh*Math.sin((deg??90)*Math.PI/180));
