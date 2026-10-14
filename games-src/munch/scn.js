@@ -82,6 +82,7 @@
       { kind: 'eq', name: 'win/lose colour matches the engine', a: function () { return document.querySelector('.sline').classList.contains('win'); }, b: function () { return winning(G.cb); } },
       { kind: 'play', name: 'tap Fight!: the winner is decided right and the loot is given', snap: function () { var h = hearth(); h.win = h.you > h.mon; return h; },
         steps: [{ sel: '.fightb' }], idle: function () { return !G.cb && G.phase !== 'combat' && !UI.busy; },
+        diag: function () { return 'phase ' + G.phase + ', stage ' + (G.cb && G.cb.stage) + ', side ' + sideToAct() + ', pause ' + UI.pause + ', busy ' + UI.busy + ', q ' + (G.q && G.q.kind) + ', buttons ' + [].map.call(document.querySelectorAll('button.primary,button.btn'), function (b) { return GXS.vis(b) ? b.textContent.trim().slice(0, 14) : ''; }).filter(Boolean).slice(0, 6).join('|'); },
         verify: function (b, a) {
           if (!G.out) return 'no fight result'; if (!!G.out.won !== b.win) return 'YOU ' + b.you + ' vs MONSTERS ' + b.mon + ' but the engine says won=' + G.out.won;
           if (!b.win) return true;

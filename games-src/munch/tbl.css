@@ -243,3 +243,5 @@ html.ph .arena:has(>.vs){--res:calc(98px + var(--rb,0px) + var(--re,0px) + var(-
 html .arena .vs .score .num{display:none!important}
 html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sline .sm{gap:4px}html.ph .sline .sl1 i{font-size:.75rem;letter-spacing:.02em}html.ph .sline .sv{font-size:.9rem}
 html.ph .sline .n{min-width:.9em}
+/* PC: after a bonus card the fight rows outgrow the arena; Fight!/Run/Help stay pinned inside it instead of being cut off and unclickable (scenario dk-fight-bonus @1366x768) */
+html:not(.ph) .arena .fbtns{position:sticky;bottom:0;z-index:3}
