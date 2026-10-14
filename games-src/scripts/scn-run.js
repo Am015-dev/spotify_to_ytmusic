@@ -65,17 +65,19 @@ async function checkScenario(page, base, slug, id, phone, mut) {
     }
     if (r.tap) { await tapAt(r.tap.x, r.tap.y); await sleep(450); const a = await after(i); if (!a.ok) fails.push(a.msg); }
   }
+  const invFails = [];   // universal invariants + glow-answers-tap, kept apart from the scenario's own checks (build-all.py warns on them, blocks on `fails`); one run gives both
   if (info && !info.error) {
-    (await page.evaluate(inv => GXS.universal(inv), !process.env.SCN_NOINV).catch(() => [])).forEach(m => fails.push(m));
+    const all = await page.evaluate(() => GXS.universal(true)).catch(() => []), base = await page.evaluate(() => GXS.universal(false)).catch(() => []);
+    base.forEach(m => fails.push(m)); all.filter(m => !base.includes(m)).forEach(m => invFails.push(m));
     if (!process.env.SCN_NOINV) for (let k = 0; k < 3; k++) {   // every glowing legal target must answer a real tap (the game state must change)
       const g = await page.evaluate(() => ({ t: GXS.glow(), fp: GXS.fp() })).catch(() => ({ t: [] }));
       if (!g.t.length) break;
       await tapAt(g.t[0].x, g.t[0].y); await sleep(500);
-      if (g.fp === await page.evaluate(() => GXS.fp()).catch(() => g.fp)) { fails.push(`glowing target "${g.t[0].n}" did not respond to a tap`); break; }
+      if (g.fp === await page.evaluate(() => GXS.fp()).catch(() => g.fp)) { invFails.push(`glowing target "${g.t[0].n}" did not respond to a tap`); break; }
     }
   }
   errs.forEach(e => fails.push('page error: ' + e));
-  return { info, fails };
+  return { info, fails, invFails };
 }
 
 // For scenario-mutate.js (own browser, no Playwright Test): same check in a fresh context.
@@ -83,7 +85,7 @@ async function runOne(browser, base, slug, sc, sz, mut) {
   const t0 = Date.now(), ctx = await browser.newContext(sz.phone
     ? { viewport: { width: sz.w, height: sz.h }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' }
     : { viewport: { width: sz.w, height: sz.h }, deviceScaleFactor: 1, serviceWorkers: 'block' });
-  try { const page = await ctx.newPage(), { info, fails } = await checkScenario(page, base, slug, sc.id, sz.phone, mut);
+  try { const page = await ctx.newPage(), { info, fails: own, invFails } = await checkScenario(page, base, slug, sc.id, sz.phone, mut), fails = own.concat(process.env.SCN_NOINV ? [] : invFails);
     return { info, id: sc.id, size: sz.id, ok: !fails.length, fails, sec: +((Date.now() - t0) / 1000).toFixed(1) }; }
   catch (e) { return { info: null, id: sc.id, size: sz.id, ok: false, fails: ['harness: ' + String(e.message).slice(0, 100)] }; }
   finally { await ctx.close(); }

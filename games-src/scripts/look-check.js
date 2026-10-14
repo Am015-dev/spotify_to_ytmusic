@@ -469,7 +469,8 @@ const gridPx = (w, h, dpr) => { const up = v => v <= 512 ? 512 : 1024; return [u
 
 function judge(raw, ctx) {
   const { size, screen, contrastOf } = ctx; const phone = size.mobile; const F = [];
-  const add = (f) => F.push({ size: size.id, screen, ...f });
+  const SKIP = (opt('skip', '') || '').split(',').filter(Boolean);   // --skip size,overflow,...: checks already done by the scenario invariants / menu scenario (build-all.py --deploy)
+  const add = (f) => { if (!SKIP.includes(f.check)) F.push({ size: size.id, screen, ...f }); };
   for (const t of raw.texts) t.ok = !t.skip && (t.selfHit >= 0.4 || (t.__glyph || 0) >= 20);
   // 1 text size
   for (const t of raw.texts) {

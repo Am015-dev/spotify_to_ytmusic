@@ -23,12 +23,12 @@ for (const [slug, scns] of Object.entries(list)) test.describe(slug, () => {
   for (const sc of scns) test(sc.id, async ({ page }, ti) => {
     const phone = !!ti.project.use.isMobile;
     test.skip((sc.sizes === 'phone' && !phone) || (sc.sizes === 'pc' && phone), 'scenario is not for this size');
-    let fails = [];
+    let fails = [], inv = [];
     if (process.env.AXE_ONLY) {
       await page.goto(`${BASE}/${slug}/?scn=${encodeURIComponent(sc.id)}`, { waitUntil: 'load', timeout: 45000 });
       await page.waitForFunction(() => window.GXSCN && window.GXSCN.ready, null, { timeout: 30000 }).catch(() => { });
       await page.waitForTimeout(800);
-    } else fails = (await checkScenario(page, BASE, slug, sc.id, phone)).fails;
+    } else { const r = await checkScenario(page, BASE, slug, sc.id, phone); fails = r.fails; inv = r.invFails; }
     if (sc.id === 'menu' && !process.env.AXE_ONLY) {   // axe on every menu surface (tap targets >= 24 px, contrast >= 2:1, named buttons): the shared menu scenario opens them one by one
       const n = await page.evaluate(() => window.GXS.menuList().length).catch(() => 0);
       for (let i = 0; i < n; i++) {
@@ -43,6 +43,10 @@ for (const [slug, scns] of Object.entries(list)) test.describe(slug, () => {
       const dir = path.join(path.resolve(process.env.LOOK_OUT), slug); fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(path.join(dir, `${sc.id}-${ti.project.name}.json`), JSON.stringify(severe));
     }
+    if (inv.length && process.env.INV_OUT) {   // invariants (text < 11 px, clipping, ...) also flag OLD problems: written aside, build-all.py warns on them; only the scenario's own checks fail the test
+      const dir = path.join(path.resolve(process.env.INV_OUT), slug); fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, `${sc.id}-${ti.project.name}.json`), JSON.stringify(inv));
+    } else if (inv.length) fails.push(...inv);
     expect(fails, fails.slice(0, 3).join(' | ')).toEqual([]);
   });
 });

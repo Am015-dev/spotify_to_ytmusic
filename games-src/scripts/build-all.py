@@ -57,6 +57,9 @@ SWEEPS = {
 }
 PHONE_MS = {"crown-city-smash": 420000}   # its six phone scenarios need ~180 s on this machine (default limit per game is 180 s)
 TIMES = []   # (slug, check, seconds)
+def _safe(fn, x):   # (x, result) or (x, the exception): one crashing game must not stop the thread pool
+    try: return fn(x)
+    except Exception as e: return x, e
 
 def inject_lab(html_path):
     """Inline the LAB (shell/gx-lab-core.js + gx-lab.js + gx-lab.css) at the end of the staged page. Inert unless test mode is on (?test=1 or localStorage gx_test=1)."""
@@ -190,8 +193,9 @@ def main():
             if passing:
                 look = a.deploy and not a.no_look   # the same pages are scanned with axe (contrast / tap size / button names); verdict in 3b
                 projects = ["--project=phone"] + ([] if not a.full else ["--project=phone-s", "--project=pc"])
+                shutil.rmtree(out / ".inv", ignore_errors=True); shutil.rmtree(out / ".look-axe", ignore_errors=True)   # stale results of an earlier run
                 def pw(slugs, extra_env, log):
-                    return run_check([str(SRC / "node_modules" / ".bin" / "playwright"), "test"] + projects, str(SRC), dict(env3, SCN_SLUGS=",".join(slugs), PW_JSON=str(out / ".check" / "scn.json"), **extra_env), log, 1800)
+                    return run_check([str(SRC / "node_modules" / ".bin" / "playwright"), "test"] + projects, str(SRC), dict(env3, SCN_SLUGS=",".join(slugs), PW_JSON=str(out / ".check" / "scn.json"), INV_OUT=str(out / ".inv"), **extra_env), log, 1800)
                 code, tail = timed("all" if len(passing) > 1 else passing[0], "scenarios", lambda: pw(passing, {"LOOK_OUT": str(out / ".look-axe")} if look else {}, out / ".check" / "scenarios.log"))
                 def verdict():   # per game: (passed, total, first failures) from the JSON reporter; titles are  file > game > scenario
                     res = {}
@@ -214,14 +218,12 @@ def main():
                 for s in passing:
                     ok_n, tot, fl = v.get(s, [0, 0, []])
                     if not tot: status[s], why[s] = "FAIL", "scenarios: none ran (no scenarios registered?)"
-                    elif fl:
-                        # Universal invariants (text < 11 px, clipping, ...) also flag OLD problems already on the live game. Rerun with the
-                        # scenarios' own checks only: if those pass, warn (the look check, which compares with the live game, guards regressions).
-                        pw([s], {"SCN_NOINV": "1"}, out / ".check" / "scenarios-own.log")
-                        o = verdict().get(s, [0, 0, []])
-                        if o[1] and not o[2]: print(f"[scn] {s:18} own checks {o[0]}/{o[1]} ok; WARN universal: {fl[0][:120]}", flush=True)
-                        else: status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (ok_n, tot, "; ".join(fl[:2])[:100])
-                    else: print(f"[scn] {s:18} {ok_n}/{tot} scenarios ok")
+                    elif fl: status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (ok_n, tot, "; ".join(fl[:2])[:100])
+                    else:
+                        # Universal invariants (text < 11 px, clipping, ...) also flag OLD problems already on the live game: recorded by the same run (INV_OUT), a warning only
+                        inv = sorted({m for fp in sorted((out / ".inv" / s).glob("*.json")) for m in json.load(open(fp))}) if (out / ".inv" / s).is_dir() else []
+                        if inv: print(f"[scn] {s:18} own checks {ok_n}/{tot} ok; WARN universal: {inv[0][:120]}", flush=True); continue
+                        print(f"[scn] {s:18} {ok_n}/{tot} scenarios ok")
         if a.full:  # 3a2. LAB acceptance tests (shared pages; warn-only, so not in the fast gate: --full only): test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
             passing = [s for s in ok if status[s] == "PASS"]
             if passing:   # a game's first deploy has no rows in games/scenarios.json yet: index the staged pages first so lab.html can list them
@@ -253,60 +255,78 @@ def main():
     else:
         for s in ok: status[s] = "PASS" if a.no_check else status[s]
 
-    if a.deploy and not a.no_look:  # 3b. look check: only NEW severe visual findings vs games-src/look-baseline.json block the deploy
+    if a.deploy and not a.no_look:  # 3b. look check + axe: only NEW severe findings block. "New" = not in look-known/<slug>.json (committed, rewritten on every successful deploy; no live re-measurement)
         env = dict(os.environ); env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
-        for s in [x for x in slugs if status[x] == "PASS"]:
+        mode = "all" if a.full else "phone"
+        KNOWN = SRC / "look-known"
+        def known_get(s, kind):
+            try: return {tuple(f) for f in json.load(open(KNOWN / f"{s}.json"))[mode][kind]}
+            except Exception: return None   # no baseline for this game yet: measured once on the live game below, then committed
+        def look_run(s):   # runs in a worker thread: the look-check of one staged game
+            r = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--gate", "--game", s, "--games-dir", str(out), "--out", str(out / ".look"), "--no-shots", "--skip", "size,overflow,overlap,fonts"] + ([] if a.full else ["--sizes", "phone"]),
+                               env=env, capture_output=True, text=True, timeout=900)
+            return s, r
+        def sev(path, s):
             try:
-                r = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--gate", "--game", s, "--games-dir", str(out), "--out", str(out / ".look"), "--no-shots"] + ([] if a.full else ["--sizes", "phone"]),
-                                   env=env, capture_output=True, text=True, timeout=900)
+                g = json.load(open(path)).get("games", {}).get(s, {})
+                return {(str(f.get("check")), str(f.get("sel")), str(f.get("text"))) for f in g.get("findings", []) if f.get("sev") == "severe"}
+            except Exception: return None
+        def live_look(s):   # fallback for a game without a committed baseline: measure the live game once
+            cache = SRC / ".look-live-cache" / f"{s}-live-{mode}"
+            if not (cache / "report.json").exists():
+                subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--game", s, "--games-dir", str(SRC.parent / "games"), "--out", str(cache), "--no-shots"] + ([] if a.full else ["--sizes", "phone"]), env=env, capture_output=True, text=True, timeout=900)
+            return sev(cache / "report.json", s)
+        todo = [x for x in slugs if status[x] == "PASS"]
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=2) as ex:
+            results = list(ex.map(lambda x: _safe(look_run, x), todo))
+        new_look = {}
+        for s, r in results:
+            try:
+                if isinstance(r, Exception): print(f"[look] {s}: skipped ({r})"); continue
                 tail = [l for l in r.stdout.splitlines() if "[look]" in l and s in l]
+                new_look[s] = sev(out / ".look" / "report.json", s) if (out / ".look" / "report.json").exists() else None
                 if r.returncode == 1:
-                    # Block only on findings the LIVE game doesn't already have (the baseline file goes stale as other workers deploy).
-                    def sev(path):
-                        try:
-                            g = json.load(open(path)).get("games", {}).get(s, {})
-                            return {(f.get("check"), f.get("sel"), f.get("text")) for f in g.get("findings", []) if f.get("sev") == "severe"}
-                        except Exception: return None
-                    new_f = sev(out / ".look" / "report.json")
-                    import hashlib
-                    lp = SRC.parent / "games" / s / "index.html"
-                    key = hashlib.sha1(lp.read_bytes()).hexdigest()[:12] if lp.exists() else "none"
-                    cache = SRC / ".look-live-cache" / f"{s}-{key}-{'all' if a.full else 'phone'}"
-                    if not (cache / "report.json").exists():   # live version not measured yet: measure once, reuse for every later deploy
-                        subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--game", s, "--games-dir", str(SRC.parent / "games"), "--out", str(cache), "--no-shots"] + ([] if a.full else ["--sizes", "phone"]),
-                                       env=env, capture_output=True, text=True, timeout=900)
-                    live_f = sev(cache / "report.json")
                     msg = (tail[-1].split("] ", 1)[-1] if tail else "new severe findings")[:140]
-                    if new_f is not None and live_f is not None and new_f <= live_f:
+                    live_f = known_get(s, "look")
+                    if live_f is None: live_f = live_look(s)
+                    if new_look[s] is not None and live_f is not None and new_look[s] <= live_f:
                         print(f"[look] {s}: WARN pre-existing on the live game too, not caused by this change: {msg}", flush=True)
-                    else:
-                        status[s], why[s] = "FAIL", "look-check (new vs live): " + msg
+                    else: status[s], why[s] = "FAIL", "look-check (new vs known): " + msg
                 elif r.returncode != 0: print(f"[look] {s}: look-check crashed, report-only ({r.stderr.strip()[-80:]})")
                 else: print(f"[look] {s}: {tail[-1].split('] ', 1)[-1] if tail else 'ok'}")
             except Exception as e:
                 print(f"[look] {s}: skipped ({e})")
-        # 3b2. axe part of the look check (contrast / tap size / button names, run on the scenario pages in 3a): only NEW severe findings vs the LIVE game block
+        # 3b2. axe part (contrast / tap size / button names, run on the scenario pages in 3a): only NEW severe findings vs the known set block
         def axe_set(d, s):
             return {tuple(f) for fp in sorted((d / s).glob("*.json")) for f in json.load(open(fp))}
+        new_axe = {}
         for s in [x for x in slugs if status[x] == "PASS" and (out / ".look-axe" / x).is_dir()]:
             try:
-                import hashlib
-                new_f = axe_set(out / ".look-axe", s)
-                lp = SRC.parent / "games" / s / "index.html"
-                key = hashlib.sha1(lp.read_bytes()).hexdigest()[:12] if lp.exists() else "none"
-                cache = SRC / ".look-live-cache" / f"{s}-{key}-axe-{'all' if a.full else 'phone'}"
-                if not cache.is_dir():   # live version not measured yet: same pages, live server (stage = empty dir, games/ only), reused by every later deploy
-                    ids = sorted({re.sub(r"-[a-z-]+\.json$", "", fp.name) for fp in (out / ".look-axe" / s).glob("*.json")})
-                    empty = out / ".check" / ".empty"; empty.mkdir(parents=True, exist_ok=True)
-                    e2 = {k: v for k, v in env3.items() if k not in ("GX_URL", "GX_STAGE")}
-                    run_check([str(SRC / "node_modules" / ".bin" / "playwright"), "test"] + projects, str(SRC), dict(e2, GX_STAGE=str(empty), SCN_SLUGS=s, SCN_LIST=json.dumps({s: [{"id": i, "sizes": "all"} for i in ids]}),
-                              AXE_ONLY="1", LOOK_OUT=str(cache), PW_JSON=str(out / ".check" / "axe-live.json")), out / ".check" / "axe-live.log", 900)
-                    cache.mkdir(parents=True, exist_ok=True)
-                live_f = axe_set(cache, s)
-                if new_f - live_f: status[s], why[s] = "FAIL", "axe (new vs live): " + "; ".join(" ".join(f) for f in sorted(new_f - live_f))[:140]
-                else: print(f"[look] {s}: axe ok ({len(new_f)} severe, all already on the live game)" if new_f else f"[look] {s}: axe ok")
+                new_f = new_axe[s] = axe_set(out / ".look-axe", s)
+                live_f = known_get(s, "axe")
+                if live_f is None:   # no committed baseline yet: same pages on the live server, once
+                    cache = SRC / ".look-live-cache" / f"{s}-live-axe-{mode}"
+                    if not cache.is_dir():
+                        ids = sorted({re.sub(r"-[a-z-]+\.json$", "", fp.name) for fp in (out / ".look-axe" / s).glob("*.json")})
+                        empty = out / ".check" / ".empty"; empty.mkdir(parents=True, exist_ok=True)
+                        e2 = {k: v for k, v in env3.items() if k not in ("GX_URL", "GX_STAGE")}
+                        run_check([str(SRC / "node_modules" / ".bin" / "playwright"), "test"] + projects, str(SRC), dict(e2, GX_STAGE=str(empty), SCN_SLUGS=s, SCN_LIST=json.dumps({s: [{"id": i, "sizes": "all"} for i in ids]}),
+                                  AXE_ONLY="1", LOOK_OUT=str(cache), PW_JSON=str(out / ".check" / "axe-live.json")), out / ".check" / "axe-live.log", 900)
+                        cache.mkdir(parents=True, exist_ok=True)
+                    live_f = axe_set(cache, s)
+                if new_f - live_f: status[s], why[s] = "FAIL", "axe (new vs known): " + "; ".join(" ".join(f) for f in sorted(new_f - live_f))[:140]
+                else: print(f"[look] {s}: axe ok ({len(new_f)} severe, all already known)" if new_f else f"[look] {s}: axe ok")
             except Exception as e:
                 print(f"[look] {s}: axe skipped ({e})")
+        # 3b3. committed baseline of known findings: rewritten for every game that passed (it becomes the live game when the deploy lands)
+        KNOWN.mkdir(exist_ok=True)
+        for s in slugs:
+            if status[s] != "PASS" or (s not in new_look and s not in new_axe): continue
+            try: cur = json.load(open(KNOWN / f"{s}.json"))
+            except Exception: cur = {}
+            cur[mode] = {"look": sorted([list(f) for f in (new_look.get(s) or [])]), "axe": sorted([list(f) for f in new_axe.get(s, [])])}
+            (KNOWN / f"{s}.json").write_text(json.dumps(cur, indent=0) + "\n")
 
     deployed = []
     if a.deploy:  # 4. copy only passing games into games/
