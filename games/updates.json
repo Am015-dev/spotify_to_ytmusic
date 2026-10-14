@@ -1,6 +1,15 @@
 [
  {
   "date": "2026-10-14",
+  "game": "rampart-and-vine",
+  "title": "desktop menu and board readable: rows fit their art, 16px text, zoomed valley",
+  "items": [],
+  "check": "",
+  "scn": [],
+  "ask": []
+ },
+ {
+  "date": "2026-10-14",
   "game": "sunglaze",
   "title": "readable 3D board labels",
   "items": [
@@ -199,15 +208,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-14",
-  "game": "rampart-and-vine",
-  "title": "one big Play button, one-line tips, UI-bar checks",
-  "items": [],
-  "check": "",
-  "scn": [],
-  "ask": []
  },
  {
   "date": "2026-10-14",
