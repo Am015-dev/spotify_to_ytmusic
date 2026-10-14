@@ -157,3 +157,5 @@ header.gx-bar [data-gx="dr-menu"]{font-size:1.15rem;min-width:44px}
 /* menu test v2: bare text sits 8px+ inside the column of the framed rows (monster picker, buttons) */
 .dlg.start>h2,.dlg.start>p,.dlg.start>details.custom{padding-inline:10px}
 details.custom:not([open])>*:not(summary){display:none}
+.dlg.start .acts .btn{margin-inline:-14px;width:calc(100% + 28px)}
+.dlg.start>h2,.dlg.start>p,.dlg.start>details.custom{padding-inline:24px}
