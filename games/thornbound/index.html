@@ -662,6 +662,13 @@ html.sk .ppop:not([hidden]){background:#e9d7a8 url(media/ui-sheet-c.webp) center
 /* one instruction line: the coach tip replaces the status caption; no tip floats over an open drawer */
 body:has(.gxh-bub.on) #barstat .st-t{visibility:hidden}
 body:has(.gx-drawer.on) .gxh-bub{visibility:hidden}
+
+/* UI bar: an open drawer owns the screen (nothing under it to be covered); one instruction line; title text inset */
+body:has(.gx-drawer.on) #rivals,body:has(.gx-drawer.on) #board,body:has(.gx-drawer.on) #main,body:has(.gx-drawer.on) #dockbody{visibility:hidden}
+body:has(.gxh-bub.on) #road .dk-ins{display:none}
+#start .tag.goal,#start .st-c{padding-inline:16px}
+html.sk .gx-drawer{background-color:#e9d7a8}
+.gx-drawer:not(.on){transition:none}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -1619,7 +1626,7 @@ const GX={key:'gx',open:null,
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
     return out;
   }
@@ -7451,7 +7458,7 @@ function hlpSuggest(){const M=UI.bf;if(!M||!M.kind||UI.card||UI.dragging||!M.sug
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'thornbound',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot'});
+  GXH.init({game:'thornbound',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.kcb,.gx-board svg text,.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
   const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||(typeof tutOn==='function'&&tutOn())||(st&&!st.hidden)||isPassing();
