@@ -35,7 +35,7 @@ function hproj(wx,wz,wy){try{const P=ovMakeProj();const bd=$('#board');if(!P||!b
 function hlpPipExample(){try{const d=sideToAct();const info=startInfo(d);let best=null,bd=1e9;
   for(const o of info){const p=hproj(o.w[0],o.w[1]);if(!p)continue;const dd=Math.abs(p.x-innerWidth/2)*.6+Math.abs(p.y-innerHeight*.55);if(dd<bd){bd=dd;best=p}}return best}catch(e){return null}}
 const HLP_STEPS={
- start:{target:()=>hlpPipExample(),title:'Pick a start mark',text:'Tap a gold mark on the board\'s edge. The middle of an edge is safest; corners are cramped.',pic:()=>HP.mark()},
+ start:{target:()=>hlpPipExample(),title:'Pick a start mark',text:'Tap a glowing gold mark.',pic:()=>HP.mark()},
  lay:{target:hq('#ppop .ph-tiles','#ps .ps-tiles','#pin .hand'),title:'Lay a current',text:'Pick a tile, turn it, then tap Place. Your junk sails along the new line.',pic:()=>HP.tile()},
  nolay:{target:hq('#ps .ps-x .pb','#ps .ps-ctl .pb','#pin .row .btn','#main .row .btn'),title:'Nothing to lay',text:'No tile fits. Tap Pass, or use a Rift Gate or Deck Cannon if you have one.',pic:()=>HP.pass()},
  doom:{target:hq('#pc [data-qkind] h4','#main [data-qkind] h4'),title:'Junk in danger',text:'A leviathan is about to sink you. Pick a rescue below, or Accept.',pic:()=>HP.lev()},

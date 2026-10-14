@@ -1,7 +1,7 @@
 /* painted UI over the shared skin (gx-skin.css); switches (html.sk, sk-*) are added by skinInit in ui13.js after each file loaded */
 html.sk{--sk-ink:#2a160c;--sk-cream:#f5e6c0;--sk-num:#2a1405;--sk-num-done:#fff0c4}
 /* the game's own buttons: ivory plate (normal), crimson velvet (primary) */
-html.sk .btn{display:inline-flex;flex-direction:row;gap:6px;align-items:center;border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk .btn{display:inline-flex;flex-direction:row;gap:6px;align-items:center;border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/8px 16px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 html.sk .btn.pri,html.sk .btn.go,html.sk .btn.on{border-image-source:url(media/ui-button-go-c.webp);color:#fff4e0;text-shadow:0 1px 2px rgba(0,0,0,.7)}
 html.sk .btn:disabled{opacity:.5}
 /* drawer heads in the vellum strip once its file loaded */
@@ -33,8 +33,11 @@ html.sk .gx-drawer .gl.new,html.sk .gx-drawer .lk{color:#7c1b2c}
 html.sk .btn:has(>small),html.sk .btn:has(>b){flex-direction:column;gap:0}
 html.sk .gx-drawer{border-width:0}
 /* wide tap-rows (Tutorial) sit on the painted strip; border widths unchanged, only the paint changes */
-html.sk .btn.gxt-menu{border-image:url(media/ui-row-c.webp) 30 fill/12px 12px 12px 5px stretch;text-align:center;color:var(--sk-ink);text-shadow:none}
+html.sk .btn.gxt-menu{border-image:url(media/ui-row-c.webp) 30 fill/8px 16px 8px 5px stretch;text-align:center;color:var(--sk-ink);text-shadow:none}
 html.sk .btn.gxt-menu>*{color:inherit;text-shadow:inherit}
 /* speech badge on the coach bubble, vellum sheet behind the detail popup */
 html.sk .gxh-bub::before{content:'';position:absolute;left:-9px;top:-11px;width:26px;height:20px;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;pointer-events:none}
 html.sk .ppop:not([hidden]){background:#e9d7a8 url(media/ui-sheet-c.webp) center/100% 100% no-repeat;border-top:0}
+/* one instruction line: the coach tip replaces the status caption; no tip floats over an open drawer */
+body:has(.gxh-bub.on) #barstat .st-t{visibility:hidden}
+body:has(.gx-drawer.on) .gxh-bub{visibility:hidden}

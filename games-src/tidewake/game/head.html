@@ -115,6 +115,7 @@ p{margin:4px 0 6px}
 .gx-drawer-head{background:linear-gradient(#e8c466,#c99a35)}
 .gx-drawer-head h2{font:1.3rem var(--fd);margin:0;flex:1;display:flex;gap:8px;align-items:center}
 .gx-drawer-body{font-size:1.02rem}
+.gx-drawer-body p>b{white-space:nowrap}
 .gx-drawer h3{border-bottom:2px solid var(--gold2);padding-bottom:2px}
 .gx-drawer ul{margin:4px 0 8px;padding-left:20px}
 .gx-drawer li{margin:2px 0}
@@ -143,6 +144,8 @@ p{margin:4px 0 6px}
 .stin{max-width:980px;margin:0 auto;padding:12px 14px calc(18px + env(safe-area-inset-bottom,0px))}
 .stin h1{font:2.6rem/1 var(--fd);color:var(--gold);margin:6px 0 2px;text-shadow:0 3px 4px #000;display:flex;align-items:center;gap:10px}
 .stin .tag{font-size:1.1rem;color:#cfe9e4;margin:0 0 8px}
+.stin>h1,.stin>.tag{padding:0 24px}.stcard>p,.stcard small,.stcard>.tiny{padding-left:10px;padding-right:10px}
+details.online:not([open])>#netblock{display:none}
 .stcard{background:rgba(243,230,191,.96);color:var(--ink);border:2px solid var(--gold2);border-radius:14px;padding:10px 12px;margin:10px 0}
 .stcard h2{font:1.3rem var(--fd);margin:0 0 6px}
 .stcols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -378,6 +381,7 @@ html.ph .omark span{display:none}
 html.ph .omark{margin:-13px 0 0 -13px}
 html.ph .omark b{width:26px;height:26px;font-size:.85rem;border-width:2px}
 html.ph .gx-drawer{top:auto}
+body:has(.gx-drawer.on) .gxh-bub,body:has(.gx-drawer.open) .gxh-bub{display:none}
 @media (prefers-reduced-motion:reduce){html.ph .ppop.in,html.ph .pcard.in{animation:none}}
 </style>
 </head>

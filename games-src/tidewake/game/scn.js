@@ -24,6 +24,16 @@
     }).then(function () { try { GXH.setEnabled(false); GXH.hide(); } catch (e) { } if (UI.mph) { PH.mphHide = UI.mph; try { phAfter(); } catch (e) { } } return idle(1500); });
   }
 
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () {
+    if (!booted()) return;
+    try { GX.close(); } catch (e) { }
+    var s = defaultSetup(); s.mode = 'me'; s.np = 2; s.variant = null; s.noMon = false; s.exp = { rift: 0, wave: 0, maelstrom: 0, cannon: 0 };
+    s.seats.forEach(function (x, i) { x.h = i === 0; x.lv = 'normal'; });
+    AIDELAY = 60; try { GXH.reset(); GXH.setEnabled(true); } catch (e) { }
+    startGame(JSON.parse(JSON.stringify(s)));
+    return GXS.wait(function () { return G && G.phase === 'setup' && !UI.busy && sideToAct() === 0; }, 15000).then(function () { return idle(600); });
+  };
   GXS.add({
     id: 'tw-board', name: 'Start of game board', ask: 'Is the sea chart clear with your tiles?', seed: 5, when: booted,
     setup: function () { return table(5); },
