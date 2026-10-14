@@ -190,7 +190,7 @@ def main():
                         else:
                             status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
                     else: print(f"[scn] {s:18} {m.group(2)}/{m.group(3)} scenarios ok")
-        if a.quick or a.deploy:  # 3a2. LAB acceptance tests: test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
+        if a.full:  # 3a2. LAB acceptance tests (shared pages; warn-only, so not in the fast gate: --full only): test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
             passing = [s for s in ok if status[s] == "PASS"]
             if passing:   # a game's first deploy has no rows in games/scenarios.json yet: index the staged pages first so lab.html can list them
                 try:
@@ -236,9 +236,14 @@ def main():
                             return {(f.get("check"), f.get("sel"), f.get("text")) for f in g.get("findings", []) if f.get("sev") == "severe"}
                         except Exception: return None
                     new_f = sev(out / ".look" / "report.json")
-                    rl = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--game", s, "--games-dir", str(SRC.parent / "games"), "--out", str(out / ".look-live"), "--no-shots"],
-                                        env=env, capture_output=True, text=True, timeout=900)
-                    live_f = sev(out / ".look-live" / "report.json")
+                    import hashlib
+                    lp = SRC.parent / "games" / s / "index.html"
+                    key = hashlib.sha1(lp.read_bytes()).hexdigest()[:12] if lp.exists() else "none"
+                    cache = SRC / ".look-live-cache" / f"{s}-{key}"
+                    if not (cache / "report.json").exists():   # live version not measured yet: measure once, reuse for every later deploy
+                        subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--game", s, "--games-dir", str(SRC.parent / "games"), "--out", str(cache), "--no-shots"],
+                                       env=env, capture_output=True, text=True, timeout=900)
+                    live_f = sev(cache / "report.json")
                     msg = (tail[-1].split("] ", 1)[-1] if tail else "new severe findings")[:140]
                     if new_f is not None and live_f is not None and new_f <= live_f:
                         print(f"[look] {s}: WARN pre-existing on the live game too, not caused by this change: {msg}", flush=True)
