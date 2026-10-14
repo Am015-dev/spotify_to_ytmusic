@@ -310,3 +310,18 @@ Still weak: pile labels + Diary box hidden under 1000px wide (menu test fails at
 - Still finishing (stop by 09:45): Sunglaze (Guide button dead, 3D black tile, 3D labels, title contrast), Lantern Dive (stretched background, tiny desktop text), Rampart (menu rows art over labels, desktop sizes).
 - Next (one round only, after the audit table): one worker per game that FAILS the audit, brief = the audit's failing rows only. Then the shared fixes listed above (stale shell copies in 12 games, test bugs, drawer solid background).
 - Token rules for the next orchestrator: run on a small context; do not relay each worker report to the owner, report once per round with the audit table; put all instructions in the brief up front (each create_trigger result costs ~6k tokens of context).
+
+## Independent UI audit (14 Oct)
+**Status: stopped early by owner order (09:26). Spec built, NOT run on the 15 games.** No game was edited, no screenshots saved.
+- Built: `scripts/ui-audit.spec.js` (rules A-F, Playwright Test, reuses playwright.config.js projects + GXS.menuList/menuOpen/boardAudit) and `scripts/ui-audit-table.js` (results -> this table). Run: `GX_URL=https://am015-dev.github.io/spotify_to_ytmusic SCN_SLUGS=<slugs> UA_OUT=.staging/ui-audit node_modules/.bin/playwright test scripts/ui-audit.spec.js --project=phone ...` then `node scripts/ui-audit-table.js`.
+- Not verified: the pc/wide run (it crashed once on a bug I then fixed, the fixed re-run was cancelled); rule D (three.js hook via Object.prototype setter) only tried on sunglaze, which is 2D, so untested on a 3D game; E taps at pc may exceed the 420 s test timeout (lower UA_MAX_BTN or UA_E_SIZES).
+- Known spec quirk: the first sunglaze run used the pre-fix surface list (no real start screen); its F "title has 0 big buttons" is a spec artefact, ignore it.
+
+Results so far: only **sunglaze @ phone 390x763** (earlier spec version). All other games: not run.
+| game | A text size | B contrast/busy bg | C stretched | D 3D | E dead buttons | F bar/title/instr |
+|---|---|---|---|---|---|---|
+| sunglaze (phone) | pass | FAIL 15 | pass | n/a (2D) | FAIL 17 | artefact, ignore |
+| other 14 games | not run | not run | not run | not run | not run | not run |
+
+sunglaze B worst 3: board/title floating score "−2/−3/−1" 3.06:1 `div.bf-fl>b.bf-c>span`; campaign node numbers "8","2","5" 1.0:1 against their disc `div.gxc-path>button.gxc-node>span.gxc-disc`; campaign "Act 1 · Wet Clay" 1.79:1 `div.gxc-path>div.gxc-act>b`.
+sunglaze E (likely partly false positives, unchecked): "Saffron/Obsidian/Cobalt" `div.bf-table>div.bf-k>i.bf-t` (board tiles exposed as buttons on the title; tap does nothing); the "covered" ones in the campaign list were modal-hidden buttons, now skipped by the spec.

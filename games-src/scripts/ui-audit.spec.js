@@ -1,3 +1,4 @@
+// UNFINISHED (stopped by owner order 14 Oct 09:26): runs on one game/size only; the 15-game x 5-size run was never done. See HANDOFF.md "Independent UI audit (14 Oct)".
 // Independent UI audit (owner, 14 Oct 2026): strict, LIVE-build check of rules A-F per game x size x surface. It never fixes anything and saves no screenshots
 // (page.screenshot buffers are analysed in memory). Reuses: playwright.config.js projects (phone-s phone tablet pc wide), shell/gx-scenario.js (GXS.menuList /
 // menuOpen / boardAudit open and walk every surface), the existing ?scn=menu page hook.
