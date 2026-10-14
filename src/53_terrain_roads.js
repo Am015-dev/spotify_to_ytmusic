@@ -17,11 +17,10 @@ let TR_W=null;
 function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX1-WX0)/r)+1,nz=Math.ceil((WZN-WZS)/r)+1,h=new Float32Array(nx*nz);
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const[e,n]=RW(WX0+i*r,WZS+j*r);h[j*nx+i]=Math.max(0,(TR_real(e,n)-TR_DATUM)*TR_EX)}
   TR_relief(h,nx,nz,r);
-  let D=null;if(WATERS.length){D=new Float32Array(nx*nz).fill(1e9);for(let j=0;j<nz;j++)for(let i=0;i<nx;i++)if(inRiver(WX0+i*r,WZS+j*r))D[j*nx+i]=0;
+  if(WATERS.length){const D=new Float32Array(nx*nz).fill(1e9);for(let j=0;j<nz;j++)for(let i=0;i<nx;i++)if(inRiver(WX0+i*r,WZS+j*r))D[j*nx+i]=0;
     const s2=r*Math.SQRT2;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i;let d=D[k];if(i)d=Math.min(d,D[k-1]+r);if(j){d=Math.min(d,D[k-nx]+r);if(i)d=Math.min(d,D[k-nx-1]+s2);if(i<nx-1)d=Math.min(d,D[k-nx+1]+s2)}D[k]=d}
     for(let j=nz-1;j>=0;j--)for(let i=nx-1;i>=0;i--){const k=j*nx+i;let d=D[k];if(i<nx-1)d=Math.min(d,D[k+1]+r);if(j<nz-1){d=Math.min(d,D[k+nx]+r);if(i<nx-1)d=Math.min(d,D[k+nx+1]+s2);if(i)d=Math.min(d,D[k+nx-1]+s2)}D[k]=d}
     for(let k=0;k<h.length;k++){const t=clamp((D[k]-30)/150,0,1);h[k]*=t*t*(3-2*t)}}
-  TR_hills4(h,nx,nz,r,D);
   if(CID!=='fra'&&typeof HILL_BY!=='undefined'&&HILL_BY.akro){const A=HILL_BY.akro;let top=0;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=WX0+i*r,z=WZS+j*r;if(athHill1(A,x,z)>=A.H-.01)top=Math.max(top,h[j*nx+i])}
     top=OC_top(top);const H0=A.H;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=WX0+i*r,z=WZS+j*r,m=athHill1(A,x,z)/H0;if(m>0){const k=j*nx+i;h[k]+=(top-h[k])*m}}A.H=top;A.trH0=H0}
   OC_lyka(h,nx,nz,r);TR_W={r,nx,nz,h};TR_roadsInit(TR_W);return TR_W}
@@ -32,10 +31,7 @@ function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX
 const TERR={on:(()=>{try{const q=new URLSearchParams(location.search).get('terr');if(q!=null)sessionStorage.setItem('mho_terr',q);return(q??sessionStorage.getItem('mho_terr')??localStorage.getItem('mho_terr'))!=='0'}catch(e){return true}})()};
 // the Athens ground-quadtree cache (10b) is fitted on the TERR raster (tools/qtdump.js after any height change): with ?terr=0 every cell is fitted live
 if((!TERR.on||window.__qtdump)&&typeof QTC!=='undefined')QTC.ok=false;
-// terr-4 (Alex: hills from more streets): stronger in-city relief, default ON; ?trh=0 = terr-3's k. ?trk=<k> overrides k (tests; the Athens
-// quadtree cache is fitted on the default (trh on), so ?trh=0 or any ?trk fits every cell live)
-const TR_H4=(()=>{const q=new URLSearchParams(location.search);return{on:TERR.on&&q.get('trh')!=='0',k:q.get('trk')}})();
-const TR_RK=CID==="fra"?{k:TR_H4.on?3.9:3.9,c:200}:{k:TR_H4.on?1.4:1.4,c:200};if(TR_H4.k)TR_RK.k=+TR_H4.k;if((TR_H4.k||!TR_H4.on)&&typeof QTC!=='undefined')QTC.ok=false;
+const TR_RK=CID==="fra"?{k:3.9,c:200}:{k:1.4,c:200};
 function TR_relief(h,nx,nz,r){if(!TERR.on||new URLSearchParams(location.search).get('trx')==='0')return;const s=Math.max(1,Math.round(96/r)),cx=Math.ceil(nx/s),cz=Math.ceil(nz/s),C=new Float32Array(cx*cz),N=new Float32Array(cx*cz);
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=((j/s)|0)*cx+((i/s)|0);C[k]+=h[j*nx+i];N[k]++}for(let k=0;k<C.length;k++)C[k]/=N[k]||1;
   const R=Math.round(1200/96),T=new Float32Array(C.length),blur=()=>{for(let j=0;j<cz;j++){let a=0,c=0;for(let i=-R;i<cx+R;i++){if(i+R<cx){a+=C[j*cx+i+R];c++}if(i-R-1>=0){a-=C[j*cx+i-R-1];c--}if(i>=0&&i<cx)T[j*cx+i]=a/c}}
@@ -50,21 +46,6 @@ function TR_relief(h,nx,nz,r){if(!TERR.on||new URLSearchParams(location.search).
   // nearer ridges: a ring of hills rising from 0.4 to 1.6 km outside the city box (Frankfurt +55 m, Athens +40 m), so streets see hills ~3 km away
   const RN=CID==='fra'?55:40;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=WX0+i*r,z=WZS+j*r,dx=Math.max(HX0-x,0,x-HX1),dz=Math.max(HZS-z,0,z-HZN),d=Math.hypot(dx,dz);if(d<=400)continue;
       const t=Math.min(1,(d-400)/1200),n=.5+.3*Math.sin(x/610-.7)*Math.cos(z/770+.4)+.2*Math.sin((x-z)/350);h[j*nx+i]+=RN*t*t*(3-2*t)*n}}
-// terr-4 hills (Alex: hills from more streets; GO terr4/terrain-hills-*): where the ground is flat for ~1.2 km around (local relief RMS
-// < TR_HA.rr m) add smooth mounds up to TR_HA.h m, ~1.2 km across, ~2.5 km apart, so a flat street sees a hill within the 1.5 km draw range.
-// Kept off the river (fade 250..700 m from the water), landmark plazas (their radius + 60..160 m) and the Acropolis; roads are graded after.
-const TR_HA=CID==='fra'?{h:70,rr:90,w:400}:{h:100,rr:50,w:450};
-function TR_hills4(h,nx,nz,r,D){if(!TR_H4.on)return;const s=Math.max(1,Math.round(96/r)),cx=Math.ceil(nx/s),cz=Math.ceil(nz/s),C=new Float32Array(cx*cz),Q=new Float32Array(cx*cz),N=new Float32Array(cx*cz);
-  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=((j/s)|0)*cx+((i/s)|0),v=h[j*nx+i];C[k]+=v;Q[k]+=v*v;N[k]++}for(let k=0;k<C.length;k++){C[k]/=N[k]||1;Q[k]/=N[k]||1}
-  const R=Math.round(600/96),T=new Float32Array(C.length),blur=A=>{for(let j=0;j<cz;j++){let a=0,c=0;for(let i=-R;i<cx+R;i++){if(i+R<cx){a+=A[j*cx+i+R];c++}if(i-R-1>=0){a-=A[j*cx+i-R-1];c--}if(i>=0&&i<cx)T[j*cx+i]=a/c}}
-    for(let i=0;i<cx;i++){let a=0,c=0;for(let j=-R;j<cz+R;j++){if(j+R<cz){a+=T[(j+R)*cx+i];c++}if(j-R-1>=0){a-=T[(j-R-1)*cx+i];c--}if(j>=0&&j<cz)A[j*cx+i]=a/c}}};blur(C);blur(Q);
-  const F=new Float32Array(C.length);for(let k=0;k<F.length;k++){const rms=Math.sqrt(Math.max(0,Q[k]-C[k]*C[k])),t=clamp(1-rms/TR_HA.rr,0,1);F[k]=t*t*(3-2*t)}
-  const A=CID!=='fra'&&typeof HILL_BY!=='undefined'?HILL_BY.akro:null,LM=(typeof LMX!=='undefined'?LMX:[]).filter(L=>L.x!=null).map(L=>[L.x,L.z,Math.min(60,L.r||0)+60]),ss=(a,b,v)=>{const t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t)};
-  let n=0,top=0;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=WX0+i*r,z=WZS+j*r,dx=Math.max(HX0-x,0,x-HX1),dz=Math.max(HZS-z,0,z-HZN);if(dx+dz>1600)continue;
-    const b=.6*Math.sin(x/TR_HA.w+1.1)*Math.sin(z/(TR_HA.w*1.07)+.3)+.4*Math.sin((x*.8-z*.6)/(TR_HA.w*.82)+2),m0=ss(.1,.85,b);if(m0<=0)continue;
-    let fx=Math.min(cx-1.001,Math.max(0,i/s-.5)),fz=Math.min(cz-1.001,Math.max(0,j/s-.5));const a=fx|0,c=fz|0,tx=fx-a,tz=fz-c,q=c*cx+a,f=(F[q]*(1-tx)+F[q+1]*tx)*(1-tz)+(F[q+cx]*(1-tx)+F[q+cx+1]*tx)*tz;
-    let m=m0*f;if(m<=0)continue;if(D)m*=ss(250,700,D[j*nx+i]);if(A&&athHill1(A,x,z)>0)m=0;for(const L of LM){if(Math.abs(x-L[0])>L[2]+100||Math.abs(z-L[1])>L[2]+100)continue;const d=Math.hypot(x-L[0],z-L[1]);if(d<L[2]+100)m*=ss(L[2],L[2]+100,d)}
-    if(m>0){const v=TR_HA.h*m;h[j*nx+i]+=v;n++;if(v>top)top=v}}TR_HA.cells=n;TR_HA.top=+top.toFixed(1)}
 // road corridors baked into the raster: each street gets a smooth profile (<= 9.5 % grade, ends pinned at bridges), flat across its width
 // (+ a shoulder of one raster cell, so bilinear lookups on the road see only flat cells), feathered back to the terrain over 3x the cut/fill
 // height (12..40 m). Junctions average the profiles that meet there; 3 passes re-sample the merged surface. Frankfurt filler roads are
