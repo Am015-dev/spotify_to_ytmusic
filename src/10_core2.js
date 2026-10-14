@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.21',date:'14 Oct 2026',items:[{t:'NEW',s:'Race menu: NEW LAGOON SPLASH builder track; Canyon Split loop no longer overlaps itself.'},{t:'CHANGED',s:'Athens loads faster (shelf height cache, ground dedupe).'}]},
   {v:'v90m-beta.20',date:'14 Oct 2026',items:[{t:'CHANGED',s:'Crash damage: traffic cars no longer burst when pushed; they only burst on a side-dash or a hit above 60 km/h.'},{t:'CHANGED',s:'District collectibles are now solid chunky LEGO bricks (2x2 with studs) that spin and bob.'}]},
   {v:'v90m-beta.19',date:'14 Oct 2026',items:[{t:'NEW',s:'Crashes knock bricks off, with smoke and fire; a car explodes only after about 6 hard hits and rebuilds in 2 s.'}]},
   {v:'v90m-beta.18',date:'13 Oct 2026',items:[{t:'NEW',s:'Race menu: CLIFF RUN and CANYON SPLIT builder tracks (2 laps each) are back.'}]},
