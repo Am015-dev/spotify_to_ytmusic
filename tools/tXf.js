@@ -1,7 +1,7 @@
 // tXf: run the xform-1 checklist GOs (xf1/*) in one ?test=fra page; prints one PASS/FAIL line per GO + console errors.
-//   node tools/tXf.js <base url> [ids comma, default grass,kerb]
+//   [PHONE=1] node tools/tXf.js <base url> [ids comma, default grass,kerb]  (PHONE=1: 852x393 touch, iPhone landscape profile)
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');
-(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:852,height:393}});
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await (await b.newContext({viewport:{width:852,height:393},...(process.env.PHONE?{isMobile:true,hasTouch:true,deviceScaleFactor:1}:{})})).newPage();
  const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});
  const T=Date.now();await p.goto(process.argv[2]+'?test=fra&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:120000});console.log('BOOT',((Date.now()-T)/1000).toFixed(1),'s');
  for(const id of(process.argv[3]||'grass,kerb').split(',')){let s=await p.evaluate(id=>__chk.go('xf1/'+id)||'',id);

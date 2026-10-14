@@ -221,8 +221,8 @@ function OF_settle(){const C=OF.car;if(!C||!C.own||!pl||!pl.mesh||(pl.boatK||0)>
   {const ud=pl.mesh.userData,f=new THREE.Vector3(Math.sin(C.h),0,Math.cos(C.h)),u=new THREE.Vector3(0,1,0);ud.m.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3().crossVectors(f,u),u,f.clone().negate()))}
   // real wheels (userData.r) when the ride has them: wheels back to rest height, pitch/roll from the ground under each tyre, lowest tyre bottom CR_TYRE_Y above the road, then each wheel drops/rises ≤ 4 cm onto the road (box corners only as a fallback)
   const ud=pl.mesh.userData,W=[];ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let v=true,q=w;while(q&&q!==ud.m){if(!q.visible)v=false;q=q.parent}if(v)W.push(w)});
-  // the tyre bottom is the wheel mesh's real world box (its geometry is not always centred on its origin: the Hot Rod's tyres hung 14 cm below origin − r·scale, so the old centre-minus-radius settle sank them into the road)
-  const tyre=()=>{pl.mesh.updateMatrixWorld(true);return W.map(w=>{const b=OF_wbx.setFromObject(w),p=b.getCenter(new THREE.Vector3()),sc=w.getWorldScale(new THREE.Vector3()).y,g=groundAt(p.x,p.z,b.min.y+1);return{w,p,sc,g,d:b.min.y-g}})};
+  // the tyre bottom is the wheel mesh's PRECISE world box (vertex-based: the default Box3 is the AABB of the rotated geometry box and reads up to 40 % too deep on a spun wheel)
+  const tyre=()=>{pl.mesh.updateMatrixWorld(true);return W.map(w=>{const b=OF_wbx.setFromObject(w,true),p=b.getCenter(new THREE.Vector3()),sc=w.getWorldScale(new THREE.Vector3()).y,g=groundAt(p.x,p.z,b.min.y+1);return{w,p,sc,g,d:b.min.y-g}})};
   if(W.length>=3){for(const w of W){if(w.userData.by!=null)w.position.y=w.userData.by}let T=tyre();const fx=Math.sin(C.h),fz=Math.cos(C.h);
    const lf=t=>(t.p.x-C.x)*fx+(t.p.z-C.z)*fz,ls=t=>(t.p.x-C.x)*fz-(t.p.z-C.z)*fx,F=T.filter(t=>lf(t)>0),Bk=T.filter(t=>lf(t)<=0),L=T.filter(t=>ls(t)>0),R=T.filter(t=>ls(t)<=0),av=(A,f)=>A.reduce((a,t)=>a+f(t),0)/A.length,gy=t=>t.g;// the road under each tyre (was p.y−d = road + tyre radius: bigger rear wheels pitched the parked car nose-down)
    
@@ -237,7 +237,7 @@ OF_exit=(f=>function(){const r=f.apply(this,arguments);OF.stT=0;OF_settle();setT
 // park check (v90k/park-sit): visible tyres' bottom − road, body (non-wheel) bottom − road at the 8 CR_bodyPts, and the car's pitch/roll minus the road's slope under it (degrees)
 function OF_parkChk(){if(!pl||!pl.mesh)return null;const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);const A=new THREE.Vector3(),S=new THREE.Vector3(),W=[];
   ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let v=true,q=w;while(q&&q!==ud.m){if(!q.visible)v=false;q=q.parent}if(v)W.push(w)});
-  const tyre=W.map(w=>{const b=OF_wbx.setFromObject(w);b.getCenter(A);return +(b.min.y-groundAt(A.x,A.z,b.min.y+1)).toFixed(3)});// real tyre bottom = the wheel mesh's world box (origin − r·scale was 14 cm off on the Hot Rod)
+  const tyre=W.map(w=>{const b=OF_wbx.setFromObject(w,true);b.getCenter(A);return +(b.min.y-groundAt(A.x,A.z,b.min.y+1)).toFixed(3)});// real tyre bottom = the wheel mesh's world box (origin − r·scale was 14 cm off on the Hot Rod)
   CR_PS.k='';let body=9;for(const p of CR_bodyPts(ud)){A.copy(p).applyMatrix4(ud.m.matrixWorld);body=Math.min(body,A.y-groundAt(A.x,A.z,A.y+1.5))}
   const C=OF.car||{x:RO.x,z:RO.z,h:RO.h,y:RO.y},h=C.h,fx=Math.sin(h),fz=Math.cos(h),g=(a,b)=>groundAt(C.x+fx*a+fz*b,C.z+fz*a-fx*b,(C.y||0)+1.5);
   const f=new THREE.Vector3(fx,0,fz),r=new THREE.Vector3(fz,0,-fx),up=new THREE.Vector3(0,1,0).applyQuaternion(ud.m.getWorldQuaternion(new THREE.Quaternion())),D=180/Math.PI;
@@ -462,7 +462,7 @@ document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.cl
 // ---- sink audit (cam-2, 2026-10-14; Alex beta.25: the yellow semi cab and the dark-blue Hot Rod sat half under the asphalt after he stepped out in Hot Drop).
 // OF_sinkChk = the parked ride vs the road under every tyre: each real wheel mesh's WORLD BOX bottom (not origin − radius: the geometry is not centred on the origin) and the body box corners; gap > 0 = float, < 0 = sunk (m).
 function OF_sinkChk(){if(!pl||!pl.mesh)return null;const ud=pl.mesh.userData,W=[];ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;for(let q=w;q&&q!==ud.m;q=q.parent)if(!q.visible)return;W.push(w)});pl.mesh.updateMatrixWorld(true);
-  const g=[];for(const w of W){const b=new THREE.Box3().setFromObject(w),c=b.getCenter(new THREE.Vector3());g.push(b.min.y-groundAt(c.x,c.z,b.min.y+1))}
+  const g=[];for(const w of W){const b=new THREE.Box3().setFromObject(w,true),c=b.getCenter(new THREE.Vector3());g.push(b.min.y-groundAt(c.x,c.z,b.min.y+1))}
   const P=OF_corners(),c=P?P.map(p=>p.y-groundAt(p.x,p.z,p.y+1)):[],mx=a=>a.length?+Math.max(...a).toFixed(3):null,mn=a=>a.length?+Math.min(...a).toFixed(3):null;
   return{nW:W.length,wMax:mx(g),wMin:mn(g),cMax:mx(c),cMin:mn(c)}}
 const OF_sinkOk=r=>!r.err&&(r.wMax==null||(r.wMax<=.05&&r.wMin>=-.03))&&(r.cMin==null||r.cMin>=-.03)&&(r.nW>0||r.cMax!=null);

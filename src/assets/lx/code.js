@@ -74,7 +74,7 @@ const LIFE_CAP={set:14,setM:14,prop:18,ball:6,dog:6,fig:150,sm:44,pop:8};
 // dynamic usage + userData.keep: WB city batching (98wb WB_cand) otherwise freezes static instanced meshes into its merged tiles (they vanished in Athens)
 function LIFE_im(geo,n,mat){const m=new THREE.InstancedMesh(geo,mat||LV_mat(),n);m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.userData.keep=1;m.frustumCulled=false;m.castShadow=false;m.receiveShadow=false;m.count=0;m.visible=false;LIFE.grp.add(m);return m}
 function LIFE_init(){if(LIFE.grp===HUB.grp)return true;if(!HUB.grp||!HUB.nodes||!HUB.nodes.length||typeof LV_eGrid!=='function')return false;
- const G=LIFE_geos(),M={};LIFE.grp=HUB.grp;LIFE.C.clear();LIFE.SC.clear();LIFE.dead.clear();LIFE.fly.clear();LIFE.L=[];LIFE.px=1e9;
+ const G=LIFE_geos(),M={};LIFE.grp=HUB.grp;LIFE.C.clear();LIFE.SL=new Map();LIFE.CA=new Map();LIFE.SC.clear();LIFE.dead.clear();LIFE.fly.clear();LIFE.L=[];LIFE.px=1e9;
  for(const k of LIFE_SET){M['s_'+k]=LIFE_im(G.S[k][0],LIFE_CAP.set);M['m_'+k]=LIFE_im(G.S[k][1],LIFE_CAP.setM)}
  for(const k in G.Q)M['q_'+k]=LIFE_im(G.Q[k],LIFE_CAP.prop);M.ball=LIFE_im(G.ball,LIFE_CAP.ball);M.dog=LIFE_im(G.dog,LIFE_CAP.dog);
  M.fig=LIFE_im(G.fig,LIFE_CAP.fig);M.torso=LIFE_im(G.torso,LIFE_CAP.fig);M.arms=LIFE_im(G.arms,LIFE_CAP.fig);
@@ -87,32 +87,47 @@ function LIFE_init(){if(LIFE.grp===HUB.grp)return true;if(!HUB.grp||!HUB.nodes||
 // a kerb point s m along edge A→B on side sd, dist m beyond the carriageway edge; h faces the road
 function LIFE_side(A,B,s,sd,dist){const L=Math.hypot(B.x-A.x,B.z-A.z)||1,ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20)),
   off=W/2+dist;return{x:A.x+ux*s-uz*off*sd,z:A.z+uz*s+ux*off*sd,ux,uz,h:Math.atan2(uz*sd,-ux*sd)}}
-function LIFE_free(x,z,r,y){if(LV_onRoad(x,z,r*.7+.6))return false;if(roamHit(x,z,r+.4,y+.5))return false;if(typeof inRiver==='function'&&inRiver(x,z,-2))return false;return true}
+// never in a driving lane: the carriageway + 1 m stays clear (coordinator 2026-10-14)
+function LIFE_free(x,z,r,y){if(LV_onRoad(x,z,Math.max(1,r*.7+.6)))return false;if(roamHit(x,z,r+.4,y+.5))return false;if(typeof inRiver==='function'&&inRiver(x,z,-2))return false;return true}
 // first free spot for something of radius r at this slot: kerb distances tried nearest first (Athens blocks are narrow, so the near ones matter)
 function LIFE_at(p,r){for(const d of p.D){const q=LIFE_side(p.EA,p.EB,p.s,p.sd,d+r),y=LIFE_gy(q.x,q.z);if(!isFinite(y)||y<-2)continue;if(LIFE_free(q.x,q.z,r,y)){q.y=y;return q}}return null}
-// fallback for smashables only: the parking strip just inside the carriageway edge (2K cones and crates stand at the kerb); never inside a building or water
-function LIFE_kerb(p){const q=LIFE_side(p.EA,p.EB,p.s,p.sd,-.9),y=LIFE_gy(q.x,q.z);if(!isFinite(y)||y<-2||roamHit(q.x,q.z,1,y+.5)||typeof inRiver==='function'&&inRiver(q.x,q.z,-2))return null;q.y=y;q.k=1;return q}
-const LIFE_D={fra:[3,4.6,6.5],ath:[1.4,2.4,3.6,5]};
-function LIFE_cell(a,b){const key=a*100000+b;let C=LIFE.C.get(key);if(C)return C;C=[];LIFE.C.set(key,C);const N=HUB.nodes,E=LV_eGrid().get(key);if(!E)return C;
- const S=[],seen=new Set(),D=LIFE_D[CID]||LIFE_D.fra,step=CID==='fra'?LIFE_STEP:8;
+let LIFE_SMT=CID==='fra'?18:15;// smashable groups wanted per 5×5 cells (tuned: 10-40 smashables per 100 m window)
+const LIFE_D={fra:[1.2,3,4.6,6.5],ath:[.5,1.4,2.4,3.6,5,7,9]};// m beyond the carriageway edge (+ the item's radius); LIFE_free keeps lane + 1 m clear
+// kerb slots of a cell (every 16 m, Athens 8 m, both sides), hash-sorted; cached
+function LIFE_slots(a,b){const key=a*100000+b;let S=LIFE.SL.get(key);if(S)return S;const N=HUB.nodes,E=LV_eGrid().get(key);if(!E){LIFE.SL.set(key,S=[]);return S}
+ S=[];const seen=new Set(),D=LIFE_D[CID]||LIFE_D.fra,step=CID==='fra'?12:8;
  for(let q=0;q<E.length;q+=2){let i=E[q],j=E[q+1];if(i>j){const t=i;i=j;j=t}const ek=i*1e6+j;if(seen.has(ek))continue;seen.add(ek);const A=N[i],B=N[j];if(!A||!B||A.ab||B.ab)continue;
   const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<6)continue;const o0=LIFE_h(i,j,7)*step;
   for(let s=o0;s<L-2;s+=step)for(const sd of[-1,1]){const p=LIFE_side(A,B,s,sd,D[0]);if(Math.floor(p.x/LIFE_CELL)!==a||Math.floor(p.z/LIFE_CELL)!==b)continue;
    Object.assign(p,{EA:A,EB:B,s,sd,D,u:LIFE_h(Math.round(p.x*4),Math.round(p.z*4),11)});S.push(p)}}
  S.sort((p,q)=>p.u-q.u);
- // pass 1: set pieces and people groups, alternating (so both get the slots with room); pass 2: smashable groups on what is left, about one
- // per set piece / group (+2), at the kerb if nothing else fits. Types rotate per cell from a hashed start, so neighbours differ.
- let nS=0,nM=0,nG=0;const used=[],cap=Math.ceil(S.length*(CID==='fra'?.6:.35)),h0=Math.floor(LIFE_h(a,b,3)*64);
- const room=(x,z,r)=>used.every(u=>(u[0]-x)**2+(u[1]-z)**2>(u[2]+r+1.5)**2);
+ LIFE.SL.set(key,S);return S}
+// every smashable-group spot that fits in a cell (≥ 4 m apart), before thinning; cached
+function LIFE_cand(a,b){const key=a*100000+b;let L=LIFE.CA.get(key);if(L)return L;L=[];const S=LIFE_slots(a,b);
+ for(let k=0;k<S.length;k++){const q=LIFE_at(S[k],.6);if(q&&L.every(o=>(o.q.x-q.x)**2+(o.q.z-q.z)**2>16))L.push({q,k})}LIFE.CA.set(key,L);return L}
+function LIFE_cell(a,b){const key=a*100000+b;let C=LIFE.C.get(key);if(C)return C;C=[];LIFE.C.set(key,C);if(!LV_eGrid().has(key))return C;
+ const S=LIFE_slots(a,b);
+ // pass 1: smashable groups (thinned, below); pass 2: set pieces and people groups, alternating, in the room left.
+ // Types rotate per cell from a hashed start, so neighbours differ.
+ let nS=0,nM=0,nG=0;const used=[],cap=Math.ceil(S.length*(CID==='fra'?.7:.35)),h0=Math.floor(LIFE_h(a,b,3)*64);
+ const room=(x,z,r,g=1.5)=>used.every(u=>(u[0]-x)**2+(u[1]-z)**2>(u[2]+r+Math.min(g,u[3]??g))**2);/* a smashable group only asks .3 m of air */
  const putM=(p,hh)=>{for(let tt=0;tt<LIFE_SET.length;tt++){const t=LIFE_SET[(h0+Math.floor(hh*8)+nM*3+tt)%LIFE_SET.length],r=LIFE_SETR[t],q=LIFE_at(p,r);
    if(!q||!room(q.x,q.z,r))continue;C.push({c:'set',t,x:q.x,z:q.z,y:q.y,h:q.h,r,ph:hh*20,id:key*256+C.length});used.push([q.x,q.z,r]);nM++;return true}return false};
  const putG=(p,hh)=>{for(let tt=0;tt<LIFE_GRP.length;tt++){const t=LIFE_GRP[(h0+Math.floor(hh*8)+nG*3+tt)%LIFE_GRP.length],r=LIFE_GRPR[t],q=LIFE_at(p,r);
    if(!q||!room(q.x,q.z,r))continue;C.push({c:'grp',t,x:q.x,z:q.z,y:q.y,h:q.h,ux:q.ux,uz:q.uz,r,ph:hh*20,id:key*256+C.length});used.push([q.x,q.z,r]);nG++;return true}return false};
- for(let k=0;k<S.length&&nM+nG<cap;k++){const p=S[k],hh=LIFE_h(a*7+k,b*13+k,5);if(nM<=nG?(putM(p,hh)||putG(p,hh)):(putG(p,hh)||putM(p,hh)))p.taken=1}
- for(let k=0;k<S.length&&nS<nM+nG+(CID==='fra'?2:0);k++){const p=S[k];if(p.taken)continue;const hh=LIFE_h(a*7+k,b*13+k,5),q=LIFE_at(p,1)||LIFE_kerb(p);if(!q||!room(q.x,q.z,1.2))continue;
-  const n=3;let got=0;for(let m=0;m<n;m++){const t=LIFE_SM[(h0+Math.floor(hh*600)+m*(1+nS)+nS*2)%LIFE_SM.length],d=(m-(n-1)/2)*1.6,x=q.x+q.ux*d,z=q.z+q.uz*d;
-   if(q.k?roamHit(x,z,.6,q.y+.5):!LIFE_free(x,z,.45,q.y))continue;C.push({c:'sm',t,x,z,y:LIFE_gy(x,z),h:q.h+hh*6,id:key*256+C.length});got++}
-  if(got){nS++;used.push([q.x,q.z,1.6])}}
+ const smPass=()=>{
+ // smashables: every spot that fits is a candidate; each is kept with p = min(1, LIFE_SMT / candidates in the 5×5 cells around), so a 100 m window
+ // gets ~8-10 groups (10-40 smashables, coordinator cap) on dense grids and everything there is on sparse streets. Same in every session.
+ let n25=0;for(let u=-2;u<=2;u++)for(let v=-2;v<=2;v++)n25+=LIFE_cand(a+u,b+v).length;const pk=Math.min(1,LIFE_SMT/Math.max(1,n25));
+ for(const {q,k} of LIFE_cand(a,b)){if(S.length<10&&nS>=1)break;const hh=LIFE_h(a*7+k,b*13+k,5);if(LIFE_h(Math.round(q.x*8),Math.round(q.z*8),13)>=pk||!room(q.x,q.z,.8,.4))continue;
+  let got=0;for(let m=0;m<2;m++){const t=LIFE_SM[(h0+Math.floor(hh*600)+m*(1+nS)+nS*2)%LIFE_SM.length],d=(m-.5)*1.6,x=q.x+q.ux*d,z=q.z+q.uz*d;
+   if(!LIFE_free(x,z,.45,q.y))continue;C.push({c:'sm',t,x,z,y:LIFE_gy(x,z),h:q.h+hh*6,id:key*256+C.length});got++}
+  if(got){nS++;used.push([q.x,q.z,1.3,.3])}}
+ };
+ const mgPass=()=>{
+ for(let k=0;k<S.length&&nM+nG<cap;k++){const p=S[k],hh=LIFE_h(a*7+k,b*13+k,5);if(nM*3<=nG*5?(putM(p,hh)||putG(p,hh)):(putG(p,hh)||putM(p,hh)))p.taken=1}/* moving : groups ≈ 5 : 3, the test ratio */
+ };
+ smPass();mgPass();/* smashables first (they need the least room), then set pieces and people; a cell with few kerb slots keeps ≤ 1 smashable group for them */
  return C}
 // pop-up bubbles: one per 100 m square, on the street point nearest the square's centre (in the lane, so you can drive through it)
 function LIFE_pop(A,B){const key=A*100000+B;if(LIFE.SC.has(key))return LIFE.SC.get(key);let best=null,bd=1e18;const N=HUB.nodes,PG=LIFE_PG,cx=(A+.5)*PG,cz=(B+.5)*PG,G=LV_eGrid();
@@ -206,27 +221,27 @@ function LIFE_step(dt){if(!LIFE.on||!RO.on||RO.wk){if(LIFE.M&&LIFE.grp)for(const
 {const _lfLS=LV_step;LV_step=dt=>{_lfLS(dt);try{LIFE_step(dt)}catch(e){if(!LIFE.e){LIFE.e=1;console.warn('LIFE',e)}}}}
 // ---------- tests: audit any road window (state asserts, no rendering), cost, GO spots
 // a "200 m of road" window = every LIFE item within 100 m of a street point (the stretch 100 m either way + side streets)
-function LIFE_win(x,z,R0=100){const o={move:0,grp:0,sm:0,pop:0,set:[],smT:[]},cr=Math.ceil(R0/LIFE_CELL);for(let a=Math.floor(x/LIFE_CELL)-cr;a<=Math.floor(x/LIFE_CELL)+cr;a++)for(let b=Math.floor(z/LIFE_CELL)-cr;b<=Math.floor(z/LIFE_CELL)+cr;b++)
-  for(const it of LIFE_cell(a,b)){if((it.x-x)**2+(it.z-z)**2>R0*R0)continue;if(it.c==='sm'){o.sm++;o.smT.push(it)}else if(it.c==='set'){o.move++;o.set.push(it)}else if(it.c==='grp'){o.grp++;if(LIFE_MOVE.has(it.t))o.move++}}
+function LIFE_win(x,z,R0=100){const o={move:0,grp:0,sm:0,pop:0,lane:0,set:[],smT:[]},cr=Math.ceil(R0/LIFE_CELL);for(let a=Math.floor(x/LIFE_CELL)-cr;a<=Math.floor(x/LIFE_CELL)+cr;a++)for(let b=Math.floor(z/LIFE_CELL)-cr;b<=Math.floor(z/LIFE_CELL)+cr;b++)
+  for(const it of LIFE_cell(a,b)){if((it.x-x)**2+(it.z-z)**2>R0*R0)continue;if(LV_onRoad(it.x,it.z,1))o.lane++;if(it.c==='sm'){o.sm++;o.smT.push(it)}else if(it.c==='set'){o.move++;o.set.push(it)}else if(it.c==='grp'){o.grp++;if(LIFE_MOVE.has(it.t))o.move++}}
  for(let a=Math.floor((x-R0)/LIFE_PG);a<=Math.floor((x+R0)/LIFE_PG);a++)for(let b=Math.floor((z-R0)/LIFE_PG);b<=Math.floor((z+R0)/LIFE_PG);b++){const p=LIFE_pop(a,b);if(p&&(p.x-x)**2+(p.z-z)**2<=R0*R0)o.pop++}
  if(LIFE.lm&&(LIFE.lm.x-x)**2+(LIFE.lm.z-z)**2<R0*R0)o.move++;return o}
-const LIFE_T={move:5,grp:3,sm:10,pop:1,rep:.3};
+const LIFE_T={move:5,grp:3,sm:10,pop:1,rep:.3,smMax:40};
 // n street points spread over the whole city (deterministic): every k-th node that has a non-motorway edge of ≥ 20 m
 function LIFE_samples(n){const N=HUB.nodes,o=[];const st=Math.max(1,Math.floor(N.length/(n*3)));for(let i=Math.floor(st/2);i<N.length&&o.length<n;i+=st){const A=N[i];if(!A||A.ab||!A.nb)continue;
   for(const j of A.nb){const B=N[j];if(!B||B.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L<20)continue;o.push({x:(A.x+B.x)/2,z:(A.z+B.z)/2,h:Math.atan2(B.x-A.x,B.z-A.z)});break}}return o}
 // repeat rate: of all pairs of set pieces (and of smashable groups' items) within 100 m of each other, the share that is the same type
 function LIFE_rep(L){let s=0,n=0;for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){if((L[i].x-L[j].x)**2+(L[i].z-L[j].z)**2>1e4)continue;n++;if(L[i].t===L[j].t)s++}return n?s/n:0}
-function LIFE_audit(n=60){if(!LIFE_init())return null;const S=LIFE_samples(n),fail=[],min={move:1e9,grp:1e9,sm:1e9,pop:1e9},t0=performance.now();let ok=0,rs=0,rm=0,rn=0;
- for(const p of S){const w=LIFE_win(p.x,p.z);for(const k in min)min[k]=Math.min(min[k],w[k]);const f=[];for(const k of['move','grp','sm','pop'])if(w[k]<LIFE_T[k])f.push(k+' '+w[k]);
+function LIFE_audit(n=60){if(!LIFE_init())return null;const S=LIFE_samples(n),fail=[],min={move:1e9,grp:1e9,sm:1e9,pop:1e9},t0=performance.now();let ok=0,rs=0,rm=0,rn=0,lane=0,smMax=0;
+ for(const p of S){const w=LIFE_win(p.x,p.z);for(const k in min)min[k]=Math.min(min[k],w[k]);const f=[];for(const k of['move','grp','sm','pop'])if(w[k]<LIFE_T[k])f.push(k+' '+w[k]);if(w.sm>LIFE_T.smMax)f.push('clutter '+w.sm);if(w.lane)f.push('in lane '+w.lane);lane+=w.lane;smMax=Math.max(smMax,w.sm);
   if(f.length)fail.push([Math.round(p.x),Math.round(p.z),f.join(' ')]);else ok++;rs+=LIFE_rep(w.set);rm+=LIFE_rep(w.smT);rn++}
- return{n:S.length,ok,pct:+(ok/Math.max(1,S.length)*100).toFixed(1),min,repSet:+(rs/rn).toFixed(2),repSm:+(rm/rn).toFixed(2),fail:fail.slice(0,6),ms:Math.round(performance.now()-t0)}}
+ return{n:S.length,ok,pct:+(ok/Math.max(1,S.length)*100).toFixed(1),min,repSet:+(rs/rn).toFixed(2),repSm:+(rm/rn).toFixed(2),lane,smMax,fail:fail.slice(0,6),ms:Math.round(performance.now()-t0)}}
 // draw calls and instances this frame (the frame-cost metric) + the CPU time of LIFE_step (smoothed)
 function LIFE_cost(){let dc=0,inst=0;for(const k in LIFE.M||{}){const m=LIFE.M[k];if(m.visible&&m.count){dc++;inst+=m.count}}if(LIFE.lm&&LIFE.lm.g.visible)dc+=LIFE.lm.g.children.length;return{dc,inst,ms:+LIFE.ms.toFixed(2)}}
 // GO: jump to a street spot of the audit, wait, then report density + cost; pass line in the checklist
 function LIFE_go(say){if(!LIFE.on)return'📍 LIFE is OFF in this build (remove ?life=0)';const S=LIFE_samples(40),p=S[(LIFE.goI=(LIFE.goI||0)+7)%S.length]||S[0];if(!p||!roamWarp(p.x,p.z,p.h))return'📍 Can\'t jump right now';RO.v=0;LIFE.rec=[];
  setTimeout(()=>{let A,w,c;try{const R=LIFE.rec||[];LIFE.rec=null;c=LIFE_cost();const n=Math.max(1,R.length),m=R.reduce((a,r)=>a+r[0],0)/n,fd=R.reduce((a,r)=>a+r[1],0)/n*1000;c.ms=+m.toFixed(2);c.fr=+fd.toFixed(1);c.lim=+Math.max(1.5,fd*.08).toFixed(2);A=LIFE_audit(60);w=LIFE_win(RO.x,RO.z)}catch(e){say('📍 LIFE ❌ '+e);return}
-  const okW=w.move>=5&&w.grp>=3&&w.sm>=10&&w.pop>=1,okA=A.pct>=95&&A.repSet<=LIFE_T.rep&&A.repSm<=LIFE_T.rep,okC=c.ms<=c.lim&&c.dc<=40;window.__chk=window.__chk||{};window.__chk.life=Object.assign({w,A,c},{ok:okW&&okA&&okC});
-  say(`📍 LIFE ${CID} here: ${w.move} moving · ${w.grp} groups · ${w.sm} smashables · ${w.pop} pop-up | city ${A.ok}/${A.n} windows pass (${A.pct}%, min ${A.min.move}/${A.min.grp}/${A.min.sm}/${A.min.pop}) · repeats ${Math.round(A.repSet*100)}% / ${Math.round(A.repSm*100)}% | ${c.dc} draws · ${c.inst} inst · ${c.ms} ms/frame (limit ${c.lim}, frame ${c.fr} ms) `+(okW&&okA&&okC?'✅':'❌'))},2500);return'📍 LIFE '+CID+' · measuring…'}
+  const okW=w.move>=5&&w.grp>=3&&w.sm>=10&&w.sm<=LIFE_T.smMax&&w.pop>=1&&!w.lane,okA=A.pct>=95&&!A.lane&&A.repSet<=LIFE_T.rep&&A.repSm<=LIFE_T.rep,okC=c.ms<=c.lim&&c.dc<=40;window.__chk=window.__chk||{};window.__chk.life=Object.assign({w,A,c},{ok:okW&&okA&&okC});
+  say(`📍 LIFE ${CID} here: ${w.move} moving · ${w.grp} groups · ${w.sm} smashables · ${w.pop} pop-up | city ${A.ok}/${A.n} windows pass (${A.pct}%, min ${A.min.move}/${A.min.grp}/${A.min.sm}/${A.min.pop}) · repeats ${Math.round(A.repSet*100)}% / ${Math.round(A.repSm*100)}% · in lanes ${A.lane} · max ${A.smMax} smashables/window | ${c.dc} draws · ${c.inst} inst · ${c.ms} ms/frame (limit ${c.lim}, frame ${c.fr} ms) `+(okW&&okA&&okC?'✅':'❌'))},2500);return'📍 LIFE '+CID+' · measuring…'}
 // a run-up of D m to target it, clear of buildings, other LIFE set pieces / groups and city props (2.2 m either side): {bx,bz,h} or null
 function LIFE_runup(it,D){const y=it.y+.5,nb=(x,z)=>{if(roamHit(x,z,1.6,y))return true;for(const q of LIFE.L)if(q!==it&&q.c!=='sm'&&q.c!=='pop'&&(q.x-x)**2+(q.z-z)**2<((q.r||1.5)+2.2)**2)return true;
   const G=HUB.pgrid&&HUB.pgrid.get(Math.floor(x/16)*10000+Math.floor(z/16));if(G)for(const p of G)if(p.alive!==false&&(p.x-x)**2+(p.z-z)**2<2.2*2.2)return true;return false};
@@ -250,4 +265,4 @@ function LIFE_goLm(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_init();const l
 // by name, so a hot reload of one GO function takes effect
 const LIFE_GOS={'fra-density':{fn:s=>LIFE_go(s)},'ath-density':{fn:s=>LIFE_go(s)},'smash':{fn:s=>LIFE_goSmash(s)},
  'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
-window.__life={GOS:LIFE_GOS,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
+window.__life={setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
