@@ -52,7 +52,7 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
   }catch(e){fails.push('bx-crash:'+String(e).slice(0,60))}
   R.push({fam:'builder',tag:demo+'|'+prof+'|'+rid,fails,ms:performance.now()-t0});return fails.length},
  // ---------------- free roam ----------------
- starts(n){if(MX._st&&MX._st.length)return MX._st.slice(0,n);const S=new Map();for(let x=WX0+100;x<=WX1-100;x+=150)for(let z=WZS+100;z<=WZN-100;z+=150){const q=rfSnap(x,z,60);if(q)S.set(Math.round(q[0]/30)+','+Math.round(q[1]/30),q)}
+ starts(n){if(MX._st&&MX._st.length)return MX._st.slice(0,n);const S=new Map();for(let x=WX0+100;x<=WX1-100;x+=150)for(let z=WZS+100;z<=WZN-100;z+=150){const q=rfSnap(x,z,60);if(q&&!(q[0]===x&&q[1]===z))S.set(Math.round(q[0]/30)+','+Math.round(q[1]/30),q)}
   const all=[...S.values()].sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const step=Math.max(1,all.length/n),o=[];for(let i=0;i<n&&Math.floor(i*step)<all.length;i++)o.push(all[Math.floor(i*step)]);MX._st=o;return o},
  spotStarts(){const o=[];const add=(e,n)=>{if(!isFinite(e)||!isFinite(n))return;const w=WP(e,n),q=rfSnap(w[0],w[1],200);if(q)o.push(q)};
   for(const k in RF.spots||{}){const v=RF.spots[k];if(Array.isArray(v)&&typeof v[0]==='number'&&typeof v[1]==='number')add(v[0],v[1])}
@@ -64,7 +64,7 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
     const touch=prof!=='desktop';TOUCH.on=touch;TOUCH.used=touch;TOUCH.gas=false;TOUCH.brake=false;for(const k in K)K[k]=false;
     roamStep(1/120);for(let i=0;i<4;i++)roamPose(pl,.25);camSnap=true;roamCam(1/60)
     const fx=Math.sin(RO.h),fz=Math.cos(RO.h);
-    {const r=rfSnap(RO.x,RO.z,60);if(!r)fails.push('roam-off-road-at-start');else{const a=ang(fx,fz,Math.sin(r[2]),Math.cos(r[2]));if(a>20&&a<160)fails.push('roam-heading-vs-road')}}
+    {const r=rfSnap(RO.x,RO.z,60);if(!r)fails.push('roam-off-road-at-start');else{const a=ang(fx,fz,Math.sin(r[2]),Math.cos(r[2]));if(a>20&&a<160){const f=fillAt(RO.x,RO.z),a2=f&&f.d<f.r.w/2+6?ang(fx,fz,f.r.ux,f.r.uz):999;/* a filler street under the car counts too (rfSnap prefers a city road up to 60 m away) */if(!(a2<=20||a2>=160))fails.push('roam-heading-vs-road')}}}
     if(SC_hit(RO.x,RO.z,RO.y))fails.push('roam-start-inside-wall');
     if(RO.y<groundAt(RO.x,RO.z,RO.y+3)-.3)fails.push('roam-underground');
     {const pk=OF_parkChk();if(!pk||pk.tyre.some(g=>!(Math.abs(g)<=.05)))fails.push('roam-tyre-gap>5cm');MX.last=pk&&pk.tyre}

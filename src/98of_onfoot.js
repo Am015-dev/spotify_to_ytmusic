@@ -28,7 +28,11 @@ function OF_figMake(spec,opt){const P=[],Q=[];GAR_fig(spec,P,Q,false);const part
   for(const k in parts){if(!parts[k].length)continue;const g=mergeGeometries(parts[k].map(q=>{q=q.index?q.toNonIndexed():q;for(const a of Object.keys(q.attributes))if(a!=='position'&&a!=='normal'&&a!=='color')q.deleteAttribute(a);return q}));
     const p=piv[k];g.translate(-p[0],-p[1],-p[2]);const m=new THREE.Mesh(g,GB_MAT);m.position.set(p[0],p[1],p[2]);m.castShadow=false;m.receiveShadow=false;inner.add(m);M[k]=m}
   grp.userData.qaFig=1;grp.userData.of=1;grp.visible=false;return{g:grp,M,s,h:+(s*(bb.max.y-Math.min(0,bb.min.y))).toFixed(3)}}
-function OF_figPose(dt){const F=OF.fig;if(!F)return;F.g.position.set(OF.x,OF.y,OF.z);F.g.rotation.y=OF.h+Math.PI;
+function OF_figPose(dt){const F=OF.fig;if(!F)return;
+  // foot-2: the body pitches with the ground along its heading (uphill = leans forward, downhill = back, a 0.4 m step = a visible lean) and the visible height eases onto each step (no pop); at rest both settle to the exact surface
+  const fx=Math.sin(OF.h),fz=Math.cos(OF.h),sl=OF.air?0:groundAt(OF.x+fx*.5,OF.z+fz*.5,OF.y+OF_STEP+.05)-groundAt(OF.x-fx*.5,OF.z-fz*.5,OF.y+OF_STEP+.05),tp=clamp(Math.atan(sl)*.8,-.45,.45);
+  OF.pit=(OF.pit||0)+(tp-(OF.pit||0))*Math.min(1,dt*10);F.vy=F.vy==null||OF.air||Math.abs(OF.y-F.vy)>.7?OF.y:F.vy+(OF.y-F.vy)*Math.min(1,dt*18);
+  F.g.position.set(OF.x,F.vy,OF.z);F.g.rotation.order='YXZ';F.g.rotation.y=OF.h+Math.PI;F.g.rotation.x=-OF.pit;
   const v=OF.air?0:OF.spd,str=.8+.7*clamp((v-OF_WALK)/(OF_RUN-OF_WALK),0,1),hz=v/str,Lg=.36*F.s,amp=clamp(str/(6.283*Lg),.2,.8);OF.ph+=dt*hz*6.283;OF.footV=Lg*amp*hz*6.283;
   OF.legA=(OF.legA||0)+((v>.15?amp:0)-(OF.legA||0))*Math.min(1,dt*10);const k=Math.min(1,v/OF_WALK);const a=OF.air?.5:Math.sin(OF.ph)*OF.legA,M=F.M;if(M.lL)M.lL.rotation.x=a;if(M.lR)M.lR.rotation.x=-a;if(M.aL)M.aL.rotation.x=-a*.9-(OF.air?.9:0);if(M.aR)M.aR.rotation.x=a*.9-(OF.air?.9:0);
   if(M.b)M.b.position.y=OF.air?0:Math.abs(Math.sin(OF.ph))*.02*k}
