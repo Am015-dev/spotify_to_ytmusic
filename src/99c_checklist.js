@@ -357,7 +357,7 @@ const OD_CHECKLIST=[
   'v90j/fra-props':[{p:'cone',c:'fra',n:'cone'},{p:'barrier',c:'fra',n:'barrier'},{p:'clight',c:'fra',n:'warning light'},{p:'sign',c:'fra',n:'STOP sign'},{p:'rock',c:'fra',n:'rock'}],
   'v90j/ath-trees':[{p:'CE_pine',c:'ath',n:'pine'},{p:'CE_olive',c:'ath',n:'olive tree'},{p:'CE_cypress',c:'ath',n:'cypress'},{p:'CE_rock',c:'ath',n:'rock'}]};
  // art-2 (lf1): empty-green spots, each GO parks the car at its spot and measures it (src/98lf_lively_fill.js)
- for(const id in LF.SP)GO['lf1/'+id]=[{c:LF.SP[id].c,fn:()=>LF.on?LF_goSpot(id):'📍 PENDING · art-2 green-field fill is OFF in this build (add ?lf=1 to try it)',n:LF.SP[id].n}];GO['lf1/mound']=[{c:'fra',fn:()=>LF.on?LF_goMound():'📍 PENDING · art-2 green-field fill is OFF in this build (add ?lf=1 to try it)',n:'grass hill'}];
+ for(const id in LF.SP)GO['lf1/'+id]=[{c:LF.SP[id].c,fn:()=>LF.on?LF_goSpot(id):'📍 PENDING · art-2 green-field fill is OFF in this build (add ?lf=1 to try it)',n:LF.SP[id].n}];GO['lf1/mound']=[{c:'fra',fn:()=>(typeof TERR!=='undefined'&&TERR.on)?TRN_go('muehl',goSay)+' (terr-1 terrain hills replace the LF mounds)':LF.on?LF_goMound():'📍 PENDING · art-2 green-field fill is OFF in this build (add ?lf=1 to try it)',n:'grass hill'}];
  // chk-1 (Alex v90j-beta: "checklist has no GO scenarios"): every item without its own target gets one from its area/text:
  // garage items open the garage (RIDES); Athens items fly to Athens; the rest drive in Frankfurt free roam.
  for(const it of OD_CHECKLIST){if(GO[k(it)])continue;const t=(it.text||'').toLowerCase();
