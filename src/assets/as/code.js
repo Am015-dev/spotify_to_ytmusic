@@ -146,11 +146,16 @@ function AS_assign(L){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=ASSET.ag
 // terr-3 (Athens boot: 4.7 s of 5 full passes over ~100k trees): a tree is re-scored only when a variant changed within its 5x5 cells since its
 // last scoring (cell stamps; same result as re-scoring all), distances squared first
 function AS_fix(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=ASSET.ag;let sw=0,step=0;const all={};for(const b in POOL)if(b!=='bush')Object.assign(all,POOL[b]);delete all.palm;
+ // numeric variant ids + one reused counter (sums in the same order as the old cnt object, so the same swaps); bush-free cell lists
+ const VI=new Map(),vi=v=>{let k=VI.get(v);if(k==null){k=VI.size;VI.set(v,k)}return k},GF=new Map();for(const[k,A]of G){const F=[];for(const q of A){q._vi=vi(q.av);if(q.t!=='bush')F.push(q)}GF.set(k,F)}
+ for(const p of L)p._vi=vi(p.av);const PL=P=>Object.keys(P).map(v=>[v,vi(v)]),PA=PL(all),PP={};for(const t in POOL)PP[t]=PL(POOL[t]);
+ const cnt=new Float64Array(VI.size+1),T=[];
  const ST=new Map(),EV=new Map();
- for(let k=0;k<passes;k++){let ch=0;for(const p of L){if(!p.av||p.t==='bush'||AS_R[p.av].prop)continue;const kx=Math.floor(p.x/30),kz=Math.floor(p.z/30),cnt={};step++;
+ for(let k=0;k<passes;k++){let ch=0;for(const p of L){if(!p.av||p.t==='bush'||AS_R[p.av].prop)continue;const kx=Math.floor(p.x/30),kz=Math.floor(p.z/30);step++;
   const e0=EV.get(p);if(e0!=null){let st=false;for(let a=-2;a<=2&&!st;a++)for(let b=-2;b<=2;b++){const t=ST.get((kx+a)*100000+kz+b);if(t!=null&&t>e0){st=true;break}}if(!st)continue}EV.set(p,step);
-  for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const A=G.get((kx+a)*100000+kz+b);if(A)for(const q of A){if(q===p||q.t==="bush")continue;const dx=q.x-p.x,dz=q.z-p.z,d2=dx*dx+dz*dz;if(d2>3600)continue;const d=Math.sqrt(d2);cnt[q.av]=(cnt[q.av]||0)+(d<30?1.5:1)-d/80}}
-  const c0=cnt[p.av]||0;if(!c0)continue;let best=p.av,bc=c0;for(const P of[POOL[p.t],all]){for(const v in P){const c=cnt[v]||0;if(c<bc-1e-6){bc=c;best=v}}if(bc===0)break}if(best!==p.av){p.av=best;ch++;ST.set(kx*100000+kz,step)}}sw+=ch;if(!ch)break}return sw}
+  for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const A=GF.get((kx+a)*100000+kz+b);if(A)for(const q of A){if(q===p)continue;const dx=q.x-p.x,dz=q.z-p.z,d2=dx*dx+dz*dz;if(d2>3600)continue;const d=Math.sqrt(d2),i=q._vi;if(cnt[i]===0)T.push(i);cnt[i]+=(d<30?1.5:1)-d/80}}
+  const c0=cnt[p._vi];if(c0){let best=p.av,bv=p._vi,bc=c0;for(const P of[PP[p.t]||[],PA]){for(const[v,i]of P){const c=cnt[i];if(c<bc-1e-6){bc=c;best=v;bv=i}}if(bc===0)break}if(best!==p.av){p.av=best;p._vi=bv;ch++;ST.set(kx*100000+kz,step)}}
+  for(const i of T)cnt[i]=0;T.length=0}sw+=ch;if(!ch)break}return sw}
 function AS_farM(p,m){const V=ASSET.V[p.av];return m.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),V.cls==='keep'?_ts.set(1,1,1):_ts.set(V.rx,V.H,V.rx))}
 // far instances of assigned props: variant scale + crown tint (+ debris colour)
 function AS_far(L){const M=new THREE.Matrix4(),dirty=new Set();for(const p of L){if(!p.av||!p.im)continue;const V=ASSET.V[p.av];if(V.cls==='keep')continue;if(p.alive)p.im.setMatrixAt(p.i,AS_farM(p,M));if(p.im.geometry.userData.asImp){p.im.setColorAt(p.i,_asC.setRGB(V.cell/255,0,0));if(p.im.material!==ASSET.imp.mat)p.im.material=ASSET.imp.mat;p.im.castShadow=false}else if(p.im.instanceColor)p.im.setColorAt(p.i,V.leaf);p.col=V.leaf.clone();dirty.add(p.im)}

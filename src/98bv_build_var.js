@@ -7,11 +7,15 @@ const BV_k=(x,z)=>Math.floor(x/BV.C)*100000+Math.floor(z/BV.C);
 function BV_reset(){BV.G=new Map();BV.RB=[]}
 function BV_add(x,z,key,fac,o){const k=BV_k(x,z);let A=BV.G.get(k);if(!A)BV.G.set(k,A=[]);A.push(Object.assign({x,z,key,fac},o))}
 // how many buildings within r m carry each key (or facade, by='fac')
-function BV_near(x,z,r,by){const n={},c=Math.ceil(r/BV.C),kx=Math.floor(x/BV.C),kz=Math.floor(z/BV.C);for(let a=-c;a<=c;a++)for(let b=-c;b<=c;b++){const A=BV.G.get((kx+a)*100000+kz+b);if(!A)continue;
-  for(const o of A)if((o.x-x)**2+(o.z-z)**2<r*r){const k=by==='fac'?o.fac:o.key;n[k]=(n[k]||0)+1}}return n}
+// terr-3 (Athens boot 2.2 s): only the cells the circle touches; r2 > 0 also counts within r2 into n2 (one scan for BV_pick's two radii)
+function BV_near(x,z,r,by,r2,n2){const n={},C=BV.C,rr=r*r,q2=r2?r2*r2:-1;for(let i=Math.floor((x-r)/C);i<=Math.floor((x+r)/C);i++)for(let j=Math.floor((z-r)/C);j<=Math.floor((z+r)/C);j++){const A=BV.G.get(i*100000+j);if(!A)continue;
+  for(const o of A){const d=(o.x-x)**2+(o.z-z)**2;if(d<rr){const k=by==='fac'?o.fac:o.key;n[k]=(n[k]||0)+1;if(d<q2)n2[k]=(n2[k]||0)+1}}}return n}
 const BV_h=(x,z,s)=>{const h=Math.sin(x*12.9898+z*78.233+(s||0)*37.719)*43758.5453;return h-Math.floor(h)};
 // least-used option near (x,z); W = optional weights (higher = preferred, e.g. the district's usual kind); 'by' picks facade or full key
-function BV_pick(opts,x,z,s,by,W){const n=BV_near(x,z,100,by),N=BV_near(x,z,45,by);let best=opts[0],bs=1e9;opts.forEach((o,i)=>{const sc=((n[o]||0)+3*(N[o]||0))/(W?W[i]:1)+BV_h(x,z,s+i)*.9;if(sc<bs){bs=sc;best=o}});return best}
+// both counts (key and facade, 100 m and 45 m) in one scan: CV_put's two picks per building (Athens boot)
+function BV_near2(x,z){const C=BV.C,f=[{},{}],k=[{},{}];for(let i=Math.floor((x-100)/C);i<=Math.floor((x+100)/C);i++)for(let j=Math.floor((z-100)/C);j<=Math.floor((z+100)/C);j++){const A=BV.G.get(i*100000+j);if(!A)continue;
+  for(const o of A){const d=(o.x-x)**2+(o.z-z)**2;if(d<1e4){f[0][o.fac]=(f[0][o.fac]||0)+1;k[0][o.key]=(k[0][o.key]||0)+1;if(d<2025){f[1][o.fac]=(f[1][o.fac]||0)+1;k[1][o.key]=(k[1][o.key]||0)+1}}}}return{f,k}}
+function BV_pick(opts,x,z,s,by,W,pre){let N={},n;if(pre){n=pre[0];N=pre[1]}else n=BV_near(x,z,100,by,45,N);let best=opts[0],bs=1e9;opts.forEach((o,i)=>{const sc=((n[o]||0)+3*(N[o]||0))/(W?W[i]:1)+BV_h(x,z,s+i)*.9;if(sc<bs){bs=sc;best=o}});return best}
 // the placed buildings: [{x,z,key,fac}]
 function BV_list(){const L=[];for(const A of BV.G.values())L.push(...A);return L}
 // repeat = mean over buildings of (same key within 100 m) / (all others within 100 m); blocks = 80 m cells with ≥ 4 buildings

@@ -353,7 +353,7 @@ function CV_put(E,U,x,z,ry,c,s,fr){const k=U.k,h0=CV_h(x,z),h1=CV_h(x,z,1),h2=CV
   kif=k==='poly'&&q&&q.d<q.road.w/2+32&&/kifis/i.test((q.road.name||'')+(q.road.id||'')),dn=districtAt(x,z)||'';let deco=0,pal=CV_AP[kif?'glass':k]||CV_AP.poly;
   // art-3 BV: facade texture + roof type, least used within 100 m (facade first, then the facade+roof combination)
   if(BV.on&&!kif){const F=k==='poly'?['','2','3','4']:k==='neo'?['','2']:['','2','3'],R=k==='poly'?['flat','garden','tank','pent']:k==='neo'?['corn','ped']:k==='villa'?['tile','tileB','flat']:['tile','tileB','terr'];
-    U.fv=BV_pick(F.map(f=>k+f),x,z,3,'fac').slice(k.length);U.rf=BV_pick(R.map(r=>k+U.fv+'/'+r),x,z,5).split('/')[1]}
+    const BC=BV_near2(x,z);U.fv=BV_pick(F.map(f=>k+f),x,z,3,'fac',null,BC.f).slice(k.length);U.rf=BV_pick(R.map(r=>k+U.fv+'/'+r),x,z,5,undefined,null,BC.k).split('/')[1]}
   if(k==='poly')U.fl=(f=>typeof OC_fix==='function'?OC_fix({...U,fl:f},x,z).fl:f)(kif?7+Math.floor(h0*6):Math.max(3,Math.min(9,U.fl+[-1,0,0,1,2][Math.floor(h0*5)])));else if(k==='neo'&&!/Plaka/.test(dn))U.fl=Math.max(2,Math.min(4,U.fl+(h0<.3?1:0)));
   let ci=Math.floor(h1*pal.length),P=CV.last;if(P&&Math.hypot(P[0]-x,P[1]-z)<30&&P[2]===U.fl&&P[3]===pal[ci])ci=(ci+1)%pal.length;U.cvc=hx(pal[ci]);
   const{w,d,fh}=U,fl=U.fl,h=fl*fh+(k==='villa'?.4:.6);
