@@ -310,3 +310,14 @@ Still weak: pile labels + Diary box hidden under 1000px wide (menu test fails at
 - Still finishing (stop by 09:45): Sunglaze (Guide button dead, 3D black tile, 3D labels, title contrast), Lantern Dive (stretched background, tiny desktop text), Rampart (menu rows art over labels, desktop sizes).
 - Next (one round only, after the audit table): one worker per game that FAILS the audit, brief = the audit's failing rows only. Then the shared fixes listed above (stale shell copies in 12 games, test bugs, drawer solid background).
 - Token rules for the next orchestrator: run on a small context; do not relay each worker report to the owner, report once per round with the audit table; put all instructions in the brief up front (each create_trigger result costs ~6k tokens of context).
+
+## Sunglaze stop 14 Oct
+Deployed earlier today: top bar cut to Players/Log/Rules/Menu with a Menu drawer, simple start screen, text sizes and drawer insets, bigger 3D board labels (row numbers, breakage numerals, sack/shard box), scoring note removed from the boards. Scenarios: menu (5 sizes), ui-bar, ui-start, ui-3d.
+NOT deployed (pushed as source only, last deploy gate failed on a shell scenario, see below):
+- Guide: Menu "Guide: on/off" now closes the drawer; new Menu entry "Learn the rules"; scenario sg-guide (passes at pc). Cause found: the first game starts with Guide on, so one tap switched it off, with the drawer left open over the dock. ui.js (case 'coach' / 'tutorial' in the click switch, render's #coachbtn line), body.html (#coachbtn, #tutbtn), scn.js (sg-guide). Phone: Guide lives in the phone More card (ui8.js:157), closing it was added in ui.js but is not tapped in a test.
+- Title contrast: skin.css bottom (html.sk .gx-bar plain cream plate, h1 span dark ink). Cause: `.gx-bar h1 span` in head.html:131 is gradient-clipped text, so the skin's colour never applied. Not measured yet: azul/game/ui-contrast-test.js (pixel sampling behind text) has never completed a run (crashed once on a re-rendered element; patched, not rerun).
+Not fixed:
+- Black square on the computer's drying racks: not reproduced (3D frames scanned, no dark block, no texture-less mesh). Needs round/phase from the owner's screenshot. Candidate places: three3d.js boardGeos (slot cut-outs, ~line 377) vs boardSlots (~line 376); GLB models (glbLoad, ~line 238).
+- Table fills ~44% of the screen height at 1560x900: three3d.js computeLayout (~line 258), 'row' layout is width-limited. Needs a one-board-at-a-time view (owner's call).
+- Shell: shell/gx-scenario.js:363 evaluates every [data-engine] value (three.js sets "three.js r158" on its canvas; worked around in three3d.js). Deploy gate now fails with "ui-audit: GXS.menuList is not a function" (new shared scenario, not this game's code); sunglaze cannot deploy until the shell side is fixed or ui-audit is adapted.
+- UI-BAR rules 3, 5, 6, 8 only partly machine-checked (see the earlier report).
