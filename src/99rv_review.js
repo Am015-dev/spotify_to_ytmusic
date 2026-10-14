@@ -4,7 +4,9 @@
 function RV14_vis(id){const e=typeof id==='string'?document.getElementById(id):id;if(!e)return null;const r=e.getBoundingClientRect(),cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity===0||r.width<2||r.height<2)return null;return r}
 function RV14_ovl(a,b){if(!a||!b)return 0;const w=Math.min(a.right,b.right)-Math.max(a.left,b.left),h=Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top);return w>1&&h>1?Math.round(w*h):0}
 // screen rect of the player's ride (8 corners of its world box projected)
-function RV14_carBox(){try{const m=pl.mesh;m.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(m),v=new THREE.Vector3();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+// xform-1: visible meshes only (setFromObject also counted the hidden off-road/boat forms and helpers: the box spanned −566…972 px in portrait)
+function RV14_carBox(){try{const m=pl.mesh;m.updateMatrixWorld(true);const b=new THREE.Box3(),bb=new THREE.Box3(),v=new THREE.Vector3();
+  m.traverse(o=>{if(!o.isMesh||o.isSprite||!o.geometry)return;for(let q=o;q;q=q.parent){if(!q.visible)return;if(q===m)break}if(o.material&&(o.material.transparent&&o.material.opacity<.6||o.material.blending===THREE.AdditiveBlending))return;if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();bb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);b.union(bb)});if(b.isEmpty())return null;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
   for(let i=0;i<8;i++){v.set(i&1?b.max.x:b.min.x,i&2?b.max.y:b.min.y,i&4?b.max.z:b.min.z).project(camera);const x=(v.x+1)/2*innerWidth,y=(1-v.y)/2*innerHeight;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   y1=y0+(y1-y0)*.8;/* bottom 20 %: shadow + contact patches, not body */return{left:x0,right:x1,top:y0,bottom:y1,width:x1-x0,height:y1-y0,L:Math.max(b.max.x-b.min.x,b.max.z-b.min.z)}}catch(e){return null}}
 function RV14_mark(kind,id,nth){const L=RO.marks.filter(m=>m.kind===kind&&(!id||(m.ev&&m.ev.id===id)));return L[nth||0]}
@@ -15,7 +17,7 @@ function RV14_pairs(P){const bad=[];for(const[a,b]of P){const A=a==='CAR'?RV14_c
 function RV14_go(kind,say){
  const P=innerHeight>innerWidth?'portrait':'landscape',ok=b=>b?' ✅':' ❌';
  if(kind==='card'){const m=RV14_mark('quest','q_ball');if(!m)return'📍 no Giant Ball marker ❌';RV14_near(m,14);roamOpen(m);RO.cardPin=1;
-  setTimeout(()=>{const c=document.getElementById('roamCard');if(!RV14_vis(c))return say('📍 GIANT BALL CARD ('+P+') did not open ❌');constbt=['rcGo','rcNo'].map(RV14_vis),bad=[];let narrow=0;
+  setTimeout(()=>{const c=document.getElementById('roamCard');if(!RV14_vis(c))return say('📍 GIANT BALL CARD ('+P+') did not open ❌');const bt=['rcGo','rcNo'].map(RV14_vis),bad=[];let narrow=0;
    for(const e of c.querySelectorAll('*')){if(e.id==='rcGo'||e.id==='rcNo'||e.closest('#rcGo,#rcNo'))continue;if(!e.childNodes.length||![...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim().length>2))continue;const r=RV14_vis(e);if(!r)continue;
     for(const b of bt)if(RV14_ovl(r,b)>40)bad.push((e.textContent||'').trim().slice(0,14));if((e.textContent||'').trim().length>40&&r.width<150)narrow++}
    say('📍 GIANT BALL CARD ('+P+') · buttons over text: '+bad.length+(bad[0]?' ("'+bad[0]+'")':'')+' · narrow text blocks (<150 px): '+narrow+ok(!bad.length&&!narrow))},700);
