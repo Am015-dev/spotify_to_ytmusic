@@ -14,9 +14,9 @@ function GFX_isDay(){return RO.on&&MOOD&&!(typeof FL!=='undefined'&&FL.n>.5)&&MO
 function GFX_light(){if(!GFX.on)return;const day=GFX_isDay();GFX.day=day;
  if(!day){GFX.U.value=1;if(renderer.toneMapping!==THREE.NeutralToneMapping)renderer.toneMapping=THREE.NeutralToneMapping;return}
  if(!GFX.keyOrig.has(MOOD)){GFX.keyOrig.set(MOOD,MOOD.key[2]);MOOD.key[2]=GFX_SUN}moonL.position.set(...GFX_SUN);
- renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
+ renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.06;
  const ath=CID==='ath';moonL.color.set(ath?'#ffd9a8':'#ffe1b4');moonL.intensity=4.3;
- hemi.color.set('#a9c8ff');hemi.groundColor.set(ath?'#7a6a48':'#4f6a38');hemi.intensity=.45;
+ hemi.color.set('#a9c8ff');hemi.groundColor.set(ath?'#7a6a48':'#4f6a38');hemi.intensity=.68;
  scene.environmentIntensity=.3;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
  const U=SKYU;U.uTop.value.set(.012,.09,.55);U.uMid.value.set(.05,.26,.86);U.uHor.value.set(ath?.62:.48,ath?.66:.68,ath?.78:.92);U.uSun.value.set(1.0,.8,.5);
  scene.fog.color.set(ath?'#cfd6e2':'#b9cff0');
@@ -42,10 +42,10 @@ function GFX_gspec(m){if(m.userData.gfxSpec)return;m.userData.gfxSpec=1;const ob
  m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);sh.uniforms.uGfxSp=GFX.U;sh.fragmentShader=sh.fragmentShader.replace('void main() {','uniform float uGfxSp;\nvoid main() {').replace('#include <lights_fragment_end>','#include <lights_fragment_end>\nreflectedLight.directSpecular*=uGfxSp;')};
  m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|gfxg'};m.needsUpdate=true}
 // ground (meshes that never cast): matte. Grass/pavement at roughness .55 caught the low sun as a white sheen across Frankfurt
-// ground = never casts, or mostly up-facing triangles (>= 85 % of sampled normals): Frankfurt's merged grass/pavement/road plates DO cast and
+// ground = never casts, or mostly up-facing triangles (>= 70 % of sampled normals; pavement strips with kerbs sit near 75 %): Frankfurt's merged grass/pavement/road plates DO cast and
 // carry kerbs (bbox > .5 m), so neither "casts" nor a flat bbox found them; at roughness .4 they lit up as a white sun sheen
 function GFX_flat(o){const g=o.geometry;if(!g||!g.attributes||!g.attributes.normal)return false;if(g.userData.gfxUp!==undefined)return g.userData.gfxUp;
- const N=g.attributes.normal,n=N.count,st=Math.max(1,Math.floor(n/400));let up=0,k=0;for(let i=0;i<n;i+=st){k++;if(N.getY(i)>.9)up++}return g.userData.gfxUp=k>0&&up/k>=.85}
+ const N=g.attributes.normal,n=N.count,st=Math.max(1,Math.floor(n/400));let up=0,k=0;for(let i=0;i<n;i+=st){k++;if(N.getY(i)>.9)up++}return g.userData.gfxUp=k>0&&up/k>=.7}
 function GFX_plastic(root){let k=0;root.traverse(o=>{if(!o.isMesh)return;if(!o.castShadow||GFX_flat(o)){for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m)||!m.isMeshStandardMaterial||m.isMeshPhysicalMaterial||m.transparent||m.roughness>=.85)continue;
     GFX.mats.add(m);m.userData.gfx0=[m.roughness,m.envMapIntensity];m.roughness=.88;GFX_gspec(m);GFX.gm.push(m)}return}
   for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m))continue;if(GFX.gm.includes(m))continue;GFX.mats.add(m);
