@@ -2,15 +2,18 @@
  {
   "date": "2026-10-14",
   "game": "doorkick-dungeon",
-  "title": "Tests that find bugs",
+  "title": "Cleaner menus",
   "items": [
-   "Kick, bonus card, Fight!, loot and end turn are tested with real taps; Fight! no longer cut off on PC"
+   "Kick, bonus card, Fight!, loot and end turn are tested with real taps; Fight! no longer cut off on PC",
+   "Menus use one title font and one body font, no overlaps"
   ],
-  "check": "Kick, play the bonus, tap Fight!",
+  "check": "Open the menus: text readable, nothing overlapping",
   "scn": [
-   "dk-fight-bonus"
+   "dk-fight-bonus",
+   "menu"
   ],
   "ask": [
+   null,
    null
   ]
  },
