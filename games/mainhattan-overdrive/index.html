@@ -756,6 +756,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.51',date:'14 Oct 2026',items:[{t:'FIXED',s:'Mission markers sit on the road and face along it.'}]},
   {v:'v90m-beta.50',date:'14 Oct 2026',items:[{t:'FIXED',s:'LEGO-set buildings count as shops and landmarks in Athens and the visit checks.'}]},
   {v:'v90m-beta.49',date:'14 Oct 2026',items:[{t:'FIXED',s:'Athens loads faster; touch controls come back after the garage on hybrid devices.'}]},
   {v:'v90m-beta.48',date:'14 Oct 2026',items:[{t:'NEW',s:'Low-rise streets are lined with LEGO-set buildings on plinths.'}]},
@@ -1535,7 +1536,7 @@ function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c
 // XCV = chunk name -> content hash, filled by tools/build.sh (empty in a raw src/ page: then nothing is lazy). A chunk may export top-level names
 // (module list "name:a,b" in src/LAZY): the page declares `let a,b;` stubs, the chunk's last expression is ({a,b}) and XC.apply[name] copies them over.
 // Eager code must not touch a chunk's names at boot; use XC.done / XC_need(name) first. Tests: __tq.ready also waits for XC.done.
-const XCV=/*XCV*/{"99c_checklist":"6e0146fc","10c_qtc_blob":"ede9840f","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"addde155","10c_qtc_blob":"ede9840f","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -3620,7 +3621,7 @@ const QV_TX={fra:{e_strand:['Tante Gerda','Stranded!','My old Opel died right he
   e_smash:['Builder Vangelis','Pile Smasher','Brick piles block three streets. Smash them all!','Clear streets! Thank you.','Still bricks everywhere…'],
   e_taxi:['Taxi Babis','Taxi Shift','Three fares across Athens. Stop right next to each customer.','Five stars!','They took the metro…']}};
 function qvEncEv(t){const X=(QV_TX[CID]||QV_TX.fra)[t.id]||QV_TX.fra[t.id];return{id:t.id,kind:t.k,rival:X[0],npc:X[0],name:X[1],hi:X[2],win:X[3],lose:X[4],em:t.em,col:t.col,legs:t.legs,ret:t.ret,grab:t.grab,fragile:t.fragile,dyn:1,d:QV_D[t.k]}}
-function qvMk(m){const x=m.x,z=m.z,h=m.h||0,ev=m.ev;const g=new THREE.Group();g.position.set(x,groundY(x,z),z);const ring=new THREE.Mesh(new THREE.TorusGeometry(9,.6,8,48),neonMat(m.col,2.4));ring.rotation.x=Math.PI/2;ring.position.y=.3;g.add(ring);m.ring=ring;
+function qvMk(m){if(!(m.ev&&m.ev.m1))RO_snapMark(m);const x=m.x,z=m.z,h=m.h||0,ev=m.ev;const g=new THREE.Group();g.position.set(x,groundY(x,z),z);const ring=new THREE.Mesh(new THREE.TorusGeometry(9,.6,8,48),neonMat(m.col,2.4));ring.rotation.x=Math.PI/2;ring.position.y=.3;g.add(ring);m.ring=ring;
   const beam=new THREE.Mesh(new THREE.CylinderGeometry(1.6,3,140,14,1,true),new THREE.MeshBasicMaterial({color:glowCol(ev.col,1),transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));beam.position.y=70;g.add(beam);m.beam=beam;
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:iconTex(m),depthWrite:false}));sp.scale.set(10,10,1);sp.position.y=12;g.add(sp);m.sp=sp;const f=minifig(ev.col);f.position.set(Math.cos(h)*13,0,-Math.sin(h)*13);f.rotation.y=h-Math.PI/2;g.add(f);m.fig=f;m.g=g;g.visible=!(RO.ch||RO.sp);RO.grp.add(g);RO.marks.push(m);return m}
 function qvEncMark(t,x,z,h,seed,disc,uid,born){const ev=qvEncEv(t);return qvMk({kind:'quest',dyn:1,ev,uid:uid||(Date.now().toString(36)+(QV.uid++).toString(36)),x,z,h,seed,disc:!!disc,born:born||Date.now(),icon:disc?ev.em:'?',col:disc?ev.col:'#9aa6b2'})}
@@ -5625,9 +5626,12 @@ function athGbSpots0(){const out=[],add=(x,z)=>{{let bq=null,bd=120;const kx=Mat
   for(let k=0;k<50;k++){const a=k*2.4,r=k*2,px=x+Math.cos(a)*r,pz=z+Math.sin(a)*r,gy=groundY(px,pz);if(!roamHit(px,pz,3.5,gy+1)&&!lzHit(px,pz,3.5)){out.push([px,pz,gy+2.5]);return}}out.push([x,z,groundY(x,z)+2.5])};
   for(const[e,n]of[[175,-480],[20,-530],[40,-440],[-330,-930],[-193,-400],[20,50],[-470,75],[-250,-170],[-660,260],[-1180,330],[250,-385],[1560,655],[820,-40],[1334,129],[1390,-965],[1150,-350],[840,-610],[2000,-800],[2300,150],[740,1200],[2600,650],[2050,500],[2724,736],[3100,1000],[4330,3140],[3300,2600],[5000,4300],[6350,5073],[6950,8000],[7100,5350]])add(...WP(e,n));
   const S=CITY_S.find(q=>q.r.id==='lyka');if(S){const p=S.pts[Math.floor(S.pts.length*.55)];out.push([p.x,p.z,p.y+2.5])}return out}
+// cam-3: a marker more than 15 m from a road (or inside a collider) moves to the nearest road point (rfSnap, ≤ 400 m) and takes its heading, so every mission start is drivable
+function RO_snapMark(m,keepH){let moved=false;try{const q=rfSnap(m.x,m.z,400);if(!q)return false;const g=groundAt(m.x,m.z,99);if(Math.hypot(q[0]-m.x,q[1]-m.z)>15||SC_hit(m.x,m.z,g)){m.x=q[0];m.z=q[1];if(q[2]!=null&&!keepH)m.h=q[2];moved=true}
+  if(!keepH){const r=rfSnap(m.x,m.z,60);if(r&&r[2]!=null){let d=r[2]-(m.h||0);d=Math.atan2(Math.sin(d),Math.cos(d));const h2=Math.abs(d)>1.5708?r[2]+Math.PI:r[2];if(Math.abs(h2-(m.h||0))>.01){m.h=h2;moved=true}}}}catch(e){}return moved}
 function buildRoam(){const grp=new THREE.Group();HUB.grp.add(grp);RO.grp=grp;RO.marks=[];RO.studs=[];RO.ramps=[];RO.built=true;const cat=roamCatalog();rfMarks();for(const L of LAZY)for(const k in L.spots){const q=L.spots[k];MARKPOS[k]=[q[0],q[1]];MARKH[k]=q[2]||0}for(const g of GARAGES)if(g.x!=null)MARKPOS[g.id]=[g.x,g.z];
   if(CID==='fra'){const g=GARAGES.find(q=>q.id==='g_fra');if(g){const sx=Math.sin(g.h),sz=Math.cos(g.h),rx=Math.cos(g.h),rz=-Math.sin(g.h);let best=null;for(const o of[60,-60,80,-80,100,-100]){const x=g.x+rx*o,z=g.z+rz*o;if(!lzHit(x,z,10)&&!roamHit(x,z,10)&&!lzHit(x+sx*26,z+sz*26,6)&&x>WX0+60&&x<WX1-60&&z>WZS+60&&z<WZN-60){best=[x,z];break}}let bq=null,bd=1e9;for(const S of LZ.roads)for(const q of S.pts){const dg=Math.hypot(q.x-g.x,q.z-g.z);if(dg<50||dg>170||lzHit(q.x,q.z,7)||roamHit(q.x,q.z,7))continue;const d=Math.hypot(q.x-g.x-rx*60,q.z-g.z-rz*60);if(d<bd){bd=d;bq=q}}MARKPOS.flight=bq?[bq.x,bq.z]:best||[g.x+rx*60,g.z+rz*60];MARKH.flight=bq?Math.atan2(bq.tx,bq.tz):g.h}}
-  for(const m of cat){const p=MARKPOS[markKey(m)];if(!p)continue;m.x=p[0];m.z=p[1];m.h=MARKH[markKey(m)]??0;if(m.kind==='garage'&&m.id!=='g_city')m.h=GARAGES.find(q=>q.id===m.id).h;const y=groundY(m.x,m.z),g=new THREE.Group();g.position.set(m.x,y,m.z);
+  for(const m of cat){const p=MARKPOS[markKey(m)];if(!p)continue;m.x=p[0];m.z=p[1];m.h=MARKH[markKey(m)]??0;if(m.kind==='garage'&&m.id!=='g_city')m.h=GARAGES.find(q=>q.id===m.id).h;if(RO_snapMark(m,m.kind==='garage')){MARKPOS[markKey(m)]=[m.x,m.z];MARKH[markKey(m)]=m.h}const y=groundY(m.x,m.z),g=new THREE.Group();g.position.set(m.x,y,m.z);
     if(m.kind==='otg'){const arch=new THREE.Mesh(new THREE.TorusGeometry(7,.5,8,40,Math.PI),neonMat(m.col,2.2));arch.rotation.y=m.h+Math.PI/2;g.add(arch);const pane=new THREE.Mesh(new THREE.CircleGeometry(7,32,0,Math.PI),new THREE.MeshBasicMaterial({color:glowCol(m.col,.8),transparent:true,opacity:.2,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));pane.rotation.y=m.h+Math.PI/2;g.add(pane);m.ring=arch;m.pane=pane}
     else{const ring=new THREE.Mesh(new THREE.TorusGeometry(9,.6,8,48),neonMat(m.col,2.4));ring.rotation.x=Math.PI/2;ring.position.y=.3;g.add(ring);m.ring=ring}
     const beam=new THREE.Mesh(new THREE.CylinderGeometry(1.6,3,140,14,1,true),new THREE.MeshBasicMaterial({color:glowCol(m.col,1),transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));beam.position.y=70;g.add(beam);m.beam=beam;
@@ -14949,6 +14953,8 @@ async function OF_hudRun(){const W=ms=>new Promise(r=>setTimeout(r,ms)),bad=[],i
   for(const id of['t_v7612_1','rod']){if(!await OF_pickRide(id)){bad.push(id+':pick');continue}await W(200)}
   window.dispatchEvent(new TouchEvent('touchstart',{touches:[],changedTouches:[]}));await W(400);miss('hybrid after touch');
   return(bad.length?'❌ FAIL ':'✅ PASS ')+'TOUCH BUTTONS AFTER RIDE SWITCHES · 3 phone switches + hybrid touch · '+(bad.length?'missing '+bad.join(', '):'all 5 visible every time')}
+// cam-3: every RO.mark within 15 m of a road (rfSnap) and clear of colliders, both cities
+function OF_markChk(){const bad=[];for(const m of RO.marks||[]){const g=groundAt(m.x,m.z,99),q=rfSnap(m.x,m.z,400),d=q?Math.hypot(q[0]-m.x,q[1]-m.z):1e9;if(d>15||SC_hit(m.x,m.z,g))bad.push((m.kind+':'+(m.id||'?'))+'@'+(m.x|0)+','+(m.z|0)+(d>15?' '+Math.round(d)+'m':' wall'))}return{n:(RO.marks||[]).length,bad}}
 // SHB (v90k): soft blob shadows on the ground under the player car, city traffic, people and trees. One InstancedMesh, depth-write off, ~1 draw call.
 // Cause of "no shadows": the sun shadow map only runs on HIGH quality (LK_shadow), auto-quality drops it on busy PCs, and v86v (ART6) replaced the car
 // blobs with tiny 45 % tyre patches. These blobs are cheap and always on in free roam. window.__sh = {n, pl} for the checklist test.
