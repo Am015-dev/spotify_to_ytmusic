@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-14",
+  "game": "shipwreck-isle",
+  "title": "readable on every screen size",
+  "items": [
+   "Rules text clears the frame; More menu readable"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "cauldron-fair",
   "title": "readable on every screen size",
   "items": [
@@ -206,21 +221,6 @@
   ],
   "ask": [
    null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "shipwreck-isle",
-  "title": "Menus and Rules panel cleaned up",
-  "items": [
-   "Rules text clears the frame; More menu readable"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
    null
   ]
  },
