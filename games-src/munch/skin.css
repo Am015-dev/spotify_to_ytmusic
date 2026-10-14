@@ -106,3 +106,34 @@ html.dk-bt .gxh-a-bottom .gxh-arr{bottom:-19px}html.dk-bt .gxh-a-top .gxh-arr{to
 html.sk .btn.bigb,html.sk .btn.primary,html.sk .btn.gxt-menu{border-image-width:9px 12px;padding-top:8px;padding-bottom:8px}
 body:has(.gxh-bub.on) #prompt .bfline{display:none}
 html.sk .gx-drawer{padding:33px}
+
+/* start screen (one column): every row the same width, text 15px+, 16px inset for bare text inside the framed column */
+html.sk .dlg.dk2{max-width:480px;padding-left:30px;padding-right:30px;display:flex;flex-direction:column;gap:10px}
+html.sk.ph .dlg.dk2{padding-left:26px;padding-right:26px;gap:8px}
+.dlg.dk2>*{margin:0}
+.dlg.dk2 h2{font-size:2rem!important;text-align:center;padding:0 16px;margin:0;line-height:1.1}
+.dlg.dk2 h2 span{color:inherit}
+html.ph .dlg.dk2 h2{font-size:1.7rem!important}
+.dlg.dk2 .tagline,.dlg.dk2 h3,.dlg.dk2 p{padding:0 16px;font-size:15px;line-height:1.3}
+.dlg.dk2 .tagline{text-align:center;margin-bottom:4px}
+.dlg.dk2 h3{margin:6px 0 0;font-size:15px}
+html.ph .dlg.dk2 p,html.ph .dlg.dk2 h3{font-size:15px}
+.dlg.dk2 .btn,html.ph .dlg.dk2 .btn,html.ph .dlg.dk2 .seg .btn{display:block;width:100%;box-sizing:border-box;min-height:46px;font-size:16px;text-align:center;white-space:normal;line-height:1.15;padding:9px 16px}
+.dlg.dk2 .btn.bigb{min-height:54px;font-size:17px}
+.dlg.dk2 .qopts{display:flex;flex-direction:column;gap:8px}
+.dlg.dk2 .seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px}
+.dlg.dk2 .seg .btn{padding:9px 8px}
+html.sk .dlg.dk2 .btn.gxt-menu,html.sk .dlg.dk2 .btn.qrow{border-image-source:url(media/ui-button-cream-c.webp);border-image-slice:30 42 fill;border-image-width:9px 12px;color:#3a2410;text-align:center}
+.dlg.dk2 .gxt-menu :is(small,span){display:none}
+
+/* wide screens (tablet / desktop): nothing runs under frame art, the start screen hides while a drawer is open, the hand wraps instead of clipping */
+html.dk-par:not(.ph) .gx-dock-body{padding:12px 22px 16px}
+body:has(.gx-drawer.on) #modal{visibility:hidden}
+html:not(.ph) .hand{flex-wrap:wrap;overflow:visible;justify-content:center;-webkit-mask-image:none;mask-image:none}
+body:has(.gxh-bub.on) #prompt ol{display:none}
+.gx-drawer-body li,.gx-drawer-body p{line-height:1.5}
+html.sk:not(.ph) .menu .btn{border-image-width:10px 12px;padding-top:9px;padding-bottom:9px}
+html.dk-title:not(.ph) .gx-dock{visibility:hidden}
+@media (max-width:1000px){html:not(.ph) .recent,html:not(.ph) .pile .lbl{display:none}}
+body:has(.gxh-bub.on) .mine .str .muted{display:none}
+.bfdoor .bfboot{position:static;display:inline-block;margin-left:4px}
