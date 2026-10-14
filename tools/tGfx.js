@@ -2,8 +2,8 @@
 //   node tools/tGfx.js <base url> <outdir> [q=high] [extra query, e.g. gfx=1]
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
 const BASE=process.argv[2],OUT=process.argv[3]||'qa_gfx',Q=process.argv[4]||'high',EX=process.argv[5]||'';fs.mkdirSync(OUT,{recursive:true});
-(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
- const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1});const p=await ctx.newPage();p.setDefaultTimeout(420000);const errs=[];
+const errs=[];(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
+ const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1});const p=await ctx.newPage();p.setDefaultTimeout(+process.env.TMO||900000);errs.length=0;
  p.on('pageerror',e=>errs.push(String(e).slice(0,200)));
  const R={};for(const c of(process.env.CITIES||'fra,ath').split(',')){const t=Date.now();
   await p.goto(BASE+'?test='+c+'&q='+Q+'&draw=0'+(EX?'&'+EX:''));await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250});
