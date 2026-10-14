@@ -18,4 +18,5 @@ module.exports=[
  {seed:'stick',expect:'FAIL stick/angle-decreases-with-speed'},
  {seed:'track-grade',expect:'FAIL tracks-pieces/grade-<=22pct-up'},
  {seed:'track-rail',expect:'FAIL tracks-rails/(rail-height|rail-continuous)'},
+ {seed:'human-giant',expect:'FAIL humans/pedestrian-1.80m'},
 ];

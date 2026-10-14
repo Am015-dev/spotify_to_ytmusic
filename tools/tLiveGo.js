@@ -12,7 +12,7 @@ const [BASE,OUT,TAG,ONLY]=process.argv.slice(2);const want=id=>!ONLY||ONLY.split
   for(const id of ids.filter(want)){const said=await p.evaluate(id=>__chk.go('lf1/'+id)||'',id);let m=null;
    if(id==='mound'){await p.waitForTimeout(800);await p.keyboard.down('ArrowUp');await p.waitForFunction(()=>__lvf.LF.lastM,null,{polling:200,timeout:30000}).catch(()=>{});await p.keyboard.up('ArrowUp');m=await p.evaluate(()=>__lvf.LF.lastM)}
    else{await p.waitForFunction(()=>__lvf.LF.last,null,{polling:200,timeout:10000}).catch(()=>{});m=await p.evaluate(()=>__lvf.LF.last)}
-   if(c==='fra0')await p.evaluate(()=>__tq.draw()).catch(()=>{});const f=`${OUT}/${TAG||'go'}_${id}.png`;await p.screenshot({path:f});const ok=!!(m&&m.pass);res.push({id,ok,m,said});
+   if(c==='fra0')await p.evaluate(()=>__tq.draw()).catch(()=>{});const f=`${OUT}/${TAG||'go'}_${id}.png`;await p.screenshot({path:f});if(process.env.GM)fs.writeFileSync(f+'.gm.json',JSON.stringify(await p.evaluate(()=>__lvf.LF.gm||[])));const ok=!!(m&&m.pass);res.push({id,ok,m,said});
    console.log(`${ok?'PASS':'FAIL'} lf1/${id} · ${m?JSON.stringify(m):'(no result) '+said}`)}}
  console.log(JSON.stringify({pass:res.filter(r=>r.ok).length,total:res.length,errors:errs.length,firstError:errs[0]||'',secs:Math.round((Date.now()-T0)/1000)}));
  fs.writeFileSync(`${OUT}/${TAG||'go'}.json`,JSON.stringify({res,errs},null,1));await b.close()})();

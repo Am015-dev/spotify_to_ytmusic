@@ -26,9 +26,11 @@ function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX
   OC_lyka(h,nx,nz,r);TR_W={r,nx,nz,h};TR_roadsInit(TR_W);return TR_W}
 // ---- terr-1 (Alex: "both cities are flat, not realistic"): real relief, exaggerated above a smooth valley floor (floor = 1.2 km box blur of
 // the DEM): Frankfurt 3.6x on the soft-capped part (~2.2x on the Sachsenhausen hills; cap +320 m on the Taunus), Athens 1.4x outside the Acropolis (plateau keeps its real height).
-// feature flag (OFF until the lane passes): ?terr=1 = hills + graded road corridors + slope colours, kept for the tab (sessionStorage, so GO
-// reloads keep it) or for good with localStorage mho_terr=1; ?terr=0 clears it. ?trx=0 / ?trg=0 / ?trc=0 switch one part off
-const TERR={on:(()=>{try{const q=new URLSearchParams(location.search).get('terr');if(q!=null)sessionStorage.setItem('mho_terr',q);return(q??sessionStorage.getItem('mho_terr')??localStorage.getItem('mho_terr'))==='1'}catch(e){return false}})()};
+// feature flag, ON by default (coordinator 2026-10-14): hills + graded road corridors + slope colours; ?terr=0 = the old flat raster, kept for
+// the tab (sessionStorage, so GO reloads keep it) or for good with localStorage mho_terr=0; ?terr=1 = on again. ?trx=0 / ?trg=0 / ?trc=0 switch one part off
+const TERR={on:(()=>{try{const q=new URLSearchParams(location.search).get('terr');if(q!=null)sessionStorage.setItem('mho_terr',q);return(q??sessionStorage.getItem('mho_terr')??localStorage.getItem('mho_terr'))!=='0'}catch(e){return true}})()};
+// the Athens ground-quadtree cache (10b) is fitted on the TERR raster (tools/qtdump.js after any height change): with ?terr=0 every cell is fitted live
+if(!TERR.on&&typeof QTC!=='undefined')QTC.ok=false;
 const TR_RK=CID==="fra"?{k:3.6,c:200}:{k:1.4,c:200};
 function TR_relief(h,nx,nz,r){if(!TERR.on||new URLSearchParams(location.search).get('trx')==='0')return;const s=Math.max(1,Math.round(96/r)),cx=Math.ceil(nx/s),cz=Math.ceil(nz/s),C=new Float32Array(cx*cz),N=new Float32Array(cx*cz);
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=((j/s)|0)*cx+((i/s)|0);C[k]+=h[j*nx+i];N[k]++}for(let k=0;k<C.length;k++)C[k]/=N[k]||1;
