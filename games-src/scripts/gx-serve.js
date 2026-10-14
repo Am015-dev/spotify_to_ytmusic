@@ -1,4 +1,4 @@
-// One shared static server for every check (sweep.js, rotate-test.js, phone-check.js, scenario-test.js). No file://, no per-game route hacks.
+// One shared static server for every check (sweep.js, rotate-test.js, phone-check.js, scenarios.spec.js). No file://, no per-game route hacks.
 // It serves the game exactly like the live site: /<slug>/ -> the page, /<slug>/media|music|models/... -> the real files.
 //   Resolution for /<slug>/<rest>:  1. overrides[slug] (a built html file, for rest '' / index.html)
 //                                   2. <stage>/<slug>/<rest>   (build-all staging: index.html, cards/ ...)

@@ -21,7 +21,7 @@ async function openGame(ctx, base, slug, qs, errs) {
 }
 const tapSel = async (page, sel) => { const b = await page.evaluate(s => { const e = document.querySelector(s); if (!e) return null; e.scrollIntoView({ block: 'center' }); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; }, sel); if (!b) throw new Error('not found ' + sel); await page.touchscreen.tap(b.x, b.y); await sleep(250); };
 
-async function runChecks(page, fails, id) {   // same step/tap protocol as scenario-test.js, touch only
+async function runChecks(page, fails, id) {   // same step/tap protocol as scn-run.js, touch only
   await page.waitForFunction(() => window.GXSCN && window.GXSCN.ready, null, { timeout: 30000 }).catch(() => fails.push(id + ': scenario never ready'));
   const info = await page.evaluate(() => window.GXSCN).catch(() => null);
   if (!info) return; if (info.error) { fails.push(id + ': ' + info.error); return; }
@@ -31,7 +31,7 @@ async function runChecks(page, fails, id) {   // same step/tap protocol as scena
     let r = await page.evaluate(i => GXS.step(i), i).catch(e => ({ ok: false, msg: 'step threw' }));
     for (let k = 0; !r.ok && info.checks[i].kind === 'eq' && k < 8; k++) { await sleep(400); r = await page.evaluate(i => GXS.step(i), i).catch(() => r); }   // an animated tally gets ~3 s to land
     if (!r.ok) { fails.push(`${id}: ${r.msg}`); continue; }
-    if (r.play) {   // behaviour check: real taps step by step, the turn must settle, then the outcome is asserted (same protocol as scenario-test.js)
+    if (r.play) {   // behaviour check: real taps step by step, the turn must settle, then the outcome is asserted (same protocol as scn-run.js)
       let bad = '';
       for (let j = 0; j < r.play.n && !bad; j++) { let tries = 0, p;
         do { p = await page.evaluate(([i, j]) => GXS.pstep(i, j), [i, j]); if (p.err) { bad = p.err; break; } if (p.skip) break; await page.touchscreen.tap(p.x, p.y); await sleep(p.after); tries++; }

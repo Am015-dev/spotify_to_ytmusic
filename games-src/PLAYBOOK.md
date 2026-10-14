@@ -19,7 +19,7 @@ Read root `CLAUDE.md` first (hard rules, cost rules). A finished game goes strai
   the skin on versus off, and prints which computed property moved.
 - **Scenarios ("spawn the requirement only"):** every game registers scenarios in its own `scn.js` (see `shell/gx-scenario.js`,
   worked example `munch/scn.js`): `?scn=<id>` skips menus and tutorial, seeds the RNG, builds the exact state and shows a "Test:" tag;
-  `scripts/scenario-test.js <slug>` runs every scenario at 390x763, 375x553 and 1366x768 over http. Write a scenario for every owner request
+  `scripts/scn-run.js` (Playwright Test: `node_modules/.bin/playwright test`, config `playwright.config.js`, env `SCN_SLUGS=<slug>`) runs every scenario at 390x763 (`--project=phone`; `phone-s` 375x553 and `pc` 1366x768 with --full) over http. Write a scenario for every owner request
   (it is the repro that stays), put its `ask` line in the What's new entry with `add-update.py ... --scn <id>` so the owner gets "▶ Try this".
   Every game needs at least `<prefix>-board` and `<prefix>-zoom`.
 
@@ -30,13 +30,13 @@ Read root `CLAUDE.md` first (hard rules, cost rules). A finished game goes strai
 3. **ends in a valid next state**: `idle()` must become true (no stuck state > 8 s: nothing changing for 8 s fails; the computer's turn completes) and the next turn must start,
 4. **is killed by `scripts/scenario-mutate.js`**: it breaks the feature (dead/throwing handler, hidden/covered/shrunk element, off-by-one number, and your own `mut:[{name, js}]` engine mutants: change a cost, skip the refill, swap a score) and the scenario must FAIL on every mutant. A survivor means the scenario is useless: fix it or delete it. Target: >= 90% killed per game, and every scenario needs at least one `mut` unless it only checks looks.
 Every scenario also gets these invariants for free (`gx-scenario.js`): no console/page error, no failed same-origin request (404 image/music/model), no text under 11 px / clipped / overlapping, no covered button, no horizontal scroll, every element with `data-engine="G.pl[0].en"` shows that engine value (settles for 5 s), and every glowing legal target (`GXS.glowSel`) answers a real tap. Mark numbers worth proving with `data-engine`. A finding a game cannot fix now goes into `GXS.known` (regex + why) in its `scn.js` AND `HANDOFF.md`, never silently.
-Run: `node games-src/scripts/scenario-test.js <slug>` (fast, every build) and `node games-src/scripts/scenario-mutate.js <slug>` (about 2-4 min a game; run when you add or change a scenario, not on every build). No screenshots.
+Run: `cd games-src && SCN_SLUGS=<slug> node_modules/.bin/playwright test --project=phone` (fast, every build; needs `npm install` in games-src; `-g <scn-id>` for one scenario) and `node games-src/scripts/scenario-mutate.js <slug>` (about 2-4 min a game; run when you add or change a scenario, not on every build). No screenshots.
 
 ## Fast delivery (owner, 13 Oct 2026: "better checklists and tests, less playing the game and waiting for hours")
 Every change, however small, ships as: **code + scenario + checklist item**, in that order, in one deploy.
 1. **Scenario first.** For each requirement in the brief, register a `?scn=<id>` scenario (`games-src/shell/gx-scenario.js`)
    that builds that exact moment directly (no menus, no playing there) with an `ask` line (8 words or fewer) and machine
-   `checks`. The scenario is the spec: write it before the fix, watch `scenario-test.js` fail, then make it pass.
+   `checks`. The scenario is the spec: write it before the fix, watch the scenario test fail, then make it pass.
 2. **Iterate with `build-all.py --quick <slug>`** (phone-check + scenario tests + 4-game sweep, minutes). Never run the full
    sweep while iterating.
 3. **`--deploy` as soon as the scenarios pass** (no sweep; `--full` only for engine/rules changes). Small batches: 1-3 games per worker, deploy each
