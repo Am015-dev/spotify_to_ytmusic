@@ -18,7 +18,8 @@ if(TQ){
  // &draw=0 (headless tools): no pictures at all except __tq.shot() (software GL needs ~10 s for the first frame's shaders)
  const TQS={ready:false,drv:false,t0:performance.now(),tReady:0,log:[],st:[]};ldSet=(f=>function(a,lab){try{const L=TQS.st,l=lab||'';if(!L.length||L[L.length-1][1]!==l)L.push([Math.round(performance.now()-TQS.t0),l])}catch(e){}return f.apply(this,arguments)})(ldSet);
  const skip=()=>{try{if(window.__m1&&__m1.cs&&__m1.cs()&&__m1.skip)__m1.skip()}catch(e){}
-  for(const s of['#storyGo','#rcGo','.m1go','#tutSkip','#m1Cs']){const e=document.querySelector(s);if(e&&!e.hidden&&e.offsetWidth)try{e.click()}catch(er){}}};
+  // xform-1: once drivable, never auto-accept a mission card (LET'S GO): checklist GOs open cards on purpose (rv14/rv-p-card)
+  for(const s of(TQS.ready?['#storyGo','.m1go','#tutSkip','#m1Cs']:['#storyGo','#rcGo','.m1go','#tutSkip','#m1Cs'])){const e=document.querySelector(s);if(e&&!e.hidden&&e.offsetWidth)try{e.click()}catch(er){}}};
  const ride=()=>new Promise(res=>{if(!TQ.car)return res();let S=null;try{S=GAR_set(TQ.car)}catch(e){}if(!S||S.id!==TQ.car){TQS.log.push('no ride '+TQ.car);return res()}
   try{gbOpen();GAR_select(TQ.car)}catch(e){TQS.log.push('ride: '+e);return res()}
   let n=0;const w=()=>{if((typeof LDL==='undefined'||!LDL.wait.size)||++n>150){try{gbClose(true)}catch(e){}setTimeout(res,300)}else setTimeout(w,200)};setTimeout(w,300)});

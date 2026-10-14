@@ -499,6 +499,10 @@ async function OF_dropRun(id){const W=ms=>new Promise(r=>setTimeout(r,ms));if(!a
   M1_startHotDrop();let t0=performance.now();while(performance.now()-t0<20000&&!M1.cs)await W(50);t0=performance.now();while(performance.now()-t0<20000&&(M1.cs||RO.story||RO.frozen))await W(50);
   if(M1.cs||RO.frozen)return'❌ FAIL '+id+': parachute scene did not end';await W(2000);const r=OF_sinkChk();if(!r||!r.nW)return'❌ FAIL '+id+': no wheels measured';
   const ok=r.wMin>=-.02&&r.wMax<=.05;return(ok?'✅ PASS ':'❌ FAIL ')+'HOT DROP LANDING · '+id+' · '+r.nW+' tyres '+r.wMin+'..'+r.wMax+' m above the road (0..0.05)'}
+// cam-3: start in the 5 m gap between two jump ramps (Frankfurt -850,1920) with the long Tiny Muscle: the warp steps out across a ramp, tyres 0..5 cm above the road (it sat 1.08 m up: the rear was inside a 1.8 m high end)
+async function OF_rampRun(){const W=ms=>new Promise(r=>setTimeout(r,ms));if(!await OF_pickRide('t_v7612_1'))return'❌ FAIL ramp-gap: cannot pick the ride';try{OF_reset();if(RO.ch)chAbort()}catch(e){}
+  if(!roamWarp(-850,1920,-1.6))return'❌ FAIL ramp-gap: warp refused';await W(1500);const p=OF_parkChk();if(!p||!p.tyre.length)return'❌ FAIL ramp-gap: no wheels measured';const lo=Math.min(...p.tyre),hi=Math.max(...p.tyre);
+  return(lo>=-.02&&hi<=.05?'✅ PASS ':'❌ FAIL ')+'START BETWEEN RAMPS · '+p.tyre.length+' tyres '+lo+'..'+hi+' m above the road (0..0.05)'}
 function OF_sinkGo(id,say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sinkRun(id).then(say);return'📍 HOT DROP EXIT · '+id+' · starting…'}
 async function OF_sitRun(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';const r=await OF_sitAll(3);return r.err?'❌ FAIL '+r.err:(r.bad?'❌ FAIL ':'✅ PASS ')+'SIT · '+r.n+' benches: '+(r.bad?JSON.stringify(r.fails):'legs on the seat, back to the backrest, facing away')}
 function OF_sitGo(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sitRun().then(say);return'📍 SIT · the 3 nearest benches · running…'}
