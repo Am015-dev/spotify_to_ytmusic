@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-14",
+  "game": "nebula-aces",
+  "title": "readable on every screen size",
+  "items": [
+   "Buttons, panels and the battle board no longer cover or crowd their text"
+  ],
+  "check": "Open the menu and the battle: all text sits inside its frame",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "crown-city-smash",
   "title": "Menus: clean and readable",
   "items": [
@@ -58,21 +73,6 @@
   "check": "",
   "scn": [],
   "ask": []
- },
- {
-  "date": "2026-10-14",
-  "game": "nebula-aces",
-  "title": "Cleaner menus",
-  "items": [
-   "Buttons, panels and the battle board no longer cover or crowd their text"
-  ],
-  "check": "Open the menu and the battle: all text sits inside its frame",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
  },
  {
   "date": "2026-10-14",
