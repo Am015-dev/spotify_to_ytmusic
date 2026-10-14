@@ -73,6 +73,12 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
   sessions can't see or stop other sessions.) Instead every worker STOPS ITSELF at 45 minutes or ~150k context: deploy what passed,
   commit + push, HANDOFF note, stop. The orchestrator checks all workers (get_session) at every owner message and archives finished ones.
 - Prove the approach on one game before touching others. Clarity before features.
+- **Reuse, don't build (owner, 14 Oct 2026: "why you continue to reinvent the wheel, most of the things you build are available,
+  just search and copy paste").** Before any new script, checker, page or helper:
+  - first search this repo: `find.sh`, games-src/scripts/, another game's version, Overdrive's tests (read only);
+  - then search for an existing open-source tool and use it: Playwright Test (scenarios, phone sizes, retries, reports),
+    axe-core (text size, contrast, tap targets), rembg (cut-outs).
+  New code only for the gap, and every report names what was reused. Briefs must say where to copy from.
 - **Read less (owner, 13 Oct 2026: 98% of tokens were workers re-reading their own long contexts):**
   - Start from the code map, not the files: `games-src/scripts/find.sh --maps`, then the game's `MODULES.md` and
     `find.sh <symbol|text> <game>`. Read only the line ranges you change (Read with offset/limit). Never read the built
