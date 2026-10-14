@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.23',date:'14 Oct 2026',items:[{t:'NEW',s:'Two-level city: 4th race track (viaduct over the inner loop, lake splash shortcut).'}]},
   {v:'v90m-beta.22',date:'14 Oct 2026',items:[{t:'CHANGED',s:'Athens loads faster again (road shelf cell bound).'}]},
   {v:'v90m-beta.21',date:'14 Oct 2026',items:[{t:'NEW',s:'Race menu: NEW LAGOON SPLASH builder track; Canyon Split loop no longer overlaps itself.'},{t:'CHANGED',s:'Athens loads faster (shelf height cache, ground dedupe).'}]},
   {v:'v90m-beta.20',date:'14 Oct 2026',items:[{t:'CHANGED',s:'Crash damage: traffic cars no longer burst when pushed; they only burst on a side-dash or a hit above 60 km/h.'},{t:'CHANGED',s:'District collectibles are now solid chunky LEGO bricks (2x2 with studs) that spin and bob.'}]},
