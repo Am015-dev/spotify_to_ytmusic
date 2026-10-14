@@ -69,7 +69,7 @@ function hotPage(){let s=fs.readFileSync(SRC+'/assets/shell_head.html','utf8');c
 
 // ---------- daemon ----------
 async function daemon(){
- if(!fs.existsSync(OUT+'/models.js')){console.log('first start: tools/build.sh hot (assets)');execSync('tools/build.sh hot',{cwd:ROOT,stdio:'inherit'})}
+ if(!fs.existsSync(OUT+'/models.js')||!fs.existsSync(OUT+'/models/xf.js')){console.log('first start: tools/build.sh hot (assets)');execSync('tools/build.sh hot',{cwd:ROOT,stdio:'inherit'})}
  const MT={'.js':'text/javascript','.json':'application/json','.html':'text/html','.mp3':'audio/mpeg','.png':'image/png','.jpg':'image/jpeg'};
  const {chromium}=require('/opt/node22/lib/node_modules/playwright');
  const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-accelerated-2d-canvas']});
