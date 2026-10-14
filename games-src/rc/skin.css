@@ -50,3 +50,4 @@ html.sk.ph .more .gxh-set button[aria-pressed=true]{background:#e0a64a;color:#1b
 html.sk .gx-drawer{background-color:#f1e6c8;background-clip:padding-box}
 html.sk .gx-drawer .gxh-set,html.sk .gx-drawer .gxh-set>span,html.sk .gx-drawer .gxh-set button{color:#2a1a0a;border-color:#6b4a1a}
 html.sk .gx-drawer .gxh-set button[aria-pressed=true]{background:#e0a64a;color:#1b1208}
+html.sk .gx-drawer a{color:#5a3200;text-decoration:underline}
