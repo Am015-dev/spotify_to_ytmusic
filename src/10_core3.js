@@ -55,7 +55,7 @@ const R=mul(20990);const rr=(a,b)=>a+R()*(b-a);
 const CK=['mho_season','mho_flags','mho_roam','mho_riv','mho_career','mho_prof','mho_story','mho_perks','mho_garage','mho_stars','mho_build','mho_packs','mho_gbown','mho_adapt','mho_disc','mho_log','mho_pstat','mho_city','mho_qpos','mho_enc','mho_sq'];let SLOT=1;try{SLOT=+(localStorage.getItem('mho_slot')||1)||1}catch(e){}
 // TQ (int-2, 2026-10-13): FAST TEST START. ?test=fra|ath[&car=<ride id>][&at=x,z][&go=<checklist ver/id>] skips intro, menu, story and tutorial and boots
 // straight into free roam on a throwaway save slot (9, wiped each load; the player's slots are untouched), minimal graphics; 98tq_test_quick.js does the rest.
-const TQ=(()=>{try{const q=new URLSearchParams(location.search),c=q.get('test');if(c!=='fra'&&c!=='ath')return null;const at=(q.get('at')||'').split(',').map(Number);
+const TQ=(()=>{try{const q=new URLSearchParams(location.search);{const rp=q.get('repro');if(rp)try{const R=JSON.parse(decodeURIComponent(escape(atob(rp.replace(/-/g,'+').replace(/_/g,'/')))));window.__repro=R;q.set('test',R.c);if(R.ride)q.set('car',R.ride);q.set('at',R.x+','+R.z);q.set('draw',q.get('draw')||'1')}catch(e){}}const c=q.get('test');if(c!=='fra'&&c!=='ath')return null;const at=(q.get('at')||'').split(',').map(Number);
  const o={c,car:q.get('car')||'',at:at.length===2&&at.every(Number.isFinite)?at:null,go:q.get('go')||'',nodraw:q.get('draw')==='0'};SLOT=9;
  for(let i=localStorage.length-1;i>=0;i--){const k=localStorage.key(i);if(k&&/@9$/.test(k))localStorage.removeItem(k)}
  const J=(k,v)=>localStorage.setItem(k+'@9',JSON.stringify(v));localStorage.setItem('mho_city@9',c);
