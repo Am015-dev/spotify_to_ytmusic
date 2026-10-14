@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-14",
+  "game": "hollowbough",
+  "title": "hollowbough: readable on every screen size",
+  "items": [
+   "Board tip bubble no longer covers cards and counts; the caption line says it"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "short-fuse",
   "title": "short-fuse: readable on every screen size",
   "items": [
@@ -137,21 +152,6 @@
   ],
   "ask": [
    null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "hollowbough",
-  "title": "Menu and board cleanup",
-  "items": [
-   "Board tip bubble no longer covers cards and counts; the caption line says it"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
    null
   ]
  },
