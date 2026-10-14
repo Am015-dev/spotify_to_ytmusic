@@ -5,8 +5,8 @@ const fs=require('fs'),path=require('path'),cp=require('child_process'),http=req
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');
 const ROOT=path.resolve(__dirname,'..','..'),PORT=+process.env.HOT_PORT||8890;
 const A=process.argv.slice(2),arg=(f,d)=>{const i=A.indexOf(f);return i<0?d:A[i+1]};
-const QUICK=A.includes('--quick');if(QUICK){for(const [k,v] of [['--city','fra,ath'],['--profiles','phone,desktop'],['--rides','2'],['--starts','250'],['--fam','builder,roam,spot,foot,race,camfit,props,footsurf'],['--foot-starts','12'],['--foot-rides','1'],['--spot-rides','1'],['--race-rides','1']])if(A.indexOf(k)<0)A.push(k,v)}
-const FULL=A.includes('--full');if(FULL){for(const [k,v] of [['--city','fra,ath'],['--rides','3'],['--starts','1000'],['--fam','builder,roam,spot,foot,race,camfit,props,footsurf'],['--foot-starts','24'],['--race-rides','1'],['--foot-rides','1'],['--spot-rides','1']])if(A.indexOf(k)<0)A.push(k,v)}
+const QUICK=A.includes('--quick');if(QUICK){for(const [k,v] of [['--city','fra,ath'],['--profiles','phone,desktop'],['--rides','2'],['--starts','250'],['--fam','builder,roam,spot,foot,race,camfit,props,footsurf,mission,garage,respawn'],['--foot-starts','12'],['--foot-rides','1'],['--spot-rides','1'],['--race-rides','1']])if(A.indexOf(k)<0)A.push(k,v)}
+const FULL=A.includes('--full');if(FULL){for(const [k,v] of [['--city','fra,ath'],['--rides','3'],['--starts','1000'],['--fam','builder,roam,spot,foot,race,camfit,props,footsurf,mission,garage,respawn'],['--foot-starts','24'],['--race-rides','1'],['--foot-rides','1'],['--spot-rides','1']])if(A.indexOf(k)<0)A.push(k,v)}
 const CITIES=(arg('--city','fra')).split(','),PROFS=(arg('--profiles','phone,portrait,desktop')).split(','),NR=+arg('--rides',12),FAMS=(arg('--fam','builder')).split(','),OUT=arg('--out','out/matrix'),SH=+arg('--shards',1);
 const T0=Date.now(),log=m=>console.error(((Date.now()-T0)/1000).toFixed(1)+'s '+m);
 const VP={phone:{width:852,height:393},portrait:{width:393,height:852},desktop:{width:1280,height:720}};
@@ -42,6 +42,9 @@ const up=()=>new Promise(r=>http.get('http://127.0.0.1:'+PORT+'/hot.html?probe=1
     if(st.length){for(let i=0;i<st.length;i+=50)await H(st.slice(i,i+50).map((q,j)=>'MX.roamCase('+J(pr)+','+J(rid)+','+J(q)+','+(i+j)+','+((i+j)%250===0)+')').join(';'))}
     if(spots.length&&ri<+arg('--spot-rides',3))await H(spots.map((q,j)=>'MX.roamCase('+J(pr)+','+J(rid)+','+J(q)+','+j+','+(j%6===0)+',"spot")').join(';'));
     if(fsel.length&&ri<+arg('--foot-rides',3)&&pr===PROFS[0])await H(fsel.map((q,j)=>'MX.footCase('+J(pr)+','+J(rid)+','+J(q)+','+j+')').join(';'));
+    if(FAMS.includes('mission')&&second&&ri<+arg('--mission-rides',1)){const mk=await H('MX.markStarts()');await H(mk.map((m,j)=>'MX.markCase('+J(pr)+','+J(rid)+','+J(m)+','+j+')').join(';'))}
+    if(FAMS.includes('garage')&&first)await H('MX.garageExit('+J(pr)+','+J(rid)+')');
+    if(FAMS.includes('respawn')&&second&&ri<+arg('--respawn-rides',2)){const rs=await H('MX.starts(40)');await H(rs.filter((_,i)=>i%2===0).map((q,j)=>'MX.respawnCase('+J(pr)+','+J(rid)+','+J(q)+','+j+')').join(';'))}
     if(tr.length&&ri<+arg('--race-rides',2))for(const t of tr)await H('MX.raceCase('+J(t)+','+J(pr)+','+J(rid)+')');
    }log(tag+' ride '+rid+' done')}
   // builder last: closing it leaves the page without the phone controls (the roam HUD is checked before)

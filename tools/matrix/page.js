@@ -60,7 +60,7 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
   for(const t of RF.taxi||[])add(t[0],t[1]);for(const g of RF.garages||[])add(g[2],g[3]);for(const l of RF.lm||[])add(l[2],l[3]);return o},
  roamCase(prof,rid,q,idx,prog,fam){const fails=[],t0=performance.now();
   try{
-   if(!roamWarp(q[0],q[1],q[2])&&!(MX.rst()&&roamWarp(q[0],q[1],q[2])))fails.push('roam-warp-refused');
+   if(q&&!roamWarp(q[0],q[1],q[2])&&!(MX.rst()&&roamWarp(q[0],q[1],q[2])))fails.push('roam-warp-refused');
    else{
     const touch=prof!=='desktop';TOUCH.on=touch;TOUCH.used=touch;TOUCH.gas=false;TOUCH.brake=false;for(const k in K)K[k]=false;
     if(prog)roamStep(1/120);/* the 10 ms world step is only needed for the gas test; pose/camera/tyre state needs none (same findings, 9x faster) */
@@ -79,7 +79,7 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
      const mv=(RO.x-x0)*fx+(RO.z-z0)*fz;if(!(mv>5))fails.push('roam-no-forward-progress');if(minV<-1)fails.push('roam-reverses')}
    }
   }catch(e){fails.push('roam-crash:'+String(e).slice(0,70))}
-  R.push({fam:fam||'roam',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length?q.map(x=>Math.round(x*10)/10).join(','):''),fails,det:fails.length&&fails.some(f=>/tyre/.test(f))?MX.last:undefined,ms:performance.now()-t0});return fails.length},
+  R.push({fam:fam||'roam',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length&&q?q.map(x=>Math.round(x*10)/10).join(','):''),fails,det:fails.length&&fails.some(f=>/tyre/.test(f))?MX.last:undefined,ms:performance.now()-t0});return fails.length},
  // HUD of the profile once per ride (free roam)
  roamHud(prof,rid){const fails=[];const touch=prof!=='desktop';
   try{if(state!=='roam'||!RO.on||document.body.classList.contains('bxOn')||getComputedStyle(document.getElementById('touch')).display==='none'){try{MX.bxEnd()}catch(e){}MX.frame(2)}
@@ -140,7 +140,7 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
    }
   }catch(e){fails.push('foot-crash:'+String(e).slice(0,70))}
   try{OF_reset()}catch(e){}
-  R.push({fam:'foot',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length?q.map(x=>Math.round(x*10)/10).join(','):''),fails,info,ms:performance.now()-t0});return fails.length},
+  R.push({fam:'foot',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length&&q?q.map(x=>Math.round(x*10)/10).join(','):''),fails,info,ms:performance.now()-t0});return fails.length},
 
  // ---------------- placed instances vs roads (props, trees, lite cover/fill) ----------------
  propScan(){const bad={},tot={},ex={};const chk=(t,x,z)=>{tot[t]=(tot[t]||0)+1;const q=cityAt(x,z);if(!q)return;const hw=(q.S.r.w||8)/2;if(q.d<hw-.5){bad[t]=(bad[t]||0)+1;(ex[t]=ex[t]||[]).length<2&&ex[t].push([Math.round(x),Math.round(z),Math.round(q.d*10)/10,q.S.r.name||q.S.r.id])}};
@@ -155,6 +155,24 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
    if(CAM.P&&Math.abs(CAM.P.L/P.L-1)>.12)fails.push('camfit-stale-profile');
    if(Math.abs(d/want-1)>.35)fails.push('camfit-distance-not-matching-ride')}}catch(e){fails.push('camfit-crash:'+String(e).slice(0,60))}
   R.push({fam:'camfit',tag:rid,fails,ms:0});return fails.length},
+
+ // ---------------- mission/quest markers, garage exit, respawn ----------------
+ markStarts(){const o=[];for(const m of RO.marks||[])if(isFinite(m.x)&&isFinite(m.z))o.push([m.x,m.z,isFinite(m.h)?m.h:0,m.kind,m.id]);return o},
+ markCase(prof,rid,m,idx){const f0=R.length;const q=[m[0],m[1],m[2]];MX.roamCase(prof,rid,q,idx,false,'mission:'+m[3]);const r=R[R.length-1];
+  try{const g=groundAt(m[0],m[1],99);if(!isFinite(g)||g<-50)r.fails.push('mission-marker-no-ground');if(SC_hit(m[0],m[1],g))r.fails.push('mission-marker-inside-wall');const c=cityAt(m[0],m[1]);if(!c||c.d>(c.S.r.w||8)/2+200)r.fails.push('mission-marker-far-from-any-road')}catch(e){r.fails.push('mission-crash:'+String(e).slice(0,50))}
+  r.tag=m[3]+':'+m[4]+'|'+prof+'|'+rid;return r.fails.length},
+ garageExit(prof,rid){const f0=R.length;MX.roamCase(prof,rid,null,0,false,'garage-exit');const r=R[R.length-1];r.tag='exit|'+prof+'|'+rid;
+  return r.fails.length},
+ respawnCase(prof,rid,q,idx){const fails=[],t0=performance.now();let info={};
+  try{if(!roamWarp(q[0],q[1],q[2])&&!(MX.rst()&&roamWarp(q[0],q[1],q[2])))fails.push('respawn-warp-refused');else{
+   TOUCH.on=prof!=='desktop';roamStep(1/60);const x0=RO.x,z0=RO.z;roamWreck();if(!RO.wk)fails.push('respawn-wreck-not-started');
+   let n=0;while(RO.wk&&n<300){roamStep(1/30);n++}info.t=+(n/30).toFixed(2);
+   if(RO.wk)fails.push('respawn-never-rebuilds');else{if(n/30>3.5)fails.push('respawn-slower-than-3.5s');if((RO.hp??100)<99)fails.push('respawn-hp-not-restored');
+    if(Math.hypot(RO.x-x0,RO.z-z0)>5)fails.push('respawn-moved-away');if(SC_hit(RO.x,RO.z,RO.y))fails.push('respawn-inside-wall');
+    for(let i=0;i<4;i++)roamPose(pl,.25);const pk=OF_parkChk();if(!pk||pk.tyre.some(g=>!(Math.abs(g)<=.05)))fails.push('respawn-tyre-gap>5cm');
+    camSnap=true;roamCam(1/60);const c=camera.position,fx=Math.sin(RO.h),fz=Math.cos(RO.h),dx=c.x-RO.x,dz=c.z-RO.z,h=Math.hypot(dx,dz);if(!(h>2&&(dx*fx+dz*fz)/h<-.5))fails.push('respawn-camera-behind')}}
+  }catch(e){fails.push('respawn-crash:'+String(e).slice(0,60))}
+  R.push({fam:'respawn',tag:idx+'|'+prof+'|'+rid,fails,info,ms:performance.now()-t0});return fails.length},
 
 };
 window.MX=MX;return 'MX ready'})()

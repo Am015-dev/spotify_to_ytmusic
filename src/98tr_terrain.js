@@ -61,7 +61,14 @@ function TRN_go(kind,say){if(!TERR.on)return'📍 PENDING · terr-1 hills are OF
   if(kind==='base'){const o=TRN_base();return'📍 BUILDING BASES · '+o.n+' buildings · '+o.bad+' float above the ground (max '+o.max+' m) (need 0)'+(o.bad?' ❌':' ✅')}
   if(kind==='flush'){const o=TRN_flush(),j=TRN_junc(),ok=!o.buried&&!o.float&&j.max<=.1;return'📍 ROAD PIECES FLUSH · '+o.n+' thin road pieces: '+o.buried+' sunk, '+o.float+' floating (need 0'+(o.ex[0]?', e.g. ('+o.ex[0][0]+','+o.ex[0][1]+')':'')+') · '+j.n+' junctions planar within '+j.max+' m'+(j.worst?' (worst '+j.worst.join(',')+')':'')+' (need ≤0.1)'+(ok?' ✅':' ❌')}
   if(kind==='tyre')return TRN_tyre(say);if(kind==='fps')return TRN_fps(say)}catch(e){return'📍 terrain test error '+e.message+' ❌'}}
-window.__trn={TRN,go:TRN_go,grade:TRN_grade,edge:TRN_edge,ramp:TRN_ramp,base:TRN_base,relief:TRN_relief,roads:TRN_roads,gap:TRN_gapNow};
+// terr-3: slipway tops meet the bank (3 of 4 Frankfurt slipways ended in a +4.7..+15 m cliff): the ramp mesh's top edge (3 points across) vs the
+// ground 0.6 m inland, and the drive surface (roamTerr) step across the top edge; info: ramp grade. Athens has no slipways (no river) → n 0.
+function TRN_slip(){const S=typeof SLIPS!=='undefined'?SLIPS:[],o={n:S.length,max:0,worst:null,L:[]};for(const s of S){const yT=s.yT??0;let gap=0;
+  for(const c of[-8,0,8]){const x=s.x+s.tx*c,z=s.z+s.tz*c;gap=Math.max(gap,Math.abs(yT-groundY(x-s.ix*.6,z-s.iz*.6)),Math.abs(roamTerr(x+s.ix*.3,z+s.iz*.3,99).g-roamTerr(x-s.ix*.3,z-s.iz*.3,99).g))}
+  const r={x:Math.round(s.x),z:Math.round(s.z),top:+yT.toFixed(2),gap:+gap.toFixed(3),grade:Math.round((yT-HWY)/30*100)};o.L.push(r);if(gap>=o.max){o.max=+gap.toFixed(3);o.worst=r;o.s=s}}return o}
+function TRN_slipGo(){const o=TRN_slip();if(!o.n)return'📍 SLIPWAYS · '+CID+': no slipways here (no river) ✅';const s=o.s;roamWarp(s.x+s.ix*8,s.z+s.iz*8,Math.atan2(-s.ix,-s.iz));RO.v=0;
+  return'📍 SLIPWAY TOPS · '+o.n+' slipways · top-to-bank gap '+o.L.map(r=>r.gap+' m ('+r.x+','+r.z+' top '+r.top+' m, '+r.grade+'%)').join(' · ')+' · worst '+o.max+' m (need ≤0.1; you stand on it, facing the bank)'+(o.max<=.1?' ✅':' ❌')}
+window.__trn={TRN,go:TRN_go,slip:TRN_slip,grade:TRN_grade,edge:TRN_edge,ramp:TRN_ramp,base:TRN_base,relief:TRN_relief,roads:TRN_roads,gap:TRN_gapNow};
 // slope colours on the open land (outer ground heightfields with a col callback): grass → dry grass (15-30 %) → dirt (30-55 %) → rock (>55 %);
 // Athens also dries out with height (macchia above ~120 m)
 const TRN_C={dry:new THREE.Color(CID==='fra'?'#b3a85e':'#c2ae72'),dirt:new THREE.Color('#9a7a52'),rock:new THREE.Color('#8e8a82')};
