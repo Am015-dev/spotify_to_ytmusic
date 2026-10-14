@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-14",
+  "game": "sands-of-qamar",
+  "title": "Every panel and the board readable",
+  "items": [
+   "Menu and campaign text now sits inside the painted frames"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "rampart-and-vine",
   "title": "one big Play button, one-line tips, UI-bar checks",
   "items": [],
@@ -49,21 +64,6 @@
   "check": "",
   "scn": [],
   "ask": []
- },
- {
-  "date": "2026-10-14",
-  "game": "sands-of-qamar",
-  "title": "Readable on every screen size",
-  "items": [
-   "Menu and campaign text now sits inside the painted frames"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
  },
  {
   "date": "2026-10-14",

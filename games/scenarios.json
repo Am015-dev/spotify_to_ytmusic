@@ -627,6 +627,14 @@
    "mut": 0
   },
   {
+   "id": "sq-uibar",
+   "name": "UI bar: bar, line, panels, text sizes",
+   "ask": "Is every screen clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "sq-zoom",
    "name": "Djinn card list",
    "ask": "Are the djinn cards readable?",
