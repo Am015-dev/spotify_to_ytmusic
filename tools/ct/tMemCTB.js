@@ -1,0 +1,6 @@
+// tMemCTB (art-5): LEGO-set buildings ON (?ctb=1) vs OFF (?ctb=0): boot ms, JS heap after GC, GPU geometries/textures, CTB stats. node tools/ct/tMemCTB.js <page url> <fra|ath>
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,C]=process.argv.slice(2);
+(async()=>{const R={};for(const q of['ctb=0','ctb=1']){const b=await chromium.launch({args:['--js-flags=--expose-gc','--enable-precise-memory-info','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const p=await b.newPage({viewport:{width:852,height:393}});const t=Date.now();await p.goto(BASE+(BASE.includes('?')?'&':'?')+'test='+C+'&draw=0&'+q);await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:240000});
+ R[q]=await p.evaluate(()=>{gc();gc();const m=__ct.r().info.memory;const s=window.__ctb?__ctb.CTB.st:{};return{heapMB:+(performance.memory.usedJSHeapSize/1048576).toFixed(0),geo:m.geometries,tex:m.textures,sets:s.sets||0,skip:s.skip||0,wait:__ctb.CTB.wait}});R[q].boot=Date.now()-t;await b.close()}
+ const a=R['ctb=0'],o=R['ctb=1'],dh=o.heapMB-a.heapMB,db=(o.boot-a.boot)/1000;console.log(C,'off',JSON.stringify(a),'on',JSON.stringify(o),`${dh<=60&&db<=8?'PASS':'FAIL'} mem ctb ${C}: heap +${dh} MB (≤ 60), boot ${db>=0?'+':''}${db.toFixed(1)} s (≤ 8)`)})();
