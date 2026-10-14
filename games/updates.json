@@ -1,6 +1,15 @@
 [
  {
   "date": "2026-10-14",
+  "game": "rampart-and-vine",
+  "title": "readable on every screen size",
+  "items": [],
+  "check": "",
+  "scn": [],
+  "ask": []
+ },
+ {
+  "date": "2026-10-14",
   "game": "crown-city-smash",
   "title": "Menus: clean and readable",
   "items": [
