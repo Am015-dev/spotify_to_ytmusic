@@ -410,7 +410,7 @@ function BX_tick(now){const dt=BX.fast?1/60:Math.min(.05,(now-(BX.last||now))/10
 // ---------------------------------------------------------------- input (keys + touch buttons; gas is on by default on touch)
 addEventListener('keydown',e=>{if(!BX.on)return;BX.keys[e.code]=1;if(BX.mode==='drive'&&e.code==='KeyR')BX_respawn('key');if(e.code==='Escape')BX.mode==='drive'?BX_driveStop():BX_close();e.stopImmediatePropagation()},true);
 addEventListener('keyup',e=>{if(!BX.on)return;BX.keys[e.code]=0;e.stopImmediatePropagation()},true);
-function BX_input(){const K=BX.keys,T=BX.tc||{};const l=K.ArrowLeft||K.KeyA||T.l,r=K.ArrowRight||K.KeyD||T.r,kb=K.ArrowUp||K.KeyW,brk=K.ArrowDown||K.KeyS||K.Space||T.b;
+function BX_input(){if(BX.auto&&BX.v)return BX_autoInp(BX.auto.W,BX.auto.st);const K=BX.keys,T=BX.tc||{};const l=K.ArrowLeft||K.KeyA||T.l,r=K.ArrowRight||K.KeyD||T.r,kb=K.ArrowUp||K.KeyW,brk=K.ArrowDown||K.KeyS||K.Space||T.b;
  return{s:(r?1:0)-(l?1:0),g:(kb||BX.touch)&&!brk?1:0,b:brk?1:0}}
 // ---------------------------------------------------------------- UI
 function BX_css(){if($('#bxCss'))return;const s=document.createElement('style');s.id='bxCss';s.textContent=`
@@ -612,8 +612,58 @@ function BX_data(){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+
 // the bxT check: track data + the 3 s input check (GO -> GAS 3 s -> >=15 m forward, never backward)
 for(const k of['bx-t-cliff','bx-t-city','bx-t-canyon','bx-t-lagoon']){const T=BX_TESTS[k];T.chk=()=>{const m=BX.m,D=BX_data(),i=[['>=15 m forward in 3 s',m.fwd3>=15,`forward ${(m.fwd3||0).toFixed(0)} m in 3 s`],['0 backward',!(m.back0>0),`backward ${(m.back0||0).toFixed(1)} s`]];
  const ok=D.ok&&i.every(x=>x[1]);return{ok,fails:[...D.fails,...i.filter(x=>!x[1]).map(x=>x[0])],msg:D.msg+' | '+i.map(x=>(x[1]?'✔ ':'✘ ')+x[2]).join(', ')}}}
+// ---------------------------------------------------------------- trk-4 OPEN TRACKS (Alex 2026-10-14: "very limited spaces to drive around, no freedom compared to 2K Drive tracks ...
+// unplayable tracks, no buttons"). Acceptance tests (checklist ver 'trk4', 📍 GO = BX_test). Every demo track is measured from its built pieces + terrain;
+// the AI lap runs the real car physics (BX_step) in fast time, no rendering. Reference traits: docs/TRACKS_REF.md
+const BX_HW=BXRW+.5; // outer half-width of a deck (asphalt + kerb)
+function BX_demoNames(){return Object.keys(BX_DEMOS).filter(k=>!BX_DEMOS[k].hide)}
+function BX_eachDemo(f){const cur={log:BX.log},cn=BX.name,dr=BX.mode==='drive',R=[];if(dr)BX_driveStop();try{BX_raceClear()}catch(e){}
+ for(const k of BX_demoNames()){BX_load(BX_DEMOS[k],k);R.push([k,f(k)])}BX_load(cur,cn);if(dr)BX_driveStart();return R}
+// the lap as piece samples (same walk as __bx.route): ch[k] = branch at the k-th SPLIT
+function BX_lap(ch=[]){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set(),splits=0;
+ while(pc&&!seen.has(pc.id)){seen.add(pc.id);const last=out.length?out[out.length-1].s.p:null,b=pc.def.in?(last?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-last.x,S[0].p.z-last.z)]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;
+  if(pc.S.length>1&&!pc.def.in)splits++;for(const s of pc.S[b])out.push({s,pc});const e=pc.ex[Math.min(b,pc.ex.length-1)],E=BX_fr(e).o;pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).map(p=>[p,p.S[0][0].p.distanceTo(E)]).filter(x=>x[1]<60).sort((a,c)=>a[1]-c[1]).map(x=>x[0])[0]||null} // a water splash leaves a gap: the next piece is the nearest unseen start (like route())
+ out.splits=splits;out.closed=!!(out.length&&out[0].s.p.distanceTo(out[out.length-1].s.p)<6);return out}
+// drivable metres beyond a deck edge (side sg = -1 left, +1 right), up to 30 m: no rail, ground (or water: boat) within 0.6 m per metre of the last point, no building/rock/tree/pillar
+const bxRail=pc=>pc.rail!=null?pc.rail:!(pc.def.in||pc.def.p.length>1)&&BX_RAIL.length>0;
+function BX_side(s,pc,sg){if(bxRail(pc))return 0;let y=s.p.y+s.S.y*sg*BX_HW,w=0;const eff=h=>h<-.7?0:h;
+ for(let d=1;d<=30;d++){const o=BX_HW+d,x=s.p.x+s.S.x*sg*o,z=s.p.z+s.S.z*sg*o,h=eff(BX_h(x,z));if(Math.abs(h-y)>(d===1?.8:.6))break;
+  if((BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+1&&Math.abs(b.z-z)<b.d/2+1)||(BX.rk||[]).some(r=>Math.hypot(r[0]-x,r[1]-z)<r[3]*1.2+1)||(BX.tr||[]).some(t=>Math.hypot(t[0]-x,t[1]-z)<1.8)||(BX.pil||[]).some(p=>Math.hypot(p[0]-x,p[1]-z)<2&&h<p[3]))break;y=h;w=d}return w}
+function BX_openData(){const R=[];for(const ch of[[0,0,0],[1,1,1]]){const S=BX_lap(ch);let wide=0,open=0,n=0;const W=[];for(let i=0;i<S.length;i+=2){const{s,pc}=S[i];if(s.U.y<.6)continue;n++;const l=BX_side(s,pc,-1),r=BX_side(s,pc,1),w=2*BX_HW+l+r;W.push(w);if(w>=24)wide++;if(Math.max(l,r)>=8)open++}
+ R.push({wide:wide/Math.max(1,n),open:open/Math.max(1,n),splits:S.splits,closed:S.closed,wmin:Math.min(...W)})}return R}
+// fast-time AI lap: the real car physics at 120 Hz with an autopilot on the lap samples (gas on, steer to a point ~1 s ahead, brake on sharp turns)
+function BX_autoInp(W,st){const V=BX.v,n=W.length;let bi=st.i,bd=1e9;for(let k=-6;k<90;k++){const j=((st.i+k)%n+n)%n,d=W[j].distanceToSquared(V.p);if(d<bd){bd=d;bi=j}}
+ if(bd>900)W.forEach((p,j)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=j}});st.i=bi;const sp=V.v.length(),tw=W[(bi+Math.max(5,Math.round(sp/1.6)))%n],dx=tw.x-V.p.x,dz=tw.z-V.p.z,
+ S=bxV().crossVectors(V.F,V.U),a=Math.atan2(S.x*dx+S.z*dz,V.F.x*dx+V.F.z*dz);return{s:bxCl(a*3,-1,1),g:1,b:Math.abs(a)>.9&&sp>16?1:0}}
+function BX_sim(ch=[],maxT=220){try{BX_raceClear()}catch(e){}BX_driveStart();const V=BX.v,m=BX.m,W=BX_lap(ch).map(o=>o.s.p),st={i:0},dt=1/120;let slow=0,slowMax=0,t0=performance.now();
+ for(let i=0;i<maxT*120&&W.length;i++){const inp=BX.inp=BX_autoInp(W,st);BX_step(dt,inp);if(i%4===0)BX_farCheck(dt*4);const sp=V.v.length();slow=sp<2?slow+dt:0;slowMax=Math.max(slowMax,slow);if(m.laps>=1)break}
+ const r={laps:m.laps,t:+m.t.toFixed(1),lap:m.lapT[0]||0,slowMax:+slowMax.toFixed(2),resp:m.resp,why:m.respWhy.join(','),turned:m.turned||0,air1:(m.lands||[]).filter(l=>l.air>=1).length,airs:(m.lands||[]).map(l=>l.air),ms:Math.round(performance.now()-t0)};BX_driveStop();return r}
+const bxRes=C=>({ok:C.every(c=>c[1]),fails:C.filter(c=>!c[1]).map(c=>c[0]),msg:C.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(', ')});
+// phone layout of a set of buttons: inside the screen, >= 40 px, the button itself is under its centre (nothing covers it), no two overlap
+function BX_btnChk(ids){const W=innerWidth,H=innerHeight,B=ids.map(id=>[id,$('#'+id)]),bad=[];const R=B.map(([id,e])=>[id,e&&e.getBoundingClientRect()]);
+ for(const[id,r]of R){if(!r||!r.width){bad.push(id+' missing');continue}if(r.left<0||r.top<0||r.right>W+.5||r.bottom>H+.5)bad.push(id+' off-screen');if(Math.min(r.width,r.height)<40)bad.push(id+' small '+Math.round(Math.min(r.width,r.height)));
+  const e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);if(!e||!(e.id===id||e.closest('#'+id)))bad.push(id+' covered'+(e?' by '+(e.id||e.tagName):''))}
+ for(let a=0;a<R.length;a++)for(let b=a+1;b<R.length;b++){const p=R[a][1],q=R[b][1];if(p&&q&&p.width&&q.width&&p.left<q.right-1&&q.left<p.right-1&&p.top<q.bottom-1&&q.top<p.bottom-1)bad.push(R[a][0]+'×'+R[b][0])}
+ return{bad,msg:`${ids.length-bad.filter(x=>!x.includes('×')).length}/${ids.length} buttons OK in ${W}x${H}${bad.length?' ('+bad.slice(0,4).join('; ')+')':''}`}}
+const BX_DRIVE_BTNS=['bxL','bxR','bxB','bxG','bxBo','bxPz','bxRsp'];
+Object.assign(BX_TESTS,{
+ 'bx-o-width':{n:'WIDE ROADS: all tracks',log:()=>BX_DEMOS['CLIFF RUN'].log,chk:()=>{const R=BX_eachDemo(()=>BX_openData());
+  return bxRes(R.map(([k,D])=>[k,D.every(d=>d.wide>=.9),`${k}: ${D.map(d=>Math.round(d.wide*100)+'%').join('/')} of the lap ≥ 24 m drivable (min ${Math.round(Math.min(...D.map(d=>d.wmin)))} m)`]))}},
+ 'bx-o-routes':{n:'ROUTE CHOICES: all tracks',log:()=>BX_DEMOS['CANYON SPLIT'].log,chk:()=>{const R=BX_eachDemo(()=>BX_openData());
+  return bxRes(R.map(([k,D])=>[k,D[0].splits>=2&&D.every(d=>d.closed),`${k}: ${D[0].splits} route choices, both ways ${D.every(d=>d.closed)?'close the lap':'do NOT close'}`]))}},
+ 'bx-o-open':{n:'OPEN SPACE: all tracks',log:()=>BX_DEMOS['LAGOON SPLASH'].log,chk:()=>{const R=BX_eachDemo(()=>BX_openData());
+  return bxRes(R.map(([k,D])=>[k,D.every(d=>d.open>=.3),`${k}: ${D.map(d=>Math.round(d.open*100)+'%').join('/')} of the lap has ≥ 8 m open ground beside the road`]))}},
+ 'bx-o-jumps':{n:'BIG JUMPS: all tracks',log:()=>BX_DEMOS['CLIFF RUN'].log,drive:1,auto:1,chk:()=>{const R=BX_eachDemo(()=>BX_sim([0,0,0]));
+  return bxRes(R.map(([k,r])=>[k,r.air1>=3,`${k}: ${r.air1} jumps ≥ 1 s air (${r.airs.join('/')||'none'})`]))}},
+ 'bx-o-ai':{n:'AI LAP: all tracks',log:()=>BX_DEMOS['CANYON SPLIT'].log,drive:1,auto:1,chk:()=>{const R=BX_eachDemo(()=>[BX_sim([0,0,0]),BX_sim([1,1,1])]);
+  return bxRes(R.map(([k,rr])=>[k,rr.every(r=>r.laps>=1&&r.slowMax<=2&&r.resp===0&&r.turned===0),`${k}: `+rr.map(r=>`lap ${r.laps?r.lap.toFixed(0)+' s':'NOT done ('+r.t+' s)'}, stuck max ${r.slowMax} s, respawns ${r.resp}${r.why?' '+r.why:''}, turned ${r.turned}`).join(' | ')]))}},
+ 'bx-o-btn':{n:'RACE BUTTONS: CLIFF RUN',log:()=>BX_DEMOS['CLIFF RUN'].log,drive:1,race:1,chk:()=>{const c=BX_btnChk(BX_DRIVE_BTNS);return bxRes([['race buttons',BX.mode==='drive'&&!c.bad.length,c.msg]])}},
+ 'bx-o-ui':{n:'BUILDER BUTTONS',log:()=>BX_DEMOS['CLIFF RUN'].log,chk:()=>{if(BX.mode!=='build')return bxRes([['build mode',false,'not in build mode']]);const ids=[...document.querySelectorAll('#bxTop button,#bxAct button')].map(e=>e.id),c=BX_btnChk(ids),
+  H=innerHeight,W=innerWidth,pal=[...document.querySelectorAll('#bxPal button')].filter(e=>{const r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=H&&r.left>=0&&r.right<=W&&r.height>=40}).length;
+  return bxRes([['top + side buttons',!c.bad.length,c.msg],['piece buttons',pal>=4,`${pal} piece buttons fully on screen`]])}}});
 function BX_test(id){const T=BX_TESTS[id];if(!T)return;const ck=$('#odChk');if(ck)ck.hidden=true;if(!BX.on)BX_open();if(BX.mode==='drive')BX_driveStop();
- BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();if(T.drive)BX_driveStart();if(T.race)BX_raceSetup();return T.n}
+ BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();BX.auto=null;if(T.drive)BX_driveStart();if(T.race)BX_raceSetup();
+ if(T.auto)BX.auto={W:BX_lap([0,0,0]).map(o=>o.s.p),st:{i:0}};return T.n} // trk-4: auto = the AI drives the lap you watch (the check runs the same autopilot in fast time)
 window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||BX.testId].chk(),tests:()=>Object.keys(BX_TESTS),off:id=>BX_TESTS[id||BX.testId].off||null,
  proj:(x,y,z)=>{const v=bxV(x,y,z).project(BX.cam);return[(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z<1?1:0]},
  cell:(i,j,l)=>{const p=bxV(BXO+(i+.5)*BXC,l==null?BX_h(BXO+(i+.5)*BXC,BXO+(j+.5)*BXC):l*BXH,BXO+(j+.5)*BXC).project(BX.cam);return[(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]},
