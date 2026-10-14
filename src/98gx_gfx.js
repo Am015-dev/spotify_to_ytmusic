@@ -24,7 +24,7 @@ function GFX_light(){if(!GFX.on)return;const day=GFX_isDay();GFX.day=day;
 for(const m of GFX.gm)m.roughness=.88}   // applyMoodMaterials resets the road's roughness on every mood change
 // 98_garage_driver forces bloom.threshold=1 before every roam render: by GFX day the threshold reads 2.2 whatever is written
 {let thr=bloom.threshold;Object.defineProperty(bloom,'threshold',{configurable:true,get(){return GFX.on&&GFX.day&&RO.on?2.2:thr},set(v){thr=v}})}
-function GFX_off(){GFX_carLock();GFX.U.value=1;for(const m of GFX.gm){const o=m.userData.gfx0;if(o)m.roughness=o[0]}GFX.gm=[];for(const m of GFX.pm){const o=m.userData.gfx0;if(o){m.roughness=o[0];m.envMapIntensity=o[1]}m.envMap=null;m.needsUpdate=true}GFX.pm=[];GFX.mats=new WeakSet();GFX.n=0;
+function GFX_off(){if(GFX.gtao)GFX.gtao.enabled=false;GFX_carLock();GFX.U.value=1;for(const m of GFX.gm){const o=m.userData.gfx0;if(o)m.roughness=o[0]}GFX.gm=[];for(const m of GFX.pm){const o=m.userData.gfx0;if(o){m.roughness=o[0];m.envMapIntensity=o[1]}m.envMap=null;m.needsUpdate=true}GFX.pm=[];GFX.mats=new WeakSet();GFX.n=0;
  if(HUB.grp)HUB.grp.traverse(o=>{if(o.userData.gfxCast){o.castShadow=false;o.userData.gfxCast=0}});for(const[m,k]of GFX.keyOrig)m.key[2]=k;GFX.keyOrig.clear();renderer.toneMapping=THREE.NeutralToneMapping}
 // shadow map: fitted ±55 m (high, 2048, soft) / ±40 m (med, 1024) around the player; LK_roamLook only allowed it on high
 function GFX_shadow(){if(!GFX.on||!HUB.grp||!HUB.grp.visible)return;const t=GFX_tier();GFX.tier=t;
@@ -50,9 +50,21 @@ function GFX_plastic(root){let k=0;root.traverse(o=>{if(!o.isMesh)return;if(!o.c
     GFX.mats.add(m);m.userData.gfx0=[m.roughness,m.envMapIntensity];m.roughness=.88;GFX_gspec(m);GFX.gm.push(m)}return}
   for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m))continue;if(GFX.gm.includes(m))continue;GFX.mats.add(m);
   if(!m.isMeshStandardMaterial||m.transparent||m.metalness>.3)continue;m.userData.gfx0=[m.roughness,m.envMapIntensity];
-  m.roughness=Math.min(m.roughness,m.isMeshPhysicalMaterial?.25:.4)*.85+.06;m.envMapIntensity=1.25;GFX.pm.push(m);k++}});GFX.n+=k;
+  m.roughness=Math.min(m.roughness,m.isMeshPhysicalMaterial?.25:.4)*.85+.06;m.envMapIntensity=.9;GFX.pm.push(m);k++}});GFX.n+=k;
  // three uses scene.environmentIntensity for every material without its own envMap: give plastic the scene env explicitly so its own intensity counts
- const env=scene.environment;if(env)for(const m of GFX.pm)if(m.envMap!==env){if(!m.envMap)m.needsUpdate=true;m.envMap=env}return k}
+ const env=GFX_room();if(env)for(const m of GFX.pm)if(m.envMap!==env){if(!m.envMap)m.needsUpdate=true;m.envMap=env}return k}
+// stock three.js RoomEnvironment through PMREM (three r164 addon, as in the three.js examples): soft studio panels = the white glints of LEGO
+// product shots. Built once (~30 ms), shared by all plastic.
+function GFX_room(){if(GFX.room)return GFX.room;try{const pm=new THREE.PMREMGenerator(renderer);GFX.room=pm.fromScene(new RoomEnvironment(),.04).texture;pm.dispose()}catch(e){GFX.room=scene.environment}return GFX.room}
+// stock GTAOPass (three r164 addon) after the RenderPass, PC high tier by day only: contact shadows where bricks meet the street and in corners.
+// It re-renders scene normals/depth, so it costs one extra geometry pass: never on med/phone.
+function GFX_ao(){const want=GFX.on&&GFX.day&&GFX.tier==='high'&&state==='roam';if(!want&&!GFX.gtao)return;
+ if(!GFX.gtao){const w=innerWidth,h=innerHeight;const p=new GTAOPass(scene,camera,w,h);p.output=GTAOPass.OUTPUT.Default;p.blendIntensity=.7;
+  p.updateGtaoMaterial({radius:1.2,distanceExponent:1.5,thickness:1.5,scale:1,samples:12});p.updatePdMaterial({lumaPhi:10,depthPhi:2,normalPhi:3,radius:6,rings:2,samples:12});
+  composer.insertPass(p,1);GFX.gtao=p;resize()}
+ GFX.gtao.enabled=want}
+function GFX_aoSize(){if(GFX.gtao){const pr=renderer.getPixelRatio();GFX.gtao.setSize(innerWidth*pr,innerHeight*pr)}}
+resize=(f=>function(){f.apply(this,arguments);GFX_aoSize()})(resize);addEventListener('resize',GFX_aoSize);   // the window listener holds the unwrapped resize
 // the player car is rebuilt (LEGO model, garage, ride swap) after LK_shadow flagged it, so it lost castShadow: re-flag every pass.
 // It does not receive: self-shadowing small bricks gave red/black acne speckle on the body.
 // ART6_noCast (97_art.js, v86v) locks castShadow to a getter returning false on the player car: unlock it (delete the accessor), re-lock on GFX off.
@@ -62,7 +74,7 @@ function GFX_carLock(){if(pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.userData.gfxUnl)
 // Tall ones (> 2.5 m) cast again; ground/road merges stay off (they would only add acne and shadow-pass cost).
 function GFX_cast(){if(!HUB.grp)return;let k=0;HUB.grp.traverse(o=>{if(!o.isMesh||o.castShadow||o.userData.gfxNo||!o.geometry||!o.visible)return;const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();
   if(g.boundingBox.max.y-g.boundingBox.min.y<2.5){o.userData.gfxNo=1;return}o.castShadow=true;o.receiveShadow=true;o.userData.gfxCast=1;k++});GFX.cast=(GFX.cast||0)+k}
-function GFX_frame(){if(!GFX.on||state!=='roam')return;const now=performance.now();if(now<GFX.t)return;GFX.t=now+2500;GFX.fc=(GFX.fc||0)+1;GFX_shadow();GFX_car();if(RO.shadowOn)GFX_cast();try{GFX_plastic(scene)}catch(e){}}
+function GFX_frame(){if(!GFX.on||state!=='roam')return;const now=performance.now();if(now<GFX.t)return;GFX.t=now+2500;GFX.fc=(GFX.fc||0)+1;GFX_shadow();GFX_car();if(RO.shadowOn)GFX_cast();try{GFX_ao()}catch(e){GFX.aoErr=String(e)}try{GFX_plastic(scene)}catch(e){}}
 ART_light=(f=>function(){const r=f.apply(this,arguments);try{GFX_light()}catch(e){}return r})(ART_light);
 LK_roamLook=(f=>function(){const r=f.apply(this,arguments);try{GFX.t=0;GFX_frame()}catch(e){}return r})(LK_roamLook);
 roamStep=(f=>function(dt){f(dt);GFX_frame()})(roamStep);
@@ -73,4 +85,4 @@ function GFX_shChk(){const sh=moonL.shadow;if(!sh.map||!pl)return null;const W=s
  const c=new THREE.Vector3(RO.x,RO.y+1,RO.z),s=new THREE.Vector3(RO.x+Math.cos(RO.h)*12,RO.y,RO.z-Math.sin(RO.h)*12);return{car:rd(c),road:rd(s)}}
 window.__gfx={render:()=>composer.render(),get GFX(){return GFX},set:GFX_set,shChk:GFX_shChk,state(){const sh=moonL.shadow;return{on:GFX.on,day:GFX.day,tier:GFX.tier,tone:renderer.toneMapping===THREE.ACESFilmicToneMapping?'ACES':renderer.toneMapping,
  exp:renderer.toneMappingExposure,shadowMap:renderer.shadowMap.enabled,sunCast:moonL.castShadow,map:sh.mapSize.x,ext:sh.camera.right,sunEl:+(Math.asin(moonL.position.clone().sub(moonL.target.position).normalize().y)*57.3).toFixed(1),
- hemi:hemi.intensity,env:scene.environmentIntensity,plEnv:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.envMapIntensity,0)/GFX.pm.length).toFixed(2):0,plRough:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.roughness,0)/GFX.pm.length).toFixed(2):0,plMetal:GFX.pm.length?+Math.max(...GFX.pm.map(m=>m.metalness)).toFixed(2):0,plastic:GFX.n,cast:GFX.cast||0,fc:GFX.fc,carCast:pl&&pl.mesh?(()=>{let c=0,n=0;pl.mesh.traverse(o=>{if(o.isMesh){n++;if(o.castShadow)c++}});return c+'/'+n})():'no pl'}}};
+ hemi:hemi.intensity,env:scene.environmentIntensity,plEnv:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.envMapIntensity,0)/GFX.pm.length).toFixed(2):0,plRough:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.roughness,0)/GFX.pm.length).toFixed(2):0,plMetal:GFX.pm.length?+Math.max(...GFX.pm.map(m=>m.metalness)).toFixed(2):0,plastic:GFX.n,ao:!!(GFX.gtao&&GFX.gtao.enabled),aoErr:GFX.aoErr||'',cast:GFX.cast||0,fc:GFX.fc,carCast:pl&&pl.mesh?(()=>{let c=0,n=0;pl.mesh.traverse(o=>{if(o.isMesh){n++;if(o.castShadow)c++}});return c+'/'+n})():'no pl'}}};
