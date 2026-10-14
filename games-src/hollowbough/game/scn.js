@@ -109,4 +109,46 @@
       skin
     ]
   });
+
+  // UI-BAR rules 1, 4-8 that the shared menu test cannot see (14 Oct 2026)
+  var uvis = function (e) { if (e.closest && e.closest('.gx-drawer:not(.on)')) return false; var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 0 && r.height > 0 && c.visibility !== 'hidden' && c.display !== 'none'; };
+  var ulim = function () { return innerWidth >= 1024 ? 16 : 13; };
+  var minFont = function (root, lim) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || !uvis(e) || ![].some.call(e.childNodes, function (n) { return n.nodeType === 3 && /\S/.test(n.textContent); })) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < lim - .01 && !e.closest('svg')) bad = (e.className.baseVal || e.className || e.tagName) + ' ' + f + 'px "' + e.textContent.trim().slice(0, 14) + '"'; }); return bad || true; };
+  GXS.add({
+    id: 'ui-bar', name: 'UI bar: top bar, panels, text size', ask: 'Few buttons, one line, readable text?', seed: 5, when: booted,
+    setup: function () { return table(5); },
+    checks: [
+      { kind: 'fn', name: 'rule 4: top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), uvis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'rule 5: one instruction line of 8 words or fewer', fn: function () { var t = (document.getElementById('prompt') || {}).textContent || ''; return words(t) <= 8 || words(t) + ' words'; } },
+      { kind: 'fn', name: 'rule 1: board text at least 13/16 px', fn: function () { return minFont('#bd', ulim()); } },
+      { kind: 'fn', name: 'rule 8: images keep their natural aspect', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (m) { if (bad || !uvis(m) || !m.naturalWidth) return; var a = m.naturalWidth / m.naturalHeight, b = m.clientWidth / m.clientHeight, cs = getComputedStyle(m).objectFit; if (cs === 'fill' && Math.abs(a / b - 1) > .04) bad = (m.src || '').slice(-30); }); return bad || true; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-start', name: 'UI bar: start screen', ask: 'One big Play button, simple options?', seed: 5, when: booted,
+    setup: function () { try { GX.close(); } catch (e) { } UI.started = false; showStart(); return new Promise(function (r) { setTimeout(r, 600); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 7: exactly one primary button', fn: function () { var n = [].filter.call(document.querySelectorAll('#start .sbtn.big'), uvis).length; return n === 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'rule 7: no character roster, no step list', fn: function () { return !document.querySelector('#start .sgrid, #start ol, #start .seat') || 'roster or list visible'; } },
+      { kind: 'fn', name: 'rule 7: options are one style (chips)', fn: function () { var o = [].filter.call(document.querySelectorAll('#start .opts button'), uvis); return (o.length && o.every(function (b) { return b.classList.contains('chipb'); })) || 'mixed option buttons'; } },
+      { kind: 'fn', name: 'rule 1: start text at least 13/16 px', fn: function () { return minFont('#start', ulim()); } },
+      { kind: 'fn', name: 'rule 7: Continue only with a save', fn: function () { var c = document.querySelector('#start [data-a="loadsave"]'); var has = typeof hasSave === 'function' && hasSave(); return (!!c === !!has) || 'Continue shown without a save'; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-log', name: 'UI bar: diary panel', ask: 'Is the diary panel readable?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { document.querySelector('[data-gx="logd"]').click(); return new Promise(function (r) { setTimeout(r, 800); }); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 1: diary text at least 13/16 px', fn: function () { return minFont('#logd', ulim()); } },
+      { kind: 'fn', name: 'rule 6: diary panel fits its content (no tall empty parchment)', fn: function () { var b = document.querySelector('#logd .gx-drawer-body'); return b.scrollHeight - b.clientHeight <= 2 || 'panel scrolls'; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-rivals', name: 'UI bar: rivals panel', ask: 'Is the rivals panel readable?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { document.querySelector('[data-gx="rivald"]').click(); return new Promise(function (r) { setTimeout(r, 800); }); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 1: rivals text at least 13/16 px', fn: function () { return minFont('#rivald', ulim()); } },
+      { kind: 'fn', name: 'rule 6: rivals panel fits its content (no tall empty parchment)', fn: function () { var b = document.querySelector('#rivald .gx-drawer-body'); return b.scrollHeight - b.clientHeight <= 2 || 'panel scrolls'; } }
+    ]
+  });
 })();

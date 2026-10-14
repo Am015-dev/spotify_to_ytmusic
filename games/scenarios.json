@@ -295,6 +295,38 @@
    "mut": 0
   },
   {
+   "id": "fa-title",
+   "name": "Start screen: one Play, one Quick game row",
+   "ask": "Is the start screen clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-ui",
+   "name": "Top bar, dock, log and briefing",
+   "ask": "Are the panels short and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-log",
+   "name": "Log panel",
+   "ask": "Is the log short and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-brief",
+   "name": "Briefing panel",
+   "ask": "Is the briefing short and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -356,6 +388,38 @@
    "id": "hb-art",
    "name": "Painted art wired",
    "ask": "Are the resource icons painted?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-bar",
+   "name": "UI bar: top bar, panels, text size",
+   "ask": "Few buttons, one line, readable text?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-start",
+   "name": "UI bar: start screen",
+   "ask": "One big Play button, simple options?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "ui-log",
+   "name": "UI bar: diary panel",
+   "ask": "Is the diary panel readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-rivals",
+   "name": "UI bar: rivals panel",
+   "ask": "Is the rivals panel readable?",
    "sizes": "all",
    "group": "UI",
    "mut": 0
