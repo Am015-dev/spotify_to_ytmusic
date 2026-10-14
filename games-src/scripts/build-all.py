@@ -136,10 +136,13 @@ def main():
     out.mkdir(parents=True, exist_ok=True)
     status, why = {}, {}
 
-    for s in slugs:  # 1. build + stage
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=3) as ex:   # each game builds in its own folder: run the builds side by side, stage serially below
+        runs = dict(zip(slugs, ex.map(lambda x: subprocess.run(GAMES[x][1], shell=True, cwd=SRC / GAMES[x][0], capture_output=True, text=True), slugs)))
+    for s in slugs:  # 1. stage the builds
         d, cmd, o = GAMES[s]
         cwd = SRC / d
-        r = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True)
+        r = runs[s]
         built = (cwd / o).resolve()
         if r.returncode != 0:
             status[s], why[s] = "FAIL", "build error: " + (r.stderr.strip().splitlines() or r.stdout.strip().splitlines() or ["?"])[-1][:120]
