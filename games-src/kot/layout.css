@@ -154,3 +154,6 @@ header.gx-bar [data-gx="dr-menu"]{font-size:1.15rem;min-width:44px}
 @media (max-width:560px){header.gx-bar h1{display:none}header.gx-bar{gap:4px}}
 @media (max-width:560px){header.gx-bar{gap:3px;padding-left:6px}header.gx-bar .gx-ibtn.btn{font-size:.72rem;padding:.1rem .3rem;min-width:36px;border-width:2.5px}}
 .dlg.paper table.stats{width:100%;font-size:.85rem}@media (max-width:560px){.dlg.paper table.stats{font-size:.72rem}.dlg.paper table.stats th:nth-child(n+7),.dlg.paper table.stats td:nth-child(n+7){display:none}}
+/* menu test v2: bare text sits 8px+ inside the column of the framed rows (monster picker, buttons) */
+.dlg.start>h2,.dlg.start>p,.dlg.start>details.custom{padding-inline:10px}
+details.custom:not([open])>*:not(summary){display:none}

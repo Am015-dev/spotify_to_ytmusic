@@ -40,7 +40,7 @@
     for (var i = 0; i < list.length; i++) {
       var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
       var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
-      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+      out.push(infl(core(r, k), (k < CORE ? 2 : 4) + ((cfg && cfg.avoidPad) || 0)));   // avoidPad: a game keeps the bubble's pointer off small text too
     }
     return out;
   }

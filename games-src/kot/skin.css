@@ -112,3 +112,8 @@ html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
 html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
 html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
 html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
+/* menu test v2: text starts inside the painted frames (border-width + padding >= border-image-width on every side) */
+html.sk #modal .dlg:not(.paper){border-width:16px;border-image-width:16px;padding:.6rem 12px}
+html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.big,html.sk .btn.primary,html.sk .btn.camp,html.sk .btn.on{border-width:8px 10px;border-image-width:8px 10px;padding:0 2px}
+html.sk .btn.mini,html.sk .pcard .btn,html.sk .pc .btn,html.sk .bm .btn,html.sk #buymini h3 .btn,html.sk #youbox .btn,html.sk .btn.buy{border-width:6px 9px;border-image-width:6px 9px;padding:0 1px}
+html.sk .btn.mrow{border-width:8px;border-image-width:8px;padding:0 4px}
