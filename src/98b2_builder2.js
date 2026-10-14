@@ -277,7 +277,7 @@ function BX_car(){if(BX.car)return BX.car;const root=new THREE.Group();let mesh=
  const vbox=o=>{const B=new THREE.Box3();o.updateMatrixWorld(true);o.traverseVisible(q=>{if(q.isMesh){q.geometry.computeBoundingBox();B.union(q.geometry.boundingBox.clone().applyMatrix4(q.matrixWorld))}});return B};
  const box=vbox(mesh),sz=box.getSize(bxV()),k=4.3/Math.max(sz.x,sz.z,.1);mesh.scale.multiplyScalar(k);
  const b2=vbox(mesh);mesh.position.y-=b2.min.y;mesh.position.x-=(b2.min.x+b2.max.x)/2;mesh.position.z-=(b2.min.z+b2.max.z)/2;
- BX.cyaw=sz.x>sz.z?Math.PI/2:0;const inner=new THREE.Group();inner.add(mesh);inner.rotation.y=BX.cyaw;root.add(inner);
+ BX.cyaw=sz.x>sz.z?Math.PI/2:0;const inner=new THREE.Group();inner.add(mesh);inner.rotation.y=BX.cyaw+Math.PI;root.add(inner); // rides are built with their FRONT on local -z (roamPose basis(right,up,-fwd)); the car root faces +z (Alex beta.22: drawn backwards)
  mesh.traverse(o=>{if(o.isMesh)o.castShadow=true});BX.carM=mesh;
  const sh=new THREE.Mesh(new THREE.CircleGeometry(1.7,20),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.22,depthWrite:false}));sh.rotation.x=-Math.PI/2;BX.shM=sh;
  BX.car=root;return root}
