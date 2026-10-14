@@ -1,0 +1,23 @@
+{
+"phone": {
+"look": [],
+"axe": [
+[
+"hb-hand-chips-phone.json",
+"target-size",
+"button[data-zoom=\"card:108\"]",
+""
+]
+],
+"axe_pages": [
+"hb-art-phone.json",
+"hb-board-phone.json",
+"hb-hand-chips-phone.json",
+"hb-handtoggle-phone.json",
+"hb-help-phone.json",
+"hb-zoom-phone.json",
+"menu-phone.json",
+"story-scene-phone.json"
+]
+}
+}
