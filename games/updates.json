@@ -10,6 +10,21 @@
  },
  {
   "date": "2026-10-14",
+  "game": "sands-of-qamar",
+  "title": "Menus tidied",
+  "items": [
+   "Menu and campaign text now sits inside the painted frames"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "sunglaze",
   "title": "Menus tidied",
   "items": [
