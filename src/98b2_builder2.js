@@ -9,7 +9,8 @@
 // Drawn with the main renderer while BX.on (frame() is wrapped; the game loop is idle meanwhile). Probe: window.__bx.
 const BX={on:false,ui:0,tab:'track',sel:'st',tool:'raise',world:'valley',log:[],pcs:[],cur:{i:20,j:22,l:2,r:0},hl:-1,mode:'build',
  cam:null,sc:null,v:null,m:null,keys:{},t:0,acc:0,camB:{x:0,z:0,d:72,yaw:3.5,pit:0.52},name:'MY TRACK',fast:/[?&](bx)?fast=1/.test(location.search),tfast:/[?&]bxfast=1/.test(location.search)};
-const BXC=8,BXH=2,BXN=56,BX_OFF=8,BXW=BXN*BXC,BXR=4,BXTN=BXW/BXR+1,BXO=-BXW/2,BXG=16,BXRW=6.5; // trk-2: 56 cells = 448 m (was 40 = 320 m; old 40-grid cells are +BX_OFF, same metres). road 13 m + kerbs = 14 m wide (trk-1: LEGO 2K Drive roads are wide; 8 m with walls = constant scraping)
+const BX_OPEN=!(typeof location!=='undefined'&&/[?&]bxopen=0/.test(location.search)); // trk-4 OPEN tracks (Alex 2026-10-14 "very limited spaces to drive around, no freedom"): 24 m decks, no rails except on high decks, open verges, 20° kickers. ?bxopen=0 = the trk-3 corridor
+const BXC=8,BXH=2,BXN=56,BX_OFF=8,BXW=BXN*BXC,BXR=4,BXTN=BXW/BXR+1,BXO=-BXW/2,BXG=16,BXRW=BX_OPEN?11.5:6.5,BX_HW=BXRW+.5; // trk-2: 56 cells = 448 m (was 40 = 320 m; old 40-grid cells are +BX_OFF, same metres). road 13 m + kerbs = 14 m wide (trk-1: LEGO 2K Drive roads are wide; 8 m with walls = constant scraping)
 const BXF=[[0,1],[-1,0],[0,-1],[1,0]];
 const bxV=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z),bxSS=t=>t*t*(3-2*t),bxCl=(v,a,b)=>v<a?a:v>b?b:v;
 BX.th=new Float32Array(BXTN*BXTN);
@@ -21,7 +22,7 @@ function BX_h(x,z){const fx=(x-BXO)/BXR,fz=(z-BXO)/BXR,a=Math.floor(fx),b=Math.f
 function BX_hTri(x,z){const fx=(x-BXO)/BXR,fz=(z-BXO)/BXR,a=Math.floor(fx),b=Math.floor(fz),u=fx-a,v=fz-b,h00=BX_hv(a,b),h10=BX_hv(a+1,b),h01=BX_hv(a,b+1),h11=BX_hv(a+1,b+1);
  return u+v<=1?h00+u*(h10-h00)+v*(h01-h00):h11+(1-u)*(h01-h11)+(1-v)*(h10-h11)}
 // trk-3: road points (both edges + across the deck) where the drawn terrain comes up through the road surface
-function BX_terrClear(){let bad=0,n=0,worst=0,at=null;for(const{s}of BX.samp||[])for(let l=-7;l<=7;l+=.5){const x=s.p.x+s.S.x*l,z=s.p.z+s.S.z*l,sf=s.p.y+s.S.y*l,d=BX_hTri(x,z)-sf;n++;if(d>-.03){bad++;if(d>worst){worst=d;at=[+x.toFixed(1),+z.toFixed(1),+l.toFixed(1)]}}}return{bad,n,worst:+worst.toFixed(2),at}}
+function BX_terrClear(){let bad=0,n=0,worst=0,at=null;for(const{s}of BX.samp||[])for(let l=-BX_HW;l<=BX_HW;l+=.5){const x=s.p.x+s.S.x*l,z=s.p.z+s.S.z*l,sf=s.p.y+s.S.y*l,d=BX_hTri(x,z)-sf;n++;if(d>-.03){bad++;if(d>worst){worst=d;at=[+x.toFixed(1),+z.toFixed(1),+l.toFixed(1)]}}}return{bad,n,worst:+worst.toFixed(2),at}}
 function BX_tn(x,z,o){return (o||bxV()).set(BX_h(x-1,z)-BX_h(x+1,z),2,BX_h(x,z-1)-BX_h(x,z+1)).normalize()}
 const bxBowl=(x,z,cx,cz,r,deep)=>{const d=Math.hypot(x-cx,z-cz);return d<r?deep+(2-deep+1)*(d/r)**2:99};
 const BX_WORLDS={
@@ -33,6 +34,14 @@ const BX_WORLDS={
   return Math.min(Math.max(2+.8*Math.sin(x/23)*Math.cos(z/19),m),bxBowl(x,z,-95,-85,45,-4))}},
  canyon:{n:'CANYON',f:(x,z)=>{const cz=48*Math.sin(x/46),d=Math.abs(z-cz)*Math.cos(Math.atan(48/46*Math.cos(x/46))),pl=18+1.2*Math.sin(x/17)*Math.cos(z/21);
   if(d>32)return pl;if(d>22)return 2+(pl-2)*bxSS((d-22)/10);return d<7?2-5*bxSS(1-d/7):2}},
+ // trk-5 GRAND TOUR (flagship): 4 biomes on one map. South = stadium town (grass), east = red-rock CANYON plateau (11.4 m, cliffs, a dry gorge, mesas),
+ // north = FARM meadow with a river from the north edge into a lake, west = LAGOON (sand, turquoise water, a lighthouse islet). Zones: FS_zone (98fs_flagship.js)
+ gp:{n:'GRAND TOUR',f:(x,z)=>{let h=3.4+.7*Math.sin(x/31)*Math.cos(z/27)+.45*Math.sin((x+z)/53);
+  const dx=Math.max(46+26*bxSS(bxCl((z-16)/18,0,1))-x,x-240,0),dz=Math.max(-96-z,z-84,0),dd=Math.hypot(dx,dz);if(dd<10)h=Math.max(h,h+(11.4+.25*Math.sin(x/9)*Math.cos(z/11)-h)*(1-bxSS(dd/10)));
+  if(z>40&&x>100&&x<156){const g=Math.abs(x-128);if(g<11)h=Math.min(h,g<6?1.2:1.2+(h-1.2)*bxSS((g-6)/5))}
+  for(const[mx,mz,r,mh]of[[138,20,10,30],[205,-75,12,26],[196,150,15,24],[112,-204,9,18],[166,-160,13,30],[124,-118,7,16]]){const d=Math.hypot(x-mx,z-mz);if(d<r+5)h=Math.max(h,d<r?mh-(d/r)**4*2:mh*(1-bxSS((d-r)/5)))}
+  if(z>110&&x<20){const rx=-80+7*Math.sin(z/30),dr=Math.abs(x-rx);if(dr<12)h=Math.min(h,dr<6?-2.6:-2.6+(h+2.6)*bxSS((dr-6)/6))}
+  h=Math.min(h,bxBowl(x,z,-70,100,22,-3),bxBowl(x,z,-185,52,56,-7));const li=Math.hypot(x+205,z-52);if(li<9)h=Math.max(h,3.2-li*li/40);return h}},
  city:{n:'CITY',f:(x,z)=>Math.min(2,bxBowl(x,z,-180,bxCl(z,-60,40),24,-4))},
  islands:{n:'ISLANDS',f:(x,z)=>{const b=(cx,cz,r,h)=>{const d=Math.hypot(x-cx,z-cz);return d<r?-5+(h+5)*bxSS(1-d/r):-5};return Math.max(b(-10,0,85,4),b(-95,85,45,12),b(100,90,50,7),b(90,-100,40,16))}}
 };
@@ -49,11 +58,15 @@ function BX_brush(tool,x,z,y){const R=tool==='water'?14:12,a0=Math.max(0,Math.fl
   T[k]=bxCl(T[k],-8,60)}}
 // pieces sit IN the ground: terrain under a piece is cut to just below the deck, and lifted to it where the gap is small (embankment)
 // a road below the ground cuts a flat 9 m shoulder, then ~39° walls (dev-2: the old near-vertical 16 m cut walls let the car drive INTO the rock)
-function BX_carve(pc){const T=BX.th,R0=9,SL=.8,R=R0+24/SL;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18-7.4*Math.abs(s.S.y); // banked deck: below its LOW edge (trk-3: the edge is 7 m out; 4.2 left the inside of every banked corner up to 1.3 m under the terrain)
+function BX_carve(pc){const T=BX.th,R0=BX_OPEN?BX_HW+8:9,SL=BX_OPEN?.4:.8,R=R0+24/SL,FL=BX_OPEN?BX_HW+8:7; // trk-4 open: an 8 m flat verge beside the deck, then 22° banks (drivable), not 39° cut walls
+for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y0=s.p.y-.18-(BX_HW+.4)*Math.abs(s.S.y); // banked deck: below its LOW edge (trk-3: the edge is 7 m out; 4.2 left the inside of every banked corner up to 1.3 m under the terrain)
  const a0=Math.floor((s.p.x-R-BXO)/BXR),a1=Math.ceil((s.p.x+R-BXO)/BXR),b0=Math.floor((s.p.z-R-BXO)/BXR),b1=Math.ceil((s.p.z+R-BXO)/BXR);
- for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){const dx=BXO+a*BXR-s.p.x,dz=BXO+b*BXR-s.p.z;
-  const dd=Math.hypot(dx,dz);if(dd>R)continue;const k=b*BXTN+a;if(dd<R0){if(T[k]>y||(dd<7&&y-T[k]<2.2))T[k]=y}else{const cap=y+(dd-R0)*SL;if(T[k]>cap)T[k]=cap}}}}
+ for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){const dx=BXO+a*BXR-s.p.x,dz=BXO+b*BXR-s.p.z;const y=BX_OPEN?s.p.y-.28+s.S.y*bxCl(dx*s.S.x+dz*s.S.z,-BX_HW-.4,BX_HW+.4):y0; /* trk-4: each verge at its own edge height (a banked corner gets a banked embankment, not a 5 m step on its high side) */
+  const dd=Math.hypot(dx,dz);if(dd>R)continue;const k=b*BXTN+a,fill=BX_OPEN?y-T[k]<6&&T[k]>-.7:false; // trk-4 open: low ground (not water, not a canyon > 6 m deep) becomes an earth bank with the 8 m verge on top
+  if(dd<R0){if(T[k]>y||(dd<FL&&y-T[k]<2.2)||fill)T[k]=y}else{const cap=y+(dd-R0)*SL;if(T[k]>cap)T[k]=cap;else if(fill){const lo=y-(dd-R0)*SL;if(T[k]<lo)T[k]=lo}}}}}
 // ---------------------------------------------------------------- pieces (local: x = right, y = up, z = forward; origin = entry edge middle)
+const BX_KJ=BX_OPEN?1.5:.9,BX_BK=BX_OPEN?.5:1; // BX_BK: banks at half angle on 24 m decks (a 0.42 rad bank lifted the outer edge 5 m over the inner one)
+ // trk-4: kicker lip 1.5 m = 20.6° (>= 1 s air from 85 km/h); trk-1's 0.9 m (12.7°) gave 0.7-0.9 s
 const bxRamp=t=>{const b=.25,c=1/(1-b);return t<b?c*t*t/(2*b):t>1-b?1-c*(1-t)*(1-t)/(2*b):c*(t-b/2)};
 const bxCurve=(R,s)=>t=>{const a=t*Math.PI/2;return[s*(R-R*Math.cos(a)),0,R*Math.sin(a)]};
 const BX_P={
@@ -74,23 +87,26 @@ const BX_P={
  sd1:{n:'STEEP DOWN',v:'side',p:[t=>[0,-8*bxSS(t),16*t]],ex:[[0,2,-4,0]],k:12},
  kk:{n:'JUMP',v:'side',p:[t=>[0,2.2*t*t,8*t]],ex:[[0,4,0,0]],k:8,jump:1},
  // kicker: 0.9 m lip at 12.7°, the road goes on flat behind it (land on it): ~0.6 s air at 55 km/h, ~1.1 s at 120 km/h
- kj:{n:'KICKER',v:'side',p:[t=>[0,.9*t*t,8*t]],ex:[[0,1,0,0]],k:8,jump:1},
- bl:{n:'BANK L',v:'top',p:[bxCurve(20,-1)],bank:t=>-.62*Math.sin(Math.PI*t),ex:[[-3,2,0,-1]],k:18},
- br:{n:'BANK R',v:'top',p:[bxCurve(20,1)],bank:t=>.62*Math.sin(Math.PI*t),ex:[[3,2,0,1]],k:18},
+ kj:{n:'KICKER',v:'side',p:[t=>[0,BX_KJ*t*t,8*t]],ex:[[0,1,0,0]],k:8,jump:1},
+ bl:{n:'BANK L',v:'top',p:[bxCurve(20,-1)],bank:t=>-BX_BK*.62*Math.sin(Math.PI*t),ex:[[-3,2,0,-1]],k:18},
+ br:{n:'BANK R',v:'top',p:[bxCurve(20,1)],bank:t=>BX_BK*.62*Math.sin(Math.PI*t),ex:[[3,2,0,1]],k:18},
  // wide banked corners (radius 36 m: full speed, no braking)
- wbl:{n:'WIDE BANK L',v:'top',p:[bxCurve(36,-1)],bank:t=>-.42*Math.sin(Math.PI*t),ex:[[-5,4,0,-1]],k:30},
- wbr:{n:'WIDE BANK R',v:'top',p:[bxCurve(36,1)],bank:t=>.42*Math.sin(Math.PI*t),ex:[[5,4,0,1]],k:30},
+ wbl:{n:'WIDE BANK L',v:'top',p:[bxCurve(36,-1)],bank:t=>-BX_BK*.42*Math.sin(Math.PI*t),ex:[[-5,4,0,-1]],k:30},
+ wbr:{n:'WIDE BANK R',v:'top',p:[bxCurve(36,1)],bank:t=>BX_BK*.42*Math.sin(Math.PI*t),ex:[[5,4,0,1]],k:30},
  wl:{n:'WALL L',v:'top',p:[bxCurve(20,-1)],bank:t=>-1.2*Math.sin(Math.PI*t)**.8,ex:[[-3,2,0,-1]],k:22,stick:1},
  wr:{n:'WALL R',v:'top',p:[bxCurve(20,1)],bank:t=>1.2*Math.sin(Math.PI*t)**.8,ex:[[3,2,0,1]],k:22,stick:1},
  lp:{n:'LOOP',v:'side',p:[t=>{const a=2*Math.PI*t;return[8*bxSS(t),7*(1-Math.cos(a)),16*t+7*Math.sin(a)]}],ex:[[1,2,0,0]],k:64,stick:1},
  fk:{n:'SPLIT',v:'top',p:[t=>[-8*bxSS(t),0,16*t],t=>[8*bxSS(t),0,16*t]],ex:[[-1,2,0,0],[1,2,0,0]],k:8},
  // merge: the two SPLIT routes join again (entry = the left route's end; the right route ends 2 cells to the right: in)
  mg:{n:'MERGE',v:'top',p:[t=>[8*bxSS(t),0,16*t],t=>[16-8*bxSS(t),0,16*t]],ex:[[1,2,0,0]],in:[[2,0]],k:8},
+ // trk-4 wide split/merge: two lanes 32 m apart (8 m of open ground between two 24 m decks), 3 cells long; the 2nd route choice on every demo
+ fk2:{n:'WIDE SPLIT',v:'top',p:[t=>[-16*bxSS(t),0,24*t],t=>[16*bxSS(t),0,24*t]],ex:[[-2,3,0,0],[2,3,0,0]],k:12},
+ mg2:{n:'WIDE MERGE',v:'top',p:[t=>[16*bxSS(t),0,24*t],t=>[32-16*bxSS(t),0,24*t]],ex:[[2,3,0,0]],in:[[4,0]],k:12},
  bo:{n:'BOOST',v:'top',p:[t=>[0,0,8*t]],ex:[[0,1,0,0]],k:3,boost:1},
  cp:{n:'CHECKPOINT',v:'top',p:[t=>[0,0,8*t]],ex:[[0,1,0,0]],k:3,cp:1},
  sf:{n:'START',v:'top',p:[t=>[0,0,8*t]],ex:[[0,1,0,0]],k:3,start:1}
 };
-const BX_PAL=['sf','st','cl','cr','wbl','wbr','up','dn','lu','ld','su','sd','kj','kk','lp','bl','br','wl','wr','fk','mg','bo','cp'];
+const BX_PAL=['sf','st','cl','cr','wbl','wbr','up','dn','lu','ld','su','sd','kj','kk','lp','bl','br','wl','wr','fk','mg','fk2','mg2','bo','cp'];
 function BX_fr(c){const f=BXF[c.r&3],rv=BXF[(c.r+1)&3],cx=BXO+(c.i+.5)*BXC,cz=BXO+(c.j+.5)*BXC;
  return{o:bxV(cx-f[0]*BXC/2,c.l*BXH,cz-f[1]*BXC/2),F:bxV(f[0],0,f[1]),R:bxV(rv[0],0,rv[1])}}
 function BX_exit(c,e){const f=BXF[c.r&3],rv=BXF[(c.r+1)&3];return{i:c.i+e[0]*rv[0]+e[1]*f[0],j:c.j+e[0]*rv[1]+e[1]*f[1],l:c.l+e[2],r:(c.r+e[3]+4)&3}}
@@ -118,16 +134,16 @@ function BX_mats(){if(BX.M)return BX.M;const M=BX.M={};
  return M}
 const bxCol=c=>new THREE.Color(c);
 // piece mesh: road top (textured) + body (kerbs, sides, bottom; vertex colours). Collision uses these same meshes.
-const BX_PROF=[[-6.5,0,-6.5,.14,1,0,'k'],[-6.5,.14,-7,.14,0,1,'k'],[-7,.14,-7,-.8,-1,0,'s'],[-7,-.8,7,-.8,0,-1,'b'],[7,-.8,7,.14,1,0,'s'],[7,.14,6.5,.14,0,1,'k'],[6.5,.14,6.5,0,-1,0,'k']];
+const BX_PROF=[[-BXRW,0,-BXRW,.14,1,0,'k'],[-BXRW,.14,-BX_HW,.14,0,1,'k'],[-BX_HW,.14,-BX_HW,-.8,-1,0,'s'],[-BX_HW,-.8,BX_HW,-.8,0,-1,'b'],[BX_HW,-.8,BX_HW,.14,1,0,'s'],[BX_HW,.14,BXRW,.14,0,1,'k'],[BXRW,.14,BXRW,0,-1,0,'k']];
 // side barriers (Alex: "frustrated because of the multiple spawning"): a 1 m kerb-coloured wall on both edges keeps the car on the deck; SPLIT/MERGE have none (their lanes cross)
-const BX_RAIL=[[-7,.14,-7,1.4,-1,0,'k'],[-7,1.4,-6.55,1.4,0,1,'k'],[-6.55,1.4,-6.55,.14,1,0,'k'],[6.55,.14,6.55,1.4,-1,0,'k'],[6.55,1.4,7,1.4,0,1,'k'],[7,1.4,7,.14,1,0,'k']];
-function BX_geo(S,def){const rp=[],rn=[],ru=[],ri=[],bp=[],bc=[],bi=[],tmp=bxV(),cS=bxCol(def.boost?'#ff8a00':def.cp?'#0055bf':def.start?'#202020':'#a0a5a9'),cB=bxCol('#6d7276');
+const BX_RAIL=[[-BX_HW,.14,-BX_HW,1.4,-1,0,'k'],[-BX_HW,1.4,-BX_HW+.45,1.4,0,1,'k'],[-BX_HW+.45,1.4,-BX_HW+.45,.14,1,0,'k'],[BX_HW-.45,.14,BX_HW-.45,1.4,-1,0,'k'],[BX_HW-.45,1.4,BX_HW,1.4,0,1,'k'],[BX_HW,1.4,BX_HW,.14,1,0,'k']];
+function BX_geo(S,def,rail){if(rail==null)rail=!(def.in||def.p.length>1);const rp=[],rn=[],ru=[],ri=[],bp=[],bc=[],bi=[],tmp=bxV(),cS=bxCol(def.boost?'#ff8a00':def.cp?'#0055bf':def.start?'#202020':'#a0a5a9'),cB=bxCol('#6d7276');
  for(let k=0;k<S.length;k++){const s=S[k];for(const x of[-BXRW,BXRW]){tmp.copy(s.p).addScaledVector(s.S,x);rp.push(tmp.x,tmp.y,tmp.z);rn.push(s.U.x,s.U.y,s.U.z);ru.push(x<0?0:1,s.d/8)}
   if(k){const a=(k-1)*2;ri.push(a,a+2,a+1,a+1,a+2,a+3)}}
  // fix winding of the road so its front face points along U
  {const A=bxV().fromArray(rp,0),B=bxV().fromArray(rp,6),C=bxV().fromArray(rp,3),n=bxV().crossVectors(B.clone().sub(A),C.clone().sub(A));if(n.dot(S[0].U)<0)for(let i=0;i<ri.length;i+=3){const t=ri[i+1];ri[i+1]=ri[i+2];ri[i+2]=t}}
  let vb=0;const kerbC=(k)=>((S[k].d/2|0)%2?bxCol('#c91a09'):bxCol('#f4f4f4'));
- for(const e of def.in||def.p.length>1?BX_PROF:[...BX_PROF,...BX_RAIL]){for(let k=1;k<S.length;k++){const q=[];for(const kk of[k-1,k])for(const[x,y]of[[e[0],e[1]],[e[2],e[3]]]){const s=S[kk];tmp.copy(s.p).addScaledVector(s.S,x).addScaledVector(s.U,y);q.push(tmp.clone())}
+ for(const e of rail?[...BX_PROF,...BX_RAIL]:BX_PROF){for(let k=1;k<S.length;k++){const q=[];for(const kk of[k-1,k])for(const[x,y]of[[e[0],e[1]],[e[2],e[3]]]){const s=S[kk];tmp.copy(s.p).addScaledVector(s.S,x).addScaledVector(s.U,y);q.push(tmp.clone())}
    const nE=S[k].S.clone().multiplyScalar(e[4]).addScaledVector(S[k].U,e[5]),n=bxV().crossVectors(q[2].clone().sub(q[0]),q[1].clone().sub(q[0]));
    const c=e[6]==='k'?kerbC(k):e[6]==='s'?cS:cB;for(const v of q){bp.push(v.x,v.y,v.z);bc.push(c.r,c.g,c.b)}
    if(n.dot(nE)>=0)bi.push(vb,vb+2,vb+1,vb+1,vb+2,vb+3);else bi.push(vb,vb+1,vb+2,vb+1,vb+3,vb+2);vb+=4}}
@@ -148,20 +164,26 @@ function BX_undo(){if(!BX.log.length)return;const a=BX.log.pop();if(a[0]==='w'&&
 function BX_hashAll(){BX.hash=new Map();BX.samp=[];for(const pc of BX.pcs){if(pc.dead)continue;for(const S of pc.S)for(const s of S){BX.samp.push({s,pc});
  const ci=Math.floor(s.p.x/BXC),cj=Math.floor(s.p.z/BXC);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const k=(ci+a)*4096+(cj+b);let L=BX.hash.get(k);if(!L)BX.hash.set(k,L=new Set());L.add(pc)}}}}
 function BX_near(x,z){const L=BX.hash&&BX.hash.get(Math.floor(x/BXC)*4096+Math.floor(z/BXC));return L?[...L]:[]}
-function BX_pcMesh(pc){const M=BX_mats();for(const S of pc.S){const[g1,g2]=BX_geo(S,pc.def),a=new THREE.Mesh(g1,M.road),b=new THREE.Mesh(g2,M.body);
+// trk-4: with BX_OPEN a piece only gets side rails where its deck stands > 3 m over the ground (a bridge / viaduct) or it is a loop/wall; everywhere else the verge is open
+function BX_railOf(pc){if(pc.def.in||pc.def.p.length>1)return false;if(!BX_OPEN||pc.def.stick)return true;let hi=false;for(const S of pc.S)for(const s of S){const g=BX_h(s.p.x,s.p.z);if(g<-.7?s.p.y>6:s.p.y-g>3)hi=true}if(!hi)return false;
+ // no rail where this deck overlaps another (not chained) deck at about the same height: next to a SPLIT the two branches overlap, and a rail there is a wall across the other route
+ const key=c=>c.i+','+c.j+','+c.l+','+c.r,mine=new Set([...BX_ents(pc),...pc.ex].map(key)),o0=pc.S[0][0].p;
+ for(const q of BX.pcs){if(q===pc||q.dead||q.S[0][0].p.distanceTo(o0)>90)continue;if([...BX_ents(q),...q.ex].some(c=>mine.has(key(c))))continue;
+  for(const A of pc.S)for(const a of A)for(const B of q.S)for(const b of B)if(Math.abs(a.p.y-b.p.y)<4&&Math.hypot(a.p.x-b.p.x,a.p.z-b.p.z)<2*BX_HW-2)return false}return true} // over water only a > 6 m deck: a lower one is a splash-in (boat)
+function BX_pcMesh(pc){const M=BX_mats();pc.rail=BX_railOf(pc);for(const S of pc.S){const[g1,g2]=BX_geo(S,pc.def,pc.rail),a=new THREE.Mesh(g1,M.road),b=new THREE.Mesh(g2,M.body);
  for(const o of[a,b]){o.castShadow=o.receiveShadow=true;o.userData.pc=pc;BX.gP.add(o);pc.meshes.push(o)}}
  if(pc.def.cp||pc.def.start)BX_gate(pc);BX_hashAll();}
 function BX_pcDrop(pc){if(!pc)return;for(const o of pc.meshes){BX.gP.remove(o);o.geometry&&o.geometry.dispose()}pc.meshes=[];BX_hashAll()}
-function BX_gate(pc){const s=pc.S[0][Math.floor(pc.S[0].length/2)],g=new THREE.Group(),c=pc.def.start?0xf4f4f4:0x0055bf,m=new THREE.MeshStandardMaterial({color:c,roughness:.4}),bx=new THREE.BoxGeometry(1,7,1),top=new THREE.BoxGeometry(16,1.4,1);
- for(const x of[-7.6,7.6]){const p=new THREE.Mesh(bx,m);p.position.set(x,3.5,0);g.add(p)}const t=new THREE.Mesh(top,new THREE.MeshStandardMaterial({color:pc.def.start?0x202020:0xf2cd37,roughness:.4}));t.position.y=7.4;g.add(t);
+function BX_gate(pc){const s=pc.S[0][Math.floor(pc.S[0].length/2)],g=new THREE.Group(),c=pc.def.start?0xf4f4f4:0x0055bf,m=new THREE.MeshStandardMaterial({color:c,roughness:.4}),bx=new THREE.BoxGeometry(1,7,1),top=new THREE.BoxGeometry(2*BX_HW+2,1.4,1);
+ for(const x of[-BX_HW-.6,BX_HW+.6]){const p=new THREE.Mesh(bx,m);p.position.set(x,3.5,0);g.add(p)}const t=new THREE.Mesh(top,new THREE.MeshStandardMaterial({color:pc.def.start?0x202020:0xf2cd37,roughness:.4}));t.position.y=7.4;g.add(t);
  g.position.copy(s.p);g.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(s.S.clone().negate(),s.U,s.F)); // (S,U,F) is left-handed: it rotated the posts onto the road centreg.traverse(o=>{o.castShadow=true});BX.gP.add(g);pc.meshes.push(g);
  g.children.forEach(o=>o.userData.pc=pc);BX.posts=BX.posts||[]}
 function BX_buildAll(){if(!BX.sc)return;for(const o of[...BX.gP.children]){BX.gP.remove(o);o.geometry&&o.geometry.dispose()}for(const pc of BX.pcs)if(!pc.dead){pc.meshes=[];BX_pcMesh(pc)}
  BX_hashAll();BX_terrMesh();BX_bld();BX_after()}
 // pillars (LEGO brick columns) under every deck that floats > 0.8 m over the ground; colliders = the same circles; none within 9 m of a lower road (trk-2: 5.5 m put tan blocks on its edge)
 function BX_pillars(){const M=BX_mats(),P=[];for(const pc of BX.pcs){if(pc.dead)continue;for(const S of pc.S){let last=-99;for(const s of S){if(s.U.y<.8||s.d-last<9)continue;
-  for(const sx of[-2.6,2.6]){const x=s.p.x+s.S.x*sx,z=s.p.z+s.S.z*sx,top=s.p.y+s.S.y*sx-.8,g=BX_h(x,z); // trk-3: under the deck surface right above it (a banked deck's low side; top=centre-0.8 poked 0.9 m through: Alex's "tan wedges")
-   if(top-g>.8&&!BX.samp.some(q=>q.pc!==pc&&q.s.p.y<top-1&&Math.hypot(q.s.p.x-x,q.s.p.z-z)<9))P.push([x,z,g,top])}last=s.d}}}
+  for(const sx of[-BX_HW*.37,BX_HW*.37]){const x=s.p.x+s.S.x*sx,z=s.p.z+s.S.z*sx,top=s.p.y+s.S.y*sx-.8,g=BX_h(x,z); // trk-3: under the deck surface right above it (a banked deck's low side; top=centre-0.8 poked 0.9 m through: Alex's "tan wedges")
+   if(top-g>.8&&!BX.samp.some(q=>q.pc!==pc&&q.s.p.y<top-1&&Math.hypot(q.s.p.x-x,q.s.p.z-z)<BX_HW+2))P.push([x,z,g,top])}last=s.d}}}
  BX.pil=P;if(BX.pilM){BX.sc.remove(BX.pilM);BX.pilM.dispose()}if(!P.length){BX.pilM=null;return}
  const im=new THREE.InstancedMesh(new THREE.BoxGeometry(1.6,1,1.6),M.pil,P.length),mt=new THREE.Matrix4();
  P.forEach(([x,z,g,t],i)=>{mt.makeScale(1,t-g+.3,1);mt.setPosition(x,(t+g)/2,z);im.setMatrixAt(i,mt)});im.castShadow=im.receiveShadow=true;BX.sc.add(im);BX.pilM=im}
@@ -170,13 +192,13 @@ function BX_pillars(){const M=BX_mats(),P=[];for(const pc of BX.pcs){if(pc.dead)
 // one landmark per track (a giant LEGO minifig statue near the start). All instanced; no collision (they stand outside the rails).
 const BX_DC=['#c91a09','#0055bf','#f2cd37','#237841','#fe8a18','#ffffff','#a0a5a9'].map(bxCol);
 function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isInstancedMesh)o.dispose()})}const g=BX.drM=new THREE.Group();BX.sc.add(g);
- const L=BX.pcs.filter(p=>!p.dead),body=[],head=[],legs=[],stand=[],pole=[],flag=[],ban=[],chev=[],rban=[],tree=[],near=(x,z)=>BX_near(x,z).length&&BX.samp.some(q=>Math.hypot(q.s.p.x-x,q.s.p.z-z)<8.5)/* another road within its rail */,
+ const L=BX.pcs.filter(p=>!p.dead),body=[],head=[],legs=[],stand=[],pole=[],flag=[],ban=[],chev=[],rban=[],tree=[],near=(x,z)=>BX_near(x,z).length&&BX.samp.some(q=>Math.hypot(q.s.p.x-x,q.s.p.z-z)<BX_HW+1.5)/* another road within its rail */,
   inB=(x,z)=>(BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+2&&Math.abs(b.z-z)<b.d/2+2);let n=0,side=1,run=0,len=0,props=0;
  for(const pc of L){const S=pc.S[0];for(let k=1;k<S.length;k++){const s=S[k],d=s.d-S[k-1].d;len+=d;run+=d;if(pc.def.boost&&k%Math.max(1,S.length>>1)===0)chev.push(s);if(run<7)continue;run=0;side=-side;n++;
   const raised=s.p.y-BX_h(s.p.x,s.p.z)>2.5||pc.def.p.length>1;if(pc.def.p.length>1||pc.def.stick)continue;
-  if(raised){if(n%2){const o=side*6.8;rban.push([s.p.x+s.S.x*o,s.p.y+s.S.y*o+1.4,s.p.z+s.S.z*o,n,s]);props++;continue} // trk-3 (Alex beta.36 "bare grey + sky"): sponsor boards on the deck rail, alternating with the pennants
-   const x=s.p.x+s.S.x*side*7.4,z=s.p.z+s.S.z*side*7.4,y=s.p.y+s.S.y*side*7.4+1.4;pole.push([x,y,z,3]);flag.push([x,y+2.2,z,n,s]);props++;continue} // trk-2 (Alex beta.22 "giant poles block the view"): 3 m rail pennants instead of 7 m poles
-  const x=s.p.x+s.S.x*side*9.6,z=s.p.z+s.S.z*side*9.6,y=BX_h(x,z);if(y<-.4||near(x,z,pc)||inB(x,z))continue;props++;
+  if(raised){if(n%2){const o=side*(BX_HW-.2);rban.push([s.p.x+s.S.x*o,s.p.y+s.S.y*o+1.4,s.p.z+s.S.z*o,n,s]);props++;continue} // trk-3 (Alex beta.36 "bare grey + sky"): sponsor boards on the deck rail, alternating with the pennants
+   const o=side*(BX_HW+.4),x=s.p.x+s.S.x*o,z=s.p.z+s.S.z*o,y=s.p.y+s.S.y*o+1.4;pole.push([x,y,z,3]);flag.push([x,y+2.2,z,n,s]);props++;continue} // trk-2 (Alex beta.22 "giant poles block the view"): 3 m rail pennants instead of 7 m poles
+  const o=side*(BX_OPEN?BX_HW+11:9.6),x=s.p.x+s.S.x*o,z=s.p.z+s.S.z*o,y=BX_h(x,z);if(y<-.4||near(x,z,pc)||inB(x,z))continue;props++;
   if(n%4===1){const tx=s.p.x-s.S.x*side*15,tz=s.p.z-s.S.z*side*15,ty=BX_h(tx,tz);if(ty>=.3&&!near(tx,tz)&&!inB(tx,tz)&&!BX.samp.some(q=>Math.hypot(q.s.p.x-tx,q.s.p.z-tz)<11))tree.push([tx,ty,tz,n])} // trk-3: a tree line at chase-cam distance on the other side
   if(n%3===0){stand.push([x,y,z,s]);for(let f=-2;f<=2;f++){const fx=x+s.F.x*f*2.8,fz=z+s.F.z*f*2.8;legs.push([fx,y+1.7,fz]);body.push([fx,y+3.2,fz,n+f]);head.push([fx,y+4.55,fz])}}
   else if(n%3===1){ban.push([x,y,z,n,s]);for(const e of[-4.6,4.6])pole.push([x+s.F.x*e,y,z+s.F.z*e,3.2])}else{pole.push([x,y,z,10]);flag.push([x,y+8.6,z,n,s])}}}
@@ -204,12 +226,12 @@ function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isI
  const cm=BX.chevMat=BX.chevMat||(()=>{const t=BX_tex(128,128,(c,w,h)=>{c.fillStyle='#1560e8';c.fillRect(0,0,w,h);c.strokeStyle='#9cc8ff';c.lineWidth=6;c.strokeRect(3,3,w-6,h-6);
    for(let k=0;k<3;k++){const y=24+k*36;c.beginPath();c.moveTo(18,y+26);c.lineTo(64,y);c.lineTo(110,y+26);c.lineTo(110,y+40);c.lineTo(64,y+14);c.lineTo(18,y+40);c.closePath();c.fillStyle='#ff8a00';c.fill();c.strokeStyle='#fff3c0';c.lineWidth=2;c.stroke()}});
    return new THREE.MeshStandardMaterial({map:t,emissiveMap:t,emissive:0xffffff,emissiveIntensity:.32,roughness:1,metalness:0,polygonOffset:true,polygonOffsetFactor:-2})})();
- M(new THREE.PlaneGeometry(11,7.4),cm,chev,s=>{mt.makeBasis(s.S,s.F,s.U);mt.setPosition(pos.copy(s.p).addScaledVector(s.U,.05))});
+ M(new THREE.PlaneGeometry(2*BXRW-2,7.4),cm,chev,s=>{mt.makeBasis(s.S,s.F,s.U);mt.setPosition(pos.copy(s.p).addScaledVector(s.U,.05))});
  // KICKERS read as jump ramps: a yellow/black striped band on the lip and on the 0.9 m drop face behind it (trk-2)
  const km=BX.kickMat=BX.kickMat||new THREE.MeshStandardMaterial({roughness:.4,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,map:BX_tex(128,16,(c,w,h)=>{c.fillStyle='#ffd21a';c.fillRect(0,0,w,h);c.fillStyle='#1b1b1b';for(let x=-16;x<w;x+=16){c.beginPath();c.moveTo(x,h);c.lineTo(x+8,0);c.lineTo(x+16,0);c.lineTo(x+8,h);c.fill()}})});
  const kk=L.filter(p=>p.def.jump).map(p=>p.S[0][p.S[0].length-1]);
- M(new THREE.PlaneGeometry(13,1.6),km,kk,e=>{mt.makeBasis(e.S,e.F,e.U);mt.setPosition(pos.copy(e.p).addScaledVector(e.F,-.8).addScaledVector(e.U,.05))});
- M(new THREE.PlaneGeometry(13,.9),km,kk,e=>{mt.makeBasis(e.S,e.U,e.F.clone().negate());mt.setPosition(pos.copy(e.p).addScaledVector(e.U,-.45).addScaledVector(e.F,.02))});
+ M(new THREE.PlaneGeometry(2*BXRW,1.6),km,kk,e=>{mt.makeBasis(e.S,e.F,e.U);mt.setPosition(pos.copy(e.p).addScaledVector(e.F,-.8).addScaledVector(e.U,.05))});
+ M(new THREE.PlaneGeometry(2*BXRW,BX_KJ),km,kk,e=>{mt.makeBasis(e.S,e.U,e.F.clone().negate());mt.setPosition(pos.copy(e.p).addScaledVector(e.U,-BX_KJ/2).addScaledVector(e.F,.02))});
  const block=pole.filter(([x,y,z,h])=>h>4&&BX.samp.some(({s})=>Math.hypot(s.p.x-x,s.p.z-z)<8&&Math.abs(s.p.y-y)<6)).length+(BX.pil||[]).filter(([x,z,g,t])=>BX.samp.some(({s})=>s.p.y<t-1&&Math.hypot(s.p.x-x,s.p.z-z)<8)).length;
  BX.dressN={props:props+tree.length,len,landmark:BX_landmark(g,L),block,trees:tree.length,rail:rban.length}}
 // landmark: a giant LEGO minifig (~16 m) on open ground 30-50 m from the course, as close to START as possible
@@ -241,12 +263,12 @@ function BX_marks(){if(BX.gE){BX.sc.remove(BX.gE)}const g=BX.gE=new THREE.Group(
  const fr=BX_fr(BX.cur),ring=new THREE.Mesh(new THREE.TorusGeometry(4.6,.35,6,24),M.cur);ring.position.copy(fr.o).addScaledVector(fr.F,4).add(bxV(0,.3,0));ring.rotation.x=Math.PI/2;g.add(ring);
  const gy=BX_h(ring.position.x,ring.position.z);if(ring.position.y-gy>1){const post=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,ring.position.y-gy,6),M.cur);post.position.set(ring.position.x,(ring.position.y+gy)/2,ring.position.z);g.add(post)}}
 function BX_ghost(){if(BX.gG){BX.sc.remove(BX.gG);BX.gG.traverse(o=>o.geometry&&o.geometry.dispose())}BX.gG=null;if(BX.mode!=='build'||BX.tab!=='track')return;
- const pc=BX_mk(BX.sel,BX.cur,-1);if(!pc)return;const g=BX.gG=new THREE.Group();for(const S of pc.S){const[g1,g2]=BX_geo(S,pc.def);g.add(new THREE.Mesh(g1,BX_mats().ghost),new THREE.Mesh(g2,BX_mats().ghost))}
+ const pc=BX_mk(BX.sel,BX.cur,-1);if(!pc)return;const g=BX.gG=new THREE.Group();for(const S of pc.S){const[g1,g2]=BX_geo(S,pc.def,BX_OPEN?false:undefined);g.add(new THREE.Mesh(g1,BX_mats().ghost),new THREE.Mesh(g2,BX_mats().ghost))}
  g.children.forEach(o=>o.userData.ghost=1);BX.sc.add(g)}
 // ---------------------------------------------------------------- terrain mesh + world dressing
 // trk-3: after all pieces carved: a later piece's 'fill under the road' clause could lift terrain over an EARLIER, lower road (1.2 m up through the deck); every vertex within 9 m stays under every road there
-function BX_clampRoads(){const T=BX.th;for(const pc of BX.pcs){if(pc.dead)continue;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18-7.4*Math.abs(s.S.y),a0=Math.floor((s.p.x-9-BXO)/BXR),a1=Math.ceil((s.p.x+9-BXO)/BXR),b0=Math.floor((s.p.z-9-BXO)/BXR),b1=Math.ceil((s.p.z+9-BXO)/BXR);
- for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){if(Math.hypot(BXO+a*BXR-s.p.x,BXO+b*BXR-s.p.z)>9)continue;const k=b*BXTN+a;if(T[k]>y)T[k]=y}}}}
+function BX_clampRoads(){const T=BX.th;for(const pc of BX.pcs){if(pc.dead)continue;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y0=s.p.y-.18-(BX_HW+.4)*Math.abs(s.S.y),CR=BX_HW+6,a0=Math.floor((s.p.x-CR-BXO)/BXR),a1=Math.ceil((s.p.x+CR-BXO)/BXR),b0=Math.floor((s.p.z-CR-BXO)/BXR),b1=Math.ceil((s.p.z+CR-BXO)/BXR);
+ for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){const dd=Math.hypot(BXO+a*BXR-s.p.x,BXO+b*BXR-s.p.z);if(dd>CR)continue;const y=BX_OPEN?s.p.y-.28+s.S.y*bxCl((BXO+a*BXR-s.p.x)*s.S.x+(BXO+b*BXR-s.p.z)*s.S.z,-BX_HW-.4,BX_HW+.4):y0;const k=b*BXTN+a,cy=y+Math.max(0,dd-BX_HW-2)*.15;if(T[k]>cy)T[k]=cy}}}} // trk-4: flat to 2 m past the edge, then a gentle rise (a full 18 m flat clamp cut the verges of stacked hairpins)
 function BX_terrMesh(){BX_clampRoads();const n=BXTN;if(!BX.tg){const g=BX.tg=new THREE.BufferGeometry(),p=new Float32Array(n*n*3),uv=new Float32Array(n*n*2),idx=[];
   for(let b=0;b<n;b++)for(let a=0;a<n;a++){const k=b*n+a;p[k*3]=BXO+a*BXR;p[k*3+2]=BXO+b*BXR;uv[k*2]=(BXO+a*BXR)/.8;uv[k*2+1]=(BXO+b*BXR)/.8;if(a<n-1&&b<n-1)idx.push(k,k+n,k+1,k+1,k+n,k+n+1)}
   g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('uv',new THREE.BufferAttribute(uv,2));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*n*3),3));g.setIndex(idx);
@@ -261,9 +283,9 @@ function BX_asTrees(g,T,seed=0){const A=window.__as;if(!A||!A.build||!T.length)r
  V.forEach((v,k)=>{if(!by[k].length)return;let geo=BX.asG[v];if(geo===undefined){try{geo=A.build(v,'m')}catch(e){geo=null}BX.asG[v]=geo}if(!geo)return;const im=new THREE.InstancedMesh(geo,BX.asMat,by[k].length),m=new THREE.Matrix4(),q=new THREE.Quaternion(),sc=bxV();
   by[k].forEach(([x,y,z],i)=>{const r=(x*12.9898+z*78.233)%6.283,f=.9+((Math.abs(x*7+z*3)|0)%5)*.06;m.compose(bxV(x,y-.1,z),q.setFromAxisAngle(bxV(0,1,0),r),sc.set(f,f,f));im.setMatrixAt(i,m)});im.castShadow=true;g.add(im);ok=true});return ok}
 function BX_trees(){if(BX.trM){BX.sc.remove(BX.trM);BX.trM=null}const T=[],RK=[];let s=7;const rnd=()=>(s=(s*16807)%2147483647)/2147483647;
- for(let i=0;i<60;i++){const x=BXO+16+rnd()*(BXW-32),z=BXO+16+rnd()*(BXW-32),h=BX_h(x,z);if(h<.3)continue;if(BX.samp&&BX.samp.some(({s})=>Math.abs(s.p.x-x)<10&&Math.abs(s.p.z-z)<10))continue;RK.push([x,z,h,1+rnd()*2.2])}
+ for(let i=0;i<60;i++){const x=BXO+16+rnd()*(BXW-32),z=BXO+16+rnd()*(BXW-32),h=BX_h(x,z);if(h<.3)continue;if(BX.samp&&BX.samp.some(({s})=>Math.abs(s.p.x-x)<BX_HW+(BX_OPEN?9:3)&&Math.abs(s.p.z-z)<BX_HW+(BX_OPEN?9:3)))continue;RK.push([x,z,h,1+rnd()*2.2])}
  BX.rk=RK;for(let i=0;i<150;i++){const x=BXO+20+rnd()*(BXW-40),z=BXO+20+rnd()*(BXW-40),h=BX_h(x,z),n=BX_tn(x,z);if(h<.6||n.y<.85)continue;
-  if(BX.samp&&BX.samp.some(({s})=>Math.abs(s.p.x-x)<9&&Math.abs(s.p.z-z)<9))continue;if(BX.bld&&BX.bld.some(b=>Math.abs(b.x-x)<b.w/2+4&&Math.abs(b.z-z)<b.d/2+4))continue;T.push([x,z,h])}
+  if(BX.samp&&BX.samp.some(({s})=>Math.abs(s.p.x-x)<BX_HW+(BX_OPEN?9:2)&&Math.abs(s.p.z-z)<BX_HW+(BX_OPEN?9:2)))continue;if(BX.bld&&BX.bld.some(b=>Math.abs(b.x-x)<b.w/2+4&&Math.abs(b.z-z)<b.d/2+4))continue;T.push([x,z,h])}
  BX.tr=T;const gg=new THREE.Group();BX.sc.add(gg);BX.trM=gg;if(RK.length){const rm=new THREE.InstancedMesh(new THREE.DodecahedronGeometry(1,0),new THREE.MeshStandardMaterial({color:0x8f8a82,flatShading:true,roughness:.9}),RK.length),q=new THREE.Matrix4();
  RK.forEach(([x,z,h,r],i)=>{q.compose(bxV(x,h+r*.35,z),new THREE.Quaternion().setFromEuler(new THREE.Euler(i,i*2,0)),bxV(r*1.3,r,r*1.1));rm.setMatrixAt(i,q)});rm.castShadow=rm.receiveShadow=true;gg.add(rm)}if(!T.length)return;const g=new THREE.Group(),tr=new THREE.InstancedMesh(new THREE.CylinderGeometry(.5,.6,3,6),new THREE.MeshStandardMaterial({color:0x7c4a1e}),T.length),
   lf=new THREE.InstancedMesh(new THREE.ConeGeometry(2.6,5,6),new THREE.MeshStandardMaterial({color:0x237841,flatShading:true}),T.length),mt=new THREE.Matrix4();
@@ -314,7 +336,7 @@ function BX_driveStart(){BX.mode='drive';BX_after();const car=BX_car();BX.sc.add
  BX.camD={p:sp.p.clone().addScaledVector(sp.F,-9).add(bxV(0,4,0)),up:bxV(0,1,0)}}
 function BX_driveStop(){BX.mode='build';if(BX.car)BX.sc.remove(BX.car,BX.shM);BX_after();BX_ui()}
 function BX_hud(){const V=BX.v,m=BX.m,H=$('#bxHud'),M=$('#bxMsg');if(!H)return;const cps=BX.pcs.filter(p=>!p.dead&&p.def.cp).length;
- H.textContent=`${Math.round(V.v.length()*3.6)} km/h · ${V.boat?'BOAT':'CAR'}${cps?' · CP '+V.cps.size+'/'+cps:''} · LAP ${Math.min(m.laps+1,BX_RACE_LAPS)}/${BX_RACE_LAPS}`;M.textContent=V.msgT>0?V.msg:''}
+ H.textContent=`${Math.round(V.v.length()*3.6)} km/h · ${V.boat?'BOAT':'CAR'}${cps?' · CP '+V.cps.size+'/'+cps:''} · LAP ${Math.min(m.laps+1,BX_RACE_LAPS)}/${BX_RACE_LAPS}`;M.textContent=V.msgT>0?V.msg:'';const bo=$('#bxBo');if(bo){bo.style.setProperty('--e',(V.boostE||0).toFixed(2));bo.classList.toggle('rdy',(V.boostE||0)>=.34)}}
 function BX_say(t,s=1.4){const V=BX.v;if(V){V.msg=t;V.msgT=s}}
 function BX_respawn(why){const V=BX.v,m=BX.m,s=V.lastCp||V.safe,sp=6;if(why==='far'&&V.fallPk-V.p.y>16)why='cliff';V.fallPk=-1e9;
  V.hist=[];V.p.copy(s.p).add(bxV(0,.8,0));V.F.copy(s.F);V.U.set(0,1,0);V.v.copy(s.F).multiplyScalar(sp);V.g=false;V.air=0;V.pk=V.p.y;V.far=0;V.stuck=0;
@@ -361,7 +383,7 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
    if(U.y>.94&&!pc.def.jump&&V.v.length()>2&&m.t-(V.sT||0)>.25){V.sT=m.t;V.hist.push({p:V.p.clone(),F:F.clone(),sp:V.v.length(),t:m.t});if(V.hist.length>40)V.hist.shift()}BX_course(pc)}else V.on=null}
  else{V.air+=dt;V.v.y-=BXG*dt;V.pk=Math.max(V.pk,V.p.y);U.lerp(bxV(0,1,0),Math.min(1,dt*1.6)).normalize();F.addScaledVector(U,-F.dot(U)).normalize();const ya=-inp.s*1.1*dt;F.applyAxisAngle(U,ya);
   {const vy=V.v.y;V.v.y=0;V.v.applyAxisAngle(bxV(0,1,0),ya*.8);V.v.y=vy}if(V.air>.1)V.on=null}
- V.g=grounded;if(V.boost>0)V.boost-=dt;
+ V.g=grounded;if(V.boost>0)V.boost-=dt;V.boostE=Math.min(1,(V.boostE||0)+dt/8+(V.air>.2?dt/3:0));
  // obstacles you can SEE: pillars, trees, buildings (circle/box push-out, glancing hits slide)
  const push=(nx,nz,d)=>{V.p.x+=nx*d;V.p.z+=nz*d;const vn=V.v.x*nx+V.v.z*nz;if(vn<0){V.v.x-=nx*vn*1.25;V.v.z-=nz*vn*1.25;if(vn<-6)m.bump++}};
  for(const[x,z,g,t]of BX.pil||[]){if(V.p.y>t-.4||V.p.y<g-1)continue;const dx=V.p.x-x,dz=V.p.z-z,d=Math.hypot(dx,dz);if(d<2&&d>.01)push(dx/d,dz/d,2-d)}
@@ -372,8 +394,8 @@ function BX_step(dt,inp){const V=BX.v,m=BX.m,F=V.F,U=V.U,S=bxV().crossVectors(F,
  if(objs.length&&!V.boat){const sp=V.v.length();if(sp>1){const d=V.v.clone().normalize();BX.ray.set(V.p.clone().addScaledVector(U,.55),d);BX.ray.far=2.4+sp*dt;const h=BX.ray.intersectObjects(objs,false)[0];
   const hp=h&&h.object.userData.pc;if(h&&h.face&&h.face.normal.dot(U)<.5&&!(hp&&!hp.def.in&&hp.def.p.length===1&&hp===V.on)){const nw=h.face.normal,vn=V.v.dot(nw);if(vn<0){V.v.addScaledVector(nw,-vn*1.3);m.wall++;V.p.addScaledVector(nw,.2)}}}}
  // barriers: on a railed piece the car's centre stays within 2.5 m of the deck centre line; the outward speed is taken away (it slides along the wall)
- {const q=V.on&&!V.on.def.in&&V.on.S.length===1&&!H.some(h=>h&&h.pc&&h.pc!==V.on)?V.on:null;if(q&&!V.boat){let b=null,bd=1e9;for(const s of q.S[0]){const d=s.p.distanceToSquared(V.p);if(d<bd){bd=d;b=s}}
-  const lat=_r1.copy(V.p).sub(b.p).dot(b.S),lim=5.4;if(Math.abs(lat)>lim&&Math.abs(lat)<8){const sg=Math.sign(lat);V.p.addScaledVector(b.S,(lim-Math.abs(lat))*sg);const vo=V.v.dot(b.S)*sg;if(vo>0){V.v.addScaledVector(b.S,-vo*sg);if(vo>4&&!V.rub)m.wall++;V.rub=.3}
+ {const q=V.on&&V.on.rail!==false&&!V.on.def.in&&V.on.S.length===1&&!H.some(h=>h&&h.pc&&h.pc!==V.on)?V.on:null;if(q&&!V.boat){let b=null,bd=1e9;for(const s of q.S[0]){const d=s.p.distanceToSquared(V.p);if(d<bd){bd=d;b=s}}
+  const lat=_r1.copy(V.p).sub(b.p).dot(b.S),lim=BXRW-1.1;if(Math.abs(lat)>lim&&Math.abs(lat)<BX_HW+1){const sg=Math.sign(lat);V.p.addScaledVector(b.S,(lim-Math.abs(lat))*sg);const vo=V.v.dot(b.S)*sg;if(vo>0){V.v.addScaledVector(b.S,-vo*sg);if(vo>4&&!V.rub)m.wall++;V.rub=.3}
    // trk-2 (Alex beta.22 "the car drives backwards"): nose into the rail -> turn it along the course (yaw needs speed, the pinned car had none and ground round to face backwards)
    if(F.dot(b.S)*sg>-.05){const tf=_r2.copy(b.F).addScaledVector(U,-b.F.dot(U)).normalize();F.lerp(tf,Math.min(1,dt*6)).normalize()}}}}if(V.rub>0)V.rub-=dt
  V.p.addScaledVector(V.v,dt);
@@ -410,28 +432,31 @@ function BX_tick(now){const dt=BX.fast?1/60:Math.min(.05,(now-(BX.last||now))/10
 // ---------------------------------------------------------------- input (keys + touch buttons; gas is on by default on touch)
 addEventListener('keydown',e=>{if(!BX.on)return;BX.keys[e.code]=1;if(BX.mode==='drive'&&e.code==='KeyR')BX_respawn('key');if(e.code==='Escape')BX.mode==='drive'?BX_driveStop():BX_close();e.stopImmediatePropagation()},true);
 addEventListener('keyup',e=>{if(!BX.on)return;BX.keys[e.code]=0;e.stopImmediatePropagation()},true);
-function BX_input(){const K=BX.keys,T=BX.tc||{};const l=K.ArrowLeft||K.KeyA||T.l,r=K.ArrowRight||K.KeyD||T.r,kb=K.ArrowUp||K.KeyW,brk=K.ArrowDown||K.KeyS||K.Space||T.b;
+function BX_input(){if(BX.auto&&BX.v)return BX_autoInp(BX.auto.W,BX.auto.st);const K=BX.keys,T=BX.tc||{};const l=K.ArrowLeft||K.KeyA||T.l,r=K.ArrowRight||K.KeyD||T.r,kb=K.ArrowUp||K.KeyW||T.g,brk=K.ArrowDown||K.KeyS||K.Space||T.b;
  return{s:(r?1:0)-(l?1:0),g:(kb||BX.touch)&&!brk?1:0,b:brk?1:0}}
 // ---------------------------------------------------------------- UI
 function BX_css(){if($('#bxCss'))return;const s=document.createElement('style');s.id='bxCss';s.textContent=`
 body.bxOn>*:not(#c):not(#bx){visibility:hidden!important}
 #bx{--bxT:env(safe-area-inset-top,0px);position:fixed;inset:0;z-index:60;pointer-events:none;font:700 13px system-ui,-apple-system,sans-serif;color:#fff;user-select:none;-webkit-user-select:none}
-#bx button{pointer-events:auto;font:800 12px system-ui,-apple-system,sans-serif;color:#fff;background:rgba(14,42,104,.86);border:2px solid rgba(255,255,255,.55);border-radius:10px;touch-action:manipulation;min-height:38px;padding:2px 6px;letter-spacing:.02em}
+#bx button{pointer-events:auto;font:800 12px system-ui,-apple-system,sans-serif;color:#fff;background:rgba(14,42,104,.86);border:2px solid rgba(255,255,255,.55);border-radius:10px;touch-action:manipulation;min-height:40px;padding:2px 6px;letter-spacing:.02em}
 #bx button.on{background:#f2cd37;color:#14243f;border-color:#fff}
 #bxTap{position:absolute;inset:0;pointer-events:auto;touch-action:none}
 #bxTop{position:absolute;left:0;right:0;top:var(--bxT);display:flex;gap:5px;align-items:center;padding:4px max(8px,env(safe-area-inset-right)) 0 max(8px,env(safe-area-inset-left))}
-#bxTop button{min-height:32px}#bxInfo{flex:1;text-align:center;font-size:12px;text-shadow:0 1px 3px #000;white-space:nowrap;overflow:hidden}
-#bxPal{position:absolute;left:0;top:calc(var(--bxT) + 42px);bottom:0;width:164px;padding:2px 6px 8px max(6px,env(safe-area-inset-left));overflow-y:auto;pointer-events:auto;display:grid;grid-template-columns:1fr 1fr;gap:5px;align-content:start;background:linear-gradient(90deg,rgba(8,24,60,.6),rgba(8,24,60,.25))}
+#bxTop button{min-height:40px}#bxInfo{flex:1;text-align:center;font-size:12px;text-shadow:0 1px 3px #000;white-space:nowrap;overflow:hidden}
+#bxPal{position:absolute;left:0;top:calc(var(--bxT) + 50px);bottom:0;width:164px;padding:2px 6px 8px max(6px,env(safe-area-inset-left));overflow-y:auto;pointer-events:auto;display:grid;grid-template-columns:1fr 1fr;gap:5px;align-content:start;background:linear-gradient(90deg,rgba(8,24,60,.6),rgba(8,24,60,.25))}
 #bxPal button{display:flex;flex-direction:column;align-items:center;justify-content:center;height:66px;padding:2px}#bxPal canvas{width:52px;height:36px}
 #bxPal h4{grid-column:1/3;margin:6px 0 0;font-size:12px;color:#f2cd37}
-#bxAct{position:absolute;right:0;top:calc(var(--bxT) + 42px);bottom:0;width:92px;display:flex;flex-direction:column;gap:5px;padding:0 max(6px,env(safe-area-inset-right)) 6px 4px}
+#bxAct{position:absolute;right:0;top:calc(var(--bxT) + 50px);bottom:0;width:92px;display:flex;flex-direction:column;gap:5px;padding:0 max(6px,env(safe-area-inset-right)) 6px 4px}
 #bxAct button{flex:1;min-height:36px;font-size:13px}#bxAct .go{background:#1f9e3a}
 #bxD .st{position:absolute;bottom:max(10px,env(safe-area-inset-bottom));width:88px;height:88px;border-radius:50%;font-size:26px;background:rgba(14,42,104,.55)}
 #bxHud{position:absolute;top:calc(var(--bxT) + 6px);left:50%;transform:translateX(-50%);text-align:center;font-size:14px;text-shadow:0 1px 3px #000;white-space:nowrap}
 #bxMsg{position:absolute;top:30%;left:50%;transform:translateX(-50%);font:900 24px system-ui,sans-serif;color:#f2cd37;text-shadow:0 2px 0 #14243f,0 0 8px #000;white-space:nowrap}
-#bxLoad{position:absolute;inset:calc(var(--bxT) + 44px) 110px 10px 172px;background:rgba(8,24,60,.94);border-radius:12px;padding:8px;overflow-y:auto;pointer-events:auto;display:flex;flex-direction:column;gap:6px}
+#bxLoad{position:absolute;inset:calc(var(--bxT) + 52px) 110px 10px 172px;background:rgba(8,24,60,.94);border-radius:12px;padding:8px;overflow-y:auto;pointer-events:auto;display:flex;flex-direction:column;gap:6px}
 /* trk-3 (Alex beta.36 portrait: the 6/6 box sat under the Claude app's top bar): in portrait every top HUD row starts 100 px down (safe area + the in-app iframe bar) */
-@media (orientation:portrait){#bx{--bxT:calc(env(safe-area-inset-top,0px) + 100px)}}
+@media (orientation:portrait){#bx{--bxT:calc(env(safe-area-inset-top,0px) + 100px)}#bxHud{top:calc(var(--bxT) + 124px)}}
+/* trk-4 (Alex: "no buttons"): GAS above BRAKE, BOOST (fills with its meter) left of GAS, PAUSE card */
+#bxBo{--e:0;background:linear-gradient(0deg,rgba(255,138,0,.9) calc(var(--e)*100%),rgba(14,42,104,.55) calc(var(--e)*100%))!important}#bxBo.rdy{border-color:#ffd21a;box-shadow:0 0 12px #ffb000}
+#bxPause{position:absolute;inset:0;background:rgba(6,18,46,.72);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;pointer-events:auto;z-index:3}#bxPause[hidden]{display:none}#bxPause b{font:900 30px system-ui,sans-serif;color:#ffd21a}#bxPause button{min-width:200px;min-height:48px;font-size:16px}
 `;document.head.appendChild(s)}
 function BX_icon(type){const c=document.createElement('canvas');c.width=104;c.height=72;const g=c.getContext('2d'),def=BX_P[type];g.lineCap='round';
  const P=def.p.map(fn=>{const a=[];for(let k=0;k<=24;k++)a.push(fn(k/24));return a}),xs=[],ys=[];for(const A of P)for(const l of A){xs.push(def.v==='side'?l[2]:l[0]);ys.push(def.v==='side'?l[1]:l[2])}
@@ -441,15 +466,23 @@ function BX_icon(type){const c=document.createElement('canvas');c.width=104;c.he
  for(const A of P){g.beginPath();A.forEach((l,i)=>{const x=X(def.v==='side'?l[2]:l[0]),y=Y(def.v==='side'?l[1]:l[2]);i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()}
  if(def.v==='side'){g.strokeStyle='#4fb33a';g.lineWidth=3;g.beginPath();g.moveTo(0,Y(0)+5);g.lineTo(104,Y(0)+5);g.stroke()}return c}
 const BX_TOOLS=[['raise','⬆ RAISE'],['lower','⬇ LOWER'],['flat','▬ FLATTEN'],['smooth','〰 SMOOTH'],['water','🌊 WATER']];
+// trk-4: BOOST button spends a third of the boost meter (fills in 8 s, faster in the air); PAUSE freezes the drive/race (BX.hold) behind a card
+function BX_boostGo(){const V=BX.v;if(!V||BX.hold)return;if((V.boostE||0)>=.34){V.boostE-=.34;V.boost=Math.max(V.boost,1.6);BX_say('BOOST!',.8);try{AU.sfx&&AU.sfx('boost')}catch(e){}}else BX_say('BOOST CHARGING',.6)}
+function BX_pause(on){BX.hold=on?1:0;BX.paused=!!on;const c=$('#bxPause');if(c)c.hidden=!on;if(!on)BX.last=0}
 function BX_ui(){BX_css();let R=$('#bx');if(!R){R=document.createElement('div');R.id='bx';document.body.appendChild(R)}const d=BX.mode==='drive';
  R.innerHTML=d?`<div id="bxD"><button id="bxBack" style="position:absolute;top:calc(var(--bxT) + 6px);left:max(8px,env(safe-area-inset-left))">◀ BUILD</button><button id="bxRsp" style="position:absolute;top:calc(var(--bxT) + 6px);right:max(8px,env(safe-area-inset-right))">↺ RESPAWN</button>
   <div id="bxHud"></div><div id="bxMsg"></div><button class="st" id="bxL" style="left:max(14px,env(safe-area-inset-left))">◀</button><button class="st" id="bxR" style="left:calc(max(14px,env(safe-area-inset-left)) + 100px)">▶</button>
-  <button class="st" id="bxB" style="right:max(14px,env(safe-area-inset-right));font-size:14px">BRAKE</button></div>`
+  <button class="st" id="bxB" style="right:max(14px,env(safe-area-inset-right));font-size:14px">BRAKE</button>
+  <button class="st" id="bxG" style="right:max(14px,env(safe-area-inset-right));bottom:calc(max(10px,env(safe-area-inset-bottom)) + 98px);font-size:15px">GAS</button>
+  <button class="st" id="bxBo" style="right:calc(max(14px,env(safe-area-inset-right)) + 100px);bottom:calc(max(10px,env(safe-area-inset-bottom)) + 98px);font-size:13px">🔥 BOOST</button>
+  <button id="bxPz" style="position:absolute;top:calc(var(--bxT) + 6px);right:calc(max(8px,env(safe-area-inset-right)) + 104px)">⏸ PAUSE</button>
+  <div id="bxPause" hidden><b>PAUSED</b><button id="bxPzGo">▶ RESUME</button><button id="bxPzRe">↺ RESTART</button><button id="bxPzBk">◀ BUILD</button></div></div>`
  :`<div id="bxTap"></div><div id="bxTop"><button id="bxExit">◀ EXIT</button><button id="bxT1" class="${BX.tab==='track'?'on':''}">TRACK</button><button id="bxT2" class="${BX.tab==='land'?'on':''}">LAND</button>
   <div id="bxInfo"></div><button id="bxSave">💾 SAVE</button><button id="bxOpen">📂 LOAD</button></div><div id="bxPal"></div>
   <div id="bxAct">${BX.tab==='track'?'<button id="bxPlace">✔ PLACE</button><button id="bxTurn">↻ TURN</button><button id="bxUp">▲ UP</button><button id="bxDn">▼ DOWN</button><button id="bxDel">✖ DEL</button>':'<button id="bxView">⟲ VIEW</button>'}<button id="bxUndo">↶ UNDO</button><button id="bxGo" class="go">▶ DRIVE</button></div>`;
  const on=(id,f)=>{const b=$('#'+id);if(b)b.onclick=e=>{e.stopPropagation();try{AU.sfx&&AU.sfx('pick')}catch(_){}f()}};
- if(d){on('bxBack',BX_driveStop);on('bxRsp',()=>BX_respawn('button'));BX.tc={};for(const[id,k]of[['bxL','l'],['bxR','r'],['bxB','b']]){const b=$('#'+id),set=v=>e=>{e.preventDefault();BX.tc[k]=v;BX.touch=BX.touch||e.type.startsWith('touch')};
+ if(d){on('bxBack',()=>{BX.auto=null;BX_pause(0);BX_driveStop()});on('bxRsp',()=>BX_respawn('button'));on('bxBo',BX_boostGo);on('bxPz',()=>BX_pause(1));on('bxPzGo',()=>BX_pause(0));
+  on('bxPzRe',()=>{BX_pause(0);const rc=!!BX.race;BX_driveStart();if(rc)BX_raceSetup()});on('bxPzBk',()=>{BX.auto=null;BX_pause(0);try{BX_raceClear()}catch(e){}BX_driveStop()});BX.tc={};for(const[id,k]of[['bxL','l'],['bxR','r'],['bxB','b'],['bxG','g']]){const b=$('#'+id),set=v=>e=>{e.preventDefault();BX.tc[k]=v;BX.touch=BX.touch||e.type.startsWith('touch')};
    b.addEventListener('touchstart',set(1),{passive:false});b.addEventListener('touchend',set(0));b.addEventListener('touchcancel',set(0));b.addEventListener('mousedown',set(1));b.addEventListener('mouseup',set(0));b.addEventListener('mouseleave',set(0))}
   BX.touch=matchMedia('(pointer:coarse)').matches;return}
  const P=$('#bxPal');if(BX.tab==='track'){for(const t of BX_PAL){const b=document.createElement('button');b.dataset.p=t;if(t===BX.sel)b.className='on';b.appendChild(BX_icon(t));b.append(BX_P[t].n);b.onclick=()=>{BX.sel=t;BX_ghost();P.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};P.appendChild(b)}}
@@ -509,25 +542,26 @@ buildMenu=(f=>function(){const r=f.apply(this,arguments);try{BX_raceMenu()}catch
 function bxCh(w,c,L,o=BX_OFF){const log=w?[['w',w]]:[];let cur={i:c[0]+o,j:c[1]+o,l:c[2],r:c[3]},sp=null;for(const t of L){if(Array.isArray(t)){cur={i:t[0]+o,j:t[1]+o,l:t[2],r:t[3]};continue} // o: cells authored on the old 40-grid get +BX_OFF (pass 0 for 56-grid layouts)
  if(typeof t==='number'){cur={...sp[t]};continue}log.push(['p',t,cur.i,cur.j,cur.l,cur.r]);const ex=BX_P[t].ex.map(e=>BX_exit(cur,e));if(ex.length>1)sp=ex;cur=ex[0]}return log}
 const bxRep=(t,n)=>Array(n).fill(t);
+const bxW2=()=>['fk2',1,'st','kj','st','st',0,'st','bo','st','st','mg2']; // trk-4: replaces 10 straight cells
 const bxCross=ids=>{const L=BX.pcs.filter(p=>ids.has(p.id));for(const A of L)for(const B of L){if(A===B)continue;for(const a of A.S[0])for(const b of B.S[0])if(Math.hypot(a.p.x-b.p.x,a.p.z-b.p.z)<4&&a.p.y-b.p.y>5)return true}return false};
 // built-in tracks (dev-2, Alex: "I see no tracks made with the builder yet!!!"): plain builder logs, so ★ load + edit + save works like any track
 // trk-1 rebuild (Alex on the first versions: "horrible! not fun, not easy to drive, the car moves backward"): every ramp <= 22 %, corners are the
 // 36 m WIDE BANKs (full speed), one KICKER each (0.6-1.5 s air, flat landing), closed loops (the SPLIT joins again at a MERGE), laps ~1.4-1.7 km
 Object.assign(BX_DEMOS,{
  // mountain: low start -> climb in two hairpins -> across the mesa top (kicker) -> elevated 30 m hairpin -> long descent -> home
- 'CLIFF RUN':{log:bxCh('mountain',[8,4,1,3],['sf','st','st','kj',...bxRep('st',3),'cp',...bxRep('st',6),'kj',...bxRep('st',10),'wbr','st','wbr',
+ 'CLIFF RUN':{log:bxCh('mountain',[8,4,1,3],['sf','st','st','kj',...bxRep('st',3),'cp',...bxRep('st',6),'kj',...bxW2(),'wbr','st','wbr',
   'su','st','su','st','cp',...bxRep('st',8),'wbl','st','wbl','lu','su','bo',...bxRep('st',5),'kj',...bxRep('st',6),'wbr',...bxRep('st',5),'wbr',
   'st','st','sd','sd','cp','sd','ld','wbr','bo','fk',1,'wbr','st','wbl','st','wbl','st','wbr',0,...bxRep('st',7),'kj',...bxRep('st',11),'mg','st','wbr'])},
  // city (trk-2: its own layout on the 56-cell grid): a downtown square ring round the blocks. The west side climbs onto a 12 m viaduct over
  // the lake (two levels); on the south side a SPLIT: the straight lane has two kickers, the other lane is a banked detour through the infield
- 'TWO-LEVEL CITY':{log:bxCh('city',[5,4,1,3],['sf','st','bo',...bxRep('st',6),'kj',...bxRep('st',10),'cp',...bxRep('st',19),'wbr',...bxRep('st',6),'kj',...bxRep('st',12),'bo',...bxRep('st',20),'wbr',...bxRep('st',3),'fk',1,'st','wbr',...bxRep('st',2),'wbl','kj',...bxRep('st',2),'wbl',...bxRep('st',2),'wbr',0,...bxRep('st',4),'kj',...bxRep('st',11),'kj',...bxRep('st',5),'mg',...bxRep('st',11),'wbr',...bxRep('st',2),'su',...bxRep('st',14),'cp',...bxRep('st',4),'sd',...bxRep('st',7),'wbr'],0)},
+ 'TWO-LEVEL CITY':{log:bxCh('city',[5,4,1,3],['sf','st','bo',...bxRep('st',6),'kj',...bxRep('st',10),'cp',...bxW2(),...bxRep('st',9),'wbr',...bxRep('st',6),'kj',...bxRep('st',12),'bo',...bxRep('st',20),'wbr',...bxRep('st',3),'fk',1,'st','wbr',...bxRep('st',2),'wbl','kj',...bxRep('st',2),'wbl',...bxRep('st',2),'wbr',0,...bxRep('st',4),'kj',...bxRep('st',11),'kj',...bxRep('st',5),'mg',...bxRep('st',11),'wbr',...bxRep('st',2),'su',...bxRep('st',14),'cp',...bxRep('st',4),'sd',...bxRep('st',7),'wbr'],0)},
  // canyon snail on the 18 m plateau: SPLIT over the canyon (bridge, or down to the floor and up) -> MERGE -> viaduct along the canyon -> 26 m bridge over itself
  'CANYON SPLIT':{log:bxCh('canyon',[13,2,13,3],['sd','sf','st','bo',...bxRep('st',10),'wbr','fk',1,'wbr','wbl','st','st','st','wbl','wbr',0,...bxRep('st',21),'mg',
-  'st','wbr',...bxRep('st',10),'kj',...bxRep('st',12),'cp','wbr','bo',...bxRep('st',6),'kj',...bxRep('st',8),'wbr',...bxRep('st',5),'kj',...bxRep('st',5),'wbr',...bxRep('st',8),'cp','wbr',...bxRep('st',6),'wbr','su',...bxRep('st',13),'wbr'])},
+  'st','wbr',...bxW2(),'kj',...bxRep('st',12),'cp','wbr','bo',...bxRep('st',6),'kj',...bxRep('st',8),'wbr',...bxRep('st',5),'kj',...bxRep('st',5),'wbr',...bxRep('st',8),'cp','wbr',...bxRep('st',6),'wbr','su',...bxRep('st',13),'wbr'])},
  // islands (trk-2: its own layout on the 56-cell grid): a figure-8 over the sea. Loop A turns right, loop B left; the north run climbs over
  // the start straight on a 12 m bridge. On loop A's south side a SPLIT: the straight lane splashes into the sea (boat) and up a ramp, the
  // other lane is a banked detour round the inside; they MERGE again. Laid out with tools/bx/plan.js (closed, 0 overlaps, in bounds)
- 'LAGOON SPLASH':{log:bxCh('islands',[25,24,2,3],['sf','st','bo',...bxRep('st',5),'kj',...bxRep('st',7),'cp',...bxRep('st',7),'wbr',...bxRep('st',5),'kj',...bxRep('st',13),'wbr','st','fk',1,'br',...bxRep('st',3),'bl',...bxRep('st',2),'bl',...bxRep('st',3),'br',0,'dn',[38,53,0,1],'up',...bxRep('st',2),'mg',...bxRep('st',2),'wbr',...bxRep('st',16),'su',...bxRep('st',5),'sd',...bxRep('st',8),'wbl',...bxRep('st',4),'kj',...bxRep('st',9),'wbl',...bxRep('st',3),'bo',...bxRep('st',9),'wbl',...bxRep('st',10),'kj',...bxRep('st',7)],0)}});
+ 'LAGOON SPLASH':{log:bxCh('islands',[25,24,2,3],['sf','st','bo',...bxRep('st',5),'kj',...bxRep('st',7),'cp',...bxRep('st',7),'wbr',...bxRep('st',5),'kj',...bxRep('st',13),'wbr','st','fk',1,'br',...bxRep('st',3),'bl',...bxRep('st',2),'bl',...bxRep('st',3),'br',0,'dn',[38,53,0,1],'up',...bxRep('st',2),'mg',...bxRep('st',2),'wbr',...bxW2(),...bxRep('st',6),'su',...bxRep('st',5),'sd',...bxRep('st',8),'wbl',...bxRep('st',4),'kj',...bxRep('st',9),'wbl',...bxRep('st',3),'bo',...bxRep('st',9),'wbl',...bxRep('st',10),'kj',...bxRep('st',7)],0)}});
 // "drivable and fun" pass lines (coordinator 2026-10-13, after Alex: "horrible! not fun, not easy to drive, the car moves backward"):
 // 0 backward start, <=1 respawn per lap, <=2 wall hits/min, average speed >=60 % of top, a 0.6-1.5 s jump with a clean landing, lap 45-90 s, no grade >25 %
 function BX_grade(){let g=0,at='';for(const p of BX.pcs){if(p.dead||p.def.jump)continue;for(const S of p.S)for(let k=1;k<S.length;k++){const a=S[k-1].p,b=S[k].p,h=Math.hypot(b.x-a.x,b.z-a.z);if(h>.05){const q=Math.abs(b.y-a.y)/h;if(q>g){g=q;at=p.type}}}}return{g,at}}
@@ -600,9 +634,9 @@ function BX_routeLen(ch){const W=window.__bx.route(ch);let d=0;for(let i=1;i<W.l
  const T=[...new Set(W.map(w=>w[3]+'#'+w[4]))].map(x=>x.split('#')[0]);return{d,kick:T.filter(t=>t==='kj'||t==='kk').length,boost:T.filter(t=>t==='bo').length}}
 function BX_data(){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,NS=new Set(L.flatMap(p=>BX_ents(p).map(key)));
  const gaps=L.flatMap(p=>p.ex.filter(e=>{if(NS.has(key(e)))return false;const o=BX_fr(e).o;return BX_h(o.x,o.z)>-.7}).map(()=>p.type));
- const noRail=L.filter(p=>!(p.def.in||p.def.p.length>1)&&!BX_RAIL.length).length,width=2*BXRW+1,G=BX_grade(),fk=L.some(p=>p.type==='fk')&&L.some(p=>p.type==='mg');
- const R=[BX_routeLen([0]),BX_routeLen([1])],short=fk?Math.abs(R[0].d-R[1].d):0,lo=Math.min(R[0].d,R[1].d),hi=Math.max(R[0].d,R[1].d);
- const C=[['rails on every piece',noRail===0,`${noRail} pieces without rails`],['width >=14 m',width>=14,`width ${width} m`],['0 gaps',gaps.length===0,`open ends ${gaps.length}${gaps.length?' ('+gaps.join(',')+')':''}`],
+ const noRail=L.filter(p=>!(p.def.in||p.def.p.length>1)&&!BX_RAIL.length).length,width=2*BX_HW,G=BX_grade(),fk=L.some(p=>p.type==='fk')&&L.some(p=>p.type==='mg');
+ const R=[BX_routeLen([0,0,0]),BX_routeLen([1,1,1])],short=fk?Math.abs(R[0].d-R[1].d):0,lo=Math.min(R[0].d,R[1].d),hi=Math.max(R[0].d,R[1].d);
+ const C=[BX_OPEN?['rails only on high decks',true,`rails on ${L.filter(p=>p.rail).length}/${L.length} pieces (bridges)`]:['rails on every piece',noRail===0,`${noRail} pieces without rails`],BX_OPEN?['width >=24 m',width>=24,`width ${width} m`]:['width >=14 m',width>=14,`width ${width} m`],['0 gaps',gaps.length===0,`open ends ${gaps.length}${gaps.length?' ('+gaps.join(',')+')':''}`],
   ['>=3 jumps',Math.min(R[0].kick,R[1].kick)>=3,`jumps ${R[0].kick}/${R[1].kick}`],['>=2 boosts',Math.min(R[0].boost,R[1].boost)>=2,`boosts ${R[0].boost}/${R[1].boost}`],
   ['shortcut',fk&&short>=50,`shortcut ${fk?'saves '+short.toFixed(0)+' m':'none'}`],['grade <=25 %',G.g<=.25,`max grade ${Math.round(G.g*100)} %`],
   ['lap 1.5-2.7 km',lo>=1500&&hi<=2700,`lap ${(lo/1000).toFixed(2)}-${(hi/1000).toFixed(2)} km`],
@@ -612,8 +646,61 @@ function BX_data(){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+
 // the bxT check: track data + the 3 s input check (GO -> GAS 3 s -> >=15 m forward, never backward)
 for(const k of['bx-t-cliff','bx-t-city','bx-t-canyon','bx-t-lagoon']){const T=BX_TESTS[k];T.chk=()=>{const m=BX.m,D=BX_data(),i=[['>=15 m forward in 3 s',m.fwd3>=15,`forward ${(m.fwd3||0).toFixed(0)} m in 3 s`],['0 backward',!(m.back0>0),`backward ${(m.back0||0).toFixed(1)} s`]];
  const ok=D.ok&&i.every(x=>x[1]);return{ok,fails:[...D.fails,...i.filter(x=>!x[1]).map(x=>x[0])],msg:D.msg+' | '+i.map(x=>(x[1]?'✔ ':'✘ ')+x[2]).join(', ')}}}
+// ---------------------------------------------------------------- trk-4 OPEN TRACKS (Alex 2026-10-14: "very limited spaces to drive around, no freedom compared to 2K Drive tracks ...
+// unplayable tracks, no buttons"). Acceptance tests (checklist ver 'trk4', 📍 GO = BX_test). Every demo track is measured from its built pieces + terrain;
+// the AI lap runs the real car physics (BX_step) in fast time, no rendering. Reference traits: docs/TRACKS_REF.md
+function BX_demoNames(){return Object.keys(BX_DEMOS).filter(k=>!BX_DEMOS[k].hide)}
+function BX_eachDemo(f){const cur={log:BX.log},cn=BX.name,dr=BX.mode==='drive',R=[];if(dr)BX_driveStop();try{BX_raceClear()}catch(e){}
+ for(const k of BX_demoNames()){BX_load(BX_DEMOS[k],k);R.push([k,f(k)])}BX_load(cur,cn);if(dr)BX_driveStart();return R}
+// the lap as piece samples (same walk as __bx.route): ch[k] = branch at the k-th SPLIT
+// trk-5: across a water gap (splash lane: RAMP DOWN into the water ... RAMP UP out of it) the course goes on at the nearest unseen piece AHEAD of the exit,
+// in line with it (the old nearest-piece rule jumped sideways onto the other lane of the split, so the AI never took the splash)
+function BX_gapNext(L,seen,e){const fr=BX_fr(e),E=fr.o,F=fr.F;let best=null,bs=1e9;for(const p of L){if(seen.has(p.id))continue;const d=p.S[0][0].p.clone().sub(E),fw=d.x*F.x+d.z*F.z,lat=Math.abs(d.x*F.z-d.z*F.x),dist=Math.hypot(d.x,d.z);
+ if(dist>60||fw<-2)continue;const sc=dist+3*lat;if(sc<bs){bs=sc;best=p}}return best}
+function BX_lap(ch=[]){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set(),splits=0;
+ while(pc&&!seen.has(pc.id)){seen.add(pc.id);const last=out.length?out[out.length-1].s.p:null,b=pc.def.in?(last?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-last.x,S[0].p.z-last.z)]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;
+  if(pc.S.length>1&&!pc.def.in)splits++;for(const s of pc.S[b])out.push({s,pc});const e=pc.ex[Math.min(b,pc.ex.length-1)],E=BX_fr(e).o;pc=by.get(key(e))||BX_gapNext(L,seen,e)} // a water splash leaves a gap: the next piece is the nearest unseen start (like route())
+ out.splits=splits;out.closed=!!(out.length&&out[0].s.p.distanceTo(out[out.length-1].s.p)<6);return out}
+// drivable metres beyond a deck edge (side sg = -1 left, +1 right), up to 30 m: no rail, ground (or water: boat) within 0.6 m per metre of the last point, no building/rock/tree/pillar
+const bxRail=pc=>pc.rail!=null?pc.rail:!(pc.def.in||pc.def.p.length>1)&&BX_RAIL.length>0;
+function BX_side(s,pc,sg){if(bxRail(pc))return 0;let y=s.p.y+s.S.y*sg*BX_HW,w=0;const eff=h=>h<-.7?0:h;
+ for(let d=1;d<=30;d++){const o=BX_HW+d,x=s.p.x+s.S.x*sg*o,z=s.p.z+s.S.z*sg*o,hr=BX_h(x,z),h=eff(hr);if(Math.abs(h-y)>(d===1?.8:.6)&&!(hr<-.7&&y-h<=6&&y>=h))break; // a drop into water up to 6 m = splash in (boat)
+  if((BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+1&&Math.abs(b.z-z)<b.d/2+1)||(BX.rk||[]).some(r=>Math.hypot(r[0]-x,r[1]-z)<r[3]*1.2+1)||(BX.tr||[]).some(t=>Math.hypot(t[0]-x,t[1]-z)<1.8)||(BX.pil||[]).some(p=>Math.hypot(p[0]-x,p[1]-z)<2&&h<p[3]))break;y=h;w=d}return w}
+function BX_openData(){const R=[];for(const ch of[[0,0,0],[1,1,1]]){const S=BX_lap(ch);let wide=0,open=0,n=0;const W=[];for(let i=0;i<S.length;i+=2){const{s,pc}=S[i];if(s.U.y<.6)continue;n++;const l=BX_side(s,pc,-1),r=BX_side(s,pc,1),w=2*BX_HW+l+r;W.push(w);if(w>=24)wide++;if(Math.max(l,r)>=8)open++}
+ R.push({wide:wide/Math.max(1,n),open:open/Math.max(1,n),splits:S.splits,closed:S.closed,wmin:Math.min(...W)})}return R}
+// fast-time AI lap: the real car physics at 120 Hz with an autopilot on the lap samples (gas on, steer to a point ~1 s ahead, brake on sharp turns)
+function BX_autoInp(W,st){const V=BX.v,n=W.length;let bi=st.i,bd=1e9;for(let k=-6;k<90;k++){const j=((st.i+k)%n+n)%n,d=W[j].distanceToSquared(V.p);if(d<bd){bd=d;bi=j}}
+ if(bd>900)W.forEach((p,j)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=j}});st.i=bi;const sp=V.v.length(),tw=W[(bi+Math.max(5,Math.round(sp/1.6)))%n],dx=tw.x-V.p.x,dz=tw.z-V.p.z,
+ S=bxV().crossVectors(V.F,V.U),a=Math.atan2(S.x*dx+S.z*dz,V.F.x*dx+V.F.z*dz);return{s:bxCl(a*3,-1,1),g:1,b:Math.abs(a)>.9&&sp>16?1:0}}
+function BX_sim(ch=[],maxT=220){try{BX_raceClear()}catch(e){}BX_driveStart();const V=BX.v,m=BX.m,W=BX_lap(ch).map(o=>o.s.p),st={i:0},dt=1/120;let slow=0,slowMax=0,t0=performance.now();const tr=[];
+ for(let i=0;i<maxT*120&&W.length;i++){const inp=BX.inp=BX_autoInp(W,st);BX_step(dt,inp);if(i%4===0)BX_farCheck(dt*4);const sp=V.v.length();slow=sp<2?slow+dt:0;slowMax=Math.max(slowMax,slow);if(i%(BX.trK||240)===0)tr.push([+m.t.toFixed(1),Math.round(V.p.x),Math.round(V.p.y),Math.round(V.p.z),st.i,V.g?1:0,+inp.s.toFixed(2),Math.round(sp),V.on?V.on.type:"-"]);if(m.laps>=1)break}
+ const r={laps:m.laps,t:+m.t.toFixed(1),lap:m.lapT[0]||0,slowMax:+slowMax.toFixed(2),resp:m.resp,why:m.respWhy.join(','),turned:m.turned||0,air1:(m.lands||[]).filter(l=>l.air>=1).length,airs:(m.lands||[]).map(l=>l.air),ms:Math.round(performance.now()-t0)};BX.simTr=tr;BX_driveStop();return r}
+const bxRes=C=>({ok:C.every(c=>c[1]),fails:C.filter(c=>!c[1]).map(c=>c[0]),msg:C.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(', ')});
+// phone layout of a set of buttons: inside the screen, >= 40 px, the button itself is under its centre (nothing covers it), no two overlap
+function BX_btnChk(ids){const W=innerWidth,H=innerHeight,B=ids.map(id=>[id,$('#'+id)]),bad=[];const R=B.map(([id,e])=>[id,e&&e.getBoundingClientRect()]);
+ for(const[id,r]of R){if(!r||!r.width){bad.push(id+' missing');continue}if(r.left<0||r.top<0||r.right>W+.5||r.bottom>H+.5)bad.push(id+' off-screen');if(Math.min(r.width,r.height)<40)bad.push(id+' small '+Math.round(Math.min(r.width,r.height)));
+  const e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);if(!e||!(e.id===id||e.closest('#'+id)))bad.push(id+' covered'+(e?' by '+(e.id||e.tagName):''))}
+ for(let a=0;a<R.length;a++)for(let b=a+1;b<R.length;b++){const p=R[a][1],q=R[b][1];if(p&&q&&p.width&&q.width&&p.left<q.right-1&&q.left<p.right-1&&p.top<q.bottom-1&&q.top<p.bottom-1)bad.push(R[a][0]+'×'+R[b][0])}
+ return{bad,msg:`${ids.length-bad.filter(x=>!x.includes('×')).length}/${ids.length} buttons OK in ${W}x${H}${bad.length?' ('+bad.slice(0,4).join('; ')+')':''}`}}
+const BX_DRIVE_BTNS=['bxL','bxR','bxB','bxG','bxBo','bxPz','bxRsp'];
+Object.assign(BX_TESTS,{
+ 'bx-o-width':{n:'WIDE ROADS: all tracks',log:()=>BX_DEMOS['CLIFF RUN'].log,chk:()=>{const R=BX_eachDemo(()=>BX_openData());
+  return bxRes(R.map(([k,D])=>[k,D.every(d=>d.wide>=.9),`${k}: ${D.map(d=>Math.round(d.wide*100)+'%').join('/')} of the lap ≥ 24 m drivable (min ${Math.round(Math.min(...D.map(d=>d.wmin)))} m)`]))}},
+ 'bx-o-routes':{n:'ROUTE CHOICES: all tracks',log:()=>BX_DEMOS['CANYON SPLIT'].log,chk:()=>{const R=BX_eachDemo(()=>BX_openData());
+  return bxRes(R.map(([k,D])=>[k,D[0].splits>=2&&D.every(d=>d.closed),`${k}: ${D[0].splits} route choices, both ways ${D.every(d=>d.closed)?'close the lap':'do NOT close'}`]))}},
+ 'bx-o-open':{n:'OPEN SPACE: all tracks',log:()=>BX_DEMOS['LAGOON SPLASH'].log,chk:()=>{const R=BX_eachDemo(()=>BX_openData());
+  return bxRes(R.map(([k,D])=>[k,D.every(d=>d.open>=.3),`${k}: ${D.map(d=>Math.round(d.open*100)+'%').join('/')} of the lap has ≥ 8 m open ground beside the road`]))}},
+ 'bx-o-jumps':{n:'BIG JUMPS: all tracks',log:()=>BX_DEMOS['CLIFF RUN'].log,drive:1,auto:1,chk:()=>{const R=BX_eachDemo(()=>BX_sim([0,0,0]));
+  return bxRes(R.map(([k,r])=>[k,r.air1>=3,`${k}: ${r.air1} jumps ≥ 1 s air (${r.airs.join('/')||'none'})`]))}},
+ 'bx-o-ai':{n:'AI LAP: all tracks',log:()=>BX_DEMOS['CANYON SPLIT'].log,drive:1,auto:1,chk:()=>{const R=BX_eachDemo(()=>[BX_sim([0,0,0]),BX_sim([1,1,1])]);
+  return bxRes(R.map(([k,rr])=>[k,rr.every(r=>r.laps>=1&&r.slowMax<=2&&r.resp===0&&r.turned===0),`${k}: `+rr.map(r=>`lap ${r.laps?r.lap.toFixed(0)+' s':'NOT done ('+r.t+' s)'}, stuck max ${r.slowMax} s, respawns ${r.resp}${r.why?' '+r.why:''}, turned ${r.turned}`).join(' | ')]))}},
+ 'bx-o-btn':{n:'RACE BUTTONS: CLIFF RUN',log:()=>BX_DEMOS['CLIFF RUN'].log,drive:1,race:1,chk:()=>{const c=BX_btnChk(BX_DRIVE_BTNS);return bxRes([['race buttons',BX.mode==='drive'&&!c.bad.length,c.msg]])}},
+ 'bx-o-ui':{n:'BUILDER BUTTONS',log:()=>BX_DEMOS['CLIFF RUN'].log,chk:()=>{if(BX.mode!=='build')return bxRes([['build mode',false,'not in build mode']]);const ids=[...document.querySelectorAll('#bxTop button,#bxAct button')].map(e=>e.id),c=BX_btnChk(ids),
+  H=innerHeight,W=innerWidth,pal=[...document.querySelectorAll('#bxPal button')].filter(e=>{const r=e.getBoundingClientRect();return r.top>=0&&r.bottom<=H&&r.left>=0&&r.right<=W&&r.height>=40}).length;
+  return bxRes([['top + side buttons',!c.bad.length,c.msg],['piece buttons',pal>=4,`${pal} piece buttons fully on screen`]])}}});
 function BX_test(id){const T=BX_TESTS[id];if(!T)return;const ck=$('#odChk');if(ck)ck.hidden=true;if(!BX.on)BX_open();if(BX.mode==='drive')BX_driveStop();
- BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();if(T.drive)BX_driveStart();if(T.race)BX_raceSetup();return T.n}
+ BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();BX.auto=null;if(T.drive)BX_driveStart();if(T.race)BX_raceSetup();
+ if(T.auto)BX.auto={W:BX_lap([0,0,0]).map(o=>o.s.p),st:{i:0}};return T.n} // trk-4: auto = the AI drives the lap you watch (the check runs the same autopilot in fast time)
 window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||BX.testId].chk(),tests:()=>Object.keys(BX_TESTS),off:id=>BX_TESTS[id||BX.testId].off||null,
  proj:(x,y,z)=>{const v=bxV(x,y,z).project(BX.cam);return[(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z<1?1:0]},
  cell:(i,j,l)=>{const p=bxV(BXO+(i+.5)*BXC,l==null?BX_h(BXO+(i+.5)*BXC,BXO+(j+.5)*BXC):l*BXH,BXO+(j+.5)*BXC).project(BX.cam);return[(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]},
@@ -623,8 +710,8 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
  // the course as waypoints (for the test driver): follow exits from START, choosing branch ch[k] at the k-th SPLIT
  route:(ch=[])=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set();
   while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.def.in?(out.length?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-out[out.length-1][0],S[0].p.z-out[out.length-1][2])]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type,pc.id]);
-   const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).sort((a,c)=>{const A=a.S[0][0].p,C=c.S[0][0].p,E=BX_fr(e).o;return A.distanceTo(E)-C.distanceTo(E)})[0]}return out},
- h:(x,z)=>BX_h(x,z),clear:()=>BX_terrClear(),demos:()=>BX_DEMOS,log:()=>JSON.stringify({v:3,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
+   const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||BX_gapNext(L,seen,e)}return out},
+ h:(x,z)=>BX_h(x,z),clear:()=>BX_terrClear(),sim:(ch,t)=>BX_sim(ch,t),lap:ch=>BX_lap(ch),openData:()=>BX_openData(),side:(s,pc,g)=>BX_side(s,pc,g),demos:()=>BX_DEMOS,log:()=>JSON.stringify({v:3,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
 
 // ---------------------------------------------------------------- RACE on a builder track (trk-2 MVP, coordinator-approved; Alex beta.22: "none of the race methods is applied")
 // 3-2-1-GO countdown (car held), 5 rivals (the city race team rides) on the course waypoints with a curve speed profile, position "3/6" + lap timer,
@@ -665,7 +752,7 @@ function BX_raceTick(dt){const r=BX.race;if(!r||BX.mode!=='drive')return;const c
  if(cd&&cd.textContent){r.goT+=dt;if(r.goT>.8)cd.textContent=''}r.t+=dt;const R=r.R,end=r.s0+BX_RACE_LAPS*R.L;
  const me0=BX_raceProg();
  // trk-3 (Alex beta.36 "5/6 -> 6/6 and never sees a rival"): light rubber-banding keeps the pack in sight: a rival > 10 m ahead eases off (to 50 % at ~70 m), one behind pushes up to +15 %
- for(const q of r.rv){if(q.fin==null){const at=BX_pathAt(R,q.s),g=q.s-r.s0-me0,rb=g>10?Math.max(.5,1-(g-10)/120):g<-10?Math.min(1.15,1+(-g-10)/150):1,lim=Math.min(q.base*rb,R.VL[at.i]*(q.base/33)*Math.min(rb,1.08));q.v+=Math.sign(lim-q.v)*Math.min(Math.abs(lim-q.v),(lim>q.v?10:16)*dt);q.s+=q.v*dt;if(q.s>=end){q.fin=r.t;q.s=end}}
+ for(const q of r.rv){if(q.fin==null){const at=BX_pathAt(R,q.s),g=q.s-r.s0-me0,rb=r.fair?(g>10?Math.max(.85,1-(g-10)/400):1):g>10?Math.max(.5,1-(g-10)/120):g<-10?Math.min(1.15,1+(-g-10)/150):1 /* trk-5 fair (GRAND TOUR): a rival never speeds up because you lead; one far ahead eases off at most 15 % */,lim=Math.min(q.base*rb,R.VL[at.i]*(q.base/33)*Math.min(rb,1.08));q.v+=Math.sign(lim-q.v)*Math.min(Math.abs(lim-q.v),(lim>q.v?10:16)*dt);q.s+=q.v*dt;if(q.s>=end){q.fin=r.t;q.s=end}}
   const a=BX_pathAt(R,q.s),b=BX_pathAt(R,q.s+3),Sx=b.F.z,Sz=-b.F.x;q.o.position.set(a.p.x+Sx*q.lat,a.p.y+.05,a.p.z+Sz*q.lat);q.o.lookAt(b.p.x+Sx*q.lat,a.p.y+.05,b.p.z+Sz*q.lat)}
  const me=BX_raceProg(),pos=1+r.rv.filter(q=>q.s-r.s0>me).length;r.pos=pos;r.gapNow=Math.min(...r.rv.map(q=>Math.abs(q.s-r.s0-me)));if(BX.m.laps<1)r.gapMax=Math.max(r.gapMax||0,r.gapNow);const P=$('#bxPos'),T=$('#bxTm'),lt=BX.m.t-BX.m.lap0;
  if(P)P.textContent=pos+'/'+(BX_RIV+1);if(T)T.textContent=`LAP ${Math.min(BX.m.laps+1,BX_RACE_LAPS)}/${BX_RACE_LAPS} · ${Math.floor(lt/60)}:${(lt%60).toFixed(1).padStart(4,'0')}`;

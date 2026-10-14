@@ -150,7 +150,7 @@ function* WB_supMk(S,keep){const nt=S.nt,grp=S.grp;if(!nt){if(!keep)for(const c 
       if(keep&&performance.now()-ty>STR.sl){yield;ty=performance.now()}}
     rng.push([c,o0/3,(o-o0)/3,B]);for(let d=0;d<3;d++){if(B[d]<bx[d])bx[d]=B[d];if(B[d+3]>bx[d+3])bx[d+3]=B[d+3]}if(!keep){c.T=c.M=c.C=null}}
   if(keep)yield;
-  const A=[new THREE.BufferAttribute(p,3),new THREE.BufferAttribute(nn,3,true),new THREE.BufferAttribute(cc,3,true)];if(keep&&TUNE.strFree){const rel=function(){STR.st.relMB+=this.array.byteLength/1048576;this.array=null};for(const a of A)a.onUpload(rel)}
+  const A=[new THREE.BufferAttribute(p,3),new THREE.BufferAttribute(nn,3,true),new THREE.BufferAttribute(cc,3,true)];if(keep&&TUNE.strFree){const rel=function(){STR.st.relMB+=this.array.byteLength/1048576;this.array=null;this.getX=this.getY=this.getZ=this.getW=BA_freed/* rev-3: a freed array made every CPU-side getY throw 'null (reading 1)' (Alex, beta.60) */};for(const a of A)a.onUpload(rel)}
   const bs=B=>new THREE.Sphere(new THREE.Vector3((B[0]+B[3])/2,(B[1]+B[4])/2,(B[2]+B[5])/2),Math.hypot(B[3]-B[0],B[4]-B[1],B[5]-B[2])/2);  // v89b: bounds from the fill loop (a full rescan was the unsliced tail of a streamed build)
   const mk=(st,n,B)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',A[0]);g.setAttribute('normal',A[1]);g.setAttribute('color',A[2]);g.setDrawRange(st,n);g.boundingSphere=bs(B);
     const m=new THREE.Mesh(g,WBC.mat);m.matrixAutoUpdate=false;m.visible=false;m.userData.keep=1;m.userData.wbLod=1;m.raycast=()=>{};m.receiveShadow=false;m.castShadow=false;grp.add(m);return m};
@@ -225,3 +225,6 @@ function WB_icoPre(cam){WBI.h.length=0;if(WBI.m)WBI.m.visible=false;if(!TUNE.wbI
 function WB_icoPost(){for(const s of WBI.h)s.visible=true;WBI.h.length=0}
 {const ob=scene.onBeforeRender,oa=scene.onAfterRender;scene.onBeforeRender=function(...a){const r=ob.apply(this,a);try{if(a[2]&&a[2].isPerspectiveCamera)WB_icoPre(a[2])}catch(e){WB_icoPost();console.warn('WBI',e)}return r};
  scene.onAfterRender=function(...a){try{WB_icoPost()}catch(e){}return oa.apply(this,a)}}
+
+// rev-3: CPU-side reads of a GPU-uploaded (array freed) attribute return 0 instead of throwing
+function BA_freed(){return 0}

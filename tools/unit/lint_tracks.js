@@ -6,7 +6,7 @@ module.exports=async T=>{
  if(!THREE){console.log('SKIP '+'lint_tracks.js'+': three.js missing: run  npm i three@0.164.1 --no-save  (node_modules is not tracked)');return}
  const ss=/bxSS=([^,;]+)[,;]/.exec(L.JSCODE());
  const pre='const bxSS='+ss[1]+';\nconst bxCl=(v,a,b)=>v<a?a:v>b?b:v;\n'+L.lineSrc('bxRamp')+'\n'+L.lineSrc('bxCurve')+'\n'+L.lineSrc('bxBowl')+'\n';
- const S=L.sandbox(['BXF','BXC','BXH','BXRW','fn:BX_exit','BX_P','BX_PAL','BX_PROF','BX_RAIL','bxRep','fn:bxCh','BX_WORLDS','BXN','BX_OFF'],{THREE},'',pre);
+ const S=L.sandbox(['BX_OPEN','BXF','BXC','BXH','BXRW','BX_HW','fn:BX_exit','BX_KJ','BX_BK','BX_P','BX_PAL','BX_PROF','BX_RAIL','bxRep','bxW2','fn:bxCh','BX_WORLDS','BXN','BX_OFF'],{THREE},'',pre);
  const {BX_P,BX_PAL,BX_PROF,BX_RAIL,BXC,BXH,BXRW,BX_WORLDS,BXN}=S;const BXO=-BXN*BXC/2;
  // demos: run the real Object.assign(BX_DEMOS,{...}) statement
  const src=L.JSCODE(),i0=src.indexOf('Object.assign(BX_DEMOS,{'),i1=L.bal(src,i0+'Object.assign'.length);
