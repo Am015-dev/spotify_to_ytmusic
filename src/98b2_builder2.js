@@ -9,7 +9,7 @@
 // Drawn with the main renderer while BX.on (frame() is wrapped; the game loop is idle meanwhile). Probe: window.__bx.
 const BX={on:false,ui:0,tab:'track',sel:'st',tool:'raise',world:'valley',log:[],pcs:[],cur:{i:20,j:22,l:2,r:0},hl:-1,mode:'build',
  cam:null,sc:null,v:null,m:null,keys:{},t:0,acc:0,camB:{x:0,z:0,d:72,yaw:3.5,pit:0.52},name:'MY TRACK',fast:/[?&](bx)?fast=1/.test(location.search),tfast:/[?&]bxfast=1/.test(location.search)};
-const BXC=8,BXH=2,BXN=40,BXW=BXN*BXC,BXR=4,BXTN=BXW/BXR+1,BXO=-BXW/2,BXG=16,BXRW=6.5; // road 13 m + kerbs = 14 m wide (trk-1: LEGO 2K Drive roads are wide; 8 m with walls = constant scraping)
+const BXC=8,BXH=2,BXN=56,BX_OFF=8,BXW=BXN*BXC,BXR=4,BXTN=BXW/BXR+1,BXO=-BXW/2,BXG=16,BXRW=6.5; // trk-2: 56 cells = 448 m (was 40 = 320 m; old 40-grid cells are +BX_OFF, same metres). road 13 m + kerbs = 14 m wide (trk-1: LEGO 2K Drive roads are wide; 8 m with walls = constant scraping)
 const BXF=[[0,1],[-1,0],[0,-1],[1,0]];
 const bxV=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z),bxSS=t=>t*t*(3-2*t),bxCl=(v,a,b)=>v<a?a:v>b?b:v;
 BX.th=new Float32Array(BXTN*BXTN);
@@ -201,7 +201,7 @@ function BX_dress(){if(BX.drM){BX.sc.remove(BX.drM);BX.drM.traverse(o=>{if(o.isI
  BX.dressN={props,len,landmark:BX_landmark(g,L),block}}
 // landmark: a giant LEGO minifig (~16 m) on open ground 30-50 m from the course, as close to START as possible
 function BX_landmark(g,L){const st=L.find(p=>p.def.start)||L[0];if(!st||!BX.samp.length)return 0;const o=st.S[0][0].p,sF=st.S[0][0].F;let best=null,bd=1e9;
- for(const[cmin,dm]of[[.94,26],[.8,18]])if(!best)for(let a=0;a<64;a++)for(const r of[70,85,100,120,140]){const ca=Math.cos(a/64*6.283),sa=Math.sin(a/64*6.283),x=o.x+ca*r,z=o.z+sa*r;if(ca*sF.x+sa*sF.z<cmin)continue;/* ahead of the start grid */if(Math.abs(x)>150||Math.abs(z)>150)continue;const h0=BX_h(x,z),h=Math.max(h0,.6);if(h0>=.3&&BX_tn(x,z).y<.9)continue;
+ for(const[cmin,dm]of[[.94,26],[.8,18]])if(!best)for(let a=0;a<64;a++)for(const r of[70,85,100,120,140]){const ca=Math.cos(a/64*6.283),sa=Math.sin(a/64*6.283),x=o.x+ca*r,z=o.z+sa*r;if(ca*sF.x+sa*sF.z<cmin)continue;/* ahead of the start grid */if(Math.abs(x)>BXW/2-10||Math.abs(z)>BXW/2-10)continue;const h0=BX_h(x,z),h=Math.max(h0,.6);if(h0>=.3&&BX_tn(x,z).y<.9)continue;
   let dmin=1e9;for(const{s}of BX.samp){const d=Math.hypot(s.p.x-x,s.p.z-z);if(d<dmin)dmin=d}if(dmin<dm)continue;if((BX.bld||[]).some(b=>Math.abs(b.x-x)<b.w/2+8&&Math.abs(b.z-z)<b.d/2+8))continue;
   const sc=r-(ca*sF.x+sa*sF.z)*30;if(sc<bd){bd=sc;best=[x,h,z]}}
  if(!best)return 0;const f=new THREE.Group(),std=c=>new THREE.MeshStandardMaterial({color:c,roughness:.35}),B=(w,h,d,c,x,y,z)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),std(c));m.position.set(x,y,z);m.castShadow=true;f.add(m);return m};
@@ -442,10 +442,10 @@ function BX_stats(){const I=$('#bxInfo');if(!I)return;const L=BX.pcs.filter(p=>!
 function BX_tapInit(){const el=$('#bxTap');if(!el)return;const P=new Map();let moved=0,d0=0,z0=0;
  el.onpointerdown=e=>{el.setPointerCapture(e.pointerId);P.set(e.pointerId,{x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY});moved=0;if(P.size===2){const[a,b]=[...P.values()];d0=Math.hypot(a.x-b.x,a.y-b.y);z0=BX.camB.d}};
  el.onpointermove=e=>{const p=P.get(e.pointerId);if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;if(Math.hypot(p.x-p.x0,p.y-p.y0)>9)moved=1;
-  if(P.size===2){const[a,b]=[...P.values()];BX.camB.d=bxCl(z0*d0/Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),30,320);return}
+  if(P.size===2){const[a,b]=[...P.values()];BX.camB.d=bxCl(z0*d0/Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),30,440);return}
   if(moved){const c=BX.camB,k=c.d/innerHeight*1.4,cs=Math.cos(c.yaw),sn=Math.sin(c.yaw);c.x=bxCl(c.x-(dx*cs+dy*sn)*k,-BXW/2,BXW/2);c.z=bxCl(c.z-(-dx*sn+dy*cs)*k,-BXW/2,BXW/2)}};
  el.onpointerup=el.onpointercancel=e=>{const p=P.get(e.pointerId);P.delete(e.pointerId);if(!p||moved||e.type==='pointercancel')return;BX_tap(e.clientX,e.clientY)};
- el.onwheel=e=>{BX.camB.d=bxCl(BX.camB.d*(e.deltaY>0?1.12:.89),30,320)}}
+ el.onwheel=e=>{BX.camB.d=bxCl(BX.camB.d*(e.deltaY>0?1.12:.89),30,440)}}
 function BX_tap(x,y){const R=BX.ray,nd=new THREE.Vector2(x/innerWidth*2-1,-y/innerHeight*2+1);R.setFromCamera(nd,BX.cam);R.far=2000;R.near=0;
  if(BX.tab==='track'){const hm=R.intersectObjects(BX.gE?BX.gE.children:[],false).find(h=>h.object.userData.end);if(hm){BX.cur={...hm.object.userData.end};BX.hl=-1;BX_hlShow();return BX_after()}
   const hg=BX.gG?R.intersectObjects(BX.gG.children,false)[0]:null,hp=R.intersectObjects(BX.gP.children,true)[0];
@@ -457,9 +457,10 @@ function BX_tap(x,y){const R=BX.ray,nd=new THREE.Vector2(x/innerWidth*2-1,-y/inn
 function BX_hlShow(){if(BX.hlM){BX.sc.remove(BX.hlM);BX.hlM=null}const pc=BX.pcs[BX.hl];if(!pc||pc.dead)return;const g=BX.hlM=new THREE.Group();for(const o of pc.meshes)if(o.isMesh){const m=new THREE.Mesh(o.geometry,BX_mats().hl);g.add(m)}BX.sc.add(g)}
 // ---------------------------------------------------------------- save / load (the action log)
 // tracks saved before v2 used the short steep ramps: keep their shape (legacy pieces up1/dn1/su1/sd1)
-const BX_mig=o=>o.v>=2?o:{v:2,log:o.log.map(a=>a[0]==='p'&&{up:1,dn:1,su:1,sd:1}[a[1]]?[a[0],a[1]+'1',...a.slice(2)]:a)};
+const BX_mig=o=>{if(o.v>=3)return o;let L=o.log;if(!(o.v>=2))L=L.map(a=>a[0]==='p'&&{up:1,dn:1,su:1,sd:1}[a[1]]?[a[0],a[1]+'1',...a.slice(2)]:a);
+ return{v:3,log:L.map(a=>a[0]==='p'?[a[0],a[1],a[2]+BX_OFF,a[3]+BX_OFF,...a.slice(4)]:a)}}; // v<3 = saved on the 40-cell grid: same metres = cells +BX_OFF
 function BX_saved(){try{return JSON.parse(localStorage.getItem('bx_tracks')||'{}')}catch(e){return{}}}
-function BX_save(){const S=BX_saved();if(BX.name==='MY TRACK'||BX_DEMOS[BX.name])BX.name='TRACK '+(Object.keys(S).length+1);S[BX.name]={v:2,log:BX.log};try{localStorage.setItem('bx_tracks',JSON.stringify(S))}catch(e){}BX_stats()}
+function BX_save(){const S=BX_saved();if(BX.name==='MY TRACK'||BX_DEMOS[BX.name])BX.name='TRACK '+(Object.keys(S).length+1);S[BX.name]={v:3,log:BX.log};try{localStorage.setItem('bx_tracks',JSON.stringify(S))}catch(e){}BX_stats()}
 function BX_load(o,name){BX.log=JSON.parse(JSON.stringify(o.log));BX.name=name||'TRACK';BX_replay();const L=BX.pcs.filter(p=>!p.dead);if(L.length){BX.cur={...L[L.length-1].ex[0]};const s=L[0].S[0][0].p;BX.camB.x=s.x;BX.camB.z=s.z}BX_after()}
 function BX_loadUI(){const old=$('#bxLoad');if(old){old.remove();return}const D=document.createElement('div');D.id='bxLoad';const add=(t,f)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{D.remove();f()};D.appendChild(b)};
  D.insertAdjacentHTML('beforeend','<b style="font-size:13px">DEMO TRACKS</b>');if(BX_DEMOS_SHOW)for(const k in BX_DEMOS)if(!BX_DEMOS[k].hide)add('★ '+k,()=>BX_load(BX_DEMOS[k],k));
@@ -481,7 +482,7 @@ function BX_raceMenu(){const tw=$('#tracks');if(!BX_DEMOS_SHOW||!tw||$('#pSetup'
 buildMenu=(f=>function(){const r=f.apply(this,arguments);try{BX_raceMenu()}catch(e){console.warn(e)}return r})(buildMenu);
 
 // ---------------------------------------------------------------- acceptance tests (checklist items 'bx-*', 📍 GO = BX_test(id); the automated run uses the same spawn)
-function bxCh(w,c,L){const log=w?[['w',w]]:[];let cur={i:c[0],j:c[1],l:c[2],r:c[3]},sp=null;for(const t of L){if(Array.isArray(t)){cur={i:t[0],j:t[1],l:t[2],r:t[3]};continue}
+function bxCh(w,c,L,o=BX_OFF){const log=w?[['w',w]]:[];let cur={i:c[0]+o,j:c[1]+o,l:c[2],r:c[3]},sp=null;for(const t of L){if(Array.isArray(t)){cur={i:t[0]+o,j:t[1]+o,l:t[2],r:t[3]};continue} // o: cells authored on the old 40-grid get +BX_OFF (pass 0 for 56-grid layouts)
  if(typeof t==='number'){cur={...sp[t]};continue}log.push(['p',t,cur.i,cur.j,cur.l,cur.r]);const ex=BX_P[t].ex.map(e=>BX_exit(cur,e));if(ex.length>1)sp=ex;cur=ex[0]}return log}
 const bxRep=(t,n)=>Array(n).fill(t);
 const bxCross=ids=>{const L=BX.pcs.filter(p=>ids.has(p.id));for(const A of L)for(const B of L){if(A===B)continue;for(const a of A.S[0])for(const b of B.S[0])if(Math.hypot(a.p.x-b.p.x,a.p.z-b.p.z)<4&&a.p.y-b.p.y>5)return true}return false};
@@ -577,7 +578,7 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
  route:(ch=[])=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set();
   while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.def.in?(out.length?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-out[out.length-1][0],S[0].p.z-out[out.length-1][2])]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type,pc.id]);
    const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).sort((a,c)=>{const A=a.S[0][0].p,C=c.S[0][0].p,E=BX_fr(e).o;return A.distanceTo(E)-C.distanceTo(E)})[0]}return out},
- h:(x,z)=>BX_h(x,z),log:()=>JSON.stringify({v:2,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
+ h:(x,z)=>BX_h(x,z),log:()=>JSON.stringify({v:3,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
 
 // ---------------------------------------------------------------- RACE on a builder track (trk-2 MVP, coordinator-approved; Alex beta.22: "none of the race methods is applied")
 // 3-2-1-GO countdown (car held), 5 rivals (the city race team rides) on the course waypoints with a curve speed profile, position "3/6" + lap timer,
