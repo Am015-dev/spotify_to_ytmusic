@@ -21,3 +21,14 @@
 - On-foot camera height OF_CAMH = 2.9 (98of). Tests: v90n/cam-go-* in 99c, `node tools/tCamGo.js <url>/index.html <out>` (FAIL lines only, ALL=1 all, SHOTS=1, BEFORE=1 old camera).
 - All rides: `node tools/tCamAll.js <url>/index.html` = __cam.audit(): every ride (157) built off-screen, chase cam solved for 852×393 + 393×852, virtual
   camera raycast/projection; asserts road 10 m past the nose not hidden + lower middle, fill 15-35 %, ride's rear edge on screen (≤ 98 %). ~38 s. STOCK=1 = old camera (15/157).
+
+## cam-1 → next worker (2026-10-13 late), alex/od-foot @ 898cca2+
+- Pushes go to alex/od-foot (session branch rule); int-3 merges from it.
+- cam perf (68c996d): CAM refits only on ride/aspect/mode change, active mode, coarse-to-fine. tools/tPerfCmp.js = 3 fixed views, frame ms, busy CPU, top fns (PROF=1).
+- DMG (src/98dmg_damage.js, flag DMG.on, ?dmg=0 off): DMG_impact(kmh normal speed) is THE hit; roamBounce wrapper supplies the wall normal speed,
+  roamDamage(5|12) = traffic (closing speed), other amounts (falls/quests) ÷ class. Debris pool 60 (DMG_throw/DMG_debStep), missing panels =
+  DMG_panels(frac) collapsing outer bricks' triangles in a cloned geometry (geometry.userData.bid/bt from GB_geo), smoke <50 %, fire <20 %, 0 → roamWreck
+  (existing 2 s rebuild), 5 s no hit → repair. Hull bar #rgHull hidden at 100 %. Tests: v90n/dmg-go-{light,medium,wreck,graze}, `node tools/tDmgGo.js <url>` (14/14).
+- Gotcha: with ?draw=0 the ride mesh is not moved between a warp and the next frame; DMG_panels offsets by RO − mesh position.
+- Phase 2 DONE: DMG_traf (hook in 70_roam_world.js smash condition): pin no longer bursts, burst only side-dash / > 60 km/h closing / > 150 km/h; bumps > 25 km/h throw 2-4 bricks + DMG_impact.
+- NEXT: repair pickup / prop smash +5 (LEGO 2K style).

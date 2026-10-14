@@ -538,7 +538,10 @@ function OG_roofOn(sp){if(sp.roofOn)return;sp.roofOn=1;const R=sp.roof,n0=RO.grp
 function OG_fadeMat(col){const m=new THREE.MeshBasicMaterial({color:col,transparent:true,depthWrite:false,toneMapped:false});m.onBeforeCompile=sh=>{sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nattribute float aF;varying float vF;').replace('#include <begin_vertex>','#include <begin_vertex>\nvF=aF;');sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying float vF;').replace('#include <color_fragment>','#include <color_fragment>\ndiffuseColor.a*=vF;')};return m}
 function OG_meshes(){const grp=OG.grp=new THREE.Group();grp.name='OG';RO.grp.add(grp);const mk=(geo,col)=>{const im=new THREE.InstancedMesh(geo,OG_fadeMat(col),OG_N);im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);im.setColorAt(0,new THREE.Color(1,1,1));const f=new THREE.InstancedBufferAttribute(new Float32Array(OG_N),1);f.setUsage(THREE.DynamicDrawUsage);geo.setAttribute('aF',f);im.count=0;im.frustumCulled=false;grp.add(im);return im};
   OG.imE=mk(new THREE.TorusGeometry(5.6,.55,8,28),0xffffff);const bg=new THREE.BoxGeometry(2.4,1.1,1.2);OG.imG=mk(bg,0xffc21a);
-  OG.imC=mk(new THREE.LatheGeometry([[0,0],[.55,.05],[.8,.6],[.75,1.2],[.4,1.6],[.45,2],[.6,2.15]].map(([x,y])=>new THREE.Vector2(x,y)),12),0xffffff);OG.imE.name='ogEventRing';OG.imG.name='ogGold';OG.imC.name='ogCollectible'}
+  // dev4: the district collectible is a solid chunky LEGO brick (2x2, four studs, darker base plate) with the district colour as the instance tint, lit and opaque
+  // (it was a flat translucent vase); it sits on the ground (OG_draw: y = spot - 1.55) and spins/bobs gently. The fade is a scale-in, not alpha.
+  OG.imC=mk(mergeG([cbox(1.9,.3,1.9,0,.15,0,'#8c8c8c'),cbox(1.7,1.0,1.7,0,.8,0,'#ffffff'),...[[-.42,-.42],[.42,-.42],[-.42,.42],[.42,.42]].map(([x,z])=>ccyl(.27,.27,.26,x,1.43,z,'#ffffff',12))]),0xffffff);
+  OG.imC.material=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.38,metalness:.05});OG.imE.name='ogEventRing';OG.imG.name='ogGold';OG.imC.name='ogCollectible'}
 const _om=new THREE.Matrix4(),_oq=new THREE.Quaternion(),_oe=new THREE.Euler(),_ov=new THREE.Vector3(),_os=new THREE.Vector3(),_oc=new THREE.Color();
 function OG_navCells(){const N=QV.nav,P=N&&N.P,wp=RO.wp;const key=P||wp?(P?P.length+':'+(P[0]&&P[0][0]):'')+'|'+(wp?Math.round(wp.x)+','+Math.round(wp.z):''):'';if(key===OG.navK)return OG.navC;OG.navK=key;const C=new Set();
   const add=(x,z)=>{for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++)C.add((Math.floor(x/30)+a)*100000+Math.floor(z/30)+b)};
@@ -555,7 +558,7 @@ function OG_draw(){if(!OG.imE)return;const on=!OG.ev&&state==='roam';const n={E:
   if(on)for(const sp of OG.vis){const d=Math.hypot(sp.x-RO.x,sp.z-RO.z),f=clamp((OG_FADE[1]-d)/(OG_FADE[1]-OG_FADE[0]),0,1)*(OG_done(sp)?.45:1);if(f<=0)continue;let im,k;
     if(sp.k==='ev'){im=OG.imE;k='E';_oe.set(0,sp.dir?Math.atan2(sp.dir[0],sp.dir[1]):t*.6,0);_ov.set(sp.x,sp.y+5.6,sp.z);_os.setScalar(1);_oc.set(OG_T[sp.t].col)}
     else if(sp.k==='gold'){im=OG.imG;k='G';_oe.set(0,t*1.6,0);_ov.set(sp.x,sp.y+Math.sin(t*2+sp.x)*.3,sp.z);_os.setScalar(1);_oc.setRGB(1,1,1)}
-    else{im=OG.imC;k='C';_oe.set(0,t*1.2,0);_ov.set(sp.x,sp.y-1+Math.sin(t*2+sp.z)*.25,sp.z);_os.setScalar(1.3);_oc.set(OG.A[sp.t]?OG.A[sp.t].th[2]:0xffffff)}
+    else{im=OG.imC;k='C';_oe.set(0,t*1.2,0);_ov.set(sp.x,sp.y-1.55+.18+Math.sin(t*2+sp.z)*.15,sp.z);_os.setScalar(1.15*Math.max(.02,Math.min(1,f*1.6)));_oc.set(OG.A[sp.t]?OG.A[sp.t].th[2]:0xffffff)}
     const i=n[k]++;_oq.setFromEuler(_oe);_om.compose(_ov,_oq,_os);im.setMatrixAt(i,_om);im.setColorAt(i,_oc);im.geometry.attributes.aF.array[i]=f}
   for(const[im,k]of[[OG.imE,'E'],[OG.imG,'G'],[OG.imC,'C']]){im.count=n[k];im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.geometry.attributes.aF.needsUpdate=true}}
 // ---------- area completion
