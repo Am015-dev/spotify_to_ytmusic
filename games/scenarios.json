@@ -547,6 +547,14 @@
  ],
  "sands-of-qamar": [
   {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "sq-board",
    "name": "Start of game board",
    "ask": "Is the bazaar clear and filled?",
