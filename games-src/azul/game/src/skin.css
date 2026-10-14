@@ -56,3 +56,7 @@ html.sk .gx-drawer{border-image:url(media/ui-panel-c.webp) 100 fill/18px stretch
 @media (min-width:1024px){.mbox,.gx-drawer,.gx-dock{font-size:1rem}.mbox small,.gx-drawer small,.gx-dock small,.small{font-size:1rem}}
 #chip,.gx-dock .info{display:none!important}
 @media (min-width:1024px){.gx-dock i,.gx-dock em,.gx-dock b,.gx-dock button,.mbox .btn.sm,.mbox .seg button,.mbox b{font-size:1rem}}
+/* top bar: a plain cream plate, dark ink (the tile strip and the pale gradient title were unreadable, 14 Oct 2026) */
+html.sk .gx-bar{background:#f3e3c4}
+html.sk .gx-bar h1 span{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#3a1a0a;filter:none;text-shadow:none}
+html.sk .gx-drawer-head{background:#f3e3c4}
