@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.36',date:'14 Oct 2026',items:[{t:'CHANGED',s:'Two-level city race track has its own layout: downtown ring, viaduct over the lake, kicker shortcut.'}]},
   {v:'v90m-beta.35',date:'14 Oct 2026',items:[{t:'NEW',s:'Builder race tracks are back in the Race menu, with countdown, rival cars and results.'},{t:'NEW',s:'Bug button in the pause menu: report a problem with a screenshot and the spot.'}]},
   {v:'v90m-beta.34',date:'14 Oct 2026',items:[{t:'FIXED',s:'Street life runs lighter (smoother frame rate in Athens).'}]},
   {v:'v90m-beta.33',date:'14 Oct 2026',items:[{t:'FIXED',s:'On foot you collide with real truck and bus shapes; café table and parasol rebuilt from LEGO parts.'}]},
