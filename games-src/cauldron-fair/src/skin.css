@@ -54,3 +54,8 @@ body :where(#board,.gx-drawer,.gx-dock) *:not(svg):not(svg *):not(canvas){font-s
 @media (min-width:1024px){#fortchip .fk,#fort .fk{font-size:16px}}
 .gx-drawer{bottom:auto;max-height:calc(100vh - var(--gx-bar-h) - 24px)}
 @media (min-width:1024px){.rc .ct i{white-space:normal;overflow-wrap:anywhere}.gx-dock{overflow-x:hidden}}
+/* start screen: one big primary button, one row of small secondary buttons */
+.tsec{display:flex;gap:10px;width:100%}
+.tsb{flex:1 1 0;appearance:none;border:2px solid #2a1c36;border-radius:14px;background:linear-gradient(180deg,#fff8e6,#efdfbd);color:var(--ink);min-height:48px;padding:6px 12px;font-weight:800;font-size:16px;line-height:1.1;font-family:inherit;cursor:pointer}
+html:not(.ph) .tbtns{flex-direction:column;align-items:center}html:not(.ph) .tbtns .tbtn{flex:0 0 auto;width:min(460px,100%)}html:not(.ph) .tsec{width:min(460px,100%)}
+.tbtn span{font-size:max(16px,.97rem)}@media (min-width:1024px){#start,#start *{font-size:max(16px,1em)}}
