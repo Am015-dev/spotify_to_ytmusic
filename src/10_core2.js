@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.45',date:'14 Oct 2026',items:[{t:'FIXED',s:'Thiseio fountain water sits in its basin.'}]},
   {v:'v90m-beta.44',date:'14 Oct 2026',items:[{t:'FIXED',s:'Portrait HUD, race and garage layout; jump ramps no longer lift the car on spawn.'},{t:'NEW',s:'Athens rooftop billboards.'},{t:'FIXED',s:'Race decks clear of terrain on banked corners.'}]},
   {v:'v90m-beta.43',date:'14 Oct 2026',items:[{t:'FIXED',s:'Flat junctions: kerbs stop at every junction, no strips across the asphalt.'},{t:'CHANGED',s:'Sun sits behind the camera so all roads are lit; far trees are LEGO impostors.'},{t:'NEW',s:'More street life; crash damage test; portrait race shows the right position.'}]},
   {v:'v90m-beta.42',date:'14 Oct 2026',items:[{t:'NEW',s:'Real LEGO sets in the world: Frankfurt Ferris wheel, Athens carousel, wind turbines; more street activities and LEGO street furniture.'},{t:'CHANGED',s:'Sun follows the camera so cars are always lit; cars sit on slopes and grass.'},{t:'FIXED',s:'Portrait race HUD, banked pillars, rival grid; crates on car roofs; black facades.'}]},
