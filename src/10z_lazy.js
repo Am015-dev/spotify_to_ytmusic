@@ -13,6 +13,6 @@ function XC_need(name){
   s.onerror=()=>{XC.err.push(name+': 404');res()};document.head.appendChild(s)}))}
 function XC_go(){if(XC.p)return XC.p;XC.t0=performance.now();return XC.p=(async()=>{for(const n of Object.keys(XCV))await XC_need(n);XC.done=true;XC.t1=performance.now()})()}
 if(!XC.done&&!TQ){const iv=setInterval(()=>{try{if(state==='loading'||LD.on||LD.busy)return}catch(e){return}clearInterval(iv);setTimeout(XC_go,1500)},300)}
-window.__xc={XC,need:XC_need,go:XC_go};
+window.__xc={XC,need:XC_need,go:XC_go,ev:XC_eval};   // ev = test hook: eval in module scope
 // per-city boot data (52_terrain_data.js awaits these): start the downloads NOW, ~40 modules before the await, so they run parallel to the rest of the page's start-up
 for(const n of CID==='ath'?['10c_qtc_blob','52a_terr_ath']:['52f_terr_fra'])XC_need(n);
