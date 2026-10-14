@@ -1,6 +1,36 @@
 [
  {
   "date": "2026-10-14",
+  "game": "kaiten-kitchen",
+  "title": "Cleaner menus",
+  "items": [
+   "Menus use one title font and one body font, no overlaps"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "cauldron-fair",
+  "title": "Cleaner menus",
+  "items": [
+   "Menus use one title font and one body font, no overlaps"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "doorkick-dungeon",
   "title": "Cleaner menus",
   "items": [
