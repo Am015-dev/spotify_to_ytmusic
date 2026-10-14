@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.30',date:'14 Oct 2026',items:[{t:'FIXED',s:'Athens birds, flags and street life were invisible; road and junction fixes.'}]},
   {v:'v90m-beta.29',date:'14 Oct 2026',items:[{t:'NEW',s:'Trees and bushes are now built from LEGO parts (?asset=0 for the old ones).'}]},
   {v:'v90m-beta.28',date:'14 Oct 2026',items:[{t:'NEW',s:'More life in the streets: pedestrians, smashables and popups (?life=0 turns off).'}]},
   {v:'v90m-beta.27',date:'14 Oct 2026',items:[{t:'NEW',s:'More variety in building shapes and colours across both cities.'}]},
