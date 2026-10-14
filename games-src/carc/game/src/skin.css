@@ -53,3 +53,5 @@ body:has(#menu) #modal .scrim:has(.card[aria-label=Start]){visibility:hidden}
 html.sk .gxc-btn.go{background:#b5532f padding-box}
 @media(max-width:400px){html.sk .seat{flex:0 0 auto;padding-right:12px}html.sk .seat:not(.cur) .nm{display:none}html.sk .seat .nm{max-width:none;overflow:visible}}
 html.sk #hskip{padding:0}
+html.sk .seat .nm,html.sk .seat .fl{font-size:13px}html.sk .seat .dot{font-size:13px}
+@media(min-width:1024px){html.sk .seat .nm,html.sk .seat .fl,html.sk .seat .dot,html.sk .seat b,html.sk #left,html.sk #left b,html.sk #status,html.sk .opt,html.sk .sub,html.sk .gxh-tt,html.sk .gxh-tx,html.sk .gxh-ok,html.sk .btn{font-size:16px}html.sk .seat .dot{width:22px;height:22px}}

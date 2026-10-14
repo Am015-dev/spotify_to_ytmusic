@@ -23,7 +23,7 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 .bfdoor .bfdi,.bfdoor .bfkick{animation:bfBreathe 1.6s ease-in-out infinite}
 .bfdoor .bfdi{position:absolute;inset:0;border-radius:12px;overflow:hidden}
 .bfdoor .bfdi img,.bfdoor .bfdi svg{width:100%;height:100%;display:block}
-.bfdoor .bfkick{position:relative;font:900 clamp(26px,9vw,46px)/1 var(--title);color:#ffe9a8;letter-spacing:.04em;text-shadow:0 3px 0 #3a1004,0 0 18px #ff7a1a,0 0 2px #000;rotate:-6deg}
+.bfdoor .bfkick{position:relative;font:900 clamp(26px,9vw,46px)/1 var(--title);color:#ffe9a8;letter-spacing:.04em;text-shadow:0 3px 0 #3a1004,0 0 18px #ff7a1a,0 0 2px #000;rotate:-6deg;z-index:2}
 .bfdoor .bfboot{position:absolute;right:-6%;bottom:8%;font-size:clamp(28px,9vw,46px);animation:bfBoot 1.6s ease-in-out infinite}
 .bfdoor:focus-visible{outline:3px solid #7fd0ff}
 @keyframes bfBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
@@ -71,7 +71,7 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 html.ph-p{--ph-dock:calc(104px + env(safe-area-inset-bottom,0px))}
 html.ph-p:has(#prompt.bfq),html.ph-p:has(#prompt .sellbar){--ph-dock:auto}
 html.ph-p:has(#prompt.bfq) .gx-dock,html.ph-p:has(#prompt .sellbar) .gx-dock{max-height:52dvh!important;overflow:auto}
-html.ph .bfline{display:block;margin:0 0 6px!important;font:700 14.5px/1.25 var(--title)!important;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:20px}
+html.ph .bfline{display:block;margin:0 0 6px!important;font:700 14px/1.25 var(--title)!important;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:20px}
 html.ph #prompt{display:flex;flex-direction:column}
 html.ph #prompt>.bfline{order:1}html.ph #prompt>.acts.main{order:2}html.ph #prompt>*{order:3}
 html.ph #prompt:not(.bfq) p.say,html.ph #prompt>p:not(.bfline):not(.say),html.ph #prompt .hint,html.ph #prompt .lesson,html.ph #prompt>.tip,html.ph #prompt .since{display:none!important}
@@ -115,7 +115,7 @@ html.ph-l .hand{padding-top:14px}
   html.ph-p .mine .gear{padding-left:76px;min-height:44px!important}
   html.ph-p .hand{padding-top:12px}
   html.ph-p{--ph-dock:calc(96px + env(safe-area-inset-bottom,0px))}
-  html.ph .bfline{font-size:15px!important;margin-bottom:4px!important}
+  html.ph .bfline{font-size:13.5px!important;margin-bottom:4px!important}
 }
 .bfbub.note{max-width:220px;background:#fff6dc}
 .mine .gear .gchip.eqoff{position:relative;opacity:.8}

@@ -41,3 +41,13 @@ html.sk .ppop:not([hidden]){background:#e9d7a8 url(media/ui-sheet-c.webp) center
 /* one instruction line: the coach tip replaces the status caption; no tip floats over an open drawer */
 body:has(.gxh-bub.on) #barstat .st-t{visibility:hidden}
 body:has(.gx-drawer.on) .gxh-bub{visibility:hidden}
+
+/* UI bar: an open drawer owns the screen (nothing under it to be covered); one instruction line; title text inset */
+body:has(.gx-drawer.on) #rivals,body:has(.gx-drawer.on) #board,body:has(.gx-drawer.on) #main,body:has(.gx-drawer.on) #dockbody{visibility:hidden}
+body:has(.gxh-bub.on) #road .dk-ins{display:none}
+#start .tag.goal,#start .st-c{padding-inline:16px}
+html.sk .gx-drawer{background-color:#e9d7a8}
+.gx-drawer:not(.on){transition:none}
+/* UI bar 1: >= 16px text on wide screens (bars, chips, rivals, log lines) */
+@media (min-width:1024px){#barstat,#barstat *,#rivals,#rivals *,.gx-drawer small,.gx-drawer .small,.gxh-bub .gxh-tx{font-size:max(1em,16px)}#rivals *{font-size:16px}}
+@media (min-width:1024px){.gxh-bub .gxh-tx,.gxh-bub .gxh-tt,#boardd .gx-drawer-body *,#boardd .gx-drawer-body{font-size:max(1em,16px)!important}}

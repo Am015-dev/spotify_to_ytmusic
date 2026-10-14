@@ -250,8 +250,11 @@ body:has(.gxc:not([hidden])) .gx-bar{visibility:hidden}
 .gx-drawer{border:4px solid var(--ink)}
 body:has(.gx-drawer.on) #start .st-head,body:has(.gx-drawer.on) #start .st-body{visibility:hidden}
 .gx-drawer-body p.ctr{text-align:center}
-.gx-x{min-width:44px;min-height:44px}
-.gxc-score{min-width:44px;min-height:44px}
+.btn.wide{width:100%;min-height:48px;font-size:1rem}
+.btn.wide small{margin-left:6px;font-weight:700;opacity:.85}
+.gx-drawer-head .gx-x{min-width:44px;min-height:44px}
+html .gxc-score{min-width:44px;min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+@media (min-width:1024px){#start .btn,#start .btn.small,#start .btn.wide small,#start small{font-size:1rem}}
 .gx-drawer-head{background:linear-gradient(#ffd27a,#ffb347);border-bottom:3px solid var(--ink);border-radius:12px 12px 0 0}
 .gx-drawer-head h2{font:1.25rem var(--fd);letter-spacing:.4px;display:flex;align-items:center;gap:8px}
 .gx-drawer-head h2 svg{width:22px;height:22px}
@@ -1439,6 +1442,17 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
       { kind: 'fn', name: 'drawer is on screen', fn: function () { return inView($('#missiond')) || 'drawer off screen'; } },
       skin,
       { kind: 'tap', sel: '#missiond .gx-x', name: 'tap closes the card', state: function () { return GX.open === 'missiond'; }, expect: function (a, b) { return (a && !b) || 'card did not close'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'sf-uibar', name: 'Title screen: one primary, readable, 5 top-bar buttons', ask: 'Is the title screen clean?', seed: 15, when: booted, group: 'UI',
+    setup: function () { try { GX.close(); } catch (e) { } try { showStart(); } catch (e) { } return idle(900); },
+    checks: [
+      { kind: 'fn', name: 'exactly one primary button', fn: function () { var n = [].filter.call(document.querySelectorAll('#start .big'), GXS.vis).length; return n === 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-ibtn,.bulbbtn'), GXS.vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'title text >= 13px phone / 16px wide', fn: function () { var min = innerWidth >= 1024 ? 16 : 13, bad = []; [].forEach.call(document.querySelectorAll('#start *'), function (e) { if (!GXS.vis(e)) return; var t = [].filter.call(e.childNodes, function (c) { return c.nodeType === 3 && c.textContent.trim(); }).length; if (t && parseFloat(getComputedStyle(e).fontSize) < min - .3) bad.push(e.textContent.trim().slice(0, 14) + ' ' + getComputedStyle(e).fontSize); }); return !bad.length || bad.slice(0, 4).join(' | '); } },
+      { kind: 'fn', name: 'no character roster on the title', fn: function () { return !document.querySelector('#start .chars,#start .roster,#start .crew') || 'roster shown'; } }
     ]
   });
 
@@ -6462,10 +6476,10 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=jobProg();const 
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">${ICO.bomb}</svg><h1>Short Fuse</h1><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back</button>':''}</div>
   <div class="st-body"><div class="st-main">
    ${tutFirst?tutBtn('big go'):''}
-   <button class="big${tutFirst?'':' go'}" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
-   <button class="big blue" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small></button>
-   ${tutFirst?'':tutBtn('big')}
-   ${saved?`<button class="big" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
+   <button class="${tutFirst?'btn wide':'big go'}" data-a="start">${ico('play')}${onl?'Start online ('+nOnl+')':nh===0?'Watch':'Play'}</button>
+   <button class="btn wide" data-a="story">${ico('map')}Story<small>${esc(campLine())}</small></button>
+   ${tutFirst?'':tutBtn('btn wide')}
+   ${saved?`<button class="btn wide" data-a="resume">${ico('fwd')}Continue<small>Job ${saved.G.mission}</small></button>`:''}
    <div class="jobrow"><button class="btn" data-a="jobprev" aria-label="Previous job">${ico('back')}</button><div class="jobcur"><b>${n}</b><span>${esc(M.nm)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?'<i class="t">⏱</i>':''}</div><button class="btn" data-a="jobnext" aria-label="Next job">${ico('fwd')}</button></div>
    <div class="seg" role="group" aria-label="Crew size">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div>
    <div class="seg" role="group" aria-label="Computer level">${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div>

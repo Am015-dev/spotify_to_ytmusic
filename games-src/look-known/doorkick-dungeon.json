@@ -1,22 +1,6 @@
 {
 "phone": {
-"look": [
-[
-"plates",
-"button.btn",
-"ui-button-cream-c.webp"
-],
-[
-"plates",
-"button.btn",
-"ui-button-go-c.webp"
-],
-[
-"plates",
-"button.btn.primary",
-"ui-button-go-c.webp"
-]
-],
+"look": [],
 "axe": [],
 "axe_pages": [
 "dk-art-phone.json",
