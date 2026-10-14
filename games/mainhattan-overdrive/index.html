@@ -756,6 +756,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.48',date:'14 Oct 2026',items:[{t:'NEW',s:'Low-rise streets are lined with LEGO-set buildings on plinths.'}]},
   {v:'v90m-beta.47',date:'14 Oct 2026',items:[{t:'FIXED',s:'Sitting on a bench keeps you upright; the Hot Drop card closes when you park.'}]},
   {v:'v90m-beta.46',date:'14 Oct 2026',items:[{t:'FIXED',s:'The roam camera never dips under the terrain.'}]},
   {v:'v90m-beta.45',date:'14 Oct 2026',items:[{t:'FIXED',s:'Thiseio fountain water sits in its basin.'}]},
@@ -1532,7 +1533,7 @@ function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c
 // XCV = chunk name -> content hash, filled by tools/build.sh (empty in a raw src/ page: then nothing is lazy). A chunk may export top-level names
 // (module list "name:a,b" in src/LAZY): the page declares `let a,b;` stubs, the chunk's last expression is ({a,b}) and XC.apply[name] copies them over.
 // Eager code must not touch a chunk's names at boot; use XC.done / XC_need(name) first. Tests: __tq.ready also waits for XC.done.
-const XCV=/*XCV*/{"99c_checklist":"d15f1e17","10c_qtc_blob":"ede9840f","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"d99e7cba","10c_qtc_blob":"ede9840f","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -7755,8 +7756,11 @@ function TR_bldFix(){const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
   for(const b of B){b.trBot=b.trMin;if(b.trY===1e9){b.trOff=0;continue}const base=Math.max(b.trMin,b.trMax-.8),lo=b.trY<Math.max(b.trMin-1,.3)&&b.trMin>-1&&base>.05;if(lo){b.trOff=base;
       b.h+=base;b.y0=b.y0!=null?b.y0+base:b.trMin-1;b.trBase=b.trY+base;b.trDoor=base}else{const up=b.trMin>-1?base-b.trY:0;b.trOff=up>.05&&up<6?up:0;if(b.trOff){b.h+=up;if(b.y0!=null)b.y0+=up}b.trBase=b.trY+b.trOff;b.trDoor=b.trBase}
     if(b.trBase>b.trMin+.06){TR_PL.push(b);b.trBot=b.trMin-.4}else b.trBot=Math.min(b.trBase,b.trMin)}
-  for(const o of meshes){let ch=false;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
-    const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){const b=find(p[i],p[i+2],1.6);if(!b||!b.trOff)continue;
+  // terr-3 (Athens boot): pass 2 looks up the full grid only near a lifted building (C2 holds those alone; same result)
+  const C2=new Map();for(const b of B){if(!b.trOff)continue;const R=Math.hypot(b.hw,b.hd)+1.8;for(let i=Math.floor((b.x-R)/CS);i<=Math.floor((b.x+R)/CS);i++)for(let j=Math.floor((b.z-R)/CS);j<=Math.floor((b.z+R)/CS);j++)C2.set(K(i,j),1)}
+  const near=(x,z)=>C2.has(K(Math.floor(x/CS),Math.floor(z/CS)));
+  if(C2.size)for(const o of meshes){let ch=false;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);if(!near(_p.x,_p.z))continue;const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
+    const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){if(!near(p[i],p[i+2]))continue;const b=find(p[i],p[i+2],1.6);if(!b||!b.trOff)continue;
       const core=find(p[i],p[i+2],.4)===b;if(!core){const gv=groundY(p[i],p[i+2]);if(p[i+1]>gv-.15&&p[i+1]<gv+.35)continue}p[i+1]+=b.trOff;ch=true}
     if(ch){A.needsUpdate=true;o.geometry.computeBoundingSphere();o.geometry.computeBoundingBox()}}
   // plinths: 4 stone sides per lifted/floating building, merged per 800 m tile
@@ -9250,7 +9254,9 @@ function DR_keep(t,x,z,TC){if(DR.solid.length&&DR_inSolid(x,z,1))return false;if
   if(t==='lamp')return e>=.5;
   if(/^(tree|tree2|tree3|CE_cypress|CE_pine|CE_olive)$/.test(t)&&e>=.6){const k=Math.floor(x/26)*100000+Math.floor(z/26);if(TC.has(k))return false;TC.add(k);return true}
   return false}
-function DR_inSolid(x,z,m=0){for(const b of DR.solid)if(x>b.x0-m&&x<b.x1+m&&z>b.z0-m&&z<b.z1+m)return true;return false}
+// terr-3 (Athens boot: 2.4 s scanning every solid block per prop): 64 m grid over the blocks (margin 2 m), rebuilt when DR.solid is replaced
+function DR_inSolid(x,z,m=0){const S=DR.solid;let L=S;if(m<=2){if(DR._sg!==S){DR._sg=S;const G=DR._g=new Map();for(const b of S)for(let i=Math.floor((b.x0-2)/64);i<=Math.floor((b.x1+2)/64);i++)for(let j=Math.floor((b.z0-2)/64);j<=Math.floor((b.z1+2)/64);j++){const k=i*100000+j;let A=G.get(k);if(!A)G.set(k,A=[]);A.push(b)}}
+  L=DR._g.get(Math.floor(x/64)*100000+Math.floor(z/64));if(!L)return false}for(const b of L)if(x>b.x0-m&&x<b.x1+m&&z>b.z0-m&&z<b.z1+m)return true;return false}
 // solid blocks: Frankfurt = 'resid' filler blocks; Athens = 16 m raster of deep interiors (>= 22 m from every street edge)
 function DR_solidBuild(){const R=[],lm=(x,z,m)=>LMX.some(L=>Math.hypot(L.x-x,L.z-z)<(L.r||30)+m)||(HUB.garage&&Math.hypot(HUB.garage.x-x,HUB.garage.z-z)<70)||(HUB.gates||[]).some(g=>Math.hypot(g.x-x,g.z-z)<60)||(RO.ramps||[]).some(q=>Math.hypot(q.x-x,q.z-z)<50);
   const free=(x,z)=>!inRiver(x,z,-6)&&!onAnyDeck(x,z)&&!(PARKS.some(P=>inR(P,x,z,4))||PLAZAS.some(P=>inR(P,x,z,4)));
@@ -14206,7 +14212,7 @@ window.__ct={CT,swap:CT_SWAP,hcar:()=>HCAR.slice(),geo:nm=>CR_cityGeo(nm),r:()=>
 // Colliders = each set's footprint of tall parts (oriented, like the Kenney boxes, so glancing hits slide the same way). Landmarks, towers, quest
 // buildings and the existing LDraw props are untouched. Render: one InstancedMesh per model variant and material (near, full bricks) plus one
 // far mesh per variant (vertex-clustered, ~5 % tris); every few frames the instances are re-sorted by distance and view direction.
-const CTB={on:/[?&]ctb=1/.test(location.search)/* v90b: traffic ships first; buildings are test-only (?ctb=1) until their memory pass */,K:{},near:70,far:520,st:{slots:0,sets:0,skip:0,by:{}},t:0,cg:[]};
+const CTB={on:!/[?&]ctb=0/.test(location.search)/* art-5: default ON (ctb/fra-row, ctb/collide, ctb/perf pass; heap +13 MB fra, +5 MB ath); ?ctb=0 = the old Kenney/procedural rows */,K:{},near:70,far:520,st:{slots:0,sets:0,skip:0,by:{}},t:0,cg:[],pl:[]};
 // model variants: id(s), recolour map (old hex → new hex), where. fra = Frankfurt rows; ath = Athens plaka/villa houses (whitewashed)
 const CTB_V={fra:[
   {k:'bank',ids:['bank'],w:3},{k:'bank_t',ids:['bank'],w:2,rc:{'#b40000':'#e4cd9e','#f4f4f4':'#b40000'}},
@@ -14215,6 +14221,11 @@ const CTB_V={fra:[
  ath:[{k:'6365_w',ids:['w6365'],w:3,rc:{'#fac80a':'#f4f4f4','#b40000':'#1e5aa8'}},{k:'6365_c',ids:['w6365'],w:1,rc:{'#fac80a':'#f2e3bd','#b40000':'#c8643c'}},
   {k:'6372_w',ids:['w6372'],w:2,rc:{'#1e5aa8':'#f4f4f4','#b40000':'#1e5aa8'}},{k:'6402',ids:['w6402'],w:1}]};
 function CTB_city(){return CID==='fra'?'fra':'ath'}
+// art-5: the sets must be in before the city builds (at build time models.js had not loaded them, so 3219 of 3219 Frankfurt slots fell back to
+// Kenney). Prefetch both cities' sets at boot; roamLoad waits for the current city's chunks (a few hundred KB, usually already in) before buildHubG.
+function CTB_ids(c){return[...new Set(CTB_V[c||CTB_city()].flatMap(v=>v.ids))]}
+if(CTB.on)try{LD_need(CTB_ids('fra').concat(CTB_ids('ath')))}catch(e){}
+roamLoad=(f=>async function(){if(CTB.on&&!HUB.built){const t=performance.now();try{await Promise.race([LD_need(CTB_ids()),new Promise(r=>setTimeout(r,15000))])}catch(e){}CTB.wait=Math.round(performance.now()-t)}return f.apply(this,arguments)})(roamLoad);
 // footprint + geometry of a variant, built once (first slot that wants it): near [[geo,mat]], far geo, size, collider box in the set's frame
 function CTB_kind(v){if(CTB.K[v.k])return CTB.K[v.k];if(!v.ids.every(id=>LD_MODELS[id]))return null;LDW_reg();
  let B=v.ids.flatMap(id=>LD_br(id));if(v.rc)B=B.map(b=>v.rc[b.c]?{...b,c:v.rc[b.c]}:b);
@@ -14238,17 +14249,23 @@ function CTB_pick(x,z,i,maxW,maxD){const V=CTB_V[CTB_city()],tot=V.reduce((a,v)=
 function CTB_fill(x,z,ry,w,d,h0,extra){if(!CTB.on)return false;CTB.st.slots++;const c=Math.cos(ry),s=Math.sin(ry),row=[];let p=-w/2,i=0;
  while(p<w/2-3&&i<8&&!(row.length&&w/2-p<7)){const K=CTB_pick(x+p,z,i++,w/2-p,d);if(!K)break;row.push([K,p+K.W/2]);p+=K.W+.4}
  if(!row.length){CTB.st.skip++;return false}const sh=(w/2-p)/2;// centre the row in the slot
- for(const[K,lx0]of row){const lx=lx0+sh,lz=d/2-K.D/2,px=x+lx*c+lz*s,pz=z-lx*s+lz*c,y=groundY(px,pz),a=ry+Math.PI;// set front (−z) → street (+z local)
-  K.L.push({x:px,z:pz,y,a});if(K.v.gap)CTB.cg.push([px,pz]);const ca=Math.cos(a),sa=Math.sin(a);
-  hubAddB({x:px+K.col.ox*ca+K.col.oz*sa,z:pz-K.col.ox*sa+K.col.oz*ca,hw:K.col.hw,hd:K.col.hd,h:y+K.H,ry:a,...(extra||{})});CTB.st.sets++}return true}
+ const P=[];for(const[K,lx0]of row){const lx=lx0+sh,lz=d/2-K.D/2,px=x+lx*c+lz*s,pz=z-lx*s+lz*c;let g0=1e9,g1=-1e9;// art-5: on a slope the set sits at its HIGH corner on a grey plinth down to the low one (never sunk or floating); a slope over 3 m keeps the old building
+  for(const[u,v]of[[-1,-1],[1,-1],[1,1],[-1,1],[0,0]]){const ux=u*K.W/2,uz=v*K.D/2,g=groundY(px+ux*c+uz*s,pz-ux*s+uz*c);g0=Math.min(g0,g);g1=Math.max(g1,g)}if(g1-g0>3){CTB.st.slope=(CTB.st.slope||0)+1;CTB.st.skip++;return false}P.push([K,px,pz,g1,g1-g0])}
+ for(const[K,px,pz,y,ph]of P){const a=ry+Math.PI;// set front (−z) → street (+z local)
+  const o={x:px,z:pz,y,a,ph};if(ph>.12)CTB.pl.push([o,K,ph+.15]);K.L.push(o);if(K.v.gap)CTB.cg.push([px,pz]);const ca=Math.cos(a),sa=Math.sin(a);
+  o.b=hubAddB({x:px+K.col.ox*ca+K.col.oz*sa,z:pz-K.col.ox*sa+K.col.oz*ca,hw:K.col.hw,hd:K.col.hd,h:y+K.H,ry:a,...(extra||{})});CTB.st.sets++}return true}
 // Frankfurt hook (putK in buildHubG): only the generic street buildings, never towers
 function CTB_putK(nm,sc,x,z,ry,tint,bx,w,h,d){if(!bx||CID!=='fra'||!/^building-([a-m]|type-[a-z])$/.test(nm))return false;return CTB_fill(x,z,ry,w,d,h)}
 // Athens hook (put in athBuildG): small old-town houses and villas
 function CTB_put(U,x,z,ry){if(CID==='fra'||(U.k!=='plaka'&&U.k!=='villa'))return false;const sty=athStyleAt(x,z);CTB.st.by[sty]=(CTB.st.by[sty]||0)+1;if(sty!=='plaka'&&sty!=='villa')return false;/* old town + villa districts (the 13k suburban 'town' houses stay procedural: CPU + memory) */return CTB_fill(x,z,ry,U.w+1.5,U.d+1,0,{ab:1})}
 // meshes once the city is built; LOD + view sort every 6 frames
+// plinths (art-5): one static instanced box, light bluish grey, under every set on a slope
+function CTB_plinth(){if(CTB.pim||!CTB.pl.length)return;const g=new THREE.BoxGeometry(1,1,1);g.translate(0,-.5,0);const im=new THREE.InstancedMesh(g,new THREE.MeshStandardMaterial({color:'#a0a5a9',roughness:.85}),CTB.pl.length);
+ im.name='ctb_plinth';im.receiveShadow=true;im.userData.keep=1;const S=new THREE.Vector3();CTB.pl.forEach(([o,K,h],i)=>{_ctbM.compose(_ctbP.set(o.x,o.y+.02,o.z),_ctbQ.setFromAxisAngle(_ctbU,o.a),S.set(K.W,h,K.D));im.setMatrixAt(i,_ctbM)});
+ im.computeBoundingSphere();HUB.grp.add(im);CTB.pim=im}
 function CTB_mesh(){if(!HUB.grp)return;for(const k in CTB.K){const K=CTB.K[k];if(K.ims.length||!K.L.length)continue;const n=K.L.length;
   for(const[g,mat]of K.near){const im=new THREE.InstancedMesh(g,mat,n);im.count=0;im.frustumCulled=false;im.receiveShadow=true;im.name='ctb_'+k;if(mat===CR_GM)im.renderOrder=2;im.userData.keep=1;HUB.grp.add(im);K.ims.push(im)}
-  const f=new THREE.InstancedMesh(K.far,K.near[0][1],n);f.count=0;f.frustumCulled=false;f.name='ctbf_'+k;f.userData.keep=1;HUB.grp.add(f);K.fim=f}CTB_step(1)}
+  const f=new THREE.InstancedMesh(K.far,K.near[0][1],n);f.count=0;f.frustumCulled=false;f.name='ctbf_'+k;f.userData.keep=1;HUB.grp.add(f);K.fim=f}CTB_plinth();CTB_step(1)}
 const _ctbM=new THREE.Matrix4(),_ctbQ=new THREE.Quaternion(),_ctbP=new THREE.Vector3(),_ctbS=new THREE.Vector3(1,1,1),_ctbU=new THREE.Vector3(0,1,0),_ctbD=new THREE.Vector3();
 function CTB_step(force){if(!force&&++CTB.t%6)return;if(typeof camera==='undefined')return;const cx=camera.position.x,cz=camera.position.z;camera.getWorldDirection(_ctbD);const dl=Math.hypot(_ctbD.x,_ctbD.z)||1,fx=_ctbD.x/dl,fz=_ctbD.z/dl;
  for(const k in CTB.K){const K=CTB.K[k];if(!K.fim)continue;let nn=0,nf=0;const r=Math.max(K.W,K.D);
@@ -14257,7 +14274,43 @@ function CTB_step(force){if(!force&&++CTB.t%6)return;if(typeof camera==='undefin
   for(const im of K.ims){im.count=nn;im.instanceMatrix.needsUpdate=true}K.fim.count=nf;K.fim.instanceMatrix.needsUpdate=true}}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);try{CTB_mesh()}catch(e){console.warn('CTB mesh',e)}return r})(buildRoam);
 hubCullStep=(f=>function(){f.apply(this,arguments);try{CTB_step()}catch(e){}})(hubCullStep);
-window.__ctb={CTB,pos:()=>({x:RO.x,z:RO.z}),V:CTB_V,stat:()=>({...CTB.st,kinds:Object.values(CTB.K).map(K=>({k:K.v.k,n:K.L.length,W:+K.W.toFixed(1),D:+K.D.toFixed(1),H:+K.H.toFixed(1),tris:K.tris,ftris:K.ftris,near:K.ims[0]?K.ims[0].count:0,far:K.fim?K.fim.count:0}))}),
+// ---- tests (art-5): ctb/fra-row, ctb/collide, ctb/perf (src/99c_checklist.js). Each GO parks the car at a fixed row of sets (nearest a fixed
+// origin with ≥ 3 sets within 40 m and a free road spot in front), so every run checks the same place.
+function CTB_all(){const A=[];for(const k in CTB.K)for(const o of CTB.K[k].L)A.push([o,CTB.K[k]]);return A}
+// street normal of a set (front → road) and the road spot d m in front of its facade
+function CTB_front(o,K,d){const nx=-Math.sin(o.a),nz=-Math.cos(o.a);return{nx,nz,x:o.x+nx*(K.D/2+d),z:o.z+nz*(K.D/2+d)}}
+function CTB_spot(d){const A=CTB_all();if(!A.length)return null;const O=CID==='fra'?{x:0,z:0}:{x:0,z:-600};A.sort((p,q)=>Math.hypot(p[0].x-O.x,p[0].z-O.z)-Math.hypot(q[0].x-O.x,q[0].z-O.z));
+ for(const[o,K]of A.slice(0,4000)){if(K.v.gap)continue;const n=A.filter(([q])=>Math.hypot(q.x-o.x,q.z-o.z)<40).length;if(n<3)continue;let dd=d;if(!dd){/* row view: 2.5 m onto the asphalt */for(let t=1;t<=14&&!dd;t+=.5){const P=CTB_front(o,K,t);if(CTB_onRoad(P.x,P.z))dd=t+2.5}if(!dd)continue}const F=CTB_front(o,K,dd);
+  if(!LF_onRoad(F.x,F.z)||roamHit(F.x,F.z,1.4,groundY(F.x,F.z)+.5))continue;let ok=true;/* clear run to the facade */for(let t=dd;t>1.5&&ok;t-=.5){const b=roamHit(o.x+F.nx*(K.D/2+t),o.z+F.nz*(K.D/2+t),1,groundY(F.x,F.z)+.5);if(b&&b!==o.b)ok=false}
+  if(ok)return{o,K,F}}return null}
+function CTB_park(S,h){try{OF_reset()}catch(e){}if(RO.wk){RO.wk=null;try{RBRK.visible=false;pl.mesh.visible=true}catch(e){}}roamWarp(S.F.x,S.F.z,h,true);RO.x=S.F.x;RO.z=S.F.z;RO.h=RO.vh=h;RO.v=0;CTB_step(1)}
+// on the asphalt itself (no margin: the old Kenney fronts sit at the same slot front)
+function CTB_onRoad(x,z){const q=cityAt(x,z);if(q&&q.d<q.road.w/2)return 1;const f=fillAt(x,z);if(f&&f.d<f.r.w/2)return 1;const a=abAt(x,z);return a&&a.d<a.road.w/2?1:0}
+const CTB_off=()=>CTB.on?'':'📍 PENDING · LEGO-set buildings are OFF (?ctb=0) ❌';
+const CTB_box=(o,K,sh)=>{const c=Math.cos(o.a),s=Math.sin(o.a),C=K.col,cx=o.x+C.ox*c+C.oz*s,cz=o.z-C.ox*s+C.oz*c,P=[];for(const[u,v]of[[-1,-1],[1,-1],[1,1],[-1,1],[0,-1]]){const lx=u*(C.hw-sh),lz=v*(C.hd-sh);P.push([cx+lx*c+lz*s,cz-lx*s+lz*c])}return P};
+// ctb/fra-row: a street of sets, near LOD drawn, every footprint off the road, sitting on the ground
+function CTB_goRow(say){const off=CTB_off();if(off)return off;if(state!=='roam'||!RO.on)return'📍 Start free roam first';const S=CTB_spot(0);if(!S)return'📍 no row of LEGO sets with a free street spot ❌';
+ CTB_park(S,S.o.a+1.1);const N=CTB_all().filter(([q])=>Math.hypot(q.x-RO.x,q.z-RO.z)<50);let road=0,gmax=0,near=0;
+ for(const[q,K]of N){for(const[x,z]of CTB_box(q,K,.3))if(CTB_onRoad(x,z))road++;const c=Math.cos(q.a),s=Math.sin(q.a);for(const[u,v]of[[-1,-1],[1,-1],[1,1],[-1,1]]){const lx=u*K.W/2,lz=v*K.D/2,g=groundY(q.x+lx*c+lz*s,q.z-lx*s+lz*c);gmax=Math.max(gmax,g-q.y,q.ph>.12?0:q.y-g)}}/* sunk anywhere, or floating without a plinth */
+ for(const k in CTB.K)near+=CTB.K[k].ims[0]?CTB.K[k].ims[0].count:0;const kinds=new Set(N.map(([,K])=>K.v.k)).size,ok=N.length>=3&&near>=3&&road===0&&gmax<=.15&&kinds>=2;
+ window.__chk=window.__chk||{};window.__chk.ctbRow={n:N.length,near,kinds,road,gmax:+gmax.toFixed(2),ok};
+ return`📍 LEGO STREET: ${N.length} sets within 50 m (${kinds} looks), ${near} drawn full-detail, ${road} footprint corners on the road, sunk/floating ≤ ${gmax.toFixed(2)} m (≤ 0.15) `+(ok?'✅':'❌')}
+// ctb/collide: drive (real gas) head-on into a set: the car stops at the facade (no pass-through, no invisible wall)
+function CTB_goHit(say){const off=CTB_off();if(off)return off;if(state!=='roam'||!RO.on)return'📍 Start free roam first';const S=CTB_spot(16);if(!S)return'📍 no set with a clear 16 m run ❌';
+ const{o,F}=S,KK=S.K;CTB_park(S,Math.atan2(-F.nx,-F.nz));const pd=()=>(RO.x-o.x)*F.nx+(RO.z-o.z)*F.nz-KK.D/2;/* car centre ↔ visual facade plane */let mn=1e9,vmax=0,inb=0;K.ArrowUp=true;const t0=performance.now();
+ const iv=setInterval(()=>{const d=pd();mn=Math.min(mn,d);vmax=Math.max(vmax,Math.abs(RO.v)*3.6);if(bHit(o.b,RO.x,RO.z,0))inb++;if(performance.now()-t0<5000)return;/* 5 s of gas: at a low frame rate the first contact stops it a step short; it creeps to the wall */clearInterval(iv);K.ArrowUp=false;
+  const ok=vmax>=25&&mn>=.8&&mn<=3.6&&!inb;window.__chk=window.__chk||{};window.__chk.ctbHit={vmax:+vmax.toFixed(0),mn:+mn.toFixed(2),inb,ok};
+  say(`📍 LEGO WALL: hit at up to ${vmax.toFixed(0)} km/h, car centre stopped ${mn.toFixed(2)} m from the facade (0.8–3.6), ${inb} frames inside `+(ok?'✅':'❌'))},16);return'📍 LEGO WALL · driving at the set…'}
+// ctb/perf: at the row, frame time + draw calls with the sets drawn vs hidden, plus their GPU memory and per-frame CPU
+function CTB_goPerf(say){const off=CTB_off();if(off)return off;if(state!=='roam'||!RO.on)return'📍 Start free roam first';const S=CTB_spot(0);if(!S)return'📍 no row ❌';CTB_park(S,S.o.a+1.1);
+ const M=[];for(const k in CTB.K){const K=CTB.K[k];M.push(...K.ims);K.fim&&M.push(K.fim)}const R=renderer,ar=R.info.autoReset;
+ const fr=vis=>{for(const m of M)m.visible=vis;const T=[];let calls=0,tris=0;for(let i=0;i<4;i++){R.info.autoReset=false;R.info.reset();const t=performance.now(),q=typeof TQ!=='undefined'?TQ:null;/* test mode draws only on TQ.draw */if(q)q.draw=1;try{composer.render()}finally{if(q)q.draw=0}T.push(performance.now()-t);calls=R.info.render.calls;tris=R.info.render.triangles}R.info.autoReset=ar;T.shift();T.sort((a,b)=>a-b);return{ms:T[1],calls,tris}};
+ let a,b;try{a=fr(false);b=fr(true);const a2=fr(false),b2=fr(true);a.ms=Math.min(a.ms,a2.ms);b.ms=Math.min(b.ms,b2.ms)}finally{for(const m of M)m.visible=true}
+ let mb=0;const seen=new Set();for(const k in CTB.K){const K=CTB.K[k];for(const g of[...K.near.map(q=>q[0]),K.far])if(g&&!seen.has(g)){seen.add(g);for(const n in g.attributes)mb+=g.attributes[n].array.byteLength;if(g.index)mb+=g.index.array.byteLength}for(const m of[...K.ims,K.fim])if(m)mb+=m.instanceMatrix.array.byteLength}mb/=1048576;
+ const t=performance.now();for(let i=0;i<20;i++)CTB_step(1);const cpu=(performance.now()-t)/20/6;/* step runs every 6 frames */
+ const df=(b.ms/a.ms-1)*100,dc=b.calls-a.calls,ok=df<=15&&dc<=40&&mb<=60&&cpu<=.5;window.__chk=window.__chk||{};window.__chk.ctbPerf={off:a,on:b,df:+df.toFixed(1),dc,mb:+mb.toFixed(1),cpu:+cpu.toFixed(3),ok};
+ return`📍 LEGO STREET PERF: frame ${df>=0?'+':''}${df.toFixed(1)} % (≤ 15), +${dc} draw calls (≤ 40), ${(b.tris/1e3).toFixed(0)}k tris, sets' GPU memory ${mb.toFixed(1)} MB (≤ 60), sort ${cpu.toFixed(2)} ms/frame (≤ 0.5) `+(ok?'✅':'❌')}
+window.__ctb={go:{row:s=>CTB_goRow(s),hit:s=>CTB_goHit(s),perf:s=>CTB_goPerf(s)},spot:CTB_spot,CTB,pos:()=>({x:RO.x,z:RO.z}),V:CTB_V,stat:()=>({...CTB.st,kinds:Object.values(CTB.K).map(K=>({k:K.v.k,n:K.L.length,W:+K.W.toFixed(1),D:+K.D.toFixed(1),H:+K.H.toFixed(1),tris:K.tris,ftris:K.ftris,near:K.ims[0]?K.ims[0].count:0,far:K.fim?K.fim.count:0}))}),
  near:()=>{let best=null;for(const k in CTB.K)for(const o of CTB.K[k].L){const d=Math.hypot(o.x-RO.x,o.z-RO.z);if(!best||d<best.d)best={k,d,...o,W:CTB.K[k].W,D:CTB.K[k].D,H:CTB.K[k].H}}return best},list:k=>CTB.K[k]?CTB.K[k].L:[]};
 // ---- RSZ (size-1, 2026-10-10). Alex: "many of the big vehicles need better size". Two root causes, fixed here for every ride:
 // 1. SC_ship (96_scale_qa.js) squeezed EVERY roam ride to 75 % width (SC_K.shipX, made for the old winged ships). Brick rides (garage builds, templates,
@@ -16848,7 +16901,7 @@ window.__trn={TRN,go:TRN_go,slip:TRN_slip,grade:TRN_grade,edge:TRN_edge,ramp:TRN
 // slope colours on the open land (outer ground heightfields with a col callback): grass → dry grass (15-30 %) → dirt (30-55 %) → rock (>55 %);
 // Athens also dries out with height (macchia above ~120 m)
 const TRN_C={dry:new THREE.Color(CID==='fra'?'#b3a85e':'#c2ae72'),dirt:new THREE.Color('#9a7a52'),rock:new THREE.Color('#8e8a82')};
-function TRN_slopeCol(c,x,z){if(!c||!c.isColor)return c;let s=0,h=0;try{h=groundY(x,z);const a=groundY(x+5,z)-groundY(x-5,z),b=groundY(x,z+5)-groundY(x,z-5);s=Math.hypot(a,b)/10}catch(e){return c}
+function TRN_slopeCol(c,x,z){if(!c||!c.isColor)return c;let s=0,h=0;try{h=groundY(x,z);const a=groundY(x+5,z)-h,b=groundY(x,z+5)-h;s=Math.hypot(a,b)/5}catch(e){return c}
   const ss=(a,b,v)=>{const t=clamp((v-a)/(b-a),0,1);return t*t*(3-2*t)};let d=ss(.12,.3,s)*.55;if(CID!=='fra')d=Math.max(d,ss(110,220,h)*.45);if(d>0)c.lerp(TRN_C.dry,d);const r=ss(.3,.55,s);if(r>0)c.lerp(TRN_C.dirt,r*.7);const k=ss(.55,.9,s);if(k>0)c.lerp(TRN_C.rock,k*.8);return c}
 if(TERR.on&&new URLSearchParams(location.search).get('trc')!=='0'){const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{if(o&&o.col&&!o.trc){const c0=o.col;o={...o,trc:1,col:(x,z)=>TRN_slopeCol(c0(x,z),x,z)}}
   // in-city ground (pavement + grass classes, no colours): the grass material gets a slope tint (white = untinted texture; walk/rock ignore colours)
