@@ -3,10 +3,11 @@
 const L=require('./lib.js');
 module.exports=async T=>{
  const THREE=await L.THREE();
+ if(!THREE){console.log('SKIP '+'lint_tracks.js'+': three.js missing: run  npm i three@0.164.1 --no-save  (node_modules is not tracked)');return}
  const ss=/bxSS=([^,;]+)[,;]/.exec(L.JSCODE());
  const pre='const bxSS='+ss[1]+';\nconst bxCl=(v,a,b)=>v<a?a:v>b?b:v;\n'+L.lineSrc('bxRamp')+'\n'+L.lineSrc('bxCurve')+'\n'+L.lineSrc('bxBowl')+'\n';
- const S=L.sandbox(['BXF','BXC','BXH','BXRW','fn:BX_exit','BX_P','BX_PAL','BX_PROF','BX_RAIL','bxRep','fn:bxCh','BX_WORLDS'],{THREE},'',pre);
- const {BX_P,BX_PAL,BX_PROF,BX_RAIL,BXC,BXH,BXRW,BX_WORLDS}=S;
+ const S=L.sandbox(['BXF','BXC','BXH','BXRW','fn:BX_exit','BX_P','BX_PAL','BX_PROF','BX_RAIL','bxRep','fn:bxCh','BX_WORLDS','BXN','BX_OFF'],{THREE},'',pre);
+ const {BX_P,BX_PAL,BX_PROF,BX_RAIL,BXC,BXH,BXRW,BX_WORLDS,BXN}=S;const BXO=-BXN*BXC/2;
  // demos: run the real Object.assign(BX_DEMOS,{...}) statement
  const src=L.JSCODE(),i0=src.indexOf('Object.assign(BX_DEMOS,{'),i1=L.bal(src,i0+'Object.assign'.length);
  const D=S.ctx.BX_DEMOS={};require('vm').runInContext('BX_DEMOS={};'+src.slice(i0,i1+1),S.ctx);const DEMOS=S.ctx.BX_DEMOS;
@@ -46,15 +47,15 @@ module.exports=async T=>{
   T.ok(pcs.some(a=>a[1]==='sf'),'has-start-'+nm);T.ok(pcs.some(a=>a[1]==='cp'),'has-checkpoint-'+nm);
   // boat crossings (trk-2): a lane may end in the lake and the course go on from a ramp that starts in the lake (the car is a boat between them),
   // like the in-game BX_data rule (exits into water are allowed). Water = terrain < -0.7 m under the cell; such pieces may start below sea level.
-  const wf=(BX_WORLDS[(log.find(a=>a[0]==='w')||[])[1]]||{}).f,wet=c=>!!wf&&wf(-160+(c.i+.5)*BXC,-160+(c.j+.5)*BXC)<-.7&&c.l*BXH<=.5;
+  const wf=(BX_WORLDS[(log.find(a=>a[0]==='w')||[])[1]]||{}).f,wet=c=>!!wf&&wf(BXO+(c.i+.5)*BXC,BXO+(c.j+.5)*BXC)<-.7&&c.l*BXH<=.5;
   const key=c=>c.i+','+c.j+','+c.l+','+c.r,exits=new Set(),starts=new Map();let gaps=[],dups=[],wetStarts=new Set();
   pcs.forEach((a,n)=>{const c={i:a[2],j:a[3],l:a[4],r:a[5]},k=key(c);if(n>0&&!exits.has(k)){if(wet(c))wetStarts.add(n);else gaps.push(n+':'+a[1]+'@'+k)}if(starts.has(k)&&!['mg'].includes(a[1]))dups.push(n+':'+a[1]+'@'+k);starts.set(k,1);
    for(const e of BX_P[a[1]].ex)exits.add(key(S.BX_exit(c,e)))});
   T.ok(gaps.length===0,'no-gaps-'+nm,gaps.length+' pieces start where no piece ends: '+gaps.slice(0,4));
   T.ok(dups.length===0,'no-overlap-'+nm,dups.length+' pieces start in an occupied cell: '+dups.slice(0,4));
   const inb=pcs.every(a=>a[2]>=-2&&a[3]>=-2&&a[2]<=S.ctx.BXN+1&&a[3]<=S.ctx.BXN+1||true);void inb;
-  // cell bounds (BXN = 40)
-  T.ok(pcs.every(a=>a[2]>=-2&&a[3]>=-2&&a[2]<=41&&a[3]<=41),'in-world-bounds-'+nm,'a piece sits outside the 40x40 builder world');
+  // cell bounds (BXN = 56 since trk-2)
+  T.ok(pcs.every(a=>a[2]>=-2&&a[3]>=-2&&a[2]<=BXN+1&&a[3]<=BXN+1),'in-world-bounds-'+nm,'a piece sits outside the '+BXN+'x'+BXN+' builder world');
   T.ok(pcs.every((a,n)=>a[4]>=0||wetStarts.has(n)),'above-sea-level-'+nm,'a piece at a negative height level (outside a boat crossing)');
   T.ok(wetStarts.size===0||pcs.some(a=>BX_P[a[1]].ex.some(e=>{const x=S.BX_exit({i:a[2],j:a[3],l:a[4],r:a[5]},e);return wet(x)&&!starts.has(key(x))})),'boat-crossing-has-splash-'+nm,'a lake restart with no lane ending in the lake');
  }

@@ -35,7 +35,7 @@ const LV_AFAC={poly:['#ffffff','#ffe2a8','#ffc890','#f4f0e8','#ffc8b8','#c8e4f4'
 // ---------- shared
 const _lvM=new THREE.Matrix4(),_lvQ=new THREE.Quaternion(),_lvE=new THREE.Euler(),_lvP=new THREE.Vector3(),_lvS=new THREE.Vector3(),_lvZ=new THREE.Matrix4().makeScale(0,0,0);
 const LV_mat=()=>new THREE.MeshStandardMaterial({vertexColors:true,roughness:.45});
-function LV_im(geo,n){const m=new THREE.InstancedMesh(geo,LV_mat(),Math.max(1,n));m.frustumCulled=false;m.castShadow=false;m.receiveShadow=false;for(let i=0;i<m.count;i++)m.setMatrixAt(i,_lvZ);HUB.grp.add(m);return m}
+function LV_im(geo,n){const m=new THREE.InstancedMesh(geo,LV_mat(),Math.max(1,n));m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.userData.keep=1;/* life-1: else WB city batching freezes these moving meshes (birds, flags, AD dress vanished in Athens) */m.frustumCulled=false;m.castShadow=false;m.receiveShadow=false;for(let i=0;i<m.count;i++)m.setMatrixAt(i,_lvZ);HUB.grp.add(m);return m}
 const LV_set=(m,i,x,y,z,rx,ry,rz,s)=>{_lvE.set(rx,ry,rz,'YXZ');_lvQ.setFromEuler(_lvE);_lvM.compose(_lvP.set(x,y,z),_lvQ,_lvS.set(s,s,s));m.setMatrixAt(i,_lvM)};
 // a pavement spot near a street node: 'ahead' = in front of the car
 function LV_spot(min,max,ahead){const c=LV_edges(min,max,ahead?.3:-2),E=c[0];if(!E)return null;const N=HUB.nodes,A=N[E.i],B=N[E.bi];

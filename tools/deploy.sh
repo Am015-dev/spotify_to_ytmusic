@@ -19,6 +19,7 @@ PY
 cp "$OUT/km.js" "$W/$D/km.js"
 [ -f "$OUT/models.js" ] && cp "$OUT/models.js" "$W/$D/models.js"   # LDraw model index (since v89v, src/MODELS)
 if [ -d "$OUT/models" ]; then rm -rf "$W/$D/models"; cp -r "$OUT/models" "$W/$D/models"; fi   # v89z: one chunk per model, loaded on demand
+if [ -d "$OUT/xc" ]; then rm -rf "$W/$D/xc"; cp -r "$OUT/xc" "$W/$D/xc"; fi   # split-1: lazy code chunks (src/LAZY), loaded after drivable
 [ -f "$OUT/tune.json" ] && cp "$OUT/tune.json" "$W/$D/tune.json"   # published TUNE values (docs/TUNE.md), optional
 cd "$W"; git add "$D"
 git commit -q -m "$MSG" -m "$(printf "%b" "${DEPLOY_TRAILER:-}")"
