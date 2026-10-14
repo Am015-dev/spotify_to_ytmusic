@@ -108,14 +108,17 @@ function titleEl() {
     h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Lantern Dive')),
     h('p.tag', 'Dive together. Say nothing. Trust the lantern.'),
     h('div.tbtns',
-      firstTime() ? h('div.tutw', { html: tutBtn('tbtn go') }) : null,
-      window.CAMPAIGN ? h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), ' ', h('span', campLine())) : null,
-      h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'descent', type: 'button' }, h('b', 'The Descent'), ' ', h('span', '4 zones, 4 bosses')),
-      h('button.tbtn', { 'data-a': 'play', type: 'button' }, h('b', 'Free play'), ' ', h('span', 'any dive, any crew')),
-      firstTime() ? null : h('div.tutw', { html: tutBtn('tbtn') }),
-      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), ' ', h('span', 'with friends, free')),
-      sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), ' ', h('span', 'your saved dive')) : null),
-    h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
+      firstTime() ? h('div.tutw', { html: tutBtn('tbtn go') }) : (window.CAMPAIGN
+        ? h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', 'Play Story'), ' ', h('span', campLine()))
+        : h('button.tbtn.go.story', { 'data-a': 'descent', type: 'button' }, h('b', 'The Descent'), ' ', h('span', '4 zones, 4 bosses'))),
+      sv ? h('button.tbtn.res', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Continue'), ' ', h('span', 'your saved dive')) : null,
+      h('div.qg', h('div.qgl', 'Quick game'),
+        h('div.qrow',
+          firstTime() && window.CAMPAIGN ? h('button.qseg', { 'data-a': 'story', type: 'button' }, 'Story') : null,
+          window.CAMPAIGN ? h('button.qseg', { 'data-a': 'descent', type: 'button' }, 'Descent') : null,
+          h('button.qseg', { 'data-a': 'play', type: 'button' }, 'Free play'),
+          h('button.qseg', { 'data-a': 'online', type: 'button' }, 'Online'),
+          firstTime() ? null : h('div.tutw', { html: tutBtn('qseg') }))))));
 }
 function dinerCard(c, o) {
   const b = D.blurbs[c], on = o.seats.indexOf(c) >= 0, lv = o.lv[c] || b.lv || 'normal', pc = KIT.DIVERS[c];

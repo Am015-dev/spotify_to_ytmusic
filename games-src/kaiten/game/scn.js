@@ -68,6 +68,33 @@
       { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
     ]
   });
+  /* UI-BAR rules 4-8 as DOM checks: top-bar buttons, panel text size and fit, dock fit, start screen, art aspect */
+  var vis = function (e) { var r = e.getBoundingClientRect(), cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
+  var minFont = function (root, minPx) { var bad = ''; [].forEach.call(root.querySelectorAll('*'), function (e) { if (bad || !vis(e)) return; if (e instanceof SVGElement) return; var own = [].some.call(e.childNodes, function (n) { return n.nodeType === 3 && /\S/.test(n.nodeValue); }); if (own && parseFloat(getComputedStyle(e).fontSize) < minPx) bad = (e.className || e.tagName) + ' ' + getComputedStyle(e).fontSize + ' "' + e.textContent.trim().slice(0, 20) + '"'; }); return bad ? 'text under ' + minPx + 'px: ' + bad : true; };
+  var need = function () { return innerWidth >= 1024 ? 16 : 13; };
+  var panelCheck = function (id) { return { kind: 'fn', name: 'panel ' + id + ': text size, fits content, inset', fn: function () { GX.show(id); var d = document.getElementById(id), b = d.querySelector('.gx-drawer-body'); if (!d || !b) return 'no panel'; var m = minFont(d, need()); if (m !== true) return m; var kids = [].filter.call(b.children, vis), used = kids.length ? Math.max.apply(null, kids.map(function (k) { return k.getBoundingClientRect().bottom; })) - b.getBoundingClientRect().top : 0, empty = b.clientHeight - used; if (empty > Math.max(120, b.clientHeight * .5)) return 'empty space ' + Math.round(empty) + 'px of ' + b.clientHeight; var dr = d.getBoundingClientRect(); for (var i = 0; i < kids.length; i++) { var r = kids[i].getBoundingClientRect(); if (r.left - dr.left < 16 || dr.right - r.right < 16) return 'flush to panel edge: ' + (kids[i].className || kids[i].tagName); } return true; } }; };
+  GXS.add({
+    id: 'kk-uibar', name: 'UI bar: top bar, panels, dock, art', ask: 'Are the bar, panels and dock clean?', seed: 33, when: booted, group: 'UI',
+    setup: function () { return table(33); },
+    checks: [
+      { kind: 'fn', name: 'rule 4: top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), vis).length; return n <= 5 || n + ' buttons in the top bar'; } },
+      { kind: 'fn', name: 'rule 4: title not overlapped', fn: function () { var t = $('.gx-bar h1'), a = t.getBoundingClientRect(), bad = ''; [].forEach.call(document.querySelectorAll('.gx-bar > *'), function (e) { if (e === t || !vis(e)) return; var r = e.getBoundingClientRect(); if (r.left < a.right - 1 && r.right > a.left + 1 && r.top < a.bottom && r.bottom > a.top) bad = e.id || e.className; }); return bad ? 'overlaps title: ' + bad : true; } },
+      { kind: 'fn', name: 'rule 5: one instruction line, 8 words or fewer', fn: function () { var p = $('#prompt'); if (!p) return true; var t = p.textContent.trim(); return words(t) <= 8 || 'prompt has ' + words(t) + ' words'; } },
+      panelCheck('logd'), panelCheck('rivald'), panelCheck('rulesd'), panelCheck('setd'),
+      { kind: 'fn', name: 'rule 6: dock text size and no tall empty box', fn: function () { try { GX.close(); } catch (e) { } var d = $('.gx-dock'); if (!d || !vis(d)) return true; var m = minFont(d, need()); if (m !== true) return m; var b = d.querySelector('.gx-dock-body'); if (!b) return true; var kids = [].filter.call(b.children, vis), used = kids.length ? Math.max.apply(null, kids.map(function (k) { return k.getBoundingClientRect().bottom; })) - b.getBoundingClientRect().top : 0; return b.clientHeight - used < Math.max(160, b.clientHeight * .6) || 'dock empty space ' + Math.round(b.clientHeight - used) + 'px'; } },
+      { kind: 'fn', name: 'rule 8: images at natural aspect', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (i) { if (bad || !vis(i) || !i.naturalWidth) return; var r = i.getBoundingClientRect(), cs = getComputedStyle(i); if (cs.objectFit !== 'fill' && cs.objectFit !== '') return; var k = (r.width / r.height) / (i.naturalWidth / i.naturalHeight); if (k < .93 || k > 1.07) bad = (i.className || i.src.split('/').pop()) + ' stretched x' + k.toFixed(2); }); return bad || true; } }
+    ]
+  });
+  GXS.add({
+    id: 'kk-uibar-start', name: 'UI bar: start screen', ask: 'Is the start screen clean?', seed: 34, when: booted, group: 'UI',
+    setup: function () { try { GX.close(); } catch (e) { } UI.started = false; UI.sv = 'title'; try { render(); } catch (e) { } return idle(600); },
+    checks: [
+      { kind: 'fn', name: 'rule 7: ONE primary button', fn: function () { var n = [].filter.call(document.querySelectorAll('#start .tbtn.go'), vis).length; return n === 1 || n + ' primary buttons on the start screen'; } },
+      { kind: 'fn', name: 'rule 7: start screen text size', fn: function () { return minFont($('#start'), need()); } },
+      { kind: 'fn', name: 'rule 7: no character roster', fn: function () { return document.querySelectorAll('#start .roster, #start .cav, #start .chip').length === 0 || 'roster on start screen'; } },
+      { kind: 'fn', name: 'rule 7: at most 4 start buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('#start button'), vis).length; return n <= 4 || n + ' buttons on the start screen'; } }
+    ]
+  });
   /* painted art wiring (ui-row-c, ui-bubble-tail): the files load and are used where they belong */
   var artLoad = {};
   GXS.add({
