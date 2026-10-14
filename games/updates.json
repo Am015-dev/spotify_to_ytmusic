@@ -14,6 +14,26 @@
   ],
   "ask": [
    null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "sands-of-qamar",
+  "title": "Every panel and the board readable",
+  "items": [
+   "Menu and campaign text now sits inside the painted frames"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "shipwreck-isle",
   "title": "simple start screen",
   "items": [
@@ -173,21 +193,6 @@
  },
  {
   "date": "2026-10-14",
-  "game": "sands-of-qamar",
-  "title": "Readable on every screen size",
-  "items": [
-   "Menu and campaign text now sits inside the painted frames"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
   "game": "thornbound",
   "title": "readable on every screen size",
   "items": [
@@ -258,49 +263,6 @@
   "scn": [
    "menu",
    "sf-uibar"
-  ],
-  "ask": [
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "final-approach",
-  "title": "final-approach: readable on every screen size",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "shipwreck-isle",
-  "title": "Menus and Rules panel cleaned up",
-  "items": [
-   "Rules text clears the frame; More menu readable"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-  "game": "lantern-dive",
-  "title": "lantern-dive: new start screen, readable text, bigger cards on wide screens",
-  "items": [
-   "Menus use one title font and one body font, no overlaps",
-   "Menu, help and tip text clear of frame art"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu",
-   "menu"
   ],
   "ask": [
    null,
