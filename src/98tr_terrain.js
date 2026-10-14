@@ -4,7 +4,7 @@ const TRN={};
 function TRN_rng(s){let a=s>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
 function TRN_roads(){const R=[];for(const S of CITY_S)R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2,id:S.r.id||S.r.name,cls:S.r.cls,ref:S});
   if(CID==='fra'){try{hubRoads()}catch(e){}for(const r of FILL_R||[]){const P=[],n=Math.max(1,Math.round(r.L/8));for(let i=0;i<=n;i++)P.push([r.x0+r.ux*r.L*i/n,r.z0+r.uz*r.L*i/n]);R.push({P,hw:r.w/2,id:'fill'+r.g,cls:'fill',ref:r})}
-    for(const A of AB||[]){const P=[];for(let i=1;i<A.pts.length;i++){const a=A.pts[i-1],b=A.pts[i],n=Math.max(1,Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])/8));for(let k=0;k<n;k++){const x=a[0]+(b[0]-a[0])*k/n,z=a[1]+(b[1]-a[1])*k/n;if(x>WX0+50&&x<WX1-50&&z>WZS+50&&z<WZN-50)P.push([x,z])}}R.push({P,hw:A.w/4,id:A.k||A.id,cls:'ab'})}}
+    for(const S of abSamples()){const P=S.pts.filter(p=>p.x>WX0+50&&p.x<WX1-50&&p.z>WZS+50&&p.z<WZN-50).map(p=>[p.x,p.z]);if(P.length>1)R.push({P,hw:S.r.w/4,id:S.r.k||S.r.id,cls:'ab'})}}
   return R}
 // points to skip: water (bridges carry their own decks), decks, and the world rim
 function TRN_skip(x,z){if(x<WX0+60||x>WX1-60||z<WZS+60||z>WZN-60)return true;if(CID==='fra'&&inRiver(x,z,-25))return true;for(const b of ALL_DECKS)if(deckAt(b,x,z)!=null)return true;return false}
@@ -22,7 +22,7 @@ function TRN_edge(n=50){const R=TRN_roads().filter(r=>r.P.length>2),rnd=TRN_rng(
     const d=Math.max(Math.abs(groundY(c[0]+nx*hw,c[1]+nz*hw)-y),Math.abs(groundY(c[0]-nx*hw,c[1]-nz*hw)-y));out.push({d,x:Math.round(c[0]),z:Math.round(c[1]),id:r.id})}
   out.sort((a,b)=>b.d-a.d);const o={n:out.length,max:+out[0].d.toFixed(2),worst:out[0],over:out.filter(q=>q.d>.3).length};TRN.edge=o;return o}
 // deck (bridge / ramp) ends: deck surface vs the ground just past the joint
-function TRN_ramp(){let mx=0,w=null,n=0;for(const b of ALL_DECKS){for(const s of[-1,1]){const a=s*(b.half-.3),y=deckY(b,a);if(y==null)continue;const[x,z]=deckPt(b,s*(b.half+.6));if(CID==='fra'&&inRiver(x,z))continue;n++;
+function TRN_ramp(){let mx=0,w=null,n=0;for(const b of ALL_DECKS){for(const s of[-1,1]){const a=s*b.half,y=deckY(b,a);if(y==null)continue;const[x,z]=deckPt(b,s*(b.half+.6));if(CID==='fra'&&inRiver(x,z))continue;n++;
     const d=Math.abs(y-groundY(x,z));if(d>mx){mx=d;w={id:b.id,x:Math.round(x),z:Math.round(z)}}}}const o={n,max:+mx.toFixed(2),worst:w};TRN.ramp=o;return o}
 // buildings: the lowest point of the body/plinth vs the lowest ground under its footprint (9 points)
 function TRN_base(){let n=0,bad=0,mx=0,w=null;for(const b of HUB.bld||[]){if(b.hw==null||b.trMin==null)continue;n++;const g=b.trMin,bot=b.trBot??g,gap=bot-g;if(gap>.05){bad++;if(gap>mx){mx=gap;w={x:Math.round(b.x),z:Math.round(b.z)}}}}
