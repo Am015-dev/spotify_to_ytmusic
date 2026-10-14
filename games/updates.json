@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-14",
+  "game": "final-approach",
+  "title": "final-approach: readable on every screen size",
+  "items": [
+   "Menus use one title font and one body font, no overlaps"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "crown-city-smash",
   "title": "Menus: clean and readable",
   "items": [
@@ -195,21 +210,6 @@
    null,
    null,
    "Do the menus and board look clean?"
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "final-approach",
-  "title": "Cleaner menus",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
   ]
  },
  {
