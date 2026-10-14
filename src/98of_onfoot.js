@@ -482,3 +482,14 @@ async function OF_sitAll(max){const W=ms=>new Promise(r=>setTimeout(r,ms));if(st
     const e=performance.now()+3000;while(performance.now()<e&&!(OF.sit&&OF.sit.t>=1))await W(50);await W(60);const r=OF_sitChk();n++;if(!r.ok)fails.push(Object.assign({x:Math.round(q.x),z:Math.round(q.z)},r));OF.sit=null}
   return{n,bad:fails.length,fails:fails.slice(0,8)}}
 window.OF_sitAll=OF_sitAll;
+// ---- checklist GOs (cam-2, 2026-10-14). sink: pick the ride in the garage, start Hot Drop (the cutscene skipped: M1.noScene runs its end(), the touchdown pose), drive 2 s, step out, and
+// check the parked ride's tyres (precise wheel boxes) 0..5 cm above the road and the body not below it. sit: SIT on the 3 nearest benches, OF_sitChk each.
+async function OF_pickRide(id){const W=ms=>new Promise(r=>setTimeout(r,ms));try{if(GAR_get().sel===id)return true;gbOpen();GAR_select(id)}catch(e){return false}await W(250);
+  const e=performance.now()+20000;while(performance.now()<e&&typeof LDL!=='undefined'&&LDL.wait.size)await W(60);try{gbClose(true)}catch(e){return false}await W(300);return true}
+async function OF_sinkRun(id){const W=ms=>new Promise(r=>setTimeout(r,ms));if(!await OF_pickRide(id))return'❌ FAIL '+id+': cannot pick the ride';try{OF_reset();if(RO.ch)chAbort()}catch(e){}
+  const ns=M1.noScene;M1.noScene=true;try{M1_startHotDrop()}finally{M1.noScene=ns}await W(1500);OF_exit();for(let i=0;i<50&&RO.foot!=='walk';i++)await W(100);await W(1200);
+  const p=OF_parkChk();try{OF_enter(OF_cars(false).find(k=>k.k==='cur'))}catch(e){}if(!p||!p.tyre.length)return'❌ FAIL '+id+': no wheels measured';const lo=Math.min(...p.tyre),hi=Math.max(...p.tyre),ok=lo>=-.02&&hi<=.05&&p.body>=-.02;
+  return(ok?'✅ PASS ':'❌ FAIL ')+'HOT DROP EXIT · '+id+' · '+p.tyre.length+' tyres '+lo+'..'+hi+' m above the road (0..0.05) · body '+p.body+' m'}
+function OF_sinkGo(id,say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sinkRun(id).then(say);return'📍 HOT DROP EXIT · '+id+' · starting…'}
+async function OF_sitRun(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';const r=await OF_sitAll(3);return r.err?'❌ FAIL '+r.err:(r.bad?'❌ FAIL ':'✅ PASS ')+'SIT · '+r.n+' benches: '+(r.bad?JSON.stringify(r.fails):'legs on the seat, back to the backrest, facing away')}
+function OF_sitGo(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sitRun().then(say);return'📍 SIT · the 3 nearest benches · running…'}
