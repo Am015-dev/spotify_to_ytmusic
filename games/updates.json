@@ -1,12 +1,21 @@
 [
  {
   "date": "2026-10-14",
-  "game": "nebula-aces",
+  "game": "rampart-and-vine",
+  "title": "one big Play button, one-line tips, UI-bar checks",
+  "items": [],
+  "check": "",
+  "scn": [],
+  "ask": []
+ },
+ {
+  "date": "2026-10-14",
+  "game": "shipwreck-isle",
   "title": "readable on every screen size",
   "items": [
-   "Buttons, panels and the battle board no longer cover or crowd their text"
+   "Rules text clears the frame; More menu readable"
   ],
-  "check": "Open the menu and the battle: all text sits inside its frame",
+  "check": "",
   "scn": [
    "menu"
   ],
@@ -142,15 +151,6 @@
  },
  {
   "date": "2026-10-14",
-  "game": "rampart-and-vine",
-  "title": "readable on every screen size",
-  "items": [],
-  "check": "",
-  "scn": [],
-  "ask": []
- },
- {
-  "date": "2026-10-14",
   "game": "sunglaze",
   "title": "readable on every screen size",
   "items": [
@@ -226,12 +226,12 @@
  },
  {
   "date": "2026-10-14",
-  "game": "shipwreck-isle",
-  "title": "Menus and Rules panel cleaned up",
+  "game": "nebula-aces",
+  "title": "Cleaner menus",
   "items": [
-   "Rules text clears the frame; More menu readable"
+   "Buttons, panels and the battle board no longer cover or crowd their text"
   ],
-  "check": "",
+  "check": "Open the menu and the battle: all text sits inside its frame",
   "scn": [
    "menu"
   ],
