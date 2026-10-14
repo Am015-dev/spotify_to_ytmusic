@@ -32,15 +32,15 @@ int-4 (session_01QewuGcL86b169339CDxRy9) was **inactive** for every push, so non
   - They are recorded in `BV.RB`, which seeds `BV.L`. `?bvr=0` turns them off.
   - At 1 in 5 roofs with 6 boxes each, perf FAILED (+13% frame). The current setting passed twice.
 
-## Waiting for a yes (sent to the coordinator)
+## APPROVED, do this FIRST (coordinator, 2026-10-14 03:44Z): "CTB: YES, as specced, for low-rise filler streets only (no skyline). Behind ?ctb flag, default ON once the 3 tests pass. Reuse the existing LD pipeline. Do it before the street-life item. int-5 (session_01E4VvRXCv89qkKrh9WxLtxR) builds from git, so no PUSHED message is needed. DONE only."
 - **Item 4, reuse LDraw/OMR:** turn on CTB (98ct_city_lego, `?ctb=1`).
   - It is broken today. At city build `models.js` hasn't loaded yet, so 3219 of 3219 slots fall back. Once the models are loaded, `CTB_kind` works (bank 12.5 × 6.3 × 6.2 m, etc.).
   - Work: re-fill the slots after the load (swap the Kenney instances and colliders), do the memory pass, then add OMR modular buildings.
   - Tests are in the DONE message. The mock-up is `qa_art4/ctb_mock.jpg`.
   - The sets are minifig scale (6-7 m tall). They suit low-rise filler streets.
-- **No build work before the yes.**
+- Write the 3 tests first (ctb/fra-row, ctb/collide, ctb/perf in src/99c_checklist.js with 📍 GO), then the re-fill-after-models-load, then turn the default ON once they pass.
 
-## Next (if there is no yes)
+## Next (after CTB)
 1. District themes (art-3 Next #2): Sachsenhausen apple-wine taverns, Bahnhof neon, Osthafen murals.
 2. Athens CE_dec shops are not recorded in `BV.L` yet.
 3. The pink panel on a black pole near the Athens Festival start is not a BV piece. Find its owner if a reviewer flags it.
