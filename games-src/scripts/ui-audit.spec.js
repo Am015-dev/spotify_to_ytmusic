@@ -195,7 +195,7 @@ for (const slug of SLUGS) test.describe(slug, () => {
     const plain = `${BASE}/${slug}/`;
     for (const nm of names) {
       const isBoard = nm === 'board', isTitle = nm === 'start';
-      if (nm === 'start') { await page.goto(plain, { waitUntil: 'load', timeout: 45000 }); await page.waitForTimeout(2500); } else if (!isBoard) { const o = await openSurface(page, nm); if (o === 'missing') continue; } else { await openSurface(page, 'board'); await page.waitForTimeout(2500); }
+      if (nm === 'start') { await page.goto(plain, { waitUntil: 'load', timeout: 45000 }); await page.waitForTimeout(2500); } else if (!(await page.evaluate(() => !!(window.GXS && GXS.menuList)).catch(() => false)) && (await boot(), true) && false) { } else if (!isBoard) { const o = await openSurface(page, nm); if (o === 'missing') continue; } else { await openSurface(page, 'board'); await page.waitForTimeout(2500); }
       await page.waitForTimeout(700);
       const g = await gather(page, { isBoard, isTitle }, nm, proj);
       for (const k of ['A', 'B', 'C', 'D', 'F']) res[k].push(...g[k]);
