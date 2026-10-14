@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Look check: a deterministic visual reviewer (no AI). Opens every shelf game on phone + PC, never plays a full game,
-// and reports what LOOKS wrong: small/low-contrast/cut-off/overlapping text, bad fonts, unlabeled/covered/tiny buttons,
+// and reports what LOOKS wrong: small/cut-off/overlapping text, bad fonts, covered buttons,
 // broken/stretched/blurry art, blank boards, cards that overlap or spill, sideways scroll, page errors.
+// Contrast, tap-target size and unlabeled buttons are NOT checked here any more: scripts/look.spec.js runs axe-core for them.
 //
 //   NODE_PATH=/opt/node-tools/node_modules node games-src/scripts/look-check.js                 # all games -> games/look/
 //   node games-src/scripts/look-check.js --game doorkick-dungeon [--game thornbound] [--sizes phone,small,pc]
@@ -479,16 +480,6 @@ function judge(raw, ctx) {
         desc: `${cap(nice(t.sel))} text "${t.text.slice(0, 24)}" is ${Math.round(px * 10) / 10} px on ${phone ? 'phone' : 'PC'}` });
     }
   }
-  // 2 contrast (+ button label invisible)
-  for (const t of raw.texts) {
-    if (!t.ok || !t.letters || t.dis || t.__ratio == null || t.clipText || t.help) continue;
-    const r = t.__ratio;
-    if (r < 3) {
-      const inBtn = !!t.btn;
-      if (r < 1.3 && inBtn) add({ check: 'button', sev: 'severe', sel: t.sel, text: t.text, box: t.box, key: `labelinvis|${t.sel}`, num: r, desc: `Button label "${t.text.slice(0, 24)}" is invisible: same colour as its background (contrast ${r}:1)` });
-      else add({ check: 'contrast', sev: r < 2 ? 'severe' : 'warn', sel: t.sel, text: t.text, box: t.box, key: `contrast|${t.sel}`, num: r, desc: `${cap(nice(t.sel))} text "${t.text.slice(0, 24)}" is hard to read: contrast ${r}:1` });
-    }
-  }
   // 3 cut off
   for (const t of raw.texts) {
     if (!t.ok || !t.letters) continue;
@@ -508,9 +499,6 @@ function judge(raw, ctx) {
     if (b.disabled) continue;
     const w = b.box[2], h = b.box[3];
     const label = nice(b.sel);
-    if (phone && !b.inline && !b.isObj && (w < 40 || h < 40) && !b.scrollAnc && (b.text || b.aria || b.hasVisual || b.painted)) add({ check: 'button', sev: Math.min(w, h) < 24 ? 'severe' : 'warn', sel: b.sel, text: b.text || b.aria, box: b.box, key: `tap|${b.sel}`, num: `${Math.round(w)}x${Math.round(h)}`, desc: `${cap(label)} button${b.text ? ' "' + b.text.slice(0, 20) + '"' : ''} is only ${Math.round(w)}x${Math.round(h)} px to tap` });
-    if (!b.hasText && !b.hasVisual && (b.aria || b.textInvisible) && (b.painted || b.bgImg) && w >= 20 && h >= 20 && !b.isObj) add({ check: 'button', sev: 'severe', sel: b.sel, text: b.aria || b.text, box: b.box, key: `nolabel|${b.sel}`, desc: `${cap(b.aria ? b.aria.slice(0, 24) : label)} button has no visible label${b.textInvisible ? ' (' + b.textInvisible + ')' : ''}` });
-    else if (!b.hasText && b.textInvisible && b.hasVisual && /font-size 0|transparent|opacity|clipped/.test(b.textInvisible) === false) { /* fine */ }
     if (b.cover >= 0.6 && !b.coverModal && !b.coverBig) add({ check: 'button', sev: b.cover >= 0.99 ? 'severe' : 'warn', sel: b.sel, text: b.text || b.aria, box: b.box, key: `cover|${b.sel}|${b.coverBy}`, desc: `${cap(label)} button${b.text ? ' "' + b.text.slice(0, 20) + '"' : ''} is covered by ${nice(b.coverBy) || 'another element'}` });
   }
   // 7 images
@@ -710,7 +698,6 @@ function merge(findings) {
     if (prefer(f, g._best)) g._best = f;
     if (f.needs_art && f.target_px) { const [aw, ah] = f.target_px, [bw, bh] = g.target_px || [0, 0]; if (aw * ah > bw * bh) g.target_px = f.target_px; }
   }
-  for (const g of m.values()) if ((g.check === 'contrast' || /^labelinvis/.test(g.key)) && g.sev === 'severe' && g.sites.length < 2) g.sev = 'warn';  // one-off contrast hits are usually animation noise
   return [...m.values()].map(g => { const b = g._best; const o = { check: g.check, sev: g.sev, sel: b.sel, text: b.text, desc: b.desc, box: b.box.map(v => Math.round(v * 10) / 10), size: b.size, screen: b.screen, shot: b.shot, count: g.count, sites: g.sites, num: b.num };
     if (g.needs_art) Object.assign(o, { needs_art: true, element: g.element, target_px: g.target_px, ratio: g.ratio, transparent: g.transparent }); return o; })
     .sort((a, b) => SEV[b.sev] - SEV[a.sev] || b.count - a.count);
