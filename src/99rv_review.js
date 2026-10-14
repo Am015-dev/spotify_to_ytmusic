@@ -42,7 +42,13 @@ function RV14_go(kind,say){
  if(kind==='filo'){const q=rfSnap(2200,-2600,150);roamWarp(q?q[0]:2200,q?q[1]:-2600,q&&q[2]!=null?q[2]:0);camSnap=true;
   setTimeout(()=>{const inCar=!!SC_hit(RO.x,RO.z,RO.y),c=camera.position,inCam=!!roamHit(c.x,c.z,.3,c.y);say('📍 FILOPAPPOU ROAD · car inside a building: '+(inCar?'yes':'no')+' · camera inside a building: '+(inCam?'yes':'no')+ok(!inCar&&!inCam))},1200);return'📍 FILOPAPPOU ROAD · checking…'}
  if(kind==='athfoot'){try{__tq&&__tq.reset&&__tq.reset()}catch(e){}const r=OF_go('car');return r+(/No clear|first/i.test(r)?' ❌ (GO cannot get out at the Athens start, Eleni\'s garage)':' ✅')}
- if(kind==='fest'){const m=RO.marks.find(q=>q.ev&&(q.ev.id==='e_fest'||/Festival/.test(q.ev.name||'')));if(!m)return'📍 Festival Delivery marker not on the map yet (visual check skipped)';RV14_near(m,10);roamOpen(m);setTimeout(()=>{try{roamGo()}catch(e){}},250);
-  return'📍 FESTIVAL DELIVERY START · look 10-20 m ahead-left: no flat plain-brown box standing on the road and no black square on the asphalt (visual check)'}
- if(kind==='black'){roamWarp(706,564,Math.PI,true);camSnap=true;return'📍 ZEIL WEST (706,564) · look right: every building facade has windows/texture, no wall renders pure black (visual check)'}
+ if(kind==='fest'){let n=0;const go=()=>{const m=RO.marks.find(q=>q.ev&&(q.ev.id==='e_fest'||/Festival/.test(q.ev.name||'')));if(!m){if(++n<8)return setTimeout(go,250);const t=QV_ENC.find(q=>q.id==='e_fest'),q=rfSnap(RO.x+40,RO.z+40,150);if(!t||!q)return say('📍 Festival Delivery marker not on the map ❌');qvEncMark(t,q[0],q[1],q[2]||0,7,1);return go()}RV14_near(m,10);roamOpen(m);setTimeout(()=>{try{roamGo()}catch(e){}},250);
+  setTimeout(()=>{const g=RO.ch&&RO.ch.crates;if(!g||!g.children.length)return say('📍 FESTIVAL DELIVERY START · no crates loaded ❌');const C=new THREE.Box3(),B=new THREE.Box3();g.updateMatrixWorld(true);C.setFromObject(g);
+   g.parent.children.forEach(o=>{if(o!==g&&o.visible&&!o.userData.cargo)B.expandByObject(o)});const c=C.getCenter(new THREE.Vector3()),b=B.getCenter(new THREE.Vector3()),dh=Math.hypot(c.x-b.x,c.z-b.z),hl=Math.max(B.max.x-B.min.x,B.max.z-B.min.z)/2,on=dh<hl&&C.min.y>B.max.y-.3;
+   say('📍 FESTIVAL DELIVERY START · '+g.children.length+' crates ride on the car roof (centre '+dh.toFixed(1)+' m from car centre, half-length '+hl.toFixed(1)+'; bottom '+(C.min.y-B.max.y).toFixed(2)+' m vs roof), no brown slab on the road'+ok(on))},3000)};go();
+  return'📍 FESTIVAL DELIVERY START · checking the crates…'}
+ if(kind==='black'){roamWarp(706,564,Math.PI,true);camSnap=true;let dark=0,n=0,em=0;try{for(const k of['com','sub']){const m=KMM[k];if(!m||!m.map||!m.map.image)continue;n++;if(m.emissiveMap&&m.emissiveMap!==m.map)em++;
+   const im=m.map.image,c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);const d=x.getImageData(0,0,c.width,c.height).data;
+   for(let i=0;i<d.length;i+=4){const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);if(d[i+3]>8&&mx>=24&&mx<=105&&mx-mn<=30)dark++}}}catch(e){}
+  return'📍 ZEIL WEST (706,564) · look right: glass facades read as blue-grey glass with window lines, no wall renders flat black · auto: '+n+' Kenney atlases, dark-glass texels left '+dark+', glass-only glow '+em+'/'+n+ok(n>=1&&!dark&&em===n)}
  return'📍 unknown rv14 kind '+kind+' ❌'}

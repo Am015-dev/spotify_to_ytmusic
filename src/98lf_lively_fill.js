@@ -32,7 +32,7 @@ roamTerr=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r.deck&&LF.MG.s
 // and its top is part of the walk/drive height: LF_patchY(x,z) = the plane's top inside the 9-gon, else null. The figure's feet and the tyres use the SAME surface as the mesh.
 LF.PG=new Map();const LF_PPOLY=[];for(let i=0;i<9;i++){const a=i/9*Math.PI*2,r=.75+.25*LF_h(i,3,1);LF_PPOLY.push([Math.cos(a)*r,-Math.sin(a)*r])}
 function LF_patchY(x,z){const A=LF.PG.get(Math.floor(x/32)*10000+Math.floor(z/32));if(!A)return null;let best=null;
- for(const p of A){const dx=x-p.x,dz=z-p.z;if(dx*dx+dz*dz>p.R2)continue;const lx=(p.c*dx-p.s*dz)/p.sx,lz=(p.s*dx+p.c*dz)/p.sz;let ins=false;
+ for(const p of A){const dx=x-p.x,dz=z-p.z;if(p.d||dx*dx+dz*dz>p.R2)continue;const lx=(p.c*dx-p.s*dz)/p.sx,lz=(p.s*dx+p.c*dz)/p.sz;let ins=false;
   for(let i=0,j=8;i<9;j=i++){const a=LF_PPOLY[i],b=LF_PPOLY[j];if((a[1]>lz)!==(b[1]>lz)&&lx<(b[0]-a[0])*(lz-a[1])/(b[1]-a[1])+a[0])ins=!ins}
   if(ins){const y=p.yt+p.gx*dx+p.gz*dz;if(best==null||y>best)best=y}}
  return best}
@@ -88,6 +88,22 @@ function LF_fit(L,p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,y0=p
  p.y=y0+lift;p.gx=gx;p.gz=gz;
  const R=Math.max(p.sx,p.sz),e={x:p.x,z:p.z,c,s,sx:p.sx,sz:p.sz,R2:R*R,yt:p.y+.04,gx,gz};if(!L.lfP)L.lfP=[];
  for(let i=Math.floor((p.x-R)/32);i<=Math.floor((p.x+R)/32);i++)for(let j=Math.floor((p.z-R)/32);j<=Math.floor((p.z+R)/32);j++){const k=i*10000+j;let A=LF.PG.get(k);if(!A)LF.PG.set(k,A=[]);A.push(e);L.lfP.push([k,e])}}
+LF.drape=!/[?&]lfd=0\b/.test(location.search);
+function LF_patchMat(){return LF.pm||(LF.pm=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4}))}
+// patch residual vs its best tilted plane (same samples as LF_fit): small = keep the cheap instanced plane, big = drape it
+function LF_resid(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,g0=gy(p.x,p.z),gx=(gy(p.x+d,p.z)-gy(p.x-d,p.z))/(2*d),gz=(gy(p.x,p.z+d)-gy(p.x,p.z-d))/(2*d);let hi=-9,lo=9;
+ for(const q of LF_PPOLY)for(const u of[.97,.5]){const a=q[0]*p.sx*u,b=q[1]*p.sz*u,dx=c*a+s*b,dz=-s*a+c*b,r=gy(p.x+dx,p.z+dz)-(g0+gx*dx+gz*dz);hi=Math.max(hi,r);lo=Math.min(lo,r)}return Math.max(hi,0)-Math.min(lo,0)}
+// one merged INDEXED draped mesh for the uneven patches of a tile: centre + 9 inner (r .5) + 18 rim points, y = ground + .035 at every vertex
+const LF_DT=(()=>{const V=[[0,0]],I=[];for(let i=0;i<9;i++)V.push(LF_PPOLY[i].map(v=>v*.5));for(let i=0;i<18;i++){const a=LF_PPOLY[i>>1],b=LF_PPOLY[((i>>1)+1)%9],t=(i&1)/2;V.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t])}
+ const T=(a,b,c)=>{const u=V[b][0]-V[a][0],v=V[b][1]-V[a][1],w=V[c][0]-V[a][0],x=V[c][1]-V[a][1];/* (u,0,v)x(w,0,x).y = v*w-u*x must be > 0 (normal up) */if(v*w-u*x>0)I.push(a,b,c);else I.push(a,c,b)};
+ for(let i=0;i<9;i++){const j=(i+1)%9,o=10+2*i;T(0,1+i,1+j);T(1+i,o,o+1);T(1+i,o+1,1+j);T(1+j,o+1,10+(2*i+2)%18)}return{V,I}})();
+function LF_drapeG(L,A,gy){const n=LF_DT.V.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),idx=[],C=new THREE.Color();if(!L.lfP)L.lfP=[];
+ A.forEach((p,k)=>{const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
+  LF_DT.V.forEach((q,i)=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=gy(x,z)+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b});
+  for(const i of LF_DT.I)idx.push(o+i);
+  const Rr=Math.max(p.sx,p.sz),e={x:p.x,z:p.z,c,s,sx:p.sx,sz:p.sz,R2:Rr*Rr,yt:pos[o*3+1],gx:0,gz:0,d:1};
+  for(let i=Math.floor((p.x-Rr)/32);i<=Math.floor((p.x+Rr)/32);i++)for(let j=Math.floor((p.z-Rr)/32);j<=Math.floor((p.z+Rr)/32);j++){const kk=i*10000+j;let B=LF.PG.get(kk);if(!B)LF.PG.set(kk,B=[]);B.push(e);L.lfP.push([kk,e])}});
+ if(!A.length)return null;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));g.setIndex(idx);g.computeVertexNormals();g.computeBoundingSphere();return g}
 function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=CID==='fra',[X0,X1,Z0,Z1]=L.rect,I={tuft:[],bed:[],patch:[],pond:[],reed:[],mound:[]},st=LF.st;
  const has=t=>!!D[t],pk=a=>{const b=a.filter(has);return b.length?b[Math.floor(LF_h(a.length,b.length,L.props.length)*b.length)]:null},{TREES,ROCK,GRN,DIRT}=C;
  const gy=(x,z)=>groundY(x,z)+LF_mound(x,z),G16=(x,z)=>{const k=Math.floor(x/16)*10000+Math.floor(z/16),e=[x,z];let A=LF.G.get(k);if(!A)LF.G.set(k,A=[]);A.push(e);L.lfG.push([k,e])};
@@ -149,6 +165,12 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
  // 5 · decor meshes (one per type for this tile), then the props through the city's own prop builder
  const GE=LF.geo||(LF.geo=LF_geos()),mat=LF.mat||(LF.mat={def:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),tuft:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,side:THREE.DoubleSide}),pond:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.12,metalness:.15})});
  const M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),S=new THREE.Vector3(),Pv=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),Co=new THREE.Color();LF.ms=LF.ms||[];
+ // art-4: uneven patches are DRAPED (Alex: "patches cut the figure in half"): a patch whose tilted-plane fit is off by > 8 cm becomes part of one merged
+ // indexed mesh per tile, every vertex at groundY+3.5 cm (polygon offset against z-fight), walk height = terrain; even ones stay instanced planes. Ponds whose rim varies > 15 cm and beds on > 20 cm are dropped;
+ // beds sit at their lowest corner (sink uphill, never float). ?lfd=0 = the old tilted planes.
+ if(LF.drape){const DR=I.patch.filter(p=>LF_resid(p,gy)>.08);if(DR.length){const g=LF_drapeG(L,DR,gy);const S=new Set(DR);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield}}
+  I.pond=I.pond.filter(p=>{let lo=9e9,hi=-9e9;for(let k=0;k<12;k++){const a=k/12*6.283,y=gy(p.x+Math.cos(a)*p.sx,p.z+Math.sin(a)*p.sz);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.15)return false;p.y=(lo+hi)/2+.02;return true});
+  I.bed=I.bed.filter(p=>{const c=Math.cos(p.ry||0),sn=Math.sin(p.ry||0);let lo=9e9,hi=-9e9;for(const[a,b]of[[-2,-1.2],[2,-1.2],[2,1.2],[-2,1.2]]){const u=a*p.sx,v=b*p.sz,y=gy(p.x+c*u+sn*v,p.z-sn*u+c*v);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.2)return false;p.y=lo;return true})}
  for(const t in I){const A=I[t];if(!A.length)continue;const m=new THREE.InstancedMesh(GE[t],t==='tuft'||t==='reed'?mat.tuft:t==='pond'?mat.pond:mat.def,A.length);
   A.forEach((p,i)=>{if(t==='patch')LF_fit(L,p,gy);Q.setFromAxisAngle(Y,p.ry||0);M4.compose(Pv.set(p.x,p.y,p.z),Q,S.set(p.sx,p.sy,p.sz));if(p.gx||p.gz){const e=M4.elements;e[1]=p.gx*e[0]+p.gz*e[2];e[9]=p.gx*e[8]+p.gz*e[10]}m.setMatrixAt(i,M4);m.setColorAt(i,Co.set(p.c||'#ffffff'))});
   m.computeBoundingSphere();m.castShadow=t==='mound';m.receiveShadow=true;m.userData.lf=t;m.userData.lfR=L.id;m.userData.nsh=t!=='mound';L.root.add(m);LF.ms.push(m);yield}

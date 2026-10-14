@@ -1,13 +1,6 @@
 {
- "roads-fra/taxi-on-road-3": "stand -150,-1000 is 99 m from the nearest road",
- "roads-fra/taxi-on-road-4": "stand -2000,180 is 73 m from the nearest road",
  "roads-ath/no-hairpin-reversal": "17 >160° reversals Andrea Syngrou@1,Athanasiou Diakou@1,Peiraios@2",
  "roads-ath/no-teleport-edge": "1 absurdly long edges Ioannou Drosopoulou 1095m",
- "roads-ath/landmark-not-on-road": "g_kol 3m from Tsakalof; g_amp 4m from Selinountos; arch 10m from Vasilissis Amalias",
- "roads-ath/taxi-on-road-0": "stand 39,29 is 41 m from the nearest road",
- "roads-ath/taxi-on-road-1": "stand 829,-65 is 63 m from the nearest road",
- "roads-ath/taxi-on-road-3": "stand 2512,553 is 70 m from the nearest road",
- "roads-ath/garage-on-road-a_hil": "garage a_hil is 31 m from a road",
  "models/ride-height-v3056_1": "height 4 < 6 plates: no roof/body",
  "models/ride-aspect-v3056_1": "length/width 0.71 not car-like",
  "models/ride-aspect-v6361_1": "length/width 5.50 not car-like",

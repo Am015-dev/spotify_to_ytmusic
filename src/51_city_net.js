@@ -11,9 +11,21 @@ function kmGeo(nm,sc=1){const key=nm+'@'+sc;if(KMG[key])return KMG[key];const[ki
 function kmKit(nm){return KM_IDX[nm][0]}
 function kmSize(nm,sc=1){const e=KM_IDX[nm];return[e[7]*sc,e[8]*sc,e[9]*sc]}
 function kmMat(kit){if(KMM[kit])return KMM[kit];let m;if(kit==='nat')m=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.85,metalness:0});
-  else{const t=new THREE.TextureLoader().load(KM_TEX[kit]);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;t.flipY=false;KEEP_TEX.add(t);
+  else{const t=new THREE.TextureLoader().load(KM_TEX[kit],(kit==='com'||kit==='sub')&&!/[?&]kmg=0\b/.test(location.search)?KM_glass:undefined);t.colorSpace=THREE.SRGBColorSpace;t.magFilter=THREE.NearestFilter;t.minFilter=THREE.NearestFilter;t.generateMipmaps=false;t.flipY=false;KEEP_TEX.add(t);
     m=new THREE.MeshStandardMaterial({map:t,roughness:.55,metalness:.05,emissiveMap:kit==='com'||kit==='sub'?t:null,emissive:kit==='com'||kit==='sub'?new THREE.Color('#ffffff'):new THREE.Color(0),emissiveIntensity:.1})}
   return KMM[kit]=m}
+// art-4 (rv14 black facades): Kenney com/sub glass is a neutral 56-80 grey ramp (~4 % linear); times a warm instance tint and with only the hemi
+// light on the shade side, whole glass facades rendered as flat black slabs. Lift those texels to a light LEGO trans-clear blue, and give the
+// material a glass-only emissive map (glass = sky glow, walls = 1/4 of their old glow) so glass reads as glass whatever the tint. ?kmg=0 = off.
+function KM_glass(t){try{const im=t.image,c=document.createElement('canvas'),e=document.createElement('canvas');c.width=e.width=im.width;c.height=e.height=im.height;const x=c.getContext('2d'),y=e.getContext('2d');x.drawImage(im,0,0);
+ const D=x.getImageData(0,0,c.width,c.height),d=D.data,E=y.createImageData(c.width,c.height),q=E.data;
+ for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2],mx=Math.max(r,g,b),mn=Math.min(r,g,b);q[i+3]=255;
+  if(d[i+3]<8||mx<24||mx>105||mx-mn>30){q[i]=r*.25;q[i+1]=g*.25;q[i+2]=b*.25;continue}
+  d[i]=r*.3+150*.7;d[i+1]=g*.3+182*.7;d[i+2]=b*.3+218*.7;q[i]=150;q[i+1]=185;q[i+2]=230}
+ x.putImageData(D,0,0);y.putImageData(E,0,0);t.image=c;t.needsUpdate=true;
+ const et=new THREE.CanvasTexture(e);et.colorSpace=THREE.SRGBColorSpace;et.magFilter=et.minFilter=THREE.NearestFilter;et.generateMipmaps=false;et.flipY=false;KEEP_TEX.add(et);
+ const fit=()=>{for(const k in KMM){const m=KMM[k];if(!m||m.map!==t)continue;m.emissiveMap=et;m.emissive.set('#ffffff');m.emissiveIntensity=.36;m.needsUpdate=true;if(typeof FL!=='undefined'&&FL.mats&&FL.mats.has(m))FL.mats.set(m,.36);return 1}};
+ if(!fit())setTimeout(fit,0)}catch(e){}}
 // ---------- real-Frankfurt layout (Stage 2). Real data (metres east e / north n of the Römerberg) enters only through WP(e,n):
 // 1:1 inside the city box, compressed x0.35 outside; real east is world -x (the camera shows -x on the right when facing north/+z)
 const ATH_DIST={A:{id:'A',name:'Historic Centre',el:'Istoriko Kentro',r:[[-1350,760,-1150,1000]],st:[39,29],col:'#e8b04a'},
