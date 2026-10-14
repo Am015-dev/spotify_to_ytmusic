@@ -75,7 +75,7 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
     {const pk=OF_parkChk();if(!pk||pk.tyre.some(g=>!(Math.abs(g)<=.05)))fails.push('roam-tyre-gap>5cm');MX.last=pk&&pk.tyre}
     {const m=pl.mesh.userData.m;m.updateMatrixWorld(true);const wd=new THREE.Vector3(0,0,-1).transformDirection(m.matrixWorld);if(ang(wd.x,wd.z,fx,fz)>20)fails.push('roam-visual-facing')}
     {const c=camera.position,dx=c.x-RO.x,dz=c.z-RO.z,h=Math.hypot(dx,dz);if(!(h>2&&h<40&&(dx*fx+dz*fz)/h<-.5))fails.push('roam-camera-behind');if(c.y<RO.y)fails.push('roam-camera-below-car')}
-    if(prog){const x0=RO.x,z0=RO.z;if(touch)TOUCH.gas=true;else K.ArrowUp=true;let minV=1e9,wall0=SC_S.nb;for(let i=0;i<90;i++){roamStep(1/60);if(i>20)minV=Math.min(minV,RO.v)}K.ArrowUp=false;TOUCH.gas=false;
+    if(prog){/* rev-3: the gas test measures driving, not marker cards: a card left over from the previous spot (or opened by a marker within range) brakes the car = 6 false roam-no-forward-progress per 71 spots */RO.card=null;{const c=document.getElementById('roamCard');if(c)c.hidden=true}RO.cool=99;const x0=RO.x,z0=RO.z;if(touch)TOUCH.gas=true;else K.ArrowUp=true;let minV=1e9,wall0=SC_S.nb;for(let i=0;i<90;i++){roamStep(1/60);if(i>20)minV=Math.min(minV,RO.v)}K.ArrowUp=false;TOUCH.gas=false;RO.cool=0;
      const mv=(RO.x-x0)*fx+(RO.z-z0)*fz;if(!(mv>5))fails.push('roam-no-forward-progress');if(minV<-1)fails.push('roam-reverses')}
    }
   }catch(e){fails.push('roam-crash:'+String(e).slice(0,70))}
