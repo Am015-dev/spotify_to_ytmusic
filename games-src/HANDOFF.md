@@ -321,3 +321,26 @@ Not fixed:
 - Table fills ~44% of the screen height at 1560x900: three3d.js computeLayout (~line 258), 'row' layout is width-limited. Needs a one-board-at-a-time view (owner's call).
 - Shell: shell/gx-scenario.js:363 evaluates every [data-engine] value (three.js sets "three.js r158" on its canvas; worked around in three3d.js). Deploy gate now fails with "ui-audit: GXS.menuList is not a function" (new shared scenario, not this game's code); sunglaze cannot deploy until the shell side is fixed or ui-audit is adapted.
 - UI-BAR rules 3, 5, 6, 8 only partly machine-checked (see the earlier report).
+## Independent UI audit (14 Oct)
+**Status: stopped early by owner order (09:26). Spec built, NOT run on the 15 games.** No game was edited, no screenshots saved.
+- Built: `scripts/ui-audit.spec.js` (rules A-F, Playwright Test, reuses playwright.config.js projects + GXS.menuList/menuOpen/boardAudit) and `scripts/ui-audit-table.js` (results -> this table). Run: `GX_URL=https://am015-dev.github.io/spotify_to_ytmusic SCN_SLUGS=<slugs> UA_OUT=.staging/ui-audit node_modules/.bin/playwright test scripts/ui-audit.spec.js --project=phone ...` then `node scripts/ui-audit-table.js`.
+- Not verified: the pc/wide run (it crashed once on a bug I then fixed, the fixed re-run was cancelled); rule D (three.js hook via Object.prototype setter) only tried on sunglaze, which is 2D, so untested on a 3D game; E taps at pc may exceed the 420 s test timeout (lower UA_MAX_BTN or UA_E_SIZES).
+- Known spec quirk: the first sunglaze run used the pre-fix surface list (no real start screen); its F "title has 0 big buttons" is a spec artefact, ignore it.
+
+Results so far: only **sunglaze @ phone 390x763** (earlier spec version). All other games: not run.
+| game | A text size | B contrast/busy bg | C stretched | D 3D | E dead buttons | F bar/title/instr |
+|---|---|---|---|---|---|---|
+| sunglaze (phone) | pass | FAIL 15 | pass | n/a (2D) | FAIL 17 | artefact, ignore |
+| other 14 games | not run | not run | not run | not run | not run | not run |
+
+sunglaze B worst 3: board/title floating score "−2/−3/−1" 3.06:1 `div.bf-fl>b.bf-c>span`; campaign node numbers "8","2","5" 1.0:1 against their disc `div.gxc-path>button.gxc-node>span.gxc-disc`; campaign "Act 1 · Wet Clay" 1.79:1 `div.gxc-path>div.gxc-act>b`.
+sunglaze E (likely partly false positives, unchecked): "Saffron/Obsidian/Cobalt" `div.bf-table>div.bf-k>i.bf-t` (board tiles exposed as buttons on the title; tap does nothing); the "covered" ones in the campaign list were modal-hidden buttons, now skipped by the spec.
+## STOP 14 Oct 09:27 UTC (owner: "wrap up everything and deploy, make workers write down what they found and stop them")
+Last live times (UTC, games/<slug>/index.html): rampart 08:59, short-fuse 08:56, tidewake 08:56, nebula 09:01, final-approach 09:03, hollowbough 09:05, thornbound 09:05, kaiten 09:07, doorkick 09:10, crown 09:11, cauldron 09:15, shipwreck 09:15, lantern 09:20, sands 09:20, sunglaze 09:20.
+Open faults found by the owner (rampart and lantern workers report these fixed and deployed after 09:20, NOT independently verified; check against the list):
+- rampart-and-vine (1920 wide, Menu drawer): row panel art starts ~30px in and cuts the labels; menu text 11-12px; Tips On/Off + Reset tips oval chips in another style; score chips "You 0 ★5" ~10px with icons over numbers; tiles ~90px in a 1900px table, "Place your tile" ~11px; full-width hand tray with one small tile.
+- lantern-dive (1920 wide): underwater background stretched/upscaled (blurry); seat names, "Same as Commander", "Exactly two Lanterns", "Lanterns", top-bar labels, status line all 9-11px; cards ~90px, hand card cut at bottom.
+- sunglaze: see "Sunglaze stop 14 Oct" (Guide button dead, black untextured tile on Olive's rack, 3D board labels 6-9px, scoring note cut at board edge, table ~60% of screen height, title pale on pale bar).
+- crown: start screen still 2 big buttons + Customise; tablet dock covers "IN DOWNTOWN"/"0 cards" (kot/art.js:146).
+- shipwreck: castaway choice (who/human-computer) removed from the start screen; restore under More ways to play.
+- all: per-game worker reports above ("rules pass") were NOT independently verified; see "Independent UI audit (14 Oct)" for the partial checker.
