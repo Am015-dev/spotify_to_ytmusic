@@ -1,14 +1,7 @@
 {
 "phone": {
 "look": [],
-"axe": [
-[
-"story-scene-phone.json",
-"target-size",
-".bf-more > summary",
-"Options"
-]
-],
+"axe": [],
 "axe_pages": [
 "menu-phone.json",
 "sg-art-phone.json",

@@ -1,6 +1,24 @@
 [
  {
   "date": "2026-10-14",
+  "game": "sunglaze",
+  "title": "readable on every screen size",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art"
+  ],
+  "check": "Open Campaign: the three top buttons read cleanly",
+  "scn": [
+   "menu",
+   "menu"
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "final-approach",
   "title": "final-approach: readable on every screen size",
   "items": [
@@ -161,24 +179,6 @@
    "menu"
   ],
   "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "sunglaze",
-  "title": "Menus tidied",
-  "items": [
-   "Menus use one title font and one body font, no overlaps",
-   "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art"
-  ],
-  "check": "Open Campaign: the three top buttons read cleanly",
-  "scn": [
-   "menu",
-   "menu"
-  ],
-  "ask": [
-   null,
    null
   ]
  },
