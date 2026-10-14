@@ -14,7 +14,7 @@ function hud(ids,fails,pre){const rs={},V=VW();for(const id of ids){const e=docu
 const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)frame(performance.now())},
  reset(){R.length=0},
  rst(){try{__tq.reset();return true}catch(e){return false}},
- setProf(pr){MX.prof=pr;const t=pr!=='desktop';try{TOUCH.on=t;TOUCH.used=t;document.body.classList.toggle('touch',t)}catch(e){}window.dispatchEvent(new Event('resize'))},
+ setProf(pr){MX.prof=pr;const t=pr!=='desktop';try{TOUCH.on=t;TOUCH.used=t;document.body.classList.toggle('touch',t)}catch(e){}if(t)try{window.dispatchEvent(new TouchEvent('touchstart',{touches:[],changedTouches:[]}))}catch(e){}window.dispatchEvent(new Event('resize'))},
  bxEnd(){try{if(BX.on)BX_close()}catch(e){}try{__tq.reset()}catch(e){}},
  async setRide(id){TQ.car=id;gbOpen();GAR_select(id);let k=0;while(typeof LDL!=='undefined'&&LDL.wait.size&&k++<200)await new Promise(r=>setTimeout(r,25));gbClose(true);await new Promise(r=>setTimeout(r,20));
   if(typeof BX!=='undefined'){try{if(BX.mode==='drive')BX_driveStop()}catch(e){}try{if(BX.car&&BX.car.parent)BX.car.parent.remove(BX.car)}catch(e){}BX.car=null}return id},

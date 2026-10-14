@@ -506,3 +506,13 @@ async function OF_rampRun(){const W=ms=>new Promise(r=>setTimeout(r,ms));if(!awa
 function OF_sinkGo(id,say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sinkRun(id).then(say);return'📍 HOT DROP EXIT · '+id+' · starting…'}
 async function OF_sitRun(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';const r=await OF_sitAll(3);return r.err?'❌ FAIL '+r.err:(r.bad?'❌ FAIL ':'✅ PASS ')+'SIT · '+r.n+' benches: '+(r.bad?JSON.stringify(r.fails):'legs on the seat, back to the backrest, facing away')}
 function OF_sitGo(say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';OF_sitRun().then(say);return'📍 SIT · the 3 nearest benches · running…'}
+// cam-3: touch buttons after ride switches. Phone: 3 consecutive garage switches; hybrid: switch while TOUCH.on is still false (mouse/keys first), then the first real touch must bring the 5 buttons back.
+function OF_hudVis(){const o={};for(const id of['tB','tL','tR','tP','tG']){const e=document.getElementById(id);let ok=!!e;if(e){const r=e.getBoundingClientRect();for(let a=e;a;a=a.parentElement)if(a.hidden){ok=false;break}const cs=getComputedStyle(e);ok=ok&&cs.display!=='none'&&cs.visibility!=='hidden'&&r.width>=4}o[id]=ok}return o}
+async function OF_hudRun(){const W=ms=>new Promise(r=>setTimeout(r,ms)),bad=[],ids=['t_v7612_1','t_bus','rod'];
+  const miss=l=>{const v=OF_hudVis();for(const k in v)if(!v[k])bad.push(l+':'+k)};
+  try{OF_reset()}catch(e){}TOUCH.on=true;TOUCH.used=true;document.body.classList.add('touch');
+  for(const id of ids){if(!await OF_pickRide(id)){bad.push(id+':pick');continue}await W(300);miss('phone '+id)}
+  TOUCH.on=false;document.body.classList.remove('touch');
+  for(const id of['t_v7612_1','rod']){if(!await OF_pickRide(id)){bad.push(id+':pick');continue}await W(200)}
+  window.dispatchEvent(new TouchEvent('touchstart',{touches:[],changedTouches:[]}));await W(400);miss('hybrid after touch');
+  return(bad.length?'❌ FAIL ':'✅ PASS ')+'TOUCH BUTTONS AFTER RIDE SWITCHES · 3 phone switches + hybrid touch · '+(bad.length?'missing '+bad.join(', '):'all 5 visible every time')}
