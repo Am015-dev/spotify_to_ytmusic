@@ -354,29 +354,19 @@
    "id": "si-board",
    "name": "Start of game board",
    "ask": "Is the island clear with glowing places?",
-   "sizes": "all",
-   "group": "Board"
+   "sizes": "all"
   },
   {
    "id": "si-zoom",
    "name": "Card zoom",
    "ask": "Is the big card readable?",
-   "sizes": "phone",
-   "group": "Cards"
-  },
-  {
-   "id": "si-help",
-   "name": "Help: rules cards",
-   "ask": "Can you read the help cards?",
-   "sizes": "all",
-   "group": "UI"
+   "sizes": "phone"
   },
   {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
-   "sizes": "all",
-   "group": "Story"
+   "sizes": "all"
   }
  ],
  "sunglaze": [
