@@ -7,6 +7,7 @@
 const XCV=/*XCV*/{}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
+ if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
  return XC.q[name]||(XC.q[name]=new Promise(res=>{const s=document.createElement('script');s.src='xc/'+name+'.js?'+(XCV[name]||0);
   s.onload=()=>{try{const c=window.__XC&&window.__XC[name];if(c){delete window.__XC[name];const o=XC_eval(c);if(XC.apply[name]&&o)XC.apply[name](o)}}catch(e){XC.err.push(name+': '+e);console.warn('XC '+name,e)}res()};
   s.onerror=()=>{XC.err.push(name+': 404');res()};document.head.appendChild(s)}))}

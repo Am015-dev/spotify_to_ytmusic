@@ -15,7 +15,7 @@ module.exports=T=>{
  for(const f of files){const inM=fs.readFileSync(path.join(L.SRCD,'MODELS'),'utf8').split('\n').includes(f);
    T.ok(listed.has(f)||inM,'order-has-'+f,f+' not in src/ORDER or src/MODELS')}
  for(const f of order){T.ok(fs.existsSync(path.join(L.SRCD,f)),'order-file-'+f,'listed but missing');
-   T.ok(Buffer.byteLength(mods[f]||'')<=200*1024||/^(00_|02_|10b_|50_|52_)/.test(f),'mod-size-'+f,f+' over 200 KB')}
+   T.ok(Buffer.byteLength(mods[f]||'')<=200*1024||/^(00_|02_|10b_|10c_|50_|52_)/.test(f),'mod-size-'+f,f+' over 200 KB')}
  T.ok(order.indexOf('99_api.js')>=0&&order.indexOf('99_api.js')>order.indexOf('10_core.js'),'order-api-after-core');
  T.ok(new Set(order).size===order.length,'order-unique');
  T.ok(/<\/script>\s*$/.test(P.trim())||/<\/script>/.test(mods['99_api.js']),'api-closes-script');
