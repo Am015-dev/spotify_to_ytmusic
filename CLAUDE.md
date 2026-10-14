@@ -57,6 +57,25 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
     orchestrator asks the owner one yes/no.
 - **"No story mode":** chapters with bosses and a difficulty curve (`games-src/shell/CAMPAIGN.md`).
 
+## Production v2 (owner, 14 Oct 2026: "you waste way too many tokens and deliver shit results")
+What went wrong on 14 Oct: one Opus orchestrator with 650k context re-read on every turn (~$1-2 per reply, $632 total); ~60
+follow-up messages to workers (each ~6k tokens of tool noise); 3 rounds of 15 parallel workers on the same fault because the
+test was wrong; workers' "all rules pass" relayed as done and disproved by the owner in seconds. Rules from now on:
+- Orchestrator: Sonnet, fresh session per round (hand off at ~150k), never relays single worker reports; ONE report per round with
+  the audit table and live times (UTC). Every update states when it went live.
+- Brief once, complete: every instruction goes in the worker brief; no follow-up messages except the owner's new bug reports.
+- Parallel only for independent work: at most 5 workers. A shared/shell change is made and deployed ONCE by one worker before
+  any per-game round. No per-game round while the shared test is unproven.
+- Prove on one game, owner says yes, then roll out (unchanged rule, broken on 14 Oct).
+- Done = the independent audit passes (games-src/scripts/ui-audit.spec.js, see HANDOFF "Independent UI audit"), never a worker's
+  self-report. The audit checks every text node at 5 sizes, real pixel contrast, stretched images, 3D labels/untextured meshes,
+  dead buttons (taps every button), clutter (bar <= 5, one primary, one instruction line).
+- Design system, not patches: one type scale, spacing and panel/button set as CSS variables in shell/ (games theme colours and
+  board art only); text sits on flat calm surfaces, art never under words; wide screens get their own layout. UI-BAR.md lists the bar.
+- Game state hooks (GXS scenarios, boardOpen) drive tests; never AI eyes. Pending owner OK: Playwright toHaveScreenshot baselines
+  as a machine-only pixel gate (images compared by the test, never read by a model, stored outside the repo).
+- Cost habits: Haiku for chores/relays, Sonnet for code; workers stop at 30 min or 150k; read line ranges only; keep this file short.
+
 ## Cost rules (about $4,000 was spent, mostly waste)
 - **Always set the model on every helper and cloud session.** The default is the most expensive model; all 45 earlier
   cloud sessions ran on it by accident. Main model: plan, decide, review only (no hands-on screenshots). Sonnet: build, fix, sweeps.

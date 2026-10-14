@@ -27,8 +27,10 @@ Rules
   mcp__claude-code-remote__create_trigger with persistent_session_id=<orchestrator session id>, run_once_at = now + 1 min,
   prompt = "[DONE <title>] <your report>". That wakes the orchestrator; it archives you and tells the owner. Report EVEN IF
   blocked or not deployed, and never end on a question (14 Oct: 6 of 15 workers went idle asking "Which do you want?" and never reported).
-- HARD STOP: at 45 minutes or ~150k context, stop yourself: deploy what passed, commit + push, write a HANDOFF note, stop.
+- HARD STOP: at 30 minutes or ~150k context, stop yourself: deploy what passed, commit + push, write a HANDOFF note, stop.
 - A check failure that the LIVE game also has is not yours: deploy anyway (build-all.py already warns instead of failing).
+- DONE is decided by the independent audit (games-src/scripts/ui-audit.spec.js), not by you: run it on your game before you
+  report and paste its result. Report live time in UTC. All instructions are in this brief; expect no follow-ups.
 - NEVER wait for an answer (owner, 13 Oct 2026: workers sat blocked for ~15-20 min). If a check fails or you're unsure: fix the real
   cause (max 20 min), never raise limits or skip checks; if it still fails, commit, write what fails and where in HANDOFF.md,
   move on to your next game, and mention it in your report.
