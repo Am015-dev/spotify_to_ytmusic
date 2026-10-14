@@ -297,12 +297,16 @@ function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v
  if(cheer&&!S)LIFE.n.cheer++;
  for(const k in M){const m=M[k];if(m.userData.st!==LIFE.S)continue;const n=cnt[k]||0;if(m.isBm){if(n!==m.vis){for(let i=0;i<m.ids.length;i++)m.B.setVisibleAt(m.ids[i],i<n);m.vis=n}m.count=n;m.visible=n>0;continue}m.count=n;m.visible=n>0;if(n){m.instanceMatrix.needsUpdate=true;if(m.instanceColor&&(k==='pop'||k==='ring'||LIFE.cd&&(k==='torso'||k==='arms')))m.instanceColor.needsUpdate=true}}for(const k in M){const B=M[k];if(B.userData.bmk)B.visible=B.userData.P.some(x=>x.visible)}if(!S)LIFE.cd=0;LIFE.S=false;LIFE.cnt=Object.assign(LIFE.cnt||{},cnt)}
 // ---------- collisions: smash small things, bump set pieces, drive through pop-up bubbles
+// rev-2 (monkey STUCK, Athens start seesaw): a round set-piece collider took 20 % of the speed EVERY frame whatever the angle, so even a glancing
+// touch stalled the car against it. Now only the into-the-piece part costs speed and a glancing hit turns the car along the rim (CLAUDE.md lesson 3).
+function LIFE_slide(nx,nz,k){const s=RO.v<0?-1:1,hx=Math.sin(RO.h)*s,hz=Math.cos(RO.h)*s,cin=-(hx*nx+hz*nz);if(cin<=0)return;RO.v*=1-k*cin;
+ if(s>0&&cin<.95){const side=hx*-nz+hz*nx>=0?1:-1;RO.h+=angDiff(Math.atan2(-nz*side,nx*side),RO.h)*.25}}
 function LIFE_hit(){const sp=Math.abs(RO.v),y0=RO.y||0;for(const it of LIFE.H||[]){const ex=RO.x-it.x,ez=RO.z-it.z;if(Math.abs(ex)>9||Math.abs(ez)>9)continue;const e2=ex*ex+ez*ez;
   if(it.c==='sm'){if(e2>1.9*1.9||Math.abs(y0-it.y)>3||LIFE.dead.has(it.id))continue;LIFE.dead.set(it.id,1);const at=V3(it.x,it.y+.6,it.z),fw=V3(Math.sin(RO.vh??RO.h),0,Math.cos(RO.vh??RO.h)),
     C={cone:'#ff6a10,#ffffff',crate:'#c8904c,#8a5a30',barrel:'#2f7dd0,#ffffff',fruit:'#a8743c,#ff4040,#7cd04c,#ffd12c',planter:'#b85a3a,#3aa046,#ff4c8c',bin:'#3a8a4a,#2a6a3a'}[it.t];
     try{debris(at,fw.clone().multiplyScalar(Math.max(4,sp)*.4).add(V3(0,6,0)),it.t==='fruit'?14:9,C.split(',').map(c=>new THREE.Color(c)),.7,it.y);studBurst(at,fw,Math.max(6,sp));AU.sfx('brick')}catch(e){}
     HUB.smashed++;comboAdd(1);RO.v*=it.t==='fruit'||it.t==='barrel'?.94:.98;LIFE.n.smash++;LIFE.px=1e9}
-  else if(it.c==='set'){const rr=it.r+1.2;if(e2>rr*rr||Math.abs(y0-it.y)>4)continue;const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.8}
+  else if(it.c==='set'){const rr=it.r+1.2;if(e2>rr*rr||Math.abs(y0-it.y)>4)continue;const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;LIFE_slide(ex/e,ez/e,.2)}
   else if(it.c==='pop'){if(e2>4.2*4.2||it.cd>LIFE.t||RO.pop||RO.ch||RO.sp||RO.card)continue;it.cd=LIFE.t+90;const K=it.K;LIFE.n.pop++;
    RO.pop=Object.assign({},K,{t:0,v:0,s0:HUB.smashed,txt(){return `${this.k==='smash'?Math.floor(this.v):this.v.toFixed(1)} / ${this.goal} ${this.u}`}});try{AU.sfx('go');say(K.name,'POP-UP · '+K.lim+' s',1.6)}catch(e){}}}
  const lm=LIFE.lm;if(lm){const ex=RO.x-lm.x,ez=RO.z-lm.z,rr=lm.r+1.2,e2=ex*ex+ez*ez;if(e2<rr*rr&&Math.abs(y0-lm.y)<6){const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.7}}}

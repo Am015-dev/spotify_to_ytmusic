@@ -62,3 +62,14 @@ function RV14_go(kind,say){RV14_reset();if(RV14.ride0==null)try{RV14.ride0=GAR_g
    for(let i=0;i<d.length;i+=4){const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);if(d[i+3]>8&&mx>=24&&mx<=105&&mx-mn<=30)dark++}}}catch(e){}
   return'📍 ZEIL WEST (706,564) · look right: glass facades read as blue-grey glass with window lines, no wall renders flat black · auto: '+n+' Kenney atlases, dark-glass texels left '+dark+', glass-only glow '+em+'/'+n+ok(n>=1&&!dark&&em===n)}
  return'📍 unknown rv14 kind '+kind+' ❌'}
+// ===== RV15 (rev-2, 2026-10-14): monkey-bot STUCK clusters (test-1 0b34d0c2, beta.41). GO = spawn in the cluster, hold GAS (real key events
+// through the game's own handlers) for 3 s of game time, PASS when the car moved ≥ 5 m. Root cause found: street-life set pieces (seesaw at the
+// Athens start) and Athens dressing props took 20-30 % speed EVERY frame of contact whatever the angle → now glancing hits slide (LIFE_slide).
+const RV15_SPOTS={'fra-west':['fra',-925,225,0],'fra-start':['fra',-375,475,0],'fra-north':['fra',-475,775,0],'fra-corner':['fra',7990,6990,-2.36],
+ 'ath-start':['ath',1986.4,-1651.9,.85],'ath-psyrri':['ath',2125,-1675,0],'ath-north':['ath',2775,6525,0],'ath-sw':['ath',-6475,-3375,0]};
+function RV15_go(id,say){const S=RV15_SPOTS[id];if(!S)return'📍 unknown spot '+id+' ❌';RV14_reset();const[,x,z,h]=S;if(!roamWarp(x,z,h,true))return'📍 '+id+' · can\'t jump right now ❌';RO.v=0;camSnap=true;
+ const K=on=>dispatchEvent(new KeyboardEvent(on?'keydown':'keyup',{code:'KeyW',key:'KeyW',bubbles:true}));let x0=0,z0=0,t=0,last=0,ph=0;
+ const f=now=>{if(ph===0){if(!last){last=now;return requestAnimationFrame(f)}if(now-last<900)return requestAnimationFrame(f);if(RO.card){const b=document.getElementById('rcNo');if(b)b.click();/* the Athens start pops the pinned ✈ Flights card: tap LATER like a player */}x0=RO.x;z0=RO.z;K(true);ph=1;last=now;return requestAnimationFrame(f)}
+  t+=Math.min(.05,(now-last)/1000);last=now;if(RO.card){const b=document.getElementById('rcNo');if(b)b.click()}if(t<3)return requestAnimationFrame(f);K(false);const d=Math.hypot(RO.x-x0,RO.z-z0);
+  say('📍 STUCK CLUSTER '+id+' ('+Math.round(x)+','+Math.round(z)+') · 3 s of gas moved the car '+d.toFixed(1)+' m (≥ 5 m)'+(d>=5?' ✅':' ❌'))};
+ requestAnimationFrame(f);return'📍 STUCK CLUSTER '+id+' · holding GAS 3 s…'}

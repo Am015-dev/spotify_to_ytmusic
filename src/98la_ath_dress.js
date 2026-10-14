@@ -38,7 +38,7 @@ function AD_hit(){const sp=Math.abs(RO.v),cx=Math.floor(RO.x/40),cz=Math.floor(R
     if(e2>rr*rr||Math.abs((RO.y||0)-it.y)>3)continue;
     if(sp>6){AD.dead.add(it);const at=V3(it.x,it.y+1,it.z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,fw.clone().multiplyScalar(sp*.4).add(V3(0,6,0)),it.t===1?14:8,(['#38a046,#ff8c1a,#7a4a24','#2f7d4a,#ffd12c,#f2f2f2,#e8302a','#ffffff,#222222,#e8302a','#3a4a44,#e8e8e8'][it.t]).split(',').map(c=>new THREE.Color(c)),.7,it.y);
       studBurst(at,fw,sp);HUB.smashed++;comboAdd(1);RO.v*=it.t===1?.9:.97;AU.sfx('crash');AD.n.smash=(AD.n.smash||0)+1;AD.px=1e9}
-    else{const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.7}}}
+    else{const e=Math.sqrt(e2)||1,o=rr-e,nx=ex/e,nz=ez/e;RO.x+=nx*o;RO.z+=nz*o;/* rev-2: slide on glancing hits, only the head-on part costs speed (was ×0.7 every frame) */const sg=RO.v<0?-1:1,hx=Math.sin(RO.h)*sg,hz=Math.cos(RO.h)*sg,cin=-(hx*nx+hz*nz);if(cin>0){RO.v*=1-.3*cin;if(sg>0&&cin<.95){const sd=hx*-nz+hz*nx>=0?1:-1;RO.h+=angDiff(Math.atan2(-nz*sd,nx*sd),RO.h)*.25}}}}}
 function AD_step(){if(CID==='fra'||!HUB.grp||!HUB.nodes||!HUB.bld||!HUB.bld.length)return;if(LV_d('lvDress')<=0){if(AD.M)for(const m of AD.M)m.count=0;return}
   if(AD.grp!==HUB.grp)AD_init();AD.fr++;if(AD.fr%12===0||Math.hypot(RO.x-AD.px,RO.z-AD.pz)>25){AD.px=RO.x;AD.pz=RO.z;AD_fill()}AD_hit()}
 {const _adLS=LV_step;LV_step=dt=>{_adLS(dt);if(!RO.on||!LV.init)return;try{AD_step()}catch(e){if(!AD.e){AD.e=1;console.warn('AD dress',e)}}}}

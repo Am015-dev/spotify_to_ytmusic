@@ -21,6 +21,8 @@ OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop)
 (()=>{const st=document.createElement('style');st.id='crPrompt';st.textContent=`
 html body.touch #roamPrompt#roamPrompt{left:50%!important;right:auto!important;top:auto!important;bottom:calc(62px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(240px,30vw)!important;padding:3px 12px!important;font-size:12px!important}
 html body #roamPrompt#roamPrompt *{font-size:12px!important;line-height:1.2!important}
+/* rev-2 (monkey hud_over_figure, Athens start): bottom-centre sat on the car's rear in phone landscape → left column above TAP TAP = SMASH, under the left thumb */
+@media (orientation:landscape){html body.touch #roamPrompt#roamPrompt{left:calc(14px + env(safe-area-inset-left,0px))!important;transform:none!important;bottom:calc(166px + env(safe-area-inset-bottom,0px))!important;max-width:min(240px,34vw)!important}}
 body.crMerge #roamArrow{display:none!important}`;document.head.appendChild(st)})();
 
 roamPose=(f=>function(s,dt){f(s,dt);if(s===pl&&state==='roam'&&((CR_hudS.f=(CR_hudS.f||0)+1)&1))try{CR_hud()}catch(e){}})(roamPose);
