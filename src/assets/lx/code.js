@@ -74,14 +74,14 @@ const LIFE_CAP={set:14,setM:14,prop:18,ball:6,dog:6,fig:150,sm:44,pop:8};
 // dynamic usage + userData.keep: WB city batching (98wb WB_cand) otherwise freezes static instanced meshes into its merged tiles (they vanished in Athens)
 function LIFE_im(geo,n,mat){const m=new THREE.InstancedMesh(geo,mat||LV_mat(),n);m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.userData.keep=1;m.frustumCulled=false;m.castShadow=false;m.receiveShadow=false;m.count=0;m.visible=false;LIFE.grp.add(m);return m}
 function LIFE_init(){if(LIFE.grp===HUB.grp)return true;if(!HUB.grp||!HUB.nodes||!HUB.nodes.length||typeof LV_eGrid!=='function')return false;
- const G=LIFE_geos(),M={};LIFE.grp=HUB.grp;LIFE.C.clear();LIFE.SL=new Map();LIFE.CA=new Map();LIFE.SC.clear();LIFE.dead.clear();LIFE.fly.clear();LIFE.L=[];LIFE.px=1e9;
+ const G=LIFE_geos(),M={};LIFE.grp=HUB.grp;LIFE.C.clear();LIFE.SL=new Map();LIFE.CA=new Map();LIFE.SC.clear();LIFE.dead.clear();LIFE.KK=new Set();LIFE.fly.clear();LIFE.L=[];LIFE.px=1e9;
  for(const k of LIFE_SET){M['s_'+k]=LIFE_im(G.S[k][0],LIFE_CAP.set);M['m_'+k]=LIFE_im(G.S[k][1],LIFE_CAP.setM)}
  for(const k in G.Q)M['q_'+k]=LIFE_im(G.Q[k],LIFE_CAP.prop);M.ball=LIFE_im(G.ball,LIFE_CAP.ball);M.dog=LIFE_im(G.dog,LIFE_CAP.dog);
  M.fig=LIFE_im(G.fig,LIFE_CAP.fig);M.torso=LIFE_im(G.torso,LIFE_CAP.fig);M.arms=LIFE_im(G.arms,LIFE_CAP.fig);
  const c=new THREE.Color();for(let i=0;i<LIFE_CAP.fig;i++){c.set(LIFE_SHIRT[i%LIFE_SHIRT.length]);M.torso.setColorAt(i,c);M.arms.setColorAt(i,c)}
  for(const k of LIFE_SM)M['x_'+k]=LIFE_im(G.M[k],LIFE_CAP.sm);
  const pm=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.3,emissive:'#ffffff',emissiveIntensity:.35,transparent:true,opacity:.82});
- M.pop=LIFE_im(G.pop,LIFE_CAP.pop,pm);M.ring=LIFE_im(G.ring,LIFE_CAP.pop,pm.clone());
+ M.kick=LIFE_im(LIFE_kickGeo(),LIFE_CAP.pop);M.pop=LIFE_im(G.pop,LIFE_CAP.pop,pm);M.ring=LIFE_im(G.ring,LIFE_CAP.pop,pm.clone());
  for(const k in M){M[k].name=k;M[k].userData.st=/^[xsq]_/.test(k)}LIFE.M=M;LIFE_landmark();return true}
 // ---------- placement: slots every 16 m on both sides of every street edge (no motorways), owned by the 40 m cell they fall in
 // a kerb point s m along edge A→B on side sd, dist m beyond the carriageway edge; h faces the road
@@ -130,12 +130,34 @@ function LIFE_cell(a,b){const key=a*100000+b;let C=LIFE.C.get(key);if(C)return C
  smPass();mgPass();/* smashables first (they need the least room), then set pieces and people; a cell with few kerb slots keeps ≤ 1 smashable group for them */
  return C}
 // pop-up bubbles: one per 100 m square, on the street point nearest the square's centre (in the lane, so you can drive through it)
-function LIFE_pop(A,B){const key=A*100000+B;if(LIFE.SC.has(key))return LIFE.SC.get(key);let best=null,bd=1e18;const N=HUB.nodes,PG=LIFE_PG,cx=(A+.5)*PG,cz=(B+.5)*PG,G=LV_eGrid();
- for(let a=Math.floor(A*PG/40);a<=Math.floor((A+1)*PG/40);a++)for(let b=Math.floor(B*PG/40);b<=Math.floor((B+1)*PG/40);b++){const E=G.get(a*100000+b);if(!E)continue;for(let q=0;q<E.length;q+=2){const P=N[E[q]],Q=N[E[q+1]];if(!P||!Q||P.ab||Q.ab)continue;
-  const dx=Q.x-P.x,dz=Q.z-P.z,l2=dx*dx+dz*dz;if(l2<400)continue;const t=Math.max(.2,Math.min(.8,((cx-P.x)*dx+(cz-P.z)*dz)/l2)),x=P.x+dx*t,z=P.z+dz*t,d=(x-cx)**2+(z-cz)**2;
-  if(d<bd&&Math.floor(x/PG)===A&&Math.floor(z/PG)===B){bd=d;best={x,z,h:Math.atan2(dx,dz)}}}}
- if(best){const y=LIFE_gy(best.x,best.z);if(!isFinite(y))best=null;else{best.y=y;best.c='pop';best.K=LIFE_POP[Math.floor(LIFE_h(A,B,9)*3)];best.id='p'+key}}
+function LIFE_pop(A,B){const key=A*100000+B;if(LIFE.SC.has(key))return LIFE.SC.get(key);let K=LIFE_POP[Math.floor(LIFE_h(A,B,9)*3)],best=LIFE_pop1(A,B,K.k==='air'?LIFE_KK.half+3:0);
+ if(!best&&K.k==='air'){K=LIFE_POP[0];best=LIFE_pop1(A,B,0)}/* life-2: AIR TIME needs a straight 31 m for its kicker, else the square gets a SMASH bubble */
+ if(best){const y=LIFE_gy(best.x,best.z);if(!isFinite(y))best=null;else{best.y=y;best.c='pop';best.K=K;best.id='p'+key}}
  LIFE.SC.set(key,best);return best}
+// the street point nearest the square's centre, ≥ need m from both ends of its edge
+function LIFE_pop1(A,B,need){let best=null,bd=1e18;const N=HUB.nodes,PG=LIFE_PG,cx=(A+.5)*PG,cz=(B+.5)*PG,G=LV_eGrid();
+ for(let a=Math.floor(A*PG/40);a<=Math.floor((A+1)*PG/40);a++)for(let b=Math.floor(B*PG/40);b<=Math.floor((B+1)*PG/40);b++){const E=G.get(a*100000+b);if(!E)continue;for(let q=0;q<E.length;q+=2){const P=N[E[q]],Q=N[E[q+1]];if(!P||!Q||P.ab||Q.ab)continue;
+  const dx=Q.x-P.x,dz=Q.z-P.z,l2=dx*dx+dz*dz;if(l2<400||l2<4*need*need)continue;const l=Math.sqrt(l2),t=Math.max(.2,need/l,Math.min(.8,1-need/l,((cx-P.x)*dx+(cz-P.z)*dz)/l2)),x=P.x+dx*t,z=P.z+dz*t,d=(x-cx)**2+(z-cz)**2;
+  if(d<bd&&Math.floor(x/PG)===A&&Math.floor(z/PG)===B){bd=d;best={x,z,h:Math.atan2(dx,dz)}}}}
+ return best}
+// ---------- life-2: a real kicker under every AIR TIME bubble: take-off wedge, 5 m gap (the bubble floats over it), landing wedge; works both ways.
+// Physics = two RO.ramps entries (the launch code fires at the lip because the gap is road again), registered only while within LIFE_R.
+const LIFE_KK={len:9,hgt:1.8,gap:5,w:6,half:11.5,col:'#ffc800'};
+function LIFE_kick(it){if(it.kk!==undefined)return it.kk;const K=LIFE_KK,fx=Math.sin(it.h),fz=Math.cos(it.h);it.kk=null;let y0=1e9;
+ for(const a of[-K.half,-K.gap/2,0,K.gap/2,K.half])for(const b of[-K.w/2,K.w/2]){const x=it.x+fx*a+fz*b,z=it.z+fz*a-fx*b,g=LIFE_gy(x,z);
+  if(!isFinite(g)||Math.abs(g-it.y)>.8||Math.abs(groundAt(x,z,it.y+1)-g)>.3||roamHit(x,z,.8,g+1))return null;y0=Math.min(y0,g)}
+ const m=K.gap/2+K.len/2,R=s=>({x:it.x+fx*m*s,z:it.z+fz*m*s,h:s<0?it.h:it.h+Math.PI,len:K.len,hgt:K.hgt,w:K.w,y0,dk:false,col:0xffcd03,lx:1});
+ return it.kk={A:R(-1),B:R(1),y0}}
+function LIFE_kickSync(L){const want=new Set();for(const it of L)if(it.c==='pop'&&it.K.k==='air'&&LIFE_kick(it))want.add(it);
+ for(const it of LIFE.KK||[])if(!want.has(it))for(const r of[it.kk.A,it.kk.B]){const i=RO.ramps.indexOf(r);if(i>=0)RO.ramps.splice(i,1)}
+ for(const it of want)if(!(LIFE.KK||new Set()).has(it))RO.ramps.push(it.kk.A,it.kk.B);LIFE.KK=want}
+function LIFE_kickGeo(){const K=LIFE_KK,P=[],wedge=(a0,a1,up)=>{const S=new THREE.Shape();S.moveTo(a0,0);S.lineTo(a1,0);S.lineTo(up>0?a1:a0,K.hgt);S.closePath();
+  const g=new THREE.ExtrudeGeometry(S,{depth:K.w,bevelEnabled:false});g.rotateY(-Math.PI/2);g.translate(K.w/2,0,0);return g};
+ P.push([wedge(-K.half,-K.gap/2,1),K.col],[wedge(K.gap/2,K.half,-1),K.col]);
+ // black/yellow lip bands and red side rails, so it reads as a jump from far away
+ for(const s of[-1,1])for(let i=0;i<6;i++)P.push([LB(K.w/6,.3,.5),i%2?'#1b1c22':'#ffffff',-K.w/2+K.w/12+i*K.w/6,K.hgt-.15+.01,s*(K.gap/2+.25)]);
+ const sl=Math.atan2(K.hgt,K.len),hy=Math.hypot(K.len,K.hgt);for(const s of[-1,1])for(const b of[-1,1])P.push([LB(.3,.3,hy),'#e8302a',b*(K.w/2-.15),K.hgt/2+.2,s*(K.gap/2+K.len/2),s*sl,0,0]);
+ return LIFE_g(P)}
 // ---------- landmarks: Frankfurt Ferris wheel on the Main bank; Athens big carousel in Pedion tou Areos (one mesh pair each, always drawn within 900 m)
 function LIFE_landmark(){LIFE.lm=null;const fra=CID==='fra';let at=null;
  const tryAt=(x,z,r)=>{for(let k=0;k<60&&!at;k++){const a=k*2.39,d=k*4,px=x+Math.sin(a)*d,pz=z+Math.cos(a)*d,y=LIFE_gy(px,pz);if(isFinite(y)&&LIFE_free(px,pz,r,y))at={x:px,z:pz,y}}};
@@ -156,7 +178,7 @@ function LIFE_fill(){const x0=RO.x,z0=RO.z,cr=Math.ceil(LIFE_R/LIFE_CELL),ca=Mat
  const pr=Math.ceil(LIFE_R/LIFE_PG);for(let a=Math.floor(x0/LIFE_PG)-pr;a<=Math.floor(x0/LIFE_PG)+pr;a++)for(let b=Math.floor(z0/LIFE_PG)-pr;b<=Math.floor(z0/LIFE_PG)+pr;b++){const it=LIFE_pop(a,b);if(it){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
  near.sort((p,q)=>p[0]-q[0]);const keep=new Set(),L=[];for(const [,it] of near){keep.add(it.id);if(!LIFE.dead.has(it.id))L.push(it)}
  for(const id of LIFE.dead.keys())if(!keep.has(id))LIFE.dead.delete(id);// smashed things come back once you are out of range
- LIFE.L=L;LIFE.D=L.filter(it=>it.c==='pop'||it.c==='set'||it.c==='grp'&&(it.x-x0)**2+(it.z-z0)**2<150*150);LIFE.H=L.filter(it=>(it.x-x0)**2+(it.z-z0)**2<40*40);
+ LIFE_kickSync(L);LIFE.L=L;LIFE.D=L.filter(it=>it.c==='pop'||it.c==='set'||it.c==='grp'&&(it.x-x0)**2+(it.z-z0)**2<150*150);LIFE.H=L.filter(it=>(it.x-x0)**2+(it.z-z0)**2<40*40);
  LIFE_draw(true);if(todo)LIFE.px=1e9}
 // ---------- draw (every frame: the pools are small; static parts are rewritten too, which keeps the code simple and costs ~0.1 ms)
 const _lfM=new THREE.Matrix4(),_lfQ=new THREE.Quaternion(),_lfE=new THREE.Euler(),_lfP=new THREE.Vector3(),_lfS=new THREE.Vector3();
@@ -170,7 +192,7 @@ function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v
  let cheer=0;
  for(const it of S?LIFE.L:LIFE.D){const dx=it.x-RO.x,dz=it.z-RO.z,d2=dx*dx+dz*dz;
   if(it.c==='sm')LIFE_put(M['x_'+it.t],cnt,it.x,it.y,it.z,0,it.h,0,1);
-  else if(it.c==='pop'){const busy=it.cd>t;if(busy)continue;const bob=Math.sin(t*2+it.x)*.4,i=LIFE_put(M.pop,cnt,it.x,it.y+3.2+bob,it.z,t*.8,t*1.3,0,1);if(i>=0){_lfC.set(it.K.col);M.pop.setColorAt(i,_lfC);LIFE_put(M.ring,cnt,it.x,it.y+3.2,it.z,0,it.h,t*1.5,1);M.ring.setColorAt(i,_lfC)}}
+  else if(it.c==='pop'){const kk=it.kk,hy=kk?kk.y0-it.y+LIFE_KK.hgt+2.4:3.2;if(kk)LIFE_put(M.kick,cnt,it.x,kk.y0,it.z,0,it.h,0,1);const busy=it.cd>t;if(busy)continue;const bob=Math.sin(t*2+it.x)*.4,i=LIFE_put(M.pop,cnt,it.x,it.y+hy+bob,it.z,t*.8,t*1.3,0,1);if(i>=0){_lfC.set(it.K.col);M.pop.setColorAt(i,_lfC);LIFE_put(M.ring,cnt,it.x,it.y+hy,it.z,0,it.h,t*1.5,1);M.ring.setColorAt(i,_lfC)}}
   else if(it.c==='set'){const T=it.t,tt=t+it.ph;LIFE_put(M['s_'+T],cnt,it.x,it.y,it.z,0,it.h,0,1);const m=M['m_'+T];
    if(T==='windmill')LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.25,it.y+7.2,it.z+Math.cos(it.h)*1.25,0,it.h,tt*1.4,1);
    else if(T==='turbine')LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.2,it.y+13.2,it.z+Math.cos(it.h)*1.2,0,it.h,tt*2.2,1);
@@ -213,7 +235,7 @@ function LIFE_hit(){const sp=Math.abs(RO.v),y0=RO.y||0;for(const it of LIFE.H||[
    RO.pop=Object.assign({},K,{t:0,v:0,s0:HUB.smashed,txt(){return `${this.k==='smash'?Math.floor(this.v):this.v.toFixed(1)} / ${this.goal} ${this.u}`}});try{AU.sfx('go');say(K.name,'POP-UP · '+K.lim+' s',1.6)}catch(e){}}}
  const lm=LIFE.lm;if(lm){const ex=RO.x-lm.x,ez=RO.z-lm.z,rr=lm.r+1.2,e2=ex*ex+ez*ez;if(e2<rr*rr&&Math.abs(y0-lm.y)<6){const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.7}}}
 // ---------- per frame (after LV_step: free roam only)
-function LIFE_step(dt){if(!LIFE.on||!RO.on||RO.wk){if(LIFE.M&&LIFE.grp)for(const k in LIFE.M){LIFE.M[k].visible=false}if(LIFE.lm)LIFE.lm.g.visible=!!LIFE.on;return}
+function LIFE_step(dt){if(!LIFE.on||!RO.on||RO.wk){if(LIFE.KK&&LIFE.KK.size)LIFE_kickSync([]);if(LIFE.M&&LIFE.grp)for(const k in LIFE.M){LIFE.M[k].visible=false}if(LIFE.lm)LIFE.lm.g.visible=!!LIFE.on;return}
  const t0=performance.now();if(!LIFE_init())return;LIFE.t+=dt;LIFE.fr++;
  if(LIFE.fr%12===0||Math.hypot(RO.x-LIFE.px,RO.z-LIFE.pz)>20){LIFE.px=RO.x;LIFE.pz=RO.z;LIFE_fill()}
  LIFE_hit();LIFE_draw();const lm=LIFE.lm;if(lm){lm.g.visible=(lm.x-RO.x)**2+(lm.z-RO.z)**2<900*900;if(lm.ax==='z')lm.spin.rotation.z=LIFE.t*.12;else lm.spin.rotation.y=LIFE.t*.5}
@@ -262,7 +284,15 @@ function LIFE_goPop(say){if(!LIFE.on)return'📍 LIFE is OFF';const a0=Math.floo
 function LIFE_goLm(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_init();const lm=LIFE.lm;if(!lm)return'📍 no landmark ❌';let ok=false,bx=0,bz=0,h=0;for(let k=0;k<24&&!ok;k++){h=k*Math.PI/12;bx=lm.x-Math.sin(h)*55;bz=lm.z-Math.cos(h)*55;ok=!roamHit(bx,bz,2.5,groundAt(bx,bz,999)+.5)}
  if(!roamWarp(bx,bz,h))return'📍 Can\'t jump right now';RO.v=0;const r0=lm.ax==='z'?lm.spin.rotation.z:lm.spin.rotation.y;
  setTimeout(()=>{const r1=lm.ax==='z'?lm.spin.rotation.z:lm.spin.rotation.y;say(`📍 ${lm.k.toUpperCase()}: turned ${(r1-r0).toFixed(2)} rad in 2 s `+(lm.g.visible&&Math.abs(r1-r0)>.1?'✅':'❌'))},2000);return'📍 '+lm.k.toUpperCase()+' · watching…'}
+// GO (life-2): 45 m before an AIR TIME kicker, real keyboard gas for 6 s: the car takes off from the lip, flies the gap through the bubble (≥ 0.6 s air), lands and keeps going
+function LIFE_goKick(say){if(!LIFE.on)return'📍 LIFE is OFF';const a0=Math.floor(RO.x/LIFE_PG),b0=Math.floor(RO.z/LIFE_PG);let p=null;
+ for(let r=0;r<8&&!p;r++)for(let a=a0-r;a<=a0+r&&!p;a++)for(let b=b0-r;b<=b0+r&&!p;b++){if(Math.max(Math.abs(a-a0),Math.abs(b-b0))!==r)continue;const q=LIFE_pop(a,b);if(q&&q.K.k==='air'&&LIFE_kick(q)){const bx=q.x-Math.sin(q.h)*45,bz=q.z-Math.cos(q.h)*45;if(!roamHit(bx,bz,2.5,q.y+.5))p=q}}
+ if(!p)return'📍 no AIR TIME kicker near ❌';const bx=p.x-Math.sin(p.h)*45,bz=p.z-Math.cos(p.h)*45;p.cd=0;RO.pop=null;if(!roamWarp(bx,bz,p.h))return'📍 Can\'t jump right now';RO.v=0;LIFE.px=1e9;
+ const n0=LIFE.n.pop;let air=0,top=0,last=performance.now(),v1=0;K.ArrowUp=true;const iv=setInterval(()=>{const now=performance.now(),dt=(now-last)/1000;last=now;const g=groundAt(RO.x,RO.z,RO.y+.3);if(RO.y-g>.35){air+=dt;top=Math.max(top,RO.y-p.y)}},40);
+ setTimeout(()=>{v1=Math.abs(RO.v)},5200);
+ setTimeout(()=>{clearInterval(iv);K.ArrowUp=false;const ok=LIFE.n.pop>n0&&air>=.6&&v1>5,P=RO.pop;window.__chk=window.__chk||{};window.__chk.kick={air:+air.toFixed(2),top:+top.toFixed(1),v1:+v1.toFixed(1),pop:!!P,ok};
+  say(`📍 AIR TIME kicker: ${air.toFixed(2)} s in the air, ${top.toFixed(1)} m high, bubble ${LIFE.n.pop>n0?'started ('+(P?P.name+' '+(P.v||0).toFixed(1)+' s':'done')+')':'not hit'}, ${(v1*3.6).toFixed(0)} km/h after landing `+(ok?'✅':'❌'))},6000);return'📍 AIR TIME kicker · driving…'}
 // by name, so a hot reload of one GO function takes effect
 const LIFE_GOS={'fra-density':{fn:s=>LIFE_go(s)},'ath-density':{fn:s=>LIFE_go(s)},'smash':{fn:s=>LIFE_goSmash(s)},
- 'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
+ 'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'kicker':{fn:s=>LIFE_goKick(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
 window.__life={setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
