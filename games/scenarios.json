@@ -49,6 +49,22 @@
    "mut": 0
   },
   {
+   "id": "cf-ui",
+   "name": "UI bar: top bar, text sizes, panels, image shapes",
+   "ask": "Is every panel readable and not stretched?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "cf-start",
+   "name": "UI bar 7: start screen",
+   "ask": "One big Play button, small options below?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -104,6 +120,14 @@
    "ask": "Is the board clear and filled?",
    "sizes": "all",
    "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "cc-uibar",
+   "name": "UI bar: top bar, dock and panels",
+   "ask": "Are bar, dock and panels clean?",
+   "sizes": "all",
+   "group": "UI",
    "mut": 0
   },
   {
@@ -163,6 +187,46 @@
    "sizes": "all",
    "group": "UI",
    "mut": 4
+  },
+  {
+   "id": "dk-diary",
+   "name": "Diary: readable lines, one style",
+   "ask": "Diary lines big, dark, one style?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "dk-dock",
+   "name": "Side dock: each event once, one instruction",
+   "ask": "Dock short and readable?",
+   "sizes": "pc",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "dk-topbar",
+   "name": "Desktop top bar: 5 buttons, 16px, nothing on the title",
+   "ask": "Top bar tidy?",
+   "sizes": "pc",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "dk-wide-board",
+   "name": "Desktop board: natural cards, readable decks",
+   "ask": "Cards big, decks readable?",
+   "sizes": "pc",
+   "group": "Cards",
+   "mut": 1
+  },
+  {
+   "id": "dk-kick-order",
+   "name": "Kick: door opens first, then the card",
+   "ask": "Door swings open, THEN the card shows?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 1
   },
   {
    "id": "dk-boss-reveal",
@@ -295,6 +359,38 @@
    "mut": 0
   },
   {
+   "id": "fa-title",
+   "name": "Start screen: one Play, one Quick game row",
+   "ask": "Is the start screen clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-ui",
+   "name": "Top bar, dock, log and briefing",
+   "ask": "Are the panels short and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-log",
+   "name": "Log panel",
+   "ask": "Is the log short and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-brief",
+   "name": "Briefing panel",
+   "ask": "Is the briefing short and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -361,6 +457,38 @@
    "mut": 0
   },
   {
+   "id": "ui-bar",
+   "name": "UI bar: top bar, panels, text size",
+   "ask": "Few buttons, one line, readable text?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-start",
+   "name": "UI bar: start screen",
+   "ask": "One big Play button, simple options?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "ui-log",
+   "name": "UI bar: diary panel",
+   "ask": "Is the diary panel readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-rivals",
+   "name": "UI bar: rivals panel",
+   "ask": "Is the rivals panel readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
@@ -398,6 +526,22 @@
    "id": "kk-help",
    "name": "Rules cards",
    "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "kk-uibar",
+   "name": "UI bar: top bar, panels, dock, art",
+   "ask": "Are the bar, panels and dock clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "kk-uibar-start",
+   "name": "UI bar: start screen",
+   "ask": "Is the start screen clean?",
    "sizes": "all",
    "group": "UI",
    "mut": 0
@@ -582,6 +726,22 @@
    "ask": "Are the pieces painted and coloured?",
    "sizes": "all",
    "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-bar",
+   "name": "UI bar: top bar, one line, images",
+   "ask": "Few buttons, one line, readable text?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-start",
+   "name": "UI bar: start screen",
+   "ask": "One big Play button, simple options?",
+   "sizes": "all",
+   "group": "Board",
    "mut": 0
   },
   {

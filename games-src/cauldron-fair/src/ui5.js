@@ -122,11 +122,11 @@ function titleEl() {
     h('div', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Cauldron Fair')), h('p.tag', 'Brew bold. Stop wise.')),
     h('div.tbtns',
       firstTime() ? tutNode('tbtn go') : null,
-      h('button.tbtn.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), h('span', campLine() || 'Ten chapters, three bosses')),
       h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
-      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')),
-      sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved fair')) : null,
-      h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play'))));
+      h('div.tsec',
+        h('button.tsb', { 'data-a': 'story', type: 'button' }, '\u2728 Story'),
+        h('button.tsb', { 'data-a': 'online', type: 'button' }, 'Online'),
+        sv ? h('button.tsb', { 'data-a': 'loadsave', type: 'button' }, 'Continue') : null))));
 }
 function charCard(c, o) {
   const ch = D.CHARS[c], me = c === o.me, on = me || o.seats.indexOf(c) >= 0, lv = (o.lvBy && o.lvBy[c]) || TEMPER[c];
@@ -251,7 +251,7 @@ function renderLegend() {
 function renderBlg() {
   const e = $('#blg'); if (!e) return; const on = false;   // the header buttons carry their names on phones now
   e.hidden = !on; if (!on || e.dataset.k) return; e.dataset.k = 1;
-  e.append(h('div', h('b', 'Top buttons, left to right: '), 'Scores, Log, Chips and cards, How to play, Menu.'), h('button.btn.go', { 'data-a': 'blgx', type: 'button' }, 'OK'));
+  e.append(h('div', h('b', 'Top buttons, left to right: '), 'Hint, Scores, Log, How to play, Menu.'), h('button.btn.go', { 'data-a': 'blgx', type: 'button' }, 'OK'));
 }
 function isPh() { return document.documentElement.classList.contains('ph'); }
 function applyPhone() {

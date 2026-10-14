@@ -160,6 +160,32 @@
     ]
   });
 
+  /* UI-BAR 4-6, 8: top-bar button count, text size in the dock and every top-bar panel, empty parchment, image aspect */
+  var minPx = function () { return innerWidth >= 1024 ? 16 : 13; };
+  var smallText = function (root) { var bad = []; [].forEach.call(root.querySelectorAll('*'), function (e) { if (!GXS.vis(e) || e.closest('svg,canvas') || getComputedStyle(e).fontSize === '0px') return; var own = [].filter.call(e.childNodes, function (n) { return n.nodeType === 3 && /\S{2}/.test(n.textContent); }).length; if (!own) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < minPx() - .01) bad.push((e.id || e.className || e.tagName) + ' ' + f + 'px'); }); return bad; };
+  GXS.add({
+    id: 'cc-uibar', name: 'UI bar: top bar, dock and panels', ask: 'Are bar, dock and panels clean?', ls: LS, seed: 27, when: booted,
+    setup: function () { return table(27); },
+    checks: [
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('header.gx-bar .gx-ibtn'), GXS.vis).length; return n <= 5 || n + ' buttons in the top bar'; } },
+      { kind: 'fn', name: 'dock text is big enough', fn: function () { var d = document.querySelector('.gx-dock'); var b = d ? smallText(d) : []; return !b.length || b.slice(0, 4).join(' | '); } },
+      { kind: 'fn', name: 'every top-bar panel: text size, no tall empty parchment', fn: function () {
+        var out = [];
+        ['dr-market', 'dr-mine', 'dr-mons', 'dr-log', 'dr-menu', 'dr-rules'].forEach(function (id) {
+          try { GX.show(id); } catch (e) { out.push(id + ' will not open'); return; }
+          var el = document.getElementById(id); if (!el) { out.push(id + ' missing'); return; }
+          var bad = smallText(el); if (bad.length) out.push(id + ' small text: ' + bad.slice(0, 3).join(', '));
+          var body = el.querySelector('.gx-drawer-body,.gx-dbody') || el, top = body.getBoundingClientRect().top, bot = 0;
+          [].forEach.call(body.querySelectorAll('*'), function (c) { if (GXS.vis(c)) bot = Math.max(bot, c.getBoundingClientRect().bottom); });
+          var empty = body.getBoundingClientRect().bottom - Math.max(bot, top); if (empty > 220 && body.scrollHeight <= body.clientHeight + 2) out.push(id + ' empty space ' + Math.round(empty) + 'px');
+        });
+        try { GX.close(); } catch (e) { }
+        return !out.length || out.join(' | ');
+      } },
+      { kind: 'fn', name: 'board images keep their natural aspect', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('[data-board] img'), function (i) { if (!GXS.vis(i) || !i.naturalWidth) return; var r = i.getBoundingClientRect(), cs = getComputedStyle(i); if (cs.objectFit === 'fill' && Math.abs(r.width / r.height - i.naturalWidth / i.naturalHeight) > .08) bad.push((i.className || i.src.slice(-20)) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height)); }); return !bad.length || bad.slice(0, 3).join(' | '); } }
+    ]
+  });
+
   GXS.add({
     id: 'cc-zoom', name: 'Big card zoom', ask: 'Is the big card readable?', ls: LS, seed: 26, when: booted,
     setup: function () { return marketTable(26).then(function () { obShowCard(G.market[0], ''); return new Promise(function (r) { setTimeout(r, 500); }); }); },

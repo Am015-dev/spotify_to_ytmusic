@@ -200,7 +200,7 @@ function sinceDiff(me,sn){const p=P(me),nm=p.nm,out=[];const lines=G.log.filter(
   const cu=p.curse.filter(id=>!sn.cu.includes(id));if(cu.length)out.push(`<b>Curse on you:</b> ${cu.map(id=>esc(cname(id))+': '+esc(cd(id).x||'')).join(' ')}`);
   return out.length?out:null}
 function sinceHTML(me){if(!UI.since||!G||G.active!==me||!['window','main'].includes(G.phase)||G.cb)return '';
-  return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,3).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}
+  return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,2).map(x=>`<li>${x.replace(/ ?<span class="muted">.*?<\/span>/g,'')}</li>`).join('')}</ul></div>`}
 // ---- learn as you play: one short idea, the first time it matters (only in a "teach me" game) ----
 const LESSONS={
   setup:'<b>Goal:</b> reach level 10. Tap glowing cards.',

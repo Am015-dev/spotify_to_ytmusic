@@ -9,7 +9,9 @@
 "rv-buttons-phone.json",
 "rv-help-phone.json",
 "rv-zoom-phone.json",
-"story-scene-phone.json"
+"story-scene-phone.json",
+"ui-bar-phone.json",
+"ui-start-phone.json"
 ]
 }
 }

@@ -529,7 +529,7 @@ html.pulling #acts .btn.stopb{opacity:.6}
 .shopfoot .btn.go{flex:0 0 auto;min-height:56px;min-width:108px;font-size:18px}
 /* phones: the board is the screen */
 html.ph #me,html.ph #legend,html.ph #bagi{display:none!important}
-html.ph .gx-bar [data-gx=logd],html.ph .gx-bar [data-gx=refd]{display:none}
+html.ph .gx-bar [data-gx=logd]{display:none}
 .gx-bar .gxh-bulb{flex:0 0 auto}html.ph .gx-bar .gxh-bulb{min-width:34px;width:34px}html.ph .gx-bar .gx-ibtn[data-gx]{min-width:42px}html.ph .gx-bar .gxh-bulb svg{width:22px;height:22px}
 @media (max-width:384px){html.ph .bst .bav{display:none}}
 .mrow .gxt-menu{display:block;text-align:left;width:100%}.mrow .gxt-menu b,.mrow .gxt-menu span{display:block}.mrow .gxt-menu span{font-size:12px;opacity:.85;font-weight:600}
@@ -823,6 +823,20 @@ html.sk-row .mrow{position:relative;isolation:isolate}
 html.sk-row .mrow::before{content:'';position:absolute;inset:-4px -6px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
 @media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
 body:has(.gxh-bub.on) #fortchip>div,body:has(.gxh-bub.on) #fort>div,body:has(.gxh-bub.on) #toast{display:none}
+/* UI bar: text >= 16px on wide screens, panels fit their content */
+@media (min-width:1024px){
+body :where(#board,.gx-drawer,.gx-dock) *:not(svg):not(svg *):not(canvas){font-size:max(16px,1em)!important}
+#toast,.gx-bar .gx-ibtn span,#barstat .dayn,.logl .ll,.lt,#fort .fk,#fortchip .fk{font-size:16px}
+}
+#fortchip .fk,#fort .fk{font-size:13px}
+@media (min-width:1024px){#fortchip .fk,#fort .fk{font-size:16px}}
+.gx-drawer{bottom:auto;max-height:calc(100vh - var(--gx-bar-h) - 24px)}
+@media (min-width:1024px){.rc .ct i{white-space:normal;overflow-wrap:anywhere}.gx-dock{overflow-x:hidden}}
+/* start screen: one big primary button, one row of small secondary buttons */
+.tsec{display:flex;gap:10px;width:100%}
+.tsb{flex:1 1 0;appearance:none;border:2px solid #2a1c36;border-radius:14px;background:linear-gradient(180deg,#fff8e6,#efdfbd);color:var(--ink);min-height:48px;padding:6px 12px;font-weight:800;font-size:16px;line-height:1.1;font-family:inherit;cursor:pointer}
+html:not(.ph) .tbtns{flex-direction:column;align-items:center}html:not(.ph) .tbtns .tbtn{flex:0 0 auto;width:min(460px,100%)}html:not(.ph) .tsec{width:min(460px,100%)}
+.tbtn span{font-size:max(16px,.97rem)}@media (min-width:1024px){#start,#start *{font-size:max(16px,1em)}}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -1031,7 +1045,8 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 /* compact form: used by gx-help.js when no free spot exists on a crowded board */
 .gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
-.gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+.gxh-bub.gxh-compact .gxh-tx{padding-right:104px}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:104px}}
 .gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
 
 
@@ -1093,7 +1108,6 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
   <button class="gx-ibtn" data-gx="scored" aria-expanded="false" aria-label="Scores and players" title="Scores and players"><svg viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></svg><span>Scores</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false" aria-label="Log" title="Log"><svg viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/></svg><span>Log</span></button>
-  <button class="gx-ibtn" data-gx="refd" aria-expanded="false" aria-label="Chips and cards" title="Chips, books and cards"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="12" height="17" rx="2"/><path d="M8 7h4M8 11h4M19 7v13"/></svg><span>Cards</span></button>
   <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" aria-label="How to play" title="How to play"><svg viewBox="0 0 24 24"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1z M12 6v13"/></svg><span>Rules</span></button>
   <button class="gx-ibtn" data-gx="setd" aria-expanded="false" aria-label="Menu" title="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
 </header>
@@ -4025,6 +4039,45 @@ fn mainFragment(
       art('bubble tail painted', '#arttail .gxh-arr', 'ui-bubble-tail', null, 'sk-tail'),
       { kind: 'text', sel: '#arttail .gxh-tx', re: /bag/i, name: 'bubble text readable' },
       { kind: 'fn', name: 'settings row painted', fn: function () { GX.show('setd'); var e = document.querySelector('#setbody .mrow'); if (!e) return 'no row'; var r = e.getBoundingClientRect(), c = getComputedStyle(e, '::before'); var ok = r.width > 4 && c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0; try { GX.close(); } catch (x) { } return ok || 'ui-row-c not painted'; } }
+    ]
+  });
+
+  // UI-BAR rules the shared menu test cannot see (4 top bar, 1 text size, 6 panels fit, 8 image aspect), checked on the play screen and each drawer
+  function minFont(root) {
+    var need = innerWidth >= 1024 ? 16 : 13, bad = [], w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (var n; (n = w.nextNode());) {
+      if (!/\S/.test(n.nodeValue)) continue; var e = n.parentElement; if (!e || e.closest('#gxscn-tag') || e.closest('script,style,svg,canvas')) continue;
+      var r = e.getBoundingClientRect(), cs = getComputedStyle(e); if (r.width < 2 || r.height < 2 || cs.visibility === 'hidden' || cs.display === 'none') continue;
+      var fs = parseFloat(cs.fontSize); if (fs < need - .01) bad.push(Math.round(fs * 10) / 10 + 'px ' + e.tagName.toLowerCase() + (e.className && e.className.baseVal === undefined ? '.' + String(e.className).split(' ')[0] : '') + ' "' + n.nodeValue.trim().slice(0, 18) + '"');
+    }
+    return bad;
+  }
+  function uiBad(list) { return list.length ? 'N=' + list.length + ' ' + list.slice(0, 6).join(' | ') : true; }
+  GXS.add({
+    id: 'cf-ui', name: 'UI bar: top bar, text sizes, panels, image shapes', ask: 'Is every panel readable and not stretched?', seed: 5, when: booted, group: 'UI',
+    setup: function () {
+      try { GXH.setEnabled(false); } catch (e) { }
+      window.AIDELAY = 120; newGame('vs', {});
+      return GXS.wait(function () { prepFix(); return q('.bagb:not(.off)') || q('.stopb:not(.off)'); }, 40000).then(function () { return quiet(); });
+    },
+    checks: [
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), function (b) { return b.getBoundingClientRect().width > 2 && getComputedStyle(b).display !== 'none'; }); return n.length <= 5 || n.length + ' buttons: ' + n.map(function (b) { return b.id || b.getAttribute('data-a') || b.textContent.trim().slice(0, 8); }).join(','); } },
+      { kind: 'fn', name: 'board text >= 13 px phone / 16 px wide', fn: function () { return uiBad(minFont(document.body)); } },
+      { kind: 'fn', name: 'images keep their natural shape', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('img'), function (i) { var r = i.getBoundingClientRect(), cs = getComputedStyle(i); if (r.width < 24 || !i.naturalWidth || cs.objectFit === 'contain' || cs.objectFit === 'cover') return; var a = (r.width / r.height) / (i.naturalWidth / i.naturalHeight); if (a < .92 || a > 1.08) bad.push((i.className || i.id || i.src.split('/').pop()) + ' x' + a.toFixed(2)); }); return uiBad(bad); } },
+      { kind: 'fn', name: 'log panel: text size, fits its content', fn: function () { GX.show('logd'); var d = document.querySelector('#logbody'); var bad = minFont(d.closest('.gx-drawer,.drawer,[role=dialog]') || d); var p = d.closest('.gx-drawer,.drawer,[role=dialog]') || d; var pr = p.getBoundingClientRect(); if (pr.height > 200 && d.scrollHeight < pr.height * .35 && pr.height > innerHeight * .5) bad.push('panel ' + Math.round(pr.height) + 'px for ' + d.scrollHeight + 'px of content'); try { GX.close(); } catch (e) { } return uiBad(bad); } },
+      { kind: 'fn', name: 'rules + settings panels: text size', fn: function () { var bad = []; ['rulesd', 'setd'].forEach(function (id) { try { GX.show(id); } catch (e) { return; } var el = document.getElementById(id) || document.querySelector('.gx-drawer.on,.drawer.on'); if (el) minFont(el).forEach(function (m) { bad.push(id + ' ' + m); }); try { GX.close(); } catch (e) { } }); return uiBad(bad); } }
+    ]
+  });
+
+  GXS.add({
+    id: 'cf-start', name: 'UI bar 7: start screen', ask: 'One big Play button, small options below?', seed: 5, when: booted, group: 'UI',
+    setup: function () { try { GXH.setEnabled(false); } catch (e) { } try { GX.close(); } catch (e) { } UI.sv = 'title'; renderStart(); return new Promise(function (r) { setTimeout(r, 600); }); },
+    checks: [
+      { kind: 'fn', name: 'exactly one big primary button', fn: function () { var n = document.querySelectorAll('#start .tbtn'); return n.length === 2 - (firstTime() ? 0 : 1) || n.length + ' big buttons'; } },
+      { kind: 'fn', name: 'Continue only when a save exists', fn: function () { var c = !!document.querySelector('#start [data-a=loadsave]'); return c === !!hasSave() || 'Continue ' + c + ' but save ' + hasSave(); } },
+      { kind: 'fn', name: 'no character roster on the start screen', fn: function () { return !document.querySelector('#start .dcard,#start #roster') || 'roster shown'; } },
+      { kind: 'fn', name: 'start buttons at least 44 px tall', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('#start button'), function (b) { if (b.getBoundingClientRect().height < 44) bad.push(b.textContent.slice(0, 12)); }); return uiBad(bad); } },
+      { kind: 'fn', name: 'start text >= 13 px phone / 16 px wide', fn: function () { return uiBad(minFont(document.getElementById('start'))); } }
     ]
   });
 })();
@@ -8072,11 +8125,11 @@ function titleEl() {
     h('div', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Cauldron Fair')), h('p.tag', 'Brew bold. Stop wise.')),
     h('div.tbtns',
       firstTime() ? tutNode('tbtn go') : null,
-      h('button.tbtn.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), h('span', campLine() || 'Ten chapters, three bosses')),
       h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
-      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')),
-      sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved fair')) : null,
-      h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play'))));
+      h('div.tsec',
+        h('button.tsb', { 'data-a': 'story', type: 'button' }, '\u2728 Story'),
+        h('button.tsb', { 'data-a': 'online', type: 'button' }, 'Online'),
+        sv ? h('button.tsb', { 'data-a': 'loadsave', type: 'button' }, 'Continue') : null))));
 }
 function charCard(c, o) {
   const ch = D.CHARS[c], me = c === o.me, on = me || o.seats.indexOf(c) >= 0, lv = (o.lvBy && o.lvBy[c]) || TEMPER[c];
@@ -8201,7 +8254,7 @@ function renderLegend() {
 function renderBlg() {
   const e = $('#blg'); if (!e) return; const on = false;   // the header buttons carry their names on phones now
   e.hidden = !on; if (!on || e.dataset.k) return; e.dataset.k = 1;
-  e.append(h('div', h('b', 'Top buttons, left to right: '), 'Scores, Log, Chips and cards, How to play, Menu.'), h('button.btn.go', { 'data-a': 'blgx', type: 'button' }, 'OK'));
+  e.append(h('div', h('b', 'Top buttons, left to right: '), 'Hint, Scores, Log, How to play, Menu.'), h('button.btn.go', { 'data-a': 'blgx', type: 'button' }, 'OK'));
 }
 function isPh() { return document.documentElement.classList.contains('ph'); }
 function applyPhone() {

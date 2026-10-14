@@ -48,13 +48,15 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 @keyframes bfDoorR{to{transform:translateX(120%) rotate(30deg);opacity:0}}
 .bfrev .bfwho{position:relative;font:700 16px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;animation:bfIn .2s both}
 .bfrev .bfrc{position:relative;perspective:800px}
-.bfrev .bfrc .card{--w:min(46vw,210px);animation:bfFlip .6s .45s cubic-bezier(.2,1.4,.4,1) both;box-shadow:0 18px 40px rgba(0,0,0,.7)}
+.bfrev .bfrc .card{--w:min(46vw,210px);visibility:hidden;box-shadow:0 18px 40px rgba(0,0,0,.7)}
+.bfrev.open .bfrc .card{visibility:visible;animation:bfFlip .6s cubic-bezier(.2,1.4,.4,1) both;box-shadow:0 18px 40px rgba(0,0,0,.7)}
 .bfrev:not(.mine) .bfrc .card{--w:min(36vw,160px)}
 @keyframes bfFlip{from{transform:rotateY(90deg) scale(.3)}to{transform:none}}
-.bfrev .bfban{position:relative;font:900 clamp(30px,11vw,56px)/1 var(--title);color:#fff2c0;letter-spacing:.03em;text-shadow:0 4px 0 #4a0c02,0 0 24px #ff5a1a;animation:bfSlam .45s .75s cubic-bezier(.2,1.6,.4,1) both}
+.bfrev .bfban{position:relative;font:900 clamp(30px,11vw,56px)/1 var(--title);color:#fff2c0;letter-spacing:.03em;text-shadow:0 4px 0 #4a0c02,0 0 24px #ff5a1a;animation:bfSlam .45s .3s cubic-bezier(.2,1.6,.4,1) both;visibility:hidden}
+.bfrev.open .bfban,.bfrev.open .bfsub{visibility:visible}
 .bfrev.k-curse .bfban{text-shadow:0 4px 0 #2a0450,0 0 24px #b04aff}
 .bfrev.k-other .bfban{font-size:clamp(22px,7vw,34px);text-shadow:0 3px 0 #2a1208}
-.bfrev .bfsub{position:relative;font:600 15px var(--ui,system-ui);color:#f3e2c0;text-shadow:0 1px 0 #000;max-width:86vw;text-align:center;animation:bfIn .3s .9s both}
+.bfrev .bfsub{position:relative;font:600 15px var(--ui,system-ui);color:#f3e2c0;text-shadow:0 1px 0 #000;max-width:86vw;text-align:center;visibility:hidden;animation:bfIn .3s .5s both}
 @keyframes bfSlam{from{transform:scale(2.4);opacity:0}to{transform:none;opacity:1}}
 @keyframes bfIn{from{opacity:0}to{opacity:1}}
 /* flying cards, floating numbers, rival bubbles, the ghost finger */
@@ -162,3 +164,6 @@ html.bf-clipping .arena .row.mons .mon{visibility:hidden}
 .bfrev .bfdust{position:absolute;left:50%;bottom:8%;width:34%;aspect-ratio:1;translate:-50% 0;border-radius:50%;background:radial-gradient(circle,rgba(230,205,165,.8),rgba(190,160,120,.35) 55%,rgba(190,160,120,0) 72%);opacity:0;animation:bfDust .7s .3s ease-out both}
 @keyframes bfDust{0%{opacity:.9;transform:translate(0,0) scale(.3)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.5)}}
 .pile.pr .stack .n{right:0}
+
+/* kick order: board copy of the drawn card hidden until the door has opened */
+html.bf-rev .bfstage .row,html.bf-rev .bfstage .bfcap,html.bf-rev .arena .row.mons{visibility:hidden}

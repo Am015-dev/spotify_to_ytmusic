@@ -118,11 +118,8 @@ function titleEl() {
       firstTime() ? tutNode('tbtn go') : null,
       sv ? h('button.tbtn.go', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', (si => si ? 'your meal, round ' + si.round + ' of ' + D.rounds + ' · ' + si.np + ' diners' : 'your saved meal')(saveInfo()))) : null,
       h('button.tbtn' + (sv || firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', sv ? 'New game' : 'Play'), h('span', 'against the computer chefs')),
-      h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '★ Story'), h('span', campLine())),
-      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free'))),
-    h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play'),
-    h('button.tlink', { 'data-a': 'musicopen', type: 'button' }, '\u266A Music'),
-    firstTime() ? null : tutNode('tlink', { sub: false })));
+      h('button.tbtn.story', { 'data-a': 'story', type: 'button' }, h('b', '★ Story'), h('span', campLine())),
+      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')))));
 }
 function dinerCard(c, o) {
   const d = DINERS[c], on = o.seats.indexOf(c) >= 0, lv = o.lv[c - 1] || 'normal', pc = KIT.PLAYERS[c];
