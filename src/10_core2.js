@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.38',date:'14 Oct 2026',items:[{t:'FIXED',s:'Fewer props on roads; parked tyres sit exactly on the ground; NPC lanes stay clear.'}]},
   {v:'v90m-beta.37',date:'14 Oct 2026',items:[{t:'FIXED',s:'Parked cars no longer sink into the ground; sitting on benches fits the seat.'}]},
   {v:'v90m-beta.36',date:'14 Oct 2026',items:[{t:'CHANGED',s:'Two-level city race track has its own layout: downtown ring, viaduct over the lake, kicker shortcut.'}]},
   {v:'v90m-beta.35',date:'14 Oct 2026',items:[{t:'NEW',s:'Builder race tracks are back in the Race menu, with countdown, rival cars and results.'},{t:'NEW',s:'Bug button in the pause menu: report a problem with a screenshot and the spot.'}]},
