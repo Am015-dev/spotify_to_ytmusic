@@ -9,7 +9,7 @@
 // Drawn with the main renderer while BX.on (frame() is wrapped; the game loop is idle meanwhile). Probe: window.__bx.
 const BX={on:false,ui:0,tab:'track',sel:'st',tool:'raise',world:'valley',log:[],pcs:[],cur:{i:20,j:22,l:2,r:0},hl:-1,mode:'build',
  cam:null,sc:null,v:null,m:null,keys:{},t:0,acc:0,camB:{x:0,z:0,d:72,yaw:3.5,pit:0.52},name:'MY TRACK',fast:/[?&](bx)?fast=1/.test(location.search),tfast:/[?&]bxfast=1/.test(location.search)};
-const BX_OPEN=!/[?&]bxopen=0/.test(location.search); // trk-4 OPEN tracks (Alex 2026-10-14 "very limited spaces to drive around, no freedom"): 24 m decks, no rails except on high decks, open verges, 20° kickers. ?bxopen=0 = the trk-3 corridor
+const BX_OPEN=!(typeof location!=='undefined'&&/[?&]bxopen=0/.test(location.search)); // trk-4 OPEN tracks (Alex 2026-10-14 "very limited spaces to drive around, no freedom"): 24 m decks, no rails except on high decks, open verges, 20° kickers. ?bxopen=0 = the trk-3 corridor
 const BXC=8,BXH=2,BXN=56,BX_OFF=8,BXW=BXN*BXC,BXR=4,BXTN=BXW/BXR+1,BXO=-BXW/2,BXG=16,BXRW=BX_OPEN?11.5:6.5,BX_HW=BXRW+.5; // trk-2: 56 cells = 448 m (was 40 = 320 m; old 40-grid cells are +BX_OFF, same metres). road 13 m + kerbs = 14 m wide (trk-1: LEGO 2K Drive roads are wide; 8 m with walls = constant scraping)
 const BXF=[[0,1],[-1,0],[0,-1],[1,0]];
 const bxV=(x=0,y=0,z=0)=>new THREE.Vector3(x,y,z),bxSS=t=>t*t*(3-2*t),bxCl=(v,a,b)=>v<a?a:v>b?b:v;
@@ -51,13 +51,14 @@ function BX_brush(tool,x,z,y){const R=tool==='water'?14:12,a0=Math.max(0,Math.fl
 // pieces sit IN the ground: terrain under a piece is cut to just below the deck, and lifted to it where the gap is small (embankment)
 // a road below the ground cuts a flat 9 m shoulder, then ~39° walls (dev-2: the old near-vertical 16 m cut walls let the car drive INTO the rock)
 function BX_carve(pc){const T=BX.th,R0=BX_OPEN?BX_HW+8:9,SL=BX_OPEN?.4:.8,R=R0+24/SL,FL=BX_OPEN?BX_HW+8:7; // trk-4 open: an 8 m flat verge beside the deck, then 22° banks (drivable), not 39° cut walls
-for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18-(BX_HW+.4)*Math.abs(s.S.y); // banked deck: below its LOW edge (trk-3: the edge is 7 m out; 4.2 left the inside of every banked corner up to 1.3 m under the terrain)
+for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y0=s.p.y-.18-(BX_HW+.4)*Math.abs(s.S.y); // banked deck: below its LOW edge (trk-3: the edge is 7 m out; 4.2 left the inside of every banked corner up to 1.3 m under the terrain)
  const a0=Math.floor((s.p.x-R-BXO)/BXR),a1=Math.ceil((s.p.x+R-BXO)/BXR),b0=Math.floor((s.p.z-R-BXO)/BXR),b1=Math.ceil((s.p.z+R-BXO)/BXR);
- for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){const dx=BXO+a*BXR-s.p.x,dz=BXO+b*BXR-s.p.z;
+ for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){const dx=BXO+a*BXR-s.p.x,dz=BXO+b*BXR-s.p.z;const y=BX_OPEN?s.p.y-.28+s.S.y*bxCl(dx*s.S.x+dz*s.S.z,-BX_HW-.4,BX_HW+.4):y0; /* trk-4: each verge at its own edge height (a banked corner gets a banked embankment, not a 5 m step on its high side) */
   const dd=Math.hypot(dx,dz);if(dd>R)continue;const k=b*BXTN+a,fill=BX_OPEN?y-T[k]<6&&T[k]>-.7:false; // trk-4 open: low ground (not water, not a canyon > 6 m deep) becomes an earth bank with the 8 m verge on top
   if(dd<R0){if(T[k]>y||(dd<FL&&y-T[k]<2.2)||fill)T[k]=y}else{const cap=y+(dd-R0)*SL;if(T[k]>cap)T[k]=cap;else if(fill){const lo=y-(dd-R0)*SL;if(T[k]<lo)T[k]=lo}}}}}
 // ---------------------------------------------------------------- pieces (local: x = right, y = up, z = forward; origin = entry edge middle)
-const BX_KJ=BX_OPEN?1.5:.9; // trk-4: kicker lip 1.5 m = 20.6° (>= 1 s air from 85 km/h); trk-1's 0.9 m (12.7°) gave 0.7-0.9 s
+const BX_KJ=BX_OPEN?1.5:.9,BX_BK=BX_OPEN?.5:1; // BX_BK: banks at half angle on 24 m decks (a 0.42 rad bank lifted the outer edge 5 m over the inner one)
+ // trk-4: kicker lip 1.5 m = 20.6° (>= 1 s air from 85 km/h); trk-1's 0.9 m (12.7°) gave 0.7-0.9 s
 const bxRamp=t=>{const b=.25,c=1/(1-b);return t<b?c*t*t/(2*b):t>1-b?1-c*(1-t)*(1-t)/(2*b):c*(t-b/2)};
 const bxCurve=(R,s)=>t=>{const a=t*Math.PI/2;return[s*(R-R*Math.cos(a)),0,R*Math.sin(a)]};
 const BX_P={
@@ -79,11 +80,11 @@ const BX_P={
  kk:{n:'JUMP',v:'side',p:[t=>[0,2.2*t*t,8*t]],ex:[[0,4,0,0]],k:8,jump:1},
  // kicker: 0.9 m lip at 12.7°, the road goes on flat behind it (land on it): ~0.6 s air at 55 km/h, ~1.1 s at 120 km/h
  kj:{n:'KICKER',v:'side',p:[t=>[0,BX_KJ*t*t,8*t]],ex:[[0,1,0,0]],k:8,jump:1},
- bl:{n:'BANK L',v:'top',p:[bxCurve(20,-1)],bank:t=>-.62*Math.sin(Math.PI*t),ex:[[-3,2,0,-1]],k:18},
- br:{n:'BANK R',v:'top',p:[bxCurve(20,1)],bank:t=>.62*Math.sin(Math.PI*t),ex:[[3,2,0,1]],k:18},
+ bl:{n:'BANK L',v:'top',p:[bxCurve(20,-1)],bank:t=>-BX_BK*.62*Math.sin(Math.PI*t),ex:[[-3,2,0,-1]],k:18},
+ br:{n:'BANK R',v:'top',p:[bxCurve(20,1)],bank:t=>BX_BK*.62*Math.sin(Math.PI*t),ex:[[3,2,0,1]],k:18},
  // wide banked corners (radius 36 m: full speed, no braking)
- wbl:{n:'WIDE BANK L',v:'top',p:[bxCurve(36,-1)],bank:t=>-.42*Math.sin(Math.PI*t),ex:[[-5,4,0,-1]],k:30},
- wbr:{n:'WIDE BANK R',v:'top',p:[bxCurve(36,1)],bank:t=>.42*Math.sin(Math.PI*t),ex:[[5,4,0,1]],k:30},
+ wbl:{n:'WIDE BANK L',v:'top',p:[bxCurve(36,-1)],bank:t=>-BX_BK*.42*Math.sin(Math.PI*t),ex:[[-5,4,0,-1]],k:30},
+ wbr:{n:'WIDE BANK R',v:'top',p:[bxCurve(36,1)],bank:t=>BX_BK*.42*Math.sin(Math.PI*t),ex:[[5,4,0,1]],k:30},
  wl:{n:'WALL L',v:'top',p:[bxCurve(20,-1)],bank:t=>-1.2*Math.sin(Math.PI*t)**.8,ex:[[-3,2,0,-1]],k:22,stick:1},
  wr:{n:'WALL R',v:'top',p:[bxCurve(20,1)],bank:t=>1.2*Math.sin(Math.PI*t)**.8,ex:[[3,2,0,1]],k:22,stick:1},
  lp:{n:'LOOP',v:'side',p:[t=>{const a=2*Math.PI*t;return[8*bxSS(t),7*(1-Math.cos(a)),16*t+7*Math.sin(a)]}],ex:[[1,2,0,0]],k:64,stick:1},
@@ -156,7 +157,11 @@ function BX_hashAll(){BX.hash=new Map();BX.samp=[];for(const pc of BX.pcs){if(pc
  const ci=Math.floor(s.p.x/BXC),cj=Math.floor(s.p.z/BXC);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const k=(ci+a)*4096+(cj+b);let L=BX.hash.get(k);if(!L)BX.hash.set(k,L=new Set());L.add(pc)}}}}
 function BX_near(x,z){const L=BX.hash&&BX.hash.get(Math.floor(x/BXC)*4096+Math.floor(z/BXC));return L?[...L]:[]}
 // trk-4: with BX_OPEN a piece only gets side rails where its deck stands > 3 m over the ground (a bridge / viaduct) or it is a loop/wall; everywhere else the verge is open
-function BX_railOf(pc){if(pc.def.in||pc.def.p.length>1)return false;if(!BX_OPEN||pc.def.stick)return true;for(const S of pc.S)for(const s of S){const g=BX_h(s.p.x,s.p.z);if(g<-.7?s.p.y>6:s.p.y-g>3)return true}return false} // over water only a > 6 m deck: a lower one is a splash-in (boat)
+function BX_railOf(pc){if(pc.def.in||pc.def.p.length>1)return false;if(!BX_OPEN||pc.def.stick)return true;let hi=false;for(const S of pc.S)for(const s of S){const g=BX_h(s.p.x,s.p.z);if(g<-.7?s.p.y>6:s.p.y-g>3)hi=true}if(!hi)return false;
+ // no rail where this deck overlaps another (not chained) deck at about the same height: next to a SPLIT the two branches overlap, and a rail there is a wall across the other route
+ const key=c=>c.i+','+c.j+','+c.l+','+c.r,mine=new Set([...BX_ents(pc),...pc.ex].map(key)),o0=pc.S[0][0].p;
+ for(const q of BX.pcs){if(q===pc||q.dead||q.S[0][0].p.distanceTo(o0)>90)continue;if([...BX_ents(q),...q.ex].some(c=>mine.has(key(c))))continue;
+  for(const A of pc.S)for(const a of A)for(const B of q.S)for(const b of B)if(Math.abs(a.p.y-b.p.y)<4&&Math.hypot(a.p.x-b.p.x,a.p.z-b.p.z)<2*BX_HW-2)return false}return true} // over water only a > 6 m deck: a lower one is a splash-in (boat)
 function BX_pcMesh(pc){const M=BX_mats();pc.rail=BX_railOf(pc);for(const S of pc.S){const[g1,g2]=BX_geo(S,pc.def,pc.rail),a=new THREE.Mesh(g1,M.road),b=new THREE.Mesh(g2,M.body);
  for(const o of[a,b]){o.castShadow=o.receiveShadow=true;o.userData.pc=pc;BX.gP.add(o);pc.meshes.push(o)}}
  if(pc.def.cp||pc.def.start)BX_gate(pc);BX_hashAll();}
@@ -254,8 +259,8 @@ function BX_ghost(){if(BX.gG){BX.sc.remove(BX.gG);BX.gG.traverse(o=>o.geometry&&
  g.children.forEach(o=>o.userData.ghost=1);BX.sc.add(g)}
 // ---------------------------------------------------------------- terrain mesh + world dressing
 // trk-3: after all pieces carved: a later piece's 'fill under the road' clause could lift terrain over an EARLIER, lower road (1.2 m up through the deck); every vertex within 9 m stays under every road there
-function BX_clampRoads(){const T=BX.th;for(const pc of BX.pcs){if(pc.dead)continue;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y=s.p.y-.18-(BX_HW+.4)*Math.abs(s.S.y),CR=BX_HW+2,a0=Math.floor((s.p.x-CR-BXO)/BXR),a1=Math.ceil((s.p.x+CR-BXO)/BXR),b0=Math.floor((s.p.z-CR-BXO)/BXR),b1=Math.ceil((s.p.z+CR-BXO)/BXR);
- for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){if(Math.hypot(BXO+a*BXR-s.p.x,BXO+b*BXR-s.p.z)>CR)continue;const k=b*BXTN+a;if(T[k]>y)T[k]=y}}}}
+function BX_clampRoads(){const T=BX.th;for(const pc of BX.pcs){if(pc.dead)continue;for(const S of pc.S)for(const s of S){if(s.U.y<.6)continue;const y0=s.p.y-.18-(BX_HW+.4)*Math.abs(s.S.y),CR=BX_HW+6,a0=Math.floor((s.p.x-CR-BXO)/BXR),a1=Math.ceil((s.p.x+CR-BXO)/BXR),b0=Math.floor((s.p.z-CR-BXO)/BXR),b1=Math.ceil((s.p.z+CR-BXO)/BXR);
+ for(let b=Math.max(0,b0);b<=Math.min(BXTN-1,b1);b++)for(let a=Math.max(0,a0);a<=Math.min(BXTN-1,a1);a++){const dd=Math.hypot(BXO+a*BXR-s.p.x,BXO+b*BXR-s.p.z);if(dd>CR)continue;const y=BX_OPEN?s.p.y-.28+s.S.y*bxCl((BXO+a*BXR-s.p.x)*s.S.x+(BXO+b*BXR-s.p.z)*s.S.z,-BX_HW-.4,BX_HW+.4):y0;const k=b*BXTN+a,cy=y+Math.max(0,dd-BX_HW-2)*.15;if(T[k]>cy)T[k]=cy}}}} // trk-4: flat to 2 m past the edge, then a gentle rise (a full 18 m flat clamp cut the verges of stacked hairpins)
 function BX_terrMesh(){BX_clampRoads();const n=BXTN;if(!BX.tg){const g=BX.tg=new THREE.BufferGeometry(),p=new Float32Array(n*n*3),uv=new Float32Array(n*n*2),idx=[];
   for(let b=0;b<n;b++)for(let a=0;a<n;a++){const k=b*n+a;p[k*3]=BXO+a*BXR;p[k*3+2]=BXO+b*BXR;uv[k*2]=(BXO+a*BXR)/.8;uv[k*2+1]=(BXO+b*BXR)/.8;if(a<n-1&&b<n-1)idx.push(k,k+n,k+1,k+1,k+n,k+n+1)}
   g.setAttribute('position',new THREE.BufferAttribute(p,3));g.setAttribute('uv',new THREE.BufferAttribute(uv,2));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(n*n*3),3));g.setIndex(idx);
@@ -622,7 +627,7 @@ function BX_routeLen(ch){const W=window.__bx.route(ch);let d=0;for(let i=1;i<W.l
 function BX_data(){const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,NS=new Set(L.flatMap(p=>BX_ents(p).map(key)));
  const gaps=L.flatMap(p=>p.ex.filter(e=>{if(NS.has(key(e)))return false;const o=BX_fr(e).o;return BX_h(o.x,o.z)>-.7}).map(()=>p.type));
  const noRail=L.filter(p=>!(p.def.in||p.def.p.length>1)&&!BX_RAIL.length).length,width=2*BX_HW,G=BX_grade(),fk=L.some(p=>p.type==='fk')&&L.some(p=>p.type==='mg');
- const R=[BX_routeLen([0]),BX_routeLen([1])],short=fk?Math.abs(R[0].d-R[1].d):0,lo=Math.min(R[0].d,R[1].d),hi=Math.max(R[0].d,R[1].d);
+ const R=[BX_routeLen([0,0,0]),BX_routeLen([1,1,1])],short=fk?Math.abs(R[0].d-R[1].d):0,lo=Math.min(R[0].d,R[1].d),hi=Math.max(R[0].d,R[1].d);
  const C=[BX_OPEN?['rails only on high decks',true,`rails on ${L.filter(p=>p.rail).length}/${L.length} pieces (bridges)`]:['rails on every piece',noRail===0,`${noRail} pieces without rails`],BX_OPEN?['width >=24 m',width>=24,`width ${width} m`]:['width >=14 m',width>=14,`width ${width} m`],['0 gaps',gaps.length===0,`open ends ${gaps.length}${gaps.length?' ('+gaps.join(',')+')':''}`],
   ['>=3 jumps',Math.min(R[0].kick,R[1].kick)>=3,`jumps ${R[0].kick}/${R[1].kick}`],['>=2 boosts',Math.min(R[0].boost,R[1].boost)>=2,`boosts ${R[0].boost}/${R[1].boost}`],
   ['shortcut',fk&&short>=50,`shortcut ${fk?'saves '+short.toFixed(0)+' m':'none'}`],['grade <=25 %',G.g<=.25,`max grade ${Math.round(G.g*100)} %`],
@@ -655,9 +660,9 @@ function BX_openData(){const R=[];for(const ch of[[0,0,0],[1,1,1]]){const S=BX_l
 function BX_autoInp(W,st){const V=BX.v,n=W.length;let bi=st.i,bd=1e9;for(let k=-6;k<90;k++){const j=((st.i+k)%n+n)%n,d=W[j].distanceToSquared(V.p);if(d<bd){bd=d;bi=j}}
  if(bd>900)W.forEach((p,j)=>{const d=p.distanceToSquared(V.p);if(d<bd){bd=d;bi=j}});st.i=bi;const sp=V.v.length(),tw=W[(bi+Math.max(5,Math.round(sp/1.6)))%n],dx=tw.x-V.p.x,dz=tw.z-V.p.z,
  S=bxV().crossVectors(V.F,V.U),a=Math.atan2(S.x*dx+S.z*dz,V.F.x*dx+V.F.z*dz);return{s:bxCl(a*3,-1,1),g:1,b:Math.abs(a)>.9&&sp>16?1:0}}
-function BX_sim(ch=[],maxT=220){try{BX_raceClear()}catch(e){}BX_driveStart();const V=BX.v,m=BX.m,W=BX_lap(ch).map(o=>o.s.p),st={i:0},dt=1/120;let slow=0,slowMax=0,t0=performance.now();
- for(let i=0;i<maxT*120&&W.length;i++){const inp=BX.inp=BX_autoInp(W,st);BX_step(dt,inp);if(i%4===0)BX_farCheck(dt*4);const sp=V.v.length();slow=sp<2?slow+dt:0;slowMax=Math.max(slowMax,slow);if(m.laps>=1)break}
- const r={laps:m.laps,t:+m.t.toFixed(1),lap:m.lapT[0]||0,slowMax:+slowMax.toFixed(2),resp:m.resp,why:m.respWhy.join(','),turned:m.turned||0,air1:(m.lands||[]).filter(l=>l.air>=1).length,airs:(m.lands||[]).map(l=>l.air),ms:Math.round(performance.now()-t0)};BX_driveStop();return r}
+function BX_sim(ch=[],maxT=220){try{BX_raceClear()}catch(e){}BX_driveStart();const V=BX.v,m=BX.m,W=BX_lap(ch).map(o=>o.s.p),st={i:0},dt=1/120;let slow=0,slowMax=0,t0=performance.now();const tr=[];
+ for(let i=0;i<maxT*120&&W.length;i++){const inp=BX.inp=BX_autoInp(W,st);BX_step(dt,inp);if(i%4===0)BX_farCheck(dt*4);const sp=V.v.length();slow=sp<2?slow+dt:0;slowMax=Math.max(slowMax,slow);if(i%(BX.trK||240)===0)tr.push([+m.t.toFixed(1),Math.round(V.p.x),Math.round(V.p.y),Math.round(V.p.z),st.i,V.g?1:0,+inp.s.toFixed(2),Math.round(sp),V.on?V.on.type:"-"]);if(m.laps>=1)break}
+ const r={laps:m.laps,t:+m.t.toFixed(1),lap:m.lapT[0]||0,slowMax:+slowMax.toFixed(2),resp:m.resp,why:m.respWhy.join(','),turned:m.turned||0,air1:(m.lands||[]).filter(l=>l.air>=1).length,airs:(m.lands||[]).map(l=>l.air),ms:Math.round(performance.now()-t0)};BX.simTr=tr;BX_driveStop();return r}
 const bxRes=C=>({ok:C.every(c=>c[1]),fails:C.filter(c=>!c[1]).map(c=>c[0]),msg:C.map(c=>(c[1]?'✔ ':'✘ ')+c[2]).join(', ')});
 // phone layout of a set of buttons: inside the screen, >= 40 px, the button itself is under its centre (nothing covers it), no two overlap
 function BX_btnChk(ids){const W=innerWidth,H=innerHeight,B=ids.map(id=>[id,$('#'+id)]),bad=[];const R=B.map(([id,e])=>[id,e&&e.getBoundingClientRect()]);
@@ -694,7 +699,7 @@ window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||
  route:(ch=[])=>{const L=BX.pcs.filter(p=>!p.dead),key=c=>c.i+','+c.j+','+c.l+','+c.r,by=new Map(L.flatMap(p=>BX_ents(p).map(c=>[key(c),p])));let pc=L.find(p=>p.def.start)||L[0],k=0,out=[],seen=new Set();
   while(pc&&!seen.has(pc.id)){seen.add(pc.id);const b=pc.def.in?(out.length?pc.S.map((S,i)=>[i,Math.hypot(S[0].p.x-out[out.length-1][0],S[0].p.z-out[out.length-1][2])]).sort((a,c)=>a[1]-c[1])[0][0]:0):pc.S.length>1?(ch[k++]||0)%pc.S.length:0;for(const s of pc.S[b])out.push([+s.p.x.toFixed(2),+s.p.y.toFixed(2),+s.p.z.toFixed(2),pc.type,pc.id]);
    const e=pc.ex[Math.min(b,pc.ex.length-1)];pc=by.get(key(e))||L.filter(p=>!seen.has(p.id)).sort((a,c)=>{const A=a.S[0][0].p,C=c.S[0][0].p,E=BX_fr(e).o;return A.distanceTo(E)-C.distanceTo(E)})[0]}return out},
- h:(x,z)=>BX_h(x,z),clear:()=>BX_terrClear(),demos:()=>BX_DEMOS,log:()=>JSON.stringify({v:3,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
+ h:(x,z)=>BX_h(x,z),clear:()=>BX_terrClear(),sim:(ch,t)=>BX_sim(ch,t),lap:ch=>BX_lap(ch),openData:()=>BX_openData(),side:(s,pc,g)=>BX_side(s,pc,g),demos:()=>BX_DEMOS,log:()=>JSON.stringify({v:3,log:BX.log}),load:(o,n)=>BX_load(typeof o==='string'?JSON.parse(o):o,n)};
 
 // ---------------------------------------------------------------- RACE on a builder track (trk-2 MVP, coordinator-approved; Alex beta.22: "none of the race methods is applied")
 // 3-2-1-GO countdown (car held), 5 rivals (the city race team rides) on the course waypoints with a curve speed profile, position "3/6" + lap timer,

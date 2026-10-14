@@ -11,9 +11,9 @@ const ALL=['bx-o-width','bx-o-routes','bx-o-open','bx-o-jumps','bx-o-ai','bx-o-b
  console.log('BOOT',((Date.now()-T0)/1000).toFixed(1),'s');const cdp=await c.newCDPSession(p);
  const tap=async sel=>{const bb=await p.locator(sel).first().boundingBox();if(!bb)return false;const x=bb.x+bb.width/2,y=bb.y+bb.height/2;
   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});await sleep(90);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await sleep(250);return true};
- const chk=id=>p.evaluate(i=>__bx.check(i),id),go=id=>p.evaluate(i=>__chk.go('trk4/'+i),id);
+ const chk=id=>p.evaluate(i=>__bx.check(i.split('/').pop()),id),go=id=>p.evaluate(i=>__chk.go(i.includes('/')?i:'trk4/'+i),id);
  const line=(id,r)=>{R[id]=r;console.log((r.ok?'PASS ':'FAIL ')+id+' :: '+r.msg)};
- for(const id of IDS.length?IDS:ALL){const t=Date.now();try{await go(id);await sleep(1200);
+ for(const id of IDS.length?IDS:ALL){const t=Date.now();try{await go(id);await sleep(1200);if(id.includes('/'))await p.waitForFunction(()=>!__bx.BX.m||__bx.BX.mode!=='drive'||__bx.BX.m.t>=4,null,{polling:300,timeout:150000});
   if(id==='bx-o-btn'||id==='bx-o-ui'){const rr=[];for(const vp of[[852,393],[393,852]]){await p.setViewportSize({width:vp[0],height:vp[1]});await sleep(700);const r=await chk(id);rr.push(r)}
    const acts=[];
    if(id==='bx-o-btn'){await p.evaluate(()=>{__bx.BX.v.boostE=1});const b0=await p.evaluate(()=>__bx.BX.v.boost);await tap('#bxBo');const b1=await p.evaluate(()=>__bx.BX.v.boost);acts.push(['BOOST tap',b1>0&&b1>b0,`boost ${b0.toFixed(1)} -> ${b1.toFixed(1)} s`]);
