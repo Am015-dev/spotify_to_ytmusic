@@ -1,6 +1,21 @@
 [
  {
   "date": "2026-10-14",
+  "game": "sunglaze",
+  "title": "Cleaner menus",
+  "items": [
+   "Menus use one title font and one body font, no overlaps"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "lantern-dive",
   "title": "Cleaner menus",
   "items": [

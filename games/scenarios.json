@@ -612,39 +612,60 @@
  ],
  "sunglaze": [
   {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "sg-board",
    "name": "Start of game board",
    "ask": "Are the workshops and your rack clear?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
   },
   {
    "id": "sg-zoom",
    "name": "Board / tile list zoom",
    "ask": "Is the rival board readable?",
    "sizes": "all",
-   "group": "Cards"
+   "group": "Cards",
+   "mut": 0
   },
   {
    "id": "sg-help",
    "name": "Help: how this works",
    "ask": "Can you read the help cards?",
    "sizes": "all",
-   "group": "UI"
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "sg-buttons",
    "name": "Painted buttons keep their labels",
    "ask": "Are the buttons readable?",
    "sizes": "all",
-   "group": "Board"
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "sg-art",
+   "name": "Painted art: rack trays, tail, rows",
+   "ask": "Do the racks look like wooden trays?",
+   "sizes": "phone",
+   "group": "UI",
+   "mut": 0
   },
   {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",
    "sizes": "all",
-   "group": "Story"
+   "group": "Story",
+   "mut": 0
   }
  ],
  "thornbound": [
