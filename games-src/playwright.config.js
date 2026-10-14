@@ -21,5 +21,5 @@ module.exports = defineConfig({
     { name: 'phone-s', use: phone(375, 553) },
     { name: 'pc', use: { viewport: { width: 1366, height: 768 } } },
   ],
-  webServer: external ? undefined : { command: `node scripts/gx-serve.js .staging ${PORT}`, port: PORT, reuseExistingServer: true },
+  webServer: external ? undefined : { command: `node scripts/gx-serve.js ${process.env.GX_STAGE || '.staging'} ${PORT}`, port: PORT, reuseExistingServer: true },
 });
