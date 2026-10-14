@@ -49,11 +49,11 @@ Fast loop
   passes (quick sweep; `--full` only for engine/rules changes). Then `add-update.py <game> "headline" "item" --check "..." --scn <id>`.
 - Commit at least every 10 minutes (explicit paths). Push after fetch+merge.
 
-Report (under 150 words, once): per game before -> after numbers, scenario ids, the live link, what is still weak.
+Report (5 lines max, once; print only pass/fail lines while working): per game before -> after numbers, scenario ids, the live link, what is still weak.
 ```
 
 Orchestrator notes
-- ONE session per game, at most 15 at a time. Title starts with the group tag ([ART] [TESTS] [LAB] [FIX] [NIGHTRUN] [OPS]) + game; tag it
+- At most 3 workers at once (1 integrator + 2 fixers), one ~30-min deliverable each. Title starts with the group tag ([ART] [TESTS] [LAB] [FIX] [NIGHTRUN] [OPS]) + game; tag it
   group:<name> (set_session_tags); add it to the groups table in HANDOFF.md. Model: Haiku for chores (status refresh, copying, converting, repeating
   an already-written fix, checks that only report), Sonnet for code/fixes/tests. Never the main model for workers.
 - Put the owner's bug reports first in "Known bugs" and name the function (run `find.sh` yourself, it is cheap).
