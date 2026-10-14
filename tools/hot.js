@@ -110,7 +110,7 @@ async function daemon(){
   const u=decodeURIComponent(q.url.split('?')[0]);
   if(u==='/hot.html'){try{const s=hotPage();r.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store'});r.end(s)}catch(e){r.writeHead(500);r.end(String(e))}return}
   const f=path.join(OUT,path.normalize(u).replace(/^(\.\.[\/\\])+/,''));fs.readFile(f,(e,s)=>{if(e){r.writeHead(404);r.end();return}r.writeHead(200,{'content-type':(MT[path.extname(f)]||'application/octet-stream')+(/js|json|html/.test(path.extname(f))?'; charset=utf-8':'')});r.end(s)})
- }).listen(PORT,'127.0.0.1',()=>{console.log('hot daemon on '+PORT);setTimeout(()=>{try{reloadCode([],false)}catch(e){console.log('index: '+e)}},100);for(const c of(process.env.HOT_CITIES||'fra,ath').split(','))boot(c)});
+ }).listen(PORT,'127.0.0.1',()=>{console.log('hot daemon on '+PORT);setTimeout(()=>{try{reloadCode([],false)}catch(e){console.log('index: '+e)}},100);for(const c of(process.env.HOT_CITIES??'fra,ath').split(',').filter(c=>c==='fra'||c==='ath'))boot(c)});
 }
 
 // ---------- client ----------
