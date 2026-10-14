@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.43',date:'14 Oct 2026',items:[{t:'FIXED',s:'Flat junctions: kerbs stop at every junction, no strips across the asphalt.'},{t:'CHANGED',s:'Sun sits behind the camera so all roads are lit; far trees are LEGO impostors.'},{t:'NEW',s:'More street life; crash damage test; portrait race shows the right position.'}]},
   {v:'v90m-beta.42',date:'14 Oct 2026',items:[{t:'NEW',s:'Real LEGO sets in the world: Frankfurt Ferris wheel, Athens carousel, wind turbines; more street activities and LEGO street furniture.'},{t:'CHANGED',s:'Sun follows the camera so cars are always lit; cars sit on slopes and grass.'},{t:'FIXED',s:'Portrait race HUD, banked pillars, rival grid; crates on car roofs; black facades.'}]},
   {v:'v90m-beta.41',date:'14 Oct 2026',items:[{t:'FIXED',s:'Road kerbs and junctions follow the ground (no sunk or floating pieces).'},{t:'NEW',s:'AIR TIME bubbles float over a real kicker ramp.'},{t:'FIXED',s:'Cars step out cleanly after a hot drop.'}]},
   {v:'v90m-beta.40',date:'14 Oct 2026',items:[{t:'NEW',s:'Athens building facades and storefronts have more variety; fewer props on roads.'}]},
