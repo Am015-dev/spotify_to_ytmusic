@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.59',date:'14 Oct 2026',items:[{t:'NEW',s:'Race tracks are open: wide decks, flat verges, earth banks, kickers and route choices.'}]},
   {v:'v90m-beta.58',date:'14 Oct 2026',items:[{t:'FIXED',s:'Festival crates stay on the roof of your car after you change vehicle.'}]},
   {v:'v90m-beta.57',date:'14 Oct 2026',items:[{t:'FIXED',s:'Roadworks barriers no longer block main streets.'}]},
   {v:'v90m-beta.56',date:'14 Oct 2026',items:[{t:'FIXED',s:'On desktop the name plate no longer stretches into a tall dark column.'}]},
