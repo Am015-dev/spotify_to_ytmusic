@@ -1,0 +1,789 @@
+[
+ {
+  "n": "01_home_drive",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "92.2"
+ },
+ {
+  "n": "02_q0_card",
+  "r0": "card Sesame Emergency (Koulouri Run 1/3)",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "30.3"
+ },
+ {
+  "n": "03_quest0_start",
+  "r0": "start Sesame Emergency (Koulouri Run 1/3) state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "32.5"
+ },
+ {
+  "n": "04_quest1_start",
+  "r0": "start Thieves! (The Stolen Amphora 1/3) state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "34.6"
+ },
+ {
+  "n": "05_quest2_start",
+  "r0": "start The Musicians (Taverna Night 1/3) state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "35.8"
+ },
+ {
+  "n": "06_quest3_start",
+  "r0": "start Police Chase state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "37.2"
+ },
+ {
+  "n": "07_quest4_start",
+  "r0": "start Smuggler Crate state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "34.3"
+ },
+ {
+  "n": "08_quest5_start",
+  "r0": "start Smuggler Crate state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "33.9"
+ },
+ {
+  "n": "09_quest6_start",
+  "r0": "start Pile Smasher state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "44.3"
+ },
+ {
+  "n": "10_quest7_start",
+  "r0": "start Taxi Shift state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "32.5"
+ },
+ {
+  "n": "11_quest8_start",
+  "r0": "start Police Chase state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "29.1"
+ },
+ {
+  "n": "12_quest9_start",
+  "r0": "start Festival Delivery state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "45.4"
+ },
+ {
+  "n": "13_quest10_start",
+  "r0": "start Taxi Shift state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "36.1"
+ },
+ {
+  "n": "14_quest11_start",
+  "r0": "start Speed Run state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "39.0"
+ },
+ {
+  "n": "15_quest12_start",
+  "r0": "start Stranded! state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "33.6"
+ },
+ {
+  "n": "16_quest13_start",
+  "r0": "start Brick Hunt state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "27.7"
+ },
+ {
+  "n": "17_quest14_start",
+  "r0": "start Speed Run state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "26.5"
+ },
+ {
+  "n": "18_quest15_start",
+  "r0": "start Koulouri Rush state=roam",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "47.1"
+ },
+ {
+  "n": "19_garage",
+  "r0": "gar",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "57.3"
+ },
+ {
+  "n": "20_acropolis",
+  "r0": "warp true 1883,-2054,0",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "21.1"
+ },
+ {
+  "n": "21_filopappou",
+  "r0": "warp true 2200,-2600,0",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "18.2"
+ },
+ {
+  "n": "22_plaka",
+  "r0": "warp true 1452,-2031,-3",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "21.6"
+ },
+ {
+  "n": "23_monastiraki",
+  "r0": "warp true 1800,-1681,1",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "38.1"
+ },
+ {
+  "n": "24_psyrri",
+  "r0": "warp true 1923,-1394,0",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "49.2"
+ },
+ {
+  "n": "25_north_hills",
+  "r0": "warp true -2494,1349,3",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "32.4"
+ },
+ {
+  "n": "26_far_ne",
+  "r0": "warp true -4404,3243,1",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "35.8"
+ },
+ {
+  "n": "27_junction_a",
+  "r0": "warp true -815,-1061,0",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "33.0"
+ },
+ {
+  "n": "28_junction_b",
+  "r0": "warp true 185,-355,2",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "36.3"
+ },
+ {
+  "n": "29_junction_c",
+  "r0": "warp true 3111,-1765,2",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "21.6"
+ },
+ {
+  "n": "30_foot_car",
+  "r0": "📍 No clear pavement nearby · drive on and try again",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "27.9"
+ },
+ {
+  "n": "31_foot_bench",
+  "r0": "📍 BENCH · walk up, tap the button (PC: E)",
+  "met": {
+   "st": "roam",
+   "foot": "walk",
+   "carDy": 0,
+   "footDy": 0,
+   "footInWall": false,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "44.2"
+ },
+ {
+  "n": "32_foot_mission",
+  "r0": "📍 MISSION GIVER · walk up, tap the button (PC: E)",
+  "met": {
+   "st": "roam",
+   "foot": "walk",
+   "carDy": 0,
+   "footDy": 0,
+   "footInWall": false,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "36.4"
+ },
+ {
+  "n": "33_foot_npc_plaka",
+  "r0": "📍 No clear pavement nearby · drive on and try again",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "35.9"
+ },
+ {
+  "n": "34_foot_traffic_big",
+  "r0": "beside traffic hw=0.45 hd=1.04 dy=0.00",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "36.5"
+ },
+ {
+  "n": "35_foot_traffic_near",
+  "r0": "beside traffic hw=0.45 hd=1.04 dy=0.00",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "33.4"
+ },
+ {
+  "n": "36_exit_truck",
+  "r0": "📍 No clear pavement nearby · drive on and try again",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "43.3"
+ },
+ {
+  "n": "37_exit_bus",
+  "r0": "📍 No clear pavement nearby · drive on and try again",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "51.9"
+ },
+ {
+  "n": "38_exit_hotrod",
+  "r0": "📍 No clear pavement nearby · drive on and try again",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    -133.39,
+    -133.34,
+    -133.36,
+    -133.29
+   ],
+   "cars": []
+  },
+  "s": "40.9"
+ },
+ {
+  "n": "39_exit_ladder",
+  "r0": "📍 No clear pavement nearby · drive on and try again",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "53.4"
+ },
+ {
+  "n": "40_drive_bus",
+  "r0": "warp true 1800,-1681,1",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    -133.42,
+    -133.38,
+    -133.34,
+    -133.28
+   ],
+   "cars": []
+  },
+  "s": "48.7"
+ },
+ {
+  "n": "41_boat_pireas",
+  "r0": "warp true -1330,-906,1",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    -133.39,
+    -133.34,
+    -133.36,
+    -133.29
+   ],
+   "cars": []
+  },
+  "s": "48.1"
+ },
+ {
+  "n": "42_prop_tree_952_-1666",
+  "r0": "raw true",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "43.2"
+ },
+ {
+  "n": "43_prop_bush_1362_-126",
+  "r0": "raw true",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "41.1"
+ },
+ {
+  "n": "44_prop_bench_-153_-348",
+  "r0": "raw true",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "38.3"
+ },
+ {
+  "n": "45_prop_tree_-3005_2068",
+  "r0": "raw true",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "43.8"
+ },
+ {
+  "n": "46_prop_lamp_1492_-718",
+  "r0": "raw true",
+  "met": {
+   "st": "roam",
+   "foot": "car",
+   "carDy": 0,
+   "tyre": [
+    0.03,
+    0.03,
+    0.03,
+    0.03
+   ],
+   "cars": []
+  },
+  "s": "42.9"
+ }
+]
