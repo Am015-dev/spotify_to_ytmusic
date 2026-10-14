@@ -21,6 +21,11 @@ Night / FL night: back to Neutral, spec 1.
 `info` = draw calls/tris of one composer frame, one 852×393 shot per city. Boots `?test=<city>&q=<tier>&draw=0` (q param added to 98tq).
 Swiftshader only here: ~4 s/frame, Athens high boot up to ~5 min; never run more than 2 in parallel (timeouts). Frame time is not measurable in this container.
 
+## Results (4485d0a, tools/tGfx.js)
+12/12 PASS (gfx-sun/shadow/plastic × fra/ath × high/med), 0 console errors. Shots: docs/shots/gfx/s2_before_after.jpg, s2_fra.jpg, s2_ath.jpg.
+Perf (draw calls/frame, gfx=0 → 1): high fra 742→843, high ath 545→624, med ath 447→536 (+0.4 M shadow tris). GTAO (?ao=1) +~720 calls: opt-in only.
+Stock addons: RoomEnvironment+PMREM, GTAOPass (three 0.164.1). CSM/Sky not used: CSM needs setupMaterial on every material (collides with LK_inject), mood sky shader drives env.
+
 ## Open
 - Flip default on after reviewer look; perf on a real iPhone (med adds a 1024 shadow pass: +~16 % draw calls, +25 % tris at high).
 - Next: cheap contact AO at facade bottoms, height fog/aerial perspective, warm grade preset, per-building variation (art-2 owns fill/props).
