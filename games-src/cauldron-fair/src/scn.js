@@ -117,4 +117,16 @@
       { kind: 'fn', name: 'rules + settings panels: text size', fn: function () { var bad = []; ['rulesd', 'setd'].forEach(function (id) { try { GX.show(id); } catch (e) { return; } var el = document.getElementById(id) || document.querySelector('.gx-drawer.on,.drawer.on'); if (el) minFont(el).forEach(function (m) { bad.push(id + ' ' + m); }); try { GX.close(); } catch (e) { } }); return uiBad(bad); } }
     ]
   });
+
+  GXS.add({
+    id: 'cf-start', name: 'UI bar 7: start screen', ask: 'One big Play button, small options below?', seed: 5, when: booted, group: 'UI',
+    setup: function () { try { GXH.setEnabled(false); } catch (e) { } try { GX.close(); } catch (e) { } UI.sv = 'title'; renderStart(); return new Promise(function (r) { setTimeout(r, 600); }); },
+    checks: [
+      { kind: 'fn', name: 'exactly one big primary button', fn: function () { var n = document.querySelectorAll('#start .tbtn'); return n.length === 2 - (firstTime() ? 0 : 1) || n.length + ' big buttons'; } },
+      { kind: 'fn', name: 'Continue only when a save exists', fn: function () { var c = !!document.querySelector('#start [data-a=loadsave]'); return c === !!hasSave() || 'Continue ' + c + ' but save ' + hasSave(); } },
+      { kind: 'fn', name: 'no character roster on the start screen', fn: function () { return !document.querySelector('#start .dcard,#start #roster') || 'roster shown'; } },
+      { kind: 'fn', name: 'start buttons at least 44 px tall', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('#start button'), function (b) { if (b.getBoundingClientRect().height < 44) bad.push(b.textContent.slice(0, 12)); }); return uiBad(bad); } },
+      { kind: 'fn', name: 'start text >= 13 px phone / 16 px wide', fn: function () { return uiBad(minFont(document.getElementById('start'))); } }
+    ]
+  });
 })();

@@ -57,6 +57,14 @@
    "mut": 0
   },
   {
+   "id": "cf-start",
+   "name": "UI bar 7: start screen",
+   "ask": "One big Play button, small options below?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
    "id": "story-scene",
    "name": "Story scene: speech bubble",
    "ask": "Is the speech bubble clean, with no sideways bar?",

@@ -1,6 +1,27 @@
 [
  {
   "date": "2026-10-14",
+  "game": "cauldron-fair",
+  "title": "start screen: one Play button, small options",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Icon buttons and buttons keep their content inside the frame art; one instruction line on the board",
+   "menu"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu",
+   "menu",
+   "cf-ui"
+  ],
+  "ask": [
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "hollowbough",
   "title": "simple start screen, 5 top-bar buttons, readable on wide screens",
   "items": [
@@ -65,27 +86,6 @@
    "menu"
   ],
   "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "cauldron-fair",
-  "title": "top bar, text sizes and panels on every screen size",
-  "items": [
-   "Menus use one title font and one body font, no overlaps",
-   "Icon buttons and buttons keep their content inside the frame art; one instruction line on the board",
-   "menu"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu",
-   "menu",
-   "cf-ui"
-  ],
-  "ask": [
-   null,
-   null,
    null
   ]
  },
