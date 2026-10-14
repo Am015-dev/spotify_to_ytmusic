@@ -10,6 +10,9 @@ html.sk .big.go,html.sk .btn.go,html.sk .chip.go,html.sk .btn.on,html.sk .chip.o
 html.sk .big.blue,html.sk .btn.blue{border-image-source:url(media/ui-button-power-c.webp);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
 html.sk .chip.on{border-image-source:url(media/ui-button-power-c.webp)}
 html.sk .chip.x{color:var(--sk-ink);text-shadow:none;border-image-source:url(media/ui-button-cream-c.webp)}
+/* the painted plates hide the background, but contrast checkers read it: a matching flat colour under each light-on-paint button */
+html.sk .big.go,html.sk .btn.go,html.sk .chip.go,html.sk .btn.on{background-color:#c4480a;background-clip:content-box}
+html.sk .big.blue,html.sk .btn.blue,html.sk .chip.on{background-color:#2457b8;background-clip:content-box}
 html.sk .big:active,html.sk .btn:active,html.sk .chip:active{transform:translateY(2px);box-shadow:none}
 html.sk .btn:hover{background:none}
 html.sk .btn[disabled],html.sk .btn.dis{opacity:.5}
@@ -69,6 +72,7 @@ html.sk-key .gxc-node.boss .gxc-disc,html.sk-key .gxc-node.boss.a2 .gxc-disc,htm
 @media (prefers-reduced-motion:reduce){html.sk-spark .spark{animation:none}}
 /* wide tap-rows (Tutorial) sit on the painted strip; border widths unchanged, only the paint changes */
 html.sk .btn.gxt-menu{border-image:url(media/ui-row-c.webp) 30 fill/12px 12px 12px 7px stretch;text-align:center;color:#f6efdc;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+html.sk .btn.gxt-menu{background-color:#4a3018;background-clip:content-box}
 html.sk .btn.gxt-menu>*{color:inherit;text-shadow:inherit}
 /* painted speech tail replaces the coach bubble's diamond arrow (art points right; rotated to face the target) */
 html.sk .gxh-arr{pointer-events:none;width:20px;height:14px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:rotate(0deg)}

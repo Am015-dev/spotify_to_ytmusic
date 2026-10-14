@@ -401,6 +401,8 @@ em.sure,em.roll{font-style:normal;font-size:.75rem;padding:0 6px;border-radius:9
 .online{margin:12px 0 4px;padding:10px 12px;border:1px solid #b99f67;border-radius:10px;background:rgba(255,250,240,.6)}
 .online summary{cursor:pointer;font:1.05rem var(--title);color:#5a4320;list-style-position:inside}
 .online .netrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.online:not([open])>:not(summary){display:none}
+body:has(.gxc:not([hidden])) .gx-bar{visibility:hidden}
 .online input,.invrow input{flex:1 1 150px;min-width:0;min-height:38px;padding:6px 10px;border:1px solid #b99f67;border-radius:8px;background:#fffaf0;color:#2a2014;font:inherit}
 .online .code,.lobby .code{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.08em;background:#fff3d6;border:1px solid #d9bf85;border-radius:6px;padding:1px 6px}
 .lobby .invrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}

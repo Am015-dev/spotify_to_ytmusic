@@ -28,12 +28,12 @@ html.sk #hinfo .big{color:#2a3a14;font-size:1.35rem;padding:20px 54px;background
 html.sk #htile{border-radius:6px}
 html.sk #htile .rot{right:-1px;bottom:-1px;width:34px;height:34px;border-radius:0;background:url(media/ui-rotate-btn.webp) center/contain no-repeat;font-size:0;color:transparent;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
 /* buttons: terracotta / cream pills */
-html.sk .btn,html.sk #hskip{border-style:solid;border-color:transparent;border-image:url(media/ui-button-go-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));display:inline-flex;align-items:center}
-html.sk .btn.alt{border-image-source:url(media/ui-button-cream-c.webp);color:#3a2410;text-shadow:none}
+html.sk .btn,html.sk #hskip{border-style:solid;border-color:transparent;border-image:url(media/ui-button-go-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:#b5532f padding-box;box-shadow:none;color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));display:inline-flex;align-items:center}
+html.sk .btn.alt{border-image-source:url(media/ui-button-cream-c.webp);color:#3a2410;text-shadow:none;background-color:#f3e3c3}
 html.sk .btn:active,html.sk #hskip:active{transform:translateY(2px)}
 html.sk #hskip.hintspot{filter:drop-shadow(0 0 6px #ffd24a) drop-shadow(0 0 3px #ffd24a)}
-html.sk .opt{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 20px stretch;border-radius:0;background:none;color:#3a2410;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
-html.sk .opt[aria-pressed=true]{border-image-source:url(media/ui-button-power-c.webp);color:#f6ffe6;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .opt{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 20px stretch;border-radius:0;background:#f3e3c3 padding-box;color:#3a2410;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}
+html.sk .opt[aria-pressed=true]{background:#2f6a22 padding-box;border-image-source:url(media/ui-button-power-c.webp);color:#f6ffe6;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 /* panels: stone-cornered frame around a plain parchment centre (the painted centre of the panel is a map, so no 'fill') */
 html.sk .card,html.sk .menu,html.sk .gx-drawer,html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100/34px stretch;border-radius:0;background:var(--paper) padding-box;background-clip:padding-box;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a2410}
 html.sk .card{max-width:392px}
@@ -47,3 +47,6 @@ html.sk .card h1,html.sk .card h2{color:#8e3a1c}
 .endart{position:relative}
 html.sk .endart.win::after{content:'';position:absolute;right:6px;bottom:4px;width:64px;height:64px;background:url(media/ui-trophy.webp) center/contain no-repeat;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6))}
 html.sk .card[aria-label=Result] h2,html.sk .gxc-res h2{background:url(media/ui-ribbon.webp) center/100% 100% no-repeat;padding:20px 44px;color:#2a3a14;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+/* the top-bar menu opens over the title: hide the title card under it so no button sits covered */
+body:has(#menu) #modal .scrim:has(.card[aria-label=Start]){visibility:hidden}
+html.sk .gxc-btn.go{background:#b5532f padding-box}
