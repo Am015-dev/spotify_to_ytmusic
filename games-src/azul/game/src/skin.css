@@ -1,12 +1,12 @@
 
 /* ===== Sunglaze skin (facelift): painted kit over the shell (gx-skin.css does bar, drawers, icon buttons); this file holds the game's own buttons and dialogs ===== */
 html.sk{--sk-ink:#3a1a0a;--sk-cream:#3a1a0a}
-html.sk .btn:not(.sm):not(.ghost):not(.on){border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#3a1a0a;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .btn:not(.sm):not(.ghost):not(.on){border-width:14px 22px;padding:0;border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#3a1a0a;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .btn.go:not(.sm){border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn.cob:not(.sm){border-image-source:url(media/ui-button-power-c.webp);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .btn:not(.sm):active{transform:translateY(2px)}
 html.sk .btn:disabled{opacity:.55}
-html.sk .mbox{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a1a0a}
+html.sk .mbox,html.sk.ph .mbox{background:none;border-width:34px;padding:0;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a1a0a}
 /* the tile-strip bar and drawer strips are busy: a cream veil keeps the labels readable */
 html.sk .gx-bar{background:linear-gradient(rgba(255,246,226,.84),rgba(255,246,226,.84)),url(media/ui-topbar.webp) left center/auto 100% repeat-x #f3e3c4;color:#3a1a0a}
 html.sk .gx-bar h1,html.sk .gx-bar .gx-ibtn,html.sk .gx-bar .gx-ibtn span{color:#3a1a0a;text-shadow:none}
@@ -33,3 +33,5 @@ html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
 /* settings rows: the painted glazed strip behind each row (overlay, no size change) */
 html.sk-row .gx-row{position:relative;isolation:isolate}
 html.sk-row .gx-row::before{content:'';position:absolute;inset:0 -4px 0 -10px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
+
+html.sk .sg-hero,html.sk.ph .sg-hero{margin:0;border-radius:0}
