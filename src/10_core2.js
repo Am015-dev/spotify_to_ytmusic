@@ -1,5 +1,5 @@
 const OD_CHANGELOG=[
-  {v:'v90m-beta.24',date:'14 Oct 2026',items:[{t:'NEW',s:'Hills and horizon ridges around both cities (terrain on); more kerb grass.'},{t:'CHANGED',s:'Extra builder race tracks hidden for now.'}]},
+  {v:'v90m-beta.25',date:'14 Oct 2026',items:[{t:'NEW',s:'Hills and horizon ridges around both cities (terrain on); more kerb grass.'},{t:'CHANGED',s:'Extra builder race tracks hidden for now.'}]},
   {v:'v90m-beta.23',date:'14 Oct 2026',items:[{t:'NEW',s:'Two-level city: 4th race track (viaduct over the inner loop, lake splash shortcut).'}]},
   {v:'v90m-beta.22',date:'14 Oct 2026',items:[{t:'CHANGED',s:'Athens loads faster again (road shelf cell bound).'}]},
   {v:'v90m-beta.21',date:'14 Oct 2026',items:[{t:'NEW',s:'Race menu: NEW LAGOON SPLASH builder track; Canyon Split loop no longer overlaps itself.'},{t:'CHANGED',s:'Athens loads faster (shelf height cache, ground dedupe).'}]},
