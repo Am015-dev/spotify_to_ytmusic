@@ -756,6 +756,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.38',date:'14 Oct 2026',items:[{t:'FIXED',s:'Fewer props on roads; parked tyres sit exactly on the ground; NPC lanes stay clear.'}]},
   {v:'v90m-beta.37',date:'14 Oct 2026',items:[{t:'FIXED',s:'Parked cars no longer sink into the ground; sitting on benches fits the seat.'}]},
   {v:'v90m-beta.36',date:'14 Oct 2026',items:[{t:'CHANGED',s:'Two-level city race track has its own layout: downtown ring, viaduct over the lake, kicker shortcut.'}]},
   {v:'v90m-beta.35',date:'14 Oct 2026',items:[{t:'NEW',s:'Builder race tracks are back in the Race menu, with countdown, rival cars and results.'},{t:'NEW',s:'Bug button in the pause menu: report a problem with a screenshot and the spot.'}]},
@@ -1522,7 +1523,7 @@ function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c
 // XCV = chunk name -> content hash, filled by tools/build.sh (empty in a raw src/ page: then nothing is lazy). A chunk may export top-level names
 // (module list "name:a,b" in src/LAZY): the page declares `let a,b;` stubs, the chunk's last expression is ({a,b}) and XC.apply[name] copies them over.
 // Eager code must not touch a chunk's names at boot; use XC.done / XC_need(name) first. Tests: __tq.ready also waits for XC.done.
-const XCV=/*XCV*/{"99c_checklist":"d8c63442","10c_qtc_blob":"ae0cc0af","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"7a595a76","10c_qtc_blob":"ae0cc0af","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -14526,8 +14527,8 @@ function OF_settle(){const C=OF.car;if(!C||!C.own||!pl||!pl.mesh||(pl.boatK||0)>
   {const ud=pl.mesh.userData,f=new THREE.Vector3(Math.sin(C.h),0,Math.cos(C.h)),u=new THREE.Vector3(0,1,0);ud.m.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(new THREE.Vector3().crossVectors(f,u),u,f.clone().negate()))}
   // real wheels (userData.r) when the ride has them: wheels back to rest height, pitch/roll from the ground under each tyre, lowest tyre bottom CR_TYRE_Y above the road, then each wheel drops/rises ≤ 4 cm onto the road (box corners only as a fallback)
   const ud=pl.mesh.userData,W=[];ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let v=true,q=w;while(q&&q!==ud.m){if(!q.visible)v=false;q=q.parent}if(v)W.push(w)});
-  // the tyre bottom is the wheel mesh's real world box (its geometry is not always centred on its origin: the Hot Rod's tyres hung 14 cm below origin − r·scale, so the old centre-minus-radius settle sank them into the road)
-  const tyre=()=>{pl.mesh.updateMatrixWorld(true);return W.map(w=>{const b=OF_wbx.setFromObject(w),p=b.getCenter(new THREE.Vector3()),sc=w.getWorldScale(new THREE.Vector3()).y,g=groundAt(p.x,p.z,b.min.y+1);return{w,p,sc,g,d:b.min.y-g}})};
+  // the tyre bottom is the wheel mesh's PRECISE world box (vertex-based: the default Box3 is the AABB of the rotated geometry box and reads up to 40 % too deep on a spun wheel)
+  const tyre=()=>{pl.mesh.updateMatrixWorld(true);return W.map(w=>{const b=OF_wbx.setFromObject(w,true),p=b.getCenter(new THREE.Vector3()),sc=w.getWorldScale(new THREE.Vector3()).y,g=groundAt(p.x,p.z,b.min.y+1);return{w,p,sc,g,d:b.min.y-g}})};
   if(W.length>=3){for(const w of W){if(w.userData.by!=null)w.position.y=w.userData.by}let T=tyre();const fx=Math.sin(C.h),fz=Math.cos(C.h);
    const lf=t=>(t.p.x-C.x)*fx+(t.p.z-C.z)*fz,ls=t=>(t.p.x-C.x)*fz-(t.p.z-C.z)*fx,F=T.filter(t=>lf(t)>0),Bk=T.filter(t=>lf(t)<=0),L=T.filter(t=>ls(t)>0),R=T.filter(t=>ls(t)<=0),av=(A,f)=>A.reduce((a,t)=>a+f(t),0)/A.length,gy=t=>t.g;// the road under each tyre (was p.y−d = road + tyre radius: bigger rear wheels pitched the parked car nose-down)
    
@@ -14542,7 +14543,7 @@ OF_exit=(f=>function(){const r=f.apply(this,arguments);OF.stT=0;OF_settle();setT
 // park check (v90k/park-sit): visible tyres' bottom − road, body (non-wheel) bottom − road at the 8 CR_bodyPts, and the car's pitch/roll minus the road's slope under it (degrees)
 function OF_parkChk(){if(!pl||!pl.mesh)return null;const ud=pl.mesh.userData;pl.mesh.updateMatrixWorld(true);const A=new THREE.Vector3(),S=new THREE.Vector3(),W=[];
   ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let v=true,q=w;while(q&&q!==ud.m){if(!q.visible)v=false;q=q.parent}if(v)W.push(w)});
-  const tyre=W.map(w=>{const b=OF_wbx.setFromObject(w);b.getCenter(A);return +(b.min.y-groundAt(A.x,A.z,b.min.y+1)).toFixed(3)});// real tyre bottom = the wheel mesh's world box (origin − r·scale was 14 cm off on the Hot Rod)
+  const tyre=W.map(w=>{const b=OF_wbx.setFromObject(w,true);b.getCenter(A);return +(b.min.y-groundAt(A.x,A.z,b.min.y+1)).toFixed(3)});// real tyre bottom = the wheel mesh's world box (origin − r·scale was 14 cm off on the Hot Rod)
   CR_PS.k='';let body=9;for(const p of CR_bodyPts(ud)){A.copy(p).applyMatrix4(ud.m.matrixWorld);body=Math.min(body,A.y-groundAt(A.x,A.z,A.y+1.5))}
   const C=OF.car||{x:RO.x,z:RO.z,h:RO.h,y:RO.y},h=C.h,fx=Math.sin(h),fz=Math.cos(h),g=(a,b)=>groundAt(C.x+fx*a+fz*b,C.z+fz*a-fx*b,(C.y||0)+1.5);
   const f=new THREE.Vector3(fx,0,fz),r=new THREE.Vector3(fz,0,-fx),up=new THREE.Vector3(0,1,0).applyQuaternion(ud.m.getWorldQuaternion(new THREE.Quaternion())),D=180/Math.PI;
@@ -14767,7 +14768,7 @@ document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.cl
 // ---- sink audit (cam-2, 2026-10-14; Alex beta.25: the yellow semi cab and the dark-blue Hot Rod sat half under the asphalt after he stepped out in Hot Drop).
 // OF_sinkChk = the parked ride vs the road under every tyre: each real wheel mesh's WORLD BOX bottom (not origin − radius: the geometry is not centred on the origin) and the body box corners; gap > 0 = float, < 0 = sunk (m).
 function OF_sinkChk(){if(!pl||!pl.mesh)return null;const ud=pl.mesh.userData,W=[];ud.m.traverse(w=>{if(!w.isMesh||!w.userData.r)return;for(let q=w;q&&q!==ud.m;q=q.parent)if(!q.visible)return;W.push(w)});pl.mesh.updateMatrixWorld(true);
-  const g=[];for(const w of W){const b=new THREE.Box3().setFromObject(w),c=b.getCenter(new THREE.Vector3());g.push(b.min.y-groundAt(c.x,c.z,b.min.y+1))}
+  const g=[];for(const w of W){const b=new THREE.Box3().setFromObject(w,true),c=b.getCenter(new THREE.Vector3());g.push(b.min.y-groundAt(c.x,c.z,b.min.y+1))}
   const P=OF_corners(),c=P?P.map(p=>p.y-groundAt(p.x,p.z,p.y+1)):[],mx=a=>a.length?+Math.max(...a).toFixed(3):null,mn=a=>a.length?+Math.min(...a).toFixed(3):null;
   return{nW:W.length,wMax:mx(g),wMin:mn(g),cMax:mx(c),cMin:mn(c)}}
 const OF_sinkOk=r=>!r.err&&(r.wMax==null||(r.wMax<=.05&&r.wMin>=-.03))&&(r.cMin==null||r.cMin>=-.03)&&(r.nW>0||r.cMax!=null);
@@ -14875,6 +14876,8 @@ function LF_geos(){const g={};
  {const P=[];for(let i=0;i<=6;i++){const r=i/6,k=1-r*r;P.push(new THREE.Vector2(r,k*k))}P.reverse();const d=new THREE.LatheGeometry(P,12).toNonIndexed();d.translate(0,-.02,0);g.mound=colorize(d,new THREE.Color('#ffffff'));g.mound.computeVertexNormals()}
  return g}
 function LF_free(x,z,m){if(roamHit(x,z,m)||inRiver(x,z,-m))return false;const q=cityAt(x,z);if(q&&q.d<q.road.w/2+m)return false;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+m)return false;const a=abAt(x,z);return !(a&&a.d<a.road.w/2+m)&&trailDist(x,z)>=m}
+// every fill piece keeps m metres off the asphalt (street, filler road, Autobahn) and off bridge decks; true = too close (coordinator: bushes on road)
+function LF_offRoad(x,z,m){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+m)return true;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+m)return true;const a=abAt(x,z);return !!(a&&a.d<a.road.w/2+m)||onAnyDeck(x,z)}
 // lite cover needs no collider margin: road / river / Autobahn / trail clearance only (quay walls and plaza edges block LF_free's roamHit(5))
 function LF_liteOk(x,z){if(inRiver(x,z,-3.5))return false;const q=cityAt(x,z);if(q&&q.d<q.road.w/2+3.5)return false;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+3.5)return false;const a=abAt(x,z);return !(a&&a.d<a.road.w/2+6)&&trailDist(x,z)>=3.5}
 // ---- streamed: the fill is NOT built at boot (Athens boot was +5-7 s). Each 1 km tile of the city box is a LAZY region (60_city_build4 lzReg):
@@ -14906,8 +14909,8 @@ function LF_fit(L,p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,y0=p
 function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=CID==='fra',[X0,X1,Z0,Z1]=L.rect,I={tuft:[],bed:[],patch:[],pond:[],reed:[],mound:[]},st=LF.st;
  const has=t=>!!D[t],pk=a=>{const b=a.filter(has);return b.length?b[Math.floor(LF_h(a.length,b.length,L.props.length)*b.length)]:null},{TREES,ROCK,GRN,DIRT}=C;
  const gy=(x,z)=>groundY(x,z)+LF_mound(x,z),G16=(x,z)=>{const k=Math.floor(x/16)*10000+Math.floor(z/16),e=[x,z];let A=LF.G.get(k);if(!A)LF.G.set(k,A=[]);A.push(e);L.lfG.push([k,e])};
- const P=(t,x,z,ry,y)=>{if(!t||!has(t))return;const m=LF_mound(x,z);L.props.push([t,x,z,ry==null?LF_h(x,z,99)*6.28:ry,m>0?groundY(x,z)+m:y]);G16(x,z);st.props=(st.props||0)+1};
- const di=(t,x,z,ry,sx,sy,sz,c,y)=>{I[t].push({x,y:y==null?gy(x,z):y,z,ry,sx,sy,sz,c});st.n=(st.n||0)+1;if(t!=='tuft'&&t!=='patch'&&t!=='mound')G16(x,z)};
+ const P=(t,x,z,ry,y)=>{if(!t||!has(t)||LF_offRoad(x,z,2.5))return;const m=LF_mound(x,z);L.props.push([t,x,z,ry==null?LF_h(x,z,99)*6.28:ry,m>0?groundY(x,z)+m:y]);G16(x,z);st.props=(st.props||0)+1};
+ const di=(t,x,z,ry,sx,sy,sz,c,y)=>{if(t!=='mound'&&LF_offRoad(x,z,t==='patch'||t==='pond'?Math.max(sx,sz)*.9+.5:t==='bed'?2.6:1.2))return;I[t].push({x,y:y==null?gy(x,z):y,z,ry,sx,sy,sz,c});st.n=(st.n||0)+1;if(t!=='tuft'&&t!=='patch'&&t!=='mound')G16(x,z)};
  let t0=performance.now();const slice=()=>performance.now()-t0>1.2;
  // 1 · open cells of this tile
  const cs=40,cells=[],lite=[];for(let x=X0+cs/2;x<X1;x+=cs){for(let z=Z0+cs/2;z<Z1;z+=cs){if(x<HX0+cs||x>HX1-cs||z<HZS+cs||z>HZN-cs)continue;const jx=x+(LF_h(x,z,1)-.5)*10,jz=z+(LF_h(x,z,2)-.5)*10;
@@ -14992,6 +14995,15 @@ function LF_goSpot(id){const s=LF.SP[id];if(!s)return'no spot '+id;if(s.c!==CID)
  setTimeout(()=>{const m=LF_metrics(s);m.green=LF_green();m.id=id;m.pass=LF.pass(m);LF.last=m;try{say('',(m.pass?'✅ PASS':'❌ FAIL')+` · flat green ${m.green}% · ${m.props50} props ≤50 m · hills ${m.hRange} m`,4)}catch(e){}},2500);
  return'📍 '+s.n.toUpperCase()+' · measuring in 2.5 s'}
 Object.assign(window.__lvf,{goSpot:LF_goSpot,green:LF_green,SP:LF.SP});
+// road-clear check (coordinator 2026-10-14 "bushes on road"): every fill piece (decor instances + fill props) within r m of (cx,cz) that stands on a
+// road surface (street, filler road, Autobahn, bridge deck: inside the asphalt edge + 0.5 m). Pass = 0.
+function LF_onRoad(x,z){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+.5)return'street';const f=fillAt(x,z);if(f&&f.d<f.r.w/2+.5)return'filler';const a=abAt(x,z);if(a&&a.d<a.road.w/2+.5)return'autobahn';return onAnyDeck(x,z)?'deck':''}
+function LF_roadCheck(cx,cz,r){const M4=new THREE.Matrix4(),P=new THREE.Vector3(),bad=[];let n=0;const chk=(x,z,t)=>{if((x-cx)**2+(z-cz)**2>r*r)return;n++;const w=LF_onRoad(x,z);if(w)bad.push([t,Math.round(x),Math.round(z),w])};
+  for(const m of LF.ms||[]){if(!m.parent)continue;const t=m.userData.lf;if(t==='mound')continue;for(let i=0;i<m.count;i++){m.getMatrixAt(i,M4);P.setFromMatrixPosition(M4);chk(P.x,P.z,t)}}
+  for(const L of(typeof LAZY!=='undefined'?LAZY:[]))if(L.lf&&L.done)for(const p of L.props||[])chk(p[1],p[2],p[0]);return{n,bad:bad.length,ex:bad.slice(0,6)}}
+function LF_goRoad(){const s=LF.SP[CID==='fra'?'fra-2':'ath-1'];LF_go(s);LF_ensure(s.x,s.z,900);LF.lastR=null;setTimeout(()=>{const m=LF_roadCheck(RO.x,RO.z,900);m.pass=m.bad===0&&m.n>500;LF.lastR=m;
+  try{say('',(m.pass?'✅ PASS':'❌ FAIL')+` · ${m.bad} fill pieces on a road (of ${m.n} within 900 m)`,4)}catch(e){}},1500);return'📍 FILL OFF THE ROADS · checking 900 m around'}
+Object.assign(window.__lvf,{roadCheck:LF_roadCheck,goRoad:LF_goRoad});
 // mound GO: the nearest grass hill with a clear 50 m run-up (no building, road edge or water on the line); the car is parked 40 m before its centre
 // facing it. You (or the test) drive at it: PASS = the car climbs ≥ 60% of the hill's height, passes within r/3 of the top and never stalls (< 2 m/s after 1.5 s of gas).
 function LF_goMound(){LF_ensure(RO.x,RO.z,900);let best=null,bd=1e18;for(const m of LF.M){const d=(m.x-RO.x)**2+(m.z-RO.z)**2;if(d>=bd)continue;for(let k=0;k<8;k++){const a=k*Math.PI/4,sx=m.x-Math.sin(a)*(m.r+40),sz=m.z-Math.cos(a)*(m.r+40);let ok=true;
@@ -15094,6 +15106,54 @@ function BV_life(){if(!BV.on||BV.L||/[?&]bvl=0\b/.test(location.search))return;B
   for(const[,a]of I){const n=a.length/8,im=new THREE.InstancedMesh(g,m,n);for(let i=0;i<n;i++){const o=i*8;Q.setFromAxisAngle(Y,a[o+3]);M4.compose(Pv.set(a[o],a[o+1],a[o+2]),Q,S.set(a[o+4],a[o+5],a[o+6]));im.setMatrixAt(i,M4);im.setColorAt(i,Co.setHex(a[o+7]))}
     im.computeBoundingSphere();im.userData.bvL=1;im.userData.cd=500;HUB.grp.add(im)}BV.st={life:BV.L.length,meshes:I.size}}
 buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{BV_life()}catch(e){console.warn('BV life',e)}return r})(buildHubProps);
+// ===== RV14 (rev-1 bug hunter, 2026-10-14): checklist GO + auto checks for the bugs found in the beta.27 teleport sweep (qa_rv1/).
+// RV14_go(kind,say) is called from the GO map in 99c_checklist.js (items tagged rv:2026-10-14). say(t) updates the GO message later (async checks).
+// Every check returns a one-line verdict with ✅ / ❌ so tools/tChkGo.js can score it.
+function RV14_vis(id){const e=typeof id==='string'?document.getElementById(id):id;if(!e)return null;const r=e.getBoundingClientRect(),cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity===0||r.width<2||r.height<2)return null;return r}
+function RV14_ovl(a,b){if(!a||!b)return 0;const w=Math.min(a.right,b.right)-Math.max(a.left,b.left),h=Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top);return w>1&&h>1?Math.round(w*h):0}
+// screen rect of the player's ride (8 corners of its world box projected)
+function RV14_carBox(){try{const m=pl.mesh;m.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(m),v=new THREE.Vector3();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(let i=0;i<8;i++){v.set(i&1?b.max.x:b.min.x,i&2?b.max.y:b.min.y,i&4?b.max.z:b.min.z).project(camera);const x=(v.x+1)/2*innerWidth,y=(1-v.y)/2*innerHeight;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
+  y1=y0+(y1-y0)*.8;/* bottom 20 %: shadow + contact patches, not body */return{left:x0,right:x1,top:y0,bottom:y1,width:x1-x0,height:y1-y0,L:Math.max(b.max.x-b.min.x,b.max.z-b.min.z)}}catch(e){return null}}
+function RV14_mark(kind,id,nth){const L=RO.marks.filter(m=>m.kind===kind&&(!id||(m.ev&&m.ev.id===id)));return L[nth||0]}
+function RV14_near(m,d){const h=m.h!=null?m.h:0,q=rfSnap(m.x-Math.sin(h)*d,m.z-Math.cos(h)*d,80);roamWarp(q?q[0]:m.x,q?q[1]:m.z,q&&q[2]!=null?q[2]:h);camSnap=true}
+function RV14_start(kind,id,nth){const m=RV14_mark(kind,id,nth);if(!m)return false;RV14_near(m,10);roamOpen(m);setTimeout(()=>{try{roamGo()}catch(e){}},250);return true}
+function RV14_ride(id,cb){try{gbOpen();GAR_select(id)}catch(e){return cb('ride '+id+': '+e)}let n=0;const w=()=>{if((typeof LDL==='undefined'||!LDL.wait.size)||++n>60){try{gbClose(true)}catch(e){}setTimeout(()=>cb(null),1200)}else setTimeout(w,100)};setTimeout(w,200)}
+function RV14_pairs(P){const bad=[];for(const[a,b]of P){const A=a==='CAR'?RV14_carBox():RV14_vis(a),B=b==='CAR'?RV14_carBox():RV14_vis(b),o=RV14_ovl(A,B),lim=(a==='CAR'||b==='CAR')?.5*Math.min(A?A.width*A.height:1e9,B?B.width*B.height:1e9):40;if(o>lim)bad.push(a+'×'+b+' '+o+'px²')}return bad}
+function RV14_go(kind,say){
+ const P=innerHeight>innerWidth?'portrait':'landscape',ok=b=>b?' ✅':' ❌';
+ if(kind==='card'){const m=RV14_mark('quest','q_ball');if(!m)return'📍 no Giant Ball marker ❌';RV14_near(m,14);roamOpen(m);RO.cardPin=1;
+  setTimeout(()=>{const c=document.getElementById('roamCard');if(!RV14_vis(c))return say('📍 GIANT BALL CARD ('+P+') did not open ❌');constbt=['rcGo','rcNo'].map(RV14_vis),bad=[];let narrow=0;
+   for(const e of c.querySelectorAll('*')){if(e.id==='rcGo'||e.id==='rcNo'||e.closest('#rcGo,#rcNo'))continue;if(!e.childNodes.length||![...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim().length>2))continue;const r=RV14_vis(e);if(!r)continue;
+    for(const b of bt)if(RV14_ovl(r,b)>40)bad.push((e.textContent||'').trim().slice(0,14));if((e.textContent||'').trim().length>40&&r.width<150)narrow++}
+   say('📍 GIANT BALL CARD ('+P+') · buttons over text: '+bad.length+(bad[0]?' ("'+bad[0]+'")':'')+' · narrow text blocks (<150 px): '+narrow+ok(!bad.length&&!narrow))},700);
+  return'📍 GIANT BALL CARD · checking…'}
+ if(kind==='hud'){if(!RV14_start('quest','m1_hotdrop'))return'📍 no Hot Drop marker ❌';
+  const sk=setInterval(()=>{try{__tq&&__tq.skip&&__tq.skip()}catch(e){}},200);setTimeout(()=>{clearInterval(sk);if(!RV14_vis('roamGauge'))return say('📍 HOT DROP HUD ('+P+') · driving HUD not on screen (cutscene?) ❌');const bad=RV14_pairs([['raceW','tP'],['b2kM','tL'],['b2kM','tR'],['npcSay','roamMini'],['roamArrow','roamMini'],['rgSpd','CAR']]);
+   say('📍 HOT DROP HUD ('+P+') · overlaps: '+(bad.join(' · ')||'none')+ok(!bad.length))},3500);return'📍 HOT DROP HUD · checking…'}
+ if(kind==='race'){if(!RV14_start('rival',null,0))return'📍 no rival marker ❌';
+  setTimeout(()=>{const bad=RV14_pairs([['hPos','spd'],['pos','spd'],['hTime','tP']]),bx=new THREE.Box3().setFromObject(pl.mesh),inside=bx.containsPoint(camera.position);
+   say('📍 RIVAL RACE START ('+P+') · overlaps: '+(bad.join(' · ')||'none')+' · camera inside the car: '+(inside?'yes':'no')+ok(!bad.length&&!inside))},4000);return'📍 RIVAL RACE · checking…'}
+ if(kind==='garage'){gbOpen();setTimeout(()=>{const d=RV14_vis('ogArea');let root=null;for(const e of document.querySelectorAll('button,div'))if(/SHOWROOM/.test(e.textContent||'')&&RV14_vis(e)){root=e}while(root&&root.parentElement&&getComputedStyle(root).position!=='fixed')root=root.parentElement;
+   let min=99,tiny=0;if(root)for(const e of root.querySelectorAll('*')){if(![...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim().length>1)||!RV14_vis(e))continue;const f=parseFloat(getComputedStyle(e).fontSize);min=Math.min(min,f);if(f<9)tiny++}
+   say('📍 GARAGE ('+P+') · text blocks under 9 px: '+tiny+' (smallest '+min.toFixed(0)+' px) · district chip: '+(d?'visible over the garage':'hidden')+ok(!tiny&&!d))},1500);return'📍 GARAGE · checking…'}
+ if(kind==='cam'){const L=['rod','t_bus','rod','t_truck'],res=[];let i=0;
+  const next=()=>{if(i>=L.length){const d0=res[0].d,good=res[1].d>=1.3*d0&&res[2].d>=.8*d0&&res[2].d<=1.2*d0&&res[3].d>=1.3*d0;RV14_ride('rod',()=>{});say('📍 RIDE SWITCH CAMERA · camera distance: '+res.map(r=>r.id+' '+r.d.toFixed(1)+' m').join(' · ')+' (bus/truck ≥ 1.3× hot rod, hot rod again ±20 %)'+ok(good));return}
+   const id=L[i++];RV14_ride(id,err=>{if(err){res.push({id,d:0});return next()}res.push({id,d:camera.position.distanceTo(pl.mesh.position)});next()})};next();return'📍 RIDE SWITCH CAMERA · switching hot rod → bus → hot rod → truck…'}
+ if(kind==='median'){const q=rfSnap(704,605,80);roamWarp(q[0],q[1],q[2]);camSnap=true;const c=cityAt(RO.x,RO.z),lat=c?Math.abs(c.lat):99,w=c?c.S.r.w:0;
+  return'📍 RESPAWN ON ANLAGENRING (road '+w+' m) · car '+lat.toFixed(1)+' m from the centre line (min 2.5: in a lane, not on the green median)'+ok(lat>=2.5||w<24)}
+ if(kind==='tilt'){const S=[[6500,4000,'Königstein road'],[3250,5850,'Kurpark Bad Homburg']],res=[];let i=0;
+  const next=()=>{if(i>=S.length){const bad=res.filter(r=>!r.ok);say('📍 HILL SPAWNS · '+res.map(r=>r.t).join(' · ')+ok(!bad.length));return}
+   const[x,z,n]=S[i++],q=rfSnap(x,z,150);roamWarp(q?q[0]:x,q?q[1]:z,q&&q[2]!=null?q[2]:0);camSnap=true;
+   setTimeout(()=>{let k=null;try{k=OF_parkChk()}catch(e){}const up=new THREE.Vector3(0,1,0).applyQuaternion(pl.mesh.getWorldQuaternion(new THREE.Quaternion())),tilt=Math.acos(Math.min(1,up.y))*180/Math.PI,gap=k?Math.max(...k.tyre.map(Math.abs)):9;
+    res.push({ok:tilt<15&&gap<=.05,t:n+' tilt '+tilt.toFixed(0)+'° tyre gap '+gap.toFixed(2)+' m'});next()},1500)};next();return'📍 HILL SPAWNS · checking…'}
+ if(kind==='filo'){const q=rfSnap(2200,-2600,150);roamWarp(q?q[0]:2200,q?q[1]:-2600,q&&q[2]!=null?q[2]:0);camSnap=true;
+  setTimeout(()=>{const inCar=!!SC_hit(RO.x,RO.z,RO.y),c=camera.position,inCam=!!roamHit(c.x,c.z,.3,c.y);say('📍 FILOPAPPOU ROAD · car inside a building: '+(inCar?'yes':'no')+' · camera inside a building: '+(inCam?'yes':'no')+ok(!inCar&&!inCam))},1200);return'📍 FILOPAPPOU ROAD · checking…'}
+ if(kind==='athfoot'){try{__tq&&__tq.reset&&__tq.reset()}catch(e){}const r=OF_go('car');return r+(/No clear|first/i.test(r)?' ❌ (GO cannot get out at the Athens start, Eleni\'s garage)':' ✅')}
+ if(kind==='fest'){const m=RO.marks.find(q=>q.ev&&(q.ev.id==='e_fest'||/Festival/.test(q.ev.name||'')));if(!m)return'📍 Festival Delivery marker not on the map yet (visual check skipped)';RV14_near(m,10);roamOpen(m);setTimeout(()=>{try{roamGo()}catch(e){}},250);
+  return'📍 FESTIVAL DELIVERY START · look 10-20 m ahead-left: no flat plain-brown box standing on the road and no black square on the asphalt (visual check)'}
+ if(kind==='black'){roamWarp(706,564,Math.PI,true);camSnap=true;return'📍 ZEIL WEST (706,564) · look right: every building facade has windows/texture, no wall renders pure black (visual check)'}
+ return'📍 unknown rv14 kind '+kind+' ❌'}
 
 // ===== RF (race fun, 2026-10-09): Alex "we have functionalities but the races are boring". Reference: LEGO 2K Drive rival race
 // (docs/race_ref, docs/RACE_PLAN.md). Measured before (tRace, phone): the player started on POLE and led ~75 % of the race alone,
