@@ -1,6 +1,27 @@
 [
  {
   "date": "2026-10-14",
+  "game": "crown-city-smash",
+  "title": "readable on every screen size",
+  "items": [
+   "Buying a card, SMASH, rolling and ending the turn are now tested with real taps; energy chip fixed on small phones",
+   "Painted button and dialog frames keep text inside them",
+   "One instruction line on the board"
+  ],
+  "check": "Tap a card twice: energy drops by its cost",
+  "scn": [
+   "cc-market",
+   "menu",
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "short-fuse",
   "title": "short-fuse: readable on every screen size",
   "items": [
@@ -43,27 +64,6 @@
    "menu"
   ],
   "ask": [
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "crown-city-smash",
-  "title": "Menus: clean and readable",
-  "items": [
-   "Buying a card, SMASH, rolling and ending the turn are now tested with real taps; energy chip fixed on small phones",
-   "Painted button and dialog frames keep text inside them",
-   "One instruction line on the board"
-  ],
-  "check": "Tap a card twice: energy drops by its cost",
-  "scn": [
-   "cc-market",
-   "menu",
-   null
-  ],
-  "ask": [
-   null,
    null,
    null
   ]
