@@ -75,11 +75,11 @@ async function daemon(){
  const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-accelerated-2d-canvas']});
  const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});
  const P={};const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works while/i;
- const boot=(c,q)=>{const o=P[c]||(P[c]={c,errs:[],nav:0});o.up=0;if(q!==undefined)o.q=q;o.ready=(async()=>{if(o.p)await o.p.close().catch(()=>{});const p=o.p=await ctx.newPage();p.setDefaultTimeout(120000);
+ const boot=(c,q)=>{const o=P[c]||(P[c]={c,errs:[],nav:0});o.up=0;if(q!==undefined)o.q=q;o.ready=(async()=>{if(o.p)await o.p.close().catch(()=>{});const p=o.p=await ctx.newPage();p.setDefaultTimeout(240000);
    p.on('pageerror',e=>o.errs.push(String(e).slice(0,240)));p.on('console',m=>{if(m.type()==='error')o.errs.push('console: '+m.text().slice(0,240))});p.on('framenavigated',f=>{if(f===p.mainFrame()){o.nav++;o.snap={...LAST}}});
-   const t=Date.now();await p.goto(`http://127.0.0.1:${PORT}/hot.html?test=${c==='gym'?'fra':c}&draw=0${o.q?'&'+o.q:''}`);await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:120000});
+   const t=Date.now();await p.goto(`http://127.0.0.1:${PORT}/hot.html?test=${c==='gym'?'fra':c}&draw=0${o.q?'&'+o.q:''}`);await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:240000});
    o.boot=(Date.now()-t)/1000;o.nav=0;o.up=1;console.log(`BOOT ${c} ${o.boot.toFixed(1)} s`);return p})();o.ready.catch(e=>console.log('BOOT FAIL '+c+' '+e));return o.ready};
- const page=async c=>{if(!P[c])boot(c);const p=await P[c].ready;if(P[c].nav){await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:120000});P[c].nav=0}return p};
+ const page=async c=>{if(!P[c])boot(c);const p=await P[c].ready;if(P[c].nav){await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:240000});P[c].nav=0}return p};
  const errsSince=(o,n)=>o.errs.slice(n);
  const H={
   async status(){return Object.values(P).map(o=>`${o.c}: ${o.up?'up':'booting'} boot ${o.boot?o.boot.toFixed(1)+' s':'…'} errors ${o.errs.length}`).join('\n')||'no pages'},
