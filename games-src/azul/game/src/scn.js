@@ -98,4 +98,30 @@
       { kind: 'fn', name: 'settings row strip painted', fn: function () { var c = getComputedStyle(document.querySelector('#artdrawer .gx-row'), '::before'); return (c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0) || 'ui-row-c not painted'; } }
     ]
   });
+
+  // UI-BAR rules 4-8 that the shared menu test cannot see (14 Oct 2026)
+  var vis = function (e) { if (e.closest && e.closest('details:not([open])') && !e.matches('summary')) return false; var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 0 && r.height > 0 && c.visibility !== 'hidden' && c.display !== 'none'; };
+  var minFont = function (root, lim) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || e.children.length || !vis(e) || !/\S/.test(e.textContent)) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < lim - .01) bad = (e.className || e.tagName) + ' ' + f + 'px'; }); return bad || true; };
+  var lim = function () { return innerWidth >= 1024 ? 16 : 13; };
+  GXS.add({
+    id: 'ui-bar', name: 'UI bar: top bar, dock, images', ask: 'Few buttons, one line, readable text?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { return idle(300); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 4: top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'rule 5: one instruction line of 8 words or fewer', fn: function () { if (ph()) return true; var t = (document.getElementById('dockt') || {}).textContent || ''; return words(t) <= 8 || 'dock line has ' + words(t) + ' words'; } },
+      { kind: 'fn', name: 'rule 1: dock text at least 13/16 px', fn: function () { return ph() ? true : minFont('.gx-dock', lim()); } },
+      { kind: 'fn', name: 'rule 6: dock has no empty parchment', fn: function () { if (ph()) return true; var d = $('.gx-dock'), b = $('#dockbody'); return d.scrollHeight - d.clientHeight <= 2 || 'dock overflows'; } },
+      { kind: 'fn', name: 'rule 8: images keep their natural aspect', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (m) { if (bad || !vis(m) || !m.naturalWidth) return; var a = m.naturalWidth / m.naturalHeight, b = m.clientWidth / m.clientHeight, cs = getComputedStyle(m).objectFit; if (cs === 'fill' && Math.abs(a / b - 1) > .04) bad = (m.src || '').slice(-30); }); return bad || true; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-start', name: 'UI bar: start screen', ask: 'One big Begin button, simple options?', seed: 5, when: booted,
+    setup: function () { try { GX.close(); } catch (e) { } UI.modal = 'start'; render(); return idle(600); },
+    checks: [
+      { kind: 'fn', name: 'rule 7: exactly one primary button', fn: function () { var n = [].filter.call(document.querySelectorAll('#modal .bigb'), vis).length; return n === 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'rule 7: no character roster', fn: function () { return ![].some.call(document.querySelectorAll('#modal .seat'), vis) || 'roster visible'; } },
+      { kind: 'fn', name: 'rule 1: start text at least 13/16 px', fn: function () { return minFont('#modal', lim()); } },
+      { kind: 'fn', name: 'rule 7: start fits without scrolling', fn: function () { var m = $('#modal .mbox'); return m.scrollHeight - m.clientHeight <= 2 || 'start card scrolls'; } }
+    ]
+  });
 })();
