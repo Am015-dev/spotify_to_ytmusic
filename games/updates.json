@@ -16,6 +16,21 @@
  },
  {
   "date": "2026-10-14",
+  "game": "hollowbough",
+  "title": "Menu and board cleanup",
+  "items": [
+   "Board tip bubble no longer covers cards and counts; the caption line says it"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "sands-of-qamar",
   "title": "Menus tidied",
   "items": [
