@@ -189,6 +189,30 @@
    "mut": 1
   },
   {
+   "id": "dk-menu-rows",
+   "name": "Menu rows: text clear of the painted frame",
+   "ask": "Do menu rows read cleanly?",
+   "sizes": "phone",
+   "group": "UI",
+   "mut": 3
+  },
+  {
+   "id": "dk-hand-names",
+   "name": "Hand card names readable",
+   "ask": "Can you read every card name?",
+   "sizes": "phone",
+   "group": "Board",
+   "mut": 1
+  },
+  {
+   "id": "dk-gear-up",
+   "name": "Gear-up board: badges whole, one instruction",
+   "ask": "One clear line, nothing cut off?",
+   "sizes": "phone",
+   "group": "Board",
+   "mut": 3
+  },
+  {
    "id": "dk-status-line",
    "name": "Short drag/tap status line",
    "ask": "Is the line short and does it match?",
