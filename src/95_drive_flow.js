@@ -36,7 +36,9 @@ function DR_keep(t,x,z,TC){if(DR.solid.length&&DR_inSolid(x,z,1))return false;if
   if(t==='lamp')return e>=.5;
   if(/^(tree|tree2|tree3|CE_cypress|CE_pine|CE_olive)$/.test(t)&&e>=.6){const k=Math.floor(x/26)*100000+Math.floor(z/26);if(TC.has(k))return false;TC.add(k);return true}
   return false}
-function DR_inSolid(x,z,m=0){for(const b of DR.solid)if(x>b.x0-m&&x<b.x1+m&&z>b.z0-m&&z<b.z1+m)return true;return false}
+// terr-3 (Athens boot: 2.4 s scanning every solid block per prop): 64 m grid over the blocks (margin 2 m), rebuilt when DR.solid is replaced
+function DR_inSolid(x,z,m=0){const S=DR.solid;let L=S;if(m<=2){if(DR._sg!==S){DR._sg=S;const G=DR._g=new Map();for(const b of S)for(let i=Math.floor((b.x0-2)/64);i<=Math.floor((b.x1+2)/64);i++)for(let j=Math.floor((b.z0-2)/64);j<=Math.floor((b.z1+2)/64);j++){const k=i*100000+j;let A=G.get(k);if(!A)G.set(k,A=[]);A.push(b)}}
+  L=DR._g.get(Math.floor(x/64)*100000+Math.floor(z/64));if(!L)return false}for(const b of L)if(x>b.x0-m&&x<b.x1+m&&z>b.z0-m&&z<b.z1+m)return true;return false}
 // solid blocks: Frankfurt = 'resid' filler blocks; Athens = 16 m raster of deep interiors (>= 22 m from every street edge)
 function DR_solidBuild(){const R=[],lm=(x,z,m)=>LMX.some(L=>Math.hypot(L.x-x,L.z-z)<(L.r||30)+m)||(HUB.garage&&Math.hypot(HUB.garage.x-x,HUB.garage.z-z)<70)||(HUB.gates||[]).some(g=>Math.hypot(g.x-x,g.z-z)<60)||(RO.ramps||[]).some(q=>Math.hypot(q.x-x,q.z-z)<50);
   const free=(x,z)=>!inRiver(x,z,-6)&&!onAnyDeck(x,z)&&!(PARKS.some(P=>inR(P,x,z,4))||PLAZAS.some(P=>inR(P,x,z,4)));

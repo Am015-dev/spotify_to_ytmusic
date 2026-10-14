@@ -395,8 +395,11 @@ function TR_bldFix(){const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
   for(const b of B){b.trBot=b.trMin;if(b.trY===1e9){b.trOff=0;continue}const base=Math.max(b.trMin,b.trMax-.8),lo=b.trY<Math.max(b.trMin-1,.3)&&b.trMin>-1&&base>.05;if(lo){b.trOff=base;
       b.h+=base;b.y0=b.y0!=null?b.y0+base:b.trMin-1;b.trBase=b.trY+base;b.trDoor=base}else{const up=b.trMin>-1?base-b.trY:0;b.trOff=up>.05&&up<6?up:0;if(b.trOff){b.h+=up;if(b.y0!=null)b.y0+=up}b.trBase=b.trY+b.trOff;b.trDoor=b.trBase}
     if(b.trBase>b.trMin+.06){TR_PL.push(b);b.trBot=b.trMin-.4}else b.trBot=Math.min(b.trBase,b.trMin)}
-  for(const o of meshes){let ch=false;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
-    const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){const b=find(p[i],p[i+2],1.6);if(!b||!b.trOff)continue;
+  // terr-3 (Athens boot): pass 2 looks up the full grid only near a lifted building (C2 holds those alone; same result)
+  const C2=new Map();for(const b of B){if(!b.trOff)continue;const R=Math.hypot(b.hw,b.hd)+1.8;for(let i=Math.floor((b.x-R)/CS);i<=Math.floor((b.x+R)/CS);i++)for(let j=Math.floor((b.z-R)/CS);j<=Math.floor((b.z+R)/CS);j++)C2.set(K(i,j),1)}
+  const near=(x,z)=>C2.has(K(Math.floor(x/CS),Math.floor(z/CS)));
+  if(C2.size)for(const o of meshes){let ch=false;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);if(!near(_p.x,_p.z))continue;const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
+    const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){if(!near(p[i],p[i+2]))continue;const b=find(p[i],p[i+2],1.6);if(!b||!b.trOff)continue;
       const core=find(p[i],p[i+2],.4)===b;if(!core){const gv=groundY(p[i],p[i+2]);if(p[i+1]>gv-.15&&p[i+1]<gv+.35)continue}p[i+1]+=b.trOff;ch=true}
     if(ch){A.needsUpdate=true;o.geometry.computeBoundingSphere();o.geometry.computeBoundingBox()}}
   // plinths: 4 stone sides per lifted/floating building, merged per 800 m tile
