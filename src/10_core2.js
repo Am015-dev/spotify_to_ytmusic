@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.28',date:'14 Oct 2026',items:[{t:'NEW',s:'More life in the streets: pedestrians, smashables and popups (?life=0 turns off).'}]},
   {v:'v90m-beta.27',date:'14 Oct 2026',items:[{t:'NEW',s:'More variety in building shapes and colours across both cities.'}]},
   {v:'v90m-beta.26',date:'14 Oct 2026',items:[{t:'FIXED',s:'Builder-track car no longer sticks on the rail or drives backwards.'}]},
   {v:'v90m-beta.25',date:'14 Oct 2026',items:[{t:'NEW',s:'Hills and horizon ridges around both cities (terrain on); more kerb grass.'},{t:'CHANGED',s:'Extra builder race tracks hidden for now.'}]},
