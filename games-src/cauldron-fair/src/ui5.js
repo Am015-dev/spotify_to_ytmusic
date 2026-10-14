@@ -122,8 +122,10 @@ function titleEl() {
     h('div', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Cauldron Fair')), h('p.tag', 'Brew bold. Stop wise.')),
     h('div.tbtns',
       firstTime() ? tutNode('tbtn go') : null,
-      h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
+      h('button.tbtn' + (firstTime() ? '' : '.go'), { 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
+      h('div.tseg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (optObj().np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': optObj().np === v ? 'true' : 'false' }, String(v)))),
       h('div.tsec',
+        h('button.tsb', { 'data-a': 'play', type: 'button' }, 'More options'),
         h('button.tsb', { 'data-a': 'story', type: 'button' }, '\u2728 Story'),
         h('button.tsb', { 'data-a': 'online', type: 'button' }, 'Online'),
         sv ? h('button.tsb', { 'data-a': 'loadsave', type: 'button' }, 'Continue') : null))));
