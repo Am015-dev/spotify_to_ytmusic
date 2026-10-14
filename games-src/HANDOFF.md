@@ -325,3 +325,12 @@ Results so far: only **sunglaze @ phone 390x763** (earlier spec version). All ot
 
 sunglaze B worst 3: board/title floating score "−2/−3/−1" 3.06:1 `div.bf-fl>b.bf-c>span`; campaign node numbers "8","2","5" 1.0:1 against their disc `div.gxc-path>button.gxc-node>span.gxc-disc`; campaign "Act 1 · Wet Clay" 1.79:1 `div.gxc-path>div.gxc-act>b`.
 sunglaze E (likely partly false positives, unchecked): "Saffron/Obsidian/Cobalt" `div.bf-table>div.bf-k>i.bf-t` (board tiles exposed as buttons on the title; tap does nothing); the "covered" ones in the campaign list were modal-hidden buttons, now skipped by the spec.
+## STOP 14 Oct 09:27 UTC (owner: "wrap up everything and deploy, make workers write down what they found and stop them")
+Last live times (UTC, games/<slug>/index.html): rampart 08:59, short-fuse 08:56, tidewake 08:56, nebula 09:01, final-approach 09:03, hollowbough 09:05, thornbound 09:05, kaiten 09:07, doorkick 09:10, crown 09:11, cauldron 09:15, shipwreck 09:15, lantern 09:20, sands 09:20, sunglaze 09:20.
+Open faults found by the owner (rampart and lantern workers report these fixed and deployed after 09:20, NOT independently verified; check against the list):
+- rampart-and-vine (1920 wide, Menu drawer): row panel art starts ~30px in and cuts the labels; menu text 11-12px; Tips On/Off + Reset tips oval chips in another style; score chips "You 0 ★5" ~10px with icons over numbers; tiles ~90px in a 1900px table, "Place your tile" ~11px; full-width hand tray with one small tile.
+- lantern-dive (1920 wide): underwater background stretched/upscaled (blurry); seat names, "Same as Commander", "Exactly two Lanterns", "Lanterns", top-bar labels, status line all 9-11px; cards ~90px, hand card cut at bottom.
+- sunglaze: see "Sunglaze stop 14 Oct" (Guide button dead, black untextured tile on Olive's rack, 3D board labels 6-9px, scoring note cut at board edge, table ~60% of screen height, title pale on pale bar).
+- crown: start screen still 2 big buttons + Customise; tablet dock covers "IN DOWNTOWN"/"0 cards" (kot/art.js:146).
+- shipwreck: castaway choice (who/human-computer) removed from the start screen; restore under More ways to play.
+- all: per-game worker reports above ("rules pass") were NOT independently verified; see "Independent UI audit (14 Oct)" for the partial checker.
