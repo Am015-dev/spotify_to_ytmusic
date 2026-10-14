@@ -42,7 +42,11 @@ function GFX_gspec(m){if(m.userData.gfxSpec)return;m.userData.gfxSpec=1;const ob
  m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);sh.uniforms.uGfxSp=GFX.U;sh.fragmentShader=sh.fragmentShader.replace('void main() {','uniform float uGfxSp;\nvoid main() {').replace('#include <lights_fragment_end>','#include <lights_fragment_end>\nreflectedLight.directSpecular*=uGfxSp;')};
  m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|gfxg'};m.needsUpdate=true}
 // ground (meshes that never cast): matte. Grass/pavement at roughness .55 caught the low sun as a white sheen across Frankfurt
-function GFX_plastic(root){let k=0;root.traverse(o=>{if(!o.isMesh)return;if(!o.castShadow){for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m)||!m.isMeshStandardMaterial||m.isMeshPhysicalMaterial||m.transparent||m.roughness>=.85)continue;
+// ground = never casts, or mostly up-facing triangles (>= 85 % of sampled normals): Frankfurt's merged grass/pavement/road plates DO cast and
+// carry kerbs (bbox > .5 m), so neither "casts" nor a flat bbox found them; at roughness .4 they lit up as a white sun sheen
+function GFX_flat(o){const g=o.geometry;if(!g||!g.attributes||!g.attributes.normal)return false;if(g.userData.gfxUp!==undefined)return g.userData.gfxUp;
+ const N=g.attributes.normal,n=N.count,st=Math.max(1,Math.floor(n/400));let up=0,k=0;for(let i=0;i<n;i+=st){k++;if(N.getY(i)>.9)up++}return g.userData.gfxUp=k>0&&up/k>=.85}
+function GFX_plastic(root){let k=0;root.traverse(o=>{if(!o.isMesh)return;if(!o.castShadow||GFX_flat(o)){for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m)||!m.isMeshStandardMaterial||m.isMeshPhysicalMaterial||m.transparent||m.roughness>=.85)continue;
     GFX.mats.add(m);m.userData.gfx0=[m.roughness,m.envMapIntensity];m.roughness=.88;GFX_gspec(m);GFX.gm.push(m)}return}
   for(const m of[].concat(o.material)){if(!m||GFX.mats.has(m))continue;if(GFX.gm.includes(m))continue;GFX.mats.add(m);
   if(!m.isMeshStandardMaterial||m.transparent||m.metalness>.3)continue;m.userData.gfx0=[m.roughness,m.envMapIntensity];
@@ -67,6 +71,6 @@ function GFX_set(on){GFX.on=!!on;try{store.set('mho_gfx',on?1:0)}catch(e){}if(on
 function GFX_shChk(){const sh=moonL.shadow;if(!sh.map||!pl)return null;const W=sh.mapSize.x,px=new Uint8Array(4),v=new THREE.Vector3(),rd=p=>{v.copy(p).applyMatrix4(sh.matrix);
   const x=Math.round(v.x*W),y=Math.round(v.y*W);if(x<0||y<0||x>=W||y>=W)return null;renderer.readRenderTargetPixels(sh.map,x,y,1,1,px);return+(px[0]/255/16777216+px[1]/255/65536+px[2]/255/256+px[3]/255).toFixed(4)};
  const c=new THREE.Vector3(RO.x,RO.y+1,RO.z),s=new THREE.Vector3(RO.x+Math.cos(RO.h)*12,RO.y,RO.z-Math.sin(RO.h)*12);return{car:rd(c),road:rd(s)}}
-window.__gfx={get GFX(){return GFX},set:GFX_set,shChk:GFX_shChk,state(){const sh=moonL.shadow;return{on:GFX.on,day:GFX.day,tier:GFX.tier,tone:renderer.toneMapping===THREE.ACESFilmicToneMapping?'ACES':renderer.toneMapping,
+window.__gfx={render:()=>composer.render(),get GFX(){return GFX},set:GFX_set,shChk:GFX_shChk,state(){const sh=moonL.shadow;return{on:GFX.on,day:GFX.day,tier:GFX.tier,tone:renderer.toneMapping===THREE.ACESFilmicToneMapping?'ACES':renderer.toneMapping,
  exp:renderer.toneMappingExposure,shadowMap:renderer.shadowMap.enabled,sunCast:moonL.castShadow,map:sh.mapSize.x,ext:sh.camera.right,sunEl:+(Math.asin(moonL.position.clone().sub(moonL.target.position).normalize().y)*57.3).toFixed(1),
  hemi:hemi.intensity,env:scene.environmentIntensity,plEnv:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.envMapIntensity,0)/GFX.pm.length).toFixed(2):0,plRough:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.roughness,0)/GFX.pm.length).toFixed(2):0,plMetal:GFX.pm.length?+Math.max(...GFX.pm.map(m=>m.metalness)).toFixed(2):0,plastic:GFX.n,cast:GFX.cast||0,fc:GFX.fc,carCast:pl&&pl.mesh?(()=>{let c=0,n=0;pl.mesh.traverse(o=>{if(o.isMesh){n++;if(o.castShadow)c++}});return c+'/'+n})():'no pl'}}};
