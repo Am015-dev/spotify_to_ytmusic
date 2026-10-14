@@ -137,5 +137,19 @@ const R=[];const MX={R,prof:'phone',ang,hud,frame(n){for(let i=0;i<(n||1);i++)fr
   try{OF_reset()}catch(e){}
   R.push({fam:'foot',tag:idx+'|'+prof+'|'+rid+'|'+(fails.length?q.map(x=>Math.round(x*10)/10).join(','):''),fails,info,ms:performance.now()-t0});return fails.length},
 
+ // ---------------- placed instances vs roads (props, trees, lite cover/fill) ----------------
+ propScan(){const bad={},tot={},ex={};const chk=(t,x,z)=>{tot[t]=(tot[t]||0)+1;const q=cityAt(x,z);if(!q)return;const hw=(q.S.r.w||8)/2;if(q.d<hw-.5){bad[t]=(bad[t]||0)+1;(ex[t]=ex[t]||[]).length<2&&ex[t].push([Math.round(x),Math.round(z),Math.round(q.d*10)/10,q.S.r.name||q.S.r.id])}};
+  try{LF_ensure(0,0,1e6)}catch(e){}
+  for(const p of HUB.props||[])if(p.alive!==false)chk('prop:'+p.t,p.x,p.z);
+  try{for(const L of LF.G.values())for(const p of L)chk('fill',p[0],p[1])}catch(e){}
+  const fails=[];for(const t in bad)fails.push('props-in-road:'+t);
+  R.push({fam:'props',tag:CID,fails,info:{bad,tot:Object.values(tot).reduce((a,b)=>a+b,0),ex},ms:0});return {bad,ex,n:Object.values(tot).reduce((a,b)=>a+b,0)}},
+ // ---------------- camera fit after a vehicle switch ----------------
+ camFit(rid){const fails=[];try{TOUCH.on=true;MX.frame(4);for(let i=0;i<30;i++)roamCam(.5);const P=CAM_prof();if(!P){fails.push('camfit-no-profile')}else{
+   const sol=CAM_solve(P,SET.rcam||'chase',camera.aspect),c=camera.position,d=Math.hypot(c.x-RO.x,c.z-RO.z),want=sol.b;
+   if(CAM.P&&Math.abs(CAM.P.L/P.L-1)>.12)fails.push('camfit-stale-profile');
+   if(Math.abs(d/want-1)>.35)fails.push('camfit-distance-not-matching-ride')}}catch(e){fails.push('camfit-crash:'+String(e).slice(0,60))}
+  R.push({fam:'camfit',tag:rid,fails,ms:0});return fails.length},
+
 };
 window.MX=MX;return 'MX ready'})()

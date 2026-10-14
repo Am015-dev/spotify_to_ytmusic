@@ -3,6 +3,7 @@
 const L=require('./lib.js');
 module.exports=async T=>{
  const THREE=await L.THREE();
+ if(!THREE){console.log('SKIP '+'lint_tracks.js'+': three.js missing: run  npm i three@0.164.1 --no-save  (node_modules is not tracked)');return}
  const ss=/bxSS=([^,;]+)[,;]/.exec(L.JSCODE());
  const pre='const bxSS='+ss[1]+';\nconst bxCl=(v,a,b)=>v<a?a:v>b?b:v;\n'+L.lineSrc('bxRamp')+'\n'+L.lineSrc('bxCurve')+'\n'+L.lineSrc('bxBowl')+'\n';
  const S=L.sandbox(['BXF','BXC','BXH','BXRW','fn:BX_exit','BX_P','BX_PAL','BX_PROF','BX_RAIL','bxRep','fn:bxCh','BX_WORLDS','BXN','BX_OFF'],{THREE},'',pre);

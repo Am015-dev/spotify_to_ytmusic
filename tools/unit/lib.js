@@ -50,5 +50,5 @@ function sandbox(names,globals,extraSrc,preSrc){const parts=preSrc?[preSrc]:[];
   const ctx=vm.createContext(Object.assign({Math,JSON,Map,Set,Array,Object,Number,isFinite,console,performance:{now:()=>0}},globals||{}));
   const out=names.map(n=>n.replace(/^fn:/,''));
   vm.runInContext(parts.join('\n')+'\n'+(extraSrc||'')+'\n__out={'+out.join(',')+'};',ctx,{timeout:5000});return Object.assign(ctx.__out,{ctx})}
-let THREEp=null;const THREE=()=>THREEp||(THREEp=import(require('url').pathToFileURL(path.join(ROOT,'node_modules/three/build/three.module.js')).href));
+let THREEp=null;const THREE=()=>THREEp||(THREEp=(fs.existsSync(path.join(ROOT,'node_modules/three/build/three.module.js'))?import(require('url').pathToFileURL(path.join(ROOT,'node_modules/three/build/three.module.js')).href):Promise.resolve(null)));
 module.exports={lineSrc,sandbox,THREE,ROOT,SRCD,SEED,ORDER,MODS,PAGE,JSCODE,constSrc,fnSrc,ev,bal,FRA,ATH,CHANGELOG,CHECKLIST,loadModels,modelsDir,rd,jsonBlock};
