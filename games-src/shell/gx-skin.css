@@ -41,7 +41,7 @@ html.sk .gxc-lab{font-size:13px;background:rgba(246,230,194,.94);color:#2a1d10}
 html.sk .gxc-node .gxc-stars{top:56px}
 html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
 html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
-html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:auto;min-height:46px;box-sizing:border-box;padding:3px 0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
 html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
 html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
