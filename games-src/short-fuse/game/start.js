@@ -86,7 +86,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.sel&&!GX.open){UI.sel=null;refresh()}});
 // ---------- boot ----------
 function boot(){GX.init({key:'sf'});paintIcons();loadSettings();
-  GX.onShow=id=>{sfx('open');if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML+GLOSS_HTML+'<h3>Credits</h3><p>Names, card text and art are original. <button class="btn small" data-gx="credd">Full credits</button></p>';if(id==='refd')renderRef();if(id==='musicd')renderMusic();if(id==='setd')renderSettings();if(G)renderOpenDrawer();else if(id==='logd'||id==='missiond'||id==='geard')$('#'+id+' .gx-drawer-body').innerHTML='<p>Start a job first.</p>'};
+  GX.onShow=id=>{sfx('open');if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML+GLOSS_HTML+'<h3>Credits</h3><p class="ctr"><button class="btn small" data-gx="credd">Full credits</button></p>';if(id==='refd')renderRef();if(id==='musicd')renderMusic();if(id==='setd')renderSettings();if(G)renderOpenDrawer();else if(id==='logd'||id==='missiond'||id==='geard')$('#'+id+' .gx-drawer-body').innerHTML='<p>Start a job first.</p>'};
   GX.onClose=()=>sfx('close');
   setInterval(clockTick,250);setInterval(()=>{if(G&&UI.started&&timedJob()&&!G.over){const p=document.querySelector('#timerpill span');if(p&&UI.V){const c=clockLeft(knowledge(Math.max(0,UI.V.seat)));if(c){p.textContent=fmt(c.left)+(UI.pause?' ⏸':'');const cl=p.parentNode;if(cl)cl.classList.toggle('low',c.real<30)}}}},1000);
   campInit();netInit();showStart();if(UI.netOpen)netRender()}

@@ -5,15 +5,33 @@
   "title": "readable on every screen size",
   "items": [
    "Menus use one title font and one body font, no overlaps",
-   "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art"
+   "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art",
+   "Start screen simplified, one Menu drawer in the top bar, bigger text and clear insets on every panel"
   ],
   "check": "Open Campaign: the three top buttons read cleanly",
   "scn": [
+   "menu",
    "menu",
    "menu"
   ],
   "ask": [
    null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "short-fuse",
+  "title": "short-fuse: readable on every screen size",
+  "items": [
+   "Menus, panels and start screen readable at all 5 sizes"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
    null
   ]
  },
@@ -142,15 +160,6 @@
    null,
    null
   ]
- },
- {
-  "date": "2026-10-14",
-  "game": "short-fuse",
-  "title": "Menus: painted buttons keep their art shape",
-  "items": [],
-  "check": "",
-  "scn": [],
-  "ask": []
  },
  {
   "date": "2026-10-14",
