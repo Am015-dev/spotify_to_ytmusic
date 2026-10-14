@@ -36,3 +36,7 @@ Flag default ON once tests pass. Before push: unit 0 FAIL + TAG=life1,xf1,terrai
 ## Test commands
 - Hot: `node tools/hot.js reboot fra simp=1` then `node tools/hot.js go simp/hit-fra1` etc.; numbers: `eval 'JSON.stringify(__simp.stat())'`.
 - Built page: `TAG=life1,xf1,terrain,ctb,simp tools/tGo.sh http://localhost:<port>/index.html <dir>` (simp items say PENDING while the flag is off).
+
+## At stop (coordinator order, 2026-10-14)
+- TAG=life1,xf1,terrain,ctb,simp on the built page (flag off): Athens 24/25, 0 errors (life1/ath-density, slowest at 12.2 s; probable SLOW limit, unconfirmed); Frankfurt result not read before the stop.
+- Bug report qzoepg321p56r0qbh200 (Athens 1724,131 "somanybuildinspointlss"): with ?simp=1 that spot is inside a park pocket (78 m from Acharnon): the interior blocks are gone, and the car can't drive onto that grass any more. GO: simp/far-ath, simp/hedge-ath.

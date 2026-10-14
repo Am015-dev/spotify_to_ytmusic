@@ -23,7 +23,7 @@ Hooks: `putK` + `athUnit` (60_city_build4), Athens `put` + interior pass (60_cit
 | boot to drivable (hot page) | 34.6 s | ~41 s (hot daemon) | 37.9 s | ~46 s (hot daemon) |
 
 Draw calls went UP: removing instances inside per-tile InstancedMeshes does not remove calls; the hedges (LBatch 1400 m tiles), pocket trees
-(1 InstancedMesh per 800 m hubTile × 3 kinds) and gap trees (props per type × tile) add calls. See HANDOFF_simp1.md "Next" for the plan.
+(1 InstancedMesh per 800 m hubTile × 3 kinds) and gap trees (props per type × tile) add calls. See HANDOFF_simplify1.md "Next" for the plan.
 
 ## Tests (src/99c_checklist.js, ver `simp`, 📍 GO; WIP: say PENDING while the flag is off)
 `simp/far-<c>`, `simp/solid-<c>`, `simp/gaps-<c>`, `simp/hedge-<c>`, `simp/walk-<c>`, `simp/hit-<c>1..5` (2 facades each, real gas), `simp/perf-<c>`; c = fra | ath.
