@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.48',date:'14 Oct 2026',items:[{t:'NEW',s:'Low-rise streets are lined with LEGO-set buildings on plinths.'}]},
   {v:'v90m-beta.47',date:'14 Oct 2026',items:[{t:'FIXED',s:'Sitting on a bench keeps you upright; the Hot Drop card closes when you park.'}]},
   {v:'v90m-beta.46',date:'14 Oct 2026',items:[{t:'FIXED',s:'The roam camera never dips under the terrain.'}]},
   {v:'v90m-beta.45',date:'14 Oct 2026',items:[{t:'FIXED',s:'Thiseio fountain water sits in its basin.'}]},
