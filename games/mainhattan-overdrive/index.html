@@ -756,6 +756,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.61',date:'14 Oct 2026',items:[{t:'FIXED',s:'Wind turbines stand only in open ground, not on pavements; fixed a rare crash; the on-foot camera no longer clips pavement props.'}]},
   {v:'v90m-beta.60',date:'14 Oct 2026',items:[{t:'NEW',s:'A bug button is always on screen; tap it to report a problem.'}]},
   {v:'v90m-beta.59',date:'14 Oct 2026',items:[{t:'NEW',s:'Race tracks are open: wide decks, flat verges, earth banks, kickers and route choices.'}]},
   {v:'v90m-beta.58',date:'14 Oct 2026',items:[{t:'FIXED',s:'Festival crates stay on the roof of your car after you change vehicle.'}]},
@@ -1545,7 +1546,7 @@ function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c
 // XCV = chunk name -> content hash, filled by tools/build.sh (empty in a raw src/ page: then nothing is lazy). A chunk may export top-level names
 // (module list "name:a,b" in src/LAZY): the page declares `let a,b;` stubs, the chunk's last expression is ({a,b}) and XC.apply[name] copies them over.
 // Eager code must not touch a chunk's names at boot; use XC.done / XC_need(name) first. Tests: __tq.ready also waits for XC.done.
-const XCV=/*XCV*/{"99c_checklist":"772b0d5d","10c_qtc_blob":"2b15c7a8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"46780ebf","10c_qtc_blob":"2b15c7a8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -6374,7 +6375,7 @@ async function SM_upload(a,b){if(!SM3.on||!HUB.grp||SM3.done)return;SM3.done=1;c
   HUB.grp.traverse(o=>{if(o.isMesh&&o.geometry)use.set(o.geometry,(use.get(o.geometry)||0)+1)});
   HUB.grp.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.isSkinnedMesh||o.userData.pw||!o.geometry||use.get(o.geometry)!==1)return;const g=o.geometry;
     if(g.morphAttributes&&Object.keys(g.morphAttributes).length)return;const P=g.attributes.position;if(!P||!P.array||P.isInterleavedBufferAttribute)return;L.push(g)});
-  const sc=new THREE.Scene(),mt=new THREE.MeshBasicMaterial(),rt=new THREE.WebGLRenderTarget(1,1),prev=renderer.getRenderTarget(),rel=function(){SM3.mb+=this.array.byteLength;this.array=null};
+  const sc=new THREE.Scene(),mt=new THREE.MeshBasicMaterial(),rt=new THREE.WebGLRenderTarget(1,1),prev=renderer.getRenderTarget(),rel=function(){SM3.mb+=this.array.byteLength;this.array=null;this.getX=this.getY=this.getZ=this.getW=BA_freed/* rev-3: a freed array made every CPU-side getY throw 'null (reading 1)' (Alex, beta.60) */};
   let t=performance.now(),i=0;
   try{while(i<L.length){const B=L.slice(i,i+120),dr=[];i+=B.length;
     for(const g of B){if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingBox)g.computeBoundingBox();for(const k in g.attributes)g.attributes[k].onUpload(rel);if(g.index)g.index.onUpload(rel);
@@ -13019,7 +13020,7 @@ function* WB_supMk(S,keep){const nt=S.nt,grp=S.grp;if(!nt){if(!keep)for(const c 
       if(keep&&performance.now()-ty>STR.sl){yield;ty=performance.now()}}
     rng.push([c,o0/3,(o-o0)/3,B]);for(let d=0;d<3;d++){if(B[d]<bx[d])bx[d]=B[d];if(B[d+3]>bx[d+3])bx[d+3]=B[d+3]}if(!keep){c.T=c.M=c.C=null}}
   if(keep)yield;
-  const A=[new THREE.BufferAttribute(p,3),new THREE.BufferAttribute(nn,3,true),new THREE.BufferAttribute(cc,3,true)];if(keep&&TUNE.strFree){const rel=function(){STR.st.relMB+=this.array.byteLength/1048576;this.array=null};for(const a of A)a.onUpload(rel)}
+  const A=[new THREE.BufferAttribute(p,3),new THREE.BufferAttribute(nn,3,true),new THREE.BufferAttribute(cc,3,true)];if(keep&&TUNE.strFree){const rel=function(){STR.st.relMB+=this.array.byteLength/1048576;this.array=null;this.getX=this.getY=this.getZ=this.getW=BA_freed/* rev-3: a freed array made every CPU-side getY throw 'null (reading 1)' (Alex, beta.60) */};for(const a of A)a.onUpload(rel)}
   const bs=B=>new THREE.Sphere(new THREE.Vector3((B[0]+B[3])/2,(B[1]+B[4])/2,(B[2]+B[5])/2),Math.hypot(B[3]-B[0],B[4]-B[1],B[5]-B[2])/2);  // v89b: bounds from the fill loop (a full rescan was the unsliced tail of a streamed build)
   const mk=(st,n,B)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',A[0]);g.setAttribute('normal',A[1]);g.setAttribute('color',A[2]);g.setDrawRange(st,n);g.boundingSphere=bs(B);
     const m=new THREE.Mesh(g,WBC.mat);m.matrixAutoUpdate=false;m.visible=false;m.userData.keep=1;m.userData.wbLod=1;m.raycast=()=>{};m.receiveShadow=false;m.castShadow=false;grp.add(m);return m};
@@ -13094,6 +13095,9 @@ function WB_icoPre(cam){WBI.h.length=0;if(WBI.m)WBI.m.visible=false;if(!TUNE.wbI
 function WB_icoPost(){for(const s of WBI.h)s.visible=true;WBI.h.length=0}
 {const ob=scene.onBeforeRender,oa=scene.onAfterRender;scene.onBeforeRender=function(...a){const r=ob.apply(this,a);try{if(a[2]&&a[2].isPerspectiveCamera)WB_icoPre(a[2])}catch(e){WB_icoPost();console.warn('WBI',e)}return r};
  scene.onAfterRender=function(...a){try{WB_icoPost()}catch(e){}return oa.apply(this,a)}}
+
+// rev-3: CPU-side reads of a GPU-uploaded (array freed) attribute return 0 instead of throwing
+function BA_freed(){return 0}
 // ===== STR (v89b): streaming. Owner: stream worker (alex/od-stream). =====
 // Measured live v89a: the JS heap after GC is flat (~140 MB Athens, ~75 MB Frankfurt) but geometry buffers grow from 68 → 222 MB (Athens) and
 // 114 → 215 MB (Frankfurt) in a tour, because the WB far city (2×2 "super cells", 54 B per far triangle, CPU copy + GPU copy) was built for the
@@ -14693,7 +14697,7 @@ function OF_cam(dt){if(OF.car&&pl)pl.mesh.position.set(OF.car.x,OF.car.py??OF.ca
   const fx=Math.sin(OF.cy),fz=Math.cos(OF.cy),hy=OF.y+OF_CAMH+Math.sin(OF.cp)*4.2;const PC=OF_cars(false).map(o=>OF_box(o.x,o.z,o.h,o.hw,o.hd));let back=4.5,carUp=0;for(let d=.3;d<=4.8;d+=.3){const x=OF.x-fx*d,z=OF.z-fz*d;if(roamHit(x,z,.35,hy)){back=Math.max(.25,d-.5);break}if(!carUp&&PC.some(b=>bHit(b,x,z,.3)))carUp=1}
   OF.camB=back<OF.camB?back:OF.camB+(back-OF.camB)*Math.min(1,dt*3);const cx=OF.x-fx*OF.camB,cz=OF.z-fz*OF.camB;
   OF.camU=(OF.camU||0)+((carUp?1.6:0)-(OF.camU||0))*Math.min(1,dt*4);const cyv=Math.max(hy+OF.camU,groundAt(cx,cz,hy)+.6);camera.position.set(cx,cyv,cz);{const la=2.5*clamp((OF.camB-.4)/3.6,0,1);camera.lookAt(OF.x+fx*la,OF.y+1.25-(1-la/2.5)*.4,OF.z+fz*la)};
-  if(roamHit(cx,cz,.3,cyv))OF.n.camIn++;camera.fov+=(pFov(TUNE.fov||62)-camera.fov)*Math.min(1,dt*4);camera.updateProjectionMatrix()}
+  if(roamHit(cx,cz,.3,cyv))OF.n.camIn++;camera.fov+=(pFov(TUNE.fov||62)-camera.fov)*Math.min(1,dt*4);/* rev-3 (Alex, beta.60): a bollard/statue block beside the walker cut into the lens at the bottom of the screen → near-clip grows with the camera distance (≤ 1.1 m), props closer than that are clipped, not shown as a pale slab */camera.near=clamp(OF.camB*.45,.4,1.1);camera.updateProjectionMatrix()}
 // parked cars stay parked while you walk (the lively-city parker would re-park them relative to the walker)
 if(typeof LV_parkStep==='function')LV_parkStep=(f=>function(){if(RO.foot&&RO.foot!=='car')return;return f.apply(this,arguments)})(LV_parkStep);
 // borrowed body: lift ud.m so its lowest tyre point sits CR_TYRE_Y above the road (same rule as CR_carPose for real wheels)
@@ -14743,7 +14747,7 @@ function OF_parkChk(){if(!pl||!pl.mesh)return null;const ud=pl.mesh.userData;pl.
 function OF_ogVis(on){try{if(typeof OG!=='undefined'&&OG.grp&&OG.grp.visible!==on)OG.grp.visible=on}catch(e){}}
 roamStep=(f=>function(dt){if(RO.foot&&RO.foot!=='car'){OF_ogVis(false);if(state==='roam'&&!RO.frozen){OF_step(dt);OF.stT=(OF.stT||0)+(dt||0);if(OF.stT>.25){OF.stT=0;OF_settle()}}return}
   OF_ogVis(true);const busy=TOUCH.gas||TOUCH.brake||K.ArrowUp||K.ArrowDown||K.KeyW||K.KeyS;OF.idle=busy||Math.abs(RO.v)>2.2?0:OF.idle+(dt||0);const r=f(dt);try{OF_lift()}catch(e){}try{OF_fleeStep(dt||0);OF_starStep(dt||0)}catch(e){if(!OF.e2){OF.e2=1;console.warn('OF flee',e)}}OF_dom();OF_btns();return r})(roamStep);
-roamCam=(f=>function(dt){if(RO.foot&&RO.foot!=='car')return OF_cam(dt);return f(dt)})(roamCam);
+roamCam=(f=>function(dt){if(RO.foot&&RO.foot!=='car')return OF_cam(dt);if(camera.near!==.4){camera.near=.4;camera.updateProjectionMatrix()}return f(dt)})(roamCam);
 // leaving roam (menu, district change, wreck reset) puts you back in the car
 function OF_reset(){OF_jackEnd();OF_fleeEnd();if(RO.foot==='car'&&!OF.car)return;try{if(OF.car)OF_poseCar(OF.car.x,OF.car.z,OF.car.y,OF.car.h)}catch(e){}OF.car=null;if(OF.fig)OF.fig.g.visible=false;RO.foot='car';try{if(OF.cur.own)OF_drv(pl&&pl.mesh,true)}catch(e){}OF_btns()}
 if(typeof exitRoam==='function')exitRoam=(f=>function(){OF_reset();return f.apply(this,arguments)})(exitRoam);
@@ -15454,6 +15458,15 @@ function RV16_bug(say){const b=document.getElementById('qaBugTop');if(!b||!windo
  let n=0;const iv=setInterval(()=>{const m=document.getElementById('qaMsg').textContent;if(m.indexOf('Sent')<0&&++n<40)return;clearInterval(iv);delete window.__qaDbMock;const rec=got[0]&&got[0][1],kb=rec&&rec.shot?Math.round(rec.shot.length*.75/1024):-1;
   const ok=!bad.length&&open&&got.length===1&&got[0][0]==='bugs'&&rec.note==='GO test report'&&rec.build&&rec.city&&/^http/.test(rec.repro)&&Array.isArray(rec.errors)&&Array.isArray(rec.bugs)&&kb>0&&kb<=150&&m.indexOf('Sent')>=0;
   document.getElementById('qaCancel').click();say('📍 BUG BUTTON · '+Math.round(r.width)+'×'+Math.round(r.height)+' px at '+Math.round(r.left)+','+Math.round(r.top)+(bad.length?' · '+bad.join(', '):' · clear of the controls')+' · sheet '+(open?'opens':'did NOT open')+' · SEND wrote '+got.length+' record to "bugs"'+(rec?' (shot '+kb+' KB, '+rec.errors.length+' errors, '+rec.bugs.length+' bugs)':'')+' · "'+m+'"'+(ok?' ✅':' ❌'))},150);return'📍 BUG BUTTON · tapping 🐞 → SEND…'}
+
+// rev-3 (Alex's first 🐞 report, Athens on foot @899.7,-1033): street turbine between apartment blocks, js_error null [1] (freed GPU array), pale slab in the foot camera
+function RV16_turb(say){const S=[[899.7,-1033],[2074,-1637],[1986,-1652],[525,-1629]],bad=[];let n=0;
+ for(const[x,z]of S){const q=rfSnap(x,z,80);if(!q)continue;roamWarp(q[0],q[1],q[2]);for(let i=0;i<150;i++)roamStep(1/30);const L=window.__life&&window.__life.LIFE;for(const it of((L&&L.H)||[])){if(it.c!=='set'||(it.t!=='turbine'&&it.t!=='windmill'))continue;n++;if(roamHit(it.x,it.z,15,it.y+.5))bad.push(it.t+'@'+Math.round(it.x)+','+Math.round(it.z))}}
+ return('📍 STREET TURBINES · '+n+' turbines/windmills near 4 Athens street spots, '+bad.length+' within 15 m of a building'+(bad.length?' ('+bad.slice(0,3).join(' ')+')':'')+(bad.length?' ❌':' ✅'))}
+function RV16_freed(say){let freed=0,thrown=0;scene.traverse(o=>{const g=o.geometry;if(!g||!g.attributes)return;for(const k in g.attributes){const a=g.attributes[k];if(a&&a.isBufferAttribute&&a.array===null){freed++;try{a.getX(0);a.getY(0);a.getZ(0)}catch(e){thrown++}}}});
+ return('📍 FREED GPU ARRAYS · '+freed+' attributes with the CPU array freed after upload, '+thrown+' throw on getY (null reading 1)'+(thrown?' ❌':' ✅'))}
+function RV16_near(say){const r=OF_go('car');let n=0;const iv=setInterval(()=>{if((RO.foot==='car'||!RO.foot)&&++n<60)return;clearInterval(iv);for(let i=0;i<30;i++)roamStep(1/30);const nf=camera.near;
+  say('📍 FOOT NEAR-CLIP · on foot camera.near '+nf.toFixed(2)+' m (0.4–1.1, grows with the camera distance)'+((RO.foot&&RO.foot!=='car'&&nf>=.4&&nf<=1.1)?' ✅':' ❌'))},200);return'📍 FOOT NEAR-CLIP · getting out…'}
 
 // ===== RF (race fun, 2026-10-09): Alex "we have functionalities but the races are boring". Reference: LEGO 2K Drive rival race
 // (docs/race_ref, docs/RACE_PLAN.md). Measured before (tRace, phone): the player started on POLE and led ~75 % of the race alone,

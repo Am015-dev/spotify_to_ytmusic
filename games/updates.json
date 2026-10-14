@@ -1,12 +1,63 @@
 [
  {
   "date": "2026-10-14",
-  "game": "rampart-and-vine",
-  "title": "desktop menu and board readable: rows fit their art, 16px text, zoomed valley",
-  "items": [],
+  "game": "sunglaze",
+  "title": "readable 3D board labels",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art",
+   "Start screen simplified, one Menu drawer in the top bar, bigger text and clear insets on every panel",
+   "UI-BAR checks for top bar, start screen and dock",
+   "Board labels, row numbers and the sack and shard box labels are larger; scoring note removed from the boards"
+  ],
+  "check": "Open Campaign: the three top buttons read cleanly",
+  "scn": [
+   "menu",
+   "menu",
+   "menu",
+   "ui-bar",
+   "ui-3d"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "lantern-dive",
+  "title": "lantern-dive: desktop fixes - sharper table, 16px text, bigger cards",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Menu, help and tip text clear of frame art"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu",
+   "menu"
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "sands-of-qamar",
+  "title": "Every panel and the board readable",
+  "items": [
+   "Menu and campaign text now sits inside the painted frames"
+  ],
   "check": "",
-  "scn": [],
-  "ask": []
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
  },
  {
   "date": "2026-10-14",
@@ -151,8 +202,8 @@
  },
  {
   "date": "2026-10-14",
-  "game": "tidewake",
-  "title": "tidewake: readable on every screen size",
+  "game": "rampart-and-vine",
+  "title": "one big Play button, one-line tips, UI-bar checks",
   "items": [],
   "check": "",
   "scn": [],
@@ -160,18 +211,12 @@
  },
  {
   "date": "2026-10-14",
-  "game": "sands-of-qamar",
-  "title": "Readable on every screen size",
-  "items": [
-   "Menu and campaign text now sits inside the painted frames"
-  ],
+  "game": "tidewake",
+  "title": "tidewake: readable on every screen size",
+  "items": [],
   "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
+  "scn": [],
+  "ask": []
  },
  {
   "date": "2026-10-14",
@@ -211,30 +256,6 @@
  },
  {
   "date": "2026-10-14",
-  "game": "sunglaze",
-  "title": "readable on every screen size",
-  "items": [
-   "Menus use one title font and one body font, no overlaps",
-   "Campaign Back, Tutorial and score buttons now keep their text clear of the frame art",
-   "Start screen simplified, one Menu drawer in the top bar, bigger text and clear insets on every panel",
-   "UI-BAR checks for top bar, start screen and dock"
-  ],
-  "check": "Open Campaign: the three top buttons read cleanly",
-  "scn": [
-   "menu",
-   "menu",
-   "menu",
-   "ui-bar"
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
   "game": "short-fuse",
   "title": "short-fuse: one primary button on the title",
   "items": [
@@ -245,24 +266,6 @@
   "scn": [
    "menu",
    "sf-uibar"
-  ],
-  "ask": [
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "lantern-dive",
-  "title": "lantern-dive: new start screen, readable text, bigger cards on wide screens",
-  "items": [
-   "Menus use one title font and one body font, no overlaps",
-   "Menu, help and tip text clear of frame art"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu",
-   "menu"
   ],
   "ask": [
    null,

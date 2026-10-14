@@ -569,6 +569,14 @@ body:has(.gxh-bub.on) #prompt{visibility:hidden}
 #logd .gx-drawer-body,#jobd .gx-drawer-body{height:auto;flex:0 1 auto;max-height:100%}
 /* UI-BAR 4: tablet top bar keeps room for the one line */
 @media (max-width:1023px){.gx-bar .gx-ibtn span{display:none}.gx-bar .gx-ibtn{min-width:44px}#barprompt{min-width:240px}.gx-bar .gx-sp{display:none}}
+/* UI-BAR 1/8 (owner, desktop): every text >= 16px at >= 1024px wide */
+@media (min-width:1024px){
+.jc,.seat .jc,.jc .t,.seat .jc .t,#lead,#lead span,#pile .pbtn span,#pile,#felttxt,#bossbar b,#bossbar span,.seat .bdg,.seat .bdg b,.me .bdg,.me .bdg b,#mine .bdg,#mine .bdg b,.gx-bar h1,.gx-bar .gx-ibtn span,#netst,#netst .nl{font-size:16px}
+.seat .jc .sm,.jc .sm{width:20px;height:20px}
+.jc{min-height:30px}
+.seat .nm,.me .nm{font-size:16px}
+}
+@media (min-width:1024px){.gxh-bub{max-width:min(400px,calc(100vw - 16px))}.gxh-bub .gxh-tt,.gxh-bub .gxh-tx,.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font-size:16px}}
 
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -3602,6 +3610,7 @@ fn mainFragment(
   function scrim(t) { for (var x = t; x && x !== document.body; x = x.parentElement) { var r = x.getBoundingClientRect(); if (r.width * r.height >= .6 * innerWidth * innerHeight && (x === t || getComputedStyle(x).position === 'fixed')) return true; } return false; }   // a modal / story layer on top legitimately covers what is below
   function coveredBy(e) { var b = box(e), r = b.r; if (r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return ''; if (getComputedStyle(e).pointerEvents === 'none') return '';
     var t = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, b.x)), Math.max(1, Math.min(innerHeight - 1, b.y)));
+    if (t && t.closest('.gx-drawer-head') && e.closest('.gx-drawer') && !e.closest('.gx-drawer-head')) return '';   // scrolled under the drawer's sticky head: clipped by the scroll, not covered
     if (!t || related(t, e) || t.closest(SKIPSEL) || scrim(t) || getComputedStyle(t).pointerEvents === 'none') return ''; return t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]; }
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
   function engineBad() {   // every element marked data-engine="<js expression>" must show that engine number
@@ -3624,7 +3633,7 @@ fn mainFragment(
     for (var a = 0; a < rects.length; a++) for (var b = a + 1; b < rects.length; b++) { var A = rects[a], B = rects[b]; if (related(A.e, B.e)) continue;
       var w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left), h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
       if (w > 2 && h > 2 && w * h > .3 * Math.min(A.r.width * A.r.height, B.r.width * B.r.height)) add('text overlaps: "' + A.t + '" <' + who(A.e) + '> / "' + B.t + '" <' + who(B.e) + '>'); }
-    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '>'); });
+    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '> "' + (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 24) + '"'); });
     engineBad().forEach(add);
     return out;
   };
@@ -3708,6 +3717,9 @@ fn mainFragment(
       { kind: 'eq', name: 'cards left, first rival', a: function () { return GXS.num('#opp .seat[data-seat="1"] .bdg.n b'); }, b: function () { return G.players[1].hand.length; } },
       { kind: 'eq', name: 'your tricks won', a: function () { return GXS.num('#mine .bdg.t b'); }, b: function () { return tricksWon()[0]; } },
       { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#board *, #prompt'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
+      { kind: 'fn', name: 'every visible text >= 16 px at >= 1024 px wide (13 on phones)', fn: function () { var min = innerWidth >= 1024 ? 16 : 13, bad = [], w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n; while ((n = w.nextNode())) { var t = n.textContent.trim(), e = n.parentElement; if (!t || !e || e.closest('script,style,#stash,#gxscn-tag') || !GXS.vis(e)) continue; var px = parseFloat(getComputedStyle(e).fontSize); if (e.closest('svg') && e.getScreenCTM) px *= e.getScreenCTM().a; if (px < min - .1) bad.push(Math.round(px) + 'px "' + t.slice(0, 20) + '"'); } return !bad.length || bad.slice(0, 4).join(', '); } },
+      { kind: 'fn', name: 'table background: not stretched, <= 1.5x upscale', fn: function () { var bd = $('#bd'), m = /url\(["']?([^"')]+)/.exec(getComputedStyle(bd).backgroundImage); if (!m) return true; var im = new Image(); im.src = m[1]; if (!im.naturalWidth) return true; var cs = getComputedStyle(bd); if (cs.backgroundSize !== 'cover') return 'background-size ' + cs.backgroundSize; var k = Math.max(bd.clientWidth / im.naturalWidth, bd.clientHeight / im.naturalHeight); return k <= 1.5 + .02 || 'background upscaled ' + k.toFixed(2) + 'x'; } },
+      { kind: 'fn', name: 'cards >= 20% of board height on wide screens', fn: function () { if (innerWidth < 1100) return true; var c = $('#hand .hc, #hand .card'), b = $('#bd').getBoundingClientRect(), r = c && c.getBoundingClientRect(); if (!r) return 'no hand card'; if (r.bottom > innerHeight + 1) return 'hand card cut at the bottom'; return r.height >= b.height * .17 || 'hand card ' + Math.round(r.height) + 'px of ' + Math.round(b.height); } },
       skin
     ]
   });
@@ -8062,7 +8074,7 @@ function tableGeo() {
   const drone = G.players.findIndex(p => p.helper);
   const compact = side || small;
   const av = side ? 28 : (small ? 28 : 32), jr = Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))));
-  const seatW = side ? 132 : Math.round(Math.min(90, W * .23)), seatH = side ? 76 : (small ? 100 : 116);
+  const wideT = side && W >= 1100, seatW = side ? (wideT ? 190 : 132) : Math.round(Math.min(90, W * .23)), seatH = side ? (wideT ? 112 : 76) : (small ? 100 : 116);
   const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : 54;
   const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, seats: [], slots: [] };
   const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
@@ -8071,7 +8083,7 @@ function tableGeo() {
   let top, zl = 0, zr = W;
   if (side) { top = y0; zl = seatW + 12; zr = W - seatW - 12; if (drone >= 0) zr = W - droneW - 12; } else top = y0 + (drone >= 0 ? Math.max(seatH, geo.dh) : seatH) + 4;
   const zoneH = Math.max(80, H - top - bottom), cy = top + zoneH / 2, cx = side ? (zl + zr) / 2 : W / 2;
-  let cw = Math.floor(zoneH / (side ? 3.8 : 4.4)); const cwMax = ph ? 70 : 112;
+  let cw = Math.floor(zoneH / (side ? 3.8 : 4.4)); const cwMax = ph ? 70 : (W >= 1100 ? 176 : 112);
   if (!side && k >= 3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
   if (side) cw = Math.min(cw, Math.floor((zr - zl) / 4.6));
   cw = Math.max(30, Math.min(cwMax, cw)); const ch = Math.round(cw * 1.4);
@@ -9198,11 +9210,11 @@ function pxResize(force) {
 function pxRect(el, B) { const r = el.getBoundingClientRect(); return { x: r.left - B.left, y: r.top - B.top, w: r.width, h: r.height }; }
 function pxDrawFelt(R) {
   const g = PX.mat; g.clear(); if (!R) return;
-  if (PADIMG) pxPad(R); else {
+  if (PADIMG && R.w <= 760 && R.h <= 520) pxPad(R); else {
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).fill({ color: 0x0d3b6e, alpha: .5 });
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).stroke({ color: 0x8fcdf5, alpha: .3, width: 2 });
   }
-  if (!PADIMG && PX.padS) PX.padS.visible = false;
+  if (!(PADIMG && R.w <= 760 && R.h <= 520) && PX.padS) PX.padS.visible = false;
   g.roundRect(R.x + 12, R.y + 9, R.w - 24, R.h - 18, 16).stroke({ color: 0xffd873, alpha: .16, width: 1.5 });
   PX.caus.x = R.x + 4; PX.caus.y = R.y + 2; PX.caus.width = Math.max(1, R.w - 8); PX.caus.height = Math.max(1, R.h - 4);
   PX.feltR = R;

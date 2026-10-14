@@ -124,4 +124,16 @@
       { kind: 'fn', name: 'rule 7: start fits without scrolling', fn: function () { var m = $('#modal .mbox'); return m.scrollHeight - m.clientHeight <= 2 || 'start card scrolls'; } }
     ]
   });
+
+  // 3D board text (drawn into textures, invisible to DOM checks): on-screen pixel height and containment, computed from the layout scale (14 Oct 2026)
+  GXS.add({
+    id: 'ui-3d', name: 'UI bar: 3D board labels', ask: 'Can you read the board labels?', seed: 5, sizes: 'pc', when: booted,
+    setup: function () { return table(5).then(function () { return idle(300); }); },
+    checks: [
+      { kind: 'fn', name: 'board labels at least 13/16 px on screen', fn: function () { var b = $('.gx-board'); if (!b || typeof computeLayout !== 'function') return true; var sc = computeLayout(b.clientWidth, b.clientHeight).sc; var f = 1.09 * sc, px = LBLPX * f / 100, bag = 58 * 5.2 * f / 512, lm = innerWidth >= 1024 ? 16 : 13; return (px >= lm && bag >= lm) || 'board labels ' + px.toFixed(1) + 'px, sack label ' + bag.toFixed(1) + 'px at scale ' + sc.toFixed(1); } },
+      { kind: 'fn', name: 'board labels stay inside the board', fn: function () { var c = document.createElement('canvas').getContext('2d'); c.font = 'italic 700 ' + LBLPX + 'px Georgia'; var X = function (v) { return (v + BW / 2) * 100; }; var r = X(.45) + c.measureText('unmarked mosaic').width, l = X(-5.8) + c.measureText('drying racks').width; return (r <= BW * 100 - 60 && l <= X(-.45)) || 'label runs out of its area (' + Math.round(r) + ' / ' + Math.round(l) + ')'; } },
+      { kind: 'fn', name: 'no scoring note drawn on the boards', fn: function () { return !/extra tiles go|at the end:/.test(String(paintBoard)) || 'scoring note still in paintBoard'; } },
+      { kind: 'fn', name: 'no mesh is missing the texture its siblings have', fn: function () { if (!V3.on || !V3.scene) return true; var g = {}; V3.scene.traverse(function (m) { if (!m.isMesh || !m.visible) return; [].concat(m.material).forEach(function (mt) { if (!mt || mt.type === 'ShaderMaterial') return; var k = m.geometry.type + '|' + mt.type; var o = g[k] = g[k] || { y: 0, n: 0 }; if (mt.map) o.y++; else o.n++; if (mt.map && mt.map.image && !(mt.map.image.width > 0)) o.f = 1; }); }); var bad = Object.keys(g).filter(function (k) { return g[k].f || (g[k].y > 3 && g[k].n > 0 && g[k].n < 2 && /^ExtrudeGeometry\|MeshPhysical/.test(k)); }); return !bad.length || 'texture missing: ' + bad.join(', '); } }
+    ]
+  });
 })();
