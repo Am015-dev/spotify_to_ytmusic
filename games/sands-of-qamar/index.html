@@ -220,7 +220,7 @@ body[data-gfx=high] .view::after{display:none}
 .mbox.lobby{position:relative;max-width:520px}.mbox.lobby h2{padding-right:36px}.mbox.lobby h3{margin:4px 0 0;font-size:1rem}.lobx.gx-x{position:absolute;top:8px;right:8px;color:var(--gx-ink)}.lobx.gx-x:hover{background:rgba(0,0,0,.06)}
 .plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}.plist li{display:flex;gap:7px;align-items:center}.plist i{width:12px;height:12px;border-radius:3px;background:var(--pc);flex:0 0 auto}
 .lobby .seg button:disabled{opacity:.4;cursor:default}.lobby .exs{flex-direction:row;flex-wrap:wrap;gap:4px 14px}.netst{margin:0}
-@media (min-width:1000px){html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .menu .btn.gxt-menu{min-height:48px!important;padding-top:6px;padding-bottom:6px}.gx-drawer-body.menu{display:grid;grid-template-columns:1fr 1fr;gap:4px;align-content:start}.gx-drawer-body.menu>div{grid-column:1/-1}}
+@media (min-width:1000px){.gx-drawer .menu .btn,.gx-drawer .menu .btn.gxt-menu{min-height:48px!important}.gx-drawer-body.menu{display:grid;grid-template-columns:1fr 1fr;gap:4px;align-content:start}.gx-drawer-body.menu>div{grid-column:1/-1}}
 body:has(.gx-drawer.on) #modal{visibility:hidden}
 .setrow h4,.gx-drawer h4{font-size:.9rem}
 /* UI-BAR 4: bar keeps Djinns, Log, Rules, Menu; the rest live in Menu */
@@ -236,13 +236,13 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .gx-main{display:block;grid-template-columns:none;position:relative;min-height:0}
 .gx-board{position:absolute;inset:0;display:flex;flex-direction:column;gap:3px;padding:4px 5px calc(5px + env(safe-area-inset-bottom,0px));box-sizing:border-box;background:radial-gradient(ellipse at 50% 30%,#f3d9a4 0%,#e3b878 60%,#c98f55 100%)}
 #seats{flex:0 0 auto;display:flex;gap:4px}
-.sch{flex:1 1 0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"sn ss" "s2 s2" "s3 s3";align-items:center;column-gap:4px;padding:2px 6px 3px;border-radius:10px;background:#fff9ea;border:2px solid var(--pc);box-shadow:0 1px 3px rgba(60,30,10,.3);font-size:11px;line-height:1.2;cursor:default;overflow:hidden;transition:background .2s}.sch.glow{cursor:pointer}
+.sch{flex:1 1 0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"sn ss" "s2 s2" "s3 s3";align-items:center;column-gap:4px;padding:2px 6px 3px;border-radius:10px;background:#fff9ea;border:2px solid var(--pc);box-shadow:0 1px 3px rgba(60,30,10,.3);font-size:13px;line-height:1.2;cursor:default;overflow:hidden;transition:background .2s}.sch.glow{cursor:pointer}
 .sch .sn{grid-area:sn;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#2b1a10}.sch .sn small{font-size:9px;opacity:.6;margin-left:3px;font-weight:600}
 .sch .ss{grid-area:ss;font-size:15px;color:#5a1f08;font-family:var(--ff-h);display:inline-block}
 .sch .s2{grid-area:s2;display:flex;gap:6px;white-space:nowrap}.sch .s3{grid-area:s3;display:flex;gap:5px;white-space:nowrap;min-height:13px;align-items:center}
 .sch .pp{display:inline-flex;align-items:center;gap:1px;font-weight:700;font-size:11px}
 .sch.actnow{background:#fff0c0;box-shadow:0 0 0 3px #ffcf5a,0 0 12px rgba(255,190,60,.8)}
-#seats[data-n="4"] .sch,#seats[data-n="5"] .sch{padding:2px 4px 3px}#seats[data-n="5"] .sch .s2{gap:3px}#seats[data-n="5"] .sch .s3{gap:3px}#seats[data-n="5"] .sch{font-size:10px}
+#seats[data-n="4"] .sch,#seats[data-n="5"] .sch{padding:2px 4px 3px}#seats[data-n="5"] .sch .s2{gap:3px}#seats[data-n="5"] .sch .s3{gap:3px}#seats[data-n="5"] .sch{font-size:13px}
 #line{flex:0 0 auto;min-height:24px;line-height:24px;text-align:center;font:700 16px var(--ff-h);color:#4d2616;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #line.mine{color:#9a3a14}
 #table{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:3px}
@@ -262,9 +262,9 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 .tile.blue{background:linear-gradient(#cfe6f6,#8fb7d8);border-color:#3b6a97}.tile.red{background:linear-gradient(#f9d3b3,#e29c6c);border-color:#9a4a28}
 .tile.owned{box-shadow:inset 0 0 0 4px var(--oc)}
 .tile .ti{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:calc(var(--cw)*.55);opacity:.2;pointer-events:none;font-style:normal;line-height:1}
-.tile .tn{position:relative;z-index:1;font-size:clamp(8px,calc(var(--cw)*.16),11px);font-weight:800;color:#3a2412;line-height:1.05;max-width:calc(100% - 17px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.tile .tv{position:absolute;z-index:2;top:2px;right:2px;min-width:16px;height:16px;padding:0 2px;box-sizing:border-box;border-radius:9px;background:#f4c04a;color:#4a2a05;font-size:11px;line-height:14px;text-align:center;border:1px solid #9a6b12}
-.tile .tc{position:absolute;left:3px;bottom:1px;font-size:8px;opacity:.55;font-style:normal;pointer-events:none}
+.tile .tn{position:relative;z-index:1;font-size:clamp(13px,calc(var(--cw)*.16),16px);font-weight:800;color:#3a2412;line-height:1.05;max-width:calc(100% - 17px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.tile .tv{position:absolute;z-index:2;top:2px;right:2px;min-width:16px;height:16px;padding:0 2px;box-sizing:border-box;border-radius:9px;background:#f4c04a;color:#4a2a05;font-size:13px;line-height:14px;text-align:center;border:1px solid #9a6b12}
+.tile .tc{display:none;position:absolute;left:3px;bottom:1px;font-size:8px;opacity:.55;font-style:normal;pointer-events:none}
 .tile .ms{position:relative;z-index:1;flex:1 1 auto;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:2px 2px;min-height:0;padding-bottom:11px}
 .tile .tk{position:absolute;z-index:2;right:2px;bottom:2px;display:flex;gap:2px;align-items:center}
 .tile.m7{--k:.82}.tile.m10{--k:.66}
@@ -399,6 +399,23 @@ html .mbox .btn.xs{min-height:44px}
 html:not(.tp) .tile .tc,html.tp .tile .tc{font-size:11px;line-height:13px}
 .gxh-bub .gxh-tt{display:none}
 body:has(.gxh-bub.on) #line{visibility:hidden}
+
+/* UI-BAR 6/1: small panels fit their content; chips and labels 13px phone / 16px desktop */
+.sch .sn,.sch .sn small,.sch .s2,.sch .s3,.pchip{font-size:13px}
+@media (min-width:1024px){.sch,.sch .sn,.sch .sn small,.sch .s2,.sch .s3,.pchip{font-size:16px}}
+#logd,#plrd,#setd,#musicd{bottom:auto;height:auto;max-height:calc(100dvh - var(--gx-bar-h) - 24px)}
+@media (max-width:700px){#logd,#plrd,#setd,#musicd{height:auto;max-height:88dvh}}
+.sch .sn small,.dcard .dv,.spot .ord,.spot .sp-c,.gx-drawer small,.gx-drawer .stat .st small,.gx-drawer .muted{font-size:13px}
+@media (min-width:1024px){.gx-bar h1,.sch .sn small,.dcard,.dcard b,.dcard .dv,.spot .ord,.spot .sp-c,.spot .sp-b,.tile .tv,.gx-drawer-body,.gx-drawer-body p,.gx-drawer-body small,.gx-drawer-body h4,.gx-drawer-body .tag,.gx-drawer-body .muted,.gx-drawer-body .stat *{font-size:16px}.tile .tv{min-width:22px;height:22px;line-height:20px}}
+.sch .sn small,.spot .ord{font-size:13px!important}
+@media (min-width:1024px){.gx-bar h1,.pchip,.sch .sn small,.spot .ord,.gx-drawer small,.gx-drawer h3 small,.gx-drawer h4 small,.gx-drawer li small,.sti{font-size:16px!important}}
+.tile .tn{font-size:13px!important}
+@media (min-width:1024px){.tile .tn,.gx-drawer .menu .btn,.gx-drawer .menu .seg button,.gx-drawer .menu *{font-size:16px!important}}
+.tile .tn{max-width:calc(100% - 24px)}
+@media (min-width:1024px){.tile .tn{max-width:calc(100% - 30px)}}
+.tile .tn{margin-top:16px;max-width:100%}
+@media (min-width:1024px){.tile .tn{margin-top:24px;max-width:100%}}
+@media (max-height:600px) and (max-width:420px){.tile .tn{display:none!important}}
 /* ===== GX skin: painted UI kit over the shared shell + campaign classes. Opt-in: nothing changes until gx-skin.js adds
    html.sk (after the kit files loaded). Kit files live in the game's media/ (ui-topbar, ui-iconbtn, ui-panel, ui-drawer-head,
    ui-button-cream/go/power, ui-row, ui-bubble, ui-node-*). Extra switches: html.sk-icons (icon-*.webp set), html.sk-map (story-map.webp),
@@ -792,6 +809,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
 .gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
 
 /* gx-tutor.css: the staged tutorial (spotlight, bubble, progress dots, end card). Bubble styles come from gx-help.css (.gxh-bub); see GX-KIT.md section 10.
@@ -1351,6 +1369,26 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     ]
   });
 
+  GXS.add({
+    id: 'sq-uibar', name: 'UI bar: bar, line, panels, text sizes', ask: 'Is every screen clean and readable?', seed: 10, when: booted, group: 'UI',
+    setup: function () { return table(10); },
+    checks: [
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), GXS.vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'one instruction line of 8 words or fewer', fn: function () { var t = ($('#line') || {}).innerText || ''; return (words(t) > 0 && words(t) <= 8) || 'line: ' + t; } },
+      { kind: 'fn', name: 'at most one primary button on the board', fn: function () { var n = [].filter.call(document.querySelectorAll('.btn.go'), GXS.vis).length; return n <= 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'board text >= 13 px (16 px at >= 1024 wide)', fn: function () { var min = innerWidth >= 1024 ? 16 : 13, bad = ''; [].forEach.call(document.querySelectorAll('body *'), function (e) { if (bad || e.children.length || !e.textContent.trim() || !GXS.vis(e) || e.closest('.gx-drawer, svg') || /^Test:/.test(e.textContent.trim())) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f > 0 && f < min - .05) bad = (e.className || e.tagName) + ' ' + f + 'px "' + e.textContent.trim().slice(0, 12) + '"'; }); return !bad || bad; } },
+      { kind: 'fn', name: 'no sideways scroll, no seat chip text cut', fn: function () { if (document.documentElement.scrollWidth > innerWidth + 1) return 'page scrolls sideways'; var bad = ''; [].forEach.call(document.querySelectorAll('.sch'), function (c) { if (c.scrollWidth > c.clientWidth + 2) bad = bad || 'seat chip ' + c.scrollWidth + '>' + c.clientWidth; }); return !bad || bad; } },
+      { kind: 'fn', name: 'pictures keep their natural shape', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (i) { if (bad || !GXS.vis(i) || !i.naturalWidth) return; var r = i.getBoundingClientRect(), q = (r.width / r.height) / (i.naturalWidth / i.naturalHeight); if (Math.abs(q - 1) > .08) bad = (i.className || 'img') + ' ' + q.toFixed(2); }); return !bad || bad; } },
+      { kind: 'fn', name: 'diary, players and menu panels fit their content with text >= 13/16 px', fn: function () {
+        var min = innerWidth >= 1024 ? 16 : 13, bad = '';
+        ['logd', 'plrd', 'menud'].forEach(function (id) { if (bad) return; try { GX.show(id); } catch (e) { return; } var d = $('#' + id), b = d && d.querySelector('.gx-drawer-body'); if (!b) return;
+          var last = b.lastElementChild; var empty = last ? b.getBoundingClientRect().bottom - last.getBoundingClientRect().bottom : 0;
+          if (id !== 'menud' && b.scrollHeight <= b.clientHeight && empty > 120) bad = id + ' has ' + Math.round(empty) + ' px empty space';
+          [].forEach.call(d.querySelectorAll('*'), function (e) { if (bad || e.children.length || !e.textContent.trim() || !GXS.vis(e) || e.closest('svg')) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f > 0 && f < min - .05) bad = id + ': ' + f + 'px "' + e.textContent.trim().slice(0, 12) + '"'; });
+          try { GX.close(); } catch (e) { } });
+        return !bad || bad; } },
+    ]
+  });
   GXS.add({
     id: 'sq-zoom', name: 'Djinn card list', ask: 'Are the djinn cards readable?', seed: 6, when: booted,
     setup: function () { return table(6).then(function () { GX.show('djd'); try { renderDjPop(); } catch (e) { } return idle(900); }); },
