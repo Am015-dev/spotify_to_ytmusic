@@ -1,6 +1,24 @@
 [
  {
   "date": "2026-10-14",
+  "game": "hollowbough",
+  "title": "simple start screen, 5 top-bar buttons, readable on wide screens",
+  "items": [
+   "Board tip bubble no longer covers cards and counts; the caption line says it",
+   "ui-bar"
+  ],
+  "check": "",
+  "scn": [
+   "menu",
+   "ui-start"
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
   "game": "final-approach",
   "title": "final-approach: start screen, top bar and panels cleaned up",
   "items": [
@@ -158,21 +176,6 @@
   "ask": [
    null,
    null,
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "hollowbough",
-  "title": "readable on every screen size",
-  "items": [
-   "Board tip bubble no longer covers cards and counts; the caption line says it"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
    null
   ]
  },

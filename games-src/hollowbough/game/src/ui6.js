@@ -49,22 +49,19 @@ function renderStart() {
   if (NET.on) { netStartScreen(s); return; }
   const o = UI.opt = UI.opt || Object.assign({}, DEF);
   const seg = (l, key, vals, fmt) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (o[key] === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': key, 'data-v': v, type: 'button' }, fmt ? fmt(v) : v)));
+  const modes = (firstTime() ? [['guided', 'Guided']] : []).concat([['vs', 'vs computer'], ['solo', 'Solo'], ['hot', 'Hot-seat'], ['ai', 'Watch']]).concat(window.CAMPAIGN ? [['story', 'Story']] : []);
+  const mode = o.mode || (firstTime() ? 'guided' : 'vs');
   const card = h('div.scard',
     h('h1', h('span', { html: ICO.tree }), 'Hollowbough'),
-    h('p.tag', 'Build a woodland city. Place workers, play cards, outlast the winter.'),
-    firstTime() ? tutNode('sbtn big') : null,
-    h('button.sbtn.big', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and one gentle computer player.')),
-    window.CAMPAIGN ? h('button.sbtn.big.story', { 'data-start': 'story', 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story: The Long Winter'), h('span', campLine())) : null,
-    h('div.opts', seg('Players', 'np', [2, 3, 4]), seg('Computer level', 'level', ['easy', 'normal', 'hard']), seg('Solo rival', 'solo', [1, 2, 3], v => D.soloLevels[v - 1] + (v > 1 ? '*' : ''))),
-    h('p.sm', '*Gruff and Ghastly are very hard.'),
-    h('div.sgrid',
-      h('button.sbtn', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Play vs computer'), h('span', 'You against 1 to 3 computer players')),
-      h('button.sbtn', { 'data-start': 'solo', 'data-a': 'start', 'data-m': 'solo', type: 'button' }, h('b', 'Solo vs ' + D.soloName), h('span', 'Beat the automated rival')),
-      h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', '2 to 4 people, one device')),
-      h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch computers'), h('span', 'Sit back and learn'))),
+    h('p.tag', 'Build a woodland city. Outlast the winter.'),
+    h('button.sbtn.big', { 'data-start': 'play', 'data-a': 'play', type: 'button' }, h('b', mode === 'story' ? 'Play the story' : 'Play')),
+    h('div.opts',
+      h('div.seg', h('span.lbl', 'Mode'), modes.map(m => h('button.chipb' + (mode === m[0] ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'mode', 'data-v': m[0], type: 'button' }, m[1]))),
+      mode === 'vs' || mode === 'hot' ? seg('Players', 'np', [2, 3, 4]) : null,
+      mode === 'vs' ? seg('Computer', 'level', ['easy', 'normal', 'hard']) : null,
+      mode === 'solo' ? seg('Rival', 'solo', [1, 2, 3], v => D.soloLevels[v - 1]) : null),
     netBlock(),
-    firstTime() ? null : tutNode('sbtn'),
-    h('div.srow2', hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null, h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, '\u266A Music')));
+    hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null);
   s.appendChild(h('div.skylogo', { 'aria-hidden': 'true' }, 'Hollowbough', h('small', 'Build a woodland city. Outlast the winter.')));
   s.appendChild(card);
 }
@@ -96,6 +93,7 @@ document.addEventListener('click', ev => {
     case 'story': storyOpen(); break;
     case 'campfin': campFinish(); break;
     case 'start': if (d.m !== 'ai' && tutOffer(() => newGame(d.m))) break; newGame(d.m); break;
+    case 'play': { const m = (UI.opt && UI.opt.mode) || (firstTime() ? 'guided' : 'vs'); if (m === 'guided') { if (tutOffer(() => newGame('guided'))) break; newGame('guided'); break; } if (m === 'story') { storyOpen(); break; } if (m !== 'ai' && tutOffer(() => newGame(m))) break; newGame(m); break; }
     case 'guided': if (tutOffer(() => newGame('guided'))) break; newGame('guided'); break;
     case 'opt': { UI.opt = UI.opt || Object.assign({}, DEF); UI.opt[d.k] = isNaN(+d.v) ? d.v : +d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
