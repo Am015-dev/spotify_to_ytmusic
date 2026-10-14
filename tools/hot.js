@@ -4,6 +4,7 @@
 //   node tools/hot.js go v90k/park-sit                                                    __tq.reset() + that checklist GO → PASS/FAIL line
 //   node tools/hot.js eval 'RO.v' [--city ath]     node tools/hot.js reset|status|errors|stop     node tools/hot.js reboot [fra|ath]
 //   node tools/hot.js shot out.jpg [--city ath]    (one rendered frame, slow in software GL)
+//   node tools/hot.js gym drive|foot|cam|park      small-world page (src/test/gym.js, ~3 s); then --city gym for eval/reload/shot
 // The first command starts the daemon (detached, log out/hot/hot.log); cities = HOT_CITIES (default fra,ath), port HOT_PORT (8890).
 // The page is served as out/hot/hot.html, concatenated from src/ORDER (+ src/test/*.js) on EVERY request, so a reboot or a GO that jumps city
 // always loads the current src. Only the hot page gets the hook window.__hot (a direct eval in the game's module scope); nothing ships.
@@ -71,12 +72,12 @@ async function daemon(){
  if(!fs.existsSync(OUT+'/models.js')){console.log('first start: tools/build.sh hot (assets)');execSync('tools/build.sh hot',{cwd:ROOT,stdio:'inherit'})}
  const MT={'.js':'text/javascript','.json':'application/json','.html':'text/html','.mp3':'audio/mpeg','.png':'image/png','.jpg':'image/jpeg'};
  const {chromium}=require('/opt/node22/lib/node_modules/playwright');
- const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-accelerated-2d-canvas']});
  const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});
  const P={};const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works while/i;
- const boot=c=>{const o=P[c]||(P[c]={c,errs:[],nav:0});o.up=0;o.ready=(async()=>{if(o.p)await o.p.close().catch(()=>{});const p=o.p=await ctx.newPage();p.setDefaultTimeout(120000);
+ const boot=(c,q)=>{const o=P[c]||(P[c]={c,errs:[],nav:0});o.up=0;if(q!==undefined)o.q=q;o.ready=(async()=>{if(o.p)await o.p.close().catch(()=>{});const p=o.p=await ctx.newPage();p.setDefaultTimeout(120000);
    p.on('pageerror',e=>o.errs.push(String(e).slice(0,240)));p.on('console',m=>{if(m.type()==='error')o.errs.push('console: '+m.text().slice(0,240))});p.on('framenavigated',f=>{if(f===p.mainFrame()){o.nav++;o.snap={...LAST}}});
-   const t=Date.now();await p.goto(`http://127.0.0.1:${PORT}/hot.html?test=${c}&draw=0`);await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:120000});
+   const t=Date.now();await p.goto(`http://127.0.0.1:${PORT}/hot.html?test=${c==='gym'?'fra':c}&draw=0${o.q?'&'+o.q:''}`);await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:120000});
    o.boot=(Date.now()-t)/1000;o.nav=0;o.up=1;console.log(`BOOT ${c} ${o.boot.toFixed(1)} s`);return p})();o.ready.catch(e=>console.log('BOOT FAIL '+c+' '+e));return o.ready};
  const page=async c=>{if(!P[c])boot(c);const p=await P[c].ready;if(P[c].nav){await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:120000});P[c].nav=0}return p};
  const errsSince=(o,n)=>o.errs.slice(n);
@@ -93,17 +94,19 @@ async function daemon(){
    if(info&&info.inner.length)out.push('WARN also re-assigned inside a function (runtime wrapper, now dropped; reboot if it matters): '+info.inner.join(' '));
    out.push(`${((Date.now()-t)/1000).toFixed(1)} s`);return out.join('\n')},
   async go({id}){const t=Date.now();const p0=await page(P.fra?'fra':Object.keys(P)[0]);let c=await p0.evaluate(id=>window.__chk&&__chk.city(id),id);if(!c)return'FAIL no GO '+id;if(c==='bx')c='fra';
-   const o=P[c]||{},p=await page(c),e0=o.errs.length,n0=o.nav;await p.evaluate(()=>__tq.reset()).catch(()=>{});
+   const p=await page(c),o=P[c],e0=o.errs.length,n0=o.nav;await p.evaluate(()=>__tq.reset()).catch(()=>{});
    let said='';try{said=await p.evaluate(id=>window.__chk.go(id)||'',id);if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:20000,polling:100}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){said='EVAL '+String(e).slice(0,120)}
    const ne=errsSince(o,e0),nav=P[c].nav>n0;const ok=!!said&&!BAD.test(said)&&!ne.length&&!nav;
    return `${ok?'PASS':'FAIL'} ${c} ${id} ${((Date.now()-t)/1000).toFixed(1)}s · ${said||'(no message)'}${nav?' · NAVIGATED (page reloaded from current src)':''}${ne.length?' · ERR '+ne[0]:''}`},
-  async eval({js,city}){const out=[];for(const c of city?[city]:Object.keys(P).slice(0,1)){const o=P[c],p=await page(c),e0=o.errs.length;
-    const r=await p.evaluate(s=>{try{const v=window.__hot(s);return JSON.stringify(v,(k,x)=>typeof x==='number'?Math.round(x*1000)/1000:x)?.slice(0,2000)??String(v)}catch(e){return'ERR '+e}},js).catch(e=>'EVAL '+e);
+  async eval({js,city}){const out=[];for(const c of city?[city]:Object.keys(P).slice(0,1)){const p=await page(c),o=P[c],e0=o.errs.length;
+    const r=await p.evaluate(async s=>{try{const v=await window.__hot(s);return JSON.stringify(v,(k,x)=>typeof x==='number'?Math.round(x*1000)/1000:x)?.slice(0,2000)??String(v)}catch(e){return'ERR '+e}},js).catch(e=>'EVAL '+e);
     out.push(`${c}: ${r}${o.errs.length>e0?' · ERR '+o.errs[e0]:''}`)}return out.join('\n')},
   async reset({city}){const out=[];for(const c of city?[city]:Object.keys(P)){const p=await page(c);out.push(c+': '+JSON.stringify(await p.evaluate(()=>__tq.reset())))}return out.join('\n')},
   async errors({city}){return Object.values(P).filter(o=>!city||o.c===city).map(o=>`${o.c}: ${o.errs.length} errors${o.errs.length?'\n  '+o.errs.slice(-5).join('\n  '):''}`).join('\n')},
-  async reboot({city}){const cs=city?[city]:Object.keys(P);await Promise.all(cs.map(c=>{P[c].errs=[];return boot(c)}));return cs.map(c=>`${c} booted ${P[c].boot.toFixed(1)} s`).join('\n')},
+  async reboot({city}){const cs=city?[city]:Object.keys(P);await Promise.all(cs.map(c=>{if(P[c])P[c].errs=[];return boot(c)}));return cs.map(c=>`${c} booted ${P[c].boot.toFixed(1)} s`).join('\n')},
   async shot({file,city}){const c=city||'fra',p=await page(c);await p.evaluate(()=>__tq.draw()).catch(()=>{});await p.screenshot({path:path.resolve(file),type:/png$/.test(file)?'png':'jpeg',quality:/png$/.test(file)?undefined:75});return 'wrote '+file},
+  async gym({kind}){const k=kind||'drive',t=Date.now();await boot('gym','gym='+k);const p=P.gym.p;await p.waitForFunction(()=>window.__gym&&__gym.ok,null,{timeout:8000,polling:50}).catch(()=>{});P.gym.boot=(Date.now()-t)/1000;const r=await p.evaluate(()=>window.__hot('JSON.stringify({x:RO.x,z:RO.z,foot:RO.foot,tReady:__tq.tReady})')).catch(e=>String(e));
+   return `gym ${k} ready in ${P.gym.boot.toFixed(1)} s (page) · ${r} · errors ${P.gym.errs.length}${P.gym.errs.length?' · '+P.gym.errs[0]:''}\nuse --city gym with eval/reload/shot/reset`},
   async stop(){setTimeout(()=>{b.close().finally(()=>process.exit(0))},50);return'stopped'}};
  http.createServer(async(q,r)=>{
   if(q.method==='POST'&&q.url==='/cmd'){let d='';q.on('data',x=>d+=x);q.on('end',async()=>{let o;try{const j=JSON.parse(d);o=H[j.cmd]?await H[j.cmd](j):'unknown command '+j.cmd}catch(e){o='DAEMON ERR '+(e&&e.stack||e)}r.writeHead(200,{'content-type':'text/plain; charset=utf-8'});r.end(o)});return}
@@ -118,7 +121,7 @@ const send=j=>new Promise((res,rej)=>{const q=http.request({host:'127.0.0.1',por
 async function client(){
  const city=flag('--city');const j={cmd,city:typeof city==='string'?city:undefined};
  if(cmd==='reload'){j.files=pos;j.all=!!flag('--all');j.full=!!flag('--full');if(!pos.length)return console.log('usage: hot.js reload src/<mod>.js')}
- else if(cmd==='go')j.id=pos[0];else if(cmd==='eval')j.js=pos.join(' ');else if(cmd==='shot')j.file=pos[0]||'hot.jpg';else if(cmd==='reboot'&&pos[0])j.city=pos[0];
+ else if(cmd==='go')j.id=pos[0];else if(cmd==='eval')j.js=pos.join(' ');else if(cmd==='shot')j.file=pos[0]||'hot.jpg';else if(cmd==='reboot'&&pos[0])j.city=pos[0];else if(cmd==='gym')j.kind=pos[0];
  try{console.log(await send(j))}catch(e){
   if(cmd==='stop')return console.log('not running');
   fs.mkdirSync(OUT,{recursive:true});const log=fs.openSync(OUT+'/hot.log','a');spawn(process.execPath,[__filename,'daemon'],{detached:true,stdio:['ignore',log,log],cwd:ROOT}).unref();
