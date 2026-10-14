@@ -1,12 +1,18 @@
 [
  {
   "date": "2026-10-14",
-  "game": "short-fuse",
-  "title": "Menus: painted buttons keep their art shape",
-  "items": [],
+  "game": "hollowbough",
+  "title": "Menu and board cleanup",
+  "items": [
+   "Board tip bubble no longer covers cards and counts; the caption line says it"
+  ],
   "check": "",
-  "scn": [],
-  "ask": []
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
  },
  {
   "date": "2026-10-14",
