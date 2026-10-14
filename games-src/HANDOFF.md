@@ -5,6 +5,14 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
 
+## Lantern Dive last paintings (13 Oct 2026, 23:xx UTC): NOT deployed, one check failing
+
+- Wiring result: `table-tunnel-glow-phone` is already live (`ui99.js:18` builds the name by concatenation, so the scan still lists it). Nothing new wired.
+- `ui-bubble-tail`: no tail element exists in the shared help kit (`shell/gx-help.css`/`gx-help.js`). Adding one changes every game, so not used here. Needs an owner decision.
+- `ui-row`: its description names no place. Not used until a target is named.
+- 23:4x re-run on merged branch (50583c8): gate still FAILS only on ld-help@375x553 clipping. A report of a clipped player name ("Nerea", span.nm, seat plate, ld-art scenario) was NOT reproduced by this gate run. Verify it before any CSS change.
+- Deploy gate FAILED on merged branch: `ld-help@375x553` text clipped ("First two tricks", span.t). Not caused by this change (no Lantern source edited). Fix in help layout (`lantern-dive/game/src/ui11.js` / shared `gx-help.css`), then rerun `build-all.py --deploy lantern-dive`.
+
 ## Story bubble + painted plate fix (13 Oct 2026): source done, only 1 of 15 deployed
 - Shell: `gx-skin.css` speech bubble is a 9-slice (`22 62 34 30 fill`), `gx-campaign.css` scene/boss/result/sheet never scroll sideways, `?scn=story-scene` registered in `gx-campaign.js`. All painted buttons use `30 42 fill/14px Npx` (vertical caps, were `0 42` = stretched on tall buttons). Short Fuse nameplate/rack, Thornbound sheet head, Doorkick dock frame, Crown `#choice` fixed in their skin/layout css.
 - `look-check.js` has two new checks (`panels`: scrollbar for decoration-only overflow, severe on x; `plates`: 9-slice/100% 100% distortion, >25% warn, >40% severe) and a `story-scene` screen. Calibrated: old final-approach build = 2 severe, fixed = 0.
@@ -24,8 +32,20 @@ Read CLAUDE.md (Fast loop + Cost rules), then `PLAYBOOK.md`. Paste `games-src/BR
   - `session_0173P8APho8S4jxLQSJj26oe` Nightrun K2: stages + map, difficulty curve, strategic shop/garage/market.
   - In this session's checkout a look fixer was deploying Crown, Sands, Tidewake, Thornbound, Cauldron (label sizes, tap targets, Got it button); check `git log` for "Look fixes" and finish any not live.
 - **Open items:** Nightrun quick sweep failed on rhythm/difficulty/story-lock/tune items after the boss deploy (likely K2's in-progress work; K2's deploy must clear them). Nightrun needs LAB/scenarios adopted after K2 (note above). Owner may want the Overdrive car-damage request handled by the Overdrive session (session_017iH3DB4VyxwKSdMwsco4Ut).
-- **Watchdog:** routine `trig_01SnC3sNN1s8bCYNsQCoo8u1` runs hourly at :38 in a fresh **Haiku** session (not in any orchestrator): sends wrap-ups (commit, push, HANDOFF, deploy what passed), archives 20 min later, starts one replacement; log under "## Watchdog log" at the end of this file.
+- **Fast tests, game-industry style** (owner: "lab tests are extremely stupid" / "fast tests like game industry"): `session_01FAqai6WD8dZNr6tGwzjBBW` builds the test pyramid on Crown + Doorkick: (1) engine unit + invariant tests and 1,000 seeded headless AI games in < 10 s (node, no browser); (2) thin UI smoke < 30 s (errors, 404s, glowing targets respond, text, numbers = engine); (3) owner QA via ✔ Test / LAB GO. Deploy gate = 1 + 2, < 60 s per game. If it works, roll out (Sonnet, 2-3 games per worker).
+- **Watchdog:** 4 Haiku routines, every 15 min (:08 trig_01A9jTmTB2EvmdBmHtwKsW5X, :23 trig_01Tbt3WcM5AgSMDhNdgPVbhK, :38 trig_01SnC3sNN1s8bCYNsQCoo8u1, :53 trig_016JC8qhbc7XGpWJgNebEAyB), each a fresh session: UNBLOCKS any worker waiting for an answer (fix the real cause, never bypass checks), sends wrap-ups (commit, push, HANDOFF, deploy what passed), archives finished workers, starts one replacement; log under "## Watchdog log".
 - **Owner is frustrated by slowness:** target ≤ 15 min per game from start to live; report real times. Hand off this orchestrator at ~150k context.
+
+## Worker groups (13 Oct 2026, 23:10 UTC) — one worker per game, max 15, titles start with the group tag
+| Group | Worker (session) | Model | Games | Status |
+|---|---|---|---|---|
+| [ART] | session_011jRzpiYd1pxZRj3N2mtQGt | Sonnet | Sands of Qamar (31 paintings wired in source) | fix gold-badge digit contrast, deploy (old worker archived, over context) |
+| [ART] | session_01VZTUufsMh4x1FxGCz95a9S | Sonnet | Final Approach, Short Fuse (2 + 2) | fixing phone-check cause, then deploy |
+| [TESTS] | session_01FAqai6WD8dZNr6tGwzjBBW | Sonnet | pilot: Crown, Doorkick | fast test pyramid (engine tests + UI smoke < 60 s) |
+| [LAB] | session_01VxGyhTM7mpMZhPEraRLygh | Sonnet | all games | LAB menu + pinned checklist GO: 9 live, 6 to go |
+| [OPS] | routine trig_01SnC3sNN1s8bCYNsQCoo8u1 | Haiku | all workers | hourly watchdog at :38 |
+Done today (archived): art wiring for Hollowbough, Rampart, Nebula, Lantern, Shipwreck, Crown, Tidewake, Cauldron, Sunglaze, Thornbound, Kaiten, Doorkick; Nightrun phone HUD.
+Next after the [TESTS] pilot passes: one [TESTS] worker per remaining game (13), Sonnet, all in parallel (≤ 15 total).
 
 ## Checks: two speeds + scenarios (13 Oct 2026) — read `PLAYBOOK.md` "Iterate fast, check once"
 - `build-all.py --quick <slug>` (phone-check + scenarios + QUICK sweep) to iterate; `--deploy <slug>` = full sweep once, then live. Numbers: `CHECK-SPEED.md`.
@@ -109,3 +129,32 @@ Commits carry NO attribution lines. If `/dev/null` is a symlink (`ls -la /dev/nu
 - **Shelf:** the 3 new games are not on it yet. To add them, run `games-src/room/add-new-games.py` (covers are
   ready).
 - **Art:** the owner will make art with Google Flow later; each game has a prompt list in `ART-PROMPTS.md`.
+
+## Final Approach + Short Fuse: art wired, deploy blocked by phone-check (13 Oct 2026)
+Wired in source and pushed (skin.css + `fa-art` / `sf-art` scenarios + checklist items); Thornbound and Kaiten Kitchen are live.
+`build-all.py --deploy <slug>` stops at phone-check. **The currently live games fail the same checks** (run `GAMES_DIR=$PWD/games PC_OUT_DIR=/tmp/pc node games-src/scripts/phone-check.js <slug>`), so the new art is not the cause.
+- **final-approach:** "slow" = one tap in every run takes 400-950 ms (limit 800). It is always the same tap: placing a die on "Axis, any die" (the 4th move). Median tap is ~120 ms. A GPU upload warm-up of all PIXI textures after `pxTextures()` (ui7.js) did not change it, so it is not first-use texture upload; next step is a CDP profile of that tap (suspects: the computer's reply / `render()` after a placement, PIXI scene rebuild).
+- **short-fuse:** "2 dead taps" in the rotation scenarios (P>L, stale; sometimes L>P): after rotating, taps on the candidates "2" and "Wire C" change nothing within 1 s. Not investigated yet; start with the rotation relayout (`gx-viewport.js` + the game's resize handler) and whether the board is re-laid out before the candidates are tapped.
+- `phone-check.js` now prints each tap's latency (slow taps labelled) and which taps were dead, to make this faster to chase.
+## Sands of Qamar painted art wiring (13 Oct, worker)
+- Wired (sources, committed, not live yet): tile glyph medallions, tile frames, badges, star icon, goods-card, nameplate, djinn bar, ribbon, finger, bubble tail, item and trophy pictures (`html.sk-pl`, scenario `sq-art`). Not used: `ui-seat-chip` (its frame is too thick for 4-5 seat chips).
+- Deploy blocked by the look gate: `contrast|b.tv` (digits on the gold badge, 1.5-2.7:1 depending on the tile behind). The look check measures what is behind the digits; the badge picture now sits on `.tv::before` over a solid `#f4c04a`. `btn.sm` plate fixed; goods row has 44 px boxes. Next: lift `.tv` text contrast (e.g. a cream plate behind the digits), run `NODE_PATH=/opt/node-tools/node_modules python3 games-src/scripts/build-all.py --deploy sands-of-qamar`, then `look-check.js --baseline --game sands-of-qamar`, `add-update.py sands-of-qamar "Painted art wired" "item" --check "..." --scn sq-art`.
+- Note: export `NODE_PATH=/opt/node-tools/node_modules` before build-all (the look gate crashes otherwise).
+- Doorkick Dungeon: live (hand/level icons, bubble tail, 3D winner heroes; scenarios dk-art, dk-tips, dk-status-line).
+
+## Shipwreck Isle: last paintings wired (blocked deploy gate)
+
+- Wired `ui-bubble-tail` (island label tail, `html.sk .tl:not(.far)::after` in games-src/rc/skin.css) and `ui-row` (`html.sk .row`, `.row.has`, `.row:hover`).
+- Deploy NOT done: `build-all.py --deploy shipwreck-isle` fails scenario si-art: "text under 11px" on the phase strip label "Event" (9.6px, ui.js PHASES). The same failure reproduces on the commit before this change, so it is pre-existing.
+- Next: raise the phase strip label to 11px or more (shared phase-bar style), then re-run the deploy.
+
+## Update 13 Oct (late): Final Approach is live; Short Fuse blocked only by look-check
+Final Approach deployed (GO `fa-art`, LAB 24/24, look ok). Shelf checklist entries must use the shelf ids (`approach`, `shortfuse`), not the slugs, or the LAB shelf check says "missing".
+Short Fuse: GO scenarios 6/6 and LAB 24/24 pass; `--deploy` stops at look-check with NEW severe findings that are not from the art wiring: `plates|div.tile.crew` (the crew tile frame `wire-tile-frame-c.webp` is drawn stretched, box 56x73 vs picture 100x240) and `contrast|div.gxc-sc-name` (story-scene speaker name). Fix the tile frame slice/size in `games-src/short-fuse/game/skin.css` and the speaker-name colour, then `build-all.py --deploy short-fuse` (its art is already wired and committed).
+Short Fuse, after merging the build-all fix: every scenario (all 6, not only `sf-art`) now fails the universal "text under 11px" check: `"1"` at 7px in `<i.cn12>` (the small wire-number labels on the board). Together with the look-check findings above, Short Fuse needs a readability pass (wire number labels >= 11px, crew tile frame slice, speaker-name contrast) before it can deploy; its art wiring and `sf-art` are already committed.
+
+## Nebula Aces: last painting (ui-bubble-tail) wired, NOT deployed
+- Wired: the coach bubble pointer (`.gxh-arr`) wears `ui-bubble-tail` (xw/skin.css `html.sk-tail` rules, xw/media.js set `sk-tail`), same 12x12 box and place. Scenario `nb-tail` (xw/scn.js) checks it; its two painted-tail checks pass.
+- Blocked: `build-all.py --deploy nebula-aces` fails 0/7 scenarios on look checks that also fail on the untouched `nb-art` scenario: text under 11px (`set dials`, `move + act`, `now`), clipped labels (`Setup · Deploy Fringe`, `Captain Kade`, `you`), `button covered by div.gxt-cell` in nb-tutorial-play, and `data-engine "three.js r158" threw Unexpected identifier 'r158'`. The three.js message looks like a harness artifact (engine label evaluated as JS), not a load failure; unverified.
+- Next: confirm these fail on the base commit too; if so, fix the look checks in xw/ (font sizes, clipping, tutorial cell cover) or the engine-label check, then re-run the deploy and add the "Last painting wired" item.
+- Setup note: `games-src` needed `npm install` (three@0.158.0) before any build.

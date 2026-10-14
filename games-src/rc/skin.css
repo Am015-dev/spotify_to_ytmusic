@@ -30,3 +30,8 @@ html.sk .gx-bar{background:linear-gradient(rgba(255,246,226,.82),rgba(255,246,22
 html.sk .gx-bar .gx-ibtn,html.sk .gx-bar .gx-ibtn span,html.sk #phchip{color:#2a1a0a;text-shadow:none}
 html.sk .gx-drawer-head{background:linear-gradient(rgba(255,246,226,.8),rgba(255,246,226,.8)),url(media/ui-drawer-head.webp) center/auto 100% repeat-x #e8d9b4}
 html.sk .gx-ibtn svg,html.sk .gx-ibtn svg *{stroke:#2a1a0a;color:#2a1a0a}
+/* last paintings: the island label's pointed tail (size kept: the 8px box) and the list row strip (drawer and camp rows) */
+html.sk .tl:not(.far)::after{background:url(media/ui-bubble-tail.webp) center/contain no-repeat;border:0;transform:none}
+html.sk .row{background:url(media/ui-row.webp) center/100% 100% no-repeat;border-bottom:0}
+html.sk .row:hover{background:url(media/ui-row.webp) center/100% 100% no-repeat;filter:brightness(1.06)}
+html.sk .row.has{background:linear-gradient(rgba(255,236,190,.45),rgba(255,236,190,.45)),url(media/ui-row.webp) center/100% 100% no-repeat}

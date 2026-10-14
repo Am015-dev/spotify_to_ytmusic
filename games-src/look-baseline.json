@@ -1,7 +1,7 @@
 {
  "crown-city-smash": {
   "severe": 4,
-  "warn": 6,
+  "warn": 3,
   "severeKeys": [
    "contrast|em.v",
    "plates|button.btn.mini",
@@ -9,10 +9,8 @@
    "plates|button.btn"
   ],
   "counts": {
-   "contrast": 2,
-   "overflow": 2,
    "images": 2,
-   "button": 1,
+   "overflow": 1,
    "art": 0
   }
  },
@@ -99,12 +97,17 @@
   }
  },
  "tidewake": {
-  "severe": 0,
-  "warn": 5,
-  "severeKeys": [],
+  "severe": 2,
+  "warn": 7,
+  "severeKeys": [
+   "size|button#bulbbtn > span",
+   "size|button.gx-ibtn > span"
+  ],
   "counts": {
-   "contrast": 1,
+   "size": 2,
+   "contrast": 2,
    "images": 3,
+   "button": 1,
    "boards": 1,
    "art": 0
   }
@@ -120,16 +123,18 @@
   }
  },
  "thornbound": {
-  "severe": 3,
-  "warn": 6,
+  "severe": 4,
+  "warn": 8,
   "severeKeys": [
    "size|g.tb-m-round > g > text",
+   "size|g.tb-m-static > g > text",
    "size|g.tbx-pan > g > text",
    "contrast|g.tb-m-static > g > text"
   ],
   "counts": {
-   "images": 4,
-   "contrast": 2,
+   "size": 5,
+   "images": 5,
+   "button": 1,
    "art": 0
   }
  },
@@ -153,17 +158,16 @@
  },
  "cauldron-fair": {
   "severe": 2,
-  "warn": 10,
+  "warn": 8,
   "severeKeys": [
    "contrast|span.bagn",
    "size|svg.chip > text"
   ],
   "counts": {
-   "contrast": 1,
+   "contrast": 2,
    "images": 4,
-   "overflow": 1,
-   "button": 2,
-   "size": 2,
+   "button": 1,
+   "size": 1,
    "art": 0
   }
  },

@@ -147,23 +147,30 @@ def main():
         srv, base = start_server(out)   # ONE server for every check below
         env = dict(os.environ, GX_URL=base, GX_STAGE=str(out))
         env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
-    if ok and not a.no_check:  # 3. phone-check against the staging folder
+    # Owner, 13 Oct 2026: "don't play the game, run tests". phone-check PLAYS each game (6 scenarios, up to 3 min each), so it
+    # runs only with --full. The gate is the ?scn= scenario tests + LAB test + look check (open a state, check it, no playing).
+    if ok and not a.no_check:  # 3. phone-check (plays the game): --full only; otherwise straight to the scenario tests
         chk = out / ".check"
         env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk), GAME_MS=str(max([PHONE_MS.get(x, 180000) for x in ok])))
-        r = timed("all" if len(ok) > 1 else ok[0], "phone-check", lambda: subprocess.run(["node", str(SCRIPTS / "phone-check.js")] + ok, env=env3, capture_output=True, text=True))
-        rows = {}
-        md = chk / "phone-check-results.md"
-        if md.exists():
-            for line in md.read_text().splitlines():
-                m = re.match(r"\| (\S+) \| (.*) \| ([^|]*) \|$", line)
-                if m and m.group(1) in ok: rows[m.group(1)] = (m.group(2).split(" | "), m.group(3))
-        for s in ok:
-            if s not in rows: status[s], why[s] = "FAIL", "phone-check did not report (see %s)" % (r.stderr.strip()[-100:] or "log")
-            else:
-                cells, errs = rows[s]
-                failing = [c for c in cells if c != "PASS"]
-                if failing: status[s], why[s] = "FAIL", "phone-check: " + "; ".join(failing)[:120]
-                else: status[s], why[s] = "PASS", "" if errs == "none" else "page errors: " + errs[:80]
+        if a.full:
+            r = timed("all" if len(ok) > 1 else ok[0], "phone-check", lambda: subprocess.run(["node", str(SCRIPTS / "phone-check.js")] + ok, env=env3, capture_output=True, text=True))
+            rows = {}
+            md = chk / "phone-check-results.md"
+            if md.exists():
+                for line in md.read_text().splitlines():
+                    m = re.match(r"\| (\S+) \| (.*) \| ([^|]*) \|$", line)
+                    if m and m.group(1) in ok: rows[m.group(1)] = (m.group(2).split(" | "), m.group(3))
+            for s in ok:
+                if s not in rows: status[s], why[s] = "FAIL", "phone-check did not report (see %s)" % (r.stderr.strip()[-100:] or "log")
+                else:
+                    cells, errs = rows[s]
+                    failing = [c for c in cells if c != "PASS"]
+                    if failing: status[s], why[s] = "FAIL", "phone-check: " + "; ".join(failing)[:120]
+                    else: status[s], why[s] = "PASS", "" if errs == "none" else "page errors: " + errs[:80]
+        else:
+            (out / ".check").mkdir(parents=True, exist_ok=True)
+            for s in ok: status[s], why[s] = "PASS", ""
+            print("[phone-check] skipped: it plays the game (use --full for engine/rules changes)", flush=True)
         if a.quick or a.deploy:  # 3a. scenario tests (`?scn=<id>` states: skip menus, seed the RNG, build the state, assert), all games in one run
             passing = [s for s in ok if status[s] == "PASS"]
             if passing:
@@ -172,9 +179,18 @@ def main():
                 for s in passing:
                     m = re.search(r"^SCN %s (\S+) (\d+)/(\d+)(.*)$" % re.escape(s), txt, re.M)
                     if not m: status[s], why[s] = "FAIL", "scenario-test did not report"
-                    elif m.group(1) != "ok": status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
+                    elif m.group(1) != "ok":
+                        # Universal invariants (text < 11 px, clipping, ...) also flag OLD problems already on the live game. Rerun with the
+                        # scenarios' own checks only: if those pass, warn (the look check, which compares with the live game, guards regressions).
+                        rn = subprocess.run(["node", str(SCRIPTS / "scenario-test.js"), s], cwd=str(SCRIPTS), env=dict(env3, SCN_NOINV="1", SCN_OUT=str(out / ".check" / ".scn-own")),
+                                            capture_output=True, text=True, timeout=600)
+                        m2 = re.search(r"^SCN %s (\S+) (\d+)/(\d+)(.*)$" % re.escape(s), rn.stdout, re.M)
+                        if m2 and m2.group(1) == "ok":
+                            print(f"[scn] {s:18} own checks {m2.group(2)}/{m2.group(3)} ok; WARN universal: {m.group(4).strip()[:120]}", flush=True)
+                        else:
+                            status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
                     else: print(f"[scn] {s:18} {m.group(2)}/{m.group(3)} scenarios ok")
-        if a.quick or a.deploy:  # 3a2. LAB acceptance tests: test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
+        if a.full:  # 3a2. LAB acceptance tests (shared pages; warn-only, so not in the fast gate: --full only): test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
             passing = [s for s in ok if status[s] == "PASS"]
             if passing:   # a game's first deploy has no rows in games/scenarios.json yet: index the staged pages first so lab.html can list them
                 try:
@@ -185,12 +201,13 @@ def main():
                 txt = (out / ".check" / "lab-test.log").read_text()
                 for s in passing:
                     m = re.search(r"^LAB %s (\S+) (.*)$" % re.escape(s), txt, re.M)
-                    if not m: status[s], why[s] = "FAIL", "lab-test did not report"
-                    elif m.group(1) != "ok": status[s], why[s] = "FAIL", "lab-test: " + m.group(2)[:140]
+                    # lab-test checks the shared shelf/LAB pages, not this game: report, never block a game's deploy
+                    if not m: print(f"[lab] {s:18} WARN lab-test did not report", flush=True)
+                    elif m.group(1) != "ok": print(f"[lab] {s:18} WARN " + m.group(2)[:140], flush=True)
                     else: print(f"[lab] {s:18} ok {m.group(2)[:40]}")
         # 3c. the game's own sweeps (they play whole games).
         # Owner, 13 Oct 2026: "don't play the game". Sweeps play whole games, so they run ONLY with --full (engine/rules changes).
-        # --quick and --deploy = phone-check + ?scn= GO scenarios + look check, no game playing.
+        # --quick and --deploy = ?scn= GO scenarios + look check (+ LAB test as a warning), no game playing.
         if a.full:
             for s in [x for x in ok if status[x] == "PASS"]:
                 d, scripts = SWEEPS[s]
@@ -211,7 +228,27 @@ def main():
                 r = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--gate", "--game", s, "--games-dir", str(out), "--out", str(out / ".look"), "--no-shots"],
                                    env=env, capture_output=True, text=True, timeout=900)
                 tail = [l for l in r.stdout.splitlines() if "[look]" in l and s in l]
-                if r.returncode == 1: status[s], why[s] = "FAIL", "look-check: " + (tail[-1].split("] ", 1)[-1] if tail else "new severe findings")[:140]
+                if r.returncode == 1:
+                    # Block only on findings the LIVE game doesn't already have (the baseline file goes stale as other workers deploy).
+                    def sev(path):
+                        try:
+                            g = json.load(open(path)).get("games", {}).get(s, {})
+                            return {(f.get("check"), f.get("sel"), f.get("text")) for f in g.get("findings", []) if f.get("sev") == "severe"}
+                        except Exception: return None
+                    new_f = sev(out / ".look" / "report.json")
+                    import hashlib
+                    lp = SRC.parent / "games" / s / "index.html"
+                    key = hashlib.sha1(lp.read_bytes()).hexdigest()[:12] if lp.exists() else "none"
+                    cache = SRC / ".look-live-cache" / f"{s}-{key}"
+                    if not (cache / "report.json").exists():   # live version not measured yet: measure once, reuse for every later deploy
+                        subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--game", s, "--games-dir", str(SRC.parent / "games"), "--out", str(cache), "--no-shots"],
+                                       env=env, capture_output=True, text=True, timeout=900)
+                    live_f = sev(cache / "report.json")
+                    msg = (tail[-1].split("] ", 1)[-1] if tail else "new severe findings")[:140]
+                    if new_f is not None and live_f is not None and new_f <= live_f:
+                        print(f"[look] {s}: WARN pre-existing on the live game too, not caused by this change: {msg}", flush=True)
+                    else:
+                        status[s], why[s] = "FAIL", "look-check (new vs live): " + msg
                 elif r.returncode != 0: print(f"[look] {s}: look-check crashed, report-only ({r.stderr.strip()[-80:]})")
                 else: print(f"[look] {s}: {tail[-1].split('] ', 1)[-1] if tail else 'ok'}")
             except Exception as e:

@@ -1,6 +1,412 @@
 [
  {
   "date": "2026-10-13",
+  "game": "shipwreck-isle",
+  "title": "Last paintings wired",
+  "items": [
+   "Camp icons (shelter, roof, palisade, weapon), 3D campfire, raft and a third palm",
+   "ui-bubble-tail: island label tail; ui-row: drawer and camp row strip"
+  ],
+  "check": "Island labels show a small tail; drawer and camp rows show the painted sailcloth strip",
+  "scn": [
+   "si-art",
+   null
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "sands-of-qamar",
+  "title": "Painted art in Sands",
+  "items": [
+   "item"
+  ],
+  "check": "Open a game: tiles, badges and items are painted; numbers readable",
+  "scn": [
+   "sq-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "sunglaze",
+  "title": "Painted art wired",
+  "items": [
+   "Painted terracotta kiln plates and a wooden centre tray",
+   "Carved rack dishes, clay floor dishes and plaster wall recesses",
+   "Painted sun token, glaze highlights on tiles, ceramic buttons and panels",
+   "Rack tray, bubble tail, rows"
+  ],
+  "check": "Five-dish rack is a wooden tray",
+  "scn": [
+   "sg-board",
+   "sg-board",
+   "sg-buttons",
+   "sg-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   "Does the rack look like a tray?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "cauldron-fair",
+  "title": "Painted art wired",
+  "items": [
+   "Draw dish, chip track, bubble tail, rows"
+  ],
+  "check": "Draw bag and chip track look painted",
+  "scn": [
+   "cf-art"
+  ],
+  "ask": [
+   "Do the bag and chip track look painted?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "tidewake",
+  "title": "Painted art wired",
+  "items": [
+   "The board sea is painted water tiles with a painted brass compass rose",
+   "Brass-and-teal buttons and bar",
+   "Board frame, brass rings, luggage tag, bubble tail, rows"
+  ],
+  "check": "Board is framed, labels readable",
+  "scn": [
+   "tw-board",
+   "tw-buttons",
+   "tw-art"
+  ],
+  "ask": [
+   null,
+   null,
+   "Is the board framed?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "crown-city-smash",
+  "title": "Painted art wired",
+  "items": [
+   "Crown icon, chips, dice tray, pink/yellow/ghost buttons, bubble tail"
+  ],
+  "check": "Top chips, dice tray and crown look painted",
+  "scn": [
+   "cc-art"
+  ],
+  "ask": [
+   "Do the chips and dice tray look painted?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "kaiten-kitchen",
+  "title": "Painted art wired",
+  "items": [
+   "The domes over each pick are now detailed 3D brass cloches",
+   "They still lift with steam when the round reveals",
+   "Each chef has a painted chopstick-sleeve name tag",
+   "Stars, plates, custard cups and Fire Paste are painted icons",
+   "Top bar, menus and buttons use the lacquer kit",
+   "Menu learn row and speech tail are painted"
+  ],
+  "check": "Open Menu: the learn row is a painted strip",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "kk-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "nebula-aces",
+  "title": "Painted art wired",
+  "items": [
+   "Every hull shows its own painted ship; radio strip on a painted plate"
+  ],
+  "check": "Does each ship card show its picture?",
+  "scn": [
+   "nb-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "doorkick-dungeon",
+  "title": "Short status line",
+  "items": [
+   "Hand and level icons, speech-bubble tail, 3D winner hero",
+   "Lightbulb, first-time tips, rules cards, Tips switch",
+   "Drag/tap status line is 8 words or fewer"
+  ],
+  "check": "Is the line short and does it match?",
+  "scn": [
+   "dk-art",
+   "dk-tips",
+   "dk-status-line"
+  ],
+  "ask": [
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "lantern-dive",
+  "title": "Painted art wired",
+  "items": [
+   "A detailed 3D lantern swings in at the Commander's seat when jobs are handed out",
+   "The Commander badge is now the lantern too",
+   "The trick table is a brass-rimmed painted pad",
+   "Oxygen tanks and boss hearts are painted",
+   "Buttons, top bar and menus use the brass kit",
+   "Painted card frames, tick/cross, seat plates, portrait Descent table"
+  ],
+  "check": "Do cards, seats and job marks look painted?",
+  "scn": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   "ld-art"
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "hollowbough",
+  "title": "Painted art wired",
+  "items": [
+   "Painted resource icons, season wheel and kit"
+  ],
+  "check": "Are the resource icons painted?",
+  "scn": [
+   "hb-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "cauldron",
+  "title": "Readable chip numbers",
+  "items": [
+   "Story speech bubble keeps its frame and tail instead of being stretched",
+   "Painted buttons and panels keep their proportions",
+   "The numbers on the small chips under each cauldron are bigger"
+  ],
+  "check": "Draw a few chips and read the small numbers",
+  "scn": [
+   "story-scene",
+   "cf-board",
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "mainhattan-nightrun",
+  "title": "Clear phone screen in runs",
+  "items": [
+   "On a phone the run shows the city and enemies: HUD is one slim strip on top, power-ups are small chips, dash and EMP charge sit on their buttons"
+  ],
+  "check": "Play a run on your phone: you see the city and enemies, HUD only at the top",
+  "scn": [
+   "nr-hud-busy"
+  ],
+  "ask": [
+   "Is the middle of the screen clear?"
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "mainhattan",
+  "title": "Nightrun bosses: clean edges, facing you, walkers on the road",
+  "items": [
+   "Title, pause, garage, shop and story buttons are now painted plates",
+   "Settings card has a painted frame, header and rows",
+   "Run HUD sits in painted housings; hints in a speech bubble",
+   "Phone pause, DASH and EMP are painted round buttons",
+   "Story map stages sit on medallions: open, done, boss, locked",
+   "All ten bosses now animate: idle frames, a wind-up before they fire, then the shot and recovery",
+   "LAB: in-run buttons put you straight back in the game; RESUME RUN at the top; BOSS PICKER; small LAB chip in the run",
+   "Fixed oversized difficulty badges in the LAB and cramped story map on small phones",
+   "40 story stages plus 5 optional challenges on a painted route map: tap a stage to see its goal, stars and PLAY",
+   "Difficulty climbs a little every stage; bosses sit slightly above their stage",
+   "Pit stop: build paths, synergies, a heat budget, 6 to 8 upgrade slots, selling, boss picks",
+   "Garage: build presets, trade-off perks, ship fire patterns; market with a sale, cargo hold and sell-back",
+   "LAB is its own stage (title > LAB, Settings > OPEN LAB, ?lab=1): boss gallery with intro, phases, attacks, poses, hit and death; foes, items and power-ups one at a time",
+   "Less lag on big screens: ground haze baked into the backdrop, menus no longer redraw the game behind them, slow machines lower the picture sharpness by themselves",
+   "Labels fit their plates: scrolling story list, HUD type 11 px or more on phones, readable garage tabs, new ui-align-test.js",
+   "No more white gaps or halos around the ten bosses",
+   "Talos now faces you",
+   "Tank, vault, spearman and Talos walk or roll along the road with a shadow; the river beast rides the water",
+   "LAB opens straight on a boss with ?boss=talos"
+  ],
+  "check": "Open LAB → each boss: no white edges, faces you, walkers stay on the road"
+ },
+ {
+  "date": "2026-10-13",
+  "game": "crown",
+  "title": "Clearer score chips and bigger Got it",
+  "items": [
+   "New painted bar, panels and buttons",
+   "3D towers, fountain and Dot in the city",
+   "Full-detail Clampede on the board",
+   "Little 3D hearts, stars and energy bolts burst out",
+   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
+   "Hearts, energy and stars fly to the chips as painted icons.",
+   "Tap SMASH! over the city to use your dice",
+   "Cards for sale are painted cards on the board: hold to read, tap to buy",
+   "Your power cards sit along the top of the board",
+   "Stay or yield opens in the middle of the board",
+   "The side panel is smaller: just status and advice",
+   "Star and bolt numbers on the player chips are darker on a pale plate and no longer clipped",
+   "The Got it button on help bubbles is a bigger tap target"
+  ],
+  "check": "Start a game and look at the chips at the top: star and bolt numbers",
+  "scn": [
+   "cc-board",
+   "cc-board",
+   "cc-board",
+   "cc-dice-end",
+   "cc-market",
+   "cc-smash",
+   "cc-smash",
+   "cc-market",
+   "cc-board",
+   "cc-board",
+   "cc-board",
+   "cc-board",
+   "cc-board",
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "sands",
+  "title": "Button text size",
+  "items": [
+   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
+   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
+   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots",
+   "Bid chips 13 px"
+  ],
+  "check": "sweep 4/4 clean, no empty or clipped button labels",
+  "scn": [
+   "sq-zoom",
+   "sq-board",
+   "sq-chips",
+   "sq-chips",
+   null,
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
+  "game": "rampart-and-vine",
+  "title": "Painted art wired",
+  "items": [
+   "Painted pieces, menu rows, bubble tail"
+  ],
+  "check": "Are the pieces painted and coloured?",
+  "scn": [
+   "rv-art"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-13",
   "game": "approach",
   "title": "Painted art wired",
   "items": [
@@ -157,42 +563,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "hollowbough",
-  "title": "Painted art wired",
-  "items": [
-   "Painted resource icons, season wheel and kit"
-  ],
-  "check": "Are the resource icons painted?",
-  "scn": [
-   "hb-art"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "cauldron",
-  "title": "Readable chip numbers",
-  "items": [
-   "Story speech bubble keeps its frame and tail instead of being stretched",
-   "Painted buttons and panels keep their proportions",
-   "The numbers on the small chips under each cauldron are bigger"
-  ],
-  "check": "Draw a few chips and read the small numbers",
-  "scn": [
-   "story-scene",
-   "cf-board",
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
   "game": "doorkick",
   "title": "Doorkick: scenario tests and steadier phone layout",
   "items": [
@@ -250,75 +620,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "mainhattan-nightrun",
-  "title": "Clear phone screen in runs",
-  "items": [
-   "On a phone the run shows the city and enemies: HUD is one slim strip on top, power-ups are small chips, dash and EMP charge sit on their buttons"
-  ],
-  "check": "Play a run on your phone: you see the city and enemies, HUD only at the top",
-  "scn": [
-   "nr-hud-busy"
-  ],
-  "ask": [
-   "Is the middle of the screen clear?"
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "mainhattan",
-  "title": "Nightrun bosses: clean edges, facing you, walkers on the road",
-  "items": [
-   "Title, pause, garage, shop and story buttons are now painted plates",
-   "Settings card has a painted frame, header and rows",
-   "Run HUD sits in painted housings; hints in a speech bubble",
-   "Phone pause, DASH and EMP are painted round buttons",
-   "Story map stages sit on medallions: open, done, boss, locked",
-   "All ten bosses now animate: idle frames, a wind-up before they fire, then the shot and recovery",
-   "LAB: in-run buttons put you straight back in the game; RESUME RUN at the top; BOSS PICKER; small LAB chip in the run",
-   "Fixed oversized difficulty badges in the LAB and cramped story map on small phones",
-   "40 story stages plus 5 optional challenges on a painted route map: tap a stage to see its goal, stars and PLAY",
-   "Difficulty climbs a little every stage; bosses sit slightly above their stage",
-   "Pit stop: build paths, synergies, a heat budget, 6 to 8 upgrade slots, selling, boss picks",
-   "Garage: build presets, trade-off perks, ship fire patterns; market with a sale, cargo hold and sell-back",
-   "LAB is its own stage (title > LAB, Settings > OPEN LAB, ?lab=1): boss gallery with intro, phases, attacks, poses, hit and death; foes, items and power-ups one at a time",
-   "Less lag on big screens: ground haze baked into the backdrop, menus no longer redraw the game behind them, slow machines lower the picture sharpness by themselves",
-   "Labels fit their plates: scrolling story list, HUD type 11 px or more on phones, readable garage tabs, new ui-align-test.js",
-   "No more white gaps or halos around the ten bosses",
-   "Talos now faces you",
-   "Tank, vault, spearman and Talos walk or roll along the road with a shadow; the river beast rides the water",
-   "LAB opens straight on a boss with ?boss=talos"
-  ],
-  "check": "Open LAB → each boss: no white edges, faces you, walkers stay on the road"
- },
- {
-  "date": "2026-10-13",
-  "game": "sunglaze",
-  "title": "Painted kilns and rack for Sunglaze",
-  "items": [
-   "Painted terracotta kiln plates and a wooden centre tray",
-   "Carved rack dishes, clay floor dishes and plaster wall recesses",
-   "Painted sun token, glaze highlights on tiles, ceramic buttons and panels"
-  ],
-  "check": "Start a game on a phone: look at the kilns, the centre tray and your rack.",
-  "scn": [
-   "sg-board",
-   "sg-board",
-   "sg-buttons",
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
   "game": "rampart",
   "title": "Painted look for Rampart & Vine",
   "items": [
@@ -333,105 +634,6 @@
    "rv-buttons",
    "rv-buttons",
    "rv-art"
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "crown",
-  "title": "Clearer score chips and bigger Got it",
-  "items": [
-   "New painted bar, panels and buttons",
-   "3D towers, fountain and Dot in the city",
-   "Full-detail Clampede on the board",
-   "Little 3D hearts, stars and energy bolts burst out",
-   "All 182 power cards show their own picture in the shop, on the board tiles and in your owned list.",
-   "Hearts, energy and stars fly to the chips as painted icons.",
-   "Tap SMASH! over the city to use your dice",
-   "Cards for sale are painted cards on the board: hold to read, tap to buy",
-   "Your power cards sit along the top of the board",
-   "Stay or yield opens in the middle of the board",
-   "The side panel is smaller: just status and advice",
-   "Star and bolt numbers on the player chips are darker on a pale plate and no longer clipped",
-   "The Got it button on help bubbles is a bigger tap target"
-  ],
-  "check": "Start a game and look at the chips at the top: star and bolt numbers",
-  "scn": [
-   "cc-board",
-   "cc-board",
-   "cc-board",
-   "cc-dice-end",
-   "cc-market",
-   "cc-smash",
-   "cc-smash",
-   "cc-market",
-   "cc-board",
-   "cc-board",
-   "cc-board",
-   "cc-board",
-   "cc-board",
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "tidewake",
-  "title": "Painted sea for Tidewake",
-  "items": [
-   "The board sea is painted water tiles with a painted brass compass rose",
-   "Brass-and-teal buttons and bar"
-  ],
-  "check": "Start a game: look at the water under the tiles and the compass in the middle.",
-  "scn": [
-   "tw-board",
-   "tw-buttons",
-   null,
-   null
   ],
   "ask": [
    null,
@@ -505,65 +707,6 @@
  },
  {
   "date": "2026-10-13",
-  "game": "sands",
-  "title": "Button text size",
-  "items": [
-   "Every djinn now shows its painting: in the row, the summon pop-up and the Djinns list",
-   "Goods, camel and tent tokens, palm and palace, item and cutpurse art replace emoji",
-   "Coin, camel, goods and djinn icons on the score chips; painted turn-order slots",
-   "Bid chips 13 px"
-  ],
-  "check": "sweep 4/4 clean, no empty or clipped button labels",
-  "scn": [
-   "sq-zoom",
-   "sq-board",
-   "sq-chips",
-   "sq-chips",
-   null,
-   null,
-   null,
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
-  "game": "thornbound",
-  "title": "Readable map labels",
-  "items": [
-   "The winner's screen now shows a detailed 3D crown that drops in and sways",
-   "Faction emblems on the seat chips and faction sheet",
-   "Wax seal strength plates on the map and a painted round shield",
-   "Buttons, bars and menus use the painted vellum kit",
-   "ROUND, region names and influence numbers on the map are bigger"
-  ],
-  "check": "Open a game: read ROUND and the region names on the map",
-  "scn": [
-   "tb-board",
-   "tb-rivals",
-   "tb-board",
-   "tb-buttons",
-   null
-  ],
-  "ask": [
-   null,
-   null,
-   null,
-   null,
-   null
-  ]
- },
- {
-  "date": "2026-10-13",
   "game": "shelf",
   "title": "Test mode and LAB in every game",
   "items": [
@@ -576,6 +719,18 @@
    "lab.html: every game, every scenario, one page"
   ],
   "check": "Turn on 🧪 Test mode, open LAB, tap GO on any scenario"
+ },
+ {
+  "date": "2026-10-10",
+  "game": "sands-of-qamar",
+  "title": "Painted look for Sands of Qamar",
+  "items": [
+   "New carved top bar and painted icon buttons",
+   "Parchment menus and dialogs with gilt corners",
+   "Painted story map with medallion chapters and act banners",
+   "The six tribes are now painted meeples on the board"
+  ],
+  "check": "Open Story mode and scroll the map; tap a chapter"
  },
  {
   "date": "2026-10-10",
