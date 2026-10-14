@@ -157,7 +157,15 @@ function AS_defs(D){const C=CID==='fra'?'fra':'ath';AS_variants();ASSET.far=ASSE
 // after the city's props are built (or when this file arrives later): far blobs, variants, rebalance, tints, near/mid meshes
 function AS_apply(){const D=HUB.ptypes;if(!D||!HUB.props||!HUB.grp)return;const C=CID==='fra'?'fra':'ath',old=new Map();for(const t in AS_POOL[C]){const d=D[t];if(d&&!d.asB)for(const g of[d.g,d.gFar,d.gOld])if(g)old.set(g,t)}
  AS_defs(D);if(old.size)scene.traverse(o=>{if(o.isInstancedMesh&&old.has(o.geometry))o.geometry=D[old.get(o.geometry)].g});ASSET.ag=new Map();ASSET.agId=(ASSET.agId|0)+1;ASSET.hid.clear();
- ASSET.nA=AS_assign(HUB.props);ASSET.nFix=AS_fix(HUB.props);AS_far(HUB.props);AS_mk();ASSET.cx=1e9}
+ ASSET.nA=AS_assign(HUB.props);ASSET.nFix=AS_fix(HUB.props);AS_far(HUB.props);AS_mk();ASSET.cx=1e9;AS_tufts()}
+// fill grass tufts (98lf, ~216k in Frankfurt, two open 5-sided cones = 10 tris each) -> a low-poly copy of LEGO 6255 Plant 1x1 Round with 3 Large Leaves:
+// 3 kite leaves 120° apart (centre r 4 -> sides r 28 ±16 -> tip r 54 LDU as measured on the LDraw part; tips arched up to 27-33 LDU so the tuft keeps the old ~0.9 m height), a second one turned 60° on a
+// 1x1 round stem above it (plants stacked on round bricks, as in LEGO bushes): 12 tris, white (the fill's instance colour picks the green), double-sided material
+function AS_tuftGeo(){const P=[],C=[],k=.018,leaf=(a0,y0,s)=>{for(let i=0;i<3;i++){const a=(a0+i*120)*Math.PI/180,ca=Math.cos(a),sa=Math.sin(a),pt=(r,w,y)=>[(ca*r-sa*w)*s*k,(y0+y)*k,(sa*r+ca*w)*s*k],
+  c=pt(4,0,4),l=pt(28,-16,19),r=pt(28,16,19),t=pt(54,0,27+i*3);P.push(...c,...l,...t,...c,...t,...r);for(let j=0;j<6;j++){const d=j%3===0?.72:j%3===1?.92:1;C.push(d,d,d)}}};
+ leaf(15,0,1);leaf(75,30,.72);const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));g.computeVertexNormals();g.computeBoundingSphere();g.userData.as='tuft 6255';return g}
+function AS_tufts(){if(typeof LF==='undefined'||typeof LF_geos!=='function'||ASSET.off)return;const GE=LF.geo||(LF.geo=LF_geos());if(GE.tuft.userData.as)return;const old=GE.tuft;GE.tuft=ASSET.tuft||(ASSET.tuft=AS_tuftGeo());GE.tuftOld=old;
+ scene.traverse(o=>{if(o.isInstancedMesh&&o.geometry===old)o.geometry=GE.tuft})}
 buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{AS_apply()}catch(e){console.warn('AS apply',e)}return r})(buildHubProps);
 lzPropsG=(f=>function*(L){yield* f.apply(this,arguments);try{const P=HUB.props,n=L.nProps|0,T=P.slice(P.length-n);if(HUB.ptypes)AS_defs(HUB.ptypes);AS_assign(T);AS_fix(T);AS_far(T);ASSET.cx=1e9}catch(e){console.warn('AS lz',e)}})(lzPropsG);
 propRevive=(f=>function(p){f.apply(this,arguments);if(p.av&&p.im&&ASSET.V[p.av]){p.im.setMatrixAt(p.i,AS_farM(p,new THREE.Matrix4()));ASSET.cx=1e9}})(propRevive);
@@ -182,7 +190,7 @@ function AS_step(){if(ASSET.off||!HUB.pgrid||!HUB.props||!ASSET.nm||!camera)retu
  ASSET.last={ms:+(performance.now()-t0).toFixed(2),draws,tris,near:inst[0],mid:inst[1],hidden:now.size}}
 // test hook: chk() = per-variant parts/studs/tris; lod() = every drawn instance on the right LOD for its distance; mix(r) = worst same-variant share within r m
 // ab(1): draw the old trees again (A/B shots and perf), ab(0): back to the LEGO builds
-function AS_ab(off){const D=HUB.ptypes,M=new THREE.Matrix4(),dirty=new Set();ASSET.off=!!off;for(const M2 of[ASSET.nm,ASSET.mm])for(const n in M2)M2[n].visible=!off&&M2[n].count>0;
+function AS_ab(off){const D=HUB.ptypes,M=new THREE.Matrix4(),dirty=new Set();ASSET.off=!!off;{const GE=typeof LF!=='undefined'&&LF.geo;if(GE&&GE.tuftOld){const a=off?GE.tuft:GE.tuftOld,b=off?GE.tuftOld:GE.tuft;scene.traverse(o=>{if(o.isInstancedMesh&&o.geometry===a)o.geometry=b})}}for(const M2 of[ASSET.nm,ASSET.mm])for(const n in M2)M2[n].visible=!off&&M2[n].count>0;
  for(const p of HUB.props||[]){if(!p.av||!p.im)continue;const d=D[p.t],im=p.im;if(ASSET.V[p.av].cls==='keep'){if(off&&p.alive){M.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));im.setMatrixAt(p.i,M);dirty.add(im)}continue}if(!im.userData.asOld)im.userData.asOld=d.gAS0;im.geometry=off?im.userData.asOld:d.g;
   if(p.alive){if(off)M.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));im.setMatrixAt(p.i,off?M:AS_farM(p,M))}
   if(off&&im.instanceColor)im.setColorAt(p.i,new THREE.Color(d.tint?d.tint[(p.i*7)%d.tint.length]:'#ffffff'));dirty.add(im)}
