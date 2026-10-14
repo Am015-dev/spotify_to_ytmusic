@@ -44,3 +44,9 @@ Code: `src/98b2_builder2.js` (builder), `src/99c_checklist.js` (bxT items + GO).
 1. TWO-LEVEL CITY: no shortcut and the lap is 1.45 km. The city blocks (z = ±40), the lake and the 320 m edge leave no room for a loop out and back. Redesign it or drop it (coordinator's call).
 2. Scenery is still plainer than 2K: props are big boxes and there's one landmark. Ideas: the tunnel mouth, crowds on stands.
 3. Lap 60–90 s isn't possible in the 320 m grid. The coordinator approved 1.5–2.7 km laps with 2-lap races.
+
+## trk-2 (2026-10-14)
+- TWO-LEVEL CITY is shown again (4th race track). It is the lagoon snail turned 180° (`[26,37,5,1]`, re-anchor `[2,18,-1,2]`) on city ground: a 10 m viaduct over the inner loop, and a lake splash shortcut (54 m) in a stadium-shaped lake (`city` world f). BX_CITY blocks moved into the infields (plan.js: bldg hits 0; the bx-bridge test roads are clear too).
+- tData now runs 4 tracks (`bx-t-city` added, with a checklist item + GO). All 4 PASS.
+- Polish: each world has its own landmark (`BX_landmark`: city TV tower, islands lighthouse, canyon brick stack, otherwise the minifig). Banners are printed boards on legs (`BX.banMat`). Crowds are separate minifigs on a grey stand.
+- Known: canyon, lagoon and city share one layout (different worlds and scenery). A distinct city layout needs a bigger grid (BXN=40 is global).
