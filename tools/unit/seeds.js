@@ -8,4 +8,6 @@ module.exports=[
  {seed:'fra-dead',expect:'FAIL roads-fra/deadend-arterial|FAIL roads-fra/deadend-main|FAIL roads-fra/deadend-ring|FAIL roads-fra/coords-finite'},
  {seed:'fra-zero',expect:'FAIL roads-fra/no-zero-length-edge'},
  {seed:'ath-zero',expect:'FAIL roads-ath/no-zero-length-edge'},
+ {seed:'model-hollow',expect:'FAIL models/ride-(bricks|fill)-v6'},
+ {seed:'model-color',expect:'FAIL models/colour-index-v6'},
 ];

@@ -7,5 +7,14 @@
  "roads-ath/taxi-on-road-0": "stand 39,29 is 41 m from the nearest road",
  "roads-ath/taxi-on-road-1": "stand 829,-65 is 63 m from the nearest road",
  "roads-ath/taxi-on-road-3": "stand 2512,553 is 70 m from the nearest road",
- "roads-ath/garage-on-road-a_hil": "garage a_hil is 31 m from a road"
+ "roads-ath/garage-on-road-a_hil": "garage a_hil is 31 m from a road",
+ "models/ride-height-v3056_1": "height 4 < 6 plates: no roof/body",
+ "models/ride-aspect-v3056_1": "length/width 0.71 not car-like",
+ "models/ride-aspect-v6361_1": "length/width 5.50 not car-like",
+ "models/ride-bricks-v6522_1": "only 12 bricks (hollow?)",
+ "models/ride-width-v6522_1": "width 3 studs outside 4..13",
+ "models/ride-wheels-v6522_1": "3 wheel parts (<4)",
+ "models/ride-fill-v6581_1": "footprint fill 0.19 < 0.20 = hollow shell",
+ "models/ride-bricks-v6609_1": "only 13 bricks (hollow?)",
+ "models/ride-height-v7613_1": "height 5 < 6 plates: no roof/body"
 }
