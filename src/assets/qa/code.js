@@ -123,8 +123,8 @@ Q.apply=function(R){R=R||window.__repro;if(!R)return false;
   const wait=()=>{if(!(window.__tq&&__tq.ready&&state==='roam'&&RO.on&&!LD.busy))return setTimeout(wait,200);
     try{for(const k of(R.fl||[]))try{const F=flags();F[k]=true;store.set('mho_flags',F)}catch(e){}
       roamWarp(R.x,R.z,R.h);RO.x=R.x;RO.z=R.z;RO.y=R.y!=null?Math.max(R.y,gy(R.x,R.z,99)):RO.y;RO.h=RO.vh=R.h;RO.v=0;
-      if((R.foot==='walk'||R.foot==='sit')&&RO.foot==='car'){OF_exit();let n=0;const w=()=>{if(RO.foot==='walk'||++n>50){if(RO.foot==='walk'){OF.x=R.ox;OF.z=R.oz;OF.y=gy(R.ox,R.oz,(R.oy||R.y||0)+1);OF.h=R.oh||R.h}Q.applied=true}else{for(let i=0;i<20&&RO.foot==='exit';i++)roamStep(1/60);setTimeout(w,50)}};w()}
-      else Q.applied=true;camSnap=true}catch(e){Q.applied='ERR '+e}};
+      if((R.foot==='walk'||R.foot==='sit')&&RO.foot==='car'){OF_exit();let n=0;const w=()=>{if(RO.foot==='walk'||++n>50){if(RO.foot==='walk'){OF.x=R.ox;OF.z=R.oz;OF.y=gy(R.ox,R.oz,(R.oy||R.y||0)+1);OF.h=R.oh||R.h}Q.at=RO.foot==='walk'?[OF.x,OF.z]:[RO.x,RO.z];Q.applied=true}else{for(let i=0;i<20&&RO.foot==='exit';i++)roamStep(1/60);setTimeout(w,50)}};w()}
+      else{Q.at=[RO.x,RO.z];Q.applied=true}camSnap=true}catch(e){Q.applied='ERR '+e}};
   wait();return true};
 if(window.__repro)Q.apply();
 // ---- deterministic stepping for the monkey bot: n frames with a fixed 1/60 s clock, rAF chain stopped (the page does not run by itself)
