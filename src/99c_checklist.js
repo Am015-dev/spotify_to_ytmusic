@@ -15,6 +15,7 @@ function CK_pit(m){m.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(
  let roof=0;for(const y of map.values())if(y>=minY+.93*h)roof++;
  return{roof:+(roof/Math.max(1,tot)).toFixed(2),tris,area:+(tot*cell*cell).toFixed(1),h:+h.toFixed(2),low:+(low/Math.max(1,tot)).toFixed(2),pit:+(pit/Math.max(1,inner)).toFixed(2)}}
 const OD_CHECKLIST=[
+ {ver:'sh1',id:'cut-world',area:'story',text:'rv:2026-10-14 (b59 shot 5) STORY SCENE WORLD (📍 GO plays Vex Kaiser\'s scene with Hilde\'s truck 2 km from your car): the city around the scene is drawn (≥ 90 % of blocks within 400 m, outskirts loaded) within 3 s and the Taunus hills stay on the horizon (ridge centred on the camera), never a green banded wall over the sky or flat grey lots without buildings.'},
  {ver:'xf1',id:'grass',area:'city',text:'AUTO TRANSFORM road → grass (📍 GO drives you from a street into a park): within 0.5 s on the grass your car rebuilds into its OFF-ROAD form with a brick burst; speed stays (≥ 90 %), no menu. Back on the street it is the street car again.'},
  {ver:'xf1',id:'water',area:'city',text:'AUTO TRANSFORM land → water (📍 GO drives you down a Frankfurt slipway): within 0.5 s on the water you are a BOAT, speed kept, the hull sits IN the water (not floating above, not sunk).'},
  {ver:'xf1',id:'land',area:'city',text:'AUTO TRANSFORM water → land (📍 GO drives the boat up a slipway): within 0.5 s on land it rebuilds into the street car (road) or the off-road form (grass), tyres on the ground.'},
@@ -460,7 +461,8 @@ const OD_CHECKLIST=[
  for(const[id,f]of[['fra-row','row'],['collide','hit'],['perf','perf']])GO['ctb/'+id]=[{c:'fra',n:'LEGO street',fn:()=>window.__ctb&&__ctb.go?__ctb.go[f](goSay):'📍 CTB not loaded ❌'}];
  // art-6: matrix FAILs props-in-road / footsurf-crash (src/98ar_art_go.js)
  for(const dz of['sachs','bahn','ost'])GO['dt/'+dz]=[{c:'fra',n:{sachs:'Sachsenhausen taverns',bahn:'Bahnhof neon',ost:'Osthafen murals'}[dz],fn:()=>window.__dt?__dt.go(dz,goSay):'📍 district themes not loaded ❌'}];/* art-6 district themes (src/98dt_district_themes.js) */
- GO['art/props-road']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt brick pile':'Athens brick pile',fn:()=>window.__art?__art.propsRoad(goSay):'📍 art GO not loaded ❌'}));
+ for(const id of['cut-world'])GO['sh1/'+id]=[{c:'fra',n:'Kaiser scene, Hilde 2 km away',fn:()=>window.__sh1?__sh1.GOS[id].fn(goSay):'📍 SH1 not loaded ❌'}];/* shots-1 (src/98sh_shots1.js) */
+GO['art/props-road']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt brick pile':'Athens brick pile',fn:()=>window.__art?__art.propsRoad(goSay):'📍 art GO not loaded ❌'}));
  GO['art/fest-form']=[{c:'ath',n:'Festival Delivery',fn:()=>window.__art?__art.festForm(goSay):'📍 art GO not loaded ❌'}];
  GO['art/footsurf']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt grass patch':'Athens grass patch',fn:()=>window.__art?__art.footSurf(goSay):'📍 art GO not loaded ❌'}));
  // chk-1 (Alex v90j-beta: "checklist has no GO scenarios"): every item without its own target gets one from its area/text:
