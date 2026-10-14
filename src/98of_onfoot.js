@@ -136,10 +136,29 @@ function OF_input(){const S=OF.stick;let fx=0,fy=0,run=false,jump=false;
   if(TOUCH.gas)run=true;jump=!!(TOUCH.boost||K.Space)||OF.jQ>0;return{fx,fy,run,jump,mag}}
 // foot-1: speed from stick travel, continuous: half stick = walk (2 m/s), full = run (5 m/s), RUN / Shift = run at any travel; keys = walk
 function OF_tv(I){if(I.mag<=0)return 0;if(I.run)return OF_RUN;const m=I.mag;return m<=.5?OF_WALK*(.45+.55*m/.5):OF_WALK+(OF_RUN-OF_WALK)*Math.pow((m-.5)/.5,1.3)}
-function OF_collide(x,z,y){for(let it=0;it<4;it++){const b=roamHit(x,z,OF_R,y+1);if(!b)break;const p=bldPush(b,x,z,OF_R);x=p[0];z=p[1]}
+// foot-2: a prop blocks the walker with its real footprint (oriented box from the model's bounding box: a 11 m fence, a 4.6 m parked car, a bench, a stall, a container),
+// not a ≤ 1.1 m circle. Poles / trunks / overhead things / tiny things keep a round collider; pigeons none. Cached per type.
+const OF_PF_RND=/^(tree|tree2|tree3|CE_pine|CE_olive|CE_cypress|lamp|post|sign|tlight|clight|lights|awning|parasol|CE_pigeon)$/;
+function OF_pf(t,d){const C=OF.pfc||(OF.pfc={});let f=C[t];if(f&&f.d===d)return f;f={d};
+  if(OF_PF_RND.test(t))f.r=t==='CE_pigeon'?0:Math.max(.15,Math.min(1.1,d.r*.45));
+  else{let b=null;try{d.g.computeBoundingBox();b=d.g.boundingBox}catch(e){}if(!b)f.r=Math.max(.15,Math.min(1.1,d.r*.45));
+    else{f.hw=Math.max(.2,(b.max.x-b.min.x)/2);f.hd=Math.max(.2,(b.max.z-b.min.z)/2);f.ox=(b.max.x+b.min.x)/2;f.oz=(b.max.z+b.min.z)/2}}
+  return C[t]=f}
+// foot-2 GO: 📍 spawns ONLY the requirement. 'patch' = standing on the nearest dirt/sand patch; 'car' / 'fence' = 5 m in front of the nearest parked car / fence, facing it (hold forward: you stop at the body)
+function OF_surfGo(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first';try{LF_ensure(RO.x,RO.z,900)}catch(e){}
+  let best=null,bd=1e9;const d2=(x,z)=>(x-RO.x)**2+(z-RO.z)**2;
+  if(kind==='patch'){for(const A of LF.PG.values())for(const q of A)if(q.sx>=3&&d2(q.x,q.z)<bd){bd=d2(q.x,q.z);best=q}if(!best)return'📍 No patch near';
+    if(!OF_spawn({cx:best.x-6,cz:best.z-6,h:.8},best.x,best.z,.8))return'📍 Can\'t jump right now';return'📍 PATCH · you stand on the sand/dirt patch: feet on its top (no half-buried legs). Walk across it and off it'}
+  const re=kind==='fence'?/^fence$/:/^(car\d?|CE_car\d?)$/;for(const L of HUB.pgrid.values())for(const q of L)if(q.alive&&re.test(q.t)&&d2(q.x,q.z)<bd){bd=d2(q.x,q.z);best=q}
+  if(!best)return'📍 No '+kind+' near';const a=best.ry+Math.PI/2,x=best.x+Math.sin(a)*6,z=best.z+Math.cos(a)*6;
+  if(!OF_spawn({cx:x-3,cz:z-3,h:0},x,z,Math.atan2(best.x-x,best.z-z)))return'📍 Can\'t jump right now';return'📍 '+kind.toUpperCase()+' · hold forward: you stop AT it (no walking through), slide along it when you steer'}
+function OF_collide(x,z,y){for(let pass=0;pass<2;pass++){const x0=x,z0=z;[x,z]=OF_collide1(x,z,y);if(Math.abs(x-x0)+Math.abs(z-z0)<1e-4)break}return[x,z]}
+function OF_collide1(x,z,y){for(let it=0;it<4;it++){const b=roamHit(x,z,OF_R,y+1);if(!b)break;const p=bldPush(b,x,z,OF_R);x=p[0];z=p[1]}
   for(const o of OF_cars(true)){if(Math.abs((o.y||0)-y)>2)continue;const b=OF_box(o.x,o.z,o.h,o.hw,o.hd);if(bHit(b,x,z,OF_R)){const p=bldPush(b,x,z,OF_R);x=p[0];z=p[1]}}
   const PG=HUB.pgrid,D=HUB.ptypes;if(PG&&D){const kx=Math.floor(x/16),kz=Math.floor(z/16);for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){const L=PG.get((kx+a)*10000+kz+c);if(!L)continue;
-    for(const p of L){if(!p.alive)continue;const d=D[p.t];if(!d||Math.abs((p.y||0)-y)>2)continue;const r=Math.max(.15,Math.min(1.1,d.r*.45))+OF_R,dx=x-p.x,dz=z-p.z,l=Math.hypot(dx,dz);if(l<r&&l>1e-4){x=p.x+dx/l*r;z=p.z+dz/l*r}}}}
+    for(const p of L){if(!p.alive)continue;const d=D[p.t];if(!d||Math.abs((p.y||0)-y)>2)continue;const f=OF_pf(p.t,d);
+      if(f.r!=null){if(f.r>0){const r=f.r+OF_R,dx=x-p.x,dz=z-p.z,l=Math.hypot(dx,dz);if(l<r&&l>1e-4){x=p.x+dx/l*r;z=p.z+dz/l*r}}}
+      else{const cy=Math.cos(p.ry||0),sy=Math.sin(p.ry||0),b={x:p.x+cy*f.ox+sy*f.oz,z:p.z-sy*f.ox+cy*f.oz,hw:f.hw,hd:f.hd,c:cy,s:sy};if(bHit(b,x,z,OF_R)){const q=bldPush(b,x,z,OF_R);x=q[0];z=q[1]}}}}}
   return[x,z]}
 function OF_walk(dt){const I=OF_input(),il=Math.hypot(I.fx,I.fy),ia=Math.atan2(I.fx,I.fy);
   // v89b1: the stick's frame is the camera yaw, frozen while the stick direction is held (an auto-recentre never steers the walker = no "rounds"); follows a manual orbit
