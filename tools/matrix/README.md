@@ -1,5 +1,5 @@
 # tools/matrix: generated player-experience matrix (no real-time play)
-`node tools/matrix/run.js --quick` (≈2.3k cases, ~3.5 min on 4 cores) · `--full` (≈20k cases, ~16 min on 4 cores, 6 warm pages: fra/ath × phone 852×393 / portrait 393×852 / desktop 1280×720).
+`node tools/matrix/run.js --quick` (≈2.3k cases, ~3.5 min on 4 cores) · `--full` (≈19k cases, ~14 min on this 4-core box: 4 warm pages = fra/ath × 2 shards; the 3 input profiles phone 852×393 / portrait 393×852 / desktop 1280×720 run in the same page via viewport + touch switch; desktop is emulated, so touch-absence checks are not made). The qa-1 invariant kit (src/assets/qa/code.js) is injected and its window.__bugs are reported as `qa-inv:<name>`.
 Flags: `--city fra,ath --profiles phone,portrait,desktop --rides N|--ids a,b --starts N --fam builder,roam,spot,foot,race --jobs 4`.
 One warm page per (city, profile) from tools/hot.js's server (current src, no build). The game's rAF loop is stopped; `MX.frame()` runs one real frame when a check needs the DOM. State checks run in 10-50 ms each.
 Output: one `FAIL <check>: <n> cases · e.g. …` line per root cause, console errors, then `MATRIX OK|FAIL: cases · failing · root causes · errors · seconds`; raw rows in out/matrix/matrix.json. Exit 1 on any FAIL.
