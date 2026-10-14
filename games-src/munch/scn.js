@@ -100,6 +100,84 @@
     ]
   });
 
+  // ---- UI-bar round 3 (14 Oct 2026): diary, side dock, desktop top bar and board. Pure DOM measurements, no screenshots ----
+  var rgb = function (c) { var m = String(c).match(/[\d.]+/g) || [0, 0, 0]; return [+m[0], +m[1], +m[2], m[3] == null ? 1 : +m[3]]; };
+  var lum = function (c) { var a = rgb(c).slice(0, 3).map(function (v) { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * a[0] + .7152 * a[1] + .0722 * a[2]; };
+  var bgOf = function (e) { for (; e && e.nodeType === 1; e = e.parentElement) { var c = rgb(getComputedStyle(e).backgroundColor); if (c[3] > .9) return getComputedStyle(e).backgroundColor; } return 'rgb(246,236,210)'; };
+  var ratio = function (e) { var a = lum(getComputedStyle(e).color), b = lum(bgOf(e)); return (Math.max(a, b) + .05) / (Math.min(a, b) + .05); };
+  GXS.add({
+    id: 'dk-diary', name: 'Diary: readable lines, one style', ask: 'Diary lines big, dark, one style?', ls: { dkd_offer: '1' }, seed: 14, when: booted,
+    setup: function () { table(14); for (var i = 0; i < 4; i++) G.log.unshift({ s: i % 3, t: 'Test line ' + i + ': Pip defeats the Plutonium Dragon and gains a level.', n: (G.ln || 0) + i + 1 }); render(); GX.toggle('dkLog'); return GXS.wait(function () { return document.querySelector('#dkLog.on #log li'); }, 5000).then(function () { return idle(500); }); },
+    mut: [{ name: 'pale small lines', js: 'var st = document.createElement("style"); st.textContent = "#dkLog #log li .dklt{font-size:11px!important;color:#c8b38a!important}"; document.head.appendChild(st)' }],
+    checks: [
+      { kind: 'fn', name: 'every diary line is >= 15px with AA contrast (4.5:1)', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('#dkLog #log li .dklt'), function (e) { var f = parseFloat(getComputedStyle(e).fontSize), r = ratio(e); if (f < 15 || r < 4.5) bad.push(Math.round(f) + 'px ' + r.toFixed(1) + ':1'); }); return bad.length ? bad.slice(0, 3).join('; ') : true; } },
+      { kind: 'fn', name: 'one line style: 24px avatar + text, 16px inset from the panel edge', fn: function () { var lis = [].slice.call(document.querySelectorAll('#dkLog #log li')), sig = {}, body = document.querySelector('#dkLog .gx-drawer-body').getBoundingClientRect(), bad = ''; lis.forEach(function (li) { var a = li.querySelector('.ptoklog'), t = li.querySelector('.dklt'); if (!a || !t) { bad = 'line without avatar+text'; return; } var ar = a.getBoundingClientRect(); sig[Math.round(ar.width) + 'x' + Math.round(ar.height) + '/' + getComputedStyle(li).borderLeftWidth]=1; if (ar.left - body.left < 15.5) bad = 'avatar only ' + Math.round(ar.left - body.left) + 'px from the edge'; }); var k = Object.keys(sig); return bad || (k.length === 1 && /^24x24/.test(k[0]) ? true : 'line styles: ' + k.join(' | ')); } },
+      { kind: 'fn', name: 'panel is as tall as its lines on a phone (no empty parchment)', fn: function () { var d = document.querySelector('#dkLog'), b = d.querySelector('.gx-drawer-body'); if (innerWidth > 700) return true; return d.getBoundingClientRect().height <= innerHeight * .88 + 1 && (b.scrollHeight - b.clientHeight < 4 ? (d.getBoundingClientRect().height < innerHeight * .88 - 20 || b.scrollHeight > b.clientHeight - 20) : true) || 'panel taller than its content'; } }
+    ]
+  });
+  GXS.add({
+    id: 'dk-dock', sizes: 'pc', name: 'Side dock: each event once, one instruction', ask: 'Dock short and readable?', ls: { dkd_offer: '1' }, seed: 15, when: booted,
+    setup: function () { table(15); G.phase = 'main'; G.active = 0; UI.since = ['<b>Morwen: level 2 → 3</b>', '<b>You lost a Sword</b>', 'third']; UI.snAct = G.gid + ':0:' + G.turn; UI.toast = { t: 'Ouch test', until: Date.now() + 60000 }; render(); return idle(700); },
+    mut: [{ name: 'step pills come back', js: 'var d = document.createElement("div"); d.className = "steps"; d.innerHTML = "<span>1 Get ready</span>"; document.querySelector("#prompt").prepend(d)' }],
+    checks: [
+      { kind: 'fn', name: 'no step pills, no Ouch banner, no step list, no strength box in the dock', fn: function () { var n = document.querySelectorAll('.gx-dock .steps, .gx-dock .toast, #prompt ol, #prompt .tip').length; return n === 0 || n + ' extra boxes'; } },
+      { kind: 'fn', name: '"While you waited" shows at most 2 lines', fn: function () { var n = document.querySelectorAll('#prompt .since li').length; return n <= 2 || n + ' lines'; } },
+      { kind: 'fn', name: 'turn order: avatars >= 32px, the current one marked', fn: function () { var a = [].slice.call(document.querySelectorAll('.gx-dock .order .ordav')); if (a.length < 2) return 'only ' + a.length + ' avatars'; var small = a.filter(function (e) { var r = e.getBoundingClientRect(); return r.width < 31.5 || r.height < 31.5; }); return small.length ? small.length + ' avatars under 32px' : document.querySelectorAll('.gx-dock .order .on').length === 1 || 'current player not marked'; } },
+      { kind: 'fn', name: 'all dock text >= 16px at >= 1024 wide', fn: function () { if (innerWidth < 1024) return true; var bad = []; [].forEach.call(document.querySelectorAll('.gx-dock *'), function (e) { if (!GXS.vis(e)) return; var own = [].filter.call(e.childNodes, function (n) { return n.nodeType === 3 && /\S/.test(n.textContent); }).length; if (own && parseFloat(getComputedStyle(e).fontSize) < 15.9) bad.push(e.tagName + '.' + e.className + ' ' + getComputedStyle(e).fontSize); }); return bad.length ? bad.slice(0, 3).join('; ') : true; } },
+      { kind: 'fn', name: 'main buttons: one size, full width of the dock', fn: function () { var bs = [].slice.call(document.querySelectorAll('#prompt .acts.main .btn')).filter(GXS.vis); if (!bs.length) return 'no buttons'; var w = bs.map(function (b) { return Math.round(b.getBoundingClientRect().width); }), h = bs.map(function (b) { return b.getBoundingClientRect().height; }); var pw = document.querySelector('#prompt').getBoundingClientRect().width; return (Math.max.apply(0, w) - Math.min.apply(0, w) <= 1 && Math.min.apply(0, h) >= 44 && w[0] >= pw - 40) || 'buttons ' + w.join('/') + ' x ' + h.join('/') + ' in ' + Math.round(pw); } },
+      { kind: 'fn', name: 'dock height fits its content (no tall empty parchment)', fn: function () { var d = document.querySelector('.gx-dock'), b = d.querySelector('.gx-dock-body'); var empty = d.getBoundingClientRect().height - d.querySelector('.gx-dock-head').getBoundingClientRect().height - b.scrollHeight; return empty < 40 || Math.round(empty) + 'px empty'; } }
+    ]
+  });
+  GXS.add({
+    id: 'dk-topbar', sizes: 'pc', name: 'Desktop top bar: 5 buttons, 16px, nothing on the title', ask: 'Top bar tidy?', ls: { dkd_offer: '1' }, seed: 16, when: booted,
+    setup: function () { table(16); render(); return idle(600); },
+    mut: [{ name: 'a sixth button', js: 'var b = document.createElement("button"); b.className = "gx-ibtn"; b.textContent = "Extra"; document.querySelector(".gx-bar").appendChild(b)' }],
+    checks: [
+      { kind: 'fn', name: 'at most 5 visible top-bar buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), GXS.vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'top-bar text >= 16px at >= 1024 wide', fn: function () { if (innerWidth < 1024) return true; var bad = []; [].forEach.call(document.querySelectorAll('.gx-bar *, .opps .opp *'), function (e) { if (!GXS.vis(e)) return; var own = [].filter.call(e.childNodes, function (n) { return n.nodeType === 3 && /\S/.test(n.textContent); }).length; if (own && parseFloat(getComputedStyle(e).fontSize) < 15.9) bad.push(e.tagName + '.' + e.className + ' "' + e.textContent.trim().slice(0, 12) + '" ' + getComputedStyle(e).fontSize); }); return bad.length ? bad.slice(0, 3).join('; ') : true; } },
+      { kind: 'fn', name: 'nothing sits on the title', fn: function () { var t = document.querySelector('.gx-bar h1').getBoundingClientRect(), bad = []; [].forEach.call(document.querySelectorAll('#gxlab-bar, .gx-bar button, .gx-bar .ph-chip'), function (e) { if (!GXS.vis(e)) return; var r = e.getBoundingClientRect(); if (r.left < t.right && r.right > t.left && r.top < t.bottom && r.bottom > t.top) bad.push(e.id || e.className); }); return bad.length ? 'over the title: ' + bad.join(', ') : true; } },
+      { kind: 'fn', name: 'rival chip text stays inside its chip', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('.opp.seat'), function (s) { var sr = s.getBoundingClientRect(); [].forEach.call(s.querySelectorAll('.snm,.sbd,.sbd *'), function (e) { var r = e.getBoundingClientRect(); if (r.width && (r.right > sr.right - 2 || e.scrollWidth > e.clientWidth + 1 && getComputedStyle(e).overflow !== 'visible')) bad.push(e.textContent.trim().slice(0, 14)); }); }); return bad.length ? 'spills: ' + bad.slice(0, 3).join(', ') : true; } }
+    ]
+  });
+  GXS.add({
+    id: 'dk-wide-board', sizes: 'pc', name: 'Desktop board: natural cards, readable decks', ask: 'Cards big, decks readable?', ls: { dkd_offer: '1' }, seed: 17, when: booted,
+    setup: function () { table(17); G.phase = 'main'; G.active = 1; G.kicked = null; render(); return idle(700); },
+    mut: [{ name: 'door stretched', js: 'var st = document.createElement("style"); st.textContent = ".bfdoor.small{width:90px!important;aspect-ratio:auto!important}"; document.head.appendChild(st)' }],
+    checks: [
+      { kind: 'fn', name: 'the door card keeps its aspect (1:1.42) and is >= 20% of the board height', fn: function () { var d = document.querySelector('.bfdoor'); if (!d) return 'no door'; var r = d.getBoundingClientRect(), b = document.querySelector('.gx-board').getBoundingClientRect(); var ar = r.height / r.width; if (Math.abs(ar - 1.42) > .1) return 'aspect ' + ar.toFixed(2); return r.height >= .2 * b.height || 'door only ' + Math.round(100 * r.height / b.height) + '% of the board'; } },
+      { kind: 'fn', name: 'decks and discards whole inside the board, labels >= 16px', fn: function () { if (innerWidth < 1024) return true; var b = document.querySelector('.gx-board').getBoundingClientRect(), bad = []; [].forEach.call(document.querySelectorAll('.pile, .pile *'), function (e) { if (!GXS.vis(e)) return; var r = e.getBoundingClientRect(); if (r.left < b.left - 1 || r.right > b.right + 1 || r.top < b.top - 1 || r.bottom > b.bottom + 1) bad.push('cut ' + (e.className + '').slice(0, 12)); var own = [].filter.call(e.childNodes, function (n) { return n.nodeType === 3 && /\S/.test(n.textContent); }).length; if (own && !e.closest('.card') && parseFloat(getComputedStyle(e).fontSize) < 15.9) bad.push((e.className + '').slice(0, 10) + ' ' + getComputedStyle(e).fontSize); }); return bad.length ? bad.slice(0, 3).join('; ') : true; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'dk-kick-order', name: 'Kick: door opens first, then the card', ask: 'Door swings open, THEN the card shows?', ls: { dkd_offer: '1' }, seed: 12, when: booted,
+    setup: function () {
+      table(12); UI.pause = true; try { GXH.setEnabled(false); } catch (e) { }
+      var ob = window.__ko = { door0: 0, door1: 0, card: 0, early: '' };
+      var m = idOf('lizards'); if (m != null) { pull(m); G.door.push(m); }   // a plain monster on top: no boss clip
+      var iv = setInterval(function () {
+        var now = performance.now(), r = document.getElementById('bfrev');
+        if (r) { if (!ob.door0 && r.classList.contains('door')) ob.door0 = now; var i = r.querySelector('.bfd3 img'); if (!ob.door1 && r.classList.contains('open')) { ob.door1 = now; }
+          var oc = r.querySelector('.bfrc .card'); if (!ob.card && oc && getComputedStyle(oc).visibility !== 'hidden') ob.card = now; }
+        var bc = document.querySelector('.arena .row.mons .mon .card,.bfstage .row .card');
+        if (bc && !ob.card && getComputedStyle(bc).visibility !== 'hidden') ob.early = 'the board card is visible before the door animation ended';
+      }, 16);
+      window.__koIv = iv; G.phase = 'main'; G.active = 0; render();
+      return new Promise(function (r) { setTimeout(r, 300); });
+    },
+    mut: [{ name: 'card shown at once', js: 'var st = document.createElement("style"); st.textContent = ".bfrev .bfrc .card{visibility:visible!important}"; document.head.appendChild(st)' }],
+    checks: [
+      { kind: 'play', name: 'tap Kick: door animation start < end <= card visible', settleMs: 6000, snap: function () { return { door: G.door.length }; },
+        steps: [{ sel: '.bfdoor' }], idle: function () { var o = window.__ko; return o.card && !document.getElementById('bfrev'); },
+        verify: function (b, a) { clearInterval(window.__koIv); var o = window.__ko;
+          if (!o.door0) return 'the door animation never started';
+          if (!(o.door0 < o.door1)) return 'door animation did not run (start ' + o.door0 + ', end ' + o.door1 + ')';
+          if (!(o.door1 <= o.card)) return 'card visible before the door finished (' + Math.round(o.door1 - o.card) + ' ms)';
+          if (o.card - o.door0 < 300) return 'door opened in ' + Math.round(o.card - o.door0) + ' ms: no animation';
+          return o.early || (a.door === b.door - 1) || 'door pile did not shrink'; } }
+    ]
+  });
+
   GXS.add({
     id: 'dk-boss-reveal', name: 'Boss clip, then the card', ask: 'Boss clip, roar, then the monster card?', ls: { dkd_offer: '1' }, seed: 11, when: booted,
     setup: function () {
