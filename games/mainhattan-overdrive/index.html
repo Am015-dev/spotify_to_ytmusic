@@ -756,6 +756,7 @@ const TUNE={life:1,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIco
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.52',date:'14 Oct 2026',items:[{t:'FIXED',s:'Brushing a playground or fair piece or a street prop no longer stops your car dead; the tap-to-open bubble no longer covers your car.'}]},
   {v:'v90m-beta.51',date:'14 Oct 2026',items:[{t:'FIXED',s:'Mission markers sit on the road and face along it.'}]},
   {v:'v90m-beta.50',date:'14 Oct 2026',items:[{t:'FIXED',s:'LEGO-set buildings count as shops and landmarks in Athens and the visit checks.'}]},
   {v:'v90m-beta.49',date:'14 Oct 2026',items:[{t:'FIXED',s:'Athens loads faster; touch controls come back after the garage on hybrid devices.'}]},
@@ -1536,7 +1537,7 @@ function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c
 // XCV = chunk name -> content hash, filled by tools/build.sh (empty in a raw src/ page: then nothing is lazy). A chunk may export top-level names
 // (module list "name:a,b" in src/LAZY): the page declares `let a,b;` stubs, the chunk's last expression is ({a,b}) and XC.apply[name] copies them over.
 // Eager code must not touch a chunk's names at boot; use XC.done / XC_need(name) first. Tests: __tq.ready also waits for XC.done.
-const XCV=/*XCV*/{"99c_checklist":"addde155","10c_qtc_blob":"ede9840f","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"4cd96d81","10c_qtc_blob":"ede9840f","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -12639,7 +12640,7 @@ function AD_hit(){const sp=Math.abs(RO.v),cx=Math.floor(RO.x/40),cz=Math.floor(R
     if(e2>rr*rr||Math.abs((RO.y||0)-it.y)>3)continue;
     if(sp>6){AD.dead.add(it);const at=V3(it.x,it.y+1,it.z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,fw.clone().multiplyScalar(sp*.4).add(V3(0,6,0)),it.t===1?14:8,(['#38a046,#ff8c1a,#7a4a24','#2f7d4a,#ffd12c,#f2f2f2,#e8302a','#ffffff,#222222,#e8302a','#3a4a44,#e8e8e8'][it.t]).split(',').map(c=>new THREE.Color(c)),.7,it.y);
       studBurst(at,fw,sp);HUB.smashed++;comboAdd(1);RO.v*=it.t===1?.9:.97;AU.sfx('crash');AD.n.smash=(AD.n.smash||0)+1;AD.px=1e9}
-    else{const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.7}}}
+    else{const e=Math.sqrt(e2)||1,o=rr-e,nx=ex/e,nz=ez/e;RO.x+=nx*o;RO.z+=nz*o;/* rev-2: slide on glancing hits, only the head-on part costs speed (was ×0.7 every frame) */const sg=RO.v<0?-1:1,hx=Math.sin(RO.h)*sg,hz=Math.cos(RO.h)*sg,cin=-(hx*nx+hz*nz);if(cin>0){RO.v*=1-.3*cin;if(sg>0&&cin<.95){const sd=hx*-nz+hz*nx>=0?1:-1;RO.h+=angDiff(Math.atan2(-nz*sd,nx*sd),RO.h)*.25}}}}}
 function AD_step(){if(CID==='fra'||!HUB.grp||!HUB.nodes||!HUB.bld||!HUB.bld.length)return;if(LV_d('lvDress')<=0){if(AD.M)for(const m of AD.M)m.count=0;return}
   if(AD.grp!==HUB.grp)AD_init();AD.fr++;if(AD.fr%12===0||Math.hypot(RO.x-AD.px,RO.z-AD.pz)>25){AD.px=RO.x;AD.pz=RO.z;AD_fill()}AD_hit()}
 {const _adLS=LV_step;LV_step=dt=>{_adLS(dt);if(!RO.on||!LV.init)return;try{AD_step()}catch(e){if(!AD.e){AD.e=1;console.warn('AD dress',e)}}}}
@@ -15374,6 +15375,17 @@ function RV14_go(kind,say){RV14_reset();if(RV14.ride0==null)try{RV14.ride0=GAR_g
    for(let i=0;i<d.length;i+=4){const mx=Math.max(d[i],d[i+1],d[i+2]),mn=Math.min(d[i],d[i+1],d[i+2]);if(d[i+3]>8&&mx>=24&&mx<=105&&mx-mn<=30)dark++}}}catch(e){}
   return'📍 ZEIL WEST (706,564) · look right: glass facades read as blue-grey glass with window lines, no wall renders flat black · auto: '+n+' Kenney atlases, dark-glass texels left '+dark+', glass-only glow '+em+'/'+n+ok(n>=1&&!dark&&em===n)}
  return'📍 unknown rv14 kind '+kind+' ❌'}
+// ===== RV15 (rev-2, 2026-10-14): monkey-bot STUCK clusters (test-1 0b34d0c2, beta.41). GO = spawn in the cluster, hold GAS (real key events
+// through the game's own handlers) for 3 s of game time, PASS when the car moved ≥ 5 m. Root cause found: street-life set pieces (seesaw at the
+// Athens start) and Athens dressing props took 20-30 % speed EVERY frame of contact whatever the angle → now glancing hits slide (LIFE_slide).
+const RV15_SPOTS={'fra-west':['fra',-925,225,0],'fra-start':['fra',-375,475,0],'fra-north':['fra',-475,775,0],'fra-corner':['fra',7990,6990,-2.36],
+ 'ath-start':['ath',1986.4,-1651.9,.85],'ath-psyrri':['ath',2125,-1675,0],'ath-north':['ath',2775,6525,0],'ath-sw':['ath',-6475,-3375,0]};
+function RV15_go(id,say){const S=RV15_SPOTS[id];if(!S)return'📍 unknown spot '+id+' ❌';RV14_reset();const[,x,z,h]=S;if(!roamWarp(x,z,h,true))return'📍 '+id+' · can\'t jump right now ❌';RO.v=0;camSnap=true;
+ const K=on=>dispatchEvent(new KeyboardEvent(on?'keydown':'keyup',{code:'KeyW',key:'KeyW',bubbles:true}));let x0=0,z0=0,t=0,last=0,ph=0;
+ const f=now=>{if(ph===0){if(!last){last=now;return requestAnimationFrame(f)}if(now-last<900)return requestAnimationFrame(f);if(RO.card){const b=document.getElementById('rcNo');if(b)b.click();/* the Athens start pops the pinned ✈ Flights card: tap LATER like a player */}x0=RO.x;z0=RO.z;K(true);ph=1;last=now;return requestAnimationFrame(f)}
+  t+=Math.min(.05,(now-last)/1000);last=now;if(RO.card){const b=document.getElementById('rcNo');if(b)b.click()}if(t<3)return requestAnimationFrame(f);K(false);const d=Math.hypot(RO.x-x0,RO.z-z0);
+  say('📍 STUCK CLUSTER '+id+' ('+Math.round(x)+','+Math.round(z)+') · 3 s of gas moved the car '+d.toFixed(1)+' m (≥ 5 m)'+(d>=5?' ✅':' ❌'))};
+ requestAnimationFrame(f);return'📍 STUCK CLUSTER '+id+' · holding GAS 3 s…'}
 
 // ===== RF (race fun, 2026-10-09): Alex "we have functionalities but the races are boring". Reference: LEGO 2K Drive rival race
 // (docs/race_ref, docs/RACE_PLAN.md). Measured before (tRace, phone): the player started on POLE and led ~75 % of the race alone,
@@ -17474,6 +17486,8 @@ OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop)
 (()=>{const st=document.createElement('style');st.id='crPrompt';st.textContent=`
 html body.touch #roamPrompt#roamPrompt{left:50%!important;right:auto!important;top:auto!important;bottom:calc(62px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(240px,30vw)!important;padding:3px 12px!important;font-size:12px!important}
 html body #roamPrompt#roamPrompt *{font-size:12px!important;line-height:1.2!important}
+/* rev-2 (monkey hud_over_figure, Athens start): bottom-centre sat on the car's rear in phone landscape → left column above TAP TAP = SMASH, under the left thumb */
+@media (orientation:landscape){html body.touch #roamPrompt#roamPrompt{left:calc(14px + env(safe-area-inset-left,0px))!important;transform:none!important;bottom:calc(166px + env(safe-area-inset-bottom,0px))!important;max-width:min(240px,34vw)!important}}
 body.crMerge #roamArrow{display:none!important}`;document.head.appendChild(st)})();
 
 roamPose=(f=>function(s,dt){f(s,dt);if(s===pl&&state==='roam'&&((CR_hudS.f=(CR_hudS.f||0)+1)&1))try{CR_hud()}catch(e){}})(roamPose);
