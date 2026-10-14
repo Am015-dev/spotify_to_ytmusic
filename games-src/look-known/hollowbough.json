@@ -17,7 +17,11 @@
 "hb-help-phone.json",
 "hb-zoom-phone.json",
 "menu-phone.json",
-"story-scene-phone.json"
+"story-scene-phone.json",
+"ui-bar-phone.json",
+"ui-log-phone.json",
+"ui-rivals-phone.json",
+"ui-start-phone.json"
 ]
 }
 }

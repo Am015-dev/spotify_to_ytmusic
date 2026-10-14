@@ -251,7 +251,7 @@ function renderLegend() {
 function renderBlg() {
   const e = $('#blg'); if (!e) return; const on = false;   // the header buttons carry their names on phones now
   e.hidden = !on; if (!on || e.dataset.k) return; e.dataset.k = 1;
-  e.append(h('div', h('b', 'Top buttons, left to right: '), 'Scores, Log, Chips and cards, How to play, Menu.'), h('button.btn.go', { 'data-a': 'blgx', type: 'button' }, 'OK'));
+  e.append(h('div', h('b', 'Top buttons, left to right: '), 'Hint, Scores, Log, How to play, Menu.'), h('button.btn.go', { 'data-a': 'blgx', type: 'button' }, 'OK'));
 }
 function isPh() { return document.documentElement.classList.contains('ph'); }
 function applyPhone() {

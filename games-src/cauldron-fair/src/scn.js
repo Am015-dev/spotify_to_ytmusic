@@ -90,4 +90,31 @@
       { kind: 'fn', name: 'settings row painted', fn: function () { GX.show('setd'); var e = document.querySelector('#setbody .mrow'); if (!e) return 'no row'; var r = e.getBoundingClientRect(), c = getComputedStyle(e, '::before'); var ok = r.width > 4 && c.borderImageSource.indexOf('ui-row-c') >= 0 && GXSK.classes().indexOf('sk-row') >= 0; try { GX.close(); } catch (x) { } return ok || 'ui-row-c not painted'; } }
     ]
   });
+
+  // UI-BAR rules the shared menu test cannot see (4 top bar, 1 text size, 6 panels fit, 8 image aspect), checked on the play screen and each drawer
+  function minFont(root) {
+    var need = innerWidth >= 1024 ? 16 : 13, bad = [], w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    for (var n; (n = w.nextNode());) {
+      if (!/\S/.test(n.nodeValue)) continue; var e = n.parentElement; if (!e || e.closest('#gxscn-tag') || e.closest('script,style,svg,canvas')) continue;
+      var r = e.getBoundingClientRect(), cs = getComputedStyle(e); if (r.width < 2 || r.height < 2 || cs.visibility === 'hidden' || cs.display === 'none') continue;
+      var fs = parseFloat(cs.fontSize); if (fs < need - .01) bad.push(Math.round(fs * 10) / 10 + 'px ' + e.tagName.toLowerCase() + (e.className && e.className.baseVal === undefined ? '.' + String(e.className).split(' ')[0] : '') + ' "' + n.nodeValue.trim().slice(0, 18) + '"');
+    }
+    return bad;
+  }
+  function uiBad(list) { return list.length ? 'N=' + list.length + ' ' + list.slice(0, 6).join(' | ') : true; }
+  GXS.add({
+    id: 'cf-ui', name: 'UI bar: top bar, text sizes, panels, image shapes', ask: 'Is every panel readable and not stretched?', seed: 5, when: booted, group: 'UI',
+    setup: function () {
+      try { GXH.setEnabled(false); } catch (e) { }
+      window.AIDELAY = 120; newGame('vs', {});
+      return GXS.wait(function () { prepFix(); return q('.bagb:not(.off)') || q('.stopb:not(.off)'); }, 40000).then(function () { return quiet(); });
+    },
+    checks: [
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), function (b) { return b.getBoundingClientRect().width > 2 && getComputedStyle(b).display !== 'none'; }); return n.length <= 5 || n.length + ' buttons: ' + n.map(function (b) { return b.id || b.getAttribute('data-a') || b.textContent.trim().slice(0, 8); }).join(','); } },
+      { kind: 'fn', name: 'board text >= 13 px phone / 16 px wide', fn: function () { return uiBad(minFont(document.body)); } },
+      { kind: 'fn', name: 'images keep their natural shape', fn: function () { var bad = []; [].forEach.call(document.querySelectorAll('img'), function (i) { var r = i.getBoundingClientRect(), cs = getComputedStyle(i); if (r.width < 24 || !i.naturalWidth || cs.objectFit === 'contain' || cs.objectFit === 'cover') return; var a = (r.width / r.height) / (i.naturalWidth / i.naturalHeight); if (a < .92 || a > 1.08) bad.push((i.className || i.id || i.src.split('/').pop()) + ' x' + a.toFixed(2)); }); return uiBad(bad); } },
+      { kind: 'fn', name: 'log panel: text size, fits its content', fn: function () { GX.show('logd'); var d = document.querySelector('#logbody'); var bad = minFont(d.closest('.gx-drawer,.drawer,[role=dialog]') || d); var p = d.closest('.gx-drawer,.drawer,[role=dialog]') || d; var pr = p.getBoundingClientRect(); if (pr.height > 200 && d.scrollHeight < pr.height * .35 && pr.height > innerHeight * .5) bad.push('panel ' + Math.round(pr.height) + 'px for ' + d.scrollHeight + 'px of content'); try { GX.close(); } catch (e) { } return uiBad(bad); } },
+      { kind: 'fn', name: 'rules + settings panels: text size', fn: function () { var bad = []; ['rulesd', 'setd'].forEach(function (id) { try { GX.show(id); } catch (e) { return; } var el = document.getElementById(id) || document.querySelector('.gx-drawer.on,.drawer.on'); if (el) minFont(el).forEach(function (m) { bad.push(id + ' ' + m); }); try { GX.close(); } catch (e) { } }); return uiBad(bad); } }
+    ]
+  });
 })();

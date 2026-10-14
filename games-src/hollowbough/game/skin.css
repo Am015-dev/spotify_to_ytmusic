@@ -17,5 +17,12 @@ html.sk .gx-drawer-body{padding:16px}
 html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 /* UI bar 1/8/9: bigger bar text on wide screens, rules panel off the centred title, no clipped card names, no sub-11px svg text */
 @media (min-width:700px){html .gx-bar{min-height:68px}html #prompt{font-size:calc(16px*var(--gx-text,1));-webkit-line-clamp:2;overflow:visible}html .sc.hc .hcn{font-size:13px;line-height:1;-webkit-line-clamp:1;display:block;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:100%}}
-@media (min-width:700px){.gx-drawer.wide{width:min(620px,calc(100vw - 16px))}}
+@media (min-width:700px){.gx-drawer.wide{width:min(556px,calc(100vw - 16px))}}
 .sc svg text{display:none}
+.gx-bar .gx-refbtn{display:none!important}
+/* UI bar 1 at >=1024px: nothing under 16px; hand scroller keeps the end cards' names inside */
+@media (min-width:1024px){#bd .nm,#bd span,#bd .hcn,#start span,#start button,#start .lbl,#start summary,#start p,.gxc-lab,.gxc-ib,.gxc-ib *,.scard small,.scard b{font-size:16px!important}#bd svg text{display:none}}
+.hscroll{scroll-padding:0 12px}.hscroll .hin{padding-right:12px;box-sizing:content-box}
+@media (min-width:1024px){.btn,#acts button,#rivalbody,#rivalbody *,#logbody,#logbody *,#start .scard span,#start .scard small,#start .scard b,.gx-main .btn{font-size:16px!important}}
+.scount,.htog{font-size:13px!important}
+@media (min-width:700px){body:has(.gx-drawer.on) #start .scard{margin-left:12px;margin-right:auto}}

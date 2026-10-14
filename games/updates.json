@@ -16,6 +16,105 @@
  },
  {
   "date": "2026-10-14",
+  "game": "hollowbough",
+  "title": "simple start screen, 5 top-bar buttons, readable on wide screens",
+  "items": [
+   "Board tip bubble no longer covers cards and counts; the caption line says it",
+   "ui-bar"
+  ],
+  "check": "",
+  "scn": [
+   "menu",
+   "ui-start"
+  ],
+  "ask": [
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "final-approach",
+  "title": "final-approach: start screen, top bar and panels cleaned up",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "fa-title",
+   "fa-ui",
+   "fa-log",
+   "fa-brief"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu",
+   "menu",
+   null,
+   null,
+   null
+  ],
+  "ask": [
+   null,
+   null,
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "rampart-and-vine",
+  "title": "one big Play button, one-line tips, UI-bar checks",
+  "items": [],
+  "check": "",
+  "scn": [],
+  "ask": []
+ },
+ {
+  "date": "2026-10-14",
+  "game": "shipwreck-isle",
+  "title": "readable on every screen size",
+  "items": [
+   "Rules text clears the frame; More menu readable"
+  ],
+  "check": "",
+  "scn": [
+   "menu"
+  ],
+  "ask": [
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "cauldron-fair",
+  "title": "top bar, text sizes and panels on every screen size",
+  "items": [
+   "Menus use one title font and one body font, no overlaps",
+   "Icon buttons and buttons keep their content inside the frame art; one instruction line on the board",
+   "menu"
+  ],
+  "check": "Open the menus: text readable, nothing overlapping",
+  "scn": [
+   "menu",
+   "menu",
+   "cf-ui"
+  ],
+  "ask": [
+   null,
+   null,
+   null
+  ]
+ },
+ {
+  "date": "2026-10-14",
+  "game": "tidewake",
+  "title": "tidewake: readable on every screen size",
+  "items": [],
+  "check": "",
+  "scn": [],
+  "ask": []
+ },
+ {
+  "date": "2026-10-14",
   "game": "sands-of-qamar",
   "title": "Readable on every screen size",
   "items": [
@@ -100,30 +199,6 @@
  },
  {
   "date": "2026-10-14",
-  "game": "hollowbough",
-  "title": "readable on every screen size",
-  "items": [
-   "Board tip bubble no longer covers cards and counts; the caption line says it"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "rampart-and-vine",
-  "title": "readable on every screen size",
-  "items": [],
-  "check": "",
-  "scn": [],
-  "ask": []
- },
- {
-  "date": "2026-10-14",
   "game": "sunglaze",
   "title": "readable on every screen size",
   "items": [
@@ -149,37 +224,25 @@
  {
   "date": "2026-10-14",
   "game": "short-fuse",
-  "title": "short-fuse: readable on every screen size",
+  "title": "short-fuse: one primary button on the title",
   "items": [
-   "Menus, panels and start screen readable at all 5 sizes"
+   "Menus, panels and start screen readable at all 5 sizes",
+   "Title: Play is the only big button; top bar and text sizes checked"
   ],
   "check": "",
   "scn": [
-   "menu"
+   "menu",
+   "sf-uibar"
   ],
   "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "final-approach",
-  "title": "final-approach: readable on every screen size",
-  "items": [
-   "Menus use one title font and one body font, no overlaps"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
+   null,
    null
   ]
  },
  {
   "date": "2026-10-14",
   "game": "lantern-dive",
-  "title": "lantern-dive: readable on every screen size",
+  "title": "lantern-dive: new start screen, readable text, bigger cards on wide screens",
   "items": [
    "Menus use one title font and one body font, no overlaps",
    "Menu, help and tip text clear of frame art"
@@ -196,30 +259,6 @@
  },
  {
   "date": "2026-10-14",
-  "game": "shipwreck-isle",
-  "title": "Menus and Rules panel cleaned up",
-  "items": [
-   "Rules text clears the frame; More menu readable"
-  ],
-  "check": "",
-  "scn": [
-   "menu"
-  ],
-  "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "tidewake",
-  "title": "Menus tidied: button frames, title text, rules, icon buttons, one start line",
-  "items": [],
-  "check": "",
-  "scn": [],
-  "ask": []
- },
- {
-  "date": "2026-10-14",
   "game": "nebula-aces",
   "title": "Cleaner menus",
   "items": [
@@ -230,24 +269,6 @@
    "menu"
   ],
   "ask": [
-   null
-  ]
- },
- {
-  "date": "2026-10-14",
-  "game": "cauldron-fair",
-  "title": "Menus: icon buttons, buttons and tips inside their frames",
-  "items": [
-   "Menus use one title font and one body font, no overlaps",
-   "Icon buttons and buttons keep their content inside the frame art; one instruction line on the board"
-  ],
-  "check": "Open the menus: text readable, nothing overlapping",
-  "scn": [
-   "menu",
-   "menu"
-  ],
-  "ask": [
-   null,
    null
   ]
  },

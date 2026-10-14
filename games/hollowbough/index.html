@@ -345,6 +345,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 .gxh-bub.gxh-compact{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub.gxh-compact .gxh-sp{display:none}.gxh-bub.gxh-compact .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub.gxh-compact .gxh-tx{font-size:13px;line-height:1.25}
 .gxh-bub.gxh-compact .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub.gxh-compact .gxh-ok{min-height:44px;border-width:8px;margin:-8px -8px -8px 0;padding:0 12px}.gxh-bub.gxh-compact .gxh-bd>div{min-width:0}
 .gxh-bub.gxh-compact .gxh-tx{padding-right:84px}
+@media (max-height:620px){.gxh-bub .gxh-tx{padding-right:84px}}
 .gxh-bub.gxh-compact.gxh-bulbb .gxh-row2{position:static;margin-top:2px}
 
 
@@ -458,8 +459,15 @@ html.sk .gx-drawer-body{padding:16px}
 html.sk .gx-drawer-head{padding-left:16px;padding-right:12px}
 /* UI bar 1/8/9: bigger bar text on wide screens, rules panel off the centred title, no clipped card names, no sub-11px svg text */
 @media (min-width:700px){html .gx-bar{min-height:68px}html #prompt{font-size:calc(16px*var(--gx-text,1));-webkit-line-clamp:2;overflow:visible}html .sc.hc .hcn{font-size:13px;line-height:1;-webkit-line-clamp:1;display:block;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:100%}}
-@media (min-width:700px){.gx-drawer.wide{width:min(620px,calc(100vw - 16px))}}
+@media (min-width:700px){.gx-drawer.wide{width:min(556px,calc(100vw - 16px))}}
 .sc svg text{display:none}
+.gx-bar .gx-refbtn{display:none!important}
+/* UI bar 1 at >=1024px: nothing under 16px; hand scroller keeps the end cards' names inside */
+@media (min-width:1024px){#bd .nm,#bd span,#bd .hcn,#start span,#start button,#start .lbl,#start summary,#start p,.gxc-lab,.gxc-ib,.gxc-ib *,.scard small,.scard b{font-size:16px!important}#bd svg text{display:none}}
+.hscroll{scroll-padding:0 12px}.hscroll .hin{padding-right:12px;box-sizing:content-box}
+@media (min-width:1024px){.btn,#acts button,#rivalbody,#rivalbody *,#logbody,#logbody *,#start .scard span,#start .scard small,#start .scard b,.gx-main .btn{font-size:16px!important}}
+.scount,.htog{font-size:13px!important}
+@media (min-width:700px){body:has(.gx-drawer.on) #start .scard{margin-left:12px;margin-right:auto}}
 
 :root{--ink:#3b2f2a;--paper:#f6ecd6;--paper2:#ecdcba;--wood:#a67c52;--wood2:#7c5636;--leaf:#5f8f4a;--gold:#e3b02e;--red:#b04a38;--gx-bg:#2c3b27;--gx-bar:#22301f;--gx-panel:#f6ecd6;--gx-ink:#3b2f2a;--gx-accent:#e3b02e;--gx-dock-w:clamp(330px,31vw,430px);--gx-bar-h:48px;
   --font:'Palatino Linotype','Book Antiqua',Palatino,'Iowan Old Style','Hoefler Text',Georgia,'DejaVu Serif',serif}
@@ -1194,6 +1202,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
   function scrim(t) { for (var x = t; x && x !== document.body; x = x.parentElement) { var r = x.getBoundingClientRect(); if (r.width * r.height >= .6 * innerWidth * innerHeight && (x === t || getComputedStyle(x).position === 'fixed')) return true; } return false; }   // a modal / story layer on top legitimately covers what is below
   function coveredBy(e) { var b = box(e), r = b.r; if (r.right <= 0 || r.bottom <= 0 || r.left >= innerWidth || r.top >= innerHeight) return ''; if (getComputedStyle(e).pointerEvents === 'none') return '';
     var t = document.elementFromPoint(Math.max(1, Math.min(innerWidth - 1, b.x)), Math.max(1, Math.min(innerHeight - 1, b.y)));
+    if (t && t.closest('.gx-drawer-head') && e.closest('.gx-drawer') && !e.closest('.gx-drawer-head')) return '';   // scrolled under the drawer's sticky head: clipped by the scroll, not covered
     if (!t || related(t, e) || t.closest(SKIPSEL) || scrim(t) || getComputedStyle(t).pointerEvents === 'none') return ''; return t.id ? '#' + t.id : t.tagName.toLowerCase() + '.' + String(t.className && t.className.baseVal === undefined ? t.className : '').split(' ')[0]; }
   function who(e) { var c = e.className && e.className.baseVal === undefined ? String(e.className).trim().split(/\s+/).slice(0, 2).join('.') : ''; return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (c ? '.' + c : ''); }
   function engineBad() {   // every element marked data-engine="<js expression>" must show that engine number
@@ -1216,7 +1225,7 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
     for (var a = 0; a < rects.length; a++) for (var b = a + 1; b < rects.length; b++) { var A = rects[a], B = rects[b]; if (related(A.e, B.e)) continue;
       var w = Math.min(A.r.right, B.r.right) - Math.max(A.r.left, B.r.left), h = Math.min(A.r.bottom, B.r.bottom) - Math.max(A.r.top, B.r.top);
       if (w > 2 && h > 2 && w * h > .3 * Math.min(A.r.width * A.r.height, B.r.width * B.r.height)) add('text overlaps: "' + A.t + '" <' + who(A.e) + '> / "' + B.t + '" <' + who(B.e) + '>'); }
-    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '>'); });
+    [].slice.call(document.querySelectorAll('button,[role=button],a[href],[data-act],[data-mv],.btn')).forEach(function (e) { if (e.closest(SKIPSEL) || !S.vis(e)) return; var w = coveredBy(e); if (w) add('button covered by ' + w + ': <' + who(e) + '> "' + (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 24) + '"'); });
     engineBad().forEach(add);
     return out;
   };
@@ -1373,6 +1382,48 @@ html body :is(small,.small,.muted,.lbl,.box,.gx-ibtn span,.gx-set small){font-si
       { kind: 'fn', name: 'painted resource icons show on the board', fn: function () { var n = ['berry', 'pebble', 'resin', 'twig'].filter(function (k) { return document.querySelector('img[src*="icon-' + k + '"]'); }); return n.length >= 3 || 'painted icons on the board: ' + n.join(','); } },
       { kind: 'fn', name: 'painted pictures loaded and not stretched', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img[src*="icon-"], img[src*="ui-season"]'), function (e) { if (!GXS.vis(e)) return; if (!e.naturalWidth) bad = bad || e.src; var r = e.getBoundingClientRect(); if (e.naturalWidth && r.width > 4 && Math.abs(r.width / r.height - e.naturalWidth / e.naturalHeight) > 0.15) bad = bad || 'stretched ' + e.src; }); return !bad || bad; } },
       skin
+    ]
+  });
+
+  // UI-BAR rules 1, 4-8 that the shared menu test cannot see (14 Oct 2026)
+  var uvis = function (e) { if (e.closest && e.closest('.gx-drawer:not(.on)')) return false; var r = e.getBoundingClientRect(), c = getComputedStyle(e); return r.width > 0 && r.height > 0 && c.visibility !== 'hidden' && c.display !== 'none'; };
+  var ulim = function () { return innerWidth >= 1024 ? 16 : 13; };
+  var minFont = function (root, lim) { var bad = ''; [].forEach.call(document.querySelectorAll(root + ' *'), function (e) { if (bad || !uvis(e) || ![].some.call(e.childNodes, function (n) { return n.nodeType === 3 && /\S/.test(n.textContent); })) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f < lim - .01 && !e.closest('svg')) bad = (e.className.baseVal || e.className || e.tagName) + ' ' + f + 'px "' + e.textContent.trim().slice(0, 14) + '"'; }); return bad || true; };
+  GXS.add({
+    id: 'ui-bar', name: 'UI bar: top bar, panels, text size', ask: 'Few buttons, one line, readable text?', seed: 5, when: booted,
+    setup: function () { return table(5); },
+    checks: [
+      { kind: 'fn', name: 'rule 4: top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), uvis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'rule 5: one instruction line of 8 words or fewer', fn: function () { var t = (document.getElementById('prompt') || {}).textContent || ''; return words(t) <= 8 || words(t) + ' words'; } },
+      { kind: 'fn', name: 'rule 1: board text at least 13/16 px', fn: function () { return minFont('#bd', ulim()); } },
+      { kind: 'fn', name: 'rule 8: images keep their natural aspect', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (m) { if (bad || !uvis(m) || !m.naturalWidth) return; var a = m.naturalWidth / m.naturalHeight, b = m.clientWidth / m.clientHeight, cs = getComputedStyle(m).objectFit; if (cs === 'fill' && Math.abs(a / b - 1) > .04) bad = (m.src || '').slice(-30); }); return bad || true; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-start', name: 'UI bar: start screen', ask: 'One big Play button, simple options?', seed: 5, when: booted,
+    setup: function () { try { GX.close(); } catch (e) { } UI.started = false; showStart(); return new Promise(function (r) { setTimeout(r, 600); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 7: exactly one primary button', fn: function () { var n = [].filter.call(document.querySelectorAll('#start .sbtn.big'), uvis).length; return n === 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'rule 7: no character roster, no step list', fn: function () { return !document.querySelector('#start .sgrid, #start ol, #start .seat') || 'roster or list visible'; } },
+      { kind: 'fn', name: 'rule 7: options are one style (chips)', fn: function () { var o = [].filter.call(document.querySelectorAll('#start .opts button'), uvis); return (o.length && o.every(function (b) { return b.classList.contains('chipb'); })) || 'mixed option buttons'; } },
+      { kind: 'fn', name: 'rule 1: start text at least 13/16 px', fn: function () { return minFont('#start', ulim()); } },
+      { kind: 'fn', name: 'rule 7: Continue only with a save', fn: function () { var c = document.querySelector('#start [data-a="loadsave"]'); var has = typeof hasSave === 'function' && hasSave(); return (!!c === !!has) || 'Continue shown without a save'; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-log', name: 'UI bar: diary panel', ask: 'Is the diary panel readable?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { document.querySelector('[data-gx="logd"]').click(); return new Promise(function (r) { setTimeout(r, 800); }); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 1: diary text at least 13/16 px', fn: function () { return minFont('#logd', ulim()); } },
+      { kind: 'fn', name: 'rule 6: diary panel fits its content (no tall empty parchment)', fn: function () { var b = document.querySelector('#logd .gx-drawer-body'); return b.scrollHeight - b.clientHeight <= 2 || 'panel scrolls'; } }
+    ]
+  });
+  GXS.add({
+    id: 'ui-rivals', name: 'UI bar: rivals panel', ask: 'Is the rivals panel readable?', seed: 5, when: booted,
+    setup: function () { return table(5).then(function () { document.querySelector('[data-gx="rivald"]').click(); return new Promise(function (r) { setTimeout(r, 800); }); }); },
+    checks: [
+      { kind: 'fn', name: 'rule 1: rivals text at least 13/16 px', fn: function () { return minFont('#rivald', ulim()); } },
+      { kind: 'fn', name: 'rule 6: rivals panel fits its content (no tall empty parchment)', fn: function () { var b = document.querySelector('#rivald .gx-drawer-body'); return b.scrollHeight - b.clientHeight <= 2 || 'panel scrolls'; } }
     ]
   });
 })();
@@ -6449,7 +6500,7 @@ function renderBoard() {
     if (v < 0) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
     else if (!n) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
     // readable chips in a sideways-scrolling row: picture thumbnail + name + cost + points (tap = zoom)
-    const vert = handBox.h >= 150, chH = vert ? 56 : Math.max(46, handBox.h - 4), thW = Math.min(40, Math.floor((chH - 6) / 1.406)), chW = vert ? handBox.w - 8 : thW + 160, x0 = vert ? 4 : 40, gapc = 4;
+    const vert = handBox.h >= 150, chH = vert ? 56 : Math.max(46, handBox.h - 4), thW = Math.min(40, Math.floor((chH - 6) / 1.406)), x0 = vert ? 4 : 40, gapc = 4; let chW = vert ? handBox.w - 8 : thW + 160; if (!vert && n * (chW + gapc) + x0 > handBox.w) { const k = Math.max(1, Math.floor((handBox.w - x0) / (chW + gapc))); chW = Math.max(thW + 96, Math.floor((handBox.w - x0) / k) - gapc); }   // whole cards only: the last visible card is never cut by the scroller edge
     const hs = placeBox(h('div.hscroll'), handBox), hin = h('div.hin'); hin.style.cssText = vert ? `width:${handBox.w}px;height:${n * (chH + gapc) + 22}px` : `width:${x0 + n * (chW + gapc) + 2}px;height:${handBox.h}px`; if (vert) hs.classList.add('vert'); hs.appendChild(hin); bd.appendChild(hs);
     hand.forEach((id, i) => {
       const tg = 'p:hand:' + id, sp = spec(id);
@@ -6971,22 +7022,19 @@ function renderStart() {
   if (NET.on) { netStartScreen(s); return; }
   const o = UI.opt = UI.opt || Object.assign({}, DEF);
   const seg = (l, key, vals, fmt) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (o[key] === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': key, 'data-v': v, type: 'button' }, fmt ? fmt(v) : v)));
+  const modes = (firstTime() ? [['guided', 'Guided']] : []).concat([['vs', 'vs computer'], ['solo', 'Solo'], ['hot', 'Hot-seat'], ['ai', 'Watch']]).concat(window.CAMPAIGN ? [['story', 'Story']] : []);
+  const mode = o.mode || (firstTime() ? 'guided' : 'vs');
   const card = h('div.scard',
     h('h1', h('span', { html: ICO.tree }), 'Hollowbough'),
-    h('p.tag', 'Build a woodland city. Place workers, play cards, outlast the winter.'),
-    firstTime() ? tutNode('sbtn big') : null,
-    h('button.sbtn.big', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and one gentle computer player.')),
-    window.CAMPAIGN ? h('button.sbtn.big.story', { 'data-start': 'story', 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story: The Long Winter'), h('span', campLine())) : null,
-    h('div.opts', seg('Players', 'np', [2, 3, 4]), seg('Computer level', 'level', ['easy', 'normal', 'hard']), seg('Solo rival', 'solo', [1, 2, 3], v => D.soloLevels[v - 1] + (v > 1 ? '*' : ''))),
-    h('p.sm', '*Gruff and Ghastly are very hard.'),
-    h('div.sgrid',
-      h('button.sbtn', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Play vs computer'), h('span', 'You against 1 to 3 computer players')),
-      h('button.sbtn', { 'data-start': 'solo', 'data-a': 'start', 'data-m': 'solo', type: 'button' }, h('b', 'Solo vs ' + D.soloName), h('span', 'Beat the automated rival')),
-      h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', '2 to 4 people, one device')),
-      h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch computers'), h('span', 'Sit back and learn'))),
+    h('p.tag', 'Build a woodland city. Outlast the winter.'),
+    h('button.sbtn.big', { 'data-start': 'play', 'data-a': 'play', type: 'button' }, h('b', mode === 'story' ? 'Play the story' : 'Play')),
+    h('div.opts',
+      h('div.seg', h('span.lbl', 'Mode'), modes.map(m => h('button.chipb' + (mode === m[0] ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'mode', 'data-v': m[0], type: 'button' }, m[1]))),
+      mode === 'vs' || mode === 'hot' ? seg('Players', 'np', [2, 3, 4]) : null,
+      mode === 'vs' ? seg('Computer', 'level', ['easy', 'normal', 'hard']) : null,
+      mode === 'solo' ? seg('Rival', 'solo', [1, 2, 3], v => D.soloLevels[v - 1]) : null),
     netBlock(),
-    firstTime() ? null : tutNode('sbtn'),
-    h('div.srow2', hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null, h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'musicopen', type: 'button' }, '\u266A Music')));
+    hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null);
   s.appendChild(h('div.skylogo', { 'aria-hidden': 'true' }, 'Hollowbough', h('small', 'Build a woodland city. Outlast the winter.')));
   s.appendChild(card);
 }
@@ -7018,6 +7066,7 @@ document.addEventListener('click', ev => {
     case 'story': storyOpen(); break;
     case 'campfin': campFinish(); break;
     case 'start': if (d.m !== 'ai' && tutOffer(() => newGame(d.m))) break; newGame(d.m); break;
+    case 'play': { const m = (UI.opt && UI.opt.mode) || (firstTime() ? 'guided' : 'vs'); if (m === 'guided') { if (tutOffer(() => newGame('guided'))) break; newGame('guided'); break; } if (m === 'story') { storyOpen(); break; } if (m !== 'ai' && tutOffer(() => newGame(m))) break; newGame(m); break; }
     case 'guided': if (tutOffer(() => newGame('guided'))) break; newGame('guided'); break;
     case 'opt': { UI.opt = UI.opt || Object.assign({}, DEF); UI.opt[d.k] = isNaN(+d.v) ? d.v : +d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
