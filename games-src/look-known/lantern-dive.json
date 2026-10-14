@@ -1,0 +1,14 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"ld-art-phone.json",
+"ld-board-phone.json",
+"ld-help-phone.json",
+"ld-zoom-phone.json",
+"menu-phone.json",
+"story-scene-phone.json"
+]
+}
+}
