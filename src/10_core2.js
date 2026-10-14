@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.54',date:'14 Oct 2026',items:[{t:'NEW',s:'Frankfurt districts have their own look: Sachsenhausen taverns, Bahnhof neon, Osthafen murals.'},{t:'FIXED',s:'Kiosks and cafes have collision.'}]},
   {v:'v90m-beta.53',date:'14 Oct 2026',items:[{t:'FIXED',s:'In portrait the tap-to-open bubble no longer covers a control or your car.'}]},
   {v:'v90m-beta.52',date:'14 Oct 2026',items:[{t:'FIXED',s:'Brushing a playground or fair piece or a street prop no longer stops your car dead; the tap-to-open bubble no longer covers your car.'}]},
   {v:'v90m-beta.51',date:'14 Oct 2026',items:[{t:'FIXED',s:'Mission markers sit on the road and face along it.'}]},
