@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.57',date:'14 Oct 2026',items:[{t:'FIXED',s:'Roadworks barriers no longer block main streets.'}]},
   {v:'v90m-beta.56',date:'14 Oct 2026',items:[{t:'FIXED',s:'On desktop the name plate no longer stretches into a tall dark column.'}]},
   {v:'v90m-beta.55',date:'14 Oct 2026',items:[{t:'NEW',s:'More hills along the streets, green hill crowns and the Taunus mountains on the horizon.'},{t:'FIXED',s:'The tap-to-open bubble stays off your car on desktop.'}]},
   {v:'v90m-beta.54',date:'14 Oct 2026',items:[{t:'NEW',s:'Frankfurt districts have their own look: Sachsenhausen taverns, Bahnhof neon, Osthafen murals.'},{t:'FIXED',s:'Kiosks and cafes have collision.'}]},
