@@ -71,17 +71,20 @@
  {
   "date": "2026-10-14",
   "game": "cauldron-fair",
-  "title": "readable on every screen size",
+  "title": "top bar, text sizes and panels on every screen size",
   "items": [
    "Menus use one title font and one body font, no overlaps",
-   "Icon buttons and buttons keep their content inside the frame art; one instruction line on the board"
+   "Icon buttons and buttons keep their content inside the frame art; one instruction line on the board",
+   "menu"
   ],
   "check": "Open the menus: text readable, nothing overlapping",
   "scn": [
    "menu",
-   "menu"
+   "menu",
+   "cf-ui"
   ],
   "ask": [
+   null,
    null,
    null
   ]
