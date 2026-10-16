@@ -217,7 +217,7 @@ const todayN=()=>{const d=(window.RET&&RET.daily&&RET.clock)?new Date(RET.clock(
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 // every setting, its default and (in c.js) its row in the settings panel. Saved under mnr_set, applied live by applySet().
-const DEFS={music:.45,sfx:.8,master:1,duck:true,mute:false,diff:'normal',hud:'min',auto:true,aim:false,layout:'right',sens:3,dsize:'M',win:'normal',all:false,sync:0,cue:'M',
+const DEFS={music:.45,sfx:.8,master:1,duck:true,react:true,mute:false,diff:'normal',hud:'min',auto:true,aim:false,layout:'right',sens:3,dsize:'M',win:'normal',all:false,sync:0,cue:'M',
   part:1,shake:2,flash:RM?1:2,rm:RM,hc:false,pal:'neon',q:'M',fps:60,fpsc:false};
 const SET=Object.assign({},DEFS,load('mnr_set',{}));
 if(!SET.v3){SET.v3=1;if(SET.guide===false)SET.cue='off';if(SET.reduce){SET.rm=true;SET.flash=1;}SET.part=1;SET.music=Math.min(SET.music,.45);   // older saves: calm visuals everywhere, music under the effects
@@ -291,6 +291,7 @@ const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beat
 const TR={by:{},bufs:{},busy:{},bad:{},list:[]};
 function normTrack(t){if(!t||typeof t.file!=='string'||!DEF_BPM[t.stage])return null;const bpm=+t.bpm;return{file:t.file,bpm:bpm>=40&&bpm<=300?bpm:DEF_BPM[t.stage],offsetMs:+t.offsetMs||0,gapMs:t.gapMs>=0&&t.gapMs<200?+t.gapMs:24,title:String(t.title||'').slice(0,40),stage:t.stage};}
 try{if(location.protocol!=='file:'&&(!NOMUSIC||SIM))fetch('music/tracks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;const arr=Array.isArray(j)?j:Array.isArray(j.tracks)?j.tracks:[];
+  if(Array.isArray(j.stingers))AU.stList=j.stingers.filter(x=>typeof x==='string');   // B20: stinger files that exist (music/st-<name>.mp3); only those are fetched
   for(const t of arr){const n=normTrack(t);if(n&&!TR.by[n.stage]){TR.by[n.stage]=n;TR.list.push(n);}}
   if(AU.a&&!running)AU.menuMusic();}).catch(()=>{});}catch(e){}
 const slotReady=s=>{const e=s.el;if(!s.blob||!e||e.readyState<4||!(e.duration>0)||!isFinite(e.duration))return false;s.D=e.duration;
@@ -318,13 +319,16 @@ function calTap(ts){if(!CAL.on)return null;const h=audible(ts>0?ts:undefined)-SE
 /* ---------- audio ---------- */
 const silentWav=(()=>{let u=null;return()=>{if(u)return u;try{const n=1600,b=new Uint8Array(44+n),dv=new DataView(b.buffer),w=(o,t)=>{for(let i=0;i<t.length;i++)b[o+i]=t.charCodeAt(i);};w(0,'RIFF');dv.setUint32(4,36+n,true);w(8,'WAVEfmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,8000,true);dv.setUint32(28,8000,true);dv.setUint16(32,1,true);dv.setUint16(34,8,true);w(36,'data');dv.setUint32(40,n,true);b.fill(128,44);
   u=URL.createObjectURL(new Blob([b],{type:'audio/wav'}));}catch(e){u='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';}return u;};})();   // 0.2 s of silence: unlocks an <audio> slot inside a tap
-const SFXGAP={shot:.16,hit:.07,graze:.12,heat:.4};
+const SFXGAP={shot:.16,hit:.07,graze:.12,heat:.4,sting:.12};
 const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
   init(){if(this.a||SIM)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
     this.m=a.createGain();try{const L=this.lim=a.createDynamicsCompressor();L.threshold.value=-4;L.knee.value=3;L.ratio.value=20;L.attack.value=.003;L.release.value=.12;this.m.connect(L);L.connect(a.destination);}catch(e){this.m.connect(a.destination);}   // master limiter: nothing clips, however many effects stack
     this.cutg=a.createGain();this.cutg.connect(this.m);                                     // the Drop power-up cuts the music here
     this.duck=a.createGain();this.duck.connect(this.cutg);                                     // music dips briefly under big effects
-    this.musv=a.createGain();this.musv.connect(this.duck);
+    this.musv=a.createGain();
+    if(window.RET&&RET.layers){const lp=this.lp=a.createBiquadFilter();lp.type='lowpass';lp.Q.value=.5;lp.frequency.value=this.lpHz[2];this.musv.connect(lp);lp.connect(this.duck);   // B19: the combo tier opens this filter
+      this.drm=a.createGain();this.drm.gain.value=0;this.drm.connect(this.musv);}                // B19: drum layer from tier 2
+    else this.musv.connect(this.duck);
     this.mus=a.createGain();this.mus.gain.value=.34;this.mus.connect(this.musv);          // synth soundtrack
     this.fb=a.createGain();this.fb.gain.value=.9;this.fb.connect(this.musv);               // music files
     this.sfxv=a.createGain();this.sfxv.connect(this.m);
@@ -345,7 +349,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
   slowColour(on){const a=this.a;if(!a||!this.cutg||!this.m)return;on=!!on;if(this.slc===on)return;this.slc=on;
     try{if(!this.lpf){this.lpf=a.createBiquadFilter();this.lpf.type='lowpass';this.lpf.Q.value=.5;this.lpf.frequency.value=20000;this.cutg.disconnect();this.cutg.connect(this.lpf);this.lpf.connect(this.m);}
       const f=this.lpf.frequency,t=a.currentTime;f.cancelScheduledValues(t);f.setTargetAtTime(on?3200:20000,t,.25);}catch(e){}},   // SLOW: a gentle low-pass on the song, no pitch change
-  duckMusic(){const a=this.a;if(!a||!this.duck||!SET.duck)return;const t=a.currentTime,g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.7,t,.012);g.setTargetAtTime(1,t+.3,.15);},
+  duckMusic(at){const a=this.a;if(!a||!this.duck||!SET.duck)return;const t=at||a.currentTime,g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.7,t,.012);g.setTargetAtTime(1,t+.3,.15);},
   vol(now){if(!this.a)return;const t=this.a.currentTime,k=now?0:.02;
     this.m.gain.setTargetAtTime(SET.mute?0:.55*SET.master,t,k||.001);this.musv.gain.setTargetAtTime(SET.music,t,k||.001);this.sfxv.gain.setTargetAtTime(SET.sfx,t,k||.001);},
   suspend(){this.hold=true;const a=this.a;for(const s of this.slots||[])if(s.playing&&!s.el.paused){s.heldPlay=true;try{s.el.pause();}catch(e){}}   // the songs keep their place
@@ -468,11 +472,54 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
   isched(a){const s16=BT.spb/4,t0=BT.t0+BT.off,now=a.currentTime;
     if(this.irev!==BT.rev||this.istep===undefined){this.irev=BT.rev;this.istep=Math.ceil((now-t0)/s16);}
     if(t0+this.istep*s16<now-.02)this.istep=Math.ceil((now-t0)/s16);
+    const D=!this.int&&this.drm?this.drm:this.mus;   // B19: the tier layer has its own gain (level x .34 = the mini-boss loudness); the mini-boss layer is unchanged
     while(t0+this.istep*s16<now+.12){const n=this.istep,t=t0+n*s16,s=((n%16)+16)%16;
-      if(s%4===0)this.osc(t,'sine',150,.22,.5,this.mus,40);
-      if(s%4===2)this.noise(t,.035,.15,8000,this.mus);
-      if(s===4||s===12)this.noise(t,.11,.28,1600,this.mus,'bandpass');
+      if(s%4===0)this.osc(t,'sine',150,.22,.5,D,40);
+      if(s%4===2)this.noise(t,.035,.15,8000,D);
+      if(s===4||s===12)this.noise(t,.11,.28,1600,D,'bandpass');
       this.istep++;}},
+  // B19 combo-driven music: the filter and the drum layer follow the combo tier (tier 1..4 = steps 0..3), changes land on the next bar line, a hit muffles the song for about a beat
+  lpHz:[2500,6000,20000,20000],lyLog:[],recT:0,
+  lyStep(){return SET.react===false||!running?2:Math.max(0,Math.min(3,(this.tier|0)-1));},
+  lyDrum(){return this.drm&&SET.react!==false&&running?[0,0,.5,1][Math.max(0,Math.min(3,(this.tier|0)-1))]:0;},
+  dlive(){return !!this.drm&&this.lyDrum()>0;},
+  lyPlan(a,now,at){const L=this.lp.frequency,D=this.drm.gain,f=this.lpHz[this.lyStep()],d=this.lyDrum()*.34;
+    L.cancelScheduledValues(now);D.cancelScheduledValues(now);L.setTargetAtTime(f,at,.12);D.setTargetAtTime(d,at,.12);
+    this.lyLog.push({k:'tier',now,at,f,d,tier:this.tier,t0:BT.t0+BT.off,spb:BT.spb});if(this.lyLog.length>200)this.lyLog.shift();},
+  lyTick(a){const key=this.lyStep()*10+this.lyDrum();if(key===this.lyKey)return;this.lyKey=key;const now=a.currentTime;let at=now;
+    if(this.recT>now)at=this.recT;   // a hit is still muffling the song: join its recovery
+    else if(running&&!paused&&BT.mode!=='none'){const bar=4*BT.spb,t0=BT.t0+BT.off;at=t0+Math.ceil((now+.02-t0)/bar)*bar;}
+    this.lyPlan(a,now,at);},
+  lyHit(){const a=this.a;if(!a||!this.lp||SET.react===false||!running||paused)return;const now=a.currentTime,spb=BT.spb||.5,t0=BT.t0+BT.off,q=spb/4,L=this.lp.frequency,D=this.drm.gain;
+    const rec=t0+Math.ceil((now+spb*.5-t0)/spb)*spb;this.recT=rec;this.lyKey=this.lyStep()*10+this.lyDrum();
+    L.cancelScheduledValues(now);D.cancelScheduledValues(now);L.setTargetAtTime(900,now,q/3);D.setTargetAtTime(0,now,.03);
+    L.setTargetAtTime(this.lpHz[this.lyStep()],rec,q);D.setTargetAtTime(this.lyDrum()*.34,rec,q);
+    this.lyLog.push({k:'hit',now,at:rec,f:900,tier:this.tier,t0,spb});if(this.lyLog.length>200)this.lyLog.shift();},
+  // B20 stingers: short one-shots on the beat grid (a perfect hit on the next 16th, the rest on the next beat), -3 dB on the sfx bus, at most one per beat and never two within 120 ms.
+  // A decoded file music/st-<name>.mp3 is used when tracks.json lists it, otherwise a soft synth stand-in.
+  stg:{},stLog:[],stLast:-9,stBeat:-9,
+  sting(n){const a=this.a;if(!a||a.state!=='running'||!window.RET||!RET.sting||SET.mute)return false;const now=a.currentTime;
+    const L=this.lastSfx||(this.lastSfx={});if(now-(L.sting||-9)<SFXGAP.sting)return false;
+    const spb=BT.spb||.5,t0=BT.t0+BT.off,grid=BT.mode!=='none'&&BT.spb>0,step=n==='perfect'?spb/4:spb;
+    const t=grid?t0+Math.ceil((now+.02-t0)/step-1e-9)*step:now+.02,bi=grid?Math.floor((t-t0)/spb+1e-6):-1;
+    if(Math.abs(t-this.stLast)<.12||(grid&&bi===this.stBeat))return false;
+    L.sting=now;this.stLast=t;this.stBeat=bi;
+    if(!this.stb){this.stb=a.createGain();this.stb.gain.value=.708;this.stb.connect(this.sfxv);}
+    const B=this.stg[n];if(B===undefined&&this.stList&&this.stList.indexOf(n)>=0){this.stg[n]=0;try{fetch('music/st-'+n+'.mp3').then(r=>r.ok?r.arrayBuffer():null).then(b=>b?a.decodeAudioData(b):null).then(buf=>{if(buf)this.stg[n]=buf;}).catch(()=>{});}catch(e){}}
+    this.stLog.push({n,t,now,spb,t0,file:!!B});if(this.stLog.length>200)this.stLog.shift();
+    if(B){const s=a.createBufferSource();s.buffer=B;s.connect(this.stb);s.start(t);}
+    else this.stSynth(n,t);
+    if(n==='boss-in'||n==='clear'||n==='fail'||n==='unlock'||n==='newbest')this.duckMusic(t);
+    return true;},
+  stSynth(n,t){const F=this.stb,f=k=>this.f(k),o=(dt,ty,k,dur,v,sl)=>this.osc(t+dt,ty,f(k),dur,v,F,sl?f(sl):0);
+    if(n==='perfect'){o(0,'sine',100,.14,.04);o(.04,'sine',107,.2,.035);}
+    else if(/^tierup/.test(n)){const m=+n.slice(6)||1;[0,4,7,12,16].slice(0,2+m).forEach((k,i)=>o(i*.07,'triangle',72+k+3*m,.22,.07));}
+    else if(n==='phase'){o(0,'sine',52,.5,.14,40);o(.12,'triangle',64,.3,.06);}
+    else if(n==='boss-in'){o(0,'sawtooth',40,.9,.07,36);o(0,'sine',40,.9,.14,32);o(.4,'triangle',76,.4,.05);}
+    else if(n==='clear'){[0,4,7,12,16].forEach((k,i)=>o(i*.09,'triangle',72+k,.3,.08));}
+    else if(n==='fail'){[7,3,0].forEach((k,i)=>o(i*.14,'sine',60+k,.4,.1));}
+    else if(n==='unlock'){o(0,'sine',84,.5,.07);o(.1,'sine',91,.6,.06);o(.2,'sine',96,.7,.05);}
+    else if(n==='newbest'){[0,7,12,19].forEach((k,i)=>o(i*.08,'triangle',76+k,.35,.07));o(.34,'sine',100,.8,.05);}},
   // power layers: every tier of the meter adds a part on the same grid (2: hats, 3: kick + clap, 4: pulsing bass line)
   tier:1,
   tlsched(a){const s16=BT.spb/4,t0=BT.t0+BT.off,now=a.currentTime,T=this.tier;
@@ -480,7 +527,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     if(t0+this.tstep*s16<now-.02)this.tstep=Math.ceil((now-t0)/s16);
     while(t0+this.tstep*s16<now+.12){const n=this.tstep,t=t0+n*s16,s=((n%16)+16)%16;
       if(s%2===0)this.noise(t,.03,.08+.02*T,9000,this.mus);
-      if(T>=3){if(s%4===0&&!this.int)this.osc(t,'sine',150,.2,.4,this.mus,40);if(s===4||s===12)this.noise(t,.09,.2,1800,this.mus,'bandpass');}
+      if(T>=3&&!this.dlive()){if(s%4===0&&!this.int)this.osc(t,'sine',150,.2,.4,this.mus,40);if(s===4||s===12)this.noise(t,.09,.2,1800,this.mus,'bandpass');}
       if(T>=4&&s%2===0)this.osc(t,'square',this.f(this.root+12+[0,7,12,7][(s/2)%4]),.11,.05,this.mus,0,2400);
       this.tstep++;}},
   calsched(a){if(!CAL.on||CAL.dom!==1)return;const now=a.currentTime;                                  // latency test: a click every half second on the audio clock
@@ -494,9 +541,10 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     f.type=type;f.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(dest);s.start(t);s.stop(t+dur+.02);},
   // the synth soundtrack: one 16th-note step is scheduled on the beat grid BT.t0 + n*spb/4
   sched(){const a=this.a;if(a&&this.slots)this.strTick(a);if(a&&CAL.on&&a.state==='running')this.calsched(a);if(a&&this.want&&running&&!paused)this.switchTo(this.want);
+    if(a&&a.state==='running'&&this.lp)this.lyTick(a);
     if(!a||a.state!=='running'||!running||paused)return;
     if(BT.mode==='synth'&&!BT.pend&&!this.want&&TR.by[BT.stage]&&TR.bufs[TR.by[BT.stage].file])this.trackReady(BT.stage);   // the song file arrived while a switch was pending: swap it in on the next bar
-    if(this.int&&BT.mode==='file')this.isched(a);
+    if((this.int||this.dlive())&&BT.mode==='file')this.isched(a);
     if(this.tier>1&&BT.mode!=='none')this.tlsched(a);
     if(BT.mode!=='synth')return;
     const s16=BT.spb/4,now=a.currentTime;if(BT.t0+this.step*s16<now-.02)this.step=Math.ceil((now-BT.t0)/s16);
@@ -902,7 +950,7 @@ function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,min
   const nm=o.nm||D.bossName;
   G.boss={type:'boss',k,mini,nm,lbl:o.lbl,x:W+120,y:H/2,r:o.r||(k===3?54:46),hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:o.score||5000*(k+1),
     col:o.col||[D.a,D.b,D.a,D.a][k]||D.a,p2:mini?6:14,p3:mini?11:26,minBar:mini?14:BOSS_MIN_BAR,floor:Math.ceil(hp*.62)};
-  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNUNG',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');
+  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNUNG',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');NR.emit('bossIn',{mini});
   if(G.live){const sg=bossSong(k,mini);if(sg){AU.switchTo(sg);AU.intense(false);}else AU.intense(true);}
   return G.boss;}
 
@@ -941,7 +989,7 @@ function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false}
   if(GX()<(.009+(SH.lk||0)*.3)*healK()&&P.hp<P.max)drop('hp');}   // a district has 300+ kills now: one hull drop in about 110
 // a dash waiting for its beat already protects the ship (P.dq)
 function hurt(n){n=n>1?n:1;if(P.inv>0||P.dashT>0||P.dq||G.dead||godMode||ST.over)return;if(SH.absorb())return;P.hp=Math.max(0,P.hp-n);if(n>1){shake(12);G.flash=Math.max(G.flash,.3*FX());}   // a heavy shell takes 2 hull
-  ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);tierDrop('hit');G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
+  ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);tierDrop('hit');G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');NR.emit('hurt');
   burst(P.x,P.y,'#ff3050',24,300);if(P.hp<=0)die();}
 function die(){G.dead=true;G.deadT=0;G.slow=.3;shake(16);burst(P.x,P.y,'#ffffff',40,420,1);burst(P.x,P.y,DISTRICTS[G.di].a,60,500,1.2);AU.sfx('big');}
 
@@ -970,7 +1018,7 @@ function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit(
   }}
 function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e.p2?2:1;     // phases change on bar p2 and p3; the boss cannot fall earlier than minBar (armour holds its HP at a floor)
   e.floor=bar>=e.minBar?0:bar>=e.p3?Math.max(1,Math.ceil(e.max*.04)):bar>=e.p2?Math.ceil(e.max*.3):Math.ceil(e.max*.62);e.minBar_=e.minBar;
-  if(ph!==e.ph){e.ph=ph;e.pi=0;e.pc=-2;e.cnt=0;G.eb=[];e.lasers=[];e.arm=false;banner(ph===2?'PHASE 2':'FINAL PHASE',e.nm,true,2.2);G.flash=Math.max(G.flash,.25*FX());shake(10);AU.sfx('phase');
+  if(ph!==e.ph){e.ph=ph;e.pi=0;e.pc=-2;e.cnt=0;G.eb=[];e.lasers=[];e.arm=false;banner(ph===2?'PHASE 2':'FINAL PHASE',e.nm,true,2.2);G.flash=Math.max(G.flash,.25*FX());shake(10);AU.sfx('phase');NR.emit('bossPhase',{ph});
     if(P.hp<P.max||!e.mini)G.pk.push({t:'hp',x:Math.min(e.x,W-80),y:e.y,vx:-150,vy:rnd(-50,50),bob:0});   // a broken armour plate drops a repair
     return;}
   if(e.x>bossX()||G.dead){e.arm=false;return;}
@@ -3312,6 +3360,19 @@ RET.dailyShow=function(){let e=$('retTt');
 RET.dailyShow();
 window.DY=DY;
 
+/* ===== B19 combo-driven music, B20 stingers (POLISH.md). The engine is in a.js (AU.lyTick / AU.lyHit / AU.sting); this only wires the events. ===== */
+if(RET.layers===undefined)RET.layers=true;   // lowpass opens with the combo tier, drum layer from tier 3, a hit muffles the song for a beat
+if(RET.sting===undefined)RET.sting=true;     // short stingers on the beat grid
+RET.lastTier=1;
+NR.on('runStart',()=>{RET.lastTier=1;});
+NR.on('hurt',()=>{if(RET.layers)AU.lyHit();});
+NR.on('tier',d=>{if(!d)return;const up=d.tier>RET.lastTier;RET.lastTier=d.tier;if(RET.sting&&up)AU.sting('tierup'+Math.min(3,d.tier-1));});
+NR.on('perfect',()=>{if(RET.sting)AU.sting('perfect');});
+NR.on('bossIn',d=>{if(RET.sting&&!(d&&d.mini))AU.sting('boss-in');});
+NR.on('bossPhase',()=>{if(RET.sting)AU.sting('phase');});
+NR.on('stageClear',()=>{if(RET.sting)AU.sting('clear');});
+NR.on('runEnd',d=>{if(RET.sting&&d&&!d.quit&&!d.cleared)AU.sting('fail');});
+
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
    The LAB is a real run with G.lab set: no waves, no district clock, no boss timer, no chest or pit stop, god mode on. What appears is decided by the panel at the bottom:
    BOSS (gallery: pick any boss and its district, replay the intro, lock a phase, force an attack pattern, hold any pose of its sprite sheet, hit flash, death + respawn),
@@ -3718,6 +3779,7 @@ NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L3',id:'music-reacts',text:'The music now follows your combo: it starts muffled and opens up as your tier rises, drums join at tier 3, a hit muffles the song for a beat, and soft chimes land on the beat for tier-ups, PERFECT hits, bosses and stage clears. Does it feel good, and is anything too loud? (Settings > Audio > Music reacts turns the filter and drums off.)'},
  {ver:'L3',id:'heat-ladder',text:'After you clear the story, every cleared stage gets a HEAT ladder: tap + on the stage card for Heat 1-10. Each Heat adds one mutator (Turbo, Elite Guard, Hailstorm, Fast Decay, No Heal, -1 Hull ...), pays +20% Neon and a medal the first time. Does each step feel a little harder, never unfair?'},
  {ver:'L3',id:'daily-streak',text:'Title screen: a daily streak and a weekly challenge. Fly the DAILY RUN once a day to earn Neon (60 on day 1, up to 120 on day 7+); miss one day and the streak holds, miss two and it starts again. WEEKLY RUN: the same two mutators for everyone all week; beat the first boss once a week for 300 Neon. Is the status line clear?'},
  {ver:'L3',id:'clear-pay',text:'Clearing a stage now pays Neon: 40 plus 12 per stage number the first time, 25 more for each new star, and a tenth of that on later clears. Everything in the garage costs far less (weapons, perks), and kills pay a bit more, so a full build is a matter of hours, not weeks. Fail a stage twice and the next try gets +1 hull; fail four times and it is a little easier too. Do the prices feel fair?'},
@@ -4670,7 +4732,7 @@ const SCHEMA=[
   {g:'Controls',rows:[{k:'layout',l:'Touch layout',o:[['left','Left'],['right','Right']]},{k:'sens',l:'Sensitivity',s:[1,5,1],f:v=>String(v)},{k:'dsize',l:'Button size',o:[['S','Small'],['M','Medium'],['L','Large']]}]},
   {g:'Rhythm',rows:[{k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']]},{k:'all',l:'Everything counts',o:OFFON},{k:'cue',l:'Beat cue',o:[['off','Off'],['S','Small'],['M','Medium'],['L','Large']]},
     {k:'sync',l:'Latency',s:[-150,150,5],f:v=>(v>0?'+':'')+v+' ms',tap:1}]},
-  {g:'Audio',rows:[{k:'master',l:'Master',s:[0,100,5],p:1},{k:'music',l:'Music',s:[0,100,5],p:1},{k:'sfx',l:'Effects',s:[0,100,5],p:1},{k:'duck',l:'Ducking',o:[[true,'On'],[false,'Off']]},{k:'mute',l:'Mute all',o:OFFON}]},
+  {g:'Audio',rows:[{k:'master',l:'Master',s:[0,100,5],p:1},{k:'music',l:'Music',s:[0,100,5],p:1},{k:'sfx',l:'Effects',s:[0,100,5],p:1},{k:'duck',l:'Ducking',o:[[true,'On'],[false,'Off']]},{k:'react',l:'Music reacts',o:OFFON},{k:'mute',l:'Mute all',o:OFFON}]},
   {g:'Visuals',rows:[{k:'part',l:'Particles',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'shake',l:'Screen shake',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'flash',l:'Flashing',o:[[0,'Off'],[1,'Reduced'],[2,'Full']]},
     {k:'q',l:'Quality',o:[['L','Low'],['M','Medium'],['H','High']]},{k:'fps',l:'FPS cap',o:[[30,'30'],[60,'60']]},{k:"pal",l:"Colour theme",o:[['neon','Neon'],['cb','Blue-orange'],['term','Terminal']]},{k:'fpsc',l:'FPS counter',o:OFFON}]},
   {g:'Accessibility',rows:[{k:'rm',l:'Reduced motion',o:OFFON},{k:'hc',l:'High-contrast bullets',o:OFFON}]}];

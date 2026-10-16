@@ -175,3 +175,16 @@ RET.dailyShow=function(){let e=$('retTt');
    +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
 RET.dailyShow();
 window.DY=DY;
+
+/* ===== B19 combo-driven music, B20 stingers (POLISH.md). The engine is in a.js (AU.lyTick / AU.lyHit / AU.sting); this only wires the events. ===== */
+if(RET.layers===undefined)RET.layers=true;   // lowpass opens with the combo tier, drum layer from tier 3, a hit muffles the song for a beat
+if(RET.sting===undefined)RET.sting=true;     // short stingers on the beat grid
+RET.lastTier=1;
+NR.on('runStart',()=>{RET.lastTier=1;});
+NR.on('hurt',()=>{if(RET.layers)AU.lyHit();});
+NR.on('tier',d=>{if(!d)return;const up=d.tier>RET.lastTier;RET.lastTier=d.tier;if(RET.sting&&up)AU.sting('tierup'+Math.min(3,d.tier-1));});
+NR.on('perfect',()=>{if(RET.sting)AU.sting('perfect');});
+NR.on('bossIn',d=>{if(RET.sting&&!(d&&d.mini))AU.sting('boss-in');});
+NR.on('bossPhase',()=>{if(RET.sting)AU.sting('phase');});
+NR.on('stageClear',()=>{if(RET.sting)AU.sting('clear');});
+NR.on('runEnd',d=>{if(RET.sting&&d&&!d.quit&&!d.cleared)AU.sting('fail');});
