@@ -1,0 +1,6 @@
+# HANDOFF ramp-2 (2026-10-16)
+1. ROOT CAUSE FOUND: the b60 "road wedge" is road asphalt (M.road filler streets, also M.street/resSt/cobble) lifted a SECOND time: TR_bldFix pass 2 (src/85) and OC_unbury (src/90) add the building lift (trOff / ocUp, up to 55 m for Frankfurt buildings authored at y 0) to EVERY vertex inside a footprint, including road vertices already on groundY. Road vertices inside/next to a footprint got +30 m (e.g. fra 189-213,351-357: y 59.5 over ground 29.7) = a steep road-textured wedge through a house. Found by scanning built-page road meshes vs groundY and bisecting the boot (flush ok, the hubGrid() wrappers made it).
+2. Fix: both lift loops skip road-surface meshes (new TR_roadMat in src/85). Measured on the built page: road verts >10 m over ground 111 -> 0 (fra), Athens 0.
+3. tools/pitscan.js --only ramp and RP_scan now also count "road spikes" (asphalt/junction verts >6 m over groundY, river bridge decks excluded); GO ramp1/ramp-clear fails on any (fra 0, ath 0).
+4. Gate: unit 0 FAIL; TAG=life1,xf1,terrain,ramp1 37/37 on the built page. Before/after shots did not frame the wedge (car crashed into a house), so the evidence is numeric; Alex should look at the Garage -> 577 m junction.
+5. Not done: terr-8 height functions untouched; kerbs / non-road meshes inside footprints are still lifted (none seen >6 m).
