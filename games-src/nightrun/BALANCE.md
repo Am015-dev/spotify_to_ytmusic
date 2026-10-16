@@ -108,3 +108,16 @@ shooters, drones and chargers overlap on screen and their bullets/touches add up
 - balance-test (RUNS 3, 3 diffs x 3 builds): 32 PASS, 0 FAIL (Easy late unseen 0 %, shooters fired 71 %). normal/late 1/8/20/30/42 = 67/100/100/100/100,
   hard/late 30 = 33 % (RUNS 10: 50 %). afk-test and weapon-test PASS.
 - Still weak: stage 30 with the default kit and mid builds is 20-67 % (long stage, hull 5, many "other" hits = fences/beams the bot ignores). Next lever: `DMG.lvK`/`fkFloor`.
+
+## Walls (RET.walls, 16 Oct 2026)
+Story bot (`story-sim.js`, Normal, ARCADE, 16 runs per stage). Flag off = the old tables exactly. `CLASSIC=1` runs the full-song mode.
+**Cause:** (1) ARCADE cuts a stage to ~150 s but the kill goal still scaled with the old bar count, so the bot needed 190-280 s on a kill stage, ran past the song and died late (stages 11, 12, 18, 23, 30, 39: 38-88% clear, 4-6 hits). (2) TALOS (stage 40) fires a laser every 2nd cycle from level 8 (every 3rd before); the bot does not read the beam telegraph and took 4.4 hits, 27 laser hits in 16 runs.
+**Change:** kill goal x0.75 in ARCADE and x0.45 in CLASSIC (`wallK` in `story.js`, table `RET.wallKill` in `ret.js`; per-stage entries override). TALOS laser cadence stays at every 3rd cycle (`b.js`). The boss fight length is unchanged (60-63 s), the entry grace, damage soft cap and anti-idle are untouched.
+| Stage | 11 | 12 | 18 | 23 | 30 | 31 | 39 | 40 |
+|---|---|---|---|---|---|---|---|---|
+| clear% before | 88 | 75 | 81 | **38** | 75 | 88 | 69 | 69 |
+| clear% after | 100 | 100 | 69 | 88 | 94 | 81 | 63 | 100 |
+| hits before > after | 4.4>3.2 | 5.0>4.2 | 5.6>4.6 | 5.8>3.9 | 3.8>1.5 | 1.7>1.8 | 3.5>3.1 | 4.4>0.4 |
+Whole curve (main stages 1-40): minimum 63%, worst dip against the two neighbours: 18 (69% vs 100/100 avg, noise at 16 runs; before: stage 23 was 62 points under). Mean hits per main stage 2.0 (before 2.3; max 4.6). Challenges 41 and 45 (no-hit) stay at 38% / 13%: one hit ends them by design, they are optional and not changed.
+**CLASSIC (8-12 runs, before > after):** 18 0>83, 23 50>83, 40 63>75, 30 25>50, 39 13>42. Stages 30 and 39 are still weak in CLASSIC (they are attrition deaths over 4 minutes, not the kill goal); next: spawn spacing on those two.
+Gate: `ret-walls-test.js`.

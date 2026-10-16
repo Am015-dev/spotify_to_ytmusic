@@ -255,7 +255,7 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e
     case'fan9':if(c%cad===0)fan(e,9,1.5,(190+15*d)*sp,c2);break;
     case'ring':if(c%cad===0){ring(e,14+2*Math.min(e.k,3),(140+10*d)*sp,e.cnt*.21,'#ff3dbb');e.cnt++;}break;
     case'summon':if(c===0||c===4||(e.ph===3&&(c===2||c===6))){en('drone',{x:W+20,y:gx(60,H-100),amp:40,ph:gx(0,6)});en('charger',{x:W+60,y:gx(60,H-100)});}break;
-    case'laser':if(c%(ST.on&&ST.lvl>=8||DF.el?2:3)===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}
+    case'laser':if(c%(ST.on&&ST.lvl>=8&&!(window.RET&&RET.walls)||DF.el?2:3)===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}
   eb.src=null;e.arm=bossNext(e);}
 // what the boss fires on the beat k beats from now (k>=1): {t:'fan',n,sp,spd} / {t:'ring',n,spd,off} / {t:'spiral'} / null. bossBeat fires exactly this; the safe-path check plans against it.
 function bossShot(e,k){let pc=e.pc+k,pi=e.pi;const list=e.lists[e.ph-1];if(pc<0)return null;while(pc>=8){pc-=8;pi=(pi+1)%list.length;}
@@ -272,7 +272,7 @@ function bossNext(e){if(e.x>bossX()||G.dead)return false;const list=e.lists[e.ph
   const cad=e.ph===3?1:2;switch(list[pi%list.length]){
     case'fan5':case'fan7':case'fan9':case'ring':return pc%cad===0;
     case'summon':return pc===0||pc===4||(e.ph===3&&(pc===2||pc===6));
-    case'laser':return pc%(ST.on&&ST.lvl>=8||DF.el?2:3)===0;
+    case'laser':return pc%(ST.on&&ST.lvl>=8&&!(window.RET&&RET.walls)||DF.el?2:3)===0;
     case'spiral':return true;}
   return false;}
 

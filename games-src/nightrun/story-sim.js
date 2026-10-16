@@ -5,13 +5,13 @@
 // Prints clear-rate, time, hits and perfects per stage. The bot is the sweep's decide() (dodge grid, dash when a shot is near, EMP when swamped) with a ~50 ms reaction.
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
-const RUNS = +process.env.RUNS || 20, PC = process.env.PC != null ? +process.env.PC : .4, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 420;
+const CLASSIC = !!process.env.CLASSIC, RUNS = +process.env.RUNS || 20, PC = process.env.PC != null ? +process.env.PC : .4, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 420;
 const STAGES = (process.env.STAGES || '1,2,3,4,5,6,7,8,9,10,11,12').split(',').map(Number);
 function freePort() { return new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); }); }
 const BOT = (opts) => {
   const m = window.__mnr, rnd = Math.random; const { n, PC, MAXT, endless } = opts;
   if (opts.t2) Object.assign(m.TUNE2, opts.t2);
-  if (endless) m.startStory(1); else m.startStory(n);
+  if (opts.classic) m.ARC.set(false); if (endless) m.startStory(1); else m.startStory(n);
   m.simOn(true);
   const dec = () => {
     const G = m.G, P = m.P; let ty = 270 + 140 * Math.sin(G.t * .9), tx = 220 + 70 * Math.sin(G.t * .55), bd = 1e9;   // a real player never parks: the anti-idle beam would hit the bot
@@ -55,7 +55,7 @@ const BOT = (opts) => {
   await Promise.all(Array.from({ length: PAR }, async () => {
     const p = await browser.newPage({ viewport: { width: 960, height: 540 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); if (process.env.CLASSIC) await p.evaluate(() => window.__mnr.ARC && window.__mnr.ARC.set(false));
-    while (next < jobs.length) { const n = jobs[next++]; const r = await p.evaluate(BOT, { n, PC, MAXT, endless: false, t2: process.env.T2 ? JSON.parse(process.env.T2) : null }); (res[n] = res[n] || []).push(r); if (errs.length) { console.log('PAGE ERROR', errs[0]); errs.length = 0; } }
+    while (next < jobs.length) { const n = jobs[next++]; const r = await p.evaluate(BOT, { n, PC, MAXT, endless: false, classic: CLASSIC, t2: process.env.T2 ? JSON.parse(process.env.T2) : null }); (res[n] = res[n] || []).push(r); if (errs.length) { console.log('PAGE ERROR', errs[0]); errs.length = 0; } }
     await p.close();
   }));
   await browser.close(); srv.kill();

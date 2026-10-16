@@ -88,7 +88,8 @@ const ACTN=['ACT I','ACT II','ACT III','ACT IV','ACT V'];
 const stLenC=s=>{const b=songBars(s.song);return s.ch?Math.round(b*.6):b;};
 const stLen=s=>ARC.bars(s,stLenC(s));   // stage length in bars = its song (a challenge is 60% of it)
 const stK=s=>stLen(s)/46;                                 // the old goals were made for 46 bars: they scale with the length
-const stKill=s=>Math.round(s.goal.v*stK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
+const wallK=s=>window.RET&&RET.walls&&!s.ch?(RET.wallKill[s.n]||(ARC.active()?RET.wallKill.all:RET.wallKill.classic)):1;   // RET.walls: a kill goal is cut so the stage ends with its song
+const stKill=s=>Math.round(s.goal.v*stK(s)*wallK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
 const stS3=s=>Math.round(s.s3*stK(s)/5000)*5000;
 const goalTxt=s=>{const g=s.goal;return s.ch==='nohit'?'NO HIT · '+stLen(s)+' BARS':s.ch==='perfect'?'PERFECT '+stPerf(s)+' · '+stLen(s)+' BARS':s.ch==='speed'?'KILL '+stKill(s)+' IN '+Math.round(stLen(s)*s.tb)+' BARS':g.k==='survive'?'SURVIVE '+stLen(s)+' BARS':g.k==='kill'?'KILL '+stKill(s):g.k==='score'?'SCORE '+(stScore(s)/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
 /* the three stars of a stage: [clear, PERFECT target, no hull lost (challenges: a score)] as plain lines */

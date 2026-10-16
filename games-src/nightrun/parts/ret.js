@@ -58,3 +58,7 @@ const ARC={secs:150,leadSecs:44,maxBars:80,on:load('mnr_arc',1)!==0,
     return Math.max(Math.min(full,BOSS_BARS+20),Math.min(full,this.maxBars,Math.floor(this.secs/spb),lead+BOSS_BARS));},
   label(){return this.active()?'ARCADE · ~3 MIN':'CLASSIC · FULL SONG';}};
 window.ARC=ARC;
+
+/* ===== WALLS: difficulty cliffs removed (BALANCE.md "Walls"). Flag off = the old tables. Per-stage data lives here. ===== */
+if(RET.walls===undefined)RET.walls=true;
+RET.wallKill={all:.75,classic:.45};   // ARCADE: kill goals are x.75 (the bot needed ~100 s more than the cut song to reach them, so a kill stage ran long and ended in a death); CLASSIC (full song) is x.45; a stage number overrides
