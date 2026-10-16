@@ -72,17 +72,17 @@ function ENV_ground(m,opt){if(!m||!ENV_on()||m.userData.env1)return;m.userData.e
     sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vEvP;varying vec3 vEvN;uniform vec3 uEvP[5];uniform vec3 uEvB;'+ENV_glsl())
       .replace('#include <color_fragment>','#include <color_fragment>\n'+f)};
   m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|env1'+opt.kind+(lo?'l':'')};m.needsUpdate=true}
-function ENV_water(m){if(!m||!ENV_on()||m.userData.env1)return;m.userData.env1='water';ENV_state.water=1;const lo=ENV_lo(),ob=m.onBeforeCompile,ck=m.customProgramCacheKey,C=h=>{const c=new THREE.Color(h);return`vec3(${c.r.toFixed(4)},${c.g.toFixed(4)},${c.b.toFixed(4)})`};
+function ENV_water(m){if(!m||!ENV_on()||m.userData.env1)return;m.userData.env1='water';ENV_state.water=1;m.metalness=.06;m.envMapIntensity=.7;const lo=ENV_lo(),ob=m.onBeforeCompile,ck=m.customProgramCacheKey,C=h=>{const c=new THREE.Color(h);return`vec3(${c.r.toFixed(4)},${c.g.toFixed(4)},${c.b.toFixed(4)})`};
   m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);
     sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>'+ENV_glsl()+'\nfloat evFr=0.;')
       .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
-{float b=vBank;vec3 wc=mix(${C('#5ad1c8')},${C('#2fa3c9')},smoothstep(2.,18.,b));wc=mix(wc,${C('#12487a')},smoothstep(20.,55.,b));
+{float b=vBank;vec3 wc=mix(${C('#43d3e6')},${C('#2b8fe8')},smoothstep(2.,18.,b));wc=mix(wc,${C('#1456c4')},smoothstep(20.,55.,b));
  ${lo?'':'normal=normalize(normal+vec3(evN(vWP.xz*.35+uT*.4)-.5,0.,evN(vWP.xz*.3-uT*.35+9.)-.5)*.10);'}
  float fo2=smoothstep(6.,0.,b+sin(vWP.x*.35+uT*2.)*1.4);float cr=smoothstep(.45,.7,wvH(vWP.xz,uT)/.79*.5+.5);
  float fb=smoothstep(.80,.95,sin((b${lo?'':'+evN(vWP.xz*.08)*6.'})*.9-uT*1.8)*.5+.5)*(1.-smoothstep(4.,16.,b))${lo?'':'*smoothstep(.25,.6,evN(vWP.xz*.15+uT*.05))'};
  wc=mix(wc,vec3(.95,.98,1.),clamp(max(fo2*.85,cr*.3)+fb*.7,0.,1.));
  evFr=pow(1.-clamp(dot(normalize(normal),normalize(vViewPosition)),0.,1.),3.);diffuseColor.rgb=wc*(1.-evFr*.2);}`)
-      .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=vec3(.62,.80,.98)*evFr*.16;');
+      .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=vec3(.62,.80,.98)*evFr*.16+diffuseColor.rgb*.32;/* burst-1: keeps the Main blue under the grey reflections */');
     if(!sh.fragmentShader.includes('float wvH'))sh.fragmentShader=sh.fragmentShader.replace('varying vec3 vWP;','varying vec3 vWP;\nfloat wvH(vec2 p,float t){return .38*sin(p.x*.045+t*1.6)+.26*sin(p.y*.09+p.x*.021-t*1.9)+.15*sin((p.x+p.y)*.13+t*2.7);}')};
   m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|env1w'+(lo?'l':'')};m.needsUpdate=true}
 // hooks: water via the waterMat factory, city lawns + Taunus via ART_hub (after the city materials exist); outer land in worldGroundBuild

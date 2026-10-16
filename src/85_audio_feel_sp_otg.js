@@ -136,8 +136,8 @@ function FL_terr(T0,ground,dt=1/60){const raw=FL_raw(T0,ground),air=RO.y>ground+
   return raw}
 const FL_VEH={road:'ship',dirt:'ship',water:'boat'};  // R1: dirt was 'offroad' = the car turned into the buggy on grass at 100 km/h
 function FL_veh(){const v=(RO.vsel||'auto')==='auto'?FL_VEH[FL.s||'road']:RO.vsel;if(v!==FL.v&&!(pl&&pl.air)){if(FL.v){FL.log.push({v,s:FL.s,x:Math.round(RO.x),z:Math.round(RO.z)});if(FL.log.length>60)FL.log.shift();FL_burst(v)}FL.v=v}return FL.v||v}
-function FL_burst(v){if(!pl||!RO.on)return;const at=pl.mesh.position.clone();at.y+=1.2;
-  CR_noGlow=1;try{debris(at,V3(0,5,0),8,['#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ffffff'].map(c=>new THREE.Color(c)),.45,RO.y);burst(SPARK,at,8,9,.25,new THREE.Color(1.3,1.2,.9))}finally{CR_noGlow=0}AU.sfx('boost');fovKick=Math.max(fovKick,4)}
+function FL_burst(v){if(!pl||!RO.on||RO.rcT>0)return;/* burst-1: never in the roamWarp grace */const at=pl.mesh.position.clone();at.y+=1.2;
+  CR_noGlow=1;try{debris(at,V3(0,5,0),8,['#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ffffff'].map(c=>new THREE.Color(c)),.45,RO.y);burst(SPARK,at,8,9,.25,new THREE.Color(1.3,1.2,.9))}finally{CR_noGlow=0}xfBurst(at,['#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ffffff'].map(c=>new THREE.Color(c)));AU.sfx('boost');fovKick=Math.max(fovKick,4)}
 // ---------- 2 · smashing fills boost (size-scaled, chain combo), goon takedowns refill, slower passive recharge
 const FL_RECH=9,FL_CHAIN=1.6;
 const FL_mult=n=>Math.min(3,1+.25*Math.max(0,n-1));
