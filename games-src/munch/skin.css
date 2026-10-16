@@ -15,7 +15,7 @@ html.sk .gx-drawer-head h2{color:var(--sk-cream)}
 html.sk .gx-drawer,html.sk .gx-drawer-body{--ink:#3a2410}
 html.sk .gx-dock-head{background:url(media/ui-drawer-head.webp) center/auto 100% repeat-x #3a2210;color:var(--sk-cream)}
 /* buttons: cream / go / power pills */
-html.sk .btn,html.sk .btn:hover{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#3a2410;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));transition:none}
+html.sk .btn,html.sk .btn:hover{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/12px stretch;border-radius:0;background:none;box-shadow:none;color:#3a2410;text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));transition:none}
 html.sk .btn.primary,html.sk .btn.good{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn.danger{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .btn.rec{background:none!important;border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec}
@@ -25,6 +25,7 @@ html.sk .seg .btn.on,html.sk .grid2 .btn.on,html.sk .btn.learn.on{background:non
 html.sk .btn .ic{color:currentColor}
 /* menu / option rows */
 html.sk .menu .btn,html.sk .opts .btn,html.sk .opt,html.sk .btn.gxt-menu,html.sk .btn.learn{border-style:solid;border-color:transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;text-align:left;color:#3a2410;text-shadow:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .menu .mrow{border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;color:#3a2410;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 html.sk .btn.gxt-menu.gxt-first{box-shadow:none;filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 1px 2px rgba(0,0,0,.3))}
 html.sk .btn.learn{display:flex;align-items:center}
 html.sk .btn.learn.on{border-image-source:url(media/ui-row-c.webp);color:#1b4332;filter:drop-shadow(0 0 5px #7fe08a) drop-shadow(0 1px 2px rgba(0,0,0,.3));text-shadow:none}
@@ -37,11 +38,11 @@ html.sk .dlg.start h2 span{color:#b3261a}
 html.sk .dlg .small,html.sk .dlg .muted{color:#5a4128}
 html.sk.ph .dlg{border-image-width:26px}
 html.sk.ph .dlg .acts{position:sticky;bottom:0;z-index:2;background:linear-gradient(rgba(240,222,176,0),#f0deb0 10px)}
-html.sk .mrow .btn{border-image-width:0 16px}
+html.sk .mrow .btn{border-image-width:0 8px}
 /* ===== painted HUD pieces (classes set in tbl.js once the file loaded) ===== */
 /* gear slots, curse and gear icons */
 html.dk-slot .mine .slots{opacity:.75}
-html.dk-slot .mine .slots i{width:40px;height:40px;border:0;border-radius:0;font-size:0;background:center/contain no-repeat}
+html.dk-slot .mine .slots i{border-color:transparent;border-radius:0;font-size:0;background:center/contain no-repeat}
 html.dk-slot .mine .slots i[data-s=head]{background-image:url(media/ui-slot-head.webp)}html.dk-slot .mine .slots i[data-s=body]{background-image:url(media/ui-slot-body.webp)}
 html.dk-slot .mine .slots i[data-s=hands]{background-image:url(media/ui-slot-hands.webp)}html.dk-slot .mine .slots i[data-s=feet]{background-image:url(media/ui-slot-feet.webp)}
 html.dk-slot .gchip .gi{font-size:0;display:inline-block;width:22px;height:22px;vertical-align:middle;margin-right:4px;background:center/contain no-repeat}
@@ -51,7 +52,7 @@ html.dk-slot .gchip .gi[data-s=class]{background-image:url(media/ui-slot-class.w
 html.dk-curse .gi[data-s=curse]{font-size:0;display:inline-block;width:18px;height:18px;vertical-align:middle;background:url(media/token-curse.webp) center/contain no-repeat}
 html.dk-gi .opp.seat .gi[data-s=gear]{font-size:0;display:inline-block;width:16px;height:16px;vertical-align:-3px;margin-right:2px;background:url(media/icon-gear.webp) center/contain no-repeat}
 /* rival chips: carved-wood plaque */
-html.dk-chip .opp.seat{background:url(media/ui-rival-chip.webp) center/100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;padding:4px 14px 4px 7px;min-height:44px;flex-basis:170px;max-width:200px;min-width:112px}
+html.dk-chip .opp.seat{background:url(media/ui-rival-chip.webp) center/100% 100% no-repeat;border:0;border-radius:0;box-shadow:none;}
 html.dk-chip .opp.seat.active,html.ph.dk-chip .opp.seat.active{box-shadow:none;filter:drop-shadow(0 0 4px #ffd76a) drop-shadow(0 0 2px #ffd76a)}
 /* clash: medallions behind the strength numbers, painted swords between them */
 html.dk-clash.dk-clash .arena .vs .score.hero .num,html.dk-clash.dk-clash .arena .vs .score.mons .num{background-color:transparent;background-position:center;background-size:contain;background-repeat:no-repeat;border:0;border-radius:0;box-shadow:none;min-width:2.5em;height:2.5em;display:grid;place-items:center;font-weight:800}
@@ -82,15 +83,106 @@ html.sk .fbtns .btn:not(.helpb){flex:1 1 0;max-width:340px}
 html.sk.ph #prompt .bfline{color:#3a2410;text-shadow:none}
 /* top-bar labels >=13px; small buttons reach 44px tap height */
 html.sk .gx-ibtn,html.sk .gx-ibtn>span{font-size:13px}
-html.sk .gxh-bub .gxh-ok{font-size:14px}
 /* contrast: dark ink on the orange "go" plates (cream on orange measured 3.3-3.8:1) */
 html.sk .btn.primary,html.sk .btn.good,html.sk .btn.rec,html.sk .seg .btn.on,html.sk .grid2 .btn.on{color:#1c0e03;text-shadow:0 1px 0 rgba(255,235,190,.5)}
 /* phone dock has a fixed height: the 20px painted frame left no room for the buttons (cut off at the screen bottom) */
-html.ph.dk-par .gx-dock-body{border-image-width:4px 14px}
+html.ph.dk-par .gx-dock-body{border-image-width:7px}
 /* dock + dialog buttons: slimmer plate caps and labels that wrap instead of being cut off */
-html.sk #prompt .acts .btn,html.sk .dlg .acts .btn{border-image-width:0 16px;overflow:visible;text-overflow:clip;text-align:center}
+html.sk #prompt .acts .btn,html.sk .dlg .acts .btn{border-image-width:0 8px;overflow:visible;text-overflow:clip;text-align:center}
 html.sk.ph #prompt .acts .btn{font-size:15px}
 html.sk.ph #prompt .acts.main .btn{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.1;font-size:15px}
 /* a hovered card on the table must not stretch its tap zone over the buttons below it (it covered Help) */
 .arena .card>.hit,.arena .card:hover>.hit{pointer-events:none!important;bottom:0}
 
+
+/* painted icons: hand, level gem, bubble tail, 3D winner (html.dk-hand / dk-lv / dk-bt) */
+.pic{width:1.15em;height:1.15em;vertical-align:-.25em;object-fit:contain}
+html.dk-lv .mine .lv small{display:inline-block;width:14px;height:14px;font-size:0;vertical-align:-2px;margin-right:2px;background:url(media/icon-level.webp) center/contain no-repeat}
+html.dk-lv.ph .mine .lv small{display:block}
+html.dk-bt .gxh-bub .gxh-arr{width:28px;height:21px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none}
+html.dk-bt .gxh-a-bottom .gxh-arr{bottom:-19px}html.dk-bt .gxh-a-top .gxh-arr{top:-19px;transform:scaleY(-1)}html.dk-bt .gxh-a-left .gxh-arr{left:-22px;transform:rotate(90deg)}html.dk-bt .gxh-a-right .gxh-arr{right:-22px;transform:rotate(-90deg)}
+.win3d{display:block;margin:0 auto 2px;width:min(44vw,160px);height:min(44vw,160px);object-fit:contain;filter:drop-shadow(0 8px 10px rgba(0,0,0,.55))}
+
+html.sk .btn.bigb,html.sk .btn.primary,html.sk .btn.gxt-menu{border-image-width:9px 12px;padding-top:8px;padding-bottom:8px}
+body:has(.gxh-bub.on) #prompt .bfline{display:none}
+html.sk .gx-drawer{padding:33px}
+
+/* start screen (one column): every row the same width, text 15px+, 16px inset for bare text inside the framed column */
+html.sk .dlg.dk2{max-width:480px;padding-left:30px;padding-right:30px;display:flex;flex-direction:column;gap:10px}
+html.sk.ph .dlg.dk2{padding-left:26px;padding-right:26px;gap:8px}
+.dlg.dk2>*{margin:0}
+.dlg.dk2 h2{font-size:2rem!important;text-align:center;padding:0 16px;margin:0;line-height:1.1}
+.dlg.dk2 h2 span{color:inherit}
+html.ph .dlg.dk2 h2{font-size:1.7rem!important}
+.dlg.dk2 .tagline,.dlg.dk2 h3,.dlg.dk2 p{padding:0 16px;font-size:15px;line-height:1.3}
+.dlg.dk2 .tagline{text-align:center;margin-bottom:4px}
+.dlg.dk2 h3{margin:6px 0 0;font-size:15px}
+html.ph .dlg.dk2 p,html.ph .dlg.dk2 h3{font-size:15px}
+.dlg.dk2 .btn,html.ph .dlg.dk2 .btn,html.ph .dlg.dk2 .seg .btn{display:block;width:100%;box-sizing:border-box;min-height:46px;font-size:16px;text-align:center;white-space:normal;line-height:1.15;padding:9px 16px}
+.dlg.dk2 .btn.bigb{min-height:54px;font-size:17px}
+.dlg.dk2 .qopts{display:flex;flex-direction:column;gap:8px}
+.dlg.dk2 .seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(104px,1fr));gap:8px}
+.dlg.dk2 .seg .btn{padding:9px 8px}
+html.sk .dlg.dk2 .btn.gxt-menu,html.sk .dlg.dk2 .btn.qrow{border-image-source:url(media/ui-button-cream-c.webp);border-image-slice:30 42 fill;border-image-width:9px 12px;color:#3a2410;text-align:center}
+.dlg.dk2 .gxt-menu :is(small,span){display:none}
+
+/* wide screens (tablet / desktop): nothing runs under frame art, the start screen hides while a drawer is open, the hand wraps instead of clipping */
+html.dk-par:not(.ph) .gx-dock-body{padding:12px 22px 16px}
+body:has(.gx-drawer.on) #modal{visibility:hidden}
+html:not(.ph) .hand{flex-wrap:wrap;overflow:visible;justify-content:center;-webkit-mask-image:none;mask-image:none}
+body:has(.gxh-bub.on) #prompt ol{display:none}
+.gx-drawer-body li,.gx-drawer-body p{line-height:1.5}
+html.sk:not(.ph) .menu .btn{border-image-width:10px 12px;padding-top:9px;padding-bottom:9px}
+html.dk-title:not(.ph) .gx-dock{visibility:hidden}
+@media (max-width:1000px){html:not(.ph) .recent,html:not(.ph) .pile .lbl{display:none}}
+body:has(.gxh-bub.on) .mine .str .muted{display:none}
+.bfdoor .bfboot{position:static;display:inline-block;margin-left:4px}
+
+/* Dungeon diary: one line style (24px avatar + text), 16px+ dark ink on calm parchment, 16px inset, panel as tall as its lines */
+#dkLog .gx-drawer-body{background:#f6ecd2;color:#2a1808;padding:16px;font-size:16px}
+#dkLog #log.dklog{list-style:none;margin:0;padding:0;font-size:16px;line-height:1.4;color:#2a1808}
+#dkLog #log.dklog li{display:flex;align-items:center;gap:10px;margin:0;padding:8px 0;border-bottom:1px solid rgba(58,36,16,.18);list-style:none;border-left:0}
+#dkLog #log.dklog li:last-child{border-bottom:0}
+#dkLog #log.dklog .ptoklog{flex:0 0 24px;width:24px;height:24px;font-size:14px;margin:0;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:#e4d3a8;overflow:hidden}
+#dkLog #log.dklog .dklt{flex:1 1 auto;min-width:0}
+html.ph #dkLog.gx-drawer{height:auto;max-height:88dvh}
+
+/* side dock (desktop/tablet): turn-order avatars 32px+, one instruction, main buttons one size, 16px text, height = content */
+html:not(.ph) .gx-dock{align-self:start;max-height:calc(100dvh - var(--gx-bar-h,52px) - 16px)}
+html:not(.ph) .gx-dock .gx-dock-body{padding:0 16px 16px}
+.order{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 10px;align-items:center}
+.order span{padding:2px;border:2px solid transparent;border-radius:50%;line-height:0;opacity:.7}
+.order span.on{opacity:1;border-color:var(--c);box-shadow:0 0 0 2px #fff6d8,0 0 0 4px var(--c)}
+.order .ordav{width:32px;height:32px;border-radius:50%;object-fit:cover;display:block;background:#2a170b}
+.order svg.ordav{overflow:hidden}
+html:not(.ph) #prompt .who{font-size:18px}
+html:not(.ph) #prompt .acts.main{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+html:not(.ph) #prompt .acts.main .btn{width:100%;min-height:52px;font-size:18px;justify-content:center;text-align:center;white-space:normal;flex:none}
+html:not(.ph) #prompt .since,html:not(.ph) #prompt .since li,html:not(.ph) .recent ol,html:not(.ph) .recent li,html:not(.ph) .recent .rl h3{font-size:16px}
+html:not(.ph) #prompt .since ul{margin:4px 0 0;padding-left:18px}
+html:not(.ph) .recent .btn{min-height:40px;font-size:16px;padding:2px 14px}
+html:not(.ph) #prompt .tip{font-size:16px}
+
+/* top bar: at most 5 buttons, text 16px+ on wide screens, the test-mode LAB badge never sits on the title */
+#gxlab-bar{top:auto!important;bottom:2px;left:2px}
+@media (min-width:1024px){.gx-bar .gx-ibtn .gx-lbl,.gx-bar .gx-ibtn{font-size:16px!important}.gx-bar h1,.gx-bar h1 span{font-size:24px!important}.gx-bar .gx-ibtn{font-size:16px;gap:6px}.gx-bar .ph-chip{font-size:16px}}
+@media (min-width:1024px){
+  html:not(.ph) .opp.seat{flex:0 0 auto;max-width:none;min-height:60px;padding:4px 24px 4px 10px;column-gap:10px}
+  html:not(.ph) .opp.seat .snm,html:not(.ph) .opp.seat .sbd{font-size:16px;line-height:1.2}
+  html:not(.ph) .opp.seat .lb{font-size:16px}
+  html:not(.ph) .opp.seat .slv{font-size:16px;min-width:24px;height:24px}
+  html:not(.ph) .opp.seat .sbd{gap:12px;overflow:visible}
+  html:not(.ph) .opps{gap:14px;flex-wrap:wrap}
+}
+
+/* wide screens: cards at their natural aspect, main card >= 20% of the board height, decks and discards whole and readable */
+@media (min-width:1024px){
+  html:not(.ph) .bfdoor.small{height:clamp(160px,calc(100cqh - 120px),420px);width:auto;aspect-ratio:100/142;max-width:none}
+  html:not(.ph) .bfstage .row .card,html:not(.ph) .arena .row .card{--w:clamp(170px,17vh,300px)}
+  html:not(.ph) .pile{--sw:clamp(100px,9vw,150px);gap:8px;padding:0 6px}
+  html:not(.ph) .pile .lbl{font-size:16px;white-space:nowrap}
+  html:not(.ph) .pile .stack .dn{font-size:16px;letter-spacing:.02em;bottom:4%}
+  html:not(.ph) .pile .stack .n{font-size:16px;min-width:30px;height:30px;top:-10px;right:-6px}
+  html:not(.ph) .pile .card.xs{--w:clamp(84px,7vw,120px)}
+  html:not(.ph) .bfcap,html:not(.ph) .bfcap.sm{font-size:20px}
+}

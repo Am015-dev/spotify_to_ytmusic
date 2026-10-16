@@ -1,5 +1,8 @@
 // painted hero portraits (media/camp-<name>.webp)
 const DK_PORT=new Set(['hobb','pip','tansy','bodkin','grub','morwen','wrenna']);
+// 3D hero renders (models/hero-<name>[@512].webp, transparent): the winner stands on the end screen; falls back to the painting
+const DK_3D=new Set(['pip','morwen','grub','tansy']);
+function dkHero3d(nm,cls){const k=String(nm||'').split(/[ ,]/)[0].toLowerCase();if(!DK_3D.has(k))return '';return `<img class="${cls||''}" src="models/hero-${k}${innerWidth<700?'@512':''}.webp" alt="" draggable="false" decoding="async" onerror="this.outerHTML=dkPortrait('${k}','winp')">`}
 function dkPortrait(nm,cls){const k=String(nm||'').split(/[ ,]/)[0].toLowerCase();if(!DK_PORT.has(k))return '';return `<img class="${cls||''}" src="media/camp-${k}.webp" alt="" draggable="false" decoding="async">`}
 // ---------- coach: hints, warnings and the story layer. It only READS the game: every "what if" runs on a throw-away copy of G. ----------
 const PERSONA={Pip:['the Plucky','first through every door, rarely first out'],Morwen:['the Grudge-Keeper','never forgets a curse, and always pays it back'],Grub:['the Mercenary','helps anyone… for a price'],
@@ -197,7 +200,7 @@ function sinceDiff(me,sn){const p=P(me),nm=p.nm,out=[];const lines=G.log.filter(
   const cu=p.curse.filter(id=>!sn.cu.includes(id));if(cu.length)out.push(`<b>Curse on you:</b> ${cu.map(id=>esc(cname(id))+': '+esc(cd(id).x||'')).join(' ')}`);
   return out.length?out:null}
 function sinceHTML(me){if(!UI.since||!G||G.active!==me||!['window','main'].includes(G.phase)||G.cb)return '';
-  return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,3).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}
+  return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,2).map(x=>`<li>${x.replace(/ ?<span class="muted">.*?<\/span>/g,'')}</li>`).join('')}</ul></div>`}
 // ---- learn as you play: one short idea, the first time it matters (only in a "teach me" game) ----
 const LESSONS={
   setup:'<b>Goal:</b> reach level 10. Tap glowing cards.',

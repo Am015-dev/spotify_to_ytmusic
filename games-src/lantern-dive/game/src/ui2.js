@@ -16,7 +16,7 @@ function actorSeat() {
 // ---- sizes: hand card width (CSS variable); the table's own geometry comes from tableGeo() once the hand has its height ----
 function layoutVars() {
   const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), vw = GXV.now(), land = ph && vw.w > vw.h;
-  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(62, Math.round(H * .092)))) : Math.max(60, Math.min(104, Math.round(H * .125)));
+  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(62, Math.round(H * .092)))) : Math.max(60, Math.min(150, Math.round(H * (W >= 1000 ? .15 : .125))));
   const short = ph && !land && vw.h < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
   bd.classList.toggle('side', W > H * 1.45);
   document.documentElement.style.setProperty('--hw', hw + 'px');
@@ -118,7 +118,7 @@ function tableGeo() {
   const drone = G.players.findIndex(p => p.helper);
   const compact = side || small;
   const av = side ? 28 : (small ? 28 : 32), jr = Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))));
-  const seatW = side ? 132 : Math.round(Math.min(90, W * .23)), seatH = side ? 76 : (small ? 100 : 116);
+  const wideT = side && W >= 1100, seatW = side ? (wideT ? 190 : 132) : Math.round(Math.min(90, W * .23)), seatH = side ? (wideT ? 112 : 76) : (small ? 100 : 116);
   const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : 54;
   const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, seats: [], slots: [] };
   const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
@@ -127,7 +127,7 @@ function tableGeo() {
   let top, zl = 0, zr = W;
   if (side) { top = y0; zl = seatW + 12; zr = W - seatW - 12; if (drone >= 0) zr = W - droneW - 12; } else top = y0 + (drone >= 0 ? Math.max(seatH, geo.dh) : seatH) + 4;
   const zoneH = Math.max(80, H - top - bottom), cy = top + zoneH / 2, cx = side ? (zl + zr) / 2 : W / 2;
-  let cw = Math.floor(zoneH / (side ? 3.8 : 4.4)); const cwMax = ph ? 70 : 112;
+  let cw = Math.floor(zoneH / (side ? 3.8 : 4.4)); const cwMax = ph ? 70 : (W >= 1100 ? 176 : 112);
   if (!side && k >= 3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
   if (side) cw = Math.min(cw, Math.floor((zr - zl) / 4.6));
   cw = Math.max(30, Math.min(cwMax, cw)); const ch = Math.round(cw * 1.4);
@@ -189,7 +189,7 @@ function renderFelt(v) {
     const mv = myMoves(), mineTurn = iMustAct() && assign && !UI.busy, free = G.tasks.filter(t => t.owner < 0).length;
     const pw = Math.max(120, geo.pr - geo.pl);
     pool.style.left = geo.pl + 'px'; pool.style.right = 'auto'; pool.style.width = pw + 'px'; pool.style.top = geo.top + 'px'; pool.style.height = geo.zoneH + 'px';
-    const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(86, Math.min(150, Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
+    const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(86, Math.min(pw >= 700 ? 230 : 150, Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
     G.tasks.forEach((t, i) => {
       if (t.owner >= 0) return; const d = TASKS[t.id], can = mineTurn && mv.some(m => m.t === 'take' && m.i === i);
       const c = h('button.jcard' + (can ? '.glow' : (mineTurn && mv.some(m => m.t === 'take') ? '.no' : '.off')), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, style: 'width:' + tw + 'px', 'aria-label': d.s + ', difficulty ' + jobDiff(i) + (can ? '' : ', not available') });

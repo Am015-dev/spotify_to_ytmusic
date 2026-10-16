@@ -35,7 +35,7 @@ svg.ico{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-wi
 .gx-dock{background:linear-gradient(#f3e6bf,#e9d7a2);color:var(--ink);border-left:4px solid var(--gold2);box-shadow:-6px 0 14px rgba(0,0,0,.35)}
 .gx-dock-head{background:linear-gradient(#e8c466,#c99a35);border-bottom:2px solid #7a5a14}
 .gx-dock-head .gx-dt{font:1.15rem var(--fd);letter-spacing:.3px}
-.gx-dock .gx-ibtn{background:#fbf2d4;border:2px solid #7a5a14;color:var(--ink);min-height:36px;min-width:36px;border-radius:10px}
+.gx-dock .gx-ibtn{padding:2px;background:#fbf2d4;border:2px solid #7a5a14;color:var(--ink);min-height:36px;min-width:36px;border-radius:10px}
 .gx-dock-body{padding:8px 10px 12px;display:flex;flex-direction:column;gap:8px}
 @media (max-width:999px){:root{--gx-sheet-h:46dvh}.gx-dock{border-left:0;border-top:3px solid var(--gold2);box-shadow:0 -6px 14px rgba(0,0,0,.35)}
   .gx-app:not(.gx-dock-min) .gx-dock{height:var(--gx-sheet-h)}.gx-app.gx-sheet-full:not(.gx-dock-min) .gx-dock{height:78dvh}.gx-dock-body{padding:6px 8px 10px;gap:6px}}
@@ -111,10 +111,11 @@ p{margin:4px 0 6px}
 .startpick .btn{min-height:34px;padding:0;font-size:.85rem}
 .legend{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.85rem}
 /* drawers */
-.gx-drawer{background:#f3e6bf;color:var(--ink)}
+.gx-drawer{background:#f3e6bf;color:var(--ink);border:3px solid transparent;background-clip:padding-box}
 .gx-drawer-head{background:linear-gradient(#e8c466,#c99a35)}
 .gx-drawer-head h2{font:1.3rem var(--fd);margin:0;flex:1;display:flex;gap:8px;align-items:center}
 .gx-drawer-body{font-size:1.02rem}
+.gx-drawer-body p>b{white-space:nowrap}
 .gx-drawer h3{border-bottom:2px solid var(--gold2);padding-bottom:2px}
 .gx-drawer ul{margin:4px 0 8px;padding-left:20px}
 .gx-drawer li{margin:2px 0}
@@ -143,6 +144,8 @@ p{margin:4px 0 6px}
 .stin{max-width:980px;margin:0 auto;padding:12px 14px calc(18px + env(safe-area-inset-bottom,0px))}
 .stin h1{font:2.6rem/1 var(--fd);color:var(--gold);margin:6px 0 2px;text-shadow:0 3px 4px #000;display:flex;align-items:center;gap:10px}
 .stin .tag{font-size:1.1rem;color:#cfe9e4;margin:0 0 8px}
+.stin>h1,.stin>.tag{padding:0 24px}.stcard>p,.stcard small,.stcard>.tiny{padding-left:10px;padding-right:10px}
+details.online:not([open])>#netblock{display:none}
 .stcard{background:rgba(243,230,191,.96);color:var(--ink);border:2px solid var(--gold2);border-radius:14px;padding:10px 12px;margin:10px 0}
 .stcard h2{font:1.3rem var(--fd);margin:0 0 6px}
 .stcols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -257,7 +260,7 @@ html.ph .gx-reopen,html.ph #sheetbtn,html.ph #chip,html.ph .gx-dock-head{display
 html.ph .gx-bar{box-sizing:border-box;padding:0 4px;min-height:var(--bar);height:var(--bar);gap:2px;border-bottom-width:2px;overflow:hidden;align-items:center}
 html.ph .gx-bar h1{display:none}
 html.ph .gx-bar .gx-ibtn>span{display:none}
-html.ph .gx-bar .gx-ibtn{min-width:44px;width:44px;min-height:44px;height:44px;padding:0;border-radius:10px;flex:0 0 auto}
+html.ph .gx-bar .gx-ibtn{min-width:44px;width:44px;min-height:44px;height:44px;padding:2px;border-radius:10px;flex:0 0 auto}
 html.ph svg.ico{width:22px;height:22px}
 html.ph .gx-bar .gx-sp{display:none}
 html.ph .barstat{flex:1 1 auto;min-width:0;display:flex;justify-content:center}
@@ -359,8 +362,9 @@ html.ph #ps>*{flex-shrink:0}
 @media (max-height:700px){html.ph-p .ph-t .mini,html.ph-p .ph-t svg.cardart{max-width:58px}html.ph-p .ph-t small{min-height:0}html.ph-p .ph-head{min-height:36px}html.ph-p .ph-tiles{gap:6px}}
 html.ph .bd.risk{background:#e3a21a;color:#14232b}html.ph .pt .bd.risk{background:#e3a21a;color:#14232b}
 /* the bar now holds the Hint bulb as well: 6 buttons + the turn chip must fit a 375px phone */
-html.ph .gx-bar .gx-ibtn{min-width:40px;width:40px}html.ph .gx-bar{gap:1px}html.ph .chip{padding:2px 6px;gap:5px;min-width:0;max-width:100%;overflow:hidden}html.ph .chip .c2 small{font-size:.7rem}
-html.ph .gx-bar .gx-ibtn{flex-direction:column;gap:0}html.ph .gx-bar .gx-ibtn>span{display:block!important;font:800 .69rem/1 var(--fb);margin-top:1px;letter-spacing:0;padding:0;color:#fff7d6;text-shadow:0 0 3px #06141a,0 1px 2px #06141a,0 0 6px #06141a}html.ph .gx-bar .gx-ibtn .ico{width:18px;height:18px}html.ph .gx-bar .gx-ibtn{width:auto;min-width:40px;padding-left:3px;padding-right:3px}
+html.ph .gx-bar .gx-ibtn{min-width:40px;width:40px}html.ph .gx-bar{gap:3px}html.ph .chip{padding:2px 6px;gap:5px;min-width:0;max-width:100%;overflow:hidden}html.ph .chip .c2 small{font-size:.7rem}
+body:has(.gxc:not([hidden])) .gx-bar{visibility:hidden}
+html.ph .gx-bar .gx-ibtn{flex-direction:column;gap:0}html.ph .gx-bar .gx-ibtn>span{display:block!important;font:800 13px/1 var(--fb);margin-top:1px;letter-spacing:0;color:#fff7d6;background:rgba(6,20,26,.78);border-radius:4px;padding:1px 2px;text-shadow:0 1px 1px #06141a}html.ph .gx-bar .gx-ibtn .ico{width:18px;height:18px}html.ph .gx-bar .gx-ibtn{width:auto;min-width:40px;min-height:44px;padding-left:2px;padding-right:2px}
 html.ph .ps-feed{margin:8px 4px 0;padding:8px 10px;border-radius:12px;background:rgba(8,30,37,.72);border:1px solid rgba(227,178,75,.35);font:500 .86rem/1.3 var(--fb);color:#dcefeb}
 html.ph .ps-feed h5{margin:0 0 4px;font:700 .78rem/1.2 var(--fb);color:#e3b24b;text-transform:uppercase;letter-spacing:.04em}
 html.ph .ps-feed ol{margin:0;padding:0 0 0 1.1em}html.ph .ps-feed li{margin:2px 0}html.ph .ps-feed li.bad{color:#ffb4a6}html.ph .ps-feed li.big{color:#ffe7a3}
@@ -377,6 +381,21 @@ html.ph .omark span{display:none}
 html.ph .omark{margin:-13px 0 0 -13px}
 html.ph .omark b{width:26px;height:26px;font-size:.85rem;border-width:2px}
 html.ph .gx-drawer{top:auto}
+body:has(.gx-drawer.on) .gxh-bub,body:has(.gx-drawer.open) .gxh-bub{display:none}
 @media (prefers-reduced-motion:reduce){html.ph .ppop.in,html.ph .pcard.in{animation:none}}
+/* ui-bar: readable sizes, panels stay inside the dock column */
+.otag,.opip,.opip b,.opip u,.omark span,.ostop span,.otag.ship,.otag.ship.me{font-size:max(13px,.72rem)}
+.otag.mon.hi{font-size:max(13px,.82rem)}
+.prompt .tiny,.prompt summary{opacity:1;color:#2a1c05;font-size:max(13px,.85rem)}
+@media (min-width:1000px){
+  .otag,.opip,.opip b,.opip u,.omark span,.ostop span,.otag.ship,.otag.ship.me,.otag.mon.hi{font-size:16px}
+  .opip{width:36px;height:36px;margin:-18px 0 0 -18px}.opip.best{width:44px;height:44px;margin:-22px 0 0 -22px}
+  .gx-drawer,.gx-drawer.wide{width:calc(var(--gx-dock-w) - 8px)}
+  body:has(.gx-drawer.on) .gx-dock{visibility:hidden}
+}
+.rs{font-size:max(13px,.78rem)}.startpick{font-size:max(13px,.8rem)}.startpick .btn{font-size:max(13px,.85rem)}
+body:has(.gxh-tx) #chip{display:none}
+@media (min-width:1000px){.gx-drawer{transition:none}body:has(.gx-drawer.on) :is(.gxh-bub,.gxh-finger,.gxh-ring,.gxh-arr,.gxh-bulb,.gxh-ar,.gxh-compact){visibility:hidden}}
+html.sk .gx-drawer{background:#f3e6bf;background-clip:padding-box}
 </style>
 </head>

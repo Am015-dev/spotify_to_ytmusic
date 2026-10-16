@@ -1,0 +1,16 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"menu-phone.json",
+"nb-art-phone.json",
+"nb-board-phone.json",
+"nb-help-phone.json",
+"nb-tail-phone.json",
+"nb-tutorial-play-phone.json",
+"nb-zoom-phone.json",
+"story-scene-phone.json"
+]
+}
+}

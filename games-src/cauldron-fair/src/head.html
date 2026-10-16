@@ -359,6 +359,8 @@ html.ph .gx-dock:has(#qbox:not([hidden])) #promptDock{display:none}
 .bdeck{flex:1 1 100%;display:flex;flex-direction:column;gap:5px;min-width:0}
 .bline{font-weight:900;font-size:16px;text-align:center;line-height:1.15;min-height:19px;color:#3a2438}
 .bdeck.hot .bline{color:#c9352a}
+/* the coach bubble says the same thing: one instruction line at a time */
+body:has(.gxh-bub.on) .bline:not(.watch){visibility:hidden}
 .meter{display:flex;align-items:center;gap:6px;background:#2d1f3a;border-radius:20px;padding:3px 6px 3px 4px;min-height:36px;color:#f8eed8}
 .meter .mw{flex:0 0 auto}
 .mcells{flex:1 1 auto;display:flex;align-items:center;gap:3px;min-width:0;position:relative}
@@ -478,7 +480,7 @@ html.pulling #acts .btn.stopb{opacity:.6}
 .shopfoot .btn.go{flex:0 0 auto;min-height:56px;min-width:108px;font-size:18px}
 /* phones: the board is the screen */
 html.ph #me,html.ph #legend,html.ph #bagi{display:none!important}
-html.ph .gx-bar [data-gx=logd],html.ph .gx-bar [data-gx=refd]{display:none}
+html.ph .gx-bar [data-gx=logd]{display:none}
 .gx-bar .gxh-bulb{flex:0 0 auto}html.ph .gx-bar .gxh-bulb{min-width:34px;width:34px}html.ph .gx-bar .gx-ibtn[data-gx]{min-width:42px}html.ph .gx-bar .gxh-bulb svg{width:22px;height:22px}
 @media (max-width:384px){html.ph .bst .bav{display:none}}
 .mrow .gxt-menu{display:block;text-align:left;width:100%}.mrow .gxt-menu b,.mrow .gxt-menu span{display:block}.mrow .gxt-menu span{font-size:12px;opacity:.85;font-weight:600}

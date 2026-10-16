@@ -10,5 +10,38 @@
   "icon-time-day",
   "icon-time-dusk",
   "icon-time-night"
+ ],
+ "hollowbough": [
+  "ever-tree"
+ ],
+ "rampart-and-vine": [
+  "piece-meeple-red",
+  "piece-meeple-blue",
+  "piece-meeple-yellow",
+  "piece-meeple-green",
+  "piece-champ-red",
+  "piece-champ-blue",
+  "piece-champ-yellow",
+  "piece-champ-green",
+  "piece-mason-red",
+  "piece-mason-blue",
+  "piece-mason-yellow",
+  "piece-mason-green",
+  "piece-hog-red",
+  "piece-hog-blue",
+  "piece-hog-yellow",
+  "piece-hog-green"
+ ],
+ "nebula-aces": [
+  "ship-anvil",
+  "ship-hauler",
+  "ship-herald",
+  "ship-keel",
+  "ship-kestrel",
+  "ship-maul",
+  "ship-needle",
+  "ship-razor",
+  "ship-warden",
+  "ui-row"
  ]
 }

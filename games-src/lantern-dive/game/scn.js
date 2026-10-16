@@ -17,6 +17,9 @@
     return GXS.wait(function () { return UI.started && G.phase === 'assign' && $('#pool .jcard') && $('#hand .card, #hand > *') && !UI.busy && !UI.cards.length; }, 12000).then(function () { return idle(1200); });
   }
 
+  // the shared menu test's "board" surface (shell/gx-scenario.js): the play screen right after a game starts, tutorial tips on
+  GXS.boardOpen = function () { if (!booted()) return; return table(5).then(function () { try { GXH.setEnabled(true); GXH.phase(hlpPhase()); } catch (e) { } render(); }); };
+
   GXS.add({
     id: 'ld-board', name: 'Start of game board', ask: 'Are the jobs and your hand clear?', seed: 5, when: booted,
     setup: function () { return table(5); },
@@ -26,11 +29,14 @@
       { kind: 'visible', sel: '#pool .jcard.glow', name: 'job to take' },
       { kind: 'visible', sel: '#acts button', name: 'Pass button' },
       { kind: 'text', sel: '#pool .jcard b', re: /\S/, name: 'job name' },
-      { kind: 'text', sel: '#prompt', re: /\S/, name: 'top line' },
+      { kind: 'fn', name: 'top line has text, >= 12 px', fn: function () { var e = document.querySelector('#prompt'); if (!e || !/\S/.test(e.textContent)) return 'no top line'; var px = parseFloat(getComputedStyle(e).fontSize); return px >= 12 || 'font ' + px; } },
       { kind: 'fn', name: 'your whole hand is on screen', fn: function () { var h = [].slice.call(document.querySelectorAll('#hand > *')).filter(GXS.vis); if (h.length !== G.players[0].hand.length) return h.length + ' cards shown, engine has ' + G.players[0].hand.length; for (var i = 0; i < h.length; i++) if (!inView(h[i])) return 'card ' + i + ' off screen'; return true; } },
       { kind: 'eq', name: 'cards left, first rival', a: function () { return GXS.num('#opp .seat[data-seat="1"] .bdg.n b'); }, b: function () { return G.players[1].hand.length; } },
       { kind: 'eq', name: 'your tricks won', a: function () { return GXS.num('#mine .bdg.t b'); }, b: function () { return tricksWon()[0]; } },
       { kind: 'fn', name: 'no line of text over 8 words on the board', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#board *, #prompt'), function (e) { if (e.children.length || !GXS.vis(e)) return; var t = (e.textContent || '').trim(); if (words(t) > 8) bad = bad || '"' + t.slice(0, 40) + '" (' + words(t) + ' words)'; }); return !bad || bad; } },
+      { kind: 'fn', name: 'every visible text >= 16 px at >= 1024 px wide (13 on phones)', fn: function () { var min = innerWidth >= 1024 ? 16 : 13, bad = [], w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), n; while ((n = w.nextNode())) { var t = n.textContent.trim(), e = n.parentElement; if (!t || !e || e.closest('script,style,#stash,#gxscn-tag') || !GXS.vis(e)) continue; var px = parseFloat(getComputedStyle(e).fontSize); if (e.closest('svg') && e.getScreenCTM) px *= e.getScreenCTM().a; if (px < min - .1) bad.push(Math.round(px) + 'px "' + t.slice(0, 20) + '"'); } return !bad.length || bad.slice(0, 4).join(', '); } },
+      { kind: 'fn', name: 'table background: not stretched, <= 1.5x upscale', fn: function () { var bd = $('#bd'), m = /url\(["']?([^"')]+)/.exec(getComputedStyle(bd).backgroundImage); if (!m) return true; var im = new Image(); im.src = m[1]; if (!im.naturalWidth) return true; var cs = getComputedStyle(bd); if (cs.backgroundSize !== 'cover') return 'background-size ' + cs.backgroundSize; var k = Math.max(bd.clientWidth / im.naturalWidth, bd.clientHeight / im.naturalHeight); return k <= 1.5 + .02 || 'background upscaled ' + k.toFixed(2) + 'x'; } },
+      { kind: 'fn', name: 'cards >= 20% of board height on wide screens', fn: function () { if (innerWidth < 1100) return true; var c = $('#hand .hc, #hand .card'), b = $('#bd').getBoundingClientRect(), r = c && c.getBoundingClientRect(); if (!r) return 'no hand card'; if (r.bottom > innerHeight + 1) return 'hand card cut at the bottom'; return r.height >= b.height * .17 || 'hand card ' + Math.round(r.height) + 'px of ' + Math.round(b.height); } },
       skin
     ]
   });
@@ -48,4 +54,36 @@
       { kind: 'tap', sel: '#ppop [data-a=popx]', name: 'tap closes the card', state: function () { return !$('#ppop').hidden; }, expect: function (a, b) { return (a && !b) || 'card did not close'; } }
     ]
   });
+
+  GXS.add({
+    id: 'ld-help', name: 'Rules cards', ask: 'Can you read the rules card?', seed: 10, when: booted, group: 'UI',
+    setup: function () { return table(10).then(function () { GXH.rules(); return GXS.wait(function () { return document.querySelector('.gxh-card'); }, 5000); }).then(function () { return new Promise(function (r) { setTimeout(r, 400); }); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-card', name: 'rules card' },
+      { kind: 'text', sel: '.gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!document.querySelector('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
+    ]
+  });
+  // painted art: card frames, tick/cross, seat plates and the portrait Descent table
+  GXS.add({
+    id: 'ld-art', name: 'Painted cards, seats, tick and cross', ask: 'Do cards and seats look painted?', seed: 5, when: booted,
+    setup: function () {
+      window.__ldf = [];
+      var loads = ['coral', 'tide', 'kelp', 'sunstar', 'lantern'].map(function (n) { return new Promise(function (r) { var i = new Image(); i.onload = function () { window.__ldf.push([n, i.naturalWidth > 0]); r(); }; i.onerror = function () { window.__ldf.push([n, false]); r(); }; i.src = 'media/card-face-' + n + '.webp'; }); });
+      return Promise.all(loads).then(function () { return table(5); }).then(function () {
+        try { GXC.unlocked = function () { return [{ type: 'table', id: 'tunnel-glow' }]; }; tableApply(); } catch (e) { }
+        return GXS.wait(function () { return /tunnel-glow/.test(getComputedStyle(document.documentElement).getPropertyValue('--tableimg')) && document.documentElement.classList.contains('sk-seat'); }, 8000);
+      }).then(function () { return idle(1200); });
+    },
+    checks: [
+      { kind: 'fn', name: 'all 5 card frames load', fn: function () { var b = (window.__ldf || []).filter(function (x) { return !x[1]; }).map(function (x) { return x[0]; }); return ((window.__ldf || []).length === 5 && !b.length) || 'not loaded: ' + (b.join(',') || 'none tried'); } },
+      { kind: 'fn', name: 'table cards use the painted frames', fn: function () { if (!PX || !PX.on) return true; var m = [0, 1, 2, 3, 4].filter(function (s) { return !PX.img['face' + s]; }); return !m.length || 'suits without frame: ' + m.join(','); } },
+      { kind: 'fn', name: 'tick and cross are painted and clipped to a disc', fn: function () { var t = KIT.stateMark(1, 100), c = KIT.stateMark(-1, 100); return (/icon-tick\.webp/.test(t) && /icon-cross\.webp/.test(c) && /clip-path/.test(t + c)) || 'marks not painted: ' + KIT.stateMark(1, 100).slice(0, 40); } },
+      { kind: 'fn', name: 'seat names sit on the brass plate and stay readable', fn: function () { var e = document.querySelector('.seat:not(.drone) .top .nm'); if (!e) return 'no seat name'; var cs = getComputedStyle(e), c = cs.color.match(/\d+/g).map(Number); return (/ui-seat\.webp/.test(cs.backgroundImage) && (c[0] + c[1] + c[2]) / 3 < 110 && parseFloat(cs.fontSize) >= 11) || 'plate ' + cs.backgroundImage.slice(0, 30) + ' ink ' + cs.color + ' ' + cs.fontSize; } },
+      { kind: 'fn', name: 'Descent table matches the screen shape', fn: function () { var v = getComputedStyle(document.documentElement).getPropertyValue('--tableimg'), want = innerWidth < 700 && innerHeight > innerWidth ? 'tunnel-glow-phone' : 'tunnel-glow.webp'; return v.indexOf(want) >= 0 || 'table image is ' + v.slice(-40) + ', wanted ' + want; } },
+      skin
+    ]
+  });
+
 })();

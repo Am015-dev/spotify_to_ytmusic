@@ -7,7 +7,7 @@ html.sk-dark{--sk-ink:#f3e9ff;--sk-num:#241044;--sk-num-done:#f6e9ff}
 /* top bar + icon buttons */
 html.sk .gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241208;color:var(--sk-cream);box-shadow:0 3px 8px rgba(0,0,0,.45)}
 html.sk .gx-ibtn,html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-cream);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
-html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .gxc-ib{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 30 42 fill/14px 22px stretch;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .gx-ibtn:active,html.sk .gxc-ib:active{transform:translateY(1px)}
 html.sk .gx-ibtn[aria-expanded=true]{filter:drop-shadow(0 0 6px #ffd36a)}
 html.sk .gx-ibtn i[data-ic],html.sk .gx-ibtn .sk-ic{width:24px;height:24px;display:inline-block}
@@ -19,7 +19,7 @@ html.sk .gx-drawer-head{background:url(media/ui-drawer-head.webp) center/auto 10
 html.sk .gx-drawer-head h2{text-shadow:0 2px 3px rgba(0,0,0,.7);font-size:1.1rem}
 html.sk .gx-drawer .gx-x{color:var(--sk-cream)}
 /* campaign kit */
-html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
+html.sk .gxc-btn,html.sk .gxc-btn.soft,html.sk .gxc-btn.ghost{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .gxc-btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65);box-shadow:none}
 html.sk .gxc-btn.go:active{transform:translateY(2px);box-shadow:none}
 html.sk .gxc-sheet,html.sk .gxc-scene,html.sk .gxc-boss,html.sk .gxc-res{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:var(--sk-ink)}
@@ -37,17 +37,19 @@ html.sk .gxc-node.boss .gxc-disc::after,html.sk .gxc-lock{display:none}
 html.sk .gxc-node.boss .gxc-disc .gxc-pt{width:34px!important;height:34px!important;margin-top:8px}
 html.sk .gxc-node.next .gxc-disc{animation:sk-pulse 1.6s ease-in-out infinite}
 @keyframes sk-pulse{0%,100%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 0 rgba(255,214,90,.9))}50%{filter:drop-shadow(0 4px 4px rgba(0,0,0,.35)) drop-shadow(0 0 9px rgba(255,214,90,.95))}}
-html.sk .gxc-lab{font-size:12.5px;background:rgba(246,230,194,.94);color:#2a1d10}
+html.sk .gxc-lab{font-size:13px;background:rgba(246,230,194,.94);color:#2a1d10}
 html.sk .gxc-node .gxc-stars{top:56px}
 html.sk-map .gxc-path{background:url(media/story-map.webp) center top/100% 100% no-repeat}
 html.sk-map .gxc-road-edge,html.sk-map .gxc-road-fill{opacity:.55}
-html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:46px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html.sk-banner .gxc-act{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-act-banner-c.webp) 0 70 fill/0 26px stretch;left:6px;right:6px;height:auto;min-height:46px;box-sizing:border-box;padding:3px 0;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 html.sk-banner .gxc-act b,html.sk-banner .gxc-act small{color:#fbefd6;text-shadow:0 1px 2px rgba(0,0,0,.8);opacity:1}
 html.sk-stars .gxc-st{font-size:0;width:15px;height:15px;background:url(media/ui-star-off.webp) center/contain no-repeat}
 html.sk-stars .gxc-st.on{background-image:url(media/ui-star-on.webp);text-shadow:none}
 html.sk-stars .gxc-stars.big .gxc-st{width:48px;height:48px}
 html.sk-stars .gxc-node .gxc-st{width:13px;height:13px}
 /* speech bubble behind the story-scene line (tail flipped up toward the speaker) */
-html.sk .gxc-sc-text{position:relative;isolation:isolate;padding:30px 42px 24px;margin:14px 0 10px}
-html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-8px -14px;z-index:-1;background:url(media/ui-bubble-c.webp) center/100% 100% no-repeat;transform:scaleY(-1)}
+/* speech bubble: 9-slice (corners + the whole tail keep their shape, only the plain frame stretches); flipped so the tail points up at the speaker.
+   slice px are of the ~170x160 art (tail = bottom-right 60x34); widths are the same slices at ~0.7 scale. Never wider than the text box. */
+html.sk .gxc-sc-text{position:relative;isolation:isolate;box-sizing:border-box;max-width:100%;padding:30px 42px 24px;margin:14px 0 10px}
+html.sk .gxc-sc-text::before{content:'';position:absolute;inset:-6px 0;z-index:-1;pointer-events:none;border-style:solid;border-color:transparent;border-width:15px 42px 24px 21px;border-image:url(media/ui-bubble-c.webp) 22 62 34 30 fill/15px 42px 24px 21px stretch;transform:scaleY(-1)}
 @media (prefers-reduced-motion:reduce){html.sk .gxc-node.next .gxc-disc{animation:none}}

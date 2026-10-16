@@ -16,6 +16,8 @@
     return GXS.wait(function () { return G && G.phase === 'bid' && $('#acts .sp-b.glow') && !UI.modal; }, 12000).then(function () { return idle(1200); });
   }
 
+  GXS.boardOpen = function () { if (!booted()) return; return table(5).then(function () { try { GXH.reset(); GXH.setEnabled(true); GXH.phase(hlpPhase()); } catch (e) { } render(); }); };
+
   GXS.add({
     id: 'sq-board', name: 'Start of game board', ask: 'Is the bazaar clear and filled?', seed: 5, when: booted,
     setup: function () { return table(5); },
@@ -37,6 +39,26 @@
   });
 
   GXS.add({
+    id: 'sq-uibar', name: 'UI bar: bar, line, panels, text sizes', ask: 'Is every screen clean and readable?', seed: 10, when: booted, group: 'UI',
+    setup: function () { return table(10); },
+    checks: [
+      { kind: 'fn', name: 'top bar has at most 5 buttons', fn: function () { var n = [].filter.call(document.querySelectorAll('.gx-bar button'), GXS.vis).length; return n <= 5 || n + ' buttons'; } },
+      { kind: 'fn', name: 'one instruction line of 8 words or fewer', fn: function () { var t = ($('#line') || {}).innerText || ''; return (words(t) > 0 && words(t) <= 8) || 'line: ' + t; } },
+      { kind: 'fn', name: 'at most one primary button on the board', fn: function () { var n = [].filter.call(document.querySelectorAll('.btn.go'), GXS.vis).length; return n <= 1 || n + ' primary buttons'; } },
+      { kind: 'fn', name: 'board text >= 13 px (16 px at >= 1024 wide)', fn: function () { var min = innerWidth >= 1024 ? 16 : 13, bad = ''; [].forEach.call(document.querySelectorAll('body *'), function (e) { if (bad || e.children.length || !e.textContent.trim() || !GXS.vis(e) || e.closest('.gx-drawer, svg') || /^Test:/.test(e.textContent.trim())) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f > 0 && f < min - .05) bad = (e.className || e.tagName) + ' ' + f + 'px "' + e.textContent.trim().slice(0, 12) + '"'; }); return !bad || bad; } },
+      { kind: 'fn', name: 'no sideways scroll, no seat chip text cut', fn: function () { if (document.documentElement.scrollWidth > innerWidth + 1) return 'page scrolls sideways'; var bad = ''; [].forEach.call(document.querySelectorAll('.sch'), function (c) { if (c.scrollWidth > c.clientWidth + 2) bad = bad || 'seat chip ' + c.scrollWidth + '>' + c.clientWidth; }); return !bad || bad; } },
+      { kind: 'fn', name: 'pictures keep their natural shape', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('img'), function (i) { if (bad || !GXS.vis(i) || !i.naturalWidth) return; var r = i.getBoundingClientRect(), q = (r.width / r.height) / (i.naturalWidth / i.naturalHeight); if (Math.abs(q - 1) > .08) bad = (i.className || 'img') + ' ' + q.toFixed(2); }); return !bad || bad; } },
+      { kind: 'fn', name: 'diary, players and menu panels fit their content with text >= 13/16 px', fn: function () {
+        var min = innerWidth >= 1024 ? 16 : 13, bad = '';
+        ['logd', 'plrd', 'menud'].forEach(function (id) { if (bad) return; try { GX.show(id); } catch (e) { return; } var d = $('#' + id), b = d && d.querySelector('.gx-drawer-body'); if (!b) return;
+          var last = b.lastElementChild; var empty = last ? b.getBoundingClientRect().bottom - last.getBoundingClientRect().bottom : 0;
+          if (id !== 'menud' && b.scrollHeight <= b.clientHeight && empty > 120) bad = id + ' has ' + Math.round(empty) + ' px empty space';
+          [].forEach.call(d.querySelectorAll('*'), function (e) { if (bad || e.children.length || !e.textContent.trim() || !GXS.vis(e) || e.closest('svg')) return; var f = parseFloat(getComputedStyle(e).fontSize); if (f > 0 && f < min - .05) bad = id + ': ' + f + 'px "' + e.textContent.trim().slice(0, 12) + '"'; });
+          try { GX.close(); } catch (e) { } });
+        return !bad || bad; } },
+    ]
+  });
+  GXS.add({
     id: 'sq-zoom', name: 'Djinn card list', ask: 'Are the djinn cards readable?', seed: 6, when: booted,
     setup: function () { return table(6).then(function () { GX.show('djd'); try { renderDjPop(); } catch (e) { } return idle(900); }); },
     checks: [
@@ -47,6 +69,72 @@
       { kind: 'fn', name: 'drawer is on screen', fn: function () { return inView($('#djd')) || 'drawer off screen'; } },
       skin,
       { kind: 'tap', sel: '#djd .gx-x', name: 'tap closes the drawer', state: function () { return GX.open === 'djd'; }, expect: function (a, b) { return (a && !b) || 'drawer did not close'; } }
+    ]
+  });
+
+  GXS.add({
+    id: 'sq-chips', name: 'Bid chips and score chips', ask: 'Are the bid numbers big enough?', seed: 7, when: booted, group: 'Board',
+    setup: function () { return table(7); },
+    checks: [
+      { kind: 'text', sel: '#acts .sp-b.glow', re: /\d/, name: 'bid chip number', minPx: 13 },
+      { kind: 'fn', name: 'every bid chip number >= 13 px', fn: function () { var bad = ''; [].forEach.call(document.querySelectorAll('#acts .sp-b'), function (e) { if (bad || !GXS.vis(e)) return; var px = parseFloat(getComputedStyle(e).fontSize); if (px < 13) bad = 'bid chip font ' + px + ' px'; }); return !bad || bad; } },
+      { kind: 'visible', sel: '.sch[data-seat="0"] .ss', name: 'your score chip' },
+      { kind: 'eq', name: 'your score', a: function () { return GXS.num('.sch[data-seat="0"] .ss'); }, b: function () { return shownTotal(G.pl[0]); } },
+      skin
+    ]
+  });
+
+  GXS.add({
+    id: 'sq-help', name: 'Rules cards', ask: 'Can you read the rules card?', seed: 8, when: booted, group: 'UI',
+    setup: function () { return table(8).then(function () { GXH.rules(); return GXS.wait(function () { return $('.gxh-card'); }, 5000); }).then(function () { return idle(400); }); },
+    checks: [
+      { kind: 'visible', sel: '.gxh-card', name: 'rules card' },
+      { kind: 'text', sel: '.gxh-rt', re: /\S/, name: 'card title' },
+      { kind: 'text', sel: '.gxh-rx', re: /\S/, name: 'card text' },
+      { kind: 'tap', sel: '.gxh-x', name: 'tap Close', state: function () { return !!$('.gxh-card'); }, expect: function (a, b) { return (a === true && b === false) || 'close the card'; } }
+    ]
+  });
+  // painted plates/glyphs/badges: every wired file loaded, applied to its element, and not stretched out of shape
+  var ART = [ // [selector, pseudo, file, max stretch]
+    ['.tile.blue', '::after', 'ui-tile-frame-blue', 0], ['.tile:not(.blue)', '::after', 'ui-tile-frame-red', 0],
+    ['.tile .tv', '::before', 'ui-badge-gold', 1.6], ['.dcard:not(.th) .dv', '::before', 'ui-badge-cream', 1.6],
+    ['.sch .sti', '', 'icon-star', 0], ['.mcard:not(.empty)', '', 'ui-goods-card', 0]
+  ];
+  var PROBE = [ // transient pieces: built as a probe so their CSS is tested without waiting for the moment
+    ['<div class="card dj"><h4>Djinn</h4></div>', '.card.dj h4', '', 'ui-djinn-bar', 0], ['<div id="summon"><b>Name</b></div>', '#summon b', '', 'ui-ribbon', 0],
+    ['<div class="stat"><b class="nm">Ann</b></div>', '.stat .nm', '', 'ui-nameplate', 0], ['<div class="gxh-bub gxh-a-bottom"><i class="gxh-arr"></i></div>', '.gxh-arr', '', 'ui-bubble-tail', 0],
+    ['<div id="finger"><svg></svg></div>', '#finger', '', 'ui-finger', 0]
+  ];
+  var GLYPH = ['village', 'sacred', 'oasis', 'small', 'large', 'workshop', 'exchange', 'city', 'lake'];
+  function bg(sel, ps) { var e = $(sel); if (!e) return null; var cs = getComputedStyle(e, ps || null); return { e: e, s: cs.backgroundImage + ' ' + cs.borderImageSource + ' ' + cs.getPropertyValue('--gl'), cs: cs }; }
+  function loaded(f) { return new Promise(function (r) { var i = new Image(); i.onload = function () { r(i.naturalWidth > 0 && i); }; i.onerror = function () { r(false); }; i.src = 'media/' + f + '.webp'; }); }
+  var artOut = null;
+  GXS.add({
+    id: 'sq-art', name: 'Painted plates and glyphs', ask: 'Are the painted pieces sharp and in place?', seed: 9, when: booted, group: 'Art',
+    setup: function () {
+      return table(9).then(function () {
+        var h = document.createElement('div'); h.id = 'artprobe'; h.style.cssText = 'position:fixed;left:-999px;top:0;width:200px'; h.innerHTML = PROBE.map(function (p) { return p[0]; }).join(''); document.body.appendChild(h);
+        var files = ART.map(function (a) { return a[2]; }).concat(PROBE.map(function (p) { return p[3]; }), GLYPH.map(function (k) { return 'glyph-' + k; }), Object.keys(ITEMS).map(function (k) { return 'item-' + k; }), ['ui-trophy']);
+        return Promise.all(files.map(loaded)).then(function (r) { artOut = {}; files.forEach(function (f, i) { artOut[f] = r[i]; }); return idle(300); });
+      });
+    },
+    checks: [
+      { kind: 'fn', name: 'painted layer is on', fn: function () { return document.documentElement.classList.contains('sk-pl') || 'html.sk-pl missing'; } },
+      { kind: 'fn', name: 'every wired file loads (naturalWidth > 0)', fn: function () { var bad = Object.keys(artOut).filter(function (f) { return !artOut[f]; }); return !bad.length || 'not loaded: ' + bad.join(', '); } },
+      { kind: 'fn', name: 'plates, badges, frames use their painting', fn: function () {
+        var bad = ''; ART.forEach(function (a) { var b = bg(a[0], a[1]); if (!b) { bad = bad || 'no element ' + a[0]; return; } if (b.s.indexOf(a[2] + '.webp') < 0) bad = bad || a[0] + a[1] + ' lacks ' + a[2]; });
+        return !bad || bad; } },
+      { kind: 'fn', name: 'every tile kind has its glyph medallion', fn: function () {
+        var bad = ''; [].forEach.call(document.querySelectorAll('.tile'), function (t) { var k = (t.className.match(/k-(\w+)/) || [])[1]; var s = getComputedStyle(t, '::before').backgroundImage; if (k && GLYPH.indexOf(k) >= 0 && s.indexOf('glyph-' + k + '.webp') < 0) bad = bad || 'tile ' + k + ' has no glyph'; });
+        return !bad || bad; } },
+      { kind: 'fn', name: 'transient pieces (djinn bar, ribbon, name plate, bubble tail, finger) are painted', fn: function () {
+        var bad = ''; PROBE.forEach(function (p) { var b = bg(p[1], p[2]); if (!b || b.s.indexOf(p[3] + '.webp') < 0) bad = bad || p[1] + ' lacks ' + p[3]; }); return !bad || bad; } },
+      { kind: 'fn', name: 'item and trophy pictures replace the emoji', fn: function () { return (itemIc('lamp').indexOf('item-lamp.webp') > 0 && pIc('ui-trophy.webp', 'x').indexOf('ui-trophy.webp') > 0) || 'emoji still shown'; } },
+      { kind: 'fn', name: 'plates are not stretched out of shape', fn: function () {
+        var bad = ''; ART.forEach(function (a) { if (!a[3]) return; var e = $(a[0]); if (!e) return; var r = e.getBoundingClientRect(), i = artOut[a[2]]; if (!i || !r.width || !r.height) return; var q = (r.width / r.height) / (i.naturalWidth / i.naturalHeight); if (q > a[3] || q < 1 / a[3]) bad = bad || a[0] + ' stretched x' + q.toFixed(2); });
+        return !bad || bad; } },
+      { kind: 'fn', name: 'labels on the art stay readable (>= 11 px)', fn: function () { var bad = ''; ['.sch .sn', '.tile .tn', '.tile .tv', '.dcard b'].forEach(function (s) { var e = $(s); if (e && parseFloat(getComputedStyle(e).fontSize) < 11 && !bad) bad = s + ' ' + getComputedStyle(e).fontSize; }); return !bad || bad; } },
+      skin
     ]
   });
 })();
