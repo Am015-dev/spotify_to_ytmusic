@@ -430,7 +430,7 @@ function TR8_near(x,z){for(const r of[80,200,450,900]){const q=rfSnap(x,z,r);if(
   let b=null,bd=1e18;for(const S of CITY_S){const P=S.pts;for(let i=0;i<P.length-1;i++){const p=P[i],d=(p.x-x)**2+(p.z-z)**2;if(d<bd){bd=d;const n=P[i+1];b=[p.x,p.z,Math.atan2(n.x-p.x,n.z-p.z)]}}}return b}
 function TR8_fade(){try{let d=document.getElementById('tr8f');if(!d){d=document.createElement('div');d.id='tr8f';d.style.cssText='position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:50';document.body.appendChild(d)}
   d.style.transition='none';d.style.opacity='.85';void d.offsetWidth;d.style.transition='opacity .5s';d.style.opacity='0'}catch(e){}}
-function TR8_unstick(dt){if(!TR8_on())return;const c=CTL,held=c&&(c.thr||c.boost||c.brk),off=held&&!RO.trDeck&&!TR8_onRoad(RO.x,RO.z);
+function TR8_unstick(dt){if(!TR8_on())return;const c=CTL,held=c&&(c.thr||c.boost||c.brk),off=held&&!RO.trDeck&&!TR8_onRoad(RO.x,RO.z)&&RO.veh!=='boat';  // tracks-3: a boat on the Main is not stuck (the lift to the nearest road threw the river-run boat onto the quay every ~6 s)
   if(off&&!RO.t8a)RO.t8a=[RO.x,RO.z];const d=RO.t8a?Math.hypot(RO.x-RO.t8a[0],RO.z-RO.t8a[1]):0,on=off&&(Math.abs(RO.v)<2||d<6);  // slow, or sliding/rocking without 6 m of progress
   if(!on)RO.t8a=off?[RO.x,RO.z]:null;RO.t6s=on?(RO.t6s||0)+dt:Math.max(0,(RO.t6s||0)-.5*dt);if(RO.t6s<3)return;RO.t8a=null;if(RO.t6s<3)return;RO.t6s=0;const q=TR8_near(RO.x,RO.z);if(!q)return;TR8_fade();
   if(!roamWarp(q[0],q[1],q[2])){RO.x=q[0];RO.z=q[1];RO.h=RO.vh=q[2];RO.y=groundAt(q[0],q[1],99);RO.vy=0}RO.v=0;RO.t6n=(RO.t6n||0)+1}

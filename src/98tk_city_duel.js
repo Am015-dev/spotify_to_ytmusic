@@ -32,14 +32,39 @@ function tkSimTime(C,r){const G=tkGeoOf(C),P=r==='A'?G.pA:G.pB,L=tkLen(P),a={bas
 function tkSpread(C){const A=tkSimTime(C,'A'),B=tkSimTime(C,'B');return{A,B,spread:+(Math.abs(A.t-B.t)/Math.min(A.t,B.t)*100).toFixed(1)}}
 // share of route B that runs on route A (two routes must really differ)
 function tkOverlap(A,B){let n=0;for(const p of B){let d=1e9;for(const q of A){d=Math.min(d,Math.hypot(p[0]-q[0],p[1]-q[1]));if(d<14)break}if(d<14)n++}return n/Math.max(1,B.length)}
-function tkBuild(spec){if(TK.built[spec.key])return TK.built[spec.key];const G=qvGraph();if(!G)return null;let cx=0,cz=0;for(let i=0;i<G.X.length;i++){cx+=G.X[i];cz+=G.Z[i]}cx/=G.X.length;cz/=G.X.length;
-  if(spec.x==null||spec.auto){spec.auto=1;spec.k=spec.k||0;const h=tkHash(spec.key)+spec.k*97,ang=(h%360)*Math.PI/180+spec.k*1.3,r=Math.max(250,500+(h>>>9)%800-spec.k*120);spec.x=cx+Math.sin(ang)*r;spec.z=cz+Math.cos(ang)*r}
+// tracks-3: WATER section. Route B leaves the street down a Main slipway, runs the river as a boat (auto transform, 98xf_xform.js) and climbs the next slipway on the same bank; route A stays on the bank streets.
+function tkWaterCourse(spec){if(typeof SLIPS==='undefined'||!SLIPS.length||typeof MAINR==='undefined')return null;const P=MAINR.pts,free=(a,b)=>{for(let k=0;k<=14;k++)if(roamHit(a[0]+(b[0]-a[0])*k/14,a[1]+(b[1]-a[1])*k/14,3))return false;return true},path=(a,b)=>qvPath(a[0],a[1],b[0],b[1]).map(p=>[p[0],p[1]]);let best=null;
+  const land=(S,d)=>{const X=tkSnap(S.x-S.ix*d,S.z-S.iz*d);return X&&free(X,[S.x-S.ix*6,S.z-S.iz*6])?X:null};
+  for(const S of SLIPS)for(const E of SLIPS){if(S.sd!==E.sd||E.i-S.i<40||E.i-S.i>260)continue;
+    for(const d of[130,170,220]){const X=land(S,d),J=land(E,d);if(!X||!J)continue;const F=tkSnap(J[0]-E.ix*560,J[1]-E.iz*560),S0=tkSnap(X[0]-S.ix*700,X[1]-S.iz*700);if(!F||!S0)continue;
+      const st=path(S0,X),fin=path(J,F),A=path(X,J);if(st.length<2||fin.length<2||A.length<3||tkLen(st)<250||tkLen(fin)<250)continue;
+      const wv=[[S.x-S.ix*10,S.z-S.iz*10],[S.x,S.z],[S.x+S.ix*30,S.z+S.iz*30],[S.x+S.ix*52,S.z+S.iz*52]];for(let k=S.i;k<=E.i;k+=3){const q=P[k],o=q.hw*.36;wv.push([q.x+q.tz*S.sd*o,q.z-q.tx*S.sd*o])}
+      wv.push([E.x+E.ix*52,E.z+E.iz*52],[E.x+E.ix*30,E.z+E.iz*30],[E.x,E.z],[E.x-E.ix*10,E.z-E.iz*10]);const B=tkCat([X],wv,[J]);
+      if(tkLen(B)<400||tkLen(A)<400)continue;const rr=Math.max(tkLen(A),tkLen(B))/Math.min(tkLen(A),tkLen(B));if(rr>1.5)continue;
+      const C={key:spec.key,id:'tk_'+spec.key.replace(/\W/g,'_'),name:spec.name||'Main River Run',p:spec.p,kind:spec.kind,ev:spec.ev,ai:spec.ai,base:spec.base||62,off:false,water:true,
+        seg:{start:st,A,B,fin},ramps:[['start',.55,22,5,16],['A',.5,20,5,14],['B',.04,20,5,14],['B',.96,20,5,14],['fin',.45,26,8,16]],items:[['start',.35],['start',.75],['A',.3],['A',.7],['B',.15],['B',.5],['B',.85],['fin',.25],['fin',.7]],boost:null};
+      let r=tkSpread(C);const slow=r.A.t>r.B.t?'A':'B';for(const f of[[.2,.5,.8],[.12,.3,.5,.7,.88]]){if(r.spread<=2)break;const C2={...C,geo:null,boost:{r:slow,f}},r2=tkSpread(C2);if(r2.spread<r.spread){C.boost=C2.boost;r=r2}C.geo=null}
+      C.spread=r;if(!best||r.spread<best.C.spread.spread)best={C};if(r.spread<=3)break}
+    if(best&&best.C.spread.spread<=3)break}
+  if(!best)return null;const C=best.C;tkGeoOf(C);const qa=tkAt(C.seg.A,.4);C.nA=tkRoad(qa.x,qa.z)||'Bank road';C.nB='Main river (boat)';return TK.built[spec.key]=tkTidy(C)}
+// tracks-3 feel fixes. (1) A ramp throws the car ~22 x its height ahead at top speed (measured: 5 m ramp at 33 m/s lands 105 m on). So a ramp needs the route straight (≤ 7 m off) and collider-free for that distance:
+//   slide it along its segment (±18 % in 3 % steps), then try 70 % / 50 % height, last resort a 2.5 m kicker. (2) A "?" brick inside a collider slides ±6 % along the route.
+function tkTidy(C){const G=tkGeoOf(C),n={ramps:0,low:0,items:0},clear=(sg,f,len,h)=>{const P=G.seg[sg],L=tkLen(P),q=tkAt(P,f),D=22*h+len+10;if(f+D/L>.99)return false;if(sg!=='start'&&sg!=='fin'&&C.water&&inRiver(q.x,q.z,0))return false;
+    if(f-45/L<.02)return false;for(const d of[-12,-26,-45]){const r=tkAt(P,f+d/L);if(Math.hypot(r.x-(q.x+Math.sin(q.h)*d),r.z-(q.z+Math.cos(q.h)*d))>5)return false}   // a straight run-up too: no ramp right after a corner
+    for(let d=-4;d<=D;d+=6){const x=q.x+Math.sin(q.h)*d,z=q.z+Math.cos(q.h)*d;if(d>len+2&&d<len+10)continue;if(roamHit(x,z,2.4))return false;if(d>0){const r=tkAt(P,f+d/L);if(Math.hypot(r.x-x,r.z-z)>7)return false}}return true};
+  C.ramps=C.ramps.map(r=>{const[sg,f0,len,h0]=r;for(const k of[1,.7,.5])for(const df of[0,.03,-.03,.06,-.06,.09,-.09,.12,-.12,.15,-.15,.18,-.18]){const f=f0+df,h=h0*k;if(f>.04&&f<.96&&h>=2.5&&clear(sg,f,len,h)){if(df||k<1)n.ramps++;if(k<1)n.low++;return[sg,f,len,Math.max(2.5,h),r[4]]}}n.low++;return[sg,f0,len,2.5,r[4]]});
+  const free1=(sg,f)=>[-6,0,6].every(o=>{const q=tkAt(G.seg[sg],f);return !roamHit(q.x+Math.cos(q.h)*o,q.z-Math.sin(q.h)*o,1)});
+  C.items=C.items.map(([sg,f])=>{for(const df of[0,.02,-.02,.04,-.04,.06,-.06])if(free1(sg,f+df)){if(df)n.items++;return[sg,f+df]}return[sg,f]});C.tidy=n;return C}
+function tkBuild(spec){if(TK.built[spec.key])return TK.built[spec.key];const G=qvGraph();if(!G)return null;if(spec.water){const W=tkWaterCourse(spec);if(W)return W}let cx=0,cz=0;for(let i=0;i<G.X.length;i++){cx+=G.X[i];cz+=G.Z[i]}cx/=G.X.length;cz/=G.X.length;
+  if(CID==='ath'&&spec.off&&PARKS.length&&!spec.pk){spec.pk=1;spec.auto=1}
+  if(spec.x==null||spec.auto){spec.auto=1;spec.k=spec.k||0;const h=tkHash(spec.key)+spec.k*97,ang=(h%360)*Math.PI/180+spec.k*1.3,r=Math.max(250,500+(h>>>9)%800-spec.k*120);spec.x=cx+Math.sin(ang)*r;spec.z=cz+Math.cos(ang)*r;if(CID==='ath'&&spec.off){const Rk=PARKS.filter(R=>Math.min(R.x1-R.x0,R.z1-R.z0)>90).sort((a,b)=>(b.x1-b.x0)*(b.z1-b.z0)-(a.x1-a.x0)*(a.z1-a.z0))[spec.k%3]||PARKS[0];spec.x=(Rk.x0+Rk.x1)/2+Math.sin(ang)*(900+(h>>>7)%300);spec.z=(Rk.z0+Rk.z1)/2+Math.cos(ang)*(900+(h>>>7)%300)}}
   const S=tkSnap(spec.x,spec.z);if(!S){if(spec.auto&&spec.k<8){spec.k++;return tkBuild(spec)}return null}const base=Math.atan2(cx-S[0],cz-S[1])+((tkHash(spec.key)%7)-3)*.25,path=(a,b)=>{const P=qvPath(a[0],a[1],b[0],b[1]);return P.map(p=>[p[0],p[1]])};let best=null;
   const park=spec.off?PARKS.map(R=>({R,d:Math.hypot((R.x0+R.x1)/2-S[0],(R.z0+R.z1)/2-S[1])})).filter(o=>o.d<2600&&Math.min(o.R.x1-o.R.x0,o.R.z1-o.R.z0)>90).sort((a,b)=>a.d-b.d)[0]:null;
   const tries=[];for(const da of[0,.5,-.5,1,-1,1.6,-1.6,2.4])for(const W of[260,180,360])tries.push([da,W]);
   for(const[da,W]of tries){const h=base+da,dx=Math.sin(h),dz=Math.cos(h),px=Math.cos(h),pz=-Math.sin(h);let X,J,F,A,B,offB=null;
     if(park&&da===0){const R=park.R,mx=(R.x0+R.x1)/2,mz=(R.z0+R.z1)/2,hx=Math.atan2(mx-S[0],mz-S[1]),ex=Math.sin(hx),ez=Math.cos(hx),hw=Math.min(R.x1-R.x0,R.z1-R.z0)/2;
-      const pe=[mx-ex*(hw+5),mz-ez*(hw+5)],pq=[mx+ex*(hw+5),mz+ez*(hw+5)],e1=tkSnap(...pe),e2=tkSnap(...pq);if(!e1||!e2)continue;
+      const pe=[mx-ex*(hw+5),mz-ez*(hw+5)],pq=[mx+ex*(hw+5),mz+ez*(hw+5)];let cr=null;for(const lat of[0,35,-35,70,-70,105,-105,140,-140]){if(Math.abs(lat)>hw*.85)continue;const lx=Math.cos(hx)*lat,lz=-Math.sin(hx)*lat,a1=tkSnap(pe[0]+lx,pe[1]+lz),a2=tkSnap(pq[0]+lx,pq[1]+lz);if(!a1||!a2)continue;let hit=0;for(let k=0;k<=40;k++)if(roamHit(a1[0]+(a2[0]-a1[0])*k/40,a1[1]+(a2[1]-a1[1])*k/40,2.8))hit++;if(!cr||hit<cr.hit)cr={a1,a2,hit};if(!hit)break}
+      if(!cr)continue;const e1=cr.a1,e2=cr.a2;
       X=tkSnap(S[0]+ex*(park.d-hw)*.55,S[1]+ez*(park.d-hw)*.55);J=tkSnap(mx+ex*(hw+220),mz+ez*(hw+220));F=tkSnap(J[0]+ex*480,J[1]+ez*480);if(!X||!J||!F)continue;
       const cross=[];for(let k=0;k<=8;k++)cross.push([e1[0]+(e2[0]-e1[0])*k/8,e1[1]+(e2[1]-e1[1])*k/8]);offB=cross;B=tkCat(path(X,e1),cross,path(e2,J));A=path(X,J)}
     else{X=tkSnap(S[0]+dx*520,S[1]+dz*520);J=tkSnap(S[0]+dx*1300,S[1]+dz*1300);if(!X||!J)continue;F=tkSnap(J[0]+dx*520,J[1]+dz*520);const mx=(X[0]+J[0])/2,mz=(X[1]+J[1])/2,vA=tkSnap(mx+px*W,mz+pz*W),vB=tkSnap(mx-px*W,mz-pz*W);if(!F||!vA||!vB)continue;
@@ -52,12 +77,12 @@ function tkBuild(spec){if(TK.built[spec.key])return TK.built[spec.key];const G=q
     let r=tkSpread(C);const slow=r.A.t>r.B.t?'A':'B';for(const f of[[.2,.5,.8],[.12,.3,.5,.7,.88]]){if(r.spread<=2)break;const C2={...C,geo:null,boost:{r:slow,f}},r2=tkSpread(C2);if(r2.spread<r.spread){C.boost=C2.boost;r=r2}C.geo=null}
     C.spread=r;const sc=r.spread+(tkLen(tkGeoOf(C).pA)<1500?20:0);if(!best||sc<best.sc){best={C,sc}}if(r.spread<=3&&(!spec.off||offB))break}
   if(!best){if(spec.auto&&spec.k<8){spec.k++;return tkBuild(spec)}return null}const C=best.C;tkGeoOf(C);const qa=tkAt(C.seg.A,.4),qb=tkAt(C.seg.B,.4);C.nA=tkRoad(qa.x,qa.z)||'Route A';C.nB=C.off?'Park cut':tkRoad(qb.x,qb.z)||'Route B';if(C.nA===C.nB){C.nA+=' (A)';C.nB+=' (B)'}
-  if(!C.name){const q=tkAt(C.seg.start,1);const used=new Set(Object.values(TK.built).map(o=>o.name)),qf=tkAt(C.seg.fin,.6),sfx=C.kind==='rival'?' Duel':' Split',pd=PD[C.p];C.name=[tkRoad(q.x,q.z),tkRoad(qf.x,qf.z),C.nA].map(n=>n&&n+sfx).find(n=>n&&!used.has(n))||((pd?pd.full.split(' ').pop():'City')+sfx)}return TK.built[spec.key]=C}
+  if(!C.name){const q=tkAt(C.seg.start,1);const used=new Set(Object.values(TK.built).map(o=>o.name)),qf=tkAt(C.seg.fin,.6),sfx=C.kind==='rival'?' Duel':' Split',pd=PD[C.p];C.name=[tkRoad(q.x,q.z),tkRoad(qf.x,qf.z),C.nA].map(n=>n&&n+sfx).find(n=>n&&!used.has(n))||((pd?pd.full.split(' ').pop():'City')+sfx)}return TK.built[spec.key]=tkTidy(C)}
 // which course a marker gets (null = old race path)
 function tkSpecOf(m){if(!m||!m.ev)return null;const e=m.ev,ath=CID==='ath';
   if(m.kind==='rival'){if(!ath&&e.p===TK_C.p)return null;return{key:'rival:'+e.p,kind:'rival',p:e.p,ev:e,x:m.x,z:m.z,ai:[e.p],off:ath?e.p==='GALANI':e.p==='OKAFOR'}}
   if(m.kind==='boss')return{key:ath?'boss:ath':'boss',kind:'boss',p:e.p,ev:e,x:m.x,z:m.z,ai:[e.p],base:66,name:ath?'Akropolis Cup Final':'Sky Cup Final'};
-  if(m.kind==='sprint'&&typeof SPR_TRACK!=='undefined'&&SPR_TRACK[e.id])return{key:'sprint:'+e.id,kind:'sprint',ev:e,x:m.x,z:m.z,ai:(e.ai||['WEBER','KAYA','ADLER']).slice(0,3),name:e.name,off:e.id==='sp_wald'};return null}
+  if(m.kind==='sprint'&&typeof SPR_TRACK!=='undefined'&&SPR_TRACK[e.id])return{key:'sprint:'+e.id,kind:'sprint',ev:e,x:m.x,z:m.z,ai:(e.ai||['WEBER','KAYA','ADLER']).slice(0,3),name:e.name,off:e.id==='sp_wald',water:e.id==='sp_kai'&&CID==='fra'};return null}
 function tkCourseOf(m){if(!m||!m.ev)return null;if(!TK.on)return null;if(CID==='fra'&&m.kind==='rival'&&m.ev.p===TK_C.p)return TK_C;const s=tkSpecOf(m);return s?tkBuild(s):null}
 // brick arch: two stacked-brick pillars, a checkered beam with studs (2K checkpoint gates are brick-built arches)
 let TK_ARCH=null;function tkArchMats(){if(TK_ARCH)return TK_ARCH;const[c,g]=cv(256,64);for(let i=0;i<16;i++)for(let j=0;j<4;j++){g.fillStyle=(i+j)%2?'#111':'#fff';g.fillRect(i*16,j*16,16,16)}g.fillStyle='#ffd12c';g.fillRect(64,14,128,36);g.fillStyle='#1b1c22';g.font='900 26px system-ui';g.textAlign='center';g.textBaseline='middle';g.fillText('CHECK',128,33);const t=tex(c);KEEP_TEX.add(t);
@@ -89,7 +114,7 @@ function tkStart(m,C0){const C=C0||tkCourseOf(m)||TK_C;TK.C=C;const Gm=tkGeoOf(C
   (C.ai||[C.p]).forEach((p,i)=>{const pd=PD[p],team=vehOf(p)||(pd?teamOf(pd):TEAMS[i%TEAMS.length]),g=shipMesh(team);RO.grp.add(g);sp.objs.push(g);
     sp.ai.push({p,name:pd?pd.full:p,g,s:4-i*7,lane:[-4,4,0][i%3],v:0,base:(C.base||62)*diffMul()*(1-i*.03),route:(i+(Math.random()<.5?0:1))%2?'B':'A',fin:null,item:null,itemCd:0,stun:0})});
   const who=sp.ai.length>1?sp.ai.length+' RIVALS':(sp.ai[0].name||'').toUpperCase();
-  say((C.kind==='boss'?'FINAL · ':C.kind==='sprint'?'CITY SPRINT · ':'RIVAL RACE · ')+C.name.toUpperCase(),who+' · 2 ROUTES'+(C.off?' · PARK CUT':'')+' · GRAB THE ? BRICKS',2);AU.sfx('pick');return sp}
+  say((C.kind==='boss'?'FINAL · ':C.kind==='sprint'?'CITY SPRINT · ':C.kind==='quick'?'QUICK RACE · ':'RIVAL RACE · ')+C.name.toUpperCase(),who+' · 2 ROUTES'+(C.off?' · PARK CUT':'')+(C.water?' · RIVER BOAT':'')+' · GRAB THE ? BRICKS',2);AU.sfx('pick');return sp}
 function tkPath(a){const G=tkGeo();return a.route==='B'?G.pB:G.pA}
 function tkPosOn(P,s){let cum=0;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(s<=cum+L||i===P.length-1){const t=clamp((s-cum)/(L||1),0,1),n=P[i+1],turn=n?Math.abs(angDiff(Math.atan2(n[0]-b[0],n[1]-b[1]),Math.atan2(b[0]-a[0],b[1]-a[1]))):0;return{x:a[0]+(b[0]-a[0])*t,z:a[1]+(b[1]-a[1])*t,h:Math.atan2(b[0]-a[0],b[1]-a[1]),toCorner:cum+L-s,turn}}cum+=L}}
 // rival speed model, shared by the race and GO tk1/route-spread: base speed, slow for sharp corners, turbo pads on the pad route
@@ -119,19 +144,20 @@ function tkStep(dt){const sp=RO.sp,e=sp.e;TK.C=sp.C;const G=tkGeo();RO.cool=2;TK
     a.v+=(tv-a.v)*Math.min(1,dt*(tv>a.v?1.6:2.5));a.s+=a.v*dt;if(a.s>=Lp&&a.fin==null){a.fin=sp.t;say('',a.name.toUpperCase()+' FINISHED',1.2)}
     const q=tkPosOn(P,Math.max(0,a.s)),x=q.x+Math.cos(q.h)*a.lane,z=q.z-Math.sin(q.h)*a.lane;
     if(a.itemCd<=0)for(const it of sp.items)if(it.cd<=0&&Math.hypot(it.x-x,it.z-z)<5){it.cd=3;a.itemCd=4;tkFire('ai',TK_ITEMS[(sp.items.indexOf(it)+1)%3],sp,a);break}
-    a.y=groundAt(x,z,(a.y??0)+3);a.h=(a.h??q.h)+angDiff(q.h,a.h??q.h)*Math.min(1,dt*4);a.g.position.set(x,a.y,z);a.g.rotation.y=a.h+Math.PI;const ud=a.g.userData;if(ud.m)ud.m.position.y=1.6+Math.sin(T*6)*.1;if(ud.ribbons)for(const rb of ud.ribbons){rb.scale.z=6+a.v/8;rb.material.uniforms.uT.value=T}
+    a.y=groundAt(x,z,(a.y??0)+3);a.h=(a.h??q.h)+angDiff(q.h,a.h??q.h)*Math.min(1,dt*4);a.g.position.set(x,a.y,z);a.g.rotation.y=a.h+Math.PI;const ud=a.g.userData,wet=C.water&&typeof inRiver==='function'&&inRiver(x,z,0);if(wet)sp.aiWet=(sp.aiWet||0)+1;if(ud.boat&&ud.carG){ud.boat.visible=!!wet;ud.carG.visible=!wet}if(ud.m)ud.m.position.y=1.6+Math.sin(T*6)*.1;if(ud.ribbons)for(const rb of ud.ribbons){rb.scale.z=6+a.v/8;rb.material.uniforms.uT.value=T}
     const d=Math.hypot(x-RO.x,z-RO.z);if(d<5.5&&d>.01&&Math.abs(a.y-RO.y)<3){const k=(5.5-d)/2;RO.x+=(RO.x-x)/d*k;RO.z+=(RO.z-z)/d*k;a.v*=.92;RO.v*=.95;AU.sfx('bump')}}
   const n=sp.ai.length,ahead=sp.ai.filter(a=>a.fin!=null||a.s/tkLen(tkPath(a))*G.lenA>sp.myS).length,lastFin=sp.ai.every(a=>a.fin!=null)?Math.max(...sp.ai.map(a=>a.fin)):null;sp.place=1+ahead;
   if(!sp.done&&sp.cd<=0&&(sp.t>=235||(lastFin!=null&&sp.t-lastFin>=40)))return tkFinish(true);
   sp.hud=`<b>🏁 ${e.name.toUpperCase()}</b><span>POS ${sp.place}/${n+1} · CP ${Math.min(sp.gi,sp.G.length)}/${sp.G.length} · ${fmt(Math.max(0,sp.t))}${sp.shieldT>0?' · 🛡':''}${lastFin!=null?' · DNF in '+Math.ceil(40-(sp.t-lastFin))+' s':''}</span>`}
 function tkFinish(dnf){const sp=RO.sp,C=sp.C,n=sp.ai.length;sp.done=true;const place=dnf?n+1:1+sp.ai.filter(a=>a.fin!=null&&a.fin<sp.t).length,won=place===1;
-  const stars=C.kind==='sprint'?(place===1?3:place===2?2:place===3?1:0):won?(sp.t<120?3:2):0,a=sp.ai[0];
+  const stars=C.kind==='sprint'||C.kind==='quick'?(place===1?3:place===2?2:place===3?1:0):won?(sp.t<120?3:2):0,a=sp.ai[0];
   TK.last={key:C.key,place,t:+sp.t.toFixed(1),dnf,stars,rival:a.fin,route:a.route,fired:sp.fired||0};
   const all=store.get('mho_stars',{}),F=flags();
   if(C.kind==='sprint'){const e=C.ev,o=roamSave();o.sp=o.sp||{};const prev=o.sp[e.id]||{st:0,best:0};o.sp[e.id]={st:Math.max(prev.st,stars),best:!dnf&&(!prev.best||sp.t<prev.best)?sp.t:prev.best};roamStore(o);const key='sprint:'+e.id;if((all[key]||0)<stars){all[key]=stars;store.set('mho_stars',all);addXP(130)}logDone(key,C.name,'sprint',stars,fmt2(sp.t))}
+  else if(C.kind==='quick'){const S=season();S.cr+=[300,180,90][place-1]||40;saveSeason(S)}
   else if(won){const fl=C.kind==='boss'?(CID==='ath'?'AKROCUP':'SKYCUP'):C.p,nw=!F[fl];F[fl]=1;store.set('mho_flags',F);const key=C.kind==='boss'?'boss':'rival:'+C.p;if((all[key]||0)<stars){all[key]=stars;store.set('mho_stars',all)}if(nw)addXP(C.kind==='boss'?600:200);logDone(key,C.name,C.kind,stars,fmt2(sp.t))}
   const rows=[{n:'YOU',t:dnf?null:sp.t,me:1},...sp.ai.map(b=>({n:b.name,t:b.fin}))].sort((x,y)=>(x.t??1e9)-(y.t??1e9));
-  const head=won?(C.kind==='boss'?(CID==='ath'?'AKROPOLIS CUP CHAMPION':'SKY CUP CHAMPION'):C.kind==='sprint'?'1ST · YOU WIN!':'1ST · FLAG WON!'):dnf?'DNF · '+(rows[0].n||'').toUpperCase()+' WINS':ord(place)+' PLACE';
+  const head=won?(C.kind==='boss'?(CID==='ath'?'AKROPOLIS CUP CHAMPION':'SKY CUP CHAMPION'):C.kind==='sprint'||C.kind==='quick'?'1ST · YOU WIN!':'1ST · FLAG WON!'):dnf?'DNF · '+(rows[0].n||'').toUpperCase()+' WINS':ord(place)+' PLACE';
   const el=$('#spRes');el.hidden=false;el.innerHTML=`<h3>${head}</h3><div class="st">${'★'.repeat(stars)}<i>${'★'.repeat(3-stars)}</i></div><p>${C.name} · ${dnf?'did not finish':fmt2(sp.t)}</p><table>${rows.map((r,i)=>`<tr class="${r.me?'me':''}"><td>${i+1}</td><td>${r.n}</td><td>${r.t!=null?fmt2(r.t):'—'}</td></tr>`).join('')}</table><div class="rcb"><button class="go" id="spAgain">RACE AGAIN</button><button class="go alt" id="spOk">CONTINUE</button></div>`;
   AU.sfx(won?'finish':'crash');const m=sp.m;$('#spOk').onclick=()=>{el.hidden=true};$('#spAgain').onclick=()=>{el.hidden=true;tkStart(m,C)};sprintEnd()}
 {const _st=sprintStep,_end=sprintEnd;sprintStep=function(dt){if(RO.sp&&RO.sp.tk)return tkStep(dt);return _st(dt)};
@@ -141,6 +167,11 @@ function tkMarkOf(ev){if(!ev)return null;const boss=ev===BOSS_EV||(typeof ATH_BO
 function tkWorldEvs(){return CID==='ath'?[...ATH_TRK_EV,ATH_BOSS_EV]:[...RIVAL_EV,BOSS_EV]}
 {const f0=startRace;startRace=function(){const ev=worldPick;if(TK.on&&menuTab==='world'&&ev&&!RO.launching&&!(typeof SP_S!=='undefined'&&SP_S.on)){
    const go=()=>{const m=tkMarkOf(ev),C=tkCourseOf(m);if(C){$('#menu').hidden=true;tkStart(m,C)}else say('','NO CITY COURSE HERE',1.6)};const r=enterRoam();if(r&&r.then)r.then(()=>setTimeout(go,60));else go();return}return f0()}}
+// tracks-3: QUICK RACE on real streets. The menu track picks the course: Westhafen = the river run, Nordschleife / Akropolis = a park cut, the rest are plain two-route city courses.
+function tkQuickSpec(){const id=menuTrack,sid=typeof SPR_TRACK!=='undefined'&&Object.keys(SPR_TRACK).find(k=>SPR_TRACK[k]===id),m=sid&&RO.marks&&RO.marks.find(q=>q.kind==='sprint'&&q.ev&&q.ev.id===sid),td=TRACK_DEFS.find(t=>t.id===id)||{};
+  return{key:'quick:'+CID+':'+id,kind:'quick',name:(td.short||'City')+' Quick Race',ai:['WEBER','KAYA','ADLER'],x:m?m.x:null,z:m?m.z:null,off:id==='nord'||id==='akro',water:id==='hafen'&&CID==='fra'}}
+{const f1=startRace;startRace=function(){if(TK.on&&menuTab==='quick'&&!RO.sprId&&!RO.launching&&!(typeof SP_S!=='undefined'&&SP_S.on)){const C=tkBuild(tkQuickSpec());
+   if(C){const go=()=>{$('#menu').hidden=true;tkStart({kind:'quick',ev:null},C)};const r=enterRoam();if(r&&r.then)r.then(()=>setTimeout(go,60));else go();return}}return f1()}}
 // rival / boss / track-sprint markers start a city course instead of the spline track
 function tkWants(m){return TK.on&&m&&(m.kind==='rival'||m.kind==='boss'||m.kind==='sprint')&&!!tkCourseOf(m)}
 {const _go=roamGo;roamGo=function(){const m=RO.card;if(m&&!$('#rcGo').disabled&&!(CM.on&&!['garage','cruise'].includes(m.kind))&&tkWants(m)){pickAdd(m);tkStart(m);return}return _go()};$('#rcGo').onclick=roamGo}
@@ -156,4 +187,4 @@ function tkGoCourses(){const L=[...tkWorldEvs().map(tkMarkOf),...RO.marks.filter
   store.set('mho_flags',JSON.parse(F0));store.set('mho_stars',JSON.parse(S0));store.set('mho_roam',JSON.parse(R0));
   const spreads=L.map(m=>tkCourseOf(m)).filter(Boolean).map(C=>(C.spread||tkSpread(C)).spread),mx=spreads.length?Math.max(...spreads):0;window.__chk&&(window.__chk.tk=out);
   return'📍 CITY COURSES · '+nC+'/'+L.length+' built · max spread '+mx+' % · off-road '+off+' · '+out.join(' · ')+(!bad&&nC&&(CID!=='fra'||off)?' ✅':' ❌')}
-window.__tk={mark:tkMarkOf,view:(f)=>{const G=tkGeo(),q=tkAt(G.seg.start,f);RO.x=q.x;RO.z=q.z;RO.y=groundAt(q.x,q.z,99);RO.h=RO.vh=q.h;camSnap=true;for(let i=0;i<40;i++)roamCam(1/60)},evs:()=>tkWorldEvs(),courses:()=>{try{return tkGoCourses()}catch(e){return String(e.stack).slice(0,700)}},of:tkCourseOf,start:tkStart,TK,marks:()=>RO.marks.filter(m=>m.ev).map(m=>m.kind+':'+(m.ev.p||m.ev.id))};
+window.__tk={q:s=>eval(s),mark:tkMarkOf,view:(f)=>{const G=tkGeo(),q=tkAt(G.seg.start,f);RO.x=q.x;RO.z=q.z;RO.y=groundAt(q.x,q.z,99);RO.h=RO.vh=q.h;camSnap=true;for(let i=0;i<40;i++)roamCam(1/60)},evs:()=>tkWorldEvs(),courses:()=>{try{return tkGoCourses()}catch(e){return String(e.stack).slice(0,700)}},of:tkCourseOf,start:tkStart,TK,marks:()=>RO.marks.filter(m=>m.ev).map(m=>m.kind+':'+(m.ev.p||m.ev.id))};
