@@ -924,5 +924,192 @@
   "notes": "Fusion \"Pollen Burst\": Pulse Spread fused with Homing Swarm. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512.",
   "kind": "fx",
   "prompt": "a fusion emblem: a fan of pink energy bolts spreading from a small ship nose, magenta and white glow meeting a cluster of small amber missiles curving with glowing trails toward unseen targets, the two colours (hot pink and amber) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers"
+ },
+ {
+  "file": "wpmount-pulse.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Pulse Spread is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Pulse Spread mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff8ad8. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for pulse spread, side view, muzzle pointing right, compact single part, accent glow #ff8ad8, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-laser.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Laser Lance is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Laser Lance mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #7dffd8. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for laser lance, side view, muzzle pointing right, compact single part, accent glow #7dffd8, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-swarm.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Homing Swarm is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Homing Swarm mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffb020. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for homing swarm, side view, muzzle pointing right, compact single part, accent glow #ffb020, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-beat.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Beat Cannon is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Beat Cannon mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffe14d. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for beat cannon, side view, muzzle pointing right, compact single part, accent glow #ffe14d, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-arc.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Arc Chain is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Arc Chain mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #8fe9ff. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for arc chain, side view, muzzle pointing right, compact single part, accent glow #8fe9ff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-orbit.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Orbit Blades is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Orbit Blades mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #b6ff5a. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for orbit blades, side view, muzzle pointing right, compact single part, accent glow #b6ff5a, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-disc.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Ricochet Disc is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Ricochet Disc mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff7a45. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for ricochet disc, side view, muzzle pointing right, compact single part, accent glow #ff7a45, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-mine.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Mine Layer is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Mine Layer mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #c08aff. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for mine layer, side view, muzzle pointing right, compact single part, accent glow #c08aff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "ship-std-armed.webp",
+  "w": 512,
+  "h": 256,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "OPTIONAL: the Courier ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present",
+  "notes": "Courier ship, same pose and painted style as ship-std.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert.",
+  "prompt": "the Courier spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "ship-tri-armed.webp",
+  "w": 512,
+  "h": 256,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "OPTIONAL: the Triplet ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present",
+  "notes": "Triplet ship, same pose and painted style as ship-tri.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert.",
+  "prompt": "the Triplet spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "ship-hv-armed.webp",
+  "w": 512,
+  "h": 256,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "OPTIONAL: the Half-time Heavy ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present",
+  "notes": "Half-time Heavy ship, same pose and painted style as ship-hv.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert.",
+  "prompt": "the Half-time Heavy spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "ship-ec-armed.webp",
+  "w": 512,
+  "h": 256,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "OPTIONAL: the Echo ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present",
+  "notes": "Echo ship, same pose and painted style as ship-ec.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert.",
+  "prompt": "the Echo spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "ship-drift-armed.webp",
+  "w": 512,
+  "h": 256,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "OPTIONAL: the Drift ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present",
+  "notes": "Drift ship, same pose and painted style as ship-drift.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert.",
+  "prompt": "the Drift spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "ship-lancer-armed.webp",
+  "w": 512,
+  "h": 256,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "OPTIONAL: the Lancer ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present",
+  "notes": "Lancer ship, same pose and painted style as ship-lancer.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert.",
+  "prompt": "the Lancer spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "ship-nova-armed.webp",
+  "w": 512,
+  "h": 256,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "OPTIONAL: the Nova ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present",
+  "notes": "Nova ship, same pose and painted style as ship-nova.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert.",
+  "prompt": "the Nova spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "ship-swg-armed.webp",
+  "w": 512,
+  "h": 256,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "OPTIONAL: the Swing ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present",
+  "notes": "Swing ship, same pose and painted style as ship-swg.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert.",
+  "prompt": "the Swing spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "ship-syn-armed.webp",
+  "w": 512,
+  "h": 256,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "OPTIONAL: the Syncopator ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present",
+  "notes": "Syncopator ship, same pose and painted style as ship-syn.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert.",
+  "prompt": "the Syncopator spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
  }
 ]

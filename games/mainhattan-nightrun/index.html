@@ -1152,12 +1152,42 @@ function bossLoot(e){if(!ST.on||GX()<ST.heal)G.pk.push({t:'hp',x:e.x,y:e.y,vx:-8
   G.pk.push({t:WP.canGain()?'up':'emp',x:e.x,y:e.y,vx:-80,vy:40,bob:0});
   for(let i=0;i<8;i++)G.pk.push({t:'shard',x:e.x+rnd(-30,30),y:e.y+rnd(-30,30),vx:rnd(-160,-40),vy:rnd(-90,90),bob:0});}
 
+/* ===== weapon mounts on the ship: slot 1 = coloured circle, slot 2 = coloured triangle until wpmount-<id>.webp exists; fusion = split ring (or fx-fuse-<a>-<b>.webp).
+   Colours and ids are read from WPD at draw time. Visual only: shots and hits are unchanged. Switch: RIG.on. Hardpoints are ship-local fractions of the ship length (x forward, y down). ===== */
+const RIG={on:true,ok:false,fl:[0,0],armedRun:false,
+  hp:{std:[.30,-.2,.30,.2],tri:[.30,-.22,.30,.22],hv:[.26,-.26,.26,.26],ec:[.30,-.2,.30,.2],swg:[.28,-.24,.28,.24],syn:[.30,-.22,.30,.22],drift:[.28,-.3,.28,.3],lancer:[.36,-.15,.36,.15],nova:[.28,-.26,.28,.26]},   // [x1,y1,x2,y2] per ship id; default = std
+  pt(id,sl){const a=this.hp[id]||this.hp.std;return sl?[a[2],a[3]]:[a[0],a[1]];},
+  mount(c,wid,sl,x,y,L){const d=WPD[wid];if(!d)return;const r=L*.09,nm='wpmount-'+wid;
+    if(ART.have(nm)){const b=ART.bm[nm],w=L*.34,h=w*b.height/b.width;c.drawImage(b,x-w*.5,y-h*.5,w,h);return;}
+    c.fillStyle=d.c;c.beginPath();
+    if(sl){c.moveTo(x+r*1.15,y);c.lineTo(x-r*.8,y-r);c.lineTo(x-r*.8,y+r);c.closePath();c.fill();}
+    else{c.arc(x,y,r,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=Math.max(1,r*.22);c.globalAlpha=.85;c.beginPath();c.arc(x,y,r*.62,0,7);c.stroke();c.globalAlpha=1;}},
+  fuse(c,L,t){const f=WP.fu();if(!f)return;if(ART.have(f.img)){const b=ART.bm[f.img],w=L*1.15;c.globalCompositeOperation='lighter';c.globalAlpha=.55+.15*Math.sin(t*6);c.drawImage(b,-w*.5,-w*.5,w,w);c.globalAlpha=1;c.globalCompositeOperation='source-over';return;}
+    const r=L*.5;c.lineWidth=Math.max(1.5,L*.04);c.globalAlpha=.6+.25*Math.sin(t*6);c.strokeStyle=f.c1;c.beginPath();c.arc(0,0,r,Math.PI*.5,Math.PI*1.5);c.stroke();
+    c.strokeStyle=f.c2;c.beginPath();c.arc(0,0,r,-Math.PI*.5,Math.PI*.5);c.stroke();c.globalAlpha=1;},
+  // c is already at the ship centre (rotated); L = ship length in world units; flash = muzzle burst at the mounts for the first frames after a volley
+  draw(c,sid,L,t,oy,pv){if(!this.on)return;const eq=WP.eq,ar=pv&&ART.have('ship-'+sid+'-armed');this.fuse(c,L,t);if(ar)return;
+    for(let sl=0;sl<2;sl++){const id=eq[sl];if(!id)continue;const q=this.pt(sid,sl),x=q[0]*L,y=q[1]*L+(oy||0);this.mount(c,id,sl,x,y,L);
+      const fl=pv?0:this.fl[sl];if(fl>0){c.globalCompositeOperation='lighter';c.globalAlpha=Math.min(1,fl*14);c.fillStyle=WPD[id]?WPD[id].c:'#fff';c.beginPath();c.arc(x+L*.1,y,L*(.07+.1*fl*9),0,7);c.fill();c.globalAlpha=1;c.globalCompositeOperation='source-over';}}}};
+NR.on('fire',()=>{if(RIG.on){RIG.fl[0]=RIG.fl[1]=.09;}});
+NR.on('tick',d=>{if(RIG.fl[0]>0)RIG.fl[0]=RIG.fl[1]=Math.max(0,RIG.fl[0]-(d>0&&d<1?d:.016));});RIG.chip=function(c,id,sl,x,y,k){const d=WPD[id],r=4.5*k,cx=x+r,cy=y-4*k,n='wp-'+id;if(!d)return 0;
+  if(ART.have(n)){c.drawImage(ART.bm[n],x,cy-r*1.2,r*2.4,r*2.4);return r*2.4+3*k;}
+  c.save();c.fillStyle=d.c;c.beginPath();if(sl){c.moveTo(cx+r*1.1,cy);c.lineTo(cx-r*.8,cy-r);c.lineTo(cx-r*.8,cy+r);c.closePath();}else c.arc(cx,cy,r,0,7);c.fill();c.restore();return r*2+4*k;};
+RIG.pic=function(cv,sid){if(!cv)return;const c=cv.getContext('2d'),W=cv.width,H=cv.height,L=W*.66,n='spr-ship-'+sid,b=ART.bm[n];c.clearRect(0,0,W,H);
+  if(!b&&!(n in ART.bm))ART.load(n);if(!b)setTimeout(()=>{if(cv.isConnected)RIG.pic(cv,sid);},500);
+  c.save();c.translate(W/2,H/2);const ar=ART.have('ship-'+sid+'-armed')?ART.bm['ship-'+sid+'-armed']:null,im=ar||b;
+  if(im){const w=ar?L*1.1:L,h=w*im.height/im.width;c.drawImage(im,-w/2,-h/2,w,h);}
+  else{c.fillStyle='#16102a';c.strokeStyle='#19e3ff';c.beginPath();c.moveTo(L*.5,0);c.lineTo(-L*.4,-L*.18);c.lineTo(-L*.4,L*.18);c.closePath();c.fill();c.stroke();}
+  RIG.draw(c,sid,L,0,0,true);
+  c.font='700 '+Math.round(H*.13)+'px "Share Tech Mono",monospace';c.textAlign='center';c.fillStyle='#fff';c.globalAlpha=.9;
+  for(let sl=0;sl<2;sl++){if(!WP.eq[sl])continue;const q=RIG.pt(sid,sl);c.fillText(sl+1,q[0]*L,q[1]*L+(sl?H*.3:-H*.2));}   // slot numbers
+  c.restore();};
 function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:Math.floor(t*20)%2))return;const D=DISTRICTS[G.di];
   ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);
   const so=ART.sp('spr-ship-'+shipDef().id,60);
   if(so){const bob=Math.sin(t*5)*1.2,en=ART.sp('fx-engine',46);ctx.globalCompositeOperation='lighter';
     if(en)ART.put(en,-24-en.w*.5*(.8+.2*PUL),bob,0,.7+.3*PUL);                  // painted jet, flickers with the beat
-    G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';ART.put(so,0,bob);ctx.restore();
+    G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';ART.put(so,0,bob);RIG.draw(ctx,shipDef().id,60,t,bob);ctx.restore();
     const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}
     ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();return;}
   ctx.globalCompositeOperation='lighter';G_(-20,2,16+Math.random()*5,D.a,.9);G_(0,0,34,D.a,.18);ctx.globalCompositeOperation='source-over';
@@ -1166,6 +1196,7 @@ function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%
   ctx.strokeStyle=shv?shv[2]:D.b;ctx.lineWidth=1.5;ctx.stroke();
   ctx.fillStyle=shv?shv[2]:D.b;ctx.globalAlpha=.85;ctx.beginPath();ctx.moveTo(12,-2);ctx.lineTo(4,-8);ctx.lineTo(-6,-7);ctx.lineTo(-4,-1);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
   ctx.fillStyle=D.a;ctx.fillRect(-16,8,26,2);ctx.fillStyle='#fff';ctx.fillRect(22,1,4,2);
+  if(shv)ctx.scale(1/shv[0],1/shv[1]);RIG.draw(ctx,shipDef().id,48*(shv?shv[0]:1),t,0);
   ctx.restore();
   const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}   // each tier: more glow on the ship
   ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();}
@@ -1330,7 +1361,7 @@ const neonI='<svg class="nI" viewBox="0 0 24 24" aria-hidden="true"><path d="'+N
 const garageEl=document.createElement('div');garageEl.id='garage';garageEl.className='ov solid pg';garageEl.hidden=true;
 garageEl.innerHTML='<div class="top"><span class="ttl">GARAGE</span><span class="neon" id="gaBank"></span><span class="sp"></span><button class="go alt" id="gaBack" type="button" style="padding:.3em 1.1em">BACK</button></div>'
   +'<div class="tabs"><button class="go dim" data-t="ships" type="button">SHIPS</button><button class="go dim" data-t="crew" type="button">CREW</button><button class="go dim" data-t="looks" type="button">LOOKS</button></div>'
-  +'<div class="cards" id="gaCards"></div><div class="msg" id="gaMsg"></div>';
+  +'<canvas id="gaPic" width="300" height="96" style="display:none;margin:0 auto 4px;width:min(100%,300px);height:auto;aspect-ratio:300/96;flex:0 0 auto"></canvas><div class="cards" id="gaCards"></div><div class="msg" id="gaMsg"></div>';
 stage.appendChild(garageEl);
 const gaMsg=t=>{$('gaMsg').textContent=t;clearTimeout(gaMsg.h);gaMsg.h=setTimeout(()=>{$('gaMsg').textContent='';},1800);};
 function gaItems(){return GA.tab==='ships'?SHIPS.map(s=>({k:s.id==='std'?null:'ship_'+s.id,id:s.id,n:s.n,t:s.t,p:s.p||0,ic:s.ic,eq:GA.ship===s.id,kind:'ship'}))
@@ -1338,6 +1369,7 @@ function gaItems(){return GA.tab==='ships'?SHIPS.map(s=>({k:s.id==='std'?null:'s
   :THEMES.map(h=>({k:h.id==='neon'?null:'th_'+h.id,id:h.id,n:h.n,t:h.t,p:h.p||0,f:h.f,eq:GA.theme===h.id,kind:'theme'}));}
 function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';
   for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
+  const gp=$('gaPic');gp.style.display=GA.tab==='ships'?'block':'none';if(GA.tab==='ships'&&RIG.ok)RIG.pic(gp,GA.ship);
   const box=$('gaCards');box.innerHTML='';
   for(const it of gaItems()){const own=!it.k||GA.own[it.k],b=document.createElement('button');b.type='button';
     b.className='card'+(it.eq?' sel':'')+(!own&&GA.bank<it.p?' no':'');b.style.setProperty('--c',it.eq?'#19e3ff':own?'#8c86b8':'#ffb020');b.dataset.id=it.id;b.dataset.kind=it.kind;
@@ -3492,6 +3524,7 @@ NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L3',id:'ship-mounts',text:'Your ship now shows the weapons you equip: a coloured circle on slot 1, a triangle on slot 2, a split ring when they fuse, and a flash from the mounts when you fire. See it in WEAPONS and the Garage. Painted mounts come later. Does it read at a glance?'},
  {ver:'L2',id:'fight-back',text:'Enemies now fly in and fight back: they cannot be hit until they are fully on screen (a red ring at the edge shows where they come in), every enemy lives at least about a second on screen even against a maxed build, and chargers glide in before they dash. Do waves feel like a fight now, on Easy too?'},
  {ver:'L2',id:'no-idle',text:'Standing still is no longer safe: parking in one spot (or nudging a few pixels) now brings the red static discharge that no shield, heal or revive can outlast, plus aimed shots from the edge of the screen. Keep moving and nothing changes. Does it feel fair?'},
  {ver:'L1',id:'weapons-fusions',text:'Eight weapons now (new: Arc Chain, Orbit Blades, Ricochet Disc, Mine Layer). Put two DIFFERENT weapons in the two slots on the WEAPONS sheet and they fuse: a named fusion with its own effect and +12% damage. The fusion pictures are shapes until the art arrives. Do the new weapons feel different, and is a fusion worth choosing?'},
@@ -3769,7 +3802,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},vc:0,open:false,bl:[],mn:[],fuT:0,lmy:-9
     G.rings.push({x:P.x+24,y:P.y,l:.25,m:.25,c:'#ffe14d'});AU.sfx('shot');},
   // short text for the HUD: "PULSE 2 · LANCE 1"
   hud(c,x,y,k){c.save();c.font=`${Math.round(11*(k||1))}px "Share Tech Mono",monospace`;c.textAlign='left';let xx=x;
-    for(const id of this.eq){const d=id&&WPD[id],t=d?d.s+' '+this.lvOf(id):'-';c.fillStyle=d?d.c:'#dcd8f6';c.fillText(t,xx,y);xx+=c.measureText(t).width+10*(k||1);}
+    for(const id of this.eq){const d=id&&WPD[id],t=d?d.s+' '+this.lvOf(id):'-';if(d)xx+=RIG.chip(c,id,this.eq.indexOf(id),xx,y,k||1);c.fillStyle=d?d.c:'#dcd8f6';c.fillText(t,xx,y);xx+=c.measureText(t).width+10*(k||1);}
     const f=this.fu();if(f&&this.fuT>0){c.globalAlpha=Math.min(1,this.fuT);c.fillStyle='#ffe14d';c.fillText('FUSION '+f.name.toUpperCase(),x,y+13*(k||1));}c.restore();},
   toggle(id){const i=this.eq.indexOf(id);let m;
     if(i>=0){if(this.eqIds().length<2){this.msg('Keep one weapon equipped');return;}this.eq[i]=null;m=WPD[id].s+' removed';}
@@ -3778,6 +3811,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},vc:0,open:false,bl:[],mn:[],fuT:0,lmy:-9
   msg(t){const el=$('wpMsg');if(el)el.textContent=t;}};
 {const ld=load('mnr_wp',null);if(ld&&Array.isArray(ld.eq)){WP.eq=[WP_IDS.includes(ld.eq[0])?ld.eq[0]:null,WP_IDS.includes(ld.eq[1])&&ld.eq[1]!==ld.eq[0]?ld.eq[1]:null];if(!WP.eqIds().length)WP.eq=['pulse',null];}}
 window.__wp=Object.assign(WP,{lvl(id,n){this.lv[id]=n;}});          // test hook
+RIG.ok=true;window.__rig=Object.assign(RIG,{GA,SHIPS,pushPos:()=>[P.x,P.y]});          // test hook
 NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
 {const pd=PW.draw;PW.draw=function(t){pd.call(this,t);WP.drawWorld(t);};const cl=SH.close;SH.close=function(){cl.call(this);WP.fuT=4;};}NR.on('beat',()=>WP.beat());
 
@@ -3792,11 +3826,11 @@ NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
 #wpL .card .pp{display:flex;gap:2px;margin-top:3px}#wpL .card .pp i{display:block;width:clamp(8px,calc(var(--u)*3),14px);height:5px;border-radius:1px;background:#ffffff22}#wpL .card .pp i.on{background:var(--c)}
 #wpL .card.sel{background:#22123f}
 #wpFu{flex:0 0 auto;display:flex;gap:10px;align-items:center;min-height:30px;font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*3.2),15px);color:var(--dim);padding:2px 4px}
-#wpFu canvas{width:56px;height:56px;flex:0 0 auto}#wpFu .n{color:#ffe14d;font-size:1.05em;letter-spacing:.04em}#wpFu .t{color:var(--ink)}
+#wpShip{display:block;width:min(100%,300px);height:auto;aspect-ratio:300/96;margin:0 auto 4px;flex:0 0 auto}#wpFu canvas{width:56px;height:56px;flex:0 0 auto}#wpFu .n{color:#ffe14d;font-size:1.05em;letter-spacing:.04em}#wpFu .t{color:var(--ink)}
 #shWpRow{display:flex;gap:10px;align-items:center;flex:0 0 auto;min-height:44px}#shWpRow button{flex:0 0 auto;min-width:44px;padding:.4em 1em}#shWpRow span{font-family:var(--mono);color:var(--dim);font-size:clamp(11px,calc(var(--u)*3.2),15px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #titleRow2{margin-top:2px}#titleRow2 .go{font-size:clamp(12px,min(1.6vw,2.8vh),16px)}`;document.head.appendChild(st);}
 const wpEl=document.createElement('div');wpEl.id='wpm';wpEl.className='ov solid pg';wpEl.hidden=true;
-wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><div id="wpL"></div><div id="wpFu"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
+wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><canvas id="wpShip" width="300" height="96"></canvas><div id="wpL"></div><div id="wpFu"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
 stage.appendChild(wpEl);
 {const DEMO=(id,c,t,col)=>{                                       // t: 0..2 seconds, the demo loops
    c.clearRect(0,0,108,52);const sy=26;c.fillStyle='#ffffff';c.beginPath();c.moveTo(6,sy-6);c.lineTo(18,sy);c.lineTo(6,sy+6);c.closePath();c.fill();
@@ -3821,7 +3855,7 @@ stage.appendChild(wpEl);
    c.strokeStyle=f.c2;c.shadowColor=f.c2;c.beginPath();c.arc(m,m,z*.36,-Math.PI*.5,Math.PI*.5);c.stroke();
    c.shadowBlur=0;c.lineWidth=z*.045;c.strokeStyle=f.c1;c.beginPath();c.moveTo(z*.22,z*.78);c.lineTo(z*.78,z*.22);c.stroke();c.strokeStyle=f.c2;c.beginPath();c.moveTo(z*.22,z*.22);c.lineTo(z*.78,z*.78);c.stroke();
    c.fillStyle='#ffffff';c.font=`700 ${Math.round(z*.26)}px "Chakra Petch",sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(f.name.split(' ').map(w=>w[0]).join(''),m,m+z*.02);c.restore();};
- WP.draw=function(){const box=$('wpL');box.innerHTML='';
+ WP.draw=function(){const box=$('wpL');box.innerHTML='';RIG.pic($('wpShip'),GA.ship);
    for(const id of WP_IDS){const d=WPD[id],L=this.lvOf(id),slot=this.eq.indexOf(id),b=document.createElement('button');b.type='button';b.className='card'+(slot>=0?' sel':'');b.style.setProperty('--c',d.c);b.dataset.id=id;
      b.innerHTML=`<canvas width="108" height="52" data-id="${id}"></canvas><div class="tx"><div class="n">${d.n}</div><div class="t">${d.tx}</div><div class="pp">${[1,2,3,4,5].map(i=>`<i class="${i<=L?'on':''}"></i>`).join('')}</div></div><span class="slot">${slot>=0?'SLOT '+(slot+1):'TAP TO EQUIP'}</span>`;
      b.addEventListener('click',()=>this.toggle(id));box.appendChild(b);}

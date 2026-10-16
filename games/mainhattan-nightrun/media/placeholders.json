@@ -87,5 +87,22 @@
 "fx-fuse-mine-swarm.webp": "07de41c657364ceaee8b182351ddb3b2",
 "fx-fuse-orbit-pulse.webp": "b6f0aca4ab5352139806c3b8b13316b8",
 "fx-fuse-orbit-swarm.webp": "8c8a46e23623e943b904a02911e0e107",
-"fx-fuse-pulse-swarm.webp": "bf39d88d6bef423a8ed704cc112e95f5"
+"fx-fuse-pulse-swarm.webp": "bf39d88d6bef423a8ed704cc112e95f5",
+"wpmount-pulse.webp": "6ee699e637a09f18326fb324cf82b16a",
+"wpmount-laser.webp": "a9a029fbbd228dbfec03f170c615b5a8",
+"wpmount-swarm.webp": "b95c0b359573134ec9f4b31efb12cef5",
+"wpmount-beat.webp": "38176544b654cb38e59e36944842db54",
+"wpmount-arc.webp": "52a071bab892b3295bd73407ac35ec6f",
+"wpmount-orbit.webp": "25313d47c9dd410044ac790d6e4e311a",
+"wpmount-disc.webp": "c745057c512b27506b2dd5a176330b93",
+"wpmount-mine.webp": "80966c8bc120e0d25b2cef3736da8f6c",
+"ship-std-armed.webp": "f160cf45fe6e9f070bb1adb7434ddf82",
+"ship-tri-armed.webp": "044881b109af995908d0e0d0d1cc4ee6",
+"ship-hv-armed.webp": "a062105376dd8163e65cc270e01a11e4",
+"ship-ec-armed.webp": "64f958728a10744ffd7ab0207cd0d3fe",
+"ship-drift-armed.webp": "eece1a9ee7f93e0b7b4e71fec842dc49",
+"ship-lancer-armed.webp": "897ec75e7ebdd098f2c122c22a257786",
+"ship-nova-armed.webp": "75d956d0ca08d8fb36a0900b8679e4cf",
+"ship-swg-armed.webp": "22ca6de3b822ecd861a3b4451e8bf266",
+"ship-syn-armed.webp": "c05e81ccd4c2b1ad5ac3f40657c9073c"
 }

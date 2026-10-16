@@ -7,7 +7,7 @@ Generated 2026-10-16 by `python3 games-src/scripts/next-wave.py` (rerun after lo
 - Music and sound cues: `games-src/next-wave/music/<game>/cues-wave6.json` (2 versions a and b of each, no vocals).
 - Every picture prompt: our own names, no text, letters or numbers in the picture; a UI piece is one object on a plain flat white background. Make at 1024 px or larger; we crop and convert.
 
-**Total 147**: paintings 138, 3D source paintings 0, music/sound 8, video 1.
+**Total 164**: paintings 155, 3D source paintings 0, music/sound 8, video 1.
 
 Plus 1130 wave 7 items (pose sets, 3D variety, art variety): see `games-src/VARIETY-PLAN.md` and the page.
 
@@ -329,7 +329,7 @@ Style block (in front of every picture prompt): Hand-painted gouache illustratio
 - Size/ratio: 1024x1024, ratio 0.51
 - Prompt: Hand-painted gouache illustration for a calm co-operative deep-sea card game, deep blue and teal water, a small warm golden lantern glow as the only strong warm light, soft rim light, visible gentle brush texture on matte paper, slightly wobbly dark navy ink outline, simple readable silhouette that still works at 40 pixels, rich but not neon colours, centred, plenty of margin, no text. a single ttl bg picture, game art for a board game, no text
 
-## Mainhattan Nightrun (`mainhattan-nightrun`): 67
+## Mainhattan Nightrun (`mainhattan-nightrun`): 84
 
 Style block (in front of every picture prompt): Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers
 
@@ -552,6 +552,142 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Save as: `kit-shd.webp` (laptop) -> `games/mainhattan-nightrun/media/kit-shd.webp`
 - Size/ratio: 128x128, ratio 1:1
 - Prompt: Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers. Shield Plating: a cyan shield made of layered armour plates, no text, letters or numbers
+
+### ship-drift-armed: Ship weapon mounts: ship-drift-armed
+- Why: new weapons and fusions. New weapons and fusions: OPTIONAL: the Drift ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present
+- Type: painting; priority 3 (missing extra)
+- Save as: `ship-drift-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-drift-armed.webp`
+- Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
+- Note: Drift ship, same pose and painted style as ship-drift.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: the Drift spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### ship-ec-armed: Ship weapon mounts: ship-ec-armed
+- Why: new weapons and fusions. New weapons and fusions: OPTIONAL: the Echo ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present
+- Type: painting; priority 3 (missing extra)
+- Save as: `ship-ec-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-ec-armed.webp`
+- Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
+- Note: Echo ship, same pose and painted style as ship-ec.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: the Echo spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### ship-hv-armed: Ship weapon mounts: ship-hv-armed
+- Why: new weapons and fusions. New weapons and fusions: OPTIONAL: the Half-time Heavy ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present
+- Type: painting; priority 3 (missing extra)
+- Save as: `ship-hv-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-hv-armed.webp`
+- Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
+- Note: Half-time Heavy ship, same pose and painted style as ship-hv.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: the Half-time Heavy spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### ship-lancer-armed: Ship weapon mounts: ship-lancer-armed
+- Why: new weapons and fusions. New weapons and fusions: OPTIONAL: the Lancer ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present
+- Type: painting; priority 3 (missing extra)
+- Save as: `ship-lancer-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-lancer-armed.webp`
+- Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
+- Note: Lancer ship, same pose and painted style as ship-lancer.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: the Lancer spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### ship-nova-armed: Ship weapon mounts: ship-nova-armed
+- Why: new weapons and fusions. New weapons and fusions: OPTIONAL: the Nova ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present
+- Type: painting; priority 3 (missing extra)
+- Save as: `ship-nova-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-nova-armed.webp`
+- Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
+- Note: Nova ship, same pose and painted style as ship-nova.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: the Nova spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### ship-std-armed: Ship weapon mounts: ship-std-armed
+- Why: new weapons and fusions. New weapons and fusions: OPTIONAL: the Courier ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present
+- Type: painting; priority 3 (missing extra)
+- Save as: `ship-std-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-std-armed.webp`
+- Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
+- Note: Courier ship, same pose and painted style as ship-std.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: the Courier spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### ship-swg-armed: Ship weapon mounts: ship-swg-armed
+- Why: new weapons and fusions. New weapons and fusions: OPTIONAL: the Swing ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present
+- Type: painting; priority 3 (missing extra)
+- Save as: `ship-swg-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-swg-armed.webp`
+- Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
+- Note: Swing ship, same pose and painted style as ship-swg.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: the Swing spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### ship-syn-armed: Ship weapon mounts: ship-syn-armed
+- Why: new weapons and fusions. New weapons and fusions: OPTIONAL: the Syncopator ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present
+- Type: painting; priority 3 (missing extra)
+- Save as: `ship-syn-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-syn-armed.webp`
+- Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
+- Note: Syncopator ship, same pose and painted style as ship-syn.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: the Syncopator spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### ship-tri-armed: Ship weapon mounts: ship-tri-armed
+- Why: new weapons and fusions. New weapons and fusions: OPTIONAL: the Triplet ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present
+- Type: painting; priority 3 (missing extra)
+- Save as: `ship-tri-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-tri-armed.webp`
+- Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
+- Note: Triplet ship, same pose and painted style as ship-tri.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: the Triplet spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### wpmount-arc: Ship weapon mounts: wpmount-arc
+- Why: new weapons and fusions. New weapons and fusions: On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Arc Chain is equipped (a coloured circle/triangle until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wpmount-arc.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-arc.webp`
+- Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
+- Note: Arc Chain mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #8fe9ff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: a small spaceship weapon attachment for arc chain, side view, muzzle pointing right, compact single part, accent glow #8fe9ff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### wpmount-beat: Ship weapon mounts: wpmount-beat
+- Why: new weapons and fusions. New weapons and fusions: On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Beat Cannon is equipped (a coloured circle/triangle until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wpmount-beat.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-beat.webp`
+- Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
+- Note: Beat Cannon mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffe14d. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: a small spaceship weapon attachment for beat cannon, side view, muzzle pointing right, compact single part, accent glow #ffe14d, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### wpmount-disc: Ship weapon mounts: wpmount-disc
+- Why: new weapons and fusions. New weapons and fusions: On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Ricochet Disc is equipped (a coloured circle/triangle until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wpmount-disc.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-disc.webp`
+- Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
+- Note: Ricochet Disc mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff7a45. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: a small spaceship weapon attachment for ricochet disc, side view, muzzle pointing right, compact single part, accent glow #ff7a45, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### wpmount-laser: Ship weapon mounts: wpmount-laser
+- Why: new weapons and fusions. New weapons and fusions: On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Laser Lance is equipped (a coloured circle/triangle until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wpmount-laser.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-laser.webp`
+- Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
+- Note: Laser Lance mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #7dffd8. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: a small spaceship weapon attachment for laser lance, side view, muzzle pointing right, compact single part, accent glow #7dffd8, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### wpmount-mine: Ship weapon mounts: wpmount-mine
+- Why: new weapons and fusions. New weapons and fusions: On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Mine Layer is equipped (a coloured circle/triangle until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wpmount-mine.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-mine.webp`
+- Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
+- Note: Mine Layer mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #c08aff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: a small spaceship weapon attachment for mine layer, side view, muzzle pointing right, compact single part, accent glow #c08aff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### wpmount-orbit: Ship weapon mounts: wpmount-orbit
+- Why: new weapons and fusions. New weapons and fusions: On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Orbit Blades is equipped (a coloured circle/triangle until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wpmount-orbit.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-orbit.webp`
+- Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
+- Note: Orbit Blades mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #b6ff5a. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: a small spaceship weapon attachment for orbit blades, side view, muzzle pointing right, compact single part, accent glow #b6ff5a, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### wpmount-pulse: Ship weapon mounts: wpmount-pulse
+- Why: new weapons and fusions. New weapons and fusions: On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Pulse Spread is equipped (a coloured circle/triangle until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wpmount-pulse.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-pulse.webp`
+- Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
+- Note: Pulse Spread mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff8ad8. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: a small spaceship weapon attachment for pulse spread, side view, muzzle pointing right, compact single part, accent glow #ff8ad8, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
+
+### wpmount-swarm: Ship weapon mounts: wpmount-swarm
+- Why: new weapons and fusions. New weapons and fusions: On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Homing Swarm is equipped (a coloured circle/triangle until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wpmount-swarm.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-swarm.webp`
+- Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
+- Note: Homing Swarm mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffb020. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Prompt: a small spaceship weapon attachment for homing swarm, side view, muzzle pointing right, compact single part, accent glow #ffb020, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### fx-fuse-arc-beat: Weapon fusions: fx-fuse-arc-beat
 - Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Arc Chain + Beat Cannon are equipped (a split ring with initials until this exists)
