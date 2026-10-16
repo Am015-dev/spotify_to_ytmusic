@@ -757,6 +757,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.66',date:'16 Oct 2026',items:[{t:'NEW',s:'Each district has its own LEGO colours, so driving across town changes the look; taller stepped roofs in Frankfurt.'}]},
   {v:'v90m-beta.65',date:'16 Oct 2026',items:[{t:'NEW',s:'Livelier streets: long Frankfurt blocks are split into varied buildings, more street trees, hedges and flower boxes.'},{t:'FIXED',s:'Smoother on medium graphics: shadows update every other frame.'}]},
   {v:'v90m-beta.64',date:'16 Oct 2026',items:[{t:'FIXED',s:'Sunny again: the sun lights the city from behind the camera, so Athens buildings and trees are no longer near-black.'}]},
   {v:'v90m-beta.63',date:'16 Oct 2026',items:[{t:'NEW',s:'Garage shows your ride big in the middle with ride cards; the brick drawer has a picture on every tile.'},{t:'FIXED',s:'Races need you, fewer wrecks and dead stops, cleaner screen, no sinking at the start.'}]},
@@ -4892,7 +4893,7 @@ function* athBuildG(grp,BM,rnd){const T0=performance.now(),RS=2,NX=Math.ceil((WX
   const fits=(x,z,w,d,c,s)=>{for(const[a,b]of[[0,0],[-.45,-.45],[.45,.45],[.45,-.45],[-.45,.45]]){const lx=a*w,lz=b*d,k=ci(x+lx*c+lz*s,z-lx*s+lz*c);if(k<0||RR[k])return false}const nw=Math.max(1,Math.ceil(w/RS)),nd=Math.max(1,Math.ceil(d/RS));for(let a=0;a<=nw;a++){const lx=(a/nw-.5)*w;for(let b=0;b<=nd;b++){const lz=(b/nd-.5)*d,k=ci(x+lx*c+lz*s,z-lx*s+lz*c);if(k<0||RR[k])return false}}return true};
   const paint=(x,z,w,d,c,s,v)=>{const nw=Math.ceil(w/RS*1.5),nd=Math.ceil(d/RS*1.5);for(let a=0;a<=nw;a++){const lx=(a/nw-.5)*w;for(let b=0;b<=nd;b++){const lz=(b/nd-.5)*d,k=ci(x+lx*c+lz*s,z-lx*s+lz*c);if(k>=0&&(v===4||!RR[k]))RR[k]=v}}};
   const pk=K=>{const h=rnd();for(const[k,p]of K)if(h<p)return k;return K[K.length-1][0]},pc=a=>a[Math.floor(rnd()*a.length)];
-  const TL=new Map(),TY=['poly','neo','plaka','box','prism','bal','poly2','poly3','poly4','neo2','plaka2','plaka3'],TI={poly:0,neo:1,plaka:2,box:3,prism:4,bal:5,poly2:6,poly3:7,poly4:8,neo2:9,plaka2:10,plaka3:11},cnt={poly:0,neo:0,plaka:0,villa:0},trees=[];const E=(type,x,y,z,ry,sx,sy,sz,col)=>{const k=TI[type]*100000+hubTile(x,z);let a=TL.get(k);if(!a)TL.set(k,a=[]);a.push(x,y,z,ry,sx,sy,sz,col)};
+  const TL=new Map(),TY=['poly','neo','plaka','box','prism','bal','poly2','poly3','poly4','neo2','plaka2','plaka3'],TI={poly:0,neo:1,plaka:2,box:3,prism:4,bal:5,poly2:6,poly3:7,poly4:8,neo2:9,plaka2:10,plaka3:11},cnt={poly:0,neo:0,plaka:0,villa:0},trees=[];const E=(type,x,y,z,ry,sx,sy,sz,col)=>{if(typeof C2_int==='function')col=C2_int(col,x,z,sx,sy,sz);const k=TI[type]*100000+hubTile(x,z);let a=TL.get(k);if(!a)TL.set(k,a=[]);a.push(x,y,z,ry,sx,sy,sz,col)};
   const hx=c=>parseInt(c.slice(1),16);
   const rd=mul(4711),pc2=a=>a[Math.floor(rd()*a.length)],SHOPC=['#e8302a','#2a7ad8','#ffcc00','#3aa04a','#ff7a1c','#d6337f','#1fb5b0','#ffffff','#0d5eaf','#7a3aa0'],CEd={shop:0,ret:0,ant:0};
   const CE_dec=(k,U,x,z,ry,h,L,fr)=>{const{w,d,fl,fh}=U,sty=athStyleAt(x,z);let hr=h+.5;
@@ -5043,7 +5044,7 @@ function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){hubRoad
   // Kenney buildings: instanced per model, tinted per instance; every footprint is checked against streets, filler roads, water and exclusions
   const KCELL=320,KB={},OCC=new Map(),ok=(x,z)=>Math.floor(x/50)*100000+Math.floor(z/50);
   const occHit=(x,z,r)=>{for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=OCC.get(ok(x+a*50,z+b*50));if(L)for(const o of L)if(Math.hypot(o[0]-x,o[1]-z)<o[2]+r)return true}return false},occAdd=(x,z,r)=>{const k=ok(x,z);let L=OCC.get(k);if(!L)OCC.set(k,L=[]);L.push([x,z,r])};
-  const putK=(nm,sc,x,z,ry,tint,bx=true)=>{const[w,h,d]=kmSize(nm,sc);if(bx&&!fpOK(x,z,w-1,d-1,ry))return false;if(bx&&SIMP_cut(x,z,w,d,ry))return false;/* simplify-1: nothing that fronts no road */if(typeof CTB_putK==='function'&&CTB_putK(nm,sc,x,z,ry,tint,bx,w,h,d)){occAdd(x,z,Math.min(w,d)*.45);return true}/* CT (city-1): LEGO sets */(KB[nm]=KB[nm]||{nm,L:[]}).L.push({x,z,ry,tint,sc});try{BV_add(x,z,nm,nm,{ry,w,d,h,fr:bx?1:0})}catch(e){}if(bx)hubAddB({x,z,hw:w/2-.5,hd:d/2-.5,h,ry});occAdd(x,z,Math.min(w,d)*.45);return true};
+  const putK=(nm,sc,x,z,ry,tint,bx=true)=>{const[w,h,d]=kmSize(nm,sc);if(bx&&typeof C2_tint==='function')tint=C2_tint(x,z,tint);if(bx&&!fpOK(x,z,w-1,d-1,ry))return false;if(bx&&SIMP_cut(x,z,w,d,ry))return false;/* simplify-1: nothing that fronts no road */if(typeof CTB_putK==='function'&&CTB_putK(nm,sc,x,z,ry,tint,bx,w,h,d)){occAdd(x,z,Math.min(w,d)*.45);return true}/* CT (city-1): LEGO sets */(KB[nm]=KB[nm]||{nm,L:[]}).L.push({x,z,ry,tint,sc});try{BV_add(x,z,nm,nm,{ry,w,d,h,fr:bx?1:0})}catch(e){}if(bx)hubAddB({x,z,hw:w/2-.5,hd:d/2-.5,h,ry});occAdd(x,z,Math.min(w,d)*.45);return true};
   const CITY=['building-a','building-b','building-c','building-d','building-e','building-f','building-g','building-h','building-i','building-k','building-l','building-m'],SKY=['building-skyscraper-a','building-skyscraper-b','building-skyscraper-c','building-skyscraper-d','building-skyscraper-e'],HOUSE=['building-type-a','building-type-c','building-type-f','building-type-k','building-type-p','building-type-h'];
   const TINT={city:['#ffffff','#fff0e0','#e8f0ff','#f0ffe8','#ffe8f0','#fff8d8'],house:['#ffffff','#ffe8d8','#e8f4ff','#fff4d0','#f0e8ff']};
   // Athens units: kind poly (polykatoikia), neo (neoclassical), plaka (old town house); front = local +z (towards the street)
@@ -5121,7 +5122,7 @@ function lzY0(x,z,w,d,ry=0){const c=Math.cos(ry),s=Math.sin(ry);let m=1e9;for(co
 function lzBox(L,x,z,w,d,h,col,o={}){const ry=o.ry||0;if(!o.force&&!lzFreeBox(x,z,w,d,ry))return false;const y0=o.y0??lzY0(x,z,w,d,ry);L.parts.push({k:'b',w,h,d,x,y:y0+h/2,z,ry,col,m:o.m||'plain'});if(!o.nc){const b=hubAddB({x,z,hw:w/2,hd:d/2,h:y0+h,ry},L.bld);if(o.lift)b.y0=o.y0-.5;gridAddTo(LZ.g,[b])}return true}
 function lzCyl(L,x,z,r1,r2,h,col,o={}){if(!o.force&&!lzFree(x,z,Math.max(r1,r2)))return false;const y0=o.y0??lzY0(x,z,r2*2,r2*2);L.parts.push({k:'c',r1,r2,h,x,y:y0+h/2,z,col,seg:o.seg||12,m:o.m||'plain'});if(!o.nc){const r=Math.max(r1,r2)*.85,b=hubAddB({x,z,hw:r,hd:r,h:y0+h},L.bld);gridAddTo(LZ.g,[b])}return true}
 const lzCone=(L,x,y,z,r,h,col,seg=8)=>L.parts.push({k:'k',x,y,z,r,h,col,seg}),lzSph=(L,x,y,z,r,col,sx=1,sy=1,sz=1)=>L.parts.push({k:'s',x,y,z,r,col,sx,sy,sz}),lzGab=(L,x,y,z,w,d,h,col,ry=0)=>L.parts.push({k:'g',x,y,z,w,d,h,col,ry});
-function lzKm(L,nm,sc,x,z,ry,tint){const[w,h,d]=kmSize(nm,sc);if(!lzFreeBox(x,z,w+2,d+2,ry))return false;L.km.push({nm,sc,x,z,ry,tint});const b=hubAddB({x,z,hw:w/2-.5,hd:d/2-.5,h,ry},L.bld);gridAddTo(LZ.g,[b]);L.towns++;return true}
+function lzKm(L,nm,sc,x,z,ry,tint){const[w,h,d]=kmSize(nm,sc);if(typeof C2_tint==='function')tint=C2_tint(x,z,tint);if(!lzFreeBox(x,z,w+2,d+2,ry))return false;L.km.push({nm,sc,x,z,ry,tint});const b=hubAddB({x,z,hw:w/2-.5,hd:d/2-.5,h,ry},L.bld);gridAddTo(LZ.g,[b]);L.towns++;return true}
 function lzMapLine(pts,w,name){const S=polySamples(pts,8);S.w=w;S.name=name;LZ.roads.push(S);for(const p of S.pts){const k=Math.floor(p.x/64)*100000+Math.floor(p.z/64);let A=LZ.rg.get(k);if(!A)LZ.rg.set(k,A=[]);A.push({x:p.x,z:p.z,w})}return S}
 function lzRoad(L,pts,w,name){const S=polySamples(pts,8);S.w=w;S.name=name;L.roads.push(S);LZ.roads.push(S);for(const p of S.pts){const k=Math.floor(p.x/64)*100000+Math.floor(p.z/64);let A=LZ.rg.get(k);if(!A)LZ.rg.set(k,A=[]);A.push({x:p.x,z:p.z,w})}return S}
 // incremental batch: geometry is appended to per-material arrays as parts arrive, so the final meshes cost no big merge (1400 m tiles keep the cull radius small)
@@ -9351,16 +9352,16 @@ function DR_solidBuild(){const R=[],lm=(x,z,m)=>LMX.some(L=>Math.hypot(L.x-x,L.z
 // window grid (repeat width 10-14.4 m, floor 11.2-13.2 m), a 0-4 m setback on one long side, and every third one a stepped upper tier. Same merged meshes (0 new draws), +12 tris a box.
 // ?dsp=0 = the old single box. Colliders: one rect per segment (the setback strip stays solid for props via DR.solid, which is unchanged).
 function DR_splitOn(){return!/[?&]dsp=0\b/.test(location.search)}
-function DR_fraSplit(r,lo,h0,BMs,W,G,TN){const w=r.x1-r.x0,d=r.z1-r.z0,alongX=w>=d,L=alongX?w:d,cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,X=['#ffd24a','#ff9a7a','#8cc8ff','#b6e07a','#ff9ac4','#ffb347','#9fe0d0'],T=TN.concat(X);
+function DR_fraSplit(r,lo,h0,BMs,W,G,TN){const w=r.x1-r.x0,d=r.z1-r.z0,alongX=w>=d,L=alongX?w:d,cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,X=['#ffd24a','#ff9a7a','#8cc8ff','#b6e07a','#ff9ac4','#ffb347','#9fe0d0'],c2=typeof C2_fra==='function'?C2_fra((r.x0+r.x1)/2,(r.z0+r.z1)/2,TN):{on:false,roof:'#a85a3c'},T=c2.on?c2.T:TN.concat(X);
   const n=L>30?Math.max(2,Math.round(L/27)):1,wt=[];let sum=0;for(let i=0;i<n;i++){const v=.7+.6*DR_h(cx+i*3.7,cz+i*1.9);wt.push(v);sum+=v}
   let a=alongX?r.x0:r.z0,prev=-1;const lenC=alongX?d:w;
   for(let i=0;i<n;i++){const len=L*wt[i]/sum,b=i===n-1?(alongX?r.x1:r.z1):a+len,hv=DR_h(cx*.7+i*11.3,cz*.7+i*5.1),hw2=DR_h(cx+i*2.3,cz-i*4.1),hs=DR_h(cx-i*6.1,cz+i*3.3);
-    let k=Math.floor(hv*T.length);if(k===prev)k=(k+1)%T.length;prev=k;
-    const hh=h0-(n>1?3:0)+(n>1?[0,3.3,6.6,9.9,13.2][Math.floor(hw2*5)]:0),tw=[10,12,14.4][Math.floor(DR_h(cx+i,cz*1.3)*3)],th=[11.2,13.2][Math.floor(DR_h(cz+i,cx*1.7)*2)];
+    let k=Math.floor(hv*T.length);if(c2.on)k=(i+Math.floor(hv*2))%T.length;if(k===prev)k=(k+1)%T.length;prev=k;
+    const hh=h0-(n>1?3:0)+(n>1?(c2.on?[0,3.3,6.6,9.9,13.2,19.8,26.4]:[0,3.3,6.6,9.9,13.2])[Math.floor(hw2*(c2.on?7:5))]:0),tw=[10,12,14.4][Math.floor(DR_h(cx+i,cz*1.3)*3)],th=[11.2,13.2][Math.floor(DR_h(cz+i,cx*1.7)*2)];
     // setback: pull one long side in by 0 / 0 / 2.5 / 4 m (the segment keeps ≥ 14 m of depth)
-    const sb=[0,3,5,7][Math.floor(hs*4)],side=DR_h(cx+i*9,cz)<.5?-1:1;let c0=alongX?r.z0:r.x0,c1=alongX?r.z1:r.x1;if(lenC-sb>14){if(side<0)c0+=sb;else c1-=sb}
+    const sb=(c2.on?[0,4,7,10]:[0,3,5,7])[Math.floor(hs*4)],side=DR_h(cx+i*9,cz)<.5?-1:1;let c0=alongX?r.z0:r.x0,c1=alongX?r.z1:r.x1;if(lenC-sb>14){if(side<0)c0+=sb;else c1-=sb}
     const sx0=alongX?a:c0,sx1=alongX?b:c1,sz0=alongX?c0:a,sz1=alongX?c1:b,sw=sx1-sx0,sd=sz1-sz0,mx=(sx0+sx1)/2,mz=(sz0+sz1)/2,col=new THREE.Color(T[k]);
-    const g=bxUV(sw,hh,sd,tw,th);g.translate(mx,lo-.5+hh/2,mz);W.push(colorize(g,col));G.push(cbox(sw-1.2,.6,sd-1.2,mx,lo-.5+hh+.3,mz,'#a85a3c'));
+    const g=bxUV(sw,hh,sd,tw,th);g.translate(mx,lo-.5+hh/2,mz);W.push(colorize(g,col));G.push(cbox(sw-1.2,.6,sd-1.2,mx,lo-.5+hh+.3,mz,c2.roof));
     if(n>1&&i%3===1&&sw>12&&sd>12){const tt=5+Math.floor(DR_h(cx+i*4,cz+i)*3)*3.3,tw2=sw*.6,td2=sd*.6,g2=bxUV(tw2,tt,td2,tw,th);g2.translate(mx,lo-.5+hh+.6+tt/2,mz);W.push(colorize(g2,col.clone().offsetHSL(0,0,.05)));G.push(cbox(tw2-1,.5,td2-1,mx,lo-.5+hh+.6+tt+.25,mz,'#7a5a4c'))}
     const bb={x:mx,z:mz,hw:sw/2,hd:sd/2};HUB.bld.push(bb);if(HUB.grid)gridAddTo(HUB.grid,[bb]);a=b}
   DR.st.fraSeg=(DR.st.fraSeg||0)+n}
@@ -18522,6 +18523,36 @@ function C1_build(){const A=HUB.H1;if(!C1.on||!A||!A.length)return;const A2=A.le
     im.receiveShadow=true;im.userData.c1h=1;im.userData.cd=420;im.userData.nsh=1;im.computeBoundingSphere();HUB.grp.add(im);C1.meshes++;C1.n+=inst.length}}
 buildHubProps=(f=>function(){HUB.H1=[];const r=f.apply(this,arguments);try{C1.meshes=C1.n=0;C1_build()}catch(e){console.warn('C1',e)}return r})(buildHubProps);
 window.__c1={C1,build:C1_build,dr:()=>DR.solid,h1:()=>HUB.H1,rd:(x,z)=>{const q=cityAt(x,z);return q?q.d-q.road.w/2:999}};
+// ===== C2 (city-2, 2026-10-16): DISTRICT COLOUR BLOCKING. docs/CITY_VARIETY.md #2. ?c2=0 = old look.
+// Every district gets a bold LEGO family {f facade, a accent (every ~4th building), r roof}; building tints are blended toward it (instance colour / vertex colour only: no new meshes, no rnd()).
+// Hooks: putK + lzKm tint (60_city_build4, Kenney facades), DR_fraSplit (95_drive_flow, Frankfurt fillers), E() colour (60_city_build3, Athens facades + roofs).
+const C2={on:!/[?&]c2=0\b/.test(location.search),st:{}};
+const C2_F={ // family: facade, accent, roof
+ glass:['#86b4ea','#e4eeff','#3c4a66'],terra:['#f2a65a','#e0563c','#8a3a2a'],neon:['#c070e0','#ff4aa0','#3a2a5a'],apple:['#8fd070','#f2d23c','#7a4a2a'],
+ dock:['#ff9a30','#3f9fe6','#555a60'],teal:['#4cc8c0','#ffd24a','#2a6a70'],sun:['#ffd860','#ff7a5a','#c04a3a'],plum:['#e88ab0','#8fd070','#7a2a5a'],
+ white:['#f6f9ff','#2a7ad8','#2a7ad8'],ochre:['#f0c060','#e8803a','#b0502a'],coral:['#ff8a9a','#ffd24a','#8a2a4a'],mint:['#7fd8c8','#ff6a4a','#2a6a8a'],
+ lilac:['#b8a0f0','#ffd24a','#5a3a8a'],lime:['#c8e870','#ff8ab0','#c0503a'],sand:['#ecd49a','#4aa0d8','#a0603a']};
+const C2_D={Bankenviertel:'glass',Innenstadt:'glass',Messe:'glass',Westend:'glass',Altstadt:'terra',Nordend:'terra',Bahnhofsviertel:'neon',Sachsenhausen:'apple',Osthafen:'dock',Gutleut:'dock',Gallus:'dock',Fechenheim:'dock',
+ Bockenheim:'teal',Bornheim:'teal',Ostend:'teal',Niederrad:'sun',Oberrad:'sun',Schwanheim:'plum','Höchst & Griesheim':'plum',Offenbach:'dock',
+ Anafiotika:'white',Plaka:'white',Thiseio:'white','Areios Pagos':'white',Kolonaki:'ochre',Ilisia:'ochre',Lykavittos:'ochre',Evangelismos:'ochre',Monastiraki:'coral',Psyrri:'coral',Gazi:'coral',Kerameikos:'coral',Metaxourgeio:'coral',
+ Syntagma:'mint',Omonia:'mint',Kentro:'mint',Exarcheia:'mint',Koukaki:'lilac',Petralona:'lilac',Neapoli:'lilac',Pangrati:'lilac',Mets:'lilac',Makrygianni:'sand',Akropoli:'sand',Filopappou:'sand',
+ 'Palaio Psychiko':'lime','Neo Psychiko':'lime',Filothei:'lime',Chalandri:'lime',Marousi:'lime'};
+const C2_K=Object.keys(C2_F),C2_cache=new Map(),C2_col=new Map();
+function C2_fam(x,z){if(!C2.on)return null;const k=Math.floor(x/60)*100000+Math.floor(z/60);let v=C2_cache.get(k);if(v!==undefined)return v;let n='';try{n=districtAt(x,z)}catch(e){}
+ let f=C2_D[n];if(!f){let h=0;for(let i=0;i<n.length;i++)h=(h*31+n.charCodeAt(i))>>>0;f=C2_K[h%C2_K.length]}v=C2_F[f];v.n=f;C2_cache.set(k,v);return v}
+const C2_c=h=>C2_col.get(h)||(C2_col.set(h,new THREE.Color(h)),C2_col.get(h));
+const C2_pick=(x,z,s)=>{const F=C2_fam(x,z);if(!F)return null;return DR_h(x*.137+s,z*.211-s)<.27?F[1]:F[0]};
+// Kenney / LEGO-set tint (hex string): 78 % toward the district colour, a little of the old tint and a lightness wobble keep neighbours different
+function C2_tint(x,z,base,salt){const t=C2_pick(x,z,salt||0);if(!t)return base;const c=C2_c(t).clone().lerp(C2_c(base||'#ffffff'),.18);c.offsetHSL(0,0,(DR_h(x*.31,z*.29)-.5)*.14);C2.st.k=(C2.st.k||0)+1;return'#'+c.getHexString()}
+// Athens E() colour (int): pale walls -> facade/accent, pale thin slabs (roof caps) -> roof colour; grey details (antennas, dark trims) stay
+function C2_int(col,x,z,sx,sy,sz){const F=C2_fam(x,z);if(!F||typeof col!=='number')return col;const r=col>>16&255,g=col>>8&255,b=col&255;if(Math.min(r,g,b)<0xd0)return col;C2.st.a=(C2.st.a||0)+1;
+ if(sy<=.6&&sx>2&&sz>2)return C2_c(F[2]).clone().offsetHSL(0,0,(DR_h(x*.7,z*.9)-.5)*.1).getHex();
+ const c=C2_c(C2_pick(x,z,3)).clone().lerp(new THREE.Color(col),.12);c.offsetHSL(0,0,(DR_h(x*.31,z*.29)-.5)*.12);return c.getHex()}
+// Frankfurt fillers: facade palette for one block (alternating strong/light so neighbours split at grazing angles) + roof colour
+function C2_fra(cx,cz,T){const F=C2_fam(cx,cz);if(!F)return{T,roof:'#a85a3c',on:false};const f=C2_c(F[0]),a=C2_c(F[1]);return{on:true,roof:F[2],T:[f.clone(),a.clone(),f.clone().offsetHSL(.02,0,.1),a.clone().offsetHSL(-.02,0,-.1),f.clone().offsetHSL(-.02,0,-.1)].map(c=>'#'+c.getHexString())}}
+// test view: car on the road nearest a district's centre, looking at the centre (tools/tCity2Shots.js)
+function C2_view(n){const d=DIST_R.find(d=>d.name===n);if(!d)return null;const cx=(d.x0+d.x1)/2,cz=(d.z0+d.z1)/2,s=rfSnap(cx,cz,400);if(!s)return null;const h=Math.atan2(cx-s[0],cz-s[1]);roamWarp(s[0],s[1],h);RO.v=0;camSnap=true;return[s[0],s[1],h,(C2_fam(s[0],s[1])||{}).n]}
+window.__c2={C2,fam:C2_fam,tint:C2_tint,view:C2_view};
 // ===== art-6 (2026-10-14): GO state tests for the art lane's matrix FAILs (src/99c_checklist.js, TAG=art)
 // art/props-road: brick piles, brick towers and gold bricks (block scatter in the block RECT, which diagonal roads cross) used to be exempt from the
 //   OC push-off-the-road (OC_GAME). Now only roadworks (cone/barrier/clight) are. Pass: 0 of them with the footprint on a drivable surface, city-wide.
