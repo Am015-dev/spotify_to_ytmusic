@@ -757,6 +757,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.68',date:'16 Oct 2026',items:[{t:'FIXED',s:'No more giant road wedges sticking into the sky through houses.'},{t:'NEW',s:'Livelier landscape: colour patches and field stripes on open land, banded hills, turquoise river with shore foam.'}]},
   {v:'v90m-beta.67',date:'16 Oct 2026',items:[{t:'FIXED',s:'Never trapped: if you are stuck off-road for 3 seconds, your car is lifted back onto the nearest road.'}]},
   {v:'v90m-beta.66',date:'16 Oct 2026',items:[{t:'NEW',s:'Each district has its own LEGO colours, so driving across town changes the look; taller stepped roofs in Frankfurt.'}]},
   {v:'v90m-beta.65',date:'16 Oct 2026',items:[{t:'NEW',s:'Livelier streets: long Frankfurt blocks are split into varied buildings, more street trees, hedges and flower boxes.'},{t:'FIXED',s:'Smoother on medium graphics: shadows update every other frame.'}]},
@@ -1553,7 +1554,7 @@ function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c
 // XCV = chunk name -> content hash, filled by tools/build.sh (empty in a raw src/ page: then nothing is lazy). A chunk may export top-level names
 // (module list "name:a,b" in src/LAZY): the page declares `let a,b;` stubs, the chunk's last expression is ({a,b}) and XC.apply[name] copies them over.
 // Eager code must not touch a chunk's names at boot; use XC.done / XC_need(name) first. Tests: __tq.ready also waits for XC.done.
-const XCV=/*XCV*/{"99c_checklist":"ee7b637c","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"4bccce49","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -4654,8 +4655,8 @@ const biomeAt=(x,z)=>{for(const B of BIOMES)if(x>=B.r[0]&&x<B.r[1]&&z>=B.r[2]&&z
 const WGC=CID==='fra'?'#7aa860':'#a9a77a';const outerFree=(x,z)=>!inRiver(x,z,-40)&&!inCity(x,z,350)&&abClear(x,z)&&!inR(TAU_R,x,z,-60);
 function worldGroundBuild(grp,bt,BM){const tm=new THREE.MeshStandardMaterial({map:CID==='fra'?groundTex('grass'):athGrassTex(),vertexColors:true,roughness:.92}),base=new THREE.Color(WGC),c=new THREE.Color(),FC=['#9cb85a','#7aa860','#b8b860','#8aa04a','#a0a868'].map(v=>new THREE.Color(v)),FO=new THREE.Color('#5a8a48'),hsh=(x,z)=>{const v=Math.sin(x*12.9898+z*78.233)*43758.5453;return v-Math.floor(v)};
   // outer land: one heightfield with holes for the city box and the Taunus terrain, bank-snapped along the Main
-  tm.polygonOffset=true;tm.polygonOffsetFactor=1;tm.polygonOffsetUnits=2;gndBuild(grp,WX0,WX1,WZS,WZN,{cs:200,fine:25,y0:-.01,uv:14,tile:1000,cls:()=>'g',mats:{g:tm},hole:(x,z)=>inCity(x,z)||inR(TAU_R,x,z),hilly:(a,b,c,d)=>(b>HILL.cx-HILL.rx&&a<HILL.cx+HILL.rx&&d>HILL.cz-HILL.rz&&c<HILL.cz+HILL.rz)||[[a,c],[b,c],[a,d],[b,d],[(a+b)/2,(c+d)/2]].some(([x,z])=>tauH(x,z)>.3)||(CID!=='fra'&&athHilly(a,b,c,d)),
-    col:(x,z)=>{const r=hsh(Math.round(x/250),Math.round(z/250)),B=biomeAt(x,z),g=B?B.g:CID!=='fra'?'':z>3400?'field':z<-2600&&!inCity(x,z,200)?'forest':'';if(CID!=='fra'){const hh=hillH(x,z);c.copy(base).multiplyScalar(.92+r*.16);if(g==='villa')c.lerp(FO,.45);else if(g==='quarry')c.lerp(new THREE.Color('#d8c6a2'),.5);if(hh>1.5)c.lerp(new THREE.Color('#7f9a5a'),clamp(hh/25,0,.8))}else if(g==='field')c.copy(FC[Math.floor(r*FC.length)]);else if(g==='forest')c.copy(FO).lerp(base,r*.4);else if(g==='air')c.copy(base).lerp(FC[2],.35).multiplyScalar(.95+r*.1);else c.copy(base).multiplyScalar(.9+r*.2);if(Math.abs(x)>WX1-30||z<WZS+30||z>WZN-30)c.lerp(FO,.6);return c}});
+  if(typeof ENV_ground==='function')ENV_ground(tm,{kind:'land',tint:true,base:WGC,s:[900,260,70]});/* env-1 */tm.polygonOffset=true;tm.polygonOffsetFactor=1;tm.polygonOffsetUnits=2;gndBuild(grp,WX0,WX1,WZS,WZN,{cs:200,fine:25,y0:-.01,uv:14,tile:1000,cls:()=>'g',mats:{g:tm},hole:(x,z)=>inCity(x,z)||inR(TAU_R,x,z),hilly:(a,b,c,d)=>(b>HILL.cx-HILL.rx&&a<HILL.cx+HILL.rx&&d>HILL.cz-HILL.rz&&c<HILL.cz+HILL.rz)||[[a,c],[b,c],[a,d],[b,d],[(a+b)/2,(c+d)/2]].some(([x,z])=>tauH(x,z)>.3)||(CID!=='fra'&&athHilly(a,b,c,d)),
+    col:(x,z)=>{const r=typeof ENV_on==='function'&&ENV_on()?ENV_vn(x/250,z/250):hsh(Math.round(x/250),Math.round(z/250)),B=biomeAt(x,z),g=B?B.g:CID!=='fra'?'':z>3400?'field':z<-2600&&!inCity(x,z,200)?'forest':'';if(CID!=='fra'){const hh=hillH(x,z);c.copy(base).multiplyScalar(.92+r*.16);if(g==='villa')c.lerp(FO,.45);else if(g==='quarry')c.lerp(new THREE.Color('#d8c6a2'),.5);if(hh>1.5)c.lerp(new THREE.Color('#7f9a5a'),clamp(hh/25,0,.8))}else if(g==='field')c.copy(FC[Math.floor(r*FC.length)]);else if(g==='forest')c.copy(FO).lerp(base,r*.4);else if(g==='air')c.copy(base).lerp(FC[2],.35).multiplyScalar(.95+r*.1);else c.copy(base).multiplyScalar(.9+r*.2);if(Math.abs(x)>WX1-30||z<WZS+30||z>WZN-30)c.lerp(FO,.6);return c}});
   for(const[a,b,z,vert]of[[WX0,WX1,WZS+4,0],[WX0,WX1,WZN-4,0],[WZS,WZN,WX0+4,1],[WZS,WZN,WX1-4,1]]){const n=Math.ceil((b-a)/350);for(let i=0;i<n;i++){const L=(b-a)/n,m=a+L*(i+.5),y=vert?groundY(z,m):groundY(m,z);bt.add(vert?cbox(3,3.2,L,z,1.4+y,m,'#3f7a34'):cbox(L,3.2,3,m,1.4+y,z,'#3f7a34'),BM.plain)}}}
 function athResTex(){const[c,g]=cv(128,256),r=mul(92);g.fillStyle='#5d6169';g.fillRect(0,0,128,256);for(let i=0;i<1400;i++){const v=72+r()*40|0;g.fillStyle=`rgba(${v},${v+2},${v+8},.5)`;g.fillRect(r()*128,r()*256,2,2)}for(let i=0;i<6;i++){g.fillStyle='rgba(40,42,46,.35)';g.fillRect(20+r()*80,r()*256,8+r()*20,3)}
   g.fillStyle='#e8e6de';g.fillRect(3,0,3,256);g.fillRect(122,0,3,256);const t=tex(c);t.wrapS=THREE.ClampToEdgeWrapping;t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;KEEP_TEX.add(t);return t}
@@ -7856,6 +7857,8 @@ function TR_res(a,b,c,d){const N=6,h00=tH(a,c),h10=tH(b,c),h01=tH(a,d),h11=tH(b,
 // (vertices of merged meshes and instance origins inside the footprint, + 1.6 m for balconies/eaves); a stone plinth fills down to the
 // lowest corner. Colliders move with them. Pieces already placed on the ground keep their height (plinth only if they float).
 const TR_PL=[];
+// ramp-2: road surfaces already lie on groundY; a building lift (TR_bldFix pass 2, OC_unbury) that moves every vertex inside a footprint lifted them a second time: a 30 m road wedge
+function TR_roadMat(m){const M=HUB.M;if(Array.isArray(m))m=m[0];return!!(M&&m&&(m===M.road||m===M.street||m===M.resSt||m===M.cobble||(M.jn&&m.map&&m.map===M.jn.map)))}
 function TR_bldFix(){const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
   for(const b of B){const c=b.c??1,s=b.s??0,P=[];for(const u of[-1,0,1])for(const v of[-1,0,1]){const lx=u*b.hw,lz=v*b.hd;P.push(groundY(b.x+lx*c+lz*s,b.z-lx*s+lz*c))}
     b.trMin=Math.min(...P);b.trMax=Math.max(...P);b.trY=1e9;const R=Math.hypot(b.hw,b.hd)+1.8;
@@ -7870,7 +7873,7 @@ function TR_bldFix(){const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
   // terr-3 (Athens boot): pass 2 looks up the full grid only near a lifted building (C2 holds those alone; same result)
   const C2=new Map();for(const b of B){if(!b.trOff)continue;const R=Math.hypot(b.hw,b.hd)+1.8;for(let i=Math.floor((b.x-R)/CS);i<=Math.floor((b.x+R)/CS);i++)for(let j=Math.floor((b.z-R)/CS);j<=Math.floor((b.z+R)/CS);j++)C2.set(K(i,j),1)}
   const near=(x,z)=>C2.has(K(Math.floor(x/CS),Math.floor(z/CS)));
-  if(C2.size)for(const o of meshes){let ch=false;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);if(!near(_p.x,_p.z))continue;const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
+  if(C2.size)for(const o of meshes){let ch=false;if(!o.isInstancedMesh&&TR_roadMat(o.material))continue;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);if(!near(_p.x,_p.z))continue;const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
     const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){if(!near(p[i],p[i+2]))continue;const b=find(p[i],p[i+2],1.6);if(!b||!b.trOff)continue;
       const core=find(p[i],p[i+2],.4)===b;if(!core){const gv=groundY(p[i],p[i+2]);if(p[i+1]>gv-.15&&p[i+1]<gv+.35)continue}p[i+1]+=b.trOff;ch=true}
     if(ch){A.needsUpdate=true;o.geometry.computeBoundingSphere();o.geometry.computeBoundingBox()}}
@@ -8376,7 +8379,7 @@ function OC_acroBuild(){if(CID==='fra'||!HUB.grp||OC.acroG===HUB.grp)return;OC.a
 function OC_unbury(){const F=HUB.bld.filter(b=>b.trMin!=null&&b.trBase!=null&&b.trMin>-1&&b.trMax-b.trBase>1);OC.unb=F.length;if(!F.length)return;
   const find=(x,z,m)=>{for(const b of F){const dx=x-b.x,dz=z-b.z,lx=b.c==null?dx:dx*b.c-dz*b.s,lz=b.c==null?dz:dx*b.s+dz*b.c;if(Math.abs(lx)<=b.hw+m&&Math.abs(lz)<=b.hd+m)return b}return null};const M=new THREE.Matrix4(),P=V3(),pl=[];
   for(const b of F)b.ocUp=b.trMax-.8-b.trBase;
-  for(const o of HUB.grp.children){if(!(o.isMesh||o.isInstancedMesh)||o.userData.trG||!o.geometry||!o.geometry.attributes.position)continue;let ch=false;
+  for(const o of HUB.grp.children){if(!(o.isMesh||o.isInstancedMesh)||o.userData.trG||!o.geometry||!o.geometry.attributes.position)continue;if(!o.isInstancedMesh&&TR_roadMat(o.material))continue;let ch=false;
     if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);P.setFromMatrixPosition(M);const b=find(P.x,P.z,.4);if(!b||P.y<b.trBase-.5)continue;M.elements[13]+=b.ocUp;o.setMatrixAt(i,M);ch=true}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere()}continue}
     const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){const b=find(p[i],p[i+2],.4);if(b&&p[i+1]>=b.trBase-.5){p[i+1]+=b.ocUp;ch=true}}if(ch){A.needsUpdate=true;o.geometry.computeBoundingBox();o.geometry.computeBoundingSphere()}}
   for(const b of F){b.h+=b.ocUp;if(b.y0!=null)b.y0+=b.ocUp;b.trBase+=b.ocUp;b.trDoor=(b.trDoor||0)+b.ocUp;TR_PL.push(b);pl.push(cbox(b.hw*2+.7,b.trBase-b.trMin+.45,b.hd*2+.7,b.x,(b.trBase+b.trMin-.4)/2,b.z,'#b5a68c',b.c==null?0:Math.atan2(-b.s,b.c)))}
@@ -18463,6 +18466,106 @@ function GFX_shChk(){const sh=moonL.shadow;if(!sh.map||!pl)return null;const W=s
 window.__gfx={render:()=>composer.render(),side:()=>{const v=moonL.position.clone().sub(moonL.target.position),d=camera.getWorldDirection(new THREE.Vector3());return+(Math.acos((d.x*v.x+d.z*v.z)/Math.hypot(d.x,d.z)/Math.hypot(v.x,v.z))*57.3).toFixed(0)},get GFX(){return GFX},set:GFX_set,shChk:GFX_shChk,state(){const sh=moonL.shadow;return{on:GFX.on,day:GFX.day,tier:GFX.tier,tone:renderer.toneMapping===THREE.ACESFilmicToneMapping?'ACES':renderer.toneMapping,
  exp:renderer.toneMappingExposure,shadowMap:renderer.shadowMap.enabled,sunCast:moonL.castShadow,map:sh.mapSize.x,ext:sh.camera.right,sunEl:+(Math.asin(moonL.position.clone().sub(moonL.target.position).normalize().y)*57.3).toFixed(1),
  hemi:hemi.intensity,env:scene.environmentIntensity,plEnv:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.envMapIntensity,0)/GFX.pm.length).toFixed(2):0,plRough:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.roughness,0)/GFX.pm.length).toFixed(2):0,plMetal:GFX.pm.length?+Math.max(...GFX.pm.map(m=>m.metalness)).toFixed(2):0,plastic:GFX.n,ao:!!(GFX.gtao&&GFX.gtao.enabled),aoErr:GFX.aoErr||'',cast:GFX.cast||0,fc:GFX.fc,carCast:pl&&pl.mesh?(()=>{let c=0,n=0;pl.mesh.traverse(o=>{if(o.isMesh){n++;if(o.castShadow)c++}});return c+'/'+n})():'no pl'}}};
+// env-1: a varied, painted environment (docs/ENV_REVIEW.md items 1-5 + 7a). Colour/shader only: no heights, no new textures, +0 draw calls.
+// ENV_ground: world-space fbm colour patches with per-city/biome palettes (meadow + buttercup/daisy flower tint (smooth, no dots: dots alias into streaks), dry grass, dirt/sand, Wetterau field stripes),
+//   slope rock + height bands on hills (forest band, meadow, alpine crown; Taunus), distance haze toward the fog colour.
+// ENV_water: shallow turquoise -> deep ramp from the bank distance (aBank), fresnel sky, moving foam bands at the shore.
+// Phone low tier: 2 octaves, no flowers/strata/foam noise. ?env1=0 (or TUNE.env1=0) = the old look.
+function ENV_on(){if(ENV_on.v!==undefined)return ENV_on.v;let v=true;try{const q=new URLSearchParams(location.search).get('env1');if(q!==null)v=q!=='0';else if(typeof TUNE!=='undefined'&&TUNE.env1===0)v=false}catch(e){}return ENV_on.v=v}
+function ENV_lo(){try{if(typeof LK_lvl==='function'&&LK_lvl()==='low')return true;return typeof SET!=='undefined'&&SET.q==='low'}catch(e){return false}}
+// smooth value noise in JS (replaces the 250 m cell hash of the outer-land vertex colour)
+function ENV_vn(x,z){const h=(a,b)=>{const v=Math.sin(a*127.1+b*311.7)*43758.5453;return v-Math.floor(v)},i=Math.floor(x),j=Math.floor(z);let fx=x-i,fz=z-j;fx=fx*fx*(3-2*fx);fz=fz*fz*(3-2*fz);
+  const a=h(i,j),b=h(i+1,j),c=h(i,j+1),d=h(i+1,j+1);return a+(b-a)*fx+(c-a)*fz+(a-b-c+d)*fx*fz}
+function ENV_pal(kind){const fra=CID==='fra';
+  // [base, lush/dark, sun-dry, clover/yellow, dirt-sand] (sRGB hex, converted to linear by THREE.Color)
+  const P=kind==='lawn'?(fra?['#6ab035','#4f9a2c','#8fc44a','#a6c84a','#b8a46a']:['#98a85a','#7f9a4a','#a9b565','#b9b070','#c9a066'])
+    :kind==='hill'?(fra?['#5fae3a','#3f8f30','#9fc24c','#c8c455','#a08a62']:['#8a9a4e','#6b8a3e','#b9b070','#d2b673','#cfc4a8'])
+    :(fra?['#7cb646','#3a8432','#cdbf5c','#a8c84e','#a9885c']:['#9aa656','#7f9a5a','#b9b070','#d2b673','#c9a066']);
+  return P.map(h=>new THREE.Color(h))}
+function ENV_glsl(){return`
+float evH(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float evN(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(evH(i),evH(i+vec2(1.,0.)),f.x),mix(evH(i+vec2(0.,1.)),evH(i+vec2(1.)),f.x),f.y);}`}
+// opt: {kind:'land'|'hill'|'lawn', s:[3 scales m], tint:true -> keep the biome vertex colour as a tint relative to base}
+function ENV_ground(m,opt){if(!m||!ENV_on()||m.userData.env1)return;m.userData.env1=opt.kind;const lo=ENV_lo(),P=ENV_pal(opt.kind),s=opt.s||[900,260,70],base=new THREE.Color(opt.base||'#ffffff');
+  if(opt.kind==='hill')m.flatShading=false;if(opt.kind==='land')ENV_state.land=1;
+  const U={uEvP:{value:P},uEvB:{value:base}},v3=c=>`vec3(${c.r.toFixed(4)},${c.g.toFixed(4)},${c.b.toFixed(4)})`,C=h=>v3(new THREE.Color(h));
+  const ob=m.onBeforeCompile,ck=m.customProgramCacheKey;
+  m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);Object.assign(sh.uniforms,U);
+    sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vEvP;varying vec3 vEvN;')
+      .replace('#include <begin_vertex>','#include <begin_vertex>\nvEvP=(modelMatrix*vec4(transformed,1.)).xyz;vEvN=normalize(mat3(modelMatrix)*objectNormal);');
+    const fra=CID==='fra',K=opt.kind;
+    let f=`{vec3 p=vEvP;float dist=length(p-cameraPosition);
+ float n=${lo?`.62*evN(p.xz/${s[0].toFixed(1)})+.38*evN(p.xz/${s[1].toFixed(1)}+17.)`:`.5*evN(p.xz/${s[0].toFixed(1)})+.3*evN(p.xz/${s[1].toFixed(1)}+17.)+.2*evN(p.xz/${s[2].toFixed(1)}+31.)`};n=clamp((n-.5)*2.4+.5,0.,1.);
+ float n2=clamp((evN(p.xz/${(s[1]*.8).toFixed(1)}+53.)-.5)*1.8+.5,0.,1.);
+ vec3 pal=uEvP[0];pal=mix(pal,uEvP[1],1.-smoothstep(.22,.40,n));pal=mix(pal,uEvP[3],smoothstep(.55,.66,n)*.8);pal=mix(pal,uEvP[2],smoothstep(.70,.82,n));
+ pal=mix(pal,uEvP[4],smoothstep(.72,.84,n2)*${K==='lawn'?'.35':'.8'});`;
+    // texture detail kept as a luminance ratio (the neon dab texture no longer sets the hue); the biome vertex colour as a soft tint
+    f+=`
+ #ifdef USE_MAP
+ vec3 evT=texture2D(map,vMapUv).rgb,evA=texture2D(map,vMapUv,10.).rgb;float dl=dot(evT,vec3(.3,.59,.11))/max(dot(evA,vec3(.3,.59,.11)),.02);dl=mix(1.,dl,.55);
+ #else
+ float dl=1.;
+ #endif
+ vec3 tint=vec3(1.);
+ #ifdef USE_COLOR
+ ${opt.tint?'tint=clamp(vColor.rgb/max(uEvB,vec3(.01)),.55,1.6);tint=mix(vec3(1.),tint,.6);':''}
+ #endif
+ vec3 c=pal*dl*tint;`;
+    if(fra&&K==='land')f+=`
+ float fw=smoothstep(3400.,3600.,p.z);if(fw>0.){vec2 d1=vec2(.8,.6);float id=floor(dot(p.xz,d1)/40.)+floor(dot(p.xz,vec2(-.6,.8))/260.)*37.;float hs=evH(vec2(id,7.));
+  vec3 fc=hs<.25?${C('#d9c45a')}:hs<.33?${C('#f2d22e')}:hs<.58?${C('#8fbf3f')}:hs<.75?${C('#b58a55')}:${C('#6fbf3a')};c=mix(c,fc*dl,fw*.7);}`;
+    if(!lo&&K!=='hill')f+=`
+ float fl=smoothstep(.62,.8,evN(p.xz/14.+5.))*smoothstep(.45,.62,evN(p.xz/45.+3.));c=mix(c,mix(${C('#e8d95a')},${C('#f4f0e0')},step(.5,evH(floor(p.xz/40.)))),fl*.32);`;
+    if(K==='lawn')f+=`
+ c*=1.+.06*(step(.5,fract(dot(p.xz,vec2(.7071,.7071))/6.))-.5);`;
+    // slope rock with strata + height bands (Taunus) / limestone (Athens)
+    f+=`
+ float slope=1.-clamp(normalize(vEvN).y,0.,1.);`;
+    if(K==='hill')f+=fra?`
+ float y=p.y;c=mix(c,${C('#3f7a3a')}*dl,smoothstep(6.,14.,y)*(1.-smoothstep(38.,50.,y+n*8.))*.55);
+ c=mix(c,${C('#8cbf4a')}*dl,smoothstep(44.,56.,y+n*8.)*(1.-smoothstep(70.,80.,y))*.6);
+ c=mix(c,${C('#e8e2cc')}*dl,smoothstep(76.,90.,y+n*10.));
+ float rk=clamp(smoothstep(.12,.30,slope+.12*(n-.5))+smoothstep(.74,.86,n2)*smoothstep(35.,70.,y),0.,1.);`:`
+ float rk=smoothstep(.16,.36,slope+.12*(n-.5));`;
+    else f+=`
+ float rk=smoothstep(.30,.52,slope+.15*(n-.5))*smoothstep(2.,8.,p.y);`;
+    f+=`
+ vec3 rc=${fra?`mix(${C('#8c8478')},${C('#a69d8a')},n)`:`mix(${C('#cfc4a8')},${C('#e2d8c0')},n)`};${lo?'':'rc*=1.-.1*step(.5,fract(p.y/9.+n*.6));'}c=mix(c,rc*mix(1.,dl,.5),rk);`;
+    // aerial perspective: far land washes toward the fog colour before the fog itself
+    f+=`
+ #ifdef USE_FOG
+ c=mix(c,fogColor*1.05,smoothstep(600.,3000.,dist)*.5);
+ #endif
+ diffuseColor.rgb=c;}`;
+    sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vEvP;varying vec3 vEvN;uniform vec3 uEvP[5];uniform vec3 uEvB;'+ENV_glsl())
+      .replace('#include <color_fragment>','#include <color_fragment>\n'+f)};
+  m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|env1'+opt.kind+(lo?'l':'')};m.needsUpdate=true}
+function ENV_water(m){if(!m||!ENV_on()||m.userData.env1)return;m.userData.env1='water';ENV_state.water=1;const lo=ENV_lo(),ob=m.onBeforeCompile,ck=m.customProgramCacheKey,C=h=>{const c=new THREE.Color(h);return`vec3(${c.r.toFixed(4)},${c.g.toFixed(4)},${c.b.toFixed(4)})`};
+  m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);
+    sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>'+ENV_glsl()+'\nfloat evFr=0.;')
+      .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
+{float b=vBank;vec3 wc=mix(${C('#5ad1c8')},${C('#2fa3c9')},smoothstep(2.,18.,b));wc=mix(wc,${C('#12487a')},smoothstep(20.,55.,b));
+ ${lo?'':'normal=normalize(normal+vec3(evN(vWP.xz*.35+uT*.4)-.5,0.,evN(vWP.xz*.3-uT*.35+9.)-.5)*.10);'}
+ float fo2=smoothstep(6.,0.,b+sin(vWP.x*.35+uT*2.)*1.4);float cr=smoothstep(.45,.7,wvH(vWP.xz,uT)/.79*.5+.5);
+ float fb=smoothstep(.80,.95,sin((b${lo?'':'+evN(vWP.xz*.08)*6.'})*.9-uT*1.8)*.5+.5)*(1.-smoothstep(4.,16.,b))${lo?'':'*smoothstep(.25,.6,evN(vWP.xz*.15+uT*.05))'};
+ wc=mix(wc,vec3(.95,.98,1.),clamp(max(fo2*.85,cr*.3)+fb*.7,0.,1.));
+ evFr=pow(1.-clamp(dot(normalize(normal),normalize(vViewPosition)),0.,1.),3.);diffuseColor.rgb=wc*(1.-evFr*.2);}`)
+      .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=vec3(.62,.80,.98)*evFr*.16;');
+    if(!sh.fragmentShader.includes('float wvH'))sh.fragmentShader=sh.fragmentShader.replace('varying vec3 vWP;','varying vec3 vWP;\nfloat wvH(vec2 p,float t){return .38*sin(p.x*.045+t*1.6)+.26*sin(p.y*.09+p.x*.021-t*1.9)+.15*sin((p.x+p.y)*.13+t*2.7);}')};
+  m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|env1w'+(lo?'l':'')};m.needsUpdate=true}
+// hooks: water via the waterMat factory, city lawns + Taunus via ART_hub (after the city materials exist); outer land in worldGroundBuild
+waterMat=(f=>function(){const m=f.apply(this,arguments);try{ENV_water(m)}catch(e){console.warn('env1 water',e)}return m})(waterMat);
+ART_hub=(f=>function(){const r=f.apply(this,arguments);try{if(ENV_on()&&HUB){if(HUB.M)ENV_ground(HUB.M.grass,{kind:'lawn',s:[300,80,22]});ENV_ground(HUB.tauMat,{kind:'hill',s:[700,200,60]})}}catch(e){console.warn('env1',e)}return r})(ART_hub);
+// state for the checklist GO (env1/*): which materials are patched + a JS mirror of the palette mix (luminance spread of 200 outer-land points)
+function ENV_state(){const mats={};try{mats.lawn=!!(HUB.M&&HUB.M.grass&&HUB.M.grass.userData.env1);mats.hill=!!(HUB.tauMat&&HUB.tauMat.userData.env1);mats.land=!!ENV_state.land;mats.water=!!ENV_state.water}catch(e){}
+  const P=ENV_pal('land'),L=[],cl=new Set();for(let i=0;i<200;i++){const x=-7000+(i*7919%14000),z=-7000+(i*104729%14000),n=.5*ENV_vn(x/900,z/900)+.3*ENV_vn(x/260+17,z/260+17)+.2*ENV_vn(x/70+31,z/70+31),ss=(a,b,t)=>{t=Math.min(1,Math.max(0,(t-a)/(b-a)));return t*t*(3-2*t)};
+   n=Math.min(1,Math.max(0,(n-.5)*2.4+.5));const c=P[0].clone().lerp(P[1],1-ss(.22,.40,n)).lerp(P[3],ss(.55,.66,n)*.8).lerp(P[2],ss(.70,.82,n));const hsl={};c.getHSL(hsl);cl.add(Math.round(hsl.h*24)+'/'+Math.round(hsl.l*6));L.push(.2126*c.r+.7152*c.g+.0722*c.b)}
+  const mu=L.reduce((a,b)=>a+b,0)/L.length,sd=Math.sqrt(L.reduce((a,b)=>a+(b-mu)*(b-mu),0)/L.length);return{on:ENV_on(),lo:ENV_lo(),mats,lumSd:+sd.toFixed(3),relSd:+(sd/mu).toFixed(3),clusters:cl.size}}
+function ENV_go(kind){const s=ENV_state(),ok=b=>b?' ✅':' ❌';if(!s.on)return'📍 env-1 is OFF (?env1=0) ❌';
+  if(kind==='ground')return`ground: outer land ${s.mats.land?'patched':'NOT patched'}, lawns ${s.mats.lawn?'patched':'NOT patched'}; colour spread ${Math.round(s.relSd*100)} % (≥ 12 %), ${s.clusters} colour clusters (≥ 4)`+ok(s.mats.land&&s.mats.lawn&&s.relSd>=.12&&s.clusters>=4);
+  if(kind==='hills')return CID==='fra'?`hills: Taunus slope/height shader ${s.mats.hill?'on':'OFF'} (smooth shading ${HUB.tauMat&&!HUB.tauMat.flatShading?'yes':'no'})`+ok(s.mats.hill&&!HUB.tauMat.flatShading):`hills: Athens land slope shader ${s.mats.land?'on':'OFF'}`+ok(s.mats.land);
+  if(kind==='water')return CID==='fra'?`water: Main shader (bank ramp, fresnel, foam bands) ${s.mats.water?'on':'OFF'}`+ok(s.mats.water):'water: Athens has no water mesh (nothing to shade) ✅';return'?'}
+window.__env={state:ENV_state,go:ENV_go};
 // ---- AS world assets (asset-1, 2026-10-14): trees/bushes built from real LEGO parts (LDraw library, CCAL 2.0). Code + part data live in
 // models/as.js (src/assets/as/code.js + parts.js, packed by tools/as/pack.sh) and load by default (?asset=0 or localStorage od_asset=0 = the old trees);
 // the code is evaluated in this module's scope (it wraps buildHubProps, lzPropsG, propRevive, hubCullStep). Test hook window.__as.
