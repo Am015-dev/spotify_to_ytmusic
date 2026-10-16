@@ -757,6 +757,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.72',date:'16 Oct 2026',items:[{t:'FIXED',s:'Cars now stop at red lights and queue up.'},{t:'FIXED',s:'Far fewer crashes into roadside props.'},{t:'FIXED',s:'Trees no longer block the camera.'},{t:'CHANGED',s:'Slightly faster start.'}]},
   {v:'v90m-beta.71',date:'16 Oct 2026',items:[{t:'FIXED',s:'No more loose bricks floating in the Athens parks.'},{t:'CHANGED',s:'Lighter fir and cypress trees.'}]},
   {v:'v90m-beta.70',date:'16 Oct 2026',items:[{t:'NEW',s:'Brick-built LEGO trees in Frankfurt and Athens: 17 tree types, hedges and planters.'},{t:'CHANGED',s:'Traffic now uses all lanes.'},{t:'FIXED',s:'Pedestrians walk naturally and stay on the pavement.'}]},
   {v:'v90m-beta.69',date:'16 Oct 2026',items:[{t:'FIXED',s:'Your car no longer sinks into the grass on hills: it now drives on the ground you see.'}]},
@@ -1557,7 +1558,7 @@ function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c
 // XCV = chunk name -> content hash, filled by tools/build.sh (empty in a raw src/ page: then nothing is lazy). A chunk may export top-level names
 // (module list "name:a,b" in src/LAZY): the page declares `let a,b;` stubs, the chunk's last expression is ({a,b}) and XC.apply[name] copies them over.
 // Eager code must not touch a chunk's names at boot; use XC.done / XC_need(name) first. Tests: __tq.ready also waits for XC.done.
-const XCV=/*XCV*/{"99c_checklist":"226b5678","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"1c0af6f5","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -4423,7 +4424,9 @@ function roofAt(){return null}
 function hubAddB(b,to){if(b.ry!=null){const c=Math.cos(b.ry),s=Math.sin(b.ry);if(Math.abs(s)<1e-3||Math.abs(c)<1e-3){if(Math.abs(s)>.5){const t=b.hw;b.hw=b.hd;b.hd=t}}else{b.c=c;b.s=s}}(to||HUB.bld).push(b);return b}
 function bHit(b,x,z,rad){const dx=x-b.x,dz=z-b.z;let lx=dx,lz=dz;if(b.c!=null){lx=dx*b.c-dz*b.s;lz=dx*b.s+dz*b.c}const ex=Math.abs(lx)-b.hw,ez=Math.abs(lz)-b.hd;if(ex>=rad||ez>=rad)return false;if(ex<=0||ez<=0)return true;return ex*ex+ez*ez<rad*rad}
 const bExt=b=>b.c==null?[b.hw,b.hd]:[Math.abs(b.c)*b.hw+Math.abs(b.s)*b.hd,Math.abs(b.s)*b.hw+Math.abs(b.c)*b.hd];
-function roamHit(x,z,rad,y=0){const L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));if(!L)return null;const LP=TUNE.lowProp??1.3;/* race-1: colliders lower than 1.3 m (kerb / barrier / cone pieces) are stepped over, never beach the car */for(const b of L){if(y>=(b.h||999)-.6||(b.h&&b.h<LP)||(b.y0!=null&&y<b.y0))continue;if(bHit(b,x,z,rad))return b}return null}
+function roamHit(x,z,rad,y=0){const L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));if(!L)return null;const LP=TUNE.lowProp??1.3;/* race-1: colliders lower than 1.3 m (kerb / barrier / cone pieces) are stepped over, never beach the car */for(const b of L){if(y>=(b.h||999)-.6||(b.y0!=null&&y<b.y0))continue;if(b.h&&bLow(b,LP))continue;if(bHit(b,x,z,rad))return b}return null}
+// walls-1: b.h is an ABSOLUTE top (ground + height), so the old `b.h<1.3` never matched above sea level (Frankfurt ground ~30, Athens ~145). Height above ground, cached per collider.
+function bLow(b,LP){if(b.rh===undefined){const g=b.y0!=null?b.y0+1.5:groundY(b.x,b.z);b.rh=b.h-g}return b.rh<LP}
 // push a point out of a collider along its nearest face (local frame for oriented boxes); returns [x,z,'x'|'z' world axis of the push]
 function bldPush(b,x,z,rad){const dx=x-b.x,dz=z-b.z;if(b.c==null){const xf=Math.abs(dx)/(b.hw+rad)>Math.abs(dz)/(b.hd+rad);return xf?[b.x+Math.sign(dx||1)*(b.hw+rad+.05),z,'x']:[x,b.z+Math.sign(dz||1)*(b.hd+rad+.05),'z']}
   let lx=dx*b.c-dz*b.s,lz=dx*b.s+dz*b.c;const xf=Math.abs(lx)/(b.hw+rad)>Math.abs(lz)/(b.hd+rad);if(xf)lx=Math.sign(lx||1)*(b.hw+rad+.05);else lz=Math.sign(lz||1)*(b.hd+rad+.05);
@@ -6014,13 +6017,16 @@ function roamStep(dt){const s=pl;if(!s)return;if(Math.abs(RO.h)>50){RO.h-=Math.r
      if(best!=null){RO.crTurn=best;RO.yr=0;RO.v=Math.max(RO.v,10);RO.stkT=0}else if(RO.stkT>2){RO.v=c.brk&&!c.thr?8:-8;RO.stkT=0;say('','UNSTUCK',.6)}}}
   const grip=(air?.6:terr==='water'?2.6:terr==='dirt'?(veh==='offroad'?20:14):TUNE.gripRoad)*(RO.dDir?(terr==='road'?TUNE.drGrip:.22):1);RO.vh=(RO.vh??RO.h)+(C26.on?C26_vhStep(RO,angDiff(RO.h,RO.vh??RO.h),grip,dt,sp,C26_cityMu(terr,veh),air||!!RO.dDir||busy):angDiff(RO.h,RO.vh??RO.h)*Math.min(1,dt*grip));if(C26.on&&!RO.dDir){const b=angDiff(RO.h,RO.vh),sm=TUNE.slipMax??.6/* drive26: max slip outside drift (was .6) */;if(Math.abs(b)>sm)RO.vh=RO.h-Math.sign(b)*sm;if(!air)RO.v-=RO.v*Math.sin(b)**2*C26.scrub*dt}s.latV=Math.sin(angDiff(RO.h,RO.vh))*sp;
   if(Math.abs(angDiff(RO.h,RO.vh))>.25&&sp>25&&!air&&(terr!=='road'))RO.v-=RO.v*.08*dt;
+  /* walls-1 (2K-style bumper): a solid collider dead ahead inside braking distance eases the car down to a glancing speed (TUNE.wallV km/h, default 26 < dmgGlance) so a hands-off or full-gas driver scrapes walls with sparks, not damage. TUNE.wallAssist=0 off. */
+  if(TUNE.wallAssist!==0&&RO.v>(TUNE.wallV??26)/3.6+.5&&!air&&!busy&&!RO.dDir){const wv=(TUNE.wallV??26)/3.6,ba=TUNE.wallDec??14,sx=Math.sin(RO.vh),sz=Math.cos(RO.vh),reach=Math.max(0,(RO.v*RO.v-wv*wv)/(2*ba))+3;let wd=-1;for(let d=3;d<=reach+1.5;d+=3){if(roamHit(RO.x+sx*d,RO.z+sz*d,2.4,RO.y)){wd=d;break}}
+   if(wd>=0){const lim=Math.sqrt(wv*wv+2*ba*Math.max(0,wd-3.5));if(RO.v>lim)RO.v=Math.max(lim,RO.v-ba*1.6*dt)}}
   const fx=Math.sin(RO.vh),fz=Math.cos(RO.vh);let nx=RO.x+fx*RO.v*dt,nz=RO.z+fz*RO.v*dt;
   const N=roamTerr(nx,nz,RO.y+.3);
   if(N.low){let pop=false;for(const b of ALL_DECKS){const h=deckAt(b,nx,nz);if(h!=null&&h-RO.y<4.5){RO.y=h;RO.vy=Math.max(RO.vy,3);pop=true}}
-    if(!pop){const ax=roamTerr(nx,RO.z,RO.y+.3).low;roamBounce(ax?'x':'z',sp);nx=RO.x;nz=RO.z}}
+    if(!pop){const ax=roamTerr(nx,RO.z,RO.y+.3).low;RO.tb=1;try{roamBounce(ax?'x':'z',sp)}finally{RO.tb=0}nx=RO.x;nz=RO.z}}
   else if(N.g>RO.y+1.4&&!air){if(ground<-1.5&&N.g<=.5&&RO.v>10){RO.vy=16;RO.y+=.1;award(s,'BANK HOP',6,150,'#4ceaff');AU.sfx('launch');nx=RO.x;nz=RO.z}
     else if(N.g-RO.y<8&&RO.ramps.some(r=>Math.hypot(nx-r.x,nz-r.z)<r.len)){RO.y=N.g;RO.vy=Math.max(RO.vy,4)}
-    else{const ax=roamTerr(nx,RO.z,RO.y+.3).g>RO.y+1.4;roamBounce(ax?'x':'z',sp);nx=RO.x;nz=RO.z}}
+    else{const ax=roamTerr(nx,RO.z,RO.y+.3).g>RO.y+1.4;RO.tb=1;try{roamBounce(ax?'x':'z',sp)}finally{RO.tb=0}nx=RO.x;nz=RO.z}}
   else if(air&&N.g>RO.y+.2){nx=RO.x;nz=RO.z}
   // deck walls keep you on the road
   if(T0.deck&&!air){const b=T0.deck,lim=b.w/2-1.6,dl=deckLocal(b,nx,nz);if(Math.abs(dl[1])>lim&&Math.abs(dl[0])<b.half-2){const q=deckPt(b,dl[0],Math.sign(dl[1])*lim);nx=q[0];nz=q[1];{const ua=Math.atan2(b.ux,b.uz);let e=angDiff(ua,RO.h);if(Math.abs(e)>Math.PI/2)e=angDiff(ua+Math.PI,RO.h);RO.h+=e*Math.min(1,dt*6)}if(sp>20){RO.v*=1-.5*dt;if(R()<.4)burst(SPARK,V3(nx,RO.y+1.2,nz),6,12,.3,new THREE.Color(2,1.4,.6))}}}
@@ -18316,7 +18322,7 @@ function DMG_impact(v,o){if(!DMG.on||state!=='roam'||RO.wk||(RO.inv||0)>0)return
 DMG.wall=(kmh,deg)=>DMG_impact(kmh*Math.sin((deg??90)*Math.PI/180));
 // collisions → DMG_impact: walls (roamBounce knows the normal speed), traffic (the closing speed), the rest (falls, quest walls) keep their own amount
 roamBounce=(f=>function(ax,sp,nX,nZ){if(!DMG.on)return f.apply(this,arguments);const vx=Math.sin(RO.vh)*RO.v,vz=Math.cos(RO.vh)*RO.v;let X=nX,Z=nZ;if(X==null){if(ax==='x'){X=-(Math.sign(vx)||1);Z=0}else{X=0;Z=-(Math.sign(vz)||1)}}
- DMG.vn=Math.max(0,-(vx*X+vz*Z))*3.6;if(nX==null&&!TUNE.terrDmg)DMG.vn=Math.min(DMG.vn,(TUNE.dmgGlance??32)-1);/* race-1: terrain banks / kerbs / water edge (no collider normal) scrub speed and spark but never cost health; buildings, props and traffic do */try{return f.apply(this,arguments)}finally{DMG.vn=null}})(roamBounce);
+ DMG.vn=Math.max(0,-(vx*X+vz*Z))*3.6;if((nX==null||RO.tb)&&!TUNE.terrDmg)DMG.vn=Math.min(DMG.vn,(TUNE.dmgGlance??32)-1);/* race-1: terrain banks / kerbs / water edge (no collider normal) scrub speed and spark but never cost health; buildings, props and traffic do */try{return f.apply(this,arguments)}finally{DMG.vn=null}})(roamBounce);
 roamDamage=(f=>function(d){if(!DMG.on)return f(d);if(DMG.vn!=null)return DMG_impact(DMG.vn);if(d===5&&TUNE.smashDmg!==1)return 0;/* race-1: smashing a car you overtake / clip costs no health (2K: smash = reward); only head-on (12) hurts */if(d===12&&TUNE.smashDmg!==1){if(RO.wk||(RO.inv||0)>0||state!=='roam')return 0;/* head-on traffic smash: flat 4 % scrape + 1.2 s grace (not a 'hit' for lastHit) */RO.hp=Math.max(1,(RO.hp??100)-4/DMG_cls());RO.inv=1.2;DMG.lastHit=performance.now();return 4}
  if(d===5||d===12)return DMG_impact(Math.abs(RO.v)*3.6*(d===12?1.3:.8));
  if(RO.wk||(RO.inv||0)>0||d<1||state!=='roam')return;RO.hp=Math.max(0,(RO.hp??100)-d/DMG_cls());DMG.lastHit=performance.now();if(RO.hp<=0){DMG.n.boom++;DMG.tBoom=performance.now();DMG_panels(0);roamWreck()}})(roamDamage);
@@ -18332,9 +18338,9 @@ roamStep=(f=>function(dt){const r=f(dt);try{if(state==='roam'&&(!RO.foot||RO.foo
 // bump above 25 km/h knocks 2-4 bricks off it (its own colour) and costs you the same graded damage (DMG_impact); 0.6 s per-car cooldown.
 function DMG_rel(c,dx,dz){const v=c.cv??c.v??0,vx=Math.sin(RO.vh)*RO.v-dx*v,vz=Math.cos(RO.vh)*RO.v-dz*v;return Math.hypot(vx,vz)*3.6}
 function DMG_traf(c,x,z,dx,dz,crLg,pin){if(!DMG.on)return crLg||pin||Math.abs(RO.v)>CR_SMASHV;const rel=DMG_rel(c,dx,dz);DMG.tRel=rel;if(crLg||rel>60||Math.abs(RO.v)>CR_SMASHV){DMG.n.burst=(DMG.n.burst||0)+1;return true}
- const t=performance.now();if(rel>25&&t-(c.dmT||0)>600){c.dmT=t;DMG.n.trafHit=(DMG.n.trafHit||0)+1;let col=null;try{col=new THREE.Color(HCOL[(c.j*3+c.k)%HCOL.length])}catch(e){}
+ const t=performance.now();if(rel>25&&t-(c.dmT||0)>(TUNE.trafCd??4000)){/* walls-1: one bump per car per 4 s (was 0.6 s: shoving a stopped car re-hurt every 0.6 s); a bump below the 60 km/h smash threshold is scaled 0.5 = sparks only (smash = reward) */c.dmT=t;DMG.n.trafHit=(DMG.n.trafHit||0)+1;let col=null;try{col=new THREE.Color(HCOL[(c.j*3+c.k)%HCOL.length])}catch(e){}
   const n=clamp(Math.round(2+(rel-25)/15),2,4),src=[];for(let i=0;i<n;i++)src.push([new THREE.Vector3(x+rr(-.8,.8),(c.y||RO.y)+rr(.6,1.4),z+rr(-.8,.8)),col]);DMG_throw(n,src,rel);
-  try{burst(SPARK,V3(x,(c.y||RO.y)+1,z),10,7,.35,new THREE.Color(2,1.6,.9))}catch(e){}DMG_impact(rel)}
+  try{burst(SPARK,V3(x,(c.y||RO.y)+1,z),10,7,.35,new THREE.Color(2,1.6,.9))}catch(e){}DMG_impact(rel*(TUNE.trafK??.5))}
  return false}
 // ---- 📍 GO + test: the default ride on a straight street, then the scripted hits (the same DMG_impact the collisions call)
 function DMG_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!DMG.on)return'📍 Damage is off (?dmg=0)';try{OF_reset()}catch(e){}if(RO.wk){RO.wk=null;try{RBRK.visible=false;pl.mesh.visible=true}catch(e){}}
@@ -18482,6 +18488,14 @@ function GFX_shChk(){const sh=moonL.shadow;if(!sh.map||!pl)return null;const W=s
 window.__gfx={render:()=>composer.render(),side:()=>{const v=moonL.position.clone().sub(moonL.target.position),d=camera.getWorldDirection(new THREE.Vector3());return+(Math.acos((d.x*v.x+d.z*v.z)/Math.hypot(d.x,d.z)/Math.hypot(v.x,v.z))*57.3).toFixed(0)},get GFX(){return GFX},set:GFX_set,shChk:GFX_shChk,state(){const sh=moonL.shadow;return{on:GFX.on,day:GFX.day,tier:GFX.tier,tone:renderer.toneMapping===THREE.ACESFilmicToneMapping?'ACES':renderer.toneMapping,
  exp:renderer.toneMappingExposure,shadowMap:renderer.shadowMap.enabled,sunCast:moonL.castShadow,map:sh.mapSize.x,ext:sh.camera.right,sunEl:+(Math.asin(moonL.position.clone().sub(moonL.target.position).normalize().y)*57.3).toFixed(1),
  hemi:hemi.intensity,env:scene.environmentIntensity,plEnv:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.envMapIntensity,0)/GFX.pm.length).toFixed(2):0,plRough:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.roughness,0)/GFX.pm.length).toFixed(2):0,plMetal:GFX.pm.length?+Math.max(...GFX.pm.map(m=>m.metalness)).toFixed(2):0,plastic:GFX.n,ao:!!(GFX.gtao&&GFX.gtao.enabled),aoErr:GFX.aoErr||'',cast:GFX.cast||0,fc:GFX.fc,carCast:pl&&pl.mesh?(()=>{let c=0,n=0;pl.mesh.traverse(o=>{if(o.isMesh){n++;if(o.castShadow)c++}});return c+'/'+n})():'no pl'}}};
+// boot-1 (2026-10-16): the first roam frame switched GFX on (ACES, sun shadow, glossy plastic keys) and relinked ~60 programs (10 s stalled frame at software GL, right after "Ready").
+// Apply the roam-day GFX state once inside the loader, just before its program warm-up, so ldPrewarm links the programs the first frame draws. ?bootgfx=0 = old order.
+const GFX_BOOTPRE=!/[?&]bootgfx=0/.test(location.search);
+function GFX_pre(){if(!GFX.on||!GFX_BOOTPRE)return;const ro=RO.on;RO.on=true;
+ try{try{GFX_light()}catch(e){}try{GFX_shadow()}catch(e){}try{GFX_car()}catch(e){}try{if(RO.shadowOn)GFX_cast()}catch(e){}try{GFX_plastic(scene)}catch(e){}}finally{RO.on=ro}}
+{const _lp=ldPrewarm,_pc=P2_compile;let on=false;
+ ldPrewarm=async function(...a){on=true;try{return await _lp.apply(this,a)}finally{on=false}};
+ P2_compile=function(sc,cam){if(on){on=false;GFX_pre()}return _pc.call(this,sc,cam)}}
 // env-1: a varied, painted environment (docs/ENV_REVIEW.md items 1-5 + 7a). Colour/shader only: no heights, no new textures, +0 draw calls.
 // ENV_ground: world-space fbm colour patches with per-city/biome palettes (meadow + buttercup/daisy flower tint (smooth, no dots: dots alias into streaks), dry grass, dirt/sand, Wetterau field stripes),
 //   slope rock + height bands on hills (forest band, meadow, alpine crown; Taunus), distance haze toward the fog colour.
@@ -18591,14 +18605,14 @@ if(AS_ON){const s=document.createElement('script');s.src='models/as.js';s.onload
 // Code lives in models/xf.js (src/assets/xf/code.js, packed by tools/xf/pack.sh), eval'd here in the module scope, so the page grows by this stub only.
 // ?xf=0 = off for one visit. Test hook window.__xf (GOS = checklist xf1/* GOs, tools/tXf.js).
 if(!/[?&]xf=0\b/.test(location.search)){const s=document.createElement('script');s.src='models/xf.js';s.onload=()=>{try{eval(window.__XFJ)}catch(e){console.warn('XF load',e)}};document.head.appendChild(s)}
-/* ===== L3 · life-3: smarter traffic and natural pedestrians. default ON since life-4 (?l3=0 / od_l3=0 = off); the stop-line guard + red-light audit only with ?l3lt=1 (WIP). Test hook window.__l3 (GOs life3/*) =====
+/* ===== L3 · life-3: smarter traffic and natural pedestrians. default ON since life-4 (?l3=0 / od_l3=0 = off); the stop-line guard + red-light audit ON since lights-3 (?l3lt=0 off). Test hook window.__l3 (GOs life3/*) =====
    1. Lanes: every car keeps a lane (inner -1 / outer +1) on 2-lane-per-direction roads (≥ 14 m), passes slower cars and moves to the turn side
       before a junction (smooth 2.5 s change, only into a free gap). The old drive-flow pass put every car in the outer lane (c.lane=.36).
-   2. Signals: the CV junction logic (90_fixes_cv_ju.js) already stops, queues and releases cars; life-4 adds stop lines from each car's route (L3_edges/L3_stop/L3_guard, ?l3lt=1) and audits runs and queue overlaps.
+   2. Signals: the CV junction logic (90_fixes_cv_ju.js) already stops, queues and releases cars; life-4 adds stop lines from each car's route (L3_edges/L3_stop/L3_guard, ON; ?l3lt=0 off) and audits runs and queue overlaps.
    3. Pedestrians: minifig walk cycle (leg + opposite arm swing scaled by speed, bob at mid-stance, hip roll, torso twist, smooth turns, head look),
       speed variety, idles (look at phone, look around, chat in pairs), sidestep each other. They still leap aside from the player's car.
    4. Hazard blinkers on some parked cars (reuses the CV blinker mesh: no new draw call). */
-const L3_ON=!/[?&]l3=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3')!=='0'}catch(e){return true}})()/* life-4: ON by default (?l3=0 or od_l3=0 turns it off) */,L3_LT=L3_ON&&(/[?&]l3lt=1/.test(location.search)||(()=>{try{return localStorage.getItem('od_l3lt')==='1'}catch(e){return false}})())/* stop-line guard + red-light audit: OFF by default again in rev-71 (flaky: 3-4 red-light runs at node 115 in 2 of 5 gate runs); ?l3lt=1 or od_l3lt=1 = on */,L3={lc:0,acc:0,pacc:0,run:0,ent:0,ov:0,qs:0,idle:0,chat:0};
+const L3_ON=!/[?&]l3=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3')!=='0'}catch(e){return true}})()/* life-4: ON by default (?l3=0 or od_l3=0 turns it off) */,L3_LT=L3_ON&&!/[?&]l3lt=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3lt')!=='0'}catch(e){return true}})()/* stop-line guard + red-light audit: ON again since lights-3 (node 115 runs fixed); ?l3lt=0 or od_l3lt=0 = off */,L3={lc:0,acc:0,pacc:0,run:0,ent:0,ov:0,qs:0,idle:0,chat:0};
 function L3_ad(a,b){let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d}
 // lateral offset (from the edge's node line) of lane s∈[-1,1] for car c on edge A→B; null = no two lanes here
 function L3_off(c,A,B,s){if(!A||!B||A.ab||c.pk||c.tr)return null;if(A.g||B.g)return RD_ON&&(A.w||0)>=14?s*Math.min(A.w,B.w||A.w)*.11:null;const W=Math.min(A.w||20,B.w||20);return W>=14?W*(.27+.09*s):null}
@@ -18616,28 +18630,31 @@ function L3_near(c){if(c.dead>0||c.pk)return null;const N=HUB.nodes,A=N[c.a],B=N
 // red-light audit: a car that was outside every signalled box on the previous step and is inside one now, on an approach whose light is red, with
 // no reservation from before the line. Cars that spawn or jump into a box (no "outside" step before) are not entries.
 function L3_audit(){if(!CV.sig.length)return;for(const c of HUB.cars){const h=L3_near(c);if(!h){c.l3Q=null;continue}let In=null;CV_near(c.x,c.z,J=>J.sig&&Math.hypot(J.x-c.x,J.z-c.z)<J.R0&&(In=J));
-  if(In&&c.l3Q===0&&c.l3P!==In&&Math.hypot(c.x-c.l3x,c.z-c.l3z)<4/* a respawn or recycle jump is not an entry */){let k=-1,bd=.3;In.ap.forEach((g,i)=>{const v=g.dx*h[0]+g.dz*h[1];if(v>bd){bd=v;k=i}});if(k>=0&&In.ap.length>1){L3.ent++;const t0=In.res&&In.res.get(c);
+  if(In&&c.l3Q===0&&c.l3P!==In&&Math.hypot(c.x-c.l3x,c.z-c.l3z)<4/* a respawn or recycle jump is not an entry */){let k=-1,bd=.3;In.ap.forEach((g,i)=>{const v=g.dx*h[0]+g.dz*h[1];if(v>bd){bd=v;k=i}});if(k>=0&&In.ap.length>1){L3.ent++;const t0=Math.min(In.res&&In.res.get(c)||1e9,c.l3G===In&&CV.t-c.l3Gt<15?c.l3Gt:1e9)/* lights-3: committed on green/amber before the line = legal */;
     if(CV_st(In,k)==='r'&&!(t0<CV.t-.05)){L3.run++;const S=c.l3S;L3.rl=[Math.round(c.x),Math.round(c.z),c.a,c.b,+(c.t||0).toFixed(2),!S?'none':S.J!==In?'other':'k'+S.k+'/'+k+(c.l3V!=null?'g':''),'v'+(c.cv||0).toFixed(1),S&&'S'+(S.J.x|0)+','+(S.J.z|0)+' d'+S.d.toFixed(1),'box'+(In.x|0)+','+(In.z|0)+' R'+(In.R0|0),c.RDy];(L3.rls=L3.rls||[]).push(L3.rl)}}}
   if(In)c.l3P=In;else if(c.l3P&&Math.hypot(c.l3P.x-c.x,c.l3P.z-c.z)>c.l3P.R0+6)c.l3P=null;c.l3Q=In?1:0;c.l3x=c.x;c.l3z=c.z}}
 // stop lines from the route (life-4): every road edge knows the first signalled box it runs into (distance from its start to the circle, the
 // approach k the audit will see from that heading). A car checks its own edge, then the edge it takes next (its route, or every exit of B when it
 // has none and B is close), so it never needs to be "matched" by a proximity box. Red/late amber: brake to 2 m before the line; leads queue it.
 function L3_edges(){const N=HUB.nodes,NG=N.ng,K=CV.K,E=new Map();for(let i=0;i<NG;i++){const A=N[i];if(A.ab)continue;for(const j of A.nb){if(j>=NG)continue;const B=N[j];if(B.ab)continue;
-  const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L;let best=null;for(const J of CV.sig){if(J.ap.length<2)continue;const rx=J.x-A.x,rz=J.z-A.z;if(Math.abs(rx)>L+40||Math.abs(rz)>L+40)continue;
-    const p=rx*hx+rz*hz,q=Math.abs(rx*hz-rz*hx),R=J.R0+3/* the audit box is a bit wider than R0: edges that only graze the corner still enter it */;if(p<=0||q>=R)continue;/* heading away: leaving that box */const s=Math.max(0,p-Math.sqrt(R*R-q*q));/* 0: starts inside a big merged box but still heads in (lane-offset cars are outside) */if(s>L||best&&s>=best.s)continue;
-    let k=-1,bd=.3;J.ap.forEach((g,m)=>{const v=g.dx*hx+g.dz*hz;if(v>bd){bd=v;k=m}});if(k>=0)best={J,k,s}}if(best)E.set(i*K+j,best)}}L3.E=E;return E}
+  const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L,ln=A.g||B.g?0:Math.min(A.w||20,B.w||20)*.31;const all=[];for(const J of CV.sig){if(J.ap.length<2)continue;const rx=J.x-A.x,rz=J.z-A.z;if(Math.abs(rx)>L+40||Math.abs(rz)>L+40)continue;
+    const p=rx*hx+rz*hz,q=Math.abs(-rx*hz+rz*hx-ln)/* lights-3: from the lane the car drives in, not the centreline (93>105 missed box 608,-97 by 1.5 m while its cars cut 3 m into it) */,R=J.R0+3/* the audit box is a bit wider than R0: edges that only graze the corner still enter it */;if(p<=0||q>=R)continue;/* heading away: leaving that box */const s=Math.max(0,p-Math.sqrt(R*R-q*q));/* 0: starts inside a big merged box but still heads in (lane-offset cars are outside) */if(s>L)continue;
+    let k=-1,bd=.3;J.ap.forEach((g,m)=>{const v=g.dx*hx+g.dz*hz;if(v>bd){bd=v;k=m}});if(k>=0)all.push({J,k,s})}if(all.length)E.set(i*K+j,all.sort((a,b)=>a.s-b.s))/* every box on the edge in order (long edges cross two) */}}L3.E=E;return E}
 function L3_stop(c,h){const N=HUB.nodes,K=CV.K,E=L3.E||L3_edges(),A=N[c.a],B=N[c.b];if(!A||!B)return null;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,pos=(c.t||0)*L,rem=L-pos;
   const at=(J,k,d0)=>{const rx=J.x-c.x,rz=J.z-c.z,l=Math.hypot(rx,rz);if(l<J.R0)return null;const p=rx*h[0]+rz*h[1],q=Math.abs(rx*h[1]-rz*h[0]);return{J,k,d:q<J.R0&&p>0?p-Math.sqrt(J.R0*J.R0-q*q):Math.max(d0,l-J.R0)}};
-  let best=null;const e=E.get(c.a*K+c.b);if(e&&pos<e.s+12){const S=at(e.J,e.k,e.s-pos);if(S)best=S}/* nearest stop line ahead wins: current edge's box vs the boxes on the next edges */if(rem>45)return best;const nx=c.route&&c.route.length?[c.route[0]]:B.nb.filter(n=>n!==c.a);
-  for(const n of nx){const f=E.get(c.b*K+n);if(!f)continue;const S=at(f.J,f.k,rem+f.s);if(S&&(!best||S.d<best.d))best=S}return best}
+  let best=null;for(const e of E.get(c.a*K+c.b)||[]){if(pos>=e.s+12)continue;const S=at(e.J,e.k,e.s-pos);if(S){best=S;break}}/* nearest stop line ahead wins: current edge's box vs the boxes on the next edges */if(rem>45)return best;const nx=c.route&&c.route.length?[c.route[0]]:B.nb.filter(n=>n!==c.a);
+  for(const n of nx){const f=(E.get(c.b*K+n)||[])[0];if(!f)continue;const S=at(f.J,f.k,rem+f.s);if(S&&(!best||S.d<best.d))best=S}return best}
 // spacing (lights-1): the CV box hold only stops a follower once its leader is < 6 m ahead, so queued cars end up 2.6-3.5 m nose to nose. Cap every
 // car's speed so it stops 5.2 m (centre to centre) behind the nearest car ahead in its lane.
 function L3_space(c){if(!CV.G||c.pk)return;const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16),hx=c.CVhx,hz=c.CVhz;if(hx==null)return;let vm=1e9;
   for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of CV.G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0)continue;const rx=o.x-c.x,rz=o.z-c.z,al=rx*hx+rz*hz;if(al<=0||al>16)continue;if(Math.abs(-rx*hz+rz*hx)>1.6||o.CVhx*hx+o.CVhz*hz<.8)continue;vm=Math.min(vm,Math.sqrt(6.4*Math.max(0,al-5.2)+(o.cv||0)*(o.cv||0)))}
   if(vm<(c.cv||0)){if(c.l3V==null)c.l3V=c.v;c.v=Math.min(c.v,vm);c.cv=Math.min(c.cv||0,vm);L3.sp=(L3.sp||0)+1}}
 function L3_guard(){for(const c of HUB.cars){c.l3V=null;c.l3S=null;const h=L3_near(c);if(!h)continue;L3_space(c);const S=c.l3S=L3_stop(c,h);if(!S||S.d>60)continue;const{J,k,d}=S,v0=c.cv||0,res=J.res||(J.res=new Map());
-  if(res.has(c))continue;const st=CV_st(J,k),go=st==='g'||st==='y'&&d<v0*v0/12+1.5;if(go){if(d<6||st==='y')res.set(c,CV.t);/* amber: committed */continue}
-  const vm=Math.sqrt(10*Math.max(0,d-2));c.l3V=c.v;c.v=Math.min(c.v,vm);c.cv=Math.min(v0,vm);c.RDy='sig';L3.gd=(L3.gd||0)+1}}
+  if(res.has(c))continue;const st=CV_st(J,k),go=st==='g'||st==='y'&&d<v0*v0/12+1.5;if(go){if(d<6||st==='y'){res.set(c,CV.t);if(c.l3G!==J){c.l3G=J;c.l3Gt=CV.t}}/* amber: committed. l3G keeps the FIRST commit time: CV drops the reservation of a car on an edge that only grazes the box (centre behind it) and the guard re-adds it every step */continue}
+  /* lights-3: node 115 (612,-2) sits ~2 m outside its box. A car creeping to the line reached the node, switched edge and the new edge's lane offset put it
+     ~4 m sideways INSIDE the box (most red runs). When the box is near the end of the edge, stop 2 m before the node instead. */
+  const A=HUB.nodes[c.a],B=HUB.nodes[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1,rem=L*(1-(c.t||0)),dd=Math.hypot(B.x-J.x,B.z-J.z)<J.R0+9?Math.min(d,rem):d;
+  const vm=Math.sqrt(10*Math.max(0,dd-2));c.l3V=c.v;c.v=Math.min(c.v,vm);c.cv=Math.min(v0,vm);c.RDy='sig';L3.gd=(L3.gd||0)+1}}
 // queue overlaps: two nearly stopped cars, same heading, bodies intersecting (< 4 m nose to tail, < 1.6 m apart sideways)
 function L3_overlaps(P){const G=CV.G;if(!G)return 0;let n=0;for(const L of G.values())for(const c of L)if(!(c.dead>0)&&(c.cv||0)<1)for(const o of L){if(o===c||o.dead>0||(o.cv||0)>=1)continue;const rx=o.x-c.x,rz=o.z-c.z,al=rx*c.CVhx+rz*c.CVhz;if(al>0&&al<4&&Math.abs(-rx*c.CVhz+rz*c.CVhx)<1.6&&o.CVhx*c.CVhx+o.CVhz*c.CVhz>.8){n++;if(P)P.add(HUB.cars.indexOf(c)+'>'+HUB.cars.indexOf(o))}}return n}
 function L3_hazards(){const im=CV.im;if(!im||!(((CV.t*2.2)|0)%2))return;let n=im.count;for(const c of HUB.cars){if(!c.pk||c.dead>0||(c.j*5+c.k)%3||n>=156)continue;if(Math.abs(c.x-RO.x)>150||Math.abs(c.z-RO.z)>150)continue;const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B)continue;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L;
@@ -18672,7 +18689,7 @@ function L3_pose(p,i,x,z,h,S2,air,S,d,sp,dt){if(air||p.cw||S||p.spin)return fals
   L3_part(Q.head,i,0,3.32,0,hx,hy+tw,0);L3_part(Q.hair,i,0,3.62,0,hx,hy+tw,0);return true}
 if(L3_ON){
   buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);L3.E=null;try{L3_pedInit()}catch(e){console.warn('L3',e)}return r})(buildHubTraffic);
-  hubTrafficStep=(f=>function(dt){if(!HUB.cars||!HUB.nodes)return f.apply(this,arguments);try{L3.acc+=dt;if(L3.acc>=.2){L3.acc=0;L3_tick()}for(const c of HUB.cars){if(c.l3t==null)continue;if(c.l3c>0)c.l3c-=dt;const e=c.l3t-c.l3s;if(e)c.l3s+=Math.sign(e)*Math.min(Math.abs(e),dt*.8)}L3_pedPre(dt);if(CV.G&&L3_LT)L3_guard()}catch(e){console.warn('L3',e)}
+  hubTrafficStep=(f=>function(dt){if(!HUB.cars||!HUB.nodes)return f.apply(this,arguments);try{L3.acc+=dt;if(L3.acc>=.2){L3.acc=0;L3_tick()}for(const c of HUB.cars){if(c.l3t==null)continue;if(c.l3c>0)c.l3c-=dt;const e=c.l3t-c.l3s;if(e&&(c.cv||0)>1/* lights-3: a stopped car does not slide sideways (it drifted into the box at the line) */)c.l3s+=Math.sign(e)*Math.min(Math.abs(e),dt*.8)}L3_pedPre(dt);if(CV.G&&L3_LT)L3_guard()}catch(e){console.warn('L3',e)}
     const r=f.apply(this,arguments);try{for(const c of HUB.cars)if(c.l3V!=null){c.v=c.l3V;c.l3V=null}L3_pedPost();if(L3_LT)L3_audit();L3_hazards()}catch(e){console.warn('L3',e)}return r})(hubTrafficStep)}
 // kerb fix (life-4): RD_kerb keeps people at the RD road's own half width; where the city street is wider (ath 1899,-1663: an 8.5 m "sec" street on a
 // g-chain) that is still on the lane. Every 2nd call per person (every call while pushed out) check the city street and ease them out to its kerb + 0.9 m (not on crossings/boxes).
@@ -18682,12 +18699,12 @@ function L3_kerbFix(p,k,dt){p.l3kn=(p.l3kn||0)+1;if(p.l3kn%2===0||p.l3tx||p.rdK!
 if(L3_ON&&typeof RD_kerb==='function')RD_kerb=(f=>function(p,bx,bz,dt){const k=f.apply(this,arguments);try{return L3_kerbFix(p,k,dt||0)}catch(e){return k}})(RD_kerb);
 // ---- checklist GOs (state asserts, no rendering): sims run the real hubTrafficStep with fixed dt
 function L3_sim(sec,dt=1/15){for(let t=0;t<sec;t+=dt){T+=dt;hubTrafficStep(dt)}}
-function L3_park(x,z){RO.x=x;RO.z=z;RO.v=0}
+function L3_park(x,z,h){RO.x=x;RO.z=z;RO.v=0;if(h!=null)RO.h=RO.vh=h/* heading for shots (lights-3) */;return[RO.x,RO.z,RO.h]}
 function L3_goLanes(){if(!L3_ON)return'📍 PENDING · life-3 is OFF (?l3=0)';const N=HUB.nodes;let best=null,bn=-1;for(const c of HUB.cars){if(c.dead>0||c.l3t==null)continue;const A=N[c.a],B=N[c.b];if(L3_off(c,A,B,0)==null)continue;let n=0;for(const o of HUB.cars)if(Math.abs(o.x-c.x)<160&&Math.abs(o.z-c.z)<160)n++;if(n>bn){bn=n;best=c}}
   if(!best)return'📍 LANES · no 2-lane road with cars ❌';L3_park(best.x+6,best.z+6);const lc0=L3.lc;L3_sim(60);
   let a=0,b=0,cl=0;for(const c of HUB.cars){if(!c.CVn||c.dead>0||c.l3t==null)continue;const A=N[c.a],B=N[c.b];if(L3_off(c,A,B,0)==null)continue;if(Math.abs(c.l3s-c.l3t)>.01){cl++;continue}c.l3s<0?a++:b++}
   const n=a+b,pa=n?a/n:0,pb=n?b/n:0,ok=n>=8&&pa>=.3&&pb>=.3&&L3.lc>lc0;return`📍 LANES after 60 s: ${n} cars on 2-lane roads near you, inner ${Math.round(pa*100)} % / outer ${Math.round(pb*100)} % (${cl} mid-change), ${L3.lc-lc0} lane changes ${ok?'✅':'❌'}`}
-function L3_goLights(){if(!L3_LT)return'📍 PENDING · the stop-line guard is OFF in this build (add ?l3lt=1 to turn it on)';if(!CV.sig.length)return'📍 LIGHTS · no signals ❌';
+function L3_goLights(){if(!L3_LT)return'📍 PENDING · the stop-line guard is OFF (?l3lt=0)';if(!CV.sig.length)return'📍 LIGHTS · no signals ❌';
   // the spot with the most signalled junctions within 250 m (CV only drives cars within 320 m of the player)
   let best=null,bn=0;for(const J of CV.sig){let n=0;for(const K of CV.sig)if(Math.hypot(K.x-J.x,K.z-J.z)<250)n++;if(n>bn){bn=n;best=J}}
   L3_park(best.x+best.R0+14,best.z+best.R0+14);const r0=L3.run,e0=L3.ent;const OP=new Set();let qmax=0;for(let s=0;s<120;s++){L3_sim(1);L3_overlaps(OP);let q=0;for(const c of HUB.cars)if(c.CVn&&c.RDy==='lead'&&(c.cv||0)<1)q++;qmax=Math.max(qmax,q)}
@@ -18884,7 +18901,7 @@ window.__c2={C2,fam:C2_fam,tint:C2_tint,view:C2_view};
 // (2) ground plates: a paving pad under every vignette, kerb-edge strips, dirt paths and flowerbeds on bare lawns beside streets;
 // (3) roof kit on flat roofs: water tanks, AC units, antennas, roof gardens.
 // (2)+(3) are unit boxes in ONE InstancedMesh per 1400 m cell (frustum + distance culled). No rnd(), no colliders on plates / roof kit. Default OFF: ?c3=1 on (or TUNE.c3), ?c3=0 off. Hook: side() in 60_city_build6.js.
-const C3={on:/[?&]c3=1\b/.test(location.search)||(!/[?&]c3=0\b/.test(location.search)&&!!(typeof TUNE!=='undefined'&&TUNE.c3)),/* default OFF until the look is clearly livelier (handoff city-3); ?c3=1 on, ?c3=0 off, TUNE.c3 */cells:new Set(),G:[],R:[],V:[],n:{vig:0,gnd:0,roof:0,bld:0},meshes:0};
+const C3={on:/[?&]c3=1\b/.test(location.search)||(!/[?&]c3=0\b/.test(location.search)&&!!(typeof TUNE!=='undefined'&&TUNE.c3)),/* default OFF (city-4: perf +11-12 % tris fra districts, look not clearly livelier yet); ?c3=1 on, ?c3=0 off, TUNE.c3 */cells:new Set(),G:[],R:[],V:[],n:{vig:0,gnd:0,roof:0,bld:0},meshes:0};
 const C3_h=(x,z,s)=>{const h=Math.sin(x*12.9898+z*78.233+s*37.719)*43758.5453;return h-Math.floor(h)};
 const C3_F=['#ff4a8a','#ffd23a','#ff7a2a','#ffffff','#b46aff','#e8402a'],C3_PAVE=['#d9d0bf','#c9b8a0','#b8b0a4','#e0c8a8'],C3_PAVE_A=['#e8dcc4','#d8b48a','#efe6d2','#c89a78'];
 // vignettes: [type, along, out, yaw (0 = facing the road)]; out = metres away from the road from the kerb-side prop line
@@ -18897,10 +18914,10 @@ function C3_box(A,x,y,z,ry,sx,sy,sz,col){A.push([x,y,z,ry,sx,sy,sz,col])}
 function C3_side(add,px,pz,ux,uz,w,nx,nz,x,z,D){if(!C3.on||!HUB.grid)return;const ath=CID!=='fra';
   // (1) vignette: one per 45 m cell + side; needs a clear 8 x 4 m pavement spot
   const key=Math.floor(x/45)*100000+Math.floor(z/45)+(nx>0?.5:0);
-  if(!C3.cells.has(key)){C3.cells.add(key);const r=C3_h(x,z,11);if(r<.82){const cx=x+nx*1.2,cz=z+nz*1.2;
+  if(!C3.cells.has(key)){C3.cells.add(key);const r=C3_h(x,z,11);if(r<.42){/* city-4: .82 → .42 (vignette props were the +17 % tris) */const cx=x+nx*1.2,cz=z+nz*1.2;
     if(!gridHit(HUB.grid,cx+nx*1.5,cz+nz*1.5,4)&&!inRiver(cx,cz,2)&&!onAnyDeck(cx,cz)){const q=cityAt(cx,cz);if(!(q&&q.d<q.road.w/2+2.2)){const f=fillAt(cx,cz);if(!(f&&f.d<f.r.w/2+2.2)){
-      const K=ath?['bench','cafeA','kiosk','stop','cafeA','bench']:['bench','cafe','kiosk','stop','cafe','bench'],V=C3_V[K[Math.floor(C3_h(x,z,12)*K.length)]],yaw=Math.atan2(-nx,-nz);
-      for(const[t,a,o,ry]of V)if(D[t])add(t,cx+ux*a+nx*o,cz+uz*a+nz*o,yaw+ry);C3.V.push([cx,cz]);
+      const K=ath?['bench','cafeA','kiosk','stop','cafeA','bench']:['bench','kiosk','stop','bench','stop','bench']/* city-4: no table/parasol in Frankfurt (their per-tile buckets cost +8 % calls) */,V=C3_V[K[Math.floor(C3_h(x,z,12)*K.length)]],yaw=Math.atan2(-nx,-nz);
+      for(const[t,a,o,ry]of V)if(D[t]){const vx=cx+ux*a+nx*o,vz=cz+uz*a+nz*o;add(t,vx,vz,yaw+ry);}C3.V.push([cx,cz]);
       const y=groundY(cx,cz),P=ath?C3_PAVE_A:C3_PAVE;C3_box(C3.G,cx+nx*1.4,y+.03,cz+nz*1.4,Math.atan2(ux,uz),4.6,.12,8.6,P[Math.floor(C3_h(x,z,13)*P.length)])}}}}}
   // (2) ground breakup on bare lawn behind the pavement (no building within 7 m)
   const o=w/2+6.4,gx=px+nx*o,gz=pz+nz*o,k2=Math.floor(gx/16)*100000+Math.floor(gz/16)+.25;if(C3.cells.has(k2)||C3.G.length>26000)return;C3.cells.add(k2);const r2=C3_h(gx,gz,14);if(r2>.6)return;if(gridHit(HUB.grid,gx,gz,7)||roamHit(gx,gz,2.5))return;
@@ -18918,17 +18935,31 @@ function C3_roofs(){const A=C3.R,pk=Math.min(.62,4500/Math.max(1,HUB.bld.length)
     else if(k===2||k===1){for(let i=0;i<3;i++){const[px,pz]=W(sx*ex-sx*i*1.9,-sz*ez);C3_box(A,px,top+.55,pz,ry,1.5,1.1,1.2,'#c4c8ce');C3_box(A,px,top+1.13,pz,ry,.9,.06,.9,'#3a3f48')}}/* AC units */
     else{const[tx,tz]=W(sx*ex,-sz*ez);C3_box(A,tx,top+3,tz,ry,.22,6,.22,'#9aa0a8');C3_box(A,tx,top+4.6,tz,ry,2.2,.12,.12,'#9aa0a8');C3_box(A,tx,top+5.4,tz,ry,.12,.12,1.6,'#9aa0a8');C3_box(A,tx,top+6.1,tz,ry,.3,.3,.3,'#e8402a');C3_box(A,tx,top+.4,tz,ry,1.4,.8,1.4,'#b8bcc4')}}/* antenna */
   C3.n.bld=nb}
+// (4) city-4 shopfronts on street-facing ground floors: shop window band, striped awning (3.1 m up: clears cars and peds), sign fascia. Palette per ~300 m zone = per-district look. Boxes only, no colliders.
+const C3_AW={fra:[['#d8282e','#f4efe4'],['#2f7a3a','#f4efe4'],['#1f3a7a','#f5c20c'],['#e8762a','#f6e6c8'],['#6a2a5a','#f0d8e4'],['#2a7a8a','#f4efe4']],
+  ath:[['#2a6ad8','#ffffff'],['#c8582a','#f6e6c8'],['#6a8a2a','#f4efe4'],['#e8b42a','#ffffff'],['#2a9a9a','#ffffff'],['#b8302a','#f6e6c8']]},C3_SIGN=['#f5c20c','#ffffff','#e5177f','#2ab0e8','#1b1c3a','#ff7a2a'];
+function C3_shops(){const A=C3.G,ath=CID!=='fra',PAL=C3_AW[ath?'ath':'fra'];let na=0;for(const b of HUB.bld){if(na>=3500)break;const top=b.rt??b.h;if(top==null||b.tier||b.hw<2.5||b.hd<2.5||b.hw>40||b.hd>40)continue;
+    const g=b.y0??groundY(b.x,b.z),H=top-g;if(H<4.5||H>90)continue;const ry=b.c!=null?Math.atan2(b.s,b.c):0,c=Math.cos(ry),s=Math.sin(ry),W=(lx,lz)=>[b.x+lx*c+lz*s,b.z-lx*s+lz*c];
+    let best=null;for(const[fx,fz,hl]of[[1,0,b.hd],[-1,0,b.hd],[0,1,b.hw],[0,-1,b.hw]]){if(hl<2.5)continue;const[mx,mz]=W(fx*(fx?b.hw:0)+fx*2.5,fz*(fz?b.hd:0)+fz*2.5);const q=cityAt(mx,mz),f=fillAt(mx,mz);let e=1e9;if(q)e=Math.min(e,q.d-q.road.w/2);if(f)e=Math.min(e,f.d-f.r.w/2);if(e<9&&e>-.5&&(!best||e<best.e))best={fx,fz,hl,e}}
+    if(!best)continue;const r=C3_h(b.x,b.z,41);if(r>.8)continue;na++;const{fx,fz}=best,hl=Math.min(best.hl*.82,7),fry=ry+(fx?Math.PI/2:0),ofs=(fx?b.hw:b.hd);
+    const P=(d,a)=>W(fx*(ofs+d)+(fz?a:0),fz*(ofs+d)+(fx?a:0));/* d = out from the facade, a = along it */
+    const zone=C3_h(Math.floor(b.x/300),Math.floor(b.z/300),42),pal=PAL[Math.floor((zone*.7+C3_h(b.x,b.z,43)*.3)*PAL.length)%PAL.length],y=g+.04;
+    {const[x,z]=P(.06,0);C3_box(A,x,y+1.35,z,fry,hl*2,2.3,.14,'#2c4a6a')}/* shop window */
+    {const[x,z]=P(.1,0);C3_box(A,x,y+4.05,z,fry,hl*2+.2,.85,.22,C3_SIGN[Math.floor(C3_h(b.x,b.z,44)*C3_SIGN.length)])}/* sign fascia */
+    if(r<.55){const n=3,sw=hl*2/n;for(let i=0;i<n;i++){const a=-hl+sw*(i+.5),[x,z]=P(.85,a);C3_box(A,x,y+3.15,z,fry,sw,.16,1.6,pal[i%2])}const[vx,vz]=P(1.66,0);C3_box(A,vx,y+2.95,vz,fry,hl*2,.32,.06,pal[0])}/* striped awning + valance */
+    else{const[x,z]=P(.6,0);C3_box(A,x,y+3.2,z,fry,hl*2,.2,1.1,pal[0])}}/* flat canopy */
+  C3.n.shop=na}
 // (2b) verge flower strips along every city street (both sides, every ~8 m, colour runs of ~40 m): sampled from CITY_S, so it also covers streets whose side() slots are taken
-function C3_verge(){const A=C3.G;for(const S of CITY_S){if(S.r.cls==='hill'||S.r.cls==='quay')continue;const P=S.pts,w=S.r.w;let acc=0;for(let i=1;i<P.length;i++){const p=P[i],q0=P[i-1];acc+=Math.hypot(p.x-q0.x,p.z-q0.z);if(acc<8)continue;acc=0;if(A.length>60000)return;
+function C3_verge(){const A=C3.G;for(const S of CITY_S){if(S.r.cls==='hill'||S.r.cls==='quay')continue;const P=S.pts,w=S.r.w;let acc=0;for(let i=1;i<P.length;i++){const p=P[i],q0=P[i-1];acc+=Math.hypot(p.x-q0.x,p.z-q0.z);if(acc<11)continue;acc=0;if(A.length>48000)return;
     for(const sd of[-1,1]){const nx=p.tz*sd,nz=-p.tx*sd,o=w/2+2.4,x=p.x+nx*o,z=p.z+nz*o,run=C3_h(Math.floor(x/40),Math.floor(z/40),31+sd);if(run>.75)continue;
       if(gridHit(HUB.grid,x,z,2.2)||roamHit(x,z,1.5))continue;const q=cityAt(x,z);if(q&&q.d<q.road.w/2+1.2)continue;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+1.2)continue;if(inRiver(x,z,1)||onAnyDeck(x,z))continue;
       const y=groundY(x,z),ry=Math.atan2(p.tx,p.tz),fc=C3_F[Math.floor(run*8)%C3_F.length],fc2=C3_F[Math.floor(run*13+2)%C3_F.length];
       if(run<.45){C3_box(A,x,y+.12,z,ry,1.6,.36,7.4,'#6a4a32');for(let j=0;j<5;j++)C3_box(A,x+p.tx*(j-2)*1.45,y+.42,z+p.tz*(j-2)*1.45,ry,1.1,.34,1.1,j%2?fc:fc2)}/* flower strip */
       else{C3_box(A,x,y+.05,z,ry,1.8,.14,7.6,CID!=='fra'?'#e2d6bc':'#cfc9be');C3_box(A,x-nx*.95,y+.1,z-nz*.95,ry,.3,.24,7.6,'#8f8a84')}}}}}/* paved verge + kerb */
-function C3_build(){C3_roofs();C3_verge();const all=C3.G.concat(C3.R);if(!all.length)return;const cells=new Map();for(const o of all){const kk=Math.floor(o[0]/1400)*1000+Math.floor(o[2]/1400);let a=cells.get(kk);if(!a)cells.set(kk,a=[]);a.push(o)}
+function C3_build(){C3_roofs();try{C3_shops()}catch(e){console.warn('C3 shops',e)}C3_verge();const all=C3.G.concat(C3.R);if(!all.length)return;const cells=new Map();for(const o of all){const kk=Math.floor(o[0]/1400)*1000+Math.floor(o[2]/1400);let a=cells.get(kk);if(!a)cells.set(kk,a=[]);a.push(o)}
   const g=new THREE.BoxGeometry(1,1,1),mat=new THREE.MeshStandardMaterial({roughness:.75,metalness:0}),M=new THREE.Matrix4(),Q=new THREE.Quaternion(),Y=new THREE.Vector3(0,1,0),P=new THREE.Vector3(),S=new THREE.Vector3(),c=new THREE.Color();
   for(const[,a]of cells){const im=new THREE.InstancedMesh(g,mat,a.length);a.forEach((o,i)=>{M.compose(P.set(o[0],o[1],o[2]),Q.setFromAxisAngle(Y,o[3]),S.set(o[4],o[5],o[6]));im.setMatrixAt(i,M);im.setColorAt(i,c.set(o[7]))});
-    im.receiveShadow=true;im.userData.c3=1;im.userData.cd=700;im.userData.nsh=1;im.computeBoundingSphere();HUB.grp.add(im);C3.meshes++}
+    im.receiveShadow=true;im.userData.c3=1;im.userData.cd=450;/* city-4: 700 → 450 m (perf budget) */im.userData.nsh=1;im.computeBoundingSphere();HUB.grp.add(im);C3.meshes++}
   C3.n.gnd=C3.G.length;C3.n.roof=C3.R.length;C3.n.vig=C3.V.length}
 buildHubProps=(f=>function(){C3.cells=new Set();C3.G=[];C3.R=[];C3.V=[];C3.n={vig:0,gnd:0,roof:0,bld:0};C3.meshes=0;const r=f.apply(this,arguments);try{if(C3.on)C3_build()}catch(e){console.warn('C3',e)}return r})(buildHubProps);
 window.__c3={C3,bs:()=>{const B=HUB.bld,K={};for(const b of B)for(const k in b)K[k]=(K[k]||0)+1;return{n:B.length,K,s:B.filter(b=>b.hw>4&&b.hd>4).slice(0,4)}},stat:()=>({on:C3.on,meshes:C3.meshes,...C3.n}),near:(r=120)=>{const d=o=>Math.hypot(o[0]-RO.x,(o.length>2?o[2]:o[1])-RO.z)<r;return{g:C3.G.filter(d).length,v:C3.V.filter(d).length,roof:C3.R.filter(d).length}},view:(x,z,h)=>{roamWarp(x,z,h);RO.v=0;camSnap=true}};
@@ -19003,6 +19034,33 @@ function SH1_cutGo(say){const W=ms=>new Promise(r=>setTimeout(r,ms));
   finally{M1.csHold=0;if(el)el.click=ck;if(M)M.skip=sk;try{M1_csEnd()}catch(e){}try{if(RO.ch)chAbort()}catch(e){}}say(out)})();
  return'📍 CUTSCENE WORLD · Kaiser scene, Hilde 2 km away…'}
 window.__sh1={SH1,GOS:{'cut-world':{fn:SH1_cutGo}}};
+// foliage-cam-1 (review 2K #9): instanced/AS trees whose crown (cylinder over the trunk, +2 m margin) holds the chase camera or a point 50-75 % of the way
+// to the car are hidden (prop alive:false: AS LODs, smash and respawn skip it; tile instance zeroed, matrix remembered) and put back once the line has been
+// clear 0.4 s. Throttled to 8 Hz, 3x3 prop-grid cells, roam car camera only. ?fcam=0 turns it off. NOT a wall/terrain fix: the 'foliage' GO hits on the
+// Messe -> Mainkai road are building/road meshes without a roamHit collider (see docs/HANDOFF_fcam1.md).
+const FC={on:!/[?&]fcam=0/.test(location.search),t:0,hid:[],M:new THREE.Matrix4(),Z:new THREE.Matrix4().makeScale(0,0,0),n:0,lift:0,hide:0};
+function FC_crown(p){let c=p._fc;if(c)return c;const A=window.__as&&__as.A;let V=A&&p.av&&A.V&&A.V[p.av];if(V&&V.H&&V.rx&&V.cls!=='keep'){const a=p.cvs?p.cvs[0]:1,b=p.cvs?p.cvs[1]:1;return p._fc=[V.rx*a+2,p.y+V.H*b*.2,p.y+V.H*b]}
+  const g=p.im&&p.im.geometry;if(!g)return p._fc=[0,0,0];if(!g.boundingBox)g.computeBoundingBox();const b=g.boundingBox;p.im.getMatrixAt(p.i,FC.M);const e=FC.M.elements,s=Math.hypot(e[4],e[5],e[6])||1,sx=Math.hypot(e[0],e[1],e[2])||1;
+  const h=(b.max.y-b.min.y)*s;return p._fc=[Math.max(b.max.x-b.min.x,b.max.z-b.min.z)*.5*sx*.85,p.y+b.min.y*s+h*.35,p.y+b.max.y*s]}
+// hidden = alive:false for the prop (the AS tree LODs, smash and respawn all skip dead props), its tile instance zeroed; AS_step is forced to refill
+function FC_kick(){const A=window.__as&&__as.A;if(A)A.cx=1e9}
+function FC_restore(all){let k=0;for(let i=FC.hid.length-1;i>=0;i--){const h=FC.hid[i],p=h.p;if(!all&&FC.t-h.t<.4)continue;FC.hid.splice(i,1);
+  if(!p.im||p.im.count<=p.i)continue;try{p.alive=true;p.im.setMatrixAt(p.i,h.m);p.im.instanceMatrix.needsUpdate=true;k++}catch(e){}}if(k)FC_kick()}
+function FC_step(){const c=camera.position,ox=RO.x,oy=RO.y+1,oz=RO.z;
+  // sample points on the car -> camera line: camera, 75 %, 50 % of the way back (the 25 % point stays out: trunks near the car remain solid)
+  const S=[[c.x,c.y,c.z],[ox+(c.x-ox)*.75,oy+(c.y-oy)*.75,oz+(c.z-oz)*.75],[ox+(c.x-ox)*.5,oy+(c.y-oy)*.5,oz+(c.z-oz)*.5]];
+  const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16);let k=0;
+  for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const l=HUB.pgrid&&HUB.pgrid.get((kx+a)*10000+kz+b);if(!l)continue;
+    for(const p of l){if(!CVF_RX.test(p.t))continue;const f=p.alive===false?FC.hid.find(h=>h.p===p):null;if(p.alive===false&&!f)continue;const cr=FC_crown(p);if(!cr[0])continue;let hit=0;
+      if((p.x-ox)**2+(p.z-oz)**2<9)continue;
+      for(let q=0;q<3&&!hit;q++){const w=S[q];if(w[1]>cr[1]&&w[1]<cr[2]+.6&&(w[0]-p.x)**2+(w[2]-p.z)**2<cr[0]*cr[0])hit=1}
+      if(!hit)continue;if(f){f.t=FC.t;continue}
+      p.im.getMatrixAt(p.i,FC.M);FC.hid.push({p,m:FC.M.clone(),t:FC.t});p.alive=false;p.rt=1e9;p.im.setMatrixAt(p.i,FC.Z);p.im.instanceMatrix.needsUpdate=true;FC.hide++;k++}}
+  if(k)FC_kick();FC_restore(false)}
+roamCam=(f=>function(dt){f(dt);if(!FC.on||state!=='roam'||(RO.foot&&RO.foot!=='car')||(typeof M1!=='undefined'&&M1.cs)){if(FC.hid.length)FC_restore(true);return}
+  // foliage over / around the camera
+  FC.t+=dt;FC.n+=dt;if(FC.n>=.125){FC.n=0;try{FC_step()}catch(e){}}})(roamCam);
+window.__fcam=FC;
 // ui-1: HUD governor. At most 2 objective/hint widgets at once; no tap-to-close popups while the car is moving.
 // Runs from a MutationObserver (microtask: after the game changed a widget, before the frame is painted) + a 150 ms backstop.
 {const ORD=['m1Next','roamArrow','npcSay','roamPop','roamPlate','crSmHint'];
