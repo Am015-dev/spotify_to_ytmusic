@@ -2,8 +2,8 @@
 | # | item (GO) | measured | |
 |---|---|---|---|
 | 1 | race-handsoff | finished 2nd, race ended (<240 s) | ✅ |
-| 2 | walls | Frankfurt 5.0 hits/min, lowest health 65; Athens 8.0/min, lowest health 55 (target ≤1.5/min; health never 0 holds) | ❌ |
-| 3 | stuck | spot 1 moves 5.1 m in 1.4 s ✅; monkey rerun 6 sim-min/city: 9 stuck in 11.9 min = 0.76/min (was 2.9; target ≤0.3). 5 of 9 are one Athens cluster x 1650–1980, z −1440…−1740 (same area as the foliage/camera hits); 2 at Fra 8012,7054 (y 1270, off-map hill) and Fra 808,2639 | ❌ |
+| 2 | walls | walls-1 fix, built page, fake-clock driver: Frankfurt 0 / 0 / 0 hits/min in 3 runs (lowest health 96; was 5.0 / 65); Athens 0, 1, 1 hits/min in 3 runs (lowest health 88–100; was 8.0 / 55). Target ≤1.5/min, health never 0 | ✅ |
+| 3 | stuck | spot 1 moves 5.1 m ✅; monkey rerun 12 sim-min/city (4 pages): 13 stuck in 23.8 min = 0.55/min raw (was 0.76). The Athens cluster x 1650–1980 now gives 1 (was 5). Replaying each of the 12 records (6 m back, gas 3 s, tools/rv/whystuck.js): 10 drive away ≥ 22 m (monkey false positives); the 2 real ones are world-edge/off-map (Fra 8008,7042 edge; Ath −5401,6324 beside an edge building) = ~0.1/min real. Raw target ≤0.3 not met | ⚠️ |
 | 4 | objectives | max 2 widgets at once, 0 popups while moving | ✅ |
 | 5 | devui | 0 px² over centre 60 %, 🐞 clear | ✅ |
 | 6 | garage-car | ride 13 % of screen, 7 cards in view | ✅ |
@@ -13,5 +13,5 @@
 | 10 | card | 20 words, goal 4× = HUD 4× | ✅ |
 
 Gate: `node tools/unit/run.js` 0 FAIL (4665 pass, 13 known). tChkGo TAG=rv2k,life1,xf1,terrain: 45/53; async GOs are judged before they finish, so the table above uses each GO run alone. Other fails: xf1/grass and xf1/kerb (echo of other GOs' async lines), life1/people SLOW 10.6 s (load).
-Why walls/stuck differ from the race-1 handoff (0/min, 96 health): not found in the time box. The GO drives with real WASD events and a fake 60 Hz clock; I did not bisect the TUNE flags. First thing to check: whether `TUNE.dmgGlance/dmgCap/dmgInv` are in the built `tune.json`, and hit positions (roamDamage hook is not reachable from outside the module; log from inside the GO).
+Why walls/stuck differed from the race-1 handoff (walls-1, 2026-10-16): (1) `TUNE.lowProp` compared the absolute collider top `b.h` (ground + height) with 1.3 m, so it never matched above sea level (Frankfurt ground ~30 m, Athens ~145 m): now height above ground (`bLow` in 53_terrain_roads.js). (2) Athens: the bot reached 90–95 km/h at a bend and hit 10–20 m houses head-on 4×/min: new wall bumper in 71_roam_drive.js (a solid collider dead ahead inside braking distance eases the car to a glancing 26 km/h; TUNE.wallAssist=0 off, wallV, wallDec). (3) Terrain bounces bypassed the glancing cap (RO.tb flag). (4) Frankfurt: shoving stopped/slow traffic cars cost health every 0.6 s: one bump per car per 4 s and ×0.5 below the 60 km/h smash threshold (TUNE.trafCd, trafK). Old note follows:  The GO drives with real WASD events and a fake 60 Hz clock; I did not bisect the TUNE flags. First thing to check: whether `TUNE.dmgGlance/dmgCap/dmgInv` are in the built `tune.json`, and hit positions (roamDamage hook is not reachable from outside the module; log from inside the GO).
 New: GO `rv2k/walls-ath` (Athens road-follow).
