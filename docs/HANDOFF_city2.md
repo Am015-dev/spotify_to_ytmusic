@@ -1,0 +1,6 @@
+# HANDOFF city-2 (2026-10-16)
+1. src/98c2_district_color.js: 15 bold palettes (facade/accent/roof) mapped to every Frankfurt + Athens district (unmapped names hash into a family); instance/vertex colour only, no new meshes, no rnd(). `?c2=0` = old look. Hooks: putK/lzKm tint (60_city_build4), Athens E() colour (60_city_build3), DR_fraSplit (95_drive_flow).
+2. Frankfurt fillers: alternating strong/light facades, roofs in district roof colour, taller height steps (up to +26 m), wider setbacks (0/4/7/10 m) for the grazing street angle.
+3. Measured (6 district spots, off → on): calls 386/387/346/364/340/458 → 381/321/343/363/363/451; tris 2.97/3.06/2.90/2.73/2.35/3.07 M → 2.80/2.83/2.88/2.73/2.36/3.09 M. Shots: docs/shots/city2/grid.jpg (top off, bottom on; tools/tCity2Shots.js).
+4. Gate: unit 0 FAIL; TAG=life1,xf1,terrain on built page 35/36, only life1/ath-density fails, and it (plus life1/people) fails identically with ?c2=0, so not from this change. Looked at shots: Bockenheim (teal/yellow), Sachsenhausen, Kolonaki (ochre) read clearly; Bankenviertel blue modest.
+5. Left: Athens Plaka/villa LEGO sets (CTB_put) bypass E() so Plaka barely changes; the Monastiraki shot spot is a hillside (pick another); Frankfurt LEGO-set (CTB_putK) colours untouched.
