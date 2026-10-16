@@ -363,12 +363,14 @@ function LIFE_goDodge(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_fill();let 
 function LIFE_aim(R){RO.x=R.bx;RO.z=R.bz;RO.h=R.h;if(RO.vh!=null)RO.vh=R.h}
 // GO: 30 m before a pop-up bubble on the street, real gas → the challenge starts
 function LIFE_goPop(say){if(!LIFE.on)return'📍 LIFE is OFF';const a0=Math.floor(RO.x/LIFE_PG),b0=Math.floor(RO.z/LIFE_PG);let p=null;for(let r=0;r<4&&!p;r++)for(let a=a0-r;a<=a0+r&&!p;a++)for(let b=b0-r;b<=b0+r&&!p;b++){const q=LIFE_pop(a,b);if(q&&(q.x-RO.x)**2+(q.z-RO.z)**2>40*40)p=q}
- if(!p)return'📍 no bubble near ❌';const bx=p.x-Math.sin(p.h)*30,bz=p.z-Math.cos(p.h)*30;p.cd=0;RO.pop=null;if(!roamWarp(bx,bz,p.h))return'📍 Can\'t jump right now';RO.v=0;const n0=LIFE.n.pop;K.ArrowUp=true;
- setTimeout(()=>{K.ArrowUp=false;const ok=LIFE.n.pop>n0&&RO.pop;say(`📍 POP-UP ${p.K.name}: `+(ok?'started ('+RO.pop.name+') ✅':'not started ❌'))},4000);return'📍 POP-UP · driving…'}
+ if(!p)return'📍 no bubble near ❌';const bx=p.x-Math.sin(p.h)*30,bz=p.z-Math.cos(p.h)*30;p.cd=0;RO.pop=null;if(!roamWarp(bx,bz,p.h))return'📍 Can\'t jump right now';RO.v=0;const n0=LIFE.n.pop,t0=performance.now();K.ArrowUp=true;
+ /* popup1: the sim runs at ~0.45x real time on software GL (frame dt is capped), so gas until the bubble starts (or 25 s real) instead of a fixed 4 s */
+ const iv=setInterval(()=>{if(!(LIFE.n.pop>n0||performance.now()-t0>25000))return;clearInterval(iv);K.ArrowUp=false;const ok=LIFE.n.pop>n0&&RO.pop;say(`📍 POP-UP ${p.K.name}: `+(ok?'started ('+RO.pop.name+') ✅':'not started ❌'))},100);return'📍 POP-UP · driving…'}
 // GO: the landmark (Ferris wheel / big carousel) 60 m away, camera on it: it turns
 function LIFE_goLm(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_init();const lm=LIFE.lm;if(!lm)return'📍 no landmark ❌';let ok=false,bx=0,bz=0,h=0;for(let k=0;k<24&&!ok;k++){h=k*Math.PI/12;bx=lm.x-Math.sin(h)*55;bz=lm.z-Math.cos(h)*55;ok=!roamHit(bx,bz,2.5,groundAt(bx,bz,999)+.5)}
- if(!roamWarp(bx,bz,h))return'📍 Can\'t jump right now';RO.v=0;const r0=lm.spin.rotation[lm.ax];
- setTimeout(()=>{const r1=lm.spin.rotation[lm.ax];say(`📍 ${lm.k.toUpperCase()}: turned ${(r1-r0).toFixed(2)} rad in 2 s `+(lm.g.visible&&Math.abs(r1-r0)>.1?'✅':'❌'))},2000);return'📍 '+lm.k.toUpperCase()+' · watching…'}
+ if(!roamWarp(bx,bz,h))return'📍 Can\'t jump right now';RO.v=0;const r0=lm.spin.rotation[lm.ax],t0=performance.now();
+ /* popup1: watch until it has turned > 0.1 rad (sim runs < real time on software GL) or 15 s real, instead of a fixed 2 s */
+ const iv=setInterval(()=>{if(!(Math.abs(lm.spin.rotation[lm.ax]-r0)>.1||performance.now()-t0>15000))return;clearInterval(iv);const r1=lm.spin.rotation[lm.ax];say(`📍 ${lm.k.toUpperCase()}: turned ${(r1-r0).toFixed(2)} rad in ${((performance.now()-t0)/1000).toFixed(1)} s `+(lm.g.visible&&Math.abs(r1-r0)>.1?'✅':'❌'))},100);return'📍 '+lm.k.toUpperCase()+' · watching…'}
 // GO (life-2): 45 m before an AIR TIME kicker, real keyboard gas for 6 s: the car takes off from the lip, flies the gap through the bubble (≥ 0.6 s air), lands and keeps going
 function LIFE_goKick(say){if(!LIFE.on)return'📍 LIFE is OFF';const a0=Math.floor(RO.x/LIFE_PG),b0=Math.floor(RO.z/LIFE_PG);let p=null;
  for(let r=0;r<8&&!p;r++)for(let a=a0-r;a<=a0+r&&!p;a++)for(let b=b0-r;b<=b0+r&&!p;b++){if(Math.max(Math.abs(a-a0),Math.abs(b-b0))!==r)continue;const q=LIFE_pop(a,b);if(q&&q.K.k==='air'&&LIFE_kick(q)){const bx=q.x-Math.sin(q.h)*45,bz=q.z-Math.cos(q.h)*45;if(!roamHit(bx,bz,2.5,q.y+.5))p=q}}
