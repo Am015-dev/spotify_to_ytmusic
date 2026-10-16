@@ -119,7 +119,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     if(g.k==='survive')return Math.min(this.len,Math.floor(G.dbar))+' / '+this.len+' BARS';
     if(g.k==='kill')return Math.min(this.kv,G.kills)+' / '+this.kv+' KILLS';
     if(g.k==='score')return 'SCORE '+Math.min(this.sv,G.score).toLocaleString('de-DE')+' / '+this.sv.toLocaleString('de-DE');
-    return G.boss?(g.k==='mini'?'MINI-BOSS':'BOSS'):this.over?'CLEAR':'→ '+(g.k==='mini'?this.def.mini.nm:DISTRICTS[this.def.di].bossName);},
+    return G.boss?(g.k==='mini'?'MINI-BOSS':'BOSS'):this.over?'CLEAR':'→ '+(g.k==='mini'?UIK.pname(this.def.mini.nm,this.def.mini.k):UIK.pname(DISTRICTS[this.def.di].bossName,DISTRICTS[this.def.di].boss));},
   bossHp(){const k=this.def.goal.k==='mini'?this.def.mini.k:DISTRICTS[this.def.di].boss;
     return this.def.goal.k==='mini'?Math.round(300*(TUNE.miniHp+TUNE.miniHpd*this.lvl)*(HARD?1:1)):Math.round((340+110*Math.min(k,4))*(TUNE.bossHp+TUNE.bossHpd*this.lvl));},
   tick(dt){

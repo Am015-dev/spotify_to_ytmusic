@@ -902,7 +902,7 @@ function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,min
   const nm=o.nm||D.bossName;
   G.boss={type:'boss',k,mini,nm,lbl:o.lbl,x:W+120,y:H/2,r:o.r||(k===3?54:46),hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:o.score||5000*(k+1),
     col:o.col||[D.a,D.b,D.a,D.a][k]||D.a,p2:mini?6:14,p3:mini?11:26,minBar:mini?14:BOSS_MIN_BAR,floor:Math.ceil(hp*.62)};
-  G.en.push(G.boss);banner('WARNUNG',nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');
+  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNUNG',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');
   if(G.live){const sg=bossSong(k,mini);if(sg){AU.switchTo(sg);AU.intense(false);}else AU.intense(true);}
   return G.boss;}
 
@@ -1134,6 +1134,7 @@ function update(dt){
 }
 
 function bossUpdate(e,dt,d){
+  if(rotMode&&!e.sub)UIK.portraitSwap(e);                // turned to portrait during the fight: a boss without a road changes to its flyer
   const mv=rotMode?'air':UIK.moveOf(e);if(mv!=='air')UIK.bossMove(e,dt,mv);
   else if(e.x>bossX()){e.x-=110*dt;e.y=H/2-20;return;}
   else e.y=H/2-20+Math.sin(e.t*.7)*150;
@@ -1152,12 +1153,42 @@ function bossLoot(e){if(!ST.on||GX()<ST.heal)G.pk.push({t:'hp',x:e.x,y:e.y,vx:-8
   G.pk.push({t:WP.canGain()?'up':'emp',x:e.x,y:e.y,vx:-80,vy:40,bob:0});
   for(let i=0;i<8;i++)G.pk.push({t:'shard',x:e.x+rnd(-30,30),y:e.y+rnd(-30,30),vx:rnd(-160,-40),vy:rnd(-90,90),bob:0});}
 
+/* ===== weapon mounts on the ship: slot 1 = coloured circle, slot 2 = coloured triangle until wpmount-<id>.webp exists; fusion = split ring (or fx-fuse-<a>-<b>.webp).
+   Colours and ids are read from WPD at draw time. Visual only: shots and hits are unchanged. Switch: RIG.on. Hardpoints are ship-local fractions of the ship length (x forward, y down). ===== */
+const RIG={on:true,ok:false,fl:[0,0],armedRun:false,
+  hp:{std:[.30,-.2,.30,.2],tri:[.30,-.22,.30,.22],hv:[.26,-.26,.26,.26],ec:[.30,-.2,.30,.2],swg:[.28,-.24,.28,.24],syn:[.30,-.22,.30,.22],drift:[.28,-.3,.28,.3],lancer:[.36,-.15,.36,.15],nova:[.28,-.26,.28,.26]},   // [x1,y1,x2,y2] per ship id; default = std
+  pt(id,sl){const a=this.hp[id]||this.hp.std;return sl?[a[2],a[3]]:[a[0],a[1]];},
+  mount(c,wid,sl,x,y,L){const d=WPD[wid];if(!d)return;const r=L*.09,nm='wpmount-'+wid;
+    if(ART.have(nm)){const b=ART.bm[nm],w=L*.34,h=w*b.height/b.width;c.drawImage(b,x-w*.5,y-h*.5,w,h);return;}
+    c.fillStyle=d.c;c.beginPath();
+    if(sl){c.moveTo(x+r*1.15,y);c.lineTo(x-r*.8,y-r);c.lineTo(x-r*.8,y+r);c.closePath();c.fill();}
+    else{c.arc(x,y,r,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=Math.max(1,r*.22);c.globalAlpha=.85;c.beginPath();c.arc(x,y,r*.62,0,7);c.stroke();c.globalAlpha=1;}},
+  fuse(c,L,t){const f=WP.fu();if(!f)return;if(ART.have(f.img)){const b=ART.bm[f.img],w=L*1.15;c.globalCompositeOperation='lighter';c.globalAlpha=.55+.15*Math.sin(t*6);c.drawImage(b,-w*.5,-w*.5,w,w);c.globalAlpha=1;c.globalCompositeOperation='source-over';return;}
+    const r=L*.5;c.lineWidth=Math.max(1.5,L*.04);c.globalAlpha=.6+.25*Math.sin(t*6);c.strokeStyle=f.c1;c.beginPath();c.arc(0,0,r,Math.PI*.5,Math.PI*1.5);c.stroke();
+    c.strokeStyle=f.c2;c.beginPath();c.arc(0,0,r,-Math.PI*.5,Math.PI*.5);c.stroke();c.globalAlpha=1;},
+  // c is already at the ship centre (rotated); L = ship length in world units; flash = muzzle burst at the mounts for the first frames after a volley
+  draw(c,sid,L,t,oy,pv){if(!this.on)return;const eq=WP.eq,ar=pv&&ART.have('ship-'+sid+'-armed');this.fuse(c,L,t);if(ar)return;
+    for(let sl=0;sl<2;sl++){const id=eq[sl];if(!id)continue;const q=this.pt(sid,sl),x=q[0]*L,y=q[1]*L+(oy||0);this.mount(c,id,sl,x,y,L);
+      const fl=pv?0:this.fl[sl];if(fl>0){c.globalCompositeOperation='lighter';c.globalAlpha=Math.min(1,fl*14);c.fillStyle=WPD[id]?WPD[id].c:'#fff';c.beginPath();c.arc(x+L*.1,y,L*(.07+.1*fl*9),0,7);c.fill();c.globalAlpha=1;c.globalCompositeOperation='source-over';}}}};
+NR.on('fire',()=>{if(RIG.on){RIG.fl[0]=RIG.fl[1]=.09;}});
+NR.on('tick',d=>{if(RIG.fl[0]>0)RIG.fl[0]=RIG.fl[1]=Math.max(0,RIG.fl[0]-(d>0&&d<1?d:.016));});RIG.chip=function(c,id,sl,x,y,k){const d=WPD[id],r=4.5*k,cx=x+r,cy=y-4*k,n='wp-'+id;if(!d)return 0;
+  if(ART.have(n)){c.drawImage(ART.bm[n],x,cy-r*1.2,r*2.4,r*2.4);return r*2.4+3*k;}
+  c.save();c.fillStyle=d.c;c.beginPath();if(sl){c.moveTo(cx+r*1.1,cy);c.lineTo(cx-r*.8,cy-r);c.lineTo(cx-r*.8,cy+r);c.closePath();}else c.arc(cx,cy,r,0,7);c.fill();c.restore();return r*2+4*k;};
+RIG.pic=function(cv,sid){if(!cv)return;const c=cv.getContext('2d'),W=cv.width,H=cv.height,L=W*.66,n='spr-ship-'+sid,b=ART.bm[n];c.clearRect(0,0,W,H);
+  if(!b&&!(n in ART.bm))ART.load(n);if(!b)setTimeout(()=>{if(cv.isConnected)RIG.pic(cv,sid);},500);
+  c.save();c.translate(W/2,H/2);const ar=ART.have('ship-'+sid+'-armed')?ART.bm['ship-'+sid+'-armed']:null,im=ar||b;
+  if(im){const w=ar?L*1.1:L,h=w*im.height/im.width;c.drawImage(im,-w/2,-h/2,w,h);}
+  else{c.fillStyle='#16102a';c.strokeStyle='#19e3ff';c.beginPath();c.moveTo(L*.5,0);c.lineTo(-L*.4,-L*.18);c.lineTo(-L*.4,L*.18);c.closePath();c.fill();c.stroke();}
+  RIG.draw(c,sid,L,0,0,true);
+  c.font='700 '+Math.round(H*.13)+'px "Share Tech Mono",monospace';c.textAlign='center';c.fillStyle='#fff';c.globalAlpha=.9;
+  for(let sl=0;sl<2;sl++){if(!WP.eq[sl])continue;const q=RIG.pt(sid,sl);c.fillText(sl+1,q[0]*L,q[1]*L+(sl?H*.3:-H*.2));}   // slot numbers
+  c.restore();};
 function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:Math.floor(t*20)%2))return;const D=DISTRICTS[G.di];
   ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);
   const so=ART.sp('spr-ship-'+shipDef().id,60);
   if(so){const bob=Math.sin(t*5)*1.2,en=ART.sp('fx-engine',46);ctx.globalCompositeOperation='lighter';
     if(en)ART.put(en,-24-en.w*.5*(.8+.2*PUL),bob,0,.7+.3*PUL);                  // painted jet, flickers with the beat
-    G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';ART.put(so,0,bob);ctx.restore();
+    G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';ART.put(so,0,bob);RIG.draw(ctx,shipDef().id,60,t,bob);ctx.restore();
     const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}
     ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();return;}
   ctx.globalCompositeOperation='lighter';G_(-20,2,16+Math.random()*5,D.a,.9);G_(0,0,34,D.a,.18);ctx.globalCompositeOperation='source-over';
@@ -1166,6 +1197,7 @@ function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%
   ctx.strokeStyle=shv?shv[2]:D.b;ctx.lineWidth=1.5;ctx.stroke();
   ctx.fillStyle=shv?shv[2]:D.b;ctx.globalAlpha=.85;ctx.beginPath();ctx.moveTo(12,-2);ctx.lineTo(4,-8);ctx.lineTo(-6,-7);ctx.lineTo(-4,-1);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
   ctx.fillStyle=D.a;ctx.fillRect(-16,8,26,2);ctx.fillStyle='#fff';ctx.fillRect(22,1,4,2);
+  if(shv)ctx.scale(1/shv[0],1/shv[1]);RIG.draw(ctx,shipDef().id,48*(shv?shv[0]:1),t,0);
   ctx.restore();
   const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}   // each tier: more glow on the ship
   ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();}
@@ -1212,8 +1244,8 @@ function gatePost(y,up,fl){const o=ART.sp('spr-en-gate',26);if(!o)return false;c
   if(fl)ART.put(ART.sil('spr-en-gate',26,'#ffffff'),0,cy,0,.8,1,up?1:-1);return true;}
 function hpBar(x,y,w,f){ctx.fillStyle='#00000099';ctx.fillRect(x,y,w,4);ctx.fillStyle='#ff3dbb';ctx.fillRect(x,y,w*clamp(f,0,1),4);}
 function bossPaint(e,t,fl,c){const ak=ART.artK(e),nm=ART.bossN[ak],b=nm&&ART.bm['spr-boss-'+nm];if(!b)return false;
-  const wd=e.k===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak],mv=UIK.boss[nm]&&UIK.boss[nm].move||'air',by=mv==='air'?Math.sin(t*1.6)*3:0,tl=mv==='air'?Math.sin(t*.9)*.035:0;   // walkers and swimmers do not hover: no bob, no tilt
-  if(mv!=='air'&&!rotMode)UIK.bossShadow(e,mv,wd);
+  const wd=ak===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak],mv=UIK.boss[nm]&&UIK.boss[nm].move||'air',by=mv==='air'?Math.sin(t*1.6)*3:0,tl=mv==='air'?Math.sin(t*.9)*.035:0;   // walkers and swimmers do not hover: no bob, no tilt
+  if(!rotMode)UIK.bossShadow(e,mv,wd);
   if(e._ph===undefined){e._ph=e.ph;e.pp=0;}if(e._ph!==e.ph){e._ph=e.ph;e.pp=1;}e.pp=Math.max(0,e.pp-FD*1.4);       // a phase change pulses a glow in the district colour
   if(e.pp>0||e.ph===3){ctx.globalCompositeOperation='lighter';if(e.pp>0)G_(0,0,e.r*(2.4+1.6*e.pp),c,.6*e.pp);if(e.ph===3)G_(0,0,e.r*2.3,'#ff3040',.16+.12*PUL);ctx.globalCompositeOperation='source-over';}
   if(UIK.bossDraw(e,nm,wd,by,tl,fl))return true;
@@ -1330,7 +1362,7 @@ const neonI='<svg class="nI" viewBox="0 0 24 24" aria-hidden="true"><path d="'+N
 const garageEl=document.createElement('div');garageEl.id='garage';garageEl.className='ov solid pg';garageEl.hidden=true;
 garageEl.innerHTML='<div class="top"><span class="ttl">GARAGE</span><span class="neon" id="gaBank"></span><span class="sp"></span><button class="go alt" id="gaBack" type="button" style="padding:.3em 1.1em">BACK</button></div>'
   +'<div class="tabs"><button class="go dim" data-t="ships" type="button">SHIPS</button><button class="go dim" data-t="crew" type="button">CREW</button><button class="go dim" data-t="looks" type="button">LOOKS</button></div>'
-  +'<div class="cards" id="gaCards"></div><div class="msg" id="gaMsg"></div>';
+  +'<canvas id="gaPic" width="300" height="96" style="display:none;margin:0 auto 4px;width:min(100%,300px);height:auto;aspect-ratio:300/96;flex:0 0 auto"></canvas><div class="cards" id="gaCards"></div><div class="msg" id="gaMsg"></div>';
 stage.appendChild(garageEl);
 const gaMsg=t=>{$('gaMsg').textContent=t;clearTimeout(gaMsg.h);gaMsg.h=setTimeout(()=>{$('gaMsg').textContent='';},1800);};
 function gaItems(){return GA.tab==='ships'?SHIPS.map(s=>({k:s.id==='std'?null:'ship_'+s.id,id:s.id,n:s.n,t:s.t,p:s.p||0,ic:s.ic,eq:GA.ship===s.id,kind:'ship'}))
@@ -1338,6 +1370,7 @@ function gaItems(){return GA.tab==='ships'?SHIPS.map(s=>({k:s.id==='std'?null:'s
   :THEMES.map(h=>({k:h.id==='neon'?null:'th_'+h.id,id:h.id,n:h.n,t:h.t,p:h.p||0,f:h.f,eq:GA.theme===h.id,kind:'theme'}));}
 function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';
   for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
+  const gp=$('gaPic');gp.style.display=GA.tab==='ships'?'block':'none';if(GA.tab==='ships'&&RIG.ok)RIG.pic(gp,GA.ship);
   const box=$('gaCards');box.innerHTML='';
   for(const it of gaItems()){const own=!it.k||GA.own[it.k],b=document.createElement('button');b.type='button';
     b.className='card'+(it.eq?' sel':'')+(!own&&GA.bank<it.p?' no':'');b.style.setProperty('--c',it.eq?'#19e3ff':own?'#8c86b8':'#ffb020');b.dataset.id=it.id;b.dataset.kind=it.kind;
@@ -1745,7 +1778,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     if(g.k==='survive')return Math.min(this.len,Math.floor(G.dbar))+' / '+this.len+' BARS';
     if(g.k==='kill')return Math.min(this.kv,G.kills)+' / '+this.kv+' KILLS';
     if(g.k==='score')return 'SCORE '+Math.min(this.sv,G.score).toLocaleString('de-DE')+' / '+this.sv.toLocaleString('de-DE');
-    return G.boss?(g.k==='mini'?'MINI-BOSS':'BOSS'):this.over?'CLEAR':'→ '+(g.k==='mini'?this.def.mini.nm:DISTRICTS[this.def.di].bossName);},
+    return G.boss?(g.k==='mini'?'MINI-BOSS':'BOSS'):this.over?'CLEAR':'→ '+(g.k==='mini'?UIK.pname(this.def.mini.nm,this.def.mini.k):UIK.pname(DISTRICTS[this.def.di].bossName,DISTRICTS[this.def.di].boss));},
   bossHp(){const k=this.def.goal.k==='mini'?this.def.mini.k:DISTRICTS[this.def.di].boss;
     return this.def.goal.k==='mini'?Math.round(300*(TUNE.miniHp+TUNE.miniHpd*this.lvl)*(HARD?1:1)):Math.round((340+110*Math.min(k,4))*(TUNE.bossHp+TUNE.bossHpd*this.lvl));},
   tick(dt){
@@ -2828,7 +2861,7 @@ NR.on('pitStart',()=>{try{bgFor(ATH);if(!ATHP)ATHP=buildAthensP();}catch(e){}});
 const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
   dn:['bankenviertel','mainufer','ostend','messe','athina'],
   bossN:['sek-adler','flusskrake','zentral-ice','kronos','bruecken-waechter','schranken-wart','talos','hoplite','tresor-wart','messe-waechter'],
-  artK:e=>e.nm==='TRESOR-WART'?8:e.nm==='MESSE-WÄCHTER'?9:e.k,   // the two mini-bosses with their own paintings
+  artK:e=>e.ak!=null?e.ak:e.nm==='TRESOR-WART'?8:e.nm==='MESSE-WÄCHTER'?9:e.k,   // the two mini-bosses with their own paintings
   shipN:['std','tri','hv','ec','swg','syn'],
   enN:['drone','charger','gunship','gate','flank','swarm','mine','turret-base','turret-barrel'],
   fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine','shield-link','bullet-shell','bullet-needle','bullet-rocket'],
@@ -3418,7 +3451,7 @@ UIK.bossDraw=(e,nm,wd,by,tl,fl)=>{const A=UIK.boss[nm],sh=A&&ART.bm['anim-boss-'
   if(A.atk&&e.ph!==undefined&&(e.arm||e.fireT>0)){row=1;col=e.fireT>0?(e.fireT>.22?2:3):(PHF<.5?0:1);}      // wind-up on the beat before it fires, then the shot, then the recovery
   else col=[0,1,2,3,2,1][Math.floor(T*(A.atk?5:3.2))%6];
   if(e.labPose&&A.atk>=0){row=e.labPose[0];col=e.labPose[1];if(!A.atk)row=0;}                // LAB: a pose picked by hand
-  let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(e.k===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}e._dh=dh;e._dw=dw;
+  let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(ART.artK(e)===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}e._dh=dh;e._dw=dw;
   const ctx_=ctx;ctx_.save();ctx_.translate(0,by);if(tl)ctx_.rotate(tl);ctx_.drawImage(sh,col*A.cw,row*A.ch,A.cw,A.ch,-dw/2,-dh/2,dw,dh);
   if(fl){ctx_.globalCompositeOperation='lighter';ctx_.globalAlpha=.4;ctx_.drawImage(sh,col*A.cw,row*A.ch,A.cw,A.ch,-dw/2,-dh/2,dw,dh);}
   ctx_.restore();return true;};
@@ -3432,11 +3465,19 @@ UIK.groundY=()=>{let y=H-70;if(G&&G.lab&&!rotMode&&labEl&&!labEl.hidden&&!LAB.mi
 UIK.bossMove=(e,dt,mv)=>{const dh=e._dh||130;
   if(e.x>bossX()){e.x-=110*dt;e.y=UIK.groundY()-dh/2;return;}
   e.x=bossX()-34-34*Math.sin(e.t*(mv==='water'?.35:.5));                                   // patrols a short stretch, always left of its stop line
-  let hop=0;if(mv==='ground'&&e.fireT>0&&!e.labPose)hop=26*Math.sin(Math.PI*Math.min(1,e.fireT/.45));   // stomp-jump on the shot, back on the road
-  e.y=UIK.groundY()-dh/2-hop+(mv==='water'?Math.sin(e.t*1.3)*3:0);e.my=-dh*.12;};
-UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,y=dh/2+(mv==='water'?-1:3);ctx.save();
-  if(mv==='water'){ctx.strokeStyle='#19e3ff';ctx.lineWidth=1.5;for(let i=0;i<3;i++){const k=((e.t*.6+i/3)%1);ctx.globalAlpha=.5*(1-k);ctx.beginPath();ctx.ellipse(0,y,dw*(.45+.35*k),4+7*k,0,0,7);ctx.stroke();}}
-  else{const lift=e.y<UIK.groundY()-dh/2-2?.6:1;ctx.globalAlpha=.5*lift;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(0,y,dw*.5*(2-lift),6,0,0,7);ctx.fill();}   // the shadow stays on the road when it hops
+  const sk=mv==='ground'&&e.fireT>0&&!e.labPose?Math.sin(e.t*90)*1.5:0;                     // wheels and legs never leave the road: a small shake on the shot, no hop
+  e.x+=sk;e.y=UIK.groundY()-dh/2+(mv==='water'?Math.sin(e.t*1.3)*3:0);e.my=-dh*.12;};
+/* portrait is a view from above: there is no road line, so a ground boss would float. Each one has a flyer of the same stage tier that takes its place (same HP, same patterns, new name and art). */
+UIK.SUB={'tresor-wart':{ak:2,nm:'ZENTRAL-ICE',lbl:'Z'},'bruecken-waechter':{ak:9,nm:'MESSE-WÄCHTER',lbl:'M'},'hoplite':{ak:2,nm:'ZENTRAL-ICE',lbl:'Z'},'talos':{ak:3,nm:'KRONOS',lbl:'K'}};
+UIK.subOf=e=>{if(!rotMode||(G&&G.lab))return null;const nm=ART.bossN[ART.artK(e)],A=UIK.boss[nm];return A&&A.move==='ground'&&UIK.SUB[nm]||null;};
+UIK.portraitSwap=e=>{const s=UIK.subOf(e);if(!s)return false;e.ak=s.ak;e.nm=s.nm;e.lbl=s.lbl;e.sub=1;return true;};
+UIK.pname=(nm,k)=>{if(!rotMode||(G&&G.lab))return nm;const o=UIK.SUB[ART.bossN[ART.artK({k,nm})]];return o&&UIK.boss[ART.bossN[ART.artK({k,nm})]].move==='ground'?o.nm:nm;};
+// shadow: one soft ellipse on the road line right under the boss (a cached radial-gradient sprite, no per-frame filter); flyers throw a smaller, fainter one the higher they are
+UIK._sh=null;
+UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,gy=UIK.groundY(),h=Math.max(0,gy-(e.y+dh/2)),y=gy-e.y+1;ctx.save();
+  if(mv==='water'){ctx.strokeStyle='#19e3ff';ctx.lineWidth=1.5;for(let i=0;i<3;i++){const k=((e.t*.6+i/3)%1);ctx.globalAlpha=.5*(1-k);ctx.beginPath();ctx.ellipse(0,y-4,dw*(.45+.35*k),4+7*k,0,0,7);ctx.stroke();}}
+  else{const f=mv==='ground'?1:Math.max(0,1-h/420);if(f>.04){if(!UIK._sh){const c=document.createElement('canvas');c.width=64;c.height=16;const g=c.getContext('2d'),r=g.createRadialGradient(32,8,0,32,8,32);r.addColorStop(0,'rgba(0,0,0,.85)');r.addColorStop(.6,'rgba(0,0,0,.4)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.translate(0,8);g.scale(1,.25);g.translate(0,-8*4);g.fillRect(0,0,64,64);UIK._sh=c;}
+    const sw=dw*(.6+.4*f);ctx.globalAlpha=.55*f;ctx.drawImage(UIK._sh,-sw*.6,y-sw*.075,sw*1.2,sw*.15);}}   // width ~0.8 x the boss, flat, centred on the boss x
   ctx.restore();};
 
 /* ---------- lag fix, part 2: songs are streamed (see parts/a.js "tracks"), nothing is decoded any more, so there is no stall to hide.
@@ -3492,6 +3533,7 @@ NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L3',id:'ship-mounts',text:'Your ship now shows the weapons you equip: a coloured circle on slot 1, a triangle on slot 2, a split ring when they fuse, and a flash from the mounts when you fire. See it in WEAPONS and the Garage. Painted mounts come later. Does it read at a glance?'},
  {ver:'L2',id:'weapon-levels',text:'Weapons grow with your Neon: Garage > WEAPONS has 16 weapons (8 new: Frost Beam, Flame Arc, Plasma Wave, Shrapnel Shell, Echo Drone, Gravity Well, Rail Sniper, Storm Cell). Buy one with Neon, then buy its levels 1 to 10 (a level bar, the power it gives and the next new ability are on every card). In a run the pit-stop pickups add up to 2 more levels on top. Does a higher level feel stronger, and are the prices fair?'},
  {ver:'L2',id:'fight-back',text:'Enemies now fly in and fight back: they cannot be hit until they are fully on screen (a red ring at the edge shows where they come in), every enemy lives at least about a second on screen even against a maxed build, and chargers glide in before they dash. Do waves feel like a fight now, on Easy too?'},
  {ver:'L2',id:'no-idle',text:'Standing still is no longer safe: parking in one spot (or nudging a few pixels) now brings the red static discharge that no shield, heal or revive can outlast, plus aimed shots from the edge of the screen. Keep moving and nothing changes. Does it feel fair?'},
@@ -3519,6 +3561,7 @@ const NR_CHECKLIST=[
  {ver:'J1',id:'all-painted',text:'Every screen is painted: both mini-bosses (Tresor-Wart, Messe-Waechter) have their own art, the shield link between a leader and its drones is a painted beam. Only the 13 base perk icons are still line icons (they are on the missing-assets page).'},
  {ver:'J1',id:'set-pieces',text:'In one minute of play something new happens every 8 to 10 seconds: a WEAVE of drones crossing on the beat, a LASER FENCE across the screen (find the green gap, it fires on the bar line), a mini-boss about every 50 s. Clear a set piece and a shower of shards sweeps across the screen.'},
  {ver:'J1',id:'drop-moment',text:'Every 16 bars: DROP counts down 4-3-2-1 at the top, and a DASH on the downbeat blows the screen clear (all bullets, score burst, tier up, shard shower). Miss it and only the bullets near you vanish. Does it feel big?'},
+ {ver:'J1',id:'boss-ground',text:'Bosses on wheels and legs now stay on the road with a proper shadow instead of hopping. In portrait mode, where there is no road, they are swapped for a flying boss of the same tier. Do the bosses look grounded now?'},
  {ver:'I9',id:'painted-icons',text:'All the grey placeholder boxes are gone: painted kit perk icons (Garage TUNE and LOAD), painted SOON cards (no PLACEHOLDER tag), difficulty badges, stage medals, squad leader with painted crown, glowing homing orbs and the Drift, Lancer and Nova ships. Anything still a plain shape?'},
  {ver:'I9',id:'painted-chest',text:'Boss chest: painted closed chest and card backs, painted card faces, and the chest opens when you pick a card.'},
  {ver:'I9',id:'painted-surfaces',text:'Garage / pit stop screens and the pause + settings screens now sit on painted backgrounds (dark wash on top). Is every card and button still easy to read, on the phone upright and sideways?'},
@@ -3782,7 +3825,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
     G.rings.push({x:P.x+24,y:P.y,l:.25,m:.25,c:'#ffe14d'});AU.sfx('shot');},
   // short text for the HUD: "PULSE 2 · LANCE 1"
   hud(c,x,y,k){c.save();c.font=`${Math.round(11*(k||1))}px "Share Tech Mono",monospace`;c.textAlign='left';let xx=x;
-    for(const id of this.eq){const d=id&&WPD[id],t=d?d.s+' '+this.lvOf(id):'-';c.fillStyle=d?d.c:'#dcd8f6';c.fillText(t,xx,y);xx+=c.measureText(t).width+10*(k||1);}
+    for(const id of this.eq){const d=id&&WPD[id],t=d?d.s+' '+this.lvOf(id):'-';if(d)xx+=RIG.chip(c,id,this.eq.indexOf(id),xx,y,k||1);c.fillStyle=d?d.c:'#dcd8f6';c.fillText(t,xx,y);xx+=c.measureText(t).width+10*(k||1);}
     const f=this.fu();if(f&&this.fuT>0){c.globalAlpha=Math.min(1,this.fuT);c.fillStyle='#ffe14d';c.fillText('FUSION '+f.name.toUpperCase(),x,y+13*(k||1));}c.restore();},
   toggle(id){const i=this.eq.indexOf(id);let m;
     if(i>=0){if(this.eqIds().length<2){this.msg('Keep one weapon equipped');return;}this.eq[i]=null;m=WPD[id].s+' removed';}
@@ -3791,6 +3834,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
   msg(t){const el=$('wpMsg');if(el)el.textContent=t;}};
 {const ld=load('mnr_wp',null);if(ld&&Array.isArray(ld.eq)){WP.eq=[WP_IDS.includes(ld.eq[0])?ld.eq[0]:null,WP_IDS.includes(ld.eq[1])&&ld.eq[1]!==ld.eq[0]?ld.eq[1]:null];if(!WP.eqIds().length)WP.eq=['pulse',null];}}
 window.__wp=Object.assign(WP,{lvl(id,n){this.lv[id]=n;}});          // test hook
+RIG.ok=true;window.__rig=Object.assign(RIG,{GA,SHIPS,pushPos:()=>[P.x,P.y]});          // test hook
 NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
 {const pd=PW.draw;PW.draw=function(t){pd.call(this,t);WP.drawWorld(t);};const cl=SH.close;SH.close=function(){cl.call(this);WP.fuT=4;};}NR.on('beat',()=>WP.beat());
 
@@ -3805,11 +3849,11 @@ NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
 #wpL .card .pp{display:flex;gap:2px;margin-top:3px}#wpL .card .pp i{display:block;width:clamp(8px,calc(var(--u)*3),14px);height:5px;border-radius:1px;background:#ffffff22}#wpL .card .pp i.on{background:var(--c)}
 #wpL .card.sel{background:#22123f}
 #wpFu{flex:0 0 auto;display:flex;gap:10px;align-items:center;min-height:30px;font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*3.2),15px);color:var(--dim);padding:2px 4px}
-#wpFu canvas{width:56px;height:56px;flex:0 0 auto}#wpFu .n{color:#ffe14d;font-size:1.05em;letter-spacing:.04em}#wpFu .t{color:var(--ink)}
+#wpShip{display:block;width:min(100%,300px);height:auto;aspect-ratio:300/96;margin:0 auto 4px;flex:0 0 auto}#wpFu canvas{width:56px;height:56px;flex:0 0 auto}#wpFu .n{color:#ffe14d;font-size:1.05em;letter-spacing:.04em}#wpFu .t{color:var(--ink)}
 #shWpRow{display:flex;gap:10px;align-items:center;flex:0 0 auto;min-height:44px}#shWpRow button{flex:0 0 auto;min-width:44px;padding:.4em 1em}#shWpRow span{font-family:var(--mono);color:var(--dim);font-size:clamp(11px,calc(var(--u)*3.2),15px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #titleRow2{margin-top:2px}#titleRow2 .go{font-size:clamp(12px,min(1.6vw,2.8vh),16px)}`;document.head.appendChild(st);}
 const wpEl=document.createElement('div');wpEl.id='wpm';wpEl.className='ov solid pg';wpEl.hidden=true;
-wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><div id="wpL"></div><div id="wpFu"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
+wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><canvas id="wpShip" width="300" height="96"></canvas><div id="wpL"></div><div id="wpFu"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
 stage.appendChild(wpEl);
 {const DEMO=(id,c,t,col)=>{                                       // t: 0..2 seconds, the demo loops
    c.clearRect(0,0,108,52);const sy=26;c.fillStyle='#ffffff';c.beginPath();c.moveTo(6,sy-6);c.lineTo(18,sy);c.lineTo(6,sy+6);c.closePath();c.fill();
@@ -3837,7 +3881,7 @@ stage.appendChild(wpEl);
    c.strokeStyle=f.c2;c.shadowColor=f.c2;c.beginPath();c.arc(m,m,z*.36,-Math.PI*.5,Math.PI*.5);c.stroke();
    c.shadowBlur=0;c.lineWidth=z*.045;c.strokeStyle=f.c1;c.beginPath();c.moveTo(z*.22,z*.78);c.lineTo(z*.78,z*.22);c.stroke();c.strokeStyle=f.c2;c.beginPath();c.moveTo(z*.22,z*.22);c.lineTo(z*.78,z*.78);c.stroke();
    c.fillStyle='#ffffff';c.font=`700 ${Math.round(z*.26)}px "Chakra Petch",sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(f.name.split(' ').map(w=>w[0]).join(''),m,m+z*.02);c.restore();};
- WP.draw=function(){const box=$('wpL');box.innerHTML='';
+ WP.draw=function(){const box=$('wpL');box.innerHTML='';RIG.pic($('wpShip'),GA.ship);
    for(const id of WP_IDS){const d=WPD[id],L=this.lvOf(id),slot=this.eq.indexOf(id),b=document.createElement('button');b.type='button';b.className='card'+(slot>=0?' sel':'')+(this.has(id)?'':' no');b.style.setProperty('--c',d.c);b.dataset.id=id;
      b.innerHTML=`<canvas width="108" height="52" data-id="${id}"></canvas><div class="tx"><div class="n">${d.n}</div><div class="t">${d.tx}</div><div class="pp">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<this.permOf(id)&&this.has(id)?'on':i<L?'run':''}"></i>`).join('')}</div></div><span class="slot">${!this.has(id)?'LOCKED':slot>=0?'SLOT '+(slot+1):'TAP TO EQUIP'}</span>`;
      b.addEventListener('click',()=>this.toggle(id));box.appendChild(b);}

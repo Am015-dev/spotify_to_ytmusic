@@ -5,6 +5,7 @@
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L3',id:'ship-mounts',text:'Your ship now shows the weapons you equip: a coloured circle on slot 1, a triangle on slot 2, a split ring when they fuse, and a flash from the mounts when you fire. See it in WEAPONS and the Garage. Painted mounts come later. Does it read at a glance?'},
  {ver:'L2',id:'weapon-levels',text:'Weapons grow with your Neon: Garage > WEAPONS has 16 weapons (8 new: Frost Beam, Flame Arc, Plasma Wave, Shrapnel Shell, Echo Drone, Gravity Well, Rail Sniper, Storm Cell). Buy one with Neon, then buy its levels 1 to 10 (a level bar, the power it gives and the next new ability are on every card). In a run the pit-stop pickups add up to 2 more levels on top. Does a higher level feel stronger, and are the prices fair?'},
  {ver:'L2',id:'fight-back',text:'Enemies now fly in and fight back: they cannot be hit until they are fully on screen (a red ring at the edge shows where they come in), every enemy lives at least about a second on screen even against a maxed build, and chargers glide in before they dash. Do waves feel like a fight now, on Easy too?'},
  {ver:'L2',id:'no-idle',text:'Standing still is no longer safe: parking in one spot (or nudging a few pixels) now brings the red static discharge that no shield, heal or revive can outlast, plus aimed shots from the edge of the screen. Keep moving and nothing changes. Does it feel fair?'},
@@ -32,6 +33,7 @@ const NR_CHECKLIST=[
  {ver:'J1',id:'all-painted',text:'Every screen is painted: both mini-bosses (Tresor-Wart, Messe-Waechter) have their own art, the shield link between a leader and its drones is a painted beam. Only the 13 base perk icons are still line icons (they are on the missing-assets page).'},
  {ver:'J1',id:'set-pieces',text:'In one minute of play something new happens every 8 to 10 seconds: a WEAVE of drones crossing on the beat, a LASER FENCE across the screen (find the green gap, it fires on the bar line), a mini-boss about every 50 s. Clear a set piece and a shower of shards sweeps across the screen.'},
  {ver:'J1',id:'drop-moment',text:'Every 16 bars: DROP counts down 4-3-2-1 at the top, and a DASH on the downbeat blows the screen clear (all bullets, score burst, tier up, shard shower). Miss it and only the bullets near you vanish. Does it feel big?'},
+ {ver:'J1',id:'boss-ground',text:'Bosses on wheels and legs now stay on the road with a proper shadow instead of hopping. In portrait mode, where there is no road, they are swapped for a flying boss of the same tier. Do the bosses look grounded now?'},
  {ver:'I9',id:'painted-icons',text:'All the grey placeholder boxes are gone: painted kit perk icons (Garage TUNE and LOAD), painted SOON cards (no PLACEHOLDER tag), difficulty badges, stage medals, squad leader with painted crown, glowing homing orbs and the Drift, Lancer and Nova ships. Anything still a plain shape?'},
  {ver:'I9',id:'painted-chest',text:'Boss chest: painted closed chest and card backs, painted card faces, and the chest opens when you pick a card.'},
  {ver:'I9',id:'painted-surfaces',text:'Garage / pit stop screens and the pause + settings screens now sit on painted backgrounds (dark wash on top). Is every card and button still easy to read, on the phone upright and sideways?'},
@@ -295,7 +297,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
     G.rings.push({x:P.x+24,y:P.y,l:.25,m:.25,c:'#ffe14d'});AU.sfx('shot');},
   // short text for the HUD: "PULSE 2 · LANCE 1"
   hud(c,x,y,k){c.save();c.font=`${Math.round(11*(k||1))}px "Share Tech Mono",monospace`;c.textAlign='left';let xx=x;
-    for(const id of this.eq){const d=id&&WPD[id],t=d?d.s+' '+this.lvOf(id):'-';c.fillStyle=d?d.c:'#dcd8f6';c.fillText(t,xx,y);xx+=c.measureText(t).width+10*(k||1);}
+    for(const id of this.eq){const d=id&&WPD[id],t=d?d.s+' '+this.lvOf(id):'-';if(d)xx+=RIG.chip(c,id,this.eq.indexOf(id),xx,y,k||1);c.fillStyle=d?d.c:'#dcd8f6';c.fillText(t,xx,y);xx+=c.measureText(t).width+10*(k||1);}
     const f=this.fu();if(f&&this.fuT>0){c.globalAlpha=Math.min(1,this.fuT);c.fillStyle='#ffe14d';c.fillText('FUSION '+f.name.toUpperCase(),x,y+13*(k||1));}c.restore();},
   toggle(id){const i=this.eq.indexOf(id);let m;
     if(i>=0){if(this.eqIds().length<2){this.msg('Keep one weapon equipped');return;}this.eq[i]=null;m=WPD[id].s+' removed';}
@@ -304,6 +306,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
   msg(t){const el=$('wpMsg');if(el)el.textContent=t;}};
 {const ld=load('mnr_wp',null);if(ld&&Array.isArray(ld.eq)){WP.eq=[WP_IDS.includes(ld.eq[0])?ld.eq[0]:null,WP_IDS.includes(ld.eq[1])&&ld.eq[1]!==ld.eq[0]?ld.eq[1]:null];if(!WP.eqIds().length)WP.eq=['pulse',null];}}
 window.__wp=Object.assign(WP,{lvl(id,n){this.lv[id]=n;}});          // test hook
+RIG.ok=true;window.__rig=Object.assign(RIG,{GA,SHIPS,pushPos:()=>[P.x,P.y]});          // test hook
 NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
 {const pd=PW.draw;PW.draw=function(t){pd.call(this,t);WP.drawWorld(t);};const cl=SH.close;SH.close=function(){cl.call(this);WP.fuT=4;};}NR.on('beat',()=>WP.beat());
 
@@ -318,11 +321,11 @@ NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
 #wpL .card .pp{display:flex;gap:2px;margin-top:3px}#wpL .card .pp i{display:block;width:clamp(8px,calc(var(--u)*3),14px);height:5px;border-radius:1px;background:#ffffff22}#wpL .card .pp i.on{background:var(--c)}
 #wpL .card.sel{background:#22123f}
 #wpFu{flex:0 0 auto;display:flex;gap:10px;align-items:center;min-height:30px;font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*3.2),15px);color:var(--dim);padding:2px 4px}
-#wpFu canvas{width:56px;height:56px;flex:0 0 auto}#wpFu .n{color:#ffe14d;font-size:1.05em;letter-spacing:.04em}#wpFu .t{color:var(--ink)}
+#wpShip{display:block;width:min(100%,300px);height:auto;aspect-ratio:300/96;margin:0 auto 4px;flex:0 0 auto}#wpFu canvas{width:56px;height:56px;flex:0 0 auto}#wpFu .n{color:#ffe14d;font-size:1.05em;letter-spacing:.04em}#wpFu .t{color:var(--ink)}
 #shWpRow{display:flex;gap:10px;align-items:center;flex:0 0 auto;min-height:44px}#shWpRow button{flex:0 0 auto;min-width:44px;padding:.4em 1em}#shWpRow span{font-family:var(--mono);color:var(--dim);font-size:clamp(11px,calc(var(--u)*3.2),15px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #titleRow2{margin-top:2px}#titleRow2 .go{font-size:clamp(12px,min(1.6vw,2.8vh),16px)}`;document.head.appendChild(st);}
 const wpEl=document.createElement('div');wpEl.id='wpm';wpEl.className='ov solid pg';wpEl.hidden=true;
-wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><div id="wpL"></div><div id="wpFu"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
+wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><canvas id="wpShip" width="300" height="96"></canvas><div id="wpL"></div><div id="wpFu"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
 stage.appendChild(wpEl);
 {const DEMO=(id,c,t,col)=>{                                       // t: 0..2 seconds, the demo loops
    c.clearRect(0,0,108,52);const sy=26;c.fillStyle='#ffffff';c.beginPath();c.moveTo(6,sy-6);c.lineTo(18,sy);c.lineTo(6,sy+6);c.closePath();c.fill();
@@ -350,7 +353,7 @@ stage.appendChild(wpEl);
    c.strokeStyle=f.c2;c.shadowColor=f.c2;c.beginPath();c.arc(m,m,z*.36,-Math.PI*.5,Math.PI*.5);c.stroke();
    c.shadowBlur=0;c.lineWidth=z*.045;c.strokeStyle=f.c1;c.beginPath();c.moveTo(z*.22,z*.78);c.lineTo(z*.78,z*.22);c.stroke();c.strokeStyle=f.c2;c.beginPath();c.moveTo(z*.22,z*.22);c.lineTo(z*.78,z*.78);c.stroke();
    c.fillStyle='#ffffff';c.font=`700 ${Math.round(z*.26)}px "Chakra Petch",sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(f.name.split(' ').map(w=>w[0]).join(''),m,m+z*.02);c.restore();};
- WP.draw=function(){const box=$('wpL');box.innerHTML='';
+ WP.draw=function(){const box=$('wpL');box.innerHTML='';RIG.pic($('wpShip'),GA.ship);
    for(const id of WP_IDS){const d=WPD[id],L=this.lvOf(id),slot=this.eq.indexOf(id),b=document.createElement('button');b.type='button';b.className='card'+(slot>=0?' sel':'')+(this.has(id)?'':' no');b.style.setProperty('--c',d.c);b.dataset.id=id;
      b.innerHTML=`<canvas width="108" height="52" data-id="${id}"></canvas><div class="tx"><div class="n">${d.n}</div><div class="t">${d.tx}</div><div class="pp">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<this.permOf(id)&&this.has(id)?'on':i<L?'run':''}"></i>`).join('')}</div></div><span class="slot">${!this.has(id)?'LOCKED':slot>=0?'SLOT '+(slot+1):'TAP TO EQUIP'}</span>`;
      b.addEventListener('click',()=>this.toggle(id));box.appendChild(b);}
