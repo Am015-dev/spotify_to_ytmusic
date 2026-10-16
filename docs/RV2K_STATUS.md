@@ -9,7 +9,7 @@
 | 6 | garage-car | ride 13 % of screen, 7 cards in view | ✅ |
 | 7 | onboard | real STORY path (no ?test): 2 taps (STORY, SKIP) ✅; ~69 s here (menu 10 s, STORY tap 15 s, intro cutscene reached at ~65 s, SKIP at 68.6 s) vs ≤30 s. Software GL, so a phone is faster, but load time is the cause, not UI | ❌ |
 | 8 | drawer | 12/12 tiles pictured, 0 overlapping labels | ✅ |
-| 9 | foliage | 13/120 = 11 % samples occluded (≤2 %); needs car→camera line-of-sight pull-in (see HANDOFF_world1) | ❌ |
+| 9 | foliage | 1/120 and 0/120 samples occluded (≤2 %, twice, built page): camera pull-in on building/glass meshes (src/98fc) + GO fix (stale water/deep matrixWorld in ?draw=0), docs/HANDOFF_fcam2.md | ✅ |
 | 10 | card | 20 words, goal 4× = HUD 4× | ✅ |
 
 Gate: `node tools/unit/run.js` 0 FAIL (4665 pass, 13 known). tChkGo TAG=rv2k,life1,xf1,terrain: 45/53; async GOs are judged before they finish, so the table above uses each GO run alone. Other fails: xf1/grass and xf1/kerb (echo of other GOs' async lines), life1/people SLOW 10.6 s (load).
