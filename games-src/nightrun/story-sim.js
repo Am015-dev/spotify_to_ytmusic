@@ -54,7 +54,7 @@ const BOT = (opts) => {
   const res = {}; let next = 0;
   await Promise.all(Array.from({ length: PAR }, async () => {
     const p = await browser.newPage({ viewport: { width: 960, height: 540 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
-    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
+    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); if (process.env.CLASSIC) await p.evaluate(() => window.__mnr.ARC && window.__mnr.ARC.set(false));
     while (next < jobs.length) { const n = jobs[next++]; const r = await p.evaluate(BOT, { n, PC, MAXT, endless: false, t2: process.env.T2 ? JSON.parse(process.env.T2) : null }); (res[n] = res[n] || []).push(r); if (errs.length) { console.log('PAGE ERROR', errs[0]); errs.length = 0; } }
     await p.close();
   }));

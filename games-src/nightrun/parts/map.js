@@ -69,10 +69,12 @@ function mapDetail(n){const el=$('stDet');if(!el)return;if(!(n>0)){el.hidden=tru
   el.hidden=false;el.dataset.n=n;el.style.setProperty('--c',D.a);
   el.innerHTML=`<div class="dh"><span class="ac">${s.ch?'CHALLENGE':ACTN[s.act]+' · '+D.name}</span><span class="bs">${ok?'BEST '+'★'.repeat(k)+'☆'.repeat(3-k):''}</span><button class="x" id="stDx" type="button" aria-label="Close">✕</button></div>`
    +`<div class="dm">${bn?`<img class="bp" src="media/boss-${slugOf(bn)}.webp" alt="" onerror="this.remove()">`:''}<div class="dt"><div class="nm">${s.n<=MAIN?s.n+' · ':''}${s.name}</div><div class="gl">${goalTxt(s)}</div>${s.ch?`<div class="rl">${CHRULE[s.ch]}</div>`:''}</div></div>`
+   +(RET.arcade&&!s.ch?`<div class="arc" role="group" aria-label="Stage length"><button type="button" id="arcA" class="${ARC.on?'on':''}">ARCADE <small>~3 MIN</small></button><button type="button" id="arcC" class="${ARC.on?'':'on'}">CLASSIC <small>FULL SONG</small></button></div>`:'')
    +`<div class="stl">${lines.map((t,i)=>`<div class="${k>i?'ok':''}"><span>${k>i?'★':'☆'}</span> ${t}</div>`).join('')}</div>`
    +(rec?`<div class="tip">${rec}</div>`:'')
    +(ok?'':`<div class="lkn">Clear ${need||'the stage before'} first</div>`)
    +`<button class="go" id="stPlay" type="button"${ok?'':' disabled'}>${ok?(k?'PLAY AGAIN':'PLAY'):'LOCKED'}</button>`;
+  if($('arcA')){$('arcA').addEventListener('click',()=>{ARC.set(true);mapDetail(n);});$('arcC').addEventListener('click',()=>{ARC.set(false);mapDetail(n);});}
   $('stPlay').addEventListener('click',()=>{if(unlocked(n))startStory(n);});
   $('stDx').addEventListener('click',()=>{MAPD.sel=-1;for(const e of document.querySelectorAll('#stRows .nd.sel'))e.classList.remove('sel');el.hidden=true;});}
 function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=-1;stDraw();}
@@ -85,6 +87,7 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 {const st=document.createElement('style');st.textContent=`
 #stsel .mapbox{display:block!important;flex:1 1 0;min-height:0;position:relative;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:10px;background:#05030c;touch-action:pan-x pan-y;scrollbar-width:thin}
 #stsel .mp{position:relative;overflow:hidden}
+#stDet .arc{display:flex;gap:6px;margin:4px 0}#stDet .arc button{flex:1;min-height:40px;border:1px solid #5a4a7a;background:#120a24;color:#cfc3e8;border-radius:8px;font:700 13px/1.1 inherit;letter-spacing:.06em}#stDet .arc button small{display:block;font-size:10px;font-weight:600;opacity:.8}#stDet .arc button.on{background:#ff3fa4;border-color:#ff9bd2;color:#fff}
 #stsel .band{position:absolute;background-size:cover;background-position:center;opacity:1;border-top:2px solid var(--c);border-image:none}
 #stsel .band::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 40px #05030c}
 #stsel .ban{position:absolute;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 18px;text-align:center;white-space:nowrap;color:var(--ink);

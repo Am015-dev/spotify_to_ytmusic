@@ -85,7 +85,8 @@ if(!sSave.v40){const OLD16=['FIRST RUN','PATROL','SEK-ADLER','RIVER ROAD','BRIDG
   for(const k in sSave.stars){const m=mv(+k);if(m)st[m]=sSave.stars[k];}for(const k in sSave.snap){const m=mv(+k);if(m)sn[m]=sSave.snap[k];}
   sSave.stars=st;sSave.snap=sn;sSave.v30=1;sSave.v40=1;sPersist();}
 const ACTN=['ACT I','ACT II','ACT III','ACT IV','ACT V'];
-const stLen=s=>{const b=songBars(s.song);return s.ch?Math.round(b*.6):b;};   // stage length in bars = its song (a challenge is 60% of it)
+const stLenC=s=>{const b=songBars(s.song);return s.ch?Math.round(b*.6):b;};
+const stLen=s=>ARC.bars(s,stLenC(s));   // stage length in bars = its song (a challenge is 60% of it)
 const stK=s=>stLen(s)/46;                                 // the old goals were made for 46 bars: they scale with the length
 const stKill=s=>Math.round(s.goal.v*stK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
 const stS3=s=>Math.round(s.s3*stK(s)/5000)*5000;
@@ -95,7 +96,7 @@ const starTxt=s=>[s.ch?'Clear the challenge':'Clear the stage',(s.ch==='perfect'
 const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
-  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLen(this.def));   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
+  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def));   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
     this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=(1+TUNE.eh*L)*dmOf().hp;
     this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1];
     this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;
