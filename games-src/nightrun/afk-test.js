@@ -40,6 +40,29 @@ async function run(br, port, diff, mode) {
   await ctx.close();
   return { diff, mode, dead: !!end, surv: +(end ? end.t : last.t).toFixed(1), score: end ? end.score : last.sc, maxEb, avgEb: +(ebSum / Math.max(1, ebN)).toFixed(1), moved: Math.round(moved), errs };
 }
+
+// Story-mode idle: a late stage, the strong loadout plus Second Wind, Fortune heals, every timed power-up kept on and a free repair pickup every 1.5 s.
+// A ship that never moves (or only hops 60 px every 2.5 s) must still be dead within 35 game seconds. Stepped by hand (?sim=1), so it is fast.
+async function storyIdle(br, port, n, wig) {
+  const p = await br.newPage({ viewport: { width: 960, height: 540 } }), errs = []; p.on('pageerror', e => errs.push(e.message));
+  await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
+  const r = await p.evaluate(({ n, wig }) => {
+    const m = window.__mnr; m.startStory(n); m.simOn(true);
+    Object.assign(m.SH.got, { hm: 5, pc: 4, sc: 3, rg: 2, dr: 3, fr: 5, rc: 3, dm: 5, cr: 5, bd: 3, dc: 3, as: 3, sh: 3 }); try { m.SH.recalc(); } catch (e) { }
+    m.SH.add('wn'); m.SH.add('wn'); m.SH.lk = 2; try { window.__wp.lvl('pulse', 5); window.__wp.lvl('swarm', 5); } catch (e) { }
+    let i = 0, last = -1; const dt = 1 / 60;
+    while (m.running && m.G.t < 90) {
+      if (m.SH.active) m.SH.close();
+      if (i % 30 === 0) for (const k of ['drum', 'tempo', 'slow', 'mag', 'tri', 'nr', 'bub']) if (!m.PW.on(k)) m.PW.give(k, true);
+      if (wig && i % wig === 0) m.P.x += (Math.floor(i / wig) % 2 ? -1 : 1) * 60;
+      if (i % 90 === 0 && m.P.hp < m.P.max) m.G.pk.push({ t: 'hp', x: m.P.x + 20, y: m.P.y, vx: 0, vy: 0, bob: 0 });
+      const bn = Math.floor(m.bpos()); if (bn !== last) { last = bn; m.press('Fire'); }
+      m.step(dt); i++; if (m.ST.over || m.G.dead) break;
+    }
+    return { dead: m.G.dead, t: +m.G.t.toFixed(1) };
+  }, { n, wig });
+  await p.close(); return { n, wig, ...r, errs };
+}
 (async () => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   for (let i = 0; i < 50; i++) { try { if ((await fetch(`http://127.0.0.1:${port}/index.html`)).ok) break; } catch (e) { } await sleep(100); }
@@ -53,6 +76,8 @@ async function run(br, port, diff, mode) {
     if (a.score > b.score * .5 && b.surv >= a.surv) fails.push(`${d}: AFK score ${a.score} is not far below the bot's ${b.score}`);
     if (!(b.surv >= Math.min(SECS - 2, 45) || b.dead === false)) fails.push(`${d}: the dodging bot died at ${b.surv}s (unfair)`);
   }
+  for (const [n, wig] of [[20, 0], [42, 0], [42, 150]]) { const r = await storyIdle(br, port, n, wig); console.log(JSON.stringify(r));
+    if (!(r.dead && r.t <= 35)) fails.push(`story stage ${n}${wig ? ' (60 px hop every 2.5 s)' : ''}: idle ship ${r.dead ? 'died only at' : 'still alive after'} ${r.t}s (limit 35s)`); if (r.errs.length) fails.push('story idle page error: ' + r.errs[0]); }
   for (const r of res) if (r.errs.length) fails.push(`${r.diff}/${r.mode} page errors: ${r.errs[0]}`);
   srv.kill(); console.log(fails.length ? 'FAIL\n  ' + fails.join('\n  ') : 'PASS'); process.exit(fails.length ? 1 : 0);
 })();

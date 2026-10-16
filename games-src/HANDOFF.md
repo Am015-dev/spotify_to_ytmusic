@@ -86,3 +86,8 @@ Commits carry NO attribution lines. If `/dev/null` is a symlink (`ls -la /dev/nu
 - **Shelf:** the 3 new games are not on it yet. To add them, run `games-src/room/add-new-games.py` (covers are
   ready).
 - **Art:** the owner will make art with Google Flow later; each game has a prompt list in `ART-PROMPTS.md`.
+
+## Nightrun anti-idle (nr-idle)
+- Idle ships already died in ~21-27 s in my stepped sims, so the owner's runs avoided the clock by small nudges: a hop re-anchored and HALVED the counter, and a dash in place reset it. Revives (Second Wind) also refilled the hull after discharge death, and repairs could outrun it.
+- Fix in parts/h.js: 40 px anchor, each hop pays back only 1.2 s, dash in place pays nothing, discharge interval scales with hull (same death clock for any hull), no repair while discharging, last hull point burns revives, aimed hunter shots from the edge while parked (ebCap respected).
+- afk-test.js now also runs story idle (stage 20/42, and a 60 px hop every 2.5 s) with Second Wind, repairs and all power-ups on: dies by 25-34 s. audio-test timing checks fail in this sandbox on the old build too (CPU load).
