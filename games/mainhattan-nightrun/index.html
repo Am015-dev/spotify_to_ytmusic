@@ -1423,7 +1423,7 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
     NR.mod.mag=140+70*n('mg');NR.mod.win=14*n('wd');NR.mod.pw=1+.3*n('lp');
     this.ck=4*n('ck');this.hm=n('hm');this.sharp=1+.3*n('sb');this.nx=1+.3*n('nx');this.dmax=n('dc');this.db=n('db');this.fr=Math.pow(.8,n('fr'));},
   // ----- Neon -----
-  award(e,keep){if(!this.live)return;let v=NEON_V[e.type]||.5;if(e.pf)v*=1.5;v+=Math.min(3,tierOf(C.n)-1);this.acc=(this.acc||0)+v*this.nx*NEON_K;   // on-beat kills pay 1.5x, combos add up to +3
+  award(e,keep){if(!this.live)return;let v=NEON_V[e.type]||.5;if(e.pf)v*=1.5;v+=Math.min(3,tierOf(C.n)-1);this.acc=(this.acc||0)+v*this.nx*(window.RET&&RET.econ?RET.nk:NEON_K);   // on-beat kills pay 1.5x, combos add up to +3
     const n=Math.floor(this.acc);if(n<1)return;this.acc-=n;this.neon+=n;this.earned+=n;this.flash=.35;if(n>=3)floater(e.x+14,e.y+8,'+'+n+' NEON','#19e3ff');},
   bankRun(quiet){if(!this.live)return 0;this.live=false;const add=this.neon+Math.round(this.earned*.3);GA.bank+=add;GA.runs++;gsave();this.lastBank=add;this.lastTotal=GA.bank;
     if(!quiet)NR.emit('banked',add);return add;},
@@ -1744,7 +1744,8 @@ if(!sSave.v40){const OLD16=['FIRST RUN','PATROL','SEK-ADLER','RIVER ROAD','BRIDG
   for(const k in sSave.stars){const m=mv(+k);if(m)st[m]=sSave.stars[k];}for(const k in sSave.snap){const m=mv(+k);if(m)sn[m]=sSave.snap[k];}
   sSave.stars=st;sSave.snap=sn;sSave.v30=1;sSave.v40=1;sPersist();}
 const ACTN=['ACT I','ACT II','ACT III','ACT IV','ACT V'];
-const stLen=s=>{const b=songBars(s.song);return s.ch?Math.round(b*.6):b;};   // stage length in bars = its song (a challenge is 60% of it)
+const stLenC=s=>{const b=songBars(s.song);return s.ch?Math.round(b*.6):b;};
+const stLen=s=>ARC.bars(s,stLenC(s));   // stage length in bars = its song (a challenge is 60% of it)
 const stK=s=>stLen(s)/46;                                 // the old goals were made for 46 bars: they scale with the length
 const stKill=s=>Math.round(s.goal.v*stK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
 const stS3=s=>Math.round(s.s3*stK(s)/5000)*5000;
@@ -1754,9 +1755,9 @@ const starTxt=s=>[s.ch?'Clear the challenge':'Clear the stage',(s.ch==='perfect'
 const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
-  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLen(this.def));   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
+  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def))-(window.RET&&RET.mercy?RET.mercyLvl(n):0);   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
     this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=(1+TUNE.eh*L)*dmOf().hp;
-    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1];
+    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1]+(window.RET&&RET.mercy?RET.mercyHull(n):0);
     this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;
     const df=this.def;this.len=stLen(df);this.kv=stKill(df);this.sv=stScore(df);this.pn=stPerf(df);   // stage = song length; boss in its last 32 bars (mini-boss: 14)
     this.lead=df.goal.k==='boss'?Math.max(20,this.len-BOSS_BARS):df.goal.k==='mini'?Math.max(20,this.len-MINI_BARS):0;
@@ -1807,13 +1808,13 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     $('stBtn2').hidden=false;
     overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);
     G.over=true;},
-  finish(){running=false;const n=this.n,st=this.stars,sum=st[0]+st[1]+st[2];
+  finish(){running=false;const n=this.n,st=this.stars,sum=st[0]+st[1]+st[2];if(window.RET&&RET.clearPay)RET.payClear(n,sum);
     if(sum>(sSave.stars[n]||0))sSave.stars[n]=sum;
     if(n<MAIN){const got={};for(const id in SH.got)got[id]=SH.got[id];sSave.snap[n+1]=got;}
     sPersist();NR.emit('runEnd',{story:n,cleared:true,score:G.score,di:G.di,kills:G.kills});
     const s=this.def;$('srEye').textContent=n===MAIN?'Story complete':s.ch?'Challenge clear':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
-    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn)+' PERFECT · you '+G.perf)+row(st[2],s.ch?'Score '+(this.s3/1000)+'K · you '+Math.round(G.score/1000)+'K':'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)));
+    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn)+' PERFECT · you '+G.perf)+row(st[2],s.ch?'Score '+(this.s3/1000)+'K · you '+Math.round(G.score/1000)+'K':'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)))+(window.RET&&RET.clearPay?RET.resultRow():'');
     $('srScore').textContent=G.score.toLocaleString('de-DE');
     $('srNext').hidden=n>=MAIN;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},
@@ -1943,10 +1944,12 @@ function mapDetail(n){const el=$('stDet');if(!el)return;if(!(n>0)){el.hidden=tru
   el.hidden=false;el.dataset.n=n;el.style.setProperty('--c',D.a);
   el.innerHTML=`<div class="dh"><span class="ac">${s.ch?'CHALLENGE':ACTN[s.act]+' · '+D.name}</span><span class="bs">${ok?'BEST '+'★'.repeat(k)+'☆'.repeat(3-k):''}</span><button class="x" id="stDx" type="button" aria-label="Close">✕</button></div>`
    +`<div class="dm">${bn?`<img class="bp" src="media/boss-${slugOf(bn)}.webp" alt="" onerror="this.remove()">`:''}<div class="dt"><div class="nm">${s.n<=MAIN?s.n+' · ':''}${s.name}</div><div class="gl">${goalTxt(s)}</div>${s.ch?`<div class="rl">${CHRULE[s.ch]}</div>`:''}</div></div>`
+   +(RET.arcade&&!s.ch?`<div class="arc" role="group" aria-label="Stage length"><button type="button" id="arcA" class="${ARC.on?'on':''}">ARCADE <small>~3 MIN</small></button><button type="button" id="arcC" class="${ARC.on?'':'on'}">CLASSIC <small>FULL SONG</small></button></div>`:'')
    +`<div class="stl">${lines.map((t,i)=>`<div class="${k>i?'ok':''}"><span>${k>i?'★':'☆'}</span> ${t}</div>`).join('')}</div>`
    +(rec?`<div class="tip">${rec}</div>`:'')
    +(ok?'':`<div class="lkn">Clear ${need||'the stage before'} first</div>`)
    +`<button class="go" id="stPlay" type="button"${ok?'':' disabled'}>${ok?(k?'PLAY AGAIN':'PLAY'):'LOCKED'}</button>`;
+  if($('arcA')){$('arcA').addEventListener('click',()=>{ARC.set(true);mapDetail(n);});$('arcC').addEventListener('click',()=>{ARC.set(false);mapDetail(n);});}
   $('stPlay').addEventListener('click',()=>{if(unlocked(n))startStory(n);});
   $('stDx').addEventListener('click',()=>{MAPD.sel=-1;for(const e of document.querySelectorAll('#stRows .nd.sel'))e.classList.remove('sel');el.hidden=true;});}
 function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=-1;stDraw();}
@@ -1959,6 +1962,7 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 {const st=document.createElement('style');st.textContent=`
 #stsel .mapbox{display:block!important;flex:1 1 0;min-height:0;position:relative;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:10px;background:#05030c;touch-action:pan-x pan-y;scrollbar-width:thin}
 #stsel .mp{position:relative;overflow:hidden}
+#stDet .arc{display:flex;gap:6px;margin:4px 0}#stDet .arc button{flex:1;min-height:40px;border:1px solid #5a4a7a;background:#120a24;color:#cfc3e8;border-radius:8px;font:700 13px/1.1 inherit;letter-spacing:.06em}#stDet .arc button small{display:block;font-size:10px;font-weight:600;opacity:.8}#stDet .arc button.on{background:#ff3fa4;border-color:#ff9bd2;color:#fff}
 #stsel .band{position:absolute;background-size:cover;background-position:center;opacity:1;border-top:2px solid var(--c);border-image:none}
 #stsel .band::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 40px #05030c}
 #stsel .ban{position:absolute;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 18px;text-align:center;white-space:nowrap;color:var(--ink);
@@ -2330,7 +2334,7 @@ const TP_DEF=[
   {id:'rev',n:'Revive Token', p:400,max:5, c:'#ff2d95',pri:92,ic:'M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7z',t:l=>'Return from '+l+' death'+(l>1?'s':'')+' per run'},
   {id:'nmn',n:'Neon Mining',  p:70, max:12,c:'#19e3ff',pri:35,ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z',                                 t:l=>'+'+5*l+'% Neon from kills'}];
 const TP_BY={};for(const d of TP_DEF)TP_BY[d.id]=d;
-const tpPrice=(d,l)=>Math.round(1.5*d.p*(1+.6*l+.12*l*l)/5)*5;                  // price of level l+1: 45, 80, 120, 175 ... 1,000 (Power Core), a full garage costs about 60,000 Neon: many runs
+const tpPrice=(d,l)=>Math.round(1.5*d.p*(1+.6*l+.12*l*l)*(window.RET&&RET.econ?RET.tk:1)/5)*5;                  // price of level l+1: 45, 80, 120, 175 ... 1,000 (Power Core), a full garage costs about 60,000 Neon: many runs
 const TP={revLeft:0,rgnT:0,boost:{},
   raw(id){const v=Math.floor(+GA.tune[id])||0;return Math.max(0,Math.min(TP_BY[id].max,v));},                 // the level you own
   l(id){return GA.eqAll||(GA.eq&&GA.eq[id])?this.raw(id):0;}};                                                       // the level that counts: only equipped perks work (see LOADOUT)
@@ -3127,6 +3131,67 @@ NR.on('runStart',()=>setTimeout(()=>{if(!GA.queue.length)return;for(const id of 
 /* the LAB is its own stage now: see lab.js */
 let labEl=null,garageDirty=false;
 
+/* ---------- retention parts (RETENTION.md). Each item has a flag in RET; a flag set to false leaves the game exactly as it was. ---------- */
+const RET=window.RET=window.RET||{};
+if(RET.oneMore===undefined)RET.oneMore=true;   // B5: run-end screens show Neon banked, the next unlock bar and a ONE MORE RUN button
+RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct, can}; null when everything is owned
+  let best=null;const add=(n,p)=>{if(!(p>0))return;if(!best||p<best.price)best={n,price:p};};
+  for(const id of WP_IDS){const cur=WP.pl[id]|0;if(cur>=WP_MAX)continue;add(WPD[id].n+' LV'+(cur+1),WP.price(id));}
+  for(const s of SHIPS)if(s.id!=='std'&&!GA.own['ship_'+s.id])add(s.n,s.p||0);
+  for(const c of CREW)if(!GA.own[c.id])add(c.n,c.p||0);
+  for(const h of THEMES)if(h.id!=='neon'&&!GA.own['th_'+h.id])add(h.n,h.p||0);
+  if(!best)return null;best.bank=GA.bank;best.pct=Math.min(100,Math.floor(100*GA.bank/best.price));best.can=GA.bank>=best.price;return best;};
+{const st=document.createElement('style');st.textContent=`
+.retBar{width:100%;max-width:min(92%,420px);margin:.5em auto;text-align:center;font-family:var(--mono);font-size:clamp(12px,min(3.4vw,2.4vh),17px);line-height:1.3;color:var(--dim)}
+.retBar b{color:#fff}.retBar .rb{height:.9em;border-radius:99px;background:#ffffff1a;overflow:hidden;margin-top:.3em}
+.retBar .rb i{display:block;height:100%;background:linear-gradient(90deg,#19e3ff,#ffb020)}.retBar.can .rb i{background:#ffb020}
+`;document.head.appendChild(st);}
+function retMake(id,host){let e=$(id);if(!e){e=document.createElement('div');e.id=id;e.className='retBar';host.insertBefore(e,host.querySelector('.row'));}return e;}
+function retShow(){
+  const on=RET.oneMore,add=($('oNeon')&&/nothing/.test($('oNeon').textContent))?0:(SH.lastBank|0),nx=on?RET.next():null,pay='Failed runs still pay: '+(add?'+'+add+' Neon banked':'nothing banked this time');
+  for(const [id,host] of [['retO',$('over').querySelector('.in')],['retR',$('stres').querySelector('.in')]]){
+    const e=retMake(id,host);e.hidden=!on;if(!on)continue;
+    e.className='retBar'+(nx&&nx.can?' can':'');
+    e.innerHTML=(id==='retO'?pay+'<br>':'')+(nx?(nx.can?'Ready in Garage: <b>'+nx.n+'</b> '+nx.price:'Next: <b>'+nx.n+'</b> '+nx.bank+'/'+nx.price)+'<div class="rb"><i style="width:'+nx.pct+'%"></i></div>':'Everything unlocked');}
+  $('againBtn').textContent=on?'ONE MORE RUN':'FLY AGAIN';$('srRetry').textContent=on?'ONE MORE RUN':'RETRY';}
+NR.on('runEnd',d=>{if(!d||d.quit)return;retShow();});
+
+/* ===== B1 pay, B2 economy, B3 mercy ===== */
+Object.assign(RET,{clearPay:true,econ:true,mercy:true},{wk:.36,tk:.12,nk:.045});   // wk: weapon price scale, tk: perk price scale, nk: Neon per kill (see RETENTION.md B2)
+/* B1: a stage clear pays 40+12n Neon the first time, +25 per new star, 10% of the base on later clears */
+RET.payClear=function(n,sum){const old=sSave.stars[n]||0,first=old<1,base=40+12*n,ns=Math.max(0,sum-old);
+  const pay=first?base+25*ns:Math.round(base*.1)+25*ns;GA.bank+=pay;gsave();this.last={n,pay,first,ns};return pay;};
+RET.resultRow=function(){const l=this.last;return l&&l.pay?`<div class="sr ok"><span class="sg">◆</span> +${l.pay} Neon${l.first?' · first clear':''}</div>`:'';};
+/* B3: failed tries per stage (kept in this browser); 2 fails = +1 hull on the next try, 4 = the stage level also drops by 0.3. A clear resets it. */
+RET.fails={};try{const o=JSON.parse(localStorage.getItem('mnr_retfail')||'{}');if(o&&typeof o==='object')for(const k in o)RET.fails[k]=Math.max(0,o[k]|0);}catch(e){}
+RET.saveFails=()=>{try{localStorage.setItem('mnr_retfail',JSON.stringify(RET.fails));}catch(e){}};
+RET.mercyHull=n=>(RET.fails[n]|0)>=2?1:0;
+RET.mercyLvl=n=>(RET.fails[n]|0)>=4?.3:0;
+NR.on('runEnd',d=>{if(!RET.mercy||!d||!d.story)return;const n=d.story;
+  if(d.cleared)delete RET.fails[n];else RET.fails[n]=(RET.fails[n]|0)+1;RET.saveFails();});
+NR.on('runStart',d=>{if(!RET.mercy||!d||!d.story||!RET.mercyHull(d.story))return;
+  G.note={t:3,txt:'MERCY: +1 hull'+(RET.mercyLvl(d.story)?', a little easier':'')+' this try'};});
+/* B2: what a full garage costs, summed from the live prices (econ-test.js prints it) */
+RET.totalCost=function(){let t=0;
+  for(const d of TP_DEF)for(let l=0;l<d.max;l++)t+=tpPrice(d,l);
+  for(const id of WP_IDS){t+=WPD[id].p?(RET.econ?Math.max(5,Math.round(WPD[id].p*RET.wk)):WPD[id].p):0;for(let L=1;L<WP_MAX;L++)t+=WPX_PRICE(L);}
+  for(const a of [SHIPS,CREW,THEMES])for(const x of a)t+=x.p||0;
+  return t;};
+RET.probe=()=>({w:WPX_PRICE(1),k:tpPrice(TP_BY.dmg,0)});
+
+/* ===== B4 arcade cut ===== */
+if(RET.arcade===undefined)RET.arcade=true;
+/* ARCADE cut (RET.arcade): a main stage is cut to about 150 s of song (never more than 80 bars; a boss stage has about 45 s of build-up, the boss still comes in the last 32 bars).
+   The cut is a whole number of bars. The player picks ARCADE or CLASSIC on the stage plate; the choice is saved. */
+const ARC={secs:150,leadSecs:44,maxBars:80,on:load('mnr_arc',1)!==0,
+  set(v){this.on=!!v;save('mnr_arc',v?1:0);},
+  active(){return !!RET.arcade&&this.on;},
+  bars(s,full){if(s.ch||!this.active())return full;const t=TR.by[s.song],m=SONGM[s.song],bpm=(t&&t.bpm)||(m&&m.bpm)||120;
+    const spb=240/bpm,lead=s.goal.k==='boss'?Math.max(20,Math.floor(this.leadSecs/spb)):1e9;   // a boss stage: about 45 s of build-up, then the boss (its fight is the long part)
+    return Math.max(Math.min(full,BOSS_BARS+20),Math.min(full,this.maxBars,Math.floor(this.secs/spb),lead+BOSS_BARS));},
+  label(){return this.active()?'ARCADE · ~3 MIN':'CLASSIC · FULL SONG';}};
+window.ARC=ARC;
+
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
    The LAB is a real run with G.lab set: no waves, no district clock, no boss timer, no chest or pit stop, god mode on. What appears is decided by the panel at the bottom:
    BOSS (gallery: pick any boss and its district, replay the intro, lock a phase, force an attack pattern, hold any pose of its sprite sheet, hit flash, death + respawn),
@@ -3533,6 +3598,7 @@ NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L3',id:'clear-pay',text:'Clearing a stage now pays Neon: 40 plus 12 per stage number the first time, 25 more for each new star, and a tenth of that on later clears. Everything in the garage costs far less (weapons, perks), and kills pay a bit more, so a full build is a matter of hours, not weeks. Fail a stage twice and the next try gets +1 hull; fail four times and it is a little easier too. Do the prices feel fair?'},
  {ver:'L3',id:'ship-mounts',text:'Your ship now shows the weapons you equip: a coloured circle on slot 1, a triangle on slot 2, a split ring when they fuse, and a flash from the mounts when you fire. See it in WEAPONS and the Garage. Painted mounts come later. Does it read at a glance?'},
  {ver:'L2',id:'weapon-levels',text:'Weapons grow with your Neon: Garage > WEAPONS has 16 weapons (8 new: Frost Beam, Flame Arc, Plasma Wave, Shrapnel Shell, Echo Drone, Gravity Well, Rail Sniper, Storm Cell). Buy one with Neon, then buy its levels 1 to 10 (a level bar, the power it gives and the next new ability are on every card). In a run the pit-stop pickups add up to 2 more levels on top. Does a higher level feel stronger, and are the prices fair?'},
  {ver:'L2',id:'fight-back',text:'Enemies now fly in and fight back: they cannot be hit until they are fully on screen (a red ring at the edge shows where they come in), every enemy lives at least about a second on screen even against a maxed build, and chargers glide in before they dash. Do waves feel like a fight now, on Easy too?'},
@@ -3557,6 +3623,7 @@ const NR_CHECKLIST=[
  {ver:'J2',id:'ui-menus',text:'Menu, pause, garage, shop and story buttons are painted plates (angular on title and pause, round pills in garage, shop, story and settings); the settings card has a painted frame, header and rows. Every label is readable and every button still reacts to a tap.'},
  {ver:'J2',id:'ui-hud',text:'In a run the score and the hull/heat/dash/EMP bars sit in painted housings and the hint line in a speech bubble; all numbers stay easy to read. On a phone the pause, DASH and EMP buttons are the painted round buttons and still work.'},
  {ver:'J2',id:'ui-story-map',text:'On the story map every stage number sits on a medallion: open, done (laurel), boss (crown) or locked (padlock); garage and shop item icons sit in round chrome buttons.'},
+ {ver:'J2',id:'arcade-cut',text:'New: ARCADE stages. Tap a stage on the map and pick ARCADE (about 3 minutes, boss at the end) or CLASSIC (the full song). Same stars, goals scaled to the length. Is a short stage a better fit for a quick session?'},
  {ver:'J1',id:'music-clean',text:'The music NEVER distorts or changes pitch: grab TEMPO UP (the song stays the same speed, you shoot double-time and score x2), grab SLOW GROOVE (enemies and bullets slow to bullet time, the song only gets a soft muffle), drop to 1 hull, and die. The song is clean every time, no chipmunk, no crackle.'},
  {ver:'J1',id:'no-crops',text:'No picture looks cropped: boss intro portraits and the ship cards in the garage and shop sit in round neon badges, pickups, perks, medals and badges have no square backgrounds, and the phone view has painted rooftops scrolling at the sides.'},
  {ver:'J1',id:'all-painted',text:'Every screen is painted: both mini-bosses (Tresor-Wart, Messe-Waechter) have their own art, the shield link between a leader and its drones is a painted beam. Only the 13 base perk icons are still line icons (they are on the missing-assets page).'},
@@ -3571,6 +3638,7 @@ const NR_CHECKLIST=[
  {ver:'I7',id:'bullet-kinds',text:'Enemy fire now varies: thin fast NEEDLES from drones, round ORBS, big slow orange SHELLS that take 2 hull, and ROCKETS that home for a moment and burst into 5 pellets when you shoot them twice.'},
  {ver:'I7',id:'perk-pressure',text:'The more perks and upgrades you own, the tougher the enemies (up to 3x hull). A maxed ship should still have to fight.'},
  {ver:'I6',id:'chest',text:'After every district boss a BOSS CHEST opens: three face-down cards, tap one to flip it and get +1 hull, a shield, EMP, Neon, a revive or a random upgrade. Then the pit stop. LAB can switch it off.'},
+ {ver:'I8',id:'one-more-run',text:'The game-over and stage-clear screens now show a bar to the cheapest thing you can still unlock, and a big ONE MORE RUN button that restarts at once. Does the bar make you want one more go?'},
  {ver:'I6',id:'new-ships',text:'Three new ships in Garage > SHIPS: Drift (a wide fan), Lancer (a piercing lance every second shot) and Nova (a ring burst every third shot). They show as shapes until the art arrives. Do they feel different and worth the price?'},
  {ver:'I6',id:'badges',text:'The difficulty button on the title and the LAB show a badge per difficulty, and the stage clear screen shows a medal. Garage ship cards now show the painted ship portraits.'},
  {ver:'I6',id:'leader-look',text:'Squad leaders have a gold sheen on top of the crown and the rings so you can spot them at a glance.'},
@@ -3917,7 +3985,7 @@ WP.draw();
    plus the pit-stop level bonus (at most +2, g.js WP.lvOf). Levels grow rate, size and count; damage per shot stays under the soft cap (b.js DMG.hit).
    Total weapon DPS at level 10 is held at about 2.5x level 1 (weapon-test.js measures it). WEAPON_META switches the whole feature off: false = nothing is locked, no new weapons. */
 const WEAPON_META=true;
-const WPX_PRICE=L=>Math.round(40*Math.pow(1.45,L-1));          // Neon for the upgrade from level L to L+1: 40, 58, 84, 122, 177, 257, 372, 540, 783
+const WPX_PRICE=L=>window.RET&&RET.econ?Math.round(30*Math.pow(1.28,L-1)*RET.wk):Math.round(40*Math.pow(1.45,L-1));          // Neon for the upgrade from level L to L+1: 40, 58, 84, 122, 177, 257, 372, 540, 783
 const WPX_POWER=L=>1+1.5*(L-1)/9;                              // the "power" shown on the cards: 1.00x at level 1, 2.50x at level 10
 const WPX_META={                                               // price to unlock (0 = owned from the start), colour, and what levels 3, 6 and 10 add
   pulse:{p:0,ab:['Fan opens wider','A third pair of shots','A fourth pair of shots']},
@@ -3962,7 +4030,7 @@ function fuName(x,y){const w=id=>WPD[id].n.split(' '),cap=t=>t[0]+t.slice(1).toL
 var WP_ALL_FREE=false;
 WP.has=function(id){return WP_ALL_FREE||(this.pl[id]|0)>0||WP_ALL;};
 WP.perm=function(id,n){this.pl[id]=n;this.sync();};                 // test hook: set the permanent level (not saved)
-WP.price=function(id){const cur=this.pl[id]|0;return cur>=WP_MAX?0:cur<1?WPD[id].p:WPX_PRICE(cur);};
+WP.price=function(id){const cur=this.pl[id]|0;return cur>=WP_MAX?0:cur<1?(window.RET&&RET.econ?Math.max(5,Math.round(WPD[id].p*RET.wk)):WPD[id].p):WPX_PRICE(cur);};
 /* buy the next level (or the unlock) with Neon from the garage wallet; returns {ok,why} and never lets the bank go below zero */
 WP.buy=function(id){if(!WPD[id]||!WP_IDS.includes(id))return{ok:false,why:'unknown'};const cur=this.pl[id]|0;if(cur>=WP_MAX)return{ok:false,why:'max'};
   const price=this.price(id);if(!(Number.isFinite(price)&&price>=0)||!(GA.bank>=price))return{ok:false,why:'money',need:Math.max(0,price-GA.bank)};
@@ -4571,7 +4639,7 @@ function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){req
 applySet();syncSet();requestAnimationFrame(loop);
 document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];});
         // build the other districts' skylines while the title is up
-window.__mnr={render,hudBusy,get hudOff(){return HUDOFF},set hudOff(v){HUDOFF=!!v},ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
+window.__mnr={RET,ARC,render,hudBusy,get hudOff(){return HUDOFF},set hudOff(v){HUDOFF=!!v},ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},get TP(){return TP},TP_DEF,HUDX,UBY,PWK,hurt,NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
   get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},MAIN,get K(){return K},startStory,unlockedN:unlocked,sSave,

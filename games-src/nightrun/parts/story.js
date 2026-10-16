@@ -96,9 +96,9 @@ const starTxt=s=>[s.ch?'Clear the challenge':'Clear the stage',(s.ch==='perfect'
 const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
-  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def));   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
+  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def))-(window.RET&&RET.mercy?RET.mercyLvl(n):0);   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
     this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=(1+TUNE.eh*L)*dmOf().hp;
-    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1];
+    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1]+(window.RET&&RET.mercy?RET.mercyHull(n):0);
     this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;
     const df=this.def;this.len=stLen(df);this.kv=stKill(df);this.sv=stScore(df);this.pn=stPerf(df);   // stage = song length; boss in its last 32 bars (mini-boss: 14)
     this.lead=df.goal.k==='boss'?Math.max(20,this.len-BOSS_BARS):df.goal.k==='mini'?Math.max(20,this.len-MINI_BARS):0;
@@ -149,13 +149,13 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     $('stBtn2').hidden=false;
     overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);
     G.over=true;},
-  finish(){running=false;const n=this.n,st=this.stars,sum=st[0]+st[1]+st[2];
+  finish(){running=false;const n=this.n,st=this.stars,sum=st[0]+st[1]+st[2];if(window.RET&&RET.clearPay)RET.payClear(n,sum);
     if(sum>(sSave.stars[n]||0))sSave.stars[n]=sum;
     if(n<MAIN){const got={};for(const id in SH.got)got[id]=SH.got[id];sSave.snap[n+1]=got;}
     sPersist();NR.emit('runEnd',{story:n,cleared:true,score:G.score,di:G.di,kills:G.kills});
     const s=this.def;$('srEye').textContent=n===MAIN?'Story complete':s.ch?'Challenge clear':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
-    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn)+' PERFECT · you '+G.perf)+row(st[2],s.ch?'Score '+(this.s3/1000)+'K · you '+Math.round(G.score/1000)+'K':'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)));
+    $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn)+' PERFECT · you '+G.perf)+row(st[2],s.ch?'Score '+(this.s3/1000)+'K · you '+Math.round(G.score/1000)+'K':'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)))+(window.RET&&RET.clearPay?RET.resultRow():'');
     $('srScore').textContent=G.score.toLocaleString('de-DE');
     $('srNext').hidden=n>=MAIN;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},

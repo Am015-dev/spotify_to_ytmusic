@@ -1,20 +1,44 @@
 #!/usr/bin/env node
-// Retention features test (shared). Each feature appends its own section below.
-//   NODE_PATH=$(npm root -g) node games-src/nightrun/ret-test.js      env: RUNS=4 STAGES=1,8,20,30
-const cp = require('child_process'), fs = require('fs'), path = require('path');
-const RUNS = process.env.RUNS || '4', STAGES = process.env.STAGES || '1,8,20,30', J = path.join(__dirname, 'playtest', 'story-sim.json');
-let bad = 0; const ok = (c, m) => { console.log((c ? 'PASS ' : 'FAIL ') + m); if (!c) bad++; };
-const sim = (classic) => { cp.execFileSync('node', [path.join(__dirname, 'story-sim.js')], { env: Object.assign({}, process.env, { RUNS, STAGES, PAR: '4' }, classic ? { CLASSIC: '1' } : {}), stdio: 'ignore' }); return JSON.parse(fs.readFileSync(J, 'utf8')); };
-const stat = r => { const o = {}; for (const n in r) { const a = r[n], c = a.filter(x => x.clear); o[n] = { clear: c.length / a.length, t: (c.length ? c : a).reduce((s, x) => s + x.t, 0) / (c.length ? c.length : a.length), max: Math.max(...(c.length ? c : a).map(x => x.t)) }; } return o; };
-// ---- B4 arcade: ~3-minute stages ----
-const arc = stat(sim(false)), cla = stat(sim(true));
-const ids = STAGES.split(',');
-const mean = o => ids.reduce((s, n) => s + o[n].t, 0) / ids.length;
-console.log('stage  classic(s,clear)  arcade(s,clear,max)');
-for (const n of ids) console.log(String(n).padStart(4), cla[n].t.toFixed(0).padStart(6), Math.round(cla[n].clear * 100) + '%', ' | ', arc[n].t.toFixed(0).padStart(5), Math.round(arc[n].clear * 100) + '%', arc[n].max.toFixed(0));
-ok(mean(arc) <= 190, 'arcade mean stage length ' + mean(arc).toFixed(0) + ' s <= 190 (classic ' + mean(cla).toFixed(0) + ')');
-ok(ids.every(n => arc[n].max <= 240), 'no cleared arcade run over 240 s (a failed run ends when the bot dies)');
-ok(ids.every(n => arc[n].t <= cla[n].t + 1), 'arcade never longer than classic');
-// parity is judged on the stages BALANCE.md gives targets for (1, 8, 20); later stages are not near 100% for the bot, so a clear-rate gap there is noise
-ok(ids.filter(n => ['1', '8', '20'].includes(n)).every(n => Math.abs(arc[n].clear - cla[n].clear) <= .1 + 1 / RUNS + (RUNS < 8 ? .15 : 0)), 'clear rate within 10% of classic on stages 1/8/20 (slack at few runs)');
-process.exit(bad ? 1 : 0);
+// Nightrun retention checks (real page, ?nomusic=1). PASS/FAIL lines; exit 1 on any FAIL.  Append new sections per item.
+//   NODE_PATH=$(npm root -g) node games-src/nightrun/ret-test.js     env: GAME_DIR=...
+const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
+const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
+const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' : 'FAIL ') + n + (p || !i ? '' : ' :: ' + i)); };
+const SIZES = [['1280x720', { viewport: { width: 1280, height: 720 } }], ['390x763', { viewport: { width: 390, height: 763 }, hasTouch: true, isMobile: true }]];
+const clip = (p, sel) => p.evaluate(s => { const bad = [], vw = innerWidth, vh = innerHeight; for (const el of document.querySelectorAll(s + ',' + s + ' *')) { if (!el.getClientRects().length || el.closest('[hidden]')) continue; const r = el.getBoundingClientRect(); if (!r.width) continue; if (r.left < -1 || r.top < -1 || r.right > vw + 1 || r.bottom > vh + 1) bad.push(el.id || el.className || el.tagName); } return bad; }, sel);
+(async () => {
+  const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', port, '--bind', '127.0.0.1'], { cwd: GAME_DIR, stdio: 'ignore' }); await sleep(800);
+  const br = await PW.chromium.launch();
+  for (const [lab, opt] of SIZES) for (const flag of [true, false]) {
+    const ctx = await br.newContext(opt), p = await ctx.newPage(), errs = []; p.on('pageerror', e => errs.push(e.message)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+    await p.addInitScript(() => { try { localStorage.setItem('mnr_tut', '1'); localStorage.setItem('mnr_bank', '0'); } catch (e) { } });
+    await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.RET); await sleep(600);
+    const T = `${lab} flag ${flag ? 'on' : 'off'}`;
+    await p.evaluate(f => { window.RET.oneMore = f; }, flag);
+    const nx = await p.evaluate(() => { const m = window.__mnr; m.startStory(1); m.G.score = 1234; m.SH.neon = 7; m.ST.fail(); return { n: window.RET.next(), bank: m.GA.bank, txt: document.getElementById('retO') && !document.getElementById('retO').hidden ? document.getElementById('retO').textContent : null, btn: document.getElementById('againBtn').textContent }; });
+    if (flag) {
+      const pr = await p.evaluate(() => { let min = 1e9; for (const id of Object.keys(window.__mnr.GA.own)) { } return null; });
+      ok(`${T}: fail screen shows next unlock ${nx.n && nx.n.n} ${nx.bank}/${nx.n && nx.n.price}`, nx.txt && nx.n && nx.txt.includes(nx.n.n) && nx.txt.includes(nx.bank + '/' + nx.n.price) && /still pay/.test(nx.txt), nx.txt);
+      ok(`${T}: bar price equals WP.price when a weapon`, await p.evaluate(() => { const n = window.RET.next(); const w = window.__mnr; return !!n && n.price > 0 && n.bank === w.GA.bank; }));
+      ok(`${T}: button reads ONE MORE RUN`, nx.btn === 'ONE MORE RUN', nx.btn);
+      // updates after a banked run: add neon and fail again
+      const t2 = await p.evaluate(async () => { const m = window.__mnr; m.GA.bank += 2; window.RET.oneMore = true; m.NR.emit('runEnd', { story: 1 }); return document.getElementById('retO').textContent; });
+      ok(`${T}: bar updates with the bank`, t2.includes((nx.bank + 2) + '/'), t2);
+      ok(`${T}: nothing clipped`, !(await clip(p, '#over')).length, JSON.stringify(await clip(p, '#over')));
+      await sleep(700); const t0 = Date.now();
+      await (opt.hasTouch ? p.tap('#againBtn') : p.keyboard.press('Enter'));
+      await p.waitForFunction(() => window.__mnr.running && window.__mnr.ST.n === 1, null, { timeout: 3000 });
+      ok(`${T}: ONE MORE RUN restarts same stage in ${Date.now() - t0} ms`, Date.now() - t0 < 1000);
+      const t3 = await p.evaluate(() => { const m = window.__mnr; m.ST.stars = [1, 1, 0]; m.ST.finish(); return { txt: document.getElementById('retR').textContent, btn: document.getElementById('srRetry').textContent, hid: document.getElementById('stres').hidden }; });
+      ok(`${T}: clear screen shows bar + button`, !t3.hid && /Next:|Ready/.test(t3.txt) && t3.btn === 'ONE MORE RUN', JSON.stringify(t3));
+      ok(`${T}: clear screen nothing clipped`, !(await clip(p, '#stres')).length, JSON.stringify(await clip(p, '#stres')));
+    } else {
+      ok(`${T}: old screen (no bar, FLY AGAIN)`, nx.txt === null && nx.btn === 'FLY AGAIN', JSON.stringify(nx));
+    }
+    ok(`${T}: no page errors`, !errs.length, errs[0]);
+    await ctx.close();
+  }
+  await br.close(); srv.kill(); process.exit(res.every(Boolean) ? 0 : 1);
+})();

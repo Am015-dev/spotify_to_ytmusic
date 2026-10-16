@@ -5,6 +5,7 @@
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L3',id:'clear-pay',text:'Clearing a stage now pays Neon: 40 plus 12 per stage number the first time, 25 more for each new star, and a tenth of that on later clears. Everything in the garage costs far less (weapons, perks), and kills pay a bit more, so a full build is a matter of hours, not weeks. Fail a stage twice and the next try gets +1 hull; fail four times and it is a little easier too. Do the prices feel fair?'},
  {ver:'L3',id:'ship-mounts',text:'Your ship now shows the weapons you equip: a coloured circle on slot 1, a triangle on slot 2, a split ring when they fuse, and a flash from the mounts when you fire. See it in WEAPONS and the Garage. Painted mounts come later. Does it read at a glance?'},
  {ver:'L2',id:'weapon-levels',text:'Weapons grow with your Neon: Garage > WEAPONS has 16 weapons (8 new: Frost Beam, Flame Arc, Plasma Wave, Shrapnel Shell, Echo Drone, Gravity Well, Rail Sniper, Storm Cell). Buy one with Neon, then buy its levels 1 to 10 (a level bar, the power it gives and the next new ability are on every card). In a run the pit-stop pickups add up to 2 more levels on top. Does a higher level feel stronger, and are the prices fair?'},
  {ver:'L2',id:'fight-back',text:'Enemies now fly in and fight back: they cannot be hit until they are fully on screen (a red ring at the edge shows where they come in), every enemy lives at least about a second on screen even against a maxed build, and chargers glide in before they dash. Do waves feel like a fight now, on Easy too?'},
@@ -44,6 +45,7 @@ const NR_CHECKLIST=[
  {ver:'I7',id:'bullet-kinds',text:'Enemy fire now varies: thin fast NEEDLES from drones, round ORBS, big slow orange SHELLS that take 2 hull, and ROCKETS that home for a moment and burst into 5 pellets when you shoot them twice.'},
  {ver:'I7',id:'perk-pressure',text:'The more perks and upgrades you own, the tougher the enemies (up to 3x hull). A maxed ship should still have to fight.'},
  {ver:'I6',id:'chest',text:'After every district boss a BOSS CHEST opens: three face-down cards, tap one to flip it and get +1 hull, a shield, EMP, Neon, a revive or a random upgrade. Then the pit stop. LAB can switch it off.'},
+ {ver:'I8',id:'one-more-run',text:'The game-over and stage-clear screens now show a bar to the cheapest thing you can still unlock, and a big ONE MORE RUN button that restarts at once. Does the bar make you want one more go?'},
  {ver:'I6',id:'new-ships',text:'Three new ships in Garage > SHIPS: Drift (a wide fan), Lancer (a piercing lance every second shot) and Nova (a ring burst every third shot). They show as shapes until the art arrives. Do they feel different and worth the price?'},
  {ver:'I6',id:'badges',text:'The difficulty button on the title and the LAB show a badge per difficulty, and the stage clear screen shows a medal. Garage ship cards now show the painted ship portraits.'},
  {ver:'I6',id:'leader-look',text:'Squad leaders have a gold sheen on top of the crown and the rings so you can spot them at a glance.'},

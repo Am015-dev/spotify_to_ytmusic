@@ -3,7 +3,7 @@
    plus the pit-stop level bonus (at most +2, g.js WP.lvOf). Levels grow rate, size and count; damage per shot stays under the soft cap (b.js DMG.hit).
    Total weapon DPS at level 10 is held at about 2.5x level 1 (weapon-test.js measures it). WEAPON_META switches the whole feature off: false = nothing is locked, no new weapons. */
 const WEAPON_META=true;
-const WPX_PRICE=L=>Math.round(40*Math.pow(1.45,L-1));          // Neon for the upgrade from level L to L+1: 40, 58, 84, 122, 177, 257, 372, 540, 783
+const WPX_PRICE=L=>window.RET&&RET.econ?Math.round(30*Math.pow(1.28,L-1)*RET.wk):Math.round(40*Math.pow(1.45,L-1));          // Neon for the upgrade from level L to L+1: 40, 58, 84, 122, 177, 257, 372, 540, 783
 const WPX_POWER=L=>1+1.5*(L-1)/9;                              // the "power" shown on the cards: 1.00x at level 1, 2.50x at level 10
 const WPX_META={                                               // price to unlock (0 = owned from the start), colour, and what levels 3, 6 and 10 add
   pulse:{p:0,ab:['Fan opens wider','A third pair of shots','A fourth pair of shots']},
@@ -48,7 +48,7 @@ function fuName(x,y){const w=id=>WPD[id].n.split(' '),cap=t=>t[0]+t.slice(1).toL
 var WP_ALL_FREE=false;
 WP.has=function(id){return WP_ALL_FREE||(this.pl[id]|0)>0||WP_ALL;};
 WP.perm=function(id,n){this.pl[id]=n;this.sync();};                 // test hook: set the permanent level (not saved)
-WP.price=function(id){const cur=this.pl[id]|0;return cur>=WP_MAX?0:cur<1?WPD[id].p:WPX_PRICE(cur);};
+WP.price=function(id){const cur=this.pl[id]|0;return cur>=WP_MAX?0:cur<1?(window.RET&&RET.econ?Math.max(5,Math.round(WPD[id].p*RET.wk)):WPD[id].p):WPX_PRICE(cur);};
 /* buy the next level (or the unlock) with Neon from the garage wallet; returns {ok,why} and never lets the bank go below zero */
 WP.buy=function(id){if(!WPD[id]||!WP_IDS.includes(id))return{ok:false,why:'unknown'};const cur=this.pl[id]|0;if(cur>=WP_MAX)return{ok:false,why:'max'};
   const price=this.price(id);if(!(Number.isFinite(price)&&price>=0)||!(GA.bank>=price))return{ok:false,why:'money',need:Math.max(0,price-GA.bank)};
