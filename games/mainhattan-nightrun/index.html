@@ -1088,7 +1088,7 @@ function update(dt){
       if(e.type==='gate'){hit=Math.abs(b.x-e.x)<14&&(Math.abs(b.y-(e.gy-e.gap/2))<16||Math.abs(b.y-(e.gy+e.gap/2))<16);}
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
       if(hit&&b.px&&b.px.has(e))continue;
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1))*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom('hit-spark',b.x,b.y,30,.16);}AU.sfx('hit');break;}}
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1))*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom('hit-spark',b.x,b.y,30,.16);}AU.sfx('hit');break;}}
     if(b.rc>0&&(b.y<2&&b.vy<0||b.y>H-2&&b.vy>0)){b.vy=-b.vy;b.rc--;b.y=clamp(b.y,3,H-3);if(b.px)b.px.clear();}
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}
@@ -1153,12 +1153,42 @@ function bossLoot(e){if(!ST.on||GX()<ST.heal)G.pk.push({t:'hp',x:e.x,y:e.y,vx:-8
   G.pk.push({t:WP.canGain()?'up':'emp',x:e.x,y:e.y,vx:-80,vy:40,bob:0});
   for(let i=0;i<8;i++)G.pk.push({t:'shard',x:e.x+rnd(-30,30),y:e.y+rnd(-30,30),vx:rnd(-160,-40),vy:rnd(-90,90),bob:0});}
 
+/* ===== weapon mounts on the ship: slot 1 = coloured circle, slot 2 = coloured triangle until wpmount-<id>.webp exists; fusion = split ring (or fx-fuse-<a>-<b>.webp).
+   Colours and ids are read from WPD at draw time. Visual only: shots and hits are unchanged. Switch: RIG.on. Hardpoints are ship-local fractions of the ship length (x forward, y down). ===== */
+const RIG={on:true,ok:false,fl:[0,0],armedRun:false,
+  hp:{std:[.30,-.2,.30,.2],tri:[.30,-.22,.30,.22],hv:[.26,-.26,.26,.26],ec:[.30,-.2,.30,.2],swg:[.28,-.24,.28,.24],syn:[.30,-.22,.30,.22],drift:[.28,-.3,.28,.3],lancer:[.36,-.15,.36,.15],nova:[.28,-.26,.28,.26]},   // [x1,y1,x2,y2] per ship id; default = std
+  pt(id,sl){const a=this.hp[id]||this.hp.std;return sl?[a[2],a[3]]:[a[0],a[1]];},
+  mount(c,wid,sl,x,y,L){const d=WPD[wid];if(!d)return;const r=L*.09,nm='wpmount-'+wid;
+    if(ART.have(nm)){const b=ART.bm[nm],w=L*.34,h=w*b.height/b.width;c.drawImage(b,x-w*.5,y-h*.5,w,h);return;}
+    c.fillStyle=d.c;c.beginPath();
+    if(sl){c.moveTo(x+r*1.15,y);c.lineTo(x-r*.8,y-r);c.lineTo(x-r*.8,y+r);c.closePath();c.fill();}
+    else{c.arc(x,y,r,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=Math.max(1,r*.22);c.globalAlpha=.85;c.beginPath();c.arc(x,y,r*.62,0,7);c.stroke();c.globalAlpha=1;}},
+  fuse(c,L,t){const f=WP.fu();if(!f)return;if(ART.have(f.img)){const b=ART.bm[f.img],w=L*1.15;c.globalCompositeOperation='lighter';c.globalAlpha=.55+.15*Math.sin(t*6);c.drawImage(b,-w*.5,-w*.5,w,w);c.globalAlpha=1;c.globalCompositeOperation='source-over';return;}
+    const r=L*.5;c.lineWidth=Math.max(1.5,L*.04);c.globalAlpha=.6+.25*Math.sin(t*6);c.strokeStyle=f.c1;c.beginPath();c.arc(0,0,r,Math.PI*.5,Math.PI*1.5);c.stroke();
+    c.strokeStyle=f.c2;c.beginPath();c.arc(0,0,r,-Math.PI*.5,Math.PI*.5);c.stroke();c.globalAlpha=1;},
+  // c is already at the ship centre (rotated); L = ship length in world units; flash = muzzle burst at the mounts for the first frames after a volley
+  draw(c,sid,L,t,oy,pv){if(!this.on)return;const eq=WP.eq,ar=pv&&ART.have('ship-'+sid+'-armed');this.fuse(c,L,t);if(ar)return;
+    for(let sl=0;sl<2;sl++){const id=eq[sl];if(!id)continue;const q=this.pt(sid,sl),x=q[0]*L,y=q[1]*L+(oy||0);this.mount(c,id,sl,x,y,L);
+      const fl=pv?0:this.fl[sl];if(fl>0){c.globalCompositeOperation='lighter';c.globalAlpha=Math.min(1,fl*14);c.fillStyle=WPD[id]?WPD[id].c:'#fff';c.beginPath();c.arc(x+L*.1,y,L*(.07+.1*fl*9),0,7);c.fill();c.globalAlpha=1;c.globalCompositeOperation='source-over';}}}};
+NR.on('fire',()=>{if(RIG.on){RIG.fl[0]=RIG.fl[1]=.09;}});
+NR.on('tick',d=>{if(RIG.fl[0]>0)RIG.fl[0]=RIG.fl[1]=Math.max(0,RIG.fl[0]-(d>0&&d<1?d:.016));});RIG.chip=function(c,id,sl,x,y,k){const d=WPD[id],r=4.5*k,cx=x+r,cy=y-4*k,n='wp-'+id;if(!d)return 0;
+  if(ART.have(n)){c.drawImage(ART.bm[n],x,cy-r*1.2,r*2.4,r*2.4);return r*2.4+3*k;}
+  c.save();c.fillStyle=d.c;c.beginPath();if(sl){c.moveTo(cx+r*1.1,cy);c.lineTo(cx-r*.8,cy-r);c.lineTo(cx-r*.8,cy+r);c.closePath();}else c.arc(cx,cy,r,0,7);c.fill();c.restore();return r*2+4*k;};
+RIG.pic=function(cv,sid){if(!cv)return;const c=cv.getContext('2d'),W=cv.width,H=cv.height,L=W*.66,n='spr-ship-'+sid,b=ART.bm[n];c.clearRect(0,0,W,H);
+  if(!b&&!(n in ART.bm))ART.load(n);if(!b)setTimeout(()=>{if(cv.isConnected)RIG.pic(cv,sid);},500);
+  c.save();c.translate(W/2,H/2);const ar=ART.have('ship-'+sid+'-armed')?ART.bm['ship-'+sid+'-armed']:null,im=ar||b;
+  if(im){const w=ar?L*1.1:L,h=w*im.height/im.width;c.drawImage(im,-w/2,-h/2,w,h);}
+  else{c.fillStyle='#16102a';c.strokeStyle='#19e3ff';c.beginPath();c.moveTo(L*.5,0);c.lineTo(-L*.4,-L*.18);c.lineTo(-L*.4,L*.18);c.closePath();c.fill();c.stroke();}
+  RIG.draw(c,sid,L,0,0,true);
+  c.font='700 '+Math.round(H*.13)+'px "Share Tech Mono",monospace';c.textAlign='center';c.fillStyle='#fff';c.globalAlpha=.9;
+  for(let sl=0;sl<2;sl++){if(!WP.eq[sl])continue;const q=RIG.pt(sid,sl);c.fillText(sl+1,q[0]*L,q[1]*L+(sl?H*.3:-H*.2));}   // slot numbers
+  c.restore();};
 function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:Math.floor(t*20)%2))return;const D=DISTRICTS[G.di];
   ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);
   const so=ART.sp('spr-ship-'+shipDef().id,60);
   if(so){const bob=Math.sin(t*5)*1.2,en=ART.sp('fx-engine',46);ctx.globalCompositeOperation='lighter';
     if(en)ART.put(en,-24-en.w*.5*(.8+.2*PUL),bob,0,.7+.3*PUL);                  // painted jet, flickers with the beat
-    G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';ART.put(so,0,bob);ctx.restore();
+    G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';ART.put(so,0,bob);RIG.draw(ctx,shipDef().id,60,t,bob);ctx.restore();
     const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}
     ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();return;}
   ctx.globalCompositeOperation='lighter';G_(-20,2,16+Math.random()*5,D.a,.9);G_(0,0,34,D.a,.18);ctx.globalCompositeOperation='source-over';
@@ -1167,6 +1197,7 @@ function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%
   ctx.strokeStyle=shv?shv[2]:D.b;ctx.lineWidth=1.5;ctx.stroke();
   ctx.fillStyle=shv?shv[2]:D.b;ctx.globalAlpha=.85;ctx.beginPath();ctx.moveTo(12,-2);ctx.lineTo(4,-8);ctx.lineTo(-6,-7);ctx.lineTo(-4,-1);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
   ctx.fillStyle=D.a;ctx.fillRect(-16,8,26,2);ctx.fillStyle='#fff';ctx.fillRect(22,1,4,2);
+  if(shv)ctx.scale(1/shv[0],1/shv[1]);RIG.draw(ctx,shipDef().id,48*(shv?shv[0]:1),t,0);
   ctx.restore();
   const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}   // each tier: more glow on the ship
   ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();}
@@ -1331,7 +1362,7 @@ const neonI='<svg class="nI" viewBox="0 0 24 24" aria-hidden="true"><path d="'+N
 const garageEl=document.createElement('div');garageEl.id='garage';garageEl.className='ov solid pg';garageEl.hidden=true;
 garageEl.innerHTML='<div class="top"><span class="ttl">GARAGE</span><span class="neon" id="gaBank"></span><span class="sp"></span><button class="go alt" id="gaBack" type="button" style="padding:.3em 1.1em">BACK</button></div>'
   +'<div class="tabs"><button class="go dim" data-t="ships" type="button">SHIPS</button><button class="go dim" data-t="crew" type="button">CREW</button><button class="go dim" data-t="looks" type="button">LOOKS</button></div>'
-  +'<div class="cards" id="gaCards"></div><div class="msg" id="gaMsg"></div>';
+  +'<canvas id="gaPic" width="300" height="96" style="display:none;margin:0 auto 4px;width:min(100%,300px);height:auto;aspect-ratio:300/96;flex:0 0 auto"></canvas><div class="cards" id="gaCards"></div><div class="msg" id="gaMsg"></div>';
 stage.appendChild(garageEl);
 const gaMsg=t=>{$('gaMsg').textContent=t;clearTimeout(gaMsg.h);gaMsg.h=setTimeout(()=>{$('gaMsg').textContent='';},1800);};
 function gaItems(){return GA.tab==='ships'?SHIPS.map(s=>({k:s.id==='std'?null:'ship_'+s.id,id:s.id,n:s.n,t:s.t,p:s.p||0,ic:s.ic,eq:GA.ship===s.id,kind:'ship'}))
@@ -1339,6 +1370,7 @@ function gaItems(){return GA.tab==='ships'?SHIPS.map(s=>({k:s.id==='std'?null:'s
   :THEMES.map(h=>({k:h.id==='neon'?null:'th_'+h.id,id:h.id,n:h.n,t:h.t,p:h.p||0,f:h.f,eq:GA.theme===h.id,kind:'theme'}));}
 function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';
   for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
+  const gp=$('gaPic');gp.style.display=GA.tab==='ships'?'block':'none';if(GA.tab==='ships'&&RIG.ok)RIG.pic(gp,GA.ship);
   const box=$('gaCards');box.innerHTML='';
   for(const it of gaItems()){const own=!it.k||GA.own[it.k],b=document.createElement('button');b.type='button';
     b.className='card'+(it.eq?' sel':'')+(!own&&GA.bank<it.p?' no':'');b.style.setProperty('--c',it.eq?'#19e3ff':own?'#8c86b8':'#ffb020');b.dataset.id=it.id;b.dataset.kind=it.kind;
@@ -3501,6 +3533,8 @@ NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L3',id:'ship-mounts',text:'Your ship now shows the weapons you equip: a coloured circle on slot 1, a triangle on slot 2, a split ring when they fuse, and a flash from the mounts when you fire. See it in WEAPONS and the Garage. Painted mounts come later. Does it read at a glance?'},
+ {ver:'L2',id:'weapon-levels',text:'Weapons grow with your Neon: Garage > WEAPONS has 16 weapons (8 new: Frost Beam, Flame Arc, Plasma Wave, Shrapnel Shell, Echo Drone, Gravity Well, Rail Sniper, Storm Cell). Buy one with Neon, then buy its levels 1 to 10 (a level bar, the power it gives and the next new ability are on every card). In a run the pit-stop pickups add up to 2 more levels on top. Does a higher level feel stronger, and are the prices fair?'},
  {ver:'L2',id:'fight-back',text:'Enemies now fly in and fight back: they cannot be hit until they are fully on screen (a red ring at the edge shows where they come in), every enemy lives at least about a second on screen even against a maxed build, and chargers glide in before they dash. Do waves feel like a fight now, on Easy too?'},
  {ver:'L2',id:'no-idle',text:'Standing still is no longer safe: parking in one spot (or nudging a few pixels) now brings the red static discharge that no shield, heal or revive can outlast, plus aimed shots from the edge of the screen. Keep moving and nothing changes. Does it feel fair?'},
  {ver:'L1',id:'weapons-fusions',text:'Eight weapons now (new: Arc Chain, Orbit Blades, Ricochet Disc, Mine Layer). Put two DIFFERENT weapons in the two slots on the WEAPONS sheet and they fuse: a named fusion with its own effect and +12% damage. The fusion pictures are shapes until the art arrives. Do the new weapons feel different, and is a fusion worth choosing?'},
@@ -3689,21 +3723,28 @@ const FUSE_ON=true;                                        // switch for the who
 const FU_K=1.12;                                           // fusion damage bonus
 const pbCap=()=>touchUI||rotMode?44:64;                    // most player bullets alive at once; weapon and fusion shots that do not fit are skipped
 const pbRoom=n=>G.pb.length+(n||1)<=pbCap();
-const WP_IDS=Object.keys(WPD),WP_NEED=[2,3,4,5];                // pickups to go from LV1 to LV2, LV2 to LV3, ...
-const WP={eq:['pulse',null],lv:{},xp:{},vc:0,open:false,bl:[],mn:[],fuT:0,lmy:-999,mode:'pit',seen:!!load('mnr_wpseen',false),
-  lvOf(id){return this.lv[id]||1;},
+const WP_IDS=Object.keys(WPD),WP_NEED=[2,3];                    // in-run pit-stop pickups: LV1 to LV2, LV2 to LV3 (each in-run level adds one effective level, at most +2; wpx.js)
+const WP_ALL=/[?&]all=1/.test(location.search);                       // test link: every weapon counts as owned
+const WPX={fire:{},demo:{}};                                      // the eight newer weapons (wpx.js) plug into the fire / demo code here
+const WP_MAX=10,WP_RUN_MAX=3;                                    // permanent levels 1..10 (bought in the garage); effective level = permanent + in-run bonus, at most 10
+const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[],fuT:0,lmy:-999,mode:'pit',seen:!!load('mnr_wpseen',false),
+  permOf(id){return Math.max(1,this.pl[id]|0);},          // permanent (garage) level; a weapon that is not owned counts as 1 (test hooks may equip it)
+  has(id){return (this.pl[id]|0)>0||WP_ALL;},
+  runOf(id){return this.lv[id]||1;},                       // in-run pit-stop level 1..3
+  lvOf(id){return Math.min(WP_MAX,this.permOf(id)+Math.min(WP_RUN_MAX-1,this.runOf(id)-1));},   // effective level that drives damage, rate, size and count
   eqIds(){return this.eq.filter(Boolean);},
-  canGain(){return this.eqIds().some(id=>this.lvOf(id)<5);},
+  canGain(){return this.eqIds().some(id=>this.runOf(id)<WP_RUN_MAX&&this.lvOf(id)<WP_MAX);},
   maxLv(){let m=1;for(const id of this.eqIds())m=Math.max(m,this.lvOf(id));return m;},
-  sync(){if(typeof P!=='undefined'&&P)P.wl=this.maxLv();},
-  save(){save('mnr_wp',{eq:this.eq});},
+  sync(){if(typeof P!=='undefined'&&P)P.wl=1+Math.floor((this.maxLv()-1)/2.25);},   // ships that scale with the weapon level (Half-time Heavy) keep their old 1..5 range,
+  save(){save('mnr_wp',{eq:this.eq});save('mnr_wplv',this.pl);},
   reset(){this.lv={};this.xp={};this.vc=0;this.bl=[];this.mn=[];this.fuT=4;this.lmy=-999;this.sync();},
   // the fusion of the two equipped weapons (null when only one, or the same one twice)
   fu(){const[a,b]=this.eq;if(!FUSE_ON||!a||!b||a===b)return null;const k=a<b?a+'-'+b:b+'-'+a;if(this._fk===k)return this._f;this._fk=k;this._f=null;const[x,y]=k.split('-');
     for(const[t1,t2,fx]of FU_RULES){const tx=WTAG[x],ty=WTAG[y];let own=null,par=null;
-      if(t2){if(tx.includes(t1)&&ty.includes(t2)){own=x;par=y;}else if(ty.includes(t1)&&tx.includes(t2)){own=y;par=x;}}
+      if(t1==='*'){own=x;par=y;}
+      else if(t2){if(tx.includes(t1)&&ty.includes(t2)){own=x;par=y;}else if(ty.includes(t1)&&tx.includes(t2)){own=y;par=x;}}
       else if(tx.includes(t1)){own=x;par=y;}else if(ty.includes(t1)){own=y;par=x;}
-      if(own){this._f={id:'fu-'+k,img:'fx-fuse-'+k,k,name:FU_NAMES[k],fx,tx:FU_TX[fx],own,par,c1:WPD[x].c,c2:WPD[y].c};break;}}
+      if(own){this._f={id:'fu-'+k,img:'fx-fuse-'+k,timg:'fx-fuse-tag-'+(t1==='*'?'any':t1)+'-'+(t2||'any'),k,name:FU_NAMES[k]||fuName(x,y),fx,tx:FU_TX[fx],own,par,c1:WPD[x].c,c2:WPD[y].c};break;}}
     return this._f;},
   fk(){return this.fu()?FU_K:1;},
   // options a fusion adds to the bullets of weapon id
@@ -3713,41 +3754,46 @@ const WP={eq:['pulse',null],lv:{},xp:{},vc:0,open:false,bl:[],mn:[],fuT:0,lmy:-9
     else if(fx==='seek'&&id===f.par)o.hk=Math.max(o.hk||0,1.8);
     else if(fx==='bounce'&&id===f.par)o.rc=Math.max(o.rc||0,1);
     else if(fx==='zap'&&id===f.par)o.zp=1;
+    else if(fx==='chill'&&id===f.par)o.cl=1.6;
+    else if(fx==='splash'&&id===f.par)o.ax=1;
+    else if(fx==='wide'&&id===f.par)o.rad=(o.rad||0)+4;
+    else if(fx==='pierce1'&&id===f.par){if(!o.px){o.px=new Set();o.pn=1;}else if(o.pn!=null&&o.pn<90)o.pn++;}
     return o;},
-  gain(){const ids=this.eqIds().filter(id=>this.lvOf(id)<5);if(!ids.length){P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');return;}
+  gain(){const ids=this.eqIds().filter(id=>this.runOf(id)<WP_RUN_MAX&&this.lvOf(id)<WP_MAX);if(!ids.length){P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');return;}
     ids.sort((a,b)=>this.lvOf(a)-this.lvOf(b));const id=ids[0],d=WPD[id];this.xp[id]=(this.xp[id]||0)+1;
-    if(this.xp[id]>=WP_NEED[this.lvOf(id)-1]){this.xp[id]=0;this.lv[id]=this.lvOf(id)+1;floater(P.x,P.y-24,d.s+' LV'+this.lv[id],d.c);G.rings.push({x:P.x,y:P.y,l:.5,m:.5,c:d.c});}
-    else floater(P.x,P.y-24,d.s+' '+this.xp[id]+'/'+WP_NEED[this.lvOf(id)-1],d.c);
+    if(this.xp[id]>=WP_NEED[this.runOf(id)-1]){this.xp[id]=0;this.lv[id]=this.runOf(id)+1;floater(P.x,P.y-24,d.s+' LV'+this.lvOf(id),d.c);G.rings.push({x:P.x,y:P.y,l:.5,m:.5,c:d.c});}
+    else floater(P.x,P.y-24,d.s+' '+this.xp[id]+'/'+WP_NEED[this.runOf(id)-1],d.c);
     this.sync();if(this.open)this.draw();},
   // the shots of the equipped weapons, called inside the ship's volley so every upgrade (damage, crits, piercing...) applies to them too
   shots(std,pf){this.vc++;const f=this.fu(),k=this.fk();
-    const mk=id=>(vx,vy,d,o)=>{if(!pbRoom())return;std(vx,vy,d*k,this.mod(id,o));};
+    const mk=id=>(vx,vy,d,o)=>{if(!pbRoom())return;if(id!=='drone')WPX.last={vx,vy,d,o:o||{}};std(vx,vy,d*k,this.mod(id,o));};   // WPX.last: the drone repeats it
     for(const id of this.eq){if(id)this.fire1(id,mk(id),this.lvOf(id));}
     if(f&&f.fx==='orbitfire'&&this.vc%2===0){const par=f.par,st=mk(par);for(const b of this.bl)st(900,0,.45,{x:b.x,y:b.y,col:WPD[par].c,len:10,th:3});}},
   // one weapon's part of a volley
   fire1(id,std,L){
-    if(id==='pulse'){const d=.8+.05*(L-1),v=[130];if(L>=2)v.push(240);if(L>=3)v.push(60);if(L>=5)v.push(330);
+    if(id==='pulse'){const d=.82+.012*(L-1),v=[L>=3?145:130,L>=3?250:240];if(L>=6)v.push(60);if(L>=10)v.push(330);
       for(const a of v){std(870,-a,d,{col:'#ff8ad8',len:12});std(870,a,d,{col:'#ff8ad8',len:12});}}
-    else if(id==='laser'){if(this.vc%2===0)std(1500,0,1.5+.5*L,{big:1,px:new Set(),pn:99,col:'#7dffd8',len:90,th:3.5});}
-    else if(id==='swarm'){if(this.vc%2===1){const n=1+(L>=2)+(L>=4),d=.75+.12*L;for(let i=0;i<n;i++)std(520,(i-(n-1)/2)*300+rnd(-60,60),d,{hk:2.6+.6*L,col:'#ffb020',len:10,th:4});}}
-    else if(id==='disc'){if(this.vc%2===0){const rc=2+(L>=3)+(L>=5),d=.95+.2*L,o=()=>({rc,px:new Set(),pn:99,rad:6,big:1,col:'#ff7a45',len:16,th:8});
-      if(L>=4){std(560,-400,d,o());std(560,400,d,o());}else std(560,(this.vc%4===0?-1:1)*400,d,o());}}
+    else if(id==='laser'){if(L>=8||this.vc%(L>=4?3:2)!==(L>=4?2:1))std(1500,0,2+.04*(L-1),{big:1,px:new Set(),pn:99,rad:L>=6?3:0,col:'#7dffd8',len:90,th:3.5+.25*(L-1)});}
+    else if(id==='swarm'){if(this.vc%2===1){const n=1+(L>=6),d=.85+.015*(L-1);for(let i=0;i<n;i++)std(520,(i-(n-1)/2)*300+rnd(-60,60),d,{hk:2.6+.4*Math.min(L,7),col:'#ffb020',len:10,th:4});}}
+    else if(id==='disc'){if(this.vc%2===0){const rc=2+(L>=10),d=(.95+.02*(L-1))*(L>=6?.4:1),o=()=>({rc,px:new Set(),pn:99,rad:6,big:1,col:'#ff7a45',len:16,th:8});
+      if(L>=6){std(560,-400,d,o());std(560,400,d,o());}else std(560,(this.vc%4===0?-1:1)*400,d,o());}}
     else if(id==='arc'){if(this.vc%2===0)this.arcZap(L);}
-    else if(id==='mine'){if(this.vc%3===0)this.dropMine(L);}},
+    else if(id==='mine'){if(this.vc%3===0)this.dropMine(L);}
+    else if(WPX.fire[id])WPX.fire[id](std,L);},
   // can this foe be hurt by direct (non-bullet) damage right now?
   tgt(e){return e.hp>0&&!e.dying&&e.type!=='gate'&&e.x<W-6&&(e.type!=='boss'||e.x<W-20);},
   hurtE(e,dm){e.hp-=dm*(e.shl?.45:1);e.flash=.08;},
   // ARC CHAIN: the nearest foe in range, then it jumps from foe to foe (1+L jumps)
-  arcZap(L){const R=270+20*L,dm=(1.1+.25*L)*tpDmg()*this.fk();let cx=P.x+18,cy=P.y;const hit=new Set();
-    for(let i=0;i<1+L;i++){let best=null,bd=i?150:R;for(const e of G.en){if(hit.has(e)||!this.tgt(e)||e.x<P.x-30)continue;const d=Math.hypot(e.x-cx,e.y-cy);if(d<bd){bd=d;best=e;}}
+  arcZap(L){const R=270+14*L,dm=(1.2+.01*(L-1))*tpDmg()*this.fk();let cx=P.x+18,cy=P.y;const hit=new Set();
+    for(let i=0;i<2+(L>=6)+(L>=10);i++){let best=null,bd=i?150:R;for(const e of G.en){if(hit.has(e)||!this.tgt(e)||e.x<P.x-30)continue;const d=Math.hypot(e.x-cx,e.y-cy);if(d<bd){bd=d;best=e;}}
       if(!best)break;hit.add(best);this.hurtE(best,dm);AX.arcs.push({x1:cx,y1:cy,x2:best.x,y2:best.y,l:.22});cx=best.x;cy=best.y;}
     if(hit.size)AU.sfx('graze');},
   // a lightning leap from foe e to the nearest other foe (zap fusion)
   leap(e,dm){let best=null,bd=170;for(const o of G.en){if(o===e||!this.tgt(o))continue;const d=Math.hypot(o.x-e.x,o.y-e.y);if(d<bd){bd=d;best=o;}}
     if(best){this.hurtE(best,dm);AX.arcs.push({x1:e.x,y1:e.y,x2:best.x,y2:best.y,l:.2});}},
   // MINE LAYER: a mine only drops when the ship has moved since the last one, so sitting still lays nothing new
-  dropMine(L){if(Math.abs(P.y-this.lmy)<14)return;this.lmy=P.y;if(this.mn.length>=3+Math.ceil(L/2))this.mn.shift();this.mn.push({x:P.x-26,y:P.y,vx:70,t:0,L});},
-  boom(m){const f=this.fu(),k=this.fk(),L=m.L,R=62+5*L,dm=(3+1.2*L)*tpDmg()*k;let first=null;
+  dropMine(L){if(Math.abs(P.y-this.lmy)<14)return;this.lmy=P.y;if(this.mn.length>=(L>=6?5:4))return;this.mn.push({x:P.x-26,y:P.y,vx:70,t:0,L});},
+  boom(m){const f=this.fu(),k=this.fk(),L=m.L,R=62+3*L,dm=(3.6+.1*(L-1))*tpDmg()*k;let first=null;
     for(const e of G.en){if(!this.tgt(e))continue;if(Math.hypot(e.x-m.x,e.y-m.y)<R+e.r){this.hurtE(e,dm);if(!first)first=e;}}
     G.rings.push({x:m.x,y:m.y,l:.3,m:.3,c:WPD.mine.c});burst(m.x,m.y,WPD.mine.c,8,200,.35);AU.sfx('hit');
     if(f&&f.fx==='shrapnel'){for(let i=0;i<4&&pbRoom();i++){const a=i*Math.PI/2+.4;G.pb.push(Object.assign({x:m.x,y:m.y,vx:Math.cos(a)*600,vy:Math.sin(a)*600,dm:.55*tpDmg()*k,pf:0,col:WPD[f.par].c,len:10,th:3,fz:1}));}}
@@ -3758,7 +3804,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},vc:0,open:false,bl:[],mn:[],fuT:0,lmy:-9
   // per-tick work of the blades and mines
   upd(dt){if(!G.live||G.dead||SH.active||P.over)return;if(this.fuT>0)this.fuT-=dt;
     const ids=this.eqIds(),k=this.fk();
-    if(ids.includes('orbit')){const L=this.lvOf('orbit'),n=2+(L>=3)+(L>=5),r=44+3*L,a0=bpos()*Math.PI,dm=(.9+.25*L)*tpDmg()*k;this.bl.length=n;
+    if(ids.includes('orbit')){const L=this.lvOf('orbit'),n=2+(L>=3)+(L>=9),r=44+3*Math.min(L,6),a0=bpos()*Math.PI,dm=(.9+.015*(L-1))*tpDmg()*k;this.bl.length=n;
       for(let i=0;i<n;i++){const a=a0+i*Math.PI*2/n,b=this.bl[i]=this.bl[i]||{};b.x=P.x+Math.cos(a)*r;b.y=P.y+Math.sin(a)*r;b.a=a;
         for(const e of G.en){if(!this.tgt(e)||G.t-(e.ob||-9)<.28)continue;if(Math.hypot(e.x-b.x,e.y-b.y)<e.r+12){e.ob=G.t;this.hurtE(e,dm);burst(b.x,b.y,WPD.orbit.c,2,120,.2);}}}}
     else this.bl.length=0;
@@ -3767,20 +3813,20 @@ const WP={eq:['pulse',null],lv:{},xp:{},vc:0,open:false,bl:[],mn:[],fuT:0,lmy:-9
       if(!go&&m.t>.35)for(const e of G.en){if(this.tgt(e)&&Math.hypot(e.x-m.x,e.y-m.y)<e.r+16){go=2;break;}}
       if(go){this.mn.splice(i,1);if(go===2)this.boom(m);}}},
   drawWorld(t){if(!G||!G.live||G.dead)return;const c=ctx;
-    if(this.bl.length){c.save();c.globalCompositeOperation='lighter';c.strokeStyle=WPD.orbit.c;c.fillStyle=WPD.orbit.c;c.lineWidth=2;c.globalAlpha=.25;c.beginPath();c.arc(P.x,P.y,44+3*this.lvOf('orbit'),0,7);c.stroke();c.globalAlpha=.95;
+    if(this.bl.length){c.save();c.globalCompositeOperation='lighter';c.strokeStyle=WPD.orbit.c;c.fillStyle=WPD.orbit.c;c.lineWidth=2;c.globalAlpha=.25;c.beginPath();c.arc(P.x,P.y,44+3*Math.min(this.lvOf('orbit'),6),0,7);c.stroke();c.globalAlpha=.95;
       for(const b of this.bl){c.beginPath();c.moveTo(b.x+Math.cos(b.a+1.57)*10,b.y+Math.sin(b.a+1.57)*10);c.lineTo(b.x+Math.cos(b.a)*7,b.y+Math.sin(b.a)*7);c.lineTo(b.x-Math.cos(b.a+1.57)*10,b.y-Math.sin(b.a+1.57)*10);c.closePath();c.fill();}c.restore();}
     if(this.mn.length){c.save();c.globalCompositeOperation='lighter';for(const m of this.mn){const on=m.t>.35,p=.6+.4*Math.sin(t*8+m.x);c.globalAlpha=on?p:.35;c.strokeStyle=c.fillStyle=WPD.mine.c;c.lineWidth=2;c.beginPath();c.arc(m.x,m.y,6,0,7);c.stroke();c.beginPath();c.arc(m.x,m.y,2.5,0,7);c.fill();
       for(let i=0;i<6;i++){const a=i*1.047+t;c.beginPath();c.moveTo(m.x+Math.cos(a)*6,m.y+Math.sin(a)*6);c.lineTo(m.x+Math.cos(a)*10,m.y+Math.sin(a)*10);c.stroke();}}c.restore();}},
-  beat(){if(!G.live||G.dead||SH.active||P.over||!this.eq.includes('beat'))return;const L=this.lvOf('beat'),dm=(7+3*(L-1))*tpDmg()*this.fk();
+  beat(){if(!G.live||G.dead||SH.active||P.over||!this.eq.includes('beat'))return;const L=this.lvOf('beat'),dm=(7+.2*(L-1))*tpDmg()*this.fk();
     const f=this.fu(),k=this.fk(),mo=o=>this.mod('beat',o);
-    if(pbRoom(3)){G.pb.push(mo({x:P.x+28,y:P.y,vx:760,vy:0,dm,pf:1,big:1,rad:8,px:new Set(),pn:Math.floor((L-1)/2),col:'#ffe14d',len:40,th:9}));
-    if(L>=4)G.pb.push(mo({x:P.x+20,y:P.y-8,vx:740,vy:-130,dm:dm*.55,pf:1,big:1,px:new Set(),pn:0,col:'#ffe14d',len:24,th:6}),mo({x:P.x+20,y:P.y+8,vx:740,vy:130,dm:dm*.55,pf:1,big:1,px:new Set(),pn:0,col:'#ffe14d',len:24,th:6}));}
+    if(pbRoom(3)){G.pb.push(mo({x:P.x+28,y:P.y,vx:760,vy:0,dm,pf:1,big:1,rad:8,px:new Set(),pn:Math.floor(L/3),col:'#ffe14d',len:40,th:9+.3*(L-1)}));
+    if(L>=4)G.pb.push(mo({x:P.x+20,y:P.y-8,vx:740,vy:-130,dm:dm*.35,pf:1,big:1,px:new Set(),pn:0,col:'#ffe14d',len:24,th:6}),mo({x:P.x+20,y:P.y+8,vx:740,vy:130,dm:dm*.35,pf:1,big:1,px:new Set(),pn:0,col:'#ffe14d',len:24,th:6}));}
     if(f&&f.fx==='bomblets')G.delayed.push({t:BT.spb*.4,f:()=>{if(G.dead||!running||P.over)return;for(const vy of[-170,0,170])if(pbRoom())G.pb.push({x:P.x+110,y:P.y,vx:540,vy,dm:dm*.3,pf:0,hk:3,col:WPD.swarm.c,len:10,th:5,fz:1});}});
     if(f&&f.fx==='echo'){const par=f.par,st=(vx,vy,d,o)=>{if(pbRoom())G.pb.push(Object.assign({x:P.x+22,y:P.y,vx,vy,dm:d*SH.dmk()*tpDmg()*k,pf:0,fz:1},this.mod(par,o)));};this.fire1(par,st,this.lvOf(par));}
     G.rings.push({x:P.x+24,y:P.y,l:.25,m:.25,c:'#ffe14d'});AU.sfx('shot');},
   // short text for the HUD: "PULSE 2 · LANCE 1"
   hud(c,x,y,k){c.save();c.font=`${Math.round(11*(k||1))}px "Share Tech Mono",monospace`;c.textAlign='left';let xx=x;
-    for(const id of this.eq){const d=id&&WPD[id],t=d?d.s+' '+this.lvOf(id):'-';c.fillStyle=d?d.c:'#dcd8f6';c.fillText(t,xx,y);xx+=c.measureText(t).width+10*(k||1);}
+    for(const id of this.eq){const d=id&&WPD[id],t=d?d.s+' '+this.lvOf(id):'-';if(d)xx+=RIG.chip(c,id,this.eq.indexOf(id),xx,y,k||1);c.fillStyle=d?d.c:'#dcd8f6';c.fillText(t,xx,y);xx+=c.measureText(t).width+10*(k||1);}
     const f=this.fu();if(f&&this.fuT>0){c.globalAlpha=Math.min(1,this.fuT);c.fillStyle='#ffe14d';c.fillText('FUSION '+f.name.toUpperCase(),x,y+13*(k||1));}c.restore();},
   toggle(id){const i=this.eq.indexOf(id);let m;
     if(i>=0){if(this.eqIds().length<2){this.msg('Keep one weapon equipped');return;}this.eq[i]=null;m=WPD[id].s+' removed';}
@@ -3789,6 +3835,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},vc:0,open:false,bl:[],mn:[],fuT:0,lmy:-9
   msg(t){const el=$('wpMsg');if(el)el.textContent=t;}};
 {const ld=load('mnr_wp',null);if(ld&&Array.isArray(ld.eq)){WP.eq=[WP_IDS.includes(ld.eq[0])?ld.eq[0]:null,WP_IDS.includes(ld.eq[1])&&ld.eq[1]!==ld.eq[0]?ld.eq[1]:null];if(!WP.eqIds().length)WP.eq=['pulse',null];}}
 window.__wp=Object.assign(WP,{lvl(id,n){this.lv[id]=n;}});          // test hook
+RIG.ok=true;window.__rig=Object.assign(RIG,{GA,SHIPS,pushPos:()=>[P.x,P.y]});          // test hook
 NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
 {const pd=PW.draw;PW.draw=function(t){pd.call(this,t);WP.drawWorld(t);};const cl=SH.close;SH.close=function(){cl.call(this);WP.fuT=4;};}NR.on('beat',()=>WP.beat());
 
@@ -3803,11 +3850,11 @@ NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
 #wpL .card .pp{display:flex;gap:2px;margin-top:3px}#wpL .card .pp i{display:block;width:clamp(8px,calc(var(--u)*3),14px);height:5px;border-radius:1px;background:#ffffff22}#wpL .card .pp i.on{background:var(--c)}
 #wpL .card.sel{background:#22123f}
 #wpFu{flex:0 0 auto;display:flex;gap:10px;align-items:center;min-height:30px;font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*3.2),15px);color:var(--dim);padding:2px 4px}
-#wpFu canvas{width:56px;height:56px;flex:0 0 auto}#wpFu .n{color:#ffe14d;font-size:1.05em;letter-spacing:.04em}#wpFu .t{color:var(--ink)}
+#wpShip{display:block;width:min(100%,300px);height:auto;aspect-ratio:300/96;margin:0 auto 4px;flex:0 0 auto}#wpFu canvas{width:56px;height:56px;flex:0 0 auto}#wpFu .n{color:#ffe14d;font-size:1.05em;letter-spacing:.04em}#wpFu .t{color:var(--ink)}
 #shWpRow{display:flex;gap:10px;align-items:center;flex:0 0 auto;min-height:44px}#shWpRow button{flex:0 0 auto;min-width:44px;padding:.4em 1em}#shWpRow span{font-family:var(--mono);color:var(--dim);font-size:clamp(11px,calc(var(--u)*3.2),15px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #titleRow2{margin-top:2px}#titleRow2 .go{font-size:clamp(12px,min(1.6vw,2.8vh),16px)}`;document.head.appendChild(st);}
 const wpEl=document.createElement('div');wpEl.id='wpm';wpEl.className='ov solid pg';wpEl.hidden=true;
-wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><div id="wpL"></div><div id="wpFu"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
+wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><canvas id="wpShip" width="300" height="96"></canvas><div id="wpL"></div><div id="wpFu"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
 stage.appendChild(wpEl);
 {const DEMO=(id,c,t,col)=>{                                       // t: 0..2 seconds, the demo loops
    c.clearRect(0,0,108,52);const sy=26;c.fillStyle='#ffffff';c.beginPath();c.moveTo(6,sy-6);c.lineTo(18,sy);c.lineTo(6,sy+6);c.closePath();c.fill();
@@ -3821,20 +3868,23 @@ stage.appendChild(wpEl);
    else if(id==='orbit'){foe(70-((t%2)/2)*30,sy-4,((t%2)/2)>.5);for(let i=0;i<3;i++){const a=t*6.28+i*2.094,x=18+Math.cos(a)*16,y=sy+Math.sin(a)*16;c.beginPath();c.moveTo(x+Math.cos(a+1.57)*5,y+Math.sin(a+1.57)*5);c.lineTo(x+Math.cos(a)*4,y+Math.sin(a)*4);c.lineTo(x-Math.cos(a+1.57)*5,y-Math.sin(a+1.57)*5);c.closePath();c.fill();}}
    else if(id==='disc'){foe(98,sy,false);const p=(t%2)/2,x=18+p*80,y=sy-20+Math.abs(((p*3)%1)*2-1)*40;c.beginPath();c.arc(x,y,4.5,0,7);c.fill();c.globalAlpha=.4;c.beginPath();c.arc(x-9,y,3,0,7);c.fill();c.globalAlpha=1;}
    else if(id==='mine'){const p=(t%2)/2;[38,60].forEach(x=>{c.beginPath();c.arc(x,sy,4+Math.sin(t*9+x)*.8,0,7);c.stroke();});const fx=98-p*44;foe(fx,sy,p>.7);if(p>.7){c.globalAlpha=1-(p-.7)/.3;c.beginPath();c.arc(60,sy,10+(p-.7)*60,0,7);c.stroke();c.globalAlpha=1;}}
+   else if(WPX.demo[id])WPX.demo[id](c,t,col,foe,sy);
    else{const p=(t%1)/1,ring=(t%1)<.3?(t%1)/.3:0;c.globalAlpha=1-ring;c.beginPath();c.arc(20,sy,4+ring*14,0,7);c.stroke();c.globalAlpha=1;foe(94,sy,p>.8&&p<.95);
      const x=20+p*70;c.fillRect(x-8,sy-4,18,8);}
  };
+ WPX.demoFn=(id,c,t,col)=>{c.clearRect(0,0,108,52);DEMO(id,c,t,col);};
  let raf=0;const loop=()=>{raf=0;if(wpEl.hidden)return;const t=(performance.now()/1000)%2;for(const cv of wpEl.querySelectorAll('canvas[data-id]')){const c=cv.getContext('2d'),n='wp-'+cv.dataset.id;if(ART.have(n)){c.clearRect(0,0,108,52);c.drawImage(ART.bm[n],28,0,52,52);}else DEMO(cv.dataset.id,c,t,WPD[cv.dataset.id].c);}raf=requestAnimationFrame(loop);};
  WP.fuIcon=function(c,f,z){c.clearRect(0,0,z,z);const m=z/2;
    if(ART.have(f.img)){c.drawImage(ART.bm[f.img],0,0,z,z);return;}
+   if(f.timg&&ART.have(f.timg)){c.drawImage(ART.bm[f.timg],0,0,z,z);return;}
    c.save();c.lineCap='round';c.shadowBlur=z*.12;
    c.strokeStyle=f.c1;c.shadowColor=f.c1;c.lineWidth=z*.1;c.beginPath();c.arc(m,m,z*.36,Math.PI*.5,Math.PI*1.5);c.stroke();
    c.strokeStyle=f.c2;c.shadowColor=f.c2;c.beginPath();c.arc(m,m,z*.36,-Math.PI*.5,Math.PI*.5);c.stroke();
    c.shadowBlur=0;c.lineWidth=z*.045;c.strokeStyle=f.c1;c.beginPath();c.moveTo(z*.22,z*.78);c.lineTo(z*.78,z*.22);c.stroke();c.strokeStyle=f.c2;c.beginPath();c.moveTo(z*.22,z*.22);c.lineTo(z*.78,z*.78);c.stroke();
    c.fillStyle='#ffffff';c.font=`700 ${Math.round(z*.26)}px "Chakra Petch",sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(f.name.split(' ').map(w=>w[0]).join(''),m,m+z*.02);c.restore();};
- WP.draw=function(){const box=$('wpL');box.innerHTML='';
-   for(const id of WP_IDS){const d=WPD[id],L=this.lvOf(id),slot=this.eq.indexOf(id),b=document.createElement('button');b.type='button';b.className='card'+(slot>=0?' sel':'');b.style.setProperty('--c',d.c);b.dataset.id=id;
-     b.innerHTML=`<canvas width="108" height="52" data-id="${id}"></canvas><div class="tx"><div class="n">${d.n}</div><div class="t">${d.tx}</div><div class="pp">${[1,2,3,4,5].map(i=>`<i class="${i<=L?'on':''}"></i>`).join('')}</div></div><span class="slot">${slot>=0?'SLOT '+(slot+1):'TAP TO EQUIP'}</span>`;
+ WP.draw=function(){const box=$('wpL');box.innerHTML='';RIG.pic($('wpShip'),GA.ship);
+   for(const id of WP_IDS){const d=WPD[id],L=this.lvOf(id),slot=this.eq.indexOf(id),b=document.createElement('button');b.type='button';b.className='card'+(slot>=0?' sel':'')+(this.has(id)?'':' no');b.style.setProperty('--c',d.c);b.dataset.id=id;
+     b.innerHTML=`<canvas width="108" height="52" data-id="${id}"></canvas><div class="tx"><div class="n">${d.n}</div><div class="t">${d.tx}</div><div class="pp">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<this.permOf(id)&&this.has(id)?'on':i<L?'run':''}"></i>`).join('')}</div></div><span class="slot">${!this.has(id)?'LOCKED':slot>=0?'SLOT '+(slot+1):'TAP TO EQUIP'}</span>`;
      b.addEventListener('click',()=>this.toggle(id));box.appendChild(b);}
    const fu=this.fu(),fb=$('wpFu');
    if(fu){fb.innerHTML=`<canvas width="112" height="112" id="wpFuC"></canvas><div><div class="n">FUSION: ${fu.name.toUpperCase()}</div><div class="t">${fu.tx} · +12% damage</div></div>`;WP.fuIcon($('wpFuC').getContext('2d'),fu,112);}
@@ -3861,6 +3911,160 @@ WP.draw();
 {const close=SH.close;SH.close=function(){const was=this.active;close.call(this);if(was&&P)P.inv=Math.max(P.inv||0,1.2);};}
 // Hard: the safety blink after a hit is shorter (1 s instead of 1.5 s), so Hard stays hard while Normal and Easy are kinder
 {const h0=hurt;hurt=function(){const hp0=P.hp;h0();if(HARD&&P.hp<hp0)P.inv=Math.min(P.inv,1);};}
+
+/* ===== 4b. WEAPON LEVELS BOUGHT IN THE GARAGE + EIGHT MORE WEAPONS (loads after g.js) =====
+   Every weapon has a permanent level 1..10 (key mnr_wplv, bought in Garage > WEAPONS with Neon). In a run the effective level is the permanent level
+   plus the pit-stop level bonus (at most +2, g.js WP.lvOf). Levels grow rate, size and count; damage per shot stays under the soft cap (b.js DMG.hit).
+   Total weapon DPS at level 10 is held at about 2.5x level 1 (weapon-test.js measures it). WEAPON_META switches the whole feature off: false = nothing is locked, no new weapons. */
+const WEAPON_META=true;
+const WPX_PRICE=L=>Math.round(40*Math.pow(1.45,L-1));          // Neon for the upgrade from level L to L+1: 40, 58, 84, 122, 177, 257, 372, 540, 783
+const WPX_POWER=L=>1+1.5*(L-1)/9;                              // the "power" shown on the cards: 1.00x at level 1, 2.50x at level 10
+const WPX_META={                                               // price to unlock (0 = owned from the start), colour, and what levels 3, 6 and 10 add
+  pulse:{p:0,ab:['Fan opens wider','A third pair of shots','A fourth pair of shots']},
+  laser:{p:30,ab:['The beam thickens','Fires 2 shots in 3','Fires on every shot']},
+  swarm:{p:40,ab:['Missiles home harder','Two missiles per volley','Faster, harder missiles']},
+  beat:{p:50,ab:['Shell pierces 1 foe','Pierces 2, side shells','Pierces 3, fatter shell']},
+  arc:{p:80,ab:['Lightning reaches further','A third target','A fourth target']},
+  orbit:{p:100,ab:['A third blade','Blades spin wider','A fourth blade']},
+  disc:{p:120,ab:['The disc hits harder','Twin discs','A third bounce']},
+  mine:{p:140,ab:['A bigger blast','Five mines out at once','Biggest blast, harder hit']},
+  frost:{p:160,ab:['Beam pierces 3 foes','Pierces 4, freezes longer','Twin side beams']},
+  flame:{p:180,ab:['Flames reach further','A wider cone','Longest reach, burns hotter']},
+  wave:{p:200,ab:['The wave grows wider','Eats more enemy bullets','Fires every other beat']},
+  shell:{p:260,ab:['Bursts into 5 fragments','7 fragments','10 fragments, wide cone']},
+  drone:{p:300,ab:['The echo follows closer','Two echo shots','Echoes hit harder']},
+  well:{p:340,ab:['The pull reaches further','Two wells at once','Pulls harder, wider burst']},
+  rail:{p:380,ab:['A wider rail lane','Charges in 2 beats','Fully charged: huge hit']},
+  storm:{p:400,ab:['The field grows','Two fields at once','Longest reach']}};
+Object.assign(WPD,{
+  frost:{n:'FROST BEAM',s:'FROST',c:'#9fe8ff',tx:'Icy beam that slows what it touches.'},
+  flame:{n:'FLAME ARC',s:'FLAME',c:'#ff5a2d',tx:'Wide fire cone. Fly in close.'},
+  wave:{n:'PLASMA WAVE',s:'WAVE',c:'#5b8cff',tx:'A growing wave that eats bullets.'},
+  shell:{n:'SHRAPNEL SHELL',s:'SHELL',c:'#ffa94d',tx:'A shell that bursts into fragments.'},
+  drone:{n:'ECHO DRONE',s:'DRONE',c:'#e6a8ff',tx:'A drone that repeats your last shot.'},
+  well:{n:'GRAVITY WELL',s:'WELL',c:'#7a4dff',tx:'An orb that pulls foes in, then bursts.'},
+  rail:{n:'RAIL SNIPER',s:'RAIL',c:'#ff3d6a',tx:'Charges, then one huge piercing shot.'},
+  storm:{n:'STORM CELL',s:'STORM',c:'#fff06a',tx:'A field dropped behind that zaps foes.'}});
+Object.assign(WTAG,{frost:['slow','beam'],flame:['melee','spread'],wave:['wave','spread'],shell:['frag','blast'],drone:['homing','echo'],well:['pull','blast'],rail:['pierce','heavy'],storm:['chain','field']});
+for(const id of Object.keys(WPX_META))if(WPD[id]){WPD[id].p=WPX_META[id].p;WPD[id].ab=WPX_META[id].ab;}
+WP_IDS.length=0;WP_IDS.push('pulse','laser','swarm','beat','arc','orbit','disc','mine','frost','flame','wave','shell','drone','well','rail','storm');
+if(!WEAPON_META)WP_IDS.length=8;
+/* generic fusions for the pairs with no hand-made rule: the effect comes from the tags, the name from the two weapon names, +12% damage like all fusions */
+FU_RULES.push(['slow',null,'chill'],['blast',null,'splash'],['pull',null,'splash'],['wave',null,'wide'],['melee',null,'wide'],['*',null,'pierce1']);
+Object.assign(FU_TX,{chill:'Partner shots chill foes',splash:'Partner hits burst in a small blast',wide:'Partner shots are thicker',pierce1:'Partner shots pierce one more foe'});
+function fuName(x,y){const w=id=>WPD[id].n.split(' '),cap=t=>t[0]+t.slice(1).toLowerCase();return cap(w(x)[0])+' '+cap(w(y).slice(-1)[0]);}
+/* ----- saved levels ----- */
+{const pl=load('mnr_wplv',null);WP.pl={pulse:1};
+ if(pl&&typeof pl==='object')for(const id of WP_IDS){const v=Math.floor(+pl[id]);if(v>=1&&v<=WP_MAX)WP.pl[id]=v;}
+ const ld=load('mnr_wp',null),ok=i=>WP_IDS.includes(i)&&WP.has(i);
+ if(ld&&Array.isArray(ld.eq)){WP.eq=[ok(ld.eq[0])?ld.eq[0]:null,ok(ld.eq[1])&&ld.eq[1]!==ld.eq[0]?ld.eq[1]:null];if(!WP.eqIds().length)WP.eq=['pulse',null];}
+ if(!WEAPON_META)WP_ALL_FREE=true;}
+var WP_ALL_FREE=false;
+WP.has=function(id){return WP_ALL_FREE||(this.pl[id]|0)>0||WP_ALL;};
+WP.perm=function(id,n){this.pl[id]=n;this.sync();};                 // test hook: set the permanent level (not saved)
+WP.price=function(id){const cur=this.pl[id]|0;return cur>=WP_MAX?0:cur<1?WPD[id].p:WPX_PRICE(cur);};
+/* buy the next level (or the unlock) with Neon from the garage wallet; returns {ok,why} and never lets the bank go below zero */
+WP.buy=function(id){if(!WPD[id]||!WP_IDS.includes(id))return{ok:false,why:'unknown'};const cur=this.pl[id]|0;if(cur>=WP_MAX)return{ok:false,why:'max'};
+  const price=this.price(id);if(!(Number.isFinite(price)&&price>=0)||!(GA.bank>=price))return{ok:false,why:'money',need:Math.max(0,price-GA.bank)};
+  GA.bank=Math.max(0,GA.bank-price);this.pl[id]=cur+1;this.save();gsave();this.sync();return{ok:true,price,lv:this.pl[id]};};
+{const tg=WP.toggle;WP.toggle=function(id){if(!this.has(id)){this.msg('Locked: buy it in Garage > WEAPONS');return;}tg.call(this,id);};}
+
+/* ----- the eight newer weapons: state, fire, per-tick work, drawing ----- */
+const WS={orb:[],fld:[],dr:{x:0,y:0},rc:0,rf:null,fa:0,sly:-999,ft:0};
+WPX.reset=()=>{WS.orb=[];WS.fld=[];WS.rc=0;WS.rf=null;WS.fa=0;WS.sly=-999;WPX.last=null;WS.ft=0;if(typeof P!=='undefined'&&P){WS.dr.x=P.x-30;WS.dr.y=P.y-30;}};
+WPX.fire.frost=(std,L)=>{if(WP.vc%2!==0)return;const o=y=>({big:1,px:new Set(),pn:1+(L>=3)+(L>=6),col:'#9fe8ff',len:64,th:4+.2*L,cl:1.4+.12*L});
+  std(1000,0,.7+.02*L,o());if(L>=10){std(980,-120,.35,o());std(980,120,.35,o());}};
+WPX.fire.wave=(std,L)=>{if(WP.vc%(L>=10?2:3)!==0)return;std(520,0,.9,{big:1,px:new Set(),pn:99,col:'#5b8cff',len:26,th:5,rad:6,gw:55+6*L,rm:26+3*L,eat:2+L+(L>=6?3:0)});};
+WPX.fire.shell=(std,L)=>{if(WP.vc%4!==0)return;std(480,0,2,{big:1,rad:9,col:'#ffa94d',len:30,th:9,sh:1,sl:L,bx:P.x});};
+WPX.fire.drone=(std,L)=>{if(WP.vc%2!==0)return;const l=WPX.last||{vx:900,vy:0,d:1,o:{}},n=1+(L>=6);
+  for(let i=0;i<n;i++){const o=Object.assign({},l.o,{x:WS.dr.x+12,y:WS.dr.y,col:'#e6a8ff'});if(l.o.px){o.px=new Set();}if(o.big){o.big=0;o.th=Math.min(o.th||4,5);}
+    std(l.vx,l.vy+(i?(i%2?1:-1)*140*Math.ceil(i/2):0),(L>=10?.58:.5)*Math.min(l.d,2),o);}};
+WPX.fire.well=(std,L)=>{if(WP.vc%5!==0||WS.orb.length>=(L>=6?2:1))return;WS.orb.push({x:P.x+34,y:P.y,vx:170,t:0,life:2.2+.1*L,R:120+8*L+(L>=3?14:0),L,tk:0});};
+WPX.fire.storm=(std,L)=>{if(WP.vc%5!==0||Math.abs(P.y-WS.sly)<40)return;WS.sly=P.y;if(WS.fld.length>=1+(L>=6))WS.fld.shift();WS.fld.push({x:P.x-10,y:P.y,vx:-30,t:0,life:4.5,R:70+4*L+(L>=3?10:0),L,zt:.15});};
+WP.hit=(h=>function(b,e){h.call(this,b,e);
+  if(b.cl)e.chl=Math.max(e.chl||0,b.cl);
+  if(b.sh&&!b.shd){b.shd=1;WPX.shell(b.x,b.y,b.sl||1,b);}
+  if(b.ax&&!b.axd){b.axd=1;for(const o of G.en){if(o!==e&&this.tgt(o)&&Math.hypot(o.x-b.x,o.y-b.y)<46+o.r)this.hurtE(o,b.dm*.5);}G.rings.push({x:b.x,y:b.y,l:.2,m:.2,c:b.col||'#fff'});}})(WP.hit);
+WPX.shell=(x,y,L,b)=>{const n=4+Math.floor(L/2)+(L>=10),wide=.9+.03*L,k=WP.fk();
+  for(let i=0;i<n&&pbRoom();i++){const a=(n>1?i/(n-1)-.5:0)*wide;G.pb.push({x,y,vx:Math.cos(a)*650,vy:Math.sin(a)*650,dm:(.7+.03*L)*tpDmg()*k,pf:0,col:'#ffa94d',len:10,th:3,fz:1});}
+  G.rings.push({x,y,l:.3,m:.3,c:'#ffa94d'});burst(x,y,'#ffa94d',8,220,.35);AU.sfx('hit');if(b)b.dead=1;};
+WPX.railFire=(L)=>{const dm=DMG.hit((8+.3*L)*tpDmg()*WP.fk()),w=10+.6*L;let n=0;
+  for(const e of G.en){if(!WP.tgt(e)||e.x<P.x||Math.abs(e.y-P.y)>e.r+w)continue;WP.hurtE(e,dm);n++;burst(e.x,e.y,WPD.rail.c,4,160,.25);}
+  WS.rf={x:P.x,y:P.y,w,l:.3,m:.3};AU.sfx('shot');return n;};
+{const bt=WP.beat;WP.beat=function(){bt.call(this);if(!G.live||G.dead||SH.active||P.over||!this.eq.includes('rail'))return;
+  const L=this.lvOf('rail'),need=L>=6?2:3;if(++WS.rc>=need){WS.rc=0;WPX.railFire(L);}};
+ const rs=WP.reset;WP.reset=function(){rs.call(this);WPX.reset();};
+ const u0=WP.upd;WP.upd=function(dt){u0.call(this,dt);if(!G.live||G.dead||SH.active||P.over)return;WPX.upd(dt);};
+ const dw=WP.drawWorld;WP.drawWorld=function(t){dw.call(this,t);if(!G||!G.live||G.dead)return;WPX.draw(t);};}
+WPX.upd=function(dt){const ids=WP.eqIds(),k=WP.fk();
+  if(ids.includes('drone')){const tx=P.x-34,ty=P.y-36,a=Math.min(1,dt*5);WS.dr.x+=(tx-WS.dr.x)*a;WS.dr.y+=(ty-WS.dr.y)*a;}
+  // chilled foes move and fire at about half speed
+  for(const e of G.en){if(e.chl>0){e.chl-=dt;if(e.type!=='boss'&&e.type!=='gate'&&e.lx!=null){e.x=e.lx+(e.x-e.lx)*.5;e.y=e.ly+(e.y-e.ly)*.5;if(e.bf!=null)e.bf+=dt*.5;}e.lx=e.x;e.ly=e.y;}else e.lx=null;}
+  if(ids.includes('wave')){const L=WP.lvOf('wave');for(const b of G.pb){if(!b.gw||b.dead)continue;b.rad=Math.min(b.rm,(b.rad||6)+b.gw*dt);b.th=4+b.rad*.45;
+    for(const o of G.eb){if(b.eat<=0)break;if(!o.dead&&Math.hypot(o.x-b.x,o.y-b.y)<b.rad+8){o.dead=1;b.eat--;burst(o.x,o.y,WPD.wave.c,2,100,.2);}}}}
+  for(const b of G.pb)if(b.sh&&!b.dead&&b.x>b.bx+300)WPX.shell(b.x,b.y,b.sl||1,b);
+  if(ids.includes('well')){const L=WP.lvOf('well');for(let i=WS.orb.length-1;i>=0;i--){const o=WS.orb[i];o.t+=dt;o.x+=o.vx*dt;o.vx=Math.max(60,o.vx-120*dt);o.tk-=dt;
+      for(const e of G.en){if(!WP.tgt(e)||e.type==='boss')continue;const dx=o.x-e.x,dy=o.y-e.y,d=Math.hypot(dx,dy);if(d<o.R&&d>4){const pull=Math.min(d,(1-d/o.R)*240*dt);e.x+=dx/d*pull;e.y+=dy/d*pull;}}
+      if(o.tk<=0){o.tk=.3;for(const e of G.en)if(WP.tgt(e)&&Math.hypot(e.x-o.x,e.y-o.y)<o.R*.6+e.r)WP.hurtE(e,(.4)*tpDmg()*k);}
+      if(o.t>=o.life||o.x>W-20){WS.orb.splice(i,1);const dm=3.4*tpDmg()*k;for(const e of G.en)if(WP.tgt(e)&&Math.hypot(e.x-o.x,e.y-o.y)<o.R*.8+e.r)WP.hurtE(e,dm);
+        G.rings.push({x:o.x,y:o.y,l:.4,m:.4,c:WPD.well.c});burst(o.x,o.y,WPD.well.c,10,240,.4);AU.sfx('hit');}}}
+  else WS.orb.length=0;
+  if(ids.includes('flame')){const L=WP.lvOf('flame');WS.ft-=dt;WS.fa=Math.max(0,WS.fa-dt);
+    if(WS.ft<=0){WS.ft=.16;const R=110+4*L+(L>=3?10:0)+(L>=10?14:0),half=.5+.015*L+(L>=6?.06:0),dm=(.55+.025*L)*tpDmg()*k;let any=false;
+      for(const e of G.en){if(!WP.tgt(e)||e.x<P.x)continue;const dx=e.x-(P.x+10),dy=e.y-P.y,d=Math.hypot(dx,dy);if(d<R+e.r&&Math.abs(Math.atan2(dy,dx))<half+Math.atan2(e.r,Math.max(20,d))){WP.hurtE(e,dm);any=true;if(Math.random()<.5)burst(e.x,e.y,WPD.flame.c,2,100,.2);}}
+      if(any)WS.fa=.25;WS.R=R;WS.half=half;}}
+  if(ids.includes('storm')){for(let i=WS.fld.length-1;i>=0;i--){const f=WS.fld[i],L=WP.lvOf('storm');f.t+=dt;f.x+=f.vx*dt;f.zt-=dt;
+      if(f.t>=f.life||f.x<-40){WS.fld.splice(i,1);continue;}
+      if(f.zt<=0){f.zt=.3;const tg=G.en.filter(e=>WP.tgt(e)&&Math.hypot(e.x-f.x,e.y-f.y)<f.R+e.r).sort((a,b)=>Math.hypot(a.x-f.x,a.y-f.y)-Math.hypot(b.x-f.x,b.y-f.y)).slice(0,1);
+        for(const e of tg){WP.hurtE(e,1.6*tpDmg()*k);AX.arcs.push({x1:f.x,y1:f.y,x2:e.x,y2:e.y,l:.18});}if(tg.length)AU.sfx('graze');}}}
+  else WS.fld.length=0;
+  if(WS.rf){WS.rf.l-=dt;if(WS.rf.l<=0)WS.rf=null;}};
+WPX.draw=function(t){const c=ctx,ids=WP.eqIds();c.save();c.globalCompositeOperation='lighter';
+  for(const e of G.en)if(e.chl>0){c.globalAlpha=.5;c.strokeStyle=WPD.frost.c;c.lineWidth=2;c.beginPath();c.arc(e.x,e.y,e.r+4,0,7);c.stroke();}
+  if(ids.includes('drone')){const d=WS.dr;c.globalAlpha=.95;c.fillStyle=WPD.drone.c;c.beginPath();c.moveTo(d.x+9,d.y);c.lineTo(d.x,d.y-6);c.lineTo(d.x-8,d.y);c.lineTo(d.x,d.y+6);c.closePath();c.fill();c.globalAlpha=.3;c.beginPath();c.arc(d.x,d.y,12+Math.sin(t*9)*2,0,7);c.stroke();}
+  for(const o of WS.orb){c.globalAlpha=.25;c.fillStyle=WPD.well.c;c.beginPath();c.arc(o.x,o.y,o.R*(.55+.45*Math.min(1,o.t/o.life)),0,7);c.fill();c.globalAlpha=1;c.strokeStyle=WPD.well.c;c.lineWidth=2;c.beginPath();c.arc(o.x,o.y,8,0,7);c.stroke();c.beginPath();c.arc(o.x,o.y,3,0,7);c.fillStyle='#fff';c.fill();}
+  for(const f of WS.fld){c.globalAlpha=.18+.1*Math.sin(t*14);c.fillStyle=WPD.storm.c;c.beginPath();c.arc(f.x,f.y,f.R,0,7);c.fill();c.globalAlpha=.9;c.strokeStyle=WPD.storm.c;c.lineWidth=1.5;c.setLineDash([6,8]);c.beginPath();c.arc(f.x,f.y,f.R,t*2,t*2+6.28);c.stroke();c.setLineDash([]);c.beginPath();c.arc(f.x,f.y,5,0,7);c.stroke();}
+  if(ids.includes('flame')&&WS.fa>0){const R=WS.R||130,h=WS.half||.6;c.globalAlpha=Math.min(.55,WS.fa*2.2);const g=c.createRadialGradient(P.x+10,P.y,4,P.x+10,P.y,R);g.addColorStop(0,'#fff6c0');g.addColorStop(.35,WPD.flame.c);g.addColorStop(1,'#ff5a2d00');c.fillStyle=g;c.beginPath();c.moveTo(P.x+10,P.y);c.arc(P.x+10,P.y,R,-h,h);c.closePath();c.fill();}
+  if(ids.includes('rail')){const L=WP.lvOf('rail'),need=L>=6?2:3,f=WS.rc/need;c.globalAlpha=.25+.6*f;c.strokeStyle=WPD.rail.c;c.lineWidth=1.5;c.beginPath();c.arc(P.x+26,P.y,5+10*f,0,7);c.stroke();if(f>0){c.globalAlpha=.12*f;c.beginPath();c.moveTo(P.x+30,P.y);c.lineTo(W,P.y);c.stroke();}}
+  if(WS.rf){const r=WS.rf,a=r.l/r.m;c.globalAlpha=a;c.fillStyle=WPD.rail.c;c.fillRect(r.x,r.y-r.w*a,W-r.x,r.w*2*a);c.globalAlpha=Math.min(1,a*1.6);c.fillStyle='#fff';c.fillRect(r.x,r.y-2,W-r.x,4);}
+  c.restore();};
+/* ----- vector demos for the weapon cards (shown until wp-<id>.webp exists) ----- */
+Object.assign(WPX.demo,{
+  frost(c,t,col,foe,sy){const p=(t%1),hit=p>.5;foe(60,sy,hit);foe(92,sy,p>.7);c.lineWidth=4;c.beginPath();c.moveTo(20,sy);c.lineTo(20+Math.min(1,p*1.5)*76,sy);c.stroke();if(hit){c.globalAlpha=.6;c.beginPath();c.arc(60,sy,9,0,7);c.stroke();c.beginPath();c.arc(92,sy,9,0,7);c.stroke();c.globalAlpha=1;}},
+  flame(c,t,col,foe,sy){const f=.75+.25*Math.sin(t*20);foe(60,sy-8,t%1>.5);foe(70,sy+9,t%1>.5);c.globalAlpha=.55;c.beginPath();c.moveTo(20,sy);c.arc(20,sy,58*f,-.6,.6);c.closePath();c.fill();c.globalAlpha=1;},
+  wave(c,t,col,foe,sy){const p=(t%1),x=20+p*70,r=4+p*20;foe(96,sy,p>.9);c.beginPath();c.arc(x,sy,r,-1.2,1.2);c.stroke();c.beginPath();c.arc(x-6,sy,r*.8,-1.1,1.1);c.globalAlpha=.4;c.stroke();c.globalAlpha=1;c.fillStyle='#ffffff88';c.fillRect(70,sy-14+((t*40)%28),3,3);},
+  shell(c,t,col,foe,sy){const p=(t%1.2)/1.2;if(p<.55){c.beginPath();c.arc(20+p*110,sy,5,0,7);c.fill();}else{const q=(p-.55)/.45;for(let i=-3;i<=3;i++){const a=i*.2;c.beginPath();c.arc(52+Math.cos(a)*q*44,sy+Math.sin(a)*q*44,2,0,7);c.fill();}}foe(96,sy-10,p>.85);foe(96,sy+10,p>.85);},
+  drone(c,t,col,foe,sy){const p=(t%.8)/.8;foe(98,sy-6,p>.8);c.fillRect(20+p*70,sy-3,8,3);c.fillRect(30+p*70-20>20?20+((p+.35)%1)*70:20,sy-22,8,3);c.beginPath();c.moveTo(26,sy-22);c.lineTo(20,sy-27);c.lineTo(14,sy-22);c.lineTo(20,sy-17);c.closePath();c.fill();},
+  well(c,t,col,foe,sy){const p=(t%2)/2,x=36+p*36;foe(98-p*38,sy-14,p>.9);foe(96-p*34,sy+16,p>.9);foe(100-p*40,sy+2,p>.9);c.globalAlpha=.25;c.beginPath();c.arc(x,sy,26,0,7);c.fill();c.globalAlpha=1;c.beginPath();c.arc(x,sy,6,0,7);c.stroke();if(p>.88){c.globalAlpha=(1-p)*8;c.beginPath();c.arc(x,sy,30,0,7);c.stroke();c.globalAlpha=1;}},
+  rail(c,t,col,foe,sy){const p=(t%2)/2,ch=Math.min(1,p*1.6);foe(50,sy,p>.75);foe(94,sy,p>.75);c.globalAlpha=.3+.6*ch;c.beginPath();c.arc(26,sy,3+8*ch,0,7);c.stroke();c.globalAlpha=1;if(p>.75&&p<.95){c.lineWidth=5;c.beginPath();c.moveTo(24,sy);c.lineTo(106,sy);c.stroke();}},
+  storm(c,t,col,foe,sy){const p=(t%1);foe(60,sy-10,p>.5&&p<.7);foe(74,sy+12,p>.8);c.globalAlpha=.3;c.setLineDash([4,5]);c.beginPath();c.arc(58,sy,24,t*2,t*2+6.28);c.stroke();c.setLineDash([]);c.globalAlpha=1;c.beginPath();c.arc(58,sy,3,0,7);c.fill();if(p>.5&&p<.7){c.beginPath();c.moveTo(58,sy);c.lineTo(62,sy-6);c.lineTo(60,sy-10);c.stroke();}}});
+
+/* ===== Garage > WEAPONS: one card per weapon, level bar, power preview, next ability, price ===== */
+{const st=document.createElement('style');st.textContent=`
+#gaCards.wpt{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));grid-auto-rows:min-content;gap:calc(var(--u)*1.6);overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;align-content:start}
+#gaCards.wpt .card{flex-direction:row;text-align:left;justify-content:flex-start;gap:10px;padding:8px 10px;min-height:96px;flex:none}
+#gaCards.wpt .card canvas{width:108px;height:52px;flex:0 0 auto;background:#0a0618;border-radius:6px}
+#gaCards.wpt .card .tx{flex:1 1 0;min-width:0}#gaCards.wpt .card .n small{font-family:var(--mono);font-weight:400;color:var(--dim);margin-left:6px;font-size:.8em}
+#gaCards.wpt .card .pb{display:flex;gap:2px;margin:4px 0 2px}#gaCards.wpt .card .pb i{flex:1 1 0;max-width:16px;height:6px;border-radius:1px;background:#ffffff22}#gaCards.wpt .card .pb i.on{background:var(--c)}
+#gaCards.wpt .card .t2{font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.9),13px);color:var(--ink);line-height:1.2}#gaCards.wpt .card .t2 b{color:var(--c);font-weight:400}
+#gaCards.wpt .card .pr{margin-left:0;align-self:center;border:1px solid var(--amber);border-radius:8px;padding:6px 8px;min-width:64px;text-align:center}
+#gaCards.wpt .card.sold .pr{border-color:#8c86b8;color:#8c86b8}
+#wpL .card .pp i.run{background:var(--c);opacity:.45}`;document.head.appendChild(st);}
+{const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='weapons';b.type='button';b.textContent='WEAPONS';b.addEventListener('click',()=>{GA.tab='weapons';gaDraw();});tb.appendChild(b);
+ const gd=gaDraw;
+ gaDraw=function(){const box=$('gaCards');box.classList.toggle('wpt',GA.tab==='weapons');gd();if(GA.tab!=='weapons')return;box.innerHTML='';
+  for(const id of WP_IDS){const d=WPD[id],cur=WP.pl[id]|0,own=cur>0,max=cur>=WP_MAX,price=WP.price(id),can=GA.bank>=price,el=document.createElement('button');el.type='button';
+   el.className='card'+(max?' sold':'')+(!max&&!can?' no':'');el.style.setProperty('--c',d.c);el.dataset.id=id;el.dataset.kind='weapon';
+   const nxt=own?cur+1:1,ab=[3,6,10].find(l=>l>=nxt&&l>cur),abT=ab?`<br>LV${ab}: ${d.ab[[3,6,10].indexOf(ab)]}`:'',
+     pw=own?(max?`power <b>${WPX_POWER(cur).toFixed(2)}x</b> (max)`:`power <b>${WPX_POWER(cur).toFixed(2)}x</b> &rarr; <b>${WPX_POWER(cur+1).toFixed(2)}x</b>`):`unlocks at <b>1.00x</b>`;
+   el.innerHTML=`<canvas width="108" height="52" data-w="${id}"></canvas><div class="tx"><div class="n">${d.n}<small>${own?'LV '+cur+'/'+WP_MAX:'LOCKED'}</small></div><div class="t">${d.tx}</div><div class="pb">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<cur?'on':''}"></i>`).join('')}</div><div class="t2">${pw}${max?'':abT}</div></div><div class="pr">${max?'MAX':(own?'BUY LV'+(cur+1):'UNLOCK')+'<br>'+neonI+' '+price}</div>`;
+   el.addEventListener('click',()=>{const r=WP.buy(id);if(!r.ok){if(r.why==='money'){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');gaMsg('Need '+r.need+' more Neon');}else if(r.why==='max')gaMsg(d.n+' is at max level');return;}
+     gaMsg(r.lv===1?d.n+' unlocked':d.s+' is now LV '+r.lv);try{AU.sfx('up')}catch(e){}gaDraw();});
+   box.appendChild(el);const c=el.querySelector('canvas').getContext('2d'),n='wp-'+id;if(ART.have(n)){c.drawImage(ART.bm[n],28,0,52,52);}else if(WPX.demoFn)WPX.demoFn(id,c,.7,d.c);}};
+ gaDraw();}
+// painted weapon icons and fusion pictures: only the files that are real art (media/ready.json) are loaded
+try{fetch(ART.base+'ready.json').then(r=>r.ok?r.json():[]).then(l=>{for(const n of l)if(/^(wp-|fx-fuse)/.test(n))ART.load(n.replace(/\.webp$/,''));}).catch(()=>{});}catch(e){}
+window.__ga={GA,gsave,openGarage:f=>openGarage(f),WPD};          // test hook
 
 /* ---------- H: no AFK wins, a dying ship slows the song ----------
    STILL (declared in b.js): a ship that stays within 50 px of one spot for more than 3 s is hunted: enemies fire faster and their bullets are quicker,

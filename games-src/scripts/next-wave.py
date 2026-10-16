@@ -357,9 +357,9 @@ def from_nightrun(titles):
         stem = e['file'].rsplit('.', 1)[0]
         fx = e['kind'] == 'fx'
         items.append(dict(slug=slug, game=titles[slug], kind='art', stem=stem, element=e['group'] + ': ' + stem, files=[e['file']], save_as=e['file'],
-                          repo_target=f"games/{slug}/media/{e['file']}", size=f"{e['w']}x{e['h']}", ratio='1:1', transparent=not fx, prompt=e['prompt'], style='',
+                          repo_target=f"games/{slug}/media/{e['file']}", size=f"{e['w']}x{e['h']}", ratio=('2:1' if e['w'] == 2 * e['h'] else '1:1'), transparent=not fx, prompt=e['prompt'], style='',
                           why='New weapons and fusions: ' + e['where'], source='nightrun', priority=3,
-                          note=e['notes'] + ' Paint at 1024x1024 or larger; we crop and convert.', crop=''))
+                          note=e['notes'] + (' Paint at 1024x1024 or larger; we crop and convert.' if e['w'] == e['h'] else ' Wide 2:1 picture; we crop and convert.'), crop=''))
     return items
 
 # ---------------------------------------------------------------- build

@@ -5,6 +5,13 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
 
+## Mainhattan Nightrun weapon levels + 8 new weapons (16 Oct 2026)
+- DONE: permanent weapon levels 1..10 (key `mnr_wplv`) bought with Neon in Garage > WEAPONS (card: icon, level bar, power preview, next ability, price); 8 new weapons (Frost Beam, Flame Arc, Plasma Wave, Shrapnel Shell, Echo Drone, Gravity Well, Rail Sniper, Storm Cell); generic fusions for all 120 pairs (name from the two weapon names, effect from the tags); 8 `wp-*` + 15 `fx-fuse-tag-*` assets in the manifest and next wave.
+- Price curve: level L to L+1 costs round(40 x 1.45^(L-1)) (40 ... 783, 2,435 for 1 to 10); unlock 0 (Pulse), 30 Lance, 40 Swarm, 50 Beat, 80-400 for the rest (`WPX_META` in `parts/wpx.js`).
+- Effective level = permanent + pit-stop bonus (in-run levels 1..3 give at most +2), capped at 10 (`WP.lvOf`, g.js). Power shown = 1.00x at LV1 to 2.50x at LV10; `weapon-test.js` measures weapon DPS on dummies (LV10 <= 2.5x LV1).
+- Files: `parts/wpx.js` (new, loaded after g.js; `WEAPON_META=false` switches the lot off), `parts/g.js` (WP levels, fire1 scaling, fusion lookup), `parts/b.js` (hit hook flags), `weapon-test.js`, manifest + `ASSETS-NEEDED.md`.
+- NEXT: paint the 8 icons and 15 fusion-family pictures (they show as vector demos / split rings until then); the ship-preview worker may touch the weapons sheet in g.js; pit-stop levels past +2 are not used (xp stops at LV3).
+
 ## Lantern Dive last paintings (13 Oct 2026, 23:xx UTC): NOT deployed, one check failing
 
 - Wiring result: `table-tunnel-glow-phone` is already live (`ui99.js:18` builds the name by concatenation, so the scan still lists it). Nothing new wired.
@@ -401,3 +408,8 @@ Open faults found by the owner (rampart and lantern workers report these fixed a
 
 ## Visual baselines (14 Oct 2026, worker)
 Built: `scripts/visual.spec.js` (title/menu/board x phone/tablet/wide, `?scn=menu` seed, animations disabled, masks), `scripts/baselines.sh pull|push`, `build-all.py --visual|--approve-visual <slug>`, config `snapshotPathTemplate` -> `games-src/.baselines/<slug>-<step>-<project>.png`, `updateSnapshots: 'none'` (missing baseline = fail). Orphan branch `ui-baselines` holds the PNGs. Flake test: 2 consecutive runs of 9 shots, 0 diffs. Recorded: rampart-and-vine ONLY (desktop fixes); all other games have no baselines and `--visual` fails for them until the owner approves their screens. Not wired into `--deploy` yet (owner's call).
+
+## Nightrun ship art / weapon mounts (16 Oct 2026)
+Done: `RIG` in `nightrun/parts/draw.js` draws the equipped weapons on the ship (slot 1 coloured circle, slot 2 triangle, split ring for a fusion, muzzle flash at the mounts; visual only, shots unchanged). Hardpoints = `RIG.hp` table (ship id -> [x1,y1,x2,y2], fractions of ship length; default std). Shown in the run, the WEAPONS sheet (`#wpShip`), the Garage ships tab (`#gaPic`) and the HUD weapon chips. Real art switches on by itself: `wpmount-<id>.webp` (256x128), `ship-<id>-armed.webp` (previews only, 512x256), `fx-fuse-<a>-<b>.webp`. Switch everything off: `RIG.on=false`.
+Asset slots: `python3 games-src/nightrun/wp-assets.py` regenerates the wpmount-* and ship-*-armed entries from WPD / ship list; then `make-placeholders.py` and `scripts/next-wave.py`. Test: `node games-src/nightrun/mount-test.js`.
+Next: owner supplies the art; tune `RIG.hp` once the real ship pictures are checked on a phone (hardpoints are guesses); in-run armed composite is off (`RIG.armedRun`, not wired).
