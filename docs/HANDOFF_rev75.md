@@ -1,0 +1,6 @@
+# HANDOFF rev-75 (2026-10-16): v90m-beta.75 = GO (with gaps)
+1. Tested trunk sha 6e1f849 (origin/alex/od-int2). Built tools/build.sh v90m-beta.75: page 3,499,987 B split, xc files, ALL_OPEN=true, "by Alex". OD_CHANGELOG entry prepended (3 lines). The entry pushed the page over the 3.5 MB unit headroom, so the two oldest entries (beta.59/.60, beyond the 15 the UPDATES screen shows) were removed. No flags flipped.
+2. Unit 0 FAIL (4775 pass, size headroom green). TAG=life1,life3,xf1,terrain,env1,tr1,debris1,tk1: first run overlapped the shot runs (xf1 land/slope/kerb failed under load); xf1 alone re-run: only SLOW (10.1-10.6 s), asserts OK. life1 ath-density/people SLOW-only.
+3. rv2k2 burst, cardstop, tiny, hudctl, traffic, items: 6/6 PASS. rv2k (6): race-handsoff, walls, walls-ath, devui PASS; card asserts OK (SLOW 10.6 s); objectives FAIL (health -6266 in ROAD-FOLLOW; flaked in rev-74 too, not re-run: timebox). close/akro/pace/menu not run (known open).
+4. Shots docs/shots/rev75 (852x393): burst_0/1 (bricks at slipway), river_boat (bluer water), quest_pass_0-2 (Athens pill, no card), portrait_race (393x852). Looked: all OK. MISSING: Westend Split mid-air jump (race bot run was killed at the timebox).
+5. Not deployed. tools/tRev75Shots.js added (burst|cardstop).
