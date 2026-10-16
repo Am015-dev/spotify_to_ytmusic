@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.70',date:'16 Oct 2026',items:[{t:'NEW',s:'Brick-built LEGO trees in Frankfurt and Athens: 17 tree types, hedges and planters.'},{t:'CHANGED',s:'Traffic now uses all lanes.'},{t:'FIXED',s:'Pedestrians walk naturally and stay on the pavement.'}]},
   {v:'v90m-beta.69',date:'16 Oct 2026',items:[{t:'FIXED',s:'Your car no longer sinks into the grass on hills: it now drives on the ground you see.'}]},
   {v:'v90m-beta.68',date:'16 Oct 2026',items:[{t:'FIXED',s:'No more giant road wedges sticking into the sky through houses.'},{t:'NEW',s:'Livelier landscape: colour patches and field stripes on open land, banded hills, turquoise river with shore foam.'}]},
   {v:'v90m-beta.67',date:'16 Oct 2026',items:[{t:'FIXED',s:'Never trapped: if you are stuck off-road for 3 seconds, your car is lifted back onto the nearest road.'}]},
