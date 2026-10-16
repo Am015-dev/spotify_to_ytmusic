@@ -1,0 +1,6 @@
+# HANDOFF rev-74 (2026-10-16): v90m-beta.74 = GO (with gaps)
+1. Tested trunk sha 1486163 (origin/alex/od-int2). Built tools/build.sh v90m-beta.74: page 3.495 MB split (<3.6), 5 xc files, ALL_OPEN=true, "by Alex" credits; OD_CHANGELOG entry prepended (src/10_core2.js). No flags flipped.
+2. Gate on built page: unit 0 FAIL (4709 pass; with three.js installed logic_core crashes "TUNE is not defined" on the base sha too, harness issue). TAG=life1,life3,xf1,terrain,env1,tr1,debris1,tk1 = 54/56, 0 errors; the 2 fails are SLOW-only (xf1/water 10.1 s, life1/ath-density 10.3 s), asserts OK. life1 popup/wheel/carousel PASS with c3 ON.
+3. Singles: race-handsoff, walls, walls-ath, garage-car, card, devui PASS. foliage = SLOW 20.9 s only. objectives FAILED once (3 widgets > 2), then PASSED on default, ?c3=0 and ?tk1=0 = flake, no flag flipped.
+4. Shots docs/shots/rev74 (852x393 unless noted): akropolis_start, signboard_0.8/0.9 (fork sign ahead), fra_street, ath_street (pavement, c3 ON), portrait_race (393x852). Looked: no car in building, HUD clear of controls (TAP TAP pill sits just above the steering arrows). MISSING: real mid-air jump in Westend Split and Main River Run boat (tools/tRev74Shots.js jump|river drives the race with tkBot; hit timebox).
+5. NOT done: human-like 150 ms feel pass on 3 courses (tracks-3 ran tkFeel before; rerun __tk.feel()). Not deployed.

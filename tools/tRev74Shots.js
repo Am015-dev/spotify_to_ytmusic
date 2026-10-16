@@ -1,5 +1,6 @@
 // tRev74Shots (rev-74): real race shots on the built page. node tools/tRev74Shots.js <base url> <outdir> <which: jump|akro|river|sign|life|portrait>
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,OUT,which]=process.argv.slice(2);
+const fs=require('fs');const BOTSRC=(t=>t.slice(t.indexOf('function tkBot'),t.indexOf('function tkStaticFeel')))(fs.readFileSync(__dirname+'/../src/98tk_go.js','utf8'));
 const L=['--use-angle=swiftshader','--enable-unsafe-swiftshader'];
 (async()=>{const por=which==='portrait',city=which==='akro'||which==='life-ath'?'ath':'fra';
  const b=await chromium.launch({args:L});const c=await b.newContext({viewport:por?{width:393,height:852}:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await c.newPage();p.setDefaultTimeout(600000);p.on('pageerror',e=>console.log('PAGEERR',String(e).slice(0,160)));
@@ -7,7 +8,7 @@ const L=['--use-angle=swiftshader','--enable-unsafe-swiftshader'];
  const Q=s=>p.evaluate(s=>__tk.q(s),s);
  const shot=n=>p.screenshot({path:OUT+'/'+n+'.png'});
  // drive: start a course, a human-like bot (150 ms lag) feeds the keys every frame
- const drive=async(startJs,routeJs)=>{await Q(`(()=>{const C=${startJs};tkStart(C.m,C.C);const sp=RO.sp;sp.cd=0;const G=tkGeoOf(C.C);window.__bot=tkBot(${routeJs},{lag:.15});(function f(){if(RO.sp===sp&&!sp.done){__bot(sp);requestAnimationFrame(f)}else{K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=false}})();return 1})()`)};
+ const drive=async(startJs,routeJs)=>{await Q(BOTSRC+`;window.tkBotX=tkBot`);await Q(`(()=>{const C=${startJs};tkStart(C.m,C.C);const sp=RO.sp;sp.cd=0;const G=tkGeoOf(C.C);window.__bot=tkBotX(${routeJs},{lag:.15});(function f(){if(RO.sp===sp&&!sp.done){__bot(sp);requestAnimationFrame(f)}else{K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=false}})();return 1})()`)};
  if(which==='jump'||which==='portrait'){
   await drive(`{C:TK_C,m:tkMarkOf(RIVAL_EV.find(e=>e.p===TK_C.p))}`,`G.pA`);
   let n=0,t0=Date.now();while(n<(por?1:2)&&Date.now()-t0<900000){const a=await Q(`(()=>{const gy=groundAt(RO.x,RO.z,99);return[RO.y-gy,RO.v,RO.sp&&RO.sp.t]})()`);
