@@ -4,6 +4,22 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun retention plan (16 Oct)
+- Full plan: `games-src/nightrun/RETENTION.md`. Research, audit and 17 ready worker briefs (B1-B17). No game code changed.
+- **The economy is the wall:** maxing everything costs 141,780 Neon. The bot banks about 390 Neon/h, so that is ~360 h at median skill. One weapon to LV10 = 2,430 Neon, about 6 h.
+- **Stages are long for phones:** they last 158-326 s (mean 208 s) because a stage = its song. One pass of all 45 stages is about 2.4 h.
+- Clearing a stage pays nothing extra: no first-clear Neon, no star Neon, no achievements, rank, streak or reward for the daily run.
+- Bot walls (Normal, default kit): stages 11/12 at 50%, 18/23/39/40 at 0%, challenges 41/45 at 0%.
+- Research: players quit over unfair or unreadable hits, difficulty cliffs, grind walls, ads, audio lag, one dominant build and repetitive runs. They stay for short runs, failed runs that still pay, build variety, risk/reward scoring, Heat ladders and achievements.
+- Order: B1 first-clear pay, B2 economy retune to about 10-12 h, B3 mercy after 2 losses, B4 Arcade 3-min cut, B5 run-end next-unlock bar + ONE MORE button.
+- Then: B6 pilot rank, B7 40 achievements, B8 Heat 1-10, B9 boss rush, B10 latency onboarding, B11 daily streak + weekly, B12 banish, B13 weapon viability sim, B14 graze juice, B15 cosmetics, B16 readability defaults, B17 time attack and no-hit.
+- Every item is behind a `RET.*` flag in a new `parts/ret.js`. The `DMG` caps, entry grace and anti-idle rules stay untouched.
+- Never add ads, energy timers, paid currency, or farming as the only way past a wall.
+- Dispatch B1+B2+B5 as one Sonnet worker (economy), and B3+B4 as a second.
+- Measured with a throwaway copy of `story-sim.js` (2 runs per stage, Normal). Re-measure after B2.
+- Weak spots: the Neon/h figure is from the bot, and real players spend in pit stops. Weapon viability has not been measured (B13).
+- Evidence gaps: no source measures churn from energy timers or juice; keep those items cheap.
+
 
 ## Mainhattan Nightrun FLIGHT SCHOOL tutorial (16 Oct 2026)
 - Done: `games-src/nightrun/parts/tut.js` (built after fun.js). A run with `G.tut` (no director/waves/stillness/Neon banking/best): 8 beats
