@@ -4,6 +4,23 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun polish plan (16 Oct)
+- Full plan: `games-src/nightrun/POLISH.md`. It covers music, 25 fun ideas, a polish checklist, flow maps and 19 worker briefs (B18-B36). No game code changed.
+- **Music repeats:** stages 1-32 share 3 songs (`story.js:78`), and the library is 11 songs, about 37 min. The first boss has no theme of its own.
+- Music plan: 15 treblo songs (2 per district, 4 boss themes with A/B phases, pit, school, endless3), 3 fever loops and 10 stingers, about 41 min more.
+  Prompts are in `next-wave/music/mainhattan-nightrun/cues-polish.json`.
+- Layering without stems: a lowpass on the music bus opens with the combo tier, the drum layer comes in at tier 2, a hit muffles the song, and stingers land on the beat.
+  True stems would drift on the 5 `<audio>` slots, so they wait.
+- Taps measured headless at 390x763: Endless 1, Story 3, and death to next run 1.
+- The title has **11 buttons** (the references have 3-5). WEEKLY is 40 px tall; 7 title texts and the map banners are 11 px.
+- Missing: save export/import, PWA/offline, credits/privacy, achievements and stats, hit-stop, transitions, and a CONTINUE button.
+- Top fun ideas per effort: combo-driven music, PERFECT-dash payoff, chest reel reveal, fusion hint, risk multiplier, local leaderboard, jukebox.
+- Order: B18 song pools, B19 combo music, B20 stingers, B24 save export, B25 title diet + CONTINUE, then B26 type floor, B21 FEVER, B22 boss phases.
+- Dispatch two build-tier workers: B18+B19+B20 (owner of `a.js`), and B24+B25+B26.
+- Every item is behind a `RET.*` flag. `DMG` caps, entry grace and anti-idle stay untouched. Hooks go through `NR.on` or flag-guarded lines (guard.py).
+- References: 13 contact sheets of store screenshots from 7 genre games (mostly HUDs); results and shop screens are from text sources.
+- Owner to supply: the treblo cues listed above. Placeholders (existing songs, synth one-shots) ship first.
+
 ## Nightrun retention plan (16 Oct)
 - Full plan: `games-src/nightrun/RETENTION.md`. Research, audit and 17 ready worker briefs (B1-B17). No game code changed.
 - **The economy is the wall:** maxing everything costs 141,780 Neon. The bot banks about 390 Neon/h, so that is ~360 h at median skill. One weapon to LV10 = 2,430 Neon, about 6 h.
