@@ -7,7 +7,7 @@ Generated 2026-10-16 by `python3 games-src/scripts/next-wave.py` (rerun after lo
 - Music and sound cues: `games-src/next-wave/music/<game>/cues-wave6.json` (2 versions a and b of each, no vocals).
 - Every picture prompt: our own names, no text, letters or numbers in the picture; a UI piece is one object on a plain flat white background. Make at 1024 px or larger; we crop and convert.
 
-**Total 147**: paintings 138, 3D source paintings 0, music/sound 8, video 1.
+**Total 170**: paintings 161, 3D source paintings 0, music/sound 8, video 1.
 
 Plus 1130 wave 7 items (pose sets, 3D variety, art variety): see `games-src/VARIETY-PLAN.md` and the page.
 
@@ -329,7 +329,7 @@ Style block (in front of every picture prompt): Hand-painted gouache illustratio
 - Size/ratio: 1024x1024, ratio 0.51
 - Prompt: Hand-painted gouache illustration for a calm co-operative deep-sea card game, deep blue and teal water, a small warm golden lantern glow as the only strong warm light, soft rim light, visible gentle brush texture on matte paper, slightly wobbly dark navy ink outline, simple readable silhouette that still works at 40 pixels, rich but not neon colours, centred, plenty of margin, no text. a single ttl bg picture, game art for a board game, no text
 
-## Mainhattan Nightrun (`mainhattan-nightrun`): 67
+## Mainhattan Nightrun (`mainhattan-nightrun`): 90
 
 Style block (in front of every picture prompt): Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers
 
@@ -777,6 +777,126 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Note: Fusion "Pollen Burst": Pulse Spread fused with Homing Swarm. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
 - Prompt: a fusion emblem: a fan of pink energy bolts spreading from a small ship nose, magenta and white glow meeting a cluster of small amber missiles curving with glowing trails toward unseen targets, the two colours (hot pink and amber) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
 
+### fx-fuse-tag-any-any: Weapon fusions: fx-fuse-tag-any-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "any/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-any-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-any-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "any + any": two shots braided together, each piercing one more target. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: two shots braided together, each piercing one more target, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-blast-any: Weapon fusions: fx-fuse-tag-blast-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "blast/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-blast-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-blast-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "blast + any": a small bright splash blast where the shot lands. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a small bright splash blast where the shot lands, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-bounce-any: Weapon fusions: fx-fuse-tag-bounce-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "bounce/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-bounce-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-bounce-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "bounce + any": a shot that bounces once off the wall. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a shot that bounces once off the wall, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-bounce-pierce: Weapon fusions: fx-fuse-tag-bounce-pierce
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "bounce/pierce" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-bounce-pierce.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-bounce-pierce.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "bounce + pierce": a piercing shot that rebounds off a glowing wall. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a piercing shot that rebounds off a glowing wall, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-burst-any: Weapon fusions: fx-fuse-tag-burst-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "burst/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-burst-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-burst-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "burst + any": a heavy shell that adds a second volley of another weapon. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a heavy shell that adds a second volley of another weapon, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-chain-any: Weapon fusions: fx-fuse-tag-chain-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "chain/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-chain-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-chain-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "chain + any": lightning that leaps from a struck target to the next. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: lightning that leaps from a struck target to the next, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-homing-any: Weapon fusions: fx-fuse-tag-homing-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "homing/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-homing-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-homing-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "homing + any": shots that curve and home onto targets. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: shots that curve and home onto targets, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-homing-burst: Weapon fusions: fx-fuse-tag-homing-burst
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "homing/burst" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-homing-burst.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-homing-burst.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "homing + burst": a swarm of small homing bomblets released from a heavy shell. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a swarm of small homing bomblets released from a heavy shell, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-melee-any: Weapon fusions: fx-fuse-tag-melee-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "melee/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-melee-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-melee-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "melee + any": a close-range burning sweep that thickens the shots. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a close-range burning sweep that thickens the shots, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-mine-any: Weapon fusions: fx-fuse-tag-mine-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "mine/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-mine-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-mine-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "mine + any": a mine blast that spits sharp shards. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a mine blast that spits sharp shards, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-orbit-any: Weapon fusions: fx-fuse-tag-orbit-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "orbit/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-orbit-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-orbit-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "orbit + any": spinning blades that also spit bolts as they turn. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: spinning blades that also spit bolts as they turn, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-pierce-spread: Weapon fusions: fx-fuse-tag-pierce-spread
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "pierce/spread" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-pierce-spread.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-pierce-spread.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "pierce + spread": a piercing lance that splits into a fan of two. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a piercing lance that splits into a fan of two, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-pull-any: Weapon fusions: fx-fuse-tag-pull-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "pull/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-pull-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-pull-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "pull + any": a gravity pull that drags targets in before the blast. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a gravity pull that drags targets in before the blast, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-slow-any: Weapon fusions: fx-fuse-tag-slow-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "slow/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-slow-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-slow-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "slow + any": a chilling frost that slows whatever it touches. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a chilling frost that slows whatever it touches, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
+### fx-fuse-tag-wave-any: Weapon fusions: fx-fuse-tag-wave-any
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet for any fusion of the "wave/any" family that has no picture of its own (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-tag-wave-any.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-tag-wave-any.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion family "wave + any": a thick widening wave of energy. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a thick widening wave of energy, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers
+
 ### wp-arc: Weapons: wp-arc
 - Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Arc Chain (an animated vector demo until this exists)
 - Type: painting; priority 3 (missing extra)
@@ -800,6 +920,30 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
 - Note: Ricochet Disc weapon card icon: an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
 - Prompt: a game icon of an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-drone: Weapons: wp-drone
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet and Garage > WEAPONS card for Echo Drone (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-drone.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-drone.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Echo Drone weapon card icon: a small lilac diamond-shaped drone with a pulsing halo, firing a bolt that leaves a ghost copy of itself behind. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a small lilac diamond-shaped drone with a pulsing halo, firing a bolt that leaves a ghost copy of itself behind, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-flame: Weapons: wp-flame
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet and Garage > WEAPONS card for Flame Arc (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-flame.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-flame.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Flame Arc weapon card icon: a wide fan of orange and red flame fanning out from a small ship nose, bright yellow core, drifting embers. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a wide fan of orange and red flame fanning out from a small ship nose, bright yellow core, drifting embers, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-frost: Weapons: wp-frost
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet and Garage > WEAPONS card for Frost Beam (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-frost.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-frost.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Frost Beam weapon card icon: a pale ice-blue beam of light that leaves a trail of frost crystals and snowflake sparks, a faint frozen halo around its tip. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a pale ice-blue beam of light that leaves a trail of frost crystals and snowflake sparks, a faint frozen halo around its tip, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
 
 ### wp-laser: Weapons: wp-laser
 - Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Laser Lance (an animated vector demo until this exists)
@@ -833,6 +977,30 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Note: Pulse Spread weapon card icon: a fan of pink energy bolts spreading from a small ship nose, magenta and white glow. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
 - Prompt: a game icon of a fan of pink energy bolts spreading from a small ship nose, magenta and white glow, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
 
+### wp-rail: Weapons: wp-rail
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet and Garage > WEAPONS card for Rail Sniper (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-rail.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-rail.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Rail Sniper weapon card icon: a long thin hot-pink piercing rail shot with a white core and charged ring at its muzzle, tiny sparks along the line. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a long thin hot-pink piercing rail shot with a white core and charged ring at its muzzle, tiny sparks along the line, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-shell: Weapons: wp-shell
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet and Garage > WEAPONS card for Shrapnel Shell (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-shell.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-shell.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Shrapnel Shell weapon card icon: an amber heavy shell bursting into a cone of sharp glowing fragments, a bright flash at the centre. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of an amber heavy shell bursting into a cone of sharp glowing fragments, a bright flash at the centre, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-storm: Weapons: wp-storm
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet and Garage > WEAPONS card for Storm Cell (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-storm.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-storm.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Storm Cell weapon card icon: a yellow ring-shaped lightning field with dotted rotating arcs and a small bolt striking from the centre. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a yellow ring-shaped lightning field with dotted rotating arcs and a small bolt striking from the centre, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
 ### wp-swarm: Weapons: wp-swarm
 - Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Homing Swarm (an animated vector demo until this exists)
 - Type: painting; priority 3 (missing extra)
@@ -840,6 +1008,22 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
 - Note: Homing Swarm weapon card icon: a cluster of small amber missiles curving with glowing trails toward unseen targets. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
 - Prompt: a game icon of a cluster of small amber missiles curving with glowing trails toward unseen targets, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-wave: Weapons: wp-wave
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet and Garage > WEAPONS card for Plasma Wave (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-wave.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-wave.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Plasma Wave weapon card icon: a widening crescent wave of electric blue plasma with rippling echo arcs behind it, tiny spark particles. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a widening crescent wave of electric blue plasma with rippling echo arcs behind it, tiny spark particles, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-well: Weapons: wp-well
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet and Garage > WEAPONS card for Gravity Well (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-well.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-well.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Gravity Well weapon card icon: a deep violet swirling orb bending space around it, thin spiral lines of light being pulled into its dark glowing core. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a deep violet swirling orb bending space around it, thin spiral lines of light being pulled into its dark glowing core, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
 
 ## Nebula Aces (`nebula-aces`): 1
 
