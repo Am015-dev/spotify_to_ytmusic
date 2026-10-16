@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.63',date:'16 Oct 2026',items:[{t:'NEW',s:'Garage shows your ride big in the middle with ride cards; the brick drawer has a picture on every tile.'},{t:'FIXED',s:'Races need you, fewer wrecks and dead stops, cleaner screen, no sinking at the start.'}]},
   {v:'v90m-beta.62',date:'16 Oct 2026',items:[{t:'FIXED',s:'Cars no longer sink into the road at the start or on ramps; story scenes keep the world loaded.'},{t:'FIXED',s:'Races need you: hands-off driving no longer wins, stuck cars reset, races always end. Fewer wrecks and dead stops.'},{t:'FIXED',s:'Cleaner screen: at most 2 objectives, no pop-ups while driving, checklist and bug button at the edge, shorter mission cards.'},{t:'NEW',s:'Bug box: type freely and see your reports.'}]},
   {v:'v90m-beta.61',date:'14 Oct 2026',items:[{t:'FIXED',s:'Wind turbines stand only in open ground, not on pavements; fixed a rare crash; the on-foot camera no longer clips pavement props.'}]},
   {v:'v90m-beta.60',date:'14 Oct 2026',items:[{t:'NEW',s:'A bug button is always on screen; tap it to report a problem.'}]},
