@@ -1,4 +1,6 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.68',date:'16 Oct 2026',items:[{t:'FIXED',s:'No more giant road wedges sticking into the sky through houses.'},{t:'NEW',s:'Livelier landscape: colour patches and field stripes on open land, banded hills, turquoise river with shore foam.'}]},
+  {v:'v90m-beta.67',date:'16 Oct 2026',items:[{t:'FIXED',s:'Never trapped: if you are stuck off-road for 3 seconds, your car is lifted back onto the nearest road.'}]},
   {v:'v90m-beta.66',date:'16 Oct 2026',items:[{t:'NEW',s:'Each district has its own LEGO colours, so driving across town changes the look; taller stepped roofs in Frankfurt.'}]},
   {v:'v90m-beta.65',date:'16 Oct 2026',items:[{t:'NEW',s:'Livelier streets: long Frankfurt blocks are split into varied buildings, more street trees, hedges and flower boxes.'},{t:'FIXED',s:'Smoother on medium graphics: shadows update every other frame.'}]},
   {v:'v90m-beta.64',date:'16 Oct 2026',items:[{t:'FIXED',s:'Sunny again: the sun lights the city from behind the camera, so Athens buildings and trees are no longer near-black.'}]},

@@ -384,6 +384,8 @@ function TR_res(a,b,c,d){const N=6,h00=tH(a,c),h10=tH(b,c),h01=tH(a,d),h11=tH(b,
 // (vertices of merged meshes and instance origins inside the footprint, + 1.6 m for balconies/eaves); a stone plinth fills down to the
 // lowest corner. Colliders move with them. Pieces already placed on the ground keep their height (plinth only if they float).
 const TR_PL=[];
+// ramp-2: road surfaces already lie on groundY; a building lift (TR_bldFix pass 2, OC_unbury) that moves every vertex inside a footprint lifted them a second time: a 30 m road wedge
+function TR_roadMat(m){const M=HUB.M;if(Array.isArray(m))m=m[0];return!!(M&&m&&(m===M.road||m===M.street||m===M.resSt||m===M.cobble||(M.jn&&m.map&&m.map===M.jn.map)))}
 function TR_bldFix(){const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
   for(const b of B){const c=b.c??1,s=b.s??0,P=[];for(const u of[-1,0,1])for(const v of[-1,0,1]){const lx=u*b.hw,lz=v*b.hd;P.push(groundY(b.x+lx*c+lz*s,b.z-lx*s+lz*c))}
     b.trMin=Math.min(...P);b.trMax=Math.max(...P);b.trY=1e9;const R=Math.hypot(b.hw,b.hd)+1.8;
@@ -398,7 +400,7 @@ function TR_bldFix(){const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
   // terr-3 (Athens boot): pass 2 looks up the full grid only near a lifted building (C2 holds those alone; same result)
   const C2=new Map();for(const b of B){if(!b.trOff)continue;const R=Math.hypot(b.hw,b.hd)+1.8;for(let i=Math.floor((b.x-R)/CS);i<=Math.floor((b.x+R)/CS);i++)for(let j=Math.floor((b.z-R)/CS);j<=Math.floor((b.z+R)/CS);j++)C2.set(K(i,j),1)}
   const near=(x,z)=>C2.has(K(Math.floor(x/CS),Math.floor(z/CS)));
-  if(C2.size)for(const o of meshes){let ch=false;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);if(!near(_p.x,_p.z))continue;const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
+  if(C2.size)for(const o of meshes){let ch=false;if(!o.isInstancedMesh&&TR_roadMat(o.material))continue;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);if(!near(_p.x,_p.z))continue;const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
     const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){if(!near(p[i],p[i+2]))continue;const b=find(p[i],p[i+2],1.6);if(!b||!b.trOff)continue;
       const core=find(p[i],p[i+2],.4)===b;if(!core){const gv=groundY(p[i],p[i+2]);if(p[i+1]>gv-.15&&p[i+1]<gv+.35)continue}p[i+1]+=b.trOff;ch=true}
     if(ch){A.needsUpdate=true;o.geometry.computeBoundingSphere();o.geometry.computeBoundingBox()}}

@@ -192,7 +192,7 @@ function OC_acroBuild(){if(CID==='fra'||!HUB.grp||OC.acroG===HUB.grp)return;OC.a
 function OC_unbury(){const F=HUB.bld.filter(b=>b.trMin!=null&&b.trBase!=null&&b.trMin>-1&&b.trMax-b.trBase>1);OC.unb=F.length;if(!F.length)return;
   const find=(x,z,m)=>{for(const b of F){const dx=x-b.x,dz=z-b.z,lx=b.c==null?dx:dx*b.c-dz*b.s,lz=b.c==null?dz:dx*b.s+dz*b.c;if(Math.abs(lx)<=b.hw+m&&Math.abs(lz)<=b.hd+m)return b}return null};const M=new THREE.Matrix4(),P=V3(),pl=[];
   for(const b of F)b.ocUp=b.trMax-.8-b.trBase;
-  for(const o of HUB.grp.children){if(!(o.isMesh||o.isInstancedMesh)||o.userData.trG||!o.geometry||!o.geometry.attributes.position)continue;let ch=false;
+  for(const o of HUB.grp.children){if(!(o.isMesh||o.isInstancedMesh)||o.userData.trG||!o.geometry||!o.geometry.attributes.position)continue;if(!o.isInstancedMesh&&TR_roadMat(o.material))continue;let ch=false;
     if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);P.setFromMatrixPosition(M);const b=find(P.x,P.z,.4);if(!b||P.y<b.trBase-.5)continue;M.elements[13]+=b.ocUp;o.setMatrixAt(i,M);ch=true}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere()}continue}
     const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){const b=find(p[i],p[i+2],.4);if(b&&p[i+1]>=b.trBase-.5){p[i+1]+=b.ocUp;ch=true}}if(ch){A.needsUpdate=true;o.geometry.computeBoundingBox();o.geometry.computeBoundingSphere()}}
   for(const b of F){b.h+=b.ocUp;if(b.y0!=null)b.y0+=b.ocUp;b.trBase+=b.ocUp;b.trDoor=(b.trDoor||0)+b.ocUp;TR_PL.push(b);pl.push(cbox(b.hw*2+.7,b.trBase-b.trMin+.45,b.hd*2+.7,b.x,(b.trBase+b.trMin-.4)/2,b.z,'#b5a68c',b.c==null?0:Math.atan2(-b.s,b.c)))}
