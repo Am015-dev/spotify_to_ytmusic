@@ -50,7 +50,21 @@ What the shots show (`docs/shots/cityvar/*_off_*.jpg`, looked at):
 Reuse (licences): LDraw parts via asset-1 (CCAL 2.0), Kenney kits in `km.js` (CC0), three.js `InstancedMesh` (MIT), own brick geometry `ART_brickGeo` (`src/97_art.js`). No new third-party files needed for 1-7.
 
 ## 4. Prototype: foliage mix (`src/98cv_city_var.js`, flag `TUNE.cvFol`, default 0 = OFF; `?cvf=1` on, `?cvf=0` off)
-PROTO_RESULTS
+What it does: every tree/bush gets a hashed size (width .82-1.2, height .78-1.32) and a small hue/saturation/lightness shift (far instances and asset-1 near LDraw meshes, also after a smashed tree respawns); half the street trees (1.6-14 m off a road) and 1 in 8 park trees get a LEGO tree pit (grey kerb, green clumps, 1x1 flower plates in 6 colours), at most 1800 spread over the city by hash, in ONE city-wide InstancedMesh pair (~130 tris a pit, no collider: it sits inside the tree's footprint).
+
+Measured on the built page (same spots, OFF vs ON; draw calls = visible meshes in the frustum, `SIMP_drawStat`):
+| spot | draw calls OFF → ON | tris OFF → ON | foliage looks in 150 m | top look | heights |
+|---|---|---|---|---|---|
+| Frankfurt start | 692 → 671 | 3.43 M → 3.52 M | 8 → 13 | 37 % → 16 % | 1 → 5 |
+| Frankfurt park | 732 → 686 | 4.27 M → 3.87 M | 21 → 43 | 17 % → 8 % | 1 → 6 |
+| Athens start | 530 → 532 (+0.4 %) | 2.63 M → 2.83 M (+7 %) | 26 → 55 | 10 % → 7 % | 1 → 6 |
+| Athens street | 424 → 426 (+0.5 %) | 2.96 M → 3.15 M (+6 %) | 22 → 38 | 11 % → 7 % | 1 → 6 |
+| Athens park | 437 → 434 | 2.45 M → 2.64 M | 28 → 64 | 9 % → 5 % | 1 → 6 |
+Frankfurt numbers move with lazy streaming between runs (OFF higher than ON there); the fixed cost of the change is +2 calls, which is what Athens shows. First version had no cap: Athens put 31,608 pits (+8.7 M tris), now capped at 1800.
+
+Shots (OFF left, ON right; looked at): `docs/shots/cityvar/fra_park_off_vs_on.jpg`, `ath_park_off_vs_on.jpg`, `fra_street_off_vs_on.jpg`, `ath_street_off_vs_on.jpg`, `fra_pit_off_vs_on.jpg`.
+Honest look: the size mix shows in parks (trees no longer the same height), the colour shift is subtle, and pits read as small flower boxes at kerb level. The gain is real but medium: on its own it does NOT fix the "repetitive" street, because the worst view (Frankfurt `bv1`) has only 10-19 trees in 150 m. Items 1 (facade slabs) and 4 (tree rows) matter more there. The Athens park camera (`CVF_park`) can land inside a tree, so use the street or pit shot to judge.
+Gate: unit 0 FAIL; `TAG=life1,xf1,terrain,cvf1` on the built page (see HANDOFF_cityvar). Turn on for a beta: set `cvFol:1` in `src/assets/tune.json` (or TUNE in `src/10_core.js`) once Alex has seen the shots.
 
 ## 5. Which become builder pieces
 Tree pit with flowers (from #3), the LDraw tree variants at 3 sizes (asset-1 + #3 sizes), hedge 1×4 / corner (#4), flowerbed 2×4 and paving / path plates (#6), the 4 prop vignettes as one-tap stamps (#5: bench set, market stall, bus stop, café), facade modules (shop front, balcony band, roof crown, water tank) from #1/#7. `src/98b2_builder2.js` already has `BX_trees` / `BX_asTrees`; the stamps would be new palette entries there.

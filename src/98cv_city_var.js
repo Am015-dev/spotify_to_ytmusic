@@ -14,12 +14,13 @@ function CVF_bedGeo(fl){const L=[];if(!fl){L.push([2.4,.32,0,0,0,'#9a948a'],[2.0
 function CVF_apply(){if(!CVF.on||CVF.done||!HUB.props)return;CVF.done=1;const c=new THREE.Color(),beds=[],tou=new Set();
   for(const p of HUB.props){if(!p.im||p.i==null||!CVF_RX.test(p.t))continue;CVF_mat(p);
     if(p.im.instanceColor){p.im.getColorAt(p.i,c);c.offsetHSL((CVF_h(p.x,p.z,3)-.5)*.06,(CVF_h(p.x,p.z,4)-.5)*.12,(CVF_h(p.x,p.z,5)-.5)*.14);p.im.setColorAt(p.i,c);tou.add(p.im)}CVF.n++;
-    if(CVF_TREE.test(p.t)&&beds.length<CVF_MAX){const hh=CVF_h(p.x,p.z,6);if(hh<.5){let e=0;try{e=OC_roadE(p.x,p.z);if(inRiver(p.x,p.z,0)||onAnyDeck(p.x,p.z))e=0}catch(x){e=0}/* street trees (1.6-14 m off the road) get a pit half the time, park trees 1 in 8 */if(e>=1.6&&(e<14||hh<.12))beds.push(p)}}}
+    if(CVF_TREE.test(p.t)){const hh=CVF_h(p.x,p.z,6);if(hh<.5){let e=0;try{e=OC_roadE(p.x,p.z);if(inRiver(p.x,p.z,0)||onAnyDeck(p.x,p.z))e=0}catch(x){e=0}/* street trees (1.6-14 m off the road) get a pit half the time, park trees 1 in 8 */if(e>=1.6&&(e<14||hh<.12))beds.push(p)}}}
   for(const im of tou)if(im.instanceColor)im.instanceColor.needsUpdate=true;
+  if(beds.length>CVF_MAX){beds.sort((a,b)=>CVF_h(a.x,a.z,8)-CVF_h(b.x,b.z,8));beds.length=CVF_MAX}/* spread over the whole city, not the first props in the list */
   if(!beds.length)return;const mk=(g,mat)=>{const im=new THREE.InstancedMesh(g,mat,beds.length);im.frustumCulled=false;im.receiveShadow=true;im.userData.nsh=1;HUB.grp.add(im);return im};
   const mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.45,metalness:0});CVF.im=mk(CVF_bedGeo(0),mat);CVF.imF=mk(CVF_bedGeo(1),mat);
   beds.forEach((p,i)=>{_m.compose(V3(p.x,p.y-.02,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));CVF.im.setMatrixAt(i,_m);CVF.imF.setMatrixAt(i,_m);
-    c.set(CVF_FL[Math.floor(CVF_h(p.x,p.z,7)*CVF_FL.length)]);CVF.imF.setColorAt(i,c)});CVF.beds=beds.length}
+    c.set(CVF_FL[Math.floor(CVF_h(p.x,p.z,7)*CVF_FL.length)]);CVF.imF.setColorAt(i,c)});CVF.beds=beds.length;CVF.B=beds}
 buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{CVF.done=0;CVF.n=CVF.beds=0;if(CVF.im){HUB.grp.remove(CVF.im);HUB.grp.remove(CVF.imF);CVF.im=CVF.imF=null}CVF_apply()}catch(e){console.warn('CVF',e)}return r})(buildHubProps);
 // a smashed tree that respawns keeps its own size (propRevive writes scale 1)
 if(typeof propRevive==='function'){const _pr=propRevive;propRevive=function(p){const r=_pr.apply(this,arguments);try{if(CVF.on&&p&&p.cvs&&p.im)CVF_mat(p)}catch(e){}return r}}
