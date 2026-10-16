@@ -86,3 +86,9 @@ Commits carry NO attribution lines. If `/dev/null` is a symlink (`ls -la /dev/nu
 - **Shelf:** the 3 new games are not on it yet. To add them, run `games-src/room/add-new-games.py` (covers are
   ready).
 - **Art:** the owner will make art with Google Flow later; each game has a prompt list in `ART-PROMPTS.md`.
+
+## Nightrun weapons and fusions (done, live)
+- Done: 4 new weapons (Arc Chain, Orbit Blades, Ricochet Disc, Mine Layer; parts/g.js WPD/fire1/upd), 28 fusions (FU_RULES table of 9 effects + 12% damage, FU_NAMES), fusion banner on the WEAPONS sheet, fusion name on the HUD chip at stage start, hard player-bullet cap (pbCap in g.js, trim line in b.js), hit hook `WP.hit` in b.js. Switch: `FUSE_ON` in g.js.
+- Art: 8 `wp-<id>.webp` (256) and 28 `fx-fuse-<a>-<b>.webp` (512) in assets-manifest.json with prompts; placeholders made; they also show in NEXT-WAVE.md / next-wave.html (next-wave.py source 5 reads manifest entries that carry a "prompt").
+- Test: `node games-src/nightrun/weapon-test.js` (28 pairs + each weapon alone clears stage 1).
+- Next: owner supplies the pictures (save under the same names, run make-placeholders.py); tune fusion strength after play.
