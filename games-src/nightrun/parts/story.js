@@ -96,14 +96,14 @@ const starTxt=s=>[s.ch?'Clear the challenge':'Clear the stage',(s.ch==='perfect'
 const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
-  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def))-(window.RET&&RET.mercy?RET.mercyLvl(n):0);   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
+  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def))-(window.RET&&RET.mercy&&!(window.HEAT&&HEAT.lv(n))?RET.mercyLvl(n):0)+(window.HEAT?HEAT.lvK*HEAT.lv(n):0);   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
     this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=(1+TUNE.eh*L)*dmOf().hp;
-    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1]+(window.RET&&RET.mercy?RET.mercyHull(n):0);
+    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1]+(window.RET&&RET.mercy&&!(window.HEAT&&HEAT.lv(n))?RET.mercyHull(n):0);
     this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;
     const df=this.def;this.len=stLen(df);this.kv=stKill(df);this.sv=stScore(df);this.pn=stPerf(df);   // stage = song length; boss in its last 32 bars (mini-boss: 14)
     this.lead=df.goal.k==='boss'?Math.max(20,this.len-BOSS_BARS):df.goal.k==='mini'?Math.max(20,this.len-MINI_BARS):0;
     this.dk=TUNE2.stDk;
-    this.ch=df.ch||'';this.s3=df.ch?stS3(df):0;this.tb=df.ch==='speed'?Math.round(this.len*df.tb):0;this.why='';},
+    this.ch=df.ch||'';this.s3=df.ch?stS3(df):0;this.tb=df.ch==='speed'?Math.round(this.len*df.tb):0;this.why='';if(window.HEAT)HEAT.apply(this);},   // B8 Heat mutators (ret.js)
   kit(n){const k=Math.floor((n-1)*.8),got={};for(let i=0;i<k;i++){const id=KIT[i];got[id]=(got[id]||0)+1;}return got;},
   snapFor(n){const f=STAGES[n-1].from||n,sn=sSave.snap[f];return sn?Object.assign({},sn):this.kit(f);},   // a challenge starts with what you had when you reached the stage that opens it
   // the new run has just been created: put this stage's district, hull and upgrades in place

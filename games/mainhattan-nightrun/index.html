@@ -954,7 +954,7 @@ function beatPump(){const p=bpos(),q=Math.floor(p*4);G.bp=p;
 function onTick(i){const e=G.boss;if(e&&((i%4)+4)%4===0&&e.x<=bossX()&&e.pc>=0&&e.lists[e.ph-1][e.pi%e.lists[e.ph-1].length]==='spiral'&&!G.dead){
   const sp=e.ph===3?1.1:1;e.sa+=.9;const arms=3+(ST.on?(ST.lvl>=6)+(ST.lvl>=10):0)+(DF.el?1:0);eb.src=e;for(let j=0;j<arms;j++)eb(e.x,e.y,e.sa+j*6.2832/arms,(150+10*diff())*sp,'#ff3dbb',5);eb.src=null;}}
 function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit('bar',{i,bar:i/4});
-  if(C.n>0&&G.bc-C.lb>8+SH.ck)tierDrop('idle');                    // the tier slips one step after 8 beats without a gain
+  if(C.n>0&&G.bc-C.lb>8+SH.ck-(window.HEAT?HEAT.td:0))tierDrop('idle');                    // the tier slips one step after 8 beats without a gain
   if(!G.dead&&!ST.over)DIR.beat(i);                     // the director spawns the waves (phrases of the song, density follows its loudness)
   if(G.dead)return;
   for(const e of G.en){
@@ -1755,14 +1755,14 @@ const starTxt=s=>[s.ch?'Clear the challenge':'Clear the stage',(s.ch==='perfect'
 const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
-  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def))-(window.RET&&RET.mercy?RET.mercyLvl(n):0);   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
+  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def))-(window.RET&&RET.mercy&&!(window.HEAT&&HEAT.lv(n))?RET.mercyLvl(n):0)+(window.HEAT?HEAT.lvK*HEAT.lv(n):0);   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
     this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=(1+TUNE.eh*L)*dmOf().hp;
-    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1]+(window.RET&&RET.mercy?RET.mercyHull(n):0);
+    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1]+(window.RET&&RET.mercy&&!(window.HEAT&&HEAT.lv(n))?RET.mercyHull(n):0);
     this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;
     const df=this.def;this.len=stLen(df);this.kv=stKill(df);this.sv=stScore(df);this.pn=stPerf(df);   // stage = song length; boss in its last 32 bars (mini-boss: 14)
     this.lead=df.goal.k==='boss'?Math.max(20,this.len-BOSS_BARS):df.goal.k==='mini'?Math.max(20,this.len-MINI_BARS):0;
     this.dk=TUNE2.stDk;
-    this.ch=df.ch||'';this.s3=df.ch?stS3(df):0;this.tb=df.ch==='speed'?Math.round(this.len*df.tb):0;this.why='';},
+    this.ch=df.ch||'';this.s3=df.ch?stS3(df):0;this.tb=df.ch==='speed'?Math.round(this.len*df.tb):0;this.why='';if(window.HEAT)HEAT.apply(this);},   // B8 Heat mutators (ret.js)
   kit(n){const k=Math.floor((n-1)*.8),got={};for(let i=0;i<k;i++){const id=KIT[i];got[id]=(got[id]||0)+1;}return got;},
   snapFor(n){const f=STAGES[n-1].from||n,sn=sSave.snap[f];return sn?Object.assign({},sn):this.kit(f);},   // a challenge starts with what you had when you reached the stage that opens it
   // the new run has just been created: put this stage's district, hull and upgrades in place
@@ -1945,11 +1945,13 @@ function mapDetail(n){const el=$('stDet');if(!el)return;if(!(n>0)){el.hidden=tru
   el.innerHTML=`<div class="dh"><span class="ac">${s.ch?'CHALLENGE':ACTN[s.act]+' · '+D.name}</span><span class="bs">${ok?'BEST '+'★'.repeat(k)+'☆'.repeat(3-k):''}</span><button class="x" id="stDx" type="button" aria-label="Close">✕</button></div>`
    +`<div class="dm">${bn?`<img class="bp" src="media/boss-${slugOf(bn)}.webp" alt="" onerror="this.remove()">`:''}<div class="dt"><div class="nm">${s.n<=MAIN?s.n+' · ':''}${s.name}</div><div class="gl">${goalTxt(s)}</div>${s.ch?`<div class="rl">${CHRULE[s.ch]}</div>`:''}</div></div>`
    +(RET.arcade&&!s.ch?`<div class="arc" role="group" aria-label="Stage length"><button type="button" id="arcA" class="${ARC.on?'on':''}">ARCADE <small>~3 MIN</small></button><button type="button" id="arcC" class="${ARC.on?'':'on'}">CLASSIC <small>FULL SONG</small></button></div>`:'')
+   +(window.HEAT?HEAT.row(n):'')
    +`<div class="stl">${lines.map((t,i)=>`<div class="${k>i?'ok':''}"><span>${k>i?'★':'☆'}</span> ${t}</div>`).join('')}</div>`
    +(rec?`<div class="tip">${rec}</div>`:'')
    +(ok?'':`<div class="lkn">Clear ${need||'the stage before'} first</div>`)
    +`<button class="go" id="stPlay" type="button"${ok?'':' disabled'}>${ok?(k?'PLAY AGAIN':'PLAY'):'LOCKED'}</button>`;
   if($('arcA')){$('arcA').addEventListener('click',()=>{ARC.set(true);mapDetail(n);});$('arcC').addEventListener('click',()=>{ARC.set(false);mapDetail(n);});}
+  if(window.HEAT)HEAT.bind(n);
   $('stPlay').addEventListener('click',()=>{if(unlocked(n))startStory(n);});
   $('stDx').addEventListener('click',()=>{MAPD.sel=-1;for(const e of document.querySelectorAll('#stRows .nd.sel'))e.classList.remove('sel');el.hidden=true;});}
 function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=-1;stDraw();}
@@ -3192,6 +3194,60 @@ const ARC={secs:150,leadSecs:44,maxBars:80,on:load('mnr_arc',1)!==0,
   label(){return this.active()?'ARCADE · ~3 MIN':'CLASSIC · FULL SONG';}};
 window.ARC=ARC;
 
+/* ===== B8 Heat ladder (RET.heat) =====
+   Opens when the story is cleared (stage MAIN has a star). On any cleared main stage the plate offers HEAT 1-10 (one above your best on that stage).
+   Each Heat step adds one small mutator (a fixed ladder built from the 6 endless mutators) and the stage level +0.12; the run's Neon pays +20% per Heat,
+   and the first clear at a new Heat earns its medal (+30 Neon x Heat). Caps kept: bullets at most +12% (endless TURBO), elites at most 0.6, hull at least 2. */
+if(RET.heat===undefined)RET.heat=true;
+const HEAT={max:10,lvK:.12,nk:.2,medalK:30,pick:{},best:{},run:0,td:0,last:null,
+  STEPS:[['turbo','TURBO','Faster shots'],['guard','ELITES','More elites'],['hail','HAIL','Rain from above'],['decay','DECAY','Tier slips sooner'],
+    ['noheal','NO HEAL','No hull drops'],['hull','-1 HULL','One hull less'],['turbo2','TURBO+','Even faster shots'],['guard2','ELITES+','Even more elites'],['heavy','HEAVY','Tougher enemies'],['inferno','INFERNO','Everything harder']],
+  open(n){const s=STAGES[n-1];return !!RET.heat&&!!s&&!s.ch&&n<=MAIN&&(sSave.stars[MAIN]|0)>=1&&(sSave.stars[n]|0)>=1;},
+  top(n){return this.open(n)?Math.min(this.max,(this.best[n]|0)+1):0;},          // highest Heat you may pick on stage n
+  lv(n){return this.open(n)?Math.max(0,Math.min(this.top(n),this.pick[n]|0)):0;},   // Heat of the next run on stage n (0 = off)
+  muts(h){return this.STEPS.slice(0,h);},
+  label(h){return h?'HEAT '+h+': '+this.muts(h).map(m=>m[1]).slice(-3).join(' · '):'';},
+  apply(s){const h=this.lv(s.n);this.run=h;this.td=0;if(!h)return;const has=id=>h>=1+this.STEPS.findIndex(m=>m[0]===id);
+    s.bs*=1+(has('turbo')?.06:0)+(has('turbo2')?.06:0);
+    s.el=Math.min(.6,s.el+(has('guard')?.08:0)+(has('guard2')?.08:0));
+    if(has('decay'))this.td=2;
+    if(has('noheal'))s.heal=0;
+    if(has('hull'))s.hp0=Math.max(2,s.hp0-1);
+    if(has('heavy'))s.eh*=1.1;
+    if(has('inferno')){s.eh*=1.08;s.d0*=1.06;s.d=s.d0*.8;}},
+  save(){try{localStorage.setItem('mnr_heat',JSON.stringify({pick:this.pick,best:this.best}));}catch(e){}},
+  medals(){let t=0;for(const k in this.best)t+=this.best[k]|0;return t;}};
+try{const o=JSON.parse(localStorage.getItem('mnr_heat')||'{}');if(o&&typeof o==='object'){for(const k in o.pick||{})HEAT.pick[k]=Math.max(0,o.pick[k]|0);for(const k in o.best||{})HEAT.best[k]=Math.max(0,o.best[k]|0);}}catch(e){}
+window.HEAT=HEAT;
+{const st=document.createElement('style');st.textContent=`
+#stDet .heat{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;color:#ff9a3c}
+#stDet .heat button{min-width:44px;min-height:40px;border:1px solid #7a4a2a;background:#1e0d08;color:#ffc58a;border-radius:8px;font:700 16px/1 inherit}
+#stDet .heat button:disabled{opacity:.35}
+#stDet .heat b{min-width:5.2em;text-align:center;color:#fff;font-size:13px;white-space:nowrap}
+#stDet .heat .hm{flex:1 1 0;min-width:0;white-space:nowrap}
+#stDet .hmu{font-family:var(--mono);font-size:11px;line-height:1.25;color:#ffc58a;overflow-wrap:anywhere}
+#stDet .heat.off{color:var(--dim)}
+#stres .sr.heat .sg{color:#ff9a3c}
+`;document.head.appendChild(st);}
+/* stage plate row (map.js mapDetail calls HEAT.row and HEAT.bind) */
+HEAT.row=function(n){if(!RET.heat)return'';const s=STAGES[n-1];if(!s||s.ch||!(sSave.stars[n]|0))return'';
+  if(!this.open(n))return'<div class="heat off">🔒 HEAT · clear the story</div>';
+  const h=this.lv(n),b=this.best[n]|0,mu=this.muts(h).map(m=>m[1]).join(' · ');
+  return`<div class="heat" role="group" aria-label="Heat"><button type="button" id="htDn"${h?'':' disabled'} aria-label="Less heat">−</button><b id="htLv">${h?'🔥 HEAT '+h:'HEAT OFF'}</b><button type="button" id="htUp"${h<this.top(n)?'':' disabled'} aria-label="More heat">+</button><span class="hm">${h?'+'+Math.round(100*this.nk*h)+'% Neon':'More Neon'}${b?' · best '+b:''}</span></div>${h?'<div class="hmu" id="htMu">'+mu+'</div>':''}`;};
+HEAT.bind=function(n){const set=v=>{this.pick[n]=Math.max(0,Math.min(this.top(n),v));this.save();mapDetail(n);};
+  if($('htDn'))$('htDn').addEventListener('click',()=>set(this.lv(n)-1));if($('htUp'))$('htUp').addEventListener('click',()=>set(this.lv(n)+1));};
+/* runs: show the mutators, add the DIR mutator, keep mercy out of Heat runs, pay +20% per Heat and the medal */
+NR.on('runStart',d=>{if(!d||!d.story){HEAT.run=0;HEAT.td=0;return;}if(!HEAT.run)return;
+  if(HEAT.run>=3)DIR.mut=['hail'];HEAT.fails0=RET.fails[d.story]|0;G.note={t:5,txt:HEAT.label(HEAT.run)};});
+NR.on('banked',add=>{if(!HEAT.run||!(add>0))return;const b=Math.round(add*HEAT.nk*HEAT.run);GA.bank+=b;SH.lastBank+=b;gsave();HEAT.bonus=b;});
+NR.on('runEnd',d=>{const h=HEAT.run;HEAT.run=0;HEAT.td=0;if(!h||!d||!d.story||d.quit)return;const n=d.story;
+  if(RET.fails[n]!==HEAT.fails0){if(HEAT.fails0)RET.fails[n]=HEAT.fails0;else delete RET.fails[n];RET.saveFails();}   // a Heat run never feeds the mercy count
+  if(!d.cleared){HEAT.last={n,h,ok:false,bonus:HEAT.bonus|0};HEAT.bonus=0;return;}
+  const first=h>(HEAT.best[n]|0);let medal=0;if(first){HEAT.best[n]=h;medal=HEAT.medalK*h;GA.bank+=medal;gsave();if(HEAT.pick[n]===h&&h<HEAT.max)HEAT.pick[n]=h+1;}
+  if(RET.last&&RET.last.n===n&&RET.last.pay){const b=Math.round(RET.last.pay*HEAT.nk*h);GA.bank+=b;gsave();HEAT.bonus=(HEAT.bonus|0)+b;}
+  HEAT.save();HEAT.last={n,h,ok:true,first,medal,bonus:HEAT.bonus|0};HEAT.bonus=0;
+  setTimeout(()=>{const e=$('srStars');if(e&&!e.querySelector('.heat'))e.insertAdjacentHTML('beforeend',`<div class="sr ok heat"><span class="sg">🔥</span> HEAT ${h}${first?' medal +'+medal:''} · +${HEAT.last.bonus} Neon</div>`);},0);});
+
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
    The LAB is a real run with G.lab set: no waves, no district clock, no boss timer, no chest or pit stop, god mode on. What appears is decided by the panel at the bottom:
    BOSS (gallery: pick any boss and its district, replay the intro, lock a phase, force an attack pattern, hold any pose of its sprite sheet, hit flash, death + respawn),
@@ -3598,6 +3654,7 @@ NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L3',id:'heat-ladder',text:'After you clear the story, every cleared stage gets a HEAT ladder: tap + on the stage card for Heat 1-10. Each Heat adds one mutator (Turbo, Elite Guard, Hailstorm, Fast Decay, No Heal, -1 Hull ...), pays +20% Neon and a medal the first time. Does each step feel a little harder, never unfair?'},
  {ver:'L3',id:'clear-pay',text:'Clearing a stage now pays Neon: 40 plus 12 per stage number the first time, 25 more for each new star, and a tenth of that on later clears. Everything in the garage costs far less (weapons, perks), and kills pay a bit more, so a full build is a matter of hours, not weeks. Fail a stage twice and the next try gets +1 hull; fail four times and it is a little easier too. Do the prices feel fair?'},
  {ver:'L3',id:'ship-mounts',text:'Your ship now shows the weapons you equip: a coloured circle on slot 1, a triangle on slot 2, a split ring when they fuse, and a flash from the mounts when you fire. See it in WEAPONS and the Garage. Painted mounts come later. Does it read at a glance?'},
  {ver:'L2',id:'weapon-levels',text:'Weapons grow with your Neon: Garage > WEAPONS has 16 weapons (8 new: Frost Beam, Flame Arc, Plasma Wave, Shrapnel Shell, Echo Drone, Gravity Well, Rail Sniper, Storm Cell). Buy one with Neon, then buy its levels 1 to 10 (a level bar, the power it gives and the next new ability are on every card). In a run the pit-stop pickups add up to 2 more levels on top. Does a higher level feel stronger, and are the prices fair?'},

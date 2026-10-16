@@ -70,11 +70,13 @@ function mapDetail(n){const el=$('stDet');if(!el)return;if(!(n>0)){el.hidden=tru
   el.innerHTML=`<div class="dh"><span class="ac">${s.ch?'CHALLENGE':ACTN[s.act]+' · '+D.name}</span><span class="bs">${ok?'BEST '+'★'.repeat(k)+'☆'.repeat(3-k):''}</span><button class="x" id="stDx" type="button" aria-label="Close">✕</button></div>`
    +`<div class="dm">${bn?`<img class="bp" src="media/boss-${slugOf(bn)}.webp" alt="" onerror="this.remove()">`:''}<div class="dt"><div class="nm">${s.n<=MAIN?s.n+' · ':''}${s.name}</div><div class="gl">${goalTxt(s)}</div>${s.ch?`<div class="rl">${CHRULE[s.ch]}</div>`:''}</div></div>`
    +(RET.arcade&&!s.ch?`<div class="arc" role="group" aria-label="Stage length"><button type="button" id="arcA" class="${ARC.on?'on':''}">ARCADE <small>~3 MIN</small></button><button type="button" id="arcC" class="${ARC.on?'':'on'}">CLASSIC <small>FULL SONG</small></button></div>`:'')
+   +(window.HEAT?HEAT.row(n):'')
    +`<div class="stl">${lines.map((t,i)=>`<div class="${k>i?'ok':''}"><span>${k>i?'★':'☆'}</span> ${t}</div>`).join('')}</div>`
    +(rec?`<div class="tip">${rec}</div>`:'')
    +(ok?'':`<div class="lkn">Clear ${need||'the stage before'} first</div>`)
    +`<button class="go" id="stPlay" type="button"${ok?'':' disabled'}>${ok?(k?'PLAY AGAIN':'PLAY'):'LOCKED'}</button>`;
   if($('arcA')){$('arcA').addEventListener('click',()=>{ARC.set(true);mapDetail(n);});$('arcC').addEventListener('click',()=>{ARC.set(false);mapDetail(n);});}
+  if(window.HEAT)HEAT.bind(n);
   $('stPlay').addEventListener('click',()=>{if(unlocked(n))startStory(n);});
   $('stDx').addEventListener('click',()=>{MAPD.sel=-1;for(const e of document.querySelectorAll('#stRows .nd.sel'))e.classList.remove('sel');el.hidden=true;});}
 function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=-1;stDraw();}

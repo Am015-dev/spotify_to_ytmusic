@@ -58,3 +58,57 @@ const ARC={secs:150,leadSecs:44,maxBars:80,on:load('mnr_arc',1)!==0,
     return Math.max(Math.min(full,BOSS_BARS+20),Math.min(full,this.maxBars,Math.floor(this.secs/spb),lead+BOSS_BARS));},
   label(){return this.active()?'ARCADE · ~3 MIN':'CLASSIC · FULL SONG';}};
 window.ARC=ARC;
+
+/* ===== B8 Heat ladder (RET.heat) =====
+   Opens when the story is cleared (stage MAIN has a star). On any cleared main stage the plate offers HEAT 1-10 (one above your best on that stage).
+   Each Heat step adds one small mutator (a fixed ladder built from the 6 endless mutators) and the stage level +0.12; the run's Neon pays +20% per Heat,
+   and the first clear at a new Heat earns its medal (+30 Neon x Heat). Caps kept: bullets at most +12% (endless TURBO), elites at most 0.6, hull at least 2. */
+if(RET.heat===undefined)RET.heat=true;
+const HEAT={max:10,lvK:.12,nk:.2,medalK:30,pick:{},best:{},run:0,td:0,last:null,
+  STEPS:[['turbo','TURBO','Faster shots'],['guard','ELITES','More elites'],['hail','HAIL','Rain from above'],['decay','DECAY','Tier slips sooner'],
+    ['noheal','NO HEAL','No hull drops'],['hull','-1 HULL','One hull less'],['turbo2','TURBO+','Even faster shots'],['guard2','ELITES+','Even more elites'],['heavy','HEAVY','Tougher enemies'],['inferno','INFERNO','Everything harder']],
+  open(n){const s=STAGES[n-1];return !!RET.heat&&!!s&&!s.ch&&n<=MAIN&&(sSave.stars[MAIN]|0)>=1&&(sSave.stars[n]|0)>=1;},
+  top(n){return this.open(n)?Math.min(this.max,(this.best[n]|0)+1):0;},          // highest Heat you may pick on stage n
+  lv(n){return this.open(n)?Math.max(0,Math.min(this.top(n),this.pick[n]|0)):0;},   // Heat of the next run on stage n (0 = off)
+  muts(h){return this.STEPS.slice(0,h);},
+  label(h){return h?'HEAT '+h+': '+this.muts(h).map(m=>m[1]).slice(-3).join(' · '):'';},
+  apply(s){const h=this.lv(s.n);this.run=h;this.td=0;if(!h)return;const has=id=>h>=1+this.STEPS.findIndex(m=>m[0]===id);
+    s.bs*=1+(has('turbo')?.06:0)+(has('turbo2')?.06:0);
+    s.el=Math.min(.6,s.el+(has('guard')?.08:0)+(has('guard2')?.08:0));
+    if(has('decay'))this.td=2;
+    if(has('noheal'))s.heal=0;
+    if(has('hull'))s.hp0=Math.max(2,s.hp0-1);
+    if(has('heavy'))s.eh*=1.1;
+    if(has('inferno')){s.eh*=1.08;s.d0*=1.06;s.d=s.d0*.8;}},
+  save(){try{localStorage.setItem('mnr_heat',JSON.stringify({pick:this.pick,best:this.best}));}catch(e){}},
+  medals(){let t=0;for(const k in this.best)t+=this.best[k]|0;return t;}};
+try{const o=JSON.parse(localStorage.getItem('mnr_heat')||'{}');if(o&&typeof o==='object'){for(const k in o.pick||{})HEAT.pick[k]=Math.max(0,o.pick[k]|0);for(const k in o.best||{})HEAT.best[k]=Math.max(0,o.best[k]|0);}}catch(e){}
+window.HEAT=HEAT;
+{const st=document.createElement('style');st.textContent=`
+#stDet .heat{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;color:#ff9a3c}
+#stDet .heat button{min-width:44px;min-height:40px;border:1px solid #7a4a2a;background:#1e0d08;color:#ffc58a;border-radius:8px;font:700 16px/1 inherit}
+#stDet .heat button:disabled{opacity:.35}
+#stDet .heat b{min-width:5.2em;text-align:center;color:#fff;font-size:13px;white-space:nowrap}
+#stDet .heat .hm{flex:1 1 0;min-width:0;white-space:nowrap}
+#stDet .hmu{font-family:var(--mono);font-size:11px;line-height:1.25;color:#ffc58a;overflow-wrap:anywhere}
+#stDet .heat.off{color:var(--dim)}
+#stres .sr.heat .sg{color:#ff9a3c}
+`;document.head.appendChild(st);}
+/* stage plate row (map.js mapDetail calls HEAT.row and HEAT.bind) */
+HEAT.row=function(n){if(!RET.heat)return'';const s=STAGES[n-1];if(!s||s.ch||!(sSave.stars[n]|0))return'';
+  if(!this.open(n))return'<div class="heat off">🔒 HEAT · clear the story</div>';
+  const h=this.lv(n),b=this.best[n]|0,mu=this.muts(h).map(m=>m[1]).join(' · ');
+  return`<div class="heat" role="group" aria-label="Heat"><button type="button" id="htDn"${h?'':' disabled'} aria-label="Less heat">−</button><b id="htLv">${h?'🔥 HEAT '+h:'HEAT OFF'}</b><button type="button" id="htUp"${h<this.top(n)?'':' disabled'} aria-label="More heat">+</button><span class="hm">${h?'+'+Math.round(100*this.nk*h)+'% Neon':'More Neon'}${b?' · best '+b:''}</span></div>${h?'<div class="hmu" id="htMu">'+mu+'</div>':''}`;};
+HEAT.bind=function(n){const set=v=>{this.pick[n]=Math.max(0,Math.min(this.top(n),v));this.save();mapDetail(n);};
+  if($('htDn'))$('htDn').addEventListener('click',()=>set(this.lv(n)-1));if($('htUp'))$('htUp').addEventListener('click',()=>set(this.lv(n)+1));};
+/* runs: show the mutators, add the DIR mutator, keep mercy out of Heat runs, pay +20% per Heat and the medal */
+NR.on('runStart',d=>{if(!d||!d.story){HEAT.run=0;HEAT.td=0;return;}if(!HEAT.run)return;
+  if(HEAT.run>=3)DIR.mut=['hail'];HEAT.fails0=RET.fails[d.story]|0;G.note={t:5,txt:HEAT.label(HEAT.run)};});
+NR.on('banked',add=>{if(!HEAT.run||!(add>0))return;const b=Math.round(add*HEAT.nk*HEAT.run);GA.bank+=b;SH.lastBank+=b;gsave();HEAT.bonus=b;});
+NR.on('runEnd',d=>{const h=HEAT.run;HEAT.run=0;HEAT.td=0;if(!h||!d||!d.story||d.quit)return;const n=d.story;
+  if(RET.fails[n]!==HEAT.fails0){if(HEAT.fails0)RET.fails[n]=HEAT.fails0;else delete RET.fails[n];RET.saveFails();}   // a Heat run never feeds the mercy count
+  if(!d.cleared){HEAT.last={n,h,ok:false,bonus:HEAT.bonus|0};HEAT.bonus=0;return;}
+  const first=h>(HEAT.best[n]|0);let medal=0;if(first){HEAT.best[n]=h;medal=HEAT.medalK*h;GA.bank+=medal;gsave();if(HEAT.pick[n]===h&&h<HEAT.max)HEAT.pick[n]=h+1;}
+  if(RET.last&&RET.last.n===n&&RET.last.pay){const b=Math.round(RET.last.pay*HEAT.nk*h);GA.bank+=b;gsave();HEAT.bonus=(HEAT.bonus|0)+b;}
+  HEAT.save();HEAT.last={n,h,ok:true,first,medal,bonus:HEAT.bonus|0};HEAT.bonus=0;
+  setTimeout(()=>{const e=$('srStars');if(e&&!e.querySelector('.heat'))e.insertAdjacentHTML('beforeend',`<div class="sr ok heat"><span class="sg">🔥</span> HEAT ${h}${first?' medal +'+medal:''} · +${HEAT.last.bonus} Neon</div>`);},0);});
