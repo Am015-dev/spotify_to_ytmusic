@@ -19,7 +19,7 @@ const STORY = (opts) => {   // runs inside the page (?sim=1): plays each boss st
     m.startStory(df.n); m.simOn(true);
     let T = 0, t0 = -1, i = 0;
     while (m.running && T < 400 && !(t0 >= 0 && m.G.t - t0 > 12)) {
-      m.P.hp = 99; m.P.inv = 1; if (m.SH.active) m.SH.close();
+      m.P.hp = 99; m.P.inv = 1; m.P.y = 380 + 150 * Math.sin(T * 1.3); m.P.x = 300 + 120 * Math.sin(T * .7); if (m.SH.active) m.SH.close();
       m.step(1 / 30); T += 1 / 30; i++;
       const b = m.G.boss;
       if (b && b.x <= (m.rotMode ? 690 : 790) + 1) {
