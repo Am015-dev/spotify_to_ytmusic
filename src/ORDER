@@ -94,6 +94,7 @@
 99rv_review.js
 99c_checklist.js
 98rf_race_fun.js
+98tk_city_duel.js
 98ro_open.js
 98zp_perf_ctx.js
 98bk_bake.js
@@ -128,4 +129,5 @@
 98sh_shots1.js
 98fc_foliage_cam.js
 99ui_hud.js
+98bt_boot2.js
 99_api.js
