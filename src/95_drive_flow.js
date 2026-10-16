@@ -59,16 +59,16 @@ function DR_solidBuild(){const R=[],lm=(x,z,m)=>LMX.some(L=>Math.hypot(L.x-x,L.z
 // window grid (repeat width 10-14.4 m, floor 11.2-13.2 m), a 0-4 m setback on one long side, and every third one a stepped upper tier. Same merged meshes (0 new draws), +12 tris a box.
 // ?dsp=0 = the old single box. Colliders: one rect per segment (the setback strip stays solid for props via DR.solid, which is unchanged).
 function DR_splitOn(){return!/[?&]dsp=0\b/.test(location.search)}
-function DR_fraSplit(r,lo,h0,BMs,W,G,TN){const w=r.x1-r.x0,d=r.z1-r.z0,alongX=w>=d,L=alongX?w:d,cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,X=['#ffd24a','#ff9a7a','#8cc8ff','#b6e07a','#ff9ac4','#ffb347','#9fe0d0'],T=TN.concat(X);
+function DR_fraSplit(r,lo,h0,BMs,W,G,TN){const w=r.x1-r.x0,d=r.z1-r.z0,alongX=w>=d,L=alongX?w:d,cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,X=['#ffd24a','#ff9a7a','#8cc8ff','#b6e07a','#ff9ac4','#ffb347','#9fe0d0'],c2=typeof C2_fra==='function'?C2_fra((r.x0+r.x1)/2,(r.z0+r.z1)/2,TN):{on:false,roof:'#a85a3c'},T=c2.on?c2.T:TN.concat(X);
   const n=L>30?Math.max(2,Math.round(L/27)):1,wt=[];let sum=0;for(let i=0;i<n;i++){const v=.7+.6*DR_h(cx+i*3.7,cz+i*1.9);wt.push(v);sum+=v}
   let a=alongX?r.x0:r.z0,prev=-1;const lenC=alongX?d:w;
   for(let i=0;i<n;i++){const len=L*wt[i]/sum,b=i===n-1?(alongX?r.x1:r.z1):a+len,hv=DR_h(cx*.7+i*11.3,cz*.7+i*5.1),hw2=DR_h(cx+i*2.3,cz-i*4.1),hs=DR_h(cx-i*6.1,cz+i*3.3);
-    let k=Math.floor(hv*T.length);if(k===prev)k=(k+1)%T.length;prev=k;
-    const hh=h0-(n>1?3:0)+(n>1?[0,3.3,6.6,9.9,13.2][Math.floor(hw2*5)]:0),tw=[10,12,14.4][Math.floor(DR_h(cx+i,cz*1.3)*3)],th=[11.2,13.2][Math.floor(DR_h(cz+i,cx*1.7)*2)];
+    let k=Math.floor(hv*T.length);if(c2.on)k=(i+Math.floor(hv*2))%T.length;if(k===prev)k=(k+1)%T.length;prev=k;
+    const hh=h0-(n>1?3:0)+(n>1?(c2.on?[0,3.3,6.6,9.9,13.2,19.8,26.4]:[0,3.3,6.6,9.9,13.2])[Math.floor(hw2*(c2.on?7:5))]:0),tw=[10,12,14.4][Math.floor(DR_h(cx+i,cz*1.3)*3)],th=[11.2,13.2][Math.floor(DR_h(cz+i,cx*1.7)*2)];
     // setback: pull one long side in by 0 / 0 / 2.5 / 4 m (the segment keeps ≥ 14 m of depth)
-    const sb=[0,3,5,7][Math.floor(hs*4)],side=DR_h(cx+i*9,cz)<.5?-1:1;let c0=alongX?r.z0:r.x0,c1=alongX?r.z1:r.x1;if(lenC-sb>14){if(side<0)c0+=sb;else c1-=sb}
+    const sb=(c2.on?[0,4,7,10]:[0,3,5,7])[Math.floor(hs*4)],side=DR_h(cx+i*9,cz)<.5?-1:1;let c0=alongX?r.z0:r.x0,c1=alongX?r.z1:r.x1;if(lenC-sb>14){if(side<0)c0+=sb;else c1-=sb}
     const sx0=alongX?a:c0,sx1=alongX?b:c1,sz0=alongX?c0:a,sz1=alongX?c1:b,sw=sx1-sx0,sd=sz1-sz0,mx=(sx0+sx1)/2,mz=(sz0+sz1)/2,col=new THREE.Color(T[k]);
-    const g=bxUV(sw,hh,sd,tw,th);g.translate(mx,lo-.5+hh/2,mz);W.push(colorize(g,col));G.push(cbox(sw-1.2,.6,sd-1.2,mx,lo-.5+hh+.3,mz,'#a85a3c'));
+    const g=bxUV(sw,hh,sd,tw,th);g.translate(mx,lo-.5+hh/2,mz);W.push(colorize(g,col));G.push(cbox(sw-1.2,.6,sd-1.2,mx,lo-.5+hh+.3,mz,c2.roof));
     if(n>1&&i%3===1&&sw>12&&sd>12){const tt=5+Math.floor(DR_h(cx+i*4,cz+i)*3)*3.3,tw2=sw*.6,td2=sd*.6,g2=bxUV(tw2,tt,td2,tw,th);g2.translate(mx,lo-.5+hh+.6+tt/2,mz);W.push(colorize(g2,col.clone().offsetHSL(0,0,.05)));G.push(cbox(tw2-1,.5,td2-1,mx,lo-.5+hh+.6+tt+.25,mz,'#7a5a4c'))}
     const bb={x:mx,z:mz,hw:sw/2,hd:sd/2};HUB.bld.push(bb);if(HUB.grid)gridAddTo(HUB.grid,[bb]);a=b}
   DR.st.fraSeg=(DR.st.fraSeg||0)+n}
