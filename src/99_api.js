@@ -196,7 +196,7 @@ function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
  const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
- h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-8))+'px'}
+ h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-22))+'px'}
 setInterval(()=>{try{CRSM_hint()}catch(e){}},250);
 window.__crsm={get S(){return CRSM},hint:()=>CRSM_hint()};
 // ---- CAR26a: races have no civilian traffic; Crash Junction keeps its (max 3) cars parked at the track edge

@@ -14,3 +14,27 @@
 }
 // ui-1: taps since page load (rv2k/onboard)
 window.__taps=0;addEventListener('pointerdown',()=>{window.__taps++},true);
+// phone-1 (review 2K-2 #9/#10): phone HUD. 12 px text, score popups in a small feed at the top-right edge (under the ⚙), objective pill
+// inside the screen, race result only once the car has stopped, BOOST beside GAS in portrait, one checklist chip.
+{const st=document.createElement('style');st.textContent=`
+html body.touch #tB,html body.touch #tN,html body.touch #tD,html body.touch #tF,html body.touch #tG{font-size:15px!important;letter-spacing:0}
+html body.touch #roamCombo small{font-size:12px}
+html body #feed,html body #hitPop,html body #roamCombo{position:fixed;left:auto!important;right:calc(8px + env(safe-area-inset-right,0px))!important;transform:none!important;text-align:right;pointer-events:none;z-index:6;max-width:min(230px,56vw)}
+html body #hitPop{top:calc(100px + env(safe-area-inset-top,0px))!important;font-size:18px!important;-webkit-text-stroke:1px #141413;text-shadow:0 2px 0 #141413;white-space:normal}
+html body #hitPop.on{animation:phIn .25s ease-out forwards!important}
+html body #roamCombo{top:calc(150px + env(safe-area-inset-top,0px))!important;grid-template-columns:auto auto;justify-content:end}
+html body #roamCombo em{font-size:24px!important}html body #roamCombo b{font-size:18px!important}html body #roamCombo div{width:90px}
+html body #feed{top:calc(190px + env(safe-area-inset-top,0px))!important;gap:2px}
+html body #feed div{font-size:15px!important;text-shadow:0 1px 3px #000,0 0 8px currentColor}html body #feed div small{font-size:12px!important}
+@keyframes phIn{from{opacity:0;translate:0 -6px}to{opacity:1;translate:0 0}}
+html body #juPop{left:auto!important;right:calc(8px + env(safe-area-inset-right,0px));top:calc(100px + env(safe-area-inset-top,0px))!important;transform:none!important;font-size:20px!important;text-align:right;max-width:min(230px,56vw);white-space:normal!important;text-shadow:0 1px 3px #000,0 0 8px rgba(0,0,0,.6)!important}html body #juPop small{font-size:12px!important;letter-spacing:.06em}
+html body.touch #roamArrow,html body.v85 #roamArrow{max-width:calc(100vw - 150px)!important;white-space:normal!important;overflow:visible!important;line-height:1.15;text-align:center}
+@media (orientation:portrait){html body.touch #roamArrow,html body.v85 #roamArrow{left:112px!important;right:56px!important;transform:none!important;max-width:none!important;justify-content:center;width:auto}
+ html body.touch[data-thr=pedal] #tN{width:clamp(56px,18vw,70px);height:clamp(56px,18vw,70px)}}
+body.phHold #spRes{visibility:hidden;pointer-events:none}
+`;document.head.appendChild(st);
+ // result panel only after the car has stopped (hard stop after 4 s so it never stays hidden)
+ let t0=0;setInterval(()=>{try{const r=document.getElementById('spRes');if(!r||r.hidden){t0=0;document.body.classList.remove('phHold');return}
+  if(!t0)t0=performance.now();const mv=typeof RO!=='undefined'&&Math.abs(RO.v||0)>1.5&&performance.now()-t0<4000;document.body.classList.toggle('phHold',mv)}catch(e){}},100);
+ // one checklist chip: duplicates of the ✓ n/N progress chip outside #odPin are hidden
+ setInterval(()=>{try{const P=document.getElementById('odPin');let n=P&&!P.hidden&&getComputedStyle(P).display!=='none'?1:0;for(const e of document.querySelectorAll('body > *:not(#odPin):not(#menu)')){if(e.children.length>3||!/^\s*[✓✔]\s*\d+\/\d+\s*$/.test(e.textContent||''))continue;e.style.display=n++?'none':e.style.display}}catch(e){}},700)}
