@@ -4,6 +4,13 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun title diet + type floor (B25, B26; 16 Oct 2026)
+- Done: flags `RET.title` and `RET.type` (ret.js; `?title=0` / `?type=0` switch them off), new part `parts/title.js` (built before c.js), test `nightrun/ret-title-test.js`.
+- Title now: PLAY (fresh save) or CONTINUE (next unbeaten stage + saved ARCADE/CLASSIC + Heat, 1 tap from cold open), ENDLESS + DAILY (streak/bonus on the tile), GARAGE + MENU, and one status chip (daily streak + weekly).
+- Where each old button lives (ids kept): MENU sheet (`#mnMore`) = STAGE MAP `#storyBtn`, WEEKLY RUN `#wkBtn`, WEAPONS `#wpBtn`, LAB `#labBtn`, CHECKLIST `.ckB`, FLIGHT SCHOOL `#tutBtn`, SETTINGS `#setBtn`, difficulty `#diffBtn`, and the controls legend.
+  Heat picker and ARCADE/CLASSIC stay on the stage plate (the map now opens with the next stage's plate open); ONE MORE RUN stays on the run-end screens; Flight School is still offered once to new players.
+- Type floor: text >= 14 px (16 px body at 900+ px wide), buttons >= 44 px on title, menu, map banners, stage plate. Tests that clicked title buttons now open the menu first (`RET.menuOpen()`).
+
 ## Nightrun polish plan (16 Oct)
 - Full plan: `games-src/nightrun/POLISH.md`. It covers music, 25 fun ideas, a polish checklist, flow maps and 19 worker briefs (B18-B36). No game code changed.
 - **Music repeats:** stages 1-32 share 3 songs (`story.js:78`), and the library is 11 songs, about 37 min. The first boss has no theme of its own.

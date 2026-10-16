@@ -766,7 +766,7 @@ if(window.ResizeObserver)new ResizeObserver(()=>fit()).observe(stage);
 
 function toGame(t){const r=frame.getBoundingClientRect();                  // portrait: the screen's up is the world's right
   return rotMode?[(r.bottom-t.clientY)/r.height*W,(t.clientX-r.left)/r.width*H]:[(t.clientX-r.left)/r.width*W,(t.clientY-r.top)/r.height*H];}
-addEventListener('keydown',e=>{const k=e.code;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(k)&&!(e.target&&e.target.tagName==='INPUT'))e.preventDefault();
+addEventListener('keydown',e=>{const k=e.code;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(k)&&!(e.target&&e.target.tagName==='INPUT')&&!(k==='Space'&&window.RET&&RET.title&&!running&&e.target&&e.target.tagName==='BUTTON'))e.preventDefault();   // RET.title: Space presses a focused menu button
   if(!K[k]){pressed[k]=stampOf(e);if(k==='Space'||k==='KeyJ')pressed.Fire=pressed[k];}
   K[k]=true;AU.unlock();
   if(k==='KeyM'&&!(e.target&&e.target.tagName==='INPUT'))toggleMute();
@@ -1955,7 +1955,7 @@ function mapDetail(n){const el=$('stDet');if(!el)return;if(!(n>0)){el.hidden=tru
   if(window.HEAT)HEAT.bind(n);
   $('stPlay').addEventListener('click',()=>{if(unlocked(n))startStory(n);});
   $('stDx').addEventListener('click',()=>{MAPD.sel=-1;for(const e of document.querySelectorAll('#stRows .nd.sel'))e.classList.remove('sel');el.hidden=true;});}
-function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=-1;stDraw();}
+function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=window.RET&&RET.title?mapCurrent():-1;stDraw();}
 function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 /* one debounced relayout for resize, rotation, visualViewport and ResizeObserver; measured again after 400 ms (iOS reports the old size right after rotating) */
 {let t=0;const go=()=>{if(selEl.hidden)return;const b=$('stRows');if(Math.abs(b.clientWidth-MAPD.lastW)>2||Math.abs(b.clientHeight-MAPD.lastH)>2)stDraw();},
@@ -3136,6 +3136,8 @@ let labEl=null,garageDirty=false;
 
 /* ---------- retention parts (RETENTION.md). Each item has a flag in RET; a flag set to false leaves the game exactly as it was. ---------- */
 const RET=window.RET=window.RET||{};
+if(RET.title===undefined)RET.title=!/[?&]title=0/.test(location.search);   // B25: title diet (PLAY / CONTINUE, 5 buttons, the rest in MENU); parts/title.js
+if(RET.type===undefined)RET.type=!/[?&]type=0/.test(location.search);     // B26: text >= 14 px and touch targets >= 44 px on title, menu and map; parts/title.js
 if(RET.oneMore===undefined)RET.oneMore=true;   // B5: run-end screens show Neon banked, the next unlock bar and a ONE MORE RUN button
 RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct, can}; null when everything is owned
   let best=null;const add=(n,p)=>{if(!(p>0))return;if(!best||p<best.price)best={n,price:p};};
@@ -3302,10 +3304,12 @@ NR.on('runEnd',d=>{if(!RET.daily||!d||d.quit)return;
 #retTt b{color:#fff;font-weight:400}#retTt .ok{color:#6cf59a}#retTt button{margin-top:.4em;font:inherit;padding:.5em 1em;min-height:40px;border-radius:99px;border:1px solid #ffb020;background:#0000;color:#ffb020;cursor:pointer}
 `;document.head.appendChild(st);}
 RET.dailyShow=function(){let e=$('retTt');
+  if(RET.title&&RET.titleDraw)RET.titleDraw();
   if(!RET.daily){if(e)e.hidden=true;return;}
   if(!e){e=document.createElement('div');e.id='retTt';$('bestT').after(e);
     e.addEventListener('click',ev=>{if(ev.target.id!=='wkBtn')return;RET.wkPending=true;start(true);});}
   e.hidden=false;const d=DY.status(),w=RET.week();
+  if(RET.title){e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· claimed</span>':'Daily streak <b>'+d.streak+'</b> · <b>+'+d.reward+'</b> Neon today')+' · '+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly open · <b>+'+DY.weekly+'</b> Neon');return;}
   e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· today\'s bonus claimed</span>':'Daily streak <b>'+d.streak+'</b> · fly the daily run for <b>+'+d.reward+'</b> Neon')
    +'<br>'+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly: <b>'+w.names.join(' + ')+'</b> · boss clear = <b>+'+DY.weekly+'</b>')+(w.best?' · best '+w.best.toLocaleString('de-DE'):'')
    +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
@@ -3763,6 +3767,7 @@ const NR_CHECKLIST=[
  {ver:'I8',id:'one-more-run',text:'The game-over and stage-clear screens now show a bar to the cheapest thing you can still unlock, and a big ONE MORE RUN button that restarts at once. Does the bar make you want one more go?'},
  {ver:'R5',id:'no-walls',text:'Kill-goal stages (Roemer, Freight Yard, Loading Dock, Boardroom, Olive Road) ask for fewer kills in Arcade, and Talos fires fewer lasers. Is there still a stage where you get stuck?'},
  {ver:'I6',id:'new-ships',text:'Three new ships in Garage > SHIPS: Drift (a wide fan), Lancer (a piercing lance every second shot) and Nova (a ring burst every third shot). They show as shapes until the art arrives. Do they feel different and worth the price?'},
+ {ver:NR_VER,id:'title-diet',text:'The title has only PLAY or CONTINUE (your next stage, in one tap), ENDLESS, DAILY, GARAGE and MENU. Story map, weekly run, weapons, lab, checklist, Flight School, settings and difficulty are in MENU. Is everything easy to find and big enough to hit?'},
  {ver:'I6',id:'badges',text:'The difficulty button on the title and the LAB show a badge per difficulty, and the stage clear screen shows a medal. Garage ship cards now show the painted ship portraits.'},
  {ver:'I6',id:'leader-look',text:'Squad leaders have a gold sheen on top of the crown and the rings so you can spot them at a glance.'},
  {ver:'I5',id:'placeholders',text:'Placeholder art is in: kit perk icons (Garage TUNE and LOAD), the SOON cards and the medal on the stage clear screen show a hatched PLACEHOLDER box with the file name. games-src/nightrun/ASSETS-NEEDED.md lists every file, its size and where it goes.'},
@@ -4509,6 +4514,77 @@ setTimeout(()=>{if(!TUT_ON)return;
 window.__tut={get on(){return TUT.on},get i(){return TUT.i},get id(){const s=TUT.cur();return s?s.id:null},get t(){return TUT.t},get n(){return TUT_S.length},ids:TUT_S.map(s=>s.id),
   get endShown(){return TUT.endShown&&!tutC.hidden},get offerShown(){return TUT.offerShown&&!tutC.hidden},get next(){return TUT.next},
   target(){const s=TUT.cur();return s&&s.tgt?s.tgt():null;},start:()=>startTut(),go:i=>{if(TUT.on)tutGo(i);},get log(){return TUT.log},skip:()=>tutSkip(),bpos:()=>bpos(),get wpOpen(){return WP.open}};
+
+/* ---------- B25 title diet + CONTINUE, B26 type floor (POLISH.md). Flags RET.title and RET.type (ret.js); flags off = the old title.
+   Title: one big PLAY / CONTINUE, ENDLESS + DAILY, GARAGE + MENU, and the daily/weekly status chip (#retTt, drawn by ret.js).
+   MENU (#mnMore) holds the old buttons, same ids: storyBtn (stage map), wkBtn (weekly run), labBtn, wpBtn, ckB (checklist), tutBtn (Flight School),
+   setBtn (settings), diffBtn (difficulty) and the controls legend. Heat and Arcade/Classic stay on the stage plate; ONE MORE RUN stays on the run-end screens. ---------- */
+if(RET.type){const st=document.createElement('style');st.textContent=`
+#title .eyebrow,#title .stat,#title .keys,#retTt,#titleRow2 .go,#title .lede{font-size:max(14px,var(--tf,14px))}
+#title .keys b,#title .keys span{font-size:14px}
+#retTt button{min-height:44px}
+#stsel .ban small,#stsel .ban span{font-size:14px}
+#stsel .nd .stars,#stsel .nd .nm{font-size:14px}
+#stDet .dh,#stDet .gl,#stDet .rl,#stDet .stl,#stDet .tip,#stDet .lkn,#stDet .hmu,#stDet .heat,#stDet .heat b{font-size:14px}
+#stDet .arc button{min-height:44px;font-size:14px}#stDet .arc button small{font-size:14px}
+#stDet .heat button{min-height:44px}
+@media (min-width:900px){#title .lede,#title .stat,#retTt,#mnMore .keys,#stDet .gl,#stDet .stl,#stDet .tip,#stDet .rl,#stDet .lkn{font-size:16px}}
+`;document.head.appendChild(st);}
+if(RET.title)setTimeout(()=>{
+  const T=titleEl,inn=T.querySelector('.in'),keys=inn.querySelector('.keys'),chip=$('retTt'),old=[...inn.querySelectorAll('.row')];
+  const st=document.createElement('style');st.textContent=`
+#ttMain{width:100%;max-width:min(94%,440px);display:flex;flex-direction:column;gap:10px}
+#ttMain .row{flex-wrap:nowrap;gap:10px}#ttMain .row .go{flex:1 1 0;min-width:0;padding-left:.6em;padding-right:.6em}
+#playBtn{width:100%;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:clamp(20px,min(5.4vw,3.8vh),28px)}
+#playBtn small,#dailyBtn small{display:block;font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.02em;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#dailyBtn small{font-size:14px}
+#mnMore{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 5%;overflow-y:auto;background:#05030cf4}
+#mnMore[hidden]{display:none}
+#mnMore h2{margin:0;font-family:var(--display);font-size:22px;letter-spacing:.14em;color:var(--ink)}
+#mnMore .mg{width:100%;max-width:440px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#mnMore .mg .go{width:100%;min-height:48px;padding:.4em .5em;font-size:14px;letter-spacing:.06em}
+#mnMore .mg .wide{grid-column:1/-1}
+#mnMore .keys{width:100%;max-width:440px;margin:4px 0}
+#mnMore .back{width:100%;max-width:440px;min-height:48px}
+@media (max-height:600px){#title .eyebrow{display:none}#title .lede{display:none}#ttMain{gap:6px}#playBtn{min-height:56px}}
+`;document.head.appendChild(st);
+  /* main block */
+  const main=document.createElement('div');main.id='ttMain';
+  const play=document.createElement('button');play.type='button';play.className='go';play.id='playBtn';
+  const r2=document.createElement('div'),r3=document.createElement('div');r2.className=r3.className='row';
+  const menu=document.createElement('button');menu.type='button';menu.className='go dim';menu.id='moreBtn';menu.textContent='MENU';
+  $('startBtn').textContent='ENDLESS';$('startBtn').classList.add('alt');$('dailyBtn').classList.add('dim');
+  r2.append($('startBtn'),$('dailyBtn'));r3.append($('gaBtn'),menu);main.append(play,r2,r3);
+  (chip||$('bestT')).after(main);
+  /* the menu sheet */
+  const mn=document.createElement('div');mn.id='mnMore';mn.hidden=true;mn.setAttribute('role','dialog');mn.setAttribute('aria-label','Menu');
+  const h2=document.createElement('h2');h2.textContent='MENU';const grid=document.createElement('div');grid.className='mg';
+  const wk=document.createElement('button');wk.type='button';wk.className='go alt';wk.id='wkBtn';wk.textContent='WEEKLY RUN';
+  wk.addEventListener('click',()=>{if(running)return;RET.wkPending=true;start(true);});
+  const sb=$('storyBtn'),ck=inn.querySelector('.ckB');
+  sb.textContent='STAGE MAP';
+  const seq=[sb,wk,$('wpBtn'),$('labBtn'),ck,$('tutBtn'),$('setBtn'),$('diffBtn')];
+  for(const b of seq)if(b){grid.append(b);}
+  if(window.diffDraw)diffDraw();
+  const back=document.createElement('button');back.type='button';back.className='go back';back.id='mnBack';back.textContent='BACK';
+  mn.append(h2,grid);if(keys)mn.append(keys);mn.append(back);T.appendChild(mn);
+  for(const r of old){if(!r.children.length)r.remove();}
+  const open=()=>{mn.hidden=false;draw();const f=sb;if(f)f.focus();},shut=()=>{mn.hidden=true;menu.focus&&menu.focus();};
+  menu.addEventListener('click',open);back.addEventListener('click',shut);
+  mn.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b&&b.id!=='diffBtn'&&b.id!=='mnBack')mn.hidden=true;},true);   // every door closes the menu; the difficulty button only cycles
+  addEventListener('keydown',e=>{if(!mn.hidden&&e.code==='Escape'&&!(window.setEl&&!setEl.hidden)){shut();e.stopImmediatePropagation();e.preventDefault();}},true);
+  /* the label of the big button follows the save: next unbeaten stage, last Arcade/Classic choice, Heat */
+  function draw(){
+    const n=mapCurrent(),s=STAGES[n-1];if(!s)return;
+    const fresh=!Object.keys(sSave.stars).some(k=>(sSave.stars[k]|0)>0),h=window.HEAT?HEAT.lv(n):0;
+    play.innerHTML=(fresh?'PLAY':'CONTINUE')+'<small>Stage '+n+' · '+s.name+(s.ch?'':' · '+(ARC.active()?'ARCADE':'CLASSIC'))+(h?' · HEAT '+h:'')+'</small>';
+    const d=window.DY&&RET.daily?DY.status():null;
+    $('dailyBtn').innerHTML='DAILY'+(d?'<small>'+(d.claimed?'streak '+d.streak+' ✓':'+'+d.reward+' Neon')+'</small>':'');}
+  RET.titleDraw=draw;draw();
+  play.addEventListener('click',()=>{if(running)return;startStory(mapCurrent());});
+  RET.menuOpen=open;RET.menuShut=shut;
+  if(window.RET&&RET.dailyShow)RET.dailyShow();
+},0);
 
 
 // the tier meter: big x1..x4, four segments (the current one fills), a thin line that runs down before the tier slips. k = size, (cx, by) = bottom-centre
