@@ -1,0 +1,15 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"menu-phone.json",
+"rc-uibar-phone.json",
+"si-art-phone.json",
+"si-board-phone.json",
+"si-help-phone.json",
+"si-zoom-phone.json",
+"story-scene-phone.json"
+]
+}
+}

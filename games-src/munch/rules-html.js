@@ -7,14 +7,14 @@ const RULES_HTML=`
 <li><b>Get ready.</b> Play races, classes and items, change what you wear, and sell items worth 1,000 gold for one level. You can't sell your way to level 10.</li>
 <li><b>Kick open the door.</b> Turn over the top door card.
  <ul><li>A <b>monster</b>: you must fight it.</li><li>A <b>curse</b>: it hits you at once.</li><li>Anything else goes into your hand.</li></ul></li>
-<li><b>If you didn't fight a monster:</b> either <b>look for trouble</b> (fight a monster from your own hand) or <b>loot the room</b> (draw a door card face down).</li>
+<li><b>If you didn't fight a monster:</b> either <b style="white-space:nowrap">look for trouble</b> (fight a monster from your own hand) or <b>loot the room</b> (draw a door card face down).</li>
 <li><b>Charity.</b> If you hold more than 5 cards (6 for dwarves), give the extras to the lowest-level player. If that's you, discard them.</li>
 </ol>
 <h3>Fighting</h3>
 <ul>
 <li>Your <b>combat strength</b> is your level plus the bonuses of the items you wear. The monster's strength is its level plus any boosts.</li>
 <li>You win if your strength is <b>higher</b>. Ties go to the monster, unless you are a warrior.</li>
-<li>Anyone can join in: <b>one-shot</b> items (potions and so on) add to either side, and <b>monster boosts</b> make a monster tougher or weaker. <b>Wandering monsters</b> add another monster to the fight.</li>
+<li>Anyone can join in: <b style="white-space:nowrap">one-shot</b> items (potions and so on) add to either side, and <b style="white-space:nowrap">monster boosts</b> make a monster tougher or weaker. <b style="white-space:nowrap">Wandering monsters</b> add another monster to the fight.</li>
 <li>You may <b>ask one player for help</b> and promise them some of the treasure. Their strength adds to yours. You gain the levels; they get what you promised.</li>
 <li><b>Winning:</b> gain a level per monster (some big monsters give 2) and draw the treasures shown.</li>
 <li><b>Running away:</b> roll a die for each monster. On 5 or 6 you get away. Otherwise that monster's <b>Bad Stuff</b> happens to you. A helper has to run too.</li>

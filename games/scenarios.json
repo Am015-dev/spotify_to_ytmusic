@@ -1,0 +1,1176 @@
+{
+ "cauldron-fair": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "cf-board",
+   "name": "Cauldron: draw or stop",
+   "ask": "Can you see Draw and Stop?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "cf-zoom",
+   "name": "Market: stalls and prices",
+   "ask": "Can you read every stall price?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "cf-draw",
+   "name": "Cauldron: pull a chip",
+   "ask": "Tap Draw. Does a chip tumble out?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "cf-help",
+   "name": "Cauldron: rules cards",
+   "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "cf-art",
+   "name": "Painted art: bag, chip track, tail, rows",
+   "ask": "Do the bag, chip track and rows look painted?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "cf-ui",
+   "name": "UI bar: top bar, text sizes, panels, image shapes",
+   "ask": "Is every panel readable and not stretched?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "cf-start",
+   "name": "UI bar 7: start screen",
+   "ask": "One big Play button, small options below?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "crown-city-smash": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "cc-smash",
+   "name": "SMASH! over the city",
+   "ask": "Tap SMASH! over the city",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 2
+  },
+  {
+   "id": "cc-market",
+   "name": "Buy a card from the board",
+   "ask": "Tap a card twice to buy it",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 3
+  },
+  {
+   "id": "cc-dice-end",
+   "name": "Dice and rolling on the board",
+   "ask": "Keep a die, roll, then smash",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 1
+  },
+  {
+   "id": "cc-end-turn",
+   "name": "End turn from the board",
+   "ask": "Tap End turn on the board",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 1
+  },
+  {
+   "id": "cc-board",
+   "name": "Start of game board",
+   "ask": "Is the board clear and filled?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "cc-uibar",
+   "name": "UI bar: top bar, dock and panels",
+   "ask": "Are bar, dock and panels clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "cc-zoom",
+   "name": "Big card zoom",
+   "ask": "Is the big card readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "cc-help",
+   "name": "Help: rules cards",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "cc-art",
+   "name": "Painted art: chips, tray, crown, buttons, tail",
+   "ask": "Do the chips, dice tray and crown look painted?",
+   "sizes": "phone",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "doorkick-dungeon": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "dk-tut-help",
+   "name": "Tutorial: ask for help",
+   "ask": "Can you read the Help button?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "dk-fight-bonus",
+   "name": "Fight with bonuses",
+   "ask": "Is YOU vs MONSTERS big and clear?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 4
+  },
+  {
+   "id": "dk-diary",
+   "name": "Diary: readable lines, one style",
+   "ask": "Diary lines big, dark, one style?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "dk-dock",
+   "name": "Side dock: each event once, one instruction",
+   "ask": "Dock short and readable?",
+   "sizes": "pc",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "dk-topbar",
+   "name": "Desktop top bar: 5 buttons, 16px, nothing on the title",
+   "ask": "Top bar tidy?",
+   "sizes": "pc",
+   "group": "UI",
+   "mut": 1
+  },
+  {
+   "id": "dk-wide-board",
+   "name": "Desktop board: natural cards, readable decks",
+   "ask": "Cards big, decks readable?",
+   "sizes": "pc",
+   "group": "Cards",
+   "mut": 1
+  },
+  {
+   "id": "dk-kick-order",
+   "name": "Kick: door opens first, then the card",
+   "ask": "Door swings open, THEN the card shows?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 1
+  },
+  {
+   "id": "dk-boss-reveal",
+   "name": "Boss clip, then the card",
+   "ask": "Boss clip, roar, then the monster card?",
+   "sizes": "all",
+   "group": "Bosses",
+   "mut": 2
+  },
+  {
+   "id": "dk-board",
+   "name": "Start of game board",
+   "ask": "Is the table clear, with Help and Run?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 2
+  },
+  {
+   "id": "dk-zoom",
+   "name": "Big card zoom",
+   "ask": "Is the big card readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 1
+  },
+  {
+   "id": "dk-menu-rows",
+   "name": "Menu rows: text clear of the painted frame",
+   "ask": "Do menu rows read cleanly?",
+   "sizes": "phone",
+   "group": "UI",
+   "mut": 3
+  },
+  {
+   "id": "dk-hand-names",
+   "name": "Hand card names readable",
+   "ask": "Can you read every card name?",
+   "sizes": "phone",
+   "group": "Board",
+   "mut": 1
+  },
+  {
+   "id": "dk-gear-up",
+   "name": "Gear-up board: badges whole, one instruction",
+   "ask": "One clear line, nothing cut off?",
+   "sizes": "phone",
+   "group": "Board",
+   "mut": 3
+  },
+  {
+   "id": "dk-status-line",
+   "name": "Short drag/tap status line",
+   "ask": "Is the line short and does it match?",
+   "sizes": "phone",
+   "group": "Board",
+   "mut": 1
+  },
+  {
+   "id": "dk-tips",
+   "name": "Lightbulb, tips, rules cards, Tips switch",
+   "ask": "Do tips, bulb and rules cards work?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "dk-art",
+   "name": "Painted icons and 3D heroes",
+   "ask": "Are the new icons and hero figures in place?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 3
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "final-approach": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-board",
+   "name": "Start of game board",
+   "ask": "Is the cockpit clear and filled?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "fa-zoom",
+   "name": "Flight briefing sheet",
+   "ask": "Is the briefing sheet readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "fa-help",
+   "name": "Help: how this works",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-buttons",
+   "name": "Painted buttons keep their labels",
+   "ask": "Are the buttons readable?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "fa-art",
+   "name": "Painted art: menu row and speech tail",
+   "ask": "Do the menu row and tip tail look painted?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-title",
+   "name": "Start screen: one Play, one Quick game row",
+   "ask": "Is the start screen clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-ui",
+   "name": "Top bar, dock, log and briefing",
+   "ask": "Are the panels short and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-log",
+   "name": "Log panel",
+   "ask": "Is the log short and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "fa-brief",
+   "name": "Briefing panel",
+   "ask": "Is the briefing short and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "hollowbough": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "hb-hand-chips",
+   "name": "Hand chips: readable, tappable",
+   "ask": "Tap the glowing hand chip",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "hb-board",
+   "name": "Start of game board",
+   "ask": "Is the board clear and filled?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "hb-zoom",
+   "name": "Card zoom",
+   "ask": "Is the big card readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "hb-handtoggle",
+   "name": "Hide and show the hand",
+   "ask": "Tap the hand toggle. Does the row hide?",
+   "sizes": "phone",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "hb-help",
+   "name": "Rules cards",
+   "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "hb-art",
+   "name": "Painted art wired",
+   "ask": "Are the resource icons painted?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-bar",
+   "name": "UI bar: top bar, panels, text size",
+   "ask": "Few buttons, one line, readable text?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-start",
+   "name": "UI bar: start screen",
+   "ask": "One big Play button, simple options?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "ui-log",
+   "name": "UI bar: diary panel",
+   "ask": "Is the diary panel readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-rivals",
+   "name": "UI bar: rivals panel",
+   "ask": "Is the rivals panel readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "kaiten-kitchen": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "kk-board",
+   "name": "Start of game board",
+   "ask": "Are the belt and dishes clear?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "kk-zoom",
+   "name": "Hold a dish to read it",
+   "ask": "Hold a dish: can you read it?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "kk-help",
+   "name": "Rules cards",
+   "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "kk-uibar",
+   "name": "UI bar: top bar, panels, dock, art",
+   "ask": "Are the bar, panels and dock clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "kk-uibar-start",
+   "name": "UI bar: start screen",
+   "ask": "Is the start screen clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "kk-art",
+   "name": "Painted art: menu row and speech tail",
+   "ask": "Do the menu row and tip tail look painted?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "lantern-dive": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ld-board",
+   "name": "Start of game board",
+   "ask": "Are the jobs and your hand clear?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "ld-zoom",
+   "name": "Job card zoom",
+   "ask": "Is the big job card readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "ld-help",
+   "name": "Rules cards",
+   "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ld-art",
+   "name": "Painted cards, seats, tick and cross",
+   "ask": "Do cards and seats look painted?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "nebula-aces": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "nb-tutorial-play",
+   "name": "Tutorial: tap your ship",
+   "ask": "Tap the glowing ship",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "nb-board",
+   "name": "Start of game board",
+   "ask": "Is the board clear and filled?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "nb-zoom",
+   "name": "Ship card zoom",
+   "ask": "Is the ship card readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "nb-art",
+   "name": "Painted ship art on every hull",
+   "ask": "Does each ship have its picture?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "nb-help",
+   "name": "Help: rules cards",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "nb-tail",
+   "name": "Coach bubble has the painted tail",
+   "ask": "Does the speech bubble have its painted tail?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "rampart-and-vine": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "rv-board",
+   "name": "Start of game board",
+   "ask": "Is the table clear with glowing spots?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "rv-zoom",
+   "name": "Tile zoom: place a follower",
+   "ask": "Is the zoomed tile and its spots clear?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "rv-help",
+   "name": "Help: how this works",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "rv-buttons",
+   "name": "Painted buttons keep their labels",
+   "ask": "Are the buttons readable?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "rv-art",
+   "name": "Painted pieces, rows and bubble tail",
+   "ask": "Are the pieces painted and coloured?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-bar",
+   "name": "UI bar: top bar, one line, images",
+   "ask": "Few buttons, one line, readable text?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-start",
+   "name": "UI bar: start screen",
+   "ask": "One big Play button, simple options?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "ui-menu",
+   "name": "UI bar: menu drawer",
+   "ask": "Do menu labels sit inside their art, readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "sands-of-qamar": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "sq-board",
+   "name": "Start of game board",
+   "ask": "Is the bazaar clear and filled?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "sq-uibar",
+   "name": "UI bar: bar, line, panels, text sizes",
+   "ask": "Is every screen clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "sq-zoom",
+   "name": "Djinn card list",
+   "ask": "Are the djinn cards readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "sq-chips",
+   "name": "Bid chips and score chips",
+   "ask": "Are the bid numbers big enough?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "sq-help",
+   "name": "Rules cards",
+   "ask": "Can you read the rules card?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "sq-art",
+   "name": "Painted plates and glyphs",
+   "ask": "Are the painted pieces sharp and in place?",
+   "sizes": "all",
+   "group": "Art",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "shipwreck-isle": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "si-board",
+   "name": "Start of game board",
+   "ask": "Is the island clear with glowing places?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "si-art",
+   "name": "Camp icons and 3D campfire, raft, palm",
+   "ask": "Do camp icons and models look painted?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "si-zoom",
+   "name": "Card zoom",
+   "ask": "Is the big card readable?",
+   "sizes": "phone",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "si-help",
+   "name": "Help: rules cards",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "rc-uibar",
+   "name": "UI bar: top bar, dock, start screen",
+   "ask": "Is the top bar short, the dock calm and the start screen one button?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "short-fuse": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "sf-board",
+   "name": "Start of game board",
+   "ask": "Are the wires and fuse clear?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "sf-zoom",
+   "name": "Job card",
+   "ask": "Is the job card readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "sf-uibar",
+   "name": "Title screen: one primary, readable, 5 top-bar buttons",
+   "ask": "Is the title screen clean?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "sf-help",
+   "name": "Help: how this works",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "sf-buttons",
+   "name": "Painted buttons keep their labels",
+   "ask": "Are the buttons readable?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "sf-art",
+   "name": "Painted art: menu row and speech tail",
+   "ask": "Do the menu row and tip tail look painted?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "sunglaze": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "sg-board",
+   "name": "Start of game board",
+   "ask": "Are the workshops and your rack clear?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "sg-zoom",
+   "name": "Board / tile list zoom",
+   "ask": "Is the rival board readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "sg-help",
+   "name": "Help: how this works",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "sg-buttons",
+   "name": "Painted buttons keep their labels",
+   "ask": "Are the buttons readable?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "sg-art",
+   "name": "Painted art: rack trays, tail, rows",
+   "ask": "Do the racks look like wooden trays?",
+   "sizes": "phone",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-bar",
+   "name": "UI bar: top bar, dock, images",
+   "ask": "Few buttons, one line, readable text?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "ui-start",
+   "name": "UI bar: start screen",
+   "ask": "One big Begin button, simple options?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "ui-3d",
+   "name": "UI bar: 3D board labels",
+   "ask": "Can you read the board labels?",
+   "sizes": "pc",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "thornbound": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "tb-pc-hand",
+   "name": "PC: hand and Great Road",
+   "ask": "Do hand and road fill the panel?",
+   "sizes": "pc",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "tb-story-start",
+   "name": "Story after Skip tutorial",
+   "ask": "Skip tutorial: is the chapter map next?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  },
+  {
+   "id": "tb-board",
+   "name": "Start of game board",
+   "ask": "Is the board clear and filled?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "tb-zoom",
+   "name": "Card zoom",
+   "ask": "Is the big card readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "tb-help",
+   "name": "Help: how this works",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "tb-rivals",
+   "name": "Rival strip with faction emblems",
+   "ask": "Are the rival chips readable?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "tb-buttons",
+   "name": "Painted buttons keep their labels",
+   "ask": "Are the action buttons readable?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "tb-art",
+   "name": "Painted art: menu row and speech tail",
+   "ask": "Do the menu row and tip tail look painted?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ],
+ "tidewake": [
+  {
+   "id": "menu",
+   "name": "Menus: clean and readable",
+   "ask": "Is every menu clean and readable?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "tw-board",
+   "name": "Start of game board",
+   "ask": "Is the sea chart clear with your tiles?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "tw-zoom",
+   "name": "Piece detail: your junk",
+   "ask": "Is the ship card readable?",
+   "sizes": "all",
+   "group": "Cards",
+   "mut": 0
+  },
+  {
+   "id": "tw-help",
+   "name": "Help: how this works",
+   "ask": "Can you read the help cards?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "tw-buttons",
+   "name": "Brass buttons keep their labels",
+   "ask": "Are Place and Help buttons readable?",
+   "sizes": "all",
+   "group": "Board",
+   "mut": 0
+  },
+  {
+   "id": "tw-art",
+   "name": "Painted art: frame, rings, tag, tail, rows",
+   "ask": "Is the board framed, with brass rings?",
+   "sizes": "all",
+   "group": "UI",
+   "mut": 0
+  },
+  {
+   "id": "story-scene",
+   "name": "Story scene: speech bubble",
+   "ask": "Is the speech bubble clean, with no sideways bar?",
+   "sizes": "all",
+   "group": "Story",
+   "mut": 0
+  }
+ ]
+}

@@ -132,6 +132,9 @@ button.go:hover,button.go:focus-visible{filter:brightness(1.3);outline:none}
 #touch button#bDash{background-image:url(media/ui-touch-dash.webp)}
 #touch button#bEmp{background-image:url(media/ui-touch-emp.webp)}
 #touch button#bPause{background-image:url(media/ui-touch-pause.webp);border-radius:50%}
+#touch button#bDash,#touch button#bEmp{position:relative;overflow:visible}
+#touch button#bDash::after,#touch button#bEmp::after{content:attr(data-n);position:absolute;inset:-4px;border-radius:50%;pointer-events:none;color:#fff;font:700 12px var(--mono);text-align:right;text-shadow:0 0 3px #000;
+  background:conic-gradient(var(--rc,#19e3ff) calc(var(--f,1)*360deg),#ffffff22 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))}
 </style></head><body>
 
 <div id="stage"><div id="frame">
@@ -165,6 +168,7 @@ button.go:hover,button.go:focus-visible{filter:brightness(1.3);outline:none}
   <div id="pausem" class="ov solid" hidden><div class="in">
     <div class="eyebrow">Paused</div>
     <h1>PAUSE</h1>
+    <div id="pStats" style="margin:6px 0 10px;font:12px var(--mono);color:#c9c4ec;text-align:center"></div>
     <div class="row"><button class="go" id="resumeBtn">RESUME</button><button class="go alt" id="restartBtn">RESTART</button><button class="go dim" id="pSetBtn">SETTINGS</button><button class="go dim" id="quitBtn">TITLE</button></div>
   </div></div>
   <div id="setm" class="ov solid" hidden><div class="card" role="dialog" aria-label="Settings">
@@ -314,6 +318,7 @@ function calTap(ts){if(!CAL.on)return null;const h=audible(ts>0?ts:undefined)-SE
 /* ---------- audio ---------- */
 const silentWav=(()=>{let u=null;return()=>{if(u)return u;try{const n=1600,b=new Uint8Array(44+n),dv=new DataView(b.buffer),w=(o,t)=>{for(let i=0;i<t.length;i++)b[o+i]=t.charCodeAt(i);};w(0,'RIFF');dv.setUint32(4,36+n,true);w(8,'WAVEfmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,8000,true);dv.setUint32(28,8000,true);dv.setUint16(32,1,true);dv.setUint16(34,8,true);w(36,'data');dv.setUint32(40,n,true);b.fill(128,44);
   u=URL.createObjectURL(new Blob([b],{type:'audio/wav'}));}catch(e){u='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';}return u;};})();   // 0.2 s of silence: unlocks an <audio> slot inside a tap
+const SFXGAP={shot:.16,hit:.07,graze:.12,heat:.4};
 const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
   init(){if(this.a||SIM)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
     this.m=a.createGain();try{const L=this.lim=a.createDynamicsCompressor();L.threshold.value=-4;L.knee.value=3;L.ratio.value=20;L.attack.value=.003;L.release.value=.12;this.m.connect(L);L.connect(a.destination);}catch(e){this.m.connect(a.destination);}   // master limiter: nothing clips, however many effects stack
@@ -503,14 +508,16 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     if(s%2===1)this.noise(t,.04,.18,7000,this.mus);
     const bl=[0,0,12,0,0,12,0,7,0,0,12,0,10,0,7,12][s];this.osc(t,'sawtooth',this.f(r+bl),spb*.9,.22,this.mus,0,this.boss?1800:900);
     if(s%2===0){const ar=[0,3,7,10,12,10,7,3][(s/2)%8];const g=this.osc(t,'square',this.f(r+24+ar),spb*1.6,.05,this.mus,0,3000);g.connect(this.dly);}},
-  sfx(n){const a=this.a;if(!a||a.state!=='running')return;const t=a.currentTime,F=this.fx;if(n==='boom'||n==='big'||n==='phase'||n==='emp'||n==='hurt')this.duckMusic();
+  sfx(n){const a=this.a;if(!a||a.state!=='running')return;const t=a.currentTime,F=this.fx;
+    // continuous sounds (own shots, hits, grazes) are rate-limited and soft so they sit under the music instead of buzzing over it
+    const GAP=SFXGAP[n];if(GAP){const L=this.lastSfx||(this.lastSfx={});if(t-(L[n]||-9)<GAP)return;L[n]=t;}if(n==='boom'||n==='big'||n==='phase'||n==='emp'||n==='hurt')this.duckMusic();
     switch(n){
-      case'shot':this.osc(t,'square',1400,.05,.05,F,700);break;
-      case'hit':this.osc(t,'square',300,.05,.06,F,150);break;
+      case'shot':this.osc(t,'sine',this.f(60),.07,.035,F,this.f(48));break;
+      case'hit':this.osc(t,'triangle',220,.05,.03,F,140);break;
       case'boom':this.noise(t,.45,.7,400,F,'lowpass');this.osc(t,'sine',120,.4,.6,F,30);break;
       case'big':this.noise(t,1.2,.9,300,F,'lowpass');this.osc(t,'sawtooth',90,1.1,.5,F,25,800);break;
       case'pick':this.osc(t,'triangle',this.f(88),.12,.18,F);this.osc(t+.06,'triangle',this.f(95),.16,.16,F);break;
-      case'graze':this.osc(t,'sine',2600,.04,.05,F,3200);break;
+      case'graze':this.osc(t,'sine',this.f(96),.05,.018,F);break;
       case'dash':this.noise(t,.2,.35,2500,F,'bandpass');this.osc(t,'sine',300,.2,.2,F,1200);break;
       case'hurt':this.noise(t,.35,.8,900,F,'bandpass');this.osc(t,'sawtooth',220,.35,.35,F,60);break;
       case'emp':this.osc(t,'sine',60,1,.9,F,1800);this.noise(t,.9,.6,3000,F);break;
@@ -1015,7 +1022,7 @@ function update(dt){
     if(P.over){P.heat-=48*pdt;if(P.heat<=25)P.over=false;}
     else if(firing&&fresh&&SH.cellOn(cell)){const fr=SH.shot(),x=P.x+22,y=P.y+2,pf=Math.abs(cell*gs-Math.round(cell*gs))<.01?1:0;P.heat+=fr.heat;
       SH.volley(x,y,pf);NR.emit('fire',{x,y,pf});SH.extra(cell,gs);
-      AU.sfx('shot');if(P.heat>=100){P.heat=100;P.over=true;AU.sfx('heat');floater(P.x,P.y-24,'OVERHEAT','#ff5050');}}
+      AU.sfx('shot');if(P.heat>=100){P.heat=100;P.over=true;AU.sfx('heat');if(!rotMode)floater(P.x,P.y-24,'OVERHEAT','#ff5050');}}
     if(firing&&!P.over)P.heat=Math.max(0,P.heat-4*pdt);else if(!firing)P.heat=Math.max(0,P.heat-34*pdt);
     if(!SET.calm&&Math.random()<.7)G.pt.push({x:P.x-18,y:P.y+rnd(-2,2)+2,vx:rnd(-220,-120),vy:rnd(-15,15),l:.3,m:.3,c:D.a,sz:rnd(2,4)});
   }
@@ -1057,6 +1064,7 @@ function update(dt){
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}
   G.pb=G.pb.filter(b=>!b.dead);
+  {const cap=touchUI||rotMode?44:64;let over=G.pb.length-cap;if(over>0)for(const b of G.pb){if(over<=0)break;if(!b.big&&!b.pf){b.dead=1;over--;}}G.pb=G.pb.filter(b=>!b.dead);}   // player bullets alive at once: the oldest side/spray shots go first (aimed, big and on-beat shots stay), so no weapon fills the screen
   for(const e of G.en){if(e.type==='boss'&&e.floor>0&&e.hp<e.floor){e.hp=e.floor;if(!(e.lk>0)){e.lk=.35;if(!e.armN||G.t-e.armN>6){e.armN=G.t;floater(e.x,e.y-e.r-18,'ARMOUR','#19e3ff');}}}
     if(e.lk>0)e.lk-=dt;
     if(e.hp<=0&&!e.dead){e.dead=1;if(e.type==='boss')bossDown(e);else kill(e);}
@@ -1557,6 +1565,12 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
   draw(t){const s=G.pw;if(!s)return;
     const d=s.drop;if(d&&bpos()>=d.cutB){ctx.fillStyle='rgba(8,2,20,.28)';ctx.fillRect(0,0,W,H);}   // the bar without music
     if(s.wv>0){const k=1-s.wv/.7;ctx.strokeStyle='#b36bff';ctx.globalAlpha=1-k;ctx.lineWidth=14*(1-k)+2;ctx.beginPath();ctx.arc(P.x,P.y,k*1300,0,7);ctx.stroke();ctx.globalAlpha=1;}},
+  // phone HUD: one small round chip per active power-up (icon + a ring that runs down), left to right from x; returns nothing
+  chips(t,x,y,k){const s=G.pw;if(!s)return;const cur=this.cur(),r=11*k,items=s.act.map(a=>({k:a.k,f:clamp(1-(cur-a.s)/a.d,0,1)}));
+    if(s.drop){const d=s.drop;items.push({k:'drop',f:clamp((d.blastB-bpos())/(d.blastB-d.b0),0,1)});}
+    let cx=x+r;for(const it of items){const K=PWK[it.k];ctx.save();ctx.translate(cx,y-4*k);ctx.fillStyle='#05030cb0';ctx.beginPath();ctx.arc(0,0,r+3*k,0,7);ctx.fill();
+      ctx.lineWidth=2.6*k;ctx.strokeStyle='#ffffff2a';ctx.beginPath();ctx.arc(0,0,r+1*k,0,7);ctx.stroke();ctx.strokeStyle=K.c;ctx.beginPath();ctx.arc(0,0,r+1*k,-Math.PI/2,-Math.PI/2+6.2832*it.f);ctx.stroke();
+      this.coin(it.k,r-4*k);ctx.restore();cx+=2*r+10*k;}},
   hud(t,x0,y0,k){const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;const cur=this.cur(),items=s.act.map(a=>({k:a.k,rem:a.d-(cur-a.s),tot:a.d,txt:null}));
     if(s.drop){const d=s.drop,p=bpos();items.push({k:'drop',rem:d.blastB-p,tot:d.blastB-d.b0,txt:p<d.cutB?'CUT ON THE DOWNBEAT':'BLAST IN '+Math.max(1,Math.ceil((d.blastB-p)/4))+' BAR'});}
     let y=y0==null?112:y0;
@@ -3166,7 +3180,7 @@ function labBuildCheats(body){
   const d=lsec(body,'DIFFICULTY');[['easy','Easy'],['normal','Normal'],['hard','Hard'],['vhard','Very hard'],['legend','Legend']].forEach(([k,n])=>lchip(d,n,()=>{SET.diff=k;saveSet();DF=DIFFS[k];HARD=HARDS.includes(k);diffDraw();},{on:()=>SET.diff===k,html:diffBadge(k)+' '+n}));
   const p=lsec(body,'PLAYER');
   tg(p,'GOD MODE',()=>{godMode=!godMode;},()=>godMode,on=>on?'GOD MODE: ON':'GOD MODE');
-  tg(p,'FPS COUNTER',()=>{SET.fpsc=!SET.fpsc;saveSet();$('fpsEl').hidden=!SET.fpsc;},()=>!!SET.fpsc,on=>on?'FPS COUNTER: ON':'FPS COUNTER');
+  tg(p,'FPS COUNTER',()=>{SET.fpsc=!SET.fpsc;saveSet();$('fpsEl').hidden=!FPSOK();},()=>!!SET.fpsc,on=>on?'FPS COUNTER: ON':'FPS COUNTER');
   tg(p,'BOSS CHEST',()=>{save('mnr_chest',CHEST_ON()?0:1);},()=>CHEST_ON(),on=>on?'BOSS CHEST: ON':'BOSS CHEST: OFF');
   const n=lsec(body,'NEON');lchip(n,'+1,000',()=>{GA.bank+=1000;gsave();garageDirty=true;});lchip(n,'+10,000',()=>{GA.bank+=10000;gsave();garageDirty=true;});lchip(n,'SET 0',()=>{GA.bank=0;gsave();garageDirty=true;});
   const g=lsec(body,'GARAGE');
@@ -3306,7 +3320,8 @@ const HUDX={
     for(const id of SH.order){const u=UBY[id];icon(u.ic,u.c,SH.n(id));}
     c.restore();},
   // round the ship (centre sx, sy in upright screen units)
-  ship(c,sx,sy,k,t){if(G.dead)return;const v=this.vals();c.save();c.lineCap='round';
+  ship(c,sx,sy,k,t,lite){if(G.dead)return;const v=this.vals();c.save();c.lineCap='round';
+    if(lite){if(PW.on('bub')){c.strokeStyle='#7dffd8';c.globalAlpha=.55+.2*Math.sin(t*5);c.lineWidth=2*k;c.beginPath();c.arc(sx,sy,29*k,0,7);c.stroke();c.fillStyle='#7dffd818';c.fill();c.globalAlpha=1;}c.restore();return;}   // phone: hull, dash, shield and power-up timers live in the top strip / on the touch buttons
     // hull pips above the ship
     const pw=7*k,gap=2.5*k,w=v.max*(pw+gap)-gap;for(let i=0;i<v.max;i++){c.fillStyle=i<v.hp?(v.hp<=1?'#ff3040':'#3dffb0'):'#ffffff22';c.fillRect(sx-w/2+i*(pw+gap),sy-37*k,pw,4*k);}
     if(v.rev){c.save();c.translate(sx+w/2+5*k,sy-42*k);c.scale(.5*k,.5*k);c.fillStyle='#ff2d95';c.fill(this.iRev,'evenodd');c.restore();}
@@ -3331,6 +3346,17 @@ SH.hud=function(c,t,L){L=L||{nx:24,ny:57,dx:214,dy:H-30,sx:18,sy:H-34,ring:true}
   HUDX.strip(c,L.nx+(10+String(this.neon).length*8+14)*k,L.ny+5*k,k);
   if(L.ring)this.ring(c,t);
   HUDLOG.sh=this.sh;HUDLOG.spare=this.spare;};
+
+/* ?scn=nr-hud-busy (owner test link, ✔ Test checklist) and hud-cover-test.js: the worst-case moment of a phone run in one spawn - Legend, Bankenviertel,
+   boss incoming, two power-ups, shield x7, one revive, heat high, combo at x4 - kept topped up so the HUD can be judged while it is on screen. */
+function hudBusy(){
+  if(running)return;SET.diff='legend';SET.hud='full';SET.fpsc=true;applySet();start();godMode=true;
+  const bi=Math.max(0,DISTRICTS.findIndex(d=>d.name==='BANKENVIERTEL'));enterDistrict(bi);G.banner.t=0;G.hint.t=0;
+  P.hp=P.max;SH.sh=7;TP.revLeft=1;SH.neon=16;GA.eqAll=true;G.force=true;G.en=[];
+  const top=()=>{if(!running)return;P.heat=Math.max(P.heat,86);P.over=false;C.n=Math.max(C.n,TS*3+3);C.lb=G.bc;SH.sh=Math.max(SH.sh,7);
+    for(const k of['tempo','drum'])if(!PW.on(k))PW.give(k,true);};
+  top();setInterval(top,150);}
+if(/[?&]scn=nr-hud-busy/.test(location.search))addEventListener('load',()=>setTimeout(hudBusy,600));
 
 /* ---------- painted UI kit (media/ui-*.webp): canvas HUD plates + the hint bubble. The DOM side (buttons, panels, rows, touch buttons) is CSS in head.html.
    Every image is decoded once (ART.load -> ImageBitmap) and drawn as a 9-slice with plain drawImage: no per-frame filters. Until it has decoded the old flat look is drawn. */
@@ -3435,6 +3461,7 @@ NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});
 const NR_VER='L1';
 const NR_CHECKLIST=[
  {ver:'L2',id:'no-idle',text:'Standing still is no longer safe: parking in one spot (or nudging a few pixels) now brings the red static discharge that no shield, heal or revive can outlast, plus aimed shots from the edge of the screen. Keep moving and nothing changes. Does it feel fair?'},
+ {ver:'L1',id:'phone-hud',text:'On a phone the run shows the city: one slim strip on top (score, combo, hull, heat), small chips for shield, revive and power-ups under it, dash and EMP charge on their buttons. Nothing sits over the middle of the screen. Test link: ?scn=nr-hud-busy.'},
  {ver:'L1',id:'story-map',text:'STORY opens a painted route map: 40 stages in five districts (8 each), mini-bosses and bosses are bigger medallions, your next stage glows, locked stages show a padlock. Tap a stage: a plate shows goal, the three stars, your best and PLAY. Scroll along the road (up on a phone, sideways on a wide screen).'},
  {ver:'L1',id:'challenges',text:'Each district has an optional challenge stage that opens after its mini-boss: a side branch on the map. NO-HIT ends on the first hull hit, SPEED needs the kills before the clock, PERFECT needs a PERFECT count. Each pays up to 3 stars.'},
  {ver:'L1',id:'curve',text:'Difficulty rises a little every stage with no sudden spike: stage 1 to 4 feel gentle, a boss is slightly above the stages around it.'},
@@ -3820,6 +3847,8 @@ function tierMeter(cx,by,k){const T=tierOf(C.n),col=TIERC[T-1],w=262*k,h=40*k,x0
 /* MINIMAL HUD (the default; settings > Visuals > HUD): no best score, no upgrade icon rows, no stat chips round the ship; only a small shield count and a revive count where the hull is.
    The numbers are still logged for the tests. */
 const HUDMIN=()=>SET.hud!=='full';
+const FPSOK=()=>!!SET.fpsc&&(/[?&]test=1/.test(location.search)||!touchUI);   // the FPS counter: PC any time; on a phone only in test mode (?test=1)
+function setRing(b,f,c,n){const key=f.toFixed(2)+'|'+n;if(!b||b._k===key)return;b._k=key;b.style.setProperty('--f',f);b.style.setProperty('--rc',c);b.dataset.n=n;}   // charge ring + count on a touch button
 function hudMin(c,k,x,y,t){try{Object.assign(HUDLOG,{x:HUDX.vals()});}catch(e){}
   const parts=[];if(SH.sh>0)parts.push(['#19e3ff','◆'+SH.sh]);if(TP.revLeft>0)parts.push(['#ff2d95','+'+TP.revLeft]);if(!parts.length)return;
   c.save();c.font=`700 ${13*k}px "Share Tech Mono",monospace`;c.textAlign='left';let xx=x;for(const [col,txt] of parts){c.fillStyle=col;c.fillText(txt,xx,y);xx+=c.measureText(txt).width+10*k;}c.restore();}
@@ -3865,30 +3894,32 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
 function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.save();
   const sc=String(G.score).padStart(8,'0'),mu='×'+G.mult.toFixed(1),bs=String(Math.max(best.score,G.score)).padStart(8,'0');
   Object.assign(HUDLOG,{score:sc,mult:mu,best:bs,hp:P.hp,hpMax:P.max,neon:SH.neon,heat:Math.round(P.heat),emp:P.emp,wl:P.wl,combo:C.n,tier:T,district:D.name+(G.loop?' +'+G.loop:''),story:ST.on?ST.n:0,goal:ST.on?ST.label():'',boss:!!G.boss,bossHp:G.boss?Math.round(G.boss.hp):0,beat:((Math.floor(G.bp)%4)+4)%4,frame:HUDLOG.frame+1});
-  UIK.plate(ctx,'ui-hud-mult',6,4*k,206*k,(HUDMIN()?46:62)*k,20,12*k,33,125);     // the text sits inside the painted frame (12k thick), never on it
-  ctx.textAlign='left';ctx.font=`700 ${22*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(sc,20*k,34*k);
-  const sw=ctx.measureText(sc).width;ctx.font=`${16*k}px "Share Tech Mono",monospace`;ctx.fillStyle=D.b;ctx.fillText(mu,20*k+sw+10*k,33*k);
-  if(!HUDMIN()){ctx.fillStyle='#8c86b8';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillText((G.daily?'DAILY ':'BEST ')+(G.daily?String(Math.max(dailyBest.score,G.score)).padStart(8,'0'):bs),20*k,50*k);}
-  const dn=ST.on?ST.n+' · '+ST.def.name:D.name+(G.loop?' +'+G.loop:'')+(DF===DIFFS.hard?' · HARD':DF===DIFFS.vhard?' · VERY HARD':DF===DIFFS.legend?' · LEGEND':'');
-  ctx.textAlign='right';ctx.font=`700 ${15*k}px "Chakra Petch",sans-serif`;const dtw=ctx.measureText(dn).width,tight=6+206*k+12+dtw>w-14,ro=tight?50*k:0;   // no room beside the score frame: the district block moves under it
-  ctx.fillStyle=D.a;ctx.fillText(dn,w-14,26*k+ro);
-  const pw=Math.min(170*k,Math.max(dtw,110*k)),px=w-14-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,33*k+ro,pw,4*k);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,33*k+ro,pw*(ST.on?ST.frac():G.boss||G.bossDone?1:DIR.frac()),4*k);
-  if(!HUDMIN()||ST.on){ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(ST.on?ST.label():G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,w-14,50*k+ro);}
-  // status row: hull, heat, dash, EMP on row 1, the weapons on row 2, all inside the painted frame (inner area: 12k in from every edge)
-  const y=88*k+ro,pw2=Math.min(w-12,270*k+34);UIK.plate(ctx,'ui-hud-bars',6,y-34*k,pw2,(HUDMIN()?66:82)*k,24,12*k,157,197);ctx.textAlign='left';ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#dcd8f6';
-  const hw=Math.min(17,96/P.max);ctx.fillText('HULL',20*k,y-12*k);for(let i=0;i<P.max;i++){ctx.fillStyle=i<P.hp?(P.hp<=1?'#ff3040':'#3dffb0'):'#ffffff1a';ctx.fillRect(20*k+i*hw*k,y-6*k,(hw-4)*k,9*k);}
-  const hx=20*k+P.max*hw*k+14*k;ctx.fillStyle='#dcd8f6';ctx.fillText('HEAT',hx,y-12*k);ctx.fillStyle='#ffffff1a';ctx.fillRect(hx,y-6*k,60*k,9*k);
-  ctx.fillStyle=P.over?(SET.reduce||Math.floor(t*10)%2?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(hx,y-6*k,60*k*P.heat/100,9*k);
-  const dx=hx+74*k;ctx.fillStyle='#dcd8f6';ctx.fillText('DASH',dx,y-12*k);ctx.fillStyle=P.dashCd<=0?D.a:'#ffffff1a';ctx.fillRect(dx,y-6*k,36*k*(1-P.dashCd),9*k);
-  const ex=dx+42*k;ctx.fillStyle='#dcd8f6';ctx.fillText('EMP',ex,y-12*k);for(let i=0;i<3;i++){ctx.fillStyle=i<P.emp?'#ffb020':'#ffffff1a';ctx.beginPath();ctx.arc(ex+5*k+i*14*k,y-1.5*k,4.5*k,0,7);ctx.fill();}
-  ctx.fillStyle='#dcd8f6';WP.hud(ctx,20*k,y+16*k,k);
-  if(HUDMIN())hudMin(ctx,k,14,y+50*k,t);else{SH.hud(ctx,t,{nx:24*k,ny:y+62*k,dx:dx,dy:y+30*k,sx:14,sy:y+70*k,k:k});
-  HUDX.ship(ctx,P.y,PH_-P.x,k,t);}
-  let ny=(HUDMIN()?y+60*k:y+90*k)+16*k;
-  if(G.boss&&G.boss.x<W){const b=G.boss,bw=Math.min(440,w-28);ctx.fillStyle='#00000088';ctx.fillRect((w-bw)/2,ny+8*k,bw,9*k);ctx.fillStyle='#ff3040';ctx.fillRect((w-bw)/2,ny+8*k,bw*clamp(b.hp/b.max,0,1),9*k);
-    ctx.textAlign='center';ctx.font=`700 ${12*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),w/2,ny+4*k);ny+=30*k;}
-  PW.hud(t,14,ny+22*k,k);
-  tierMeter(w/2,h-10*k,k*1.1);
+  // PHONE HUD (owner, 13 Oct 2026: "impossible to see"): ONE slim strip on the top edge, nothing else in the middle of the screen.
+  // left: score, multiplier, combo tier + a thin combo bar | right: hull pips + heat | hairline on the very top = district progress.
+  // The district / boss name is only the 2 s banner when it changes. Shield / revive / power-ups are small chips under the strip. Dash + EMP charge live on their touch buttons.
+  const sH=40*k,pad=10*k;ctx.fillStyle='#05030cc8';ctx.fillRect(0,0,w,sH);ctx.fillStyle=D.a+'66';ctx.fillRect(0,sH,w,1.5);
+  ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(0,0,w*(ST.on?ST.frac():G.boss||G.bossDone?1:DIR.frac()),2.5*k);
+  ctx.textAlign='left';ctx.font=`700 ${19*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(sc,pad,19*k);
+  const sw=ctx.measureText(sc).width;ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle=D.b;ctx.fillText(mu,pad+sw+8*k,18*k);
+  {const col=TIERC[T-1],bx=pad+30*k,bw=Math.min(180*k,w*.36),sg=(bw-3*3*k)/TIERS,by=25*k,bh=6*k;
+    ctx.font=`700 ${13*k}px "Chakra Petch",sans-serif`;ctx.fillStyle=col;ctx.fillText('×'+T,pad,32*k);
+    for(let i=0;i<TIERS;i++){const f=i<T-1?1:i===T-1?(T===TIERS?1:(C.n-(T-1)*TS)/TS):0,x=bx+i*(sg+3*k);ctx.fillStyle='#ffffff1c';ctx.fillRect(x,by,sg,bh);ctx.fillStyle=TIERC[i];ctx.fillRect(x,by,sg*f,bh);
+      if(i===T-1&&T===TIERS){ctx.globalAlpha=.3+.4*PUL;ctx.fillStyle='#fff';ctx.fillRect(x,by,sg,bh);ctx.globalAlpha=1;}}
+    if(C.n>0){const left=clamp(1-(G.bc-C.lb+PHF)/(8+SH.ck),0,1);ctx.fillStyle='#ffffff22';ctx.fillRect(bx,by+bh+2*k,bw,2*k);ctx.fillStyle=col;ctx.fillRect(bx,by+bh+2*k,bw*left,2*k);}}
+  {const hw=Math.min(11*k,70*k/P.max),hwid=P.max*(hw+3*k)-3*k,rx=w-pad;ctx.save();ctx.translate(rx-hwid-18*k,3*k);ctx.scale(.62*k,.62*k);ctx.fillStyle=P.hp<=1?'#ff3040':'#3dffb0';ctx.fill(HUDX.iHeart,'evenodd');ctx.restore();
+    for(let i=0;i<P.max;i++){ctx.fillStyle=i<P.hp?(P.hp<=1?'#ff3040':'#3dffb0'):'#ffffff1a';ctx.fillRect(rx-hwid+i*(hw+3*k),6*k,hw,8*k);}
+    const lb=P.over?'OVERHEAT':'HEAT',bwd=64*k;ctx.textAlign='right';ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle=P.over?'#ff3040':'#dcd8f6';ctx.fillText(lb,rx-bwd-5*k,32*k);
+    ctx.fillStyle='#ffffff1a';ctx.fillRect(rx-bwd,25*k,bwd,7*k);ctx.fillStyle=P.over?(SET.reduce||Math.floor(t*10)%2?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(rx-bwd,25*k,bwd*P.heat/100,7*k);}
+  Object.assign(HUDLOG,{x:HUDX.vals()});
+  let ny=sH+6*k;
+  if(G.boss&&G.boss.x<W){const b=G.boss,bw=Math.min(330,w-120);ctx.fillStyle='#00000088';ctx.fillRect((w-bw)/2,ny+12*k,bw,6*k);ctx.fillStyle='#ff3040';ctx.fillRect((w-bw)/2,ny+12*k,bw*clamp(b.hp/b.max,0,1),6*k);
+    ctx.textAlign='center';ctx.font=`700 ${11*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),w/2,ny+9*k);ny+=21*k;}
+  {let cx=pad;const cy=ny+12*k;ctx.save();
+    if(SH.sh>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iShield,'#19e3ff','×'+SH.sh);
+    if(TP.revLeft>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iRev,'#ff2d95','×'+TP.revLeft);
+    ctx.restore();PW.chips(t,cx,cy,k);}
+  HUDX.ship(ctx,P.y,PH_-P.x,k,t,true);
+  {const v=HUDX.vals();setRing($('bDash'),Math.min(1,(v.dash+(v.dash<v.dashMax&&P.dashCd>0?1-clamp(P.dashCd,0,1):0))/v.dashMax),'#19e3ff',v.dashMax>1?v.dash:'');setRing($('bEmp'),P.emp/3,'#ffb020',P.emp>0?P.emp:'');}
   if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
   if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);ctx.textAlign='center';ctx.font=`700 ${17*k}px "Chakra Petch",sans-serif`;{const tw=ctx.measureText(G.hint.txt).width;UIK.bubble(ctx,w/2-tw/2-26*k,h-170*k-28*k,tw+52*k,44*k);}ctx.fillStyle='#fff';ctx.fillText(G.hint.txt,w/2,h-170*k);ctx.globalAlpha=1;}
   if(G.banner.t>0){const kk=G.banner.t,m=G.banner.m,a=Math.min(1,kk*2,(m-kk)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
@@ -3899,7 +3930,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
     ctx.font=`${Math.min(15*k,w/Math.max(20,G.banner.b.length*.62))}px "Share Tech Mono",monospace`;ctx.fillStyle='#e9e6ff';ctx.fillText(G.banner.b,w/2,h/2+26*k);ctx.globalAlpha=1;}
   ctx.restore();}
 
-let PUL=0,PHF=0,FD=0;
+let PUL=0,PHF=0,FD=0,HUDOFF=false;
 function tierGlow(c){const T=tierOf(C.n);c.save();c.globalCompositeOperation='lighter';c.globalAlpha=.012*(T-1)+.02*(T-1)*PUL*FX();c.fillStyle=TIERC[T-1];c.fillRect(0,0,W,H);c.restore();}   // each tier lifts the whole picture a little
 function shotDraw(b,D){const ang=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0;let o,al=.55,sy;      // the ship's own shots stay thinner and dimmer than the lime enemy bullets
   if(b.hv){o=ART.sp('fx-shot-hv',46);al=.8;}
@@ -3944,9 +3975,9 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   if(PT){if(running)FXV.edges(t);
     ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.drawImage(wcv,0,0);                // world, turned so that its right is the screen's up
     ctx.setTransform(VS,0,0,VS,0,0);ctx.drawImage(scanFor(true),0,0,PW_,PH_);
-    if(running)drawHUDP(t);}
+    if(running&&!HUDOFF)drawHUDP(t);}
   else{ctx.drawImage(scanFor(false),0,0,W,H);
-    if(running){FXV.edges(t);drawHUD(t);PW.hud(t);}}}
+    if(running){FXV.edges(t);if(!HUDOFF){drawHUD(t);PW.hud(t);}}}}
 
 /* ---------- menus, settings, flow ---------- */
 const titleEl=$('title'),overEl=$('over'),pauseEl=$('pausem'),setEl=$('setm');
@@ -3973,7 +4004,7 @@ function applyPal(){if(palOn===SET.pal)return;palOn=SET.pal;const th=PALS[SET.pa
   for(const k in BGC)delete BGC[k];for(const k in BGPC)delete BGPC[k];}
 function applySet(){deriveSet();AU.vol();DF=DIFFS[SET.diff]||DIFFS.normal;HARD=HARDS.includes(SET.diff);applyPal();
   stage.classList.toggle('ds-S',SET.dsize==='S');stage.classList.toggle('ds-L',SET.dsize==='L');document.documentElement.classList.toggle('hc',!!SET.hc);
-  $('fpsEl').hidden=!SET.fpsc;fit();
+  $('fpsEl').hidden=!FPSOK();fit();
   if(typeof diffDraw==='function')diffDraw();}
 function setVal(k,v){SET[k]=v;saveSet();applySet();syncSet();}
 const setRows={};
@@ -4010,6 +4041,7 @@ $('setBtn').addEventListener('click',()=>openSettings('title'));
 $('pSetBtn').addEventListener('click',()=>openSettings('pause'));
 buildSettings();
 function setPause(on){if(!running||on===paused)return;paused=on;pauseEl.hidden=!on;
+  if(on){const v=HUDX.vals();$('pStats').textContent=`Hull ${v.hp}/${v.max} · Shield ×${v.sh} · Dash ${v.dash}/${v.dashMax}`+(v.rev?` · Revive ×${v.rev}`:'')+(v.drones?` · Drones ×${v.drones}`:'')+` · Perks ${v.perks} · Upgrades ${v.upg}`;}   // the counters the phone HUD hides while you play
   if(on){AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}
   syncUI();if(on)$('resumeBtn').focus();}
 function start(daily){if(running)return;if(ST.on){startStory(ST.n);return;}AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
@@ -4042,7 +4074,7 @@ let simOn=false;
 let fpsN=0,fpsT=0;
 function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){requestAnimationFrame(loop);return;}   // FPS cap: 30 skips every other frame; 60 holds a 120/144/240 Hz screen to 60-80 draws a second (the game was drawing every refresh)
   let dt=Math.min(.05,raw/1000);last=now;if(simOn){requestAnimationFrame(loop);return;}
-  if(SET.fpsc){fpsN++;if(now-fpsT>500){$('fpsEl').textContent=Math.round(fpsN*1000/(now-fpsT))+' FPS';fpsN=0;fpsT=now;}}
+  if(SET.fpsc){fpsN++;if(now-fpsT>500){$('fpsEl').hidden=!FPSOK();$('fpsEl').textContent=Math.round(fpsN*1000/(now-fpsT))+' FPS';fpsN=0;fpsT=now;}}
   if(CAL.on)calFrame();
   if(!paused)fbT+=dt;
   if(running&&!paused){update(dt);if(raw<1000&&!document.hidden){FPS.n++;FPS.t+=raw;if(raw>FPS.worst)FPS.worst=raw;if(raw>40)FPS.slow++;RSC.feed(raw);}}
@@ -4053,7 +4085,7 @@ function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){req
 applySet();syncSet();requestAnimationFrame(loop);
 document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];});
         // build the other districts' skylines while the title is up
-window.__mnr={ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
+window.__mnr={render,hudBusy,get hudOff(){return HUDOFF},set hudOff(v){HUDOFF=!!v},ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},get TP(){return TP},TP_DEF,HUDX,UBY,PWK,hurt,NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
   get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},MAIN,get K(){return K},startStory,unlockedN:unlocked,sSave,

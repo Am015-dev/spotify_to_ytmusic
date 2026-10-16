@@ -78,7 +78,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-floor{display:flex;align-items:center;gap:6px;margin-top:4px;border-radius:8px;cursor:pointer}
 .bf-floor .bf-fl{padding:1px;border-radius:8px}
 .bf-floor .bf-c{background:#ecd3c7;box-shadow:inset 0 0 0 2px #a8493a}
-.bf-floor .bf-c span{position:absolute;inset:0;display:grid;place-items:center;font:900 calc(var(--cs)*.42) var(--ff);color:#a8302a}
+.bf-floor .bf-c span{position:absolute;inset:0;display:grid;place-items:center;font:900 max(13px,calc(var(--cs)*.42)) var(--ff);color:#a8302a}
 .bf-floor.ok .bf-fl{box-shadow:0 0 0 3px #ff7a4a,0 0 12px 2px rgba(255,110,70,.7)}
 .bf-floor{position:relative}.bf-bd.fbd{left:auto;right:2px}.bf-bd.fbr{left:auto;right:34px}
 .bf-fll{font:italic 700 13px var(--ff);color:#8a4a2a}
@@ -435,7 +435,7 @@ BF.on=PHN.on&&bfWanted();document.documentElement.classList.toggle('bf',BF.on);
  const _pf=phFx;phFx=function(f){if(BF.on)return bfFx(f);return _pf.apply(this,arguments)};
  const _mp=renderMap2D;renderMap2D=function(){if(BF.on){const el=document.getElementById('map2d');if(el)el.hidden=true;return}return _mp.apply(this,arguments)};
  const _st=storyHtml;storyHtml=function(){if(!BF.on)return _st.apply(this,arguments);return `<div class="mbox story bf-story">${storyPic()}<p class="q">Tile the king’s palace wall.<br><b>Most ★ wins.</b></p><div class="acts"><button class="btn go" data-ui="story-ok">Play ▶</button></div></div>`};
- const _sh=startHtml;startHtml=function(){let h=_sh.apply(this,arguments);if(!BF.on)return h;const i=h.indexOf('<h3>Variants</h3>'),j=h.indexOf('</div>',h.indexOf('class="exs"'));if(i<0||j<0)return h;return h.slice(0,i)+'<details class="bf-more"><summary>Options</summary>'+h.slice(i+17,j+6)+'</details>'+h.slice(j+6)};
+ const _sh=startHtml;startHtml=function(){let h=_sh.apply(this,arguments);if(!BF.on)return h;const i=h.indexOf('<h3>Variants</h3>'),j=h.indexOf('</div>',h.indexOf('class="exs"'));if(i<0||j<0)return h;return h.slice(0,i)+'<details class="bf-more" ontoggle="var x=this.querySelector(\'.exs\');if(x)x.hidden=!this.open"><summary>Options</summary>'+h.slice(i+17,j+6).replace('class="exs"','class="exs" hidden')+'</details>'+h.slice(j+6)};
  const _to=toast;toast=function(t){if(!BF.on)return _to.apply(this,arguments)}}
 function bfRender(){if(!BF.on)return;bfEnsure();if(!G){BF.disp=null;bfDraw();return}const fresh=bfSync();
   if(BF.q.length&&!BF.busy&&!UI.modal){bfRun();return}
