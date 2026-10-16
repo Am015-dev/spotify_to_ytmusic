@@ -14,13 +14,12 @@
 }
 // ui-1: taps since page load (rv2k/onboard)
 window.__taps=0;addEventListener('pointerdown',()=>{window.__taps++},true);
-// phone-1 (review 2K-2 #9/#10): phone HUD. 12 px text, score popups in a small feed at the top-right edge (under the ⚙), objective pill
-// inside the screen, race result only once the car has stopped, BOOST beside GAS in portrait, one checklist chip.
+// phone-1: phone HUD (12 px text, popups top-right under ⚙, pill inside screen, result panel after the car stops, BOOST by GAS)
 {const st=document.createElement('style');st.textContent=`
 html body.touch #tB,html body.touch #tN,html body.touch #tD,html body.touch #tF,html body.touch #tG{font-size:15px!important;letter-spacing:0}
 html body.touch #roamCombo small{font-size:12px}
 html body #feed,html body #hitPop,html body #roamCombo{position:fixed;left:auto!important;right:calc(8px + env(safe-area-inset-right,0px))!important;transform:none!important;text-align:right;pointer-events:none;z-index:6;max-width:min(230px,56vw)}
-html body #hitPop{top:calc(100px + env(safe-area-inset-top,0px))!important;font-size:18px!important;-webkit-text-stroke:1px #141413;text-shadow:0 2px 0 #141413;white-space:normal}
+html body #hitPop{top:calc(100px + env(safe-area-inset-top,0px))!important;font-size:18px!important;white-space:normal}
 html body #hitPop.on{animation:phIn .25s ease-out forwards!important}
 html body #roamCombo{top:calc(150px + env(safe-area-inset-top,0px))!important;grid-template-columns:auto auto;justify-content:end}
 html body #roamCombo em{font-size:24px!important}html body #roamCombo b{font-size:18px!important}html body #roamCombo div{width:90px}
@@ -33,8 +32,5 @@ html body.touch #roamArrow,html body.v85 #roamArrow{max-width:calc(100vw - 150px
  html body.touch[data-thr=pedal] #tN{width:clamp(56px,18vw,70px);height:clamp(56px,18vw,70px)}}
 body.phHold #spRes{visibility:hidden;pointer-events:none}
 `;document.head.appendChild(st);
- // result panel only after the car has stopped (hard stop after 4 s so it never stays hidden)
  let t0=0;setInterval(()=>{try{const r=document.getElementById('spRes');if(!r||r.hidden){t0=0;document.body.classList.remove('phHold');return}
-  if(!t0)t0=performance.now();const mv=typeof RO!=='undefined'&&Math.abs(RO.v||0)>1.5&&performance.now()-t0<4000;document.body.classList.toggle('phHold',mv)}catch(e){}},100);
- // one checklist chip: duplicates of the ✓ n/N progress chip outside #odPin are hidden
- setInterval(()=>{try{const P=document.getElementById('odPin');let n=P&&!P.hidden&&getComputedStyle(P).display!=='none'?1:0;for(const e of document.querySelectorAll('body > *:not(#odPin):not(#menu)')){if(e.children.length>3||!/^\s*[✓✔]\s*\d+\/\d+\s*$/.test(e.textContent||''))continue;e.style.display=n++?'none':e.style.display}}catch(e){}},700)}
+  if(!t0)t0=performance.now();const mv=typeof RO!=='undefined'&&Math.abs(RO.v||0)>1.5&&performance.now()-t0<4000;document.body.classList.toggle('phHold',mv)}catch(e){}},100);}
