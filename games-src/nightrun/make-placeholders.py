@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = os.path.dirname(os.path.abspath(__file__)); MEDIA = os.path.normpath(os.path.join(HERE, '..', '..', 'games', 'mainhattan-nightrun', 'media'))
 M = json.load(open(os.path.join(HERE, 'assets-manifest.json')))
 COL = {'Garage kit perks': (255, 90, 61), 'Garage SOON cards': (140, 134, 184), 'Stage medals': (255, 176, 32), 'Difficulty badges': (255, 45, 149), 'Boss chest reveal': (255, 225, 77), 'Enemies': (25, 227, 255),
-       'Effects': (61, 255, 176), 'Planned ships': (192, 138, 255), 'Mini-bosses': (255, 64, 96), 'Portrait parallax': (91, 140, 255)}
+       'Effects': (61, 255, 176), 'Planned ships': (192, 138, 255), 'Mini-bosses': (255, 64, 96), 'Portrait parallax': (91, 140, 255), 'Weapons': (182, 255, 90), 'Weapon fusions': (255, 225, 77)}
 def font(sz):
     for f in ('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', '/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf'):
         if os.path.exists(f): return ImageFont.truetype(f, sz)

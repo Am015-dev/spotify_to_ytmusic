@@ -134,6 +134,11 @@ Commits carry NO attribution lines. If `/dev/null` is a symlink (`ls -la /dev/nu
 - Idle ships already died in ~21-27 s in my stepped sims, so the owner's runs avoided the clock by small nudges: a hop re-anchored and HALVED the counter, and a dash in place reset it. Revives (Second Wind) also refilled the hull after discharge death, and repairs could outrun it.
 - Fix in parts/h.js: 40 px anchor, each hop pays back only 1.2 s, dash in place pays nothing, discharge interval scales with hull (same death clock for any hull), no repair while discharging, last hull point burns revives, aimed hunter shots from the edge while parked (ebCap respected).
 - afk-test.js now also runs story idle (stage 20/42, and a 60 px hop every 2.5 s) with Second Wind, repairs and all power-ups on: dies by 25-34 s. audio-test timing checks fail in this sandbox on the old build too (CPU load).
+## Nightrun weapons and fusions (done, live)
+- Done: 4 new weapons (Arc Chain, Orbit Blades, Ricochet Disc, Mine Layer; parts/g.js WPD/fire1/upd), 28 fusions (FU_RULES table of 9 effects + 12% damage, FU_NAMES), fusion banner on the WEAPONS sheet, fusion name on the HUD chip at stage start, hard player-bullet cap (pbCap in g.js, trim line in b.js), hit hook `WP.hit` in b.js. Switch: `FUSE_ON` in g.js.
+- Art: 8 `wp-<id>.webp` (256) and 28 `fx-fuse-<a>-<b>.webp` (512) in assets-manifest.json with prompts; placeholders made; they also show in NEXT-WAVE.md / next-wave.html (next-wave.py source 5 reads manifest entries that carry a "prompt").
+- Test: `node games-src/nightrun/weapon-test.js` (28 pairs + each weapon alone clears stage 1).
+- Next: owner supplies the pictures (save under the same names, run make-placeholders.py); tune fusion strength after play.
 ## Final Approach + Short Fuse: art wired, deploy blocked by phone-check (13 Oct 2026)
 Wired in source and pushed (skin.css + `fa-art` / `sf-art` scenarios + checklist items); Thornbound and Kaiten Kitchen are live.
 `build-all.py --deploy <slug>` stops at phone-check. **The currently live games fail the same checks** (run `GAMES_DIR=$PWD/games PC_OUT_DIR=/tmp/pc node games-src/scripts/phone-check.js <slug>`), so the new art is not the cause.

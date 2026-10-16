@@ -1,13 +1,13 @@
 # Next wave: everything still to make, with prompts
 
-Generated 2026-10-13 by `python3 games-src/scripts/next-wave.py` (rerun after look-check and wiring-status). Page: https://am015-dev.github.io/spotify_to_ytmusic/next-wave.html
+Generated 2026-10-16 by `python3 games-src/scripts/next-wave.py` (rerun after look-check and wiring-status). Page: https://am015-dev.github.io/spotify_to_ytmusic/next-wave.html
 
 - Replaces `MISSING-ASSETS.md` as the to-make list. Same sources deduped by game + file name: missing items, facelift elements still plain, and the look-check reviewer's findings (`games/look/needs-art.json`).
 - Laptop prompt files (copy `games-src/next-wave/flow-2d` and `flow-3d` into game-assets): `flow-2d/<game>/prompts-wave6[-wide|-43|-34|-tall].json`, same `{"cards": {name: prompt}}` schema, one file per ratio. Card prompts are bare like the earlier waves (the runner puts the game's style block in front); the style block sits in the file under `style`.
 - Music and sound cues: `games-src/next-wave/music/<game>/cues-wave6.json` (2 versions a and b of each, no vocals).
 - Every picture prompt: our own names, no text, letters or numbers in the picture; a UI piece is one object on a plain flat white background. Make at 1024 px or larger; we crop and convert.
 
-**Total 111**: paintings 102, 3D source paintings 0, music/sound 8, video 1.
+**Total 147**: paintings 138, 3D source paintings 0, music/sound 8, video 1.
 
 Plus 1130 wave 7 items (pose sets, 3D variety, art variety): see `games-src/VARIETY-PLAN.md` and the page.
 
@@ -329,7 +329,7 @@ Style block (in front of every picture prompt): Hand-painted gouache illustratio
 - Size/ratio: 1024x1024, ratio 0.51
 - Prompt: Hand-painted gouache illustration for a calm co-operative deep-sea card game, deep blue and teal water, a small warm golden lantern glow as the only strong warm light, soft rim light, visible gentle brush texture on matte paper, slightly wobbly dark navy ink outline, simple readable silhouette that still works at 40 pixels, rich but not neon colours, centred, plenty of margin, no text. a single ttl bg picture, game art for a board game, no text
 
-## Mainhattan Nightrun (`mainhattan-nightrun`): 31
+## Mainhattan Nightrun (`mainhattan-nightrun`): 67
 
 Style block (in front of every picture prompt): Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers
 
@@ -552,6 +552,294 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Save as: `kit-shd.webp` (laptop) -> `games/mainhattan-nightrun/media/kit-shd.webp`
 - Size/ratio: 128x128, ratio 1:1
 - Prompt: Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers. Shield Plating: a cyan shield made of layered armour plates, no text, letters or numbers
+
+### fx-fuse-arc-beat: Weapon fusions: fx-fuse-arc-beat
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Arc Chain + Beat Cannon are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-arc-beat.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-arc-beat.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Thunder Drum": Arc Chain fused with Beat Cannon. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a forked cyan lightning bolt leaping between three glowing nodes, electric sparks meeting a heavy golden shell with a pulsing shockwave ring, thick yellow plasma core, the two colours (electric cyan and golden yellow) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-arc-disc: Weapon fusions: fx-fuse-arc-disc
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Arc Chain + Ricochet Disc are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-arc-disc.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-arc-disc.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Storm Quoit": Arc Chain fused with Ricochet Disc. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a forked cyan lightning bolt leaping between three glowing nodes, electric sparks meeting an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce, the two colours (electric cyan and orange) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-arc-laser: Weapon fusions: fx-fuse-arc-laser
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Arc Chain + Laser Lance are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-arc-laser.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-arc-laser.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Volt Spear": Arc Chain fused with Laser Lance. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a forked cyan lightning bolt leaping between three glowing nodes, electric sparks meeting one long piercing mint-green beam of light with a bright core, cutting through the dark, the two colours (electric cyan and mint green) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-arc-mine: Weapon fusions: fx-fuse-arc-mine
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Arc Chain + Mine Layer are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-arc-mine.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-arc-mine.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Static Field": Arc Chain fused with Mine Layer. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a forked cyan lightning bolt leaping between three glowing nodes, electric sparks meeting a spiked violet mine with a pulsing core and a faint blast ring, drifting, the two colours (electric cyan and violet) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-arc-orbit: Weapon fusions: fx-fuse-arc-orbit
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Arc Chain + Orbit Blades are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-arc-orbit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-arc-orbit.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Halo Spark": Arc Chain fused with Orbit Blades. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a forked cyan lightning bolt leaping between three glowing nodes, electric sparks meeting three lime-green curved blades spinning in a ring around a small glowing core, motion arcs, the two colours (electric cyan and lime green) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-arc-pulse: Weapon fusions: fx-fuse-arc-pulse
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Arc Chain + Pulse Spread are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-arc-pulse.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-arc-pulse.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Fork Flash": Arc Chain fused with Pulse Spread. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a forked cyan lightning bolt leaping between three glowing nodes, electric sparks meeting a fan of pink energy bolts spreading from a small ship nose, magenta and white glow, the two colours (electric cyan and hot pink) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-arc-swarm: Weapon fusions: fx-fuse-arc-swarm
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Arc Chain + Homing Swarm are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-arc-swarm.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-arc-swarm.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Chain Hornets": Arc Chain fused with Homing Swarm. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a forked cyan lightning bolt leaping between three glowing nodes, electric sparks meeting a cluster of small amber missiles curving with glowing trails toward unseen targets, the two colours (electric cyan and amber) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-beat-disc: Weapon fusions: fx-fuse-beat-disc
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Beat Cannon + Ricochet Disc are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-beat-disc.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-beat-disc.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Bass Ricochet": Beat Cannon fused with Ricochet Disc. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a heavy golden shell with a pulsing shockwave ring, thick yellow plasma core meeting an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce, the two colours (golden yellow and orange) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-beat-laser: Weapon fusions: fx-fuse-beat-laser
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Beat Cannon + Laser Lance are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-beat-laser.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-beat-laser.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Kick Lance": Beat Cannon fused with Laser Lance. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a heavy golden shell with a pulsing shockwave ring, thick yellow plasma core meeting one long piercing mint-green beam of light with a bright core, cutting through the dark, the two colours (golden yellow and mint green) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-beat-mine: Weapon fusions: fx-fuse-beat-mine
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Beat Cannon + Mine Layer are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-beat-mine.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-beat-mine.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Subwoofer Trap": Beat Cannon fused with Mine Layer. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a heavy golden shell with a pulsing shockwave ring, thick yellow plasma core meeting a spiked violet mine with a pulsing core and a faint blast ring, drifting, the two colours (golden yellow and violet) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-beat-orbit: Weapon fusions: fx-fuse-beat-orbit
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Beat Cannon + Orbit Blades are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-beat-orbit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-beat-orbit.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Metronome Ring": Beat Cannon fused with Orbit Blades. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a heavy golden shell with a pulsing shockwave ring, thick yellow plasma core meeting three lime-green curved blades spinning in a ring around a small glowing core, motion arcs, the two colours (golden yellow and lime green) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-beat-pulse: Weapon fusions: fx-fuse-beat-pulse
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Beat Cannon + Pulse Spread are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-beat-pulse.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-beat-pulse.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Drop Fan": Beat Cannon fused with Pulse Spread. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a heavy golden shell with a pulsing shockwave ring, thick yellow plasma core meeting a fan of pink energy bolts spreading from a small ship nose, magenta and white glow, the two colours (golden yellow and hot pink) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-beat-swarm: Weapon fusions: fx-fuse-beat-swarm
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Beat Cannon + Homing Swarm are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-beat-swarm.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-beat-swarm.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Bomblet Choir": Beat Cannon fused with Homing Swarm. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a heavy golden shell with a pulsing shockwave ring, thick yellow plasma core meeting a cluster of small amber missiles curving with glowing trails toward unseen targets, the two colours (golden yellow and amber) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-disc-laser: Weapon fusions: fx-fuse-disc-laser
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Ricochet Disc + Laser Lance are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-disc-laser.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-disc-laser.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Mirror Lance": Ricochet Disc fused with Laser Lance. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce meeting one long piercing mint-green beam of light with a bright core, cutting through the dark, the two colours (orange and mint green) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-disc-mine: Weapon fusions: fx-fuse-disc-mine
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Ricochet Disc + Mine Layer are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-disc-mine.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-disc-mine.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Pinball Grave": Ricochet Disc fused with Mine Layer. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce meeting a spiked violet mine with a pulsing core and a faint blast ring, drifting, the two colours (orange and violet) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-disc-orbit: Weapon fusions: fx-fuse-disc-orbit
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Ricochet Disc + Orbit Blades are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-disc-orbit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-disc-orbit.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Saw Carousel": Ricochet Disc fused with Orbit Blades. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce meeting three lime-green curved blades spinning in a ring around a small glowing core, motion arcs, the two colours (orange and lime green) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-disc-pulse: Weapon fusions: fx-fuse-disc-pulse
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Ricochet Disc + Pulse Spread are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-disc-pulse.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-disc-pulse.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Rain Bounce": Ricochet Disc fused with Pulse Spread. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce meeting a fan of pink energy bolts spreading from a small ship nose, magenta and white glow, the two colours (orange and hot pink) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-disc-swarm: Weapon fusions: fx-fuse-disc-swarm
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Ricochet Disc + Homing Swarm are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-disc-swarm.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-disc-swarm.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Boomerang Bees": Ricochet Disc fused with Homing Swarm. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce meeting a cluster of small amber missiles curving with glowing trails toward unseen targets, the two colours (orange and amber) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-laser-mine: Weapon fusions: fx-fuse-laser-mine
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Laser Lance + Mine Layer are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-laser-mine.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-laser-mine.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Tripwire Beam": Laser Lance fused with Mine Layer. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: one long piercing mint-green beam of light with a bright core, cutting through the dark meeting a spiked violet mine with a pulsing core and a faint blast ring, drifting, the two colours (mint green and violet) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-laser-orbit: Weapon fusions: fx-fuse-laser-orbit
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Laser Lance + Orbit Blades are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-laser-orbit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-laser-orbit.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Lantern Spin": Laser Lance fused with Orbit Blades. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: one long piercing mint-green beam of light with a bright core, cutting through the dark meeting three lime-green curved blades spinning in a ring around a small glowing core, motion arcs, the two colours (mint green and lime green) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-laser-pulse: Weapon fusions: fx-fuse-laser-pulse
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Laser Lance + Pulse Spread are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-laser-pulse.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-laser-pulse.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Needle Storm": Laser Lance fused with Pulse Spread. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: one long piercing mint-green beam of light with a bright core, cutting through the dark meeting a fan of pink energy bolts spreading from a small ship nose, magenta and white glow, the two colours (mint green and hot pink) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-laser-swarm: Weapon fusions: fx-fuse-laser-swarm
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Laser Lance + Homing Swarm are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-laser-swarm.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-laser-swarm.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Hunter Needles": Laser Lance fused with Homing Swarm. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: one long piercing mint-green beam of light with a bright core, cutting through the dark meeting a cluster of small amber missiles curving with glowing trails toward unseen targets, the two colours (mint green and amber) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-mine-orbit: Weapon fusions: fx-fuse-mine-orbit
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Mine Layer + Orbit Blades are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-mine-orbit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-mine-orbit.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Satellite Mines": Mine Layer fused with Orbit Blades. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a spiked violet mine with a pulsing core and a faint blast ring, drifting meeting three lime-green curved blades spinning in a ring around a small glowing core, motion arcs, the two colours (violet and lime green) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-mine-pulse: Weapon fusions: fx-fuse-mine-pulse
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Mine Layer + Pulse Spread are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-mine-pulse.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-mine-pulse.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Seed Spray": Mine Layer fused with Pulse Spread. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a spiked violet mine with a pulsing core and a faint blast ring, drifting meeting a fan of pink energy bolts spreading from a small ship nose, magenta and white glow, the two colours (violet and hot pink) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-mine-swarm: Weapon fusions: fx-fuse-mine-swarm
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Mine Layer + Homing Swarm are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-mine-swarm.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-mine-swarm.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Hive Mines": Mine Layer fused with Homing Swarm. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a spiked violet mine with a pulsing core and a faint blast ring, drifting meeting a cluster of small amber missiles curving with glowing trails toward unseen targets, the two colours (violet and amber) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-orbit-pulse: Weapon fusions: fx-fuse-orbit-pulse
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Orbit Blades + Pulse Spread are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-orbit-pulse.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-orbit-pulse.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Comet Crown": Orbit Blades fused with Pulse Spread. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: three lime-green curved blades spinning in a ring around a small glowing core, motion arcs meeting a fan of pink energy bolts spreading from a small ship nose, magenta and white glow, the two colours (lime green and hot pink) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-orbit-swarm: Weapon fusions: fx-fuse-orbit-swarm
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Orbit Blades + Homing Swarm are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-orbit-swarm.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-orbit-swarm.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Wasp Halo": Orbit Blades fused with Homing Swarm. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: three lime-green curved blades spinning in a ring around a small glowing core, motion arcs meeting a cluster of small amber missiles curving with glowing trails toward unseen targets, the two colours (lime green and amber) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### fx-fuse-pulse-swarm: Weapon fusions: fx-fuse-pulse-swarm
+- Why: new weapons and fusions. New weapons and fusions: FUSION banner on the WEAPONS sheet when Pulse Spread + Homing Swarm are equipped (a split ring with initials until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-fuse-pulse-swarm.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-fuse-pulse-swarm.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Fusion "Pollen Burst": Pulse Spread fused with Homing Swarm. Painted look on black, light on black (drawn additively). Paint at 1024 px or larger, we convert to 512x512. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a fusion emblem: a fan of pink energy bolts spreading from a small ship nose, magenta and white glow meeting a cluster of small amber missiles curving with glowing trails toward unseen targets, the two colours (hot pink and amber) braided into one glowing crest, painted neon energy art, light on a pure black background, centred, no text, letters or numbers
+
+### wp-arc: Weapons: wp-arc
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Arc Chain (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-arc.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-arc.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Arc Chain weapon card icon: a forked cyan lightning bolt leaping between three glowing nodes, electric sparks. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a forked cyan lightning bolt leaping between three glowing nodes, electric sparks, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-beat: Weapons: wp-beat
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Beat Cannon (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-beat.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-beat.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Beat Cannon weapon card icon: a heavy golden shell with a pulsing shockwave ring, thick yellow plasma core. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a heavy golden shell with a pulsing shockwave ring, thick yellow plasma core, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-disc: Weapons: wp-disc
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Ricochet Disc (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-disc.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-disc.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Ricochet Disc weapon card icon: an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of an orange razor-edged disc bouncing between two angled neon walls, sparks at each bounce, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-laser: Weapons: wp-laser
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Laser Lance (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-laser.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-laser.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Laser Lance weapon card icon: one long piercing mint-green beam of light with a bright core, cutting through the dark. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of one long piercing mint-green beam of light with a bright core, cutting through the dark, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-mine: Weapons: wp-mine
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Mine Layer (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-mine.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-mine.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Mine Layer weapon card icon: a spiked violet mine with a pulsing core and a faint blast ring, drifting. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a spiked violet mine with a pulsing core and a faint blast ring, drifting, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-orbit: Weapons: wp-orbit
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Orbit Blades (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-orbit.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-orbit.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Orbit Blades weapon card icon: three lime-green curved blades spinning in a ring around a small glowing core, motion arcs. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of three lime-green curved blades spinning in a ring around a small glowing core, motion arcs, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-pulse: Weapons: wp-pulse
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Pulse Spread (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-pulse.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-pulse.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Pulse Spread weapon card icon: a fan of pink energy bolts spreading from a small ship nose, magenta and white glow. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a fan of pink energy bolts spreading from a small ship nose, magenta and white glow, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
+
+### wp-swarm: Weapons: wp-swarm
+- Why: new weapons and fusions. New weapons and fusions: WEAPONS sheet card for Homing Swarm (an animated vector demo until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `wp-swarm.webp` (laptop) -> `games/mainhattan-nightrun/media/wp-swarm.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Homing Swarm weapon card icon: a cluster of small amber missiles curving with glowing trails toward unseen targets. Square, transparent, painted neon look. Paint at 1024 px or larger, we convert to 256x256. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: a game icon of a cluster of small amber missiles curving with glowing trails toward unseen targets, centred single subject on a dark gunmetal bezel, painted neon cyberpunk look, no text, letters or numbers, single object, centred, plain flat white background, no shadow
 
 ## Nebula Aces (`nebula-aces`): 1
 

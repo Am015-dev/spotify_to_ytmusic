@@ -344,6 +344,24 @@ def from_wave7(titles):
                               crop=m.get('thumb', ''), tag=tag, bg=m.get('bg', ''), align=m.get('align', ''), wave=m.get('wave', '')))
     return items
 
+# ---------------------------------------------------------------- source 5: Nightrun asset manifest (entries that carry a "prompt")
+def from_nightrun(titles):
+    slug = 'mainhattan-nightrun'
+    mf = 'games-src/nightrun/assets-manifest.json'
+    if slug not in titles or not os.path.exists(mf): return []
+    try: ready = set(json.load(open(f'games/{slug}/media/ready.json', encoding='utf-8')))
+    except (OSError, ValueError): ready = set()
+    items = []
+    for e in json.load(open(mf, encoding='utf-8')):
+        if not e.get('prompt') or e['file'] in ready: continue
+        stem = e['file'].rsplit('.', 1)[0]
+        fx = e['kind'] == 'fx'
+        items.append(dict(slug=slug, game=titles[slug], kind='art', stem=stem, element=e['group'] + ': ' + stem, files=[e['file']], save_as=e['file'],
+                          repo_target=f"games/{slug}/media/{e['file']}", size=f"{e['w']}x{e['h']}", ratio='1:1', transparent=not fx, prompt=e['prompt'], style='',
+                          why='New weapons and fusions: ' + e['where'], source='nightrun', priority=3,
+                          note=e['notes'] + ' Paint at 1024x1024 or larger; we crop and convert.', crop=''))
+    return items
+
 # ---------------------------------------------------------------- build
 def main():
     shelf = [g for g in GS.shelf_games() if g['slug'] != 'mainhattan-overdrive']  # Overdrive: other sessions own it
@@ -360,6 +378,7 @@ def main():
             all_items += it; drops.update(dr)
     lc, have_lc = from_lookcheck(styles, titles)
     all_items += lc
+    all_items += from_nightrun(titles)
     w7 = from_wave7(titles)
     all_items += w7
     # dedupe by game + stem: keep the highest priority, remember every source
@@ -429,7 +448,7 @@ def write_json_files(items):
         with open(os.path.join(d, name), 'w', encoding='utf-8') as f: json.dump(doc, f, ensure_ascii=False, indent=1); f.write('\n')
 
 KIND_LABEL = {'art': 'painting', 'music': 'music', 'model3d': '3D source painting', 'video': 'video'}
-SRC_LABEL = {'lookcheck': 'look-check finding', 'facelift': 'facelift', 'missing': 'missing', 'wave7': 'wave 7 variety'}
+SRC_LABEL = {'nightrun': 'new weapons and fusions', 'lookcheck': 'look-check finding', 'facelift': 'facelift', 'missing': 'missing', 'wave7': 'wave 7 variety'}
 def write_md(items, titles, have_lc, drops, n7=0):
     L = ['# Next wave: everything still to make, with prompts', '',
          f'Generated {datetime.date.today().isoformat()} by `python3 games-src/scripts/next-wave.py` (rerun after look-check and wiring-status). Page: https://am015-dev.github.io/spotify_to_ytmusic/next-wave.html', '',

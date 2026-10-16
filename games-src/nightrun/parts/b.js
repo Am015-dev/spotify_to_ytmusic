@@ -332,12 +332,13 @@ function update(dt){
       if(e.type==='gate'){hit=Math.abs(b.x-e.x)<14&&(Math.abs(b.y-(e.gy-e.gap/2))<16||Math.abs(b.y-(e.gy+e.gap/2))<16);}
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
       if(hit&&b.px&&b.px.has(e))continue;
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=b.dm*(b.pf?SH.sharp:1)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom('hit-spark',b.x,b.y,30,.16);}AU.sfx('hit');break;}}
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=b.dm*(b.pf?SH.sharp:1)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom('hit-spark',b.x,b.y,30,.16);}AU.sfx('hit');break;}}
     if(b.rc>0&&(b.y<2&&b.vy<0||b.y>H-2&&b.vy>0)){b.vy=-b.vy;b.rc--;b.y=clamp(b.y,3,H-3);if(b.px)b.px.clear();}
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}
   G.pb=G.pb.filter(b=>!b.dead);
   {const cap=touchUI||rotMode?44:64;let over=G.pb.length-cap;if(over>0)for(const b of G.pb){if(over<=0)break;if(!b.big&&!b.pf){b.dead=1;over--;}}G.pb=G.pb.filter(b=>!b.dead);}   // player bullets alive at once: the oldest side/spray shots go first (aimed, big and on-beat shots stay), so no weapon fills the screen
+  if(G.pb.length>pbCap())G.pb.splice(0,G.pb.length-pbCap());   // player-bullet cap (g.js): the oldest shots go first
   for(const e of G.en){if(e.type==='boss'&&e.floor>0&&e.hp<e.floor){e.hp=e.floor;if(!(e.lk>0)){e.lk=.35;if(!e.armN||G.t-e.armN>6){e.armN=G.t;floater(e.x,e.y-e.r-18,'ARMOUR','#19e3ff');}}}
     if(e.lk>0)e.lk-=dt;
     if(e.hp<=0&&!e.dead){e.dead=1;if(e.type==='boss')bossDown(e);else kill(e);}
