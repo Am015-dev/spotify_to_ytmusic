@@ -1,0 +1,5 @@
+# HANDOFF flow1 (2026-10-16)
+1. Markers: a card opens only when stopped (< 15 km/h, was 25); moving past one shows only the pill "<name> · stop to start · TAP TO OPEN". Side-quest cards lose the long brief, quote capped at 25 words (src/71_roam_drive.js). rv2k2/cardstop PASS, rv2k/card PASS on built page; unit 0 FAIL.
+2. Athens slow cause (pace GO now prints km/h every 4 s): bot hits ~95 km/h, then rear-ends slower/stopped traffic cars (equal-mass bump, rel speed < 60 km/h does not smash), slows to 0, and the old 25 km/h rule then opened a card that parked it at 0 for the rest of the run (avg 15-41 km/h).
+3. NOT fixed: rv2k2/pace still < 90 km/h in Athens (traffic, not cards, is the limiter). A bot swerve-around-traffic try made the drive never finish, reverted. Next: traffic yield/lane-clear ahead of the player, or lower the smash threshold.
+4. Not run: rv2k/objectives (flaky 3>2 widgets before), the Athens driving shot (no shot in docs/shots/flow1). xf1/grass failed once with tyre float 0.11, not touched by this change; life1/ath-density SLOW only.

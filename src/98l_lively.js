@@ -21,8 +21,8 @@ function LV_pn(n){return Math.min(n,LV_walk(n)+(LV.cl?LV_crowdN():0))}
 // wave: arms up and waving when the car passes within 16 m (2 of 3 people), never while leaping
 const LV_wave=(i,d,sp)=>TUNE.lvWave&&LV_d('lvPed')>0&&d<16&&sp>4&&i%3!==0;
 // traffic: cars further than 300 m are moved to streets 100-260 m around, half of them ahead (was 650 / 480 m → 180-480 m, behind)
-function LV_trFar(){const d=LV_d('lvTraf');return d<=0?(CID==='fra'?650:480):240}
-function LV_trNear(){const d=LV_d('lvTraf');return d<=0?(CID==='fra'?hubNear(180,480,true):hubNear(130,400,true)):R()<.65?LV_nearHid(70,200):hubNear(90,220,true)}
+function LV_trFar(){const d=LV_d('lvTraf');return d<=0?(CID==='fra'?650:480):(CID==='fra'?240:160)/* burst-1: Athens keeps traffic closer */}
+function LV_trNear(){const d=LV_d('lvTraf');return d<=0?(CID==='fra'?hubNear(180,480,true):hubNear(130,400,true)):R()<.65?LV_nearHid(60,CID==='fra'?200:150):hubNear(80,CID==='fra'?220:170,true)}
 // v88p: a street node 70-200 m ahead that the camera cannot see right now (no pop-in), so cars drive into view 20-60 m ahead
 function LV_nearHid(min,max){let i=-1;for(let k=0;k<6;k++){i=LV_near(min,max,1);if(i<0)return i;const n=HUB.nodes[i];if(!LV_seen(n.x,n.y||RO.y||0,n.z))return i}return i}
 // ---------- 6 · bolder facade colours: the district tints (90 CV_FP) were near-white pastels; mixed toward LEGO colours by TUNE.lvFac (read once, at city build)

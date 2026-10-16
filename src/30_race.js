@@ -121,7 +121,14 @@ function buildDebris(){const n=320,im=new THREE.InstancedMesh(brickGeo(),new THR
 function debris(at,vel,n,cols,size=1,floor){if(!DEB)return;for(let k=0;k<n;k++){const i=DEB.next;DEB.next=(DEB.next+1)%DEB.n;const j=DEB.list.findIndex(o=>o.i===i);if(j>=0)DEB.list.splice(j,1);
     DEB.list.push({i,p:at.clone().add(V3(rr(-1.2,1.2),rr(0,1),rr(-1.2,1.2))),v:vel.clone().add(V3(rr(-11,11),rr(5,17),rr(-11,11))),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-10,10),rr(-10,10),rr(-10,10)),
       s:V3(rr(.45,.9),rr(.35,.65),rr(.45,.9)).multiplyScalar(size),life:rr(2.4,4),floor:floor??at.y-1.2});DEB.im.setColorAt(i,cols[k%cols.length])}DEB.im.instanceColor.needsUpdate=true}
-function updDebris(dt){if(!DEB)return;const L=DEB.list;for(let j=L.length-1;j>=0;j--){const d=L[j];d.life-=dt;if(d.life<=0){_m.makeScale(0,0,0);DEB.im.setMatrixAt(d.i,_m);L.splice(j,1);DEB.dirty=true;continue}
+// burst-1: transform celebration. A fresh instanced-brick group per swap (named brickfx_burst), 0.3 s life, shared geometry, disposed on expiry.
+const XFB=[];let XFB_GEO=null;
+function xfBurst(at,cols){if(!XFB_GEO)XFB_GEO=brickGeo();const n=16,im=new THREE.InstancedMesh(XFB_GEO,new THREE.MeshStandardMaterial({color:0xffffff,roughness:.32,metalness:.05,transparent:true}),n);im.name='brickfx_burst';im.frustumCulled=false;
+  const L=[];for(let i=0;i<n;i++){im.setColorAt(i,cols[i%cols.length]);const a=i/n*6.283+rr(-.2,.2);L.push({p:at.clone(),v:V3(Math.cos(a)*rr(7,13),rr(5,11),Math.sin(a)*rr(7,13)),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-14,14),rr(-14,14),rr(-14,14)),k:rr(.35,.6)})}
+  scene.add(im);XFB.push({im,L,t:0});AU.sfx('whoosh');shake=Math.max(shake,.22)}
+function updXfb(dt){for(let j=XFB.length-1;j>=0;j--){const b=XFB[j];b.t+=dt;if(b.t>=.34){scene.remove(b.im);b.im.material.dispose();b.im.dispose();XFB.splice(j,1);continue}
+    const f=1-b.t/.34;b.im.material.opacity=Math.min(1,f*2.2);for(let i=0;i<b.L.length;i++){const d=b.L[i];d.v.y-=22*dt;d.p.addScaledVector(d.v,dt);_e2.set(d.w.x*dt,d.w.y*dt,d.w.z*dt);d.q.multiply(_q2.setFromEuler(_e2));_m.compose(d.p,d.q,_s2.setScalar(d.k*(.4+.6*f)));b.im.setMatrixAt(i,_m)}b.im.instanceMatrix.needsUpdate=true}}
+function updDebris(dt){updXfb(dt);if(!DEB)return;const L=DEB.list;for(let j=L.length-1;j>=0;j--){const d=L[j];d.life-=dt;if(d.life<=0){_m.makeScale(0,0,0);DEB.im.setMatrixAt(d.i,_m);L.splice(j,1);DEB.dirty=true;continue}
     d.v.y-=32*dt;d.p.addScaledVector(d.v,dt);if(d.p.y<d.floor){d.p.y=d.floor;if(d.v.y<0)d.v.y*=-.32;d.v.x*=.72;d.v.z*=.72;d.w.multiplyScalar(.65)}
     _e2.set(d.w.x*dt,d.w.y*dt,d.w.z*dt);d.q.multiply(_q2.setFromEuler(_e2));_m.compose(d.p,d.q,_s2.copy(d.s).multiplyScalar(d.life<.6?d.life/.6:1));DEB.im.setMatrixAt(d.i,_m)}
   if(L.length||DEB.dirty){DEB.im.instanceMatrix.needsUpdate=true;DEB.dirty=false}}
@@ -183,6 +190,7 @@ const AU={a:null,muted:store.get('mho_mute',false),
   scrape(on){if(this.a)this.scr.g.gain.setTargetAtTime(on?.18:0,this.a.currentTime,.03)},
   sfx(n){const a=this.a;if(!a)return;const t=a.currentTime,F=this.fx;switch(n){
     case'beep':this.osc(t,'square',660,.18,.16,F);break;case'go':this.osc(t,'square',990,.5,.18,F);this.osc(t,'square',1485,.5,.08,F);break;
+    case'whoosh':this.noise(t,.32,.34,700,F,'bandpass');this.noise(t+.04,.26,.22,2200,F,'bandpass');this.osc(t,'sawtooth',this.f(120),.28,.1,F,420);break;
     case'brick':for(let i=0;i<6;i++)this.noise(t+i*.032+Math.random()*.01,.028,.32,2600+Math.random()*2200,F,'bandpass');this.osc(t+.2,'triangle',this.f(96),.08,.12,F);break;
     case'pick':this.osc(t,'triangle',this.f(84),.1,.2,F);this.osc(t+.05,'triangle',this.f(91),.14,.18,F);break;
     case'rocket':for(let i=0;i<3;i++)this.osc(t+i*.08,'sawtooth',700,.18,.12,F,120);break;

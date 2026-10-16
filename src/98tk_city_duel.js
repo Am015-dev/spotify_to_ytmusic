@@ -4,7 +4,7 @@
    The builder tries a few headings / widths and keeps the pair of routes with the smallest time spread (rival speed model, turbo pads go on the slower route), ≤ 5 %.
    Courses marked off:1 send route B straight across the nearest park (grass: the car turns into the off-road buggy by itself, 98xf_xform.js).
    Brick checkpoint arches, ≥ 2 ramps on each route, "?" item bricks that fire on pickup (no extra button: TURBO / BRICK BLAST / SHIELD), rivals use the same bricks and routes.
-   Fair rivals: rubber band both ways, a blast is announced 0.7 s ahead and can hit you at most once per 8 s. Hands-off: DNF 40 s after the last rival finishes or at 235 s.
+   Fair rivals: rubber band both ways, a blast is announced 0.7 s ahead and can hit you at most once per 8 s. Hands-off: DNF 40 s after the last rival finishes or at 235 s (?fair=1: tkGrace, 25 s after the first).
    Rides on the city-sprint engine (70_roam_world.js). ?tk1=0 = old spline tracks. GO: tk1/route-spread, tk1/items, tk1/courses(-ath), rv2k/race-handsoff. */
 const TK={on:(()=>{try{return new URLSearchParams(location.search).get('tk1')!=='0'}catch(e){return true}})(),last:null,C:null,built:{}};
 const TK_C={id:'tk_rossi',key:'rival:ROSSI',kind:'rival',ai:['ROSSI'],p:'ROSSI',name:'Westend Split',nA:'Anlagenring',nB:'Neue Mainzer Str.',
@@ -119,12 +119,20 @@ function tkPath(a){const G=tkGeo();return a.route==='B'?G.pB:G.pA}
 function tkPosOn(P,s){let cum=0;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(s<=cum+L||i===P.length-1){const t=clamp((s-cum)/(L||1),0,1),n=P[i+1],turn=n?Math.abs(angDiff(Math.atan2(n[0]-b[0],n[1]-b[1]),Math.atan2(b[0]-a[0],b[1]-a[1]))):0;return{x:a[0]+(b[0]-a[0])*t,z:a[1]+(b[1]-a[1])*t,h:Math.atan2(b[0]-a[0],b[1]-a[1]),toCorner:cum+L-s,turn}}cum+=L}}
 // rival speed model, shared by the race and GO tk1/route-spread: base speed, slow for sharp corners, turbo pads on the pad route
 function tkAiTarget(a,P,s){const q=tkPosOn(P,Math.max(0,s));let tv=a.base;if(q.turn>.5&&q.toCorner<55)tv=Math.min(tv,30);else if(q.turn>.25&&q.toCorner<45)tv=Math.min(tv,44);const C=TK.C||TK_C;if(C.boost&&a.route===C.boost.r&&TK.sp&&TK.sp.padT>0)tv*=1.25;return tv}
+// fair-1 (2026-10-16): pace band, as in 2K Drive / Mario Kart. The rival's speed model is scaled to the player's car (TK_PACE: base 62 -> 31 m/s, the car tops out ~31)
+// and pulled toward a target gap that moves with your progress: it leads early, lets you by, comes back, then trails you into the finish, so a clean race is close and
+// winnable, while a crash still costs (it waits less near the end). Over 400 m apart (you stopped) the band lets go. Without ?fair=1: old pace (base 62, ±10 % past 150 m, DNF +40 s).
+const TK_FAIR=(()=>{try{return new URLSearchParams(location.search).get('fair')==='1'}catch(e){return false}})(),TK_PACE=.5;   // WIP: OFF until rv2k2/close passes (?fair=1 on)
+function tkGapT(pr,i){const k=[[0,30],[.25,30],[.35,-30],[.5,-30],[.6,25],[.72,25],[.82,-40],[1,-40]];let j=1;while(j<k.length-1&&pr>k[j][0])j++;const a=k[j-1],b=k[j];return a[1]+(b[1]-a[1])*clamp((pr-a[0])/(b[0]-a[0]),0,1)-i*20}
+function tkRub(gap,pr,i){if(!TK_FAIR)return gap>150?.9:gap<-150?1.1:1;if(Math.abs(gap)>400)return 1;const e=gap-tkGapT(pr,i),fin=pr>.82;return e>0?1-(fin?.25:.45)*Math.min(1,e/120):1+(fin?.06:.3)*Math.min(1,-e/100)}
+// DNF: relative to the first rival home and generous: you get the time your own average pace needs to finish (+10 s), 30 s at least, up to the winner's whole time again.
+function tkGrace(sp,firstFin,len){if(!TK_FAIR)return 40;const v=sp.myS/Math.max(1,sp.t);return v>4?clamp((len-sp.myS)/v+10,30,Math.max(30,firstFin)):25}
 function tkFire(who,kind,sp,ai){const lead=sp.ai.filter(b=>b.fin==null&&b.s>sp.myS-20&&b.s-sp.myS<220).sort((x,y)=>x.s-y.s)[0];
   if(who==='me'){if(kind==='TURBO'){RO.v=Math.max(RO.v,0)+20;RO.turbo=Math.max(RO.turbo||0,1.5);if(pl)pl.bm=100;fovKick=Math.max(fovKick,12);AU.sfx('nitro')}
     else if(kind==='SHIELD'){sp.shieldT=6;AU.sfx('pick')}
     else{if(lead){lead.stun=1.2;lead.v*=.35;feed('BRICK BLAST · '+lead.name,250,'#ff2d95');AU.sfx('crash')}else feed('BRICK BLAST · missed',0,'#9fb0c0')}
     feed(kind,0,'#c46bff');return}
-  const a=ai||sp.ai[0];if(kind==='TURBO'){a.v+=16;return}if(kind==='SHIELD')return;
+  const a=ai||sp.ai[0];if(kind==='TURBO'){a.v+=TK_FAIR?9:16;return}if(kind==='SHIELD')return;
   // rival blast: telegraphed, needs you ahead, one hit per 8 s, a shield blocks it
   if(sp.myS>a.s&&sp.myS-a.s<160&&sp.hitCd<=0&&sp.warn==null){sp.warn=.7;say('','⚠ '+a.name.toUpperCase()+' · BRICK BLAST',.7)}}
 function tkStep(dt){const sp=RO.sp,e=sp.e;TK.C=sp.C;const G=tkGeo();RO.cool=2;TK.sp=sp;
@@ -139,16 +147,16 @@ function tkStep(dt){const sp=RO.sp,e=sp.e;TK.C=sp.C;const G=tkGeo();RO.cool=2;TK
   for(const it of sp.items){it.cd=Math.max(0,it.cd-dt);it.g.visible=it.cd<=0;it.g.rotation.y+=dt*2;if(it.cd>0||sp.cd>0)continue;
     if(Math.hypot(it.x-RO.x,it.z-RO.z)<4.5){it.cd=3;tkFire('me',TK_ITEMS[(sp.items.indexOf(it)+Math.floor(sp.t))%3],sp);sp.fired=(sp.fired||0)+1}}
   const C=sp.C;for(const a of sp.ai){const P=tkPath(a),Lp=tkLen(P);if(a.fin!=null&&a.s>=Lp+40)continue;a.stun=Math.max(0,a.stun-dt);a.itemCd=Math.max(0,a.itemCd-dt);
-    const gap=a.s/Lp*G.lenA-sp.myS,rub=gap>150?.9:gap<-150?1.1:1;let tv=tkAiTarget(a,P,a.s)*rub;if(sp.cd>0||a.stun>0)tv=0;
+    const gap=a.s/Lp*G.lenA-sp.myS,rub=tkRub(gap,sp.myS/G.lenA,sp.ai.indexOf(a));let tv=tkAiTarget(a,P,a.s)*(TK_FAIR?TK_PACE:1)*rub;if(sp.cd>0||a.stun>0)tv=0;
     if(C.boost&&a.route===C.boost.r){const q=tkPosOn(P,a.s);if(sp.pads.some(p=>Math.hypot(q.x-p.x,q.z-p.z)<8))sp.padT=1.5}
     a.v+=(tv-a.v)*Math.min(1,dt*(tv>a.v?1.6:2.5));a.s+=a.v*dt;if(a.s>=Lp&&a.fin==null){a.fin=sp.t;say('',a.name.toUpperCase()+' FINISHED',1.2)}
     const q=tkPosOn(P,Math.max(0,a.s)),x=q.x+Math.cos(q.h)*a.lane,z=q.z-Math.sin(q.h)*a.lane;
     if(a.itemCd<=0)for(const it of sp.items)if(it.cd<=0&&Math.hypot(it.x-x,it.z-z)<5){it.cd=3;a.itemCd=4;tkFire('ai',TK_ITEMS[(sp.items.indexOf(it)+1)%3],sp,a);break}
     a.y=groundAt(x,z,(a.y??0)+3);a.h=(a.h??q.h)+angDiff(q.h,a.h??q.h)*Math.min(1,dt*4);a.g.position.set(x,a.y,z);a.g.rotation.y=a.h+Math.PI;const ud=a.g.userData,wet=C.water&&typeof inRiver==='function'&&inRiver(x,z,0);if(wet)sp.aiWet=(sp.aiWet||0)+1;if(ud.boat&&ud.carG){ud.boat.visible=!!wet;ud.carG.visible=!wet}if(ud.m)ud.m.position.y=1.6+Math.sin(T*6)*.1;if(ud.ribbons)for(const rb of ud.ribbons){rb.scale.z=6+a.v/8;rb.material.uniforms.uT.value=T}
     const d=Math.hypot(x-RO.x,z-RO.z);if(d<5.5&&d>.01&&Math.abs(a.y-RO.y)<3){const k=(5.5-d)/2;RO.x+=(RO.x-x)/d*k;RO.z+=(RO.z-z)/d*k;a.v*=.92;RO.v*=.95;AU.sfx('bump')}}
-  const n=sp.ai.length,ahead=sp.ai.filter(a=>a.fin!=null||a.s/tkLen(tkPath(a))*G.lenA>sp.myS).length,lastFin=sp.ai.every(a=>a.fin!=null)?Math.max(...sp.ai.map(a=>a.fin)):null;sp.place=1+ahead;
-  if(!sp.done&&sp.cd<=0&&(sp.t>=235||(lastFin!=null&&sp.t-lastFin>=40)))return tkFinish(true);
-  sp.hud=`<b>🏁 ${e.name.toUpperCase()}</b><span>POS ${sp.place}/${n+1} · CP ${Math.min(sp.gi,sp.G.length)}/${sp.G.length} · ${fmt(Math.max(0,sp.t))}${sp.shieldT>0?' · 🛡':''}${lastFin!=null?' · DNF in '+Math.ceil(40-(sp.t-lastFin))+' s':''}</span>`}
+  const n=sp.ai.length,ahead=sp.ai.filter(a=>a.fin!=null||a.s/tkLen(tkPath(a))*G.lenA>sp.myS).length,lastFin=TK_FAIR?(sp.ai.some(a=>a.fin!=null)?Math.min(...sp.ai.filter(a=>a.fin!=null).map(a=>a.fin)):null):sp.ai.every(a=>a.fin!=null)?Math.max(...sp.ai.map(a=>a.fin)):null;sp.place=1+ahead;
+  const grace=lastFin!=null?tkGrace(sp,lastFin,G.lenA):0;if(!sp.done&&sp.cd<=0&&(sp.t>=(TK_FAIR?420:235)||(lastFin!=null&&sp.t-lastFin>=grace)))return tkFinish(true);
+  sp.hud=`<b>🏁 ${e.name.toUpperCase()}</b><span>POS ${sp.place}/${n+1} · CP ${Math.min(sp.gi,sp.G.length)}/${sp.G.length} · ${fmt(Math.max(0,sp.t))}${sp.shieldT>0?' · 🛡':''}${lastFin!=null?' · DNF in '+Math.ceil(grace-(sp.t-lastFin))+' s':''}</span>`}
 function tkFinish(dnf){const sp=RO.sp,C=sp.C,n=sp.ai.length;sp.done=true;const place=dnf?n+1:1+sp.ai.filter(a=>a.fin!=null&&a.fin<sp.t).length,won=place===1;
   const stars=C.kind==='sprint'||C.kind==='quick'?(place===1?3:place===2?2:place===3?1:0):won?(sp.t<120?3:2):0,a=sp.ai[0];
   TK.last={key:C.key,place,t:+sp.t.toFixed(1),dnf,stars,rival:a.fin,route:a.route,fired:sp.fired||0};
