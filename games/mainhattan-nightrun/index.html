@@ -213,7 +213,7 @@ function G_(x,y,r,col,a=1){ctx.globalAlpha=a;ctx.drawImage(glow(col),x-r,y-r,r*2
 function load(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 let best=load('mnr_best',{score:0,dist:''});
-const todayN=()=>{const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
+const todayN=()=>{const d=(window.RET&&RET.daily&&RET.clock)?new Date(RET.clock()):new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 // every setting, its default and (in c.js) its row in the settings panel. Saved under mnr_set, applied live by applySet().
@@ -954,7 +954,7 @@ function beatPump(){const p=bpos(),q=Math.floor(p*4);G.bp=p;
 function onTick(i){const e=G.boss;if(e&&((i%4)+4)%4===0&&e.x<=bossX()&&e.pc>=0&&e.lists[e.ph-1][e.pi%e.lists[e.ph-1].length]==='spiral'&&!G.dead){
   const sp=e.ph===3?1.1:1;e.sa+=.9;const arms=3+(ST.on?(ST.lvl>=6)+(ST.lvl>=10):0)+(DF.el?1:0);eb.src=e;for(let j=0;j<arms;j++)eb(e.x,e.y,e.sa+j*6.2832/arms,(150+10*diff())*sp,'#ff3dbb',5);eb.src=null;}}
 function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit('bar',{i,bar:i/4});
-  if(C.n>0&&G.bc-C.lb>8+SH.ck)tierDrop('idle');                    // the tier slips one step after 8 beats without a gain
+  if(C.n>0&&G.bc-C.lb>8+SH.ck-(window.HEAT?HEAT.td:0))tierDrop('idle');                    // the tier slips one step after 8 beats without a gain
   if(!G.dead&&!ST.over)DIR.beat(i);                     // the director spawns the waves (phrases of the song, density follows its loudness)
   if(G.dead)return;
   for(const e of G.en){
@@ -982,7 +982,7 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e
     case'fan9':if(c%cad===0)fan(e,9,1.5,(190+15*d)*sp,c2);break;
     case'ring':if(c%cad===0){ring(e,14+2*Math.min(e.k,3),(140+10*d)*sp,e.cnt*.21,'#ff3dbb');e.cnt++;}break;
     case'summon':if(c===0||c===4||(e.ph===3&&(c===2||c===6))){en('drone',{x:W+20,y:gx(60,H-100),amp:40,ph:gx(0,6)});en('charger',{x:W+60,y:gx(60,H-100)});}break;
-    case'laser':if(c%(ST.on&&ST.lvl>=8||DF.el?2:3)===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}
+    case'laser':if(c%(ST.on&&ST.lvl>=8&&!(window.RET&&RET.walls)||DF.el?2:3)===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}
   eb.src=null;e.arm=bossNext(e);}
 // what the boss fires on the beat k beats from now (k>=1): {t:'fan',n,sp,spd} / {t:'ring',n,spd,off} / {t:'spiral'} / null. bossBeat fires exactly this; the safe-path check plans against it.
 function bossShot(e,k){let pc=e.pc+k,pi=e.pi;const list=e.lists[e.ph-1];if(pc<0)return null;while(pc>=8){pc-=8;pi=(pi+1)%list.length;}
@@ -999,7 +999,7 @@ function bossNext(e){if(e.x>bossX()||G.dead)return false;const list=e.lists[e.ph
   const cad=e.ph===3?1:2;switch(list[pi%list.length]){
     case'fan5':case'fan7':case'fan9':case'ring':return pc%cad===0;
     case'summon':return pc===0||pc===4||(e.ph===3&&(pc===2||pc===6));
-    case'laser':return pc%(ST.on&&ST.lvl>=8||DF.el?2:3)===0;
+    case'laser':return pc%(ST.on&&ST.lvl>=8&&!(window.RET&&RET.walls)||DF.el?2:3)===0;
     case'spiral':return true;}
   return false;}
 
@@ -1747,7 +1747,8 @@ const ACTN=['ACT I','ACT II','ACT III','ACT IV','ACT V'];
 const stLenC=s=>{const b=songBars(s.song);return s.ch?Math.round(b*.6):b;};
 const stLen=s=>ARC.bars(s,stLenC(s));   // stage length in bars = its song (a challenge is 60% of it)
 const stK=s=>stLen(s)/46;                                 // the old goals were made for 46 bars: they scale with the length
-const stKill=s=>Math.round(s.goal.v*stK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
+const wallK=s=>window.RET&&RET.walls&&!s.ch?(RET.wallKill[s.n]||(ARC.active()?RET.wallKill.all:RET.wallKill.classic)):1;   // RET.walls: a kill goal is cut so the stage ends with its song
+const stKill=s=>Math.round(s.goal.v*stK(s)*wallK(s)/10)*10,stScore=s=>Math.round(s.goal.v*stK(s)/5000)*5000,stPerf=s=>Math.round(s.perf*stK(s));
 const stS3=s=>Math.round(s.s3*stK(s)/5000)*5000;
 const goalTxt=s=>{const g=s.goal;return s.ch==='nohit'?'NO HIT · '+stLen(s)+' BARS':s.ch==='perfect'?'PERFECT '+stPerf(s)+' · '+stLen(s)+' BARS':s.ch==='speed'?'KILL '+stKill(s)+' IN '+Math.round(stLen(s)*s.tb)+' BARS':g.k==='survive'?'SURVIVE '+stLen(s)+' BARS':g.k==='kill'?'KILL '+stKill(s):g.k==='score'?'SCORE '+(stScore(s)/1000)+'K':g.k==='mini'?'MINI-BOSS':'BOSS';};
 /* the three stars of a stage: [clear, PERFECT target, no hull lost (challenges: a score)] as plain lines */
@@ -1755,14 +1756,14 @@ const starTxt=s=>[s.ch?'Clear the challenge':'Clear the stage',(s.ch==='perfect'
 const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd','hm','ck','dc','fr','sh','mg','wd','hm','ck','dc','sh','hm','wd','ck','fr','sh','mg','wd'];   // what a player who jumped straight to a stage gets (about what a normal run would have bought)
 
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
-  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def))-(window.RET&&RET.mercy?RET.mercyLvl(n):0);   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
+  setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def))-(window.RET&&RET.mercy&&!(window.HEAT&&HEAT.lv(n))?RET.mercyLvl(n):0)+(window.HEAT?HEAT.lvK*HEAT.lv(n):0);   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
     this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=(1+TUNE.eh*L)*dmOf().hp;
-    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1]+(window.RET&&RET.mercy?RET.mercyHull(n):0);
+    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1]+(window.RET&&RET.mercy&&!(window.HEAT&&HEAT.lv(n))?RET.mercyHull(n):0);
     this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;
     const df=this.def;this.len=stLen(df);this.kv=stKill(df);this.sv=stScore(df);this.pn=stPerf(df);   // stage = song length; boss in its last 32 bars (mini-boss: 14)
     this.lead=df.goal.k==='boss'?Math.max(20,this.len-BOSS_BARS):df.goal.k==='mini'?Math.max(20,this.len-MINI_BARS):0;
     this.dk=TUNE2.stDk;
-    this.ch=df.ch||'';this.s3=df.ch?stS3(df):0;this.tb=df.ch==='speed'?Math.round(this.len*df.tb):0;this.why='';},
+    this.ch=df.ch||'';this.s3=df.ch?stS3(df):0;this.tb=df.ch==='speed'?Math.round(this.len*df.tb):0;this.why='';if(window.HEAT)HEAT.apply(this);},   // B8 Heat mutators (ret.js)
   kit(n){const k=Math.floor((n-1)*.8),got={};for(let i=0;i<k;i++){const id=KIT[i];got[id]=(got[id]||0)+1;}return got;},
   snapFor(n){const f=STAGES[n-1].from||n,sn=sSave.snap[f];return sn?Object.assign({},sn):this.kit(f);},   // a challenge starts with what you had when you reached the stage that opens it
   // the new run has just been created: put this stage's district, hull and upgrades in place
@@ -1945,11 +1946,13 @@ function mapDetail(n){const el=$('stDet');if(!el)return;if(!(n>0)){el.hidden=tru
   el.innerHTML=`<div class="dh"><span class="ac">${s.ch?'CHALLENGE':ACTN[s.act]+' · '+D.name}</span><span class="bs">${ok?'BEST '+'★'.repeat(k)+'☆'.repeat(3-k):''}</span><button class="x" id="stDx" type="button" aria-label="Close">✕</button></div>`
    +`<div class="dm">${bn?`<img class="bp" src="media/boss-${slugOf(bn)}.webp" alt="" onerror="this.remove()">`:''}<div class="dt"><div class="nm">${s.n<=MAIN?s.n+' · ':''}${s.name}</div><div class="gl">${goalTxt(s)}</div>${s.ch?`<div class="rl">${CHRULE[s.ch]}</div>`:''}</div></div>`
    +(RET.arcade&&!s.ch?`<div class="arc" role="group" aria-label="Stage length"><button type="button" id="arcA" class="${ARC.on?'on':''}">ARCADE <small>~3 MIN</small></button><button type="button" id="arcC" class="${ARC.on?'':'on'}">CLASSIC <small>FULL SONG</small></button></div>`:'')
+   +(window.HEAT?HEAT.row(n):'')
    +`<div class="stl">${lines.map((t,i)=>`<div class="${k>i?'ok':''}"><span>${k>i?'★':'☆'}</span> ${t}</div>`).join('')}</div>`
    +(rec?`<div class="tip">${rec}</div>`:'')
    +(ok?'':`<div class="lkn">Clear ${need||'the stage before'} first</div>`)
    +`<button class="go" id="stPlay" type="button"${ok?'':' disabled'}>${ok?(k?'PLAY AGAIN':'PLAY'):'LOCKED'}</button>`;
   if($('arcA')){$('arcA').addEventListener('click',()=>{ARC.set(true);mapDetail(n);});$('arcC').addEventListener('click',()=>{ARC.set(false);mapDetail(n);});}
+  if(window.HEAT)HEAT.bind(n);
   $('stPlay').addEventListener('click',()=>{if(unlocked(n))startStory(n);});
   $('stDx').addEventListener('click',()=>{MAPD.sel=-1;for(const e of document.querySelectorAll('#stRows .nd.sel'))e.classList.remove('sel');el.hidden=true;});}
 function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=-1;stDraw();}
@@ -3192,6 +3195,123 @@ const ARC={secs:150,leadSecs:44,maxBars:80,on:load('mnr_arc',1)!==0,
   label(){return this.active()?'ARCADE · ~3 MIN':'CLASSIC · FULL SONG';}};
 window.ARC=ARC;
 
+/* ===== WALLS: difficulty cliffs removed (BALANCE.md "Walls"). Flag off = the old tables. Per-stage data lives here. ===== */
+if(RET.walls===undefined)RET.walls=true;
+RET.wallKill={all:.75,classic:.45};   // ARCADE: kill goals are x.75 (the bot needed ~100 s more than the cut song to reach them, so a kill stage ran long and ended in a death); CLASSIC (full song) is x.45; a stage number overrides
+
+/* ===== B8 Heat ladder (RET.heat) =====
+   Opens when the story is cleared (stage MAIN has a star). On any cleared main stage the plate offers HEAT 1-10 (one above your best on that stage).
+   Each Heat step adds one small mutator (a fixed ladder built from the 6 endless mutators) and the stage level +0.12; the run's Neon pays +20% per Heat,
+   and the first clear at a new Heat earns its medal (+30 Neon x Heat). Caps kept: bullets at most +12% (endless TURBO), elites at most 0.6, hull at least 2. */
+if(RET.heat===undefined)RET.heat=true;
+const HEAT={max:10,lvK:.12,nk:.2,medalK:30,pick:{},best:{},run:0,td:0,last:null,
+  STEPS:[['turbo','TURBO','Faster shots'],['guard','ELITES','More elites'],['hail','HAIL','Rain from above'],['decay','DECAY','Tier slips sooner'],
+    ['noheal','NO HEAL','No hull drops'],['hull','-1 HULL','One hull less'],['turbo2','TURBO+','Even faster shots'],['guard2','ELITES+','Even more elites'],['heavy','HEAVY','Tougher enemies'],['inferno','INFERNO','Everything harder']],
+  open(n){const s=STAGES[n-1];return !!RET.heat&&!!s&&!s.ch&&n<=MAIN&&(sSave.stars[MAIN]|0)>=1&&(sSave.stars[n]|0)>=1;},
+  top(n){return this.open(n)?Math.min(this.max,(this.best[n]|0)+1):0;},          // highest Heat you may pick on stage n
+  lv(n){return this.open(n)?Math.max(0,Math.min(this.top(n),this.pick[n]|0)):0;},   // Heat of the next run on stage n (0 = off)
+  muts(h){return this.STEPS.slice(0,h);},
+  label(h){return h?'HEAT '+h+': '+this.muts(h).map(m=>m[1]).slice(-3).join(' · '):'';},
+  apply(s){const h=this.lv(s.n);this.run=h;this.td=0;if(!h)return;const has=id=>h>=1+this.STEPS.findIndex(m=>m[0]===id);
+    s.bs*=1+(has('turbo')?.06:0)+(has('turbo2')?.06:0);
+    s.el=Math.min(.6,s.el+(has('guard')?.08:0)+(has('guard2')?.08:0));
+    if(has('decay'))this.td=2;
+    if(has('noheal'))s.heal=0;
+    if(has('hull'))s.hp0=Math.max(2,s.hp0-1);
+    if(has('heavy'))s.eh*=1.1;
+    if(has('inferno')){s.eh*=1.08;s.d0*=1.06;s.d=s.d0*.8;}},
+  save(){try{localStorage.setItem('mnr_heat',JSON.stringify({pick:this.pick,best:this.best}));}catch(e){}},
+  medals(){let t=0;for(const k in this.best)t+=this.best[k]|0;return t;}};
+try{const o=JSON.parse(localStorage.getItem('mnr_heat')||'{}');if(o&&typeof o==='object'){for(const k in o.pick||{})HEAT.pick[k]=Math.max(0,o.pick[k]|0);for(const k in o.best||{})HEAT.best[k]=Math.max(0,o.best[k]|0);}}catch(e){}
+window.HEAT=HEAT;
+{const st=document.createElement('style');st.textContent=`
+#stDet .heat{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;color:#ff9a3c}
+#stDet .heat button{min-width:44px;min-height:40px;border:1px solid #7a4a2a;background:#1e0d08;color:#ffc58a;border-radius:8px;font:700 16px/1 inherit}
+#stDet .heat button:disabled{opacity:.35}
+#stDet .heat b{min-width:5.2em;text-align:center;color:#fff;font-size:13px;white-space:nowrap}
+#stDet .heat .hm{flex:1 1 0;min-width:0;white-space:nowrap}
+#stDet .hmu{font-family:var(--mono);font-size:11px;line-height:1.25;color:#ffc58a;overflow-wrap:anywhere}
+#stDet .heat.off{color:var(--dim)}
+#stres .sr.heat .sg{color:#ff9a3c}
+`;document.head.appendChild(st);}
+/* stage plate row (map.js mapDetail calls HEAT.row and HEAT.bind) */
+HEAT.row=function(n){if(!RET.heat)return'';const s=STAGES[n-1];if(!s||s.ch||!(sSave.stars[n]|0))return'';
+  if(!this.open(n))return'<div class="heat off">🔒 HEAT · clear the story</div>';
+  const h=this.lv(n),b=this.best[n]|0,mu=this.muts(h).map(m=>m[1]).join(' · ');
+  return`<div class="heat" role="group" aria-label="Heat"><button type="button" id="htDn"${h?'':' disabled'} aria-label="Less heat">−</button><b id="htLv">${h?'🔥 HEAT '+h:'HEAT OFF'}</b><button type="button" id="htUp"${h<this.top(n)?'':' disabled'} aria-label="More heat">+</button><span class="hm">${h?'+'+Math.round(100*this.nk*h)+'% Neon':'More Neon'}${b?' · best '+b:''}</span></div>${h?'<div class="hmu" id="htMu">'+mu+'</div>':''}`;};
+HEAT.bind=function(n){const set=v=>{this.pick[n]=Math.max(0,Math.min(this.top(n),v));this.save();mapDetail(n);};
+  if($('htDn'))$('htDn').addEventListener('click',()=>set(this.lv(n)-1));if($('htUp'))$('htUp').addEventListener('click',()=>set(this.lv(n)+1));};
+/* runs: show the mutators, add the DIR mutator, keep mercy out of Heat runs, pay +20% per Heat and the medal */
+NR.on('runStart',d=>{if(!d||!d.story){HEAT.run=0;HEAT.td=0;return;}if(!HEAT.run)return;
+  if(HEAT.run>=3)DIR.mut=['hail'];HEAT.fails0=RET.fails[d.story]|0;G.note={t:5,txt:HEAT.label(HEAT.run)};});
+NR.on('banked',add=>{if(!HEAT.run||!(add>0))return;const b=Math.round(add*HEAT.nk*HEAT.run);GA.bank+=b;SH.lastBank+=b;gsave();HEAT.bonus=b;});
+NR.on('runEnd',d=>{const h=HEAT.run;HEAT.run=0;HEAT.td=0;if(!h||!d||!d.story||d.quit)return;const n=d.story;
+  if(RET.fails[n]!==HEAT.fails0){if(HEAT.fails0)RET.fails[n]=HEAT.fails0;else delete RET.fails[n];RET.saveFails();}   // a Heat run never feeds the mercy count
+  if(!d.cleared){HEAT.last={n,h,ok:false,bonus:HEAT.bonus|0};HEAT.bonus=0;return;}
+  const first=h>(HEAT.best[n]|0);let medal=0;if(first){HEAT.best[n]=h;medal=HEAT.medalK*h;GA.bank+=medal;gsave();if(HEAT.pick[n]===h&&h<HEAT.max)HEAT.pick[n]=h+1;}
+  if(RET.last&&RET.last.n===n&&RET.last.pay){const b=Math.round(RET.last.pay*HEAT.nk*h);GA.bank+=b;gsave();HEAT.bonus=(HEAT.bonus|0)+b;}
+  HEAT.save();HEAT.last={n,h,ok:true,first,medal,bonus:HEAT.bonus|0};HEAT.bonus=0;
+  setTimeout(()=>{const e=$('srStars');if(e&&!e.querySelector('.heat'))e.insertAdjacentHTML('beforeend',`<div class="sr ok heat"><span class="sg">🔥</span> HEAT ${h}${first?' medal +'+medal:''} · +${HEAT.last.bonus} Neon</div>`);},0);});
+/* ===== B11 daily streak and weekly challenge ===== */
+if(RET.daily===undefined)RET.daily=true;
+RET.clock=null;                                   // test hook: RET.setClock(ms | () => ms | null) replaces the system clock
+RET.setClock=f=>{RET.clock=f==null?null:(typeof f==='function'?f:()=>f);RET.dailyShow();};
+const DY={max:7,base:50,step:10,weekly:300,
+  s:Object.assign({last:0,streak:0,seen:0,wk:0,wkN:0,wkBest:0},load('mnr_streak',{}))};
+for(const k in DY.s)if(!isFinite(DY.s[k]))DY.s[k]=0;
+DY.persist=()=>save('mnr_streak',DY.s);
+DY.ms=()=>{let m=RET.clock?+RET.clock():Date.now();return isFinite(m)&&m>0?m:Date.now();};
+DY.dn=ms=>{const d=new Date(ms);return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);};   // local calendar day number, so a timezone change moves the date only by what the wall clock shows
+/* today: never earlier than the latest day seen, so a clock set back cannot grant twice or cut a streak; a jump back of more than 3 days is taken as a clock fix */
+DY.today=()=>{const s=DY.s,ms=DY.ms();let t=DY.dn(ms);
+  if(s.seen>0&&s.seen-t>3){s.seen=t;s.last=Math.min(s.last,t-1);DY.persist();}
+  else if(t<s.seen)t=s.seen;
+  if(t>s.seen){s.seen=t;DY.persist();}
+  return t;};
+DY.streakNow=t=>DY.s.last&&t-DY.s.last<=2?DY.s.streak:0;      // one missed day keeps it, two reset it
+DY.reward=n=>DY.base+DY.step*Math.min(n,DY.max);
+DY.status=()=>{const t=DY.today(),done=DY.s.last===t,cur=DY.streakNow(t),next=done?cur:cur+1;
+  return{today:t,claimed:done,streak:cur,next,reward:DY.reward(next)};};
+DY.pay=n=>{if(!(n>0)||!isFinite(n))return 0;GA.bank+=Math.floor(n);gsave();return Math.floor(n);};
+RET.dailyClaim=function(){if(!RET.daily)return 0;const st=DY.status();if(st.claimed)return 0;
+  DY.s.streak=st.next;DY.s.last=st.today;DY.persist();return DY.pay(st.reward);};
+/* weekly: ISO 8601 week of the local date; the seed and the two mutators depend on the week only */
+DY.weekKey=t=>{const wd=(t+3)%7,thu=t-wd+3,y=new Date(thu*864e5).getUTCFullYear(),j1=Math.floor(Date.UTC(y,0,1)/864e5);return y*100+Math.floor((thu-j1)/7)+1;};
+RET.week=function(){const k=DY.weekKey(DY.today()),r=mul(k*7919+13),pool=MUTS.map(m=>m.id),m=[];
+  while(m.length<2){const i=Math.floor(r()*pool.length);m.push(pool.splice(i,1)[0]);}
+  return{key:k,seed:k*31+5,muts:m,names:m.map(id=>MUTS.find(x=>x.id===id).n),cleared:DY.s.wk===k,best:DY.s.wkN===k?DY.s.wkBest:0};};
+RET.weeklyBestLine=()=>{const w=RET.week();return'Weekly best <strong>'+(w.best?w.best.toLocaleString('de-DE'):'—')+'</strong>';};
+RET.weeklyEnd=function(score){const w=RET.week();let eye='Weekly run over';
+  if(DY.s.wkN!==w.key){DY.s.wkN=w.key;DY.s.wkBest=0;}
+  if(score>DY.s.wkBest){DY.s.wkBest=score;eye='New weekly best';}DY.persist();return eye;};
+RET.weeklyClear=function(){const w=RET.week();if(w.cleared)return 0;DY.s.wk=w.key;DY.persist();return DY.pay(DY.weekly);};
+NR.on('runStart',d=>{if(!RET.daily||!d||!d.daily||!RET.wkPending){return;}
+  RET.wkPending=false;const w=RET.week();G.weekly=w.key;
+  GR=mul(w.seed);GX=mul(w.seed+7919);DIR.mut=w.muts.slice();DIR.bsK=DIR.has('turbo')?1.12:1;
+  G.note={t:6,txt:'Weekly: '+w.names.join(' + ')};});
+NR.on('districtEnd',()=>{if(!RET.daily||!G.weekly)return;const p=RET.weeklyClear();if(p)G.note={t:5,txt:'Weekly cleared +'+p+' Neon'};});
+NR.on('runEnd',d=>{if(!RET.daily||!d||d.quit)return;
+  const e=(()=>{let x=$('retDy');if(!x){x=document.createElement('div');x.id='retDy';x.className='retBar';const h=$('over').querySelector('.in');h.insertBefore(x,h.querySelector('.row'));}return x;})();
+  if(G.weekly){e.hidden=false;const w=RET.week();e.innerHTML=w.cleared?'Weekly challenge cleared':'Weekly: beat the first boss for <b>'+DY.weekly+'</b> Neon';return;}
+  if(!G.daily){e.hidden=true;return;}
+  const p=RET.dailyClaim(),st=DY.status();e.hidden=false;
+  e.innerHTML=p?'Daily bonus <b>+'+p+'</b> Neon · streak <b>'+st.streak+'</b>':'Daily bonus already claimed today · streak <b>'+st.streak+'</b>';});
+/* title screen status: one block under the best line (a few lines, wraps at 390 px) */
+{const st=document.createElement('style');st.textContent=`
+#retTt{width:100%;max-width:min(94%,440px);margin:.5em auto 0;text-align:center;font-family:var(--mono);font-size:clamp(12px,min(3.3vw,2.3vh),16px);line-height:1.35;color:var(--dim);overflow-wrap:anywhere}
+#retTt b{color:#fff;font-weight:400}#retTt .ok{color:#6cf59a}#retTt button{margin-top:.4em;font:inherit;padding:.5em 1em;min-height:40px;border-radius:99px;border:1px solid #ffb020;background:#0000;color:#ffb020;cursor:pointer}
+`;document.head.appendChild(st);}
+RET.dailyShow=function(){let e=$('retTt');
+  if(!RET.daily){if(e)e.hidden=true;return;}
+  if(!e){e=document.createElement('div');e.id='retTt';$('bestT').after(e);
+    e.addEventListener('click',ev=>{if(ev.target.id!=='wkBtn')return;RET.wkPending=true;start(true);});}
+  e.hidden=false;const d=DY.status(),w=RET.week();
+  e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· today\'s bonus claimed</span>':'Daily streak <b>'+d.streak+'</b> · fly the daily run for <b>+'+d.reward+'</b> Neon')
+   +'<br>'+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly: <b>'+w.names.join(' + ')+'</b> · boss clear = <b>+'+DY.weekly+'</b>')+(w.best?' · best '+w.best.toLocaleString('de-DE'):'')
+   +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
+RET.dailyShow();
+window.DY=DY;
+
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
    The LAB is a real run with G.lab set: no waves, no district clock, no boss timer, no chest or pit stop, god mode on. What appears is decided by the panel at the bottom:
    BOSS (gallery: pick any boss and its district, replay the intro, lock a phase, force an attack pattern, hold any pose of its sprite sheet, hit flash, death + respawn),
@@ -3598,6 +3718,8 @@ NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L3',id:'heat-ladder',text:'After you clear the story, every cleared stage gets a HEAT ladder: tap + on the stage card for Heat 1-10. Each Heat adds one mutator (Turbo, Elite Guard, Hailstorm, Fast Decay, No Heal, -1 Hull ...), pays +20% Neon and a medal the first time. Does each step feel a little harder, never unfair?'},
+ {ver:'L3',id:'daily-streak',text:'Title screen: a daily streak and a weekly challenge. Fly the DAILY RUN once a day to earn Neon (60 on day 1, up to 120 on day 7+); miss one day and the streak holds, miss two and it starts again. WEEKLY RUN: the same two mutators for everyone all week; beat the first boss once a week for 300 Neon. Is the status line clear?'},
  {ver:'L3',id:'clear-pay',text:'Clearing a stage now pays Neon: 40 plus 12 per stage number the first time, 25 more for each new star, and a tenth of that on later clears. Everything in the garage costs far less (weapons, perks), and kills pay a bit more, so a full build is a matter of hours, not weeks. Fail a stage twice and the next try gets +1 hull; fail four times and it is a little easier too. Do the prices feel fair?'},
  {ver:'L3',id:'ship-mounts',text:'Your ship now shows the weapons you equip: a coloured circle on slot 1, a triangle on slot 2, a split ring when they fuse, and a flash from the mounts when you fire. See it in WEAPONS and the Garage. Painted mounts come later. Does it read at a glance?'},
  {ver:'L2',id:'weapon-levels',text:'Weapons grow with your Neon: Garage > WEAPONS has 16 weapons (8 new: Frost Beam, Flame Arc, Plasma Wave, Shrapnel Shell, Echo Drone, Gravity Well, Rail Sniper, Storm Cell). Buy one with Neon, then buy its levels 1 to 10 (a level bar, the power it gives and the next new ability are on every card). In a run the pit-stop pickups add up to 2 more levels on top. Does a higher level feel stronger, and are the prices fair?'},
@@ -3639,6 +3761,7 @@ const NR_CHECKLIST=[
  {ver:'I7',id:'perk-pressure',text:'The more perks and upgrades you own, the tougher the enemies (up to 3x hull). A maxed ship should still have to fight.'},
  {ver:'I6',id:'chest',text:'After every district boss a BOSS CHEST opens: three face-down cards, tap one to flip it and get +1 hull, a shield, EMP, Neon, a revive or a random upgrade. Then the pit stop. LAB can switch it off.'},
  {ver:'I8',id:'one-more-run',text:'The game-over and stage-clear screens now show a bar to the cheapest thing you can still unlock, and a big ONE MORE RUN button that restarts at once. Does the bar make you want one more go?'},
+ {ver:'R5',id:'no-walls',text:'Kill-goal stages (Roemer, Freight Yard, Loading Dock, Boardroom, Olive Road) ask for fewer kills in Arcade, and Talos fires fewer lasers. Is there still a stage where you get stuck?'},
  {ver:'I6',id:'new-ships',text:'Three new ships in Garage > SHIPS: Drift (a wide fan), Lancer (a piercing lance every second shot) and Nova (a ring burst every third shot). They show as shapes until the art arrives. Do they feel different and worth the price?'},
  {ver:'I6',id:'badges',text:'The difficulty button on the title and the LAB show a badge per difficulty, and the stage clear screen shows a medal. Garage ship cards now show the painted ship portraits.'},
  {ver:'I6',id:'leader-look',text:'Squad leaders have a gold sheen on top of the crown and the rings so you can spot them at a glance.'},
@@ -4537,7 +4660,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
 const titleEl=$('title'),overEl=$('over'),pauseEl=$('pausem'),setEl=$('setm');
 const HUDLOG={frame:0};
 function showBest(){$('bestT').innerHTML=(best.score?`Best run <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`:'No runs logged yet')
-  +` &nbsp;·&nbsp; Daily <strong>${dailyBest.score?dailyBest.score.toLocaleString('de-DE'):'—'}</strong>`;}
+  +` &nbsp;·&nbsp; Daily <strong>${dailyBest.score?dailyBest.score.toLocaleString('de-DE'):'—'}</strong>`;if(window.RET&&RET.dailyShow)RET.dailyShow();}
 showBest();
 function syncUI(){$('touch').hidden=!(running&&touchUI&&!paused&&!SH.active);}
 /* ---------- settings (one card, Overdrive's look): the schema drives the rows; every change is saved and applied live ---------- */
@@ -4601,21 +4724,22 @@ function setPause(on){if(!running||on===paused)return;paused=on;pauseEl.hidden=!
 function start(daily){if(running)return;if(ST.on){startStory(ST.n);return;}AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
   newGame(daily);G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(stageFor(0,false));NR.emit('runStart',{daily:!!daily});
   FPS.n=0;FPS.t=0;FPS.slow=0;FPS.worst=0;syncUI();}
-function restart(){if(ST.on){const n=ST.n;running=false;paused=false;startStory(n);return;}const dl=G.daily;running=false;paused=false;start(dl);}
+function restart(){if(ST.on){const n=ST.n;running=false;paused=false;startStory(n);return;}const dl=G.daily;if(G.weekly)RET.wkPending=true;running=false;paused=false;start(dl);}
 function quitToTitle(){if(running)NR.emit('runEnd',{quit:true});ST.on=false;ST.over=false;selEl.hidden=true;resEl.hidden=true;$('stBtn2').hidden=true;running=false;paused=false;pauseEl.hidden=true;overEl.hidden=true;titleEl.hidden=false;newGame();G.banner.t=0;P.x=-200;AU.resume();AU.menuMusic();syncUI();showBest();}
 function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false;NR.emit('runEnd',{score:G.score,di:G.di,kills:G.kills});const D=DISTRICTS[G.di];const dist=D.name+(G.loop?' +'+G.loop:'');let eye='Signal lost';
-  if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
+  if(G.weekly)eye=RET.weeklyEnd(G.score);
+  else if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;
   $('oScore').textContent=G.score.toLocaleString('de-DE');$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
-  $('oBest').innerHTML=G.daily?`Daily best <strong>${dailyBest.score.toLocaleString('de-DE')}</strong>`:`Best <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`;
+  $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${dailyBest.score.toLocaleString('de-DE')}</strong>`:`Best <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`;
   overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);showBest();
-  G.over=true;lastDaily=G.daily;}
-let lastDaily=false;
+  G.over=true;lastDaily=G.daily;lastWeekly=!!G.weekly;}
+let lastDaily=false,lastWeekly=false;
 $('startBtn').addEventListener('click',()=>start(false));
 storyUI();
 $('dailyBtn').addEventListener('click',()=>start(true));
-$('againBtn').addEventListener('click',()=>start(lastDaily));
+$('againBtn').addEventListener('click',()=>{if(lastWeekly&&lastDaily)RET.wkPending=true;start(lastDaily);});
 $('menuBtn').addEventListener('click',quitToTitle);
 $('resumeBtn').addEventListener('click',()=>setPause(false));
 $('restartBtn').addEventListener('click',restart);
