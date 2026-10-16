@@ -502,8 +502,9 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     const L=this.lastSfx||(this.lastSfx={});if(now-(L.sting||-9)<SFXGAP.sting)return false;
     const spb=BT.spb||.5,t0=BT.t0+BT.off,grid=BT.mode!=='none'&&BT.spb>0,step=n==='perfect'?spb/4:spb;
     const t=grid?t0+Math.ceil((now+.02-t0)/step-1e-9)*step:now+.02,bi=grid?Math.floor((t-t0)/spb+1e-6):-1;
-    if(Math.abs(t-this.stLast)<.12||(grid&&bi===this.stBeat))return false;
-    L.sting=now;this.stLast=t;this.stBeat=bi;
+    const R=this.stRec||(this.stRec=[]);while(R.length&&R[0].t<now-1)R.shift();   // every stinger still pending or just played, not only the last one
+    if(R.some(r=>Math.abs(t-r.t)<.12||(grid&&bi===r.bi)))return false;
+    R.push({t,bi});L.sting=now;this.stLast=t;this.stBeat=bi;
     if(!this.stb){this.stb=a.createGain();this.stb.gain.value=.708;this.stb.connect(this.sfxv);}
     const B=this.stg[n];if(B===undefined&&this.stList&&this.stList.indexOf(n)>=0){this.stg[n]=0;try{fetch('music/st-'+n+'.mp3').then(r=>r.ok?r.arrayBuffer():null).then(b=>b?a.decodeAudioData(b):null).then(buf=>{if(buf)this.stg[n]=buf;}).catch(()=>{});}catch(e){}}
     this.stLog.push({n,t,now,spb,t0,file:!!B});if(this.stLog.length>200)this.stLog.shift();

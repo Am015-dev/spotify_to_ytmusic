@@ -69,7 +69,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
   const worst = sl.map(e => { const q = e.n === 'perfect' ? e.spb / 4 : e.spb; let x = (e.t - e.t0) / q; x -= Math.round(x); return Math.abs(x * q * 1000); });
   ok(`${sl.length} stingers scheduled, every one on the grid (worst ${Math.max(...worst).toFixed(1)} ms)`, sl.length >= 8 && Math.max(...worst) <= 10);
   ok('every stinger is scheduled in the future of the call', sl.every(e => e.t >= e.now));
-  const ts = sl.map(e => e.t).sort((a, b) => a - b); let gap = 9; for (let i = 1; i < ts.length; i++) gap = Math.min(gap, ts[i] - ts[i - 1]);
+  if (process.env.DBG) console.log(JSON.stringify(sl.map(e => [e.n, +e.t.toFixed(3), +e.now.toFixed(3), +e.t0.toFixed(3)]))); const ts = sl.map(e => e.t).sort((a, b) => a - b); let gap = 9; for (let i = 1; i < ts.length; i++) gap = Math.min(gap, ts[i] - ts[i - 1]);
   ok(`no two stingers within 120 ms (closest ${(gap * 1000).toFixed(0)} ms)`, gap >= .12);
   const bis = sl.map(e => Math.floor((e.t - e.t0) / e.spb + 1e-6)); ok('at most one stinger per beat', new Set(bis).size === bis.length);
   ok('rate-limited calls return false instead of stacking', ret.filter(x => x).length === sl.length - 4 + 0 || ret.some(x => !x));
