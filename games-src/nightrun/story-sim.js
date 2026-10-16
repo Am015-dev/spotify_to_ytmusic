@@ -43,7 +43,7 @@ const BOT = (opts) => {
     if (!endless && m.ST.over) { cleared = true; bt1 = m.G.t; break; }
   }
   const G = m.G, P = m.P, ST = m.ST;
-  const r = { n, clear: cleared, dead: G.dead, t: +G.t.toFixed(1), hits: ST.hits, perf: G.perf, score: G.score, kills: G.kills, bars: Math.floor(G.bc / 4), hp: P.hp, stars: cleared ? ST.stars.slice() : null, di: G.di, loop: G.loop, upg: Object.keys(m.SH.got).length, fight: bt0 >= 0 ? +((cleared ? bt1 : G.t) - bt0).toFixed(1) : 0, bhp: G.boss ? Math.round(G.boss.hp) : 0, hb, hw, causes };
+  const r = { n, clear: cleared, dead: G.dead, t: +G.t.toFixed(1), hits: ST.hits, perf: G.perf, score: G.score, kills: G.kills, bars: Math.floor(G.bc / 4), hp: P.hp, stars: cleared ? ST.stars.slice() : null, di: G.di, loop: G.loop, upg: Object.keys(m.SH.got).length, fight: bt0 >= 0 ? +((cleared ? bt1 : G.t) - bt0).toFixed(1) : 0, bhp: G.boss ? Math.round(G.boss.hp) : 0, hb, hw, causes, neon: m.SH.neon + Math.round(m.SH.earned * .3), earned: m.SH.earned };
   m.abort(); return r;
 };
 (async () => {

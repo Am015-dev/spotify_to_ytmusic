@@ -16,7 +16,7 @@ const TP_DEF=[
   {id:'rev',n:'Revive Token', p:400,max:5, c:'#ff2d95',pri:92,ic:'M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7z',t:l=>'Return from '+l+' death'+(l>1?'s':'')+' per run'},
   {id:'nmn',n:'Neon Mining',  p:70, max:12,c:'#19e3ff',pri:35,ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z',                                 t:l=>'+'+5*l+'% Neon from kills'}];
 const TP_BY={};for(const d of TP_DEF)TP_BY[d.id]=d;
-const tpPrice=(d,l)=>Math.round(1.5*d.p*(1+.6*l+.12*l*l)/5)*5;                  // price of level l+1: 45, 80, 120, 175 ... 1,000 (Power Core), a full garage costs about 60,000 Neon: many runs
+const tpPrice=(d,l)=>Math.round(1.5*d.p*(1+.6*l+.12*l*l)*(window.RET&&RET.econ?RET.tk:1)/5)*5;                  // price of level l+1: 45, 80, 120, 175 ... 1,000 (Power Core), a full garage costs about 60,000 Neon: many runs
 const TP={revLeft:0,rgnT:0,boost:{},
   raw(id){const v=Math.floor(+GA.tune[id])||0;return Math.max(0,Math.min(TP_BY[id].max,v));},                 // the level you own
   l(id){return GA.eqAll||(GA.eq&&GA.eq[id])?this.raw(id):0;}};                                                       // the level that counts: only equipped perks work (see LOADOUT)

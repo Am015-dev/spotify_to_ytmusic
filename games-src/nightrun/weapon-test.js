@@ -100,7 +100,7 @@ const T = ({ a, b, L }) => {
     chk(r1.start[0] === 500 && r1.start[1] === 1 && r1.start[2] === 0, 'fresh profile: 500 Neon, pulse LV1, laser locked ' + JSON.stringify(r1.start));
     chk(r1.locked && JSON.stringify(r1.eqLocked) === '["pulse",null]', 'a locked weapon cannot be equipped');
     chk(r1.unlock[0] && r1.unlock[1] === r1.unlock[2] && r1.unlock[3] === 1, 'unlock takes exactly its price and gives LV1 ' + JSON.stringify(r1.unlock));
-    chk(r1.lv2[0] && r1.lv2[1] === 40 && r1.lv2[2] === 40 && r1.lv2[3] === 2, 'LV1->2 costs 40 and gives LV2 ' + JSON.stringify(r1.lv2));
+    chk(r1.lv2[0] && r1.lv2[1] > 0 && r1.lv2[1] === r1.lv2[2] && r1.lv2[3] === 2, 'LV1->2 costs its price (40 at the original prices, 11 with RET.econ) and gives LV2 ' + JSON.stringify(r1.lv2));
     chk(r1.eff === 2, 'effective level = permanent level outside a run ' + r1.eff);
     chk(!r1.poor[0] && r1.poor[1] === 'money' && r1.poor[2] === 5 && r1.poor[3] === 2, 'cannot buy without money, bank untouched ' + JSON.stringify(r1.poor));
     chk(!r1.zero[0] && r1.zero[1] === 0 && r1.zero[2] === 0, 'bank 0: nothing bought, never negative ' + JSON.stringify(r1.zero));
