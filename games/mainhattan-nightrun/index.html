@@ -3312,6 +3312,59 @@ RET.dailyShow=function(){let e=$('retTt');
 RET.dailyShow();
 window.DY=DY;
 
+/* ===== B27 screen transitions + bank chip + score count-up (RET.trans), B36 grade pops per 16 bars (RET.grade) ===== */
+if(RET.trans===undefined)RET.trans=true;
+if(RET.grade===undefined)RET.grade=true;
+{const st=document.createElement('style');st.textContent=`
+@keyframes retIn{from{opacity:0}to{opacity:1}}
+html.rtr .ov:not([hidden]){animation:retIn .18s ease-out}
+.retChip{position:absolute;top:8px;right:10px;z-index:6;pointer-events:none;font-family:var(--mono);font-size:clamp(12px,min(3.4vw,2.4vh),16px);color:#19e3ff;background:#05030cc0;border:1px solid #19e3ff55;border-radius:99px;padding:.15em .7em}
+.retChip b{color:#fff;font-weight:700}
+.retGr{font-family:var(--mono);font-size:clamp(12px,min(3.4vw,2.4vh),17px);color:var(--dim)}.retGr b{margin-left:.5em;color:#fff}.retGr b.S{color:#ffe14d}.retGr b.A{color:#3dffb0}
+#retPop{position:absolute;left:50%;top:max(11%,64px);z-index:4;pointer-events:none;font:700 clamp(30px,9vw,54px) var(--display);color:#fff;text-shadow:0 0 14px currentColor;opacity:0;transform:translate(-50%,0)}
+#retPop.on{animation:retPop .75s ease-out forwards}
+html.rtn #retPop.on{animation:none;opacity:1}
+@keyframes retPop{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}18%{opacity:1;transform:translate(-50%,0) scale(1.1)}70%{opacity:1;transform:translate(-50%,-4px) scale(1)}100%{opacity:0;transform:translate(-50%,-14px) scale(1)}}
+`;document.head.appendChild(st);}
+RET.motion=()=>!(SET.rm||RM);   // reduced motion (setting or OS) turns the fades and count-ups off
+RET.syncMotion=()=>{const h=document.documentElement;h.classList.toggle('rtr',!!RET.trans&&RET.motion());h.classList.toggle('rtn',!RET.motion());};
+RET.syncMotion();
+document.addEventListener('pointerdown',()=>{if(!RET.trans)return;RET.syncMotion();RET.skip();},true);   // a tap finishes any fade or count-up
+const retCnt=[];   // running count-ups: {el,to,fmt,t0,dur}
+let retRaf=0;
+function retStep(now){retRaf=0;for(let i=retCnt.length-1;i>=0;i--){const c=retCnt[i],k=Math.min(1,(now-c.t0)/c.dur);c.set(k>=1?c.to:Math.round(c.from+(c.to-c.from)*(1-(1-k)*(1-k))));if(k>=1)retCnt.splice(i,1);}if(retCnt.length)retRaf=requestAnimationFrame(retStep);}
+RET.countUp=function(set,from,to,dur){if(!RET.motion()||from===to||dur<=0){set(to);return;}   // set(n) writes the text; ends exactly on `to`
+  for(let i=retCnt.length-1;i>=0;i--)if(retCnt[i].set===set)retCnt.splice(i,1);
+  retCnt.push({set,from,to,t0:performance.now(),dur});set(from);if(!retRaf)retRaf=requestAnimationFrame(retStep);};
+RET.skip=function(){for(const c of retCnt)c.set(c.to);retCnt.length=0;try{for(const a of document.getAnimations())if(a.animationName==='retIn')a.finish();}catch(e){}};
+/* bank chip: pinned top-right on the game-over, stage-clear and stage-select screens; counts up when the bank grows */
+RET.chipV=GA.bank;RET.chips=[];
+function retChipSet(n){const t=n.toLocaleString('de-DE');for(const c of RET.chips)c.firstElementChild.textContent=t;}
+RET.chipSync=function(){if(!RET.trans)return;for(const el of [$('over'),$('stres'),$('stsel')]){if(!el||el.querySelector('.retChip'))continue;
+    const c=document.createElement('div');c.className='retChip';c.innerHTML='◆ <b></b> Neon';el.appendChild(c);RET.chips.push(c);}
+  if(RET.chipV!==GA.bank||!RET.chips[0].firstElementChild.textContent){RET.countUp(retChipSet,RET.chipV,GA.bank,800);RET.chipV=GA.bank;}};
+for(const id of ['over','stres','stsel']){const el=$(id);if(el)new MutationObserver(()=>{if(!el.hidden&&RET.trans&&!retCnt.length)RET.chipSync();}).observe(el,{attributes:true,attributeFilter:['hidden']});}
+/* grades: every 16 bars a letter from the PERFECTs and hull lost in those bars */
+RET.gr={bar:0,perf:0,hits:0,hp:0,list:[]};
+RET.gradeOf=(dp,hits)=>{const r=dp/64;return r>=.35&&hits===0?'S':r>=.2&&hits<=1?'A':r>=.08&&hits<=2?'B':'C';};   // PERFECTs per beat in 16 bars (64 beats), hull lost
+NR.on('runStart',()=>{const g=RET.gr;g.bar=0;g.perf=G.perf|0;g.hits=0;g.hp=P.hp;g.list=[];RET.chipV=GA.bank;});
+NR.on('tick',()=>{const g=RET.gr;if(P.hp<g.hp)g.hits+=g.hp-P.hp;g.hp=P.hp;});
+NR.on('bar',()=>{if(!RET.grade||!G.live||G.dead)return;const g=RET.gr;if(++g.bar%16)return;
+  const L=RET.gradeOf((G.perf|0)-g.perf,g.hits);g.list.push(L);g.perf=G.perf|0;g.hits=0;RET.pop(L);});
+RET.pop=function(L){let e=$('retPop');if(!e){e=document.createElement('div');e.id='retPop';e.setAttribute('aria-hidden','true');($('stage')||document.body).appendChild(e);
+    e.addEventListener('animationend',()=>e.classList.remove('on'));}
+  e.textContent=L;e.style.color=L==='S'?'#ffe14d':L==='A'?'#3dffb0':L==='B'?'#19e3ff':'#c9c4ec';e.classList.remove('on');void e.offsetWidth;e.classList.add('on');
+  if(!RET.motion())setTimeout(()=>e.classList.remove('on'),800);
+  if(L==='S')try{AU.sfx('up');}catch(x){}};
+/* run end: count the score up (the texts are written after the event, so wait one tick), show the grade strip */
+NR.on('runEnd',d=>{if(!d||d.quit||!RET.trans&&!RET.grade)return;setTimeout(()=>{
+  if(RET.trans){for(const [id,sc] of [['oScore','over'],['srScore','stres']]){const el=$(id);if(!el||$(sc).hidden)continue;const to=G.score|0;
+      RET.countUp(n=>{el.textContent=n.toLocaleString('de-DE');},0,to,800);}
+    RET.chipSync();}
+  if(RET.grade)for(const [id,host] of [['grO',$('over')],['grR',$('stres')]]){let e=$(id);const L=RET.gr.list;
+    if(!e){e=document.createElement('div');e.id=id;e.className='retGr';host.querySelector('.in').insertBefore(e,host.querySelector('.row'));}
+    e.hidden=!L.length;e.innerHTML=L.length?'Grades'+L.map(x=>'<b class="'+x+'">'+x+'</b>').join(''):'';}},0);});
+
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
    The LAB is a real run with G.lab set: no waves, no district clock, no boss timer, no chest or pit stop, god mode on. What appears is decided by the panel at the bottom:
    BOSS (gallery: pick any boss and its district, replay the intro, lock a phase, force an attack pattern, hold any pose of its sprite sheet, hit flash, death + respawn),
@@ -3760,6 +3813,7 @@ const NR_CHECKLIST=[
  {ver:'I7',id:'bullet-kinds',text:'Enemy fire now varies: thin fast NEEDLES from drones, round ORBS, big slow orange SHELLS that take 2 hull, and ROCKETS that home for a moment and burst into 5 pellets when you shoot them twice.'},
  {ver:'I7',id:'perk-pressure',text:'The more perks and upgrades you own, the tougher the enemies (up to 3x hull). A maxed ship should still have to fight.'},
  {ver:'I6',id:'chest',text:'After every district boss a BOSS CHEST opens: three face-down cards, tap one to flip it and get +1 hull, a shield, EMP, Neon, a revive or a random upgrade. Then the pit stop. LAB can switch it off.'},
+ {ver:'I9',id:'polish-flow',text:'Screens now fade in, the game-over and stage-clear screens count the score up (tap to skip) and show a Neon chip top-right, and every 16 bars a grade letter (C, B, A or S) pops from your PERFECTs and hits. Does it feel smooth, and do the letters ever get in the way?'},
  {ver:'I8',id:'one-more-run',text:'The game-over and stage-clear screens now show a bar to the cheapest thing you can still unlock, and a big ONE MORE RUN button that restarts at once. Does the bar make you want one more go?'},
  {ver:'R5',id:'no-walls',text:'Kill-goal stages (Roemer, Freight Yard, Loading Dock, Boardroom, Olive Road) ask for fewer kills in Arcade, and Talos fires fewer lasers. Is there still a stage where you get stuck?'},
  {ver:'I6',id:'new-ships',text:'Three new ships in Garage > SHIPS: Drift (a wide fan), Lancer (a piercing lance every second shot) and Nova (a ring burst every third shot). They show as shapes until the art arrives. Do they feel different and worth the price?'},
