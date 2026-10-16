@@ -757,6 +757,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.75',date:'16 Oct 2026',items:[{t:'NEW',s:'Bricks burst when your car transforms.'},{t:'CHANGED',s:'Quests no longer stop you mid-drive.'},{t:'CHANGED',s:'Bigger, cleaner phone HUD; bluer river.'}]},
   {v:'v90m-beta.74',date:'16 Oct 2026',items:[{t:'NEW',s:'Every race now runs on real Frankfurt and Athens streets, with two routes, jumps and power-ups.'},{t:'NEW',s:'Quick Race includes a river run where your car becomes a boat.'},{t:'CHANGED',s:'Livelier streets with shopfronts, kiosks and café tables.'}]},
   {v:'v90m-beta.73',date:'16 Oct 2026',items:[{t:'NEW',s:'Race Rossi on real Frankfurt streets: two routes, a big jump and power-up bricks.'},{t:'FIXED',s:'The camera no longer hides behind buildings.'},{t:'CHANGED',s:'Faster start.'}]},
   {v:'v90m-beta.72',date:'16 Oct 2026',items:[{t:'FIXED',s:'Cars now stop at red lights and queue up.'},{t:'FIXED',s:'Far fewer crashes into roadside props.'},{t:'FIXED',s:'Trees no longer block the camera.'},{t:'CHANGED',s:'Slightly faster start.'}]},
@@ -771,8 +772,6 @@ const OD_CHANGELOG=[
   {v:'v90m-beta.63',date:'16 Oct 2026',items:[{t:'NEW',s:'Garage shows your ride big in the middle with ride cards; the brick drawer has a picture on every tile.'},{t:'FIXED',s:'Races need you, fewer wrecks and dead stops, cleaner screen, no sinking at the start.'}]},
   {v:'v90m-beta.62',date:'16 Oct 2026',items:[{t:'FIXED',s:'Cars no longer sink into the road at the start or on ramps; story scenes keep the world loaded.'},{t:'FIXED',s:'Races need you: hands-off driving no longer wins, stuck cars reset, races always end. Fewer wrecks and dead stops.'},{t:'FIXED',s:'Cleaner screen: at most 2 objectives, no pop-ups while driving, checklist and bug button at the edge, shorter mission cards.'},{t:'NEW',s:'Bug box: type freely and see your reports.'}]},
   {v:'v90m-beta.61',date:'14 Oct 2026',items:[{t:'FIXED',s:'Wind turbines stand only in open ground, not on pavements; fixed a rare crash; the on-foot camera no longer clips pavement props.'}]},
-  {v:'v90m-beta.60',date:'14 Oct 2026',items:[{t:'NEW',s:'A bug button is always on screen; tap it to report a problem.'}]},
-  {v:'v90m-beta.59',date:'14 Oct 2026',items:[{t:'NEW',s:'Race tracks are open: wide decks, flat verges, earth banks, kickers and route choices.'}]},
   {v:'v90m-beta.58',date:'14 Oct 2026',items:[{t:'FIXED',s:'Festival crates stay on the roof of your car after you change vehicle.'}]},
   {v:'v90m-beta.57',date:'14 Oct 2026',items:[{t:'FIXED',s:'Roadworks barriers no longer block main streets.'}]},
   {v:'v90m-beta.56',date:'14 Oct 2026',items:[{t:'FIXED',s:'On desktop the name plate no longer stretches into a tall dark column.'}]},
@@ -1560,12 +1559,13 @@ function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c
 // XCV = chunk name -> content hash, filled by tools/build.sh (empty in a raw src/ page: then nothing is lazy). A chunk may export top-level names
 // (module list "name:a,b" in src/LAZY): the page declares `let a,b;` stubs, the chunk's last expression is ({a,b}) and XC.apply[name] copies them over.
 // Eager code must not touch a chunk's names at boot; use XC.done / XC_need(name) first. Tests: __tq.ready also waits for XC.done.
-const XCV=/*XCV*/{"99c_checklist":"bbd1190b","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"d5df27a7"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"313d771a","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"833f751e"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
+// fair-1: no `let` stubs / XC.apply are generated, so a chunk's exports (src/LAZY "f.js:a,b") go on window, where other chunks (checklist -> tkBot) see them by name
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
  return XC.q[name]||(XC.q[name]=new Promise(res=>{const s=document.createElement('script');s.src='xc/'+name+'.js?'+(XCV[name]||0);
-  s.onload=()=>{try{const c=window.__XC&&window.__XC[name];if(c){delete window.__XC[name];const o=XC_eval(c);if(XC.apply[name]&&o)XC.apply[name](o)}}catch(e){XC.err.push(name+': '+e);console.warn('XC '+name,e)}res()};
+  s.onload=()=>{try{const c=window.__XC&&window.__XC[name];if(c){delete window.__XC[name];const o=XC_eval(c);if(XC.apply[name]&&o)XC.apply[name](o);else if(o&&typeof o==='object')for(const k in o)if(typeof o[k]==='function'&&!(k in window))window[k]=o[k]}}catch(e){XC.err.push(name+': '+e);console.warn('XC '+name,e)}res()};
   s.onerror=()=>{XC.err.push(name+': 404');res()};document.head.appendChild(s)}))}
 function XC_go(){if(XC.p)return XC.p;XC.t0=performance.now();return XC.p=(async()=>{for(const n of Object.keys(XCV))await XC_need(n);XC.done=true;XC.t1=performance.now()})()}
 if(!XC.done&&!TQ){const iv=setInterval(()=>{try{if(state==='loading'||LD.on||LD.busy)return}catch(e){return}clearInterval(iv);setTimeout(XC_go,1500)},300)}
@@ -2191,7 +2191,7 @@ function poseInit(grp,fold){grp.children.forEach((c,i)=>{c.userData.p1=c.positio
 function poseApply(grp,v){grp.visible=v>.001;if(!grp.visible)return;for(const c of grp.children){const u=c.userData;if(!u.p1)continue;const k=clamp(v*1.7-u.ix*.7,0,1),f=k<=0?0:easeBack(k);c.position.lerpVectors(u.p0,u.p1,f);c.scale.copy(u.s1).multiplyScalar(Math.max(.04,f))}}
 function vehMode(s,dt){const ud=s.mesh.userData;if(!ud.carG)return;if(!ud.posed){poseInit(ud.boat,p=>p.set(p.x*.25,p.y+1.8,p.z*.5));poseInit(ud.wheels,p=>p.set(p.x*.3,p.y+1.3,p.z*.6));ud.posed=true}
   const want=s.boatMode?'boat':s.dirtMode?'4x4':'car';
-  if(want!==(s.vmode||'car')){s.vmode=want;if((s.isPlayer||near(s))&&!(s.isPlayer&&RO.rcT>0)/* debris-1: no transform burst (floating bricks) right after a warp/spawn */){const at=s.mesh.position.clone();at.y+=1.4;debris(at,V3(0,6,0),10,teamCols(s.team),.4,at.y-4);burst(SPARK,at,24,14,.35,new THREE.Color(2,1.8,1));if(s.isPlayer){AU.sfx('brick');say('',want==='boat'?'BOAT':want==='4x4'?'4×4':'CAR',.6)}}}
+  if(want!==(s.vmode||'car')){s.vmode=want;if((s.isPlayer||near(s))&&!(s.isPlayer&&RO.rcT>0)/* debris-1: no transform burst (floating bricks) right after a warp/spawn */){const at=s.mesh.position.clone();at.y+=1.4;debris(at,V3(0,6,0),10,teamCols(s.team),.4,at.y-4);if(s.isPlayer)xfBurst(at,teamCols(s.team));burst(SPARK,at,24,14,.35,new THREE.Color(2,1.8,1));if(s.isPlayer){AU.sfx('brick');say('',want==='boat'?'BOAT':want==='4x4'?'4×4':'CAR',.6)}}}
   const rt=dt*6.5;s.bt=clamp((s.bt||0)+(s.vmode==='boat'?rt:-rt),0,1);s.wt=clamp((s.wt||0)+(s.vmode==='4x4'?rt:-rt),0,1);
   poseApply(ud.boat,s.bt);poseApply(ud.wheels,s.wt);ud.carG.position.y=.6*s.bt+.35*s.wt;ud.under.visible=s.bt<.5&&!(ud.gbHid&&ud.gbHid.length);for(const rb of ud.ribbons)rb.visible=s.bt<.5&&!(ud.gbHid&&ud.gbHid.length);if(ud.gbV)CR_vis(s,ud)}
 function shipMesh(team){const g=new THREE.Group(),m=new THREE.Group();g.add(m);m.scale.setScalar(SHIP_K);
@@ -2347,7 +2347,14 @@ function buildDebris(){const n=320,im=new THREE.InstancedMesh(brickGeo(),new THR
 function debris(at,vel,n,cols,size=1,floor){if(!DEB)return;for(let k=0;k<n;k++){const i=DEB.next;DEB.next=(DEB.next+1)%DEB.n;const j=DEB.list.findIndex(o=>o.i===i);if(j>=0)DEB.list.splice(j,1);
     DEB.list.push({i,p:at.clone().add(V3(rr(-1.2,1.2),rr(0,1),rr(-1.2,1.2))),v:vel.clone().add(V3(rr(-11,11),rr(5,17),rr(-11,11))),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-10,10),rr(-10,10),rr(-10,10)),
       s:V3(rr(.45,.9),rr(.35,.65),rr(.45,.9)).multiplyScalar(size),life:rr(2.4,4),floor:floor??at.y-1.2});DEB.im.setColorAt(i,cols[k%cols.length])}DEB.im.instanceColor.needsUpdate=true}
-function updDebris(dt){if(!DEB)return;const L=DEB.list;for(let j=L.length-1;j>=0;j--){const d=L[j];d.life-=dt;if(d.life<=0){_m.makeScale(0,0,0);DEB.im.setMatrixAt(d.i,_m);L.splice(j,1);DEB.dirty=true;continue}
+// burst-1: transform celebration. A fresh instanced-brick group per swap (named brickfx_burst), 0.3 s life, shared geometry, disposed on expiry.
+const XFB=[];let XFB_GEO=null;
+function xfBurst(at,cols){if(!XFB_GEO)XFB_GEO=brickGeo();const n=16,im=new THREE.InstancedMesh(XFB_GEO,new THREE.MeshStandardMaterial({color:0xffffff,roughness:.32,metalness:.05,transparent:true}),n);im.name='brickfx_burst';im.frustumCulled=false;
+  const L=[];for(let i=0;i<n;i++){im.setColorAt(i,cols[i%cols.length]);const a=i/n*6.283+rr(-.2,.2);L.push({p:at.clone(),v:V3(Math.cos(a)*rr(7,13),rr(5,11),Math.sin(a)*rr(7,13)),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-14,14),rr(-14,14),rr(-14,14)),k:rr(.35,.6)})}
+  scene.add(im);XFB.push({im,L,t:0});AU.sfx('whoosh');shake=Math.max(shake,.22)}
+function updXfb(dt){for(let j=XFB.length-1;j>=0;j--){const b=XFB[j];b.t+=dt;if(b.t>=.34){scene.remove(b.im);b.im.material.dispose();b.im.dispose();XFB.splice(j,1);continue}
+    const f=1-b.t/.34;b.im.material.opacity=Math.min(1,f*2.2);for(let i=0;i<b.L.length;i++){const d=b.L[i];d.v.y-=22*dt;d.p.addScaledVector(d.v,dt);_e2.set(d.w.x*dt,d.w.y*dt,d.w.z*dt);d.q.multiply(_q2.setFromEuler(_e2));_m.compose(d.p,d.q,_s2.setScalar(d.k*(.4+.6*f)));b.im.setMatrixAt(i,_m)}b.im.instanceMatrix.needsUpdate=true}}
+function updDebris(dt){updXfb(dt);if(!DEB)return;const L=DEB.list;for(let j=L.length-1;j>=0;j--){const d=L[j];d.life-=dt;if(d.life<=0){_m.makeScale(0,0,0);DEB.im.setMatrixAt(d.i,_m);L.splice(j,1);DEB.dirty=true;continue}
     d.v.y-=32*dt;d.p.addScaledVector(d.v,dt);if(d.p.y<d.floor){d.p.y=d.floor;if(d.v.y<0)d.v.y*=-.32;d.v.x*=.72;d.v.z*=.72;d.w.multiplyScalar(.65)}
     _e2.set(d.w.x*dt,d.w.y*dt,d.w.z*dt);d.q.multiply(_q2.setFromEuler(_e2));_m.compose(d.p,d.q,_s2.copy(d.s).multiplyScalar(d.life<.6?d.life/.6:1));DEB.im.setMatrixAt(d.i,_m)}
   if(L.length||DEB.dirty){DEB.im.instanceMatrix.needsUpdate=true;DEB.dirty=false}}
@@ -2409,6 +2416,7 @@ const AU={a:null,muted:store.get('mho_mute',false),
   scrape(on){if(this.a)this.scr.g.gain.setTargetAtTime(on?.18:0,this.a.currentTime,.03)},
   sfx(n){const a=this.a;if(!a)return;const t=a.currentTime,F=this.fx;switch(n){
     case'beep':this.osc(t,'square',660,.18,.16,F);break;case'go':this.osc(t,'square',990,.5,.18,F);this.osc(t,'square',1485,.5,.08,F);break;
+    case'whoosh':this.noise(t,.32,.34,700,F,'bandpass');this.noise(t+.04,.26,.22,2200,F,'bandpass');this.osc(t,'sawtooth',this.f(120),.28,.1,F,420);break;
     case'brick':for(let i=0;i<6;i++)this.noise(t+i*.032+Math.random()*.01,.028,.32,2600+Math.random()*2200,F,'bandpass');this.osc(t+.2,'triangle',this.f(96),.08,.12,F);break;
     case'pick':this.osc(t,'triangle',this.f(84),.1,.2,F);this.osc(t+.05,'triangle',this.f(91),.14,.18,F);break;
     case'rocket':for(let i=0;i<3;i++)this.osc(t+i*.08,'sawtooth',700,.18,.12,F,120);break;
@@ -6057,7 +6065,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(Math.abs(RO.h)>50){RO.h-=Math.r
     if(!st.pull&&d<mag&&Math.abs(dy)<mag)st.pull=true;if(st.pull){const k=Math.min(1,dt*(9+sp*.12));st.m.position.x+=dx*k;st.m.position.z+=dz*k;st.m.position.y+=dy*k}
     if(d<2.6&&Math.abs(dy)<3){st.alive=false;st.m.visible=false;st.t=240;studGain(st.v)}}
   RO.cool=Math.max(0,RO.cool-dt);RO.saveT=(RO.saveT||0)+dt;if(RO.saveT>3&&!air){RO.saveT=0;roamSavePos()}
-  sprintStep(dt);tutStep(dt);qvTick(dt);PIN_tick(dt);if(RO.ch)chStep(dt);else{let near=null,nd=1e9;for(const m of RO.marks){const d=Math.hypot(m.x-RO.x,m.z-RO.z);m.ring.rotation.z+=dt;if(m.fig){const u=m.fig.userData;u.arm.rotation.z=-.6-Math.sin(T*5)*.6;u.ex.position.y=5.4+Math.sin(T*3)*.25;u.ex.visible=!markDone(m)}const lk=markLocked(m);{const nf=clamp((d-12)/45,.12,1);m.sp.material.opacity=(lk?.25:markDone(m)?.5:1)*nf;if(m.beam)m.beam.material.opacity=.28*nf;if(m.pane)m.pane.material.opacity=.2*nf}const busyEv=RO.ch||RO.sp||document.body.classList.contains('crQ');m.g.visible=busyEv?(RO.ch&&RO.ch.m===m):!lk||m.kind==='flight';if(busyEv)continue;if(!lk&&d<350)discover(m);const svc=m.kind==='garage'||m.kind==='flight';if(!markDone(m)&&!lk&&markKnown(m)&&!(svc&&RO.svcV&&RO.svcV.has(m))&&d<nd){nd=d;near=m}if((!lk||m.kind==='flight')&&d<11&&Math.abs(RO.y-m.g.position.y)<6&&!RO.card&&RO.cool<=0){RO.pmNew=m;if(svc){(RO.svcV=RO.svcV||new Set()).add(m);RO.svcT=Math.abs(RO.v)<1.2?(RO.svcM===m?RO.svcT:0)+dt:0;RO.svcM=m;if(RO.svcT>=.4)roamOpen(m)}else if(Math.abs(RO.v)<7)roamOpen(m)}}
+  sprintStep(dt);tutStep(dt);qvTick(dt);PIN_tick(dt);if(RO.ch)chStep(dt);else{let near=null,nd=1e9;for(const m of RO.marks){const d=Math.hypot(m.x-RO.x,m.z-RO.z);m.ring.rotation.z+=dt;if(m.fig){const u=m.fig.userData;u.arm.rotation.z=-.6-Math.sin(T*5)*.6;u.ex.position.y=5.4+Math.sin(T*3)*.25;u.ex.visible=!markDone(m)}const lk=markLocked(m);{const nf=clamp((d-12)/45,.12,1);m.sp.material.opacity=(lk?.25:markDone(m)?.5:1)*nf;if(m.beam)m.beam.material.opacity=.28*nf;if(m.pane)m.pane.material.opacity=.2*nf}const busyEv=RO.ch||RO.sp||document.body.classList.contains('crQ');m.g.visible=busyEv?(RO.ch&&RO.ch.m===m):!lk||m.kind==='flight';if(busyEv)continue;if(!lk&&d<350)discover(m);const svc=m.kind==='garage'||m.kind==='flight';if(!markDone(m)&&!lk&&markKnown(m)&&!(svc&&RO.svcV&&RO.svcV.has(m))&&d<nd){nd=d;near=m}if((!lk||m.kind==='flight')&&d<11&&Math.abs(RO.y-m.g.position.y)<6&&!RO.card&&RO.cool<=0){RO.pmNew=m;if(svc){(RO.svcV=RO.svcV||new Set()).add(m);RO.svcT=Math.abs(RO.v)<1.2?(RO.svcM===m?RO.svcT:0)+dt:0;RO.svcM=m;if(RO.svcT>=.4)roamOpen(m)}else if(Math.abs(RO.v)<4.2)roamOpen(m)}}
     if(RO.wp){const d=Math.hypot(RO.wp.x-RO.x,RO.wp.z-RO.z);if(d<12)RO.wp=null;else{near=RO.wp;nd=d}}RO.near=near;RO.nd=nd}
   if(RO.card&&!RO.cardPin&&Math.hypot(RO.card.x-RO.x,RO.card.z-RO.z)>12){RO.card=null;$('#roamCard').hidden=true}roamPrompt(dt);
   smashCheck(dt);studFXStep(dt);hubTrafficStep(dt);comboStep(dt);popStep(dt,busy);gbStep(dt);RO.prT=(RO.prT||0)+dt;if(RO.prT>1){propRespawn(RO.prT);RO.prT=0}hubFrame(dt);
@@ -6147,7 +6155,7 @@ $('#profX').onclick=()=>{$('#profile').hidden=true};
 {const ok=e=>{e.preventDefault();e.stopPropagation();document.body.classList.add('portraitOk');try{localStorage.setItem('mho_portok','1')}catch(_){}};$('#rotOk').addEventListener('click',ok);$('#rotOk').addEventListener('touchend',ok,{passive:false});$('#rotOk').addEventListener('pointerup',ok)}try{if(localStorage.getItem('mho_portok'))document.body.classList.add('portraitOk')}catch(e){}
 function storyClose(){$('#story').hidden=true;RO.story=false;RO.cool=1;if(athInvitePending()&&RO.on&&state==='roam')setTimeout(()=>{if(RO.on&&state==='roam'&&!RO.story&&athInvitePending())storyCheck()},450)}
 const roamBossOpen=()=>nFlags()>=BOSS_EV.need;
-function roamPrompt(dt){const el=$('#roamPrompt');if(!el)return;if(RO.pmNew&&!RO.card){if(RO.pm!==RO.pmNew){RO.pm=RO.pmNew;const m=RO.pm;el.innerHTML=`<b>${markTitle(m)}</b><span>${TOUCH.on?'TAP TO OPEN':'ENTER TO OPEN'}</span>`;el.style.setProperty('--c',m.col||'#4ceaff')}RO.pmT=2.5}
+function roamPrompt(dt){const el=$('#roamPrompt');if(!el)return;if(RO.pmNew&&!RO.card){if(RO.pm!==RO.pmNew){RO.pm=RO.pmNew;const m=RO.pm;el.innerHTML=`<b>${markTitle(m)}</b><span>${m.kind==='garage'||m.kind==='flight'?'':'stop to start · '}${TOUCH.on?'TAP TO OPEN':'ENTER TO OPEN'}</span>`;el.style.setProperty('--c',m.col||'#4ceaff')}RO.pmT=2.5}
   RO.pmNew=null;RO.pmT=Math.max(0,(RO.pmT||0)-dt);if(RO.card||RO.ch||RO.sp||RO.pmT<=0)RO.pm=null;el.hidden=!RO.pm}
 function roamPromptOpen(){const m=RO.pm;if(!m||RO.card)return false;RO.pm=null;$('#roamPrompt').hidden=true;roamOpen(m);RO.cardPin=1;return true}
 const BRIEF={checkpoint:['🟢','Drive through every ring in order.','The next ring glows green. Follow the arrow and the dotted line on the minimap.'],
@@ -6178,7 +6186,7 @@ function roamOpen(m){RO.card=m;RO.cool=2;RO.cardPin=0;const c=$('#roamCard'),k=m
   else if(k==='season'){const S=season(),rd=seasonRound(S.L,S.r);body=`${LEAGUES[S.L].name} · Round ${S.r+1}/5: <b>${rd.name}</b> on ${rd.short}${rd.dbl?' (double points)':''}<br>Championship points, credits and promotion.`;go='RACE ROUND ▶'}
   else if(k==='challenge'){body=lock?'Win a medal in the previous challenge first.':`${e.sub}<br>${e.goal}`}
   else if(k==='mode'){body=e.d+(e.track?` · ${TRACK_DEFS.find(t=>t.id===e.track).short}`:'');go='PLAY ▶'}
-  else if(k==='quest'){const md=roamSave().otg[e.id]||0;c.querySelector('h4').textContent=e.em+' '+e.npc+' · '+e.name;body=`<i>“${e.hi}”</i>`;go='LET\'S GO ▶'}
+  else if(k==='quest'){const md=roamSave().otg[e.id]||0;c.querySelector('h4').textContent=e.em+' '+e.npc+' · '+e.name;{let hi='';for(const t of String(e.hi).split(/(?<=[.!?…]) /)){if(hi&&(hi+' '+t).replace(/<[^>]+>/g,'').split(/\s+/).length>25)break;hi+=(hi?' ':'')+t}body=`<i>“${hi}”</i>`}go='LET\'S GO ▶'}
   else if(k==='sprint'&&SPR_TRACK[e.id]){const bs=(store.get('mho_stars',{})['sprint:'+e.id])||0,td=TRACK_DEFS.find(t=>t.id===SPR_TRACK[e.id]);body=`🏟️ <b>Track race</b> · ${td.name}<br>${e.d}<br>${bs?`Your best ${'★'.repeat(bs)}${'☆'.repeat(3-bs)}${bs>=3?' · mastered: replays pay studs only':''}`:'1st ★★★ · 2nd ★★ · 3rd ★'}`;go='TO THE TRACK ▶'}
   else if(k==='sprint'){const r=spSave()[e.id]||{};body=`City sprint · ${(e.len/1000).toFixed(1)} km · ${e.ai.length} rivals · traffic on<br>${e.d}<br>${r.best?`Best ${fmt2(r.best)} · ${'★'.repeat(r.st||0)}${'☆'.repeat(3-(r.st||0))}`:'1st ★★★ · 2nd ★★ · 3rd ★ · 1,300 studs per ★'}`;go='RACE ▶'}
   else if(k==='otg'){body=qvUse(m)?QV_D[e.kind]:`${e.d}`;go='START ▶'}
@@ -6186,7 +6194,7 @@ function roamOpen(m){RO.card=m;RO.cool=2;RO.cardPin=0;const c=$('#roamCard'),k=m
   else if(k==='flight'){const T=CITYCFG[CCF.to];body=lock?`🔒 <b>Unlocks after ${ATH_NEED} Frankfurt flags</b> · you have ${fraFlags()}/${ATH_NEED}.<br>Beat the Frankfurt rivals one-on-one to win their flags. Someone in Athens is waiting for you.`:`<b>${CCF.code} → ${T.code} · ${T.name}</b> · ${CCF.flight}<br>Your progress here is saved. Studs, XP, cars and garage parts fly with you.${RO.ch||RO.sp?'<br><b>Finish the event first.</b>':''}`;go=CID==='fra'?'✈ FLY TO ATHENS ▶':'✈ FLY HOME TO FRANKFURT ▶'}
   else if(k==='garage'){body=`Credits <b>${season().cr.toLocaleString('de-DE')}</b> · choose your team and upgrade your craft.`;go='DONE';garageUI(X)}
   if(markCh(m)>chapter())body=`🔒 Unlocks in <b>Chapter ${markCh(m)} · ${CHS()[markCh(m)-1].title}</b> (${CHS()[markCh(m)-1].need} flags).`;
-  if(CM.on&&!['garage','cruise'].includes(k)){go='SET ROUTE ▶';body+='<br><small>📍 Drive there to start. The minimap shows the way.</small>'}const bf=BRIEF[e&&e.kind];if((k==='otg'||k==='quest')&&e&&!(k==='quest'&&e.kind==='chase'))body+=qvUse(m)?(lock?'':qvBrief(m)):bf?briefHTML(e):'';P.innerHTML=body;cardStars(m,k,e,lock);if(k==='quest'&&e&&e.kind==='chase')$('#rcTiers').hidden=true;$('#rcGo').disabled=lock||(k==='flight'&&!!(RO.ch||RO.sp));$('#rcGo').textContent=lock?'🔒 LOCKED':go;RO.v*=.3;AU.sfx('pick')}
+  if(CM.on&&!['garage','cruise'].includes(k)){go='SET ROUTE ▶';body+='<br><small>📍 Drive there to start. The minimap shows the way.</small>'}const bf=BRIEF[e&&e.kind];if(k==='otg'&&e)body+=qvUse(m)?(lock?'':qvBrief(m)):bf?briefHTML(e):'';P.innerHTML=body;cardStars(m,k,e,lock);if(k==='quest'&&e&&e.kind==='chase')$('#rcTiers').hidden=true;$('#rcGo').disabled=lock||(k==='flight'&&!!(RO.ch||RO.sp));$('#rcGo').textContent=lock?'🔒 LOCKED':go;RO.v*=.3;AU.sfx('pick')}
 function garageUI(X){const S=season();{const gb=document.createElement('button');gb.className='go';gb.style.cssText='width:100%;margin-bottom:6px';gb.textContent='🔧 OPEN GARAGE BUILDER';gb.onclick=()=>gbOpen();X.appendChild(gb)}const tw=document.createElement('div');tw.className='gTeams';if(teamLocked(TEAMS[teamIdx])){teamIdx=0;store.set('mho_team',0)}const cur=TEAMS[teamIdx],pc=v=>Math.round(v*100);const vh=document.createElement('div');vh.className='gH';vh.innerHTML=`VEHICLE · <b>${cur.name}</b> <small>${cur.desc} · top ${pc(cur.top)} · acc ${pc(cur.acc)} · grip ${pc(cur.han)} · hull ${pc(cur.hull)}</small>`;X.appendChild(vh);
   TEAMS.forEach((t,i)=>{const b=document.createElement('button');const buy=t.cost&&!garOwned().includes(t.id)&&t.unlock<=medalPts(),lock=teamLocked(t)&&!buy;b.className='rnd'+(i===teamIdx?' cur':'')+(t.own||t.cost?' veh':'');b.title=t.desc;b.disabled=lock||(buy&&S.cr<t.cost);
     b.innerHTML=(lock?'🔒 ':'')+t.name+(buy?` · ${t.cost.toLocaleString('de-DE')} cr`:'')+(lock&&t.own?` <small>(${t.own==='SKYCUP'?'win the Sky Cup':'beat '+PD[t.own].full.split(' ').pop()})</small>`:'');
@@ -7644,8 +7652,8 @@ function FL_terr(T0,ground,dt=1/60){const raw=FL_raw(T0,ground),air=RO.y>ground+
   return raw}
 const FL_VEH={road:'ship',dirt:'ship',water:'boat'};  // R1: dirt was 'offroad' = the car turned into the buggy on grass at 100 km/h
 function FL_veh(){const v=(RO.vsel||'auto')==='auto'?FL_VEH[FL.s||'road']:RO.vsel;if(v!==FL.v&&!(pl&&pl.air)){if(FL.v){FL.log.push({v,s:FL.s,x:Math.round(RO.x),z:Math.round(RO.z)});if(FL.log.length>60)FL.log.shift();FL_burst(v)}FL.v=v}return FL.v||v}
-function FL_burst(v){if(!pl||!RO.on)return;const at=pl.mesh.position.clone();at.y+=1.2;
-  CR_noGlow=1;try{debris(at,V3(0,5,0),8,['#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ffffff'].map(c=>new THREE.Color(c)),.45,RO.y);burst(SPARK,at,8,9,.25,new THREE.Color(1.3,1.2,.9))}finally{CR_noGlow=0}AU.sfx('boost');fovKick=Math.max(fovKick,4)}
+function FL_burst(v){if(!pl||!RO.on||RO.rcT>0)return;/* burst-1: never in the roamWarp grace */const at=pl.mesh.position.clone();at.y+=1.2;
+  CR_noGlow=1;try{debris(at,V3(0,5,0),8,['#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ffffff'].map(c=>new THREE.Color(c)),.45,RO.y);burst(SPARK,at,8,9,.25,new THREE.Color(1.3,1.2,.9))}finally{CR_noGlow=0}xfBurst(at,['#e8302a','#2a7ad8','#ffd12c','#3aa04a','#ffffff'].map(c=>new THREE.Color(c)));AU.sfx('boost');fovKick=Math.max(fovKick,4)}
 // ---------- 2 · smashing fills boost (size-scaled, chain combo), goon takedowns refill, slower passive recharge
 const FL_RECH=9,FL_CHAIN=1.6;
 const FL_mult=n=>Math.min(3,1+.25*Math.max(0,n-1));
@@ -12519,8 +12527,8 @@ function LV_pn(n){return Math.min(n,LV_walk(n)+(LV.cl?LV_crowdN():0))}
 // wave: arms up and waving when the car passes within 16 m (2 of 3 people), never while leaping
 const LV_wave=(i,d,sp)=>TUNE.lvWave&&LV_d('lvPed')>0&&d<16&&sp>4&&i%3!==0;
 // traffic: cars further than 300 m are moved to streets 100-260 m around, half of them ahead (was 650 / 480 m → 180-480 m, behind)
-function LV_trFar(){const d=LV_d('lvTraf');return d<=0?(CID==='fra'?650:480):240}
-function LV_trNear(){const d=LV_d('lvTraf');return d<=0?(CID==='fra'?hubNear(180,480,true):hubNear(130,400,true)):R()<.65?LV_nearHid(70,200):hubNear(90,220,true)}
+function LV_trFar(){const d=LV_d('lvTraf');return d<=0?(CID==='fra'?650:480):(CID==='fra'?240:160)/* burst-1: Athens keeps traffic closer */}
+function LV_trNear(){const d=LV_d('lvTraf');return d<=0?(CID==='fra'?hubNear(180,480,true):hubNear(130,400,true)):R()<.65?LV_nearHid(60,CID==='fra'?200:150):hubNear(80,CID==='fra'?220:170,true)}
 // v88p: a street node 70-200 m ahead that the camera cannot see right now (no pop-in), so cars drive into view 20-60 m ahead
 function LV_nearHid(min,max){let i=-1;for(let k=0;k<6;k++){i=LV_near(min,max,1);if(i<0)return i;const n=HUB.nodes[i];if(!LV_seen(n.x,n.y||RO.y||0,n.z))return i}return i}
 // ---------- 6 · bolder facade colours: the district tints (90 CV_FP) were near-white pastels; mixed toward LEGO colours by TUNE.lvFac (read once, at city build)
@@ -16034,7 +16042,7 @@ addEventListener('keydown',e=>{if(e.code==='KeyR'&&typeof state!=='undefined'&&s
    The builder tries a few headings / widths and keeps the pair of routes with the smallest time spread (rival speed model, turbo pads go on the slower route), ≤ 5 %.
    Courses marked off:1 send route B straight across the nearest park (grass: the car turns into the off-road buggy by itself, 98xf_xform.js).
    Brick checkpoint arches, ≥ 2 ramps on each route, "?" item bricks that fire on pickup (no extra button: TURBO / BRICK BLAST / SHIELD), rivals use the same bricks and routes.
-   Fair rivals: rubber band both ways, a blast is announced 0.7 s ahead and can hit you at most once per 8 s. Hands-off: DNF 40 s after the last rival finishes or at 235 s.
+   Fair rivals: rubber band both ways, a blast is announced 0.7 s ahead and can hit you at most once per 8 s. Hands-off: DNF 40 s after the last rival finishes or at 235 s (?fair=1: tkGrace, 25 s after the first).
    Rides on the city-sprint engine (70_roam_world.js). ?tk1=0 = old spline tracks. GO: tk1/route-spread, tk1/items, tk1/courses(-ath), rv2k/race-handsoff. */
 const TK={on:(()=>{try{return new URLSearchParams(location.search).get('tk1')!=='0'}catch(e){return true}})(),last:null,C:null,built:{}};
 const TK_C={id:'tk_rossi',key:'rival:ROSSI',kind:'rival',ai:['ROSSI'],p:'ROSSI',name:'Westend Split',nA:'Anlagenring',nB:'Neue Mainzer Str.',
@@ -16149,12 +16157,20 @@ function tkPath(a){const G=tkGeo();return a.route==='B'?G.pB:G.pA}
 function tkPosOn(P,s){let cum=0;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(s<=cum+L||i===P.length-1){const t=clamp((s-cum)/(L||1),0,1),n=P[i+1],turn=n?Math.abs(angDiff(Math.atan2(n[0]-b[0],n[1]-b[1]),Math.atan2(b[0]-a[0],b[1]-a[1]))):0;return{x:a[0]+(b[0]-a[0])*t,z:a[1]+(b[1]-a[1])*t,h:Math.atan2(b[0]-a[0],b[1]-a[1]),toCorner:cum+L-s,turn}}cum+=L}}
 // rival speed model, shared by the race and GO tk1/route-spread: base speed, slow for sharp corners, turbo pads on the pad route
 function tkAiTarget(a,P,s){const q=tkPosOn(P,Math.max(0,s));let tv=a.base;if(q.turn>.5&&q.toCorner<55)tv=Math.min(tv,30);else if(q.turn>.25&&q.toCorner<45)tv=Math.min(tv,44);const C=TK.C||TK_C;if(C.boost&&a.route===C.boost.r&&TK.sp&&TK.sp.padT>0)tv*=1.25;return tv}
+// fair-1 (2026-10-16): pace band, as in 2K Drive / Mario Kart. The rival's speed model is scaled to the player's car (TK_PACE: base 62 -> 31 m/s, the car tops out ~31)
+// and pulled toward a target gap that moves with your progress: it leads early, lets you by, comes back, then trails you into the finish, so a clean race is close and
+// winnable, while a crash still costs (it waits less near the end). Over 400 m apart (you stopped) the band lets go. Without ?fair=1: old pace (base 62, ±10 % past 150 m, DNF +40 s).
+const TK_FAIR=(()=>{try{return new URLSearchParams(location.search).get('fair')==='1'}catch(e){return false}})(),TK_PACE=.5;   // WIP: OFF until rv2k2/close passes (?fair=1 on)
+function tkGapT(pr,i){const k=[[0,30],[.25,30],[.35,-30],[.5,-30],[.6,25],[.72,25],[.82,-40],[1,-40]];let j=1;while(j<k.length-1&&pr>k[j][0])j++;const a=k[j-1],b=k[j];return a[1]+(b[1]-a[1])*clamp((pr-a[0])/(b[0]-a[0]),0,1)-i*20}
+function tkRub(gap,pr,i){if(!TK_FAIR)return gap>150?.9:gap<-150?1.1:1;if(Math.abs(gap)>400)return 1;const e=gap-tkGapT(pr,i),fin=pr>.82;return e>0?1-(fin?.25:.45)*Math.min(1,e/120):1+(fin?.06:.3)*Math.min(1,-e/100)}
+// DNF: relative to the first rival home and generous: you get the time your own average pace needs to finish (+10 s), 30 s at least, up to the winner's whole time again.
+function tkGrace(sp,firstFin,len){if(!TK_FAIR)return 40;const v=sp.myS/Math.max(1,sp.t);return v>4?clamp((len-sp.myS)/v+10,30,Math.max(30,firstFin)):25}
 function tkFire(who,kind,sp,ai){const lead=sp.ai.filter(b=>b.fin==null&&b.s>sp.myS-20&&b.s-sp.myS<220).sort((x,y)=>x.s-y.s)[0];
   if(who==='me'){if(kind==='TURBO'){RO.v=Math.max(RO.v,0)+20;RO.turbo=Math.max(RO.turbo||0,1.5);if(pl)pl.bm=100;fovKick=Math.max(fovKick,12);AU.sfx('nitro')}
     else if(kind==='SHIELD'){sp.shieldT=6;AU.sfx('pick')}
     else{if(lead){lead.stun=1.2;lead.v*=.35;feed('BRICK BLAST · '+lead.name,250,'#ff2d95');AU.sfx('crash')}else feed('BRICK BLAST · missed',0,'#9fb0c0')}
     feed(kind,0,'#c46bff');return}
-  const a=ai||sp.ai[0];if(kind==='TURBO'){a.v+=16;return}if(kind==='SHIELD')return;
+  const a=ai||sp.ai[0];if(kind==='TURBO'){a.v+=TK_FAIR?9:16;return}if(kind==='SHIELD')return;
   // rival blast: telegraphed, needs you ahead, one hit per 8 s, a shield blocks it
   if(sp.myS>a.s&&sp.myS-a.s<160&&sp.hitCd<=0&&sp.warn==null){sp.warn=.7;say('','⚠ '+a.name.toUpperCase()+' · BRICK BLAST',.7)}}
 function tkStep(dt){const sp=RO.sp,e=sp.e;TK.C=sp.C;const G=tkGeo();RO.cool=2;TK.sp=sp;
@@ -16169,16 +16185,16 @@ function tkStep(dt){const sp=RO.sp,e=sp.e;TK.C=sp.C;const G=tkGeo();RO.cool=2;TK
   for(const it of sp.items){it.cd=Math.max(0,it.cd-dt);it.g.visible=it.cd<=0;it.g.rotation.y+=dt*2;if(it.cd>0||sp.cd>0)continue;
     if(Math.hypot(it.x-RO.x,it.z-RO.z)<4.5){it.cd=3;tkFire('me',TK_ITEMS[(sp.items.indexOf(it)+Math.floor(sp.t))%3],sp);sp.fired=(sp.fired||0)+1}}
   const C=sp.C;for(const a of sp.ai){const P=tkPath(a),Lp=tkLen(P);if(a.fin!=null&&a.s>=Lp+40)continue;a.stun=Math.max(0,a.stun-dt);a.itemCd=Math.max(0,a.itemCd-dt);
-    const gap=a.s/Lp*G.lenA-sp.myS,rub=gap>150?.9:gap<-150?1.1:1;let tv=tkAiTarget(a,P,a.s)*rub;if(sp.cd>0||a.stun>0)tv=0;
+    const gap=a.s/Lp*G.lenA-sp.myS,rub=tkRub(gap,sp.myS/G.lenA,sp.ai.indexOf(a));let tv=tkAiTarget(a,P,a.s)*(TK_FAIR?TK_PACE:1)*rub;if(sp.cd>0||a.stun>0)tv=0;
     if(C.boost&&a.route===C.boost.r){const q=tkPosOn(P,a.s);if(sp.pads.some(p=>Math.hypot(q.x-p.x,q.z-p.z)<8))sp.padT=1.5}
     a.v+=(tv-a.v)*Math.min(1,dt*(tv>a.v?1.6:2.5));a.s+=a.v*dt;if(a.s>=Lp&&a.fin==null){a.fin=sp.t;say('',a.name.toUpperCase()+' FINISHED',1.2)}
     const q=tkPosOn(P,Math.max(0,a.s)),x=q.x+Math.cos(q.h)*a.lane,z=q.z-Math.sin(q.h)*a.lane;
     if(a.itemCd<=0)for(const it of sp.items)if(it.cd<=0&&Math.hypot(it.x-x,it.z-z)<5){it.cd=3;a.itemCd=4;tkFire('ai',TK_ITEMS[(sp.items.indexOf(it)+1)%3],sp,a);break}
     a.y=groundAt(x,z,(a.y??0)+3);a.h=(a.h??q.h)+angDiff(q.h,a.h??q.h)*Math.min(1,dt*4);a.g.position.set(x,a.y,z);a.g.rotation.y=a.h+Math.PI;const ud=a.g.userData,wet=C.water&&typeof inRiver==='function'&&inRiver(x,z,0);if(wet)sp.aiWet=(sp.aiWet||0)+1;if(ud.boat&&ud.carG){ud.boat.visible=!!wet;ud.carG.visible=!wet}if(ud.m)ud.m.position.y=1.6+Math.sin(T*6)*.1;if(ud.ribbons)for(const rb of ud.ribbons){rb.scale.z=6+a.v/8;rb.material.uniforms.uT.value=T}
     const d=Math.hypot(x-RO.x,z-RO.z);if(d<5.5&&d>.01&&Math.abs(a.y-RO.y)<3){const k=(5.5-d)/2;RO.x+=(RO.x-x)/d*k;RO.z+=(RO.z-z)/d*k;a.v*=.92;RO.v*=.95;AU.sfx('bump')}}
-  const n=sp.ai.length,ahead=sp.ai.filter(a=>a.fin!=null||a.s/tkLen(tkPath(a))*G.lenA>sp.myS).length,lastFin=sp.ai.every(a=>a.fin!=null)?Math.max(...sp.ai.map(a=>a.fin)):null;sp.place=1+ahead;
-  if(!sp.done&&sp.cd<=0&&(sp.t>=235||(lastFin!=null&&sp.t-lastFin>=40)))return tkFinish(true);
-  sp.hud=`<b>🏁 ${e.name.toUpperCase()}</b><span>POS ${sp.place}/${n+1} · CP ${Math.min(sp.gi,sp.G.length)}/${sp.G.length} · ${fmt(Math.max(0,sp.t))}${sp.shieldT>0?' · 🛡':''}${lastFin!=null?' · DNF in '+Math.ceil(40-(sp.t-lastFin))+' s':''}</span>`}
+  const n=sp.ai.length,ahead=sp.ai.filter(a=>a.fin!=null||a.s/tkLen(tkPath(a))*G.lenA>sp.myS).length,lastFin=TK_FAIR?(sp.ai.some(a=>a.fin!=null)?Math.min(...sp.ai.filter(a=>a.fin!=null).map(a=>a.fin)):null):sp.ai.every(a=>a.fin!=null)?Math.max(...sp.ai.map(a=>a.fin)):null;sp.place=1+ahead;
+  const grace=lastFin!=null?tkGrace(sp,lastFin,G.lenA):0;if(!sp.done&&sp.cd<=0&&(sp.t>=(TK_FAIR?420:235)||(lastFin!=null&&sp.t-lastFin>=grace)))return tkFinish(true);
+  sp.hud=`<b>🏁 ${e.name.toUpperCase()}</b><span>POS ${sp.place}/${n+1} · CP ${Math.min(sp.gi,sp.G.length)}/${sp.G.length} · ${fmt(Math.max(0,sp.t))}${sp.shieldT>0?' · 🛡':''}${lastFin!=null?' · DNF in '+Math.ceil(grace-(sp.t-lastFin))+' s':''}</span>`}
 function tkFinish(dnf){const sp=RO.sp,C=sp.C,n=sp.ai.length;sp.done=true;const place=dnf?n+1:1+sp.ai.filter(a=>a.fin!=null&&a.fin<sp.t).length,won=place===1;
   const stars=C.kind==='sprint'||C.kind==='quick'?(place===1?3:place===2?2:place===3?1:0):won?(sp.t<120?3:2):0,a=sp.ai[0];
   TK.last={key:C.key,place,t:+sp.t.toFixed(1),dnf,stars,rival:a.fin,route:a.route,fired:sp.fired||0};
@@ -18773,17 +18789,17 @@ function ENV_ground(m,opt){if(!m||!ENV_on()||m.userData.env1)return;m.userData.e
     sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nvarying vec3 vEvP;varying vec3 vEvN;uniform vec3 uEvP[5];uniform vec3 uEvB;'+ENV_glsl())
       .replace('#include <color_fragment>','#include <color_fragment>\n'+f)};
   m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|env1'+opt.kind+(lo?'l':'')};m.needsUpdate=true}
-function ENV_water(m){if(!m||!ENV_on()||m.userData.env1)return;m.userData.env1='water';ENV_state.water=1;const lo=ENV_lo(),ob=m.onBeforeCompile,ck=m.customProgramCacheKey,C=h=>{const c=new THREE.Color(h);return`vec3(${c.r.toFixed(4)},${c.g.toFixed(4)},${c.b.toFixed(4)})`};
+function ENV_water(m){if(!m||!ENV_on()||m.userData.env1)return;m.userData.env1='water';ENV_state.water=1;m.metalness=.06;m.envMapIntensity=.7;const lo=ENV_lo(),ob=m.onBeforeCompile,ck=m.customProgramCacheKey,C=h=>{const c=new THREE.Color(h);return`vec3(${c.r.toFixed(4)},${c.g.toFixed(4)},${c.b.toFixed(4)})`};
   m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);
     sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>'+ENV_glsl()+'\nfloat evFr=0.;')
       .replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
-{float b=vBank;vec3 wc=mix(${C('#5ad1c8')},${C('#2fa3c9')},smoothstep(2.,18.,b));wc=mix(wc,${C('#12487a')},smoothstep(20.,55.,b));
+{float b=vBank;vec3 wc=mix(${C('#43d3e6')},${C('#2b8fe8')},smoothstep(2.,18.,b));wc=mix(wc,${C('#1456c4')},smoothstep(20.,55.,b));
  ${lo?'':'normal=normalize(normal+vec3(evN(vWP.xz*.35+uT*.4)-.5,0.,evN(vWP.xz*.3-uT*.35+9.)-.5)*.10);'}
  float fo2=smoothstep(6.,0.,b+sin(vWP.x*.35+uT*2.)*1.4);float cr=smoothstep(.45,.7,wvH(vWP.xz,uT)/.79*.5+.5);
  float fb=smoothstep(.80,.95,sin((b${lo?'':'+evN(vWP.xz*.08)*6.'})*.9-uT*1.8)*.5+.5)*(1.-smoothstep(4.,16.,b))${lo?'':'*smoothstep(.25,.6,evN(vWP.xz*.15+uT*.05))'};
  wc=mix(wc,vec3(.95,.98,1.),clamp(max(fo2*.85,cr*.3)+fb*.7,0.,1.));
  evFr=pow(1.-clamp(dot(normalize(normal),normalize(vViewPosition)),0.,1.),3.);diffuseColor.rgb=wc*(1.-evFr*.2);}`)
-      .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=vec3(.62,.80,.98)*evFr*.16;');
+      .replace('#include <emissivemap_fragment>','#include <emissivemap_fragment>\ntotalEmissiveRadiance+=vec3(.62,.80,.98)*evFr*.16+diffuseColor.rgb*.32;/* burst-1: keeps the Main blue under the grey reflections */');
     if(!sh.fragmentShader.includes('float wvH'))sh.fragmentShader=sh.fragmentShader.replace('varying vec3 vWP;','varying vec3 vWP;\nfloat wvH(vec2 p,float t){return .38*sin(p.x*.045+t*1.6)+.26*sin(p.y*.09+p.x*.021-t*1.9)+.15*sin((p.x+p.y)*.13+t*2.7);}')};
   m.customProgramCacheKey=function(){return(ck?ck.call(this):'')+'|env1w'+(lo?'l':'')};m.needsUpdate=true}
 // hooks: water via the waterMat factory, city lawns + Taunus via ART_hub (after the city materials exist); outer land in worldGroundBuild
@@ -19291,8 +19307,7 @@ roamCam=(f=>function(dt){if(FC.off.lengthSq()){camera.position.add(FC.off);FC.of
   // foliage over / around the camera
   FC.t+=dt;FC.n+=dt;if(FC.n>=.125){FC.n=0;try{FC_step()}catch(e){}}try{FC_pull(dt)}catch(e){}})(roamCam);
 window.__fcam=FC;
-// ui-1: HUD governor. At most 2 objective/hint widgets at once; no tap-to-close popups while the car is moving.
-// Runs from a MutationObserver (microtask: after the game changed a widget, before the frame is painted) + a 150 ms backstop.
+// ui-1: HUD governor (≤ 2 objective widgets, none tap-to-close while moving)
 {const ORD=['m1Next','roamArrow','npcSay','roamPop','roamPlate','crSmHint'];
  const st=document.createElement('style');st.textContent='.ui1X{display:none!important}body.ui1Mv #rotateHint{display:none!important}';document.head.appendChild(st);
  const vis=e=>{if(!e)return false;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity===0&&!(e.getAnimations&&e.getAnimations().length))return false;const r=e.getBoundingClientRect();return r.width>=2&&r.height>=2&&r.right>0&&r.left<innerWidth&&r.bottom>0&&r.top<innerHeight};
@@ -19307,6 +19322,18 @@ window.__fcam=FC;
 }
 // ui-1: taps since page load (rv2k/onboard)
 window.__taps=0;addEventListener('pointerdown',()=>{window.__taps++},true);
+// phone-1: phone HUD (12 px text, popups top-right under ⚙, pill inside screen, result panel after the car stops, BOOST by GAS)
+{const st=document.createElement('style');st.textContent=`html body.touch :is(#tB,#tN,#tD,#tF,#tG){font-size:15px!important}
+html body :is(#feed,#hitPop,#roamCombo,#juPop){position:fixed;left:auto!important;right:calc(8px + env(safe-area-inset-right,0px))!important;transform:none!important;text-align:right;pointer-events:none;z-index:6;max-width:min(230px,56vw);white-space:normal!important}
+html body :is(#hitPop,#juPop){top:calc(100px + env(safe-area-inset-top,0px))!important;font-size:18px!important}
+html body #hitPop.on{animation:none!important}html body #juPop{top:calc(124px + env(safe-area-inset-top,0px))!important}
+html body :is(#roamCombo,#feed){top:calc(152px + env(safe-area-inset-top,0px))!important}
+html body :is(.touch,.v85) #roamArrow{max-width:calc(100vw - 150px)!important;white-space:normal!important;overflow:visible!important;text-align:center}
+@media (orientation:portrait){html body :is(.touch,.v85) #roamArrow{left:112px!important;right:56px!important;transform:none!important;max-width:none!important;justify-content:center}
+}
+body.phHold #spRes{visibility:hidden;pointer-events:none}`;document.head.appendChild(st);
+ let t0=0;setInterval(()=>{try{const r=document.getElementById('spRes');if(!r||r.hidden){t0=0;document.body.classList.remove('phHold');return}
+  if(!t0)t0=performance.now();document.body.classList.toggle('phHold',typeof RO!=='undefined'&&Math.abs(RO.v||0)>1.5&&performance.now()-t0<4000)}catch(e){}},100)}
 // boot-2 (2026-10-16): shorter STORY boot (rv2k/onboard). ?boot2=0 = old path.
 // (1) ?boot2g=1: the outer land and the Autobahn/periptera meshes are built after the first roam frame, in ≤ 8 ms slices, nearest batch first. Physics never
 //     reads these meshes (groundY is analytic; GND_far only refines the outer land, outside the start district), so the car stands right before they exist.
@@ -19352,7 +19379,6 @@ html body #ogArea{left:auto!important;right:calc(12px + env(safe-area-inset-righ
 html body #ogArea b{font-size:13px!important;letter-spacing:.05em!important}html body #ogArea em{font-size:12px!important;display:inline!important;margin-left:6px}
 html body #ogArea .ogBar,html body #ogArea span{display:none!important}
 html body #speedFx#speedFx{filter:opacity(.5) hue-rotate(10deg) saturate(2.2)!important;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 44%,transparent 54%)!important;mask-image:linear-gradient(to bottom,#000 0%,#000 44%,transparent 54%)!important}
-/* rev-3: bottom:auto, or the base bottom:30px stretches the plate to a 586 px dark column on tall desktop windows */
 html body #roamPlate#roamPlate{bottom:auto!important;left:auto!important;right:calc(12px + env(safe-area-inset-right,0px))!important;top:calc(56px + env(safe-area-inset-top,0px))!important;transform:none!important;max-width:230px!important;padding:3px 10px!important;border-radius:10px!important;background:rgba(20,20,19,.86)!important;text-align:right!important;min-width:0!important;width:auto!important;height:auto!important}
 /* v89o: below the 44 px ⚙ (6-50 px; 54-98 px in challenges) */html body.racing #roamPlate#roamPlate{top:calc(104px + env(safe-area-inset-top,0px))!important}html body #roamPlate#roamPlate *{font-size:12px!important;line-height:1.25!important;letter-spacing:0!important}html body #roamPlate::before,html body #roamPlate::after{display:none!important}`;document.head.appendChild(st)})();
 OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop);
@@ -19360,11 +19386,8 @@ OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop)
 (()=>{const st=document.createElement('style');st.id='crPrompt';st.textContent=`
 html body.touch #roamPrompt#roamPrompt{left:50%!important;right:auto!important;top:auto!important;bottom:calc(62px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(240px,30vw)!important;padding:3px 12px!important;font-size:12px!important}
 html body #roamPrompt#roamPrompt *{font-size:12px!important;line-height:1.2!important}
-/* rev-2 (monkey hud_over_figure, Athens start): bottom-centre sat on the car's rear in phone landscape → left column above TAP TAP = SMASH, under the left thumb */
 @media (orientation:landscape){html body.touch #roamPrompt#roamPrompt{left:calc(14px + env(safe-area-inset-left,0px))!important;transform:none!important;bottom:calc(166px + env(safe-area-inset-bottom,0px))!important;max-width:min(240px,34vw)!important}}
-/* rev-3 (matrix hud_over_figure, desktop 1280×720): the default bottom-centre prompt sat on the car's rear → above the car, in the road/sky band */
 html body:not(.touch) #roamPrompt#roamPrompt{bottom:auto!important;top:30%!important}
-/* rev-3 (matrix hud_over_controls @-444,455): in portrait the bottom-centre prompt sat on #tR and the car's rear (controls row 14-83 px, car to ~750 px) → empty road/sky band under the speed gauge */
 @media (orientation:portrait){html body.touch #roamPrompt#roamPrompt{bottom:auto!important;top:calc(268px + env(safe-area-inset-top,0px))!important}}
 body.crMerge #roamArrow{display:none!important}`;document.head.appendChild(st)})();
 
@@ -19534,7 +19557,7 @@ function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
  const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
- h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-8))+'px'}
+ h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-22))+'px'}
 setInterval(()=>{try{CRSM_hint()}catch(e){}},250);
 window.__crsm={get S(){return CRSM},hint:()=>CRSM_hint()};
 // ---- CAR26a: races have no civilian traffic; Crash Junction keeps its (max 3) cars parked at the track edge
