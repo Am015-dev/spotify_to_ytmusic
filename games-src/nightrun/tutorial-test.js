@@ -43,7 +43,7 @@ const BOT = (mode) => { const m = window.__mnr, T = window.__tut, B = { up: 'Arr
 async function fullRun(br, port, opt, mode, label) {
   const { ctx, p, errs } = await page(br, port, opt, '', () => { try { localStorage.setItem('mnr_tut', '1'); localStorage.setItem('mnr_best', JSON.stringify({ score: 4321, dist: 'TEST' })); } catch (e) { } });
   const s0 = await state(p), bank0 = await p.evaluate(() => window.__mnr.GA.bank);
-  if (mode === 'touch') await p.tap('#tutBtn'); else await p.click('#tutBtn');
+  await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); if (mode === 'touch') await p.tap('#tutBtn'); else await p.click('#tutBtn');
   await p.waitForFunction(() => window.__tut.on, null, { timeout: 5000 });
   await p.evaluate(BOT, mode);
   const t0 = Date.now(), lim = mode === 'idle' ? 300000 : 240000; let died = false, clip = [], stuck = 0, lastI = -1, lastC = Date.now();
@@ -92,7 +92,7 @@ async function offer(br, port, opt, label) {
   if (shown) { if (opt.hasTouch) await p.tap('#tutNo'); else await p.click('#tutNo'); }
   await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__tut); await sleep(1700);
   ok(`${label}: offer never shows again`, !(await p.evaluate(() => window.__tut.offerShown)));
-  if (opt.hasTouch) await p.tap('#setBtn'); else await p.click('#setBtn'); await sleep(300);
+  await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); if (opt.hasTouch) await p.tap('#setBtn'); else await p.click('#setBtn'); await sleep(300);
   await p.evaluate(() => document.getElementById('tutBtnS').scrollIntoView()); if (opt.hasTouch) await p.tap('#tutBtnS'); else await p.click('#tutBtnS'); await sleep(500);
   ok(`${label}: Settings > REPLAY TUTORIAL starts it`, await p.evaluate(() => window.__tut.on && window.__mnr.running));
   await p.evaluate(() => window.__tut.skip());

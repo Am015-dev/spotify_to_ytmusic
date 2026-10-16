@@ -79,7 +79,7 @@ function mapDetail(n){const el=$('stDet');if(!el)return;if(!(n>0)){el.hidden=tru
   if(window.HEAT)HEAT.bind(n);
   $('stPlay').addEventListener('click',()=>{if(unlocked(n))startStory(n);});
   $('stDx').addEventListener('click',()=>{MAPD.sel=-1;for(const e of document.querySelectorAll('#stRows .nd.sel'))e.classList.remove('sel');el.hidden=true;});}
-function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=-1;stDraw();}
+function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=window.RET&&RET.title?mapCurrent():-1;stDraw();}
 function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 /* one debounced relayout for resize, rotation, visualViewport and ResizeObserver; measured again after 400 ms (iOS reports the old size right after rotating) */
 {let t=0;const go=()=>{if(selEl.hidden)return;const b=$('stRows');if(Math.abs(b.clientWidth-MAPD.lastW)>2||Math.abs(b.clientHeight-MAPD.lastH)>2)stDraw();},

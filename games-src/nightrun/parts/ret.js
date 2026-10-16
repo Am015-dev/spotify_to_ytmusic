@@ -1,5 +1,7 @@
 /* ---------- retention parts (RETENTION.md). Each item has a flag in RET; a flag set to false leaves the game exactly as it was. ---------- */
 const RET=window.RET=window.RET||{};
+if(RET.title===undefined)RET.title=!/[?&]title=0/.test(location.search);   // B25: title diet (PLAY / CONTINUE, 5 buttons, the rest in MENU); parts/title.js
+if(RET.type===undefined)RET.type=!/[?&]type=0/.test(location.search);     // B26: text >= 14 px and touch targets >= 44 px on title, menu and map; parts/title.js
 if(RET.oneMore===undefined)RET.oneMore=true;   // B5: run-end screens show Neon banked, the next unlock bar and a ONE MORE RUN button
 RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct, can}; null when everything is owned
   let best=null;const add=(n,p)=>{if(!(p>0))return;if(!best||p<best.price)best={n,price:p};};
@@ -166,10 +168,12 @@ NR.on('runEnd',d=>{if(!RET.daily||!d||d.quit)return;
 #retTt b{color:#fff;font-weight:400}#retTt .ok{color:#6cf59a}#retTt button{margin-top:.4em;font:inherit;padding:.5em 1em;min-height:40px;border-radius:99px;border:1px solid #ffb020;background:#0000;color:#ffb020;cursor:pointer}
 `;document.head.appendChild(st);}
 RET.dailyShow=function(){let e=$('retTt');
+  if(RET.title&&RET.titleDraw)RET.titleDraw();
   if(!RET.daily){if(e)e.hidden=true;return;}
   if(!e){e=document.createElement('div');e.id='retTt';$('bestT').after(e);
     e.addEventListener('click',ev=>{if(ev.target.id!=='wkBtn')return;RET.wkPending=true;start(true);});}
   e.hidden=false;const d=DY.status(),w=RET.week();
+  if(RET.title){e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· claimed</span>':'Daily streak <b>'+d.streak+'</b> · <b>+'+d.reward+'</b> Neon today')+' · '+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly open · <b>+'+DY.weekly+'</b> Neon');return;}
   e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· today\'s bonus claimed</span>':'Daily streak <b>'+d.streak+'</b> · fly the daily run for <b>+'+d.reward+'</b> Neon')
    +'<br>'+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly: <b>'+w.names.join(' + ')+'</b> · boss clear = <b>+'+DY.weekly+'</b>')+(w.best?' · best '+w.best.toLocaleString('de-DE'):'')
    +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
