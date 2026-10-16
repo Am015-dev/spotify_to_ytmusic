@@ -13,7 +13,7 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
   const t0=Date.now();const row={v:v.replace('v90m-beta.',''),Q,city:CITY};
   try{await p.goto(`http://127.0.0.1:${port}/${v}/index.html?test=${CITY}&q=${Q}`);
    await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__R,null,{polling:500});row.boot=+((Date.now()-t0)/1000).toFixed(0);
-   await p.evaluate(()=>{window.__auto=false;const R=__R,C=__C;C.__real=C.render;C.render=()=>{};let sh=0;const sr=R.shadowMap.render.bind(R.shadowMap);R.shadowMap.render=function(){sh++;return sr.apply(this,arguments)};window.__shN=()=>sh});
+   await p.evaluate(()=>{window.__auto=false;const R=__R,C=__C;C.__real=C.render;C.render=()=>{};let sh=0;const sr=R.shadowMap.render.bind(R.shadowMap);R.shadowMap.render=function(l){if(l&&l.length)sh++;return sr.apply(this,arguments)};window.__shN=()=>sh});
    await p.keyboard.down('ArrowUp');await p.evaluate(()=>__tick(120));
    const r=await p.evaluate(async([N,S])=>{const R=__R,C=__C,ms=[],smp=[];let x0=window.__mho&&__mho.RO?__mho.RO.x:0,z0=window.__mho&&__mho.RO?__mho.RO.z:0;
     for(let i=0;i<N;i++){const t=performance.now();if(i%S===S-1){const s0=__shN();R.info.autoReset=false;R.info.reset();C.render=C.__real;__tick(1);C.render=()=>{};const k=R.info;smp.push({calls:k.render.calls,tris:k.render.triangles,sh:__shN()-s0,prog:k.programs?k.programs.length:0,geo:k.memory.geometries,tex:k.memory.textures,heap:performance.memory?performance.memory.usedJSHeapSize/1048576:0});R.info.autoReset=true}else{__tick(1);ms.push(performance.now()-t)}
