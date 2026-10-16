@@ -52,8 +52,26 @@ function DR_solidBuild(){const R=[],lm=(x,z,m)=>LMX.some(L=>Math.hypot(L.x-x,L.z
     for(const r of R){r.x0=HX0+r.i0*C;r.x1=HX0+(r.i1+1)*C;r.z0=HZS+r.j0*C;r.z1=HZS+r.j1*C}DR.inS=(x,z)=>{const i=Math.floor((x-HX0)/C),j=Math.floor((z-HZS)/C);return i>=0&&j>=0&&i<cols&&j<rows&&S[i*rows+j]===1}}
   DR.solid=R;if(!R.length)return;if(CID!=='fra'&&DR_athFill(R))return;const G=[],col=CID==='fra'?['#e8dcc8','#a85a3c']:['#efe3c8','#c8643c'];/* v89i: the plain beige filler boxes read as long blank walls: walls now carry the street-building window facade (12 m repeat) */const BMs=HUB.BM&&HUB.BM.office,W=[],TN=['#e8dcc8','#e2c9a8','#d9b99b','#ecdfc4','#d8c4b0'];
   for(const r of R){const cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,w=r.x1-r.x0,d=r.z1-r.z0;let lo=1e9,hi=-1e9;for(const[a,b]of[[r.x0,r.z0],[r.x1,r.z0],[r.x0,r.z1],[r.x1,r.z1],[cx,cz]]){const y=groundY(a,b);lo=Math.min(lo,y);hi=Math.max(hi,y)}
-    const h=hi-lo+7.5;if(BMs){const g=bxUV(w,h,d,12,13.2);g.translate(cx,lo-.5+h/2,cz);W.push(colorize(g,new THREE.Color(TN[Math.floor(DR_h(cx*.31,cz*.31)*TN.length)])))}else G.push(cbox(w,h,d,cx,lo-.5+h/2,cz,col[0]));G.push(cbox(w-1.2,.6,d-1.2,cx,lo-.5+h+.3,cz,col[1]));const b={x:cx,z:cz,hw:w/2,hd:d/2};HUB.bld.push(b);if(HUB.grid)gridAddTo(HUB.grid,[b])}
+    const h=hi-lo+7.5;if(BMs&&CID==='fra'&&DR_splitOn()){DR_fraSplit(r,lo,h,BMs,W,G,TN);continue}if(BMs){const g=bxUV(w,h,d,12,13.2);g.translate(cx,lo-.5+h/2,cz);W.push(colorize(g,new THREE.Color(TN[Math.floor(DR_h(cx*.31,cz*.31)*TN.length)])))}else G.push(cbox(w,h,d,cx,lo-.5+h/2,cz,col[0]));G.push(cbox(w-1.2,.6,d-1.2,cx,lo-.5+h+.3,cz,col[1]));const b={x:cx,z:cz,hw:w/2,hd:d/2};HUB.bld.push(b);if(HUB.grid)gridAddTo(HUB.grid,[b])}
   const m=new THREE.Mesh(mergeG(G),new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}));m.castShadow=false;m.receiveShadow=true;m.userData.dr=1;HUB.grp.add(m);if(W.length){const mw=new THREE.Mesh(DR_mergeUV(W),HUB.BM.office);mw.castShadow=false;mw.receiveShadow=true;mw.userData.dr=1;HUB.grp.add(mw)}DR.st.solid=R.length}
+// city-1 (Alex: "the city looks repetitive"; docs/CITY_VARIETY.md #1): a Frankfurt 'resid' block interior was ONE box up to ~150 m long (one height, one tint, one window grid).
+// Now a face longer than ~30 m is cut into 20-34 m segments along its long axis; each has its own height (+0..5 floors), tint (never the same as its neighbour),
+// window grid (repeat width 10-14.4 m, floor 11.2-13.2 m), a 0-4 m setback on one long side, and every third one a stepped upper tier. Same merged meshes (0 new draws), +12 tris a box.
+// ?dsp=0 = the old single box. Colliders: one rect per segment (the setback strip stays solid for props via DR.solid, which is unchanged).
+function DR_splitOn(){return!/[?&]dsp=0\b/.test(location.search)}
+function DR_fraSplit(r,lo,h0,BMs,W,G,TN){const w=r.x1-r.x0,d=r.z1-r.z0,alongX=w>=d,L=alongX?w:d,cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,X=['#ffd24a','#ff9a7a','#8cc8ff','#b6e07a','#ff9ac4','#ffb347','#9fe0d0'],T=TN.concat(X);
+  const n=L>30?Math.max(2,Math.round(L/27)):1,wt=[];let sum=0;for(let i=0;i<n;i++){const v=.7+.6*DR_h(cx+i*3.7,cz+i*1.9);wt.push(v);sum+=v}
+  let a=alongX?r.x0:r.z0,prev=-1;const lenC=alongX?d:w;
+  for(let i=0;i<n;i++){const len=L*wt[i]/sum,b=i===n-1?(alongX?r.x1:r.z1):a+len,hv=DR_h(cx*.7+i*11.3,cz*.7+i*5.1),hw2=DR_h(cx+i*2.3,cz-i*4.1),hs=DR_h(cx-i*6.1,cz+i*3.3);
+    let k=Math.floor(hv*T.length);if(k===prev)k=(k+1)%T.length;prev=k;
+    const hh=h0-(n>1?3:0)+(n>1?[0,3.3,6.6,9.9,13.2][Math.floor(hw2*5)]:0),tw=[10,12,14.4][Math.floor(DR_h(cx+i,cz*1.3)*3)],th=[11.2,13.2][Math.floor(DR_h(cz+i,cx*1.7)*2)];
+    // setback: pull one long side in by 0 / 0 / 2.5 / 4 m (the segment keeps ≥ 14 m of depth)
+    const sb=[0,3,5,7][Math.floor(hs*4)],side=DR_h(cx+i*9,cz)<.5?-1:1;let c0=alongX?r.z0:r.x0,c1=alongX?r.z1:r.x1;if(lenC-sb>14){if(side<0)c0+=sb;else c1-=sb}
+    const sx0=alongX?a:c0,sx1=alongX?b:c1,sz0=alongX?c0:a,sz1=alongX?c1:b,sw=sx1-sx0,sd=sz1-sz0,mx=(sx0+sx1)/2,mz=(sz0+sz1)/2,col=new THREE.Color(T[k]);
+    const g=bxUV(sw,hh,sd,tw,th);g.translate(mx,lo-.5+hh/2,mz);W.push(colorize(g,col));G.push(cbox(sw-1.2,.6,sd-1.2,mx,lo-.5+hh+.3,mz,'#a85a3c'));
+    if(n>1&&i%3===1&&sw>12&&sd>12){const tt=5+Math.floor(DR_h(cx+i*4,cz+i)*3)*3.3,tw2=sw*.6,td2=sd*.6,g2=bxUV(tw2,tt,td2,tw,th);g2.translate(mx,lo-.5+hh+.6+tt/2,mz);W.push(colorize(g2,col.clone().offsetHSL(0,0,.05)));G.push(cbox(tw2-1,.5,td2-1,mx,lo-.5+hh+.6+tt+.25,mz,'#7a5a4c'))}
+    const bb={x:mx,z:mz,hw:sw/2,hd:sd/2};HUB.bld.push(bb);if(HUB.grid)gridAddTo(HUB.grid,[bb]);a=b}
+  DR.st.fraSeg=(DR.st.fraSeg||0)+n}
 // v89i: merge keeping the UV set (mergeG drops it): the filler walls need their facade texture
 function DR_mergeUV(list){const A={position:[3,[]],normal:[3,[]],uv:[2,[]],color:[3,[]]},r=new THREE.BufferGeometry();for(let g of list){g=g.index?g.toNonIndexed():g;for(const k in A){const at=g.attributes[k],n=A[k][0];for(let i=0;i<at.count;i++)for(let c=0;c<n;c++)A[k][1].push(at.getComponent?at.getComponent(i,c):at.array[i*n+c])}}for(const k in A)r.setAttribute(k,new THREE.Float32BufferAttribute(A[k][1],A[k][0]));return r}
 // v89f (Alex: "long blank grey walls with no windows" ~1.5 km out of Athens): the Athens solid fill (deep block interiors ≥ 22 m from every
