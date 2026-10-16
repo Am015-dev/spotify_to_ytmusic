@@ -2,7 +2,7 @@
 Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-int2. Beta page: claude.ai/artifact/P6zT2b2SwfHYguRTtb67Ug. Owner: Alex (iPhone 16 landscape + PC). Full history and old rules: docs/LESSONS_and_old_rules.md (read only when needed).
 
 ## Production model (2026-10-14, after $700+ and many reverts)
-1. Few lanes, short tasks: at most 3 workers at once (1 integrator on Sonnet, ≤2 fixers). Each task is timeboxed to ~30 min or ~100k context, with ONE deliverable; then the worker writes 5 lines in docs/HANDOFF_<lane>.md, pushes and STOPS. No idle or self-waking workers, no queues, no open-ended lanes.
+1. Few lanes, short tasks: at most 5 workers at once (Alex, 2026-10-16: 1 integrator/reviewer, ≤4 fixers). Each task is timeboxed to ~30 min or ~100k context, with ONE deliverable; then the worker writes 5 lines in docs/HANDOFF_<lane>.md, pushes and STOPS. No idle or self-waking workers, no queues, no open-ended lanes.
 2. Cheapest model that can do it: Haiku for mechanical work, Sonnet for bugs with a repro, UI, integration and tests, Opus only for design or feel or anything Sonnet failed twice. Subagents: always set `model`.
 3. Push only green: before every push, build (tools/build.sh) and run unit (`node tools/unit/run.js`, 0 FAIL) + your TAG + `TAG=life1,xf1,terrain` on the BUILT page, not hot. WIP sits behind a flag that defaults OFF until its tests pass. A reverted push is the most expensive outcome.
 4. Tests are state asserts with no graphics (checklist GO in src/99c_checklist.js with a pass line). No real-time play as a test. One 852×393 shot only for visual changes, and LOOK at it. Each 2K-Drive-quality claim needs a side-by-side shot with a reference.
