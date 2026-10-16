@@ -43,6 +43,7 @@ const TUNE_K=[ // [group, id, label, min, max, step]
  ['FX','TUNE.fxFlS','Flame size ×',0,2.5,.05],['FX','TUNE.fxFlL','Flame length ×',0,3,.05],['FX','TUNE.fxFlI','Flame brightness ×',0,3,.05],
  ['FX','TUNE.fxSpk','Boost sparkles',0,1,1,'bool'],['FX','TUNE.fxSpkN','Sparkle count ×',0,3,.1],['FX','TUNE.fxSpkS','Sparkle size / spread ×',.2,3,.05],
  ['FX','TUNE.fxLines','Speed lines on boost ×',0,3,.05],['FX','TUNE.fxGlow','Boost screen glow / blur ×',0,3,.05],
+ ['Light','TUNE.gfxHemi','Shade fill (sky light)',0,1.5,.05],['Light','TUNE.gfxSun','Sun strength',0,8,.1],['Light','TUNE.gfxEnv','Ground sky reflection',0,1,.02],['Light','TUNE.gfxEl','Sun height (rad)',.2,1.3,.02],['Light','TUNE.gfxAz','Sun angle behind view (rad)',1.6,3.14,.02],['Light','TUNE.gfxSlew','Sun turn speed (rad/s)',.1,3,.05],['Light','TUNE.gfxSnap','Sun snap after (rad)',.3,3.14,.05],
  ['FX','TUNE.fxFov','Boost FOV kick ×',0,3,.05],['FX','TUNE.fxShake','Boost camera shake ×',0,3,.05],
  // fix21 AUDIO: music tracks + synth music, SFX (engine, boost, smash), ducking (98m_music.js). The menu SOUND button still mutes everything
  ['Audio','TUNE.musOn','Music',0,1,1,'bool'],['Audio','TUNE.musVol','Music volume',0,1,.05],['Audio','TUNE.sfxVol','SFX volume (engine, boost, smash) ×',0,2,.05],
