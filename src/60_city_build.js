@@ -27,9 +27,18 @@ function GND_far(x,z,g){let r=null;for(const G of GND_L){const q=GND_in(G,x,z);i
     for(const[d,ex,ez]of[[q.u*w,-1,0],[(1-q.u)*w,1,0],[q.v*h,0,-1],[(1-q.v)*h,0,1]]){if(d>=GND_B)continue;const n=GND_in(G,x+ex*(d+.3),z+ez*(d+.3));if(!n||!n.L[n.k+8])f=Math.min(f,d/GND_B)}
     y=g+(m-g)*f}
   r=r===null?y:Math.max(r,y)}return r===null?g:r}
-function gndBuild(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1-x0)/cs),nz=Math.round((z1-z0)/cs),dx=(x1-x0)/nx,dz=(z1-z0)/nz;
+// boot-3: gndGen = gndBuild as a generator. With o.near (()=>[x,z]) the cells run tile by tile, nearest tile first, one yield per cell, and each
+// tile's meshes are added as soon as its last cell is done (same groups as the one-shot build: a group never spans tiles). GND_L cells stay
+// undefined until built, so GND_far falls back to the analytic ground there. gndBuild runs it to the end (unchanged order and output).
+function gndBuild(grp,x0,x1,z0,z1,o){const g=gndGen(grp,x0,x1,z0,z1,o);let r;while(!(r=g.next()).done);return r.value}
+function* gndGen(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1-x0)/cs),nz=Math.round((z1-z0)/cs),dx=(x1-x0)/nx,dz=(z1-z0)/nz;
   const GL=o.hilly?{x0,z0,dx,dz,nx,nz,c:new Array(nx*nz)}:null;if(GL)GND_L.push(GL);
-  for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const ax=x0+i*dx,az=z0+j*dz,cx=ax+dx/2,cz=az+dz/2;if(o.hole&&o.hole(cx,cz))continue;
+  const out=[],mk=G=>{if(!G.i.length)return;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(G.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(G.n,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(G.u,2));if(o.col)g.setAttribute('color',new THREE.Float32BufferAttribute(G.c,3));g.setIndex(G.i);
+    const m=new THREE.Mesh(g,o.mats[G.k]);m.receiveShadow=true;m.userData.gk=G.k;grp.add(m);out.push(m)};
+  let C=[];for(let i=0;i<nx;i++)for(let j=0;j<nz;j++)C.push([i,j]);const tkOf=(i,j)=>'|'+Math.floor((x0+i*dx+dx/2-x0)/o.tile)+'|'+Math.floor((z0+j*dz+dz/2-z0)/o.tile);
+  if(o.near){const[px,pz]=o.near(),T=new Map();for(const c of C){const k=tkOf(c[0],c[1]);let L=T.get(k);if(!L)T.set(k,L={c:[],d:Infinity});L.c.push(c);L.d=Math.min(L.d,Math.hypot(x0+c[0]*dx+dx/2-px,z0+c[1]*dz+dz/2-pz))}
+    C=[];for(const L of[...T.values()].sort((a,b)=>a.d-b.d)){for(const c of L.c)C.push(c);L.c[L.c.length-1].end=1}}
+  for(const cc of C){const i=cc[0],j=cc[1];if(o.near)yield;const ax=x0+i*dx,az=z0+j*dz,cx=ax+dx/2,cz=az+dz/2;if(!(o.hole&&o.hole(cx,cz))){
     let n=1,f=cs,Q=null;if(rivClear(cx,cz)<Math.hypot(dx,dz)/2+o.fine*1.5){n=Math.ceil(dx/o.fine);f=o.fine;if(o.hilly)Q=ART8_riv(ax,az,dx,dz,n)}else if(o.hilly){Q=[];ART7_quad(ax,az,dx,dz,Q)}let LL=null;if(GL)GL.c[i*nz+j]=Q?(LL=[]):null;
     const k0=o.cls(cx,cz),tk='|'+Math.floor((cx-x0)/o.tile)+'|'+Math.floor((cz-z0)/o.tile);let G=null;
     for(const[lx,lz,lw,lh,ln,sn]of Q||[[ax,az,dx,dz]]){if(Q){n=ln||1;f=lw/n}
@@ -42,8 +51,8 @@ function gndBuild(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1
       if(v[3])G.n.push(0,1,0);else{const e=2,hx=tH(v[0]+e,v[2])-tH(v[0]-e,v[2]),hz=tH(v[0],v[2]+e)-tH(v[0],v[2]-e),l=Math.hypot(hx,2*e,hz);G.n.push(-hx/l,2*e/l,-hz/l)}}
     if(LL&&n===1&&!sn)LL.push(lx,lz,lw,lh,G.p[ix[0]*3+1],G.p[ix[1]*3+1],G.p[ix[2]*3+1],G.p[ix[3]*3+1],-1);
     for(let a=0;a<n;a++)for(let b=0;b<n;b++){const q=a*(n+1)+b;if(V[q][3]&&V[q+1][3]&&V[q+n+1][3]&&V[q+n+2][3])continue;G.i.push(ix[q],ix[q+1],ix[q+n+1],ix[q+1],ix[q+n+2],ix[q+n+1])}}}
-  const out=[];for(const G of B.values()){if(!G.i.length)continue;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(G.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(G.n,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(G.u,2));if(o.col)g.setAttribute('color',new THREE.Float32BufferAttribute(G.c,3));g.setIndex(G.i);
-    const m=new THREE.Mesh(g,o.mats[G.k]);m.receiveShadow=true;m.userData.gk=G.k;grp.add(m);out.push(m)}return out}
+    if(o.near&&cc.end){const tk=tkOf(i,j);for(const[key,G]of B)if(key.endsWith(tk)&&key.length>tk.length&&!key.slice(0,-tk.length).includes('|')){mk(G);B.delete(key)}}}
+  for(const G of B.values())mk(G);return out}
 // the Main and the Osthafen basin: water ribbons (~1.2 km pieces so they cull) with the distance to the bank as a vertex attribute (quay foam)
 function waterBuild(grp,wm){HUB.water=[];for(const S of WATERS){const P=S.pts,n=P.length;let i0=0;while(i0<n-1){const c=P[i0],city=Math.abs(c.x)<HX1+600&&c.z>HZS-500&&c.z<HZN,st=city?2:4,i1=Math.min(n-1,i0+150),idx=[];for(let i=i0;i<i1;i+=st)idx.push(i);idx.push(i1);
     const K=8,pos=[],bank=[],ix=[];for(const i of idx){const p=P[i],e=p.hw+2;for(let k=0;k<=K;k++){const d=-e+2*e*k/K;pos.push(p.x+p.tz*d,HWY-.1,p.z-p.tx*d);bank.push(Math.max(0,p.hw-Math.abs(d)))}}
@@ -119,9 +128,11 @@ const BIOMES=CID!=='fra'?(RF.biomes||[]).map(([id,name,e0,e1,n0,n1,g])=>{const R
   {id:'osthafen',name:'Osthafen',r:[-3000,-1900,-450,250],g:'city'},{id:'stadtwald',name:'Stadtwald',r:[-1500,3300,-3250,-1750],g:'forest'}];
 const biomeAt=(x,z)=>{for(const B of BIOMES)if(x>=B.r[0]&&x<B.r[1]&&z>=B.r[2]&&z<B.r[3])return B;return null};
 const WGC=CID==='fra'?'#7aa860':'#a9a77a';const outerFree=(x,z)=>!inRiver(x,z,-40)&&!inCity(x,z,350)&&abClear(x,z)&&!inR(TAU_R,x,z,-60);
-function worldGroundBuild(grp,bt,BM){const tm=new THREE.MeshStandardMaterial({map:CID==='fra'?groundTex('grass'):athGrassTex(),vertexColors:true,roughness:.92}),base=new THREE.Color(WGC),c=new THREE.Color(),FC=['#9cb85a','#7aa860','#b8b860','#8aa04a','#a0a868'].map(v=>new THREE.Color(v)),FO=new THREE.Color('#5a8a48'),hsh=(x,z)=>{const v=Math.sin(x*12.9898+z*78.233)*43758.5453;return v-Math.floor(v)};
+function worldGroundBuild(grp,bt,BM){const g=worldGroundGen(grp,bt,BM);while(!g.next().done);}
+// boot-3: near (()=>[x,z]) = time-sliced, nearest tiles first (src/98bt_boot2.js)
+function* worldGroundGen(grp,bt,BM,near){const tm=new THREE.MeshStandardMaterial({map:CID==='fra'?groundTex('grass'):athGrassTex(),vertexColors:true,roughness:.92}),base=new THREE.Color(WGC),c=new THREE.Color(),FC=['#9cb85a','#7aa860','#b8b860','#8aa04a','#a0a868'].map(v=>new THREE.Color(v)),FO=new THREE.Color('#5a8a48'),hsh=(x,z)=>{const v=Math.sin(x*12.9898+z*78.233)*43758.5453;return v-Math.floor(v)};
   // outer land: one heightfield with holes for the city box and the Taunus terrain, bank-snapped along the Main
-  if(typeof ENV_ground==='function')ENV_ground(tm,{kind:'land',tint:true,base:WGC,s:[900,260,70]});/* env-1 */tm.polygonOffset=true;tm.polygonOffsetFactor=1;tm.polygonOffsetUnits=2;gndBuild(grp,WX0,WX1,WZS,WZN,{cs:200,fine:25,y0:-.01,uv:14,tile:1000,cls:()=>'g',mats:{g:tm},hole:(x,z)=>inCity(x,z)||inR(TAU_R,x,z),hilly:(a,b,c,d)=>(b>HILL.cx-HILL.rx&&a<HILL.cx+HILL.rx&&d>HILL.cz-HILL.rz&&c<HILL.cz+HILL.rz)||[[a,c],[b,c],[a,d],[b,d],[(a+b)/2,(c+d)/2]].some(([x,z])=>tauH(x,z)>.3)||(CID!=='fra'&&athHilly(a,b,c,d)),
+  if(typeof ENV_ground==='function')ENV_ground(tm,{kind:'land',tint:true,base:WGC,s:[900,260,70]});/* env-1 */tm.polygonOffset=true;tm.polygonOffsetFactor=1;tm.polygonOffsetUnits=2;yield* gndGen(grp,WX0,WX1,WZS,WZN,{near,cs:200,fine:25,y0:-.01,uv:14,tile:1000,cls:()=>'g',mats:{g:tm},hole:(x,z)=>inCity(x,z)||inR(TAU_R,x,z),hilly:(a,b,c,d)=>(b>HILL.cx-HILL.rx&&a<HILL.cx+HILL.rx&&d>HILL.cz-HILL.rz&&c<HILL.cz+HILL.rz)||[[a,c],[b,c],[a,d],[b,d],[(a+b)/2,(c+d)/2]].some(([x,z])=>tauH(x,z)>.3)||(CID!=='fra'&&athHilly(a,b,c,d)),
     col:(x,z)=>{const r=typeof ENV_on==='function'&&ENV_on()?ENV_vn(x/250,z/250):hsh(Math.round(x/250),Math.round(z/250)),B=biomeAt(x,z),g=B?B.g:CID!=='fra'?'':z>3400?'field':z<-2600&&!inCity(x,z,200)?'forest':'';if(CID!=='fra'){const hh=hillH(x,z);c.copy(base).multiplyScalar(.92+r*.16);if(g==='villa')c.lerp(FO,.45);else if(g==='quarry')c.lerp(new THREE.Color('#d8c6a2'),.5);if(hh>1.5)c.lerp(new THREE.Color('#7f9a5a'),clamp(hh/25,0,.8))}else if(g==='field')c.copy(FC[Math.floor(r*FC.length)]);else if(g==='forest')c.copy(FO).lerp(base,r*.4);else if(g==='air')c.copy(base).lerp(FC[2],.35).multiplyScalar(.95+r*.1);else c.copy(base).multiplyScalar(.9+r*.2);if(Math.abs(x)>WX1-30||z<WZS+30||z>WZN-30)c.lerp(FO,.6);return c}});
   for(const[a,b,z,vert]of[[WX0,WX1,WZS+4,0],[WX0,WX1,WZN-4,0],[WZS,WZN,WX0+4,1],[WZS,WZN,WX1-4,1]]){const n=Math.ceil((b-a)/350);for(let i=0;i<n;i++){const L=(b-a)/n,m=a+L*(i+.5),y=vert?groundY(z,m):groundY(m,z);bt.add(vert?cbox(3,3.2,L,z,1.4+y,m,'#3f7a34'):cbox(L,3.2,3,m,1.4+y,z,'#3f7a34'),BM.plain)}}}
 function athResTex(){const[c,g]=cv(128,256),r=mul(92);g.fillStyle='#5d6169';g.fillRect(0,0,128,256);for(let i=0;i<1400;i++){const v=72+r()*40|0;g.fillStyle=`rgba(${v},${v+2},${v+8},.5)`;g.fillRect(r()*128,r()*256,2,2)}for(let i=0;i<6;i++){g.fillStyle='rgba(40,42,46,.35)';g.fillRect(20+r()*80,r()*256,8+r()*20,3)}

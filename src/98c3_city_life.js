@@ -3,7 +3,7 @@
 // (2) ground plates: a paving pad under every vignette, kerb-edge strips, dirt paths and flowerbeds on bare lawns beside streets;
 // (3) roof kit on flat roofs: water tanks, AC units, antennas, roof gardens.
 // (2)+(3) are unit boxes in ONE InstancedMesh per 1400 m cell (frustum + distance culled). No rnd(), no colliders on plates / roof kit. Default OFF: ?c3=1 on (or TUNE.c3), ?c3=0 off. Hook: side() in 60_city_build6.js.
-const C3={on:/[?&]c3=1\b/.test(location.search)||(!/[?&]c3=0\b/.test(location.search)&&!!(typeof TUNE!=='undefined'&&TUNE.c3)),/* default OFF until the look is clearly livelier (handoff city-3); ?c3=1 on, ?c3=0 off, TUNE.c3 */cells:new Set(),G:[],R:[],V:[],n:{vig:0,gnd:0,roof:0,bld:0},meshes:0};
+const C3={on:/[?&]c3=1\b/.test(location.search)||(!/[?&]c3=0\b/.test(location.search)&&!!(typeof TUNE!=='undefined'&&TUNE.c3)),/* default OFF (city-4: perf +11-12 % tris fra districts, look not clearly livelier yet); ?c3=1 on, ?c3=0 off, TUNE.c3 */cells:new Set(),G:[],R:[],V:[],n:{vig:0,gnd:0,roof:0,bld:0},meshes:0};
 const C3_h=(x,z,s)=>{const h=Math.sin(x*12.9898+z*78.233+s*37.719)*43758.5453;return h-Math.floor(h)};
 const C3_F=['#ff4a8a','#ffd23a','#ff7a2a','#ffffff','#b46aff','#e8402a'],C3_PAVE=['#d9d0bf','#c9b8a0','#b8b0a4','#e0c8a8'],C3_PAVE_A=['#e8dcc4','#d8b48a','#efe6d2','#c89a78'];
 // vignettes: [type, along, out, yaw (0 = facing the road)]; out = metres away from the road from the kerb-side prop line
@@ -16,10 +16,10 @@ function C3_box(A,x,y,z,ry,sx,sy,sz,col){A.push([x,y,z,ry,sx,sy,sz,col])}
 function C3_side(add,px,pz,ux,uz,w,nx,nz,x,z,D){if(!C3.on||!HUB.grid)return;const ath=CID!=='fra';
   // (1) vignette: one per 45 m cell + side; needs a clear 8 x 4 m pavement spot
   const key=Math.floor(x/45)*100000+Math.floor(z/45)+(nx>0?.5:0);
-  if(!C3.cells.has(key)){C3.cells.add(key);const r=C3_h(x,z,11);if(r<.82){const cx=x+nx*1.2,cz=z+nz*1.2;
+  if(!C3.cells.has(key)){C3.cells.add(key);const r=C3_h(x,z,11);if(r<.42){/* city-4: .82 → .42 (vignette props were the +17 % tris) */const cx=x+nx*1.2,cz=z+nz*1.2;
     if(!gridHit(HUB.grid,cx+nx*1.5,cz+nz*1.5,4)&&!inRiver(cx,cz,2)&&!onAnyDeck(cx,cz)){const q=cityAt(cx,cz);if(!(q&&q.d<q.road.w/2+2.2)){const f=fillAt(cx,cz);if(!(f&&f.d<f.r.w/2+2.2)){
-      const K=ath?['bench','cafeA','kiosk','stop','cafeA','bench']:['bench','cafe','kiosk','stop','cafe','bench'],V=C3_V[K[Math.floor(C3_h(x,z,12)*K.length)]],yaw=Math.atan2(-nx,-nz);
-      for(const[t,a,o,ry]of V)if(D[t])add(t,cx+ux*a+nx*o,cz+uz*a+nz*o,yaw+ry);C3.V.push([cx,cz]);
+      const K=ath?['bench','cafeA','kiosk','stop','cafeA','bench']:['bench','kiosk','stop','bench','stop','bench']/* city-4: no table/parasol in Frankfurt (their per-tile buckets cost +8 % calls) */,V=C3_V[K[Math.floor(C3_h(x,z,12)*K.length)]],yaw=Math.atan2(-nx,-nz);
+      for(const[t,a,o,ry]of V)if(D[t]){const vx=cx+ux*a+nx*o,vz=cz+uz*a+nz*o;add(t,vx,vz,yaw+ry);}C3.V.push([cx,cz]);
       const y=groundY(cx,cz),P=ath?C3_PAVE_A:C3_PAVE;C3_box(C3.G,cx+nx*1.4,y+.03,cz+nz*1.4,Math.atan2(ux,uz),4.6,.12,8.6,P[Math.floor(C3_h(x,z,13)*P.length)])}}}}}
   // (2) ground breakup on bare lawn behind the pavement (no building within 7 m)
   const o=w/2+6.4,gx=px+nx*o,gz=pz+nz*o,k2=Math.floor(gx/16)*100000+Math.floor(gz/16)+.25;if(C3.cells.has(k2)||C3.G.length>26000)return;C3.cells.add(k2);const r2=C3_h(gx,gz,14);if(r2>.6)return;if(gridHit(HUB.grid,gx,gz,7)||roamHit(gx,gz,2.5))return;
@@ -37,17 +37,31 @@ function C3_roofs(){const A=C3.R,pk=Math.min(.62,4500/Math.max(1,HUB.bld.length)
     else if(k===2||k===1){for(let i=0;i<3;i++){const[px,pz]=W(sx*ex-sx*i*1.9,-sz*ez);C3_box(A,px,top+.55,pz,ry,1.5,1.1,1.2,'#c4c8ce');C3_box(A,px,top+1.13,pz,ry,.9,.06,.9,'#3a3f48')}}/* AC units */
     else{const[tx,tz]=W(sx*ex,-sz*ez);C3_box(A,tx,top+3,tz,ry,.22,6,.22,'#9aa0a8');C3_box(A,tx,top+4.6,tz,ry,2.2,.12,.12,'#9aa0a8');C3_box(A,tx,top+5.4,tz,ry,.12,.12,1.6,'#9aa0a8');C3_box(A,tx,top+6.1,tz,ry,.3,.3,.3,'#e8402a');C3_box(A,tx,top+.4,tz,ry,1.4,.8,1.4,'#b8bcc4')}}/* antenna */
   C3.n.bld=nb}
+// (4) city-4 shopfronts on street-facing ground floors: shop window band, striped awning (3.1 m up: clears cars and peds), sign fascia. Palette per ~300 m zone = per-district look. Boxes only, no colliders.
+const C3_AW={fra:[['#d8282e','#f4efe4'],['#2f7a3a','#f4efe4'],['#1f3a7a','#f5c20c'],['#e8762a','#f6e6c8'],['#6a2a5a','#f0d8e4'],['#2a7a8a','#f4efe4']],
+  ath:[['#2a6ad8','#ffffff'],['#c8582a','#f6e6c8'],['#6a8a2a','#f4efe4'],['#e8b42a','#ffffff'],['#2a9a9a','#ffffff'],['#b8302a','#f6e6c8']]},C3_SIGN=['#f5c20c','#ffffff','#e5177f','#2ab0e8','#1b1c3a','#ff7a2a'];
+function C3_shops(){const A=C3.G,ath=CID!=='fra',PAL=C3_AW[ath?'ath':'fra'];let na=0;for(const b of HUB.bld){if(na>=3500)break;const top=b.rt??b.h;if(top==null||b.tier||b.hw<2.5||b.hd<2.5||b.hw>40||b.hd>40)continue;
+    const g=b.y0??groundY(b.x,b.z),H=top-g;if(H<4.5||H>90)continue;const ry=b.c!=null?Math.atan2(b.s,b.c):0,c=Math.cos(ry),s=Math.sin(ry),W=(lx,lz)=>[b.x+lx*c+lz*s,b.z-lx*s+lz*c];
+    let best=null;for(const[fx,fz,hl]of[[1,0,b.hd],[-1,0,b.hd],[0,1,b.hw],[0,-1,b.hw]]){if(hl<2.5)continue;const[mx,mz]=W(fx*(fx?b.hw:0)+fx*2.5,fz*(fz?b.hd:0)+fz*2.5);const q=cityAt(mx,mz),f=fillAt(mx,mz);let e=1e9;if(q)e=Math.min(e,q.d-q.road.w/2);if(f)e=Math.min(e,f.d-f.r.w/2);if(e<9&&e>-.5&&(!best||e<best.e))best={fx,fz,hl,e}}
+    if(!best)continue;const r=C3_h(b.x,b.z,41);if(r>.8)continue;na++;const{fx,fz}=best,hl=Math.min(best.hl*.82,7),fry=ry+(fx?Math.PI/2:0),ofs=(fx?b.hw:b.hd);
+    const P=(d,a)=>W(fx*(ofs+d)+(fz?a:0),fz*(ofs+d)+(fx?a:0));/* d = out from the facade, a = along it */
+    const zone=C3_h(Math.floor(b.x/300),Math.floor(b.z/300),42),pal=PAL[Math.floor((zone*.7+C3_h(b.x,b.z,43)*.3)*PAL.length)%PAL.length],y=g+.04;
+    {const[x,z]=P(.06,0);C3_box(A,x,y+1.35,z,fry,hl*2,2.3,.14,'#2c4a6a')}/* shop window */
+    {const[x,z]=P(.1,0);C3_box(A,x,y+4.05,z,fry,hl*2+.2,.85,.22,C3_SIGN[Math.floor(C3_h(b.x,b.z,44)*C3_SIGN.length)])}/* sign fascia */
+    if(r<.55){const n=3,sw=hl*2/n;for(let i=0;i<n;i++){const a=-hl+sw*(i+.5),[x,z]=P(.85,a);C3_box(A,x,y+3.15,z,fry,sw,.16,1.6,pal[i%2])}const[vx,vz]=P(1.66,0);C3_box(A,vx,y+2.95,vz,fry,hl*2,.32,.06,pal[0])}/* striped awning + valance */
+    else{const[x,z]=P(.6,0);C3_box(A,x,y+3.2,z,fry,hl*2,.2,1.1,pal[0])}}/* flat canopy */
+  C3.n.shop=na}
 // (2b) verge flower strips along every city street (both sides, every ~8 m, colour runs of ~40 m): sampled from CITY_S, so it also covers streets whose side() slots are taken
-function C3_verge(){const A=C3.G;for(const S of CITY_S){if(S.r.cls==='hill'||S.r.cls==='quay')continue;const P=S.pts,w=S.r.w;let acc=0;for(let i=1;i<P.length;i++){const p=P[i],q0=P[i-1];acc+=Math.hypot(p.x-q0.x,p.z-q0.z);if(acc<8)continue;acc=0;if(A.length>60000)return;
+function C3_verge(){const A=C3.G;for(const S of CITY_S){if(S.r.cls==='hill'||S.r.cls==='quay')continue;const P=S.pts,w=S.r.w;let acc=0;for(let i=1;i<P.length;i++){const p=P[i],q0=P[i-1];acc+=Math.hypot(p.x-q0.x,p.z-q0.z);if(acc<11)continue;acc=0;if(A.length>48000)return;
     for(const sd of[-1,1]){const nx=p.tz*sd,nz=-p.tx*sd,o=w/2+2.4,x=p.x+nx*o,z=p.z+nz*o,run=C3_h(Math.floor(x/40),Math.floor(z/40),31+sd);if(run>.75)continue;
       if(gridHit(HUB.grid,x,z,2.2)||roamHit(x,z,1.5))continue;const q=cityAt(x,z);if(q&&q.d<q.road.w/2+1.2)continue;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+1.2)continue;if(inRiver(x,z,1)||onAnyDeck(x,z))continue;
       const y=groundY(x,z),ry=Math.atan2(p.tx,p.tz),fc=C3_F[Math.floor(run*8)%C3_F.length],fc2=C3_F[Math.floor(run*13+2)%C3_F.length];
       if(run<.45){C3_box(A,x,y+.12,z,ry,1.6,.36,7.4,'#6a4a32');for(let j=0;j<5;j++)C3_box(A,x+p.tx*(j-2)*1.45,y+.42,z+p.tz*(j-2)*1.45,ry,1.1,.34,1.1,j%2?fc:fc2)}/* flower strip */
       else{C3_box(A,x,y+.05,z,ry,1.8,.14,7.6,CID!=='fra'?'#e2d6bc':'#cfc9be');C3_box(A,x-nx*.95,y+.1,z-nz*.95,ry,.3,.24,7.6,'#8f8a84')}}}}}/* paved verge + kerb */
-function C3_build(){C3_roofs();C3_verge();const all=C3.G.concat(C3.R);if(!all.length)return;const cells=new Map();for(const o of all){const kk=Math.floor(o[0]/1400)*1000+Math.floor(o[2]/1400);let a=cells.get(kk);if(!a)cells.set(kk,a=[]);a.push(o)}
+function C3_build(){C3_roofs();try{C3_shops()}catch(e){console.warn('C3 shops',e)}C3_verge();const all=C3.G.concat(C3.R);if(!all.length)return;const cells=new Map();for(const o of all){const kk=Math.floor(o[0]/1400)*1000+Math.floor(o[2]/1400);let a=cells.get(kk);if(!a)cells.set(kk,a=[]);a.push(o)}
   const g=new THREE.BoxGeometry(1,1,1),mat=new THREE.MeshStandardMaterial({roughness:.75,metalness:0}),M=new THREE.Matrix4(),Q=new THREE.Quaternion(),Y=new THREE.Vector3(0,1,0),P=new THREE.Vector3(),S=new THREE.Vector3(),c=new THREE.Color();
   for(const[,a]of cells){const im=new THREE.InstancedMesh(g,mat,a.length);a.forEach((o,i)=>{M.compose(P.set(o[0],o[1],o[2]),Q.setFromAxisAngle(Y,o[3]),S.set(o[4],o[5],o[6]));im.setMatrixAt(i,M);im.setColorAt(i,c.set(o[7]))});
-    im.receiveShadow=true;im.userData.c3=1;im.userData.cd=700;im.userData.nsh=1;im.computeBoundingSphere();HUB.grp.add(im);C3.meshes++}
+    im.receiveShadow=true;im.userData.c3=1;im.userData.cd=450;/* city-4: 700 → 450 m (perf budget) */im.userData.nsh=1;im.computeBoundingSphere();HUB.grp.add(im);C3.meshes++}
   C3.n.gnd=C3.G.length;C3.n.roof=C3.R.length;C3.n.vig=C3.V.length}
 buildHubProps=(f=>function(){C3.cells=new Set();C3.G=[];C3.R=[];C3.V=[];C3.n={vig:0,gnd:0,roof:0,bld:0};C3.meshes=0;const r=f.apply(this,arguments);try{if(C3.on)C3_build()}catch(e){console.warn('C3',e)}return r})(buildHubProps);
 window.__c3={C3,bs:()=>{const B=HUB.bld,K={};for(const b of B)for(const k in b)K[k]=(K[k]||0)+1;return{n:B.length,K,s:B.filter(b=>b.hw>4&&b.hd>4).slice(0,4)}},stat:()=>({on:C3.on,meshes:C3.meshes,...C3.n}),near:(r=120)=>{const d=o=>Math.hypot(o[0]-RO.x,(o.length>2?o[2]:o[1])-RO.z)<r;return{g:C3.G.filter(d).length,v:C3.V.filter(d).length,roof:C3.R.filter(d).length}},view:(x,z,h)=>{roamWarp(x,z,h);RO.v=0;camSnap=true}};
