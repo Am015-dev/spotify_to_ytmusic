@@ -1,0 +1,6 @@
+# HANDOFF boot2 (2026-10-16)
+- Shipped src/98bt_boot2.js (`?boot2=0` = old path, default ON): street graph (QV) leaves the loader and is built in ≤8 ms idle slices after the first roam frame (qvTick also advances it); racer avatars are drawn during menu idle. STORY path, built page, this box: loader hide 48.1 → 44.9 s, first frame 57.2 → 54.3 s. Not ≤ 30 s yet.
+- Built but OFF (`?boot2g=1`): outer ground + Autobahn deferred after the first frame, then hide is 35.5 s. It stays off because worldGroundBuild runs as one ~5 s synchronous block (worst early frame 7.8 s vs 3.1 s). Next: turn gndBuild's cell loop into a generator (nearest cells first), then flip boot2g on.
+- Not done: cutting the ~175 shader programs (KHR_parallel_shader_compile is already used); the "Loading the city into the GPU" stage (5–9 s) and the first-frame stall (~9 s) are the remaining big items.
+- Gate: unit 0 FAIL; TAG rv2k/onboard,life1,life3,xf1,terrain,v90m 47/48 with 0 errors; only v90m/ath-boot fails, on timing alone (31.8 s, ground 25/25).
+- Shots docs/shots/boot2/first.jpg + at10s.jpg: intro dialogue over the start, geometry complete, no holes (the dialogue blocked the drive, so no 10 s drive was measured).

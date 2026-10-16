@@ -1,0 +1,6 @@
+# HANDOFF fcam-2 (2026-10-16)
+1. Hits identified: (a) water plane 0a1030 + "deep" plane 04030a: 9000 m planes with a never-updated identity matrixWorld because the test start draws nothing (?draw=0), so the ray saw a vertical sheet at z 0 (not in the real game) → GO now calls scene.updateMatrixWorld(true); (b) real merged glass/building meshes (4c4c66, 52-55k verts) and bvL instanced boxes right beside the road, no roamHit collider, camera behind/inside them.
+2. src/98fc_foliage_cam.js: camera pull-in along the car→camera line (20 Hz cast vs a learned list of big meshes, both faces, nearest-to-car wall wins; k snaps in, eases back 0.8/s; never < 3 m from the car; orientation kept; ?fcpull=0 off). docs/shots/fcam2/{before,after}.png at (1616,-59): camera 7.5 m → 2.9 m, 88 pulled frames.
+3. rv2k/foliage on the built page: 1/120 then 0/120 (≤ 2 %, twice). Unit 0 FAIL; TAG=tr1,life1,xf1,terrain 38/43 = SLOW + xf1/grass (flaky: also fails on the base build, passes on rerun).
+4. GO now logs window.__fcD (mesh name, bbox, material, normal) and window.__fcShot(x,z,n,heading) for shots.
+5. Left: cost on phone not measured (20 Hz × 2-3 big meshes without BVH); if it shows in perf, drop the rate to 10 Hz or only cast when the camera is < 12 m from a building cell.
