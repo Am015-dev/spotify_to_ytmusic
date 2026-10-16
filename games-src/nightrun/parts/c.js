@@ -148,7 +148,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
 const titleEl=$('title'),overEl=$('over'),pauseEl=$('pausem'),setEl=$('setm');
 const HUDLOG={frame:0};
 function showBest(){$('bestT').innerHTML=(best.score?`Best run <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`:'No runs logged yet')
-  +` &nbsp;·&nbsp; Daily <strong>${dailyBest.score?dailyBest.score.toLocaleString('de-DE'):'—'}</strong>`;}
+  +` &nbsp;·&nbsp; Daily <strong>${dailyBest.score?dailyBest.score.toLocaleString('de-DE'):'—'}</strong>`;if(window.RET&&RET.dailyShow)RET.dailyShow();}
 showBest();
 function syncUI(){$('touch').hidden=!(running&&touchUI&&!paused&&!SH.active);}
 /* ---------- settings (one card, Overdrive's look): the schema drives the rows; every change is saved and applied live ---------- */
@@ -212,21 +212,22 @@ function setPause(on){if(!running||on===paused)return;paused=on;pauseEl.hidden=!
 function start(daily){if(running)return;if(ST.on){startStory(ST.n);return;}AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
   newGame(daily);G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(stageFor(0,false));NR.emit('runStart',{daily:!!daily});
   FPS.n=0;FPS.t=0;FPS.slow=0;FPS.worst=0;syncUI();}
-function restart(){if(ST.on){const n=ST.n;running=false;paused=false;startStory(n);return;}const dl=G.daily;running=false;paused=false;start(dl);}
+function restart(){if(ST.on){const n=ST.n;running=false;paused=false;startStory(n);return;}const dl=G.daily;if(G.weekly)RET.wkPending=true;running=false;paused=false;start(dl);}
 function quitToTitle(){if(running)NR.emit('runEnd',{quit:true});ST.on=false;ST.over=false;selEl.hidden=true;resEl.hidden=true;$('stBtn2').hidden=true;running=false;paused=false;pauseEl.hidden=true;overEl.hidden=true;titleEl.hidden=false;newGame();G.banner.t=0;P.x=-200;AU.resume();AU.menuMusic();syncUI();showBest();}
 function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false;NR.emit('runEnd',{score:G.score,di:G.di,kills:G.kills});const D=DISTRICTS[G.di];const dist=D.name+(G.loop?' +'+G.loop:'');let eye='Signal lost';
-  if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
+  if(G.weekly)eye=RET.weeklyEnd(G.score);
+  else if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;
   $('oScore').textContent=G.score.toLocaleString('de-DE');$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
-  $('oBest').innerHTML=G.daily?`Daily best <strong>${dailyBest.score.toLocaleString('de-DE')}</strong>`:`Best <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`;
+  $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${dailyBest.score.toLocaleString('de-DE')}</strong>`:`Best <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`;
   overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);showBest();
-  G.over=true;lastDaily=G.daily;}
-let lastDaily=false;
+  G.over=true;lastDaily=G.daily;lastWeekly=!!G.weekly;}
+let lastDaily=false,lastWeekly=false;
 $('startBtn').addEventListener('click',()=>start(false));
 storyUI();
 $('dailyBtn').addEventListener('click',()=>start(true));
-$('againBtn').addEventListener('click',()=>start(lastDaily));
+$('againBtn').addEventListener('click',()=>{if(lastWeekly&&lastDaily)RET.wkPending=true;start(lastDaily);});
 $('menuBtn').addEventListener('click',quitToTitle);
 $('resumeBtn').addEventListener('click',()=>setPause(false));
 $('restartBtn').addEventListener('click',restart);
