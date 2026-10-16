@@ -1,5 +1,4 @@
 // ===== OB (owner bugs): burst cause log + phantom-burst fixes
-// every debris / stud burst / transform burst is logged with the function that fired it (cause); bursts fire only from real hits, pickups or real vehicle switches
 const OB={log:[],on:false,n:0,unc:0,sw:[],off:(()=>{try{return localStorage.getItem('ob_off')==='1'}catch(e){return false}})()};  // ob_off=1: old behaviour (for before/after measurements)
 function OB_who(){const L=(new Error().stack||'').split('\n').slice(2);if(L.some(l=>/AU_fountain/.test(l)))return'smashCheck';for(const l of L){const m=l.match(/at (?:[\w$]+\.)*([\w$]+) \(/);if(m&&!/^(OB_|debris$|studBurst$|burst$|AU_fountain$|forEach$|map$|apply$|call$)/.test(m[1]))return m[1]}return '?'}
 function OB_prop(at){if(!at||!HUB.pgrid)return null;const L=HUB.pgrid.get(Math.floor(at.x/16)*10000+Math.floor(at.z/16))||[];for(const p of L)if(Math.abs(p.x-at.x)<.01&&Math.abs(p.z-at.z)<.01){let v=true;for(let o=p.im;o;o=o.parent)if(!o.visible)v=false;return{t:p.t,vis:v,dy:+(p.y-groundY(p.x,p.z)).toFixed(1),py:+p.y.toFixed(1),ry:+RO.y.toFixed(1)}}return null}
@@ -20,8 +19,6 @@ if(!OB.off)FL_terr=function(T0,ground,dt=1/60){const raw=FL_raw(T0,ground),air=R
     if(FL.cT>=OB_HOLD&&(FL.cD>=OB_DIST||raw==='water')&&FL.hold<=0){FL.s=raw;FL.hold=OB_MINHOLD;FL.cT=0;FL.cD=0}}
   else if(!air){FL.cand=FL.s;FL.cT=0;FL.cD=0}
   return raw};
-// ---- fix 2 · contact tests: the old checks were circles (props: r+2.1 m, traffic: 5 m) so passing a lamp, bin or a car in the next lane
-// 1–3 m away "smashed" it with a full brick burst. Now: the car's real footprint (oriented box) must touch the prop / the other car's box.
 let OB_HW=1.25,OB_HL=2.45; // let: 98bc_bigcars.js sizes them to the player car
 function OB_touch(px,pz,r,ox=RO.x,oz=RO.z,oh=RO.h){const dx=px-ox,dz=pz-oz,s=Math.sin(oh),c=Math.cos(oh),a=dx*s+dz*c,b=dx*c-dz*s;
   const qa=Math.max(0,Math.abs(a)-OB_HL),qb=Math.max(0,Math.abs(b)-OB_HW);const g=Math.hypot(qa,qb),ok=g<r+.25;if(ok)OB.hit={k:'prop',f:OB.fr};else OB.pm.add(px*7919+pz);return ok||OB.off}
@@ -34,11 +31,9 @@ OB.cm=new Set();OB.pm=new Set();OB.fr=0;
 // frame counter for the contact flag (a burst is 'with contact' when a contact test passed in the same sim step)
 roamStep=(f=>function(dt){OB.fr++;OB.n0=OB.fr;return f.apply(this,arguments)})(roamStep);
 
-// OB: Euro-Skulptur (Willy-Brandt-Platz) rebuilt as a readable € sign: blue C arc (~300°, open to the right), two yellow bars
 // reaching left past the arc, on a neck + plinth, ringed by 12 yellow five-pointed stars (EU flag), ~14 m tall.
 // Everything is merged into ONE vertex-coloured geometry added to the landmark batch (BM.plain) -> no extra draw call.
 let OB_EURO=null;
-// Base height = what TR_bldFix computes for the collider footprint (max(min,max-.8) of 9 ground samples), so its terrain lift is 0:
 // the base game lifted only the vertices near the 2x2 collider (the old arc/stars got sheared = the "weird shape").
 const OB_EURO_HW=3.4,OB_EURO_HD=2.1;
 function OB_euroBuild(bt,BM,x,z){const GY=(a,b)=>(typeof groundY==='function'?groundY(a,b):0)||0,P=[];for(const u of[-1,0,1])for(const v of[-1,0,1])P.push(GY(x+u*OB_EURO_HW,z+v*OB_EURO_HD));
@@ -65,19 +60,13 @@ window.__ob=Object.assign(window.__ob||{},{euro:()=>{if(!OB_EURO)return null;con
 
 // ===== OC (owner bugs 2): soft night lights, real-scale Acropolis, height fixes, nothing standing on the roads
 const OC={dropT:{},pool:null,lamps:[],acro:null,moved:0,dropped:0,sunk:0,scaled:{},skip:/^(parthenon|erechtheion|propylaea|odeon)$/};
-// ---------- 1 · night lights. Headlights: one faint additive fan per car that fades along its length and to its edges (peak +0.24 after
-// FL's 2.4x night colour, no hard polygon); street lamps: a small bulb under each head + a warm radial pool on the ground (one draw call)
 function OC_beamGeo(){const NL=14,NW=8,L=20,P=[],C=[],I=[];
   for(let i=0;i<=NL;i++){const t=i/NL,z=2.3+t*L,hw=.95+t*L*.3,f=Math.min(1,t/.06)*(1-t)*(1-t);for(let j=0;j<=NW;j++){const u=j/NW*2-1,g=(1-u*u)*(1-u*u),k=.1*f*g;P.push(u*hw,.16,z);C.push(k,k*.93,k*.78)}}
   for(let i=0;i<NL;i++)for(let j=0;j<NW;j++){const a=i*(NW+1)+j,b=a+1,c=a+NW+1,d=c+1;I.push(a,c,b,b,c,d)}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));g.setIndex(I);g.setAttribute('uv',new THREE.Float32BufferAttribute(new Array(P.length/3*2).fill(0),2));g.computeVertexNormals();return g}
 FL_headlights=function(n){if(!HUB.grp||!HUB.cars)return;let H=FL.hl;const N=HUB.cars.length+1;
-  // PERF-4: capacity = instanceMatrix.count. H.count is the drawn count set below, so `H.count<N` rebuilt the mesh every call while any car was hidden
-  // (most of the time), and the old one was never disposed: its geometry + instance buffer stayed on the GPU (+0.7 MB per area, ~1 rebuild/s at dusk/night).
   if(H&&H.parent!==HUB.grp&&H.instanceMatrix.count>=N)HUB.grp.add(H);
   if(!H||H.instanceMatrix.count<N){if(H){H.removeFromParent();H.geometry.dispose();H.material.dispose();H.dispose()}
-    // v89q: no lamp boxes. The 4 fixed cboxes (±.74 m, ±2.25 m) fitted no car (traffic rears -2.0..-2.8 m, player x1.2), so at 2.4x additive
-    // they floated beside/behind every car as solid pink/white rectangles. The cars' own lamp parts glow via FL_emis; only the soft beam fan stays.
     const L=[OC_beamGeo()];
     const mat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false,color:0x000000,fog:true,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4});
     H=FL.hl=new THREE.InstancedMesh(mergeG(L),mat,N+8);H.frustumCulled=false;H.renderOrder=2;HUB.grp.add(H);H.userData.keep=1;H.userData.oc=1}
@@ -85,10 +74,8 @@ FL_headlights=function(n){if(!HUB.grp||!HUB.cars)return;let H=FL.hl;const N=HUB.
   if(pl&&RO.on){FL_hq.setFromAxisAngle(FL_hy,RO.h);FL_hm.compose(FL_hv.set(RO.x,RO.y,RO.z),FL_hq,FL_hs.set(1.2,1.2,1.25));H.setMatrixAt(j++,FL_hm)}
   for(const c of HUB.cars){if(c.dead>0)continue;const im=HUB.cim[c.k];if(!im)continue;im.getMatrixAt(c.j,FL_hm);H.setMatrixAt(j++,FL_hm)}
   H.count=j;H.instanceMatrix.needsUpdate=true;OC_poolStep(n)};
-// radial pool: 6 concentric discs (radius 1 .. 0.2) merged into one geometry, each adding 1/6 of the light: a soft stepped falloff to the rim
 function OC_poolGeo(){const L=[];for(let k=0;k<6;k++){const r=.5*(1-k*.16);L.push(new THREE.CircleGeometry(r,28).rotateX(-Math.PI/2).toNonIndexed())}const P=[];for(const g of L)P.push(...g.attributes.position.array);
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));return g}
-// lamp heads: the 1.4 m white glow ball becomes a small flattened bulb under the head; pools of light on the ground under every lamp
 function OC_lampsBuild(){const D=HUB.ptypes;if(!D||!D.lamp||!HUB.lampGlow)return;const bulb=new THREE.SphereGeometry(.3,10,6);bulb.scale(1.3,.5,1);bulb.translate(0,-.3,0);
   HUB.grp.traverse(o=>{if(o.isInstancedMesh&&o.material===HUB.lampGlow)o.geometry=bulb});
   const L=OC.lamps=HUB.props.filter(p=>p.t==='lamp');if(OC.pool&&OC.pool.parent)OC.pool.parent.remove(OC.pool);OC.pool=null;if(!L.length)return;
@@ -98,7 +85,6 @@ function OC_lampsBuild(){const D=HUB.ptypes;if(!D||!D.lamp||!HUB.lampGlow)return
   im.computeBoundingSphere();im.frustumCulled=false;im.renderOrder=1;im.visible=false;im.userData.keep=1;im.userData.ocPool=1;HUB.grp.add(im);OC.pool=im;OC.pm=m;OC.dead=new Set()}
 function OC_poolStep(n){const P=OC.pool;if(!P)return;P.material.opacity=.04*n;OC.poolPeak=6*.04*n;P.visible=n>.02;if(!P.visible)return;OC.pt=(OC.pt||0)+1;if(OC.pt%20)return;let ch=false;
   for(const p of OC.lamps){const dead=!p.alive;if(dead===OC.dead.has(p))continue;if(dead){OC.dead.add(p);P.getMatrixAt(p.ocP,OC.pm);p.ocM=OC.pm.clone();OC.pm.makeScale(0,0,0)}else{OC.dead.delete(p);OC.pm.copy(p.ocM)}P.setMatrixAt(p.ocP,OC.pm);ch=true}if(ch)P.instanceMatrix.needsUpdate=true}
-// ---------- 2 · props: nothing stands on a drivable surface (streets, filler roads, Autobahn, biome roads, trails, junctions); real heights;
 // ground-placed props sit on the lowest ground under their footprint (no floating edge on slopes)
 const OC_GAME=new Set(['cone','barrier','clight']);// roadworks deliberately placed on the lanes (art-6: brick piles, towers and gold bricks are block scatter in the block RECT, which diagonal roads cross, so they get the same push-off-the-road as any prop; GO art/props-road)
 const OC_fp=(t,D)=>t.startsWith('car')||/^CE_(car|taxi)/.test(t)?1.1:Math.min((D[t]?D[t].r:1)*.5,1.2);
@@ -121,17 +107,12 @@ function OC_props(L,D){OC_scaleDefs(D);let j=0;for(const p of L){let ground=Math
     if(ground&&D[p.t]){const y=OC_minG(p.x,p.z,OC_fp(p.t,D));if(g0-y>1){OC.steep=(OC.steep||0)+1;continue}if(p.y-y>.05){p.y=y;OC.sunk++}p.gp=1}
     L[j++]=p}L.length=j;HUB.OC={moved:OC.moved,dropped:OC.dropped,by:OC.dropT,sunk:OC.sunk,steep:OC.steep||0};return L}
 const OC_onRoad=(t,x,z)=>!OC_GAME.has(t)&&HUB.ptypes&&OC_roadE(x,z)<OC_fp(t,HUB.ptypes)+.35;
-// real heights: Athens street tree 4.8 m -> 6.5 m, olive 3.7 -> 6.1 m; parked and traffic cars (toy 3.0-3.5 m tall, 5.9-6.3 m long) -> ~1.6 x 1.95 x 4.6 m
 function OC_carScale(g,car){if(g.userData.oc)return;g.computeBoundingBox();const b=g.boundingBox,w=b.max.x-b.min.x,h=b.max.y-b.min.y,l=b.max.z-b.min.z;if(h<2.2)return;
   if(w<1.2){const k=1.75/h;g.scale(k,k,k)}else if(car||l<=6.4&&w>=3.2)g.scale(1.95/w,1.6/h,4.6/l);else g.scale(Math.min(1,2.5/w),Math.min(1,(h>4.5?4.2:3.4)/h),1);// cars: real size; vans, trucks, buses: real width, height capped
   g.userData.oc=1;g.computeBoundingBox();g.computeBoundingSphere()}
 function OC_scaleDefs(D){const S={tree:CID==='fra'?null:[1.25,1.35,1.25],CE_olive:[1.2,1.65,1.2]};for(const t in S){const d=D[t];if(!d||!S[t]||d.g.userData.oc)continue;d.g.scale(...S[t]);d.g.userData.oc=1;OC.scaled[t]=S[t]}
   for(const t of['car','car2','car3','car4'])if(D[t]){OC_carScale(D[t].g,1);OC.scaled[t]=1}}
 function OC_traffic(){for(const k in HUB.cim||{}){const im=HUB.cim[k];if(im&&im.geometry){OC_carScale(im.geometry);im.computeBoundingSphere&&im.computeBoundingSphere()}}}
-// ---------- 3 · the Acropolis at real scale (1 world unit = 1 m). Plateau ~266 x 156 m (hill data), Parthenon 69.5 x 30.9 m stylobate,
-// 8 x 17 Doric columns 10.43 m, entablature 3.29 m, pediments; Erechtheion + caryatid porch, Propylaea, Athena Nike on its bastion,
-// Odeon of Herodes Atticus, Theatre of Dionysus; scaffolding + tower crane at the Parthenon. Offsets in metres east/north of the Parthenon
-// centre (site plan + Wikipedia coordinates). Built right after the terrain fix, merged into one batch, colliders added to the grid.
 const OC_AK={parth:[0,0],erech:[-15,60],propy:[-118,15],nike:[-137,-9],odeon:[-186,-88],dion:[111,-125],crane:[-6,27]};
 function OC_acroBuild(){if(CID==='fra'||!HUB.grp||OC.acroG===HUB.grp)return;OC.acroG=HUB.grp;const[px,pz]=WP(80,-507);if(px<WX0+300||px>WX1-300||pz<WZS+300||pz>WZN-300)return;
   const bt=new LBatch(),BM=HUB.BM,MB='#e6d8b8',MW='#efe4cb',MD='#d4c29c',W=(e,n)=>[px-e,pz+n],cols=[],bl=[],box=(w,h,d,x,y,z,c,ry=0)=>bt.add(cbox(w,h,d,x,y+h/2,z,c,ry),BM.plain);
@@ -156,13 +137,11 @@ function OC_acroBuild(){if(CID==='fra'||!HUB.grp||OC.acroG===HUB.grp)return;OC.a
   {const[x,z]=W(...OC_AK.crane),y=groundY(x,z),Y='#f2c200',H=42;for(let k=0;k<7;k++)box(1.8,H/7-.4,1.8,x,y+k*H/7,z,Y);for(let k=0;k<7;k++)for(const s of[-1,1])bt.add(cbox(.1,6,.1,x+s*.85,y+k*H/7+3,z+.85*s,'#d8a800'),BM.plain);
     box(2.2,2.4,2.2,x,y+H,z,'#d8a800');box(46,1.2,1.2,x-14,y+H+2.4,z,Y);box(14,1,1.2,x+16,y+H+2.4,z,Y);box(4,2.6,2.4,x+20,y+H+.2,z,'#7a7a7a');box(2.2,2,2.2,x+1.8,y+H-1.6,z-1.7,'#ffffff');
     box(.1,8,.1,x,y+H+3.6,z,Y);box(.06,16,.06,x-30,y+H+2.4-16,z,'#333333');box(.8,.8,.8,x-30,y+H+2.4-16.8,z,'#e8302a');coll(x,z,1.2,1.2,y,y+H+3,0);A.crane=H+3.6}
-  // Erechtheion: main block 23.5 x 11.6 m, east porch (6 Ionic columns), north porch (4+2), caryatid porch on the south side (6 korai on a podium)
   {const[x,z]=W(...OC_AK.erech),y=gmin(x,z,14,9),BW=23.5,BD=11.6;box(BW+2,1,BD+2,x,y-.4,z,MD);box(BW,8.6,BD,x+1,y+.6,z,MB);box(BW+.8,1.4,BD+.8,x+1,y+9.2,z,MW);
     for(let i=0;i<6;i++)col(x-BW/2-1.6,y+.6,z-BD/2+1+i*(BD-2)/5,.42,6.6);box(1.6,1.4,BD,x-BW/2-1.6,y+7.2,z,MW);ped(x-BW/2-1.2,y+8.6,z,BD+.6,2.4,2.2,MW);
     {const nx=x+BW/2-5.5,nz=z+BD/2+3.8;box(10.7,.6,7.6,nx,y-.2,nz,MD);for(let i=0;i<4;i++)col(nx-4.5+i*3,y+.4,nz+3.2,.45,7.6);for(const s of[-1,1])col(nx+s*4.5,y+.4,nz,.45,7.6);box(10.7,1.6,7.6,nx,y+8,nz,MW)}
     {const cx=x+BW/2-4,cz=z-BD/2-1.9;box(5.6,1.8,3.8,cx,y+.6,cz,MD);for(const[a,b]of[[-2.2,-1.5],[-.75,-1.5],[.75,-1.5],[2.2,-1.5],[-2.2,0],[2.2,0]]){bt.add(ccyl(.28,.36,2.3,cx+a,y+2.4+1.15,cz+b,'#f2e8d2',8),BM.plain);bt.add(csph(.3,cx+a,y+4.85,cz+b,'#f2e8d2'),BM.plain)}box(5.9,.7,4.1,cx,y+5.1,cz,MW)}
     coll(x+1,z+1.5,BW/2+1.6,BD/2+3,y,y+10.6,0);A.erech={x,z,y}}
-  // Propylaea: central gate building (6 Doric columns west and east, pediments), Pinakotheke (NW wing), SW wing; stairs down the west approach
   {const[x,z]=W(...OC_AK.propy),y=gmin(x,z,14,12);box(24,1.2,20,x,y-.6,z,MD);const yw=y+.6;
     for(const[ex,h]of[[12,8.8],[-12,8.5]])for(let i=0;i<6;i++){col(x+ex,yw,z-8.5+i*3.4,.78,h);}for(const s of[-1,1])box(22,9.2,1.4,x,yw,z+s*9.5,MB);for(const zz of[-5.1,5.1])box(1.4,9,2.6,x+1,yw,z+zz,MB);
     for(const ex of[12,-12]){box(2.2,2.4,20,x+ex,yw+8.8,z,MB);ped(x+ex,yw+11.2,z,20.4,2.2,2.6,MW)}box(22,.5,20,x,yw+11,z,MW);
@@ -184,7 +163,6 @@ function OC_acroBuild(){if(CID==='fra'||!HUB.grp||OC.acroG===HUB.grp)return;OC.a
   {const[x,z]=W(...OC_AK.dion),yo=groundY(x,z);bt.add(ccyl(10,10,.3,x,yo,z,'#d9cdb2',24),BM.plain);for(let t=0;t<18;t++){const R=11+t*1.55,top=yo+.45+t*.78,n=Math.ceil(R*1.25*Math.PI/4.2);
       for(let k=0;k<n;k++){const a=-.12*Math.PI+1.24*Math.PI*(k+.5)/n,cx=x+Math.cos(a)*R,cz=z+Math.sin(a)*R,g=groundY(cx,cz);if(g>top-.2)continue;box(R*1.24*Math.PI/n+.3,top-g+.8,1.7,cx,g-.8,cz,t===0?'#f0e6d0':t%6===5?'#cbbd9e':'#dfd3b8',Math.PI/2-a)}}
     const zs=z-14,gs=gmin(x,zs,22,3);box(44,2.4+(yo-gs),5,x,gs,zs,'#c9b994');for(let k=0;k<6;k++)col(x-15+k*6,yo+2.4,zs,.4,3.2,MB,8);coll(x,zs,22,2.5,gs,yo+3,0);A.dion={x,z,y:yo}}
-  // circuit walls along the plateau edge (the base ring is skipped: the terrain fix lifted it by the plateau height); open to the west approach
   {const H=HILL_BY.akro,N=72,pt=t=>{const u=Math.sin(t),v=Math.cos(t),de=(u*H.rx*.975)*H.ca+(v*H.rz*.975)*H.sa,dn=-(u*H.rx*.975)*H.sa+(v*H.rz*.975)*H.ca;return[H.cx-de*H.sx,H.cz+dn*H.sz,u]},yH=groundY(H.cx,H.cz);
     for(let k=0;k<N;k++){const t0=k/N*Math.PI*2,t1=(k+1)/N*Math.PI*2,[x0,z0,u0]=pt(t0),[x1,z1,u1]=pt(t1);if((u0+u1)/2<-.42)continue;const cx=(x0+x1)/2,cz=(z0+z1)/2,L=Math.hypot(x1-x0,z1-z0)+1.6,ry=Math.atan2(-(z1-z0),x1-x0),g=groundY(cx,cz);
       box(L,yH+1.3-(g-7),2.2,cx,g-7,cz,'#cdb995',ry);box(L,.35,2.6,cx,yH+1.3,cz,'#bba882',ry);coll(cx,cz,L/2,1.1,g,yH+1.6,ry)}}
@@ -199,7 +177,6 @@ function OC_unbury(){const F=HUB.bld.filter(b=>b.trMin!=null&&b.trBase!=null&&b.
   const m=new THREE.Mesh(mergeG(pl),new THREE.MeshStandardMaterial({vertexColors:true,roughness:.92}));m.receiveShadow=true;m.userData.trPl=1;HUB.grp.add(m)}
 {const _hg=hubGrid;hubGrid=()=>{if(CID==='fra'&&HUB.grp&&OC.altG!==HUB.grp){OC.altG=HUB.grp;try{OC_altFix()}catch(e){console.warn('OC alt',e)}}const first=HUB.grp&&OC.ubG!==HUB.grp,r=_hg();if(first){OC.ubG=HUB.grp;try{OC_unbury()}catch(e){console.warn('OC unbury',e)}}try{OC_acroBuild()}catch(e){console.warn('OC acro',e)}return r}}
 {const _ts=hubTrafficStep;hubTrafficStep=function(){if(HUB.cim&&OC.cimS!==HUB.cim){OC.cimS=HUB.cim;OC_traffic()}return _ts.apply(this,arguments)}}
-// Frankfurt Altstadt core (Römerberg - Dom - Paulsplatz): non-landmark blocks above 19 m are brought down to 4-5 storeys (14.5-18 m incl. roof),
 // before the terrain fix (bodies still at y=0): colliders, instances and merged vertices inside each footprint scale in y
 function OC_altFix(){const R=LM_BY['Römer'],K=LM_BY['Kaiserdom'];if(!R||!K)return;const cx=(R.x+K.x)/2,cz=(R.z+K.z)/2,inC=(x,z)=>((x-cx)/280)**2+((z-cz)/170)**2<1&&!inRiver(x,z);OC.alt={cx,cz,n:0};
   const LMS=Object.values(LM_BY).filter(L=>L&&L.x!=null),lmk=b=>LMS.some(L=>Math.hypot(b.x-L.x,b.z-L.z)<Math.max(L.r||0,28));const F=[];
@@ -239,7 +216,6 @@ function OC_audit(){const D=HUB.ptypes,T=[],out={rows:T,bad:[],float:0,buried:0,
 function OC_lyka(h,nx,nz,r){if(CID==='fra'||typeof HILL_BY==='undefined'||!HILL_BY.lyka)return;const L=HILL_BY.lyka;if(L.cx<WX0+300||L.cx>WX1-300||L.cz<WZS+300||L.cz>WZN-300)return;let b=-1,bi=0,bj=0;const i0=Math.max(0,Math.floor((L.cx-260-WX0)/r)),i1=Math.min(nx-1,Math.ceil((L.cx+260-WX0)/r)),j0=Math.max(0,Math.floor((L.cz-260-WZS)/r)),j1=Math.min(nz-1,Math.ceil((L.cz+260-WZS)/r));
   for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++)if(h[j*nx+i]>b){b=h[j*nx+i];bi=i;bj=j}const d=277-TR_DATUM-b;if(!(d>0)||b<100)return;const R=190;
   for(let j=Math.max(0,bj-Math.ceil(R/r));j<=Math.min(nz-1,bj+Math.ceil(R/r));j++)for(let i=Math.max(0,bi-Math.ceil(R/r));i<=Math.min(nx-1,bi+Math.ceil(R/r));i++){const t=1-Math.hypot(i-bi,j-bj)*r/R;if(t>0)h[j*nx+i]+=d*t*t*(3-2*t)}window.__ocLyka=d}
-// the Acropolis south slope (Odeon - Theatre of Dionysus) is an archaeological park: no apartment blocks in the building raster there
 function OC_zone(cap){if(CID==='fra')return;const[px,pz]=WP(80,-507),W=(e,n)=>[px-e,pz+n],[ox,oz]=W(...OC_AK.odeon),[dx,dz]=W(...OC_AK.dion);cap(ox,oz,dx,dz,50,3);cap(ox,oz,ox,oz,56,3);cap(dx,dz,dx,dz,64,3)}
 function OC_top(t){return Math.max(t,156-TR_DATUM)}// plateau at the real summit level (156 m a.s.l.), ~70 m above the Plaka streets
 function OC_fix(U,x,z){if(U.k!=='poly')return U;const s=athStyleAt(x,z),lo=s==='old'||s==='town'||s==='outer'||s==='plaka'?3:s==='villa'?2:5,hi=s==='old'||s==='plaka'?5:s==='town'||s==='villa'?4:s==='outer'?6:8,f=Math.min(hi,Math.max(lo,U.fl));return f===U.fl?U:{...U,fl:f}}
@@ -346,7 +322,6 @@ function CV_pedPost(){const P=HUB.peds,N=HUB.nodes;if(!P)return;for(const p of P
  const _ht=hubTrafficStep;hubTrafficStep=dt=>{if(!CV.sig.length&&!CV.yl.length||!HUB.cars)return _ht(dt);CV.t+=dt;CV_pre(dt);_ht(dt);CV_post(dt)}
  const _ps=pedStep;pedStep=dt=>{if(!CV.sig.length||RD_ON)return _ps(dt);/* RD: pedestrians follow RD_kerb rules instead */CV_pedPre(dt);_ps(dt);CV_pedPost()}
  const _ce=CE_streets;CE_streets=(add,rnd,D)=>{_ce(add,rnd,D);try{CV_streets(add,D)}catch(e){console.warn('CV',e)}}}
-// ---------- city variety: Athens units (hooked into athBuildG put), per-building seed for height, colour, roof, balconies, shopfront
 const CV_AP={poly:['#f4f1ea','#efe3c8','#f2d9b0','#e9e4dc','#f3dcd2','#dfe9ee','#e8d5c0','#f0e0a8','#d8e4d0','#f6e2d6','#cfd8e0','#e9c9a8'],neo:['#efe0bf','#f2d7a0','#e8cfa6','#e6b8a0','#f0c8b8','#dcc8a8','#f3e9d8','#e8d0b0','#c9d6c0'],
   plaka:['#f7f3ea','#f3e3c3','#e8c9a0','#d9e6ef','#f4d8c8','#ffffff','#f1e6b8','#e8b890'],villa:['#ffffff','#fbf6ea','#f6eedc','#fff8f0','#f0e0c8','#e8eef0','#f4e4d4'],glass:['#2f5d73','#3a6a80','#4a7a8a','#2a4a5a','#5a8a98','#3a5a6a']};
 function CV_put(E,U,x,z,ry,c,s,fr){const k=U.k,h0=CV_h(x,z),h1=CV_h(x,z,1),h2=CV_h(x,z,2),L=(lx,lz)=>[x+lx*c+lz*s,z-lx*s+lz*c],hx=v=>parseInt(v.slice(1),16),q=cityAt(x,z),
@@ -385,7 +360,6 @@ function CV_fraVar(){const grp=HUB.grp,BI=new Map();for(const b of HUB.bld)BI.se
   mk(mergeG(B),tb,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}),(e,i,m)=>{_m.compose(Q.set(e[0],.3,e[1]),e[5],V3(e[3]+.12,e[2],e[4]+.12));m.setMatrixAt(i,_m)});CV.cr=cr.length;CV.tb=tb.length}
 // ---------- street types: tree-lined boulevard medians, tiled pedestrian streets, plaza fountains, small parks
 function CV_streets(add,D){const rd=mul(9090),grp=HUB.grp,MP=[],MC=[],TP=[],TU=[],TI=[];let nm=0,nt=0,nf=0,np=0;const has=t=>D[t]?t:'tree',nearJ=(x,z,m)=>JUNC.some(J=>Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m)||TJ_nearFx(x,z,m-4)/* terr-2: medians also stop at filler crossings */;
-  // dev4: no median slab within 70 m of a motorway-ramp start (the green strip ended in a flat 'plate' right where the ramp's double yellow begins); CV.medP lists the median segment starts for the GO check
   const RS=(typeof AB_AUTO!=='undefined'?AB_AUTO:[]).map(Z=>Z.pts[0]),nearRamp=(x,z)=>RS.some(u=>Math.hypot(u[0]-x,u[1]-z)<70);CV.medP=[];
   const quad=(A,a,b,c,d)=>A.push(...a,...b,...c,...a,...c,...d);
   for(const S of CITY_S){const cl=S.r.cls,P=S.pts,w=S.r.w;if((cl==='arterial'||cl==='ring')&&w>=17&&!S.prof&&S.L>80){for(let i=2;i<P.length-3;i+=2){const p=P[i],o=P[i+2];if(nearJ(p.x,p.z,14)||nearJ(o.x,o.z,14)||nearRamp(p.x,p.z)||nearRamp(o.x,o.z)||onAnyDeck(p.x,p.z)||onAnyDeck(o.x,o.z)||inRiver(p.x,p.z,-2)||(HUB.gates||[]).some(g=>Math.hypot(g.x-p.x,g.z-p.z)<40))continue;
@@ -434,7 +408,6 @@ const JU_ss=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
 feed=(f=>function(l,p,c){if(JU_roam())JU_ev(/NEAR MISS/.test(l)?'near':/^AIR /.test(l)?'air':'feed');return f(l,p,c)})(feed);
 say=(f=>function(a,b,t){if(JU_roam()&&(a||b))JU_ev('say');return f(a,b,t)})(say);
 studGain=(f=>function(v,b){if(JU_roam())JU_ev('stud');return f(v,b)})(studGain);
-// ---- hit-stop: the frame clock stands still for JU.hs seconds of real time (sim dt = 0, sound already fired on the impact frame)
 function JU_hit(s){if(!JU.on||!JU_roam()||JU_busy()||JU_split())return;const k=fxK();JU.kick=Math.max(JU.kick,Math.min(1,s/JU_C.hsTd)*k);if(JU.hsCd>0||!k)return;JU.hs=Math.max(JU.hs,s);JU.hsCd=.35}
 function JU_gate(rt){JU.hsCd=Math.max(0,JU.hsCd-rt);if(JU.hs>0){JU.hs-=rt;JU.frz=true}else JU.frz=false;return JU.frz}
 frame=(f=>function(now){if(JU.hold){requestAnimationFrame(frame);composer.render();return}const rt=Math.min(.05,Math.max(0,(now-(JU.ln??now))/1000));JU.ln=now;JU.rt=rt;if(JU_gate(rt))JU.off+=rt*1000;f(now-JU.off);if(state!=='roam'&&pl&&pl.mesh.scale.y!==1)pl.mesh.scale.set(1,1,1)})(frame);
@@ -450,14 +423,11 @@ comboStep=(f=>function(dt){const n0=CB.n,m0=comboMult();f(dt);if(JU.on&&n0>=5&&C
 // ---- roam step: clock, drift tiers, near miss, air + landing, stud trail
 roamStep=(f=>function(dt){const busy=JU_busy();if(!busy)JU.clk+=dt;if(!JU.on||!pl||!dt)return f(dt);
   const s=pl,d0=RO.dDir,t0=RO.dT||0,tr0=d0?JU_tier(t0):0,a0=!!s.air;f(dt);if(RO.wk||!pl)return;
-  // drift: slower charge (tiers at 0.5 / 1.1 / 2.0 s when steering into it), a cue per tier, payout 8 / 18 / 32 % bar + 0.8 / 1.6 / 2.6 s turbo
   if(d0&&RO.dDir){RO.dT=t0+(RO.dT-t0)*JU_C.tierK;const tr=JU_tier(RO.dT);if(tr>tr0){const fx0=Math.sin(RO.h),fz0=Math.cos(RO.h);burst(SPARK,JU.v1.set(RO.x-fx0*3,RO.y+.6,RO.z-fz0*3),10+tr*6,9+tr*3,.35,JU_TC[tr-1]);AU.sfx('style');JU_ev('tier');JU.kick=Math.max(JU.kick,.12*tr*fxK())}}
   else if(d0&&!RO.dDir&&tr0>0){RO.turbo=Math.max(RO.turbo||0,JU_C.turbo[tr0-1]);s.bm=Math.min(100,s.bm+JU_C.bm[tr0-1]-6*tr0);if(tr0===3)JU_pop('ULTRA TURBO','','#c46bff')}
   const sp=Math.abs(RO.v);
-  // near miss: a traffic car passes 5–8 m beside us at ≥ 15 m/s (the base one needs 45 m/s); shares the base cooldown c.nm
   if(sp>=15&&!s.air&&!busy&&(JU.nmF=(JU.nmF+1)&1)===0){const fx=Math.sin(RO.vh??RO.h),fz=Math.cos(RO.vh??RO.h);for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z;if(dx*dx+dz*dz>144){c.jpa=null;continue}const al=dx*fx+dz*fz,lat=Math.abs(dx*fz-dz*fx);
     if(c.jpa!=null&&c.jpa>0&&al<=0&&lat>(SC_S&&SC_S.on?2.9:4.8)&&lat<(SC_S&&SC_S.on?5.5:8)&&Math.abs((c.y||0)-RO.y)<3&&!(c.nm>0)){c.nm=3;award(s,'NEAR MISS',6,100,'#4ceaff');AU.sfx('near');comboAdd(2)}c.jpa=al}}
-  // air: the base already pays an air bonus over 1 s (roamLanded); here: squash on landing, camera kick on big landings, slight stretch in the air
   if(s.air&&!a0)JU.airT0=JU.clk;else if(!s.air&&a0){const at=JU.clk-JU.airT0;JU.sq=Math.min(.24,.14+at*.1);if(at>=JU_C.airMin)JU.kick=Math.max(JU.kick,Math.min(.45,at*.3)*fxK())}
   JU.sq=Math.min(.24,Math.max(0,JU.sq-Math.max(0,dt)*1.1));/* size-1: a negative dt (test clock) grew sq to 3.5 → car 2.6× big and upside down */{const q=s.air?-.05:JU.sq*Math.min(1,JU.sq*8),m=s.mesh.scale;if(Math.abs(m.y-(1-q))>1e-4)m.set(1+q*.45,1-q,1+q*.45)}
   // stud trail: nothing rewarding for 5 s while driving → a fountain of studs on the road ahead (pooled stud meshes)
@@ -465,19 +435,16 @@ roamStep=(f=>function(dt){const busy=JU_busy();if(!busy)JU.clk+=dt;if(!JU.on||!p
     for(let k=0;k<6;k++){const x=RO.x+fx*(ahead+k*3.5),z=RO.z+fz*(ahead+k*3.5);if(roamHit(x,z,1,RO.y))break;studBurst(JU.v1.set(x,groundAt(x,z,RO.y+3)+.8,z),JU.v0,0);n++}
     // blocked ahead (a wall, a tight turn): pop them in a ring around the car instead, inside the stud magnet
     if(!n){JU.v0.set(0,0,0);for(let k=0;k<6;k++){const a=k*1.047,x=RO.x+Math.sin(a)*6,z=RO.z+Math.cos(a)*6;if(!roamHit(x,z,1,RO.y))studBurst(JU.v1.set(x,groundAt(x,z,RO.y+3)+.8,z),JU.v0,0)}}}})(roamStep);
-// ---- camera: offsets are removed before the base camera runs and re-applied after, so they never feed back into its smoothing
 roamCam=(f=>function(dt){const c=camera;c.position.sub(JU.co);c.fov-=JU.cf;JU.co.set(0,0,0);JU.cf=0;f(dt);
   if(!JU.on||!JU_roam()||(typeof M1!=='undefined'&&(M1.cs||M1.tdc&&M1.tdc.t>0))){c.updateProjectionMatrix();return}
   const rt=JU.rt,sp=Math.abs(RO.v),k=clamp(sp/Math.max(30,RO.top||60),0,1.3),e=1-Math.exp(-rt*4),boost=!!pl.nitro;
   JU.drop+=(2.2*SC_cam()*JU_ss(.3,1.05,k)*(pl.air?.3:1)-JU.drop)*e;JU.fx+=((2*JU_ss(.6,1,k)+(boost?2.5:0))-JU.fx)*e;
   JU.la+=(clamp((RO.yr||0)*.07*Math.min(1,sp/20)+(RO.dDir?RO.dDir*.05:0),-.15,.15)-JU.la)*(1-Math.exp(-rt*5));
   if(!JU.frz)JU.kick*=Math.exp(-rt*9);if(JU.kick<.002)JU.kick=0;
-  // tighter chase at speed: the base lag lets the camera drift ~30 m back at top speed; keep it within 24 m (boost may stretch to 27)
   const dx=RO.x-c.position.x,dz=RO.z-c.position.z,dh=Math.hypot(dx,dz)||1,lim=(boost?27:24)*SC_cam(),pull=Math.max(0,dh-lim)*.9+JU.kick*1.6;
   JU.co.set(dx/dh*pull,-JU.drop+JU.kick*.5,dz/dh*pull);if(c.position.y+JU.co.y<RO.y+2.2)JU.co.y=RO.y+2.2-c.position.y;c.position.add(JU.co);
   if(JU.la)c.rotateOnWorldAxis(JU.Y,JU.la);
   JU.cf=JU.fx+JU.kick*5;c.fov+=JU.cf;c.updateProjectionMatrix();
-  // speed blur + speed lines: capped at the mission limits everywhere (uSpeed ≤ .25, uBoost ≤ .15, lines ≤ .3 in missions)
   const U=FX.uniforms,K=fxK();U.uSpeed.value+=(Math.min(.25,.25*JU_ss(.55,1.1,k))*K-U.uSpeed.value)*e;U.uBoost.value+=((boost?.15:RO.turbo>0?.1:0)*K*TUNE.fxGlow-U.uBoost.value)*e;
   {const el=huQ('#speedFx');if(el){let w=Math.max(boost?clamp(sp/40,0,1)*.85*TUNE.fxLines:0,.32*JU_ss(.7,1.05,k));if(JU_mis())w=Math.min(w,.3);w*=K;const o=+el.style.opacity||0,n=Math.abs(w-o)<.004?w:Math.round((o+(w-o)*.15)*1000)/1000;if(n!==o)el.style.opacity=n}}})(roamCam);
 // ---- wind rises with speed relative to the roam top speed, a low road rumble under it (one extra noise loop, made once)
@@ -502,12 +469,6 @@ window.__ju={get JU(){return JU},C:JU_C,on:b=>{JU.on=!!b;if(!JU.on&&pl)pl.mesh.s
   aimTraffic:(v=38)=>{let b=null,bd=1e9;for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<bd&&d>30){bd=d;b=c}}if(!b)return null;const N=HUB.nodes,A=N[b.a],B=N[b.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L;
     RO.x=b.x-dx*26;RO.z=b.z-dz*26;RO.y=groundAt(RO.x,RO.z,b.y+3);RO.vy=0;RO.h=RO.vh=Math.atan2(dx,dz);RO.yr=0;RO.v=v;camSnap=true;return{x:b.x,z:b.z}}};
 
-// ---- W12 · car paint reads as LEGO colours (Bright Red read pink-magenta, blue lavender, yellow pale). Two causes, measured on a side view:
-// 1) the player's glossy paint mirrored the sky environment at envMapIntensity 1.2 (traffic is capped at .6): base specular + clearcoat add
-//    a blue-white veil, which in sRGB lifts the near-zero channels of a saturated paint (red 208,23,18 → 245,51,69). Env off → 224,6,6.
-// 2) the OutputPass Neutral tone map desaturates every pixel whose brightest channel passes ~0.76 toward white; sunlit paint gets there.
-// Fix, car materials only (world look unchanged): player paint env capped at .6 like traffic, and a hue-preserving soft knee before the tone
-// map keeps a saturated paint's brightest channel under 0.76; white/grey highlights (low saturation) are left to the tone map as before.
 const W12P={t:0,K:.55,M:.76,env:.6};
 function W12_paint(m){if(!m||m.userData.w12||!(m.isMeshStandardMaterial))return;m.userData.w12=1;const ob=m.onBeforeCompile,pk=m.customProgramCacheKey;
   m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);sh.fragmentShader=sh.fragmentShader.replace('#include <opaque_fragment>',

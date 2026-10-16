@@ -1,0 +1,27 @@
+diff --git a/src/98tk_city_duel.js b/src/98tk_city_duel.js
+index 6d3e630..0f84c2b 100644
+--- a/src/98tk_city_duel.js
++++ b/src/98tk_city_duel.js
+@@ -18,8 +18,11 @@ const tkCat=(...L)=>{const o=[];for(const P of L)for(const p of P)if(!o.length||
+ function tkChain(W){const o=[];for(let k=1;k<W.length;k++)for(const p of tkLeg(W[k-1],W[k]))if(!o.length||Math.hypot(p[0]-o[o.length-1][0],p[1]-o[o.length-1][1])>2)o.push(p);return o}
+ function tkLen(P){let s=0;for(let i=1;i<P.length;i++)s+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);return s}
+ function tkAt(P,f){const L=tkLen(P)*f;let c=0;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],l=Math.hypot(b[0]-a[0],b[1]-a[1]);if(c+l>=L){const t=(L-c)/(l||1);return{x:a[0]+(b[0]-a[0])*t,z:a[1]+(b[1]-a[1])*t,h:Math.atan2(b[0]-a[0],b[1]-a[1])}}c+=l}const b=P[P.length-1],a=P[P.length-2];return{x:b[0],z:b[1],h:Math.atan2(b[0]-a[0],b[1]-a[1])}}
+-function tkGeoOf(C){if(C.geo)return C.geo;const s=C.seg?C.seg.start:tkChain(C.start),A=C.seg?C.seg.A:tkChain(C.A),B=C.seg?C.seg.B:tkChain(C.B),f=C.seg?C.seg.fin:tkChain(C.fin);
+-  const pA=tkCat(s,A,f),pB=tkCat(s,B,f);return C.geo={seg:{start:s,A,B,fin:f},pA,pB,Ls:tkLen(s),LA:tkLen(A),LB:tkLen(B),Lf:tkLen(f),lenA:tkLen(pA),lenB:tkLen(pB)}}
++// fair-2: a waypoint that is off the street graph makes the street legs on both sides meet in a spike (Westend A: 137 deg at (880,170), 180 deg at (566,-304)); a car cannot follow it and the bot pins there.
++// Drop a vertex that turns > 100 deg with a short (< 40 m) neighbour segment, repeat until none (the ends stay).
++function tkDespike(P){const o=P.slice();for(let k=0;k<40;k++){let cut=-1;for(let i=1;i<o.length-1;i++){const a=o[i-1],b=o[i],c=o[i+1],l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]);if(Math.min(l1,l2)>=40)continue;const t=Math.abs(angDiff(Math.atan2(c[0]-b[0],c[1]-b[1]),Math.atan2(b[0]-a[0],b[1]-a[1])));if(t>1.75){cut=i;break}}if(cut<0)break;o.splice(cut,1)}return o}
++function tkGeoOf(C){if(C.geo)return C.geo;const dsp=P=>C.water?P:tkDespike(P),s=dsp(C.seg?C.seg.start:tkChain(C.start)),A=dsp(C.seg?C.seg.A:tkChain(C.A)),B=dsp(C.seg?C.seg.B:tkChain(C.B)),f=dsp(C.seg?C.seg.fin:tkChain(C.fin));
++  const pA=dsp(tkCat(s,A,f)),pB=dsp(tkCat(s,B,f));return C.geo={seg:{start:s,A,B,fin:f},pA,pB,Ls:tkLen(s),LA:tkLen(A),LB:tkLen(B),Lf:tkLen(f),lenA:tkLen(pA),lenB:tkLen(pB)}}
+ function tkGeo(){return tkGeoOf(TK.C||TK_C)}
+ // ---- course builder: start leg -> split -> 2 routes -> rejoin -> finish leg, all on the GPS street graph
+ function tkSnap(x,z){const i=qvNear(x,z,700),G=qvGraph();return i<0?null:[G.X[i],G.Z[i]]}
+@@ -122,7 +125,7 @@ function tkAiTarget(a,P,s){const q=tkPosOn(P,Math.max(0,s));let tv=a.base;if(q.t
+ // fair-1 (2026-10-16): pace band, as in 2K Drive / Mario Kart. The rival's speed model is scaled to the player's car (TK_PACE: base 62 -> 31 m/s, the car tops out ~31)
+ // and pulled toward a target gap that moves with your progress: it leads early, lets you by, comes back, then trails you into the finish, so a clean race is close and
+ // winnable, while a crash still costs (it waits less near the end). Over 400 m apart (you stopped) the band lets go. Without ?fair=1: old pace (base 62, ±10 % past 150 m, DNF +40 s).
+-const TK_FAIR=(()=>{try{return new URLSearchParams(location.search).get('fair')==='1'}catch(e){return false}})(),TK_PACE=.5;   // WIP: OFF until rv2k2/close passes (?fair=1 on)
++const TK_FAIR=(()=>{try{return new URLSearchParams(location.search).get('fair')==='1'}catch(e){return false}})(),TK_PACE=.5;   // OFF until rv2k2/close passes (fair-2: still red, see HANDOFF_fair2); ?fair=1 on
+ function tkGapT(pr,i){const k=[[0,30],[.25,30],[.35,-30],[.5,-30],[.6,25],[.72,25],[.82,-40],[1,-40]];let j=1;while(j<k.length-1&&pr>k[j][0])j++;const a=k[j-1],b=k[j];return a[1]+(b[1]-a[1])*clamp((pr-a[0])/(b[0]-a[0]),0,1)-i*20}
+ function tkRub(gap,pr,i){if(!TK_FAIR)return gap>150?.9:gap<-150?1.1:1;if(Math.abs(gap)>400)return 1;const e=gap-tkGapT(pr,i),fin=pr>.82;return e>0?1-(fin?.25:.45)*Math.min(1,e/120):1+(fin?.06:.3)*Math.min(1,-e/100)}
+ // DNF: relative to the first rival home and generous: you get the time your own average pace needs to finish (+10 s), 30 s at least, up to the winner's whole time again.
