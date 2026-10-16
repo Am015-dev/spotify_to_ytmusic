@@ -1,0 +1,6 @@
+# HANDOFF onboard-2 (2026-10-16)
+- New src/98ob2_onboard.js (in ORDER before 99_api.js): first launch = logo + ONE big PLAY (old STORY card: empty slot → NEW GAME → Hot Drop); returning = big CONTINUE + RACES / GARAGE / BUILD / MORE (5 buttons). MORE = old cards, pills, top buttons (SAVES, DAILY, TT, UPDATES, SETTINGS, SOUND, PROFILE). `?ob2=0` = old menu.
+- Dev chips (✔ pin, 🐞, ⚙) hidden on the home screen only; "New in" banner is a small bottom-right chip, marks itself seen after 7 s; .hby credits + small texts now 12 px; credits line "Made with ❤ by Alex · 3D models by Alex" on the home screen.
+- Gate (built page): unit 0 FAIL; rv2k2/menu 1–5 buttons, banner 0 px², rv2k/onboard, rv2k/devui pass. GO text said "FIRST SCREEN", which tChkGo's BAD regex (/first/) always failed: renamed OPENING SCREEN; GO now forces the home view when measuring. ath-density + ath-boot fail on the unchanged base too; xf1/grass flaked once in the combined run, passes alone.
+- Page is 3,499,759 B: only ~240 B under the 3.5 MB unit headroom check (size-headroom): the next module must shrink something first.
+- Shots: docs/shots/onboard2/{first,ret}_{land,port}.png + more_land.png. Left: portrait PLAY card sits low-centre; real-phone check by Alex.
