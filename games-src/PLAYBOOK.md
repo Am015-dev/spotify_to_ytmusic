@@ -6,7 +6,7 @@ Read root `CLAUDE.md` first (hard rules, cost rules). A finished game goes strai
 ## Iterate fast, check once (two speeds; numbers in `CHECK-SPEED.md`)
 - **Iterate with `--quick`:** `python3 games-src/scripts/build-all.py --quick <slug>` = build + stamp + phone-check + the game's scenario tests
   (`?scn=` states, seconds each) + a QUICK sweep (4 games, one rotation). Run it after every small fix. Never run the full sweep to iterate.
-- **Go live with `--deploy`:** `build-all.py --deploy <slug>` = the same checks + the FULL sweep (the CLAUDE.md gate, unchanged) + rotate-test,
+- **Go live with `--deploy`:** `build-all.py --deploy <slug>` = the same checks (QUICK sweep; owner, 13 Oct 2026). Add `--full` (full sweep + rotate-test) only for engine/rules changes,
   once, then copies the passing game into `games/`. Run it once, right before going live (not after each fix, not again after a merge unless
   the merge touched your game's logic). `--no-sweep` skips the sweep: only for a change that cannot touch play, and say why in the commit.
 - **One shared http server:** build-all.py starts `scripts/gx-serve.js` once and passes `GX_URL` to every check. Sweeps, rotate-tests,
@@ -19,23 +19,41 @@ Read root `CLAUDE.md` first (hard rules, cost rules). A finished game goes strai
   the skin on versus off, and prints which computed property moved.
 - **Scenarios ("spawn the requirement only"):** every game registers scenarios in its own `scn.js` (see `shell/gx-scenario.js`,
   worked example `munch/scn.js`): `?scn=<id>` skips menus and tutorial, seeds the RNG, builds the exact state and shows a "Test:" tag;
-  `scripts/scenario-test.js <slug>` runs every scenario at 390x763, 375x553 and 1366x768 over http. Write a scenario for every owner request
+  `scripts/scn-run.js` (Playwright Test: `node_modules/.bin/playwright test`, config `playwright.config.js`, env `SCN_SLUGS=<slug>`) runs every scenario at 390x763 (`--project=phone`; `phone-s` 375x553 and `pc` 1366x768 with --full) over http. Write a scenario for every owner request
   (it is the repro that stays), put its `ask` line in the What's new entry with `add-update.py ... --scn <id>` so the owner gets "▶ Try this".
   Every game needs at least `<prefix>-board` and `<prefix>-zoom`.
+
+## A scenario must find bugs (owner, 13 Oct 2026: "the lab tests are extremely stupid, not finding any bugs")
+"Element visible / text matches / font >= 12 px" passes on a broken game. A scenario counts only if it:
+1. **acts with REAL taps** (`{kind:'play', steps:[{sel, until, max}], idle, verify}`: the runner touch-taps, nothing is forced during the action),
+2. **asserts the OUTCOME in the engine** in `verify(before, after)` (energy dropped by the cost, the card is in the hand, the market refilled, YOU/MONSTERS moved by the card's value, the winner and the loot are right, on-screen numbers equal the engine),
+3. **ends in a valid next state**: `idle()` must become true (no stuck state > 8 s: nothing changing for 8 s fails; the computer's turn completes) and the next turn must start,
+4. **is killed by `scripts/scenario-mutate.js`**: it breaks the feature (dead/throwing handler, hidden/covered/shrunk element, off-by-one number, and your own `mut:[{name, js}]` engine mutants: change a cost, skip the refill, swap a score) and the scenario must FAIL on every mutant. A survivor means the scenario is useless: fix it or delete it. Target: >= 90% killed per game, and every scenario needs at least one `mut` unless it only checks looks.
+Every scenario also gets these invariants for free (`gx-scenario.js`): no console/page error, no failed same-origin request (404 image/music/model), no text under 11 px / clipped / overlapping, no covered button, no horizontal scroll, every element with `data-engine="G.pl[0].en"` shows that engine value (settles for 5 s), and every glowing legal target (`GXS.glowSel`) answers a real tap. Mark numbers worth proving with `data-engine`. A finding a game cannot fix now goes into `GXS.known` (regex + why) in its `scn.js` AND `HANDOFF.md`, never silently.
+Run: `cd games-src && SCN_SLUGS=<slug> node_modules/.bin/playwright test --project=phone` (fast, every build; needs `npm install` in games-src; `-g <scn-id>` for one scenario) and `node games-src/scripts/scenario-mutate.js <slug>` (about 2-4 min a game; run when you add or change a scenario, not on every build). No screenshots.
 
 ## Fast delivery (owner, 13 Oct 2026: "better checklists and tests, less playing the game and waiting for hours")
 Every change, however small, ships as: **code + scenario + checklist item**, in that order, in one deploy.
 1. **Scenario first.** For each requirement in the brief, register a `?scn=<id>` scenario (`games-src/shell/gx-scenario.js`)
    that builds that exact moment directly (no menus, no playing there) with an `ask` line (8 words or fewer) and machine
-   `checks`. The scenario is the spec: write it before the fix, watch `scenario-test.js` fail, then make it pass.
+   `checks`. The scenario is the spec: write it before the fix, watch the scenario test fail, then make it pass.
 2. **Iterate with `build-all.py --quick <slug>`** (phone-check + scenario tests + 4-game sweep, minutes). Never run the full
    sweep while iterating.
-3. **One full `--deploy` at the end** (the full sweep gate is unchanged). Small batches: 1-3 games per worker, deploy each
+3. **`--deploy` as soon as the scenarios pass** (no sweep; `--full` only for engine/rules changes). Small batches: 1-3 games per worker, deploy each
    game as soon as it passes; never hold finished games back for the rest of a batch.
 4. **Checklist item per scenario:** `add-update.py <game> "headline" "item" --check "what to try" --scn <id>` so the owner
    gets a "▶ Try this" button that opens that moment. The owner tests scenarios, not whole games.
 5. **Report** = before/after numbers + the scenario ids. No "play a few games to check" steps for the owner, ever.
-6. Hand off at ~250k context tokens; long sessions get slow and expensive.
+6. Hand off at ~150k context tokens with a HANDOFF note; long sessions get slow and expensive (see "Read less" below).
+
+## Read less: code maps, find.sh, guards (owner, 13 Oct 2026)
+Workers were re-reading 270-650k tokens of their own context, mostly whole UI files and built output. Now:
+1. `games-src/scripts/find.sh --maps` lists each game's `MODULES.md` (generated, not committed; `find.sh --refresh` or any `build-all.py` run rebuilds them).
+   It gives every source file in build order with size and purpose, its functions with line numbers, and which later file overrides which function.
+2. `games-src/scripts/find.sh <symbol|text> [game]` prints `file:line` and which definition wins. Read only that range.
+3. Built html, `x.js` and the joined `ui.js` are git-ignored and skipped by search (`.ignore` files). The numbered `ui1..uiN.js` parts are the real sources.
+4. `scripts/guard.py` (every build + `.github/workflows/guard.yml`) stops big non-media files, growth of sources over 120 KB, new override layer files and tracked build outputs.
+5. Start every worker session from `games-src/BRIEF-TEMPLATE.md`. Numbers: `games-src/CHECK-SPEED.md` (Tokens).
 
 ## The tools (all scripts, no AI)
 - `python3 games-src/scripts/build-all.py [slugs] [--out DIR] [--no-check] [--deploy [--suffix -next]]`
@@ -90,7 +108,7 @@ Versions and what is missing: `python3 games-src/scripts/game-status.py` writes 
    No AI testers for bugs.
 
 ## Efficiency rules (from CLAUDE.md)
-- Test once, at the end: iterate with `build-all.py --quick <slug>`, then `--deploy <slug>` runs the one full sweep. After merging origin, run only `--quick` unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
+- Test once, at the end: iterate with `build-all.py --quick <slug>`, then `--deploy <slug>` (no sweep; `--full` only for engine/rules changes). After merging origin, run only `--quick` unless the merge touched your game's logic. Never run the full sweep twice in a row; never restart a full sweep just because origin moved (owner, 8 Oct 2026: "extremely slow").
 - One worker per game, a tiny brief that names the files; reports under 150 words; at most 2 subagents at once.
 - Always set the model: orchestrator on main, workers on Sonnet, plain copying/downloads on Haiku. No new cloud sessions.
 - Scripts do the checking (build-all, phone-check, sweep); AI testers only for new-game blind tests, never for bugs.
@@ -143,3 +161,13 @@ blank canvases, small boards, overlapping or spilling cards, sideways scroll and
 - After a real fix, re-save the baseline: `look-check.js --baseline --game <slug>`. Scene drivers live in
   `games-src/scripts/look-scenes.json` (a copy of the ones in asset-viewer/screens.html).
 - An owner bug report about looks ("can't read it", "button has no label") goes into the fixer's brief first, then run the look check on that game.
+
+## LAB and test mode (owner, 13 Oct 2026)
+Every deployed game carries the 🧪 LAB (test mode only; `shell/LAB.md`): build-all inlines `gx-lab-core.js`, `gx-lab.js`, `gx-lab.css` into the staged page, so a game only needs `scn.js`. Per game: `<prefix>-board`, `<prefix>-zoom`, `<prefix>-help`, the shared `story-scene`, and a scenario for every item of its newest What's new entries (`scripts/set-scn.py <game-id> <date> 3=<scn-id>`).
+`build-all.py --quick/--deploy` also runs `scripts/lab-test.js` (off = no LAB element; on = LAB lists GXSLIST and every GO passes its checks; pinned checklist -> shelf -> `games/lab.html`), and after a deploy refreshes `games/scenarios.json` (`scripts/lab-index.js`) and `games/lab.html` (`scripts/lab-page.py`). Brief for a scenarios worker: `games-src/lab/BRIEF-scenarios.md`.
+
+## Visual baselines (owner, 14 Oct 2026; machine-only, NEVER open the images)
+- `build-all.py --visual <slug>`: compares the deployed game's title / menu / board (phone, tablet, wide) with the approved baselines (`scripts/visual.spec.js`); a diff or a missing baseline fails.
+- `build-all.py --approve-visual <slug>`: only after the owner approves that game's screens; re-records and pushes to the orphan branch `ui-baselines` (`scripts/baselines.sh pull|push`; files live in git-ignored `games-src/.baselines/`).
+- Masked: timers, dice, coach bubble, finger, pops; give any other volatile element `data-volatile`. Needs `npm i --no-save @playwright/test @axe-core/playwright` once per machine.
+- Recorded so far: rampart-and-vine only (mechanism proof). Never record a game unapproved.

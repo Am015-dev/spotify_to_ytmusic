@@ -208,7 +208,7 @@ async function doMoves(page, n, st, used) {
     const before = await page.evaluate('window.__pc.snap()').catch(() => '');
     await tap(page, c.x, c.y); st.moves++;
     const lat = await waitChange(page, before, 1000);
-    if (lat < 0) { st.unresp++; st.unrespWhat.push(c.t || 'tap'); } else st.lat.push(lat);
+    if (lat < 0) { st.unresp++; st.unrespWhat.push(c.t || 'tap'); } else { st.lat.push(lat); (st.lbl = st.lbl || []).push((c.t || '').slice(0, 14)); }
     await sleep(500);
   }
 }
@@ -292,12 +292,12 @@ function verdict(st) {
   if (st.smallBoard.size) r.push('board <55% of screen: ' + [...st.smallBoard][0]);
   if (st.skinMoved.size) r.push('skin changed box: ' + [...st.skinMoved].slice(0, 2).join(' | ') + (st.skinMoved.size > 2 ? ' +' + (st.skinMoved.size - 2) : ''));
   if (st.wordy.size) r.push('text >8 words: ' + [...st.wordy].slice(0, 2).join(', '));
-  if (st.unresp > 1) r.push(st.unresp + ' dead taps');
+  if (st.unresp > 1) r.push(st.unresp + ' dead taps (' + st.unrespWhat.slice(0, 2).join(' | ').slice(0, 100) + ')');
   if (st.stuck) r.push('stuck 8s');
   if (st.notes.length) r.push(st.notes[0]);
   const lat = st.lat.length ? Math.max(...st.lat) : 0;
   const med = st.lat.length ? [...st.lat].sort((a, b) => a - b)[st.lat.length >> 1] : 0;
-  const tail = ` (${st.moves}mv, ${med}ms${st.unresp === 1 ? ', 1 dead' : ''}${st.moves === 0 ? ', no moves found' : ''})`;
+  const tail = ` (${st.moves}mv, ${med}ms, lat ${st.lat.map((l, i) => l + (l > 400 ? ':' + (st.lbl && st.lbl[i]) : '')).join('/')}${st.unresp === 1 ? ', 1 dead' : ''}${st.moves === 0 ? ', no moves found' : ''})`;
   if (lat > 800) r.push('slow ' + lat + 'ms');
   return { ok: r.length === 0, text: (r.length ? 'FAIL ' + r.join('; ') : 'PASS') + tail };
 }

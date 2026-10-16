@@ -26,20 +26,10 @@
 <header class="gx-bar">
   <h1><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#gz1"/></svg><span>Sunglaze</span></h1>
   <span class="gx-sp"></span>
-  <button class="gx-ibtn" data-a="coach" id="coachbtn" title="Guided play: the panel explains every step"><svg class="ic" aria-hidden="true"><use href="#i-guide"/></svg><span>Guide</span></button>
-  <button class="gx-ibtn" data-gx="plrd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-players"/></svg><span>Players</span></button>
-  <button class="gx-ibtn" data-gx="logd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg><span>Log</span></button>
-  <button class="gx-ibtn" data-gx="refd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-tiles"/></svg><span>Tile list</span></button>
-  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-rules"/></svg><span>Rules</span></button>
-  <button class="gx-ibtn" data-a="snd" id="sndbtn" aria-label="Sound"><svg class="ic" aria-hidden="true"><use href="#i-snd"/></svg></button>
-  <button class="gx-ibtn" data-a="mus" id="musbtn" aria-label="Music"><svg class="ic" aria-hidden="true"><use href="#i-music"/></svg></button>
-  <button class="gx-ibtn" data-a="musicpick" id="songbtn" aria-label="Choose songs"><svg class="ic" aria-hidden="true"><use href="#i-music"/></svg><span>Songs</span></button>
-  <button class="gx-ibtn" data-a="speed" id="speedbtn" title="How fast the computer plays"><svg class="ic" aria-hidden="true"><use href="#i-speed"/></svg><span>normal</span></button>
-  <button class="gx-ibtn" data-a="gfx" id="gfxbtn" title="Graphics quality (Auto picks by device; drops a level if frames stutter)"><svg class="ic" aria-hidden="true"><use href="#i-gfx"/></svg><span>Graphics</span></button>
-  <button class="gx-ibtn perfb" data-perfhud="show" aria-pressed="false" title="Show frame rate and frame time">Show speed</button>
-  <button class="gx-ibtn perfb" data-perfhud="test" title="Measure each graphics level and recommend one">Test speed</button>
-  <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden><svg class="ic" aria-hidden="true"><use href="#i-pause"/></svg></button>
-  <button class="gx-ibtn" data-a="new"><svg class="ic" aria-hidden="true"><use href="#i-new"/></svg><span>New game</span></button>
+  <button class="gx-ibtn" aria-label="Players and scores" data-gx="plrd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-players"/></svg><span>Players</span></button>
+  <button class="gx-ibtn" aria-label="Log" data-gx="logd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg><span>Log</span></button>
+  <button class="gx-ibtn" aria-label="Rules" data-gx="rulesd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-rules"/></svg><span>Rules</span></button>
+  <button class="gx-ibtn" data-gx="menud" aria-expanded="false" aria-label="Menu"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg><span>Menu</span></button>
 </header>
 <div class="gx-main">
   <main class="gx-board"><div class="view"><canvas id="c3" aria-label="The courtyard table in 3D. Tap a glowing tile to pick its glaze, then a glowing rack. Drag to tilt, scroll to zoom, double-click to reset."></canvas><div id="map2d" hidden></div><div id="chip" aria-hidden="true"></div></div></main>
@@ -50,12 +40,28 @@
   <button class="gx-ibtn gx-reopen" data-gx="dock"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg> Panel</button>
 </div>
 </div>
+<section class="gx-drawer" id="menud" role="dialog" aria-label="Menu"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg> Menu</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"><div class="menugrid">
+  <button class="gx-ibtn" data-a="new"><svg class="ic" aria-hidden="true"><use href="#i-new"/></svg><span>New game</span></button>
+  <button class="gx-ibtn" data-a="tutorial" id="tutbtn"><svg class="ic" aria-hidden="true"><use href="#i-guide"/></svg><span>Learn the rules</span></button>
+  <button class="gx-ibtn" data-a="coach" id="coachbtn" title="Guided play: the panel explains every step"><svg class="ic" aria-hidden="true"><use href="#i-guide"/></svg><span>Guide</span></button>
+  <button class="gx-ibtn" data-gx="refd" aria-expanded="false"><svg class="ic" aria-hidden="true"><use href="#i-tiles"/></svg><span>Tile list</span></button>
+  <button class="gx-ibtn" data-a="snd" id="sndbtn" aria-label="Sound"><svg class="ic" aria-hidden="true"><use href="#i-snd"/></svg></button>
+  <button class="gx-ibtn" data-a="mus" id="musbtn" aria-label="Music"><svg class="ic" aria-hidden="true"><use href="#i-music"/></svg></button>
+  <button class="gx-ibtn" data-a="musicpick" id="songbtn" aria-label="Choose songs"><svg class="ic" aria-hidden="true"><use href="#i-music"/></svg><span>Songs</span></button>
+  <button class="gx-ibtn" data-a="speed" id="speedbtn" title="How fast the computer plays"><svg class="ic" aria-hidden="true"><use href="#i-speed"/></svg><span>normal</span></button>
+  <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden><svg class="ic" aria-hidden="true"><use href="#i-pause"/></svg></button>
+  <button class="gx-ibtn" data-a="gfx" id="gfxbtn" title="Graphics quality (Auto picks by device; drops a level if frames stutter)"><svg class="ic" aria-hidden="true"><use href="#i-gfx"/></svg><span>Graphics</span></button>
+  <button class="gx-ibtn perfb" data-perfhud="show" aria-pressed="false" title="Show frame rate and frame time">Show speed</button>
+  <button class="gx-ibtn perfb" data-perfhud="test" title="Measure each graphics level and recommend one">Test speed</button>
+</div></div></section>
 <section class="gx-drawer wide" id="plrd" role="dialog" aria-label="Players"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-players"/></svg> Players and scores</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="plrbody"></div></section>
 <section class="gx-drawer" id="logd" role="dialog" aria-label="Log"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-log"/></svg> Log</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="logbody"></div></section>
 <section class="gx-drawer wide" id="refd" role="dialog" aria-label="Tile list"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-tiles"/></svg> Tiles, tokens and scoring</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="refbody"></div></section>
 <section class="gx-drawer wide" id="rulesd" role="dialog" aria-label="Rules"><div class="gx-drawer-head"><h2><svg class="ic" aria-hidden="true"><use href="#i-rules"/></svg> How to play</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="rulesbody"></div></section>
 <div id="modal" hidden></div>
 <div id="defs"></div>
+<script src="gx-scenario.js"></script>
+<script src="scn.js"></script>
 <script src="shell.js"></script>
 <script src="gx-viewport.js"></script>
 <script src="gx-skin.js"></script>

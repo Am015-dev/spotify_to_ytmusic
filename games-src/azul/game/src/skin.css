@@ -1,12 +1,12 @@
 
 /* ===== Sunglaze skin (facelift): painted kit over the shell (gx-skin.css does bar, drawers, icon buttons); this file holds the game's own buttons and dialogs ===== */
 html.sk{--sk-ink:#3a1a0a;--sk-cream:#3a1a0a}
-html.sk .btn:not(.sm):not(.ghost):not(.on){border:0 solid transparent;border-width:0 22px;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;min-height:46px;padding:0 2px;color:#3a1a0a;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));justify-content:center;text-shadow:none}
+html.sk .btn:not(.sm):not(.ghost):not(.on){border-width:14px 22px;padding:0;border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#3a1a0a;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-shadow:none}
 html.sk .btn.go:not(.sm){border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .btn.cob:not(.sm){border-image-source:url(media/ui-button-power-c.webp);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .btn:not(.sm):active{transform:translateY(2px)}
 html.sk .btn:disabled{opacity:.55}
-html.sk .mbox{background:none;border:34px solid transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));padding:0 2px;box-sizing:border-box;color:#3a1a0a}
+html.sk .mbox,html.sk.ph .mbox{background:none;border-width:34px;padding:0;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a1a0a}
 /* the tile-strip bar and drawer strips are busy: a cream veil keeps the labels readable */
 html.sk .gx-bar{background:linear-gradient(rgba(255,246,226,.84),rgba(255,246,226,.84)),url(media/ui-topbar.webp) left center/auto 100% repeat-x #f3e3c4;color:#3a1a0a}
 html.sk .gx-bar h1,html.sk .gx-bar .gx-ibtn,html.sk .gx-bar .gx-ibtn span{color:#3a1a0a;text-shadow:none}
@@ -20,3 +20,43 @@ html.sk-cells .bf-floor .bf-c{background:url(media/ui-floor-cell.webp) center/11
 html.sk .gxc-head{background:linear-gradient(rgba(255,246,226,.84),rgba(255,246,226,.84)),url(media/ui-topbar.webp) left center/auto 100% repeat-x #f3e3c4;color:#3a1a0a}
 html.sk .gxc-htitle{color:#3a1a0a;text-shadow:none;line-height:1.3;padding:2px 0}
 html.sk .gxc-ib{color:#fff}
+
+/* carved wooden tray around the full five-dish rack (the shorter racks are a staircase, so they keep plain dishes) (overlay behind the dishes, no size change) */
+html.sk-rackf .bf-rack:not(:has(>.bf-c.no)){isolation:isolate}
+html.sk-rackf .bf-rack:not(:has(>.bf-c.no))::before{content:'';position:absolute;inset:-9px -5px -8px;z-index:-1;pointer-events:none;border:solid transparent;border-width:11px 5px 9px;border-image:url(media/ui-rack-frame-c.webp) 36 16 30 16 fill/11px 5px 9px stretch;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+/* coach bubble pointer: the painted tail instead of the plain diamond */
+html.sk-tail .gxh-arr{width:26px;height:20px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
+html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
+html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
+html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
+/* settings rows: the painted glazed strip behind each row (overlay, no size change) */
+html.sk-row .gx-row{position:relative;isolation:isolate}
+html.sk-row .gx-row::before{content:'';position:absolute;inset:0 -4px 0 -10px;z-index:-1;pointer-events:none;border:solid transparent;border-width:12px;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch}
+
+html.sk .sg-hero,html.sk.ph .sg-hero{margin:0;border-radius:0}
+
+/* ===== UI bar (14 Oct 2026): inset, text size, menu drawer, start screen ===== */
+.gx-drawer{border-width:18px}
+html.sk .gx-drawer{border-image:url(media/ui-panel-c.webp) 100 fill/18px stretch}
+.gx-drawer-head{padding:10px 16px}.gx-drawer-body{padding:16px}
+.menugrid{display:flex;flex-direction:column;gap:8px}
+.menugrid .gx-ibtn{width:100%;justify-content:flex-start;min-height:48px;gap:10px;padding:8px 16px;font-size:1rem}
+.menugrid .gx-ibtn span{display:inline!important;font-size:1rem}
+.src b{font-size:1rem}.info{font-size:1rem}
+.mbox.start .lede{margin:0;font-size:1.05rem}
+.mbox.start .acts{justify-content:stretch}.mbox.start .acts .btn{flex:1 1 auto;justify-content:center}
+.mbox.start .qrow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.mbox.start .qrow>span{font-weight:800;font-size:1rem;min-width:84px}
+.mbox.start .seg button{min-width:56px;min-height:44px;font-size:1rem;text-transform:capitalize}
+.mbox.start details.more{margin-top:2px}.mbox.start summary{cursor:pointer;font-weight:800;font-size:1rem;min-height:44px;display:flex;align-items:center}
+.mbox.start details.more[open]{display:flex;flex-direction:column;gap:10px}
+.mbox .nrow .btn.sm{min-height:44px}
+.gxc-head .gxc-htitle{overflow:visible;padding:2px 0;line-height:1.3}
+#chip{z-index:5}
+@media (min-width:1024px){.mbox,.gx-drawer,.gx-dock{font-size:1rem}.mbox small,.gx-drawer small,.gx-dock small,.small{font-size:1rem}}
+#chip,.gx-dock .info{display:none!important}
+@media (min-width:1024px){.gx-dock i,.gx-dock em,.gx-dock b,.gx-dock button,.mbox .btn.sm,.mbox .seg button,.mbox b{font-size:1rem}}
+/* top bar: a plain cream plate, dark ink (the tile strip and the pale gradient title were unreadable, 14 Oct 2026) */
+html.sk .gx-bar{background:#f3e3c4}
+html.sk .gx-bar h1 span{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:#3a1a0a;filter:none;text-shadow:none}
+html.sk .gx-drawer-head{background:#f3e3c4}
