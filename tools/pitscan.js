@@ -4,6 +4,7 @@
 // A) pits: 10 m grid of groundY, priority-flood fill -> every enclosed basin >3 m deep with its wall slope; steep (>30 deg) cells within 30 m of a road edge / POI.
 // B) sink: ~300 random drivable points, warp the car, settle 45 frames, compare wheel + body height to a raycast on the rendered terrain/street meshes (gap >0.1 m).
 // C) pass-through: horizontal rays (1 m above ground) from road edges against every solid mesh; hit within 5 m with no collider within 0.5 m = pass-through.
+// E) ramp (--only ramp): every RO.ramps piece (kickers, jump / story / pop-up ramps) vs building colliders + 10 m height cap; ramps on a road lane listed as info (in-game RP_scan, src/99c_checklist.js; GO ramp1/ramp-clear)
 // D) escape: spawn at the 5 worst pits, hold gas 10 s, auto-steer to the nearest road, report stuck yes/no.
 // Output: one JSON per city on stdout (--json writes it too); docs/PIT_REVIEW.md is made from it by hand/tools. Page functions below run INSIDE the game (module scope).
 const L=require('./qa/lib');const fs=require('fs');
@@ -110,6 +111,8 @@ async function city(c){
   const A=await L.open({base,city:c});const p=A.p,t0=Date.now(),out={city:c,build:await L.ev(p,'OD_CHANGELOG[0].v')};
   const log=(m)=>console.error(`[${c}] ${((Date.now()-t0)/1000).toFixed(0)}s ${m}`);
     const call=async(fn,arg)=>{const r=await L.ev(p,'(()=>{const ARG='+JSON.stringify(arg||{})+';return JSON.stringify(('+fn.toString()+')(ARG))})()');if(typeof r==='string'&&r.startsWith('ERR'))throw new Error(fn.name+' '+r);return JSON.parse(r)};
+  out.ramp=JSON.parse(await L.ev(p,'JSON.stringify(__chk.rpScan())'));log(`E ramp ${out.ramp.n} pieces, ${out.ramp.bld.length} in buildings, ${out.ramp.tall.length} >10 m, ${out.ramp.lane.length} on a lane (info)`);
+  if(ONLY==='ramp'){await A.close();return out}
   out.pois=await call(pageNear);log('index '+out.pois+' POIs');
   out.terrain=await call(pageTerrain);log(`A pits ${out.terrain.pitsTotal}, steep clusters ${out.terrain.hotTotal}`);
   if(ONLY==='terrain'){await A.close();return out}
@@ -123,5 +126,5 @@ async function city(c){
 (async()=>{const which=opt('city','both'),cs=which==='both'?['fra','ath']:[which],all={};
   for(const c of cs)all[c]=await city(c);
   const js=JSON.stringify(all);if(opt('json'))fs.writeFileSync(opt('json'),js);
-  const sm=Object.values(all).map(r=>`${r.city}: pits>3m ${r.terrain.pitsTotal} (rim>25deg ${r.terrain.pits.filter(x=>x.rimSlope>25).length}) | steep>30deg near road/POI ${r.terrain.hotTotal} | sink/float>0.1m ${r.sink?r.sink.bad.length+'/'+r.sink.n:'-'} | pass-through ${r.through?r.through.noCollider:'-'} | stuck ${r.escape?r.escape.filter(x=>x.stuck).length+'/'+r.escape.length:'-'}`);
+  const sm=ONLY==='ramp'?Object.values(all).map(r=>`${r.city}: ramps ${r.ramp.n} | in buildings ${r.ramp.bld.length} ${JSON.stringify(r.ramp.bld.slice(0,6))} | >10 m ${r.ramp.tall.length} | on lane (info) ${r.ramp.lane.length}`):Object.values(all).map(r=>`${r.city}: pits>3m ${r.terrain.pitsTotal} (rim>25deg ${r.terrain.pits.filter(x=>x.rimSlope>25).length}) | steep>30deg near road/POI ${r.terrain.hotTotal} | sink/float>0.1m ${r.sink?r.sink.bad.length+'/'+r.sink.n:'-'} | pass-through ${r.through?r.through.noCollider:'-'} | stuck ${r.escape?r.escape.filter(x=>x.stuck).length+'/'+r.escape.length:'-'}`);
   console.log(sm.join('\n'));})().catch(e=>{console.error(e);process.exit(1)});

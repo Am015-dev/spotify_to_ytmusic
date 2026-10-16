@@ -198,8 +198,13 @@ renderer.render=(f=>function(sc,cam){if(sc===scene)try{ART6_step()}catch(e){}ret
 /*ART<art7.js>*/// ==== ART pART7 · hill grass on the physics ground (±0.05 m): ground cells that are not flat split as a quadtree until each leaf's two
 // triangles (gndBuild's diagonal) are within 3 cm of tH at 25 sample points; leaves stop at ~3 m. River-bank cells keep their own step.
 // (constants inline: the world is built before this module's top-level lines run; function declarations are hoisted)
-function ART7_flat(x,z,w,h,tol,dn){tol=tol||.03;dn=dn||tol;const A=tH(x,z),Bv=tH(x,z+h),C=tH(x+w,z),D=tH(x+w,z+h);
-  for(let i=1;i<6;i++)for(let j=1;j<6;j++){const u=i/6,v=j/6,l=u+v<=1?A+(C-A)*u+(Bv-A)*v:D+(Bv-D)*(1-u)+(C-D)*(1-v);const e=l-tH(x+w*u,z+h*v);if(e>tol||-e>dn)return false}return true}
+// terr-6 (Alex b60, car sunk to the roof on grass): the grass sat up to 3.4 m (fra) / 4.5 m (ath) ABOVE the physics ground: 25 samples per cell missed
+// the road cut/fill feathers, and far cells allowed 0.2 m. Now every leaf is checked on a ~3 m sample grid (≥6×6) and may sit at most 4 cm above tH
+// (the car follows tH, so higher grass = a sunk car / sunk props). terr-7: OFF by default (3.8x leaves = boot 60-88 s); the car rides max(tH, drawn grass)
+// instead (GND_Y in 60_city_build), ?t6m=1 = this fit.
+function ART7_t6(){return ART7_t6.v??(ART7_t6.v=new URLSearchParams(location.search).get('t6m')==='1')}
+function ART7_flat(x,z,w,h,tol,dn){tol=tol||.03;dn=dn||tol;if(ART7_t6())tol=Math.min(tol,.04);const A=tH(x,z),Bv=tH(x,z+h),C=tH(x+w,z),D=tH(x+w,z+h),N=ART7_t6()?Math.max(6,Math.min(24,Math.ceil(Math.max(w,h)/3))):6;
+  for(let i=1;i<N;i++)for(let j=1;j<N;j++){const u=i/N,v=j/N,l=u+v<=1?A+(C-A)*u+(Bv-A)*v:D+(Bv-D)*(1-u)+(C-D)*(1-v);const e=l-tH(x+w*u,z+h*v);if(e>tol||-e>dn)return false}return true}
 // pART8: the 3 cm fit is only needed where cars drive and the camera is close: cells ≤ 64 m whose every point is more than 8 m from every road edge
 // (city, filler, autobahn, trails, mountain and town roads) use a 6 cm fit with ≥ 8 m leaves (same look from the road, far fewer triangles)
 function ART7_rd(x,z){try{let b=1e9;const q=cityAt(x,z);if(q)b=Math.min(b,q.d-q.road.w/2);const f=fillAt(x,z);if(f)b=Math.min(b,f.d-f.r.w/2);const a=abAt(x,z);if(a)b=Math.min(b,a.d-a.road.w/2);
@@ -220,7 +225,7 @@ function ART7_quad(x,z,w,h,out){
       if(v===hh){const n0=out.length;ART7_bits=B;ART7_pos=QTC.pos+16;try{ART7_quad(x,z,w,h,out)}finally{ART7_bits=null;QTC.pos=ART7_pos}if(++QTC.cnt%450===0)QTC.smp.push([x,z,w,h,out.slice(n0).map(q=>q.join()).join(';')]);return}QTC.ok=false;console.warn('QTC desync at '+QTC.pos+', fitting live')}
     if(window.__qtdump){ART7_rec=[];try{ART7_quad(x,z,w,h,out)}finally{ART7_QD.push(hh.toString(2).padStart(16,'0')+ART7_rec.join(''));ART7_rec=null}return}}
   let leaf;if(ART7_bits!==null)leaf=ART7_bits[ART7_pos++]===0;
-  else{const far=ART7_far(x,z,w,h),nr=!far&&ART7_near(x,z,w,h);leaf=w/2<(far?12:nr?2:6)||(far?ART7_flat(x,z,w,h,.2):ART7_flat(x,z,w,h,nr?.025:.06,.08));if(ART7_rec)ART7_rec.push(leaf?0:1)}
+  else{const far=ART7_far(x,z,w,h),nr=!far&&ART7_near(x,z,w,h);leaf=w/2<(far?(ART7_t6()?3:12):nr?2:(ART7_t6()?3:6))||(far?ART7_flat(x,z,w,h,.2):ART7_flat(x,z,w,h,nr?.025:.06,.08));if(ART7_rec)ART7_rec.push(leaf?0:1)}
   if(leaf){out.push([x,z,w,h]);return}const w2=w/2,h2=h/2;
   ART7_quad(x,z,w2,h2,out);ART7_quad(x+w2,z,w2,h2,out);ART7_quad(x,z+h2,w2,h2,out);ART7_quad(x+w2,z+h2,w2,h2,out)}
 // river-bank cells keep one uniform n×n grid (gndVert snaps it to the banks): the step is verified on the cell's own land triangles (pART8: water and
