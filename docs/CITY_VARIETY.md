@@ -62,9 +62,9 @@ Measured on the built page (same spots, OFF vs ON; draw calls = visible meshes i
 | Athens park | 437 → 434 | 2.45 M → 2.64 M | 28 → 64 | 9 % → 5 % | 1 → 6 |
 Frankfurt numbers move with lazy streaming between runs (OFF higher than ON there); the fixed cost of the change is +2 calls, which is what Athens shows. First version had no cap: Athens put 31,608 pits (+8.7 M tris), now capped at 1800.
 
-Shots (OFF left, ON right; looked at): `docs/shots/cityvar/fra_park_off_vs_on.jpg`, `ath_park_off_vs_on.jpg`, `fra_street_off_vs_on.jpg`, `ath_street_off_vs_on.jpg`, `fra_pit_off_vs_on.jpg`.
+Shots (OFF left, ON right; looked at): `docs/shots/cityvar/fra_park_off_vs_on.jpg`, `ath_park_off_vs_on.jpg`, `fra_street_off_vs_on.jpg`, `ath_street_off_vs_on.jpg`, `fra_pit_off_vs_on.jpg` (this one failed: the warp smashed the tree, debris hides the pit; a pit close-up is still owed).
 Honest look: the size mix shows in parks (trees no longer the same height), the colour shift is subtle, and pits read as small flower boxes at kerb level. The gain is real but medium: on its own it does NOT fix the "repetitive" street, because the worst view (Frankfurt `bv1`) has only 10-19 trees in 150 m. Items 1 (facade slabs) and 4 (tree rows) matter more there. The Athens park camera (`CVF_park`) can land inside a tree, so use the street or pit shot to judge.
-Gate: unit 0 FAIL; `TAG=life1,xf1,terrain,cvf1` on the built page (see HANDOFF_cityvar). Turn on for a beta: set `cvFol:1` in `src/assets/tune.json` (or TUNE in `src/10_core.js`) once Alex has seen the shots.
+Gate (flag OFF, built page out/cv5): unit 0 FAIL (4560 pass); `TAG=life1,xf1,terrain,cvf1` 38/38 PASS, 0 errors. Turn on for a beta: set `cvFol:1` in `src/assets/tune.json` (or TUNE in `src/10_core.js`) once Alex has seen the shots.
 
 ## 5. Which become builder pieces
 Tree pit with flowers (from #3), the LDraw tree variants at 3 sizes (asset-1 + #3 sizes), hedge 1×4 / corner (#4), flowerbed 2×4 and paving / path plates (#6), the 4 prop vignettes as one-tap stamps (#5: bench set, market stall, bus stop, café), facade modules (shop front, balcony band, roof crown, water tank) from #1/#7. `src/98b2_builder2.js` already has `BX_trees` / `BX_asTrees`; the stamps would be new palette entries there.
