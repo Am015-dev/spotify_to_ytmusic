@@ -18,7 +18,7 @@ async function page(br, port, opt, q, init) {
   await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1${q || ''}`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__tut);
   await sleep(600); return { ctx, p, errs };
 }
-const state = p => p.evaluate(k => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const n = localStorage.key(i); if (new RegExp(k, 'i').test(n)) o[n] = localStorage.getItem(n); } return JSON.stringify(o); }, KEEP.source);
+const state = p => p.evaluate(k => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const n = localStorage.key(i); if (new RegExp(k, 'i').test(n)) o[n] = localStorage.getItem(n); } return JSON.stringify(Object.keys(o).sort().map(n => [n, o[n]])); }, KEEP.source);
 // every visible text box of the tutorial lies inside the viewport and its text is not clipped
 const clipCheck = p => p.evaluate(() => { const bad = [], vw = innerWidth, vh = innerHeight;
   for (const el of document.querySelectorAll('#tutB, #tutB *, #tutC, #tutC *')) { if (!el.getClientRects().length || el.closest('[hidden]')) continue;
