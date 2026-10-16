@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.66',date:'16 Oct 2026',items:[{t:'NEW',s:'Each district has its own LEGO colours, so driving across town changes the look; taller stepped roofs in Frankfurt.'}]},
   {v:'v90m-beta.65',date:'16 Oct 2026',items:[{t:'NEW',s:'Livelier streets: long Frankfurt blocks are split into varied buildings, more street trees, hedges and flower boxes.'},{t:'FIXED',s:'Smoother on medium graphics: shadows update every other frame.'}]},
   {v:'v90m-beta.64',date:'16 Oct 2026',items:[{t:'FIXED',s:'Sunny again: the sun lights the city from behind the camera, so Athens buildings and trees are no longer near-black.'}]},
   {v:'v90m-beta.63',date:'16 Oct 2026',items:[{t:'NEW',s:'Garage shows your ride big in the middle with ride cards; the brick drawer has a picture on every tile.'},{t:'FIXED',s:'Races need you, fewer wrecks and dead stops, cleaner screen, no sinking at the start.'}]},
