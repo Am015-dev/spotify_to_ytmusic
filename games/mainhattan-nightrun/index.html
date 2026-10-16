@@ -3080,7 +3080,7 @@ const MK={s:(()=>{const o=load('mnr_mkt',null);return o&&o.day===day()?Object.as
   full(id){return Math.round(UBY[id].p*3.2/5)*5;},
   rerollPrice(){return 40+40*this.s.rr;},max:2,left(){return this.max-this.s.b.length;},save(){save('mnr_mkt',this.s);}};
 const gd0=gaDraw;
-gaDraw=function(){if(garageEl.hidden&&labEl&&!labEl.hidden){garageDirty=true;return;}if(!['load','mkt','soon'].includes(GA.tab)){gd0();return;}
+gaDraw=function(){if(garageEl.hidden&&labEl&&!labEl.hidden){garageDirty=true;return;}$('gaCards').classList.toggle('wpt',GA.tab==='weapons');if(!['load','mkt','soon'].includes(GA.tab)){gd0();if(GA.tab==='weapons'&&window.wpTabDraw)wpTabDraw();return;}
   $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
   const box=$('gaCards');box.innerHTML='';box.classList.add('tune');
   if(GA.tab==='load')loadDraw(box);else if(GA.tab==='mkt')mktDraw(box);else soonDraw(box);affUpd();};
@@ -4051,8 +4051,7 @@ Object.assign(WPX.demo,{
 #gaCards.wpt .card.sold .pr{border-color:#8c86b8;color:#8c86b8}
 #wpL .card .pp i.run{background:var(--c);opacity:.45}`;document.head.appendChild(st);}
 {const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='weapons';b.type='button';b.textContent='WEAPONS';b.addEventListener('click',()=>{GA.tab='weapons';gaDraw();});tb.appendChild(b);
- const gd=gaDraw;
- gaDraw=function(){const box=$('gaCards');box.classList.toggle('wpt',GA.tab==='weapons');gd();if(GA.tab!=='weapons')return;box.innerHTML='';
+ window.wpTabDraw=function(){const box=$('gaCards');box.innerHTML='';
   for(const id of WP_IDS){const d=WPD[id],cur=WP.pl[id]|0,own=cur>0,max=cur>=WP_MAX,price=WP.price(id),can=GA.bank>=price,el=document.createElement('button');el.type='button';
    el.className='card'+(max?' sold':'')+(!max&&!can?' no':'');el.style.setProperty('--c',d.c);el.dataset.id=id;el.dataset.kind='weapon';
    const nxt=own?cur+1:1,ab=[3,6,10].find(l=>l>=nxt&&l>cur),abT=ab?`<br>LV${ab}: ${d.ab[[3,6,10].indexOf(ab)]}`:'',

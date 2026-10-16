@@ -137,8 +137,7 @@ Object.assign(WPX.demo,{
 #gaCards.wpt .card.sold .pr{border-color:#8c86b8;color:#8c86b8}
 #wpL .card .pp i.run{background:var(--c);opacity:.45}`;document.head.appendChild(st);}
 {const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='weapons';b.type='button';b.textContent='WEAPONS';b.addEventListener('click',()=>{GA.tab='weapons';gaDraw();});tb.appendChild(b);
- const gd=gaDraw;
- gaDraw=function(){const box=$('gaCards');box.classList.toggle('wpt',GA.tab==='weapons');gd();if(GA.tab!=='weapons')return;box.innerHTML='';
+ window.wpTabDraw=function(){const box=$('gaCards');box.innerHTML='';
   for(const id of WP_IDS){const d=WPD[id],cur=WP.pl[id]|0,own=cur>0,max=cur>=WP_MAX,price=WP.price(id),can=GA.bank>=price,el=document.createElement('button');el.type='button';
    el.className='card'+(max?' sold':'')+(!max&&!can?' no':'');el.style.setProperty('--c',d.c);el.dataset.id=id;el.dataset.kind='weapon';
    const nxt=own?cur+1:1,ab=[3,6,10].find(l=>l>=nxt&&l>cur),abT=ab?`<br>LV${ab}: ${d.ab[[3,6,10].indexOf(ab)]}`:'',
