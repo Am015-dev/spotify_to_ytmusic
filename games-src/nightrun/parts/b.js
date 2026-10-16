@@ -93,7 +93,7 @@ let DF=DIFFS.normal;
 const STILL={t:0,k:0,fk:1,bk:1,sk:1,ax:0,ay:0,beam:null,nb:0,said:false};   // AFK pressure (h.js): a ship that stops moving is hunted harder and scores less
 const DYE={cur:1,q:1};                                     // dying slows the song (h.js)
 const FIRE_K=.62;                                          // enemy fire cadence: about 40% fewer bullets than before, each one aimed and telegraphed
-const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk*AI.fk()*(DMG.on?DMG.fk*(SET.diff==='easy'?.8:1)*(ST.on?1:DMG.fkE):1);   // DMG.fk: enemies live longer now (BALANCE.md), so each fires a little less often
+const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk*AI.fk()*(DMG.on?DMG.fk*DMG.lf()*(SET.diff==='easy'?.8:1)*(ST.on?1:DMG.fkE):1);   // DMG.fk: enemies live longer now (BALANCE.md), so each fires a little less often
 function diff(){if(ST.on)return ST.d*DF.sd*UPS.d;const ease=G.loop||G.pos?1:clamp(.8+.2*G.t/150,.8,1);return(1+.17*(G.pos+G.dprog)+TUNE2.loopD*G.loop)*ease*DF.d*UPS.d;}   // endless: a smooth ramp over the districts and loops, a gentle first minutes; UPS.d = soft scaling with the player's upgrades
 const bossX=()=>rotMode?690:790;                          // where a boss stops: portrait keeps it clear of the HUD at the top
 const bossStage=k=>k===3?'boss2':k===6?'boss3':'boss';   // final boss gets its own song
@@ -114,11 +114,15 @@ function enterDistrict(i){G.di=i;G.pos=posOf(i);G.dt=0;G.d0=G.bc;G.dprog=0;G.for
    2. soft cap: a single shot's damage above 2 counts at half, ceiling 8 (DMG.hit); the measured-DPS cap (soft) is off, it fed back on itself;
    3. on-screen floor: a normal enemy cannot lose its hull faster than its minimum life on screen (ml), so it gets to move and shoot.
    A ramming enemy (e.rk) and the EMP (G.empT) ignore the floor. DMG.on=false switches the whole model off. */
-const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,ref:25,half:.5,ceil:4,dps:0,k:1,easyK:.9,hk:2,hc:8,
+const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil:4,dps:0,k:1,easyK:.9,hk:2,hc:8,
   hit(d){return !this.on||d<=this.hk?d:Math.min(this.hc,this.hk+(d-this.hk)*this.half);},   // one shot: damage above x2 counts at half, never more than 8 (crits, sharp beat and damage perks stacked)
 
+  // late stages: several enemies overlap, so each stays a little shorter and fires a little less (level L from story.js; 1 up to lvA, then falls by lvK a level to a floor)
+  lvA:3,lvK:.1,mlFloor:.5,fkFloor:.45,
+  lf(){return ST.on?Math.max(this.fkFloor,1-this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
+  lm(){return ST.on?Math.max(this.mlFloor,1-2*this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
   ml:{drone:1.2,flank:1.2,turret:1.3,charger:1.3,gunship:2.6,gate:1.4,mine:.6,swarm:0},elMl:4,
-  minLife(e){const b=e.el?(e.type==='charger'?2:Math.max(this.elMl,this.ml[e.type]||0)):(this.ml[e.type]||0);return b*(SET.diff==='easy'?this.easyK:1);},
+  minLife(e){const b=e.el?(e.type==='charger'?2:Math.max(this.elMl,this.ml[e.type]||0)):(this.ml[e.type]||0);return b*this.lm()*(SET.diff==='easy'?this.easyK:1);},
   pass(dt){if(!this.on)return;let raw=0;
     for(const e of G.en){if(e.dead)continue;
       if(e.hq==null)e.hq=e.max||e.hp;
@@ -339,7 +343,7 @@ function update(dt){
     switch(e.type){
       case'drone':e.x-=(120+15*d)*sdt;e.y=e.by+Math.sin(G.bp*Math.PI/2+(e.ph||0))*(e.amp||0);break;
       case'turret':if(e.t<6.5){if(e.x>e.stop)e.x-=150*sdt;}else{e.x-=180*sdt;e.y-=40*sdt;}break;
-      case'charger':{const aw=Math.max(.55,BT.spb*1.05);if(DMG.on&&e.x>W-70&&e.t<3){e.x-=Math.max(130,(e.x-W+70)*2.2)*sdt;e.t=Math.min(e.t,.35);}else if(e.t<.7)e.x-=130*sdt;else if(e.t<.7+aw){e.y+=(P.y-e.y)*Math.min(1,sdt*5);e.aimL=1;}else{e.aimL=0;e.x-=(DMG.on?DMG.cv+40*d:600+60*d)*sdt*(e.el?1.2:1);}}break;
+      case'charger':{const aw=Math.max(.55,BT.spb*1.05);if(DMG.on&&e.x>W-70&&e.t<3){e.x-=Math.max(130,(e.x-W+70)*2.2)*sdt;e.t=Math.min(e.t,.35);}else if(e.t<.7)e.x-=130*sdt;else if(e.t<.7+aw){e.y+=(P.y-e.y)*Math.min(1,sdt*5);e.aimL=1;}else{e.aimL=0;e.x-=(DMG.on?Math.min(DMG.cvMax,DMG.cv+40*d):600+60*d)*sdt*(e.el?1.2:1);}}break;
       case'gunship':if(e.x>W-170)e.x-=60*sdt;else e.y=e.by+Math.sin(e.t*.8)*60;
         if(e.t>13)e.x-=90*sdt;break;
       case'gate':e.x-=95*sdt;if(G.di>=3||G.loop)e.gy+=Math.sin(e.t*1.4)*40*sdt;{const tl=Math.max(.45,BT.spb*1.05),cyc=e.t%(2.8+tl),on0=tl+.4;e.on=cyc>on0;e.tele=cyc>on0-tl&&cyc<=on0;}
