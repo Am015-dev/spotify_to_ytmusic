@@ -1,0 +1,6 @@
+# HANDOFF walls-1 (2026-10-16)
+- Root causes: (1) lowProp compared absolute collider height (never < 1.3 above sea level) -> bLow() uses height above ground; (2) Athens bend at x -610, z 36: bot hit houses head-on at 90+ km/h 4x/min -> wall bumper in 71_roam_drive.js eases to 26 km/h when a collider is dead ahead; (3) terrain bounces were uncapped (RO.tb); (4) Frankfurt traffic shoves re-hurt every 0.6 s (98dmg DMG_traf: 4 s per car, x0.5 under the smash threshold).
+- Measured on the built page: walls Fra 0/0/0 per min (health 96), Ath 0/1/1 (health 88+); was 5.0 and 8.0. Flags: TUNE.wallAssist/wallV/wallDec/trafCd/trafK. Buildings are still solid.
+- Stuck monkey 0.76 -> 0.55/min raw (13 in 23.8 min); Athens cluster 5 -> 1. 10 of 12 records replay fine (monkey false positives); the real ones are world-edge/off-map. Target 0.3 NOT met raw.
+- Gate: unit 0 FAIL; TAG=xf1,terrain 35/35 alone; rv2k/life1 combined fails are the known async-echo ones (objectives, foliage, ath-density load). tools/unit/logic_core.js is stale (needs three.js; TUNE missing in its sandbox, 3 traffic asserts expect the old 0.6 s/40 km/h rule).
+- Left: make the monkey ignore card/edge false stuck; foliage camera pull-in; objectives widgets.

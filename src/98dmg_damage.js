@@ -42,7 +42,7 @@ function DMG_impact(v,o){if(!DMG.on||state!=='roam'||RO.wk||(RO.inv||0)>0)return
 DMG.wall=(kmh,deg)=>DMG_impact(kmh*Math.sin((deg??90)*Math.PI/180));
 // collisions → DMG_impact: walls (roamBounce knows the normal speed), traffic (the closing speed), the rest (falls, quest walls) keep their own amount
 roamBounce=(f=>function(ax,sp,nX,nZ){if(!DMG.on)return f.apply(this,arguments);const vx=Math.sin(RO.vh)*RO.v,vz=Math.cos(RO.vh)*RO.v;let X=nX,Z=nZ;if(X==null){if(ax==='x'){X=-(Math.sign(vx)||1);Z=0}else{X=0;Z=-(Math.sign(vz)||1)}}
- DMG.vn=Math.max(0,-(vx*X+vz*Z))*3.6;if(nX==null&&!TUNE.terrDmg)DMG.vn=Math.min(DMG.vn,(TUNE.dmgGlance??32)-1);/* race-1: terrain banks / kerbs / water edge (no collider normal) scrub speed and spark but never cost health; buildings, props and traffic do */try{return f.apply(this,arguments)}finally{DMG.vn=null}})(roamBounce);
+ DMG.vn=Math.max(0,-(vx*X+vz*Z))*3.6;if((nX==null||RO.tb)&&!TUNE.terrDmg)DMG.vn=Math.min(DMG.vn,(TUNE.dmgGlance??32)-1);/* race-1: terrain banks / kerbs / water edge (no collider normal) scrub speed and spark but never cost health; buildings, props and traffic do */try{return f.apply(this,arguments)}finally{DMG.vn=null}})(roamBounce);
 roamDamage=(f=>function(d){if(!DMG.on)return f(d);if(DMG.vn!=null)return DMG_impact(DMG.vn);if(d===5&&TUNE.smashDmg!==1)return 0;/* race-1: smashing a car you overtake / clip costs no health (2K: smash = reward); only head-on (12) hurts */if(d===12&&TUNE.smashDmg!==1){if(RO.wk||(RO.inv||0)>0||state!=='roam')return 0;/* head-on traffic smash: flat 4 % scrape + 1.2 s grace (not a 'hit' for lastHit) */RO.hp=Math.max(1,(RO.hp??100)-4/DMG_cls());RO.inv=1.2;DMG.lastHit=performance.now();return 4}
  if(d===5||d===12)return DMG_impact(Math.abs(RO.v)*3.6*(d===12?1.3:.8));
  if(RO.wk||(RO.inv||0)>0||d<1||state!=='roam')return;RO.hp=Math.max(0,(RO.hp??100)-d/DMG_cls());DMG.lastHit=performance.now();if(RO.hp<=0){DMG.n.boom++;DMG.tBoom=performance.now();DMG_panels(0);roamWreck()}})(roamDamage);
@@ -58,9 +58,9 @@ roamStep=(f=>function(dt){const r=f(dt);try{if(state==='roam'&&(!RO.foot||RO.foo
 // bump above 25 km/h knocks 2-4 bricks off it (its own colour) and costs you the same graded damage (DMG_impact); 0.6 s per-car cooldown.
 function DMG_rel(c,dx,dz){const v=c.cv??c.v??0,vx=Math.sin(RO.vh)*RO.v-dx*v,vz=Math.cos(RO.vh)*RO.v-dz*v;return Math.hypot(vx,vz)*3.6}
 function DMG_traf(c,x,z,dx,dz,crLg,pin){if(!DMG.on)return crLg||pin||Math.abs(RO.v)>CR_SMASHV;const rel=DMG_rel(c,dx,dz);DMG.tRel=rel;if(crLg||rel>60||Math.abs(RO.v)>CR_SMASHV){DMG.n.burst=(DMG.n.burst||0)+1;return true}
- const t=performance.now();if(rel>25&&t-(c.dmT||0)>600){c.dmT=t;DMG.n.trafHit=(DMG.n.trafHit||0)+1;let col=null;try{col=new THREE.Color(HCOL[(c.j*3+c.k)%HCOL.length])}catch(e){}
+ const t=performance.now();if(rel>25&&t-(c.dmT||0)>(TUNE.trafCd??4000)){/* walls-1: one bump per car per 4 s (was 0.6 s: shoving a stopped car re-hurt every 0.6 s); a bump below the 60 km/h smash threshold is scaled 0.5 = sparks only (smash = reward) */c.dmT=t;DMG.n.trafHit=(DMG.n.trafHit||0)+1;let col=null;try{col=new THREE.Color(HCOL[(c.j*3+c.k)%HCOL.length])}catch(e){}
   const n=clamp(Math.round(2+(rel-25)/15),2,4),src=[];for(let i=0;i<n;i++)src.push([new THREE.Vector3(x+rr(-.8,.8),(c.y||RO.y)+rr(.6,1.4),z+rr(-.8,.8)),col]);DMG_throw(n,src,rel);
-  try{burst(SPARK,V3(x,(c.y||RO.y)+1,z),10,7,.35,new THREE.Color(2,1.6,.9))}catch(e){}DMG_impact(rel)}
+  try{burst(SPARK,V3(x,(c.y||RO.y)+1,z),10,7,.35,new THREE.Color(2,1.6,.9))}catch(e){}DMG_impact(rel*(TUNE.trafK??.5))}
  return false}
 // ---- 📍 GO + test: the default ride on a straight street, then the scripted hits (the same DMG_impact the collisions call)
 function DMG_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!DMG.on)return'📍 Damage is off (?dmg=0)';try{OF_reset()}catch(e){}if(RO.wk){RO.wk=null;try{RBRK.visible=false;pl.mesh.visible=true}catch(e){}}
