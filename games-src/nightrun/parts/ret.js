@@ -175,3 +175,88 @@ RET.dailyShow=function(){let e=$('retTt');
    +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
 RET.dailyShow();
 window.DY=DY;
+/* ---------- B24 save export / import (POLISH.md). Flag RET.saveio; off = Settings exactly as before. Hooks: click listeners on the Settings buttons and NR 'runEnd'. Nothing is executed: a file or code is parsed as data only. ---------- */
+if(RET.saveio===undefined)RET.saveio=true;
+RET.sioKeys=['arc','bank','best','chest','chk','daily','eq','hard','heat','mkt','mute','own','q','retfail','runs','set','ship','story','streak','theme','tipdone','tune','tut','tutgift','wp','wplv','wpseen'].map(k=>'mnr_'+k);   // other parts append their save keys here
+RET.sio=(()=>{const L=window.localStorage,BAK='mnr_bak',INFO='mnr_bakinfo',MAXTXT=262144,MAXVAL=65536,BAD=/^(__proto__|constructor|prototype)$/;
+  const S={sess:false,pending:null,msg:'',err:false};
+  const get=k=>{try{return L.getItem(k);}catch(e){return null;}},set=(k,v)=>{try{L.setItem(k,v);return true;}catch(e){return false;}},del=k=>{try{L.removeItem(k);}catch(e){}};
+  const info=()=>{try{const o=JSON.parse(get(INFO)||'{}');return o&&typeof o==='object'?o:{};}catch(e){return{};}};
+  const setInfo=p=>set(INFO,JSON.stringify(Object.assign(info(),p)));
+  const sum=m=>{let h=2166136261>>>0;const s=Object.keys(m).sort().map(k=>k+'='+m[k]).join('\n');for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h.toString(16);};
+  const b64e=s=>btoa(unescape(encodeURIComponent(s))),b64d=s=>decodeURIComponent(escape(atob(s)));
+  const snapshot=()=>{const m={};for(const k of RET.sioKeys){const v=get(k);if(v!=null)m[k]=v;}return m;};
+  const pack=()=>JSON.stringify({app:'mnr',v:1,t:Date.now(),sum:sum(snapshot()),keys:snapshot()});
+  const num=(v,lo,hi)=>typeof v==='number'&&isFinite(v)&&v>=lo&&v<=hi;
+  function walk(x,d){if(d>8)return false;if(typeof x==='number')return isFinite(x)&&Math.abs(x)<=1e9;if(typeof x==='string')return x.length<=300;if(x===null||typeof x==='boolean')return true;
+    if(typeof x!=='object')return false;if(Array.isArray(x))return x.length<=500&&x.every(e=>walk(e,d+1));const ks=Object.keys(x);return ks.length<=500&&ks.every(k=>!BAD.test(k)&&k.length<=60&&walk(x[k],d+1));}
+  const SHAPE={mnr_bank:v=>num(v,0,1e9),mnr_runs:v=>num(v,0,1e9),mnr_tut:v=>num(v,0,2),mnr_tutgift:v=>num(v,0,1),mnr_chest:v=>num(v,0,1),mnr_arc:v=>num(v,0,1),
+    mnr_hard:v=>typeof v==='boolean',mnr_mute:v=>typeof v==='boolean',mnr_tipdone:v=>typeof v==='boolean',mnr_wpseen:v=>typeof v==='boolean',
+    mnr_ship:v=>typeof v==='string',mnr_theme:v=>typeof v==='string',mnr_best:v=>v&&typeof v==='object'&&num(v.score,0,1e9),mnr_daily:v=>v&&typeof v==='object'&&num(v.score,0,1e9),
+    mnr_wplv:v=>v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).every(k=>num(v[k],0,99)),mnr_set:v=>v&&typeof v==='object'&&!Array.isArray(v),mnr_story:v=>v&&typeof v==='object'&&!Array.isArray(v)};
+  function parse(txt){   // -> {ok,keys,t,reason}; never changes anything
+    const no=r=>({ok:false,reason:r});
+    if(typeof txt!=='string')return no('Not a save.');txt=txt.trim();if(!txt)return no('Nothing to import.');if(txt.length>MAXTXT)return no('Too big to be a save.');
+    let raw=txt;try{if(txt[0]!=='{'){const t=txt.replace(/^MNR1\./,'').replace(/\s+/g,'').replace(/-/g,'+').replace(/_/g,'/');raw=b64d(t);}}catch(e){return no('That code is damaged.');}
+    let o;try{o=JSON.parse(raw);}catch(e){return no('That is not a Nightrun save.');}
+    if(!o||typeof o!=='object'||Array.isArray(o)||o.app!=='mnr')return no('That is not a Nightrun save.');
+    if(o.v!==1)return no('Save version '+String(o.v).slice(0,8)+' is not supported.');
+    const ks=o.keys;if(!ks||typeof ks!=='object'||Array.isArray(ks))return no('That save has no data.');
+    const names=Object.keys(ks);if(!names.length)return no('That save is empty.');
+    for(const k of names){if(BAD.test(k)||RET.sioKeys.indexOf(k)<0)return no('Unknown data in the save.');
+      const s=ks[k];if(typeof s!=='string'||s.length>MAXVAL)return no('Damaged data in the save.');
+      let v;try{v=JSON.parse(s);}catch(e){return no('Damaged data in the save.');}
+      if(!walk(v,0)||(SHAPE[k]&&!SHAPE[k](v)))return no('A value in the save is out of range.');}
+    if(typeof o.sum!=='string'||o.sum!==sum(ks))return no('The checksum does not match.');
+    return{ok:true,keys:ks,t:+o.t||0};}
+  function applyKeys(m){for(const k of RET.sioKeys)del(k);for(const k in m)set(k,m[k]);}
+  function backup(){const m=snapshot();return set(BAK,JSON.stringify({t:Date.now(),keys:m}));}
+  function hasUndo(){try{const o=JSON.parse(get(BAK)||'null');return !!(o&&o.keys&&typeof o.keys==='object');}catch(e){return false;}}
+  function doImport(p){if(!p||!p.ok)return false;if(!backup())return false;applyKeys(p.keys);setInfo({imp:Date.now()});return true;}
+  function undo(){try{const o=JSON.parse(get(BAK)||'null');if(!o||!o.keys)return false;const p=parse(JSON.stringify({app:'mnr',v:1,t:0,sum:sum(o.keys),keys:o.keys}));
+      if(!p.ok&&Object.keys(o.keys).length)return false;applyKeys(o.keys);del(BAK);setInfo({imp:Date.now()});return true;}catch(e){return false;}}
+  function persist(){if(S.sess)return;S.sess=true;try{const st=navigator.storage;if(st&&st.persist)Promise.resolve(st.persisted&&st.persisted()).then(p=>{if(!p)return st.persist();}).catch(()=>{});}catch(e){}}
+  function lsOk(){try{const k='mnr_probe';L.setItem(k,'1');L.removeItem(k);return true;}catch(e){return false;}}
+  return{parse,pack,snapshot,doImport,undo,hasUndo,persist,lsOk,info,setInfo,S,sum,BAK,INFO};})();
+RET.sioUI=(()=>{const X=RET.sio,$$=id=>document.getElementById(id);let box=null,toastT=0;
+  const css='#sioBox{display:flex;flex-direction:column;gap:8px;margin-top:2px}#sioBox .sioRow{display:flex;gap:8px;flex-wrap:wrap}#sioBox button{all:unset;box-sizing:border-box;cursor:pointer;font:italic 800 12px var(--display,sans-serif);letter-spacing:.08em;text-transform:uppercase;padding:0 14px;min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid rgba(76,234,255,.45);background:rgba(8,20,32,.7);color:#e6f6ff;text-align:center}#sioBox button.hot{background:linear-gradient(90deg,#ff6a6a,#ff9a3c);border-color:transparent;color:#1a0505}#sioBox button:focus-visible{outline:2px solid var(--yel,#ff0)}#sioBox textarea{box-sizing:border-box;width:100%;min-height:64px;max-height:120px;resize:vertical;font:12px monospace;color:#e6f6ff;background:rgba(0,0,0,.4);border:1px solid rgba(76,234,255,.35);border-radius:8px;padding:6px}#sioBox .sioNote{font:12px/1.35 var(--body,sans-serif);color:#b4d2e2;overflow-wrap:anywhere}#sioBox .sioNote.err{color:#ff8a8a}#sioBox .sioNote.ok{color:#8affb0}#sioBox .sioAsk{border:1px solid rgba(255,154,60,.7);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:8px;color:#fff;font:700 13px var(--body,sans-serif)}';
+  const when=t=>t?new Date(t).toLocaleString():'never';
+  function say(t,err,ok){X.S.msg=t;X.S.err=!!err;const n=$$('sioMsg');if(n){n.textContent=t;n.className='sioNote'+(err?' err':ok?' ok':'');}}
+  function toast(t){let e=$$('sioToast');if(!e){e=document.createElement('div');e.id='sioToast';e.style.cssText='position:fixed;left:50%;bottom:14px;transform:translateX(-50%);max-width:92vw;background:#220;color:#ffd24a;border:1px solid #ffd24a;border-radius:8px;padding:8px 12px;font:700 12px sans-serif;z-index:99999;pointer-events:none';document.body.appendChild(e);}e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{e.hidden=true;},5000);}
+  function refresh(){const n=$$('sioLast');if(!n)return;const i=X.info();let t='Last backup: '+when(i.exp);if(i.imp)t+=' · Last import: '+when(i.imp);
+    n.textContent=t+(navigator.storage&&navigator.storage.persisted?'':'');const u=$$('sioUndo');if(u)u.hidden=!X.hasUndo();
+    if(!X.lsOk()){say('Storage is blocked in this browser: progress cannot be saved.',true);}}
+  function download(){const txt=X.pack(),b=new Blob([txt],{type:'application/json'}),a=document.createElement('a'),d=new Date(),p=n=>String(n).padStart(2,'0');
+    a.href=URL.createObjectURL(b);a.download='nightrun-save-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},800);
+    X.setInfo({exp:Date.now()});say('Save file created.',false,true);refresh();}
+  function code(){return 'MNR1.'+btoa(unescape(encodeURIComponent(X.pack()))).replace(/\+/g,'-').replace(/\//g,'_');}
+  function copy(){const c=code(),ta=$$('sioTxt');X.setInfo({exp:Date.now()});refresh();
+    const done=()=>say('Code copied. Paste it on your other device.',false,true),shown=()=>{ta.value=c;ta.focus();ta.select();say('Copy the code from the box below.',false,true);};
+    try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(c).then(done,shown);return;}}catch(e){}shown();}
+  function ask(p){X.S.pending=p;const a=$$('sioAsk'),n=Object.keys(p.keys).length;a.hidden=false;
+    a.firstChild.textContent='Replace progress on this device? '+n+' saved items'+(p.t?', backed up '+when(p.t):'')+'. Your current save is kept for UNDO.';}
+  function tryText(t){const p=X.parse(t);if(!p.ok){X.S.pending=null;$$('sioAsk').hidden=true;say('Import failed: '+p.reason+' Nothing was changed.',true);return;}say('',false);ask(p);}
+  function build(){if(box&&box.isConnected)return box;const body=$$('setBody');if(!body)return null;
+    if(!$$('sioCss')){const s=document.createElement('style');s.id='sioCss';s.textContent=css;document.head.appendChild(s);}
+    const h=document.createElement('h3');h.id='sioH';h.textContent='Save';box=document.createElement('div');box.id='sioBox';
+    box.innerHTML='<div class="sioNote" id="sioLast"></div><div class="sioRow"><button type="button" id="sioFile">EXPORT FILE</button><button type="button" id="sioCopy">COPY CODE</button></div>'
+      +'<textarea id="sioTxt" rows="3" placeholder="Paste a save code here" aria-label="Save code" spellcheck="false" autocomplete="off"></textarea>'
+      +'<div class="sioRow"><button type="button" id="sioPaste">IMPORT CODE</button><button type="button" id="sioLoad">IMPORT FILE</button><button type="button" id="sioUndo" hidden>UNDO LAST IMPORT</button></div>'
+      +'<input type="file" id="sioPick" accept=".json,.txt,application/json,text/plain" hidden>'
+      +'<div class="sioAsk" id="sioAsk" hidden><span></span><div class="sioRow"><button type="button" id="sioYes" class="hot">REPLACE</button><button type="button" id="sioNo">CANCEL</button></div></div><div class="sioNote" id="sioMsg" role="status"></div>';
+    body.appendChild(h);body.appendChild(box);
+    $$('sioFile').addEventListener('click',download);$$('sioCopy').addEventListener('click',copy);
+    $$('sioPaste').addEventListener('click',()=>tryText($$('sioTxt').value));
+    $$('sioLoad').addEventListener('click',()=>$$('sioPick').click());
+    $$('sioPick').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;if(f.size>262144){say('Import failed: Too big to be a save. Nothing was changed.',true);return;}
+      const r=new FileReader();r.onload=()=>tryText(String(r.result));r.onerror=()=>say('Import failed: could not read the file.',true);r.readAsText(f);});
+    $$('sioNo').addEventListener('click',()=>{X.S.pending=null;$$('sioAsk').hidden=true;say('Cancelled. Nothing was changed.');});
+    $$('sioYes').addEventListener('click',()=>{const p=X.S.pending;X.S.pending=null;$$('sioAsk').hidden=true;
+      if(p&&X.doImport(p)){say('Progress replaced. Reloading…',false,true);setTimeout(()=>location.reload(),RET.sioNoReload?1e9:600);}else say('Import failed. Nothing was changed.',true);});
+    $$('sioUndo').addEventListener('click',()=>{if(X.undo()){say('Previous progress restored. Reloading…',false,true);setTimeout(()=>location.reload(),RET.sioNoReload?1e9:600);}else say('Nothing to undo.',true);});
+    return box;}
+  function onOpen(){const has=!!$$('sioBox');if(!RET.saveio){if(has){$$('sioBox').remove();const h=$$('sioH');if(h)h.remove();box=null;}return;}
+    setTimeout(()=>{if(!RET.saveio)return;if(!build())return;refresh();X.persist();if(!X.lsOk()&&!X.S.warned){X.S.warned=true;toast('Storage is blocked: progress will not be saved.');}},0);}
+  for(const id of['setBtn','pSetBtn']){const b=$$(id);if(b)b.addEventListener('click',onOpen);}
+  NR.on('runEnd',()=>{if(RET.saveio)X.persist();});
+  return{build,refresh,onOpen,code,toast};})();
