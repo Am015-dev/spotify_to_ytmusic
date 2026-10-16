@@ -111,7 +111,7 @@ const AS_PROPS={fra:['bench','bin','hydrant','post','planter','stall','parasol',
 const AS_PN={ath:{post:'p_kiosk'}},AS_ALT={fence:['p_hedge',.45]};
 const AS_FARS={round:[[.07,0],[.07,.32],[.75,.4],[1,.62],[.8,.86],[0,1]],umbrella:[[.06,0],[.06,.62],[1,.72],[.9,.9],[0,1]],cone:[[.07,0],[.07,.18],[1,.22],[.45,.62],[0,1]],
  column:[[.08,0],[.08,.08],[.9,.15],[1,.5],[.6,.85],[0,1]],palm:[[.05,0],[.05,.82],[1,.86],[.3,.96],[0,1]],bush:[[.6,0],[1,.35],[.85,.75],[0,1]]};
-function AS_build(name,lod,fit){const R=AS_R[name],B=AS_B(name.length*7919+13);R.f(B);const P=[],C=[];let parts=0,studs=0,ymax=0;const col=new THREE.Color(),v=new THREE.Vector3();
+function AS_build(name,lod,fit){if(TR1.on&&TR1_R[name])return TR1_build(name,lod,fit);/* trees-1 (tr1.js) */const R=AS_R[name],B=AS_B(name.length*7919+13);R.f(B);const P=[],C=[];let parts=0,studs=0,ymax=0;const col=new THREE.Color(),v=new THREE.Vector3();
  const SG=5;// stud cylinder r 6, h 4 LDU (real stud 4.8 mm x 1.7 mm), SG sides + 4-tri cap
  for(const q of B.L){const G=AS_part(q.id,lod),M=AS_mat(q);col.set(AS_COL[q.c]||q.c);parts++;
   for(let j=0;j<G.i.length;j++){const a=G.i[j]*3;v.set(G.p[a],G.p[a+1],G.p[a+2]).applyMatrix4(M);P.push(v.x,v.y,v.z);C.push(col.r,col.g,col.b);if(v.y>ymax)ymax=v.y}
@@ -127,7 +127,7 @@ function AS_farGeo(cls){const pr=AS_FARS[cls],g=new THREE.LatheGeometry(pr.map((
  for(let i=0;i<p.count;i+=3){const y=(p.getY(i)+p.getY(i+1)+p.getY(i+2))/3,r=Math.max(...[0,1,2].map(j=>Math.hypot(p.getX(i+j),p.getZ(i+j)))),t=cls!=='bush'&&r<.1&&y<.9;for(let j=0;j<3;j++)c.push(...(t?[.35,.25,.18]:[1,1,1]))}
  g.setAttribute('color',new THREE.Float32BufferAttribute(c,3));g.deleteAttribute('uv');g.computeVertexNormals();g.computeBoundingSphere();return g}
 function AS_variants(){const C=CID==='fra'?'fra':'ath';if(ASSET.city===C&&(ASSET.np||!HUB.ptypes))return ASSET.V;ASSET.city=C;ASSET.V={};const st={};
- for(const b in AS_POOL[C])for(const n in AS_POOL[C][b])if(!ASSET.V[n]){const t0=performance.now(),gn=AS_build(n,'n'),gm=AS_build(n,'m'),u=gn.userData.as;
+ for(const b in AS_POOL[C])for(const n in AS_POOL[C][b])if(!ASSET.V[n]){const t0=performance.now(),gm=AS_build(n,'m'),gn=TR1.on&&TR1_R[n]&&TR1_low()?gm:AS_build(n,'n'),u=gn.userData.as;/* tr1: low tier = one LOD */
   ASSET.V[n]={n,gn,gm,cls:AS_R[n].far,H:u.H,rx:Math.max(u.rx,gm.userData.as.rx),leaf:new THREE.Color(AS_COL[AS_R[n].leaf])};st[n]={parts:u.parts,studs:u.studs,near:u.tris,mid:gm.userData.as.tris,ids:u.ids.join(' '),ms:Math.round(performance.now()-t0)}}
  const D=HUB.ptypes;if(D)for(const t of AS_PROPS[C])for(const n of[AS_pn(t),...(AS_ALT[t]?[AS_ALT[t][0]]:[])]){const d=D[t];if(!d||!d.g)continue;const og=d.gAS0||d.g;og.computeBoundingBox();const ob=og.boundingBox,ax=AS_R[n].fit,fit=[ax,ax==='x'?ob.max.x-ob.min.x:ob.max.y-ob.min.y];
   const t0=performance.now(),gn=AS_build(n,'n',fit),gm=AS_build(n,'m',fit),u=gn.userData.as;ASSET.V[n]={n,gn,gm,cls:'keep',mid:!!AS_R[n].mid,H:u.H,rx:1,leaf:new THREE.Color(AS_COL[AS_R[n].leaf])};
@@ -156,7 +156,7 @@ function AS_fix(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=AS
   for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const A=GF.get((kx+a)*100000+kz+b);if(A)for(const q of A){if(q===p)continue;const dx=q.x-p.x,dz=q.z-p.z,d2=dx*dx+dz*dz;if(d2>3600)continue;const d=Math.sqrt(d2),i=q._vi;if(cnt[i]===0)T.push(i);cnt[i]+=(d<30?1.5:1)-d/80}}
   const c0=cnt[p._vi];if(c0){let best=p.av,bv=p._vi,bc=c0;for(const P of[PP[p.t]||[],PA]){for(const[v,i]of P){const c=cnt[i];if(c<bc-1e-6){bc=c;best=v;bv=i}}if(bc===0)break}if(best!==p.av){p.av=best;p._vi=bv;ch++;ST.set(kx*100000+kz,step)}}
   for(const i of T)cnt[i]=0;T.length=0}sw+=ch;if(!ch)break}return sw}
-function AS_farM(p,m){const V=ASSET.V[p.av];return m.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),V.cls==='keep'?_ts.set(1,1,1):_ts.set(V.rx*(p.cvs?p.cvs[0]:1),V.H*(p.cvs?p.cvs[1]:1),V.rx*(p.cvs?p.cvs[0]:1)))/* city-var: p.cvs = foliage-mix size (98cv) */}
+function AS_farM(p,m){const V=ASSET.V[p.av];TR1_s(p);return m.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),V.cls==='keep'?_ts.set(1,1,1):_ts.set(V.rx*(p.cvs?p.cvs[0]:1),V.H*(p.cvs?p.cvs[1]:1),V.rx*(p.cvs?p.cvs[0]:1)))/* city-var: p.cvs = foliage-mix size (98cv) */}
 // far instances of assigned props: variant scale + crown tint (+ debris colour)
 function AS_far(L){const M=new THREE.Matrix4(),dirty=new Set();for(const p of L){if(!p.av||!p.im)continue;const V=ASSET.V[p.av];if(V.cls==='keep')continue;if(p.alive)p.im.setMatrixAt(p.i,AS_farM(p,M));if(p.im.geometry.userData.asImp){p.im.setColorAt(p.i,_asC.setRGB(V.cell/255,0,0));if(p.im.material!==ASSET.imp.mat)p.im.material=ASSET.imp.mat;p.im.castShadow=false}else if(p.im.instanceColor)p.im.setColorAt(p.i,V.leaf);p.col=V.leaf.clone();dirty.add(p.im)}
  for(const im of dirty){im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.computeBoundingSphere()}}
@@ -217,8 +217,8 @@ function AS_step(){if(ASSET.off||!HUB.pgrid||!HUB.props||!ASSET.nm||!camera)retu
  for(const p of ASSET.hid)if(!now.has(p)&&p.alive&&p.im){p.im.setMatrixAt(p.i,AS_farM(p,M));ASSET.dirty.add(p.im)}ASSET.hid=now;for(const im of ASSET.dirty)im.instanceMatrix.needsUpdate=true;ASSET.dirty.clear();
  let draws=0,tris=0,inst=[0,0];for(const[S,MM,li]of[[near,ASSET.nm,0],[mid,ASSET.mm,1]])for(const n in MM){let im=MM[n];const L=S[n]||[];
   if(L.length>im.instanceMatrix.count){const g=im.geometry,par=im.parent;par&&par.remove(im);im.dispose&&im.dispose();im=new THREE.InstancedMesh(g,ASSET.mat,Math.ceil(L.length*1.5));im.userData=Object.assign({},MM[n].userData);par&&par.add(im);MM[n]=im}
-  L.forEach((p,i)=>{const w=p.cvs?p.cvs[0]:1;M.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(w,p.cvs?p.cvs[1]:1,w));im.setMatrixAt(i,M)});im.count=L.length;im.visible=L.length>0;
-  if(L.length){im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();draws++;tris+=L.length*im.geometry.userData.as.tris;inst[li]+=L.length}}
+  L.forEach((p,i)=>{TR1_s(p);if(TR1.on&&TR1_R[n]&&!AS_R[n].prop)im.setColorAt(i,TR1_col(p));const w=p.cvs?p.cvs[0]:1;M.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(w,p.cvs?p.cvs[1]:1,w));im.setMatrixAt(i,M)});im.count=L.length;im.visible=L.length>0;
+  if(L.length){im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.computeBoundingSphere();draws++;tris+=L.length*im.geometry.userData.as.tris;inst[li]+=L.length}}
  ASSET.last={ms:+(performance.now()-t0).toFixed(2),draws,tris,near:inst[0],mid:inst[1],hidden:now.size}}
 // test hook: chk() = per-variant parts/studs/tris; lod() = every drawn instance on the right LOD for its distance; mix(r) = worst same-variant share within r m
 // ab(1): draw the old trees again (A/B shots and perf), ab(0): back to the LEGO builds
@@ -233,7 +233,7 @@ function AS_spot(F){const T=HUB.props.filter(p=>p.av&&(F?F(p):p.t!=='bush')&&Mat
  let bk=null,bs=-1;for(const[k,n]of G){const[a,b]=k.split(',').map(Number),sc=(F?K.get(k).size*1000:0)+n;if(sc>bs&&!roamHit(a*40+20,b*40+20,2)){bs=sc;bk=[a,b]}}if(bk)roamWarp(bk[0]*40+20,bk[1]*40+20,RO.h||0,performance.now());return bk?G.get(bk.join(',')):0}
 const AS_FURN=/^p_(lamp|tlight|sign|stop|hedge|kiosk)$/;
 function AS_go(kind){const C=CID==='fra'?'fra':'ath',n=AS_spot(kind==='street'?p=>AS_FURN.test(p.av):null),st=AS_variants()&&ASSET.st,tree=Object.keys(st).filter(v=>AS_R[v].far!=='bush'&&!AS_R[v].prop);let ok,msg;
- if(kind==='parts'){const bad=Object.entries(st).filter(([v,o])=>o.parts<(AS_R[v].prop?5:8)||(o.studs<1&&!AS_R[v].prop)||o.ids.split(' ').some(i=>!AS_PD[i]));ok=!bad.length;
+ if(kind==='parts'){const bad=Object.entries(st).filter(([v,o])=>o.parts<(AS_R[v].prop?5:8)||(o.studs<1&&!AS_R[v].prop)||o.ids.split(' ').some(i=>i!=='tr1'&&!AS_PD[i])/* tr1 builds are procedural */);ok=!bad.length;
   msg=`${Object.keys(st).length} types: parts ${Math.min(...Object.values(st).map(o=>o.parts))}-${Math.max(...Object.values(st).map(o=>o.parts))}, studs ≥ ${Math.min(...Object.values(st).map(o=>o.studs))}, real LDraw parts ${[...new Set(Object.values(st).flatMap(o=>o.ids.split(' ')))].join(' ')}${bad.length?' · BAD '+bad.map(b=>b[0]).join(' '):''}`}
  else if(kind==='mix'){const m=__as.mix();ok=tree.length>=6&&m.variants>=6&&m.p95<=.3;msg=`${m.variants} tree variants placed (${tree.length} built) · most common variant in a 30 m disc: median ${m.p50*100|0}%, p95 ${m.p95*100|0}% (pass ≤ 30%), worst ${m.worst*100|0}% · ${m.trees} trees`}
  else if(kind==='far'){const I=ASSET.imp,T=HUB.props.filter(p=>p.av&&p.im&&ASSET.V[p.av].cls!=='keep'),imp=T.filter(p=>I&&p.im.material===I.mat&&p.im.geometry===I.geo),cells=Object.values(ASSET.V).filter(v=>v.cls!=='keep'),noc=cells.filter(v=>v.cell==null).length;
