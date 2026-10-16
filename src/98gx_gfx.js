@@ -7,6 +7,8 @@
 // env 1.0) on everything that casts a shadow (buildings, cars, props; never the ground), deeper sky, subtle bloom on highlights.
 const GFX={on:(()=>{try{const q=new URLSearchParams(location.search).get('gfx');if(q!==null)return q!=='0';return store.get('mho_gfx',1)===1}catch(e){return true}})(),   // gfx-2 (2026-10-14): ON by default for everyone (coordinator); ?gfx=0 / store 0 = old look
  day:false,keyOrig:new Map(),mats:new WeakSet(),pm:[],gm:[],U:{value:1},G:{value:new THREE.Vector4(0,0,0,0)},t:0,n:0,tier:null};
+// light-1 (2026-10-16): beta.40 brightness back. Live knobs (TUNE drawer "Light", tune.json): fill, sun, sun height / angle behind the view, slew, snap.
+Object.assign(TUNE,Object.assign({gfxHemi:.8,gfxSun:4.2,gfxEnv:.3,gfxEl:.6,gfxAz:2.8,gfxSlew:.8,gfxSnap:1},TUNE));
 const GFX_SUN=[600,300,380];   // ~30° elevation (GFX_sunFollow; coordinator: shadows must read clearly, 2K-style long shadows under cars, buildings, trees)
 function GFX_tier(){try{const L=LK_lvl();return L==='high'?'high':L==='med'?'med':'off'}catch(e){return SET.q==='high'?'high':SET.q==='med'?'med':'off'}}
 function GFX_isDay(){return RO.on&&MOOD&&!(typeof FL!=='undefined'&&FL.n>.5)&&MOOD.id!=='night'&&MOOD.id!=='flnight'}
@@ -15,9 +17,11 @@ function GFX_light(){if(!GFX.on)return;const day=GFX_isDay();GFX.day=day;
  if(!day){GFX.U.value=1;GFX_GRADE.uniforms.uOn.value=0;if(renderer.toneMapping!==THREE.NeutralToneMapping)renderer.toneMapping=THREE.NeutralToneMapping;return}
  if(!GFX.keyOrig.has(MOOD)){GFX.keyOrig.set(MOOD,MOOD.key[2]);MOOD.key[2]=GFX_SUN}moonL.position.copy(moonL.target.position).add(new THREE.Vector3(...GFX_SUN).setLength(400));   // relative to the shadow target (71_roam_drive), not world 0
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
- const ath=CID==='ath';moonL.color.set(ath?'#ffd9a8':'#ffe1b4');moonL.intensity=4.8;
- hemi.color.set('#86acff');hemi.groundColor.set(ath?'#5e4c32':'#4a5a4c');hemi.intensity=.4;   // gfx-2: .5 left shadows at ~65 % of sunlit; .4 = dark, cool-blue shadows (.34 + green-brown bounce read as mud)
- scene.environmentIntensity=.22;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
+ const ath=CID==='ath';moonL.color.set(ath?'#ffd9a8':'#ffe1b4');moonL.intensity=TUNE.gfxSun;
+ // light-1: hemi .4 (gfx-2) made every face away from the sun near-black (beta.50-.63 Athens trees/facades, black shadow wedges); .8 with a warm,
+ // brighter ground bounce = mid-tone blue-grey shade like 2K Drive, sunlit vs shaded still clearly differ (sun 4.2)
+ hemi.color.set('#9cbcff');hemi.groundColor.set(ath?'#8a7656':'#6f7a60');hemi.intensity=TUNE.gfxHemi;
+ scene.environmentIntensity=TUNE.gfxEnv;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
  const U=SKYU;U.uTop.value.set(.004,.045,.40);U.uMid.value.set(.025,.16,.72);U.uHor.value.set(ath?.62:.48,ath?.66:.68,ath?.78:.92);U.uSun.value.set(1.0,.8,.5);
  scene.fog.color.set(ath?'#cfd6e2':'#b9cff0');
  GFX.U.value=.15;GFX_GRADE.uniforms.uOn.value=1;bloom.strength=.16;bloom.radius=.45;
@@ -91,10 +95,14 @@ LK_roamLook=(f=>function(){const r=f.apply(this,arguments);try{GFX.t=0;GFX_frame
 // sun follows the camera slowly from behind-left (gfx-2): a fixed world sun was backlit on half the headings (v90m Frankfurt start: we saw only
 // shaded faces, the car's shadow hid under it, sun glare greyed the sky). Now lit faces + shadows falling forward-right on screen, every heading.
 // Azimuth slews at most GFX_SLEW rad/s (smoothed), so shadows creep while turning instead of swinging.
-function GFX_sunFollow(dt){const GFX_EL=.52,GFX_AZ=2.8,GFX_SLEW=.35;   // elevation ~30°, sun 160° from the view direction (behind, a little left): at 24°/140° Frankfurt's building rows shaded the whole road
+// light-1: at .35 rad/s the sun was still ahead of the camera seconds after spawn / a camera cut (beta.63 Athens start: 69° = backlit, black faces).
+// Now: an error > gfxSnap rad (spawn, respawn, camera cut, U-turn) snaps the sun behind the view; smaller errors slew at gfxSlew rad/s or faster.
+function GFX_sunFollow(dt){const GFX_EL=TUNE.gfxEl,GFX_AZ=TUNE.gfxAz,GFX_SLEW=TUNE.gfxSlew;   // elevation ~34°, sun 160° from the view direction (behind, a little left): at 24°/140° Frankfurt's building rows shaded the whole road
  if(!GFX.on||!GFX.day||!camera)return;const d=GFX.cd||(GFX.cd=new THREE.Vector3());camera.getWorldDirection(d);
+ hemi.intensity=TUNE.gfxHemi;moonL.intensity=TUNE.gfxSun;scene.environmentIntensity=TUNE.gfxEnv;   // live TUNE (other code may rewrite them between moods)
  const want=Math.atan2(d.z,d.x)-GFX_AZ;if(GFX.az===undefined||dt>1)GFX.az=want;let e=want-GFX.az;e=Math.atan2(Math.sin(e),Math.cos(e));
- GFX.az+=Math.sign(e)*Math.min(Math.abs(e),Math.max(GFX_SLEW,Math.abs(e)*.6)*Math.min(dt,.1));
+ if(Math.abs(e)>TUNE.gfxSnap){GFX.az=want;e=0}
+ GFX.az+=Math.sign(e)*Math.min(Math.abs(e),Math.max(GFX_SLEW,Math.abs(e)*1.5)*Math.min(dt,.1));
  const c=Math.cos(GFX_EL)*700;GFX_SUN[0]=Math.cos(GFX.az)*c;GFX_SUN[1]=Math.sin(GFX_EL)*700;GFX_SUN[2]=Math.sin(GFX.az)*c;
  if(MOOD&&MOOD.key[2]!==GFX_SUN){if(!GFX.keyOrig.has(MOOD))GFX.keyOrig.set(MOOD,MOOD.key[2]);MOOD.key[2]=GFX_SUN}
  if(typeof SKYU!=='undefined'&&SKYU.uSunD)SKYU.uSunD.value.set(GFX_SUN[0],Math.max(GFX_SUN[1]*.35,40),GFX_SUN[2]).normalize()}
