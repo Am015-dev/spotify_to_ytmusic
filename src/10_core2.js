@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.74',date:'16 Oct 2026',items:[{t:'NEW',s:'Every race now runs on real Frankfurt and Athens streets, with two routes, jumps and power-ups.'},{t:'NEW',s:'Quick Race includes a river run where your car becomes a boat.'},{t:'CHANGED',s:'Livelier streets with shopfronts, kiosks and café tables.'}]},
   {v:'v90m-beta.73',date:'16 Oct 2026',items:[{t:'NEW',s:'Race Rossi on real Frankfurt streets: two routes, a big jump and power-up bricks.'},{t:'FIXED',s:'The camera no longer hides behind buildings.'},{t:'CHANGED',s:'Faster start.'}]},
   {v:'v90m-beta.72',date:'16 Oct 2026',items:[{t:'FIXED',s:'Cars now stop at red lights and queue up.'},{t:'FIXED',s:'Far fewer crashes into roadside props.'},{t:'FIXED',s:'Trees no longer block the camera.'},{t:'CHANGED',s:'Slightly faster start.'}]},
   {v:'v90m-beta.71',date:'16 Oct 2026',items:[{t:'FIXED',s:'No more loose bricks floating in the Athens parks.'},{t:'CHANGED',s:'Lighter fir and cypress trees.'}]},
