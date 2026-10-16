@@ -70,5 +70,21 @@ Tempo Up, Slow Groove, Magnet Storm and Triple Shot kept on all stage long.
   kills the bot with lasers on the OLD build too (0% clear, 14 laser hits): the bot cannot dodge lasers, not a balance regression.
 - Weak: stage 30 with the mid build is 0-33% (late build 100%); a fresh ship (no upgrades at all) fails from stage 20 on.
   Hard is hard: late build 33% at stage 20/30. Next lever if the owner finds Normal 30 too hard: `densd` (story.js) or `DMG.fk`.
-- afk-test PASS (idle: dead in 21 s Normal / 16 s Hard; dodging bot alive 69 s on both) after the endless fire factor `DMG.fkE` .65.
+- afk-test PASS (idle ships die; the dodging bot survives on Normal and Hard) with the endless fire factor `DMG.fkE` .5.
 - story-sim RUNS=6 (fresh ship, no builds): 1/8 100%, 20 67%, 30 0%, 42 100%; hits 2.5-5.7 a stage.
+
+## AFTER on the merged build (with the 8 weapons, fusions, bullet cap and anti-idle from origin; RUNS=2)
+| diff/build | drone | turret | charger | gunship | killed unseen | shooters fired | boss s | clear % 1/8/20/30/42 | hits med |
+|---|---|---|---|---|---|---|---|---|---|
+| easy/fresh | 2.12 | 3.12 | 1.78 | 8.77 | 0.0% | 85% | 8:60,8:59 | 100/100/100/0/100 | 3 |
+| easy/late | 1.53 | 1.82 | 1.80 | 3.47 | 2.5% | 74% | 8:59,8:58 | 100/100/100/100/100 | 2 |
+| easy/mid | 1.85 | 2.33 | 1.73 | 2.68 | 0.0% | 81% | 8:59 | 100/100/100/0/100 | 4 |
+| hard/fresh | 3.15 | 3.68 | 2.07 | - | 0.0% | 89% | 8:59 | 100/100/0/0/100 | 5 |
+| hard/late | 1.93 | 3.68 | 2.25 | 11.42 | 0.1% | 82% | 8:58 | 100/100/50/0/100 | 5 |
+| hard/mid | 2.82 | 4.27 | 2.03 | 13.30 | 0.0% | 88% | 8:59 | 100/50/0/0/100 | 5 |
+| normal/fresh | 2.67 | 4.10 | 1.97 | 9.13 | 0.0% | 87% | 8:60,8:59 | 100/100/100/0/100 | 4 |
+| normal/late | 1.83 | 3.03 | 2.02 | 7.03 | 1.5% | 79% | 8:58 | 100/100/100/50/100 | 3 |
+| normal/mid | 2.68 | 4.03 | 2.20 | 8.25 | 0.0% | 87% | 8:60,8:59 | 100/100/100/50/100 | 3 |
+
+- weapon-test PASS (each weapon alone clears stage 1); afk-test PASS after `DMG.fkE` .5 (endless only).
+- balance-test: 1 FAIL left: easy/late unseen 2.5% (> 2%), the same cleared-run residual as above. Next session: trace it.

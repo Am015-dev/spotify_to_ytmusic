@@ -841,7 +841,7 @@ function enterDistrict(i){G.di=i;G.pos=posOf(i);G.dt=0;G.d0=G.bc;G.dprog=0;G.for
    2. soft cap: a single shot's damage above 2 counts at half, ceiling 8 (DMG.hit); the measured-DPS cap (soft) is off, it fed back on itself;
    3. on-screen floor: a normal enemy cannot lose its hull faster than its minimum life on screen (ml), so it gets to move and shoot.
    A ramming enemy (e.rk) and the EMP (G.empT) ignore the floor. DMG.on=false switches the whole model off. */
-const DMG={on:true,soft:false,fk:.45,fkE:.65,cv:400,ref:25,half:.5,ceil:4,dps:0,k:1,easyK:.9,hk:2,hc:8,
+const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,ref:25,half:.5,ceil:4,dps:0,k:1,easyK:.9,hk:2,hc:8,
   hit(d){return !this.on||d<=this.hk?d:Math.min(this.hc,this.hk+(d-this.hk)*this.half);},   // one shot: damage above x2 counts at half, never more than 8 (crits, sharp beat and damage perks stacked)
 
   ml:{drone:1.2,flank:1.2,turret:1.3,charger:1.3,gunship:2.6,gate:1.4,mine:.6,swarm:0},elMl:4,

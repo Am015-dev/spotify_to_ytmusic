@@ -64,8 +64,8 @@ Next after the [TESTS] pilot passes: one [TESTS] worker per remaining game (13),
 ## Mainhattan Nightrun L2 (16 Oct 2026): enemies are seen and fought
 - Done: one damage model in `parts/b.js` (`DMG`): entry grace (no damage until x <= W-40, bullets fly through, a red edge ring telegraphs spawns), an on-screen
   minimum life per enemy type (drone 1.2 s .. gunship 2.6 s, elites 4 s, Easy x0.9), a per-shot soft cap (above 2 at half, max 8), gentler enemy fire
-  (`DMG.fk` .45, Easy x0.8, endless `fkE` .65), chargers glide in and dash at 400+40d px/s, story density growth `densd` .035, Easy level -0.8, speed challenge clock 1.05.
-  Before -> after (late build, Normal): drones alive on screen 0.00 -> 1.53 s, shooters that fire 0% -> 79%, killed unseen 82% -> 0.6%, bot hits 0 -> 2, clears 1-42 100%.
+  (`DMG.fk` .45, Easy x0.8, endless `fkE` .5), chargers glide in and dash at 400+40d px/s, story density growth `densd` .035, Easy level -0.8, speed challenge clock 1.05.
+  Before -> after (late build, Normal): drones alive on screen 0.00 -> 1.53 s, shooters that fire 0% -> 79%, killed unseen 82% -> 1.5%, bot hits 0 -> 3, clears 1/8/20/42 100%, 30 50%. balance-test: 1 FAIL left (easy/late unseen 2.5% > 2%).
   Numbers and targets: `games-src/nightrun/BALANCE.md`. Check: `games-src/nightrun/balance-test.js` (fails the old build, passes this one); afk-test PASS.
 - Next: trace the last 0.1-1.8% unseen kills (cleared runs, stage 1/8/42); stage 30 with a mid build is 0-33%; the bot can't dodge the stage-5 mini-boss lasers (old build too);
   `weapon-test.js` named in the brief does not exist in the repo.
