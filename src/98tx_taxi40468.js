@@ -11,7 +11,7 @@
 //    green/blue roof sign, no chequer stripe (the real set has none).
 const TX={pad:0};
 // ---------- new parts
-const TX_NEW={tx12:['Brick 1×2 TAXI print',2,1,3,'Bricks',3004],lp12:['Tile 1×2 number plate',1,2,1,'Tiles',3069],
+const TX_NEW={tx12:['Taxi 1×2',2,1,3,'Bricks',3004],lp12:['Tile 1×2 number plate',1,2,1,'Tiles',3069],
  sg14g:['Tile 1×4 sign BRICK OVEN!',1,4,1,'Tiles',2431],sg14b:['Tile 1×4 sign stars',1,4,1,'Tiles',2431],
  cp24:['Curved plate 2×4×2/3',4,2,2,'Slopes',88930],lh11:['Lamp holder 1×1',1,1,1,'Vehicle',41632],be24:['Bearing element 2×4',4,2,3,'Vehicle',18892]};
 for(const k in TX_NEW){const[n,w,d,h,cat,id]=TX_NEW[k];GB_PC[k]={n,w,d,h,cat,ic:'▭',g:cat==='Tiles'?'T':undefined};G13_ID[k]=id}

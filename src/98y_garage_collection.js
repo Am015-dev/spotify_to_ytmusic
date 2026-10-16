@@ -123,3 +123,16 @@ GAR_tab=(f=>function(){f();const B=$('#gbBody');if(!B)return;const row=B.querySe
 #g9Col .g9None{font:700 12px system-ui;color:#8fb3c7;grid-column:1/-1}
 @media (max-height:500px){#g9Col .g9Grid{grid-template-columns:repeat(auto-fill,minmax(138px,1fr))}#g9Col .g9Card{min-height:0}}`;document.head.appendChild(st)}
 window.__g9c={S:G9C,list:f=>G9C_list(f||G9C.type).A.map(e=>e.S.id),eq:f=>G9C_eq(f),T:G9_T,render:(id,f,w,h)=>G9C_render(GAR_set(id),f||'car',w,h),bricks:(id,f)=>G9C_bricks(GAR_set(id),f||'car')};
+/* rv2k garage-car (review 2K #6): landscape phone RIDES = 4-column card grid in a 340 px panel with the header chrome folded away (>= 6 cards in view); the ride is framed by R2_frame (zoom factor below). Flag: window.__RV2K_GAR=0 (before load) turns it off. */
+if(window.__RV2K_GAR!==0){const st=document.createElement('style');st.textContent=`@media (max-height:500px) and (orientation:landscape){
+#gbx.r2.r2m-rides{--r2pw:340px}#gbx.r2.r2m-rides #gbStats{display:none}
+#gbx.r2.r2m-rides #g9Col .g9Grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+#gbx.r2.r2m-rides #g9Col .g9Card{min-height:0;padding:3px 3px 4px;gap:0;border-radius:9px;border-bottom-width:4px}
+#gbx.r2.r2m-rides #g9Col .g9Card img{aspect-ratio:168/96}#gbx.r2.r2m-rides #g9Col .g9Card b{font-size:12px}#gbx.r2.r2m-rides #g9Col .g9Card small{display:none}#gbx.r2.r2m-rides #g9Col .g9Card.on small{display:block;font-size:12px;line-height:1.1}
+#gbx.r2.r2m-rides #g9Col .g9Ed{display:none}#gbx.r2.r2m-rides #g9Col .g9R{left:5px;top:5px;max-width:calc(100% - 10px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;padding:0 4px}
+#gbx.r2.r2m-rides #g9Col .g9Fav{display:none}
+#gbx.r2.r2m-rides #g9Col .g9New{min-height:0;padding:2px 4px}#gbx.r2.r2m-rides #g9Col .g9New small{display:none}
+#gbx.r2.r2m-rides #gbBody>h5,#gbx.r2.r2m-rides #g9Col .g9Cnt,#gbx.r2.r2m-rides #g9Col .suHd small{display:none}#gbx.r2.r2m-rides #g9Col .suHd{min-height:0;padding:0;margin:0}}`;document.head.appendChild(st);
+}
+/* rv2k drawer (review 2K #8): on a landscape phone the LEGO id badge sat on the part picture and under the + button; the id stays in the search and the tooltip */
+{const st=document.createElement('style');st.textContent=`@media (max-height:500px){#gbx.r2.gbBk #gbBkPc .gbPc .txId{display:none}#gbx.r2.gbBk #gbBkPc .gbPc{overflow:hidden}}`;document.head.appendChild(st)}

@@ -30,10 +30,19 @@ function RV2K_go(kind,say){const ok=b=>b?' ✅':' ❌',P=innerHeight>innerWidth?
  if(kind==='devui'){const pin=RV14_vis('odPin'),bug=RV14_vis('qaBugTop'),C={left:innerWidth*.2,right:innerWidth*.8,top:innerHeight*.2,bottom:innerHeight*.8,width:innerWidth*.6,height:innerHeight*.6};
   const pc=pin?RV14_ovl(pin,C):0,bad=[];if(bug)for(const id of['tP','roamMini','roamArrow','m1Next','hTime','raceW','roamGauge','tuG'])if(RV14_ovl(bug,RV14_vis(id))>0)bad.push('#'+id);
   return'📍 DEV UI ('+P+') · checklist bar over the centre 60 % of the view: '+pc+' px² (0) · 🐞 over HUD: '+(bad.join(' ')||'none')+ok(!pc&&!bad.length)}
- if(kind==='garage'){gbOpen();setTimeout(()=>{const b=RV14_carBox(),fr=b?Math.max(0,Math.min(b.right,innerWidth)-Math.max(b.left,0))*Math.max(0,Math.min(b.bottom,innerHeight)-Math.max(b.top,0))/(innerWidth*innerHeight):0;
-   say('📍 GARAGE ('+P+') · your ride covers '+Math.round(fr*100)+' % of the screen (≥ 12 %, whole car, not one tyre)'+ok(fr>=.12))},2500);return'📍 GARAGE · opening…'}
+ if(kind==='garage'){gbOpen();let n=0;const iv=setInterval(()=>{n++;const busy=(typeof BA!=='undefined'&&BA.on)||(typeof LDL!=='undefined'&&LDL.wait.size)||!GB.mesh||!(GB.cam.view&&GB.cam.view.enabled);if(busy&&n<100)return;clearInterval(iv);
+   /* the garage has its OWN scene + camera (GB), not the roam camera: project the ride's box through GB.cam */
+   let fr=0,L=0,R=0;try{if(GB_.bk)GB_cam();GB.cam.updateMatrixWorld(true);GB.mesh.updateMatrixWorld(true);const v=new THREE.Vector3(),M=new THREE.Matrix4();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9,np=0;const pt=()=>{v.project(GB.cam);const x=(v.x+1)/2*innerWidth,y=(1-v.y)/2*innerHeight;x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);np++};
+    /* real vertices (the ride's own meshes; the flat floor pad is skipped), not the 3D box: a box's corners overstate a car's silhouette */
+    GB.mesh.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes.position)return;for(let q=o;q;q=q.parent){if(!q.visible)return;if(q===GB.mesh)break}if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();const g=o.geometry.boundingBox;if(g.max.y-g.min.y<.05||o.geometry.attributes.position.count<16)return;
+     const P=o.geometry.attributes.position,st=Math.max(1,Math.floor(P.count/1500)),I=o.isInstancedMesh?Math.max(1,Math.floor(o.count/300)):0;
+     if(I){for(let i=0;i<o.count;i+=I){o.getMatrixAt(i,M);M.premultiply(o.matrixWorld);for(let k=0;k<8;k++){v.set(k&1?g.max.x:g.min.x,k&2?g.max.y:g.min.y,k&4?g.max.z:g.min.z).applyMatrix4(M);pt()}}}
+     else for(let i=0;i<P.count;i+=st){v.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld);pt()}});if(!np)throw 0;
+    y1=y0+(y1-y0)*.8;L=x0;R=x1;fr=Math.max(0,Math.min(x1,innerWidth)-Math.max(x0,0))*Math.max(0,Math.min(y1,innerHeight)-Math.max(y0,0))/(innerWidth*innerHeight)}catch(e){}
+   const pn=RV14_vis(document.querySelector('#gbx .gbp')),cards=[...document.querySelectorAll('#g9Col .g9Card')].filter(e=>{const r=RV14_vis(e);return r&&r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight-50&&(!pn||r.bottom<=pn.bottom+2)}).length,under=pn&&R>pn.left+30;
+   say('📍 GARAGE ('+P+') · your ride covers '+Math.round(fr*100)+' % of the screen (≥ 12 %, whole car, not one tyre) · ride cards fully in view: '+cards+' (≥ 6)'+(under?' · car runs under the panel':'')+' · car x '+Math.round(L)+'–'+Math.round(R)+ok(fr>=.12&&cards>=6&&!under))},400);return'📍 GARAGE · opening…'}
  if(kind==='drawer'){gbOpen();setTimeout(()=>{for(const e of document.querySelectorAll('button'))if(/^\S*\s*BUILD$/.test(RV2K_txt(e))&&RV14_vis(e)&&RV14_vis(e).left<90){e.click();break}setTimeout(()=>{let tiles=0,pic=0,ovl=0;
-   for(const e of document.querySelectorAll('button,div')){const r=RV14_vis(e);if(!r||r.width<50||r.width>110||r.height<40||r.height>80||!/\b\d{4}\b/.test(RV2K_txt(e))||e.parentElement&&/\b\d{4}\b/.test(RV2K_txt(e.parentElement))&&RV14_vis(e.parentElement)&&RV14_vis(e.parentElement).width<110)continue;tiles++;
+   for(const e of document.querySelectorAll('#gbBkPc .gbPc')){const r=RV14_vis(e);if(!r||r.right<0||r.left>innerWidth||r.width<40)continue;tiles++;
     if([...e.querySelectorAll('img,canvas,svg')].some(i=>{const q=i.getBoundingClientRect();return q.width>=32&&q.height>=32}))pic++;const R=[];const w=document.createTreeWalker(e,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(!n.textContent.trim())continue;const g=document.createRange();g.selectNodeContents(n);R.push(...g.getClientRects())}
     for(let i=0;i<R.length;i++)for(let j=i+1;j<R.length;j++)if(RV14_ovl(R[i],R[j])>4){ovl++;i=R.length;break}}
    say('📍 BRICK DRAWER ('+P+') · '+tiles+' tiles · with a part picture ≥ 32 px: '+pic+' · tiles with overlapping labels: '+ovl+' (all tiles pictured, 0 overlaps)'+ok(tiles&&pic===tiles&&!ovl))},1200)},1500);return'📍 BRICK DRAWER · opening the builder…'}
@@ -44,7 +53,7 @@ function RV2K_go(kind,say){const ok=b=>b?' ✅':' ❌',P=innerHeight>innerWidth?
  if(kind==='card'){const m=RV14_mark('quest','q_thief');if(!m)return'📍 no Stop, Thief! marker ❌';RV14_near(m,10);roamOpen(m);RO.cardPin=1;const num=t=>{const w={one:1,two:2,three:3,four:4,five:5,once:1,twice:2},x=(t.match(/(\d+)\s*(×|x\b|times)|\b(one|two|three|four|five)\s+times|\b(once|twice)\b/i)||[]);return x[1]?+x[1]:w[(x[3]||x[4]||'').toLowerCase()]||0};
   setTimeout(()=>{const c=document.getElementById('roamCard'),words=RV2K_txt(c).replace(/LET.S GO|LATER|▶/g,'').split(' ').filter(Boolean).length,a=num(RV2K_txt(c));try{roamGo()}catch(e){}
    setTimeout(()=>{const b=num(RV2K_txt(document.body).replace(RV2K_txt(c),''));say('📍 STOP, THIEF! CARD · '+words+' words on the card (≤ 25) · goal on card '+a+'× vs HUD '+b+'× (equal)'+ok(words<=25&&a&&a===b))},2500)},800);return'📍 MISSION CARD · checking…'}
- if(kind==='foliage'){const q=rfSnap(1884,0,150);roamWarp(q?q[0]:1884,q?q[1]:0,q&&q[2]!=null?q[2]:Math.PI*1.5,true);RO.v=0;camSnap=true;const rc=new THREE.Raycaster(),v=new THREE.Vector3();let n=0,bad=0,acc=0;
+ if(kind==='foliage'){const q=rfSnap(1884,0,150);roamWarp(q?q[0]:1884,q?q[1]:0,q&&q[2]!=null?q[2]:Math.PI*1.5,true);RO.v=0;camSnap=true;const rc=new THREE.Raycaster(),v=new THREE.Vector3();rc.camera=camera;let n=0,bad=0,acc=0;
   RV2K_drive(30,dt=>{acc+=dt;if(acc<.25)return;acc=0;n++;v.set(RO.x,RO.y+1,RO.z).sub(camera.position);const d=v.length();rc.set(camera.position,v.normalize());rc.far=Math.max(.1,d-2.5);
    const solid=i=>i.object.visible&&!i.object.isSprite&&!(i.object.material&&i.object.material.transparent&&i.object.material.opacity<.5)&&!pl.mesh.getObjectById(i.object.id);let h=rc.intersectObjects(scene.children,true).find(solid);
    /* camera INSIDE a bush/wall: a ray from the camera misses the back faces, so also cast car → camera */if(!h){const o=new THREE.Vector3(RO.x,RO.y+1,RO.z);rc.set(o,camera.position.clone().sub(o).normalize());rc.far=d;h=rc.intersectObjects(scene.children,true).find(i=>solid(i)&&i.distance>2.5)}if(h)bad++},
@@ -556,7 +565,7 @@ GO['art/props-road']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt brick pile'
  // garage items open the garage (RIDES); Athens items fly to Athens; the rest drive in Frankfurt free roam.
  for(const it of OD_CHECKLIST){if(GO[k(it)])continue;const t=(it.text||'').toLowerCase();
   GO[k(it)]=[(it.area==='garage'||/^garage|garage →|rides →/.test(t))?{gar:1,n:'garage'}:/athens|syntagma|acropolis/.test(t)?{here:1,c:'ath',n:'Athens free roam'}:{here:1,c:'fra',n:'Frankfurt free roam'}]}
- const goI={},goSay=t=>{goI._t=t;try{say('',t,2.2)}catch(e){}};
+ const goI={},goSay=t=>{goI._t=t;window.__goLast=t;try{say('',t,2.2)}catch(e){}};
  const goCity=T=>T.gar?CID:T.c||(T.w&&((LDW_P.find(q=>q.model===T.w)||{}).city))||'fra';
  const goAt=T=>{if(T.w){const E=LDW.on.find(e=>e.id===T.w);return E&&{x:E.x,z:E.z}}
   if(T.p){let b=null,bd=1e18;for(const q of HUB.props||[]){if(q.t!==T.p||q.alive===false)continue;const d=(q.x-RO.x)**2+(q.z-RO.z)**2;if(d>900&&d<bd){bd=d;b=q}}return b&&{x:b.x,z:b.z}}

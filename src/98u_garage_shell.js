@@ -127,7 +127,7 @@ function R2_calc(){const c=$('#gbC');if(!c)return null;const r=c.getBoundingClie
  if(vis(R))l=R.getBoundingClientRect().right-r.left;if(GB_.bk)l+=(parseFloat(getComputedStyle($('#gbx')).getPropertyValue('--r2pad'))||62)+10;if(vis(H))t=H.getBoundingClientRect().bottom-r.top;if(!GB_.bk&&vis(p))R0=p.getBoundingClientRect().left-r.left;
  if(vis(C)){const q=C.querySelector('#gbBkPc')||C;const y=q.getBoundingClientRect().top-r.top;if(y>t+60)b=y}return{l,t,r:R0,b,w:r.width,h:r.height}}
 function R2_frame(C,bk){if(!C||$('#gbx').hidden)return;if(!R2.area||++R2.af>20){R2.area=R2_calc();R2.af=1}const A=R2.area;if(!A||A.r-A.l<80||A.b-A.t<60)return;
- const ox=Math.round(A.w/2-(A.l+A.r)/2),oy=Math.round(A.h/2-(A.t+A.b)/2),z=Math.max(.8,Math.min(1.8,(bk?R2.bz:2.6)*Math.min((A.r-A.l)/A.w,(A.b-A.t)/A.h)));const v=C.view;
+ const ox=Math.round(A.w/2-(A.l+A.r)/2),oy=Math.round(A.h/2-(A.t+A.b)/2),z=Math.max(.8,Math.min(bk||window.__RV2K_GAR===0?1.8:2,(bk?R2.bz:(window.__RV2K_GAR===0?2.6:3.6))*Math.min((A.r-A.l)/A.w,(A.b-A.t)/A.h)));const v=C.view;
  if(!v||!v.enabled||v.offsetX!==ox||v.offsetY!==oy||v.fullWidth!==A.w||v.fullHeight!==A.h||C.zoom!==z){C.zoom=z;C.setViewOffset(A.w,A.h,ox,oy,A.w,A.h)}C.updateMatrixWorld()}
 G8_band=function(){const A=R2.area||R2_calc();const c=$('#gbC').getBoundingClientRect();return A?[A.t+G8.T.top,A.b-G8.T.bot,c.height,c.width]:[0,c.height,c.height,c.width]};
 GB_cam=(f=>function(){f();R2_frame(GB.cam,GB_.bk)})(GB_cam);
