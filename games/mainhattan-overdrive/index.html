@@ -745,7 +745,7 @@ body.touch #roamPlate small{white-space:nowrap}
 // in the city above 125 km/h (was 86 km/h, which the faster city car reaches on every street).
 const W14_ST={k0:.25,rk:1.5,hbCity:34.7},W14_PIV=1.6;
 // TUNE (tune20): live-tunable driving numbers that used to be inline literals; defaults = the v87w values. Knob table + ?tune=1 drawer: src/99t_tune.js.
-const TUNE={life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIcon:1,wbNear:70,wbFar:900,wbCell:.06,wbCity:1,wbMerged:1,wbNfc:1,wbFig:260,wbRingCam:6,wbLodD:190,wbLodCell:3,bwOn:1,bwFade:90,bwCourse:.48,bwStud:1,bwStudD:60,bwStudP:1.2,bwStudH:2,bwStudTop:16,bwStudMax:8000,bwCar:1,wbSuperD:700,wbTerr:1,wbLzD:420,wbRuns:1,bwRampSh:70,perfHud:0,lvPed:.8,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:1,lvFac:1,lvCrowd:.67,lvPark:1,lvPop:1,lvPopGap:28,lvPopRw:1,stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
+const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIcon:1,wbNear:70,wbFar:900,wbCell:.06,wbCity:1,wbMerged:1,wbNfc:1,wbFig:260,wbRingCam:6,wbLodD:190,wbLodCell:3,bwOn:1,bwFade:90,bwCourse:.48,bwStud:1,bwStudD:60,bwStudP:1.2,bwStudH:2,bwStudTop:16,bwStudMax:8000,bwCar:1,wbSuperD:700,wbTerr:1,wbLzD:420,wbRuns:1,bwRampSh:70,perfHud:0,lvPed:.8,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:1,lvFac:1,lvCrowd:.67,lvPark:1,lvPop:1,lvPopGap:28,lvPopRw:1,stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
   // fix21 boost FX (TUNE drawer "FX" tab): thruster flame size / length / brightness, boost sparks on/off + count + size, speed lines, screen blur/glow, FOV kick, shake (all ×, 1 = default look)
   fxFlS:1,fxFlL:1,fxFlI:1,fxSpk:1,fxSpkN:1,fxSpkS:1,fxLines:1,fxGlow:1,fxFov:1,fxShake:1,
   // fix21 audio (TUNE drawer AUDIO tab, 98m_music.js): music on/off + volume (0.5 = the old synth level), SFX ×, duck music under dialogue (on/off + how much)
@@ -757,6 +757,7 @@ const TUNE={life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.
   // how fast the car stops turning when the steering eases off (/s; 71_roam_drive.js, was 7-11 like turning in)
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.65',date:'16 Oct 2026',items:[{t:'NEW',s:'Livelier streets: long Frankfurt blocks are split into varied buildings, more street trees, hedges and flower boxes.'},{t:'FIXED',s:'Smoother on medium graphics: shadows update every other frame.'}]},
   {v:'v90m-beta.64',date:'16 Oct 2026',items:[{t:'FIXED',s:'Sunny again: the sun lights the city from behind the camera, so Athens buildings and trees are no longer near-black.'}]},
   {v:'v90m-beta.63',date:'16 Oct 2026',items:[{t:'NEW',s:'Garage shows your ride big in the middle with ride cards; the brick drawer has a picture on every tile.'},{t:'FIXED',s:'Races need you, fewer wrecks and dead stops, cleaner screen, no sinking at the start.'}]},
   {v:'v90m-beta.62',date:'16 Oct 2026',items:[{t:'FIXED',s:'Cars no longer sink into the road at the start or on ramps; story scenes keep the world loaded.'},{t:'FIXED',s:'Races need you: hands-off driving no longer wins, stuck cars reset, races always end. Fewer wrecks and dead stops.'},{t:'FIXED',s:'Cleaner screen: at most 2 objectives, no pop-ups while driving, checklist and bug button at the edge, shorter mission cards.'},{t:'NEW',s:'Bug box: type freely and see your reports.'}]},
@@ -5410,6 +5411,7 @@ function buildHubProps(rnd,rr2,pick){const D=kmProps(propDefs());if(CID!=='fra')
   const side=(px,pz,ux,uz,w,k,boul,self,sid,M7=7,pr=.07,pc=.012)=>{for(const sd of[-1,1]){const nx=uz*sd,nz=-ux*sd,off=w/2+3.2,x=px+nx*off,z=pz+nz*off,ry=Math.atan2(-nx,-nz);
       const q=cityAt(x,z,sid);if(q&&q.d<q.road.w/2+5)continue;const f=fillAt(x,z,self);if(f&&f.d<f.r.w/2+5)continue;
       if(k%M7===0)add('lamp',x,z,lampRy(-nx,-nz));else if(k%M7===3&&(boul||rnd()<.5))add(pick(['tree','tree2','tree']),x+nx*2,z+nz*2);else if(rnd()<pr)add(pick(['bench','bin','post','hydrant','bin','bench','dumpster','planter','sign']),x+nx*3,z+nz*3,ry);else if(rnd()<.01)add('stop',x,z,ry);
+      if(typeof C1_side==='function')C1_side(add,px,pz,ux,uz,w,nx,nz,k,M7,boul,x,z);/* city-1: 2nd street tree + hedge runs, no rnd() */
       if(rnd()<pc)add(pick(CID!=='fra'&&typeof ATHD!=='undefined'&&SM_dz(px,pz)>'B'?['car','car3']:['car','car2','car3','car4']),px+nx*(w/2-2.6),pz+nz*(w/2-2.6),Math.atan2(ux,uz)+(sd>0?0:Math.PI))}};
   for(const r of hubRoads())for(let d=10;d<r.L-10;d+=6)side(r.x0+r.ux*d,r.z0+r.uz*d,r.ux,r.uz,r.w,Math.round(d/6),r.w>=22,r,-1);
   CITY_S.forEach((S,si)=>{const P=S.pts;if(CID!=='fra'){const c=S.r.cls;if(c==='hill')return;const st=c==='res'||c==='ped'||c==='link'?3:2,m7=c==='res'||c==='ped'?6:5;for(let i=1;i<P.length-1;i+=st){const p=P[i];side(p.x,p.z,p.tx,p.tz,S.r.w,Math.round(i/st),S.r.w>=24,null,si,m7,typeof ATHD!=='undefined'&&SM_dz(p.x,p.z)>'B'?0:c==='res'?.02:.025,c==='res'?.007:c==='sec'?.01:.006)}return}for(let i=1;i<P.length-1;i++){const p=P[i];side(p.x,p.z,p.tx,p.tz,S.r.w,i,S.r.w>=28,null,si,7,.03,.006)}});
@@ -6347,7 +6349,7 @@ function frame(now){requestAnimationFrame(frame);if(LD.on)return;if(ENVD)buildEn
   if(state==='roam'){if(!RO.frozen){roamStep(dt);studSync()}else if(pl){AU.engine(pl,0,false);AU.scrape(false)}roamCam(dt)}else{for(const s of ships)posShip(s,dt);updateCam(dt)}drawTraffic(dt);updWorld(dt,T);updPool(SPARK,dt,20);updPool(FIRE,dt,-2);updPool(SMOKE,dt,-1.5);updPool(FIREB,dt,-3);updDebris(dt);waterTick(dt);updStreaks();updPool(WATER,dt,24);updPool(GLOWP,0);shake=Math.max(0,shake-dt*3);
   if(msgTimer>0){msgTimer-=dt;if(msgTimer<=0){$('#msg').style.opacity=0;$('#sub').style.opacity=0}}
   if(pl&&(state==='race'||state==='countdown'||state==='finished')){updHud();AU.engine(pl,CTL.thr,!paused&&!pl.dead&&!pl.eliminated);AU.scrape(pl.wall>0&&!paused);if(pl.wrong>1&&state==='race'&&msgTimer<=0)say('','WRONG WAY',.5)}
-  PERF.js=lerp(PERF.js,performance.now()-pf0,.1);const pfOn=SET.perf||TUNE.perfHud;if(pfOn){renderer.info.autoReset=false;renderer.info.reset()}if(!(CM.on&&CM.light))composer.render();
+  PERF.js=lerp(PERF.js,performance.now()-pf0,.1);const pfOn=SET.perf||TUNE.perfHud;if(pfOn){renderer.info.autoReset=false;renderer.info.reset()}if(!(CM.on&&CM.light)){const se=TUNE.shEvery|0;if(se>1&&SET.q==='med'&&RO.shadowOn&&!(typeof SP_S!=='undefined'&&SP_S.on)){renderer.shadowMap.autoUpdate=false;if((RO.shF=(RO.shF|0)+1)%se===0)renderer.shadowMap.needsUpdate=true}else renderer.shadowMap.autoUpdate=true;composer.render()}
   // v88u: TUNE.perfHud (⚙ TUNE → Life) shows the same line with the frame's real draw calls (all passes; autoReset counted only the last pass = 1-3), triangles, JS ms and the worst frame of the last 2 s
   if(pfOn){const fm=now-(PERF.last||now-16);PERF.fps=lerp(PERF.fps||60,1000/Math.max(1,fm),.05);PERF.last=now;PERF.wm=Math.max(PERF.wm||0,fm);const ri=renderer.info.render;renderer.info.autoReset=true;if((PERF.tick=(PERF.tick||0)+1)%20===0){const el=$('#fps');el.hidden=false;el.textContent=`${Math.round(PERF.fps)}fps · worst ${Math.round(PERF.wm)}ms · JS ${Math.round(PERF.js)} · ${ri.calls}dc · ${(ri.triangles/1e6).toFixed(1)}M`;el.title=`${innerWidth}×${innerHeight} @${renderer.getPixelRatio().toFixed(2)}x · ${SET.q}`;if(PERF.tick%120===0)PERF.wm=0}}else if(PERF.tick){$('#fps').hidden=true;PERF.tick=0}}
 
@@ -6884,7 +6886,7 @@ const _lkF=new THREE.Vector3();function LK_boost(){return;if(state!=='roam'||!pl
 function LK_shadow(on){if(on&&!RO.shadowOn&&HUB.grp&&HUB.grp.visible){renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;moonL.castShadow=true;moonL.shadow.mapSize.set(2048,2048);const sc=moonL.shadow.camera;sc.left=-90;sc.right=90;sc.top=90;sc.bottom=-90;sc.near=50;sc.far=900;sc.updateProjectionMatrix();moonL.shadow.bias=-.0006;moonL.shadow.normalBias=.6;if(!moonL.target.parent)scene.add(moonL.target);RO.shadowOn=true;if(pl)pl.mesh.traverse(o=>{if(o.isMesh)o.castShadow=true})}
   if(!on&&RO.shadowOn){moonL.castShadow=false;RO.shadowOn=false;renderer.shadowMap.enabled=false}}
 function LK_lvl(){return LK_LV[Math.min(3,LK_LV.indexOf(LK.userQ||SET.q)+LK.drop)]}
-function LK_roamLook(){if(!HUB.grp||!HUB.grp.visible)return;const L=LK_lvl();scene.fog.density={high:.00016,med:.00024,low:.00032,min:.00045}[L];camera.far={high:3400,med:2600,low:2000,min:1500}[L];camera.updateProjectionMatrix();
+function LK_roamLook(){if(!HUB.grp||!HUB.grp.visible)return;const L=LK_lvl();scene.fog.density={high:.00016,med:.00024,low:.00032,min:.00045}[L];camera.far={high:3400,med:TUNE.farMed||2600,low:2000,min:1500}[L];camera.updateProjectionMatrix();
   LK.U.uLkOn.value=L==='min'?0:1;LK_shadow(L==='high'&&SET.q==='high');if(RO.shadowOn){const sc=moonL.shadow.camera;if(sc.right!==90){sc.left=sc.bottom=-90;sc.right=sc.top=90;sc.updateProjectionMatrix()}}HUB.cpos=null}
 function LK_apply(){const L=LK_lvl(),q=L==='min'?'low':L;LK.effQ=q;if(SET.q!==q){SET.q=q;_lkAQ()}LK_roamLook()}
 const _lkAQ=applyQuality;applyQuality=(...a)=>{if(LK.effQ!==null&&SET.q!==LK.effQ){LK.userQ=SET.q;LK.drop=0}else if(LK.userQ===null)LK.userQ=SET.q;LK.effQ=SET.q;const r=_lkAQ(...a);LK_roamLook();return r};
@@ -9342,8 +9344,26 @@ function DR_solidBuild(){const R=[],lm=(x,z,m)=>LMX.some(L=>Math.hypot(L.x-x,L.z
     for(const r of R){r.x0=HX0+r.i0*C;r.x1=HX0+(r.i1+1)*C;r.z0=HZS+r.j0*C;r.z1=HZS+r.j1*C}DR.inS=(x,z)=>{const i=Math.floor((x-HX0)/C),j=Math.floor((z-HZS)/C);return i>=0&&j>=0&&i<cols&&j<rows&&S[i*rows+j]===1}}
   DR.solid=R;if(!R.length)return;if(CID!=='fra'&&DR_athFill(R))return;const G=[],col=CID==='fra'?['#e8dcc8','#a85a3c']:['#efe3c8','#c8643c'];/* v89i: the plain beige filler boxes read as long blank walls: walls now carry the street-building window facade (12 m repeat) */const BMs=HUB.BM&&HUB.BM.office,W=[],TN=['#e8dcc8','#e2c9a8','#d9b99b','#ecdfc4','#d8c4b0'];
   for(const r of R){const cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,w=r.x1-r.x0,d=r.z1-r.z0;let lo=1e9,hi=-1e9;for(const[a,b]of[[r.x0,r.z0],[r.x1,r.z0],[r.x0,r.z1],[r.x1,r.z1],[cx,cz]]){const y=groundY(a,b);lo=Math.min(lo,y);hi=Math.max(hi,y)}
-    const h=hi-lo+7.5;if(BMs){const g=bxUV(w,h,d,12,13.2);g.translate(cx,lo-.5+h/2,cz);W.push(colorize(g,new THREE.Color(TN[Math.floor(DR_h(cx*.31,cz*.31)*TN.length)])))}else G.push(cbox(w,h,d,cx,lo-.5+h/2,cz,col[0]));G.push(cbox(w-1.2,.6,d-1.2,cx,lo-.5+h+.3,cz,col[1]));const b={x:cx,z:cz,hw:w/2,hd:d/2};HUB.bld.push(b);if(HUB.grid)gridAddTo(HUB.grid,[b])}
+    const h=hi-lo+7.5;if(BMs&&CID==='fra'&&DR_splitOn()){DR_fraSplit(r,lo,h,BMs,W,G,TN);continue}if(BMs){const g=bxUV(w,h,d,12,13.2);g.translate(cx,lo-.5+h/2,cz);W.push(colorize(g,new THREE.Color(TN[Math.floor(DR_h(cx*.31,cz*.31)*TN.length)])))}else G.push(cbox(w,h,d,cx,lo-.5+h/2,cz,col[0]));G.push(cbox(w-1.2,.6,d-1.2,cx,lo-.5+h+.3,cz,col[1]));const b={x:cx,z:cz,hw:w/2,hd:d/2};HUB.bld.push(b);if(HUB.grid)gridAddTo(HUB.grid,[b])}
   const m=new THREE.Mesh(mergeG(G),new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}));m.castShadow=false;m.receiveShadow=true;m.userData.dr=1;HUB.grp.add(m);if(W.length){const mw=new THREE.Mesh(DR_mergeUV(W),HUB.BM.office);mw.castShadow=false;mw.receiveShadow=true;mw.userData.dr=1;HUB.grp.add(mw)}DR.st.solid=R.length}
+// city-1 (Alex: "the city looks repetitive"; docs/CITY_VARIETY.md #1): a Frankfurt 'resid' block interior was ONE box up to ~150 m long (one height, one tint, one window grid).
+// Now a face longer than ~30 m is cut into 20-34 m segments along its long axis; each has its own height (+0..5 floors), tint (never the same as its neighbour),
+// window grid (repeat width 10-14.4 m, floor 11.2-13.2 m), a 0-4 m setback on one long side, and every third one a stepped upper tier. Same merged meshes (0 new draws), +12 tris a box.
+// ?dsp=0 = the old single box. Colliders: one rect per segment (the setback strip stays solid for props via DR.solid, which is unchanged).
+function DR_splitOn(){return!/[?&]dsp=0\b/.test(location.search)}
+function DR_fraSplit(r,lo,h0,BMs,W,G,TN){const w=r.x1-r.x0,d=r.z1-r.z0,alongX=w>=d,L=alongX?w:d,cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2,X=['#ffd24a','#ff9a7a','#8cc8ff','#b6e07a','#ff9ac4','#ffb347','#9fe0d0'],T=TN.concat(X);
+  const n=L>30?Math.max(2,Math.round(L/27)):1,wt=[];let sum=0;for(let i=0;i<n;i++){const v=.7+.6*DR_h(cx+i*3.7,cz+i*1.9);wt.push(v);sum+=v}
+  let a=alongX?r.x0:r.z0,prev=-1;const lenC=alongX?d:w;
+  for(let i=0;i<n;i++){const len=L*wt[i]/sum,b=i===n-1?(alongX?r.x1:r.z1):a+len,hv=DR_h(cx*.7+i*11.3,cz*.7+i*5.1),hw2=DR_h(cx+i*2.3,cz-i*4.1),hs=DR_h(cx-i*6.1,cz+i*3.3);
+    let k=Math.floor(hv*T.length);if(k===prev)k=(k+1)%T.length;prev=k;
+    const hh=h0-(n>1?3:0)+(n>1?[0,3.3,6.6,9.9,13.2][Math.floor(hw2*5)]:0),tw=[10,12,14.4][Math.floor(DR_h(cx+i,cz*1.3)*3)],th=[11.2,13.2][Math.floor(DR_h(cz+i,cx*1.7)*2)];
+    // setback: pull one long side in by 0 / 0 / 2.5 / 4 m (the segment keeps ≥ 14 m of depth)
+    const sb=[0,3,5,7][Math.floor(hs*4)],side=DR_h(cx+i*9,cz)<.5?-1:1;let c0=alongX?r.z0:r.x0,c1=alongX?r.z1:r.x1;if(lenC-sb>14){if(side<0)c0+=sb;else c1-=sb}
+    const sx0=alongX?a:c0,sx1=alongX?b:c1,sz0=alongX?c0:a,sz1=alongX?c1:b,sw=sx1-sx0,sd=sz1-sz0,mx=(sx0+sx1)/2,mz=(sz0+sz1)/2,col=new THREE.Color(T[k]);
+    const g=bxUV(sw,hh,sd,tw,th);g.translate(mx,lo-.5+hh/2,mz);W.push(colorize(g,col));G.push(cbox(sw-1.2,.6,sd-1.2,mx,lo-.5+hh+.3,mz,'#a85a3c'));
+    if(n>1&&i%3===1&&sw>12&&sd>12){const tt=5+Math.floor(DR_h(cx+i*4,cz+i)*3)*3.3,tw2=sw*.6,td2=sd*.6,g2=bxUV(tw2,tt,td2,tw,th);g2.translate(mx,lo-.5+hh+.6+tt/2,mz);W.push(colorize(g2,col.clone().offsetHSL(0,0,.05)));G.push(cbox(tw2-1,.5,td2-1,mx,lo-.5+hh+.6+tt+.25,mz,'#7a5a4c'))}
+    const bb={x:mx,z:mz,hw:sw/2,hd:sd/2};HUB.bld.push(bb);if(HUB.grid)gridAddTo(HUB.grid,[bb]);a=b}
+  DR.st.fraSeg=(DR.st.fraSeg||0)+n}
 // v89i: merge keeping the UV set (mergeG drops it): the filler walls need their facade texture
 function DR_mergeUV(list){const A={position:[3,[]],normal:[3,[]],uv:[2,[]],color:[3,[]]},r=new THREE.BufferGeometry();for(let g of list){g=g.index?g.toNonIndexed():g;for(const k in A){const at=g.attributes[k],n=A[k][0];for(let i=0;i<at.count;i++)for(let c=0;c<n;c++)A[k][1].push(at.getComponent?at.getComponent(i,c):at.array[i*n+c])}}for(const k in A)r.setAttribute(k,new THREE.Float32BufferAttribute(A[k][1],A[k][0]));return r}
 // v89f (Alex: "long blank grey walls with no windows" ~1.5 km out of Athens): the Athens solid fill (deep block interiors ≥ 22 m from every
@@ -15481,7 +15501,7 @@ function BV_go(){const N=HUB.nodes||[];let best=null,bn=-1;for(let i=0;i<N.lengt
   return'📍 BUSIEST STREET · measuring building variety'}
 // test view: car 16 m out from a street-life piece, looking back at it (diagonal, so the wall and pavement show)
 function BV_view(o){const a=o.h+.45;roamWarp(o.x-Math.sin(a)*16,o.z-Math.cos(a)*16,a);RO.v=0;camSnap=true;return true}
-window.__bv={view:BV_view,BV,measure:BV_measure,go:BV_go,list:BV_list,near:BV_near,ptypes:()=>Object.keys(HUB.ptypes||{}),pcount:()=>{const n={};for(const q of HUB.props||[])n[q.t]=(n[q.t]||0)+1;return n}};
+window.__bv={pickAt:(px,py)=>{const R=new THREE.Raycaster();R.setFromCamera(new THREE.Vector2(px/innerWidth*2-1,-(py/innerHeight*2-1)),camera);const h=R.intersectObjects(scene.children,true).filter(x=>x.object.visible&&x.object.type!=="LineSegments"&&x.object.type!=="Line"&&x.object.type!=="Points")[0];if(!h)return null;const o=h.object,g=o.geometry;if(g&&!g.boundingBox)g.computeBoundingBox();const b=g&&g.boundingBox;return{d:h.distance|0,type:o.type,name:o.name,par:o.parent&&o.parent.name,ud:Object.keys(o.userData).join(),bb:b?[b.max.x-b.min.x|0,b.max.y-b.min.y|0,b.max.z-b.min.z|0]:0,id:h.instanceId,cnt:o.count,p:[h.point.x|0,h.point.y|0,h.point.z|0]}},sc:()=>scene,ro:()=>({x:RO.x,z:RO.z,h:RO.h}),view:BV_view,BV,measure:BV_measure,go:BV_go,list:BV_list,near:BV_near,ptypes:()=>Object.keys(HUB.ptypes||{}),pcount:()=>{const n={};for(const q of HUB.props||[])n[q.t]=(n[q.t]||0)+1;return n}};
 // Athens roofs (called from athBuildG put for poly): garden = green roof plate + planters + pergola; tank = the Greek rooftop solar water
 // heaters (tilted dark-blue panel + white tank, 1-3 per roof); pent = penthouse (CE_dec builds it); flat = parapet + antenna only
 function BV_roof(E,U,x,z,ry,h,L){const{w,d}=U,r=BV_h(x,z,11);
@@ -18481,6 +18501,27 @@ function CVF_audit(R){R=R||150;const x=RO.x,z=RO.z,P=HUB.props||[],near={},all={
 function CVF_park(){const P=(HUB.props||[]).filter(p=>CVF_RX.test(p.t));let best=null,bn=0;for(let i=0;i<P.length;i+=7){const q=P[i];let n=0;for(const o of P)if((o.x-q.x)**2+(o.z-q.z)**2<900)n++;if(n>bn){bn=n;best=q}}
   if(!best)return null;let sp=null;for(let a=0;a<6.28&&!sp;a+=.39){const x=best.x+Math.sin(a)*22,z=best.z+Math.cos(a)*22;if(!roamHit(x,z,2.5))sp=[x,z,a+Math.PI]}if(!sp)return null;roamWarp(sp[0],sp[1],sp[2]);RO.v=0;camSnap=true;return{x:Math.round(best.x),z:Math.round(best.z),n:bn}}
 window.__cvf={CVF,audit:CVF_audit,park:CVF_park};
+// ===== C1 (city-1, 2026-10-16): STREET GREEN. Alex: "the city looks repetitive". docs/CITY_VARIETY.md #4 (+ #1 lives in src/95_drive_flow.js DR_fraSplit).
+// (1) a second street tree per ~40 m on pavements (3 tree kinds, hashed yaw; sizes come from the foliage mix TUNE.cvFol);
+// (2) low hedge / flower-box runs on bare lawns beside streets (no building within 6 m): one InstancedMesh of unit boxes per 700 m cell (frustum + distance culled).
+// No rnd() is used (the prop stream and every later layout stay as they were). Decor only: no colliders. ?c1=0 = off. Called from side() in 60_city_build6.js.
+const C1={on:!/[?&]c1=0\b/.test(location.search),n:0,meshes:0,L:[]};
+const C1_h=(x,z,s)=>{const h=Math.sin(x*12.9898+z*78.233+s*37.719)*43758.5453;return h-Math.floor(h)};
+const C1_G=['#1f6f34','#2a7a46','#246b3a','#33803a','#1b5f2e'],C1_F=['#ff4a8a','#ffd23a','#ff7a2a','#ffffff','#b46aff','#e8402a'];
+function C1_side(add,px,pz,ux,uz,w,nx,nz,k,M7,boul,x,z){if(!C1.on||!HUB.grid)return;
+  if(k%M7===M7-1&&w>=10&&(boul||C1_h(x,z,1)<.8)){const t=['tree','tree2','tree3','tree'][Math.floor(C1_h(x,z,2)*4)];add(t,x+nx*2.2+ux*1.5,z+nz*2.2+uz*1.5,C1_h(x,z,3)*6.28)}
+  if(C1_h(px,pz,4)<.7){const o=w/2+7.6,hx=px+nx*o,hz=pz+nz*o;if(gridHit(HUB.grid,hx,hz,6)||roamHit(hx,hz,2.2))return;const q=cityAt(hx,hz);if(q&&q.d<q.road.w/2+4)return;const f=fillAt(hx,hz);if(f&&f.d<f.r.w/2+4)return;
+    if(inRiver(hx,hz,2)||onAnyDeck(hx,hz))return;HUB.H1.push([hx,hz,Math.atan2(ux,uz),k])}}
+function C1_build(){const A=HUB.H1;if(!C1.on||!A||!A.length)return;const A2=A.length>9000?A.filter((_,i)=>i%Math.ceil(A.length/9000)===0):A,cells=new Map(),c=new THREE.Color();
+  for(const[hx,hz,ry,k]of A2){const kk=Math.floor(hx/700)*1000+Math.floor(hz/700);let a=cells.get(kk);if(!a)cells.set(kk,a=[]);a.push([hx,hz,ry,k])}
+  const g=new THREE.BoxGeometry(1,1,1),mat=new THREE.MeshStandardMaterial({roughness:.7,metalness:0}),M=new THREE.Matrix4(),Q=new THREE.Quaternion(),Y=new THREE.Vector3(0,1,0),P=new THREE.Vector3(),S=new THREE.Vector3();
+  for(const[,a]of cells){const inst=[];for(const[hx,hz,ry,k]of a){const y=groundY(hx,hz),r=C1_h(hx,hz,5),h=1.1+.5*C1_h(hx,hz,6);
+      if(r<.2){inst.push([hx,y+.3,hz,ry,1.5,.6,6,'#a89a8a']);inst.push([hx,y+.7,hz,ry,1.2,.25,5.6,C1_F[Math.floor(C1_h(hx,hz,7)*C1_F.length)]])}/* flower box: stone rim + bloom */
+      else{inst.push([hx,y+h/2-.1,hz,ry,1.5,h,6.4,C1_G[Math.floor(C1_h(hx,hz,8)*C1_G.length)]]);if(r<.7)inst.push([hx,y+h-.05,hz,ry,1.2,.25,6,C1_F[Math.floor(C1_h(hx,hz,9)*C1_F.length)]])}}
+    const im=new THREE.InstancedMesh(g,mat,inst.length);inst.forEach((o,i)=>{M.compose(P.set(o[0],o[1],o[2]),Q.setFromAxisAngle(Y,o[3]),S.set(o[4],o[5],o[6]));im.setMatrixAt(i,M);im.setColorAt(i,c.set(o[7]))});
+    im.receiveShadow=true;im.userData.c1h=1;im.userData.cd=420;im.userData.nsh=1;im.computeBoundingSphere();HUB.grp.add(im);C1.meshes++;C1.n+=inst.length}}
+buildHubProps=(f=>function(){HUB.H1=[];const r=f.apply(this,arguments);try{C1.meshes=C1.n=0;C1_build()}catch(e){console.warn('C1',e)}return r})(buildHubProps);
+window.__c1={C1,build:C1_build,dr:()=>DR.solid,h1:()=>HUB.H1,rd:(x,z)=>{const q=cityAt(x,z);return q?q.d-q.road.w/2:999}};
 // ===== art-6 (2026-10-14): GO state tests for the art lane's matrix FAILs (src/99c_checklist.js, TAG=art)
 // art/props-road: brick piles, brick towers and gold bricks (block scatter in the block RECT, which diagonal roads cross) used to be exempt from the
 //   OC push-off-the-road (OC_GAME). Now only roadworks (cone/barrier/clight) are. Pass: 0 of them with the footprint on a drivable surface, city-wide.
