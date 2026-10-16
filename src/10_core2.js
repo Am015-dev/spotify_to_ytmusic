@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.73',date:'16 Oct 2026',items:[{t:'NEW',s:'Race Rossi on real Frankfurt streets: two routes, a big jump and power-up bricks.'},{t:'FIXED',s:'The camera no longer hides behind buildings.'},{t:'CHANGED',s:'Faster start.'}]},
   {v:'v90m-beta.72',date:'16 Oct 2026',items:[{t:'FIXED',s:'Cars now stop at red lights and queue up.'},{t:'FIXED',s:'Far fewer crashes into roadside props.'},{t:'FIXED',s:'Trees no longer block the camera.'},{t:'CHANGED',s:'Slightly faster start.'}]},
   {v:'v90m-beta.71',date:'16 Oct 2026',items:[{t:'FIXED',s:'No more loose bricks floating in the Athens parks.'},{t:'CHANGED',s:'Lighter fir and cypress trees.'}]},
   {v:'v90m-beta.70',date:'16 Oct 2026',items:[{t:'NEW',s:'Brick-built LEGO trees in Frankfurt and Athens: 17 tree types, hedges and planters.'},{t:'CHANGED',s:'Traffic now uses all lanes.'},{t:'FIXED',s:'Pedestrians walk naturally and stay on the pavement.'}]},

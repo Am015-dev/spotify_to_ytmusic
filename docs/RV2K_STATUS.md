@@ -3,7 +3,7 @@
 |---|---|---|---|
 | 1 | race-handsoff | finished 2nd, race ended (<240 s) | ✅ |
 | 2 | walls | walls-1 fix, built page, fake-clock driver: Frankfurt 0 / 0 / 0 hits/min in 3 runs (lowest health 96; was 5.0 / 65); Athens 0, 1, 1 hits/min in 3 runs (lowest health 88–100; was 8.0 / 55). Target ≤1.5/min, health never 0 | ✅ |
-| 3 | stuck | spot 1 moves 5.1 m ✅; monkey rerun 12 sim-min/city (4 pages): 13 stuck in 23.8 min = 0.55/min raw (was 0.76). The Athens cluster x 1650–1980 now gives 1 (was 5). Replaying each of the 12 records (6 m back, gas 3 s, tools/rv/whystuck.js): 10 drive away ≥ 22 m (monkey false positives); the 2 real ones are world-edge/off-map (Fra 8008,7042 edge; Ath −5401,6324 beside an edge building) = ~0.1/min real. Raw target ≤0.3 not met | ⚠️ |
+| 3 | stuck | stuck-1 (built page out/stuck1, monkey fixed-step, 2 seeds): Frankfurt 0 stuck in 23.6 sim-min (seeds 1, 2) = 0/min; Athens 5 in 23.8 sim-min (3+1 seed 1, 0+1 seed 2) = 0.21/min; both ≤0.3 (was 0.55 raw). Cause of the old count: the monkey flagged a window as stuck even when gas/brake/unstick had changed inside it (starts from rest), and traffic jams; both now excluded (stuck needs gas held the whole 3 s, no traffic car within 7 m = `log.jam`). Replays from the stuck spot (6 m back and exact spot, 3 s W) all drive away ≥ 24 m: no collider/terrain cause found. Only recurring Athens spot: x −2466, z −1512 (3 of 5), beside a 19 m house, not fixed. No game code changed | ✅ |
 | 4 | objectives | max 2 widgets at once, 0 popups while moving | ✅ |
 | 5 | devui | 0 px² over centre 60 %, 🐞 clear | ✅ |
 | 6 | garage-car | ride 13 % of screen, 7 cards in view | ✅ |
