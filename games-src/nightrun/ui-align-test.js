@@ -149,8 +149,8 @@ print(json.dumps(out))`;
 const clickText = async (p, sel, txt) => { const h = await p.$(`${sel}:has-text("${txt}")`); if (!h) throw new Error('no ' + sel + ' with ' + txt); await h.click({ force: true }); };
 const SCREENS = [
   ['title', async p => { }],
-  ['settings', async p => { await p.click('#setBtn'); await sleep(300); }],
-  ['settings-scrolled', async p => { await p.click('#setBtn'); await sleep(300); await p.evaluate(() => { const b = document.getElementById('setBody'); if (b) b.scrollTop = b.scrollHeight; }); await sleep(200); }],
+  ['settings', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#setBtn'); await sleep(300); }],
+  ['settings-scrolled', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#setBtn'); await sleep(300); await p.evaluate(() => { const b = document.getElementById('setBody'); if (b) b.scrollTop = b.scrollHeight; }); await sleep(200); }],
   ['story-map', async p => { await clickText(p, '#title button', 'STORY'); await sleep(500); }],
   ['story-stage', async p => { await p.evaluate(() => { __mnr.sSave.all = true; __mnr.startStory(1); }); await sleep(900); }, 'canvas'],
   ['hud-run', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = true; }); await sleep(2500); }, 'canvas'],
@@ -162,10 +162,10 @@ const SCREENS = [
   ['game-over', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = false; __mnr.hurt(99); __mnr.G.deadT = 9; }); await sleep(1800); }],
   ['garage', async p => { await p.click('#gaBtn'); await sleep(500); }],
   ['garage-tabs', null],
-  ['lab-boss', async p => { await p.click('#labBtn'); await sleep(2500); }, 'canvas'],
-  ['lab-foes', async p => { await p.click('#labBtn'); await sleep(900); await p.click('#labTab_foes'); await sleep(300); }],
-  ['lab-items', async p => { await p.click('#labBtn'); await sleep(900); await p.click('#labTab_items'); await sleep(300); }],
-  ['lab-cheats', async p => { await p.click('#labBtn'); await sleep(900); await p.click('#labTab_cheats'); await sleep(300); }],
+  ['lab-boss', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#labBtn'); await sleep(2500); }, 'canvas'],
+  ['lab-foes', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#labBtn'); await sleep(900); await p.click('#labTab_foes'); await sleep(300); }],
+  ['lab-items', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#labBtn'); await sleep(900); await p.click('#labTab_items'); await sleep(300); }],
+  ['lab-cheats', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#labBtn'); await sleep(900); await p.click('#labTab_cheats'); await sleep(300); }],
 ];
 
 (async () => {

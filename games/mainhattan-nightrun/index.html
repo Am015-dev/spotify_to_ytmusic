@@ -217,7 +217,7 @@ const todayN=()=>{const d=(window.RET&&RET.daily&&RET.clock)?new Date(RET.clock(
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 // every setting, its default and (in c.js) its row in the settings panel. Saved under mnr_set, applied live by applySet().
-const DEFS={music:.45,sfx:.8,master:1,duck:true,mute:false,diff:'normal',hud:'min',auto:true,aim:false,layout:'right',sens:3,dsize:'M',win:'normal',all:false,sync:0,cue:'M',
+const DEFS={music:.45,sfx:.8,master:1,duck:true,react:true,mute:false,diff:'normal',hud:'min',auto:true,aim:false,layout:'right',sens:3,dsize:'M',win:'normal',all:false,sync:0,cue:'M',
   part:1,shake:2,flash:RM?1:2,rm:RM,hc:false,pal:'neon',q:'M',fps:60,fpsc:false};
 const SET=Object.assign({},DEFS,load('mnr_set',{}));
 if(!SET.v3){SET.v3=1;if(SET.guide===false)SET.cue='off';if(SET.reduce){SET.rm=true;SET.flash=1;}SET.part=1;SET.music=Math.min(SET.music,.45);   // older saves: calm visuals everywhere, music under the effects
@@ -291,6 +291,7 @@ const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beat
 const TR={by:{},bufs:{},busy:{},bad:{},list:[]};
 function normTrack(t){if(!t||typeof t.file!=='string'||!DEF_BPM[t.stage])return null;const bpm=+t.bpm;return{file:t.file,bpm:bpm>=40&&bpm<=300?bpm:DEF_BPM[t.stage],offsetMs:+t.offsetMs||0,gapMs:t.gapMs>=0&&t.gapMs<200?+t.gapMs:24,title:String(t.title||'').slice(0,40),stage:t.stage};}
 try{if(location.protocol!=='file:'&&(!NOMUSIC||SIM))fetch('music/tracks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;const arr=Array.isArray(j)?j:Array.isArray(j.tracks)?j.tracks:[];
+  if(Array.isArray(j.stingers))AU.stList=j.stingers.filter(x=>typeof x==='string');   // B20: stinger files that exist (music/st-<name>.mp3); only those are fetched
   for(const t of arr){const n=normTrack(t);if(n&&!TR.by[n.stage]){TR.by[n.stage]=n;TR.list.push(n);}}
   if(AU.a&&!running)AU.menuMusic();}).catch(()=>{});}catch(e){}
 const slotReady=s=>{const e=s.el;if(!s.blob||!e||e.readyState<4||!(e.duration>0)||!isFinite(e.duration))return false;s.D=e.duration;
@@ -318,13 +319,16 @@ function calTap(ts){if(!CAL.on)return null;const h=audible(ts>0?ts:undefined)-SE
 /* ---------- audio ---------- */
 const silentWav=(()=>{let u=null;return()=>{if(u)return u;try{const n=1600,b=new Uint8Array(44+n),dv=new DataView(b.buffer),w=(o,t)=>{for(let i=0;i<t.length;i++)b[o+i]=t.charCodeAt(i);};w(0,'RIFF');dv.setUint32(4,36+n,true);w(8,'WAVEfmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,8000,true);dv.setUint32(28,8000,true);dv.setUint16(32,1,true);dv.setUint16(34,8,true);w(36,'data');dv.setUint32(40,n,true);b.fill(128,44);
   u=URL.createObjectURL(new Blob([b],{type:'audio/wav'}));}catch(e){u='data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=';}return u;};})();   // 0.2 s of silence: unlocks an <audio> slot inside a tap
-const SFXGAP={shot:.16,hit:.07,graze:.12,heat:.4};
+const SFXGAP={shot:.16,hit:.07,graze:.12,heat:.4,sting:.12};
 const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
   init(){if(this.a||SIM)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
     this.m=a.createGain();try{const L=this.lim=a.createDynamicsCompressor();L.threshold.value=-4;L.knee.value=3;L.ratio.value=20;L.attack.value=.003;L.release.value=.12;this.m.connect(L);L.connect(a.destination);}catch(e){this.m.connect(a.destination);}   // master limiter: nothing clips, however many effects stack
     this.cutg=a.createGain();this.cutg.connect(this.m);                                     // the Drop power-up cuts the music here
     this.duck=a.createGain();this.duck.connect(this.cutg);                                     // music dips briefly under big effects
-    this.musv=a.createGain();this.musv.connect(this.duck);
+    this.musv=a.createGain();
+    if(window.RET&&RET.layers){const lp=this.lp=a.createBiquadFilter();lp.type='lowpass';lp.Q.value=.5;lp.frequency.value=this.lpHz[2];this.musv.connect(lp);lp.connect(this.duck);   // B19: the combo tier opens this filter
+      this.drm=a.createGain();this.drm.gain.value=0;this.drm.connect(this.musv);}                // B19: drum layer from tier 2
+    else this.musv.connect(this.duck);
     this.mus=a.createGain();this.mus.gain.value=.34;this.mus.connect(this.musv);          // synth soundtrack
     this.fb=a.createGain();this.fb.gain.value=.9;this.fb.connect(this.musv);               // music files
     this.sfxv=a.createGain();this.sfxv.connect(this.m);
@@ -345,7 +349,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
   slowColour(on){const a=this.a;if(!a||!this.cutg||!this.m)return;on=!!on;if(this.slc===on)return;this.slc=on;
     try{if(!this.lpf){this.lpf=a.createBiquadFilter();this.lpf.type='lowpass';this.lpf.Q.value=.5;this.lpf.frequency.value=20000;this.cutg.disconnect();this.cutg.connect(this.lpf);this.lpf.connect(this.m);}
       const f=this.lpf.frequency,t=a.currentTime;f.cancelScheduledValues(t);f.setTargetAtTime(on?3200:20000,t,.25);}catch(e){}},   // SLOW: a gentle low-pass on the song, no pitch change
-  duckMusic(){const a=this.a;if(!a||!this.duck||!SET.duck)return;const t=a.currentTime,g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.7,t,.012);g.setTargetAtTime(1,t+.3,.15);},
+  duckMusic(at){const a=this.a;if(!a||!this.duck||!SET.duck)return;const t=at||a.currentTime,g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.7,t,.012);g.setTargetAtTime(1,t+.3,.15);},
   vol(now){if(!this.a)return;const t=this.a.currentTime,k=now?0:.02;
     this.m.gain.setTargetAtTime(SET.mute?0:.55*SET.master,t,k||.001);this.musv.gain.setTargetAtTime(SET.music,t,k||.001);this.sfxv.gain.setTargetAtTime(SET.sfx,t,k||.001);},
   suspend(){this.hold=true;const a=this.a;for(const s of this.slots||[])if(s.playing&&!s.el.paused){s.heldPlay=true;try{s.el.pause();}catch(e){}}   // the songs keep their place
@@ -468,11 +472,54 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
   isched(a){const s16=BT.spb/4,t0=BT.t0+BT.off,now=a.currentTime;
     if(this.irev!==BT.rev||this.istep===undefined){this.irev=BT.rev;this.istep=Math.ceil((now-t0)/s16);}
     if(t0+this.istep*s16<now-.02)this.istep=Math.ceil((now-t0)/s16);
+    const D=!this.int&&this.drm?this.drm:this.mus;   // B19: the tier layer has its own gain (level x .34 = the mini-boss loudness); the mini-boss layer is unchanged
     while(t0+this.istep*s16<now+.12){const n=this.istep,t=t0+n*s16,s=((n%16)+16)%16;
-      if(s%4===0)this.osc(t,'sine',150,.22,.5,this.mus,40);
-      if(s%4===2)this.noise(t,.035,.15,8000,this.mus);
-      if(s===4||s===12)this.noise(t,.11,.28,1600,this.mus,'bandpass');
+      if(s%4===0)this.osc(t,'sine',150,.22,.5,D,40);
+      if(s%4===2)this.noise(t,.035,.15,8000,D);
+      if(s===4||s===12)this.noise(t,.11,.28,1600,D,'bandpass');
       this.istep++;}},
+  // B19 combo-driven music: the filter and the drum layer follow the combo tier (tier 1..4 = steps 0..3), changes land on the next bar line, a hit muffles the song for about a beat
+  lpHz:[2500,6000,20000,20000],lyLog:[],recT:0,
+  lyStep(){return SET.react===false||!running?2:Math.max(0,Math.min(3,(this.tier|0)-1));},
+  lyDrum(){return this.drm&&SET.react!==false&&running?[0,0,.5,1][Math.max(0,Math.min(3,(this.tier|0)-1))]:0;},
+  dlive(){return !!this.drm&&this.lyDrum()>0;},
+  lyPlan(a,now,at){const L=this.lp.frequency,D=this.drm.gain,f=this.lpHz[this.lyStep()],d=this.lyDrum()*.34;
+    L.cancelScheduledValues(now);D.cancelScheduledValues(now);L.setTargetAtTime(f,at,.12);D.setTargetAtTime(d,at,.12);
+    this.lyLog.push({k:'tier',now,at,f,d,tier:this.tier,t0:BT.t0+BT.off,spb:BT.spb});if(this.lyLog.length>200)this.lyLog.shift();},
+  lyTick(a){const key=this.lyStep()*10+this.lyDrum();if(key===this.lyKey)return;this.lyKey=key;const now=a.currentTime;let at=now;
+    if(this.recT>now)at=this.recT;   // a hit is still muffling the song: join its recovery
+    else if(running&&!paused&&BT.mode!=='none'){const bar=4*BT.spb,t0=BT.t0+BT.off;at=t0+Math.ceil((now+.02-t0)/bar)*bar;}
+    this.lyPlan(a,now,at);},
+  lyHit(){const a=this.a;if(!a||!this.lp||SET.react===false||!running||paused)return;const now=a.currentTime,spb=BT.spb||.5,t0=BT.t0+BT.off,q=spb/4,L=this.lp.frequency,D=this.drm.gain;
+    const rec=t0+Math.ceil((now+spb*.5-t0)/spb)*spb;this.recT=rec;this.lyKey=this.lyStep()*10+this.lyDrum();
+    L.cancelScheduledValues(now);D.cancelScheduledValues(now);L.setTargetAtTime(900,now,q/3);D.setTargetAtTime(0,now,.03);
+    L.setTargetAtTime(this.lpHz[this.lyStep()],rec,q);D.setTargetAtTime(this.lyDrum()*.34,rec,q);
+    this.lyLog.push({k:'hit',now,at:rec,f:900,tier:this.tier,t0,spb});if(this.lyLog.length>200)this.lyLog.shift();},
+  // B20 stingers: short one-shots on the beat grid (a perfect hit on the next 16th, the rest on the next beat), -3 dB on the sfx bus, at most one per beat and never two within 120 ms.
+  // A decoded file music/st-<name>.mp3 is used when tracks.json lists it, otherwise a soft synth stand-in.
+  stg:{},stLog:[],stLast:-9,stBeat:-9,
+  sting(n){const a=this.a;if(!a||a.state!=='running'||!window.RET||!RET.sting||SET.mute)return false;const now=a.currentTime;
+    const L=this.lastSfx||(this.lastSfx={});if(now-(L.sting||-9)<SFXGAP.sting)return false;
+    const spb=BT.spb||.5,t0=BT.t0+BT.off,grid=BT.mode!=='none'&&BT.spb>0,step=n==='perfect'?spb/4:spb;
+    const t=grid?t0+Math.ceil((now+.02-t0)/step-1e-9)*step:now+.02,bi=grid?Math.floor((t-t0)/spb+1e-6):-1;
+    if(Math.abs(t-this.stLast)<.12||(grid&&bi===this.stBeat))return false;
+    L.sting=now;this.stLast=t;this.stBeat=bi;
+    if(!this.stb){this.stb=a.createGain();this.stb.gain.value=.708;this.stb.connect(this.sfxv);}
+    const B=this.stg[n];if(B===undefined&&this.stList&&this.stList.indexOf(n)>=0){this.stg[n]=0;try{fetch('music/st-'+n+'.mp3').then(r=>r.ok?r.arrayBuffer():null).then(b=>b?a.decodeAudioData(b):null).then(buf=>{if(buf)this.stg[n]=buf;}).catch(()=>{});}catch(e){}}
+    this.stLog.push({n,t,now,spb,t0,file:!!B});if(this.stLog.length>200)this.stLog.shift();
+    if(B){const s=a.createBufferSource();s.buffer=B;s.connect(this.stb);s.start(t);}
+    else this.stSynth(n,t);
+    if(n==='boss-in'||n==='clear'||n==='fail'||n==='unlock'||n==='newbest')this.duckMusic(t);
+    return true;},
+  stSynth(n,t){const F=this.stb,f=k=>this.f(k),o=(dt,ty,k,dur,v,sl)=>this.osc(t+dt,ty,f(k),dur,v,F,sl?f(sl):0);
+    if(n==='perfect'){o(0,'sine',100,.14,.04);o(.04,'sine',107,.2,.035);}
+    else if(/^tierup/.test(n)){const m=+n.slice(6)||1;[0,4,7,12,16].slice(0,2+m).forEach((k,i)=>o(i*.07,'triangle',72+k+3*m,.22,.07));}
+    else if(n==='phase'){o(0,'sine',52,.5,.14,40);o(.12,'triangle',64,.3,.06);}
+    else if(n==='boss-in'){o(0,'sawtooth',40,.9,.07,36);o(0,'sine',40,.9,.14,32);o(.4,'triangle',76,.4,.05);}
+    else if(n==='clear'){[0,4,7,12,16].forEach((k,i)=>o(i*.09,'triangle',72+k,.3,.08));}
+    else if(n==='fail'){[7,3,0].forEach((k,i)=>o(i*.14,'sine',60+k,.4,.1));}
+    else if(n==='unlock'){o(0,'sine',84,.5,.07);o(.1,'sine',91,.6,.06);o(.2,'sine',96,.7,.05);}
+    else if(n==='newbest'){[0,7,12,19].forEach((k,i)=>o(i*.08,'triangle',76+k,.35,.07));o(.34,'sine',100,.8,.05);}},
   // power layers: every tier of the meter adds a part on the same grid (2: hats, 3: kick + clap, 4: pulsing bass line)
   tier:1,
   tlsched(a){const s16=BT.spb/4,t0=BT.t0+BT.off,now=a.currentTime,T=this.tier;
@@ -480,7 +527,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     if(t0+this.tstep*s16<now-.02)this.tstep=Math.ceil((now-t0)/s16);
     while(t0+this.tstep*s16<now+.12){const n=this.tstep,t=t0+n*s16,s=((n%16)+16)%16;
       if(s%2===0)this.noise(t,.03,.08+.02*T,9000,this.mus);
-      if(T>=3){if(s%4===0&&!this.int)this.osc(t,'sine',150,.2,.4,this.mus,40);if(s===4||s===12)this.noise(t,.09,.2,1800,this.mus,'bandpass');}
+      if(T>=3&&!this.dlive()){if(s%4===0&&!this.int)this.osc(t,'sine',150,.2,.4,this.mus,40);if(s===4||s===12)this.noise(t,.09,.2,1800,this.mus,'bandpass');}
       if(T>=4&&s%2===0)this.osc(t,'square',this.f(this.root+12+[0,7,12,7][(s/2)%4]),.11,.05,this.mus,0,2400);
       this.tstep++;}},
   calsched(a){if(!CAL.on||CAL.dom!==1)return;const now=a.currentTime;                                  // latency test: a click every half second on the audio clock
@@ -494,9 +541,10 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     f.type=type;f.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(dest);s.start(t);s.stop(t+dur+.02);},
   // the synth soundtrack: one 16th-note step is scheduled on the beat grid BT.t0 + n*spb/4
   sched(){const a=this.a;if(a&&this.slots)this.strTick(a);if(a&&CAL.on&&a.state==='running')this.calsched(a);if(a&&this.want&&running&&!paused)this.switchTo(this.want);
+    if(a&&a.state==='running'&&this.lp)this.lyTick(a);
     if(!a||a.state!=='running'||!running||paused)return;
     if(BT.mode==='synth'&&!BT.pend&&!this.want&&TR.by[BT.stage]&&TR.bufs[TR.by[BT.stage].file])this.trackReady(BT.stage);   // the song file arrived while a switch was pending: swap it in on the next bar
-    if(this.int&&BT.mode==='file')this.isched(a);
+    if((this.int||this.dlive())&&BT.mode==='file')this.isched(a);
     if(this.tier>1&&BT.mode!=='none')this.tlsched(a);
     if(BT.mode!=='synth')return;
     const s16=BT.spb/4,now=a.currentTime;if(BT.t0+this.step*s16<now-.02)this.step=Math.ceil((now-BT.t0)/s16);
@@ -766,7 +814,7 @@ if(window.ResizeObserver)new ResizeObserver(()=>fit()).observe(stage);
 
 function toGame(t){const r=frame.getBoundingClientRect();                  // portrait: the screen's up is the world's right
   return rotMode?[(r.bottom-t.clientY)/r.height*W,(t.clientX-r.left)/r.width*H]:[(t.clientX-r.left)/r.width*W,(t.clientY-r.top)/r.height*H];}
-addEventListener('keydown',e=>{const k=e.code;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(k)&&!(e.target&&e.target.tagName==='INPUT'))e.preventDefault();
+addEventListener('keydown',e=>{const k=e.code;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(k)&&!(e.target&&e.target.tagName==='INPUT')&&!(k==='Space'&&window.RET&&RET.title&&!running&&e.target&&e.target.tagName==='BUTTON'))e.preventDefault();   // RET.title: Space presses a focused menu button
   if(!K[k]){pressed[k]=stampOf(e);if(k==='Space'||k==='KeyJ')pressed.Fire=pressed[k];}
   K[k]=true;AU.unlock();
   if(k==='KeyM'&&!(e.target&&e.target.tagName==='INPUT'))toggleMute();
@@ -823,13 +871,13 @@ const FIRE_K=.62;                                          // enemy fire cadence
 const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk*AI.fk()*(DMG.on?DMG.fk*DMG.lf()*(SET.diff==='easy'?.8:1)*(ST.on?1:DMG.fkE):1);   // DMG.fk: enemies live longer now (BALANCE.md), so each fires a little less often
 function diff(){if(ST.on)return ST.d*DF.sd*UPS.d;const ease=G.loop||G.pos?1:clamp(.8+.2*G.t/150,.8,1);return(1+.17*(G.pos+G.dprog)+TUNE2.loopD*G.loop)*ease*DF.d*UPS.d;}   // endless: a smooth ramp over the districts and loops, a gentle first minutes; UPS.d = soft scaling with the player's upgrades
 const bossX=()=>rotMode?690:790;                          // where a boss stops: portrait keeps it clear of the HUD at the top
-const bossStage=k=>k===3?'boss2':k===6?'boss3':'boss';   // final boss gets its own song
+const bossStage=k=>(window.RET&&RET.dpool&&RET.DP.boss(k))||(k===3?'boss2':k===6?'boss3':'boss');   // final boss gets its own song
 // Mini-bosses and the first boss (SEK-ADLER) keep the stage song and get a drum layer; the district bosses switch to the boss song, the final boss to boss2.
-const bossSong=(k,mini)=>mini||k===0?null:bossStage(k);
+const bossSong=(k,mini)=>mini||(k===0&&!(window.RET&&RET.dpool))?null:bossStage(k);
 const ORDER=[0,1,2,4,3];                                  // endless cycle: Bank, Main, Ostend, Athens, then the final-boss district (Messe)
 const posOf=i=>Math.max(0,ORDER.indexOf(i));
 const nextDi=i=>{const p=posOf(i)+1;return p>=ORDER.length?{di:ORDER[0],wrap:true}:{di:ORDER[p],wrap:false};};
-const songFor=(i,loop)=>{const p=posOf(i);return loop?['endless','endless2'][p%2]:DISTRICTS[i]&&DISTRICTS[i].song||['stage1','stage2','stage3'][p%3];};
+const songFor=(i,loop)=>{const p=posOf(i);if(window.RET&&RET.dpool)return RET.DP.endless(i,loop|0);return loop?['endless','endless2'][p%2]:DISTRICTS[i]&&DISTRICTS[i].song||['stage1','stage2','stage3'][p%3];};
 const stageFor=(i,boss)=>ST.on?ST.def.song:boss?bossStage(DISTRICTS[i%DISTRICTS.length].boss):songFor(i,G.loop);
 function enterDistrict(i){G.di=i;G.pos=posOf(i);G.dt=0;G.d0=G.bc;G.dprog=0;G.force=false;G.boss=null;G.bossDone=false;G.waveT=3.2;G.waveWait=false;G.preload=false;const D=DISTRICTS[i];bgFor(i);DIR.begin(i);
   banner(D.name,D.sub+(G.loop?`  ·  SCHICHT ${G.loop+1}`:'')+DIR.tag(),false,3.2);AU.root=D.root;AU.boss=false;
@@ -902,7 +950,7 @@ function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,min
   const nm=o.nm||D.bossName;
   G.boss={type:'boss',k,mini,nm,lbl:o.lbl,x:W+120,y:H/2,r:o.r||(k===3?54:46),hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:o.score||5000*(k+1),
     col:o.col||[D.a,D.b,D.a,D.a][k]||D.a,p2:mini?6:14,p3:mini?11:26,minBar:mini?14:BOSS_MIN_BAR,floor:Math.ceil(hp*.62)};
-  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNUNG',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');
+  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNUNG',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');NR.emit('bossIn',{mini});
   if(G.live){const sg=bossSong(k,mini);if(sg){AU.switchTo(sg);AU.intense(false);}else AU.intense(true);}
   return G.boss;}
 
@@ -941,7 +989,7 @@ function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false}
   if(GX()<(.009+(SH.lk||0)*.3)*healK()&&P.hp<P.max)drop('hp');}   // a district has 300+ kills now: one hull drop in about 110
 // a dash waiting for its beat already protects the ship (P.dq)
 function hurt(n){n=n>1?n:1;if(P.inv>0||P.dashT>0||P.dq||G.dead||godMode||ST.over)return;if(SH.absorb())return;P.hp=Math.max(0,P.hp-n);if(n>1){shake(12);G.flash=Math.max(G.flash,.3*FX());}   // a heavy shell takes 2 hull
-  ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);tierDrop('hit');G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
+  ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);tierDrop('hit');G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');NR.emit('hurt');
   burst(P.x,P.y,'#ff3050',24,300);if(P.hp<=0)die();}
 function die(){G.dead=true;G.deadT=0;G.slow=.3;shake(16);burst(P.x,P.y,'#ffffff',40,420,1);burst(P.x,P.y,DISTRICTS[G.di].a,60,500,1.2);AU.sfx('big');}
 
@@ -970,7 +1018,7 @@ function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit(
   }}
 function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e.p2?2:1;     // phases change on bar p2 and p3; the boss cannot fall earlier than minBar (armour holds its HP at a floor)
   e.floor=bar>=e.minBar?0:bar>=e.p3?Math.max(1,Math.ceil(e.max*.04)):bar>=e.p2?Math.ceil(e.max*.3):Math.ceil(e.max*.62);e.minBar_=e.minBar;
-  if(ph!==e.ph){e.ph=ph;e.pi=0;e.pc=-2;e.cnt=0;G.eb=[];e.lasers=[];e.arm=false;banner(ph===2?'PHASE 2':'FINAL PHASE',e.nm,true,2.2);G.flash=Math.max(G.flash,.25*FX());shake(10);AU.sfx('phase');
+  if(ph!==e.ph){e.ph=ph;e.pi=0;e.pc=-2;e.cnt=0;G.eb=[];e.lasers=[];e.arm=false;banner(ph===2?'PHASE 2':'FINAL PHASE',e.nm,true,2.2);G.flash=Math.max(G.flash,.25*FX());shake(10);AU.sfx('phase');NR.emit('bossPhase',{ph});
     if(P.hp<P.max||!e.mini)G.pk.push({t:'hp',x:Math.min(e.x,W-80),y:e.y,vx:-150,vy:rnd(-50,50),bob:0});   // a broken armour plate drops a repair
     return;}
   if(e.x>bossX()||G.dead){e.arm=false;return;}
@@ -1955,7 +2003,7 @@ function mapDetail(n){const el=$('stDet');if(!el)return;if(!(n>0)){el.hidden=tru
   if(window.HEAT)HEAT.bind(n);
   $('stPlay').addEventListener('click',()=>{if(unlocked(n))startStory(n);});
   $('stDx').addEventListener('click',()=>{MAPD.sel=-1;for(const e of document.querySelectorAll('#stRows .nd.sel'))e.classList.remove('sel');el.hidden=true;});}
-function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=-1;stDraw();}
+function openStages(){ST.on=false;titleEl.hidden=true;overEl.hidden=true;resEl.hidden=true;pauseEl.hidden=true;selEl.hidden=false;MAPD.keep=false;MAPD.sel=window.RET&&RET.title?mapCurrent():-1;stDraw();}
 function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 /* one debounced relayout for resize, rotation, visualViewport and ResizeObserver; measured again after 400 ms (iOS reports the old size right after rotating) */
 {let t=0;const go=()=>{if(selEl.hidden)return;const b=$('stRows');if(Math.abs(b.clientWidth-MAPD.lastW)>2||Math.abs(b.clientHeight-MAPD.lastH)>2)stDraw();},
@@ -3136,6 +3184,8 @@ let labEl=null,garageDirty=false;
 
 /* ---------- retention parts (RETENTION.md). Each item has a flag in RET; a flag set to false leaves the game exactly as it was. ---------- */
 const RET=window.RET=window.RET||{};
+if(RET.title===undefined)RET.title=!/[?&]title=0/.test(location.search);   // B25: title diet (PLAY / CONTINUE, 5 buttons, the rest in MENU); parts/title.js
+if(RET.type===undefined)RET.type=!/[?&]type=0/.test(location.search);     // B26: text >= 14 px and touch targets >= 44 px on title, menu and map; parts/title.js
 if(RET.oneMore===undefined)RET.oneMore=true;   // B5: run-end screens show Neon banked, the next unlock bar and a ONE MORE RUN button
 RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct, can}; null when everything is owned
   let best=null;const add=(n,p)=>{if(!(p>0))return;if(!best||p<best.price)best={n,price:p};};
@@ -3302,15 +3352,190 @@ NR.on('runEnd',d=>{if(!RET.daily||!d||d.quit)return;
 #retTt b{color:#fff;font-weight:400}#retTt .ok{color:#6cf59a}#retTt button{margin-top:.4em;font:inherit;padding:.5em 1em;min-height:40px;border-radius:99px;border:1px solid #ffb020;background:#0000;color:#ffb020;cursor:pointer}
 `;document.head.appendChild(st);}
 RET.dailyShow=function(){let e=$('retTt');
+  if(RET.title&&RET.titleDraw)RET.titleDraw();
   if(!RET.daily){if(e)e.hidden=true;return;}
   if(!e){e=document.createElement('div');e.id='retTt';$('bestT').after(e);
     e.addEventListener('click',ev=>{if(ev.target.id!=='wkBtn')return;RET.wkPending=true;start(true);});}
   e.hidden=false;const d=DY.status(),w=RET.week();
+  if(RET.title){e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· claimed</span>':'Daily streak <b>'+d.streak+'</b> · <b>+'+d.reward+'</b> Neon today')+' · '+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly open · <b>+'+DY.weekly+'</b> Neon');return;}
   e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· today\'s bonus claimed</span>':'Daily streak <b>'+d.streak+'</b> · fly the daily run for <b>+'+d.reward+'</b> Neon')
    +'<br>'+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly: <b>'+w.names.join(' + ')+'</b> · boss clear = <b>+'+DY.weekly+'</b>')+(w.best?' · best '+w.best.toLocaleString('de-DE'):'')
    +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
 RET.dailyShow();
 window.DY=DY;
+
+/* ---------- B18: district song pools + a theme for every boss (POLISH.md). RET.dpool=false: the old picks, byte for byte.
+   New song = 3 steps (music-treblo/README.md): 1 the mp3 into games/mainhattan-nightrun/music/, 2 measure it (audio-test.js) and add its tracks.json entry,
+   3 one row in DP.rows below. A row whose song is not loaded (no tracks.json entry) is ignored, so a row can be added before the file arrives. ---------- */
+if(RET.dpool===undefined)RET.dpool=true;
+const DP=RET.DP={
+  base:{0:['stage1','stage2','stage3'],1:['stage2','stage3','endless'],2:['stage3','endless','endless2'],3:['endless2','stage1','stage2'],4:['athina','athina2']},   // by district index (4 = Athens); the songs that exist today
+  rows:[   // {k:song key, bpm:synth fallback tempo, d:[district indexes]}; the owner's treblo songs (cues-polish.json): d1a,d1b = Bank ... d4a,d4b = Messe
+    {k:'d1a',bpm:118,d:[0]},{k:'d1b',bpm:120,d:[0]},{k:'d2a',bpm:124,d:[1]},{k:'d2b',bpm:126,d:[1]},{k:'d3a',bpm:126,d:[2]},{k:'d3b',bpm:128,d:[2]},{k:'d4a',bpm:128,d:[3]},{k:'d4b',bpm:130,d:[3]}],
+  bossT:{0:['boss-d1','boss'],1:['boss-d2','boss3'],2:['boss-d3','boss'],3:['boss-d4','boss2'],6:['boss3']},   // boss k -> themes, the first one that is loaded wins (the last is the song we have)
+  bossRows:[{k:'boss-d1',bpm:140},{k:'boss-d2',bpm:140},{k:'boss-d3',bpm:140},{k:'boss-d4',bpm:140}]};
+for(const r of DP.rows.concat(DP.bossRows))if(!DEF_BPM[r.k])DEF_BPM[r.k]=r.bpm;   // normTrack() needs a tempo for every key it accepts
+DP.have=k=>!!(TR.by&&TR.by[k]);
+DP.pool=di=>{const o=(DP.base[di]||DP.base[0]).slice();for(const r of DP.rows)if(r.d.includes(di)&&DP.have(r.k)&&!o.includes(r.k))o.push(r.k);return o;};
+DP.boss=k=>{const a=DP.bossT[k];if(!a)return null;for(const s of a)if(DP.have(s)||s==='boss'||s==='boss2'||s==='boss3')return s;return null;};
+// the pick for step s of a sequence: the next pool song (rotating by how often the district came up) that is not the one before
+DP.pick=(dis)=>{const out=[],cnt={};for(let s=0;s<dis.length;s++){const di=dis[s],p=DP.pool(di),c=cnt[di]=(cnt[di]||0)+1,prev=out[s-1];let r=p[(c-1)%p.length];for(let j=0;j<p.length&&r===prev;j++)r=p[(c-1+j+1)%p.length];out.push(r);}return out;};
+DP.endless=(di,loop)=>{const n=ORDER.length,pos=posOf(di),dis=[];for(let l=0;l<=loop;l++)for(const d of ORDER)dis.push(d);return DP.pick(dis)[loop*n+pos];};
+DP.stage=n=>{const key=TR.list.length;if(DP.sc!==key){const dis=STAGES.map(s=>s.di);DP.sq=DP.pick(dis);DP.sc=key;}return DP.sq[n-1];};
+for(const s of STAGES){if(s.ch)continue;const old=s.song;   // challenge stages (fixed rules, tuned to their song) keep their old pick
+  Object.defineProperty(s,'song',{configurable:true,enumerable:true,get(){return RET.dpool?DP.stage(this.n):old;},set(v){Object.defineProperty(this,'song',{value:v,writable:true,configurable:true,enumerable:true});}});}
+window.__dp={STAGES,songFor,bossSong,bossStage,ORDER,DISTRICTS,songBars};   // test hook (ret-dpool-test.js)
+/* ===== B19 combo-driven music, B20 stingers (POLISH.md). The engine is in a.js (AU.lyTick / AU.lyHit / AU.sting); this only wires the events. ===== */
+if(RET.layers===undefined)RET.layers=true;   // lowpass opens with the combo tier, drum layer from tier 3, a hit muffles the song for a beat
+if(RET.sting===undefined)RET.sting=true;     // short stingers on the beat grid
+RET.lastTier=1;
+NR.on('runStart',()=>{RET.lastTier=1;});
+NR.on('hurt',()=>{if(RET.layers)AU.lyHit();});
+NR.on('tier',d=>{if(!d)return;const up=d.tier>RET.lastTier;RET.lastTier=d.tier;if(RET.sting&&up)AU.sting('tierup'+Math.min(3,d.tier-1));});
+NR.on('perfect',()=>{if(RET.sting)AU.sting('perfect');});
+NR.on('bossIn',d=>{if(RET.sting&&!(d&&d.mini))AU.sting('boss-in');});
+NR.on('bossPhase',()=>{if(RET.sting)AU.sting('phase');});
+NR.on('stageClear',()=>{if(RET.sting)AU.sting('clear');});
+NR.on('runEnd',d=>{if(RET.sting&&d&&!d.quit&&!d.cleared)AU.sting('fail');});
+
+/* ===== B27 screen transitions + bank chip + score count-up (RET.trans), B36 grade pops per 16 bars (RET.grade) ===== */
+if(RET.trans===undefined)RET.trans=true;
+if(RET.grade===undefined)RET.grade=true;
+{const st=document.createElement('style');st.textContent=`
+@keyframes retIn{from{opacity:0}to{opacity:1}}
+html.rtr .ov:not([hidden]){animation:retIn .18s ease-out}
+.retChip{position:absolute;top:8px;right:10px;z-index:6;pointer-events:none;font-family:var(--mono);font-size:clamp(12px,min(3.4vw,2.4vh),16px);color:#19e3ff;background:#05030cc0;border:1px solid #19e3ff55;border-radius:99px;padding:.15em .7em}
+.retChip b{color:#fff;font-weight:700}
+.retGr{font-family:var(--mono);font-size:clamp(12px,min(3.4vw,2.4vh),17px);color:var(--dim)}.retGr b{margin-left:.5em;color:#fff}.retGr b.S{color:#ffe14d}.retGr b.A{color:#3dffb0}
+#retPop{position:absolute;left:50%;top:max(11%,64px);z-index:4;pointer-events:none;font:700 clamp(30px,9vw,54px) var(--display);color:#fff;text-shadow:0 0 14px currentColor;opacity:0;transform:translate(-50%,0)}
+#retPop.on{animation:retPop .75s ease-out forwards}
+html.rtn #retPop.on{animation:none;opacity:1}
+@keyframes retPop{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}18%{opacity:1;transform:translate(-50%,0) scale(1.1)}70%{opacity:1;transform:translate(-50%,-4px) scale(1)}100%{opacity:0;transform:translate(-50%,-14px) scale(1)}}
+`;document.head.appendChild(st);}
+RET.motion=()=>!(SET.rm||RM);   // reduced motion (setting or OS) turns the fades and count-ups off
+RET.syncMotion=()=>{const h=document.documentElement;h.classList.toggle('rtr',!!RET.trans&&RET.motion());h.classList.toggle('rtn',!RET.motion());};
+RET.syncMotion();
+document.addEventListener('pointerdown',()=>{if(!RET.trans)return;RET.syncMotion();RET.skip();},true);   // a tap finishes any fade or count-up
+const retCnt=[];   // running count-ups: {el,to,fmt,t0,dur}
+let retRaf=0;
+function retStep(now){retRaf=0;for(let i=retCnt.length-1;i>=0;i--){const c=retCnt[i],k=Math.min(1,(now-c.t0)/c.dur);c.set(k>=1?c.to:Math.round(c.from+(c.to-c.from)*(1-(1-k)*(1-k))));if(k>=1)retCnt.splice(i,1);}if(retCnt.length)retRaf=requestAnimationFrame(retStep);}
+RET.countUp=function(set,from,to,dur){if(!RET.motion()||from===to||dur<=0){set(to);return;}   // set(n) writes the text; ends exactly on `to`
+  for(let i=retCnt.length-1;i>=0;i--)if(retCnt[i].set===set)retCnt.splice(i,1);
+  retCnt.push({set,from,to,t0:performance.now(),dur});set(from);if(!retRaf)retRaf=requestAnimationFrame(retStep);};
+RET.skip=function(){for(const c of retCnt)c.set(c.to);retCnt.length=0;try{for(const a of document.getAnimations())if(a.animationName==='retIn')a.finish();}catch(e){}};
+/* bank chip: pinned top-right on the game-over, stage-clear and stage-select screens; counts up when the bank grows */
+RET.chipV=GA.bank;RET.chips=[];
+function retChipSet(n){const t=n.toLocaleString('de-DE');for(const c of RET.chips)c.firstElementChild.textContent=t;}
+RET.chipSync=function(){if(!RET.trans)return;for(const el of [$('over'),$('stres'),$('stsel')]){if(!el||el.querySelector('.retChip'))continue;
+    const c=document.createElement('div');c.className='retChip';c.innerHTML='◆ <b></b> Neon';el.appendChild(c);RET.chips.push(c);}
+  if(RET.chipV!==GA.bank||!RET.chips[0].firstElementChild.textContent){RET.countUp(retChipSet,RET.chipV,GA.bank,800);RET.chipV=GA.bank;}};
+for(const id of ['over','stres','stsel']){const el=$(id);if(el)new MutationObserver(()=>{if(!el.hidden&&RET.trans&&!retCnt.length)RET.chipSync();}).observe(el,{attributes:true,attributeFilter:['hidden']});}
+/* grades: every 16 bars a letter from the PERFECTs and hull lost in those bars */
+RET.gr={bar:0,perf:0,hits:0,hp:0,list:[]};
+RET.gradeOf=(dp,hits)=>{const r=dp/64;return r>=.35&&hits===0?'S':r>=.2&&hits<=1?'A':r>=.08&&hits<=2?'B':'C';};   // PERFECTs per beat in 16 bars (64 beats), hull lost
+NR.on('runStart',()=>{const g=RET.gr;g.bar=0;g.perf=G.perf|0;g.hits=0;g.hp=P.hp;g.list=[];RET.chipV=GA.bank;});
+NR.on('tick',()=>{const g=RET.gr;if(P.hp<g.hp)g.hits+=g.hp-P.hp;g.hp=P.hp;});
+NR.on('bar',()=>{if(!RET.grade||!G.live||G.dead)return;const g=RET.gr;if(++g.bar%16)return;
+  const L=RET.gradeOf((G.perf|0)-g.perf,g.hits);g.list.push(L);g.perf=G.perf|0;g.hits=0;RET.pop(L);});
+RET.pop=function(L){let e=$('retPop');if(!e){e=document.createElement('div');e.id='retPop';e.setAttribute('aria-hidden','true');($('stage')||document.body).appendChild(e);
+    e.addEventListener('animationend',()=>e.classList.remove('on'));}
+  e.textContent=L;e.style.color=L==='S'?'#ffe14d':L==='A'?'#3dffb0':L==='B'?'#19e3ff':'#c9c4ec';e.classList.remove('on');void e.offsetWidth;e.classList.add('on');
+  if(!RET.motion())setTimeout(()=>e.classList.remove('on'),800);
+  if(L==='S')try{AU.sfx('up');}catch(x){}};
+/* run end: count the score up (the texts are written after the event, so wait one tick), show the grade strip */
+NR.on('runEnd',d=>{if(!d||d.quit||!RET.trans&&!RET.grade)return;setTimeout(()=>{
+  if(RET.trans){for(const [id,sc] of [['oScore','over'],['srScore','stres']]){const el=$(id);if(!el||$(sc).hidden)continue;const to=G.score|0;
+      RET.countUp(n=>{el.textContent=n.toLocaleString('de-DE');},0,to,800);}
+    RET.chipSync();}
+  if(RET.grade)for(const [id,host] of [['grO',$('over')],['grR',$('stres')]]){let e=$(id);const L=RET.gr.list;
+    if(!e){e=document.createElement('div');e.id=id;e.className='retGr';host.querySelector('.in').insertBefore(e,host.querySelector('.row'));}
+    e.hidden=!L.length;e.innerHTML=L.length?'Grades'+L.map(x=>'<b class="'+x+'">'+x+'</b>').join(''):'';}},0);});
+
+/* ---------- B24 save export / import (POLISH.md). Flag RET.saveio; off = Settings exactly as before. Hooks: click listeners on the Settings buttons and NR 'runEnd'. Nothing is executed: a file or code is parsed as data only. ---------- */
+if(RET.saveio===undefined)RET.saveio=true;
+RET.sioKeys=['arc','bank','best','chest','chk','daily','eq','hard','heat','mkt','mute','own','q','retfail','runs','set','ship','story','streak','theme','tipdone','tune','tut','tutgift','wp','wplv','wpseen'].map(k=>'mnr_'+k);   // other parts append their save keys here
+RET.sio=(()=>{const L=window.localStorage,BAK='mnr_bak',INFO='mnr_bakinfo',MAXTXT=262144,MAXVAL=65536,BAD=/^(__proto__|constructor|prototype)$/;
+  const S={sess:false,pending:null,msg:'',err:false};
+  const get=k=>{try{return L.getItem(k);}catch(e){return null;}},set=(k,v)=>{try{L.setItem(k,v);return true;}catch(e){return false;}},del=k=>{try{L.removeItem(k);}catch(e){}};
+  const info=()=>{try{const o=JSON.parse(get(INFO)||'{}');return o&&typeof o==='object'?o:{};}catch(e){return{};}};
+  const setInfo=p=>set(INFO,JSON.stringify(Object.assign(info(),p)));
+  const sum=m=>{let h=2166136261>>>0;const s=Object.keys(m).sort().map(k=>k+'='+m[k]).join('\n');for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h.toString(16);};
+  const b64e=s=>btoa(unescape(encodeURIComponent(s))),b64d=s=>decodeURIComponent(escape(atob(s)));
+  const snapshot=()=>{const m={};for(const k of RET.sioKeys){const v=get(k);if(v!=null)m[k]=v;}return m;};
+  const pack=()=>JSON.stringify({app:'mnr',v:1,t:Date.now(),sum:sum(snapshot()),keys:snapshot()});
+  const num=(v,lo,hi)=>typeof v==='number'&&isFinite(v)&&v>=lo&&v<=hi;
+  function walk(x,d){if(d>8)return false;if(typeof x==='number')return isFinite(x)&&Math.abs(x)<=1e9;if(typeof x==='string')return x.length<=300;if(x===null||typeof x==='boolean')return true;
+    if(typeof x!=='object')return false;if(Array.isArray(x))return x.length<=500&&x.every(e=>walk(e,d+1));const ks=Object.keys(x);return ks.length<=500&&ks.every(k=>!BAD.test(k)&&k.length<=60&&walk(x[k],d+1));}
+  const SHAPE={mnr_bank:v=>num(v,0,1e9),mnr_runs:v=>num(v,0,1e9),mnr_tut:v=>num(v,0,2),mnr_tutgift:v=>num(v,0,1),mnr_chest:v=>num(v,0,1),mnr_arc:v=>num(v,0,1),
+    mnr_hard:v=>typeof v==='boolean',mnr_mute:v=>typeof v==='boolean',mnr_tipdone:v=>typeof v==='boolean',mnr_wpseen:v=>typeof v==='boolean',
+    mnr_ship:v=>typeof v==='string',mnr_theme:v=>typeof v==='string',mnr_best:v=>v&&typeof v==='object'&&num(v.score,0,1e9),mnr_daily:v=>v&&typeof v==='object'&&num(v.score,0,1e9),
+    mnr_wplv:v=>v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).every(k=>num(v[k],0,99)),mnr_set:v=>v&&typeof v==='object'&&!Array.isArray(v),mnr_story:v=>v&&typeof v==='object'&&!Array.isArray(v)};
+  function parse(txt){   // -> {ok,keys,t,reason}; never changes anything
+    const no=r=>({ok:false,reason:r});
+    if(typeof txt!=='string')return no('Not a save.');txt=txt.trim();if(!txt)return no('Nothing to import.');if(txt.length>MAXTXT)return no('Too big to be a save.');
+    let raw=txt;try{if(txt[0]!=='{'){const t=txt.replace(/^MNR1\./,'').replace(/\s+/g,'').replace(/-/g,'+').replace(/_/g,'/');raw=b64d(t);}}catch(e){return no('That code is damaged.');}
+    let o;try{o=JSON.parse(raw);}catch(e){return no('That is not a Nightrun save.');}
+    if(!o||typeof o!=='object'||Array.isArray(o)||o.app!=='mnr')return no('That is not a Nightrun save.');
+    if(o.v!==1)return no('Save version '+String(o.v).slice(0,8)+' is not supported.');
+    const ks=o.keys;if(!ks||typeof ks!=='object'||Array.isArray(ks))return no('That save has no data.');
+    const names=Object.keys(ks);if(!names.length)return no('That save is empty.');
+    for(const k of names){if(BAD.test(k)||RET.sioKeys.indexOf(k)<0)return no('Unknown data in the save.');
+      const s=ks[k];if(typeof s!=='string'||s.length>MAXVAL)return no('Damaged data in the save.');
+      let v;try{v=JSON.parse(s);}catch(e){return no('Damaged data in the save.');}
+      if(!walk(v,0)||(SHAPE[k]&&!SHAPE[k](v)))return no('A value in the save is out of range.');}
+    if(typeof o.sum!=='string'||o.sum!==sum(ks))return no('The checksum does not match.');
+    return{ok:true,keys:ks,t:+o.t||0};}
+  function applyKeys(m){for(const k of RET.sioKeys)del(k);for(const k in m)set(k,m[k]);}
+  function backup(){const m=snapshot();return set(BAK,JSON.stringify({t:Date.now(),keys:m}));}
+  function hasUndo(){try{const o=JSON.parse(get(BAK)||'null');return !!(o&&o.keys&&typeof o.keys==='object');}catch(e){return false;}}
+  function doImport(p){if(!p||!p.ok)return false;if(!backup())return false;applyKeys(p.keys);setInfo({imp:Date.now()});return true;}
+  function undo(){try{const o=JSON.parse(get(BAK)||'null');if(!o||!o.keys)return false;const p=parse(JSON.stringify({app:'mnr',v:1,t:0,sum:sum(o.keys),keys:o.keys}));
+      if(!p.ok&&Object.keys(o.keys).length)return false;applyKeys(o.keys);del(BAK);setInfo({imp:Date.now()});return true;}catch(e){return false;}}
+  function persist(){if(S.sess)return;S.sess=true;try{const st=navigator.storage;if(st&&st.persist)Promise.resolve(st.persisted&&st.persisted()).then(p=>{if(!p)return st.persist();}).catch(()=>{});}catch(e){}}
+  function lsOk(){try{const k='mnr_probe';L.setItem(k,'1');L.removeItem(k);return true;}catch(e){return false;}}
+  return{parse,pack,snapshot,doImport,undo,hasUndo,persist,lsOk,info,setInfo,S,sum,BAK,INFO};})();
+RET.sioUI=(()=>{const X=RET.sio,$$=id=>document.getElementById(id);let box=null,toastT=0;
+  const css='#sioBox{display:flex;flex-direction:column;gap:8px;margin-top:2px}#sioBox .sioRow{display:flex;gap:8px;flex-wrap:wrap}#sioBox button{all:unset;box-sizing:border-box;cursor:pointer;font:italic 800 12px var(--display,sans-serif);letter-spacing:.08em;text-transform:uppercase;padding:0 14px;min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid rgba(76,234,255,.45);background:rgba(8,20,32,.7);color:#e6f6ff;text-align:center}#sioBox button.hot{background:linear-gradient(90deg,#ff6a6a,#ff9a3c);border-color:transparent;color:#1a0505}#sioBox button:focus-visible{outline:2px solid var(--yel,#ff0)}#sioBox textarea{box-sizing:border-box;width:100%;min-height:64px;max-height:120px;resize:vertical;font:12px monospace;color:#e6f6ff;background:rgba(0,0,0,.4);border:1px solid rgba(76,234,255,.35);border-radius:8px;padding:6px}#sioBox .sioNote{font:12px/1.35 var(--body,sans-serif);color:#b4d2e2;overflow-wrap:anywhere}#sioBox .sioNote.err{color:#ff8a8a}#sioBox .sioNote.ok{color:#8affb0}#sioBox .sioAsk{border:1px solid rgba(255,154,60,.7);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:8px;color:#fff;font:700 13px var(--body,sans-serif)}';
+  const when=t=>t?new Date(t).toLocaleString():'never';
+  function say(t,err,ok){X.S.msg=t;X.S.err=!!err;const n=$$('sioMsg');if(n){n.textContent=t;n.className='sioNote'+(err?' err':ok?' ok':'');}}
+  function toast(t){let e=$$('sioToast');if(!e){e=document.createElement('div');e.id='sioToast';e.style.cssText='position:fixed;left:50%;bottom:14px;transform:translateX(-50%);max-width:92vw;background:#220;color:#ffd24a;border:1px solid #ffd24a;border-radius:8px;padding:8px 12px;font:700 12px sans-serif;z-index:99999;pointer-events:none';document.body.appendChild(e);}e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{e.hidden=true;},5000);}
+  function refresh(){const n=$$('sioLast');if(!n)return;const i=X.info();let t='Last backup: '+when(i.exp);if(i.imp)t+=' · Last import: '+when(i.imp);
+    n.textContent=t+(navigator.storage&&navigator.storage.persisted?'':'');const u=$$('sioUndo');if(u)u.hidden=!X.hasUndo();
+    if(!X.lsOk()){say('Storage is blocked in this browser: progress cannot be saved.',true);}}
+  function download(){const txt=X.pack(),b=new Blob([txt],{type:'application/json'}),a=document.createElement('a'),d=new Date(),p=n=>String(n).padStart(2,'0');
+    a.href=URL.createObjectURL(b);a.download='nightrun-save-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},800);
+    X.setInfo({exp:Date.now()});say('Save file created.',false,true);refresh();}
+  function code(){return 'MNR1.'+btoa(unescape(encodeURIComponent(X.pack()))).replace(/\+/g,'-').replace(/\//g,'_');}
+  function copy(){const c=code(),ta=$$('sioTxt');X.setInfo({exp:Date.now()});refresh();
+    const done=()=>say('Code copied. Paste it on your other device.',false,true),shown=()=>{ta.value=c;ta.focus();ta.select();say('Copy the code from the box below.',false,true);};
+    try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(c).then(done,shown);return;}}catch(e){}shown();}
+  function ask(p){X.S.pending=p;const a=$$('sioAsk'),n=Object.keys(p.keys).length;a.hidden=false;
+    a.firstChild.textContent='Replace progress on this device? '+n+' saved items'+(p.t?', backed up '+when(p.t):'')+'. Your current save is kept for UNDO.';}
+  function tryText(t){const p=X.parse(t);if(!p.ok){X.S.pending=null;$$('sioAsk').hidden=true;say('Import failed: '+p.reason+' Nothing was changed.',true);return;}say('',false);ask(p);}
+  function build(){if(box&&box.isConnected)return box;const body=$$('setBody');if(!body)return null;
+    if(!$$('sioCss')){const s=document.createElement('style');s.id='sioCss';s.textContent=css;document.head.appendChild(s);}
+    const h=document.createElement('h3');h.id='sioH';h.textContent='Save';box=document.createElement('div');box.id='sioBox';
+    box.innerHTML='<div class="sioNote" id="sioLast"></div><div class="sioRow"><button type="button" id="sioFile">EXPORT FILE</button><button type="button" id="sioCopy">COPY CODE</button></div>'
+      +'<textarea id="sioTxt" rows="3" placeholder="Paste a save code here" aria-label="Save code" spellcheck="false" autocomplete="off"></textarea>'
+      +'<div class="sioRow"><button type="button" id="sioPaste">IMPORT CODE</button><button type="button" id="sioLoad">IMPORT FILE</button><button type="button" id="sioUndo" hidden>UNDO LAST IMPORT</button></div>'
+      +'<input type="file" id="sioPick" accept=".json,.txt,application/json,text/plain" hidden>'
+      +'<div class="sioAsk" id="sioAsk" hidden><span></span><div class="sioRow"><button type="button" id="sioYes" class="hot">REPLACE</button><button type="button" id="sioNo">CANCEL</button></div></div><div class="sioNote" id="sioMsg" role="status"></div>';
+    body.appendChild(h);body.appendChild(box);
+    $$('sioFile').addEventListener('click',download);$$('sioCopy').addEventListener('click',copy);
+    $$('sioPaste').addEventListener('click',()=>tryText($$('sioTxt').value));
+    $$('sioLoad').addEventListener('click',()=>$$('sioPick').click());
+    $$('sioPick').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;if(f.size>262144){say('Import failed: Too big to be a save. Nothing was changed.',true);return;}
+      const r=new FileReader();r.onload=()=>tryText(String(r.result));r.onerror=()=>say('Import failed: could not read the file.',true);r.readAsText(f);});
+    $$('sioNo').addEventListener('click',()=>{X.S.pending=null;$$('sioAsk').hidden=true;say('Cancelled. Nothing was changed.');});
+    $$('sioYes').addEventListener('click',()=>{const p=X.S.pending;X.S.pending=null;$$('sioAsk').hidden=true;
+      if(p&&X.doImport(p)){say('Progress replaced. Reloading…',false,true);setTimeout(()=>location.reload(),RET.sioNoReload?1e9:600);}else say('Import failed. Nothing was changed.',true);});
+    $$('sioUndo').addEventListener('click',()=>{if(X.undo()){say('Previous progress restored. Reloading…',false,true);setTimeout(()=>location.reload(),RET.sioNoReload?1e9:600);}else say('Nothing to undo.',true);});
+    return box;}
+  function onOpen(){const has=!!$$('sioBox');if(!RET.saveio){if(has){$$('sioBox').remove();const h=$$('sioH');if(h)h.remove();box=null;}return;}
+    setTimeout(()=>{if(!RET.saveio)return;if(!build())return;refresh();X.persist();if(!X.lsOk()&&!X.S.warned){X.S.warned=true;toast('Storage is blocked: progress will not be saved.');}},0);}
+  for(const id of['setBtn','pSetBtn']){const b=$$(id);if(b)b.addEventListener('click',onOpen);}
+  NR.on('runEnd',()=>{if(RET.saveio)X.persist();});
+  return{build,refresh,onOpen,code,toast};})();
 
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
    The LAB is a real run with G.lab set: no waves, no district clock, no boss timer, no chest or pit stop, god mode on. What appears is decided by the panel at the bottom:
@@ -3718,6 +3943,8 @@ NR.on('runStart',()=>{RSC.t0=performance.now();RSC.buf=[];RSC.cool=60;});
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L4',id:'district-songs',text:'Every district now has several songs, so the same song never plays on two stages in a row, and every boss has its own theme (the first boss too). Do the stages feel less repetitive?'},
+ {ver:'L3',id:'music-reacts',text:'The music now follows your combo: it starts muffled and opens up as your tier rises, drums join at tier 3, a hit muffles the song for a beat, and soft chimes land on the beat for tier-ups, PERFECT hits, bosses and stage clears. Does it feel good, and is anything too loud? (Settings > Audio > Music reacts turns the filter and drums off.)'},
  {ver:'L3',id:'heat-ladder',text:'After you clear the story, every cleared stage gets a HEAT ladder: tap + on the stage card for Heat 1-10. Each Heat adds one mutator (Turbo, Elite Guard, Hailstorm, Fast Decay, No Heal, -1 Hull ...), pays +20% Neon and a medal the first time. Does each step feel a little harder, never unfair?'},
  {ver:'L3',id:'daily-streak',text:'Title screen: a daily streak and a weekly challenge. Fly the DAILY RUN once a day to earn Neon (60 on day 1, up to 120 on day 7+); miss one day and the streak holds, miss two and it starts again. WEEKLY RUN: the same two mutators for everyone all week; beat the first boss once a week for 300 Neon. Is the status line clear?'},
  {ver:'L3',id:'clear-pay',text:'Clearing a stage now pays Neon: 40 plus 12 per stage number the first time, 25 more for each new star, and a tenth of that on later clears. Everything in the garage costs far less (weapons, perks), and kills pay a bit more, so a full build is a matter of hours, not weeks. Fail a stage twice and the next try gets +1 hull; fail four times and it is a little easier too. Do the prices feel fair?'},
@@ -3760,9 +3987,12 @@ const NR_CHECKLIST=[
  {ver:'I7',id:'bullet-kinds',text:'Enemy fire now varies: thin fast NEEDLES from drones, round ORBS, big slow orange SHELLS that take 2 hull, and ROCKETS that home for a moment and burst into 5 pellets when you shoot them twice.'},
  {ver:'I7',id:'perk-pressure',text:'The more perks and upgrades you own, the tougher the enemies (up to 3x hull). A maxed ship should still have to fight.'},
  {ver:'I6',id:'chest',text:'After every district boss a BOSS CHEST opens: three face-down cards, tap one to flip it and get +1 hull, a shield, EMP, Neon, a revive or a random upgrade. Then the pit stop. LAB can switch it off.'},
+ {ver:'I9',id:'polish-flow',text:'Screens now fade in, the game-over and stage-clear screens count the score up (tap to skip) and show a Neon chip top-right, and every 16 bars a grade letter (C, B, A or S) pops from your PERFECTs and hits. Does it feel smooth, and do the letters ever get in the way?'},
  {ver:'I8',id:'one-more-run',text:'The game-over and stage-clear screens now show a bar to the cheapest thing you can still unlock, and a big ONE MORE RUN button that restarts at once. Does the bar make you want one more go?'},
  {ver:'R5',id:'no-walls',text:'Kill-goal stages (Roemer, Freight Yard, Loading Dock, Boardroom, Olive Road) ask for fewer kills in Arcade, and Talos fires fewer lasers. Is there still a stage where you get stuck?'},
+ {ver:'L2',id:'save-backup',text:'Settings > Save: EXPORT your whole progress as a file or a code, and IMPORT it on another device or after a wipe. Importing asks first and keeps your old save for one UNDO. Try it: export, then import it back. Does it feel safe?'},
  {ver:'I6',id:'new-ships',text:'Three new ships in Garage > SHIPS: Drift (a wide fan), Lancer (a piercing lance every second shot) and Nova (a ring burst every third shot). They show as shapes until the art arrives. Do they feel different and worth the price?'},
+ {ver:NR_VER,id:'title-diet',text:'The title has only PLAY or CONTINUE (your next stage, in one tap), ENDLESS, DAILY, GARAGE and MENU. Story map, weekly run, weapons, lab, checklist, Flight School, settings and difficulty are in MENU. Is everything easy to find and big enough to hit?'},
  {ver:'I6',id:'badges',text:'The difficulty button on the title and the LAB show a badge per difficulty, and the stage clear screen shows a medal. Garage ship cards now show the painted ship portraits.'},
  {ver:'I6',id:'leader-look',text:'Squad leaders have a gold sheen on top of the crown and the rings so you can spot them at a glance.'},
  {ver:'I5',id:'placeholders',text:'Placeholder art is in: kit perk icons (Garage TUNE and LOAD), the SOON cards and the medal on the stage clear screen show a hatched PLACEHOLDER box with the file name. games-src/nightrun/ASSETS-NEEDED.md lists every file, its size and where it goes.'},
@@ -4510,6 +4740,77 @@ window.__tut={get on(){return TUT.on},get i(){return TUT.i},get id(){const s=TUT
   get endShown(){return TUT.endShown&&!tutC.hidden},get offerShown(){return TUT.offerShown&&!tutC.hidden},get next(){return TUT.next},
   target(){const s=TUT.cur();return s&&s.tgt?s.tgt():null;},start:()=>startTut(),go:i=>{if(TUT.on)tutGo(i);},get log(){return TUT.log},skip:()=>tutSkip(),bpos:()=>bpos(),get wpOpen(){return WP.open}};
 
+/* ---------- B25 title diet + CONTINUE, B26 type floor (POLISH.md). Flags RET.title and RET.type (ret.js); flags off = the old title.
+   Title: one big PLAY / CONTINUE, ENDLESS + DAILY, GARAGE + MENU, and the daily/weekly status chip (#retTt, drawn by ret.js).
+   MENU (#mnMore) holds the old buttons, same ids: storyBtn (stage map), wkBtn (weekly run), labBtn, wpBtn, ckB (checklist), tutBtn (Flight School),
+   setBtn (settings), diffBtn (difficulty) and the controls legend. Heat and Arcade/Classic stay on the stage plate; ONE MORE RUN stays on the run-end screens. ---------- */
+if(RET.type){const st=document.createElement('style');st.textContent=`
+#title .eyebrow,#title .stat,#title .keys,#retTt,#titleRow2 .go,#title .lede{font-size:max(14px,var(--tf,14px))}
+#title .keys b,#title .keys span{font-size:14px}
+#retTt button{min-height:44px}
+#stsel .ban small,#stsel .ban span{font-size:14px}
+#stsel .nd .stars,#stsel .nd .nm{font-size:14px}
+#stDet .dh,#stDet .gl,#stDet .rl,#stDet .stl,#stDet .tip,#stDet .lkn,#stDet .hmu,#stDet .heat,#stDet .heat b{font-size:14px}
+#stDet .arc button{min-height:44px;font-size:14px}#stDet .arc button small{font-size:14px}
+#stDet .heat button{min-height:44px}
+@media (min-width:900px){#title .lede,#title .stat,#retTt,#mnMore .keys,#stDet .gl,#stDet .stl,#stDet .tip,#stDet .rl,#stDet .lkn{font-size:16px}}
+`;document.head.appendChild(st);}
+if(RET.title)setTimeout(()=>{
+  const T=titleEl,inn=T.querySelector('.in'),keys=inn.querySelector('.keys'),chip=$('retTt'),old=[...inn.querySelectorAll('.row')];
+  const st=document.createElement('style');st.textContent=`
+#ttMain{width:100%;max-width:min(94%,440px);display:flex;flex-direction:column;gap:10px}
+#ttMain .row{flex-wrap:nowrap;gap:10px}#ttMain .row .go{flex:1 1 0;min-width:0;padding-left:.6em;padding-right:.6em}
+#playBtn{width:100%;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:clamp(20px,min(5.4vw,3.8vh),28px)}
+#playBtn small,#dailyBtn small{display:block;font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.02em;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#dailyBtn small{font-size:14px}
+#mnMore{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 5%;overflow-y:auto;background:#05030cf4}
+#mnMore[hidden]{display:none}
+#mnMore h2{margin:0;font-family:var(--display);font-size:22px;letter-spacing:.14em;color:var(--ink)}
+#mnMore .mg{width:100%;max-width:440px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#mnMore .mg .go{width:100%;min-height:48px;padding:.4em .5em;font-size:14px;letter-spacing:.06em}
+#mnMore .mg .wide{grid-column:1/-1}
+#mnMore .keys{width:100%;max-width:440px;margin:4px 0}
+#mnMore .back{width:100%;max-width:440px;min-height:48px}
+@media (max-height:600px){#title .eyebrow{display:none}#title .lede{display:none}#ttMain{gap:6px}#playBtn{min-height:56px}}
+`;document.head.appendChild(st);
+  /* main block */
+  const main=document.createElement('div');main.id='ttMain';
+  const play=document.createElement('button');play.type='button';play.className='go';play.id='playBtn';
+  const r2=document.createElement('div'),r3=document.createElement('div');r2.className=r3.className='row';
+  const menu=document.createElement('button');menu.type='button';menu.className='go dim';menu.id='moreBtn';menu.textContent='MENU';
+  $('startBtn').textContent='ENDLESS';$('startBtn').classList.add('alt');$('dailyBtn').classList.add('dim');
+  r2.append($('startBtn'),$('dailyBtn'));r3.append($('gaBtn'),menu);main.append(play,r2,r3);
+  (chip||$('bestT')).after(main);
+  /* the menu sheet */
+  const mn=document.createElement('div');mn.id='mnMore';mn.hidden=true;mn.setAttribute('role','dialog');mn.setAttribute('aria-label','Menu');
+  const h2=document.createElement('h2');h2.textContent='MENU';const grid=document.createElement('div');grid.className='mg';
+  const wk=document.createElement('button');wk.type='button';wk.className='go alt';wk.id='wkBtn';wk.textContent='WEEKLY RUN';
+  wk.addEventListener('click',()=>{if(running)return;RET.wkPending=true;start(true);});
+  const sb=$('storyBtn'),ck=inn.querySelector('.ckB');
+  sb.textContent='STAGE MAP';
+  const seq=[sb,wk,$('wpBtn'),$('labBtn'),ck,$('tutBtn'),$('setBtn'),$('diffBtn')];
+  for(const b of seq)if(b){grid.append(b);}
+  if(window.diffDraw)diffDraw();
+  const back=document.createElement('button');back.type='button';back.className='go back';back.id='mnBack';back.textContent='BACK';
+  mn.append(h2,grid);if(keys)mn.append(keys);mn.append(back);T.appendChild(mn);
+  for(const r of old){if(!r.children.length)r.remove();}
+  const open=()=>{mn.hidden=false;draw();const f=sb;if(f)f.focus();},shut=()=>{mn.hidden=true;menu.focus&&menu.focus();};
+  menu.addEventListener('click',open);back.addEventListener('click',shut);
+  mn.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b&&b.id!=='diffBtn'&&b.id!=='mnBack')mn.hidden=true;},true);   // every door closes the menu; the difficulty button only cycles
+  addEventListener('keydown',e=>{if(!mn.hidden&&e.code==='Escape'&&!(window.setEl&&!setEl.hidden)){shut();e.stopImmediatePropagation();e.preventDefault();}},true);
+  /* the label of the big button follows the save: next unbeaten stage, last Arcade/Classic choice, Heat */
+  function draw(){
+    const n=mapCurrent(),s=STAGES[n-1];if(!s)return;
+    const fresh=!Object.keys(sSave.stars).some(k=>(sSave.stars[k]|0)>0),h=window.HEAT?HEAT.lv(n):0;
+    play.innerHTML=(fresh?'PLAY':'CONTINUE')+'<small>Stage '+n+' · '+s.name+(s.ch?'':' · '+(ARC.active()?'ARCADE':'CLASSIC'))+(h?' · HEAT '+h:'')+'</small>';
+    const d=window.DY&&RET.daily?DY.status():null;
+    $('dailyBtn').innerHTML='DAILY'+(d?'<small>'+(d.claimed?'streak '+d.streak+' ✓':'+'+d.reward+' Neon')+'</small>':'');}
+  RET.titleDraw=draw;draw();
+  play.addEventListener('click',()=>{if(running)return;startStory(mapCurrent());});
+  RET.menuOpen=open;RET.menuShut=shut;
+  if(window.RET&&RET.dailyShow)RET.dailyShow();
+},0);
+
 
 // the tier meter: big x1..x4, four segments (the current one fills), a thin line that runs down before the tier slips. k = size, (cx, by) = bottom-centre
 function tierMeter(cx,by,k){const T=tierOf(C.n),col=TIERC[T-1],w=262*k,h=40*k,x0=cx-w/2,y0=by-h,pop=G.tpop>0?1+G.tpop*.4*(G.tdir>0?1:-.5):1;
@@ -4670,7 +4971,7 @@ const SCHEMA=[
   {g:'Controls',rows:[{k:'layout',l:'Touch layout',o:[['left','Left'],['right','Right']]},{k:'sens',l:'Sensitivity',s:[1,5,1],f:v=>String(v)},{k:'dsize',l:'Button size',o:[['S','Small'],['M','Medium'],['L','Large']]}]},
   {g:'Rhythm',rows:[{k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']]},{k:'all',l:'Everything counts',o:OFFON},{k:'cue',l:'Beat cue',o:[['off','Off'],['S','Small'],['M','Medium'],['L','Large']]},
     {k:'sync',l:'Latency',s:[-150,150,5],f:v=>(v>0?'+':'')+v+' ms',tap:1}]},
-  {g:'Audio',rows:[{k:'master',l:'Master',s:[0,100,5],p:1},{k:'music',l:'Music',s:[0,100,5],p:1},{k:'sfx',l:'Effects',s:[0,100,5],p:1},{k:'duck',l:'Ducking',o:[[true,'On'],[false,'Off']]},{k:'mute',l:'Mute all',o:OFFON}]},
+  {g:'Audio',rows:[{k:'master',l:'Master',s:[0,100,5],p:1},{k:'music',l:'Music',s:[0,100,5],p:1},{k:'sfx',l:'Effects',s:[0,100,5],p:1},{k:'duck',l:'Ducking',o:[[true,'On'],[false,'Off']]},{k:'react',l:'Music reacts',o:OFFON},{k:'mute',l:'Mute all',o:OFFON}]},
   {g:'Visuals',rows:[{k:'part',l:'Particles',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'shake',l:'Screen shake',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'flash',l:'Flashing',o:[[0,'Off'],[1,'Reduced'],[2,'Full']]},
     {k:'q',l:'Quality',o:[['L','Low'],['M','Medium'],['H','High']]},{k:'fps',l:'FPS cap',o:[[30,'30'],[60,'60']]},{k:"pal",l:"Colour theme",o:[['neon','Neon'],['cb','Blue-orange'],['term','Terminal']]},{k:'fpsc',l:'FPS counter',o:OFFON}]},
   {g:'Accessibility',rows:[{k:'rm',l:'Reduced motion',o:OFFON},{k:'hc',l:'High-contrast bullets',o:OFFON}]}];

@@ -1,5 +1,7 @@
 /* ---------- retention parts (RETENTION.md). Each item has a flag in RET; a flag set to false leaves the game exactly as it was. ---------- */
 const RET=window.RET=window.RET||{};
+if(RET.title===undefined)RET.title=!/[?&]title=0/.test(location.search);   // B25: title diet (PLAY / CONTINUE, 5 buttons, the rest in MENU); parts/title.js
+if(RET.type===undefined)RET.type=!/[?&]type=0/.test(location.search);     // B26: text >= 14 px and touch targets >= 44 px on title, menu and map; parts/title.js
 if(RET.oneMore===undefined)RET.oneMore=true;   // B5: run-end screens show Neon banked, the next unlock bar and a ONE MORE RUN button
 RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct, can}; null when everything is owned
   let best=null;const add=(n,p)=>{if(!(p>0))return;if(!best||p<best.price)best={n,price:p};};
@@ -166,10 +168,12 @@ NR.on('runEnd',d=>{if(!RET.daily||!d||d.quit)return;
 #retTt b{color:#fff;font-weight:400}#retTt .ok{color:#6cf59a}#retTt button{margin-top:.4em;font:inherit;padding:.5em 1em;min-height:40px;border-radius:99px;border:1px solid #ffb020;background:#0000;color:#ffb020;cursor:pointer}
 `;document.head.appendChild(st);}
 RET.dailyShow=function(){let e=$('retTt');
+  if(RET.title&&RET.titleDraw)RET.titleDraw();
   if(!RET.daily){if(e)e.hidden=true;return;}
   if(!e){e=document.createElement('div');e.id='retTt';$('bestT').after(e);
     e.addEventListener('click',ev=>{if(ev.target.id!=='wkBtn')return;RET.wkPending=true;start(true);});}
   e.hidden=false;const d=DY.status(),w=RET.week();
+  if(RET.title){e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· claimed</span>':'Daily streak <b>'+d.streak+'</b> · <b>+'+d.reward+'</b> Neon today')+' · '+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly open · <b>+'+DY.weekly+'</b> Neon');return;}
   e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· today\'s bonus claimed</span>':'Daily streak <b>'+d.streak+'</b> · fly the daily run for <b>+'+d.reward+'</b> Neon')
    +'<br>'+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly: <b>'+w.names.join(' + ')+'</b> · boss clear = <b>+'+DY.weekly+'</b>')+(w.best?' · best '+w.best.toLocaleString('de-DE'):'')
    +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
@@ -197,3 +201,154 @@ DP.stage=n=>{const key=TR.list.length;if(DP.sc!==key){const dis=STAGES.map(s=>s.
 for(const s of STAGES){if(s.ch)continue;const old=s.song;   // challenge stages (fixed rules, tuned to their song) keep their old pick
   Object.defineProperty(s,'song',{configurable:true,enumerable:true,get(){return RET.dpool?DP.stage(this.n):old;},set(v){Object.defineProperty(this,'song',{value:v,writable:true,configurable:true,enumerable:true});}});}
 window.__dp={STAGES,songFor,bossSong,bossStage,ORDER,DISTRICTS,songBars};   // test hook (ret-dpool-test.js)
+/* ===== B19 combo-driven music, B20 stingers (POLISH.md). The engine is in a.js (AU.lyTick / AU.lyHit / AU.sting); this only wires the events. ===== */
+if(RET.layers===undefined)RET.layers=true;   // lowpass opens with the combo tier, drum layer from tier 3, a hit muffles the song for a beat
+if(RET.sting===undefined)RET.sting=true;     // short stingers on the beat grid
+RET.lastTier=1;
+NR.on('runStart',()=>{RET.lastTier=1;});
+NR.on('hurt',()=>{if(RET.layers)AU.lyHit();});
+NR.on('tier',d=>{if(!d)return;const up=d.tier>RET.lastTier;RET.lastTier=d.tier;if(RET.sting&&up)AU.sting('tierup'+Math.min(3,d.tier-1));});
+NR.on('perfect',()=>{if(RET.sting)AU.sting('perfect');});
+NR.on('bossIn',d=>{if(RET.sting&&!(d&&d.mini))AU.sting('boss-in');});
+NR.on('bossPhase',()=>{if(RET.sting)AU.sting('phase');});
+NR.on('stageClear',()=>{if(RET.sting)AU.sting('clear');});
+NR.on('runEnd',d=>{if(RET.sting&&d&&!d.quit&&!d.cleared)AU.sting('fail');});
+
+/* ===== B27 screen transitions + bank chip + score count-up (RET.trans), B36 grade pops per 16 bars (RET.grade) ===== */
+if(RET.trans===undefined)RET.trans=true;
+if(RET.grade===undefined)RET.grade=true;
+{const st=document.createElement('style');st.textContent=`
+@keyframes retIn{from{opacity:0}to{opacity:1}}
+html.rtr .ov:not([hidden]){animation:retIn .18s ease-out}
+.retChip{position:absolute;top:8px;right:10px;z-index:6;pointer-events:none;font-family:var(--mono);font-size:clamp(12px,min(3.4vw,2.4vh),16px);color:#19e3ff;background:#05030cc0;border:1px solid #19e3ff55;border-radius:99px;padding:.15em .7em}
+.retChip b{color:#fff;font-weight:700}
+.retGr{font-family:var(--mono);font-size:clamp(12px,min(3.4vw,2.4vh),17px);color:var(--dim)}.retGr b{margin-left:.5em;color:#fff}.retGr b.S{color:#ffe14d}.retGr b.A{color:#3dffb0}
+#retPop{position:absolute;left:50%;top:max(11%,64px);z-index:4;pointer-events:none;font:700 clamp(30px,9vw,54px) var(--display);color:#fff;text-shadow:0 0 14px currentColor;opacity:0;transform:translate(-50%,0)}
+#retPop.on{animation:retPop .75s ease-out forwards}
+html.rtn #retPop.on{animation:none;opacity:1}
+@keyframes retPop{0%{opacity:0;transform:translate(-50%,10px) scale(.7)}18%{opacity:1;transform:translate(-50%,0) scale(1.1)}70%{opacity:1;transform:translate(-50%,-4px) scale(1)}100%{opacity:0;transform:translate(-50%,-14px) scale(1)}}
+`;document.head.appendChild(st);}
+RET.motion=()=>!(SET.rm||RM);   // reduced motion (setting or OS) turns the fades and count-ups off
+RET.syncMotion=()=>{const h=document.documentElement;h.classList.toggle('rtr',!!RET.trans&&RET.motion());h.classList.toggle('rtn',!RET.motion());};
+RET.syncMotion();
+document.addEventListener('pointerdown',()=>{if(!RET.trans)return;RET.syncMotion();RET.skip();},true);   // a tap finishes any fade or count-up
+const retCnt=[];   // running count-ups: {el,to,fmt,t0,dur}
+let retRaf=0;
+function retStep(now){retRaf=0;for(let i=retCnt.length-1;i>=0;i--){const c=retCnt[i],k=Math.min(1,(now-c.t0)/c.dur);c.set(k>=1?c.to:Math.round(c.from+(c.to-c.from)*(1-(1-k)*(1-k))));if(k>=1)retCnt.splice(i,1);}if(retCnt.length)retRaf=requestAnimationFrame(retStep);}
+RET.countUp=function(set,from,to,dur){if(!RET.motion()||from===to||dur<=0){set(to);return;}   // set(n) writes the text; ends exactly on `to`
+  for(let i=retCnt.length-1;i>=0;i--)if(retCnt[i].set===set)retCnt.splice(i,1);
+  retCnt.push({set,from,to,t0:performance.now(),dur});set(from);if(!retRaf)retRaf=requestAnimationFrame(retStep);};
+RET.skip=function(){for(const c of retCnt)c.set(c.to);retCnt.length=0;try{for(const a of document.getAnimations())if(a.animationName==='retIn')a.finish();}catch(e){}};
+/* bank chip: pinned top-right on the game-over, stage-clear and stage-select screens; counts up when the bank grows */
+RET.chipV=GA.bank;RET.chips=[];
+function retChipSet(n){const t=n.toLocaleString('de-DE');for(const c of RET.chips)c.firstElementChild.textContent=t;}
+RET.chipSync=function(){if(!RET.trans)return;for(const el of [$('over'),$('stres'),$('stsel')]){if(!el||el.querySelector('.retChip'))continue;
+    const c=document.createElement('div');c.className='retChip';c.innerHTML='◆ <b></b> Neon';el.appendChild(c);RET.chips.push(c);}
+  if(RET.chipV!==GA.bank||!RET.chips[0].firstElementChild.textContent){RET.countUp(retChipSet,RET.chipV,GA.bank,800);RET.chipV=GA.bank;}};
+for(const id of ['over','stres','stsel']){const el=$(id);if(el)new MutationObserver(()=>{if(!el.hidden&&RET.trans&&!retCnt.length)RET.chipSync();}).observe(el,{attributes:true,attributeFilter:['hidden']});}
+/* grades: every 16 bars a letter from the PERFECTs and hull lost in those bars */
+RET.gr={bar:0,perf:0,hits:0,hp:0,list:[]};
+RET.gradeOf=(dp,hits)=>{const r=dp/64;return r>=.35&&hits===0?'S':r>=.2&&hits<=1?'A':r>=.08&&hits<=2?'B':'C';};   // PERFECTs per beat in 16 bars (64 beats), hull lost
+NR.on('runStart',()=>{const g=RET.gr;g.bar=0;g.perf=G.perf|0;g.hits=0;g.hp=P.hp;g.list=[];RET.chipV=GA.bank;});
+NR.on('tick',()=>{const g=RET.gr;if(P.hp<g.hp)g.hits+=g.hp-P.hp;g.hp=P.hp;});
+NR.on('bar',()=>{if(!RET.grade||!G.live||G.dead)return;const g=RET.gr;if(++g.bar%16)return;
+  const L=RET.gradeOf((G.perf|0)-g.perf,g.hits);g.list.push(L);g.perf=G.perf|0;g.hits=0;RET.pop(L);});
+RET.pop=function(L){let e=$('retPop');if(!e){e=document.createElement('div');e.id='retPop';e.setAttribute('aria-hidden','true');($('stage')||document.body).appendChild(e);
+    e.addEventListener('animationend',()=>e.classList.remove('on'));}
+  e.textContent=L;e.style.color=L==='S'?'#ffe14d':L==='A'?'#3dffb0':L==='B'?'#19e3ff':'#c9c4ec';e.classList.remove('on');void e.offsetWidth;e.classList.add('on');
+  if(!RET.motion())setTimeout(()=>e.classList.remove('on'),800);
+  if(L==='S')try{AU.sfx('up');}catch(x){}};
+/* run end: count the score up (the texts are written after the event, so wait one tick), show the grade strip */
+NR.on('runEnd',d=>{if(!d||d.quit||!RET.trans&&!RET.grade)return;setTimeout(()=>{
+  if(RET.trans){for(const [id,sc] of [['oScore','over'],['srScore','stres']]){const el=$(id);if(!el||$(sc).hidden)continue;const to=G.score|0;
+      RET.countUp(n=>{el.textContent=n.toLocaleString('de-DE');},0,to,800);}
+    RET.chipSync();}
+  if(RET.grade)for(const [id,host] of [['grO',$('over')],['grR',$('stres')]]){let e=$(id);const L=RET.gr.list;
+    if(!e){e=document.createElement('div');e.id=id;e.className='retGr';host.querySelector('.in').insertBefore(e,host.querySelector('.row'));}
+    e.hidden=!L.length;e.innerHTML=L.length?'Grades'+L.map(x=>'<b class="'+x+'">'+x+'</b>').join(''):'';}},0);});
+
+/* ---------- B24 save export / import (POLISH.md). Flag RET.saveio; off = Settings exactly as before. Hooks: click listeners on the Settings buttons and NR 'runEnd'. Nothing is executed: a file or code is parsed as data only. ---------- */
+if(RET.saveio===undefined)RET.saveio=true;
+RET.sioKeys=['arc','bank','best','chest','chk','daily','eq','hard','heat','mkt','mute','own','q','retfail','runs','set','ship','story','streak','theme','tipdone','tune','tut','tutgift','wp','wplv','wpseen'].map(k=>'mnr_'+k);   // other parts append their save keys here
+RET.sio=(()=>{const L=window.localStorage,BAK='mnr_bak',INFO='mnr_bakinfo',MAXTXT=262144,MAXVAL=65536,BAD=/^(__proto__|constructor|prototype)$/;
+  const S={sess:false,pending:null,msg:'',err:false};
+  const get=k=>{try{return L.getItem(k);}catch(e){return null;}},set=(k,v)=>{try{L.setItem(k,v);return true;}catch(e){return false;}},del=k=>{try{L.removeItem(k);}catch(e){}};
+  const info=()=>{try{const o=JSON.parse(get(INFO)||'{}');return o&&typeof o==='object'?o:{};}catch(e){return{};}};
+  const setInfo=p=>set(INFO,JSON.stringify(Object.assign(info(),p)));
+  const sum=m=>{let h=2166136261>>>0;const s=Object.keys(m).sort().map(k=>k+'='+m[k]).join('\n');for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return h.toString(16);};
+  const b64e=s=>btoa(unescape(encodeURIComponent(s))),b64d=s=>decodeURIComponent(escape(atob(s)));
+  const snapshot=()=>{const m={};for(const k of RET.sioKeys){const v=get(k);if(v!=null)m[k]=v;}return m;};
+  const pack=()=>JSON.stringify({app:'mnr',v:1,t:Date.now(),sum:sum(snapshot()),keys:snapshot()});
+  const num=(v,lo,hi)=>typeof v==='number'&&isFinite(v)&&v>=lo&&v<=hi;
+  function walk(x,d){if(d>8)return false;if(typeof x==='number')return isFinite(x)&&Math.abs(x)<=1e9;if(typeof x==='string')return x.length<=300;if(x===null||typeof x==='boolean')return true;
+    if(typeof x!=='object')return false;if(Array.isArray(x))return x.length<=500&&x.every(e=>walk(e,d+1));const ks=Object.keys(x);return ks.length<=500&&ks.every(k=>!BAD.test(k)&&k.length<=60&&walk(x[k],d+1));}
+  const SHAPE={mnr_bank:v=>num(v,0,1e9),mnr_runs:v=>num(v,0,1e9),mnr_tut:v=>num(v,0,2),mnr_tutgift:v=>num(v,0,1),mnr_chest:v=>num(v,0,1),mnr_arc:v=>num(v,0,1),
+    mnr_hard:v=>typeof v==='boolean',mnr_mute:v=>typeof v==='boolean',mnr_tipdone:v=>typeof v==='boolean',mnr_wpseen:v=>typeof v==='boolean',
+    mnr_ship:v=>typeof v==='string',mnr_theme:v=>typeof v==='string',mnr_best:v=>v&&typeof v==='object'&&num(v.score,0,1e9),mnr_daily:v=>v&&typeof v==='object'&&num(v.score,0,1e9),
+    mnr_wplv:v=>v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).every(k=>num(v[k],0,99)),mnr_set:v=>v&&typeof v==='object'&&!Array.isArray(v),mnr_story:v=>v&&typeof v==='object'&&!Array.isArray(v)};
+  function parse(txt){   // -> {ok,keys,t,reason}; never changes anything
+    const no=r=>({ok:false,reason:r});
+    if(typeof txt!=='string')return no('Not a save.');txt=txt.trim();if(!txt)return no('Nothing to import.');if(txt.length>MAXTXT)return no('Too big to be a save.');
+    let raw=txt;try{if(txt[0]!=='{'){const t=txt.replace(/^MNR1\./,'').replace(/\s+/g,'').replace(/-/g,'+').replace(/_/g,'/');raw=b64d(t);}}catch(e){return no('That code is damaged.');}
+    let o;try{o=JSON.parse(raw);}catch(e){return no('That is not a Nightrun save.');}
+    if(!o||typeof o!=='object'||Array.isArray(o)||o.app!=='mnr')return no('That is not a Nightrun save.');
+    if(o.v!==1)return no('Save version '+String(o.v).slice(0,8)+' is not supported.');
+    const ks=o.keys;if(!ks||typeof ks!=='object'||Array.isArray(ks))return no('That save has no data.');
+    const names=Object.keys(ks);if(!names.length)return no('That save is empty.');
+    for(const k of names){if(BAD.test(k)||RET.sioKeys.indexOf(k)<0)return no('Unknown data in the save.');
+      const s=ks[k];if(typeof s!=='string'||s.length>MAXVAL)return no('Damaged data in the save.');
+      let v;try{v=JSON.parse(s);}catch(e){return no('Damaged data in the save.');}
+      if(!walk(v,0)||(SHAPE[k]&&!SHAPE[k](v)))return no('A value in the save is out of range.');}
+    if(typeof o.sum!=='string'||o.sum!==sum(ks))return no('The checksum does not match.');
+    return{ok:true,keys:ks,t:+o.t||0};}
+  function applyKeys(m){for(const k of RET.sioKeys)del(k);for(const k in m)set(k,m[k]);}
+  function backup(){const m=snapshot();return set(BAK,JSON.stringify({t:Date.now(),keys:m}));}
+  function hasUndo(){try{const o=JSON.parse(get(BAK)||'null');return !!(o&&o.keys&&typeof o.keys==='object');}catch(e){return false;}}
+  function doImport(p){if(!p||!p.ok)return false;if(!backup())return false;applyKeys(p.keys);setInfo({imp:Date.now()});return true;}
+  function undo(){try{const o=JSON.parse(get(BAK)||'null');if(!o||!o.keys)return false;const p=parse(JSON.stringify({app:'mnr',v:1,t:0,sum:sum(o.keys),keys:o.keys}));
+      if(!p.ok&&Object.keys(o.keys).length)return false;applyKeys(o.keys);del(BAK);setInfo({imp:Date.now()});return true;}catch(e){return false;}}
+  function persist(){if(S.sess)return;S.sess=true;try{const st=navigator.storage;if(st&&st.persist)Promise.resolve(st.persisted&&st.persisted()).then(p=>{if(!p)return st.persist();}).catch(()=>{});}catch(e){}}
+  function lsOk(){try{const k='mnr_probe';L.setItem(k,'1');L.removeItem(k);return true;}catch(e){return false;}}
+  return{parse,pack,snapshot,doImport,undo,hasUndo,persist,lsOk,info,setInfo,S,sum,BAK,INFO};})();
+RET.sioUI=(()=>{const X=RET.sio,$$=id=>document.getElementById(id);let box=null,toastT=0;
+  const css='#sioBox{display:flex;flex-direction:column;gap:8px;margin-top:2px}#sioBox .sioRow{display:flex;gap:8px;flex-wrap:wrap}#sioBox button{all:unset;box-sizing:border-box;cursor:pointer;font:italic 800 12px var(--display,sans-serif);letter-spacing:.08em;text-transform:uppercase;padding:0 14px;min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;border:1px solid rgba(76,234,255,.45);background:rgba(8,20,32,.7);color:#e6f6ff;text-align:center}#sioBox button.hot{background:linear-gradient(90deg,#ff6a6a,#ff9a3c);border-color:transparent;color:#1a0505}#sioBox button:focus-visible{outline:2px solid var(--yel,#ff0)}#sioBox textarea{box-sizing:border-box;width:100%;min-height:64px;max-height:120px;resize:vertical;font:12px monospace;color:#e6f6ff;background:rgba(0,0,0,.4);border:1px solid rgba(76,234,255,.35);border-radius:8px;padding:6px}#sioBox .sioNote{font:12px/1.35 var(--body,sans-serif);color:#b4d2e2;overflow-wrap:anywhere}#sioBox .sioNote.err{color:#ff8a8a}#sioBox .sioNote.ok{color:#8affb0}#sioBox .sioAsk{border:1px solid rgba(255,154,60,.7);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:8px;color:#fff;font:700 13px var(--body,sans-serif)}';
+  const when=t=>t?new Date(t).toLocaleString():'never';
+  function say(t,err,ok){X.S.msg=t;X.S.err=!!err;const n=$$('sioMsg');if(n){n.textContent=t;n.className='sioNote'+(err?' err':ok?' ok':'');}}
+  function toast(t){let e=$$('sioToast');if(!e){e=document.createElement('div');e.id='sioToast';e.style.cssText='position:fixed;left:50%;bottom:14px;transform:translateX(-50%);max-width:92vw;background:#220;color:#ffd24a;border:1px solid #ffd24a;border-radius:8px;padding:8px 12px;font:700 12px sans-serif;z-index:99999;pointer-events:none';document.body.appendChild(e);}e.textContent=t;e.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{e.hidden=true;},5000);}
+  function refresh(){const n=$$('sioLast');if(!n)return;const i=X.info();let t='Last backup: '+when(i.exp);if(i.imp)t+=' · Last import: '+when(i.imp);
+    n.textContent=t+(navigator.storage&&navigator.storage.persisted?'':'');const u=$$('sioUndo');if(u)u.hidden=!X.hasUndo();
+    if(!X.lsOk()){say('Storage is blocked in this browser: progress cannot be saved.',true);}}
+  function download(){const txt=X.pack(),b=new Blob([txt],{type:'application/json'}),a=document.createElement('a'),d=new Date(),p=n=>String(n).padStart(2,'0');
+    a.href=URL.createObjectURL(b);a.download='nightrun-save-'+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},800);
+    X.setInfo({exp:Date.now()});say('Save file created.',false,true);refresh();}
+  function code(){return 'MNR1.'+btoa(unescape(encodeURIComponent(X.pack()))).replace(/\+/g,'-').replace(/\//g,'_');}
+  function copy(){const c=code(),ta=$$('sioTxt');X.setInfo({exp:Date.now()});refresh();
+    const done=()=>say('Code copied. Paste it on your other device.',false,true),shown=()=>{ta.value=c;ta.focus();ta.select();say('Copy the code from the box below.',false,true);};
+    try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(c).then(done,shown);return;}}catch(e){}shown();}
+  function ask(p){X.S.pending=p;const a=$$('sioAsk'),n=Object.keys(p.keys).length;a.hidden=false;
+    a.firstChild.textContent='Replace progress on this device? '+n+' saved items'+(p.t?', backed up '+when(p.t):'')+'. Your current save is kept for UNDO.';}
+  function tryText(t){const p=X.parse(t);if(!p.ok){X.S.pending=null;$$('sioAsk').hidden=true;say('Import failed: '+p.reason+' Nothing was changed.',true);return;}say('',false);ask(p);}
+  function build(){if(box&&box.isConnected)return box;const body=$$('setBody');if(!body)return null;
+    if(!$$('sioCss')){const s=document.createElement('style');s.id='sioCss';s.textContent=css;document.head.appendChild(s);}
+    const h=document.createElement('h3');h.id='sioH';h.textContent='Save';box=document.createElement('div');box.id='sioBox';
+    box.innerHTML='<div class="sioNote" id="sioLast"></div><div class="sioRow"><button type="button" id="sioFile">EXPORT FILE</button><button type="button" id="sioCopy">COPY CODE</button></div>'
+      +'<textarea id="sioTxt" rows="3" placeholder="Paste a save code here" aria-label="Save code" spellcheck="false" autocomplete="off"></textarea>'
+      +'<div class="sioRow"><button type="button" id="sioPaste">IMPORT CODE</button><button type="button" id="sioLoad">IMPORT FILE</button><button type="button" id="sioUndo" hidden>UNDO LAST IMPORT</button></div>'
+      +'<input type="file" id="sioPick" accept=".json,.txt,application/json,text/plain" hidden>'
+      +'<div class="sioAsk" id="sioAsk" hidden><span></span><div class="sioRow"><button type="button" id="sioYes" class="hot">REPLACE</button><button type="button" id="sioNo">CANCEL</button></div></div><div class="sioNote" id="sioMsg" role="status"></div>';
+    body.appendChild(h);body.appendChild(box);
+    $$('sioFile').addEventListener('click',download);$$('sioCopy').addEventListener('click',copy);
+    $$('sioPaste').addEventListener('click',()=>tryText($$('sioTxt').value));
+    $$('sioLoad').addEventListener('click',()=>$$('sioPick').click());
+    $$('sioPick').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;if(f.size>262144){say('Import failed: Too big to be a save. Nothing was changed.',true);return;}
+      const r=new FileReader();r.onload=()=>tryText(String(r.result));r.onerror=()=>say('Import failed: could not read the file.',true);r.readAsText(f);});
+    $$('sioNo').addEventListener('click',()=>{X.S.pending=null;$$('sioAsk').hidden=true;say('Cancelled. Nothing was changed.');});
+    $$('sioYes').addEventListener('click',()=>{const p=X.S.pending;X.S.pending=null;$$('sioAsk').hidden=true;
+      if(p&&X.doImport(p)){say('Progress replaced. Reloading…',false,true);setTimeout(()=>location.reload(),RET.sioNoReload?1e9:600);}else say('Import failed. Nothing was changed.',true);});
+    $$('sioUndo').addEventListener('click',()=>{if(X.undo()){say('Previous progress restored. Reloading…',false,true);setTimeout(()=>location.reload(),RET.sioNoReload?1e9:600);}else say('Nothing to undo.',true);});
+    return box;}
+  function onOpen(){const has=!!$$('sioBox');if(!RET.saveio){if(has){$$('sioBox').remove();const h=$$('sioH');if(h)h.remove();box=null;}return;}
+    setTimeout(()=>{if(!RET.saveio)return;if(!build())return;refresh();X.persist();if(!X.lsOk()&&!X.S.warned){X.S.warned=true;toast('Storage is blocked: progress will not be saved.');}},0);}
+  for(const id of['setBtn','pSetBtn']){const b=$$(id);if(b)b.addEventListener('click',onOpen);}
+  NR.on('runEnd',()=>{if(RET.saveio)X.persist();});
+  return{build,refresh,onOpen,code,toast};})();
