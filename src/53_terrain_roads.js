@@ -151,7 +151,27 @@ const TR_RG=TERR.on&&new URLSearchParams(location.search).get('trg')!=='0';
 function TR_roadsInit(W,force){if(!TR_RG)return;if(CID!=='fra'&&!force)return;  // Athens: graded after AB_auto has extended the dead-end streets (TR_afterExt)
   const T0=performance.now(),R=[];try{for(const S of CITY_S)if(S.r.cls!=='hill'||CID!=='fra')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2,g:S.r.cls==='hill'?.3:0})
     if(CID==='fra')for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
-    const skip=CID==='fra'?TR_rivSkip:null,pinY=(x,z)=>{for(const b of BRIDGES){if(Math.abs(x-b.cx)>b.r+30||Math.abs(z-b.cz)>b.r+30)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(c)<b.w&&Math.abs(a)>b.half-5&&Math.abs(a)<b.half+45){const v=deckY(b,Math.sign(a)*b.half);if(v!=null)return v}}return null};if(/trdbg/.test(location.search))W.trSnap={S:CITY_S.slice(),n:CITY_S.map(S=>S.pts.length),p0:CITY_S.map(S=>S.pts[0]),pts:CITY_S.map(S=>S.pts)};W.trg={n:TR_grade(W,R,{skip,pin:CID==='fra'?TR_rivPin:null,flat:W.r+4,g:CID==='fra'?.085:.07,junc:TR_padList()}),ms:0}}catch(e){W.trg={err:String(e)}}W.trg.ms=Math.round(performance.now()-T0);try{TR_bridgeEnds()}catch(e){}}
+    const skip=CID==='fra'?TR_rivSkip:null,pinY=(x,z)=>{for(const b of BRIDGES){if(Math.abs(x-b.cx)>b.r+30||Math.abs(z-b.cz)>b.r+30)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(c)<b.w&&Math.abs(a)>b.half-5&&Math.abs(a)<b.half+45){const v=deckY(b,Math.sign(a)*b.half);if(v!=null)return v}}return null};if(/trdbg/.test(location.search))W.trSnap={S:CITY_S.slice(),n:CITY_S.map(S=>S.pts.length),p0:CITY_S.map(S=>S.pts[0]),pts:CITY_S.map(S=>S.pts)};W.trg={n:TR_grade(W,R,{skip,pin:CID==='fra'?TR_rivPin:null,flat:W.r+4,g:CID==='fra'?.085:.07,junc:TR_padList()}),ms:0};TR8_fadeRoads(W,R,TR_padList())}catch(e){W.trg={err:String(e)}}W.trg.ms=Math.round(performance.now()-T0);try{TR_bridgeEnds()}catch(e){}}
+// terr-8 (Alex b60 deep bowl, simple route): after grading, the terrain beside every road / filler road / junction or plaza pad is held inside a
+// 26° cone around the nearest road cell's height (|h − H| ≤ d·tan 26°), fully up to 60 m from the road edge, fading out by 120 m (a plain
+// 40 m blend toward road height squeezed tall hills into steeper walls): no basins or walls beside the roads. Acropolis plateau kept.
+// Default OFF (?t8f=1 on, Athens then fits its ground live): pitscan barely moved (fra pits 96→95, steep 118→114; ath 296/597→296/595), so the
+// steep cells beside roads are not in this raster pass (road cut/fill feathers or groundY's own ribbons; FILL_R is not built yet here). Distance + nearest road height by a
+// 2-pass chamfer. River banks (inRiver −25 m) are left alone.
+const TR8_F=60,TR8_K=Math.tan(26*Math.PI/180),TR8_FON=new URLSearchParams(location.search).get('t8f')==='1';if(TR8_FON&&typeof QTC!=='undefined')QTC.ok=false;
+function TR8_fadeRoads(W,R,pads){if(!TR8_FON)return;const T0=performance.now(),{r,nx,nz,h}=W,n=nx*nz,D=new Float32Array(n).fill(1e9),H=new Float32Array(n);
+  const seed=(x0,z0,x1,z1,hw)=>{const i0=Math.max(0,Math.floor((Math.min(x0,x1)-hw-WX0)/r)),i1=Math.min(nx-1,Math.ceil((Math.max(x0,x1)+hw-WX0)/r)),j0=Math.max(0,Math.floor((Math.min(z0,z1)-hw-WZS)/r)),j1=Math.min(nz-1,Math.ceil((Math.max(z0,z1)+hw-WZS)/r));
+    const dx=x1-x0,dz=z1-z0,L2=dx*dx+dz*dz||1;for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const x=WX0+i*r,z=WZS+j*r,t=clamp(((x-x0)*dx+(z-z0)*dz)/L2,0,1),d=Math.hypot(x-x0-dx*t,z-z0-dz*t);if(d<=hw){const k=j*nx+i;if(D[k]){D[k]=0;H[k]=h[k]}}}};
+  for(const q of R){const P=q.P;for(let a=0;a<P.length-1;a++)seed(P[a][0],P[a][1],P[a+1][0],P[a+1][1],(q.hw||4))}
+  let FR=[];try{FR=FILL_R||[]}catch(e){}if(CID==='fra')for(const f of FR)seed(f.x0,f.z0,f.x0+f.ux*f.L,f.z0+f.uz*f.L,f.w/2);
+  for(const p of pads||[])seed(p[0],p[1],p[0],p[1],p[2]);
+  const s2=r*Math.SQRT2,rel=(k,k2,c)=>{const d=D[k2]+c;if(d<D[k]){D[k]=d;H[k]=H[k2]}};
+  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i;if(i)rel(k,k-1,r);if(j){rel(k,k-nx,r);if(i)rel(k,k-nx-1,s2);if(i<nx-1)rel(k,k-nx+1,s2)}}
+  for(let j=nz-1;j>=0;j--)for(let i=nx-1;i>=0;i--){const k=j*nx+i;if(i<nx-1)rel(k,k+1,r);if(j<nz-1){rel(k,k+nx,r);if(i<nx-1)rel(k,k+nx+1,s2);if(i)rel(k,k+nx-1,s2)}}
+  let m=0;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i,d=D[k];if(d<=0||d>=2*TR8_F)continue;const x=WX0+i*r,z=WZS+j*r;if(WATERS.length&&inRiver(x,z,-25))continue;
+    if(CID!=='fra'&&typeof HILL_BY!=='undefined'&&HILL_BY.akro&&athHill1(HILL_BY.akro,x,z)>0)continue;
+    const lim=TR8_K*d,c=clamp(h[k],H[k]-lim,H[k]+lim);if(c===h[k])continue;const t=clamp((d-TR8_F)/TR8_F,0,1),w=1-t*t*(3-2*t);h[k]+=(c-h[k])*w;m++}
+  W.tr8={fill:FR.length,cells:m,ms:Math.round(performance.now()-T0)}}
 // every deck (city bridges had none: decks from y 0) starts and ends at the graded ground, re-read after each grading pass: no step at the joints
 function TR_bridgeEnds(){if(CID!=='fra'||!TR_RG)return;for(const b of[...BRIDGES,...(AB_BRIDGES||[])]){const g=s=>{const[x,z]=deckPt(b,s*(b.half+.6));return TR_G(x,z)};b.yA=g(-1);b.yB=g(1);b.trE=1}}
 
