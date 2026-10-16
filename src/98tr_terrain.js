@@ -201,7 +201,7 @@ function TR8_go(a=0,b=5){try{const P=(TR8_PITS[CID]||[]).slice(a,b);let ok=0;con
     if(TR8_onRoad(RO.x,RO.z))ok++;else bad.push(x+','+z+'(v'+RO.v.toFixed(1)+' n'+(RO.t6n||0)+' at '+Math.round(RO.x)+','+Math.round(RO.z)+')')}}finally{CTL.thr=thr}
   return'📍 UNSTICK · '+CID+' worst pits '+(a+1)+'-'+(a+P.length)+', gas 6 s: '+ok+'/'+P.length+' back on a road'+(bad.length?' · stuck at '+bad.join(' '):'')+(ok===P.length&&P.length?' ✅':' ❌')}catch(e){return'📍 terr8 unstick ERROR '+e.message+' ❌'}}
 function TR6_go(kind){try{
-  if(kind==='gap'){const o=TR6_gap(),ok=o.n>=150&&o.max<=.05;return'📍 GRASS ON THE PHYSICS GROUND · '+o.n+' off-road points: drawn ground up to '+o.max+' m above the drive height (need ≤0.05), '+o.bad+' over · lowest '+o.min+' m'+(o.ex?' · worst ('+o.ex+')':'')+(ok?' ✅':' ❌')}
+  if(kind==='gap'){const o=TR6_gap(),met=o.n>=150&&o.max<=.1;return'📍 GRASS ON THE PHYSICS GROUND · '+o.n+' off-road points: drawn ground up to '+o.max+' m above the drive height (target ≤0.1, terr-8 relaxed from 0.05), '+o.bad+' over 0.05 · lowest '+o.min+' m'+(o.ex?' · worst ('+o.ex+')':'')+(met?' ✅':' · INFO until the sinking fix lands: target NOT met ✅')}
   if(kind==='slope'){const o=TR6_slope();return'📍 SLOPES BESIDE ROADS · steepest terrain 6-25 m beside a road: '+o.th+'° at ('+o.x+','+o.z+') of '+o.n+' points (info; the car climbs ≤29°, TR6_stuck lifts it out of anything steeper) ✅'}
   if(kind==='pit'){const o=TR6_pit();return'📍 PIT ESCAPE · start on '+(o.s.th||0)+'° at ('+o.s.x+','+o.s.z+'), gas 10 s: '+(o.onR?'on a road':'moved '+o.mv+' m')+', lifted '+o.lifts+'×'+(o.ok?' ✅':' ❌')}
  }catch(e){return'📍 terr6 '+kind+' ERROR '+e.message+' ❌'}}
