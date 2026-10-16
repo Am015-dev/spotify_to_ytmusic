@@ -378,7 +378,7 @@ window.__SP={S:SP_S,open:SP_open,go:SP_go,start:(o={})=>{Object.assign(SP_S,{m:o
 function TR_res(a,b,c,d){const N=6,h00=tH(a,c),h10=tH(b,c),h01=tH(a,d),h11=tH(b,d);let e=0;
   for(let i=1;i<N;i++)for(let j=1;j<N;j++){const u=i/N,v=j/N,l=(h00*(1-u)+h10*u)*(1-v)+(h01*(1-u)+h11*u)*v;e=Math.max(e,Math.abs(tH(a+(b-a)*u,c+(d-c)*v)-l))}
   if(e<.05)return false;const n=Math.min(Math.ceil((b-a)/8),Math.ceil(Math.sqrt(e/.05)));return n<=1?false:(b-a)/n}
-{const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{const out=_g(grp,x0,x1,z0,z1,{...o,hilly:TR_res,y0:(o.y0||0)-.005});for(const m of out)m.userData.trG=1;return out}}
+{const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{const out=_g(grp,x0,x1,z0,z1,{...o,hilly:(a,b,c,d)=>ART7_t6()||TR_res(a,b,c,d),y0:(o.y0||0)-.005});for(const m of out)m.userData.trG=1;return out}}
 // buildings: most city builders place bodies at y=0. Right after the city merge (first hubGrid) every collider footprint gets its ground
 // (min/max over corners, edges, centre). Bodies that start below their ground are lifted to max(lowest corner, highest corner - 0.8 m)
 // (vertices of merged meshes and instance origins inside the footprint, + 1.6 m for balconies/eaves); a stone plinth fills down to the
@@ -415,7 +415,11 @@ let TR_bf=0;{const _hg=hubGrid;hubGrid=()=>{if(!TR_bf&&HUB.grp){TR_bf=1;TR_bldFi
 function TR_pre(dt){RO.trSlope=null;const T=roamTerr(RO.x,RO.z,RO.y+.3);if(RO.y>T.g+.5||T.deck||T.g<-1.5){RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);return}
   const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz),th=Math.atan(s),fx=Math.sin(RO.vh??RO.h),fz=Math.cos(RO.vh??RO.h),a=gx*fx+gz*fz;RO.trSlope={gx,gz,th,a};
   RO.v-=9.8*.75*a/Math.sqrt(1+a*a)*dt;const grip=clamp((.665-th)/(.665-.5),0,1);RO.trGrip=grip;
-  if(grip<1){if(a>0&&RO.v>-2&&CTL&&(CTL.thr||CTL.boost))RO.v-=(1-grip)*58*dt;RO.trSl=Math.min(9,(RO.trSl||0)+(1-grip)*16*dt)}else RO.trSl=Math.max(0,(RO.trSl||0)-12*dt)}
+  if(grip<1){if(a>0&&RO.v>-2&&CTL&&(CTL.thr||CTL.boost))RO.v-=(1-grip)*58*dt;RO.trSl=Math.min(9,(RO.trSl||0)+(1-grip)*16*dt)}else RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);TR6_stuck(dt,th)}
+// terr-6 (Alex b60 deep bowl): gas held, < 2 m/s, on a terrain slope > 20° for 3 s (a little slack for rocking back and forth) → lift to the nearest road
+function TR6_stuck(dt,th){if(new URLSearchParams(location.search).get('t6r')==='0')return;const on=CTL&&(CTL.thr||CTL.boost)&&Math.abs(RO.v)<2&&th>.349;
+  RO.t6s=on?(RO.t6s||0)+dt:Math.max(0,(RO.t6s||0)-.5*dt);if(RO.t6s<3)return;RO.t6s=0;
+  for(const r of[80,200,450,900]){const q=rfSnap(RO.x,RO.z,r);if(q[0]!==RO.x||q[1]!==RO.z){if(roamWarp(q[0],q[1],q[2])){RO.v=0;RO.t6n=(RO.t6n||0)+1}return}}}
 function TR_post(dt){const S=RO.trSlope;if(RO.trSl>.05&&S){const s=Math.hypot(S.gx,S.gz)||1,dx=-S.gx/s*RO.trSl*dt,dz=-S.gz/s*RO.trSl*dt;if(!roamHit(RO.x+dx,RO.z+dz,2.2,RO.y)){RO.x+=dx;RO.z+=dz}}
   TR_snap();TR_summitStep()}
 function TR_snap(){const dt=1/60,T=roamTerr(RO.x,RO.z,RO.y+.3),g=T.g;RO.trDeck=!!T.deck;

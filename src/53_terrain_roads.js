@@ -31,7 +31,7 @@ function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX
 // the tab (sessionStorage, so GO reloads keep it) or for good with localStorage mho_terr=0; ?terr=1 = on again. ?trx=0 / ?trg=0 / ?trc=0 switch one part off
 const TERR={on:(()=>{try{const q=new URLSearchParams(location.search).get('terr');if(q!=null)sessionStorage.setItem('mho_terr',q);return(q??sessionStorage.getItem('mho_terr')??localStorage.getItem('mho_terr'))!=='0'}catch(e){return true}})()};
 // the Athens ground-quadtree cache (10b) is fitted on the TERR raster (tools/qtdump.js after any height change): with ?terr=0 every cell is fitted live
-if((!TERR.on||window.__qtdump)&&typeof QTC!=='undefined')QTC.ok=false;
+if((!TERR.on||window.__qtdump||(QTC.v!==6)===ART7_t6())&&typeof QTC!=='undefined')QTC.ok=false;  // terr-6: the cache is fitted for the terr-6 fit (v:6); ?t6m=0 fits live
 // terr-4 (Alex: hills from more streets): stronger in-city relief, default ON; ?trh=0 = terr-3's k. ?trk=<k> overrides k (tests; the Athens
 // quadtree cache is fitted on the default (trh on), so ?trh=0 or any ?trk fits every cell live)
 const TR_H4=(()=>{const q=new URLSearchParams(location.search);return{on:TERR.on&&q.get('trh')!=='0',k:q.get('trk')}})();

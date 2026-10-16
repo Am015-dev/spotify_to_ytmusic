@@ -176,3 +176,25 @@ function TRN_crownGo(){if(!TR_GT.on)return'📍 PENDING · green crowns are OFF 
 const TRN_RC=new THREE.Raycaster();
 function TRN_gmat(x,z){const G=TRN.gm||(TRN.gm=(()=>{const o=[];HUB.grp.traverse(m=>{if(m.isMesh&&m.userData.trG)o.push(m)});return o})());TRN_RC.set(new THREE.Vector3(x,3000,z),new THREE.Vector3(0,-1,0));TRN_RC.far=4000;
   const h=TRN_RC.intersectObjects(G,false)[0];if(!h)return null;const M=h.object.material,mm=Array.isArray(M)?M[0]:M;return h.object.userData.gk==='g'?'g':'w'}
+// ---------- terr-6 (Alex b60: car sunk to the roof on grass, deep bowl near the Battle Arena). State asserts, no pictures.
+// gap: 200 random off-road terrain points in the hub, ray onto the drawn ground (trG meshes) vs groundY (= what the car drives on); grass above
+//   groundY = a sunk car / sunk props. Need ≤ 0.05 m. slope: the steepest terrain 6-25 m beside the roads (info + the spot the pit test uses).
+// pit: the car is put at the steepest off-road spot found (≤25 m from a road it is the bowl rim, else the worst spot overall), gas held 10 s of
+//   physics steps (roamStep, no rendering): it must end on a road or ≥ 20 m from the start (TR6_stuck lifts it after 3 s).
+function TR6_rnd(sd){let s=sd;return()=>(s=(s*16807)%2147483647)/2147483647}
+function TR6_gap(n=200){const G=[];HUB.grp.updateMatrixWorld(true);HUB.grp.traverse(m=>{if(m.isMesh&&m.userData.trG)G.push(m)});const RC=new THREE.Raycaster(),r=TR6_rnd(4242);let k=0,mx=0,mn=0,ex=null,bad=0;
+  for(let t=0;t<20000&&k<n;t++){const x=HX0+(HX1-HX0)*r(),z=HZS+(HZN-HZS)*r();if(ART7_rd(x,z)<2||rivClear(x,z)<8)continue;const g=groundY(x,z);if(g<-1)continue;
+    RC.set(new THREE.Vector3(x,g+400,z),new THREE.Vector3(0,-1,0));RC.far=800;const h=RC.intersectObjects(G,false)[0];if(!h)continue;k++;const d=h.point.y-g;if(d>.05)bad++;if(d>mx){mx=d;ex=[Math.round(x),Math.round(z)]}if(d<mn)mn=d}
+  return{n:k,max:+mx.toFixed(3),min:+mn.toFixed(3),bad,ex}}
+function TR6_slope(){const r=TR6_rnd(77);let best={th:0};const S=TRN_roads().filter(q=>q.cls!=='ab'&&q.P.length>2);let k=0;
+  for(const q of S)for(let i=0;i<q.P.length-1;i+=3){const a=q.P[i],b=q.P[i+1],L=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/L,nz=(b[0]-a[0])/L;
+    for(const sd of[-1,1])for(const o of[6,12,18,25]){const x=a[0]+nx*sd*((q.hw||4)+o),z=a[1]+nz*sd*((q.hw||4)+o);if(ART7_rd(x,z)<1||rivClear(x,z)<8)continue;k++;const[gx,gz]=TR_grad(x,z,2),th=Math.atan(Math.hypot(gx,gz))*57.3;if(th>best.th)best={th:+th.toFixed(1),x:Math.round(x),z:Math.round(z)}}}
+  best.n=k;return best}
+function TR6_pit(){const s=TR6_slope();if(!s.x)return{ok:true,why:'no slope'};roamWarp(s.x,s.z,0);RO.v=0;RO.t6n=0;const x0=RO.x,z0=RO.z,thr=CTL.thr;
+  try{for(let i=0;i<300;i++){CTL.thr=1;roamStep(1/30)}}finally{CTL.thr=thr}
+  const q=cityAt(RO.x,RO.z),f=fillAt(RO.x,RO.z),onR=(q&&q.d<q.road.w/2+3)||(f&&f.d<f.r.w/2+3),mv=Math.hypot(RO.x-x0,RO.z-z0);return{ok:onR||mv>=20,onR:!!onR,mv:Math.round(mv),lifts:RO.t6n||0,s}}
+function TR6_go(kind){try{
+  if(kind==='gap'){const o=TR6_gap(),ok=o.n>=150&&o.max<=.05;return'📍 GRASS ON THE PHYSICS GROUND · '+o.n+' off-road points: drawn ground up to '+o.max+' m above the drive height (need ≤0.05), '+o.bad+' over · lowest '+o.min+' m'+(o.ex?' · worst ('+o.ex+')':'')+(ok?' ✅':' ❌')}
+  if(kind==='slope'){const o=TR6_slope();return'📍 SLOPES BESIDE ROADS · steepest terrain 6-25 m beside a road: '+o.th+'° at ('+o.x+','+o.z+') of '+o.n+' points (info; the car climbs ≤29°, TR6_stuck lifts it out of anything steeper) ✅'}
+  if(kind==='pit'){const o=TR6_pit();return'📍 PIT ESCAPE · start on '+(o.s.th||0)+'° at ('+o.s.x+','+o.s.z+'), gas 10 s: '+(o.onR?'on a road':'moved '+o.mv+' m')+', lifted '+o.lifts+'×'+(o.ok?' ✅':' ❌')}
+ }catch(e){return'📍 terr6 '+kind+' ERROR '+e.message+' ❌'}}

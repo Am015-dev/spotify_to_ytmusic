@@ -9,6 +9,6 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  for(let i=0;i<bits.length;i+=6){let v=0;for(let j=0;j<6;j++)v=v*2+(bits.charCodeAt(i+j)===49?1:0);o+=A[v]}
  // split-1 layout: 10b holds the QTC header (n), 10c the bit-blob (lazy chunk); keep both files' comment lines
  const hb=fs.readFileSync('src/10b_qt_data.js','utf8').split('\n')[0],hc=fs.readFileSync('src/10c_qtc_blob.js','utf8').split('\n')[0];
- fs.writeFileSync('src/10b_qt_data.js',hb+'\nconst QTC={ok:true,cnt:0,smp:[],pos:0,n:'+bits.length+',b:null};\n');
+ fs.writeFileSync('src/10b_qt_data.js',hb+'\nconst QTC={ok:true,v:6,cnt:0,smp:[],pos:0,n:'+bits.length+',b:null};\n');
  fs.writeFileSync('src/10c_qtc_blob.js',hc+'\n{const A=\''+A+'\',S="'+o+'",B=new Uint8Array(S.length*6);for(let i=0;i<S.length;i++){const v=A.indexOf(S[i]);for(let j=0;j<6;j++)B[i*6+j]=v>>(5-j)&1}QTC.b=B}\n');
  console.log('cells',D.length,'bits',bits.length,'chars',o.length);await b.close()})()
