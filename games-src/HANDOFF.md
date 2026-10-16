@@ -5,6 +5,15 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
 
+## Mainhattan Nightrun FLIGHT SCHOOL tutorial (16 Oct 2026)
+- Done: `games-src/nightrun/parts/tut.js` (built after fun.js). A run with `G.tut` (no director/waves/stillness/Neon banking/best): 8 beats
+  move (3 rings + ghost finger), shoot (gold on-beat shots), dodge (slow fan + tame KEEP MOVING ring), dash on the pulse, pickups + tier,
+  EMP + heat, weapons (sheet opens with two slots, fusion name from `WP.fu()`, then a wave), leader. Then a clear card: GARAGE / MENU, +60 Neon once.
+  25 s timeout per beat, hull auto-heals, SKIP top bar. Entries: title FLIGHT SCHOOL, Settings > REPLAY TUTORIAL, first-launch offer (mnr_tut, not for
+  returning players or webdriver; `?tut=offer` forces the check, `?tut=1` starts it). Switch: `TUT_ON`. Gift key `mnr_tutgift`.
+- Test: `games-src/nightrun/tutorial-test.js` (all PASS). Also fixed the WEAPONS sheet crash on the fusion canvas (`canvas[data-id]` in g.js).
+- Next: ground-test.js fails "boss never appeared" (stages 5,13,21,24,29,37) on the build before this change too: not from the tutorial.
+
 ## Mainhattan Nightrun weapon levels + 8 new weapons (16 Oct 2026)
 - DONE: permanent weapon levels 1..10 (key `mnr_wplv`) bought with Neon in Garage > WEAPONS (card: icon, level bar, power preview, next ability, price); 8 new weapons (Frost Beam, Flame Arc, Plasma Wave, Shrapnel Shell, Echo Drone, Gravity Well, Rail Sniper, Storm Cell); generic fusions for all 120 pairs (name from the two weapon names, effect from the tags); 8 `wp-*` + 15 `fx-fuse-tag-*` assets in the manifest and next wave.
 - Price curve: level L to L+1 costs round(40 x 1.45^(L-1)) (40 ... 783, 2,435 for 1 to 10); unlock 0 (Pulse), 30 Lance, 40 Swarm, 50 Beat, 80-400 for the rest (`WPX_META` in `parts/wpx.js`).
