@@ -1,0 +1,6 @@
+# terr-7 handoff (2026-10-16) · branch alex/terr6-wip (NOT on od-int2: terr6 GOs still red)
+1. Boot fixed: terr-6 fit now OFF by default (?t6m=1 on), Athens QTC regenerated on the slope-capped raster (v:5, 1.30 M bits ≈ beta.66). Same box: beta.66 fra 70.6 / ath 72.4 s → t7 66.9 / 72.9 s (?t7g=0 run 60.2 / 67.5).
+2. Slope cap: TR7_cap (src/53) fill-only 27° cap on the relief raster before road grading, river fade cells skipped (?tr7=0 off). xf1/life1/terrain stay green. Not done: hill fade near roads/POIs/shelves (athShelfY 18 m band makes the 75° pit-ath wall), pitscan.js rerun.
+3. Gap: GND_Y (src/60) keeps every quadtree leaf's drawn corners; roamTerr rides max(groundY, drawn) behind ?t7g=1 (default OFF). With it on: gap fra 0.23 / ath 0.10 m (river/uniform-grid cells not registered yet) AND xf1 grass/slope/kerb fail (1.66 m steps where a leaf meets a hole cell). Next: register n>1 river blocks, and blend/clamp at hole edges, or pin leaf edges to tH on hole borders.
+4. pit-ath still FAIL (moved 0, lifted 0) even with TR6_stuck now also called while airborne in TR_pre: check roamWarp/deck at (2506,-1036) and the 14 s runtime.
+5. Gate on out/t7 (default flags): unit 0 FAIL; TAG=life1,xf1,terrain,terr6 → fails = terr6 gap-fra, gap-ath, pit-ath + known life1/ath-density. No shot taken. Not merged.
