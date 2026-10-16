@@ -1,0 +1,6 @@
+# HANDOFF ramp-1 (2026-10-16)
+1. NOT FOUND: the wedge in b60/3 is not any RO.ramps piece (51 fra / 21 ath: all <=9 m high, orange/striped, none in a building), not an AB motorway ramp (AB_netChk rampHits 0, 11 ramps looked at), not a bridge deck (12 decks, <=12 m), not a Lively pop-up ramp (13x3 m). A boot-time scan of every mesh and instance in the scene finds no tall road-textured piece and no terrain spike beside a street; it is probably spawned at runtime or by a lazy chunk. Need Alex's position (🐞 bugs doc) to repro.
+2. Added `RP_scan()` (src/99c_checklist.js, exposed as `__chk.rpScan`): every ramp footprint vs building colliders + 10 m height cap; ramps on a lane listed as info (street jump ramps sit on the lane by design, 23 fra / 21 ath).
+3. tools/pitscan.js `--only ramp` prints it per city; checklist GO `ramp1/ramp-clear` asserts 0 in buildings and 0 over 10 m (both cities, currently 0/0). Bridge-deck ramps (dk) are skipped for the building test.
+4. Traffic stuck at that crossing: not investigated (needs the spot).
+5. Gate: unit 0 FAIL; TAG gate 37/38, the one fail life1/ath-density also fails on the unchanged base build (pre-existing). Next: read the b60 bug doc position (ArtifactData `bugs`), warp there, then scene.traverse for the mesh. No game code changed, no flag added.
