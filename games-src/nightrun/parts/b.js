@@ -175,7 +175,7 @@ function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,min
   const nm=o.nm||D.bossName;
   G.boss={type:'boss',k,mini,nm,lbl:o.lbl,x:W+120,y:H/2,r:o.r||(k===3?54:46),hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:o.score||5000*(k+1),
     col:o.col||[D.a,D.b,D.a,D.a][k]||D.a,p2:mini?6:14,p3:mini?11:26,minBar:mini?14:BOSS_MIN_BAR,floor:Math.ceil(hp*.62)};
-  G.en.push(G.boss);banner('WARNUNG',nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');
+  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNUNG',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');
   if(G.live){const sg=bossSong(k,mini);if(sg){AU.switchTo(sg);AU.intense(false);}else AU.intense(true);}
   return G.boss;}
 
@@ -407,6 +407,7 @@ function update(dt){
 }
 
 function bossUpdate(e,dt,d){
+  if(rotMode&&!e.sub)UIK.portraitSwap(e);                // turned to portrait during the fight: a boss without a road changes to its flyer
   const mv=rotMode?'air':UIK.moveOf(e);if(mv!=='air')UIK.bossMove(e,dt,mv);
   else if(e.x>bossX()){e.x-=110*dt;e.y=H/2-20;return;}
   else e.y=H/2-20+Math.sin(e.t*.7)*150;

@@ -26,7 +26,7 @@ UIK.bossDraw=(e,nm,wd,by,tl,fl)=>{const A=UIK.boss[nm],sh=A&&ART.bm['anim-boss-'
   if(A.atk&&e.ph!==undefined&&(e.arm||e.fireT>0)){row=1;col=e.fireT>0?(e.fireT>.22?2:3):(PHF<.5?0:1);}      // wind-up on the beat before it fires, then the shot, then the recovery
   else col=[0,1,2,3,2,1][Math.floor(T*(A.atk?5:3.2))%6];
   if(e.labPose&&A.atk>=0){row=e.labPose[0];col=e.labPose[1];if(!A.atk)row=0;}                // LAB: a pose picked by hand
-  let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(e.k===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}e._dh=dh;e._dw=dw;
+  let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(ART.artK(e)===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}e._dh=dh;e._dw=dw;
   const ctx_=ctx;ctx_.save();ctx_.translate(0,by);if(tl)ctx_.rotate(tl);ctx_.drawImage(sh,col*A.cw,row*A.ch,A.cw,A.ch,-dw/2,-dh/2,dw,dh);
   if(fl){ctx_.globalCompositeOperation='lighter';ctx_.globalAlpha=.4;ctx_.drawImage(sh,col*A.cw,row*A.ch,A.cw,A.ch,-dw/2,-dh/2,dw,dh);}
   ctx_.restore();return true;};
@@ -40,9 +40,17 @@ UIK.groundY=()=>{let y=H-70;if(G&&G.lab&&!rotMode&&labEl&&!labEl.hidden&&!LAB.mi
 UIK.bossMove=(e,dt,mv)=>{const dh=e._dh||130;
   if(e.x>bossX()){e.x-=110*dt;e.y=UIK.groundY()-dh/2;return;}
   e.x=bossX()-34-34*Math.sin(e.t*(mv==='water'?.35:.5));                                   // patrols a short stretch, always left of its stop line
-  let hop=0;if(mv==='ground'&&e.fireT>0&&!e.labPose)hop=26*Math.sin(Math.PI*Math.min(1,e.fireT/.45));   // stomp-jump on the shot, back on the road
-  e.y=UIK.groundY()-dh/2-hop+(mv==='water'?Math.sin(e.t*1.3)*3:0);e.my=-dh*.12;};
-UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,y=dh/2+(mv==='water'?-1:3);ctx.save();
-  if(mv==='water'){ctx.strokeStyle='#19e3ff';ctx.lineWidth=1.5;for(let i=0;i<3;i++){const k=((e.t*.6+i/3)%1);ctx.globalAlpha=.5*(1-k);ctx.beginPath();ctx.ellipse(0,y,dw*(.45+.35*k),4+7*k,0,0,7);ctx.stroke();}}
-  else{const lift=e.y<UIK.groundY()-dh/2-2?.6:1;ctx.globalAlpha=.5*lift;ctx.fillStyle='#000';ctx.beginPath();ctx.ellipse(0,y,dw*.5*(2-lift),6,0,0,7);ctx.fill();}   // the shadow stays on the road when it hops
+  const sk=mv==='ground'&&e.fireT>0&&!e.labPose?Math.sin(e.t*90)*1.5:0;                     // wheels and legs never leave the road: a small shake on the shot, no hop
+  e.x+=sk;e.y=UIK.groundY()-dh/2+(mv==='water'?Math.sin(e.t*1.3)*3:0);e.my=-dh*.12;};
+/* portrait is a view from above: there is no road line, so a ground boss would float. Each one has a flyer of the same stage tier that takes its place (same HP, same patterns, new name and art). */
+UIK.SUB={'tresor-wart':{ak:2,nm:'ZENTRAL-ICE',lbl:'Z'},'bruecken-waechter':{ak:9,nm:'MESSE-WÄCHTER',lbl:'M'},'hoplite':{ak:2,nm:'ZENTRAL-ICE',lbl:'Z'},'talos':{ak:3,nm:'KRONOS',lbl:'K'}};
+UIK.subOf=e=>{if(!rotMode||(G&&G.lab))return null;const nm=ART.bossN[ART.artK(e)],A=UIK.boss[nm];return A&&A.move==='ground'&&UIK.SUB[nm]||null;};
+UIK.portraitSwap=e=>{const s=UIK.subOf(e);if(!s)return false;e.ak=s.ak;e.nm=s.nm;e.lbl=s.lbl;e.sub=1;return true;};
+UIK.pname=(nm,k)=>{if(!rotMode||(G&&G.lab))return nm;const o=UIK.SUB[ART.bossN[ART.artK({k,nm})]];return o&&UIK.boss[ART.bossN[ART.artK({k,nm})]].move==='ground'?o.nm:nm;};
+// shadow: one soft ellipse on the road line right under the boss (a cached radial-gradient sprite, no per-frame filter); flyers throw a smaller, fainter one the higher they are
+UIK._sh=null;
+UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,gy=UIK.groundY(),h=Math.max(0,gy-(e.y+dh/2)),y=gy-e.y+1;ctx.save();
+  if(mv==='water'){ctx.strokeStyle='#19e3ff';ctx.lineWidth=1.5;for(let i=0;i<3;i++){const k=((e.t*.6+i/3)%1);ctx.globalAlpha=.5*(1-k);ctx.beginPath();ctx.ellipse(0,y-4,dw*(.45+.35*k),4+7*k,0,0,7);ctx.stroke();}}
+  else{const f=mv==='ground'?1:Math.max(0,1-h/420);if(f>.04){if(!UIK._sh){const c=document.createElement('canvas');c.width=64;c.height=16;const g=c.getContext('2d'),r=g.createRadialGradient(32,8,0,32,8,32);r.addColorStop(0,'rgba(0,0,0,.85)');r.addColorStop(.6,'rgba(0,0,0,.4)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.translate(0,8);g.scale(1,.25);g.translate(0,-8*4);g.fillRect(0,0,64,64);UIK._sh=c;}
+    const sw=dw*(.6+.4*f);ctx.globalAlpha=.55*f;ctx.drawImage(UIK._sh,-sw*.6,y-sw*.075,sw*1.2,sw*.15);}}   // width ~0.8 x the boss, flat, centred on the boss x
   ctx.restore();};
