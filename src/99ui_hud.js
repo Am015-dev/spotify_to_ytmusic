@@ -1,5 +1,4 @@
-// ui-1: HUD governor. At most 2 objective/hint widgets at once; no tap-to-close popups while the car is moving.
-// Runs from a MutationObserver (microtask: after the game changed a widget, before the frame is painted) + a 150 ms backstop.
+// ui-1: HUD governor (≤ 2 objective widgets, none tap-to-close while moving)
 {const ORD=['m1Next','roamArrow','npcSay','roamPop','roamPlate','crSmHint'];
  const st=document.createElement('style');st.textContent='.ui1X{display:none!important}body.ui1Mv #rotateHint{display:none!important}';document.head.appendChild(st);
  const vis=e=>{if(!e)return false;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity===0&&!(e.getAnimations&&e.getAnimations().length))return false;const r=e.getBoundingClientRect();return r.width>=2&&r.height>=2&&r.right>0&&r.left<innerWidth&&r.bottom>0&&r.top<innerHeight};
