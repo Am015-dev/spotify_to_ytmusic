@@ -397,7 +397,7 @@ const inLot=(x,z)=>{const Z=zoneAt(x,z);return !!Z&&(Z.t==='dirt'||Z.t==='grass'
 const slipTop=s=>{if(!TERR.on)return 0;return TR_Y(s.x-s.ix*.6,s.z-s.iz*.6)};  // the bank's ground at the ramp's top end
 function slipY(x,z){for(const s of SLIPS){const dx=x-s.x,dz=z-s.z;if(dx>40||dx<-40||dz>40||dz<-40)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<10&&inw>0&&inw<30){const yT=s.yT??0;return yT+(HWY-yT)*inw/30}}return null}
 function roamTerr(x,z,y){let low=false;for(const b of ALL_DECKS){const h=deckAt(b,x,z);if(h!=null&&h>.2){if(y>=h-2.4){let g2=h;for(const r of RO.ramps){if(!r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),c=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(c)<r.w/2&&a>-r.len/2&&a<r.len/2)g2=Math.max(g2,r.y0+(a+r.len/2)/r.len*r.hgt)}return{g:g2,deck:b}}if(h-y<5.5)low=true}}
-  let g=groundY(x,z);if(GND_ON){const m=GND_Y(x,z);if(m!==null&&m>g)g=m}const sl=slipY(x,z);if(sl!=null)g=Math.max(g,sl);
+  let g=groundY(x,z);if(GND_ON)g=GND_far(x,z,g);const sl=slipY(x,z);if(sl!=null)g=Math.max(g,sl);
   for(const r of RO.ramps){if(r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(b)<r.w/2&&a>-r.len/2&&a<r.len/2)g=Math.max(g,r.y0+(a+r.len/2)/r.len*r.hgt)}
   return{g,deck:null,low}}
 function groundAt(x,z,y){return roamTerr(x,z,y).g}

@@ -12,13 +12,25 @@ function gndVert(x,z,y0,f){const r=riverAt(x,z);if(!r)return[x,y0+tH(x,z),z,0];c
   return[P.x+P.tx*a+P.tz*d,y0,P.z+P.tz*a-P.tx*d,0]}
 // terr-7 (Alex b60 car sunk): the car rides max(groundY, drawn grass). Every quadtree leaf of a hilly gndBuild is kept per cell with its 4 drawn corner
 // heights; GND_Y(x,z) = the drawn triangle's height there (gndBuild's B-C diagonal), null under holes/river cells (keeps the cheap 25-sample fit = fast boot)
-var GND_L=[],GND_ON=new URLSearchParams(location.search).get('t7g')==='1';  // OFF: steps at hole/T-junction edges broke xf1 grass|slope|kerb
-function GND_Y(x,z){for(const g of GND_L){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)continue;const L=g.c[i*g.nz+j];if(L===undefined)continue;if(L===null)return null;
-  for(let k=0;k<L.length;k+=8){const u=(x-L[k])/L[k+2],v=(z-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;const A=L[k+4],Bv=L[k+5],C=L[k+6],D=L[k+7];return u+v<=1?A+(C-A)*u+(Bv-A)*v:D+(Bv-D)*(1-u)+(C-D)*(1-v)}return null}return null}
+// terr-10: ON again, but only on leaves that do not touch a road (ART7_far, e.g. the 12.5 m leaves whose 2 triangles bridge raster dips up to 2.4 m fra /
+// 3.4 m ath, or !ART7_near: forced 6 m leaves, ≤0.23 m); road/kerb leaves (ART7_near, 2.5 cm fit) keep groundY, and within 1.5 m of a far-leaf edge that borders a non-far leaf/hole/river the drawn height fades to groundY (no steps). ?t7g=0 = off
+var GND_L=[],GND_ON=new URLSearchParams(location.search).get('t7g')!=='0',GND_B=1.5;
+function GND_in(g,x,z){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)return undefined;const L=g.c[i*g.nz+j];if(!L)return L;
+  for(let k=0;k<L.length;k+=9){const u=(x-L[k])/L[k+2],v=(z-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(L[k],L[k+1],L[k+2],L[k+3])||!ART7_near(L[k],L[k+1],L[k+2],L[k+3])?1:0;return{L,k,u,v}}return null}
+function GND_leaf(x,z){for(const g of GND_L){const q=GND_in(g,x,z);if(q!==undefined)return q}return null}
+function GND_tri(L,k,u,v){const A=L[k+4],Bv=L[k+5],C=L[k+6],D=L[k+7];return u+v<=1?A+(C-A)*u+(Bv-A)*v:D+(Bv-D)*(1-u)+(C-D)*(1-v)}
+function GND_Y(x,z){const q=GND_leaf(x,z);return q?GND_tri(q.L,q.k,q.u,q.v):null}
+// terr-10: the car's ground on a far leaf = its drawn triangle (gndBuild's B-C diagonal), faded to g at edges shared with a non-far leaf / hole;
+// where two hilly ground builds overlap (Athens grass 'g' over 'w') the highest drawn one wins
+function GND_far(x,z,g){let r=null;for(const G of GND_L){const q=GND_in(G,x,z);if(q===undefined)continue;let y=g;
+  if(q&&q.L[q.k+8]){const L=q.L,k=q.k,w=L[k+2],h=L[k+3],m=GND_tri(L,k,q.u,q.v);let f=1;
+    for(const[d,ex,ez]of[[q.u*w,-1,0],[(1-q.u)*w,1,0],[q.v*h,0,-1],[(1-q.v)*h,0,1]]){if(d>=GND_B)continue;const n=GND_in(G,x+ex*(d+.3),z+ez*(d+.3));if(!n||!n.L[n.k+8])f=Math.min(f,d/GND_B)}
+    y=g+(m-g)*f}
+  r=r===null?y:Math.max(r,y)}return r===null?g:r}
 function gndBuild(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1-x0)/cs),nz=Math.round((z1-z0)/cs),dx=(x1-x0)/nx,dz=(z1-z0)/nz;
   const GL=o.hilly?{x0,z0,dx,dz,nx,nz,c:new Array(nx*nz)}:null;if(GL)GND_L.push(GL);
   for(let i=0;i<nx;i++)for(let j=0;j<nz;j++){const ax=x0+i*dx,az=z0+j*dz,cx=ax+dx/2,cz=az+dz/2;if(o.hole&&o.hole(cx,cz))continue;
-    let n=1,f=cs,Q=null;if(rivClear(cx,cz)<Math.hypot(dx,dz)/2+o.fine*1.5){n=Math.ceil(dx/o.fine);f=o.fine;if(o.hilly)Q=ART8_riv(ax,az,dx,dz,n)}else if(o.hilly){Q=[];ART7_quad(ax,az,dx,dz,Q)}let LL=null;if(GL)GL.c[i*nz+j]=Q&&n===1?(LL=[]):null;
+    let n=1,f=cs,Q=null;if(rivClear(cx,cz)<Math.hypot(dx,dz)/2+o.fine*1.5){n=Math.ceil(dx/o.fine);f=o.fine;if(o.hilly)Q=ART8_riv(ax,az,dx,dz,n)}else if(o.hilly){Q=[];ART7_quad(ax,az,dx,dz,Q)}let LL=null;if(GL)GL.c[i*nz+j]=Q?(LL=[]):null;
     const k0=o.cls(cx,cz),tk='|'+Math.floor((cx-x0)/o.tile)+'|'+Math.floor((cz-z0)/o.tile);let G=null;
     for(const[lx,lz,lw,lh,ln,sn]of Q||[[ax,az,dx,dz]]){if(Q){n=ln||1;f=lw/n}
     // terr-5: o.qcls re-classes each quadtree quad (green mound crowns inside a pavement cell)
@@ -28,7 +40,7 @@ function gndBuild(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1
       V.push(n>1||sn?gndVert(vx,vz,o.y0,f):Q&&G.m.has(Math.round(vx*16)+','+Math.round(vz*16))?[vx,0,vz,0]:[vx,o.y0+tH(vx,vz)-ART8_dip(vx,vz),vz,0])}
     const ix=[];for(const v of V){const kk=Q?Math.round(v[0]*16)+','+Math.round(v[2]*16):null;if(kk!==null&&G.m.has(kk)){ix.push(G.m.get(kk));continue}ix.push(G.p.length/3);if(kk!==null)G.m.set(kk,G.p.length/3);G.p.push(v[0],v[1],v[2]);G.u.push(v[0]/o.uv,v[2]/o.uv);if(o.col){const c=o.col(v[0],v[2]);G.c.push(c.r,c.g,c.b)}
       if(v[3])G.n.push(0,1,0);else{const e=2,hx=tH(v[0]+e,v[2])-tH(v[0]-e,v[2]),hz=tH(v[0],v[2]+e)-tH(v[0],v[2]-e),l=Math.hypot(hx,2*e,hz);G.n.push(-hx/l,2*e/l,-hz/l)}}
-    if(LL&&n===1)LL.push(lx,lz,lw,lh,G.p[ix[0]*3+1],G.p[ix[1]*3+1],G.p[ix[2]*3+1],G.p[ix[3]*3+1]);
+    if(LL&&n===1&&!sn)LL.push(lx,lz,lw,lh,G.p[ix[0]*3+1],G.p[ix[1]*3+1],G.p[ix[2]*3+1],G.p[ix[3]*3+1],-1);
     for(let a=0;a<n;a++)for(let b=0;b<n;b++){const q=a*(n+1)+b;if(V[q][3]&&V[q+1][3]&&V[q+n+1][3]&&V[q+n+2][3])continue;G.i.push(ix[q],ix[q+1],ix[q+n+1],ix[q+1],ix[q+n+2],ix[q+n+1])}}}
   const out=[];for(const G of B.values()){if(!G.i.length)continue;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(G.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(G.n,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(G.u,2));if(o.col)g.setAttribute('color',new THREE.Float32BufferAttribute(G.c,3));g.setIndex(G.i);
     const m=new THREE.Mesh(g,o.mats[G.k]);m.receiveShadow=true;m.userData.gk=G.k;grp.add(m);out.push(m)}return out}
