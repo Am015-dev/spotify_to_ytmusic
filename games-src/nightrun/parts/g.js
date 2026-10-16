@@ -5,6 +5,7 @@
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
 const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L4',id:'district-songs',text:'Every district now has several songs, so the same song never plays on two stages in a row, and every boss has its own theme (the first boss too). Do the stages feel less repetitive?'},
  {ver:'L3',id:'heat-ladder',text:'After you clear the story, every cleared stage gets a HEAT ladder: tap + on the stage card for Heat 1-10. Each Heat adds one mutator (Turbo, Elite Guard, Hailstorm, Fast Decay, No Heal, -1 Hull ...), pays +20% Neon and a medal the first time. Does each step feel a little harder, never unfair?'},
  {ver:'L3',id:'daily-streak',text:'Title screen: a daily streak and a weekly challenge. Fly the DAILY RUN once a day to earn Neon (60 on day 1, up to 120 on day 7+); miss one day and the streak holds, miss two and it starts again. WEEKLY RUN: the same two mutators for everyone all week; beat the first boss once a week for 300 Neon. Is the status line clear?'},
  {ver:'L3',id:'clear-pay',text:'Clearing a stage now pays Neon: 40 plus 12 per stage number the first time, 25 more for each new star, and a tenth of that on later clears. Everything in the garage costs far less (weapons, perks), and kills pay a bit more, so a full build is a matter of hours, not weeks. Fail a stage twice and the next try gets +1 hull; fail four times and it is a little easier too. Do the prices feel fair?'},

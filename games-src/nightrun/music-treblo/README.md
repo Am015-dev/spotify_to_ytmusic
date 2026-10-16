@@ -17,3 +17,10 @@ Athina (stages 13–16) has no theme of its own; it reuses `stage1`–`stage3`, 
 5. Point stages 13–15 at it (`s.song` in `story.js` / `athens.js`), and TALOS's boss switch at the boss track.
 
 **Licence:** generated with Treblo by the project owner's account. Under Treblo's Terms of Service, section 8, the user owns the outputs. No samples are used, and the prompts name no artists. Log it like the existing Suno tracks.
+
+## Adding a song to the district pools (flag `RET.dpool`, `parts/ret.js`, B18)
+Every district has a pool of songs (`RET.DP.base` = what exists today, `RET.DP.rows` = songs still to come). A stage takes the next pool song that is not the one before; the same rule runs the Endless loop. Bosses take the first loaded entry of `RET.DP.bossT[k]` (`boss-d1`..`boss-d4`, then the old boss songs). A new song needs three steps:
+1. **File:** copy the mp3 (trimmed to whole bars, -18 LUFS) into `games/mainhattan-nightrun/music/`.
+2. **Measure:** run `audio-test.js`, take the real `bpm`, `offsetMs` and `gapMs`, and add the entry to `music/tracks.json` (`stage` = the key, for example `d1a`). Optionally run `analysis/song-energy.py` for its `SONGM` line.
+3. **Row:** make sure the key has a row in `DP.rows` (`{k:'d1a',bpm:118,d:[0]}`, `d` = district indexes 0 Bank, 1 Main, 2 Ostend, 3 Messe, 4 Athens). The keys from `cues-polish.json` (`d1a`..`d4b`, `boss-d1`..`boss-d4`) already have rows; a row without a loaded song is ignored. For a boss theme use its `boss-dN` key.
+Then run `ret-dpool-test.js` and `audio-test.js` (the beat grid must stay within 40 ms).

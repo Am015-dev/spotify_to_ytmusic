@@ -96,13 +96,13 @@ const FIRE_K=.62;                                          // enemy fire cadence
 const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk*AI.fk()*(DMG.on?DMG.fk*DMG.lf()*(SET.diff==='easy'?.8:1)*(ST.on?1:DMG.fkE):1);   // DMG.fk: enemies live longer now (BALANCE.md), so each fires a little less often
 function diff(){if(ST.on)return ST.d*DF.sd*UPS.d;const ease=G.loop||G.pos?1:clamp(.8+.2*G.t/150,.8,1);return(1+.17*(G.pos+G.dprog)+TUNE2.loopD*G.loop)*ease*DF.d*UPS.d;}   // endless: a smooth ramp over the districts and loops, a gentle first minutes; UPS.d = soft scaling with the player's upgrades
 const bossX=()=>rotMode?690:790;                          // where a boss stops: portrait keeps it clear of the HUD at the top
-const bossStage=k=>k===3?'boss2':k===6?'boss3':'boss';   // final boss gets its own song
+const bossStage=k=>(window.RET&&RET.dpool&&RET.DP.boss(k))||(k===3?'boss2':k===6?'boss3':'boss');   // final boss gets its own song
 // Mini-bosses and the first boss (SEK-ADLER) keep the stage song and get a drum layer; the district bosses switch to the boss song, the final boss to boss2.
-const bossSong=(k,mini)=>mini||k===0?null:bossStage(k);
+const bossSong=(k,mini)=>mini||(k===0&&!(window.RET&&RET.dpool))?null:bossStage(k);
 const ORDER=[0,1,2,4,3];                                  // endless cycle: Bank, Main, Ostend, Athens, then the final-boss district (Messe)
 const posOf=i=>Math.max(0,ORDER.indexOf(i));
 const nextDi=i=>{const p=posOf(i)+1;return p>=ORDER.length?{di:ORDER[0],wrap:true}:{di:ORDER[p],wrap:false};};
-const songFor=(i,loop)=>{const p=posOf(i);return loop?['endless','endless2'][p%2]:DISTRICTS[i]&&DISTRICTS[i].song||['stage1','stage2','stage3'][p%3];};
+const songFor=(i,loop)=>{const p=posOf(i);if(window.RET&&RET.dpool)return RET.DP.endless(i,loop|0);return loop?['endless','endless2'][p%2]:DISTRICTS[i]&&DISTRICTS[i].song||['stage1','stage2','stage3'][p%3];};
 const stageFor=(i,boss)=>ST.on?ST.def.song:boss?bossStage(DISTRICTS[i%DISTRICTS.length].boss):songFor(i,G.loop);
 function enterDistrict(i){G.di=i;G.pos=posOf(i);G.dt=0;G.d0=G.bc;G.dprog=0;G.force=false;G.boss=null;G.bossDone=false;G.waveT=3.2;G.waveWait=false;G.preload=false;const D=DISTRICTS[i];bgFor(i);DIR.begin(i);
   banner(D.name,D.sub+(G.loop?`  ·  SCHICHT ${G.loop+1}`:'')+DIR.tag(),false,3.2);AU.root=D.root;AU.boss=false;

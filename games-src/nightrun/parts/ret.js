@@ -175,3 +175,25 @@ RET.dailyShow=function(){let e=$('retTt');
    +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
 RET.dailyShow();
 window.DY=DY;
+
+/* ---------- B18: district song pools + a theme for every boss (POLISH.md). RET.dpool=false: the old picks, byte for byte.
+   New song = 3 steps (music-treblo/README.md): 1 the mp3 into games/mainhattan-nightrun/music/, 2 measure it (audio-test.js) and add its tracks.json entry,
+   3 one row in DP.rows below. A row whose song is not loaded (no tracks.json entry) is ignored, so a row can be added before the file arrives. ---------- */
+if(RET.dpool===undefined)RET.dpool=true;
+const DP=RET.DP={
+  base:{0:['stage1','stage2','stage3'],1:['stage2','stage3','endless'],2:['stage3','endless','endless2'],3:['endless2','stage1','stage2'],4:['athina','athina2']},   // by district index (4 = Athens); the songs that exist today
+  rows:[   // {k:song key, bpm:synth fallback tempo, d:[district indexes]}; the owner's treblo songs (cues-polish.json): d1a,d1b = Bank ... d4a,d4b = Messe
+    {k:'d1a',bpm:118,d:[0]},{k:'d1b',bpm:120,d:[0]},{k:'d2a',bpm:124,d:[1]},{k:'d2b',bpm:126,d:[1]},{k:'d3a',bpm:126,d:[2]},{k:'d3b',bpm:128,d:[2]},{k:'d4a',bpm:128,d:[3]},{k:'d4b',bpm:130,d:[3]}],
+  bossT:{0:['boss-d1','boss'],1:['boss-d2','boss3'],2:['boss-d3','boss'],3:['boss-d4','boss2'],6:['boss3']},   // boss k -> themes, the first one that is loaded wins (the last is the song we have)
+  bossRows:[{k:'boss-d1',bpm:140},{k:'boss-d2',bpm:140},{k:'boss-d3',bpm:140},{k:'boss-d4',bpm:140}]};
+for(const r of DP.rows.concat(DP.bossRows))if(!DEF_BPM[r.k])DEF_BPM[r.k]=r.bpm;   // normTrack() needs a tempo for every key it accepts
+DP.have=k=>!!(TR.by&&TR.by[k]);
+DP.pool=di=>{const o=(DP.base[di]||DP.base[0]).slice();for(const r of DP.rows)if(r.d.includes(di)&&DP.have(r.k)&&!o.includes(r.k))o.push(r.k);return o;};
+DP.boss=k=>{const a=DP.bossT[k];if(!a)return null;for(const s of a)if(DP.have(s)||s==='boss'||s==='boss2'||s==='boss3')return s;return null;};
+// the pick for step s of a sequence: the next pool song (rotating by how often the district came up) that is not the one before
+DP.pick=(dis)=>{const out=[],cnt={};for(let s=0;s<dis.length;s++){const di=dis[s],p=DP.pool(di),c=cnt[di]=(cnt[di]||0)+1,prev=out[s-1];let r=p[(c-1)%p.length];for(let j=0;j<p.length&&r===prev;j++)r=p[(c-1+j+1)%p.length];out.push(r);}return out;};
+DP.endless=(di,loop)=>{const n=ORDER.length,pos=posOf(di),dis=[];for(let l=0;l<=loop;l++)for(const d of ORDER)dis.push(d);return DP.pick(dis)[loop*n+pos];};
+DP.stage=n=>{const key=TR.list.length;if(DP.sc!==key){const dis=STAGES.map(s=>s.di);DP.sq=DP.pick(dis);DP.sc=key;}return DP.sq[n-1];};
+for(const s of STAGES){if(s.ch)continue;const old=s.song;   // challenge stages (fixed rules, tuned to their song) keep their old pick
+  Object.defineProperty(s,'song',{configurable:true,enumerable:true,get(){return RET.dpool?DP.stage(this.n):old;},set(v){Object.defineProperty(this,'song',{value:v,writable:true,configurable:true,enumerable:true});}});}
+window.__dp={STAGES,songFor,bossSong,bossStage,ORDER,DISTRICTS,songBars};   // test hook (ret-dpool-test.js)
