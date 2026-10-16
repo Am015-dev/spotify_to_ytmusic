@@ -6,6 +6,7 @@
   python3 games-src/scripts/build-all.py --out /tmp/stage sunglaze
   python3 games-src/scripts/build-all.py --deploy sunglaze  # also copy PASSING games into games/<slug>/index.html
   python3 games-src/scripts/build-all.py --deploy --suffix -next sunglaze   # preview: games/<slug>-next/
+Every run first executes guard.py (stops on a failure) and modmap.py (refreshes the MODULES.md code maps).
 Other flags: --no-check (skip phone-check), --no-look (skip the look-check gate), --list (print the table and exit).
 
 Staging layout: <out>/<slug>/index.html (+ <out>/.check/ with phone-check results and shots).
@@ -54,7 +55,34 @@ SWEEPS = {
     "thornbound":       ("thornbound/game",     ["sweep.js"]),
     "tidewake":         ("tidewake/game",       ["sweep.js"]),
 }
+PHONE_MS = {"crown-city-smash": 420000}   # its six phone scenarios need ~180 s on this machine (default limit per game is 180 s)
 TIMES = []   # (slug, check, seconds)
+def _safe(fn, x):   # (x, result) or (x, the exception): one crashing game must not stop the thread pool
+    try: return fn(x)
+    except Exception as e: return x, e
+
+def inject_lab(html_path):
+    """Inline the LAB (shell/gx-lab-core.js + gx-lab.js + gx-lab.css) at the end of the staged page. Inert unless test mode is on (?test=1 or localStorage gx_test=1)."""
+    sh = SRC / "shell"
+    t = pathlib.Path(html_path).read_text(encoding="utf-8")
+    if "gxlab-" in t and "GXLAB_CSS" in t: return
+    blk = "<script>window.GXLAB_CSS=" + json.dumps((sh / "gx-lab.css").read_text(encoding="utf-8")).replace("</", "<\\/") + ";</script>\n<script>\n" + (sh / "gx-lab-core.js").read_text(encoding="utf-8") + "\n</script>\n<script>\n" + (sh / "gx-lab.js").read_text(encoding="utf-8") + "\n</script>\n"
+    i = t.rfind("</body>")
+    t = t[:i] + blk + t[i:] if i >= 0 else t + blk
+    pathlib.Path(html_path).write_text(t, encoding="utf-8")
+
+def inject_menu(html_path):
+    """Self-hosted menu faces (shell/fonts: Cinzel 700, Alegreya Sans 400/700, base64 so the single html stays one file) + shell/gx-menu.css, last in <head>."""
+    import base64
+    sh = SRC / "shell"
+    t = pathlib.Path(html_path).read_text(encoding="utf-8")
+    if 'id="gx-menu"' in t: return
+    face = lambda fam, w, f: "@font-face{font-family:'%s';font-weight:%d;font-style:normal;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2')}" % (fam, w, base64.b64encode((sh / "fonts" / f).read_bytes()).decode())
+    css = face("Cinzel", 700, "cinzel-700.woff2") + face("Alegreya Sans", 400, "alegreya-sans-400.woff2") + face("Alegreya Sans", 700, "alegreya-sans-700.woff2") + (sh / "gx-menu.css").read_text(encoding="utf-8")
+    blk = '<style id="gx-menu">' + css + '</style>\n'
+    i = t.find("</head>")
+    t = t[:i] + blk + t[i:] if i >= 0 else blk + t
+    pathlib.Path(html_path).write_text(t, encoding="utf-8")
 
 def timed(slug, name, fn):
     t = time.time(); r = fn(); dt = time.time() - t
@@ -87,24 +115,47 @@ def main():
     ap.add_argument("--suffix", default="", help='deploy folder suffix, e.g. "-next" for a preview')
     ap.add_argument("--no-check", action="store_true", help="skip every check (build + stamp only)")
     ap.add_argument("--quick", action="store_true", help="iterate: phone-check + scenario tests + QUICK sweep (4 games, 1 rotation)")
-    ap.add_argument("--no-sweep", action="store_true", help="with --deploy: skip the full sweep (say why in the commit)")
+    ap.add_argument("--no-sweep", action="store_true", help="with --deploy: skip the sweep (say why in the commit)")
+    ap.add_argument("--full", action="store_true", help="run the game sweeps (they play whole games): only for engine/rules changes. Without it no sweep runs (owner, 13 Oct 2026)")
     ap.add_argument("--no-look", action="store_true", help="skip the look check gate (new severe visual findings block --deploy)")
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--visual", metavar="SLUG", help="visual baselines (scripts/visual.spec.js, machine-only): compare the DEPLOYED game's title / menu / board at phone, tablet, wide with the approved baselines; fails on a diff or a missing baseline. No build.")
+    ap.add_argument("--approve-visual", metavar="SLUG", help="owner approved this game's screens: (re)record its baselines and push them to the orphan branch ui-baselines. Never run it unasked.")
     a = ap.parse_args()
+    if a.visual or a.approve_visual:
+        slug = a.visual or a.approve_visual
+        if slug not in GAMES: sys.exit("unknown slug: " + slug)
+        subprocess.run(["bash", str(SCRIPTS / "baselines.sh"), "pull"], check=False)
+        env = dict(os.environ, VIS_SLUGS=slug, JOBS=os.environ.get("JOBS", "2")); env.pop("GX_URL", None)
+        cmd = [str(SRC / "node_modules" / ".bin" / "playwright"), "test", "scripts/visual.spec.js", "--project=phone", "--project=tablet", "--project=wide", "--reporter=line"] + (["--update-snapshots"] if a.approve_visual else [])
+        (SRC / ".staging").mkdir(exist_ok=True)
+        r = subprocess.run(cmd, cwd=SRC, env=env)
+        if r.returncode: sys.exit(f"[visual] {slug}: FAIL (diff or missing baseline; images are compared by the test, never opened)")
+        if a.approve_visual: sys.exit(subprocess.run(["bash", str(SCRIPTS / "baselines.sh"), "push", f"approve {slug}"]).returncode)
+        print(f"[visual] {slug}: PASS"); return 0
     if a.list:
         for s, (d, c, o) in GAMES.items(): print(f"{s:18} cd games-src/{d} && {c}  -> {o}")
         return 0
     slugs = a.slugs or list(GAMES)
     bad = [s for s in slugs if s not in GAMES]
     if bad: sys.exit("unknown slug(s): %s\nknown: %s" % (" ".join(bad), " ".join(GAMES)))
+    # cost guard (fails the build) and fresh code maps (games-src/<dir>/MODULES.md: read these, not the built files)
+    g = subprocess.run([sys.executable, str(SCRIPTS / "guard.py")], capture_output=True, text=True)
+    print(g.stdout.rstrip())
+    if g.returncode: sys.exit("build stopped by guard.py (see the Fix: hints above)")
+    m = subprocess.run([sys.executable, str(SCRIPTS / "modmap.py")], capture_output=True, text=True)
+    print(m.stdout.strip() or ("modmap failed: " + m.stderr.strip()[-200:]), flush=True)
     out = pathlib.Path(a.out).resolve()
     out.mkdir(parents=True, exist_ok=True)
     status, why = {}, {}
 
-    for s in slugs:  # 1. build + stage
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=3) as ex:   # each game builds in its own folder: run the builds side by side, stage serially below
+        runs = dict(zip(slugs, ex.map(lambda x: subprocess.run(GAMES[x][1], shell=True, cwd=SRC / GAMES[x][0], capture_output=True, text=True), slugs)))
+    for s in slugs:  # 1. stage the builds
         d, cmd, o = GAMES[s]
         cwd = SRC / d
-        r = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True)
+        r = runs[s]
         built = (cwd / o).resolve()
         if r.returncode != 0:
             status[s], why[s] = "FAIL", "build error: " + (r.stderr.strip().splitlines() or r.stdout.strip().splitlines() or ["?"])[-1][:120]
@@ -113,6 +164,8 @@ def main():
         else:
             (out / s).mkdir(parents=True, exist_ok=True)
             shutil.copyfile(built, out / s / "index.html")
+            inject_lab(out / s / "index.html")
+            inject_menu(out / s / "index.html")
             status[s], why[s] = "BUILT", ""
         print(f"[build] {s:18} {status[s]} {why[s]}", flush=True)
 
@@ -127,58 +180,176 @@ def main():
         srv, base = start_server(out)   # ONE server for every check below
         env = dict(os.environ, GX_URL=base, GX_STAGE=str(out))
         env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
-    if ok and not a.no_check:  # 3. phone-check against the staging folder
+    # Owner, 13 Oct 2026: "don't play the game, run tests". phone-check PLAYS each game (6 scenarios, up to 3 min each), so it
+    # runs only with --full. The gate is the ?scn= scenario tests + LAB test + look check (open a state, check it, no playing).
+    if ok and not a.no_check:  # 3. phone-check (plays the game): --full only; otherwise straight to the scenario tests
         chk = out / ".check"
-        env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk))
-        r = timed("all" if len(ok) > 1 else ok[0], "phone-check", lambda: subprocess.run(["node", str(SCRIPTS / "phone-check.js")] + ok, env=env3, capture_output=True, text=True))
-        rows = {}
-        md = chk / "phone-check-results.md"
-        if md.exists():
-            for line in md.read_text().splitlines():
-                m = re.match(r"\| (\S+) \| (.*) \| ([^|]*) \|$", line)
-                if m and m.group(1) in ok: rows[m.group(1)] = (m.group(2).split(" | "), m.group(3))
-        for s in ok:
-            if s not in rows: status[s], why[s] = "FAIL", "phone-check did not report (see %s)" % (r.stderr.strip()[-100:] or "log")
-            else:
-                cells, errs = rows[s]
-                failing = [c for c in cells if c != "PASS"]
-                if failing: status[s], why[s] = "FAIL", "phone-check: " + "; ".join(failing)[:120]
-                else: status[s], why[s] = "PASS", "" if errs == "none" else "page errors: " + errs[:80]
-        if a.quick or a.deploy:  # 3a. scenario tests (`?scn=<id>` states: skip menus, seed the RNG, build the state, assert), all games in one run
+        env3 = dict(env, GAMES_DIR=str(out), PC_OUT_DIR=str(chk), GAME_MS=str(max([PHONE_MS.get(x, 180000) for x in ok])))
+        if a.full:
+            r = timed("all" if len(ok) > 1 else ok[0], "phone-check", lambda: subprocess.run(["node", str(SCRIPTS / "phone-check.js")] + ok, env=env3, capture_output=True, text=True))
+            rows = {}
+            md = chk / "phone-check-results.md"
+            if md.exists():
+                for line in md.read_text().splitlines():
+                    m = re.match(r"\| (\S+) \| (.*) \| ([^|]*) \|$", line)
+                    if m and m.group(1) in ok: rows[m.group(1)] = (m.group(2).split(" | "), m.group(3))
+            for s in ok:
+                if s not in rows: status[s], why[s] = "FAIL", "phone-check did not report (see %s)" % (r.stderr.strip()[-100:] or "log")
+                else:
+                    cells, errs = rows[s]
+                    failing = [c for c in cells if c != "PASS"]
+                    if failing: status[s], why[s] = "FAIL", "phone-check: " + "; ".join(failing)[:120]
+                    else: status[s], why[s] = "PASS", "" if errs == "none" else "page errors: " + errs[:80]
+        else:
+            (out / ".check").mkdir(parents=True, exist_ok=True)
+            for s in ok: status[s], why[s] = "PASS", ""
+            print("[phone-check] skipped: it plays the game (use --full for engine/rules changes)", flush=True)
+        if a.quick or a.deploy:  # 3a. scenario tests (`?scn=<id>` states: skip menus, seed the RNG, build the state, assert), all games in one Playwright Test run
             passing = [s for s in ok if status[s] == "PASS"]
             if passing:
-                code, tail = timed("all" if len(passing) > 1 else passing[0], "scenarios", lambda: run_check(["node", str(SCRIPTS / "scenario-test.js")] + passing, str(SCRIPTS), dict(env3, SCN_OUT=str(out / ".scn")), out / ".check" / "scenarios.log", 1800))
-                txt = (out / ".check" / "scenarios.log").read_text()
+                look = a.deploy and not a.no_look   # the same pages are scanned with axe (contrast / tap size / button names); verdict in 3b
+                projects = ["--project=phone"] + ([] if not a.full else ["--project=phone-s", "--project=pc"])
+                shutil.rmtree(out / ".inv", ignore_errors=True); shutil.rmtree(out / ".look-axe", ignore_errors=True)   # stale results of an earlier run
+                def pw(slugs, extra_env, log):
+                    return run_check([str(SRC / "node_modules" / ".bin" / "playwright"), "test"] + projects, str(SRC), dict(env3, SCN_SLUGS=",".join(slugs), PW_JSON=str(out / ".check" / "scn.json"), INV_OUT=str(out / ".inv"), **extra_env), log, 1800)
+                code, tail = timed("all" if len(passing) > 1 else passing[0], "scenarios", lambda: pw(passing, {"LOOK_OUT": str(out / ".look-axe")} if look else {}, out / ".check" / "scenarios.log"))
+                def verdict():   # per game: (passed, total, first failures) from the JSON reporter; titles are  file > game > scenario
+                    res = {}
+                    try: rep = json.load(open(out / ".check" / "scn.json"))
+                    except Exception: return res
+                    def walk(su, game=None):
+                        for sub in su.get("suites", []):
+                            walk(sub, sub["title"] if sub["title"] in passing else game)
+                        for sp in su.get("specs", []):
+                            r = res.setdefault(game, [0, 0, []]); st = [t["status"] for t in sp["tests"]]
+                            if all(x == "skipped" for x in st): continue
+                            r[1] += 1
+                            if sp["ok"]: r[0] += 1
+                            else:
+                                msg = next((re.sub(r"\x1b\[[0-9;]*m", "", e.get("message", "")) for t in sp["tests"] for rs in t["results"] for e in rs.get("errors", [])), "failed")
+                                r[2].append("%s: %s" % (sp["title"], msg.replace("\n", " ")[:90]))
+                    for su in rep.get("suites", []): walk(su)
+                    return res
+                v = verdict()
                 for s in passing:
-                    m = re.search(r"^SCN %s (\S+) (\d+)/(\d+)(.*)$" % re.escape(s), txt, re.M)
-                    if not m: status[s], why[s] = "FAIL", "scenario-test did not report"
-                    elif m.group(1) != "ok": status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (m.group(2), m.group(3), m.group(4).strip()[:100])
-                    else: print(f"[scn] {s:18} {m.group(2)}/{m.group(3)} scenarios ok")
-        # 3c. the game's own sweeps: QUICK=1 for --quick, the full default for --deploy (once)
-        if (a.quick or a.deploy) and not (a.deploy and a.no_sweep):
+                    ok_n, tot, fl = v.get(s, [0, 0, []])
+                    if not tot: status[s], why[s] = "FAIL", "scenarios: none ran (no scenarios registered?)"
+                    elif fl: status[s], why[s] = "FAIL", "scenarios %s/%s ok: %s" % (ok_n, tot, "; ".join(fl[:2])[:100])
+                    else:
+                        # Universal invariants (text < 11 px, clipping, ...) also flag OLD problems already on the live game: recorded by the same run (INV_OUT), a warning only
+                        inv = sorted({m for fp in sorted((out / ".inv" / s).glob("*.json")) for m in json.load(open(fp))}) if (out / ".inv" / s).is_dir() else []
+                        if inv: print(f"[scn] {s:18} own checks {ok_n}/{tot} ok; WARN universal: {inv[0][:120]}", flush=True); continue
+                        print(f"[scn] {s:18} {ok_n}/{tot} scenarios ok")
+        if a.full:  # 3a2. LAB acceptance tests (shared pages; warn-only, so not in the fast gate: --full only): test mode off = untouched page; on = LAB lists + opens every scenario; pinned checklist -> shelf + lab.html
+            passing = [s for s in ok if status[s] == "PASS"]
+            if passing:   # a game's first deploy has no rows in games/scenarios.json yet: index the staged pages first so lab.html can list them
+                try:
+                    subprocess.run(["node", str(SCRIPTS / "lab-index.js")] + passing, env=env, capture_output=True, text=True, timeout=300)
+                    subprocess.run([sys.executable, str(SCRIPTS / "lab-page.py")], check=False, timeout=60)
+                except Exception as e: print("lab-index (pre-test) skipped:", e)
+                code, tail = timed("all" if len(passing) > 1 else passing[0], "lab-test", lambda: run_check(["node", str(SCRIPTS / "lab-test.js")] + passing, str(SCRIPTS), env3, out / ".check" / "lab-test.log", 1800))
+                txt = (out / ".check" / "lab-test.log").read_text()
+                for s in passing:
+                    m = re.search(r"^LAB %s (\S+) (.*)$" % re.escape(s), txt, re.M)
+                    # lab-test checks the shared shelf/LAB pages, not this game: report, never block a game's deploy
+                    if not m: print(f"[lab] {s:18} WARN lab-test did not report", flush=True)
+                    elif m.group(1) != "ok": print(f"[lab] {s:18} WARN " + m.group(2)[:140], flush=True)
+                    else: print(f"[lab] {s:18} ok {m.group(2)[:40]}")
+        # 3c. the game's own sweeps (they play whole games).
+        # Owner, 13 Oct 2026: "don't play the game". Sweeps play whole games, so they run ONLY with --full (engine/rules changes).
+        # --quick and --deploy = ?scn= GO scenarios + look check (+ LAB test as a warning), no game playing.
+        if a.full:
             for s in [x for x in ok if status[x] == "PASS"]:
                 d, scripts = SWEEPS[s]
-                for sc in (scripts if a.deploy else scripts[:1]):
+                full = a.deploy and a.full
+                for sc in (scripts if full else scripts[:1]):
                     e = dict(env, GX_SLUG=s)
-                    if not a.deploy: e["QUICK"] = "1"
-                    code, tail = timed(s, ("quick " if not a.deploy else "full ") + sc.replace(".js", ""), lambda: run_check(["node", sc], str(SRC / d), e, out / ".check" / f"{s}-{sc}.log", 5400))
+                    if not full: e["QUICK"] = "1"
+                    code, tail = timed(s, ("quick " if not full else "full ") + sc.replace(".js", ""), lambda: run_check(["node", sc], str(SRC / d), e, out / ".check" / f"{s}-{sc}.log", 5400))
                     if code != 0: status[s], why[s] = "FAIL", f"{sc}: {tail}"[:200]; break
                     print(f"[sweep] {s:18} {sc} ok: {tail[-90:]}", flush=True)
     else:
         for s in ok: status[s] = "PASS" if a.no_check else status[s]
 
-    if a.deploy and not a.no_look:  # 3b. look check: only NEW severe visual findings vs games-src/look-baseline.json block the deploy
+    if a.deploy and not a.no_look:  # 3b. look check + axe: only NEW severe findings block. "New" = not in look-known/<slug>.json (committed, rewritten on every successful deploy; no live re-measurement)
         env = dict(os.environ); env.setdefault("NODE_PATH", "/opt/node-tools/node_modules")
-        for s in [x for x in slugs if status[x] == "PASS"]:
+        mode = "all" if a.full else "phone"
+        KNOWN = SRC / "look-known"
+        def known_get(s, kind):
+            try: return {tuple(f) for f in json.load(open(KNOWN / f"{s}.json"))[mode][kind]}
+            except Exception: return None   # no baseline for this game yet: measured once on the live game below, then committed
+        def look_run(s):   # runs in a worker thread: the look-check of one staged game
+            r = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--gate", "--game", s, "--games-dir", str(out), "--out", str(out / ".look"), "--no-shots", "--skip", "size,overflow,overlap,fonts"] + ([] if a.full else ["--sizes", "phone"]),
+                               env=env, capture_output=True, text=True, timeout=900)
+            return s, r
+        def sev(path, s):
             try:
-                r = subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--gate", "--game", s, "--games-dir", str(out), "--out", str(out / ".look"), "--no-shots"],
-                                   env=env, capture_output=True, text=True, timeout=900)
+                g = json.load(open(path)).get("games", {}).get(s, {})
+                return {(str(f.get("check")), str(f.get("sel")), str(f.get("text"))) for f in g.get("findings", []) if f.get("sev") == "severe"}
+            except Exception: return None
+        def live_look(s):   # fallback for a game without a committed baseline: measure the live game once
+            cache = SRC / ".look-live-cache" / f"{s}-live-{mode}"
+            if not (cache / "report.json").exists():
+                subprocess.run(["node", str(SCRIPTS / "look-check.js"), "--game", s, "--games-dir", str(SRC.parent / "games"), "--out", str(cache), "--no-shots"] + ([] if a.full else ["--sizes", "phone"]), env=env, capture_output=True, text=True, timeout=900)
+            return sev(cache / "report.json", s)
+        todo = [x for x in slugs if status[x] == "PASS"]
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=2) as ex:
+            results = list(ex.map(lambda x: _safe(look_run, x), todo))
+        new_look = {}
+        for s, r in results:
+            try:
+                if isinstance(r, Exception): print(f"[look] {s}: skipped ({r})"); continue
                 tail = [l for l in r.stdout.splitlines() if "[look]" in l and s in l]
-                if r.returncode == 1: status[s], why[s] = "FAIL", "look-check: " + (tail[-1].split("] ", 1)[-1] if tail else "new severe findings")[:140]
+                new_look[s] = sev(out / ".look" / "report.json", s) if (out / ".look" / "report.json").exists() else None
+                if r.returncode == 1:
+                    msg = (tail[-1].split("] ", 1)[-1] if tail else "new severe findings")[:140]
+                    live_f = known_get(s, "look")
+                    if live_f is None: live_f = live_look(s)
+                    if new_look[s] is not None and live_f is not None and new_look[s] <= live_f:
+                        print(f"[look] {s}: WARN pre-existing on the live game too, not caused by this change: {msg}", flush=True)
+                    else: status[s], why[s] = "FAIL", "look-check (new vs known): " + msg
                 elif r.returncode != 0: print(f"[look] {s}: look-check crashed, report-only ({r.stderr.strip()[-80:]})")
                 else: print(f"[look] {s}: {tail[-1].split('] ', 1)[-1] if tail else 'ok'}")
             except Exception as e:
                 print(f"[look] {s}: skipped ({e})")
+        # 3b2. axe part (contrast / tap size / button names, run on the scenario pages in 3a): only NEW severe findings vs the known set block
+        def axe_set(d, s):
+            return {(fp.name,) + tuple(f) for fp in sorted((d / s).glob("*.json")) for f in json.load(open(fp))}   # page file name + (rule, selector, text)
+        def axe_pages(d, s): return {fp.name for fp in (d / s).glob("*.json")} if (d / s).is_dir() else set()
+        new_axe = {}
+        for s in [x for x in slugs if status[x] == "PASS" and (out / ".look-axe" / x).is_dir()]:
+            try:
+                new_f = new_axe[s] = axe_set(out / ".look-axe", s)
+                live_f = known_get(s, "axe")
+                if live_f is None:   # no committed baseline yet: same pages on the live server, once
+                    cache = SRC / ".look-live-cache" / f"{s}-live-axe-{mode}"
+                    if not cache.is_dir():
+                        ids = sorted({re.sub(r"-[a-z-]+\.json$", "", fp.name) for fp in (out / ".look-axe" / s).glob("*.json")})
+                        empty = out / ".check" / ".empty"; empty.mkdir(parents=True, exist_ok=True)
+                        e2 = {k: v for k, v in env3.items() if k not in ("GX_URL", "GX_STAGE")}
+                        run_check([str(SRC / "node_modules" / ".bin" / "playwright"), "test"] + projects, str(SRC), dict(e2, GX_STAGE=str(empty), SCN_SLUGS=s, SCN_LIST=json.dumps({s: [{"id": i, "sizes": "all"} for i in ids]}),
+                                  AXE_ONLY="1", LOOK_OUT=str(cache), PW_JSON=str(out / ".check" / "axe-live.json")), out / ".check" / "axe-live.log", 900)
+                        cache.mkdir(parents=True, exist_ok=True)
+                    live_f = axe_set(cache, s)
+                # a page the live game does not have yet (a new scenario) cannot have regressed: its findings are recorded, a warning only
+                try: pages = set(json.load(open(KNOWN / f"{s}.json"))[mode]["axe_pages"])
+                except Exception: pages = axe_pages(SRC / ".look-live-cache" / f"{s}-live-axe-{mode}", s)
+                bad = {f for f in new_f - live_f if f[0] in pages}
+                if bad: status[s], why[s] = "FAIL", "axe (new vs known): " + "; ".join(" ".join(f[1:]) for f in sorted(bad))[:140]
+                else:
+                    if new_f - live_f: print(f"[look] {s}: WARN axe findings on scenario pages the live game lacks (recorded as known): {len(new_f - live_f)}", flush=True)
+                    else: print(f"[look] {s}: axe ok ({len(new_f)} severe, all already known)" if new_f else f"[look] {s}: axe ok")
+            except Exception as e:
+                print(f"[look] {s}: axe skipped ({e})")
+        # 3b3. committed baseline of known findings: rewritten for every game that passed (it becomes the live game when the deploy lands)
+        KNOWN.mkdir(exist_ok=True)
+        for s in slugs:
+            if status[s] != "PASS" or (s not in new_look and s not in new_axe): continue
+            try: cur = json.load(open(KNOWN / f"{s}.json"))
+            except Exception: cur = {}
+            cur[mode] = {"look": sorted([list(f) for f in (new_look.get(s) or [])]), "axe": sorted([list(f) for f in new_axe.get(s, [])]), "axe_pages": sorted(axe_pages(out / ".look-axe", s))}
+            (KNOWN / f"{s}.json").write_text(json.dumps(cur, indent=0) + "\n")
 
     deployed = []
     if a.deploy:  # 4. copy only passing games into games/
@@ -189,6 +360,11 @@ def main():
                 shutil.copyfile(out / s / "index.html", dest / "index.html")
                 deployed.append(s)
 
+    if deployed and srv and not a.suffix:  # the LAB owner page: every deployed game's scenario list -> games/scenarios.json, then games/lab.html
+        try:
+            r = subprocess.run(["node", str(SCRIPTS / "lab-index.js")] + deployed, env=env, capture_output=True, text=True, timeout=300); print(r.stdout.strip())
+            subprocess.run([sys.executable, str(SCRIPTS / "lab-page.py")], check=False, timeout=60)
+        except Exception as e: print("lab-index skipped:", e)
     if srv: srv.kill()
     if TIMES:
         tj = out / ".check" / "timings.json"; tj.parent.mkdir(parents=True, exist_ok=True)

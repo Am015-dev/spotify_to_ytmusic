@@ -1,0 +1,41 @@
+/* GX LAB (test mode only; every rule is under #gxlab-* / .gxl-*, so the page is untouched when test mode is off) */
+#gxlab-bar{position:fixed;z-index:2147483640;top:max(2px,env(safe-area-inset-top));left:2px;display:flex;gap:3px;align-items:center;max-width:calc(100vw - 4px);font:700 12px/1 system-ui,-apple-system,sans-serif}
+#gxlab-bar.r{left:auto;right:2px;flex-direction:row-reverse}
+#gxlab-bar button,.gxl-panel button{font:700 12px/1 system-ui,-apple-system,sans-serif;color:#f4ead8;background:rgba(36,24,16,.86);border:1px solid #f0c05a;border-radius:9px;padding:0 8px;min-height:28px;cursor:pointer;touch-action:manipulation;white-space:nowrap}
+#gxlab-bar button.on{background:#f0c05a;color:#2a1b10}
+#gxlab-bar .gxl-r button{min-width:30px;padding:0 4px}
+#gxlab-bar .gxl-r button[aria-pressed=true]{background:#2f7d4f;border-color:#2f7d4f}
+#gxlab-bar .gxl-r button[data-s=bad][aria-pressed=true]{background:#b3382c;border-color:#b3382c}
+#gxlab-bar .gxl-r{display:flex;gap:3px}
+.gxl-panel{position:fixed;z-index:2147483600;left:0;right:0;bottom:0;height:min(78vh,640px);display:flex;flex-direction:column;box-sizing:border-box;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:14px 14px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.55);font:500 14px/1.35 system-ui,-apple-system,sans-serif;padding-bottom:env(safe-area-inset-bottom,0)}
+.gxl-panel[hidden]{display:none}
+@media (min-width:700px){.gxl-panel{left:auto;top:0;width:380px;height:auto;border-radius:0;border-width:0 0 0 1.5px}}
+.gxl-h{display:flex;gap:6px;align-items:center;padding:8px 8px 6px 12px;border-bottom:1px solid #4a3326;flex:none}
+.gxl-h h2{margin:0;flex:1;min-width:0;font:800 15px/1.2 system-ui,sans-serif;color:#f0c05a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gxl-panel button{min-height:40px}
+.gxl-tools{display:flex;gap:6px;flex-wrap:wrap;padding:6px 10px 0;flex:none}
+.gxl-tools button{flex:1 1 auto}
+.gxl-body{overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:6px 10px 14px;flex:1;min-height:0}
+.gxl-g{font:800 11px/1 system-ui,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#bca78c;margin:12px 0 4px}
+.gxl-row,.gxl-item{border:1px solid #4a3326;border-radius:11px;padding:8px 10px;margin:5px 0;background:rgba(255,255,255,.03)}
+.gxl-row{display:flex;gap:8px;align-items:center}
+.gxl-row .gxl-t{flex:1;min-width:0}
+.gxl-row b,.gxl-item .gxl-p{display:block;font:700 14px/1.25 system-ui,sans-serif;overflow-wrap:anywhere}
+.gxl-row small,.gxl-ask{display:block;color:#9fd6ff;font:600 12px/1.3 system-ui,sans-serif;overflow-wrap:anywhere}
+.gxl-go{border-color:#f0c05a!important;background:rgba(240,192,90,.14)!important;color:#f0c05a!important;font-weight:800!important;min-width:58px}
+.gxl-go.here{background:#f0c05a!important;color:#2a1b10!important}
+.gxl-chip{min-width:44px;font-size:18px!important;padding:0!important;border-color:#4a3326!important;background:transparent!important}
+.gxl-rate{display:flex;gap:6px;margin-top:6px}
+.gxl-rate button{flex:1;padding:0 4px}
+.gxl-rate button[aria-pressed=true][data-s=ok]{background:#2f7d4f;border-color:#2f7d4f}
+.gxl-rate button[aria-pressed=true][data-s=bad]{background:#b3382c;border-color:#b3382c}
+.gxl-rate button[aria-pressed=true][data-s=skip]{background:#6b5a48;border-color:#6b5a48}
+.gxl-item .gxl-top{display:flex;gap:8px;align-items:center;margin-top:5px}
+.gxl-item .gxl-top .gxl-ask{flex:1}
+.gxl-note{display:block;width:100%;box-sizing:border-box;margin-top:6px;min-height:40px;padding:0 10px;border-radius:10px;border:1.5px solid #b3382c;background:#150d08;color:#f4ead8;font:500 16px system-ui,sans-serif}
+.gxl-ed{font:800 12px/1.2 system-ui,sans-serif;color:#bca78c;margin:10px 0 2px}
+.gxl-ed b{color:#f4ead8}
+.gxl-toast{position:fixed;z-index:2147483100;left:50%;bottom:90px;transform:translateX(-50%);background:#2f7d4f;color:#fff;font:700 13px system-ui,sans-serif;padding:8px 14px;border-radius:10px;pointer-events:none}
+.gxl-fb{position:fixed;z-index:2147483200;left:12px;right:12px;bottom:12px;max-width:520px;margin:auto;background:#241810;color:#f4ead8;border:1.5px solid #f0c05a;border-radius:12px;padding:10px;display:grid;gap:8px}
+.gxl-fb textarea{width:100%;min-height:110px;box-sizing:border-box;background:#150d08;color:#f4ead8;border:1px solid #4a3326;border-radius:8px;font:12px system-ui}
+.gxl-fb button{min-height:40px;border-radius:10px;border:1.5px solid #f0c05a;background:transparent;color:#f4ead8;font:700 13px system-ui}

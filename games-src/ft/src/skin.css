@@ -27,18 +27,19 @@ html.sk-icons .ri[data-r=sound]{background-image:url(media/icon-sound.webp)}html
 html.sk-icons .ri[data-r=speed]{background-image:url(media/icon-speed.webp)}html.sk-icons .ri[data-r=settings]{background-image:url(media/icon-settings.webp)}
 html.sk-icons .ri[data-r=log]{background-image:url(media/icon-log.webp)}html.sk-icons .ri[data-r=newgame]{background-image:url(media/icon-newgame.webp)}
 /* buttons: cream / go / power pills */
-html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost,html.sk .gx-drawer .seg button{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center}
+html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost,html.sk .gx-drawer .seg button{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 18px stretch;border-width:14px 18px;padding:0;border-radius:0;background:none;box-shadow:none;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center}
 html.sk .ab.go,html.sk .mbox .btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
 html.sk .ab.pw,html.sk .mbox .btn.warn{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 html.sk .ab.pw.on{filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .ab:active,html.sk .mbox .btn:active{transform:translateY(2px);box-shadow:none}
 html.sk .ab:disabled,html.sk .mbox .btn:disabled{opacity:.5}
-html.sk .mbox .btn.sm{border-image-width:0 18px}
+html.sk .mbox .btn.sm{border-image-width:14px 18px;border-width:14px 18px}
 /* menu rows */
 html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .opts .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;display:flex;align-items:center;gap:2px;text-align:left;color:#3a2410;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .gx-drawer .menu .btn.gxt-menu{min-height:64px;padding-top:10px;padding-bottom:10px}
 html.sk .gx-drawer .menu .btn:active{transform:translateY(1px)}
 /* dialogs over the table */
-html.sk .mbox{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a2410}
+html.sk .mbox{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-width:30px;padding:0;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a2410}
 html.ti.sk #modal[data-k=start] .mbox.start{background:none}
 html.sk .mbox h2{color:#8e3a1c}
 
@@ -100,4 +101,31 @@ html.sk-fx .ft.up{text-shadow:0 0 6px #ffd35a,0 1px 2px rgba(0,0,0,.6)}
 .spot .ord,.spot.taken .ord{font-size:11px;font-weight:800;color:#3a2010;background:rgba(255,246,220,.92);border-radius:4px;padding:0 3px;align-self:center;line-height:1.15}
 .spot .sp-c,.spot.taken .sp-c{color:#3a2010;font-weight:800;background:rgba(255,246,220,.92);border-radius:4px;padding:0 3px;align-self:center;line-height:20px}
 .exd summary{min-height:44px;display:flex;align-items:center;margin:0}
-.sch .sn small{font-size:11px;opacity:.85}
+.sch .sn small{font-size:11px;opacity:1;color:#3d2a1c}
+
+/* painted plates, glyphs and badges (html.sk-pl): backgrounds and overlays only, no box moves */
+html.sk-pl .tile::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;box-sizing:border-box;border:5px solid transparent;border-image:url(media/ui-tile-frame-red.webp) 28/5px stretch}
+html.sk-pl .tile>*{z-index:2}
+html.sk-pl .tile.blue::after{border-image-source:url(media/ui-tile-frame-blue.webp)}
+html.sk-pl .tile::before{content:'';position:absolute;right:5px;bottom:5px;z-index:1;width:22px;height:22px;pointer-events:none;background:var(--gl) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,15,5,.6))}
+html.sk-pl .tile.k-village{--gl:url(media/glyph-village.webp)}html.sk-pl .tile.k-sacred{--gl:url(media/glyph-sacred.webp)}html.sk-pl .tile.k-oasis{--gl:url(media/glyph-oasis.webp)}html.sk-pl .tile.k-small{--gl:url(media/glyph-small.webp)}html.sk-pl .tile.k-large{--gl:url(media/glyph-large.webp)}html.sk-pl .tile.k-workshop{--gl:url(media/glyph-workshop.webp)}html.sk-pl .tile.k-exchange{--gl:url(media/glyph-exchange.webp)}html.sk-pl .tile.k-city{--gl:url(media/glyph-city.webp)}html.sk-pl .tile.k-lake{--gl:url(media/glyph-lake.webp)}
+html.sk-pl .tile .tv{background:#2a1500;border-color:transparent;z-index:3;isolation:isolate}
+html.sk-pl .tile .tv::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(#2a1500,#2a1500) center/calc(100% - 4px) calc(100% - 4px) no-repeat,url(media/ui-badge-gold.webp) center/142% no-repeat}
+html.sk-pl .dcard .dv{background:#8a4a2a;isolation:isolate;position:relative;color:#fff8e8;font-weight:800;line-height:12px;box-shadow:none}
+html.sk-pl .sti{font-style:normal;color:transparent;background:url(media/icon-star.webp) center/contain no-repeat}
+html.sk-pl .mcard:not(.empty){background:url(media/ui-goods-card.webp) center/auto 100% no-repeat,linear-gradient(#fffdf6,#f1e0bc)}
+html.sk-pl .stat .nm{background:url(media/ui-nameplate.webp) center/100% 100% no-repeat;padding:0 4px;color:#3a2410}
+html.sk-pl .card.dj h4,html.sk-pl .dcard.th{background:url(media/ui-djinn-bar.webp) center/100% 100% no-repeat,#2a1250;color:#ffe9a8;text-indent:10px}
+html.sk-pl #summon b{background:url(media/ui-ribbon.webp) center/100% 100% no-repeat;padding:.3em 1.1em;text-shadow:0 2px 0 #3a1004}
+html.sk-pl #finger svg{display:none}html.sk-pl #finger{background:url(media/ui-finger.webp) center/contain no-repeat}
+.pic{width:1.25em;height:1.25em;vertical-align:-.3em;object-fit:contain}.tag .pic{margin-right:3px}
+html.sk-pl .gxh-bub .gxh-arr{width:28px;height:21px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none}
+html.sk-pl .gxh-a-bottom .gxh-arr{bottom:-19px}html.sk-pl .gxh-a-top .gxh-arr{top:-19px;transform:scaleY(-1)}html.sk-pl .gxh-a-left .gxh-arr{left:-22px;transform:rotate(90deg)}html.sk-pl .gxh-a-right .gxh-arr{right:-22px;transform:rotate(-90deg)}
+
+/* look fixes: readable tile names, 44 px tap boxes for the goods row (footprint unchanged: margin takes back the extra 10 px) */
+html.sk-pl .tile .tn{background:rgba(255,247,226,.93);box-shadow:0 0 0 2px rgba(255,247,226,.93);border-radius:3px;color:#2e1a0a}
+html.sk-pl .tile .tv{color:#fff3c8;font-weight:800;line-height:11px;padding-top:2px;text-shadow:0 0 2px #000}
+html:not(.land):not(.short) .mcard{height:44px;margin:-5px 0;padding:5px 0;box-sizing:border-box;border:0;border-radius:7px;outline:1px solid #8a5a18;outline-offset:-5px;box-shadow:none;background-clip:content-box!important;background-origin:content-box!important}
+html.sk-pl .dcard .dv::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:url(media/ui-badge-cream.webp) center/142% no-repeat}
+/* menu test v2: solid colour under the painted button art so contrast is measurable (art fills the same colour) */
+html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost{background-color:#f3e2bc}html.sk .ab.go,html.sk .mbox .btn.go{background-color:#b8532b}html.sk .ab.pw,html.sk .mbox .btn.warn{background-color:#4a2f7a}

@@ -92,3 +92,35 @@
 .dlg.debrief[data-end=lose]{background-image:linear-gradient(180deg,rgba(14,12,42,.05) 0,rgba(14,12,42,.4) 110px,#0e0c2a 220px),var(--na-end-lose,none)}
 /* flat (simple) board shows the painted table under the map */
 body.flat .gx-board{background:#05040f var(--tbl-flat,none) center/cover no-repeat}
+.btn:not(.sm):not(.ghost){padding:13px 21px}   /* = painted frame 14/22 minus the 1px border, so the skin on/off boxes match */
+
+/* UI-BAR 14 Oct: readable text, one say-it-once, no overlaps */
+.legend,.lgbtn{display:none!important}
+.road .ph i,.road .ph .tx,.road .ph .mk,.qs,.qx,.qy,.qa{display:none!important}
+.btn,.gx-more .gxh-mrow .btn{font-size:max(13px,.82rem)}
+.qc i,.qc em,.ql,.ql em,.road .ph,.road .ph b,.road .rn{font-size:max(13px,.8rem)}
+.gx-ibtn{padding:12px}
+.gx-ibtn svg{width:22px;height:22px}
+@media (min-width:1024px){.btn,.gx-more .gxh-mrow .btn,.qc i,.qc em,.ql,.ql em,.road .ph,.road .ph b,.road .rn,.gx-dock,.gx-bar{font-size:max(16px,1rem)}}
+table.dial th,table.dial th.cw,table.dial th.sp,.mv .rs,.mv small,.na-guide b,.gx-bar .btn b{font-size:max(13px,.8rem)}
+@media (min-width:1024px){table.dial th,table.dial th.cw,table.dial th.sp,.mv .rs,.mv small,.na-guide b{font-size:16px}}
+.gx-bar .gxh-bulb,.gx-bar .gx-ibtn{padding:12px;box-sizing:border-box}
+.gx-bar{flex-wrap:nowrap;min-width:0}
+.gx-bar .btn{white-space:nowrap;padding-inline:10px}
+.gx-dock{overflow-x:hidden;box-sizing:border-box;padding-inline:16px}
+.gx-dock table.dial{max-width:100%;table-layout:auto}
+.gx-more .gxh-mrow .btn,.gx-more .btn{font-size:max(13px,.82rem)}
+@media (min-width:1600px){.gx-more{flex-direction:column}.gx-more .gxh-mrow{flex:1 1 auto;gap:8px}.gx-more .gxh-mrow:last-child>span:first-child{display:inline}}
+.gx-bar .gxh-bulb{min-width:48px;width:48px;min-height:44px;padding:11px 13px}
+.gx-bar h1{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis}
+.gx-dock .btn.sm{margin-right:4px}
+.gx-dock{padding-inline-end:20px}
+.gx-bar .gxh-bulb,.gx-bar .na-guide{min-width:52px;min-height:52px;height:52px;width:52px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.dlg.start h1{line-height:1.25;margin:0 0 .5rem}
+.dlg .launchbar{margin-top:.5rem;flex-wrap:wrap}
+.gx-dock .btn.sm{max-width:calc(100% - 24px);white-space:normal}
+#phchip.ph-chip{overflow:visible;padding-top:4px}
+.dlg .launchbar{position:static}
+.dlg.start h1{position:static;display:block}
+.dlg .launchbar h1{position:static}
+.gx-dock div:has(>.btn.sm[data-dial]){display:flex;flex-wrap:wrap;gap:6px;max-width:100%;box-sizing:border-box;padding-right:8px}

@@ -36,7 +36,7 @@ function slot(){const s=document.getElementById('start');
   if(!UI.tut&&(SND.mood==='tension'||(UI.camp&&UI.camp.boss&&campOn())))return['fight',0];
   return['main',0]}
 function boot(){
-  try{GXSK.init({})}catch(e){}
+  try{GXSK.init({sets:{'sk-frame':['board-frame'],'sk-ringslot':['ring-slot'],'sk-nametag':['ui-nametag-c'],'sk-tail':['ui-bubble-tail'],'sk-row':['ui-row-c']}})}catch(e){}
   try{GXMUS.init({key:'tw',slots:SLOTS,slot,on:()=>SND.music,toggle:()=>toggleMusic()})}catch(e){}
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="musicpick"]');if(b){e.stopPropagation();GXMUS.open()}},true);
   artVars();setInterval(()=>{try{artVars();skin()}catch(e){}},800)}

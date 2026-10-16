@@ -1,0 +1,23 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"dk-art-phone.json",
+"dk-board-phone.json",
+"dk-boss-reveal-phone.json",
+"dk-diary-phone.json",
+"dk-fight-bonus-phone.json",
+"dk-gear-up-phone.json",
+"dk-hand-names-phone.json",
+"dk-kick-order-phone.json",
+"dk-menu-rows-phone.json",
+"dk-status-line-phone.json",
+"dk-tips-phone.json",
+"dk-tut-help-phone.json",
+"dk-zoom-phone.json",
+"menu-phone.json",
+"story-scene-phone.json"
+]
+}
+}

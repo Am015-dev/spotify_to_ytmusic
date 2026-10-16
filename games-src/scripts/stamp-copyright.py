@@ -28,4 +28,4 @@ for page in pages(sys.argv[1:]):
     if not n:
         sys.exit(f"no <head> in {page}")
     page.write_text(new, encoding="utf-8")
-    print("stamped", page.relative_to(ROOT.parent))
+    print("stamped", page)

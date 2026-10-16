@@ -12,8 +12,8 @@ const sPersist=()=>save('mnr_story',sSave);
    DM: per-difficulty multipliers: lv = added to the stage level, hp = enemy and boss HP. (Bullet speed, density and fire rate per difficulty live in DIFFS, b.js.) */
 const LV=[1.6, 1.8, 2.0, 2.2, 2.61, 2.62, 2.83, 3.24, 3.26, 3.47, 3.7, 3.92, 4.34, 4.37, 4.6, 5.04, 5.07, 5.31, 5.55, 5.8, 6.24, 6.29, 6.54, 7.0, 7.05, 7.31, 7.57, 7.84, 8.3, 8.37, 8.64, 9.12, 9.19, 9.47, 9.75, 10.04, 10.53, 10.61, 10.91, 11.4, 2.81, 4.54, 6.44, 8.5, 10.73];
 const HULL=[7, 7, 7, 7, 7, 7, 7, 7, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6];
-const TUNE={lenK:.02,d0:.85,dd:.125,dens0:1.15,densd:.055,xd:.12,xs:2,bsd:.085,eh:.24,el0:2,eld:.07,hd:.09,hull:HULL,lv:LV,bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12,
-  dm:{easy:{lv:-.5,hp:.9},normal:{lv:0,hp:1},hard:{lv:.3,hp:1.1},vhard:{lv:.5,hp:1.2},legend:{lv:.8,hp:1.3}}};
+const TUNE={lenK:.02,d0:.85,dd:.125,dens0:1.15,densd:.035,xd:.12,xs:2,bsd:.085,eh:.24,el0:2,eld:.07,hd:.09,hull:HULL,lv:LV,bossHp:1.2,bossHpd:.12,miniHp:1.4,miniHpd:.12,
+  dm:{easy:{lv:-.8,hp:.9},normal:{lv:0,hp:1},hard:{lv:.3,hp:1.1},vhard:{lv:.5,hp:1.2},legend:{lv:.8,hp:1.3}}};
 const dmOf=()=>TUNE.dm[SET.diff]||TUNE.dm.normal;
 const BOSS_SUB={4:'Bridge sentinel, twin cannon',5:'Gate warden, laser rig'};
 /* 40 story stages, eight per city: a run through, a hunt, a gimmick stage, a new twist, the city's mini-boss, a hard convoy (squad leaders), a pre-boss test and the boss.
@@ -69,9 +69,9 @@ const CITYS=[
    req = the stage that opens it (the city's mini-boss); s3 = the score for its third star */
 const CHALL=[
  {di:0,req:5, name:'GLASS LANE',  intro:'One hit ends it. Stay clean.',  ch:'nohit',  goal:{k:'survive',v:46}, perf:30,s3:300000, waves:['droneLine','droneSine','droneV','chargers','turret']},
- {di:1,req:13,name:'FERRY SPRINT',intro:'Beat the clock. Kill fast.',     ch:'speed',  goal:{k:'kill',v:130},    perf:24,s3:250000, waves:['droneSine','droneV','chargers','turret','gunship'],tb:.9},
+ {di:1,req:13,name:'FERRY SPRINT',intro:'Beat the clock. Kill fast.',     ch:'speed',  goal:{k:'kill',v:130},    perf:24,s3:250000, waves:['droneSine','droneV','chargers','turret','gunship'],tb:1.05},
  {di:2,req:21,name:'RAIL RHYTHM', intro:'Land PERFECTs. Hold the beat.',  ch:'perfect',goal:{k:'survive',v:46}, perf:28,s3:450000, waves:['gate','droneLine','chargers','turret','droneSine']},
- {di:3,req:29,name:'FAIR DASH',   intro:'Beat the clock. Kill fast.',     ch:'speed',  goal:{k:'kill',v:120},    perf:22,s3:600000, waves:['droneV','chargers','turret','gunship','gate'],tb:.9},
+ {di:3,req:29,name:'FAIR DASH',   intro:'Beat the clock. Kill fast.',     ch:'speed',  goal:{k:'kill',v:120},    perf:22,s3:600000, waves:['droneV','chargers','turret','gunship','gate'],tb:1.05},
  {di:4,req:37,name:'MARBLE LANE', intro:'One hit ends it. Stay clean.',  ch:'nohit',  goal:{k:'survive',v:46}, perf:26,s3:800000, waves:['phalanx','wedge','turret','droneSine','gunship']}];
 const STAGES=[];
 CITYS.forEach((c,ci)=>c.st.forEach((r,k)=>{const n=STAGES.length+1,d={n,di:c.di,name:r[0],intro:r[1],goal:r[2],perf:r[3],waves:r[4],act:ci,pos:k};

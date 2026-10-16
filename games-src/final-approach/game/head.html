@@ -496,4 +496,23 @@ html.ph.ph-p .gx-dock-body{gap:0!important;padding-top:0!important;padding-botto
 html.fapx .w.appr.scene{background:transparent}
 #acts [data-a=ready]{padding-left:40px;min-height:48px}
 #crewd.gx-drawer{border-style:solid;border-color:transparent;border-width:84px 34px 40px;background-clip:padding-box}
+/* a side drawer owns the screen while open: what it would cover steps aside (UI-BAR 9) */
+html:has(.gx-drawer.on) .gx-dock,html:has(.gx-drawer.on) .gx-reopen,html:has(.gx-drawer.on) #start{visibility:hidden}
+/* start screen: one primary + one Quick game row (UI-BAR 7); bigger text on wide screens (UI-BAR 1, 8) */
+.tbtns{gap:16px}.tbtn.go{min-height:76px}
+.qrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;background:rgba(8,16,24,.62);border-radius:14px;padding:10px 16px}
+.qlbl{flex:1 0 100%;text-align:center;color:#ffe9c2;font:800 14px var(--font)}
+.qseg{flex:1 1 0;appearance:none;border:2px solid #14202c;border-radius:12px;min-height:48px;padding:0 12px;background:linear-gradient(180deg,#fff,#d3dde6);color:#14202c;font:800 16px var(--font);cursor:pointer}
+@media (min-width:1024px){.tbtn span,.qlbl,.ttl .tag{font-size:16px}.tbtn b{font-size:28px}.gx-bar,.gx-bar *{font-size:max(1em,16px)}.gx-bar .gx-ibtn span{font-size:16px}}
+/* UI-BAR 1/5/6/9 at desktop widths */
+.w .tl{display:none}
+.ttl-in{padding-top:calc(var(--gx-bar-h,56px) + 16px)}
+@media (min-width:1024px){
+#barstat,.gx-dock-head .gx-dt{font-size:16px}
+.gx-drawer-body :where(span,summary,small,p,li,label,td,button,b){font-size:max(16px,1em)!important}
+.gx-dock-body :where(span,small,p,li,label,td,b,i,em,strong){font-size:max(16px,1em)!important}
+html:has(.gx-drawer.on) #pz{visibility:hidden}
+.gx-drawer-body :where(.ll,.sm,.tinyc,i,em,strong),.gx-dock .gx-ibtn,#prompt,#says,#says *,#rt,#rt *,#selinfo,#selinfo *,#acts button,#acts button *{font-size:16px!important}
+}
+@media (min-width:1000px){html:not(.ph) .gx-dock{align-self:start;max-height:100%}}
 </style></head>

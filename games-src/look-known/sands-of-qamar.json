@@ -1,0 +1,16 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"menu-phone.json",
+"sq-art-phone.json",
+"sq-board-phone.json",
+"sq-chips-phone.json",
+"sq-help-phone.json",
+"sq-uibar-phone.json",
+"sq-zoom-phone.json",
+"story-scene-phone.json"
+]
+}
+}
