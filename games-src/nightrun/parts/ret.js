@@ -58,3 +58,63 @@ const ARC={secs:150,leadSecs:44,maxBars:80,on:load('mnr_arc',1)!==0,
     return Math.max(Math.min(full,BOSS_BARS+20),Math.min(full,this.maxBars,Math.floor(this.secs/spb),lead+BOSS_BARS));},
   label(){return this.active()?'ARCADE · ~3 MIN':'CLASSIC · FULL SONG';}};
 window.ARC=ARC;
+
+/* ===== B11 daily streak and weekly challenge ===== */
+if(RET.daily===undefined)RET.daily=true;
+RET.clock=null;                                   // test hook: RET.setClock(ms | () => ms | null) replaces the system clock
+RET.setClock=f=>{RET.clock=f==null?null:(typeof f==='function'?f:()=>f);RET.dailyShow();};
+const DY={max:7,base:50,step:10,weekly:300,
+  s:Object.assign({last:0,streak:0,seen:0,wk:0,wkN:0,wkBest:0},load('mnr_streak',{}))};
+for(const k in DY.s)if(!isFinite(DY.s[k]))DY.s[k]=0;
+DY.persist=()=>save('mnr_streak',DY.s);
+DY.ms=()=>{let m=RET.clock?+RET.clock():Date.now();return isFinite(m)&&m>0?m:Date.now();};
+DY.dn=ms=>{const d=new Date(ms);return Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);};   // local calendar day number, so a timezone change moves the date only by what the wall clock shows
+/* today: never earlier than the latest day seen, so a clock set back cannot grant twice or cut a streak; a jump back of more than 3 days is taken as a clock fix */
+DY.today=()=>{const s=DY.s,ms=DY.ms();let t=DY.dn(ms);
+  if(s.seen>0&&s.seen-t>3){s.seen=t;s.last=Math.min(s.last,t-1);DY.persist();}
+  else if(t<s.seen)t=s.seen;
+  if(t>s.seen){s.seen=t;DY.persist();}
+  return t;};
+DY.streakNow=t=>DY.s.last&&t-DY.s.last<=2?DY.s.streak:0;      // one missed day keeps it, two reset it
+DY.reward=n=>DY.base+DY.step*Math.min(n,DY.max);
+DY.status=()=>{const t=DY.today(),done=DY.s.last===t,cur=DY.streakNow(t),next=done?cur:cur+1;
+  return{today:t,claimed:done,streak:cur,next,reward:DY.reward(next)};};
+DY.pay=n=>{if(!(n>0)||!isFinite(n))return 0;GA.bank+=Math.floor(n);gsave();return Math.floor(n);};
+RET.dailyClaim=function(){if(!RET.daily)return 0;const st=DY.status();if(st.claimed)return 0;
+  DY.s.streak=st.next;DY.s.last=st.today;DY.persist();return DY.pay(st.reward);};
+/* weekly: ISO 8601 week of the local date; the seed and the two mutators depend on the week only */
+DY.weekKey=t=>{const wd=(t+3)%7,thu=t-wd+3,y=new Date(thu*864e5).getUTCFullYear(),j1=Math.floor(Date.UTC(y,0,1)/864e5);return y*100+Math.floor((thu-j1)/7)+1;};
+RET.week=function(){const k=DY.weekKey(DY.today()),r=mul(k*7919+13),pool=MUTS.map(m=>m.id),m=[];
+  while(m.length<2){const i=Math.floor(r()*pool.length);m.push(pool.splice(i,1)[0]);}
+  return{key:k,seed:k*31+5,muts:m,names:m.map(id=>MUTS.find(x=>x.id===id).n),cleared:DY.s.wk===k,best:DY.s.wkN===k?DY.s.wkBest:0};};
+RET.weeklyBestLine=()=>{const w=RET.week();return'Weekly best <strong>'+(w.best?w.best.toLocaleString('de-DE'):'—')+'</strong>';};
+RET.weeklyEnd=function(score){const w=RET.week();let eye='Weekly run over';
+  if(DY.s.wkN!==w.key){DY.s.wkN=w.key;DY.s.wkBest=0;}
+  if(score>DY.s.wkBest){DY.s.wkBest=score;eye='New weekly best';}DY.persist();return eye;};
+RET.weeklyClear=function(){const w=RET.week();if(w.cleared)return 0;DY.s.wk=w.key;DY.persist();return DY.pay(DY.weekly);};
+NR.on('runStart',d=>{if(!RET.daily||!d||!d.daily||!RET.wkPending){return;}
+  RET.wkPending=false;const w=RET.week();G.weekly=w.key;
+  GR=mul(w.seed);GX=mul(w.seed+7919);DIR.mut=w.muts.slice();DIR.bsK=DIR.has('turbo')?1.12:1;
+  G.note={t:6,txt:'Weekly: '+w.names.join(' + ')};});
+NR.on('districtEnd',()=>{if(!RET.daily||!G.weekly)return;const p=RET.weeklyClear();if(p)G.note={t:5,txt:'Weekly cleared +'+p+' Neon'};});
+NR.on('runEnd',d=>{if(!RET.daily||!d||d.quit)return;
+  const e=(()=>{let x=$('retDy');if(!x){x=document.createElement('div');x.id='retDy';x.className='retBar';const h=$('over').querySelector('.in');h.insertBefore(x,h.querySelector('.row'));}return x;})();
+  if(G.weekly){e.hidden=false;const w=RET.week();e.innerHTML=w.cleared?'Weekly challenge cleared':'Weekly: beat the first boss for <b>'+DY.weekly+'</b> Neon';return;}
+  if(!G.daily){e.hidden=true;return;}
+  const p=RET.dailyClaim(),st=DY.status();e.hidden=false;
+  e.innerHTML=p?'Daily bonus <b>+'+p+'</b> Neon · streak <b>'+st.streak+'</b>':'Daily bonus already claimed today · streak <b>'+st.streak+'</b>';});
+/* title screen status: one block under the best line (a few lines, wraps at 390 px) */
+{const st=document.createElement('style');st.textContent=`
+#retTt{width:100%;max-width:min(94%,440px);margin:.5em auto 0;text-align:center;font-family:var(--mono);font-size:clamp(12px,min(3.3vw,2.3vh),16px);line-height:1.35;color:var(--dim);overflow-wrap:anywhere}
+#retTt b{color:#fff;font-weight:400}#retTt .ok{color:#6cf59a}#retTt button{margin-top:.4em;font:inherit;padding:.5em 1em;min-height:40px;border-radius:99px;border:1px solid #ffb020;background:#0000;color:#ffb020;cursor:pointer}
+`;document.head.appendChild(st);}
+RET.dailyShow=function(){let e=$('retTt');
+  if(!RET.daily){if(e)e.hidden=true;return;}
+  if(!e){e=document.createElement('div');e.id='retTt';$('bestT').after(e);
+    e.addEventListener('click',ev=>{if(ev.target.id!=='wkBtn')return;RET.wkPending=true;start(true);});}
+  e.hidden=false;const d=DY.status(),w=RET.week();
+  e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· today\'s bonus claimed</span>':'Daily streak <b>'+d.streak+'</b> · fly the daily run for <b>+'+d.reward+'</b> Neon')
+   +'<br>'+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly: <b>'+w.names.join(' + ')+'</b> · boss clear = <b>+'+DY.weekly+'</b>')+(w.best?' · best '+w.best.toLocaleString('de-DE'):'')
+   +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
+RET.dailyShow();
+window.DY=DY;
