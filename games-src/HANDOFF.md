@@ -18,6 +18,15 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Owner rules this week: credits = "Art and music by Am015-dev", never name the music/art tools; "Shuffle all songs" is the default music; music never changes playback rate; check a live link (curl 200) before sending it; look at PC layouts as well as phone.
 - Open owner decisions: replace the few CC BY tracks (credits must stay while used); open games as separate pages instead of the shelf iframe (frees memory fully).
 
+## Mainhattan Nightrun L2 (16 Oct 2026): enemies are seen and fought
+- Done: one damage model in `parts/b.js` (`DMG`): entry grace (no damage until x <= W-40, bullets fly through, a red edge ring telegraphs spawns), an on-screen
+  minimum life per enemy type (drone 1.2 s .. gunship 2.6 s, elites 4 s, Easy x0.9), a per-shot soft cap (above 2 at half, max 8), gentler enemy fire
+  (`DMG.fk` .45, Easy x0.8, endless `fkE` .65), chargers glide in and dash at 400+40d px/s, story density growth `densd` .035, Easy level -0.8, speed challenge clock 1.05.
+  Before -> after (late build, Normal): drones alive on screen 0.00 -> 1.53 s, shooters that fire 0% -> 79%, killed unseen 82% -> 0.6%, bot hits 0 -> 2, clears 1-42 100%.
+  Numbers and targets: `games-src/nightrun/BALANCE.md`. Check: `games-src/nightrun/balance-test.js` (fails the old build, passes this one); afk-test PASS.
+- Next: trace the last 0.1-1.8% unseen kills (cleared runs, stage 1/8/42); stage 30 with a mid build is 0-33%; the bot can't dodge the stage-5 mini-boss lasers (old build too);
+  `weapon-test.js` named in the brief does not exist in the repo.
+
 ## Mainhattan Nightrun L1 (13 Oct 2026): stages, map, difficulty, strategy
 - Story is 40 stages (8 per district) plus 5 optional challenge stages (no-hit, speed, perfect-beat) on a painted scrollable route map (`parts/map.js`); tap a node, read the plate, PLAY. Old saves move by stage name (`v40`). How it works: `games-src/nightrun/STORY.md`.
 - One tuning table (`LV`, `HULL`, `TUNE.dm`, `TUNE.lenK` at the top of `parts/story.js`); check it with `RUNS=16 STAGES=$(seq -s, 1 45) node games-src/nightrun/story-sim.js` (bot clears stages 1-16 every time, about 80% of 33-40; the bot keeps moving, the anti-idle beam hit it before).
