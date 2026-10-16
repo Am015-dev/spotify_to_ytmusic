@@ -156,7 +156,7 @@ function AS_fix(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=AS
   for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const A=GF.get((kx+a)*100000+kz+b);if(A)for(const q of A){if(q===p)continue;const dx=q.x-p.x,dz=q.z-p.z,d2=dx*dx+dz*dz;if(d2>3600)continue;const d=Math.sqrt(d2),i=q._vi;if(cnt[i]===0)T.push(i);cnt[i]+=(d<30?1.5:1)-d/80}}
   const c0=cnt[p._vi];if(c0){let best=p.av,bv=p._vi,bc=c0;for(const P of[PP[p.t]||[],PA]){for(const[v,i]of P){const c=cnt[i];if(c<bc-1e-6){bc=c;best=v;bv=i}}if(bc===0)break}if(best!==p.av){p.av=best;p._vi=bv;ch++;ST.set(kx*100000+kz,step)}}
   for(const i of T)cnt[i]=0;T.length=0}sw+=ch;if(!ch)break}return sw}
-function AS_farM(p,m){const V=ASSET.V[p.av];return m.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),V.cls==='keep'?_ts.set(1,1,1):_ts.set(V.rx,V.H,V.rx))}
+function AS_farM(p,m){const V=ASSET.V[p.av];return m.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),V.cls==='keep'?_ts.set(1,1,1):_ts.set(V.rx*(p.cvs?p.cvs[0]:1),V.H*(p.cvs?p.cvs[1]:1),V.rx*(p.cvs?p.cvs[0]:1)))/* city-var: p.cvs = foliage-mix size (98cv) */}
 // far instances of assigned props: variant scale + crown tint (+ debris colour)
 function AS_far(L){const M=new THREE.Matrix4(),dirty=new Set();for(const p of L){if(!p.av||!p.im)continue;const V=ASSET.V[p.av];if(V.cls==='keep')continue;if(p.alive)p.im.setMatrixAt(p.i,AS_farM(p,M));if(p.im.geometry.userData.asImp){p.im.setColorAt(p.i,_asC.setRGB(V.cell/255,0,0));if(p.im.material!==ASSET.imp.mat)p.im.material=ASSET.imp.mat;p.im.castShadow=false}else if(p.im.instanceColor)p.im.setColorAt(p.i,V.leaf);p.col=V.leaf.clone();dirty.add(p.im)}
  for(const im of dirty){im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.computeBoundingSphere()}}
@@ -217,7 +217,7 @@ function AS_step(){if(ASSET.off||!HUB.pgrid||!HUB.props||!ASSET.nm||!camera)retu
  for(const p of ASSET.hid)if(!now.has(p)&&p.alive&&p.im){p.im.setMatrixAt(p.i,AS_farM(p,M));ASSET.dirty.add(p.im)}ASSET.hid=now;for(const im of ASSET.dirty)im.instanceMatrix.needsUpdate=true;ASSET.dirty.clear();
  let draws=0,tris=0,inst=[0,0];for(const[S,MM,li]of[[near,ASSET.nm,0],[mid,ASSET.mm,1]])for(const n in MM){let im=MM[n];const L=S[n]||[];
   if(L.length>im.instanceMatrix.count){const g=im.geometry,par=im.parent;par&&par.remove(im);im.dispose&&im.dispose();im=new THREE.InstancedMesh(g,ASSET.mat,Math.ceil(L.length*1.5));im.userData=Object.assign({},MM[n].userData);par&&par.add(im);MM[n]=im}
-  L.forEach((p,i)=>{M.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));im.setMatrixAt(i,M)});im.count=L.length;im.visible=L.length>0;
+  L.forEach((p,i)=>{const w=p.cvs?p.cvs[0]:1;M.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(w,p.cvs?p.cvs[1]:1,w));im.setMatrixAt(i,M)});im.count=L.length;im.visible=L.length>0;
   if(L.length){im.instanceMatrix.needsUpdate=true;im.computeBoundingSphere();draws++;tris+=L.length*im.geometry.userData.as.tris;inst[li]+=L.length}}
  ASSET.last={ms:+(performance.now()-t0).toFixed(2),draws,tris,near:inst[0],mid:inst[1],hidden:now.size}}
 // test hook: chk() = per-variant parts/studs/tris; lod() = every drawn instance on the right LOD for its distance; mix(r) = worst same-variant share within r m
