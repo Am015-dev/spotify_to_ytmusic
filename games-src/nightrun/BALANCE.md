@@ -88,3 +88,23 @@ Tempo Up, Slow Groove, Magnet Storm and Triple Shot kept on all stage long.
 
 - weapon-test PASS (each weapon alone clears stage 1); afk-test PASS after `DMG.fkE` .5 (endless only).
 - balance-test: 1 FAIL left: easy/late unseen 2.5% (> 2%), the same cleared-run residual as above. Next session: trace it.
+
+## Round 2 (16 Oct 2026): late stages, Hard, Easy unseen kills, stage-5 lasers
+Root cause of the late-stage regression: with entry grace and a minimum life, every enemy now lives 1.2-2.6 s, so at story level L >= 5 several
+shooters, drones and chargers overlap on screen and their bullets/touches add up (stage 30 = hull 5, ~320 s long). Fixes (all in `b.js` `DMG`, story only):
+- `DMG.lf()` enemy fire falls 13% per level above 3 (floor .4); `DMG.lm()` minimum life falls 1.5 x .13 per level (floor .65). The floors from round 1 still hold.
+- Charger dash capped at 470 px/s (`DMG.cvMax`). Hard story: enemy speed 1.3 (was 1.45), bullet speed 1.1 (1.22), fire 1.0 (1.35).
+- Easy unseen kills traced: a kill's own blast (processed earlier in the same enemy loop) finished drones that were still entering (hp -1.8 at x 950-1050,
+  `gr` set). The loop now restores hp of any enemy still entering before it checks for death.
+- Stage-5 mini-boss lasers: the laser is a locked line with a 2-beat telegraph; the bot now stays off the telegraphed line (story-sim.js), like a player.
+  Result 100% clear, boss fight 34 s (>= 25 s), so the boss is not trivial.
+| check (story-sim, RUNS 10-16, Normal) | before | after |
+|---|---|---|
+| stage 1 / 8 | 100 / 100 % | 100 / 100 %, hits 2.1 / 3.0 |
+| stage 5 (mini-boss) | 0 % (6.4 laser hits) | 100 %, hits 2.4 |
+| stage 20 | 50 % (5.3 hits) | 90-94 % (3.4-3.7 hits) |
+| stage 30 | 0 % (5.5 hits) | 20-38 % (5.1-5.4 hits) with the default kit; balance-test late build 100 % |
+| stage 42 | 83 % | 100 % |
+- balance-test (RUNS 3, 3 diffs x 3 builds): 32 PASS, 0 FAIL (Easy late unseen 0 %, shooters fired 71 %). normal/late 1/8/20/30/42 = 67/100/100/100/100,
+  hard/late 30 = 33 % (RUNS 10: 50 %). afk-test and weapon-test PASS.
+- Still weak: stage 30 with the default kit and mid builds is 20-67 % (long stage, hull 5, many "other" hits = fences/beams the bot ignores). Next lever: `DMG.lvK`/`fkFloor`.

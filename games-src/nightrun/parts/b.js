@@ -85,7 +85,7 @@ function newGame(daily){
 // Story has its own ramp (ST.*, see story.js): sd, sbs, sfr scale it. fan = bullets added to every fan and ring, heal = hull drops, el = elite share.
 const DIFFS={easy:{d:.85,bs:.9,fr:.85,dn:.75,sd:.85,sbs:.92,sfr:.9,fan:-1,heal:1.5,el:0},
   normal:{d:1.9,bs:1.25,fr:1.45,dn:1,sd:1,sbs:1,sfr:1,fan:0,heal:1,el:0},
-  hard:{d:3.6,bs:2,fr:5.6,dn:1.45,sd:1.45,sbs:1.22,sfr:1.35,fan:3,heal:.35,el:1.3,aq:3},
+  hard:{d:3.6,bs:2,fr:5.6,dn:1.45,sd:1.3,sbs:1.1,sfr:1,fan:3,heal:.35,el:1.3,aq:3},
   vhard:{d:4,bs:2.15,fr:5.8,dn:1.6,sd:1.7,sbs:1.35,sfr:1.5,fan:4,heal:.3,el:1.5,aq:4},       // VERY HARD: faster, denser, more elites, almost no repairs
   legend:{d:4.7,bs:2.4,fr:6.6,dn:1.8,sd:2,sbs:1.5,sfr:1.7,fan:5,heal:.15,el:1.9,aq:6}};         // LEGEND: the full set of smart enemy tricks from the start
 const HARDS=['hard','vhard','legend'];
@@ -118,9 +118,9 @@ const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil
   hit(d){return !this.on||d<=this.hk?d:Math.min(this.hc,this.hk+(d-this.hk)*this.half);},   // one shot: damage above x2 counts at half, never more than 8 (crits, sharp beat and damage perks stacked)
 
   // late stages: several enemies overlap, so each stays a little shorter and fires a little less (level L from story.js; 1 up to lvA, then falls by lvK a level to a floor)
-  lvA:3,lvK:.1,mlFloor:.5,fkFloor:.45,
+  lvA:3,lvK:.13,mlFloor:.65,fkFloor:.4,
   lf(){return ST.on?Math.max(this.fkFloor,1-this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
-  lm(){return ST.on?Math.max(this.mlFloor,1-2*this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
+  lm(){return ST.on?Math.max(this.mlFloor,1-1.5*this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
   ml:{drone:1.2,flank:1.2,turret:1.3,charger:1.3,gunship:2.6,gate:1.4,mine:.6,swarm:0},elMl:4,
   minLife(e){const b=e.el?(e.type==='charger'?2:Math.max(this.elMl,this.ml[e.type]||0)):(this.ml[e.type]||0);return b*this.lm()*(SET.diff==='easy'?this.easyK:1);},
   pass(dt){if(!this.on)return;let raw=0;
@@ -371,6 +371,7 @@ function update(dt){
   DMG.pass(dt);
   for(const e of G.en){if(e.type==='boss'&&e.floor>0&&e.hp<e.floor){e.hp=e.floor;if(!(e.lk>0)){e.lk=.35;if(!e.armN||G.t-e.armN>6){e.armN=G.t;floater(e.x,e.y-e.r-18,'ARMOUR','#19e3ff');}}}
     if(e.lk>0)e.lk-=dt;
+    if(DMG.on&&e.gr&&e.hq!=null&&e.hp<e.hq)e.hp=e.hq;   // a kill's own blast (earlier in this loop) must not finish an enemy still entering
     if(e.hp<=0&&!e.dead){e.dead=1;if(e.type==='boss')bossDown(e);else kill(e);}
     if(e.x<-120||e.y<-120)e.dead=1;}
   G.en=G.en.filter(e=>!e.dead);
