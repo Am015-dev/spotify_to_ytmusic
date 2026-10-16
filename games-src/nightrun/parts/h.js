@@ -17,7 +17,7 @@ NR.on('tick',dt=>{if(!G.live)return;
   /* a hop of 40 px or more re-anchors and pays back 1.2 s of stillness (it used to halve it, so a nudge every few seconds kept a parked ship safe); a dash in place pays nothing, only real distance does */
   if(Math.hypot(P.x-STILL.ax,P.y-STILL.ay)>40){STILL.ax=P.x;STILL.ay=P.y;STILL.t=Math.max(0,STILL.t-1.2);}
   else if(P.dashT>0){STILL.ax=P.x;STILL.ay=P.y;}
-  else if(G.t>6&&G.transT<0&&!G.lab)STILL.t+=dt;
+  else if(G.t>6&&G.transT<0&&!G.lab&&!G.tut)STILL.t+=dt;   // the flight school (tut.js) shows its own tame warning
   const s=Math.max(0,STILL.t-STILLF()),k=Math.min(1,s/STILL_RAMP);STILL.k=k;
   STILL.fk=1+1.4*k;STILL.bk=1+.22*k;STILL.sk=Math.max(.12,1-.88*k);
   if(s>0&&G.mult>1)G.mult=Math.max(1,G.mult-.4*dt);

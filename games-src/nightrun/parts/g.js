@@ -9,6 +9,7 @@ const NR_CHECKLIST=[
  {ver:'L2',id:'no-idle',text:'Standing still is no longer safe: parking in one spot (or nudging a few pixels) now brings the red static discharge that no shield, heal or revive can outlast, plus aimed shots from the edge of the screen. Keep moving and nothing changes. Does it feel fair?'},
  {ver:'L1',id:'weapons-fusions',text:'Eight weapons now (new: Arc Chain, Orbit Blades, Ricochet Disc, Mine Layer). Put two DIFFERENT weapons in the two slots on the WEAPONS sheet and they fuse: a named fusion with its own effect and +12% damage. The fusion pictures are shapes until the art arrives. Do the new weapons feel different, and is a fusion worth choosing?'},
  {ver:'L1',id:'phone-hud',text:'On a phone the run shows the city: one slim strip on top (score, combo, hull, heat), small chips for shield, revive and power-ups under it, dash and EMP charge on their buttons. Nothing sits over the middle of the screen. Test link: ?scn=nr-hud-busy.'},
+ {ver:'L1',id:'flight-school',text:'New FLIGHT SCHOOL (title > FLIGHT SCHOOL, or Settings > REPLAY TUTORIAL; new players are offered it once): about 3 minutes of tiny challenges: rings, gold on-beat shots, a slow fan, the on-beat dash, pickups and tier, EMP and heat, your two weapons and their fusion, a leader. SKIP is always top right, you can never lose, and the first clear gives +60 Neon for the Garage.'},
  {ver:'L1',id:'story-map',text:'STORY opens a painted route map: 40 stages in five districts (8 each), mini-bosses and bosses are bigger medallions, your next stage glows, locked stages show a padlock. Tap a stage: a plate shows goal, the three stars, your best and PLAY. Scroll along the road (up on a phone, sideways on a wide screen).'},
  {ver:'L1',id:'challenges',text:'Each district has an optional challenge stage that opens after its mini-boss: a side branch on the map. NO-HIT ends on the first hull hit, SPEED needs the kills before the clock, PERFECT needs a PERFECT count. Each pays up to 3 stars.'},
  {ver:'L1',id:'curve',text:'Difficulty rises a little every stage with no sudden spike: stage 1 to 4 feel gentle, a boss is slightly above the stages around it.'},
@@ -327,7 +328,7 @@ stage.appendChild(wpEl);
    else{const p=(t%1)/1,ring=(t%1)<.3?(t%1)/.3:0;c.globalAlpha=1-ring;c.beginPath();c.arc(20,sy,4+ring*14,0,7);c.stroke();c.globalAlpha=1;foe(94,sy,p>.8&&p<.95);
      const x=20+p*70;c.fillRect(x-8,sy-4,18,8);}
  };
- let raf=0;const loop=()=>{raf=0;if(wpEl.hidden)return;const t=(performance.now()/1000)%2;for(const cv of wpEl.querySelectorAll('canvas')){const c=cv.getContext('2d'),n='wp-'+cv.dataset.id;if(ART.have(n)){c.clearRect(0,0,108,52);c.drawImage(ART.bm[n],28,0,52,52);}else DEMO(cv.dataset.id,c,t,WPD[cv.dataset.id].c);}raf=requestAnimationFrame(loop);};
+ let raf=0;const loop=()=>{raf=0;if(wpEl.hidden)return;const t=(performance.now()/1000)%2;for(const cv of wpEl.querySelectorAll('canvas[data-id]')){const c=cv.getContext('2d'),n='wp-'+cv.dataset.id;if(ART.have(n)){c.clearRect(0,0,108,52);c.drawImage(ART.bm[n],28,0,52,52);}else DEMO(cv.dataset.id,c,t,WPD[cv.dataset.id].c);}raf=requestAnimationFrame(loop);};
  WP.fuIcon=function(c,f,z){c.clearRect(0,0,z,z);const m=z/2;
    if(ART.have(f.img)){c.drawImage(ART.bm[f.img],0,0,z,z);return;}
    c.save();c.lineCap='round';c.shadowBlur=z*.12;

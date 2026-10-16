@@ -287,7 +287,7 @@ function update(dt){
   for(const x of G.delayed){x.t-=dt;if(x.t<=0){x.dead=1;x.f();}}G.delayed=G.delayed.filter(x=>!x.dead);
   if(G.dead){G.deadT+=dt;if(G.deadT>2.2)gameOver();}
   if(!G.dead){beatPump();
-    if(G.t>1.5&&!G.hint.txt&&!TIP.done&&!G.lab){G.hint={t:6,txt:say('Dash on the pulse to power up')};}}   // the one hint, until the first on-beat dash
+    if(G.t>1.5&&!G.hint.txt&&!TIP.done&&!G.lab&&!G.tut){G.hint={t:6,txt:say('Dash on the pulse to power up')};}}   // the one hint, until the first on-beat dash
   else G.bp=bpos();
 
   /* player */
@@ -332,7 +332,7 @@ function update(dt){
 
   /* waves & boss trigger */
   if(ST.on){ST.tick(dt);}
-  else if(G.lab){}                                        // the LAB stage: no waves, no district clock, no boss timer; the LAB panel decides what appears (lab.js)
+  else if(G.lab||G.tut){}                                        // the LAB stage: no waves, no district clock, no boss timer; the LAB panel decides what appears (lab.js)
   else if(!G.dead&&!G.boss&&!G.bossDone){G.dt+=dt;DIR.tick(dt);                 // the director schedules the waves on bar lines; it also decides when the boss comes
     if(!G.preload&&G.dt>10){G.preload=true;const n=nextDi(G.di).di;loadTrack(stageFor(G.di,true));loadTrack(stageFor(n,false));}}
   else if(!G.dead&&G.boss&&G.boss.mini&&!ST.on){G.dt+=dt;DIR.tick(dt);}
