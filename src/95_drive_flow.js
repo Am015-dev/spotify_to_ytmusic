@@ -70,7 +70,7 @@ function DR_fraSplit(r,lo,h0,BMs,W,G,TN){const w=r.x1-r.x0,d=r.z1-r.z0,alongX=w>
     const sx0=alongX?a:c0,sx1=alongX?b:c1,sz0=alongX?c0:a,sz1=alongX?c1:b,sw=sx1-sx0,sd=sz1-sz0,mx=(sx0+sx1)/2,mz=(sz0+sz1)/2,col=new THREE.Color(T[k]);
     const g=bxUV(sw,hh,sd,tw,th);g.translate(mx,lo-.5+hh/2,mz);W.push(colorize(g,col));G.push(cbox(sw-1.2,.6,sd-1.2,mx,lo-.5+hh+.3,mz,c2.roof));
     if(n>1&&i%3===1&&sw>12&&sd>12){const tt=5+Math.floor(DR_h(cx+i*4,cz+i)*3)*3.3,tw2=sw*.6,td2=sd*.6,g2=bxUV(tw2,tt,td2,tw,th);g2.translate(mx,lo-.5+hh+.6+tt/2,mz);W.push(colorize(g2,col.clone().offsetHSL(0,0,.05)));G.push(cbox(tw2-1,.5,td2-1,mx,lo-.5+hh+.6+tt+.25,mz,'#7a5a4c'))}
-    const bb={x:mx,z:mz,hw:sw/2,hd:sd/2};HUB.bld.push(bb);if(HUB.grid)gridAddTo(HUB.grid,[bb]);a=b}
+    const bb={x:mx,z:mz,hw:sw/2,hd:sd/2,rt:lo-.5+hh+.6,tier:n>1&&i%3===1&&sw>12&&sd>12?1:0};/* city-3: rt/tier = roof top for the roof kit (98c3), not used by collision */HUB.bld.push(bb);if(HUB.grid)gridAddTo(HUB.grid,[bb]);a=b}
   DR.st.fraSeg=(DR.st.fraSeg||0)+n}
 // v89i: merge keeping the UV set (mergeG drops it): the filler walls need their facade texture
 function DR_mergeUV(list){const A={position:[3,[]],normal:[3,[]],uv:[2,[]],color:[3,[]]},r=new THREE.BufferGeometry();for(let g of list){g=g.index?g.toNonIndexed():g;for(const k in A){const at=g.attributes[k],n=A[k][0];for(let i=0;i<at.count;i++)for(let c=0;c<n;c++)A[k][1].push(at.getComponent?at.getComponent(i,c):at.array[i*n+c])}}for(const k in A)r.setAttribute(k,new THREE.Float32BufferAttribute(A[k][1],A[k][0]));return r}
