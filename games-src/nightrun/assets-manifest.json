@@ -1364,5 +1364,93 @@
   "notes": "Fusion family \"any + any\": two shots braided together, each piercing one more target. One picture shared by every pair of that family. Painted look on black, light on black (drawn additively), two glowing colours braided into one emblem. Paint at 1024 px or larger, we convert to 512x512.",
   "kind": "fx",
   "prompt": "a fusion emblem: two shots braided together, each piercing one more target, two glowing colours braided into one round emblem, painted neon look on pure black, light on black, no text, letters or numbers"
+ },
+ {
+  "file": "wpmount-frost.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Frost Beam is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Frost Beam mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #9fe8ff. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for frost beam, side view, muzzle pointing right, compact single part, accent glow #9fe8ff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-flame.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Flame Arc is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Flame Arc mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff5a2d. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for flame arc, side view, muzzle pointing right, compact single part, accent glow #ff5a2d, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-wave.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Plasma Wave is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Plasma Wave mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #5b8cff. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for plasma wave, side view, muzzle pointing right, compact single part, accent glow #5b8cff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-shell.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Shrapnel Shell is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Shrapnel Shell mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffa94d. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for shrapnel shell, side view, muzzle pointing right, compact single part, accent glow #ffa94d, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-drone.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Echo Drone is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Echo Drone mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #e6a8ff. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for echo drone, side view, muzzle pointing right, compact single part, accent glow #e6a8ff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-well.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Gravity Well is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Gravity Well mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #7a4dff. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for gravity well, side view, muzzle pointing right, compact single part, accent glow #7a4dff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-rail.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Rail Sniper is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Rail Sniper mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff3d6a. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for rail sniper, side view, muzzle pointing right, compact single part, accent glow #ff3d6a, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "wpmount-storm.webp",
+  "w": 256,
+  "h": 128,
+  "group": "Ship weapon mounts",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Storm Cell is equipped (a coloured circle/triangle until this exists)",
+  "notes": "Storm Cell mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #fff06a. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
+  "prompt": "a small spaceship weapon attachment for storm cell, side view, muzzle pointing right, compact single part, accent glow #fff06a, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
  }
 ]

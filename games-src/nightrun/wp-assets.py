@@ -7,6 +7,7 @@ import json, os, re, glob
 HERE = os.path.dirname(os.path.abspath(__file__)); P = os.path.join(HERE, 'parts'); MEDIA = os.path.normpath(os.path.join(HERE, '..', '..', 'games', 'mainhattan-nightrun', 'media'))
 g = open(os.path.join(P, 'g.js'), encoding='utf8').read()
 blk = g[g.index('const WPD={'):]; blk = blk[:blk.index('};') + 2]
+blk += open(os.path.join(P, 'wpx.js'), encoding='utf8').read()   # the 8 later weapons are added by Object.assign(WPD,...) in wpx.js
 weapons = re.findall(r"(\w+):\{n:'([^']+)',s:'[^']*',c:'(#[0-9a-fA-F]{3,6})'", blk)
 src = ''.join(open(os.path.join(P, f), encoding='utf8').read() for f in ('garage.js', 'shapes.js', 'up2.js'))
 real = {os.path.basename(f)[5:-5] for f in glob.glob(os.path.join(MEDIA, 'ship-*.webp')) if not f.endswith('-armed.webp')}
