@@ -114,6 +114,7 @@
 98cam_size_cam.js
 98dmg_damage.js
 98gx_gfx.js
+98ev_env.js
 98as_assets.js
 98xf_xform.js
 98pu_portrait_ui.js

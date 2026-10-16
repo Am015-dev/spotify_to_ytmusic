@@ -2,8 +2,8 @@
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');const [BASE,OUT]=process.argv.slice(2);fs.mkdirSync(OUT,{recursive:true});
 (async()=>{
  for(const c of(process.env.CITIES||'fra,ath').split(',')){const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await b.newPage({viewport:{width:852,height:393}});
-  p.on('pageerror',e=>console.log('ERR',e.message.slice(0,120)));
-  await p.goto(BASE+'?test='+c+'&q=high');await p.waitForFunction(()=>window.__chk&&window.__bv,null,{timeout:300000});await p.waitForTimeout(4000);
+  p.on('pageerror',e=>console.log('ERR',e.message.slice(0,120)));p.on('console',m=>{if(m.type()==='error'&&/shader|THREE|env1/i.test(m.text()))console.log('CERR',m.text().slice(0,300))});
+  await p.goto(BASE+'?test='+c+'&q=high'+(process.env.Q||''));/* env-1: Q='&env1=0' for the before shots */await p.waitForFunction(()=>window.__chk&&window.__bv,null,{timeout:300000});await p.waitForTimeout(4000);
   // pick spots in-page: returns [name,x,z,yaw]
   await p.evaluate(()=>{window.__dbg=true});
   const spots=await p.evaluate(c=>__oc.ev('('+(function(c){const out=[];const face=(x,z,tx,tz)=>Math.atan2(tx-x,tz-z);
