@@ -177,14 +177,14 @@ const TRN_RC=new THREE.Raycaster();
 function TRN_gmat(x,z){const G=TRN.gm||(TRN.gm=(()=>{const o=[];HUB.grp.traverse(m=>{if(m.isMesh&&m.userData.trG)o.push(m)});return o})());TRN_RC.set(new THREE.Vector3(x,3000,z),new THREE.Vector3(0,-1,0));TRN_RC.far=4000;
   const h=TRN_RC.intersectObjects(G,false)[0];if(!h)return null;const M=h.object.material,mm=Array.isArray(M)?M[0]:M;return h.object.userData.gk==='g'?'g':'w'}
 // ---------- terr-6 (Alex b60: car sunk to the roof on grass, deep bowl near the Battle Arena). State asserts, no pictures.
-// gap: 200 random off-road terrain points in the hub, ray onto the drawn ground (trG meshes) vs groundY (= what the car drives on); grass above
+// gap: 200 random off-road terrain points in the hub, ray onto the drawn ground (trG meshes) vs groundAt (= what the car drives on; terr-7: max(groundY, drawn)); grass above
 //   groundY = a sunk car / sunk props. Need ≤ 0.05 m. slope: the steepest terrain 6-25 m beside the roads (info + the spot the pit test uses).
 // pit: the car is put at the steepest off-road spot found (≤25 m from a road it is the bowl rim, else the worst spot overall), gas held 10 s of
 //   physics steps (roamStep, no rendering): it must end on a road or ≥ 20 m from the start (TR6_stuck lifts it after 3 s).
 function TR6_rnd(sd){let s=sd;return()=>(s=(s*16807)%2147483647)/2147483647}
 function TR6_gap(n=200){const G=[];HUB.grp.updateMatrixWorld(true);HUB.grp.traverse(m=>{if(m.isMesh&&m.userData.trG)G.push(m)});const RC=new THREE.Raycaster(),r=TR6_rnd(4242);let k=0,mx=0,mn=0,ex=null,bad=0;
   for(let t=0;t<20000&&k<n;t++){const x=HX0+(HX1-HX0)*r(),z=HZS+(HZN-HZS)*r();if(ART7_rd(x,z)<2||rivClear(x,z)<8)continue;const g=groundY(x,z);if(g<-1)continue;
-    RC.set(new THREE.Vector3(x,g+400,z),new THREE.Vector3(0,-1,0));RC.far=800;const h=RC.intersectObjects(G,false)[0];if(!h)continue;k++;const d=h.point.y-g;if(d>.05)bad++;if(d>mx){mx=d;ex=[Math.round(x),Math.round(z)]}if(d<mn)mn=d}
+    RC.set(new THREE.Vector3(x,g+400,z),new THREE.Vector3(0,-1,0));RC.far=800;const h=RC.intersectObjects(G,false)[0];if(!h)continue;k++;const d=h.point.y-groundAt(x,z,g+.3);if(d>.05)bad++;if(d>mx){mx=d;ex=[Math.round(x),Math.round(z)]}if(d<mn)mn=d}
   return{n:k,max:+mx.toFixed(3),min:+mn.toFixed(3),bad,ex}}
 function TR6_slope(){const r=TR6_rnd(77);let best={th:0};const S=TRN_roads().filter(q=>q.cls!=='ab'&&q.P.length>2);let k=0;
   for(const q of S)for(let i=0;i<q.P.length-1;i+=3){const a=q.P[i],b=q.P[i+1],L=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/L,nz=(b[0]-a[0])/L;

@@ -22,6 +22,7 @@ function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX
     for(let j=nz-1;j>=0;j--)for(let i=nx-1;i>=0;i--){const k=j*nx+i;let d=D[k];if(i<nx-1)d=Math.min(d,D[k+1]+r);if(j<nz-1){d=Math.min(d,D[k+nx]+r);if(i<nx-1)d=Math.min(d,D[k+nx+1]+s2);if(i)d=Math.min(d,D[k+nx-1]+s2)}D[k]=d}
     for(let k=0;k<h.length;k++){const t=clamp((D[k]-30)/150,0,1);h[k]*=t*t*(3-2*t)}}
   TR_hills4(h,nx,nz,r,D);
+  TR7_cap(h,nx,nz,r,D);
   if(CID!=='fra'&&typeof HILL_BY!=='undefined'&&HILL_BY.akro){const A=HILL_BY.akro;let top=0;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=WX0+i*r,z=WZS+j*r;if(athHill1(A,x,z)>=A.H-.01)top=Math.max(top,h[j*nx+i])}
     top=OC_top(top);const H0=A.H;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const x=WX0+i*r,z=WZS+j*r,m=athHill1(A,x,z)/H0;if(m>0){const k=j*nx+i;h[k]+=(top-h[k])*m}}A.H=top;A.trH0=H0}
   OC_lyka(h,nx,nz,r);TR_W={r,nx,nz,h};TR_roadsInit(TR_W);return TR_W}
@@ -31,7 +32,7 @@ function TR_init(){if(TR_W)return TR_W;const r=CID==='fra'?12:6,nx=Math.ceil((WX
 // the tab (sessionStorage, so GO reloads keep it) or for good with localStorage mho_terr=0; ?terr=1 = on again. ?trx=0 / ?trg=0 / ?trc=0 switch one part off
 const TERR={on:(()=>{try{const q=new URLSearchParams(location.search).get('terr');if(q!=null)sessionStorage.setItem('mho_terr',q);return(q??sessionStorage.getItem('mho_terr')??localStorage.getItem('mho_terr'))!=='0'}catch(e){return true}})()};
 // the Athens ground-quadtree cache (10b) is fitted on the TERR raster (tools/qtdump.js after any height change): with ?terr=0 every cell is fitted live
-if((!TERR.on||window.__qtdump||(QTC.v!==6)===ART7_t6())&&typeof QTC!=='undefined')QTC.ok=false;  // terr-6: the cache is fitted for the terr-6 fit (v:6); ?t6m=0 fits live
+if((!TERR.on||window.__qtdump||(QTC.v===6)!==ART7_t6())&&typeof QTC!=='undefined')QTC.ok=false;  // terr-6: v:6 = the cache was fitted with the terr-6 fit (?t6m=1); a fit/cache mismatch fits live
 // terr-4 (Alex: hills from more streets): stronger in-city relief, default ON; ?trh=0 = terr-3's k. ?trk=<k> overrides k (tests; the Athens
 // quadtree cache is fitted on the default (trh on), so ?trh=0 or any ?trk fits every cell live)
 const TR_H4=(()=>{const q=new URLSearchParams(location.search);return{on:TERR.on&&q.get('trh')!=='0',k:q.get('trk')}})();
@@ -154,6 +155,12 @@ function TR_roadsInit(W,force){if(!TR_RG)return;if(CID!=='fra'&&!force)return;  
 // every deck (city bridges had none: decks from y 0) starts and ends at the graded ground, re-read after each grading pass: no step at the joints
 function TR_bridgeEnds(){if(CID!=='fra'||!TR_RG)return;for(const b of[...BRIDGES,...(AB_BRIDGES||[])]){const g=s=>{const[x,z]=deckPt(b,s*(b.half+.6));return TR_G(x,z)};b.yA=g(-1);b.yB=g(1);b.trE=1}}
 
+// terr-7 (Alex b60 deep bowl; rev-pit: 36 fra / 286 ath basins, walls up to 75°): the relief raster gets a fill-only slope cap before the roads are
+// graded: two sweeps (forward + backward, 8 neighbours) raise every cell to ≥ neighbour − tan 27°·distance, so no bowl or wall is steeper than
+// ~27° (pits fill up, ridges keep their height). River fade cells (D < 180 m) are left alone (banks). ?tr7=0 = off.
+function TR7_cap(h,nx,nz,r,D){if(new URLSearchParams(location.search).get('tr7')==='0')return;const s=Math.tan(27*Math.PI/180)*r,s2=s*Math.SQRT2,ok=k=>!D||D[k]>=180;
+  for(let it=0;it<2;it++){for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i;if(!ok(k))continue;let v=h[k];if(i)v=Math.max(v,h[k-1]-s);if(j){v=Math.max(v,h[k-nx]-s);if(i)v=Math.max(v,h[k-nx-1]-s2);if(i<nx-1)v=Math.max(v,h[k-nx+1]-s2)}h[k]=v}
+    for(let j=nz-1;j>=0;j--)for(let i=nx-1;i>=0;i--){const k=j*nx+i;if(!ok(k))continue;let v=h[k];if(i<nx-1)v=Math.max(v,h[k+1]-s);if(j<nz-1){v=Math.max(v,h[k+nx]-s);if(i<nx-1)v=Math.max(v,h[k+nx+1]-s2);if(i)v=Math.max(v,h[k+nx-1]-s2)}h[k]=v}}}
 function TR_G(x,z){const W=TR_W||TR_init();let fx=(x-WX0)/W.r,fz=(z-WZS)/W.r;fx=fx<0?0:fx>W.nx-1.001?W.nx-1.001:fx;fz=fz<0?0:fz>W.nz-1.001?W.nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*W.nx+i,h=W.h;
   return(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+W.nx]*(1-tx)+h[k+W.nx+1]*tx)*tz}
 const TR_tauH0=tauH;
@@ -370,7 +377,7 @@ const inLot=(x,z)=>{const Z=zoneAt(x,z);return !!Z&&(Z.t==='dirt'||Z.t==='grass'
 const slipTop=s=>{if(!TERR.on)return 0;return TR_Y(s.x-s.ix*.6,s.z-s.iz*.6)};  // the bank's ground at the ramp's top end
 function slipY(x,z){for(const s of SLIPS){const dx=x-s.x,dz=z-s.z;if(dx>40||dx<-40||dz>40||dz<-40)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<10&&inw>0&&inw<30){const yT=s.yT??0;return yT+(HWY-yT)*inw/30}}return null}
 function roamTerr(x,z,y){let low=false;for(const b of ALL_DECKS){const h=deckAt(b,x,z);if(h!=null&&h>.2){if(y>=h-2.4){let g2=h;for(const r of RO.ramps){if(!r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),c=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(c)<r.w/2&&a>-r.len/2&&a<r.len/2)g2=Math.max(g2,r.y0+(a+r.len/2)/r.len*r.hgt)}return{g:g2,deck:b}}if(h-y<5.5)low=true}}
-  let g=groundY(x,z);const sl=slipY(x,z);if(sl!=null)g=Math.max(g,sl);
+  let g=groundY(x,z);if(GND_ON){const m=GND_Y(x,z);if(m!==null&&m>g)g=m}const sl=slipY(x,z);if(sl!=null)g=Math.max(g,sl);
   for(const r of RO.ramps){if(r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(b)<r.w/2&&a>-r.len/2&&a<r.len/2)g=Math.max(g,r.y0+(a+r.len/2)/r.len*r.hgt)}
   return{g,deck:null,low}}
 function groundAt(x,z,y){return roamTerr(x,z,y).g}

@@ -200,8 +200,9 @@ renderer.render=(f=>function(sc,cam){if(sc===scene)try{ART6_step()}catch(e){}ret
 // (constants inline: the world is built before this module's top-level lines run; function declarations are hoisted)
 // terr-6 (Alex b60, car sunk to the roof on grass): the grass sat up to 3.4 m (fra) / 4.5 m (ath) ABOVE the physics ground: 25 samples per cell missed
 // the road cut/fill feathers, and far cells allowed 0.2 m. Now every leaf is checked on a ~3 m sample grid (≥6×6) and may sit at most 4 cm above tH
-// (the car follows tH, so higher grass = a sunk car / sunk props). ?t6m=0 = old fit.
-function ART7_t6(){return ART7_t6.v??(ART7_t6.v=new URLSearchParams(location.search).get('t6m')!=='0')}
+// (the car follows tH, so higher grass = a sunk car / sunk props). terr-7: OFF by default (3.8x leaves = boot 60-88 s); the car rides max(tH, drawn grass)
+// instead (GND_Y in 60_city_build), ?t6m=1 = this fit.
+function ART7_t6(){return ART7_t6.v??(ART7_t6.v=new URLSearchParams(location.search).get('t6m')==='1')}
 function ART7_flat(x,z,w,h,tol,dn){tol=tol||.03;dn=dn||tol;if(ART7_t6())tol=Math.min(tol,.04);const A=tH(x,z),Bv=tH(x,z+h),C=tH(x+w,z),D=tH(x+w,z+h),N=ART7_t6()?Math.max(6,Math.min(24,Math.ceil(Math.max(w,h)/3))):6;
   for(let i=1;i<N;i++)for(let j=1;j<N;j++){const u=i/N,v=j/N,l=u+v<=1?A+(C-A)*u+(Bv-A)*v:D+(Bv-D)*(1-u)+(C-D)*(1-v);const e=l-tH(x+w*u,z+h*v);if(e>tol||-e>dn)return false}return true}
 // pART8: the 3 cm fit is only needed where cars drive and the camera is close: cells ≤ 64 m whose every point is more than 8 m from every road edge
