@@ -14,7 +14,6 @@ html body #ogArea{left:auto!important;right:calc(12px + env(safe-area-inset-righ
 html body #ogArea b{font-size:13px!important;letter-spacing:.05em!important}html body #ogArea em{font-size:12px!important;display:inline!important;margin-left:6px}
 html body #ogArea .ogBar,html body #ogArea span{display:none!important}
 html body #speedFx#speedFx{filter:opacity(.5) hue-rotate(10deg) saturate(2.2)!important;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 44%,transparent 54%)!important;mask-image:linear-gradient(to bottom,#000 0%,#000 44%,transparent 54%)!important}
-/* rev-3: bottom:auto, or the base bottom:30px stretches the plate to a 586 px dark column on tall desktop windows */
 html body #roamPlate#roamPlate{bottom:auto!important;left:auto!important;right:calc(12px + env(safe-area-inset-right,0px))!important;top:calc(56px + env(safe-area-inset-top,0px))!important;transform:none!important;max-width:230px!important;padding:3px 10px!important;border-radius:10px!important;background:rgba(20,20,19,.86)!important;text-align:right!important;min-width:0!important;width:auto!important;height:auto!important}
 /* v89o: below the 44 px ⚙ (6-50 px; 54-98 px in challenges) */html body.racing #roamPlate#roamPlate{top:calc(104px + env(safe-area-inset-top,0px))!important}html body #roamPlate#roamPlate *{font-size:12px!important;line-height:1.25!important;letter-spacing:0!important}html body #roamPlate::before,html body #roamPlate::after{display:none!important}`;document.head.appendChild(st)})();
 OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop);
@@ -22,11 +21,8 @@ OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop)
 (()=>{const st=document.createElement('style');st.id='crPrompt';st.textContent=`
 html body.touch #roamPrompt#roamPrompt{left:50%!important;right:auto!important;top:auto!important;bottom:calc(62px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(240px,30vw)!important;padding:3px 12px!important;font-size:12px!important}
 html body #roamPrompt#roamPrompt *{font-size:12px!important;line-height:1.2!important}
-/* rev-2 (monkey hud_over_figure, Athens start): bottom-centre sat on the car's rear in phone landscape → left column above TAP TAP = SMASH, under the left thumb */
 @media (orientation:landscape){html body.touch #roamPrompt#roamPrompt{left:calc(14px + env(safe-area-inset-left,0px))!important;transform:none!important;bottom:calc(166px + env(safe-area-inset-bottom,0px))!important;max-width:min(240px,34vw)!important}}
-/* rev-3 (matrix hud_over_figure, desktop 1280×720): the default bottom-centre prompt sat on the car's rear → above the car, in the road/sky band */
 html body:not(.touch) #roamPrompt#roamPrompt{bottom:auto!important;top:30%!important}
-/* rev-3 (matrix hud_over_controls @-444,455): in portrait the bottom-centre prompt sat on #tR and the car's rear (controls row 14-83 px, car to ~750 px) → empty road/sky band under the speed gauge */
 @media (orientation:portrait){html body.touch #roamPrompt#roamPrompt{bottom:auto!important;top:calc(268px + env(safe-area-inset-top,0px))!important}}
 body.crMerge #roamArrow{display:none!important}`;document.head.appendChild(st)})();
 
@@ -196,7 +192,7 @@ function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
  const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
- h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-8))+'px'}
+ h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-22))+'px'}
 setInterval(()=>{try{CRSM_hint()}catch(e){}},250);
 window.__crsm={get S(){return CRSM},hint:()=>CRSM_hint()};
 // ---- CAR26a: races have no civilian traffic; Crash Junction keeps its (max 3) cars parked at the track edge
