@@ -10,11 +10,11 @@
   const tap=(c)=>{window.dispatchEvent(new KeyboardEvent('keydown',{code:c,key:c,bubbles:true,cancelable:true}));window.dispatchEvent(new KeyboardEvent('keyup',{code:c,key:c,bubbles:true,cancelable:true}))};
   const release=()=>{for(const c of Object.keys(held))key(c,false)};
   const log={acts:{},stuck:0,exits:0,enters:0,takes:0,warps:0,steps:0};const act=n=>{log.acts[n]=(log.acts[n]||0)+1};
-  let steer=0,steerT=0,gas=true,gasT=0,boostT=0,brkT=0,footT=0,mode='drive',actT=0,still=0,stuckT=0,lastX=RO.x,lastZ=RO.z,posT=0,unstick=0,carSpot=null;
+  let steer=0,steerT=0,gas=true,gasT=0,boostT=0,brkT=0,footT=0,mode='drive',actT=0,still=0,stuckT=0,lastX=RO.x,lastZ=RO.z,posT=0,unstick=0,carSpot=null,tainted=0,edgeN=0;
   const total=Math.round(simSec/dt),per=Math.round(.5/dt);let done=0;const t0=__qa.t;
   while(done<total){
    // popups / cards / pause that a player would dismiss
-   try{if(window.__tq&&__tq.skip)__tq.skip();if(RO.pOpen){roamPauseClose&&roamPauseClose()}if(RO.card){const b=document.getElementById('rcNo');if(b&&b.offsetWidth)b.click();else if(RO.card.close)RO.card.close()}}catch(e){}
+   try{if(RO.pOpen||RO.card||(typeof state!=='undefined'&&state!=='roam'))tainted=1;if(window.__tq&&__tq.skip)__tq.skip();if(RO.pOpen){roamPauseClose&&roamPauseClose()}if(RO.card){const b=document.getElementById('rcNo');if(b&&b.offsetWidth)b.click();else if(RO.card.close)RO.card.close()}}catch(e){}
    const foot=RO.foot;
    if(foot==='car'){
      // steering: a random walk of held keys, 0.6–3 s each; gas mostly on, some brake, boost bursts; now and then park and get out
@@ -24,7 +24,9 @@
      boostT-=.5;if(boostT<=0&&R()<.1){boostT=rng(1,3);act('boost')}
      key('KeyA',steer<0);key('KeyD',steer>0);key('KeyW',gas&&brkT<=0&&unstick<=0);key('KeyS',brkT>0||unstick>0);key('ShiftLeft',boostT>0);
      // stuck: moved < 3 m in 3 s with gas held
-     posT+=.5;if(posT>=3){const d=Math.hypot(RO.x-lastX,RO.z-lastZ);if(gas&&brkT<=0&&unstick<=0&&d<3&&!RO.frozen&&!(pl&&pl.air)&&!(pl&&(pl.boatK||0)>.5)){log.stuck++;const b=__qa.bug('stuck',RO.x,RO.z,RO.y,'speed <1 m/s for 3 s with gas ('+d.toFixed(1)+' m moved)');stuckT++;unstick=1.5;steer=pick([-1,1]);steerT=2;
+     posT+=.5;if(posT>=3){const d=Math.hypot(RO.x-lastX,RO.z-lastZ);
+       // rv2k-gate: not a stuck when a menu/pause/card was open in the window (the bot, not the car, was paused), or at the world edge / off the map (nothing to drive to)
+       const edge=RO.x<=WX0+24||RO.x>=WX1-24||RO.z<=WZS+24||RO.z>=WZN-24||!inCity(RO.x,RO.z,0);if(tainted||edge){tainted=0;if(edge){log.edge=(log.edge||0)+1;if(d<3&&++edgeN>=2){edgeN=0;try{const q=rfSnap(RO.x,RO.z,200);if(q&&roamWarp(q[0],q[1],RO.h+Math.PI)){log.warps++;act('respawn')}}catch(e){}}}posT=0;lastX=RO.x;lastZ=RO.z}else if(gas&&brkT<=0&&unstick<=0&&d<3&&!RO.frozen&&!(pl&&pl.air)&&!(pl&&(pl.boatK||0)>.5)){log.stuck++;const b=__qa.bug('stuck',RO.x,RO.z,RO.y,'speed <1 m/s for 3 s with gas ('+d.toFixed(1)+' m moved)');stuckT++;unstick=1.5;steer=pick([-1,1]);steerT=2;
          if(stuckT>=4){stuckT=0;try{const q=rfSnap(RO.x+rng(-30,30),RO.z+rng(-30,30),120);if(q&&roamWarp(q[0],q[1],RO.h+Math.PI)){log.warps++;act('respawn')}}catch(e){}}}else if(d>=3)stuckT=Math.max(0,stuckT-1);
        posT=0;lastX=RO.x;lastZ=RO.z}
      if(unstick>0)unstick-=.5;
