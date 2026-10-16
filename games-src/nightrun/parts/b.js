@@ -39,7 +39,7 @@ if(window.ResizeObserver)new ResizeObserver(()=>fit()).observe(stage);
 
 function toGame(t){const r=frame.getBoundingClientRect();                  // portrait: the screen's up is the world's right
   return rotMode?[(r.bottom-t.clientY)/r.height*W,(t.clientX-r.left)/r.width*H]:[(t.clientX-r.left)/r.width*W,(t.clientY-r.top)/r.height*H];}
-addEventListener('keydown',e=>{const k=e.code;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(k)&&!(e.target&&e.target.tagName==='INPUT'))e.preventDefault();
+addEventListener('keydown',e=>{const k=e.code;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(k)&&!(e.target&&e.target.tagName==='INPUT')&&!(k==='Space'&&window.RET&&RET.title&&!running&&e.target&&e.target.tagName==='BUTTON'))e.preventDefault();   // RET.title: Space presses a focused menu button
   if(!K[k]){pressed[k]=stampOf(e);if(k==='Space'||k==='KeyJ')pressed.Fire=pressed[k];}
   K[k]=true;AU.unlock();
   if(k==='KeyM'&&!(e.target&&e.target.tagName==='INPUT'))toggleMute();
