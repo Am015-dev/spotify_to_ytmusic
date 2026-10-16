@@ -1,11 +1,11 @@
-/* ===== L3 · life-3: smarter traffic and natural pedestrians. default ON since life-4 (?l3=0 / od_l3=0 = off); the stop-line guard + red-light audit only with ?l3lt=1 (WIP). Test hook window.__l3 (GOs life3/*) =====
+/* ===== L3 · life-3: smarter traffic and natural pedestrians. default ON since life-4 (?l3=0 / od_l3=0 = off); the stop-line guard + red-light audit ON since lights-3 (?l3lt=0 off). Test hook window.__l3 (GOs life3/*) =====
    1. Lanes: every car keeps a lane (inner -1 / outer +1) on 2-lane-per-direction roads (≥ 14 m), passes slower cars and moves to the turn side
       before a junction (smooth 2.5 s change, only into a free gap). The old drive-flow pass put every car in the outer lane (c.lane=.36).
-   2. Signals: the CV junction logic (90_fixes_cv_ju.js) already stops, queues and releases cars; life-4 adds stop lines from each car's route (L3_edges/L3_stop/L3_guard, ?l3lt=1) and audits runs and queue overlaps.
+   2. Signals: the CV junction logic (90_fixes_cv_ju.js) already stops, queues and releases cars; life-4 adds stop lines from each car's route (L3_edges/L3_stop/L3_guard, ON; ?l3lt=0 off) and audits runs and queue overlaps.
    3. Pedestrians: minifig walk cycle (leg + opposite arm swing scaled by speed, bob at mid-stance, hip roll, torso twist, smooth turns, head look),
       speed variety, idles (look at phone, look around, chat in pairs), sidestep each other. They still leap aside from the player's car.
    4. Hazard blinkers on some parked cars (reuses the CV blinker mesh: no new draw call). */
-const L3_ON=!/[?&]l3=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3')!=='0'}catch(e){return true}})()/* life-4: ON by default (?l3=0 or od_l3=0 turns it off) */,L3_LT=L3_ON&&(/[?&]l3lt=1/.test(location.search)||(()=>{try{return localStorage.getItem('od_l3lt')==='1'}catch(e){return false}})())/* stop-line guard + red-light audit: OFF by default again in rev-71 (flaky: 3-4 red-light runs at node 115 in 2 of 5 gate runs); ?l3lt=1 or od_l3lt=1 = on */,L3={lc:0,acc:0,pacc:0,run:0,ent:0,ov:0,qs:0,idle:0,chat:0};
+const L3_ON=!/[?&]l3=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3')!=='0'}catch(e){return true}})()/* life-4: ON by default (?l3=0 or od_l3=0 turns it off) */,L3_LT=L3_ON&&!/[?&]l3lt=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3lt')!=='0'}catch(e){return true}})()/* stop-line guard + red-light audit: ON again since lights-3 (node 115 runs fixed); ?l3lt=0 or od_l3lt=0 = off */,L3={lc:0,acc:0,pacc:0,run:0,ent:0,ov:0,qs:0,idle:0,chat:0};
 function L3_ad(a,b){let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d}
 // lateral offset (from the edge's node line) of lane s∈[-1,1] for car c on edge A→B; null = no two lanes here
 function L3_off(c,A,B,s){if(!A||!B||A.ab||c.pk||c.tr)return null;if(A.g||B.g)return RD_ON&&(A.w||0)>=14?s*Math.min(A.w,B.w||A.w)*.11:null;const W=Math.min(A.w||20,B.w||20);return W>=14?W*(.27+.09*s):null}
@@ -23,28 +23,31 @@ function L3_near(c){if(c.dead>0||c.pk)return null;const N=HUB.nodes,A=N[c.a],B=N
 // red-light audit: a car that was outside every signalled box on the previous step and is inside one now, on an approach whose light is red, with
 // no reservation from before the line. Cars that spawn or jump into a box (no "outside" step before) are not entries.
 function L3_audit(){if(!CV.sig.length)return;for(const c of HUB.cars){const h=L3_near(c);if(!h){c.l3Q=null;continue}let In=null;CV_near(c.x,c.z,J=>J.sig&&Math.hypot(J.x-c.x,J.z-c.z)<J.R0&&(In=J));
-  if(In&&c.l3Q===0&&c.l3P!==In&&Math.hypot(c.x-c.l3x,c.z-c.l3z)<4/* a respawn or recycle jump is not an entry */){let k=-1,bd=.3;In.ap.forEach((g,i)=>{const v=g.dx*h[0]+g.dz*h[1];if(v>bd){bd=v;k=i}});if(k>=0&&In.ap.length>1){L3.ent++;const t0=In.res&&In.res.get(c);
+  if(In&&c.l3Q===0&&c.l3P!==In&&Math.hypot(c.x-c.l3x,c.z-c.l3z)<4/* a respawn or recycle jump is not an entry */){let k=-1,bd=.3;In.ap.forEach((g,i)=>{const v=g.dx*h[0]+g.dz*h[1];if(v>bd){bd=v;k=i}});if(k>=0&&In.ap.length>1){L3.ent++;const t0=Math.min(In.res&&In.res.get(c)||1e9,c.l3G===In&&CV.t-c.l3Gt<15?c.l3Gt:1e9)/* lights-3: committed on green/amber before the line = legal */;
     if(CV_st(In,k)==='r'&&!(t0<CV.t-.05)){L3.run++;const S=c.l3S;L3.rl=[Math.round(c.x),Math.round(c.z),c.a,c.b,+(c.t||0).toFixed(2),!S?'none':S.J!==In?'other':'k'+S.k+'/'+k+(c.l3V!=null?'g':''),'v'+(c.cv||0).toFixed(1),S&&'S'+(S.J.x|0)+','+(S.J.z|0)+' d'+S.d.toFixed(1),'box'+(In.x|0)+','+(In.z|0)+' R'+(In.R0|0),c.RDy];(L3.rls=L3.rls||[]).push(L3.rl)}}}
   if(In)c.l3P=In;else if(c.l3P&&Math.hypot(c.l3P.x-c.x,c.l3P.z-c.z)>c.l3P.R0+6)c.l3P=null;c.l3Q=In?1:0;c.l3x=c.x;c.l3z=c.z}}
 // stop lines from the route (life-4): every road edge knows the first signalled box it runs into (distance from its start to the circle, the
 // approach k the audit will see from that heading). A car checks its own edge, then the edge it takes next (its route, or every exit of B when it
 // has none and B is close), so it never needs to be "matched" by a proximity box. Red/late amber: brake to 2 m before the line; leads queue it.
 function L3_edges(){const N=HUB.nodes,NG=N.ng,K=CV.K,E=new Map();for(let i=0;i<NG;i++){const A=N[i];if(A.ab)continue;for(const j of A.nb){if(j>=NG)continue;const B=N[j];if(B.ab)continue;
-  const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L;let best=null;for(const J of CV.sig){if(J.ap.length<2)continue;const rx=J.x-A.x,rz=J.z-A.z;if(Math.abs(rx)>L+40||Math.abs(rz)>L+40)continue;
-    const p=rx*hx+rz*hz,q=Math.abs(rx*hz-rz*hx),R=J.R0+3/* the audit box is a bit wider than R0: edges that only graze the corner still enter it */;if(p<=0||q>=R)continue;/* heading away: leaving that box */const s=Math.max(0,p-Math.sqrt(R*R-q*q));/* 0: starts inside a big merged box but still heads in (lane-offset cars are outside) */if(s>L||best&&s>=best.s)continue;
-    let k=-1,bd=.3;J.ap.forEach((g,m)=>{const v=g.dx*hx+g.dz*hz;if(v>bd){bd=v;k=m}});if(k>=0)best={J,k,s}}if(best)E.set(i*K+j,best)}}L3.E=E;return E}
+  const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L,ln=A.g||B.g?0:Math.min(A.w||20,B.w||20)*.31;const all=[];for(const J of CV.sig){if(J.ap.length<2)continue;const rx=J.x-A.x,rz=J.z-A.z;if(Math.abs(rx)>L+40||Math.abs(rz)>L+40)continue;
+    const p=rx*hx+rz*hz,q=Math.abs(-rx*hz+rz*hx-ln)/* lights-3: from the lane the car drives in, not the centreline (93>105 missed box 608,-97 by 1.5 m while its cars cut 3 m into it) */,R=J.R0+3/* the audit box is a bit wider than R0: edges that only graze the corner still enter it */;if(p<=0||q>=R)continue;/* heading away: leaving that box */const s=Math.max(0,p-Math.sqrt(R*R-q*q));/* 0: starts inside a big merged box but still heads in (lane-offset cars are outside) */if(s>L)continue;
+    let k=-1,bd=.3;J.ap.forEach((g,m)=>{const v=g.dx*hx+g.dz*hz;if(v>bd){bd=v;k=m}});if(k>=0)all.push({J,k,s})}if(all.length)E.set(i*K+j,all.sort((a,b)=>a.s-b.s))/* every box on the edge in order (long edges cross two) */}}L3.E=E;return E}
 function L3_stop(c,h){const N=HUB.nodes,K=CV.K,E=L3.E||L3_edges(),A=N[c.a],B=N[c.b];if(!A||!B)return null;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,pos=(c.t||0)*L,rem=L-pos;
   const at=(J,k,d0)=>{const rx=J.x-c.x,rz=J.z-c.z,l=Math.hypot(rx,rz);if(l<J.R0)return null;const p=rx*h[0]+rz*h[1],q=Math.abs(rx*h[1]-rz*h[0]);return{J,k,d:q<J.R0&&p>0?p-Math.sqrt(J.R0*J.R0-q*q):Math.max(d0,l-J.R0)}};
-  let best=null;const e=E.get(c.a*K+c.b);if(e&&pos<e.s+12){const S=at(e.J,e.k,e.s-pos);if(S)best=S}/* nearest stop line ahead wins: current edge's box vs the boxes on the next edges */if(rem>45)return best;const nx=c.route&&c.route.length?[c.route[0]]:B.nb.filter(n=>n!==c.a);
-  for(const n of nx){const f=E.get(c.b*K+n);if(!f)continue;const S=at(f.J,f.k,rem+f.s);if(S&&(!best||S.d<best.d))best=S}return best}
+  let best=null;for(const e of E.get(c.a*K+c.b)||[]){if(pos>=e.s+12)continue;const S=at(e.J,e.k,e.s-pos);if(S){best=S;break}}/* nearest stop line ahead wins: current edge's box vs the boxes on the next edges */if(rem>45)return best;const nx=c.route&&c.route.length?[c.route[0]]:B.nb.filter(n=>n!==c.a);
+  for(const n of nx){const f=(E.get(c.b*K+n)||[])[0];if(!f)continue;const S=at(f.J,f.k,rem+f.s);if(S&&(!best||S.d<best.d))best=S}return best}
 // spacing (lights-1): the CV box hold only stops a follower once its leader is < 6 m ahead, so queued cars end up 2.6-3.5 m nose to nose. Cap every
 // car's speed so it stops 5.2 m (centre to centre) behind the nearest car ahead in its lane.
 function L3_space(c){if(!CV.G||c.pk)return;const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16),hx=c.CVhx,hz=c.CVhz;if(hx==null)return;let vm=1e9;
   for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of CV.G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0)continue;const rx=o.x-c.x,rz=o.z-c.z,al=rx*hx+rz*hz;if(al<=0||al>16)continue;if(Math.abs(-rx*hz+rz*hx)>1.6||o.CVhx*hx+o.CVhz*hz<.8)continue;vm=Math.min(vm,Math.sqrt(6.4*Math.max(0,al-5.2)+(o.cv||0)*(o.cv||0)))}
   if(vm<(c.cv||0)){if(c.l3V==null)c.l3V=c.v;c.v=Math.min(c.v,vm);c.cv=Math.min(c.cv||0,vm);L3.sp=(L3.sp||0)+1}}
 function L3_guard(){for(const c of HUB.cars){c.l3V=null;c.l3S=null;const h=L3_near(c);if(!h)continue;L3_space(c);const S=c.l3S=L3_stop(c,h);if(!S||S.d>60)continue;const{J,k,d}=S,v0=c.cv||0,res=J.res||(J.res=new Map());
-  if(res.has(c))continue;const st=CV_st(J,k),go=st==='g'||st==='y'&&d<v0*v0/12+1.5;if(go){if(d<6||st==='y')res.set(c,CV.t);/* amber: committed */continue}
-  const vm=Math.sqrt(10*Math.max(0,d-2));c.l3V=c.v;c.v=Math.min(c.v,vm);c.cv=Math.min(v0,vm);c.RDy='sig';L3.gd=(L3.gd||0)+1}}
+  if(res.has(c))continue;const st=CV_st(J,k),go=st==='g'||st==='y'&&d<v0*v0/12+1.5;if(go){if(d<6||st==='y'){res.set(c,CV.t);if(c.l3G!==J){c.l3G=J;c.l3Gt=CV.t}}/* amber: committed. l3G keeps the FIRST commit time: CV drops the reservation of a car on an edge that only grazes the box (centre behind it) and the guard re-adds it every step */continue}
+  /* lights-3: node 115 (612,-2) sits ~2 m outside its box. A car creeping to the line reached the node, switched edge and the new edge's lane offset put it
+     ~4 m sideways INSIDE the box (most red runs). When the box is near the end of the edge, stop 2 m before the node instead. */
+  const A=HUB.nodes[c.a],B=HUB.nodes[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1,rem=L*(1-(c.t||0)),dd=Math.hypot(B.x-J.x,B.z-J.z)<J.R0+9?Math.min(d,rem):d;
+  const vm=Math.sqrt(10*Math.max(0,dd-2));c.l3V=c.v;c.v=Math.min(c.v,vm);c.cv=Math.min(v0,vm);c.RDy='sig';L3.gd=(L3.gd||0)+1}}
 // queue overlaps: two nearly stopped cars, same heading, bodies intersecting (< 4 m nose to tail, < 1.6 m apart sideways)
 function L3_overlaps(P){const G=CV.G;if(!G)return 0;let n=0;for(const L of G.values())for(const c of L)if(!(c.dead>0)&&(c.cv||0)<1)for(const o of L){if(o===c||o.dead>0||(o.cv||0)>=1)continue;const rx=o.x-c.x,rz=o.z-c.z,al=rx*c.CVhx+rz*c.CVhz;if(al>0&&al<4&&Math.abs(-rx*c.CVhz+rz*c.CVhx)<1.6&&o.CVhx*c.CVhx+o.CVhz*c.CVhz>.8){n++;if(P)P.add(HUB.cars.indexOf(c)+'>'+HUB.cars.indexOf(o))}}return n}
 function L3_hazards(){const im=CV.im;if(!im||!(((CV.t*2.2)|0)%2))return;let n=im.count;for(const c of HUB.cars){if(!c.pk||c.dead>0||(c.j*5+c.k)%3||n>=156)continue;if(Math.abs(c.x-RO.x)>150||Math.abs(c.z-RO.z)>150)continue;const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B)continue;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L;
@@ -79,7 +82,7 @@ function L3_pose(p,i,x,z,h,S2,air,S,d,sp,dt){if(air||p.cw||S||p.spin)return fals
   L3_part(Q.head,i,0,3.32,0,hx,hy+tw,0);L3_part(Q.hair,i,0,3.62,0,hx,hy+tw,0);return true}
 if(L3_ON){
   buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);L3.E=null;try{L3_pedInit()}catch(e){console.warn('L3',e)}return r})(buildHubTraffic);
-  hubTrafficStep=(f=>function(dt){if(!HUB.cars||!HUB.nodes)return f.apply(this,arguments);try{L3.acc+=dt;if(L3.acc>=.2){L3.acc=0;L3_tick()}for(const c of HUB.cars){if(c.l3t==null)continue;if(c.l3c>0)c.l3c-=dt;const e=c.l3t-c.l3s;if(e)c.l3s+=Math.sign(e)*Math.min(Math.abs(e),dt*.8)}L3_pedPre(dt);if(CV.G&&L3_LT)L3_guard()}catch(e){console.warn('L3',e)}
+  hubTrafficStep=(f=>function(dt){if(!HUB.cars||!HUB.nodes)return f.apply(this,arguments);try{L3.acc+=dt;if(L3.acc>=.2){L3.acc=0;L3_tick()}for(const c of HUB.cars){if(c.l3t==null)continue;if(c.l3c>0)c.l3c-=dt;const e=c.l3t-c.l3s;if(e&&(c.cv||0)>1/* lights-3: a stopped car does not slide sideways (it drifted into the box at the line) */)c.l3s+=Math.sign(e)*Math.min(Math.abs(e),dt*.8)}L3_pedPre(dt);if(CV.G&&L3_LT)L3_guard()}catch(e){console.warn('L3',e)}
     const r=f.apply(this,arguments);try{for(const c of HUB.cars)if(c.l3V!=null){c.v=c.l3V;c.l3V=null}L3_pedPost();if(L3_LT)L3_audit();L3_hazards()}catch(e){console.warn('L3',e)}return r})(hubTrafficStep)}
 // kerb fix (life-4): RD_kerb keeps people at the RD road's own half width; where the city street is wider (ath 1899,-1663: an 8.5 m "sec" street on a
 // g-chain) that is still on the lane. Every 2nd call per person (every call while pushed out) check the city street and ease them out to its kerb + 0.9 m (not on crossings/boxes).
@@ -89,12 +92,12 @@ function L3_kerbFix(p,k,dt){p.l3kn=(p.l3kn||0)+1;if(p.l3kn%2===0||p.l3tx||p.rdK!
 if(L3_ON&&typeof RD_kerb==='function')RD_kerb=(f=>function(p,bx,bz,dt){const k=f.apply(this,arguments);try{return L3_kerbFix(p,k,dt||0)}catch(e){return k}})(RD_kerb);
 // ---- checklist GOs (state asserts, no rendering): sims run the real hubTrafficStep with fixed dt
 function L3_sim(sec,dt=1/15){for(let t=0;t<sec;t+=dt){T+=dt;hubTrafficStep(dt)}}
-function L3_park(x,z){RO.x=x;RO.z=z;RO.v=0}
+function L3_park(x,z,h){RO.x=x;RO.z=z;RO.v=0;if(h!=null)RO.h=RO.vh=h/* heading for shots (lights-3) */;return[RO.x,RO.z,RO.h]}
 function L3_goLanes(){if(!L3_ON)return'📍 PENDING · life-3 is OFF (?l3=0)';const N=HUB.nodes;let best=null,bn=-1;for(const c of HUB.cars){if(c.dead>0||c.l3t==null)continue;const A=N[c.a],B=N[c.b];if(L3_off(c,A,B,0)==null)continue;let n=0;for(const o of HUB.cars)if(Math.abs(o.x-c.x)<160&&Math.abs(o.z-c.z)<160)n++;if(n>bn){bn=n;best=c}}
   if(!best)return'📍 LANES · no 2-lane road with cars ❌';L3_park(best.x+6,best.z+6);const lc0=L3.lc;L3_sim(60);
   let a=0,b=0,cl=0;for(const c of HUB.cars){if(!c.CVn||c.dead>0||c.l3t==null)continue;const A=N[c.a],B=N[c.b];if(L3_off(c,A,B,0)==null)continue;if(Math.abs(c.l3s-c.l3t)>.01){cl++;continue}c.l3s<0?a++:b++}
   const n=a+b,pa=n?a/n:0,pb=n?b/n:0,ok=n>=8&&pa>=.3&&pb>=.3&&L3.lc>lc0;return`📍 LANES after 60 s: ${n} cars on 2-lane roads near you, inner ${Math.round(pa*100)} % / outer ${Math.round(pb*100)} % (${cl} mid-change), ${L3.lc-lc0} lane changes ${ok?'✅':'❌'}`}
-function L3_goLights(){if(!L3_LT)return'📍 PENDING · the stop-line guard is OFF in this build (add ?l3lt=1 to turn it on)';if(!CV.sig.length)return'📍 LIGHTS · no signals ❌';
+function L3_goLights(){if(!L3_LT)return'📍 PENDING · the stop-line guard is OFF (?l3lt=0)';if(!CV.sig.length)return'📍 LIGHTS · no signals ❌';
   // the spot with the most signalled junctions within 250 m (CV only drives cars within 320 m of the player)
   let best=null,bn=0;for(const J of CV.sig){let n=0;for(const K of CV.sig)if(Math.hypot(K.x-J.x,K.z-J.z)<250)n++;if(n>bn){bn=n;best=J}}
   L3_park(best.x+best.R0+14,best.z+best.R0+14);const r0=L3.run,e0=L3.ent;const OP=new Set();let qmax=0;for(let s=0;s<120;s++){L3_sim(1);L3_overlaps(OP);let q=0;for(const c of HUB.cars)if(c.CVn&&c.RDy==='lead'&&(c.cv||0)<1)q++;qmax=Math.max(qmax,q)}
