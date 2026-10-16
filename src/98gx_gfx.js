@@ -121,3 +121,11 @@ function GFX_shChk(){const sh=moonL.shadow;if(!sh.map||!pl)return null;const W=s
 window.__gfx={render:()=>composer.render(),side:()=>{const v=moonL.position.clone().sub(moonL.target.position),d=camera.getWorldDirection(new THREE.Vector3());return+(Math.acos((d.x*v.x+d.z*v.z)/Math.hypot(d.x,d.z)/Math.hypot(v.x,v.z))*57.3).toFixed(0)},get GFX(){return GFX},set:GFX_set,shChk:GFX_shChk,state(){const sh=moonL.shadow;return{on:GFX.on,day:GFX.day,tier:GFX.tier,tone:renderer.toneMapping===THREE.ACESFilmicToneMapping?'ACES':renderer.toneMapping,
  exp:renderer.toneMappingExposure,shadowMap:renderer.shadowMap.enabled,sunCast:moonL.castShadow,map:sh.mapSize.x,ext:sh.camera.right,sunEl:+(Math.asin(moonL.position.clone().sub(moonL.target.position).normalize().y)*57.3).toFixed(1),
  hemi:hemi.intensity,env:scene.environmentIntensity,plEnv:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.envMapIntensity,0)/GFX.pm.length).toFixed(2):0,plRough:GFX.pm.length?+(GFX.pm.reduce((a,m)=>a+m.roughness,0)/GFX.pm.length).toFixed(2):0,plMetal:GFX.pm.length?+Math.max(...GFX.pm.map(m=>m.metalness)).toFixed(2):0,plastic:GFX.n,ao:!!(GFX.gtao&&GFX.gtao.enabled),aoErr:GFX.aoErr||'',cast:GFX.cast||0,fc:GFX.fc,carCast:pl&&pl.mesh?(()=>{let c=0,n=0;pl.mesh.traverse(o=>{if(o.isMesh){n++;if(o.castShadow)c++}});return c+'/'+n})():'no pl'}}};
+// boot-1 (2026-10-16): the first roam frame switched GFX on (ACES, sun shadow, glossy plastic keys) and relinked ~60 programs (10 s stalled frame at software GL, right after "Ready").
+// Apply the roam-day GFX state once inside the loader, just before its program warm-up, so ldPrewarm links the programs the first frame draws. ?bootgfx=0 = old order.
+const GFX_BOOTPRE=!/[?&]bootgfx=0/.test(location.search);
+function GFX_pre(){if(!GFX.on||!GFX_BOOTPRE)return;const ro=RO.on;RO.on=true;
+ try{try{GFX_light()}catch(e){}try{GFX_shadow()}catch(e){}try{GFX_car()}catch(e){}try{if(RO.shadowOn)GFX_cast()}catch(e){}try{GFX_plastic(scene)}catch(e){}}finally{RO.on=ro}}
+{const _lp=ldPrewarm,_pc=P2_compile;let on=false;
+ ldPrewarm=async function(...a){on=true;try{return await _lp.apply(this,a)}finally{on=false}};
+ P2_compile=function(sc,cam){if(on){on=false;GFX_pre()}return _pc.call(this,sc,cam)}}

@@ -65,13 +65,16 @@ function roamStep(dt){const s=pl;if(!s)return;if(Math.abs(RO.h)>50){RO.h-=Math.r
      if(best!=null){RO.crTurn=best;RO.yr=0;RO.v=Math.max(RO.v,10);RO.stkT=0}else if(RO.stkT>2){RO.v=c.brk&&!c.thr?8:-8;RO.stkT=0;say('','UNSTUCK',.6)}}}
   const grip=(air?.6:terr==='water'?2.6:terr==='dirt'?(veh==='offroad'?20:14):TUNE.gripRoad)*(RO.dDir?(terr==='road'?TUNE.drGrip:.22):1);RO.vh=(RO.vh??RO.h)+(C26.on?C26_vhStep(RO,angDiff(RO.h,RO.vh??RO.h),grip,dt,sp,C26_cityMu(terr,veh),air||!!RO.dDir||busy):angDiff(RO.h,RO.vh??RO.h)*Math.min(1,dt*grip));if(C26.on&&!RO.dDir){const b=angDiff(RO.h,RO.vh),sm=TUNE.slipMax??.6/* drive26: max slip outside drift (was .6) */;if(Math.abs(b)>sm)RO.vh=RO.h-Math.sign(b)*sm;if(!air)RO.v-=RO.v*Math.sin(b)**2*C26.scrub*dt}s.latV=Math.sin(angDiff(RO.h,RO.vh))*sp;
   if(Math.abs(angDiff(RO.h,RO.vh))>.25&&sp>25&&!air&&(terr!=='road'))RO.v-=RO.v*.08*dt;
+  /* walls-1 (2K-style bumper): a solid collider dead ahead inside braking distance eases the car down to a glancing speed (TUNE.wallV km/h, default 26 < dmgGlance) so a hands-off or full-gas driver scrapes walls with sparks, not damage. TUNE.wallAssist=0 off. */
+  if(TUNE.wallAssist!==0&&RO.v>(TUNE.wallV??26)/3.6+.5&&!air&&!busy&&!RO.dDir){const wv=(TUNE.wallV??26)/3.6,ba=TUNE.wallDec??14,sx=Math.sin(RO.vh),sz=Math.cos(RO.vh),reach=Math.max(0,(RO.v*RO.v-wv*wv)/(2*ba))+3;let wd=-1;for(let d=3;d<=reach+1.5;d+=3){if(roamHit(RO.x+sx*d,RO.z+sz*d,2.4,RO.y)){wd=d;break}}
+   if(wd>=0){const lim=Math.sqrt(wv*wv+2*ba*Math.max(0,wd-3.5));if(RO.v>lim)RO.v=Math.max(lim,RO.v-ba*1.6*dt)}}
   const fx=Math.sin(RO.vh),fz=Math.cos(RO.vh);let nx=RO.x+fx*RO.v*dt,nz=RO.z+fz*RO.v*dt;
   const N=roamTerr(nx,nz,RO.y+.3);
   if(N.low){let pop=false;for(const b of ALL_DECKS){const h=deckAt(b,nx,nz);if(h!=null&&h-RO.y<4.5){RO.y=h;RO.vy=Math.max(RO.vy,3);pop=true}}
-    if(!pop){const ax=roamTerr(nx,RO.z,RO.y+.3).low;roamBounce(ax?'x':'z',sp);nx=RO.x;nz=RO.z}}
+    if(!pop){const ax=roamTerr(nx,RO.z,RO.y+.3).low;RO.tb=1;try{roamBounce(ax?'x':'z',sp)}finally{RO.tb=0}nx=RO.x;nz=RO.z}}
   else if(N.g>RO.y+1.4&&!air){if(ground<-1.5&&N.g<=.5&&RO.v>10){RO.vy=16;RO.y+=.1;award(s,'BANK HOP',6,150,'#4ceaff');AU.sfx('launch');nx=RO.x;nz=RO.z}
     else if(N.g-RO.y<8&&RO.ramps.some(r=>Math.hypot(nx-r.x,nz-r.z)<r.len)){RO.y=N.g;RO.vy=Math.max(RO.vy,4)}
-    else{const ax=roamTerr(nx,RO.z,RO.y+.3).g>RO.y+1.4;roamBounce(ax?'x':'z',sp);nx=RO.x;nz=RO.z}}
+    else{const ax=roamTerr(nx,RO.z,RO.y+.3).g>RO.y+1.4;RO.tb=1;try{roamBounce(ax?'x':'z',sp)}finally{RO.tb=0}nx=RO.x;nz=RO.z}}
   else if(air&&N.g>RO.y+.2){nx=RO.x;nz=RO.z}
   // deck walls keep you on the road
   if(T0.deck&&!air){const b=T0.deck,lim=b.w/2-1.6,dl=deckLocal(b,nx,nz);if(Math.abs(dl[1])>lim&&Math.abs(dl[0])<b.half-2){const q=deckPt(b,dl[0],Math.sign(dl[1])*lim);nx=q[0];nz=q[1];{const ua=Math.atan2(b.ux,b.uz);let e=angDiff(ua,RO.h);if(Math.abs(e)>Math.PI/2)e=angDiff(ua+Math.PI,RO.h);RO.h+=e*Math.min(1,dt*6)}if(sp>20){RO.v*=1-.5*dt;if(R()<.4)burst(SPARK,V3(nx,RO.y+1.2,nz),6,12,.3,new THREE.Color(2,1.4,.6))}}}
