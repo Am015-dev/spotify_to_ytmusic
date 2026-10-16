@@ -12,7 +12,8 @@ function gndVert(x,z,y0,f){const r=riverAt(x,z);if(!r)return[x,y0+tH(x,z),z,0];c
   return[P.x+P.tx*a+P.tz*d,y0,P.z+P.tz*a-P.tx*d,0]}
 // terr-7 (Alex b60 car sunk): the car rides max(groundY, drawn grass). Every quadtree leaf of a hilly gndBuild is kept per cell with its 4 drawn corner
 // heights; GND_Y(x,z) = the drawn triangle's height there (gndBuild's B-C diagonal), null under holes/river cells (keeps the cheap 25-sample fit = fast boot)
-var GND_L=[],GND_ON=new URLSearchParams(location.search).get('t7g')==='1';  // OFF: steps at hole/T-junction edges broke xf1 grass|slope|kerbfunction GND_Y(x,z){for(const g of GND_L){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)continue;const L=g.c[i*g.nz+j];if(L===undefined)continue;if(L===null)return null;
+var GND_L=[],GND_ON=new URLSearchParams(location.search).get('t7g')==='1';  // OFF: steps at hole/T-junction edges broke xf1 grass|slope|kerb
+function GND_Y(x,z){for(const g of GND_L){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)continue;const L=g.c[i*g.nz+j];if(L===undefined)continue;if(L===null)return null;
   for(let k=0;k<L.length;k+=8){const u=(x-L[k])/L[k+2],v=(z-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;const A=L[k+4],Bv=L[k+5],C=L[k+6],D=L[k+7];return u+v<=1?A+(C-A)*u+(Bv-A)*v:D+(Bv-D)*(1-u)+(C-D)*(1-v)}return null}return null}
 function gndBuild(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1-x0)/cs),nz=Math.round((z1-z0)/cs),dx=(x1-x0)/nx,dz=(z1-z0)/nz;
   const GL=o.hilly?{x0,z0,dx,dz,nx,nz,c:new Array(nx*nz)}:null;if(GL)GND_L.push(GL);

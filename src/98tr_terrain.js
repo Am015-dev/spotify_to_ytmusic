@@ -191,8 +191,15 @@ function TR6_slope(){const r=TR6_rnd(77);let best={th:0};const S=TRN_roads().fil
     for(const sd of[-1,1])for(const o of[6,12,18,25]){const x=a[0]+nx*sd*((q.hw||4)+o),z=a[1]+nz*sd*((q.hw||4)+o);if(ART7_rd(x,z)<1||rivClear(x,z)<8)continue;k++;const[gx,gz]=TR_grad(x,z,2),th=Math.atan(Math.hypot(gx,gz))*57.3;if(th>best.th)best={th:+th.toFixed(1),x:Math.round(x),z:Math.round(z)}}}
   best.n=k;return best}
 function TR6_pit(){const s=TR6_slope();if(!s.x)return{ok:true,why:'no slope'};roamWarp(s.x,s.z,0);RO.v=0;RO.t6n=0;const x0=RO.x,z0=RO.z,thr=CTL.thr;
-  try{for(let i=0;i<300;i++){CTL.thr=1;roamStep(1/30)}}finally{CTL.thr=thr}
+  try{for(let i=0;i<300;i++){CTL.thr=1;roamStep(1/30);if(RO.t6n&&TR8_onRoad(RO.x,RO.z))break}}finally{CTL.thr=thr}
   const q=cityAt(RO.x,RO.z),f=fillAt(RO.x,RO.z),onR=(q&&q.d<q.road.w/2+3)||(f&&f.d<f.r.w/2+3),mv=Math.hypot(RO.x-x0,RO.z-z0);return{ok:onR||mv>=20,onR:!!onR,mv:Math.round(mv),lifts:RO.t6n||0,s}}
+// terr-8 unstick GO: the 5 worst pits of docs/PIT_REVIEW per city; car put in the pit bottom, gas held 6 s of physics steps → must end on a road
+const TR8_PITS={fra:[[790,1520],[1370,1270],[790,1720],[-1800,1750],[-350,1740]],ath:[[550,-2500],[2430,-1500],[-730,-1090],[1070,-2620],[2310,-1330]]};
+function TR8_go(a=0,b=5){try{const P=(TR8_PITS[CID]||[]).slice(a,b);let ok=0;const bad=[],thr=CTL.thr;
+  try{for(const[x,z]of P){roamWarp(x,z,0);RO.x=x;RO.z=z;RO.y=groundAt(x,z,99);RO.v=0;RO.t6s=0;RO.t8a=null;let t=0;
+    for(let i=0;i<120;i++){CTL.thr=1;roamStep(1/20);t+=1/20;if(TR8_onRoad(RO.x,RO.z))break}
+    if(TR8_onRoad(RO.x,RO.z))ok++;else bad.push(x+','+z+'(v'+RO.v.toFixed(1)+' n'+(RO.t6n||0)+' at '+Math.round(RO.x)+','+Math.round(RO.z)+')')}}finally{CTL.thr=thr}
+  return'📍 UNSTICK · '+CID+' worst pits '+(a+1)+'-'+(a+P.length)+', gas 6 s: '+ok+'/'+P.length+' back on a road'+(bad.length?' · stuck at '+bad.join(' '):'')+(ok===P.length&&P.length?' ✅':' ❌')}catch(e){return'📍 terr8 unstick ERROR '+e.message+' ❌'}}
 function TR6_go(kind){try{
   if(kind==='gap'){const o=TR6_gap(),ok=o.n>=150&&o.max<=.05;return'📍 GRASS ON THE PHYSICS GROUND · '+o.n+' off-road points: drawn ground up to '+o.max+' m above the drive height (need ≤0.05), '+o.bad+' over · lowest '+o.min+' m'+(o.ex?' · worst ('+o.ex+')':'')+(ok?' ✅':' ❌')}
   if(kind==='slope'){const o=TR6_slope();return'📍 SLOPES BESIDE ROADS · steepest terrain 6-25 m beside a road: '+o.th+'° at ('+o.x+','+o.z+') of '+o.n+' points (info; the car climbs ≤29°, TR6_stuck lifts it out of anything steeper) ✅'}

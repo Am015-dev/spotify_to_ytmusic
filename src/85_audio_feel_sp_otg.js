@@ -417,9 +417,21 @@ function TR_pre(dt){RO.trSlope=null;const T=roamTerr(RO.x,RO.z,RO.y+.3);if(RO.y>
   RO.v-=9.8*.75*a/Math.sqrt(1+a*a)*dt;const grip=clamp((.665-th)/(.665-.5),0,1);RO.trGrip=grip;
   if(grip<1){if(a>0&&RO.v>-2&&CTL&&(CTL.thr||CTL.boost))RO.v-=(1-grip)*58*dt;RO.trSl=Math.min(9,(RO.trSl||0)+(1-grip)*16*dt)}else RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);TR6_stuck(dt,th)}
 // terr-6 (Alex b60 deep bowl): gas held, < 2 m/s, on a terrain slope > 20° for 3 s (a little slack for rocking back and forth) → lift to the nearest road
-function TR6_stuck(dt,th){if(new URLSearchParams(location.search).get('t6r')==='0')return;const on=CTL&&(CTL.thr||CTL.boost)&&Math.abs(RO.v)<2&&th>.349;
+function TR6_stuck(dt,th){if(TR8_on()||new URLSearchParams(location.search).get('t6r')==='0')return;const on=CTL&&(CTL.thr||CTL.boost)&&Math.abs(RO.v)<2&&th>.349;
   RO.t6s=on?(RO.t6s||0)+dt:Math.max(0,(RO.t6s||0)-.5*dt);if(RO.t6s<3)return;RO.t6s=0;
   for(const r of[80,200,450,900]){const q=rfSnap(RO.x,RO.z,r);if(q[0]!==RO.x||q[1]!==RO.z){if(roamWarp(q[0],q[1],q[2])){RO.v=0;RO.t6n=(RO.t6n||0)+1}return}}}
+// terr-8 universal unstick (the player is never trapped): gas, boost or brake held, < 2 m/s, off-road (any slope, shelf, pit or hang-up) for 3 s
+//   → short fade, lift onto the nearest road point facing along it. Replaces the slope-gated TR6_stuck (?t8u=0 → old behaviour).
+const TR8_q=new URLSearchParams(location.search).get('t8u')!=='0',TR8_on=()=>TR8_q;
+function TR8_onRoad(x,z){const q=cityAt(x,z);if(q&&q.road&&q.d<q.road.w/2+3)return true;const f=fillAt(x,z);return!!(f&&f.r&&f.d<f.r.w/2+3)}
+function TR8_near(x,z){for(const r of[80,200,450,900]){const q=rfSnap(x,z,r);if(q[0]!==x||q[1]!==z)return q}
+  let b=null,bd=1e18;for(const S of CITY_S){const P=S.pts;for(let i=0;i<P.length-1;i++){const p=P[i],d=(p.x-x)**2+(p.z-z)**2;if(d<bd){bd=d;const n=P[i+1];b=[p.x,p.z,Math.atan2(n.x-p.x,n.z-p.z)]}}}return b}
+function TR8_fade(){try{let d=document.getElementById('tr8f');if(!d){d=document.createElement('div');d.id='tr8f';d.style.cssText='position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:50';document.body.appendChild(d)}
+  d.style.transition='none';d.style.opacity='.85';void d.offsetWidth;d.style.transition='opacity .5s';d.style.opacity='0'}catch(e){}}
+function TR8_unstick(dt){if(!TR8_on())return;const c=CTL,held=c&&(c.thr||c.boost||c.brk),off=held&&!RO.trDeck&&!TR8_onRoad(RO.x,RO.z);
+  if(off&&!RO.t8a)RO.t8a=[RO.x,RO.z];const d=RO.t8a?Math.hypot(RO.x-RO.t8a[0],RO.z-RO.t8a[1]):0,on=off&&(Math.abs(RO.v)<2||d<6);  // slow, or sliding/rocking without 6 m of progress
+  if(!on)RO.t8a=off?[RO.x,RO.z]:null;RO.t6s=on?(RO.t6s||0)+dt:Math.max(0,(RO.t6s||0)-.5*dt);if(RO.t6s<3)return;RO.t8a=null;if(RO.t6s<3)return;RO.t6s=0;const q=TR8_near(RO.x,RO.z);if(!q)return;TR8_fade();
+  if(!roamWarp(q[0],q[1],q[2])){RO.x=q[0];RO.z=q[1];RO.h=RO.vh=q[2];RO.y=groundAt(q[0],q[1],99);RO.vy=0}RO.v=0;RO.t6n=(RO.t6n||0)+1}
 function TR_post(dt){const S=RO.trSlope;if(RO.trSl>.05&&S){const s=Math.hypot(S.gx,S.gz)||1,dx=-S.gx/s*RO.trSl*dt,dz=-S.gz/s*RO.trSl*dt;if(!roamHit(RO.x+dx,RO.z+dz,2.2,RO.y)){RO.x+=dx;RO.z+=dz}}
   TR_snap();TR_summitStep()}
 function TR_snap(){const dt=1/60,T=roamTerr(RO.x,RO.z,RO.y+.3),g=T.g;RO.trDeck=!!T.deck;
@@ -428,7 +440,7 @@ function TR_tilt(s,dt){const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m)return;let
   const N=RO.trN||(RO.trN=V3(0,1,0)),k=Math.min(1,dt*9);N.x+=(nx-N.x)*k;N.y+=(ny-N.y)*k;N.z+=(nz-N.z)*k;N.normalize();if(N.y>.9999)return;TR_q.setFromUnitVectors(TR_up,N);ud.m.quaternion.premultiply(TR_q)}
 const TR_q=new THREE.Quaternion(),TR_up=V3(0,1,0);
 const TR_live=()=>!!pl&&!RO.wk&&(RO.on||state==='roam');
-{const _rs=roamStep;roamStep=dt=>{const on=TR_live();if(on)TR_pre(dt);_rs(dt);if(on&&TR_live())TR_post(dt)}}
+{const _rs=roamStep;roamStep=dt=>{const on=TR_live();if(on){TR_pre(dt);TR8_unstick(dt)}_rs(dt);if(on&&TR_live())TR_post(dt)}}
 {const _rp=roamPose;roamPose=(s,dt)=>{if(TR_live())TR_snap();_rp(s,dt);if(TR_live())TR_tilt(s,dt)}}
 // chase camera: lifted over the hillside between camera and car (fast up, slow down) so it never clips into the slope
 {const _rc=roamCam;roamCam=dt=>{_rc(dt);if(!TR_live())return;const c=camera.position;let need=0;for(const t of[1,.7,.4]){const x=RO.x+(c.x-RO.x)*t,z=RO.z+(c.z-RO.z)*t,yl=RO.y+2+(c.y-RO.y-2)*t,gq=groundY(x,z)+1.7;need=Math.max(need,(gq-yl)/t)}
