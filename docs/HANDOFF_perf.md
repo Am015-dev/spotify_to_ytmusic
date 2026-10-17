@@ -43,3 +43,10 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 - Only on top of A. Cars (93_cars_lego.js CR_*) and city facades: finer bricks, visible studs, tiles/plates/SNOT bands. Add the detail as merged geometry or normal-mapped/texture detail (studs as one instanced stud mesh per chunk), full detail ≤ 40-60 m, simplified beyond. Budget: draws ≤ v88m + 10 %, frame time ≤ v88u. Before/after shots at the same spots, side views of cars; the tyre gap must stay ≤ 0.05 m.
 ### C · Athens busier (the original brief of this branch)
 - See the "Athens" bullet in "Next: root cause (step 2)" above; before-shots in ath/before/sheet.png from `node ath/shots6.js <url> <out>` (SET='TUNE.perfHud=1' shows the perf line). Keep the v88u people defaults unless Alex's perf-pc numbers allow more; the Athens dressing must be instanced (≤ +10 draws).
+
+## perf-3 (2026-10-17, alex/perf3-wip): NOT on trunk (TAG gates not run in the timebox; max frame not improved)
+1. Main find: V8 deopt loop. `TR_G` optimized→deopted ~5800x in 10 s and `roamTerr` ~400x ("insufficient type feedback for generic named access" on the TR_W fields, `JSFLAGS="--trace-deopt --trace-opt" DEBUG=pw:browser` in tools/perf1/tFrame.js). So every ground sample ran unoptimized and boxed its doubles. Fix: TR_G reads the grid fields from script lets.
+2. Also: LF_drapeOk uses scratch buffers; a per-tile drape-check cache (LF.dc); roamTerr/roamHit use indexed loops; DEST_find uses a 130 m node grid and an allocation-free Dijkstra (same distances, tested on random graphs).
+3. Athens, 30 s roam, run alone: allocated 9.9 GB→5.6 GB (~330→190 MB/s); median/p95/max 23.3/118/624→20.3/120/1027 ms (single runs, max is noisy). Frankfurt not measured.
+4. Left: run TAG=life1,xf1,terrain,mem,cam vs trunk, measure Frankfurt, look for the same deopt loop in TR_Y/groundY/LF_drapeOk (175/59/44 cycles), DEST_open garbage (roamHit 240 MB), computeVertexNormals in LF_drapeG, QA invariants (0.24 GB, skip outside ?qa).
+5. Draw calls (666-698) untouched.
