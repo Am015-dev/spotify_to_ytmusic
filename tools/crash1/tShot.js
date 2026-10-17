@@ -1,0 +1,6 @@
+// crash-1: one 852x393 shot of the low-mem tier in play (iPhone UA, DPR 3, touch). node tools/crash1/tShot.js <page url> <out.jpg>
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,OUT]=process.argv.slice(2);const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:UA});const p=await ctx.newPage();p.setDefaultTimeout(600000);
+ await p.goto(BASE+(BASE.includes('?')?'&':'?')+'test=fra&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:240000});
+ const r=await p.evaluate(()=>__xc.ev(`{K.ArrowUp=true;for(let i=0;i<240;i++)roamStep(1/30);K.ArrowUp=false;for(let i=0;i<20;i++)roamStep(1/30);__tq.draw();__tq.draw();({lowmem:LOWMEM,pr:renderer.getPixelRatio(),mf:TUNE.memFree,cars:HUB.cars.filter(c=>!c.dead&&Math.hypot(c.x-RO.x,c.z-RO.z)<250).length})}`));
+ await p.screenshot({path:OUT,type:'jpeg',quality:80});console.log(JSON.stringify(r));await b.close()})();
