@@ -285,7 +285,10 @@ function sprintStep(dt){const sp=RO.sp;if(!sp)return;const e=sp.e;RO.cool=2;
 // rv3C: signed gap (m, + = you lead) to the nearest rival along the course, for the race HUD gap pill. pairs = [[rival, its distance along the course]]
 function RV3_gap(sp,pairs,myS){let b=null;for(const[a,s]of pairs){const g=myS-s;if(!b||Math.abs(g)<Math.abs(b[0]))b=[g,a.name]}sp.gapM=b?b[0]:null;sp.gapN=b?(b[1]||'').toUpperCase():null}
 function spHud(){if(RO.sp&&RO.sp.hud)huTop(RO.sp.hud)}
-function sprintEnd(){const sp=RO.sp;if(!sp)return;for(const o of sp.objs)RO.grp.remove(o);RO.sp=null;RO.wp=null;RO.cool=3}
+// crash-1: race props (arches, ? bricks with their canvas textures, pads, rival cars, ramps) were only removed, never disposed: ~800 GPU geometries + 15-40 textures leaked per race.
+// Shared geometry/materials that something else still draws are simply uploaded again on their next draw (three.js re-inits disposed resources).
+function OBJ_free(o){o.traverse(m=>{const g=m.geometry;if(g&&g.dispose&&!g.userData.mfDone&&!(g.attributes.position&&!g.attributes.position.array))g.dispose();const M=m.material;if(M)for(const x of Array.isArray(M)?M:[M]){for(const k in x){const v=x[k];if(v&&v.isTexture&&!v.isRenderTargetTexture&&v!==scene.environment)v.dispose()}x.dispose()}})}
+function sprintEnd(){const sp=RO.sp;if(!sp)return;for(const o of sp.objs){RO.grp.remove(o);try{OBJ_free(o)}catch(e){}}RO.sp=null;RO.wp=null;RO.cool=3}
 function sprintFinish(){const sp=RO.sp,e=sp.e;sp.done=true;const place=1+sp.ai.filter(a=>a.fin!=null&&a.fin<sp.t).length,stars=place===1?3:place===2?2:place===3?1:0;
   const o=roamSave();o.sp=o.sp||{};const prev=o.sp[e.id]||{st:0,best:0};const nb=!prev.best||sp.t<prev.best;o.sp[e.id]={st:Math.max(prev.st,stars),best:nb?sp.t:prev.best};roamStore(o);
   const all=store.get('mho_stars',{}),key='sprint:'+e.id,best=all[key]||0,pay=1700,fresh=Math.max(0,stars-best),cr=Math.round(pay*fresh+pay*(best>=3?.2:.3)*Math.min(stars,best)),xp=Math.round(130*(fresh+(best>=3?.1:.25)*Math.min(stars,best)));const gift=stars===3&&best<3?rewardItem():'';logDone(key,e.name,'sprint',stars,fmt2(sp.t));if(stars>best){all[key]=stars;store.set('mho_stars',all)}if(cr){const S=season();S.cr+=cr;saveSeason(S)}if(xp)addXP(xp);
