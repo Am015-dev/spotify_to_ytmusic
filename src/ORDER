@@ -145,5 +145,6 @@
 99ui_hud.js
 98bt_boot2.js
 98ob2_onboard.js
+99c6_athpush.js
 99_api.js
 99c5_athroads.js

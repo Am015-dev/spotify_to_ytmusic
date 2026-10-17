@@ -14,4 +14,5 @@ JS errors: 0 on every run. HUD over controls: 0 overlaps. FPS: not measurable on
 | 7 | People don't react (life1/people 0 jumped aside) | GO red | 2 | known on trunk (HANDOFF_peopleath: hill-street run-up) |
 | 8 | Slow boot 48.3 s (v90m/ath-boot ❌) | GO red | 1 | under 2 parallel pages + 3 hunt pages; re-run solo before ranking |
 Not seen: falling through terrain, floating, invisible static walls (athroads4's area), traffic pile-ups (≥4 stopped cars), prompts that never clear (only SMASH!/COMBO pops, which refresh).
+Fixed (athpush): #2+#3 negative dt in frame() (see docs/HANDOFF_athpush.md); review push-outs = TR8 off-road rescue; #4 green when not under load.
 Next: (1) find the reader of dead cars' position (pv/pt or hub car grid) and skip c.dead>0 there; GO = pin.js setup asserts no pin with a dead car within 4 m. (2) clamp RO.x/z to WX0..WX1 inside roamStep and log the frame that writes > 100 m/frame (reverse on ped street 1082). (3) carousel spin tick in Athens.

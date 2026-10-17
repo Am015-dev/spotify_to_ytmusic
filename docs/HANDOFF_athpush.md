@@ -1,0 +1,6 @@
+# HANDOFF athpush (2026-10-17), on trunk alex/od-int2
+- Root cause #2/#3: frame() had no floor on dt; a rAF stamp 32 s behind `last` gave dt=-32 → TR_pre grew the terrain slide to 385 m/s, TR_post threw the car 5-13 km out, T/story timers rewound (chapter banner), leftover slide = 7 m/frame jitter. Fix: dt floored at 0 (72_roam_map_loop_boot.js). Found with tools/qa/athhunt/trap.js (setter trap on RO.x/z).
+- Safety net (not the fix): src/99c6_athpush.js outermost roamStep wrapper: dt clamped 0..0.1, car kept in the world, >100 m steps logged to window.__odPush.
+- Review push-outs (31-50 m near (1039,-1893)/(1107,-1913)/(1974,-1539)) = TR8_unstick off-road rescue (4 s stuck off a street → fade + lift to the road), deliberate; GO counts it, does not fail on it.
+- #4 carousel: life1/carousel + life2/ath-landmark green solo and in TAG=life1; the hunt red was load (15 s real-time watch under 5 pages), no code change.
+- GO athbugs/ath-push (3 routes, 1800 stepped frames + a backwards-clock frame) green; red without the dt fix (clock reset). Gates: unit 0 FAIL; reds xf1/*, terr1/*, life1/smash, life1/ath-density are SLOW-only and also red on trunk; cam/stable green 2/2 solo.
