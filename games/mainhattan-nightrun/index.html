@@ -5454,7 +5454,7 @@ NR.on('tick',dt=>{const a=Math.min(1,dt/3),au=S3.au,man=S3.man;S3.st.au+=au;S3.s
   S3.ka=S3.eA>1?clamp(S3.SH/(1-S3.SH)*S3.eM/S3.eA,.08,1):1;     // auto-aimed damage after the cut is at most SH of the total
   S3.ka=1-(1-S3.ka)*Math.min(1,SC.f()/.4);                       // ... for a strong ship: a fresh one keeps its homing
   if(!S3.act()||!G.live)return;const e=G.boss;if(!e||e.dead||!e.minBar||e.x>bossX())return;
-  if(e.s3a==null)e.s3a=G.t;if(G.t-e.s3a>2.5&&!(e.cores&&e.cores.length)){const top=e.max*[1,.66,.33][Math.min(2,e.gi|0)],r=Math.min(top-e.hp,e.max*.012*dt);if(r>0){e.hp+=r;e.hq=e.hp;if(e.hp0!=null)e.hp0+=r;S3.st.reg+=r;}}});
+  if(e.s3a==null)e.s3a=G.t;if(G.t-e.s3a>2.5&&!(e.cores&&e.cores.length)&&!(window.B2X&&B2X.on&&!CAMP.on)){const top=e.max*[1,.66,.33][Math.min(2,e.gi|0)],r=Math.min(top-e.hp,e.max*.012*dt);if(r>0){e.hp+=r;e.hq=e.hp;if(e.hp0!=null)e.hp0+=r;S3.st.reg+=r;}}});
 /* the district and final bosses on the hard tiers: auto-aim hits them at bA and they repair themselves, so their hull is cut to keep the fight at ~55-80 s for a maxed ship */
 {const sb1=spawnBoss;spawnBoss=function(o){const b=sb1(o);if(b&&S3.on&&S2.hard()&&!b.mini){b.hp=b.max=Math.round(b.max*S3.bK);b.floor=b.pf0=Math.ceil(b.max*.62);}return b;};}
 {const t0=B2.tmin;B2.tmin=function(e){const t=t0.call(this,e);return S3.on&&S2.hard()&&!e.mini?Math.round(t*S3.bT):t;};}   // ... and its damage budget is shorter: the shield cores and the repair add their time
@@ -5471,19 +5471,19 @@ window.__s3={S3};
    C. power scale: the hull is set high (x HK), and a ship whose honest damage cannot finish inside ~1.2 T gets its boss damage raised (at most x AMP); hard.js's repair is held to REP x the cap,
       so a fresh ship is not stuck: its fight ends near 1.2 T; the cap still holds the floor. */
 if(RET.boss2===undefined)RET.boss2=!/[?&]boss2=0/.test(location.search);
-const B2X=window.B2X={get on(){return!!RET.boss2;},HK:1.8,M:1.06,AMP:12,LATE:1.2,LS:8,REP:.4,
+const B2X=window.B2X={get on(){return!!RET.boss2;},HK:1.8,M:1.06,AMP:12,LATE:1.2,LS:8,REP:.2,BK:5,SHT:14,
   T:{mini:{easy:42,normal:50,hard:60,vhard:65,legend:70},dist:{easy:66,normal:80,hard:95,vhard:102,legend:110},fin:{easy:100,normal:120,hard:145,vhard:158,legend:170}},   // the shortest fight in seconds
   kind(e){return e.mini?'mini':(e.k===3||ST.on&&ST.n>=40||!ST.on&&G.pos>=4)?'fin':'dist';},
   tf(e){const t=this.T[this.kind(e)];return t[SET.diff]||t.normal;},
   cap(e){return e.max/(this.tf(e)*this.M);},                     // HP per second at most (rolling 1 s window)
-  hz:[],st:{abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,ls:0,calm:0}};
+  hz:[],st:{bank:0,abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,ls:0,calm:0}};
 NR.on('runStart',()=>{B2X.hz=[];B2X.st={abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,ls:0,calm:0};});
 /* spawn: high hull, HP-driven phases (p2/p3 are set on the bar line, b.js bossBeat), the phase pattern lists */
 {const sb=spawnBoss;spawnBoss=function(o){const b=sb(o);if(!B2X.on||!b||!b.minBar)return b;
   b.hp=b.max=Math.round(b.max*B2X.HK);b.floor=b.pf0=Math.ceil(b.max*.62);b.p2=b.p3=1e9;
   const p=b.lists[1].slice(),h=Math.ceil(p.length/2),up={fan5:'fan7',fan7:'fan9'};
   b.lists=[b.lists[0],p.slice(h).concat(p.slice(0,h)),p.map(x=>up[x]||x)];   // phase 2 opens with the patterns phase 1 never used; phase 3 fans are one size up
-  b.b2={w:[],ref:b.hp,act:0,rate:0,amp:1,sp:0,sh:0,cl:0,fl:0,ls:0,lsd:0};return b;};}
+  b.b2={w:[],bk:0,ref:b.hp,act:0,rate:0,amp:1,sp:0,sh:0,cl:0,fl:0,ls:0,lsd:0};return b;};}
 /* the bar line: a phase starts only on a bar, with one bar of calm; the last stand silences the boss */
 {const bb=bossBeat;bossBeat=function(e,d){const s=e.b2;if(!B2X.on||!s)return bb(e,d);
   const nb=e.bt+1;if(nb%4===0&&e.x<=bossX()){const bar=nb/4;
@@ -5494,23 +5494,26 @@ NR.on('runStart',()=>{B2X.hz=[];B2X.st={abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,l
     if(e.ph===3){try{AU.intense(true);}catch(x){}}}};}
 /* A + C: the cap, the phase floors and the weak-ship help, booked where DMG.pass books the frame's hull loss (b.js update: next is the boss floor and the kill check) */
 {const p0=DMG.pass;DMG.pass=function(dt){const r=p0.call(this,dt);const e=G.boss;if(!B2X.on||!e||e.dead||!e.b2)return r;const s=e.b2;
+  if(e.gw){s.gt=(s.gt||0)+dt;if(s.gt>B2X.SHT){s.gt=0;for(const c of e.cores)c.hp=c.hq=0;floater(e.x,e.y-e.r-30,'SHIELD OVERLOAD','#ffe14d');}}else s.gt=0;   // a shield the cores keep up longer than SHT s overloads: the cap, not the shield, sets the length
   if(e.gi===1)e.gi=2;                                            // fair.js: the 66% shield only; phase 3 has its own verb
   const raw=Math.max(0,s.ref-e.hp);
   if(e.x<=bossX())s.act+=dt;                                    // seconds since it took position (shields, calm bars and the last stand count)
   s.rate+=(raw/Math.max(dt,1e-3)-s.rate)*Math.min(1,dt/3);
   const need=s.ref/Math.max(4,B2X.LATE*B2X.tf(e)-s.act);
   s.amp=s.rate>1e-3?clamp(need/s.rate,1,B2X.AMP):B2X.AMP;     // only damage that lands is raised (a ship that does not hit gets nothing)
-  let loss=raw*s.amp;const now=G.t,cap=B2X.cap(e);s.w=s.w.filter(x=>now-x[0]<1);let used=0;for(const x of s.w)used+=x[1];
-  const room=Math.max(0,cap-used),take=Math.min(loss,room);
+  const loss=raw*s.amp+s.bk;const now=G.t,cap=B2X.cap(e);s.w=s.w.filter(x=>now-x[0]<1);let used=0;for(const x of s.w)used+=x[1];
+  const room=Math.max(0,cap-used),take=Math.min(loss,room),left=loss-take;   // damage above the cap waits in the armour (up to BK s of the cap) and goes in at the cap's pace: bursts (a salvo, a bomb) are not lost, so the cap, not the bot's rhythm, sets the length
+  s.bk=Math.min(left,cap*B2X.BK);
   if(raw>0){B2X.st.dealt+=raw;if(s.amp>1)B2X.st.amp+=take-Math.min(raw,take);}
-  if(loss>take+.01){B2X.st.abs+=loss-take;s.sh=.35;
+  if(left>s.bk+.01)B2X.st.abs+=left-s.bk;
+  if(left>.01){s.sh=.35;
     if(now-s.sp>.12){s.sp=now;burst(e.x-e.r*.7,e.y+rnd(-e.r*.5,e.r*.5),'#cfe8ff',5,190,.25);}
     if(now-s.cl>.3){s.cl=now;AU.sfx('hit');}
     if(now-s.fl>5){s.fl=now;floater(e.x,e.y-e.r-34,'ARMOUR HOLDS','#cfe8ff');}}
   if(take>0)s.w.push([now,take]);
   let hp=s.ref-take;const pf=e.ph===1?e.max*.64:e.ph===2?e.max*.31:0;   // hold the HP at the next phase line until that phase starts on the bar
   if(hp<pf)hp=Math.min(s.ref,pf);
-  if(raw<=0)hp=Math.min(e.hp,s.ref+cap*B2X.REP*dt);               // a repair (hard.js) runs at most REP of the cap, so a ship that hits keeps gaining
+  if(raw<=0&&take<=0)hp=Math.min(e.hp,s.ref+cap*B2X.REP*dt);      // a repair (hard.js, campers only) runs at most REP of the cap, so a ship that hits keeps gaining
   e.hp=hp;e.hq=hp;s.ref=hp;
   if(e.ph===3&&!s.lsd&&e.hp<=e.max*.12){s.lsd=1;s.ls=B2X.LS;B2X.st.ls++;floater(e.x,e.y-e.r-34,'EXPOSED!','#ffe14d');G.flash=Math.max(G.flash,.2*FX());shake(8);}
   if(s.sh>0)s.sh-=dt;e.b2s=s.sh>0?1:0;return r;};}
