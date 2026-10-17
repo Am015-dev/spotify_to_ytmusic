@@ -116,7 +116,9 @@ function LIFE_init(){if(LIFE.grp===HUB.grp)return true;if(!HUB.grp||!HUB.nodes||
 function LIFE_side(A,B,s,sd,dist){const L=Math.hypot(B.x-A.x,B.z-A.z)||1,ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20)),
   off=W/2+dist;return{x:A.x+ux*s-uz*off*sd,z:A.z+uz*s+ux*off*sd,ux,uz,h:Math.atan2(uz*sd,-ux*sd)}}
 // never in a driving lane: the carriageway + 1 m stays clear (coordinator 2026-10-14)
-function LIFE_free(x,z,r,y){if(LV_onRoad(x,z,Math.max(1,r*.7+.6)))return false;if(roamHit(x,z,r+.4,y+.5))return false;if(typeof inRiver==='function'&&inRiver(x,z,-2))return false;return true}
+function LIFE_free(x,z,r,y){if(LV_onRoad(x,z,Math.max(1,r*.7+.6)))return false;
+ {/* slow1: the hub graph is not the drawn road: set pieces stood ON the real street (Athens -2244,-1487 sprinkler, -2241,-1484 balloons: solid, r+1.2 m, 3 s wedge) — also test the city street and fill roads that the car actually drives on */
+  const m=r*.7+.6;if(typeof cityAt==='function'){const q=cityAt(x,z);if(q&&q.road&&q.d<q.road.w/2+m)return false}if(typeof fillAt==='function'){const f=fillAt(x,z);if(f&&f.r&&f.d<f.r.w/2+m)return false}}if(roamHit(x,z,r+.4,y+.5))return false;if(typeof inRiver==='function'&&inRiver(x,z,-2))return false;return true}
 // first free spot for something of radius r at this slot: kerb distances tried nearest first (Athens blocks are narrow, so the near ones matter)
 function LIFE_at(p,r){for(const d of p.D){const q=LIFE_side(p.EA,p.EB,p.s,p.sd,d+r),y=LIFE_gy(q.x,q.z);if(!isFinite(y)||y<-2)continue;if(LIFE_free(q.x,q.z,r,y)){q.y=y;return q}}return null}
 let LIFE_SMT=CID==='fra'?18:15;// smashable groups wanted per 5×5 cells (tuned: 10-40 smashables per 100 m window)
