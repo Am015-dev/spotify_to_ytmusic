@@ -4,7 +4,11 @@
 3. Gates on built c7a: unit 0 FAIL; TAG=life1,xf1,terrain,mem,rv2k2 43/58 (trunk 46/58 in crash-6 notes). Reds: mem/stable (913 MB end, red on trunk), rv2k2/close (red on trunk), xf1/grass,water,land,slope,kerb, terr1/tyre+fps fra/ath, life1/smash,popup,ath-density,people (SLOW-only lines, run in parallel with Athens). 15 reds vs 10 on trunk: not proven identical, so pushed to alex/od-crash7-wip, not trunk.
 4. Next: rerun the gates alone (one city at a time) on c7a and on trunk for a same-name comparison, run mem/ath-boot, take one fra_lowmem shot and LOOK for pop-in at 250 m past draw range; if clean, merge to alex/od-int2.
 
-## Result (merged to alex/od-int2)
-- Merged alex/od-int2 into the crash-7 branch; build c7m OK (page 3.19 MB); unit 0 FAIL.
-- Gate TAG=life1,xf1,terrain,mem, run serially: branch 43/45 (reds mem/stable, mem/ath-boot); trunk 42/45 (reds mem/stable, xf1/grass, mem/ath-boot). No new reds by name.
-- Athens lowmem (tMem2 c7 ath 1): peak total 749 MB <= 785. One 852x393 Frankfurt lowmem shot: no visible pop-in near the car (single frame).
+## Result (NOT on alex/od-int2: new red)
+- Merged alex/od-int2 (through 05bc17f) into the crash-7 branch; build c7m OK (page 3.19 MB); unit 0 FAIL.
+- Gate TAG=life1,xf1,terrain,mem, serial, final builds: branch reds mem/stable, mem/ath-boot, xf1/grass; trunk reds mem/stable, mem/ath-boot.
+- NEW RED: xf1/grass (ROAD -> GRASS, Grueneburgpark) fails on the branch 2 of 2 when run alone, passes on trunk 2 of 2 alone. Off-road after 0.53 s on grass at 73 km/h.
+- mem/stable and mem/ath-boot are red on both builds (not new).
+- Athens lowmem (tMem2 c7 ath 1): peak total 746 MB <= 785.
+- Shot 852x393 Frankfurt lowmem (taken on the pre-update build): no visible pop-in near the car, single frame. Re-shoot needed after the xf1/grass fix.
+- Next: find why the lowmem keep distance changes the grass step on Grueneburgpark; then rerun the gates alone.
