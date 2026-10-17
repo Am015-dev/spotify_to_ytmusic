@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.88',date:'17 Oct 2026',items:[{t:'FIXED',s:'The track builder no longer opens as a black screen when you come from the garage.'},{t:'FIXED',s:'The LEVEL UP card waits until you close the garage or builder instead of covering it.'}]},
   {v:'v90m-beta.87',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens: the big walls that cut across streets are gone (a stale street map made the city builder put blocks on roads).'},{t:'FIXED',s:'Athens: dead-end streets that ended in a wall are open again.'}]},
   {v:'v90m-beta.86',date:'17 Oct 2026',items:[{t:'FIXED',s:'Camera no longer jumps far ahead and back when the car switches to its 4x4 form.'},{t:'NEW',s:'Smash more street items: walls let you slide instead of stopping dead, playground pieces and stalls break.'},{t:'NEW',s:'Shortcuts marked with arrows in Athens and Frankfurt, each one much quicker than the road.'}]},
   {v:'v90m-beta.85',date:'17 Oct 2026',items:[{t:'FIXED',s:'Less phone memory again: far street objects are freed while you drive and a memory leak is fixed (Frankfurt about 55 MB lower after 5 minutes).'}]},
