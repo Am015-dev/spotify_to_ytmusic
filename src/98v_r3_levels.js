@@ -59,7 +59,8 @@ const R3U={q:[]};
 addXP=(f=>function(n,why){const l0=lvlOf(prof().xp),s0=say;say=function(a){if(a==='LEVEL UP')return;return s0.apply(this,arguments)};let r;try{r=f.apply(this,arguments)}finally{say=s0}
  const l1=lvlOf(prof().xp);if(l1>l0){R3U.q.push([l0,l1]);R3_upPump()}return r})(addXP);
 const R3_racing=()=>state==='race'||state==='countdown'||state==='finished'||state==='loading'||!!RO.sp;   // rv3C: also any city race (RO.sp is cleared only after the result panel is up); the pump below also waits while the result panel shows (the card comes after CONTINUE)
-function R3_upPump(){if(R3_racing()){const U=$('#r3Up');if(U&&!U.hidden&&R3U.cur&&U.classList.contains('mini')){U.hidden=true;R3U.q.unshift(R3U.cur);R3U.cur=null}return}const sr=$('#spRes');if(sr&&!sr.hidden)return;if(!R3U.q.length||!$('#r3Up').hidden)return;const[l0,l1]=R3U.q.shift();R3_up(l0,l1)}
+function R3_upPump(){const gx=$('#gbx'),gar=!!(gx&&!gx.hidden)||(typeof BX!=='undefined'&&BX.on);if(gar){const U=$('#r3Up');if(U&&!U.hidden&&R3U.cur){U.hidden=true;R3U.q.unshift(R3U.cur);R3U.cur=null}return}   // bld1: the card waits until the garage / builder closes
+ if(R3_racing()){const U=$('#r3Up');if(U&&!U.hidden&&R3U.cur&&U.classList.contains('mini')){U.hidden=true;R3U.q.unshift(R3U.cur);R3U.cur=null}return}const sr=$('#spRes');if(sr&&!sr.hidden)return;if(!R3U.q.length||!$('#r3Up').hidden)return;const[l0,l1]=R3U.q.shift();R3_up(l0,l1)}
 setInterval(()=>{try{R3_upPump()}catch(e){}},600);
 function R3_up(l0,l1,mini){const U=$('#r3Up');R3U.cur=[l0,l1];let rw=[['📈','STATS UP','top speed, acceleration, handling, health']];for(let L=l0+1;L<=l1;L++)rw=rw.concat(R3_road(L));
  mini=mini!=null?mini:state==='roam';U.classList.toggle('mini',!!mini);
