@@ -746,6 +746,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.80',date:'17 Oct 2026',items:[{t:'FIXED',s:'One tidy stack of cards on the left: the marker prompt first, then the objective, never overlapping.'},{t:'FIXED',s:'Objective card text is now at least 12 px, easier to read on a phone.'}]},
   {v:'v90m-beta.79',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens streets: trees, stalls and other solid props no longer stand on the road.'},{t:'NEW',s:'Traffic in your lane now moves over when you come up fast from behind.'},{t:'FIXED',s:'Head-on smashes with traffic slow you down less.'}]},
   {v:'v90m-beta.78',date:'17 Oct 2026',items:[{t:'FIXED',s:'Traffic comes back around you after a fast travel: no more empty streets.'},{t:'NEW',s:'Two more start activities near the Frankfurt start: Stud Rush Bankenviertel and Brick Smash Taunusanlage.'}]},
   {v:'v90m-beta.77',date:'17 Oct 2026',items:[{t:'FIXED',s:'Sprint races: slow traffic no longer drags you down to a crawl.'},{t:'FIXED',s:'Athens races are finishable: the Akropolis course no longer doubles back on itself.'},{t:'CHANGED',s:'Fairer rivals by default, and smoother race routes.'},{t:'FIXED',s:'Phone home screen: the logo no longer covers WELCOME BACK.'}]},
@@ -1508,7 +1509,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c_checklist":"eaa8e1fb","99c2_slowspots":"8ec3375b","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"833f751e"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"babf2ef1","99c2_slowspots":"8ec3375b","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"833f751e"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -16197,10 +16198,27 @@ window.__fcam=FC;
   if(!els){els=ORD.map(i=>document.getElementById(i)).filter(Boolean);if(!els.length){els=null;return}mo=new MutationObserver(gov);for(const e of els)mo.observe(e,{attributes:true,attributeFilter:['hidden','style','class']})}
   document.body.classList.toggle('ui1Mv',Math.abs(RO.v)>3);
   for(const e of els)e.classList.remove('ui1X');
+  HUDSTACK_layout();
   let n=0;for(const e of els)if(vis(e)&&++n>2)e.classList.add('ui1X');
   mo.takeRecords()}catch(e){}};
  setInterval(gov,150);
 }
+function HUDSTACK_layout(){const G=id=>document.getElementById(id),S=['roamPrompt','roamPop','crSmHint'].map(G).filter(Boolean);
+ for(const e of S)e.classList.remove('ui1X');
+ const on=e=>!e.hidden&&(e.id!=='crSmHint'||e.classList.contains('on'))&&getComputedStyle(e).display!=='none',L=S.filter(on);
+ const pr=L.some(e=>e.id==='roamPrompt'),sh=[];for(const e of L){if(e.id==='crSmHint'&&pr)e.classList.add('ui1X');else if(sh.length<2)sh.push(e);else e.classList.add('ui1X')}
+ if(!sh.length)return sh;
+ const R=id=>{const e=G(id);if(!e||e.hidden||getComputedStyle(e).display==='none')return null;const r=e.getBoundingClientRect();return r.width>2&&r.height>2&&r.bottom>0&&r.top<innerHeight?r:null};
+ const mm=R('roamMini')||R('map');
+ let x=Math.max(14,mm?Math.ceil(mm.right)+8:0),y=60;for(const id of ['m1Next','roamArrow'])y=Math.max(y,Math.ceil((R(id)||{bottom:0}).bottom)+6);
+ const w=Math.min(240,Math.max(120,innerWidth-x-72));
+ for(const e of sh){const q=(k,v)=>e.style.setProperty(k,v,'important');q('position','fixed');q('left',x+'px');q('top',y+'px');q('right','auto');q('bottom','auto');q('transform','none');q('margin','0');q('width','auto');q('min-width','0');q('max-width',w+'px');y+=Math.ceil(e.getBoundingClientRect().height)+6}
+ return sh}
+const HUDSTACK_css=document.createElement('style');HUDSTACK_css.textContent='html body #roamPop,html body #roamPop *{font-size:12px!important;line-height:1.25!important}html body #roamPop h5{display:inline;margin:0 6px 0 0}';document.head.appendChild(HUDSTACK_css);
+function HUDSTACK_go(say,P,ok){const m=RO.marks.find(q=>q.kind==='quest'||q.kind==='collect')||RO.marks[0];if(m)RV14_near(m,10);CRSM.hn=0;const tick=()=>{RO.pop={k:'smash',name:'SMASH 20',goal:20,lim:25,v:0,t:0,txt(){return '0/20'}};if(m)RO.pmNew=m;RO.pmT=2.5};tick();const iv=setInterval(tick,100);
+  setTimeout(()=>{clearInterval(iv);tick();setTimeout(()=>{const sh=HUDSTACK_layout(),R=sh.map(e=>e.getBoundingClientRect()),sm=[...document.querySelectorAll('#roamMini,#map')].map(RV14_vis).filter(Boolean);let ov=0;for(let i=0;i<R.length;i++){for(let j=i+1;j<R.length;j++)ov+=RV14_ovl(R[i],R[j]);for(const c of sm)ov+=RV14_ovl(R[i],c);for(const id of ['tL','tR','tG','tB'])ov+=RV14_ovl(R[i],RV14_vis(document.getElementById(id)))}
+   const small=sh.some(e=>[...e.querySelectorAll('*'),e].some(x=>x.childNodes[0]&&x.childNodes[0].nodeType===3&&parseFloat(getComputedStyle(x).fontSize)<12)),ids=sh.map(e=>e.id).join('+');RO.pop=null;RO.pm=null;
+   say('📍 LEFT HUD STACK ('+P+') · cards shown: '+ids+' (≤ 2, prompt has priority, no hint beside the prompt) · overlap with each other, minimap or controls '+ov+' px² (0) · text under 12 px: '+(small?'yes':'no')+ok(sh.length>=1&&sh.length<=2&&!ov&&!small&&!(ids.includes('roamPrompt')&&ids.includes('crSmHint'))))},300)},1000);return'📍 LEFT HUD STACK · setting up prompt + SMASH objective…'}
 window.__taps=0;addEventListener('pointerdown',()=>{window.__taps++},true);
 {const st=document.createElement('style');st.textContent=`html body.touch :is(#tB,#tN,#tD,#tF,#tG){font-size:15px!important}
 html body :is(#feed,#hitPop,#roamCombo,#juPop){position:fixed;left:auto!important;right:calc(8px + env(safe-area-inset-right,0px))!important;transform:none!important;text-align:right;pointer-events:none;z-index:6;max-width:min(230px,56vw);white-space:normal!important}
@@ -16432,6 +16450,7 @@ function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
  const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;
+ if(state==='roam')return;/* hudstack-1: the left HUD stack positions it */
  h.style.left=Math.round(Math.max(6,Math.min(innerWidth-w-6,(a.left+b.right)/2-w/2)))+'px';h.style.top=Math.round(Math.max(6,Math.min(a.top,b.top)-hh-22))+'px'}
 setInterval(()=>{try{CRSM_hint()}catch(e){}},250);
 window.__crsm={get S(){return CRSM},hint:()=>CRSM_hint()};
