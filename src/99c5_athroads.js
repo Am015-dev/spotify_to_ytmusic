@@ -34,7 +34,7 @@ function ATHR_walls(visit){/* visit(x0,z0,x1,z1,topAboveGround,meshName) for eve
   cache.set(g.uuid,L=Float32Array.from(T));return L};
  const tri=(T,t,W,nm)=>{a.set(T[t],T[t+1],T[t+2]).applyMatrix4(W);b.set(T[t+3],T[t+4],T[t+5]).applyMatrix4(W);c.set(T[t+6],T[t+7],T[t+8]).applyMatrix4(W);
   const ux=b.x-a.x,uy=b.y-a.y,uz=b.z-a.z,vx=c.x-a.x,vy=c.y-a.y,vz=c.z-a.z,nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,nl=Math.hypot(nx,ny,nz);if(nl<1e-6||Math.abs(ny)/nl>.3)return;
-  const lo=Math.min(a.y,b.y,c.y),hi=Math.max(a.y,b.y,c.y),gx=(a.x+b.x+c.x)/3,gz=(a.z+b.z+c.z)/3,g=groundY(gx,gz);if(hi-g<3.5||lo-g>2)return;
+  const lo=Math.min(a.y,b.y,c.y),hi=Math.max(a.y,b.y,c.y),gx=(a.x+b.x+c.x)/3,gz=(a.z+b.z+c.z)/3,g=groundY(gx,gz);if(hi-g<3.5||hi-g>300||lo-g>2)return;/* >300 m = terrain cliffs / mountain meshes, not buildings */
   /* base segment = the horizontal extent of the triangle */let p=[a,b,c].sort((q,r)=>q.x-r.x),dx=p[2].x-p[0].x,dz=p[2].z-p[0].z;let q0=p[0],q1=p[2];if(Math.abs(dz)>Math.abs(dx)){p=[a,b,c].sort((q,r)=>q.z-r.z);q0=p[0];q1=p[2]}
   if(Math.hypot(q1.x-q0.x,q1.z-q0.z)<1.5)return;visit(q0.x,q0.z,q1.x,q1.z,hi-g,nm)};
  scene.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes.position||!isVis(o))return;const g=o.geometry;if(o.material&&o.material.transparent&&o.material.opacity<.3)return;const T=local(g),n=o.isInstancedMesh?o.count:1;if(!g.boundingBox)g.computeBoundingBox();const gb=g.boundingBox,sz=Math.max(gb.max.x-gb.min.x,gb.max.z-gb.min.z);
@@ -45,7 +45,7 @@ function ATHR_vis(){const R=ATHR_roads(),G=new Map(),K=(i,j)=>i*10000+j,out=[],s
  const deck=(x,z)=>typeof onAnyDeck==='function'&&onAnyDeck(x,z);
  ATHR_walls((x0,z0,x1,z1,h,nm)=>{const T=new Set();for(let i=Math.floor((Math.min(x0,x1))/40);i<=Math.floor(Math.max(x0,x1)/40);i++)for(let j=Math.floor(Math.min(z0,z1)/40);j<=Math.floor(Math.max(z0,z1)/40);j++)for(const r of G.get(K(i,j))||[])T.add(r);
   for(const r of T){const hh=r.w/2-.5;if(hh<=0)continue;const d=ATHR_sd(x0,z0,x1,z1,r.x0,r.z0,r.x1,r.z1);if(d>=hh)continue;const mx=(x0+x1)/2,mz=(z0+z1)/2;if(deck(mx,mz))continue;
-   const k=r.rd+Math.round(mx/6)+','+Math.round(mz/6);if(seen.has(k))continue;seen.add(k);out.push({type:'mesh',x:Math.round(mx),z:Math.round(mz),road:r.rd,w:+r.w.toFixed(1),dep:+(hh-d).toFixed(1),note:nm+' h='+h.toFixed(0)})}});
+   const k=r.rd+Math.round(mx/6)+','+Math.round(mz/6);if(seen.has(k))continue;seen.add(k);{const cl=!!(roamHit(mx,mz,1.2,groundY(mx,mz)+.5)||roamHit(x0,z0,.6,groundY(x0,z0)+.5)||roamHit(x1,z1,.6,groundY(x1,z1)+.5));out.push({type:cl?'mesh+col':'mesh',x:Math.round(mx),z:Math.round(mz),road:r.rd,w:+r.w.toFixed(1),dep:+(hh-d).toFixed(1),note:nm+' h='+h.toFixed(0)})}}});
  out.sort((a,b)=>b.dep-a.dep);return{n:out.length,km,list:out}}
 window.__athVis=ATHR_vis;
 // dead ends: a street end (CITY_S polyline end, not ped/hill) that touches no other road within w/2+3 m, with a wall (mesh) or collider within 15 m straight ahead
