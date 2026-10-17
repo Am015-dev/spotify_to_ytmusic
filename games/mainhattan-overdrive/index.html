@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.93',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens traffic: no more dead cars stuck in the road.'},{t:'NEW',s:'Livelier Athens streets, and traffic gives way at junctions.'}]},
 {v:'v90m-beta.92',date:'17 Oct 2026',items:[{t:'FIXED',s:'Fewer long freezes, especially in Athens: the game makes far less throwaway data, so the browser pauses less to clean up.'},{t:'FIXED',s:'Shop shutters no longer rebuild every frame.'},{t:'CHANGED',s:'Background loading now runs in small slices instead of big bursts.'}]},
 {v:'v90m-beta.91',date:'17 Oct 2026',items:[{t:'FIXED',s:'Much less lag: the camera no longer stalls for a frame when it checks walls (the worst hitch was 66 ms).'},{t:'FIXED',s:'Smoother Frankfurt: slowest frames down from 122 ms to about 23 ms.'},{t:'CHANGED',s:'Lighter road and avatar drawing, so big scenes load and run smoother.'}]},
   {v:'v90m-beta.90',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phones: parts of the city far behind you are freed sooner, so memory stays lower on long drives (fewer crashes).'}]},
@@ -5161,7 +5162,7 @@ function hubTrafficStep(dt){CR_npcPush();if(HUB.ridge)HUB.ridge.position.set(cam
     const ahead=Math.hypot(RO.x-(c.x+(B.x-A.x)/L*8),RO.z-(c.z+(B.z-A.z)/L*8))<9;const V=A.ab?(c.hv||(c.hv=rr(28,36))):c.v;if(c.hitT>0){c.hitT-=dt;c.cv=W10_brake(c.cv||0,dt)}else c.cv=(c.cv??V)+Math.min(((ahead?Math.min(2,V):V)-(c.cv??V))*Math.min(1,dt*3),4*dt);
     c.t+=c.cv*dt/L;if(c.t>=1&&c.route){c.a=c.b;c.b=c.route.length?c.route.shift():c.a;c.t=0;c.rn=(c.rn||0)+1;continue}if(c.t>=1){let nx=B.nb.filter(n=>n!==c.a&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);c.a=c.b;c.b=nx.length?nx[Math.floor(R()*nx.length)]:c.a;c.t=0;continue}
     if(TUNE.lvLod&&c.dead<=0&&!c.route&&!c.pk&&(HUB.fr+c.j+c.k)%4&&(c.x-RO.x)**2+(c.z-RO.z)**2>62500)continue;
-    const dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gA=A.g||B.g,W=c.pk&&c.ofW?c.ofW:A.ab||gA?0:Math.min(A.w||20,B.w||20),lane=W*(c.l3s!=null&&!c.pk&&W>=14?.27+.09*c.l3s:c.lane)/* life-3: inner/outer lane, smooth lane changes (98l3) */+(RD_ON&&gA&&!c.pk&&!c.tr&&(A.w||0)>=14?(c.l3s??(c.lane<.27?-1:1))*Math.min(A.w,B.w||A.w)*.11:0)/* RD: two lanes per direction on wide streets */,x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;
+    const dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gA=A.g||B.g,W=c.pk&&c.ofW?c.ofW:A.ab||gA?0:Math.min(A.w||20,B.w||20),lane=W*(c.l3s!=null&&!c.pk&&W>=14?.27+.09*c.l3s:c.lane)/* life-3: inner/outer lane, smooth lane changes (98l3) */+(RD_ON&&gA&&!c.pk&&!c.tr&&(A.w||0)>=14?(c.l3s??(c.lane<.27?-1:1))*Math.min(A.w,B.w||A.w)*.11:0)/* RD: two lanes per direction on wide streets */+(c.yo||0)/* ayd: give way sideways (98ayd_yield.js) */,x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;
     c.x=x;c.z=z;c.y=A.ab||gA?groundAt(x,z,(c.y||0)+4):groundY(x,z);
     _m.makeBasis(_hrt.set(dz,0,-dx),_hup,_hfw.set(dx,0,dz)).setPosition(x,c.y,z);CR_susp(c,dx,dz,dt,im,_m);
     const d=Math.hypot(x-RO.x,z-RO.z);if(d<5&&Math.abs(c.y-RO.y)<3&&OB_car(x,z,dx,dz,c)){const crLg=(RO.crLg||0)>0,pin=W10_pin(c),crSm=(typeof DMG_traf==='function'?DMG_traf(c,x,z,dx,dz,crLg,pin):crLg||pin||Math.abs(RO.v)>CR_SMASHV)||(PACE2&&typeof L3_jam==='function'&&L3_jam());/* rv2k3 jam: parked against a car with gas held for > 1.2 s = smash through (2K never parks you) */if(!crSm){if(!(RO.sp&&!RO.sp.done))W10_bump(c,x,z,dx,dz,W)/* fair-4: in a sprint race slow traffic is a ghost to the player; a parked/braking car on the line wedged the car at 1-2 m/s (pursuit bots and careful drivers alike) */}else if(1){const f2=TR_smashFx(c,x,z,dx,dz);const rx=x-RO.x,rz=z-RO.z,rl=Math.hypot(rx,rz)||1,ho=(f2.x*dx+f2.z*dz)<-.6&&(f2.x*rx+f2.z*rz)/rl>.7;RO.v*=pl&&pl.nitro?.95:ho?(PACE2?.85:.6):.88;shake=ho?.5:.3;AU.sfx('crash');if(crSm)CR_smashHit();if(pl&&pl.nitro)roamHeal(3);else if(!crLg&&!pin)roamDamage(ho?12:5);addXP(3,'traffic smash');comboAdd(3);qCrate();if(pl)pl.bm=Math.min(100,pl.bm+12)}else{c.t=Math.max(0,c.t-.02)}}if(c.crB>0)c.crB-=dt;
@@ -8657,7 +8658,7 @@ roamCam=(f=>function(dt){f(dt);if(state!=='roam'||(typeof M1!=='undefined'&&M1.c
   if(!ok){c.set(RO.x-Math.sin(RO.h)*2.5,Math.max(y0,RO.y+6),RO.z-Math.cos(RO.h)*2.5)}camera.lookAt(RO.x+Math.sin(RO.h)*6,RO.y+1.5,RO.z+Math.cos(RO.h)*6)})(roamCam);
 
 qvEnter=(f=>function(ch,i){const r=f.apply(this,arguments);try{const V=ch&&ch.v2,S=V&&V.L.st[V.si];if(S&&S.T&&V.left>0&&!S.qaT){S.qaT=1;V.left*=1.3}}catch(e){}return r})(qvEnter);
-buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);if(CID!=='fra'&&HUB.cars)HUB.cars.forEach((c,i)=>{if(i%5>1)c.dead=1e9});return r})(buildHubTraffic);
+buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);if(CID!=='fra'&&HUB.cars)HUB.cars.forEach((c,i)=>{if(i%5>3)c.dead=1e9})/* rv4B: was i%5>1 (60 % hidden for ever; with DR_traffic only 37 of 114 cars alive, 5 within 120 m at the start) */;return r})(buildHubTraffic);
 const QA7={o:null,resets:0};
 function QA7_release(){TOUCH.sid=null;TOUCH.bz=null;TOUCH.target=0;TOUCH.steer=0;TOUCH.lock=0;TOUCH.gas=false;TOUCH.brake=false;TOUCH.boost=false;TOUCH.hb=false;
   try{bzSet(0)}catch(e){}document.querySelectorAll('#touch .down').forEach(e=>e.classList.remove('down'));try{SZ.classList.remove('on')}catch(e){}QA7.resets++}
@@ -13698,6 +13699,21 @@ function CAMST_go(say){const ok=b=>b?' ✅':' ❌';const FL=240,WIN=200,NF=6,S={
 (function CAMST_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='cam'&&q.id==='stable'))C.items.push({ver:'cam',id:'stable',area:'drive',text:'rv:2026-10-17 · cam/stable: stepped-frame drive with car/4x4 flips in both cities: the follow distance never jumps past its old/new value, no teleports'});
   C.GO['cam/stable']=['fra','ath'].map(c=>({c,n:'stable follow camera',secs:120,fn:()=>CAMST_go()}));return}
  if(i<600)setTimeout(()=>CAMST_reg(i+1),100)})(0);
+function RV4B_drive(secs,onStep,cap){const rnd0=Math.random,W=a=>Math.atan2(Math.sin(a),Math.cos(a));RO.v=0;let sum=0,n=0;if(cap){let sd=4242;Math.random=()=>(sd=(sd*16807)%2147483647)/2147483647}try{for(let t=0;t<secs&&state==='roam';t+=1/30){const la=12+RO.v*.9,q=rfSnap(RO.x+Math.sin(RO.h)*la,RO.z+Math.cos(RO.h)*la,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;K.KeyW=K.ArrowUp=!cap||RO.v<cap;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;roamStep(1/30);sum+=Math.abs(RO.v);n++;if(onStep)onStep(t)}}finally{Math.random=rnd0}
+ K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;return Math.round(sum/Math.max(n,1)*3.6)}
+function RV4B_go(kind){const ok=b=>b?' ✅':' ❌';if(state!=='roam'||!RO.on)return'📍 Start free roam in Athens ❌';
+ if(kind==='traf'){const n0=SM2.n.carTap+SM2.n.carSmash,DG=[],f0=SM2_car;SM2_car=function(c){const h=RO.vh??RO.h,rx=c.x-RO.x,rz=c.z-RO.z;DG.push([Math.round(rx*Math.sin(h)+rz*Math.cos(h)),Math.round(rx*Math.cos(h)-rz*Math.sin(h)),Math.round(c.cv??c.v??0),c.yo?1:0,(c.pk?'p':'')+(c.tr?'t':'')+(c.route?'r':'')+(HUB.nodes[c.a]&&HUB.nodes[c.a].ab?'a':'')+(c.hitT>0?'h':''),Math.round(Math.hypot(HUB.nodes[c.b].x-HUB.nodes[c.a].x,HUB.nodes[c.b].z-HUB.nodes[c.a].z)*(Math.sin(h)*(HUB.nodes[c.b].x-HUB.nodes[c.a].x)+Math.cos(h)*(HUB.nodes[c.b].z-HUB.nodes[c.a].z))/(Math.hypot(HUB.nodes[c.b].x-HUB.nodes[c.a].x,HUB.nodes[c.b].z-HUB.nodes[c.a].z)||1)**2*10),Math.round(RO.v)].join(','));return f0.apply(this,arguments)};let kmh;try{kmh=RV4B_drive(120,null,19.4)}finally{SM2_car=f0}const hits=SM2.n.carTap+SM2.n.carSmash-n0;
+  const dd=HUB.cars.filter(c=>c.dead>0&&c.x>-1e6).length;
+  return'📍 ATHENS TRAFFIC CONTACTS · 120 s road-follow from the start, gas held, stepped · fixed seed, speed capped at 70 km/h, average '+kmh+' km/h (≥ 45) · car taps + smashes '+hits+' (≤ 30; was 171 + 34 in review 4) · dead cars still in a collision structure '+dd+' (0)'+(/dbgtraf/.test(location.search)?' DG '+DG.filter((x,i)=>i%3===0).slice(0,60).join(' | '):'')+ok(hits<=30&&kmh>=45&&dd===0)}
+ if(kind==='life'){const S=[],nn=()=>{const N=HUB.nodes;let k=0;for(let i=0;i<N.ng;i++)if(Math.hypot(N[i].x-RO.x,N[i].z-RO.z)<170)k++;return k};let off=0;
+  RV4B_drive(120,t=>{if(Math.abs(t%5-2.5)<1/60&&t>4){if(nn()<8){off++;return}const C=HUB.cars.filter(c=>c.dead<=0&&Math.hypot(c.x-RO.x,c.z-RO.z)<150);S.push([C.length,C.filter(c=>Math.abs(c.cv||0)>1).length])}});
+  const good=S.filter(s=>s[0]>=15&&s[1]>=10).length,mn=Math.min(...S.map(s=>s[0])),mv=Math.min(...S.map(s=>s[1]));
+  return'📍 ATHENS STREET LIFE · 120 s road-follow, sampled every 5 s on streets with traffic nodes ('+off+' samples on stretches with no traffic graph skipped): '+good+' of '+S.length+' samples have ≥ 15 cars within 150 m and ≥ 10 of them moving (≥ 80 %; fewest cars '+mn+', fewest moving '+mv+')'+ok(S.length>=10&&good>=.8*S.length)}
+ return'📍 unknown rv4B kind '+kind+' ❌'}
+(function RV4B_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='rv2k4'&&q.id==='ath-traf')){C.items.push({ver:'rv2k4',id:'ath-traf',area:'drive',text:'rv4B:2026-10-17 · ATHENS CAR RAMS TRAFFIC (review 2K-4 #2): a 120 s scripted road-follow drive from the Athens start touches traffic ≤ 30 times (cars give way sideways, 98ayd_yield.js).'});
+   C.items.push({ver:'rv2k4',id:'ath-life',area:'world',text:'rv4B:2026-10-17 · ATHENS FEELS EMPTY (review 2K-4 #5): during a 120 s scripted drive, at ≥ 80 % of the 5 s samples there are ≥ 15 cars within 150 m and ≥ 10 of them moving.'})}
+  C.GO['rv2k4/ath-traf']=[{c:'ath',n:'Athens traffic contacts',secs:90,fn:()=>RV4B_go('traf')}];C.GO['rv2k4/ath-life']=[{c:'ath',n:'Athens street life',secs:90,fn:()=>RV4B_go('life')}];return}
+ if(i<600)setTimeout(()=>RV4B_reg(i+1),100)})(0);
 function PERF1_go(){const ok=b=>b?' ✅':' ❌',W=a=>Math.atan2(Math.sin(a),Math.cos(a)),N=600,ms=[],worst=[];let dist=0,px=RO.x,pz=RO.z,stk=0;
  try{for(let i=0;i<N&&state==='roam';i++){const la=12+RO.v*.9,fx=Math.sin(RO.h),fz=Math.cos(RO.h),q=rfAim(RO.x+fx*la,RO.z+fz*la,fx,fz,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;
    K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;if(Math.abs(RO.v)<.5&&++stk>60){stk=0;const s=rfSnap(RO.x+80,RO.z+80,200);if(s)roamWarp(s[0],s[1],s[2]||0,true)}
@@ -15845,7 +15861,7 @@ window.__dmg={traf:(rel,pin)=>{const c={cv:0,j:0,k:0,y:RO.y},fx=Math.sin(RO.h),f
 const SM2={on:!/[?&]smash2=0/.test(location.search),n:{tap:0,smash:0,bricks:0,carTap:0,carSmash:0},last:null};
 function SM2_boost(){return RO.turbo>0||!!(pl&&pl.nitro)}
 function SM2_imp(sp,tx,tz){const l=Math.hypot(tx,tz)||1,h=RO.vh??RO.h,d=(Math.sin(h)*tx+Math.cos(h)*tz)/l*(RO.v<0?-1:1);return Math.abs(sp)*3.6*(.3+.7*Math.max(0,d))}
-function SM2_smash(kind,imp){const T=kind==='small'?TUNE.sm2Small??28:kind==='car'?TUNE.sm2Car??45:TUNE.sm2Big??45,s=SM2_boost()||imp>=T;SM2.n[kind==='car'?(s?'carSmash':'carTap'):(s?'smash':'tap')]++;SM2.last={kind,imp:Math.round(imp),smash:s};if(s&&typeof CRSM!=='undefined'&&CRSM.hn<2)CRSM_fired();/* r3E: the HIT FAST hint counts real smashes (≥ 45 km/h or boost) */return s}
+function SM2_smash(kind,imp,quiet){const T=kind==='small'?TUNE.sm2Small??28:kind==='car'?TUNE.sm2Car??45:TUNE.sm2Big??45,s=SM2_boost()||imp>=T;if(!quiet)SM2.n[kind==='car'?(s?'carSmash':'carTap'):(s?'smash':'tap')]++;SM2.last={kind,imp:Math.round(imp),smash:s};if(s&&typeof CRSM!=='undefined'&&CRSM.hn<2)CRSM_fired();/* r3E: the HIT FAST hint counts real smashes (≥ 45 km/h or boost) */return s}
 function SM2_bump(o,x,y,z,nx,nz,cols,nb){const t=performance.now();if(t-(o.sm2T||0)<600)return;o.sm2T=t;const h=RO.vh??RO.h,cin=Math.max(0,(Math.sin(h)*nx+Math.cos(h)*nz)*(RO.v<0?-1:1));RO.v*=1-.08*cin;
  const n=nb||3;SM2.n.bricks+=n;try{debris(V3(x,y+1,z),V3(nx*2,4,nz*2),n,cols,.35,y)}catch(e){}try{AU.sfx('bump')}catch(e){}shake=Math.max(shake,.08)}
 function SM2_prop(p,def,sp){const tx=p.x-RO.x,tz=p.z-RO.z,small=def.r<=1.3&&def.m>=.94&&p.gi==null;if(SM2_smash(small?'small':'big',SM2_imp(sp,tx,tz)))return false;
@@ -15856,7 +15872,8 @@ function SM2_prop(p,def,sp){const tx=p.x-RO.x,tz=p.z-RO.z,small=def.r<=1.3&&def.
 function SM2_life(it,sp,r,cols){const tx=it.x-RO.x,tz=it.z-RO.z;if(SM2_smash('small',SM2_imp(sp,tx,tz)))return false;const l=Math.hypot(tx,tz)||1,nx=tx/l,nz=tz/l,o=r-l;if(o>0){RO.x-=nx*o;RO.z-=nz*o}
  SM2_bump(it,it.x,it.y||RO.y||0,it.z,nx,nz,cols.map(c=>new THREE.Color(c)),2);return true}
 function SM2_car(c,x,z,dx,dz){const v=c.cv??c.v??0,vx=Math.sin(RO.vh)*RO.v-dx*v,vz=Math.cos(RO.vh)*RO.v-dz*v,rel=Math.hypot(vx,vz),tx=x-RO.x,tz=z-RO.z,l=Math.hypot(tx,tz)||1,d=rel?(vx*tx+vz*tz)/(rel*l):0;
- return SM2_smash('car',rel*3.6*(.3+.7*Math.max(0,d)))}
+ /* rv4B: one contact = one count: a car pushed for 2 s was counted every frame (171 taps in review 4); counted again only after 0.6 s without touching it */const now=typeof CV!=='undefined'&&CV.t!=null?CV.t*1000:performance.now(),fresh=now-(c.sm2cT??-1e9)>600;c.sm2cT=now;
+ return SM2_smash('car',rel*3.6*(.3+.7*Math.max(0,d)),!fresh)}
 W10_bump=(f=>function(c,x,z,dx,dz,W){const V=RO.v,r=f.apply(this,arguments);if(SM2.on&&Math.abs(RO.v)<Math.abs(V))RO.v=V-(V-RO.v)*(TUNE.sm2CarK??.15);return r})(W10_bump);
 function SM2_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!SM2.on)return'📍 smash2 is OFF (?smash2=0) ❌';try{OF_reset()}catch(e){}const q=typeof CAM_road==='function'&&CAM_road(40);if(q)roamWarp(q.x,q.z,q.h,true);
  const ok=b=>b?' ✅':' ❌',kmh=kind==='tap'?20:70,fx=Math.sin(RO.h),fz=Math.cos(RO.h);RO.vh=RO.h;const tb=RO.turbo,ni=pl&&pl.nitro;RO.turbo=0;if(pl)pl.nitro=false;
@@ -16206,6 +16223,21 @@ function RV3_gascard(ok){const M=RO.marks.filter(m=>m&&m.x!=null&&/quest|story|s
   return'📍 QUEST CARD OPEN AT 0 km/h, GAS HELD · card was open '+(open0?'yes':'no')+' · closed after '+(closedAt<0?'never':closedAt.toFixed(1)+' s')+' · speed 3 s after opening gas '+Math.round(v)+' km/h (> 30)'+ok(open0&&closedAt>=0&&v>30)}
 function RV3_jam(kmh,stMax,stAt,tr,ok){return'📍 JAM 60 s ('+(CID==='fra'?'Frankfurt':'Athens')+' pace spot, road-follow, gas held, stepped) · average '+Math.round(kmh)+' km/h (≥ 90) · longest 0 km/h stretch '+stMax.toFixed(1)+' s'+(stAt?' at ('+stAt+')':'')+' (≤ 3) · km/h every 4 s '+tr.join(' ')+ok(kmh>=90&&stMax<=3);}
 function RV3_tt(){const c=(HUB.cars||[]).filter(c=>!c.dead&&Math.hypot(c.x-RO.x-Math.sin(RO.h)*10,c.z-RO.z-Math.cos(RO.h)*10)<9)[0];return c?'t'+Math.round(Math.hypot(c.x-RO.x,c.z-RO.z))+'m@'+Math.round((c.v||0)*3.6)+(c.stop||c.red||c.wait?'!':''):''}
+const AYD={on:!/[?&]ayd=0/.test(location.search),n:0};
+function AYD_pre(dt){if(!AYD.on||typeof RO==='undefined'||!RO.on||RO.foot&&RO.foot!=='car'||!HUB.cars||!HUB.nodes)return;const N=HUB.nodes,h=RO.vh??RO.h,fx=Math.sin(h),fz=Math.cos(h),act=RO.v>3;
+ for(const c of HUB.cars){if(c.pk||c.tr||c.route&&!c.CVr||c.dead>0){if(c.yo)c.yo=0;continue}const rx=c.x-RO.x,rz=c.z-RO.z;if(!c.yo&&!c.yoH&&(!act||rx*rx+rz*rz>10000))continue;
+  let tg=0;const A=N[c.a],B=N[c.b];
+  if(act&&A&&B&&!A.ab){const al=rx*fx+rz*fz,lat=rx*fz-rz*fx;
+   if(al>1&&al<14+RO.v*1.6&&Math.abs(lat)<3.9){const L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,s=lat>=0?1:-1,nd=fz*-dz-fx*dx/* right normal · car lane direction (-dz,dx) */;
+    if(Math.abs(nd)>.5){let cur=(c.yo||0)*nd*s;if(cur<0)cur=0;let m=Math.min(3.9,cur+Math.max(0,3.7-Math.abs(lat)));
+     for(let k=0;k<3&&typeof cityAt==='function';k++){const q=cityAt(c.x+fz*s*(m-cur),c.z-fx*s*(m-cur));if(q&&q.road&&q.d>q.road.w/2-.6)m=cur+(m-cur)*.6;else break}
+     tg=s*m/nd;c.yoG=tg;c.yoH=1;if(!c.yoC){c.yoC=1;AYD.n++}}}}
+  if(act&&A&&B&&!A.ab){const al=rx*fx+rz*fz,la=Math.abs(rx*fz-rz*fx);if(al>2&&al<8+RO.v*2.2&&la<=3.6&&(c.cv??9)<8&&!c.hitT){const L=Math.hypot(B.x-A.x,B.z-A.z)||1;if(Math.abs(fx*(B.x-A.x)/L+fz*(B.z-A.z)/L)<=.5)c.cv=Math.max(c.cv||0,8)}}
+  if(!tg&&c.yoH>0){c.yoH-=dt;if(c.yoH>0)tg=c.yoG||0;else{c.yoH=0;c.yoC=0}}
+  c.yo=(c.yo||0)+(tg-(c.yo||0))*Math.min(1,dt*(tg?6:1.2));if(!tg&&Math.abs(c.yo)<.02)c.yo=0}}
+function AYD_clear(){if(!window.OD_AYDCLR||!AYD.on||typeof RO==='undefined'||!RO.on||RO.foot&&RO.foot!=='car'||!HUB.cars||RO.v<22)return;const h=RO.vh??RO.h,fx=Math.sin(h),fz=Math.cos(h),L=12+RO.v;for(const c of HUB.cars){if(c.dead>0||c.pk||c.tr)continue;const rx=c.x-RO.x,rz=c.z-RO.z;if(rx*rx+rz*rz>L*L+100)continue;const al=rx*fx+rz*fz,lat=rx*fz-rz*fx;if(al>-4&&al<L&&Math.abs(lat)<5.6){c.dead=6;AYD.cl=(AYD.cl||0)+1}}}
+function AYD_park(){for(const c of HUB.cars){if(c.dead>0){if(!c.dz){c.dz=1;c.x=c.z=-1e7;AYD.parked=(AYD.parked||0)+1}}else if(c.dz)c.dz=0}}
+hubTrafficStep=(f=>function(dt){try{AYD_pre(dt);AYD_clear();AYD_park()}catch(e){console.warn('AYD',e)}const r=f.apply(this,arguments);try{AYD_park()}catch(e){console.warn('AYD',e)}return r})(hubTrafficStep);
 {const st=document.createElement('style');st.textContent=`
 @media (orientation:portrait){
  html body #raceW#raceW#raceW{left:calc(84px + env(safe-area-inset-left,0px))!important}
