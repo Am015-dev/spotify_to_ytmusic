@@ -98,6 +98,7 @@
 99c2_slowspots.js
 99c3_rv3c.js
 99c4_mem.js
+99c5_camstable.js
 99c4_fair2.js
 98rf_race_fun.js
 98tk_city_duel.js
@@ -124,6 +125,8 @@
 98cam_size_cam.js
 98dmg_damage.js
 98sm2_smash2.js
+98dest_destruct.js
+98dest_go.js
 98r3e_r3e.js
 98gx_gfx.js
 98ev_env.js

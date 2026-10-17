@@ -7,4 +7,5 @@
 98tk_go.js:tkBot,tkStaticFeel,tkFeel,tkGoWater,tkGoQuick,TD_go
 99c4_mem.js:MEM1_go
 99c4_fair2.js
+98dest_go.js:DEST_wander,DEST_go
 99c5_athroads.js:ATHR_go

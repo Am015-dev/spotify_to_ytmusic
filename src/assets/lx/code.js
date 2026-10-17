@@ -310,7 +310,7 @@ function LIFE_hit(){const sp=Math.abs(RO.v),y0=RO.y||0;for(const it of LIFE.H||[
     C={cone:'#ff6a10,#ffffff',crate:'#c8904c,#8a5a30',barrel:'#2f7dd0,#ffffff',fruit:'#a8743c,#ff4040,#7cd04c,#ffd12c',planter:'#b85a3a,#3aa046,#ff4c8c',bin:'#3a8a4a,#2a6a3a'}[it.t];
     try{debris(at,fw.clone().multiplyScalar(Math.max(4,sp)*.4).add(V3(0,6,0)),it.t==='fruit'?14:9,C.split(',').map(c=>new THREE.Color(c)),.7,it.y);studBurst(at,fw,Math.max(6,sp));AU.sfx('brick')}catch(e){}
     HUB.smashed++;comboAdd(1);RO.v*=it.t==='fruit'||it.t==='barrel'?.94:.98;LIFE.n.smash++;LIFE.px=1e9}
-  else if(it.c==='set'){const rr=it.r+1.2;if(e2>rr*rr||Math.abs(y0-it.y)>4)continue;const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;LIFE_slide(ex/e,ez/e,.2)}
+  else if(it.c==='set'){const rr=it.r+1.2;if(e2>rr*rr||Math.abs(y0-it.y)>4||LIFE.dead.has(it.id))continue;if(typeof DEST!=='undefined'&&DEST.on&&DEST_set(it,sp,rr))continue;/* dest-1: small set pieces smash / bump */const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;LIFE_slide(ex/e,ez/e,typeof DEST!=='undefined'&&DEST.on?.1:.2)}
   else if(it.c==='pop'){if(e2>4.2*4.2||it.cd>LIFE.t||RO.pop||RO.ch||RO.sp||RO.card)continue;it.cd=LIFE.t+90;const K=it.K;LIFE.n.pop++;
    RO.pop=Object.assign({},K,{t:0,v:0,s0:HUB.smashed,txt(){return `${this.k==='smash'?Math.floor(this.v):this.v.toFixed(1)} / ${this.goal} ${this.u}`}});try{AU.sfx('go');say(K.name,'POP-UP · '+K.lim+' s',1.6)}catch(e){}}}
  const lm=LIFE.lm;if(lm){const ex=RO.x-lm.x,ez=RO.z-lm.z,rr=lm.r+1.2,e2=ex*ex+ez*ez;if(e2<rr*rr&&Math.abs(y0-lm.y)<6){const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.7}}}
@@ -403,4 +403,4 @@ function LIFE_goLmLd(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_init();const
 // by name, so a hot reload of one GO function takes effect
 const LIFE_GOS={'fra-density':{fn:s=>LIFE_go(s)},'ath-density':{fn:s=>LIFE_go(s)},'smash':{fn:s=>LIFE_goSmash(s)},
  'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'kicker':{fn:s=>LIFE_goKick(s)},'fra-variety':{fn:s=>LIFE_goVar(s)},'fra-landmark':{fn:s=>LIFE_goLmLd(s)},'ath-landmark':{fn:s=>LIFE_goLmLd(s)},'ath-variety':{fn:s=>LIFE_goVar(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
-window.__life={ldLm:LIFE_ldLm,setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
+window.__life={CELL:LIFE_CELL,hit:LIFE_hit,SETR:LIFE_SETR,ldLm:LIFE_ldLm,setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
