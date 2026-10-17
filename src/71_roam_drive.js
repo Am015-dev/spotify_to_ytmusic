@@ -280,7 +280,7 @@ function roamPose(s,dt){const ud=s.mesh.userData,fw=V3(Math.sin(RO.h),0,Math.cos
 let camSnap=false;
 const RCAM={chase:{b:8.5,bk:-1.2,h:2.8,hk:-.3,l:14,lk:8,ly:1.5,n:'CHASE'},close:{b:9,bk:3,h:3.2,hk:.8,l:10,lk:6,ly:1.8,n:'CLOSE'},far:{b:22,bk:6,h:7.5,hk:2,l:16,lk:10,ly:2,n:'FAR'},high:{b:16,bk:4,h:26,hk:4,l:10,lk:8,ly:0,n:'HIGH'},low:{b:10,bk:3,h:1.9,hk:.4,l:24,lk:10,ly:3,n:'LOW'}};
 function roamCamCycle(){const k=Object.keys(RCAM),i=(k.indexOf(SET.rcam||'chase')+1)%k.length;SET.rcam=k[i];saveSet();camSnap=true;feed('CAMERA · '+RCAM[k[i]].n,0,'#4ceaff')}
-function roamCam(dt){const C=RCAM[SET.rcam]||RCAM.chase;const sn=camSnap;camSnap=false;const k1=clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.4);
+function roamCam(dt){const C=RCAM[SET.rcam]||RCAM.chase;const sn=camSnap;camSnap=false;const k1r=clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.4);RO.camK1=sn||RO.camK1==null?k1r:RO.camK1+(k1r-RO.camK1)*Math.min(1,dt*1.2);const k1=RO.camK1;/* rv4A: the speed term eases (~0.8 s): a traffic bump or a gas lift no longer swings the camera 2+ m */
   RO.camH=sn||RO.camH==null?RO.h:RO.camH+angDiff(RO.h,RO.camH)*Math.min(1,dt*(RO.dDir?3:TUNE.camK));const fw=V3(Math.sin(RO.camH),0,Math.cos(RO.camH)),p=V3(RO.x,RO.y,RO.z);
   const bmax=C.b+C.bk*k1;let back=bmax;for(let d=2;d<=bmax;d+=.5)if(roamHit(RO.x-fw.x*d,RO.z-fw.z*d,1.5,RO.y+2.5)){back=Math.max(CR_minBack(),d-1);break}
   RO.camB=sn||RO.camB==null||back<RO.camB?back:RO.camB+(back-RO.camB)*Math.min(1,dt*3);RO.camY=sn||RO.camY==null?RO.y:RO.camY+(RO.y-RO.camY)*Math.min(1,dt*TUNE.camY);
