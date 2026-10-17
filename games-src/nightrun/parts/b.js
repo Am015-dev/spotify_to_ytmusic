@@ -339,7 +339,8 @@ function update(dt){
   if(G.transT>=0&&!ST.on){G.transT-=dt;if(G.transT<0){NR.emit('districtEnd',{di:G.di});const nx=nextDi(G.di);if(nx.wrap)G.loop++;SH.pit(()=>enterDistrict(nx.di));}}
 
   /* enemies */
-  for(const e of G.en){e.t+=sdt;e.flash=Math.max(0,e.flash-dt);
+  const sdtA=sdt;
+  for(const e of G.en){const sdt=e.gnd||!window.LEAK||!RET.leak?sdtA:sdtA*LEAK.es(e);e.t+=sdt;e.flash=Math.max(0,e.flash-dt);   // leak.js: flyers are calmer (LEAK.es), ground enemies keep their own pace
     switch(e.type){
       case'drone':e.x-=(120+15*d)*sdt;e.y=e.by+Math.sin(G.bp*Math.PI/2+(e.ph||0))*(e.amp||0);break;
       case'turret':if(e.t<6.5){if(e.x>e.stop)e.x-=150*sdt;}else{e.x-=180*sdt;e.y-=40*sdt;}break;
@@ -351,7 +352,8 @@ function update(dt){
       case'flank':DIR.moveFlank(e,sdt,d);break;
       case'swarm':DIR.moveSwarm(e,sdt,d);break;
       case'mine':DIR.moveMine(e,sdt,d);break;
-      case'boss':bossUpdate(e,sdt,d);break;}
+      case'boss':bossUpdate(e,sdt,d);break;
+      case'gtank':case'gturret':case'gwalker':if(window.LEAK)LEAK.move(e,sdt);break;}
     if(e.type!=='gate'&&e.type!=='boss'&&!G.dead&&e.x<W-2&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+(HARD?8:5)){hurt();if(e.type!=='gunship'){e.hp=0;e.rk=1;}}
     if(e.type==='boss'&&!G.dead&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+6)hurt();
   }
