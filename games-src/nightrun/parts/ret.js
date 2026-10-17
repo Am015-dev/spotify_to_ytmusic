@@ -353,6 +353,22 @@ RET.sioUI=(()=>{const X=RET.sio,$$=id=>document.getElementById(id);let box=null,
   NR.on('runEnd',()=>{if(RET.saveio)X.persist();});
   return{build,refresh,onOpen,code,toast};})();
 
+/* ---------- B28 hit-stop and PERFECT juice. The hit-stop scales the world and player step (b.js: hk), never the audio clock or the beat grid. ---------- */
+if(RET.juice===undefined)RET.juice=!/[?&]juice=0/.test(location.search);
+RET.JU=(()=>{const J={k:1,hold:0,clk:0,log:[],tot:0,n:0,pf:-9,lim:.08,win:.3,ms:{boss:50,phase:45,dash:35,big:25},
+  grant(kind){if(!RET.juice||!G||!G.live||G.dead||SET.reduce||SET.rm)return 0;let ms=J.ms[kind]||0;if(!ms)return 0;if(SET.calm)ms*=.5;
+    const L=J.log;while(L.length&&L[0].t<J.clk-J.win)L.shift();let used=0;for(const r of L)used+=r.ms;
+    ms=Math.min(ms,J.lim*1000-used);if(ms<5)return 0;L.push({t:J.clk,ms});J.hold=Math.max(J.hold,ms/1000);J.tot+=ms;J.n++;J.k=.04;return ms;},
+  reset(){J.k=1;J.hold=0;J.log.length=0;J.pf=-9;}};
+NR.on('tick',dt=>{J.clk+=dt;if(J.hold>0){J.hold-=dt;if(J.hold<=0){J.hold=0;J.k=1;}}else J.k=1;});
+NR.on('runStart',J.reset);NR.on('runEnd',J.reset);
+NR.on('bossPhase',()=>{J.grant('phase');});
+NR.on('kill',d=>{if(!d||!d.e)return;if(d.boss)J.grant('boss');else if(d.e.type==='gunship')J.grant('big');});
+NR.on('perfect',d=>{if(!RET.juice||!d||d.kind!=='dash'||!G.live||G.dead)return;   // the stinger and the small ring already come from onPerfect and B20
+  J.grant('dash');
+  if(J.clk-J.pf<.25||SET.reduce||G.rings.length>20)return;J.pf=J.clk;
+  G.rings.push({x:d.x,y:d.y,l:.32,m:.32,c:'#ffffff'});});   // one extra thin white ring on a PERFECT dash, at most 4 a second; rings are outlines, so ship and bullets stay visible
+return J;})();
 /* ---------- B35: Assist mode (POLISH.md). RET.assist=false: no Assist section, every factor is 1 and no run is ever marked.
    Options live in SET (mnr_set: saved, exported and imported with the rest of the settings). The WORLD slows (enemy speed, scroll, spawns); the song and the beat grid never change.
    Run-changing options (asSpd, asBul, asHull, asWin) mark a run ⓐ: it never blocks progress and costs no Neon, it just sets no records (best run, daily, weekly, Heat medal).

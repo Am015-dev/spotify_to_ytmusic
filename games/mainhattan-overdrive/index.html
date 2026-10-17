@@ -746,6 +746,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.82',date:'17 Oct 2026',items:[{t:'FIXED',s:'The STORY pill at the top now reads in full on a phone in landscape.'},{t:'FIXED',s:'Pedestrians in the run-up test are no longer picked from steep Athens streets.'}]},
   {v:'v90m-beta.81',date:'17 Oct 2026',items:[{t:'FIXED',s:'The top STORY pill no longer repeats the marker name while the prompt card on the left shows it.'}]},
   {v:'v90m-beta.80',date:'17 Oct 2026',items:[{t:'FIXED',s:'One tidy stack of cards on the left: the marker prompt first, then the objective, never overlapping.'},{t:'FIXED',s:'Objective card text is now at least 12 px, easier to read on a phone.'}]},
   {v:'v90m-beta.79',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens streets: trees, stalls and other solid props no longer stand on the road.'},{t:'NEW',s:'Traffic in your lane now moves over when you come up fast from behind.'},{t:'FIXED',s:'Head-on smashes with traffic slow you down less.'}]},
@@ -8200,7 +8201,7 @@ function CR_susp(c,dx,dz,dt,im,M){const w=im.userData.w;if(!w){im.setMatrixAt(c.
 
 (()=>{const st=document.createElement('style');st.textContent=`
 #m1Next b,#m1Next small{display:none!important}#m1Next{border-radius:18px!important;padding:3px 12px 3px 8px!important;gap:6px!important}#m1Next span{font-size:13px!important;max-width:min(300px,46vw)!important}
-#m1Next .crD{display:block;flex:0 100 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font:800 12px system-ui;color:#4ceaff;white-space:nowrap}#m1Next>div{min-width:0;flex:0 0 auto;max-width:calc(100% - 36px)}#m1Next>div small{width:0;min-width:100%}#m1Next{box-sizing:border-box;overflow:hidden}/* dev4: long text is cut with … inside the box (it ran under the ⚙ button in portrait) */body.crMerge #roamArrow{visibility:hidden!important}
+#m1Next .crD{display:block;flex:0 100 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font:800 12px system-ui;color:#4ceaff;white-space:nowrap}#m1Next>div{min-width:0;flex:0 1 auto}#m1Next .crD:empty{display:none}/* pillclip: the % max-width resolved 2px short of the label in the shrink-to-fit pill (landscape) and ellipsised it */#m1Next>div small{width:0;min-width:100%}#m1Next{box-sizing:border-box;overflow:hidden}/* dev4: long text is cut with … inside the box (it ran under the ⚙ button in portrait) */body.crMerge #roamArrow{visibility:hidden!important}
 body.crMerge #m1Next{top:calc(54px + env(safe-area-inset-top,0px))!important}@media (max-height:520px){body.crMerge #m1Next{top:calc(26px + env(safe-area-inset-top,0px))!important}}
 #roamPlate{transition:opacity .45s}#roamPlate.crHide{opacity:0!important}
 body.touch #roamPlate{left:calc(114px + env(safe-area-inset-left,0px))!important}`;document.head.appendChild(st)})();
