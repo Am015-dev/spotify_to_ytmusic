@@ -37,3 +37,26 @@ The GO starts right at drivable, while lazy zones, LF tiles and the ground pump 
 58/73 · unit 0 FAIL · rv2k2 and cam/stable green in both cities.
 - perf/frame: Frankfurt median 10.0 / p95 23.0 / max 171 ms; Athens median 20.0 / p95 100 / max 409 ms. **RED**.
 - The other reds are mem/stable, the SLOW-only xf1/terr1/life1 lines, terr1/terrain-tyre-ath and terr6/terrain-slope-ath. The same names were red on trunk in crash-6/7. The trunk rerun was cut short, so a same-name comparison is still owed.
+
+## perf-2 (2026-10-17, alex/perf-wip a63fd37): allocation hunt. NOT on trunk (target not reached)
+Probe: `tools/perf1/tFrame.js` now takes `HEAP=1` (CDP sampling heap profile, top allocators incl. collected garbage). Builds: pq0 = fe664b0 line (before), pq2 = a63fd37 (after).
+Paired A/B (both builds at once on the same 4-core cloud CPU, 30 s roam, desktop, high): numbers are noisy and inflated by the shared CPU. Only the ratio counts.
+| city | before (pq0) median / p95 / max ms | after (pq2) | heap over 30 s |
+|---|---|---|---|
+| Athens | 28.2 / 192 / 2747 | 27.0 / 176 / 1647 | +202 MB -> +232 MB |
+| Frankfurt | 16.9 / 102 / 1269 | 18.2 / 108 / 686 | +176 -> +171 MB |
+Run alone, Athens pq0: 17.5 / 85 / 719 ms; pq1: 20.6 / 71 / 856 ms. Lowmem not measured (timebox). GO perf/frame now judges p95 ≤ 16 and max ≤ 50 ms (was ≤ 8), and it is still RED.
+
+Root cause of the "random" spikes (CV_pre 75 ms, LV_step 67 ms, hubTrafficStep 220 ms, QS_clear 164 ms): **GC**. The heap sampler shows **~9-10 GB allocated in 20-30 s of Athens driving (~400 MB/s)**.
+The pauses land in whichever function runs next. The long frames' wrapped children add up to less than half of their total.
+Fixed (perf-2):
+- `QS_shutSet` (98qs_speed): it rebuilt every ramp x every street edge, with a closure per edge, whenever a pop-up/duel ramp came or went: **~1.9 GB / 20 s**, now 0. Per-ramp edge cache plus a bbox prefilter.
+- `roamTerr` takes a 4th scratch arg. `groundAt` and `DEST_open` pass a scratch object (they only read .g/.low). The LF wrappers no longer use `apply(arguments)`.
+- `DEV_yield`: the elements are cached, the overlap scan is skipped when hidden or busy, and it runs every 500 ms (was 150). `B2_pump`: 4 ms slices capped by the idle deadline (was 8 ms). `CV.act`: one Set reused.
+Still open, by allocated MB in 30 s (pq1):
+- `LF_drapeOk`/`LF_tileG` + TR_G under it: ~2 GB. LF tile build: `V.map` arrays per prop, `_vy` arrays. Pool them in Float32Arrays.
+- `DEST_find`/`DEST_open`: ~1.5 GB, the O(N²) shortcut scan with DEST_dij Maps. Run it once offline/at load, or cap it per frame by node pairs and not per scI.
+- `invariants`/`Q.tick` (assets/qa): ~0.3 GB. QA ticker: skip outside ?qa.
+- TR_G samples are boxed doubles: TR_G/roamTerr look unoptimized (megamorphic via the wrappers). Check with `--trace-deopt`.
+- Draw calls 650-730 in view (target ≤ 400): untouched.
+Gates: unit 0 FAIL on pq2. The TAG/GO gates were not run (target not met, so the work stays on alex/perf-wip). No visual change, so no shot.
