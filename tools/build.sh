@@ -15,7 +15,7 @@ python3 tools/modmap.py || echo "WARN: modmap failed (docs/MODULES.md not refres
 XC_ORDER=$(grep -vxF -f <(sed 's/:.*//;/^#/d;/^$/d' src/LAZY 2>/dev/null; echo __none__) src/ORDER)
 rm -rf "$OUT/xc"; XCV=$(node tools/lazy/pack.js "$OUT") || { echo "BUILD FAIL: lazy chunks"; exit 1; }
 for f in "$OUT"/xc/*.js; do [ -e "$f" ] && { node --check "$f" || { echo "BUILD FAIL: $f syntax"; exit 1; }; }; done
-( cd src && cat $XC_ORDER ) | XCV="$XCV" python3 tools/lazy/inject.py > "$OUT/overdrive.html"
+( cd src && node ../tools/strip.js $XC_ORDER ) | XCV="$XCV" python3 tools/lazy/inject.py > "$OUT/overdrive.html"   # deploy page: own-line comments stripped (tools/strip.js, AST-identical); --local dev page below stays unstripped
 cp src/assets/km.js "$OUT/km.js"
 # LDraw model data (src/MODELS): out/<ver>/models.js = small index (presets, placements, chunk table; v89z) + out/<ver>/models/<id>.js, one chunk per model, loaded on demand
 python3 tools/ld/mkmodels.py "$OUT" || { echo "BUILD FAIL: models"; exit 1; }

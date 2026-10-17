@@ -118,9 +118,9 @@ let DEB=null;const _e2=new THREE.Euler(),_q2=new THREE.Quaternion(),_s2=V3();
 function brickGeo(){const L=[new THREE.BoxGeometry(1.6,1,1.6)];for(const x of[-.4,.4])for(const z of[-.4,.4]){const c=new THREE.CylinderGeometry(.24,.24,.3,10);c.translate(x,.65,z);L.push(c)}const g=mergeGeometries(L.map(g=>{const n=g.toNonIndexed();n.deleteAttribute('uv');return n}));g.computeVertexNormals();return g}
 function buildDebris(){const n=320,im=new THREE.InstancedMesh(brickGeo(),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.32,metalness:.05}),n);im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);im.frustumCulled=false;
   _m.makeScale(0,0,0);const c=new THREE.Color(1,1,1);for(let i=0;i<n;i++){im.setMatrixAt(i,_m);im.setColorAt(i,c)}scene.add(im);DEB={im,n,list:[],next:0}}
-function debris(at,vel,n,cols,size=1,floor){if(!DEB)return;for(let k=0;k<n;k++){const i=DEB.next;DEB.next=(DEB.next+1)%DEB.n;const j=DEB.list.findIndex(o=>o.i===i);if(j>=0)DEB.list.splice(j,1);
-    DEB.list.push({i,p:at.clone().add(V3(rr(-1.2,1.2),rr(0,1),rr(-1.2,1.2))),v:vel.clone().add(V3(rr(-11,11),rr(5,17),rr(-11,11))),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-10,10),rr(-10,10),rr(-10,10)),
-      s:V3(rr(.45,.9),rr(.35,.65),rr(.45,.9)).multiplyScalar(size),life:rr(2.4,4),floor:floor??at.y-1.2});DEB.im.setColorAt(i,cols[k%cols.length])}DEB.im.instanceColor.needsUpdate=true}
+function debris(at,vel,n,cols,size=1,floor){if(!DEB)return;size=Math.min(size,1)*.62/* debris-2: pieces <= ~0.9 m whatever the caller asks, so a smashed tree never throws house-size bricks */;for(let k=0;k<n;k++){const i=DEB.next;DEB.next=(DEB.next+1)%DEB.n;const j=DEB.list.findIndex(o=>o.i===i);if(j>=0)DEB.list.splice(j,1);
+    DEB.list.push({i,p:at.clone().add(V3(rr(-1.2,1.2),rr(0,1),rr(-1.2,1.2))),v:vel.clone().add(V3(rr(-11,11),rr(5,17),rr(-11,11))).clampLength(0,22),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-10,10),rr(-10,10),rr(-10,10)),
+      s:V3(rr(.45,.9),rr(.35,.65),rr(.45,.9)).multiplyScalar(size),life:rr(1,1.5),floor:Math.min(floor??at.y-1.2,at.y)});DEB.im.setColorAt(i,cols[k%cols.length])}DEB.im.instanceColor.needsUpdate=true}
 // burst-1: transform celebration. A fresh instanced-brick group per swap (named brickfx_burst), 0.3 s life, shared geometry, disposed on expiry.
 const XFB=[];let XFB_GEO=null;
 function xfBurst(at,cols){if(!XFB_GEO)XFB_GEO=brickGeo();const n=16,im=new THREE.InstancedMesh(XFB_GEO,new THREE.MeshStandardMaterial({color:0xffffff,roughness:.32,metalness:.05,transparent:true}),n);im.name='brickfx_burst';im.frustumCulled=false;
@@ -130,7 +130,7 @@ function updXfb(dt){for(let j=XFB.length-1;j>=0;j--){const b=XFB[j];b.t+=dt;if(b
     const f=1-b.t/.34;b.im.material.opacity=Math.min(1,f*2.2);for(let i=0;i<b.L.length;i++){const d=b.L[i];d.v.y-=22*dt;d.p.addScaledVector(d.v,dt);_e2.set(d.w.x*dt,d.w.y*dt,d.w.z*dt);d.q.multiply(_q2.setFromEuler(_e2));_m.compose(d.p,d.q,_s2.setScalar(d.k*(.4+.6*f)));b.im.setMatrixAt(i,_m)}b.im.instanceMatrix.needsUpdate=true}}
 function updDebris(dt){updXfb(dt);if(!DEB)return;const L=DEB.list;for(let j=L.length-1;j>=0;j--){const d=L[j];d.life-=dt;if(d.life<=0){_m.makeScale(0,0,0);DEB.im.setMatrixAt(d.i,_m);L.splice(j,1);DEB.dirty=true;continue}
     d.v.y-=32*dt;d.p.addScaledVector(d.v,dt);if(d.p.y<d.floor){d.p.y=d.floor;if(d.v.y<0)d.v.y*=-.32;d.v.x*=.72;d.v.z*=.72;d.w.multiplyScalar(.65)}
-    _e2.set(d.w.x*dt,d.w.y*dt,d.w.z*dt);d.q.multiply(_q2.setFromEuler(_e2));_m.compose(d.p,d.q,_s2.copy(d.s).multiplyScalar(d.life<.6?d.life/.6:1));DEB.im.setMatrixAt(d.i,_m)}
+    _e2.set(d.w.x*dt,d.w.y*dt,d.w.z*dt);d.q.multiply(_q2.setFromEuler(_e2));_m.compose(d.p,d.q,_s2.copy(d.s).multiplyScalar(d.life<.5?d.life/.5:1));DEB.im.setMatrixAt(d.i,_m)}
   if(L.length||DEB.dirty){DEB.im.instanceMatrix.needsUpdate=true;DEB.dirty=false}}
 const teamCols=t=>[new THREE.Color(t.a),new THREE.Color(t.b),new THREE.Color('#2a2e40'),new THREE.Color(t.a).multiplyScalar(.6)];
 function pointPool(n,size){const pos=new Float32Array(n*3),col=new Float32Array(n*3);const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));

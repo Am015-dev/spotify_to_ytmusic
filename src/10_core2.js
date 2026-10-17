@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.75',date:'16 Oct 2026',items:[{t:'NEW',s:'Bricks burst when your car transforms.'},{t:'CHANGED',s:'Quests no longer stop you mid-drive.'},{t:'CHANGED',s:'Bigger, cleaner phone HUD; bluer river.'}]},
   {v:'v90m-beta.74',date:'16 Oct 2026',items:[{t:'NEW',s:'Every race now runs on real Frankfurt and Athens streets, with two routes, jumps and power-ups.'},{t:'NEW',s:'Quick Race includes a river run where your car becomes a boat.'},{t:'CHANGED',s:'Livelier streets with shopfronts, kiosks and café tables.'}]},
   {v:'v90m-beta.73',date:'16 Oct 2026',items:[{t:'NEW',s:'Race Rossi on real Frankfurt streets: two routes, a big jump and power-up bricks.'},{t:'FIXED',s:'The camera no longer hides behind buildings.'},{t:'CHANGED',s:'Faster start.'}]},
   {v:'v90m-beta.72',date:'16 Oct 2026',items:[{t:'FIXED',s:'Cars now stop at red lights and queue up.'},{t:'FIXED',s:'Far fewer crashes into roadside props.'},{t:'FIXED',s:'Trees no longer block the camera.'},{t:'CHANGED',s:'Slightly faster start.'}]},
@@ -13,8 +14,6 @@ const OD_CHANGELOG=[
   {v:'v90m-beta.63',date:'16 Oct 2026',items:[{t:'NEW',s:'Garage shows your ride big in the middle with ride cards; the brick drawer has a picture on every tile.'},{t:'FIXED',s:'Races need you, fewer wrecks and dead stops, cleaner screen, no sinking at the start.'}]},
   {v:'v90m-beta.62',date:'16 Oct 2026',items:[{t:'FIXED',s:'Cars no longer sink into the road at the start or on ramps; story scenes keep the world loaded.'},{t:'FIXED',s:'Races need you: hands-off driving no longer wins, stuck cars reset, races always end. Fewer wrecks and dead stops.'},{t:'FIXED',s:'Cleaner screen: at most 2 objectives, no pop-ups while driving, checklist and bug button at the edge, shorter mission cards.'},{t:'NEW',s:'Bug box: type freely and see your reports.'}]},
   {v:'v90m-beta.61',date:'14 Oct 2026',items:[{t:'FIXED',s:'Wind turbines stand only in open ground, not on pavements; fixed a rare crash; the on-foot camera no longer clips pavement props.'}]},
-  {v:'v90m-beta.60',date:'14 Oct 2026',items:[{t:'NEW',s:'A bug button is always on screen; tap it to report a problem.'}]},
-  {v:'v90m-beta.59',date:'14 Oct 2026',items:[{t:'NEW',s:'Race tracks are open: wide decks, flat verges, earth banks, kickers and route choices.'}]},
   {v:'v90m-beta.58',date:'14 Oct 2026',items:[{t:'FIXED',s:'Festival crates stay on the roof of your car after you change vehicle.'}]},
   {v:'v90m-beta.57',date:'14 Oct 2026',items:[{t:'FIXED',s:'Roadworks barriers no longer block main streets.'}]},
   {v:'v90m-beta.56',date:'14 Oct 2026',items:[{t:'FIXED',s:'On desktop the name plate no longer stretches into a tall dark column.'}]},
