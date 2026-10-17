@@ -107,9 +107,13 @@ const LF_DT=(()=>{const V=[[0,0]],I=[];for(let i=0;i<9;i++)V.push(LF_PPOLY[i].ma
 // (feet inside the patch, GO art/footsurf). A patch is draped only if every triangle's centroid and edge midpoints sit 1.2 cm above to 7 cm below ground + 3.5 cm (the feet walk on the ground,
 // so they stay within 5 cm of the grass they stand in);
 // a failing patch is tried at 0.7x and 0.5x its size (the error falls with size squared), then dropped.
-function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),V=LF_DT.V.map(q=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;return[x,gy(x,z),z]}),I=LF_DT.I;p._vy=V.map(v=>v[1]);
- for(let t=0;t<I.length;t+=3){const A=V[I[t]],B=V[I[t+1]],C=V[I[t+2]];for(const[u,v,w]of[[1/3,1/3,1/3],[.5,.5,0],[0,.5,.5],[.5,0,.5]]){const x=A[0]*u+B[0]*v+C[0]*w,z=A[2]*u+B[2]*v+C[2]*w;
-  const e=A[1]*u+B[1]*v+C[1]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
+// perf-3: no per-call arrays (was 28 vertex arrays + 5 weight arrays per triangle per try, ~2 GB / 20 s in Athens); scratch buffers, _vy keeps a Float32Array per prop
+const LF_DW=[1/3,1/3,1/3,.5,.5,0,0,.5,.5,.5,0,.5],LF_DX=new Float64Array(LF_DT.V.length),LF_DY=new Float64Array(LF_DT.V.length),LF_DZ=new Float64Array(LF_DT.V.length);
+function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),Q=LF_DT.V,n=Q.length,I=LF_DT.I,X=LF_DX,Y=LF_DY,Z=LF_DZ,W=LF_DW;
+ for(let i=0;i<n;i++){const a=Q[i][0]*p.sx,b=Q[i][1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;X[i]=x;Y[i]=gy(x,z);Z[i]=z}
+ const vy=p._vy&&p._vy.length===n?p._vy:(p._vy=new Float32Array(n));for(let i=0;i<n;i++)vy[i]=Y[i];
+ for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];for(let k=0;k<12;k+=3){const u=W[k],v=W[k+1],w=W[k+2],x=X[a]*u+X[b]*v+X[d]*w,z=Z[a]*u+Z[b]*v+Z[d]*w;
+  const e=Y[a]*u+Y[b]*v+Y[d]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
 function LF_drapeG(L,A,gy){const n=LF_DT.V.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),idx=[],C=new THREE.Color();if(!L.lfP)L.lfP=[];
  A.forEach((p,k)=>{const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
   LF_DT.V.forEach((q,i)=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=(p._vy?p._vy[i]:gy(x,z))+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b});
