@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.90',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phones: parts of the city far behind you are freed sooner, so memory stays lower on long drives (fewer crashes).'}]},
   {v:'v90m-beta.89',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens: no more sudden jumps out of the world, chapter resets or the car shaking in place.'},{t:'FIXED',s:'Smoother chase camera: it no longer pumps in and out on hills or when the car changes form.'},{t:'CHANGED',s:'Athens now starts on wide Syngrou Avenue, so you are up to speed in about 4 seconds.'}]},
   {v:'v90m-beta.88',date:'17 Oct 2026',items:[{t:'FIXED',s:'The track builder no longer opens as a black screen when you come from the garage.'},{t:'FIXED',s:'The LEVEL UP card waits until you close the garage or builder instead of covering it.'}]},
   {v:'v90m-beta.87',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens: the big walls that cut across streets are gone (a stale street map made the city builder put blocks on roads).'},{t:'FIXED',s:'Athens: dead-end streets that ended in a wall are open again.'}]},
