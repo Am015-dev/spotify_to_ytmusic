@@ -388,3 +388,42 @@ RET.pwaX=(function(){
   if(sw&&!SIM)addEventListener('load',()=>{
     navigator.serviceWorker.register('sw.js',{scope:'./'}).then(r=>{X.reg=r;return navigator.serviceWorker.ready;}).then(()=>X.count()).catch(()=>{});});
   return X;})();
+
+/* ===== B21 FEVER: grazes and PERFECTs fill a thin meter at the top edge; when it is full the next bar starts 8 bars of FEVER (score x1.5, music fully open,
+   gold edge glow). No extra damage or fire rate: it only pays in score. Needs movement (a still ship fills nothing), once per 32 bars, never with a boss
+   on screen. Flag off = the old game. The music reads AU.fever (a.js lyStep/lyDrum), the score reads RET.fv.k (b.js comboK). ===== */
+if(RET.fever===undefined)RET.fever=!/[?&]fever=0/.test(location.search);
+const FV=RET.fv={m:0,on:false,armed:false,bars:0,tb:0,last:-99,k:1.5,len:8,gap:32,gz:.025*100,pf:6,dash:8,starts:0,still:1.5};
+RET.fvEl=null;
+RET.fvDom=function(){let e=RET.fvEl;if(e&&e.isConnected)return e;e=document.createElement('div');e.id='retFv';e.setAttribute('aria-hidden','true');
+  e.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:6;opacity:1;';
+  e.innerHTML='<div class="fvGl" style="position:absolute;inset:0;opacity:0;box-shadow:inset 0 0 26px 5px rgba(255,210,61,.55)"></div>'+
+    '<div class="fvTr" style="position:absolute;left:12%;right:12%;top:1px;height:4px;border-radius:2px;background:rgba(255,255,255,.14)"><div class="fvBar" style="height:100%;width:0;border-radius:2px;background:#19e3ff"></div></div>';
+  ($('stage')||document.body).appendChild(e);RET.fvEl=e;return e;};
+RET.fvDraw=function(){if(!RET.fever){if(RET.fvEl)RET.fvEl.style.display='none';return;}
+  const e=RET.fvDom(),bar=e.querySelector('.fvBar'),gl=e.querySelector('.fvGl'),mo=RET.motion();e.style.display='';
+  const w=FV.on?100*(FV.len-FV.bars)/FV.len:FV.m;
+  bar.style.transition=mo?'width .2s linear':'none';bar.style.width=Math.max(0,Math.min(100,w))+'%';
+  bar.style.background=FV.on?'#ffd23d':(FV.m>=100||FV.armed?'#ffe9a0':'#19e3ff');
+  gl.style.transition=mo?'opacity .4s':'none';gl.style.opacity=FV.on?'1':'0';};
+RET.fvReset=function(){const was=FV.on||FV.armed;FV.m=0;FV.on=false;FV.armed=false;FV.bars=0;FV.last=-99;FV.tb=0;AU.fever=false;if(was)try{AU.lyTick(AU.a);}catch(x){}RET.fvDraw();};
+RET.fvStop=function(){const was=FV.on;FV.on=false;FV.armed=false;FV.bars=0;AU.fever=false;if(was&&running)floater(W*.5,H*.3,'FEVER OVER','#ffd23d');RET.fvDraw();};
+RET.fvGain=function(v){if(!RET.fever||!running||G.dead||G.over||FV.on||FV.armed||G.boss||STILL.t>FV.still)return false;
+  FV.m=Math.min(100,FV.m+v);RET.fvDraw();return true;};
+RET.fvReady=()=>RET.fever&&running&&!G.dead&&!G.boss&&FV.m>=100&&FV.tb-FV.last>=FV.gap;
+NR.on('runStart',()=>{RET.fvReset();});
+NR.on('runEnd',()=>{RET.fvReset();});
+NR.on('stageClear',()=>{RET.fvReset();});
+NR.on('districtEnd',()=>{RET.fvStop();FV.m=0;RET.fvDraw();});
+NR.on('bossIn',d=>{if(FV.on||FV.armed)RET.fvStop();});
+NR.on('graze',()=>{RET.fvGain(FV.gz);});
+NR.on('perfect',d=>{RET.fvGain(d&&d.kind==='dash'?FV.dash:FV.pf);});
+NR.on('beat',d=>{if(!RET.fever){if(RET.fvEl&&RET.fvEl.style.display!=='none')RET.fvEl.style.display='none';return;}if(!d||d.i%4!==3)return;   // the beat before a bar line: arm / disarm the music so its layers change on that line
+  if(FV.on){if(FV.bars>=FV.len-1)AU.fever=false;}
+  else if(!FV.armed&&RET.fvReady()){FV.armed=true;AU.fever=true;}});
+NR.on('bar',()=>{if(!RET.fever)return;FV.tb++;
+  if(FV.on){if(++FV.bars>=FV.len)RET.fvStop();else RET.fvDraw();return;}
+  if(FV.armed){FV.armed=false;
+    if(!RET.fvReady()){AU.fever=false;return;}
+    FV.on=true;FV.bars=0;FV.m=0;FV.last=FV.tb;FV.starts++;AU.fever=true;
+    floater(W*.5,H*.3,'FEVER ×'+FV.k,'#ffd23d');G.flash=Math.max(G.flash,.25*FX());if(RET.sting)AU.sting('fever');RET.fvDraw();}});
