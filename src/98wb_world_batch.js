@@ -207,13 +207,14 @@ window.__wb={WB,WBC,fast:()=>{WBC.fast=1;return new Promise(r=>{const t=performa
 // v88w: map icons (≈70 mission/garage/event sprites, 1 draw each) draw as ONE instanced camera-facing quad from a 16×8 atlas of their 128 px canvases.
 // Pre-render: visible icon sprites are hidden and copied into the batch; post-render they are shown again (game code keeps using m.sp as before).
 const WBI={slot:new Map(),free:[],h:[],m:null,cv:null,tx:null};
-function WB_icoInit(){const c=document.createElement('canvas');c.width=2048;c.height=1024;WBI.cv=c;WBI.cx=c.getContext('2d');for(let i=127;i>=0;i--)WBI.free.push(i);
+function WB_icoInit(){const c=document.createElement('canvas');WBI.s=LOWMEM?64:128;c.width=16*WBI.s;c.height=8*WBI.s;   // crash-2: low-mem tier 1024×512 (-8 MB GPU with mips), the icons draw ~40 px on screen
+  WBI.cv=c;WBI.cx=c.getContext('2d');for(let i=127;i>=0;i--)WBI.free.push(i);
   const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;WBI.tx=t;const N=160,geo=new THREE.PlaneGeometry(1,1),ia=new THREE.InstancedBufferAttribute(new Float32Array(N*3),3);ia.setUsage(THREE.DynamicDrawUsage);geo.setAttribute('iA',ia);
   const mat=new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false});mat.onBeforeCompile=s=>{s.vertexShader=s.vertexShader.replace('#include <common>','#include <common>\nattribute vec3 iA;varying float vIA;').replace('#include <uv_vertex>','#include <uv_vertex>\nvMapUv=vMapUv*vec2(.0625,.125)+iA.xy;vIA=iA.z;');
     s.fragmentShader=s.fragmentShader.replace('#include <common>','#include <common>\nvarying float vIA;').replace('#include <map_fragment>','#include <map_fragment>\ndiffuseColor.a*=vIA;')};mat.customProgramCacheKey=()=>'wbIco';
   const m=new THREE.InstancedMesh(geo,mat,N);m.count=0;m.frustumCulled=false;m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.userData.keep=1;m.raycast=()=>{};m.name='WB_icons';WBI.m=m;WBI.ia=ia;scene.add(m)}
-function WB_icoSlot(t){let k=WBI.slot.get(t);if(k!=null)return k;const img=t&&t.image;if(!img||!img.width||!WBI.free.length)return -1;k=WBI.free.pop();const x=(k%16)*128,y=Math.floor(k/16)*128;
-  WBI.cx.clearRect(x,y,128,128);WBI.cx.drawImage(img,x,y,128,128);WBI.tx.needsUpdate=true;WBI.slot.set(t,k);t.addEventListener('dispose',()=>{if(WBI.slot.get(t)===k){WBI.slot.delete(t);WBI.free.push(k)}});return k}
+function WB_icoSlot(t){let k=WBI.slot.get(t);if(k!=null)return k;const img=t&&t.image;if(!img||!img.width||!WBI.free.length)return -1;k=WBI.free.pop();const S=WBI.s,x=(k%16)*S,y=Math.floor(k/16)*S;
+  WBI.cx.clearRect(x,y,S,S);WBI.cx.drawImage(img,x,y,S,S);WBI.tx.needsUpdate=true;WBI.slot.set(t,k);t.addEventListener('dispose',()=>{if(WBI.slot.get(t)===k){WBI.slot.delete(t);WBI.free.push(k)}});return k}
 const _wbiQ=new THREE.Quaternion(),_wbiP=new THREE.Vector3(),_wbiS=new THREE.Vector3(),_wbiM=new THREE.Matrix4();
 function WB_icoPre(cam){WBI.h.length=0;if(WBI.m)WBI.m.visible=false;if(!TUNE.wbIcon||typeof state==='undefined'||state!=='roam'||typeof RO==='undefined'||!RO||!RO.marks)return;if(!WBI.m)WB_icoInit();
   const m=WBI.m,a=WBI.ia.array;let n=0;cam.getWorldQuaternion(_wbiQ);

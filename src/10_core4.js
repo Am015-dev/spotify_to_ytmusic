@@ -187,6 +187,16 @@ let lowGfx=matchMedia('(pointer:coarse)').matches;
 // crash-1: low-memory tier, auto on iPhone/iPad/Android (iOS Safari kills the tab when the page gets too big). ?lowmem=0 off, ?lowmem=1 on anywhere
 function LOWMEM_is(u,tp,q){if(q==='0'||q==='1')return q==='1';return /iPhone|iPad|iPod|Android/.test(u||'')||/Macintosh/.test(u||'')&&tp>1}
 const LOWMEM=LOWMEM_is(navigator.userAgent,navigator.maxTouchPoints,new URLSearchParams(location.search).get('lowmem'));window.__lowmem=LOWMEM;
+// crash-2: live GPU bytes (buffers + textures), counted at the GL calls; renderer.info counts objects, not bytes, and a first-visit upload of
+// boot-built city geometry raises the count while memFree drops the CPU copy (no growth in bytes). MEM_GPU.mb() = live MB..
+const MEM_GPU={b:new Map,t:new Map,bb:0,tb:0,mb(){return+((this.bb+this.tb)/1048576).toFixed(1)}};
+{const gl=renderer.getContext(),G=MEM_GPU,cur={},tb={},BPP=f=>({6408:4,32856:4,35907:4,6407:3,32849:3,6410:2,6409:1,6406:1,33321:1,33323:2,34842:8,34836:16,33326:4,33328:8,33325:2,33327:4,35898:4,36012:4,35056:4,33190:4,33189:2,6402:4,36168:1})[f]||4;let unit=33984;
+ const W=(n,f)=>{const o=gl[n];gl[n]=function(){f.apply(this,arguments);return o.apply(this,arguments)}},setT=(t,n)=>{if(!t)return;G.tb+=n-(G.t.get(t)||0);G.t.set(t,n)},T=k=>tb[unit+':'+k];
+ W('bindBuffer',(k,b)=>{cur[k]=b});W('bufferData',(k,x)=>{const b=cur[k],n=typeof x==='number'?x:x&&x.byteLength||0;if(b){G.bb+=n-(G.b.get(b)||0);G.b.set(b,n)}});W('deleteBuffer',b=>{G.bb-=G.b.get(b)||0;G.b.delete(b)});
+ W('activeTexture',u=>{unit=u});W('bindTexture',(k,t)=>{tb[unit+':'+k]=t});W('deleteTexture',t=>{G.tb-=G.t.get(t)||0;G.t.delete(t)});
+ if(gl.texStorage2D)W('texStorage2D',(k,L,f,w,h)=>setT(T(k),Math.round(w*h*BPP(f)*(k===34067?6:1)*(L>1?4/3:1))));if(gl.texStorage3D)W('texStorage3D',(k,L,f,w,h,d)=>setT(T(k),w*h*d*BPP(f)));
+ W('texImage2D',function(k,L,f){if(L!==0)return;const a=arguments,im=a[5],w=a.length>=8?a[3]:im&&(im.width||im.videoWidth)||0,h=a.length>=8?a[4]:im&&(im.height||im.videoHeight)||0,cf=k>=34069&&k<=34074,t=T(cf?34067:k);if(!t)return;setT(t,(cf&&k>34069?G.t.get(t)||0:0)+w*h*BPP(f))});
+}
 // adaptive difficulty: rating -1..1 moves after each race; AI pace = setting x (1 +- 6%)
 const adaptR=()=>store.get('mho_adapt',0),adaptMul=()=>SET.adapt==='off'?1:1+.06*adaptR(),diffMul=()=>({relaxed:.93,normal:1,hard:1.06}[SET.diff]||1)*adaptMul();
 function adaptAfter(place,n,margin){if(n<2)return;let d=place===1?(margin>4?.3:.15):place<=3?.05:place>=Math.max(4,Math.ceil(n*.6))?-.25:-.1;const r=clamp(adaptR()+d,-1,1);store.set('mho_adapt',+r.toFixed(2));return r}
