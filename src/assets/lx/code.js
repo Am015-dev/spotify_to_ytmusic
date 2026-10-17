@@ -91,7 +91,7 @@ function LIFE_geos(){const fra=CID==='fra',P=Math.PI;
  const TB=LIFE_ldTurb();LIFE.TB=TB&&TB.hub;if(TB)S.turbine=TB.geo;/* life-2: real 7747 turbine */
  return{S,Q,ball,dog,fig,torso,arms,M,pop,ring}}
 // ---------- pools: name → InstancedMesh (count set per frame; invisible while empty, so an empty pool costs no draw call)
-const LIFE_CAP={set:14,setM:14,prop:18,ball:14,dog:6,fig:180,sm:44,pop:8,bm:8};// bm: copies of each type in the batched pools (one draw call for all types)
+const LIFE_CAP={set:14,setM:14,prop:18,ball:14,dog:6,fig:180,sm:44,pop:8,bm:8};if(typeof LOWMEM!=='undefined'&&LOWMEM)LIFE_CAP.bm=3;// crash-5: the batched pools copy every geometry bm times (no addInstance before three r166): 8 -> 3 copies on low-mem phones = -23 MB CPU+GPU in Athens// bm: copies of each type in the batched pools (one draw call for all types)
 // dynamic usage + userData.keep: WB city batching (98wb WB_cand) otherwise freezes static instanced meshes into its merged tiles (they vanished in Athens)
 // a batched pool: every geometry added LIFE_CAP.bm times (×mul), proxies with the InstancedMesh calls LIFE_put/LIFE_draw use (setMatrixAt, count, visible)
 function LIFE_bm(G,st,name,mul={}){let nv=0,n=0;for(const k in G){const c=LIFE_CAP.bm*(mul[k]||1);nv+=G[k].attributes.position.count*c;n+=c}
@@ -316,6 +316,7 @@ function LIFE_hit(){const sp=Math.abs(RO.v),y0=RO.y||0;for(const it of LIFE.H||[
  const lm=LIFE.lm;if(lm){const ex=RO.x-lm.x,ez=RO.z-lm.z,rr=lm.r+1.2,e2=ex*ex+ez*ez;if(e2<rr*rr&&Math.abs(y0-lm.y)<6){const e=Math.sqrt(e2)||1,o=rr-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.7}}}
 // ---------- per frame (after LV_step: free roam only)
 function LIFE_step(dt){if(!LIFE.on||!RO.on||RO.wk){if(LIFE.KK&&LIFE.KK.size)LIFE_kickSync([]);if(LIFE.M&&LIFE.grp)for(const k in LIFE.M){LIFE.M[k].visible=false}if(LIFE.lm)LIFE.lm.g.visible=!!LIFE.on;return}
+ if(typeof LOWMEM!=='undefined'&&LOWMEM&&LIFE.grp!==HUB.grp&&(LIFE.w=(LIFE.w||0)+dt)<12)return;// crash-5: low-mem phones build LIFE 12 s into roam, after the boot peak has been collected
  const t0=performance.now();if(!LIFE_init())return;LIFE.t+=dt;LIFE.fr++;
  const P=LIFE.pf||(LIFE.pf={fill:0,hit:0,draw:0,n:0});let q=performance.now();if(LIFE.fr%12===0||LIFE.todo&&LIFE.fr>=LIFE.todo||Math.hypot(RO.x-LIFE.px,RO.z-LIFE.pz)>20){LIFE.px=RO.x;LIFE.pz=RO.z;LIFE_fill()}
  P.fill+=performance.now()-q;q=performance.now();LIFE_hit();P.hit+=performance.now()-q;q=performance.now();LIFE_draw();P.draw+=performance.now()-q;P.n++;/* where LIFE's time goes (window.__life.LIFE.pf) */const lm=LIFE.lm;if(lm){lm.g.visible=(lm.x-RO.x)**2+(lm.z-RO.z)**2<900*900;const a=LIFE.t*(lm.ax==='y'?.5:.12);lm.spin.rotation[lm.ax]=a;if(lm.upd&&lm.g.visible)lm.upd(a)}

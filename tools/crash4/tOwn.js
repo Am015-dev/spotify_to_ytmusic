@@ -1,0 +1,11 @@
+// crash-4: live GPU buffers by owner (in scene / orphan / GC'd / untagged), grouped by the geometry's creating call site, at drivable+60 s and after 3 warps + a race.
+// node tools/crash4/tOwn.js <probe page url (tools/crash4/mkprobe.sh)> [fra|ath] [frames per leg=900]
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,C0,N0]=process.argv.slice(2);const C=C0||'fra',N=+(N0||900);const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+(async()=>{const b=await chromium.launch({args:['--js-flags=--expose-gc','--enable-precise-memory-info','--use-angle=swiftshader','--enable-unsafe-swiftshader']});const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:UA});const p=await ctx.newPage();p.setDefaultTimeout(900000);const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,160)));
+ await p.goto(BASE+(BASE.includes('?')?'&':'?')+'test='+C+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:240000});const ev=s=>p.evaluate(s=>__xc.ev(s),s);
+ await ev(`window.__drv=n=>{K.ArrowUp=true;for(let i=0;i<n;i++){K.ArrowLeft=((i/90|0)%3===0);roamStep(1/30);if(i%300===299)__tq.draw()}K.ArrowUp=K.ArrowLeft=false}`);
+ await ev(`__drv(${2*N})`);const A=await ev('(__tq.draw(),gc(),__own(scene))');
+ for(let s=0;s<3;s++){await ev(`{const q=rfSnap(RO.x+(Math.random()-.5)*2400,RO.z+(Math.random()-.5)*2400,300);if(q)roamWarp(q[0],q[1],q[2]||0,true);RO.v=0}`);await ev(`__drv(${N})`)}
+ await ev(`{try{const mk=tkMarkOf(RIVAL_EV.find(e=>e.p===TK_C.p));tkStart(mk,TK_C);const sp=RO.sp;sp.cd=0;const bot=tkBot(tkGeoOf(TK_C).pA,{lag:.15});for(let k=0;k<8;k++){for(let i=0;i<150;i++){bot(sp);roamStep(1/30)}__tq.draw()}try{$('#spRes').hidden=true}catch(e){}RO.fin=false;if(RO.sp===sp)sprintEnd()}catch(e){}__drv(${N})}`);
+ const Z=await ev('(__tq.draw(),gc(),__own(scene))');const m=o=>Object.fromEntries(o.by.map(r=>[r[3],r[0]]));const a=m(A),z=m(Z);
+ console.log('BUF at60',A.tot,'gpu',A.gpu,'-> end',Z.tot,'gpu',Z.gpu,'errs',errs.length);for(const r of Z.by)console.log(JSON.stringify([r[0],+(r[0]-(a[r[3]]||0)).toFixed(1),r[1],'t'+r[2],r[3].slice(0,200)]));await b.close()})();

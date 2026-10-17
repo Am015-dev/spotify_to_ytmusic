@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.84',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phone memory cut a lot: Athens loads with about 130 MB less, and far parts of the city are freed while you drive, so fewer crashes.'},{t:'FIXED',s:'Fountains and filler roads no longer block streets in Frankfurt and Athens; the Aiolou side street in Athens is now drivable.'},{t:'NEW',s:'Garage cars show a rarity tag: NEAT, COOL, EPIC or SUPER.'}]},
   {v:'v90m-beta.83',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phone crash: races now free their props when they end, and phones use a lighter memory mode (sharper than before is traded for stability).'},{t:'NEW',s:'Race HUD shows your place and the gap to the rival; smashing, quest card and jam fixes; better Athens roads.'}]},
   {v:'v90m-beta.82',date:'17 Oct 2026',items:[{t:'FIXED',s:'The STORY pill at the top now reads in full on a phone in landscape.'},{t:'FIXED',s:'Pedestrians in the run-up test are no longer picked from steep Athens streets.'}]},
   {v:'v90m-beta.81',date:'17 Oct 2026',items:[{t:'FIXED',s:'The top STORY pill no longer repeats the marker name while the prompt card on the left shows it.'}]},

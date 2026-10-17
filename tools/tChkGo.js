@@ -11,7 +11,7 @@
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
 const BASE=process.argv[2],OUT=process.argv[3]||'.',FIL=process.argv[4]||'';fs.mkdirSync(OUT,{recursive:true});
 const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: tools/chkgo_verdict.js (a throwing GO is FAIL)
-(async()=>{const T0=Date.now(),b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+(async()=>{const T0=Date.now(),b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});
  const ctx=await b.newContext({viewport:process.env.PORTRAIT?{width:393,height:852}:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const errs=[],boots={},res=[],RS={n:0,ms:0};let nav=0,p=null;const FC={};
  const newPage=async()=>{p=await ctx.newPage();p.setDefaultTimeout(120000);p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});p.on('framenavigated',f=>{if(f===p.mainFrame())nav++})};await newPage();
  const open=async c=>{const t=Date.now();await p.goto(BASE+(BASE.includes('?')?'&':'?')+'test='+c+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:90000});if(!open.warm){open.warm=1;await p.evaluate(()=>__tq.draw()).catch(()=>{})}  // one picture up front: the first draw compiles the shaders (~5 s) and would be billed to the first GO that needs a render
