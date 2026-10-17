@@ -34,7 +34,7 @@ const check = (ok, msg) => { if (!ok) fails.push(msg); else notes.push('ok ' + m
   await p.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: 'domcontentloaded' });
   await p.waitForFunction(() => window.__mnr);
   await p.click('#startBtn'); await p.waitForFunction(() => window.__mnr.running, null, { timeout: 5000 });
-  await p.evaluate(() => { const m = window.__mnr; m.god = true; window.__wrap(); setInterval(() => { if (m.G && m.G.live) m.PW.st().cnt = 1e9; }, 30); });   // no power-ups: they change the tempo
+  await p.evaluate(() => { const m = window.__mnr; m.SET.keepmus = false; m.god = true; window.__wrap(); setInterval(() => { if (m.G && m.G.live) m.PW.st().cnt = 1e9; }, 30); });   // no power-ups: they change the tempo
   const ok1 = await p.waitForFunction(() => __mnr.BT.mode === 'file' && __mnr.BT.stage === 'stage1' && !__mnr.BT.pend, null, { timeout: 15000 }).then(() => true, () => false);
   check(ok1, 'stage1 streamed song became the beat clock');
   if (!ok1) { console.log(JSON.stringify({ fails, errs })); process.exit(1); }
