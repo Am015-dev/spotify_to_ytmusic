@@ -14,7 +14,7 @@ if(!/[?&]ob2=0/.test(location.search)){
 body.ob2home :is(#odPin,#qaBugTop,#tuG){display:none!important}
 #menu.home.ob2:not(.ob2more):not([hidden]) ~ #topBtns{display:none}
 body #odNew{top:auto;bottom:8px;right:max(10px,env(safe-area-inset-right));padding:1px 4px 1px 10px;gap:6px;font-size:12px;border-width:2px}
-@media (max-width:500px) and (orientation:portrait){#home .hbar h2{margin-left:150px!important}#menu.home.ob2 #ob2{margin-top:90px}.ob2row{flex-wrap:wrap}#ob2 .ob2row button{flex:1 1 40%}}`;
+@media (max-width:500px) and (orientation:portrait){#home .hbar h2{margin-left:175px!important;font-size:20px!important}#menu.home.ob2 #ob2{margin-top:90px}.ob2row{flex-wrap:wrap}#ob2 .ob2row button{flex:1 1 40%}}`;
   document.head.appendChild(st);
   const M=document.getElementById('menu'),$$=s=>document.querySelector(s),bar=document.createElement('div');bar.id='ob2';
   bar.innerHTML=`<button class="ob2play ob2m" id="ob2Play"><span>▶ PLAY<small></small></span></button><div class="ob2row ob2m" id="ob2Row"><button data-k="#home .hc[data-a=quick]">🏁 RACES</button><button data-k="#gbMenuBtn">🔧 GARAGE</button><button data-k="#bxMenuBtn">🏗 BUILD</button><button>⋯ MORE</button></div><button class="ob2back" id="ob2Back">◀ BACK</button><div class="ob2by">Made with ❤ by Alex · 3D models by Alex</div>`;
