@@ -15,7 +15,15 @@ function gndVert(x,z,y0,f){const r=riverAt(x,z);if(!r)return[x,y0+tH(x,z),z,0];c
 // terr-10: ON again, but only on leaves that do not touch a road (ART7_far, e.g. the 12.5 m leaves whose 2 triangles bridge raster dips up to 2.4 m fra /
 // 3.4 m ath, or !ART7_near: forced 6 m leaves, ≤0.23 m); road/kerb leaves (ART7_near, 2.5 cm fit) keep groundY, and within 1.5 m of a far-leaf edge that borders a non-far leaf/hole/river the drawn height fades to groundY (no steps). ?t7g=0 = off
 var GND_L=[],GND_ON=new URLSearchParams(location.search).get('t7g')!=='0',GND_B=1.5;
-function GND_in(g,x,z){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)return undefined;const L=g.c[i*g.nz+j];if(!L)return L;
+// crash-3: after the build GND_pack moves the leaf lists into one Float32Array (x/z relative to the cell corner, so float32 stays exact to ~1e-5 m):
+// Athens had 7.5 M boxed numbers in per-cell JS arrays (~60-85 MB heap). g.s[2c],g.s[2c+1] = start/end in g.P; -1 = not built (undefined), -2 = flat (null).
+function GND_pack(g){let n=0;for(const L of g.c)if(L)n+=L.length;const P=new Float32Array(n),S=new Int32Array(g.c.length*2);let o=0;
+  for(let c=0;c<g.c.length;c++){const L=g.c[c];if(!L){S[2*c]=S[2*c+1]=L===undefined?-1:-2;continue}const ox=g.x0+Math.floor(c/g.nz)*g.dx,oz=g.z0+c%g.nz*g.dz;S[2*c]=o;
+    for(let k=0;k<L.length;k+=9){P[o]=L[k]-ox;P[o+1]=L[k+1]-oz;for(let q=2;q<9;q++)P[o+q]=L[k+q];o+=9}S[2*c+1]=o}g.P=P;g.s=S;g.c=null}
+function GND_in(g,x,z){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)return undefined;
+  if(g.P){const c=i*g.nz+j,s=g.s[2*c],e=g.s[2*c+1];if(s<0)return s===-1?undefined:null;const L=g.P,ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz;
+    for(let k=s;k<e;k+=9){const u=(rx-L[k])/L[k+2],v=(rz-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(ox+L[k],oz+L[k+1],L[k+2],L[k+3])||!ART7_near(ox+L[k],oz+L[k+1],L[k+2],L[k+3])?1:0;return{L,k,u,v}}return null}
+  const L=g.c[i*g.nz+j];if(!L)return L;
   for(let k=0;k<L.length;k+=9){const u=(x-L[k])/L[k+2],v=(z-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(L[k],L[k+1],L[k+2],L[k+3])||!ART7_near(L[k],L[k+1],L[k+2],L[k+3])?1:0;return{L,k,u,v}}return null}
 function GND_leaf(x,z){for(const g of GND_L){const q=GND_in(g,x,z);if(q!==undefined)return q}return null}
 function GND_tri(L,k,u,v){const A=L[k+4],Bv=L[k+5],C=L[k+6],D=L[k+7];return u+v<=1?A+(C-A)*u+(Bv-A)*v:D+(Bv-D)*(1-u)+(C-D)*(1-v)}
@@ -52,7 +60,7 @@ function* gndGen(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1-
     if(LL&&n===1&&!sn)LL.push(lx,lz,lw,lh,G.p[ix[0]*3+1],G.p[ix[1]*3+1],G.p[ix[2]*3+1],G.p[ix[3]*3+1],-1);
     for(let a=0;a<n;a++)for(let b=0;b<n;b++){const q=a*(n+1)+b;if(V[q][3]&&V[q+1][3]&&V[q+n+1][3]&&V[q+n+2][3])continue;G.i.push(ix[q],ix[q+1],ix[q+n+1],ix[q+1],ix[q+n+2],ix[q+n+1])}}}
     if(o.near&&cc.end){const tk=tkOf(i,j);for(const[key,G]of B)if(key.endsWith(tk)&&key.length>tk.length&&!key.slice(0,-tk.length).includes('|')){mk(G);B.delete(key)}}}
-  for(const G of B.values())mk(G);return out}
+  for(const G of B.values())mk(G);if(GL&&LOWMEM)GND_pack(GL);return out}
 // the Main and the Osthafen basin: water ribbons (~1.2 km pieces so they cull) with the distance to the bank as a vertex attribute (quay foam)
 function waterBuild(grp,wm){HUB.water=[];for(const S of WATERS){const P=S.pts,n=P.length;let i0=0;while(i0<n-1){const c=P[i0],city=Math.abs(c.x)<HX1+600&&c.z>HZS-500&&c.z<HZN,st=city?2:4,i1=Math.min(n-1,i0+150),idx=[];for(let i=i0;i<i1;i+=st)idx.push(i);idx.push(i1);
     const K=8,pos=[],bank=[],ix=[];for(const i of idx){const p=P[i],e=p.hw+2;for(let k=0;k<=K;k++){const d=-e+2*e*k/K;pos.push(p.x+p.tz*d,HWY-.1,p.z-p.tx*d);bank.push(Math.max(0,p.hw-Math.abs(d)))}}

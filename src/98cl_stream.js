@@ -24,7 +24,8 @@ function STR_step(){if(!STR_on()||!WBC.on||state!=='roam'||!WBC.sup||typeof came
 window.__str={st:STR.st,sup:()=>{let b=0,mb=0;for(const S of WBC.sup||[])if(S.built){b++;mb+=S.mb}return{sup:(WBC.sup||[]).length,built:b,mb:+mb.toFixed(1),lodT:WBC.st.lodT}}};
 // LAZY unload: only regions built by the plain lzBuildG (their build has no side effects beyond L.root + props); Taunus/Wald/Attiki corridors stay
 // (their builders add terrain, colliders or lanes while building). Colliders were added once at the first finish and are kept.
-const STR_lzOk=L=>L.build===lzBuildG&&!L.pre&&L.done&&!L.it&&L.root&&LZ.cur!==L;
+// crash-4: LF fill tiles (build LF_tileG, own free hook LF_unreg) unload too: they were never freed and grew GPU buffers ~+25 MB per 5 min in Frankfurt
+const STR_lzOk=L=>(L.build===lzBuildG||L.lf)&&!L.pre&&L.done&&!L.it&&L.root&&LZ.cur!==L;
 function STR_lzFree(L){const R=L.root,inR=o=>{for(let q=o;q;q=q.parent)if(q===R)return true;return false};
   if(HUB.props){const keep=[],gone=[];for(const p of HUB.props)(p.im&&inR(p.im)?gone:keep).push(p);if(gone.length){HUB.props.length=0;for(const p of keep)HUB.props.push(p);/* art-2: no spread, 130k+ props overflow the call stack */const PG=HUB.pgrid;if(PG)for(const p of gone){const k=Math.floor(p.x/16)*10000+Math.floor(p.z/16),A=PG.get(k);if(A){const i=A.indexOf(p);if(i>=0)A.splice(i,1)}}}}
   if(HUB.cull){const C=HUB.cull.filter(c=>!inR(c.o));HUB.cull.length=0;for(const c of C)HUB.cull.push(c)}
@@ -34,7 +35,7 @@ function STR_lzFree(L){const R=L.root,inR=o=>{for(let q=o;q;q=q.parent)if(q===R)
 STR.st.lzBig=[];
 {const _st=lzStart;lzStart=function(L){if(!L.it&&L.pN==null)L.pN=L.props.length;const fresh=!L.it,r=_st.apply(this,arguments);if(fresh&&L.it){const it=L.it;let k=0;L.it={next(){const t=performance.now(),q=it.next(),d=performance.now()-t;k++;if(d>6){const B=STR.st.lzBig;B.push([+d.toFixed(1),L.id,k,q.done?'end':'']);B.sort((a,b)=>b[0]-a[0]);B.length=Math.min(B.length,3)}return q},[Symbol.iterator](){return this}}}return r}}
 {const _fi=lzFinish;lzFinish=function(L){if(!L.strRe)return _fi.apply(this,arguments);const b=L.bld;L.bld=[];try{return _fi.apply(this,arguments)}finally{L.bld=b;STR.st.lzB++}}}
-function STR_lzStep(){if(!STR_on()||!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;for(const L of LAZY)if(STR_lzOk(L)&&lzD(L,x,z)>STR_R()+TUNE.strLzOut)STR_lzFree(L)}
+function STR_lzStep(){if(!STR_on()||!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;for(const L of LAZY)if(STR_lzOk(L)&&lzD(L,x,z)>(L.outR||STR_R()+TUNE.strLzOut))STR_lzFree(L)}
 // per-frame cost of all streaming work (LAZY build + LAZY unload + far-cell build/free): STR.st.fr = frames, max ms, over 8/16/50 ms
 STR.st.fr={n:0,max:0,o8:0,o16:0,o50:0};
 {const _ls=lazyStep;lazyStep=function(){const t0=performance.now();try{STR_lzStep();STR.lzT0=performance.now()-t0;LZ.inR=STR_on()?STR_R()+TUNE.strLzIn:2200;return _ls.apply(this,arguments)}finally{const dt=performance.now()-t0,F=STR.st.fr;if(dt>.05){F.n++;if(dt>F.max)F.max=+dt.toFixed(1);if(dt>8)F.o8++;if(dt>16)F.o16++;if(dt>50)F.o50++}}}}

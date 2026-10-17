@@ -8,6 +8,8 @@ function MEM1_go(kind,say){const ok=b=>b?' ✅':' ❌';
  if(kind==='tier'){const ios='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1',pc='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0 Safari/537.36',pad='Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Version/18.0 Safari/605.1.15';
   const a=LOWMEM_is(ios,5,null),p=LOWMEM_is(pad,5,null),b=!LOWMEM_is(pc,0,null),m=!LOWMEM_is(pad,0,null),c=!LOWMEM_is(ios,5,'0'),pr=renderer.getPixelRatio(),d=!LOWMEM||pr<=1.5+1e-6&&!!TUNE.memFree;
   return'📍 LOW-MEM TIER · iPhone '+a+' · iPad '+p+' · PC off '+b+' · Mac off '+m+' · ?lowmem=0 off '+c+' · this page '+(LOWMEM?'ON':'off')+' · pixel ratio '+pr.toFixed(2)+' · memFree '+(TUNE.memFree|0)+ok(a&&p&&b&&m&&c&&d)}
+ if(kind==='ath-boot'){const pk=Math.round(MEM_GPU.pk),f=+(localStorage.getItem('mho_mempk_fra')||0),ref=f||830,drv=CID==='ath'&&!!(RO.on&&RO.built)&&typeof pl!=='undefined'&&!!pl,lim=Math.round(ref*1.1);   // 830 = crash-3 Frankfurt boot peak, iPhone emulation
+  return'📍 ATHENS BOOT · drivable '+(drv?'yes':'NO')+' · boot peak heap + GPU '+pk+' MB ≤ Frankfurt '+ref+(f?'':' (ref)')+' + 10 % = '+lim+' MB'+(LOWMEM?' (low-mem tier)':'')+ok(drv&&pk>0&&pk<=lim)}
  if(kind==='stable'){const N=5*60*30,R={};let i=0,sp=null,bot=null;const warp=()=>{const q=rfSnap(RO.x+(Math.random()-.5)*2400,RO.z+(Math.random()-.5)*2400,300);if(q)roamWarp(q[0],q[1],q[2]||0,true);RO.v=0};
   const step=()=>{for(let n=0;n<150&&i<N;n++,i++){const t=i/30;
     if(i===Math.round(N*.25)||i===Math.round(N*.5))warp();
