@@ -1,0 +1,6 @@
+# HANDOFF races (2026-10-17, timeboxed out; WIP on alex/races-wip, NOT green, nothing on trunk)
+1. Driver: `node tools/tRaces.js <built index.html> 3 river,gp,westend,akro` (warm page, tkBot lag .15, prints PASS/FAIL + progress trace). GO `races/finish` (fra: River, GP, Westend; ath: Akropolis) is wired, not yet run through tChkGo. rv2k3/akro-play + rv2k3/races GOs ported from r3A-wip.
+2. Root causes found: (a) River: rival boat unpaced (TK_PACE skipped for water) = 50 m/s vs boat 18; now TK_PACE_W=.36 + rubber band on water. (b) Pinned car: stuck detector in 71_roam_drive.js read per-frame travel (<0.07 m), a wall-jittering car moves more, so hop/turn never fired; now 0.5 s window.
+3. After fixes (beta.90 build, 3 runs): Westend 3/3 finish, Akropolis 2/3 (run1 pinned/circling at (-2730,290), v 0-6), River 1/3 (runs 2,3 DNF at ~2300/3515 m, cause not traced: rival and player level but DNF fires), GP 0/3 (car stuck at (-570,360), a 90 deg corner (-600,421)->(-600,360)->(-552,360), v 0-9, spinning).
+4. Next: dump state at the stall (what wall/collider at (-570,360) and (-2730,290); is RO.nudge hop blocked?), trace why River DNF fires while level; then rerun tRaces 3x, then unit + TAG=life1,xf1,terrain + rv2k3 + races/finish on the BUILT page.
+5. Remove the `[FROZEN ...]` trace in src/99c3_rv2k3.js (RV3A_race dg) once fixed.

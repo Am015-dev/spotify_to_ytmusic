@@ -127,9 +127,9 @@ function tkAiTarget(a,P,s){const q=tkPosOn(P,Math.max(0,s));let tv=a.base;if(q.t
 // fair-1 (2026-10-16): pace band, as in 2K Drive / Mario Kart. The rival's speed model is scaled to the player's car (TK_PACE: base 62 -> 31 m/s, the car tops out ~31)
 // and pulled toward a target gap that moves with your progress: it leads early, lets you by, comes back, then trails you into the finish, so a clean race is close and
 // winnable, while a crash still costs (it waits less near the end). Over 400 m apart (you stopped) the band lets go. Without ?fair=1: old pace (base 62, ±10 % past 150 m, DNF +40 s).
-const TK_FAIR=(()=>{try{return new URLSearchParams(location.search).get('fair')!=='0'}catch(e){return false}})(),TK_PACE=.5;   // fair-4: ON by default (?fair=0 = old pace)
+const TK_FAIR=(()=>{try{return new URLSearchParams(location.search).get('fair')!=='0'}catch(e){return false}})(),TK_PACE=.5,TK_PACE_W=.36;   // fair-4: ON by default (?fair=0 = old pace)
 function tkGapT(pr,i){const k=[[0,30],[.25,30],[.35,-30],[.5,-30],[.6,25],[.72,25],[.82,-40],[1,-40]];let j=1;while(j<k.length-1&&pr>k[j][0])j++;const a=k[j-1],b=k[j];return a[1]+(b[1]-a[1])*clamp((pr-a[0])/(b[0]-a[0]),0,1)-i*20}
-function tkRub(gap,pr,i,wet){if(!TK_FAIR||wet)return gap>150?.9:gap<-150?1.1:1;if(Math.abs(gap)>400)return 1;const e=gap-tkGapT(pr,i),fin=pr>.82;return e>0?1-(fin?.25:.45)*Math.min(1,e/120):1+(fin?.06:.3)*Math.min(1,-e/100)}
+function tkRub(gap,pr,i,wet){if(!TK_FAIR)return gap>150?.9:gap<-150?1.1:1;if(Math.abs(gap)>400)return 1;const e=gap-tkGapT(pr,i),fin=pr>.82;return e>0?1-(fin?.25:.45)*Math.min(1,e/120):1+(fin?.06:.3)*Math.min(1,-e/100)}
 // DNF: relative to the first rival home and generous: you get the time your own average pace needs to finish (+10 s), 30 s at least, up to the winner's whole time again.
 function tkGrace(sp,firstFin,len){if(!TK_FAIR)return 40;const v=sp.myS/Math.max(1,sp.t);return v>4?clamp((len-sp.myS)/v+10,30,Math.max(30,firstFin)):25}
 function tkFire(who,kind,sp,ai){const lead=sp.ai.filter(b=>b.fin==null&&b.s>sp.myS-20&&b.s-sp.myS<220).sort((x,y)=>x.s-y.s)[0];
@@ -152,7 +152,7 @@ function tkStep(dt){const sp=RO.sp,e=sp.e;TK.C=sp.C;const G=tkGeo();RO.cool=2;TK
   for(const it of sp.items){it.cd=Math.max(0,it.cd-dt);it.g.visible=it.cd<=0;it.g.rotation.y+=dt*2;if(it.cd>0||sp.cd>0)continue;
     if(Math.hypot(it.x-RO.x,it.z-RO.z)<4.5){it.cd=3;tkFire('me',TK_ITEMS[(sp.items.indexOf(it)+Math.floor(sp.t))%3],sp);sp.fired=(sp.fired||0)+1}}
   const C=sp.C;for(const a of sp.ai){const P=tkPath(a),Lp=tkLen(P);if(a.fin!=null&&a.s>=Lp+40)continue;a.stun=Math.max(0,a.stun-dt);a.itemCd=Math.max(0,a.itemCd-dt);
-    const gap=a.s/Lp*G.lenA-sp.myS,rub=tkRub(gap,sp.myS/G.lenA,sp.ai.indexOf(a),C.water);let tv=tkAiTarget(a,P,a.s)*(TK_FAIR&&!C.water?TK_PACE:1)*rub  /* fair-4: the boat leg keeps the old pace */;if(sp.cd>0||a.stun>0)tv=0;const fc2=FC2_live(sp);if(fc2)tv*=FC2_pre(a,dt);   // fair2 (98fc_fair2.js): takedown/ghost/catch-up timers
+    const gap=a.s/Lp*G.lenA-sp.myS,rub=tkRub(gap,sp.myS/G.lenA,sp.ai.indexOf(a),C.water);let tv=tkAiTarget(a,P,a.s)*(TK_FAIR?(C.water?TK_PACE_W:TK_PACE):1)*rub  /* races-1: the boat is paced too (old pace 50 m/s vs a 18-25 m/s boat = River Run DNF, gap 1250 m) */;if(sp.cd>0||a.stun>0)tv=0;const fc2=FC2_live(sp);if(fc2)tv*=FC2_pre(a,dt);   // fair2 (98fc_fair2.js): takedown/ghost/catch-up timers
     if(C.boost&&a.route===C.boost.r){const q=tkPosOn(P,a.s);if(sp.pads.some(p=>Math.hypot(q.x-p.x,q.z-p.z)<8))sp.padT=1.5}
     a.v+=(tv-a.v)*Math.min(1,dt*(tv>a.v?1.6:2.5));a.s+=a.v*dt;if(a.s>=Lp&&a.fin==null){a.fin=sp.t;say('',a.name.toUpperCase()+' FINISHED',1.2)}
     const q=tkPosOn(P,Math.max(0,a.s)),ln=fc2?FC2_lane(a):a.lane,x=q.x+Math.cos(q.h)*ln,z=q.z-Math.sin(q.h)*ln;
