@@ -89,12 +89,14 @@ function G9C_render(S,f,W=168,Hh=104){const key=W+'|'+G9C_key(S,f)+'|'+(f==='car
 function G9C_pump(){if(G9C.busy)return;const next=()=>{const L=[...document.querySelectorAll('#g9Col img[data-k]:not([src])')],V=$('#g9Col'),vr=V&&V.getBoundingClientRect(),vis=e=>{const r=e.getBoundingClientRect();return vr&&r.bottom>vr.top&&r.top<vr.bottom&&r.right>vr.left&&r.left<vr.right},im=L.find(vis)||L[0];/* v90e: on-screen cards first (the newest rides sit at the end of the list) */if(!im||$('#gbx').hidden){G9C.busy=0;return}
   const S=GAR_set(im.dataset.s),u=G9C_render(S,im.dataset.f);if(u)im.src=u;else im.removeAttribute('data-k');setTimeout(next,16)};G9C.busy=1;setTimeout(next,30)}
 // ---------- UI: replaces the VEHICLES row at the top of RIDES
+// rarity tag on the card: short words so they fit the corner tag in the 4-column landscape grid (full 2K names stay in the sub-title and perks)
+const G9C_TAG={c:'NEAT',r:'COOL',e:'EPIC',l:'SUPER'};
 function G9C_html(){const f=G9C.type,{A,all,own}=G9C_list(f),eq=G9C_eq(f),SL={rar:'RARITY',az:'A–Z',new:'NEW'},FL={all:'ALL',own:'OWNED',fav:'★ FAVS',rac:'🏁 RACERS'};
  let h=`<div id="g9Col"><div class="g9Bar">${G9C_TY.map(([k,ic,n])=>{const L=G9C_list(k);return`<button class="g9Ty ${k===f?'on':''}" data-gty="${k}">${ic} ${n} <small>${L.own}/${L.all}</small></button>`}).join('')}
  <button class="g9Ch" data-gso>⇅ ${SL[G9C.sort]}</button><button class="g9Ch" data-gfi>${FL[G9C.filt]}</button></div>
  <div class="g9Cnt">owned ${own} / ${all} · locked ${all-own}</div><div class="g9Grid">`;
  for(const e of A){const S=e.S,[tn,tc]=GAR_TIER[S.tier],on=S.id===eq,k=G9C_key(S,f);
-  h+=`<div class="g9Card ${on?'on':''} ${e.own?'':'lock'}" style="--tc:${tc}" data-gc="${S.id}"><img data-k="${k}" data-s="${S.id}" data-f="${f}" alt=""><i class="g9R">${tn}</i>
+  h+=`<div class="g9Card ${on?'on':''} ${e.own?'':'lock'}" style="--tc:${tc}" data-gc="${S.id}"><img data-k="${k}" data-s="${S.id}" data-f="${f}" alt=""><i class="g9R">${G9C_TAG[S.tier]||tn}</i>
    <button class="g9Fav ${e.fav?'on':''}" data-gfav="${S.id}" aria-label="favourite">${e.fav?'★':'☆'}</button><b>${e.own?'':'🔒 '}${G9C_name(S,f)}</b>
    <small>${on?'✔ EQUIPPED':e.own?(S.tpl?'LEGO design':'tap to equip'):gbReqTxt(S.req)}</small>${f==='car'&&e.own?`<button class="g9Ed" data-ged="${S.id}">✎ BUILD</button>`:''}</div>`}
  if(!A.length)h+=`<p class="g9None">${G9C.filt==='fav'?'No favourites yet · tap ☆ on a card':'Nothing here yet'}</p>`;return h+'</div></div>'}

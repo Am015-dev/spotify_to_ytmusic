@@ -58,6 +58,8 @@ function athNetLink(out){
   /* r3B3: Mitropoleos (ped) ended 40 m short of the Ermou/Athinas hub: a dead end that trapped the road-follow driver; tie its east end to that junction (the shared e|n key makes it a real junction) */
   {const at=(q,x,z)=>q.pts.findIndex(p=>{const w=WP(p[0],p[1]);return Math.hypot(w[0]-x,w[1]-z)<6}),M=out.find(q=>q.name==='Mitropoleos'&&q.cls==='ped'&&at(q,1787,-1722)===q.pts.length-1),H=out.find(q=>q.cls==='sec'&&at(q,1793,-1682)>=0);
     if(M&&H){const p=H.pts[at(H,1793,-1682)];M.pts.push([p[0],p[1]])}}
+  /* small1: the Aiolou pedestrian spur (1669,-1703)->(1644,-1574) joins two drivable streets but was pedestrian, so the road-follow driver dead-ended on it; make it a drivable street (same as the Mitropoleos link) */
+  {const S=out.find(q=>q.name==='Aiolou'&&q.cls==='ped'&&q.pts.length===2&&Math.hypot(WP(q.pts[1][0],q.pts[1][1])[0]-1644,WP(q.pts[1][0],q.pts[1][1])[1]+1574)<6);if(S)S.cls='res'}
   return out}
 // linear samples (<= step apart) that keep every vertex; vertices carry their key (junction lookup)
 function linSamples(pts,step,keys){const P=[];let s=0;for(let i=0;i<pts.length-1;i++){const a=pts[i],b=pts[i+1],L=Math.hypot(b[0]-a[0],b[1]-a[1]),n=Math.max(1,Math.ceil(L/step));for(let k=0;k<n;k++){const t=k/n,p={x:a[0]+(b[0]-a[0])*t,z:a[1]+(b[1]-a[1])*t,s:s+L*t};if(k===0)p.k=keys[i];P.push(p)}s+=L}
