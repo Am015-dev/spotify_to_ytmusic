@@ -1818,5 +1818,35 @@
   "where": "Story dialogue card, STORY LOG timeline and stage plate preview (a coloured hex badge with the initial until this is real art)",
   "notes": "Portrait bust, Wren: mysterious ally, hooded figure half in static, lime green signal glow. Accent colour #b6ff5a. Square 256x256, head and shoulders centred, dark transparent-friendly background, painted neon style like the boss portraits. Shown cropped to a circle.",
   "prompt": "portrait bust of Wren: mysterious ally, hooded figure half in static, lime green signal glow, head and shoulders centred, painted neon cyberpunk look like the existing boss portraits, accent glow #b6ff5a, no text, letters or numbers"
+ },
+ {
+  "file": "spr-en-gtank.webp",
+  "w": 256,
+  "h": 160,
+  "group": "Enemies",
+  "status": "WIRED",
+  "where": "Ground enemies (coloured shapes until this exists): drawn in parts/leak.js",
+  "notes": "Ground tank: tracked body, short cannon pointing up-left. Faces LEFT, sits on its tracks (bottom edge = road line), transparent, 256 px wide.",
+  "kind": "sprite"
+ },
+ {
+  "file": "spr-en-gturret.webp",
+  "w": 192,
+  "h": 160,
+  "group": "Enemies",
+  "status": "WIRED",
+  "where": "Ground enemies (coloured shapes until this exists): drawn in parts/leak.js",
+  "notes": "Ground turret: low armoured base and dome with a barrel; the barrel is drawn pointing up-left. Bottom edge = road line, transparent, 192 px wide.",
+  "kind": "sprite"
+ },
+ {
+  "file": "spr-en-gwalker.webp",
+  "w": 256,
+  "h": 288,
+  "group": "Enemies",
+  "status": "WIRED",
+  "where": "Ground enemies (coloured shapes until this exists): drawn in parts/leak.js",
+  "notes": "Walker mech: two bent legs, boxy torso, arm cannon on the left. Feet at the bottom edge (= road line), faces LEFT, transparent, 256 px wide.",
+  "kind": "sprite"
  }
 ]
