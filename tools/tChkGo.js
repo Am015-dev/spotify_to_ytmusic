@@ -27,6 +27,7 @@ const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works whil
  const want=id=>id.includes(FIL)&&(!process.env.SMOKE||SM.includes(id))&&(!TG.length||TG.some(t=>id.startsWith(t)||id.includes('/'+t)||id.split('/')[0]===t));
  const LAST=['v90k/rv-scale','v90k/ww-card','v90k/park-sit'],pick=c=>all.filter(([id,cc])=>cc===c&&want(id)).map(([id])=>id).sort((a,b)=>(process.env.SMOKE?LAST.includes(a)-LAST.includes(b):0)).filter(id=>{const k=kind[id]&&c+kind[id];if(!k)return true;if(seen[k]){same[id]=seen[k];return false}seen[k]=id;return true});
  const run=async(c,ids)=>{for(const id of ids){const e0=errs.length;let said='';
+   if(id==='rv2k2/traffic'&&res.some(r=>r.id==='rv2k2/pace'))await open(c);   // rv2k2h: traffic is not re-populated at the start after pace drove >1 km and the test warped back (game question, see docs/HANDOFF_rv2k2h.md): judge it on a fresh page, like a solo run
    const t1=Date.now();try{const LONG=BUD[id]>=25&&id.startsWith('rv2k')&&id!=='rv2k/race-handsoff'&&!process.env.SMOKE;   // race-handsoff drives its own fake clock (tkRun), real timers   // long GOs (race 240 s, walls 60 s, objectives 30 s): drive them on a fake clock (sim time, not software-GL wall time) and WAIT until they say a verdict, so a combined run judges them like a solo run
     if(LONG&&!FC.on){await p.clock.install().catch(()=>{});FC.on=1}
     said=await p.evaluate(id=>window.__chk.go(id)||'',id);
