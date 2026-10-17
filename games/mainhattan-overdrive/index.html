@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.88',date:'17 Oct 2026',items:[{t:'FIXED',s:'The track builder no longer opens as a black screen when you come from the garage.'},{t:'FIXED',s:'The LEVEL UP card waits until you close the garage or builder instead of covering it.'}]},
   {v:'v90m-beta.87',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens: the big walls that cut across streets are gone (a stale street map made the city builder put blocks on roads).'},{t:'FIXED',s:'Athens: dead-end streets that ended in a wall are open again.'}]},
   {v:'v90m-beta.86',date:'17 Oct 2026',items:[{t:'FIXED',s:'Camera no longer jumps far ahead and back when the car switches to its 4x4 form.'},{t:'NEW',s:'Smash more street items: walls let you slide instead of stopping dead, playground pieces and stalls break.'},{t:'NEW',s:'Shortcuts marked with arrows in Athens and Frankfurt, each one much quicker than the road.'}]},
   {v:'v90m-beta.85',date:'17 Oct 2026',items:[{t:'FIXED',s:'Less phone memory again: far street objects are freed while you drive and a memory leak is fixed (Frankfurt about 55 MB lower after 5 minutes).'}]},
@@ -10142,7 +10143,8 @@ const R3U={q:[]};
 addXP=(f=>function(n,why){const l0=lvlOf(prof().xp),s0=say;say=function(a){if(a==='LEVEL UP')return;return s0.apply(this,arguments)};let r;try{r=f.apply(this,arguments)}finally{say=s0}
  const l1=lvlOf(prof().xp);if(l1>l0){R3U.q.push([l0,l1]);R3_upPump()}return r})(addXP);
 const R3_racing=()=>state==='race'||state==='countdown'||state==='finished'||state==='loading'||!!RO.sp;   // rv3C: also any city race (RO.sp is cleared only after the result panel is up); the pump below also waits while the result panel shows (the card comes after CONTINUE)
-function R3_upPump(){if(R3_racing()){const U=$('#r3Up');if(U&&!U.hidden&&R3U.cur&&U.classList.contains('mini')){U.hidden=true;R3U.q.unshift(R3U.cur);R3U.cur=null}return}const sr=$('#spRes');if(sr&&!sr.hidden)return;if(!R3U.q.length||!$('#r3Up').hidden)return;const[l0,l1]=R3U.q.shift();R3_up(l0,l1)}
+function R3_upPump(){const gx=$('#gbx'),gar=!!(gx&&!gx.hidden)||(typeof BX!=='undefined'&&BX.on);if(gar){const U=$('#r3Up');if(U&&!U.hidden&&R3U.cur){U.hidden=true;R3U.q.unshift(R3U.cur);R3U.cur=null}return}   // bld1: the card waits until the garage / builder closes
+ if(R3_racing()){const U=$('#r3Up');if(U&&!U.hidden&&R3U.cur&&U.classList.contains('mini')){U.hidden=true;R3U.q.unshift(R3U.cur);R3U.cur=null}return}const sr=$('#spRes');if(sr&&!sr.hidden)return;if(!R3U.q.length||!$('#r3Up').hidden)return;const[l0,l1]=R3U.q.shift();R3_up(l0,l1)}
 setInterval(()=>{try{R3_upPump()}catch(e){}},600);
 function R3_up(l0,l1,mini){const U=$('#r3Up');R3U.cur=[l0,l1];let rw=[['📈','STATS UP','top speed, acceleration, handling, health']];for(let L=l0+1;L<=l1;L++)rw=rw.concat(R3_road(L));
  mini=mini!=null?mini:state==='roam';U.classList.toggle('mini',!!mini);
@@ -14830,7 +14832,7 @@ function BX_loadUI(){const old=$('#bxLoad');if(old){old.remove();return}const D=
  const S=BX_saved();D.insertAdjacentHTML('beforeend','<b style="font-size:13px">MY TRACKS</b>');for(const k in S)add(k,()=>BX_load(BX_mig(S[k]),k));
  add('✚ NEW EMPTY TRACK',()=>{BX_load({log:[['w','valley']]},'MY TRACK');BX_seed()});add('✖ CLOSE',()=>{});$('#bx').appendChild(D)}
 const BX_DEMOS={};
-function BX_open(){BX_scene();try{if(!BX.sc.environment&&scene.environment)BX.sc.environment=scene.environment}catch(e){}BX.on=true;renderer.shadowMap.enabled=true;document.body.classList.add('bxOn');if(BX.tfast){renderer.setPixelRatio(.5);BX.sun.shadow.mapSize.set(1024,1024)}BX.mode='build';BX.last=0;for(const id of['#menu','#topBtns','#hud','#touch'])if($(id))$(id).hidden=true;
+function BX_open(){try{const g=$('#gbx');if(g&&!g.hidden)gbClose(false)}catch(e){}BX_scene();try{if(!BX.sc.environment&&scene.environment)BX.sc.environment=scene.environment}catch(e){}BX.on=true;renderer.shadowMap.enabled=true;document.body.classList.add('bxOn');if(BX.tfast){renderer.setPixelRatio(.5);BX.sun.shadow.mapSize.set(1024,1024)}BX.mode='build';BX.last=0;for(const id of['#menu','#topBtns','#hud','#touch'])if($(id))$(id).hidden=true;
  if(!BX.log.length){BX.log=[['w','valley']];BX_replay()}else BX_buildAll();BX.camGo=1;BX_ui();BX_seed()}
 function BX_close(){BX.on=false;document.body.classList.remove('bxOn');if(BX.mode==='drive')BX_driveStop();const R=$('#bx');if(R)R.remove();$('#menu').hidden=false;$('#topBtns').hidden=false;try{resize()}catch(e){}}
 frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try{BX_tick(now)}catch(e){console.error(e);BX.on=false}})(frame);
@@ -15882,7 +15884,22 @@ function R3E_builderGo(){if(typeof BX==='undefined')return'📍 builder missing 
   const pct=100*blk/(D.length/4),np=BX.pcs.filter(p=>!p.dead).length,gr=!!BX.gridG;
   return'📍 BUILDER VIEW · '+np+' piece(s) (START ≥ 1)'+ok(np>=1)+' · grid '+(gr?'on':'off')+ok(gr)+' · pure-black pixels in the centre 50 %: '+pct.toFixed(1)+' % (< 20)'+ok(pct<20)}
  finally{if(!was)try{BX_close()}catch(e){}IDS.forEach((i,j)=>{const e=$(i);if(e&&hid[j]!==null)e.hidden=hid[j]});/* BX_open hides the HUD and touch pad; hand them back as they were */}}
-(function R3E_reg(i){const C=window.__chk;if(C&&C.GO){C.GO['rv2k3/builder']=[{c:'fra',n:'builder view',fn:R3E_builderGo}];return}if(i<600)setTimeout(()=>R3E_reg(i+1),100)})(0);
+function R3E_visibleGo(){if(typeof BX==='undefined')return'📍 builder missing ❌';const was=BX.on,IDS=['#menu','#topBtns','#hud','#touch'],hid=IDS.map(i=>{const e=$(i);return e?e.hidden:null}),ok=b=>b?' ✅':' ❌';
+ try{try{if(typeof gbOpen==='function'&&($('#gbx')||{hidden:1}).hidden)gbOpen()}catch(e){}
+  if(!BX.on)BX_open();
+  const gb=$('#gbx'),cx=Math.floor(innerWidth/2),cy=Math.floor(innerHeight/2),top=document.elementFromPoint(cx,cy),cover=!!(gb&&!gb.hidden)||!!(top&&top.closest&&top.closest('#gbx')),T=window.__tq&&__tq.o,d0=T&&T.draw;if(T)T.draw=1;
+  BX.cam.aspect=innerWidth/innerHeight;BX.cam.updateProjectionMatrix();BX_camBuild();renderer.setRenderTarget(null);renderer.render(BX.sc,BX.cam);
+  const cv=renderer.domElement,w=cv.width,h=cv.height,o=document.createElement('canvas');o.width=w;o.height=h;const x=o.getContext('2d',{willReadFrequently:true});x.drawImage(cv,0,0);if(T)T.draw=d0;
+  const D=x.getImageData(Math.floor(w*.25),Math.floor(h*.25),Math.floor(w*.5),Math.floor(h*.5)).data;let blk=0;for(let i=0;i<D.length;i+=4)if(D[i]<10&&D[i+1]<10&&D[i+2]<10)blk++;
+  const pct=100*blk/(D.length/4);let meshes=0;BX.sc.traverse(m=>{if(m.isMesh&&m.visible)meshes++});
+  return'📍 BUILDER VISIBLE (after garage) · garage overlay over the canvas: '+(cover?'yes':'no')+ok(!cover)+' · track meshes '+meshes+' (> 0)'+ok(meshes>0)+' · pure-black pixels in the centre 50 %: '+pct.toFixed(1)+' % (< 20)'+ok(pct<20)}
+ finally{if(!was)try{BX_close()}catch(e){}IDS.forEach((i,j)=>{const e=$(i);if(e&&hid[j]!==null)e.hidden=hid[j]})}}
+function R3E_popGo(){if(typeof R3U==='undefined')return'📍 level card missing ❌';const ok=b=>b?' ✅':' ❌',q0=R3U.q.slice();
+ try{const U=$('#r3Up');R3U.q=[];if(typeof gbOpen==='function'&&($('#gbx')||{hidden:1}).hidden)gbOpen();R3U.q.push([2,3]);R3_upPump();const hidden=U.hidden,kept=R3U.q.length===1;
+  try{gbClose(false)}catch(e){}R3_upPump();const shown=!U.hidden;U.hidden=true;R3U.q=q0;
+  return'📍 LEVEL UP vs GARAGE · hidden while the garage is open'+ok(hidden)+' · kept queued'+ok(kept)+' · shows after the garage closes'+ok(shown)}
+ finally{R3U.q=q0}}
+(function R3E_reg(i){const C=window.__chk;if(C&&C.GO){C.GO['rv2k3/builder']=[{c:'fra',n:'builder view',fn:R3E_builderGo}];try{for(const[id,t]of[['levelpop','garage open: LEVEL UP card stays hidden (queued), shows after the garage closes'],['visible','builder opened from the garage: no garage overlay on the canvas, track meshes > 0, centre not black']])if(!OD_CHECKLIST.some(q=>q.ver==='bld1'&&q.id===id))OD_CHECKLIST.push({ver:'bld1',id,area:id==='visible'?'build':'ui',text:t})}catch(e){}C.GO['garage/levelpop']=[{c:'fra',n:'level up queued',fn:R3E_popGo}];C.GO['builder/visible']=[{c:'fra',n:'builder after garage',fn:R3E_visibleGo}];return}if(i<600)setTimeout(()=>R3E_reg(i+1),100)})(0);
 const GFX={on:(()=>{try{const q=new URLSearchParams(location.search).get('gfx');if(q!==null)return q!=='0';return store.get('mho_gfx',1)===1}catch(e){return true}})(),   // gfx-2 (2026-10-14): ON by default for everyone (coordinator); ?gfx=0 / store 0 = old look
  day:false,keyOrig:new Map(),mats:new WeakSet(),pm:[],gm:[],U:{value:1},G:{value:new THREE.Vector4(0,0,0,0)},t:0,n:0,tier:null};
 Object.assign(TUNE,Object.assign({gfxHemi:.8,gfxSun:4.2,gfxEnv:.3,gfxEl:.6,gfxAz:2.8,gfxSlew:.8,gfxSnap:1},TUNE));
