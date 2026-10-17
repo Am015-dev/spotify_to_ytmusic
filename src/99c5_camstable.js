@@ -5,9 +5,9 @@ function CAMST_go(say){const ok=b=>b?' ✅':' ❌';const N=60*30,S={tele:0,step:
  const run=()=>{for(let n=0;n<240&&i<N;n++,i++){const dt=i%40===39?.05:1/30;K.ArrowUp=true;K.ArrowLeft=((i/45|0)%4===0);K.ArrowRight=((i/45|0)%4===2);
    if(i%180===179&&pl){pl.vmode=pl.vmode==='4x4'?'car':'4x4';S.flip++}
    roamStep(dt);try{roamCam(dt)}catch(e){}const c=camera.position,d=Math.hypot(c.x-RO.x,c.z-RO.z),sp=Math.hypot(RO.x-px,RO.z-pz);
-   if(i>120){if(Math.abs(RO.v)*3.6>10&&sp>Math.abs(RO.v)*dt*1.6+1.5)S.tele++;rec.push([d,pd==null?0:Math.abs(d-pd)])}px=RO.x;pz=RO.z;pd=d}
+   if(i>120){if(Math.abs(RO.v)*3.6>10&&sp>Math.abs(RO.v)*dt*1.6+1.5)S.tele++;rec.push([d,pd==null?0:Math.abs(d-pd),i,Math.abs(RO.v)*3.6|0,pl&&pl.vmode])}px=RO.x;pz=RO.z;pd=d}
   if(i<N){setTimeout(run,0);return}
-  K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;const q=rec.map(r=>r[0]).sort((a,b)=>a-b);med=q[q.length>>1]||1;for(const r of rec){if(r[0]<.35*med||r[0]>2*med)S.band++;if(r[1]>med)S.step++}
+  K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;const q=rec.map(r=>r[0]).sort((a,b)=>a-b);med=q[q.length>>1]||1;for(const r of rec){if(r[0]<.35*med||r[0]>2*med){S.band++;(S.bf=S.bf||[]).push(r[2]+':'+r[0].toFixed(1)+'@'+r[3]+r[4])}if(r[1]>med)S.step++}
   const pass=!S.tele&&!S.band&&!S.step;window.__chk.camst=S;
   say('📍 CAM STABLE · 60 s hitchy touch drive, '+S.flip+' form flips · teleports while moving '+S.tele+' · distance out of band '+S.band+' (median '+med.toFixed(1)+' m) · frame jumps > median '+S.step+ok(pass))};
  setTimeout(run,0);return'📍 CAM STABLE · 60 s scripted drive…'}
