@@ -424,7 +424,7 @@ function lmNear(x,z,m=0){for(const L of LMX)if(Math.hypot(x-L.x,z-L.z)<L.r+m)ret
 function rfFree(x,z,m=0){return x>HX0+20&&x<HX1-20&&z>HZS+20&&z<HZN-30&&!PLAZAS.some(R=>inR(R,x,z,m))&&!PARKS.some(R=>inR(R,x,z,m))&&!lmNear(x,z,m)&&hillH(x,z)<.2}
 function fillAt(x,z,skip){if(!FILL_G)return null;const kx=Math.floor(x/64),kz=Math.floor(z/64);let bd=1e9,br=null;for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){const L=FILL_G.get((kx+a)*100000+kz+c);if(L)for(const r of L){if(r===skip)continue;const t=clamp((x-r.x0)*r.ux+(z-r.z0)*r.uz,0,r.L),d=Math.hypot(r.x0+r.ux*t-x,r.z0+r.uz*t-z);if(d<bd){bd=d;br=r}}}return br?{d:bd,r:br}:null}
 function rfGrid(){if(FILL_R)return;FILL_R=[];FILL_G=new Map();BLOCK_C=[];
-  const okPt=(G,x,z,vert)=>{if(gridAt(x,z)!==G||!rfFree(x,z,4)||inRiver(x,z,-(G.w/2+12)))return false;const q=cityAt(x,z);if(q&&(q.road.cls==='ped'||q.road.cls==='hill')&&q.d<q.road.w/2+G.w/2+3)return false;if(q&&Math.abs(vert?q.p.tz:q.p.tx)>.8&&q.d<q.road.w/2+G.w/2+14)return false;return true};
+  const okPt=(G,x,z,vert)=>{if(gridAt(x,z)!==G||!rfFree(x,z,4)||lmNear(x,z,G.w/2+16)||inRiver(x,z,-(G.w/2+12)))return false;const q=cityAt(x,z);if(q&&(q.road.cls==='ped'||q.road.cls==='hill')&&q.d<q.road.w/2+G.w/2+3)return false;if(q&&Math.abs(vert?q.p.tz:q.p.tx)>.8&&q.d<q.road.w/2+G.w/2+14)return false;return true};
   for(const G of GRIDS){const xs=[],zs=[];for(let x=Math.ceil(G.x0/G.sp)*G.sp;x<G.x1;x+=G.sp)xs.push(x);for(let z=Math.ceil(G.z0/G.sp)*G.sp;z<G.z1;z+=G.sp)zs.push(z);G.xs=xs;G.zs=zs;
     for(const vert of[1,0])for(const c of vert?xs:zs){const a0=vert?G.z0:G.x0,a1=vert?G.z1:G.x1;let s=null,la=null;
       const fl=e=>{if(s!=null&&e-s>=50){const r=vert?{x0:c,z0:s,x1:c,z1:e}:{x0:s,z0:c,x1:e,z1:c};r.w=G.w;r.v=vert;r.g=G.gi;r.L=e-s;r.ux=vert?0:1;r.uz=vert?1:0;FILL_R.push(r)}s=null};
@@ -441,7 +441,12 @@ function hubRoads(){rfGrid();return FILL_R}
 {const _rg=rfGrid;rfGrid=function(){const was=FILL_R;_rg();if(!was&&FILL_R&&CID==='fra'&&TR_RG)try{const W=TR_W||TR_init(),T0=performance.now();const R=FILL_R.map(f=>({P:[[f.x0,f.z0],[f.x1,f.z1]],hw:f.w/2}));for(const S of CITY_S)if(S.r.cls!=='hill')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
     W.trf={n:TR_grade(W,R,{skip:TR_rivSkip,pin:TR_rivPin,flat:W.r+4,junc:TR_padList()})};W.trf.ms=Math.round(performance.now()-T0);TR_bridgeEnds()}catch(e){(TR_W||{}).trf={err:String(e)}}}}
 // footprint test for buildings (9 points of the rotated rectangle): off streets, filler roads, water, plazas/parks/landmarks
-function fpOK(x,z,w,d,ry,lm=true){const c=Math.cos(ry),s=Math.sin(ry);for(const[a,b]of[[0,0],[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5],[0,-.5],[0,.5],[-.5,0],[.5,0]]){const lx=a*w,lz=b*d,px=x+lx*c+lz*s,pz=z-lx*s+lz*c;
+// athroads: true when a street or filler road reaches within r m of (x,z) (kerb included)
+function fpRoad(x,z,r){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+r)return true;const f=fillAt(x,z);return!!(f&&f.d<f.r.w/2+r)}
+const FP_9=[[0,0],[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5],[0,-.5],[0,.5],[-.5,0],[.5,0]];
+// athroads: a big footprint (> 12 m) is tested on a ≤ 5 m grid, not 9 points (a 45 m block used to straddle a narrow filler road between its sample points)
+function fpPts(w,d){if(w<=12&&d<=12)return FP_9;const P=FP_9.slice(),nx=Math.ceil(w/5),nz=Math.ceil(d/5);for(let i=0;i<=nx;i++)for(let j=0;j<=nz;j++)P.push([i/nx-.5,j/nz-.5]);return P}
+function fpOK(x,z,w,d,ry,lm=true){const c=Math.cos(ry),s=Math.sin(ry);for(const[a,b]of fpPts(w,d)){const lx=a*w,lz=b*d,px=x+lx*c+lz*s,pz=z-lx*s+lz*c;
     if(!(px>HX0+10&&px<HX1-10&&pz>HZS+10&&pz<HZN-10))return false;const q=cityAt(px,pz);if(q&&q.d<q.road.w/2+(SC_S&&SC_S.on?SC_K.sbF:2.5))return false;const f=fillAt(px,pz);if(f&&f.d<f.r.w/2+(SC_S&&SC_S.on?SC_K.sbF:2.5))return false;if(inRiver(px,pz,-10)||hillH(px,pz)>.3||TR_onCrown(px,pz))return false;
     if(PLAZAS.some(R=>inR(R,px,pz,2))||PARKS.some(R=>inR(R,px,pz,2))||(lm&&lmNear(px,pz)))return false}return true}
 const onAnyDeck=(x,z)=>{for(const b of ALL_DECKS){const h=deckAt(b,x,z);if(h!=null)return b}return null};
