@@ -289,7 +289,7 @@ function CV_pre(dt){const N=HUB.nodes;CV.acc+=dt;CV.fr=(CV.fr||0)+1;if(CV.acc>=.
   for(const c of HUB.cars){if(!c.CVn||c.dead>0)continue;const A=N[c.a],B=N[c.b];if(A&&B){const L=Math.hypot(B.x-A.x,B.z-A.z)||1;c.CVhx=(B.x-A.x)/L;c.CVhz=(B.z-A.z)/L}
     c.CVin=null;CV_near(c.x,c.z,J=>{if(Math.hypot(J.x-c.x,J.z-c.z)>=J.R0)return false;if(!c.CVin||J.sig)c.CVin=J;if(J.of!==CV.fr){J.of=CV.fr;J.oc=[]}J.oc.push(c);if(J.sig&&c.CVgh!==J){const r=J.res||(J.res=new Map());if(!r.has(c))r.set(c,CV.t)}return false})}
   for(const J of CV.act||[])if(J.res)for(const[c,t]of J.res){const rx=J.x-c.x,rz=J.z-c.z,l=Math.hypot(rx,rz);if(CV.t-t>7&&c.CVin===J)c.CVgh=J;if(c.dead>0||!c.CVn||CV.t-t>7||l>J.R0+1&&rx*c.CVhx+rz*c.CVhz<0||l>J.R0+30)J.res.delete(c)}
-  CV.act=new Set();
+  if(CV.act)CV.act.clear();else CV.act=new Set();// perf-2: reused (was a new Set per frame)
   for(const c of HUB.cars){c.RDy=null;if(c.CVr&&c.route&&!c.route.length){c.route=null;c.CVr=0}if(!c.CVn||c.dead>0)continue;const A=N[c.a],B=N[c.b];if(!A||!B)continue;let vm=1e9;const g=CV.seg.get(c.a*CV.K+c.b),In=c.CVin;if(In)CV.act.add(In);
     let J=null,jd=1e9;if(!In||!In.sig)CV_near(c.x,c.z,Q=>{if(Q===In)return false;const rx=Q.x-c.x,rz=Q.z-c.z,l=Math.hypot(rx,rz),e=l-(Q.sig?1e3:0);if(l<Q.R0+(Q.sig?40:16)&&e<jd&&rx*c.CVhx+rz*c.CVhz>l*.45&&Math.abs(rx*c.CVhz-rz*c.CVhx)<Q.R0*.8){jd=e;J=Q}return false});
     if(J){CV.act.add(J);let d=Math.hypot(J.x-c.x,J.z-c.z)-J.R0,k=-1,bd=-2;J.ap.forEach((a,i)=>{const v=a.dx*c.CVhx+a.dz*c.CVhz;if(v>bd){bd=v;k=i}});if(k>=0)d=(J.x-c.x)*J.ap[k].dx+(J.z-c.z)*J.ap[k].dz-J.R0;c.CVf=J.id*8+k;const res=J.res||(J.res=new Map());

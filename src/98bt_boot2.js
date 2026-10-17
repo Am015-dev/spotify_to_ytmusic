@@ -7,8 +7,9 @@ const BOOT2=!/[?&]boot2=0/.test(location.search);
 const BOOT2G=!/[?&]boot2g=0/.test(location.search);// ground/Autobahn deferral, ON (boot-3: the outer land is a generator, one ground cell per step, nearest 1 km tile first; ?boot2g=0 = in the loader)
 const B2={q:[],on:false,defer:false,ms:{},t0:0,done:0};
 function B2_slice(gen,first){if(first)B2.q.unshift(gen);else B2.q.push(gen)}
-function B2_pump(){if(!B2.q.length){B2.on=false;B2.done=performance.now();return}const t=performance.now();
-  try{while(B2.q.length&&performance.now()-t<8){const g=B2.q[0];let r;try{r=g.next()}catch(e){console.error(e);r={done:true}}if(r.done)B2.q.shift()}}catch(e){console.error(e)}
+// perf-2: slice 4 ms (was 8) and never past the idle deadline, so an idle slice cannot push the next frame out (B2_pump was 6 s in 20 s of driving)
+function B2_pump(dl){if(!B2.q.length){B2.on=false;B2.done=performance.now();return}const t=performance.now(),B=Math.max(1.5,Math.min(4,dl&&dl.timeRemaining&&!dl.didTimeout?dl.timeRemaining()-1:4));
+  try{while(B2.q.length&&performance.now()-t<B){const g=B2.q[0];let r;try{r=g.next()}catch(e){console.error(e);r={done:true}}if(r.done)B2.q.shift()}}catch(e){console.error(e)}
   (window.requestIdleCallback?f=>requestIdleCallback(f,{timeout:60}):requestAnimationFrame)(B2_pump)}
 function B2_start(){if(B2.on||!B2.q.length)return;B2.on=true;B2.t0=performance.now();requestAnimationFrame(()=>requestAnimationFrame(B2_pump))}
 if(BOOT2){
