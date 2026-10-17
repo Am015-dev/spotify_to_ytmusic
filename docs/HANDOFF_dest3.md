@@ -1,0 +1,6 @@
+# HANDOFF dest3 (2026-10-17): shortcut placement + scripted GO, default stays OFF (?dest=1), pushed to alex/dest-wip, NOT trunk
+1. Done: finder needs road route >= 1.45x the straight line (>= 31 % saved) and 60-130 m long (longer ones kept hitting streamed or moving obstacles), denser corridor sampling; GO drives a scripted straight line (heading follows the line, snapped back if bumped) and needs >= 20 % saved. Unit 0 FAIL (5312).
+2. Built page, sequential: dest/shortcut green in Athens (all runs); Frankfurt still red (last run 7 of 8 pass, one weak one saves 15 %; before the 130 m cap two long ones stalled with 18 and 3 hard stops). Fra dest/stops also went red once on the last run (1 -> 0 but noisy, wander counts vary).
+3. rv2k2/burst, xf1/*, life1/people, life1/ath-density: all green on this build and on trunk 4ccd800 (the dest2 reds were load timing). No reds beyond dest/*.
+4. Shot (852x393, tools/dest/shots.js): came out blank white (swiftshader did not draw the world), arrows NOT seen. No OD_CHANGELOG entry.
+5. Next: drop shortcuts that stall once in Fra (re-check by a short real drive, not just colliders), re-run dest/ in fra twice, retake the shot, then flip default ON and merge to od-int2.
