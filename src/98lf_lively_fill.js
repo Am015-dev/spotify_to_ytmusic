@@ -27,7 +27,7 @@ LF.R={tuft:350,bed:380,patch:700,pond:900,reed:300,mound:1400};LF.M=[];LF.MG=new
 const LF_h=(x,z,s)=>{let h=Math.sin(x*12.9898+z*78.233+(s||0)*37.719)*43758.5453;return h-Math.floor(h)};
 const LF_n=(x,z)=>{const a=x/160,b=z/160,i=Math.floor(a),j=Math.floor(b),u=a-i,v=b-j,s=t=>t*t*(3-2*t),q=(p,r)=>LF_h(p,r,7);return q(i,j)*(1-s(u))*(1-s(v))+q(i+1,j)*s(u)*(1-s(v))+q(i,j+1)*(1-s(u))*s(v)+q(i+1,j+1)*s(u)*s(v)};
 function LF_mound(x,z){const L=LF.MG.get(Math.floor(x/64)*10000+Math.floor(z/64));if(!L)return 0;let h=0;for(const m of L){const q=((x-m.x)**2+(z-m.z)**2)/(m.r*m.r);if(q<1){const k=1-q;h=Math.max(h,m.h*k*k)}}return h}
-roamTerr=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r.deck&&LF.MG.size){const m=LF_mound(x,z);if(m>0)r.g+=m}return r})(roamTerr);
+roamTerr=(f=>function(x,z,y,o){const r=f(x,z,y,o);if(!r.deck&&LF.MG.size){const m=LF_mound(x,z);if(m>0)r.g+=m}return r})(roamTerr);
 // foot-2: a dirt/sand/grass PATCH is a tilted plane draped on the ground under it (planar fit + lift so it never dips under the terrain / a mound),
 // and its top is part of the walk/drive height: LF_patchY(x,z) = the plane's top inside the 9-gon, else null. The figure's feet and the tyres use the SAME surface as the mesh.
 LF.PG=new Map();const LF_PPOLY=[];for(let i=0;i<9;i++){const a=i/9*Math.PI*2,r=.75+.25*LF_h(i,3,1);LF_PPOLY.push([Math.cos(a)*r,-Math.sin(a)*r])}
@@ -36,7 +36,7 @@ function LF_patchY(x,z){const A=LF.PG.get(Math.floor(x/32)*10000+Math.floor(z/32
   for(let i=0,j=8;i<9;j=i++){const a=LF_PPOLY[i],b=LF_PPOLY[j];if((a[1]>lz)!==(b[1]>lz)&&lx<(b[0]-a[0])*(lz-a[1])/(b[1]-a[1])+a[0])ins=!ins}
   if(ins){const y=p.yt+p.gx*dx+p.gz*dz;if(best==null||y>best)best=y}}
  return best}
-roamTerr=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r.deck&&LF.PG.size){const t=LF_patchY(x,z);if(t!=null&&t>r.g&&t-r.g<.8)r.g=t}return r})(roamTerr);
+roamTerr=(f=>function(x,z,y,o){const r=f(x,z,y,o);if(!r.deck&&LF.PG.size){const t=LF_patchY(x,z);if(t!=null&&t>r.g&&t-r.g<.8)r.g=t}return r})(roamTerr);
 // cheapest checks first (grid lookups), trail distance (a loop over every trail point) last; returns the road-edge distance or -1
 function LF_open(x,z){if(roamHit(x,z,5))return -1;const q=cityAt(x,z),f=fillAt(x,z),d=Math.min(q?q.d-q.road.w/2:1e9,f?f.d-f.r.w/2:1e9);if(d<7)return -1;
  if(inRiver(x,z,-12)||onAnyDeck(x,z))return -1;const a=abAt(x,z);if(a&&a.d<a.road.w/2+14)return -1;if(RO.ramps&&RO.ramps.some(r=>Math.abs(r.x-x)<30&&Math.abs(r.z-z)<30))return -1;
