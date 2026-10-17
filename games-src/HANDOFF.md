@@ -464,3 +464,9 @@ Asset slots: `python3 games-src/nightrun/wp-assets.py` regenerates the wpmount-*
 Next: owner supplies the art; tune `RIG.hp` once the real ship pictures are checked on a phone (hardpoints are guesses); in-run armed composite is off (`RIG.armedRun`, not wired).
 
 - 16 Oct 2026 Nightrun B8 Heat ladder live (flag RET.heat, parts/ret.js; hooks in story.js setLevel, b.js tier decay, map.js plate). Bot clears Heat 1-3 at 90-100% on stages 1/8/20: steeper early steps are a follow-up (ret-heat-test.js HEATSET env tunes order/lvK). ret-arcade-test fails on stage 30 arcade length with or without Heat.
+
+## Nightrun: checkpoints with grace (parts/cp.js, flag RET.cp, `?cp=0` = off)
+- Stages of 150 s or more that are not arcade-cut (Classic length, long boss approach): a checkpoint at about 1/3 and 2/3 (bar-aligned, never in a boss fight or the last 15 s). Flags on the progress bar, CHECKPOINT banner, existing `up` sting.
+- Death after one: run-end shows RESUME FROM CHECKPOINT (once per checkpoint, 2 per stage). A resume repeats the startStory calls with `runStart {resume:true}` (add-on counters should ignore `d.resume`), puts the snapshot back, moves G.dbar/G.dt and the song/beat clock (BT.t0, file restarted at that place) to the bar, half hull (>= 2), 3 s grace + shimmer.
+- Marked ↺ = counts as an assist run (RET.assistRun: no Heat medal, no records), Neon x0.75 (payClear and banked), no hull-lost star. Death bank is refunded on resume.
+- Test: `NODE_PATH=$(npm root -g) node games-src/nightrun/ret-cp-test.js` (34 checks). No pictures added, so no asset manifest entries. afk-test is flaky under load (fails ~1 in 2 on the baseline too; rerun alone).
