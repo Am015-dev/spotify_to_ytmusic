@@ -1,0 +1,11 @@
+// crash-1: who creates the GPU geometries that leave the scene without dispose(). node tools/crash1/tLeak.js <page url> [secs=90]
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,SEC]=process.argv.slice(2);const UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:UA});const p=await ctx.newPage();p.setDefaultTimeout(600000);
+ await p.goto(BASE+(BASE.includes('?')?'&':'?')+'test=fra&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:240000});const ev=s=>p.evaluate(s=>__xc.ev(s),s);
+ await ev(`{K.ArrowUp=true;for(let i=0;i<1800;i++){K.ArrowLeft=((i/90|0)%3===0);roamStep(1/30)}__tq.draw();
+  const P=THREE.BufferGeometry.prototype,sa=P.setAttribute,di=P.dispose;window.__LK=new Set;P.setAttribute=function(){if(!this.__lk){this.__lk=(new Error().stack||'').split('\\n').slice(2,6).map(s=>s.trim().replace(/\\(?http[^)]*\\/([^/:]*:\\d+):\\d+\\)?/,'$1')).join(' < ');__LK.add(this)}return sa.apply(this,arguments)};
+  P.dispose=function(){__LK.delete(this);return di.apply(this,arguments)};const C=THREE.BufferGeometry.prototype.clone;P.clone=function(){const g=C.apply(this,arguments);g.__lk=(new Error().stack||'').split('\\n').slice(2,6).map(s=>s.trim()).join(' < ');__LK.add(g);return g};window.__G0=renderer.info.memory.geometries}`);
+ for(let k=0;k<(+SEC||90)/10;k++)await ev(`{K.ArrowUp=true;for(let i=0;i<300;i++){K.ArrowLeft=((i/90|0)%3===0);roamStep(1/30)}__tq.draw()}`);
+ const r=await ev(`(()=>{const live=new Set;scene.traverse(o=>{if(o.geometry)live.add(o.geometry)});const by={};let n=0,ns=0;for(const g of __LK){if(live.has(g)){ns++;continue}n++;const k=String(g.__lk).slice(0,330);by[k]=(by[k]||0)+1}
+  return{geoNow:renderer.info.memory.geometries,geo0:__G0,trackedOff:n,trackedInScene:ns,top:Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,8)}})()`);
+ console.log(JSON.stringify(r,null,1));await b.close()})();

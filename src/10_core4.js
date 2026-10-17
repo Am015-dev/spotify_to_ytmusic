@@ -184,6 +184,9 @@ const scene=new THREE.Scene();
 const FOGC=new THREE.Color('#1c1030');scene.fog=new THREE.FogExp2(FOGC,0.00042);
 const camera=new THREE.PerspectiveCamera(64,1,.4,9000);scene.add(camera);
 let lowGfx=matchMedia('(pointer:coarse)').matches;
+// crash-1: low-memory tier, auto on iPhone/iPad/Android (iOS Safari kills the tab when the page gets too big). ?lowmem=0 off, ?lowmem=1 on anywhere
+function LOWMEM_is(u,tp,q){if(q==='0'||q==='1')return q==='1';return /iPhone|iPad|iPod|Android/.test(u||'')||/Macintosh/.test(u||'')&&tp>1}
+const LOWMEM=LOWMEM_is(navigator.userAgent,navigator.maxTouchPoints,new URLSearchParams(location.search).get('lowmem'));window.__lowmem=LOWMEM;
 // adaptive difficulty: rating -1..1 moves after each race; AI pace = setting x (1 +- 6%)
 const adaptR=()=>store.get('mho_adapt',0),adaptMul=()=>SET.adapt==='off'?1:1+.06*adaptR(),diffMul=()=>({relaxed:.93,normal:1,hard:1.06}[SET.diff]||1)*adaptMul();
 function adaptAfter(place,n,margin){if(n<2)return;let d=place===1?(margin>4?.3:.15):place<=3?.05:place>=Math.max(4,Math.ceil(n*.6))?-.25:-.1;const r=clamp(adaptR()+d,-1,1);store.set('mho_adapt',+r.toFixed(2));return r}
@@ -218,7 +221,7 @@ const DPR2=()=>Math.min(devicePixelRatio||1,2);
 const DRES={s:1,t:0,n:0,sum:0,sq:0,skip:0};function dresStep(ms){if(SET.dres!=='on'||paused||document.hidden||!(state==='roam'||state==='race'||state==='countdown')||ms>150||ms<=0){DRES.t=DRES.n=DRES.sum=DRES.sq=0;return}DRES.t+=ms;DRES.sum+=ms;DRES.sq+=ms*ms;DRES.n++;if(DRES.t<2000)return;const a=DRES.sum/DRES.n,sd=Math.sqrt(Math.max(0,DRES.sq/DRES.n-a*a)),cap30=Math.abs(a-33.3)<3&&sd<4;DRES.t=DRES.n=DRES.sum=DRES.sq=0;if(DRES.skip>0){DRES.skip--;return}
   // a steady ~33 ms is the browser's 30 fps cap (iOS low power mode), not the GPU struggling: keep the resolution
   const s=a>22&&!cap30?Math.max(.6,DRES.s-.15):a<15||cap30&&DRES.s<1?Math.min(1,DRES.s+.1):DRES.s;if(s!==DRES.s){const p0=renderer.getPixelRatio();DRES.s=s;resize();if(renderer.getPixelRatio()===p0&&a>22)DRES.s=s+.15;DRES.skip=1}}
-function resize(){const w=innerWidth,h=innerHeight;const cap={std:1.5,sharp:2,max:3}[SET.res]||{low:1,med:1.5,high:2}[SET.q],bud=lowGfx?3.4e6:2.8e6;let pr=Math.min(devicePixelRatio||1,cap);if(w*h*pr*pr>bud)pr=Math.sqrt(bud/(w*h));if(SET.dres==='on'&&DRES.s<1)pr=Math.max(Math.min(pr,1),pr*DRES.s);renderer.setPixelRatio(pr);renderer.setSize(w,h,false);composer.setPixelRatio(pr);composer.setSize(w,h);bloom.resolution.set(w*pr/2,h*pr/2);SPRSCALE.value=h*pr*.5/Math.tan(THREE.MathUtils.degToRad(34));camera.aspect=w/h;camera.updateProjectionMatrix()}
+function resize(){const w=innerWidth,h=innerHeight;const cap=Math.min(LOWMEM?1.5:3,{std:1.5,sharp:2,max:3}[SET.res]||{low:1,med:1.5,high:2}[SET.q]),bud=lowGfx?3.4e6:2.8e6;let pr=Math.min(devicePixelRatio||1,cap);if(w*h*pr*pr>bud)pr=Math.sqrt(bud/(w*h));if(SET.dres==='on'&&DRES.s<1)pr=Math.max(Math.min(pr,1),pr*DRES.s);renderer.setPixelRatio(pr);renderer.setSize(w,h,false);composer.setPixelRatio(pr);composer.setSize(w,h);bloom.resolution.set(w*pr/2,h*pr/2);SPRSCALE.value=h*pr*.5/Math.tan(THREE.MathUtils.degToRad(34));camera.aspect=w/h;camera.updateProjectionMatrix()}
 addEventListener('resize',resize);resize();
 const hemi=new THREE.HemisphereLight(0x6a5ab0,0x180e2c,.6);scene.add(hemi);
 const moonL=new THREE.DirectionalLight(0xc9d2ff,.45);moonL.position.set(-400,600,-300);scene.add(moonL);
