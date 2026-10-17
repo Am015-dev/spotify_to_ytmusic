@@ -182,3 +182,35 @@ Owner (third report): "extremely easy even on Legend ... my missiles shoot targe
 | dodging bot Legend max 20/30/40 | 0 / 0 / 100% | 33 / 0 / 100% (RUNS 3) |
 | Normal mid 8/20 | 100% | 100% |
 - Weak: stage 30 is still a wall for the dodging bot (deaths are rams by chargers and drones plus bullets: the bot's dodger does not avoid bodies well; not a ceiling effect at .8 f), the final boss stays bot-clearable (12 hits absorbed by revives/shields), Legend bands are still bimodal per stage.
+
+## Boss fights, round 4 (flag RET.boss2, 17 Oct 2026; `?boss2=0` = round 3 exactly)
+Owner, after playing the live build: "Legend is still easy but the difficulty increased, boss fights are still short"; earlier: "even boss I can beat in seconds". Bot numbers are not trusted for this, so the floor is a hard rule that does not depend on the bot. Code: `parts/armour.js` (after hard.js; a numbered `boss2.js` is refused by guard.py), two one-line sheen hooks in `c.js` (boss bar, landscape + portrait). Gate: `boss2-test.js`.
+**Change:**
+1. Hard damage-rate cap: a boss loses at most `max / (T x 1.06)` HP in any rolling 1 s window, booked in `DMG.pass`, which runs right before the only place a boss can die (b.js update). Every source lowers `e.hp`, so homing, bomblets, mines, chains, blades, power-ups (nova is flat .6 x, never % HP), wingmates and blasts are all capped. Floors T (s): mini 50 Normal / 70 Legend, district 80 / 110, final 120 / 170 (Easy, Hard and Very hard in between, table `B2X.T`). Damage above the cap = armour: sparks, a dull hit sound, "ARMOUR HOLDS" (every 5 s at most), a white sheen on the boss bar. hard.js's repair runs at most .4 x the cap.
+2. Three phases by HP (66% / 33%), started only on a bar line; the HP is held at the phase line until then; 1 bar of calm (no boss bullets) after each change. Phase 2: new pattern order (the patterns phase 1 never used come first) + fair.js's shield cores (the 33% shield is off: phase 3 has its own verb). Phase 3: fans one size up (fanN / ebCap still apply), music intensity layer, a lane beam aimed at the ship's row every 2nd bar (warned 1 beat on the hard tiers, 2 on Normal / Easy; 44 px band, the ship moves out of it), and a last stand at 12%: EXPOSED, the boss fires nothing for 8 beats.
+3. Power: hull x1.8; a ship whose landed damage cannot finish by 1.2 T has its boss damage raised up to x12 (only damage that lands; the cap still holds the floor).
+**Measured** (`boss2-test`: 1e6 HP of damage every frame = any build; balance-test GOD=1, dodging bot, RUNS 2):
+| fight | before (max build) | god-damage stress after (floor) | max build after | fresh ship after |
+|---|---|---|---|---|
+| Normal mini (stages 5/13/21/29/37) | 28-29 s | 51-65 s (50) | 64-66 s | 79-81 s |
+| Normal district (8/16/24) | 74 s | 84 s (80) | 103-109 s | 129-131 s |
+| Normal final (32/40) | 63 s | 127 s (120) | 164-171 s | 197-198 s |
+| Legend mini | 52-105 s | 73-91 s (70) | 95-104 s | 109-112 s |
+| Legend district | 74-80 s | 116 s (110) | 229-236 s | 184-186 s |
+| Legend final | 67-106 s | 180 s (170) | 278-291 s | 319-352 s |
+- Every boss on both tiers: phases 2 and 3 start on a bar line, calm bar, armour feedback, last stand (boss2-test).
+- Weak: Legend district and final run LONG for the bot (229-291 s vs 110-170 / 170-260 targets) and the fresh ship is above 1.3 x floor on every tier (Normal mini 80 vs 65): the x12 help does not reach the target; suspected cause the Legend core shields (2 cores under hard.js's ceiling) and hard.js's x.35 auto-aim on bosses. scale2/scale3-test boss windows moved to the round-4 targets (Legend final upper bound 340, target not reached). afk-test stage 42 "dodging bot died" fails before and after (not this change).
+
+### Boss fights, round 4b (18 Oct 2026: the cap, not the bot's rhythm, repair or shields, sets the length)
+Problem: with the round-4 cap the Legend bot (max build) needed 339-362 s for the final boss and ~233 s for a district boss (targets Legend 70-110 / 110-170 / 170-260, Normal 50-80 / 80-120 / 120-180). Measured: raw damage was 3-4x the cap on average, yet the HP fell at only ~45% of the cap, because (1) damage above the cap in a second was thrown away while the bot's damage arrives in bursts (beat taps, salvos, bombs), so quiet seconds were not paid back; (2) hard.js's "repair without aimed hits" (1.2%/s) ate damage before it reached the cap; (3) fair.js's 66% core shield froze the bar 4-52 s (a bot artifact, but it added straight on top of the cap).
+**Change (all inside `RET.boss2`, `?boss2=0` = round 3):** armour.js `B2X.BK=5`: damage above the cap waits in the armour (at most 5 s of the cap) and goes in at the cap's pace, so the floor is unchanged (never more than the cap in 1 s) and the length is decided by the cap; `B2X.SHT=14`: a core shield that lasts more than 14 s overloads (cores blow, "SHIELD OVERLOAD"); hard.js: the boss repair runs only while the ship camps (`CAMP.on`), and then at most `B2X.REP=.2` x the cap (was .4).
+**Measured** (god mode, dodging bot, max build, RUNS 2-3; on-screen time): 
+| fight | round 4 | now moving | now parked (camper) | god-damage stress | fresh ship |
+|---|---|---|---|---|---|
+| Legend mini | 95-105 | 78-87 | 88-109 | 73 | 78 |
+| Legend district | 229-236 | 127-133 | 132 | 116 | 120 |
+| Legend final | 278-362 | 194-202 | 212-234 | 180 | 195 |
+| Normal mini | 64-66 | 53-60 | 54-67 | 52 | 55-57 |
+| Normal district | 103-109 | 87-92 | 87-96 | 84 | 87 |
+| Normal final | 164-171 | 128-141 | 131-138 | 127 | 131-136 |
+scale2-test / scale3-test Legend final window is back at 170-260 s; boss2-test's stress now also checks the upper targets.

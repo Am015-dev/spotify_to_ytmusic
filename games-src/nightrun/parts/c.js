@@ -44,7 +44,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
   if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);ctx.textAlign='center';ctx.font='700 15px "Chakra Petch",sans-serif';{const tw=ctx.measureText(G.hint.txt).width;UIK.bubble(ctx,W/2-tw/2-26,H-62-26,tw+52,40);}ctx.fillStyle='#ffffff';ctx.fillText(G.hint.txt,W/2,H-62);ctx.globalAlpha=1;});
   if(!mn){SH.hud(ctx,t,{nx:24,ny:90,dx:216,dy:H-52,sx:18,sy:H-60,ring:true});HUDX.ship(ctx,P.x,P.y,1,t);}else HUDX.ship(ctx,P.x,P.y,1,t);
   // boss bar
-  if(G.boss&&G.boss.x<W){const b=G.boss;ctx.fillStyle='#00000088';ctx.fillRect(W/2-200*ku,30*ku,400*ku,8*ku);ctx.fillStyle='#ff3040';ctx.fillRect(W/2-200*ku,30*ku,400*ku*clamp(b.hp/b.max,0,1),8*ku);
+  if(G.boss&&G.boss.x<W){const b=G.boss;ctx.fillStyle='#00000088';ctx.fillRect(W/2-200*ku,30*ku,400*ku,8*ku);ctx.fillStyle='#ff3040';ctx.fillRect(W/2-200*ku,30*ku,400*ku*clamp(b.hp/b.max,0,1),8*ku);if(b.b2s&&window.B2X)B2X.sheen(W/2-200*ku,30*ku,400*ku*clamp(b.hp/b.max,0,1),8*ku);
     ctx.textAlign='center';ctx.font=`700 ${12*ku}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),W/2,24*ku);}
   // banner
   if(G.banner.t>0){const k=G.banner.t,m=G.banner.m,a=Math.min(1,k*2,(m-k)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
@@ -77,7 +77,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
     ctx.fillStyle='#ffffff1a';ctx.fillRect(rx-bwd,25*k,bwd,7*k);ctx.fillStyle=P.over?(SET.reduce||Math.floor(t*10)%2?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(rx-bwd,25*k,bwd*P.heat/100,7*k);}
   Object.assign(HUDLOG,{x:HUDX.vals()});
   let ny=sH+6*k;
-  if(G.boss&&G.boss.x<W){const b=G.boss,bw=Math.min(330,w-120);ctx.fillStyle='#00000088';ctx.fillRect((w-bw)/2,ny+12*k,bw,6*k);ctx.fillStyle='#ff3040';ctx.fillRect((w-bw)/2,ny+12*k,bw*clamp(b.hp/b.max,0,1),6*k);
+  if(G.boss&&G.boss.x<W){const b=G.boss,bw=Math.min(330,w-120);ctx.fillStyle='#00000088';ctx.fillRect((w-bw)/2,ny+12*k,bw,6*k);ctx.fillStyle='#ff3040';ctx.fillRect((w-bw)/2,ny+12*k,bw*clamp(b.hp/b.max,0,1),6*k);if(b.b2s&&window.B2X)B2X.sheen((w-bw)/2,ny+12*k,bw*clamp(b.hp/b.max,0,1),6*k);
     ctx.textAlign='center';ctx.font=`700 ${11*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),w/2,ny+9*k);ny+=21*k;}
   {let cx=pad;const cy=ny+12*k;ctx.save();
     if(SH.sh>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iShield,'#19e3ff','×'+SH.sh);

@@ -4,6 +4,10 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun boss fights round 4 (flag RET.boss2, 17 Oct 2026)
+- Done + live: `parts/armour.js` (hard damage-rate cap per boss = max/T over a rolling 1 s, HP phases on bar lines with a calm bar, phase-3 lane beams + EXPOSED last stand, weak-ship help), gate `nightrun/boss2-test.js`. `?boss2=0` = before. Numbers: BALANCE.md "Boss fights, round 4".
+- The floor holds for every boss and tier under a 1e6-HP/frame stress test. Normal max build is inside every target window.
+- Next: Legend district/final run long (229-291 s) and fresh ships run above 1.3x floor. Look at the Legend core shields and hard.js bA=.35 on bosses before touching the cap.
 ## Nightrun zoo: time to kill them all + 8 new enemies (17 Oct 2026)
 - Done: `nightrun/parts/zoo.js` (built after leak.js; flag `RET.zoo`, `?zoo=0` = old). Drones and flankers enter, hover on a spread-out slot in the right 60% for N beats
   (Easy 6, Normal 5, Hard 4, Very hard/Legend 3), then leave; busy screen (ZOO.cap) defers a wave in 2-beat steps. Hard/Legend flyers enter x.8 / x.9.

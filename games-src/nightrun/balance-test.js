@@ -6,7 +6,7 @@
 // Prints pass/fail lines against the targets in BALANCE.md (late build).
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
-const RUNS = +process.env.RUNS || 3, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 420;
+const RUNS = +process.env.RUNS || 3, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 600;   // 600: a Legend final boss lasts 170-260 s (boss fights round 4)
 const STAGES = (process.env.STAGES || '1,8,20,30,42').split(',').map(Number);
 const DFS = (process.env.DIFFS || 'easy,normal,hard').split(','), BUILDS = (process.env.BUILDS || 'fresh,mid,late').split(',');
 function freePort() { return new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); }); }
@@ -80,7 +80,7 @@ const BOT = (opts) => {
     r.fired = shooters.has(e); r.on = r.in >= 0 ? +(r.end - r.in).toFixed(2) : 0; if (cleared && r.end >= m.G.t - 4 && r.in < 0) r.killed = false; r.unseen = r.killed && r.in < 0 && !r.ram;   // a ram (the ship touched it) is seen   // the stage-clear wipe in its last seconds is not a kill
     out.push({ ty: r.boss ? (r.mini ? 'miniboss' : 'boss') : r.ty, el: r.el, sx: r.sx, ix: r.ix, dx: r.dx, on: r.on, fired: r.fired, killed: !!r.killed, ram: !!r.ram, unseen: r.unseen });
   }
-  const res = { n, build, diff, clear: cleared, dead: m.G.dead, t: +m.G.t.toFixed(1), hits: m.ST.hits, causes, dps: dN ? Math.round(dS / dN) : 0, k: dN ? +(kS / dN).toFixed(2) : 1, fight: bt0 >= 0 ? +((cleared ? bt1 : m.G.t) - bt0).toFixed(1) : 0, en: out };
+  const res = { n, build, diff, clear: cleared, dead: m.G.dead, t: +m.G.t.toFixed(1), hits: m.ST.hits, causes, dps: dN ? Math.round(dS / dN) : 0, k: dN ? +(kS / dN).toFixed(2) : 1, dbg: window.__dbg || null, fight: bt0 >= 0 ? +((cleared ? bt1 : m.G.t) - bt0).toFixed(1) : 0, en: out };
   m.abort(); return res;
 };
 (async () => {
