@@ -10,7 +10,7 @@
 //   node tools/tChkGo.js <base url of the build, e.g. http://localhost:8811/index.html> <outdir> [filter substring]
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
 const BASE=process.argv[2],OUT=process.argv[3]||'.',FIL=process.argv[4]||'';fs.mkdirSync(OUT,{recursive:true});
-const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works while/i;
+const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: tools/chkgo_verdict.js (a throwing GO is FAIL)
 (async()=>{const T0=Date.now(),b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const errs=[],boots={},res=[],RS={n:0,ms:0};let nav=0,p=null;const FC={};
  const newPage=async()=>{p=await ctx.newPage();p.setDefaultTimeout(120000);p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});p.on('framenavigated',f=>{if(f===p.mainFrame())nav++})};await newPage();
@@ -28,14 +28,14 @@ const BAD=/❌|can't|no .* nearby|loading a test drive|first|get back|works whil
  const LAST=['v90k/rv-scale','v90k/ww-card','v90k/park-sit'],pick=c=>all.filter(([id,cc])=>cc===c&&want(id)).map(([id])=>id).sort((a,b)=>(process.env.SMOKE?LAST.includes(a)-LAST.includes(b):0)).filter(id=>{const k=kind[id]&&c+kind[id];if(!k)return true;if(seen[k]){same[id]=seen[k];return false}seen[k]=id;return true});
  const run=async(c,ids)=>{for(const id of ids){const e0=errs.length;let said='';
    if(id==='rv2k2/traffic'&&res.some(r=>r.id==='rv2k2/pace'))await open(c);   // rv2k2h: traffic is not re-populated at the start after pace drove >1 km and the test warped back (game question, see docs/HANDOFF_rv2k2h.md): judge it on a fresh page, like a solo run
-   const t1=Date.now();try{const LONG=BUD[id]>=25&&id.startsWith('rv2k')&&id!=='rv2k/race-handsoff'&&!process.env.SMOKE;   // race-handsoff drives its own fake clock (tkRun), real timers   // long GOs (race 240 s, walls 60 s, objectives 30 s): drive them on a fake clock (sim time, not software-GL wall time) and WAIT until they say a verdict, so a combined run judges them like a solo run
+   const t1=Date.now();let threw=false;try{const LONG=BUD[id]>=25&&id.startsWith('rv2k')&&id!=='rv2k/race-handsoff'&&!process.env.SMOKE;   // race-handsoff drives its own fake clock (tkRun), real timers   // long GOs (race 240 s, walls 60 s, objectives 30 s): drive them on a fake clock (sim time, not software-GL wall time) and WAIT until they say a verdict, so a combined run judges them like a solo run
     if(LONG&&!FC.on){await p.clock.install().catch(()=>{});FC.on=1}
     said=await p.evaluate(id=>window.__chk.go(id)||'',id);
     if(LONG&&/…$/.test(said)){let sim=0;const cap=BUD[id]*1000+60000;while(sim<cap){await p.clock.runFor(1000);sim+=1000;const s=await p.evaluate(()=>window.__chk.said()||'');if(!/…$/.test(s))break}await p.clock.resume().catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}
-    else if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:process.env.SMOKE?4000:Math.max(20000,(BUD[id]+10)*1000),polling:250}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){said='EVAL '+String(e).slice(0,80)}
+    else if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:process.env.SMOKE?4000:Math.max(20000,(BUD[id]+10)*1000),polling:250}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){threw=true;said=evalError(e)}
    await p.waitForTimeout(c==='bx'?1500:process.env.SMOKE?150:500);
    const st=await p.evaluate(()=>({state:typeof __mho!=='undefined'?__mho.state:'?',gar:!!(document.getElementById('gbx')&&!document.getElementById('gbx').hidden)})).catch(()=>({state:'nav'}));
-   if(!said&&st.state==='race')said='(race started)';const ok=!!said&&!BAD.test(said)&&errs.length===e0&&!nav;const secs=(Date.now()-t1)/1000,slow=secs>Math.max(10,BUD[id]||0)&&c!=='bx'&&!(BUD[id]>=25&&id.startsWith('rv2k')&&id!=='rv2k/race-handsoff');if(slow)said+=' · SLOW '+secs.toFixed(1)+' s > 10 s ❌';const spawnOnly=c==='bx'&&ok,fin=(spawnOnly||slow)?false:ok;res.push({id,c,ok:fin,spawnOnly,secs,said,state:st.state,errs:errs.slice(e0)});
+   if(!said&&st.state==='race')said='(race started)';const ok=verdict({said,threw,newErr:errs.length>e0,nav}).ok;const secs=(Date.now()-t1)/1000,slow=secs>Math.max(10,BUD[id]||0)&&c!=='bx'&&!(BUD[id]>=25&&id.startsWith('rv2k')&&id!=='rv2k/race-handsoff');if(slow)said+=' · SLOW '+secs.toFixed(1)+' s > 10 s ❌';const spawnOnly=c==='bx'&&ok,fin=(spawnOnly||slow)?false:ok;res.push({id,c,ok:fin,spawnOnly,secs,said,state:st.state,errs:errs.slice(e0)});
    if(!process.env.QUIET||!fin||spawnOnly)console.log(`${spawnOnly?'SPAWN-ONLY(laps NOT checked, run tools/bx/tTracks.js)':fin?'PASS':'FAIL'} ${c} ${id} ${((Date.now()-t1)/1000).toFixed(1)}s · ${said||'(no message)'}${errs.length>e0?' · ERR '+errs[e0]:''}`);
    if(process.env.SHOTS&&(res.length<=3||id.endsWith('/shadow')))await shot(`go_${res.length}_${id.replace(/\W/g,'_')}.jpg`);
    if(c==='bx')continue;
