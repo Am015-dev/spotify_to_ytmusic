@@ -41,6 +41,10 @@ html body :is(#roamCombo,#feed){top:calc(152px + env(safe-area-inset-top,0px))!i
 html body :is(.touch,.v85) #roamArrow{max-width:calc(100vw - 150px)!important;white-space:normal!important;overflow:visible!important;text-align:center}
 @media (orientation:portrait){html body :is(.touch,.v85) #roamArrow{left:112px!important;right:56px!important;transform:none!important;max-width:none!important;justify-content:center}
 }
-body.phHold #spRes{visibility:hidden;pointer-events:none}`;document.head.appendChild(st);
- let t0=0;setInterval(()=>{try{const r=document.getElementById('spRes');if(!r||r.hidden){t0=0;document.body.classList.remove('phHold');return}
+body.phHold #spRes{visibility:hidden;pointer-events:none}
+#roam.racing #roamPlate{display:none!important}
+@media (orientation:portrait){html body.spOn #raceW .cp{display:none!important}}   /* rv3C: portrait is 393 px wide: place + time + gap fit, the checkpoint count is in the arrow pill */
+body.v85.spOn[data-mode=roam]:not(.v85b) #raceW:not([hidden]){display:flex!important}   /* rv3C: v85 hides #raceW after its 5 s brief; in a race the place/gap/checkpoint/time pills stay up */
+body.spShow :is(#m1Next,#roamArrow,#roamPlate,#roamPop,#roamPrompt,#crSmHint){visibility:hidden!important}`;document.head.appendChild(st);
+ let t0=0;setInterval(()=>{try{const r=document.getElementById('spRes');document.body.classList.toggle('spShow',!!r&&!r.hidden);if(!r||r.hidden){t0=0;document.body.classList.remove('phHold');return}
   if(!t0)t0=performance.now();document.body.classList.toggle('phHold',typeof RO!=='undefined'&&Math.abs(RO.v||0)>1.5&&performance.now()-t0<4000)}catch(e){}},100)}

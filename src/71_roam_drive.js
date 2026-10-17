@@ -28,7 +28,7 @@ const W13_lift=c=>1-W13S.lift*clamp((Math.abs(c.steer||0)-.3)/.7,0,1)*clamp((RO.
 const BG23_cap=(v,tt)=>v<=0?1:Math.max(0,1-(v/tt)**3);
 function roamStep(dt){const s=pl;if(!s)return;if(Math.abs(RO.h)>50){RO.h-=Math.round(RO.h/(2*Math.PI))*2*Math.PI;try{camSnap=true}catch(e){}}if(RO.wk){AU.engine(s,0,false);AU.scrape(false);roamWreckStep(dt);hubTrafficStep(dt);studFXStep(dt);roamHud();return}RO.inv=Math.max(0,(RO.inv||0)-dt);RO.lastHit=(RO.lastHit||0)+dt;if(RO.lastHit>4)roamHeal(3*dt);
   if((RO.hp??100)<35&&R()<.25)puff(s.mesh.position.clone().add(V3(0,2.4,0)),1,_tipC.setRGB(.2,.2,.22),1,4,.9,.5,1,3);if((RO.hp??100)<15&&R()<.2)burst(SPARK,s.mesh.position.clone().add(V3(0,2,0)),4,8,.3,new THREE.Color(2,1.2,.4));
-  if(!s.mesh.visible&&!(typeof M1!=='undefined'&&M1.ghost>0))s.mesh.visible=true;const c=ctlPlayer(dt);CTL=c;const busy=RO.card||RO.mapOpen||RO.story;RO.hitCd=Math.max(0,(RO.hitCd||0)-dt);
+  if(!s.mesh.visible&&!(typeof M1!=='undefined'&&M1.ghost>0))s.mesh.visible=true;const c=ctlPlayer(dt);CTL=c;const busy=RO.card||RO.mapOpen||RO.story||(RO.fin&&(RO.fin=!$('#spRes').hidden));RO.hitCd=Math.max(0,(RO.hitCd||0)-dt);
   const T0=roamTerr(RO.x,RO.z,RO.y+.3),ground=T0.g,air=RO.y>ground+.5;const terr=FL_terr(T0,ground,dt);
   const veh=FL_veh();const V85OFF=v85Off(dt);
   const fit=Math.max(.87,{ship:{road:1,dirt:.72,water:.78},boat:{road:.42,dirt:.38,water:1},offroad:{road:.93,dirt:1,water:.35}}[veh][terr]);
@@ -206,7 +206,7 @@ function cardStars(m,k,e,lock){const st=markStars(m),T=$('#rcTiers'),S=$('#rcSta
   S.innerHTML=`<span class="big">${'★'.repeat(st)}<i>${'★'.repeat(3-st)}</i></span><small>${st>=3?'MASTERED':st?'YOUR BEST':'NOT PLAYED YET'}</small>`;
   const qg=qvCardG(m),g=qg?qg.g:(k==='otg'||k==='quest')?OTG_GOAL[e.kind]:null,u=qg?qg.u:g&&(OTG_HI[e.kind]?OTG_U[e.kind]:' s'),lab=g?[`${g[2]}${u}`,`${g[1]}${u}`,`${g[0]}${u}`]:['3rd place','2nd place','1st place'];
   const pay=qg?qg.pay:CARD_PAY[k];T.innerHTML=`<div class="tiers">${[1,2,3].map(n=>`<div class="${st>=n?'on':''}"><b>${'★'.repeat(n)}</b><span>${lab[n-1]}</span></div>`).join('')}</div><div class="rew"><span>🟡 ${pay.toLocaleString('de-DE')} per new ★</span>${st<3?'<span>🎁 garage part at ★★★</span>':'<span>✔ replays pay 20% studs</span>'}</div>`}
-function roamOpen(m){RO.card=m;RO.cool=2;RO.cardPin=0;const c=$('#roamCard'),k=m.kind,e=m.ev,lock=markLocked(m),done=markDone(m);c.hidden=false;const img=c.querySelector('img');
+function roamOpen(m){if(RO.sp&&!RO.sp.done)return;RO.card=m;RO.cool=2;RO.cardPin=0;const c=$('#roamCard'),k=m.kind,e=m.ev,lock=markLocked(m),done=markDone(m);c.hidden=false;const img=c.querySelector('img');
   img.src=k==='quest'?npcAvatar(e):(k==='rival'||k==='boss')?avatar(e.p):(m.sp?m.sp.material.map.image:iconTex(m).image).toDataURL();c.querySelector('h4').textContent=(k==='rival'||k==='boss')?`${PD[e.p].flag} ${PD[e.p].full}${k==='boss'?' · BOSS':''}`:markTitle(m);
   let body='',go='RACE ▶';const P=c.querySelector('p'),X=$('#rcExtra');X.innerHTML='';
   if(k==='rival'){const td=TRACK_DEFS.find(t=>t.id===e.track);body=`Rival race · one-on-one · ${SIG[e.sig]} · ${td.short}<br><i>“${e.line}”</i>`}
