@@ -746,6 +746,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.77',date:'17 Oct 2026',items:[{t:'FIXED',s:'Sprint races: slow traffic no longer drags you down to a crawl.'},{t:'FIXED',s:'Athens races are finishable: the Akropolis course no longer doubles back on itself.'},{t:'CHANGED',s:'Fairer rivals by default, and smoother race routes.'},{t:'FIXED',s:'Phone home screen: the logo no longer covers WELCOME BACK.'}]},
   {v:'v90m-beta.76',date:'17 Oct 2026',items:[{t:'NEW',s:'New home screen: one tap to play.'},{t:'CHANGED',s:'Smaller, faster download.'},{t:'FIXED',s:'No more giant bricks floating after crashes.'}]},
   {v:'v90m-beta.75',date:'16 Oct 2026',items:[{t:'NEW',s:'Bricks burst when your car transforms.'},{t:'CHANGED',s:'Quests no longer stop you mid-drive.'},{t:'CHANGED',s:'Bigger, cleaner phone HUD; bluer river.'}]},
   {v:'v90m-beta.74',date:'16 Oct 2026',items:[{t:'NEW',s:'Every race now runs on real Frankfurt and Athens streets, with two routes, jumps and power-ups.'},{t:'NEW',s:'Quick Race includes a river run where your car becomes a boat.'},{t:'CHANGED',s:'Livelier streets with shopfronts, kiosks and café tables.'}]},
@@ -1505,7 +1506,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c_checklist":"3cb8e361","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"833f751e"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"a44e859c","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"833f751e"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -5111,7 +5112,7 @@ function hubTrafficStep(dt){CR_npcPush();if(HUB.ridge)HUB.ridge.position.set(cam
     const dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gA=A.g||B.g,W=c.pk&&c.ofW?c.ofW:A.ab||gA?0:Math.min(A.w||20,B.w||20),lane=W*(c.l3s!=null&&!c.pk&&W>=14?.27+.09*c.l3s:c.lane)/* life-3: inner/outer lane, smooth lane changes (98l3) */+(RD_ON&&gA&&!c.pk&&!c.tr&&(A.w||0)>=14?(c.l3s??(c.lane<.27?-1:1))*Math.min(A.w,B.w||A.w)*.11:0)/* RD: two lanes per direction on wide streets */,x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;
     c.x=x;c.z=z;c.y=A.ab||gA?groundAt(x,z,(c.y||0)+4):groundY(x,z);
     _m.makeBasis(_hrt.set(dz,0,-dx),_hup,_hfw.set(dx,0,dz)).setPosition(x,c.y,z);CR_susp(c,dx,dz,dt,im,_m);
-    const d=Math.hypot(x-RO.x,z-RO.z);if(d<5&&Math.abs(c.y-RO.y)<3&&OB_car(x,z,dx,dz,c)){const crLg=(RO.crLg||0)>0,pin=W10_pin(c),crSm=typeof DMG_traf==='function'?DMG_traf(c,x,z,dx,dz,crLg,pin):crLg||pin||Math.abs(RO.v)>CR_SMASHV;if(!crSm){W10_bump(c,x,z,dx,dz,W)}else if(1){c.dead=25;CR_tumbleStart(c,x,z,dx,dz);const at=V3(x,c.y+1.5,z),f2=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,V3(0,9,0).addScaledVector(f2,Math.abs(RO.v)*.5),18,[new THREE.Color(HCOL[(c.j*3+c.k)%HCOL.length]),new THREE.Color('#22252f'),new THREE.Color('#d0e8ff')],1.1,c.y);for(let k=0;k<8;k++)studBurst(at,f2,Math.abs(RO.v));const rx=x-RO.x,rz=z-RO.z,rl=Math.hypot(rx,rz)||1,ho=(f2.x*dx+f2.z*dz)<-.6&&(f2.x*rx+f2.z*rz)/rl>.7;RO.v*=pl&&pl.nitro?.95:ho?.6:.88;shake=ho?.5:.3;AU.sfx('crash');if(crSm)CR_smashHit();if(pl&&pl.nitro)roamHeal(3);else if(!crLg&&!pin)roamDamage(ho?12:5);addXP(3,'traffic smash');comboAdd(3);qCrate();if(pl)pl.bm=Math.min(100,pl.bm+12)}else{c.t=Math.max(0,c.t-.02)}}if(c.crB>0)c.crB-=dt;
+    const d=Math.hypot(x-RO.x,z-RO.z);if(d<5&&Math.abs(c.y-RO.y)<3&&OB_car(x,z,dx,dz,c)){const crLg=(RO.crLg||0)>0,pin=W10_pin(c),crSm=typeof DMG_traf==='function'?DMG_traf(c,x,z,dx,dz,crLg,pin):crLg||pin||Math.abs(RO.v)>CR_SMASHV;if(!crSm){if(!(RO.sp&&!RO.sp.done))W10_bump(c,x,z,dx,dz,W)/* fair-4: in a sprint race slow traffic is a ghost to the player; a parked/braking car on the line wedged the car at 1-2 m/s (pursuit bots and careful drivers alike) */}else if(1){c.dead=25;CR_tumbleStart(c,x,z,dx,dz);const at=V3(x,c.y+1.5,z),f2=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,V3(0,9,0).addScaledVector(f2,Math.abs(RO.v)*.5),18,[new THREE.Color(HCOL[(c.j*3+c.k)%HCOL.length]),new THREE.Color('#22252f'),new THREE.Color('#d0e8ff')],1.1,c.y);for(let k=0;k<8;k++)studBurst(at,f2,Math.abs(RO.v));const rx=x-RO.x,rz=z-RO.z,rl=Math.hypot(rx,rz)||1,ho=(f2.x*dx+f2.z*dz)<-.6&&(f2.x*rx+f2.z*rz)/rl>.7;RO.v*=pl&&pl.nitro?.95:ho?.6:.88;shake=ho?.5:.3;AU.sfx('crash');if(crSm)CR_smashHit();if(pl&&pl.nitro)roamHeal(3);else if(!crLg&&!pin)roamDamage(ho?12:5);addXP(3,'traffic smash');comboAdd(3);qCrate();if(pl)pl.bm=Math.min(100,pl.bm+12)}else{c.t=Math.max(0,c.t-.02)}}if(c.crB>0)c.crB-=dt;
     else if(d<10&&Math.abs(RO.v)>45&&!(c.nm>0)&&Math.abs(c.y-RO.y)<3){c.nm=3;if(pl){pl.bm=Math.min(100,pl.bm+8);award(pl,'NEAR MISS',0,200,'#4ceaff');AU.sfx('near');comboAdd(2)}}if(c.nm>0)c.nm-=dt}
   for(const im of HUB.cim){im.instanceMatrix.needsUpdate=true;if(im.userData.w)im.userData.w.instanceMatrix.needsUpdate=true;if(im.userData.g)im.userData.g.instanceMatrix.needsUpdate=true}}
 let CLOUDS=null;function cloudsOn(v){if(v&&!CLOUDS){const N=150,per=6,geo=new THREE.BoxGeometry(1,1,1),mat=new THREE.MeshLambertMaterial({color:0xffffff,emissive:0xdfe9f7,emissiveIntensity:.72,fog:false}),im=new THREE.InstancedMesh(geo,mat,N*per),M=new THREE.Matrix4(),q=new THREE.Quaternion(),S=new THREE.Vector3(),P=new THREE.Vector3();let r=7;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;let k=0;
@@ -13617,8 +13618,9 @@ const tkCat=(...L)=>{const o=[];for(const P of L)for(const p of P)if(!o.length||
 function tkChain(W){const o=[];for(let k=1;k<W.length;k++)for(const p of tkLeg(W[k-1],W[k]))if(!o.length||Math.hypot(p[0]-o[o.length-1][0],p[1]-o[o.length-1][1])>2)o.push(p);return o}
 function tkLen(P){let s=0;for(let i=1;i<P.length;i++)s+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);return s}
 function tkAt(P,f){const L=tkLen(P)*f;let c=0;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],l=Math.hypot(b[0]-a[0],b[1]-a[1]);if(c+l>=L){const t=(L-c)/(l||1);return{x:a[0]+(b[0]-a[0])*t,z:a[1]+(b[1]-a[1])*t,h:Math.atan2(b[0]-a[0],b[1]-a[1])}}c+=l}const b=P[P.length-1],a=P[P.length-2];return{x:b[0],z:b[1],h:Math.atan2(b[0]-a[0],b[1]-a[1])}}
-function tkGeoOf(C){if(C.geo)return C.geo;const s=C.seg?C.seg.start:tkChain(C.start),A=C.seg?C.seg.A:tkChain(C.A),B=C.seg?C.seg.B:tkChain(C.B),f=C.seg?C.seg.fin:tkChain(C.fin);
-  const pA=tkCat(s,A,f),pB=tkCat(s,B,f);return C.geo={seg:{start:s,A,B,fin:f},pA,pB,Ls:tkLen(s),LA:tkLen(A),LB:tkLen(B),Lf:tkLen(f),lenA:tkLen(pA),lenB:tkLen(pB)}}
+function tkDespike(P){const o=P.slice();for(let k=0;k<40;k++){let cut=-1;for(let i=1;i<o.length-1;i++){const a=o[i-1],b=o[i],c=o[i+1],l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]);if(Math.min(l1,l2)>=40)continue;const t=Math.abs(angDiff(Math.atan2(c[0]-b[0],c[1]-b[1]),Math.atan2(b[0]-a[0],b[1]-a[1])));if(t>1.75){cut=i;break}}if(cut<0)break;o.splice(cut,1)}return o}
+function tkGeoOf(C){if(C.geo)return C.geo;const dsp=P=>C.water?P:tkDespike(P),s=dsp(C.seg?C.seg.start:tkChain(C.start)),A=dsp(C.seg?C.seg.A:tkChain(C.A)),B=dsp(C.seg?C.seg.B:tkChain(C.B)),f=dsp(C.seg?C.seg.fin:tkChain(C.fin));
+  const pA=dsp(tkCat(s,A,f)),pB=dsp(tkCat(s,B,f));return C.geo={seg:{start:s,A,B,fin:f},pA,pB,Ls:tkLen(s),LA:tkLen(A),LB:tkLen(B),Lf:tkLen(f),lenA:tkLen(pA),lenB:tkLen(pB)}}
 function tkGeo(){return tkGeoOf(TK.C||TK_C)}
 function tkSnap(x,z){const i=qvNear(x,z,700),G=qvGraph();return i<0?null:[G.X[i],G.Z[i]]}
 function tkRoad(x,z){const c=cityAt(x,z);const r=c&&c.road;return String(r&&(r.name||r.n||r.nm)||'').split(' · ')[0]}
@@ -13627,6 +13629,7 @@ function tkSimTime(C,r){const G=tkGeoOf(C),P=r==='A'?G.pA:G.pB,L=tkLen(P),a={bas
   while(a.s<L&&t<600){const dt=1/15;if(pads.length){const q=tkPosOn(P,a.s);if(pads.some(p=>Math.hypot(q.x-p.x,q.z-p.z)<8))pad=1.5}TK.sp.padT=pad;pad=Math.max(0,pad-dt);const tv=tkAiTarget(a,P,a.s);a.v+=(tv-a.v)*Math.min(1,dt*(tv>a.v?1.6:2.5));a.s+=a.v*dt;t+=dt}
   TK.sp=sv;TK.C=sC;return{t:+t.toFixed(1),len:Math.round(L)}}
 function tkSpread(C){const A=tkSimTime(C,'A'),B=tkSimTime(C,'B');return{A,B,spread:+(Math.abs(A.t-B.t)/Math.min(A.t,B.t)*100).toFixed(1)}}
+function tkOverD(A,B){let n=0,m=0;for(let i=1;i<B.length;i++){const a=B[i-1],b=B[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]),k=Math.max(1,Math.ceil(L/10));for(let j=0;j<k;j++){const x=a[0]+(b[0]-a[0])*(j+.5)/k,z=a[1]+(b[1]-a[1])*(j+.5)/k;let d=1e9;for(let u=1;u<A.length&&d>=14;u++){const p=A[u-1],q=A[u],dx=q[0]-p[0],dz=q[1]-p[1],l2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-p[0])*dx+(z-p[1])*dz)/l2));d=Math.min(d,Math.hypot(p[0]+dx*t-x,p[1]+dz*t-z))}m++;if(d<14)n++}}return n/Math.max(1,m)}
 function tkOverlap(A,B){let n=0;for(const p of B){let d=1e9;for(const q of A){d=Math.min(d,Math.hypot(p[0]-q[0],p[1]-q[1]));if(d<14)break}if(d<14)n++}return n/Math.max(1,B.length)}
 function tkWaterCourse(spec){if(typeof SLIPS==='undefined'||!SLIPS.length||typeof MAINR==='undefined')return null;const P=MAINR.pts,free=(a,b)=>{for(let k=0;k<=14;k++)if(roamHit(a[0]+(b[0]-a[0])*k/14,a[1]+(b[1]-a[1])*k/14,3))return false;return true},path=(a,b)=>qvPath(a[0],a[1],b[0],b[1]).map(p=>[p[0],p[1]]);let best=null;
   const land=(S,d)=>{const X=tkSnap(S.x-S.ix*d,S.z-S.iz*d);return X&&free(X,[S.x-S.ix*6,S.z-S.iz*6])?X:null};
@@ -13663,7 +13666,7 @@ function tkBuild(spec){if(TK.built[spec.key])return TK.built[spec.key];const G=q
     else{X=tkSnap(S[0]+dx*520,S[1]+dz*520);J=tkSnap(S[0]+dx*1300,S[1]+dz*1300);if(!X||!J)continue;F=tkSnap(J[0]+dx*520,J[1]+dz*520);const mx=(X[0]+J[0])/2,mz=(X[1]+J[1])/2,vA=tkSnap(mx+px*W,mz+pz*W),vB=tkSnap(mx-px*W,mz-pz*W);if(!F||!vA||!vB)continue;
       A=tkCat(path(X,vA),path(vA,J));B=tkCat(path(X,vB),path(vB,J))}
     if(!A||!B||A.length<3||B.length<3)continue;const st=path(S,X),fin=path(J,F);if(st.length<2||fin.length<2||tkLen(st)<250||tkLen(fin)<250)continue
-    const LA=tkLen(A),LB=tkLen(B);if(LA<400||LB<400||Math.max(LA,LB)/Math.min(LA,LB)>1.35||tkOverlap(A,B)>.4)continue
+    const LA=tkLen(A),LB=tkLen(B);if(LA<400||LB<400||Math.max(LA,LB)/Math.min(LA,LB)>1.35||tkOverlap(A,B)>.4||tkOverD(st,A)>.15||tkOverD(st,B)>.15||tkOverD(A,fin)>.15||tkOverD(B,fin)>.15)continue
     const C={key:spec.key,id:'tk_'+spec.key.replace(/\W/g,'_'),name:spec.name,p:spec.p,kind:spec.kind,ev:spec.ev,ai:spec.ai,base:spec.base||62,off:!!offB,
       seg:{start:st,A,B,fin},ramps:[['start',.55,22,5,16],['A',.5,20,5,14],['B',.45,20,5,14],['fin',.45,26,8,16]],items:[['start',.35],['start',.75],['A',.3],['A',.7],['B',.3],['B',.7],['fin',.25],['fin',.7]],boost:null};
     if(offB)C.ramps[2]=['fin',.15,20,5,14];
@@ -13707,9 +13710,9 @@ function tkStart(m,C0){const C=C0||tkCourseOf(m)||TK_C;TK.C=C;const Gm=tkGeoOf(C
 function tkPath(a){const G=tkGeo();return a.route==='B'?G.pB:G.pA}
 function tkPosOn(P,s){let cum=0;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(s<=cum+L||i===P.length-1){const t=clamp((s-cum)/(L||1),0,1),n=P[i+1],turn=n?Math.abs(angDiff(Math.atan2(n[0]-b[0],n[1]-b[1]),Math.atan2(b[0]-a[0],b[1]-a[1]))):0;return{x:a[0]+(b[0]-a[0])*t,z:a[1]+(b[1]-a[1])*t,h:Math.atan2(b[0]-a[0],b[1]-a[1]),toCorner:cum+L-s,turn}}cum+=L}}
 function tkAiTarget(a,P,s){const q=tkPosOn(P,Math.max(0,s));let tv=a.base;if(q.turn>.5&&q.toCorner<55)tv=Math.min(tv,30);else if(q.turn>.25&&q.toCorner<45)tv=Math.min(tv,44);const C=TK.C||TK_C;if(C.boost&&a.route===C.boost.r&&TK.sp&&TK.sp.padT>0)tv*=1.25;return tv}
-const TK_FAIR=(()=>{try{return new URLSearchParams(location.search).get('fair')==='1'}catch(e){return false}})(),TK_PACE=.5;   // WIP: OFF until rv2k2/close passes (?fair=1 on)
+const TK_FAIR=(()=>{try{return new URLSearchParams(location.search).get('fair')!=='0'}catch(e){return false}})(),TK_PACE=.5;   // fair-4: ON by default (?fair=0 = old pace)
 function tkGapT(pr,i){const k=[[0,30],[.25,30],[.35,-30],[.5,-30],[.6,25],[.72,25],[.82,-40],[1,-40]];let j=1;while(j<k.length-1&&pr>k[j][0])j++;const a=k[j-1],b=k[j];return a[1]+(b[1]-a[1])*clamp((pr-a[0])/(b[0]-a[0]),0,1)-i*20}
-function tkRub(gap,pr,i){if(!TK_FAIR)return gap>150?.9:gap<-150?1.1:1;if(Math.abs(gap)>400)return 1;const e=gap-tkGapT(pr,i),fin=pr>.82;return e>0?1-(fin?.25:.45)*Math.min(1,e/120):1+(fin?.06:.3)*Math.min(1,-e/100)}
+function tkRub(gap,pr,i,wet){if(!TK_FAIR||wet)return gap>150?.9:gap<-150?1.1:1;if(Math.abs(gap)>400)return 1;const e=gap-tkGapT(pr,i),fin=pr>.82;return e>0?1-(fin?.25:.45)*Math.min(1,e/120):1+(fin?.06:.3)*Math.min(1,-e/100)}
 function tkGrace(sp,firstFin,len){if(!TK_FAIR)return 40;const v=sp.myS/Math.max(1,sp.t);return v>4?clamp((len-sp.myS)/v+10,30,Math.max(30,firstFin)):25}
 function tkFire(who,kind,sp,ai){const lead=sp.ai.filter(b=>b.fin==null&&b.s>sp.myS-20&&b.s-sp.myS<220).sort((x,y)=>x.s-y.s)[0];
   if(who==='me'){if(kind==='TURBO'){RO.v=Math.max(RO.v,0)+20;RO.turbo=Math.max(RO.turbo||0,1.5);if(pl)pl.bm=100;fovKick=Math.max(fovKick,12);AU.sfx('nitro')}
@@ -13729,7 +13732,7 @@ function tkStep(dt){const sp=RO.sp,e=sp.e;TK.C=sp.C;const G=tkGeo();RO.cool=2;TK
   for(const it of sp.items){it.cd=Math.max(0,it.cd-dt);it.g.visible=it.cd<=0;it.g.rotation.y+=dt*2;if(it.cd>0||sp.cd>0)continue;
     if(Math.hypot(it.x-RO.x,it.z-RO.z)<4.5){it.cd=3;tkFire('me',TK_ITEMS[(sp.items.indexOf(it)+Math.floor(sp.t))%3],sp);sp.fired=(sp.fired||0)+1}}
   const C=sp.C;for(const a of sp.ai){const P=tkPath(a),Lp=tkLen(P);if(a.fin!=null&&a.s>=Lp+40)continue;a.stun=Math.max(0,a.stun-dt);a.itemCd=Math.max(0,a.itemCd-dt);
-    const gap=a.s/Lp*G.lenA-sp.myS,rub=tkRub(gap,sp.myS/G.lenA,sp.ai.indexOf(a));let tv=tkAiTarget(a,P,a.s)*(TK_FAIR?TK_PACE:1)*rub;if(sp.cd>0||a.stun>0)tv=0;
+    const gap=a.s/Lp*G.lenA-sp.myS,rub=tkRub(gap,sp.myS/G.lenA,sp.ai.indexOf(a),C.water);let tv=tkAiTarget(a,P,a.s)*(TK_FAIR&&!C.water?TK_PACE:1)*rub  /* fair-4: the boat leg keeps the old pace */;if(sp.cd>0||a.stun>0)tv=0;
     if(C.boost&&a.route===C.boost.r){const q=tkPosOn(P,a.s);if(sp.pads.some(p=>Math.hypot(q.x-p.x,q.z-p.z)<8))sp.padT=1.5}
     a.v+=(tv-a.v)*Math.min(1,dt*(tv>a.v?1.6:2.5));a.s+=a.v*dt;if(a.s>=Lp&&a.fin==null){a.fin=sp.t;say('',a.name.toUpperCase()+' FINISHED',1.2)}
     const q=tkPosOn(P,Math.max(0,a.s)),x=q.x+Math.cos(q.h)*a.lane,z=q.z-Math.sin(q.h)*a.lane;
@@ -15799,15 +15802,17 @@ window.__env={state:ENV_state,go:ENV_go};
 const AS_ON=/[?&]asset=1\b/.test(location.search)||(!/[?&]asset=0\b/.test(location.search)&&(()=>{try{return localStorage.getItem('od_asset')!=='0'}catch(e){return true}})());
 if(AS_ON){const s=document.createElement('script');s.src='models/as.js';s.onload=()=>{try{eval(window.__ASJ)}catch(e){console.warn('AS load',e)}};document.head.appendChild(s)}
 if(!/[?&]xf=0\b/.test(location.search)){const s=document.createElement('script');s.src='models/xf.js';s.onload=()=>{try{eval(window.__XFJ)}catch(e){console.warn('XF load',e)}};document.head.appendChild(s)}
-const L3_ON=!/[?&]l3=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3')!=='0'}catch(e){return true}})()/* life-4: ON by default (?l3=0 or od_l3=0 turns it off) */,L3_LT=L3_ON&&!/[?&]l3lt=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3lt')!=='0'}catch(e){return true}})()/* stop-line guard + red-light audit: ON again since lights-3 (node 115 runs fixed); ?l3lt=0 or od_l3lt=0 = off */,L3={lc:0,acc:0,pacc:0,run:0,ent:0,ov:0,qs:0,idle:0,chat:0};
+const L3_ON=!/[?&]l3=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3')!=='0'}catch(e){return true}})()/* life-4: ON by default (?l3=0 or od_l3=0 turns it off) */,L3_LT=L3_ON&&!/[?&]l3lt=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3lt')!=='0'}catch(e){return true}})()/* stop-line guard + red-light audit: ON again since lights-3 (node 115 runs fixed); ?l3lt=0 or od_l3lt=0 = off */,L3_YLD=L3_ON&&/[?&]yld=1/.test(location.search),L3={lc:0,acc:0,pacc:0,run:0,ent:0,ov:0,qs:0,idle:0,chat:0};
 function L3_ad(a,b){let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d}
 function L3_off(c,A,B,s){if(!A||!B||A.ab||c.pk||c.tr)return null;if(A.g||B.g)return RD_ON&&(A.w||0)>=14?s*Math.min(A.w,B.w||A.w)*.11:null;const W=Math.min(A.w||20,B.w||20);return W>=14?W*(.27+.09*s):null}
 function L3_free(c,A,B,tgt){const G=CV.G;if(!G)return false;const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16),cur=L3_off(c,A,B,c.l3s),to=L3_off(c,A,B,tgt);if(cur==null||to==null)return false;
   for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0||o.CVhx*c.CVhx+o.CVhz*c.CVhz<.7)continue;const rx=o.x-c.x,rz=o.z-c.z,al=rx*c.CVhx+rz*c.CVhz;if(al<-11||al>15)continue;
     const lat=cur+(-rx*c.CVhz+rz*c.CVhx);if(Math.abs(lat-to)<2)return false}return true}
+function L3_yieldP(c){if(!L3_YLD||typeof RO==='undefined'||RO.foot||RO.v<14||c.CVhx==null)return false;const rx=c.x-RO.x,rz=c.z-RO.z,al=rx*c.CVhx+rz*c.CVhz;if(al<4||al>45)return false;if(Math.abs(-rx*c.CVhz+rz*c.CVhx)>2.4)return false;if(RO.v*(Math.sin(RO.h)*c.CVhx+Math.cos(RO.h)*c.CVhz)<(c.cv||0)+6)return false;return true}
 function L3_tick(){const N=HUB.nodes;for(const c of HUB.cars){if(c.l3t==null){if(c.pk||c.tr||CT_wideHw(c))continue;c.l3t=((c.j*7+c.k*3)>>1)%2?1:-1;c.l3s=c.l3t}
   if(!c.CVn||c.dead>0||c.route&&!c.CVr||(c.l3c||0)>0)continue;const A=N[c.a],B=N[c.b];if(L3_off(c,A,B,0)==null)continue;let want=c.l3t;
   if(c.CVi&&c.CViT>0&&c.RDy!=='box')want=-c.CVi;/* turning soon: be in the lane on the turn side (blinker side = -lane) */
+  else if(L3_yieldP(c))want=-c.l3t;/* yield-1: the player closes fast from behind in my lane: take the other lane */
   else{const l=c.CVl;if(l&&!(l.dead>0)&&!c.RDy){const al=(l.x-c.x)*c.CVhx+(l.z-c.z)*c.CVhz;if(al<24&&(l.cv||0)>.5&&(l.cv||0)<(c.v||0)*.75&&!l.RDy)want=-c.l3t}}/* slower car ahead (not queued at a light): pass it */
   if(want!==c.l3t&&L3_free(c,A,B,want)){c.l3t=want;c.l3c=4;L3.lc++}}}
 function L3_near(c){if(c.dead>0||c.pk)return null;const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B||A.ab||B.ab||c.a>=N.ng||c.b>=N.ng)return null;if(Math.abs(c.x-RO.x)>320||Math.abs(c.z-RO.z)>320)return null;
@@ -16241,7 +16246,7 @@ if(!/[?&]ob2=0/.test(location.search)){
 body.ob2home :is(#odPin,#qaBugTop,#tuG){display:none!important}
 #menu.home.ob2:not(.ob2more):not([hidden]) ~ #topBtns{display:none}
 body #odNew{top:auto;bottom:8px;right:max(10px,env(safe-area-inset-right));padding:1px 4px 1px 10px;gap:6px;font-size:12px;border-width:2px}
-@media (max-width:500px) and (orientation:portrait){#home .hbar h2{margin-left:150px!important}#menu.home.ob2 #ob2{margin-top:90px}.ob2row{flex-wrap:wrap}#ob2 .ob2row button{flex:1 1 40%}}`;
+@media (max-width:500px) and (orientation:portrait){#home .hbar h2{margin-left:175px!important;font-size:20px!important}#menu.home.ob2 #ob2{margin-top:90px}.ob2row{flex-wrap:wrap}#ob2 .ob2row button{flex:1 1 40%}}`;
   document.head.appendChild(st);
   const M=document.getElementById('menu'),$$=s=>document.querySelector(s),bar=document.createElement('div');bar.id='ob2';
   bar.innerHTML=`<button class="ob2play ob2m" id="ob2Play"><span>▶ PLAY<small></small></span></button><div class="ob2row ob2m" id="ob2Row"><button data-k="#home .hc[data-a=quick]">🏁 RACES</button><button data-k="#gbMenuBtn">🔧 GARAGE</button><button data-k="#bxMenuBtn">🏗 BUILD</button><button>⋯ MORE</button></div><button class="ob2back" id="ob2Back">◀ BACK</button><div class="ob2by">Made with ❤ by Alex · 3D models by Alex</div>`;
