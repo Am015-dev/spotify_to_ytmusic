@@ -6,6 +6,8 @@ function* athBuildG(grp,BM,rnd){const T0=performance.now(),RS=2,NX=Math.ceil((WX
   rect(WX0,WX0+40,WZS,WZN,3);rect(WX1-40,WX1,WZS,WZN,3);rect(WX0,WX1,WZS,WZS+40,3);rect(WX0,WX1,WZN-40,WZN,3);
   const SBC=SC_S&&SC_S.on?SC_K.sbA:{ped:1.2,res:2.2,link:2.5,sec:3,main:3.2,arterial:4,hill:3},SBX={arterial:1.5,main:1,sec:.5};
   for(const S of CITY_S){const P=S.pts,r=S.r.w/2+(SBC[S.r.cls]||3);for(let i=1;i<P.length;i++)cap(P[i-1].x,P[i-1].z,P[i].x,P[i].z,r,1);if(Y())yield [.36]}
+  // athroads4: a street end that meets no other street keeps 16 m of open ground ahead (Athens had stub streets running into a facade)
+  CITY_reidx();CITY_S.forEach((S,si)=>{const P=S.pts;if(P.length<2||S.r.cls==='ped')return;for(const[e,q]of[[P[0],P[1]],[P[P.length-1],P[P.length-2]]]){const o=cityAt(e.x,e.z,si);if(o&&o.d<o.road.w/2+S.r.w/2+6)continue;const L=Math.hypot(e.x-q.x,e.z-q.z)||1;cap(e.x,e.z,e.x+(e.x-q.x)/L*16,e.z+(e.z-q.z)/L*16,S.r.w/2+1,3)}});
   const tR1=performance.now();for(const S of CITY_S){if(!S.prof)continue;const P=S.pts;for(let i=1;i<P.length;i++)if(TR_dev(P[i])>1.5||TR_dev(P[i-1])>1.5)cap(P[i-1].x,P[i-1].z,P[i].x,P[i].z,S.r.w/2+26,3)}
   for(const R of[...PLAZAS,...PARKS])rect(R.x0,R.x1,R.z0,R.z1,3);for(const L of LMX)cap(L.x,L.z,L.x,L.z,L.r+4,3);OC_zone(cap);for(const T of TRAILS){const P=T.pts;for(let i=1;i<P.length;i++)cap(P[i-1].x,P[i-1].z,P[i].x,P[i].z,T.w/2+8,3)}
   for(const g of GARAGES)if(g.x!=null)cap(g.x,g.z,g.x,g.z,24,3);for(const k in RF.spots){const[x,z]=WP(RF.spots[k][0],RF.spots[k][1]);cap(x,z,x,z,18,3)}
