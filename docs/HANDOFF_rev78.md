@@ -1,0 +1,6 @@
+# HANDOFF rev-78 (2026-10-17): v90m-beta.78 = GO
+1. Tested trunk sha f41b1b5 (30f709c rv2k2 harness, 2dc7820 traffic respawn fix, f41b1b5 two Frankfurt start activities; no slowspot1 commits on trunk). Built v90m-beta.78: page 3,132,780 B (split). Changelog commit adds the beta.78 entry only. Not deployed.
+2. Unit: 0 FAIL, 4798 pass (13 known; three.js not installed so lint_tracks/logic_core skipped).
+3. TAG=rv2k2,life1,xf1,terrain: 44/54, every red is SLOW-only (software GL) or known: life1/ath-density (known), rv2k2/pace (variable harness result: avg 30, then 64 km/h, traffic ahead in the lane; red on beta.77 too), xf1/terr1/life1-smash pass their asserts. rv2k2/warp-traffic PASS, rv2k2/near PASS (not in fail list), rv2k2/traffic PASS.
+4. TAG=rv2k: 17/23, reds: close (2ND, median gap 71 m vs 60, known/beta.77 74 m), pace (above), drawer/foliage/card = SLOW only; page lost at walls-ath (browser closed mid-run, not rerun in the timebox; passed on beta.77).
+5. Shots docs/shots/rev78 (852x393, looked at): start_0 (Frankfurt start, Hot Drop story marker), warp_0-2 (after a 1.5 km warp and back: bus, car, pedestrians ahead, 49-51 cars within 250 m, "Stud Rush: Bankenviertel 48 m" marker). tools/tRev78Shots.js makes them.
