@@ -160,3 +160,25 @@ Owner: "extremely easy even on Legend ... I stay in a spot, my missiles shoot ta
 | dodging bot, Legend max, stages 20 / 30 / 40 | 100 / 0 / 100% | 0-100 / 0 / 100% (scale-test run: 100/0/100; target 25-55% NOT reached) |
 | Normal mid, stages 8 / 20 | 100 / 100% | 100 / 100% |
 - Weak: the final boss is not camper-proof (12+ hits absorbed by revives/shields), stage 30 is still a wall for the bot by attrition (3 hull on Legend), Legend clear bands are bimodal per stage, Normal max still takes only ~1 hit.
+
+## Power scale, round 3 (flag RET.scale3, 17 Oct 2026; `?scale3=0` = round 2 exactly)
+Owner (third report): "extremely easy even on Legend ... my missiles shoot targets automatically; even the boss I beat in seconds", "homing swarm beat all enemies very fast on legend". Code: `parts/hard.js` (after fair.js), one hook in `b.js` (`DMG.hit(dm,b,e)` passes the bullet and the enemy). Hard tiers only; Easy/Normal keep round 2. Probe `scale3-probe.js` (build matrix), gate `scale3-test.js`.
+**Measured (round 2, Legend stage 20, god mode, 60 s, permanent LV10 pair + all perks + shop picks):** single weapons are weak but the stack is not: every pair (pulse+swarm, swarm+beat bomblets, swarm+laser, swarm+arc, laser+beat, arc+beat) with CRESCENDO / ECHO / WINGMATES / DRUM dealt 285-504 hull/s moving, 237-382 parked, vs a fresh ship 79 / 49. 57-85% of it came from shots that locked and curved (the shop Homing perk turns every gun shot into a homing shot) or from arc chains. Top offenders: swarm+arc, laser+beat and arc+beat with CRESCENDO (456-504/s).
+**Change:**
+1. Damage ceiling on ordinary enemies, booked in `DMG.pass`: a bucket refilled at `S3.cap()` per s (1 s saved up). `cap = fresh(n) x SC.hpK() x (1 + .8 f)`, `fresh(n) = 40 + 2.8 n` (measured fresh ship: 36 / 96 / 97 / 133 at stages 8/20/30/40), so it never drops below a fresh ship and grows with the stage and the power score. At .45 f it crowded the screen (drones 9 s on screen, ram deaths): .8.
+2. Homing (hard tiers): a shot retargets once at most (`S3.RT`), loses its lock when the target is behind the ship or more than 50 deg off the ship's nose, keeps round 2's cone, delay and cut, and drops its CRESCENDO bonus.
+3. Auto-aim share: damage from shots that locked and curved > .2 rad, plus arc/leap chains, is scaled so it is at most 35% of the total (EMA 3 s; floor x.08); scaled in by power (a fresh ship keeps its homing).
+4. Bosses (hard tiers): auto-aimed damage on a boss x.6; with no aimed hit for 2.5 s the boss repairs 1.2% max/s up to its phase top (this beats the camper). District and final bosses: hull x.55 and round 2's damage budget x.55 (the shield cores and the repair add the time back).
+**After:**
+| check | round 2 | round 3 |
+|---|---|---|
+| strongest builds, Legend 20, moving: hull dps applied | 285-504 | 56-196 (ceiling 223 at .45 f; matrix in scale3-test) |
+| fresh ship, moving | 79 | 75 (no cut) |
+| auto-aim share, moving builds | 59-71% | 26-36% |
+| corner camper Legend max 20/30/40 | 33% (cleared the final boss) | 0% of 9 (parked: final boss not killed in 200 s, it repairs) |
+| Legend max mini-boss (god) | 48-82 s | 60-73 s |
+| Legend max final boss (god) | 117-151 s | 84-88 s at budget x.65; x.55 in the final scale3-test run (see HANDOFF) |
+| Normal max mini / final boss | 28-34 / 61-63 s | 28-30 / 62-63 s (unchanged) |
+| dodging bot Legend max 20/30/40 | 0 / 0 / 100% | 33 / 0 / 100% (RUNS 3) |
+| Normal mid 8/20 | 100% | 100% |
+- Weak: stage 30 is still a wall for the dodging bot (deaths are rams by chargers and drones plus bullets: the bot's dodger does not avoid bodies well; not a ceiling effect at .8 f), the final boss stays bot-clearable (12 hits absorbed by revives/shields), Legend bands are still bimodal per stage.
