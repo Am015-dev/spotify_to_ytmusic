@@ -108,7 +108,7 @@ function DR_athFill(R){let mat=null;HUB.grp.traverse(o=>{if(!mat&&o.isInstancedM
   mk(P,N,U,C,I,mat);mk(rP,null,null,rC,rI,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}));DR.inS=null;DR.st.solid=R.length;DR.st.fill=st;DR.st.fillV=P.length/3+rP.length/3;return true}
 function DR_cull(L){const TC=new Set();let j=0,drop=0;for(const p of L){if(p.simp||DR_keep(p.t,p.x,p.z,TC))L[j++]=p;/* simplify-1 gap trees stay */else drop++}L.length=j;DR.st.drop=(DR.st.drop||0)+drop;DR.st.kept=j}
 if(DR.on){
- {const _ce=CE_streets;CE_streets=(add,rnd,D)=>{_ce(add,rnd,D);try{DR_solidBuild()}catch(e){console.warn('DR solid',e)}try{DR_cull(HUB.CE_L)}catch(e){console.warn('DR cull',e)}}}
+ {const _ce=CE_streets;CE_streets=(add,rnd,D)=>{_ce(add,rnd,D);try{CITY_reidx();DR_solidBuild()}catch(e){console.warn('DR solid',e)}try{DR_cull(HUB.CE_L)}catch(e){console.warn('DR cull',e)}}}
  {const _lz=lzPropsG;lzPropsG=function*(L){try{const TC=new Set();L.props=L.props.filter(([t,x,z])=>DR_keep(t,x,z,TC))}catch(e){}yield* _lz(L)}}
  {const _sc=smashCheck;smashCheck=dt=>{DR.t+=dt||0;const v0=RO.v,n0=HUB.smashed;_sc(dt);if(HUB.smashed>n0&&Math.abs(v0)>.5){if(DR.t-DR.ct>1){DR.ct=DR.t;DR.vref=Math.abs(v0)}
    const fl=Math.max(Math.abs(v0)*.95,DR.vref*.85);if(Math.abs(RO.v)<fl)RO.v=Math.sign(v0)*fl}}}

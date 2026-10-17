@@ -293,7 +293,8 @@ window.__ob=Object.assign(window.__ob||{},{roadAudit:()=>OB_audit(),RA:OB_RA,RD,
   // debug: drawn street samples within R of (x,z): [segment index, class, width, sample index, x, z, junction key]
   roadsNear:(x,z,R=20)=>{const o=[];CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(Math.hypot(p.x-x,p.z-z)<R)o.push([si,S.r.cls,S.r.w,i,+p.x.toFixed(1),+p.z.toFixed(1),p.k==null?null:OB_kf(p.k)])}));return o}});
 
-const CITY_G=new Map();CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{const k=Math.floor(p.x/64)*100000+Math.floor(p.z/64);let L=CITY_G.get(k);if(!L)CITY_G.set(k,L=[]);L.push(si,i)}));
+const CITY_G=new Map();function CITY_reidx(){CITY_G.clear();CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{const k=Math.floor(p.x/64)*100000+Math.floor(p.z/64);let L=CITY_G.get(k);if(!L)CITY_G.set(k,L=[]);L.push(si,i)}));try{BK_ci.clear()}catch(_){}}CITY_reidx();function CITY_mis(){let b=0;for(const[k,L]of CITY_G)for(let j=0;j<L.length;j+=2){const S=CITY_S[L[j]],p=S&&S.pts[L[j+1]];if(!p||Math.floor(p.x/64)*100000+Math.floor(p.z/64)!==k)b++}return b}
+// athroads4: CITY_reidx() again once the street samples are final (the hub build edits them after this point; a stale index made cityAt miss the street and Athens filler blocks stood on the road)
 function cityAt(x,z,skip=-1,np=false){const kx=Math.floor(x/64),kz=Math.floor(z/64);let bd=1e12,bs=-1,bi=0;for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=CITY_G.get((kx+a)*100000+kz+b);if(!L)continue;for(let j=0;j<L.length;j+=2){if(L[j]===skip||np&&CITY_S[L[j]].r.cls==='ped')continue;const p=CITY_S[L[j]].pts[L[j+1]],dx=p.x-x,dz=p.z-z,d=dx*dx+dz*dz;if(d<bd){bd=d;bs=L[j];bi=L[j+1]}}}
   if(bs<0)return null;const S=CITY_S[bs],p=S.pts[bi];return{d:Math.sqrt(bd),lat:(x-p.x)*p.tz-(z-p.z)*p.tx,s:p.s,road:S.r,si:bs,i:bi,S,p}}
 // street crossings and T-junctions (junction discs, traffic links)

@@ -19,7 +19,7 @@ function TRN_edge(n=50){const R=TRN_roads().filter(r=>r.P.length>2),rnd=TRN_rng(
     const l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l,nz=(b[0]-a[0])/l,y=groundY(c[0],c[1]),hw=Math.min(r.hw,8);if(TRN_skip(c[0]+nx*hw,c[1]+nz*hw)||TRN_skip(c[0]-nx*hw,c[1]-nz*hw))continue;
     // intersections: across one road is along the other (its grade), not a cross-fall; terr-4: also junction mouths (centre within one
     // half-width of a terr-2 junction pad / disc / filler square: the pad plane carries the cross street's grade, blended over 20 m)
-    if(typeof TJ_inJunc==='function'&&TJ_inJunc(c[0],c[1],hw))continue;
+    if(typeof TJ_inJA==='function'&&TJ_inJA(c[0],c[1],hw))continue;/* athroads4: TJ_inJunc is also true on any street, so with a current street index every centre point was skipped */
     if([1,-1].some(sd=>{const x=c[0]+nx*hw*sd,z=c[1]+nz*hw*sd,q=cityAt(x,z);if(q&&q.S!==r.ref&&q.d<q.S.r.w/2+2)return true;try{const f=fillAt(x,z,r.ref);if(f&&f.d<f.r.w/2+2)return true}catch(e){}return false}))continue;
     const d=Math.max(Math.abs(groundY(c[0]+nx*hw,c[1]+nz*hw)-y),Math.abs(groundY(c[0]-nx*hw,c[1]-nz*hw)-y));out.push({d,x:Math.round(c[0]),z:Math.round(c[1]),id:r.id})}
   out.sort((a,b)=>b.d-a.d);const o={n:out.length,max:+out[0].d.toFixed(2),worst:out[0],over:out.filter(q=>q.d>.3).length};TRN.edge=o;return o}
