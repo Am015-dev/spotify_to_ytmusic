@@ -27,6 +27,7 @@ function ATHR_sd(ax,az,bx,bz,cx,cz,dx,dz){/* distance between segments ab and cd
  if(ccw(ax,az,bx,bz,cx,cz)*ccw(ax,az,bx,bz,dx,dz)<0&&ccw(cx,cz,dx,dz,ax,az)*ccw(cx,cz,dx,dz,bx,bz)<0)return 0;
  const pd=(px,pz,x0,z0,x1,z1)=>{const vx=x1-x0,vz=z1-z0,L=vx*vx+vz*vz,t=L?Math.max(0,Math.min(1,((px-x0)*vx+(pz-z0)*vz)/L)):0;return Math.hypot(px-x0-vx*t,pz-z0-vz*t)};
  return Math.min(pd(ax,az,cx,cz,dx,dz),pd(bx,bz,cx,cz,dx,dz),pd(cx,cz,ax,az,bx,bz),pd(dx,dz,ax,az,bx,bz))}
+const ATHR_T={hi:2.5,lo:.6,lo0:-2.5};/* triage (athroads3): a real car-height obstruction has a VERTICAL edge (terrain slopes/cliffs do not), its base within [lo0,lo] m of the ground and its top >= hi m above it (window.__athT overrides) */
 function ATHR_walls(visit){/* visit(x0,z0,x1,z1,topAboveGround,meshName) for every wall base segment of every visible mesh */
  scene.updateMatrixWorld(true);const M=new THREE.Matrix4(),W=new THREE.Matrix4(),a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),cache=new Map();
  const isVis=o=>{for(let p=o;p;p=p.parent)if(!p.visible)return false;return true};
@@ -34,12 +35,12 @@ function ATHR_walls(visit){/* visit(x0,z0,x1,z1,topAboveGround,meshName) for eve
   cache.set(g.uuid,L=Float32Array.from(T));return L};
  const tri=(T,t,W,nm)=>{a.set(T[t],T[t+1],T[t+2]).applyMatrix4(W);b.set(T[t+3],T[t+4],T[t+5]).applyMatrix4(W);c.set(T[t+6],T[t+7],T[t+8]).applyMatrix4(W);
   const ux=b.x-a.x,uy=b.y-a.y,uz=b.z-a.z,vx=c.x-a.x,vy=c.y-a.y,vz=c.z-a.z,nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,nl=Math.hypot(nx,ny,nz);if(nl<1e-6||Math.abs(ny)/nl>.3)return;
-  const lo=Math.min(a.y,b.y,c.y),hi=Math.max(a.y,b.y,c.y),gx=(a.x+b.x+c.x)/3,gz=(a.z+b.z+c.z)/3,g=groundY(gx,gz);if(hi-g<3.5||hi-g>300||lo-g>2)return;/* >300 m = terrain cliffs / mountain meshes, not buildings */
+  const lo=Math.min(a.y,b.y,c.y),hi=Math.max(a.y,b.y,c.y),gx=(a.x+b.x+c.x)/3,gz=(a.z+b.z+c.z)/3,g=groundY(gx,gz);const T0=window.__athT||ATHR_T;if(hi-g<T0.hi||hi-g>300||lo-g>T0.lo||lo-g<T0.lo0)return;const vt=(p,q)=>Math.hypot(p.x-q.x,p.z-q.z)<.6&&Math.abs(p.y-q.y)>1;if(!(vt(a,b)||vt(a,c)||vt(b,c)))return;/* >300 m = terrain cliffs / mountain meshes, not buildings */
   /* base segment = the horizontal extent of the triangle */let p=[a,b,c].sort((q,r)=>q.x-r.x),dx=p[2].x-p[0].x,dz=p[2].z-p[0].z;let q0=p[0],q1=p[2];if(Math.abs(dz)>Math.abs(dx)){p=[a,b,c].sort((q,r)=>q.z-r.z);q0=p[0];q1=p[2]}
-  if(Math.hypot(q1.x-q0.x,q1.z-q0.z)<1.5)return;visit(q0.x,q0.z,q1.x,q1.z,hi-g,nm)};
+  if(Math.hypot(q1.x-q0.x,q1.z-q0.z)<1.5)return;visit(q0.x,q0.z,q1.x,q1.z,hi-g,nm+' lo='+(lo-g).toFixed(1)+' L='+Math.hypot(q1.x-q0.x,q1.z-q0.z).toFixed(0)+' g='+g.toFixed(0)+' y='+hi.toFixed(0)+' v='+[a,b,c].map(q=>q.x.toFixed(0)+','+q.y.toFixed(0)+','+q.z.toFixed(0)).join(';'))};
  scene.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes.position||!isVis(o))return;const g=o.geometry;if(o.material&&o.material.transparent&&o.material.opacity<.3)return;const T=local(g),n=o.isInstancedMesh?o.count:1;if(!g.boundingBox)g.computeBoundingBox();const gb=g.boundingBox,sz=Math.max(gb.max.x-gb.min.x,gb.max.z-gb.min.z);
   if(o.isInstancedMesh&&(gb.max.y-gb.min.y<3.5||sz<1.5))return;/* props, kerb pieces, trees' trunks are not walls */
-  for(let i=0;i<n;i++){if(o.isInstancedMesh){o.getMatrixAt(i,M);W.multiplyMatrices(o.matrixWorld,M)}else W.copy(o.matrixWorld);for(let t=0;t<T.length;t+=9)tri(T,t,W,o.name||(o.isInstancedMesh?'inst':'mesh'))}})}
+  for(let i=0;i<n;i++){if(o.isInstancedMesh){o.getMatrixAt(i,M);W.multiplyMatrices(o.matrixWorld,M)}else W.copy(o.matrixWorld);for(let t=0;t<T.length;t+=9)tri(T,t,W,(o.name||(o.isInstancedMesh?'inst':'mesh'))+' nv='+g.attributes.position.count+(o.isInstancedMesh?'i':'')+'<'+(o.parent&&o.parent.name||(o.parent&&o.parent.parent&&o.parent.parent.name)||'')+(o.geometry.userData&&o.geometry.userData.tag?'#'+o.geometry.userData.tag:''))}})}
 function ATHR_vis(){const R=ATHR_roads(),G=new Map(),K=(i,j)=>i*10000+j,out=[],seen=new Set();let km=0;for(const r of R){km+=Math.hypot(r.x1-r.x0,r.z1-r.z0)/1000;const x0=Math.min(r.x0,r.x1)-r.w,x1=Math.max(r.x0,r.x1)+r.w,z0=Math.min(r.z0,r.z1)-r.w,z1=Math.max(r.z0,r.z1)+r.w;
   for(let i=Math.floor(x0/40);i<=Math.floor(x1/40);i++)for(let j=Math.floor(z0/40);j<=Math.floor(z1/40);j++){const k=K(i,j);let L=G.get(k);if(!L)G.set(k,L=[]);L.push(r)}}
  const deck=(x,z)=>typeof onAnyDeck==='function'&&onAnyDeck(x,z);
@@ -66,3 +67,5 @@ function ATHR_dead(){const R=ATHR_roads(),out=[];const ends=[];
 window.__athDead=ATHR_dead;
 function ATHR_go2(){const v=ATHR_vis(),d=ATHR_dead();return'📍 ROADS VISUAL ('+CID+') · '+v.n+' visible overlaps, '+d.n+' blocked dead ends ('+d.all+' dead ends in all)'+(v.n?' · worst '+v.list.slice(0,3).map(o=>o.x+','+o.z+' '+o.road).join('; '):'')+(d.n?' · dead '+d.list.slice(0,3).map(o=>o.x+','+o.z+' '+o.road).join('; '):'')+(v.n||d.n?' ❌':' ✅')}
 window.__athDump=(x,z,r)=>{const R=[],B=[];for(const S of CITY_S)if(S.pts.some(p=>Math.abs(p.x-x)<r&&Math.abs(p.z-z)<r))R.push({c:S.r.cls,w:S.r.w,p:S.pts.map(p=>[Math.round(p.x),Math.round(p.z)])});const seen=new Set();for(let a=x-r;a<=x+r;a+=40)for(let c=z-r;c<=z+r;c+=40)for(const b of(HUB.grid.get(Math.floor(a/40)*10000+Math.floor(c/40))||[]))if(!seen.has(b)){seen.add(b);B.push([+b.x.toFixed(1),+b.z.toFixed(1),+b.hw.toFixed(1),+b.hd.toFixed(1),b.c==null?0:+Math.atan2(b.s,b.c).toFixed(2),+(b.h||0).toFixed(0)])}return{R,B}};
+window.__athHub=()=>HUB;
+window.__athScene=()=>scene;
