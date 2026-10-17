@@ -4,6 +4,11 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun boss fights round 4 (flag RET.boss2, 17 Oct 2026)
+- Done + live: `parts/armour.js` (hard damage-rate cap per boss = max/T over a rolling 1 s, HP phases on bar lines with a calm bar, phase-3 lane beams + EXPOSED last stand, weak-ship help), gate `nightrun/boss2-test.js`. `?boss2=0` = before. Numbers: BALANCE.md "Boss fights, round 4".
+- The floor holds for every boss and tier under a 1e6-HP/frame stress test. Normal max build is inside every target window.
+- Next: Legend district/final run long (229-291 s) and fresh ships run above 1.3x floor. Look at the Legend core shields and hard.js bA=.35 on bosses before touching the cap.
+
 ## Nightrun title diet + type floor (B25, B26; 16 Oct 2026)
 - Done: flags `RET.title` and `RET.type` (ret.js; `?title=0` / `?type=0` switch them off), new part `parts/title.js` (built before c.js), test `nightrun/ret-title-test.js`.
 - Title now: PLAY (fresh save) or CONTINUE (next unbeaten stage + saved ARCADE/CLASSIC + Heat, 1 tap from cold open), ENDLESS + DAILY (streak/bonus on the tile), GARAGE + MENU, and one status chip (daily streak + weekly).

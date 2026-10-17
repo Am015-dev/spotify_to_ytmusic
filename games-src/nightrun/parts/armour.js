@@ -9,7 +9,7 @@
    C. power scale: the hull is set high (x HK), and a ship whose honest damage cannot finish inside ~1.2 T gets its boss damage raised (at most x AMP); hard.js's repair is held to REP x the cap,
       so a fresh ship is not stuck: its fight ends near 1.2 T; the cap still holds the floor. */
 if(RET.boss2===undefined)RET.boss2=!/[?&]boss2=0/.test(location.search);
-const B2X=window.B2X={get on(){return!!RET.boss2;},HK:2.4,M:1.06,AMP:12,LATE:1.2,LS:8,REP:.4,
+const B2X=window.B2X={get on(){return!!RET.boss2;},HK:1.8,M:1.06,AMP:12,LATE:1.2,LS:8,REP:.4,
   T:{mini:{easy:42,normal:50,hard:60,vhard:65,legend:70},dist:{easy:66,normal:80,hard:95,vhard:102,legend:110},fin:{easy:100,normal:120,hard:145,vhard:158,legend:170}},   // the shortest fight in seconds
   kind(e){return e.mini?'mini':(e.k===3||ST.on&&ST.n>=40||!ST.on&&G.pos>=4)?'fin':'dist';},
   tf(e){const t=this.T[this.kind(e)];return t[SET.diff]||t.normal;},
@@ -37,7 +37,7 @@ NR.on('runStart',()=>{B2X.hz=[];B2X.st={abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,l
   if(e.x<=bossX())s.act+=dt;                                    // seconds since it took position (shields, calm bars and the last stand count)
   s.rate+=(raw/Math.max(dt,1e-3)-s.rate)*Math.min(1,dt/3);
   const need=s.ref/Math.max(4,B2X.LATE*B2X.tf(e)-s.act);
-  s.amp=typeof CAMP!=='undefined'&&CAMP.on?1:s.rate>1e-3?clamp(need/s.rate,1,B2X.AMP):B2X.AMP;   // no help for a parked ship (fair.js camping)
+  s.amp=s.rate>1e-3?clamp(need/s.rate,1,B2X.AMP):B2X.AMP;     // only damage that lands is raised (a ship that does not hit gets nothing)
   let loss=raw*s.amp;const now=G.t,cap=B2X.cap(e);s.w=s.w.filter(x=>now-x[0]<1);let used=0;for(const x of s.w)used+=x[1];
   const room=Math.max(0,cap-used),take=Math.min(loss,room);
   if(raw>0){B2X.st.dealt+=raw;if(s.amp>1)B2X.st.amp+=take-Math.min(raw,take);}
