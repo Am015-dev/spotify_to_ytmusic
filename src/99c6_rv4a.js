@@ -5,7 +5,8 @@ function RV4A_drive(sec,on){const rnd0=Math.random;let sd=4242;Math.random=()=>(
  try{for(let i=0;i<N;i++){const dt=i%40===39?.05:1/30,la=12+RO.v*.9,q=rfSnap(RO.x+Math.sin(RO.h)*la,RO.z+Math.cos(RO.h)*la,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;
    K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;roamStep(dt);try{roamCam(dt)}catch(er){}if(on(i,dt)===false)break}}
  finally{K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;Math.random=rnd0}}
-function RV4A_go(kind){const ok=b=>b?' ✅':' ❌',FC=window.__fcam;
+function RV4A_home(){try{OF_reset()}catch(e){}roamWarp(ATH_SPAWN[0],ATH_SPAWN[1],ATH_SPAWN[2],true);RO.v=0;RO.vy=0;camSnap=true}   // both GOs start from the free-roam spawn (a combined tChkGo run does not reset the car between items)
+function RV4A_go(kind){RV4A_home();const ok=b=>b?' ✅':' ❌',FC=window.__fcam;
  if(kind==='cam'){const ds=[],pk=[],jm=[],cb=[];let f0=FC?FC.pulls:0,pc=null,ppx=RO.x,ppz=RO.z,jmax=0,ji=-1;RV4A_drive(120,(i)=>{const c=camera.position;const tp=Math.hypot(RO.x-ppx,RO.z-ppz)>Math.abs(RO.v)/30*1.6+1.5;ppx=RO.x;ppz=RO.z;if(pc&&!tp){const j=Math.hypot(c.x-pc[0],c.y-pc[1],c.z-pc[2])-Math.abs(RO.v)*(i%40===39?.05:1/30);if(j>jmax){jmax=j;ji=i}}pc=[c.x,c.y,c.z];ds.push(Math.hypot(c.x-RO.x,c.y-RO.y,c.z-RO.z));pk.push(FC?FC.k:1);cb.push([RO.camB,Math.abs(RO.v)*3.6])});
   const sm=ds.map((_,i)=>{let s=0,n=0;for(let k=Math.max(0,i-4);k<=i;k++){s+=ds[k];n++}return s/n});   // 0.3 s smoothing
   let sw=0,ex=sm[0],dir=0,swP=0;const sws=[];for(let i=1;i<sm.length;i++){const d=sm[i]-ex;if(!dir){if(Math.abs(d)>=2){dir=Math.sign(d);sw++;ex=sm[i];sws.push(i)}else if(d*(sm[i]-sm[i-1])<0&&Math.abs(d)<.01)ex=sm[i]}else if(Math.sign(sm[i]-ex)===dir){ex=sm[i]}else if(Math.abs(sm[i]-ex)>=2){dir=-dir;sw++;ex=sm[i];sws.push(i)}}
