@@ -1,0 +1,7 @@
+# lane D (review 2K-3 fixes) handoff, 2026-10-17
+
+- devui2: 🐞 + ✔ chip hide (class `odDevHide`, `src/99rv3_review.js` `DEV_yield`, 150 ms) over any button/panel and for the whole race, result and garage; the pause menu's 🐞 BUG button now opens the same report sheet (`src/assets/qa/code.js`). GO `rv2k3/devui2` (roam + result + garage PAINT): 0 px² landscape and portrait (old behaviour: 3872 / 9836 px²).
+- debris-por: smashed traffic is thrown to the side and shrinks to 25 % (`CR_tumbleStart`, `CR_tk` in `src/10_core3.js`; effect in `TR_smashFx`, `src/70_roam_world.js`). GO `rv2k3/debris-por` (portrait, 70 km/h): 1-2 % of the screen at 0.5 s (≤ 10 %).
+- Other: EXIT is its own small button under the ⚙ (`#ofExit`), BRAKE/REVERSE stay put (`src/98of_onfoot.js`); `RO.veh` reads `car` on the road (was the old id `ship`); `tools/tRv2k2.js` life probe reads `HUB.cars`; `tools/tChkGo.js` has `PORTRAIT=1` and reopens the page after devui2.
+- Open: `hudstack1/stack` FAILs when it runs after other GOs on a warm page (same on the untouched trunk build with TAG=rv2k2/tiny,rv2k/devui,hudstack1; solo and in tGo's first page it passes), not caused by this lane. 99c_checklist.js is 51 B under the 200 KB cap: new GO code goes in `99rv3_review.js`. No OD_CHANGELOG entry (coordinator adds it at deploy).
+- Tools: `tools/tRv3Shot.js` (smash shot), `tools/tRv3Dev.js` (devui2 + garage/result shots), `tools/tRv3Exit.js` (EXIT shot).

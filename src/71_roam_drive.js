@@ -85,7 +85,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(Math.abs(RO.h)>50){RO.h-=Math.r
   if(!onRamp&&!(RO.y>g2+.05||RO.vy>0))RO.lastRamp=null;if(CID==='ath'&&RO.vy===0&&!RO.lastRamp&&!onRamp&&RO.y>g2&&RO.y-g2<=Math.abs(RO.v)*dt*.4+.1)RO.y=g2;
   if(RO.y>g2+.05||RO.vy>0){RO.vy-=(RO.crRJ?CR_RG:TUNE.grav)*dt;if(RO.crRJ&&RO.vy<-22)RO.vy=-22;RO.y+=RO.vy*dt;if(RO.y<=g2){if(RO.vy<-24)roamDamage(Math.min(20,(-RO.vy-24)*1.5+6));RO.landK=Math.min(1,Math.max(RO.landK||0,-RO.vy/22));if(RO.vy<-8&&g2>-1.5)puff(V3(RO.x,g2+.4,RO.z),6,_tipC.setRGB(.8,.78,.74),2,7,.8,.4,4,2);if(RO.vy<-10){AU.sfx(g2<-1.5?'splash':'land');if(g2<-1.5)burst(WATER,V3(RO.x,g2+1,RO.z),50,18,.8,new THREE.Color(.4,.7,1.2));shake=.35}RO.y=g2;RO.vy=0;roamLanded()}}else{RO.crRJ=0;if(g2-RO.y<1.6)RO.y+=(g2-RO.y)*Math.min(1,dt*14);else RO.y=g2}
   if(RO.y>g2+1.2&&!s.air)s.air={vy:RO.vy};else if(RO.y<=g2+.3)s.air=null;
-  if(!s.air){s.terrain=terr;s.boatMode=veh==='boat';s.dirtMode=veh==='offroad'}RO.fit=fit;RO.terr=terr;RO.veh=veh;
+  if(!s.air){s.terrain=terr;s.boatMode=veh==='boat';s.dirtMode=veh==='offroad'}RO.fit=fit;RO.terr=terr;RO.veh=veh==='ship'?'car':veh/* rv2k3: the road vehicle reads 'car' (the internal id 'ship' is the old name; GOs and tools expect car / boat / offroad) */;
   s.v=sp;s.dist=0;
   // studs: magnet pulls them in
   const mag=roamMagnet();for(const st of RO.studs){if(!st.alive){if((st.t-=dt)<=0){st.alive=true;st.m.visible=true;st.m.position.set(st.x,st.y,st.z);st.pull=false}continue}st.m.rotation.z+=dt*3;const dx=RO.x-st.m.position.x,dz=RO.z-st.m.position.z,dy=RO.y+.6-st.m.position.y,d=Math.hypot(dx,dz);

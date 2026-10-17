@@ -116,7 +116,7 @@ async function report(){
 Q.report=report;
 function addBtn(){const pg=document.querySelector('#roamPause .pg');if(!pg||pg.querySelector('[data-p="bug"]'))return!!pg;
   const b=document.createElement('button');b.dataset.p='bug';b.id='qaBugBtn';b.textContent='🐞 BUG';b.style.cssText='font-size:13px';
-  b.addEventListener('click',async e=>{e.stopPropagation();e.preventDefault();try{if(Q.pending){const p=Q.pending;Q.pending=null;try{await navigator.share({files:[p.file],text:p.txt});toast('🐞 shared');b.textContent='🐞 BUG';return}catch(er){}}
+  b.addEventListener('click',async e=>{e.stopPropagation();e.preventDefault();{const t=document.getElementById('qaBugTop');if(t){t.click();return}}/* rv2k3/devui2: the pause menu's BUG button opens the report sheet (the 🐞 top button hides over panels) */try{if(Q.pending){const p=Q.pending;Q.pending=null;try{await navigator.share({files:[p.file],text:p.txt});toast('🐞 shared');b.textContent='🐞 BUG';return}catch(er){}}
       b.textContent='🐞 …';const r=await report();if(r==='tap-again'){b.textContent='📤 TAP TO SHARE';toast('🐞 ready · tap again to share');return}toast(r==='shared'?'🐞 report shared':r==='cancelled'?'🐞 cancelled':'🐞 repro link '+(r.indexOf('copied')===0?'copied':'not copied')+(r.indexOf('png')>0?' · screenshot saved':''))}catch(er){toast('🐞 failed: '+er)}finally{if(!Q.pending)b.textContent='🐞 BUG'}},true);
   pg.appendChild(b);return true}
 // ---- rev-3: always-visible 🐞 BUG button (top bar) + report sheet → shared db 'bugs' (window.claude db capability), clipboard fallback

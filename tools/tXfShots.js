@@ -6,7 +6,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  await p.goto(process.argv[2]+'?test=fra&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:120000});await p.evaluate(()=>__tq.draw());
  const shot=async(f,pre)=>{await p.evaluate(pre||'0');await p.evaluate(()=>__tq.draw());await p.screenshot({path:OUT+'/'+f});console.log('SHOT',f,JSON.stringify(await p.evaluate(()=>__xf.surf())))};
  const until=async(fn,ms=20000)=>p.waitForFunction(fn,null,{polling:50,timeout:ms}).catch(()=>console.log('timeout',String(fn)));
- await p.evaluate(()=>__chk.go('xf1/grass'));await until(()=>__fl.surf().veh==='ship'&&Math.abs(__xf.XF.t)>=0);await p.waitForTimeout(1200);await shot('x1_road_car.jpg');
+ await p.evaluate(()=>__chk.go('xf1/grass'));await until(()=>__fl.surf().veh==='car'&&Math.abs(__xf.XF.t)>=0);await p.waitForTimeout(1200);await shot('x1_road_car.jpg');
  await until(()=>__xf.surf().veh==='offroad');await shot('x2_transform.jpg','__xf.XF.t=.1');await until(()=>/✅|❌/.test(__chk.said()||''));await shot('x3_offroad_grass.jpg');
  await p.evaluate(()=>__chk.go('xf1/water'));await until(()=>/✅|❌/.test(__chk.said()||''),30000);await shot('x4_boat_river.jpg');
  await p.evaluate(()=>__chk.go('xf1/land'));await until(()=>/✅|❌/.test(__chk.said()||''),30000);await shot('x5_land.jpg');

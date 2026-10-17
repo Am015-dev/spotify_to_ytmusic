@@ -7,9 +7,10 @@ const CR_SPDCAM={b:2.2,h:.9};
 function CR_smashHit(){const t=performance.now();if(t-(CR_smashHit.t||0)<250)return;CR_smashHit.t=t;shake=Math.max(shake,.75);fovKick=Math.max(fovKick,10);slowmo=Math.max(slowmo,.18);try{AU.sfx('takedown')}catch(e){}try{hitPop('💥 SMASH!','#ffd12c')}catch(e){}}
 // city victims tumble for 0.9 s (barrel roll + flight) before they burst into bricks
 const _crTQ=new THREE.Quaternion(),_crTE=new THREE.Euler(),_crTS=new THREE.Vector3(1,1,1),_crTP=new THREE.Vector3(),_crTM=new THREE.Matrix4();
-function CR_tumbleStart(c,x,z,dx,dz){const f=Math.hypot(dx,dz)||1,rx=x-RO.x,rz=z-RO.z,rl=Math.hypot(rx,rz)||1,v=Math.max(12,Math.abs(RO.v));c.crW={t:0,x,y:c.y,z,h:Math.atan2(dx,dz),vx:Math.sin(RO.vh)*v*.55+rx/rl*6,vz:Math.cos(RO.vh)*v*.55+rz/rl*6,vy:7+v*.08,r:0,p:0,sr:(Math.random()<.5?-1:1)*9,sp:(Math.random()-.5)*5}}
+function CR_tumbleStart(c,x,z,dx,dz){const f=Math.hypot(dx,dz)||1,rx=x-RO.x,rz=z-RO.z,rl=Math.hypot(rx,rz)||1,v=Math.max(12,Math.abs(RO.v)),sd=(rx*Math.cos(RO.vh)-rz*Math.sin(RO.vh))<0?-1:1,lx=Math.cos(RO.vh)*sd,lz=-Math.sin(RO.vh)*sd/* rv2k3/debris-por: thrown to the side of the road, not along it into the camera */;c.crW={t:0,x,y:c.y,z,h:Math.atan2(dx,dz),vx:Math.sin(RO.vh)*v*.15+lx*9,vz:Math.cos(RO.vh)*v*.15+lz*9,vy:6+v*.05,r:0,p:0,sr:(Math.random()<.5?-1:1)*9,sp:(Math.random()-.5)*5}}
+function CR_tk(t){return 1-.75*Math.min(1,t/.6)}/* rv2k3/debris-por: the smashed car shrinks to a quarter while it is thrown */
 function CR_tumble(c,im,dt){const W=c.crW;if(!W)return false;if(W.t>=.9){c.crW=null;return false}W.t+=dt;W.vy-=22*dt;W.x+=W.vx*dt;W.y=Math.max(c.y-.5,W.y+W.vy*dt);W.z+=W.vz*dt;W.r+=W.sr*dt;W.p+=W.sp*dt;
- _crTQ.setFromEuler(_crTE.set(W.p,W.h,W.r,'YXZ'));_crTM.compose(_crTP.set(W.x,W.y,W.z),_crTQ,_crTS);im.setMatrixAt(c.j,_crTM);if(im.userData.w)im.userData.w.setMatrixAt(c.j,_crTM);if(im.userData.g)im.userData.g.setMatrixAt(c.j,_crTM);return true}
+ _crTQ.setFromEuler(_crTE.set(W.p,W.h,W.r,'YXZ'));_crTM.compose(_crTP.set(W.x,W.y,W.z),_crTQ,_crTS.setScalar(CR_tk(W.t)));im.setMatrixAt(c.j,_crTM);if(im.userData.w)im.userData.w.setMatrixAt(c.j,_crTM);if(im.userData.g)im.userData.g.setMatrixAt(c.j,_crTM);return true}
 function CR_dodge(s,o){const m=s.crDg||(s.crDg=new Map()),t=typeof raceT!=='undefined'?raceT:performance.now()/1000,e=m.get(o);if(e&&t-e.t<1.5)return e.d;const d=o.x>s.x?-1:1;m.set(o,{d,t});return d}
 
 const CR_TYRE_Y=.03;

@@ -1,6 +1,6 @@
 // checklist helpers moved out of 99c_checklist.js (lazy, at its 200 KB unit cap, 2026-10-17): main-page module, so the lazy checklist sees them
-function RV2K2_race(lag,secs){const sp0=RO.sp;if(sp0)try{sprintEnd()}catch(e){}const m=tkMarkOf(RIVAL_EV.find(e=>e.p===TK_C.p));tkStart(m,TK_C);const sp=RO.sp;sp.cd=0;const G=tkGeoOf(TK_C),bot=lag==null?null:tkBot(G.pA,{lag});let lc=0,sg=0,acc=0;const gaps=[];
+window.__rv3={race:(l,t,k)=>RV2K2_race(l,t,k)};function RV2K2_race(lag,secs,keep){const sp0=RO.sp;if(sp0)try{sprintEnd()}catch(e){}const m=tkMarkOf(RIVAL_EV.find(e=>e.p===TK_C.p));tkStart(m,TK_C);const sp=RO.sp;sp.cd=0;const G=tkGeoOf(TK_C),bot=lag==null?null:tkBot(G.pA,{lag});let lc=0,sg=0,acc=0;const gaps=[];
  tkRun(secs||300,s=>{if(bot)bot(s);acc+=1/30;if(acc>=1){acc=0;const a=s.ai[0];if(a){const d=Math.sign((s.myS||0)-(a.s||0));if(sg&&d&&d!==sg)lc++;if(d)sg=d;gaps.push((s.myS||0)-(a.s||0))}}});
  const r=TK.last,ab=gaps.map(Math.abs).sort((a,b)=>a-b),o={fin:!!r&&!r.dnf,place:r&&r.place,t:r&&r.t,lc,med:Math.round(ab[ab.length>>1]||0),fired:sp.fired||0,walls:bot?bot.R.walls:0,stuck:bot?bot.R.stuck.length:0};
- try{$('#spRes').hidden=true}catch(e){}if(RO.sp===sp)try{sprintEnd()}catch(e){}K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=K.ArrowDown=false;return o}
+ if(keep)return o;try{$('#spRes').hidden=true}catch(e){}if(RO.sp===sp)try{sprintEnd()}catch(e){}K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=K.ArrowDown=false;return o}
 function RV2K2_vis(e){const r=e&&e.getBoundingClientRect();return r&&r.width>0&&r.height>0&&e.offsetParent!==null&&getComputedStyle(e).visibility!=='hidden'&&+getComputedStyle(e).opacity>.05?r:null}

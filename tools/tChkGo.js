@@ -12,7 +12,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
 const BASE=process.argv[2],OUT=process.argv[3]||'.',FIL=process.argv[4]||'';fs.mkdirSync(OUT,{recursive:true});
 const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: tools/chkgo_verdict.js (a throwing GO is FAIL)
 (async()=>{const T0=Date.now(),b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
- const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const errs=[],boots={},res=[],RS={n:0,ms:0};let nav=0,p=null;const FC={};
+ const ctx=await b.newContext({viewport:process.env.PORTRAIT?{width:393,height:852}:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const errs=[],boots={},res=[],RS={n:0,ms:0};let nav=0,p=null;const FC={};
  const newPage=async()=>{p=await ctx.newPage();p.setDefaultTimeout(120000);p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});p.on('framenavigated',f=>{if(f===p.mainFrame())nav++})};await newPage();
  const open=async c=>{const t=Date.now();await p.goto(BASE+(BASE.includes('?')?'&':'?')+'test='+c+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:90000});if(!open.warm){open.warm=1;await p.evaluate(()=>__tq.draw()).catch(()=>{})}  // one picture up front: the first draw compiles the shaders (~5 s) and would be billed to the first GO that needs a render
   const s=(Date.now()-t)/1000;(boots[c]=boots[c]||[]).push(s);if(!process.env.QUIET)console.log(`BOOT ${c} ${s.toFixed(1)} s`);nav=0};
@@ -40,6 +40,7 @@ const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: too
    if(!process.env.QUIET||!fin||spawnOnly)console.log(`${spawnOnly?'SPAWN-ONLY(laps NOT checked, run tools/bx/tTracks.js)':fin?'PASS':'FAIL'} ${c} ${id} ${((Date.now()-t1)/1000).toFixed(1)}s · ${said||'(no message)'}${errs.length>e0?' · ERR '+errs[e0]:''}`);
    if(process.env.SHOTS&&(res.length<=3||id.endsWith('/shadow')))await shot(`go_${res.length}_${id.replace(/\W/g,'_')}.jpg`);
    if(c==='bx')continue;
+   if(id==='rv2k3/devui2'){await open(c);continue}   // rv2k3: devui2 plays a whole race and opens the garage: later GOs get a fresh page
    if(st.gar)await p.evaluate(()=>{try{gbClose(false)}catch(e){}});
    // warm page: reset to a clean roam in the same page (no reload); reload only when the reset can't (navigation, no __tq.reset, still not roam)
    if(!nav){const r=await p.evaluate(()=>window.__tq&&__tq.reset?__tq.reset():null).catch(()=>null);if(r&&r.state==='roam'){RS.n++;RS.ms+=r.ms;continue}}

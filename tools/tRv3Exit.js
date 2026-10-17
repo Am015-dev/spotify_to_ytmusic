@@ -1,0 +1,6 @@
+// tRv3Exit (rv2k3): node tools/tRv3Exit.js <base url> <out jpg> [portrait|land]  car stopped and idle: BRAKE stays, the small EXIT sits under the gear
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,OUT,M]=process.argv.slice(2);const por=M==='portrait';
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const c=await b.newContext({viewport:por?{width:393,height:852}:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await c.newPage();p.setDefaultTimeout(600000);
+ await p.goto(BASE+'?test=fra');await p.waitForFunction(()=>window.__chk&&window.__tq&&__tq.ready,null,{timeout:400000});await p.waitForTimeout(3000);
+ const r=await p.evaluate(()=>__tk.q(`(()=>{RO.v=0;K.KeyW=K.ArrowUp=K.ArrowDown=false;for(let i=0;i<60;i++)roamStep(1/30);const X=document.getElementById('ofExit'),B=document.getElementById('tB'),G=document.getElementById('tG'),N=document.getElementById('tN'),R=e=>{const r=e.getBoundingClientRect();return[r.left,r.top,r.right,r.bottom].map(Math.round).join(',')};return JSON.stringify({exit:X&&!X.hidden&&R(X),brake:B.textContent+' '+R(B),boost:R(N)})})()`));
+ console.log(r);await p.evaluate(()=>__tq.draw()).catch(()=>{});await p.waitForTimeout(300);await p.screenshot({path:OUT,type:'jpeg',quality:75});await b.close()})();
