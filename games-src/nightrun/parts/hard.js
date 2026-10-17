@@ -7,13 +7,13 @@
       and does not keep a CRESCENDO bonus; damage from shots that really curved (and arc/leap chains) is held at <= S3.SH of the total.
    C. bosses: auto-aimed damage on a boss counts x S3.bA; with no aimed hit on it for 2.5 s the boss repairs itself (up to its phase top). */
 if(RET.scale3===undefined)RET.scale3=!/[?&]scale3=0/.test(location.search);
-const S3=window.S3={get on(){return!!(RET.scale3&&RET.scale2);},RT:1,SH:.35,bA:.3,bK:.6,
+const S3=window.S3={get on(){return!!(RET.scale3&&RET.scale2);},RT:1,SH:.35,bA:.6,bK:.55,bT:.55,
   st:{aup:0,all:0,au:0,man:0,cut:0,bau:0,bman:0,reg:0,t:0},   // damage counters (counted with the flag off too: the probe reads them)
   au:0,man:0,ka:1,bud:0,cur:null,ctx:0,
   hard(){return S2.hard();},
   act(){return this.on&&this.hard()&&!G.lab&&!G.tut;},
   fresh(n){return 40+2.8*n;},                                    // about what a fresh ship deals on ordinary enemies on stage n, Legend (measured, BALANCE.md round 3)
-  cap(){const n=Math.min(40,S2.stg());return this.fresh(n)*SC.hpK()*(1+.45*SC.f());}};   // fresh ship x the power's hull factor x up to 1.4: a maxed ship kills ~1.4x faster than a fresh one, not 2.3x+
+  cap(){const n=Math.min(40,S2.stg());return this.fresh(n)*SC.hpK()*(1+.8*SC.f());}};   // fresh ship x the power's hull factor x up to 1.7: a maxed ship kills ~1.7x faster than a fresh one, not 2.3x+ (tighter crowds the screen: ram deaths)
 NR.on('runStart',()=>{S3.au=S3.man=0;S3.ka=1;S3.bud=0;for(const k in S3.st)S3.st[k]=0;});
 const S3auto=b=>b&&b.au&&(b.tu||0)>.2;                           // a shot that locked and really curved
 /* B. homing with a lock budget and a facing rule (hard tiers); round 2's steer elsewhere */
@@ -50,4 +50,5 @@ NR.on('tick',dt=>{const a=Math.min(1,dt/3),au=S3.au,man=S3.man;S3.st.au+=au;S3.s
   if(e.s3a==null)e.s3a=G.t;if(G.t-e.s3a>2.5&&!(e.cores&&e.cores.length)){const top=e.max*[1,.66,.33][Math.min(2,e.gi|0)],r=Math.min(top-e.hp,e.max*.012*dt);if(r>0){e.hp+=r;e.hq=e.hp;if(e.hp0!=null)e.hp0+=r;S3.st.reg+=r;}}});
 /* the district and final bosses on the hard tiers: auto-aim hits them at bA and they repair themselves, so their hull is cut to keep the fight at ~55-80 s for a maxed ship */
 {const sb1=spawnBoss;spawnBoss=function(o){const b=sb1(o);if(b&&S3.on&&S2.hard()&&!b.mini){b.hp=b.max=Math.round(b.max*S3.bK);b.floor=b.pf0=Math.ceil(b.max*.62);}return b;};}
+{const t0=B2.tmin;B2.tmin=function(e){const t=t0.call(this,e);return S3.on&&S2.hard()&&!e.mini?Math.round(t*S3.bT):t;};}   // ... and its damage budget is shorter: the shield cores and the repair add their time
 window.__s3={S3};

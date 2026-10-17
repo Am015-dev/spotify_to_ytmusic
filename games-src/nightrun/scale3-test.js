@@ -14,7 +14,7 @@ const bal = env => { const js = path.join(os.tmpdir(), 's3-' + process.pid + '-'
   cp.spawnSync('node', [path.join(__dirname, 'balance-test.js')], { env: Object.assign({}, process.env, { RUNS, PAR: '4', JSON: js }, env), stdio: 'ignore' });
   let r = []; try { r = JSON.parse(fs.readFileSync(js, 'utf8')); fs.unlinkSync(js); } catch (e) { } return r; };
 const rate = a => a.length ? a.filter(x => x.clear).length / a.length : NaN, pc = v => Math.round(100 * v) + '%';
-const cap = n => (40 + 2.8 * n) * 1.6 * 1.45;   // S3.cap() at most: fresh(n) x hpK x (1 + .45 f)
+const cap = n => (40 + 2.8 * n) * 1.6 * 1.8;   // S3.cap() at most: fresh(n) x hpK x (1 + .8 f)
 const PAIRS = 'fresh,pulse+swarm,swarm+beat,swarm+laser,swarm+arc,laser+beat', POWS = 'none,cres,echo';
 const off = probe({ Q: '&scale3=0', PAIRS, POWS: 'none,cres', PARK: '0' }), on = probe({ PAIRS, POWS });
 line(off.length > 0 && off.every(r => r.cut === 0), `flag off (?scale3=0): no damage cut in ${off.length} builds (round 2)`);

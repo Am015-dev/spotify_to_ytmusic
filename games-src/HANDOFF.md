@@ -493,3 +493,6 @@ Next: owner supplies the art; tune `RIG.hp` once the real ship pictures are chec
 
 ## Nightrun power scale round 2 (flag RET.scale2, `?scale2=0` = round 1; 17 Oct 2026)
 `parts/fair.js` (auto-aim cone/lock delay/damage cut, camping = standing still, boss shields with cores + damage budget, aimed lead shots and gap walls on hard tiers). Gate `scale2-test.js`: 5 of 7 pass; open: corner camper still clears the final boss (stage 40), Legend mini-boss TTK spread 35-82 s. Dodging-bot Legend bands (25-55%) not reached: 20/40 stay easy or flip to 0, 30 is an attrition wall. Run bot tests at PAR<=4. Numbers: BALANCE.md "Power scale, round 2".
+
+## Nightrun power scale round 3 (flag RET.scale3, `?scale3=0` = round 2; 17 Oct 2026)
+`parts/hard.js` (hard tiers only: damage ceiling in DMG.pass, homing lock budget + facing rule, auto-aim share <= 35%, boss repair without aimed hits, district/final boss hull and budget x.55). Hook: `b.js` passes bullet+enemy to `DMG.hit`. Probe `scale3-probe.js`, gate `scale3-test.js`. Camper 0%, strongest-build dps 285-504 -> <= 223. Open: dodging bot Legend 20/30/40 = 33/0/100% (stage 30 deaths are rams; final boss absorbs hits via revives). Numbers: BALANCE.md "Power scale, round 3".
