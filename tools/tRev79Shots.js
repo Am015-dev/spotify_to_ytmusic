@@ -1,0 +1,8 @@
+// tRev79Shots: Athens street that used to carry props (-2466,-1512) + traffic moving aside as the player closes fast (Frankfurt). node tools/tRev79Shots.js <base url> <outdir>
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,OUT]=process.argv.slice(2);
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const c=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});
+ const run=async(city,name,pre,n)=>{const p=await c.newPage();p.setDefaultTimeout(400000);await p.goto(BASE+'?test='+city);await p.waitForFunction(()=>window.__chk&&window.__tq&&__tq.ready,null,{timeout:400000});await p.waitForTimeout(3000);
+  for(let i=0;i<n;i++){console.log(name,i,await p.evaluate(s=>__tk.q(s),pre(i)));await p.waitForTimeout(2500);await p.screenshot({path:OUT+'/'+name+'_'+i+'.png'})}await p.close()};
+ await run('ath','ath_street',i=>i?'1':`(()=>{const q=rfSnap(-2466,-1512,120)||[-2466,-1512,0];roamWarp(q[0],q[1],q[2]||0,true);RO.v=0;for(let i=0;i<150;i++)roamStep(1/30);return 'at '+Math.round(q[0])+','+Math.round(q[1])})()`,2);
+ await run('fra','yield',i=>i?`(()=>{RO.v=Math.max(RO.v,30);for(let i=0;i<20;i++)roamStep(1/30);const c=(HUB.cars||[]).filter(c=>!c.dead).map(c=>[Math.hypot(c.x-RO.x,c.z-RO.z),c]).sort((a,b)=>a[0]-b[0])[0];return 'v '+Math.round(RO.v*3.6)+' km/h nearest '+(c?Math.round(c[0]):'-')+' m'})()`:`(()=>{const q=rfSnap(-375,475,120)||[-375,475,0];roamWarp(q[0],q[1],q[2]||0,true);RO.v=30;for(let i=0;i<60;i++)roamStep(1/30);return 'start '+Math.round(RO.v*3.6)})()`,4);
+ await b.close()})();

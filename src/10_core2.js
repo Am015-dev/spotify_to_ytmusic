@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.79',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens streets: trees, stalls and other solid props no longer stand on the road.'},{t:'NEW',s:'Traffic in your lane now moves over when you come up fast from behind.'},{t:'FIXED',s:'Head-on smashes with traffic slow you down less.'}]},
   {v:'v90m-beta.78',date:'17 Oct 2026',items:[{t:'FIXED',s:'Traffic comes back around you after a fast travel: no more empty streets.'},{t:'NEW',s:'Two more start activities near the Frankfurt start: Stud Rush Bankenviertel and Brick Smash Taunusanlage.'}]},
   {v:'v90m-beta.77',date:'17 Oct 2026',items:[{t:'FIXED',s:'Sprint races: slow traffic no longer drags you down to a crawl.'},{t:'FIXED',s:'Athens races are finishable: the Akropolis course no longer doubles back on itself.'},{t:'CHANGED',s:'Fairer rivals by default, and smoother race routes.'},{t:'FIXED',s:'Phone home screen: the logo no longer covers WELCOME BACK.'}]},
   {v:'v90m-beta.76',date:'17 Oct 2026',items:[{t:'NEW',s:'New home screen: one tap to play.'},{t:'CHANGED',s:'Smaller, faster download.'},{t:'FIXED',s:'No more giant bricks floating after crashes.'}]},
