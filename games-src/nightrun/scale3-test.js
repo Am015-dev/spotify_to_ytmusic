@@ -30,7 +30,7 @@ line(camp.length > 0 && cr <= .15, `corner camper, Legend, maxed ship, stages 20
 const god = bal({ GOD: '1', STAGES: '5,40', DIFFS: 'legend,normal', BUILDS: 'max' }), ttk = (d, n) => god.filter(x => x.diff === d && x.n === n).map(x => (x.en.find(e => e.ty === 'boss' || e.ty === 'miniboss') || {}).on || 0), f = a => a.map(v => Math.round(v)).join('/');
 const lm = ttk('legend', 5), lf = ttk('legend', 40), nm = ttk('normal', 5), nf = ttk('normal', 40);
 line(lm.length && lm.every(v => v >= 70 && v <= 115), `Legend maxed: mini-boss ${f(lm)} s (70-115, boss fights round 4 = boss2-test; round 3 50-85)`);
-line(lf.length && lf.every(v => v >= 170 && v <= 340), `Legend maxed: final boss ${f(lf)} s (170-340: target 170-260 NOT reached, measured 278-291, round 4; round 3 50-85)`);
+line(lf.length && lf.every(v => v >= 170 && v <= 260), `Legend maxed: final boss ${f(lf)} s (170-260, boss fights round 4 + overflow bank; round 3 50-85)`);
 line(nm.length && nf.length && nm.every(v => v >= 50 && v <= 85) && nf.every(v => v >= 120 && v <= 190), `Normal maxed: mini-boss ${f(nm)} s (50-85), final boss ${f(nf)} s (120-190; round 4, was 25-65)`);
 const lg = bal({ STAGES: '20,30,40', DIFFS: 'legend', BUILDS: 'max' }), per = [20, 30, 40].map(n => rate(lg.filter(x => x.n === n))), mean = rate(lg);
 line(mean >= .2 && mean <= .6 && per.every(v => v < 1), `dodging bot, Legend maxed, stages 20/30/40: ${per.map(pc).join(' / ')} (mean ${pc(mean)}: 20-60%, none at 100%; target 25-55% each; round 2 0/0/100)`);

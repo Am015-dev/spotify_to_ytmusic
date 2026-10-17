@@ -10,6 +10,7 @@ const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/ma
 const STAGES = (process.env.STAGES || '5,8,13,16,21,24,29,32,37,40').split(',').map(Number);
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 let fails = 0; const line = (ok, s) => { if (!ok) fails++; console.log((ok ? 'PASS ' : 'FAIL ') + s); };
+const UP = { normal: { mini: 80, dist: 120, fin: 180 }, legend: { mini: 110, dist: 170, fin: 260 } };   // the upper targets: the cap, not shields or repair, sets the length
 const STRESS = ({ n, diff, dmg }) => {
   const m = window.__mnr; m.SET.diff = diff; try { m.applySet(); } catch (e) { } m.startStory(n); m.simOn(true); m.god = true;
   const B = window.B2X; let t0 = null, t1 = null, sheen = 0, kind = '', T = 0, ok = 1, max = 0, phs = [];
@@ -34,7 +35,7 @@ const OFF = ({ n }) => { const m = window.__mnr; m.SET.diff = 'legend'; try { m.
   const res = []; const pages = await Promise.all([0, 1, 2, 3].map(() => page('')));
   await Promise.all(pages.map(async (p, k) => { for (let j = k; j < jobs.length; j += 4) { await p.reload(); await p.waitForFunction(() => window.__mnr && window.__mnr.startStory); res.push(await p.evaluate(STRESS, jobs[j])); } }));
   res.sort((a, b) => a.diff.localeCompare(b.diff) || a.n - b.n);
-  for (const r of res) line(r.ttk != null && r.ttk >= r.T, `stress ${r.diff} stage ${r.n} ${r.kind}: killed in ${r.ttk} s with 1e6 HP/frame (floor ${r.T} s), absorbed ${r.abs}, phases at beats ${r.phs.join('/')}, last stand ${r.ls}, beams ${r.hz}`);
+  for (const r of res) line(r.ttk != null && r.ttk >= r.T && r.ttk <= UP[r.diff][r.kind], `stress ${r.diff} stage ${r.n} ${r.kind}: killed in ${r.ttk} s with 1e6 HP/frame (floor ${r.T} s, at most ${UP[r.diff][r.kind]} s), absorbed ${r.abs}, phases at beats ${r.phs.join('/')}, last stand ${r.ls}, beams ${r.hz}`);
   line(res.every(r => r.phs.length === 2 && r.phs.every(b => b % 4 === 0) && r.ph[0].ph === 2 && r.ph[1].ph === 3), 'phases 2 and 3 start on a bar line (beat % 4 == 0), in order, on every boss');
   line(res.every(r => r.calm >= 2 && r.abs > 0 && r.sheen > 0), 'every fight: a calm bar per phase change, armour absorbed damage, the bar sheen showed');
   line(res.every(r => r.ls >= 1), 'every fight has its last stand (EXPOSED) in phase 3');

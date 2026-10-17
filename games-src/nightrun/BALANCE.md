@@ -200,3 +200,17 @@ Owner, after playing the live build: "Legend is still easy but the difficulty in
 | Legend final | 67-106 s | 180 s (170) | 278-291 s | 319-352 s |
 - Every boss on both tiers: phases 2 and 3 start on a bar line, calm bar, armour feedback, last stand (boss2-test).
 - Weak: Legend district and final run LONG for the bot (229-291 s vs 110-170 / 170-260 targets) and the fresh ship is above 1.3 x floor on every tier (Normal mini 80 vs 65): the x12 help does not reach the target; suspected cause the Legend core shields (2 cores under hard.js's ceiling) and hard.js's x.35 auto-aim on bosses. scale2/scale3-test boss windows moved to the round-4 targets (Legend final upper bound 340, target not reached). afk-test stage 42 "dodging bot died" fails before and after (not this change).
+
+### Boss fights, round 4b (18 Oct 2026: the cap, not the bot's rhythm, repair or shields, sets the length)
+Problem: with the round-4 cap the Legend bot (max build) needed 339-362 s for the final boss and ~233 s for a district boss (targets Legend 70-110 / 110-170 / 170-260, Normal 50-80 / 80-120 / 120-180). Measured: raw damage was 3-4x the cap on average, yet the HP fell at only ~45% of the cap, because (1) damage above the cap in a second was thrown away while the bot's damage arrives in bursts (beat taps, salvos, bombs), so quiet seconds were not paid back; (2) hard.js's "repair without aimed hits" (1.2%/s) ate damage before it reached the cap; (3) fair.js's 66% core shield froze the bar 4-52 s (a bot artifact, but it added straight on top of the cap).
+**Change (all inside `RET.boss2`, `?boss2=0` = round 3):** armour.js `B2X.BK=5`: damage above the cap waits in the armour (at most 5 s of the cap) and goes in at the cap's pace, so the floor is unchanged (never more than the cap in 1 s) and the length is decided by the cap; `B2X.SHT=14`: a core shield that lasts more than 14 s overloads (cores blow, "SHIELD OVERLOAD"); hard.js: the boss repair runs only while the ship camps (`CAMP.on`), and then at most `B2X.REP=.2` x the cap (was .4).
+**Measured** (god mode, dodging bot, max build, RUNS 2-3; on-screen time): 
+| fight | round 4 | now moving | now parked (camper) | god-damage stress | fresh ship |
+|---|---|---|---|---|---|
+| Legend mini | 95-105 | 78-87 | 88-109 | 73 | 78 |
+| Legend district | 229-236 | 127-133 | 132 | 116 | 120 |
+| Legend final | 278-362 | 194-202 | 212-234 | 180 | 195 |
+| Normal mini | 64-66 | 53-60 | 54-67 | 52 | 55-57 |
+| Normal district | 103-109 | 87-92 | 87-96 | 84 | 87 |
+| Normal final | 164-171 | 128-141 | 131-138 | 127 | 131-136 |
+scale2-test / scale3-test Legend final window is back at 170-260 s; boss2-test's stress now also checks the upper targets.
