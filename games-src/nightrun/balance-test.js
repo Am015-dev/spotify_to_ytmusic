@@ -15,17 +15,19 @@ const BOT = (opts) => {
   m.SET.diff = diff; try { m.applySet(); } catch (e) { }
   m.startStory(n); m.simOn(true); const DM = window.__dmg; if (DM && opts.dk) Object.assign(DM, opts.dk); let dS = 0, dN = 0, kS = 0;
   const SH = m.SH, WP = window.__wp, W = 960;
+  const late = build === 'late' || build === 'max';   // max = late + the Garage's permanent levels: two weapons at LV10 (fusion), every perk maxed (scale-test.js, BALANCE.md power scale)
   const ups = () => {   // the builds: weapons, shop upgrades, garage perks
     if (build === 'fresh') return;
-    const L = build === 'late' ? 5 : 3;
-    WP.eq = build === 'late' ? (opts.fuse ? ['laser', 'beat'] : ['pulse', 'swarm']) : ['pulse', 'swarm']; WP.lv = {}; for (const id of WP.eq) WP.lv[id] = build === 'late' ? (id === 'swarm' ? 4 : 5) : 2; WP.sync();
-    const ids = SH.UPG.map(u => u.id), want = build === 'late' ? { fr: 5, hm: 3, sb: 5, dm: 5, cr: 5, pc: 3, sc: 3, cl: 3, og: 2, rc: 2, dr: 2, rg: 2 } : { fr: 2, dm: 2, hm: 1 };
+    if (build === 'max') { const GA = window.__ga.GA; GA.eqAll = true; for (const d of m.TP_DEF) GA.tune[d.id] = d.max || 3; WP.pl = { pulse: 10, laser: 10, beat: 10, swarm: 10 }; }
+    const L = late ? 5 : 3;
+    WP.eq = late ? (opts.fuse ? ['laser', 'beat'] : ['pulse', 'swarm']) : ['pulse', 'swarm']; WP.lv = {}; for (const id of WP.eq) WP.lv[id] = late ? (id === 'swarm' ? 4 : 5) : 2; WP.sync();
+    const ids = SH.UPG.map(u => u.id), want = late ? { fr: 5, hm: 3, sb: 5, dm: 5, cr: 5, pc: 3, sc: 3, cl: 3, og: 2, rc: 2, dr: 2, rg: 2 } : { fr: 2, dm: 2, hm: 1 };
     for (const id in want) if (ids.includes(id)) for (let k = 0; k < want[id] * (L >= 5 ? 1 : 1); k++) { try { SH.add(id); } catch (e) { } }
-    if (build === 'late' && m.TP && m.TP_DEF) { try { for (const d of (Array.isArray(m.TP_DEF) ? m.TP_DEF : Object.values(m.TP_DEF))) { const id = d.id; if (id && m.TP.lv) m.TP.lv[id] = d.max || 3; } } catch (e) { } }
+    if (late && m.TP && m.TP_DEF) { try { for (const d of (Array.isArray(m.TP_DEF) ? m.TP_DEF : Object.values(m.TP_DEF))) { const id = d.id; if (id && m.TP.lv) m.TP.lv[id] = d.max || 3; } } catch (e) { } }
     try { SH.recalc && SH.recalc(); } catch (e) { }
   };
   ups();
-  const keepPw = () => { if (build !== 'late') return; for (const k of ['drum', 'tempo', 'slow', 'mag', 'tri']) if (!m.PW.on(k)) { try { m.PW.give(k); } catch (e) { } } };
+  const keepPw = () => { if (!late) return; for (const k of ['drum', 'tempo', 'slow', 'mag', 'tri']) if (!m.PW.on(k)) { try { m.PW.give(k); } catch (e) { } } };
   const dec = () => {
     const G = m.G, P = m.P; let ty = 270 + 140 * Math.sin(G.t * .9), tx = 220 + 70 * Math.sin(G.t * .55), bd = 1e9;
     for (const e of G.en) { if (e.type === 'boss') { if (e.x < 960) ty = e.y; continue; } const dx = e.x - P.x; if (dx > 0 && dx < bd && e.x < 940) { bd = dx; ty = e.type === 'gate' ? e.gy : e.y; } }
@@ -82,7 +84,8 @@ const BOT = (opts) => {
   const res = []; let next = 0, errs = 0;
   await Promise.all(Array.from({ length: PAR }, async () => {
     const p = await browser.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { errs++; if (errs < 4) console.log('PAGE ERROR', e.message); });
-    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
+    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ""}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
+    if (process.env.PRE) await p.evaluate(process.env.PRE);   // e.g. PRE='window.SC.k=0' to bisect a tuning change
     while (next < jobs.length) { const j = jobs[next++]; try { res.push(await p.evaluate(BOT, j)); } catch (e) { console.log('RUN ERROR', j.n, j.build, e.message.slice(0, 200)); } }
     await p.close();
   }));

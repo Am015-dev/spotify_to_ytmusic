@@ -127,7 +127,7 @@ const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil
     for(const e of G.en){if(e.dead)continue;
       if(e.hq==null)e.hq=e.max||e.hp;
       if(e.type!=='boss'&&e.x>W-40&&!e.rk){e.hp=e.hq;e.gr=1;continue;}       // entry grace
-      if(e.gr){e.gr=0;e.tin=G.t;e.bf=Math.min(e.bf,2);}                       // fully inside: hittable, and it gets its shot in soon
+      if(e.gr){e.gr=0;e.tin=G.t;e.bf=Math.min(e.bf,window.SC?SC.firstShot():2);}                       // fully inside: hittable, and it gets its shot in soon
       if(e.tin==null)e.tin=G.t;
       const loss=e.hq-e.hp;if(loss>0&&!e.rk){const real=Math.min(loss,Math.max(0,e.hq));raw+=real;if(this.soft)e.hp=e.hq-real*this.k;}
       if(e.type!=='boss'&&!e.rk&&!(G.empT>0)){const ml=this.minLife(e);if(ml>0){const fl=e.max*(1-(G.t-e.tin)/ml);if(e.hp<fl)e.hp=Math.max(e.hp,Math.min(e.hq,fl));}}
@@ -139,7 +139,7 @@ NR.on('runStart',()=>{DMG.dps=0;DMG.k=1;});
 /* ---------- spawning ---------- */
 function en(type,o){const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600},flank:{r:13,hp:3,score:180},swarm:{r:9,hp:1,score:60},mine:{r:15,hp:5,score:200}}[type];
-  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2,gr:DMG.on?1:0},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK())));
+  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2,gr:DMG.on?1:0},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK()*(window.SC?SC.hpK():1))));
   if(!o.mini&&(type==='drone'||type==='charger'||type==='turret'||type==='flank')&&GX()<eliteP()){e.el=1;e.hp=Math.round(e.hp*2);e.r=Math.round(e.r*1.25);e.score*=2;}   // elites: tougher, gold ring, shoot more
   e.arm=e.bf===1&&type!=='charger';DIR.safe(e);
   e.max=e.hp;e.by=e.y;G.en.push(e);if(DMG.on&&type!=='swarm'&&G.rings.length<24)G.rings.push({x:W-14,y:e.gy||e.y,l:.5,m:.5,c:'#ff3d6a'});   // spawn telegraph at the edge it comes in from

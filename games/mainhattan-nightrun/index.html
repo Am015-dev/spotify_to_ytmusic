@@ -904,7 +904,7 @@ const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil
     for(const e of G.en){if(e.dead)continue;
       if(e.hq==null)e.hq=e.max||e.hp;
       if(e.type!=='boss'&&e.x>W-40&&!e.rk){e.hp=e.hq;e.gr=1;continue;}       // entry grace
-      if(e.gr){e.gr=0;e.tin=G.t;e.bf=Math.min(e.bf,2);}                       // fully inside: hittable, and it gets its shot in soon
+      if(e.gr){e.gr=0;e.tin=G.t;e.bf=Math.min(e.bf,window.SC?SC.firstShot():2);}                       // fully inside: hittable, and it gets its shot in soon
       if(e.tin==null)e.tin=G.t;
       const loss=e.hq-e.hp;if(loss>0&&!e.rk){const real=Math.min(loss,Math.max(0,e.hq));raw+=real;if(this.soft)e.hp=e.hq-real*this.k;}
       if(e.type!=='boss'&&!e.rk&&!(G.empT>0)){const ml=this.minLife(e);if(ml>0){const fl=e.max*(1-(G.t-e.tin)/ml);if(e.hp<fl)e.hp=Math.max(e.hp,Math.min(e.hq,fl));}}
@@ -916,7 +916,7 @@ NR.on('runStart',()=>{DMG.dps=0;DMG.k=1;});
 /* ---------- spawning ---------- */
 function en(type,o){const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600},flank:{r:13,hp:3,score:180},swarm:{r:9,hp:1,score:60},mine:{r:15,hp:5,score:200}}[type];
-  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2,gr:DMG.on?1:0},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK())));
+  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2,gr:DMG.on?1:0},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK()*(window.SC?SC.hpK():1))));
   if(!o.mini&&(type==='drone'||type==='charger'||type==='turret'||type==='flank')&&GX()<eliteP()){e.el=1;e.hp=Math.round(e.hp*2);e.r=Math.round(e.r*1.25);e.score*=2;}   // elites: tougher, gold ring, shoot more
   e.arm=e.bf===1&&type!=='charger';DIR.safe(e);
   e.max=e.hp;e.by=e.y;G.en.push(e);if(DMG.on&&type!=='swarm'&&G.rings.length<24)G.rings.push({x:W-14,y:e.gy||e.y,l:.5,m:.5,c:'#ff3d6a'});   // spawn telegraph at the edge it comes in from
@@ -3671,6 +3671,31 @@ NR.on('bar',()=>{if(!RET.fever)return;FV.tb++;
     FV.on=true;FV.bars=0;FV.m=0;FV.last=FV.tb;FV.starts++;AU.fever=true;
     floater(W*.5,H*.3,'FEVER ×'+FV.k,'#ffd23d');G.flash=Math.max(G.flash,.25*FX());if(RET.sting)AU.sting('fever');RET.fvDraw();}});
 
+/* ---------- power-aware scale (flag RET.scale; ?scale=0 = the old numbers exactly). BALANCE.md "Power scale". ----------
+   The player's power score counts what the Garage sells that upsCalc (dir.js) did not: permanent weapon levels, the fusion, plus shop and garage perks (UPS.u).
+   Enemy hull points grow with the power ABOVE what the stage expects, up to a ceiling; a weapon level adds less damage per shot than it used to (LV10 = 1.8x LV1, not 2.5x+). Bosses are not scaled (their armour sets the fight). */
+if(RET.scale===undefined)RET.scale=!/[?&]scale=0/.test(location.search);   // power-aware scale: enemy hull follows the player's power, weapon level growth is diminishing
+const SC=window.SC={get on(){return!!RET.scale;},k:.6,ref:4,lvTop:.8,
+  e0:.25,e1:.055,
+  wu(){let u=0;try{for(const id of WP.eqIds())u+=.1*(WP.lvOf(id)-1);if(WP.fu())u+=.3;}catch(e){}return u;},
+  power(){return(UPS.u||0)+this.wu();},
+  exp(){const n=ST.on?Math.min(40,ST.n):Math.min(40,6*(G.pos+5*G.loop)+2);return this.e0+this.e1*n;},
+  over(){return Math.max(0,this.power()-this.exp());},
+  f(){return this.on?1-Math.exp(-this.over()/this.ref):0;},   // 0 at the expected power, .6 for a mid garage, .9 for a maxed one
+  hpK(){return 1+this.k*this.f();},
+  proj:['pulse','laser','swarm','disc','frost','wave','shell','drone'],      // the weapons whose shots go through WP.shots (g.js): their damage per shot follows lvW; blades, arc, mines, rail, flame, wells, storms and the beat cannon keep their old growth
+  scaled(id){return this.on&&this.proj.includes(id);},
+  lvW(L){return 1+(this.on?this.lvTop:1.5)*(L-1)/9;},                  // the number the Garage card shows: x power of a weapon level
+  wk(id){if(!this.scaled(id))return 1;const L=WP.lvOf(id);return this.lvW(L)/(1+1.5*(L-1)/9);}};   // damage per shot of weapon id: its new curve over the old one
+window.__scale={SC,en:(t,o)=>en(t,o||{}),spawnBoss:o=>spawnBoss(o),UPS,upsCalc};
+
+/* hardest tiers (story): a higher stage level and tougher hulls than the old table, no mercy, the first shot of an enemy one beat sooner (SC.firstShot).
+   Normal and Easy keep their numbers; the DMG caps, the on-screen floor, ebCap and BCAP are untouched. */
+SC.hard={hard:{lv:.5,hp:1.2},vhard:{lv:.9,hp:1.3},legend:{lv:1.2,hp:1.45}};
+SC.firstShot=()=>SC.on&&HARDS.includes(SET.diff)&&SET.diff!=='hard'?1:2;
+if(RET.scale){Object.assign(TUNE.dm,SC.hard);
+  const mh=RET.mercyHull,ml=RET.mercyLvl;RET.mercyHull=n=>HARDS.includes(SET.diff)&&SET.diff!=='hard'?0:mh.call(RET,n);RET.mercyLvl=n=>HARDS.includes(SET.diff)&&SET.diff!=='hard'?0:ml.call(RET,n);}
+
 /* ---------- TALE: the adventure on top of the 40 stages (cast, story beats, dialogue card, STORY LOG timeline). Flag RET.tale (?tale=0 = off, exactly as before: no new UI).
    The owner edits the text in the data table right below. Pictures: media/char-<id>.webp (256x256, see assets-manifest.json); until the file is real art the game draws a coloured badge with the initial.
    Hooks: the stage plate's PLAY (before-card), mapDetail() (one preview line on the stage plate), NR 'runEnd' {story,cleared} (unlock + after-scene), a STORY LOG button in the MENU (title.js builds #mnMore).
@@ -4721,7 +4746,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
     this.sync();if(this.open)this.draw();},
   // the shots of the equipped weapons, called inside the ship's volley so every upgrade (damage, crits, piercing...) applies to them too
   shots(std,pf){this.vc++;const f=this.fu(),k=this.fk();
-    const mk=id=>(vx,vy,d,o)=>{if(!pbRoom())return;if(id!=='drone')WPX.last={vx,vy,d,o:o||{}};std(vx,vy,d*k,this.mod(id,o));};   // WPX.last: the drone repeats it
+    const mk=id=>(vx,vy,d,o)=>{if(!pbRoom())return;if(id!=='drone')WPX.last={vx,vy,d,o:o||{}};std(vx,vy,d*k*(window.SC?SC.wk(id):1),this.mod(id,o));};   // WPX.last: the drone repeats it
     for(const id of this.eq){if(id)this.fire1(id,mk(id),this.lvOf(id));}
     if(f&&f.fx==='orbitfire'&&this.vc%2===0){const par=f.par,st=mk(par);for(const b of this.bl)st(900,0,.45,{x:b.x,y:b.y,col:WPD[par].c,len:10,th:3});}},
   // one weapon's part of a volley
@@ -4873,7 +4898,7 @@ WP.draw();
    Total weapon DPS at level 10 is held at about 2.5x level 1 (weapon-test.js measures it). WEAPON_META switches the whole feature off: false = nothing is locked, no new weapons. */
 const WEAPON_META=true;
 const WPX_PRICE=L=>window.RET&&RET.econ?Math.round(30*Math.pow(1.28,L-1)*RET.wk):Math.round(40*Math.pow(1.45,L-1));          // Neon for the upgrade from level L to L+1: 40, 58, 84, 122, 177, 257, 372, 540, 783
-const WPX_POWER=L=>1+1.5*(L-1)/9;                              // the "power" shown on the cards: 1.00x at level 1, 2.50x at level 10
+const WPX_POWER=(L,id)=>window.SC&&SC.scaled(id)?SC.lvW(L):1+1.5*(L-1)/9;                              // the "power" shown on the cards: 1.00x at level 1, 2.50x at level 10
 const WPX_META={                                               // price to unlock (0 = owned from the start), colour, and what levels 3, 6 and 10 add
   pulse:{p:0,ab:['Fan opens wider','A third pair of shots','A fourth pair of shots']},
   laser:{p:30,ab:['The beam thickens','Fires 2 shots in 3','Fires on every shot']},
@@ -5010,7 +5035,7 @@ Object.assign(WPX.demo,{
   for(const id of WP_IDS){const d=WPD[id],cur=WP.pl[id]|0,own=cur>0,max=cur>=WP_MAX,price=WP.price(id),can=GA.bank>=price,el=document.createElement('button');el.type='button';
    el.className='card'+(max?' sold':'')+(!max&&!can?' no':'');el.style.setProperty('--c',d.c);el.dataset.id=id;el.dataset.kind='weapon';
    const nxt=own?cur+1:1,ab=[3,6,10].find(l=>l>=nxt&&l>cur),abT=ab?`<br>LV${ab}: ${d.ab[[3,6,10].indexOf(ab)]}`:'',
-     pw=own?(max?`power <b>${WPX_POWER(cur).toFixed(2)}x</b> (max)`:`power <b>${WPX_POWER(cur).toFixed(2)}x</b> &rarr; <b>${WPX_POWER(cur+1).toFixed(2)}x</b>`):`unlocks at <b>1.00x</b>`;
+     pw=own?(max?`power <b>${WPX_POWER(cur,id).toFixed(2)}x</b> (max)`:`power <b>${WPX_POWER(cur,id).toFixed(2)}x</b> &rarr; <b>${WPX_POWER(cur+1,id).toFixed(2)}x</b>`):`unlocks at <b>1.00x</b>`;
    el.innerHTML=`<canvas width="108" height="52" data-w="${id}"></canvas><div class="tx"><div class="n">${d.n}<small>${own?'LV '+cur+'/'+WP_MAX:'LOCKED'}</small></div><div class="t">${d.tx}</div><div class="pb">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<cur?'on':''}"></i>`).join('')}</div><div class="t2">${pw}${max?'':abT}</div></div><div class="pr">${max?'MAX':(own?'BUY LV'+(cur+1):'UNLOCK')+'<br>'+neonI+' '+price}</div>`;
    el.addEventListener('click',()=>{const r=WP.buy(id);if(!r.ok){if(r.why==='money'){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');gaMsg('Need '+r.need+' more Neon');}else if(r.why==='max')gaMsg(d.n+' is at max level');return;}
      gaMsg(r.lv===1?d.n+' unlocked':d.s+' is now LV '+r.lv);try{AU.sfx('up')}catch(e){}gaDraw();});

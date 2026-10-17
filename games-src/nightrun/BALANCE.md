@@ -121,3 +121,26 @@ Story bot (`story-sim.js`, Normal, ARCADE, 16 runs per stage). Flag off = the ol
 Whole curve (main stages 1-40): minimum 63%, worst dip against the two neighbours: 18 (69% vs 100/100 avg, noise at 16 runs; before: stage 23 was 62 points under). Mean hits per main stage 2.0 (before 2.3; max 4.6). Challenges 41 and 45 (no-hit) stay at 38% / 13%: one hit ends them by design, they are optional and not changed.
 **CLASSIC (8-12 runs, before > after):** 18 0>83, 23 50>83, 40 63>75, 30 25>50, 39 13>42. Stages 30 and 39 are still weak in CLASSIC (they are attrition deaths over 4 minutes, not the kill goal); next: spawn spacing on those two.
 Gate: `ret-walls-test.js`.
+
+## Power scale (RET.scale, 17 Oct 2026; `?scale=0` = the old numbers exactly)
+Owner: "quite easy even on Legend, weapon level-ups very unfair to the enemies". Code: `parts/scale.js` (new), small guarded hooks in `b.js` (enemy hull in `en()`, first-shot beat), `g.js` (`WP.shots`), `wpx.js` (card number). Gate: `scale-test.js`; `scale-probe.js` prints power / damage / time-to-kill per build.
+**Measured (before):**
+- `balance-test` never tested the Garage: its "late" build set in-run levels only (`WP.pl` stayed LV1; `m.TP.lv` does not exist, so no perk was applied). New build `BUILDS=max` = two weapons at permanent LV10 (fusion), every garage perk at max, shop picks, power-ups.
+- The old `UPS` hull factor (dir.js) counted shop picks and perks only, saturated at x2.1 from a mid garage on, and ignored weapon levels and fusions: mid and max enemies had the same hull.
+- Max build, 8 builds x stages 8/20/30/40, 2 runs, before: Normal 100% on every stage with 0 hits; Legend 100% on every stage (hits 4), boss 74 s / 62 s. Legend fresh ship: 0% from stage 20 (the gap between a fresh and a maxed ship was the whole difficulty).
+- Weapon level growth: card said LV10 = 2.50x of LV1 (weapon-test cap), plus perks x2.1, fusion x1.12, power-ups.
+**Change (all flag `RET.scale`):**
+1. Power score = `UPS.u` (shop + garage perks) + 0.1 per equipped weapon level above 1 + 0.3 for a fusion. Expected power of stage n = 0.25 + 0.055 n (endless: by district/loop).
+2. Hull factor `SC.hpK = 1 + 0.6 * (1 - exp(-(power - expected)/4))`, at most x1.6, on top of the old `UPS.hp`; fresh ship x1.00, mid garage x1.36, maxed x1.54. Applies to every non-swarm enemy at spawn (`en()`). Bosses and mini-bosses are NOT scaled: their armour already holds a fight at 60-75 s on every build (BALANCE round 1).
+3. Diminishing levels: the damage per shot of the shot weapons (pulse, lance, swarm, disc, frost, wave, shell, drone echo) follows `1 + 0.8 (L-1)/9` instead of `1 + 1.5 (L-1)/9`: **LV10 = 1.80x LV1** (was 2.50x). The Garage card shows the new number ("power 1.80x"), truthfully; measured on dummies, ship guns subtracted: pulse LV10/LV1 = 1.6x. Blades, arc, mines, rail, flame, wells, storms and the beat cannon keep the old curve (their damage is applied outside the shot path; the card still shows 2.50x for them).
+4. Hardest tiers (story): stage level and hull table `TUNE.dm` hard .3/1.1 -> .5/1.2, very hard .5/1.2 -> .9/1.3, legend .8/1.3 -> 1.2/1.45; no mercy hull/level on very hard and legend; their enemies' first shot comes after 1 beat instead of 2. Normal and Easy untouched. DMG caps, on-screen floor, `ebCap`, `BCAP` unchanged.
+**After (RUNS 3-6, dodging bot):**
+| check | before | after |
+|---|---|---|
+| gunship time to kill, stage 20, fresh / maxed ship (dummy dps) | 2.4 s / 5.0 s | 2.4 s / 4.5 s (hull 815 vs 530, level-damage down) |
+| Legend, maxed ship, stages 20 / 30 / 40 | 100 / 100 / 100 % | 40-100 / 0 / 100 % over 5-6 runs (mean 47-67%; target 25-45% NOT reached: stage 20 and the final boss stay bot-easy, stage 30 is a wall; scale-test band 15-75%) |
+| Normal, mid garage, stages 8 / 20 | 100 / 100 % | 100 / 75-100 % |
+| Normal, maxed ship, stages 8 / 20 | 100 / 100 %, 0 hits | 100 / 100 %, 0-1 hits (still a power fantasy) |
+| bosses, stage 8 / 40 | 74 / 62 s | 74 / 62 s (unchanged by design) |
+- The bot's late-stage clear is bimodal per stage (30 = long attrition stage 0%, 40 = final boss 100%); a human on Legend with a maxed ship now gets hit and loses hull where before the bot had 4 hits median and cleared with ease.
+- Weak: Normal with a maxed ship is still untouchable for the bot (0-1 hits): the defence perks (shield, regen, revive, dash) carry it; next lever is a power-aware fire density (`ebCap` stays), not more hull. Non-shot weapons keep 2.5x. A fresh ship still fails from stage 20 on Legend (0%).

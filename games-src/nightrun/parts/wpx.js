@@ -4,7 +4,7 @@
    Total weapon DPS at level 10 is held at about 2.5x level 1 (weapon-test.js measures it). WEAPON_META switches the whole feature off: false = nothing is locked, no new weapons. */
 const WEAPON_META=true;
 const WPX_PRICE=L=>window.RET&&RET.econ?Math.round(30*Math.pow(1.28,L-1)*RET.wk):Math.round(40*Math.pow(1.45,L-1));          // Neon for the upgrade from level L to L+1: 40, 58, 84, 122, 177, 257, 372, 540, 783
-const WPX_POWER=L=>1+1.5*(L-1)/9;                              // the "power" shown on the cards: 1.00x at level 1, 2.50x at level 10
+const WPX_POWER=(L,id)=>window.SC&&SC.scaled(id)?SC.lvW(L):1+1.5*(L-1)/9;                              // the "power" shown on the cards: 1.00x at level 1, 2.50x at level 10
 const WPX_META={                                               // price to unlock (0 = owned from the start), colour, and what levels 3, 6 and 10 add
   pulse:{p:0,ab:['Fan opens wider','A third pair of shots','A fourth pair of shots']},
   laser:{p:30,ab:['The beam thickens','Fires 2 shots in 3','Fires on every shot']},
@@ -141,7 +141,7 @@ Object.assign(WPX.demo,{
   for(const id of WP_IDS){const d=WPD[id],cur=WP.pl[id]|0,own=cur>0,max=cur>=WP_MAX,price=WP.price(id),can=GA.bank>=price,el=document.createElement('button');el.type='button';
    el.className='card'+(max?' sold':'')+(!max&&!can?' no':'');el.style.setProperty('--c',d.c);el.dataset.id=id;el.dataset.kind='weapon';
    const nxt=own?cur+1:1,ab=[3,6,10].find(l=>l>=nxt&&l>cur),abT=ab?`<br>LV${ab}: ${d.ab[[3,6,10].indexOf(ab)]}`:'',
-     pw=own?(max?`power <b>${WPX_POWER(cur).toFixed(2)}x</b> (max)`:`power <b>${WPX_POWER(cur).toFixed(2)}x</b> &rarr; <b>${WPX_POWER(cur+1).toFixed(2)}x</b>`):`unlocks at <b>1.00x</b>`;
+     pw=own?(max?`power <b>${WPX_POWER(cur,id).toFixed(2)}x</b> (max)`:`power <b>${WPX_POWER(cur,id).toFixed(2)}x</b> &rarr; <b>${WPX_POWER(cur+1,id).toFixed(2)}x</b>`):`unlocks at <b>1.00x</b>`;
    el.innerHTML=`<canvas width="108" height="52" data-w="${id}"></canvas><div class="tx"><div class="n">${d.n}<small>${own?'LV '+cur+'/'+WP_MAX:'LOCKED'}</small></div><div class="t">${d.tx}</div><div class="pb">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<cur?'on':''}"></i>`).join('')}</div><div class="t2">${pw}${max?'':abT}</div></div><div class="pr">${max?'MAX':(own?'BUY LV'+(cur+1):'UNLOCK')+'<br>'+neonI+' '+price}</div>`;
    el.addEventListener('click',()=>{const r=WP.buy(id);if(!r.ok){if(r.why==='money'){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');gaMsg('Need '+r.need+' more Neon');}else if(r.why==='max')gaMsg(d.n+' is at max level');return;}
      gaMsg(r.lv===1?d.n+' unlocked':d.s+' is now LV '+r.lv);try{AU.sfx('up')}catch(e){}gaDraw();});

@@ -253,7 +253,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
     this.sync();if(this.open)this.draw();},
   // the shots of the equipped weapons, called inside the ship's volley so every upgrade (damage, crits, piercing...) applies to them too
   shots(std,pf){this.vc++;const f=this.fu(),k=this.fk();
-    const mk=id=>(vx,vy,d,o)=>{if(!pbRoom())return;if(id!=='drone')WPX.last={vx,vy,d,o:o||{}};std(vx,vy,d*k,this.mod(id,o));};   // WPX.last: the drone repeats it
+    const mk=id=>(vx,vy,d,o)=>{if(!pbRoom())return;if(id!=='drone')WPX.last={vx,vy,d,o:o||{}};std(vx,vy,d*k*(window.SC?SC.wk(id):1),this.mod(id,o));};   // WPX.last: the drone repeats it
     for(const id of this.eq){if(id)this.fire1(id,mk(id),this.lvOf(id));}
     if(f&&f.fx==='orbitfire'&&this.vc%2===0){const par=f.par,st=mk(par);for(const b of this.bl)st(900,0,.45,{x:b.x,y:b.y,col:WPD[par].c,len:10,th:3});}},
   // one weapon's part of a volley
