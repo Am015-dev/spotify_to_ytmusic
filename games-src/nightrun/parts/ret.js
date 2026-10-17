@@ -30,7 +30,7 @@ Object.assign(RET,{clearPay:true,econ:true,mercy:true},{wk:.36,tk:.12,nk:.045});
 /* B1: a stage clear pays 40+12n Neon the first time, +25 per new star, 10% of the base on later clears */
 RET.payClear=function(n,sum){const old=sSave.stars[n]||0,first=old<1,base=40+12*n,ns=Math.max(0,sum-old);
   const pay=first?base+25*ns:Math.round(base*.1)+25*ns;GA.bank+=pay;gsave();this.last={n,pay,first,ns};return pay;};
-RET.resultRow=function(){const l=this.last;return l&&l.pay?`<div class="sr ok"><span class="sg">◆</span> +${l.pay} Neon${l.first?' · first clear':''}</div>`:'';};
+RET.resultRow=function(){const l=this.last;return (l&&l.pay?`<div class="sr ok"><span class="sg">◆</span> +${l.pay} Neon${l.first?' · first clear':''}</div>`:'')+(RET.assistRun()?'<div class="sr"><span class="sg">ⓐ</span> Assist run · no records</div>':'');};
 /* B3: failed tries per stage (kept in this browser); 2 fails = +1 hull on the next try, 4 = the stage level also drops by 0.3. A clear resets it. */
 RET.fails={};try{const o=JSON.parse(localStorage.getItem('mnr_retfail')||'{}');if(o&&typeof o==='object')for(const k in o)RET.fails[k]=Math.max(0,o[k]|0);}catch(e){}
 RET.saveFails=()=>{try{localStorage.setItem('mnr_retfail',JSON.stringify(RET.fails));}catch(e){}};
@@ -114,7 +114,7 @@ NR.on('banked',add=>{if(!HEAT.run||!(add>0))return;const b=Math.round(add*HEAT.n
 NR.on('runEnd',d=>{const h=HEAT.run;HEAT.run=0;HEAT.td=0;if(!h||!d||!d.story||d.quit)return;const n=d.story;
   if(RET.fails[n]!==HEAT.fails0){if(HEAT.fails0)RET.fails[n]=HEAT.fails0;else delete RET.fails[n];RET.saveFails();}   // a Heat run never feeds the mercy count
   if(!d.cleared){HEAT.last={n,h,ok:false,bonus:HEAT.bonus|0};HEAT.bonus=0;return;}
-  const first=h>(HEAT.best[n]|0);let medal=0;if(first){HEAT.best[n]=h;medal=HEAT.medalK*h;GA.bank+=medal;gsave();if(HEAT.pick[n]===h&&h<HEAT.max)HEAT.pick[n]=h+1;}
+  const first=h>(HEAT.best[n]|0)&&!RET.assistRun();let medal=0;if(first){HEAT.best[n]=h;medal=HEAT.medalK*h;GA.bank+=medal;gsave();if(HEAT.pick[n]===h&&h<HEAT.max)HEAT.pick[n]=h+1;}
   if(RET.last&&RET.last.n===n&&RET.last.pay){const b=Math.round(RET.last.pay*HEAT.nk*h);GA.bank+=b;gsave();HEAT.bonus=(HEAT.bonus|0)+b;}
   HEAT.save();HEAT.last={n,h,ok:true,first,medal,bonus:HEAT.bonus|0};HEAT.bonus=0;
   setTimeout(()=>{const e=$('srStars');if(e&&!e.querySelector('.heat'))e.insertAdjacentHTML('beforeend',`<div class="sr ok heat"><span class="sg">🔥</span> HEAT ${h}${first?' medal +'+medal:''} · +${HEAT.last.bonus} Neon</div>`);},0);});
@@ -352,3 +352,45 @@ RET.sioUI=(()=>{const X=RET.sio,$$=id=>document.getElementById(id);let box=null,
   for(const id of['setBtn','pSetBtn']){const b=$$(id);if(b)b.addEventListener('click',onOpen);}
   NR.on('runEnd',()=>{if(RET.saveio)X.persist();});
   return{build,refresh,onOpen,code,toast};})();
+
+/* ---------- B35: Assist mode (POLISH.md). RET.assist=false: no Assist section, every factor is 1 and no run is ever marked.
+   Options live in SET (mnr_set: saved, exported and imported with the rest of the settings). The WORLD slows (enemy speed, scroll, spawns); the song and the beat grid never change.
+   Run-changing options (asSpd, asBul, asHull, asWin) mark a run ⓐ: it never blocks progress and costs no Neon, it just sets no records (best run, daily, weekly, Heat medal).
+   Looks-only options (big bullets, high contrast, reduced motion) never mark a run. Nothing here touches DMG, the entry grace, the on-screen floor or the anti-idle beam (h.js), whose clocks run on real time. */
+if(RET.assist===undefined)RET.assist=!/[?&]assist=0/.test(location.search);
+const AS_PICK=(v,list,d)=>list.indexOf(v)>=0?v:d;
+RET.asLists={asSpd:[100,85,70],asBul:[100,85,70],asHull:[0,2],asWin:[0,60,120]};
+RET.assistClean=function(){const L=RET.asLists;SET.asSpd=AS_PICK(SET.asSpd,L.asSpd,100);SET.asBul=AS_PICK(SET.asBul,L.asBul,100);SET.asHull=AS_PICK(SET.asHull,L.asHull,0);SET.asWin=AS_PICK(SET.asWin,L.asWin,0);SET.asBig=SET.asBig===true;};
+RET.assistClean();
+RET.asW=()=>RET.assist?SET.asSpd/100:1;                 // world speed factor (sdt)
+RET.asB=()=>RET.assist?SET.asBul/100:1;                 // enemy bullet speed factor on top of it
+RET.asWinMs=()=>RET.assist?SET.asWin:0;                 // ms added to the half-width of the on-beat window
+RET.asHullN=()=>RET.assist?SET.asHull:0;
+RET.asBigOn=()=>!!(RET.assist&&SET.asBig);
+RET.assistActive=()=>!!RET.assist&&(SET.asSpd<100||SET.asBul<100||SET.asHull>0||SET.asWin>0);
+RET.assistRun=()=>!!RET.assist&&!!G.assist;
+RET.assistApply=function(){RET.assistClean();document.documentElement.classList.toggle('asbig',RET.asBigOn());
+  if(RET.assist&&typeof G!=='undefined'&&G&&G.live&&RET.assistActive())G.assist=1;};   // switching an option on mid-run marks that run too
+NR.on('runStart',d=>{G.assist=0;if(!RET.assist||!d||d.lab||!RET.assistActive())return;G.assist=1;const h=RET.asHullN();if(h&&!G.tut){P.max+=h;P.hp+=h;}
+  if(!G.tut&&!(G.note&&G.note.t>0))G.note={t:4,txt:'ⓐ ASSIST RUN · no records'};});
+RET.assistSchema=function(SC){if(!RET.assist)return;
+  for(const g of SC)if(g.g==='Rhythm')g.rows=g.rows.filter(r=>r.k!=='win');
+  const acc=SC.find(g=>g.g==='Accessibility');if(acc)SC.splice(SC.indexOf(acc),1);
+  const O=[[false,'Off'],[true,'On']];
+  SC.push({g:'Assist',rows:[
+    {k:'asSpd',l:'World speed',o:[[100,'100%'],[85,'85%'],[70,'70%']],d:'Enemies, bullets and scrolling move slower. The music and the beat do not change. Marks the run ⓐ.'},
+    {k:'asBul',l:'Enemy bullets',o:[[100,'Normal'],[85,'Slower'],[70,'Slowest']],d:'Only enemy bullets fly slower, so there is more time to dodge. Marks the run ⓐ.'},
+    {k:'asHull',l:'Extra hull',o:[[0,'Off'],[2,'+2']],d:'Start every run with 2 more hull. Marks the run ⓐ.'},
+    {k:'asWin',l:'Beat window',o:[[0,'Normal'],[60,'+60 ms'],[120,'+120 ms']],d:'More time to hit the beat for a PERFECT, on top of Timing window. Marks the run ⓐ.'},
+    {k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']],d:'How exact a tap has to be. Never marks a run.'},
+    {k:'asBig',l:'Big bullets',o:O,d:'Enemy bullets are drawn bigger with a white halo. The real hit size is unchanged. Never marks a run.'},
+    {k:'hc',l:'High-contrast bullets',o:O,d:'Bright white halo around enemy bullets. Never marks a run.'},
+    {k:'rm',l:'Reduced motion',o:O,d:'Calmer effects, no strobing, no count-up. Never marks a run.'}]});};
+RET.assistBuild=function(){if(!RET.assist)return;
+  const css=document.createElement('style');css.textContent='#setm .as>span{font-size:14px}#setm .as button{min-height:44px;font-size:14px}#setm .asd{margin:0 0 6px;font:14px/1.35 var(--mono,monospace);color:#b4d2e2}#setm .asn{margin:0 0 8px;font:14px/1.4 var(--mono,monospace);color:#e6f6ff}';
+  document.head.appendChild(css);
+  const g=SCHEMA.find(x=>x.g==='Assist');let first=true;
+  for(const r of g.rows){const row=setRows[r.k];if(!row)continue;row.classList.add('as');
+    if(first){const n=document.createElement('p');n.className='asn';n.id='asNote';n.textContent='Assist makes the game easier. It never blocks progress and never costs Neon. A run with World speed, Enemy bullets, Extra hull or Beat window on is marked ⓐ and sets no records (best, daily, weekly, Heat medal). Looks-only options never mark a run.';
+      row.parentNode.insertBefore(n,row);first=false;}
+    const p=document.createElement('p');p.className='asd';p.textContent=r.d;row.after(p);}};
