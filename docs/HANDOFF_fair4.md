@@ -1,0 +1,6 @@
+# HANDOFF fair-4 (2026-10-17): speed-loss root cause fixed, despike applied, ?fair ON (?fair=0 = old pace)
+- Root cause of the 60-75 % one-step speed loss: NOT roamStep. A slow/braking traffic car on the race line (route car, cv 0, lane .36) at (780,569): hubTrafficStep → W10_bump (momentum exchange) cut RO.v, and the CR_acc clamp in the roamStep wrapper then ate every unstuck nudge. Earlier probes missed it (traffic filter on HUB.cars). Probe: tools/fair3/vtrace.js (accessor trap on RO.v with stack).
+- Fix (src/70_roam_world.js): in a sprint race (RO.sp, not done) slow traffic is a ghost to the player (no W10_bump; smash at speed unchanged). Free roam is unchanged (bumps are by design). Despike patch applied (tkDespike on legs + pA/pB). Boat course keeps old pace/rubber band (C.water).
+- Measured (built page, pp pursuit bot): Westend finishes, place 2, 6 lead changes, median gap 50 m, 0 walls. Gate: unit 0 FAIL; TAG tk1/*, rv2k2/close, items, race-handsoff 9/9. rv2k2/akro still red (DNF, 0 stuck, 1 hit; also red before). rv2k2/pace SLOW-only. xf1/*, life1/* reds are identical on the untouched baseline here (env).
+- Shot docs/shots/fair4/finish.png is post-race free roam, not a finish screen. Bridge spot (576,-306) not re-probed.
+- Next: Akropolis (boss) rival band / why the bot DNFs with 0 stuck; confirm bridge spot with vtrace.js.
