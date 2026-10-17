@@ -1,0 +1,50 @@
+{
+ "res": [
+  {
+   "id": "simp/perf-ath",
+   "c": "ath",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 0.641,
+   "said": "📍 PENDING · simplify is OFF (WIP): open the page with ?simp=1 to test",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "v89i/perf-thumbs",
+   "c": "ath",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 8.465,
+   "said": "📍 GARAGE",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "v88u/perf-smooth",
+   "c": "ath",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 1.071,
+   "said": "📍 ATHENS FREE ROAM · drive",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "perf/frame#1",
+   "c": "ath",
+   "ok": false,
+   "spawnOnly": false,
+   "secs": 31.756,
+   "said": "📍 PERF FRAME · 585 stepped frames, 756 m · median 31.9 ms · p95 161.9 ms (≤ 8) · max 527 ms (≤ 50) at 1649,-2942 ❌",
+   "state": "roam",
+   "errs": []
+  }
+ ],
+ "boots": {
+  "ath": [
+   79.757
+  ]
+ },
+ "errs": []
+}
