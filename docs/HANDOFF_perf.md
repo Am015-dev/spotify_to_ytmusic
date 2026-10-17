@@ -57,3 +57,9 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 - TAG life1,xf1,terrain,smash2,cam,rv2k2,mem on built page: no new reds. Perf-wip reds = trunk reds or known list (fra: mem/stable, xf1/water/land/slope/kerb, terr1/terrain-tyre-fra, life1/fra-density; ath: terr1/terrain-tyre-ath).
 - Trunk 770da51 same set reds: fra mem/stable, xf1/*, terr1/terrain-tyre-fra, life1/fra-density, life1/popup; ath terr1/terrain-tyre-ath, life1/ath-density, life1/carousel.
 - Left: perf/frame strict target not met; terr1 tyre-gap and xf1 red on both trunk and perf-wip.
+
+## perf-3 landed (2026-10-17): perf3-wip merged onto od-int2
+1. Perf harness, 30 s roam, median of 3 separate runs (median/p95/max ms, MB/s alloc): Athens trunk 20.8/45.8/308, 353 -> perf3 14.9/39.4/261, 183; Frankfurt trunk 13.2/33.6/287, 204 -> perf3 13.3/33.5/306, 178 (max is noise, runs 192-398).
+2. Gate on built page TAG=life1,xf1,terrain,smash2,cam,rv2k2,mem: perf3 59/67 vs trunk 56/67; no new reds (life1/people red once, passed on 2 reruns = flaky).
+3. Changes: TR_G deopt fix, LF_drapeOk scratch + drape cache, DEST_find grid. No flag needed.
+4. Left: same deopt loop in TR_Y/groundY/LF_drapeOk, DEST_open garbage, computeVertexNormals in LF_drapeG, QA invariants alloc. Draw calls untouched.
