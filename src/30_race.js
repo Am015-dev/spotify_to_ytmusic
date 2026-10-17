@@ -234,7 +234,7 @@ function nemesis(){const rv=rivals();let b=null,bv=2;for(const k in rv)if(rv[k]>
 const seasonRoster=L=>PDL.slice([0,1,2,4,5][L],[0,1,2,4,5][L]+7).map(p=>p.n);
 function seasonRound(L,r){const ath=CID==='ath',TR=ath?ATH_IDS:['grand','hafen','fraport','sky'],track=TR[(L*2+r)%4],td=TRACK_DEFS.find(t=>t.id===track);
   return{name:RND_NAMES[r],track,mood:(ath?['athgold','athnoon','athnight','athdusk','athnight']:['night','dawn','fog','storm','night'])[(r+L)%5],type:r===2?'elim':'race',laps:r===2?99:td.laps,items:r!==1,traffic:12+L*4,aggr:Math.min(.6,.08+L*.08+(r===3?.25:0)),dbl:r===4,short:td.short}}
-const AVC={},AVCC={};function avatar(n){return AVC[n]||(AVC[n]=avatarCv(n).toDataURL())}function avatarCv(n){if(AVCC[n])return AVCC[n];const p=PD[n],t=p?teamOf(p):TEAMS[0];const[c,g]=cv(64,64);
+const AVC={},AVCC={};function avatar(n){return AVC[n]||(AVC[n]=avatarCv(n).toDataURL())}function avatarCv(n){if(AVCC[n])return AVCC[n];const p=PD[n],t=p?teamOf(p):TEAMS[0];const[c,g]=cv(64,64,1);
   let gr=g.createRadialGradient(32,26,4,32,32,34);gr.addColorStop(0,t.b);gr.addColorStop(1,'#020812');g.fillStyle=gr;g.fillRect(0,0,64,64);
   g.fillStyle=t.a;g.beginPath();g.arc(32,36,22,Math.PI*1.02,Math.PI*1.98);g.lineTo(54,50);g.quadraticCurveTo(32,60,10,50);g.closePath();g.fill();
   g.fillStyle=t.c;g.fillRect(29,14,6,22);g.fillStyle='#0a1222';g.beginPath();g.ellipse(32,40,17,7,0,0,7);g.fill();

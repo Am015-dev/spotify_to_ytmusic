@@ -14,7 +14,7 @@ function applyMoodMaterials(){const m=MOOD;if(typeof GLASS!=='undefined')for(con
 /* Some browsers (privacy/anti-fingerprinting modes, some GPU drivers, embedded web views) refuse or corrupt 2D-canvas
    uploads to WebGL, which turns every texture black. At boot we render a known canvas colour through each upload path
    and keep the first path that reads back correctly; if none does, textures fall back to each canvas's base colour. */
-function cv(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');const fr=g.fillRect.bind(g);
+function cv(w,h,cpu){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',cpu?{willReadFrequently:true}:undefined);/* perf-1: cpu = software canvas, so toDataURL never waits on the GPU queue */const fr=g.fillRect.bind(g);
   g.fillRect=(x,y,W,H)=>{if(c._base===undefined&&x<=0&&y<=0&&W>=w&&H>=h&&typeof g.fillStyle==='string')c._base=g.fillStyle;fr(x,y,W,H)};return[c,g]}
 const TEXV=[{canvas:1,mip:1,name:'canvas'},{canvas:1,mip:0,name:'canvas, no mipmaps'},{mip:1,name:'pixel copy'},{mip:0,name:'pixel copy, no mipmaps'},{half:1,mip:0,name:'float pixel copy'}];
 let TEXMODE=0;
