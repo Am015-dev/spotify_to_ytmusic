@@ -530,7 +530,7 @@ function BX_loadUI(){const old=$('#bxLoad');if(old){old.remove();return}const D=
  add('✚ NEW EMPTY TRACK',()=>{BX_load({log:[['w','valley']]},'MY TRACK');BX_seed()});add('✖ CLOSE',()=>{});$('#bx').appendChild(D)}
 const BX_DEMOS={};
 // ---------------------------------------------------------------- open / close
-function BX_open(){BX_scene();try{if(!BX.sc.environment&&scene.environment)BX.sc.environment=scene.environment}catch(e){}BX.on=true;renderer.shadowMap.enabled=true;document.body.classList.add('bxOn');if(BX.tfast){renderer.setPixelRatio(.5);BX.sun.shadow.mapSize.set(1024,1024)}BX.mode='build';BX.last=0;for(const id of['#menu','#topBtns','#hud','#touch'])if($(id))$(id).hidden=true;
+function BX_open(){try{const g=$('#gbx');if(g&&!g.hidden)gbClose(false)}catch(e){}BX_scene();try{if(!BX.sc.environment&&scene.environment)BX.sc.environment=scene.environment}catch(e){}BX.on=true;renderer.shadowMap.enabled=true;document.body.classList.add('bxOn');if(BX.tfast){renderer.setPixelRatio(.5);BX.sun.shadow.mapSize.set(1024,1024)}BX.mode='build';BX.last=0;for(const id of['#menu','#topBtns','#hud','#touch'])if($(id))$(id).hidden=true;
  if(!BX.log.length){BX.log=[['w','valley']];BX_replay()}else BX_buildAll();BX.camGo=1;BX_ui();BX_seed()}
 function BX_close(){BX.on=false;document.body.classList.remove('bxOn');if(BX.mode==='drive')BX_driveStop();const R=$('#bx');if(R)R.remove();$('#menu').hidden=false;$('#topBtns').hidden=false;try{resize()}catch(e){}}
 frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try{BX_tick(now)}catch(e){console.error(e);BX.on=false}})(frame);

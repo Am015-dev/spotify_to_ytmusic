@@ -1,0 +1,14 @@
+# HANDOFF crash-7 (2026-10-17): lower keep distance for lazy zones and LF tiles on ?lowmem (WIP, not on trunk)
+1. src/98cl_stream.js: strLzOut default is 250 on LOWMEM (800 otherwise); with strLzIn 100 that is 150 m hysteresis. src/98lf_lively_fill.js: LF.outR 600 on LOWMEM (was 1000, load stays 400). Zone free path (STR_lzFree: geometry.dispose, props and cull lists dropped, root detached) was already complete; unchanged.
+2. Measured (tMem2, iPhone emulation, ?lowmem=1, Frankfurt, 5 min, one run, built c7a): total 653/659 -> 639 MB; heap growth after minute 2 (409 -> 428) +19 MB (was +38..45). Both targets met. Athens boot (mem/ath-boot) and the 852x393 pop-in shot were NOT done.
+3. Gates on built c7a: unit 0 FAIL; TAG=life1,xf1,terrain,mem,rv2k2 43/58 (trunk 46/58 in crash-6 notes). Reds: mem/stable (913 MB end, red on trunk), rv2k2/close (red on trunk), xf1/grass,water,land,slope,kerb, terr1/tyre+fps fra/ath, life1/smash,popup,ath-density,people (SLOW-only lines, run in parallel with Athens). 15 reds vs 10 on trunk: not proven identical, so pushed to alex/od-crash7-wip, not trunk.
+4. Next: rerun the gates alone (one city at a time) on c7a and on trunk for a same-name comparison, run mem/ath-boot, take one fra_lowmem shot and LOOK for pop-in at 250 m past draw range; if clean, merge to alex/od-int2.
+
+## Result (NOT on alex/od-int2: new red)
+- Merged alex/od-int2 (through 05bc17f) into the crash-7 branch; build c7m OK (page 3.19 MB); unit 0 FAIL.
+- Gate TAG=life1,xf1,terrain,mem, serial, final builds: branch reds mem/stable, mem/ath-boot, xf1/grass; trunk reds mem/stable, mem/ath-boot.
+- NEW RED: xf1/grass (ROAD -> GRASS, Grueneburgpark) fails on the branch 2 of 2 when run alone, passes on trunk 2 of 2 alone. Off-road after 0.53 s on grass at 73 km/h.
+- mem/stable and mem/ath-boot are red on both builds (not new).
+- Athens lowmem (tMem2 c7 ath 1): peak total 746 MB <= 785.
+- Shot 852x393 Frankfurt lowmem (taken on the pre-update build): no visible pop-in near the car, single frame. Re-shoot needed after the xf1/grass fix.
+- Next: find why the lowmem keep distance changes the grass step on Grueneburgpark; then rerun the gates alone.

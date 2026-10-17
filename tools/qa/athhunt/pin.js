@@ -1,5 +1,5 @@
 const L=require('/home/user/spotify_to_ytmusic/tools/qa/lib.js');
-(async()=>{const S=await L.open({base:'/home/user/spotify_to_ytmusic/out/rv4c',city:'ath',extra:{lowmem:'auto'}});
+(async()=>{const S=await L.open({base:'/home/user/spotify_to_ytmusic/out/athbugs',city:'ath',extra:{lowmem:'auto'}});
 for(const [x,z] of [[-80,-3092],[1879,-1615],[1921,-1646],[-80,-3092],[1879,-1615]]){const r=await L.ev(S.p,`(()=>{const q=cityAt(${x},${z},-1,true);for(const f of [1,-1]){const p=q.p;const h=Math.atan2(p.tx*f,p.tz*f);roamWarp(p.x-p.tx*f*25,p.z-p.tz*f*25,h);__qa.step(10,.05);const k=(c,on)=>window.dispatchEvent(new KeyboardEvent(on?'keydown':'keyup',{code:c}));k('KeyW',1);
  for(let i=0;i<100;i++){const ax=RO.x,az=RO.z;const qq=cityAt(RO.x,RO.z,-1,true);if(qq){const hd=Math.atan2(qq.p.tx*f,qq.p.tz*f);let e=hd-RO.h;while(e>Math.PI)e-=2*Math.PI;while(e<-Math.PI)e+=2*Math.PI;k('KeyA',e>.05);k('KeyD',e<-.05)}
  __qa.step(1,.05);const mv=Math.hypot(RO.x-ax,RO.z-az);if(i>30&&mv<.05&&Math.abs(RO.v)>3){
