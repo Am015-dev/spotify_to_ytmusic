@@ -1,0 +1,60 @@
+{
+ "cards": {
+  "hobb-idle": "Old Hobb the Doorwarden: a bearded old doorkeeper with a lantern and a ring of big iron keys. Pose: standing in a relaxed idle pose, weight settled on both feet, calm neutral expression. Full body from head to feet, front three-quarter view, centred, feet on the same ground line at the bottom fifth of the frame, figure about 80 percent of the frame height, the same camera distance and the same scale in every pose of this character. Same character exactly as the reference painting (same face, proportions, colours and costume); reuse this exact description and the same seed for every pose of this character. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+  "hobb-win": "Old Hobb the Doorwarden: a bearded old doorkeeper with a lantern and a ring of big iron keys. Pose: celebrating a victory: arms raised high, a big triumphant grin, chest out, a small happy hop. Full body from head to feet, front three-quarter view, centred, feet on the same ground line at the bottom fifth of the frame, figure about 80 percent of the frame height, the same camera distance and the same scale in every pose of this character. Same character exactly as the reference painting (same face, proportions, colours and costume); reuse this exact description and the same seed for every pose of this character. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers.",
+  "hobb-lose": "Old Hobb the Doorwarden: a bearded old doorkeeper with a lantern and a ring of big iron keys. Pose: defeated: slumped shoulders, head hanging low, eyes down, arms limp, dejected. Full body from head to feet, front three-quarter view, centred, feet on the same ground line at the bottom fifth of the frame, figure about 80 percent of the frame height, the same camera distance and the same scale in every pose of this character. Same character exactly as the reference painting (same face, proportions, colours and costume); reuse this exact description and the same seed for every pose of this character. Isolated on a solid flat pure chroma green background (#00FF00), no shadow, no floor, no gradient, no green on the subject, sharp edges. No text, letters or numbers."
+ },
+ "style": "Hand-painted medieval storybook gouache illustration for a rowdy dungeon-door card game, warm torchlight, chunky readable shapes, slightly wobbly dark ink outline, no text",
+ "notes": "Pose / expression set. One character = one reused description + the reference painting (meta.ref) + the same seed, same camera, same scale, centred, feet on one baseline. Background is flat chroma colour (meta.bg) so games-src/scripts/cutout.py can key it: save each as <name>.png in one folder per character, then python3 games-src/scripts/cutout.py <folder>/<char>-*.png --out <target folder> --size 512 --align <meta.align>  (writes transparent webp + contact-sheet.png). Check the contact sheet: all poses the same height, same feet line. Style block: use the one in \"style\" but ignore any background wording in it.",
+ "wave": "Wave 9",
+ "meta": {
+  "hobb-idle": {
+   "element": "Old Hobb the Doorwarden: idle pose",
+   "why": "Set of 3 for hobb: same description, camera, scale and feet line as its other poses",
+   "pri": 3,
+   "ref": "games/doorkick-dungeon/media/camp-hobb.webp",
+   "thumb": "doorkick-dungeon/media/camp-hobb.webp",
+   "bg": "green",
+   "align": "feet",
+   "save_as": "hobb-idle.png",
+   "target": "games/doorkick-dungeon/media/poses/hobb-idle.webp",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "group": "hobb",
+   "tag": "poses",
+   "wave": "Wave 9"
+  },
+  "hobb-win": {
+   "element": "Old Hobb the Doorwarden: win pose",
+   "why": "Set of 3 for hobb: same description, camera, scale and feet line as its other poses",
+   "pri": 3,
+   "ref": "games/doorkick-dungeon/media/camp-hobb.webp",
+   "thumb": "doorkick-dungeon/media/camp-hobb.webp",
+   "bg": "green",
+   "align": "feet",
+   "save_as": "hobb-win.png",
+   "target": "games/doorkick-dungeon/media/poses/hobb-win.webp",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "group": "hobb",
+   "tag": "poses",
+   "wave": "Wave 9"
+  },
+  "hobb-lose": {
+   "element": "Old Hobb the Doorwarden: lose pose",
+   "why": "Set of 3 for hobb: same description, camera, scale and feet line as its other poses",
+   "pri": 3,
+   "ref": "games/doorkick-dungeon/media/camp-hobb.webp",
+   "thumb": "doorkick-dungeon/media/camp-hobb.webp",
+   "bg": "green",
+   "align": "feet",
+   "save_as": "hobb-lose.png",
+   "target": "games/doorkick-dungeon/media/poses/hobb-lose.webp",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "group": "hobb",
+   "tag": "poses",
+   "wave": "Wave 9"
+  }
+ }
+}

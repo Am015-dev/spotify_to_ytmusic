@@ -1,0 +1,96 @@
+{
+ "cards": {
+  "na-anvil": "an assault bomber with a pointed lance nose, swept wing plates, a heavy belly ordnance pod and armoured cheeks, dark gunmetal hull with red trim, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "na-hauler": "a boxy long-haul freighter with cargo pods along a spine, a forward bridge and a dorsal turret, cream hull with orange trim, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "na-keel": "a crescent flying-wing strike fighter with a central cockpit pod and wingtip engine pods, cream hull with orange trim, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "na-kestrel": "a flattened lifting-body courier ship with swept tail wings and twin engines, cream hull with orange trim, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "na-rift-gate": "the Crown Rift gate: a large ring gate with a glowing crown-shaped core and support pylons, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache sci-fi illustration for a starfighter duel game, deep indigo space, glowing engine light, clean readable shapes, retro-futurist, rich but not neon colours, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave B",
+ "meta": {
+  "na-anvil": {
+   "element": "3D model: na-anvil",
+   "why": "painted hull already exists (ship-anvil)",
+   "pri": 1,
+   "ref": "games/nebula-aces/media/ship-anvil.webp",
+   "thumb": "nebula-aces/media/ship-anvil.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "na-anvil.png",
+   "target": "games/nebula-aces/models/na-anvil.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "na-hauler": {
+   "element": "3D model: na-hauler",
+   "why": "painted hull already exists (ship-hauler)",
+   "pri": 1,
+   "ref": "games/nebula-aces/media/ship-hauler.webp",
+   "thumb": "nebula-aces/media/ship-hauler.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "na-hauler.png",
+   "target": "games/nebula-aces/models/na-hauler.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "na-keel": {
+   "element": "3D model: na-keel",
+   "why": "painted hull already exists (ship-keel)",
+   "pri": 1,
+   "ref": "games/nebula-aces/media/ship-keel.webp",
+   "thumb": "nebula-aces/media/ship-keel.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "na-keel.png",
+   "target": "games/nebula-aces/models/na-keel.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "na-kestrel": {
+   "element": "3D model: na-kestrel",
+   "why": "painted hull already exists (ship-kestrel)",
+   "pri": 1,
+   "ref": "games/nebula-aces/media/ship-kestrel.webp",
+   "thumb": "nebula-aces/media/ship-kestrel.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "na-kestrel.png",
+   "target": "games/nebula-aces/models/na-kestrel.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "na-rift-gate": {
+   "element": "3D model: na-rift-gate",
+   "why": "hero landmark for the last chapters",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "na-rift-gate.png",
+   "target": "games/nebula-aces/models/na-rift-gate.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  }
+ },
+ "targets": {
+  "na-anvil": "games/nebula-aces/models/na-anvil.glb",
+  "na-hauler": "games/nebula-aces/models/na-hauler.glb",
+  "na-keel": "games/nebula-aces/models/na-keel.glb",
+  "na-kestrel": "games/nebula-aces/models/na-kestrel.glb",
+  "na-rift-gate": "games/nebula-aces/models/na-rift-gate.glb"
+ }
+}

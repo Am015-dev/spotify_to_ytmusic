@@ -1,0 +1,13 @@
+{"reliability":"machine transcript (two passes); the announcements are clear, but long music stretches contain no speech",
+ "framing":"After the opening info tokens, start the track. A villain voice says the lair self-destructs in 15 minutes; the track itself is the clock.",
+ "timeline_track_seconds":[
+  {"t":100,"event":"Countdown starts: \"15 minutes\". Play begins (about 1:40 into the track)."},
+  {"t":290,"event":"\"12 minutes\" announcement."},
+  {"t":428,"event":"\"10 minutes\" announcement."},
+  {"t":437,"event":"Twist: the villain jumps the countdown straight to \"5 minutes\"."},
+  {"t":620,"event":"\"2 minutes\"."},
+  {"t":720,"event":"\"30 seconds\"."},
+  {"t":758,"event":"Spoken 10-to-1 countdown; at about 12:48 into the track the bomb goes off if it is not yet defused (the villain gloats)."},
+  {"t":942,"event":"Outro joke: the villain notes the bomb blew minutes ago and that the 15-minute track length was never your real time limit."}],
+ "implementation":"Real-time mission: about 668 s of actual play (track 100 s to 768 s), with a fake '15:00' display that jumps to 5:00 at 337 s of play. Fail if the mission is not won by then.",
+ "gaps":["Whether the bomb is meant to explode exactly at the spoken zero (assumed); no other rule changes were heard."]}

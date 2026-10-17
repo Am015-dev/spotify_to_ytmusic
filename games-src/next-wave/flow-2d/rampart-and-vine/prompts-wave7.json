@@ -1,0 +1,57 @@
+{
+ "cards": {
+  "tex-field-b": "a top-down painted square map tile of a ploughed field with green furrows and a scarecrow, no text, letters or numbers",
+  "tex-field-c": "a top-down painted square map tile of a golden wheat field with a small path, no text, letters or numbers",
+  "tex-road-b": "a top-down painted square map tile of a dirt road with a crossing and wheel ruts, different from the standard road tile, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a medieval valley tile-laying game, green fields, stone towers and vines, warm afternoon light, matte paper texture, slightly wobbly dark brown outline, simple readable silhouette, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "tex-field-b": {
+   "element": "Painting: tex-field-b",
+   "why": "terrain variety",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tex-field-b.png",
+   "target": "games/rampart-and-vine/media/tex-field-b.webp",
+   "size": "256x256",
+   "ratio": "1:1",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "tex-field-c": {
+   "element": "Painting: tex-field-c",
+   "why": "terrain variety",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tex-field-c.png",
+   "target": "games/rampart-and-vine/media/tex-field-c.webp",
+   "size": "256x256",
+   "ratio": "1:1",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "tex-road-b": {
+   "element": "Painting: tex-road-b",
+   "why": "terrain textures repeat across the valley",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "tex-road-b.png",
+   "target": "games/rampart-and-vine/media/tex-road-b.webp",
+   "size": "256x256",
+   "ratio": "1:1",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

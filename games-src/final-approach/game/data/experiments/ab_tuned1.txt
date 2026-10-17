@@ -1,0 +1,3 @@
+normal g1 green Port Alder                    27/40  68% avg rounds 7.0 {"speed":2,"checks:flaps":2,"checks:gear+axis":1,"spin":4,"checks:axis":1,"checks:planes":1,"checks:gear+flaps":1,"checks:flaps+axis":1} 2102ms/game
+normal g2 green Foxmere                        9/40  23% avg rounds 7.0 {"checks:planes+flaps+axis":1,"mandatory":5,"spin":8,"checks:axis":3,"checks:planes+axis":1,"checks:flaps":4,"speed":4,"checks:flaps+axis":1,"checks:gear+flaps":2,"checks:gear+axis":1,"checks:gear+flaps+axis":1} 1191ms/game
+normal g3 green Seabright Bay                  8/40  20% avg rounds 6.4 {"checks:axis":3,"short":7,"corridor":2,"collision":5,"checks:flaps":6,"spin":3,"checks:gear+flaps":2,"checks:flaps+axis":1,"mandatory":2,"speed":1} 750ms/game

@@ -1,0 +1,167 @@
+{
+ "note": "id (the card key k in cards.js) -> base file name in this folder. Painted with Google Flow (Nano Banana), prompts in game-assets/cards/doorkick/prompts.json; made by prep_doorkick_art.py.",
+ "items": {
+  "ch_base1": "ch_base1",
+  "ch_base2": "ch_base2",
+  "ch_base3": "ch_base3",
+  "ch_base4": "ch_base4",
+  "ch_captain": "ch_captain",
+  "ch_new1": "ch_new1",
+  "ch_new2": "ch_new2",
+  "ch_new3": "ch_new3",
+  "ch_new4": "ch_new4",
+  "dd": "dd",
+  "eq1": "eq1",
+  "eq10": "eq10",
+  "eq1010": "eq1010",
+  "eq11": "eq11",
+  "eq1111": "eq1111",
+  "eq12": "eq12",
+  "eq2": "eq2",
+  "eq22": "eq22",
+  "eq3": "eq3",
+  "eq33": "eq33",
+  "eq4": "eq4",
+  "eq5": "eq5",
+  "eq6": "eq6",
+  "eq7": "eq7",
+  "eq8": "eq8",
+  "eq9": "eq9",
+  "eq99": "eq99",
+  "eqY": "eqY",
+  "handsets": "handsets",
+  "pt10": "pt10",
+  "pt3": "pt3",
+  "sweep": "sweep"
+ },
+ "size": {
+  "ch_base1": [
+   256,
+   256
+  ],
+  "ch_base2": [
+   256,
+   256
+  ],
+  "ch_base3": [
+   256,
+   256
+  ],
+  "ch_base4": [
+   256,
+   256
+  ],
+  "ch_captain": [
+   256,
+   256
+  ],
+  "ch_new1": [
+   256,
+   256
+  ],
+  "ch_new2": [
+   256,
+   256
+  ],
+  "ch_new3": [
+   256,
+   256
+  ],
+  "ch_new4": [
+   256,
+   256
+  ],
+  "dd": [
+   256,
+   256
+  ],
+  "eq1": [
+   256,
+   256
+  ],
+  "eq10": [
+   256,
+   256
+  ],
+  "eq1010": [
+   256,
+   256
+  ],
+  "eq11": [
+   256,
+   256
+  ],
+  "eq1111": [
+   256,
+   256
+  ],
+  "eq12": [
+   256,
+   256
+  ],
+  "eq2": [
+   256,
+   256
+  ],
+  "eq22": [
+   256,
+   256
+  ],
+  "eq3": [
+   256,
+   256
+  ],
+  "eq33": [
+   256,
+   256
+  ],
+  "eq4": [
+   256,
+   256
+  ],
+  "eq5": [
+   256,
+   256
+  ],
+  "eq6": [
+   256,
+   256
+  ],
+  "eq7": [
+   256,
+   256
+  ],
+  "eq8": [
+   256,
+   256
+  ],
+  "eq9": [
+   256,
+   256
+  ],
+  "eq99": [
+   256,
+   256
+  ],
+  "eqY": [
+   256,
+   256
+  ],
+  "handsets": [
+   256,
+   256
+  ],
+  "pt10": [
+   256,
+   256
+  ],
+  "pt3": [
+   256,
+   256
+  ],
+  "sweep": [
+   256,
+   256
+  ]
+ }
+}

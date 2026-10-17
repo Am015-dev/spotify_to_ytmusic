@@ -1,0 +1,57 @@
+{
+ "cards": {
+  "belt-b": "a painted straight segment of a sushi conveyor belt from above in a dark brushed-steel and cream slat style, seamless left to right, no text, letters or numbers",
+  "table-breakfast-counter": "a wide painted tabletop seen from above: a sunny morning counter with a wooden surface and a belt channel, calm empty space in the middle for cards, no text, letters or numbers",
+  "table-rainy-evening": "a wide painted tabletop seen from above: a rainy evening counter with warm paper lanterns reflecting on dark wood, calm empty space in the middle for cards, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a cosy card game, top-down view of a single round ceramic plate, the food on the plate is a cute character with an expressive face (little eyebrows, eyelids, a clear emotion), warm-brown ink outline with a slightly wobbly brush edge, soft rim light, gentle shadow under the plate, rich but warm colours, matte paper texture, crisp at small sizes, simple readable silhouette, centred, plenty of margin, plain transparent background, no text. Do NOT put the plate on a placemat.",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "belt-b": {
+   "element": "Painting: belt-b",
+   "why": "the belt is one picture",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "belt-b.png",
+   "target": "games/kaiten-kitchen/media/belt-b.webp",
+   "size": "1920x384",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "table-breakfast-counter": {
+   "element": "Painting: table-breakfast-counter",
+   "why": "two tables for ten chapters",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-breakfast-counter.png",
+   "target": "games/kaiten-kitchen/media/table-breakfast-counter.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "table-rainy-evening": {
+   "element": "Painting: table-rainy-evening",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-rainy-evening.png",
+   "target": "games/kaiten-kitchen/media/table-rainy-evening.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

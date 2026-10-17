@@ -1,0 +1,142 @@
+{
+ "note": "id -> base file name in this folder. build.py embeds <name>.png if present (a user painting, resized to the size below), else <name>.webp (made by ../paint/paint.js).",
+ "items": {
+  "chip-W": "chip-W",
+  "chip-O": "chip-O",
+  "chip-G": "chip-G",
+  "chip-B": "chip-B",
+  "chip-R": "chip-R",
+  "chip-Y": "chip-Y",
+  "chip-P": "chip-P",
+  "chip-K": "chip-K",
+  "cauldron": "cauldron",
+  "bag": "bag",
+  "flask": "flask",
+  "flask-empty": "flask-empty",
+  "ruby": "ruby",
+  "droplet": "droplet",
+  "rat": "rat",
+  "puff": "puff",
+  "splash": "splash",
+  "bubble": "bubble",
+  "pad": "pad",
+  "seer": "seer",
+  "book": "book",
+  "char-wynne": "char-wynne",
+  "char-odo": "char-odo",
+  "char-tamsin": "char-tamsin",
+  "char-mirabel": "char-mirabel",
+  "table": "table",
+  "title": "title"
+ },
+ "size": {
+  "chip-W": [
+   128,
+   128
+  ],
+  "chip-O": [
+   128,
+   128
+  ],
+  "chip-G": [
+   128,
+   128
+  ],
+  "chip-B": [
+   128,
+   128
+  ],
+  "chip-R": [
+   128,
+   128
+  ],
+  "chip-Y": [
+   128,
+   128
+  ],
+  "chip-P": [
+   128,
+   128
+  ],
+  "chip-K": [
+   128,
+   128
+  ],
+  "cauldron": [
+   640,
+   640
+  ],
+  "bag": [
+   160,
+   160
+  ],
+  "flask": [
+   128,
+   128
+  ],
+  "flask-empty": [
+   128,
+   128
+  ],
+  "ruby": [
+   96,
+   96
+  ],
+  "droplet": [
+   96,
+   96
+  ],
+  "rat": [
+   128,
+   128
+  ],
+  "puff": [
+   160,
+   160
+  ],
+  "splash": [
+   160,
+   160
+  ],
+  "bubble": [
+   96,
+   96
+  ],
+  "pad": [
+   128,
+   128
+  ],
+  "seer": [
+   128,
+   128
+  ],
+  "book": [
+   128,
+   128
+  ],
+  "char-wynne": [
+   192,
+   192
+  ],
+  "char-odo": [
+   192,
+   192
+  ],
+  "char-tamsin": [
+   192,
+   192
+  ],
+  "char-mirabel": [
+   192,
+   192
+  ],
+  "table": [
+   1280,
+   720
+  ],
+  "title": [
+   1440,
+   810
+  ]
+ }
+}

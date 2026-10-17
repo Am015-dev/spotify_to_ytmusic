@@ -1,0 +1,1007 @@
+{
+  "game": "cauldron",
+  "title": "The Golden Ladle",
+  "version": 1,
+  "cast": {
+    "hask": {
+      "name": "Granny Hask",
+      "portrait": "camp-hask.webp",
+      "emoji": "🧓",
+      "color": "#7a5c3e"
+    },
+    "wynne": {
+      "name": "Wynne",
+      "portrait": "camp-wynne.webp",
+      "emoji": "🌿",
+      "color": "#3fa04a"
+    },
+    "odo": {
+      "name": "Odo",
+      "portrait": "camp-odo.webp",
+      "emoji": "🥕",
+      "color": "#e8b425"
+    },
+    "tamsin": {
+      "name": "Tamsin",
+      "portrait": "camp-tamsin.webp",
+      "emoji": "🪶",
+      "color": "#3b82d6"
+    },
+    "mirabel": {
+      "name": "Mirabel",
+      "portrait": "camp-mirabel.webp",
+      "emoji": "🔥",
+      "color": "#d6392f"
+    },
+    "vesper": {
+      "name": "Madame Vesper",
+      "portrait": "camp-vesper.webp",
+      "emoji": "🥄",
+      "color": "#8a55c4"
+    }
+  },
+  "acts": [
+    {
+      "act": 1,
+      "title": "The Gates Open",
+      "blurb": "Learn to stop before the boil, and to shop."
+    },
+    {
+      "act": 2,
+      "title": "Market Days",
+      "blurb": "New ingredient books, sharper rivals."
+    },
+    {
+      "act": 3,
+      "title": "The Golden Ladle",
+      "blurb": "The best brewers in the county, at full strength."
+    }
+  ],
+  "twists": [
+    {
+      "id": "boss-rubies",
+      "where": "setup",
+      "how": "After CF.newGame, add param rubies to the boss seat (G.players[1].rubies += param)."
+    },
+    {
+      "id": "boss-chip",
+      "where": "setup",
+      "how": "After CF.newGame, call CF._.give(G, G.players[1], param, true) to put one chip of key param (e.g. \"G2\") from the supply into the boss bag at a random spot."
+    },
+    {
+      "id": "boss-droplet",
+      "where": "setup",
+      "how": "After CF.newGame, set G.players[1].droplet = param so every brew of the boss starts param spaces further on (CF.startPos reads it)."
+    },
+    {
+      "id": "boss-lead",
+      "where": "setup",
+      "how": "After CF.newGame, set G.players[1].vp = param; from day 2 the normal rat-tail rule gives trailing players their head start."
+    },
+    {
+      "id": "crowded-bag",
+      "where": "setup",
+      "how": "After CF.newGame, call CF._.give(G, G.players[0], \"W1\", true) param times so the player bag starts with param extra Fizzpod 1 chips."
+    }
+  ],
+  "chapters": [
+    {
+      "boss": false,
+      "twist": null,
+      "hints": true,
+      "id": "c1",
+      "act": 1,
+      "title": "First Bubbles",
+      "intro": [
+        {
+          "who": "hask",
+          "text": "Welcome to Bramblemere Fair, apprentice. Your bag, your cauldron, nine days of brewing."
+        },
+        {
+          "who": "hask",
+          "text": "Draw a chip, lay it down, then choose: draw again or stop. Too many Fizzpods and it blows."
+        },
+        {
+          "who": "wynne",
+          "text": "I will brew beside you. No hurry, dear."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hask",
+          "text": "You stopped before the pot blew. That is half of brewing already."
+        }
+      ],
+      "opponent": {
+        "name": "Wynne",
+        "portrait": "camp-wynne.webp",
+        "emoji": "🌿",
+        "cast": "wynne",
+        "personality": "Patient and kind. Stops early, buys whatever Mossbacks she can afford.",
+        "aiLevel": "easy",
+        "aiStyle": "standard"
+      },
+      "setup": {
+        "players": 2,
+        "seed": null,
+        "setMode": 1,
+        "firstCard": "lucky7"
+      },
+      "goal": {
+        "type": "score",
+        "value": 15,
+        "winNotNeeded": true,
+        "text": "Score at least 15 points (winning is not needed)."
+      },
+      "stars": [
+        {
+          "text": "Score 15 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 15
+          }
+        },
+        {
+          "text": "Explode no more than once",
+          "test": {
+            "k": "booms",
+            "op": "<=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Beat Wynne",
+          "test": {
+            "k": "won"
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Same gentle game; the coach keeps every tip on."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "wynne",
+          "text": "Wynne's portrait"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": null,
+      "hints": true,
+      "id": "c2",
+      "act": 1,
+      "title": "The Coin Stall",
+      "intro": [
+        {
+          "who": "hask",
+          "text": "Coins are not points. Spend them: every chip you buy makes your next brew go further."
+        },
+        {
+          "who": "hask",
+          "text": "Buy two chips of different colours whenever you can."
+        },
+        {
+          "who": "wynne",
+          "text": "Mossbacks are cheap and they bring rubies. Just saying."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hask",
+          "text": "A fuller bag, a longer brew. Now you see why the shop matters."
+        }
+      ],
+      "opponent": {
+        "name": "Wynne",
+        "portrait": "camp-wynne.webp",
+        "emoji": "🌿",
+        "cast": "wynne",
+        "personality": "Patient and kind. Stops early, buys whatever Mossbacks she can afford.",
+        "aiLevel": "easy",
+        "aiStyle": "standard"
+      },
+      "setup": {
+        "players": 2,
+        "seed": null,
+        "setMode": 1
+      },
+      "goal": {
+        "type": "custom",
+        "value": 8,
+        "winNotNeeded": true,
+        "text": "Buy at least 8 new chips over the fair (winning is not needed)."
+      },
+      "stars": [
+        {
+          "text": "Buy 8 or more chips",
+          "test": {
+            "k": "bought",
+            "op": ">=",
+            "v": 8
+          }
+        },
+        {
+          "text": "Reach scoring space 30 in one brew",
+          "test": {
+            "k": "best",
+            "op": ">=",
+            "v": 30
+          }
+        },
+        {
+          "text": "Beat Wynne",
+          "test": {
+            "k": "won"
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Wynne stays gentle and the coach keeps every tip on."
+      },
+      "unlock": [
+        {
+          "type": "cardback",
+          "id": "moss-bag",
+          "text": "Mossback bag pattern"
+        }
+      ]
+    },
+    {
+      "boss": true,
+      "twist": null,
+      "hints": true,
+      "id": "c3",
+      "act": 1,
+      "title": "Odo's Loud Stall",
+      "intro": [
+        {
+          "who": "odo",
+          "text": "Fresh sunroots! Rare! Nearly free! And I will brew you under the table, apprentice."
+        },
+        {
+          "who": "hask",
+          "text": "Odo always draws one chip too many. Let his pot blow; keep yours whole."
+        },
+        {
+          "who": "hask",
+          "text": "From day 2, whoever trails gets a rat stone head start. Falling behind is not the end."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hask",
+          "text": "Odo is still talking, but the ribbon is yours."
+        },
+        {
+          "who": "odo",
+          "text": "Rare luck, that was. Very rare."
+        }
+      ],
+      "opponent": {
+        "name": "Odo",
+        "portrait": "camp-odo.webp",
+        "emoji": "🥕",
+        "cast": "odo",
+        "personality": "Loud root dealer. Draws one chip too many and brags about it either way.",
+        "aiLevel": "easy",
+        "aiStyle": "standard",
+        "taunt": "Ha! Told you my roots were the best in the county!",
+        "praise": "Fine, fine. Have a sunroot. On the house. Once."
+      },
+      "setup": {
+        "players": 2,
+        "seed": null,
+        "setMode": 1
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the fair against Odo."
+      },
+      "stars": [
+        {
+          "text": "Win",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Score 40 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 40
+          }
+        },
+        {
+          "text": "Explode no more than once",
+          "test": {
+            "k": "booms",
+            "op": "<=",
+            "v": 1
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "firstCard": "lucky7"
+        },
+        "maxStars": 2,
+        "text": "Odo plays gently and day 1 opens with a kind fortune card."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "odo",
+          "text": "Odo's portrait"
+        },
+        {
+          "type": "act",
+          "id": "act2",
+          "text": "Act 2: Market Days"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": null,
+      "hints": false,
+      "id": "c4",
+      "act": 2,
+      "title": "The Feather Stall",
+      "intro": [
+        {
+          "who": "hask",
+          "text": "New day, new ingredient books. The colours brew differently now; read the stall cards."
+        },
+        {
+          "who": "tamsin",
+          "text": "I have counted your Fizzpods. Have you?"
+        },
+        {
+          "who": "hask",
+          "text": "No more coach in your ear. Trust what you learned."
+        }
+      ],
+      "outro": [
+        {
+          "who": "tamsin",
+          "text": "The feathers did not see that coming. Neither did I."
+        }
+      ],
+      "opponent": {
+        "name": "Tamsin",
+        "portrait": "camp-tamsin.webp",
+        "emoji": "🪶",
+        "cast": "tamsin",
+        "personality": "Quiet feather seer. Counts every Fizzpod left in her bag before she draws.",
+        "aiLevel": "normal",
+        "aiStyle": "standard"
+      },
+      "setup": {
+        "players": 2,
+        "seed": null,
+        "setMode": 2
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the fair with the second set of ingredient books."
+      },
+      "stars": [
+        {
+          "text": "Win",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Win by 5 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 5
+          }
+        },
+        {
+          "text": "Score 45 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 45
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Tamsin plays gently."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "tamsin",
+          "text": "Tamsin's portrait"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": {
+        "id": "boss-chip",
+        "param": "G2",
+        "text": "Rival rule: Odo starts with an extra Mossback 2 in his bag."
+      },
+      "hints": false,
+      "id": "c5",
+      "act": 2,
+      "title": "Three Pots Bubbling",
+      "intro": [
+        {
+          "who": "hask",
+          "text": "Three cauldrons today. The leader gives everyone else rat stones, so stay close."
+        },
+        {
+          "who": "odo",
+          "text": "Odo is back, with a Mossback 2 tucked in his bag. Perfectly legal. Mostly."
+        },
+        {
+          "who": "hask",
+          "text": "Wynne brews too. Win with a real score, not a lucky one."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hask",
+          "text": "Three pots and yours went furthest. The fair is starting to notice you."
+        }
+      ],
+      "opponent": {
+        "name": "Odo",
+        "portrait": "camp-odo.webp",
+        "emoji": "🥕",
+        "cast": "odo",
+        "personality": "Loud root dealer. Draws one chip too many and brags about it either way.",
+        "aiLevel": "normal",
+        "aiStyle": "standard"
+      },
+      "setup": {
+        "players": 3,
+        "seed": null,
+        "setMode": 3
+      },
+      "goal": {
+        "type": "score",
+        "value": 40,
+        "text": "Win with at least 40 points against Odo and Wynne."
+      },
+      "stars": [
+        {
+          "text": "Win with 40 or more",
+          "test": {
+            "k": "winScore",
+            "op": ">=",
+            "v": 40
+          }
+        },
+        {
+          "text": "Explode no more than twice",
+          "test": {
+            "k": "booms",
+            "op": "<=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Buy 12 or more chips",
+          "test": {
+            "k": "bought",
+            "op": ">=",
+            "v": 12
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Both rivals play gently and Odo has no extra chip."
+      },
+      "unlock": [
+        {
+          "type": "table",
+          "id": "market-cloth",
+          "text": "Market-day table cloth"
+        }
+      ]
+    },
+    {
+      "boss": true,
+      "twist": {
+        "id": "boss-rubies",
+        "param": 2,
+        "text": "Boss rule: Tamsin starts with 2 extra rubies."
+      },
+      "hints": false,
+      "id": "c6",
+      "act": 2,
+      "title": "The Seer's Wager",
+      "intro": [
+        {
+          "who": "tamsin",
+          "text": "The feathers say you lose by five. Shall we see?"
+        },
+        {
+          "who": "hask",
+          "text": "Tamsin brings rubies to the table. She will buy droplet steps early."
+        },
+        {
+          "who": "hask",
+          "text": "Win clearly. A one-point win will not convince her."
+        }
+      ],
+      "outro": [
+        {
+          "who": "tamsin",
+          "text": "Five points. The feathers were right about the number and wrong about the name."
+        },
+        {
+          "who": "hask",
+          "text": "Next week the Golden Ladle is judged. Mirabel and Madame Vesper will be there."
+        }
+      ],
+      "opponent": {
+        "name": "Tamsin",
+        "portrait": "camp-tamsin.webp",
+        "emoji": "🪶",
+        "cast": "tamsin",
+        "personality": "Quiet feather seer. Counts every Fizzpod left in her bag before she draws.",
+        "aiLevel": "normal",
+        "aiStyle": "standard",
+        "taunt": "The feathers never lie. Better luck at the next fair.",
+        "praise": "I will read your name in the feathers from now on."
+      },
+      "setup": {
+        "players": 2,
+        "seed": null,
+        "setMode": 2
+      },
+      "goal": {
+        "type": "margin",
+        "value": 5,
+        "text": "Beat Tamsin by 5 points or more."
+      },
+      "stars": [
+        {
+          "text": "Win by 5 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 5
+          }
+        },
+        {
+          "text": "Explode no more than once",
+          "test": {
+            "k": "booms",
+            "op": "<=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Reach scoring space 40 in one brew",
+          "test": {
+            "k": "best",
+            "op": ">=",
+            "v": 40
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Tamsin plays gently and brings no extra rubies."
+      },
+      "unlock": [
+        {
+          "type": "title",
+          "id": "feather-reader",
+          "text": "Title: Feather Reader"
+        },
+        {
+          "type": "act",
+          "id": "act3",
+          "text": "Act 3: The Golden Ladle"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": null,
+      "hints": false,
+      "id": "c7",
+      "act": 3,
+      "title": "Fire Brewer",
+      "intro": [
+        {
+          "who": "mirabel",
+          "text": "A pot that never bubbles over is a pot that never tried."
+        },
+        {
+          "who": "hask",
+          "text": "Mirabel plays sharp now. The fourth book set: red chips pay off after reds land."
+        },
+        {
+          "who": "hask",
+          "text": "Brew your own pace. Do not chase her."
+        }
+      ],
+      "outro": [
+        {
+          "who": "mirabel",
+          "text": "You let me blow up and kept your head. Annoying. Well brewed."
+        }
+      ],
+      "opponent": {
+        "name": "Mirabel",
+        "portrait": "camp-mirabel.webp",
+        "emoji": "🔥",
+        "cast": "mirabel",
+        "personality": "Fire brewer. Pushes every pot to the brink and loves Scarlet Caps.",
+        "aiLevel": "hard",
+        "aiStyle": "standard"
+      },
+      "setup": {
+        "players": 2,
+        "seed": null,
+        "setMode": 4
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the fair against Mirabel at full strength."
+      },
+      "stars": [
+        {
+          "text": "Win",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Score 50 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 50
+          }
+        },
+        {
+          "text": "Explode no more than once",
+          "test": {
+            "k": "booms",
+            "op": "<=",
+            "v": 1
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Mirabel plays at normal strength."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "mirabel",
+          "text": "Mirabel's portrait"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": {
+        "id": "crowded-bag",
+        "param": 1,
+        "text": "Rival rule: your bag starts with 1 extra Fizzpod 1."
+      },
+      "hints": false,
+      "id": "c8",
+      "act": 3,
+      "title": "A Crowded Bag",
+      "intro": [
+        {
+          "who": "mirabel",
+          "text": "I slipped something into your bag. Call it a welcome gift."
+        },
+        {
+          "who": "hask",
+          "text": "One more Fizzpod 1 from the start. The flask and Wren Feathers matter more now."
+        },
+        {
+          "who": "hask",
+          "text": "Buy chips that push the white ones down the bag."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hask",
+          "text": "More risk in the bag and you still finished ahead. The judges were watching."
+        }
+      ],
+      "opponent": {
+        "name": "Mirabel",
+        "portrait": "camp-mirabel.webp",
+        "emoji": "🔥",
+        "cast": "mirabel",
+        "personality": "Fire brewer. Pushes every pot to the brink and loves Scarlet Caps.",
+        "aiLevel": "hard",
+        "aiStyle": "standard"
+      },
+      "setup": {
+        "players": 2,
+        "seed": null,
+        "setMode": "random"
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the fair with an extra Fizzpod in your bag."
+      },
+      "stars": [
+        {
+          "text": "Win",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Explode no more than twice",
+          "test": {
+            "k": "booms",
+            "op": "<=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Buy 12 or more chips",
+          "test": {
+            "k": "bought",
+            "op": ">=",
+            "v": 12
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Mirabel plays at normal strength and your bag is the usual one."
+      },
+      "unlock": [
+        {
+          "type": "cardback",
+          "id": "ember-bag",
+          "text": "Ember bag pattern"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": {
+        "id": "boss-lead",
+        "param": 4,
+        "text": "Rival rule: Odo starts the fair with 4 points."
+      },
+      "hints": false,
+      "id": "c9",
+      "act": 3,
+      "title": "Ladle Heats",
+      "intro": [
+        {
+          "who": "hask",
+          "text": "The heats: three pots, one goes to the final. Odo and Mirabel both play sharp."
+        },
+        {
+          "who": "odo",
+          "text": "I paid the judge in sunroots. Four points before we even start!"
+        },
+        {
+          "who": "hask",
+          "text": "A leader gives rat stones to everyone behind. Use them."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hask",
+          "text": "Through to the final. Madame Vesper has asked your name."
+        }
+      ],
+      "opponent": {
+        "name": "Odo",
+        "portrait": "camp-odo.webp",
+        "emoji": "🥕",
+        "cast": "odo",
+        "personality": "Loud root dealer. Draws one chip too many and brags about it either way.",
+        "aiLevel": "hard",
+        "aiStyle": "standard"
+      },
+      "setup": {
+        "players": 3,
+        "seed": null,
+        "setMode": 3
+      },
+      "goal": {
+        "type": "score",
+        "value": 50,
+        "text": "Win with at least 50 points against Odo and Mirabel."
+      },
+      "stars": [
+        {
+          "text": "Win with 50 or more",
+          "test": {
+            "k": "winScore",
+            "op": ">=",
+            "v": 50
+          }
+        },
+        {
+          "text": "Win by 3 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 3
+          }
+        },
+        {
+          "text": "Reach scoring space 45 in one brew",
+          "test": {
+            "k": "best",
+            "op": ">=",
+            "v": 45
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Both rivals play at normal strength and Odo starts at 0."
+      },
+      "unlock": [
+        {
+          "type": "table",
+          "id": "judges-tent",
+          "text": "Judges' tent table"
+        }
+      ]
+    },
+    {
+      "boss": true,
+      "twist": {
+        "id": "boss-droplet",
+        "param": 1,
+        "text": "Boss rule: Madame Vesper starts with her droplet 1 space further on."
+      },
+      "hints": false,
+      "id": "c10",
+      "act": 3,
+      "title": "The Golden Ladle",
+      "intro": [
+        {
+          "who": "vesper",
+          "text": "Nine fairs, nine ladles. You are the tenth apprentice to try."
+        },
+        {
+          "who": "hask",
+          "text": "Vesper starts every brew one space further on. She has earned that droplet."
+        },
+        {
+          "who": "hask",
+          "text": "Every book set may appear. Read the stalls, keep the flask for the last white."
+        },
+        {
+          "who": "vesper",
+          "text": "Begin."
+        }
+      ],
+      "outro": [
+        {
+          "who": "vesper",
+          "text": "The Ladle is yours. Polish it daily."
+        },
+        {
+          "who": "hask",
+          "text": "Bramblemere has a new champion. I knew it the day you stopped before the boil."
+        }
+      ],
+      "opponent": {
+        "name": "Madame Vesper",
+        "portrait": "camp-vesper.webp",
+        "emoji": "🥄",
+        "cast": "vesper",
+        "personality": "Nine-time holder of the Golden Ladle. Cold, exact, never wastes a coin.",
+        "aiLevel": "hard",
+        "aiStyle": "standard",
+        "taunt": "Ten fairs, ten ladles. Come back next year, apprentice.",
+        "praise": "Exact, patient, unafraid. Take the Ladle; you earned it."
+      },
+      "setup": {
+        "players": 2,
+        "seed": null,
+        "setMode": "random"
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the final against Madame Vesper."
+      },
+      "stars": [
+        {
+          "text": "Win",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Win by 5 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 5
+          }
+        },
+        {
+          "text": "Score 55 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 55
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Madame Vesper plays at normal strength and starts on the usual space."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "vesper",
+          "text": "Madame Vesper's portrait"
+        },
+        {
+          "type": "title",
+          "id": "ladle",
+          "text": "Title: Keeper of the Golden Ladle"
+        }
+      ]
+    }
+  ]
+}

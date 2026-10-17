@@ -315,9 +315,11 @@ No, this runs on Linux/Windows/MacOS.
 
 ## License
 
-Creative Commons Zero v1.0 Universal
+The spotify2ytmusic tool is Creative Commons Zero v1.0 Universal; spotify-backup.py is
+licensed under the MIT License. See <https://github.com/caseychu/spotify-backup> for more
+information, and LICENSE-spotify2ytmusic for the full terms.
 
-spotify-backup.py licensed under MIT License.
-See <https://github.com/caseychu/spotify-backup> for more information.
+The Game Night Shelf (`games/`, `games-src/` and `skills/`) is copyright (c) 2026
+Am015-dev, all rights reserved. See LICENSE.
 
 [//]: # " vim: set tw=90 ts=4 sw=4 ai: "

@@ -1,0 +1,77 @@
+{
+ "style": "",
+ "cards": {
+  "07-boss-schranken-wart-a": {
+   "prompt": "The exact same the barrier boss as the reference. Pose: red laser bright, striped arms tilted up. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "07-boss-schranken-wart.png"
+   ]
+  },
+  "07-boss-schranken-wart-b": {
+   "prompt": "The exact same the barrier boss as the reference. Pose: red laser faint, striped arms tilted down. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "07-boss-schranken-wart.png"
+   ]
+  },
+  "07-boss-schranken-wart-c": {
+   "prompt": "The exact same the barrier boss as the reference. Pose: red laser bright, arms level, sensor lights on. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "07-boss-schranken-wart.png"
+   ]
+  },
+  "07-boss-schranken-wart-d": {
+   "prompt": "The exact same the barrier boss as the reference. Pose: red laser faint, arms level, sensor lights off. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "07-boss-schranken-wart.png"
+   ]
+  },
+  "09-boss-hoplite-a": {
+   "prompt": "The exact same the hoplite boss as the reference. Pose: chest breathed in, plume swung left, spear tip glinting. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "09-boss-hoplite.png"
+   ]
+  },
+  "09-boss-hoplite-b": {
+   "prompt": "The exact same the hoplite boss as the reference. Pose: chest breathed out, plume swung right. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "09-boss-hoplite.png"
+   ]
+  },
+  "09-boss-hoplite-c": {
+   "prompt": "The exact same the hoplite boss as the reference. Pose: shield shifted slightly to the left, plume centred. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "09-boss-hoplite.png"
+   ]
+  },
+  "09-boss-hoplite-d": {
+   "prompt": "The exact same the hoplite boss as the reference. Pose: shield shifted slightly to the right, spear tip glinting. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "09-boss-hoplite.png"
+   ]
+  },
+  "10-boss-talos-a": {
+   "prompt": "The exact same the bronze giant boss as the reference. Pose: shoulders raised, chest core bright orange, fists clenched. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "10-boss-talos.png"
+   ]
+  },
+  "10-boss-talos-b": {
+   "prompt": "The exact same the bronze giant boss as the reference. Pose: shoulders lowered, chest core dim orange, fists loose. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "10-boss-talos.png"
+   ]
+  },
+  "10-boss-talos-c": {
+   "prompt": "The exact same the bronze giant boss as the reference. Pose: shoulders raised, core medium orange, fists loose. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "10-boss-talos.png"
+   ]
+  },
+  "10-boss-talos-d": {
+   "prompt": "The exact same the bronze giant boss as the reference. Pose: shoulders lowered, core bright orange, fists clenched. Identical art style, colours, outline, size and view as the reference, centred on a plain pure white background. No shadow, no floor, no smoke, no sparks, no text.",
+   "ingredients": [
+    "10-boss-talos.png"
+   ]
+  }
+ }
+}

@@ -1,0 +1,11 @@
+const {JSDOM,VirtualConsole}=require('../../node_modules/jsdom');const fs=require('fs');
+const html=fs.readFileSync(__dirname+'/tidewake.html','utf8');
+const vc=new VirtualConsole();vc.on('jsdomError',e=>console.log('JSDOM',e.message.slice(0,300),e.detail&&String(e.detail.stack||e.detail).slice(0,600)));vc.on('error',(...a)=>console.log('ERR',a.join(' ').slice(0,500)));
+const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://gns.test/',virtualConsole:vc});const w=dom.window,d=w.document;
+w.addEventListener('load',()=>{w.eval('AIDELAY=0;ANIM=0;setSeed(5);setAiSeed(5)');
+ const click=el=>el.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
+ click(d.querySelector('[data-a=guided]'));
+ let n=0,last='';const iv=setInterval(()=>{const b=d.querySelector('#main [data-a=startmark]:not([disabled]),#main [data-a=place]:not([disabled]),#main [data-a=q]');
+  const sig=w.eval('G.logN+":"+G.turn');if(n%20===0||sig===last)console.log(n,sig,d.querySelector('#main').textContent.slice(0,80));last=sig;
+  if(b){click(b);n++}if(n>150||w.eval('G.over')||n>0&&!b&&n>3000){clearInterval(iv);console.log('clicks',n,'over',JSON.stringify(w.eval('G.over')),'turn',w.eval('G.turn'));console.log(d.querySelector('#main').textContent.slice(0,300));process.exit(0)}},2)});
+setTimeout(()=>{console.log('TIMEOUT');process.exit(1)},40000);

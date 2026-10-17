@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shardfall — War of Two Roads</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#e9dcb8; --paper2:#dfcfa4; --paper3:#f3e9cf; --ink:#2c1e10; --ink2:#5a4630; --faded:#8a7354; --rule:#6b5537;
+  --wax-f:#22407a; --wax-f2:#4468ad; --wax-s:#8f1d14; --wax-s2:#c8402c; --gold:#b8892a; --gold2:#e2bd5c;
+  --free:#22407a; --throne:#8f1d14; --neutral:#cbbb90; --ash:#3a2c22; --ok:#3d6b2f; --shadow:rgba(40,25,5,.35);
+  --sea:#cfc1a0;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --paper:#3a2f22; --paper2:#302619; --paper3:#46392a; --ink:#efe3c6; --ink2:#d3c19b; --faded:#a48f6c; --rule:#8f7a58;
+  --free:#7ea1e6; --throne:#e8664c; --neutral:#5b4d38; --ash:#120d09; --ok:#7fc063; --shadow:rgba(0,0,0,.6); --sea:#2c2419;
+}}
+:root[data-theme="dark"]{
+  --paper:#3a2f22; --paper2:#302619; --paper3:#46392a; --ink:#efe3c6; --ink2:#d3c19b; --faded:#a48f6c; --rule:#8f7a58;
+  --free:#7ea1e6; --throne:#e8664c; --neutral:#5b4d38; --ash:#120d09; --ok:#7fc063; --shadow:rgba(0,0,0,.6); --sea:#2c2419;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.45 "Cormorant Garamond",Georgia,serif;font-weight:500;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .1 0 0 0 .12 0'/></filter><rect width='400' height='400' filter='url(%23n)'/></svg>")}
+h1,h2,h3{font-family:"IM Fell English",Georgia,serif;font-weight:400;letter-spacing:.01em}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,g.reg:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem 1rem;padding:.8rem 1.4rem .6rem;border-bottom:3px double var(--rule)}
+header h1{margin:0;font-size:2.3rem;font-family:"IM Fell English SC","IM Fell English",Georgia,serif}
+header .sub{color:var(--ink2);font-style:italic}
+header .spacer{flex:1}
+.btn{border:1.5px solid var(--rule);background:var(--paper3);padding:.4rem .9rem;border-radius:3px;line-height:1.25;box-shadow:inset 0 0 0 1px var(--paper3),inset 0 0 0 2px var(--rule);font-family:"IM Fell English",Georgia,serif;font-size:.98rem}
+.btn:hover{background:var(--paper)}
+.btn.primary{background:var(--ink);color:var(--paper3);border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink),inset 0 0 0 2px var(--paper3)}
+.btn[disabled]{opacity:.38;cursor:not-allowed}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:1.1rem;padding:1rem 1.4rem;max-width:1520px;margin:0 auto}
+@media (max-width:980px){.wrap{grid-template-columns:1fr;padding:.6rem}}
+.board{min-width:0}
+#map{width:100%;height:auto;display:block;border:2px solid var(--rule);outline:1px solid var(--rule);outline-offset:4px;box-shadow:0 8px 30px var(--shadow)}
+.side{display:flex;flex-direction:column;gap:.8rem;min-width:0}
+.box{background:var(--paper3);border:1.5px solid var(--rule);outline:1px solid var(--rule);outline-offset:3px;padding:.75rem .9rem;margin:4px}
+.box h3{margin:0 0 .35rem;font-size:1.25rem;border-bottom:1px solid var(--rule);padding-bottom:.15rem}
+.box h3::before{content:"❧ ";color:var(--faded)}
+.muted{color:var(--faded)} .small{font-size:.9rem}
+#prompt.F .who{color:var(--free)} #prompt.S .who{color:var(--throne)}
+#prompt .who{font-family:"IM Fell English SC","IM Fell English",Georgia,serif;font-size:1.45rem}
+.acts{display:flex;flex-direction:column;gap:.35rem;margin-top:.5rem}
+.acts .btn{text-align:left;font-family:"Cormorant Garamond",Georgia,serif;font-weight:600}
+.acts .btn small{display:block;color:var(--ink2);font-size:.82rem;font-weight:500}
+.dicerow{display:flex;flex-wrap:wrap;gap:.45rem;align-items:center;margin:.3rem 0 .55rem}
+.dicerow .lbl{width:4.8rem;font-family:"IM Fell English",Georgia,serif}
+.die{width:54px;height:54px;border-radius:6px;border:1.5px solid var(--rule);background:var(--paper3);display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;padding:0;box-shadow:inset 0 0 0 2px var(--paper3),inset 0 0 0 3px var(--rule)}
+.die .g{font-size:1.35rem} .die .t{font-size:.62rem;margin-top:3px;color:var(--ink2);font-family:"IM Fell English",Georgia,serif}
+.die.F .g{color:var(--free)} .die.S .g{color:var(--throne)}
+.die.used{opacity:.3;cursor:default;background:var(--paper2)} .die.hunt{border-style:dashed;cursor:default;opacity:.85}
+.die.sel{box-shadow:inset 0 0 0 2px var(--paper3),inset 0 0 0 3px var(--rule),0 0 0 3px var(--gold)}
+.tracks{display:grid;gap:.55rem;margin-top:.9rem}
+.track{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.track .name{width:6.2rem;font-family:"IM Fell English",Georgia,serif;font-size:1.1rem}
+.cells{display:flex;gap:3px;flex-wrap:wrap}
+.cell{width:30px;height:30px;border:1px solid var(--rule);background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:.75rem;color:var(--ink2);font-family:"IM Fell English",Georgia,serif}
+.cell.ash{background:var(--ash);color:#d8c6a2;border-color:#1c1410}
+.cell.here{background:var(--gold2);color:#2c1e10;font-weight:700;border-color:var(--gold);border-radius:50%;box-shadow:0 1px 2px var(--shadow)}
+.cell.taint{background:var(--wax-s2);border-color:var(--wax-s);color:#fff}
+.cell.forge{border:2px solid var(--throne)}
+.chips{display:flex;flex-wrap:wrap;gap:.35rem}
+.chip{border:1px solid var(--rule);border-radius:2px;padding:.05rem .55rem;font-size:.88rem;background:var(--paper)}
+.chip.warn{border-color:var(--throne);color:var(--throne)} .chip.F{color:var(--free)} .chip.S{color:var(--throne)}
+.hand{display:flex;flex-direction:column;gap:.5rem}
+.card{border:1.5px solid var(--rule);padding:.45rem .65rem;background:var(--paper);box-shadow:inset 0 0 0 2px var(--paper),inset 0 0 0 3px var(--rule)}
+.card .top{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
+.card .nm{font-family:"IM Fell English",Georgia,serif;font-size:1.15rem}
+.card .ty{font-size:.75rem;color:var(--ink2);white-space:nowrap;font-style:italic}
+.card p{margin:.2rem 0 .4rem;font-size:.92rem}
+.nat{display:grid;grid-template-columns:1fr auto;gap:.2rem .6rem;font-size:.95rem}
+#log{max-height:240px;overflow:auto}
+#log div{font-size:.9rem;padding:.12rem 0;border-bottom:1px dotted var(--rule)}
+#log .F{color:var(--free)} #log .S{color:var(--throne)} #log .N{font-family:"IM Fell English",Georgia,serif;color:var(--faded)}
+.modal{position:fixed;inset:0;background:rgba(30,20,8,.62);display:flex;align-items:center;justify-content:center;padding:1rem;z-index:10}
+.modal.hidden{display:none}
+.dlg{background:var(--paper3);border:2px solid var(--rule);outline:1px solid var(--rule);outline-offset:4px;max-width:600px;width:100%;max-height:88vh;overflow:auto;padding:1.2rem 1.35rem;box-shadow:0 24px 60px var(--shadow)}
+.dlg h2{margin:0 0 .4rem;font-size:1.8rem;font-family:"IM Fell English SC","IM Fell English",Georgia,serif}
+.dlg .acts .btn{padding:.55rem .8rem}
+.rules h3{margin:1rem 0 .2rem;font-size:1.2rem} .rules p,.rules li{font-size:1rem;max-width:68ch}
+g.reg.pickable{cursor:pointer}
+g.reg.pickable .ring{stroke:var(--gold);stroke-width:5;animation:pulse 1.1s ease-in-out infinite}
+@keyframes pulse{50%{stroke-opacity:.3}}
+.legend{display:grid;grid-template-columns:auto 1fr;gap:.3rem .6rem;font-size:.9rem;align-items:center}
+.legend svg{width:38px;height:38px;display:block}
+details summary{cursor:pointer;font-family:"IM Fell English",Georgia,serif;font-size:1.25rem}
+.win{font-size:1.6rem}
+.inspect{margin-top:.5rem;padding-top:.5rem;border-top:1px dotted var(--rule);font-size:.92rem}
+.coach{border:2px solid var(--gold);background:var(--paper3)}
+.coach h3{color:var(--gold)}
+.hl{box-shadow:0 0 0 3px var(--gold)!important}
+.rolls{display:grid;gap:.8rem;margin:.5rem 0}
+.rollrow{padding:.55rem .7rem;border:1px solid var(--rule);background:var(--paper)}
+.rollrow.F{border-left:5px solid var(--free)} .rollrow.S{border-left:5px solid var(--throne)}
+.rollrow .lbl{display:flex;justify-content:space-between;font-size:.95rem;margin-bottom:.35rem}
+.dset{display:flex;flex-wrap:wrap;gap:.35rem}
+.d6{width:40px;height:40px;border-radius:6px;border:1.5px solid var(--rule);background:var(--paper3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.25rem;box-shadow:inset 0 0 0 2px var(--paper3),inset 0 0 0 3px var(--rule)}
+.d6.spin{animation:spin .12s linear infinite}
+@keyframes spin{50%{transform:rotate(12deg) scale(1.05)}}
+.d6.hit{background:var(--ok);color:#fff;border-color:var(--ok);box-shadow:none}
+.d6.rr{border-style:dashed}
+.d6.tile{width:64px;height:64px;font-size:1.5rem;border-color:var(--throne);background:var(--ash);color:#f2e6cf;box-shadow:none}
+.outcome{font-family:"IM Fell English",Georgia,serif;font-size:1.3rem;margin:.4rem 0}
+@media (prefers-reduced-motion:reduce){.d6.spin{animation:none}g.reg.pickable .ring{animation:none}}
+
+.pol{display:grid;grid-template-columns:1fr auto;gap:.3rem .6rem;font-size:.95rem;align-items:center}
+.pips{display:flex;gap:3px;align-items:center}
+.pip{width:15px;height:15px;border:1px solid var(--rule);background:var(--paper)}
+.pip.on{background:var(--ink2)} .pip.war{background:var(--wax-s2);border-color:var(--wax-s)}
+.tag{font-size:.75rem;font-style:italic;color:var(--gold)}
+.cell.mord{background:var(--ash);color:#d8c6a2;border-color:#1c1410}
+.chip.dead{text-decoration:line-through;opacity:.6}
+.deck{font-size:.72rem;border:1px solid var(--rule);padding:0 .35rem;margin-left:.3rem}
+.combat{font-size:.82rem;font-style:italic;color:var(--ink2);border-top:1px dotted var(--rule);padding-top:.2rem;margin-top:.2rem}
+</style>
+</head>
+<body>
+<header>
+  <h1>Shardfall</h1>
+  <span class="sub">A war of two roads: the hidden Fellowship, and the armies of the west.</span>
+  <span class="spacer"></span>
+  <button class="btn" id="bTour">Guided tour</button>
+  <button class="btn" id="bRules">Rules</button>
+  <button class="btn" id="bNew">New game</button>
+</header>
+<main class="wrap">
+  <section class="board">
+    <svg id="map" viewBox="0 0 1000 660" role="img" aria-label="Game map"></svg>
+    <div class="tracks box" id="tracks"></div>
+  </section>
+  <aside class="side">
+    <div id="coach" class="box coach" style="display:none"></div>
+    <div id="prompt" class="box"></div>
+    <div id="dice" class="box"></div>
+    <div id="hand" class="box"></div>
+    <div id="nations" class="box"></div>
+    <div class="box"><details><summary>Map legend</summary><div class="legend" id="legend"></div></details></div>
+    <div class="box"><h3>Chronicle</h3><div id="log"></div></div>
+  </aside>
+</main>
+<div id="modal" class="modal hidden"></div>
+<script>
+/* ======================= DATA ======================= */
+const MORDOR=6,MAXC=12,VP_S=10,VP_F=5,SAVE='shardfall-v3',TOUR='shardfall-tour3';
+var ANIM=1,AIDELAY=650;
+const RAND=n=>Math.floor(Math.random()*n),d6=()=>1+RAND(6);
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=RAND(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+const SIDES={F:{name:'Free Realms',long:'The Free Realms'},S:{name:'Throne',long:'The Ashen Throne'}};
+const NATIONS={
+  north:{name:'Northmarch',side:'F'},sylvan:{name:'Sylvan Realms',side:'F'},stonekin:{name:'Stonekin',side:'F'},
+  riders:{name:'Plainsriders',side:'F'},aldmere:{name:'Aldmere',side:'F'},
+  ironspire:{name:'Iron Spire',side:'S'},ashen:{name:'Ashen Throne',side:'S'},south:{name:'Southern Hordes',side:'S'},
+};
+const R=[
+ ['greyhaven','Greyhaven','sylvan','fort',55,215],['hearthdale','Hearthdale','north','city',150,165],['northdowns','Northdowns','north',null,210,75],
+ ['bramble','Bramblefield','north',null,255,215],['silverglen','Silverglen','sylvan','fort',360,140],['mirefang','Mirefang','ashen','fort',470,62],
+ ['highpass','High Pass',null,null,460,150],['thornhall','Thornhall','sylvan','fort',610,95],['dalemark','Dalemark','north','city',760,80],
+ ['deephold','Deephold','stonekin','fort',855,62],['irongate','Irongate','stonekin','city',925,135],['dunmoor','Dunmoor','ironspire','city',160,330],
+ ['mistpass','Mistgate',null,null,340,275],['wildmoor','Wildmoor',null,null,470,250],['blackspire','Blackspire','ashen','fort',600,225],
+ ['fenmoor','Fenmoor',null,null,720,185],['eastfields','Eastfields',null,null,840,250],['rhunhold','Rhunhold','south','fort',920,315],
+ ['ironspire','Ironspire','ironspire','fort',270,395],['mistwood','Mistwood','sylvan','fort',500,345],['brownlands','Brownlands',null,null,665,315],
+ ['deadfields','Deadfields',null,null,725,392],['morrowgate','Morrowgate','ashen','fort',815,380],['ashplain','Ashplain','ashen',null,885,445],
+ ['goldhall','Goldhall','riders','city',400,455],['riderplain','Riderplain','riders',null,525,445],['horsemere','Horsemere','riders','fort',280,505],
+ ['highcrown','Highcrown','aldmere','fort',625,500],['osgate','Osgate','aldmere',null,715,462],['shadegate','Shadegate','ashen','fort',800,540],
+ ['cinderhold','Cinderhold','ashen','fort',925,515],['westshore','Westshore','aldmere',null,235,605],['seahaven','Seahaven','aldmere','fort',390,610],
+ ['harrowby','Harrowby','aldmere','city',545,600],['nearsand','Nearsand','south','city',700,605],['sunward','Sunward','south','fort',865,600],
+].map(([id,name,nation,set,x,y])=>({id,name,nation,set,x,y}));
+const REG=Object.fromEntries(R.map(r=>[r.id,r]));
+const EDGES=`greyhaven-hearthdale greyhaven-dunmoor hearthdale-northdowns hearthdale-bramble northdowns-bramble bramble-silverglen bramble-dunmoor bramble-mistpass silverglen-highpass silverglen-mistpass highpass-mirefang highpass-wildmoor mirefang-thornhall thornhall-wildmoor thornhall-blackspire thornhall-dalemark thornhall-fenmoor dalemark-deephold dalemark-fenmoor deephold-irongate irongate-eastfields irongate-rhunhold dunmoor-mistpass dunmoor-ironspire mistpass-wildmoor mistpass-ironspire wildmoor-mistwood wildmoor-blackspire blackspire-mistwood blackspire-fenmoor blackspire-brownlands fenmoor-eastfields fenmoor-brownlands eastfields-rhunhold eastfields-brownlands eastfields-deadfields rhunhold-ashplain ironspire-horsemere ironspire-goldhall mistwood-riderplain mistwood-brownlands brownlands-deadfields brownlands-riderplain deadfields-riderplain deadfields-morrowgate deadfields-osgate morrowgate-ashplain ashplain-cinderhold ashplain-shadegate shadegate-cinderhold shadegate-osgate shadegate-nearsand goldhall-horsemere goldhall-riderplain goldhall-westshore riderplain-highcrown horsemere-westshore highcrown-osgate highcrown-harrowby highcrown-seahaven westshore-seahaven seahaven-harrowby harrowby-osgate harrowby-nearsand harrowby-sunward nearsand-sunward`.split(' ').map(e=>e.split('-'));
+const ADJ={};R.forEach(r=>ADJ[r.id]=[]);EDGES.forEach(([a,b])=>{ADJ[a].push(b);ADJ[b].push(a)});
+const GATES=['morrowgate','shadegate'];
+const COMPS={
+  aldric:{name:'Aldric',role:'Heir of Highcrown',lvl:3,lead:2,nat:['aldmere','riders'],guide:'Guide: the Fellowship may hide with any die.'},
+  tamsin:{name:'Tamsin',role:'Grey Loremaster',lvl:3,lead:1,nat:'any',guide:'Guide: Eye tiles deal 1 less damage (never below 1).'},
+  veyra:{name:'Veyra',role:'Sylvan Archer',lvl:2,lead:1,nat:['sylvan'],guide:'Guide: the Hunt gets no rerolls from the region.'},
+  hollis:{name:'Hollis',role:'Stonekin Axe',lvl:2,lead:1,nat:['stonekin'],guide:'Guide: casualties absorb 1 extra damage.'},
+  corran:{name:'Corran',role:'Captain of Aldmere',lvl:2,lead:1,nat:['aldmere']},
+  kettle:{name:'Kettle',role:'Hearthdale Scout',lvl:1,lead:1,nat:['north'],guide:'Guide: the first reveal each turn is ignored.'},
+  pip:{name:'Pip',role:'Hearthdale Scout',lvl:1,lead:1,nat:['north']},
+};
+const WRETCH={name:'The Wretch',guide:'Guide (when no Wardens remain): reveals are ignored and the Fellowship hides with any die.'};
+const LEADV={l:1,w:1,tyrant:1,ashking:2,herald:2};
+const MINIONS={tyrant:{name:'The White Tyrant',txt:'Iron Spire at war. Stays in Ironspire. +1 die; lets Muster dice forge elites.'},ashking:{name:'The Ashen King',txt:'Ashen Throne and a Free nation at war. Flies like a Wraith, leadership 2. +1 die.'},herald:{name:'The Pale Herald',txt:'Ashen Throne at war, and the Fellowship in Mordor or two Free nations at war. Leadership 2. +1 die.'}};
+const FF=['C','C','AM','M','E','W'],SF=['H','C','A','AM','M','E'];
+const FACE={C:['♞','Character'],A:['⚔','Army'],M:['⚑','Muster'],AM:['⚔⚑','Army/Muster'],E:['✦','Event'],W:['☀','Will'],H:['◉','Eye']};
+const TILES=()=>[{v:'E',r:1},{v:'E',r:1},{v:'E',r:1},{v:'E',r:1},{v:3},{v:3,r:1},{v:2},{v:2,r:1},{v:2,r:1},{v:1},{v:1},{v:1,r:1},{v:1,r:1},{v:0},{v:3},{v:0,r:1}];
+const DARK=()=>[{v:'X'},{v:'X'},{v:'X'},{v:3,r:1}];
+
+/* ======================= HELPERS ======================= */
+let G=null;const UI={pick:null,choice:null,sel:null,focus:null,roll:null,info:false,coach:null,acts:[],busy:false};
+const other=s=>s==='F'?'S':'F';
+const isC=u=>u.t==='r'||u.t==='e';
+const combat=rid=>G.units[rid].filter(isC).length;
+const cnt=(rid,t)=>G.units[rid].filter(u=>u.t===t).length;
+const owner=rid=>G.units[rid].length?NATIONS[G.units[rid][0].n].side:null;
+const compLead=id=>id==='aldric'&&G.up.aldric?3:id==='tamsin'&&G.up.tamsin?2:COMPS[id].lead;
+const lead=rid=>G.units[rid].reduce((a,u)=>a+(LEADV[u.t]||0),0)+(owner(rid)==='F'?G.comps[rid].reduce((a,id)=>a+compLead(id),0):0);
+const atWar=n=>G.pol[n].step===0;
+const vpOf=rid=>REG[rid].set==='fort'?2:REG[rid].set==='city'?1:0;
+const homeSide=rid=>REG[rid].nation?NATIONS[REG[rid].nation].side:null;
+const held=(rid,s)=>!!REG[rid].set&&G.ctrl[rid]===s;
+const unused=s=>G.dice[s].filter(d=>!d.used).length;
+const isHuman=s=>G.mode==='hot'||G.mode===s;
+const minionsOn=()=>Object.keys(MINIONS).filter(m=>R.some(r=>cnt(r.id,m)));
+const wraiths=()=>R.reduce((a,r)=>a+cnt(r.id,'w'),0);
+const diceCount=s=>s==='F'?4+(G.up.aldric?1:0)+(G.up.tamsin?1:0):7+minionsOn().length;
+const fNations=()=>Object.keys(NATIONS).filter(n=>NATIONS[n].side==='F');
+const guideName=()=>G.f.guide==='wretch'?WRETCH.name:COMPS[G.f.guide].name;
+function vp(s){return R.filter(r=>r.set&&homeSide(r.id)!==s&&G.ctrl[r.id]===s).reduce((a,r)=>a+vpOf(r.id),0)}
+function log(s,t){G.log.unshift({s,t});if(G.log.length>200)G.log.length=200}
+function add(rid,n,t,k){for(let i=0;i<k;i++){if((t==='r'||t==='e')&&combat(rid)>=10)break;G.units[rid].push({n,t})}}
+function natFor(rid,s){const u=G.units[rid].find(isC);if(u)return u.n;const n=REG[rid].nation;if(n&&NATIONS[n].side===s)return n;return s==='F'?'aldmere':'ashen'}
+function addCorr(n){G.f.corr=Math.min(MAXC,G.f.corr+n)}
+function heal(n){G.f.corr=Math.max(0,G.f.corr-n)}
+function bfs(from){const d={[from]:0},p={},q=[from];while(q.length){const c=q.shift();for(const n of ADJ[c])if(d[n]==null){d[n]=d[c]+1;p[n]=c;q.push(n)}}return{d,p}}
+function pathTo(from,to){const{p}=bfs(from);const path=[to];while(path[0]!==from)path.unshift(p[path[0]]);return path}
+function within(from,k){const{d}=bfs(from);return R.filter(r=>d[r.id]<=k).map(r=>r.id)}
+function gatePath(from){let best=null;GATES.forEach(g=>{const p=pathTo(from,g);if(!best||p.length<best.length)best=p});return best}
+function distMap(target){const d={},q=[];R.forEach(r=>{if(target(r.id)){d[r.id]=0;q.push(r.id)}});while(q.length){const c=q.shift();for(const n of ADJ[c])if(d[n]==null){d[n]=d[c]+1;q.push(n)}}R.forEach(r=>{if(d[r.id]==null)d[r.id]=99});return d}
+function strength(rid){const c=combat(rid),e=cnt(rid,'e');return Math.min(5,c)+e*0.45+Math.min(lead(rid),Math.min(5,c))*0.4+Math.max(0,c-5)*0.4}
+function threat(rid){if(!held(rid,'F')||owner(rid)==='S')return 0;const mine=owner(rid)==='F'?strength(rid):0;const m=ADJ[rid].reduce((a,x)=>owner(x)==='S'&&combat(x)>0?Math.max(a,strength(x)):a,0);return m-mine*(REG[rid].set==='fort'?1.5:1.1)}
+function sThreat(rid){if(!held(rid,'S')||owner(rid)==='F')return 0;const mine=owner(rid)==='S'?strength(rid):0;const m=ADJ[rid].reduce((a,x)=>owner(x)==='F'&&combat(x)>0?Math.max(a,strength(x)):a,0);return m-mine*(REG[rid].set==='fort'?1.5:1.1)}
+
+/* ======================= POLITICS ======================= */
+function rouse(n,step){if(!n)return;const p=G.pol[n],N=NATIONS[n];if(!p.active){p.active=true;log(N.side,`${N.name} is roused.`)}if(step&&p.step>0){p.step--;log(N.side,p.step===0?`${N.name} goes to war!`:`${N.name} moves toward war (${p.step} to go).`)}}
+function canAdvance(n){const p=G.pol[n];return p.step>1||(p.step===1&&p.active)}
+function advance(n){G.pol[n].step--;const N=NATIONS[n];log(N.side,G.pol[n].step===0?`${N.name} goes to war!`:`${N.name} moves toward war (${G.pol[n].step} to go).`)}
+function diploTargets(s){return Object.keys(NATIONS).filter(n=>NATIONS[n].side===s&&canAdvance(n))}
+
+/* ======================= CARDS HELPERS ======================= */
+function drawCard(s,deck){if(!G.decks[s][deck].length){G.decks[s][deck]=shuffle(G.disc[s][deck]);G.disc[s][deck]=[]}if(!G.decks[s][deck].length)return false;G.hands[s].push(G.decks[s][deck].pop());if(G.hands[s].length>6){const k=G.hands[s].shift();discard(s,k);log(s,`Hand full: “${CARDS[k].name}” discarded.`)}return true}
+function discard(s,k){G.disc[s][CARDS[k].deck].push(k)}
+function drawTile(){if(!G.tiles.length){G.tiles=shuffle(G.used);G.used=[]}const t=G.tiles.pop();G.used.push(t);return t}
+
+/* ======================= UNITS & MOVEMENT ======================= */
+function relocateFlyer(u){const spots=R.filter(r=>r.nation==='ashen'&&r.set==='fort'&&G.ctrl[r.id]==='S'&&owner(r.id)!=='F').map(r=>r.id);const dest=spots.includes('cinderhold')?'cinderhold':spots[0];if(dest){G.units[dest].push({n:'ashen',t:u.t});log('S',`${u.t==='w'?'A Wraith':'The Ashen King'} flees to ${REG[dest].name}.`)}else log('F',`${u.t==='w'?'A Wraith':'The Ashen King'} is banished.`)}
+function eliminateComp(id,where){G.f.band=G.f.band.filter(x=>x!==id);R.forEach(r=>G.comps[r.id]=G.comps[r.id].filter(x=>x!==id));if(!G.f.dead.includes(id))G.f.dead.push(id);if(id==='aldric')G.up.aldric=false;if(id==='tamsin'&&G.up.tamsin){G.up.tamsin=false;G.tamsinGone=true}if(G.f.guide===id||!G.f.band.includes(G.f.guide))G.f.guide=bestGuide();log('F',`${COMPS[id].name} is slain${where?(/^(on|by) /.test(where)?' '+where:' at '+where):''}.`)}
+function bestGuide(){const b=G.f.band;if(!b.length)return 'wretch';return b.slice().sort((a,c)=>COMPS[c].lvl-COMPS[a].lvl)[0]}
+function wipe(rid){const us=G.units[rid];G.units[rid]=[];us.forEach(u=>{if(u.t==='w'||u.t==='ashking')relocateFlyer(u);else if(u.t==='tyrant'||u.t==='herald'){G.minionDead[u.t]=true;log('F',`${MINIONS[u.t].name} is slain!`)}else if(u.t==='l')log(NATIONS[u.n].side,`A leader falls at ${REG[rid].name}.`)});[...G.comps[rid]].forEach(id=>eliminateComp(id,REG[rid].name))}
+function applyHits(rid,n){let k=0;for(let i=0;i<n;i++){const us=G.units[rid];let j=us.findIndex(u=>u.t==='r');if(j>=0){us.splice(j,1);k++;continue}j=us.findIndex(u=>u.t==='e');if(j>=0){us[j].t='r';k++;continue}break}if(combat(rid)===0&&(G.units[rid].length||G.comps[rid].length))wipe(rid);return k}
+function fleeComps(rid){if(!G.comps[rid].length)return;const{d}=bfs(rid);const dest=R.filter(r=>r.id!==rid&&owner(r.id)!=='S'&&homeSide(r.id)==='F').sort((a,b)=>d[a.id]-d[b.id])[0];if(dest){log('F',`${G.comps[rid].map(id=>COMPS[id].name).join(', ')} slip away to ${dest.name}.`);G.comps[dest.id].push(...G.comps[rid])}G.comps[rid]=[]}
+function onEnter(to,me){
+  if(REG[to].set&&G.ctrl[to]!==me){const home=homeSide(to);G.ctrl[to]=me;log(me,home===me?`${SIDES[me].name} retakes ${REG[to].name}!`:`${SIDES[me].name} captures ${REG[to].name} (+${vpOf(to)} VP).`);if(home!==me)rouse(REG[to].nation,true)}
+  if(me==='S'){const n=REG[to].nation;if(n&&NATIONS[n].side==='F')rouse(n,false);fleeComps(to)}
+}
+function moveUnits(from,to,n){
+  const me=owner(from),o=owner(to);
+  if(o&&o!==me&&combat(to)===0){const us=G.units[to];G.units[to]=[];us.forEach(u=>{if(u.t==='w'||u.t==='ashking')relocateFlyer(u);else if(u.t==='tyrant'||u.t==='herald'){G.minionDead[u.t]=true;log('F',`${MINIONS[u.t].name} is caught and slain!`)}})}
+  const us=G.units[from];
+  const cmb=us.filter(isC).sort((a,b)=>(b.t==='e')-(a.t==='e')).slice(0,n);
+  const lds=us.filter(u=>!isC(u)&&u.t!=='tyrant');
+  G.units[from]=us.filter(u=>!cmb.includes(u)&&!lds.includes(u));
+  G.units[to].push(...cmb,...lds);
+  if(me==='F'){G.comps[to].push(...G.comps[from]);G.comps[from]=[]}
+  log(me,`${SIDES[me].name} marches ${n} from ${REG[from].name} to ${REG[to].name}.`);
+  onEnter(to,me);
+}
+function canLeave(from,to){return G.units[from].filter(isC).every(u=>atWar(u.n)||REG[to].nation===u.n)}
+function canAttack(from){return G.units[from].filter(isC).every(u=>atWar(u.n))}
+function destOk(from,to,atk,me){const o=owner(to);if(o&&o!==me&&combat(to)>0)return atk&&canAttack(from);return canLeave(from,to)&&combat(to)<10}
+function hasLeader(rid,me){return me==='F'?(cnt(rid,'l')+G.comps[rid].length)>0:(cnt(rid,'w')+cnt(rid,'ashking')+cnt(rid,'herald')+cnt(rid,'tyrant'))>0}
+function armyCan(rid,me,ld,atk,skip){return owner(rid)===me&&combat(rid)>0&&!(skip&&skip.has(rid))&&(!ld||hasLeader(rid,me))&&ADJ[rid].some(t=>destOk(rid,t,atk,me))}
+function recruitTargets(s){return R.filter(r=>r.set&&homeSide(r.id)===s&&G.ctrl[r.id]===s&&atWar(r.nation)&&owner(r.id)!==other(s)&&combat(r.id)<10).map(r=>r.id)}
+function recruitKinds(s,rid){const k=[],room=10-combat(rid);if(room>=2)k.push(['rr','2 regulars']);k.push(['e','1 elite']);if(s==='F')k.push(['rl','1 regular and 1 leader']);if(s==='S'&&REG[rid].nation==='ashen'&&REG[rid].set==='fort'&&wraiths()<6)k.push(['rw','1 regular and 1 Wraith']);return k}
+function recruit(rid,kind,s){const n=REG[rid].nation;if(kind==='rr')add(rid,n,'r',2);if(kind==='e')add(rid,n,'e',1);if(kind==='rl'){add(rid,n,'r',1);add(rid,n,'l',1)}if(kind==='rw'){add(rid,n,'r',1);G.units[rid].push({n:'ashen',t:'w'})}log(s,`${SIDES[s].name} musters ${({rr:'2 regulars',e:'an elite',rl:'a regular and a leader',rw:'a regular and a Wraith'})[kind]} at ${REG[rid].name}.`)}
+function minionOk(m){if(minionsOn().includes(m)||G.minionDead[m])return false;const fw=fNations().filter(atWar).length;
+  if(m==='tyrant')return atWar('ironspire')&&G.ctrl.ironspire==='S'&&owner('ironspire')!=='F';
+  if(m==='ashking')return atWar('ashen')&&fw>=1&&minionSpots(m).length>0;
+  return atWar('ashen')&&(G.f.mordor>=0||fw>=2)&&minionSpots(m).length>0}
+function minionSpots(m){if(m==='tyrant')return['ironspire'];if(m==='ashking')return R.filter(r=>owner(r.id)==='S'&&combat(r.id)>0).map(r=>r.id);return R.filter(r=>r.nation==='ashen'&&r.set==='fort'&&G.ctrl[r.id]==='S'&&owner(r.id)!=='F').map(r=>r.id)}
+function placeMinion(m,rid){G.units[rid].push({n:m==='tyrant'?'ironspire':'ashen',t:m});log('S',`${MINIONS[m].name} enters the war at ${REG[rid].name}! The Throne gains a die.`)}
+function wraithDests(){return R.filter(r=>!(held(r.id,'F')&&REG[r.id].set==='fort')&&!(owner(r.id)==='F'&&combat(r.id)>0)).map(r=>r.id)}
+function flyGroup(from,to){const us=G.units[from];const fl=us.filter(u=>u.t==='w'||u.t==='ashking');G.units[from]=us.filter(u=>!fl.includes(u));G.units[to].push(...fl);log('S',`${fl.length} Wraith${fl.length>1?'s':''} fl${fl.length>1?'y':'ies'} from ${REG[from].name} to ${REG[to].name}.`)}
+function flyerSources(){return R.filter(r=>cnt(r.id,'w')+cnt(r.id,'ashking')>0).map(r=>r.id)}
+
+/* ======================= FELLOWSHIP ======================= */
+function declare(rid,voluntary){const f=G.f;const d=bfs(f.loc).d[rid];f.loc=rid;f.prog=0;log('F',voluntary?`The Fellowship declares itself at ${REG[rid].name}.`:`The Fellowship is seen at ${REG[rid].name}.`);
+  if(voluntary&&REG[rid].set&&homeSide(rid)==='F'&&G.ctrl[rid]==='F'&&owner(rid)!=='S'){if(f.corr>0){heal(1);log('F',`Rest at ${REG[rid].name}: Wren heals 1 Corruption.`)}rouse(REG[rid].nation,false)}}
+function enterMordor(){const f=G.f;f.mordor=0;f.prog=0;G.tiles=shuffle(G.tiles.concat(DARK()));log('F','The Fellowship enters the Ashlands of Mordor! Every step now draws a Hunt tile.')}
+function sepTargets(id){if(G.f.mordor>=0)return[];return within(G.f.loc,G.f.prog+COMPS[id].lvl).filter(r=>owner(r)!=='S')}
+function arrival(id,rid){const n=REG[rid].nation;if(n&&NATIONS[n].side==='F'&&REG[rid].set&&G.ctrl[rid]==='F'&&(COMPS[id].nat==='any'||COMPS[id].nat.includes(n)))rouse(n,false)}
+function separate(id,rid){G.f.band=G.f.band.filter(x=>x!==id);G.comps[rid].push(id);if(G.f.guide===id)G.f.guide=bestGuide();log('F',`${COMPS[id].name} leaves the Fellowship for ${REG[rid].name}.`);arrival(id,rid)}
+function compMoveTargets(from){const k=Math.min(...G.comps[from].map(id=>COMPS[id].lvl));return within(from,k).filter(r=>r!==from&&owner(r)!=='S')}
+function moveComps(from,to){const g=G.comps[from];G.comps[from]=[];G.comps[to].push(...g);log('F',`${g.map(id=>COMPS[id].name).join(', ')} travel${g.length>1?'':'s'} to ${REG[to].name}.`);g.forEach(id=>arrival(id,to))}
+function canCrown(){return !G.up.aldric&&G.comps.highcrown.includes('aldric')&&G.ctrl.highcrown==='F'&&atWar('aldmere')}
+function crown(){G.up.aldric=true;log('F','Aldric is crowned King of Highcrown! The Free Realms gain a die, and his leadership rises to 3.')}
+function canRadiant(){return !G.up.tamsin&&!G.tamsinGone&&(G.f.dead.includes('tamsin')||minionsOn().length>0)&&radiantSpots().length>0}
+function radiantSpots(){return R.filter(r=>r.set==='fort'&&homeSide(r.id)==='F'&&G.ctrl[r.id]==='F'&&owner(r.id)!=='S').map(r=>r.id)}
+function radiant(rid){G.f.band=G.f.band.filter(x=>x!=='tamsin');G.f.dead=G.f.dead.filter(x=>x!=='tamsin');R.forEach(r=>G.comps[r.id]=G.comps[r.id].filter(x=>x!=='tamsin'));G.comps[rid].push('tamsin');G.up.tamsin=true;if(G.f.guide==='tamsin')G.f.guide=bestGuide();log('F',`Tamsin returns as the Radiant at ${REG[rid].name}! The Free Realms gain a die.`)}
+function hideAny(){return (G.f.guide==='aldric'&&G.f.band.includes('aldric'))||G.f.guide==='wretch'}
+function huntRerolls(){const f=G.f,loc=f.loc;if(f.guide==='veyra'&&f.band.includes('veyra'))return 0;let r=0;if(owner(loc)==='S'&&combat(loc)>0)r++;if(cnt(loc,'w')+cnt(loc,'ashking')>0)r++;if(REG[loc].set&&G.ctrl[loc]==='S')r++;return r}
+function rollHits(n,need,rer){const a=Array.from({length:Math.max(0,n)},d6);let hits=a.filter(x=>x>=need).length;const rr=Math.min(rer,a.length-hits);const b=Array.from({length:rr},d6);hits+=b.filter(x=>x>=need).length;return{a,b,hits}}
+function fellowshipMove(done){
+  const f=G.f;f.moves++;
+  if(f.mordor>=0){f.mordor++;log('F',`The Fellowship climbs to step ${f.mordor} of ${MORDOR} in Mordor.`);if(f.mordor>=MORDOR){done();return}resolveTile(drawTile(),0,done);return}
+  f.prog++;
+  const n=Math.min(5,G.huntBox);let need=Math.max(2,7-f.moves);if(G.warn)need=Math.min(6,need+1);
+  const rer=huntRerolls();const H=rollHits(n,need,Math.min(rer,n));let succ=H.hits;const snare=G.snare&&succ===0;if(snare)succ=1;if(G.snare)G.snare=false;
+  log('F',`The Fellowship moves on in secret (progress ${f.prog}).`);
+  if(!n&&!snare){log('S','The Hunt box is empty; the Fellowship passes unseen.');done();return}
+  log('S',`Hunt roll [${H.a.join(' ')}${H.b.length?' | reroll '+H.b.join(' '):''}] needing ${need}+: ${succ?succ+' success'+(succ>1?'es':'')+(snare?' (Snare)':''):'nothing'}.`);
+  showRoll({title:'The Hunt',sub:`The Fellowship moves (move ${f.moves} this turn). The Throne rolls ${n} Hunt ${n===1?'die':'dice'} from the Hunt box, needing ${need}+${rer?`, with ${rer} reroll${rer>1?'s':''} for enemies around ${REG[f.loc].name}`:''}.`,
+    rows:[{side:'S',label:`Hunt · ${n} dice, need ${need}+`,dice:H.a,rr:H.b,need,hits:H.hits}],outcome:succ?`Found! ${succ} success${succ>1?'es':''}${snare?' (the Snare)':''}. A Hunt tile is drawn.`:'They pass unseen.'},()=>{if(succ)resolveTile(drawTile(),succ,done);else done()});
+}
+function tileFace(t){return(t.v==='E'?'◉':t.v==='X'?'?':String(t.v))+(t.r?' 👁':'')}
+function resolveTile(t,succ,done){
+  const f=G.f,inM=f.mordor>=0;
+  let dmg=t.v==='E'?(inM?G.huntBox:succ):t.v==='X'?Math.ceil(d6()*2/3):t.v;
+  if(t.v==='E'&&f.guide==='tamsin'&&f.band.includes('tamsin')&&dmg>1)dmg--;
+  let rev=!!t.r&&f.hidden,note='';
+  if(rev&&!inM){if(f.guide==='wretch'){rev=false;note=' The Wretch leads them off the path; no reveal.'}else if(f.guide==='kettle'&&f.band.includes('kettle')&&!G.kettleUsed){rev=false;G.kettleUsed=true;note=' Kettle spots the watchers first; no reveal.'}}
+  const desc=`Tile ${tileFace(t)}: ${t.v==='E'?(inM?`Eye — damage equals the ${G.huntBox} dice in the Hunt box`:`Eye — damage equals the ${succ} Hunt success${succ>1?'es':''}`):t.v==='X'?'Dark tile — roll a die, damage is two thirds of it':`${t.v} damage`}. ${dmg} damage in all.${t.r?(rev?' The Fellowship is revealed!':note||''):''}`;
+  const after=()=>{if(rev){f.hidden=false;log('S','The Fellowship is revealed!');if(!inM&&f.prog>0){forcedDeclare(done);return}}done()};
+  if(dmg<=0){log('S',`Hunt tile ${tileFace(t)}: no damage.${rev?' Revealed!':''}`);infoModal('Hunt tile',desc,t,after);return}
+  damageChoice(dmg,t,desc,after);
+}
+function absorb(id){return COMPS[id].lvl+(G.f.guide==='hollis'&&G.f.band.includes('hollis')?1:0)}
+function damageChoice(dmg,t,desc,cb){
+  const f=G.f;
+  const takeCorr=()=>{addCorr(dmg);log('S',`Hunt tile ${tileFace(t)}: Wren takes ${dmg} Corruption (now ${f.corr}).`);cb()};
+  const cas=id=>{const rest=Math.max(0,dmg-absorb(id));eliminateComp(id,'on the road');addCorr(rest);if(rest)log('S',`Wren still takes ${rest} Corruption.`);cb()};
+  if(!isHuman('F')){const c=aiDamage(dmg);if(isHuman('S')&&!(G.mode==='ai')){infoModal('Hunt tile',desc+` ${c?`${COMPS[c].name} gives their life.`:'Wren takes the Corruption.'}`,t,()=>c?cas(c):takeCorr())}else{c?cas(c):takeCorr()}return}
+  const opts=[{label:`Wren takes ${dmg} Corruption`,sub:`Corruption ${f.corr} → ${Math.min(MAXC,f.corr+dmg)} of ${MAXC}${f.corr+dmg>=MAXC?' — the Shard wins':''}`,fn:takeCorr}];
+  if(f.band.length&&f.guide!=='wretch'){const g=f.guide;opts.push({label:`The Guide, ${COMPS[g].name}, gives their life`,sub:`Absorbs up to ${absorb(g)}${dmg>absorb(g)?` — Wren still takes ${dmg-absorb(g)}`:' — Wren is spared'}`,fn:()=>cas(g)})}
+  if(f.band.length>1){opts.push({label:'A random Warden gives their life',sub:`Could be anyone in the band. Absorbs up to their level (${f.band.map(id=>COMPS[id].lvl).join('/')})`,fn:()=>cas(f.band[RAND(f.band.length)])})}
+  UI.choice={title:'The Hunt strikes',text:desc,tile:t,options:opts};renderModal();
+}
+function forcedDeclare(done){const f=G.f;const c=within(f.loc,f.prog);if(isHuman('F')){pick(`Revealed! Move the Fellowship figure up to ${f.prog} region${f.prog>1?'s':''} from ${REG[f.loc].name} (its hidden progress). Choose where it is seen.`,c,rid=>{declare(rid,false);done()},null)}else{declare(aiDeclareTarget(),false);done()}}
+
+/* ======================= CARDS ======================= */
+const adjS=rid=>ADJ[rid].some(a=>owner(a)==='S'&&combat(a)>0),adjF=rid=>ADJ[rid].some(a=>owner(a)==='F'&&combat(a)>0);
+const nationPick=(pred)=>fNations().filter(pred).map(n=>R.find(r=>r.nation===n&&r.set)).filter(Boolean).map(r=>r.id);
+function marchDests(rid){const me=owner(rid);const{d}=bfs(rid);const ok=new Set();let fr=[rid];const seen=new Set([rid]);for(let i=0;i<2;i++){const nx=[];fr.forEach(c=>ADJ[c].forEach(n=>{if(seen.has(n))return;seen.add(n);const o=owner(n);if(o&&o!==me&&combat(n)>0)return;if(!canLeave(rid,n)||combat(n)>=10)return;ok.add(n);nx.push(n)}));fr=nx}return[...ok]}
+const CARDS={
+ secret:{side:'F',deck:'C',name:'Secret Paths',text:'The hidden Fellowship gains 1 progress with no Hunt roll (not in Mordor).',can:()=>G.f.hidden&&G.f.mordor<0,play:()=>{G.f.prog++;log('F','Secret paths: +1 progress, unseen.')},combat:{t:'rer',txt:'Combat: reroll all missed dice.'},ai:()=>3},
+ hearth:{side:'F',deck:'C',name:'Warm Hearth',text:'Wren heals 2 Corruption.',can:()=>G.f.corr>0,play:()=>heal(2),combat:{t:'cancel',n:1,txt:'Combat: cancel 1 hit on you.'},ai:()=>G.f.corr>=3?2.2+G.f.corr*.2:.5},
+ lore:{side:'F',deck:'C',name:'Old Lore',text:'Remove up to 2 dice from the Hunt box.',can:()=>G.huntBox>0,play:()=>{G.huntBox=Math.max(0,G.huntBox-2)},combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>G.huntBox>=2&&unused('F')>=1?2.3:.3},
+ cloaks:{side:'F',deck:'C',name:'Grey Cloaks',text:'Hide the Fellowship and give it 1 progress with no Hunt (not in Mordor).',can:()=>G.f.mordor<0,play:()=>{G.f.hidden=true;G.f.prog++},combat:{t:'cancel',n:2,txt:'Combat: cancel up to 2 hits on you.'},ai:()=>!G.f.hidden?3.5:2.4},
+ messenger:{side:'F',deck:'C',name:'Swift Messenger',text:'Pick a Free nation not at war (click one of its settlements): it is roused and moves 1 step toward war.',targets:()=>nationPick(n=>!atWar(n)),play:rid=>rouse(REG[rid].nation,true),combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>2,aiT:ids=>ids.sort((a,b)=>G.pol[REG[a].nation].step-G.pol[REG[b].nation].step)[0]},
+ rally:{side:'F',deck:'C',name:"Wardens' Rally",text:'Pick a region with a Warden and a Free army: add 2 regulars.',targets:()=>R.filter(r=>G.comps[r.id].length&&owner(r.id)==='F'&&combat(r.id)<10).map(r=>r.id),play:rid=>add(rid,natFor(rid,'F'),'r',2),combat:{t:'dice',n:2,txt:'Combat: roll 2 extra dice.'},ai:()=>1.9},
+ refuge:{side:'F',deck:'C',name:'Hidden Refuge',text:'If the Fellowship is in a Free-held stronghold (not in Mordor): heal 3 Corruption.',can:()=>G.f.mordor<0&&G.f.corr>0&&held(G.f.loc,'F')&&REG[G.f.loc].set==='fort',play:()=>heal(3),combat:{t:'cancel',n:1,txt:'Combat: cancel 1 hit on you.'},ai:()=>G.f.corr>=2?3:.5},
+ wretch:{side:'F',deck:'C',name:'The Wretch Leads',text:'If no Wardens remain in the band: +2 progress with no Hunt, or 1 Mordor step with no tile.',can:()=>G.f.band.length===0&&G.f.hidden&&G.f.mordor<MORDOR-0,play:()=>{if(G.f.mordor>=0){G.f.mordor++;log('F','The Wretch finds a hidden stair in Mordor.')}else G.f.prog+=2},combat:{t:'rer',txt:'Combat: reroll all missed dice.'},ai:()=>4},
+ brave:{side:'F',deck:'C',name:'Brave Heart',text:'Remove 1 die from the Hunt box and heal 1 Corruption.',can:()=>G.huntBox>0||G.f.corr>0,play:()=>{G.huntBox=Math.max(0,G.huntBox-1);heal(1)},combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>1.8},
+ kinship:{side:'F',deck:'C',name:'Kinship',text:'Return the strongest slain Warden to the band (not Tamsin if she returned).',can:()=>G.f.dead.some(id=>!(id==='tamsin'&&G.tamsinGone)),play:()=>{const id=G.f.dead.filter(x=>!(x==='tamsin'&&G.tamsinGone)).sort((a,b)=>COMPS[b].lvl-COMPS[a].lvl)[0];G.f.dead=G.f.dead.filter(x=>x!==id);G.f.band.push(id);if(G.f.guide==='wretch')G.f.guide=id;log('F',`${COMPS[id].name} rejoins the Fellowship.`)},combat:{t:'cancel',n:1,txt:'Combat: cancel 1 hit on you.'},ai:()=>2.6},
+ warning:{side:'F',deck:'C',name:'Word of Warning',text:'For the rest of this turn, every Hunt roll needs 1 more (a 6 still hits).',can:()=>!G.warn&&G.f.mordor<0,play:()=>{G.warn=true},combat:{t:'plus',txt:'Combat: your dice hit on 1 less.'},ai:()=>unused('F')>=2&&G.f.hidden&&G.huntBox>=2?2.1:0},
+ steadfast:{side:'F',deck:'C',name:'Steadfast',text:'In Mordor, the hidden Fellowship climbs 1 step with no Hunt tile.',can:()=>G.f.mordor>=0&&G.f.mordor<MORDOR&&G.f.hidden,play:()=>{G.f.mordor++;log('F',`Steadfast: Mordor step ${G.f.mordor}.`)},combat:{t:'plus',txt:'Combat: your dice hit on 1 less.'},ai:()=>4},
+ beacons:{side:'F',deck:'S',name:'Beacons Lit',text:'Every Free nation is roused. Aldmere moves 1 step toward war.',can:()=>fNations().some(n=>!atWar(n)),play:()=>{fNations().forEach(n=>rouse(n,false));if(!atWar('aldmere'))advance('aldmere')},combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>fNations().filter(n=>!atWar(n)).length>=2?2.7:1},
+ riders:{side:'F',deck:'S',name:'Riders of the Plain',text:'Plainsriders at war: add 2 elites to Goldhall or Horsemere.',targets:()=>['goldhall','horsemere'].filter(r=>atWar('riders')&&held(r,'F')&&owner(r)!=='S'&&combat(r)<10),play:rid=>add(rid,'riders','e',2),combat:{t:'plus',txt:'Combat: your dice hit on 1 less.'},ai:()=>2.6,aiT:ids=>ids.sort((a,b)=>threat(b)-threat(a))[0]},
+ hammers:{side:'F',deck:'S',name:'Hammers of Deephold',text:'Stonekin at war: add 2 elites and a leader to Deephold.',targets:()=>['deephold'].filter(r=>atWar('stonekin')&&held(r,'F')&&owner(r)!=='S'&&combat(r)<10),play:rid=>{add(rid,'stonekin','e',2);add(rid,'stonekin','l',1)},combat:{t:'dice',n:2,txt:'Combat: roll 2 extra dice.'},ai:()=>2.6},
+ host:{side:'F',deck:'S',name:'Sylvan Host',text:'Sylvan Realms at war: add 1 elite to every Sylvan stronghold you hold.',can:()=>atWar('sylvan')&&R.some(r=>r.nation==='sylvan'&&held(r.id,'F')),play:()=>R.forEach(r=>{if(r.nation==='sylvan'&&held(r.id,'F')&&owner(r.id)!=='S')add(r.id,'sylvan','e',1)}),combat:{t:'cancel',n:2,txt:'Combat: cancel up to 2 hits on you.'},ai:()=>2.8},
+ ambush:{side:'F',deck:'S',name:'Ambush',text:'A Throne army next to a Free army loses 2 units.',targets:()=>R.filter(r=>owner(r.id)==='S'&&combat(r.id)>0&&adjF(r.id)).map(r=>r.id),play:rid=>log('F',`Ambush at ${REG[rid].name}: ${applyHits(rid,2)} lost.`),combat:{t:'hit',txt:'Combat: score 1 extra hit.'},ai:()=>2.7,aiT:ids=>ids.sort((a,b)=>ADJ[b].reduce((m,x)=>Math.max(m,threat(x)),0)-ADJ[a].reduce((m,x)=>Math.max(m,threat(x)),0))[0]},
+ sally:{side:'F',deck:'S',name:'Sally Forth',text:'Pick a Free-held stronghold with an army: every Throne army next to it loses 1 unit.',targets:()=>R.filter(r=>r.set==='fort'&&held(r.id,'F')&&owner(r.id)==='F'&&adjS(r.id)).map(r=>r.id),play:rid=>ADJ[rid].forEach(a=>{if(owner(a)==='S'&&combat(a)>0)log('F',`Sortie from ${REG[rid].name}: ${applyHits(a,1)} lost at ${REG[a].name}.`)}),combat:{t:'rer',txt:'Combat: reroll all missed dice.'},ai:()=>2.2},
+ walls:{side:'F',deck:'S',name:'Hold the Walls',text:'Add 2 regulars and a leader to a Free-held stronghold (war not needed).',targets:()=>R.filter(r=>r.set==='fort'&&held(r.id,'F')&&owner(r.id)!=='S'&&combat(r.id)<9).map(r=>r.id),play:rid=>{const n=REG[rid].nation;add(rid,n,'r',2);add(rid,n,'l',1)},combat:{t:'cancel',n:1,txt:'Combat: cancel 1 hit on you.'},ai:()=>R.some(r=>threat(r.id)>0&&REG[r.id].set==='fort')?2.9:1.2,aiT:ids=>ids.sort((a,b)=>threat(b)-threat(a))[0]},
+ march:{side:'F',deck:'S',name:'Forced March',text:'Move a Free army up to 2 regions (no attack).',targets:()=>R.filter(r=>owner(r.id)==='F'&&combat(r.id)>0&&marchDests(r.id).length).map(r=>r.id),play:(rid,done)=>{const ds=marchDests(rid);if(isHuman('F')){pick('Forced March: where does the army go?',ds,t=>{moveUnits(rid,t,combat(rid));done()},null);return true}const t=ds.sort((a,b)=>threat(b)-threat(a))[0];moveUnits(rid,t,combat(rid))},combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>R.some(r=>threat(r.id)>1)?1.6:.5,aiT:ids=>ids.sort((a,b)=>combat(b)-combat(a))[0]},
+ wood:{side:'F',deck:'S',name:'The Wood Wakes',text:'Plainsriders or Sylvan Realms at war: the Throne army at Ironspire loses 3 units.',can:()=>(atWar('riders')||atWar('sylvan'))&&owner('ironspire')==='S'&&combat('ironspire')>0,play:()=>log('F',`The wood marches on Ironspire: ${applyHits('ironspire',3)} lost.`),combat:{t:'hit',txt:'Combat: score 1 extra hit.'},ai:()=>3},
+ oath:{side:'F',deck:'S',name:'Oathbound Host',text:'Aldric is away from the Fellowship: add 3 elites to his region if no Throne units are there.',can:()=>{const r=R.find(x=>G.comps[x.id].includes('aldric'));return !!r&&owner(r.id)!=='S'&&combat(r.id)<8},play:()=>{const r=R.find(x=>G.comps[x.id].includes('aldric'));add(r.id,natFor(r.id,'F'),'e',3);log('F',`An oathbound host rises around Aldric at ${r.name}.`)},combat:{t:'dice',n:2,txt:'Combat: roll 2 extra dice.'},ai:()=>3},
+ levy:{side:'F',deck:'S',name:'Northern Levy',text:'Northmarch at war: add 3 regulars to a Northmarch settlement.',targets:()=>['hearthdale','dalemark'].filter(r=>atWar('north')&&held(r,'F')&&owner(r)!=='S'&&combat(r)<8),play:rid=>add(rid,'north','r',3),combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>2.3},
+ counsel:{side:'F',deck:'S',name:'Counsel of Kings',text:'Draw 2 cards.',play:()=>{drawCard('F','C');drawCard('F','S')},combat:{t:'rer',txt:'Combat: reroll all missed dice.'},ai:()=>G.hands.F.length<=2?1.8:.4},
+
+ whispers:{side:'S',deck:'C',name:'Whispers of Doubt',text:'Wren gains 2 Corruption.',play:()=>addCorr(2),combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>2.8+G.f.corr*.15},
+ eyeturns:{side:'S',deck:'C',name:'The Eye Turns',text:'Add 2 dice to the Hunt box.',can:()=>G.huntBox<7,play:()=>{G.huntBox+=2},combat:{t:'plus',txt:'Combat: your dice hit on 1 less.'},ai:()=>unused('F')>=2?(G.f.mordor>=0?3.4:2.5):.4},
+ scouts:{side:'S',deck:'C',name:'Scouts on the Road',text:'Reveal the Fellowship (not in Mordor). Wren gains 1 Corruption.',can:()=>G.f.hidden&&G.f.mordor<0,play:()=>{G.f.hidden=false;addCorr(1);log('S','Scouts reveal the Fellowship!')},combat:{t:'cancel',n:1,txt:'Combat: cancel 1 hit on you.'},ai:()=>unused('F')>=1?2.7:1.2},
+ snare:{side:'S',deck:'C',name:"Hunter's Snare",text:'The next Hunt roll this turn scores at least 1 success.',can:()=>!G.snare&&G.f.mordor<0,play:()=>{G.snare=true},combat:{t:'rer',txt:'Combat: reroll all missed dice.'},ai:()=>unused('F')>=2&&G.f.hidden?2.4:0},
+ abroad:{side:'S',deck:'C',name:'Wraiths Abroad',text:"Move every Wraith to the Fellowship's region (not in Mordor, not into a Free stronghold).",can:()=>G.f.mordor<0&&wraiths()>0&&wraithDests().includes(G.f.loc),play:()=>R.forEach(r=>{if(r.id!==G.f.loc){const w=G.units[r.id].filter(u=>u.t==='w');if(w.length){G.units[r.id]=G.units[r.id].filter(u=>u.t!=='w');G.units[G.f.loc].push(...w)}}}),combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>unused('F')>=2&&cnt(G.f.loc,'w')===0?2.2:.3},
+ summons:{side:'S',deck:'C',name:'Dread Summons',text:'Add a Wraith to a Throne army (max 6 Wraiths).',can:()=>wraiths()<6,targets:()=>R.filter(r=>owner(r.id)==='S'&&combat(r.id)>0).map(r=>r.id),play:rid=>G.units[rid].push({n:'ashen',t:'w'}),combat:{t:'hit',txt:'Combat: score 1 extra hit.'},ai:()=>1.7,aiT:ids=>ids.sort((a,b)=>(combat(b)-4*lead(b))-(combat(a)-4*lead(a)))[0]},
+ treachery:{side:'S',deck:'C',name:'Treachery',text:'If the Fellowship is revealed: a random Warden in the band is slain.',can:()=>!G.f.hidden&&G.f.band.length>0,play:()=>eliminateComp(G.f.band[RAND(G.f.band.length)],'by treachery'),combat:{t:'dice',n:2,txt:'Combat: roll 2 extra dice.'},ai:()=>3.2},
+ fellvoice:{side:'S',deck:'C',name:'Fell Voice',text:'Every Free leader (not Warden) in a region next to a Wraith is slain.',can:()=>R.some(r=>cnt(r.id,'l')&&ADJ[r.id].concat(r.id).some(a=>cnt(a,'w'))),play:()=>R.forEach(r=>{if(cnt(r.id,'l')&&ADJ[r.id].concat(r.id).some(a=>cnt(a,'w'))){G.units[r.id]=G.units[r.id].filter(u=>u.t!=='l');log('S',`Leaders at ${r.name} fall to the fell voice.`)}}),combat:{t:'plus',txt:'Combat: your dice hit on 1 less.'},ai:()=>1.8},
+ offer:{side:'S',deck:'C',name:"The Herald's Offer",text:'The Pale Herald is in play: the Free Realms discard 2 random cards and Wren gains 1 Corruption.',can:()=>minionsOn().includes('herald'),play:()=>{for(let i=0;i<2&&G.hands.F.length;i++){const k=G.hands.F.splice(RAND(G.hands.F.length),1)[0];discard('F',k)}addCorr(1)},combat:{t:'cancel',n:1,txt:'Combat: cancel 1 hit on you.'},ai:()=>2.6},
+ shadowroad:{side:'S',deck:'C',name:'Shadow on the Road',text:"Add 1 die to the Hunt box. If Throne units are in the Fellowship's region, reveal it.",play:()=>{G.huntBox++;if(G.f.mordor<0&&owner(G.f.loc)==='S'&&G.f.hidden){G.f.hidden=false;log('S','The Fellowship is revealed on the road!')}},combat:{t:'rer',txt:'Combat: reroll all missed dice.'},ai:()=>unused('F')>=1?2:.5},
+ despair:{side:'S',deck:'C',name:'Despair',text:'Every Free nation not at war moves 1 step further from war (max 3).',can:()=>fNations().some(n=>!atWar(n)&&G.pol[n].step<3),play:()=>fNations().forEach(n=>{if(!atWar(n)&&G.pol[n].step<3)G.pol[n].step++}),combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>fNations().filter(n=>!atWar(n)&&G.pol[n].step<3).length>=2?2.3:.6},
+ pursuit:{side:'S',deck:'C',name:'Wraith Pursuit',text:"A Wraith is in the Fellowship's region (not in Mordor): Wren gains 3 Corruption.",can:()=>G.f.mordor<0&&cnt(G.f.loc,'w')+cnt(G.f.loc,'ashking')>0,play:()=>addCorr(3),combat:{t:'dice',n:2,txt:'Combat: roll 2 extra dice.'},ai:()=>3.6},
+ dread:{side:'S',deck:'S',name:'Dread Muster',text:'Add 4 regulars to a Throne stronghold whose nation is at war.',targets:()=>R.filter(r=>r.set==='fort'&&homeSide(r.id)==='S'&&G.ctrl[r.id]==='S'&&atWar(r.nation)&&owner(r.id)!=='F'&&combat(r.id)<=6).map(r=>r.id),play:rid=>add(rid,REG[rid].nation,'r',4),combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>2.3,aiT:ids=>nearestFront(ids)},
+ tar:{side:'S',deck:'S',name:'Burning Tar',text:'A Free army next to a Throne army loses 2 units.',targets:()=>R.filter(r=>owner(r.id)==='F'&&combat(r.id)>0&&adjS(r.id)).map(r=>r.id),play:rid=>log('S',`Burning tar at ${REG[rid].name}: ${applyHits(rid,2)} lost.`),combat:{t:'hit',txt:'Combat: score 1 extra hit.'},ai:()=>2.7,aiT:ids=>ids.sort((a,b)=>(vpOf(b)*2-combat(b)*.2)-(vpOf(a)*2-combat(a)*.2))[0]},
+ engines:{side:'S',deck:'S',name:'Siege Engines',text:'For the rest of this turn, Throne attacks on strongholds hit on 5+.',can:()=>!G.siege,play:()=>{G.siege=true},combat:{t:'plus',txt:'Combat: your dice hit on 1 less.'},ai:()=>R.some(r=>owner(r.id)==='S'&&combat(r.id)>=5&&ADJ[r.id].some(a=>held(a,'F')&&REG[a].set==='fort'&&owner(a)==='F'))&&unused('S')>=2?2.9:0},
+ terror:{side:'S',deck:'S',name:'Terror',text:'A Free-held settlement next to a Throne army, with 2 or fewer units, is abandoned.',targets:()=>R.filter(r=>held(r.id,'F')&&owner(r.id)==='F'&&combat(r.id)<=2&&adjS(r.id)).map(r=>r.id),play:rid=>{wipe(rid);log('S',`${REG[rid].name} is abandoned in terror.`)},combat:{t:'cancel',n:1,txt:'Combat: cancel 1 hit on you.'},ai:()=>3,aiT:ids=>ids.sort((a,b)=>vpOf(b)-vpOf(a))[0]},
+ southmuster:{side:'S',deck:'S',name:'Southern Muster',text:'Southern Hordes at war: add 3 regulars and an elite to a Southern stronghold.',targets:()=>['rhunhold','sunward'].filter(r=>atWar('south')&&held(r,'S')&&owner(r)!=='F'&&combat(r)<=6),play:rid=>{add(rid,'south','r',3);add(rid,'south','e',1)},combat:{t:'dice',n:2,txt:'Combat: roll 2 extra dice.'},ai:()=>2.4,aiT:ids=>nearestFront(ids)},
+ horns:{side:'S',deck:'S',name:'Horns of the South',text:'The Southern Hordes go to war.',can:()=>!atWar('south'),play:()=>{G.pol.south.step=0;log('S','The Southern Hordes go to war!')},combat:{t:'rer',txt:'Combat: reroll all missed dice.'},ai:()=>3},
+ legions:{side:'S',deck:'S',name:'Iron Legions',text:'Iron Spire at war: add 2 elites to Ironspire.',targets:()=>['ironspire'].filter(r=>atWar('ironspire')&&held(r,'S')&&owner(r)!=='F'&&combat(r)<=8),play:rid=>add(rid,'ironspire','e',2),combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>2.4},
+ drums:{side:'S',deck:'S',name:'Drums of War',text:'Promote up to 3 regulars to elites in one Throne army.',targets:()=>R.filter(r=>owner(r.id)==='S'&&cnt(r.id,'r')>0).map(r=>r.id),play:rid=>{let c=0;G.units[rid].forEach(u=>{if(u.t==='r'&&c<3){u.t='e';c++}})},combat:{t:'hit',txt:'Combat: score 1 extra hit.'},ai:()=>1.6,aiT:ids=>ids.sort((a,b)=>cnt(b,'r')-cnt(a,'r'))[0]},
+ corsairs:{side:'S',deck:'S',name:'Corsair Raid',text:'Southern Hordes at war: the Free army at Harrowby loses 2 units; if there is none, add 3 regulars to Sunward.',can:()=>atWar('south'),play:()=>{if(owner('harrowby')==='F'&&combat('harrowby')>0)log('S',`Corsairs raid Harrowby: ${applyHits('harrowby',2)} lost.`);else if(held('sunward','S')&&owner('sunward')!=='F')add('sunward','south','r',3)},combat:{t:'cancel',n:1,txt:'Combat: cancel 1 hit on you.'},ai:()=>2},
+ smarch:{side:'S',deck:'S',name:'Forced March',text:'Move a Throne army up to 2 regions (no attack).',targets:()=>R.filter(r=>owner(r.id)==='S'&&combat(r.id)>=3&&marchDests(r.id).length).map(r=>r.id),play:(rid,done)=>{const ds=marchDests(rid);if(isHuman('S')){pick('Forced March: where does the army go?',ds,t=>{moveUnits(rid,t,combat(rid));done()},null);return true}const D=frontDist();const t=ds.sort((a,b)=>D[a]-D[b])[0];moveUnits(rid,t,combat(rid))},combat:{t:'rer',txt:'Combat: reroll all missed dice.'},ai:()=>1.5,aiT:ids=>ids.sort((a,b)=>combat(b)-combat(a))[0]},
+ tribute:{side:'S',deck:'S',name:'Iron Tribute',text:'Draw 2 cards.',play:()=>{drawCard('S','C');drawCard('S','S')},combat:{t:'dice',n:1,txt:'Combat: roll 1 extra die.'},ai:()=>G.hands.S.length<=2?1.8:.3},
+ discord:{side:'S',deck:'S',name:'Sow Discord',text:'A Free nation not at war (click one of its settlements) moves 1 step further from war (max 3).',targets:()=>nationPick(n=>!atWar(n)&&G.pol[n].step<3),play:rid=>{const n=REG[rid].nation;G.pol[n].step++;log('S',`Discord in ${NATIONS[n].name}: ${G.pol[n].step} steps from war.`)},combat:{t:'cancel',n:2,txt:'Combat: cancel up to 2 hits on you.'},ai:()=>1.7,aiT:ids=>ids.sort((a,b)=>G.pol[REG[a].nation].step-G.pol[REG[b].nation].step)[0]},
+};
+function cardCan(c){if(c.can&&!c.can())return false;if(c.targets&&!c.targets().length)return false;return true}
+function eventDie(s){return G.dice[s].findIndex(d=>!d.used&&(d.f==='E'||d.f==='W'))}
+function bestEventDie(s){const i=G.dice[s].findIndex(d=>!d.used&&d.f==='E');return i>=0?i:eventDie(s)}
+function playCard(s,key,rid,done){const h=G.hands[s];h.splice(h.indexOf(key),1);discard(s,key);log(s,`${SIDES[s].name} plays “${CARDS[key].name}”.`);const async=CARDS[key].play(rid,done);if(async!==true)done()}
+
+/* ======================= BATTLE ======================= */
+function battle(from,to,done){const B={from,to,a:owner(from),d:owner(to),round:0,done,roused:false};nextRound(B)}
+function nextRound(B){B.round++;B.mod={a:null,d:null};offerCard(B,'a',()=>offerCard(B,'d',()=>rollRound(B)))}
+function useCombat(B,who,k){const s=B[who];const h=G.hands[s];h.splice(h.indexOf(k),1);discard(s,k);B.mod[who]=CARDS[k].combat;log(s,`${SIDES[s].name} plays “${CARDS[k].name}” in battle: ${CARDS[k].combat.txt.replace('Combat: ','')}`)}
+function offerCard(B,who,cb){const s=B[who];const hand=G.hands[s];if(!hand.length){cb();return}
+  if(isHuman(s)){const o=[{label:'Fight without a card',fn:cb}].concat([...new Set(hand)].map(k=>({label:CARDS[k].name,sub:CARDS[k].combat.txt,fn:()=>{useCombat(B,who,k);cb()}})));choose(`${SIDES[s].name}: combat card?`,`Round ${B.round} at ${REG[B.to].name}: ${SIDES[B.a].name} ${combat(B.from)} vs ${SIDES[B.d].name} ${combat(B.to)}. You may discard one card to use its combat effect this round.`,o);return}
+  const k=aiCombatCard(B,who);if(k)useCombat(B,who,k);cb()}
+function rollRound(B){
+  const aU=combat(B.from),dU=combat(B.to);const ma=B.mod.a||{},md=B.mod.d||{};
+  const fortD=REG[B.to].set==='fort'&&G.ctrl[B.to]===B.d,cityD=REG[B.to].set==='city'&&G.ctrl[B.to]===B.d&&B.round===1;
+  let aNeed=(fortD||cityD)?6:5;if(fortD&&B.a==='S'&&G.siege)aNeed=5;if(ma.t==='plus')aNeed--;let dNeed=5;if(md.t==='plus')dNeed--;
+  const aN=Math.min(5,aU)+(ma.t==='dice'?ma.n:0),dN=Math.min(5,dU)+(md.t==='dice'?md.n:0);
+  const aR=ma.t==='rer'?99:Math.min(lead(B.from),aN),dR=md.t==='rer'?99:Math.min(lead(B.to),dN);
+  const A=rollHits(aN,aNeed,aR),D=rollHits(dN,dNeed,dR);
+  let aHits=A.hits+(ma.t==='hit'?1:0),dHits=D.hits+(md.t==='hit'?1:0);
+  if(md.t==='cancel')aHits=Math.max(0,aHits-md.n);if(ma.t==='cancel')dHits=Math.max(0,dHits-ma.n);
+  const defN=new Set(G.units[B.to].filter(isC).map(u=>u.n));if(REG[B.to].nation)defN.add(REG[B.to].nation);
+  applyHits(B.to,aHits);applyHits(B.from,dHits);
+  if(!B.roused){B.roused=true;defN.forEach(n=>{if(NATIONS[n].side===B.d)rouse(n,true)})}
+  const aL=combat(B.from),dL=combat(B.to);
+  let outcome;if(dL===0&&aL>0)outcome=`${REG[B.to].name} falls. The ${SIDES[B.a].name} moves in.`;else if(aL===0)outcome=`The attackers are destroyed.`;else outcome=`${SIDES[B.a].name} ${aU}→${aL}, ${SIDES[B.d].name} ${dU}→${dL}.`;
+  log(B.a,`Battle at ${REG[B.to].name}, round ${B.round}: ${aHits} hit${aHits===1?'':'s'} dealt, ${dHits} taken. ${outcome}`);
+  showRoll({title:`Battle for ${REG[B.to].name} — round ${B.round}`,sub:`${SIDES[B.a].name} attacks with ${aU}${fortD?' against a stronghold (hits on '+aNeed+'+)':cityD?' against a city (first round, hits on 6)':''}. ${SIDES[B.d].name} defends with ${dU}.`,
+    rows:[{side:B.a,label:`${SIDES[B.a].name} · ${aN} dice, need ${aNeed}+${aR?`, ${aR>=99?'all misses':aR} reroll${aR===1?'':'s'}`:''}${ma.t==='hit'?', +1 hit':''}${ma.t==='cancel'?`, cancels ${ma.n}`:''}`,dice:A.a,rr:A.b,need:aNeed,hits:aHits},
+          {side:B.d,label:`${SIDES[B.d].name} · ${dN} dice, need ${dNeed}+${dR?`, ${dR>=99?'all misses':dR} reroll${dR===1?'':'s'}`:''}${md.t==='hit'?', +1 hit':''}${md.t==='cancel'?`, cancels ${md.n}`:''}`,dice:D.a,rr:D.b,need:dNeed,hits:dHits}],outcome},()=>afterRound(B));
+}
+function afterRound(B){
+  if(combat(B.to)===0&&combat(B.from)>0){moveUnits(B.from,B.to,combat(B.from));B.done();return}
+  if(combat(B.from)===0){B.done();return}
+  askContinue(B,cont=>{if(!cont){log(B.a,`${SIDES[B.a].name} breaks off the attack.`);B.done();return}askRetreat(B,dest=>{if(dest){const n=combat(B.to);const us=G.units[B.to];G.units[B.to]=[];G.units[dest].push(...us);if(B.d==='F'){G.comps[dest].push(...G.comps[B.to]);G.comps[B.to]=[]}log(B.d,`${SIDES[B.d].name} retreats from ${REG[B.to].name} to ${REG[dest].name}.`);moveUnits(B.from,B.to,combat(B.from));B.done();return}nextRound(B)})});
+}
+function retreatDests(B){const s=B.d;return ADJ[B.to].filter(r=>{const o=owner(r);return(!o||o===s)&&combat(r)+combat(B.to)<=10&&r!==B.from})}
+function askContinue(B,cb){const s=B.a;if(isHuman(s)){choose('Continue the attack?',`${REG[B.to].name}: your ${combat(B.from)} vs their ${combat(B.to)}.`,[{label:`Attack again (round ${B.round+1})`,fn:()=>cb(true)},{label:'Break off',fn:()=>cb(false)}]);return}cb(aiContinue(B))}
+function askRetreat(B,cb){const s=B.d;const fort=REG[B.to].set==='fort'&&G.ctrl[B.to]===s;if(fort){cb(null);return}const ds=retreatDests(B);if(!ds.length){cb(null);return}
+  if(isHuman(s)){choose('Stand or retreat?',`${combat(B.from)} attackers against your ${combat(B.to)} at ${REG[B.to].name}. Retreating gives up the region.`,[{label:'Stand and fight',fn:()=>cb(null)}].concat(ds.map(r=>({label:`Retreat to ${REG[r].name}`,fn:()=>cb(r)}))));return}
+  cb(aiRetreat(B,ds))}
+
+/* ======================= TURN FLOW ======================= */
+function newGame(mode){
+  G={mode,turn:0,phase:'',active:'F',units:{},comps:{},ctrl:{},pol:{},up:{aldric:false,tamsin:false},tamsinGone:false,minionDead:{},
+     f:{loc:'hearthdale',prog:0,hidden:true,band:Object.keys(COMPS),guide:'tamsin',mordor:-1,corr:0,moves:0,dead:[]},
+     dice:{F:[],S:[]},huntBox:0,tiles:shuffle(TILES()),used:[],hands:{F:[],S:[]},decks:{F:{C:[],S:[]},S:{C:[],S:[]}},disc:{F:{C:[],S:[]},S:{C:[],S:[]}},
+     log:[],winner:null,snare:false,siege:false,warn:false,kettleUsed:false,wraithMoved:false,stats:{battles:0,reveals:0,captures:0}};
+  R.forEach(r=>{G.units[r.id]=[];G.comps[r.id]=[];if(r.set)G.ctrl[r.id]=homeSide(r.id)});
+  const P=(rid,n,r,e,l,w)=>{add(rid,n,'r',r);add(rid,n,'e',e||0);add(rid,n,'l',l||0);for(let i=0;i<(w||0);i++)G.units[rid].push({n:'ashen',t:'w'})};
+  P('hearthdale','north',1);P('bramble','north',1);P('dalemark','north',1,0,1);
+  P('greyhaven','sylvan',1,1,1);P('silverglen','sylvan',0,2,1);P('mistwood','sylvan',1,2,1);P('thornhall','sylvan',1,2,1);
+  P('deephold','stonekin',1,2,1);P('irongate','stonekin',1);
+  P('goldhall','riders',1,1,1);P('horsemere','riders',2);
+  P('highcrown','aldmere',4,1,1);P('osgate','aldmere',2);P('seahaven','aldmere',2,1,1);P('harrowby','aldmere',1);
+  P('ironspire','ironspire',4,1);P('dunmoor','ironspire',3);
+  P('mirefang','ashen',3,1);P('blackspire','ashen',5,0,0,1);P('morrowgate','ashen',5,0,0,1);P('shadegate','ashen',5,0,0,1);P('cinderhold','ashen',4,0,0,1);P('ashplain','ashen',3);
+  P('rhunhold','south',3,1);P('nearsand','south',3);P('sunward','south',3,1);
+  G.pol={north:{step:3,active:false},sylvan:{step:2,active:true},stonekin:{step:3,active:false},riders:{step:2,active:false},aldmere:{step:2,active:false},ironspire:{step:1,active:true},ashen:{step:1,active:true},south:{step:1,active:true}};
+  Object.entries(CARDS).forEach(([k,c])=>G.decks[c.side][c.deck].push(k));
+  ['F','S'].forEach(s=>{shuffle(G.decks[s].C);shuffle(G.decks[s].S)});
+  UI.pick=null;UI.choice=null;UI.sel=null;UI.focus=null;UI.roll=null;UI.busy=false;
+  log('N','The Shard is found. Wren and seven Wardens leave Hearthdale for the fires of Mordor.');
+  startTurn();
+}
+function startTurn(){
+  G.turn++;G.f.moves=0;G.snare=false;G.siege=false;G.warn=false;G.kettleUsed=false;G.wraithMoved=false;G.huntBox=0;
+  ['F','S'].forEach(s=>{drawCard(s,'C');drawCard(s,'S')});
+  G.dice={F:[],S:[]};G.phase='fellowship';log('N',`Turn ${G.turn}`);
+  render();save();
+  const next=()=>{checkWin();if(G.winner){refresh();return}G.phase='hunt';allocPhase()};
+  if(isHuman('F'))fellowshipModal(next);else{aiFellowshipPhase();next()}
+}
+function fellowshipModal(next){
+  const f=G.f;const o=[];
+  if(f.mordor<0&&f.prog>0)o.push({label:`Declare the Fellowship's position`,sub:`Move the figure up to ${f.prog} region${f.prog>1?'s':''} from ${REG[f.loc].name}; progress resets. Declaring in a Free city or stronghold heals 1 and rouses that nation.`,fn:()=>pick(`Declare: pick a region up to ${f.prog} away from ${REG[f.loc].name}.`,within(f.loc,f.prog),rid=>{declare(rid,true);fellowshipModal(next)},()=>fellowshipModal(next))});
+  if(f.mordor<0&&GATES.includes(f.loc))o.push({label:'Enter Mordor',sub:'Leave the map for the 6-step Mordor track. Every step draws a Hunt tile, and Eye tiles hit as hard as the Hunt box is full.',fn:()=>{enterMordor();fellowshipModal(next)}});
+  if(f.band.length>1)o.push({label:`Change the Guide (now ${guideName()})`,sub:f.guide!=='wretch'?COMPS[f.guide].guide||'This Warden has no Guide ability.':'',fn:()=>choose('Choose the Guide','',f.band.map(id=>({label:COMPS[id].name,sub:COMPS[id].guide||'No Guide ability.',fn:()=>{f.guide=id;log('F',`${COMPS[id].name} now guides the Fellowship.`);fellowshipModal(next)}})),()=>fellowshipModal(next))});
+  if(!o.length){next();return}
+  o.push({label:'Done',sub:'Continue to the Hunt and the dice roll.',fn:next});
+  choose('Fellowship phase',`Wren is ${f.mordor>=0?`on Mordor step ${f.mordor}`:`last seen at ${REG[f.loc].name}, ${f.prog} progress hidden`}. Corruption ${f.corr} of ${MAXC}. ${f.hidden?'Hidden.':'Revealed.'}`,o);
+}
+function allocPhase(){const max=Math.min(Math.max(1,G.f.band.length),diceCount('S'));
+  if(isHuman('S')){choose('Throne: allocate the Hunt',`Put dice in the Hunt box before rolling (up to ${max}: one per Warden still in the Fellowship). Each die hunts the Fellowship this turn instead of acting.`,Array.from({length:max+1},(_,n)=>({label:`${n} in the Hunt box`,sub:`You roll ${diceCount('S')-n} action dice`,fn:()=>rollDice(n)})));return}
+  rollDice(aiAlloc(max))}
+function rollDice(k){
+  G.huntBox=k;
+  G.dice.F=Array.from({length:diceCount('F')},()=>({f:FF[RAND(6)],used:false}));
+  G.dice.S=Array.from({length:diceCount('S')-k},()=>({f:SF[RAND(6)],used:false}));
+  const eyes=G.dice.S.filter(d=>d.f==='H');eyes.forEach(d=>{d.used=true;d.hunt=true});G.huntBox+=eyes.length;
+  log('S',`The Throne sets ${k} on the Hunt and rolls ${eyes.length} Eye${eyes.length===1?'':'s'}. Hunt box: ${G.huntBox}.`);
+  G.phase='actions';G.active='F';UI.sel=null;refresh();
+}
+function finishDie(){if(UI.sel!=null&&G.dice[G.active][UI.sel])G.dice[G.active][UI.sel].used=true;UI.sel=null;UI.pick=null;UI.busy=false;endAction()}
+function endAction(){checkWin();if(!G.winner){const me=G.active,op=other(me);if(unused(op)>0)G.active=op;else if(unused(me)===0){log('N',`End of turn ${G.turn}.`);startTurn();return}}refresh()}
+function passTurn(){log(G.active,`${SIDES[G.active].name} passes.`);UI.sel=null;G.active=other(G.active);refresh()}
+function checkWin(){if(G.winner)return;const f=G.f;
+  if(f.corr>=MAXC)win('S','Wren is consumed by the Shard. The Ashen Throne reclaims it, and the west falls into shadow.');
+  else if(f.mordor>=MORDOR)win('F','Wren casts the Shard into the Sunken Forge. The Ashen Throne collapses into dust.');
+  else if(vp('S')>=VP_S)win('S',`The Throne holds ${vp('S')} VP of Free cities and strongholds. The west is conquered.`);
+  else if(vp('F')>=VP_F)win('F',`The Free Realms hold ${vp('F')} VP of Throne strongholds. The Throne's power is broken.`)}
+function win(s,t){G.winner=s;G.winText=t;G.phase='over';log(s,t)}
+function refresh(){render();save();schedule()}
+function schedule(){if(!G||G.winner||G.phase!=='actions'||isHuman(G.active)||UI.roll||UI.choice||UI.pick||UI.busy)return;setTimeout(aiStep,ANIM?AIDELAY:0)}
+function save(){try{localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}
+function load(){try{const s=localStorage.getItem(SAVE);return s?JSON.parse(s):null}catch(e){return null}}
+
+/* ======================= HUMAN ACTIONS ======================= */
+function pick(prompt,ids,cb,cancel){UI.pick={prompt,ok:new Set(ids),cb,cancel};render()}
+function cancelToDie(){UI.pick=null;render()}
+function actArmy(moves,ld){
+  const me=G.active;let done=0;const touched=new Set();const cancel=()=>{if(done>0)finishDie();else cancelToDie()};
+  const step=()=>{const ids=R.filter(r=>armyCan(r.id,me,ld,done===0,touched)).map(r=>r.id);if(!ids.length){finishDie();return}
+    pick(done?'Second move: choose another army, or cancel to finish.':'Choose an army to command.',ids,from=>{
+      pick(`Move the army at ${REG[from].name}: pick where it goes. Pick an enemy army to attack it.`,ADJ[from].filter(t=>destOk(from,t,done===0,me)),to=>{
+        if(owner(to)&&owner(to)!==me&&combat(to)>0){UI.busy=true;battle(from,to,finishDie);return}
+        askCount(from,to,n=>{moveUnits(from,to,n);touched.add(to);done++;if(done<moves&&R.some(r=>armyCan(r.id,me,ld,false,touched)))choose('Army moved','Move a second army with this die?',[{label:'Move another army',fn:step},{label:'Finish',fn:finishDie}]);else finishDie()},cancel)},cancel)},cancel)};
+  step();
+}
+function askCount(from,to,cb,cancel){const max=Math.min(combat(from),10-combat(to));if(max<=1){cb(1);return}const o=[];for(let k=max;k>=1;k--)o.push({label:k===combat(from)?`All ${k} units`:`${k} unit${k>1?'s':''}`,sub:k<combat(from)?`${combat(from)-k} stay behind; leaders go with the moving army`:'',fn:()=>cb(k)});choose('How many move?',`${REG[from].name} → ${REG[to].name}`,o,cancel)}
+function actRecruit(){const me=G.active;pick('Choose a settlement to muster in.',recruitTargets(me),rid=>choose(`Muster at ${REG[rid].name}`,'',recruitKinds(me,rid).map(([k,l])=>({label:l,fn:()=>{recruit(rid,k,me);finishDie()}})),cancelToDie),cancelToDie)}
+function actDiplo(){choose('Diplomacy','Move a nation one step toward war. A nation that is not roused cannot take the last step.',diploTargets(G.active).map(n=>({label:NATIONS[n].name,sub:`${G.pol[n].step} step${G.pol[n].step>1?'s':''} from war${G.pol[n].active?', roused':', not roused'}`,fn:()=>{advance(n);finishDie()}})),cancelToDie)}
+function actSeparate(){choose('Separate a Warden',`A Warden may travel up to the Fellowship's progress (${G.f.prog}) plus their level from ${REG[G.f.loc].name}. On the map they lead armies and rouse their own nation when they reach one of its cities or strongholds. Fewer Wardens in the band also means fewer Hunt dice.`,G.f.band.filter(id=>sepTargets(id).length).map(id=>({label:COMPS[id].name,sub:`${COMPS[id].role} · level ${COMPS[id].lvl}, leadership ${COMPS[id].lead}`,fn:()=>pick(`Where does ${COMPS[id].name} go?`,sepTargets(id),rid=>{separate(id,rid);finishDie()},cancelToDie)})),cancelToDie)}
+function actMoveComps(){pick('Choose Wardens on the map to move (up to their level).',R.filter(r=>G.comps[r.id].length&&compMoveTargets(r.id).length).map(r=>r.id),from=>pick('Move them where?',compMoveTargets(from),to=>{moveComps(from,to);finishDie()},cancelToDie),cancelToDie)}
+function actFly(){pick('Choose Wraiths to fly (all Wraiths in that region move).',flyerSources().filter(r=>wraithDests().some(d=>d!==r)),from=>pick('Fly them to which region? (Not into a Free stronghold or onto a Free army.)',wraithDests().filter(d=>d!==from),to=>{flyGroup(from,to);choose('Wraiths moved','Move another group of Wraiths with this die?',[{label:'Move another group',fn:actFlyMore},{label:'Finish',fn:finishDie}])},cancelToDie),cancelToDie)}
+function actFlyMore(){const src=flyerSources();if(!src.length){finishDie();return}pick('Choose another group of Wraiths, or cancel to finish.',src,from=>pick('Fly them to which region?',wraithDests().filter(d=>d!==from),to=>{flyGroup(from,to);choose('Wraiths moved','Move another group?',[{label:'Move another group',fn:actFlyMore},{label:'Finish',fn:finishDie}])},finishDie),finishDie)}
+function actMinion(){choose('Bring a Minion into play','Each Minion gives the Throne one extra action die from next turn.',Object.keys(MINIONS).filter(minionOk).map(m=>({label:MINIONS[m].name,sub:MINIONS[m].txt,fn:()=>{const sp=minionSpots(m);if(sp.length===1){placeMinion(m,sp[0]);finishDie()}else pick(`Place ${MINIONS[m].name}.`,sp,rid=>{placeMinion(m,rid);finishDie()},cancelToDie)}})),cancelToDie)}
+function forgeOk(){return minionsOn().includes('tyrant')&&R.some(r=>r.nation==='ironspire'&&owner(r.id)==='S'&&cnt(r.id,'r')>0)}
+function forge(){let c=0;['ironspire','dunmoor'].forEach(r=>{if(owner(r)==='S')G.units[r].forEach(u=>{if(u.t==='r'&&u.n==='ironspire'&&c<3){u.t='e';c++}})});add('ironspire','ironspire','r',1);log('S',`The White Tyrant's forges turn ${c} regular${c===1?'':'s'} into elites and raise a new regular.`)}
+function playFromHand(key){const s=G.active,c=CARDS[key];const di=(UI.sel!=null&&!G.dice[s][UI.sel].used&&(G.dice[s][UI.sel].f==='E'||G.dice[s][UI.sel].f==='W'))?UI.sel:bestEventDie(s);if(di<0||di==null)return;UI.sel=di;
+  const go=rid=>playCard(s,key,rid,finishDie);if(c.targets)pick(`${c.name}: choose a target.`,c.targets(),go,()=>{UI.sel=null;cancelToDie()});else go()}
+function dieActions(s,f){
+  const A=[],fs=G.f;const W=f==='W';
+  if(s==='F'){
+    if(!fs.hidden&&(f==='C'||W||hideAny()))A.push({label:'Hide the Fellowship',sub:'It must be hidden before it can move again',ok:true,fn:()=>{fs.hidden=true;log('F','The Fellowship slips back into hiding.');finishDie()}});
+    if(f==='C'||W){
+      const need=Math.max(2,6-fs.moves);
+      A.push({label:fs.mordor>=0?'Climb in Mordor':'Move the Fellowship',sub:!fs.hidden?'Revealed: hide first':fs.mordor>=0?`Step ${fs.mordor+1} of ${MORDOR}. Draws a Hunt tile.`:`+1 hidden progress. Hunt: ${Math.min(5,G.huntBox)} dice needing ${need}+${huntRerolls()?`, ${huntRerolls()} reroll(s)`:''}`,ok:fs.hidden&&fs.mordor<MORDOR,fn:()=>{UI.busy=true;fellowshipMove(finishDie)}});
+      A.push({label:'Separate a Warden',sub:'Send a companion out to lead armies and rouse nations',ok:fs.mordor<0&&fs.band.some(id=>sepTargets(id).length),fn:actSeparate});
+      A.push({label:'Move Wardens on the map',sub:'Up to their level',ok:R.some(r=>G.comps[r.id].length&&compMoveTargets(r.id).length),fn:actMoveComps});
+      A.push({label:'Lead an army',sub:'Move or attack with an army that has a leader or Warden',ok:R.some(r=>armyCan(r.id,s,true,true)),fn:()=>actArmy(1,true)});
+      if(canCrown())A.push({label:'Crown Aldric King',sub:'+1 Free die each turn; his leadership rises to 3',ok:true,fn:()=>{crown();finishDie()}});
+      if(canRadiant())A.push({label:'Tamsin the Radiant',sub:'Place her in a Free stronghold. +1 Free die each turn',ok:true,fn:()=>pick('Where does Tamsin the Radiant appear?',radiantSpots(),rid=>{radiant(rid);finishDie()},cancelToDie)});
+    }
+    if(f==='AM'||W)A.push({label:'Command armies',sub:'Move up to 2 armies, or attack with 1',ok:R.some(r=>armyCan(r.id,s,false,true)),fn:()=>actArmy(2,false)});
+    if(f==='AM'||f==='M'||W){A.push({label:'Muster troops',sub:'In a settlement of a nation at war',ok:recruitTargets(s).length>0,fn:actRecruit});A.push({label:'Diplomacy',sub:'Move a nation toward war',ok:diploTargets(s).length>0,fn:actDiplo})}
+  }else{
+    if(f==='C'){A.push({label:'Lead an army',sub:'Move or attack with an army that has a Wraith or Minion',ok:R.some(r=>armyCan(r.id,s,true,true)),fn:()=>actArmy(1,true)});
+      A.push({label:'Fly the Wraiths',sub:`Move groups anywhere. A Wraith in the Fellowship's region gives the Hunt a reroll`,ok:flyerSources().length>0,fn:actFly})}
+    if(f==='A'||f==='AM')A.push({label:'Command armies',sub:'Move up to 2 armies, or attack with 1',ok:R.some(r=>armyCan(r.id,s,false,true)),fn:()=>actArmy(2,false)});
+    if(f==='M'||f==='AM'){A.push({label:'Muster troops',sub:'In a settlement of a nation at war',ok:recruitTargets(s).length>0,fn:actRecruit});A.push({label:'Diplomacy',sub:'Move a nation toward war',ok:diploTargets(s).length>0,fn:actDiplo});
+      A.push({label:'Bring a Minion into play',sub:'+1 Throne die per Minion',ok:Object.keys(MINIONS).some(minionOk),fn:actMinion});
+      if(forgeOk())A.push({label:"The Tyrant's forges",sub:'Upgrade up to 3 Iron Spire regulars to elites, add 1 regular',ok:true,fn:()=>{forge();finishDie()}})}
+  }
+  if(f==='E'||W){A.push({label:'Draw a Character card',ok:true,fn:()=>{drawCard(s,'C');log(s,`${SIDES[s].name} draws a card.`);finishDie()}});A.push({label:'Draw a Strategy card',ok:true,fn:()=>{drawCard(s,'S');log(s,`${SIDES[s].name} draws a card.`);finishDie()}});
+    if(G.hands[s].some(k=>cardCan(CARDS[k])))A.push({label:'Play an event card',sub:'Press Play on a card in your hand',ok:false,info:true})}
+  A.push({label:'Spend the die doing nothing',ok:true,fn:()=>{log(s,`${SIDES[s].name} lets a die go unused.`);finishDie()}});
+  return A;
+}
+
+/* ======================= AI ======================= */
+function frontDist(){return distMap(r=>held(r,'F'))}
+function nearestFront(ids){const D=frontDist();return ids.slice().sort((a,b)=>D[a]-D[b]||combat(a)-combat(b))[0]}
+function aiCombatCard(B,who){const s=B[who],h=G.hands[s];if(!h.length)return null;const stake=REG[B.to].set?vpOf(B.to):0;const big=combat(B.from)+combat(B.to)>=6;if(!(stake||big)&&h.length<5)return null;if(B.round>2&&h.length<4)return null;
+  let best=null,bs=99;h.forEach(k=>{const c=CARDS[k];const v=cardCan(c)?(c.ai?c.ai():1.5):0;if(v<bs){bs=v;best=k}});return bs<2.4||h.length>=5?best:null}
+function aiContinue(B){const aU=combat(B.from),dU=combat(B.to);const fort=REG[B.to].set==='fort'&&G.ctrl[B.to]===B.d;if(aU<2)return false;return aU>=dU*(fort?(B.a==='S'&&G.siege?1.1:1.5):1)||dU<=1}
+function aiRetreat(B,ds){const aU=combat(B.from),dU=combat(B.to);const setl=!!REG[B.to].set;if(aU>=(setl?3.2:2.2)*dU&&dU<=3){const safe=ds.filter(r=>!ADJ[r].some(x=>owner(x)===B.a&&combat(x)>=dU));return (safe[0]||ds[0])}return null}
+function aiAlloc(max){const f=G.f;if(f.mordor>=0)return Math.min(max,5);const p=gatePath(f.loc);const dist=p.length-1-f.prog;let k=dist<=3?4:dist<=6?3:2;return Math.max(1,Math.min(max,k))}
+function aiUseS(face,done){
+  if(face==='A')return aiArmy('S',2,false,done)||aiCardS(['S'],99,done);
+  if(face==='AM')return aiArmy('S',2,false,done)||aiMusterS(done);
+  if(face==='C')return aiCharS(done);
+  if(face==='M')return aiMusterS(done);
+  if(face==='E')return aiEvent('S',done);
+  return false;
+}
+function aiCharS(done){const f=G.f;
+  if(f.mordor<0&&G.huntBox>0&&!G.wraithMoved&&wraithDests().includes(f.loc)&&cnt(f.loc,'w')===0&&unused('F')>0){const src=flyerSources().filter(r=>r!==f.loc).sort((a,b)=>(lead(b)-combat(b)*.2)-(lead(a)-combat(a)*.2))[0];if(src){const us=G.units[src];const i=us.findIndex(u=>u.t==='w');if(i>=0){us.splice(i,1);G.units[f.loc].push({n:'ashen',t:'w'});G.wraithMoved=true;log('S',`A Wraith flies from ${REG[src].name} to hunt near ${REG[f.loc].name}.`);done();return true}}}
+  if(aiArmy('S',1,true,done))return true;
+  const tgt=R.filter(r=>owner(r.id)==='S'&&combat(r.id)>=4&&lead(r.id)===0).sort((a,b)=>combat(b.id)-combat(a.id))[0];
+  if(tgt){const src=flyerSources().filter(r=>r!==tgt.id&&!(owner(r)==='S'&&combat(r)>=4&&lead(r)<=1)).sort((a,b)=>lead(b)-lead(a))[0];if(src){const us=G.units[src];const i=us.findIndex(u=>u.t==='w');if(i>=0){us.splice(i,1);G.units[tgt.id].push({n:'ashen',t:'w'});log('S',`A Wraith joins the army at ${tgt.name}.`);done();return true}}}
+  return false}
+function aiMusterS(done){
+  for(const n of ['ashen','ironspire','south'])if(!atWar(n)&&canAdvance(n)){advance(n);done();return true}
+
+  for(const m of ['ashking','tyrant','herald'])if(minionOk(m)){const sp=minionSpots(m);const rid=m==='ashking'?sp.sort((a,b)=>combat(b)-combat(a))[0]:nearestFront(sp);placeMinion(m,rid);done();return true}
+  const hotS=recruitTargets('S').filter(r=>sThreat(r)>1);if(hotS.length){const rid=hotS.sort((a,b)=>sThreat(b)-sThreat(a))[0];recruit(rid,combat(rid)<5&&10-combat(rid)>=2?'rr':'e','S');done();return true}
+  if(forgeOk()&&RAND(2)){forge();done();return true}
+  const ids=recruitTargets('S');if(!ids.length)return false;const hot=ids.filter(r=>sThreat(r)>0).sort((a,b)=>sThreat(b)-sThreat(a));const rid=hot[0]||nearestFront(ids);
+  const kinds=recruitKinds('S',rid).map(k=>k[0]);const kind=kinds.includes('rw')&&wraiths()<4&&RAND(2)?'rw':combat(rid)>=5||!kinds.includes('rr')?'e':'rr';recruit(rid,kind,'S');done();return true}
+function aiEvent(s,done){const k=aiBestCard(s,1.5);if(k){aiPlay(s,k,done);return true}const deck=s==='S'?(G.f.mordor>=0||G.f.prog>=2?'C':'S'):(G.f.corr>=4||G.f.mordor>=0?'C':'S');drawCard(s,deck);log(s,`${SIDES[s].name} draws a card.`);done();return true}
+function aiCardS(decks,min,done){return false}
+function aiBestCard(s,min){let best=null,bs=min;[...new Set(G.hands[s])].forEach(k=>{const c=CARDS[k];if(!cardCan(c))return;const v=c.ai?c.ai():1;if(v>=bs){bs=v;best=k}});return best}
+function aiPlay(s,k,done){const c=CARDS[k];const rid=c.targets?(c.aiT?c.aiT(c.targets()):c.targets()[0]):null;playCard(s,k,rid,done)}
+function aiArmy(me,moves,ld,done){
+  let did=0;const touched=new Set();const op=other(me);
+  const D=distMap(r=>held(r,op));
+  for(let k=0;k<moves;k++){
+    let best=null;const consider=(sc,type,act)=>{if(!best||sc>best.sc)best={sc,type,act}};
+    for(const r of R){const f=r.id;if(owner(f)!==me||combat(f)===0||touched.has(f)||(ld&&!hasLeader(f,me)))continue;
+      for(const t of ADJ[f]){
+        if(owner(t)===op&&combat(t)>0){if(k>0||!canAttack(f))continue;
+          const fort=REG[t].set==='fort'&&G.ctrl[t]===op,city=REG[t].set==='city'&&G.ctrl[t]===op;
+          const a=strength(f),d=strength(t)*(fort?(me==='S'&&G.siege?1.1:1.5):city?1.15:1);
+          const need=me==='S'?0.3:(fort?1.6:1.0);
+          if(a>=d+need)consider(6+(a-d)+vpOf(t)*1.8,'atk',()=>{UI.busy=true;battle(f,t,done)});
+        }else{
+          if(!canLeave(f,t))continue;const room=10-combat(t);if(room<1)continue;
+          let n=Math.min(combat(f),room);
+          const myHome=held(f,me)&&homeSide(f)===me;const thr=ADJ[f].some(x=>owner(x)===op&&combat(x)>0);
+          if(held(f,me))n=Math.min(n,combat(f)-(thr?Math.max(myHome?4:3,Math.ceil(combat(f)/2)):myHome?(REG[f].set==='fort'?(GATES.includes(f)||f==='cinderhold'?4:3):2):1));
+          if(n<1)continue;
+          if(held(t,op)&&combat(t)===0){consider(25+vpOf(t),'cap',()=>{moveUnits(f,t,n);touched.add(t)});continue}
+          if(me==='F'){const th=threat(t);if(th>0&&held(t,'F')){const nn=Math.min(combat(f)-(held(f,'F')&&threat(f)>0?combat(f):0),room);if(nn>=1)consider(4+th+vpOf(t),'mv',()=>{moveUnits(f,t,nn);touched.add(t)})}continue}
+          if(D[t]<D[f]&&n>=2){const danger=ADJ[t].reduce((m,x)=>owner(x)===op?Math.max(m,strength(x)):m,0);if(n+combat(t)+0.5<danger)continue;consider(1+n*0.35-D[t]*0.3+(combat(t)>0?1.2:0),'mv',()=>{moveUnits(f,t,n);touched.add(t)})}
+        }
+      }
+    }
+    if(!best)break;
+    if(best.type==='atk'){best.act();return true}
+    best.act();did++;if(G.winner)break;
+  }
+  if(did>0){done();return true}return false}
+/* ---- Free AI ---- */
+function aiDeclareTarget(){const f=G.f;const p=gatePath(f.loc);const k=Math.min(f.prog,p.length-1);return p[k]}
+function aiFellowshipPhase(){const f=G.f;
+  if(f.mordor<0&&f.prog>0){const p=gatePath(f.loc);const k=Math.min(f.prog,p.length-1);let t=p[k];if(f.corr>=3){for(let i=k;i>=1;i--){const r=p[i];if(REG[r].set&&homeSide(r)==='F'&&G.ctrl[r]==='F'&&owner(r)!=='S'){t=r;break}}}declare(t,true)}
+  if(f.mordor<0&&GATES.includes(f.loc)&&f.hidden)enterMordor();
+  if(f.band.length&&f.band.includes('tamsin'))f.guide='tamsin';else f.guide=bestGuide()}
+function aiDamage(dmg){const f=G.f;if(!f.band.length||f.guide==='wretch')return null;if(f.corr+dmg<8&&dmg<3)return null;const fits=f.band.filter(id=>absorb(id)>=dmg).sort((a,b)=>COMPS[a].lvl-COMPS[b].lvl);const pickC=fits[0]||f.band.slice().sort((a,b)=>COMPS[b].lvl-COMPS[a].lvl)[0];if(pickC==='aldric'&&f.band.length>1&&f.corr+dmg<10)return f.band.filter(x=>x!=='aldric').sort((a,b)=>COMPS[b].lvl-COMPS[a].lvl)[0];return pickC}
+function aiUseF(face,done){const f=G.f;const W=face==='W';
+  const canMove=f.hidden&&f.mordor<MORDOR;
+  const wantMove=canMove&&(f.mordor>=0?(f.corr+3<MAXC||f.mordor>=3):(f.moves===0||(f.moves===1&&G.huntBox<=2)||(f.moves<=2&&G.huntBox===0)));
+  if(face==='C'||W||hideAny()){if(!f.hidden&&(face==='C'||W||hideAny())){f.hidden=true;log('F','The Fellowship slips back into hiding.');done();return true}}
+  if(face==='C'||W){
+    if(wantMove){UI.busy=true;fellowshipMove(done);return true}
+    if(canCrown()){crown();done();return true}
+    if(canRadiant()){radiant(radiantSpots().sort((a,b)=>threat(b)-threat(a))[0]);done();return true}
+    if(f.band.includes('aldric')&&sepTargets('aldric').includes('highcrown')&&f.band.length>2&&(G.pol.aldmere.step<=1||G.turn>=3)){separate('aldric','highcrown');done();return true}
+    {const HOME={hollis:['deephold','irongate'],veyra:['silverglen','thornhall','mistwood','greyhaven'],corran:['highcrown','harrowby','seahaven'],pip:['hearthdale','dalemark']};
+     for(const id of ['corran','hollis','veyra','pip'])if(f.band.includes(id)&&f.band.length>3&&G.turn>=2){const tg=sepTargets(id).filter(r=>HOME[id].includes(r)&&held(r,'F'));const nat=REG[HOME[id][0]].nation;if(tg.length&&(!G.pol[nat].active||G.pol[nat].step>0)){separate(id,tg[0]);done();return true}}}
+    if(face==='C'){if(aiArmy('F',1,true,done))return true;const hc=R.find(r=>G.comps[r.id].includes('aldric'));if(hc&&hc.id!=='highcrown'){const mt=compMoveTargets(hc.id);const{d}=bfs('highcrown');const t=mt.sort((a,b)=>d[a]-d[b])[0];if(t&&d[t]<d[hc.id]){moveComps(hc.id,t);done();return true}}if(canMove&&f.moves<3&&(f.mordor>=0||G.huntBox<=3)){UI.busy=true;fellowshipMove(done);return true}return false}
+  }
+  if(face==='AM'||W){if(aiArmy('F',2,false,done))return true}
+  if(face==='AM'||face==='M'||W){if(aiMusterF(done))return true}
+  if(face==='E'||W)return aiEvent('F',done);
+  return false}
+function aiMusterF(done){
+  const threatened=R.filter(r=>threat(r.id)>0).map(r=>r.id);
+  const nat=fNations().filter(canAdvance).sort((a,b)=>{const ta=threatened.some(r=>REG[r].nation===a)?-2:0,tb=threatened.some(r=>REG[r].nation===b)?-2:0;return(G.pol[a].step+ta)-(G.pol[b].step+tb)})[0];
+  const rts=recruitTargets('F');const hot=rts.filter(r=>threat(r)>-1).sort((a,b)=>threat(b)-threat(a));
+  if(hot.length&&(!nat||threat(hot[0])>0)){const rid=hot[0];const ks=recruitKinds('F',rid).map(k=>k[0]);recruit(rid,lead(rid)===0&&ks.includes('rl')?'rl':ks.includes('rr')&&combat(rid)<5?'rr':'e','F');done();return true}
+  if(nat){advance(nat);done();return true}
+  if(rts.length){const D=distMap(r=>owner(r)==='S'&&combat(r)>0);const rid=rts.sort((a,b)=>D[a]-D[b])[0];recruit(rid,combat(rid)<5?'rr':'e','F');done();return true}
+  return false}
+function aiStep(){
+  if(!G||G.winner||G.phase!=='actions'||isHuman(G.active)||UI.choice||UI.roll||UI.pick||UI.busy)return;
+  const s=G.active;const done=()=>{UI.busy=false;finishDie()};
+  const order=s==='S'?['A','AM','C','M','E']:['W','C','AM','M','E'];
+  for(const f of order){const i=G.dice[s].findIndex(d=>!d.used&&d.f===f);if(i<0)continue;UI.sel=i;if(s==='S'?aiUseS(f,done):aiUseF(f,done))return}
+  const i=G.dice[s].findIndex(d=>!d.used);if(i<0){endAction();return}
+  UI.sel=i;log(s,`${SIDES[s].name} lets a die go unused.`);done();
+}
+
+/* ======================= RENDER ======================= */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+function render(){if(!G)return;renderMap();renderTracks();renderPrompt();renderDice();renderHand();renderNations();renderLog();renderModal();renderCoach()}
+function hull(pts){pts=pts.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);const lo=[],up=[];for(const p of pts){while(lo.length>=2&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}for(const p of pts.slice().reverse()){while(up.length>=2&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}return lo.slice(0,-1).concat(up.slice(0,-1))}
+function blobPath(centers,pad){const pts=[];centers.forEach(([x,y])=>{for(let i=0;i<20;i++){const a=i/20*Math.PI*2;pts.push([x+pad*Math.cos(a),y+pad*0.8*Math.sin(a)])}});const h=hull(pts);const n=h.length;let d='';for(let i=0;i<n;i++){const p0=h[(i-1+n)%n],p1=h[i],p2=h[(i+1)%n],p3=h[(i+2)%n];if(i===0)d+=`M${p1[0].toFixed(1)},${p1[1].toFixed(1)}`;d+=`C${(p1[0]+(p2[0]-p0[0])/6).toFixed(1)},${(p1[1]+(p2[1]-p0[1])/6).toFixed(1)} ${(p2[0]-(p3[0]-p1[0])/6).toFixed(1)},${(p2[1]-(p3[1]-p1[1])/6).toFixed(1)} ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`}return d+'Z'}
+function castleIcon(x,y){return `<g stroke="var(--ink)" stroke-width="1.5" fill="var(--paper3)" stroke-linejoin="round"><rect x="${x-11}" y="${y-5}" width="22" height="13"/><path d="M${x-11},${y-5} v-5 h4 v3 h3 v-3 h4 v3 h3 v-3 h4 v3 h3 v5"/><rect x="${x-17}" y="${y-9}" width="7" height="17"/><rect x="${x+10}" y="${y-9}" width="7" height="17"/><path d="M${x-17},${y-9} v-4 h2 v2 h2 v-2 h3 v4 M${x+10},${y-9} v-4 h2 v2 h2 v-2 h3 v4"/><path d="M${x-3},${y+8} v-6 a3,3 0 0 1 6,0 v6" fill="var(--ink)"/></g>`}
+function cityIcon(x,y){return `<g stroke="var(--ink)" stroke-width="1.4" fill="var(--paper3)" stroke-linejoin="round"><path d="M${x-13},${y+8} v-9 l6,-6 l6,6 v9 z"/><path d="M${x-1},${y+8} v-13 l7,-7 l7,7 v13 z"/><path d="M${x+6},${y-12} v-5 h2.5 v5" fill="var(--ink)"/></g>`}
+function treeIcon(x,y){return `<g stroke="var(--ink)" stroke-width="1.2" fill="var(--paper3)"><path d="M${x-6},${y+5} l6,-13 l6,13 z"/><path d="M${x},${y+5} v5"/></g>`}
+function seal(x,y,side,n,badge){const wax=side==='F'?'var(--wax-f)':'var(--wax-s)';let s=`<g filter="url(#waxedge)"><circle cx="${x}" cy="${y}" r="18" fill="url(#wax${side})"/></g><circle cx="${x}" cy="${y}" r="14" fill="none" stroke="${wax}" stroke-width="1.1" opacity=".8"/><text x="${x}" y="${y+7}" text-anchor="middle" font-size="19" font-weight="700" fill="#f6ecd6" font-family="IM Fell English, Georgia, serif">${n}</text>`;
+  if(badge)s+=`<g><rect x="${x+9}" y="${y-26}" width="${10+badge.length*7}" height="16" rx="8" fill="var(--paper3)" stroke="${wax}" stroke-width="1.3"/><text x="${x+14+badge.length*3.5}" y="${y-14}" text-anchor="middle" font-size="11" font-weight="700" fill="${wax}">${badge}</text></g>`;return s}
+function renderMap(){
+  const pk=UI.pick;const f=G.f;let s='';
+  s+=`<defs><filter id="paper" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="4" seed="7" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .14 0 0 0 .22 0" result="c"/><feBlend in="SourceGraphic" in2="c" mode="multiply"/></filter>
+  <filter id="rough" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="3" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter>
+  <filter id="waxedge" x="-25%" y="-25%" width="150%" height="150%"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="5" result="t"/><feDisplacementMap in="SourceGraphic" in2="t" scale="3"/><feDropShadow dx="1" dy="1.5" stdDeviation="1" flood-color="#000" flood-opacity=".45"/></filter>
+  <radialGradient id="waxF" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#5b7fc4"/><stop offset=".55" stop-color="#2a4a86"/><stop offset="1" stop-color="#172c55"/></radialGradient>
+  <radialGradient id="waxS" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#d9563d"/><stop offset=".55" stop-color="#9a2216"/><stop offset="1" stop-color="#5a0f0a"/></radialGradient>
+  <radialGradient id="waxG" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#f6db8a"/><stop offset=".6" stop-color="#c4932c"/><stop offset="1" stop-color="#7d5a12"/></radialGradient>
+  <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><line x1="0" y1="0" x2="0" y2="7" stroke="var(--ink)" stroke-width=".7" opacity=".35"/></pattern></defs>`;
+  s+=`<rect width="1000" height="660" fill="var(--paper)"/><rect width="1000" height="660" fill="var(--paper)" filter="url(#paper)"/><rect x="8" y="8" width="984" height="644" fill="none" stroke="var(--ink)" stroke-width="1.2"/><rect x="14" y="14" width="972" height="632" fill="none" stroke="var(--ink)" stroke-width="2.5"/>`;
+  const tint={F:'rgba(50,110,210,.11)',S:'rgba(170,60,35,.15)'};
+  const tintc={F:'#3a66b8',S:'#b3432a'};
+  Object.entries(NATIONS).forEach(([n,N])=>{s+=`<g opacity="${N.side==='S'?.2:.15}" filter="url(#rough)">`+R.filter(r=>r.nation===n).map(r=>`<circle cx="${r.x}" cy="${r.y}" r="${r.set==='fort'?58:50}" fill="${tintc[N.side]}"/>`).join('')+'</g>'});
+  s+=`<g filter="url(#rough)"><path d="${blobPath([[860,470],[905,500],[880,560]],34)}" fill="url(#hatch)" stroke="none"/></g>`;
+  s+=`<g transform="translate(60,610)" stroke="var(--ink)" fill="var(--paper3)" stroke-width="1.2"><circle r="20"/><path d="M0,-18 L4,0 L0,18 L-4,0 Z" fill="var(--ink)"/><path d="M-18,0 L0,-4 L18,0 L0,4 Z"/><text y="-24" text-anchor="middle" font-size="11" font-family="IM Fell English, Georgia, serif" stroke="none" fill="var(--ink)">N</text></g>`;
+  EDGES.forEach(([a,b])=>{const A=REG[a],B=REG[b];s+=`<line x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="6 5" opacity=".6"/>`});
+  if(f.mordor<0&&f.prog>0){const reach=within(f.loc,f.prog);reach.forEach(r=>{if(r!==f.loc)s+=`<circle cx="${REG[r].x}" cy="${REG[r].y}" r="34" fill="var(--gold2)" opacity=".13"/>`})}
+  R.forEach(r=>{
+    const ok=pk&&pk.ok.has(r.id);const rad=r.set==='fort'?25:r.set==='city'?21:13;const own=owner(r.id);
+    let icon=r.set==='fort'?`<circle class="ring" cx="${r.x}" cy="${r.y}" r="${rad}" fill="var(--paper3)" stroke="var(--ink)" stroke-width="2"/><circle cx="${r.x}" cy="${r.y}" r="${rad-3}" fill="none" stroke="var(--ink)" stroke-width=".7"/>${castleIcon(r.x,r.y)}`:r.set==='city'?`<circle class="ring" cx="${r.x}" cy="${r.y}" r="${rad}" fill="var(--paper3)" stroke="var(--ink)" stroke-width="1.7"/>${cityIcon(r.x,r.y)}`:`<circle class="ring" cx="${r.x}" cy="${r.y}" r="${rad}" fill="var(--paper3)" stroke="var(--ink)" stroke-width="1"/>${treeIcon(r.x,r.y-1)}`;
+    let cap='';if(r.set&&G.ctrl[r.id]!==homeSide(r.id))cap=`<circle cx="${r.x}" cy="${r.y}" r="${rad+6}" fill="none" stroke="${G.ctrl[r.id]==='F'?'var(--free)':'var(--throne)'}" stroke-width="4" stroke-dasharray="7 5"/>`;
+    let thr='';if(threat(r.id)>0)thr=`<g><circle cx="${r.x-rad-3}" cy="${r.y-rad+3}" r="10" fill="var(--wax-s2)" stroke="var(--paper3)" stroke-width="2"/><text x="${r.x-rad-3}" y="${r.y-rad+8}" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">!</text></g>`;
+    let tok='';const c=combat(r.id);
+    if(c>0){const nl=cnt(r.id,'l'),nw=cnt(r.id,'w'),mn=Object.keys(MINIONS).filter(m=>cnt(r.id,m));const ne=cnt(r.id,'e');let b='';if(ne)b+=`◆${ne}`;if(nl)b+=(b?' ':'')+`♛${nl}`;if(nw)b+=(b?' ':'')+`☠${nw}`;if(mn.length)b+=(b?' ':'')+'✦'.repeat(mn.length);tok=seal(r.x+rad*0.7+9,r.y-rad*0.7-4,own,c,b)}
+    else if(cnt(r.id,'w')+cnt(r.id,'ashking')+cnt(r.id,'tyrant')+cnt(r.id,'herald')){tok=`<g><circle cx="${r.x+rad*0.7+8}" cy="${r.y-rad*0.7-4}" r="11" fill="url(#waxS)"/><text x="${r.x+rad*0.7+8}" y="${r.y-rad*0.7+1}" text-anchor="middle" font-size="12" fill="#fff">☠${cnt(r.id,'w')>1?cnt(r.id,'w'):''}</text></g>`}
+    let comp='';if(G.comps[r.id].length){comp=`<g><circle cx="${r.x-rad*0.7-6}" cy="${r.y+rad*0.7+2}" r="10" fill="url(#waxG)" stroke="#6b4a10" stroke-width="1.1"/><text x="${r.x-rad*0.7-6}" y="${r.y+rad*0.7+7}" text-anchor="middle" font-size="12" font-weight="700" fill="#3a2a08">★${G.comps[r.id].length>1?G.comps[r.id].length:''}</text></g>`}
+    let fel='';if(f.mordor<0&&f.loc===r.id){const x=r.x-rad-16,y=r.y-rad-8;fel=`<g><circle cx="${x}" cy="${y}" r="15" fill="url(#waxG)" stroke="${f.hidden?'#6b4a10':'var(--wax-s2)'}" stroke-width="${f.hidden?1.5:3.5}" filter="url(#waxedge)"/><circle cx="${x}" cy="${y}" r="7" fill="none" stroke="#3a2a08" stroke-width="2.4"/>${f.prog?`<g><circle cx="${x-12}" cy="${y+12}" r="8" fill="var(--paper3)" stroke="#6b4a10"/><text x="${x-12}" y="${y+16}" text-anchor="middle" font-size="11" font-weight="700" fill="#3a2a08">+${f.prog}</text></g>`:''}</g>`}
+    const tip=`${r.name}${r.nation?' — '+NATIONS[r.nation].name:''}${r.set?` (${r.set==='fort'?'stronghold':'city'}, ${vpOf(r.id)} VP)`:''}`;
+    s+=`<g class="reg${ok?' pickable':''}" data-r="${r.id}" ${ok?'tabindex="0" role="button"':''}><title>${esc(tip)}</title>${cap}${icon}${thr}<text x="${r.x}" y="${r.y+rad+15}" text-anchor="middle" font-size="14" fill="var(--ink)" font-family="IM Fell English, Georgia, serif" paint-order="stroke" stroke="var(--paper)" stroke-width="4">${r.name}</text>${tok}${comp}${fel}</g>`;
+  });
+  const LBL={north:[110,105],sylvan:[330,48],stonekin:[975,200],riders:[450,522],aldmere:[470,548],ironspire:[150,452],ashen:[700,45],south:[990,378]};
+  Object.entries(NATIONS).forEach(([n,N])=>{const[x,y]=LBL[n];s+=`<text x="${x}" y="${y}" text-anchor="${n==='south'||n==='stonekin'?'end':'middle'}" font-family="IM Fell English SC, IM Fell English, Georgia, serif" font-size="15" letter-spacing="1.5" fill="${N.side==='F'?'var(--free)':'var(--throne)'}" opacity=".85">${N.name}</text>`});
+  document.getElementById('map').innerHTML=s;
+}
+function renderTracks(){
+  const f=G.f;let m='';for(let i=0;i<=MORDOR;i++)m+=`<div class="cell mord${i===f.mordor?' here':''}${i===MORDOR?' forge':''}">${i===f.mordor?'W':i===MORDOR?'⚒':i}</div>`;
+  let c='';for(let i=1;i<=MAXC;i++)c+=`<div class="cell${i<=f.corr?' taint':''}">${i}</div>`;
+  const band=f.band.map(id=>`<span class="chip"${id===f.guide?' style="border-color:var(--gold);font-weight:700"':''} title="${esc(COMPS[id].guide||'No Guide ability')}">${id===f.guide?'⚑ ':''}${COMPS[id].name} ${COMPS[id].lvl}</span>`).join('')||`<span class="chip" style="border-color:var(--gold)">⚑ ${WRETCH.name}</span>`;
+  const dead=f.dead.map(id=>`<span class="chip dead">${COMPS[id].name}</span>`).join('');
+  const where=f.mordor>=0?'In Mordor':`Last seen at <b>${REG[f.loc].name}</b>, ${f.prog} hidden progress`;
+  const gp=f.mordor<0?gatePath(f.loc).length-1:0;
+  document.getElementById('tracks').innerHTML=`
+    <div class="track"><span class="name">Fellowship</span><div class="chips"><span class="chip">${where}</span>${f.mordor<0?`<span class="chip">${gp} region${gp===1?'':'s'} from a Mordor gate</span>`:''}<span class="chip ${f.hidden?'':'warn'}">${f.hidden?'Hidden':'Revealed'}</span></div></div>
+    <div class="track"><span class="name">Mordor</span><div class="cells">${m}</div><span class="small muted">${f.mordor<0?'not yet entered':'reach ⚒ to win'}</span></div>
+    <div class="track"><span class="name">Corruption</span><div class="cells">${c}</div><span class="small muted">12 and the Throne wins</span></div>
+    <div class="track"><span class="name">The Hunt</span><div class="chips"><span class="chip ${G.huntBox?'warn':''}">${G.huntBox} ${G.huntBox===1?'die':'dice'} in the Hunt box</span>${f.mordor<0&&huntRerolls()?`<span class="chip warn">${huntRerolls()} reroll${huntRerolls()>1?'s':''} here</span>`:''}${G.snare?'<span class="chip warn">Snare set</span>':''}${G.warn?'<span class="chip">Warned</span>':''}${G.siege?'<span class="chip warn">Siege engines</span>':''}<span class="chip">${G.tiles.length} tiles in the pool</span></div></div>
+    <div class="track"><span class="name">The band</span><div class="chips"><span class="chip">Wren, the Bearer</span>${band}${dead}</div></div>
+    <div class="track"><span class="name">War</span><div class="chips"><span class="chip F">Free Realms ${vp('F')} / ${VP_F} VP</span><span class="chip S">Throne ${vp('S')} / ${VP_S} VP</span><span class="chip">Turn ${G.turn}</span><span class="chip">Dice ${diceCount('F')} vs ${diceCount('S')}</span></div></div>`;
+}
+function renderPrompt(){
+  const el=document.getElementById('prompt');el.className='box '+(G.winner||G.active);let h='';
+  if(G.winner)h=`<div class="who win">${SIDES[G.winner].long} wins</div><p>${esc(G.winText)}</p><p class="small muted">${G.turn} turns.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div>`;
+  else if(UI.pick)h=`<div class="who">${SIDES[G.active].name}</div><p>${esc(UI.pick.prompt)}</p><p class="small muted">Click a glowing region on the map.</p>${UI.pick.cancel?'<div class="acts"><button class="btn" data-a="pcancel">Cancel</button></div>':''}`;
+  else if(G.phase!=='actions')h=`<div class="who">${G.phase==='fellowship'?'Fellowship phase':'The Hunt'}</div><p>Setting up the turn…</p>`;
+  else if(!isHuman(G.active))h=`<div class="who">${SIDES[G.active].long} is moving…</div><p class="small muted">Watch the map and the chronicle.</p>`;
+  else{const s=G.active;h=`<div class="who">${SIDES[s].long}</div>`;
+    if(UI.sel==null){h+=`<p>Pick one of your dice below.${G.hands[s].some(k=>cardCan(CARDS[k]))&&eventDie(s)>=0?' You can also play an event card with an Event'+(s==='F'?' or Will':'')+' die.':''}</p>`;if(unused(s)<unused(other(s)))h+=`<div class="acts"><button class="btn" data-a="pass">Pass: let the other side act</button></div>`}
+    else{const f=G.dice[s][UI.sel].f;h+=`<p>${FACE[f][0]} ${FACE[f][1]} die: choose an action.</p><div class="acts">`;UI.acts=dieActions(s,f);UI.acts.forEach((a,i)=>{h+=`<button class="btn" data-act="${i}" ${a.ok?'':'disabled'}>${esc(a.label)}${a.sub?`<small>${esc(a.sub)}</small>`:''}</button>`});h+=`<button class="btn" data-a="unsel">Choose a different die</button></div>`}}
+  if(UI.focus&&!UI.pick){const r=REG[UI.focus];const o=owner(r.id);const us=G.units[r.id];const byN={};us.filter(isC).forEach(u=>{byN[u.n]=byN[u.n]||{r:0,e:0};byN[u.n][u.t]++});
+    const parts=Object.entries(byN).map(([n,c])=>`${NATIONS[n].name} ${c.r} regular${c.r===1?'':'s'}${c.e?`, ${c.e} elite${c.e>1?'s':''}`:''}${NATIONS[n].side==='F'&&!atWar(n)?' (not at war)':''}`);
+    const ld=[];if(cnt(r.id,'l'))ld.push(`${cnt(r.id,'l')} leader${cnt(r.id,'l')>1?'s':''}`);if(cnt(r.id,'w'))ld.push(`${cnt(r.id,'w')} Wraith${cnt(r.id,'w')>1?'s':''}`);Object.keys(MINIONS).forEach(m=>{if(cnt(r.id,m))ld.push(MINIONS[m].name)});
+    h+=`<div class="inspect"><strong>${r.name}</strong>: ${r.nation?NATIONS[r.nation].name:'wild land'}${r.set?`, ${r.set==='fort'?'stronghold':'city'} worth ${vpOf(r.id)} VP, held by the ${SIDES[G.ctrl[r.id]].name}`:''}.<br>${parts.length?parts.join('<br>'):'No army.'}${ld.length?`<br>${ld.join(', ')}`:''}${G.comps[r.id].length?`<br>Wardens: ${G.comps[r.id].map(id=>COMPS[id].name).join(', ')}`:''}${threat(r.id)>0?'<br><span style="color:var(--throne)">Threatened by a stronger Throne army next door.</span>':''}</div>`}
+  el.innerHTML=h;
+}
+function renderDice(){let h='<h3>Action dice</h3>';['F','S'].forEach(s=>{h+=`<div class="dicerow"><span class="lbl">${s==='F'?'Free':'Throne'}</span>`;G.dice[s].forEach((d,i)=>{const can=!G.winner&&G.phase==='actions'&&G.active===s&&isHuman(s)&&!d.used&&!UI.pick&&!UI.busy;h+=`<button class="die ${s}${d.used?(d.hunt?' hunt':' used'):''}${UI.sel===i&&G.active===s?' sel':''}" data-die="${s}:${i}" ${can?'':'disabled'} title="${FACE[d.f][1]}"><span class="g">${FACE[d.f][0]}</span><span class="t">${d.hunt?'Hunt box':FACE[d.f][1]}</span></button>`});if(!G.dice[s].length)h+='<span class="muted small">—</span>';h+='</div>'});document.getElementById('dice').innerHTML=h}
+function renderHand(){
+  const s=G.mode==='F'||G.mode==='S'?G.mode:G.mode==='ai'?'F':G.active;const op=other(s);
+  let h=`<h3>${SIDES[s].name} hand <span class="muted small">(${SIDES[op].name}: ${G.hands[op].length})</span></h3><div class="hand">`;
+  if(!G.hands[s].length)h+='<p class="muted small">No cards. An Event die draws one.</p>';
+  G.hands[s].forEach(k=>{const c=CARDS[k];const ok=!G.winner&&G.phase==='actions'&&G.active===s&&isHuman(s)&&!UI.pick&&!UI.busy&&cardCan(c)&&eventDie(s)>=0;
+    h+=`<div class="card"><div class="top"><span class="nm">${esc(c.name)}</span><span class="ty">${c.deck==='C'?'Character':'Strategy'}</span></div><p>${esc(c.text)}</p><div class="combat">${esc(c.combat.txt)}</div><button class="btn" data-card="${k}" ${ok?'':'disabled'} style="margin-top:.3rem">Play event</button></div>`});
+  document.getElementById('hand').innerHTML=h+'</div>'}
+function renderNations(){let h='<h3>Political track</h3><div class="pol">';Object.entries(NATIONS).forEach(([n,N])=>{const p=G.pol[n];let pips='';for(let i=3;i>=1;i--)pips+=`<span class="pip${p.step>=i?' on':''}"></span>`;h+=`<span><span style="color:${N.side==='F'?'var(--free)':'var(--throne)'}">●</span> ${N.name} ${p.active?'':'<span class="tag">not roused</span>'}</span><span class="pips">${p.step===0?'<span class="pip war"></span> <b class="small">at war</b>':pips+` <span class="small muted">${p.step} to war</span>`}</span>`});document.getElementById('nations').innerHTML=h+'</div>'}
+function renderLog(){document.getElementById('log').innerHTML=G.log.slice(0,90).map(l=>`<div class="${l.s}">${esc(l.t)}</div>`).join('')}
+function renderLegend(){const sv=i=>`<svg viewBox="0 0 40 40">${i}</svg>`;const rows=[
+  [sv(`<circle cx="20" cy="20" r="18" fill="var(--paper3)" stroke="var(--ink)" stroke-width="1.5"/>${castleIcon(20,21)}`),'Stronghold: 2 VP. Attackers hit only on 6 in every round.'],
+  [sv(`<circle cx="20" cy="20" r="17" fill="var(--paper3)" stroke="var(--ink)" stroke-width="1.5"/>${cityIcon(20,21)}`),'City: 1 VP. Attackers hit only on 6 in the first round.'],
+  [sv(`<circle cx="20" cy="20" r="13" fill="var(--paper3)" stroke="var(--ink)"/>${treeIcon(20,19)}`),'Open land.'],
+  [`<svg viewBox="0 0 40 40"><defs><radialGradient id="lgF" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#5b7fc4"/><stop offset="1" stop-color="#172c55"/></radialGradient></defs><circle cx="20" cy="21" r="16" fill="url(#lgF)"/><text x="20" y="27" text-anchor="middle" font-size="16" font-weight="700" fill="#f6ecd6">6</text></svg>`,'Wax seal: an army and its unit count. ◆ elites, ♛ leaders, ☠ Wraiths, ✦ Minions.'],
+  [`<svg viewBox="0 0 40 40"><defs><radialGradient id="lgG" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#f6db8a"/><stop offset="1" stop-color="#7d5a12"/></radialGradient></defs><circle cx="20" cy="20" r="15" fill="url(#lgG)"/><circle cx="20" cy="20" r="7" fill="none" stroke="#3a2a08" stroke-width="2.4"/></svg>`,'The Fellowship figure at its last known position. +N is hidden progress; the gold haze shows where it could really be.'],
+  [`<svg viewBox="0 0 40 40"><defs><radialGradient id="lgG2" cx=".38" cy=".35" r=".7"><stop offset="0" stop-color="#f6db8a"/><stop offset="1" stop-color="#7d5a12"/></radialGradient></defs><circle cx="20" cy="20" r="12" fill="url(#lgG2)"/><text x="20" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#3a2a08">★</text></svg>`,'Wardens away from the Fellowship.'],
+  [sv(`<circle cx="20" cy="20" r="14" fill="none" stroke="var(--throne)" stroke-width="4" stroke-dasharray="6 4"/>`),'Dashed ring: captured by the other side.'],
+  [sv(`<circle cx="20" cy="20" r="11" fill="var(--wax-s2)"/><text x="20" y="25" text-anchor="middle" font-size="15" font-weight="700" fill="#fff">!</text>`),'Threatened: a stronger Throne army is next door.']];
+  document.getElementById('legend').innerHTML=rows.map(([a,b])=>`<span>${a}</span><span>${b}</span>`).join('')}
+function choose(title,text,options,cancel){UI.choice={title,text,options,cancel};renderModal()}
+function infoModal(title,text,tile,cb){if(G.mode==='ai'){cb();return}UI.choice={title,text,tile,options:[{label:'Continue',fn:cb}]};renderModal()}
+function renderModal(){const m=document.getElementById('modal');if(UI.roll){renderRoll();return}const c=UI.choice;
+  if(!c){if(!UI.info){m.classList.add('hidden');m.innerHTML=''}return}m.classList.remove('hidden');
+  const tile=c.tile?`<div class="dset" style="margin:.4rem 0 .6rem"><div class="d6 tile">${tileFace(c.tile)}</div></div>`:'';
+  m.innerHTML=`<div class="dlg" role="dialog" aria-modal="true"><h2>${esc(c.title)}</h2>${tile}${c.text?`<p>${esc(c.text)}</p>`:''}<div class="acts">${c.options.map((o,i)=>`<button class="btn" data-opt="${i}">${esc(o.label)}${o.sub?`<small>${esc(o.sub)}</small>`:''}</button>`).join('')}${c.cancel?'<button class="btn" data-opt="x">Cancel</button>':''}</div></div>`;const b=m.querySelector('button');if(b)b.focus()}
+function showRoll(spec,done){if(!ANIM){done();return}UI.roll={spec,done,phase:'spin'};renderRoll();setTimeout(()=>{if(UI.roll&&UI.roll.spec===spec){UI.roll.phase='shown';renderRoll();if(G.mode==='ai')setTimeout(()=>{if(UI.roll&&UI.roll.spec===spec)closeRoll()},1300)}},850)}
+function renderRoll(){const m=document.getElementById('modal');const{spec,phase}=UI.roll;m.classList.remove('hidden');
+  const dice=row=>row.dice.map(v=>`<div class="d6${phase==='spin'?' spin':(v>=row.need?' hit':'')}">${phase==='spin'?d6():v}</div>`).join('')+(row.rr||[]).map(v=>`<div class="d6 rr${phase==='spin'?' spin':(v>=row.need?' hit':'')}" title="reroll">${phase==='spin'?d6():v}</div>`).join('');
+  m.innerHTML=`<div class="dlg" role="dialog" aria-modal="true"><h2>${esc(spec.title)}</h2><p>${esc(spec.sub)}</p><div class="rolls">${spec.rows.map(r=>`<div class="rollrow ${r.side}"><div class="lbl"><span>${esc(r.label)}</span><span>${phase==='spin'?'…':r.hits+' hit'+(r.hits===1?'':'s')}</span></div><div class="dset">${r.dice.length||(r.rr||[]).length?dice(r):'<span class="muted small">no dice</span>'}</div></div>`).join('')}</div>${phase==='spin'?'<div class="outcome muted">Rolling…</div>':`<div class="outcome">${esc(spec.outcome)}</div><div class="acts"><button class="btn primary" data-roll="ok">Continue</button></div>`}</div>`;
+  if(phase==='spin')setTimeout(()=>{if(UI.roll&&UI.roll.phase==='spin')renderRoll()},120);else{const b=m.querySelector('button');if(b)b.focus()}}
+function closeRoll(){const r=UI.roll;if(!r)return;UI.roll=null;renderModal();r.done()}
+function showInfo(html){UI.info=true;const m=document.getElementById('modal');m.classList.remove('hidden');m.innerHTML=`<div class="dlg rules">${html}<div class="acts"><button class="btn primary" data-info="close">Close</button></div></div>`}
+function startScreen(){const saved=load();UI.info=true;const m=document.getElementById('modal');m.classList.remove('hidden');
+  m.innerHTML=`<div class="dlg"><h2>Shardfall</h2><p>Wren carries the Shard from Hearthdale toward the fires beyond the Ashen Throne's gates, hidden by seven Wardens. Behind them the Throne's armies march on the west. The Free Realms win by reaching the Sunken Forge or breaking the Throne's strongholds; the Throne wins by corrupting Wren or taking the cities of the west.</p><div class="acts">
+  <button class="btn primary" data-start="F">Play the Free Realms against the computer<small>Recommended first game. A guided tour runs on the first play.</small></button>
+  <button class="btn" data-start="S">Play the Ashen Throne against the computer<small>Hunt the Fellowship and march on the west.</small></button>
+  <button class="btn" data-start="hot">Two players on one screen<small>Pass the device between turns.</small></button>
+  <button class="btn" data-start="ai">Watch the computer play itself<small>A good way to see the rules in action.</small></button>
+  ${saved&&!saved.winner&&saved.f?`<button class="btn" data-start="load">Continue saved game<small>Turn ${saved.turn}</small></button>`:''}
+  <button class="btn" data-info="rules">Read the rules</button>${G&&!G.winner?'<button class="btn" data-info="close">Back to the current game</button>':''}</div></div>`}
+const TOURSTEPS=[
+  {el:'#tracks',t:'Two roads to victory',b:'The Free Realms win when Wren reaches the Sunken Forge at the end of the Mordor track, or by holding 4 VP of Throne strongholds. The Throne wins when Wren’s Corruption reaches 12, or by holding 10 VP of Free cities and strongholds.'},
+  {el:'#map',t:'The hidden Fellowship',b:'The gold seal with a ring is where the Fellowship was last seen. Each move adds hidden progress (+N) instead of moving the seal. The gold haze shows every region it could really be in. At the start of a turn you can declare it anywhere in that haze.'},
+  {el:'#tracks',t:'The Hunt',b:'Before rolling, the Throne may put up to one die per Warden into the Hunt box. Each time the Fellowship moves, those dice roll: a 6 on the first move, 5+ on the second. Enemy armies, Wraiths and Throne strongholds where it was last seen give rerolls. A success draws a Hunt tile for damage and maybe a reveal.'},
+  {el:'#tracks',t:'Wardens are your shield',b:'When the Hunt hits, a Warden can give their life to absorb damage up to their level. Wardens can also leave to lead armies and rouse their nations, but then the band is smaller: fewer shields, and fewer Hunt dice for the Throne.'},
+  {el:'#nations',t:'Nations go to war slowly',b:'Free nations start at peace. They can only recruit, attack or leave home once at war. Diplomacy moves them a step; the last step needs them roused by an attack, an invasion, a Warden or the Fellowship arriving.'},
+  {el:'#dice',t:'Dice are actions',b:'♞ Character: the Fellowship, Wardens, or an army with a leader. ⚔ Army: move two armies or attack with one. ⚑ Muster: recruit or diplomacy. ✦ Event: draw or play a card. ☀ Will: anything. The Throne’s ◉ Eyes go straight into the Hunt box.'},
+  {el:'#hand',t:'Cards have two uses',b:'Play a card as an event with an Event or Will die, or discard it in a battle round for its combat effect. Battles run round by round: attackers may press on, defenders outside strongholds may retreat.'},
+  {el:'#prompt',t:'A strong first turn',b:'Move the Fellowship once while the Hunt box is small. Use Muster dice on Diplomacy for Aldmere and the Plainsriders: the Throne’s first wave will come for Highcrown and Goldhall. Consider sending Aldric toward Highcrown to be crowned for an extra die.'},
+];
+function startTour(){UI.coach=0;render()}
+function renderCoach(){const el=document.getElementById('coach');document.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));if(UI.coach==null){el.style.display='none';return}const st=TOURSTEPS[UI.coach];el.style.display='';
+  el.innerHTML=`<h3>${UI.coach+1} of ${TOURSTEPS.length}: ${esc(st.t)}</h3><p class="small">${esc(st.b)}</p><div class="acts" style="flex-direction:row;flex-wrap:wrap"><button class="btn" data-tour="prev" ${UI.coach===0?'disabled':''}>Back</button><button class="btn primary" data-tour="next">${UI.coach===TOURSTEPS.length-1?'Start playing':'Next'}</button><button class="btn" data-tour="skip">Skip tour</button></div>`;const tg=document.querySelector(st.el);if(tg)tg.classList.add('hl')}
+const RULES=`<h2>Rules of Shardfall</h2>
+<h3>Victory</h3><p><b>Free Realms:</b> Wren reaches the end of the Mordor track (the Sunken Forge), or the Free Realms hold ${VP_F} VP of Throne settlements. <b>Ashen Throne:</b> Wren's Corruption reaches ${MAXC}, or the Throne holds ${VP_S} VP of Free settlements. Cities are worth 1 VP, strongholds 2.</p>
+<h3>Turn order</h3><ol><li><b>Draw:</b> each side draws one Character and one Strategy card (hand limit 6).</li><li><b>Fellowship phase:</b> the Free player may declare the Fellowship's position, change the Guide, or enter Mordor from Morrowgate or Shadegate.</li><li><b>Hunt allocation:</b> the Throne puts 0 to N dice in the Hunt box, where N is the number of Wardens still in the Fellowship (at least 1).</li><li><b>Roll:</b> the Free Realms roll 4 dice (+1 for a crowned Aldric, +1 for Tamsin the Radiant). The Throne rolls its remaining dice from 7 (+1 per Minion); rolled Eyes join the Hunt box.</li><li><b>Actions:</b> Free first, the sides alternate using one die each. A side with fewer dice left may pass.</li></ol>
+<h3>The Fellowship</h3><p>Moving the Fellowship (Character or Will die) adds 1 hidden progress; the figure stays at its last known position. The Hunt then rolls the Hunt-box dice (max 5): it needs 6 on the first move of the turn, 5+ on the second, and so on. It gets one reroll each for a Throne army, a Wraith, and a Throne-held settlement in the Fellowship's last known region. On any success a Hunt tile is drawn: its number is damage; an Eye tile's damage equals the successes rolled; tiles marked 👁 reveal the Fellowship. When revealed, the figure is moved up to its hidden progress and the Fellowship must hide (Character die) before moving again.</p><p>Damage becomes Corruption, unless the Guide or a random Warden gives their life to absorb damage up to their level. Declaring in a Free city or stronghold heals 1 Corruption and rouses that nation. From Morrowgate or Shadegate the Fellowship may enter Mordor: then every move climbs one of 6 steps and always draws a tile, Eye tiles deal damage equal to the Hunt box, and 4 dark tiles join the pool.</p>
+<h3>Wardens</h3><p>A Warden may separate from the Fellowship and travel up to its hidden progress plus their level. On the map Wardens are leaders, move up to their level with a Character die, and rouse their own nation when they reach one of its cities or strongholds (Tamsin rouses any). Guides have powers shown on their chips. If every Warden is gone, the Wretch guides Wren. Aldric crowned in Highcrown (Aldmere at war) gives an extra die. Tamsin returns as the Radiant, with an extra die, once she has died or a Minion appears.</p>
+<h3>Armies and battles</h3><p>An Army die moves two armies one region each, or attacks with one. A Character die moves or attacks with an army that has a leader, Warden, Wraith or Minion. Each battle round, both sides may discard a card for its combat effect, then roll one die per unit (max 5), hitting on 5+. Attackers hit only on 6 against a stronghold, and against a city in the first round. Each point of leadership rerolls one miss. A hit removes a regular or turns an elite into a regular. After each round the attacker may press on and a defender outside a stronghold may retreat. Up to 10 units per region.</p>
+<h3>Politics</h3><p>A nation must be at war to recruit, attack, or leave its own lands. Diplomacy (Muster die) moves a nation one step; a nation that is not roused cannot take the last step. Free nations are roused when invaded, attacked (which also moves them a step), or visited by the Fellowship or one of their Wardens.</p>
+<h3>The Throne</h3><p>Wraiths are leaders that fly anywhere with a Character die (not into a Free stronghold). Muster dice may bring in Minions: the White Tyrant, the Ashen King and the Pale Herald, each adding a die.</p>`;
+
+/* ======================= EVENTS ======================= */
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-a],[data-act],[data-die],[data-card],[data-opt],[data-start],[data-info],[data-roll],[data-tour],g.reg');if(!t)return;
+  if(t.dataset.start){const k=t.dataset.start;UI.info=false;if(k==='load'){G=load();UI.pick=null;UI.choice=null;UI.sel=null;UI.roll=null;UI.busy=false;if(G.phase==='fellowship'||G.phase==='hunt'){G.turn--;startTurn()}else refresh()}else{newGame(k);let toured=false;try{toured=!!localStorage.getItem(TOUR);localStorage.setItem(TOUR,'1')}catch(x){}if((k==='F'||k==='S')&&!toured)startTour()}return}
+  if(t.dataset.info){if(t.dataset.info==='rules'){showInfo(RULES);return}UI.info=false;if(!G)startScreen();else renderModal();return}
+  if(t.dataset.roll){closeRoll();return}
+  if(t.dataset.tour){const k=t.dataset.tour;if(k==='skip'||(k==='next'&&UI.coach===TOURSTEPS.length-1))UI.coach=null;else if(k==='next')UI.coach++;else UI.coach--;renderCoach();return}
+  if(t.dataset.opt!=null){const c=UI.choice;UI.choice=null;renderModal();if(t.dataset.opt==='x'){c.cancel&&c.cancel()}else c.options[+t.dataset.opt].fn();if(!UI.choice&&!UI.roll&&!UI.pick)schedule();return}
+  if(!G)return;
+  if(t.matches('g.reg')){const rid=t.dataset.r;if(UI.pick&&UI.pick.ok.has(rid)){const cb=UI.pick.cb;UI.pick=null;cb(rid)}else{UI.focus=rid;renderPrompt()}return}
+  const a=t.dataset.a;
+  if(a==='new'){startScreen();return}
+  if(a==='pcancel'){const c=UI.pick.cancel;UI.pick=null;if(c)c();else render();return}
+  if(a==='pass'){passTurn();return}
+  if(a==='unsel'){UI.sel=null;render();return}
+  if(t.dataset.die){const[s,i]=t.dataset.die.split(':');if(s===G.active&&isHuman(s)&&!G.dice[s][+i].used){UI.sel=+i;render()}return}
+  if(t.dataset.act!=null){const x=UI.acts[+t.dataset.act];if(x&&x.ok&&x.fn)x.fn();return}
+  if(t.dataset.card){playFromHand(t.dataset.card);return}
+});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('g.reg.pickable')){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}))}if(e.key==='Escape'&&UI.choice&&UI.choice.cancel){const c=UI.choice;UI.choice=null;renderModal();c.cancel()}});
+document.getElementById('bRules').onclick=()=>showInfo(RULES);
+document.getElementById('bNew').onclick=()=>startScreen();
+document.getElementById('bTour').onclick=()=>{if(G)startTour()};
+renderLegend();startScreen();
+</script>
+</body>
+</html>

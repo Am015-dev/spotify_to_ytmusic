@@ -1,0 +1,15 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"menu-phone.json",
+"story-scene-phone.json",
+"tw-art-phone.json",
+"tw-board-phone.json",
+"tw-buttons-phone.json",
+"tw-help-phone.json",
+"tw-zoom-phone.json"
+]
+}
+}

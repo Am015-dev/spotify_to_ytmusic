@@ -1,0 +1,318 @@
+{
+  "game": "lantern-dive",
+  "title": "The Drowned Road",
+  "version": 1,
+  "cast": {
+    "brack": { "name": "Chief Ottilie Brack", "portrait": "camp-brack.webp", "emoji": "🎙️", "color": "#2f6f8f" },
+    "nerea": { "name": "Nerea", "portrait": "camp-nerea.webp", "emoji": "🧭", "color": "#3a7d6b" },
+    "bram": { "name": "Bram", "portrait": "camp-bram.webp", "emoji": "🔧", "color": "#8a5a2b" },
+    "sumi": { "name": "Sumi", "portrait": "camp-sumi.webp", "emoji": "🐟", "color": "#c0567a" },
+    "dag": { "name": "Dag", "portrait": "camp-dag.webp", "emoji": "🙂", "color": "#d08a1e" },
+    "echo": { "name": "Echo", "portrait": "camp-echo.webp", "emoji": "🛸", "color": "#6a7fb5" },
+    "undertow": { "name": "The Grey Undertow", "portrait": "camp-undertow.webp", "emoji": "🌀", "color": "#5b6b78" },
+    "maze": { "name": "The Thousand Turns", "portrait": "camp-maze.webp", "emoji": "🪨", "color": "#6b4f8a" },
+    "lampless": { "name": "The Lampless One", "portrait": "camp-lampless.webp", "emoji": "🌑", "color": "#1f2a3d" }
+  },
+  "acts": [
+    { "act": 1, "title": "The Bay", "blurb": "Learn to dive as a team: one job each, one trick at a time." },
+    { "act": 2, "title": "The Carved Wreck", "blurb": "The tablets point to a wreck, and the wreck points somewhere deeper." },
+    { "act": 3, "title": "The Drowned Road", "blurb": "Follow the paved sea floor to the place the carvings warned about." }
+  ],
+  "twists": [
+    { "id": "air-limit", "where": "scoring", "how": "The chapter counts as won only if the dive is completed with G.att <= param (attempts on the same G object via LD.nextAttempt)." },
+    { "id": "no-flare", "where": "scoring", "how": "The chapter counts as won only if G.distress is still false when the dive is completed, so the team must finish without lighting the distress flare." },
+    { "id": "rookie-mates", "where": "setup", "how": "Every computer teammate is created with ai level param (e.g. 'easy') in the ai array passed to LD.newGame instead of the chapter's teammate level." },
+    { "id": "big-team", "where": "setup", "how": "The dive is started with players = param (e.g. 5) in LD.newGame, so the same dive is drawn with the larger team's job values and fewer tricks each." },
+    { "id": "clock-on", "where": "setup", "how": "For a dive that has a clock in its logbook entry (dives 14, 15, 16, 26), LD.newGame is called with timer: true so the real-time rule is played with the clock instead of its no-clock alternative." }
+  ],
+  "chapters": [
+    {
+      "id": "c1", "act": 1, "title": "Training Day",
+      "boss": false,
+      "intro": [
+        { "who": "brack", "text": "Welcome to Saltmere Base. Before you dive for real, one small job in the bay." },
+        { "who": "dag", "text": "I'm new too! Win the trick your job asks for and we all go home dry." },
+        { "who": "brack", "text": "Stuck? Tap the lightbulb. Nothing down there can hurt you today." }
+      ],
+      "outro": [
+        { "who": "brack", "text": "Job done, logbook signed. You're a diver now." },
+        { "who": "sumi", "text": "Fishermen hauled up two carved stones this morning. Someone should look." }
+      ],
+      "opponent": { "name": "Calm Shallows", "portrait": "camp-shallows.webp", "emoji": "🏝️", "cast": null,
+        "personality": "Clear, warm water. The only danger is forgetting to follow suit.",
+        "aiLevel": "easy", "aiStyle": "calm" },
+      "setup": { "mode": "local", "kind": "log", "mission": 1, "np": 3, "mates": "easy", "timer": false },
+      "twist": null,
+      "goal": { "type": "mission", "value": 1, "text": "Complete dive 1, Shallow Water: finish your one job." },
+      "hints": true,
+      "stars": [
+        { "text": "Complete dive 1", "test": { "k": "won" } },
+        { "text": "Complete it on the first attempt", "test": { "k": "attempts", "op": "<=", "v": 1 } },
+        { "text": "Take the job yourself", "test": { "k": "myJobs", "op": ">=", "v": 1 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "mode": "local" }, "maxStars": 2, "text": "Easy crewmates and one small job; the lightbulb shows every step." },
+      "unlock": [ { "type": "portrait", "id": "dag", "text": "Dag's portrait" } ]
+    },
+    {
+      "id": "c2", "act": 1, "title": "Stones in the Net",
+      "boss": false,
+      "intro": [
+        { "who": "brack", "text": "Two jobs this time. The Commander picks first, then each diver in turn." },
+        { "who": "nerea", "text": "Pick the job your hand can win. Big cards win tricks; Lanterns beat every colour." },
+        { "who": "brack", "text": "Find where those stones came from." }
+      ],
+      "outro": [
+        { "who": "nerea", "text": "Both jobs done. The stones match a ledge just past the base." }
+      ],
+      "opponent": { "name": "Drifting Sand", "portrait": "camp-sand.webp", "emoji": "🏜️", "cast": null,
+        "personality": "Shifts under your fins and hides small cards where you least expect them.",
+        "aiLevel": "easy", "aiStyle": "drift" },
+      "setup": { "mode": "local", "kind": "log", "mission": 2, "np": 3, "mates": "hard", "timer": false },
+      "twist": null,
+      "goal": { "type": "mission", "value": 2, "text": "Complete dive 2, The First Tide: every job done." },
+      "hints": true,
+      "stars": [
+        { "text": "Complete dive 2", "test": { "k": "won" } },
+        { "text": "Complete it within 2 attempts", "test": { "k": "attempts", "op": "<=", "v": 2 } },
+        { "text": "Take at least one job yourself", "test": { "k": "myJobs", "op": ">=", "v": 1 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "mates": "hard" }, "maxStars": 2, "text": "Your teammates play their very best and the coach stays on." },
+      "unlock": [ { "type": "portrait", "id": "nerea", "text": "Nerea's portrait" } ]
+    },
+    {
+      "id": "c3", "act": 1, "title": "Five Chambers",
+      "boss": false,
+      "intro": [
+        { "who": "brack", "text": "The base is ours now. Check all five chambers before we move in." },
+        { "who": "sumi", "text": "More jobs means more talking. Show one card with your ping: your highest, lowest or only one." },
+        { "who": "sumi", "text": "A good ping tells the team what you can win. Try one!" }
+      ],
+      "outro": [
+        { "who": "sumi", "text": "See? One card shown and everyone knew where to play." },
+        { "who": "brack", "text": "All systems hum. Rest up; the current is turning grey out by the wreck." }
+      ],
+      "opponent": { "name": "Flickering Power", "portrait": "camp-power.webp", "emoji": "💡", "cast": null,
+        "personality": "The lights blink in every chamber, and so do your plans if nobody signals.",
+        "aiLevel": "easy", "aiStyle": "flicker" },
+      "setup": { "mode": "local", "kind": "log", "mission": 5, "np": 3, "mates": "hard", "timer": false },
+      "twist": null,
+      "goal": { "type": "mission", "value": 5, "text": "Complete dive 5, Five Chambers: every job done." },
+      "hints": true,
+      "stars": [
+        { "text": "Complete dive 5", "test": { "k": "won" } },
+        { "text": "Use your ping at least once", "test": { "k": "pings", "op": ">=", "v": 1 } },
+        { "text": "Complete it without the distress flare", "test": { "k": "flare", "op": "<=", "v": 0 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "mates": "hard" }, "maxStars": 2, "text": "Your teammates play their very best and the coach stays on." },
+      "unlock": [ { "type": "portrait", "id": "sumi", "text": "Sumi's portrait" } ]
+    },
+    {
+      "id": "c4", "act": 1, "title": "The Grey Undertow",
+      "boss": true,
+      "intro": [
+        { "who": "brack", "text": "The stones lead to an old wreck, and a grey current wraps around it." },
+        { "who": "undertow", "text": "Show me your cards, little lamps. I will blur every mark you make." },
+        { "who": "nerea", "text": "Murky water: your ping shows the card but not whether it's high, low or only. Think it through." }
+      ],
+      "outro": [
+        { "who": "bram", "text": "Through the current and into the hold. There's a tablet in here, snapped in half." },
+        { "who": "brack", "text": "Bring it home. Act one is done, divers." }
+      ],
+      "opponent": { "name": "The Grey Undertow", "portrait": "camp-undertow.webp", "emoji": "🌀", "cast": "undertow",
+        "personality": "Patient and smothering. It never strikes; it just makes every message vague.",
+        "aiLevel": "easy", "aiStyle": "murky",
+        "taunt": "Lost in the grey. Your signals meant nothing to them.",
+        "praise": "You read meaning in my fog. Go on, then. Take the wreck." },
+      "setup": { "mode": "local", "kind": "log", "mission": 9, "np": 3, "mates": "hard", "timer": false },
+      "twist": null,
+      "goal": { "type": "mission", "value": 9, "text": "Complete dive 9, The Old Wreck, in murky water." },
+      "hints": true,
+      "stars": [
+        { "text": "Complete dive 9", "test": { "k": "won" } },
+        { "text": "Complete it within 3 attempts", "test": { "k": "attempts", "op": "<=", "v": 3 } },
+        { "text": "Complete it without the distress flare", "test": { "k": "flare", "op": "<=", "v": 0 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "mission": 7, "mates": "hard" }, "maxStars": 2, "text": "Your team dives the clear-water slope (dive 7) instead of the murky wreck." },
+      "unlock": [
+        { "type": "portrait", "id": "undertow", "text": "The Grey Undertow's portrait" },
+        { "type": "cardback", "id": "wreck-brass", "text": "Wreck-brass card back" },
+        { "type": "act", "id": "2", "text": "Act 2: The Carved Wreck" }
+      ]
+    },
+    {
+      "id": "c5", "act": 2, "title": "The Inscription",
+      "boss": false,
+      "intro": [
+        { "who": "brack", "text": "The tablet is carved in signs nobody knows. One diver should study it alone." },
+        { "who": "nerea", "text": "Commander's call: the Commander takes every job, or hands them all to one willing diver." },
+        { "who": "brack", "text": "A gentle start. Choose well and the rest follows." }
+      ],
+      "outro": [
+        { "who": "nerea", "text": "The signs describe a coastline. Not ours. Not any coast on our charts." }
+      ],
+      "opponent": { "name": "The Broken Tablet", "portrait": "camp-tablet.webp", "emoji": "🪨", "cast": null,
+        "personality": "Half a message, and half a message is a riddle.",
+        "aiLevel": "normal", "aiStyle": "riddle" },
+      "setup": { "mode": "local", "kind": "log", "mission": 10, "np": 4, "mates": "normal", "timer": false },
+      "twist": null,
+      "goal": { "type": "mission", "value": 10, "text": "Complete dive 10, The Inscription: every job done." },
+      "hints": false,
+      "stars": [
+        { "text": "Complete dive 10", "test": { "k": "won" } },
+        { "text": "Complete it within 2 attempts", "test": { "k": "attempts", "op": "<=", "v": 2 } },
+        { "text": "Complete it without the distress flare", "test": { "k": "flare", "op": "<=", "v": 0 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "np": 3, "mates": "hard" }, "maxStars": 2, "text": "A team of three with your strongest teammates." },
+      "unlock": [ { "type": "portrait", "id": "bram", "text": "Bram's portrait" } ]
+    },
+    {
+      "id": "c6", "act": 2, "title": "Whispers",
+      "boss": false,
+      "intro": [
+        { "who": "sumi", "text": "The base radio answered the tablet's pattern. Something down there is listening." },
+        { "who": "brack", "text": "Deep narcosis today: a few shared ping tokens in the middle. Anyone may grab one between tricks." },
+        { "who": "bram", "text": "So don't waste them. One good signal beats three nervous ones." }
+      ],
+      "outro": [
+        { "who": "sumi", "text": "The signal repeats: a direction. North, and down." },
+        { "who": "brack", "text": "There's a maze of tunnels north of the wreck. Get some sleep." }
+      ],
+      "opponent": { "name": "The Narcosis Hum", "portrait": "camp-hum.webp", "emoji": "🔔", "cast": null,
+        "personality": "A soft ringing in your ears that makes every diver want to speak at once.",
+        "aiLevel": "normal", "aiStyle": "narcosis" },
+      "setup": { "mode": "local", "kind": "log", "mission": 11, "np": 4, "mates": "normal", "timer": false },
+      "twist": null,
+      "goal": { "type": "mission", "value": 11, "text": "Complete dive 11, Whispers, with the shared ping tokens." },
+      "hints": false,
+      "stars": [
+        { "text": "Complete dive 11", "test": { "k": "won" } },
+        { "text": "Complete it within 3 attempts", "test": { "k": "attempts", "op": "<=", "v": 3 } },
+        { "text": "Take at least 2 jobs yourself", "test": { "k": "myJobs", "op": ">=", "v": 2 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "np": 3, "mates": "hard" }, "maxStars": 2, "text": "A team of three with your strongest teammates." },
+      "unlock": [ { "type": "title", "id": "listener", "text": "Title: The Listener" } ]
+    },
+    {
+      "id": "c7", "act": 2, "title": "The Thousand Turns",
+      "boss": true,
+      "intro": [
+        { "who": "brack", "text": "The tunnels fork again and again, and the radio drops out every few metres." },
+        { "who": "maze", "text": "Every turn of mine looks like the last. Which signal will you trust today?" },
+        { "who": "nerea", "text": "Unknown waters: a drawn card picks the signalling rule. And nobody may win two more 1s than another." },
+        { "who": "brack", "text": "Boss rule: no distress flare. If you light it, we pull you out." }
+      ],
+      "outro": [
+        { "who": "bram", "text": "Out the far side. The sea floor there is flat. Too flat. Like stone slabs." },
+        { "who": "brack", "text": "Slabs laid by hand. That's a road, divers." }
+      ],
+      "opponent": { "name": "The Thousand Turns", "portrait": "camp-maze.webp", "emoji": "🪨", "cast": "maze",
+        "personality": "A playful, endless maze. It loves a diver who guesses, and hates one who counts.",
+        "aiLevel": "normal", "aiStyle": "maze",
+        "taunt": "Left, right, left again. Back to the start with you.",
+        "praise": "You counted every turn. I have nothing left to hide behind." },
+      "setup": { "mode": "local", "kind": "log", "mission": 20, "np": 4, "mates": "normal", "timer": false },
+      "twist": { "id": "no-flare", "param": null, "text": "Boss rule: the dive only counts if the team never lights the distress flare." },
+      "goal": { "type": "mission", "value": 20, "text": "Complete dive 20, The Labyrinth, without the distress flare." },
+      "hints": false,
+      "stars": [
+        { "text": "Complete dive 20 without the flare", "test": { "k": "won" } },
+        { "text": "Complete it within 4 attempts", "test": { "k": "attempts", "op": "<=", "v": 4 } },
+        { "text": "Use your ping at least once", "test": { "k": "pings", "op": ">=", "v": 1 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "np": 3, "mates": "hard" }, "maxStars": 2, "text": "The flare is allowed again and your strongest teammates dive with you, three of you." },
+      "unlock": [
+        { "type": "portrait", "id": "maze", "text": "The Thousand Turns' portrait" },
+        { "type": "table", "id": "tunnel-glow", "text": "Tunnel-glow table" },
+        { "type": "act", "id": "3", "text": "Act 3: The Drowned Road" }
+      ]
+    },
+    {
+      "id": "c8", "act": 3, "title": "The Sunken Archive",
+      "boss": false,
+      "intro": [
+        { "who": "brack", "text": "At the start of the road: rooms full of stone shelves. Nobody we know built them." },
+        { "who": "nerea", "text": "Eleven points of jobs and a random signalling rule. No special limits, though." },
+        { "who": "dag", "text": "I've been practising. I won't let you down this time." }
+      ],
+      "outro": [
+        { "who": "dag", "text": "Told you! And look: the shelves all point down the road." }
+      ],
+      "opponent": { "name": "The Silent Shelves", "portrait": "camp-shelves.webp", "emoji": "📚", "cast": null,
+        "personality": "Rows and rows of carved records. Too much to read, too little time.",
+        "aiLevel": "hard", "aiStyle": "archive" },
+      "setup": { "mode": "local", "kind": "log", "mission": 22, "np": 4, "mates": "normal", "timer": false },
+      "twist": null,
+      "goal": { "type": "mission", "value": 22, "text": "Complete dive 22, The Sunken Archive: every job done." },
+      "hints": false,
+      "stars": [
+        { "text": "Complete dive 22", "test": { "k": "won" } },
+        { "text": "Complete it within 3 attempts", "test": { "k": "attempts", "op": "<=", "v": 3 } },
+        { "text": "Complete it without the distress flare", "test": { "k": "flare", "op": "<=", "v": 0 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "np": 3, "mates": "hard" }, "maxStars": 2, "text": "A team of three with your strongest teammates." },
+      "unlock": [ { "type": "portrait", "id": "echo", "text": "Echo's portrait" } ]
+    },
+    {
+      "id": "c9", "act": 3, "title": "The Paved Road",
+      "boss": false,
+      "intro": [
+        { "who": "brack", "text": "The road runs on into the dark. Fourteen points of jobs, the biggest load yet." },
+        { "who": "nerea", "text": "Open briefing: talk freely about who takes which job. Never about cards." },
+        { "who": "bram", "text": "Split the load by what each of us is good at. Then trust each other." }
+      ],
+      "outro": [
+        { "who": "nerea", "text": "The road ends at a corridor. No light gets in. None comes out." },
+        { "who": "brack", "text": "One last dive. Whatever is in there, you go in together." }
+      ],
+      "opponent": { "name": "The Long Road", "portrait": "camp-road.webp", "emoji": "🛤️", "cast": null,
+        "personality": "Straight, endless and heavy. It tires out a team that carries too much.",
+        "aiLevel": "hard", "aiStyle": "endurance" },
+      "setup": { "mode": "local", "kind": "log", "mission": 28, "np": 4, "mates": "normal", "timer": false },
+      "twist": null,
+      "goal": { "type": "mission", "value": 28, "text": "Complete dive 28, The Paved Road: every job done." },
+      "hints": false,
+      "stars": [
+        { "text": "Complete dive 28", "test": { "k": "won" } },
+        { "text": "Complete it within 4 attempts", "test": { "k": "attempts", "op": "<=", "v": 4 } },
+        { "text": "Take at least 2 jobs yourself", "test": { "k": "myJobs", "op": ">=", "v": 2 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "mission": 24, "mates": "hard" }, "maxStars": 2, "text": "Your team dives the shorter road (dive 24, twelve points) with your strongest teammates." },
+      "unlock": [ { "type": "title", "id": "roadwalker", "text": "Title: Roadwalker" } ]
+    },
+    {
+      "id": "c10", "act": 3, "title": "The Lampless One",
+      "boss": true,
+      "intro": [
+        { "who": "lampless", "text": "Lanterns. So many little lanterns. Down here they all go out." },
+        { "who": "brack", "text": "Four fixed jobs: no tricks; exactly three in a row; two in a row; the first and the last trick." },
+        { "who": "brack", "text": "Boss rule: air for only 4 attempts. Finish within 4 or we haul you up." },
+        { "who": "nerea", "text": "Together, then. Lanterns high." }
+      ],
+      "outro": [
+        { "who": "brack", "text": "The corridor is lit end to end. You charted the drowned road, all of it." },
+        { "who": "sumi", "text": "And something down there finally saw a light it didn't put out." },
+        { "who": "brack", "text": "The Deep Dive is open, divers. As deep as you dare." }
+      ],
+      "opponent": { "name": "The Lampless One", "portrait": "camp-lampless.webp", "emoji": "🌑", "cast": "lampless",
+        "personality": "Old, cold and curious. It does not hate the divers; it simply eats light.",
+        "aiLevel": "hard", "aiStyle": "darkness",
+        "taunt": "Out goes the light. The corridor keeps you, as it kept the others.",
+        "praise": "Four jobs, four lights, and none went out. Walk on, lightbearers." },
+      "setup": { "mode": "local", "kind": "log", "mission": 32, "np": 4, "mates": "normal", "timer": false },
+      "twist": { "id": "air-limit", "param": 4, "text": "Boss rule: the dive only counts if the team completes it within 4 attempts." },
+      "goal": { "type": "mission", "value": 32, "text": "Complete dive 32, The Last Corridor, within 4 attempts." },
+      "hints": false,
+      "stars": [
+        { "text": "Complete dive 32 within 4 attempts", "test": { "k": "won" } },
+        { "text": "Complete it within 2 attempts", "test": { "k": "attempts", "op": "<=", "v": 2 } },
+        { "text": "Complete it without the distress flare", "test": { "k": "flare", "op": "<=", "v": 0 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "np": 3, "mates": "hard" }, "maxStars": 2, "text": "No attempt limit and a team of three with your strongest teammates." },
+      "unlock": [
+        { "type": "portrait", "id": "lampless", "text": "The Lampless One's portrait" },
+        { "type": "cardback", "id": "last-light", "text": "Last-light card back" },
+        { "type": "title", "id": "lightbearer", "text": "Title: Lightbearer" }
+      ]
+    }
+  ]
+}

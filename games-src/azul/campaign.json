@@ -1,0 +1,321 @@
+{
+  "game": "sunglaze",
+  "title": "The Sun Palace Mosaics",
+  "version": 1,
+  "cast": {
+    "guide":   { "name": "Mother Ochre", "portrait": "camp-ochre.webp", "emoji": "🧓", "color": "#c27a3a" },
+    "tamsin":  { "name": "Tamsin Reed", "portrait": "camp-tamsin.webp", "emoji": "🧑‍🎨", "color": "#6f8f2e" },
+    "bram":    { "name": "Bram Kettle", "portrait": "camp-bram.webp", "emoji": "🔥", "color": "#b5451b" },
+    "saffra":  { "name": "Saffra Vell, Keeper of the Courtyard", "portrait": "camp-saffra.webp", "emoji": "☀️", "color": "#f0b429" },
+    "cobb":    { "name": "Cobb the Sorter", "portrait": "camp-cobb.webp", "emoji": "📦", "color": "#8a6d4b" },
+    "iris":    { "name": "Iris Prismwright", "portrait": "camp-iris.webp", "emoji": "💎", "color": "#7b5bc4" },
+    "garnet":  { "name": "Master Garnet Hale", "portrait": "camp-garnet.webp", "emoji": "🏺", "color": "#c2362f" },
+    "nell":    { "name": "Nell Frost", "portrait": "camp-nell.webp", "emoji": "❄️", "color": "#1d6f84" },
+    "twins":   { "name": "The Lumen Twins", "portrait": "camp-twins.webp", "emoji": "👯", "color": "#3d5bb8" },
+    "vesper":  { "name": "Vesper Ash", "portrait": "camp-vesper.webp", "emoji": "🌒", "color": "#5a5f6b" },
+    "umbra":   { "name": "Lady Umbra of the Black Kiln", "portrait": "camp-umbra.webp", "emoji": "🖤", "color": "#23252b" }
+  },
+  "acts": [
+    { "act": 1, "title": "Wet Clay", "blurb": "An apprentice at the town atelier. Learn the kilns, the racks and the mosaic." },
+    { "act": 2, "title": "The Guild Kilns", "blurb": "Glaziers of the guild test you: columns, prism tiles and a master's head start." },
+    { "act": 3, "title": "The Sun Palace", "blurb": "The palace mosaic goes to the best glazier alive. The Black Kiln wants it too." }
+  ],
+  "twists": [
+    { "id": "boss-sun", "where": "setup", "how": "After newGame(), set G.first and G.cur to the boss seat so the boss holds the Sun token and makes the first take of round 1." },
+    { "id": "boss-head-start", "where": "setup", "how": "After newGame(), set the boss seat's score to param (P(boss).score = param) before the first take; the param is shown on the boss card." },
+    { "id": "boss-glazed-start", "where": "setup", "how": "After newGame(), for rows 1..param pull one Cobalt tile out of G.bag and set it on the boss mosaic at wall[r][WALLCOL(0,r)] (the Cobalt diagonal, legal on both mosaics)." },
+    { "id": "boss-column-bonus", "where": "scoring", "how": "In finish(), right after endBonus(), add param extra points to the boss for each complete mosaic column, logged as its own 'Boss rule' line." },
+    { "id": "boss-deep-sight", "where": "ai", "how": "While the chapter runs, set LVL.hard.roll = param and LVL.hard.K = 14 so the boss rolls out more futures per take, and restore {K:10, roll:2} on exit." }
+  ],
+  "chapters": [
+    {
+      "id": "c1", "act": 1, "title": "The First Kiln",
+      "boss": false,
+      "intro": [
+        { "who": "guide", "text": "Welcome to the atelier, apprentice. Five kilns, five glazes, one mosaic each." },
+        { "who": "guide", "text": "On your turn, take every tile of ONE glaze from one kiln. The rest slides to the courtyard." },
+        { "who": "tamsin", "text": "I'm new too! Let's just fill some racks and see what happens." }
+      ],
+      "outro": [
+        { "who": "guide", "text": "Every full rack set one tile on your mosaic. That is the whole heartbeat of the craft." }
+      ],
+      "opponent": { "name": "Tamsin Reed", "portrait": "camp-tamsin.webp", "emoji": "🧑‍🎨", "cast": "tamsin",
+        "personality": "Cheerful fellow apprentice who grabs the biggest pile she sees and often slips.",
+        "aiLevel": "easy", "aiStyle": "greedy" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": true,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 15 or more", "test": { "k": "score", "op": ">=", "v": 15 } },
+        { "text": "Lose 6 or fewer points to breakage", "test": { "k": "breakage", "op": "<=", "v": 6 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Tamsin slows down; the coach suggests every take." },
+      "unlock": [ { "type": "portrait", "id": "tamsin", "text": "Tamsin's portrait" } ]
+    },
+    {
+      "id": "c2", "act": 1, "title": "Side by Side",
+      "boss": false,
+      "intro": [
+        { "who": "guide", "text": "A lone tile on the mosaic scores 1. A tile touching others scores the whole line it joins." },
+        { "who": "guide", "text": "Build your tiles next to each other, in rows and down columns." },
+        { "who": "bram", "text": "I stoke the kilns all day. Scoring? I just set tiles wherever they land." }
+      ],
+      "outro": [
+        { "who": "guide", "text": "See how the points grew as your tiles joined up? Neighbours pay." }
+      ],
+      "opponent": { "name": "Bram Kettle", "portrait": "camp-bram.webp", "emoji": "🔥", "cast": "bram",
+        "personality": "Big-handed kiln stoker; takes the largest pile and ignores where it goes.",
+        "aiLevel": "easy", "aiStyle": "greedy" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "score", "value": 20, "text": "Win with at least 20 points." },
+      "hints": true,
+      "stars": [
+        { "text": "Win with at least 20 points", "test": { "k": "score", "op": ">=", "v": 20 } },
+        { "text": "Score 30 or more", "test": { "k": "score", "op": ">=", "v": 30 } },
+        { "text": "Win by 8 or more", "test": { "k": "margin", "op": ">=", "v": 8 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Bram plays gently and the coach points out the best space." },
+      "unlock": [ { "type": "portrait", "id": "bram", "text": "Bram's portrait" } ]
+    },
+    {
+      "id": "c3", "act": 1, "title": "The Courtyard Keeper",
+      "boss": true,
+      "intro": [
+        { "who": "guide", "text": "Tiles that do not fit your racks fall to the breakage line, and each one costs points." },
+        { "who": "saffra", "text": "The Sun token is mine, child. I start every round, and you clean up my leftovers." },
+        { "who": "guide", "text": "Take only what fits. A small take is often better than a big spill." }
+      ],
+      "outro": [
+        { "who": "saffra", "text": "Hm. You waste nothing. The guild will want to see you." },
+        { "who": "guide", "text": "Pack your brushes. The guild kilns are next." }
+      ],
+      "opponent": { "name": "Saffra Vell", "portrait": "camp-saffra.webp", "emoji": "☀️", "cast": "saffra",
+        "personality": "Proud keeper of the courtyard; loves the Sun token and the first pick.",
+        "aiLevel": "easy", "aiStyle": "greedy",
+        "taunt": "The courtyard always favours the one who holds the sun.",
+        "praise": "Fine. Keep the courtyard tidy for me, glazier." },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": { "id": "boss-sun", "param": null, "text": "Boss rule: Saffra holds the Sun token and makes the first take of round 1." },
+      "goal": { "type": "custom", "value": 8, "text": "Win, losing no more than 8 points to breakage." },
+      "hints": true,
+      "stars": [
+        { "text": "Win with 8 or fewer breakage points", "test": { "k": "breakage", "op": "<=", "v": 8 } },
+        { "text": "Score 25 or more", "test": { "k": "score", "op": ">=", "v": 25 } },
+        { "text": "Lose 3 or fewer points to breakage", "test": { "k": "breakage", "op": "<=", "v": 3 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "The boss rule is off: the Sun token starts at random." },
+      "unlock": [
+        { "type": "portrait", "id": "saffra", "text": "Saffra's portrait" },
+        { "type": "act", "id": "2", "text": "Act 2: The Guild Kilns" }
+      ]
+    },
+    {
+      "id": "c4", "act": 2, "title": "Columns of the Guild",
+      "boss": false,
+      "intro": [
+        { "who": "cobb", "text": "Guild rules, apprentice: a full column at the end is worth 7. A row only 2." },
+        { "who": "guide", "text": "The game ends when someone finishes a row. Build down, not across, if you can." },
+        { "who": "cobb", "text": "I sort tiles all day. I also keep an eye on what YOU need." }
+      ],
+      "outro": [
+        { "who": "cobb", "text": "Seven for a column. You were listening." }
+      ],
+      "opponent": { "name": "Cobb the Sorter", "portrait": "camp-cobb.webp", "emoji": "📦", "cast": "cobb",
+        "personality": "Careful guild sorter; weighs his gain against what he leaves you.",
+        "aiLevel": "normal", "aiStyle": "denying" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Complete at least 1 mosaic column", "test": { "k": "cols", "op": ">=", "v": 1 } },
+        { "text": "Score 35 or more", "test": { "k": "score", "op": ">=", "v": 35 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Cobb stops watching your racks." },
+      "unlock": [
+        { "type": "portrait", "id": "cobb", "text": "Cobb's portrait" },
+        { "type": "cardback", "id": "guild-seal", "text": "Guild seal tile backs" }
+      ]
+    },
+    {
+      "id": "c5", "act": 2, "title": "The Prismwright",
+      "boss": false,
+      "intro": [
+        { "who": "iris", "text": "Prism tiles are wild: they join any glaze on a rack. I already set one on my mosaic." },
+        { "who": "guide", "text": "Take prisms with a glaze to finish a rack early. But a prism never counts for a full glaze." }
+      ],
+      "outro": [
+        { "who": "iris", "text": "You bend the light better than I thought. Take this prism as a keepsake." }
+      ],
+      "opponent": { "name": "Iris Prismwright", "portrait": "camp-iris.webp", "emoji": "💎", "cast": "iris",
+        "personality": "Dreamy glass artist; hoards prisms and finishes racks in one go.",
+        "aiLevel": "normal", "aiStyle": "denying" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": true } },
+      "twist": { "id": "boss-glazed-start", "param": 1, "text": "Rival rule: Iris starts with one Cobalt tile already set in mosaic row 1." },
+      "goal": { "type": "score", "value": 30, "text": "Win with at least 30 points." },
+      "hints": false,
+      "stars": [
+        { "text": "Win with at least 30 points", "test": { "k": "score", "op": ">=", "v": 30 } },
+        { "text": "Win by 5 or more", "test": { "k": "margin", "op": ">=", "v": 5 } },
+        { "text": "Lose 4 or fewer points to breakage", "test": { "k": "breakage", "op": "<=", "v": 4 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Iris plays gently and starts with an empty mosaic." },
+      "unlock": [
+        { "type": "portrait", "id": "iris", "text": "Iris's portrait" },
+        { "type": "table", "id": "prism-light", "text": "Prism-light table" }
+      ]
+    },
+    {
+      "id": "c6", "act": 2, "title": "The Master's Head Start",
+      "boss": true,
+      "intro": [
+        { "who": "garnet", "text": "I have glazed for forty summers. I will give you a contest, not a lesson." },
+        { "who": "garnet", "text": "And I begin with points in hand. The guild calls it respect." },
+        { "who": "guide", "text": "Then out-build him. Columns and full glazes pay at the end; he can't hold them all." }
+      ],
+      "outro": [
+        { "who": "garnet", "text": "Forty summers, and an apprentice beats me fairly. The palace needs you." },
+        { "who": "guide", "text": "A letter came, sealed in black. Someone else wants the Sun Palace mosaic." }
+      ],
+      "opponent": { "name": "Master Garnet Hale", "portrait": "camp-garnet.webp", "emoji": "🏺", "cast": "garnet",
+        "personality": "Stern guild master; never wastes a tile and starves your best racks.",
+        "aiLevel": "normal", "aiStyle": "denying",
+        "taunt": "Respect the head start, apprentice. Forty summers are hard to catch.",
+        "praise": "You caught me. Take my seal to the palace gates." },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": { "id": "boss-head-start", "param": 6, "text": "Boss rule: Master Garnet starts the game with 6 points." },
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 45 or more", "test": { "k": "score", "op": ">=", "v": 45 } },
+        { "text": "Earn a full glaze bonus (all 5 of one colour)", "test": { "k": "colours", "op": ">=", "v": 1 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Garnet plays gently and starts at 0 points." },
+      "unlock": [
+        { "type": "portrait", "id": "garnet", "text": "Master Garnet's portrait" },
+        { "type": "title", "id": "journeyman", "text": "Title: Guild Glazier" },
+        { "type": "act", "id": "3", "text": "Act 3: The Sun Palace" }
+      ]
+    },
+    {
+      "id": "c7", "act": 3, "title": "Frost at the Gate",
+      "boss": false,
+      "intro": [
+        { "who": "nell", "text": "The palace gate is mine to guard. Only glaziers who think ahead get through." },
+        { "who": "guide", "text": "Nell reads several turns ahead. Watch what your take leaves in the courtyard." }
+      ],
+      "outro": [
+        { "who": "nell", "text": "Clean work. The gate is open; mind the halls." }
+      ],
+      "opponent": { "name": "Nell Frost", "portrait": "camp-nell.webp", "emoji": "❄️", "cast": "nell",
+        "personality": "Cool, patient gatekeeper; plays out the rest of the round before every take.",
+        "aiLevel": "hard", "aiStyle": "lookahead" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 50 or more", "test": { "k": "score", "op": ">=", "v": 50 } },
+        { "text": "Win by 5 or more", "test": { "k": "margin", "op": ">=", "v": 5 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Nell looks only one take ahead." },
+      "unlock": [ { "type": "portrait", "id": "nell", "text": "Nell's portrait" } ]
+    },
+    {
+      "id": "c8", "act": 3, "title": "Hall of Two Lights",
+      "boss": false,
+      "intro": [
+        { "who": "twins", "text": "Two of us, one of you. Three mosaics, seven kilns, and the courtyard fills fast." },
+        { "who": "guide", "text": "With three at the table, the tile you skip may never come back. Plan for it." }
+      ],
+      "outro": [
+        { "who": "twins", "text": "Both of us beaten! We'll tell the halls about you." }
+      ],
+      "opponent": { "name": "The Lumen Twins", "portrait": "camp-twins.webp", "emoji": "👯", "cast": "twins",
+        "personality": "Two playful lamp-lighters who each chase their own mosaic, hard and fast.",
+        "aiLevel": "hard", "aiStyle": "lookahead" },
+      "setup": { "np": 3, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the 3-player game (beat both twins)." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 45 or more", "test": { "k": "score", "op": ">=", "v": 45 } },
+        { "text": "Complete 2 or more mosaic columns", "test": { "k": "cols", "op": ">=", "v": 2 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "np": 2 }, "maxStars": 2, "text": "Only one twin plays, at normal strength." },
+      "unlock": [
+        { "type": "portrait", "id": "twins", "text": "The Lumen Twins' portrait" },
+        { "type": "cardback", "id": "lamplight", "text": "Lamplight tile backs" }
+      ]
+    },
+    {
+      "id": "c9", "act": 3, "title": "The Unmarked Wall",
+      "boss": false,
+      "intro": [
+        { "who": "vesper", "text": "This wall has no painted colours. You choose each space, so no glaze repeats in a row or column." },
+        { "who": "vesper", "text": "And my columns are blessed by the Black Kiln. Each one pays me extra." },
+        { "who": "guide", "text": "Vesper serves Lady Umbra. Finish the game before his columns fill." }
+      ],
+      "outro": [
+        { "who": "vesper", "text": "My lady will not be pleased. She waits in the throne hall." }
+      ],
+      "opponent": { "name": "Vesper Ash", "portrait": "camp-vesper.webp", "emoji": "🌒", "cast": "vesper",
+        "personality": "Quiet, precise servant of the Black Kiln; builds columns and nothing else.",
+        "aiLevel": "hard", "aiStyle": "lookahead" },
+      "setup": { "np": 2, "ex": { "gray": true, "prism": false } },
+      "twist": { "id": "boss-column-bonus", "param": 3, "text": "Rival rule: Vesper scores 3 extra points for each complete column at the end." },
+      "goal": { "type": "win", "value": null, "text": "Win on the unmarked mosaic." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Win in 6 rounds or fewer", "test": { "k": "rounds", "op": "<=", "v": 6 } },
+        { "text": "Score 45 or more", "test": { "k": "score", "op": ">=", "v": 45 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Vesper plays at normal strength with no column blessing." },
+      "unlock": [
+        { "type": "portrait", "id": "vesper", "text": "Vesper's portrait" },
+        { "type": "table", "id": "unmarked-slate", "text": "Unmarked slate table" }
+      ]
+    },
+    {
+      "id": "c10", "act": 3, "title": "The Black Kiln",
+      "boss": true,
+      "intro": [
+        { "who": "umbra", "text": "The Sun Palace mosaic will be glazed in black. My kiln sees every future." },
+        { "who": "umbra", "text": "I play each take out to the end of the round, again and again. You only guess." },
+        { "who": "guide", "text": "She weighs every pile. Give her none worth taking, and keep your breakage clean." }
+      ],
+      "outro": [
+        { "who": "umbra", "text": "The sun... in my own kiln. Very well. Glaze your palace." },
+        { "who": "guide", "text": "The mosaic is yours, master glazier. The whole town will see it at noon." }
+      ],
+      "opponent": { "name": "Lady Umbra", "portrait": "camp-umbra.webp", "emoji": "🖤", "cast": "umbra",
+        "personality": "Cold mistress of the Black Kiln; deepest look-ahead, denies your best glaze.",
+        "aiLevel": "hard", "aiStyle": "lookahead",
+        "taunt": "Black glaze sets forever. Come back when you can see further.",
+        "praise": "You out-saw the Black Kiln. The palace is yours, Sun Glazier." },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": { "id": "boss-deep-sight", "param": 4, "text": "Boss rule: Lady Umbra studies twice as many futures before every take." },
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 60 or more", "test": { "k": "score", "op": ">=", "v": 60 } },
+        { "text": "Win by 10 or more", "test": { "k": "margin", "op": ">=", "v": 10 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Lady Umbra plays at normal strength and her deep sight is off." },
+      "unlock": [
+        { "type": "portrait", "id": "umbra", "text": "Lady Umbra's portrait" },
+        { "type": "title", "id": "sun-glazier", "text": "Title: Sun Glazier" },
+        { "type": "table", "id": "sun-palace", "text": "Sun Palace table" }
+      ]
+    }
+  ]
+}

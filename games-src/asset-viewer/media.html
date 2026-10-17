@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Generated media</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{background:#14161a;color:#ddd;font:14px system-ui;margin:20px}
+a{color:#5b8fd6}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(640px,1fr));gap:16px}
+.card{background:#1d2026;padding:10px;border-radius:6px}
+video{width:100%}audio{width:100%}
+video[src*="_alpha"]{background:repeating-conic-gradient(#555 0 25%,#888 0 50%) 0 0/24px 24px}
+table{border-collapse:collapse;width:100%;max-width:900px}
+td,th{padding:6px 10px;border-bottom:1px solid #2a2e36;text-align:left}
+</style></head><body>
+<h2>Generated video &amp; sound effects <small><a href="index.html">back</a></small></h2>
+<h3>ComfyUI workflows <small>(download, then drag onto the ComfyUI canvas)</small></h3>
+<ul id="wf"><li><a href="workflows/wan22_video_plus_sfx_with_sound.json" download>wan22_video_plus_sfx_with_sound</a></li><li><a href="workflows/wan22_text_to_video_720p.json" download>wan22_text_to_video_720p</a></li><li><a href="workflows/wan22_image_to_video.json" download>wan22_image_to_video</a></li><li><a href="workflows/stable_audio_sfx.json" download>stable_audio_sfx</a></li></ul>
+<h3>SFX: current (left) vs AI-generated (right)</h3>
+<table id="cmp"><tr><th>event</th><th>current (Kenney/CC0)</th><th>AI (Stable Audio Open)</th></tr></table>
+<h3>Other <select id="sort"><option value="new">Most recently updated</option><option value="old">Oldest first</option><option value="name">Name</option></select></h3>
+<div class="grid" id="g">loading...</div>
+<script>
+const player=(src,kind)=>{const p=document.createElement(kind==='video'?'video':'audio');
+  p.controls=true;p.loop=kind==='video';p.preload='none';p.src=src;return p};
+fetch('media/manifest.json',{cache:'no-store'}).then(r=>r.json()).then(m=>{
+  const g=document.getElementById('g'),t=document.getElementById('cmp'),sel=document.getElementById('sort');
+  const ts=i=>Date.parse(i.mtime)||0;
+  const draw=()=>{
+  g.textContent='';while(t.rows.length>1)t.deleteRow(1);
+  const k=sel.value,s=[...m].sort((a,b)=>k==='name'?a.name.localeCompare(b.name):k==='old'?ts(a)-ts(b):ts(b)-ts(a));
+  s.forEach(i=>{
+    const ai=i.name.split('/').pop().match(/^ai_(.+?)_\d+\.\w+$/);
+    if(ai){
+      const tr=t.insertRow();tr.insertCell().textContent=ai[1];
+      tr.insertCell().append(player('media/orig/'+encodeURIComponent(ai[1])+'.mp3','audio'));
+      tr.insertCell().append(player('media/'+i.name.split('/').map(encodeURIComponent).join('/'),'audio'));
+      return;
+    }
+    const c=document.createElement('div');c.className='card';
+    const d=document.createElement('div');d.textContent=i.name+(ts(i)?'  ·  '+new Date(ts(i)).toLocaleString():'');
+    c.append(d,player('media/'+i.name.split('/').map(encodeURIComponent).join('/'),i.kind));g.append(c);
+  });};
+  sel.onchange=draw;draw();
+}).catch(e=>{document.getElementById('g').textContent='manifest missing: '+e});
+</script></body></html>

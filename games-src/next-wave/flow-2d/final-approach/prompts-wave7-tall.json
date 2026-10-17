@@ -1,0 +1,57 @@
+{
+ "cards": {
+  "table-fog-phone": "a tall painted cockpit-window view tabletop: a runway approach in thick fog with soft glowing approach lights, calm empty space in the middle, no text, letters or numbers",
+  "table-snow-phone": "a tall painted cockpit-window view tabletop: a snowy mountain airfield approach with blowing snow and runway lights, calm empty space in the middle, no text, letters or numbers",
+  "table-sunset-phone": "a tall painted cockpit-window view tabletop: a sunset coastal approach with orange clouds and a glowing runway, calm empty space in the middle, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a cosy cockpit game, chunky soft shapes with a slightly wobbly dark navy outline, matte paper grain, rich but warm colours (teal panel, warm cream highlights, blue and orange crew colours), gentle rim light, soft drop shadow, crisp and readable at very small sizes, simple silhouettes, no text, no numbers",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "table-fog-phone": {
+   "element": "Painting: table-fog-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-fog-phone.png",
+   "target": "games/final-approach/media/table-fog-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "table-snow-phone": {
+   "element": "Painting: table-snow-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-snow-phone.png",
+   "target": "games/final-approach/media/table-snow-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "table-sunset-phone": {
+   "element": "Painting: table-sunset-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-sunset-phone.png",
+   "target": "games/final-approach/media/table-sunset-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

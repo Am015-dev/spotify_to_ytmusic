@@ -1,0 +1,28 @@
+{
+ "cards": {
+  "chest": "a wooden treasure chest with iron bands and a brass lock, a little gold spilling out, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted medieval storybook gouache illustration for a rowdy dungeon-door card game, warm torchlight, chunky readable shapes, slightly wobbly dark ink outline, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave C",
+ "meta": {
+  "chest": {
+   "element": "3D model: chest",
+   "why": "treasure pile is a flat picture today",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "chest.png",
+   "target": "games/doorkick-dungeon/models/chest.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  }
+ },
+ "targets": {
+  "chest": "games/doorkick-dungeon/models/chest.glb"
+ }
+}

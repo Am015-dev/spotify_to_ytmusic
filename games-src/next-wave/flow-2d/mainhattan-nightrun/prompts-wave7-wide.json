@@ -1,0 +1,41 @@
+{
+ "cards": {
+  "event-boss-warning": "a neon cyberpunk warning splash: a huge red-magenta hazard stripe frame around a dark city skyline with a looming silhouette, no text",
+  "event-level-clear": "a neon cyberpunk victory splash: a cyan and gold burst over a night skyline with falling sparks, no text"
+ },
+ "style": "Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "event-boss-warning": {
+   "element": "Painting: event-boss-warning",
+   "why": "boss intro",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-boss-warning.png",
+   "target": "games/mainhattan-nightrun/media/event-boss-warning.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "event-level-clear": {
+   "element": "Painting: event-level-clear",
+   "why": "level clear",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-level-clear.png",
+   "target": "games/mainhattan-nightrun/media/event-level-clear.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

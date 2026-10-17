@@ -1,0 +1,742 @@
+{
+ "note": "id (the card key k in cards.js) -> base file name in this folder. Painted with Google Flow (Nano Banana), prompts in game-assets/cards/doorkick/prompts.json; made by prep_doorkick_art.py.",
+ "items": {
+  "amazon": "amazon",
+  "antler": "antler",
+  "balloons": "balloons",
+  "barfabunny": "barfabunny",
+  "blazing": "blazing",
+  "borrow": "borrow",
+  "boulder": "boulder",
+  "boulderitem": "boulderitem",
+  "bucket": "bucket",
+  "buzzsaw": "buzzsaw",
+  "cizzy": "cizzy",
+  "cleric": "cleric",
+  "cloak": "cloak",
+  "courage": "courage",
+  "cudgel": "cudgel",
+  "dame": "dame",
+  "dart": "dart",
+  "double": "double",
+  "dread": "dread",
+  "duckbill": "duckbill",
+  "dwarf": "dwarf",
+  "elf": "elf",
+  "favor": "favor",
+  "ficus": "ficus",
+  "fishing": "fishing",
+  "fizz": "fizz",
+  "flipflops": "flipflops",
+  "frosty": "frosty",
+  "furious": "furious",
+  "gargantuan": "gargantuan",
+  "garlic": "garlic",
+  "genius": "genius",
+  "gnawers": "gnawers",
+  "gooey": "gooey",
+  "grater": "grater",
+  "halberd": "halberd",
+  "halfling": "halfling",
+  "hatmuncher": "hatmuncher",
+  "headband": "headband",
+  "heist": "heist",
+  "hellmouse": "hellmouse",
+  "hexbig": "hexbig",
+  "hexcls": "hexcls",
+  "hexcrisis": "hexcrisis",
+  "hexgoose": "hexgoose",
+  "hexgrab": "hexgrab",
+  "hexgust": "hexgust",
+  "hexhen": "hexhen",
+  "hexid": "hexid",
+  "hexlvl": "hexlvl",
+  "hexmirror": "hexmirror",
+  "hexrace": "hexrace",
+  "hexrotten": "hexrotten",
+  "hexrust": "hexrust",
+  "hexsex": "hexsex",
+  "hexsmall": "hexsmall",
+  "hexsock": "hexsock",
+  "hextax": "hextax",
+  "horde": "horde",
+  "hotsauce": "hotsauce",
+  "hound": "hound",
+  "hugjuice": "hugjuice",
+  "imp": "imp",
+  "inferno": "inferno",
+  "jerkin": "jerkin",
+  "kneecaps": "kneecaps",
+  "kneepads": "kneepads",
+  "l1": "l1",
+  "l2": "l2",
+  "l3": "l3",
+  "l4": "l4",
+  "l5": "l5",
+  "l6": "l6",
+  "l7": "l7",
+  "l8": "l8",
+  "l9": "l9",
+  "lantern": "lantern",
+  "leech": "leech",
+  "leggings": "leggings",
+  "lizards": "lizards",
+  "longbow": "longbow",
+  "loophole": "loophole",
+  "mace": "mace",
+  "mirrors": "mirrors",
+  "mites": "mites",
+  "mixed": "mixed",
+  "moonsilver": "moonsilver",
+  "nerd": "nerd",
+  "notmine": "notmine",
+  "parrot": "parrot",
+  "paste": "paste",
+  "pergola": "pergola",
+  "pharaoh": "pharaoh",
+  "pile": "pile",
+  "pitchman": "pitchman",
+  "pixie": "pixie",
+  "plusone": "plusone",
+  "pole": "pole",
+  "pony": "pony",
+  "porter": "porter",
+  "poser": "poser",
+  "primordial": "primordial",
+  "pyramid": "pyramid",
+  "rapier": "rapier",
+  "rascal": "rascal",
+  "rattle": "rattle",
+  "rod": "rod",
+  "rooster": "rooster",
+  "sandwich": "sandwich",
+  "shinhammer": "shinhammer",
+  "shiv": "shiv",
+  "sirens": "sirens",
+  "skygrif": "skygrif",
+  "slobber": "slobber",
+  "slugs": "slugs",
+  "slurper": "slurper",
+  "snackstick": "snackstick",
+  "sneakers": "sneakers",
+  "sniffer": "sniffer",
+  "snooze": "snooze",
+  "sour": "sour",
+  "sousaphone": "sousaphone",
+  "stepstool": "stepstool",
+  "stompy": "stompy",
+  "stubby": "stubby",
+  "swash": "swash",
+  "tapsword": "tapsword",
+  "tentacles": "tentacles",
+  "thief": "thief",
+  "tiny": "tiny",
+  "title": "title",
+  "toads": "toads",
+  "troll": "troll",
+  "twin": "twin",
+  "twins": "twins",
+  "undoring": "undoring",
+  "uninvited": "uninvited",
+  "vanish": "vanish",
+  "wall": "wall",
+  "wallshield": "wallshield",
+  "warrior": "warrior",
+  "water": "water",
+  "weighted": "weighted",
+  "wildfire": "wildfire",
+  "wizard": "wizard",
+  "wyrm": "wyrm",
+  "zaphat": "zaphat"
+ },
+ "size": {
+  "amazon": [
+   256,
+   256
+  ],
+  "antler": [
+   192,
+   192
+  ],
+  "balloons": [
+   192,
+   192
+  ],
+  "barfabunny": [
+   256,
+   256
+  ],
+  "blazing": [
+   192,
+   192
+  ],
+  "borrow": [
+   192,
+   192
+  ],
+  "boulder": [
+   256,
+   256
+  ],
+  "boulderitem": [
+   192,
+   192
+  ],
+  "bucket": [
+   192,
+   192
+  ],
+  "buzzsaw": [
+   192,
+   192
+  ],
+  "cizzy": [
+   192,
+   192
+  ],
+  "cleric": [
+   256,
+   256
+  ],
+  "cloak": [
+   192,
+   192
+  ],
+  "courage": [
+   192,
+   192
+  ],
+  "cudgel": [
+   192,
+   192
+  ],
+  "dame": [
+   192,
+   192
+  ],
+  "dart": [
+   192,
+   192
+  ],
+  "double": [
+   192,
+   192
+  ],
+  "dread": [
+   256,
+   256
+  ],
+  "duckbill": [
+   256,
+   256
+  ],
+  "dwarf": [
+   256,
+   256
+  ],
+  "elf": [
+   256,
+   256
+  ],
+  "favor": [
+   192,
+   192
+  ],
+  "ficus": [
+   256,
+   256
+  ],
+  "fishing": [
+   192,
+   192
+  ],
+  "fizz": [
+   192,
+   192
+  ],
+  "flipflops": [
+   192,
+   192
+  ],
+  "frosty": [
+   192,
+   192
+  ],
+  "furious": [
+   192,
+   192
+  ],
+  "gargantuan": [
+   192,
+   192
+  ],
+  "garlic": [
+   192,
+   192
+  ],
+  "genius": [
+   192,
+   192
+  ],
+  "gnawers": [
+   256,
+   256
+  ],
+  "gooey": [
+   192,
+   192
+  ],
+  "grater": [
+   192,
+   192
+  ],
+  "halberd": [
+   192,
+   192
+  ],
+  "halfling": [
+   256,
+   256
+  ],
+  "hatmuncher": [
+   256,
+   256
+  ],
+  "headband": [
+   192,
+   192
+  ],
+  "heist": [
+   192,
+   192
+  ],
+  "hellmouse": [
+   256,
+   256
+  ],
+  "hexbig": [
+   192,
+   192
+  ],
+  "hexcls": [
+   192,
+   192
+  ],
+  "hexcrisis": [
+   192,
+   192
+  ],
+  "hexgoose": [
+   192,
+   192
+  ],
+  "hexgrab": [
+   192,
+   192
+  ],
+  "hexgust": [
+   192,
+   192
+  ],
+  "hexhen": [
+   192,
+   192
+  ],
+  "hexid": [
+   192,
+   192
+  ],
+  "hexlvl": [
+   192,
+   192
+  ],
+  "hexmirror": [
+   192,
+   192
+  ],
+  "hexrace": [
+   192,
+   192
+  ],
+  "hexrotten": [
+   192,
+   192
+  ],
+  "hexrust": [
+   192,
+   192
+  ],
+  "hexsex": [
+   192,
+   192
+  ],
+  "hexsmall": [
+   192,
+   192
+  ],
+  "hexsock": [
+   192,
+   192
+  ],
+  "hextax": [
+   192,
+   192
+  ],
+  "horde": [
+   256,
+   256
+  ],
+  "hotsauce": [
+   192,
+   192
+  ],
+  "hound": [
+   256,
+   256
+  ],
+  "hugjuice": [
+   192,
+   192
+  ],
+  "imp": [
+   256,
+   256
+  ],
+  "inferno": [
+   256,
+   256
+  ],
+  "jerkin": [
+   192,
+   192
+  ],
+  "kneecaps": [
+   192,
+   192
+  ],
+  "kneepads": [
+   192,
+   192
+  ],
+  "l1": [
+   192,
+   192
+  ],
+  "l2": [
+   192,
+   192
+  ],
+  "l3": [
+   192,
+   192
+  ],
+  "l4": [
+   192,
+   192
+  ],
+  "l5": [
+   192,
+   192
+  ],
+  "l6": [
+   192,
+   192
+  ],
+  "l7": [
+   192,
+   192
+  ],
+  "l8": [
+   192,
+   192
+  ],
+  "l9": [
+   192,
+   192
+  ],
+  "lantern": [
+   192,
+   192
+  ],
+  "leech": [
+   256,
+   256
+  ],
+  "leggings": [
+   192,
+   192
+  ],
+  "lizards": [
+   256,
+   256
+  ],
+  "longbow": [
+   192,
+   192
+  ],
+  "loophole": [
+   192,
+   192
+  ],
+  "mace": [
+   192,
+   192
+  ],
+  "mirrors": [
+   192,
+   192
+  ],
+  "mites": [
+   256,
+   256
+  ],
+  "mixed": [
+   192,
+   192
+  ],
+  "moonsilver": [
+   192,
+   192
+  ],
+  "nerd": [
+   256,
+   256
+  ],
+  "notmine": [
+   192,
+   192
+  ],
+  "parrot": [
+   192,
+   192
+  ],
+  "paste": [
+   192,
+   192
+  ],
+  "pergola": [
+   256,
+   256
+  ],
+  "pharaoh": [
+   256,
+   256
+  ],
+  "pile": [
+   192,
+   192
+  ],
+  "pitchman": [
+   256,
+   256
+  ],
+  "pixie": [
+   256,
+   256
+  ],
+  "plusone": [
+   192,
+   192
+  ],
+  "pole": [
+   192,
+   192
+  ],
+  "pony": [
+   256,
+   256
+  ],
+  "porter": [
+   192,
+   192
+  ],
+  "poser": [
+   256,
+   256
+  ],
+  "primordial": [
+   192,
+   192
+  ],
+  "pyramid": [
+   256,
+   256
+  ],
+  "rapier": [
+   192,
+   192
+  ],
+  "rascal": [
+   192,
+   192
+  ],
+  "rattle": [
+   256,
+   256
+  ],
+  "rod": [
+   192,
+   192
+  ],
+  "rooster": [
+   256,
+   256
+  ],
+  "sandwich": [
+   192,
+   192
+  ],
+  "shinhammer": [
+   192,
+   192
+  ],
+  "shiv": [
+   192,
+   192
+  ],
+  "sirens": [
+   256,
+   256
+  ],
+  "skygrif": [
+   256,
+   256
+  ],
+  "slobber": [
+   256,
+   256
+  ],
+  "slugs": [
+   256,
+   256
+  ],
+  "slurper": [
+   256,
+   256
+  ],
+  "snackstick": [
+   192,
+   192
+  ],
+  "sneakers": [
+   192,
+   192
+  ],
+  "sniffer": [
+   256,
+   256
+  ],
+  "snooze": [
+   192,
+   192
+  ],
+  "sour": [
+   192,
+   192
+  ],
+  "sousaphone": [
+   192,
+   192
+  ],
+  "stepstool": [
+   192,
+   192
+  ],
+  "stompy": [
+   192,
+   192
+  ],
+  "stubby": [
+   192,
+   192
+  ],
+  "swash": [
+   192,
+   192
+  ],
+  "tapsword": [
+   192,
+   192
+  ],
+  "tentacles": [
+   256,
+   256
+  ],
+  "thief": [
+   256,
+   256
+  ],
+  "tiny": [
+   192,
+   192
+  ],
+  "title": [
+   192,
+   192
+  ],
+  "toads": [
+   256,
+   256
+  ],
+  "troll": [
+   256,
+   256
+  ],
+  "twin": [
+   192,
+   192
+  ],
+  "twins": [
+   256,
+   256
+  ],
+  "undoring": [
+   192,
+   192
+  ],
+  "uninvited": [
+   192,
+   192
+  ],
+  "vanish": [
+   192,
+   192
+  ],
+  "wall": [
+   192,
+   192
+  ],
+  "wallshield": [
+   192,
+   192
+  ],
+  "warrior": [
+   256,
+   256
+  ],
+  "water": [
+   192,
+   192
+  ],
+  "weighted": [
+   192,
+   192
+  ],
+  "wildfire": [
+   192,
+   192
+  ],
+  "wizard": [
+   256,
+   256
+  ],
+  "wyrm": [
+   256,
+   256
+  ],
+  "zaphat": [
+   192,
+   192
+  ]
+ }
+}

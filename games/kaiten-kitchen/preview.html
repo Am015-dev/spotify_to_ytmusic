@@ -1,0 +1,990 @@
+<!doctype html><html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Kaiten Kitchen art kit demo</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0}
+:root{--ink:#4a2a22;--paper:#fbf0da;--hd:#4a2a22}
+html.night{--ink:#f6e6c4;--hd:#f6e6c4}
+body{font-family:'Nunito','Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif;color:var(--ink);min-height:100vh}
+header{padding:12px 16px 2px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}h1{margin:0;font-size:24px}
+button{font:inherit;font-weight:800;border:2px solid #4a2a22;background:#fbf0da;color:#4a2a22;border-radius:10px;padding:8px 14px;min-height:44px;cursor:pointer}
+h2{font-size:18px;margin:22px 16px 6px;padding-bottom:3px;border-bottom:2px solid currentColor;opacity:.95}
+p.n{margin:2px 16px 8px;font-size:14px;opacity:.9}
+.row{display:flex;flex-wrap:wrap;gap:10px;padding:0 16px;align-items:flex-end}
+.cell{display:flex;flex-direction:column;align-items:center;font-size:13px;gap:3px}
+.stage{position:relative;margin:6px 16px;border-radius:14px;overflow:hidden;background:#3a2c29}
+.beltrow{position:relative;height:150px;overflow:hidden;border-radius:12px;margin:8px 16px;background:#3a2c29}
+.beltrow .kk-belt{position:absolute;left:0;right:0;bottom:12px}
+.beltrow .riders{position:absolute;left:0;bottom:30px;display:flex;gap:18px;animation:ride 14s linear infinite;white-space:nowrap}
+@keyframes ride{from{transform:translateX(100vw)}to{transform:translateX(-90%)}}
+.seatbox{position:relative;width:min(100%,360px)}
+.seatbox .stack{position:absolute;left:0;right:0;top:6px;display:flex;justify-content:center}
+.seatbox .stack>*{margin:0 -14px}
+.seatwrap{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;padding:0 16px}
+.icons .cell{text-align:center}
+.mod{position:fixed;inset:0;background:#2a1c1088;display:none;align-items:center;justify-content:center;z-index:9}.mod.on{display:flex}
+.reveal{display:flex;gap:10px;padding:0 16px;flex-wrap:wrap}
+.reveal .h{position:relative}
+body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+</style></head><body>
+<header><h1>Kaiten Kitchen art kit</h1><button id="mood">Day / night</button><button id="rv">Reveal plates</button><span id="info" style="font-size:13px"></span></header>
+<div id="app"></div><div class="mod" id="mod"></div>
+<script>
+/* KKKit - Kaiten Kitchen art kit. "Conveyor-belt diner": gouache-painted plates, soft rim light, our own faces.
+   100% procedural SVG/CSS (no external images). Plain script, global KKKit. */
+(function (root) {
+'use strict';
+const INK = '#4a2a22';          // warm brown ink (never pure black)
+const CREAM = '#fbf0da', CREAM2 = '#f1dfbd', WOOD = '#a8693c', WOOD_D = '#6d3f22';
+const FONT = "'Nunito','Varela Round','Trebuchet MS','Segoe UI',system-ui,-apple-system,'DejaVu Sans',Verdana,sans-serif";
+const NS = 'http://www.w3.org/2000/svg';
+const f1 = n => Math.round(n * 10) / 10;
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+function hash(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { let s = hash(seed) || 1; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+function hex(c) { c = c.replace('#', ''); if (c.length === 3) c = c.split('').map(x => x + x).join(''); return [parseInt(c.slice(0, 2), 16), parseInt(c.slice(2, 4), 16), parseInt(c.slice(4, 6), 16)]; }
+function toHex(a) { return '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join(''); }
+function mix(a, b, t) { const A = hex(a), B = hex(b); return toHex(A.map((v, i) => v + (B[i] - v) * t)); }
+const lighten = (c, t) => mix(c, '#ffffff', t), darken = (c, t) => mix(c, '#2a120c', t);
+
+// ------------------------------------------------------------------ card types
+// c = plate colour (distinct hue per food type), rim = rim ornament, rule = badge icon name
+const TYPES = {
+  tempura:  { name: 'Crispy Prawn',   l: ['Crispy', 'Prawn'],   c: '#f08a2e', rule: 'pair',   ruleText: 'Pair of Crispy Prawns = 5 points', rim: 'dashes', group: 'tempura' },
+  sashimi:  { name: 'Fish Slice',     l: ['Fish', 'Slice'],     c: '#c93a8a', rule: 'set',    ruleText: 'Set of 3 Fish Slices = 10 points', rim: 'waves',  group: 'sashimi' },
+  dumpling: { name: 'Steam Bun',      l: ['Steam', 'Bun'],      c: '#4aaee6', rule: 'ladder', ruleText: '1 / 3 / 6 / 10 / 15 points for 1 to 5 buns', rim: 'dots', group: 'dumpling' },
+  roll1:    { name: 'Seaweed Roll',   l: ['Seaweed', 'Roll'],   c: '#22a699', rule: 'most',   ruleText: 'Most roll icons 6, second most 3', rim: 'stripes', group: 'roll', n: 1 },
+  roll2:    { name: 'Seaweed Roll',   l: ['Seaweed', 'Roll'],   c: '#22a699', rule: 'most',   ruleText: 'Most roll icons 6, second most 3', rim: 'stripes', group: 'roll', n: 2 },
+  roll3:    { name: 'Seaweed Roll',   l: ['Seaweed', 'Roll'],   c: '#22a699', rule: 'most',   ruleText: 'Most roll icons 6, second most 3', rim: 'stripes', group: 'roll', n: 3 },
+  salmon:   { name: 'Sunset Nigiri',  l: ['Sunset', 'Nigiri'],  c: '#e5472b', rule: 'v2',     ruleText: 'Worth 2 points (x3 on Fire Paste)', rim: 'scallops', group: 'nigiri', v: 2 },
+  squid:    { name: 'Moon Nigiri',    l: ['Moon', 'Nigiri'],    c: '#6657c9', rule: 'v3',     ruleText: 'Worth 3 points (x3 on Fire Paste)', rim: 'scallops', group: 'nigiri', v: 3 },
+  egg:      { name: 'Sun Nigiri',     l: ['Sun', 'Nigiri'],     c: '#f3c933', rule: 'v1',     ruleText: 'Worth 1 point (x3 on Fire Paste)', rim: 'scallops', group: 'nigiri', v: 1 },
+  wasabi:   { name: 'Fire Paste',     l: ['Fire', 'Paste'],     c: '#94c83d', rule: 'x3',     ruleText: 'Your next Nigiri is worth x3', rim: 'zigzag', group: 'wasabi' },
+  chop:     { name: 'Twin Sticks',    l: ['Twin', 'Sticks'],    c: '#9a5b3c', rule: 'swap',   ruleText: 'Later: take 2 cards, pass the sticks back', rim: 'dashes', group: 'chop' },
+  pudding:  { name: 'Custard Cup',    l: ['Custard', 'Cup'],    c: '#f4b6d2', rule: 'dessert',ruleText: 'End of game: most +6, fewest -6', rim: 'dots', group: 'pudding' }
+};
+const ORDER = ['tempura', 'sashimi', 'dumpling', 'roll1', 'roll2', 'roll3', 'salmon', 'squid', 'egg', 'wasabi', 'chop', 'pudding'];
+const PLAYERS = [
+  { name: 'Mina', c: '#e5553a', d: '#9c2f1c', t: '#fbd5c9' },
+  { name: 'Taro', c: '#2a97a0', d: '#17636a', t: '#c6ecee' },
+  { name: 'Odile', c: '#e0a31c', d: '#9a6a05', t: '#f9e6b0' },
+  { name: 'Kofi', c: '#7a5ac8', d: '#4a2f93', t: '#ddd2f5' },
+  { name: 'Pip', c: '#5aa83c', d: '#357a1f', t: '#d3ecc5' }
+];
+
+// ------------------------------------------------------------------ shared defs (gradients, filters, patterns)
+function defs() {
+  let s = '<defs>';
+  // universal soft light: top-left glow, bottom-right shade (objectBoundingBox, works on any fill)
+  s += '<linearGradient id="kk-lit" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".46"/><stop offset=".42" stop-color="#fff" stop-opacity="0"/><stop offset=".58" stop-color="#3b1408" stop-opacity="0"/><stop offset="1" stop-color="#3b1408" stop-opacity=".30"/></linearGradient>';
+  s += '<linearGradient id="kk-rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>';
+  s += '<radialGradient id="kk-well" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset=".6" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#3b1408" stop-opacity=".16"/></radialGradient>';
+  s += '<linearGradient id="kk-metal" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8d7a58"/><stop offset=".18" stop-color="#e9ddc0"/><stop offset=".4" stop-color="#f8f1de"/><stop offset=".7" stop-color="#bba67a"/><stop offset="1" stop-color="#7d6a49"/></linearGradient>';
+  s += '<linearGradient id="kk-beltg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5a4a45"/><stop offset=".12" stop-color="#3a2c29"/><stop offset=".88" stop-color="#2e2321"/><stop offset="1" stop-color="#1f1715"/></linearGradient>';
+  s += '<linearGradient id="kk-steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0e8d6"/><stop offset=".3" stop-color="#c9bda5"/><stop offset=".7" stop-color="#8e8269"/><stop offset="1" stop-color="#5c523f"/></linearGradient>';
+  s += '<radialGradient id="kk-glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6c8" stop-opacity=".95"/><stop offset="1" stop-color="#ffd25a" stop-opacity="0"/></radialGradient>';
+  // gouache filters: wobbly brush edge (+ grain on the big one)
+  s += '<filter id="kk-fx-full" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2.6" xChannelSelector="R" yChannelSelector="G" result="d"/><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="3" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 .30  0 0 0 0 .14  0 0 0 0 .08  .8 0 0 0 -.38" result="g2"/><feComposite in="g2" in2="d" operator="in" result="gc"/><feMerge><feMergeNode in="d"/><feMergeNode in="gc"/></feMerge></filter>';
+  s += '<filter id="kk-fx-lite" x="-6%" y="-6%" width="112%" height="112%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="1" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.7" xChannelSelector="R" yChannelSelector="G"/></filter>';
+  s += '<filter id="kk-soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.2"/></filter>';
+  s += '<filter id="kk-shadow" x="-20%" y="-20%" width="140%" height="150%"><feGaussianBlur stdDeviation="2.4"/></filter>';
+  // linen weave for placemats
+  s += '<pattern id="kk-weave" width="6" height="6" patternUnits="userSpaceOnUse"><path d="M0 1.5H6M0 4.5H6" stroke="#8a5a2c" stroke-opacity=".07" stroke-width="1"/><path d="M1.5 0V6M4.5 0V6" stroke="#8a5a2c" stroke-opacity=".06" stroke-width="1"/></pattern>';
+  s += '</defs>';
+  return s;
+}
+
+// ------------------------------------------------------------------ drawing helpers (plate space: centre 0,0)
+// painted path: base fill + ink outline, then soft light/shade overlay + rim light
+function P(d, fill, o) {
+  o = o || {};
+  const sw = o.sw != null ? o.sw : 1.5, st = o.stroke || INK;
+  const tr = o.tr ? ` transform="${o.tr}"` : '';
+  let s = `<path d="${d}" fill="${fill}"${sw ? ` stroke="${st}" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round"` : ''}${o.op != null ? ` opacity="${o.op}"` : ''}${tr}/>`;
+  if (!o.flat) s += `<path d="${d}" fill="url(#kk-lit)" stroke="url(#kk-rim)" stroke-width="${f1(Math.max(.8, sw * .6))}"${tr}/>`;
+  return s;
+}
+function E(cx, cy, rx, ry, fill, o) {
+  o = o || {}; const rot = o.rot ? ` transform="rotate(${o.rot} ${f1(cx)} ${f1(cy)})"` : '';
+  const sw = o.sw != null ? o.sw : 1.5;
+  let s = `<ellipse cx="${f1(cx)}" cy="${f1(cy)}" rx="${f1(rx)}" ry="${f1(ry)}" fill="${fill}"${sw ? ` stroke="${o.stroke || INK}" stroke-width="${sw}"` : ''}${o.op != null ? ` opacity="${o.op}"` : ''}${rot}/>`;
+  if (!o.flat) s += `<ellipse cx="${f1(cx)}" cy="${f1(cy)}" rx="${f1(rx)}" ry="${f1(ry)}" fill="url(#kk-lit)" stroke="url(#kk-rim)" stroke-width="${f1(Math.max(.8, sw * .6))}"${rot}/>`;
+  return s;
+}
+const L = (d, col, w, o) => `<path d="${d}" fill="none" stroke="${col || INK}" stroke-width="${w || 1.4}" stroke-linecap="round" stroke-linejoin="round"${o && o.op != null ? ` opacity="${o.op}"` : ''}${o && o.dash ? ` stroke-dasharray="${o.dash}"` : ''}/>`;
+const dot = (x, y, r, fill, op) => `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(r)}" fill="${fill}"${op != null ? ` opacity="${op}"` : ''}/>`;
+const star = (x, y, r, fill, rot) => { let d = ''; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4 + (rot || 0), rr = i % 2 ? r * .32 : r; d += (i ? 'L' : 'M') + f1(x + Math.sin(a) * rr) + ' ' + f1(y - Math.cos(a) * rr); } return `<path d="${d}Z" fill="${fill}"/>`; };
+// wobbly closed blob from points (smooth)
+function blobPath(pts) {
+  const n = pts.length, m = (a, b) => f1((a[0] + b[0]) / 2) + ' ' + f1((a[1] + b[1]) / 2);
+  let d = 'M' + m(pts[n - 1], pts[0]);
+  for (let i = 0; i < n; i++) d += `Q${f1(pts[i][0])} ${f1(pts[i][1])} ${m(pts[i], pts[(i + 1) % n])}`;
+  return d + 'Z';
+}
+function ringPts(cx, cy, rx, ry, n, jit, r, rot) { const p = []; for (let i = 0; i < n; i++) { const a = i / n * 6.2832 + (rot || 0), k = 1 + (r ? (r() - .5) * jit : 0); p.push([cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k]); } return p; }
+
+// ------------------------------------------------------------------ faces: our own expressive style
+// kinds: proud sleepy startled grin smug dreamy happy fiery wink bliss.  body = skin colour (for lids / cheek lines)
+function face(kind, cx, cy, s, body) {
+  s = s || 1; body = body || '#f0c070';
+  const ch = darken(body, .28), W = '#fffdf6', K = '#3a1a16';
+  const eye = (x, rx, ry, px, py, pr) => `<ellipse cx="${x}" cy="0" rx="${rx}" ry="${ry}" fill="${W}" stroke="${INK}" stroke-width="1.15"/><ellipse cx="${x + px}" cy="${py}" rx="${pr}" ry="${f1(pr * 1.25)}" fill="${K}"/><circle cx="${f1(x + px - pr * .35)}" cy="${f1(py - pr * .5)}" r="${f1(pr * .38)}" fill="#fff"/>`;
+  const brow = (d, w) => L(d, INK, w || 2.1);
+  const cheeks = (y) => L(`M-23 ${y}l-3 2M-22 ${y + 3}l-3 2`, ch, 1.1, { op: .7 }) + L(`M23 ${y}l3 2M22 ${y + 3}l3 2`, ch, 1.1, { op: .7 });
+  let g = '';
+  switch (kind) {
+    case 'proud':
+      g = eye(-9, 4.3, 5.2, .5, -1.1, 2.5) + eye(9, 4.3, 5.2, .5, -1.1, 2.5) +
+        brow('M-14 -9.5Q-9 -14 -4 -10.2') + brow('M4 -10.8Q9 -15.2 14.5 -10.4') +
+        `<path d="M-8 8Q0 15 8 8Q0 11.5 -8 8Z" fill="${K}" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/>` + L('M9 8.6l2.4 -1.2', INK, 1.1) + cheeks(2);
+      break;
+    case 'sleepy':
+      g = `<ellipse cx="-9" cy="0" rx="4.6" ry="4.2" fill="${W}" stroke="${INK}" stroke-width="1.1"/><ellipse cx="9" cy="0" rx="4.6" ry="4.2" fill="${W}" stroke="${INK}" stroke-width="1.1"/>` +
+        `<ellipse cx="-8.6" cy="1.4" rx="2.2" ry="2.5" fill="${K}"/><ellipse cx="8.6" cy="1.4" rx="2.2" ry="2.5" fill="${K}"/>` +
+        `<path d="M-14 -.2Q-9 -6.6 -4.2 -.2Z" fill="${body}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.2 -.2Q9 -6.6 14 -.2Z" fill="${body}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>` +
+        brow('M-14 -8Q-9 -9.5 -4 -7.5', 1.8) + brow('M4 -7.5Q9 -9.5 14 -8', 1.8) +
+        L('M-4 9.5q2.2 2 4 0t4 0', INK, 1.5) + `<path d="M17 -13h6l-6 6h6" fill="none" stroke="${INK}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>` + cheeks(3);
+      break;
+    case 'startled':
+      g = eye(-9.5, 5.4, 6.9, 0, 0, 1.9) + eye(9.5, 5.4, 6.9, 0, 0, 1.9) +
+        brow('M-15.5 -13.5Q-10 -19 -4.2 -14.5') + brow('M4.2 -14.5Q10 -19 15.5 -13.5') +
+        `<ellipse cx="0" cy="11" rx="3.4" ry="4.3" fill="${K}" stroke="${INK}" stroke-width="1.2"/><ellipse cx="0" cy="12.6" rx="2" ry="1.6" fill="#ff8f8f"/>` +
+        `<path d="M19 -9q3 4 0 7q-3 -3 0 -7Z" fill="#bfe8ff" stroke="${INK}" stroke-width="1"/>`;
+      break;
+    case 'grin':
+      g = eye(-9, 4.4, 5, 0, 0, 2.5) + eye(9, 4.4, 5, 0, 0, 2.5) +
+        brow('M-14.5 -9.6Q-9 -12.4 -4.4 -9.2') + brow('M4.4 -9.2Q9 -12.4 14.5 -9.6') +
+        `<path d="M-9 6.2Q0 8 9 6.2Q8 15 0 15Q-8 15 -9 6.2Z" fill="${K}" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/><path d="M-7.5 7.3Q0 8.6 7.5 7.3L7 10Q0 11 -7 10Z" fill="${W}"/>` + cheeks(3);
+      break;
+    case 'smug':
+      g = `<ellipse cx="-9" cy="0" rx="4.6" ry="4.6" fill="${W}" stroke="${INK}" stroke-width="1.1"/><ellipse cx="9" cy="0" rx="4.6" ry="4.6" fill="${W}" stroke="${INK}" stroke-width="1.1"/>` +
+        `<ellipse cx="-6.8" cy="1.2" rx="2.4" ry="2.8" fill="${K}"/><ellipse cx="11.2" cy="1.2" rx="2.4" ry="2.8" fill="${K}"/><circle cx="-7.6" cy=".1" r=".9" fill="#fff"/><circle cx="10.4" cy=".1" r=".9" fill="#fff"/>` +
+        `<path d="M-14.2 -2.2Q-9 -6.4 -4.2 -2.2Z" fill="${body}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.2 -2.2Q9 -6.4 14.2 -2.2Z" fill="${body}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>` +
+        brow('M-14.5 -8.4Q-9 -9.4 -4.2 -7.6') + brow('M4.4 -10.8Q10 -14.6 15 -11.6') +
+        L('M-6 10.4Q2 13.6 11 7.6', INK, 1.7) + L('M11 7.6l1.8 -1.6', INK, 1.4) + cheeks(3);
+      break;
+    case 'dreamy':
+      g = `<ellipse cx="-9" cy="0" rx="4.7" ry="5" fill="${W}" stroke="${INK}" stroke-width="1.1"/><ellipse cx="9" cy="0" rx="4.7" ry="5" fill="${W}" stroke="${INK}" stroke-width="1.1"/>` +
+        `<ellipse cx="-8.4" cy="-1.6" rx="2.4" ry="2.9" fill="${K}"/><ellipse cx="9.6" cy="-1.6" rx="2.4" ry="2.9" fill="${K}"/><circle cx="-9.2" cy="-2.8" r=".95" fill="#fff"/><circle cx="8.8" cy="-2.8" r=".95" fill="#fff"/>` +
+        `<path d="M-14.4 -1.2Q-9 -7.8 -4.2 -1.2Z" fill="${body}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M4.2 -1.2Q9 -7.8 14.4 -1.2Z" fill="${body}" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>` +
+        brow('M-14 -10Q-9 -13 -4 -10.4', 1.8) + brow('M4 -10.4Q9 -13 14 -10', 1.8) +
+        `<ellipse cx="0" cy="10.6" rx="2.2" ry="2.5" fill="${K}" stroke="${INK}" stroke-width="1"/>` + cheeks(3);
+      break;
+    case 'happy':
+      g = L('M-14 1Q-9 -6.4 -4 1', INK, 2.2) + L('M4 1Q9 -6.4 14 1', INK, 2.2) +
+        brow('M-14.5 -8.6Q-9 -13 -4.4 -9.6', 1.9) + brow('M4.4 -9.6Q9 -13 14.5 -8.6', 1.9) +
+        `<path d="M-8.5 6Q0 8 8.5 6Q8 15.5 0 15.5Q-8 15.5 -8.5 6Z" fill="${K}" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/><path d="M-4 12.2Q0 9.8 4 12.2Q2 15 0 15Q-2 15 -4 12.2Z" fill="#ff8f8f"/>` + cheeks(2);
+      break;
+    case 'fiery':
+      g = eye(-9, 3.9, 4.2, .5, .8, 2.4) + eye(9, 3.9, 4.2, -.5, .8, 2.4) +
+        L('M-15.5 -11.4L-4.2 -5.6', INK, 3) + L('M15.5 -11.4L4.2 -5.6', INK, 3) +
+        `<path d="M-9.5 8.4L-6.5 11.2L-3.5 8.4L-.5 11.2L2.5 8.4L5.5 11.2L9.5 8.4L8 14.6Q0 17 -8 14.6Z" fill="${W}" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/>` +
+        `<path d="M19 -10q3.4 4.4 0 7.4q-3.4 -3 0 -7.4Z" fill="#bfe8ff" stroke="${INK}" stroke-width="1"/>` + cheeks(2);
+      break;
+    case 'wink':
+      g = eye(-9, 4.4, 5.2, .6, -.6, 2.5) + L('M4.2 .6Q9 -4.6 14 .6', INK, 2.3) +
+        brow('M-14.5 -10.6Q-9 -14.6 -4.4 -10.6') + brow('M4 -8.8Q9 -10.4 14.5 -8.4', 1.9) +
+        L('M-5 8.6Q1 14 8 8', INK, 1.7) + `<path d="M6.5 9.6l4 -3.2" stroke="${INK}" stroke-width="1.2" stroke-linecap="round"/>` + cheeks(2);
+      break;
+    case 'bliss':
+      g = L('M-14 1.4Q-9 6.6 -4 1.4', INK, 2.2) + L('M4 1.4Q9 6.6 14 1.4', INK, 2.2) + L('M-14.6 2.2l-1.6 -1.6M14.6 2.2l1.6 -1.6', INK, 1.3) +
+        brow('M-14 -7Q-9 -10.6 -4.4 -7.4', 1.8) + brow('M4.4 -7.4Q9 -10.6 14 -7', 1.8) +
+        `<path d="M-5 8.6Q0 14.6 5 8.6Q0 10.6 -5 8.6Z" fill="${K}" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/>` + cheeks(2);
+      break;
+  }
+  return `<g transform="translate(${f1(cx)} ${f1(cy)}) scale(${s})">${g}</g>`;
+}
+
+// ------------------------------------------------------------------ rim ornaments (shape cue besides colour)
+function rimOrn(kind, c) {
+  const lt = lighten(c, .66);
+  let s = '';
+  const N = { dashes: 20, waves: 14, dots: 24, stripes: 24, scallops: 18, zigzag: 20 }[kind] || 20;
+  for (let i = 0; i < N; i++) {
+    const a = i / N * 6.2832, x = Math.sin(a), y = -Math.cos(a), r = 44.2;
+    const px = f1(x * r), py = f1(y * r), rot = f1(a * 57.2958);
+    if (kind === 'dots') s += dot(px, py, 1.55, lt, .95);
+    else if (kind === 'dashes') s += `<rect x="-.9" y="-2.7" width="1.8" height="5.4" rx=".9" fill="${lt}" transform="translate(${px} ${py}) rotate(${rot})"/>`;
+    else if (kind === 'stripes') s += `<rect x="-.8" y="-2.8" width="1.6" height="5.6" fill="${lt}" opacity=".95" transform="translate(${px} ${py}) rotate(${f1(rot + 28)})"/>`;
+    else if (kind === 'scallops') s += `<path d="M-2.8 1.4Q0 -3.2 2.8 1.4" fill="none" stroke="${lt}" stroke-width="1.5" stroke-linecap="round" transform="translate(${px} ${py}) rotate(${rot})"/>`;
+    else if (kind === 'waves') s += `<path d="M-3 0q1.5 -2.6 3 0t3 0" fill="none" stroke="${lt}" stroke-width="1.4" stroke-linecap="round" transform="translate(${px} ${py}) rotate(${f1(rot + 90)})"/>`;
+    else if (kind === 'zigzag') s += `<path d="M-2.5 -2l2.5 4l2.5 -4" fill="none" stroke="${lt}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" transform="translate(${px} ${py}) rotate(${rot})"/>`;
+  }
+  return s;
+}
+// plate seen from above: rim in the type colour, lighter well, ornament ring
+function plateBase(type) {
+  const T = TYPES[type], c = T.c, well = lighten(c, .42), well2 = lighten(c, .62);
+  let s = '';
+  s += `<circle cx="1.6" cy="3.2" r="49" fill="#2a120c" opacity=".22" filter="url(#kk-shadow)"/>`;
+  s += `<circle r="49" fill="${c}" stroke="${INK}" stroke-width="1.8"/><circle r="49" fill="url(#kk-lit)" stroke="url(#kk-rim)" stroke-width="1.4"/>`;
+  s += rimOrn(T.rim, c);
+  s += `<circle r="39" fill="${darken(c, .22)}" opacity=".9"/>`;
+  s += `<circle r="38" cx=".7" cy=".9" fill="${well}" stroke="${darken(c, .35)}" stroke-width="1.1"/>`;
+  s += `<circle r="38" cx=".7" cy=".9" fill="url(#kk-well)"/>`;
+  s += `<path d="M-30 -17Q-22 -30 -8 -34" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".55"/>`;
+  s += `<circle r="31" cx=".7" cy=".9" fill="${well2}" opacity=".35"/>`;
+  return s;
+}
+
+root.__KK = { INK, CREAM, CREAM2, WOOD, WOOD_D, FONT, NS, f1, esc, hash, rng, mix, lighten, darken, TYPES, ORDER, PLAYERS, defs, P, E, L, dot, star, blobPath, ringPts, face, rimOrn, plateBase };
+})(typeof window !== 'undefined' ? window : globalThis);
+/* p2: the food characters (plate space, centre 0,0, well radius ~38) */
+(function (root) {
+'use strict';
+const K = root.__KK, { INK, P, E, L, dot, star, face, blobPath, ringPts, rng, lighten, darken, mix, f1 } = K;
+
+// ---------------------------------------------------------------- tempura: Crispy Prawn (proud)
+function tempura() {
+  const r = rng('tempura'); let s = '<g transform="translate(3 5) scale(1.08)">';
+  const bat = '#f4b94c', crisp = '#e29a2a';
+  const bump = (cx, cy, rx, ry, n, rot) => blobPath(ringPts(cx, cy, rx, ry, n, .14, r, rot));
+  // feelers
+  s += L('M-24 -24Q-28 -36 -38 -37', INK, 1.4) + L('M-15 -28Q-16 -40 -25 -44', INK, 1.4);
+  // tail fan (behind the curled body)
+  s += P('M22 24L41 17Q45 22 42 27Q46 31 41 35Q38 40 30 36Z', '#ee5b36', { sw: 1.4 });
+  s += L('M28 27L40 22M29 30L42 30M30 33L38 38', '#a8301a', 1.1);
+  // curled tail segments, back to front
+  s += P(bump(18, 15, 12, 11, 11, .4), bat, { sw: 1.6 }) + L('M12 8Q20 14 14 22', crisp, 1.4);
+  s += P(bump(8, 4, 17, 16, 12, .2), bat, { sw: 1.6 }) + L('M0 -7Q10 -1 4 14', crisp, 1.5);
+  s += P(bump(-10, -8, 25, 23, 15, -.2), bat, { sw: 1.7 });
+  s += E(-24, 6, 7, 4, crisp, { sw: 0, flat: true, op: .5, rot: 30 }) + E(-4, -26, 9, 3.5, '#ffe6a6', { sw: 0, flat: true, op: .75, rot: -10 });
+  [[-38, 8], [-30, 22], [4, 32], [34, -4], [-20, 30], [30, 8], [36, -14]].forEach((p, i) => s += dot(p[0], p[1], 1.3 + (i % 2) * .6, '#e6a23a'));
+  s += face('proud', -12, -6, .98, bat);
+  return s + '</g>';
+}
+
+// ---------------------------------------------------------------- sashimi: Fish Slice (sleepy)
+function sashimi() {
+  let s = '';
+  // shiso leaf
+  s += P('M-36 30Q-44 2 -26 -20Q-10 -34 12 -30Q2 -16 6 6Q-4 34 -36 30Z', '#4fa05a', { sw: 1.4 });
+  s += L('M-32 24Q-18 4 0 -22', '#2f7a3c', 1.2) + L('M-30 8l8 2M-24 -4l8 3M-14 -16l7 3', '#2f7a3c', 1);
+  // daikon curls
+  s += `<g stroke="${INK}" stroke-width="1.1" fill="#fffdf6">` + E(24, -28, 8.5, 3.8, '#fffdf6', { sw: 1.1, rot: 30 }) + E(31, -20, 8, 3.4, '#f4efe2', { sw: 1.1, rot: -20 }) + E(20, -21, 7, 3.2, '#fffdf6', { sw: 1.1, rot: 10 }) + '</g>';
+  // fish slice
+  const d = 'M-31 -9Q-31 -22 -17 -23L21 -24Q34 -24 33 -11L31 11Q30 23 17 23L-19 24Q-32 24 -31 9Z';
+  s += `<g transform="rotate(-5)">` + P(d, '#ff6f87', { sw: 1.7 });
+  s += L('M-24 -14Q-10 -19 4 -13T28 -15', '#ffc6d0', 1.7, { op: .85 }) + L('M-26 4Q-8 -2 8 4T30 2', '#ffc6d0', 1.7, { op: .85 }) + L('M-22 17Q-6 12 8 18T26 15', '#ffc6d0', 1.4, { op: .75 });
+  s += face('sleepy', -2, 0, 1, '#ff6f87') + '</g>';
+  return s;
+}
+
+// ---------------------------------------------------------------- dumpling: Steam Bun (startled)
+function dumpling() {
+  let s = '';
+  // steam puffs
+  const puff = (x, y, k) => `<path d="M${x - 8 * k} ${y}Q${x - 12 * k} ${y - 7 * k} ${x - 4 * k} ${y - 8 * k}Q${x} ${y - 14 * k} ${x + 6 * k} ${y - 8 * k}Q${x + 13 * k} ${y - 7 * k} ${x + 8 * k} ${y}Q${x + 2 * k} ${y + 3 * k} ${x - 8 * k} ${y}Z" fill="#fff" fill-opacity=".92" stroke="#9fb9cc" stroke-width="1.1"/>`;
+  s += puff(-18, -32, .9) + puff(17, -34, .8) + puff(0, -39, 1.0);
+  // steamer base (back)
+  s += P('M-35 22Q-36 14 0 14Q36 14 35 22L33 33Q0 41 -33 33Z', '#d9a65e', { sw: 1.5 });
+  s += L('M-24 20L-22 36M-8 22L-7 38M8 22L8 38M24 20L22 36', '#a8742f', 1.2);
+  // bun
+  const d = 'M-30 4Q-31 -22 -6 -26Q0 -27 6 -26Q31 -22 30 4Q29 24 0 25Q-29 24 -30 4Z';
+  s += P(d, '#fff3dd', { sw: 1.7 });
+  // pleated knot on top
+  s += P('M-7 -25Q0 -34 7 -25Q4 -22 0 -22Q-4 -22 -7 -25Z', '#fbe2bd', { sw: 1.3 });
+  s += L('M0 -23L-9 -14M0 -23L-3 -12M0 -23L4 -12M0 -23L10 -14', '#e0b98a', 1.3);
+  s += `<path d="${d}" fill="none" stroke="#f3cf9c" stroke-width="3" opacity=".35" transform="translate(0 1) scale(.94)"/>`;
+  s += face('startled', 0, 3, 1, '#fff3dd');
+  // steamer front rim
+  s += P('M-37 24Q0 34 37 24L36 30Q0 42 -36 30Z', '#bf8841', { sw: 1.4 }) + L('M-30 28L-29 33M-14 31L-13 36M2 32L2 37M18 31L17 36M31 28L30 33', '#8d5a22', 1.1, { op: .7 });
+  return s;
+}
+
+// ---------------------------------------------------------------- maki slice (Seaweed Roll)
+function maki(cx, cy, R, fill, kind, fs, noFace) {
+  const nori = Math.max(3, R * .13), rice = Math.max(3.4, R * .16), fr = R - nori - rice;
+  let s = `<g transform="translate(${f1(cx)} ${f1(cy)})">`;
+  s += `<circle cx="1.2" cy="2.4" r="${R}" fill="#2a120c" opacity=".2" filter="url(#kk-shadow)"/>`;
+  s += `<circle r="${R}" fill="#2f4a3b" stroke="${INK}" stroke-width="1.6"/><circle r="${R}" fill="url(#kk-lit)" stroke="url(#kk-rim)" stroke-width="1.1"/>`;
+  s += `<path d="M${f1(-R * .78)} ${f1(-R * .4)}A${f1(R * .88)} ${f1(R * .88)} 0 0 1 ${f1(-R * .3)} ${f1(-R * .84)}" fill="none" stroke="#7fb596" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>`;
+  s += `<circle r="${f1(R - nori)}" fill="#fffaf0" stroke="#d9cdb4" stroke-width=".9"/>`;
+  // rice grains
+  const g = rng('rice' + R); for (let i = 0; i < Math.round(R * .75); i++) { const a = g() * 6.28, rr = fr + 1 + g() * (rice - 1.5); s += `<ellipse cx="${f1(Math.cos(a) * rr)}" cy="${f1(Math.sin(a) * rr)}" rx="1.5" ry=".8" fill="#e8dcc2" transform="rotate(${f1(a * 57)} ${f1(Math.cos(a) * rr)} ${f1(Math.sin(a) * rr)})"/>`; }
+  s += `<circle r="${f1(fr)}" fill="${fill}" stroke="${darken(fill, .4)}" stroke-width="1.2"/><circle r="${f1(fr)}" fill="url(#kk-lit)"/>`;
+  s += `<path d="M${f1(-fr * .7)} ${f1(-fr * .45)}Q${f1(-fr * .4)} ${f1(-fr * .8)} ${f1(fr * .05)} ${f1(-fr * .85)}" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity=".55"/>`;
+  if (noFace === 'eyes') {
+    s += `<ellipse cx="${f1(-fr * .38)}" cy="-1" rx="${f1(Math.max(1.6, fr * .13))}" ry="${f1(Math.max(2, fr * .17))}" fill="#3a1a16"/><ellipse cx="${f1(fr * .38)}" cy="-1" rx="${f1(Math.max(1.6, fr * .13))}" ry="${f1(Math.max(2, fr * .17))}" fill="#3a1a16"/>` + L(`M${f1(-fr * .25)} ${f1(fr * .38)}Q0 ${f1(fr * .55)} ${f1(fr * .25)} ${f1(fr * .38)}`, INK, 1.4);
+  } else s += face(kind, 0, 1, fs || fr / 19, fill);
+  return s + '</g>';
+}
+function roll(n) {
+  let s = '';
+  if (n === 1) s += maki(0, 1, 34, '#86cb5a', 'grin', 1.0);
+  else if (n === 2) { s += maki(-14, -11, 23, '#ff9a6a', 'happy', .62, 'eyes'); s += maki(12, 11, 26, '#ff8a5c', 'grin', .74); }
+  else { s += maki(-17, -13, 19.5, '#ffd24a', 'happy', .55, 'eyes'); s += maki(17, -13, 19.5, '#86cb5a', 'grin', .55, 'eyes'); s += maki(0, 14, 23, '#ff8a5c', 'grin', .66); }
+  return s;
+}
+
+// ---------------------------------------------------------------- nigiri (salmon / squid / egg); mini = no big face
+const NG = {
+  salmon: { top: '#ff7a55', shade: '#e0502d', face: 'smug', stripe: '#ffd0b8' },
+  squid:  { top: '#efe4ff', shade: '#c8b6ef', face: 'dreamy', stripe: '#b9a6e6' },
+  egg:    { top: '#ffd54a', shade: '#e9a824', face: 'happy', stripe: '#f0b92c' }
+};
+function nigiri(kind, o) {
+  o = o || {}; const N = NG[kind]; let s = '';
+  const rice = 'M-27 8Q-29 -2 -20 -3L20 -3Q29 -2 27 8L25 25Q23 32 15 32L-15 32Q-23 32 -25 25Z';
+  s += `<g transform="translate(${o.x || 0} ${o.y || 0}) scale(${o.s || 1})">`;
+  s += `<ellipse cx="2" cy="31" rx="31" ry="4" fill="#2a120c" opacity=".2"/>`;
+  s += P(rice, '#fffaf0', { sw: 1.6 });
+  s += L('M-17 16l3 1M-6 22l3 1M8 16l3 1M16 24l3 0M-14 26l2 1M0 28l3 0', '#d9cdb4', 1.1);
+  const top = 'M-37 5Q-39 -12 -20 -16Q0 -18 20 -16Q39 -12 37 5Q36 17 27 15Q0 7 -27 15Q-36 17 -37 5Z';
+  s += P(top, N.top, { sw: 1.7 });
+  if (kind === 'salmon') s += L('M-28 -8Q-12 -13 2 -9T29 -9', N.stripe, 1.9, { op: .9 }) + L('M-31 2Q-12 -3 4 2T32 2', N.stripe, 1.7, { op: .8 });
+  if (kind === 'squid') { for (let i = -3; i <= 3; i++) s += L(`M${i * 9 - 7} -15L${i * 9 + 8} 11`, N.stripe, 1, { op: .55 }) + L(`M${i * 9 + 7} -15L${i * 9 - 8} 11`, N.stripe, 1, { op: .4 }); }
+  if (kind === 'egg') {
+    s += L('M-33 -6Q0 -10 33 -6M-34 3Q0 -1 34 3', N.stripe, 1.2, { op: .8 });
+    s += P('M15 -17L25 -15L26 14L16 13Z', '#2f4a3b', { sw: 1.4 });   // nori belt
+  }
+  if (o.face !== false) s += face(N.face, kind === 'egg' ? -6 : 0, -2, kind === 'egg' ? .72 : .8, N.top);
+  else s += `<ellipse cx="-9" cy="-2" rx="2.4" ry="3" fill="#3a1a16"/><ellipse cx="9" cy="-2" rx="2.4" ry="3" fill="#3a1a16"/>` + L('M-4 5Q0 8 4 5', INK, 1.4);
+  return s + '</g>';
+}
+function nigiriScene(kind) {
+  let s = '';
+  if (kind === 'salmon') {   // sunset: small sun with rays over the top-right, cloud strokes
+    s += `<g transform="translate(25 -24)">`;
+    for (let i = 0; i < 12; i++) { const a = i / 12 * 6.2832; s += L(`M${f1(Math.cos(a) * 12)} ${f1(Math.sin(a) * 12)}L${f1(Math.cos(a) * 17)} ${f1(Math.sin(a) * 17)}`, '#ffb23d', 2.4); }
+    s += `<circle r="10.5" fill="#ffd166" stroke="${INK}" stroke-width="1.3"/><circle r="10.5" fill="url(#kk-lit)"/></g>`;
+    s += L('M-37 -22Q-30 -26 -22 -22M-33 -14Q-27 -17 -21 -14', '#fff3d0', 2.4, { op: .95 });
+    s += nigiri('salmon', { y: 8, s: .92 });
+  } else if (kind === 'squid') {   // moon + stars
+    s += `<path d="M0 -17A17 17 0 1 0 14 5A13 13 0 1 1 0 -17Z" fill="#fff1a8" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round" transform="translate(-27 -23) scale(.9)"/>`;
+    s += star(22, -28, 5, '#fff1a8') + star(33, -20, 3.2, '#fff1a8') + star(0, -33, 3, '#fff1a8') + star(-33, 2, 2.6, '#fff1a8');
+    s += nigiri('squid', { y: 8, s: .92 });
+  } else {   // sun nigiri: sunburst
+    s += `<g>`; for (let i = 0; i < 14; i++) { const a = i / 14 * 6.2832; s += `<path d="M${f1(Math.cos(a - .12) * 28)} ${f1(Math.sin(a - .12) * 28 - 4)}L${f1(Math.cos(a) * 38)} ${f1(Math.sin(a) * 38 - 4)}L${f1(Math.cos(a + .12) * 28)} ${f1(Math.sin(a + .12) * 28 - 4)}Z" fill="#ffe27a" stroke="${INK}" stroke-width="1"/>`; } s += `</g>`;
+    s += `<circle cx="0" cy="-4" r="28" fill="#fff0a8" stroke="${INK}" stroke-width="1.3"/><circle cx="0" cy="-4" r="28" fill="url(#kk-lit)"/>`;
+    s += nigiri('egg', { y: 7, s: .92 });
+  }
+  return s;
+}
+
+// ---------------------------------------------------------------- wasabi: Fire Paste (fiery); on = nigiri kind resting on it
+function wasabi(on) {
+  let s = '', dy = on ? 13 : 3, sc = on ? .82 : 1;
+  const r = rng('wasabi');
+  const fl = (x, h, col, w) => `<path d="M${x - w} -8Q${x - w - 4} ${-8 - h * .5} ${x - 2} ${-8 - h}Q${x - 1} ${-8 - h * .5} ${x + 4} ${-8 - h * .62}Q${x + w + 3} ${-8 - h * .35} ${x + w} -8Z" fill="${col}" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/>`;
+  s += `<g transform="translate(0 ${dy}) scale(${sc})">`;
+  s += fl(-18, 24, '#ff7a2a', 9) + fl(17, 26, '#ff8f2e', 9) + fl(0, 32, '#ffb12e', 11) + fl(0, 20, '#ffe066', 6);
+  // leaf
+  s += P('M-40 28Q-40 16 -14 20Q0 24 14 20Q40 16 40 28Q38 38 0 38Q-38 38 -40 28Z', '#3f9a4a', { sw: 1.4 });
+  s += L('M-32 30Q0 24 32 30', '#2a7435', 1.1);
+  // plump grated mound
+  const d = 'M-31 25Q-35 4 -20 -4Q-9 -13 0 -12Q9 -13 20 -4Q35 4 31 25Q0 32 -31 25Z';
+  s += P(d, '#8ac43c', { sw: 1.7 });
+  for (let i = 0; i < 26; i++) { const x = (r() - .5) * 50, y = -6 + r() * 30; if ((x * x) / 900 + ((y - 8) * (y - 8)) / 500 < 1) s += dot(x, y, .9 + r() * 1.2, r() > .5 ? '#c4e873' : '#6ea62a', .85); }
+  s += face('fiery', 0, 9, .98, '#8ac43c');
+  s += '</g>';
+  if (on) {
+    s += nigiri(on, { x: 0, y: -23, s: .5, face: false });
+    let d2 = ''; for (let i = 0; i < 16; i++) { const a = i / 16 * 6.2832, rr = i % 2 ? 7.4 : 11; d2 += (i ? 'L' : 'M') + f1(30 + Math.sin(a) * rr) + ' ' + f1(-28 - Math.cos(a) * rr); }
+    s += `<path d="${d2}Z" fill="#ffd23a" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/><text x="30" y="-24.2" text-anchor="middle" font-family="${K.FONT}" font-weight="900" font-size="10.5" fill="${INK}">x3</text>`;
+  }
+  return s;
+}
+
+// ---------------------------------------------------------------- chop: Twin Sticks (wink)
+function stick(x1, y1, x2, y2, w1, w2, col, band) {
+  const dx = x2 - x1, dy = y2 - y1, l = Math.hypot(dx, dy), nx = -dy / l, ny = dx / l;
+  const p = (t, w) => [x1 + dx * t + nx * w / 2, y1 + dy * t + ny * w / 2, x1 + dx * t - nx * w / 2, y1 + dy * t - ny * w / 2];
+  const A = p(0, w1), B = p(1, w2);
+  let s = P(`M${f1(A[0])} ${f1(A[1])}L${f1(B[0])} ${f1(B[1])}L${f1(B[2])} ${f1(B[3])}L${f1(A[2])} ${f1(A[3])}Z`, col, { sw: 1.3 });
+  const t = .3, wt = w1 + (w2 - w1) * t, q = p(t, wt), q2 = p(t + .07, wt + (w2 - w1) * .07);
+  s += `<path d="M${f1(q[0])} ${f1(q[1])}L${f1(q[2])} ${f1(q[3])}L${f1(q2[2])} ${f1(q2[3])}L${f1(q2[0])} ${f1(q2[1])}Z" fill="${band}" stroke="${INK}" stroke-width=".9"/>`;
+  return s;
+}
+function chop() {
+  let s = '';
+  s += stick(-27, 38, 22, -44, 3.4, 6.6, '#8e2f3d', '#f0cc5a');
+  s += stick(27, 38, -22, -44, 3.4, 6.6, '#2f3a4e', '#e8e8e8');
+  // porcelain pebble rest
+  const d = 'M-24 18Q-28 -4 -8 -10Q10 -14 23 -4Q31 6 24 19Q0 27 -24 18Z';
+  s += `<ellipse cx="1" cy="25" rx="27" ry="4" fill="#2a120c" opacity=".2"/>`;
+  s += P(d, '#eaf2f7', { sw: 1.7 });
+  s += L('M-21 15Q-14 11 -7 15T7 15T21 14', '#6b8cc4', 1.5) + L('M-17 21Q-10 17 -3 21T11 21T19 19', '#6b8cc4', 1.2, { op: .8 });
+  s += face('wink', -1, 1, .88, '#eaf2f7');
+  return s;
+}
+
+// ---------------------------------------------------------------- pudding: Custard Cup (bliss, tiny chef hat)
+function pudding() {
+  let s = '';
+  s += `<ellipse cx="1" cy="31" rx="27" ry="4.5" fill="#2a120c" opacity=".2"/>`;
+  s += P('M-26 -6L26 -6L20 27Q0 34 -20 27Z', '#ffdf86', { sw: 1.7 });
+  s += P('M-27 -9Q-28 1 -22 4Q-19 10 -15 4Q-11 1 -7 7Q-2 12 3 4Q8 1 13 8Q19 5 22 -1Q28 -3 27 -9Q0 -20 -27 -9Z', '#b4601c', { sw: 1.5 });
+  s += L('M-18 -12Q-8 -16 4 -14', '#e8a35a', 1.8, { op: .8 });
+  s += face('bliss', 0, 14, .86, '#ffdf86');
+  // chef hat
+  s += P('M-12 -14L12 -14L11 -24L-11 -24Z', '#fffdf6', { sw: 1.4 });
+  s += P('M-12 -24Q-20 -26 -17 -34Q-14 -41 -6 -38Q-3 -46 5 -40Q13 -43 15 -35Q21 -30 12 -24Z', '#fffdf6', { sw: 1.5 });
+  s += L('M-5 -23L-5 -17M3 -23L3 -17', '#d9cdb4', 1.1);
+  // cherry
+  s += `<path d="M22 -14Q26 -22 31 -22" stroke="#3f7a35" stroke-width="1.6" fill="none" stroke-linecap="round"/>` + `<circle cx="22" cy="-11" r="5.2" fill="#d9304a" stroke="${INK}" stroke-width="1.3"/><circle cx="20.5" cy="-13" r="1.4" fill="#fff" opacity=".8"/>`;
+  s += star(-30, -22, 4, '#fff6c8') + star(-35, -10, 2.4, '#fff6c8');
+  return s;
+}
+
+function foodArt(type, o) {
+  o = o || {};
+  switch (type) {
+    case 'tempura': return tempura();
+    case 'sashimi': return sashimi();
+    case 'dumpling': return dumpling();
+    case 'roll1': return roll(1);
+    case 'roll2': return roll(2);
+    case 'roll3': return roll(3);
+    case 'salmon': return nigiriScene('salmon');
+    case 'squid': return nigiriScene('squid');
+    case 'egg': return nigiriScene('egg');
+    case 'wasabi': return wasabi(o.on || o.variant === 'nigiri' && 'salmon' || null);
+    case 'chop': return chop();
+    case 'pudding': return pudding();
+  }
+  return '';
+}
+K.foodArt = foodArt; K.nigiri = nigiri; K.maki = maki;
+})(typeof window !== 'undefined' ? window : globalThis);
+/* p3: card frame (plate on a linen placemat + name chit + rule badge), card back, deck / discard piles */
+(function (root) {
+'use strict';
+const K = root.__KK, { INK, CREAM, CREAM2, FONT, TYPES, f1, esc, mix, lighten, darken, rng } = K;
+const doc = typeof document !== 'undefined' ? document : null;
+
+const CAPS = { tempura: 'pair = 5', sashimi: 'set of 3 = 10', dumpling: '1 3 6 10 15', roll1: 'most 6 / 2nd 3', roll2: 'most 6 / 2nd 3', roll3: 'most 6 / 2nd 3', salmon: '2 points', squid: '3 points', egg: '1 point', wasabi: 'next nigiri x3', chop: 'swap for 2 cards', pudding: 'game end +6 / -6' };
+
+function textLine(txt, x, y, fs, avail, col, weight) {
+  const tl = Math.min(avail, txt.length * fs * 0.6);
+  return `<text x="${f1(x)}" y="${f1(y)}" text-anchor="middle" font-family="${FONT}" font-weight="${weight || 800}" font-size="${f1(fs)}" fill="${col || INK}" textLength="${f1(tl)}" lengthAdjust="spacingAndGlyphs">${esc(txt)}</text>`;
+}
+// card geometry (px). Shared by cardSVG and the UI via KKKit.cardLayout(w)
+function layout(w) {
+  const H = Math.round(w * 1.4), fs = Math.max(13, Math.min(w * 0.115, 26));
+  const full = TYPES.roll1.name.length * fs * 0.6 > w * 0.84;       // longest name does not fit on one line
+  const lines = full ? 2 : 1, cap = w >= 170;
+  const chH = lines * fs * 1.1 + fs * 0.6 + (cap ? fs * 0.95 : 0), pad = Math.max(2, w * 0.035);
+  const y0 = H - chH - pad, yTop = pad * .8, yBot = y0 + chH * .22, D = Math.min(w * 0.94, yBot - yTop);
+  return { w, H, fs, lines, cap, chH, pad, y0, D, cx: w / 2, cy: yTop + D / 2, rb: Math.max(12, w * 0.15) };
+}
+
+// --- rule badge: coaster with the rule icon (iconSVG body comes from p5 via K.iconBody)
+function badge(type, cx, cy, r) {
+  const T = TYPES[type];
+  let s = `<g transform="translate(${f1(cx)} ${f1(cy)})"><circle cx="${f1(r * .08)}" cy="${f1(r * .14)}" r="${f1(r)}" fill="#2a120c" opacity=".28"/>`;
+  s += `<circle r="${f1(r)}" fill="#fffaf0" stroke="${INK}" stroke-width="${f1(Math.max(1.1, r * .09))}"/><circle r="${f1(r * .82)}" fill="none" stroke="${T.c}" stroke-width="${f1(Math.max(1.2, r * .13))}"/>`;
+  s += `<g transform="scale(${f1(r / 20)})">${K.iconBody ? K.iconBody(T.rule, T) : ''}</g></g>`;
+  return s;
+}
+
+function cardSVG(type, o) {
+  o = o || {};
+  if (!TYPES[type]) type = 'tempura';
+  const T = TYPES[type], w = o.w || 120, Ly = layout(w), H = Ly.H, id = o.id || '';
+  const fx = o.fx || (w >= 170 ? 'full' : (w >= 52 ? 'lite' : 'none'));
+  const k = Ly.D / 100, rx = w * 0.085;
+  const matc = mix(CREAM, T.c, .10), matd = mix(CREAM2, T.c, .22);
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-card kk-t-${type}" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" role="img" aria-label="${esc(T.name)}: ${esc(T.ruleText)}"${o.cls ? ` data-c="${esc(o.cls)}"` : ''}>`;
+  if (o.standalone) s += K.defs();
+  // shadow + mat
+  s += `<rect x="${f1(w * .02)}" y="${f1(w * .035)}" width="${w - w * .02}" height="${H - w * .035}" rx="${f1(rx)}" fill="#2a120c" opacity=".25"/>`;
+  s += `<rect x=".8" y=".8" width="${f1(w - 1.6)}" height="${f1(H - 1.6)}" rx="${f1(rx)}" fill="${matc}" stroke="${INK}" stroke-width="${f1(Math.max(1.2, w * .014))}"/>`;
+  s += `<rect x=".8" y=".8" width="${f1(w - 1.6)}" height="${f1(H - 1.6)}" rx="${f1(rx)}" fill="url(#kk-weave)"/>`;
+  s += `<rect x="${f1(w * .04)}" y="${f1(w * .04)}" width="${f1(w * .92)}" height="${f1(H - w * .08)}" rx="${f1(rx * .7)}" fill="none" stroke="${mix(T.c, '#ffffff', .1)}" stroke-width="${f1(Math.max(1, w * .011))}" stroke-dasharray="${f1(w * .03)} ${f1(w * .025)}" opacity=".6"/>`;
+  s += `<path d="M${f1(rx)} ${f1(w * .018)}H${f1(w - rx)}" stroke="#fff" stroke-opacity=".55" stroke-width="1.2" stroke-linecap="round"/>`;
+  // plate + food
+  s += `<g transform="translate(${f1(Ly.cx)} ${f1(Ly.cy)}) scale(${f1(k)})">${K.plateBase(type)}<g${fx === 'none' ? '' : ` filter="url(#kk-fx-${fx})"`}>${K.foodArt(type, o)}</g></g>`;
+  // name chit
+  const cx0 = w * .075, cw = w - 2 * cx0, cr = Math.max(3, w * .035);
+  s += `<g><rect x="${f1(cx0 + 1)}" y="${f1(Ly.y0 + 1.6)}" width="${f1(cw)}" height="${f1(Ly.chH)}" rx="${f1(cr)}" fill="#2a120c" opacity=".28"/>`;
+  s += `<rect x="${f1(cx0)}" y="${f1(Ly.y0)}" width="${f1(cw)}" height="${f1(Ly.chH)}" rx="${f1(cr)}" fill="#fffaf0" stroke="${INK}" stroke-width="${f1(Math.max(1.1, w * .013))}"/>`;
+  s += `<rect x="${f1(cx0 + 2)}" y="${f1(Ly.y0 + 2)}" width="${f1(cw - 4)}" height="${f1(Ly.chH - 4)}" rx="${f1(cr * .7)}" fill="none" stroke="${T.c}" stroke-width="1" opacity=".55"/>`;
+  const fs = Ly.fs, avail = cw - fs * .7;
+  let ty = Ly.y0 + fs * .3 + fs * .86;
+  if (Ly.lines === 2) { s += textLine(T.l[0], w / 2, ty, fs, avail) + textLine(T.l[1], w / 2, ty + fs * 1.1, fs, avail); ty += fs * 1.1; }
+  else s += textLine(T.name, w / 2, ty, fs, avail);
+  if (Ly.cap) s += textLine(CAPS[type] || '', w / 2, ty + fs * .98, fs * .82, avail, darken(T.c, .55), 700);
+  s += '</g>';
+  // rule badge
+  s += badge(type, Ly.rb + w * .012, Ly.rb + w * .012, Ly.rb);
+  if (o.selected) s += `<rect x="-1" y="-1" width="${w + 2}" height="${H + 2}" rx="${f1(rx + 1)}" fill="none" stroke="#ffc83a" stroke-width="${f1(Math.max(3, w * .04))}"/>`;
+  if (o.dim) s += `<rect x=".8" y=".8" width="${f1(w - 1.6)}" height="${f1(H - 1.6)}" rx="${f1(rx)}" fill="#2a120c" opacity=".38"/>`;
+  return s + '</svg>';
+}
+
+// ---------------------------------------------------------------- card back: indigo lacquer, wave scales, steaming-plate medallion (no logo, no text)
+function backSVG(o) {
+  o = o || {};
+  const w = o.w || 120, H = Math.round(w * 1.4), rx = w * .085, id = 'kk-sg' + (o.pid || '');
+  const sc = Math.max(.6, w / 120);
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-back" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" role="img" aria-label="Card back">`;
+  if (o.standalone) s += K.defs();
+  const pw = 24 * sc, ph = 12 * sc;
+  const arcs = (cx, cy) => [12, 9, 6, 3].map((r, i) => `<circle cx="${f1(cx)}" cy="${f1(cy)}" r="${f1(r * sc)}" fill="${i % 2 ? '#2f4f8a' : '#27407a'}" stroke="#7fa4e0" stroke-width="${f1(.9 * sc)}"/>`).join('');
+  s += `<defs><pattern id="${id}" width="${f1(pw)}" height="${f1(ph)}" patternUnits="userSpaceOnUse"><rect width="${f1(pw)}" height="${f1(ph)}" fill="#223a6e"/>${arcs(0, ph)}${arcs(pw, ph)}${arcs(pw / 2, ph / 2)}${arcs(0, 0)}${arcs(pw, 0)}</pattern>` +
+    `<radialGradient id="${id}-v" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#0d1a38" stop-opacity="0"/><stop offset="1" stop-color="#0d1a38" stop-opacity=".55"/></radialGradient></defs>`;
+  s += `<rect x="${f1(w * .02)}" y="${f1(w * .035)}" width="${w - w * .02}" height="${H - w * .035}" rx="${f1(rx)}" fill="#2a120c" opacity=".25"/>`;
+  s += `<rect x=".8" y=".8" width="${f1(w - 1.6)}" height="${f1(H - 1.6)}" rx="${f1(rx)}" fill="url(#${id})" stroke="${INK}" stroke-width="${f1(Math.max(1.2, w * .014))}"/>`;
+  s += `<rect x=".8" y=".8" width="${f1(w - 1.6)}" height="${f1(H - 1.6)}" rx="${f1(rx)}" fill="url(#${id}-v)"/>`;
+  // gold frame
+  s += `<rect x="${f1(w * .055)}" y="${f1(w * .055)}" width="${f1(w * .89)}" height="${f1(H - w * .11)}" rx="${f1(rx * .6)}" fill="none" stroke="#f0cd7a" stroke-width="${f1(Math.max(1.2, w * .018))}"/>`;
+  s += `<rect x="${f1(w * .085)}" y="${f1(w * .085)}" width="${f1(w * .83)}" height="${f1(H - w * .17)}" rx="${f1(rx * .45)}" fill="none" stroke="#f0cd7a" stroke-width="${f1(Math.max(.7, w * .007))}" stroke-opacity=".7"/>`;
+  // medallion: plate with steam swirls
+  const cx = w / 2, cy = H / 2, R = w * .30, m = R / 30;
+  s += `<g transform="translate(${f1(cx)} ${f1(cy)}) scale(${f1(m)})">`;
+  s += `<circle r="31.5" fill="#2a120c" opacity=".3" cx="1" cy="2"/><circle r="30" fill="#f6e6c4" stroke="${INK}" stroke-width="1.6"/><circle r="30" fill="url(#kk-lit)"/>`;
+  s += `<circle r="24" fill="#e5553a" stroke="${INK}" stroke-width="1.2"/><circle r="24" fill="url(#kk-lit)"/><circle r="19" fill="#fbf0da" stroke="${INK}" stroke-width="1"/>`;
+  for (let i = 0; i < 12; i++) { const a = i / 12 * 6.2832; s += `<circle cx="${f1(Math.sin(a) * 27)}" cy="${f1(-Math.cos(a) * 27)}" r="1.5" fill="#fbf0da"/>`; }
+  s += `<path d="M-8 9Q-14 2 -7 -3Q0 -8 -6 -14" fill="none" stroke="#c9452e" stroke-width="2.4" stroke-linecap="round"/><path d="M1 11Q-5 4 2 -1Q9 -6 3 -12" fill="none" stroke="#e5553a" stroke-width="2.4" stroke-linecap="round"/><path d="M10 9Q4 2 11 -3Q17 -7 12 -12" fill="none" stroke="#f08a2e" stroke-width="2.4" stroke-linecap="round"/>`;
+  s += '</g>';
+  // corner dots
+  [[.14, .1], [.86, .1], [.14, .9], [.86, .9]].forEach(p => s += `<circle cx="${f1(w * p[0])}" cy="${f1(H * p[1])}" r="${f1(Math.max(1.6, w * .02))}" fill="#f0cd7a"/>`);
+  s += `<path d="M${f1(rx)} ${f1(w * .018)}H${f1(w - rx)}" stroke="#fff" stroke-opacity=".35" stroke-width="1.2" stroke-linecap="round"/>`;
+  return s + '</svg>';
+}
+
+// ---------------------------------------------------------------- piles: deck (stack of backs + count) / discard (tilted faces + count)
+function pileSVG(o) {
+  o = o || {};
+  const w = o.w || 100, H = Math.round(w * 1.4), n = o.count != null ? o.count : 0, kind = o.kind || 'deck';
+  const layers = Math.min(6, Math.ceil(n / 12)) || 0, dx = Math.max(1, w * .018), pad = layers * dx + 4;
+  const W = Math.round(w + pad + 6), HH = Math.round(H + pad + 6);
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-pile kk-${kind}" width="${W}" height="${HH}" viewBox="0 0 ${W} ${HH}" role="img" aria-label="${kind === 'deck' ? 'Deck' : 'Discard pile'}: ${n} cards">`;
+  if (o.standalone) s += K.defs();
+  const r = rng('pile' + n + kind);
+  const inner = (svg) => svg.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
+  if (n <= 0) {
+    s += `<g transform="translate(3 3)"><rect x="1" y="1" width="${w - 2}" height="${H - 2}" rx="${f1(w * .085)}" fill="#fbf0da" fill-opacity=".14" stroke="#fbf0da" stroke-opacity=".7" stroke-width="2" stroke-dasharray="7 6"/><circle cx="${f1(w / 2)}" cy="${f1(H / 2)}" r="${f1(w * .26)}" fill="none" stroke="#fbf0da" stroke-opacity=".7" stroke-width="2" stroke-dasharray="4 5"/></g>`;
+  } else {
+    for (let i = layers; i >= 1; i--) {
+      const ox = 3 + i * dx, oy = 3 + i * dx * 1.1;
+      if (kind === 'deck') s += `<g transform="translate(${f1(ox)} ${f1(oy)})"><rect x="1" y="1" width="${w - 2}" height="${H - 2}" rx="${f1(w * .085)}" fill="#1b2d58" stroke="${INK}" stroke-width="1.3"/><rect x="${f1(w * .055)}" y="${f1(w * .055)}" width="${f1(w * .89)}" height="${f1(H - w * .11)}" rx="${f1(w * .05)}" fill="none" stroke="#f0cd7a" stroke-width=".9" opacity=".6"/></g>`;
+      else { const rot = (r() - .5) * 14; s += `<g transform="translate(${f1(ox)} ${f1(oy)}) rotate(${f1(rot)} ${f1(w / 2)} ${f1(H / 2)})"><rect x="1" y="1" width="${w - 2}" height="${H - 2}" rx="${f1(w * .085)}" fill="${mix(CREAM, K.TYPES[K.ORDER[Math.floor(r() * 12)]].c, .35)}" stroke="${INK}" stroke-width="1.3"/></g>`; }
+    }
+    s += `<g transform="translate(3 3)">`;
+    if (kind === 'deck') s += inner(backSVG({ w, pid: 'p' + w }));
+    else if (o.top) s += inner(cardSVG(o.top, { w, fx: o.fx }));
+    else s += inner(backSVG({ w, pid: 'p' + w }));
+    s += '</g>';
+  }
+  // count bubble
+  const br = Math.max(12, w * .17), bx = W - br - 1, by = HH - br - 1, fz = Math.max(13, br * 1.05);
+  s += `<g><circle cx="${f1(bx + 1)}" cy="${f1(by + 2)}" r="${f1(br)}" fill="#2a120c" opacity=".35"/><circle cx="${f1(bx)}" cy="${f1(by)}" r="${f1(br)}" fill="#fffaf0" stroke="${INK}" stroke-width="1.8"/><text x="${f1(bx)}" y="${f1(by + fz * .35)}" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="${f1(fz)}" fill="${INK}">${n}</text></g>`;
+  return s + '</svg>';
+}
+
+K.cardLayout = layout; K.cardSVG = cardSVG; K.backSVG = backSVG; K.pileSVG = pileSVG; K.CAPS = CAPS; K.textLine = textLine;
+})(typeof window !== 'undefined' ? window : globalThis);
+/* p4: rule icons (coaster badges), round markers, score pad */
+(function (root) {
+'use strict';
+const K = root.__KK, { INK, CREAM, FONT, TYPES, f1, esc, mix, lighten, darken, dot, star, L } = K;
+
+const GOLD = '#f2b92c', SILVER = '#cfd6dc', BRONZE = '#d78a4a', GREEN = '#3f9a4a', RED = '#d9453a';
+const plateG = (x, y, r, c) => `<g transform="translate(${x} ${y})"><circle r="${r}" fill="${c}" stroke="${INK}" stroke-width="1.3"/><circle r="${f1(r * .6)}" fill="${lighten(c, .45)}" stroke="${darken(c, .3)}" stroke-width=".7"/><circle r="${r}" fill="url(#kk-lit)"/></g>`;
+const crown = (x, y, k, c) => `<path transform="translate(${x} ${y}) scale(${k})" d="M-9 4L-10 -7L-4.5 -2L0 -9L4.5 -2L10 -7L9 4Z" fill="${c}" stroke="${INK}" stroke-width="1.3" stroke-linejoin="round"/>`;
+const arrow = (d, hx, hy, rot, c) => `<path d="${d}" fill="none" stroke="${c || INK}" stroke-width="2.6" stroke-linecap="round"/><path d="M-3.4 -3.4L3.6 0L-3.4 3.4Z" fill="${c || INK}" stroke="${c || INK}" stroke-width="1" stroke-linejoin="round" transform="translate(${hx} ${hy}) rotate(${rot})"/>`;
+const cupG = (x, y, k) => `<g transform="translate(${x} ${y}) scale(${k})"><path d="M-8 -3L8 -3L6 9Q0 11 -6 9Z" fill="#ffdf86" stroke="${INK}" stroke-width="1.5" stroke-linejoin="round"/><path d="M-8.5 -4Q-9 0 -6 1Q-4 4 -1 1Q2 0 4 2Q8 1 8.5 -4Q0 -8 -8.5 -4Z" fill="#b4601c" stroke="${INK}" stroke-width="1.4" stroke-linejoin="round"/><path d="M-4 -6L4 -6L3.4 -10Q0 -12 -3.4 -10Z" fill="#fffdf6" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/></g>`;
+
+// body drawn in a ~ +-14 box
+function iconBody(name, T) {
+  const c = T ? T.c : '#e5553a';
+  switch (name) {
+    case 'pair': return plateG(-6.6, 4, 6.2, c) + plateG(6.6, 4, 6.2, c) + L('M-11 -5Q0 -13 11 -5', INK, 2.2) + star(0, -10.5, 3.2, GOLD);
+    case 'set': return plateG(0, -6, 5.6, c) + plateG(-7.4, 6, 5.6, c) + plateG(7.4, 6, 5.6, c) + star(11, -11, 3, GOLD);
+    case 'ladder': { let s = ''; const hs = [4, 7.5, 11, 15, 19]; for (let i = 0; i < 5; i++) { const x = -12.6 + i * 5.4; s += `<rect x="${f1(x)}" y="${f1(11 - hs[i])}" width="4.4" height="${hs[i]}" rx="1" fill="${mix(lighten(c, .6), c, i / 4)}" stroke="${INK}" stroke-width="1.1"/>`; } return s; }
+    case 'most': return `<rect x="-13" y="2" width="8" height="9" fill="${SILVER}" stroke="${INK}" stroke-width="1.2"/><rect x="-5" y="-3" width="10" height="14" fill="${GOLD}" stroke="${INK}" stroke-width="1.2"/><rect x="5" y="5" width="8" height="6" fill="${BRONZE}" stroke="${INK}" stroke-width="1.2"/>` + crown(0, -8, .62, '#ffe27a');
+    case 'second': return `<rect x="-13" y="-3" width="10" height="14" fill="${SILVER}" stroke="${INK}" stroke-width="1.2"/><rect x="-3" y="-8" width="10" height="19" fill="${GOLD}" stroke="${INK}" stroke-width="1.2" opacity=".5"/><rect x="7" y="5" width="6" height="6" fill="${BRONZE}" stroke="${INK}" stroke-width="1.2"/>` + crown(-8, -9, .5, SILVER);
+    case 'v1': case 'v2': case 'v3': return `<text x="0" y="8.6" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="25" fill="${INK}">${name[1]}</text>`;
+    case 'x3': return `<path d="M-1 12Q-13 6 -9 -4Q-8 -9 -3 -13Q-3 -7 1 -8Q0 -3 4 -5Q12 2 7 9Q5 12 -1 12Z" fill="#ff9a2e" stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/><path d="M-9 -6l7 7M-2 -6l-7 7" stroke="${INK}" stroke-width="2.4" stroke-linecap="round" transform="translate(-2.4 6) scale(.78)"/><text x="4.4" y="9.8" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="21" fill="${INK}">3</text>`;
+    case 'swap': return arrow('M-10 -1Q-9 -9 1 -9L5 -9', 6.4, -9, 0, INK) + arrow('M10 1Q9 9 -1 9L-5 9', -6.4, 9, 180, INK) + `<rect x="-12.5" y="-3" width="6" height="8.5" rx="1.2" fill="${c}" stroke="${INK}" stroke-width="1.1" transform="rotate(-8 -9 1)"/><rect x="6.5" y="-5.5" width="6" height="8.5" rx="1.2" fill="${lighten(c, .5)}" stroke="${INK}" stroke-width="1.1" transform="rotate(8 9 -1)"/>`;
+    case 'dessert': return cupG(0, 2, 1.05) + `<path d="M-12 -8h6M-9 -11v6" stroke="${GREEN}" stroke-width="2.6" stroke-linecap="round"/><path d="M6 -8h6" stroke="${RED}" stroke-width="2.6" stroke-linecap="round"/>`;
+    case 'most6': return cupG(0, 4, .95) + `<path d="M0 -13L-5 -7H5Z" fill="${GREEN}" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>`;
+    case 'fewest6': return cupG(0, 0, .95) + `<path d="M0 13L-5 7H5Z" fill="${RED}" stroke="${INK}" stroke-width="1.1" stroke-linejoin="round"/>`;
+    case 'crown': return crown(0, 2, 1.25, GOLD);
+    case 'coin': return `<circle r="11" fill="${GOLD}" stroke="${INK}" stroke-width="1.5"/><circle r="7.5" fill="none" stroke="#b98a12" stroke-width="1.4"/><text x="0" y="5.2" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="14" fill="#8a6208">1</text><circle r="11" fill="url(#kk-lit)"/>`;
+    case 'star': return star(0, 0, 13, GOLD).replace('/>', ` stroke="${INK}" stroke-width="1.2" stroke-linejoin="round"/>`);
+    case 'check': return `<path d="M-9 1L-3 7L9 -7" fill="none" stroke="${GREEN}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`;
+  }
+  return '';
+}
+K.iconBody = iconBody;
+const ICON_NAMES = ['pair', 'set', 'ladder', 'most', 'second', 'v1', 'v2', 'v3', 'x3', 'swap', 'dessert', 'most6', 'fewest6', 'crown', 'coin', 'star', 'check'];
+const ICON_LABEL = { pair: 'Pair', set: 'Set of 3', ladder: 'Ladder 1-3-6-10-15', most: 'Most / second most', second: 'Second most', v1: '1 point', v2: '2 points', v3: '3 points', x3: 'Triple', swap: 'Swap', dessert: 'End of game most / fewest', most6: 'Most: +6', fewest6: 'Fewest: -6', crown: 'Crown', coin: 'Points', star: 'Star', check: 'Done' };
+
+// standalone coaster icon: iconSVG(name, {size:32, c:'#hex', standalone})
+function iconSVG(name, o) {
+  o = o || {}; const sz = o.size || 32, T = o.type ? TYPES[o.type] : (o.c ? { c: o.c } : null);
+  const ringC = T ? T.c : '#e5553a';
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-icon kk-i-${name}" width="${sz}" height="${sz}" viewBox="-21 -21 42 42" role="img" aria-label="${esc(ICON_LABEL[name] || name)}">`;
+  if (o.standalone) s += K.defs();
+  if (o.bare) s += `<g>${iconBody(name, T)}</g>`;
+  else s += `<circle cx="1" cy="1.8" r="19" fill="#2a120c" opacity=".26"/><circle r="19" fill="#fffaf0" stroke="${INK}" stroke-width="1.8"/><circle r="15.6" fill="none" stroke="${ringC}" stroke-width="2.6"/><g>${iconBody(name, T)}</g>`;
+  return s + '</svg>';
+}
+
+// ---------------------------------------------------------------- round markers: 3 lanterns / coasters  (state: done|current|todo)
+function roundMarkerSVG(n, state, o) {
+  o = o || {}; const sz = o.size || 40; state = state || 'todo';
+  const c = state === 'todo' ? '#cdbd9c' : state === 'done' ? '#3f9a4a' : '#e5553a';
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-round kk-r-${state}" width="${sz}" height="${sz}" viewBox="-21 -21 42 42" role="img" aria-label="Round ${n}: ${state}">`;
+  if (o.standalone) s += K.defs();
+  if (state === 'current') s += `<circle r="20.5" fill="url(#kk-glow)"/>`;
+  s += `<circle cx="1" cy="1.8" r="17" fill="#2a120c" opacity=".28"/><circle r="17" fill="${c}" stroke="${INK}" stroke-width="1.8"/><circle r="17" fill="url(#kk-lit)"/><circle r="12.6" fill="#fffaf0" stroke="${INK}" stroke-width="1.2"/>`;
+  if (state === 'done') s += `<path d="M-6.5 .5L-2 5L7 -5.5" fill="none" stroke="#3f9a4a" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+  else s += `<text x="0" y="6.2" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="17" fill="${state === 'todo' ? '#9c8a68' : INK}">${n}</text>`;
+  return s + '</svg>';
+}
+function roundTrackSVG(cur, o) {
+  o = o || {}; const total = o.total || 3, sz = o.size || 40, gap = Math.round(sz * .2), W = total * sz + (total - 1) * gap;
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-roundtrack" width="${W}" height="${sz}" viewBox="0 0 ${W} ${sz}" role="img" aria-label="Round ${cur} of ${total}">`;
+  if (o.standalone) s += K.defs();
+  s += `<path d="M${sz / 2} ${sz / 2}H${W - sz / 2}" stroke="#8a5a2c" stroke-width="3" stroke-dasharray="2 5" stroke-linecap="round" opacity=".6"/>`;
+  for (let i = 1; i <= total; i++) { const st = i < cur ? 'done' : i === cur ? 'current' : 'todo'; s += `<g transform="translate(${(i - 1) * (sz + gap)} 0)">${roundMarkerSVG(i, st, { size: sz }).replace(/^<svg[^>]*>/, `<svg width="${sz}" height="${sz}" viewBox="-21 -21 42 42">`)}</g>`; }
+  return s + '</svg>';
+}
+
+// ---------------------------------------------------------------- score pad (order slip): rows = [{name, i, rounds:[a,b,c], dessert, total, you}]
+function scorePadSVG(o) {
+  o = o || {}; const rows = o.rows || [], w = o.w || 360, rh = Math.max(34, o.rowH || 36), fs = 14, head = 54, foot = 12;
+  const H = head + rows.length * rh + foot + (o.title === false ? -20 : 0);
+  const cols = ['R1', 'R2', 'R3', 'Sweets', 'Total'];
+  const nameW = w * .30, cw = (w - nameW - 20) / 5, cur = o.round || 0;
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-pad" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" role="img" aria-label="Score pad">`;
+  if (o.standalone) s += K.defs();
+  s += `<rect x="3" y="5" width="${w - 6}" height="${H - 6}" rx="7" fill="#2a120c" opacity=".3"/>`;
+  s += `<path d="M2 12Q2 3 11 3H${w - 11}Q${w - 2} 3 ${w - 2} 12V${H - 8}Q${w - 2} ${H - 2} ${w - 11} ${H - 2}H11Q2 ${H - 2} 2 ${H - 8}Z" fill="#fffaf0" stroke="${INK}" stroke-width="1.7"/>`;
+  // perforation + clip header
+  s += `<rect x="0" y="0" width="${w}" height="16" rx="6" fill="#e5553a" stroke="${INK}" stroke-width="1.6"/><path d="M8 11H${w - 8}" stroke="#fff" stroke-opacity=".5" stroke-dasharray="2 5" stroke-width="2"/>`;
+  s += `<text x="12" y="${head - 10}" font-family="${FONT}" font-weight="900" font-size="15" fill="${INK}">${esc(o.title || 'Order slip')}</text>`;
+  cols.forEach((cn, i) => { const x = nameW + 10 + i * cw + cw / 2; s += `<text x="${f1(x)}" y="${head - 10}" text-anchor="middle" font-family="${FONT}" font-weight="800" font-size="12.5" fill="${i < 3 && cur === i + 1 ? '#c9452e' : '#7a5a3a'}">${cn}</text>`; });
+  s += `<path d="M10 ${head - 4}H${w - 10}" stroke="${INK}" stroke-width="1.4"/>`;
+  rows.forEach((r, ri) => {
+    const y = head + ri * rh, pc = K.PLAYERS[(r.i != null ? r.i : ri) % 5];
+    if (r.you) s += `<rect x="6" y="${y + 1}" width="${w - 12}" height="${rh - 2}" rx="6" fill="${pc.t}" opacity=".75"/>`;
+    s += `<g transform="translate(14 ${y + rh / 2})"><circle r="${f1(rh * .36)}" fill="${pc.c}" stroke="${INK}" stroke-width="1.4"/></g>`;
+    s += `<text x="${14 + rh * .36 + 8}" y="${y + rh / 2 + 5}" font-family="${FONT}" font-weight="800" font-size="${fs}" fill="${INK}" textLength="${f1(Math.min(nameW - rh * .36 - 18, (r.name || pc.name).length * fs * .6))}" lengthAdjust="spacingAndGlyphs">${esc(r.name || pc.name)}</text>`;
+    const vals = [].concat(r.rounds || [], [null, null, null]).slice(0, 3).concat([r.dessert, r.total]);
+    vals.forEach((v, i) => {
+      const x = nameW + 10 + i * cw + cw / 2, last = i === 4;
+      s += `<text x="${f1(x)}" y="${y + rh / 2 + 6}" text-anchor="middle" font-family="${FONT}" font-weight="${last ? 900 : 700}" font-size="${last ? 18 : fs + 1}" fill="${v == null ? '#c9b99a' : (v < 0 ? RED : INK)}">${v == null ? '-' : esc(v)}</text>`;
+    });
+    if (ri < rows.length - 1) s += `<path d="M10 ${y + rh}H${w - 10}" stroke="#cdbd9c" stroke-width="1" stroke-dasharray="3 4"/>`;
+  });
+  return s + '</svg>';
+}
+
+K.iconSVG = iconSVG; K.roundMarkerSVG = roundMarkerSVG; K.roundTrackSVG = roundTrackSVG; K.scorePadSVG = scorePadSVG; K.ICON_NAMES = ICON_NAMES; K.ICON_LABEL = ICON_LABEL;
+})(typeof window !== 'undefined' ? window : globalThis);
+/* p5: scene pieces: conveyor belt (seamless scroll), wooden counter, diner table, cloche + reveal flourish, CSS */
+(function (root) {
+'use strict';
+const K = root.__KK, { INK, CREAM, WOOD, WOOD_D, FONT, f1, esc, mix, lighten, darken, rng, PLAYERS } = K;
+const doc = typeof document !== 'undefined' ? document : null;
+
+// ---------------------------------------------------------------- conveyor belt segment: width = period px, tiles seamlessly in x
+function beltSegmentSVG(o) {
+  o = o || {}; const h = o.h || 72, P = o.period || 96, rail = Math.max(7, Math.round(h * .13));
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-beltseg" width="${P}" height="${h}" viewBox="0 0 ${P} ${h}" preserveAspectRatio="none">`;
+  if (o.standalone) s += K.defs();
+  s += `<rect width="${P}" height="${h}" fill="url(#kk-beltg)"/>`;
+  // slats: every P/4 a soft light edge + dark seam, repeating exactly at the tile edge
+  const n = 4, sw = P / n;
+  for (let i = 0; i <= n; i++) { const x = i * sw; s += `<rect x="${f1(x - 1.2)}" y="${rail}" width="2.4" height="${h - 2 * rail}" fill="#1c1412"/><rect x="${f1(x + 1.2)}" y="${rail}" width="1.4" height="${h - 2 * rail}" fill="#6a5750" opacity=".7"/>`; }
+  // faint wear streaks
+  const r = rng('belt' + P);
+  for (let i = 0; i < 5; i++) { const x = r() * P, y = rail + 4 + r() * (h - 2 * rail - 8); s += `<rect x="${f1(x)}" y="${f1(y)}" width="${f1(10 + r() * 14)}" height="1.2" rx=".6" fill="#fff" opacity=".07"/>`; }
+  // chevrons on each slat (direction of travel: right -> left)
+  for (let i = 0; i < n; i++) { const x = i * sw + sw / 2, y = h / 2, c = Math.min(8, h * .12); s += `<path d="M${f1(x + c * .6)} ${f1(y - c)}L${f1(x - c * .6)} ${f1(y)}L${f1(x + c * .6)} ${f1(y + c)}" fill="none" stroke="#8a756c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>`; }
+  // steel rails with rivets
+  const railG = (y, flip) => `<rect y="${y}" width="${P}" height="${rail}" fill="url(#kk-steel)"${flip ? ` transform="translate(0 ${2 * y + rail}) scale(1 -1)"` : ''}/><rect y="${flip ? y + rail - 1.2 : y}" width="${P}" height="1.2" fill="#fff" opacity=".5"/><rect y="${flip ? y : y + rail - 1.2}" width="${P}" height="1.2" fill="#2a120c" opacity=".45"/>`;
+  s += railG(0, false) + railG(h - rail, true);
+  for (let i = 0; i < n; i++) { const x = i * sw + sw / 2; s += `<circle cx="${f1(x)}" cy="${f1(rail / 2)}" r="1.5" fill="#7d6f55" stroke="#4a3f2c" stroke-width=".6"/><circle cx="${f1(x)}" cy="${f1(h - rail / 2)}" r="1.5" fill="#7d6f55" stroke="#4a3f2c" stroke-width=".6"/>`; }
+  return s + '</svg>';
+}
+function dataURL(svg) { return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
+// css: a div with this class scrolls the belt forever (respects prefers-reduced-motion)
+function beltCSS(o) {
+  o = o || {}; const h = o.h || 72, P = o.period || 96, sel = o.selector || '.kk-belt', t = o.seconds || 5;
+  const url = dataURL(beltSegmentSVG({ h, period: P, standalone: true }));
+  return `${sel}{height:${h}px;background:url("${url}") repeat-x 0 0/${P}px ${h}px;animation:kk-belt-${P} ${t}s linear infinite}@keyframes kk-belt-${P}{to{background-position-x:-${P}px}}@media (prefers-reduced-motion:reduce){${sel}{animation:none}}`;
+}
+function beltEl(o) {
+  if (!doc) return null; o = o || {}; const P = o.period || 96;
+  const id = 'kk-beltstyle-' + (o.h || 72) + '-' + P; const cls = 'kk-belt-' + (o.h || 72) + '-' + P;
+  if (!doc.getElementById(id)) { const st = doc.createElement('style'); st.id = id; st.textContent = beltCSS({ h: o.h, period: P, selector: '.' + cls, seconds: o.seconds }); doc.head.appendChild(st); }
+  const d = doc.createElement('div'); d.className = 'kk-belt ' + cls; d.setAttribute('aria-hidden', 'true'); return d;
+}
+
+// ---------------------------------------------------------------- wooden diner counter (top surface + front lip). seat 0..4 tints a cloth runner
+function counterSVG(o) {
+  o = o || {}; const w = o.w || 360, h = o.h || 110, lip = Math.round(h * .17), top = h - lip, seat = o.seat, pc = seat != null ? PLAYERS[seat % 5] : null;
+  const r = rng('counter' + w + 'x' + h + (o.variant || ''));
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-counter" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="Diner counter${pc ? ' for ' + pc.name : ''}">`;
+  if (o.standalone) s += K.defs();
+  const planks = Math.max(2, Math.round(top / 38)), ph = top / planks;
+  const cols = ['#b4743f', '#a96b3a', '#bb7c46', '#a2653a'];
+  for (let i = 0; i < planks; i++) {
+    const y = i * ph; s += `<rect x="0" y="${f1(y)}" width="${w}" height="${f1(ph + .6)}" fill="${cols[i % 4]}"/>`;
+    for (let g = 0; g < 7; g++) { const gy = y + 4 + r() * (ph - 8), x0 = r() * w * .6, len = w * (.25 + r() * .4); s += `<path d="M${f1(x0)} ${f1(gy)}q${f1(len * .25)} ${f1((r() - .5) * 5)} ${f1(len * .5)} 0t${f1(len * .5)} 0" fill="none" stroke="#7a4524" stroke-opacity="${f1(.18 + r() * .2)}" stroke-width="${f1(.8 + r() * .8)}" stroke-linecap="round"/>`; }
+    if (r() > .5) { const kx = r() * w, ky = y + ph * (.3 + r() * .4); s += `<ellipse cx="${f1(kx)}" cy="${f1(ky)}" rx="7" ry="3.2" fill="none" stroke="#7a4524" stroke-opacity=".3" stroke-width="1.2"/><ellipse cx="${f1(kx)}" cy="${f1(ky)}" rx="3" ry="1.4" fill="#7a4524" opacity=".25"/>`; }
+    if (i) s += `<rect y="${f1(y - .6)}" width="${w}" height="1.8" fill="#5b3219" opacity=".55"/><rect y="${f1(y + 1.2)}" width="${w}" height="1" fill="#fff" opacity=".12"/>`;
+  }
+  s += `<rect width="${w}" height="${top}" fill="url(#kk-lit)" opacity=".5"/>`;
+  s += `<rect width="${w}" height="${f1(top * .22)}" fill="#2a120c" opacity=".16"/>`;      // soft shadow from the belt above
+  if (pc) {   // cloth runner in the seat colour
+    const rx = w * .06, rw = w * .88, ry = top * .2, rh = top * .74;
+    s += `<rect x="${f1(rx + 1.5)}" y="${f1(ry + 3)}" width="${f1(rw)}" height="${f1(rh)}" rx="6" fill="#2a120c" opacity=".22"/><rect x="${f1(rx)}" y="${f1(ry)}" width="${f1(rw)}" height="${f1(rh)}" rx="6" fill="${pc.c}" stroke="${INK}" stroke-width="1.4"/><rect x="${f1(rx)}" y="${f1(ry)}" width="${f1(rw)}" height="${f1(rh)}" rx="6" fill="url(#kk-weave)"/><rect x="${f1(rx + 4)}" y="${f1(ry + 4)}" width="${f1(rw - 8)}" height="${f1(rh - 8)}" rx="4" fill="none" stroke="#fff" stroke-opacity=".55" stroke-dasharray="5 4" stroke-width="1.3"/><rect x="${f1(rx)}" y="${f1(ry)}" width="${f1(rw)}" height="${f1(rh)}" rx="6" fill="url(#kk-lit)"/>`;
+  }
+  // front lip
+  s += `<rect y="${top}" width="${w}" height="${lip}" fill="#7d4a27"/><rect y="${top}" width="${w}" height="${lip}" fill="url(#kk-lit)" opacity=".4"/><rect y="${top}" width="${w}" height="2.4" fill="#e0a468"/><rect y="${top + 2.4}" width="${w}" height="1.4" fill="#2a120c" opacity=".35"/><rect y="${h - 2}" width="${w}" height="2" fill="#2a120c" opacity=".4"/>`;
+  return s + '</svg>';
+}
+
+// ---------------------------------------------------------------- diner table / wall background (tile + CSS gradients)
+function tableTile(mood) {
+  const night = mood === 'night', a = night ? '#3a231d' : '#efdcb8', b = night ? '#47291f' : '#e6cf9f', ln = night ? '#2a1712' : '#c9a86e';
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><rect width="120" height="120" fill="${a}"/>`;
+  // soft seigaiha-style scale lines, very low contrast
+  for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) { const cx = x * 40 + (y % 2 ? 20 : 0), cy = y * 20 + 20; [16, 11, 6].forEach((r, i) => s += `<circle cx="${cx}" cy="${cy + 40}" r="${r}" fill="${i % 2 ? b : a}" stroke="${ln}" stroke-opacity=".2" stroke-width="1"/>`); }
+  return s + '</svg>';
+}
+function tableCSS(mood) {
+  const night = mood === 'night', url = dataURL(tableTile(mood));
+  const glow = night ? 'radial-gradient(ellipse 70% 55% at 50% 0%,rgba(255,196,110,.30),rgba(255,196,110,0) 70%),radial-gradient(ellipse at 50% 120%,rgba(0,0,0,.45),rgba(0,0,0,0) 60%)' : 'radial-gradient(ellipse 70% 55% at 50% 0%,rgba(255,255,255,.55),rgba(255,255,255,0) 70%),radial-gradient(ellipse at 50% 120%,rgba(120,70,20,.28),rgba(120,70,20,0) 60%)';
+  return `${glow},url("${url}")`;
+}
+function applyTable(el, mood) { if (!el || !el.style) return; el.style.background = tableCSS(mood) + ' 0 0/auto,120px 120px'; el.style.backgroundColor = mood === 'night' ? '#3a231d' : '#efdcb8'; }
+
+// ---------------------------------------------------------------- cloche (dome lid), same aspect as a card (1 : 1.4)
+function clocheSVG(o) {
+  o = o || {}; const w = o.w || 100, H = Math.round(w * 1.4);
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-cloche-svg" width="${w}" height="${H}" viewBox="0 0 100 140" role="img" aria-label="Covered plate">`;
+  if (o.standalone) s += K.defs();
+  s += `<ellipse cx="52" cy="127" rx="46" ry="7" fill="#2a120c" opacity=".3"/>`;
+  s += `<path d="M7 120C7 56 24 26 50 26C76 26 93 56 93 120Z" fill="url(#kk-metal)" stroke="${INK}" stroke-width="2.2" stroke-linejoin="round"/>`;
+  s += `<path d="M15 112C15 64 28 40 42 34" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".55"/><path d="M20 112C21 80 28 58 36 48" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/>`;
+  s += `<path d="M7 120C7 56 24 26 50 26C76 26 93 56 93 120Z" fill="url(#kk-lit)"/>`;
+  s += `<rect x="44" y="17" width="12" height="11" rx="2" fill="#bba67a" stroke="${INK}" stroke-width="1.8"/><circle cx="50" cy="12" r="8.5" fill="url(#kk-metal)" stroke="${INK}" stroke-width="2"/><circle cx="47" cy="9.5" r="2.2" fill="#fff" opacity=".8"/>`;
+  s += `<ellipse cx="50" cy="121" rx="47" ry="8" fill="#d8c79c" stroke="${INK}" stroke-width="2"/><ellipse cx="50" cy="119.5" rx="44" ry="5.5" fill="#f4e8c4" opacity=".7"/>`;
+  return s + '</svg>';
+}
+
+K.beltSegmentSVG = beltSegmentSVG; K.beltCSS = beltCSS; K.beltEl = beltEl; K.counterSVG = counterSVG; K.tableTile = tableTile; K.tableCSS = tableCSS; K.applyTable = applyTable; K.clocheSVG = clocheSVG; K.dataURL = dataURL;
+})(typeof window !== 'undefined' ? window : globalThis);
+/* p6: chef avatars + seats, public API (KKKit), CSS, DOM helpers, cloche reveal */
+(function (root) {
+'use strict';
+const K = root.__KK, { INK, CREAM, FONT, TYPES, ORDER, PLAYERS, f1, esc, mix, lighten, darken } = K;
+const doc = typeof document !== 'undefined' ? document : null;
+
+// ---------------------------------------------------------------- five original chefs (diverse, friendly), 100x100 portrait in a round frame
+const AV = [
+  { name: 'Mina', skin: '#8a5a3c', mood: 'grin' }, { name: 'Taro', skin: '#efc8a0', mood: 'proud' },
+  { name: 'Odile', skin: '#d39b6c', mood: 'smug' }, { name: 'Kofi', skin: '#5d3a28', mood: 'happy' }, { name: 'Pip', skin: '#f6d6bb', mood: 'wink' }
+];
+function avatarBody(i) {
+  const a = AV[i % 5], sk = a.skin, skd = darken(sk, .18), sw = 2.1, ink = `stroke="${INK}" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round"`;
+  const lit = d => `<path d="${d}" fill="url(#kk-lit)"/>`;
+  const shoulders = (col, extra) => `<path d="M8 104Q10 74 36 69L64 69Q90 74 92 104Z" fill="${col}" ${ink}/>` + lit('M8 104Q10 74 36 69L64 69Q90 74 92 104Z') + (extra || '');
+  const neck = `<path d="M43 58L43 72Q50 78 57 72L57 58Z" fill="${skd}" ${ink}/>`;
+  const head = `<ellipse cx="50" cy="44" rx="21" ry="23.5" fill="${sk}" ${ink}/>` + `<ellipse cx="50" cy="44" rx="21" ry="23.5" fill="url(#kk-lit)"/>`;
+  const ears = `<circle cx="29.5" cy="47" r="4.6" fill="${sk}" ${ink}/><circle cx="70.5" cy="47" r="4.6" fill="${sk}" ${ink}/>`;
+  const fc = K.face(a.mood, 50, 47, .8, sk);
+  let s = '';
+  if (i === 0) {   // Mina: big curly puff, yellow headband, red apron, gold hoops
+    s += [[28, 28, 11], [40, 17, 12], [60, 17, 12], [72, 28, 11], [50, 13, 12], [22, 42, 8], [78, 42, 8]].map(c => `<circle cx="${c[0]}" cy="${c[1]}" r="${c[2]}" fill="#2b1a14" ${ink}/>`).join('');
+    s += shoulders('#fffaf0', `<path d="M33 69L67 69L72 104L28 104Z" fill="#e5553a" ${ink}/>` + lit('M33 69L67 69L72 104L28 104Z') + `<path d="M38 69L36 82M62 69L64 82" stroke="${INK}" stroke-width="1.4" fill="none"/>`) + neck + ears + head;
+    s += `<path d="M29 40Q50 14 71 40Q60 30 50 31Q40 30 29 40Z" fill="#2b1a14" ${ink}/><path d="M28.5 37.5Q50 24 71.5 37.5" fill="none" stroke="#f2b92c" stroke-width="6.5" stroke-linecap="round"/><path d="M28.5 37.5Q50 24 71.5 37.5" fill="none" stroke="${INK}" stroke-width=".9" opacity=".55" transform="translate(0 -3.2)"/>`;
+    s += fc + `<circle cx="29" cy="54" r="2.4" fill="#f2b92c" stroke="${INK}" stroke-width="1"/><circle cx="71" cy="54" r="2.4" fill="#f2b92c" stroke="${INK}" stroke-width="1"/>`;
+  } else if (i === 1) {   // Taro: spiky black hair, white headband with knot, teal chef jacket
+    s += shoulders('#2a97a0', `<path d="M42 69L50 84L58 69" fill="#fffaf0" ${ink}/><circle cx="50" cy="88" r="1.7" fill="#fffaf0" stroke="${INK}" stroke-width="1"/><circle cx="50" cy="96" r="1.7" fill="#fffaf0" stroke="${INK}" stroke-width="1"/>`) + neck + ears + head;
+    s += `<path d="M28 42Q26 18 50 16Q74 18 72 42Q66 30 50 30Q34 30 28 42Z" fill="#1f1a1c" ${ink}/><path d="M34 22L36 10L42 20M46 18L50 6L55 18M58 20L65 10L66 22" fill="#1f1a1c" ${ink}/>`;
+    s += `<path d="M28.5 36Q50 26 71.5 36" fill="none" stroke="#fffaf0" stroke-width="6" stroke-linecap="round"/><path d="M28.5 33Q50 23 71.5 33M28.5 39Q50 29 71.5 39" fill="none" stroke="${INK}" stroke-width=".9" opacity=".5"/><path d="M71 36Q80 30 84 38M71 36Q82 40 82 48" fill="none" stroke="#fffaf0" stroke-width="4" stroke-linecap="round"/>`;
+    s += fc + `<g fill="#3a2a22" opacity=".55"><circle cx="43" cy="63" r=".9"/><circle cx="47" cy="65" r=".9"/><circle cx="53" cy="65" r=".9"/><circle cx="57" cy="63" r=".9"/></g>`;
+  } else if (i === 2) {   // Odile: grey bob, round tortoise glasses, mustard apron, red dotted scarf
+    s += `<path d="M25 44Q22 12 50 12Q78 12 75 44L77 68Q68 68 66 58L34 58Q32 68 23 68Z" fill="#cfd0d8" ${ink}/>`;
+    s += shoulders('#fffaf0', `<path d="M33 69L67 69L72 104L28 104Z" fill="#e0a31c" ${ink}/>` + lit('M33 69L67 69L72 104L28 104Z')) + neck + ears + head;
+    s += `<path d="M42 71L50 84L58 71Q50 76 42 71Z" fill="#d9453a" ${ink}/><g fill="#fff"><circle cx="46" cy="73" r="1"/><circle cx="53" cy="74" r="1"/><circle cx="50" cy="79" r="1"/></g>`;
+    s += `<path d="M28 40Q36 21 50 23Q64 21 72 40Q62 30 50 31Q38 30 28 40Z" fill="#cfd0d8" ${ink}/>`;
+    s += fc + `<circle cx="41" cy="47" r="8.4" fill="#fff" fill-opacity=".22" stroke="#7a4a2a" stroke-width="2.3"/><circle cx="59" cy="47" r="8.4" fill="#fff" fill-opacity=".22" stroke="#7a4a2a" stroke-width="2.3"/><path d="M49.4 46Q50 44.6 50.6 46" fill="none" stroke="#7a4a2a" stroke-width="2.2"/><path d="M32.6 46L28 44M67.4 46L72 44" stroke="#7a4a2a" stroke-width="2" stroke-linecap="round"/>`;
+  } else if (i === 3) {   // Kofi: tall chef toque (tilted), goatee, violet jacket, yellow neckerchief
+    s += shoulders('#7a5ac8', `<path d="M42 69L50 84L58 69" fill="#fffaf0" ${ink}/><path d="M42 69Q50 76 58 69L55 79L50 83L45 79Z" fill="#f2b92c" ${ink}/>`) + neck + ears + head;
+    s += `<path d="M29 38Q30 28 38 26L62 26Q70 28 71 38Q62 31 50 31Q38 31 29 38Z" fill="#1f1a1c" ${ink}/>`;
+    s += `<g transform="rotate(-7 50 28)"><path d="M31 30L69 30L67 15L33 15Z" fill="#fffdf6" ${ink}/><path d="M32 16Q20 14 22 6Q24 -4 34 -1Q38 -10 50 -6Q62 -10 66 -1Q76 -4 78 6Q80 14 68 16Z" fill="#fffdf6" ${ink}/>` + lit('M32 16Q20 14 22 6Q24 -4 34 -1Q38 -10 50 -6Q62 -10 66 -1Q76 -4 78 6Q80 14 68 16Z') + `<path d="M42 17L42 29M58 17L58 29" stroke="#d9cdb4" stroke-width="1.3"/></g>`;
+    s += fc + `<path d="M44 64Q50 73 56 64Q50 67 44 64Z" fill="#1f1a1c" stroke="${INK}" stroke-width="1" stroke-linejoin="round"/>`;
+  } else {   // Pip: ginger braids, green newsboy cap, freckles, overalls
+    s += `<path d="M26 44Q24 16 50 14Q76 16 74 44L74 56L26 56Z" fill="#d9622b" ${ink}/>`;
+    s += [[22, 62], [20, 72], [22, 82]].map(c => `<circle cx="${c[0]}" cy="${c[1]}" r="5.5" fill="#d9622b" ${ink}/>`).join('') + [[78, 62], [80, 72], [78, 82]].map(c => `<circle cx="${c[0]}" cy="${c[1]}" r="5.5" fill="#d9622b" ${ink}/>`).join('') + `<circle cx="22" cy="88" r="3.4" fill="#5aa83c" ${ink}/><circle cx="78" cy="88" r="3.4" fill="#5aa83c" ${ink}/>`;
+    s += shoulders('#fffaf0', `<path d="M36 69L64 69L68 104L32 104Z" fill="#4f7fc0" ${ink}/>` + lit('M36 69L64 69L68 104L32 104Z') + `<circle cx="40" cy="80" r="2" fill="#f2b92c" stroke="${INK}" stroke-width="1"/><circle cx="60" cy="80" r="2" fill="#f2b92c" stroke="${INK}" stroke-width="1"/>`) + neck + ears + head;
+    s += `<path d="M29 40Q36 26 50 28Q64 26 71 40Q60 34 50 35Q40 34 29 40Z" fill="#d9622b" ${ink}/>`;
+    s += `<path d="M26 36Q28 15 52 15Q74 16 75 36Q50 28 26 36Z" fill="#5aa83c" ${ink}/>` + lit('M26 36Q28 15 52 15Q74 16 75 36Q50 28 26 36Z') + `<path d="M24 36Q50 42 77 36L81 41Q50 49 21 41Z" fill="#3f8a28" ${ink}/><circle cx="51" cy="14" r="2.4" fill="#3f8a28" stroke="${INK}" stroke-width="1.2"/>`;
+    s += fc + `<g fill="#c9784a" opacity=".85"><circle cx="38" cy="54" r="1"/><circle cx="42" cy="56" r="1"/><circle cx="35" cy="57" r="1"/><circle cx="62" cy="54" r="1"/><circle cx="58" cy="56" r="1"/><circle cx="65" cy="57" r="1"/></g>`;
+  }
+  return s;
+}
+function avatarSVG(i, o) {
+  o = o || {}; const sz = o.size || 64, pc = PLAYERS[i % 5], uid = 'kk-avc' + (i % 5);
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-avatar" width="${sz}" height="${sz}" viewBox="0 0 100 100" role="img" aria-label="${esc(pc.name)}">`;
+  if (o.standalone) s += K.defs();
+  s += `<defs><clipPath id="${uid}"><circle cx="50" cy="50" r="46"/></clipPath><radialGradient id="${uid}b" cx=".5" cy=".35" r=".8"><stop offset="0" stop-color="${lighten(pc.t, .5)}"/><stop offset="1" stop-color="${pc.t}"/></radialGradient></defs>`;
+  s += `<circle cx="51" cy="53" r="46" fill="#2a120c" opacity=".25"/><circle cx="50" cy="50" r="46" fill="url(#${uid}b)"/>`;
+  s += `<g clip-path="url(#${uid})">${avatarBody(i)}</g>`;
+  s += `<circle cx="50" cy="50" r="46" fill="none" stroke="${pc.c}" stroke-width="${o.ring === false ? 0 : 6}"/><circle cx="50" cy="50" r="48.6" fill="none" stroke="${INK}" stroke-width="2.4"/><circle cx="50" cy="50" r="43.2" fill="none" stroke="${INK}" stroke-width="1.2" opacity=".6"/>`;
+  return s + '</svg>';
+}
+// seat tag: avatar + name pill + card/score counters, glow when active
+function seatSVG(i, o) {
+  o = o || {}; const w = o.w || 150, av = Math.round(w * .38), h = av + 6, pc = PLAYERS[i % 5], fs = 14, name = o.name || pc.name;
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-seat" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(name)}${o.score != null ? ', ' + o.score + ' points' : ''}">`;
+  if (o.standalone) s += K.defs();
+  const x0 = av * .55, fs2 = 16;
+  if (o.active) s += `<rect x="0" y="2" width="${w}" height="${h - 4}" rx="${(h - 4) / 2}" fill="#ffd25a" opacity=".55"/><rect x="0" y="2" width="${w}" height="${h - 4}" rx="${(h - 4) / 2}" fill="none" stroke="#ffc83a" stroke-width="3"/>`;
+  s += `<rect x="${f1(x0)}" y="${f1(h * .24)}" width="${f1(w - x0 - 2)}" height="${f1(h * .56)}" rx="${f1(h * .28)}" fill="${pc.c}" stroke="${INK}" stroke-width="1.8"/><rect x="${f1(x0)}" y="${f1(h * .24)}" width="${f1(w - x0 - 2)}" height="${f1(h * .56)}" rx="${f1(h * .28)}" fill="url(#kk-lit)"/>`;
+  s += `<text x="${f1(av * 1.0 + 8)}" y="${f1(h * .53)}" font-family="${FONT}" font-weight="800" font-size="${fs2}" fill="#fff" stroke="${darken(pc.c, .5)}" stroke-width="3" paint-order="stroke" textLength="${f1(Math.min(name.length * fs2 * .6, w - av - 52))}" lengthAdjust="spacingAndGlyphs">${esc(name)}</text>`;
+  if (o.score != null) s += `<g transform="translate(${f1(w - 22)} ${f1(h * .52)})"><circle r="14" fill="#fffaf0" stroke="${INK}" stroke-width="1.6"/><text y="5.4" text-anchor="middle" font-family="${FONT}" font-weight="900" font-size="${String(o.score).length > 2 ? 13 : 16}" fill="${INK}">${esc(o.score)}</text></g>`;
+  s += `<g transform="translate(0 3)">${avatarSVG(i, { size: av }).replace(/^<svg[^>]*>/, `<svg width="${av}" height="${av}" viewBox="0 0 100 100">`)}</g>`;
+  return s + '</svg>';
+}
+
+// bare plate + food (no frame): for belt plates / counter stacks.  d = diameter px
+function plateSVG(type, o) {
+  o = o || {}; const d = o.d || 64; if (!TYPES[type]) type = 'tempura';
+  const fx = o.fx || (d >= 120 ? 'full' : d >= 48 ? 'lite' : 'none');
+  return `<svg xmlns="http://www.w3.org/2000/svg" class="kk-plate kk-t-${type}" width="${d}" height="${d}" viewBox="-52 -52 104 104" role="img" aria-label="${esc(TYPES[type].name)}">${o.standalone ? K.defs() : ''}${K.plateBase(type)}<g${fx === 'none' ? '' : ` filter="url(#kk-fx-${fx})"`}>${K.foodArt(type, o)}</g></svg>`;
+}
+
+// ---------------------------------------------------------------- CSS (animations) + shared defs mount
+const CSS = `.kk-card,.kk-back,.kk-pile,.kk-plate,.kk-icon,.kk-avatar,.kk-seat,.kk-counter,.kk-pad,.kk-cloche-svg{display:block;max-width:none}
+@keyframes kk-glide{from{transform:translateX(var(--kk-from,110vw))}to{transform:translateX(var(--kk-to,-30vw))}}
+@keyframes kk-deal{0%{opacity:0;transform:translate(var(--kk-dx,0px),var(--kk-dy,-40px)) rotate(-8deg) scale(.86)}70%{opacity:1;transform:translate(0,2px) rotate(1deg) scale(1.02)}100%{opacity:1;transform:none}}
+@keyframes kk-land{0%{transform:translateY(-14px) scale(1.06)}60%{transform:translateY(1.5px) scale(.99)}100%{transform:none}}
+@keyframes kk-steam{0%{opacity:0;transform:translateY(6px) scale(.6)}25%{opacity:.9}100%{opacity:0;transform:translateY(-34px) scale(1.25)}}
+@keyframes kk-spark{0%{opacity:0;transform:scale(.2) rotate(0)}40%{opacity:1;transform:scale(1.15) rotate(40deg)}100%{opacity:0;transform:scale(.7) rotate(90deg)}}
+@keyframes kk-lid{0%{transform:none;opacity:1}35%{transform:translateY(-14%) rotate(-3deg)}100%{transform:translateY(-62%) translateX(14%) rotate(14deg);opacity:0}}
+.kk-deal{animation:kk-deal .42s cubic-bezier(.2,.8,.3,1) both}.kk-land{animation:kk-land .3s ease-out both}
+.kk-cloche{position:absolute;inset:0;z-index:3;pointer-events:none}.kk-cloche>svg{width:100%;height:100%}.kk-cloche.kk-lift .kk-lidwrap{animation:kk-lid .62s cubic-bezier(.3,.7,.3,1) forwards}
+.kk-fxp{position:absolute;pointer-events:none;z-index:4}
+@media (prefers-reduced-motion:reduce){.kk-deal,.kk-land{animation:none}.kk-cloche.kk-lift .kk-lidwrap{animation:none;opacity:0}}`;
+function mount() {
+  if (!doc) return;
+  const go = () => {
+    if (doc.getElementById('kk-defs')) return;
+    const d = doc.createElement('div'); d.id = 'kk-defs'; d.setAttribute('aria-hidden', 'true'); d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none';
+    d.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute">${K.defs()}</svg>`; (doc.body || doc.documentElement).appendChild(d);
+    const st = doc.createElement('style'); st.id = 'kk-css'; st.textContent = CSS; doc.head.appendChild(st);
+  };
+  if (doc.body) go(); else doc.addEventListener('DOMContentLoaded', go);
+}
+
+// ---------------------------------------------------------------- DOM helpers + caches
+const tpl = doc ? doc.createElement('template') : null;
+function el(svg) { if (!tpl) return null; tpl.innerHTML = svg.trim(); return tpl.content.firstChild; }
+const elCache = new Map();
+function cardEl(type, o) {
+  mount(); const key = type + '|' + JSON.stringify(o || {});
+  let t = elCache.get(key); if (!t) { t = el(K.cardSVG(type, o)); elCache.set(key, t); }
+  return t.cloneNode(true);
+}
+const imgCache = new Map();
+function cardURL(type, o) { return K.dataURL(K.cardSVG(type, Object.assign({}, o, { standalone: true }))); }
+function backURL(o) { return K.dataURL(K.backSVG(Object.assign({}, o, { standalone: true }))); }
+function cardImg(type, o) { const key = type + '|' + JSON.stringify(o || {}); let i = imgCache.get(key); if (!i && typeof Image !== 'undefined') { i = new Image(); i.src = cardURL(type, o); imgCache.set(key, i); } return i; }
+// canvas: drawCard(ctx, type|'back', x, y, w, opts) -> Promise<Image>; draws immediately if the image is cached and loaded
+function drawCard(ctx, type, x, y, w, o) {
+  o = Object.assign({ w }, o);
+  let i = type === 'back' ? (function () { const k = 'back|' + w; let m = imgCache.get(k); if (!m) { m = new Image(); m.src = backURL({ w }); imgCache.set(k, m); } return m; })() : cardImg(type, o);
+  return new Promise(res => { const go = () => { try { ctx.drawImage(i, x, y, w, Math.round(w * 1.4)); } catch (e) {} res(i); }; if (i.complete && i.naturalWidth) go(); else i.addEventListener('load', go, { once: true }); });
+}
+
+// ---------------------------------------------------------------- reveal flourish: a cloche covers `host` until lift() is called
+function clocheOn(host, o) {
+  o = o || {}; mount();
+  if (!doc || !host) return { el: null, lift: () => Promise.resolve(), remove() {} };
+  if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+  const c = doc.createElement('div'); c.className = 'kk-cloche';
+  c.innerHTML = `<div class="kk-lidwrap" style="position:absolute;inset:0;transform-origin:50% 100%">${K.clocheSVG({ w: 100 }).replace(/width="100" height="140"/, 'width="100%" height="100%"').replace('viewBox', 'preserveAspectRatio="none" viewBox')}</div>`;
+  host.appendChild(c);
+  const lift = (lo) => {
+    lo = lo || {}; const delay = lo.delay || 0;
+    return new Promise(res => setTimeout(() => {
+      if (lo.onLift) try { lo.onLift(); } catch (e) {}
+      c.classList.add('kk-lift');
+      const rect = host.getBoundingClientRect(), w = rect.width || 100;
+      for (let n = 0; n < 3; n++) { const p = doc.createElement('div'); p.className = 'kk-fxp'; p.style.cssText = `left:${20 + n * 28}%;top:${6 + (n % 2) * 8}%;width:${w * .22}px;height:${w * .16}px;animation:kk-steam ${.9 + n * .15}s ease-out ${n * .08}s both`; p.innerHTML = `<svg viewBox="0 0 40 28" width="100%" height="100%"><path d="M6 22Q0 14 8 11Q10 3 19 5Q28 0 32 9Q40 12 34 21Q20 26 6 22Z" fill="#fff" fill-opacity=".92" stroke="#9fb9cc" stroke-width="1.2"/></svg>`; host.appendChild(p); setTimeout(() => p.remove(), 1400); }
+      for (let n = 0; n < 4; n++) { const p = doc.createElement('div'); p.className = 'kk-fxp'; const x = 12 + n * 24 + (n % 2) * 4, y = 30 + (n * 17) % 40; p.style.cssText = `left:${x}%;top:${y}%;width:${w * .14}px;height:${w * .14}px;animation:kk-spark .7s ease-out ${.2 + n * .07}s both`; p.innerHTML = `<svg viewBox="-10 -10 20 20" width="100%" height="100%"><path d="M0 -9L2.4 -2.4L9 0L2.4 2.4L0 9L-2.4 2.4L-9 0L-2.4 -2.4Z" fill="#ffd23a" stroke="#c98a10" stroke-width=".8"/></svg>`; host.appendChild(p); setTimeout(() => p.remove(), 1300); }
+      setTimeout(() => { c.remove(); res(); }, 700);
+    }, delay));
+  };
+  return { el: c, lift, remove() { c.remove(); } };
+}
+// lift several covers at once with a stagger (ms): revealAll([host,...]) -> Promise
+function revealAll(hosts, o) { o = o || {}; const st = o.stagger != null ? o.stagger : 140; return Promise.all(hosts.map((h, i) => { const c = h.__kkc || clocheOn(h); return c.lift({ delay: i * st, onLift: o.onLift }); })); }
+
+const API = {
+  version: '1.0', TYPES, ORDER, PLAYERS, INK, CREAM, FONT, AVATARS: AV,
+  cardSVG: K.cardSVG, backSVG: K.backSVG, pileSVG: K.pileSVG, plateSVG, cardLayout: K.cardLayout,
+  beltSegmentSVG: K.beltSegmentSVG, beltCSS: K.beltCSS, beltEl: K.beltEl, counterSVG: K.counterSVG,
+  avatarSVG, seatSVG, iconSVG: K.iconSVG, iconNames: K.ICON_NAMES, iconLabel: K.ICON_LABEL, ruleIcon: t => (TYPES[t] || {}).rule,
+  roundMarkerSVG: K.roundMarkerSVG, roundTrackSVG: K.roundTrackSVG, scorePadSVG: K.scorePadSVG,
+  clocheSVG: K.clocheSVG, clocheOn, revealAll,
+  tableCSS: K.tableCSS, applyTable: K.applyTable,
+  mount, css: () => CSS, defs: K.defs, el, cardEl, cardURL, cardImg, backURL, drawCard, dataURL: K.dataURL,
+  name: t => (TYPES[t] || {}).name, ruleText: t => (TYPES[t] || {}).ruleText, color: t => (TYPES[t] || {}).c
+};
+root.KKKit = API; delete root.__KK;
+mount();
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
+(function(){
+const $=s=>document.querySelector(s),app=$('#app'),Q=new URLSearchParams(location.search),only=Q.get('only');
+const night=Q.get('mood')==='night';if(night)document.documentElement.classList.add('night');
+KKKit.applyTable(document.documentElement,night?'night':'day');
+$('#mood').onclick=()=>{const n=!document.documentElement.classList.contains('night');document.documentElement.classList.toggle('night',n);KKKit.applyTable(document.documentElement,n?'night':'day')};
+const h=(t,txt,cls)=>{const e=document.createElement(t);if(txt)e.textContent=txt;if(cls)e.className=cls;return e};
+const sec=(id,title,note,cls)=>{const w=h('div');w.dataset.s=id;if(only&&only!==id){w.style.display='none'}app.appendChild(w);w.appendChild(h('h2',title));if(note)w.appendChild(h('p',note,'n'));const r=h('div',null,cls||'row');w.appendChild(r);return r};
+const cell=(el,lab)=>{const c=h('div',null,'cell');c.appendChild(typeof el==='string'?KKKit.el(el):el);if(lab)c.appendChild(h('span',lab));return c};
+const T=KKKit.ORDER, t0=performance.now();
+// 1 cards at several widths
+[[70,'Cards at 70 px (phone hand)','Name 13 px, one big plate illustration, tiny rule badge.'],[100,'Cards at 100 px (phone table / desktop hand)'],[150,'Cards at 150 px'],[240,'Cards at 240 px (enlarged / tap-to-zoom)','Large cards add a short rule caption.']].forEach(([w,t,n])=>{
+  const r=sec('cards'+w,t,n);T.forEach(k=>r.appendChild(cell(KKKit.cardEl(k,{w}),w>=100?k:null)));r.appendChild(cell(KKKit.cardEl('wasabi',{w,variant:'nigiri'}),w>=100?'wasabi+nigiri':null));});
+// 2 plates
+{const r=sec('plates','Bare plates (belt riders, counter stacks)');T.forEach(k=>r.appendChild(cell(KKKit.plateSVG(k,{d:84}),k)));r.appendChild(cell(KKKit.plateSVG('wasabi',{d:84,variant:'nigiri'}),'wasabi+nigiri'));}
+// 3 backs, piles
+{const r=sec('backs','Card back, deck and discard piles');r.appendChild(cell(KKKit.backSVG({w:70}),'70'));r.appendChild(cell(KKKit.backSVG({w:130}),'130'));r.appendChild(cell(KKKit.backSVG({w:240}),'240'));
+ r.appendChild(cell(KKKit.pileSVG({w:90,count:84}),'deck 84'));r.appendChild(cell(KKKit.pileSVG({w:90,count:6}),'deck 6'));r.appendChild(cell(KKKit.pileSVG({w:90,count:0}),'deck empty'));
+ r.appendChild(cell(KKKit.pileSVG({w:90,count:23,kind:'discard',top:'tempura'}),'discard 23'));r.appendChild(cell(KKKit.pileSVG({w:90,count:0,kind:'discard'}),'discard empty'));}
+// 4 belt
+{const w=h('div');w.dataset.s='belt';if(only&&only!=='belt')w.style.display='none';app.appendChild(w);w.appendChild(h('h2','Conveyor belt (seamless scroll, plates riding)'));w.appendChild(h('p','The belt is a tiling SVG segment (96 px period) scrolled by CSS; plates ride in a flex row. Reduced-motion stops the scroll.','n'));
+ const b=h('div',null,'beltrow');b.style.height='110px';const rid=h('div',null,'riders');rid.style.bottom='23px';T.forEach(k=>rid.appendChild(KKKit.el(KKKit.plateSVG(k,{d:64}))));const bt=KKKit.beltEl({h:72,period:96,seconds:5});bt.style.bottom='19px';b.appendChild(bt);b.appendChild(rid);w.appendChild(b);
+ const s=h('div');s.style.cssText='margin:6px 16px';s.appendChild(KKKit.el(KKKit.beltSegmentSVG({h:72,period:96})));w.appendChild(h('p','One segment (96 x 72):','n'));w.appendChild(s);}
+// 5 counters with stacks
+{const r=sec('counter','Diner counters: played plates stack in front of each player','Cards overlap along the counter; the cloth runner is the seat colour.');
+ const kinds=[['tempura','tempura','salmon','wasabi','squid','roll2','pudding','dumpling'],['sashimi','sashimi','sashimi','egg','chop','roll3'],['dumpling','dumpling','roll1','roll1','pudding','pudding','salmon'],['tempura','sashimi','wasabi','roll2','roll3','chop','egg','squid','pudding'],['pudding','salmon','salmon','tempura']];
+ for(let i=0;i<5;i++){const col=h('div',null,'seatwrap');col.appendChild(KKKit.el(KKKit.seatSVG(i,{w:200,score:[23,15,31,8,42][i],active:i===1})));
+  const bx=h('div',null,'seatbox');bx.style.height='150px';bx.appendChild(KKKit.el(KKKit.counterSVG({w:340,h:150,seat:i})));const st=h('div',null,'stack');const n=kinds[i].length,cw=60,step=Math.min(cw*.72,(310-cw)/(n-1));kinds[i].forEach((k,j)=>{const c=KKKit.el(KKKit.cardSVG(k,{w:cw}));c.style.marginLeft=j?(step-cw)+'px':'0';c.style.marginRight=0;st.appendChild(c)});st.style.cssText='position:absolute;left:14px;top:18px;display:flex';bx.appendChild(st);col.appendChild(bx);r.appendChild(col)}}
+// 6 avatars
+{const r=sec('chefs','Five chefs and seat tags');KKKit.PLAYERS.forEach((p,i)=>{r.appendChild(cell(KKKit.avatarSVG(i,{size:96}),p.name))});KKKit.PLAYERS.forEach((p,i)=>r.appendChild(cell(KKKit.avatarSVG(i,{size:44}),'44px')));
+ const r2=h('div',null,'row');r2.style.marginTop='10px';app.querySelector('[data-s=chefs]').appendChild(r2);KKKit.PLAYERS.forEach((p,i)=>r2.appendChild(cell(KKKit.seatSVG(i,{w:190,score:i*7+3,active:i===2}))));}
+// 7 icons
+{const w=h('div');w.dataset.s='icons';if(only&&only!=='icons')w.style.display='none';app.appendChild(w);w.appendChild(h('h2','Scoring rule icons'));w.appendChild(h('p','Used as the badge on each card and in the scoring breakdown. Each is also drawn at 56 px with its card colour.','n'));
+ const g=h('div',null,'icons');KKKit.iconNames.forEach(n=>{const c=h('div',null,'cell');c.appendChild(KKKit.el(KKKit.iconSVG(n,{size:56,type:n==='pair'?'tempura':n==='set'?'sashimi':n==='ladder'?'dumpling':n==='swap'?'chop':n==='most'||n==='second'?'roll1':null})));c.appendChild(h('span',n));g.appendChild(c)});w.appendChild(g);
+ const r=h('div',null,'row');r.style.marginTop='10px';w.appendChild(r);[22,32,44].forEach(s=>r.appendChild(cell(KKKit.iconSVG('x3',{size:s}),s+'px')));}
+// 8 score pad + rounds
+{const r=sec('pad','Score pad and round markers');r.appendChild(cell(KKKit.scorePadSVG({w:340,round:2,rows:[{i:0,name:'Mina',rounds:[18,12,null],dessert:null,total:30,you:true},{i:1,name:'Taro',rounds:[15,20,null],dessert:null,total:35},{i:2,name:'Odile',rounds:[22,9,null],dessert:null,total:31},{i:3,name:'Kofi',rounds:[11,14,null],dessert:null,total:25},{i:4,name:'Pip',rounds:[8,-1,null],dessert:null,total:7}]})));
+ const c=h('div',null,'seatwrap');c.appendChild(KKKit.el(KKKit.roundTrackSVG(2,{size:44})));c.appendChild(KKKit.el(KKKit.roundTrackSVG(3,{size:30})));const rr=h('div',null,'row');rr.style.padding='0';['todo','current','done'].forEach(s=>rr.appendChild(cell(KKKit.roundMarkerSVG(2,s,{size:48}),s)));c.appendChild(rr);r.appendChild(c);}
+// 9 cloche reveal
+{const r=sec('reveal','Reveal flourish: covered plates lift their cloches','Press "Reveal plates" (top). Reduced motion: the lids simply vanish.','reveal');
+ const hosts=[];['tempura','squid','pudding','wasabi'].forEach((k,i)=>{const hd=h('div',null,'h');hd.appendChild(KKKit.cardEl(k,{w:110}));r.appendChild(hd);hosts.push(hd)});
+ const arm=()=>hosts.forEach(hd=>{if(!hd.__kkc){hd.__kkc=KKKit.clocheOn(hd)}});arm();
+ $('#rv').onclick=()=>{KKKit.revealAll(hosts,{stagger:160}).then(()=>{hosts.forEach(hd=>hd.__kkc=null);setTimeout(()=>{arm()},1200)})};
+ r.appendChild(cell(KKKit.clocheSVG({w:110}),'cloche'));if(Q.get('cover')==='0'){}}
+// 10 stress
+if(only==='stress'){const r=sec('stress','Stress: 120 cards at 70 px');const t1=performance.now();for(let i=0;i<120;i++)r.appendChild(KKKit.cardEl(T[i%12],{w:70}));window.STRESS_MS=performance.now()-t1;}
+if(Q.get('rv')){setTimeout(()=>$('#rv').click(),+Q.get('rv'))}
+$('#info').textContent=innerWidth+'x'+innerHeight+' | build '+Math.round(performance.now()-t0)+' ms';
+window.DEMO_READY=true;
+})();
+</script></body></html>

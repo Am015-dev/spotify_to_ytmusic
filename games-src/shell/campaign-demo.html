@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Campaign demo</title>
+<link rel="stylesheet" href="gx-campaign.css">
+<style>
+  html,body{margin:0;height:100%;background:#1b1410;color:#fbefd6;font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+  #title,#game{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;text-align:center}
+  #game[hidden],#title[hidden]{display:none}
+  .b{min-height:48px;min-width:160px;border-radius:12px;border:0;font:inherit;font-weight:700;padding:8px 18px;background:#c9662a;color:#fff8ec}
+  .b.alt{background:#3a2a1c;border:1px solid #6b4a2b}
+  .demo-nav{position:fixed;left:8px;bottom:8px;z-index:50;display:flex;gap:4px;opacity:.5}
+  .demo-nav:hover{opacity:1}
+  .demo-nav button{min-height:32px;font-size:12px;border-radius:8px;border:0;background:#000a;color:#fff}
+  #game pre{background:#0005;padding:8px 12px;border-radius:8px;max-width:100%;white-space:pre-wrap;text-align:left;font-size:13px}
+</style>
+</head>
+<body>
+<div id="title">
+  <h1 style="margin:0">Lantern Coast</h1>
+  <p style="margin:0;opacity:.8">A sample game title screen</p>
+  <button class="b" id="story">Story</button>
+  <button class="b alt">Quick game</button>
+</div>
+<div id="game" hidden>
+  <h2 id="gt" style="margin:0"></h2>
+  <pre id="gd"></pre>
+  <button class="b" id="win">Win (score 24)</button>
+  <button class="b alt" id="lose">Lose</button>
+</div>
+<div class="demo-nav" aria-hidden="true">
+  <button onclick="demo('map')">map</button><button onclick="demo('sheet')">sheet</button><button onclick="demo('scene')">scene</button>
+  <button onclick="demo('boss')">boss</button><button onclick="demo('result')">result</button><button onclick="demo('lost')">lost</button><button onclick="GXC.reset()">reset</button>
+</div>
+<script src="gx-campaign.js"></script>
+<script>
+// Sample data only: an invented world so the screens can be seen without any game.
+var L = function (who, text) { return { who: who, text: text }; };
+var star = function (text, k, v, op) { return { text: text, test: v == null ? { k: k } : { k: k, op: op || '>=', v: v } }; };
+var basic = function (goal) { return [star(goal, 'won'), star('Score 20 or more', 'score', 20), star('Win by 6 or more', 'margin', 6)]; };
+var CAMPAIGN = {
+  game: 'demo', title: 'The Lantern Coast', version: 1,
+  cast: {
+    keeper: { name: 'Old Wren', portrait: 'camp-wren.webp', emoji: '🧓', color: '#3b7a8c' },
+    pip: { name: 'Pip the Gull', emoji: '🐦', color: '#7aa0b8' },
+    marla: { name: 'Marla Saltwise', emoji: '🧜', color: '#4f8a4b' },
+    gorran: { name: 'Gorran Ironkeel', emoji: '⚓', color: '#7a5a3a' },
+    queen: { name: 'The Tide Queen', emoji: '👑', color: '#2d4f9e' }
+  },
+  acts: [{ act: 1, title: 'Low Tide', blurb: 'Learn the shallows, one idea at a time.' },
+         { act: 2, title: 'The Long Reef', blurb: 'Full games against sharper captains.' },
+         { act: 3, title: 'Storm Crown', blurb: 'Hard captains who bend the rules.' }],
+  twists: [{ id: 'extra-pearls', where: 'setup', how: 'The boss seat starts with +param pearls.' },
+           { id: 'short-game', where: 'setup', how: 'The game ends after param rounds instead of the usual count.' },
+           { id: 'double-reef', where: 'scoring', how: 'The boss scores reef cards twice at the end.' }],
+  chapters: []
+};
+var ch = function (o) { CAMPAIGN.chapters.push(Object.assign({ boss: false, setup: { players: 2 }, twist: null, hints: o.act === 1, easier: { maxStars: 2 }, unlock: [] }, o)); };
+var opp = function (cast, name, emoji, pers, lv, style, extra) { return Object.assign({ cast: cast, name: name, emoji: emoji, personality: pers, aiLevel: lv, aiStyle: style }, extra || {}); };
+ch({ id: 'c1', act: 1, title: 'First Light', intro: [L('keeper', 'The tide is out, child. A good day to learn.'), L('keeper', 'Pip will play you. He grabs whatever shines.'), L('pip', 'Shiny! Mine! ...if you let me.')],
+  outro: [L('keeper', 'You kept your nets full. That is the whole trick.')], opponent: opp('pip', 'Pip the Gull', '🐦', 'Grabs whatever shines first.', 'easy', 'greedy'),
+  goal: { type: 'win', text: 'Win your first game.' }, stars: basic('Win the game'), unlock: [{ type: 'portrait', id: 'pip', text: "Pip's portrait" }] });
+ch({ id: 'c2', act: 1, title: 'Counting Shells', intro: [L('keeper', 'Points come from sets. Three of a kind pays best.'), L('keeper', 'Try to finish with 15 points.')],
+  outro: [L('keeper', 'Sets, not scraps. Remember it.')], opponent: opp('pip', 'Pip the Gull', '🐦', 'Grabs whatever shines first.', 'easy', 'greedy'),
+  goal: { type: 'score', value: 15, text: 'Win with at least 15 points.' }, stars: [star('Win with 15+ points', 'score', 15), star('Score 20 or more', 'score', 20), star('Win by 6 or more', 'margin', 6)] });
+ch({ id: 'c3', act: 1, title: 'The Fog Bank', boss: true, intro: [L('keeper', 'Marla runs the fog markets. She trades fair, mostly.'), L('marla', 'Sit, little sailor. Let us see your nerve.')],
+  outro: [L('marla', 'Hm. You will do. The reef road is open to you.')],
+  opponent: opp('marla', 'Marla Saltwise', '🧜', 'Patient. Waits for you to overreach.', 'easy', 'cautious', { taunt: 'Patience wins tides, little one.', praise: 'Well read, sailor. The reef is yours to try.' }),
+  goal: { type: 'win', text: 'Beat Marla.' }, stars: basic('Beat Marla'), unlock: [{ type: 'cardback', id: 'fog', text: 'Fog card back' }] });
+ch({ id: 'c4', act: 2, title: 'Reef Road', intro: [L('keeper', 'No more training wheels. Full rules from here.'), L('gorran', 'Out of my lane, minnow.')],
+  outro: [L('keeper', 'Gorran is loud, not clever. You saw it.')], opponent: opp('gorran', 'Gorran Ironkeel', '⚓', 'Loud, blocks every lane he can.', 'normal', 'blocker'),
+  goal: { type: 'win', text: 'Win a full game.' }, stars: basic('Win the game') });
+ch({ id: 'c5', act: 2, title: 'Salt and Silver', intro: [L('keeper', 'Silver pays double tonight, but it runs out fast.'), L('keeper', 'Finish before round 6 if you can.')],
+  outro: [L('keeper', 'Quick hands. Good.')], opponent: opp('marla', 'Marla Saltwise', '🧜', 'Patient. Waits for you to overreach.', 'normal', 'cautious'),
+  goal: { type: 'before-round', value: 6, text: 'Win before round 6.' }, stars: [star('Win before round 6', 'won'), star('Score 20 or more', 'score', 20), star('Finish by round 4', 'rounds', 4, '<=')] });
+ch({ id: 'c6', act: 2, title: 'Ironkeel Harbour', boss: true, intro: [L('gorran', 'My harbour. My rules. My pearls.'), L('keeper', 'He starts richer than you. Spend early, spend well.')],
+  outro: [L('gorran', 'Bah. Take the storm road then, and drown.')],
+  opponent: opp('gorran', 'Gorran Ironkeel', '⚓', 'Loud, blocks every lane he can.', 'normal', 'blocker', { taunt: 'Ha! Ironkeel never sinks!', praise: 'Grr. Fine. You sail better than you look.' }),
+  twist: { id: 'extra-pearls', param: 2, text: 'Boss rule: Gorran starts with 2 extra pearls.' },
+  goal: { type: 'score', value: 20, text: 'Win with at least 20 points.' }, stars: [star('Win with 20+ points', 'score', 20), star('Score 26 or more', 'score', 26), star('Win by 6 or more', 'margin', 6)], unlock: [{ type: 'title', id: 'harbour', text: 'Title: Harbour Breaker' }] });
+ch({ id: 'c7', act: 3, title: 'Storm Wall', intro: [L('keeper', 'The storm captains play hard and fast.'), L('keeper', 'Start steady. One good set at a time.')],
+  outro: [L('keeper', 'You held the line in the wind.')], opponent: opp('gorran', 'Gorran Ironkeel', '⚓', 'Loud, blocks every lane he can.', 'hard', 'blocker'),
+  goal: { type: 'win', text: 'Win against a hard captain.' }, stars: basic('Win the game') });
+ch({ id: 'c8', act: 3, title: 'Short Squall', intro: [L('marla', 'Four rounds. No time to think. Ready?'), L('keeper', 'Short games reward big early sets.')],
+  outro: [L('marla', 'Fast and sharp. I am impressed.')], opponent: opp('marla', 'Marla Saltwise', '🧜', 'Patient. Waits for you to overreach.', 'hard', 'cautious'),
+  twist: { id: 'short-game', param: 4, text: 'Special rule: the game ends after round 4.' }, goal: { type: 'win', text: 'Win the 4-round game.' }, stars: basic('Win the game') });
+ch({ id: 'c9', act: 3, title: 'Reef of Echoes', intro: [L('keeper', 'The reef counts twice for whoever holds it.'), L('keeper', 'Take it before Marla does.')],
+  outro: [L('keeper', 'One last door. The Queen waits.')], opponent: opp('marla', 'Marla Saltwise', '🧜', 'Patient. Waits for you to overreach.', 'hard', 'cautious'),
+  goal: { type: 'margin', value: 4, text: 'Win by at least 4 points.' }, stars: [star('Win by 4 or more', 'margin', 4), star('Score 24 or more', 'score', 24), star('Win by 8 or more', 'margin', 8)] });
+ch({ id: 'c10', act: 3, title: 'The Drowned Crown', boss: true,
+  intro: [L('queen', 'So the little sailor reaches my throne.'), L('queen', 'Every reef I hold counts double. Every one.'), L('keeper', 'Then hold none of them for her. Go.')],
+  outro: [L('queen', 'The tide turns... and the crown is yours.'), L('keeper', 'I knew you had it in you.')],
+  opponent: opp('queen', 'The Tide Queen', '👑', 'Cold and exact. Hoards the reef and never wastes a pearl.', 'hard', 'hoarder', { taunt: 'The sea keeps what it takes. Come back stronger.', praise: 'You read the deep better than I. Take the crown.' }),
+  twist: { id: 'double-reef', text: 'Boss rule: the Tide Queen scores her reef cards twice at the end.' },
+  goal: { type: 'score', value: 25, text: 'Win with at least 25 points.' }, stars: [star('Win with 25+ points', 'score', 25), star('Score 32 or more', 'score', 32), star('Win by 8 or more', 'margin', 8)],
+  easier: { aiLevel: 'normal', twist: null, maxStars: 2, text: 'The Queen plays at normal strength and her reef counts once.' },
+  unlock: [{ type: 'portrait', id: 'queen', text: "The Tide Queen's portrait" }, { type: 'table', id: 'storm', text: 'Storm-sea table' }] });
+
+var G = null;
+GXC.init({
+  game: 'demo', data: CAMPAIGN,
+  startChapter: function (def) {
+    G = { def: def, score: [0, 0], round: 1, won: false };
+    document.getElementById('title').hidden = true; document.getElementById('game').hidden = false;
+    document.getElementById('gt').textContent = def.title;
+    document.getElementById('gd').textContent = JSON.stringify({ ai: def.opponent.aiLevel, style: def.opponent.aiStyle, twist: def.twist && def.twist.id, hints: def.hints, easy: def.easy, setup: def.setup }, null, 1);
+  },
+  isWon: function (G) { return G.won; },
+  metrics: function (G) { return { won: G.won, score: G.score[0], margin: G.score[0] - G.score[1], rounds: G.round }; },
+  scores: function (G) { return G.score; },
+  onExit: function () { document.getElementById('title').hidden = false; }
+});
+function end(won) { G.won = won; G.score = won ? [24, 17] : [12, 20]; G.round = 5; document.getElementById('game').hidden = true; GXC.finish(G); }
+document.getElementById('win').onclick = function () { end(true); };
+document.getElementById('lose').onclick = function () { end(false); };
+document.getElementById('story').onclick = function () { document.getElementById('title').hidden = true; GXC.open(); };
+
+// sample progress: act 1 done, chapter 4 beaten, chapter 5 open; chapter 5 lost twice (easier offer)
+function seed() {
+  try {
+    localStorage.setItem('gns-campaign-demo', JSON.stringify({ v: 1, last: 'c5', unlocked: [], ch: {
+      c1: { beaten: true, stars: 3, tries: 1, losses: 0 }, c2: { beaten: true, stars: 2, tries: 2, losses: 0 },
+      c3: { beaten: true, stars: 1, tries: 3, losses: 0 }, c4: { beaten: true, stars: 2, tries: 1, losses: 0 }, c5: { beaten: false, stars: 0, tries: 2, losses: 2 } } }));
+  } catch (e) { }
+}
+function byId(id) { return CAMPAIGN.chapters.filter(function (c) { return c.id === id; })[0]; }
+function demo(v) {
+  document.getElementById('title').hidden = true; document.getElementById('game').hidden = true;
+  if (v === 'map') return GXC.open();
+  if (v === 'sheet') { GXC.open(); return setTimeout(function () { document.querySelectorAll('.gxc-node')[4].click(); }, 50); }
+  if (v === 'scene') return GXC.scene(byId('c10').intro, { def: GXC.resolve(byId('c10')), title: 'The Drowned Crown' }).then(function () { GXC.open(); });
+  if (v === 'boss') return GXC.bossCard(GXC.resolve(byId('c10'))).then(function () { GXC.open(); });
+  if (v === 'result') return GXC.result({ won: true, stars: 2, def: GXC.resolve(byId('c6')), unlocks: [{ type: 'title', text: 'Title: Harbour Breaker' }, { type: 'act', text: 'Act 3 opens' }], losses: 0 }).then(function () { GXC.open(); });
+  if (v === 'lost') return GXC.result({ won: false, stars: 0, def: GXC.resolve(byId('c10')), unlocks: [], losses: 2 }).then(function () { GXC.open(); });
+}
+var q = (location.search.match(/[?&]view=(\w+)/) || [])[1];
+if (!/[?&]fresh=1/.test(location.search)) seed();
+if (q) demo(q);
+</script>
+</body>
+</html>

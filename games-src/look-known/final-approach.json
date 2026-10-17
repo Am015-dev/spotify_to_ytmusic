@@ -1,0 +1,19 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"fa-art-phone.json",
+"fa-board-phone.json",
+"fa-brief-phone.json",
+"fa-buttons-phone.json",
+"fa-help-phone.json",
+"fa-log-phone.json",
+"fa-title-phone.json",
+"fa-ui-phone.json",
+"fa-zoom-phone.json",
+"menu-phone.json",
+"story-scene-phone.json"
+]
+}
+}

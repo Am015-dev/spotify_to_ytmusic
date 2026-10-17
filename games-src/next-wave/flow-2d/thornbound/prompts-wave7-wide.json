@@ -1,0 +1,41 @@
+{
+ "cards": {
+  "table-ossuary": "a wide painted tabletop seen from above: a stone ossuary floor with moths around candles and carved bones in the walls, calm empty space in the middle for a game board, no text, letters or numbers",
+  "table-sinks-masquerade": "a wide painted tabletop seen from above: a candle-lit court floor with scattered masks and dark velvet, calm empty space in the middle for a game board, no text, letters or numbers"
+ },
+ "style": "Dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit, painterly brushwork, rich shadows, no text, no lettering, no frame.",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "table-ossuary": {
+   "element": "Painting: table-ossuary",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-ossuary.png",
+   "target": "games/thornbound/media/table-ossuary.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "table-sinks-masquerade": {
+   "element": "Painting: table-sinks-masquerade",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-sinks-masquerade.png",
+   "target": "games/thornbound/media/table-sinks-masquerade.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

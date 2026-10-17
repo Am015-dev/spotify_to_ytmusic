@@ -1,0 +1,41 @@
+{
+ "cards": {
+  "end-win-b": "four cheerful adventurers cheering on a pile of gold in a torch-lit hall, confetti of coins, no text, letters or numbers",
+  "end-win-c": "a golden boot raised on a pedestal in a glowing vault, sparkles, no text, letters or numbers"
+ },
+ "style": "Hand-painted medieval storybook gouache illustration for a rowdy dungeon-door card game, warm torchlight, chunky readable shapes, slightly wobbly dark ink outline, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 9",
+ "meta": {
+  "end-win-b": {
+   "element": "Painting: end-win-b",
+   "why": "every win shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-win-b.png",
+   "target": "games/doorkick-dungeon/media/end-win-b.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 9"
+  },
+  "end-win-c": {
+   "element": "Painting: end-win-c",
+   "why": "every win shows the same picture",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "end-win-c.png",
+   "target": "games/doorkick-dungeon/media/end-win-c.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 9"
+  }
+ }
+}

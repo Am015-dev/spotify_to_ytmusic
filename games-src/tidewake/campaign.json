@@ -1,0 +1,1231 @@
+{
+  "game": "tidewake",
+  "title": "The Lantern Reach",
+  "version": 1,
+  "cast": {
+    "osk": {
+      "name": "Grandmother Osk",
+      "portrait": "camp-osk.webp",
+      "emoji": "🏮",
+      "color": "#d9a21b"
+    },
+    "wick": {
+      "name": "Wick",
+      "portrait": "camp-wick.webp",
+      "emoji": "🕯️",
+      "color": "#2f6fb5"
+    },
+    "harrow": {
+      "name": "Gull Harrow",
+      "portrait": "camp-harrow.webp",
+      "emoji": "🦅",
+      "color": "#7b4fb5"
+    },
+    "brann": {
+      "name": "Brann Ashkeel",
+      "portrait": "camp-brann.webp",
+      "emoji": "💥",
+      "color": "#c0392b"
+    },
+    "saltshade": {
+      "name": "Saltshade",
+      "portrait": "camp-saltshade.webp",
+      "emoji": "🐙",
+      "color": "#1fa3a3"
+    },
+    "sabel": {
+      "name": "Sabel Riftwright",
+      "portrait": "camp-sabel.webp",
+      "emoji": "🌀",
+      "color": "#2e9c6a"
+    },
+    "vey": {
+      "name": "Corsair Vey",
+      "portrait": "camp-vey.webp",
+      "emoji": "🏴‍☠️",
+      "color": "#2a2f3a"
+    },
+    "crown": {
+      "name": "The Abyssal Crown",
+      "portrait": "camp-crown.webp",
+      "emoji": "🐉",
+      "color": "#1b3a5c"
+    },
+    "ysolde": {
+      "name": "Admiral Ysolde",
+      "portrait": "camp-ysolde.webp",
+      "emoji": "⚓",
+      "color": "#e8e1cf"
+    }
+  },
+  "acts": [
+    {
+      "act": 1,
+      "title": "Calm Shallows",
+      "blurb": "Learn to lay currents, keep off the edge and dodge your first leviathans."
+    },
+    {
+      "act": 2,
+      "title": "Open Water",
+      "blurb": "Deck Cannons, Rift Gates and the long night watch. The captains stop going easy."
+    },
+    {
+      "act": 3,
+      "title": "The Deep Reach",
+      "blurb": "Rogue Waves, the Maelstrom and the Admiral who rules the haunted archipelago."
+    }
+  ],
+  "twists": [
+    {
+      "id": "boss-first",
+      "where": "setup",
+      "how": "Pass newGame option first = the boss seat (1), so the boss picks its start mark first and takes the first turn."
+    },
+    {
+      "id": "boss-cannon",
+      "where": "setup",
+      "how": "After newGame has dealt the hands (exp.cannon must be 1), move param Deck Cannons (max 2) from G.deck into the boss hand, sending the same number of its currents to the bottom of G.deck."
+    },
+    {
+      "id": "deep-stir",
+      "where": "setup",
+      "how": "In newGame, schedule setupMon with n = min(10, LEV_AT_START[np] + param), so param extra leviathans rise at set-up."
+    },
+    {
+      "id": "wave-early",
+      "where": "setup",
+      "how": "With exp.wave = 1, move WAVE_ID to the front of G.mdeck in newGame before setupMon runs, so the Rogue Wave rises during set-up."
+    },
+    {
+      "id": "harrier",
+      "where": "ai",
+      "how": "When the boss seat decides, call decide() with a copy of AILV.hard whose push = param (e.g. 30), so evalPos rewards leaving rival junks next to the edge."
+    }
+  ],
+  "chapters": [
+    {
+      "id": "c1",
+      "act": 1,
+      "title": "Lantern Lit",
+      "boss": false,
+      "intro": [
+        {
+          "who": "osk",
+          "text": "Your first junk, child. Hang the lantern and lay a current in front of your bow."
+        },
+        {
+          "who": "osk",
+          "text": "Your ship follows the line to its end. Never let that line run off the board."
+        },
+        {
+          "who": "wick",
+          "text": "Race you round the shallows! No sea monsters today, promise."
+        }
+      ],
+      "outro": [
+        {
+          "who": "osk",
+          "text": "You read the water well. Wick ran off the edge, not you."
+        },
+        {
+          "who": "wick",
+          "text": "Next time I am watching my own lines!"
+        }
+      ],
+      "opponent": {
+        "name": "Wick",
+        "portrait": "camp-wick.webp",
+        "emoji": "🕯️",
+        "cast": "wick",
+        "personality": "Cheerful cabin hand who lays whatever tile is on top of the hand.",
+        "aiLevel": "easy",
+        "aiStyle": "default"
+      },
+      "setup": {
+        "players": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "names": [
+          "You",
+          "Wick"
+        ],
+        "variant": null,
+        "noMon": true,
+        "exp": {
+          "rift": 0,
+          "wave": 0,
+          "maelstrom": 0,
+          "cannon": 0
+        }
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win: be the last junk afloat (no leviathans in this chapter)."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Be the last junk afloat",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Sink Wick with a current you laid",
+          "test": {
+            "k": "sunk",
+            "op": ">=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Win within 12 turns in total",
+          "test": {
+            "k": "turns",
+            "op": "<=",
+            "v": 12
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Wick sails gently and Grandmother Osk shows the safest move every turn."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "wick",
+          "text": "Wick's portrait"
+        },
+        {
+          "type": "title",
+          "id": "deckhand",
+          "text": "Title: Deckhand"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "act": 1,
+      "title": "Leviathan Bay",
+      "boss": false,
+      "intro": [
+        {
+          "who": "osk",
+          "text": "Now the deep wakes. Each roll of 6, 7 or 8 makes every leviathan move."
+        },
+        {
+          "who": "osk",
+          "text": "A leviathan in front of your bow on your turn sinks you. Keep two squares between you."
+        },
+        {
+          "who": "wick",
+          "text": "I counted six of them. Six! Stay away from my side of the bay."
+        }
+      ],
+      "outro": [
+        {
+          "who": "osk",
+          "text": "You kept your distance and the leviathans went hungry."
+        },
+        {
+          "who": "wick",
+          "text": "One ate my current right under me. Not fair."
+        }
+      ],
+      "opponent": {
+        "name": "Wick",
+        "portrait": "camp-wick.webp",
+        "emoji": "🕯️",
+        "cast": "wick",
+        "personality": "Cheerful cabin hand who forgets the leviathans exist.",
+        "aiLevel": "easy",
+        "aiStyle": "default"
+      },
+      "setup": {
+        "players": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "names": [
+          "You",
+          "Wick"
+        ],
+        "variant": null,
+        "noMon": false,
+        "exp": {
+          "rift": 0,
+          "wave": 0,
+          "maelstrom": 0,
+          "cannon": 0
+        }
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win with the six leviathans awake."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Win with the leviathans awake",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Win using the hint at most 3 times",
+          "test": {
+            "k": "hintsUsed",
+            "op": "<=",
+            "v": 3
+          }
+        },
+        {
+          "text": "Win within 10 turns in total",
+          "test": {
+            "k": "turns",
+            "op": "<=",
+            "v": 10
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Same sea, but the hint is free and only two stars are on offer."
+      },
+      "unlock": [
+        {
+          "type": "cardback",
+          "id": "scales",
+          "text": "Leviathan-scale tile back"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "act": 1,
+      "title": "Harrow's Toll",
+      "boss": true,
+      "intro": [
+        {
+          "who": "harrow",
+          "text": "Three junks, one channel, and I collect the toll. Pay or swim."
+        },
+        {
+          "who": "osk",
+          "text": "When your current moves his junk too, you steer him. Steer him into the edge."
+        },
+        {
+          "who": "wick",
+          "text": "I'll sail with you this time. Well, near you."
+        }
+      ],
+      "outro": [
+        {
+          "who": "osk",
+          "text": "You sank a captain with your own current. Now you are a true pilot."
+        },
+        {
+          "who": "harrow",
+          "text": "Keep the toll. I will be watching the Open Water."
+        }
+      ],
+      "opponent": {
+        "name": "Gull Harrow",
+        "portrait": "camp-harrow.webp",
+        "emoji": "🦅",
+        "cast": "harrow",
+        "personality": "Swaggering toll-taker who loves crowding rivals toward the corners.",
+        "aiLevel": "easy",
+        "aiStyle": "default",
+        "taunt": "Ha! Into the corner with you. Pay the toll next time.",
+        "praise": "Hm. You steer like a harbour pilot. Pass, then."
+      },
+      "setup": {
+        "players": 3,
+        "seats": [
+          "human",
+          "ai",
+          "ai"
+        ],
+        "names": [
+          "You",
+          "Gull Harrow",
+          "Wick"
+        ],
+        "variant": null,
+        "noMon": false,
+        "exp": {
+          "rift": 0,
+          "wave": 0,
+          "maelstrom": 0,
+          "cannon": 0
+        }
+      },
+      "twist": null,
+      "goal": {
+        "type": "custom",
+        "value": 1,
+        "text": "Win and sink at least 1 rival with a current you laid."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Win and sink at least 1 rival with your current",
+          "test": {
+            "k": "sunk",
+            "op": ">=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Sink both rivals with your currents",
+          "test": {
+            "k": "sunk",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Win using the hint at most 2 times",
+          "test": {
+            "k": "hintsUsed",
+            "op": "<=",
+            "v": 2
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "players": 2,
+          "seats": [
+            "human",
+            "ai"
+          ],
+          "names": [
+            "You",
+            "Gull Harrow"
+          ]
+        },
+        "maxStars": 2,
+        "text": "Wick stays in port: it is just you and Harrow."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "harrow",
+          "text": "Gull Harrow's portrait"
+        },
+        {
+          "type": "act",
+          "id": "act2",
+          "text": "Act 2: Open Water"
+        },
+        {
+          "type": "table",
+          "id": "dawn",
+          "text": "Dawn-shallows board skin"
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "act": 2,
+      "title": "Cannon Smoke",
+      "boss": false,
+      "intro": [
+        {
+          "who": "brann",
+          "text": "Smell that? Powder. My Deck Cannons blow leviathans back to the deep."
+        },
+        {
+          "who": "osk",
+          "text": "Cannons are in the pile now. Keep one and fire it when a leviathan is about to sink you."
+        },
+        {
+          "who": "osk",
+          "text": "No more hints from me. You know the water."
+        }
+      ],
+      "outro": [
+        {
+          "who": "brann",
+          "text": "Fine shooting. Or fine dodging. Either way, I am out of powder."
+        },
+        {
+          "who": "osk",
+          "text": "A cannon kept is a life kept."
+        }
+      ],
+      "opponent": {
+        "name": "Brann Ashkeel",
+        "portrait": "camp-brann.webp",
+        "emoji": "💥",
+        "cast": "brann",
+        "personality": "Loud cannoneer who keeps every Deck Cannon and fires at the first leviathan in reach.",
+        "aiLevel": "normal",
+        "aiStyle": "default"
+      },
+      "setup": {
+        "players": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "names": [
+          "You",
+          "Brann"
+        ],
+        "variant": null,
+        "noMon": false,
+        "exp": {
+          "rift": 0,
+          "wave": 0,
+          "maelstrom": 0,
+          "cannon": 1
+        }
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win with Deck Cannons in the pile."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Fire at least 1 Deck Cannon",
+          "test": {
+            "k": "cannons",
+            "op": ">=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Sink Brann with a current you laid",
+          "test": {
+            "k": "sunk",
+            "op": ">=",
+            "v": 1
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Brann plays like a deckhand and loses track of his cannons."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "brann",
+          "text": "Brann's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "act": 2,
+      "title": "The Long Watch",
+      "boss": false,
+      "intro": [
+        {
+          "who": "osk",
+          "text": "A night watch alone. No rivals, only the leviathans and the dark."
+        },
+        {
+          "who": "saltshade",
+          "text": "...the water is cold, little lantern. Stay. Stay a while."
+        },
+        {
+          "who": "osk",
+          "text": "Stay afloat for 18 turns. Keep a cannon if one comes."
+        }
+      ],
+      "outro": [
+        {
+          "who": "osk",
+          "text": "Dawn. You kept the lantern burning all night."
+        },
+        {
+          "who": "saltshade",
+          "text": "...another night, then."
+        }
+      ],
+      "opponent": {
+        "name": "Saltshade",
+        "portrait": "camp-saltshade.webp",
+        "emoji": "🐙",
+        "cast": "saltshade",
+        "personality": "A patient leviathan that drifts close and waits for you to run out of room.",
+        "aiLevel": "normal",
+        "aiStyle": "default"
+      },
+      "setup": {
+        "players": 1,
+        "seats": [
+          "human"
+        ],
+        "names": [
+          "You"
+        ],
+        "variant": "easysolo",
+        "goalTurns": 18,
+        "noMon": false,
+        "exp": {
+          "rift": 0,
+          "wave": 0,
+          "maelstrom": 0,
+          "cannon": 1
+        }
+      },
+      "twist": null,
+      "goal": {
+        "type": "survive",
+        "value": 18,
+        "text": "Stay afloat for 18 turns."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Stay afloat for 18 turns",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Never press the hint button",
+          "test": {
+            "k": "hintsUsed",
+            "op": "<=",
+            "v": 0
+          }
+        },
+        {
+          "text": "Finish without firing a Deck Cannon",
+          "test": {
+            "k": "cannons",
+            "op": "<=",
+            "v": 0
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "goalTurns": 12
+        },
+        "maxStars": 2,
+        "text": "A shorter watch: stay afloat for 12 turns."
+      },
+      "unlock": [
+        {
+          "type": "cardback",
+          "id": "night",
+          "text": "Night-watch tile back"
+        },
+        {
+          "type": "portrait",
+          "id": "saltshade",
+          "text": "Saltshade's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c6",
+      "act": 2,
+      "title": "The Riftwright",
+      "boss": true,
+      "intro": [
+        {
+          "who": "sabel",
+          "text": "I open doors in the sea. Step through one and you land wherever the dice say."
+        },
+        {
+          "who": "osk",
+          "text": "A Rift Gate is in the pile. Play it instead of a tile, or to escape when you are about to sink."
+        },
+        {
+          "who": "brann",
+          "text": "She hid a cannon in her sleeve, I swear it."
+        }
+      ],
+      "outro": [
+        {
+          "who": "sabel",
+          "text": "You walked through my door and came out ahead. Impressive."
+        },
+        {
+          "who": "osk",
+          "text": "Past the Rift lies the Deep Reach. The Admiral waits there."
+        }
+      ],
+      "opponent": {
+        "name": "Sabel Riftwright",
+        "portrait": "camp-sabel.webp",
+        "emoji": "🌀",
+        "cast": "sabel",
+        "personality": "Calm navigator who saves the Rift Gate for her own escape and fires cannons late.",
+        "aiLevel": "normal",
+        "aiStyle": "default",
+        "taunt": "The door was open. You simply chose the wrong side.",
+        "praise": "Take the gate-key, captain. You have earned the Deep Reach."
+      },
+      "setup": {
+        "players": 3,
+        "seats": [
+          "human",
+          "ai",
+          "ai"
+        ],
+        "names": [
+          "You",
+          "Sabel",
+          "Brann"
+        ],
+        "variant": null,
+        "noMon": false,
+        "exp": {
+          "rift": 1,
+          "wave": 0,
+          "maelstrom": 0,
+          "cannon": 1
+        }
+      },
+      "twist": {
+        "id": "boss-cannon",
+        "param": 1,
+        "text": "Boss rule: Sabel starts with a Deck Cannon in her hand."
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win against Sabel and Brann with the Rift Gate in play."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Sink at least 1 rival with a current you laid",
+          "test": {
+            "k": "sunk",
+            "op": ">=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Win within 16 turns in total",
+          "test": {
+            "k": "turns",
+            "op": "<=",
+            "v": 16
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Sabel keeps no hidden cannon and both captains sail gently."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "sabel",
+          "text": "Sabel's portrait"
+        },
+        {
+          "type": "act",
+          "id": "act3",
+          "text": "Act 3: The Deep Reach"
+        },
+        {
+          "type": "title",
+          "id": "navigator",
+          "text": "Title: Navigator"
+        }
+      ]
+    },
+    {
+      "id": "c7",
+      "act": 3,
+      "title": "Rogue Water",
+      "boss": false,
+      "intro": [
+        {
+          "who": "vey",
+          "text": "The Admiral pays me to keep pilots out of the Reach. Nothing personal."
+        },
+        {
+          "who": "osk",
+          "text": "A Rogue Wave sweeps a whole row. In its row, roll the die and beat its strength or capsize."
+        },
+        {
+          "who": "osk",
+          "text": "Its strength grows each round. Stay out of its row when it is strong."
+        }
+      ],
+      "outro": [
+        {
+          "who": "vey",
+          "text": "You rode the wave and I did not. Lucky."
+        },
+        {
+          "who": "osk",
+          "text": "Not luck. You read the row."
+        }
+      ],
+      "opponent": {
+        "name": "Corsair Vey",
+        "portrait": "camp-vey.webp",
+        "emoji": "🏴‍☠️",
+        "cast": "vey",
+        "personality": "Cold corsair who plans a turn ahead and steers rivals toward the wave.",
+        "aiLevel": "hard",
+        "aiStyle": "default"
+      },
+      "setup": {
+        "players": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "names": [
+          "You",
+          "Vey"
+        ],
+        "variant": null,
+        "noMon": false,
+        "exp": {
+          "rift": 0,
+          "wave": 1,
+          "maelstrom": 0,
+          "cannon": 1
+        }
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win against Vey with the Rogue Wave in play."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Sink Vey with a current you laid",
+          "test": {
+            "k": "sunk",
+            "op": ">=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Win within 10 turns in total",
+          "test": {
+            "k": "turns",
+            "op": "<=",
+            "v": 10
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Vey stops looking ahead and plays one turn at a time."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "vey",
+          "text": "Vey's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c8",
+      "act": 3,
+      "title": "Maelstrom Row",
+      "boss": false,
+      "intro": [
+        {
+          "who": "osk",
+          "text": "The Maelstrom turns on calm rolls, when the leviathans rest. It swallows tiles whole."
+        },
+        {
+          "who": "brann",
+          "text": "Every toy at once: gates, cannons, wave and whirlpool. Lovely."
+        },
+        {
+          "who": "vey",
+          "text": "Two of us against one lantern. Sail fast."
+        }
+      ],
+      "outro": [
+        {
+          "who": "osk",
+          "text": "Every hazard of the sea, and you came through all of them."
+        },
+        {
+          "who": "brann",
+          "text": "I am buying new powder. Lots of it."
+        }
+      ],
+      "opponent": {
+        "name": "Corsair Vey",
+        "portrait": "camp-vey.webp",
+        "emoji": "🏴‍☠️",
+        "cast": "vey",
+        "personality": "Cold corsair who plans a turn ahead; Brann sails beside him.",
+        "aiLevel": "hard",
+        "aiStyle": "default"
+      },
+      "setup": {
+        "players": 3,
+        "seats": [
+          "human",
+          "ai",
+          "ai"
+        ],
+        "names": [
+          "You",
+          "Vey",
+          "Brann"
+        ],
+        "variant": null,
+        "noMon": false,
+        "exp": {
+          "rift": 1,
+          "wave": 1,
+          "maelstrom": 1,
+          "cannon": 1
+        }
+      },
+      "twist": {
+        "id": "boss-first",
+        "param": null,
+        "text": "Boss rule: Vey picks his start mark first and takes the first turn."
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win with the Rift Gate, Deck Cannons, Rogue Wave and Maelstrom all in play."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Sink at least 1 rival with a current you laid",
+          "test": {
+            "k": "sunk",
+            "op": ">=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Win using no hints",
+          "test": {
+            "k": "hintsUsed",
+            "op": "<=",
+            "v": 0
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Both captains play one turn at a time and you pick your start first."
+      },
+      "unlock": [
+        {
+          "type": "table",
+          "id": "storm",
+          "text": "Storm-reach board skin"
+        }
+      ]
+    },
+    {
+      "id": "c9",
+      "act": 3,
+      "title": "Hunt of the Crown",
+      "boss": false,
+      "intro": [
+        {
+          "who": "osk",
+          "text": "The Abyssal Crown leads the leviathans. Outlast every one of them and the Reach is open."
+        },
+        {
+          "who": "crown",
+          "text": "...ten of us rise. One lantern. The sea is patient."
+        },
+        {
+          "who": "osk",
+          "text": "Alone again. Ten leviathans, and every one must leave the board."
+        }
+      ],
+      "outro": [
+        {
+          "who": "osk",
+          "text": "The last leviathan sank into the deep. Only the Admiral remains."
+        },
+        {
+          "who": "crown",
+          "text": "...for now."
+        }
+      ],
+      "opponent": {
+        "name": "The Abyssal Crown",
+        "portrait": "camp-crown.webp",
+        "emoji": "🐉",
+        "cast": "crown",
+        "personality": "The eldest leviathan: slow, relentless, never alone.",
+        "aiLevel": "hard",
+        "aiStyle": "default"
+      },
+      "setup": {
+        "players": 1,
+        "seats": [
+          "human"
+        ],
+        "names": [
+          "You"
+        ],
+        "variant": "solo",
+        "noMon": false,
+        "exp": {
+          "rift": 0,
+          "wave": 0,
+          "maelstrom": 0,
+          "cannon": 1
+        }
+      },
+      "twist": null,
+      "goal": {
+        "type": "survive",
+        "value": null,
+        "text": "Outlast all 10 leviathans: win when none are left to rise or on the board."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Outlast all 10 leviathans",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Fire at least 2 Deck Cannons",
+          "test": {
+            "k": "cannons",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Win using no hints",
+          "test": {
+            "k": "hintsUsed",
+            "op": "<=",
+            "v": 0
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "variant": "easysolo",
+          "goalTurns": 20
+        },
+        "maxStars": 2,
+        "text": "Stay afloat for 20 turns instead of outlasting every leviathan."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "crown",
+          "text": "The Abyssal Crown's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c10",
+      "act": 3,
+      "title": "The Drowned Admiral",
+      "boss": true,
+      "intro": [
+        {
+          "who": "ysolde",
+          "text": "So the little lantern reached my waters. Every captain here sails for me."
+        },
+        {
+          "who": "osk",
+          "text": "She herds ships toward the edge. Keep your bow in the middle of the board."
+        },
+        {
+          "who": "sabel",
+          "text": "Vey and I owe her. We sail against you, but we will not cheat."
+        }
+      ],
+      "outro": [
+        {
+          "who": "ysolde",
+          "text": "The Reach is yours, lantern-bearer. Keep the light burning."
+        },
+        {
+          "who": "osk",
+          "text": "The archipelago has a new pilot. I could not be prouder."
+        }
+      ],
+      "opponent": {
+        "name": "Admiral Ysolde",
+        "portrait": "camp-ysolde.webp",
+        "emoji": "⚓",
+        "cast": "ysolde",
+        "personality": "Ruthless admiral who looks ahead and pins rival junks against the board edge.",
+        "aiLevel": "hard",
+        "aiStyle": "default",
+        "taunt": "Off the edge, like all the others. The Reach keeps its own.",
+        "praise": "You held the middle. The Reach and its lanterns are yours."
+      },
+      "setup": {
+        "players": 4,
+        "seats": [
+          "human",
+          "ai",
+          "ai",
+          "ai"
+        ],
+        "names": [
+          "You",
+          "Admiral Ysolde",
+          "Vey",
+          "Sabel"
+        ],
+        "variant": null,
+        "noMon": false,
+        "exp": {
+          "rift": 1,
+          "wave": 1,
+          "maelstrom": 1,
+          "cannon": 1
+        }
+      },
+      "twist": {
+        "id": "harrier",
+        "param": 30,
+        "text": "Boss rule: the Admiral steers every rival junk toward the board edge."
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win against the Admiral, Vey and Sabel with every hazard in play."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Sink at least 2 rivals with your currents",
+          "test": {
+            "k": "sunk",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Win using no hints",
+          "test": {
+            "k": "hintsUsed",
+            "op": "<=",
+            "v": 0
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "players": 3,
+          "seats": [
+            "human",
+            "ai",
+            "ai"
+          ],
+          "names": [
+            "You",
+            "Admiral Ysolde",
+            "Vey"
+          ]
+        },
+        "maxStars": 2,
+        "text": "Sabel stays out of it and the Admiral stops herding you to the edge."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "ysolde",
+          "text": "Admiral Ysolde's portrait"
+        },
+        {
+          "type": "title",
+          "id": "reach-pilot",
+          "text": "Title: Pilot of the Reach"
+        },
+        {
+          "type": "table",
+          "id": "lantern",
+          "text": "Lantern-night board skin"
+        }
+      ]
+    }
+  ]
+}

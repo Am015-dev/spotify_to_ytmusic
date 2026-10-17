@@ -1,0 +1,12 @@
+{
+ "cards": {
+  "btn-primary-button-plate": "a single btn primary button plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "gx-app-plate": "a single gx app plate, game art for a board game, no text",
+  "gx-bar-plate": "a single gx bar plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "gx-dock-plate": "a single gx dock plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "gxt-b-pri-button-plate": "a single gxt b pri button plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "gxt-b-pulse-button-plate": "a single gxt b pulse button plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "modal-plate": "a single modal plate, game art for a board game, no text"
+ },
+ "style": "Storybook gouache illustration for a cheerful, slightly grubby fantasy dungeon card game, warm torchlight against deep brown stone, thick dark-brown ink outline, simple readable silhouette, matte paper texture, no text"
+}

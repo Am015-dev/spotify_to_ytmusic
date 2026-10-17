@@ -1,0 +1,62 @@
+{
+ "cards": {
+  "church-tower": "a short stone church tower with a pointed roof, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "cottage": "a small thatched cottage with a chimney and a flower box, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "windmill": "a small stone windmill with four wooden sails and a thatched cap, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a medieval valley tile-laying game, green fields, stone towers and vines, warm afternoon light, matte paper texture, slightly wobbly dark brown outline, simple readable silhouette, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave C",
+ "meta": {
+  "church-tower": {
+   "element": "3D model: church-tower",
+   "why": "valley board edge",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "church-tower.png",
+   "target": "games/rampart-and-vine/models/church-tower.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "cottage": {
+   "element": "3D model: cottage",
+   "why": "valley board edge",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "cottage.png",
+   "target": "games/rampart-and-vine/models/cottage.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "windmill": {
+   "element": "3D model: windmill",
+   "why": "valley board edge",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "windmill.png",
+   "target": "games/rampart-and-vine/models/windmill.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  }
+ },
+ "targets": {
+  "church-tower": "games/rampart-and-vine/models/church-tower.glb",
+  "cottage": "games/rampart-and-vine/models/cottage.glb",
+  "windmill": "games/rampart-and-vine/models/windmill.glb"
+ }
+}

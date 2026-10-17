@@ -1,0 +1,113 @@
+{
+ "cards": {
+  "sw-altar": "a mossy stone altar with carved totems and a dark stain, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "sw-barrel": "a wooden barrel with iron hoops, slightly stained, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "sw-crate": "a splintered wooden crate half open with rope, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "sw-prowler": "a lean black jungle cat with glowing yellow eyes, crouched to pounce, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "sw-rock-a": "a cluster of grey boulders with moss and a few shells, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "sw-rock-b": "a tall jagged rock spire with a flat top, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Tropical castaway gouache illustration for a co-operative island survival card game, turquoise, sand, jungle green and driftwood colours, soft rim light, matte paper texture, slightly wobbly dark ink outline, simple readable silhouette that works small, centred, plenty of margin, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave C",
+ "meta": {
+  "sw-altar": {
+   "element": "3D model: sw-altar",
+   "why": "temple ruins hex",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "sw-altar.png",
+   "target": "games/shipwreck-isle/models/sw-altar.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "sw-barrel": {
+   "element": "3D model: sw-barrel",
+   "why": "beach edge prop",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "sw-barrel.png",
+   "target": "games/shipwreck-isle/models/sw-barrel.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "sw-crate": {
+   "element": "3D model: sw-crate",
+   "why": "beach edge prop",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "sw-crate.png",
+   "target": "games/shipwreck-isle/models/sw-crate.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "sw-prowler": {
+   "element": "3D model: sw-prowler",
+   "why": "the threat as a piece on the board",
+   "pri": 2,
+   "ref": "games/shipwreck-isle/media/camp-prowlers.webp",
+   "thumb": "shipwreck-isle/media/camp-prowlers.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "sw-prowler.png",
+   "target": "games/shipwreck-isle/models/sw-prowler.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "sw-rock-a": {
+   "element": "3D model: sw-rock-a",
+   "why": "mountains and beach hexes",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "sw-rock-a.png",
+   "target": "games/shipwreck-isle/models/sw-rock-a.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "sw-rock-b": {
+   "element": "3D model: sw-rock-b",
+   "why": "mountains hex",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "sw-rock-b.png",
+   "target": "games/shipwreck-isle/models/sw-rock-b.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  }
+ },
+ "targets": {
+  "sw-altar": "games/shipwreck-isle/models/sw-altar.glb",
+  "sw-barrel": "games/shipwreck-isle/models/sw-barrel.glb",
+  "sw-crate": "games/shipwreck-isle/models/sw-crate.glb",
+  "sw-prowler": "games/shipwreck-isle/models/sw-prowler.glb",
+  "sw-rock-a": "games/shipwreck-isle/models/sw-rock-a.glb",
+  "sw-rock-b": "games/shipwreck-isle/models/sw-rock-b.glb"
+ }
+}

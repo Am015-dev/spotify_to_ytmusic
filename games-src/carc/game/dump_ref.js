@@ -1,0 +1,18 @@
+// dump the Rampart & Vine tile/figure/token list for the shared reference page -> SP/ref_carc.json
+const fs=require('fs'),vm=require('vm');const D=__dirname+'/src/';const ctx={console,Math,JSON};vm.createContext(ctx);
+vm.runInContext(fs.readFileSync(D+'data.js','utf8')+';globalThis.__D={TT}',ctx);const {TT}=ctx.__D;const E=[];
+const add=(s,n,tags,t,c,sub)=>E.push({s,n,tags:tags.filter(Boolean),t,c:c==null?null:c,sub:sub||[]});
+const SET={base:'Base game',river:'The Riverlands',ic:'Taverns & Basilicas',tb:'Merchants & Masons'};
+function facts(d){const b=[];for(const c of d.C)b.push(`a town piece touching ${c.e.length===4?'all four sides':c.e.length+' side'+(c.e.length>1?'s':'')}${c.p?' with a banner (+2 finished, +1 unfinished)':''}${c.cat?' with a basilica (town scores 3 per tile and banner if finished, 0 if not)':''}${c.g?' showing '+c.g+' (token for whoever closes the town)':''}`);
+  for(const r of d.R)b.push(r.e.length===2?(Math.abs(r.e[0]-r.e[1])===2?'a straight road':'a road bend'):'a road end'+(r.inn?'':''));if(d.R.some(r=>r.inn))b.push('a tavern beside the road (road scores 2 per tile if finished, 0 if not)');
+  if(d.mon)b.push('a priory (9 when surrounded)');if(d.V.length)b.push(d.spring?'the river spring (first tile of the river)':d.lake?'the river pond (last river tile)':'river');b.push(d.F.length+' field'+(d.F.length===1?'':'s'));if(d.gar)b.push('a herb garden (decoration only)');if(d.start)b.push('the starting tile (shuffled in when the river is used)');
+  return 'Shows '+b.join(', ')+'.'}
+for(const d of TT)add('Tiles',d.n,[SET[d.set],d.mon?'priory':'',d.C.length?'town':'',d.R.length?'road':'',d.V.length?'river':'',d.C.some(c=>c.p)?'banner':'',d.R.some(r=>r.inn)?'tavern':'',d.C.some(c=>c.cat)?'basilica':'',d.C.find(c=>c.g)?d.C.find(c=>c.g).g:''],facts(d),d.c);
+add('Figures','Follower',['7 per colour'],'Placed on a road (wayfarer), town (warden), priory (brother) or field (farmer) of the tile just laid, only where nobody stands yet. Comes home when its feature is finished; farmers stay all game.',7);
+add('Figures','Champion',['Taverns & Basilicas','1 per colour'],'A big follower: counts as two when deciding who holds a feature; scores like one follower.',1);
+add('Figures','Mason',['Merchants & Masons','1 per colour'],'Placed on a road or town where you already have a follower. Whenever a later tile of yours extends it, you take one extra turn (never a second in a row). Comes home with the feature.',1);
+add('Figures','Hog',['Merchants & Masons','1 per colour'],'Placed in a field where you already have a farmer. If you hold the field at the end, it pays 4 instead of 3 per finished town.',1);
+for(const [n,c] of [['Wine',9],['Grain',6],['Cloth',5]])add('Goods tokens',n,['Merchants & Masons'],'One per symbol in a town, taken by whoever lays the tile that finishes the town (even with no follower in it). At the end the most of each kind scores 10; tied players each score 10.',c);
+for(const [n,a,b] of [['Road','1 per tile','1 per tile'],['Road with a tavern','2 per tile','0'],['Town','2 per tile + 2 per banner','1 per tile + 1 per banner'],['Town with a basilica','3 per tile + 3 per banner','0'],['Priory','9','1 + 1 per tile around it'],['Field','—','3 per finished town it touches (4 with your hog)'],['Goods majority','—','10 per kind']])add('Scoring',n,['finished: '+a,'end: '+b],`Finished: ${a}. Unfinished at the end: ${b}. Most followers scores it all; ties all score.`);
+add('Sets','Tile totals',[],'Base 72 (incl. the start tile), The Riverlands 12, Taverns & Basilicas 18, Merchants & Masons 24.',126);
+fs.writeFileSync(__dirname+'/../../ref_carc.json',JSON.stringify(E));console.log(E.length,'entries ->',require('path').resolve(__dirname+'/../../ref_carc.json'))

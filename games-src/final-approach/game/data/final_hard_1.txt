@@ -1,0 +1,10 @@
+hard g1 green Port Alder                      10/12  83% avg rounds 7.0 {"spin":1,"checks:gear+axis":1} 48720ms/game
+hard g2 green Foxmere                          6/12  50% avg rounds 6.9 {"spin":3,"mandatory":1,"checks:flaps":1,"speed":1} 45144ms/game
+hard g3 green Seabright Bay                    5/12  42% avg rounds 7.0 {"short":1,"checks:flaps+axis":3,"checks:flaps":1,"speed":2} 43667ms/game
+hard g4 green Lake Orrin                       7/12  58% avg rounds 7.0 {"spin":1,"speed":2,"fuel":2} 47814ms/game
+hard g5 green Grand Crossing                   8/12  67% avg rounds 7.0 {"checks:gear":1,"speed":1,"checks:gear+flaps+axis":1,"checks:planes+gear":1} 23539ms/game
+hard g6 green Castlemoor                       6/12  50% avg rounds 7.0 {"fuel":3,"speed":1,"checks:flaps+axis":1,"mandatory":1} 37349ms/game
+hard y1 yellow Foxmere                         2/12  17% avg rounds 6.9 {"checks:flaps":4,"collision":1,"speed":1,"mandatory":1,"checks:planes+flaps+axis":1,"short":1,"checks:planes+axis":1} 15485ms/game
+BAND hard green 42/72 58.3%
+BAND hard yellow 2/12 16.7%
+errors 0 stalls 0 time 3140.6s

@@ -1,0 +1,55 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Hollowbough kit demo</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0}body{font-family:'Palatino Linotype','Book Antiqua',Palatino,Georgia,'DejaVu Serif',serif;color:#3b2f2a;background:#efe3c6}
+html{min-height:100%}
+header{padding:14px 16px 4px}h1{margin:0;font-size:26px}h2{font-size:19px;margin:22px 16px 8px;border-bottom:2px solid #3b2f2a55;padding-bottom:3px}
+p.n{margin:2px 16px 8px;font-size:14px;opacity:.85}
+.row{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px}.row.big{gap:14px}
+.cell{display:flex;flex-direction:column;align-items:center;font-size:11px;gap:2px}
+.tok{display:flex;gap:10px;align-items:center;padding:6px 16px;flex-wrap:wrap}
+.tok .g{display:flex;flex-direction:column;align-items:center;font-size:12px;gap:2px}
+.board{display:flex;flex-wrap:wrap;gap:16px;padding:0 16px;align-items:flex-start}
+.bx{max-width:100%}.bx>svg{max-width:100%;height:auto}
+.plq{display:flex;flex-wrap:wrap;gap:10px}
+.mod{position:fixed;inset:0;background:#2a1c1088;display:none;align-items:center;justify-content:center;z-index:9}.mod.on{display:flex}
+</style></head><body>
+<header><h1>Hollowbough visual kit</h1><div id="info" style="font-size:13px"></div></header>
+<div id="app"></div><div class="mod" id="mod"></div>
+<script>/*KIT*/</script>
+<script>
+(function(){
+const $=s=>document.querySelector(s),app=$('#app');
+const mood=/mood=forest/.test(location.search)?'forest':'paper';HBKit.applyTable(document.documentElement,mood);
+const Q=new URLSearchParams(location.search);const only=Q.get('only'),LIM=+Q.get('n')||999;
+const TX={traveler:'Wayfarer',production:'Gathers',destination:'Visit',governance:'Council',prosperity:'Glory'};
+const N={mouse_farmer:['Mossfield Farmer','production','Gain 1 berry for each Farm in your hollow.'],squirrel_shopkeeper:['Penny Nutkin','production','Pay 1 berry: gain 2 resin of your choice.'],hedgehog_bard:['Thistle the Bard','governance','Play to draw 2 cards. Songs end at dusk.'],frog_judge:['Judge Ripple','governance','Discard a card: gain 2 points. Courthouse bonus applies.'],owl_historian:['Old Hootwick','prosperity','Gain 1 point for each unique card in your hollow.'],badger_king:['King Barrowby','prosperity','Gain 2 points for each Council card you hold.'],rabbit_queen:['Queen Clover','prosperity','Gain 3 points if you hold a Palace.'],mole_miner:['Delvin Pickett','production','Gain 1 pebble. Doubled in winter.'],beetle_architect:['Archie Scarab','governance','Build a Construction for 2 fewer twigs.'],fox_wanderer:['Rusty Wanderfoot','traveler','Gain 1 resin and 1 berry, then move on.'],shrew_ranger:['Fern Quickstep','traveler','Place a worker on a forest location without paying.'],pigeon_postal:['Pip Postbird','traveler','Give a card to another player, gain 2 berries.'],turtle_teacher:['Miss Mossback','governance','Gain 1 card per student in the schoolhouse.'],bat_doctor:['Doctor Dusk','destination','Pay 1 berry: remove 1 occupied token and gain 1 point.'],toad_undertaker:['Grim Wartly','destination','Discard 1 critter from the meadow: gain 3 resin.'],hedgehog_monk:['Brother Burr','destination','Give a player up to 2 berries: gain 2 points each.'],mouse_fool:['Pip the Fool','traveler','Place this in another player hollow: score 4 points.'],shrew_sweeper:['Chipper Sweep','production','Gain 1 twig for each Construction you hold.'],squirrel_woodcarver:['Whittle Oakhand','traveler','Discard up to 3 twigs: gain 1 point each.'],rabbit_peddler:['Barnaby Bundle','traveler','Trade any 2 resources for any 2 resources.'],frog_innkeeper:['Dame Puddle','destination','Pay 2 berries to play a critter from the meadow.'],badger_harvester:['Reed Harvester','production','Gain 2 berries. In autumn, gain 3.'],owl_judge:['Justice Barnaby','governance','Draw 2 cards, keep 1. Gain a point per seal.'],fox_peddler:['Ember Haggle','traveler','Pay 1 pebble: gain 1 berry and 1 resin.'],mole_historian:['Scribbler Delve','prosperity','Gain 1 point for each Ruins in the discard pile.'],bat_bard:['Nox the Minstrel','governance','Draw 1 card whenever a player visits the theatre.'],turtle_monk:['Elder Shellsworth','destination','Gain 2 points and draw 1 card. Slow and steady.'],toad_shopkeeper:['Mrs Warble','production','Gain 1 resin for each Store you hold.'],beetle_woodcarver:['Chip Sawdust','production','Gain 2 twigs. If you hold a Crane, gain 3.'],pigeon_ranger:['Wren Skyward','traveler','Look at the top 4 cards: keep 1, give 1 away.'],mouse_queen:['Queen Dewdrop','prosperity','Gain 2 points per Palace and Castle you hold.'],hedgehog_farmer:['Bramble Plower','production','Gain 1 berry for each Farm, up to 3.'],
+farm:['Berry Farm','production','Gain 1 berry. Produces each time a season ends.'],mine:['Pebble Mine','production','Gain 1 pebble.'],refinery:['Amber Still','production','Gain 1 resin.'],barge:['Kindling Raft','production','Gain 2 twigs.'],store:['General Store','production','Gain 1 berry, plus 1 more if you hold an Inn.'],inn:['Lantern Inn','destination','Play a critter from the meadow, paying 3 fewer.'],chapel:['Moss Chapel','destination','Gain 2 points and draw 2 cards.'],monastery:['Hollow Abbey','destination','Give 2 resources to a player: gain 4 points.'],palace:['Grand Palace','prosperity','Gain 2 points for each Governance card.'],castle:['Stone Keep','prosperity','Gain 1 point per Critter in your hollow.'],theatre:['Wick Theatre','prosperity','Gain 1 point per unique Critter you hold.'],school:['Acorn School','prosperity','Gain 1 point for each Common card you hold.'],museum:['Curio Museum','governance','Discard 3 cards: gain 2 points each.'],university:['Quill University','destination','Discard a card: gain 1 resource and 1 point.'],cemetery:['Lantern Rest','destination','Discard a critter: play 1 from the discard pile.'],ruins:['Old Ruins','governance','Discard a Construction: gain its cost back plus 2 cards.'],postoffice:['Post Burrow','destination','Give 2 cards: gain 2 resources of your choice.'],fairground:['Bunting Fair','prosperity','Gain 2 points if 4 or more players have visited.'],courthouse:['Moot Courthouse','governance','Gain 1 resource when you play a Construction.'],clocktower:['Tick Tower','governance','Place a worker here: take 1 extra action.'],lookout:['Treetop Lookout','destination','Gain 2 points and look at the next event.'],crane:['Splinter Crane','governance','Pay 3 fewer twigs when you build.'],storehouse:['Granary Hall','production','Store 1 resource here each season, gain 3 later.'],dungeon:['Hollow Dungeon','destination','Jail a critter: gain 4 points for each one.'],elderheart:['The Elderheart','prosperity','Gain 5 points. Gain 1 point per Prosperity card.'],windmill:['Whirlwind Mill','production','Gain 1 resin and 1 berry.']};
+const costs=[{twig:1},{twig:2,resin:1},{berry:2},{pebble:1,resin:1},{berry:1,twig:1},{pebble:2,berry:2},{resin:3},{twig:3,pebble:2},{berry:3,resin:2,pebble:1,twig:1}];
+const SPECS=HBKit.artKeys.map((k,i)=>{const n=N[k]||[k,'traveler','Text'];return{art:k,name:n[0],type:n[1],text:n[2],cost:costs[i%costs.length],points:(i*3)%7,unique:i%3==0,kind:HBKit.critterKeys.includes(k)?'critter':'construction'};});
+window.SPECS=SPECS;
+const h=(t,txt)=>{const e=document.createElement(t);if(txt)e.textContent=txt;return e};
+const sec=(title,note)=>{app.appendChild(h('h2',title));if(note)app.appendChild(Object.assign(h('p',note),{className:'n'}));const r=h('div');r.className='row';app.appendChild(r);return r};
+const t0=performance.now();
+const show=n=>!only||only===n;
+function open(sp){const m=$('#mod');m.innerHTML='';m.appendChild(HBKit.card(sp,{w:Math.min(330,innerWidth-24,Math.floor((innerHeight-16)/1.4))}));m.classList.add('on')}
+$('#mod').onclick=()=>$('#mod').classList.remove('on');
+if(show('crit')){const r=sec('Critter cards: small (64x90)','Tap a card to open it enlarged.');SPECS.filter(s=>s.kind=='critter').forEach(s=>{const c=h('div');c.className='cell';const e=HBKit.card(s,'small');e.onclick=()=>open(s);c.appendChild(e);r.appendChild(c)});
+const r2=sec('Critter cards: enlarged (260x364)');r2.classList.add('big');SPECS.filter(s=>s.kind=='critter').slice(0,LIM).forEach(s=>r2.appendChild(HBKit.card(s,'large')));}
+if(show('cons')){const r=sec('Construction cards: small');SPECS.filter(s=>s.kind!='critter').forEach(s=>{const e=HBKit.card(s,'small');e.onclick=()=>open(s);r.appendChild(e)});
+const r2=sec('Construction cards: enlarged');r2.classList.add('big');SPECS.filter(s=>s.kind!='critter').slice(0,LIM).forEach(s=>r2.appendChild(HBKit.card(s,'large')));}
+if(show('tok')){app.appendChild(h('h2','Tokens, workers, seasons'));const t=h('div');t.className='tok';
+const g=(lab,el)=>{const d=h('div');d.className='g';d.appendChild(el);d.appendChild(h('span',lab));t.appendChild(d)};
+HBKit.resources.forEach(k=>g(k,HBKit.resource(k,44)));g('point',HBKit.point(null,44));g('+3',HBKit.point(3,44));g('occupied',HBKit.occupied(44));
+HBKit.PLAYER.forEach((p,i)=>g(p.name,HBKit.worker(i,52)));HBKit.seasons.forEach(s=>g(s,HBKit.season(s,56)));
+[16,24].forEach(s=>g('res '+s,HBKit.resource('berry',s)));app.appendChild(t);}
+if(show('board')){app.appendChild(h('h2','Elderheart board and location plaques'));const b=h('div');b.className='board';
+const bx=h('div');bx.className='bx';bx.style.width='min(100%,420px)';bx.appendChild(HBKit.elderheart({w:420,season:'spring'}));b.appendChild(bx);
+const p=h('div');p.className='plq';p.style.flex='1 1 300px';
+[['basic','Twig Glade',null,'Gain 2 twigs.',2,1],['basic','Berry Bush',null,'Gain 1 berry.',1,0],['forest','Deep Forest','Draw 2, keep 1.','',1,0],['forest','Pebble Bank','Gain 2 pebbles.','',2,2],['haven','Haven','Discard cards: gain 1 resource per 2.',null,0,0],['journey','Journey 3','Pay 3 points: score 4.','',1,0],['journey','Journey 5','Pay 5 points: score 8.','',1,0],['event','Harvest Moot','Hold 2 Production cards.','',1,0]].forEach(a=>p.appendChild(HBKit.plaque(a[0],{label:a[1],sub:a[2]||a[3]||undefined,slots:a[4],taken:a[5],w:168})));
+b.appendChild(p);app.appendChild(b);}
+if(Q.get('open')){open(SPECS[+Q.get('open')]);}
+if(show('stress')){const r=sec('Stress: 150 small cards','Same specs reuse cached templates.');const t1=performance.now();for(let i=0;i<150;i++)r.appendChild(HBKit.card(SPECS[i%SPECS.length],'small'));window.STRESS_MS=performance.now()-t1;}
+$('#info').textContent=innerWidth+'x'+innerHeight+' | '+HBKit.artKeys.length+' art keys | build '+Math.round(performance.now()-t0)+' ms';
+window.DEMO_READY=true;
+})();
+</script></body></html>

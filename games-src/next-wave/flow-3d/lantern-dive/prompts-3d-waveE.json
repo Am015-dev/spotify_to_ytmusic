@@ -1,0 +1,62 @@
+{
+ "cards": {
+  "coral": "a cluster of orange branching coral with small glowing polyps, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "kelp": "a tall swaying kelp stalk with long ribbon leaves, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "treasure": "an old iron-bound sea chest half open with a glowing pearl, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a calm co-operative deep-sea card game, deep blue and teal water, a small warm golden lantern glow as the only strong warm light, soft rim light, visible gentle brush texture on matte paper, slightly wobbly dark navy ink outline, simple readable silhouette that still works at 40 pixels, rich but not neon colours, centred, plenty of margin, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave E",
+ "meta": {
+  "coral": {
+   "element": "3D model: coral",
+   "why": "deep prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "coral.png",
+   "target": "games/lantern-dive/models/coral.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "kelp": {
+   "element": "3D model: kelp",
+   "why": "deep prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "kelp.png",
+   "target": "games/lantern-dive/models/kelp.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "treasure": {
+   "element": "3D model: treasure",
+   "why": "deep prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "treasure.png",
+   "target": "games/lantern-dive/models/treasure.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  }
+ },
+ "targets": {
+  "coral": "games/lantern-dive/models/coral.glb",
+  "kelp": "games/lantern-dive/models/kelp.glb",
+  "treasure": "games/lantern-dive/models/treasure.glb"
+ }
+}

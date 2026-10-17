@@ -1,0 +1,23 @@
+<!doctype html><meta charset=utf-8><style>html,body{margin:0;width:960px;height:540px;overflow:hidden;background:#efe3c3}
+#s{position:absolute;inset:0;overflow:hidden}.a{position:absolute}
+</style><body><div id=s></div>
+<script src="file:///home/user/spotify_to_ytmusic/games-src/hollowbough/kit/kit.js"></script>
+<script>
+const s=document.getElementById('s');HBKit.applyTable(s,'paper');
+const el=(h,css,cls)=>{const d=document.createElement('div');d.className='a';Object.assign(d.style,css);d.appendChild(h);s.appendChild(d);return d};
+// warm vignette
+const v=document.createElement('div');v.className='a';v.style.cssText='inset:0;background:radial-gradient(ellipse at 50% 42%,rgba(255,236,170,.45),rgba(255,236,170,0) 55%),radial-gradient(ellipse at 50% 50%,rgba(0,0,0,0) 55%,rgba(120,80,30,.38) 110%);pointer-events:none;z-index:9';s.appendChild(v);
+el(HBKit.evertree({w:440,season:'autumn'}),{left:'260px',top:'4px',width:'440px',zIndex:2,filter:'drop-shadow(0 12px 14px rgba(40,30,10,.35))'});
+const L=[['mouse_farmer','traveler'],['squirrel_shopkeeper','production'],['hedgehog_bard','governance'],['frog_judge','destination']];
+const R=['inn','windmill','chapel','farm'];
+const cs=(k,t,i)=>({art:k,name:k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()),type:t,cost:{twig:1+i%2,berry:i%3,resin:i==2?1:0,pebble:0},points:1+i%3,text:'Gain a berry.'});
+L.forEach((c,i)=>{const a=-16+i*7;el(HBKit.card(cs(c[0],c[1],i),{w:150,h:210}),{left:(40+i*38)+'px',top:(150+i*34)+'px',width:'150px',transform:`rotate(${a}deg)`,zIndex:3+i,filter:'drop-shadow(0 8px 8px rgba(30,20,0,.4))'})});
+const tp=['production','destination','prosperity','governance'];
+R.forEach((c,i)=>{const a=14-i*7;el(HBKit.card({art:c,name:c.replace(/\b\w/g,x=>x.toUpperCase()),type:tp[i],cost:{twig:2,pebble:1},points:2,text:'Gain a pebble.'},{w:150,h:210}),{right:(40+(3-i)*38)+'px',top:(150+(3-i)*34)+'px',width:'150px',transform:`rotate(${a}deg)`,zIndex:3+i,filter:'drop-shadow(0 8px 8px rgba(30,20,0,.4))'})});
+// resources + workers along bottom
+const row=document.createElement('div');row.className='a';row.style.cssText='left:0;right:0;bottom:16px;display:flex;justify-content:center;gap:16px;z-index:12;align-items:flex-end';
+['twig','resin','pebble','berry'].forEach(k=>row.appendChild(HBKit.resource(k,44)));
+[0,1,2,3].forEach(i=>row.appendChild(HBKit.worker(i,56)));
+s.appendChild(row);
+window.READY=1;
+</script>

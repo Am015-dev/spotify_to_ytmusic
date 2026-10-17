@@ -1,0 +1,55 @@
+DOORKICK DUNGEON - MUSIC AND SOUND PROMPTS
+For a text-to-music tool (Suno, Udio, Stable Audio, ElevenLabs Music...). One prompt per track.
+Rules: no vocals, never name artists/games/scores, check the tool's licence allows public game use,
+and log each file in games-src/munch/ASSETS.md. Export WAV or 320 kbps MP3.
+
+======================================================================
+MUSIC LOOPS
+======================================================================
+
+1) music.tavern  (menu / title, new)
+Cosy medieval tavern folk instrumental, 100 BPM, D major, 6/8 jig feel. Lute and fiddle lead with a light hand drum, a tin whistle answering, soft crowd-murmur ambience far in the background. Warm, cheeky and welcoming, like a game night about to start. Seamless loop, 90 seconds, no vocals.
+
+2) music.main  (in game, replaces the current loop)
+Light-hearted fantasy dungeon-crawl instrumental, 92 BPM, A minor with a playful major lift. Pizzicato strings, plucked lute, bassoon and tuba walking bass, soft tambourine. Sneaky and curious, slightly comic, never tense, sits under dialogue and card sounds without getting in the way. Seamless loop, 2 minutes, no vocals, no big crescendos.
+
+3) music.fight  (fights with a level 12+ monster, new)
+Comic-heroic fantasy battle instrumental, 132 BPM, E minor. Driving frame drums and taiko, low brass stabs, fast fiddle runs, a cheeky bassoon motif answering the brass. Exciting but funny, like a pub brawl with a dragon. Seamless loop, 60 seconds, no vocals.
+
+4) music.victory  (win screen, new, not looped)
+Triumphant medieval fanfare that turns into a tavern celebration, 120 BPM, D major. Brass fanfare opening, then lute, fiddle and hand drums in a merry jig, a crowd cheer at the end. 20 seconds with a clean ending, no vocals.
+
+5) music.defeat  (lose screen, new, not looped)
+Comic sad-trombone medieval lament, 70 BPM, D minor. A lone lute and a mournful bassoon, ending on a wry two-note tuba shrug. Funny, not depressing. 10 seconds with a clean ending, no vocals.
+
+======================================================================
+SHORT STINGERS (replace the sax jingles, each under 2 s)
+======================================================================
+
+level
+Short medieval game sound effect, bright lute strum rising into a small bell chime, a happy level-up, under 2 seconds, dry, no reverb tail, no vocals.
+
+win
+Short medieval game sound effect, short brass fanfare three notes up with a cymbal sparkle, under 2 seconds, dry, no reverb tail, no vocals.
+
+lose / death
+Short medieval game sound effect, descending bassoon wah-wah with a soft drum thud, comic, under 2 seconds, dry, no reverb tail, no vocals.
+
+turn
+Short medieval game sound effect, a single warm hand-drum tap plus a lute pluck, a gentle "your turn", under 2 seconds, dry, no reverb tail, no vocals.
+
+bad
+Short medieval game sound effect, two quick low plucks slightly off-key, a playful "nope", under 2 seconds, dry, no reverb tail, no vocals.
+
+boss  (new, with the boss reveal clip)
+Short medieval game sound effect, deep war-drum hit with a low horn blast and a door-slam crack, under 2 seconds, dry, no reverb tail, no vocals.
+
+curse  (new layer)
+Short medieval game sound effect, spooky rising glass-harmonica shimmer with a goblin giggle and no words, under 2 seconds, dry, no reverb tail, no vocals.
+
+======================================================================
+AMBIENCE (optional)
+======================================================================
+
+amb.tavern  (under the menu, low volume)
+Medieval tavern ambience loop: distant crowd chatter with no clear words, mugs clinking, a crackling fireplace, creaking floorboards. 60 seconds, seamless loop.

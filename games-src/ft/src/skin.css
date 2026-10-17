@@ -1,0 +1,131 @@
+/* Sands skin (facelift): painted kit wired by gx-skin.css/js; this file holds the Sands-specific selectors. */
+html.sk{--sk-ink:#3a2410}
+/* tribe meeples */
+html.sk-meeple .mp::before{display:none}
+html.sk-meeple .mp::after{left:0;top:0;transform:none;width:100%;height:100%;border:0;border-radius:0;background:var(--mi) center/contain no-repeat}
+html.sk-meeple .mp[data-c=vizier]{--mi:url(media/meeple-vizier.webp)}html.sk-meeple .mp[data-c=elder]{--mi:url(media/meeple-elder.webp)}
+html.sk-meeple .mp[data-c=merchant]{--mi:url(media/meeple-merchant.webp)}html.sk-meeple .mp[data-c=builder]{--mi:url(media/meeple-builder.webp)}
+html.sk-meeple .mp[data-c=assassin]{--mi:url(media/meeple-assassin.webp)}html.sk-meeple .mp[data-c=artisan]{--mi:url(media/meeple-artisan.webp)}
+html.sk-meeple .mp{filter:drop-shadow(0 1px 1px rgba(30,15,5,.65))}
+html.sk-meeple .mp.h{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 4px #fff) drop-shadow(0 3px 2px rgba(0,0,0,.5))}
+/* icon set (bar, menu rows, drawer titles) */
+html.sk-icons i[data-ic=camel],html.sk-icons i[data-ic=lamp],html.sk-icons i[data-ic=scroll],html.sk-icons i[data-ic=cards],html.sk-icons i[data-ic=book],html.sk-icons i[data-ic=gear],html.sk-icons i[data-ic=menu],html.sk-icons i[data-ic=plus],html.sk-icons i[data-ic=fast]{background:center/contain no-repeat;width:24px;height:24px;display:inline-block;vertical-align:middle}
+html.sk-icons i[data-ic=camel]{background-image:url(media/icon-players.webp)}html.sk-icons i[data-ic=lamp]{background-image:url(media/icon-djinn.webp)}
+html.sk-icons i[data-ic=scroll]{background-image:url(media/icon-log.webp)}html.sk-icons i[data-ic=cards]{background-image:url(media/icon-cards.webp)}
+html.sk-icons i[data-ic=book]{background-image:url(media/icon-rules.webp)}html.sk-icons i[data-ic=gear]{background-image:url(media/icon-settings.webp)}
+html.sk-icons i[data-ic=menu]{background-image:url(media/icon-menu.webp)}html.sk-icons i[data-ic=plus]{background-image:url(media/icon-newgame.webp)}
+html.sk-icons i[data-ic=fast]{background-image:url(media/icon-speed.webp)}
+html.sk-icons i[data-ic=camel] svg,html.sk-icons i[data-ic=lamp] svg,html.sk-icons i[data-ic=scroll] svg,html.sk-icons i[data-ic=cards] svg,html.sk-icons i[data-ic=book] svg,html.sk-icons i[data-ic=gear] svg,html.sk-icons i[data-ic=menu] svg,html.sk-icons i[data-ic=plus] svg,html.sk-icons i[data-ic=fast] svg,html.sk-icons #sndbtn svg,html.sk-icons #musbtn svg{display:none}
+html.sk-icons #sndbtn,html.sk-icons #musbtn,html.sk-icons #bulbbtn{background-repeat:no-repeat;background-position:center;background-size:24px;background-origin:content-box;background-clip:content-box}
+html.sk-icons #sndbtn{background-image:url(media/icon-sound.webp)}html.sk-icons #musbtn{background-image:url(media/icon-music.webp)}html.sk-icons #bulbbtn{background-image:url(media/icon-hint.webp)}
+html.sk-icons #sndbtn[aria-pressed=false],html.sk-icons #musbtn[aria-pressed=false]{opacity:.55}
+html.sk-icons #bulbbtn svg,html.sk-icons #bulbbtn>*{opacity:0}
+html.sk-icons .ri{font-size:0;display:inline-block;width:26px;height:26px;vertical-align:middle;margin-right:8px;background:center/contain no-repeat;font-style:normal}
+html.sk-icons .ri[data-r=players]{background-image:url(media/icon-players.webp)}html.sk-icons .ri[data-r=djinn]{background-image:url(media/icon-djinn.webp)}
+html.sk-icons .ri[data-r=cards]{background-image:url(media/icon-cards.webp)}html.sk-icons .ri[data-r=rules]{background-image:url(media/icon-rules.webp)}
+html.sk-icons .ri[data-r=sound]{background-image:url(media/icon-sound.webp)}html.sk-icons .ri[data-r=music]{background-image:url(media/icon-music.webp)}
+html.sk-icons .ri[data-r=speed]{background-image:url(media/icon-speed.webp)}html.sk-icons .ri[data-r=settings]{background-image:url(media/icon-settings.webp)}
+html.sk-icons .ri[data-r=log]{background-image:url(media/icon-log.webp)}html.sk-icons .ri[data-r=newgame]{background-image:url(media/icon-newgame.webp)}
+/* buttons: cream / go / power pills */
+html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost,html.sk .gx-drawer .seg button{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 18px stretch;border-width:14px 18px;padding:0;border-radius:0;background:none;box-shadow:none;color:#3a2410;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center}
+html.sk .ab.go,html.sk .mbox .btn.go{border-image-source:url(media/ui-button-go-c.webp);color:#fff8ec;text-shadow:0 1px 2px rgba(0,0,0,.65)}
+html.sk .ab.pw,html.sk .mbox .btn.warn{border-image-source:url(media/ui-button-power-c.webp);color:#f4e6ff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+html.sk .ab.pw.on{filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .ab:active,html.sk .mbox .btn:active{transform:translateY(2px);box-shadow:none}
+html.sk .ab:disabled,html.sk .mbox .btn:disabled{opacity:.5}
+html.sk .mbox .btn.sm{border-image-width:14px 18px;border-width:14px 18px}
+/* menu rows */
+html.sk .gx-drawer .menu .btn,html.sk .gx-drawer .opts .btn{border-style:solid;border-color:transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;border-radius:0;background:none;box-shadow:none;display:flex;align-items:center;gap:2px;text-align:left;color:#3a2410;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+html.sk .gx-drawer .menu .btn.gxt-menu{min-height:64px;padding-top:10px;padding-bottom:10px}
+html.sk .gx-drawer .menu .btn:active{transform:translateY(1px)}
+/* dialogs over the table */
+html.sk .mbox{background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/30px stretch;border-width:30px;padding:0;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55));color:#3a2410}
+html.ti.sk #modal[data-k=start] .mbox.start{background:none}
+html.sk .mbox h2{color:#8e3a1c}
+
+/* 3D-model sprites on tiles (palm and palace stacks x1-x3, camel on the owner chip) and the summoning lamp; html.sp3 is set once the files loaded */
+html.sp3 .tok{position:relative;display:inline-block;width:24px;height:24px;font-size:0;text-shadow:none;background:var(--sp) center bottom/38px no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.55))}
+html.sp3 .tok small{display:none}
+html.sp3 .tok.palm{--sp:url(models/palm@512.webp)}html.sp3 .tok.pal{--sp:url(models/palace@512.webp)}
+html.sp3 .tok::before,html.sp3 .tok::after{content:'';position:absolute;inset:0;background:inherit;translate:0 -7px}
+html.sp3 .tok::after{translate:0 -14px}
+html.sp3 .tok[data-n="1"]::before,html.sp3 .tok[data-n="1"]::after,html.sp3 .tok[data-n="2"]::after{display:none}
+html.sp3 .own.cam{font-size:0;width:22px;height:22px;background:var(--pc) url(models/camel@512.webp) center 55%/40px no-repeat}
+#summon{position:fixed;inset:0;z-index:120;pointer-events:none;display:grid;place-items:center;align-content:center;gap:2px;background:radial-gradient(circle at 50% 46%,rgba(60,24,8,.1),rgba(10,4,20,.72));animation:smIn .25s ease-out both}
+#summon.out{opacity:0;transition:opacity .3s}
+#summon{--sz:min(46vw,190px)}
+#summon .sm-lamp{width:var(--sz);height:var(--sz);background:url(models/lamp-turn.webp) 0 0/calc(24*var(--sz)) var(--sz) no-repeat;animation:smTurn 1.6s steps(24) infinite;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6)) drop-shadow(0 0 18px rgba(255,200,90,.55))}
+@keyframes smTurn{to{background-position:calc(-24*var(--sz)) 0}}
+#summon .sm-smoke{position:absolute;left:50%;top:30%;width:min(60vw,260px);aspect-ratio:1;translate:-50% 0;border-radius:50%;background:radial-gradient(circle,rgba(190,140,255,.8),rgba(130,80,220,.4) 45%,rgba(90,40,180,0) 70%);filter:blur(8px);animation:smSmoke 1.7s ease-out both}
+@keyframes smSmoke{from{transform:translateY(60px) scale(.3);opacity:0}30%{opacity:.95}to{transform:translateY(-70px) scale(1.5);opacity:0}}
+#summon b{position:relative;font:900 clamp(26px,9vw,44px)/1 var(--title,Georgia,serif);color:#ffe9a8;text-shadow:0 3px 0 #3a1004,0 0 18px #ff9a2a;animation:smPop .5s .25s cubic-bezier(.2,1.6,.4,1) both}
+#summon span{position:relative;margin-top:6px;font:800 16px var(--title,Georgia,serif);color:#fff3d0;text-shadow:0 2px 0 #000;animation:smPop .4s .45s both}
+@keyframes smPop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes smIn{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){#summon .sm-lamp{animation:none}#summon .sm-smoke{animation:none;opacity:.5}}
+/* ===== painted pieces (djinns, goods, tokens, icons, tile frames, bid slots); each class is set by artProbe() once its file loaded ===== */
+/* goods market cards */
+html.sk-gd .mcard:not(.empty){background:linear-gradient(#fffdf6,#f1e0bc)}
+html.sk-gd .mcard:not(.empty) .mi{font-size:0;width:100%;height:100%;background:var(--gi) center/auto 92% no-repeat}
+html.sk-gd .fl .mi{font-size:0;display:block;width:30px;height:30px}
+/* djinn row: the painting behind the name */
+html.sk-dj .dcard:not(.th){background:linear-gradient(90deg,rgba(28,12,54,.86) 0,rgba(28,12,54,.5) 70%,rgba(28,12,54,.2)),var(--dj) center 20%/cover,#3f2766;text-shadow:0 1px 2px #000}
+html.sk-dj .dcard .dv{box-shadow:0 1px 2px rgba(0,0,0,.5)}
+.dcard .thi{font-style:normal;width:22px;height:22px;flex:0 0 22px;margin-left:-4px;background:var(--ti) center/contain no-repeat;font-size:0}
+html.sk-dj .dcard.th{padding-left:6px}
+html.sk-dj .dcard.th .thi{font-size:0}
+/* summoning: the painted djinn rises out of the smoke */
+#summon .sm-art{position:relative;width:min(70vw,300px);aspect-ratio:4/3;object-fit:cover;border-radius:16px;border:3px solid #e0b24a;box-shadow:0 10px 30px rgba(0,0,0,.65),0 0 28px rgba(190,140,255,.7);animation:smPop .55s cubic-bezier(.2,1.5,.4,1) both}
+/* reference cards */
+.card img.ca{object-fit:cover;object-position:center 22%;background:#3f2766}
+.card img.ca.ct{object-fit:contain;object-position:center;background:linear-gradient(#f6e7c6,#e0c48e);padding:3px;box-sizing:border-box}
+/* camel / tent tokens on the tiles (the player-coloured rim says who owns the tile) */
+html.sk-tk .own{width:24px;height:24px;border:0;border-radius:0;background:none center/contain no-repeat;box-shadow:none;font-size:0;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+html.sk-tk:not(.sp3) .own.cam{background-image:var(--tk)}html.sk-tk .own:not(.cam){background-image:var(--tk)}
+html.sk-tk .own[data-p="0"]{--tk:url(media/token-camel-0.webp)}html.sk-tk .own[data-p="1"]{--tk:url(media/token-camel-1.webp)}html.sk-tk .own[data-p="2"]{--tk:url(media/token-camel-2.webp)}html.sk-tk .own[data-p="3"]{--tk:url(media/token-camel-3.webp)}html.sk-tk .own[data-p="4"]{--tk:url(media/token-camel-4.webp)}
+html.sk-tk .own:not(.cam)[data-p="0"]{--tk:url(media/token-tent-0.webp)}html.sk-tk .own:not(.cam)[data-p="1"]{--tk:url(media/token-tent-1.webp)}html.sk-tk .own:not(.cam)[data-p="2"]{--tk:url(media/token-tent-2.webp)}html.sk-tk .own:not(.cam)[data-p="3"]{--tk:url(media/token-tent-3.webp)}html.sk-tk .own:not(.cam)[data-p="4"]{--tk:url(media/token-tent-4.webp)}
+html.sk-tk:not(.sp3) .tok{font-size:0;display:inline-block;width:24px;height:24px;background:var(--tp) center/contain no-repeat;text-shadow:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.55))}
+html.sk-tk:not(.sp3) .tok small{display:none}html.sk-tk:not(.sp3) .tok.palm{--tp:url(media/token-palm.webp)}html.sk-tk:not(.sp3) .tok.pal{--tp:url(media/token-palace.webp)}
+/* seat chips: coin, camel, goods and djinn icons instead of emoji */
+html.sk-ic2 .e2{font-size:0;display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:1px;background:center/contain no-repeat}
+html.sk-ic2 .e2[data-i=coin]{background-image:url(media/icon-coin.webp)}html.sk-ic2 .e2[data-i=camel]{background-image:url(media/icon-camel.webp)}
+html.sk-ic2 .e2[data-i=basket]{background-image:url(media/icon-basket.webp)}html.sk-ic2 .e2[data-i=djinn]{background-image:url(media/icon-djinn.webp)}
+/* turn-order slots: greyscale peg slot tinted with the bidder's colour */
+html.sk-spot .spot{background:url(media/ui-spot.webp) center/100% 100% no-repeat,rgba(255,248,230,.75);border-color:transparent;border-radius:6px}
+html.sk-spot .spot.taken{background:url(media/ui-spot.webp) center/100% 100% no-repeat var(--pc);background-blend-mode:multiply}
+/* winner sparkle */
+html.sk-fx .ft.up{text-shadow:0 0 6px #ffd35a,0 1px 2px rgba(0,0,0,.6)}
+.card img.ca.cv{height:116px;object-position:center 10%;border-radius:8px}
+
+/* look check: readable ordinals / spot costs (11 px on a pale plate), 44 px summary tap, 11 px cpu tag */
+.spot .ord,.spot.taken .ord{font-size:11px;font-weight:800;color:#3a2010;background:rgba(255,246,220,.92);border-radius:4px;padding:0 3px;align-self:center;line-height:1.15}
+.spot .sp-c,.spot.taken .sp-c{color:#3a2010;font-weight:800;background:rgba(255,246,220,.92);border-radius:4px;padding:0 3px;align-self:center;line-height:20px}
+.exd summary{min-height:44px;display:flex;align-items:center;margin:0}
+.sch .sn small{font-size:11px;opacity:1;color:#3d2a1c}
+
+/* painted plates, glyphs and badges (html.sk-pl): backgrounds and overlays only, no box moves */
+html.sk-pl .tile::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;box-sizing:border-box;border:5px solid transparent;border-image:url(media/ui-tile-frame-red.webp) 28/5px stretch}
+html.sk-pl .tile>*{z-index:2}
+html.sk-pl .tile.blue::after{border-image-source:url(media/ui-tile-frame-blue.webp)}
+html.sk-pl .tile::before{content:'';position:absolute;right:5px;bottom:5px;z-index:1;width:22px;height:22px;pointer-events:none;background:var(--gl) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(30,15,5,.6))}
+html.sk-pl .tile.k-village{--gl:url(media/glyph-village.webp)}html.sk-pl .tile.k-sacred{--gl:url(media/glyph-sacred.webp)}html.sk-pl .tile.k-oasis{--gl:url(media/glyph-oasis.webp)}html.sk-pl .tile.k-small{--gl:url(media/glyph-small.webp)}html.sk-pl .tile.k-large{--gl:url(media/glyph-large.webp)}html.sk-pl .tile.k-workshop{--gl:url(media/glyph-workshop.webp)}html.sk-pl .tile.k-exchange{--gl:url(media/glyph-exchange.webp)}html.sk-pl .tile.k-city{--gl:url(media/glyph-city.webp)}html.sk-pl .tile.k-lake{--gl:url(media/glyph-lake.webp)}
+html.sk-pl .tile .tv{background:#2a1500;border-color:transparent;z-index:3;isolation:isolate}
+html.sk-pl .tile .tv::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(#2a1500,#2a1500) center/calc(100% - 4px) calc(100% - 4px) no-repeat,url(media/ui-badge-gold.webp) center/142% no-repeat}
+html.sk-pl .dcard .dv{background:#8a4a2a;isolation:isolate;position:relative;color:#fff8e8;font-weight:800;line-height:12px;box-shadow:none}
+html.sk-pl .sti{font-style:normal;color:transparent;background:url(media/icon-star.webp) center/contain no-repeat}
+html.sk-pl .mcard:not(.empty){background:url(media/ui-goods-card.webp) center/auto 100% no-repeat,linear-gradient(#fffdf6,#f1e0bc)}
+html.sk-pl .stat .nm{background:url(media/ui-nameplate.webp) center/100% 100% no-repeat;padding:0 4px;color:#3a2410}
+html.sk-pl .card.dj h4,html.sk-pl .dcard.th{background:url(media/ui-djinn-bar.webp) center/100% 100% no-repeat,#2a1250;color:#ffe9a8;text-indent:10px}
+html.sk-pl #summon b{background:url(media/ui-ribbon.webp) center/100% 100% no-repeat;padding:.3em 1.1em;text-shadow:0 2px 0 #3a1004}
+html.sk-pl #finger svg{display:none}html.sk-pl #finger{background:url(media/ui-finger.webp) center/contain no-repeat}
+.pic{width:1.25em;height:1.25em;vertical-align:-.3em;object-fit:contain}.tag .pic{margin-right:3px}
+html.sk-pl .gxh-bub .gxh-arr{width:28px;height:21px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none}
+html.sk-pl .gxh-a-bottom .gxh-arr{bottom:-19px}html.sk-pl .gxh-a-top .gxh-arr{top:-19px;transform:scaleY(-1)}html.sk-pl .gxh-a-left .gxh-arr{left:-22px;transform:rotate(90deg)}html.sk-pl .gxh-a-right .gxh-arr{right:-22px;transform:rotate(-90deg)}
+
+/* look fixes: readable tile names, 44 px tap boxes for the goods row (footprint unchanged: margin takes back the extra 10 px) */
+html.sk-pl .tile .tn{background:rgba(255,247,226,.93);box-shadow:0 0 0 2px rgba(255,247,226,.93);border-radius:3px;color:#2e1a0a}
+html.sk-pl .tile .tv{color:#fff3c8;font-weight:800;line-height:11px;padding-top:2px;text-shadow:0 0 2px #000}
+html:not(.land):not(.short) .mcard{height:44px;margin:-5px 0;padding:5px 0;box-sizing:border-box;border:0;border-radius:7px;outline:1px solid #8a5a18;outline-offset:-5px;box-shadow:none;background-clip:content-box!important;background-origin:content-box!important}
+html.sk-pl .dcard .dv::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:url(media/ui-badge-cream.webp) center/142% no-repeat}
+/* menu test v2: solid colour under the painted button art so contrast is measurable (art fills the same colour) */
+html.sk .ab,html.sk .ab.ghost,html.sk .mbox .btn,html.sk .mbox .btn.ghost{background-color:#f3e2bc}html.sk .ab.go,html.sk .mbox .btn.go{background-color:#b8532b}html.sk .ab.pw,html.sk .mbox .btn.warn{background-color:#4a2f7a}

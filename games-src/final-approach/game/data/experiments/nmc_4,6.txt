@@ -1,0 +1,1 @@
+normal g2 green Foxmere                       12/20  60% avg rounds 7.0 {"mandatory":1,"checks:axis":2,"speed":2,"checks:flaps":2,"spin":1} 16151ms/game
