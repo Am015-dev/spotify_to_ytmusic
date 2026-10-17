@@ -34,8 +34,8 @@ function FC_pull(dt){const c=camera.position;
   FC.rt+=dt;if(FC.rt>=.05){FC.rt=0;const rc=FC.rc;rc.set(c,dv.clone().multiplyScalar(-1/d));rc.far=d-2.2;rc.near=0;let t=-1;   // camera -> car ; the hit nearest the car wins
    for(const m of FC.occ){const ms=Array.isArray(m.material)?m.material:[m.material],sd=ms.map(q=>q.side);   // both faces: walls that face away from the camera (camera behind a wall) count too
     let h;try{for(const q of ms)q.side=THREE.DoubleSide;h=rc.intersectObject(m,false)}finally{ms.forEach((q,i)=>q.side=sd[i])}for(const x of h)if(x.distance>t)t=x.distance}
-   FC.kt=t>=0?Math.max(3/d,Math.min(1,(d-t-.7)/d)):1}
-  FC.k=FC.kt<FC.k?FC.kt:Math.min(FC.kt,FC.k+dt*.8);
+   FC.hT=t>=0?(FC.hT||0)+.05:0;FC.kt=t>=0&&FC.hT>=.3?Math.max(3/d,Math.min(1,(d-t-.7)/d)):1}   /* rv4A: a wall must stay on the line 0.3 s (a corner clipped while passing is ignored) */
+  FC.k=FC.kt<FC.k?Math.max(FC.kt,FC.k-dt*2):Math.min(FC.kt,FC.k+dt*.5);   /* rv4A: eases in at 2/s (was a snap) and out at 0.5/s (was 0.8): road-follow in Athens swung 18/min */
   if(FC.k<.999){FC.off.copy(dv).multiplyScalar(1-FC.k);c.sub(FC.off);FC.pulls++}}
 roamCam=(f=>function(dt){if(FC.off.lengthSq()){camera.position.add(FC.off);FC.off.set(0,0,0)}f(dt);if(!FC.on||state!=='roam'||(RO.foot&&RO.foot!=='car')||(typeof M1!=='undefined'&&M1.cs)){if(FC.hid.length)FC_restore(true);FC.k=1;FC.kt=1;return}
   // foliage over / around the camera
