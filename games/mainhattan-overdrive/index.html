@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.86',date:'17 Oct 2026',items:[{t:'FIXED',s:'Camera no longer jumps far ahead and back when the car switches to its 4x4 form.'},{t:'NEW',s:'Smash more street items: walls let you slide instead of stopping dead, playground pieces and stalls break.'},{t:'NEW',s:'Shortcuts marked with arrows in Athens and Frankfurt, each one much quicker than the road.'}]},
   {v:'v90m-beta.85',date:'17 Oct 2026',items:[{t:'FIXED',s:'Less phone memory again: far street objects are freed while you drive and a memory leak is fixed (Frankfurt about 55 MB lower after 5 minutes).'}]},
   {v:'v90m-beta.84',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phone memory cut a lot: Athens loads with about 130 MB less, and far parts of the city are freed while you drive, so fewer crashes.'},{t:'FIXED',s:'Fountains and filler roads no longer block streets in Frankfurt and Athens; the Aiolou side street in Athens is now drivable.'},{t:'NEW',s:'Garage cars show a rarity tag: NEAT, COOL, EPIC or SUPER.'}]},
   {v:'v90m-beta.83',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phone crash: races now free their props when they end, and phones use a lighter memory mode (sharper than before is traded for stability).'},{t:'NEW',s:'Race HUD shows your place and the gap to the rival; smashing, quest card and jam fixes; better Athens roads.'}]},
@@ -1532,7 +1533,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c_checklist":"df62d33e","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"784b04cd","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","99c5_athroads":"327c163e"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"71818746","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"784b04cd","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"c5981e20","99c5_athroads":"327c163e"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -2099,6 +2100,7 @@ function poseInit(grp,fold){grp.children.forEach((c,i)=>{c.userData.p1=c.positio
 function poseApply(grp,v){grp.visible=v>.001;if(!grp.visible)return;for(const c of grp.children){const u=c.userData;if(!u.p1)continue;const k=clamp(v*1.7-u.ix*.7,0,1),f=k<=0?0:easeBack(k);c.position.lerpVectors(u.p0,u.p1,f);c.scale.copy(u.s1).multiplyScalar(Math.max(.04,f))}}
 function vehMode(s,dt){const ud=s.mesh.userData;if(!ud.carG)return;if(!ud.posed){poseInit(ud.boat,p=>p.set(p.x*.25,p.y+1.8,p.z*.5));poseInit(ud.wheels,p=>p.set(p.x*.3,p.y+1.3,p.z*.6));ud.posed=true}
   const want=s.boatMode?'boat':s.dirtMode?'4x4':'car';
+  if(s.isPlayer&&want!==(s.vmode||'car')&&window.__swapDelayFrames>0){if(s._swW!==want){s._swW=want;s._swN=0}if(++s._swN<=window.__swapDelayFrames)return}else if(s.isPlayer)s._swW=null;
   if(want!==(s.vmode||'car')){s.vmode=want;if((s.isPlayer||near(s))&&!(s.isPlayer&&RO.rcT>0)/* debris-1: no transform burst (floating bricks) right after a warp/spawn */){const at=s.mesh.position.clone();at.y+=1.4;debris(at,V3(0,6,0),10,teamCols(s.team),.4,at.y-4);if(s.isPlayer)xfBurst(at,teamCols(s.team));burst(SPARK,at,24,14,.35,new THREE.Color(2,1.8,1));if(s.isPlayer){AU.sfx('brick');say('',want==='boat'?'BOAT':want==='4x4'?'4×4':'CAR',.6)}}}
   const rt=dt*6.5;s.bt=clamp((s.bt||0)+(s.vmode==='boat'?rt:-rt),0,1);s.wt=clamp((s.wt||0)+(s.vmode==='4x4'?rt:-rt),0,1);
   poseApply(ud.boat,s.bt);poseApply(ud.wheels,s.wt);ud.carG.position.y=.6*s.bt+.35*s.wt;ud.under.visible=s.bt<.5&&!(ud.gbHid&&ud.gbHid.length);for(const rb of ud.ribbons)rb.visible=s.bt<.5&&!(ud.gbHid&&ud.gbHid.length);if(ud.gbV)CR_vis(s,ud)}
@@ -5452,7 +5454,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(Math.abs(RO.h)>50){RO.h-=Math.r
   if(SET.assist!=='off'&&!air&&!busy&&!RO.dDir&&RO.rdT&&RO.v>6&&Math.abs(c.steer)<.05&&!(RO.asQ>0)&&(FL.s||'road')==='road'){const a0=Math.atan2(RO.rdT[0],RO.rdT[1]);let e=angDiff(a0,RO.h);if(Math.abs(e)>Math.PI/2)e=angDiff(a0+Math.PI,RO.h);if(Math.abs(e)<TUNE.asMax)ytg+=e*TUNE.assist*clamp((sp-6)/14,0,1)*(1-Math.abs(e)/(TUNE.asMax*1.375))/* drive24b: TUNE.asMax = widest heading error the assist acts on */}
   {const y0=RO.yr||0;RO.yr=CR_yaw(c,dt,ytg,maxR,air);if(C26.on&&!air&&!RO.dDir&&!busy&&sp>3){let t=C26_yawCap(RO,RO.yr,sp,C26_cityMu(terr,veh));const b=angDiff(RO.h,RO.vh??RO.h)*Math.sign(RO.v||1);t-=C26.align*(b-clamp(b,-.1,.1))*Math.min(1,sp/20);RO.yr=y0+(t-y0)*Math.min(1,dt*(TUNE.stOn&&Math.abs(t)<Math.abs(y0)?TUNE.yrOut:TUNE.yrIn>0?TUNE.yrIn:11-4*Math.min(1,sp/40)))/* drive24b: TUNE.yrIn = yaw build-up rate (0 = old 11→7 /s) *//* D24: a let-go stops the turn fast (TUNE.yrOut /s) */}}RO.h+=RO.yr*dt;
   {const mv=Math.hypot(RO.x-(RO.stkX??RO.x),RO.z-(RO.stkZ??RO.z));RO.stkX=RO.x;RO.stkZ=RO.z;if((c.thr&&!c.brk||boost||c.brk&&(RO.bz||0)>1.2)&&!busy&&!air&&mv<dt*2)RO.stkT=(RO.stkT||0)+dt;else RO.stkT=Math.max(0,(RO.stkT||0)-dt*2);
-   if(RO.stkT>2&&TUNE.nudge!==0&&!RO.nudgeT){/* race-1: stuck 2 s with gas held and no free heading found: hop to the nearest clear spot on the ring (5 m, then 9 m), 1.5 s grace */let done=0;for(const R of[5,9]){for(let k=0;k<16&&!done;k++){const ang=RO.h+(k%2?1:-1)*Math.ceil(k/2)*Math.PI/8,px=RO.x+Math.sin(ang)*R,pz=RO.z+Math.cos(ang)*R,N=roamTerr(px,pz,RO.y+.3);if(!N.low&&N.g<=RO.y+1.4&&!roamHit(px,pz,2.4,RO.y)){RO.x=px;RO.z=pz;RO.h=RO.vh=ang;RO.v=Math.max(RO.v,9);done=1}}}
+   if(RO.stkT>4&&TUNE.nudge!==0&&!RO.nudgeT){/* race-1 (camloop: 4 s, was 2): stuck 4 s with gas held and no free heading found: hop to the nearest clear spot on the ring (5 m, then 9 m), 1.5 s grace */let done=0;for(const R of[5,9]){for(let k=0;k<16&&!done;k++){const ang=RO.h+(k%2?1:-1)*Math.ceil(k/2)*Math.PI/8,px=RO.x+Math.sin(ang)*R,pz=RO.z+Math.cos(ang)*R,N=roamTerr(px,pz,RO.y+.3);if(!N.low&&N.g<=RO.y+1.4&&!roamHit(px,pz,2.4,RO.y)){RO.x=px;RO.z=pz;RO.h=RO.vh=ang;RO.v=Math.max(RO.v,9);done=1}}}
     RO.stkT=0;RO.inv=Math.max(RO.inv||0,1);RO.nudgeT=1.5}
    if(RO.nudgeT)RO.nudgeT=Math.max(0,RO.nudgeT-dt);
    if(RO.stkT>.6){let best=null,bd=9;for(let k=1;k<16;k++){const ang=RO.h+(k%2?1:-1)*Math.ceil(k/2)*Math.PI/8,px=RO.x+Math.sin(ang)*7,pz=RO.z+Math.cos(ang)*7,N=roamTerr(px,pz,RO.y+.3);if(N.low||N.g>RO.y+1.4||roamHit(px,pz,2.4,RO.y)||(HUB.cars||[]).some(q=>!q.dead&&q.x!=null&&Math.hypot(q.x-px,q.z-pz)<5.5))continue;const d=Math.abs(angDiff(ang,RO.h));if(d<bd){bd=d;best=ang}}
@@ -7189,8 +7191,8 @@ function TR8_near(x,z){for(const r of[80,200,450,900]){const q=rfSnap(x,z,r);if(
 function TR8_fade(){try{let d=document.getElementById('tr8f');if(!d){d=document.createElement('div');d.id='tr8f';d.style.cssText='position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:50';document.body.appendChild(d)}
   d.style.transition='none';d.style.opacity='.85';void d.offsetWidth;d.style.transition='opacity .5s';d.style.opacity='0'}catch(e){}}
 function TR8_unstick(dt){if(!TR8_on())return;const c=CTL,held=c&&(c.thr||c.boost||c.brk),off=held&&!RO.trDeck&&!TR8_onRoad(RO.x,RO.z)&&RO.veh!=='boat';  // tracks-3: a boat on the Main is not stuck (the lift to the nearest road threw the river-run boat onto the quay every ~6 s)
-  if(off&&!RO.t8a)RO.t8a=[RO.x,RO.z];const d=RO.t8a?Math.hypot(RO.x-RO.t8a[0],RO.z-RO.t8a[1]):0,on=off&&(Math.abs(RO.v)<2||d<6);  // slow, or sliding/rocking without 6 m of progress
-  if(!on)RO.t8a=off?[RO.x,RO.z]:null;RO.t6s=on?(RO.t6s||0)+dt:Math.max(0,(RO.t6s||0)-.5*dt);if(RO.t6s<3)return;RO.t8a=null;if(RO.t6s<3)return;RO.t6s=0;const q=TR8_near(RO.x,RO.z);if(!q)return;TR8_fade();
+  if(off&&!RO.t8a)RO.t8a=[RO.x,RO.z];const d=RO.t8a?Math.hypot(RO.x-RO.t8a[0],RO.z-RO.t8a[1]):0,on=off&&(Math.abs(RO.v)<2||d<6&&Math.abs(RO.v)<4);  // slow, or sliding/rocking without 6 m of progress
+  if(!on)RO.t8a=off?[RO.x,RO.z]:null;RO.t6s=on?(RO.t6s||0)+dt:Math.max(0,(RO.t6s||0)-.5*dt);if(RO.t6s<4)return;RO.t8a=null;RO.t6s=0;const q=TR8_near(RO.x,RO.z);if(!q)return;TR8_fade();
   if(!roamWarp(q[0],q[1],q[2])){RO.x=q[0];RO.z=q[1];RO.h=RO.vh=q[2];RO.y=groundAt(q[0],q[1],99);RO.vy=0}RO.v=0;RO.t6n=(RO.t6n||0)+1}
 function TR_post(dt){const S=RO.trSlope;if(RO.trSl>.05&&S){const s=Math.hypot(S.gx,S.gz)||1,dx=-S.gx/s*RO.trSl*dt,dz=-S.gz/s*RO.trSl*dt;if(!roamHit(RO.x+dx,RO.z+dz,2.2,RO.y)){RO.x+=dx;RO.z+=dz}}
   TR_snap();TR_summitStep()}
@@ -11054,7 +11056,7 @@ function LV_clStep(dt){const S=LV.cl;if(!S||!HUB.peds)return;const P=HUB.peds,N=
       for(const q of C.pr){if(q.dead)continue;const ex=RO.x-q.x,ez=RO.z-q.z,e2=ex*ex+ez*ez,rr2=q.r+1.1;if(e2>rr2*rr2||Math.abs((RO.y||0)-C.y)>3)continue;
         if(typeof SM2!=='undefined'&&SM2.on?SM2_smash('big',SM2_imp(sp,q.x-RO.x,q.z-RO.z)):sp>6){q.dead=true;LV_clDraw(k,C);const at=V3(q.x,C.y+1.2,q.z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,fw.clone().multiplyScalar(sp*.45).add(V3(0,7,0)),14,(q.m==='s'?['#8a5a30','#e03020','#ffb020','#58c040','#ffffff']:['#ffffff','#c8282c','#ffd12c','#444444']).map(c=>new THREE.Color(c)),.8,C.y);
           for(let s2=0;s2<3;s2++)studBurst(at,fw,sp);HUB.smashed++;comboAdd(1);RO.v*=.94;AU.sfx('crash');LV.n.smash=(LV.n.smash||0)+1}
-        else{const e=Math.sqrt(e2)||1,o=rr2-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.7}}
+        else{const e=Math.sqrt(e2)||1,o=rr2-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=typeof DEST!=='undefined'&&DEST.on?DEST_slide(ex/e,ez/e):.7}}/* dest-1: the into-the-stall part only, and the car turns along the rim */
       for(let j=0;j<C.n;j++){const p=P[base+j];if(!p||!p.cw)continue;p.gs=C.gs;const pd=Math.hypot(p.cx-RO.x,p.cz-RO.z);
         const th=pd<35?Math.atan2(RO.x-p.cx,RO.z-p.cz):Math.atan2(p.mx-p.cx,p.mz-p.cz);let dh=th-(p.ch??th);dh=Math.atan2(Math.sin(dh),Math.cos(dh));p.ch=(p.ch??th)+dh*Math.min(1,dt*5);
         if(p.jy<=0&&pd<30&&sp>6&&R()<dt*1.3){p.jv=5.5;p.jy=.01;p.kx=p.kz=0;p.spin=0}}}
@@ -13657,6 +13659,21 @@ function RV3_go(kind,say){const ok=b=>b?' ✅':' ❌',P=innerHeight>innerWidth?'
   K.KeyW=K.ArrowUp=false;
   return'📍 SMASH DEBRIS ('+P+' '+innerWidth+'×'+innerHeight+') · 70 km/h smash of a traffic car · screen covered by debris + wreck 0.5 s later: '+Math.round(at5*100)+' % (≤ 10 %) · worst 0.3-0.7 s: '+Math.round(mx*100)+' % · wreck scale at 0.5 s '+CR_tk(.5).toFixed(2)+ok(at5<=.1&&mx<=.12)}
  return'📍 unknown RV3 kind'}
+function CAMST_go(say){const ok=b=>b?' ✅':' ❌';const FL=240,WIN=200,NF=6,S={tele:0,exc:0,flip:0,maxExc:0};const rnd0=Math.random;let sd=12345;Math.random=()=>(sd=(sd*16807)%2147483647)/2147483647;
+ const dl0=window.__swapDelayFrames;window.__swapDelayFrames=window.__camstDelay!==undefined?window.__camstDelay:45;  /* late body swap like the phone */
+ let px=RO.x,pz=RO.z,i=0,nf=window.__cam?__cam.S.n.fit:0;S.fits=[];const fb=[];const ds=[],fl=[];
+ try{for(;i<FL*NF+WIN;i++){const dt=i%40===39?.05:1/30;K.ArrowUp=true;const ph=i%FL;K.ArrowLeft=ph>150&&ph<170;K.ArrowRight=false;   /* steer only between the flip windows (roll/pitch of a turning body moves the measured profile) */
+   if(i>0&&i%FL===0&&i<FL*NF){RO.vsel=RO.vsel==='offroad'?'ship':'offroad';S.flip++;fl.push(i)}
+   roamStep(dt);try{roamCam(dt)}catch(e){}if(window.__cam&&__cam.S.n.fit!==nf){nf=__cam.S.n.fit;const q=__cam.S.log[__cam.S.log.length-1];S.fits.push(i+':'+q.join('/'));fb.push([i,q[3]])}const c=camera.position;ds.push(Math.hypot(c.x-RO.x,c.z-RO.z));
+   const sp=Math.hypot(RO.x-px,RO.z-pz);if(i>60&&Math.abs(RO.v)*3.6>10&&sp>Math.abs(RO.v)*dt*1.6+1.5)S.tele++;px=RO.x;pz=RO.z}}
+ finally{K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;if(dl0===undefined)delete window.__swapDelayFrames;else window.__swapDelayFrames=dl0;Math.random=rnd0}
+ const av=(a,b)=>{let s=0;for(let k=a;k<b;k++)s+=ds[k];return s/(b-a)},info=[];
+ for(const f of fl){const d0=av(f-10,f),d1=av(f+WIN-10,f+WIN);let hi=0,lo=0;for(let k=f;k<f+WIN;k++){hi=Math.max(hi,ds[k]-Math.max(d0,d1));lo=Math.max(lo,Math.min(d0,d1)-ds[k])}const e=Math.max(hi,lo);S.maxExc=Math.max(S.maxExc,e);const w=fb.filter(q=>q[0]>=f&&q[0]<f+WIN),db=w.length>1?Math.max(...w.map(q=>q[1]))-Math.min(...w.map(q=>q[1])):0;if(db>.3)S.exc++;info.push(w.length+' fit'+(w.length>1?'s, b '+db.toFixed(1)+' m apart':'')+', cam '+d0.toFixed(1)+'>'+d1.toFixed(1)+' (excursion '+e.toFixed(1)+')')}
+ S.info=info;S.tr=ds.map(d=>Math.round(d*10)/10);const pass=!S.tele&&!S.exc;window.__chk.camst=S;
+ return '📍 CAM STABLE · '+S.flip+' car/4x4 flips, stepped frames · teleports while moving '+S.tele+' · far/close re-fits (2 fits in one flip window > 0.3 m apart): '+S.exc+' ('+info.join(', ')+')'+ok(pass)}
+(function CAMST_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='cam'&&q.id==='stable'))C.items.push({ver:'cam',id:'stable',area:'drive',text:'rv:2026-10-17 · cam/stable: stepped-frame drive with car/4x4 flips in both cities: the follow distance never jumps past its old/new value, no teleports'});
+  C.GO['cam/stable']=['fra','ath'].map(c=>({c,n:'stable follow camera',secs:120,fn:()=>CAMST_go()}));return}
+ if(i<600)setTimeout(()=>CAMST_reg(i+1),100)})(0);
 
 const RF_GRID=()=>RC&&RC.type==='race'&&ships.length>=2&&pl;
 function RF_rub(s,gap,ld){const P=clamp(pl.dist/Math.max(1,(RC.laps||1)*TD.L),0,1),fadeB=P<.75?1:clamp((1-P)/.25,0,1),holdA=P<.7?1:.5;
@@ -15631,7 +15648,7 @@ function LVM_check(c,id){const g=LVM_go(c,id);if(!g)return'📍 Can\'t jump righ
  return'📍 '+S[1].toUpperCase()+' · measuring…'}
 window.__lvm={SPOTS:LVM_SPOTS,T:LVM_T,go:LVM_go,measure:LVM_measure,pass:LVM_pass,check:LVM_check};
 if(!/[?&]life=0\b/.test(location.search)&&(()=>{try{return localStorage.getItem('od_life')!=='0'}catch(e){return true}})()){const s=document.createElement('script');s.src='models/lx.js';s.onload=()=>{try{eval(window.__LXJ)}catch(e){console.warn('LIFE load',e)}};document.head.appendChild(s)}
-const CAM={on:1,k:'',due:0,f:0,P:null,T:{},cur:null,asp:0,sP:.62,fill:.24,m:.3,ahead:10,n:{fit:0,keep:0},go:null,log:[]};
+const CAM={on:1,k:'',sg:'',sgN:0,due:0,f:0,P:null,T:{},cur:null,asp:0,sP:.62,fill:.24,m:.3,ahead:10,n:{fit:0,keep:0},go:null,log:[]};
 const _cmV=new THREE.Vector3(),_cmB=new THREE.Box3();
 function CAM_prof(host,F){if(!host){const ud=pl&&pl.mesh&&pl.mesh.userData;host=ud&&ud.m}if(!host)return null;host.updateMatrixWorld(true);F=F||{x:RO.x,y:RO.y,z:RO.z,h:RO.h};
  const sh=Math.sin(F.h),ch=Math.cos(F.h),bins=new Map();let z0=1e9,z1=-1e9,g=1e9,top=-1e9,n=0;
@@ -15658,7 +15675,9 @@ function CAM_solve(P,n,asp,C0x){const C0=C0x||CAM_base(n),T=Math.tan(CAM_vfov(as
 function CAM_fit(){const t0=performance.now(),P=CAM_prof();if(!P)return;CAM.P=P;CAM.asp=camera.aspect;CAM.T={};const n0=SET.rcam||'chase';let kp=0;if(n0!=='high'){const s=CAM_solve(P,n0);CAM.T[n0]=s;kp=s.keep}CAM.ms=performance.now()-t0
  CAM.n.fit++;if(kp)CAM.n.keep++;CAM.log.push([RO.vsel||'',+P.L.toFixed(2),+P.H.toFixed(2),(CAM.T[SET.rcam||'chase']||{}).b,(CAM.T[SET.rcam||'chase']||{}).h]);if(CAM.log.length>20)CAM.log.shift()}
 function CAM_upd(){const ud=pl&&pl.mesh&&pl.mesh.userData;if(!ud||!ud.m||(pl.boatK||0)>.5)return;const key=CAM_rkey(ud)+'|'+(RO.vsel||'')+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:''),now=++CAM.f;
- if(key!==CAM.k){CAM.k=key;CAM.due=now+(CAM.snap?4:30);CAM.pend=1;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05){CAM.due=Math.min(CAM.due,now);CAM.pend=1}if(!CAM.T[SET.rcam||'chase']&&(SET.rcam||'chase')!=='high'&&!CAM.pend&&CAM.P){CAM.due=now;CAM.pend=1}if(!CAM.pend||now<CAM.due)return;CAM_fit();CAM.pend=0;if(CAM.snap){CAM.snap=0;CAM.cur=null}}
+ if(key!==CAM.k){CAM.k=key;CAM.sg='';CAM.sgN=0;CAM.due=now+(CAM.snap?4:30);CAM.pend=1;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05){CAM.due=Math.min(CAM.due,now);CAM.pend=1}if(!CAM.T[SET.rcam||'chase']&&(SET.rcam||'chase')!=='high'&&!CAM.pend&&CAM.P){CAM.due=now;CAM.pend=1}if(!CAM.pend||now<CAM.due)return;
+ if(!CAM.snap&&CAM.sgN<6){const P=CAM_prof(),sg=P?Math.round(P.L*4)+'x'+Math.round(P.H*4)+'x'+Math.round(P.g*8):'';if(sg!==CAM.sg){CAM.sg=sg;CAM.sgN=(CAM.sgN||0)+1;CAM.due=now+20;return}}CAM.sg='';CAM.sgN=0;
+ CAM_fit();CAM.pend=0;if(CAM.snap){CAM.snap=0;CAM.cur=null}}
 function CAM_rkey(ud){const m=ud.m,g=ud.gbM,c=m.children,l=c[c.length-1],f=c[0];return m.uuid+'|'+(g?g.length+'.'+(g[0]?g[0].uuid:''):0)+'|'+c.length+'.'+(f?f.uuid:'')+'.'+(l?l.uuid:'')}
 function CAM_fwd(s){try{frameAt(TD,s.dist,F2);const l=Math.hypot(F2.t.x,F2.t.z)||1;return[F2.t.x/l,F2.t.z/l]}catch(e){return[0,1]}}
 function CAM_rbase(){const R=CAM.R||(CAM.R={}),tall=camera.aspect<1?1.3:1,cd={close:.85,normal:1,far:1.2}[SET.camd]||1;return R.C0={b:10.5*tall*cd,h:3.4*tall*cd,l:29,ly:1.66,bk:0,hk:0,lk:0}}
@@ -15815,6 +15834,44 @@ function SM2_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam firs
   return `📍 20 km/h TAP: ${res.map(r=>`${r.t} ${r.smash?'SMASHED':'bump'} (${r.bricks} bricks, −${f(r.loss)})`).join(', ')}, car ${cr.burst?'BURST':'bump'} (−${f(cr.loss)})`+ok(pass)}
  const pass=res.every(r=>r.smash)&&cr.burst;return `📍 70 km/h HIT: ${res.map(r=>`${r.t} ${r.smash?'smashed':'NOT smashed'} (impact ${r.imp})`).join(', ')}, car ${cr.burst?'burst into bricks':'NOT burst'}`+ok(pass)}
 (function SM2_reg(i){const C=window.__chk;if(C&&C.GO){for(const k of['tap','hit'])C.GO['smash2/'+k]=[{c:'fra',n:k,fn:()=>SM2_go(k)}];return}if(i<600)setTimeout(()=>SM2_reg(i+1),100)})(0);
+// (c) 3-5 checked shortcuts per city (up to 9 candidates, each re-checked and shown only once streamed tiles are in) over open ground (parks, plazas, lawns between streets) marked with yellow brick arrows. ?dest=0 turns it OFF (default ON). Shortcuts are kept only when the road route is >= 1.7x the straight line (est. save >= 41 %, so the driven save stays >= 20 % with ~30 % wobble).
+const DEST={fr:0,hv:[],on:!/[?&]dest=0/.test(location.search),n:{slide:0,setSmash:0,setBump:0},sc:null,scI:0,scBusy:false,scGrp:null};
+const DEST_SET={banner:['#e8502a','#ffffff'],billboard:['#2a7ad8','#ffffff','#ffd12c'],balloons:['#e8502a','#ffd12c','#2a7ad8','#3aa04a'],sprinkler:['#2a7ad8','#bfe3ff'],swings:['#d8302a','#ffd12c','#2f3640'],seesaw:['#ffd12c','#2a7ad8']};
+function DEST_set(it,sp,rr){const cols=DEST_SET[it.t];if(!DEST.on||!cols)return false;const tx=it.x-RO.x,tz=it.z-RO.z,LIFE=window.__life.LIFE;/* LIFE lives in the lx chunk's scope */
+ if(SM2_smash('small',SM2_imp(sp,tx,tz))){LIFE.dead.set(it.id,1);const at=V3(it.x,it.y+.8,it.z),fw=V3(Math.sin(RO.vh??RO.h),0,Math.cos(RO.vh??RO.h));
+  try{debris(at,fw.clone().multiplyScalar(Math.max(4,sp)*.4).add(V3(0,6,0)),11,cols.map(c=>new THREE.Color(c)),.7,it.y);studBurst(at,fw,Math.max(6,sp));AU.sfx('brick')}catch(e){}
+  HUB.smashed++;comboAdd(1);RO.v*=.97;LIFE.n.smash++;LIFE.px=1e9;DEST.n.setSmash++;return true}
+ DEST.n.setBump++;return SM2_life(it,sp,rr,cols)}
+function DEST_slide(nx,nz){const s=RO.v<0?-1:1,hx=Math.sin(RO.h)*s,hz=Math.cos(RO.h)*s,cin=-(hx*nx+hz*nz);if(cin<=0)return 1;if(s>0&&cin<.95){const side=hx*-nz+hz*nx>=0?1:-1;RO.h+=angDiff(Math.atan2(-nz*side,nx*side),RO.h)*.25}DEST.n.slide++;return 1-.12*cin}
+roamBounce=(f=>function(ax,sp,nX,nZ){if(!DEST.on||RO.tb)return f.apply(this,arguments);const vx=Math.sin(RO.vh)*RO.v,vz=Math.cos(RO.vh)*RO.v;let X=nX,Z=nZ;if(X==null){if(ax==='x'){X=-(Math.sign(vx)||1);Z=0}else{X=0;Z=-(Math.sign(vz)||1)}}
+ const vn=vx*X+vz*Z,s0=Math.abs(RO.v),v0=RO.v;const r=f.apply(this,arguments);
+ const hv=DEST.hv,fl=hv.length?Math.max(...hv)*.56:0;/* no solid takes more than 44 % of the speed of the last 0.3 s */
+ if(vn>-.05||s0<2||RO.vy>1)return r;
+ if(Math.abs(RO.v)>=Math.max(s0*.6,fl))return r;
+ const a=Math.min(1,-vn/Math.max(s0,.1));let tx=vx-vn*X,tz=vz-vn*Z,tl=Math.hypot(tx,tz);if(tl<.3*s0){/* head-on: slide to the side the car is steered / pointing to */const sd=Math.sign(Math.sin(RO.h)*-Z+Math.cos(RO.h)*X)||1;tx=-Z*sd;tz=X*sd;tl=1}
+ const k=Math.max(.6,1-.4*a*a),tf=Math.atan2(tx/tl,tz/tl);RO.vh=tf;RO.h+=angDiff(tf,RO.h)*.6;RO.v=(v0<0?-1:1)*Math.max(s0*k,fl);RO.stkT=0;DEST.n.slide++;return r})(roamBounce);
+function DEST_dij(N,a,maxD){const D=new Map([[a,0]]),Q=[[0,a]];while(Q.length){let m=0;for(let i=1;i<Q.length;i++)if(Q[i][0]<Q[m][0])m=i;const[d,i]=Q.splice(m,1)[0];if(d>D.get(i))continue;const A=N[i];for(const j of A.nb||[]){const B=N[j];if(!B)continue;const nd=d+Math.hypot(B.x-A.x,B.z-A.z);if(nd<maxD&&nd<(D.get(j)??1e9)){D.set(j,nd);Q.push([nd,j])}}}return D}
+function DEST_open(ax,az,bx,bz){const L=Math.hypot(bx-ax,bz-az),dx=(bx-ax)/L,dz=(bz-az)/L;let off=0,n=0,g0=groundAt(ax,az,99);for(let s=3;s<=L-3;s+=1.5){const x=ax+dx*s,z=az+dz*s,g=groundAt(x,z,99);n++;if(roamHit(x,z,3.8,g+.6)||inRiver(x,z,2)||roamTerr(x,z,g+.3).low||Math.abs(g-g0)>.5||g<-1||Math.abs(groundAt(x+dz*1.6,z-dx*1.6,99)-g)>.6||Math.abs(groundAt(x-dz*1.6,z+dx*1.6,99)-g)>.6)return 0;g0=g;if(!LF_onRoad(x,z))off++;const PL=HUB.pgrid&&HUB.pgrid.get(Math.floor(x/16)*10000+Math.floor(z/16));if(PL)for(const p of PL){const d=HUB.ptypes[p.t];if(d&&d.r>=1.1&&Math.hypot(p.x-x,p.z-z)<d.r+2)return 0}}if(n<6||off/n<.6)return 0;
+ const LF=window.__life;if(LF&&LF.cell&&LF.CELL){/* solid LIFE set pieces (crane, carousel, fountain...) near the line; the small ones smash and do not count */try{const C=LF.CELL,seen=new Set();for(let s=0;s<=L;s+=C/2){const x=ax+dx*s,z=az+dz*s,ca=Math.floor(x/C),cb=Math.floor(z/C);for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const k=(ca+da)*100000+cb+db;if(seen.has(k))continue;seen.add(k);for(const it of LF.cell(ca+da,cb+db)){if(it.c!=='set'||DEST_SET[it.t])continue;const t=clamp(((it.x-ax)*dx+(it.z-az)*dz),0,L);if(Math.hypot(ax+dx*t-it.x,az+dz*t-it.z)<it.r+4)return 0}}}}catch(e){}}
+ return off/n}
+function DEST_find(budgetMs){const N=HUB.nodes;if(!N||!DEST.on)return;const t0=performance.now(),S=DEST;S.found=S.found||[];
+ for(;S.scI<N.length&&performance.now()-t0<budgetMs;S.scI++){const A=N[S.scI];if(!A||A.ab||!A.nb||!A.nb.length)continue;let D=null;
+  for(let j=S.scI+1;j<N.length;j++){const B=N[j];if(!B||B.ab||!B.nb||!B.nb.length)continue;const dx=B.x-A.x,dz=B.z-A.z;if(Math.abs(dx)>130||Math.abs(dz)>130)continue;const L=Math.hypot(dx,dz);if(L<60||L>130)continue;
+   D=D||DEST_dij(N,S.scI,L*2.2);const R=D.get(j);if(R==null||R<L*1.7)continue;const o=DEST_open(A.x,A.z,B.x,B.z);if(!o)continue;
+   S.found.push({a:{x:A.x,z:A.z},b:{x:B.x,z:B.z},len:Math.round(L),road:Math.round(R),save:+(1-L/R).toFixed(2)})}}
+ if(S.scI>=N.length&&!S.sc){S.found.sort((p,q)=>q.save*Math.min(q.len,140)-p.save*Math.min(p.len,140));const pick=[];for(const c of S.found){if(pick.length>=9)break;if(pick.every(p=>Math.hypot(p.a.x-c.a.x,p.a.z-c.a.z)>250&&Math.hypot(p.b.x-c.b.x,p.b.z-c.b.z)>250))pick.push(c)}S.sc=pick;DEST_mark(pick)}}
+let DEST_texM=null;
+function DEST_mark(list){if(!list.length)return;if(!DEST_texM){const[pc,pg]=cv(64,128);pg.strokeStyle='#ffd12c';pg.lineWidth=11;pg.lineCap='round';pg.lineJoin='round';for(let k=0;k<2;k++){pg.beginPath();pg.moveTo(10,104-k*44);pg.lineTo(32,66-k*44);pg.lineTo(54,104-k*44);pg.stroke()}
+  const t=tex(pc);KEEP_TEX.add(t);DEST_texM=new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false,toneMapped:false,color:new THREE.Color(1.6,1.3,.5)})}
+ const grp=DEST.scGrp=new THREE.Group(),geo=new THREE.PlaneGeometry(4.2,7.4);
+ for(const c of list){c.mk=[];const L=Math.hypot(c.b.x-c.a.x,c.b.z-c.a.z),ux=(c.b.x-c.a.x)/L,uz=(c.b.z-c.a.z)/L,h=Math.atan2(ux,uz);
+  for(const[o,dir]of[[c.a,1],[c.b,-1]])for(let k=0;k<3;k++){const x=o.x+ux*dir*(5+k*6),z=o.z+uz*dir*(5+k*6),m=new THREE.Mesh(geo,DEST_texM);m.rotation.order='YXZ';m.rotation.set(-Math.PI/2,h+(dir>0?0:Math.PI)+Math.PI,0);m.position.set(x,groundAt(x,z,99)+.18,z);m.renderOrder=3;m.visible=false;grp.add(m);c.mk.push(m)}
+  for(let s=14;s<L-12;s+=9){const x=c.a.x+ux*s,z=c.a.z+uz*s,m=new THREE.Mesh(new THREE.BoxGeometry(.8,.28,.8),DEST_texM);m.position.set(x,groundAt(x,z,99)+.2,z);m.visible=false;grp.add(m);c.mk.push(m)}}
+ HUB.grp.add(grp)}
+function DEST_check(c){if(c.ok!=null)return c.ok;c.ok=!!DEST_open(c.a.x,c.a.z,c.b.x,c.b.z);for(const m of c.mk||[])m.visible=c.ok;return c.ok}
+function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(DEST.scGrp);DEST.scGrp=null;DEST.sc=null;DEST.found=null;DEST.scI=0;DEST.N=HUB.nodes}
+const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.sc){try{DEST_find(4)}catch(e){DEST.sc=[];console.warn('DEST',e)}}else if(DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350)DEST_check(c)};
+smashCheck=(f=>function(dt){DEST_step(dt);return f.apply(this,arguments)})(smashCheck);
 function R3E_builderGo(){if(typeof BX==='undefined')return'📍 builder missing ❌';const T=window.__tq&&__tq.o,was=BX.on,IDS=['#menu','#topBtns','#hud','#touch'],hid=IDS.map(i=>{const e=$(i);return e?e.hidden:null});try{if(!BX.on)BX_open();const ok=b=>b?' ✅':' ❌',cam=BX.cam,d0=T&&T.draw;if(T)T.draw=1;
   cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();BX_camBuild();renderer.setRenderTarget(null);renderer.render(BX.sc,cam);
   const cv=renderer.domElement,w=cv.width,h=cv.height,o=document.createElement('canvas');o.width=w;o.height=h;const x=o.getContext('2d',{willReadFrequently:true});x.drawImage(cv,0,0);if(T)T.draw=d0;
