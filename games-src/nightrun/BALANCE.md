@@ -144,3 +144,19 @@ Owner: "quite easy even on Legend, weapon level-ups very unfair to the enemies".
 | bosses, stage 8 / 40 | 74 / 62 s | 74 / 62 s (unchanged by design) |
 - The bot's late-stage clear is bimodal per stage (30 = long attrition stage 0%, 40 = final boss 100%); a human on Legend with a maxed ship now gets hit and loses hull where before the bot had 4 hits median and cleared with ease.
 - Weak: Normal with a maxed ship is still untouchable for the bot (0-1 hits): the defence perks (shield, regen, revive, dash) carry it; next lever is a power-aware fire density (`ebCap` stays), not more hull. Non-shot weapons keep 2.5x. A fresh ship still fails from stage 20 on Legend (0%).
+
+## Power scale, round 2 (flag RET.scale2, 17 Oct 2026; `?scale2=0` = round 1 exactly)
+Owner: "extremely easy even on Legend ... I stay in a spot, my missiles shoot targets automatically, when bullets come I move to the other spot; even the boss I beat in seconds". Code: `parts/fair.js` (a numbered `scale2.js` is refused by guard.py), hooks by wrapping `SH.steer`, `WP.arcZap/leap`, `spawnBoss`, `bossBeat`, `SC.hpK`; anti-idle extended through `STILL.t` only (h.js untouched). Gate: `scale2-test.js` (+ `balance-test.js` CAMP=1 corner camper, GOD=1, bot shoots shield cores).
+**Change:** A. homing locks only on-screen foes past entry grace, inside a forward cone (hard tiers ±40°, 300 px) after a lock-on delay (.18 s); a locked weapon-homing shot does x.8 Normal / x.62 Hard / x.56 Very hard / x.5 Legend damage (shop Homing perk half that cut), arc chains the same; camping (60 px of the 6-s mean for 6 s, two near spots included) sets the h.js stillness clock (hunter shots, lane, discharge) and halves auto-aim. B. boss hull x(1+.3 power) (district/final x.7), a damage budget (HP bar at most max/T per s, 1.5 s burst; T Legend 56 s, mini 46 s; Normal 34/30 s), shields at 66% and 33% until 1 (Normal) / 2 (hard tiers) cores are shot (cores are never auto-aimed). C. hard tiers from stage 11: an aimed lead shot every 3 beats (Legend stage 25+: every 2), from stage 18 (Hard 25) a wall every 4 bars with a 120 px gap at a new place (measured smallest gap 136-170 px); Normal with power f>.4: one aimed shot per bar. Kill-goal stages keep the old hull (stage 30 timed out at 420 s even in god mode: 260 kills not reachable).
+**Measured** (PAR=4; higher PAR makes the bot unreliable because its beat taps follow the real clock):
+| check | round 1 | round 2 |
+|---|---|---|
+| god mode, Legend max, stage 20: kills/min parked camper vs dodger | 44 / 44 (auto-aim did all the work) | 17 / 36-52 |
+| corner camper, Legend max, stages 20 / 30 / 40 | dies (anti-idle) / dies / clears in god mode | 0 / 0 / 100% (final boss: hops between spots > 60 px apart, revives carry it) |
+| mini-boss stage 5, Legend max (god) | 24 s (bar lock, HP bar empty at once) | 48-82 s |
+| final boss stage 40, Legend max (god) | 63 s | 78-120 s (target 45-75: long side) |
+| Normal max: mini / final boss | 24 / 63 s | 28-34 / 61-63 s (the 32-bar lock sets the floor) |
+| stage 30, Legend max, god mode | 0% (timeout, kill goal) | 50% (god); dodging bot still 0% (dies, 3 hull) |
+| dodging bot, Legend max, stages 20 / 30 / 40 | 100 / 0 / 100% | 0-100 / 0 / 100% (scale-test run: 100/0/100; target 25-55% NOT reached) |
+| Normal mid, stages 8 / 20 | 100 / 100% | 100 / 100% |
+- Weak: the final boss is not camper-proof (12+ hits absorbed by revives/shields), stage 30 is still a wall for the bot by attrition (3 hull on Legend), Legend clear bands are bimodal per stage, Normal max still takes only ~1 hit.

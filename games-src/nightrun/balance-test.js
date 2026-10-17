@@ -13,7 +13,7 @@ function freePort() { return new Promise(r => { const s = net.createServer(); s.
 const BOT = (opts) => {
   const m = window.__mnr, rnd = Math.random; const { n, MAXT, build, diff } = opts;
   m.SET.diff = diff; try { m.applySet(); } catch (e) { }
-  m.startStory(n); m.simOn(true); const DM = window.__dmg; if (DM && opts.dk) Object.assign(DM, opts.dk); let dS = 0, dN = 0, kS = 0;
+  m.startStory(n); m.simOn(true); if (opts.god) m.god = true; const DM = window.__dmg; if (DM && opts.dk) Object.assign(DM, opts.dk); let dS = 0, dN = 0, kS = 0;
   const SH = m.SH, WP = window.__wp, W = 960;
   const late = build === 'late' || build === 'max';   // max = late + the Garage's permanent levels: two weapons at LV10 (fusion), every perk maxed (scale-test.js, BALANCE.md power scale)
   const ups = () => {   // the builds: weapons, shop upgrades, garage perks
@@ -28,9 +28,16 @@ const BOT = (opts) => {
   };
   ups();
   const keepPw = () => { if (!late) return; for (const k of ['drum', 'tempo', 'slow', 'mag', 'tri']) if (!m.PW.on(k)) { try { m.PW.give(k); } catch (e) { } } };
+  const SPOTS = []; for (const x of [90, 190]) for (const y of [100, 190, 280, 370, 450]) SPOTS.push([x, y]); let spot = 2;
+  const camp = () => {   // CAMP=1 (scale2-test.js): the corner camper sits at its best spot and lets auto-aim work; it only hops to another spot when bullets come to its own
+    const G = m.G, th = ([x, y]) => { let c = 0; for (const b of G.eb) for (const k of [0, .15, .3]) { const d = Math.hypot(b.x + b.vx * k - x, b.y + b.vy * k - y); if (d < 50) c += 50 - d; } for (const e of G.en) for (const k of [0, .25, .5]) { const d = Math.hypot(e.x - (e.type === 'boss' ? 0 : 160 * k) - x, e.y - y); if (d < e.r + 45) c += 200; } if (m.STILL && m.STILL.beam && Math.abs(m.STILL.beam.y - y) < 40) c += 500; return c; };
+    if (th(SPOTS[spot]) > 0) { let bc = 1e9; SPOTS.forEach((s, i) => { const c = th(s) + (i === spot ? 0 : 1); if (c < bc) { bc = c; spot = i; } }); }
+    return { bx: SPOTS[spot][0], by: SPOTS[spot][1], dash: false, emp: false };
+  };
   const dec = () => {
+    if (opts.camp) return camp();
     const G = m.G, P = m.P; let ty = 270 + 140 * Math.sin(G.t * .9), tx = 220 + 70 * Math.sin(G.t * .55), bd = 1e9;
-    for (const e of G.en) { if (e.type === 'boss') { if (e.x < 960) ty = e.y; continue; } const dx = e.x - P.x; if (dx > 0 && dx < bd && e.x < 940) { bd = dx; ty = e.type === 'gate' ? e.gy : e.y; } }
+    for (const e of G.en) { if (e.type === 'boss') { if (e.x < 960) ty = e.cores && e.cores.length ? e.cores[0].y : e.y; continue; } /* a shielded boss (fair.js): shoot its cores */ const dx = e.x - P.x; if (dx > 0 && dx < bd && e.x < 940) { bd = dx; ty = e.type === 'gate' ? e.gy : e.y; } }
     let bc = 1e18, bx = P.x, by = P.y;
     for (let ix = -5; ix <= 5; ix++) for (let iy = -5; iy <= 5; iy++) {
       const cx = P.x + ix * 24, cy = P.y + iy * 24; if (cx < 30 || cx > 900 || cy < 40 || cy > 480) continue; let c = 0;
@@ -80,7 +87,7 @@ const BOT = (opts) => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800));
   const browser = await PW.chromium.launch(); const jobs = [];
-  for (const diff of DFS) for (const build of BUILDS) for (const n of STAGES) for (let k = 0; k < RUNS; k++) jobs.push({ n, build, diff, MAXT, dk: process.env.DK ? JSON.parse(process.env.DK) : null, fuse: build === 'late' && k % 2 === 1 });
+  for (const diff of DFS) for (const build of BUILDS) for (const n of STAGES) for (let k = 0; k < RUNS; k++) jobs.push({ n, build, diff, MAXT, dk: process.env.DK ? JSON.parse(process.env.DK) : null, fuse: build === 'late' && k % 2 === 1, camp: !!process.env.CAMP, god: !!process.env.GOD });
   const res = []; let next = 0, errs = 0;
   await Promise.all(Array.from({ length: PAR }, async () => {
     const p = await browser.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { errs++; if (errs < 4) console.log('PAGE ERROR', e.message); });
