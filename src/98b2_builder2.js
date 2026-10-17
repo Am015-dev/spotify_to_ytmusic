@@ -257,7 +257,12 @@ function BX_landmark(g,L){const st=L.find(p=>p.def.start)||L[0];if(!st||!BX.samp
 const BX_ents=p=>[p.c,...(p.def.in||[]).map(e=>BX_exit(p.c,[e[0],e[1],0,0]))];
 function BX_ends(){const key=c=>c.i+','+c.j+','+c.l+','+c.r,ent=new Set(BX.pcs.filter(p=>!p.dead).flatMap(p=>BX_ents(p).map(key)));const E=[];
  for(const p of BX.pcs)if(!p.dead)for(const e of p.ex)if(!ent.has(key(e)))E.push(e);return E}
-function BX_after(){BX_pillars();BX_dress();BX_marks();BX_ghost();BX_stats()}
+function BX_after(){BX_pillars();BX_dress();BX_marks();BX_ghost();BX_grid();BX_stats()}
+// r3E (review 2K-3 #9): an empty track reads as a LEGO baseplate with a START piece on it, not a bare field
+function BX_seed(){if(BX.pcs.some(p=>!p.dead)||!BX.sc||BX.mode!=='build')return;const c=BX.cur;BX_do(['p','sf',c.i,c.j,c.l,c.r])}
+function BX_grid(){if(BX.gridG){BX.sc.remove(BX.gridG);BX.gridG.geometry.dispose()}BX.gridG=null;if(BX.mode!=='build')return;const fr=BX_fr(BX.cur),cx=Math.round(fr.o.x/BXC)*BXC,cz=Math.round(fr.o.z/BXC)*BXC,N=10,P=[];
+ for(let k=-N;k<=N;k++)for(let m=-N;m<N;m++){const a=cx+k*BXC,b=cz+m*BXC;P.push(a,BX_h(a,b)+.25,b,a,BX_h(a,b+BXC)+.25,b+BXC);P.push(b-cz+cx,BX_h(b-cz+cx,cz+k*BXC)+.25,cz+k*BXC,b-cz+cx+BXC,BX_h(b-cz+cx+BXC,cz+k*BXC)+.25,cz+k*BXC)}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));BX.gridG=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:.35,fog:true}));BX.gridG.frustumCulled=false;BX.sc.add(BX.gridG)}
 function BX_marks(){if(BX.gE){BX.sc.remove(BX.gE)}const g=BX.gE=new THREE.Group();BX.sc.add(g);const M=BX_mats(),ar=new THREE.ConeGeometry(1.6,3.2,4);
  if(BX.mode!=='build')return;for(const e of BX_ends()){const fr=BX_fr(e),m=new THREE.Mesh(ar,M.end);m.position.copy(fr.o).addScaledVector(fr.F,2).add(bxV(0,1.4,0));m.quaternion.setFromUnitVectors(bxV(0,1,0),fr.F);m.userData.end=e;g.add(m)}
  const fr=BX_fr(BX.cur),ring=new THREE.Mesh(new THREE.TorusGeometry(4.6,.35,6,24),M.cur);ring.position.copy(fr.o).addScaledVector(fr.F,4).add(bxV(0,.3,0));ring.rotation.x=Math.PI/2;g.add(ring);
@@ -522,11 +527,11 @@ function BX_load(o,name){BX.log=JSON.parse(JSON.stringify(o.log));BX.name=name||
 function BX_loadUI(){const old=$('#bxLoad');if(old){old.remove();return}const D=document.createElement('div');D.id='bxLoad';const add=(t,f)=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>{D.remove();f()};D.appendChild(b)};
  D.insertAdjacentHTML('beforeend','<b style="font-size:13px">DEMO TRACKS</b>');if(BX_DEMOS_SHOW)for(const k in BX_DEMOS)if(!BX_DEMOS[k].hide)add('★ '+k,()=>BX_load(BX_DEMOS[k],k));
  const S=BX_saved();D.insertAdjacentHTML('beforeend','<b style="font-size:13px">MY TRACKS</b>');for(const k in S)add(k,()=>BX_load(BX_mig(S[k]),k));
- add('✚ NEW EMPTY TRACK',()=>BX_load({log:[['w','valley']]},'MY TRACK'));add('✖ CLOSE',()=>{});$('#bx').appendChild(D)}
+ add('✚ NEW EMPTY TRACK',()=>{BX_load({log:[['w','valley']]},'MY TRACK');BX_seed()});add('✖ CLOSE',()=>{});$('#bx').appendChild(D)}
 const BX_DEMOS={};
 // ---------------------------------------------------------------- open / close
 function BX_open(){BX_scene();try{if(!BX.sc.environment&&scene.environment)BX.sc.environment=scene.environment}catch(e){}BX.on=true;renderer.shadowMap.enabled=true;document.body.classList.add('bxOn');if(BX.tfast){renderer.setPixelRatio(.5);BX.sun.shadow.mapSize.set(1024,1024)}BX.mode='build';BX.last=0;for(const id of['#menu','#topBtns','#hud','#touch'])if($(id))$(id).hidden=true;
- if(!BX.log.length){BX.log=[['w','valley']];BX_replay()}else BX_buildAll();BX.camGo=1;BX_ui()}
+ if(!BX.log.length){BX.log=[['w','valley']];BX_replay()}else BX_buildAll();BX.camGo=1;BX_ui();BX_seed()}
 function BX_close(){BX.on=false;document.body.classList.remove('bxOn');if(BX.mode==='drive')BX_driveStop();const R=$('#bx');if(R)R.remove();$('#menu').hidden=false;$('#topBtns').hidden=false;try{resize()}catch(e){}}
 frame=(f=>function(now){if(!BX.on)return f(now);requestAnimationFrame(frame);try{BX_tick(now)}catch(e){console.error(e);BX.on=false}})(frame);
 {const f=$('#home .hfoot');if(f){const b=document.createElement('button');b.id='bxMenuBtn';b.textContent='🏗 TRACK BUILDER';b.onclick=e=>{e.stopPropagation();BX_open()};f.appendChild(b)}}

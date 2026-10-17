@@ -128,7 +128,7 @@ if(window.__RV2K_GAR!==0){const st=document.createElement('style');st.textConten
 #gbx.r2.r2m-rides{--r2pw:340px}#gbx.r2.r2m-rides #gbStats{display:none}
 #gbx.r2.r2m-rides #g9Col .g9Grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
 #gbx.r2.r2m-rides #g9Col .g9Card{min-height:0;padding:3px 3px 4px;gap:0;border-radius:9px;border-bottom-width:4px}
-#gbx.r2.r2m-rides #g9Col .g9Card img{aspect-ratio:168/96}#gbx.r2.r2m-rides #g9Col .g9Card b{font-size:12px}#gbx.r2.r2m-rides #g9Col .g9Card small{display:none}#gbx.r2.r2m-rides #g9Col .g9Card.on small{display:block;font-size:12px;line-height:1.1}
+#gbx.r2.r2m-rides #g9Col .g9Card img{aspect-ratio:168/96}#gbx.r2.r2m-rides #g9Col .g9Card b{font-size:12px;line-height:1.1;white-space:normal;overflow:visible;text-overflow:clip;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere;min-height:2.2em;overflow:hidden}#gbx.r2.r2m-rides #g9Col .g9Card small{display:none}#gbx.r2.r2m-rides #g9Col .g9Card.on small{display:block;font-size:12px;line-height:1.1}
 #gbx.r2.r2m-rides #g9Col .g9Ed{display:none}#gbx.r2.r2m-rides #g9Col .g9R{left:5px;top:5px;max-width:calc(100% - 10px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;padding:0 4px}
 #gbx.r2.r2m-rides #g9Col .g9Fav{display:none}
 #gbx.r2.r2m-rides #g9Col .g9New{min-height:0;padding:2px 4px}#gbx.r2.r2m-rides #g9Col .g9New small{display:none}

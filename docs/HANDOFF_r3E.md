@@ -1,0 +1,4 @@
+# HANDOFF r3E (WIP, stopped early by the coordinator, NOT tested, not on od-int2)
+1. Done in code, untested: #1 builder (src/98b2_builder2.js BX_seed + BX_grid, src/98r3e_r3e.js GO rv2k3/builder, listed in src/ORDER) and #2 garage card labels (two-line, 12 px, src/98y_garage_collection.js). Build OK (tools/build.sh r3E); the builder GO was never run.
+2. Finding: the black builder canvas in review #3 is the test page's draw=0 stub (renderer.render is a no-op); with __tq.o.draw=1 the builder shows terrain. The GO renders once with drawing on.
+3. Left: #3 Athens green sphere is NOT the marker sprite/ring/beam; it is something else near g_city at 30 m (beaconGlow is squashed by src/97_art.js; check other Sphere/Torus meshes). #4 hint text in src/99_api.js CRSM_hint ("TAP TAP = SMASH") and its logic vs SM2 (>=45 km/h or boost). #5 hudstack1/stack reset at GO start (HUDSTACK_go). Then run the gates and shots.
