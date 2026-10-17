@@ -299,8 +299,8 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
       this.istep++;}},
   // B19 combo-driven music: the filter and the drum layer follow the combo tier (tier 1..4 = steps 0..3), changes land on the next bar line, a hit muffles the song for about a beat
   lpHz:[2500,6000,20000,20000],lyLog:[],recT:0,
-  lyStep(){return SET.react===false||!running?2:Math.max(0,Math.min(3,(this.tier|0)-1));},
-  lyDrum(){return this.drm&&SET.react!==false&&running?[0,0,.5,1][Math.max(0,Math.min(3,(this.tier|0)-1))]:0;},
+  lyStep(){return SET.react===false||!running?2:this.fever?3:Math.max(0,Math.min(3,(this.tier|0)-1));},
+  lyDrum(){return this.drm&&SET.react!==false&&running?this.fever?1:[0,0,.5,1][Math.max(0,Math.min(3,(this.tier|0)-1))]:0;},
   dlive(){return !!this.drm&&this.lyDrum()>0;},
   lyPlan(a,now,at){const L=this.lp.frequency,D=this.drm.gain,f=this.lpHz[this.lyStep()],d=this.lyDrum()*.34;
     L.cancelScheduledValues(now);D.cancelScheduledValues(now);L.setTargetAtTime(f,at,.12);D.setTargetAtTime(d,at,.12);
@@ -334,6 +334,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
   stSynth(n,t){const F=this.stb,f=k=>this.f(k),o=(dt,ty,k,dur,v,sl)=>this.osc(t+dt,ty,f(k),dur,v,F,sl?f(sl):0);
     if(n==='perfect'){o(0,'sine',100,.14,.04);o(.04,'sine',107,.2,.035);}
     else if(/^tierup/.test(n)){const m=+n.slice(6)||1;[0,4,7,12,16].slice(0,2+m).forEach((k,i)=>o(i*.07,'triangle',72+k+3*m,.22,.07));}
+    else if(n==='fever'){[0,7,12,19,24].forEach((k,i)=>o(i*.06,'sawtooth',72+k,.5,.05));o(0,'sine',48,.7,.12,36);}
     else if(n==='phase'){o(0,'sine',52,.5,.14,40);o(.12,'triangle',64,.3,.06);}
     else if(n==='boss-in'){o(0,'sawtooth',40,.9,.07,36);o(0,'sine',40,.9,.14,32);o(.4,'triangle',76,.4,.05);}
     else if(n==='clear'){[0,4,7,12,16].forEach((k,i)=>o(i*.09,'triangle',72+k,.3,.08));}
