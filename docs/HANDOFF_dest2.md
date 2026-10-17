@@ -1,0 +1,5 @@
+# HANDOFF dest2 (2026-10-17): od-int2 merged into alex/dest-wip, default stays OFF (?dest=1), NOT on trunk
+1. Merged od-int2 (LAZY conflict kept both lines); unit 0 FAIL (5312 assertions, needs `npm i three@0.164.1 --no-save`). Flag flip was tested ON, then put back OFF because of the reds below.
+2. dest/smash and dest/stops pass. dest/shortcut is red in both cities on the built page: driven shortcuts save only 11-15 % (bot wanders, 3 hard stops) and a streamed wall blocks one Athens run (215 m); 3 of 9 are dropped by the re-check. Raising the road ratio 1.3 -> 1.6 did not fix it (reverted).
+3. Other reds on the same build, NOT yet compared with trunk: rv2k2/burst (fra), xf1/grass,water,land,slope,kerb (SLOW >10 s), life1/ath-density, life1/people (SLOW 10.9 s). Several look like load timing; run them on a trunk build to confirm.
+4. Next: make the shortcut bot/finder reject candidates whose corridor gains a wall after streaming (or loosen the GO to arrived-only), then compare the other reds with trunk. No shot taken, no OD_CHANGELOG entry.

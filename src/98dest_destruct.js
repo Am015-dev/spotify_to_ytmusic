@@ -2,8 +2,8 @@
 // Measured with tools/dest/stops.js (2-min wander bot, hard stop = speed drop > 50 % in < 0.3 s): the item stops were (1) solid wall hits that rebounded the car to <= 12 m/s,
 // (2) LIFE "set" pieces (LIFE_slide took 20 % of the speed per frame) and (3) traffic taps. This module: (a) solids deflect / slide along instead of a dead stop (DEST_wall),
 // (b) the small LIFE set pieces (banner, billboard, balloons, sprinkler, swings, seesaw) smash like props under the smash2 gate (DEST_set, called from lx code.js),
-// (c) 3-5 checked shortcuts per city (up to 9 candidates, each re-checked and shown only once streamed tiles are in) over open ground (parks, plazas, lawns between streets) marked with yellow brick arrows. ON by default, ?dest=0 turns it off.
-const DEST={fr:0,hv:[],on:!/[?&]dest=0/.test(location.search),n:{slide:0,setSmash:0,setBump:0},sc:null,scI:0,scBusy:false,scGrp:null};
+// (c) 3-5 checked shortcuts per city (up to 9 candidates, each re-checked and shown only once streamed tiles are in) over open ground (parks, plazas, lawns between streets) marked with yellow brick arrows. ?dest=1 turns it ON (default OFF: dest/shortcut still red after the od-int2 merge).
+const DEST={fr:0,hv:[],on:/[?&]dest=1/.test(location.search),n:{slide:0,setSmash:0,setBump:0},sc:null,scI:0,scBusy:false,scGrp:null};
 const DEST_SET={banner:['#e8502a','#ffffff'],billboard:['#2a7ad8','#ffffff','#ffd12c'],balloons:['#e8502a','#ffd12c','#2a7ad8','#3aa04a'],sprinkler:['#2a7ad8','#bfe3ff'],swings:['#d8302a','#ffd12c','#2f3640'],seesaw:['#ffd12c','#2a7ad8']};
 // LIFE set piece (lx code.js): true = handled here (smashed or bumped), false = the old solid slide (windmill, turbine, fountain, crane, carousel, teacups stay solid landmarks)
 function DEST_set(it,sp,rr){const cols=DEST_SET[it.t];if(!DEST.on||!cols)return false;const tx=it.x-RO.x,tz=it.z-RO.z,LIFE=window.__life.LIFE;/* LIFE lives in the lx chunk's scope */
