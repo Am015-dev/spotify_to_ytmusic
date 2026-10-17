@@ -2,8 +2,8 @@
 // Measured with tools/dest/stops.js (2-min wander bot, hard stop = speed drop > 50 % in < 0.3 s): the item stops were (1) solid wall hits that rebounded the car to <= 12 m/s,
 // (2) LIFE "set" pieces (LIFE_slide took 20 % of the speed per frame) and (3) traffic taps. This module: (a) solids deflect / slide along instead of a dead stop (DEST_wall),
 // (b) the small LIFE set pieces (banner, billboard, balloons, sprinkler, swings, seesaw) smash like props under the smash2 gate (DEST_set, called from lx code.js),
-// (c) 3-5 checked shortcuts per city (up to 9 candidates, each re-checked and shown only once streamed tiles are in) over open ground (parks, plazas, lawns between streets) marked with yellow brick arrows. ?dest=1 turns it ON (default OFF: dest/shortcut still red in Frankfurt).
-const DEST={fr:0,hv:[],on:/[?&]dest=1/.test(location.search),n:{slide:0,setSmash:0,setBump:0},sc:null,scI:0,scBusy:false,scGrp:null};
+// (c) 3-5 checked shortcuts per city (up to 9 candidates, each re-checked and shown only once streamed tiles are in) over open ground (parks, plazas, lawns between streets) marked with yellow brick arrows. ?dest=0 turns it OFF (default ON). Shortcuts are kept only when the road route is >= 1.7x the straight line (est. save >= 41 %, so the driven save stays >= 20 % with ~30 % wobble).
+const DEST={fr:0,hv:[],on:!/[?&]dest=0/.test(location.search),n:{slide:0,setSmash:0,setBump:0},sc:null,scI:0,scBusy:false,scGrp:null};
 const DEST_SET={banner:['#e8502a','#ffffff'],billboard:['#2a7ad8','#ffffff','#ffd12c'],balloons:['#e8502a','#ffd12c','#2a7ad8','#3aa04a'],sprinkler:['#2a7ad8','#bfe3ff'],swings:['#d8302a','#ffd12c','#2f3640'],seesaw:['#ffd12c','#2a7ad8']};
 // LIFE set piece (lx code.js): true = handled here (smashed or bumped), false = the old solid slide (windmill, turbine, fountain, crane, carousel, teacups stay solid landmarks)
 function DEST_set(it,sp,rr){const cols=DEST_SET[it.t];if(!DEST.on||!cols)return false;const tx=it.x-RO.x,tz=it.z-RO.z,LIFE=window.__life.LIFE;/* LIFE lives in the lx chunk's scope */
@@ -30,7 +30,7 @@ function DEST_open(ax,az,bx,bz){const L=Math.hypot(bx-ax,bz-az),dx=(bx-ax)/L,dz=
 function DEST_find(budgetMs){const N=HUB.nodes;if(!N||!DEST.on)return;const t0=performance.now(),S=DEST;S.found=S.found||[];
  for(;S.scI<N.length&&performance.now()-t0<budgetMs;S.scI++){const A=N[S.scI];if(!A||A.ab||!A.nb||!A.nb.length)continue;let D=null;
   for(let j=S.scI+1;j<N.length;j++){const B=N[j];if(!B||B.ab||!B.nb||!B.nb.length)continue;const dx=B.x-A.x,dz=B.z-A.z;if(Math.abs(dx)>130||Math.abs(dz)>130)continue;const L=Math.hypot(dx,dz);if(L<60||L>130)continue;
-   D=D||DEST_dij(N,S.scI,L*2.2);const R=D.get(j);if(R==null||R<L*1.45)continue;const o=DEST_open(A.x,A.z,B.x,B.z);if(!o)continue;
+   D=D||DEST_dij(N,S.scI,L*2.2);const R=D.get(j);if(R==null||R<L*1.7)continue;const o=DEST_open(A.x,A.z,B.x,B.z);if(!o)continue;
    S.found.push({a:{x:A.x,z:A.z},b:{x:B.x,z:B.z},len:Math.round(L),road:Math.round(R),save:+(1-L/R).toFixed(2)})}}
  if(S.scI>=N.length&&!S.sc){S.found.sort((p,q)=>q.save*Math.min(q.len,140)-p.save*Math.min(p.len,140));const pick=[];for(const c of S.found){if(pick.length>=9)break;if(pick.every(p=>Math.hypot(p.a.x-c.a.x,p.a.z-c.a.z)>250&&Math.hypot(p.b.x-c.b.x,p.b.z-c.b.z)>250))pick.push(c)}S.sc=pick;DEST_mark(pick)}}
 let DEST_texM=null;
