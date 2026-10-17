@@ -72,11 +72,6 @@ function RV2K_go(kind,say){const ok=b=>b?' ✅':' ❌',P=innerHeight>innerWidth?
    ()=>say((window.__fcRes='📍 CAMERA vs FOLIAGE/WALLS 30 s (Messe → Mainkai, where leaves filled the screen) · samples with something between camera and car: '+bad+'/'+n+' (≤ 2 %)'+ok(n&&bad/n<=.02))+' pulls '+(window.__fcam?__fcam.pulls:'-')));return'📍 CAMERA CLEAR VIEW · driving 30 s…'}
  return'📍 unknown rv2k kind '+kind+' ❌'}
 // review2k-2 (rv2k2, 2026-10-16): the second strict review's TOP 10 (docs/REVIEW_2K_2.md). State asserts only; each GO prints its pass line.
-function RV2K2_race(lag,secs){const sp0=RO.sp;if(sp0)try{sprintEnd()}catch(e){}const m=tkMarkOf(RIVAL_EV.find(e=>e.p===TK_C.p));tkStart(m,TK_C);const sp=RO.sp;sp.cd=0;const G=tkGeoOf(TK_C),bot=lag==null?null:tkBot(G.pA,{lag});let lc=0,sg=0,acc=0;const gaps=[];
- tkRun(secs||300,s=>{if(bot)bot(s);acc+=1/30;if(acc>=1){acc=0;const a=s.ai[0];if(a){const d=Math.sign((s.myS||0)-(a.s||0));if(sg&&d&&d!==sg)lc++;if(d)sg=d;gaps.push((s.myS||0)-(a.s||0))}}});
- const r=TK.last,ab=gaps.map(Math.abs).sort((a,b)=>a-b),o={fin:!!r&&!r.dnf,place:r&&r.place,t:r&&r.t,lc,med:Math.round(ab[ab.length>>1]||0),fired:sp.fired||0,walls:bot?bot.R.walls:0,stuck:bot?bot.R.stuck.length:0};
- try{$('#spRes').hidden=true}catch(e){}if(RO.sp===sp)try{sprintEnd()}catch(e){}K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=K.ArrowDown=false;return o}
-function RV2K2_vis(e){const r=e&&e.getBoundingClientRect();return r&&r.width>0&&r.height>0&&e.offsetParent!==null&&getComputedStyle(e).visibility!=='hidden'&&+getComputedStyle(e).opacity>.05?r:null}
 function RV2K2_go(kind,say){const ok=b=>b?' ✅':' ❌',P=innerHeight>innerWidth?'portrait':'landscape';
  if(kind==='close'){XC_need('X5').then(()=>setTimeout(()=>{const o=RV2K2_race(.15,300);say('📍 WESTEND SPLIT vs ROSSI · human-like bot (150 ms lag, brakes for corners) · '+(o.fin?ord(o.place)+' in '+o.t+' s':'did not finish')+' · lead changes '+o.lc+' (≥ 2) · median gap '+o.med+' m (≤ 60)'+ok(o.fin&&o.lc>=2&&o.med<=60))},300));return'📍 RACE CLOSENESS · racing (fake clock)…'}
  if(kind==='items'){XC_need('X5').then(()=>setTimeout(()=>{const o=RV2K2_race(.15,300);say('📍 ITEMS IN A RACE · Westend Split, human-like bot on the racing line · item bricks fired '+o.fired+' (≥ 3 per race)'+ok(o.fired>=3))},300));return'📍 ITEMS · racing…'}
