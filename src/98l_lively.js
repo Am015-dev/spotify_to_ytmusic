@@ -200,7 +200,7 @@ function LV_clStep(dt){const S=LV.cl;if(!S||!HUB.peds)return;const P=HUB.peds,N=
     if(C.on){C.t+=dt;if(C.gs<1){C.gs=Math.min(1,C.gs+dt*2.2);LV_clDraw(k,C)}
       // props: the car smashes a stall / café set (brick burst, studs, slight slow-down); slow contact pushes the car out (collider = the drawn size)
       for(const q of C.pr){if(q.dead)continue;const ex=RO.x-q.x,ez=RO.z-q.z,e2=ex*ex+ez*ez,rr2=q.r+1.1;if(e2>rr2*rr2||Math.abs((RO.y||0)-C.y)>3)continue;
-        if(sp>6){q.dead=true;LV_clDraw(k,C);const at=V3(q.x,C.y+1.2,q.z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,fw.clone().multiplyScalar(sp*.45).add(V3(0,7,0)),14,(q.m==='s'?['#8a5a30','#e03020','#ffb020','#58c040','#ffffff']:['#ffffff','#c8282c','#ffd12c','#444444']).map(c=>new THREE.Color(c)),.8,C.y);
+        if(typeof SM2!=='undefined'&&SM2.on?SM2_smash('big',SM2_imp(sp,q.x-RO.x,q.z-RO.z)):sp>6){q.dead=true;LV_clDraw(k,C);const at=V3(q.x,C.y+1.2,q.z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,fw.clone().multiplyScalar(sp*.45).add(V3(0,7,0)),14,(q.m==='s'?['#8a5a30','#e03020','#ffb020','#58c040','#ffffff']:['#ffffff','#c8282c','#ffd12c','#444444']).map(c=>new THREE.Color(c)),.8,C.y);
           for(let s2=0;s2<3;s2++)studBurst(at,fw,sp);HUB.smashed++;comboAdd(1);RO.v*=.94;AU.sfx('crash');LV.n.smash=(LV.n.smash||0)+1}
         else{const e=Math.sqrt(e2)||1,o=rr2-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=.7}}
       // people: face the car once it is within 35 m, otherwise face the group; cheer-hop as it passes

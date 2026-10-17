@@ -57,7 +57,7 @@ roamStep=(f=>function(dt){const r=f(dt);try{if(state==='roam'&&(!RO.foot||RO.foo
 // explodes"), on a side-dash, or above 150 km/h. Now (DMG.on): it bursts on a side-dash or above 60 km/h closing speed; a pin no longer bursts it; any
 // bump above 25 km/h knocks 2-4 bricks off it (its own colour) and costs you the same graded damage (DMG_impact); 0.6 s per-car cooldown.
 function DMG_rel(c,dx,dz){const v=c.cv??c.v??0,vx=Math.sin(RO.vh)*RO.v-dx*v,vz=Math.cos(RO.vh)*RO.v-dz*v;return Math.hypot(vx,vz)*3.6}
-function DMG_traf(c,x,z,dx,dz,crLg,pin){if(!DMG.on)return crLg||pin||Math.abs(RO.v)>CR_SMASHV;const rel=DMG_rel(c,dx,dz);DMG.tRel=rel;if(crLg||rel>60||Math.abs(RO.v)>CR_SMASHV){DMG.n.burst=(DMG.n.burst||0)+1;return true}
+function DMG_traf(c,x,z,dx,dz,crLg,pin){if(!DMG.on)return crLg||pin||Math.abs(RO.v)>CR_SMASHV;const rel=DMG_rel(c,dx,dz);DMG.tRel=rel;if(crLg||(typeof SM2!=='undefined'&&SM2.on?SM2_car(c,x,z,dx,dz):rel>60)||Math.abs(RO.v)>CR_SMASHV){/* smash-2: the shared gate (impact × head-on, or boost) */DMG.n.burst=(DMG.n.burst||0)+1;return true}
  const t=performance.now();if(rel>25&&t-(c.dmT||0)>(TUNE.trafCd??4000)){/* walls-1: one bump per car per 4 s (was 0.6 s: shoving a stopped car re-hurt every 0.6 s); a bump below the 60 km/h smash threshold is scaled 0.5 = sparks only (smash = reward) */c.dmT=t;DMG.n.trafHit=(DMG.n.trafHit||0)+1;let col=null;try{col=new THREE.Color(HCOL[(c.j*3+c.k)%HCOL.length])}catch(e){}
   const n=clamp(Math.round(2+(rel-25)/15),2,4),src=[];for(let i=0;i<n;i++)src.push([new THREE.Vector3(x+rr(-.8,.8),(c.y||RO.y)+rr(.6,1.4),z+rr(-.8,.8)),col]);DMG_throw(n,src,rel);
   try{burst(SPARK,V3(x,(c.y||RO.y)+1,z),10,7,.35,new THREE.Color(2,1.6,.9))}catch(e){}DMG_impact(rel*(TUNE.trafK??.5))}
