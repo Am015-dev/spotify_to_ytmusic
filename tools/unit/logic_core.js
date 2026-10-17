@@ -9,7 +9,7 @@ module.exports=async T=>{
  // ===================== DMG_impact =====================
  T.group('dmg');
  const mk=(over)=>{Object.keys(calls).forEach(k=>delete calls[k]);
-  const G={THREE,clamp,state:'roam',RO:{x:0,y:0,z:0,h:0,hp:100,wk:null,inv:0,v:0,vh:0},BC:{big:false,m:1},burst:rec('burst'),SPARK:{},fireball:rec('fireball'),V3:(x,y,z)=>new THREE.Vector3(x,y,z),
+  const G={THREE,clamp,TUNE:L.ev(L.constSrc('TUNE'),{Math}),state:'roam',RO:{x:0,y:0,z:0,h:0,hp:100,wk:null,inv:0,v:0,vh:0},BC:{big:false,m:1},burst:rec('burst'),SPARK:{},fireball:rec('fireball'),V3:(x,y,z)=>new THREE.Vector3(x,y,z),
     DMG_panels:()=>[],DMG_throw:rec('throw'),DMG_hud:rec('hud'),flashHud:rec('flash'),roamWreck:rec('wreck'),CR_SMASHV:150/3.6,rr:(a,b)=>(a+b)/2,HCOL:['#fff'],location:{search:''}};
   Object.assign(G,over||{});
   const S=L.sandbox(['DMG','fn:DMG_cls','fn:DMG_impact','fn:DMG_rel','fn:DMG_traf'],G);return {S,G}};
@@ -19,6 +19,7 @@ module.exports=async T=>{
   for(const v of [1,10,24.9])T.eq(DMG_impact(v),0,'below-25-sparks-only-'+v);
   T.eq(G.RO.hp,100,'below-25-keeps-hp');T.ok(DMG.n.light>=3,'below-25-counts-light');T.eq(DMG.n.hits,0,'below-25-no-hit');
   T.near(DMG_impact(25),0,1e-9,'at-25-zero');
+  const TU=G.TUNE,cap0=TU.dmgCap,inv0=TU.dmgInv;TU.dmgCap=1e9;TU.dmgInv=0;/* formula checks run without the per-hit cap and grace window */
   const d50=DMG_impact(50);T.near(d50,15,1e-9,'50kmh-is-15pct');T.near(G.RO.hp,85,1e-9,'50kmh-hp');
   G.RO.hp=100;T.near(DMG_impact(60),15*Math.sqrt(35/25),1e-9,'60kmh-formula');
   G.RO.hp=100;T.near(DMG_impact(100),15*Math.sqrt(3),1e-9,'100kmh-formula');
@@ -29,8 +30,9 @@ module.exports=async T=>{
   G.RO.hp=100;let n=0;while(G.RO.hp>0&&n<40){DMG_impact(50);n++}T.ok(n>=6&&n<=8,'50kmh-takes-6-to-8-crashes','needed '+n);
   T.eq(calls.wreck,1,'zero-hp-wrecks-once');T.ok(calls.fireball>=1,'zero-hp-fireball');
   T.ok(G.RO.hp>=0,'hp-never-negative');
+  {TU.dmgCap=12;TU.dmgInv=1.2;G.RO.hp=100;G.RO.inv=0;T.near(DMG_impact(200),12,1e-9,'per-hit-cap-12');T.near(G.RO.inv,1.2,1e-9,'hit-grants-1.2s-grace');T.eq(DMG_impact(200),0,'grace-blocks-second-hit');G.RO.inv=0;G.RO.hp=100;TU.dmgCap=1e9;TU.dmgInv=0}
   // class divisor: bus/truck x1.7 (m^.35 clamped 1..2)
-  G.RO.hp=100;S.ctx.BC.big=true;S.ctx.BC.m=2;const dBig=DMG_impact(60);T.ok(dBig<15*Math.sqrt(35/25)&&dBig>15*Math.sqrt(35/25)/2.01,'heavy-class-takes-less','dBig '+dBig);
+  G.RO.hp=100;S.ctx.BC.big=true;S.ctx.BC.m=2;const dBig=DMG_impact(60);T.ok(dBig<15*Math.sqrt(35/25)&&dBig>15*Math.sqrt(35/25)/2.01,'heavy-class-takes-less','dBig '+dBig);TU.dmgCap=cap0;TU.dmgInv=inv0;
   T.near(S.DMG_cls(),Math.pow(2,.35),1e-9,'cls-m2');S.ctx.BC.m=1000;T.eq(S.DMG_cls(),2,'cls-clamped-2');S.ctx.BC.m=.1;T.eq(S.DMG_cls(),1,'cls-clamped-1');S.ctx.BC.big=false;
   // guards
   G.RO.hp=100;G.RO.inv=1;T.eq(DMG_impact(120),0,'invulnerable-no-dmg');G.RO.inv=0;
@@ -41,16 +43,16 @@ module.exports=async T=>{
  // ===================== traffic burst rules =====================
  T.group('traffic');
  {const {S,G}=mk();const {DMG,DMG_traf}=S;G.RO.vh=0;
-  let t=1000;S.ctx.performance.now=()=>t;
+  let t=100000;S.ctx.performance.now=()=>t;
   const car=()=>({cv:0,v:0,x:0,z:0,y:0,j:0,k:0});
   const hit=(kmh,c,lg,pin)=>{G.RO.v=kmh/3.6;G.RO.hp=100;return DMG_traf(c||car(),0,0,0,1,lg,pin)};
   T.eq(hit(10),false,'slow-push-no-burst');T.eq(hit(24),false,'24kmh-no-burst');
-  T.eq(hit(40),false,'40kmh-hurts-not-bursts');T.ok(DMG.n.trafHit>=1,'40kmh-counts-trafHit');T.ok(G.RO.hp<100,'40kmh-damages-player');
+  T.eq(hit(40),false,'40kmh-hurts-not-bursts');T.ok(DMG.n.trafHit>=1,'40kmh-counts-trafHit');T.eq(G.RO.hp,100,'40kmh-bump-sparks-only');/* walls-1: a bump below the smash threshold is scaled 0.5 (20 < 25 km/h) = sparks only */
   T.eq(hit(59),false,'59kmh-no-burst');
   T.eq(hit(61),true,'61kmh-bursts');T.eq(hit(100),true,'100kmh-bursts');
   T.eq(hit(151),true,'above-CR_SMASHV-bursts');T.eq(hit(10,car(),true),true,'big-crush-bursts');
-  // cooldown: second 40 km/h hit on the same car inside 600 ms does nothing
-  const c=car();t=5000;hit(40,c);const h1=DMG.n.trafHit;t=5300;hit(40,c);T.eq(DMG.n.trafHit,h1,'cooldown-600ms');t=5700;hit(40,c);T.eq(DMG.n.trafHit,h1+1,'cooldown-expires');
+  // cooldown: second 40 km/h hit on the same car inside the trafCd window (4 s, walls-1) does nothing
+  const cd=G.TUNE.trafCd??4000,c=car();t=200000;hit(40,c);const h1=DMG.n.trafHit;t+=300;hit(40,c);T.eq(DMG.n.trafHit,h1,'cooldown-inside-window');t+=cd;hit(40,c);T.eq(DMG.n.trafHit,h1+1,'cooldown-expires');
   // the car moving the same way lowers the closing speed (rel)
   G.RO.v=60/3.6;const cm=car();cm.cv=50/3.6;T.ok(S.DMG_rel(cm,0,1)<12,'same-direction-low-rel','rel '+S.DMG_rel(cm,0,1));
   T.ok(S.DMG_rel({cv:-20/3.6},0,1)>79,'head-on-adds-speeds');
