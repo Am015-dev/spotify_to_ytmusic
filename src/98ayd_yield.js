@@ -18,5 +18,7 @@ function AYD_pre(dt){if(!AYD.on||typeof RO==='undefined'||!RO.on||RO.foot&&RO.fo
   c.yo=(c.yo||0)+(tg-(c.yo||0))*Math.min(1,dt*(tg?6:1.2));if(!tg&&Math.abs(c.yo)<.02)c.yo=0}}
 // rv4C: a dead/despawned car leaves every collision structure (OB grid, spatial grids, caches that copy c.x/c.z) the moment it dies: its position is parked 10 000 km away until it respawns
 // (pin.js: a smashed car, dead=24.98, still pinned the player at 50-85 km/h). Tumble debris uses c.crW, not c.x/z, so the visuals are unchanged.
+/* rv4E: at 80+ km/h a car inside the player's corridor (4 m behind to 12 m + 1 s ahead, 5.6 m either side) is taken off the road (silently, respawns later): in a 10 m Athens street the yield cannot clear it in time (pace#1 counted 2-3 rams per 60 s). Free-roam density elsewhere is unchanged; ?ayd=0 off. */
+function AYD_clear(){if(!AYD.on||typeof RO==='undefined'||!RO.on||RO.foot&&RO.foot!=='car'||!HUB.cars||RO.v<22)return;const h=RO.vh??RO.h,fx=Math.sin(h),fz=Math.cos(h),L=12+RO.v;for(const c of HUB.cars){if(c.dead>0||c.pk||c.tr)continue;const rx=c.x-RO.x,rz=c.z-RO.z;if(rx*rx+rz*rz>L*L+100)continue;const al=rx*fx+rz*fz,lat=rx*fz-rz*fx;if(al>-4&&al<L&&Math.abs(lat)<5.6){c.dead=6;AYD.cl=(AYD.cl||0)+1}}}
 function AYD_park(){for(const c of HUB.cars){if(c.dead>0){if(!c.dz){c.dz=1;c.x=c.z=-1e7;AYD.parked=(AYD.parked||0)+1}}else if(c.dz)c.dz=0}}
-hubTrafficStep=(f=>function(dt){try{AYD_pre(dt);AYD_park()}catch(e){console.warn('AYD',e)}const r=f.apply(this,arguments);try{AYD_park()}catch(e){console.warn('AYD',e)}return r})(hubTrafficStep);
+hubTrafficStep=(f=>function(dt){try{AYD_pre(dt);AYD_clear();AYD_park()}catch(e){console.warn('AYD',e)}const r=f.apply(this,arguments);try{AYD_park()}catch(e){console.warn('AYD',e)}return r})(hubTrafficStep);
