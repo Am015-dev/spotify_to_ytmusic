@@ -152,13 +152,14 @@ function tkStep(dt){const sp=RO.sp,e=sp.e;TK.C=sp.C;const G=tkGeo();RO.cool=2;TK
   for(const it of sp.items){it.cd=Math.max(0,it.cd-dt);it.g.visible=it.cd<=0;it.g.rotation.y+=dt*2;if(it.cd>0||sp.cd>0)continue;
     if(Math.hypot(it.x-RO.x,it.z-RO.z)<4.5){it.cd=3;tkFire('me',TK_ITEMS[(sp.items.indexOf(it)+Math.floor(sp.t))%3],sp);sp.fired=(sp.fired||0)+1}}
   const C=sp.C;for(const a of sp.ai){const P=tkPath(a),Lp=tkLen(P);if(a.fin!=null&&a.s>=Lp+40)continue;a.stun=Math.max(0,a.stun-dt);a.itemCd=Math.max(0,a.itemCd-dt);
-    const gap=a.s/Lp*G.lenA-sp.myS,rub=tkRub(gap,sp.myS/G.lenA,sp.ai.indexOf(a),C.water);let tv=tkAiTarget(a,P,a.s)*(TK_FAIR&&!C.water?TK_PACE:1)*rub  /* fair-4: the boat leg keeps the old pace */;if(sp.cd>0||a.stun>0)tv=0;
+    const gap=a.s/Lp*G.lenA-sp.myS,rub=tkRub(gap,sp.myS/G.lenA,sp.ai.indexOf(a),C.water);let tv=tkAiTarget(a,P,a.s)*(TK_FAIR&&!C.water?TK_PACE:1)*rub  /* fair-4: the boat leg keeps the old pace */;if(sp.cd>0||a.stun>0)tv=0;const fc2=FC2_live(sp);if(fc2)tv*=FC2_pre(a,dt);   // fair2 (98fc_fair2.js): takedown/ghost/catch-up timers
     if(C.boost&&a.route===C.boost.r){const q=tkPosOn(P,a.s);if(sp.pads.some(p=>Math.hypot(q.x-p.x,q.z-p.z)<8))sp.padT=1.5}
     a.v+=(tv-a.v)*Math.min(1,dt*(tv>a.v?1.6:2.5));a.s+=a.v*dt;if(a.s>=Lp&&a.fin==null){a.fin=sp.t;say('',a.name.toUpperCase()+' FINISHED',1.2)}
-    const q=tkPosOn(P,Math.max(0,a.s)),x=q.x+Math.cos(q.h)*a.lane,z=q.z-Math.sin(q.h)*a.lane;
+    const q=tkPosOn(P,Math.max(0,a.s)),ln=fc2?FC2_lane(a):a.lane,x=q.x+Math.cos(q.h)*ln,z=q.z-Math.sin(q.h)*ln;
     if(a.itemCd<=0)for(const it of sp.items)if(it.cd<=0&&Math.hypot(it.x-x,it.z-z)<5){it.cd=3;a.itemCd=4;tkFire('ai',TK_ITEMS[(sp.items.indexOf(it)+1)%3],sp,a);break}
     a.y=groundAt(x,z,(a.y??0)+3);a.h=(a.h??q.h)+angDiff(q.h,a.h??q.h)*Math.min(1,dt*4);a.g.position.set(x,a.y,z);a.g.rotation.y=a.h+Math.PI;const ud=a.g.userData,wet=C.water&&typeof inRiver==='function'&&inRiver(x,z,0);if(wet)sp.aiWet=(sp.aiWet||0)+1;if(ud.boat&&ud.carG){ud.boat.visible=!!wet;ud.carG.visible=!wet}if(ud.m)ud.m.position.y=1.6+Math.sin(T*6)*.1;if(ud.ribbons)for(const rb of ud.ribbons){rb.scale.z=6+a.v/8;rb.material.uniforms.uT.value=T}
-    const d=Math.hypot(x-RO.x,z-RO.z);if(d<5.5&&d>.01&&Math.abs(a.y-RO.y)<3){const k=(5.5-d)/2;RO.x+=(RO.x-x)/d*k;RO.z+=(RO.z-z)/d*k;a.v*=.92;RO.v*=.95;AU.sfx('bump')}}
+    if(fc2){FC2_contact(sp,a,x,z,dt);continue}
+     const d=Math.hypot(x-RO.x,z-RO.z);if(d<5.5&&d>.01&&Math.abs(a.y-RO.y)<3){const k=(5.5-d)/2;RO.x+=(RO.x-x)/d*k;RO.z+=(RO.z-z)/d*k;a.v*=.92;RO.v*=.95;AU.sfx('bump')}}
   const n=sp.ai.length,ahead=sp.ai.filter(a=>a.fin!=null||a.s/tkLen(tkPath(a))*G.lenA>sp.myS).length,lastFin=TK_FAIR?(sp.ai.some(a=>a.fin!=null)?Math.min(...sp.ai.filter(a=>a.fin!=null).map(a=>a.fin)):null):sp.ai.every(a=>a.fin!=null)?Math.max(...sp.ai.map(a=>a.fin)):null;sp.place=1+ahead;RV3_gap(sp,sp.ai.map(a=>[a,a.fin!=null?G.lenA:Math.min(a.s/tkLen(tkPath(a)),1)*G.lenA]),sp.myS);
   const grace=lastFin!=null?tkGrace(sp,lastFin,G.lenA):0;if(!sp.done&&sp.cd<=0&&(sp.t>=(TK_FAIR?420:235)||(lastFin!=null&&sp.t-lastFin>=grace)))return tkFinish(true);
   sp.hud=`<b>🏁 ${e.name.toUpperCase()}</b><span>POS ${sp.place}/${n+1} · CP ${Math.min(sp.gi,sp.G.length)}/${sp.G.length} · ${fmt(Math.max(0,sp.t))}${sp.shieldT>0?' · 🛡':''}${lastFin!=null?' · DNF in '+Math.ceil(grace-(sp.t-lastFin))+' s':''}</span>`}
