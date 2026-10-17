@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.91',date:'17 Oct 2026',items:[{t:'FIXED',s:'Much less lag: the camera no longer stalls for a frame when it checks walls (the worst hitch was 66 ms).'},{t:'FIXED',s:'Smoother Frankfurt: slowest frames down from 122 ms to about 23 ms.'},{t:'CHANGED',s:'Lighter road and avatar drawing, so big scenes load and run smoother.'}]},
   {v:'v90m-beta.90',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phones: parts of the city far behind you are freed sooner, so memory stays lower on long drives (fewer crashes).'}]},
   {v:'v90m-beta.89',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens: no more sudden jumps out of the world, chapter resets or the car shaking in place.'},{t:'FIXED',s:'Smoother chase camera: it no longer pumps in and out on hills or when the car changes form.'},{t:'CHANGED',s:'Athens now starts on wide Syngrou Avenue, so you are up to speed in about 4 seconds.'}]},
   {v:'v90m-beta.88',date:'17 Oct 2026',items:[{t:'FIXED',s:'The track builder no longer opens as a black screen when you come from the garage.'},{t:'FIXED',s:'The LEVEL UP card waits until you close the garage or builder instead of covering it.'}]},
@@ -1408,7 +1409,7 @@ function applyMoodMaterials(){const m=MOOD;if(typeof GLASS!=='undefined')for(con
   if(MAT.pool)MAT.pool.opacity=.24*m.lamps;if(MAT.athB)MAT.athB.emissiveIntensity=m.win*.9;if(MAT.athM)MAT.athM.emissiveIntensity=m.win*.42;if(MAT.athMtn)MAT.athMtn.color.set(m.fog).lerp(new THREE.Color(m.lamps>.5?'#07080e':'#8292aa'),.42);for(const sl of(typeof searchlights!=='undefined'?searchlights:[]))sl.g.visible=m.id!=='dawn';
   if(typeof rain!=='undefined'&&rain){rain.geometry.setDrawRange(0,Math.round(m.rain[0]*(typeof rainScale==='number'?rainScale:1))*2);rain.material.opacity=m.rain[1];rain.visible=m.rain[0]>0}}
 
-function cv(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');const fr=g.fillRect.bind(g);
+function cv(w,h,cpu){const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',cpu?{willReadFrequently:true}:undefined);/* perf-1: cpu = software canvas, so toDataURL never waits on the GPU queue */const fr=g.fillRect.bind(g);
   g.fillRect=(x,y,W,H)=>{if(c._base===undefined&&x<=0&&y<=0&&W>=w&&H>=h&&typeof g.fillStyle==='string')c._base=g.fillStyle;fr(x,y,W,H)};return[c,g]}
 const TEXV=[{canvas:1,mip:1,name:'canvas'},{canvas:1,mip:0,name:'canvas, no mipmaps'},{mip:1,name:'pixel copy'},{mip:0,name:'pixel copy, no mipmaps'},{half:1,mip:0,name:'float pixel copy'}];
 let TEXMODE=0;
@@ -2362,7 +2363,7 @@ function nemesis(){const rv=rivals();let b=null,bv=2;for(const k in rv)if(rv[k]>
 const seasonRoster=L=>PDL.slice([0,1,2,4,5][L],[0,1,2,4,5][L]+7).map(p=>p.n);
 function seasonRound(L,r){const ath=CID==='ath',TR=ath?ATH_IDS:['grand','hafen','fraport','sky'],track=TR[(L*2+r)%4],td=TRACK_DEFS.find(t=>t.id===track);
   return{name:RND_NAMES[r],track,mood:(ath?['athgold','athnoon','athnight','athdusk','athnight']:['night','dawn','fog','storm','night'])[(r+L)%5],type:r===2?'elim':'race',laps:r===2?99:td.laps,items:r!==1,traffic:12+L*4,aggr:Math.min(.6,.08+L*.08+(r===3?.25:0)),dbl:r===4,short:td.short}}
-const AVC={},AVCC={};function avatar(n){return AVC[n]||(AVC[n]=avatarCv(n).toDataURL())}function avatarCv(n){if(AVCC[n])return AVCC[n];const p=PD[n],t=p?teamOf(p):TEAMS[0];const[c,g]=cv(64,64);
+const AVC={},AVCC={};function avatar(n){return AVC[n]||(AVC[n]=avatarCv(n).toDataURL())}function avatarCv(n){if(AVCC[n])return AVCC[n];const p=PD[n],t=p?teamOf(p):TEAMS[0];const[c,g]=cv(64,64,1);
   let gr=g.createRadialGradient(32,26,4,32,32,34);gr.addColorStop(0,t.b);gr.addColorStop(1,'#020812');g.fillStyle=gr;g.fillRect(0,0,64,64);
   g.fillStyle=t.a;g.beginPath();g.arc(32,36,22,Math.PI*1.02,Math.PI*1.98);g.lineTo(54,50);g.quadraticCurveTo(32,60,10,50);g.closePath();g.fill();
   g.fillStyle=t.c;g.fillRect(29,14,6,22);g.fillStyle='#0a1222';g.beginPath();g.ellipse(32,40,17,7,0,0,7);g.fill();
@@ -3119,7 +3120,7 @@ const QUESTS=[
   hi:'Land <b>three jumps over 45 metres</b> and you’re in my show! The orange ramps are your friends.',win:'Spectacular! The crowd went wild!',lose:'Not bad, not bad… but the show needs more air!'}];
 Object.assign(OTG_GOAL,{deliver:[3,2,1],ball:[45,70,100],escort:[1,4,8],wall:[20,32,48],taxi:[75,100,135],photo:[80,115,160],stunt:[45,65,90]});Object.assign(OTG_HI,{deliver:1});
 const QCH={};QUESTS.forEach(q=>QCH[q.id]=q.ch);
-const QAV={};function npcAvatar(q){if(QAV[q.id])return QAV[q.id];const[c,g]=cv(96,96);g.fillStyle=q.col;g.beginPath();g.arc(48,48,46,0,7);g.fill();g.fillStyle='#ffd84a';g.beginPath();g.arc(48,52,30,0,7);g.fill();g.fillStyle='#2a2a2a';g.beginPath();g.arc(38,46,4,0,7);g.arc(58,46,4,0,7);g.fill();g.strokeStyle='#2a2a2a';g.lineWidth=3;g.beginPath();g.arc(48,56,12,.15*Math.PI,.85*Math.PI);g.stroke();g.font='30px sans-serif';g.textAlign='center';g.fillText(q.em,72,28);return QAV[q.id]=c.toDataURL()}
+const QAV={};function npcAvatar(q){if(QAV[q.id])return QAV[q.id];const[c,g]=cv(96,96,1);g.fillStyle=q.col;g.beginPath();g.arc(48,48,46,0,7);g.fill();g.fillStyle='#ffd84a';g.beginPath();g.arc(48,52,30,0,7);g.fill();g.fillStyle='#2a2a2a';g.beginPath();g.arc(38,46,4,0,7);g.arc(58,46,4,0,7);g.fill();g.strokeStyle='#2a2a2a';g.lineWidth=3;g.beginPath();g.arc(48,56,12,.15*Math.PI,.85*Math.PI);g.stroke();g.font='30px sans-serif';g.textAlign='center';g.fillText(q.em,72,28);return QAV[q.id]=c.toDataURL()}
 function minifig(col){const g=new THREE.Group(),M=c=>new THREE.MeshStandardMaterial({color:c,roughness:.45}),B=(w,h,d,x,y,z,m)=>{const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);o.position.set(x,y,z);g.add(o);return o};
   const legs=M('#2b3a67'),torso=M(col),skin=M('#ffd84a');B(.55,1.4,.7,-.3,.7,0,legs);B(.55,1.4,.7,.3,.7,0,legs);B(1.4,1.5,.75,0,2.15,0,torso);const arm=B(.35,1.2,.4,-.88,2.2,0,torso);B(.35,1.2,.4,.88,2.2,0,torso);
   const head=new THREE.Mesh(new THREE.CylinderGeometry(.48,.48,.85,14),skin);head.position.y=3.35;g.add(head);const stud=new THREE.Mesh(new THREE.CylinderGeometry(.22,.22,.22,10),skin);stud.position.y=3.9;g.add(stud);
@@ -13216,12 +13217,12 @@ function LF_resid(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,g0=g
 const LF_DT=(()=>{const V=[[0,0]],I=[];for(let i=0;i<9;i++)V.push(LF_PPOLY[i].map(v=>v*.5));for(let i=0;i<18;i++){const a=LF_PPOLY[i>>1],b=LF_PPOLY[((i>>1)+1)%9],t=(i&1)/2;V.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t])}
  const T=(a,b,c)=>{const u=V[b][0]-V[a][0],v=V[b][1]-V[a][1],w=V[c][0]-V[a][0],x=V[c][1]-V[a][1];/* (u,0,v)x(w,0,x).y = v*w-u*x must be > 0 (normal up) */if(v*w-u*x>0)I.push(a,b,c);else I.push(a,c,b)};
  for(let i=0;i<9;i++){const j=(i+1)%9,o=10+2*i;T(0,1+i,1+j);T(1+i,o,o+1);T(1+i,o+1,1+j);T(1+j,o+1,10+(2*i+2)%18)}return{V,I}})();
-function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),V=LF_DT.V.map(q=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;return[x,gy(x,z),z]}),I=LF_DT.I;
+function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),V=LF_DT.V.map(q=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;return[x,gy(x,z),z]}),I=LF_DT.I;p._vy=V.map(v=>v[1]);
  for(let t=0;t<I.length;t+=3){const A=V[I[t]],B=V[I[t+1]],C=V[I[t+2]];for(const[u,v,w]of[[1/3,1/3,1/3],[.5,.5,0],[0,.5,.5],[.5,0,.5]]){const x=A[0]*u+B[0]*v+C[0]*w,z=A[2]*u+B[2]*v+C[2]*w;
   const e=A[1]*u+B[1]*v+C[1]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
 function LF_drapeG(L,A,gy){const n=LF_DT.V.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),idx=[],C=new THREE.Color();if(!L.lfP)L.lfP=[];
  A.forEach((p,k)=>{const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
-  LF_DT.V.forEach((q,i)=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=gy(x,z)+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b});
+  LF_DT.V.forEach((q,i)=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=(p._vy?p._vy[i]:gy(x,z))+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b});
   for(const i of LF_DT.I)idx.push(o+i);
   const Rr=Math.max(p.sx,p.sz),e={x:p.x,z:p.z,c,s,sx:p.sx,sz:p.sz,R2:Rr*Rr,yt:pos[o*3+1],gx:0,gz:0,d:1};
   for(let i=Math.floor((p.x-Rr)/32);i<=Math.floor((p.x+Rr)/32);i++)for(let j=Math.floor((p.z-Rr)/32);j<=Math.floor((p.z+Rr)/32);j++){const kk=i*10000+j;let B=LF.PG.get(kk);if(!B)LF.PG.set(kk,B=[]);B.push(e);L.lfP.push([kk,e])}});
@@ -13279,11 +13280,12 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
   if(slice()){yield;t0=performance.now()}}
  const GE=LF.geo||(LF.geo=LF_geos()),mat=LF.mat||(LF.mat={def:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),tuft:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,side:THREE.DoubleSide}),pond:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.12,metalness:.15})});
  const M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),S=new THREE.Vector3(),Pv=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),Co=new THREE.Color();LF.ms=LF.ms||[];
- if(LF.drape){const DR0=I.patch.filter(p=>LF_resid(p,gy)>.08),DR=DR0.filter(p=>{const sx=p.sx,sz=p.sz;for(const k of[1,.7,.5]){p.sx=sx*k;p.sz=sz*k;if(LF_drapeOk(p,gy))return true}p.sx=sx;p.sz=sz;return false});if(DR0.length){const g=DR.length?LF_drapeG(L,DR,gy):null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield}}
+ if(LF.drape){/* perf-1: the drape checks run sliced (one unsliced step was up to 215 ms of groundY calls on desktop) */const DR0=[],DR=[];for(const p of I.patch){if(LF_resid(p,gy)>.08)DR0.push(p);if(slice()){yield;t0=performance.now()}}
+  for(const p of DR0){const sx=p.sx,sz=p.sz;let ok=false;for(const k of[1,.7,.5]){p.sx=sx*k;p.sz=sz*k;if(LF_drapeOk(p,gy)){ok=true;break}}if(ok)DR.push(p);else{p.sx=sx;p.sz=sz;p._vy=null}if(slice()){yield;t0=performance.now()}}if(DR0.length){const g=DR.length?LF_drapeG(L,DR,gy):null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield}}
   I.pond=I.pond.filter(p=>{let lo=9e9,hi=-9e9;for(let k=0;k<12;k++){const a=k/12*6.283,y=gy(p.x+Math.cos(a)*p.sx,p.z+Math.sin(a)*p.sz);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.15)return false;p.y=(lo+hi)/2+.02;return true});
   I.bed=I.bed.filter(p=>{const c=Math.cos(p.ry||0),sn=Math.sin(p.ry||0);let lo=9e9,hi=-9e9;for(const[a,b]of[[-2,-1.2],[2,-1.2],[2,1.2],[-2,1.2]]){const u=a*p.sx,v=b*p.sz,y=gy(p.x+c*u+sn*v,p.z-sn*u+c*v);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.2)return false;p.y=lo;return true})}
  for(const t in I){const A=I[t];if(!A.length)continue;const m=new THREE.InstancedMesh(GE[t],t==='tuft'||t==='reed'?mat.tuft:t==='pond'?mat.pond:mat.def,A.length);
-  A.forEach((p,i)=>{if(t==='patch')LF_fit(L,p,gy);Q.setFromAxisAngle(Y,p.ry||0);M4.compose(Pv.set(p.x,p.y,p.z),Q,S.set(p.sx,p.sy,p.sz));if(p.gx||p.gz){const e=M4.elements;e[1]=p.gx*e[0]+p.gz*e[2];e[9]=p.gx*e[8]+p.gz*e[10]}m.setMatrixAt(i,M4);m.setColorAt(i,Co.set(p.c||'#ffffff'))});
+  for(let i=0;i<A.length;i++){const p=A[i];if(t==='patch')LF_fit(L,p,gy);Q.setFromAxisAngle(Y,p.ry||0);M4.compose(Pv.set(p.x,p.y,p.z),Q,S.set(p.sx,p.sy,p.sz));if(p.gx||p.gz){const e=M4.elements;e[1]=p.gx*e[0]+p.gz*e[2];e[9]=p.gx*e[8]+p.gz*e[10]}m.setMatrixAt(i,M4);m.setColorAt(i,Co.set(p.c||'#ffffff'));if(slice()){yield;t0=performance.now()}}
   m.computeBoundingSphere();m.castShadow=t==='mound';m.receiveShadow=true;m.userData.lf=t;m.userData.lfR=L.id;m.userData.nsh=t!=='mound';L.root.add(m);LF.ms.push(m);yield}
  st.regs=(st.regs||0)+1;yield* lzPropsG(L)}
 function LF_ensure(x,z,r){if(typeof LAZY==='undefined')return 0;let n=0;for(const L of LAZY)if(L.lf&&!L.done&&lzD(L,x,z)<r){lzRun(L);n++}return n}
@@ -13688,6 +13690,18 @@ function CAMST_go(say){const ok=b=>b?' ✅':' ❌';const FL=240,WIN=200,NF=6,S={
 (function CAMST_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='cam'&&q.id==='stable'))C.items.push({ver:'cam',id:'stable',area:'drive',text:'rv:2026-10-17 · cam/stable: stepped-frame drive with car/4x4 flips in both cities: the follow distance never jumps past its old/new value, no teleports'});
   C.GO['cam/stable']=['fra','ath'].map(c=>({c,n:'stable follow camera',secs:120,fn:()=>CAMST_go()}));return}
  if(i<600)setTimeout(()=>CAMST_reg(i+1),100)})(0);
+function PERF1_go(){const ok=b=>b?' ✅':' ❌',W=a=>Math.atan2(Math.sin(a),Math.cos(a)),N=600,ms=[],worst=[];let dist=0,px=RO.x,pz=RO.z,stk=0;
+ try{for(let i=0;i<N&&state==='roam';i++){const la=12+RO.v*.9,fx=Math.sin(RO.h),fz=Math.cos(RO.h),q=rfAim(RO.x+fx*la,RO.z+fz*la,fx,fz,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;
+   K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;if(Math.abs(RO.v)<.5&&++stk>60){stk=0;const s=rfSnap(RO.x+80,RO.z+80,200);if(s)roamWarp(s[0],s[1],s[2]||0,true)}
+   const t=performance.now();roamStep(1/30);roamCam(1/30);drawTraffic(1/30);updWorld(1/30,T);const d=performance.now()-t;dist+=Math.hypot(RO.x-px,RO.z-pz);px=RO.x;pz=RO.z;
+   if(i>=15){ms.push(d);worst.push([d,Math.round(RO.x)+','+Math.round(RO.z)])}}}
+ finally{K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false}
+ const s=ms.slice().sort((a,b)=>a-b),p95=s[Math.floor(s.length*.95)]||0,mx=s[s.length-1]||0,med=s[s.length>>1]||0;worst.sort((a,b)=>b[0]-a[0]);
+ const pass=ms.length>=500&&p95<=8&&mx<=50;window.__chk.perf1={p95,mx,med,n:ms.length,dist:Math.round(dist),worst:worst.slice(0,5)};
+ return '📍 PERF FRAME · '+ms.length+' stepped frames, '+Math.round(dist)+' m · median '+med.toFixed(1)+' ms · p95 '+p95.toFixed(1)+' ms (≤ 8) · max '+mx.toFixed(0)+' ms (≤ 50) at '+(worst[0]?worst[0][1]:'-')+ok(pass)}
+(function PERF1_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='frame'))C.items.push({ver:'perf',id:'frame',area:'drive',text:'rv:2026-10-17 · perf/frame (Alex beta.90: “lags a lot even on a very powerful machine”): stepped-frame drive at speed in both cities, the frame JS (sim, traffic, LIFE, lazy builders, streaming, camera) p95 ≤ 8 ms and no frame > 50 ms'});
+  C.GO['perf/frame']=['fra','ath'].map(c=>({c,n:'frame time',secs:120,fn:()=>PERF1_go()}));return}
+ if(i<600)setTimeout(()=>PERF1_reg(i+1),100)})(0);
 
 const RF_GRID=()=>RC&&RC.type==='race'&&ships.length>=2&&pl;
 function RF_rub(s,gap,ld){const P=clamp(pl.dist/Math.max(1,(RC.laps||1)*TD.L),0,1),fadeB=P<.75?1:clamp((1-P)/.25,0,1),holdA=P<.7?1:.5;
@@ -16467,11 +16481,44 @@ function FC_step(){const c=camera.position,ox=RO.x,oy=RO.y+1,oz=RO.z;
 FC.pull=!/[?&]fcpull=0/.test(location.search);FC.k=1;FC.off=new THREE.Vector3();FC.rc=new THREE.Raycaster();FC.o=new THREE.Vector3();FC.dv=new THREE.Vector3();FC.occ=[];FC.occT=-99;FC.rt=0;FC.kt=1;FC.pulls=0;
 function FC_occ(){FC.occT=FC.t;const L=[];scene.traverse(o=>{if(!o.isMesh||!o.visible||o===pl.mesh||pl.mesh.getObjectById(o.id))return;const m=o.material,mm=Array.isArray(m)?m[0]:m;if(mm&&mm.transparent&&mm.opacity<.5)return;
   const g=o.geometry,n=g&&g.attributes&&g.attributes.position?g.attributes.position.count:0;if(o.isInstancedMesh?(o.userData.bvL||o.userData.cv||o.userData.athB):n>=4000)L.push(o)});FC.occ=L}
+const FCG={on:!/[?&]fcbvh=0/.test(location.search),W:new WeakMap(),cs:8,ms:1.5,q:[],iM:new THREE.Matrix4(),a:new THREE.Vector3(),b:new THREE.Vector3(),bx:new THREE.Box3(),sg:new THREE.Box3(),st:{built:0,tris:0,hits:0,miss:0,ms:0}};
+function FCG_ok(g){const p=g&&g.attributes&&g.attributes.position;return!!p&&p.itemSize>=3&&!g.morphAttributes.position}
+function FCG_get(g){const e=FCG.W.get(g),p=g.attributes.position;if(e&&e.pos===p&&e.ver===p.version&&e.ix===g.index)return e;
+  const n=g.index?g.index.count/3|0:p.count/3|0,ne={pos:p,ver:p.version,ix:g.index,n,i:0,cells:new Map(),bigT:[],done:false,seen:new Uint32Array(n),stamp:0};FCG.W.set(g,ne);return ne}
+function FCG_vtx(g){const p=g.attributes.position,f=!p.isInterleavedBufferAttribute&&!p.normalized&&p.array instanceof Float32Array&&p.itemSize===3?p.array:null;
+  return f?(i,o)=>{o[0]=f[i*3];o[1]=f[i*3+1];o[2]=f[i*3+2]}:(i,o)=>{o[0]=p.getX(i);o[1]=p.getY(i);o[2]=p.getZ(i)}}
+function FCG_build(g,e,t0){const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0],B=[0,0,0],C=[0,0,0],cs=FCG.cs,M=e.cells;
+  while(e.i<e.n){const k=e.i++,a=ix?ix[k*3]:k*3,b=ix?ix[k*3+1]:k*3+1,c=ix?ix[k*3+2]:k*3+2;V(a,A);V(b,B);V(c,C);
+    const x0=Math.floor(Math.min(A[0],B[0],C[0])/cs),x1=Math.floor(Math.max(A[0],B[0],C[0])/cs),z0=Math.floor(Math.min(A[2],B[2],C[2])/cs),z1=Math.floor(Math.max(A[2],B[2],C[2])/cs);
+    if((x1-x0+1)*(z1-z0+1)>256){e.bigT.push(k);continue}   // huge triangles (ground sheets): tested on every ray
+    for(let x=x0;x<=x1;x++)for(let z=z0;z<=z1;z++){const kk=(x+32768)*65536+(z+32768);let L=M.get(kk);if(!L)M.set(kk,L=[]);L.push(k)}
+    if((k&511)===511&&performance.now()-t0>FCG.ms)return}
+  e.done=true;FCG.st.built++;FCG.st.tris+=e.n}
+function FCG_work(c,o){const t0=performance.now();FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(o).expandByScalar(80);
+  for(const m of FC.occ){if(m.isInstancedMesh||m.isBatchedMesh||!FCG_ok(m.geometry))continue;const g=m.geometry,e=FCG_get(g);if(e.done)continue;if(!g.boundingBox)g.computeBoundingBox();
+    if(!FCG.bx.copy(g.boundingBox).applyMatrix4(m.matrixWorld).intersectsBox(FCG.sg))continue;FCG_build(g,e,t0);if(performance.now()-t0>FCG.ms)break}
+  FCG.st.ms+=performance.now()-t0}
+function FCG_hit(m,c,far){const g=m.geometry;if(!FCG_ok(g)||!m.layers.test(FC.rc.layers))return FCG_ok(g)?-1:null;const e=FCG.W.get(g);
+  if(!e||!e.done||e.pos!==g.attributes.position||e.ver!==g.attributes.position.version||e.ix!==g.index){FCG.st.miss++;return null}
+  const rd=FC.rc.ray.direction,ew=FCG.a.copy(rd).multiplyScalar(far).add(c);if(!g.boundingBox)g.computeBoundingBox();
+  if(!FCG.bx.copy(g.boundingBox).applyMatrix4(m.matrixWorld).intersectsBox(FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(ew)))return -1;
+  const iM=FCG.iM.copy(m.matrixWorld).invert(),lo=FCG.b.copy(c).applyMatrix4(iM),le=ew.applyMatrix4(iM),cs=FCG.cs;
+  const ox=lo.x,oy=lo.y,oz=lo.z,dx=le.x-ox,dy=le.y-oy,dz=le.z-oz,x0=Math.floor(Math.min(ox,le.x)/cs),x1=Math.floor(Math.max(ox,le.x)/cs),z0=Math.floor(Math.min(oz,le.z)/cs),z1=Math.floor(Math.max(oz,le.z)/cs);
+  if((x1-x0+1)*(z1-z0+1)>400)return null;
+  const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0],B=[0,0,0],C=[0,0,0],sn=++e.stamp>>>0;let best=-1;FCG.st.hits++;
+  for(let x=x0-1;x<=x1;x++)for(let z=z0;z<=z1;z++){const L=x<x0?e.bigT:e.cells.get((x+32768)*65536+(z+32768));if(!L)continue;if(x<x0&&z>z0)continue;
+    for(const k of L){if(e.seen[k]===sn)continue;e.seen[k]=sn;V(ix?ix[k*3]:k*3,A);V(ix?ix[k*3+1]:k*3+1,B);V(ix?ix[k*3+2]:k*3+2,C);
+      const e1x=B[0]-A[0],e1y=B[1]-A[1],e1z=B[2]-A[2],e2x=C[0]-A[0],e2y=C[1]-A[1],e2z=C[2]-A[2],px=dy*e2z-dz*e2y,py=dz*e2x-dx*e2z,pz=dx*e2y-dy*e2x,det=e1x*px+e1y*py+e1z*pz;
+      if(det>-1e-12&&det<1e-12)continue;const inv=1/det,tx=ox-A[0],ty=oy-A[1],tz=oz-A[2],u=(tx*px+ty*py+tz*pz)*inv;if(u<0||u>1)continue;
+      const qx=ty*e1z-tz*e1y,qy=tz*e1x-tx*e1z,qz=tx*e1y-ty*e1x,v=(dx*qx+dy*qy+dz*qz)*inv;if(v<0||u+v>1)continue;const tt=(e2x*qx+e2y*qy+e2z*qz)*inv;if(tt<0||tt>1)continue;
+      const dist=tt*far;if(dist>best)best=dist}}
+  return best}
 function FC_pull(dt){const c=camera.position;
   if(!FC.pull)return;const o=FC.o.set(RO.x,RO.y+1,RO.z),dv=FC.dv.copy(c).sub(o),d=dv.length();if(d<3.2)return;
-  if(FC.t-FC.occT>8)FC_occ();
+  if(FC.t-FC.occT>8)FC_occ();if(FCG.on)FCG_work(c,o);
   FC.rt+=dt;if(FC.rt>=.05){FC.rt=0;const rc=FC.rc;rc.set(c,dv.clone().multiplyScalar(-1/d));rc.far=d-2.2;rc.near=0;let t=-1;   // camera -> car ; the hit nearest the car wins
    for(const m of FC.occ){const ms=Array.isArray(m.material)?m.material:[m.material],sd=ms.map(q=>q.side);   // both faces: walls that face away from the camera (camera behind a wall) count too
+    if(FCG.on&&!m.isInstancedMesh&&!m.isBatchedMesh){const r=FCG_hit(m,c,rc.far);if(r!==null){if(r>t)t=r;continue}}   // perf-1: grid path (null = not indexed yet / not usable -> three raycast)
     let h;try{for(const q of ms)q.side=THREE.DoubleSide;h=rc.intersectObject(m,false)}finally{ms.forEach((q,i)=>q.side=sd[i])}for(const x of h)if(x.distance>t)t=x.distance}
    FC.hT=t>=0?(FC.hT||0)+.05:0;FC.kt=t>=0&&FC.hT>=.3?Math.max(3/d,Math.min(1,(d-t-.7)/d)):1}   /* rv4A: a wall must stay on the line 0.3 s (a corner clipped while passing is ignored) */
   FC.k=FC.kt<FC.k?Math.max(FC.kt,FC.k-dt*2):Math.min(FC.kt,FC.k+dt*.5);   /* rv4A: eases in at 2/s (was a snap) and out at 0.5/s (was 0.8): road-follow in Athens swung 18/min */
