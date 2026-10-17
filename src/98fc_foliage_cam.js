@@ -35,7 +35,7 @@ function FC_pull(dt){const c=camera.position;
    for(const m of FC.occ){const ms=Array.isArray(m.material)?m.material:[m.material],sd=ms.map(q=>q.side);   // both faces: walls that face away from the camera (camera behind a wall) count too
     let h;try{for(const q of ms)q.side=THREE.DoubleSide;h=rc.intersectObject(m,false)}finally{ms.forEach((q,i)=>q.side=sd[i])}for(const x of h)if(x.distance>t)t=x.distance}
    FC.hT=t>=0?(FC.hT||0)+.05:0;FC.kt=t>=0&&FC.hT>=.3?Math.max(3/d,Math.min(1,(d-t-.7)/d)):1}   /* rv4A: a wall must stay on the line 0.3 s (a corner clipped while passing is ignored) */
-  FC.k=FC.kt<FC.k?Math.max(FC.kt,FC.k-dt*2):Math.min(FC.kt,FC.k+dt*.5);   /* rv4A: eases in at 2/s (was a snap) and out at 0.5/s (was 0.8): road-follow in Athens swung 18/min */
+  FC.k=FC.kt<FC.k?Math.max(FC.kt,FC.k-6*dt/d):Math.min(FC.kt,FC.k+2*dt/d);   /* camwall: 6 m/s in, 2 m/s out along the line (was 2/s and 0.5/s of the line length = 20 / 5 m/s) */   /* rv4A: eases in at 2/s (was a snap) and out at 0.5/s (was 0.8): road-follow in Athens swung 18/min */
   if(FC.k<.999){FC.off.copy(dv).multiplyScalar(1-FC.k);c.sub(FC.off);FC.pulls++}}
 roamCam=(f=>function(dt){if(FC.off.lengthSq()){camera.position.add(FC.off);FC.off.set(0,0,0)}f(dt);if(!FC.on||state!=='roam'||(RO.foot&&RO.foot!=='car')||(typeof M1!=='undefined'&&M1.cs)){if(FC.hid.length)FC_restore(true);FC.k=1;FC.kt=1;return}
   // foliage over / around the camera
