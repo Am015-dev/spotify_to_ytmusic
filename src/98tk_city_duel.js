@@ -34,6 +34,8 @@ function tkSimTime(C,r){const G=tkGeoOf(C),P=r==='A'?G.pA:G.pB,L=tkLen(P),a={bas
   TK.sp=sv;TK.C=sC;return{t:+t.toFixed(1),len:Math.round(L)}}
 function tkSpread(C){const A=tkSimTime(C,'A'),B=tkSimTime(C,'B');return{A,B,spread:+(Math.abs(A.t-B.t)/Math.min(A.t,B.t)*100).toFixed(1)}}
 // share of route B that runs on route A (two routes must really differ)
+// akro-1: dense version (10 m samples of B vs the segments of A): the sparse-vertex test above misses a leg that doubles back over another (Akropolis: start leg out to X, route A straight back over it for 340 m; the pursuit bot projected onto the return pass and pinned)
+function tkOverD(A,B){let n=0,m=0;for(let i=1;i<B.length;i++){const a=B[i-1],b=B[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]),k=Math.max(1,Math.ceil(L/10));for(let j=0;j<k;j++){const x=a[0]+(b[0]-a[0])*(j+.5)/k,z=a[1]+(b[1]-a[1])*(j+.5)/k;let d=1e9;for(let u=1;u<A.length&&d>=14;u++){const p=A[u-1],q=A[u],dx=q[0]-p[0],dz=q[1]-p[1],l2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-p[0])*dx+(z-p[1])*dz)/l2));d=Math.min(d,Math.hypot(p[0]+dx*t-x,p[1]+dz*t-z))}m++;if(d<14)n++}}return n/Math.max(1,m)}
 function tkOverlap(A,B){let n=0;for(const p of B){let d=1e9;for(const q of A){d=Math.min(d,Math.hypot(p[0]-q[0],p[1]-q[1]));if(d<14)break}if(d<14)n++}return n/Math.max(1,B.length)}
 // tracks-3: WATER section. Route B leaves the street down a Main slipway, runs the river as a boat (auto transform, 98xf_xform.js) and climbs the next slipway on the same bank; route A stays on the bank streets.
 function tkWaterCourse(spec){if(typeof SLIPS==='undefined'||!SLIPS.length||typeof MAINR==='undefined')return null;const P=MAINR.pts,free=(a,b)=>{for(let k=0;k<=14;k++)if(roamHit(a[0]+(b[0]-a[0])*k/14,a[1]+(b[1]-a[1])*k/14,3))return false;return true},path=(a,b)=>qvPath(a[0],a[1],b[0],b[1]).map(p=>[p[0],p[1]]);let best=null;
@@ -73,7 +75,7 @@ function tkBuild(spec){if(TK.built[spec.key])return TK.built[spec.key];const G=q
     else{X=tkSnap(S[0]+dx*520,S[1]+dz*520);J=tkSnap(S[0]+dx*1300,S[1]+dz*1300);if(!X||!J)continue;F=tkSnap(J[0]+dx*520,J[1]+dz*520);const mx=(X[0]+J[0])/2,mz=(X[1]+J[1])/2,vA=tkSnap(mx+px*W,mz+pz*W),vB=tkSnap(mx-px*W,mz-pz*W);if(!F||!vA||!vB)continue;
       A=tkCat(path(X,vA),path(vA,J));B=tkCat(path(X,vB),path(vB,J))}
     if(!A||!B||A.length<3||B.length<3)continue;const st=path(S,X),fin=path(J,F);if(st.length<2||fin.length<2||tkLen(st)<250||tkLen(fin)<250)continue
-    const LA=tkLen(A),LB=tkLen(B);if(LA<400||LB<400||Math.max(LA,LB)/Math.min(LA,LB)>1.35||tkOverlap(A,B)>.4)continue
+    const LA=tkLen(A),LB=tkLen(B);if(LA<400||LB<400||Math.max(LA,LB)/Math.min(LA,LB)>1.35||tkOverlap(A,B)>.4||tkOverD(st,A)>.15||tkOverD(st,B)>.15||tkOverD(A,fin)>.15||tkOverD(B,fin)>.15)continue
     const C={key:spec.key,id:'tk_'+spec.key.replace(/\W/g,'_'),name:spec.name,p:spec.p,kind:spec.kind,ev:spec.ev,ai:spec.ai,base:spec.base||62,off:!!offB,
       seg:{start:st,A,B,fin},ramps:[['start',.55,22,5,16],['A',.5,20,5,14],['B',.45,20,5,14],['fin',.45,26,8,16]],items:[['start',.35],['start',.75],['A',.3],['A',.7],['B',.3],['B',.7],['fin',.25],['fin',.7]],boost:null};
     if(offB)C.ramps[2]=['fin',.15,20,5,14];
