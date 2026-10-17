@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.94',date:'18 Oct 2026',items:[{t:'FIXED',s:'Smoother Athens: typical frame time down about 28% (21 ms to 15 ms).'},{t:'FIXED',s:'The ground-height check under your car runs at full speed again, instead of slowing down over and over.'},{t:'CHANGED',s:'Half the throwaway data in Athens, so fewer cleanup pauses.'}]},
 {v:'v90m-beta.93',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens traffic: no more dead cars stuck in the road.'},{t:'NEW',s:'Livelier Athens streets, and traffic gives way at junctions.'}]},
 {v:'v90m-beta.92',date:'17 Oct 2026',items:[{t:'FIXED',s:'Fewer long freezes, especially in Athens: the game makes far less throwaway data, so the browser pauses less to clean up.'},{t:'FIXED',s:'Shop shutters no longer rebuild every frame.'},{t:'CHANGED',s:'Background loading now runs in small slices instead of big bursts.'}]},
 {v:'v90m-beta.91',date:'17 Oct 2026',items:[{t:'FIXED',s:'Much less lag: the camera no longer stalls for a frame when it checks walls (the worst hitch was 66 ms).'},{t:'FIXED',s:'Smoother Frankfurt: slowest frames down from 122 ms to about 23 ms.'},{t:'CHANGED',s:'Lighter road and avatar drawing, so big scenes load and run smoother.'}]},
@@ -3899,8 +3900,9 @@ function TR_bridgeEnds(){if(CID!=='fra'||!TR_RG)return;for(const b of[...BRIDGES
 function TR7_cap(h,nx,nz,r,D){if(new URLSearchParams(location.search).get('tr7')==='0')return;const s=Math.tan(27*Math.PI/180)*r,s2=s*Math.SQRT2,ok=k=>!D||D[k]>=180;
   for(let it=0;it<2;it++){for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i;if(!ok(k))continue;let v=h[k];if(i)v=Math.max(v,h[k-1]-s);if(j){v=Math.max(v,h[k-nx]-s);if(i)v=Math.max(v,h[k-nx-1]-s2);if(i<nx-1)v=Math.max(v,h[k-nx+1]-s2)}h[k]=v}
     for(let j=nz-1;j>=0;j--)for(let i=nx-1;i>=0;i--){const k=j*nx+i;if(!ok(k))continue;let v=h[k];if(i<nx-1)v=Math.max(v,h[k+1]-s);if(j<nz-1){v=Math.max(v,h[k+nx]-s);if(i<nx-1)v=Math.max(v,h[k+nx+1]-s2);if(i)v=Math.max(v,h[k+nx-1]-s2)}h[k]=v}}}
-function TR_G(x,z){const W=TR_W||TR_init();let fx=(x-WX0)/W.r,fz=(z-WZS)/W.r;fx=fx<0?0:fx>W.nx-1.001?W.nx-1.001:fx;fz=fz<0?0:fz>W.nz-1.001?W.nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*W.nx+i,h=W.h;
-  return(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+W.nx]*(1-tx)+h[k+W.nx+1]*tx)*tz}
+let TR_Wc=null,TR_r=1,TR_nx=2,TR_nz=2,TR_h=null;
+function TR_G(x,z){if(TR_W!==TR_Wc||!TR_W){const W=TR_W||TR_init();TR_Wc=W;TR_r=W.r;TR_nx=W.nx;TR_nz=W.nz;TR_h=W.h}const nx=TR_nx;let fx=(x-WX0)/TR_r,fz=(z-WZS)/TR_r;fx=fx<0?0:fx>nx-1.001?nx-1.001:fx;fz=fz<0?0:fz>TR_nz-1.001?TR_nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*nx+i,h=TR_h;
+  return(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+nx]*(1-tx)+h[k+nx+1]*tx)*tz}
 const TR_tauH0=tauH;
 tauH=(x,z)=>{let h=TR_G(x,z)+TR_tauH0(x,z);if(x<TAU_R.x0||z<TAU_R.z0)return h;for(const P of[TAU_SUM,TAU_CAS]){const d=Math.hypot(x-P.x,z-P.z);if(d<P.r){const H=P.trH??(P.trH=TR_G(P.x,P.z)+TR_tauH0(P.x,P.z)),k=clamp((P.r-d)/(P.r*.55),0,1);h+=(H-h)*k*k*(3-2*k)}}return h};
 function TR_Y(x,z){return CID==='fra'?tauH(x,z):athShelfY(x,z,TR_G(x,z))}
@@ -4068,9 +4070,9 @@ function zoneAt(x,z){for(let i=ZONES.length-1;i>=0;i--){const Z=ZONES[i];if(x>Z.
 const inLot=(x,z)=>{const Z=zoneAt(x,z);return !!Z&&(Z.t==='dirt'||Z.t==='grass'||Z.t==='forest')};
 const slipTop=s=>{if(!TERR.on)return 0;return TR_Y(s.x-s.ix*.6,s.z-s.iz*.6)};  // the bank's ground at the ramp's top end
 function slipY(x,z){for(const s of SLIPS){const dx=x-s.x,dz=z-s.z;if(dx>40||dx<-40||dz>40||dz<-40)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<10&&inw>0&&inw<30){const yT=s.yT??0;return yT+(HWY-yT)*inw/30}}return null}
-function roamTerr(x,z,y,o){let low=false;for(const b of ALL_DECKS){const h=deckAt(b,x,z);if(h!=null&&h>.2){if(y>=h-2.4){let g2=h;for(const r of RO.ramps){if(!r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),c=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(c)<r.w/2&&a>-r.len/2&&a<r.len/2)g2=Math.max(g2,r.y0+(a+r.len/2)/r.len*r.hgt)}if(o){o.g=g2;o.deck=b;o.low=undefined;return o}return{g:g2,deck:b}}if(h-y<5.5)low=true}}
+function roamTerr(x,z,y,o){let low=false;const AD=ALL_DECKS,RR=RO.ramps;for(let bi=0;bi<AD.length;bi++){const b=AD[bi];const h=deckAt(b,x,z);if(h!=null&&h>.2){if(y>=h-2.4){let g2=h;for(let ri=0;ri<RR.length;ri++){const r=RR[ri];if(!r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),c=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(c)<r.w/2&&a>-r.len/2&&a<r.len/2)g2=Math.max(g2,r.y0+(a+r.len/2)/r.len*r.hgt)}if(o){o.g=g2;o.deck=b;o.low=undefined;return o}return{g:g2,deck:b}}if(h-y<5.5)low=true}}
   let g=groundY(x,z);if(GND_ON)g=GND_far(x,z,g);const sl=slipY(x,z);if(sl!=null)g=Math.max(g,sl);
-  for(const r of RO.ramps){if(r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(b)<r.w/2&&a>-r.len/2&&a<r.len/2)g=Math.max(g,r.y0+(a+r.len/2)/r.len*r.hgt)}
+  for(let ri=0;ri<RR.length;ri++){const r=RR[ri];if(r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(b)<r.w/2&&a>-r.len/2&&a<r.len/2)g=Math.max(g,r.y0+(a+r.len/2)/r.len*r.hgt)}
   if(o){o.g=g;o.deck=null;o.low=low;return o}return{g,deck:null,low}}
 const _gaO={g:0,deck:null,low:false};function groundAt(x,z,y){return roamTerr(x,z,y,_gaO).g}
 const groundY=CID==='fra'?(x,z)=>inRiver(x,z)?HWY:TR_Y(x,z):(x,z)=>TR_Y(x,z);
@@ -4078,7 +4080,7 @@ function roofAt(){return null}
 function hubAddB(b,to){if(b.ry!=null){const c=Math.cos(b.ry),s=Math.sin(b.ry);if(Math.abs(s)<1e-3||Math.abs(c)<1e-3){if(Math.abs(s)>.5){const t=b.hw;b.hw=b.hd;b.hd=t}}else{b.c=c;b.s=s}}(to||HUB.bld).push(b);return b}
 function bHit(b,x,z,rad){const dx=x-b.x,dz=z-b.z;let lx=dx,lz=dz;if(b.c!=null){lx=dx*b.c-dz*b.s;lz=dx*b.s+dz*b.c}const ex=Math.abs(lx)-b.hw,ez=Math.abs(lz)-b.hd;if(ex>=rad||ez>=rad)return false;if(ex<=0||ez<=0)return true;return ex*ex+ez*ez<rad*rad}
 const bExt=b=>b.c==null?[b.hw,b.hd]:[Math.abs(b.c)*b.hw+Math.abs(b.s)*b.hd,Math.abs(b.s)*b.hw+Math.abs(b.c)*b.hd];
-function roamHit(x,z,rad,y=0){const L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));if(!L)return null;const LP=TUNE.lowProp??1.3;/* race-1: colliders lower than 1.3 m (kerb / barrier / cone pieces) are stepped over, never beach the car */for(const b of L){if(y>=(b.h||999)-.6||(b.y0!=null&&y<b.y0))continue;if(b.h&&bLow(b,LP))continue;if(bHit(b,x,z,rad))return b}return null}
+function roamHit(x,z,rad,y=0){const L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));if(!L)return null;const LP=TUNE.lowProp??1.3;/* race-1: colliders lower than 1.3 m (kerb / barrier / cone pieces) are stepped over, never beach the car */for(let bi=0;bi<L.length;bi++){const b=L[bi];if(y>=(b.h||999)-.6||(b.y0!=null&&y<b.y0))continue;if(b.h&&bLow(b,LP))continue;if(bHit(b,x,z,rad))return b}return null}
 function bLow(b,LP){if(b.rh===undefined){const g=b.y0!=null?b.y0+1.5:groundY(b.x,b.z);b.rh=b.h-g}return b.rh<LP}
 function bldPush(b,x,z,rad){const dx=x-b.x,dz=z-b.z;if(b.c==null){const xf=Math.abs(dx)/(b.hw+rad)>Math.abs(dz)/(b.hd+rad);return xf?[b.x+Math.sign(dx||1)*(b.hw+rad+.05),z,'x']:[x,b.z+Math.sign(dz||1)*(b.hd+rad+.05),'z']}
   let lx=dx*b.c-dz*b.s,lz=dx*b.s+dz*b.c;const xf=Math.abs(lx)/(b.hw+rad)>Math.abs(lz)/(b.hd+rad);if(xf)lx=Math.sign(lx||1)*(b.hw+rad+.05);else lz=Math.sign(lz||1)*(b.hd+rad+.05);
@@ -13225,9 +13227,12 @@ function LF_resid(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,g0=g
 const LF_DT=(()=>{const V=[[0,0]],I=[];for(let i=0;i<9;i++)V.push(LF_PPOLY[i].map(v=>v*.5));for(let i=0;i<18;i++){const a=LF_PPOLY[i>>1],b=LF_PPOLY[((i>>1)+1)%9],t=(i&1)/2;V.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t])}
  const T=(a,b,c)=>{const u=V[b][0]-V[a][0],v=V[b][1]-V[a][1],w=V[c][0]-V[a][0],x=V[c][1]-V[a][1];/* (u,0,v)x(w,0,x).y = v*w-u*x must be > 0 (normal up) */if(v*w-u*x>0)I.push(a,b,c);else I.push(a,c,b)};
  for(let i=0;i<9;i++){const j=(i+1)%9,o=10+2*i;T(0,1+i,1+j);T(1+i,o,o+1);T(1+i,o+1,1+j);T(1+j,o+1,10+(2*i+2)%18)}return{V,I}})();
-function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),V=LF_DT.V.map(q=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;return[x,gy(x,z),z]}),I=LF_DT.I;p._vy=V.map(v=>v[1]);
- for(let t=0;t<I.length;t+=3){const A=V[I[t]],B=V[I[t+1]],C=V[I[t+2]];for(const[u,v,w]of[[1/3,1/3,1/3],[.5,.5,0],[0,.5,.5],[.5,0,.5]]){const x=A[0]*u+B[0]*v+C[0]*w,z=A[2]*u+B[2]*v+C[2]*w;
-  const e=A[1]*u+B[1]*v+C[1]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
+const LF_DW=[1/3,1/3,1/3,.5,.5,0,0,.5,.5,.5,0,.5],LF_DX=new Float64Array(LF_DT.V.length),LF_DY=new Float64Array(LF_DT.V.length),LF_DZ=new Float64Array(LF_DT.V.length);
+function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),Q=LF_DT.V,n=Q.length,I=LF_DT.I,X=LF_DX,Y=LF_DY,Z=LF_DZ,W=LF_DW;
+ for(let i=0;i<n;i++){const a=Q[i][0]*p.sx,b=Q[i][1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;X[i]=x;Y[i]=gy(x,z);Z[i]=z}
+ const vy=p._vy&&p._vy.length===n?p._vy:(p._vy=new Float32Array(n));for(let i=0;i<n;i++)vy[i]=Y[i];
+ for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];for(let k=0;k<12;k+=3){const u=W[k],v=W[k+1],w=W[k+2],x=X[a]*u+X[b]*v+X[d]*w,z=Z[a]*u+Z[b]*v+Z[d]*w;
+  const e=Y[a]*u+Y[b]*v+Y[d]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
 function LF_drapeG(L,A,gy){const n=LF_DT.V.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),idx=[],C=new THREE.Color();if(!L.lfP)L.lfP=[];
  A.forEach((p,k)=>{const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
   LF_DT.V.forEach((q,i)=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=(p._vy?p._vy[i]:gy(x,z))+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b});
@@ -13288,8 +13293,11 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
   if(slice()){yield;t0=performance.now()}}
  const GE=LF.geo||(LF.geo=LF_geos()),mat=LF.mat||(LF.mat={def:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),tuft:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,side:THREE.DoubleSide}),pond:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.12,metalness:.15})});
  const M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),S=new THREE.Vector3(),Pv=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),Co=new THREE.Color();LF.ms=LF.ms||[];
- if(LF.drape){/* perf-1: the drape checks run sliced (one unsliced step was up to 215 ms of groundY calls on desktop) */const DR0=[],DR=[];for(const p of I.patch){if(LF_resid(p,gy)>.08)DR0.push(p);if(slice()){yield;t0=performance.now()}}
-  for(const p of DR0){const sx=p.sx,sz=p.sz;let ok=false;for(const k of[1,.7,.5]){p.sx=sx*k;p.sz=sz*k;if(LF_drapeOk(p,gy)){ok=true;break}}if(ok)DR.push(p);else{p.sx=sx;p.sz=sz;p._vy=null}if(slice()){yield;t0=performance.now()}}if(DR0.length){const g=DR.length?LF_drapeG(L,DR,gy):null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield}}
+ if(LF.drape){/* perf-1: the drape checks run sliced (one unsliced step was up to 215 ms of groundY calls on desktop) */const DR0=[],DR=[];
+  const DC=LF.dc||(LF.dc=new Map()),dk=CID+L.id,pv=DC.get(dk),cu=[],ce=new Map();DC.set(dk,cu);
+  for(let i=0;i<I.patch.length;i++){const p=I.patch[i],c0=pv&&pv[i],hit=c0&&c0.x===p.x&&c0.z===p.z&&c0.sx===p.sx&&c0.sz===p.sz,c=hit?c0:{x:p.x,z:p.z,sx:p.sx,sz:p.sz,r:LF_resid(p,gy)>.08,k:-1,vy:null};cu.push(c);if(c.r){DR0.push(p);ce.set(p,c)}if(!hit&&slice()){yield;t0=performance.now()}}
+  for(const p of DR0){const sx=p.sx,sz=p.sz,c=ce.get(p);let ok=false;if(c.k>=0){if(c.k>0){p.sx=sx*c.k;p.sz=sz*c.k;p._vy=c.vy;ok=true}}else{c.k=0;for(const k of[1,.7,.5]){p.sx=sx*k;p.sz=sz*k;if(LF_drapeOk(p,gy)){ok=true;c.k=k;c.vy=p._vy;break}}}
+   if(ok)DR.push(p);else{p.sx=sx;p.sz=sz;p._vy=null}if(slice()){yield;t0=performance.now()}}if(DR0.length){const g=DR.length?LF_drapeG(L,DR,gy):null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield}}
   I.pond=I.pond.filter(p=>{let lo=9e9,hi=-9e9;for(let k=0;k<12;k++){const a=k/12*6.283,y=gy(p.x+Math.cos(a)*p.sx,p.z+Math.sin(a)*p.sz);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.15)return false;p.y=(lo+hi)/2+.02;return true});
   I.bed=I.bed.filter(p=>{const c=Math.cos(p.ry||0),sn=Math.sin(p.ry||0);let lo=9e9,hi=-9e9;for(const[a,b]of[[-2,-1.2],[2,-1.2],[2,1.2],[-2,1.2]]){const u=a*p.sx,v=b*p.sz,y=gy(p.x+c*u+sn*v,p.z-sn*u+c*v);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.2)return false;p.y=lo;return true})}
  for(const t in I){const A=I[t];if(!A.length)continue;const m=new THREE.InstancedMesh(GE[t],t==='tuft'||t==='reed'?mat.tuft:t==='pond'?mat.pond:mat.def,A.length);
@@ -15904,15 +15912,27 @@ roamBounce=(f=>function(ax,sp,nX,nZ){if(!DEST.on||RO.tb)return f.apply(this,argu
  if(Math.abs(RO.v)>=Math.max(s0*.6,fl))return r;
  const a=Math.min(1,-vn/Math.max(s0,.1));let tx=vx-vn*X,tz=vz-vn*Z,tl=Math.hypot(tx,tz);if(tl<.3*s0){/* head-on: slide to the side the car is steered / pointing to */const sd=Math.sign(Math.sin(RO.h)*-Z+Math.cos(RO.h)*X)||1;tx=-Z*sd;tz=X*sd;tl=1}
  const k=Math.max(.6,1-.4*a*a),tf=Math.atan2(tx/tl,tz/tl);RO.vh=tf;RO.h+=angDiff(tf,RO.h)*.6;RO.v=(v0<0?-1:1)*Math.max(s0*k,fl);RO.stkT=0;DEST.n.slide++;return r})(roamBounce);
-function DEST_dij(N,a,maxD){const D=new Map([[a,0]]),Q=[[0,a]];while(Q.length){let m=0;for(let i=1;i<Q.length;i++)if(Q[i][0]<Q[m][0])m=i;const[d,i]=Q.splice(m,1)[0];if(d>D.get(i))continue;const A=N[i];for(const j of A.nb||[]){const B=N[j];if(!B)continue;const nd=d+Math.hypot(B.x-A.x,B.z-A.z);if(nd<maxD&&nd<(D.get(j)??1e9)){D.set(j,nd);Q.push([nd,j])}}}return D}
+const DEST_DJ={n:0,D:null,M:null,st:0,hd:null,hi:null};
+function DEST_dij(N,a,maxD){const W=DEST_DJ;if(W.n<N.length){W.n=N.length;W.D=new Float64Array(N.length);W.M=new Uint32Array(N.length);W.hd=new Float64Array(64);W.hi=new Int32Array(64)}
+ const D=W.D,M=W.M,st=++W.st;let hd=W.hd,hi=W.hi,hn=0;
+ const push=(d,i)=>{if(hn>=hd.length){const d2=new Float64Array(hd.length*2),i2=new Int32Array(hd.length*2);d2.set(hd);i2.set(hi);W.hd=hd=d2;W.hi=hi=i2}let k=hn++;while(k>0){const q=(k-1)>>1;if(hd[q]<=d)break;hd[k]=hd[q];hi[k]=hi[q];k=q}hd[k]=d;hi[k]=i};
+ D[a]=0;M[a]=st;push(0,a);
+ while(hn){const d=hd[0],i=hi[0];hn--;if(hn){const ld=hd[hn],li=hi[hn];let k=0;for(;;){let c=2*k+1;if(c>=hn)break;if(c+1<hn&&hd[c+1]<hd[c])c++;if(hd[c]>=ld)break;hd[k]=hd[c];hi[k]=hi[c];k=c}hd[k]=ld;hi[k]=li}
+  if(d>D[i])continue;const A=N[i],nb=A.nb;if(!nb)continue;for(let t=0;t<nb.length;t++){const j=nb[t],B=N[j];if(!B)continue;const nd=d+Math.hypot(B.x-A.x,B.z-A.z);if(nd<maxD&&(M[j]!==st||nd<D[j])){D[j]=nd;M[j]=st;push(nd,j)}}}
+ return W}
+const DEST_dget=(W,j)=>W.M[j]===W.st?W.D[j]:null;
+function DEST_grid(N){const G=new Map();for(let i=0;i<N.length;i++){const B=N[i];if(!B)continue;const k=Math.floor(B.x/130)*100000+Math.floor(B.z/130);let L=G.get(k);if(!L)G.set(k,L=[]);L.push(i)}return G}
+const DEST_cand=[];
 const _dsO={g:0,deck:null,low:false};// perf-2: scratch result (the shortcut scan probes the ground ~100k times)
 function DEST_open(ax,az,bx,bz){const L=Math.hypot(bx-ax,bz-az),dx=(bx-ax)/L,dz=(bz-az)/L;let off=0,n=0,g0=groundAt(ax,az,99);for(let s=3;s<=L-3;s+=1.5){const x=ax+dx*s,z=az+dz*s,g=groundAt(x,z,99);n++;if(roamHit(x,z,3.8,g+.6)||inRiver(x,z,2)||roamTerr(x,z,g+.3,_dsO).low||Math.abs(g-g0)>.5||g<-1||Math.abs(groundAt(x+dz*1.6,z-dx*1.6,99)-g)>.6||Math.abs(groundAt(x-dz*1.6,z+dx*1.6,99)-g)>.6)return 0;g0=g;if(!LF_onRoad(x,z))off++;const PL=HUB.pgrid&&HUB.pgrid.get(Math.floor(x/16)*10000+Math.floor(z/16));if(PL)for(const p of PL){const d=HUB.ptypes[p.t];if(d&&d.r>=1.1&&Math.hypot(p.x-x,p.z-z)<d.r+2)return 0}}if(n<6||off/n<.6)return 0;
  const LF=window.__life;if(LF&&LF.cell&&LF.CELL){/* solid LIFE set pieces (crane, carousel, fountain...) near the line; the small ones smash and do not count */try{const C=LF.CELL,seen=new Set();for(let s=0;s<=L;s+=C/2){const x=ax+dx*s,z=az+dz*s,ca=Math.floor(x/C),cb=Math.floor(z/C);for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const k=(ca+da)*100000+cb+db;if(seen.has(k))continue;seen.add(k);for(const it of LF.cell(ca+da,cb+db)){if(it.c!=='set'||DEST_SET[it.t])continue;const t=clamp(((it.x-ax)*dx+(it.z-az)*dz),0,L);if(Math.hypot(ax+dx*t-it.x,az+dz*t-it.z)<it.r+4)return 0}}}}catch(e){}}
  return off/n}
 function DEST_find(budgetMs){const N=HUB.nodes;if(!N||!DEST.on)return;const t0=performance.now(),S=DEST;S.found=S.found||[];
  for(;S.scI<N.length&&performance.now()-t0<budgetMs;S.scI++){const A=N[S.scI];if(!A||A.ab||!A.nb||!A.nb.length)continue;let D=null;
-  for(let j=S.scI+1;j<N.length;j++){const B=N[j];if(!B||B.ab||!B.nb||!B.nb.length)continue;const dx=B.x-A.x,dz=B.z-A.z;if(Math.abs(dx)>130||Math.abs(dz)>130)continue;const L=Math.hypot(dx,dz);if(L<60||L>130)continue;
-   D=D||DEST_dij(N,S.scI,L*2.2);const R=D.get(j);if(R==null||R<L*1.7)continue;const o=DEST_open(A.x,A.z,B.x,B.z);if(!o)continue;
+  if(S.gN!==N){S.gN=N;S.grid=DEST_grid(N)}const C=DEST_cand;C.length=0;const ca=Math.floor(A.x/130),cb=Math.floor(A.z/130);
+  for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const L=S.grid.get((ca+da)*100000+cb+db);if(L)for(let t=0;t<L.length;t++)if(L[t]>S.scI)C.push(L[t])}C.sort((p,q)=>p-q);
+  for(let c=0;c<C.length;c++){const j=C[c],B=N[j];if(!B||B.ab||!B.nb||!B.nb.length)continue;const dx=B.x-A.x,dz=B.z-A.z;if(Math.abs(dx)>130||Math.abs(dz)>130)continue;const L=Math.hypot(dx,dz);if(L<60||L>130)continue;
+   D=D||DEST_dij(N,S.scI,L*2.2);const R=DEST_dget(D,j);if(R==null||R<L*1.7)continue;const o=DEST_open(A.x,A.z,B.x,B.z);if(!o)continue;
    S.found.push({a:{x:A.x,z:A.z},b:{x:B.x,z:B.z},len:Math.round(L),road:Math.round(R),save:+(1-L/R).toFixed(2)})}}
  if(S.scI>=N.length&&!S.sc){S.found.sort((p,q)=>q.save*Math.min(q.len,140)-p.save*Math.min(p.len,140));const pick=[];for(const c of S.found){if(pick.length>=9)break;if(pick.every(p=>Math.hypot(p.a.x-c.a.x,p.a.z-c.a.z)>250&&Math.hypot(p.b.x-c.b.x,p.b.z-c.b.z)>250))pick.push(c)}S.sc=pick;DEST_mark(pick)}}
 let DEST_texM=null;
@@ -15924,7 +15944,7 @@ function DEST_mark(list){if(!list.length)return;if(!DEST_texM){const[pc,pg]=cv(6
   for(let s=14;s<L-12;s+=9){const x=c.a.x+ux*s,z=c.a.z+uz*s,m=new THREE.Mesh(new THREE.BoxGeometry(.8,.28,.8),DEST_texM);m.position.set(x,groundAt(x,z,99)+.2,z);m.visible=false;grp.add(m);c.mk.push(m)}}
  HUB.grp.add(grp)}
 function DEST_check(c){if(c.ok!=null)return c.ok;c.ok=!!DEST_open(c.a.x,c.a.z,c.b.x,c.b.z);for(const m of c.mk||[])m.visible=c.ok;return c.ok}
-function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(DEST.scGrp);DEST.scGrp=null;DEST.sc=null;DEST.found=null;DEST.scI=0;DEST.N=HUB.nodes}
+function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(DEST.scGrp);DEST.scGrp=null;DEST.sc=null;DEST.found=null;DEST.scI=0;DEST.N=HUB.nodes;DEST.gN=null}
 const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.sc){try{DEST_find(4)}catch(e){DEST.sc=[];console.warn('DEST',e)}}else if(DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350)DEST_check(c)};
 smashCheck=(f=>function(dt){DEST_step(dt);return f.apply(this,arguments)})(smashCheck);
 function R3E_builderGo(){if(typeof BX==='undefined')return'📍 builder missing ❌';const T=window.__tq&&__tq.o,was=BX.on,IDS=['#menu','#topBtns','#hud','#touch'],hid=IDS.map(i=>{const e=$(i);return e?e.hidden:null});try{if(!BX.on)BX_open();const ok=b=>b?' ✅':' ❌',cam=BX.cam,d0=T&&T.draw;if(T)T.draw=1;
