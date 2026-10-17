@@ -181,12 +181,12 @@ RET.dailyShow();
 window.DY=DY;
 
 /* ---------- B18: district song pools + a theme for every boss (POLISH.md). RET.dpool=false: the old picks, byte for byte.
-   New song = 3 steps (music-treblo/README.md): 1 the mp3 into games/mainhattan-nightrun/music/, 2 measure it (audio-test.js) and add its tracks.json entry,
+   New song = 3 steps (the music workflow README under games-src/nightrun): 1 the mp3 into games/mainhattan-nightrun/music/, 2 measure it (audio-test.js) and add its tracks.json entry,
    3 one row in DP.rows below. A row whose song is not loaded (no tracks.json entry) is ignored, so a row can be added before the file arrives. ---------- */
 if(RET.dpool===undefined)RET.dpool=true;
 const DP=RET.DP={
   base:{0:['stage1','stage2','stage3'],1:['stage2','stage3','endless'],2:['stage3','endless','endless2'],3:['endless2','stage1','stage2'],4:['athina','athina2']},   // by district index (4 = Athens); the songs that exist today
-  rows:[   // {k:song key, bpm:synth fallback tempo, d:[district indexes]}; the owner's treblo songs (cues-polish.json): d1a,d1b = Bank ... d4a,d4b = Messe
+  rows:[   // {k:song key, bpm:synth fallback tempo, d:[district indexes]}; the owner's songs (cues-polish.json): d1a,d1b = Bank ... d4a,d4b = Messe
     {k:'d1a',bpm:118,d:[0]},{k:'d1b',bpm:120,d:[0]},{k:'d2a',bpm:124,d:[1]},{k:'d2b',bpm:126,d:[1]},{k:'d3a',bpm:126,d:[2]},{k:'d3b',bpm:128,d:[2]},{k:'d4a',bpm:128,d:[3]},{k:'d4b',bpm:130,d:[3]}],
   bossT:{0:['boss-d1','boss'],1:['boss-d2','boss3'],2:['boss-d3','boss'],3:['boss-d4','boss2'],6:['boss3']},   // boss k -> themes, the first one that is loaded wins (the last is the song we have)
   bossRows:[{k:'boss-d1',bpm:140},{k:'boss-d2',bpm:140},{k:'boss-d3',bpm:140},{k:'boss-d4',bpm:140}]};
