@@ -39,5 +39,19 @@ function tkGoQuick(say){const ids=(CID==='fra'?['grand','hafen','fraport','sky',
   setTimeout(()=>{const sp=RO.sp,ok=!bad&&sp&&sp.tk&&sp.C.kind==='quick'&&(CID!=='fra'||wet===1)&&off>=1;if(sp&&sp.tk){try{$('#spRes').hidden=true}catch(e){}sprintEnd()}menuTrack=sv[0];menuTab=sv[1];
     say('📍 QUICK RACE · '+out.join(' · ')+' · start button -> '+(sp&&sp.tk?'city course "'+sp.C.name+'"':'old spline track')+' '+(ok?'✅':'❌'))},1500);
   return'📍 QUICK RACE · starting…'}
-Object.assign(window.__tk,{feel:tkFeel,water:tkGoWater,quick:tkGoQuick});
-({tkBot,tkStaticFeel,tkFeel,tkGoWater,tkGoQuick})
+Object.assign(window.__tk,{td:TD_go,feel:tkFeel,water:tkGoWater,quick:tkGoQuick});
+// raceG/takedown GO (98td_takedown.js): Takedown Quick Race on the fake clock. (1) mode starts: sp.td + 3 rivals; (2) staged rear hit at +12 m/s = 1 takedown, rival stunned;
+// (3) staged rival shove from behind = 1 "taken down"; (4) rivals hunt you (lane steered toward you); (5) human-like bot (tkBot, lag .15) races: winner declared within 300 s, bot 1st on at least one track.
+function TD_go(say,tracks){const ok=b=>b?' ✅':' ❌',sv=[TDR.on,TDR.sel,menuTrack],out=[];let good=true;TDR.on=true;TDR.sel=true;
+  const begin=trk=>{if(RO.sp)try{sprintEnd()}catch(e){}menuTrack=trk;const C=tkBuild(tkQuickSpec());if(!C)return null;tkStart({kind:'quick',ev:null},C);const sp=RO.sp;sp.cd=0;return sp};
+  const fin=()=>{try{$('#spRes').hidden=true}catch(e){}if(RO.sp)try{sprintEnd()}catch(e){}K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=K.ArrowDown=false};
+  try{tracks=tracks||(CID==='ath'?['akro','synt']:['grand','sky','fraport']);let sp=begin(tracks[0]);const st=!!(sp&&sp.td&&sp.ai.length===3);good=good&&st;out.push('starts '+(sp?sp.C.name:'no course')+ok(st));
+    if(st){tkStep(1/30);for(const o of sp.ai)o.tdCd=9;const n0=sp.td.n,m0=sp.td.me,a=sp.ai[0],h=a.h,p=a.g.position;a.tdCd=0;RO.h=RO.vh=h;RO.x=p.x-Math.sin(h)*4.5;RO.z=p.z-Math.cos(h)*4.5;RO.y=a.y;a.v=15;RO.v=27;a.stun=0;tdContact(sp,1/30);const t1=sp.td.n===n0+1&&a.stun>0;
+      a.tdCd=9;const b=sp.ai[1],q=b.g.position;b.tdCd=0;RO.h=RO.vh=b.h;RO.x=q.x+Math.sin(b.h)*4.5;RO.z=q.z+Math.cos(b.h)*4.5;RO.y=b.y;RO.v=10;b.v=25;b.stun=0;sp.td.cd=0;sp.shieldT=0;tdContact(sp,1/30);const t2=sp.td.me===m0+1&&RO.v<7;
+      good=good&&t1&&t2;out.push('takedown +'+(sp.td.n-n0)+ok(t1)+' · taken down +'+(sp.td.me-m0)+ok(t2))}
+    let won=0,anyRes=1;for(const trk of tracks){sp=begin(trk);if(!sp)continue;const bot=tkBot(tkGeoOf(sp.C).pA,{lag:.15});tkRun(TDR.CAP+10,s=>bot(s));const r=TK.last,res=!!(r&&r.mode==='takedown'&&r.t<=TDR.CAP+1);anyRes&=res;
+      if(r&&!r.dnf&&r.place===1)won=1;out.push(`${sp.C.name}: ${r?(r.dnf?'DNF '+Math.round(100*(sp.myS||0)/tkGeoOf(sp.C).lenA)+'% @'+r.t+' s':ord(r.place)+' '+r.t+' s'):'no result'} (rival ${r&&r.rival!=null?r.rival.toFixed(0):'—'} s) · 💥 ${r?r.td:0} · hit ${r?r.tdMe:0} · aim ${r?r.aim:0}`+ok(res&&r.aim>0));good=good&&res&&r.aim>0;fin();if(won)break}
+    good=good&&won&&anyRes;out.push('bot wins '+ok(won))}
+  catch(e){good=false;out.push('ERR '+e.message)}finally{fin();TDR.on=sv[0];TDR.sel=sv[1];menuTrack=sv[2]}
+  const t='📍 TAKEDOWN RACE · '+out.join(' · ')+ok(good);window.__chk_td=t;return t}
+({tkBot,tkStaticFeel,tkFeel,tkGoWater,tkGoQuick,TD_go})
