@@ -86,7 +86,7 @@ RET.st=(function(on){
     check(false);if(dirty)save();}
   const mark=()=>{dirty=true;};
   NR.on('runStart',d=>{if(!on)return;cur=(d&&(d.tut||d.lab))?null:{story:d&&d.story||0,daily:!!(d&&d.daily)};try{lastBank=GA.bank;}catch(e){}
-    if(cur){S().runs++;mark();}});
+    if(cur&&!(d&&d.resume)){S().runs++;mark();}});
   NR.on('tick',dt=>{if(!on||!live())return;dt=Math.min(.25,dt||0);const s=S();s.time+=dt;
     try{for(const id of WP.eqIds())D.w[id]=(D.w[id]||0)+dt;if(WP.fu())s.fuse+=dt;}catch(e){}mark();});
   NR.on('kill',d=>{if(!on||!live())return;if(d&&d.boss)S().bosses++;else S().kills++;mark();});
