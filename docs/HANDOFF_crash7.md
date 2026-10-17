@@ -3,3 +3,8 @@
 2. Measured (tMem2, iPhone emulation, ?lowmem=1, Frankfurt, 5 min, one run, built c7a): total 653/659 -> 639 MB; heap growth after minute 2 (409 -> 428) +19 MB (was +38..45). Both targets met. Athens boot (mem/ath-boot) and the 852x393 pop-in shot were NOT done.
 3. Gates on built c7a: unit 0 FAIL; TAG=life1,xf1,terrain,mem,rv2k2 43/58 (trunk 46/58 in crash-6 notes). Reds: mem/stable (913 MB end, red on trunk), rv2k2/close (red on trunk), xf1/grass,water,land,slope,kerb, terr1/tyre+fps fra/ath, life1/smash,popup,ath-density,people (SLOW-only lines, run in parallel with Athens). 15 reds vs 10 on trunk: not proven identical, so pushed to alex/od-crash7-wip, not trunk.
 4. Next: rerun the gates alone (one city at a time) on c7a and on trunk for a same-name comparison, run mem/ath-boot, take one fra_lowmem shot and LOOK for pop-in at 250 m past draw range; if clean, merge to alex/od-int2.
+
+## Result (merged to alex/od-int2)
+- Merged alex/od-int2 into the crash-7 branch; build c7m OK (page 3.19 MB); unit 0 FAIL.
+- Gate TAG=life1,xf1,terrain,mem, run serially: branch 43/45 (reds mem/stable, mem/ath-boot); trunk 42/45 (reds mem/stable, xf1/grass, mem/ath-boot). No new reds by name.
+- Athens lowmem (tMem2 c7 ath 1): peak total 749 MB <= 785. One 852x393 Frankfurt lowmem shot: no visible pop-in near the car (single frame).
