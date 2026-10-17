@@ -5,16 +5,19 @@
    3. Pedestrians: minifig walk cycle (leg + opposite arm swing scaled by speed, bob at mid-stance, hip roll, torso twist, smooth turns, head look),
       speed variety, idles (look at phone, look around, chat in pairs), sidestep each other. They still leap aside from the player's car.
    4. Hazard blinkers on some parked cars (reuses the CV blinker mesh: no new draw call). */
-const L3_ON=!/[?&]l3=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3')!=='0'}catch(e){return true}})()/* life-4: ON by default (?l3=0 or od_l3=0 turns it off) */,L3_LT=L3_ON&&!/[?&]l3lt=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3lt')!=='0'}catch(e){return true}})()/* stop-line guard + red-light audit: ON again since lights-3 (node 115 runs fixed); ?l3lt=0 or od_l3lt=0 = off */,L3={lc:0,acc:0,pacc:0,run:0,ent:0,ov:0,qs:0,idle:0,chat:0};
+const L3_ON=!/[?&]l3=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3')!=='0'}catch(e){return true}})()/* life-4: ON by default (?l3=0 or od_l3=0 turns it off) */,L3_LT=L3_ON&&!/[?&]l3lt=0/.test(location.search)&&(()=>{try{return localStorage.getItem('od_l3lt')!=='0'}catch(e){return true}})()/* stop-line guard + red-light audit: ON again since lights-3 (node 115 runs fixed); ?l3lt=0 or od_l3lt=0 = off */,L3_YLD=L3_ON&&/[?&]yld=1/.test(location.search),L3={lc:0,acc:0,pacc:0,run:0,ent:0,ov:0,qs:0,idle:0,chat:0};
 function L3_ad(a,b){let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d}
 // lateral offset (from the edge's node line) of lane s∈[-1,1] for car c on edge A→B; null = no two lanes here
 function L3_off(c,A,B,s){if(!A||!B||A.ab||c.pk||c.tr)return null;if(A.g||B.g)return RD_ON&&(A.w||0)>=14?s*Math.min(A.w,B.w||A.w)*.11:null;const W=Math.min(A.w||20,B.w||20);return W>=14?W*(.27+.09*s):null}
 function L3_free(c,A,B,tgt){const G=CV.G;if(!G)return false;const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16),cur=L3_off(c,A,B,c.l3s),to=L3_off(c,A,B,tgt);if(cur==null||to==null)return false;
   for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0||o.CVhx*c.CVhx+o.CVhz*c.CVhz<.7)continue;const rx=o.x-c.x,rz=o.z-c.z,al=rx*c.CVhx+rz*c.CVhz;if(al<-11||al>15)continue;
     const lat=cur+(-rx*c.CVhz+rz*c.CVhx);if(Math.abs(lat-to)<2)return false}return true}
+// yield-1: true when the player (driving, fast) is 4-45 m behind car c, in c's lane, and closing at > 6 m/s: c should change lane (2K traffic gives way)
+function L3_yieldP(c){if(!L3_YLD||typeof RO==='undefined'||RO.foot||RO.v<14||c.CVhx==null)return false;const rx=c.x-RO.x,rz=c.z-RO.z,al=rx*c.CVhx+rz*c.CVhz;if(al<4||al>45)return false;if(Math.abs(-rx*c.CVhz+rz*c.CVhx)>2.4)return false;if(RO.v*(Math.sin(RO.h)*c.CVhx+Math.cos(RO.h)*c.CVhz)<(c.cv||0)+6)return false;return true}
 function L3_tick(){const N=HUB.nodes;for(const c of HUB.cars){if(c.l3t==null){if(c.pk||c.tr||CT_wideHw(c))continue;c.l3t=((c.j*7+c.k*3)>>1)%2?1:-1;c.l3s=c.l3t}
   if(!c.CVn||c.dead>0||c.route&&!c.CVr||(c.l3c||0)>0)continue;const A=N[c.a],B=N[c.b];if(L3_off(c,A,B,0)==null)continue;let want=c.l3t;
   if(c.CVi&&c.CViT>0&&c.RDy!=='box')want=-c.CVi;/* turning soon: be in the lane on the turn side (blinker side = -lane) */
+  else if(L3_yieldP(c))want=-c.l3t;/* yield-1: the player closes fast from behind in my lane: take the other lane */
   else{const l=c.CVl;if(l&&!(l.dead>0)&&!c.RDy){const al=(l.x-c.x)*c.CVhx+(l.z-c.z)*c.CVhz;if(al<24&&(l.cv||0)>.5&&(l.cv||0)<(c.v||0)*.75&&!l.RDy)want=-c.l3t}}/* slower car ahead (not queued at a light): pass it */
   if(want!==c.l3t&&L3_free(c,A,B,want)){c.l3t=want;c.l3c=4;L3.lc++}}}
 // red-light audit: a car entering a signalled box on red without a reservation granted before the red = a run
