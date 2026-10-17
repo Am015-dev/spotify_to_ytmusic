@@ -66,7 +66,8 @@ const ZOO=window.ZOO={
     else e.x-=(150+10*d)*1.2*dt;
     return true;},
   /* ---- movement of one enemy; true = handled here (b.js skips its own switch) ---- */
-  mv(e,dt,d){if(!RET.zoo||e.type==='boss')return false;
+  mv(e,dt,d){if(!RET.zoo||e.type==='boss'||e.dummy)return false;      // (dummy: the test dummies of weapon-test / scale-test pin themselves)
+    
     if(!e.zt){if(!this.hovOn())return false;
       if(e.type==='drone'&&!e.gnd)return this.hv(e,dt,d,{N:this.N()});
       if(e.type==='flank')return this.flank(e,dt,d);
@@ -239,7 +240,7 @@ const ZOO=window.ZOO={
     { const so=DIR.spawnOne;DIR.spawnOne=function(fill){
         if(!RET.zoo||G.lab||G.tut)return so.call(this,fill);
         if(window.LEAK&&LEAK.gapOn())return so.call(this,fill);
-        if(ZOO.count()>=ZOO.CAP()&&!ST.over){ZOO.stat.spawnsDeferred++;DIR.later(2,()=>{if(!G.dead)DIR.spawnOne(fill);});return;}   // too many on screen: this wave comes later
+        if(!G.boss&&ZOO.count()>=ZOO.CAP()&&!ST.over){ZOO.stat.spawnsDeferred++;DIR.later(2,()=>{if(!G.dead)DIR.spawnOne(fill);});return;}   // too many on screen: this wave comes later
         if(!fill&&ZOO.waveOK()&&GR()<ZOO.pz&&ZOO.wave())return;
         return so.call(this,fill);}; }
     if(typeof labBuildFoes==='function'){const lb=labBuildFoes;labBuildFoes=function(body){lb(body);const r=lsec(body,'NEW ENEMIES (the zoo)');

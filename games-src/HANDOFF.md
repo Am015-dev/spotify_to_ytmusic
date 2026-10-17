@@ -4,6 +4,14 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun zoo: time to kill them all + 8 new enemies (17 Oct 2026)
+- Done: `nightrun/parts/zoo.js` (built after leak.js; flag `RET.zoo`, `?zoo=0` = old). Drones and flankers enter, hover on a spread-out slot in the right 60% for N beats
+  (Easy 6, Normal 5, Hard 4, Very hard/Legend 3), then leave; busy screen (ZOO.cap) defers a wave in 2-beat steps. Hard/Legend flyers enter x.8 / x.9.
+  New kinds (story: from stage 4, one every 2-3 stages; endless: all by ~5 min): shielder, kamikaze, splitter, bomber, sniper, healer, carrier, minelayer; shapes in code,
+  `en-<id>.webp` placeholders in assets-manifest.json, LAB > FOES chips. b.js has 3 small hooks (movement switch, shield block, carrier contact). Test: `nightrun/zoo-test.js`.
+- Not done: the two optional ground kinds (rocket truck, mortar); painted art for the 8 kinds; tuning by hand-play (numbers are first guesses, see `ZOO.T`, `ZOO.cap`, `ZOO.pz`).
+- Test dummies must carry `dummy:1` (zoo leaves them alone).
+
 ## Nightrun title diet + type floor (B25, B26; 16 Oct 2026)
 - Done: flags `RET.title` and `RET.type` (ret.js; `?title=0` / `?type=0` switch them off), new part `parts/title.js` (built before c.js), test `nightrun/ret-title-test.js`.
 - Title now: PLAY (fresh save) or CONTINUE (next unbeaten stage + saved ARCADE/CLASSIC + Heat, 1 tap from cold open), ENDLESS + DAILY (streak/bonus on the tile), GARAGE + MENU, and one status chip (daily streak + weekly).
