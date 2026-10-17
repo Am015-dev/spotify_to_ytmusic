@@ -14,4 +14,7 @@ function AYD_pre(dt){if(!AYD.on||typeof RO==='undefined'||!RO.on||RO.foot&&RO.fo
      tg=s*m/nd;c.yoG=tg;c.yoH=1;if(!c.yoC){c.yoC=1;AYD.n++}}}}
   if(!tg&&c.yoH>0){c.yoH-=dt;if(c.yoH>0)tg=c.yoG||0;else{c.yoH=0;c.yoC=0}}
   c.yo=(c.yo||0)+(tg-(c.yo||0))*Math.min(1,dt*(tg?6:1.2));if(!tg&&Math.abs(c.yo)<.02)c.yo=0}}
-hubTrafficStep=(f=>function(dt){try{AYD_pre(dt)}catch(e){console.warn('AYD',e)}return f.apply(this,arguments)})(hubTrafficStep);
+// rv4C: a dead/despawned car leaves every collision structure (OB grid, spatial grids, caches that copy c.x/c.z) the moment it dies: its position is parked 10 000 km away until it respawns
+// (pin.js: a smashed car, dead=24.98, still pinned the player at 50-85 km/h). Tumble debris uses c.crW, not c.x/z, so the visuals are unchanged.
+function AYD_park(){for(const c of HUB.cars){if(c.dead>0){if(!c.dz){c.dz=1;c.x=c.z=-1e7;AYD.parked=(AYD.parked||0)+1}}else if(c.dz)c.dz=0}}
+hubTrafficStep=(f=>function(dt){try{AYD_pre(dt);AYD_park()}catch(e){console.warn('AYD',e)}const r=f.apply(this,arguments);try{AYD_park()}catch(e){console.warn('AYD',e)}return r})(hubTrafficStep);

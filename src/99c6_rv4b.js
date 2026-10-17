@@ -3,7 +3,8 @@ function RV4B_drive(secs,onStep){const W=a=>Math.atan2(Math.sin(a),Math.cos(a));
  K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;return Math.round(sum/Math.max(n,1)*3.6)}
 function RV4B_go(kind){const ok=b=>b?' ✅':' ❌';if(state!=='roam'||!RO.on)return'📍 Start free roam in Athens ❌';
  if(kind==='traf'){const n0=SM2.n.carTap+SM2.n.carSmash,kmh=RV4B_drive(120);const hits=SM2.n.carTap+SM2.n.carSmash-n0;
-  return'📍 ATHENS TRAFFIC CONTACTS · 120 s road-follow from the start, gas held, stepped · average '+kmh+' km/h (≥ 45) · car taps + smashes '+hits+' (≤ 30; was 171 + 34 in review 4)'+ok(hits<=30&&kmh>=45)}
+  const dd=HUB.cars.filter(c=>c.dead>0&&c.x>-1e6).length;
+  return'📍 ATHENS TRAFFIC CONTACTS · 120 s road-follow from the start, gas held, stepped · average '+kmh+' km/h (≥ 45) · car taps + smashes '+hits+' (≤ 30; was 171 + 34 in review 4) · dead cars still in a collision structure '+dd+' (0)'+ok(hits<=30&&kmh>=45&&dd===0)}
  if(kind==='life'){const S=[],nn=()=>{const N=HUB.nodes;let k=0;for(let i=0;i<N.ng;i++)if(Math.hypot(N[i].x-RO.x,N[i].z-RO.z)<170)k++;return k};let off=0;
   RV4B_drive(120,t=>{if(Math.abs(t%5-2.5)<1/60&&t>4){if(nn()<8){off++;return}const C=HUB.cars.filter(c=>c.dead<=0&&Math.hypot(c.x-RO.x,c.z-RO.z)<150);S.push([C.length,C.filter(c=>Math.abs(c.cv||0)>1).length])}});
   const good=S.filter(s=>s[0]>=15&&s[1]>=10).length,mn=Math.min(...S.map(s=>s[0])),mv=Math.min(...S.map(s=>s[1]));
