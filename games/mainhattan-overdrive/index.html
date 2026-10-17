@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.87',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens: the big walls that cut across streets are gone (a stale street map made the city builder put blocks on roads).'},{t:'FIXED',s:'Athens: dead-end streets that ended in a wall are open again.'}]},
   {v:'v90m-beta.86',date:'17 Oct 2026',items:[{t:'FIXED',s:'Camera no longer jumps far ahead and back when the car switches to its 4x4 form.'},{t:'NEW',s:'Smash more street items: walls let you slide instead of stopping dead, playground pieces and stalls break.'},{t:'NEW',s:'Shortcuts marked with arrows in Athens and Frankfurt, each one much quicker than the road.'}]},
   {v:'v90m-beta.85',date:'17 Oct 2026',items:[{t:'FIXED',s:'Less phone memory again: far street objects are freed while you drive and a memory leak is fixed (Frankfurt about 55 MB lower after 5 minutes).'}]},
   {v:'v90m-beta.84',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phone memory cut a lot: Athens loads with about 130 MB less, and far parts of the city are freed while you drive, so fewer crashes.'},{t:'FIXED',s:'Fountains and filler roads no longer block streets in Frankfurt and Athens; the Aiolou side street in Athens is now drivable.'},{t:'NEW',s:'Garage cars show a rarity tag: NEAT, COOL, EPIC or SUPER.'}]},
@@ -1533,7 +1534,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c_checklist":"71818746","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"784b04cd","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"c5981e20","99c5_athroads":"327c163e"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c_checklist":"71818746","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"784b04cd","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"c5981e20","99c5_athroads":"de55d8e9"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -3742,7 +3743,7 @@ OB_fix();RD_net();
 window.__ob=Object.assign(window.__ob||{},{roadAudit:()=>OB_audit(),RA:OB_RA,RD,
   roadsNear:(x,z,R=20)=>{const o=[];CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(Math.hypot(p.x-x,p.z-z)<R)o.push([si,S.r.cls,S.r.w,i,+p.x.toFixed(1),+p.z.toFixed(1),p.k==null?null:OB_kf(p.k)])}));return o}});
 
-const CITY_G=new Map();CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{const k=Math.floor(p.x/64)*100000+Math.floor(p.z/64);let L=CITY_G.get(k);if(!L)CITY_G.set(k,L=[]);L.push(si,i)}));
+const CITY_G=new Map();function CITY_reidx(){CITY_G.clear();CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{const k=Math.floor(p.x/64)*100000+Math.floor(p.z/64);let L=CITY_G.get(k);if(!L)CITY_G.set(k,L=[]);L.push(si,i)}));try{BK_ci.clear()}catch(_){}}CITY_reidx();function CITY_mis(){let b=0;for(const[k,L]of CITY_G)for(let j=0;j<L.length;j+=2){const S=CITY_S[L[j]],p=S&&S.pts[L[j+1]];if(!p||Math.floor(p.x/64)*100000+Math.floor(p.z/64)!==k)b++}return b}
 function cityAt(x,z,skip=-1,np=false){const kx=Math.floor(x/64),kz=Math.floor(z/64);let bd=1e12,bs=-1,bi=0;for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=CITY_G.get((kx+a)*100000+kz+b);if(!L)continue;for(let j=0;j<L.length;j+=2){if(L[j]===skip||np&&CITY_S[L[j]].r.cls==='ped')continue;const p=CITY_S[L[j]].pts[L[j+1]],dx=p.x-x,dz=p.z-z,d=dx*dx+dz*dz;if(d<bd){bd=d;bs=L[j];bi=L[j+1]}}}
   if(bs<0)return null;const S=CITY_S[bs],p=S.pts[bi];return{d:Math.sqrt(bd),lat:(x-p.x)*p.tz-(z-p.z)*p.tx,s:p.s,road:S.r,si:bs,i:bi,S,p}}
 const AJ=[];if(CID!=='fra'){const JK=new Map();CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(p.k==null)return;let L=JK.get(p.k);if(!L)JK.set(p.k,L=[]);L.push(si,i)}));
@@ -4518,6 +4519,7 @@ function* athBuildG(grp,BM,rnd){const T0=performance.now(),RS=2,NX=Math.ceil((WX
   rect(WX0,WX0+40,WZS,WZN,3);rect(WX1-40,WX1,WZS,WZN,3);rect(WX0,WX1,WZS,WZS+40,3);rect(WX0,WX1,WZN-40,WZN,3);
   const SBC=SC_S&&SC_S.on?SC_K.sbA:{ped:1.2,res:2.2,link:2.5,sec:3,main:3.2,arterial:4,hill:3},SBX={arterial:1.5,main:1,sec:.5};
   for(const S of CITY_S){const P=S.pts,r=S.r.w/2+(SBC[S.r.cls]||3);for(let i=1;i<P.length;i++)cap(P[i-1].x,P[i-1].z,P[i].x,P[i].z,r,1);if(Y())yield [.36]}
+  CITY_reidx();CITY_S.forEach((S,si)=>{const P=S.pts;if(P.length<2||S.r.cls==='ped')return;for(const[e,q]of[[P[0],P[1]],[P[P.length-1],P[P.length-2]]]){const o=cityAt(e.x,e.z,si);if(o&&o.d<o.road.w/2+S.r.w/2+6)continue;const L=Math.hypot(e.x-q.x,e.z-q.z)||1;cap(e.x,e.z,e.x+(e.x-q.x)/L*16,e.z+(e.z-q.z)/L*16,S.r.w/2+1,3)}});
   const tR1=performance.now();for(const S of CITY_S){if(!S.prof)continue;const P=S.pts;for(let i=1;i<P.length;i++)if(TR_dev(P[i])>1.5||TR_dev(P[i-1])>1.5)cap(P[i-1].x,P[i-1].z,P[i].x,P[i].z,S.r.w/2+26,3)}
   for(const R of[...PLAZAS,...PARKS])rect(R.x0,R.x1,R.z0,R.z1,3);for(const L of LMX)cap(L.x,L.z,L.x,L.z,L.r+4,3);OC_zone(cap);for(const T of TRAILS){const P=T.pts;for(let i=1;i<P.length;i++)cap(P[i-1].x,P[i-1].z,P[i].x,P[i].z,T.w/2+8,3)}
   for(const g of GARAGES)if(g.x!=null)cap(g.x,g.z,g.x,g.z,24,3);for(const k in RF.spots){const[x,z]=WP(RF.spots[k][0],RF.spots[k][1]);cap(x,z,x,z,18,3)}
@@ -8522,7 +8524,7 @@ function DR_athFill(R){let mat=null;HUB.grp.traverse(o=>{if(!mat&&o.isInstancedM
   mk(P,N,U,C,I,mat);mk(rP,null,null,rC,rI,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}));DR.inS=null;DR.st.solid=R.length;DR.st.fill=st;DR.st.fillV=P.length/3+rP.length/3;return true}
 function DR_cull(L){const TC=new Set();let j=0,drop=0;for(const p of L){if(p.simp||DR_keep(p.t,p.x,p.z,TC))L[j++]=p;/* simplify-1 gap trees stay */else drop++}L.length=j;DR.st.drop=(DR.st.drop||0)+drop;DR.st.kept=j}
 if(DR.on){
- {const _ce=CE_streets;CE_streets=(add,rnd,D)=>{_ce(add,rnd,D);try{DR_solidBuild()}catch(e){console.warn('DR solid',e)}try{DR_cull(HUB.CE_L)}catch(e){console.warn('DR cull',e)}}}
+ {const _ce=CE_streets;CE_streets=(add,rnd,D)=>{_ce(add,rnd,D);try{CITY_reidx();DR_solidBuild()}catch(e){console.warn('DR solid',e)}try{DR_cull(HUB.CE_L)}catch(e){console.warn('DR cull',e)}}}
  {const _lz=lzPropsG;lzPropsG=function*(L){try{const TC=new Set();L.props=L.props.filter(([t,x,z])=>DR_keep(t,x,z,TC))}catch(e){}yield* _lz(L)}}
  {const _sc=smashCheck;smashCheck=dt=>{DR.t+=dt||0;const v0=RO.v,n0=HUB.smashed;_sc(dt);if(HUB.smashed>n0&&Math.abs(v0)>.5){if(DR.t-DR.ct>1){DR.ct=DR.t;DR.vref=Math.abs(v0)}
    const fl=Math.max(Math.abs(v0)*.95,DR.vref*.85);if(Math.abs(RO.v)<fl)RO.v=Math.sign(v0)*fl}}}
@@ -15395,7 +15397,7 @@ function TRN_grade(){const G=[];let worst=null;for(const r of TRN_roads()){if(r.
 function TRN_edge(n=50){const R=TRN_roads().filter(r=>r.P.length>2),rnd=TRN_rng(CID==='fra'?7:11),out=[];let t=0;
   while(out.length<n&&t++<5000){const r=R[Math.floor(rnd()*R.length)],i=1+Math.floor(rnd()*(r.P.length-2)),a=r.P[i-1],b=r.P[i+1],c=r.P[i];if(TRN_skip(c[0],c[1]))continue;
     const l=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/l,nz=(b[0]-a[0])/l,y=groundY(c[0],c[1]),hw=Math.min(r.hw,8);if(TRN_skip(c[0]+nx*hw,c[1]+nz*hw)||TRN_skip(c[0]-nx*hw,c[1]-nz*hw))continue;
-    if(typeof TJ_inJunc==='function'&&TJ_inJunc(c[0],c[1],hw))continue;
+    if(typeof TJ_inJA==='function'&&TJ_inJA(c[0],c[1],hw))continue;/* athroads4: TJ_inJunc is also true on any street, so with a current street index every centre point was skipped */
     if([1,-1].some(sd=>{const x=c[0]+nx*hw*sd,z=c[1]+nz*hw*sd,q=cityAt(x,z);if(q&&q.S!==r.ref&&q.d<q.S.r.w/2+2)return true;try{const f=fillAt(x,z,r.ref);if(f&&f.d<f.r.w/2+2)return true}catch(e){}return false}))continue;
     const d=Math.max(Math.abs(groundY(c[0]+nx*hw,c[1]+nz*hw)-y),Math.abs(groundY(c[0]-nx*hw,c[1]-nz*hw)-y));out.push({d,x:Math.round(c[0]),z:Math.round(c[1]),id:r.id})}
   out.sort((a,b)=>b.d-a.d);const o={n:out.length,max:+out[0].d.toFixed(2),worst:out[0],over:out.filter(q=>q.d>.3).length};TRN.edge=o;return o}
@@ -15579,7 +15581,8 @@ function TJ_fx(){if(HUB.tjFx)return HUB.tjFx;const F=[];if(CID==='fra'&&!TJ.off)
     let a=null,last=-9,qa=null;const end=()=>{const t0=a-1.5,t1=last+1.5/* past a filler end too: a T-junction's mouth */,B=(t1-t0)/2;if(B>40||B<.5)return;const tm=(t0+t1)/2;F.push({x:f.x0+f.ux*tm,z:f.z0+f.uz*tm,tx:nx,tz:nz,ux:f.ux,uz:f.uz,A:hw,B,ws:qa.road.w,wf:f.w})};
     for(let t=0;t<=f.L;){const q0=cityAt(f.x0+f.ux*t,f.z0+f.uz*t);if(!(q0&&q0.d<q0.road.w/2+hw+8)){if(a!=null&&t-last>3){end();a=null}t+=4;continue}const q=ins(t);if(q){if(a==null){a=t;qa=q}last=t}else if(a!=null&&t-last>3){end();a=null}t+=1}if(a!=null)end()}}
   return HUB.tjFx=F}
-function TJ_inJunc(x,z,m){const p=TJ_st(x,z);if(p&&p.road.cls!=='hill'&&p.d<p.road.w/2+m)return true;for(const J of JUNC||[])if(Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m)return true;
+function TJ_inJunc(x,z,m){const p=TJ_st(x,z);if(p&&p.road.cls!=='hill'&&p.d<p.road.w/2+m)return true;return TJ_inJA(x,z,m)}
+function TJ_inJA(x,z,m){for(const J of JUNC||[])if(Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m)return true;
   for(const X of FILL_X||[])if(Math.abs(X.x-x)<X.wa/2+m&&Math.abs(X.z-z)<X.wb/2+m)return true;
   for(const c of TJ_fx()){const dx=x-c.x,dz=z-c.z;if(Math.abs(dx*c.tx+dz*c.tz)<c.A+m&&Math.abs(dx*c.ux+dz*c.uz)<c.B+m)return true}return false}
 function TJ_nearFx(x,z,m){for(const c of TJ_fx())if(Math.hypot(c.x-x,c.z-z)<Math.max(c.A,c.B)+m)return true;return false}
