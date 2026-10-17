@@ -130,7 +130,7 @@ const AUDIT = ({ root, minPx }) => {
     ok('sheet: buttons >= 44 px, text >= 14 px, nothing clipped' + tag, !a.btn.length && !a.txt.length && !a.clip.length, JSON.stringify(a));
     const lay = await p.evaluate(() => { const s = document.getElementById('stSheet'); return { hs: document.documentElement.scrollWidth > innerWidth + 1 || s.scrollWidth > s.clientWidth + 1, ach: s.querySelectorAll('.ac').length, locked: s.querySelectorAll('.ac:not(.got)').length, txt: s.textContent }; });
     ok('sheet: no horizontal scroll, 30 achievements, locked ones listed with a hint' + tag, !lay.hs && lay.ach === 30 && lay.locked >= 15, JSON.stringify([lay.hs, lay.ach, lay.locked]));
-    ok('sheet: credits and privacy lines' + tag, /treblo/.test(lay.txt) && /saved only on this device/i.test(lay.txt) && /No data is collected/.test(lay.txt));
+    ok('sheet: credits and privacy lines' + tag, /Music/.test(lay.txt) && /saved only on this device/i.test(lay.txt) && /No data is collected/.test(lay.txt));
     ok('sheet: stat grid shows the saved numbers' + tag, /123\.456/.test(lay.txt) && /1\.500/.test(lay.txt) && /COMPLETE/.test(lay.txt));
     const reach = await p.evaluate(() => { const s = document.getElementById('stSheet'); s.scrollTop = s.scrollHeight; const r = document.getElementById('stReset').getBoundingClientRect(), b = document.getElementById('stsBack').getBoundingClientRect(); return r.bottom <= innerHeight + 1 && b.bottom <= innerHeight + 1 && r.height >= 44; });
     ok('sheet: RESET and BACK reachable by scrolling' + tag, reach);

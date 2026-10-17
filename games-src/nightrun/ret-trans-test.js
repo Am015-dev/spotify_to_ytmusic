@@ -14,7 +14,7 @@ const fin = () => { const m = window.__mnr; m.startStory(1); m.G.score = 123456;
   async function open(opt, pre) {
     const ctx = await br.newContext(opt), p = await ctx.newPage(), errs = []; p.errs = errs; p.on('pageerror', e => errs.push(e.message)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
     await p.addInitScript(() => { try { localStorage.setItem('mnr_tut', '1'); } catch (e) { } });
-    await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.RET && window.RET.pop); await sleep(500);
+    await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&tale=0`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.RET && window.RET.pop); await sleep(500);
     if (pre) await p.evaluate(pre); return p;
   }
   // ---- flag on, phone

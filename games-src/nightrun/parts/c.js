@@ -158,7 +158,7 @@ const SCHEMA=[
   {g:'Controls',rows:[{k:'layout',l:'Touch layout',o:[['left','Left'],['right','Right']]},{k:'sens',l:'Sensitivity',s:[1,5,1],f:v=>String(v)},{k:'dsize',l:'Button size',o:[['S','Small'],['M','Medium'],['L','Large']]}]},
   {g:'Rhythm',rows:[{k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']]},{k:'all',l:'Everything counts',o:OFFON},{k:'cue',l:'Beat cue',o:[['off','Off'],['S','Small'],['M','Medium'],['L','Large']]},
     {k:'sync',l:'Latency',s:[-150,150,5],f:v=>(v>0?'+':'')+v+' ms',tap:1}]},
-  {g:'Audio',rows:[{k:'master',l:'Master',s:[0,100,5],p:1},{k:'music',l:'Music',s:[0,100,5],p:1},{k:'sfx',l:'Effects',s:[0,100,5],p:1},{k:'duck',l:'Ducking',o:[[true,'On'],[false,'Off']]},{k:'react',l:'Music reacts',o:OFFON},{k:'mute',l:'Mute all',o:OFFON}]},
+  {g:'Audio',rows:[{k:'master',l:'Master',s:[0,100,5],p:1},{k:'music',l:'Music',s:[0,100,5],p:1},{k:'sfx',l:'Effects',s:[0,100,5],p:1},{k:'duck',l:'Ducking',o:[[true,'On'],[false,'Off']]},{k:'keepmus',l:'Keep music playing when paused',o:[[true,'On'],[false,'Off']]},{k:'react',l:'Music reacts',o:OFFON},{k:'mute',l:'Mute all',o:OFFON}]},
   {g:'Visuals',rows:[{k:'part',l:'Particles',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'shake',l:'Screen shake',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'flash',l:'Flashing',o:[[0,'Off'],[1,'Reduced'],[2,'Full']]},
     {k:'q',l:'Quality',o:[['L','Low'],['M','Medium'],['H','High']]},{k:'fps',l:'FPS cap',o:[[30,'30'],[60,'60']]},{k:"pal",l:"Colour theme",o:[['neon','Neon'],['cb','Blue-orange'],['term','Terminal']]},{k:'fpsc',l:'FPS counter',o:OFFON}]},
   {g:'Accessibility',rows:[{k:'rm',l:'Reduced motion',o:OFFON},{k:'hc',l:'High-contrast bullets',o:OFFON}]}];
@@ -206,10 +206,10 @@ $('setBack').addEventListener('click',closeSettings);
 $('setBtn').addEventListener('click',()=>openSettings('title'));
 $('pSetBtn').addEventListener('click',()=>openSettings('pause'));
 buildSettings();if(window.RET&&RET.assistBuild)RET.assistBuild();
-function setPause(on){if(!running||on===paused)return;paused=on;pauseEl.hidden=!on;
+function setPause(on){if(!running||on===paused)return;if(!on&&window.NRF&&NRF.holdResume())return;paused=on;pauseEl.hidden=!on;
   if(on){const v=HUDX.vals();$('pStats').textContent=`Hull ${v.hp}/${v.max} · Shield ×${v.sh} · Dash ${v.dash}/${v.dashMax}`+(v.rev?` · Revive ×${v.rev}`:'')+(v.drones?` · Drones ×${v.drones}`:'')+` · Perks ${v.perks} · Upgrades ${v.upg}`;}   // the counters the phone HUD hides while you play
-  if(on){AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}
-  syncUI();if(on)$('resumeBtn').focus();}
+  if(on){if(!(window.NRF&&NRF.keepOn()))AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}
+  if(window.NRF)NRF.pauseChanged(on);syncUI();if(on)$('resumeBtn').focus();}
 function start(daily){if(running)return;if(ST.on){startStory(ST.n);return;}AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
   newGame(daily);G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(stageFor(0,false));NR.emit('runStart',{daily:!!daily});
   FPS.n=0;FPS.t=0;FPS.slow=0;FPS.worst=0;syncUI();}
