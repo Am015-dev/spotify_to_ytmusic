@@ -12,5 +12,5 @@ function CAMST_go(say){const ok=b=>b?' ✅':' ❌';const N=60*30,S={tele:0,step:
   say('📍 CAM STABLE · 60 s hitchy touch drive, '+S.flip+' form flips · teleports while moving '+S.tele+' · distance out of band '+S.band+' (median '+med.toFixed(1)+' m) · frame jumps > median '+S.step+ok(pass))};
  setTimeout(run,0);return'📍 CAM STABLE · 60 s scripted drive…'}
 (function CAMST_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='cam'&&q.id==='stable'))C.items.push({ver:'cam',id:'stable',area:'drive',text:'rv:2026-10-17 · cam/stable: 60 s hitchy touch drive in both cities: no teleports while moving, camera distance in its band'});
-  C.GO['cam/stable']=['fra','ath'].map(c=>({c,n:'stable follow camera',secs:900,fn:()=>{return CAMST_go(t=>{window.__goLast=t;try{say('',t,2.2)}catch(e){}})}}));return}
+  C.GO['cam/stable']=['fra','ath'].map(c=>({c,n:'stable follow camera',secs:90,fn:()=>CAMST_go(window.__chk.goSay)}));return}
  if(i<600)setTimeout(()=>CAMST_reg(i+1),100)})(0);
