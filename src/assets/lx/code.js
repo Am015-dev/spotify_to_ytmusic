@@ -350,7 +350,8 @@ function LIFE_goM(say){
 // a run-up of D m to target it, clear of buildings, other LIFE set pieces / groups and city props (2.2 m either side): {bx,bz,h} or null
 function LIFE_runup(it,D){const y=it.y+.5,nb=(x,z)=>{if(roamHit(x,z,1.6,y))return true;for(const q of LIFE.L)if(q!==it&&q.c!=='sm'&&q.c!=='pop'&&(q.x-x)**2+(q.z-z)**2<((q.r||1.5)+2.2)**2)return true;
   const G=HUB.pgrid&&HUB.pgrid.get(Math.floor(x/16)*10000+Math.floor(z/16));if(G)for(const p of G)if(p.alive!==false&&(p.x-x)**2+(p.z-z)**2<2.2*2.2)return true;return false};
- for(let k=0;k<24;k++){const h=k*Math.PI/12,bx=it.x-Math.sin(h)*D,bz=it.z-Math.cos(h)*D;if(roamHit(bx,bz,2.5,y))continue;let ok=true;for(let s=3;s<=D&&ok;s+=2)if(nb(it.x-Math.sin(h)*s,it.z-Math.cos(h)*s))ok=false;if(ok)return{bx,bz,h}}return null}
+ for(let k=0;k<24;k++){const h=k*Math.PI/12,bx=it.x-Math.sin(h)*D,bz=it.z-Math.cos(h)*D;if(roamHit(bx,bz,2.5,y))continue;let ok=true;for(let s=3;s<=D&&ok;s+=2)if(nb(it.x-Math.sin(h)*s,it.z-Math.cos(h)*s))ok=false;/* a hill street (Athens, 1933,-1687: 40° rise) stalls the car and rolls it back: the run-up must be drivable, ≤ 20% grade end to end and every 2 m */
+  for(let s=0;s<=D&&ok;s+=2)if(Math.abs(groundY(it.x-Math.sin(h)*s,it.z-Math.cos(h)*s)-groundY(it.x-Math.sin(h)*(s+2),it.z-Math.cos(h)*(s+2)))>.4)ok=false;if(ok)return{bx,bz,h}}return null}
 // GO: 25 m in front of a smashable group, real keyboard gas for 4 s straight at it → it bursts into bricks and studs
 function LIFE_goSmash(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_fill();let it=null,R=null;for(const q of LIFE.L){if(q.c!=='sm'||(q.x-RO.x)**2+(q.z-RO.z)**2<30*30)continue;R=LIFE_runup(q,22);if(R){it=q;break}}if(!it)return'📍 no smashable with a clear run-up ❌';
  if(!roamWarp(R.bx,R.bz,R.h))return'📍 Can\'t jump right now';LIFE_aim(R);RO.v=0;const s0=LIFE.n.smash,h0=HUB.smashed;K.ArrowUp=true;
