@@ -18,11 +18,12 @@ const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: too
   const s=(Date.now()-t)/1000;(boots[c]=boots[c]||[]).push(s);if(!process.env.QUIET)console.log(`BOOT ${c} ${s.toFixed(1)} s`);nav=0};
  const shot=async f=>{await p.evaluate(()=>__tq.draw()).catch(()=>{});await p.screenshot({path:OUT+'/'+f,type:'jpeg',quality:70})};
  await open(process.env.CITY||'fra');
- const all=await p.evaluate(()=>window.__chk.items.map(it=>it.ver+'/'+it.id).filter(id=>window.__chk.GO[id]).map(id=>[id,window.__chk.city(id)]));
+ // every city VARIANT of a GO runs (id#1 = second variant, e.g. the Athens pace/jam): goJump cycles variants per call, so go(id,j) selects j
+ const all=await p.evaluate(()=>window.__chk.items.map(it=>it.ver+'/'+it.id).filter(id=>window.__chk.GO[id]).flatMap(id=>Array.from({length:window.__chk.nvar(id)},(_,j)=>[j?id+'#'+j:id,window.__chk.city(id,j)])));
  // items whose GO only opens the garage (or says "drive here") all do the same thing: run the first, report the rest as the same
- const kind=await p.evaluate(ids=>Object.fromEntries(ids.map(id=>{const T=window.__chk.GO[id][0];return[id,T.gar?'gar':T.here?'here':'']})),all.map(a=>a[0]));
+ const kind=await p.evaluate(ids=>Object.fromEntries(ids.map(vid=>{const [id,j]=vid.split('#'),T=window.__chk.GO[id][+j||0],id0=vid;return[id0,T.gar?'gar':T.here?'here':'']})),all.map(a=>a[0]));
  // a GO may declare its own time budget (secs, e.g. sink1/start-sink: the real parachute start + 15 s): wait for it and judge SLOW against it
- const BUD=await p.evaluate(ids=>Object.fromEntries(ids.map(id=>[id,+window.__chk.GO[id][0].secs||0])),all.map(a=>a[0]));const seen={},same={};
+ const BUD=await p.evaluate(ids=>Object.fromEntries(ids.map(vid=>[vid,+window.__chk.GO[vid.split('#')[0]][+vid.split('#')[1]||0].secs||0])),all.map(a=>a[0]));const seen={},same={};
  const SM=['v90n/foot-go-walk','v90n/foot-go-npc','v90n/foot-go-jump','v90k/rv-human','v90k/no-hollow','v90k/shadow','v90k/lag','v90k/ramp-seam','v90k/fra-net','v90g/fra-props','v90m/ath-boot','v90k/ath-kriezi','v90g/ath-display','v90k/rv-scale','v90k/ww-card'],TG=(process.env.TAG||'').split(',').filter(Boolean);
  const want=id=>id.includes(FIL)&&(!process.env.SMOKE||SM.includes(id))&&(!TG.length||TG.some(t=>id.startsWith(t)||id.includes('/'+t)||id.split('/')[0]===t));
  const LAST=['v90k/rv-scale','v90k/ww-card','v90k/park-sit'],pick=c=>all.filter(([id,cc])=>cc===c&&want(id)).map(([id])=>id).sort((a,b)=>(process.env.SMOKE?LAST.includes(a)-LAST.includes(b):0)).filter(id=>{const k=kind[id]&&c+kind[id];if(!k)return true;if(seen[k]){same[id]=seen[k];return false}seen[k]=id;return true});
@@ -30,7 +31,7 @@ const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: too
    if(id==='rv2k2/traffic'&&res.some(r=>r.id==='rv2k2/pace'))await open(c);   // rv2k2h: traffic is not re-populated at the start after pace drove >1 km and the test warped back (game question, see docs/HANDOFF_rv2k2h.md): judge it on a fresh page, like a solo run
    const t1=Date.now();let threw=false;try{const LONG=BUD[id]>=25&&id.startsWith('rv2k')&&id!=='rv2k/race-handsoff'&&!process.env.SMOKE;   // race-handsoff drives its own fake clock (tkRun), real timers   // long GOs (race 240 s, walls 60 s, objectives 30 s): drive them on a fake clock (sim time, not software-GL wall time) and WAIT until they say a verdict, so a combined run judges them like a solo run
     if(LONG&&!FC.on){await p.clock.install().catch(()=>{});FC.on=1}
-    said=await p.evaluate(id=>window.__chk.go(id)||'',id);
+    said=await p.evaluate(([b,j])=>window.__chk.go(b,+j||0)||'',id.split('#'));
     if(LONG&&/…$/.test(said)){let sim=0;const cap=BUD[id]*1000+60000;while(sim<cap){await p.clock.runFor(1000);sim+=1000;const s=await p.evaluate(()=>window.__chk.said()||'');if(!/…$/.test(s))break}await p.clock.resume().catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}
     else if(/…$/.test(said)){await p.waitForFunction(()=>!/…$/.test(window.__chk.said()||''),null,{timeout:process.env.SMOKE?4000:Math.max(20000,(BUD[id]+10)*1000),polling:250}).catch(()=>{});said=await p.evaluate(()=>window.__chk.said()||'')}}catch(e){threw=true;said=evalError(e)}
    await p.waitForTimeout(c==='bx'?1500:process.env.SMOKE?150:500);

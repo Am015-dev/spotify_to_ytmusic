@@ -18,5 +18,6 @@ module.exports=async T=>{
  T.eq((await judge(async()=>'Drove to the spot ✓',{nav:1})).ok,false,'navigation-is-FAIL');
  T.eq((await judge(async()=>'❌ too slow')).ok,false,'BAD-text-is-FAIL');
  T.eq((await judge(async()=>'pace '+'12 km/h '.repeat(60)+'avg 31 km/h ❌')).ok,false,'late-❌-past-200-chars-is-FAIL');
+ T.eq((await judge(async()=>'pace avg 31 km/h ❌ '+'trace '.repeat(60)+'✅')).ok,false,'mid-text-❌-with-trailing-✅-is-FAIL');
  T.eq((await judge(async()=>'x'.repeat(300)+' FAIL')).ok,false,'late-FAIL-past-200-chars-is-FAIL');
 };

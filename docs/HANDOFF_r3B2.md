@@ -1,0 +1,6 @@
+# HANDOFF r3B2 (2026-10-17): runner variants + Athens pace finding
+1. tools/tChkGo.js now runs EVERY city variant of a GO (id#1 = second variant); __chk.go(id,j)/city(id,j)/nvar(id) in 99c_checklist.js. Athens jam/pace now run and report (they FAIL honestly: jam#1 64-89 km/h, pace#1 52-55 km/h).
+2. Verdict path checked after 01b9614: no other PASS-on-❌ path (BAD tested on the full text, SLOW adds ❌ and forces FAIL); unit case added for ❌ mid-text followed by ✅.
+3. Athens finding: with ALL traffic removed pace is still 57 km/h. The start route is the pedestrian street network (Ermou/Mitropoleos, cls ped, w 8); Mitropoleos is a DEAD END at (1676,-1748) (next street Kapnikareas starts ~70 m west, no link), so the road-follow bot U-turns and loops there. Traffic is not the main limiter in Athens.
+4. Tried: bot bans the stalled street (worse, 39 km/h), reverted. Not done: traffic yield for slow tailing (needs gap < 7 m for jam smash; bot tails at 12-16 m). Frankfurt jam also failed in this run (65 km/h, 2.6 s stop) vs 120 in r3B: runs vary, needs a seed/repeat.
+5. Next: decide Athens pace spot/route (start on a non-ped avenue or link Mitropoleos-Kapnikareas in the road data), bot snap should prefer non-ped classes; 99c_checklist.js is at the 200 KB limit (3 old comments shortened).

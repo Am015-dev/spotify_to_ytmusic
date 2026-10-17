@@ -2,7 +2,7 @@
 // OD_CHECKLIST = items per version; each gets ✅ PASS / ❌ FAIL + an optional note, saved in localStorage 'mho_chk'. "COPY RESULTS" copies
 // plain text (version, id, status, note) to paste to the coordinator. Opens from "✔ CHECKLIST" in the ⚙ drawer header and the UPDATES screen.
 // The buttons show how many items of the current version are still unanswered. Every deploy adds its own items (newest version first).
-// dev4 hollow-ride audit: top-down height map (0.3 m cells) of a ride's up-facing triangles; pit = share of interior cells lying > 0.5 m below something within 0.9 m (an open-top deck / empty bed = high, a roofed body = low)
+// dev4 hollow-ride audit: top-down height map (0.3 m cells) of a (full text: git log)
 function CK_pit(m){m.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(m.matrixWorld).invert(),cell=.3,map=new Map();let H=-1e9,minY=1e9;const A=new THREE.Vector3(),B=new THREE.Vector3(),C=new THREE.Vector3(),mm=new THREE.Matrix4(),im=new THREE.Matrix4(),n=new THREE.Vector3(),e1=new THREE.Vector3(),e2=new THREE.Vector3();let tris=0;
  m.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes.position)return;let v=o;while(v&&v!==m){if(v.visible===false||v.userData.ofSeat)return;v=v.parent}if(o.visible===false)return;const P=o.geometry.attributes.position,I=o.geometry.index,cnt=I?I.count:P.count,N=o.isInstancedMesh?o.count:1;o.updateMatrixWorld(true);
   for(let k=0;k<N;k++){if(o.isInstancedMesh){o.getMatrixAt(k,im);mm.multiplyMatrices(inv,o.matrixWorld).multiply(im)}else mm.multiplyMatrices(inv,o.matrixWorld);
@@ -593,11 +593,11 @@ const OD_CHECKLIST=[
  // 📍 GO (coordinator v90j: items a 2-min drive never reaches): drops the car on the nearest street facing the thing to check; items with
  // several things step through them on each tap. Another city → the flight there (tap 📍 again after landing). Palms → the Syntagma race.
  // Targets: w = a LEGO world model (LDW.on), p = a street prop type (HUB.props), car = a traffic car kind, race = a track id.
-// ramp-1: every RO.ramps piece (kickers, jump ramps, story / pop-up ramps) vs the building colliders (HUB.grid via roamHit) and a sane height; ramps standing on a road lane are listed as info (street jump ramps sit on the lane by design)
+// ramp-1: every RO.ramps piece (kickers, jump ramps, story / pop-up (full text: git log)
 function RP_scan(){const bld=[],tall=[],lane=[];(RO.ramps||[]).forEach((r,i)=>{const sh=Math.sin(r.h),ch=Math.cos(r.h);let hit=null;if(!r.dk)for(let a=-r.len/2;a<=r.len/2&&!hit;a+=2){const y=r.y0+(a+r.len/2)/r.len*r.hgt;for(let b=-r.w/2;b<=r.w/2;b+=2){const x=r.x+a*sh+b*ch,z=r.z+a*ch-b*sh,q=roamHit(x,z,.6,y+.3);if(q){hit=[Math.round(x),Math.round(z),q.h?Math.round(q.h):0];break}}}
   const row=[i,Math.round(r.x),Math.round(r.z),r.len,+r.hgt.toFixed(1),r.w];if(hit)bld.push(row.concat([hit]));if(r.hgt>10)tall.push(row);
   try{const q=cityAt(r.x,r.z);if(q&&q.S&&q.S.r.cls!=='hill'&&Math.abs(q.lat??0)<(q.S.r.w||8)/2)lane.push(row.concat([q.S.r.name||q.S.r.id||'road']))}catch(e){}});
-  // ramp-2: road spikes = asphalt / junction triangles whose vertices stand > 6 m over groundY (a 30 m 'road wedge' once rose through a house: building lift moved road vertices); steep = triangles > 25 deg (info)
+  // ramp-2: road spikes = asphalt / junction triangles whose vertices (full text: git log)
   const spk=[],steep=[];try{const M=HUB.M,mats=new Set(['road','street','resSt','cobble'].map(k=>M[k]).filter(Boolean)),v=new THREE.Vector3();HUB.grp.updateMatrixWorld(true);
     HUB.grp.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||o.userData.ramp||!o.geometry)return;const m=Array.isArray(o.material)?o.material[0]:o.material;if(!(mats.has(m)||(M.jn&&m.map&&m.map===M.jn.map)))return;const P=o.geometry.attributes.position;if(!P||!P.array)return;const seen=new Set();
       for(let i=0;i<P.count;i++){v.fromBufferAttribute(P,i).applyMatrix4(o.matrixWorld);const e=v.y-groundY(v.x,v.z);if(e>6&&!(CID==='fra'&&inRiver(v.x,v.z))){/* bridge decks over the river keep the road material: their ground is the river bed */const k=Math.round(v.x/10)+','+Math.round(v.z/10);if(!seen.has(k)){seen.add(k);spk.push([Math.round(v.x),Math.round(v.z),+v.y.toFixed(1),+e.toFixed(1)])}}}})}catch(e){spk.push(['ERR',String(e)])}
@@ -800,4 +800,4 @@ body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:non
      if(r.width*r.height>VA*.4||(r.left<pinBox.r+8&&r.right>pinBox.l-8&&r.top<pinBox.b+8&&r.bottom>pinBox.t-8)){y=true;break}}}
    document.body.classList.toggle('odYield',y)}catch(e){}};
  {const st3=document.createElement('style');st3.textContent='body.odYield #odPin{display:none!important}';document.head.appendChild(st3)}setInterval(yieldStep,120);
- window.__chk={rpScan:RP_scan,said:()=>goI._t,pinItems:()=>pinItems().map(k),city:id=>{const L=GO[id];return !L?null:L[0].bx?'bx':goCity(L[0])},go:id=>{const it=OD_CHECKLIST.find(q=>k(q)===id);goI._t='';if(it)goJump(it);return goI._t},GO,text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
+ window.__chk={rpScan:RP_scan,said:()=>goI._t,pinItems:()=>pinItems().map(k),city:(id,j=0)=>{const L=GO[id];return !L?null:L[j].bx?'bx':goCity(L[j])},nvar:id=>(GO[id]||[]).length,go:(id,j)=>{const it=OD_CHECKLIST.find(q=>k(q)===id);goI._t='';if(it){if(j)goI[id]=j-1;goJump(it)}return goI._t},GO,text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
