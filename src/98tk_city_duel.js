@@ -20,9 +20,10 @@ function tkLen(P){let s=0;for(let i=1;i<P.length;i++)s+=Math.hypot(P[i][0]-P[i-1
 function tkAt(P,f){const L=tkLen(P)*f;let c=0;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],l=Math.hypot(b[0]-a[0],b[1]-a[1]);if(c+l>=L){const t=(L-c)/(l||1);return{x:a[0]+(b[0]-a[0])*t,z:a[1]+(b[1]-a[1])*t,h:Math.atan2(b[0]-a[0],b[1]-a[1])}}c+=l}const b=P[P.length-1],a=P[P.length-2];return{x:b[0],z:b[1],h:Math.atan2(b[0]-a[0],b[1]-a[1])}}
 // fair-2: a waypoint that is off the street graph makes the street legs on both sides meet in a spike (Westend A: 137 deg at (880,170), 180 deg at (566,-304)); a car cannot follow it and the bot pins there.
 // Drop a vertex that turns > 100 deg with a short (< 40 m) neighbour segment, repeat until none (the ends stay).
-function tkDespike(P){const o=P.slice();for(let k=0;k<40;k++){let cut=-1;for(let i=1;i<o.length-1;i++){const a=o[i-1],b=o[i],c=o[i+1],l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]);if(Math.min(l1,l2)>=40)continue;const t=Math.abs(angDiff(Math.atan2(c[0]-b[0],c[1]-b[1]),Math.atan2(b[0]-a[0],b[1]-a[1])));if(t>1.75){cut=i;break}}if(cut<0)break;o.splice(cut,1)}return o}
+function tkDespike(P){const o=P.slice();for(let k=0;k<40;k++){let cut=-1;for(let i=1;i<o.length-1;i++){const a=o[i-1],b=o[i],c=o[i+1],l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]);const t=Math.abs(angDiff(Math.atan2(c[0]-b[0],c[1]-b[1]),Math.atan2(b[0]-a[0],b[1]-a[1])));if(Math.min(l1,l2)>=(t>2.8?50:40))continue;/* r3A: a full reversal (> 160 deg) is an undrivable out-and-back spur up to 50 m long: the Grand Prix route ran 48 m into a dead end at -552,360 and back, and the bot circled there for the whole race */if(t>1.75){cut=i;break}}if(cut<0)break;o.splice(cut,1)}return o}
 function tkGeoOf(C){if(C.geo)return C.geo;const dsp=P=>C.water?P:tkDespike(P),s=dsp(C.seg?C.seg.start:tkChain(C.start)),A=dsp(C.seg?C.seg.A:tkChain(C.A)),B=dsp(C.seg?C.seg.B:tkChain(C.B)),f=dsp(C.seg?C.seg.fin:tkChain(C.fin));
-  const pA=dsp(tkCat(s,A,f)),pB=dsp(tkCat(s,B,f));return C.geo={seg:{start:s,A,B,fin:f},pA,pB,Ls:tkLen(s),LA:tkLen(A),LB:tkLen(B),Lf:tkLen(f),lenA:tkLen(pA),lenB:tkLen(pB)}}
+  const pA=dsp(tkCat(s,A,f)),pB=dsp(tkCat(s,B,f));/* r3A: a spur removed from a whole route (it sits where two segments join) must leave the segments too, or the gate and ramps placed on them stay in the dead end */const kk=v=>v[0]+','+v[1],kA=new Set(pA.map(kk)),kB=new Set(pB.map(kk)),keep=(P,...K)=>{const o=P.filter(v=>K.every(k=>k.has(kk(v))));return o.length>=2?o:P};
+  const s2=keep(s,kA,kB),A2=keep(A,kA),B2=keep(B,kB),f2=keep(f,kA,kB);return C.geo={seg:{start:s2,A:A2,B:B2,fin:f2},pA,pB,Ls:tkLen(s2),LA:tkLen(A2),LB:tkLen(B2),Lf:tkLen(f2),lenA:tkLen(pA),lenB:tkLen(pB)}}
 function tkGeo(){return tkGeoOf(TK.C||TK_C)}
 // ---- course builder: start leg -> split -> 2 routes -> rejoin -> finish leg, all on the GPS street graph
 function tkSnap(x,z){const i=qvNear(x,z,700),G=qvGraph();return i<0?null:[G.X[i],G.Z[i]]}
@@ -129,7 +130,7 @@ function tkAiTarget(a,P,s){const q=tkPosOn(P,Math.max(0,s));let tv=a.base;if(q.t
 // winnable, while a crash still costs (it waits less near the end). Over 400 m apart (you stopped) the band lets go. Without ?fair=1: old pace (base 62, ±10 % past 150 m, DNF +40 s).
 const TK_FAIR=(()=>{try{return new URLSearchParams(location.search).get('fair')!=='0'}catch(e){return false}})(),TK_PACE=.5;   // fair-4: ON by default (?fair=0 = old pace)
 function tkGapT(pr,i){const k=[[0,30],[.25,30],[.35,-30],[.5,-30],[.6,25],[.72,25],[.82,-40],[1,-40]];let j=1;while(j<k.length-1&&pr>k[j][0])j++;const a=k[j-1],b=k[j];return a[1]+(b[1]-a[1])*clamp((pr-a[0])/(b[0]-a[0]),0,1)-i*20}
-function tkRub(gap,pr,i,wet){if(!TK_FAIR||wet)return gap>150?.9:gap<-150?1.1:1;if(Math.abs(gap)>400)return 1;const e=gap-tkGapT(pr,i),fin=pr>.82;return e>0?1-(fin?.25:.45)*Math.min(1,e/120):1+(fin?.06:.3)*Math.min(1,-e/100)}
+function tkRub(gap,pr,i,still){if(!TK_FAIR)return gap>150?.9:gap<-150?1.1:1;/* r3A: one band for every race (river boat leg too); past 400 m the band lets go only for a player who has stopped (< 6 m/s), not for a lagging one that is still driving */if(Math.abs(gap)>400&&still)return 1;const e=gap-tkGapT(pr,i),fin=pr>.82;return e>0?1-(fin?.25:.45)*Math.min(1,e/120):1+(fin?.06:.3)*Math.min(1,-e/100)}
 // DNF: relative to the first rival home and generous: you get the time your own average pace needs to finish (+10 s), 30 s at least, up to the winner's whole time again.
 function tkGrace(sp,firstFin,len){if(!TK_FAIR)return 40;const v=sp.myS/Math.max(1,sp.t);return v>4?clamp((len-sp.myS)/v+10,30,Math.max(30,firstFin)):25}
 function tkFire(who,kind,sp,ai){const lead=sp.ai.filter(b=>b.fin==null&&b.s>sp.myS-20&&b.s-sp.myS<220).sort((x,y)=>x.s-y.s)[0];
@@ -152,7 +153,7 @@ function tkStep(dt){const sp=RO.sp,e=sp.e;TK.C=sp.C;const G=tkGeo();RO.cool=2;TK
   for(const it of sp.items){it.cd=Math.max(0,it.cd-dt);it.g.visible=it.cd<=0;it.g.rotation.y+=dt*2;if(it.cd>0||sp.cd>0)continue;
     if(Math.hypot(it.x-RO.x,it.z-RO.z)<4.5){it.cd=3;tkFire('me',TK_ITEMS[(sp.items.indexOf(it)+Math.floor(sp.t))%3],sp);sp.fired=(sp.fired||0)+1}}
   const C=sp.C;for(const a of sp.ai){const P=tkPath(a),Lp=tkLen(P);if(a.fin!=null&&a.s>=Lp+40)continue;a.stun=Math.max(0,a.stun-dt);a.itemCd=Math.max(0,a.itemCd-dt);
-    const gap=a.s/Lp*G.lenA-sp.myS,rub=tkRub(gap,sp.myS/G.lenA,sp.ai.indexOf(a),C.water);let tv=tkAiTarget(a,P,a.s)*(TK_FAIR&&!C.water?TK_PACE:1)*rub  /* fair-4: the boat leg keeps the old pace */;if(sp.cd>0||a.stun>0)tv=0;
+    const gap=a.s/Lp*G.lenA-sp.myS,rub=tkRub(gap,sp.myS/G.lenA,sp.ai.indexOf(a),RO.v<6);let tv=tkAiTarget(a,P,a.s)*(TK_FAIR?(C.water?TK_PACE*.84:TK_PACE):1)*rub/* r3A: the river leg is driven as a boat (~18 m/s), so the rival paces ~26 m/s there */;if(sp.cd>0||a.stun>0)tv=0;
     if(C.boost&&a.route===C.boost.r){const q=tkPosOn(P,a.s);if(sp.pads.some(p=>Math.hypot(q.x-p.x,q.z-p.z)<8))sp.padT=1.5}
     a.v+=(tv-a.v)*Math.min(1,dt*(tv>a.v?1.6:2.5));a.s+=a.v*dt;if(a.s>=Lp&&a.fin==null){a.fin=sp.t;say('',a.name.toUpperCase()+' FINISHED',1.2)}
     const q=tkPosOn(P,Math.max(0,a.s)),x=q.x+Math.cos(q.h)*a.lane,z=q.z-Math.sin(q.h)*a.lane;

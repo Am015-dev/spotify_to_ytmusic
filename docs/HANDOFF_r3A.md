@@ -1,0 +1,5 @@
+# HANDOFF r3A (races, review 2K-3 rows 1 and 3)
+1. Causes: (a) Grand Prix route had a 48 m out-and-back spur at a segment join: bot circled there, gate sat in the dead end (tkDespike limit + segments now follow the despiked route); (b) rubber band let go past 400 m and was off on the river course; now one band for all races, lets go only for a stopped player (< 6 m/s); water rival paced TK_PACE*.84.
+2. Measured (built page, bot 150 ms): Akropolis after 30 s roam 3 runs 1st, median gap 42/53/40 m; Grand Prix 1st, 27 m; Main River Run 1st, 62 m (needs <= 60); Westend 20 m, 8 lead changes. Gap is measured in course metres (rival a.s scaled to lenA), the raw a.s read 100-200 m high on the longer route.
+3. New GOs rv2k3/akro-play, rv2k3/races (src/99c3_rv2k3.js, lazy). Unit 0 FAIL.
+4. Left: tk1/water fails (GO sets rival base 26, now paced too slow: remove that override in tkGoWater, src/98tk_go.js, not applied); River median 62 -> tune; re-run life1,xf1,terrain after. Not pushed to od-int2.

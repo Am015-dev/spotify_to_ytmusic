@@ -27,7 +27,7 @@ function tkFeel(secs=150,lag=.15){const out=[];const L=[...tkWorldEvs().map(tkMa
   return out}
 // GO tk1/water: the river run builds, the human-like bot takes route B (slipway -> Main -> slipway): it becomes a boat and back, and the rival crosses the water as well
 function tkGoWater(){const C=CID==='fra'?tkBuild({key:'rival:water-go',kind:'quick',name:'Main River Run',ai:['WEBER'],water:true}):null;if(!C||!C.water)return'📍 RIVER RUN · no water course ❌';
-  tkStart({kind:'quick',ev:null},C);const sp=RO.sp;sp.cd=0;sp.ai[0].route='B';sp.ai[0].base=26;/* slow rival: the human-like bot needs ~170 s, and the hands-off DNF comes 40 s after the rival finishes */const G=tkGeoOf(C),bot=tkBot(G.pB,{lag:.15}),veh=[];let boatT=null,backT=null;
+  tkStart({kind:'quick',ev:null},C);const sp=RO.sp;sp.cd=0;sp.ai[0].route='B';/* r3A: the rival now paces itself to the boat (TK_PACE*.84 on water + the rubber band), no slow base needed */const G=tkGeoOf(C),bot=tkBot(G.pB,{lag:.15}),veh=[];let boatT=null,backT=null;
   const exitS=G.Ls+G.LB*.95;tkRun(300,s=>{bot(s);const v=RO.veh||'';if(v==='boat'&&boatT==null)boatT=s.t;if(boatT!=null&&backT==null&&v!=='boat'&&bot.R.maxS>=exitS)backT=s.t});   // back to the car only counts at the far slipway
   const a=sp.ai[0],prog=bot.R.maxS/tkLen(G.pB),ok=boatT!=null&&backT!=null&&sp.aiWet>30&&a.fin!=null&&C.spread.spread<=5;
   try{$('#spRes').hidden=true}catch(e){}if(RO.sp===sp)sprintEnd();K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=false;
