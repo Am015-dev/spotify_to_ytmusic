@@ -118,8 +118,9 @@ function CTB_mesh(){if(!HUB.grp)return;for(const k in CTB.K){const K=CTB.K[k];if
   const f=new THREE.InstancedMesh(K.far,K.near[0][1],n);f.count=0;f.frustumCulled=false;f.name='ctbf_'+k;f.userData.keep=1;HUB.grp.add(f);K.fim=f}CTB_plinth();CTB_step(1)}
 const _ctbM=new THREE.Matrix4(),_ctbQ=new THREE.Quaternion(),_ctbP=new THREE.Vector3(),_ctbS=new THREE.Vector3(1,1,1),_ctbU=new THREE.Vector3(0,1,0),_ctbD=new THREE.Vector3();
 function CTB_step(force){if(!force&&++CTB.t%6)return;if(typeof camera==='undefined')return;const cx=camera.position.x,cz=camera.position.z;camera.getWorldDirection(_ctbD);const dl=Math.hypot(_ctbD.x,_ctbD.z)||1,fx=_ctbD.x/dl,fz=_ctbD.z/dl;
+ /* perf-4: far sets drawn to 520 m on high/med, 380 m on low, 300 m on min (the low/min hub culling hides the rest of the street by 1000 m) */const lv=typeof LK_lvl==='function'?LK_lvl():SET.q,far=lv==='min'?Math.min(CTB.far,300):lv==='low'?Math.min(CTB.far,380):CTB.far;
  for(const k in CTB.K){const K=CTB.K[k];if(!K.fim)continue;let nn=0,nf=0;const r=Math.max(K.W,K.D);
-  for(const o of K.L){const dx=o.x-cx,dz=o.z-cz,dd=Math.hypot(dx,dz);if(dd>CTB.far||(dd>r+12&&(dx*fx+dz*fz)<-r-6&&(dx*fx+dz*fz)<-dd*.35))continue;// behind the camera
+  for(const o of K.L){const dx=o.x-cx,dz=o.z-cz,dd=Math.hypot(dx,dz);if(dd>far||(dd>r+12&&(dx*fx+dz*fz)<-r-6&&(dx*fx+dz*fz)<-dd*.35))continue;// behind the camera
    _ctbM.compose(_ctbP.set(o.x,o.y,o.z),_ctbQ.setFromAxisAngle(_ctbU,o.a),_ctbS);if(dd<CTB.near){for(const im of K.ims)im.setMatrixAt(nn,_ctbM);nn++}else K.fim.setMatrixAt(nf++,_ctbM)}
   for(const im of K.ims){im.count=nn;im.instanceMatrix.needsUpdate=true}K.fim.count=nf;K.fim.instanceMatrix.needsUpdate=true}}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);try{CTB_mesh()}catch(e){console.warn('CTB mesh',e)}return r})(buildRoam);
