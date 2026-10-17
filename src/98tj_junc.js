@@ -64,7 +64,9 @@ function TJ_fx(){if(HUB.tjFx)return HUB.tjFx;const F=[];if(CID==='fra'&&!TJ.off)
     for(let t=0;t<=f.L;){const q0=cityAt(f.x0+f.ux*t,f.z0+f.uz*t);if(!(q0&&q0.d<q0.road.w/2+hw+8)){if(a!=null&&t-last>3){end();a=null}t+=4;continue}const q=ins(t);if(q){if(a==null){a=t;qa=q}last=t}else if(a!=null&&t-last>3){end();a=null}t+=1}if(a!=null)end()}}
   return HUB.tjFx=F}
 // inside a street (true distance) or any junction area, + m: filler kerbs stop there (cityAt's sample distance let them run into junctions on curves)
-function TJ_inJunc(x,z,m){const p=TJ_st(x,z);if(p&&p.road.cls!=='hill'&&p.d<p.road.w/2+m)return true;for(const J of JUNC||[])if(Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m)return true;
+function TJ_inJunc(x,z,m){const p=TJ_st(x,z);if(p&&p.road.cls!=='hill'&&p.d<p.road.w/2+m)return true;return TJ_inJA(x,z,m)}
+// junction areas only (discs, filler squares, filler pads), not plain street
+function TJ_inJA(x,z,m){for(const J of JUNC||[])if(Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m)return true;
   for(const X of FILL_X||[])if(Math.abs(X.x-x)<X.wa/2+m&&Math.abs(X.z-z)<X.wb/2+m)return true;
   for(const c of TJ_fx()){const dx=x-c.x,dz=z-c.z;if(Math.abs(dx*c.tx+dz*c.tz)<c.A+m&&Math.abs(dx*c.ux+dz*c.uz)<c.B+m)return true}return false}
 // near a filler crossing (for the CV boulevard medians, which only stopped at street discs)
