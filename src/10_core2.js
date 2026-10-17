@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.81',date:'17 Oct 2026',items:[{t:'FIXED',s:'The top STORY pill no longer repeats the marker name while the prompt card on the left shows it.'}]},
   {v:'v90m-beta.80',date:'17 Oct 2026',items:[{t:'FIXED',s:'One tidy stack of cards on the left: the marker prompt first, then the objective, never overlapping.'},{t:'FIXED',s:'Objective card text is now at least 12 px, easier to read on a phone.'}]},
   {v:'v90m-beta.79',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens streets: trees, stalls and other solid props no longer stand on the road.'},{t:'NEW',s:'Traffic in your lane now moves over when you come up fast from behind.'},{t:'FIXED',s:'Head-on smashes with traffic slow you down less.'}]},
   {v:'v90m-beta.78',date:'17 Oct 2026',items:[{t:'FIXED',s:'Traffic comes back around you after a fast travel: no more empty streets.'},{t:'NEW',s:'Two more start activities near the Frankfurt start: Stud Rush Bankenviertel and Brick Smash Taunusanlage.'}]},
