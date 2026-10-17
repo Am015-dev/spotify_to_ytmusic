@@ -13,8 +13,11 @@ function L3_free(c,A,B,tgt){const G=CV.G;if(!G)return false;const kx=Math.floor(
   for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0||o.CVhx*c.CVhx+o.CVhz*c.CVhz<.7)continue;const rx=o.x-c.x,rz=o.z-c.z,al=rx*c.CVhx+rz*c.CVhz;if(al<-11||al>15)continue;
     const lat=cur+(-rx*c.CVhz+rz*c.CVhx);if(Math.abs(lat-to)<2)return false}return true}
 // yield-1: true when the player (driving, fast) is 4-45 m behind car c, in c's lane, and closing at > 6 m/s: c should change lane (2K traffic gives way)
-function L3_yieldP(c){if(!L3_YLD||typeof RO==='undefined'||RO.foot||RO.v<14||c.CVhx==null)return false;const rx=c.x-RO.x,rz=c.z-RO.z,al=rx*c.CVhx+rz*c.CVhz;if(al<4||al>45)return false;if(Math.abs(-rx*c.CVhz+rz*c.CVhx)>2.4)return false;if(RO.v*(Math.sin(RO.h)*c.CVhx+Math.cos(RO.h)*c.CVhz)<(c.cv||0)+6)return false;return true}
-function L3_tick(){const N=HUB.nodes;for(const c of HUB.cars){if(c.l3t==null){if(c.pk||c.tr||CT_wideHw(c))continue;c.l3t=((c.j*7+c.k*3)>>1)%2?1:-1;c.l3s=c.l3t}
+// rv2k3 jam: the player is parked behind this car with gas held (< 5 m/s, car 2-22 m ahead of the player in the player's lane): it must give way too
+function L3_blocks(c){if(typeof RO==='undefined'||RO.foot||RO.v>5||!(CTL&&CTL.thr>.3&&!CTL.brk))return false;const fx=Math.sin(RO.h),fz=Math.cos(RO.h),rx=c.x-RO.x,rz=c.z-RO.z,al=rx*fx+rz*fz;return al>1&&al<22&&Math.abs(rx*fz-rz*fx)<3.4}
+function L3_yieldP(c){if(!L3_YLD||typeof RO==='undefined'||RO.foot||c.CVhx==null)return false;if(L3_blocks(c))return true;if(RO.v<14)return false;const rx=c.x-RO.x,rz=c.z-RO.z,al=rx*c.CVhx+rz*c.CVhz;if(al<4||al>45)return false;if(Math.abs(-rx*c.CVhz+rz*c.CVhx)>2.4)return false;if(RO.v*(Math.sin(RO.h)*c.CVhx+Math.cos(RO.h)*c.CVhz)<(c.cv||0)+6)return false;return true}
+function L3_jam(){return RO.blkA!=null&&CV.t-RO.blkA>1.2}
+function L3_tick(){if(typeof RO!=='undefined'){let b=false;for(const c of HUB.cars)if(c.dead<=0&&L3_blocks(c)&&Math.hypot(c.x-RO.x,c.z-RO.z)<7){b=true;break}if(!b)RO.blkA=null;else if(RO.blkA==null)RO.blkA=CV.t}const N=HUB.nodes;for(const c of HUB.cars){if(c.l3t==null){if(c.pk||c.tr||CT_wideHw(c))continue;c.l3t=((c.j*7+c.k*3)>>1)%2?1:-1;c.l3s=c.l3t}
   if(!c.CVn||c.dead>0||c.route&&!c.CVr||(c.l3c||0)>0)continue;const A=N[c.a],B=N[c.b];if(L3_off(c,A,B,0)==null)continue;let want=c.l3t;
   if(c.CVi&&c.CViT>0&&c.RDy!=='box')want=-c.CVi;/* turning soon: be in the lane on the turn side (blinker side = -lane) */
   else if(L3_yieldP(c))want=-c.l3t;/* yield-1: the player closes fast from behind in my lane: take the other lane */
@@ -112,3 +115,10 @@ function L3_goPeds(){if(!L3_ON)return'📍 PENDING · life-3 is OFF (?l3=0)';con
   const kinds=new Set(P.map(p=>p.l3k).filter(Boolean)),ok=road===0&&phn>50&&ph/phn>=.8&&(L3.idle+L3.chat)>0;
   return`📍 PEDS 30 s: ${seen} ped-samples, ${road} on a road lane outside crossings${road?' '+JSON.stringify(L3.pb):''}, walk phase tracks speed in ${phn?Math.round(ph/phn*100):0} % of ${phn}, ${L3.idle} idles + ${L3.chat} chats (now: ${[...kinds].join(',')||'-'}) ${ok?'✅':'❌'}`}
 window.__l3={L3,CV,HUB,ov:L3_overlaps,on:L3_ON,lt:L3_LT,sim:L3_sim,sig:()=>CV.sig,cars:()=>HUB.cars,park:L3_park,go:{lanes:L3_goLanes,lights:L3_goLights,peds:L3_goPeds}};
+
+// rv2k3 GO bodies (kept out of 99c_checklist.js: module size cap)
+function RV3_gascard(ok){const M=RO.marks.filter(m=>m&&m.x!=null&&/quest|story|side/.test(m.kind||'')).sort((a,b)=>Math.hypot(a.x-RO.x,a.z-RO.z)-Math.hypot(b.x-RO.x,b.z-RO.z))[0];if(!M)return'📍 no quest marker ❌';
+  const q=rfSnap(M.x,M.z,40);roamWarp(q?q[0]:M.x,q?q[1]:M.z,q&&q[2]!=null?q[2]:RO.h,true);RO.v=0;K.KeyW=K.ArrowUp=false;for(let i=0;i<10;i++)roamStep(1/30);roamOpen(M);const open0=!!RO.card;K.KeyW=K.ArrowUp=true;let closedAt=-1;for(let i=0;i<150;i++){roamStep(1/30);if(closedAt<0&&!RO.card)closedAt=i/30}K.KeyW=K.ArrowUp=false;const v=RO.v*3.6;try{roamClose&&roamClose()}catch(e){}
+  return'📍 QUEST CARD OPEN AT 0 km/h, GAS HELD · card was open '+(open0?'yes':'no')+' · closed after '+(closedAt<0?'never':closedAt.toFixed(1)+' s')+' · speed 3 s after opening gas '+Math.round(v)+' km/h (> 30)'+ok(open0&&closedAt>=0&&v>30)}
+function RV3_jam(kmh,stMax,stAt,tr,ok){return'📍 JAM 60 s ('+(CID==='fra'?'Frankfurt':'Athens')+' pace spot, road-follow, gas held, stepped) · average '+Math.round(kmh)+' km/h (≥ 90) · longest 0 km/h stretch '+stMax.toFixed(1)+' s'+(stAt?' at ('+stAt+')':'')+' (≤ 3) · km/h every 4 s '+tr.join(' ')+ok(kmh>=90&&stMax<=3);}
+function RV3_tt(){const c=(HUB.cars||[]).filter(c=>!c.dead&&Math.hypot(c.x-RO.x-Math.sin(RO.h)*10,c.z-RO.z-Math.cos(RO.h)*10)<9)[0];return c?'t'+Math.round(Math.hypot(c.x-RO.x,c.z-RO.z))+'m@'+Math.round((c.v||0)*3.6)+(c.stop||c.red||c.wait?'!':''):''}
