@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.90',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phones: parts of the city far behind you are freed sooner, so memory stays lower on long drives (fewer crashes).'}]},
   {v:'v90m-beta.89',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens: no more sudden jumps out of the world, chapter resets or the car shaking in place.'},{t:'FIXED',s:'Smoother chase camera: it no longer pumps in and out on hills or when the car changes form.'},{t:'CHANGED',s:'Athens now starts on wide Syngrou Avenue, so you are up to speed in about 4 seconds.'}]},
   {v:'v90m-beta.88',date:'17 Oct 2026',items:[{t:'FIXED',s:'The track builder no longer opens as a black screen when you come from the garage.'},{t:'FIXED',s:'The LEVEL UP card waits until you close the garage or builder instead of covering it.'}]},
   {v:'v90m-beta.87',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens: the big walls that cut across streets are gone (a stale street map made the city builder put blocks on roads).'},{t:'FIXED',s:'Athens: dead-end streets that ended in a wall are open again.'}]},
@@ -11524,7 +11525,7 @@ function WB_icoPost(){for(const s of WBI.h)s.visible=true;WBI.h.length=0}
  scene.onAfterRender=function(...a){try{WB_icoPost()}catch(e){}return oa.apply(this,a)}}
 
 function BA_freed(){return 0}
-for(const [k,v] of Object.entries({strOn:1,strFree:1,strLoad:300,strUnload:900,strLzIn:100,strLzOut:800}))if(TUNE[k]===undefined)TUNE[k]=v;
+for(const [k,v] of Object.entries({strOn:1,strFree:1,strLoad:300,strUnload:900,strLzIn:100,strLzOut:LOWMEM?250:800}))if(TUNE[k]===undefined)TUNE[k]=v;   // crash-7: low-mem keeps lazy zones only 250 m past draw range (hysteresis 150 m over strLzIn), the corridor's typed arrays no longer pile up
 const STR={it:null,S:null,sl:2,ms:4,msC:12,lzT:0,st:{b:0,f:0,max:0,over:0,relMB:0,lzF:0,lzB:0,hist:[]}};
 const STR_on=()=>!!TUNE.strOn;
 const STR_R=()=>SET.q==='high'?2100:1600;
@@ -13194,7 +13195,7 @@ function LF_ctx(){if(LF.cx)return LF.cx;const fra=CID==='fra';const VS=new Map()
   GRN:fra?['#4fa83a','#3f8f30','#62b848','#2f7a2a']:['#7a9a48','#8aa858','#6b8a3e','#9aae6a'],DIRT:fra?['#a8865a','#d8c08a','#8a6a44']:['#c8a46a','#d8bc84','#b08a5a']}}
 function LF_reg(){if(!LF.on||LF.regs||!HUB.ptypes)return;LF.regs=[];for(let x=Math.floor((HX0-LF.rb)/1000)*1000;x<HX1+LF.rb;x+=1000)for(let z=Math.floor((HZS-LF.rb)/1000)*1000;z<HZN+LF.rb;z+=1000)
   LF.regs.push(lzReg('lf_'+x+'_'+z,'',[x,x+1000,z,z+1000],{lf:1,build:LF_tileG,inR:LF.inR,outR:LF.outR}))}
-LF.inR=LOWMEM?400:0;LF.outR=LOWMEM?1000:0;
+LF.inR=LOWMEM?400:0;LF.outR=LOWMEM?600:0;   // crash-7: was 1000
 if(LOWMEM){LF.inR=-1;const _c=hubCullStep;hubCullStep=function(){const r=_c.apply(this,arguments);if(LF.inR<0&&typeof state!=='undefined'&&state==='roam'){const t=performance.now();if(!LF.t0)LF.t0=t;else if(t-LF.t0>15e3){LF.inR=400;for(const L of LF.regs||[])L.inR=400}}return r}}
 function LF_unreg(L){if(L.lfM&&L.lfM.length){const S=new Set(L.lfM);LF.M=LF.M.filter(m=>!S.has(m));for(const[k,A]of LF.MG){const B=A.filter(m=>!S.has(m));if(B.length)LF.MG.set(k,B);else LF.MG.delete(k)}}
  if(L.lfG)for(const[k,e]of L.lfG){const A=LF.G.get(k);if(A){const i=A.indexOf(e);if(i>=0)A.splice(i,1)}}if(L.lfP)for(const[k,e]of L.lfP){const A=LF.PG.get(k);if(A){const i=A.indexOf(e);if(i>=0)A.splice(i,1);if(!A.length)LF.PG.delete(k)}}L.lfM=[];L.lfG=[];L.lfP=[];if(LF.ms)LF.ms=LF.ms.filter(m=>m.parent&&m.userData.lfR!==L.id)}
