@@ -7,7 +7,7 @@
 // GPU upload. The items (shared model templates + one Float32 matrix per instance) stay, so a rebuild needs no source geometry.
 // LAZY regions (Frankfurt outskirts): meshes + props are disposed beyond draw range + TUNE.strLzOut (load at draw range + TUNE.strLzIn, was a fixed 2200 m) and rebuilt by lazyStep on return (colliders, map roads,
 // ramps and spots are plan data and stay, so collisions, missions and the minimap never depend on what is loaded).
-for(const [k,v] of Object.entries({strOn:1,strFree:1,strLoad:300,strUnload:900,strLzIn:100,strLzOut:800}))if(TUNE[k]===undefined)TUNE[k]=v;
+for(const [k,v] of Object.entries({strOn:1,strFree:1,strLoad:300,strUnload:900,strLzIn:100,strLzOut:LOWMEM?250:800}))if(TUNE[k]===undefined)TUNE[k]=v;   // crash-7: low-mem keeps lazy zones only 250 m past draw range (hysteresis 150 m over strLzIn), the corridor's typed arrays no longer pile up
 const STR={it:null,S:null,sl:2,ms:4,msC:12,lzT:0,st:{b:0,f:0,max:0,over:0,relMB:0,lzF:0,lzB:0,hist:[]}};
 const STR_on=()=>!!TUNE.strOn;
 const STR_R=()=>SET.q==='high'?2100:1600;
