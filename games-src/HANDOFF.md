@@ -464,3 +464,5 @@ Asset slots: `python3 games-src/nightrun/wp-assets.py` regenerates the wpmount-*
 Next: owner supplies the art; tune `RIG.hp` once the real ship pictures are checked on a phone (hardpoints are guesses); in-run armed composite is off (`RIG.armedRun`, not wired).
 
 - 16 Oct 2026 Nightrun B8 Heat ladder live (flag RET.heat, parts/ret.js; hooks in story.js setLevel, b.js tier decay, map.js plate). Bot clears Heat 1-3 at 90-100% on stages 1/8/20: steeper early steps are a follow-up (ret-heat-test.js HEATSET env tunes order/lvK). ret-arcade-test fails on stage 30 arcade length with or without Heat.
+
+- 17 Oct 2026 Nightrun STORY TIMELINE + CAST live (flag RET.tale, new parts/tale.js after ret.js in build.py; `?tale=0` = off). 6 cast, 32 beats + 5 boss lines in the data table at the top of tale.js; before-card on first start of a stage, after-scene on first clear, STORY LOG in MENU with NEW dot, save `mnr_tale`. Portrait slots `char-<id>.webp` (manifest group "Story cast"). Test: `node games-src/nightrun/tale-test.js` (67 checks). Next: owner paints the 6 portraits; stage-plate preview is one line only.

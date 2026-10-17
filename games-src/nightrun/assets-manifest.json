@@ -1452,5 +1452,71 @@
   "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Storm Cell is equipped (a coloured circle/triangle until this exists)",
   "notes": "Storm Cell mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #fff06a. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
   "prompt": "a small spaceship weapon attachment for storm cell, side view, muzzle pointing right, compact single part, accent glow #fff06a, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "char-courier.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Story cast",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "Story dialogue card, STORY LOG timeline and stage plate preview (a coloured hex badge with the initial until this is real art)",
+  "notes": "Portrait bust, Courier: the player pilot, young night runner, visor pushed up, cyan rim light. Accent colour #19e3ff. Square 256x256, head and shoulders centred, dark transparent-friendly background, painted neon style like the boss portraits. Shown cropped to a circle.",
+  "prompt": "portrait bust of Courier: the player pilot, young night runner, visor pushed up, cyan rim light, head and shoulders centred, painted neon cyberpunk look like the existing boss portraits, accent glow #19e3ff, no text, letters or numbers"
+ },
+ {
+  "file": "char-dispatch.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Story cast",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "Story dialogue card, STORY LOG timeline and stage plate preview (a coloured hex badge with the initial until this is real art)",
+  "notes": "Portrait bust, Oda: the dispatcher, headset, warm amber light from a console, calm tired eyes. Accent colour #ffb020. Square 256x256, head and shoulders centred, dark transparent-friendly background, painted neon style like the boss portraits. Shown cropped to a circle.",
+  "prompt": "portrait bust of Oda: the dispatcher, headset, warm amber light from a console, calm tired eyes, head and shoulders centred, painted neon cyberpunk look like the existing boss portraits, accent glow #ffb020, no text, letters or numbers"
+ },
+ {
+  "file": "char-rival.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Story cast",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "Story dialogue card, STORY LOG timeline and stage plate preview (a coloured hex badge with the initial until this is real art)",
+  "notes": "Portrait bust, Vex: rival racer, helmet with a red ghost-ship decal, smirk, hot pink rim light. Accent colour #ff2d95. Square 256x256, head and shoulders centred, dark transparent-friendly background, painted neon style like the boss portraits. Shown cropped to a circle.",
+  "prompt": "portrait bust of Vex: rival racer, helmet with a red ghost-ship decal, smirk, hot pink rim light, head and shoulders centred, painted neon cyberpunk look like the existing boss portraits, accent glow #ff2d95, no text, letters or numbers"
+ },
+ {
+  "file": "char-mechanic.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Story cast",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "Story dialogue card, STORY LOG timeline and stage plate preview (a coloured hex badge with the initial until this is real art)",
+  "notes": "Portrait bust, Pfann: old shop keeper, grease-stained goggles on forehead, mint work-lamp glow. Accent colour #7dffd8. Square 256x256, head and shoulders centred, dark transparent-friendly background, painted neon style like the boss portraits. Shown cropped to a circle.",
+  "prompt": "portrait bust of Pfann: old shop keeper, grease-stained goggles on forehead, mint work-lamp glow, head and shoulders centred, painted neon cyberpunk look like the existing boss portraits, accent glow #7dffd8, no text, letters or numbers"
+ },
+ {
+  "file": "char-lumen.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Story cast",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "Story dialogue card, STORY LOG timeline and stage plate preview (a coloured hex badge with the initial until this is real art)",
+  "notes": "Portrait bust, Lumen: the city AI, no human face, a calm violet glowing lattice or mask of light. Accent colour #b58cff. Square 256x256, head and shoulders centred, dark transparent-friendly background, painted neon style like the boss portraits. Shown cropped to a circle.",
+  "prompt": "portrait bust of Lumen: the city AI, no human face, a calm violet glowing lattice or mask of light, head and shoulders centred, painted neon cyberpunk look like the existing boss portraits, accent glow #b58cff, no text, letters or numbers"
+ },
+ {
+  "file": "char-ally.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Story cast",
+  "status": "WIRED",
+  "kind": "icon",
+  "where": "Story dialogue card, STORY LOG timeline and stage plate preview (a coloured hex badge with the initial until this is real art)",
+  "notes": "Portrait bust, Wren: mysterious ally, hooded figure half in static, lime green signal glow. Accent colour #b6ff5a. Square 256x256, head and shoulders centred, dark transparent-friendly background, painted neon style like the boss portraits. Shown cropped to a circle.",
+  "prompt": "portrait bust of Wren: mysterious ally, hooded figure half in static, lime green signal glow, head and shoulders centred, painted neon cyberpunk look like the existing boss portraits, accent glow #b6ff5a, no text, letters or numbers"
  }
 ]
