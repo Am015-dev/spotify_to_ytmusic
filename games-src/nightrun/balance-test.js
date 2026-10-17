@@ -6,7 +6,7 @@
 // Prints pass/fail lines against the targets in BALANCE.md (late build).
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
-const RUNS = +process.env.RUNS || 3, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 420;
+const RUNS = +process.env.RUNS || 3, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 600;   // 600: a Legend final boss lasts 170-260 s (boss fights round 4)
 const STAGES = (process.env.STAGES || '1,8,20,30,42').split(',').map(Number);
 const DFS = (process.env.DIFFS || 'easy,normal,hard').split(','), BUILDS = (process.env.BUILDS || 'fresh,mid,late').split(',');
 function freePort() { return new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); }); }
