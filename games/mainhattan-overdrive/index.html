@@ -746,6 +746,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+  {v:'v90m-beta.81',date:'17 Oct 2026',items:[{t:'FIXED',s:'The top STORY pill no longer repeats the marker name while the prompt card on the left shows it.'}]},
   {v:'v90m-beta.80',date:'17 Oct 2026',items:[{t:'FIXED',s:'One tidy stack of cards on the left: the marker prompt first, then the objective, never overlapping.'},{t:'FIXED',s:'Objective card text is now at least 12 px, easier to read on a phone.'}]},
   {v:'v90m-beta.79',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens streets: trees, stalls and other solid props no longer stand on the road.'},{t:'NEW',s:'Traffic in your lane now moves over when you come up fast from behind.'},{t:'FIXED',s:'Head-on smashes with traffic slow you down less.'}]},
   {v:'v90m-beta.78',date:'17 Oct 2026',items:[{t:'FIXED',s:'Traffic comes back around you after a fast travel: no more empty streets.'},{t:'NEW',s:'Two more start activities near the Frankfurt start: Stud Rush Bankenviertel and Brick Smash Taunusanlage.'}]},
@@ -8207,7 +8208,7 @@ const CR_hudS={k:'',t:0};
 function CR_hud(){const n=document.getElementById('m1Next'),a=document.getElementById('roamArrow'),pl=document.getElementById('roamPlate'),tu=document.getElementById('roamTut');
  const vis=e=>!!e&&!e.hidden&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'&&e.getClientRects().length>0;
  const m=vis(n)&&!!a;document.body.classList.toggle('crMerge',m);
- if(m){let d=n.querySelector('.crD');if(!d){d=document.createElement('em');d.className='crD';n.appendChild(d)}const sp=a.querySelector('span');d.textContent=sp?sp.textContent.trim():''}
+ if(m){let d=n.querySelector('.crD');if(!d){d=document.createElement('em');d.className='crD';n.appendChild(d)}const sp=a.querySelector('span');const pr=document.getElementById('roamPrompt');d.textContent=sp&&!vis(pr)?sp.textContent.trim():''}
  if(pl){const k=pl.textContent;const now=performance.now();if(k!==CR_hudS.k){CR_hudS.k=k;CR_hudS.t=now}pl.classList.toggle('crHide',now-CR_hudS.t>2000||vis(tu))}}
 setInterval(CR_hud,250);
 function CR_tutFit(){const t=document.getElementById('roamTut');if(!t||!document.body.classList.contains('touch')||t.hidden||!t.getClientRects().length){return}
