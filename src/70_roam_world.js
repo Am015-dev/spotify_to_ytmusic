@@ -87,8 +87,12 @@ function hubFrame(dt){if(!HUB.grp||!HUB.grp.visible)return}
 
 // ---- career places at real, named spots: every mark is snapped onto a street (or filler road) and faces along it
 // rfSnap: nearest street centre within r (else filler road), heading along the road towards its longer side
-function rfSnap(x,z,r=70){const q=cityAt(x,z);if(q&&q.d<r){const p=q.p,f=q.s<q.S.L/2?1:-1;return[p.x,p.z,Math.atan2(p.tx*f,p.tz*f)]}
+function rfSnap(x,z,r=70){/* r3B3: road-follow prefers drivable streets over pedestrian ones (Ermou/Mitropoleos); ped only when nothing else is within r */let q=cityAt(x,z,-1,true);if(!q||q.d>=r)q=cityAt(x,z);if(q&&q.d<r){const p=q.p,f=q.s<q.S.L/2?1:-1;return[p.x,p.z,Math.atan2(p.tx*f,p.tz*f)]}
   const fq=fillAt(x,z);if(fq&&fq.d<r){const R2=fq.r,t=clamp((x-R2.x0)*R2.ux+(z-R2.z0)*R2.uz,0,R2.L),f=t<R2.L/2?1:-1;return[R2.x0+R2.ux*t,R2.z0+R2.uz*t,Math.atan2(R2.ux*f,R2.uz*f)]}return[x,z,0]}
+/* r3B3: road-follow aim point for a driver heading (fx,fz): the nearest drivable street point (pedestrian streets only as a fallback), 14 m on along the street in the travel direction. At a street end it moves to the next street out of that junction instead of aiming back along the street it came from (the old nearest-point aim cut corners at T-junctions and ran into the Ermou/Mitropoleos pedestrian maze). Returns [x,z,heading] like rfSnap. */
+function rfAim(x,z,fx,fz,r=60){let q=cityAt(x,z,-1,true);if(!q||q.d>=r)q=cityAt(x,z);if(!q||q.d>=r)return rfSnap(x,z,r);
+  for(let k=0;k<2;k++){const L=q.S.L,s0=q.p.s,out=s0<12?-1:L-s0<12?1:0;if(out&&(q.p.tx*fx+q.p.tz*fz)*out>0){const q2=cityAt(q.p.x,q.p.z,q.si,true);if(q2&&q2.d<12){q=q2;continue}}break}
+  const p=q.p,L=q.S.L,s=p.s<12?1:L-p.s<12?-1:(p.tx*fx+p.tz*fz>=0?1:-1);return[p.x+p.tx*s*14,p.z+p.tz*s*14,Math.atan2(p.tx*s,p.tz*s)]}
 // waypoint tokens: [e,n] real point, ['qN'|'qS',e] quay at real e, ['bN'|'bS',id] bridge end
 function rfWp(w){if(typeof w[0]==='number')return WP(w[0],w[1]);const[k,v]=w;if(k==='qN'||k==='qS'){const P=MAINR.pts;let bi=0,bd=1e9;P.forEach((p,i)=>{const d=Math.abs(RW(p.x,p.z)[0]-v);if(d<bd){bd=d;bi=i}});const p=P[bi],o=(k==='qN'?1:-1)*(p.hw+18);return[p.x+p.tz*o,p.z-p.tx*o]}
   const b=BRIDGES.find(q=>q.id===v);return deckPt(b,(k==='bN'?1:-1)*(b.half+6))}
