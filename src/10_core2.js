@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+  {v:'v90m-beta.76',date:'17 Oct 2026',items:[{t:'NEW',s:'New home screen: one tap to play.'},{t:'CHANGED',s:'Smaller, faster download.'},{t:'FIXED',s:'No more giant bricks floating after crashes.'}]},
   {v:'v90m-beta.75',date:'16 Oct 2026',items:[{t:'NEW',s:'Bricks burst when your car transforms.'},{t:'CHANGED',s:'Quests no longer stop you mid-drive.'},{t:'CHANGED',s:'Bigger, cleaner phone HUD; bluer river.'}]},
   {v:'v90m-beta.74',date:'16 Oct 2026',items:[{t:'NEW',s:'Every race now runs on real Frankfurt and Athens streets, with two routes, jumps and power-ups.'},{t:'NEW',s:'Quick Race includes a river run where your car becomes a boat.'},{t:'CHANGED',s:'Livelier streets with shopfronts, kiosks and café tables.'}]},
   {v:'v90m-beta.73',date:'16 Oct 2026',items:[{t:'NEW',s:'Race Rossi on real Frankfurt streets: two routes, a big jump and power-up bricks.'},{t:'FIXED',s:'The camera no longer hides behind buildings.'},{t:'CHANGED',s:'Faster start.'}]},
