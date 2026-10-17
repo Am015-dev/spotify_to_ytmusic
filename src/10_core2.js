@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.93',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens traffic: no more dead cars stuck in the road.'},{t:'NEW',s:'Livelier Athens streets, and traffic gives way at junctions.'}]},
 {v:'v90m-beta.92',date:'17 Oct 2026',items:[{t:'FIXED',s:'Fewer long freezes, especially in Athens: the game makes far less throwaway data, so the browser pauses less to clean up.'},{t:'FIXED',s:'Shop shutters no longer rebuild every frame.'},{t:'CHANGED',s:'Background loading now runs in small slices instead of big bursts.'}]},
 {v:'v90m-beta.91',date:'17 Oct 2026',items:[{t:'FIXED',s:'Much less lag: the camera no longer stalls for a frame when it checks walls (the worst hitch was 66 ms).'},{t:'FIXED',s:'Smoother Frankfurt: slowest frames down from 122 ms to about 23 ms.'},{t:'CHANGED',s:'Lighter road and avatar drawing, so big scenes load and run smoother.'}]},
   {v:'v90m-beta.90',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phones: parts of the city far behind you are freed sooner, so memory stays lower on long drives (fewer crashes).'}]},
