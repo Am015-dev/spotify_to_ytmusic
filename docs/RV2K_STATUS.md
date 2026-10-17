@@ -1,3 +1,21 @@
+# Scoreboard: review #3 (beta.81) vs review #4 (trunk ab53298 = beta.85 + dest4), 2026-10-17
+| aspect | r3 | r4 | |
+|---|---|---|---|
+| First 60 s / onboarding | 5 | 5 | = |
+| Free-roam driving | 4 | 5 | ↑ |
+| Story / side quest | 3 | 4 | ↑ |
+| Races | 4 | 5 | ↑ Akropolis won |
+| Builder | 3 | 3 | = black in play |
+| Garage | 5 | 4 | ↓ LEVEL UP card |
+| Vehicle transform | 6 | 6 | = |
+| Traffic / pedestrians | 6 | 5 | ↓ Athens empty |
+| HUD / menus | 4 | 5 | ↑ |
+| Performance / memory | 3 | 4 | ↑ 644 MB Fra 5 min |
+| World art | 6 | 6 | = |
+| Portrait | 4 | 5 | ↑ |
+| **Overall** | **4.4** | **4.8** | |
+r3 TOP 10: fixed akro-play, finish, gascard, racepop, devui2, debris-por; partly jam (Ath), pos, builder; open races. New TOP 10 (`rv2k4/*`, Athens first): docs/REVIEW_2K_4.md.
+
 # RV2K status (2026-10-16, built page out/rv2km = od-int2 e5e1dd3, software GL, fake-clock driver for long GOs, each GO run alone)
 | # | item (GO) | measured | |
 |---|---|---|---|
