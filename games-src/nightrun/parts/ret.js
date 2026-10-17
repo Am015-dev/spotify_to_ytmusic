@@ -394,6 +394,41 @@ RET.assistBuild=function(){if(!RET.assist)return;
     if(first){const n=document.createElement('p');n.className='asn';n.id='asNote';n.textContent='Assist makes the game easier. It never blocks progress and never costs Neon. A run with World speed, Enemy bullets, Extra hull or Beat window on is marked ⓐ and sets no records (best, daily, weekly, Heat medal). Looks-only options never mark a run.';
       row.parentNode.insertBefore(n,row);first=false;}
     const p=document.createElement('p');p.className='asd';p.textContent=r.d;row.after(p);}};
+/* ---------- B30 installable PWA + offline cache (POLISH.md). Flag RET.pwa (off with ?pwa=0): off = no manifest link, no service worker, no MENU note (an old worker of ours is unregistered).
+   The worker is games/mainhattan-nightrun/sw.js (built from parts/sw.js, scope = this folder); it never runs in the ?sim=1 test pages. Gameplay and the beat clock are untouched.
+   MENU gets one small row: an INSTALL button (beforeinstallprompt), the iOS "Add to Home Screen" text, and an "Offline ready" note. ---------- */
+if(RET.pwa===undefined)RET.pwa=!/[?&]pwa=0/.test(location.search);
+RET.pwaX=(function(){
+  const X={ready:false,songs:0,defer:null,reg:null};
+  const standalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;}catch(e){return false;}};
+  const ios=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const sw='serviceWorker' in navigator&&location.protocol!=='file:';
+  X.count=async function(){try{const ns=(await caches.keys()).filter(n=>n.startsWith('nr-'));X.ready=ns.some(n=>n.startsWith('nr-shell-'));let m=0;for(const n of ns.filter(n=>n.startsWith('nr-assets-')))m+=(await (await caches.open(n)).keys()).filter(r=>/\/music\/[^/]+\.mp3$/.test(r.url)&&!/\/st-/.test(r.url)).length;X.songs=m;}catch(e){}return X;};
+  X.draw=async function(){const row=$('pwaRow');if(!row)return;await X.count();
+    const note=$('pwaNote'),btn=$('pwaBtn'),tip=$('pwaIos');
+    note.hidden=!(RET.pwa&&X.ready);note.textContent='Offline ready'+(X.songs?' · '+X.songs+' songs saved':'');
+    btn.hidden=!(RET.pwa&&X.defer&&!standalone());tip.hidden=!(RET.pwa&&ios()&&!standalone());
+    row.hidden=note.hidden&&btn.hidden&&tip.hidden;};
+  X.build=function(){const mn=$('mnMore');if(!mn||$('pwaRow')||!RET.pwa)return;
+    const row=document.createElement('div');row.id='pwaRow';row.hidden=true;
+    row.innerHTML='<button type="button" class="go dim" id="pwaBtn" hidden>INSTALL APP</button><div id="pwaIos" hidden>To install: tap Share, then Add to Home Screen.</div><div id="pwaNote" hidden></div>';
+    const back=$('mnBack');mn.insertBefore(row,back||null);
+    $('pwaBtn').addEventListener('click',async e=>{e.stopPropagation();const d=X.defer;if(!d)return;X.defer=null;try{d.prompt();await d.userChoice;}catch(x){}X.draw();});
+    X.draw();};
+  if(!document.getElementById('pwaCss')){const st=document.createElement('style');st.id='pwaCss';st.textContent='#pwaRow{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0 2px;font-family:var(--mono);font-size:14px;color:var(--dim);text-align:center}#pwaRow[hidden]{display:none}#pwaNote{color:#7fe6a8}';document.head.appendChild(st);}
+  if(!RET.pwa){   // flag off = the old game: forget a worker we installed earlier
+    if(sw)navigator.serviceWorker.getRegistrations().then(rs=>{for(const r of rs)if(/mainhattan-nightrun\/?$/.test(r.scope))r.unregister();}).catch(()=>{});
+    return X;}
+  const add=(tag,at)=>{const e=document.createElement(tag);for(const k in at)e.setAttribute(k,at[k]);document.head.appendChild(e);};
+  if(location.protocol!=='file:'){
+    add('link',{rel:'manifest',href:'manifest.webmanifest'});add('meta',{name:'theme-color',content:'#05030c'});
+    add('link',{rel:'apple-touch-icon',href:'icons/icon-192.png'});add('meta',{name:'mobile-web-app-capable',content:'yes'});add('meta',{name:'apple-mobile-web-app-capable',content:'yes'});}
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();X.defer=e;X.draw();});
+  addEventListener('appinstalled',()=>{X.defer=null;X.draw();});
+  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#moreBtn'))setTimeout(()=>{X.build();X.draw();},0);},true);
+  if(sw&&!SIM)addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js',{scope:'./'}).then(r=>{X.reg=r;return navigator.serviceWorker.ready;}).then(()=>X.count()).catch(()=>{});});
+  return X;})();
 
 /* ===== B21 FEVER: grazes and PERFECTs fill a thin meter at the top edge; when it is full the next bar starts 8 bars of FEVER (score x1.5, music fully open,
    gold edge glow). No extra damage or fire rate: it only pays in score. Needs movement (a still ship fills nothing), once per 32 bars, never with a boss

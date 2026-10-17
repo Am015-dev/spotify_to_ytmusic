@@ -12,5 +12,7 @@ out=rd('head.html')+rd('a.js')+"\n"+rd('songs.js')+"\n"+bg+"\n"+b+"\n"+dr+"\n"+r
 OUT=os.environ.get('NR_OUT','/home/user/spotify_to_ytmusic/games/mainhattan-nightrun/index.html')   # NR_OUT=<file> builds somewhere else (tests); default is the deploy path
 open(OUT,'w',encoding='utf8').write(out)
 print(len(out))
-import subprocess
+import subprocess,hashlib
+if 'NR_OUT' not in os.environ:   # B30: the service worker carries a hash of the page, so every deploy is a new worker and new cache names
+    open(os.path.join(os.path.dirname(OUT),'sw.js'),'w',encoding='utf8').write(rd('sw.js').replace('__BUILD__',hashlib.sha1(out.encode('utf8')).hexdigest()[:10]))
 if 'NR_OUT' not in os.environ:subprocess.run(['python3','/home/user/spotify_to_ytmusic/games-src/scripts/stamp-copyright.py',OUT],check=True)
