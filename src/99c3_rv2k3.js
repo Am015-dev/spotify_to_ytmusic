@@ -12,5 +12,11 @@ function RV3A_go(kind,say){const ok=b=>b?' ✅':' ❌',fmt=o=>(o.fin?(o.place===
  if(kind==='races'){setTimeout(()=>{const W=tkBuild({key:'rival:water-rv2',kind:'quick',name:'Main River Run',ai:['WEBER'],water:true}),sv=menuTrack;menuTrack='grand';const Gp=tkBuild(tkQuickSpec());menuTrack=sv;if(!W||!Gp)return say('📍 RACES · no course ❌');
   const a=RV3A_race(W,'pB',0),b=RV3A_race(Gp,'pA',0);
   say('📍 RACES (human-like bot) · Main River Run: '+fmt(a)+' · Grand Prix Quick Race: '+fmt(b)+' (each: finishes, ≥ 2 lead changes, median gap ≤ 60 m)'+ok([a,b].every(o=>o.fin&&o.lc>=2&&o.med<=60)))},300);return'📍 RACES · River Run + Grand Prix…'}
+ if(kind==='finish'){setTimeout(()=>{const sv=menuTrack;let L;
+  if(CID==='ath'){const m=tkMarkOf(ATH_BOSS_EV),C=m&&tkCourseOf(m);L=C?[['Akropolis',C,'pA',30]]:[]}
+  else{menuTrack='grand';const Gp=tkBuild(tkQuickSpec());menuTrack=sv;L=[['River Run',tkBuild({key:'rival:water-rv2',kind:'quick',name:'Main River Run',ai:['WEBER'],water:true}),'pB',0],['Grand Prix',Gp,'pA',0],['Westend',TK_C,'pA',0]]}
+  if(!L.length||L.some(q=>!q[1]))return say('📍 RACES FINISH · no course ❌');
+  const out=[];let all=true;for(const[n,C,r,roam]of L){const R=[0,1,2].map(()=>RV3A_race(C,r,roam)),good=R.every(o=>o.fin&&o.t<=420);all=all&&good;out.push(n+': '+R.map(o=>o.fin?o.place+'. '+o.t+' s':'DNF').join(', '))}
+  say('📍 RACES FINISH ('+CID+', 3 runs each, human-like bot, limit 420 s) · '+out.join(' · ')+ok(all))},300);return'📍 RACES FINISH · racing…'}
  return'📍 unknown rv2k3 lane A kind '+kind+' ❌'}
 ({RV3A_go})
