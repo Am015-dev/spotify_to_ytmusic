@@ -1,0 +1,6 @@
+// stretch.js <cpuprofile> [minMs] : contiguous busy stretches (no (idle)/(program) gap) longer than minMs -> top 3 entry stacks inside
+const P=JSON.parse(require('fs').readFileSync(process.argv[2]));const MIN=+(process.argv[3]||100)*1000;const by={},par={};for(const n of P.nodes){by[n.id]=n;for(const c of n.children||[])par[c]=n.id}
+const key=n=>(n.callFrame.functionName||'(anon)')+':'+n.callFrame.lineNumber;const path=id=>{const st=[];let c=id;while(c!=null){st.push(by[c]);c=par[c]}return st.reverse()};
+let cur=null,t=0;const out=[];P.samples.forEach((s,i)=>{t+=P.timeDeltas[i]||0;const st=path(s),top=st[1]?key(st[1]):'';if(/^\(idle\)/.test(top)){if(cur&&cur.d>=MIN)out.push(cur);cur=null;return}
+ const ent=st.slice(1,5).map(key).join('>');const lf=key(st[st.length-1]);if(!cur)cur={t0:t,d:0,e:{},l:{}};cur.d+=P.timeDeltas[i]||0;cur.e[ent]=(cur.e[ent]||0)+(P.timeDeltas[i]||0);cur.l[lf]=(cur.l[lf]||0)+(P.timeDeltas[i]||0)});
+for(const c of out.sort((a,b)=>b.d-a.d).slice(0,+(process.env.N||8))){console.log(`@${(c.t0/1e6).toFixed(1)}s ${(c.d/1e3).toFixed(0)}ms`);for(const [k,v] of Object.entries(c.e).sort((a,b)=>b[1]-a[1]).slice(0,2))console.log('   '+(v/1e3).toFixed(0)+'ms '+k);console.log('   leaf: '+Object.entries(c.l).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>k+' '+(v/1e3).toFixed(0)).join(', '))}

@@ -1,0 +1,100 @@
+{
+ "res": [
+  {
+   "id": "simp/perf-fra",
+   "c": "fra",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 0.521,
+   "said": "📍 PENDING · simplify is OFF (WIP): open the page with ?simp=1 to test",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "ctb/perf",
+   "c": "fra",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 9.387,
+   "said": "📍 LEGO STREET PERF: frame not timed on the test page, +14 draw calls (≤ 40), 231k tris, sets' GPU memory 27.0 MB (≤ 60), sort 0.06 ms/frame (≤ 0.5) ✅",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "v90a/perf",
+   "c": "fra",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 0.605,
+   "said": "📍 FRANKFURT FREE ROAM · drive",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "v89i/perf-thumbs",
+   "c": "fra",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 2.783,
+   "said": "📍 GARAGE",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "perf/frame",
+   "c": "fra",
+   "ok": false,
+   "spawnOnly": false,
+   "secs": 23.228,
+   "said": "📍 PERF FRAME · 585 stepped frames, 610 m · median 21.4 ms · p95 97.8 ms (≤ 8) · max 852 ms (≤ 50) at -349,448 ❌",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "v89i/perf-ctx",
+   "c": "fra",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 0.605,
+   "said": "same as v90a/perf: 📍 FRANKFURT FREE ROAM · drive",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "v88u/perf-pc",
+   "c": "fra",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 0.605,
+   "said": "same as v90a/perf: 📍 FRANKFURT FREE ROAM · drive",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "v88u/perf-people",
+   "c": "fra",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 0.605,
+   "said": "same as v90a/perf: 📍 FRANKFURT FREE ROAM · drive",
+   "state": "roam",
+   "errs": []
+  },
+  {
+   "id": "v88u/perf-pop",
+   "c": "fra",
+   "ok": true,
+   "spawnOnly": false,
+   "secs": 0.605,
+   "said": "same as v90a/perf: 📍 FRANKFURT FREE ROAM · drive",
+   "state": "roam",
+   "errs": []
+  }
+ ],
+ "boots": {
+  "fra": [
+   71.203
+  ]
+ },
+ "errs": []
+}

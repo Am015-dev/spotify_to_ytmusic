@@ -27,7 +27,7 @@ LF.R={tuft:350,bed:380,patch:700,pond:900,reed:300,mound:1400};LF.M=[];LF.MG=new
 const LF_h=(x,z,s)=>{let h=Math.sin(x*12.9898+z*78.233+(s||0)*37.719)*43758.5453;return h-Math.floor(h)};
 const LF_n=(x,z)=>{const a=x/160,b=z/160,i=Math.floor(a),j=Math.floor(b),u=a-i,v=b-j,s=t=>t*t*(3-2*t),q=(p,r)=>LF_h(p,r,7);return q(i,j)*(1-s(u))*(1-s(v))+q(i+1,j)*s(u)*(1-s(v))+q(i,j+1)*(1-s(u))*s(v)+q(i+1,j+1)*s(u)*s(v)};
 function LF_mound(x,z){const L=LF.MG.get(Math.floor(x/64)*10000+Math.floor(z/64));if(!L)return 0;let h=0;for(const m of L){const q=((x-m.x)**2+(z-m.z)**2)/(m.r*m.r);if(q<1){const k=1-q;h=Math.max(h,m.h*k*k)}}return h}
-roamTerr=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r.deck&&LF.MG.size){const m=LF_mound(x,z);if(m>0)r.g+=m}return r})(roamTerr);
+roamTerr=(f=>function(x,z,y,o){const r=f(x,z,y,o);if(!r.deck&&LF.MG.size){const m=LF_mound(x,z);if(m>0)r.g+=m}return r})(roamTerr);
 // foot-2: a dirt/sand/grass PATCH is a tilted plane draped on the ground under it (planar fit + lift so it never dips under the terrain / a mound),
 // and its top is part of the walk/drive height: LF_patchY(x,z) = the plane's top inside the 9-gon, else null. The figure's feet and the tyres use the SAME surface as the mesh.
 LF.PG=new Map();const LF_PPOLY=[];for(let i=0;i<9;i++){const a=i/9*Math.PI*2,r=.75+.25*LF_h(i,3,1);LF_PPOLY.push([Math.cos(a)*r,-Math.sin(a)*r])}
@@ -36,7 +36,7 @@ function LF_patchY(x,z){const A=LF.PG.get(Math.floor(x/32)*10000+Math.floor(z/32
   for(let i=0,j=8;i<9;j=i++){const a=LF_PPOLY[i],b=LF_PPOLY[j];if((a[1]>lz)!==(b[1]>lz)&&lx<(b[0]-a[0])*(lz-a[1])/(b[1]-a[1])+a[0])ins=!ins}
   if(ins){const y=p.yt+p.gx*dx+p.gz*dz;if(best==null||y>best)best=y}}
  return best}
-roamTerr=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r.deck&&LF.PG.size){const t=LF_patchY(x,z);if(t!=null&&t>r.g&&t-r.g<.8)r.g=t}return r})(roamTerr);
+roamTerr=(f=>function(x,z,y,o){const r=f(x,z,y,o);if(!r.deck&&LF.PG.size){const t=LF_patchY(x,z);if(t!=null&&t>r.g&&t-r.g<.8)r.g=t}return r})(roamTerr);
 // cheapest checks first (grid lookups), trail distance (a loop over every trail point) last; returns the road-edge distance or -1
 function LF_open(x,z){if(roamHit(x,z,5))return -1;const q=cityAt(x,z),f=fillAt(x,z),d=Math.min(q?q.d-q.road.w/2:1e9,f?f.d-f.r.w/2:1e9);if(d<7)return -1;
  if(inRiver(x,z,-12)||onAnyDeck(x,z))return -1;const a=abAt(x,z);if(a&&a.d<a.road.w/2+14)return -1;if(RO.ramps&&RO.ramps.some(r=>Math.abs(r.x-x)<30&&Math.abs(r.z-z)<30))return -1;
@@ -107,12 +107,12 @@ const LF_DT=(()=>{const V=[[0,0]],I=[];for(let i=0;i<9;i++)V.push(LF_PPOLY[i].ma
 // (feet inside the patch, GO art/footsurf). A patch is draped only if every triangle's centroid and edge midpoints sit 1.2 cm above to 7 cm below ground + 3.5 cm (the feet walk on the ground,
 // so they stay within 5 cm of the grass they stand in);
 // a failing patch is tried at 0.7x and 0.5x its size (the error falls with size squared), then dropped.
-function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),V=LF_DT.V.map(q=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;return[x,gy(x,z),z]}),I=LF_DT.I;
+function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),V=LF_DT.V.map(q=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;return[x,gy(x,z),z]}),I=LF_DT.I;p._vy=V.map(v=>v[1]);
  for(let t=0;t<I.length;t+=3){const A=V[I[t]],B=V[I[t+1]],C=V[I[t+2]];for(const[u,v,w]of[[1/3,1/3,1/3],[.5,.5,0],[0,.5,.5],[.5,0,.5]]){const x=A[0]*u+B[0]*v+C[0]*w,z=A[2]*u+B[2]*v+C[2]*w;
   const e=A[1]*u+B[1]*v+C[1]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
 function LF_drapeG(L,A,gy){const n=LF_DT.V.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),idx=[],C=new THREE.Color();if(!L.lfP)L.lfP=[];
  A.forEach((p,k)=>{const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
-  LF_DT.V.forEach((q,i)=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=gy(x,z)+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b});
+  LF_DT.V.forEach((q,i)=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=(p._vy?p._vy[i]:gy(x,z))+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b});
   for(const i of LF_DT.I)idx.push(o+i);
   const Rr=Math.max(p.sx,p.sz),e={x:p.x,z:p.z,c,s,sx:p.sx,sz:p.sz,R2:Rr*Rr,yt:pos[o*3+1],gx:0,gz:0,d:1};
   for(let i=Math.floor((p.x-Rr)/32);i<=Math.floor((p.x+Rr)/32);i++)for(let j=Math.floor((p.z-Rr)/32);j<=Math.floor((p.z+Rr)/32);j++){const kk=i*10000+j;let B=LF.PG.get(kk);if(!B)LF.PG.set(kk,B=[]);B.push(e);L.lfP.push([kk,e])}});
@@ -184,11 +184,12 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
  // art-4: uneven patches are DRAPED (Alex: "patches cut the figure in half"): a patch whose tilted-plane fit is off by > 8 cm becomes part of one merged
  // indexed mesh per tile, every vertex at groundY+3.5 cm (polygon offset against z-fight), walk height = terrain; even ones stay instanced planes. Ponds whose rim varies > 15 cm and beds on > 20 cm are dropped;
  // beds sit at their lowest corner (sink uphill, never float). ?lfd=0 = the old tilted planes.
- if(LF.drape){const DR0=I.patch.filter(p=>LF_resid(p,gy)>.08),DR=DR0.filter(p=>{const sx=p.sx,sz=p.sz;for(const k of[1,.7,.5]){p.sx=sx*k;p.sz=sz*k;if(LF_drapeOk(p,gy))return true}p.sx=sx;p.sz=sz;return false});if(DR0.length){const g=DR.length?LF_drapeG(L,DR,gy):null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield}}
+ if(LF.drape){/* perf-1: the drape checks run sliced (one unsliced step was up to 215 ms of groundY calls on desktop) */const DR0=[],DR=[];for(const p of I.patch){if(LF_resid(p,gy)>.08)DR0.push(p);if(slice()){yield;t0=performance.now()}}
+  for(const p of DR0){const sx=p.sx,sz=p.sz;let ok=false;for(const k of[1,.7,.5]){p.sx=sx*k;p.sz=sz*k;if(LF_drapeOk(p,gy)){ok=true;break}}if(ok)DR.push(p);else{p.sx=sx;p.sz=sz;p._vy=null}if(slice()){yield;t0=performance.now()}}if(DR0.length){const g=DR.length?LF_drapeG(L,DR,gy):null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield}}
   I.pond=I.pond.filter(p=>{let lo=9e9,hi=-9e9;for(let k=0;k<12;k++){const a=k/12*6.283,y=gy(p.x+Math.cos(a)*p.sx,p.z+Math.sin(a)*p.sz);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.15)return false;p.y=(lo+hi)/2+.02;return true});
   I.bed=I.bed.filter(p=>{const c=Math.cos(p.ry||0),sn=Math.sin(p.ry||0);let lo=9e9,hi=-9e9;for(const[a,b]of[[-2,-1.2],[2,-1.2],[2,1.2],[-2,1.2]]){const u=a*p.sx,v=b*p.sz,y=gy(p.x+c*u+sn*v,p.z-sn*u+c*v);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.2)return false;p.y=lo;return true})}
  for(const t in I){const A=I[t];if(!A.length)continue;const m=new THREE.InstancedMesh(GE[t],t==='tuft'||t==='reed'?mat.tuft:t==='pond'?mat.pond:mat.def,A.length);
-  A.forEach((p,i)=>{if(t==='patch')LF_fit(L,p,gy);Q.setFromAxisAngle(Y,p.ry||0);M4.compose(Pv.set(p.x,p.y,p.z),Q,S.set(p.sx,p.sy,p.sz));if(p.gx||p.gz){const e=M4.elements;e[1]=p.gx*e[0]+p.gz*e[2];e[9]=p.gx*e[8]+p.gz*e[10]}m.setMatrixAt(i,M4);m.setColorAt(i,Co.set(p.c||'#ffffff'))});
+  for(let i=0;i<A.length;i++){const p=A[i];if(t==='patch')LF_fit(L,p,gy);Q.setFromAxisAngle(Y,p.ry||0);M4.compose(Pv.set(p.x,p.y,p.z),Q,S.set(p.sx,p.sy,p.sz));if(p.gx||p.gz){const e=M4.elements;e[1]=p.gx*e[0]+p.gz*e[2];e[9]=p.gx*e[8]+p.gz*e[10]}m.setMatrixAt(i,M4);m.setColorAt(i,Co.set(p.c||'#ffffff'));if(slice()){yield;t0=performance.now()}}
   m.computeBoundingSphere();m.castShadow=t==='mound';m.receiveShadow=true;m.userData.lf=t;m.userData.lfR=L.id;m.userData.nsh=t!=='mound';L.root.add(m);LF.ms.push(m);yield}
  st.regs=(st.regs||0)+1;yield* lzPropsG(L)}
 // GO / tests: build the fill tiles around (x,z) now (a GO lands you there before lazyStep would reach them)

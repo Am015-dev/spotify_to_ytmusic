@@ -35,9 +35,17 @@ function QS_v0(k,ab){if(!TUNE.trOn)return HCAR[k]==='#scoot'?rr(15,22):rr(14,24)
 TUNE.rampClear=1;let QS_SH=null,QS_SHk='';
 const QS_segD=(x,z,A,B)=>{const dx=B.x-A.x,dz=B.z-A.z,L2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-A.x)*dx+(z-A.z)*dz)/L2));return Math.hypot(A.x+dx*t-x,A.z+dz*t-z)};
 function QS_pts(r){const s=Math.sin(r.h),c=Math.cos(r.h);return[-r.len/2-40,-r.len/2-20,0,r.len/2+20].map(a=>[r.x+s*a,r.z+c*a])}
-function QS_shutSet(){const N=HUB.nodes;if(!N||!RO.ramps)return null;const key=RO.ramps.length+':'+N.ng;if(QS_SH&&QS_SHk===key&&QS_SH.N===N)return QS_SH;const S=new Set();S.N=N;
- for(const r of RO.ramps){if(r.dk)continue;const P=QS_pts(r);for(let i=0;i<N.ng;i++)for(const j of N[i].nb){if(j<=i||j>=N.ng)continue;if(P.some(([x,z])=>QS_segD(x,z,N[i],N[j])<r.w/2+6))S.add(i*100000+j)}}
- QS_SH=S;QS_SHk=key;return S}
+// perf-2: the set was rebuilt from scratch (every ramp x every street edge, a closure per edge) each time a pop-up/duel ramp came or went: 2 GB of garbage
+// in 20 s of Athens driving. Now each ramp keeps its own edge list (per node graph + node count), edges are bbox-prefiltered, and the set is re-unioned only on a change.
+const QS_RE=new WeakMap();let QS_SHr=null,QS_SHn=-1,QS_SHg=-1;
+function QS_rampEdges(r,N){let c=QS_RE.get(r);if(c&&c.N===N&&c.ng===N.ng)return c.k;const P=QS_pts(r),m=r.w/2+6,k=[];let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;
+ for(const p of P){if(p[0]<x0)x0=p[0];if(p[0]>x1)x1=p[0];if(p[1]<z0)z0=p[1];if(p[1]>z1)z1=p[1]}x0-=m;x1+=m;z0-=m;z1+=m;
+ for(let i=0;i<N.ng;i++){const A=N[i];for(const j of A.nb){if(j<=i||j>=N.ng)continue;const B=N[j];if(Math.max(A.x,B.x)<x0||Math.min(A.x,B.x)>x1||Math.max(A.z,B.z)<z0||Math.min(A.z,B.z)>z1)continue;
+   for(let q=0;q<P.length;q++)if(QS_segD(P[q][0],P[q][1],A,B)<m){k.push(i*100000+j);break}}}
+ QS_RE.set(r,{N,ng:N.ng,k});return k}
+function QS_shutSet(){const N=HUB.nodes,R=RO.ramps;if(!N||!R)return null;if(QS_SH&&QS_SHr===R&&QS_SHn===R.length&&QS_SHg===N.ng&&QS_SH.N===N)return QS_SH;const S=new Set();S.N=N;
+ for(const r of R){if(r.dk)continue;for(const k of QS_rampEdges(r,N))S.add(k)}
+ QS_SH=S;QS_SHr=R;QS_SHn=R.length;QS_SHg=N.ng;return S}
 function QS_shut(a,b){if(!TUNE.rampClear||a==null||b==null)return false;const S=QS_shutSet();return!!S&&S.has(Math.min(a,b)*100000+Math.max(a,b))}
 function QS_rampNear(x,z){if(!TUNE.rampClear)return false;for(const r of RO.ramps||[])if(!r.dk&&QS_pts(r).some(([px,pz])=>Math.hypot(px-x,pz-z)<r.w/2+12))return true;return false}
 // traffic count follows the hour (FL day cycle): live cars × QS_hourK/1.2; extra cars out of sight (> 200 m) are parked off-map for 20-40 s

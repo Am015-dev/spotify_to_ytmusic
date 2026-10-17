@@ -1,0 +1,51 @@
+// perf-1 probe: tFrame.js <outdir> <ver> : stepped frames (rAF stubbed, 60 Hz fake clock), desktop context (1280x720, no touch), ?test=CITY&q=Q[&lowmem=1].
+// Free roam with a road-follow driver for SECS fake seconds, then (RACE=1) one sprint race with the human-like bot. Per frame: main-thread ms with
+// composer.render stubbed (render timed separately on every SAMPLE-th frame + renderer.info), split by wrapped subsystems; long tasks (PerformanceObserver),
+// heap per sample. CPU profile (PROF=1) -> top self-time functions overall and inside frames > 16 ms. env: CITY=fra|ath Q=high LOWMEM=0|1 SECS=120 RACE=1 SAMPLE=60
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const http=require('http'),fs=require('fs'),path=require('path');
+const OUT=path.resolve(process.argv[2]),V=process.argv[3],CITY=process.env.CITY||'fra',Q=process.env.Q||'high',LM=process.env.LOWMEM==='1',SECS=+(process.env.SECS||120),SAMPLE=+(process.env.SAMPLE||60);
+const mime={'.html':'text/html','.js':'application/javascript','.json':'application/json','.mp3':'audio/mpeg'};
+const INIT=`(()=>{const q=[];let t=0;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};window.__dbg=1;
+ window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){console.log('TICKERR '+e.message)}}}return t};window.__auto=true;setInterval(()=>{if(window.__auto)window.__tick(1)},16);
+ window.__lt=[];try{new PerformanceObserver(l=>{for(const e of l.getEntries())window.__lt.push([Math.round(e.startTime),Math.round(e.duration),window.__ph||''])}).observe({type:'longtask',buffered:true})}catch(e){}})();`;
+const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.url.split('?')[0]));fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end()}r.writeHead(200,{'content-type':mime[path.extname(f)]||'application/octet-stream'});r.end(d)})}).listen(0,async()=>{
+ const port=srv.address().port;const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});
+ const ctx=await b.newContext({viewport:{width:1280,height:720},deviceScaleFactor:1});const p=await ctx.newPage();p.setDefaultTimeout(1800000);await p.addInitScript(INIT);await p.addInitScript('window.__WRAP='+JSON.stringify(process.env.WRAP||''));
+ p.on('console',m=>{const t=m.text();if(/TICKERR|PF1/.test(t))console.log(t.slice(0,200))});p.on('pageerror',e=>console.log('ERR',e.message.slice(0,150)));
+ const cdp=await ctx.newCDPSession(p);const t0=Date.now();
+ await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}&q=${Q}${LM?'&lowmem=1':''}`);
+ await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:500});const boot=Math.round((Date.now()-t0)/1000);
+ // wrap subsystems (outermost binding, so every later wrapper is inside) + composer.render
+ const wr=await p.evaluate(()=>{window.__auto=false;window.__ph='drive';const ev=__oc.ev;window.PF1={b:{},n:0};
+  const names=['roamStep','roamCam','hubCullStep','roamHud','drawTraffic','updWorld','hubTrafficStep','miniDraw','studSync','waterTick','updDebris','updStreaks','updPool','dresStep','lapLogic','stepSim','lazyStep','hubRecycle','pedStep','districtStep','LV_step','L3_tick','CV_pre','CV_post','STR_step','STR_lzStep','SIMP_solid','lzFinish','lzStart','TRN_ridgeFit','DR_unjam','RD_carPre','RD_carPost','RD_unstack','LK_paint','OC_traffic','FC_pull','FC_step','FC_occ','LF_step','MEMF_step','GS_step','CTB_step','LIFE_draw','ART_step','FL_step','OG_tick','miniPaint','QS_clear','BC_upd','W12_chk','storyCheck'].concat((window.__WRAP||'').split(',').filter(Boolean));const ok=[];
+  for(const n of names){try{ev(`${n}=(f=>function(){const t=performance.now();try{return f.apply(this,arguments)}finally{PF1.b['${n}']=(PF1.b['${n}']||0)+performance.now()-t}})(${n})`);ok.push(n)}catch(e){}}
+  ev(`{const R=composer.render.bind(composer);composer.__real=R;composer.render=function(){if(PF1.real){const t=performance.now();R();PF1.rms=performance.now()-t}}}`);window.__R=ev('renderer');PF1.z={};try{ev(`for(const L of LAZY){if(L.__pf)continue;L.__pf=1;const b=L.build;L.build=function(L2){const it=b.apply(this,arguments),nx=it.next.bind(it),k=String(L2.id||L2.k||'?').replace(/[0-9_,.-]+$/,'');it.next=function(){const t=performance.now(),r=nx(),d=performance.now()-t,Z=PF1.z[k]||(PF1.z[k]={n:0,o8:0,max:0,tot:0});Z.n++;Z.tot+=d;if(d>8)Z.o8++;if(d>Z.max)Z.max=+d.toFixed(1);return r};return it}}`)}catch(e){console.log('PF1 lazywrap '+e.message)}window.__ev=ev;return ok});
+ console.log('PF1 wrapped',wr.join(','));
+ if(process.env.HEAP){await cdp.send('HeapProfiler.enable');await cdp.send('HeapProfiler.startSampling',{samplingInterval:16384,includeObjectsCollectedByMajorGC:true,includeObjectsCollectedByMinorGC:true})}
+ if(process.env.PROF){await cdp.send('Profiler.enable');await cdp.send('Profiler.setSamplingInterval',{interval:200});await cdp.send('Profiler.start')}
+ const run=async(ph,secs)=>p.evaluate(async([ph,N,S,race])=>{const ev=__ev,RO=__ev("RO"),R=__R,fr=[],smp=[],bk={},long=[];window.__ph=ph;
+  if(race){ev(`(()=>{const m=tkMarkOf(RIVAL_EV.find(e=>e.p===TK_C.p));tkStart(m,TK_C);RO.sp.cd=0;const G=tkGeoOf(TK_C);window.__bot=tkBot(G.pA,{lag:.15})})()`)}
+  const drv=race?()=>{if(RO.sp)__bot(RO.sp)}:ev(`(()=>{const W=a=>Math.atan2(Math.sin(a),Math.cos(a));return()=>{const la=12+RO.v*.9,fx=Math.sin(RO.h),fz=Math.cos(RO.h),q=rfAim(RO.x+fx*la,RO.z+fz*la,fx,fz,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;if(Math.abs(RO.v)<.5&&(window.__stk=(window.__stk|0)+1)>90){window.__stk=0;const s=rfSnap(RO.x+(Math.random()-.5)*400,RO.z+(Math.random()-.5)*400,200);if(s)roamWarp(s[0],s[1],s[2]||0,true)}}})()`);
+  let dist=0,px=RO.x,pz=RO.z,vs=0;
+  for(let i=0;i<N;i++){try{drv()}catch(e){}PF1.b={};const real=i%S===S-1;PF1.real=real;if(real){R.info.autoReset=false;R.info.reset()}PF1.z0=0;const t=performance.now();__tick(1);const ms=performance.now()-t;
+   const b=PF1.b;if(real){const k=R.info;smp.push({calls:k.render.calls,tris:k.render.triangles,geo:k.memory.geometries,tex:k.memory.textures,prog:k.programs.length,rms:PF1.rms,heap:performance.memory.usedJSHeapSize/1048576});R.info.autoReset=true;fr.push(ms-(PF1.rms||0))}else fr.push(ms);
+   for(const k in b)(bk[k]=bk[k]||[]).push(b[k]);const js=fr[fr.length-1];if(js>16)long.push([i,Math.round(js),Object.entries(b).filter(e=>e[1]>3).map(e=>e[0]+':'+e[1].toFixed(0)).join(' ')]);
+   dist+=Math.hypot(RO.x-px,RO.z-pz);px=RO.x;pz=RO.z;vs+=Math.abs(RO.v);
+   if(race&&!RO.sp&&i>60)break;await new Promise(r=>setTimeout(r,0))}
+  const srt=a=>a.slice().sort((x,y)=>x-y),pc=(a,q)=>{a=srt(a);return a.length?+a[Math.min(a.length-1,Math.floor(a.length*q))].toFixed(2):0},avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0,med=a=>pc(a,.5);
+  const sub={};for(const k in bk){const a=bk[k].concat(new Array(fr.length-bk[k].length).fill(0));sub[k]={avg:+avg(a).toFixed(2),p95:pc(a,.95),max:+Math.max(...a).toFixed(1)}}
+  return{ph,frames:fr.length,jsAvg:+avg(fr).toFixed(2),jsMed:med(fr),jsP95:pc(fr,.95),jsP99:pc(fr,.99),jsMax:+Math.max(...fr).toFixed(0),n16:fr.filter(x=>x>16).length,n50:fr.filter(x=>x>50).length,
+   sub,long:long.sort((a,b)=>b[1]-a[1]).slice(0,12),calls:med(smp.map(s=>s.calls)),callsMax:Math.max(...smp.map(s=>s.calls)),trisM:+(med(smp.map(s=>s.tris))/1e6).toFixed(2),renderMs:med(smp.map(s=>s.rms||0)),
+   geo:smp.length?smp[smp.length-1].geo:0,tex:smp.length?smp[smp.length-1].tex:0,prog:smp.length?smp[smp.length-1].prog:0,heap0:smp.length?+smp[0].heap.toFixed(0):0,heap1:smp.length?+smp[smp.length-1].heap.toFixed(0):0,dist:Math.round(dist),kmh:Math.round(vs/fr.length*3.6),raceDone:race?!RO.sp:undefined,lz:Object.fromEntries(Object.entries(PF1.z).filter(e=>e[1].max>4).map(([k,v])=>[k,v.n+'/'+v.o8+'/'+v.max+'/'+v.tot.toFixed(0)]))}},[ph,secs*60,SAMPLE,ph==='race']);
+ const res=[];res.push(await run('roam',SECS));if(process.env.RACE!=='0')try{res.push(await run('race',+(process.env.RSECS||120)))}catch(e){console.log('PF1 race failed '+e.message.slice(0,120))}
+ if(process.env.PROBE)console.log('PF1PROBE '+JSON.stringify(await p.evaluate(s=>__ev(s),process.env.PROBE)));
+ const lt=await p.evaluate(()=>__lt);
+ for(const r of res){r.city=CITY;r.q=Q;r.lowmem=LM;r.boot=boot;r.longtasks=lt.filter(x=>x[2]===r.ph).sort((a,b)=>b[1]-a[1]).slice(0,10);r.nLong=lt.filter(x=>x[2]===r.ph).length;console.log('PF1RES '+JSON.stringify(r))}
+ console.log('PF1BOOTLT '+JSON.stringify(lt.filter(x=>!x[2]).sort((a,b)=>b[1]-a[1]).slice(0,8)));
+ if(process.env.PROF){const {profile}=await cdp.send('Profiler.stop');const byId={};for(const n of profile.nodes)byId[n.id]=n;const self={};const dts=profile.timeDeltas;
+  profile.samples.forEach((s,i)=>{const n=byId[s],k=(n.callFrame.functionName||'(anon)')+':'+n.callFrame.lineNumber+':'+n.callFrame.columnNumber;self[k]=(self[k]||0)+(dts[i]||0)});
+  const tot=Object.values(self).reduce((a,b)=>a+b,0);console.log('PF1PROF total '+(tot/1e6).toFixed(1)+' s');Object.entries(self).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOPN||30)).forEach(([k,v])=>console.log('PF1PROF '+(v/tot*100).toFixed(1).padStart(5)+'% '+k));
+  fs.writeFileSync(process.env.PROFOUT||'/tmp/pf1.cpuprofile',JSON.stringify(profile))}
+ if(process.env.HEAP){const {profile}=await cdp.send('HeapProfiler.stopSampling');const self={};const walk=(n,st)=>{const k=(n.callFrame.functionName||'(anon)')+':'+n.callFrame.lineNumber;const s2=st.concat(k);self[k+'  <'+st.slice(-2).join('<')]=(self[k+'  <'+st.slice(-2).join('<')]||0)+n.selfSize;for(const c of n.children)walk(c,s2)};walk(profile.head,[]);
+  const tot=Object.values(self).reduce((a,b)=>a+b,0);console.log('PF1HEAP total '+(tot/1048576).toFixed(0)+' MB');Object.entries(self).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOPN||30)).forEach(([k,v])=>console.log('PF1HEAP '+(v/1048576).toFixed(1).padStart(6)+'MB '+k.slice(0,160)))}
+ await b.close();srv.close()});

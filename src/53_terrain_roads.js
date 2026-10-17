@@ -396,11 +396,12 @@ function zoneAt(x,z){for(let i=ZONES.length-1;i>=0;i--){const Z=ZONES[i];if(x>Z.
 const inLot=(x,z)=>{const Z=zoneAt(x,z);return !!Z&&(Z.t==='dirt'||Z.t==='grass'||Z.t==='forest')};
 const slipTop=s=>{if(!TERR.on)return 0;return TR_Y(s.x-s.ix*.6,s.z-s.iz*.6)};  // the bank's ground at the ramp's top end
 function slipY(x,z){for(const s of SLIPS){const dx=x-s.x,dz=z-s.z;if(dx>40||dx<-40||dz>40||dz<-40)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<10&&inw>0&&inw<30){const yT=s.yT??0;return yT+(HWY-yT)*inw/30}}return null}
-function roamTerr(x,z,y){let low=false;for(const b of ALL_DECKS){const h=deckAt(b,x,z);if(h!=null&&h>.2){if(y>=h-2.4){let g2=h;for(const r of RO.ramps){if(!r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),c=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(c)<r.w/2&&a>-r.len/2&&a<r.len/2)g2=Math.max(g2,r.y0+(a+r.len/2)/r.len*r.hgt)}return{g:g2,deck:b}}if(h-y<5.5)low=true}}
+// perf-2: optional 4th arg o = a scratch result to fill (groundAt passes one: it only reads .g; it ran millions of times a minute, one object each)
+function roamTerr(x,z,y,o){let low=false;for(const b of ALL_DECKS){const h=deckAt(b,x,z);if(h!=null&&h>.2){if(y>=h-2.4){let g2=h;for(const r of RO.ramps){if(!r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),c=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(c)<r.w/2&&a>-r.len/2&&a<r.len/2)g2=Math.max(g2,r.y0+(a+r.len/2)/r.len*r.hgt)}if(o){o.g=g2;o.deck=b;o.low=undefined;return o}return{g:g2,deck:b}}if(h-y<5.5)low=true}}
   let g=groundY(x,z);if(GND_ON)g=GND_far(x,z,g);const sl=slipY(x,z);if(sl!=null)g=Math.max(g,sl);
   for(const r of RO.ramps){if(r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(b)<r.w/2&&a>-r.len/2&&a<r.len/2)g=Math.max(g,r.y0+(a+r.len/2)/r.len*r.hgt)}
-  return{g,deck:null,low}}
-function groundAt(x,z,y){return roamTerr(x,z,y).g}
+  if(o){o.g=g;o.deck=null;o.low=low;return o}return{g,deck:null,low}}
+const _gaO={g:0,deck:null,low:false};function groundAt(x,z,y){return roamTerr(x,z,y,_gaO).g}
 const groundY=CID==='fra'?(x,z)=>inRiver(x,z)?HWY:TR_Y(x,z):(x,z)=>TR_Y(x,z);
 function roofAt(){return null}
 // building colliders: axis-aligned {x,z,hw,hd,h}, or oriented when built with ry (c=cos, s=sin; local x = width)
