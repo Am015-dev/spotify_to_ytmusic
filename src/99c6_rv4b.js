@@ -1,0 +1,15 @@
+// rv4B (docs/REVIEW_2K_4.md #2 #5): GOs rv2k4/ath-traf + rv2k4/ath-life. Own module (99c_checklist.js is at its cap). State asserts only: stepped road-follow drive, no real-time play.
+function RV4B_drive(secs,onStep){const W=a=>Math.atan2(Math.sin(a),Math.cos(a));RO.v=0;let sum=0,n=0;for(let t=0;t<secs&&state==='roam';t+=1/30){const la=12+RO.v*.9,q=rfSnap(RO.x+Math.sin(RO.h)*la,RO.z+Math.cos(RO.h)*la,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;roamStep(1/30);sum+=Math.abs(RO.v);n++;if(onStep)onStep(t)}
+ K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;return Math.round(sum/Math.max(n,1)*3.6)}
+function RV4B_go(kind){const ok=b=>b?' ✅':' ❌';if(state!=='roam'||!RO.on)return'📍 Start free roam in Athens ❌';
+ if(kind==='traf'){const n0=SM2.n.carTap+SM2.n.carSmash,kmh=RV4B_drive(120);const hits=SM2.n.carTap+SM2.n.carSmash-n0;
+  return'📍 ATHENS TRAFFIC CONTACTS · 120 s road-follow from the start, gas held, stepped · average '+kmh+' km/h (≥ 45) · car taps + smashes '+hits+' (≤ 30; was 171 + 34 in review 4)'+ok(hits<=30&&kmh>=45)}
+ if(kind==='life'){const S=[],nn=()=>{const N=HUB.nodes;let k=0;for(let i=0;i<N.ng;i++)if(Math.hypot(N[i].x-RO.x,N[i].z-RO.z)<170)k++;return k};let off=0;
+  RV4B_drive(120,t=>{if(Math.abs(t%5-2.5)<1/60&&t>4){if(nn()<8){off++;return}const C=HUB.cars.filter(c=>c.dead<=0&&Math.hypot(c.x-RO.x,c.z-RO.z)<150);S.push([C.length,C.filter(c=>Math.abs(c.cv||0)>1).length])}});
+  const good=S.filter(s=>s[0]>=15&&s[1]>=10).length,mn=Math.min(...S.map(s=>s[0])),mv=Math.min(...S.map(s=>s[1]));
+  return'📍 ATHENS STREET LIFE · 120 s road-follow, sampled every 5 s on streets with traffic nodes ('+off+' samples on stretches with no traffic graph skipped): '+good+' of '+S.length+' samples have ≥ 15 cars within 150 m and ≥ 10 of them moving (≥ 80 %; fewest cars '+mn+', fewest moving '+mv+')'+ok(S.length>=10&&good>=.8*S.length)}
+ return'📍 unknown rv4B kind '+kind+' ❌'}
+(function RV4B_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='rv2k4'&&q.id==='ath-traf')){C.items.push({ver:'rv2k4',id:'ath-traf',area:'drive',text:'rv4B:2026-10-17 · ATHENS CAR RAMS TRAFFIC (review 2K-4 #2): a 120 s scripted road-follow drive from the Athens start touches traffic ≤ 30 times (cars give way sideways, 98ayd_yield.js).'});
+   C.items.push({ver:'rv2k4',id:'ath-life',area:'world',text:'rv4B:2026-10-17 · ATHENS FEELS EMPTY (review 2K-4 #5): during a 120 s scripted drive, at ≥ 80 % of the 5 s samples there are ≥ 15 cars within 150 m and ≥ 10 of them moving.'})}
+  C.GO['rv2k4/ath-traf']=[{c:'ath',n:'Athens traffic contacts',secs:90,fn:()=>RV4B_go('traf')}];C.GO['rv2k4/ath-life']=[{c:'ath',n:'Athens street life',secs:90,fn:()=>RV4B_go('life')}];return}
+ if(i<600)setTimeout(()=>RV4B_reg(i+1),100)})(0);
