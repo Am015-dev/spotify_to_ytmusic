@@ -1848,5 +1848,85 @@
   "where": "Ground enemies (coloured shapes until this exists): drawn in parts/leak.js",
   "notes": "Walker mech: two bent legs, boxy torso, arm cannon on the left. Feet at the bottom edge (= road line), faces LEFT, transparent, 256 px wide.",
   "kind": "sprite"
+ },
+ {
+  "file": "en-shielder.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Enemies",
+  "status": "RESERVED",
+  "where": "New enemy kind (coloured shape drawn in parts/zoo.js until this exists)",
+  "notes": "Shielder: hex-plated drone with a glowing cyan half-bubble in front (arc facing LEFT). Faces LEFT, transparent, 128 px square, same painted style as spr-en-*.",
+  "kind": "sprite"
+ },
+ {
+  "file": "en-splitter.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Enemies",
+  "status": "RESERVED",
+  "where": "New enemy kind (coloured shape drawn in parts/zoo.js until this exists)",
+  "notes": "Splitter: diamond hull with a visible seam down the middle and two bright cores; looks like it can burst apart. Faces LEFT, transparent, 128 px square, same painted style as spr-en-*.",
+  "kind": "sprite"
+ },
+ {
+  "file": "en-bomber.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Enemies",
+  "status": "RESERVED",
+  "where": "New enemy kind (coloured shape drawn in parts/zoo.js until this exists)",
+  "notes": "Bomber: wide orange wedge, open bomb bay underneath with a round bomb inside. Faces LEFT, transparent, 128 px square, same painted style as spr-en-*.",
+  "kind": "sprite"
+ },
+ {
+  "file": "en-sniper.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Enemies",
+  "status": "RESERVED",
+  "where": "New enemy kind (coloured shape drawn in parts/zoo.js until this exists)",
+  "notes": "Sniper: long thin lime needle ship with a long barrel pointing LEFT and a small red scope light. Faces LEFT, transparent, 128 px square, same painted style as spr-en-*.",
+  "kind": "sprite"
+ },
+ {
+  "file": "en-kamikaze.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Enemies",
+  "status": "RESERVED",
+  "where": "New enemy kind (coloured shape drawn in parts/zoo.js until this exists)",
+  "notes": "Kamikaze: small red dart, spiked nose pointing LEFT, hot glowing engine; looks like a missile with a face. Faces LEFT, transparent, 128 px square, same painted style as spr-en-*.",
+  "kind": "sprite"
+ },
+ {
+  "file": "en-healer.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Enemies",
+  "status": "RESERVED",
+  "where": "New enemy kind (coloured shape drawn in parts/zoo.js until this exists)",
+  "notes": "Healer: round green pod with a bright white plus on its hull, soft green aura. Faces LEFT, transparent, 128 px square, same painted style as spr-en-*.",
+  "kind": "sprite"
+ },
+ {
+  "file": "en-carrier.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Enemies",
+  "status": "RESERVED",
+  "where": "New enemy kind (coloured shape drawn in parts/zoo.js until this exists)",
+  "notes": "Carrier: big slow violet mothership, two open launch bays on its left flank, drones docked inside. Faces LEFT, transparent, 128 px square, same painted style as spr-en-*.",
+  "kind": "sprite"
+ },
+ {
+  "file": "en-minelayer.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Enemies",
+  "status": "RESERVED",
+  "where": "New enemy kind (coloured shape drawn in parts/zoo.js until this exists)",
+  "notes": "Minelayer: yellow-green hull with a round mine hatch on the belly and a rack of mines at the back. Faces LEFT, transparent, 128 px square, same painted style as spr-en-*.",
+  "kind": "sprite"
  }
 ]

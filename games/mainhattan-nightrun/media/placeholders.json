@@ -145,5 +145,13 @@
 "ach-arcade.webp": "ae5ade3bcfcea54098ba63268f9f294b",
 "spr-en-gtank.webp": "07bdf8cc75b3ea68ccc3a842befc54d3",
 "spr-en-gturret.webp": "f2fa945093d7551f3e7d244e29dcc19e",
-"spr-en-gwalker.webp": "42a71969259d3c7aa678d2afa1fd038d"
+"spr-en-gwalker.webp": "42a71969259d3c7aa678d2afa1fd038d",
+"en-shielder.webp": "b774674d19e20e49501273978208ec65",
+"en-splitter.webp": "1e3bdd8aaae972ec20b13ba3d1331cdf",
+"en-bomber.webp": "296bd58c678e4993b37ce7afe10fe62b",
+"en-sniper.webp": "71cc398a5d592d36544955fbd2a3e508",
+"en-kamikaze.webp": "dcbbf87620254f2efaca31ff4f5f6dc4",
+"en-healer.webp": "cba4aeb64b50ab683d2b7226de9279a5",
+"en-carrier.webp": "62fdf5b271482e7a6e5d95dc5567c948",
+"en-minelayer.webp": "7df5044a51db1649f5bea24e8e2cc0b1"
 }

@@ -4,7 +4,7 @@
 //  (a) landscape 1366x768 and 1280x720, the 3rd stage of every city: the three ground types appear (all three over the run), stand on the road line
 //      (bottom within 1.5 px of UIK.groundY for their whole life), never above it, are reachable by a level shot (a hit lowers hp), stages 1-2 and the ferry stage have none
 //  (b) portrait 390x763 touch (rotMode): no ground enemy at all, no floating
-//  (c) pacing: flyer speed factor easy/normal .78, hard .9, legend 1 (measured on a real drone), bosses and ground enemies unchanged;
+//  (c) pacing: flyer speed factor easy/normal .78, hard .8, legend .9 (zoo.js; ?zoo=0 gives .9 / 1) (measured on a real drone), bosses and ground enemies unchanged;
 //      breathing gap: easy/normal get gaps, no spawn lands while one is on, legend gets none
 //  (d) breach: leak counting by weight, free warning, group size per difficulty (easy 4, normal 3, hard/legend 2 leaks a hull), decay 1 per 2 quiet bars, never takes the last
 //      hull on easy/normal but does on hard, a real enemy walking off screen counts, a boss never does, a leaking bullet never does, fever stops filling for the bar
@@ -69,7 +69,7 @@ const UNIT = () => {   // leak rules, driven directly
 const SPEED = (flip) => {   // measured speed of a drone entering: per difficulty, flag as it is vs flag off (ratio); flip=false only measures
   const m = window.__mnr, L = window.LEAK, res = {}, R = m.RET, keep = R.leak;
   const run = (df, on) => { R.leak = on; m.SET.diff = df; m.startStory(3); m.simOn(true); m.G.en.length = 0; m.G.eb.length = 0; m.P.hp = 99; m.P.inv = 99; m.P.x = 40;
-    const d = L.en('drone', { x: 800, y: 100, amp: 0 }); d.gr = 0; const x0 = d.x; for (let i = 0; i < 15; i++) m.step(1 / 30); const v = (x0 - d.x) / 0.5; m.abort(); return v; };
+    const d = L.en('drone', { x: 800, y: 100, amp: 0 }); d.gr = 0; if (window.ZOO) { d.zs = { x: 200, y: 100 }; d.zph = 0; d.zst = 0; } const x0 = d.x; for (let i = 0; i < 15; i++) m.step(1 / 30); const v = (x0 - d.x) / 0.5; m.abort(); return v; };
   for (const df of ['easy', 'normal', 'hard', 'vhard', 'legend']) res[df] = run(df, keep) / run(df, false);
   R.leak = keep; m.SET.diff = 'normal'; m.startStory(3); m.simOn(true); m.G.en.length = 0; const e = L.mk('gtank', 800); const x0 = e.x; for (let i = 0; i < 15; i++) m.step(1 / 30); res.tank = (x0 - e.x) / 0.5; m.abort();
   return res;
@@ -100,7 +100,7 @@ const HUDPX = () => {   // BREACH text size in css px and position
     if (!shots) fails.push(`@${w}: no ground enemy reached the shot probe`);
     for (const n of [1, 2, 12]) { const r = await p.evaluate(PLAY, { n, secs: 40, diff: 'normal' }); if (r.ground) fails.push(`stage ${n} @${w} (${r.name}) must have no ground enemies`); }
     if (w === 1366) {   // (c) pacing
-      const s = await p.evaluate(SPEED), want = { easy: .78, normal: .78, hard: .9, vhard: 1, legend: 1 };
+      const s = await p.evaluate(SPEED), want = { easy: .78, normal: .78, hard: .8, vhard: 1, legend: .9 };
       for (const k in want) if (Math.abs(s[k] - want[k]) > .03) fails.push(`speed ${k}: ${s[k].toFixed(2)} of full, wanted ${want[k]}`);
       if (s.tank < 60 || s.tank > 110) fails.push(`ground tank speed odd (${s.tank})`);
       const gp = {}; for (const df of ['easy', 'normal', 'legend']) gp[df] = await p.evaluate(PLAY, { n: 3, secs: 80, diff: df });
