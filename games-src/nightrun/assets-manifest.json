@@ -1452,5 +1452,305 @@
   "where": "On the ship (in the run, the WEAPONS sheet, the Garage preview) at the hardpoint of slot 1 or 2 when Storm Cell is equipped (a coloured circle/triangle until this exists)",
   "notes": "Storm Cell mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #fff06a. 256x128, transparent. Paint at 1024x512 or larger, we convert.",
   "prompt": "a small spaceship weapon attachment for storm cell, side view, muzzle pointing right, compact single part, accent glow #fff06a, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background"
+ },
+ {
+  "file": "ach-clear1.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ★ until this exists)",
+  "notes": "\"First Light\" (bronze tier): Clear a story stage. Round badge icon, a bronze rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-clear10.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph 10 until this exists)",
+  "notes": "\"Ten Nights\" (silver tier): Clear 10 story stages. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-story.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ☀ until this exists)",
+  "notes": "\"Dawn Breaks\" (gold tier): Finish the story. Round badge icon, a gold rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-stars60.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ✦ until this exists)",
+  "notes": "\"Star Collector\" (silver tier): Earn 60 stars. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-stars120.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ✺ until this exists)",
+  "notes": "\"Full Sky\" (gold tier): Earn all 120 stars. Round badge icon, a gold rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-boss1.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ♛ until this exists)",
+  "notes": "\"Giant Slayer\" (bronze tier): Beat a boss. Round badge icon, a bronze rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-boss10.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ♛ until this exists)",
+  "notes": "\"Boss Rush\" (silver tier): Beat 10 bosses. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-boss50.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ♚ until this exists)",
+  "notes": "\"Night King\" (gold tier): Beat 50 bosses. Round badge icon, a gold rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-perf100.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ♪ until this exists)",
+  "notes": "\"Metronome\" (bronze tier): 100 PERFECT hits. Round badge icon, a bronze rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-perf1000.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ♫ until this exists)",
+  "notes": "\"Perfect Pitch\" (gold tier): 1000 PERFECT hits. Round badge icon, a gold rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-dash50.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph » until this exists)",
+  "notes": "\"Dash Dancer\" (silver tier): 50 PERFECT dashes. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-graze500.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ≈ until this exists)",
+  "notes": "\"Close Shave\" (bronze tier): Graze 500 bullets. Round badge icon, a bronze rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-graze5000.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ⌇ until this exists)",
+  "notes": "\"Needle Thread\" (silver tier): Graze 5000 bullets. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-fever1.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ♨ until this exists)",
+  "notes": "\"Fever Dream\" (bronze tier): Start a FEVER. Round badge icon, a bronze rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-fever25.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ♨ until this exists)",
+  "notes": "\"Burning Up\" (silver tier): Start 25 FEVERs. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-nohit.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ◇ until this exists)",
+  "notes": "\"Untouched\" (silver tier): Clear a stage with no hull lost. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-hard.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph H until this exists)",
+  "notes": "\"Hard Nights\" (silver tier): Clear a stage on Hard. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-heat1.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph 🔥 until this exists)",
+  "notes": "\"Warm Up\" (bronze tier): Earn a Heat medal. Round badge icon, a bronze rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-heat3.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph 3 until this exists)",
+  "notes": "\"Heat Three\" (silver tier): Clear a stage at Heat 3. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-heat10.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph 🔥 until this exists)",
+  "notes": "\"Inferno\" (gold tier): Clear a stage at Heat 10. Round badge icon, a gold rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-arms4.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ✚ until this exists)",
+  "notes": "\"Armed\" (bronze tier): Own 4 weapons. Round badge icon, a bronze rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-arms8.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ✠ until this exists)",
+  "notes": "\"Arsenal\" (gold tier): Own all 8 weapons. Round badge icon, a gold rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-wlv10.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph Ⅹ until this exists)",
+  "notes": "\"Maxed Out\" (silver tier): Take a weapon to level 10. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-fusion.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ⚯ until this exists)",
+  "notes": "\"Fusion Spark\" (bronze tier): Fly 60 s with a fusion. Round badge icon, a bronze rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-daily3.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph 3 until this exists)",
+  "notes": "\"Three in a Row\" (bronze tier): Daily streak of 3. Round badge icon, a bronze rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-daily10.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ⌛ until this exists)",
+  "notes": "\"Habit\" (gold tier): Daily streak of 10. Round badge icon, a gold rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-runs100.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ∞ until this exists)",
+  "notes": "\"Regular\" (silver tier): Fly 100 runs. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-neon5000.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ◆ until this exists)",
+  "notes": "\"Neon Saver\" (silver tier): Earn 5000 Neon. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-kills1000.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ✸ until this exists)",
+  "notes": "\"Demolition\" (silver tier): Destroy 1000 enemies. Round badge icon, a silver rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
+ },
+ {
+  "file": "ach-arcade.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Achievements",
+  "status": "WIRED",
+  "where": "MENU > STATS achievements grid and the unlock toast (a coloured badge with the glyph ⚡ until this exists)",
+  "notes": "\"Short and Sweet\" (bronze tier): Clear a stage in Arcade. Round badge icon, a bronze rim, painted style like pk-*.webp, centred symbol, transparent corners, readable at 48 px.",
+  "kind": "icon"
  }
 ]

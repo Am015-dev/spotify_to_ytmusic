@@ -464,3 +464,8 @@ Asset slots: `python3 games-src/nightrun/wp-assets.py` regenerates the wpmount-*
 Next: owner supplies the art; tune `RIG.hp` once the real ship pictures are checked on a phone (hardpoints are guesses); in-run armed composite is off (`RIG.armedRun`, not wired).
 
 - 16 Oct 2026 Nightrun B8 Heat ladder live (flag RET.heat, parts/ret.js; hooks in story.js setLevel, b.js tier decay, map.js plate). Bot clears Heat 1-3 at 90-100% on stages 1/8/20: steeper early steps are a follow-up (ret-heat-test.js HEATSET env tunes order/lvK). ret-arcade-test fails on stage 30 arcade length with or without Heat.
+
+## Nightrun stats + achievements + completion (flag RET.stats, `?stats=0` = off)
+- `games-src/nightrun/parts/stats.js` (after ret.js in build.py): lifetime counters in `mnr_stats` (in the export list), 30 achievements (`ach-<id>.webp` 128x128 placeholders from make-placeholders.py; badge+glyph drawn until real art is in ready.json), unlock toast queue, completion % on the title chip, MENU > STATS sheet (credits, privacy, reset). API: `RET.st`. Test: `stats-test.js`.
+- Story-log (`RET.tale`) is read defensively: expects numeric/function `seen|done|count` and `total|max`; otherwise ignored.
+- Skill-gated achievements (no-hit, Hard, Heat) ignore Assist runs; Assist runs still count for the counters.
