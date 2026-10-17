@@ -9,7 +9,7 @@ const INIT=`(()=>{const q=[];let t=0;window.requestAnimationFrame=cb=>{q.push(cb
  window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){console.log('TICKERR '+e.message)}}}return t};window.__auto=true;setInterval(()=>{if(window.__auto)window.__tick(1)},16);
  window.__lt=[];try{new PerformanceObserver(l=>{for(const e of l.getEntries())window.__lt.push([Math.round(e.startTime),Math.round(e.duration),window.__ph||''])}).observe({type:'longtask',buffered:true})}catch(e){}})();`;
 const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.url.split('?')[0]));fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end()}r.writeHead(200,{'content-type':mime[path.extname(f)]||'application/octet-stream'});r.end(d)})}).listen(0,async()=>{
- const port=srv.address().port;const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});
+ const port=srv.address().port;const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info'].concat(process.env.JSFLAGS?['--js-flags='+process.env.JSFLAGS]:[])});
  const ctx=await b.newContext({viewport:{width:1280,height:720},deviceScaleFactor:1});const p=await ctx.newPage();p.setDefaultTimeout(1800000);await p.addInitScript(INIT);await p.addInitScript('window.__WRAP='+JSON.stringify(process.env.WRAP||''));
  p.on('console',m=>{const t=m.text();if(/TICKERR|PF1/.test(t))console.log(t.slice(0,200))});p.on('pageerror',e=>console.log('ERR',e.message.slice(0,150)));
  const cdp=await ctx.newCDPSession(p);const t0=Date.now();

@@ -1,3 +1,56 @@
+# HANDOFF perf (alex/od-athens): v88u perf hotfix → instancing/LOD → 2× brick detail → Athens busier
+
+Coordinator: session_017iH3DB4VyxwKSdMwsco4Ut. Reviewer: session_01Y6FYerWwxv43FuKUcaUT4v. Live: v88t (8f78291 = alex/od-supra fe7a196b), merged here.
+
+## Alex (2026-10-08)
+"the game lags, I have a strong PC but still lags, I think there are way too many people". Then: "all builds need double the number of bricks and tiles to look more realistic, same for the city".
+Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars + city) · 4 Athens busier. Each ships separately with a review.
+
+## Measured (852×393, normal gfx, headless; tools in ath/)
+- `ath/perf.js <url> fra|ath`: renderer.info calls/tris at 3 street spots (LIFE=x). `ath/perfd.js`: CPU per tick while driving, render stubbed: mean/p95/p99/max (SET='code' runs code first; `ath/prof.code` wraps pedStep/hubTrafficStep/... and prints ms per tick).
+- Draw calls, Frankfurt: v88l (pre-Life) 399 · v88q Life on 421 · Life 0 412. Athens 274 / 281 / 293. **Triangles ~2.5M Frankfurt, ~1.63M Athens in ALL builds** → Life is NOT the draw-call/GPU problem; the world is.
+- CPU driving, Frankfurt: v88l mean 2.73 / p95 4.5 / max 14.6 ms; v88p-live mean 3.51 / p95 6.4 / max 20.6.
+- Profile per tick (Frankfurt, driving): hubTrafficStep 1.58 → 2.81 ms (it contains miniDraw, hubRecycle, pedStep, hubCull, lazyStep, the 150-car loop and LV_step); pedStep 0.37 → 0.64 (97 vs 70 peds); miniDraw 0.18 → 0.36 (uses el.offsetParent = a layout read every 2nd frame).
+
+## v88u changes (src)
+- 98l: LV_ahead / LV_edges cached ~12 frames per 15 m / heading step (were full street-graph scans per call, up to 36 per frame from hubRecycle → LV_trNear → LV_nearHid); LV_onRoad uses a static 40 m edge grid (`LV_eGrid`); LV_init pre-warms shaders (incl. the lazily built pop-up ring) with renderer.compile.
+- 60 pedStep: people > 90 m re-pose every 3rd frame; 70 hubTrafficStep: cars > 250 m every 4th frame (still move every frame). Knob TUNE.lvLod (Life tab).
+- Defaults: lvPed 0.8 (56 walkers), lvCrowd 0.67 (4 clusters, 18 people) → ~74 people (was 97). 10_core + tune.json + TUNE.md.
+- Changelog v88u + 3 checklist items (perf-smooth, perf-people, perf-pop).
+- Results of the final sequential run: see the bottom of this file / the DEPLOY message.
+
+## Next: root cause (step 2)
+1. The world: 2.5M tris, 400-540 calls in Frankfurt. Find the top meshes by triangles×visible (traverse scene, sort by geometry index count × instance count; print name/userData). Likely: Kenney building kits with full detail at any distance, 150 cloud boxes ×6, trees. Fix with merged-per-material chunks + distance LOD (simplified box per building beyond ~150 m), not by deleting content.
+2. CPU: the 150-car loop (groundAt + CR_susp each), miniDraw's offsetParent layout read, roamStep 3.6-5 ms total. Spikes: p99 8-10 ms, max 15-20 ms (GC? check allocations: LV_edges slice/concat, debris V3 per hit).
+3. Then 2× brick detail through merged/instanced geometry, full detail ≤ 40-60 m, LOD beyond; budget calls ≤ v88m + 10 %, frame time ≤ the v88u numbers.
+4. Then Athens (docs/HANDOFF_lively.md + the brief): before-shots done in `ath/before/sheet.png` (`ath/shots6.js`, 6 named spots). Findings: Athens map has NO coast (ends at Faliro) → Syngrou Avenue stands in for the coast road, no ferries; Plaka/Acropolis have no drivable streets (pedestrian), so their shots come from Amalias / Rovertou Galli. Why it looks empty: wide green lawns between road and buildings, life 50 m+ away, nothing Greek near the road. Plan: kerb dressing on pavement points (kiosks/periptero, taverna sets, bitter-orange trees, bougainvillea, souvlaki/koulouri carts, cats) as instanced meshes with smash-or-push colliders = drawn size, more Athens crowd clusters (LV_cn wrap), evzone guards at the Parliament from the ped pool (same scale, p.cw=2, no wave; edit LV release checks to p.cw===1), '#bus' athVeh (keep ATH_K length odd).
+
+## Status 2026-10-09
+- Final numbers (sequential, live v88t → v88u): draw calls Frankfurt 431 → 429, Athens 303 → 293; CPU driving Frankfurt mean ~3.8 → ~3.6 ms, p95/max within noise; Athens unchanged. Life code is ~0.1 ms. The CPU gains are within noise, so the real lag is most likely GPU/world (2.5M tris), which headless cannot measure.
+- Added ⚙ TUNE → Life → "Show FPS" (TUNE.perfHud): bottom-left line with fps, worst frame, JS ms, the frame's real draws and tris (the old #fps showed the last composer pass only). The perf-smooth checklist item asks Alex for a screenshot of it.
+- QUICK REVIEW sent for b9192327 (shots ath/v88u/sheet.png, ath/v88u/ath_monastiraki.png). After PASS: fetch live, merge if moved, `tools/build.sh v88u`, `git add -f out/v88u`, push, then DEPLOY to the coordinator.
+- QUICK PASS (b9192327). Review notes fixed: FPS line shortened to one ~320 px line; checklist perf-pc added. DEPLOY sent: alex/od-athens dadad854 out/v88u (on live v88t). This session stops here (context limit); a fresh worker starts at "Next: root cause (step 2)" above.
+
+## LIVE: v88u (2026-10-09, from alex/od-athens dadad854). The beta is republished.
+
+## Plan for the next worker (in this order; each ships separately with a review)
+### A · World draw calls / triangles (the real lag)
+- First measure: traverse `scene` at 3 Frankfurt + 3 Athens spots (ath/perf.js style); for every visible mesh record triangles × instance count, material, parent name/userData; print the top 30 + the sum per category (buildings/Kenney kits, terrain/ground, trees, clouds 150×6 boxes, landmarks, props, traffic, peds, Life). Write the table here.
+- Suspects: Kenney building kits at full detail at any distance (most of the 2.5M tris in Frankfurt); per-building meshes not merged per material (the ~430 draws); the cloud InstancedMesh (900 boxes, cheap but fills); terrain resolution.
+- Fix: merge static city geometry per material per ~200 m chunk (BufferGeometryUtils.mergeGeometries; keep colliders untouched); distance LOD per chunk (full ≤ 150 m, a simple box/roof per building beyond, nothing past fog); frustum culling per chunk (the cull code is hubCull* in 70_roam_world.js). Target: draws ≤ v88m + 10 % (~400 Frankfurt, ~275 Athens) and triangles roughly halved; check with the Show FPS line + perf.js; before/after shots at the same spots (lesson 7: no visual loss up close).
+- CPU (smaller): 150-car loop (groundAt + CR_susp each frame; v88u already thins far cars), miniDraw reads el.offsetParent (a layout read) every 2nd frame, allocations in LV_edges (slice/concat) and debris V3s.
+### B · 2× brick detail (Alex: "double the number of bricks and tiles … same for the city")
+- Only on top of A. Cars (93_cars_lego.js CR_*) and city facades: finer bricks, visible studs, tiles/plates/SNOT bands. Add the detail as merged geometry or normal-mapped/texture detail (studs as one instanced stud mesh per chunk), full detail ≤ 40-60 m, simplified beyond. Budget: draws ≤ v88m + 10 %, frame time ≤ v88u. Before/after shots at the same spots, side views of cars; the tyre gap must stay ≤ 0.05 m.
+### C · Athens busier (the original brief of this branch)
+- See the "Athens" bullet in "Next: root cause (step 2)" above; before-shots in ath/before/sheet.png from `node ath/shots6.js <url> <out>` (SET='TUNE.perfHud=1' shows the perf line). Keep the v88u people defaults unless Alex's perf-pc numbers allow more; the Athens dressing must be instanced (≤ +10 draws).
+
+## perf-3 (2026-10-17, alex/perf3-wip): NOT on trunk (TAG gates not run in the timebox; max frame not improved)
+1. Main find: V8 deopt loop. `TR_G` optimized→deopted ~5800x in 10 s and `roamTerr` ~400x ("insufficient type feedback for generic named access" on the TR_W fields, `JSFLAGS="--trace-deopt --trace-opt" DEBUG=pw:browser` in tools/perf1/tFrame.js). So every ground sample ran unoptimized and boxed its doubles. Fix: TR_G reads the grid fields from script lets.
+2. Also: LF_drapeOk uses scratch buffers; a per-tile drape-check cache (LF.dc); roamTerr/roamHit use indexed loops; DEST_find uses a 130 m node grid and an allocation-free Dijkstra (same distances, tested on random graphs).
+3. Athens, 30 s roam, run alone: allocated 9.9 GB→5.6 GB (~330→190 MB/s); median/p95/max 23.3/118/624→20.3/120/1027 ms (single runs, max is noisy). Frankfurt not measured.
+4. Left: run TAG=life1,xf1,terrain,mem,cam vs trunk, measure Frankfurt, look for the same deopt loop in TR_Y/groundY/LF_drapeOk (175/59/44 cycles), DEST_open garbage (roamHit 240 MB), computeVertexNormals in LF_drapeG, QA invariants (0.24 GB, skip outside ?qa).
+5. Draw calls (666-698) untouched.
+
 # HANDOFF perf (perf-2 landed on trunk)
 - Landed: alex/perf-wip 62418d5 (perf-2 GC cuts) merged with trunk 770da51 -> pushed FF to alex/od-int2 at 74ecd2b.
 - Gates: tools/build.sh v90m-beta.92 OK; unit 5327 pass, 0 FAIL, 13 known.
@@ -5,6 +58,11 @@
 - Trunk 770da51 same set reds: fra mem/stable, xf1/*, terr1/terrain-tyre-fra, life1/fra-density, life1/popup; ath terr1/terrain-tyre-ath, life1/ath-density, life1/carousel.
 - Left: perf/frame strict target not met; terr1 tyre-gap and xf1 red on both trunk and perf-wip.
 
+## perf-3 landed (2026-10-17): perf3-wip merged onto od-int2
+1. Perf harness, 30 s roam, median of 3 separate runs (median/p95/max ms, MB/s alloc): Athens trunk 20.8/45.8/308, 353 -> perf3 14.9/39.4/261, 183; Frankfurt trunk 13.2/33.6/287, 204 -> perf3 13.3/33.5/306, 178 (max is noise, runs 192-398).
+2. Gate on built page TAG=life1,xf1,terrain,smash2,cam,rv2k2,mem: perf3 59/67 vs trunk 56/67; no new reds (life1/people red once, passed on 2 reruns = flaky).
+3. Changes: TR_G deopt fix, LF_drapeOk scratch + drape cache, DEST_find grid. No flag needed.
+4. Left: same deopt loop in TR_Y/groundY/LF_drapeOk, DEST_open garbage, computeVertexNormals in LF_drapeG, QA invariants alloc. Draw calls untouched.
 ## perf-4 (2026-10-17, alex/perf4-wip): draw calls / tris breakdown, low-quality culling knobs
 1. Probe `tools/perf4/tTris.js <url> <out.json> [low|high] [fra,ath]`: wraps renderer.renderBufferDirect, 3 fixed spawn views per city, per-object calls/tris tagged by scene path, distance band (a<100 b<300 c<700 d>700 m) and bounding radius (R>400 = city-wide), + rAF ms.
 2. Before (q=low, trunk e59bc7d): Fra 401-462 calls / 2.30-2.43 M tris · Ath 247-450 / 1.40-1.62 M. ~60 % of tris are city-wide meshes (bounding radius 400-6900 m) that per-mesh culling can never hide: G(48 IMs)#2708 217k, Ath merged Mesh R6862 110k + IM R6090 86k, ctb_plinth (all plinths, R3657) 51-62k, rdZebra R3448 42k, Mesh#32 / Group#49 IMs 55k+54k. LIFE bm_s/bm_m (BatchedMesh) are counted at full size here but only draw visible items.
