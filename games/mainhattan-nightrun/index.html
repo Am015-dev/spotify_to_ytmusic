@@ -480,8 +480,8 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
       this.istep++;}},
   // B19 combo-driven music: the filter and the drum layer follow the combo tier (tier 1..4 = steps 0..3), changes land on the next bar line, a hit muffles the song for about a beat
   lpHz:[2500,6000,20000,20000],lyLog:[],recT:0,
-  lyStep(){return SET.react===false||!running?2:Math.max(0,Math.min(3,(this.tier|0)-1));},
-  lyDrum(){return this.drm&&SET.react!==false&&running?[0,0,.5,1][Math.max(0,Math.min(3,(this.tier|0)-1))]:0;},
+  lyStep(){return SET.react===false||!running?2:this.fever?3:Math.max(0,Math.min(3,(this.tier|0)-1));},
+  lyDrum(){return this.drm&&SET.react!==false&&running?this.fever?1:[0,0,.5,1][Math.max(0,Math.min(3,(this.tier|0)-1))]:0;},
   dlive(){return !!this.drm&&this.lyDrum()>0;},
   lyPlan(a,now,at){const L=this.lp.frequency,D=this.drm.gain,f=this.lpHz[this.lyStep()],d=this.lyDrum()*.34;
     L.cancelScheduledValues(now);D.cancelScheduledValues(now);L.setTargetAtTime(f,at,.12);D.setTargetAtTime(d,at,.12);
@@ -515,6 +515,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
   stSynth(n,t){const F=this.stb,f=k=>this.f(k),o=(dt,ty,k,dur,v,sl)=>this.osc(t+dt,ty,f(k),dur,v,F,sl?f(sl):0);
     if(n==='perfect'){o(0,'sine',100,.14,.04);o(.04,'sine',107,.2,.035);}
     else if(/^tierup/.test(n)){const m=+n.slice(6)||1;[0,4,7,12,16].slice(0,2+m).forEach((k,i)=>o(i*.07,'triangle',72+k+3*m,.22,.07));}
+    else if(n==='fever'){[0,7,12,19,24].forEach((k,i)=>o(i*.06,'sawtooth',72+k,.5,.05));o(0,'sine',48,.7,.12,36);}
     else if(n==='phase'){o(0,'sine',52,.5,.14,40);o(.12,'triangle',64,.3,.06);}
     else if(n==='boss-in'){o(0,'sawtooth',40,.9,.07,36);o(0,'sine',40,.9,.14,32);o(.4,'triangle',76,.4,.05);}
     else if(n==='clear'){[0,4,7,12,16].forEach((k,i)=>o(i*.09,'triangle',72+k,.3,.08));}
@@ -961,7 +962,7 @@ function floater(x,y,txt,c='#ffffff'){G.fl.push({x,y,txt:say(txt),c,l:1});}
 const shake=v=>{G.shake=Math.max(G.shake,v*[0,.45,1][SET.shake]*(SET.rm?.3:1));};
 const TS=6,TIERS=4;                                      // power points per tier, number of tiers
 const tierOf=n=>Math.min(TIERS,1+Math.floor(n/TS));
-const comboK=()=>tierOf(C.n);                            // score multiplier = tier (x1..x4)
+const comboK=()=>tierOf(C.n)*(window.RET&&RET.fever&&RET.fv.on?RET.fv.k:1);                            // score multiplier = tier (x1..x4)
 const TIERC=['#b9b3e6','#19e3ff','#ffe14d','#ff2d95'];  // meter colour per tier
 function tierSet(n,why,x,y){const t0=tierOf(C.n);C.n=clamp(n,0,TIERS*TS-1);const t1=tierOf(C.n);AU.tier=t1;
   if(t1!==t0){G.tpop=.7;G.tdir=t1>t0?1:-1;
@@ -1158,7 +1159,7 @@ function update(dt){
     if(P.dashT>0&&dd<26){b.dead=1;G.score+=Math.round(25*G.mult*(P.dashPf?2:1));P.heat=Math.max(0,P.heat-6);burst(b.x,b.y,D.b,4,120,.3);continue;}
     if(dd<b.r+3){b.dead=1;hurt(b.dmg);continue;}
     if(!b.g&&dd<24+Math.max(0,b.r-6)){b.g=1;const pf=tryPerfect('graze',null,P.x,P.y);G.score+=Math.round(10*G.mult*(pf?2:1));P.heat=Math.max(0,P.heat-4);G.mult=Math.min(9.9,G.mult+.02);
-      if(!SET.calm)G.pt.push({x:(b.x+P.x)/2,y:(b.y+P.y)/2,vx:0,vy:-30,l:.3,m:.3,c:'#ffffff',sz:2});AU.sfx('graze');}}
+      if(!SET.calm)G.pt.push({x:(b.x+P.x)/2,y:(b.y+P.y)/2,vx:0,vy:-30,l:.3,m:.3,c:'#ffffff',sz:2});AU.sfx('graze');NR.emit('graze',{pf:!!pf});}}
   G.eb=G.eb.filter(b=>!b.dead);
 
   /* pickups */
@@ -3538,6 +3539,45 @@ RET.sioUI=(()=>{const X=RET.sio,$$=id=>document.getElementById(id);let box=null,
   NR.on('runEnd',()=>{if(RET.saveio)X.persist();});
   return{build,refresh,onOpen,code,toast};})();
 
+/* ===== B21 FEVER: grazes and PERFECTs fill a thin meter at the top edge; when it is full the next bar starts 8 bars of FEVER (score x1.5, music fully open,
+   gold edge glow). No extra damage or fire rate: it only pays in score. Needs movement (a still ship fills nothing), once per 32 bars, never with a boss
+   on screen. Flag off = the old game. The music reads AU.fever (a.js lyStep/lyDrum), the score reads RET.fv.k (b.js comboK). ===== */
+if(RET.fever===undefined)RET.fever=!/[?&]fever=0/.test(location.search);
+const FV=RET.fv={m:0,on:false,armed:false,bars:0,tb:0,last:-99,k:1.5,len:8,gap:32,gz:.025*100,pf:6,dash:8,starts:0,still:1.5};
+RET.fvEl=null;
+RET.fvDom=function(){let e=RET.fvEl;if(e&&e.isConnected)return e;e=document.createElement('div');e.id='retFv';e.setAttribute('aria-hidden','true');
+  e.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:6;opacity:1;';
+  e.innerHTML='<div class="fvGl" style="position:absolute;inset:0;opacity:0;box-shadow:inset 0 0 26px 5px rgba(255,210,61,.55)"></div>'+
+    '<div class="fvTr" style="position:absolute;left:12%;right:12%;top:1px;height:4px;border-radius:2px;background:rgba(255,255,255,.14)"><div class="fvBar" style="height:100%;width:0;border-radius:2px;background:#19e3ff"></div></div>';
+  ($('stage')||document.body).appendChild(e);RET.fvEl=e;return e;};
+RET.fvDraw=function(){if(!RET.fever){if(RET.fvEl)RET.fvEl.style.display='none';return;}
+  const e=RET.fvDom(),bar=e.querySelector('.fvBar'),gl=e.querySelector('.fvGl'),mo=RET.motion();e.style.display='';
+  const w=FV.on?100*(FV.len-FV.bars)/FV.len:FV.m;
+  bar.style.transition=mo?'width .2s linear':'none';bar.style.width=Math.max(0,Math.min(100,w))+'%';
+  bar.style.background=FV.on?'#ffd23d':(FV.m>=100||FV.armed?'#ffe9a0':'#19e3ff');
+  gl.style.transition=mo?'opacity .4s':'none';gl.style.opacity=FV.on?'1':'0';};
+RET.fvReset=function(){const was=FV.on||FV.armed;FV.m=0;FV.on=false;FV.armed=false;FV.bars=0;FV.last=-99;FV.tb=0;AU.fever=false;if(was)try{AU.lyTick(AU.a);}catch(x){}RET.fvDraw();};
+RET.fvStop=function(){const was=FV.on;FV.on=false;FV.armed=false;FV.bars=0;AU.fever=false;if(was&&running)floater(W*.5,H*.3,'FEVER OVER','#ffd23d');RET.fvDraw();};
+RET.fvGain=function(v){if(!RET.fever||!running||G.dead||G.over||FV.on||FV.armed||G.boss||STILL.t>FV.still)return false;
+  FV.m=Math.min(100,FV.m+v);RET.fvDraw();return true;};
+RET.fvReady=()=>RET.fever&&running&&!G.dead&&!G.boss&&FV.m>=100&&FV.tb-FV.last>=FV.gap;
+NR.on('runStart',()=>{RET.fvReset();});
+NR.on('runEnd',()=>{RET.fvReset();});
+NR.on('stageClear',()=>{RET.fvReset();});
+NR.on('districtEnd',()=>{RET.fvStop();FV.m=0;RET.fvDraw();});
+NR.on('bossIn',d=>{if(FV.on||FV.armed)RET.fvStop();});
+NR.on('graze',()=>{RET.fvGain(FV.gz);});
+NR.on('perfect',d=>{RET.fvGain(d&&d.kind==='dash'?FV.dash:FV.pf);});
+NR.on('beat',d=>{if(!RET.fever){if(RET.fvEl&&RET.fvEl.style.display!=='none')RET.fvEl.style.display='none';return;}if(!d||d.i%4!==3)return;   // the beat before a bar line: arm / disarm the music so its layers change on that line
+  if(FV.on){if(FV.bars>=FV.len-1)AU.fever=false;}
+  else if(!FV.armed&&RET.fvReady()){FV.armed=true;AU.fever=true;}});
+NR.on('bar',()=>{if(!RET.fever)return;FV.tb++;
+  if(FV.on){if(++FV.bars>=FV.len)RET.fvStop();else RET.fvDraw();return;}
+  if(FV.armed){FV.armed=false;
+    if(!RET.fvReady()){AU.fever=false;return;}
+    FV.on=true;FV.bars=0;FV.m=0;FV.last=FV.tb;FV.starts++;AU.fever=true;
+    floater(W*.5,H*.3,'FEVER ×'+FV.k,'#ffd23d');G.flash=Math.max(G.flash,.25*FX());if(RET.sting)AU.sting('fever');RET.fvDraw();}});
+
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
    The LAB is a real run with G.lab set: no waves, no district clock, no boss timer, no chest or pit stop, god mode on. What appears is decided by the panel at the bottom:
    BOSS (gallery: pick any boss and its district, replay the intro, lock a phase, force an attack pattern, hold any pose of its sprite sheet, hit flash, death + respawn),
@@ -3992,6 +4032,7 @@ const NR_CHECKLIST=[
  {ver:'I8',id:'one-more-run',text:'The game-over and stage-clear screens now show a bar to the cheapest thing you can still unlock, and a big ONE MORE RUN button that restarts at once. Does the bar make you want one more go?'},
  {ver:'R5',id:'no-walls',text:'Kill-goal stages (Roemer, Freight Yard, Loading Dock, Boardroom, Olive Road) ask for fewer kills in Arcade, and Talos fires fewer lasers. Is there still a stage where you get stuck?'},
  {ver:'L2',id:'save-backup',text:'Settings > Save: EXPORT your whole progress as a file or a code, and IMPORT it on another device or after a wipe. Importing asks first and keeps your old save for one UNDO. Try it: export, then import it back. Does it feel safe?'},
+ {ver:'N1',id:'fever',text:'FEVER: graze bullets and hit PERFECT beats to fill the thin bar at the top. When it is full, the next bar starts 8 bars of FEVER: score x1.5, the music opens fully and the edges glow gold. Does it feel like a reward?'},
  {ver:'I6',id:'new-ships',text:'Three new ships in Garage > SHIPS: Drift (a wide fan), Lancer (a piercing lance every second shot) and Nova (a ring burst every third shot). They show as shapes until the art arrives. Do they feel different and worth the price?'},
  {ver:NR_VER,id:'title-diet',text:'The title has only PLAY or CONTINUE (your next stage, in one tap), ENDLESS, DAILY, GARAGE and MENU. Story map, weekly run, weapons, lab, checklist, Flight School, settings and difficulty are in MENU. Is everything easy to find and big enough to hit?'},
  {ver:'I6',id:'badges',text:'The difficulty button on the title and the LAB show a badge per difficulty, and the stage clear screen shows a medal. Garage ship cards now show the painted ship portraits.'},
