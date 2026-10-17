@@ -15,13 +15,13 @@ const LEAK=window.LEAK={
   free:2,                                                // leaks that only warn
   W:{drone:1,flank:1,charger:1,turret:1,gtank:1,gturret:1,gwalker:1,gunship:3},   // leak weight per type (elite / leader: 3)
   GT:{gtank:{r:22,hp:10,score:350,ml:1.5},gturret:{r:18,hp:7,score:300,ml:1.2},gwalker:{r:28,hp:22,score:600,ml:2.8}},
-  log:[],M:0,quiet:0,total:0,paid:0,warn:0,noFev:false,flashT:0,txt:'',txtT:0,gap:0,waves:0,gaps:0,ground:0,okWaves:0,inited:false,
+  log:[],sCost:0,M:0,quiet:0,total:0,paid:0,warn:0,noFev:false,flashT:0,txt:'',txtT:0,gap:0,waves:0,gaps:0,ground:0,okWaves:0,inited:false,
   en:(t,o)=>en(t,o),                                      // for the tests (en lives inside the page closure)
   on(){return !!RET.leak;},
   hard(){return HARDS.includes(SET.diff);},
   heat(){return !!(window.HEAT&&ST.on&&HEAT.lv(ST.n)>0);},
   cap(){return this.free+(this.grp[SET.diff]||2);},
-  reset(){this.log=[];this.M=0;this.quiet=0;this.total=0;this.paid=0;this.warn=0;this.noFev=false;this.flashT=0;this.txtT=0;this.gap=0;this.waves=0;this.gaps=0;this.ground=0;this.okWaves=0;LEAK.rdy(false);},
+  reset(){this.log=[];this.sCost=0;this.M=0;this.quiet=0;this.total=0;this.paid=0;this.warn=0;this.noFev=false;this.flashT=0;this.txtT=0;this.gap=0;this.waves=0;this.gaps=0;this.ground=0;this.okWaves=0;LEAK.rdy(false);},
   /* ---- pacing ---- */
   spdK(){if(!this.on()||G.lab||G.tut||this.heat())return 1;return this.spd[SET.diff]||1;},
   es(e){return e.gnd||e.type==='boss'||e.type==='gate'?1:this.spdK();},        // speed factor of one enemy (b.js enemy loop)
@@ -60,10 +60,11 @@ const LEAK=window.LEAK={
     floater(34,clamp(e.y,60,H-90),this.M<=this.free?'LEAK '+Math.min(this.M,this.free)+'/'+this.free:'LEAK','#ff6a7a');
     while(this.M>=this.cap())this.pay();},
   pay(){this.M=this.free;this.paid++;
+    if(this.sCost>=Math.max(1,Math.floor(P.max/2))){this.say('BREACH: hull holds');return;}   // a stage's breach never takes more than half the hull
     if(!this.hard()&&P.hp<=1){this.say('BREACH: hull holds');return;}
     const hp0=P.hp,sh0=SH.sh,inv=P.inv,dq=P.dq,dh=P.dashT;P.inv=0;P.dq=0;P.dashT=0;hurt(1);
     if(P.hp>=hp0){P.inv=inv;P.dq=dq;P.dashT=dh;}
-    this.say(P.hp<hp0?'BREACH: -1 hull':'BREACH: blocked');this.cost=(this.cost|0)+(P.hp<hp0?1:0);},
+    this.say(P.hp<hp0?'BREACH: -1 hull':'BREACH: blocked');if(P.hp<hp0){this.cost=(this.cost|0)+1;this.sCost++;}},
   say(t){this.txt=t;this.txtT=2.6;floater(W*.5,H*.28,t,'#ff3050');shake(6);},
   /* ---- HUD: a thin BREACH meter in the stat strip, red as it fills ---- */
   draw(c,x,y3,k,right){if(!this.on()||!running||G.lab||G.tut||ST.over)return;const f=Math.min(1,this.M/this.cap()),t=c.getTransform(),u=Math.hypot(t.a,t.b)*(c.canvas.getBoundingClientRect().width/c.canvas.width||1),
