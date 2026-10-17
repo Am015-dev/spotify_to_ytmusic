@@ -1,0 +1,6 @@
+# HANDOFF rev-79 (2026-10-17): v90m-beta.79 = GO
+1. Tested trunk sha 5aa1cd3 (73c20a5 slow1 props off roads + GO, 265c390 throwing GO = FAIL, 5ff5672 PACE2 ON). Built v90m-beta.79: page 3,133,131 B (split). Changelog commit adds the beta.79 entry only. Not deployed.
+2. Unit: 0 FAIL, 4812 pass (13 known). ?pace2=0 loads with 0 errors.
+3. TAG=rv2k2,slow1,life1,xf1,terrain 47/56: reds are SLOW-only (software GL), life1/ath-density (known, 59/60). rv2k2/pace, close, slow1/spots, slow1/spots-ath, warp-traffic PASS. No GO threw (no new runner FAILs). Alone: terr1/terrain-tyre-ath PASS; life1/smash is FLAKY ("no smashable with a clear run-up"): fails ~1 in 3 runs both with ?pace2=0 and with PACE2 on, so not a PACE2 effect.
+4. TAG=rv2k 20/23: reds objectives (known flaky, 3 widgets vs 2), foliage and card (SLOW only). walls-ath PASS (it was lost in rev-78).
+5. Shots docs/shots/rev79 (852x393, looked at): ath_street_1 (Athens -2462,-1516: clear road, no props), yield_1..3 (Frankfurt at 75-100 km/h: traffic aside / lane open). tools/tRev79Shots.js makes them. Note: xf1/grass, xf1/slope and life1/smash can show odd text in a long mixed TAG run (state bleeds between items); alone/own run they pass.
