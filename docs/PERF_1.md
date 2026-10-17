@@ -32,3 +32,8 @@ The GO starts right at drivable, while lazy zones, LF tiles and the ground pump 
 1. Rerun `tools/perf1/tFrame.js` pf0 vs pf2 alone (no parallel runs) in fra/ath, desktop and `LOWMEM=1`, for clean before/after numbers.
 2. Profile inside the GO window (`PROF=1`) and fix sources 5-9. Then see whether p95 ≤ 8 ms is reachable on the cloud CPU, or whether the GO needs a cloud-calibrated budget.
 3. Heap +5 MB/s: find the allocators.
+
+## Gates on built pf2 (TAG=life1,xf1,terrain,mem,rv2k2,cam/stable,perf, fra+ath in parallel)
+58/73 · unit 0 FAIL · rv2k2 and cam/stable green in both cities.
+- perf/frame: Frankfurt median 10.0 / p95 23.0 / max 171 ms; Athens median 20.0 / p95 100 / max 409 ms. **RED**.
+- The other reds are mem/stable, the SLOW-only xf1/terr1/life1 lines, terr1/terrain-tyre-ath and terr6/terrain-slope-ath. The same names were red on trunk in crash-6/7. The trunk rerun was cut short, so a same-name comparison is still owed.
