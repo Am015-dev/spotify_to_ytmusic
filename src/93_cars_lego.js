@@ -325,7 +325,7 @@ const CR_hudS={k:'',t:0};
 function CR_hud(){const n=document.getElementById('m1Next'),a=document.getElementById('roamArrow'),pl=document.getElementById('roamPlate'),tu=document.getElementById('roamTut');
  const vis=e=>!!e&&!e.hidden&&getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'&&e.getClientRects().length>0;
  const m=vis(n)&&!!a;document.body.classList.toggle('crMerge',m);
- if(m){let d=n.querySelector('.crD');if(!d){d=document.createElement('em');d.className='crD';n.appendChild(d)}const sp=a.querySelector('span');d.textContent=sp?sp.textContent.trim():''}
+ if(m){let d=n.querySelector('.crD');if(!d){d=document.createElement('em');d.className='crD';n.appendChild(d)}const sp=a.querySelector('span');const pr=document.getElementById('roamPrompt');d.textContent=sp&&!vis(pr)?sp.textContent.trim():''}
  if(pl){const k=pl.textContent;const now=performance.now();if(k!==CR_hudS.k){CR_hudS.k=k;CR_hudS.t=now}pl.classList.toggle('crHide',now-CR_hudS.t>2000||vis(tu))}}
 setInterval(CR_hud,250);
 // tutorial card: keep >= 8 px clear of the touch controls (between ▶ and BRAKE)
