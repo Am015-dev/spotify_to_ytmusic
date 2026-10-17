@@ -188,7 +188,7 @@ hitPop=(f=>function(t,col){try{if(/SMASH|TAKEDOWN/.test(String(t))&&performance.
 // R3b: HUD hints (smash hint, prompts, tutorial, pops) hide while any panel or overlay is open
 const R3B_PANELS=['journal','m1Cs','roamMap','roamFT','story','roamCard','cmap','slots','roamPause','profile','pause','results','spRes','chRes','menu','r3Up','tuD','gbx'];
 function R3B_panelOpen(){for(const id of R3B_PANELS){const e=document.getElementById(id);if(e&&!e.hidden&&e.getClientRects().length&&getComputedStyle(e).visibility!=='hidden')return true}return false}
-function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document.createElement('div');h.id='crSmHint';h.textContent='TAP TAP = SMASH';document.body.appendChild(h)}
+function CRSM_hint(){let h=document.getElementById('crSmHint');if(!h){h=document.createElement('div');h.id='crSmHint';h.textContent='HIT FAST = SMASH';document.body.appendChild(h)}
  const tl=document.getElementById('tL'),tr=document.getElementById('tR'),T=document.getElementById('touch');
  const on=CRSM.hn<2&&(state==='roam'||state==='race')&&!paused&&!!T&&!T.hidden&&!!tl&&tl.getClientRects().length>0&&!(state==='roam'&&(RO.card||RO.mapOpen||RO.story||RO.wk))&&!R3B_panelOpen();document.body.classList.toggle('odPanel',R3B_panelOpen());
  if(!on){h.classList.remove('on');return}h.classList.add('on');const a=tl.getBoundingClientRect(),b=tr.getBoundingClientRect(),w=h.offsetWidth,hh=h.offsetHeight;

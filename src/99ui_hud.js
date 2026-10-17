@@ -12,7 +12,7 @@
   mo.takeRecords()}catch(e){}};
  setInterval(gov,150);
 }
-// hudstack-1: ONE left-side HUD stack for the activity prompt (roamPrompt), the objective card (roamPop) and the TAP TAP hint (crSmHint).
+// hudstack-1: ONE left-side HUD stack for the activity prompt (roamPrompt), the objective card (roamPop) and the HIT FAST hint (crSmHint).
 // Priority prompt > objective > hint, at most 2 shown, the hint hides while a prompt shows, stacked with a gap in the column right of the minimap.
 function HUDSTACK_layout(){const G=id=>document.getElementById(id),S=['roamPrompt','roamPop','crSmHint'].map(G).filter(Boolean);
  for(const e of S)e.classList.remove('ui1X');
@@ -26,7 +26,7 @@ function HUDSTACK_layout(){const G=id=>document.getElementById(id),S=['roamPromp
  for(const e of sh){const q=(k,v)=>e.style.setProperty(k,v,'important');q('position','fixed');q('left',x+'px');q('top',y+'px');q('right','auto');q('bottom','auto');q('transform','none');q('margin','0');q('width','auto');q('min-width','0');q('max-width',w+'px');y+=Math.ceil(e.getBoundingClientRect().height)+6}
  return sh}
 const HUDSTACK_css=document.createElement('style');HUDSTACK_css.textContent='html body #roamPop,html body #roamPop *{font-size:12px!important;line-height:1.25!important}html body #roamPop h5{display:inline;margin:0 6px 0 0}';document.head.appendChild(HUDSTACK_css);
-function HUDSTACK_go(say,P,ok){const m=RO.marks.find(q=>q.kind==='quest'||q.kind==='collect')||RO.marks[0];if(m)RV14_near(m,10);CRSM.hn=0;const tick=()=>{RO.pop={k:'smash',name:'SMASH 20',goal:20,lim:25,v:0,t:0,txt(){return '0/20'}};if(m)RO.pmNew=m;RO.pmT=2.5};tick();const iv=setInterval(tick,100);
+function HUDSTACK_go(say,P,ok){const m=RO.marks.find(q=>q.kind==='quest'||q.kind==='collect')||RO.marks[0];if(m)RV14_near(m,10);CRSM.hn=0;const tick=()=>{/* r3E: a warm page opens the mission card within the first second, which hides the card and the hint: keep every panel and the card closed while measuring */RO.card=null;for(const id of R3B_PANELS){const e=document.getElementById(id);if(e)e.hidden=true}RO.paused=false;RO.pop={k:'smash',name:'SMASH 20',goal:20,lim:25,v:0,t:0,txt(){return '0/20'}};if(m)RO.pmNew=m;RO.pmT=2.5};tick();const iv=setInterval(tick,100);
   setTimeout(()=>{clearInterval(iv);tick();setTimeout(()=>{const sh=HUDSTACK_layout(),R=sh.map(e=>e.getBoundingClientRect()),sm=[...document.querySelectorAll('#roamMini,#map')].map(RV14_vis).filter(Boolean);let ov=0;for(let i=0;i<R.length;i++){for(let j=i+1;j<R.length;j++)ov+=RV14_ovl(R[i],R[j]);for(const c of sm)ov+=RV14_ovl(R[i],c);for(const id of ['tL','tR','tG','tB'])ov+=RV14_ovl(R[i],RV14_vis(document.getElementById(id)))}
    const small=sh.some(e=>[...e.querySelectorAll('*'),e].some(x=>x.childNodes[0]&&x.childNodes[0].nodeType===3&&parseFloat(getComputedStyle(x).fontSize)<12)),ids=sh.map(e=>e.id).join('+');RO.pop=null;RO.pm=null;
    say('📍 LEFT HUD STACK ('+P+') · cards shown: '+ids+' (≤ 2, prompt has priority, no hint beside the prompt) · overlap with each other, minimap or controls '+ov+' px² (0) · text under 12 px: '+(small?'yes':'no')+ok(sh.length>=1&&sh.length<=2&&!ov&&!small&&!(ids.includes('roamPrompt')&&ids.includes('crSmHint'))))},300)},1000);return'📍 LEFT HUD STACK · setting up prompt + SMASH objective…'}

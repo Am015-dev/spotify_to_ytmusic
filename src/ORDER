@@ -122,6 +122,7 @@
 98cam_size_cam.js
 98dmg_damage.js
 98sm2_smash2.js
+98r3e_r3e.js
 98gx_gfx.js
 98ev_env.js
 98as_assets.js
@@ -140,4 +141,3 @@
 98bt_boot2.js
 98ob2_onboard.js
 99_api.js
-98r3e_r3e.js

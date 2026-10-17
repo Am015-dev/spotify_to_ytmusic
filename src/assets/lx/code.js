@@ -251,7 +251,7 @@ function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v
  let cheer=0;
  for(const it of S?LIFE.L:LIFE.D){const dx=it.x-RO.x,dz=it.z-RO.z,d2=dx*dx+dz*dz;
   if(it.c==='sm')LIFE_put(M['x_'+it.t],cnt,it.x,it.y,it.z,0,it.h,0,1);
-  else if(it.c==='pop'){const kk=it.kk,hy=kk?kk.y0-it.y+LIFE_KK.hgt+2.4:3.2;if(kk)LIFE_put(M.kick,cnt,it.x,kk.y0,it.z,0,it.h,0,1);const busy=it.cd>t;if(busy)continue;const bob=Math.sin(t*2+it.x)*.4,i=LIFE_put(M.pop,cnt,it.x,it.y+hy+bob,it.z,t*.8,t*1.3,0,1);if(i>=0){_lfC.set(it.K.col);M.pop.setColorAt(i,_lfC);LIFE_put(M.ring,cnt,it.x,it.y+hy,it.z,0,it.h,t*1.5,1);M.ring.setColorAt(i,_lfC)}}
+  else if(it.c==='pop'){const kk=it.kk,hy=kk?kk.y0-it.y+LIFE_KK.hgt+2.4:3.2;if(kk)LIFE_put(M.kick,cnt,it.x,kk.y0,it.z,0,it.h,0,1);const busy=it.cd>t;if(busy)continue;const i=LIFE_put(M.ring,cnt,it.x,it.y+.35,it.z,Math.PI/2,0,0,2.3);/* r3E: a flat ground ring like every other marker; the floating translucent sphere over the lane is gone */if(i>=0){_lfC.set(it.K.col);M.ring.setColorAt(i,_lfC)}}
   else if(it.c==='set'){const T=it.t,tt=t+it.ph;LIFE_put(M['s_'+T],cnt,it.x,it.y,it.z,0,it.h,0,1);const m=M['m_'+T];
    if(T==='windmill')LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.25,it.y+7.2,it.z+Math.cos(it.h)*1.25,0,it.h,tt*1.4,1);
    else if(T==='turbine'){const H=LIFE.TB;if(H){const c=Math.cos(it.h),sn=Math.sin(it.h);LIFE_put(m,cnt,it.x+H.x*c+H.z*sn,it.y+H.y,it.z-H.x*sn+H.z*c,0,it.h,tt*2.2,1)}else LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.2,it.y+13.2,it.z+Math.cos(it.h)*1.2,0,it.h,tt*2.2,1)}

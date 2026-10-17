@@ -7,7 +7,7 @@ const SM2={on:!/[?&]smash2=0/.test(location.search),n:{tap:0,smash:0,bricks:0,ca
 function SM2_boost(){return RO.turbo>0||!!(pl&&pl.nitro)}
 function SM2_imp(sp,tx,tz){const l=Math.hypot(tx,tz)||1,h=RO.vh??RO.h,d=(Math.sin(h)*tx+Math.cos(h)*tz)/l*(RO.v<0?-1:1);return Math.abs(sp)*3.6*(.3+.7*Math.max(0,d))}
 // true = a smash; kind 'small' | 'big' | 'car'
-function SM2_smash(kind,imp){const T=kind==='small'?TUNE.sm2Small??28:kind==='car'?TUNE.sm2Car??45:TUNE.sm2Big??45,s=SM2_boost()||imp>=T;SM2.n[kind==='car'?(s?'carSmash':'carTap'):(s?'smash':'tap')]++;SM2.last={kind,imp:Math.round(imp),smash:s};return s}
+function SM2_smash(kind,imp){const T=kind==='small'?TUNE.sm2Small??28:kind==='car'?TUNE.sm2Car??45:TUNE.sm2Big??45,s=SM2_boost()||imp>=T;SM2.n[kind==='car'?(s?'carSmash':'carTap'):(s?'smash':'tap')]++;SM2.last={kind,imp:Math.round(imp),smash:s};if(s&&typeof CRSM!=='undefined'&&CRSM.hn<2)CRSM_fired();/* r3E: the HIT FAST hint counts real smashes (≥ 45 km/h or boost) */return s}
 // a bump: once per thing per 0.6 s a tiny speed loss (into-the-thing part only), a few loose bricks, a soft thud
 function SM2_bump(o,x,y,z,nx,nz,cols,nb){const t=performance.now();if(t-(o.sm2T||0)<600)return;o.sm2T=t;const h=RO.vh??RO.h,cin=Math.max(0,(Math.sin(h)*nx+Math.cos(h)*nz)*(RO.v<0?-1:1));RO.v*=1-.08*cin;
  const n=nb||3;SM2.n.bricks+=n;try{debris(V3(x,y+1,z),V3(nx*2,4,nz*2),n,cols,.35,y)}catch(e){}try{AU.sfx('bump')}catch(e){}shake=Math.max(shake,.08)}
