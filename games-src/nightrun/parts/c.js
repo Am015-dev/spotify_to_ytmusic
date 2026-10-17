@@ -162,12 +162,13 @@ const SCHEMA=[
   {g:'Visuals',rows:[{k:'part',l:'Particles',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'shake',l:'Screen shake',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'flash',l:'Flashing',o:[[0,'Off'],[1,'Reduced'],[2,'Full']]},
     {k:'q',l:'Quality',o:[['L','Low'],['M','Medium'],['H','High']]},{k:'fps',l:'FPS cap',o:[[30,'30'],[60,'60']]},{k:"pal",l:"Colour theme",o:[['neon','Neon'],['cb','Blue-orange'],['term','Terminal']]},{k:'fpsc',l:'FPS counter',o:OFFON}]},
   {g:'Accessibility',rows:[{k:'rm',l:'Reduced motion',o:OFFON},{k:'hc',l:'High-contrast bullets',o:OFFON}]}];
+if(window.RET&&RET.assistSchema)RET.assistSchema(SCHEMA);
 const PALS={neon:null,cb:{a:'#ffb020',b:'#4aa3ff'},term:{a:'#3dff7a',b:'#d6ffe0'}};
 let palOn='neon';
 function applyPal(){if(palOn===SET.pal)return;palOn=SET.pal;const th=PALS[SET.pal];
   for(const D of DISTRICTS){if(!D.a0){D.a0=D.a;D.b0=D.b;}D.a=th?th.a:D.a0;D.b=th?th.b:D.b0;}
   for(const k in BGC)delete BGC[k];for(const k in BGPC)delete BGPC[k];}
-function applySet(){deriveSet();AU.vol();DF=DIFFS[SET.diff]||DIFFS.normal;HARD=HARDS.includes(SET.diff);applyPal();
+function applySet(){if(window.RET&&RET.assistApply)RET.assistApply();deriveSet();AU.vol();DF=DIFFS[SET.diff]||DIFFS.normal;HARD=HARDS.includes(SET.diff);applyPal();
   stage.classList.toggle('ds-S',SET.dsize==='S');stage.classList.toggle('ds-L',SET.dsize==='L');document.documentElement.classList.toggle('hc',!!SET.hc);
   $('fpsEl').hidden=!FPSOK();fit();
   if(typeof diffDraw==='function')diffDraw();}
@@ -204,7 +205,7 @@ function calFrame(){const pad=$('calPad');if(!pad||setEl.hidden||!CAL.on)return;
 $('setBack').addEventListener('click',closeSettings);
 $('setBtn').addEventListener('click',()=>openSettings('title'));
 $('pSetBtn').addEventListener('click',()=>openSettings('pause'));
-buildSettings();
+buildSettings();if(window.RET&&RET.assistBuild)RET.assistBuild();
 function setPause(on){if(!running||on===paused)return;paused=on;pauseEl.hidden=!on;
   if(on){const v=HUDX.vals();$('pStats').textContent=`Hull ${v.hp}/${v.max} · Shield ×${v.sh} · Dash ${v.dash}/${v.dashMax}`+(v.rev?` · Revive ×${v.rev}`:'')+(v.drones?` · Drones ×${v.drones}`:'')+` · Perks ${v.perks} · Upgrades ${v.upg}`;}   // the counters the phone HUD hides while you play
   if(on){AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}
@@ -215,7 +216,9 @@ function start(daily){if(running)return;if(ST.on){startStory(ST.n);return;}AU.un
 function restart(){if(ST.on){const n=ST.n;running=false;paused=false;startStory(n);return;}const dl=G.daily;if(G.weekly)RET.wkPending=true;running=false;paused=false;start(dl);}
 function quitToTitle(){if(running)NR.emit('runEnd',{quit:true});ST.on=false;ST.over=false;selEl.hidden=true;resEl.hidden=true;$('stBtn2').hidden=true;running=false;paused=false;pauseEl.hidden=true;overEl.hidden=true;titleEl.hidden=false;newGame();G.banner.t=0;P.x=-200;AU.resume();AU.menuMusic();syncUI();showBest();}
 function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false;NR.emit('runEnd',{score:G.score,di:G.di,kills:G.kills});const D=DISTRICTS[G.di];const dist=D.name+(G.loop?' +'+G.loop:'');let eye='Signal lost';
-  if(G.weekly)eye=RET.weeklyEnd(G.score);
+  const asr=RET.assistRun();
+  if(asr)eye='Assist run ⓐ · no record';
+  else if(G.weekly)eye=RET.weeklyEnd(G.score);
   else if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;

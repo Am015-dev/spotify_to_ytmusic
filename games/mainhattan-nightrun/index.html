@@ -218,7 +218,7 @@ let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBes
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 // every setting, its default and (in c.js) its row in the settings panel. Saved under mnr_set, applied live by applySet().
 const DEFS={music:.45,sfx:.8,master:1,duck:true,react:true,mute:false,diff:'normal',hud:'min',auto:true,aim:false,layout:'right',sens:3,dsize:'M',win:'normal',all:false,sync:0,cue:'M',
-  part:1,shake:2,flash:RM?1:2,rm:RM,hc:false,pal:'neon',q:'M',fps:60,fpsc:false};
+  part:1,shake:2,flash:RM?1:2,rm:RM,hc:false,pal:'neon',q:'M',fps:60,fpsc:false,asSpd:100,asBul:100,asHull:0,asWin:0,asBig:false};
 const SET=Object.assign({},DEFS,load('mnr_set',{}));
 if(!SET.v3){SET.v3=1;if(SET.guide===false)SET.cue='off';if(SET.reduce){SET.rm=true;SET.flash=1;}SET.part=1;SET.music=Math.min(SET.music,.45);   // older saves: calm visuals everywhere, music under the effects
   if(load('mnr_hard',false))SET.diff='hard';delete SET.guide;delete SET.calm;delete SET.reduce;delete SET.mv2;}
@@ -280,7 +280,7 @@ function audible(ts){                                    // music-clock seconds 
   return fbT-(performance.now()-p)/1000+SET.sync/1000;}
 const bpos=ts=>(audible(ts)-BT.t0-BT.off)/BT.spb;       // beats since beat 0
 const WINS={tight:70,normal:110,loose:160};
-const winMs=()=>(WINS[SET.win]||110)+NR.mod.win;         // half-width of the on-beat window in ms
+const winMs=()=>(WINS[SET.win]||110)+NR.mod.win+RET.asWinMs();         // half-width of the on-beat window in ms
 function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:(SET.all||Math.abs(dt)<=winMs())&&p>-.3,dt,beat:n};}
 const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beats at the current tempo
 
@@ -480,8 +480,8 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
       this.istep++;}},
   // B19 combo-driven music: the filter and the drum layer follow the combo tier (tier 1..4 = steps 0..3), changes land on the next bar line, a hit muffles the song for about a beat
   lpHz:[2500,6000,20000,20000],lyLog:[],recT:0,
-  lyStep(){return SET.react===false||!running?2:Math.max(0,Math.min(3,(this.tier|0)-1));},
-  lyDrum(){return this.drm&&SET.react!==false&&running?[0,0,.5,1][Math.max(0,Math.min(3,(this.tier|0)-1))]:0;},
+  lyStep(){return SET.react===false||!running?2:this.fever?3:Math.max(0,Math.min(3,(this.tier|0)-1));},
+  lyDrum(){return this.drm&&SET.react!==false&&running?this.fever?1:[0,0,.5,1][Math.max(0,Math.min(3,(this.tier|0)-1))]:0;},
   dlive(){return !!this.drm&&this.lyDrum()>0;},
   lyPlan(a,now,at){const L=this.lp.frequency,D=this.drm.gain,f=this.lpHz[this.lyStep()],d=this.lyDrum()*.34;
     L.cancelScheduledValues(now);D.cancelScheduledValues(now);L.setTargetAtTime(f,at,.12);D.setTargetAtTime(d,at,.12);
@@ -515,6 +515,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
   stSynth(n,t){const F=this.stb,f=k=>this.f(k),o=(dt,ty,k,dur,v,sl)=>this.osc(t+dt,ty,f(k),dur,v,F,sl?f(sl):0);
     if(n==='perfect'){o(0,'sine',100,.14,.04);o(.04,'sine',107,.2,.035);}
     else if(/^tierup/.test(n)){const m=+n.slice(6)||1;[0,4,7,12,16].slice(0,2+m).forEach((k,i)=>o(i*.07,'triangle',72+k+3*m,.22,.07));}
+    else if(n==='fever'){[0,7,12,19,24].forEach((k,i)=>o(i*.06,'sawtooth',72+k,.5,.05));o(0,'sine',48,.7,.12,36);}
     else if(n==='phase'){o(0,'sine',52,.5,.14,40);o(.12,'triangle',64,.3,.06);}
     else if(n==='boss-in'){o(0,'sawtooth',40,.9,.07,36);o(0,'sine',40,.9,.14,32);o(.4,'triangle',76,.4,.05);}
     else if(n==='clear'){[0,4,7,12,16].forEach((k,i)=>o(i*.09,'triangle',72+k,.3,.08));}
@@ -961,7 +962,7 @@ function floater(x,y,txt,c='#ffffff'){G.fl.push({x,y,txt:say(txt),c,l:1});}
 const shake=v=>{G.shake=Math.max(G.shake,v*[0,.45,1][SET.shake]*(SET.rm?.3:1));};
 const TS=6,TIERS=4;                                      // power points per tier, number of tiers
 const tierOf=n=>Math.min(TIERS,1+Math.floor(n/TS));
-const comboK=()=>tierOf(C.n);                            // score multiplier = tier (x1..x4)
+const comboK=()=>tierOf(C.n)*(window.RET&&RET.fever&&RET.fv.on?RET.fv.k:1);                            // score multiplier = tier (x1..x4)
 const TIERC=['#b9b3e6','#19e3ff','#ffe14d','#ff2d95'];  // meter colour per tier
 function tierSet(n,why,x,y){const t0=tierOf(C.n);C.n=clamp(n,0,TIERS*TS-1);const t1=tierOf(C.n);AU.tier=t1;
   if(t1!==t0){G.tpop=.7;G.tdir=t1>t0?1:-1;
@@ -1056,7 +1057,7 @@ function bossNext(e){if(e.x>bossX()||G.dead)return false;const list=e.lists[e.ph
 function update(dt){
   if(SH.active){SH.tick(dt);return;}                      // pit stop: the world waits
   G.t+=dt;const D=DISTRICTS[G.di],d=diff();
-  const btk=G.bt>0?(G.btk||.5):1,sdt=dt*G.slow*btk*PW.wk,pdt=dt*G.slow;if(G.bt>0)G.bt-=dt;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
+  const btk=G.bt>0?(G.btk||.5):1,jk=RET.juice&&RET.JU&&!G.dead?RET.JU.k:1,sdt=dt*G.slow*btk*PW.wk*RET.asW()*jk,pdt=dt*G.slow*jk;if(G.bt>0)G.bt-=dt;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
   
   if(G.banner.t>0)G.banner.t-=dt;if(G.note.t>0)G.note.t-=dt;if(G.hint.t>0)G.hint.t-=dt;
   G.shake=Math.max(0,G.shake-40*dt);G.glitch=Math.max(0,G.glitch-dt);G.flash=Math.max(0,G.flash-dt);G.empT=Math.max(0,G.empT-dt);
@@ -1153,12 +1154,12 @@ function update(dt){
   G.en=G.en.filter(e=>!e.dead);
 
   /* enemy bullets */
-  for(const b of G.eb){b.x+=b.vx*sdt;b.y+=b.vy*sdt;if(b.x<-30||b.x>W+30||b.y<-30||b.y>H+30){b.dead=1;continue;}
+  for(const b of G.eb){const bdt=sdt*RET.asB();b.x+=b.vx*bdt;b.y+=b.vy*bdt;if(b.x<-30||b.x>W+30||b.y<-30||b.y>H+30){b.dead=1;continue;}
     if(G.dead)continue;const dd=Math.hypot(b.x-P.x,b.y-P.y);
     if(P.dashT>0&&dd<26){b.dead=1;G.score+=Math.round(25*G.mult*(P.dashPf?2:1));P.heat=Math.max(0,P.heat-6);burst(b.x,b.y,D.b,4,120,.3);continue;}
     if(dd<b.r+3){b.dead=1;hurt(b.dmg);continue;}
     if(!b.g&&dd<24+Math.max(0,b.r-6)){b.g=1;const pf=tryPerfect('graze',null,P.x,P.y);G.score+=Math.round(10*G.mult*(pf?2:1));P.heat=Math.max(0,P.heat-4);G.mult=Math.min(9.9,G.mult+.02);
-      if(!SET.calm)G.pt.push({x:(b.x+P.x)/2,y:(b.y+P.y)/2,vx:0,vy:-30,l:.3,m:.3,c:'#ffffff',sz:2});AU.sfx('graze');}}
+      if(!SET.calm)G.pt.push({x:(b.x+P.x)/2,y:(b.y+P.y)/2,vx:0,vy:-30,l:.3,m:.3,c:'#ffffff',sz:2});AU.sfx('graze');NR.emit('graze',{pf:!!pf});}}
   G.eb=G.eb.filter(b=>!b.dead);
 
   /* pickups */
@@ -1596,11 +1597,11 @@ const FXV={
     if(!m&&(PUL>.04||this.rf>0)){ctx.globalCompositeOperation='lighter';G_(P.x,P.y,r0*2.4,col,Math.min(1,(.55*PUL+(this.rf>0?.5:0))*[.3,.6,1][SET.flash]));}
     ctx.restore();},
   bullets(){                                             // dark rim + bright body + white core: readable on every backdrop (high contrast: bigger, with a white halo)
-    if(!G.eb.length)return;const hc=SET.hc;
+    if(!G.eb.length)return;const hc=SET.hc||RET.asBigOn(),bg=RET.asBigOn()?1.35:1;
     const pb=!hc&&ART.sp('fx-bullet-enemy',5*2*1.5);                         // painted lime orb in place of the flat body (the dark rim and white core stay)
     for(const [col,k] of hc?[['#ffffff',1.7],['#07030f',1.4],[BULLET,1.05],['#ffffff',.45]]:[['#07030f',1.2],[BULLET,.9],['#ffffff',.4]]){
-      if(pb&&k===.9){ctx.globalCompositeOperation='lighter';for(const b of G.eb){const w=b.r*3.1;ctx.drawImage(pb.c,b.x-w/2,b.y-w/2,w,w*pb.h/pb.w);}ctx.globalCompositeOperation='source-over';continue;}
-      ctx.fillStyle=col;ctx.beginPath();for(const b of G.eb){const r=b.r*k;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();}}
+      if(pb&&k===.9){ctx.globalCompositeOperation='lighter';for(const b of G.eb){const w=b.r*3.1*bg;ctx.drawImage(pb.c,b.x-w/2,b.y-w/2,w,w*pb.h/pb.w);}ctx.globalCompositeOperation='source-over';continue;}
+      ctx.fillStyle=col;ctx.beginPath();for(const b of G.eb){const r=b.r*k*bg;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();}}
 };
 
 /* ---------- music power-ups: glowing enemies drop them, collecting one exactly on the beat gives +50% time ----------
@@ -3215,7 +3216,7 @@ Object.assign(RET,{clearPay:true,econ:true,mercy:true},{wk:.36,tk:.12,nk:.045});
 /* B1: a stage clear pays 40+12n Neon the first time, +25 per new star, 10% of the base on later clears */
 RET.payClear=function(n,sum){const old=sSave.stars[n]||0,first=old<1,base=40+12*n,ns=Math.max(0,sum-old);
   const pay=first?base+25*ns:Math.round(base*.1)+25*ns;GA.bank+=pay;gsave();this.last={n,pay,first,ns};return pay;};
-RET.resultRow=function(){const l=this.last;return l&&l.pay?`<div class="sr ok"><span class="sg">◆</span> +${l.pay} Neon${l.first?' · first clear':''}</div>`:'';};
+RET.resultRow=function(){const l=this.last;return (l&&l.pay?`<div class="sr ok"><span class="sg">◆</span> +${l.pay} Neon${l.first?' · first clear':''}</div>`:'')+(RET.assistRun()?'<div class="sr"><span class="sg">ⓐ</span> Assist run · no records</div>':'');};
 /* B3: failed tries per stage (kept in this browser); 2 fails = +1 hull on the next try, 4 = the stage level also drops by 0.3. A clear resets it. */
 RET.fails={};try{const o=JSON.parse(localStorage.getItem('mnr_retfail')||'{}');if(o&&typeof o==='object')for(const k in o)RET.fails[k]=Math.max(0,o[k]|0);}catch(e){}
 RET.saveFails=()=>{try{localStorage.setItem('mnr_retfail',JSON.stringify(RET.fails));}catch(e){}};
@@ -3299,7 +3300,7 @@ NR.on('banked',add=>{if(!HEAT.run||!(add>0))return;const b=Math.round(add*HEAT.n
 NR.on('runEnd',d=>{const h=HEAT.run;HEAT.run=0;HEAT.td=0;if(!h||!d||!d.story||d.quit)return;const n=d.story;
   if(RET.fails[n]!==HEAT.fails0){if(HEAT.fails0)RET.fails[n]=HEAT.fails0;else delete RET.fails[n];RET.saveFails();}   // a Heat run never feeds the mercy count
   if(!d.cleared){HEAT.last={n,h,ok:false,bonus:HEAT.bonus|0};HEAT.bonus=0;return;}
-  const first=h>(HEAT.best[n]|0);let medal=0;if(first){HEAT.best[n]=h;medal=HEAT.medalK*h;GA.bank+=medal;gsave();if(HEAT.pick[n]===h&&h<HEAT.max)HEAT.pick[n]=h+1;}
+  const first=h>(HEAT.best[n]|0)&&!RET.assistRun();let medal=0;if(first){HEAT.best[n]=h;medal=HEAT.medalK*h;GA.bank+=medal;gsave();if(HEAT.pick[n]===h&&h<HEAT.max)HEAT.pick[n]=h+1;}
   if(RET.last&&RET.last.n===n&&RET.last.pay){const b=Math.round(RET.last.pay*HEAT.nk*h);GA.bank+=b;gsave();HEAT.bonus=(HEAT.bonus|0)+b;}
   HEAT.save();HEAT.last={n,h,ok:true,first,medal,bonus:HEAT.bonus|0};HEAT.bonus=0;
   setTimeout(()=>{const e=$('srStars');if(e&&!e.querySelector('.heat'))e.insertAdjacentHTML('beforeend',`<div class="sr ok heat"><span class="sg">🔥</span> HEAT ${h}${first?' medal +'+medal:''} · +${HEAT.last.bonus} Neon</div>`);},0);});
@@ -3537,6 +3538,138 @@ RET.sioUI=(()=>{const X=RET.sio,$$=id=>document.getElementById(id);let box=null,
   for(const id of['setBtn','pSetBtn']){const b=$$(id);if(b)b.addEventListener('click',onOpen);}
   NR.on('runEnd',()=>{if(RET.saveio)X.persist();});
   return{build,refresh,onOpen,code,toast};})();
+
+/* ---------- B28 hit-stop and PERFECT juice. The hit-stop scales the world and player step (b.js: hk), never the audio clock or the beat grid. ---------- */
+if(RET.juice===undefined)RET.juice=!/[?&]juice=0/.test(location.search);
+RET.JU=(()=>{const J={k:1,hold:0,clk:0,log:[],tot:0,n:0,pf:-9,lim:.08,win:.3,ms:{boss:50,phase:45,dash:35,big:25},
+  grant(kind){if(!RET.juice||!G||!G.live||G.dead||SET.reduce||SET.rm)return 0;let ms=J.ms[kind]||0;if(!ms)return 0;if(SET.calm)ms*=.5;
+    const L=J.log;while(L.length&&L[0].t<J.clk-J.win)L.shift();let used=0;for(const r of L)used+=r.ms;
+    ms=Math.min(ms,J.lim*1000-used);if(ms<5)return 0;L.push({t:J.clk,ms});J.hold=Math.max(J.hold,ms/1000);J.tot+=ms;J.n++;J.k=.04;return ms;},
+  reset(){J.k=1;J.hold=0;J.log.length=0;J.pf=-9;}};
+NR.on('tick',dt=>{J.clk+=dt;if(J.hold>0){J.hold-=dt;if(J.hold<=0){J.hold=0;J.k=1;}}else J.k=1;});
+NR.on('runStart',J.reset);NR.on('runEnd',J.reset);
+NR.on('bossPhase',()=>{J.grant('phase');});
+NR.on('kill',d=>{if(!d||!d.e)return;if(d.boss)J.grant('boss');else if(d.e.type==='gunship')J.grant('big');});
+NR.on('perfect',d=>{if(!RET.juice||!d||d.kind!=='dash'||!G.live||G.dead)return;   // the stinger and the small ring already come from onPerfect and B20
+  J.grant('dash');
+  if(J.clk-J.pf<.25||SET.reduce||G.rings.length>20)return;J.pf=J.clk;
+  G.rings.push({x:d.x,y:d.y,l:.32,m:.32,c:'#ffffff'});});   // one extra thin white ring on a PERFECT dash, at most 4 a second; rings are outlines, so ship and bullets stay visible
+return J;})();
+/* ---------- B35: Assist mode (POLISH.md). RET.assist=false: no Assist section, every factor is 1 and no run is ever marked.
+   Options live in SET (mnr_set: saved, exported and imported with the rest of the settings). The WORLD slows (enemy speed, scroll, spawns); the song and the beat grid never change.
+   Run-changing options (asSpd, asBul, asHull, asWin) mark a run ⓐ: it never blocks progress and costs no Neon, it just sets no records (best run, daily, weekly, Heat medal).
+   Looks-only options (big bullets, high contrast, reduced motion) never mark a run. Nothing here touches DMG, the entry grace, the on-screen floor or the anti-idle beam (h.js), whose clocks run on real time. */
+if(RET.assist===undefined)RET.assist=!/[?&]assist=0/.test(location.search);
+const AS_PICK=(v,list,d)=>list.indexOf(v)>=0?v:d;
+RET.asLists={asSpd:[100,85,70],asBul:[100,85,70],asHull:[0,2],asWin:[0,60,120]};
+RET.assistClean=function(){const L=RET.asLists;SET.asSpd=AS_PICK(SET.asSpd,L.asSpd,100);SET.asBul=AS_PICK(SET.asBul,L.asBul,100);SET.asHull=AS_PICK(SET.asHull,L.asHull,0);SET.asWin=AS_PICK(SET.asWin,L.asWin,0);SET.asBig=SET.asBig===true;};
+RET.assistClean();
+RET.asW=()=>RET.assist?SET.asSpd/100:1;                 // world speed factor (sdt)
+RET.asB=()=>RET.assist?SET.asBul/100:1;                 // enemy bullet speed factor on top of it
+RET.asWinMs=()=>RET.assist?SET.asWin:0;                 // ms added to the half-width of the on-beat window
+RET.asHullN=()=>RET.assist?SET.asHull:0;
+RET.asBigOn=()=>!!(RET.assist&&SET.asBig);
+RET.assistActive=()=>!!RET.assist&&(SET.asSpd<100||SET.asBul<100||SET.asHull>0||SET.asWin>0);
+RET.assistRun=()=>!!RET.assist&&!!G.assist;
+RET.assistApply=function(){RET.assistClean();document.documentElement.classList.toggle('asbig',RET.asBigOn());
+  if(RET.assist&&typeof G!=='undefined'&&G&&G.live&&RET.assistActive())G.assist=1;};   // switching an option on mid-run marks that run too
+NR.on('runStart',d=>{G.assist=0;if(!RET.assist||!d||d.lab||!RET.assistActive())return;G.assist=1;const h=RET.asHullN();if(h&&!G.tut){P.max+=h;P.hp+=h;}
+  if(!G.tut&&!(G.note&&G.note.t>0))G.note={t:4,txt:'ⓐ ASSIST RUN · no records'};});
+RET.assistSchema=function(SC){if(!RET.assist)return;
+  for(const g of SC)if(g.g==='Rhythm')g.rows=g.rows.filter(r=>r.k!=='win');
+  const acc=SC.find(g=>g.g==='Accessibility');if(acc)SC.splice(SC.indexOf(acc),1);
+  const O=[[false,'Off'],[true,'On']];
+  SC.push({g:'Assist',rows:[
+    {k:'asSpd',l:'World speed',o:[[100,'100%'],[85,'85%'],[70,'70%']],d:'Enemies, bullets and scrolling move slower. The music and the beat do not change. Marks the run ⓐ.'},
+    {k:'asBul',l:'Enemy bullets',o:[[100,'Normal'],[85,'Slower'],[70,'Slowest']],d:'Only enemy bullets fly slower, so there is more time to dodge. Marks the run ⓐ.'},
+    {k:'asHull',l:'Extra hull',o:[[0,'Off'],[2,'+2']],d:'Start every run with 2 more hull. Marks the run ⓐ.'},
+    {k:'asWin',l:'Beat window',o:[[0,'Normal'],[60,'+60 ms'],[120,'+120 ms']],d:'More time to hit the beat for a PERFECT, on top of Timing window. Marks the run ⓐ.'},
+    {k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']],d:'How exact a tap has to be. Never marks a run.'},
+    {k:'asBig',l:'Big bullets',o:O,d:'Enemy bullets are drawn bigger with a white halo. The real hit size is unchanged. Never marks a run.'},
+    {k:'hc',l:'High-contrast bullets',o:O,d:'Bright white halo around enemy bullets. Never marks a run.'},
+    {k:'rm',l:'Reduced motion',o:O,d:'Calmer effects, no strobing, no count-up. Never marks a run.'}]});};
+RET.assistBuild=function(){if(!RET.assist)return;
+  const css=document.createElement('style');css.textContent='#setm .as>span{font-size:14px}#setm .as button{min-height:44px;font-size:14px}#setm .asd{margin:0 0 6px;font:14px/1.35 var(--mono,monospace);color:#b4d2e2}#setm .asn{margin:0 0 8px;font:14px/1.4 var(--mono,monospace);color:#e6f6ff}';
+  document.head.appendChild(css);
+  const g=SCHEMA.find(x=>x.g==='Assist');let first=true;
+  for(const r of g.rows){const row=setRows[r.k];if(!row)continue;row.classList.add('as');
+    if(first){const n=document.createElement('p');n.className='asn';n.id='asNote';n.textContent='Assist makes the game easier. It never blocks progress and never costs Neon. A run with World speed, Enemy bullets, Extra hull or Beat window on is marked ⓐ and sets no records (best, daily, weekly, Heat medal). Looks-only options never mark a run.';
+      row.parentNode.insertBefore(n,row);first=false;}
+    const p=document.createElement('p');p.className='asd';p.textContent=r.d;row.after(p);}};
+/* ---------- B30 installable PWA + offline cache (POLISH.md). Flag RET.pwa (off with ?pwa=0): off = no manifest link, no service worker, no MENU note (an old worker of ours is unregistered).
+   The worker is games/mainhattan-nightrun/sw.js (built from parts/sw.js, scope = this folder); it never runs in the ?sim=1 test pages. Gameplay and the beat clock are untouched.
+   MENU gets one small row: an INSTALL button (beforeinstallprompt), the iOS "Add to Home Screen" text, and an "Offline ready" note. ---------- */
+if(RET.pwa===undefined)RET.pwa=!/[?&]pwa=0/.test(location.search);
+RET.pwaX=(function(){
+  const X={ready:false,songs:0,defer:null,reg:null};
+  const standalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;}catch(e){return false;}};
+  const ios=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const sw='serviceWorker' in navigator&&location.protocol!=='file:';
+  X.count=async function(){try{const ns=(await caches.keys()).filter(n=>n.startsWith('nr-'));X.ready=ns.some(n=>n.startsWith('nr-shell-'));let m=0;for(const n of ns.filter(n=>n.startsWith('nr-assets-')))m+=(await (await caches.open(n)).keys()).filter(r=>/\/music\/[^/]+\.mp3$/.test(r.url)&&!/\/st-/.test(r.url)).length;X.songs=m;}catch(e){}return X;};
+  X.draw=async function(){const row=$('pwaRow');if(!row)return;await X.count();
+    const note=$('pwaNote'),btn=$('pwaBtn'),tip=$('pwaIos');
+    note.hidden=!(RET.pwa&&X.ready);note.textContent='Offline ready'+(X.songs?' · '+X.songs+' songs saved':'');
+    btn.hidden=!(RET.pwa&&X.defer&&!standalone());tip.hidden=!(RET.pwa&&ios()&&!standalone());
+    row.hidden=note.hidden&&btn.hidden&&tip.hidden;};
+  X.build=function(){const mn=$('mnMore');if(!mn||$('pwaRow')||!RET.pwa)return;
+    const row=document.createElement('div');row.id='pwaRow';row.hidden=true;
+    row.innerHTML='<button type="button" class="go dim" id="pwaBtn" hidden>INSTALL APP</button><div id="pwaIos" hidden>To install: tap Share, then Add to Home Screen.</div><div id="pwaNote" hidden></div>';
+    const back=$('mnBack');mn.insertBefore(row,back||null);
+    $('pwaBtn').addEventListener('click',async e=>{e.stopPropagation();const d=X.defer;if(!d)return;X.defer=null;try{d.prompt();await d.userChoice;}catch(x){}X.draw();});
+    X.draw();};
+  if(!document.getElementById('pwaCss')){const st=document.createElement('style');st.id='pwaCss';st.textContent='#pwaRow{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0 2px;font-family:var(--mono);font-size:14px;color:var(--dim);text-align:center}#pwaRow[hidden]{display:none}#pwaNote{color:#7fe6a8}';document.head.appendChild(st);}
+  if(!RET.pwa){   // flag off = the old game: forget a worker we installed earlier
+    if(sw)navigator.serviceWorker.getRegistrations().then(rs=>{for(const r of rs)if(/mainhattan-nightrun\/?$/.test(r.scope))r.unregister();}).catch(()=>{});
+    return X;}
+  const add=(tag,at)=>{const e=document.createElement(tag);for(const k in at)e.setAttribute(k,at[k]);document.head.appendChild(e);};
+  if(location.protocol!=='file:'){
+    add('link',{rel:'manifest',href:'manifest.webmanifest'});add('meta',{name:'theme-color',content:'#05030c'});
+    add('link',{rel:'apple-touch-icon',href:'icons/icon-192.png'});add('meta',{name:'mobile-web-app-capable',content:'yes'});add('meta',{name:'apple-mobile-web-app-capable',content:'yes'});}
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();X.defer=e;X.draw();});
+  addEventListener('appinstalled',()=>{X.defer=null;X.draw();});
+  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#moreBtn'))setTimeout(()=>{X.build();X.draw();},0);},true);
+  if(sw&&!SIM)addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js',{scope:'./'}).then(r=>{X.reg=r;return navigator.serviceWorker.ready;}).then(()=>X.count()).catch(()=>{});});
+  return X;})();
+
+/* ===== B21 FEVER: grazes and PERFECTs fill a thin meter at the top edge; when it is full the next bar starts 8 bars of FEVER (score x1.5, music fully open,
+   gold edge glow). No extra damage or fire rate: it only pays in score. Needs movement (a still ship fills nothing), once per 32 bars, never with a boss
+   on screen. Flag off = the old game. The music reads AU.fever (a.js lyStep/lyDrum), the score reads RET.fv.k (b.js comboK). ===== */
+if(RET.fever===undefined)RET.fever=!/[?&]fever=0/.test(location.search);
+const FV=RET.fv={m:0,on:false,armed:false,bars:0,tb:0,last:-99,k:1.5,len:8,gap:32,gz:.025*100,pf:6,dash:8,starts:0,still:1.5};
+RET.fvEl=null;
+RET.fvDom=function(){let e=RET.fvEl;if(e&&e.isConnected)return e;e=document.createElement('div');e.id='retFv';e.setAttribute('aria-hidden','true');
+  e.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:6;opacity:1;';
+  e.innerHTML='<div class="fvGl" style="position:absolute;inset:0;opacity:0;box-shadow:inset 0 0 26px 5px rgba(255,210,61,.55)"></div>'+
+    '<div class="fvTr" style="position:absolute;left:12%;right:12%;top:1px;height:4px;border-radius:2px;background:rgba(255,255,255,.14)"><div class="fvBar" style="height:100%;width:0;border-radius:2px;background:#19e3ff"></div></div>';
+  ($('stage')||document.body).appendChild(e);RET.fvEl=e;return e;};
+RET.fvDraw=function(){if(!RET.fever){if(RET.fvEl)RET.fvEl.style.display='none';return;}
+  const e=RET.fvDom(),bar=e.querySelector('.fvBar'),gl=e.querySelector('.fvGl'),mo=RET.motion();e.style.display='';
+  const w=FV.on?100*(FV.len-FV.bars)/FV.len:FV.m;
+  bar.style.transition=mo?'width .2s linear':'none';bar.style.width=Math.max(0,Math.min(100,w))+'%';
+  bar.style.background=FV.on?'#ffd23d':(FV.m>=100||FV.armed?'#ffe9a0':'#19e3ff');
+  gl.style.transition=mo?'opacity .4s':'none';gl.style.opacity=FV.on?'1':'0';};
+RET.fvReset=function(){const was=FV.on||FV.armed;FV.m=0;FV.on=false;FV.armed=false;FV.bars=0;FV.last=-99;FV.tb=0;AU.fever=false;if(was)try{AU.lyTick(AU.a);}catch(x){}RET.fvDraw();};
+RET.fvStop=function(){const was=FV.on;FV.on=false;FV.armed=false;FV.bars=0;AU.fever=false;if(was&&running)floater(W*.5,H*.3,'FEVER OVER','#ffd23d');RET.fvDraw();};
+RET.fvGain=function(v){if(!RET.fever||!running||G.dead||G.over||FV.on||FV.armed||G.boss||STILL.t>FV.still)return false;
+  FV.m=Math.min(100,FV.m+v);RET.fvDraw();return true;};
+RET.fvReady=()=>RET.fever&&running&&!G.dead&&!G.boss&&FV.m>=100&&FV.tb-FV.last>=FV.gap;
+NR.on('runStart',()=>{RET.fvReset();});
+NR.on('runEnd',()=>{RET.fvReset();});
+NR.on('stageClear',()=>{RET.fvReset();});
+NR.on('districtEnd',()=>{RET.fvStop();FV.m=0;RET.fvDraw();});
+NR.on('bossIn',d=>{if(FV.on||FV.armed)RET.fvStop();});
+NR.on('graze',()=>{RET.fvGain(FV.gz);});
+NR.on('perfect',d=>{RET.fvGain(d&&d.kind==='dash'?FV.dash:FV.pf);});
+NR.on('beat',d=>{if(!RET.fever){if(RET.fvEl&&RET.fvEl.style.display!=='none')RET.fvEl.style.display='none';return;}if(!d||d.i%4!==3)return;   // the beat before a bar line: arm / disarm the music so its layers change on that line
+  if(FV.on){if(FV.bars>=FV.len-1)AU.fever=false;}
+  else if(!FV.armed&&RET.fvReady()){FV.armed=true;AU.fever=true;}});
+NR.on('bar',()=>{if(!RET.fever)return;FV.tb++;
+  if(FV.on){if(++FV.bars>=FV.len)RET.fvStop();else RET.fvDraw();return;}
+  if(FV.armed){FV.armed=false;
+    if(!RET.fvReady()){AU.fever=false;return;}
+    FV.on=true;FV.bars=0;FV.m=0;FV.last=FV.tb;FV.starts++;AU.fever=true;
+    floater(W*.5,H*.3,'FEVER ×'+FV.k,'#ffd23d');G.flash=Math.max(G.flash,.25*FX());if(RET.sting)AU.sting('fever');RET.fvDraw();}});
 
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
    The LAB is a real run with G.lab set: no waves, no district clock, no boss timer, no chest or pit stop, god mode on. What appears is decided by the panel at the bottom:
@@ -3988,10 +4121,14 @@ const NR_CHECKLIST=[
  {ver:'I7',id:'bullet-kinds',text:'Enemy fire now varies: thin fast NEEDLES from drones, round ORBS, big slow orange SHELLS that take 2 hull, and ROCKETS that home for a moment and burst into 5 pellets when you shoot them twice.'},
  {ver:'I7',id:'perk-pressure',text:'The more perks and upgrades you own, the tougher the enemies (up to 3x hull). A maxed ship should still have to fight.'},
  {ver:'I6',id:'chest',text:'After every district boss a BOSS CHEST opens: three face-down cards, tap one to flip it and get +1 hull, a shield, EMP, Neon, a revive or a random upgrade. Then the pit stop. LAB can switch it off.'},
+ {ver:'L4',id:'assist-mode',text:'Settings > Assist: slow the world to 85% or 70% (the music keeps its beat), slow enemy bullets, start with +2 hull, widen the beat window by up to 120 ms, and draw bigger bullets. A run that uses speed, bullets, hull or window help is marked ⓐ, still pays Neon and clears stages, but sets no best, daily, weekly or Heat record. Is Assist clear and fair?'},
  {ver:'I9',id:'polish-flow',text:'Screens now fade in, the game-over and stage-clear screens count the score up (tap to skip) and show a Neon chip top-right, and every 16 bars a grade letter (C, B, A or S) pops from your PERFECTs and hits. Does it feel smooth, and do the letters ever get in the way?'},
  {ver:'I8',id:'one-more-run',text:'The game-over and stage-clear screens now show a bar to the cheapest thing you can still unlock, and a big ONE MORE RUN button that restarts at once. Does the bar make you want one more go?'},
  {ver:'R5',id:'no-walls',text:'Kill-goal stages (Roemer, Freight Yard, Loading Dock, Boardroom, Olive Road) ask for fewer kills in Arcade, and Talos fires fewer lasers. Is there still a stage where you get stuck?'},
+ {ver:NR_VER,id:'install-offline',text:'Nightrun can now be installed like an app (MENU > INSTALL APP, or Add to Home Screen on iPhone) and keeps working with no signal: the game, the art and every song you have already heard are saved on your device. MENU shows Offline ready. Does it start fast with the network off?'},
  {ver:'L2',id:'save-backup',text:'Settings > Save: EXPORT your whole progress as a file or a code, and IMPORT it on another device or after a wipe. Importing asks first and keeps your old save for one UNDO. Try it: export, then import it back. Does it feel safe?'},
+ {ver:'J1',id:'juice',text:'Big moments now land harder: a blink-short hit-stop on boss phase changes, boss kills, gunship kills and PERFECT dashes, plus a white ring on a PERFECT dash. It is off with Reduced motion or Flashing off. Does it feel punchy, not laggy?'},
+ {ver:'N1',id:'fever',text:'FEVER: graze bullets and hit PERFECT beats to fill the thin bar at the top. When it is full, the next bar starts 8 bars of FEVER: score x1.5, the music opens fully and the edges glow gold. Does it feel like a reward?'},
  {ver:'I6',id:'new-ships',text:'Three new ships in Garage > SHIPS: Drift (a wide fan), Lancer (a piercing lance every second shot) and Nova (a ring burst every third shot). They show as shapes until the art arrives. Do they feel different and worth the price?'},
  {ver:NR_VER,id:'title-diet',text:'The title has only PLAY or CONTINUE (your next stage, in one tap), ENDLESS, DAILY, GARAGE and MENU. Story map, weekly run, weapons, lab, checklist, Flight School, settings and difficulty are in MENU. Is everything easy to find and big enough to hit?'},
  {ver:'I6',id:'badges',text:'The difficulty button on the title and the LAB show a badge per difficulty, and the stage clear screen shows a medal. Garage ship cards now show the painted ship portraits.'},
@@ -4976,12 +5113,13 @@ const SCHEMA=[
   {g:'Visuals',rows:[{k:'part',l:'Particles',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'shake',l:'Screen shake',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'flash',l:'Flashing',o:[[0,'Off'],[1,'Reduced'],[2,'Full']]},
     {k:'q',l:'Quality',o:[['L','Low'],['M','Medium'],['H','High']]},{k:'fps',l:'FPS cap',o:[[30,'30'],[60,'60']]},{k:"pal",l:"Colour theme",o:[['neon','Neon'],['cb','Blue-orange'],['term','Terminal']]},{k:'fpsc',l:'FPS counter',o:OFFON}]},
   {g:'Accessibility',rows:[{k:'rm',l:'Reduced motion',o:OFFON},{k:'hc',l:'High-contrast bullets',o:OFFON}]}];
+if(window.RET&&RET.assistSchema)RET.assistSchema(SCHEMA);
 const PALS={neon:null,cb:{a:'#ffb020',b:'#4aa3ff'},term:{a:'#3dff7a',b:'#d6ffe0'}};
 let palOn='neon';
 function applyPal(){if(palOn===SET.pal)return;palOn=SET.pal;const th=PALS[SET.pal];
   for(const D of DISTRICTS){if(!D.a0){D.a0=D.a;D.b0=D.b;}D.a=th?th.a:D.a0;D.b=th?th.b:D.b0;}
   for(const k in BGC)delete BGC[k];for(const k in BGPC)delete BGPC[k];}
-function applySet(){deriveSet();AU.vol();DF=DIFFS[SET.diff]||DIFFS.normal;HARD=HARDS.includes(SET.diff);applyPal();
+function applySet(){if(window.RET&&RET.assistApply)RET.assistApply();deriveSet();AU.vol();DF=DIFFS[SET.diff]||DIFFS.normal;HARD=HARDS.includes(SET.diff);applyPal();
   stage.classList.toggle('ds-S',SET.dsize==='S');stage.classList.toggle('ds-L',SET.dsize==='L');document.documentElement.classList.toggle('hc',!!SET.hc);
   $('fpsEl').hidden=!FPSOK();fit();
   if(typeof diffDraw==='function')diffDraw();}
@@ -5018,7 +5156,7 @@ function calFrame(){const pad=$('calPad');if(!pad||setEl.hidden||!CAL.on)return;
 $('setBack').addEventListener('click',closeSettings);
 $('setBtn').addEventListener('click',()=>openSettings('title'));
 $('pSetBtn').addEventListener('click',()=>openSettings('pause'));
-buildSettings();
+buildSettings();if(window.RET&&RET.assistBuild)RET.assistBuild();
 function setPause(on){if(!running||on===paused)return;paused=on;pauseEl.hidden=!on;
   if(on){const v=HUDX.vals();$('pStats').textContent=`Hull ${v.hp}/${v.max} · Shield ×${v.sh} · Dash ${v.dash}/${v.dashMax}`+(v.rev?` · Revive ×${v.rev}`:'')+(v.drones?` · Drones ×${v.drones}`:'')+` · Perks ${v.perks} · Upgrades ${v.upg}`;}   // the counters the phone HUD hides while you play
   if(on){AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}
@@ -5029,7 +5167,9 @@ function start(daily){if(running)return;if(ST.on){startStory(ST.n);return;}AU.un
 function restart(){if(ST.on){const n=ST.n;running=false;paused=false;startStory(n);return;}const dl=G.daily;if(G.weekly)RET.wkPending=true;running=false;paused=false;start(dl);}
 function quitToTitle(){if(running)NR.emit('runEnd',{quit:true});ST.on=false;ST.over=false;selEl.hidden=true;resEl.hidden=true;$('stBtn2').hidden=true;running=false;paused=false;pauseEl.hidden=true;overEl.hidden=true;titleEl.hidden=false;newGame();G.banner.t=0;P.x=-200;AU.resume();AU.menuMusic();syncUI();showBest();}
 function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false;NR.emit('runEnd',{score:G.score,di:G.di,kills:G.kills});const D=DISTRICTS[G.di];const dist=D.name+(G.loop?' +'+G.loop:'');let eye='Signal lost';
-  if(G.weekly)eye=RET.weeklyEnd(G.score);
+  const asr=RET.assistRun();
+  if(asr)eye='Assist run ⓐ · no record';
+  else if(G.weekly)eye=RET.weeklyEnd(G.score);
   else if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;

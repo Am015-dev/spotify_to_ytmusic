@@ -30,7 +30,7 @@ Object.assign(RET,{clearPay:true,econ:true,mercy:true},{wk:.36,tk:.12,nk:.045});
 /* B1: a stage clear pays 40+12n Neon the first time, +25 per new star, 10% of the base on later clears */
 RET.payClear=function(n,sum){const old=sSave.stars[n]||0,first=old<1,base=40+12*n,ns=Math.max(0,sum-old);
   const pay=first?base+25*ns:Math.round(base*.1)+25*ns;GA.bank+=pay;gsave();this.last={n,pay,first,ns};return pay;};
-RET.resultRow=function(){const l=this.last;return l&&l.pay?`<div class="sr ok"><span class="sg">◆</span> +${l.pay} Neon${l.first?' · first clear':''}</div>`:'';};
+RET.resultRow=function(){const l=this.last;return (l&&l.pay?`<div class="sr ok"><span class="sg">◆</span> +${l.pay} Neon${l.first?' · first clear':''}</div>`:'')+(RET.assistRun()?'<div class="sr"><span class="sg">ⓐ</span> Assist run · no records</div>':'');};
 /* B3: failed tries per stage (kept in this browser); 2 fails = +1 hull on the next try, 4 = the stage level also drops by 0.3. A clear resets it. */
 RET.fails={};try{const o=JSON.parse(localStorage.getItem('mnr_retfail')||'{}');if(o&&typeof o==='object')for(const k in o)RET.fails[k]=Math.max(0,o[k]|0);}catch(e){}
 RET.saveFails=()=>{try{localStorage.setItem('mnr_retfail',JSON.stringify(RET.fails));}catch(e){}};
@@ -114,7 +114,7 @@ NR.on('banked',add=>{if(!HEAT.run||!(add>0))return;const b=Math.round(add*HEAT.n
 NR.on('runEnd',d=>{const h=HEAT.run;HEAT.run=0;HEAT.td=0;if(!h||!d||!d.story||d.quit)return;const n=d.story;
   if(RET.fails[n]!==HEAT.fails0){if(HEAT.fails0)RET.fails[n]=HEAT.fails0;else delete RET.fails[n];RET.saveFails();}   // a Heat run never feeds the mercy count
   if(!d.cleared){HEAT.last={n,h,ok:false,bonus:HEAT.bonus|0};HEAT.bonus=0;return;}
-  const first=h>(HEAT.best[n]|0);let medal=0;if(first){HEAT.best[n]=h;medal=HEAT.medalK*h;GA.bank+=medal;gsave();if(HEAT.pick[n]===h&&h<HEAT.max)HEAT.pick[n]=h+1;}
+  const first=h>(HEAT.best[n]|0)&&!RET.assistRun();let medal=0;if(first){HEAT.best[n]=h;medal=HEAT.medalK*h;GA.bank+=medal;gsave();if(HEAT.pick[n]===h&&h<HEAT.max)HEAT.pick[n]=h+1;}
   if(RET.last&&RET.last.n===n&&RET.last.pay){const b=Math.round(RET.last.pay*HEAT.nk*h);GA.bank+=b;gsave();HEAT.bonus=(HEAT.bonus|0)+b;}
   HEAT.save();HEAT.last={n,h,ok:true,first,medal,bonus:HEAT.bonus|0};HEAT.bonus=0;
   setTimeout(()=>{const e=$('srStars');if(e&&!e.querySelector('.heat'))e.insertAdjacentHTML('beforeend',`<div class="sr ok heat"><span class="sg">🔥</span> HEAT ${h}${first?' medal +'+medal:''} · +${HEAT.last.bonus} Neon</div>`);},0);});
@@ -369,3 +369,118 @@ NR.on('perfect',d=>{if(!RET.juice||!d||d.kind!=='dash'||!G.live||G.dead)return; 
   if(J.clk-J.pf<.25||SET.reduce||G.rings.length>20)return;J.pf=J.clk;
   G.rings.push({x:d.x,y:d.y,l:.32,m:.32,c:'#ffffff'});});   // one extra thin white ring on a PERFECT dash, at most 4 a second; rings are outlines, so ship and bullets stay visible
 return J;})();
+/* ---------- B35: Assist mode (POLISH.md). RET.assist=false: no Assist section, every factor is 1 and no run is ever marked.
+   Options live in SET (mnr_set: saved, exported and imported with the rest of the settings). The WORLD slows (enemy speed, scroll, spawns); the song and the beat grid never change.
+   Run-changing options (asSpd, asBul, asHull, asWin) mark a run ⓐ: it never blocks progress and costs no Neon, it just sets no records (best run, daily, weekly, Heat medal).
+   Looks-only options (big bullets, high contrast, reduced motion) never mark a run. Nothing here touches DMG, the entry grace, the on-screen floor or the anti-idle beam (h.js), whose clocks run on real time. */
+if(RET.assist===undefined)RET.assist=!/[?&]assist=0/.test(location.search);
+const AS_PICK=(v,list,d)=>list.indexOf(v)>=0?v:d;
+RET.asLists={asSpd:[100,85,70],asBul:[100,85,70],asHull:[0,2],asWin:[0,60,120]};
+RET.assistClean=function(){const L=RET.asLists;SET.asSpd=AS_PICK(SET.asSpd,L.asSpd,100);SET.asBul=AS_PICK(SET.asBul,L.asBul,100);SET.asHull=AS_PICK(SET.asHull,L.asHull,0);SET.asWin=AS_PICK(SET.asWin,L.asWin,0);SET.asBig=SET.asBig===true;};
+RET.assistClean();
+RET.asW=()=>RET.assist?SET.asSpd/100:1;                 // world speed factor (sdt)
+RET.asB=()=>RET.assist?SET.asBul/100:1;                 // enemy bullet speed factor on top of it
+RET.asWinMs=()=>RET.assist?SET.asWin:0;                 // ms added to the half-width of the on-beat window
+RET.asHullN=()=>RET.assist?SET.asHull:0;
+RET.asBigOn=()=>!!(RET.assist&&SET.asBig);
+RET.assistActive=()=>!!RET.assist&&(SET.asSpd<100||SET.asBul<100||SET.asHull>0||SET.asWin>0);
+RET.assistRun=()=>!!RET.assist&&!!G.assist;
+RET.assistApply=function(){RET.assistClean();document.documentElement.classList.toggle('asbig',RET.asBigOn());
+  if(RET.assist&&typeof G!=='undefined'&&G&&G.live&&RET.assistActive())G.assist=1;};   // switching an option on mid-run marks that run too
+NR.on('runStart',d=>{G.assist=0;if(!RET.assist||!d||d.lab||!RET.assistActive())return;G.assist=1;const h=RET.asHullN();if(h&&!G.tut){P.max+=h;P.hp+=h;}
+  if(!G.tut&&!(G.note&&G.note.t>0))G.note={t:4,txt:'ⓐ ASSIST RUN · no records'};});
+RET.assistSchema=function(SC){if(!RET.assist)return;
+  for(const g of SC)if(g.g==='Rhythm')g.rows=g.rows.filter(r=>r.k!=='win');
+  const acc=SC.find(g=>g.g==='Accessibility');if(acc)SC.splice(SC.indexOf(acc),1);
+  const O=[[false,'Off'],[true,'On']];
+  SC.push({g:'Assist',rows:[
+    {k:'asSpd',l:'World speed',o:[[100,'100%'],[85,'85%'],[70,'70%']],d:'Enemies, bullets and scrolling move slower. The music and the beat do not change. Marks the run ⓐ.'},
+    {k:'asBul',l:'Enemy bullets',o:[[100,'Normal'],[85,'Slower'],[70,'Slowest']],d:'Only enemy bullets fly slower, so there is more time to dodge. Marks the run ⓐ.'},
+    {k:'asHull',l:'Extra hull',o:[[0,'Off'],[2,'+2']],d:'Start every run with 2 more hull. Marks the run ⓐ.'},
+    {k:'asWin',l:'Beat window',o:[[0,'Normal'],[60,'+60 ms'],[120,'+120 ms']],d:'More time to hit the beat for a PERFECT, on top of Timing window. Marks the run ⓐ.'},
+    {k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']],d:'How exact a tap has to be. Never marks a run.'},
+    {k:'asBig',l:'Big bullets',o:O,d:'Enemy bullets are drawn bigger with a white halo. The real hit size is unchanged. Never marks a run.'},
+    {k:'hc',l:'High-contrast bullets',o:O,d:'Bright white halo around enemy bullets. Never marks a run.'},
+    {k:'rm',l:'Reduced motion',o:O,d:'Calmer effects, no strobing, no count-up. Never marks a run.'}]});};
+RET.assistBuild=function(){if(!RET.assist)return;
+  const css=document.createElement('style');css.textContent='#setm .as>span{font-size:14px}#setm .as button{min-height:44px;font-size:14px}#setm .asd{margin:0 0 6px;font:14px/1.35 var(--mono,monospace);color:#b4d2e2}#setm .asn{margin:0 0 8px;font:14px/1.4 var(--mono,monospace);color:#e6f6ff}';
+  document.head.appendChild(css);
+  const g=SCHEMA.find(x=>x.g==='Assist');let first=true;
+  for(const r of g.rows){const row=setRows[r.k];if(!row)continue;row.classList.add('as');
+    if(first){const n=document.createElement('p');n.className='asn';n.id='asNote';n.textContent='Assist makes the game easier. It never blocks progress and never costs Neon. A run with World speed, Enemy bullets, Extra hull or Beat window on is marked ⓐ and sets no records (best, daily, weekly, Heat medal). Looks-only options never mark a run.';
+      row.parentNode.insertBefore(n,row);first=false;}
+    const p=document.createElement('p');p.className='asd';p.textContent=r.d;row.after(p);}};
+/* ---------- B30 installable PWA + offline cache (POLISH.md). Flag RET.pwa (off with ?pwa=0): off = no manifest link, no service worker, no MENU note (an old worker of ours is unregistered).
+   The worker is games/mainhattan-nightrun/sw.js (built from parts/sw.js, scope = this folder); it never runs in the ?sim=1 test pages. Gameplay and the beat clock are untouched.
+   MENU gets one small row: an INSTALL button (beforeinstallprompt), the iOS "Add to Home Screen" text, and an "Offline ready" note. ---------- */
+if(RET.pwa===undefined)RET.pwa=!/[?&]pwa=0/.test(location.search);
+RET.pwaX=(function(){
+  const X={ready:false,songs:0,defer:null,reg:null};
+  const standalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;}catch(e){return false;}};
+  const ios=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const sw='serviceWorker' in navigator&&location.protocol!=='file:';
+  X.count=async function(){try{const ns=(await caches.keys()).filter(n=>n.startsWith('nr-'));X.ready=ns.some(n=>n.startsWith('nr-shell-'));let m=0;for(const n of ns.filter(n=>n.startsWith('nr-assets-')))m+=(await (await caches.open(n)).keys()).filter(r=>/\/music\/[^/]+\.mp3$/.test(r.url)&&!/\/st-/.test(r.url)).length;X.songs=m;}catch(e){}return X;};
+  X.draw=async function(){const row=$('pwaRow');if(!row)return;await X.count();
+    const note=$('pwaNote'),btn=$('pwaBtn'),tip=$('pwaIos');
+    note.hidden=!(RET.pwa&&X.ready);note.textContent='Offline ready'+(X.songs?' · '+X.songs+' songs saved':'');
+    btn.hidden=!(RET.pwa&&X.defer&&!standalone());tip.hidden=!(RET.pwa&&ios()&&!standalone());
+    row.hidden=note.hidden&&btn.hidden&&tip.hidden;};
+  X.build=function(){const mn=$('mnMore');if(!mn||$('pwaRow')||!RET.pwa)return;
+    const row=document.createElement('div');row.id='pwaRow';row.hidden=true;
+    row.innerHTML='<button type="button" class="go dim" id="pwaBtn" hidden>INSTALL APP</button><div id="pwaIos" hidden>To install: tap Share, then Add to Home Screen.</div><div id="pwaNote" hidden></div>';
+    const back=$('mnBack');mn.insertBefore(row,back||null);
+    $('pwaBtn').addEventListener('click',async e=>{e.stopPropagation();const d=X.defer;if(!d)return;X.defer=null;try{d.prompt();await d.userChoice;}catch(x){}X.draw();});
+    X.draw();};
+  if(!document.getElementById('pwaCss')){const st=document.createElement('style');st.id='pwaCss';st.textContent='#pwaRow{width:100%;display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0 2px;font-family:var(--mono);font-size:14px;color:var(--dim);text-align:center}#pwaRow[hidden]{display:none}#pwaNote{color:#7fe6a8}';document.head.appendChild(st);}
+  if(!RET.pwa){   // flag off = the old game: forget a worker we installed earlier
+    if(sw)navigator.serviceWorker.getRegistrations().then(rs=>{for(const r of rs)if(/mainhattan-nightrun\/?$/.test(r.scope))r.unregister();}).catch(()=>{});
+    return X;}
+  const add=(tag,at)=>{const e=document.createElement(tag);for(const k in at)e.setAttribute(k,at[k]);document.head.appendChild(e);};
+  if(location.protocol!=='file:'){
+    add('link',{rel:'manifest',href:'manifest.webmanifest'});add('meta',{name:'theme-color',content:'#05030c'});
+    add('link',{rel:'apple-touch-icon',href:'icons/icon-192.png'});add('meta',{name:'mobile-web-app-capable',content:'yes'});add('meta',{name:'apple-mobile-web-app-capable',content:'yes'});}
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();X.defer=e;X.draw();});
+  addEventListener('appinstalled',()=>{X.defer=null;X.draw();});
+  document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#moreBtn'))setTimeout(()=>{X.build();X.draw();},0);},true);
+  if(sw&&!SIM)addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js',{scope:'./'}).then(r=>{X.reg=r;return navigator.serviceWorker.ready;}).then(()=>X.count()).catch(()=>{});});
+  return X;})();
+
+/* ===== B21 FEVER: grazes and PERFECTs fill a thin meter at the top edge; when it is full the next bar starts 8 bars of FEVER (score x1.5, music fully open,
+   gold edge glow). No extra damage or fire rate: it only pays in score. Needs movement (a still ship fills nothing), once per 32 bars, never with a boss
+   on screen. Flag off = the old game. The music reads AU.fever (a.js lyStep/lyDrum), the score reads RET.fv.k (b.js comboK). ===== */
+if(RET.fever===undefined)RET.fever=!/[?&]fever=0/.test(location.search);
+const FV=RET.fv={m:0,on:false,armed:false,bars:0,tb:0,last:-99,k:1.5,len:8,gap:32,gz:.025*100,pf:6,dash:8,starts:0,still:1.5};
+RET.fvEl=null;
+RET.fvDom=function(){let e=RET.fvEl;if(e&&e.isConnected)return e;e=document.createElement('div');e.id='retFv';e.setAttribute('aria-hidden','true');
+  e.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:6;opacity:1;';
+  e.innerHTML='<div class="fvGl" style="position:absolute;inset:0;opacity:0;box-shadow:inset 0 0 26px 5px rgba(255,210,61,.55)"></div>'+
+    '<div class="fvTr" style="position:absolute;left:12%;right:12%;top:1px;height:4px;border-radius:2px;background:rgba(255,255,255,.14)"><div class="fvBar" style="height:100%;width:0;border-radius:2px;background:#19e3ff"></div></div>';
+  ($('stage')||document.body).appendChild(e);RET.fvEl=e;return e;};
+RET.fvDraw=function(){if(!RET.fever){if(RET.fvEl)RET.fvEl.style.display='none';return;}
+  const e=RET.fvDom(),bar=e.querySelector('.fvBar'),gl=e.querySelector('.fvGl'),mo=RET.motion();e.style.display='';
+  const w=FV.on?100*(FV.len-FV.bars)/FV.len:FV.m;
+  bar.style.transition=mo?'width .2s linear':'none';bar.style.width=Math.max(0,Math.min(100,w))+'%';
+  bar.style.background=FV.on?'#ffd23d':(FV.m>=100||FV.armed?'#ffe9a0':'#19e3ff');
+  gl.style.transition=mo?'opacity .4s':'none';gl.style.opacity=FV.on?'1':'0';};
+RET.fvReset=function(){const was=FV.on||FV.armed;FV.m=0;FV.on=false;FV.armed=false;FV.bars=0;FV.last=-99;FV.tb=0;AU.fever=false;if(was)try{AU.lyTick(AU.a);}catch(x){}RET.fvDraw();};
+RET.fvStop=function(){const was=FV.on;FV.on=false;FV.armed=false;FV.bars=0;AU.fever=false;if(was&&running)floater(W*.5,H*.3,'FEVER OVER','#ffd23d');RET.fvDraw();};
+RET.fvGain=function(v){if(!RET.fever||!running||G.dead||G.over||FV.on||FV.armed||G.boss||STILL.t>FV.still)return false;
+  FV.m=Math.min(100,FV.m+v);RET.fvDraw();return true;};
+RET.fvReady=()=>RET.fever&&running&&!G.dead&&!G.boss&&FV.m>=100&&FV.tb-FV.last>=FV.gap;
+NR.on('runStart',()=>{RET.fvReset();});
+NR.on('runEnd',()=>{RET.fvReset();});
+NR.on('stageClear',()=>{RET.fvReset();});
+NR.on('districtEnd',()=>{RET.fvStop();FV.m=0;RET.fvDraw();});
+NR.on('bossIn',d=>{if(FV.on||FV.armed)RET.fvStop();});
+NR.on('graze',()=>{RET.fvGain(FV.gz);});
+NR.on('perfect',d=>{RET.fvGain(d&&d.kind==='dash'?FV.dash:FV.pf);});
+NR.on('beat',d=>{if(!RET.fever){if(RET.fvEl&&RET.fvEl.style.display!=='none')RET.fvEl.style.display='none';return;}if(!d||d.i%4!==3)return;   // the beat before a bar line: arm / disarm the music so its layers change on that line
+  if(FV.on){if(FV.bars>=FV.len-1)AU.fever=false;}
+  else if(!FV.armed&&RET.fvReady()){FV.armed=true;AU.fever=true;}});
+NR.on('bar',()=>{if(!RET.fever)return;FV.tb++;
+  if(FV.on){if(++FV.bars>=FV.len)RET.fvStop();else RET.fvDraw();return;}
+  if(FV.armed){FV.armed=false;
+    if(!RET.fvReady()){AU.fever=false;return;}
+    FV.on=true;FV.bars=0;FV.m=0;FV.last=FV.tb;FV.starts++;AU.fever=true;
+    floater(W*.5,H*.3,'FEVER ×'+FV.k,'#ffd23d');G.flash=Math.max(G.flash,.25*FX());if(RET.sting)AU.sting('fever');RET.fvDraw();}});
