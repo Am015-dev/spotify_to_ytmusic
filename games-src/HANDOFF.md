@@ -475,3 +475,9 @@ Next: owner supplies the art; tune `RIG.hp` once the real ship pictures are chec
 - `games-src/nightrun/parts/stats.js` (after ret.js in build.py): lifetime counters in `mnr_stats` (in the export list), 30 achievements (`ach-<id>.webp` 128x128 placeholders from make-placeholders.py; badge+glyph drawn until real art is in ready.json), unlock toast queue, completion % on the title chip, MENU > STATS sheet (credits, privacy, reset). API: `RET.st`. Test: `stats-test.js`.
 - Story-log (`RET.tale`) is read defensively: expects numeric/function `seen|done|count` and `total|max`; otherwise ignored.
 - Skill-gated achievements (no-hit, Hard, Heat) ignore Assist runs; Assist runs still count for the counters.
+
+## Nightrun power-ups: six music-tied powers + reliable DRUM BURST (flag RET.pw2, `?pw2=0` = old)
+- New `parts/powerups.js` (after ret.js in build.py; no digit in the name because guard.py rejects numbered layer files). ECHO, DOWNBEAT NOVA, MAGNET BASS, WINGMATES, CRESCENDO, CHORD SHIELD: 8 bars each, weight 2 (= SLOW GROOVE), one at a time with each other and with DRUM BURST (a new pickup replaces the running one; tempo/slow/drop unchanged). Icons drawn in code, no pictures, no manifest entries. Each adds a note layer via `AU.osc` on the music bus in the song's key.
+- Drum fix: the layer is scheduled from the `beat` event on the song grid (the old 25 ms `setInterval` lost beats in a throttled tab and ignored `BT.off`); `PW.drums` is a no-op with the flag on. Shots were already beat-driven.
+- First pickup of each power keeps a 6 s hint (`mnr_pw2seen`), later ones 1.6 s. Not in the Flight School text (it has no power list).
+- Test: `NODE_PATH=$(npm root -g) node games-src/nightrun/ret-pw2-test.js` (23 checks). Bot-dull: MAGNET BASS and CHORD SHIELD (no effect on kill speed); not tuned beyond the weights.
