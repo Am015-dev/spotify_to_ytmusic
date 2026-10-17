@@ -181,8 +181,11 @@ function TR_bridgeEnds(){if(CID!=='fra'||!TR_RG)return;for(const b of[...BRIDGES
 function TR7_cap(h,nx,nz,r,D){if(new URLSearchParams(location.search).get('tr7')==='0')return;const s=Math.tan(27*Math.PI/180)*r,s2=s*Math.SQRT2,ok=k=>!D||D[k]>=180;
   for(let it=0;it<2;it++){for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i;if(!ok(k))continue;let v=h[k];if(i)v=Math.max(v,h[k-1]-s);if(j){v=Math.max(v,h[k-nx]-s);if(i)v=Math.max(v,h[k-nx-1]-s2);if(i<nx-1)v=Math.max(v,h[k-nx+1]-s2)}h[k]=v}
     for(let j=nz-1;j>=0;j--)for(let i=nx-1;i>=0;i--){const k=j*nx+i;if(!ok(k))continue;let v=h[k];if(i<nx-1)v=Math.max(v,h[k+1]-s);if(j<nz-1){v=Math.max(v,h[k+nx]-s);if(i<nx-1)v=Math.max(v,h[k+nx+1]-s2);if(i)v=Math.max(v,h[k+nx-1]-s2)}h[k]=v}}}
-function TR_G(x,z){const W=TR_W||TR_init();let fx=(x-WX0)/W.r,fz=(z-WZS)/W.r;fx=fx<0?0:fx>W.nx-1.001?W.nx-1.001:fx;fz=fz<0?0:fz>W.nz-1.001?W.nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*W.nx+i,h=W.h;
-  return(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+W.nx]*(1-tx)+h[k+W.nx+1]*tx)*tz}
+// perf-3: TR_G read W.r/W.nx/W.nz/W.h by name and its optimized code was thrown away ~600x a second ("insufficient type feedback for generic named access",
+// --trace-deopt), so every sample ran unoptimized and boxed its doubles (~1.8 GB / 30 s in Athens). The grid fields are copied to script lets once per TR_W.
+let TR_Wc=null,TR_r=1,TR_nx=2,TR_nz=2,TR_h=null;
+function TR_G(x,z){if(TR_W!==TR_Wc||!TR_W){const W=TR_W||TR_init();TR_Wc=W;TR_r=W.r;TR_nx=W.nx;TR_nz=W.nz;TR_h=W.h}const nx=TR_nx;let fx=(x-WX0)/TR_r,fz=(z-WZS)/TR_r;fx=fx<0?0:fx>nx-1.001?nx-1.001:fx;fz=fz<0?0:fz>TR_nz-1.001?TR_nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*nx+i,h=TR_h;
+  return(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+nx]*(1-tx)+h[k+nx+1]*tx)*tz}
 const TR_tauH0=tauH;
 // the Taunus keeps its sculpted ridges on top of the real ground; Frankfurt has no road shelves (gentle, smoothed DEM)
 tauH=(x,z)=>{let h=TR_G(x,z)+TR_tauH0(x,z);if(x<TAU_R.x0||z<TAU_R.z0)return h;for(const P of[TAU_SUM,TAU_CAS]){const d=Math.hypot(x-P.x,z-P.z);if(d<P.r){const H=P.trH??(P.trH=TR_G(P.x,P.z)+TR_tauH0(P.x,P.z)),k=clamp((P.r-d)/(P.r*.55),0,1);h+=(H-h)*k*k*(3-2*k)}}return h};
