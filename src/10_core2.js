@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.91',date:'17 Oct 2026',items:[{t:'FIXED',s:'Much less lag: the camera no longer stalls for a frame when it checks walls (the worst hitch was 66 ms).'},{t:'FIXED',s:'Smoother Frankfurt: slowest frames down from 122 ms to about 23 ms.'},{t:'CHANGED',s:'Lighter road and avatar drawing, so big scenes load and run smoother.'}]},
   {v:'v90m-beta.90',date:'17 Oct 2026',items:[{t:'FIXED',s:'Phones: parts of the city far behind you are freed sooner, so memory stays lower on long drives (fewer crashes).'}]},
   {v:'v90m-beta.89',date:'17 Oct 2026',items:[{t:'FIXED',s:'Athens: no more sudden jumps out of the world, chapter resets or the car shaking in place.'},{t:'FIXED',s:'Smoother chase camera: it no longer pumps in and out on hills or when the car changes form.'},{t:'CHANGED',s:'Athens now starts on wide Syngrou Avenue, so you are up to speed in about 4 seconds.'}]},
   {v:'v90m-beta.88',date:'17 Oct 2026',items:[{t:'FIXED',s:'The track builder no longer opens as a black screen when you come from the garage.'},{t:'FIXED',s:'The LEVEL UP card waits until you close the garage or builder instead of covering it.'}]},
