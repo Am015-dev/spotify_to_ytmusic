@@ -1,0 +1,5 @@
+# HANDOFF dest4 (2026-10-17): destructibles + shortcuts ON by default (?dest=0 off), pushed to alex/od-int2
+1. Shortcuts are kept only when the road route is >= 1.7x the straight line (est. save >= 41 %), so the driven save stays >= 20 % even with ~30 % wobble. dest/stops now uses the median of 3 wander seeds per side (GO timeout 800 s). Merged latest od-int2.
+2. Built page, sequential: unit 0 FAIL (5316); dest/shortcut, dest/stops, dest/smash green in Fra + Ath; smash2 green. rv2k2 (akro, cardstop) and life1/ath-density were red once under load, green on re-run. xf1/{grass,water,land,slope,kerb} fail only on "SLOW > 10 s" (content all ✅); the same names are red on trunk.
+3. Shot (852x393, tools/dest/shots.js, now uses ?draw=0 + __tq.draw() so it is no longer blank): world renders but the warped camera is upside-down / ghosted in swiftshader; arrows and a smashed prop are NOT seen. Visual claim unverified; needs a real-device look.
+4. No OD_CHANGELOG entry (coordinator adds it at deploy).

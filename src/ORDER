@@ -125,6 +125,8 @@
 98cam_size_cam.js
 98dmg_damage.js
 98sm2_smash2.js
+98dest_destruct.js
+98dest_go.js
 98r3e_r3e.js
 98gx_gfx.js
 98ev_env.js
