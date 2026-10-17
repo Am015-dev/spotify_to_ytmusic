@@ -802,4 +802,4 @@ body.ckOn #odPin{display:none}body:has(#npcSay:not([hidden])) #odPin{display:non
      if(r.width*r.height>VA*.4||(r.left<pinBox.r+8&&r.right>pinBox.l-8&&r.top<pinBox.b+8&&r.bottom>pinBox.t-8)){y=true;break}}}
    document.body.classList.toggle('odYield',y)}catch(e){}};
  {const st3=document.createElement('style');st3.textContent='body.odYield #odPin{display:none!important}';document.head.appendChild(st3)}setInterval(yieldStep,120);
- window.__chk={rpScan:RP_scan,said:()=>goI._t,pinItems:()=>pinItems().map(k),city:(id,j=0)=>{const L=GO[id];return !L?null:L[j].bx?'bx':goCity(L[j])},nvar:id=>(GO[id]||[]).length,go:(id,j)=>{const it=OD_CHECKLIST.find(q=>k(q)===id);goI._t='';if(it){if(j)goI[id]=j-1;goJump(it)}return goI._t},GO,text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}
+ window.__chk={rpScan:RP_scan,said:()=>goI._t,goSay,pinItems:()=>pinItems().map(k),city:(id,j=0)=>{const L=GO[id];return !L?null:L[j].bx?'bx':goCity(L[j])},nvar:id=>(GO[id]||[]).length,go:(id,j)=>{const it=OD_CHECKLIST.find(q=>k(q)===id);goI._t='';if(it){if(j)goI[id]=j-1;goJump(it)}return goI._t},GO,text,items:OD_CHECKLIST,pin:()=>pinR(),pinSt:()=>pst()}}

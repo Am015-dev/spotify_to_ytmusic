@@ -5,7 +5,7 @@
 // Fix: the chase camera (b back, h up, l look-ahead) is SOLVED from the ride's measured side profile (vertices binned along its length): the road point
 // 10 m past the nose must be in view over the cab (+0.3 m) at ~62 % screen height, the ride fills 15-35 % of the screen height (target 24 %), as close to
 // the stock camera as possible (normal cars keep the stock camera when it already passes). Re-solved on every ride/aspect change, eased (≤ 4 m/s, ~2-3 s).
-const CAM={on:1,k:'',due:0,f:0,P:null,T:{},cur:null,asp:0,sP:.62,fill:.24,m:.3,ahead:10,n:{fit:0,keep:0},go:null,log:[]};
+const CAM={on:1,k:'',sg:'',sgN:0,due:0,f:0,P:null,T:{},cur:null,asp:0,sP:.62,fill:.24,m:.3,ahead:10,n:{fit:0,keep:0},go:null,log:[]};
 const _cmV=new THREE.Vector3(),_cmB=new THREE.Box3();
 // side profile in the car frame: z forward from RO, y up from RO.y; bins of 0.5 m → top height; g = lowest point (tyre bottoms)
 function CAM_prof(host,F){if(!host){const ud=pl&&pl.mesh&&pl.mesh.userData;host=ud&&ud.m}if(!host)return null;host.updateMatrixWorld(true);F=F||{x:RO.x,y:RO.y,z:RO.z,h:RO.h};
@@ -36,7 +36,11 @@ function CAM_fit(){const t0=performance.now(),P=CAM_prof();if(!P)return;CAM.P=P;
  CAM.n.fit++;if(kp)CAM.n.keep++;CAM.log.push([RO.vsel||'',+P.L.toFixed(2),+P.H.toFixed(2),(CAM.T[SET.rcam||'chase']||{}).b,(CAM.T[SET.rcam||'chase']||{}).h]);if(CAM.log.length>20)CAM.log.shift()}
 // when: 30 sim frames after the ride (mesh / form) changes (the first frames still show stock parts), on a big aspect change (rotation) or a camera-mode change; never periodically (perf)
 function CAM_upd(){const ud=pl&&pl.mesh&&pl.mesh.userData;if(!ud||!ud.m||(pl.boatK||0)>.5)return;const key=CAM_rkey(ud)+'|'+(RO.vsel||'')+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:''),now=++CAM.f;
- if(key!==CAM.k){CAM.k=key;CAM.due=now+(CAM.snap?4:30);CAM.pend=1;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05){CAM.due=Math.min(CAM.due,now);CAM.pend=1}if(!CAM.T[SET.rcam||'chase']&&(SET.rcam||'chase')!=='high'&&!CAM.pend&&CAM.P){CAM.due=now;CAM.pend=1}if(!CAM.pend||now<CAM.due)return;CAM_fit();CAM.pend=0;if(CAM.snap){CAM.snap=0;CAM.cur=null}}
+ if(key!==CAM.k){CAM.k=key;CAM.sg='';CAM.sgN=0;CAM.due=now+(CAM.snap?4:30);CAM.pend=1;return}if(Math.abs((camera.aspect||1)-CAM.asp)>.05){CAM.due=Math.min(CAM.due,now);CAM.pend=1}if(!CAM.T[SET.rcam||'chase']&&(SET.rcam||'chase')!=='high'&&!CAM.pend&&CAM.P){CAM.due=now;CAM.pend=1}if(!CAM.pend||now<CAM.due)return;
+ // camloop (beta.83 phone: "the car jumps far away, then close again, in a loop"): an auto car <-> 4x4 form change (CR_MODE) is in the key, but the new body's meshes are swapped in after the 30-frame wait, so the fit measured the OLD / half-swapped
+ // shape (4.1 x 2.8 m instead of 4.4 x 1.7) and pushed the camera to 10 m, then re-fitted back 30 frames later at every terrain crossing (Athens). Now the measured shape must hold still for two reads 20 frames apart (max 6 reads) before a fit; a garage snap fits at once.
+ if(!CAM.snap&&CAM.sgN<6){const P=CAM_prof(),sg=P?Math.round(P.L*4)+'x'+Math.round(P.H*4)+'x'+Math.round(P.g*8):'';if(sg!==CAM.sg){CAM.sg=sg;CAM.sgN=(CAM.sgN||0)+1;CAM.due=now+20;return}}CAM.sg='';CAM.sgN=0;
+ CAM_fit();CAM.pend=0;if(CAM.snap){CAM.snap=0;CAM.cur=null}}
 // ride fingerprint: the player mesh is KEPT across rides (a garage pick rebuilds the gbM brick meshes on it; TAKE / ENTER swap the body children of ud.m), so the old key (mesh uuid + gbM.length)
 // missed same-count swaps: Athens never re-fitted, Frankfurt lagged one ride. Any change of the brick meshes or the body children now re-fits, whichever path changed the ride.
 function CAM_rkey(ud){const m=ud.m,g=ud.gbM,c=m.children,l=c[c.length-1],f=c[0];return m.uuid+'|'+(g?g.length+'.'+(g[0]?g[0].uuid:''):0)+'|'+c.length+'.'+(f?f.uuid:'')+'.'+(l?l.uuid:'')}
