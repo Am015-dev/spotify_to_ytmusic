@@ -529,3 +529,6 @@ Cause of the extra boss time: damage above the cap was thrown away (the bot's da
 - Anti-idle: a ship that has stood still for 3 s (`STILL.t`) hurts, frees and finds nothing; objects spawn at least 120 px away from the ship's height and never before 6 s into a stage.
 - Stats: own counters in `mnr_flavor` (also in the save export list); a SHOOTER FLAVOUR block is added to the Stats sheet when `RET.stats` is on.
 - Open: tune the medal Neon after the owner has played it; SPEED CLEAR is only for boss / kill / score stages (a survive stage cannot award it).
+
+## Nightrun on-foot enemies and Warden boss (W3, 18 Oct 2026)
+`parts/footen.js` (after ret.js in build.py): `window.FOOT_ENEMIES` (grunt, gunman, shield, bruiser, knife, sniper, drone, turret, mech) and `window.FOOT_BOSS.warden`; inert until `parts/foot.js` calls it. Table and the engine contract: `FOOT-ENEMIES.md`. Gate: `node games-src/nightrun/footen-test.js` (207 checks, fake env). Engine must run `onHit` after `hp -= dmg` and before the death check (it hands hp back for blocked/capped hits), keep calling `ai` on dead enemies until `e.remove`, and honour `canHit`. Not yet run against `foot.js` (not on the branch when this was written). weapon-test "dps well/beat" fail with and without this file.
