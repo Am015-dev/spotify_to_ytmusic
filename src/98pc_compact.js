@@ -26,14 +26,16 @@ function PC_reg(im,sky){const n=im.count,src=new Float32Array(im.instanceMatrix.
 function PC_sph(C,i){const a=C.src,o=i*16,W=C.sky?null:C.im.matrixWorld.elements,bs=C.im.geometry.boundingSphere,c=bs.center,sx=Math.hypot(a[o],a[o+1],a[o+2]),sy=Math.hypot(a[o+4],a[o+5],a[o+6]),sz=Math.hypot(a[o+8],a[o+9],a[o+10]);
  C.c[i*4]=a[o]*c.x+a[o+4]*c.y+a[o+8]*c.z+a[o+12];C.c[i*4+1]=a[o+1]*c.x+a[o+5]*c.y+a[o+9]*c.z+a[o+13];C.c[i*4+2]=a[o+2]*c.x+a[o+6]*c.y+a[o+10]*c.z+a[o+14];C.c[i*4+3]=bs.radius*Math.max(sx,sy,sz);
  if(W){const x=C.c[i*4],y=C.c[i*4+1],z=C.c[i*4+2];C.c[i*4]=W[0]*x+W[4]*y+W[8]*z+W[12];C.c[i*4+1]=W[1]*x+W[5]*y+W[9]*z+W[13];C.c[i*4+2]=W[2]*x+W[6]*y+W[10]*z+W[14]}}
-function PC_scan(){PC.L.length=0;PC.st.meshes=PC.st.src=0;PC.grp=HUB.grp;if(!HUB.grp)return;HUB.grp.traverse(o=>{if(PC_cand(o))PC_reg(o,false)});
+function PC_scan(){PC.L.length=0;PC.st.meshes=PC.st.src=0;PC.grp=HUB.grp;if(!HUB.grp)return;HUB.grp.traverse(o=>{if(PC_cand(o))PC_reg(o,false)});PC.wg=null;PC_addCk(HUB.grp);
  if(typeof CLOUDS!=='undefined'&&CLOUDS)CLOUDS.traverse(o=>{if(o.isInstancedMesh&&!o.userData.pc&&o.count>=16&&o.count===o.instanceMatrix.count)PC_reg(o,true)});
  // traffic bodies + their wheel / glass layers (same index c.j): moving, so tested one by one each pass, not in the grid
  for(const im of Object.values(HUB.cim||{}))for(const q of[im,im&&im.userData.w,im&&im.userData.g])if(q&&q.isInstancedMesh&&!q.userData.pc&&q.count>=8&&q.count===q.instanceMatrix.count)PC_reg(q,false).dyn=true;
  PC.nch=HUB.grp.children.length;PC_grid()}
 // perf-6: meshes added to HUB.grp after the first scan (lazy 'lz' leaf/filler groups: 18k-instance leaf IM = 217k tris Fra) are picked up when the child count changes
 // boot-1: PC_add only queues the new meshes; PC_drain registers them under a ~3 ms budget per frame (PC_reg + grid were 22-650 ms in one frame on a tile landing)
-function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const Q=PC.q,w=o=>{if(o===lg)return;if(!o.userData.pcQ&&PC_cand(o)){o.userData.pcQ=1;Q.push(o);n++}for(const q of o.children)w(q)};w(HUB.grp);return n}
+function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const Q=PC.q,w=o=>{if(o===lg)return;if(!o.userData.pcQ&&PC_cand(o)){o.userData.pcQ=1;Q.push(o);n++}for(const q of o.children)w(q)};if(PC_addCk(HUB.grp))w(HUB.grp);else for(const t of HUB.grp.children)if(PC_addCk(t))w(t);return n}
+// boot-3: PC_add walks only the top-level groups that changed since their last walk (child count; a streamed tile root until it is shown), not the whole hub
+function PC_addCk(t){if(t===HUB.grp){if(PC.wg===t)return false;PC.wg=t;for(const c of t.children)PC_addCk(c);return true}const k=t.children.length,u=t.userData;if(u.pcN===k&&(!u.lz||u.pcV))return false;u.pcN=k;u.pcV=t.visible;return true}
 function PC_drain(ms){if(!PC.q.length)return 0;const t=performance.now(),A=[];while(PC.q.length&&(!A.length||performance.now()-t<ms)){const o=PC.q.shift();o.userData.pcQ=0;if(o.parent&&PC_cand(o))A.push(PC_reg(o,false))}if(A.length)PC_grid(A);return A.length}
 function PC_grid(add){
  // perf-7: one 80 m world grid (PC.G = x,y,z,r per cell) tested ONCE per pass into PC.cv; each mesh keeps its own cell lists (C.G = [cell, Int32Array ids]).
@@ -42,7 +44,10 @@ function PC_grid(add){
  for(const C of add||PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
   C.G=[];for(const[k,L]of T){let q=M.get(k);if(!q){let x=0,y=0,z=0;for(const i of L){x+=C.c[i*4];y+=C.c[i*4+1];z+=C.c[i*4+2]}M.set(k,q={id:M.size,x:x/L.length,y:y/L.length,z:z/L.length,r:0})}
    for(const i of L)q.r=Math.max(q.r,Math.hypot(C.c[i*4]-q.x,C.c[i*4+1]-q.y,C.c[i*4+2]-q.z)+Math.max(C.c[i*4+3],2)+4);C.G.push(q.id,Int32Array.from(L))}}
- const G=PC.G=new Float64Array(M.size*4);for(const q of M.values()){G[q.id*4]=q.x;G[q.id*4+1]=q.y;G[q.id*4+2]=q.z;G[q.id*4+3]=q.r}PC.cv=new Uint8Array(M.size);PC.left=0}
+ // boot-3: on an add, write only the touched cells into a capacity-doubling PC.G (was: the whole grid re-copied per landing, 43 ms in Athens); PC.cv keeps one byte per cell
+ let G=PC.G;const full=!add||!G;if(full||G.length<M.size*4){const g=new Float64Array(Math.max(M.size*4,full?0:G.length*2));if(!full)g.set(G);G=PC.G=g}
+ const W=q=>{G[q.id*4]=q.x;G[q.id*4+1]=q.y;G[q.id*4+2]=q.z;G[q.id*4+3]=q.r};if(full)for(const q of M.values())W(q);else{const U=new Set();for(const C of add)if(C.G)for(let g=0;g<C.G.length;g+=2)U.add(C.G[g]);for(const q of M.values())if(U.has(q.id))W(q)}
+ if(!PC.cv||PC.cv.length!==M.size)PC.cv=new Uint8Array(M.size);PC.left=0}
 // one instance: visible → copied to the next free slot of its mesh
 function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const d=Math.hypot(x-cx,y-cy,z-cz);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
  const s=C.s++,a=C.src,arr=C.im.instanceMatrix.array;if(s!==i){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
