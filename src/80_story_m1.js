@@ -421,7 +421,7 @@ const _lkAQ=applyQuality;applyQuality=(...a)=>{if(LK.effQ!==null&&SET.q!==LK.eff
 {const _ht=hubTrafficStep;hubTrafficStep=dt=>{_ht(dt);LK_paint();LK_boost()}}
 {const _he=hubEnter;hubEnter=(...a)=>{const r=_he(...a);LK_roamLook();LK_paint();return r}}
 // extra distance culling on low/min (base: 2100/1600 m, small things 750 m); perf-4 (2026-10-17): low 1000/400 m, min 800/340 m
-{const _hc=hubCullStep;hubCullStep=()=>{const p=HUB.cpos;_hc();const L=LK_lvl();if(HUB.cpos!==p&&HUB.cull&&(L==='low'||L==='min')){const cx=camera.position.x,cz=camera.position.z,R2=L==='min'?800:1000,Rs=L==='min'?340:400;/* perf-4: were 1050/1350, 420/520 */for(const c of HUB.cull)if(c.o.visible&&Math.hypot(c.x-cx,c.z-cz)-c.r>(c.small?Rs:Math.min(R2,c.o.userData.cd||R2)))c.o.visible=false}}}
+/* perf-17: the low/min cull radii now live in hubCullStep (70_roam_world.js), sliced with it */
 function LK_feed(ms){if(SET.lkAuto==='off'||paused||document.hidden||!(state==='roam'||state==='race'||state==='countdown')||ms>150||ms<=0){LK.acc={t:0,n:0,sum:0,sq:0};return}
   const A=LK.acc;A.t+=ms;A.n++;A.sum+=ms;A.sq+=ms*ms;LK.since+=ms;if(A.t<3000)return;const a=A.sum/A.n,sd=Math.sqrt(Math.max(0,A.sq/A.n-a*a));LK.acc={t:0,n:0,sum:0,sq:0};
   if(Math.abs(a-33.3)<3&&sd<4)return; // steady 30 fps = iOS low-power cap, not the GPU

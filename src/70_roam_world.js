@@ -2,12 +2,17 @@
 function waterFx(dt){const s=pl;if(!s||!RO.on)return;const boat=s.boatMode&&!s.air,sp=Math.abs(RO.v);
   if(boat&&!RO.wasBoat&&sp>12){burst(WATER,V3(RO.x,HWY+1,RO.z),40,14,.8,new THREE.Color(.6,.85,1.3));AU.sfx('splash')}RO.wasBoat=boat;
   if(boat&&sp>6){RO.wkT=(RO.wkT||0)+dt*Math.min(3,sp/20);while(RO.wkT>.05){RO.wkT-=.05;const fx=Math.sin(RO.h),fz=Math.cos(RO.h),y=HWY+waveH(RO.x,RO.z,T)+.3;for(const sd of[-1,1])burst(WATER,V3(RO.x-fx*5+fz*sd*2.4,y,RO.z-fz*5-fx*sd*2.4),1,3+sp*.06,.7,new THREE.Color(.85,.95,1.2))}}}
-function hubCullAdd(root){if(HUB.cull)root.traverse(o=>cullPush(HUB.cull,o));HUB.cpos=null}
+function hubCullAdd(root){if(HUB.cull)root.traverse(o=>cullPush(HUB.cull,o));HUB.cj=4}
 function hubCullInit(){const L=HUB.cull=[];for(const top of HUB.grp.children)if(top!==RO.grp&&top.visible!==false)top.traverse(o=>cullPush(L,o));if(RO.grp){for(const im of RO.sim||[])if(im.boundingSphere)L.push({o:im,x:im.boundingSphere.center.x,z:im.boundingSphere.center.z,r:Math.min(im.boundingSphere.radius,400),small:true});for(const o of RO.grp.children)if(o.userData.ramp)L.push({o,x:o.position.x,z:o.position.z,r:30,small:false})}}
 function cullPush(L,o){{if(!(o.isMesh||o.isInstancedMesh)||o.frustumCulled===false)return;if(o.isInstancedMesh){if(!o.boundingSphere)o.computeBoundingSphere()}else if(!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();const bs=o.isInstancedMesh?o.boundingSphere:o.geometry.boundingSphere;if(!bs||bs.radius>1500)return;const g=o.geometry,tri=(g.index?g.index.count:g.attributes.position.count)/3;L.push({o,x:bs.center.x+o.position.x,z:bs.center.z+o.position.z,r:bs.radius,small:o.isInstancedMesh&&tri<1200&&!o.userData.nr})}}
-function hubCullStep(){if(!HUB.cull)hubCullInit();if(HUB.cull.length>4000){const C=HUB.cull,cx=camera.position.x,cz=camera.position.z,R2=SET.q==='high'?2100:1600,
+// perf-17: a camera jump (> 150 m, or a streamed tile landing) re-culls in 4 slices over 4 frames (was: the whole list in one frame, up to 65 ms in Athens); teleports (> 600 m) still cull all at once. Squared distances, no Math.hypot
+function hubCullStep(){if(!HUB.cull)hubCullInit();const C=HUB.cull,cx=camera.position.x,cz=camera.position.z,R2=SET.q==='high'?2100:1600,mv=HUB.cpos?Math.hypot(cx-HUB.cpos[0],cz-HUB.cpos[1]):1e9;
+  const LK=typeof LK_lvl==='function'?LK_lvl():'high',lo=LK==='low'||LK==='min',RL=LK==='min'?800:1000,Rs=LK==='min'?340:400;/* perf-4 low/min radii, folded in from the 80_story_m1 wrapper (was a second full pass) */
+  const vis=(i0,st)=>{for(let i=i0;i<C.length;i+=st){const c=C[i],dx=c.x-cx,dz=c.z-cz,cd=c.o.userData.cd;let k=cd||(c.small?750:R2);if(lo)k=Math.min(k,c.small?Rs:RL);k+=c.r;c.o.visible=dx*dx+dz*dz<k*k}};
+  if(mv>600){HUB.cpos=[cx,cz];HUB.cj=0;vis(0,1);return}if(mv>150){HUB.cpos=[cx,cz];HUB.cj=4}
+  if(HUB.cj>0){HUB.cj--;vis(HUB.cj,4);return}
+  if(C.length>4000){const f=HUB.cf=((HUB.cf||0)+1)%8;if(f===0)HUB.cpos=[cx,cz];vis(f,8);return}if((HUB.cf=(HUB.cf||0)+1)%8!==1)return;HUB.cpos=[cx,cz];vis(0,1)}
     jump=!HUB.cpos||Math.hypot(cx-HUB.cpos[0],cz-HUB.cpos[1])>150,f=HUB.cf=((HUB.cf||0)+1)%8;if(jump)HUB.cpos=[cx,cz];else if(f===0)HUB.cpos=[cx,cz];
-    for(let i=jump?0:f;i<C.length;i+=jump?1:8){const c=C[i];c.o.visible=Math.hypot(c.x-cx,c.z-cz)-c.r<(c.o.userData.cd||(c.small?750:R2))}return}const cx=camera.position.x,cz=camera.position.z,jump=!HUB.cpos||Math.hypot(cx-HUB.cpos[0],cz-HUB.cpos[1])>150;if((HUB.cf=(HUB.cf||0)+1)%8!==1&&!jump)return;HUB.cpos=[cx,cz];const R2=SET.q==='high'?2100:1600;for(const c of HUB.cull)c.o.visible=Math.hypot(c.x-cx,c.z-cz)-c.r<(c.o.userData.cd||(c.small?750:R2))}
 // districts: a small label when you cross into a new part of Mainhattan
 if(CID!=='fra'){const e=document.querySelector('#roamPlate b');if(e)e.textContent=''}
 const DIST_R=RF.districts.map(([name,r,side],i,A)=>({name,side:side||0,...rfRect(r),dup:A.findIndex(q=>q[0]===name)<i})),DISTRICTS=DIST_R;
