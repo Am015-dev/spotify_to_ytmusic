@@ -214,3 +214,8 @@ Problem: with the round-4 cap the Legend bot (max build) needed 339-362 s for th
 | Normal district | 103-109 | 87-92 | 87-96 | 84 | 87 |
 | Normal final | 164-171 | 128-141 | 131-138 | 127 | 131-136 |
 scale2-test / scale3-test Legend final window is back at 170-260 s; boss2-test's stress now also checks the upper targets.
+
+### Boss movesets (VARIETY B, 18 Oct 2026; parts/bossmoves.js, flag RET.bossmoves)
+Owner: "Game is extremely repetitive". All ten fights used the same 6 verbs. Now 45 verbs, every boss 8-10 in three phases, pairwise overlap <= 2, one signature + one counter each. HP, cap and phases unchanged (armour.js).
+Measured (bossmoves-audit.js): shortest telegraph 0.60 s, smallest free disc 96 px, bullets <= ebCap, speed <= BCAP, stress fight lengths at the armour floor (Normal mini ~52 s, district ~85 s, final ~127 s).
+Bot (balance-test bot, Normal, mid+late, 2 runs): 28/40 boss-stage clears vs 31/40 with ?bossmoves=0 in the last run (30 vs 28 in the run before). Weakest: Hoplite 1/4, Schranke 2/4; Talos 2/4 (was 0/4).
