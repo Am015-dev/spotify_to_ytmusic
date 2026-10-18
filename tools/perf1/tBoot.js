@@ -12,7 +12,7 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  const ctx=await b.newContext(TOUCH?{viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true}:{viewport:{width:1280,height:720},deviceScaleFactor:1});
  const p=await ctx.newPage();p.setDefaultTimeout(1800000);await p.addInitScript(INIT);await p.addInitScript('window.__WRAP='+JSON.stringify(process.env.WRAP||''));
  p.on('console',m=>{const t=m.text();if(/TICKERR|PF1/.test(t))console.log(t.slice(0,200))});p.on('pageerror',e=>console.log('ERR',e.message.slice(0,150)));const t0=Date.now();
- await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}&gov=1${process.env.QS?'&'+process.env.QS:''}`);
+ await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}&gov=1&warm=1${process.env.QS?'&'+process.env.QS:''}`);
  await p.waitForFunction(()=>window.__tq&&__tq.drv&&window.__oc,null,{polling:100});const boot=Math.round((Date.now()-t0)/1000);
  const wr=await p.evaluate(()=>{window.__auto=false;const ev=__oc.ev;window.PF1={b:{}};
   const names=['roamStep','roamCam','hubCullStep','roamHud','drawTraffic','updWorld','hubTrafficStep','miniDraw','miniPaint','studSync','updDebris','dresStep','stepSim','lazyStep','lzFinish','lzStart','hubRecycle','pedStep','districtStep','LV_step','L3_tick','STR_step','STR_lzStep','LK_paint','LK_apply','GOV_step','resize','OC_traffic','FC_step','LF_step','MEMF_step','GS_step','LIFE_draw','ART_step','FL_step','OG_tick','BC_upd','W12_chk','storyCheck','PC_step','PC_add','PC_grid','DEST_find','DEST_mark','XC_need','applyQuality','PB_tick','QA_tick'].concat((window.__WRAP||'').split(',').filter(Boolean));const ok=[];
@@ -21,12 +21,12 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  console.log('PF1 wrapped',wr.join(','));
  const r=await p.evaluate(async([N,RN])=>{const ev=__ev,RO=ev("RO"),R=__R,G=ev("typeof GOV!=='undefined'?GOV:null"),out=[];
   const drv=ev(`(()=>{const W=a=>Math.atan2(Math.sin(a),Math.cos(a));return()=>{const la=12+RO.v*.9,fx=Math.sin(RO.h),fz=Math.cos(RO.h),q=rfAim(RO.x+fx*la,RO.z+fz*la,fx,fz,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;if(Math.abs(RO.v)<.5&&(window.__stk=(window.__stk|0)+1)>90){window.__stk=0;const s=rfSnap(RO.x+(Math.random()-.5)*400,RO.z+(Math.random()-.5)*400,200);if(s)roamWarp(s[0],s[1],s[2]||0,true)}}})()`);
-  let prog=R.info.programs.length,glog=G?G.log.length:0;
+  const CONT=new Set(['roamStep','hubTrafficStep','hubCullStep','miniDraw','PC_step','stepSim','updWorld']);let prog=R.info.programs.length,glog=G?G.log.length:0;
   for(let i=0;i<N;i++){try{drv()}catch(e){}PF1.b={};PF1.rms=0;PF1.real=i%RN===RN-1;const t=performance.now();__tick(1);const ms=performance.now()-t;
-   const pg=R.info.programs.length,np=pg-prog;prog=pg;const b=PF1.b,rm=PF1.rms;let own='',om=0,sum=0;for(const k in b){if(k==='resize'||k==='LK_apply'||k==='PC_grid'||k==='PC_add'||k==='lzFinish'||k==='DEST_mark')continue;sum+=b[k];if(b[k]>om){om=b[k];own=k}}
+   const pg=R.info.programs.length,np=pg-prog;prog=pg;const b=PF1.b,rm=PF1.rms;let own='',om=0,sum=0;for(const k in b){if(CONT.has(k)||k==='resize'||k==='LK_apply'||k==='PC_grid'||k==='PC_add'||k==='lzFinish'||k==='DEST_mark')continue;sum+=b[k];if(b[k]>om){om=b[k];own=k}}
    if(rm>om&&rm>ms*.4){own='render';om=rm}if(np>0&&rm>20)own='render+prog'+np;
-   for(const k of['PC_add','lzFinish','LK_apply','GOV_step','DEST_find'])if(b[k]>ms*.3&&b[k]>15)own=k;
-   if(om+rm<ms*.5)own='gc/other';
+   for(const k of['PC_add','lzFinish','LK_apply','GOV_step','DEST_find','miniPaint'])if(b[k]>ms*.3&&b[k]>15)own=k;
+   if(om+rm<ms*.5)own=(b.roamStep||0)>ms*.5?'roamStep-self':'gc/other';
    let gl='';if(G&&G.log.length!==glog){gl=G.log.slice(glog).map(x=>x.join(':')).join(',');glog=G.log.length}
    out.push([i,+ms.toFixed(1),+rm.toFixed(1),own,+om.toFixed(1),np,gl,Object.entries(b).filter(e=>e[1]>4).map(e=>e[0]+':'+e[1].toFixed(0)).join(' ')]);
    if(ms>50)console.log('PF1L f'+i+' '+ms.toFixed(0)+' '+own+' '+out[out.length-1][7]);if(i%600===599)console.log('PF1P s'+((i+1)/60)+' '+Math.round(performance.now()/1000));await new Promise(r=>setTimeout(r,0))}

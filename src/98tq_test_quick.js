@@ -10,7 +10,7 @@ if(TQ){
  LK_shadow=(f=>function(on){return f.call(this,TQ.q?on:false)})(LK_shadow);
  // boot speed: no shader/GPU warm-up passes (they only smooth the first seconds on a phone) and no picture while the loader is up
  try{menuTrack=ROAMCFG.track||'grand'}catch(e){}  // the menu backdrop builds the same track free roam needs: built once, not twice
- ldPrewarm=async function(){};SM_upload=async function(){};P2_warm=function(){};warmTextures=function(){};
+ if(!/[?&]warm=1/.test(location.search)){ldPrewarm=async function(){};SM_upload=async function(){};P2_warm=function(){};warmTextures=function(){}}  // &warm=1 (tools/perf1/tBoot.js): keep the real loader warm-up
  {const r0=composer.render.bind(composer);composer.render=function(){let st='';try{st=state}catch(e){}if(st==='loading'||LD.busy||TQ.nodraw&&!TQ.draw)return;return r0.apply(this,arguments)}}
  // &draw=0: no NPC portraits (the first one, Hilde's tutorial face, cost 2.6 s of canvas emoji/font set-up in headless Chromium; nobody sees it)
  if(TQ.nodraw){try{avatar=function(){return'data:,'}}catch(e){}}
