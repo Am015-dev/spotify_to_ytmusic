@@ -114,13 +114,20 @@ function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),Q=LF_DT.
  const vy=p._vy&&p._vy.length===n?p._vy:(p._vy=new Float32Array(n));for(let i=0;i<n;i++)vy[i]=Y[i];
  for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];for(let k=0;k<12;k+=3){const u=W[k],v=W[k+1],w=W[k+2],x=X[a]*u+X[b]*v+X[d]*w,z=Z[a]*u+Z[b]*v+Z[d]*w;
   const e=Y[a]*u+Y[b]*v+Y[d]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
-function LF_drapeG(L,A,gy){const n=LF_DT.V.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),idx=[],C=new THREE.Color();if(!L.lfP)L.lfP=[];
- A.forEach((p,k)=>{const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
-  LF_DT.V.forEach((q,i)=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=(p._vy?p._vy[i]:gy(x,z))+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b});
-  for(const i of LF_DT.I)idx.push(o+i);
+// perf-8: a sliced generator (was one step of 20-75 ms in Athens): patches in ≤1.2 ms slices, typed index, and each patch's vertex normals summed
+// here exactly as BufferGeometry.computeVertexNormals does (area-weighted face normals, patches share no vertices), so no pass over the whole mesh
+function* LF_drapeG(L,A,gy,out){const n=LF_DT.V.length,DI=LF_DT.I,ni=DI.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),nor=new Float32Array(A.length*n*3),idx=new (A.length*n>65535?Uint32Array:Uint16Array)(A.length*ni),C=new THREE.Color();if(!L.lfP)L.lfP=[];
+ let t0=performance.now();
+ for(let k=0;k<A.length;k++){const p=A[k],c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
+  for(let i=0;i<n;i++){const q=LF_DT.V[i],a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=(p._vy?p._vy[i]:gy(x,z))+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b}
+  for(let t=0;t<ni;t+=3){const ia=(o+DI[t])*3,ib=(o+DI[t+1])*3,ic=(o+DI[t+2])*3;idx[k*ni+t]=o+DI[t];idx[k*ni+t+1]=o+DI[t+1];idx[k*ni+t+2]=o+DI[t+2];
+   const cx=pos[ic]-pos[ib],cy=pos[ic+1]-pos[ib+1],cz=pos[ic+2]-pos[ib+2],ax=pos[ia]-pos[ib],ay=pos[ia+1]-pos[ib+1],az=pos[ia+2]-pos[ib+2],nx=cy*az-cz*ay,ny=cz*ax-cx*az,nz=cx*ay-cy*ax;
+   nor[ia]+=nx;nor[ia+1]+=ny;nor[ia+2]+=nz;nor[ib]+=nx;nor[ib+1]+=ny;nor[ib+2]+=nz;nor[ic]+=nx;nor[ic+1]+=ny;nor[ic+2]+=nz}
+  for(let i=0;i<n;i++){const j=(o+i)*3,l=Math.hypot(nor[j],nor[j+1],nor[j+2])||1;nor[j]/=l;nor[j+1]/=l;nor[j+2]/=l}
   const Rr=Math.max(p.sx,p.sz),e={x:p.x,z:p.z,c,s,sx:p.sx,sz:p.sz,R2:Rr*Rr,yt:pos[o*3+1],gx:0,gz:0,d:1};
-  for(let i=Math.floor((p.x-Rr)/32);i<=Math.floor((p.x+Rr)/32);i++)for(let j=Math.floor((p.z-Rr)/32);j<=Math.floor((p.z+Rr)/32);j++){const kk=i*10000+j;let B=LF.PG.get(kk);if(!B)LF.PG.set(kk,B=[]);B.push(e);L.lfP.push([kk,e])}});
- if(!A.length)return null;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));g.setIndex(idx);g.computeVertexNormals();g.computeBoundingSphere();return g}
+  for(let i=Math.floor((p.x-Rr)/32);i<=Math.floor((p.x+Rr)/32);i++)for(let j=Math.floor((p.z-Rr)/32);j<=Math.floor((p.z+Rr)/32);j++){const kk=i*10000+j;let B=LF.PG.get(kk);if(!B)LF.PG.set(kk,B=[]);B.push(e);L.lfP.push([kk,e])}
+  if(performance.now()-t0>1.2){yield 'lf9a';t0=performance.now()}}
+ if(!A.length)return;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));g.setAttribute('normal',new THREE.BufferAttribute(nor,3));g.setIndex(new THREE.BufferAttribute(idx,1));g.computeBoundingSphere();out.g=g}
 function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=CID==='fra',[X0,X1,Z0,Z1]=L.rect,I={tuft:[],bed:[],patch:[],pond:[],reed:[],mound:[]},st=LF.st;
  const has=t=>!!D[t],pk=a=>{const b=a.filter(has);return b.length?b[Math.floor(LF_h(a.length,b.length,L.props.length)*b.length)]:null},{TREES,ROCK,GRN,DIRT}=C;
  const gy=(x,z)=>groundY(x,z)+LF_mound(x,z),G16=(x,z)=>{const k=Math.floor(x/16)*10000+Math.floor(z/16),e=[x,z];let A=LF.G.get(k);if(!A)LF.G.set(k,A=[]);A.push(e);L.lfG.push([k,e])};
@@ -193,7 +200,7 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
   const DC=LF.dc||(LF.dc=new Map()),dk=CID+L.id,pv=DC.get(dk),cu=[],ce=new Map();DC.set(dk,cu);
   for(let i=0;i<I.patch.length;i++){const p=I.patch[i],c0=pv&&pv[i],hit=c0&&c0.x===p.x&&c0.z===p.z&&c0.sx===p.sx&&c0.sz===p.sz,c=hit?c0:{x:p.x,z:p.z,sx:p.sx,sz:p.sz,r:LF_resid(p,gy)>.08,k:-1,vy:null};cu.push(c);if(c.r){DR0.push(p);ce.set(p,c)}if(!hit&&slice()){yield 'lf7';t0=performance.now()}}
   for(const p of DR0){const sx=p.sx,sz=p.sz,c=ce.get(p);let ok=false;if(c.k>=0){if(c.k>0){p.sx=sx*c.k;p.sz=sz*c.k;p._vy=c.vy;ok=true}}else{c.k=0;for(const k of[1,.7,.5]){p.sx=sx*k;p.sz=sz*k;if(LF_drapeOk(p,gy)){ok=true;c.k=k;c.vy=p._vy;break}}}
-   if(ok)DR.push(p);else{p.sx=sx;p.sz=sz;p._vy=null}if(slice()){yield 'lf8';t0=performance.now()}}if(DR0.length){const g=DR.length?LF_drapeG(L,DR,gy):null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield 'lf9'}}
+   if(ok)DR.push(p);else{p.sx=sx;p.sz=sz;p._vy=null}if(slice()){yield 'lf8';t0=performance.now()}}if(DR0.length){const og={};if(DR.length)yield* LF_drapeG(L,DR,gy,og);const g=og.g||null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield 'lf9'}}
   I.pond=I.pond.filter(p=>{let lo=9e9,hi=-9e9;for(let k=0;k<12;k++){const a=k/12*6.283,y=gy(p.x+Math.cos(a)*p.sx,p.z+Math.sin(a)*p.sz);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.15)return false;p.y=(lo+hi)/2+.02;return true});
   I.bed=I.bed.filter(p=>{const c=Math.cos(p.ry||0),sn=Math.sin(p.ry||0);let lo=9e9,hi=-9e9;for(const[a,b]of[[-2,-1.2],[2,-1.2],[2,1.2],[-2,1.2]]){const u=a*p.sx,v=b*p.sz,y=gy(p.x+c*u+sn*v,p.z-sn*u+c*v);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.2)return false;p.y=lo;return true})}
  for(const t in I){const A=I[t];if(!A.length)continue;const m=new THREE.InstancedMesh(GE[t],t==='tuft'||t==='reed'?mat.tuft:t==='pond'?mat.pond:mat.def,A.length);
