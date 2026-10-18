@@ -1,3 +1,10 @@
+## perf-8b (2026-10-18, landed on alex/od-int2 57652d4)
+1. Found with LZ.slow: the 'fin' spikes were the asset-1 lzPropsG wrapper (AS_assign/AS_fix/AS_far unsliced; AS_fix rebuilt its cell list from EVERY city cell per tile). Fix: 3 lazy steps, and AS_fix only builds the 5x5 cells around the tile (same swaps). The 'lf9' spikes were LF_drapeG: it is now a sliced generator with typed index and per-patch normals (same math as computeVertexNormals). LZ.lastV probe fixed.
+2. Athens q=high tFrame (HEAP=1 RACE=0 SECS=20, 2 runs each), trunk → perf-8: lazyStep max 100/120 → 19/19 ms, frames >50 ms 49/52 → 28/23, p95 46.9/46.2 → 39.3/37.7, median 18.1/17.9 → 18.8/18.4 (noise).
+3. Gate on the built page: unit 0 FAIL; TAG=life1,xf1,terrain,smash2,cam,mem,perf5 53/56 on both builds. Reds are only known/shared ones (mem/stable, mem/ath-boot, cam/stable). One 852×393 Athens street shot: ground and lighting look normal, but no draped patch is clearly in frame.
+4. NOT done: the Frankfurt A/B (the trunk run hung and hit the time limit) and Frankfurt FCG_build/roamStep 329-363 ms frames.
+5. Next: the Frankfurt A/B plus FCG_build slicing; the leftover Athens >50 ms frames are hubTrafficStep/roamStep (lazyStep is no longer the cause).
+
 ## perf-8 (2026-10-18, branch alex/perf8-wip, NOT merged to trunk: gate not run)
 1. Athens hitches found: they come from the LF fill tiles (98lf), not the biomes. Single steps of 20-72 ms inside LF_tileG, plus 25-70 ms in the done step (generator tail + lzFinish + SIMP/STR wrappers). 32 steps > 20 ms in 20 s (LZ.slow probe).
 2. Added: LZ.slow log (lazyStep, steps > 20 ms: [id, yield label, ms, finish ms, prev label]). LF_tileG yields are labelled lf1..lf11, and the lzBuildG yields are labelled too. Read it with PROBE='JSON.stringify(LZ.slow)'.
