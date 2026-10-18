@@ -147,7 +147,9 @@ function AS_assign(L){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=ASSET.ag
 // last scoring (cell stamps; same result as re-scoring all), distances squared first
 function AS_fix(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=ASSET.ag;let sw=0,step=0;const all={};for(const b in POOL)if(b!=='bush')Object.assign(all,POOL[b]);delete all.palm;
  // numeric variant ids + one reused counter (sums in the same order as the old cnt object, so the same swaps); bush-free cell lists
- const VI=new Map(),vi=v=>{let k=VI.get(v);if(k==null){k=VI.size;VI.set(v,k)}return k},GF=new Map();for(const[k,A]of G){const F=[];for(const q of A){q._vi=vi(q.av);if(q.t!=='bush')F.push(q)}GF.set(k,F)}
+ const VI=new Map(),vi=v=>{let k=VI.get(v);if(k==null){k=VI.size;VI.set(v,k)}return k},GF=new Map(),NK=new Set();for(const p of L){const kx=Math.floor(p.x/30),kz=Math.floor(p.z/30);for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++)NK.add((kx+a)*100000+kz+b)}
+ // perf-8: only the 5x5 cells around L (was every cell in the city on each streamed tile: 25-90 ms per LF tile in Athens)
+ for(const k of NK){const A=G.get(k);if(!A)continue;const F=[];for(const q of A){q._vi=vi(q.av);if(q.t!=='bush')F.push(q)}GF.set(k,F)}
  for(const p of L)p._vi=vi(p.av);const PL=P=>Object.keys(P).map(v=>[v,vi(v)]),PA=PL(all),PP={};for(const t in POOL)PP[t]=PL(POOL[t]);
  const cnt=new Float64Array(VI.size+1),T=[];
  const ST=new Map(),EV=new Map();
@@ -199,7 +201,8 @@ function AS_tuftGeo(){const P=[],C=[],k=.018,leaf=(a0,y0,s)=>{for(let i=0;i<3;i+
 function AS_tufts(){if(typeof LF==='undefined'||typeof LF_geos!=='function'||ASSET.off)return;const GE=LF.geo||(LF.geo=LF_geos());if(GE.tuft.userData.as)return;const old=GE.tuft;GE.tuft=ASSET.tuft||(ASSET.tuft=AS_tuftGeo());GE.tuftOld=old;
  scene.traverse(o=>{if(o.isInstancedMesh&&o.geometry===old)o.geometry=GE.tuft})}
 buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{AS_apply()}catch(e){console.warn('AS apply',e)}return r})(buildHubProps);
-lzPropsG=(f=>function*(L){yield* f.apply(this,arguments);try{const P=HUB.props,n=L.nProps|0,T=P.slice(P.length-n);if(HUB.ptypes)AS_defs(HUB.ptypes);AS_assign(T);AS_fix(T);AS_far(T);ASSET.cx=1e9}catch(e){console.warn('AS lz',e)}})(lzPropsG);
+// perf-8: the asset tail runs as three lazy steps (was one unsliced step)
+lzPropsG=(f=>function*(L){yield* f.apply(this,arguments);let T;try{const P=HUB.props,n=L.nProps|0;T=P.slice(P.length-n);if(HUB.ptypes)AS_defs(HUB.ptypes);AS_assign(T)}catch(e){console.warn('AS lz',e);return}yield 'as1';try{AS_fix(T)}catch(e){console.warn('AS lz',e)}yield 'as2';try{AS_far(T);ASSET.cx=1e9}catch(e){console.warn('AS lz',e)}})(lzPropsG);
 propRevive=(f=>function(p){f.apply(this,arguments);if(p.av&&p.im&&ASSET.V[p.av]){p.im.setMatrixAt(p.i,AS_farM(p,new THREE.Matrix4()));ASSET.cx=1e9}})(propRevive);
 hubCullStep=(f=>function(){f.apply(this,arguments);try{AS_step()}catch(e){if(!ASSET.err)console.warn('AS step',e);ASSET.err=e}})(hubCullStep);
 // near/mid instanced meshes, one pair per variant, in their own group next to HUB.grp (visible while HUB.grp is; not in the hubCull list,
