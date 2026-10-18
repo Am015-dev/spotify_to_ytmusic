@@ -17,3 +17,4 @@
 3. Gate: unit 0 FAIL. TAG run: the remaining reds (garage-car, tk1/water, tk1/quick, tk1/courses-ath) are also red with ?pack=0, so they were red before. rv2k4/ath-cam is flaky both ways (0-2 swings).
 4. NOT DONE: race frame time on the touch profile (pack vs ?pack=0). The tFrame race run (Westend) was too slow for the timebox. Next lane: copy tFrame with an 852x393 isMobile viewport, compare QS=pack=0 vs pack=1, and lower the AI LOD on touch if the median is over +2 ms.
 5. Shot (852x393 Westend, 7 s in): "5TH /5", rival box, pack ahead on the road; one smashed vehicle lies on the right edge.
+6. After the rebase: unit 0 FAIL. In the tChkGo TAG run, 5 of 6 PASS (pack5 GP, River and Akropolis, race-handsoff, r9c). In the warm tChkGo page, r9a/pack5 Westend (the first item) had a bot that never drove (DNF, 0 m). On a fresh page it is 2/2 PASS (8 lead changes, max gaps 56-86 m). Fix the warm-page start order next.
