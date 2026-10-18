@@ -8,7 +8,7 @@ const SPEC={river:{c:'fra',js:`tkBuild({key:'rival:water-rv2',kind:'quick',name:
  akro:{c:'ath',js:`tkCourseOf(tkMarkOf(ATH_BOSS_EV))`,route:'pA',roam:30}};
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let bad=0;
  for(const city of ['fra','ath']){const ks=W.filter(k=>SPEC[k].c===city);if(!ks.length)continue;
-  const p=await(await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true})).newPage();p.setDefaultTimeout(900000);
+  const p=await(await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true})).newPage();p.setDefaultTimeout(900000);if(process.env.CPU){const cd=await p.context().newCDPSession(p);await cd.send('Emulation.setCPUThrottlingRate',{rate:+process.env.CPU})}/* CPU=4: races-8 load repro */
   await p.goto(BASE+'?test='+city+'&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__chk,null,{polling:250,timeout:600000});
   for(const k of ks)for(let i=0;i<N;i++){const S=SPEC[k];
    await p.evaluate(()=>{try{__tq.reset()}catch(e){}});const r=await p.evaluate(s=>__tk.q(s),`(()=>{const C=${S.js};if(!C)return{none:1};return RV3A_race(C,'${S.route}',${S.roam})})()`);

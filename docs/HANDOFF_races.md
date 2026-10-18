@@ -24,3 +24,15 @@
 3. Reading found nothing at the source: the GP rival is a pure path-follower (tkStep: a.s += a.v*dt, gap rubber band, no traffic yield, no CR_npcPush). The 5-14 m/s crawl is the player-bot (tkBot) in RV3A_race pushed by traffic/npc at that junction, not the rival.
 4. Added tools/tGpProbe.js (hooks tkBot, logs near-car state x/z/v/yo/k/hold when v < 16 near (209,279)). Run it inside the full-GO page to catch the cause; no gate run was needed (no src change).
 5. Next: run the probe with CPU throttling or inside the GO; if cars with yo/hold sit on the line, clear traffic on the race route in tkStart (race-only).
+
+# HANDOFF races-8 (2026-10-18, branch alex/races7-wip, NOT merged to trunk: TAG gate not run)
+1. Akropolis/GP did NOT reproduce under CPU=4 (tRaces CPU=4: gp 6/6 1st 86-92 s, akro 4/4 1st so far, stuck 0), so no root cause; detector is a safety net.
+2. tkRock(W,t,s) in 98tk_go.js (sim time, rolling window): net route progress < 15 m in 6 s, any gas -> tkBot backs out + RO.stkT=4.01 (roam hop). 71_roam_drive npT window now also fires without gas when RO.sp.tk is racing.
+3. tkStart moves held traffic (yo/stop/wait/hold) within 14 m of route pA away (SIMP_clearTraffic, race-only).
+4. Unit 0 FAIL incl. new tools/unit/logic_rock.js (oscillation fires <= 6 s at dt 1/60..0.5; 8 m/s quiet). tRaces/tGpProbe take CPU=<rate>.
+5. Left: TAG=races,life1,rv2k2 on built out/r8 vs trunk, then merge + push HEAD:alex/od-int2.
+
+# HANDOFF races-9 (2026-10-18, lands races7-wip 89edc55 on trunk alex/od-int2)
+1. Merged trunk faddf7d into branch, build r8 OK, unit 5019 assertions 0 FAIL; TAG=races,life1,rv2k2 on built page: 24/25, only red life1/smash (SLOW 11.9 s > 10 s under full load).
+2. life1/smash re-run: isolated HEAD PASS 6.3 s; trunk faddf7d FAIL in isolation (0 smashes counted), so red on trunk too = not a regression.
+3. Pushed HEAD to alex/od-int2 (fast-forward); next: watch life1/smash timing under load (SMASH burst budget vs full-GO slow frames).
