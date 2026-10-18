@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.111',date:'18 Oct 2026',items:[{t:'FIXED',s:'Athens first minute: far less memory churn, so about half as many stutters (47 to 24 in our phone test).'}]},
 {v:'v90m-beta.110',date:'18 Oct 2026',items:[{t:'NEW',s:'Every city race is now a pack of 5: four rivals fight for the lead with real overtakes.'},{t:'FIXED',s:'Athens first minute: the big 0.25 s freeze is gone and stutters are roughly halved.'},{t:'FIXED',s:'Smashing props works again.'}]},
 {v:'v90m-beta.109',date:'18 Oct 2026',items:[{t:'FIXED',s:'Frankfurt: the Vex Kaiser finale no longer crashes when it starts.'},{t:'FIXED',s:'Smoother start: more graphics effects are prepared on the loading screen, and the smoothness report no longer causes a hitch (Frankfurt stutters in the first minute halved).'}]},
 {v:'v90m-beta.108',date:'18 Oct 2026',items:[{t:'FIXED',s:'First minute is smoother: new city blocks are placed a little each frame instead of freezing the game (Athens worst hitch 0.28 s to about 0.09 s).'},{t:'CHANGED',s:'Map, minimap and shortcut set-up now happen on the loading screen; Graphics Auto only changes sharpness in the first minute.'}]},
@@ -2278,11 +2279,14 @@ function buildDebris(){const n=320,im=new THREE.InstancedMesh(brickGeo(),new THR
 function debris(at,vel,n,cols,size=1,floor){if(!DEB)return;size=Math.min(size,1)*.62/* debris-2: pieces <= ~0.9 m whatever the caller asks, so a smashed tree never throws house-size bricks */;for(let k=0;k<n;k++){const i=DEB.next;DEB.next=(DEB.next+1)%DEB.n;const j=DEB.list.findIndex(o=>o.i===i);if(j>=0)DEB.list.splice(j,1);
     DEB.list.push({i,p:at.clone().add(V3(rr(-1.2,1.2),rr(0,1),rr(-1.2,1.2))),v:vel.clone().add(V3(rr(-11,11),rr(5,17),rr(-11,11))).clampLength(0,22),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-10,10),rr(-10,10),rr(-10,10)),
       s:V3(rr(.45,.9),rr(.35,.65),rr(.45,.9)).multiplyScalar(size),life:rr(1,1.5),floor:Math.min(floor??at.y-1.2,at.y)});DEB.im.setColorAt(i,cols[k%cols.length])}DEB.im.instanceColor.needsUpdate=true}
-const XFB=[];let XFB_GEO=null;
-function xfBurst(at,cols){if(!XFB_GEO)XFB_GEO=brickGeo();const n=16,im=new THREE.InstancedMesh(XFB_GEO,new THREE.MeshStandardMaterial({color:0xffffff,roughness:.32,metalness:.05,transparent:true}),n);im.name='brickfx_burst';im.frustumCulled=false;
+const XFB=[],XFB_MP=[];let XFB_GEO=null;
+function xfMat(){const m=XFB_MP.pop()||new THREE.MeshStandardMaterial({color:0xffffff,roughness:.32,metalness:.05,transparent:true});m.opacity=1;return m}
+function xfWarm(){if(!XFB_GEO)XFB_GEO=brickGeo();const im=new THREE.InstancedMesh(XFB_GEO,xfMat(),16);im.name='brickfx_burst';im.frustumCulled=false;for(let i=0;i<16;i++)im.setColorAt(i,_xfC);return im}
+const _xfC=new THREE.Color(1,1,1);
+function xfBurst(at,cols){if(!XFB_GEO)XFB_GEO=brickGeo();const n=16,im=new THREE.InstancedMesh(XFB_GEO,xfMat(),n);im.name='brickfx_burst';im.frustumCulled=false;
   const L=[];for(let i=0;i<n;i++){im.setColorAt(i,cols[i%cols.length]);const a=i/n*6.283+rr(-.2,.2);L.push({p:at.clone(),v:V3(Math.cos(a)*rr(7,13),rr(5,11),Math.sin(a)*rr(7,13)),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-14,14),rr(-14,14),rr(-14,14)),k:rr(.35,.6)})}
   scene.add(im);XFB.push({im,L,t:0});AU.sfx('whoosh');shake=Math.max(shake,.22)}
-function updXfb(dt){for(let j=XFB.length-1;j>=0;j--){const b=XFB[j];b.t+=dt;if(b.t>=.34){scene.remove(b.im);b.im.material.dispose();b.im.dispose();XFB.splice(j,1);continue}
+function updXfb(dt){for(let j=XFB.length-1;j>=0;j--){const b=XFB[j];b.t+=dt;if(b.t>=.34){scene.remove(b.im);XFB_MP.push(b.im.material);b.im.dispose();XFB.splice(j,1);continue}
     const f=1-b.t/.34;b.im.material.opacity=Math.min(1,f*2.2);for(let i=0;i<b.L.length;i++){const d=b.L[i];d.v.y-=22*dt;d.p.addScaledVector(d.v,dt);_e2.set(d.w.x*dt,d.w.y*dt,d.w.z*dt);d.q.multiply(_q2.setFromEuler(_e2));_m.compose(d.p,d.q,_s2.setScalar(d.k*(.4+.6*f)));b.im.setMatrixAt(i,_m)}b.im.instanceMatrix.needsUpdate=true}}
 function DEB_near(p){const c=camera.position,d=Math.hypot(p.x-c.x,p.y-c.y,p.z-c.z);return d>=4?1:d<=1.5?0:(d-1.5)/2.5}
 function updDebris(dt){updXfb(dt);if(!DEB)return;const L=DEB.list;for(let j=L.length-1;j>=0;j--){const d=L[j];d.life-=dt;if(d.life<=0){_m.makeScale(0,0,0);DEB.im.setMatrixAt(d.i,_m);L.splice(j,1);DEB.dirty=true;continue}
@@ -12445,7 +12449,7 @@ function LDS_scan(full){const D=HUB.ptypes;LDS.n=HUB.props?HUB.props.length:0;if
  const RS=new Set(re);LDS.on=LDS.on.filter(o=>{const t=o.userData.ldsTop;return t&&t.parent===G&&!RS.has(t)});
  for(const top of re)top.traverse(o=>{if(!o.isInstancedMesh)return;for(const t in D){const d=D[t];if(d&&d.lds&&d.gFar&&(o.geometry===d.g||o.geometry===d.gFar||o.geometry===d.gOld)){o.userData.lds=t;o.userData.ldsTop=top;if(!o.boundingBox)o.computeBoundingBox();LDS.on.push(o)}}})}
 hubCullStep=(f=>function(){f.apply(this,arguments);if((LDS.fr=(LDS.fr|0)+1)%10)return;if(!LDS.st||LDS.off||!HUB.ptypes||!HUB.props)return;if(LDS.n!==HUB.props.length||!LDS.sc)LDS_scan();const cp=camera.position,D=HUB.ptypes;
- for(const o of LDS.on){const d=D[o.userData.lds],b=o.boundingBox,dx=Math.max(b.min.x-cp.x,0,cp.x-b.max.x),dz=Math.max(b.min.z-cp.z,0,cp.z-b.max.z),nr=Math.hypot(dx,dz)<LDS.near,g=nr?d.g:d.gFar;if(o.geometry!==g)o.geometry=g;if(d.mFar){const m=nr?d.mat:d.mFar;if(o.material!==m)o.material=m}}})(hubCullStep);
+ /* boot-4: squared distance, no Math.max/hypot calls (third allocator of the Athens first minute) */const px=cp.x,pz=cp.z,n2=LDS.near*LDS.near,L=LDS.on;for(let li=0;li<L.length;li++){const o=L[li],d=D[o.userData.lds],b=o.boundingBox,ax=b.min.x-px,bx=px-b.max.x,az=b.min.z-pz,bz=pz-b.max.z,dx=ax>0?ax:bx>0?bx:0,dz=az>0?az:bz>0?bz:0,nr=dx*dx+dz*dz<n2,g=nr?d.g:d.gFar;if(o.geometry!==g)o.geometry=g;if(d.mFar){const m=nr?d.mat:d.mFar;if(o.material!==m)o.material=m}}})(hubCullStep);
 kmProps=(f=>function(D){const r=f.apply(this,arguments);if(CID==='fra')for(const t in D){const d=D[t];if(d&&d.lds&&!d.gFar&&d.gOld&&d.mOld){d.gFar=d.gOld;d.mFar=d.mOld;if(LDS.st&&LDS.st[t])LDS.st[t].far=LDS_tri(d.gFar)}}return r})(kmProps);
 LDS.props0=/[?&]props=0\b/.test(location.search);if(LDS.props0){LDS.off=true;buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{const D=HUB.ptypes,G=[];for(const t in D){const d=D[t];if(d&&(d.lds||t.startsWith('CE_')))G.push(d.g,d.gOld,d.gFar)}HUB.grp&&HUB.grp.traverse(o=>{if(o.isMesh&&G.includes(o.geometry))o.layers.set(31)})}catch(e){console.warn('props0',e)}return r})(buildHubProps)}
 LDS.chk=()=>{LDS.fr=9;try{hubCullStep()}catch(e){}const D=HUB.ptypes||{},cp=camera.position,r={on:LDS.on.length,near:0,far:0,wrong:0,fraFar:0,off:!!LDS.off};
@@ -16088,17 +16092,18 @@ function PC_addCk(t){if(t===HUB.grp){if(PC.wg===t)return false;PC.wg=t;for(const
 function PC_drain(ms){if(!PC.q.length)return 0;const t=performance.now(),A=[];while(PC.q.length&&(!A.length||performance.now()-t<ms)){const o=PC.q.shift();o.userData.pcQ=0;if(o.parent&&PC_cand(o))A.push(PC_reg(o,false))}if(A.length)PC_grid(A);return A.length}
 function PC_grid(add){
  if(!add||!PC.M)PC.M=new Map();const M=PC.M;
- for(const C of add||PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
-  C.G=[];for(const[k,L]of T){let q=M.get(k);if(!q){let x=0,y=0,z=0;for(const i of L){x+=C.c[i*4];y+=C.c[i*4+1];z+=C.c[i*4+2]}M.set(k,q={id:M.size,x:x/L.length,y:y/L.length,z:z/L.length,r:0})}
-   for(const i of L)q.r=Math.max(q.r,Math.hypot(C.c[i*4]-q.x,C.c[i*4+1]-q.y,C.c[i*4+2]-q.z)+Math.max(C.c[i*4+3],2)+4);C.G.push(q.id,Int32Array.from(L))}}
+ for(const C of add||PC.L){if(C.sky||C.dyn)continue;const n=C.n,c=C.c,K=new Float64Array(n);for(let i=0;i<n;i++)K[i]=(Math.floor(c[i*4]/80)*100003+Math.floor(c[i*4+2]/80))*1048576+i;K.sort();
+  const I=C.I=new Int32Array(n),Gs=[];for(let s=0;s<n;){const k=Math.floor(K[s]/1048576);let e=s;while(e<n&&Math.floor(K[e]/1048576)===k){I[e]=K[e]-k*1048576;e++}
+   let q=M.get(k);if(!q){let x=0,y=0,z=0;for(let j=s;j<e;j++){const i=I[j];x+=c[i*4];y+=c[i*4+1];z+=c[i*4+2]}const L=e-s;M.set(k,q={id:M.size,x:x/L,y:y/L,z:z/L,r:0})}
+   for(let j=s;j<e;j++){const i=I[j],dx=c[i*4]-q.x,dy=c[i*4+1]-q.y,dz=c[i*4+2]-q.z,rr=Math.sqrt(dx*dx+dy*dy+dz*dz)+Math.max(c[i*4+3],2)+4;if(rr>q.r)q.r=rr}Gs.push(q.id,s,e);s=e}C.G=Int32Array.from(Gs)}
  let G=PC.G;const full=!add||!G;if(full||G.length<M.size*4){const g=new Float64Array(Math.max(M.size*4,full?0:G.length*2));if(!full)g.set(G);G=PC.G=g}
- const W=q=>{G[q.id*4]=q.x;G[q.id*4+1]=q.y;G[q.id*4+2]=q.z;G[q.id*4+3]=q.r};if(full)for(const q of M.values())W(q);else{const U=new Set();for(const C of add)if(C.G)for(let g=0;g<C.G.length;g+=2)U.add(C.G[g]);for(const q of M.values())if(U.has(q.id))W(q)}
+ const W=q=>{G[q.id*4]=q.x;G[q.id*4+1]=q.y;G[q.id*4+2]=q.z;G[q.id*4+3]=q.r};if(full)for(const q of M.values())W(q);else{const U=new Set();for(const C of add)if(C.G)for(let g=0;g<C.G.length;g+=3)U.add(C.G[g]);for(const q of M.values())if(U.has(q.id))W(q)}
  if(!PC.cv||PC.cv.length!==M.size)PC.cv=new Uint8Array(M.size);PC.left=0}
-function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const d=Math.hypot(x-cx,y-cy,z-cz);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
+function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const ex=x-cx,ey=y-cy,ez=z-cz,d=Math.sqrt(ex*ex+ey*ey+ez*ez);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
  const s=C.s++,a=C.src,arr=C.im.instanceMatrix.array;if(s!==i){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
 const _pcS=new THREE.Sphere();
 function PC_mesh(C){const im=C.im;C.dirty=false;if(!im.parent)return 0;const cx=PC.x,cy=PC.y,cz=PC.z,far=PC.fr;C.s=0;C.slot.fill(-1);let n=0;
- if(C.G){const G=C.G,V=PC.cv;for(let g=0;g<G.length;g+=2){if(!V[G[g]])continue;const I=G[g+1];n+=I.length;for(let j=0;j<I.length;j++){const i=I[j];PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}}}
+ if(C.G){const G=C.G,I=C.I,V=PC.cv;for(let g=0;g<G.length;g+=3){if(!V[G[g]])continue;const e=G[g+2];n+=e-G[g+1];for(let j=G[g+1];j<e;j++){const i=I[j];PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}}}
  else if(C.sky){im.updateWorldMatrix(true,false);const W=im.matrixWorld.elements;n=C.n;for(let i=0;i<C.n;i++){const lx=C.c[i*4],ly=C.c[i*4+1],lz=C.c[i*4+2];
    PC_one(C,i,W[0]*lx+W[4]*ly+W[8]*lz+W[12],W[1]*lx+W[5]*ly+W[9]*lz+W[13],W[2]*lx+W[6]*ly+W[10]*lz+W[14],cx,cy,cz,far)}}
  else{n=C.n;for(let i=0;i<C.n;i++)PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}
@@ -16108,14 +16113,17 @@ function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!
  {const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return}if(!PC.grp)PC_scan();/* boot-1: the scan normally ran in the loader (PC_prewarm); the first pass is budgeted like any other */
  if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9))PC_add();const np=PC_drain(force?1e9:3)>0;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
- const t0=performance.now();let tested=0;const snap=()=>{camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);PC.x=cx;PC.y=camera.position.y;PC.z=cz;PC.h=h;const far=PC.fr=PC_far(),cy=PC.y,G=PC.G,V=PC.cv;if(G)for(let q=0;q<V.length;q++){const d=Math.hypot(G[q*4]-cx,G[q*4+1]-cy,G[q*4+2]-cz),r=G[q*4+3];V[q]=d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(G[q*4],G[q*4+1],G[q*4+2]),r+4+d*.25))?0:1}};
- if(force||np||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){snap();PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
- else if(++PC.t%10===0&&!PC.left){snap();for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
+ const t0=performance.now();let tested=0;
+ if(force||np||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){PC_snap(cx,cz,h);PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
+ else if(++PC.t%10===0&&!PC.left){PC_snap(cx,cz,h);for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
  const bud=force?1e9:(TUNE.pc7Bud||60000);/* circular: a new pass mid-way carries on from the same mesh, so no mesh starves under constant turning */
  while(PC.left>0&&tested<bud){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
  if(!PC.left)for(const C of PC.L)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
  if(tested){let vis=0;for(const C of PC.L)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();
+function PC_snap(cx,cz,h){camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);PC.x=cx;PC.y=camera.position.y;PC.z=cz;PC.h=h;
+ const far=PC.fr=PC_far(),cy=PC.y,G=PC.G,V=PC.cv,keep=PC.keep;if(G)for(let q=0;q<V.length;q++){const gx=G[q*4],gy=G[q*4+1],gz=G[q*4+2],dx=gx-cx,dy=gy-cy,dz=gz-cz,d=Math.sqrt(dx*dx+dy*dy+dz*dz),r=G[q*4+3];
+  V[q]=d-r>far||d-r>keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(gx,gy,gz),r+4+d*.25))?0:1}}
 function PC_prewarm(){try{if(PC.on&&HUB.grp&&!PC.grp&&PC_gate())PC_scan()}catch(e){console.warn('PC prewarm',e)}}
 function PC_gate(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc7All||lv==='low'||lv==='min'}
 function PC_release(){for(const C of PC.L){const im=C.im;if(!im.parent)continue;im.instanceMatrix.array.set(C.src);if(C.col&&im.instanceColor)im.instanceColor.array.set(C.col);
@@ -16327,8 +16335,9 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
    if(typeof ENV_ground==='function')ENV_ground(m,{kind:'land',tint:true,base:WGC,s:[900,260,70]});m.polygonOffset=true;m.polygonOffsetFactor=1;m.polygonOffsetUnits=2;
    const g=new THREE.BufferGeometry();for(const[k,n]of[['position',3],['normal',3],['uv',2],['color',3]])g.setAttribute(k,new THREE.Float32BufferAttribute(new Array(n*3).fill(0),n));
    gm=new THREE.Mesh(g,m);gm.receiveShadow=true;gm.frustumCulled=false;sc.add(gm)}}catch(e){console.warn('warmall ground',e)}
+  let bm=null;try{if(typeof xfWarm==='function'){bm=xfWarm();sc.add(bm)}}catch(e){console.warn('warmall burst',e)}
   const hid=[];sc.traverse(o=>{if(!o.visible){o.visible=true;hid.push(o)}});WARMALL.n=hid.length;
-  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}}}}
+  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}if(bm){sc.remove(bm);XFB_MP.push(bm.material);bm.dispose()}}}}
 function ENV_on(){if(ENV_on.v!==undefined)return ENV_on.v;let v=true;try{const q=new URLSearchParams(location.search).get('env1');if(q!==null)v=q!=='0';else if(typeof TUNE!=='undefined'&&TUNE.env1===0)v=false}catch(e){}return ENV_on.v=v}
 function ENV_lo(){try{if(typeof LK_lvl==='function'&&LK_lvl()==='low')return true;return typeof SET!=='undefined'&&SET.q==='low'}catch(e){return false}}
 function ENV_vn(x,z){const h=(a,b)=>{const v=Math.sin(a*127.1+b*311.7)*43758.5453;return v-Math.floor(v)},i=Math.floor(x),j=Math.floor(z);let fx=x-i,fz=z-j;fx=fx*fx*(3-2*fx);fz=fz*fz*(3-2*fz);
@@ -16851,10 +16860,10 @@ function FCG_hit(m,c,far){const g=m.geometry;if(!FCG_ok(g)||!m.layers.test(FC.rc
 function FC_pull(dt){const c=camera.position;
   if(!FC.pull)return;const o=FC.o.set(RO.x,RO.y+1,RO.z),dv=FC.dv.copy(c).sub(o),d=dv.length();if(d<3.2)return;
   if(FC.t-FC.occT>8)FC_occ();if(FCG.on)FCG_work(c,o);
-  FC.rt+=dt;if(FC.rt>=.05){FC.rt=0;const rc=FC.rc;rc.set(c,dv.clone().multiplyScalar(-1/d));rc.far=d-2.2;rc.near=0;let t=-1;   // camera -> car ; the hit nearest the car wins
-   for(const m of FC.occ){const ms=Array.isArray(m.material)?m.material:[m.material],sd=ms.map(q=>q.side);   // both faces: walls that face away from the camera (camera behind a wall) count too
+  FC.rt+=dt;if(FC.rt>=.05){FC.rt=0;const rc=FC.rc;rc.set(c,(FC.rd||(FC.rd=new THREE.Vector3())).copy(dv).multiplyScalar(-1/d));rc.far=d-2.2;rc.near=0;let t=-1;   // camera -> car ; the hit nearest the car wins
+   const SD=FC.sd||(FC.sd=[]),H=FC.h||(FC.h=[]);for(let oi=0;oi<FC.occ.length;oi++){const m=FC.occ[oi];   // both faces: walls that face away from the camera (camera behind a wall) count too
     if(FCG.on&&!m.isInstancedMesh&&!m.isBatchedMesh){const r=FCG_hit(m,c,rc.far);if(r!==null){if(r>t)t=r;continue}}   // perf-1: grid path (null = not indexed yet / not usable -> three raycast)
-    let h;try{for(const q of ms)q.side=THREE.DoubleSide;h=rc.intersectObject(m,false)}finally{ms.forEach((q,i)=>q.side=sd[i])}for(const x of h)if(x.distance>t)t=x.distance}
+    const mm=m.material,ma=Array.isArray(mm),nm=ma?mm.length:1;H.length=0;try{for(let i=0;i<nm;i++){const q=ma?mm[i]:mm;SD[i]=q.side;q.side=THREE.DoubleSide}rc.intersectObject(m,false,H)}finally{for(let i=0;i<nm;i++)(ma?mm[i]:mm).side=SD[i]}for(let i=0;i<H.length;i++)if(H[i].distance>t)t=H[i].distance}
    FC.hT=t>=0?(FC.hT||0)+.05:0;FC.kt=t>=0&&FC.hT>=.3?Math.max(3/d,Math.min(1,(d-t-.7)/d)):1}   /* rv4A: a wall must stay on the line 0.3 s (a corner clipped while passing is ignored) */
   FC.k=FC.kt<FC.k?Math.max(FC.kt,FC.k-dt*2):Math.min(FC.kt,FC.k+dt*.5);   /* rv4A: eases in at 2/s (was a snap) and out at 0.5/s (was 0.8): road-follow in Athens swung 18/min */
   if(FC.k<.999){FC.off.copy(dv).multiplyScalar(1-FC.k);c.sub(FC.off);FC.pulls++}}
