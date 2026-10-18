@@ -446,7 +446,7 @@ function draw(){if(!L||!S)return;const c=L.ctx,sc=L.sc*L.dpr,vw=L.vw,P=S.P;
     if(P.shotT>0&&WEAPONS[P.w].kind!=='arc'){const a=P.aim;c.fillStyle='#fff';c.beginPath();c.arc(P.x+Math.cos(a)*28,P.y-(P.crouch?26:44)+Math.sin(a)*20,5,0,6.283);c.fill();}}
   for(const b of S.pb){c.fillStyle=b.c;if(b.kind==='fire'){c.globalAlpha=Math.max(0,b.life*2);c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.globalAlpha=1;}else if(b.kind==='rkt'){c.fillRect(b.x-8,b.y-3,16,6);}else{c.fillRect(b.x-6,b.y-2,12,4);}}
   for(const g of S.bombsL){c.fillStyle='#ffb020';c.beginPath();c.arc(g.x,g.y,7,0,6.283);c.fill();}
-  for(const b of S.eb){c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(b.x,b.y,b.r*.45,0,6.283);c.fill();}
+  for(const b of S.eb){if(RET.read&&window.READ){READ.footEb(c,b);continue;}c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(b.x,b.y,b.r*.45,0,6.283);c.fill();}
   for(const f of S.fx){c.globalAlpha=Math.min(1,f.l*3);if(f.arc){c.strokeStyle=f.c;c.lineWidth=3;c.beginPath();f.arc.forEach(([x,y],i)=>{const j=i?ftRnd(-6,6):0;i?c.lineTo(x+j,y+j):c.moveTo(x,y);});c.stroke();}
     else if(f.slash){c.strokeStyle=f.c;c.lineWidth=4;c.beginPath();c.arc(f.x,f.y,f.w*.5,-1.2,1.2);c.stroke();}
     else if(f.ring){c.strokeStyle=f.c;c.lineWidth=4;c.beginPath();c.arc(f.x,f.y,f.r*(1-f.l/f.m*.6),0,6.283);c.stroke();}

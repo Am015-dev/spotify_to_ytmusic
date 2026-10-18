@@ -102,15 +102,15 @@ function shotDraw(b,D){const ang=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0;let o,al=.
   if(b.hv){o=ART.sp('fx-shot-hv',46);al=.8;}
   else if(b.ec){o=ART.sp('fx-shot-ec',30);al=.65;}
   else if(b.pf&&!b.big){o=ART.sp('fx-shot-perfect',32);al=.8;}
-  else{const L=b.len||(b.big?22:b.pn!=null?28:20);o=ART.tint('fx-shot-std',L*(b.big?1.2:1),b.col||(b.big?'#ffffff':D.b));al=b.big?.8:.55;if(o)sy=Math.max(.8,Math.min(3,(b.th||(b.big?4:3))*.7/o.h));}
+  else{const L=b.len||(b.big?22:b.pn!=null?28:20);o=ART.tint('fx-shot-std',L*(b.big?1.2:1),RET.read?READ.pc(b,D):b.col||(b.big?'#ffffff':D.b));al=b.big?.8:RET.read?.7:.55;if(o)sy=Math.max(.8,Math.min(3,(b.th||(b.big?4:3))*.7/o.h));}
   if(!o)return;const d=o.w/2-10;ART.put(o,b.x+Math.cos(ang)*d,b.y+Math.sin(ang)*d,ang,al,1,sy);
-  if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,b.pf?'#ffe14d':D.b,.22);}
+  if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,RET.read?READ.pc(b,D):b.pf?'#ffe14d':D.b,.22);}
 function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierOf(C.n);
   const PT=wcv!==cv;                                     // portrait: the world is drawn on its own canvas (landscape coordinates) and turned upright afterwards
-  if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);drawBGP(bgFor(G.di),t,dt,G.scroll);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
+  if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);drawBGP(bgFor(G.di),t,dt,G.scroll);if(RET.read)READ.dim(PW_,PH_);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
   else{ctx=vctx;ctx.setTransform(S,0,0,S,0,0);}
   const sh=G.shake;ctx.save();if(sh)ctx.translate(rnd(-sh,sh)*.5,rnd(-sh,sh)*.5);
-  if(!PT){drawBG(bgFor(G.di),t,dt,G.scroll);
+  if(!PT){drawBG(bgFor(G.di),t,dt,G.scroll);if(RET.read)READ.dim(W,H);
   }   // (no rain, no traffic specks: the background stays calm)
   drawPickups(t);
   for(const e of G.en)drawEnemy(e,t);
@@ -118,11 +118,11 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   ctx.globalCompositeOperation='lighter';const D=DISTRICTS[G.di];
   // the ship's own fire is dim and thin: the enemy bullets (bright lime, dark rim) are what must read
   const PS=ART.have('fx-shot-std');
-  for(const b of G.pb){if(b.wid&&FXW.bullet(b))continue;if(PS){shotDraw(b,D);continue;}ctx.globalAlpha=.5;ctx.fillStyle=b.col||(b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b);const th=(b.th||(b.big?4:3))*.6;ctx.fillRect(b.x-10,b.y-th/2,b.len||(b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16),th);if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,b.pf?'#ffe14d':D.b,.22);}
+  for(const b of G.pb){if(b.wid&&FXW.bullet(b))continue;if(PS){shotDraw(b,D);continue;}ctx.globalAlpha=RET.read?.7:.5;ctx.fillStyle=RET.read?READ.pc(b,D):b.col||(b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b);const th=(b.th||(b.big?4:3))*.6;ctx.fillRect(b.x-10,b.y-th/2,b.len||(b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16),th);if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,RET.read?READ.pc(b,D):b.pf?'#ffe14d':D.b,.22);}
   ctx.globalAlpha=1;
   if(SET.part)for(const p of G.pt){const a=p.l/p.m;if(p.ghost){G_(p.x,p.y,p.sz*2,p.c,a*.5);}else{ctx.globalAlpha=a;ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.sz,p.sz);}}
   ctx.globalAlpha=1;
-  for(const b of G.eb)G_(b.x,b.y,b.r*3.2,b.gc||b.c,b.k?.5:.9);
+  if(!RET.read)for(const b of G.eb)G_(b.x,b.y,b.r*3.2,b.gc||b.c,b.k?.5:.9);
   ctx.globalCompositeOperation='source-over';
   FXV.bullets();
   ART.fxDraw();
