@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.100',date:'18 Oct 2026',items:[{t:'FIXED',s:'Athens: far fewer stutters while driving. Ground tiles and street props now load in small slices (worst load step 120 ms to 19 ms).'},{t:'CHANGED',s:'Ground lighting is computed piece by piece instead of all at once.'}]},
 {v:'v90m-beta.99',date:'18 Oct 2026',items:[{t:'FIXED',s:'Race rivals that get stuck rocking back and forth now free themselves after a few seconds.'},{t:'FIXED',s:'Parked traffic is cleared off the race line when a race starts.'}]},
 {v:'v90m-beta.98',date:'18 Oct 2026',items:[{t:'FIXED',s:'River race: rivals brake in time for the last corner instead of overshooting.'},{t:'FIXED',s:'Westend race: rivals follow the streets instead of trying to drive through buildings.'}]},
 {v:'v90m-beta.97',date:'18 Oct 2026',items:[{t:'CHANGED',s:'Less lag: thousands of far-away street props are no longer drawn.'},{t:'CHANGED',s:'Smash debris costs nothing when nothing is breaking.'}]},
@@ -4743,22 +4744,26 @@ function lzKm(L,nm,sc,x,z,ry,tint){const[w,h,d]=kmSize(nm,sc);if(typeof C2_tint=
 function lzMapLine(pts,w,name){const S=polySamples(pts,8);S.w=w;S.name=name;LZ.roads.push(S);for(const p of S.pts){const k=Math.floor(p.x/64)*100000+Math.floor(p.z/64);let A=LZ.rg.get(k);if(!A)LZ.rg.set(k,A=[]);A.push({x:p.x,z:p.z,w})}return S}
 function lzRoad(L,pts,w,name){const S=polySamples(pts,8);S.w=w;S.name=name;L.roads.push(S);LZ.roads.push(S);for(const p of S.pts){const k=Math.floor(p.x/64)*100000+Math.floor(p.z/64);let A=LZ.rg.get(k);if(!A)LZ.rg.set(k,A=[]);A.push({x:p.x,z:p.z,w})}return S}
 class LBatch{constructor(T=1400){this.m=new Map();this.T=T}
-  add(g,mat){if(g.index)g=g.toNonIndexed();if(!g.attributes.normal)g.computeVertexNormals();const P=g.attributes.position,N=g.attributes.normal,C=g.attributes.color,U=g.attributes.uv,n=P.count,k=mat.uuid+'#'+Math.floor(P.getX(0)/this.T)+','+Math.floor(P.getZ(0)/this.T);let E=this.m.get(k);if(!E)this.m.set(k,E={mat,p:[],n:[],c:[],u:[]});
-    for(let i=0;i<n;i++){E.p.push(P.getX(i),P.getY(i),P.getZ(i));E.n.push(N.getX(i),N.getY(i),N.getZ(i));if(C)E.c.push(C.getX(i),C.getY(i),C.getZ(i));else E.c.push(1,1,1);if(U)E.u.push(U.getX(i),U.getY(i));else E.u.push(0,0)}}
-  *flushG(parent){let t=performance.now();for(const E of this.m.values()){const g=new THREE.BufferGeometry();for(const [nm,A,k] of [['position',E.p,3],['normal',E.n,3],['color',E.c,3],['uv',E.u,2]]){const o=new Float32Array(A.length);for(let i=0;i<A.length;i+=65536){const e=Math.min(A.length,i+65536);for(let j=i;j<e;j++)o[j]=A[j];if(performance.now()-t>1.2){yield;t=performance.now()}}g.setAttribute(nm,new THREE.BufferAttribute(o,k))}E.p=E.n=E.c=E.u=null;const m=new THREE.Mesh(g,E.mat);m.receiveShadow=true;parent.add(m);yield;t=performance.now()}this.m.clear()}
-  flush(parent){for(const E of this.m.values()){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(E.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(E.n,3));g.setAttribute('color',new THREE.Float32BufferAttribute(E.c,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(E.u,2));const m=new THREE.Mesh(g,E.mat);m.receiveShadow=true;parent.add(m)}this.m.clear()}}
+  add(g,mat){if(g.index)g=g.toNonIndexed();if(!g.attributes.normal)g.computeVertexNormals();const P=g.attributes.position,n=P.count,k=mat.uuid+'#'+Math.floor(P.getX(0)/this.T)+','+Math.floor(P.getZ(0)/this.T);let E=this.m.get(k);if(!E)this.m.set(k,E={mat,parts:[],n:0});
+    const A=(a,w)=>{if(!a)return null;if(!a.isInterleavedBufferAttribute&&a.itemSize===w&&a.array instanceof Float32Array&&a.array.length===n*w)return a.array;const o=new Float32Array(n*w);for(let i=0;i<n;i++){o[i*w]=a.getX(i);o[i*w+1]=a.getY(i);if(w>2)o[i*w+2]=a.getZ(i)}return o};
+    E.parts.push([A(P,3),A(g.attributes.normal,3),A(g.attributes.color,3),A(g.attributes.uv,2),n]);E.n+=n}
+  *mkG(E){const N=E.n,o=[new Float32Array(N*3),new Float32Array(N*3),new Float32Array(N*3),new Float32Array(N*2)];let t=performance.now(),v=0;
+    for(const p of E.parts){const n=p[4];o[0].set(p[0],v*3);o[1].set(p[1],v*3);if(p[2])o[2].set(p[2],v*3);else o[2].fill(1,v*3,(v+n)*3);if(p[3])o[3].set(p[3],v*2);v+=n;if(performance.now()-t>1.2){yield 'fl';t=performance.now()}}
+    E.parts=null;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(o[0],3));g.setAttribute('normal',new THREE.BufferAttribute(o[1],3));g.setAttribute('color',new THREE.BufferAttribute(o[2],3));g.setAttribute('uv',new THREE.BufferAttribute(o[3],2));return g}
+  *flushG(parent){for(const E of this.m.values()){const g=yield* this.mkG(E);const m=new THREE.Mesh(g,E.mat);m.receiveShadow=true;parent.add(m);yield 'flm'}this.m.clear()}
+  flush(parent){for(const E of this.m.values()){const it=this.mkG(E);let r;while(!(r=it.next()).done);const m=new THREE.Mesh(r.value,E.mat);m.receiveShadow=true;parent.add(m)}this.m.clear()}}
 function lzPartGeo(P){const C=new THREE.Color(P.col);if(P.k==='b'){const tex=P.m==='glass'||P.m==='office'||P.m==='brick'||P.m==='gable'||P.m==='poly'||P.m==='neo'||P.m==='plaka',g=tex?bxUV(P.w,P.h,P.d,14,12):new THREE.BoxGeometry(P.w,P.h,P.d);if(P.ry)g.rotateY(P.ry);g.translate(P.x,P.y,P.z);return colorize(g,C)}
   if(P.k==='c')return ccyl(P.r1,P.r2,P.h,P.x,P.y,P.z,P.col,P.seg);if(P.k==='k'){const g=new THREE.ConeGeometry(P.r,P.h,P.seg);g.translate(P.x,P.y+P.h/2,P.z);return colorize(g,C)}
   if(P.k==='s')return csph(P.r,P.x,P.y,P.z,P.col,P.sx,P.sy,P.sz);if(P.k==='e'){const g=new THREE.BoxGeometry(P.w,P.h,P.d);g.rotateX(P.rx||0);g.rotateZ(P.rz||0);g.rotateY(P.ry||0);g.translate(P.x,P.y,P.z);return colorize(g,C)}if(P.k==='g'){const g=roofGeo(P.w,P.d,P.h);if(P.ry)g.rotateY(P.ry);g.translate(P.x,P.y,P.z);return colorize(g,C)}return null}
-function* lzBuildG(L){const BM=HUB.BM,bt=L.bt;if(L.pre)yield* L.pre(L);let t=performance.now();for(const P of L.parts){const g=lzPartGeo(P);if(g)bt.add(g,P.m==='flat'?HUB.flatMat:P.k==='b'&&BM[P.m]?BM[P.m]:BM.plain);if(performance.now()-t>1.2){yield;t=performance.now()}}
-  yield;for(const S of L.roads){const P=S.pts;for(let i0=0;i0<P.length-1;i0+=140){const i1=Math.min(P.length-1,i0+140),m=new THREE.Mesh(abStrip(P,i0,i1,-S.w/2,S.w/2,.07,.07,32),HUB.M.street||HUB.M.road);m.receiveShadow=true;L.root.add(m)}yield}
-  const by={};for(const o of L.km)(by[o.nm]=by[o.nm]||[]).push(o);for(const nm in by){const A=by[nm],im=new THREE.InstancedMesh(kmGeo(nm,1),kmMat(kmKit(nm)),A.length),c=new THREE.Color(),q=new THREE.Quaternion(),up=V3(0,1,0),P=V3();let ks=0;A.forEach((o,i)=>{_m.compose(P.set(o.x,groundY(o.x,o.z)-.1,o.z),q.setFromAxisAngle(up,o.ry),_ts.set(o.sc,o.sc,o.sc));ks=Math.max(ks,o.sc);im.setMatrixAt(i,_m);im.setColorAt(i,c.set(o.tint||'#ffffff'))});im.userData.ks=ks;im.computeBoundingSphere();L.root.add(im);yield}
-  if(L.post)yield* L.post(L);yield* bt.flushG(L.root);yield;yield* lzPropsG(L)}
+function* lzBuildG(L){const BM=HUB.BM,bt=L.bt;if(L.pre)yield* L.pre(L);let t=performance.now();for(const P of L.parts){const g=lzPartGeo(P);if(g)bt.add(g,P.m==='flat'?HUB.flatMat:P.k==='b'&&BM[P.m]?BM[P.m]:BM.plain);if(performance.now()-t>1.2){yield 'part';t=performance.now()}}
+  yield 'parts';for(const S of L.roads){const P=S.pts;for(let i0=0;i0<P.length-1;i0+=140){const i1=Math.min(P.length-1,i0+140),m=new THREE.Mesh(abStrip(P,i0,i1,-S.w/2,S.w/2,.07,.07,32),HUB.M.street||HUB.M.road);m.receiveShadow=true;L.root.add(m)}yield 'road'}
+  const by={};for(const o of L.km)(by[o.nm]=by[o.nm]||[]).push(o);for(const nm in by){const A=by[nm],im=new THREE.InstancedMesh(kmGeo(nm,1),kmMat(kmKit(nm)),A.length),c=new THREE.Color(),q=new THREE.Quaternion(),up=V3(0,1,0),P=V3();let ks=0;A.forEach((o,i)=>{_m.compose(P.set(o.x,groundY(o.x,o.z)-.1,o.z),q.setFromAxisAngle(up,o.ry),_ts.set(o.sc,o.sc,o.sc));ks=Math.max(ks,o.sc);im.setMatrixAt(i,_m);im.setColorAt(i,c.set(o.tint||'#ffffff'))});im.userData.ks=ks;im.computeBoundingSphere();L.root.add(im);yield 'km:'+nm}
+  if(L.post)yield* L.post(L);yield* bt.flushG(L.root);yield 'flush';yield* lzPropsG(L)}
 function* lzPropsG(L){const D=HUB.ptypes;if(!D||!L.props.length)return;const G=new Map();gridAddTo(G,L.bld);const out=[],rnd=mul(L.id.length*977+L.props.length);let t0=performance.now();
-  for(const[t,x,z,ry,y]of L.props){if(performance.now()-t0>1.2){yield;t0=performance.now()}const def=D[t];if(!def)continue;if(roamHit(x,z,def.r*.6)||gridHit(G,x,z,def.r*.6)||lzRoadD(x,z)<def.r*.6)continue;if(CID!=='fra'&&!CE_RX[t]&&CE_onRoad(x,z))continue;if(y==null&&(inRiver(x,z,-1)||onAnyDeck(x,z)))continue;if(OC_onRoad(t,x,z))continue;out.push({gp:y==null,t,x,z,y:y??OC_gy(t,x,z),ry:ry??rnd()*6.28,alive:true,rt:0})}
+  for(const[t,x,z,ry,y]of L.props){if(performance.now()-t0>1.2){yield 'pr';t0=performance.now()}const def=D[t];if(!def)continue;if(roamHit(x,z,def.r*.6)||gridHit(G,x,z,def.r*.6)||lzRoadD(x,z)<def.r*.6)continue;if(CID!=='fra'&&!CE_RX[t]&&CE_onRoad(x,z))continue;if(y==null&&(inRiver(x,z,-1)||onAnyDeck(x,z)))continue;if(OC_onRoad(t,x,z))continue;out.push({gp:y==null,t,x,z,y:y??OC_gy(t,x,z),ry:ry??rnd()*6.28,alive:true,rt:0})}
   yield;const by={};for(const p of out){const k=p.t+'#'+hubTile(p.x,p.z);(by[k]=by[k]||[]).push(p)}
   for(const tk in by){const t=tk.split('#')[0],def=D[t],arr=by[tk],mat=def.mat||(D.__pm||(D.__pm=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.5,metalness:.08}))),im=new THREE.InstancedMesh(def.g,mat,arr.length);const col=new THREE.Color();
-    arr.forEach((p,i)=>{p.i=i;p.im=im;_m.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));im.setMatrixAt(i,_m);col.set(def.tint?def.tint[Math.floor(rnd()*def.tint.length)]:'#ffffff');im.setColorAt(i,col);p.col=new THREE.Color(def.cols[0])});im.computeBoundingSphere();L.root.add(im);yield}
+    arr.forEach((p,i)=>{p.i=i;p.im=im;_m.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));im.setMatrixAt(i,_m);col.set(def.tint?def.tint[Math.floor(rnd()*def.tint.length)]:'#ffffff');im.setColorAt(i,col);p.col=new THREE.Color(def.cols[0])});im.computeBoundingSphere();L.root.add(im);yield 'prim'}
   const PG=HUB.pgrid;for(const p of out){HUB.props.push(p);if(PG){const k=Math.floor(p.x/16)*10000+Math.floor(p.z/16);let A=PG.get(k);if(!A)PG.set(k,A=[]);A.push(p)}}L.nProps=out.length}
 function lzStart(L){if(L.it)return;L.root=new THREE.Group();L.root.visible=false;L.root.userData.lz=L.id;HUB.grp.add(L.root);L.bt=new LBatch(L.tile||1400);L.t0=performance.now();L.it=L.build(L)}
 function lzFinish(L){HUB.bld.push(...L.bld);hubGridAdd(L.bld);const R=L.root;R.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||!o.geometry)return;const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();const b=g.boundingBox;if(b.max.y-b.min.y>.005)return;const y=b.max.y+o.position.y;if(y<-.0045&&y>-.05)o.position.y+=y*5});
@@ -4767,7 +4772,7 @@ function lzFinish(L){HUB.bld.push(...L.bld);hubGridAdd(L.bld);const R=L.root;R.t
 function lzRun(L){if(L.done)return;const i=LZ.q.indexOf(L);if(i>=0)LZ.q.splice(i,1);lzStart(L);const t=performance.now();while(!L.it.next().done);L.ms+=performance.now()-t;lzFinish(L);if(LZ.cur===L)LZ.cur=null}
 function lazyStep(){if(!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;let add=false;for(const L of LAZY)if(!L.done&&!L.qd&&lzD(L,x,z)<(L.inR||LZ.inR||2200)){L.qd=true;LZ.q.push(L);add=true}
   if(!LZ.cur&&!LZ.q.length)return;if(add)LZ.q.sort((a,b)=>lzD(a,x,z)-lzD(b,x,z));const t0=performance.now();let n=0;
-  while(performance.now()-t0<LZ.ms){if(!LZ.cur){LZ.cur=LZ.q.shift();if(!LZ.cur)break;if(LZ.cur.done){LZ.cur=null;continue}lzStart(LZ.cur)}const L=LZ.cur,t1=performance.now(),r=L.it.next();L.ms+=performance.now()-t1;n++;if(r.done){lzFinish(L);LZ.cur=null}}
+  while(performance.now()-t0<LZ.ms){if(!LZ.cur){LZ.cur=LZ.q.shift();if(!LZ.cur)break;if(LZ.cur.done){LZ.cur=null;continue}lzStart(LZ.cur)}const L=LZ.cur,t1=performance.now(),r=L.it.next();let d1=performance.now()-t1;L.ms+=d1;n++;let d2=0;if(r.done){const t2=performance.now();lzFinish(L);d2=performance.now()-t2;d1+=d2;LZ.cur=null}if(d1>20)(LZ.slow||(LZ.slow=[])).length<40&&LZ.slow.push([L.id,r.done?'fin':r.value||'?',Math.round(d1),Math.round(d2),LZ.lastV||'']);LZ.lastV=r.value}
   if(!n)return;const dt=performance.now()-t0;LZ.steps++;LZ.tot+=dt;if(dt>LZ.max)LZ.max=dt;if(dt>8)LZ.over++;LZ.hist.push(+dt.toFixed(2));if(LZ.hist.length>900)LZ.hist.shift()}
 async function lzLoad(list,a,b){let t=performance.now(),i=0;for(const L of list){if(L.done){i++;continue}const k=LZ.q.indexOf(L);if(k>=0)LZ.q.splice(k,1);if(LZ.cur===L)LZ.cur=null;lzStart(L);if(LZT[L.id])$('#ldStep').textContent=LZT[L.id];
     while(true){const t1=performance.now(),r=L.it.next();L.ms+=performance.now()-t1;if(r.done){lzFinish(L);break}if(performance.now()-t>12){ldSet(a+(b-a)*(i+.5)/list.length);await nextFrame();t=performance.now()}}i++;ldSet(a+(b-a)*i/list.length)}}
@@ -13246,13 +13251,18 @@ function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),Q=LF_DT.
  const vy=p._vy&&p._vy.length===n?p._vy:(p._vy=new Float32Array(n));for(let i=0;i<n;i++)vy[i]=Y[i];
  for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];for(let k=0;k<12;k+=3){const u=W[k],v=W[k+1],w=W[k+2],x=X[a]*u+X[b]*v+X[d]*w,z=Z[a]*u+Z[b]*v+Z[d]*w;
   const e=Y[a]*u+Y[b]*v+Y[d]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
-function LF_drapeG(L,A,gy){const n=LF_DT.V.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),idx=[],C=new THREE.Color();if(!L.lfP)L.lfP=[];
- A.forEach((p,k)=>{const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
-  LF_DT.V.forEach((q,i)=>{const a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=(p._vy?p._vy[i]:gy(x,z))+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b});
-  for(const i of LF_DT.I)idx.push(o+i);
+function* LF_drapeG(L,A,gy,out){const n=LF_DT.V.length,DI=LF_DT.I,ni=DI.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),nor=new Float32Array(A.length*n*3),idx=new (A.length*n>65535?Uint32Array:Uint16Array)(A.length*ni),C=new THREE.Color();if(!L.lfP)L.lfP=[];
+ let t0=performance.now();
+ for(let k=0;k<A.length;k++){const p=A[k],c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
+  for(let i=0;i<n;i++){const q=LF_DT.V[i],a=q[0]*p.sx,b=q[1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b,j=(o+i)*3;pos[j]=x;pos[j+1]=(p._vy?p._vy[i]:gy(x,z))+.035;pos[j+2]=z;col[j]=C.r;col[j+1]=C.g;col[j+2]=C.b}
+  for(let t=0;t<ni;t+=3){const ia=(o+DI[t])*3,ib=(o+DI[t+1])*3,ic=(o+DI[t+2])*3;idx[k*ni+t]=o+DI[t];idx[k*ni+t+1]=o+DI[t+1];idx[k*ni+t+2]=o+DI[t+2];
+   const cx=pos[ic]-pos[ib],cy=pos[ic+1]-pos[ib+1],cz=pos[ic+2]-pos[ib+2],ax=pos[ia]-pos[ib],ay=pos[ia+1]-pos[ib+1],az=pos[ia+2]-pos[ib+2],nx=cy*az-cz*ay,ny=cz*ax-cx*az,nz=cx*ay-cy*ax;
+   nor[ia]+=nx;nor[ia+1]+=ny;nor[ia+2]+=nz;nor[ib]+=nx;nor[ib+1]+=ny;nor[ib+2]+=nz;nor[ic]+=nx;nor[ic+1]+=ny;nor[ic+2]+=nz}
+  for(let i=0;i<n;i++){const j=(o+i)*3,l=Math.hypot(nor[j],nor[j+1],nor[j+2])||1;nor[j]/=l;nor[j+1]/=l;nor[j+2]/=l}
   const Rr=Math.max(p.sx,p.sz),e={x:p.x,z:p.z,c,s,sx:p.sx,sz:p.sz,R2:Rr*Rr,yt:pos[o*3+1],gx:0,gz:0,d:1};
-  for(let i=Math.floor((p.x-Rr)/32);i<=Math.floor((p.x+Rr)/32);i++)for(let j=Math.floor((p.z-Rr)/32);j<=Math.floor((p.z+Rr)/32);j++){const kk=i*10000+j;let B=LF.PG.get(kk);if(!B)LF.PG.set(kk,B=[]);B.push(e);L.lfP.push([kk,e])}});
- if(!A.length)return null;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));g.setIndex(idx);g.computeVertexNormals();g.computeBoundingSphere();return g}
+  for(let i=Math.floor((p.x-Rr)/32);i<=Math.floor((p.x+Rr)/32);i++)for(let j=Math.floor((p.z-Rr)/32);j<=Math.floor((p.z+Rr)/32);j++){const kk=i*10000+j;let B=LF.PG.get(kk);if(!B)LF.PG.set(kk,B=[]);B.push(e);L.lfP.push([kk,e])}
+  if(performance.now()-t0>1.2){yield 'lf9a';t0=performance.now()}}
+ if(!A.length)return;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));g.setAttribute('normal',new THREE.BufferAttribute(nor,3));g.setIndex(new THREE.BufferAttribute(idx,1));g.computeBoundingSphere();out.g=g}
 function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=CID==='fra',[X0,X1,Z0,Z1]=L.rect,I={tuft:[],bed:[],patch:[],pond:[],reed:[],mound:[]},st=LF.st;
  const has=t=>!!D[t],pk=a=>{const b=a.filter(has);return b.length?b[Math.floor(LF_h(a.length,b.length,L.props.length)*b.length)]:null},{TREES,ROCK,GRN,DIRT}=C;
  const gy=(x,z)=>groundY(x,z)+LF_mound(x,z),G16=(x,z)=>{const k=Math.floor(x/16)*10000+Math.floor(z/16),e=[x,z];let A=LF.G.get(k);if(!A)LF.G.set(k,A=[]);A.push(e);L.lfG.push([k,e])};
@@ -13260,12 +13270,12 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
  const di=(t,x,z,ry,sx,sy,sz,c,y)=>{if(t!=='mound'&&LF_offRoad(x,z,t==='patch'||t==='pond'?Math.max(sx,sz)*.9+.5:t==='bed'?2.6:1.2))return;I[t].push({x,y:y==null?gy(x,z):y,z,ry,sx,sy,sz,c});st.n=(st.n||0)+1;if(t!=='tuft'&&t!=='patch'&&t!=='mound')G16(x,z)};
  let t0=performance.now();const slice=()=>performance.now()-t0>1.2;
  const cs=40,cells=[],lite=[];for(let x=X0+cs/2;x<X1;x+=cs){for(let z=Z0+cs/2;z<Z1;z+=cs){if(x<HX0+cs||x>HX1-cs||z<HZS+cs||z>HZN-cs)continue;const jx=x+(LF_h(x,z,1)-.5)*10,jz=z+(LF_h(x,z,2)-.5)*10;
-   {const k=LF_h(jx,jz,77)<LF.keep,d=LF_open(jx,jz);if(d>=0&&k&&(d<=LF.near||LF_h(jx,jz,78)<LF.far))cells.push([jx,jz])}}if(slice()){yield;t0=performance.now()}}
+   {const k=LF_h(jx,jz,77)<LF.keep,d=LF_open(jx,jz);if(d>=0&&k&&(d<=LF.near||LF_h(jx,jz,78)<LF.far))cells.push([jx,jz])}}if(slice()){yield 'lf1';t0=performance.now()}}
  if(LF.mounds)for(const[x,z]of cells){const n=LF_n(x,z),wild=n>=.62&&n<.8;const th0=n<.22?'pond':n>=.55&&n<.62?'market':'';if(th0||!(wild&&LF_h(x,z,3)<.85||LF_h(x,z,3)<.4))continue;
   if(Math.abs(groundY(x+20,z)-groundY(x-20,z))+Math.abs(groundY(x,z+20)-groundY(x,z-20))>3)continue;const r=14+LF_h(x,z,4)*12,h=Math.min(r*.17,2+LF_h(x,z,5)*2.5);let ok=true;
   for(let k=0;k<8&&ok;k++){const a=k*Math.PI/4;ok=LF_free(x+Math.sin(a)*r,z+Math.cos(a)*r,4)}if(!ok)continue;if(LF.M.some(o=>Math.hypot(o.x-x,o.z-z)<o.r+r*.6))continue;
   const m={x,z,r,h};LF.M.push(m);L.lfM.push(m);for(let a=Math.floor((x-r)/64);a<=Math.floor((x+r)/64);a++)for(let b=Math.floor((z-r)/64);b<=Math.floor((z+r)/64);b++){const k=a*10000+b;if(!LF.MG.has(k))LF.MG.set(k,[]);LF.MG.get(k).push(m)}
-  di('mound',x,z,LF_h(x,z,6)*6.28,r,h,r,GRN[Math.floor(LF_h(x,z,8)*GRN.length)],groundY(x,z));if(slice()){yield;t0=performance.now()}}
+  di('mound',x,z,LF_h(x,z,6)*6.28,r,h,r,GRN[Math.floor(LF_h(x,z,8)*GRN.length)],groundY(x,z));if(slice()){yield 'lf2';t0=performance.now()}}
  for(const[x,z]of cells){const n=LF_n(x,z),u=LF_h(x,z,9),th=n<.22?(u<.45?'pond':'meadow'):n<.42?'grove':n<.55?'garden':n<.62?'market':n<.8?'wild':'meadow';st.th=st.th||{};st.th[th]=(st.th[th]||0)+1;
   const R=(s)=>(LF_h(x,z,s)-.5),ring=(r,k,N)=>{const a=k/N*6.28+u*6.28;return[x+Math.sin(a)*r,z+Math.cos(a)*r]};
   for(let k=0;k<4;k++){const tx=x+R(20+k)*36,tz=z+R(40+k)*36,s=1.3+LF_h(tx,tz,1)*1.4;di('tuft',tx,tz,LF_h(tx,tz,2)*6.28,s,s,s,GRN[k%GRN.length])}
@@ -13279,18 +13289,18 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
   else if(th==='market'){const ry=Math.floor(u*4)*Math.PI/2;di('patch',x,z,ry,10,1,7,DIRT[1]);P('stall',x,z,ry);P('parasol',x+Math.cos(ry)*6,z-Math.sin(ry)*6);P('table',x+Math.cos(ry)*6+1.5,z-Math.sin(ry)*6+1.5);P('parasol',x-Math.cos(ry)*6,z+Math.sin(ry)*6);P('bin',x+Math.sin(ry)*5,z+Math.cos(ry)*5)}
   else if(th==='wild'){di('patch',x+R(21)*10,z+R(22)*10,u*6.28,5+u*6,1,4+u*5,DIRT[Math.floor(u*3)]);for(let k=0;k<1+Math.floor(u*2.5);k++)P(ROCK,x+R(23+k)*20,z+R(26+k)*20);P('bush',x+R(29)*16,z+R(30)*16);if(u<.4)P(pk(TREES),x+R(31)*14,z+R(32)*14)}
   else{for(let k=0;k<4;k++){const tx=x+R(50+k)*26,tz=z+R(60+k)*22;di('tuft',tx,tz,k,.7,.7,.7,LF_FC[k%LF_FC.length])}if(u<.25)P(pk(TREES),x+R(33)*10,z+R(34)*10)}
-  if(slice()){yield;t0=performance.now()}}
+  if(slice()){yield 'lf3';t0=performance.now()}}
  if(LF.lite){const CG=new Set(cells.map(([x,z])=>Math.floor(x/40)*10000+Math.floor(z/40)));for(let x=X0+10;x<X1;x+=20){for(let z=Z0+10;z<Z1;z+=20){if(x<HX0-LF.rb||x>HX1+LF.rb||z<HZS-LF.rb||z>HZN+LF.rb)continue;
    const jx=x+(LF_h(x,z,81)-.5)*6,jz=z+(LF_h(x,z,82)-.5)*6;
    const tryP=(jx,jz)=>{if(CG.has(Math.floor(jx/40)*10000+Math.floor(jz/40))&&LF_h(jx,jz,83)<.6)return;
     if(roamHit(jx,jz,1.5)||!LF_free(jx,jz,3.5)&&!LF_liteOk(jx,jz)||onAnyDeck(jx,jz)||LF_count(jx,jz,8)>=2)return;if(fra&&typeof biomeAt==='function'&&(biomeAt(jx,jz)||{}).g==='air')return;lite.push([jx,jz])};tryP(jx,jz);
-   if(LF.rb>0){const q=cityAt(x,z),f=fillAt(x,z),de=Math.min(q?q.d-q.road.w/2:1e9,f?f.d-f.r.w/2:1e9);if(de<30)tryP(x+10+(LF_h(x,z,84)-.5)*4,z+10+(LF_h(x,z,85)-.5)*4)}}if(slice()){yield;t0=performance.now()}}}
+   if(LF.rb>0){const q=cityAt(x,z),f=fillAt(x,z),de=Math.min(q?q.d-q.road.w/2:1e9,f?f.d-f.r.w/2:1e9);if(de<30)tryP(x+10+(LF_h(x,z,84)-.5)*4,z+10+(LF_h(x,z,85)-.5)*4)}}if(slice()){yield 'lf4';t0=performance.now()}}}
  for(const[x,z]of lite){const u=LF_h(x,z,90),R=s=>(LF_h(x,z,s)-.5);st.lite=(st.lite||0)+1;
   for(let k=0;k<4;k++){const tx=x+R(91+k)*18,tz=z+R(97+k)*18,s=1.2+LF_h(tx,tz,1)*1.5;di('tuft',tx,tz,LF_h(tx,tz,2)*6.28,s,s,s,GRN[(k+Math.floor(u*4))%GRN.length])}
   const s=4+u*5;di('patch',x+R(103)*8,z+R(104)*8,u*6.28,s,1,s*(.6+LF_h(x,z,105)*.5),u<.65?DIRT[Math.floor(u*6)%DIRT.length]:GRN[(Math.floor(u*9)+1)%GRN.length]);
   if(LF_h(x,z,112)<.3)di('bed',x+R(113)*10,z+R(114)*10,u*6.28,1.4,1,1.4,null);
   if(u<.45)for(let k=0;k<2;k++)di('tuft',x+R(106+k)*12,z+R(109+k)*12,k,.8,.8,.8,LF_FC[(k+Math.floor(u*20))%LF_FC.length]);
-  if(slice()){yield;t0=performance.now()}}
+  if(slice()){yield 'lf5';t0=performance.now()}}
  for(const[x,z,ux,uz,w,k]of C.VS.get(Math.floor(X0/1000)+'|'+Math.floor(Z0/1000))||[]){for(const sd of[-1,1]){const nx=uz*sd,nz=-ux*sd,u=LF_h(x+sd,z,k),o=w/2+5+u*15,px=x+nx*o,pz=z+nz*o;
    if(LF.lite)for(let j=0;j<4;j++){const ko=w/2+2.2+j*2.6+LF_h(x,z,120+j+sd)*1.2,kx=x+nx*ko+ux*(j*5-2.5),kz=z+nz*ko+uz*(j*5-2.5);const q=cityAt(kx,kz);if(q&&q.d<q.road.w/2+1.8)continue;
     if(!roamHit(kx,kz,1.5)&&!inRiver(kx,kz,-2)&&!onAnyDeck(kx,kz)){const s=.9+LF_h(kx,kz,3)*.9;if(j===3&&LF_h(kx,kz,5)<.5)di('patch',kx,kz,LF_h(kx,kz,4)*6.28,2.5,1,1.6,DIRT[(k+j)%DIRT.length]);else di('tuft',kx,kz,LF_h(kx,kz,4)*6.28,s,s,s,GRN[(k+j)%GRN.length])}}
@@ -13303,19 +13313,19 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
    else if(zn<.62){if(u<.3)P('bench',px,pz,ry+(sd>0?Math.PI/2:-Math.PI/2))}
    else if(zn<.8){if(u<.4)P(ROCK,px,pz);else di('patch',px,pz,u*6.28,3+u*4,1,2+u*3,DIRT[k%DIRT.length])}
    else for(let j=0;j<3;j++)di('tuft',px+(LF_h(px,j,4)-.5)*6,pz+(LF_h(pz,j,5)-.5)*6,j,.8,.8,.8,LF_FC[(k+j)%LF_FC.length])}
-  if(slice()){yield;t0=performance.now()}}
+  if(slice()){yield 'lf6';t0=performance.now()}}
  const GE=LF.geo||(LF.geo=LF_geos()),mat=LF.mat||(LF.mat={def:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),tuft:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,side:THREE.DoubleSide}),pond:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.12,metalness:.15})});
  const M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),S=new THREE.Vector3(),Pv=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),Co=new THREE.Color();LF.ms=LF.ms||[];
  if(LF.drape){/* perf-1: the drape checks run sliced (one unsliced step was up to 215 ms of groundY calls on desktop) */const DR0=[],DR=[];
   const DC=LF.dc||(LF.dc=new Map()),dk=CID+L.id,pv=DC.get(dk),cu=[],ce=new Map();DC.set(dk,cu);
-  for(let i=0;i<I.patch.length;i++){const p=I.patch[i],c0=pv&&pv[i],hit=c0&&c0.x===p.x&&c0.z===p.z&&c0.sx===p.sx&&c0.sz===p.sz,c=hit?c0:{x:p.x,z:p.z,sx:p.sx,sz:p.sz,r:LF_resid(p,gy)>.08,k:-1,vy:null};cu.push(c);if(c.r){DR0.push(p);ce.set(p,c)}if(!hit&&slice()){yield;t0=performance.now()}}
+  for(let i=0;i<I.patch.length;i++){const p=I.patch[i],c0=pv&&pv[i],hit=c0&&c0.x===p.x&&c0.z===p.z&&c0.sx===p.sx&&c0.sz===p.sz,c=hit?c0:{x:p.x,z:p.z,sx:p.sx,sz:p.sz,r:LF_resid(p,gy)>.08,k:-1,vy:null};cu.push(c);if(c.r){DR0.push(p);ce.set(p,c)}if(!hit&&slice()){yield 'lf7';t0=performance.now()}}
   for(const p of DR0){const sx=p.sx,sz=p.sz,c=ce.get(p);let ok=false;if(c.k>=0){if(c.k>0){p.sx=sx*c.k;p.sz=sz*c.k;p._vy=c.vy;ok=true}}else{c.k=0;for(const k of[1,.7,.5]){p.sx=sx*k;p.sz=sz*k;if(LF_drapeOk(p,gy)){ok=true;c.k=k;c.vy=p._vy;break}}}
-   if(ok)DR.push(p);else{p.sx=sx;p.sz=sz;p._vy=null}if(slice()){yield;t0=performance.now()}}if(DR0.length){const g=DR.length?LF_drapeG(L,DR,gy):null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield}}
+   if(ok)DR.push(p);else{p.sx=sx;p.sz=sz;p._vy=null}if(slice()){yield 'lf8';t0=performance.now()}}if(DR0.length){const og={};if(DR.length)yield* LF_drapeG(L,DR,gy,og);const g=og.g||null;const S=new Set(DR0);I.patch=I.patch.filter(p=>!S.has(p));st.drape=(st.drape||0)+DR.length;st.drapeDrop=(st.drapeDrop||0)+DR0.length-DR.length;if(g){const m=new THREE.Mesh(g,LF_patchMat());m.boundingSphere=g.boundingSphere;m.receiveShadow=true;m.userData.lf='patch';m.userData.lfR=L.id;m.userData.nsh=1;L.root.add(m);LF.ms.push(m);yield 'lf9'}}
   I.pond=I.pond.filter(p=>{let lo=9e9,hi=-9e9;for(let k=0;k<12;k++){const a=k/12*6.283,y=gy(p.x+Math.cos(a)*p.sx,p.z+Math.sin(a)*p.sz);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.15)return false;p.y=(lo+hi)/2+.02;return true});
   I.bed=I.bed.filter(p=>{const c=Math.cos(p.ry||0),sn=Math.sin(p.ry||0);let lo=9e9,hi=-9e9;for(const[a,b]of[[-2,-1.2],[2,-1.2],[2,1.2],[-2,1.2]]){const u=a*p.sx,v=b*p.sz,y=gy(p.x+c*u+sn*v,p.z-sn*u+c*v);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.2)return false;p.y=lo;return true})}
  for(const t in I){const A=I[t];if(!A.length)continue;const m=new THREE.InstancedMesh(GE[t],t==='tuft'||t==='reed'?mat.tuft:t==='pond'?mat.pond:mat.def,A.length);
-  for(let i=0;i<A.length;i++){const p=A[i];if(t==='patch')LF_fit(L,p,gy);Q.setFromAxisAngle(Y,p.ry||0);M4.compose(Pv.set(p.x,p.y,p.z),Q,S.set(p.sx,p.sy,p.sz));if(p.gx||p.gz){const e=M4.elements;e[1]=p.gx*e[0]+p.gz*e[2];e[9]=p.gx*e[8]+p.gz*e[10]}m.setMatrixAt(i,M4);m.setColorAt(i,Co.set(p.c||'#ffffff'));if(slice()){yield;t0=performance.now()}}
-  m.computeBoundingSphere();m.castShadow=t==='mound';m.receiveShadow=true;m.userData.lf=t;m.userData.lfR=L.id;m.userData.nsh=t!=='mound';L.root.add(m);LF.ms.push(m);yield}
+  for(let i=0;i<A.length;i++){const p=A[i];if(t==='patch')LF_fit(L,p,gy);Q.setFromAxisAngle(Y,p.ry||0);M4.compose(Pv.set(p.x,p.y,p.z),Q,S.set(p.sx,p.sy,p.sz));if(p.gx||p.gz){const e=M4.elements;e[1]=p.gx*e[0]+p.gz*e[2];e[9]=p.gx*e[8]+p.gz*e[10]}m.setMatrixAt(i,M4);m.setColorAt(i,Co.set(p.c||'#ffffff'));if(slice()){yield 'lf10';t0=performance.now()}}
+  m.computeBoundingSphere();m.castShadow=t==='mound';m.receiveShadow=true;m.userData.lf=t;m.userData.lfR=L.id;m.userData.nsh=t!=='mound';L.root.add(m);LF.ms.push(m);yield 'lf11'}
  st.regs=(st.regs||0)+1;yield* lzPropsG(L)}
 function LF_ensure(x,z,r){if(typeof LAZY==='undefined')return 0;let n=0;for(const L of LAZY)if(L.lf&&!L.done&&lzD(L,x,z)<r){lzRun(L);n++}return n}
 buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{LF_reg()}catch(e){console.warn('LF reg',e)}return r})(buildHubProps);
@@ -15911,7 +15921,7 @@ function SM2_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam firs
   return `📍 20 km/h TAP: ${res.map(r=>`${r.t} ${r.smash?'SMASHED':'bump'} (${r.bricks} bricks, −${f(r.loss)})`).join(', ')}, car ${cr.burst?'BURST':'bump'} (−${f(cr.loss)})`+ok(pass)}
  const pass=res.every(r=>r.smash)&&cr.burst;return `📍 70 km/h HIT: ${res.map(r=>`${r.t} ${r.smash?'smashed':'NOT smashed'} (impact ${r.imp})`).join(', ')}, car ${cr.burst?'burst into bricks':'NOT burst'}`+ok(pass)}
 (function SM2_reg(i){const C=window.__chk;if(C&&C.GO){for(const k of['tap','hit'])C.GO['smash2/'+k]=[{c:'fra',n:k,fn:()=>SM2_go(k)}];return}if(i<600)setTimeout(()=>SM2_reg(i+1),100)})(0);
-const PC={on:!/[?&]pc5=0/.test(location.search),L:[],grp:null,t:0,f:0,x:1e9,z:1e9,h:1e9,keep:60,st:{meshes:0,src:0,vis:0,runs:0,ms:0}};
+const PC={on:!/[?&]pc5=0/.test(location.search),L:[],grp:null,t:0,f:0,k:0,left:0,x:1e9,y:0,z:1e9,h:1e9,fr:900,keep:60,st:{meshes:0,src:0,vis:0,runs:0,ms:0}};
 const _pcM=new THREE.Matrix4(),_pcPV=new THREE.Matrix4(),_pcF=new THREE.Frustum(),_pcD=new THREE.Vector3(),_pcC=new THREE.Color(),_pcIM=THREE.InstancedMesh.prototype;
 function PC_far(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc5Far??(lv==='min'?380:lv==='low'?480:lv==='med'?700:900)}
 function PC_cand(o){if(!o.isInstancedMesh||o.userData.pc||o.count<16||o.count!==o.instanceMatrix.count||o.instanceMatrix.usage!==THREE.StaticDrawUsage)return false;
@@ -15934,33 +15944,41 @@ function PC_scan(){PC.L.length=0;PC.st.meshes=PC.st.src=0;PC.grp=HUB.grp;if(!HUB
  if(typeof CLOUDS!=='undefined'&&CLOUDS)CLOUDS.traverse(o=>{if(o.isInstancedMesh&&!o.userData.pc&&o.count>=16&&o.count===o.instanceMatrix.count)PC_reg(o,true)});
  for(const im of Object.values(HUB.cim||{}))for(const q of[im,im&&im.userData.w,im&&im.userData.g])if(q&&q.isInstancedMesh&&!q.userData.pc&&q.count>=8&&q.count===q.instanceMatrix.count)PC_reg(q,false).dyn=true;
  PC.nch=HUB.grp.children.length;PC_grid()}
-function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const w=o=>{if(o===lg)return;if(PC_cand(o)){PC_reg(o,false);n++}for(const q of o.children)w(q)};w(HUB.grp);if(n)PC_grid();return n}
-function PC_grid(){
- const M=new Map();for(const C of PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
-  for(const[k,L]of T){let Q=M.get(k);if(!Q)M.set(k,Q={x:0,y:0,z:0,r:0,n:0,E:[]});Q.E.push(C,Int32Array.from(L));for(const i of L){Q.x+=C.c[i*4];Q.y+=C.c[i*4+1];Q.z+=C.c[i*4+2];Q.n++}}}
- PC.G=[...M.values()];for(const Q of PC.G){Q.x/=Q.n;Q.y/=Q.n;Q.z/=Q.n;for(let e=0;e<Q.E.length;e+=2){const C=Q.E[e];for(const i of Q.E[e+1])Q.r=Math.max(Q.r,Math.hypot(C.c[i*4]-Q.x,C.c[i*4+1]-Q.y,C.c[i*4+2]-Q.z)+Math.max(C.c[i*4+3],2))}Q.r+=4}}
+function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const A=[],w=o=>{if(o===lg)return;if(PC_cand(o)){A.push(PC_reg(o,false));n++}for(const q of o.children)w(q)};w(HUB.grp);if(n)PC_grid(A);return n}
+function PC_grid(add){
+ if(!add||!PC.M)PC.M=new Map();const M=PC.M;
+ for(const C of add||PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
+  C.G=[];for(const[k,L]of T){let q=M.get(k);if(!q){let x=0,y=0,z=0;for(const i of L){x+=C.c[i*4];y+=C.c[i*4+1];z+=C.c[i*4+2]}M.set(k,q={id:M.size,x:x/L.length,y:y/L.length,z:z/L.length,r:0})}
+   for(const i of L)q.r=Math.max(q.r,Math.hypot(C.c[i*4]-q.x,C.c[i*4+1]-q.y,C.c[i*4+2]-q.z)+Math.max(C.c[i*4+3],2)+4);C.G.push(q.id,Int32Array.from(L))}}
+ const G=PC.G=new Float64Array(M.size*4);for(const q of M.values()){G[q.id*4]=q.x;G[q.id*4+1]=q.y;G[q.id*4+2]=q.z;G[q.id*4+3]=q.r}PC.cv=new Uint8Array(M.size);PC.left=0}
 function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const d=Math.hypot(x-cx,y-cy,z-cz);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
  const s=C.s++,a=C.src,arr=C.im.instanceMatrix.array;if(s!==i){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
 const _pcS=new THREE.Sphere();
+function PC_mesh(C){const im=C.im;C.dirty=false;if(!im.parent)return 0;const cx=PC.x,cy=PC.y,cz=PC.z,far=PC.fr;C.s=0;C.slot.fill(-1);let n=0;
+ if(C.G){const G=C.G,V=PC.cv;for(let g=0;g<G.length;g+=2){if(!V[G[g]])continue;const I=G[g+1];n+=I.length;for(let j=0;j<I.length;j++){const i=I[j];PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}}}
+ else if(C.sky){im.updateWorldMatrix(true,false);const W=im.matrixWorld.elements;n=C.n;for(let i=0;i<C.n;i++){const lx=C.c[i*4],ly=C.c[i*4+1],lz=C.c[i*4+2];
+   PC_one(C,i,W[0]*lx+W[4]*ly+W[8]*lz+W[12],W[1]*lx+W[5]*ly+W[9]*lz+W[13],W[2]*lx+W[6]*ly+W[10]*lz+W[14],cx,cy,cz,far)}}
+ else{n=C.n;for(let i=0;i<C.n;i++)PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}
+ im.count=C.s;const M=im.instanceMatrix;M.clearUpdateRanges();if(C.s){M.addUpdateRange(0,C.s*16);M.needsUpdate=true}
+ const IC=im.instanceColor;if(IC){IC.clearUpdateRanges();if(C.s){IC.addUpdateRange(0,C.s*3);IC.needsUpdate=true}}return n}
 function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!=='roam')return;if(PC.grp&&PC.grp!==HUB.grp){PC.L.length=0;PC.grp=null;PC.f=0}
- if(!PC.grp){const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return;PC_scan()}
+ if(!PC.grp){const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return;PC_scan();force=1}
  if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9)&&PC_add())force=1;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
- let dirty=false;for(const C of PC.L)if(C.dirty){dirty=true;break}
- if(!force&&++PC.t%10&&!dirty&&dh<.1&&Math.hypot(cx-PC.x,cz-PC.z)<20)return;PC.t=0;PC.x=cx;PC.z=cz;PC.h=h;const t0=performance.now();
- camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);
- const far=PC_far(),cy=camera.position.y;let vis=0;
- for(const C of PC.L){C.s=0;C.slot.fill(-1);C.dirty=false}
- for(const Q of PC.G){const d=Math.hypot(Q.x-cx,Q.y-cy,Q.z-cz);if(d-Q.r>far||d-Q.r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(Q.x,Q.y,Q.z),Q.r+4+d*.25)))continue;
-  for(let e=0;e<Q.E.length;e+=2){const C=Q.E[e],I=Q.E[e+1];if(!C.im.parent)continue;for(let j=0;j<I.length;j++){const i=I[j];PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}}}
- for(const C of PC.L){const im=C.im;if(C.dyn&&im.parent)for(let i=0;i<C.n;i++)PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far);
-  if(C.sky&&im.parent){im.updateWorldMatrix(true,false);const W=im.matrixWorld.elements;for(let i=0;i<C.n;i++){const lx=C.c[i*4],ly=C.c[i*4+1],lz=C.c[i*4+2];
-   PC_one(C,i,W[0]*lx+W[4]*ly+W[8]*lz+W[12],W[1]*lx+W[5]*ly+W[9]*lz+W[13],W[2]*lx+W[6]*ly+W[10]*lz+W[14],cx,cy,cz,far)}}
-  im.count=C.s;im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;vis+=C.s}
- PC.st.vis=vis;PC.st.runs++;PC.st.ms=+(performance.now()-t0).toFixed(2)}
+ const t0=performance.now();let tested=0;const snap=()=>{camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);PC.x=cx;PC.y=camera.position.y;PC.z=cz;PC.h=h;const far=PC.fr=PC_far(),cy=PC.y,G=PC.G,V=PC.cv;if(G)for(let q=0;q<V.length;q++){const d=Math.hypot(G[q*4]-cx,G[q*4+1]-cy,G[q*4+2]-cz),r=G[q*4+3];V[q]=d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(G[q*4],G[q*4+1],G[q*4+2]),r+4+d*.25))?0:1}};
+ if(force||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){snap();PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
+ else if(++PC.t%10===0&&!PC.left){snap();for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
+ const bud=force?1e9:(TUNE.pc7Bud||60000);/* circular: a new pass mid-way carries on from the same mesh, so no mesh starves under constant turning */
+ while(PC.left>0&&tested<bud){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
+ if(!PC.left)for(const C of PC.L)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
+ if(tested){let vis=0;for(const C of PC.L)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();
-hubCullStep=(f=>function(){f.apply(this,arguments);try{PC_step()}catch(e){if(!PC.err){PC.err=String(e);console.warn('PC',e)}}})(hubCullStep);
-function PC_go(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!PC.on)return'📍 perf5 compaction is OFF (?pc5=0) ❌';if(!PC.grp)PC_step(1);
+function PC_gate(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc7All||lv==='low'||lv==='min'}
+function PC_release(){for(const C of PC.L){const im=C.im;if(!im.parent)continue;im.instanceMatrix.array.set(C.src);if(C.col&&im.instanceColor)im.instanceColor.array.set(C.col);
+  for(let i=0;i<C.n;i++)C.slot[i]=i;C.s=C.n;C.dirty=false;im.count=C.n;im.instanceMatrix.clearUpdateRanges();im.instanceMatrix.needsUpdate=true;if(im.instanceColor){im.instanceColor.clearUpdateRanges();im.instanceColor.needsUpdate=true}}
+ PC.left=0;PC.x=1e9;PC.h=1e9;PC.rel=1}
+hubCullStep=(f=>function(){f.apply(this,arguments);try{if(PC_gate()){PC.rel=0;PC_step()}else if(PC.L.length&&!PC.rel)PC_release()}catch(e){if(!PC.err){PC.err=String(e);console.warn('PC',e)}}})(hubCullStep);
+function PC_go(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!PC.on)return'📍 perf5 compaction is OFF (?pc5=0) ❌';PC.rel=0;if(!PC.grp)PC_step(1);
  const ok=b=>b?' ✅':' ❌';const P=HUB.props.find(p=>p.alive&&p.im&&p.im.userData.pc&&p.gi==null&&p.im.userData.pc.c[p.i*4+3]>0);if(!P)return`📍 no compacted prop (meshes ${PC.st.meshes}) ❌`;
  const C=P.im.userData.pc;/* no roamWarp: a warp clears the props it lands on */camera.position.set(P.x+8,P.y+4,P.z+8);camera.lookAt(P.x,P.y,P.z);camera.updateMatrixWorld();PC_step(1);
  const shown0=C.slot[P.i]>=0;_pcM.makeScale(0,0,0);P.alive=false;P.im.setMatrixAt(P.i,_pcM);PC_step(1);
