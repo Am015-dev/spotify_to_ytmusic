@@ -303,3 +303,5 @@ BMV.draw=tm=>{const e=G.boss;if(!e||!e.bm)return;const t=G.t;ctx.save();
     if(g.tg)for(const x of g.tg)if(!x.dead){ctx.globalAlpha=.9;ctx.strokeStyle=x.bmGold?'#ffe14d':'#19e3ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x.x,x.y,x.r+8+2*Math.sin(t*12),0,7);ctx.stroke();}}
   ctx.restore();};
 window.__bmv={BMV,BMT,VB};
+/* bossvis.js (loads later) names the phase by its first verb: give the new verbs readable names there */
+NR.on('runStart',()=>{const V=window.BV;if(!V||!V.NAMES)return;for(const k in VB)if(!V.NAMES[k])V.NAMES[k]=k.replace(/_/g,' ').toUpperCase();});
