@@ -3,17 +3,18 @@
 // composer.render stubbed (render timed separately on every SAMPLE-th frame + renderer.info), split by wrapped subsystems; long tasks (PerformanceObserver),
 // heap per sample. CPU profile (PROF=1) -> top self-time functions overall and inside frames > 16 ms. env: CITY=fra|ath Q=high LOWMEM=0|1 SECS=120 RACE=1 SAMPLE=60
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const http=require('http'),fs=require('fs'),path=require('path');
-const OUT=path.resolve(process.argv[2]),V=process.argv[3],CITY=process.env.CITY||'fra',Q=process.env.Q||'high',LM=process.env.LOWMEM==='1',SECS=+(process.env.SECS||120),SAMPLE=+(process.env.SAMPLE||60);
+const TOUCH=process.env.TOUCH==='1';/* perf-r10b: TOUCH=1 = the phone context of tBoot (852x393 isMobile/hasTouch, q from the game unless Q is set) */
+const OUT=path.resolve(process.argv[2]),V=process.argv[3],CITY=process.env.CITY||'fra',Q=process.env.Q||(TOUCH?'':'high'),LM=process.env.LOWMEM==='1',SECS=+(process.env.SECS||120),SAMPLE=+(process.env.SAMPLE||60);
 const mime={'.html':'text/html','.js':'application/javascript','.json':'application/json','.mp3':'audio/mpeg'};
 const INIT=`(()=>{const q=[];let t=0;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};window.__dbg=1;
  window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){console.log('TICKERR '+e.message)}}}return t};window.__auto=true;setInterval(()=>{if(window.__auto)window.__tick(1)},16);
  window.__lt=[];try{new PerformanceObserver(l=>{for(const e of l.getEntries())window.__lt.push([Math.round(e.startTime),Math.round(e.duration),window.__ph||''])}).observe({type:'longtask',buffered:true})}catch(e){}})();`;
 const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.url.split('?')[0]));fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end()}r.writeHead(200,{'content-type':mime[path.extname(f)]||'application/octet-stream'});r.end(d)})}).listen(0,async()=>{
  const port=srv.address().port;const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info'].concat(process.env.JSFLAGS?['--js-flags='+process.env.JSFLAGS]:[])});
- const ctx=await b.newContext({viewport:{width:1280,height:720},deviceScaleFactor:1});const p=await ctx.newPage();p.setDefaultTimeout(1800000);await p.addInitScript(INIT);await p.addInitScript('window.__WRAP='+JSON.stringify(process.env.WRAP||''));
+ const ctx=await b.newContext(TOUCH?{viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true}:{viewport:{width:1280,height:720},deviceScaleFactor:1});const p=await ctx.newPage();p.setDefaultTimeout(1800000);await p.addInitScript(INIT);await p.addInitScript('window.__WRAP='+JSON.stringify(process.env.WRAP||''));
  p.on('console',m=>{const t=m.text();if(/TICKERR|PF1/.test(t))console.log(t.slice(0,200))});p.on('pageerror',e=>console.log('ERR',e.message.slice(0,150)));
  const cdp=await ctx.newCDPSession(p);const t0=Date.now();
- await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}&q=${Q}${LM?'&lowmem=1':''}${process.env.QS?'&'+process.env.QS:''}`);
+ await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}${Q?'&q='+Q:''}${LM?'&lowmem=1':''}${process.env.QS?'&'+process.env.QS:''}`);
  await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:500});const boot=Math.round((Date.now()-t0)/1000);
  // wrap subsystems (outermost binding, so every later wrapper is inside) + composer.render
  const wr=await p.evaluate(()=>{window.__auto=false;window.__ph='drive';const ev=__oc.ev;window.PF1={b:{},n:0};
