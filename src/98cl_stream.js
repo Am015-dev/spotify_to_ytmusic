@@ -30,7 +30,7 @@ function STR_lzFree(L){const R=L.root,inR=o=>{for(let q=o;q;q=q.parent)if(q===R)
   if(HUB.props){const keep=[],gone=[];for(const p of HUB.props)(p.im&&inR(p.im)?gone:keep).push(p);if(gone.length){HUB.props.length=0;for(const p of keep)HUB.props.push(p);/* art-2: no spread, 130k+ props overflow the call stack */const PG=HUB.pgrid;if(PG)for(const p of gone){const k=Math.floor(p.x/16)*10000+Math.floor(p.z/16),A=PG.get(k);if(A){const i=A.indexOf(p);if(i>=0)A.splice(i,1)}}}}
   if(HUB.cull){const C=HUB.cull.filter(c=>!inR(c.o));HUB.cull.length=0;for(const c of C)HUB.cull.push(c)}
   R.removeFromParent();R.traverse(o=>{if(o.isInstancedMesh)o.dispose();else if(o.isMesh&&o.geometry)o.geometry.dispose()});
-  L.root=null;L.done=false;L.qd=false;L.it=null;L.bt=null;L.strRe=1;if(L.pN!=null)L.props.length=L.pN;HUB.cpos=null;STR.st.lzF++}
+  L.root=null;L.done=false;L.qd=false;L.it=null;L.bt=null;L.strRe=1;if(L.pN!=null)L.props.length=L.pN;HUB.cj=4;STR.st.lzF++}
 // probe: the 3 biggest single LAZY build steps (ms, region, step index) in STR.st.lzBig
 STR.st.lzBig=[];
 {const _st=lzStart;lzStart=function(L){if(!L.it&&L.pN==null)L.pN=L.props.length;const fresh=!L.it,r=_st.apply(this,arguments);if(fresh&&L.it){const it=L.it;let k=0;L.it={next(){const t=performance.now(),q=it.next(),d=performance.now()-t;k++;if(d>6){const B=STR.st.lzBig;B.push([+d.toFixed(1),L.id,k,q.done?'end':'']);B.sort((a,b)=>b[0]-a[0]);B.length=Math.min(B.length,3)}return q},[Symbol.iterator](){return this}}}return r}}
