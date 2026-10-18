@@ -10,10 +10,10 @@ const TK={on:(()=>{try{return new URLSearchParams(location.search).get('tk1')!==
 const TK_C={id:'tk_rossi',key:'rival:ROSSI',kind:'rival',ai:['ROSSI'],p:'ROSSI',name:'Westend Split',nA:'Anlagenring',nB:'Neue Mainzer Str.',
   start:[[1900,1005],[1304,862],[760,560]],A:[[760,560],[902,333],[880,170],[660,-33],[573,-310]],B:[[760,560],[700,560],[619,348],[616,125],[608,-105],[573,-310]],fin:[[573,-310],[922,-573],[1338,-792],[1748,-1020],[2200,-1150]],
   ramps:[['start',.5,22,5,16],['B',.45,20,5,14],['fin',.45,26,8,16]],items:[['start',.3],['start',.7],['A',.35],['A',.7],['B',.25],['B',.7],['fin',.25],['fin',.7]],boost:{r:'A',f:[.15,.5,.85]}};
-function tkLeg(a,b){let best=null;for(let si=0;si<CITY_S.length;si++){const S=CITY_S[si];if(S.r.cls==='ped'||S.r.cls==='quay')continue;let ia=-1,da=40,ib=-1,db=40;
+function tkLeg(a,b,R0){const R=R0||40;let best=null;for(let si=0;si<CITY_S.length;si++){const S=CITY_S[si];if(S.r.cls==='ped'||S.r.cls==='quay')continue;let ia=-1,da=R,ib=-1,db=R;
     for(let i=0;i<S.pts.length;i++){const p=S.pts[i],d1=Math.hypot(p.x-a[0],p.z-a[1]),d2=Math.hypot(p.x-b[0],p.z-b[1]);if(d1<da){da=d1;ia=i}if(d2<db){db=d2;ib=i}}
     if(ia>=0&&ib>=0&&(!best||da+db<best[0]))best=[da+db,S,ia,ib]}
-  if(!best)return[a,b];const[,S,ia,ib]=best,st=ib>ia?3:-3,o=[a];for(let i=ia;st>0?i<ib:i>ib;i+=st)o.push([S.pts[i].x,S.pts[i].z]);o.push(b);return o}
+  if(!best)return R<75&&!R0?tkLeg(a,b,75):[a,b];/* races-5: Westend A (660,-33)->(573,-310) had no street within 40 m of both ends: a 290 m straight jump through the city, the bot stalled on a building at (630,-140) */const[,S,ia,ib]=best,st=ib>ia?3:-3,o=[a];for(let i=ia;st>0?i<ib:i>ib;i+=st)o.push([S.pts[i].x,S.pts[i].z]);o.push(b);return o}
 const tkCat=(...L)=>{const o=[];for(const P of L)for(const p of P)if(!o.length||Math.hypot(p[0]-o[o.length-1][0],p[1]-o[o.length-1][1])>2)o.push(p);return o};
 function tkChain(W){const o=[];for(let k=1;k<W.length;k++)for(const p of tkLeg(W[k-1],W[k]))if(!o.length||Math.hypot(p[0]-o[o.length-1][0],p[1]-o[o.length-1][1])>2)o.push(p);return o}
 function tkLen(P){let s=0;for(let i=1;i<P.length;i++)s+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);return s}
