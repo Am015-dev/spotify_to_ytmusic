@@ -1,3 +1,10 @@
+## perf-8 (2026-10-18, branch alex/perf8-wip, NOT merged to trunk: gate not run)
+1. Athens hitches found: they come from the LF fill tiles (98lf), not the biomes. Single steps of 20-72 ms inside LF_tileG, plus 25-70 ms in the done step (generator tail + lzFinish + SIMP/STR wrappers). 32 steps > 20 ms in 20 s (LZ.slow probe).
+2. Added: LZ.slow log (lazyStep, steps > 20 ms: [id, yield label, ms, finish ms, prev label]). LF_tileG yields are labelled lf1..lf11, and the lzBuildG yields are labelled too. Read it with PROBE='JSON.stringify(LZ.slow)'.
+3. LBatch rewritten: add() keeps the parts' typed arrays, and flushG copies them into one Float32Array per attribute in 1.2 ms slices (no giant JS-array regrowth). Unit 0 FAIL. The TAG gate and the perf A/B were NOT run.
+4. Frankfurt roamStep/FCG_build: not reached (the PROF run did not finish in the timebox).
+5. Next: run PROBE on this build to see which lfN step is slow (suspects: LF_drapeG, unsliced, with computeVertexNormals; the lzFinish traverse), cap it, then the gate and a 3x A/B.
+
 # HANDOFF perf (alex/od-athens): v88u perf hotfix → instancing/LOD → 2× brick detail → Athens busier
 
 Coordinator: session_017iH3DB4VyxwKSdMwsco4Ut. Reviewer: session_01Y6FYerWwxv43FuKUcaUT4v. Live: v88t (8f78291 = alex/od-supra fe7a196b), merged here.
