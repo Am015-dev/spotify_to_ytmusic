@@ -2,7 +2,7 @@
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');
 const [BASE,N]=process.argv.slice(2);
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const p=await(await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true})).newPage();p.setDefaultTimeout(900000);
+const p=await(await b.newContext({viewport:{width:852,height:393},isMobile:true,hasTouch:true})).newPage();p.setDefaultTimeout(900000);if(process.env.CPU){const cd=await p.context().newCDPSession(p);await cd.send('Emulation.setCPUThrottlingRate',{rate:+process.env.CPU})}
 await p.goto(BASE+'?test=fra&draw=0');await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__chk,null,{polling:250,timeout:600000});
 await p.evaluate(s=>__tk.q(s),`(()=>{const o=tkBot;window.__log=[];tkBot=function(P,op){const f=o(P,op);const g=function(sp){f(sp);if(Math.hypot(RO.x-209,RO.z-279)<45&&RO.v<16&&sp.t>5){const cs=HUB.cars.filter(c=>!c.dead&&Math.hypot(c.x-RO.x,c.z-RO.z)<16).map(c=>[Math.round(c.x),Math.round(c.z),+(c.v||0).toFixed(1),+(c.yo||0).toFixed(1),c.k,c.stop||c.wait||c.hold||0].join('/'));__log.push([sp.t.toFixed(1),RO.x.toFixed(0),RO.z.toFixed(0),RO.v.toFixed(1),RO.h.toFixed(2),K.ArrowUp?1:0,K.ArrowDown?1:0,cs.join(' ')].join(' '))}};g.R=f.R;return g};return 1})()`);
 for(let i=0;i<+N;i++){await p.evaluate(()=>{try{__tq.reset()}catch(e){}__log.length=0});

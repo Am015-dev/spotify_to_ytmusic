@@ -1,6 +1,8 @@
 // tracks-3 test-only code (lazy chunk, src/LAZY): feel check driver, static feel audit, GO tk1/water and tk1/quick. Evaluated in the page's module scope after the game is drivable.
 // tracks-3: feel check. tkBot = pure-pursuit driver on a route (lag = human steering delay in s, no auto-steer: plain arrow keys); tkFeel drives every course with it and logs stuck spots, walls hit, ramps that land in a building, bricks that sit inside a collider.
-function tkBot(P,o={}){const lagN=Math.round((o.lag||0)*30),q=[],look=o.look||26,cum=[0];for(let i=1;i<P.length;i++)cum.push(cum[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const L=cum[cum.length-1];let ix=0,s=0,still=0,pv=0,slow=0,rec=0,pgS=0,pgT=0;const R={stuck:[],walls:0,maxS:0,recov:0};
+/* races-8: rocking detector on SIM time (sp.t), not frames: a car that gas/brake-rocks in place has speed > 0 and gas held, so the speed/standstill checks never fire. Fires when net progress along the route over >= 6 s of sim time is < 15 m, then clears its window. W = {a:[[t,s]...]} */
+function tkRock(W,t,s){const a=W.a||(W.a=[]);a.push([t,s]);while(a.length>2&&t-a[1][0]>=6)a.shift();if(t-a[0][0]>=6&&s-a[0][1]<15){a.length=0;a.push([t,s]);return true}return false}
+function tkBot(P,o={}){const lagN=Math.round((o.lag||0)*30),q=[],look=o.look||26,cum=[0];for(let i=1;i<P.length;i++)cum.push(cum[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const L=cum[cum.length-1];const RW={};let ix=0,s=0,still=0,pv=0,slow=0,rec=0,pgS=0,pgT=0;const R={stuck:[],walls:0,maxS:0,recov:0};
   const at=d=>tkAt(P,Math.min(1,d/L));
   const f=function(sp){if(sp.cd>0||sp.done)return;let bd=1e9,bi=ix;for(let i=Math.max(0,ix-2);i<Math.min(P.length-1,ix+40);i++){const a=P[i],b=P[i+1],l2=(b[0]-a[0])**2+(b[1]-a[1])**2||1,t=clamp(((RO.x-a[0])*(b[0]-a[0])+(RO.z-a[1])*(b[1]-a[1]))/l2,0,1),d=Math.hypot(a[0]+(b[0]-a[0])*t-RO.x,a[1]+(b[1]-a[1])*t-RO.z);if(d<bd){bd=d;bi=i;s=cum[i]+t*Math.sqrt(l2)}}ix=bi;
     R.maxS=Math.max(R.maxS,s);const wet=RO.veh==='boat',T0=at(s+(wet?14:look)+Math.abs(RO.v)*(wet?.3:.6)),e0=angDiff(Math.atan2(T0.x-RO.x,T0.z-RO.z),RO.h);q.push(e0);const e=q.length>lagN?q[q.length-1-lagN]:0;
@@ -9,6 +11,8 @@ function tkBot(P,o={}){const lagN=Math.round((o.lag||0)*30),q=[],look=o.look||26
     if(rec>0){rec-=1/30;K.ArrowUp=K.KeyW=false;K.ArrowDown=true;if(Math.abs(e0)>.1)K[e0>0?'ArrowRight':'ArrowLeft']=true;pv=0;return}
     if(sp.t>2&&Math.abs(RO.v)<3&&K.ArrowUp){if(++slow>30){slow=0;rec=1;R.recov++}}else slow=0;
     // races-1: also back out when the progress along the route has not grown 3 m in 3 s although the speedo reads > 3 (pinned and jittering, or circling beside the road)
+    /* races-8: rocking (net progress < 15 m in 6 s sim time, any gas): hop via the roam unstick and back out */
+    if(sp.t>2&&tkRock(RW,sp.t,s)){R.rock=(R.rock||0)+1;R.recov++;rec=1.4;RO.stkT=Math.max(RO.stkT||0,4.01);RO.npHop=(RO.npHop||0)+1;pgS=s;pgT=sp.t}
     if(sp.t>2){if(s>pgS+3){pgS=s;pgT=sp.t}else if(sp.t-pgT>3){pgT=sp.t;rec=1.4;R.recov++}}
 
     if(Math.abs(e)>.035)K[e>0?'ArrowLeft':'ArrowRight']=true;/* races-5: braking horizon grows with v^2, a boost pad put the bot at 56 m/s into the River finish-leg corner (-315,446) and it overshot */const c1=at(s),c2=at(s+30+RO.v*1.5+RO.v*RO.v/25),cu=Math.abs(angDiff(c2.h,c1.h));   // a driver brakes for the corner ahead
@@ -58,4 +62,4 @@ function TD_go(say,tracks){const ok=b=>b?' ✅':' ❌',sv=[TDR.on,TDR.sel,menuTr
     good=good&&won&&anyRes;out.push('bot wins Westend '+ok(won))}
   catch(e){good=false;out.push('ERR '+e.message)}finally{fin();TDR.on=sv[0];TDR.sel=sv[1];menuTrack=sv[2]}
   const t='📍 TAKEDOWN RACE · '+out.join(' · ')+ok(good);window.__chk_td=t;return t}
-({tkBot,tkStaticFeel,tkFeel,tkGoWater,tkGoQuick,TD_go})
+({tkRock,tkBot,tkStaticFeel,tkFeel,tkGoWater,tkGoQuick,TD_go})
