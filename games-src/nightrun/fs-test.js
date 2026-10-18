@@ -33,6 +33,17 @@ let bad = 0; const ok = (n, p, i) => { if (!p) bad++; console.log((p ? 'PASS ' :
   await p2.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   await p2.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&fs=0`, { waitUntil: 'domcontentloaded' }); await sleep(900); await p2.touchscreen.tap(200, 300); await sleep(500);
   ok('?fs=0: no full screen, no button', !(await fsOn(p2)) && !(await p2.evaluate(() => !!window.FSX)));
+  // iPhone (no Fullscreen API for pages): a card explains Add to Home Screen once, never again after DON'T SHOW AGAIN, and never on Android
+  const ci = await br.newContext({ viewport: { width: 390, height: 763 }, hasTouch: true, isMobile: true, userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/120.0 Mobile/15E148 Safari/604.1' }), pi = await ci.newPage();
+  await pi.addInitScript(() => { try { delete Document.prototype.exitFullscreen; Object.defineProperty(Element.prototype, 'requestFullscreen', { value: undefined, configurable: true }); Object.defineProperty(Element.prototype, 'webkitRequestFullscreen', { value: undefined, configurable: true }); } catch (e) { } });
+  await pi.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+  await pi.goto(`http://127.0.0.1:${port}/index.html?nomusic=1`, { waitUntil: 'domcontentloaded' }); await sleep(3800);
+  ok('iPhone: the Add to Home Screen card shows on the title', await pi.evaluate(() => !!document.getElementById('fsCard')));
+  ok('iPhone: card buttons are at least 44 px', await pi.evaluate(() => [...document.querySelectorAll('#fsCard button')].every(b => b.getBoundingClientRect().height >= 44)));
+  await pi.evaluate(() => document.getElementById('fsNo').click()); await sleep(200);
+  await pi.reload({ waitUntil: 'domcontentloaded' }); await sleep(3800);
+  ok("iPhone: DON'T SHOW AGAIN is remembered", !(await pi.evaluate(() => !!document.getElementById('fsCard'))));
+  ok('Android phone: no card', !(await p2.evaluate(() => !!document.getElementById('fsCard'))));
   const c3 = await br.newContext({ viewport: { width: 1280, height: 720 } }), p3 = await c3.newPage();
   await p3.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   await p3.goto(`http://127.0.0.1:${port}/index.html?nomusic=1`, { waitUntil: 'domcontentloaded' }); await sleep(900); await p3.mouse.click(300, 300); await sleep(500);
