@@ -1,3 +1,28 @@
+## perf-11 (2026-10-18, alex/perf11-wip -> alex/od-int2): allocation-sampling rank + LIFE_at / GND_far fixes
+Athens q=high, trunk p11base, 15 s roam, CDP HeapProfiler.startSampling 32768 (tFrame HEAP=1 HEAPINT=32768), 3895 MB sampled; self-size summed per function over the top-40 stacks:
+| # | function (src) | MB | main caller |
+|---|---|---|---|
+| 1 | roamTerr (53_terrain_roads) | 350 | DEST_open < DEST_find (scan) |
+| 2 | roamHit (53_terrain_roads) | 232 | DEST_open < DEST_find; LIFE_at |
+| 3 | LF_drapeOk (98lf, perf-10 lane) | 232 | LF_tileG |
+| 4 | LIFE_at (assets/lx) | 185 | putG/putM/smPass |
+| 5 | invariants (assets/qa, every 0.5 s) | 126 (+54 iterator next) | Q.tick |
+| 6 | GND_in (60_city_build) | 121 | GND_far < roamTerr |
+| 7 | cityAt (51_city_net) | 117 | DEST_open/LF_onRoad, GND_in, LF_tileG |
+| 8 | athRoadD (60_city_build3) | 96 | OC_roadE, lzPropsG |
+| 9 | LF_drapeG (98lf) | 70 | LF_tileG |
+| 10 | LF_tileG (98lf) | 67 | lazy |
+| 11 | (anon) | 58 | misc |
+| 12 | LF_resid (98lf) | 57 | LF_tileG |
+| 13 | GND_far (60_city_build) | 46 | roamTerr |
+| 14 | DEST_open (98dest) | 46 | DEST_find |
+| 15 | WB_tpl (60_city_build) | 44 | WB_cityBuild2 |
+1. Fixed: LIFE_at computes candidate x,z in place and builds the object only for the spot that fits (same math); GND_in takes an optional out object, GND_far uses two scratch objects and an unrolled edge check (no array literals / destructuring). Both are gone from the top list on the branch.
+2. A/B Athens SECS=10 HEAP=1 RACE=0, 1 run each (timebox): trunk 2515 MB (252 MB/s), jsMed/p95/max 29.5/88/664 -> perf-11 2419 MB (242 MB/s), 24.4/55.6/404. Target 150 MB/s NOT met. Frankfurt not measured; only 1 run each, not 2.
+3. Gate on the built page: unit 0 FAIL; TAG=life1,xf1,terrain,smash2,cam,mem,perf5 trunk 45/56, perf-11 43/56 (both run at once); the 2 extra reds (terr1/terrain-fps-fra, life1/popup SLOW) pass 2/2 on a solo rerun. life1/smash is red on trunk too.
+4. The DEST_find scan (roamTerr+roamHit+GND+cityAt under DEST_open, ~700 MB/15 s) is the biggest one: no deopt loop (--trace-deopt clean for these), so the garbage is likely boxed doubles from the groundAt/_dsO result fields; next: give DEST_open a typed-array ground cache or spread the scan thinner, then invariants (QA, ~180 MB: probably the HUB.props/peds full loops) and cityAt/athRoadD.
+5. Tool: tools/perf1/tFrame.js HEAPINT env (sampling interval).
+
 ## perf-8b (2026-10-18, landed on alex/od-int2 57652d4)
 1. Found with LZ.slow: the 'fin' spikes were the asset-1 lzPropsG wrapper (AS_assign/AS_fix/AS_far unsliced; AS_fix rebuilt its cell list from EVERY city cell per tile). Fix: 3 lazy steps, and AS_fix only builds the 5x5 cells around the tile (same swaps). The 'lf9' spikes were LF_drapeG: it is now a sliced generator with typed index and per-patch normals (same math as computeVertexNormals). LZ.lastV probe fixed.
 2. Athens q=high tFrame (HEAP=1 RACE=0 SECS=20, 2 runs each), trunk → perf-8: lazyStep max 100/120 → 19/19 ms, frames >50 ms 49/52 → 28/23, p95 46.9/46.2 → 39.3/37.7, median 18.1/17.9 → 18.8/18.4 (noise).
@@ -110,3 +135,14 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 2. Gate on BUILT page: unit 0 FAIL; TAG life1,xf1,terrain,smash2,cam,mem,perf5 54/56, only known reds (fra mem/stable, xf1/grass); perf5/compact passes at q=low (test default).
 3. A/B NOT measured: out of time (3-run both cities x high/low not done; Athens partial runs hit the time limit). Expectation: high = trunk minus ~1.8 ms/frame and no 460 ms PC_add spikes; low = perf-7 WIP numbers.
 4. Next: run tools/perf1/tFrame.js (HEAP=1 Q=high|low CITY=ath|fra RACE=0) trunk vs landed, 3 runs each.
+
+## perf-9 (2026-10-18, alex/perf9-wip): NOT on trunk, NOT gated, NOT measured
+1. Scratch/no-closure cuts: cityAt(out) used by ART7_rd; athRoadD(out) + OC_roadE junction loop without spread/array; RD_road/RD_cityNear without closures or Map iteration.
+2. Not done: DEST_open, allocation-sampling rank, build, unit, TAG gate, 3-run A/B Ath+Fra, od-int2 merge. LF_tileG skipped on purpose (perf-8 lane).
+3. Blocker: tFrame.js HEAP=1 ran over 30 min here (SwiftShader) without finishing. Use run_in_background with a long timeout, SECS<=300, one run at a time.
+4. Next: baseline vs wip, SECS=300 HEAP=1 RACE=0, 3 runs Ath+Fra; then DEST_open; then gate, merge, push.
+
+## perf-9 result (2026-10-18, merged to trunk alex/od-int2)
+1. Gate on built page (merged trunk 540df66): unit 0 FAIL; TAG=life1,xf1,terrain,smash2,cam,mem,perf5 54/56, reds only known (mem/stable, cam/stable).
+2. tFrame Athens q=high SECS=10 HEAP=1 RACE=0, 2 runs each: trunk 2869/2941 MB (287 vs 290 MB/s, within noise), jsMed 20.4/19.0 vs 19.9/20.4, p95 42/39 vs 39/43. The scratch cuts did NOT measurably cut allocation; Frankfurt not measured.
+3. Next: allocation-sampling rank of what still allocates per frame (DEST_open, LF_tileG untouched).

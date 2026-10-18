@@ -20,19 +20,22 @@ var GND_L=[],GND_ON=new URLSearchParams(location.search).get('t7g')!=='0',GND_B=
 function GND_pack(g){let n=0;for(const L of g.c)if(L)n+=L.length;const P=new Float32Array(n),S=new Int32Array(g.c.length*2);let o=0;
   for(let c=0;c<g.c.length;c++){const L=g.c[c];if(!L){S[2*c]=S[2*c+1]=L===undefined?-1:-2;continue}const ox=g.x0+Math.floor(c/g.nz)*g.dx,oz=g.z0+c%g.nz*g.dz;S[2*c]=o;
     for(let k=0;k<L.length;k+=9){P[o]=L[k]-ox;P[o+1]=L[k+1]-oz;for(let q=2;q<9;q++)P[o+q]=L[k+q];o+=9}S[2*c+1]=o}g.P=P;g.s=S;g.c=null}
-function GND_in(g,x,z){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)return undefined;
+// perf-11: optional out = a reused {L,k,u,v} (GND_far: no object per ground sample)
+function GND_in(g,x,z,out){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)return undefined;
   if(g.P){const c=i*g.nz+j,s=g.s[2*c],e=g.s[2*c+1];if(s<0)return s===-1?undefined:null;const L=g.P,ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz;
-    for(let k=s;k<e;k+=9){const u=(rx-L[k])/L[k+2],v=(rz-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(ox+L[k],oz+L[k+1],L[k+2],L[k+3])||!ART7_near(ox+L[k],oz+L[k+1],L[k+2],L[k+3])?1:0;return{L,k,u,v}}return null}
+    for(let k=s;k<e;k+=9){const u=(rx-L[k])/L[k+2],v=(rz-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(ox+L[k],oz+L[k+1],L[k+2],L[k+3])||!ART7_near(ox+L[k],oz+L[k+1],L[k+2],L[k+3])?1:0;if(out){out.L=L;out.k=k;out.u=u;out.v=v;return out}return{L,k,u,v}}return null}
   const L=g.c[i*g.nz+j];if(!L)return L;
-  for(let k=0;k<L.length;k+=9){const u=(x-L[k])/L[k+2],v=(z-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(L[k],L[k+1],L[k+2],L[k+3])||!ART7_near(L[k],L[k+1],L[k+2],L[k+3])?1:0;return{L,k,u,v}}return null}
+  for(let k=0;k<L.length;k+=9){const u=(x-L[k])/L[k+2],v=(z-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(L[k],L[k+1],L[k+2],L[k+3])||!ART7_near(L[k],L[k+1],L[k+2],L[k+3])?1:0;if(out){out.L=L;out.k=k;out.u=u;out.v=v;return out}return{L,k,u,v}}return null}
 function GND_leaf(x,z){for(const g of GND_L){const q=GND_in(g,x,z);if(q!==undefined)return q}return null}
 function GND_tri(L,k,u,v){const A=L[k+4],Bv=L[k+5],C=L[k+6],D=L[k+7];return u+v<=1?A+(C-A)*u+(Bv-A)*v:D+(Bv-D)*(1-u)+(C-D)*(1-v)}
 function GND_Y(x,z){const q=GND_leaf(x,z);return q?GND_tri(q.L,q.k,q.u,q.v):null}
 // terr-10: the car's ground on a far leaf = its drawn triangle (gndBuild's B-C diagonal), faded to g at edges shared with a non-far leaf / hole;
 // where two hilly ground builds overlap (Athens grass 'g' over 'w') the highest drawn one wins
-function GND_far(x,z,g){let r=null;for(const G of GND_L){const q=GND_in(G,x,z);if(q===undefined)continue;let y=g;
-  if(q&&q.L[q.k+8]){const L=q.L,k=q.k,w=L[k+2],h=L[k+3],m=GND_tri(L,k,q.u,q.v);let f=1;
-    for(const[d,ex,ez]of[[q.u*w,-1,0],[(1-q.u)*w,1,0],[q.v*h,0,-1],[(1-q.v)*h,0,1]]){if(d>=GND_B)continue;const n=GND_in(G,x+ex*(d+.3),z+ez*(d+.3));if(!n||!n.L[n.k+8])f=Math.min(f,d/GND_B)}
+const _gfQ={L:null,k:0,u:0,v:0},_gfN={L:null,k:0,u:0,v:0};
+function GND_edge(G,x,z,d,ex,ez,f){if(d>=GND_B)return f;const n=GND_in(G,x+ex*(d+.3),z+ez*(d+.3),_gfN);return !n||!n.L[n.k+8]?Math.min(f,d/GND_B):f}
+function GND_far(x,z,g){let r=null;for(let gi=0;gi<GND_L.length;gi++){const G=GND_L[gi],q=GND_in(G,x,z,_gfQ);if(q===undefined)continue;let y=g;
+  if(q&&q.L[q.k+8]){const L=q.L,k=q.k,w=L[k+2],h=L[k+3],qu=q.u,qv=q.v,m=GND_tri(L,k,qu,qv);let f=1;
+    f=GND_edge(G,x,z,qu*w,-1,0,f);f=GND_edge(G,x,z,(1-qu)*w,1,0,f);f=GND_edge(G,x,z,qv*h,0,-1,f);f=GND_edge(G,x,z,(1-qv)*h,0,1,f);
     y=g+(m-g)*f}
   r=r===null?y:Math.max(r,y)}return r===null?g:r}
 // boot-3: gndGen = gndBuild as a generator. With o.near (()=>[x,z]) the cells run tile by tile, nearest tile first, one yield per cell, and each

@@ -207,7 +207,8 @@ function ART7_flat(x,z,w,h,tol,dn){tol=tol||.03;dn=dn||tol;if(ART7_t6())tol=Math
   for(let i=1;i<N;i++)for(let j=1;j<N;j++){const u=i/N,v=j/N,l=u+v<=1?A+(C-A)*u+(Bv-A)*v:D+(Bv-D)*(1-u)+(C-D)*(1-v);const e=l-tH(x+w*u,z+h*v);if(e>tol||-e>dn)return false}return true}
 // pART8: the 3 cm fit is only needed where cars drive and the camera is close: cells ≤ 64 m whose every point is more than 8 m from every road edge
 // (city, filler, autobahn, trails, mountain and town roads) use a 6 cm fit with ≥ 8 m leaves (same look from the road, far fewer triangles)
-function ART7_rd(x,z){try{let b=1e9;const q=cityAt(x,z);if(q)b=Math.min(b,q.d-q.road.w/2);const f=fillAt(x,z);if(f)b=Math.min(b,f.d-f.r.w/2);const a=abAt(x,z);if(a)b=Math.min(b,a.d-a.road.w/2);
+const ART7_cq={};
+function ART7_rd(x,z){try{let b=1e9;const q=cityAt(x,z,-1,false,ART7_cq);if(q)b=Math.min(b,q.d-q.road.w/2);const f=fillAt(x,z);if(f)b=Math.min(b,f.d-f.r.w/2);const a=abAt(x,z);if(a)b=Math.min(b,a.d-a.road.w/2);
   return Math.min(b,trailDist(x,z)-7,mtnDist(x,z)-12,lzRoadD(x,z))}catch(e){return 0}}
 function ART7_far(x,z,w,h){if(w>64||ART7_rd(x+w/2,z+h/2)<=Math.hypot(w,h)/2+4)return false;for(let i=0;i<=4;i++)for(let j=0;j<=4;j++)if(ART7_rd(x+w*i/4,z+h*j/4)<10)return false;return true}
 // pART8: leaves that overlap a road keep splitting down to ~3 m until they fit within 2.5 cm (a 6 m leaf on a cambered street poked 7 cm

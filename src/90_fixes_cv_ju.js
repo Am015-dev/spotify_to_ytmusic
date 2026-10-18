@@ -88,8 +88,9 @@ function OC_poolStep(n){const P=OC.pool;if(!P)return;P.material.opacity=.04*n;OC
 // ground-placed props sit on the lowest ground under their footprint (no floating edge on slopes)
 const OC_GAME=new Set(['cone','barrier','clight']);// roadworks deliberately placed on the lanes (art-6: brick piles, towers and gold bricks are block scatter in the block RECT, which diagonal roads cross, so they get the same push-off-the-road as any prop; GO art/props-road)
 const OC_fp=(t,D)=>t.startsWith('car')||/^CE_(car|taxi)/.test(t)?1.1:Math.min((D[t]?D[t].r:1)*.5,1.2);
-function OC_roadE(x,z){let e=1e9;const r=athRoadD(x,z,48);if(r)e=r.e;const f=fillAt(x,z);if(f)e=Math.min(e,f.d-f.r.w/2);const a=abAt(x,z);if(a)e=Math.min(e,a.d-a.road.w/2);
-  e=Math.min(e,lzRoadD(x,z),OC_segE(x,z));for(const J of OC_junc(x,z))e=Math.min(e,Math.hypot(J.x-x,J.z-z)-J.r);return e}
+const OC_rd={};
+function OC_roadE(x,z){let e=1e9;const r=athRoadD(x,z,48,OC_rd);if(r)e=r.e;const f=fillAt(x,z);if(f)e=Math.min(e,f.d-f.r.w/2);const a=abAt(x,z);if(a)e=Math.min(e,a.d-a.road.w/2);
+  e=Math.min(e,lzRoadD(x,z),OC_segE(x,z));OC_junc(x,z);{const kx=Math.floor(x/64),kz=Math.floor(z/64);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const A=OC.jg.get((kx+a)*100000+kz+b);if(A)for(let i=0;i<A.length;i++){const J=A[i];e=Math.min(e,Math.hypot(J.x-x,J.z-z)-J.r)}}}return e}
 // trails and Taunus roads: exact distance to their sampled centrelines (segments), edge = half width
 function OC_segE(x,z){if(!OC.sg){OC.sg=new Map();const L=[...TRAILS.map(T=>[T.pts,(T.w||12)/2])];if(CID==='fra')for(const S of mtnSamples())L.push([S.pts,6]);
     for(const[P,h]of L)for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],k=Math.floor((a.x+b.x)/2/64)*100000+Math.floor((a.z+b.z)/2/64);let A=OC.sg.get(k);if(!A)OC.sg.set(k,A=[]);A.push(a,b,h)}}
