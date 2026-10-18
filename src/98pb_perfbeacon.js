@@ -13,19 +13,23 @@ const PB_live=()=>!paused&&!document.hidden&&!LD.on&&(state==='roam'||state==='r
 function PB_gpu(){if(PB.gpu)return PB.gpu;try{const gl=renderer.getContext(),e=gl.getExtension('WEBGL_debug_renderer_info');PB.gpu=String(e?gl.getParameter(e.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER)).slice(0,120)}catch(e){PB.gpu='?'}return PB.gpu}
 const PB_q=(a,k)=>a.length?a[Math.min(a.length-1,Math.floor(a.length*k))]:0,PB_r=x=>Math.round(x*10)/10;
 // the doc for the frames recorded since the last report (pure: tests call it directly)
-function PB_doc(){const a=Array.from(PB.iv.subarray(0,PB.k)).sort((x,y)=>x-y),n=a.length,m50=PB_q(a,.5),m90=PB_q(a,.9),top=Object.entries(PB.sys).sort((x,y)=>y[1]-x[1]).slice(0,3).map(([k,v])=>({k,ms:PB_r(v/Math.max(1,n))}));
+function PB_doc(S=PB){const a=S.iv.slice(0,S.k).sort(),n=a.length,m50=PB_q(a,.5),m90=PB_q(a,.9),top=Object.entries(S.sys).sort((x,y)=>y[1]-x[1]).slice(0,3).map(([k,v])=>({k,ms:PB_r(v/Math.max(1,n))}));
   let heap=null;try{const M=performance.memory;if(M)heap={usedMB:Math.round(M.usedJSHeapSize/1048576),limitMB:Math.round(M.jsHeapSizeLimit/1048576)}}catch(e){}
   let L=null;try{const l=window.__life&&window.__life.LIFE;if(l&&l.ms!=null)L=PB_r(l.ms)}catch(e){}
   let ifr=false;try{ifr=window.self!==window.top}catch(e){ifr=true}
-  return{at:new Date().toISOString(),n:PB.n+1,build:(()=>{try{return OD_CHANGELOG[0].v}catch(e){return'?'}})(),city:typeof CID!=='undefined'?CID:'?',mode:state==='race'||state==='countdown'||state==='finished'?'race':'roam',
+  return{at:new Date().toISOString(),n:S.n!=null?S.n:PB.n+1,build:(()=>{try{return OD_CHANGELOG[0].v}catch(e){return'?'}})(),city:typeof CID!=='undefined'?CID:'?',mode:state==='race'||state==='countdown'||state==='finished'?'race':'roam',
     ua:navigator.userAgent.slice(0,200),vp:innerWidth+'x'+innerHeight,dpr:+(devicePixelRatio||1).toFixed(2),pr:+renderer.getPixelRatio().toFixed(2),gpu:PB_gpu(),touch:!!lowGfx,iframe:ifr,
     gfx:SET.qm||SET.q,auto:!!GOV.on,tier:LK_LV[Math.min(3,GOV.d)]||SET.q,scale:+(DRES.s||1).toFixed(2),
-    frames:n,fps50:m50?Math.round(1000/m50):0,fps90:m90?Math.round(1000/m90):0,ms50:PB_r(m50),ms90:PB_r(m90),over50:PB.slow,worstMs:Math.round(PB.worst),busyMs:PB_r(PB.busy/Math.max(1,n)),top,lifeMs:L,heap,govLog:GOV.log.slice(-6)}}
+    frames:n,fps50:m50?Math.round(1000/m50):0,fps90:m90?Math.round(1000/m90):0,ms50:PB_r(m50),ms90:PB_r(m90),over50:S.slow,worstMs:Math.round(S.worst),busyMs:PB_r(S.busy/Math.max(1,n)),top,lifeMs:L,heap,govLog:GOV.log.slice(-6)}}
 async function PB_db(){if(window.__pbDbMock)return window.__pbDbMock;if(PB.db!==undefined)return PB.db;PB.db=null;try{if(window.claude&&claude.use)PB.db=await claude.use('db')||null}catch(e){PB.db=null}return PB.db}
 async function PB_send(doc){try{const db=await PB_db();if(!db||!db.collection)return'nodb';await db.collection('perf').add(doc);PB.sent.push(doc.at);return'sent'}catch(e){return'fail'}}
 function PB_tick(now){if(PB.n>=PB.max)return;
   if(!PB.t0){if(PB_live()&&state!=='countdown'&&Math.abs((state==='roam'?RO.v:pl&&pl.v)||0)>2){PB.t0=now;PB.next=now+20000;PB_reset()}return}
-  if(now>=PB.next&&PB.k>=30){const d=PB_doc();PB.n++;PB.next=now+60000;PB_reset();PB_send(d)}}
+  // boot-2: the tick only snapshots the counters (a typed-array copy, <0.1 ms); the sort, the doc and the db write run in a later task, off the frame
+  if(now>=PB.next&&PB.k>=30){const S={iv:PB.iv.slice(0,PB.k),k:PB.k,slow:PB.slow,worst:PB.worst,busy:PB.busy,sys:PB.sys,n:++PB.n};PB.next=now+60000;PB_reset();
+   setTimeout(()=>{try{PB_send(PB_doc(S))}catch(e){}},0)}}
+// the GPU string (a GL query = a pipeline sync) is read once in the loader, not inside the 20 s frame
+{const _lp=ldPrewarm;ldPrewarm=async function(...a){try{PB_gpu()}catch(e){}return _lp.apply(this,a)}}
 // chip: fps (last ~1 s), p90 ms, tier, render scale, pixel ratio
 function PB_chipEl(){if(PB.chip)return PB.chip;const st=document.createElement('style');st.textContent='#pbChip{position:fixed;z-index:9989;left:50%;top:calc(1px + env(safe-area-inset-top,0px));transform:translateX(-50%);pointer-events:none;white-space:nowrap;font:700 12px/15px ui-monospace,monospace;color:#9fe8ff;background:rgba(0,0,0,.6);padding:1px 7px;border-radius:0 0 6px 6px}';document.head.appendChild(st);
   const el=document.createElement('div');el.id='pbChip';el.hidden=true;document.body.appendChild(el);return PB.chip=el}

@@ -201,3 +201,10 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 3. After: Athens PC worst frame 280 → ~90 ms under the profiler (2x overhead), PC_add 5-15 ms. Clean after-runs NOT valid: Fra overlapped the gate (CPU contention), Athens not re-measured (time cap). Goal (≤3 >50 ms, none >150) NOT met.
 4. Remaining owners (Ath PROF): major GC 100-230 ms (33 of the long frames), scene traverse/updateMatrixWorld, first-use shader links 85-205 ms at 0.5-2 s even with ldPrewarm, PB_tick 70 ms at 20 s (phone-2 beacon: tell phone-2).
 5. Next: clean 1-run A/B both cities (nothing else running), compile higher-tier programs in the loader, cut boot garbage (GC), PC_add walk only new children. Gate boot1d: unit 0 FAIL; TAG=life1,xf1,terrain,scale1,perf5 46/48 (xf1/grass, xf1/assist known).
+
+## boot-2 (2026-10-18, on trunk alex/od-int2): first-minute shader links + beacon
+1. Beacon (a): PB_tick now only snapshots counters (typed-array copy); sort/doc/db write run in a setTimeout task; the GPU string (GL query = pipeline sync) is read in the loader. phone2/beacon ✅.
+2. Shader links (b): src/98bp_warmall.js (?warmall=0 = off) builds LIFE (window.__life.init) and compiles with every hidden object made visible, plus a twin of the outer-land ground material (made by worldGroundGen after the 1st frame). tBoot PROGS=1 prints each late link's material/object chain (PF1MAT).
+3. tBoot touch, 1 run each (time cap, not the median of 2): Fra >50 ms 18→9, >150 1→0, max 254→137; Ath >50 49→49, >150 3→2, max 406→286, late-link frames 7→3. Goal NOT met in Athens.
+4. Left: Ath f4 hubCullStep 254 ms (d: scene traverse/cull), PC_step+hubCull 70-95 ms frames, one lazy-district instanced tile still links at 2 s (Group{lz} Mesh{lf,pcQ}), major GC (c) untouched.
+5. Gate: unit 0 FAIL; TAG=life1,xf1,terrain,phone2 41/44 (xf1/grass, water, assist = known).
