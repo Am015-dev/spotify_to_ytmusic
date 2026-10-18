@@ -106,7 +106,7 @@ function tkItemMesh(){const M=tkArchMats(),G=new THREE.Group(),b=new THREE.Mesh(
   for(const r of[0,Math.PI/2,Math.PI,-Math.PI/2]){const q=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.MeshBasicMaterial({map:t,transparent:true}));q.position.set(Math.sin(r)*1.32,0,Math.cos(r)*1.32);q.rotation.y=r;G.add(q)}
   for(const sx of[-.65,.65])for(const sz of[-.65,.65]){const s=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.35,10),M.box);s.position.set(sx,1.47,sz);G.add(s)}return G}
 const TK_ITEMS=['TURBO','BRICK BLAST','SHIELD'];
-function tkStart(m,C0){const C=C0||tkCourseOf(m)||TK_C;TK.C=C;const Gm=tkGeoOf(C),e={id:C.id,name:C.name,len:Gm.lenA,path:Gm.pA,ai:C.ai||[C.p]};const sp={tk:1,C,e,m,t:0,cd:3,ai:[],objs:[],ramps0:RO.ramps.length,done:false,gi:0,items:[],pads:[],shieldT:0,hitCd:0,warn:null,fx:[],jumps:{A:0,B:0}};
+function tkStart(m,C0){const C=C0||tkCourseOf(m)||TK_C;TK.C=C;/* races-5: a race starts with clean stuck/hop state (stuck and hop windows plus nudge grace carry over from the previous run) */RO.stkT=RO.stkW=0;RO.stkX=null;RO.stkP=false;RO.npT=RO.npW=0;RO.npX=null;RO.npHop=0;RO.stkG=0;RO.nudgeT=0;const Gm=tkGeoOf(C),e={id:C.id,name:C.name,len:Gm.lenA,path:Gm.pA,ai:C.ai||[C.p]};const sp={tk:1,C,e,m,t:0,cd:3,ai:[],objs:[],ramps0:RO.ramps.length,done:false,gi:0,items:[],pads:[],shieldT:0,hitCd:0,warn:null,fx:[],jumps:{A:0,B:0}};
   if(RO.sp)sprintEnd();TK.C=C;RO.sp=sp;RO.pop=null;RO.card=null;$('#roamCard').hidden=true;
   // gates: start line, split, rejoin, finish straight, finish (none inside the split: both routes are legal)
   const g0=tkAt(Gm.seg.start,.12),g1=tkAt(Gm.seg.start,.97),g2=tkAt(Gm.seg.fin,.04),g3=tkAt(Gm.seg.fin,.5),g4=tkAt(Gm.seg.fin,.99);

@@ -11,3 +11,9 @@
 3. Akropolis: did NOT reproduce (8/8 before and after), so no cause found for (-2100,490); legs there are 60-90 m zigzags (-2089,560)->(-2158,509)->(-2184,508)->(-2213,565) if it comes back.
 4. GO races/finish now gates River, GP, Westend and Akropolis 3 of 3 (Westend added). Unit 0 FAIL. Full GO run: races/finish RED once: GP run 1 DNF (stuck from 30 s near (209,299)), the other GP runs and a separate 6x tRaces gp (6/6) pass; the life1/xf1/terr1 reds match the known list, but life1/smash, life1/carousel and terr1/fps were not compared with trunk (run in parallel, slow).
 5. Next: reproduce the GP run-1 DNF right after the River runs on one warm page (state left over from the boat?) before merging.
+
+# HANDOFF races-6 (2026-10-18, races5 merged onto alex/od-int2)
+1. Merged origin/alex/od-int2 + races5 (River v^2 braking horizon, Westend 75 m leg fallback). Unit 0 FAIL.
+2. GP DNF is not a boat leak: it recurred in run 2 at the same spot (209,259-299, crawls at 5-14 m/s), so it is location/traffic-bound, not run-order state. tkStart now resets the stuck/hop windows (RO.stk*, np*, nudgeT) anyway; GO order is now Grand Prix, River, Westend.
+3. Built page, TAG=races alone, fra, 2 runs with GP first: races/finish green both. Full GO (races,life1,xf1,terrain,rv2k2) before the reorder: only known reds + SLOW-only flags from parallel load (content marks all OK); pace#1 avg 114 km/h OK.
+4. Open: the (209,299) GP crawl (~1 run in 6 when GP is not first); probe there with traffic cars near RO.
