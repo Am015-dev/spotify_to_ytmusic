@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.104',date:'18 Oct 2026',items:[{t:'FIXED',s:'Much smoother Frankfurt: the longest freezes are 3x shorter and almost all stutter frames are gone.'},{t:'FIXED',s:'Athens: street scenery creates less garbage and the worst hiccup is shorter.'},{t:'FIXED',s:'Scenery effects load at start, so no one-off freeze the first time you see them.'}]},
 {v:'v90m-beta.103',date:'18 Oct 2026',items:[{t:'FIXED',s:'Fewer memory-cleanup hiccups: the shortcut scan now has a strict time budget.'},{t:'FIXED',s:'Prop safety checks only look at nearby props, so Athens and Frankfurt stutter less.'}]},
 {v:'v90m-beta.102',date:'18 Oct 2026',items:[{t:'FIXED',s:'Frankfurt: no more half-second freezes when new buildings appear (worst frame 640 ms to about 200 ms).'},{t:'CHANGED',s:'The smash-target search and camera wall check now spread their work over several frames.'}]},
 {v:'v90m-beta.101',date:'18 Oct 2026',items:[{t:'FIXED',s:'Fewer hiccups in Athens: the people and ground checks no longer create throwaway data every frame.'},{t:'CHANGED',s:'Smaller per-frame cleanups for roads and city lookups.'}]},
@@ -13240,25 +13241,42 @@ STR_lzFree=(f=>function(L){if(L&&L.lf)LF_unreg(L);return f.apply(this,arguments)
 function LF_fit(L,p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,y0=p.y,cl=v=>Math.max(-1.2,Math.min(1.2,v));
  const gx=cl((gy(p.x+d,p.z)-gy(p.x-d,p.z))/(2*d)),gz=cl((gy(p.x,p.z+d)-gy(p.x,p.z-d))/(2*d));let lift=0,ok=false;
  for(let it=0;it<4&&!ok;it++){let hi=-9,lo=9;
-  for(const q of LF_PPOLY)for(const u of[.97,.5]){const a=q[0]*p.sx*u,b=q[1]*p.sz*u,dx=c*a+s*b,dz=-s*a+c*b,r=gy(p.x+dx,p.z+dz)-(y0+gx*dx+gz*dz);hi=Math.max(hi,r);lo=Math.min(lo,r)}
+  for(const q of LF_PPOLY)for(const u of LF_U2){const a=q[0]*p.sx*u,b=q[1]*p.sz*u,dx=c*a+s*b,dz=-s*a+c*b,r=gy(p.x+dx,p.z+dz)-(y0+gx*dx+gz*dz);hi=Math.max(hi,r);lo=Math.min(lo,r)}
   hi=Math.max(hi,0);lo=Math.min(lo,0);if(hi-lo<=.3){ok=true;lift=hi}else{p.sx*=.7;p.sz*=.7}}
  if(!ok){p.sx=p.sz=0;return}
  p.y=y0+lift;p.gx=gx;p.gz=gz;
  const R=Math.max(p.sx,p.sz),e={x:p.x,z:p.z,c,s,sx:p.sx,sz:p.sz,R2:R*R,yt:p.y+.04,gx,gz};if(!L.lfP)L.lfP=[];
  for(let i=Math.floor((p.x-R)/32);i<=Math.floor((p.x+R)/32);i++)for(let j=Math.floor((p.z-R)/32);j<=Math.floor((p.z+R)/32);j++){const k=i*10000+j;let A=LF.PG.get(k);if(!A)LF.PG.set(k,A=[]);A.push(e);L.lfP.push([k,e])}}
 LF.drape=!/[?&]lfd=0\b/.test(location.search);
+function LF_mats(){return LF.mat||(LF.mat={def:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),tuft:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,side:THREE.DoubleSide}),pond:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.12,metalness:.15})})}
+function LF_warm(){if(LF.warmed||/[?&]lfw=0/.test(location.search))return;LF.warmed=1;const M=LF_mats(),G=new THREE.Group(),b=new THREE.BoxGeometry(.1,.1,.1),c=new THREE.Color(),m4=new THREE.Matrix4();
+ for(const k of['def','tuft','pond']){const m=new THREE.InstancedMesh(b,M[k],1);m.setMatrixAt(0,m4);m.setColorAt(0,c);m.frustumCulled=false;G.add(m)}
+ const pg=b.clone();pg.setAttribute('color',new THREE.BufferAttribute(new Float32Array(pg.attributes.position.count*3).fill(1),3));const pm=new THREE.Mesh(pg,LF_patchMat());pm.frustumCulled=false;G.add(pm);
+ scene.add(G);try{P2_compile(scene,camera)}catch(e){console.warn('LF warm',e)}finally{scene.remove(G);b.dispose();pg.dispose();for(const o of G.children)if(o.dispose)o.dispose()}}
 function LF_patchMat(){return LF.pm||(LF.pm=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4}))}
-function LF_resid(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,g0=gy(p.x,p.z),gx=(gy(p.x+d,p.z)-gy(p.x-d,p.z))/(2*d),gz=(gy(p.x,p.z+d)-gy(p.x,p.z-d))/(2*d);let hi=-9,lo=9;
- for(const q of LF_PPOLY)for(const u of[.97,.5]){const a=q[0]*p.sx*u,b=q[1]*p.sz*u,dx=c*a+s*b,dz=-s*a+c*b,r=gy(p.x+dx,p.z+dz)-(g0+gx*dx+gz*dz);hi=Math.max(hi,r);lo=Math.min(lo,r)}return Math.max(hi,0)-Math.min(lo,0)}
+const LF_U2=[.97,.5],LF_SX=new Float64Array(256),LF_SZ=new Float64Array(256),LF_SY=new Float64Array(256);LF.gyb=!/[?&]lfb=0\b/.test(location.search);
+function LF_gyB(X,Z,Y,n){if(!n)return;if(CID==='fra'||!LF.gyb){for(let i=0;i<n;i++)Y[i]=groundY(X[i],Z[i])+LF_mound(X[i],Z[i]);return}
+ TR_G(X[0],Z[0]);const h=TR_h,nx=TR_nx,nz=TR_nz,r=TR_r,MG=LF.MG,mg=MG.size>0;
+ const mx=nx-1.001,mz=nz-1.001;
+ for(let i=0;i<n;i++){const x=X[i],z=Z[i],fx=Math.min(Math.max((x-WX0)/r,0),mx),fz=Math.min(Math.max((z-WZS)/r,0),mz),a=fx|0,b=fz|0,tx=fx-a,tz=fz-b,k=b*nx+a;
+  Y[i]=(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+nx]*(1-tx)+h[k+nx+1]*tx)*tz;
+  if(SHELF.has(Math.floor(x/32)*100000+Math.floor(z/32)))Y[i]=athShelfY(x,z,Y[i]);
+  if(mg&&MG.has(Math.floor(x/64)*10000+Math.floor(z/64)))Y[i]+=LF_mound(x,z)}}
+function LF_resid(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,x0=p.x,z0=p.z,SX=LF_SX,SZ=LF_SZ,SY=LF_SY;
+ SX[0]=x0;SZ[0]=z0;SX[1]=x0+d;SZ[1]=z0;SX[2]=x0-d;SZ[2]=z0;SX[3]=x0;SZ[3]=z0+d;SX[4]=x0;SZ[4]=z0-d;let m=5;
+ for(let i=0;i<LF_PPOLY.length;i++){const q=LF_PPOLY[i];for(let j=0;j<2;j++){const u=LF_U2[j],a=q[0]*p.sx*u,b=q[1]*p.sz*u;SX[m]=x0+(c*a+s*b);SZ[m]=z0+(-s*a+c*b);m++}}
+ LF_gyB(SX,SZ,SY,m);const g0=SY[0],gx=(SY[1]-SY[2])/(2*d),gz=(SY[3]-SY[4])/(2*d);let hi=-9,lo=9;m=5;
+ for(let i=0;i<LF_PPOLY.length;i++){const q=LF_PPOLY[i];for(let j=0;j<2;j++){const u=LF_U2[j],a=q[0]*p.sx*u,b=q[1]*p.sz*u,dx=c*a+s*b,dz=-s*a+c*b,r=SY[m++]-(g0+gx*dx+gz*dz);hi=Math.max(hi,r);lo=Math.min(lo,r)}}return Math.max(hi,0)-Math.min(lo,0)}
 const LF_DT=(()=>{const V=[[0,0]],I=[];for(let i=0;i<9;i++)V.push(LF_PPOLY[i].map(v=>v*.5));for(let i=0;i<18;i++){const a=LF_PPOLY[i>>1],b=LF_PPOLY[((i>>1)+1)%9],t=(i&1)/2;V.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t])}
  const T=(a,b,c)=>{const u=V[b][0]-V[a][0],v=V[b][1]-V[a][1],w=V[c][0]-V[a][0],x=V[c][1]-V[a][1];/* (u,0,v)x(w,0,x).y = v*w-u*x must be > 0 (normal up) */if(v*w-u*x>0)I.push(a,b,c);else I.push(a,c,b)};
  for(let i=0;i<9;i++){const j=(i+1)%9,o=10+2*i;T(0,1+i,1+j);T(1+i,o,o+1);T(1+i,o+1,1+j);T(1+j,o+1,10+(2*i+2)%18)}return{V,I}})();
 const LF_DW=[1/3,1/3,1/3,.5,.5,0,0,.5,.5,.5,0,.5],LF_DX=new Float64Array(LF_DT.V.length),LF_DY=new Float64Array(LF_DT.V.length),LF_DZ=new Float64Array(LF_DT.V.length);
-function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),Q=LF_DT.V,n=Q.length,I=LF_DT.I,X=LF_DX,Y=LF_DY,Z=LF_DZ,W=LF_DW;
- for(let i=0;i<n;i++){const a=Q[i][0]*p.sx,b=Q[i][1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;X[i]=x;Y[i]=gy(x,z);Z[i]=z}
+function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),Q=LF_DT.V,n=Q.length,I=LF_DT.I,X=LF_DX,Y=LF_DY,Z=LF_DZ,W=LF_DW,SX=LF_SX,SZ=LF_SZ,SY=LF_SY;
+ for(let i=0;i<n;i++){const a=Q[i][0]*p.sx,b=Q[i][1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;X[i]=x;Z[i]=z}LF_gyB(X,Z,Y,n);
  const vy=p._vy&&p._vy.length===n?p._vy:(p._vy=new Float32Array(n));for(let i=0;i<n;i++)vy[i]=Y[i];
- for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];for(let k=0;k<12;k+=3){const u=W[k],v=W[k+1],w=W[k+2],x=X[a]*u+X[b]*v+X[d]*w,z=Z[a]*u+Z[b]*v+Z[d]*w;
-  const e=Y[a]*u+Y[b]*v+Y[d]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
+ let m=0;for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];for(let k=0;k<12;k+=3){const u=W[k],v=W[k+1],w=W[k+2];SX[m]=X[a]*u+X[b]*v+X[d]*w;SZ[m]=Z[a]*u+Z[b]*v+Z[d]*w;m++}}
+ LF_gyB(SX,SZ,SY,m);m=0;
+ for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];for(let k=0;k<12;k+=3){const e=Y[a]*W[k]+Y[b]*W[k+1]+Y[d]*W[k+2]-SY[m++];if(e>.012||e<-.07)return false}}return true}
 function* LF_drapeG(L,A,gy,out){const n=LF_DT.V.length,DI=LF_DT.I,ni=DI.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),nor=new Float32Array(A.length*n*3),idx=new (A.length*n>65535?Uint32Array:Uint16Array)(A.length*ni),C=new THREE.Color();if(!L.lfP)L.lfP=[];
  let t0=performance.now();
  for(let k=0;k<A.length;k++){const p=A[k],c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),o=k*n;C.set(p.c||'#ffffff');
@@ -13322,7 +13340,7 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
    else if(zn<.8){if(u<.4)P(ROCK,px,pz);else di('patch',px,pz,u*6.28,3+u*4,1,2+u*3,DIRT[k%DIRT.length])}
    else for(let j=0;j<3;j++)di('tuft',px+(LF_h(px,j,4)-.5)*6,pz+(LF_h(pz,j,5)-.5)*6,j,.8,.8,.8,LF_FC[(k+j)%LF_FC.length])}
   if(slice()){yield 'lf6';t0=performance.now()}}
- const GE=LF.geo||(LF.geo=LF_geos()),mat=LF.mat||(LF.mat={def:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),tuft:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,side:THREE.DoubleSide}),pond:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.12,metalness:.15})});
+ const GE=LF.geo||(LF.geo=LF_geos()),mat=LF_mats();
  const M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),S=new THREE.Vector3(),Pv=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),Co=new THREE.Color();LF.ms=LF.ms||[];
  if(LF.drape){/* perf-1: the drape checks run sliced (one unsliced step was up to 215 ms of groundY calls on desktop) */const DR0=[],DR=[];
   const DC=LF.dc||(LF.dc=new Map()),dk=CID+L.id,pv=DC.get(dk),cu=[],ce=new Map();DC.set(dk,cu);
@@ -13336,7 +13354,7 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
   m.computeBoundingSphere();m.castShadow=t==='mound';m.receiveShadow=true;m.userData.lf=t;m.userData.lfR=L.id;m.userData.nsh=t!=='mound';L.root.add(m);LF.ms.push(m);yield 'lf11'}
  st.regs=(st.regs||0)+1;yield* lzPropsG(L)}
 function LF_ensure(x,z,r){if(typeof LAZY==='undefined')return 0;let n=0;for(const L of LAZY)if(L.lf&&!L.done&&lzD(L,x,z)<r){lzRun(L);n++}return n}
-buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{LF_reg()}catch(e){console.warn('LF reg',e)}return r})(buildHubProps);
+buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{LF_reg()}catch(e){console.warn('LF reg',e)}if(LF.on)P2_after(LF_warm);return r})(buildHubProps);
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LF.ms||(LF.fr=(LF.fr|0)+1)%15)return;const cp=camera.position;for(const m of LF.ms){const s=m.boundingSphere;if(!s)continue;m.visible=Math.hypot(s.center.x-cp.x,s.center.z-cp.z)-s.radius<LF.R[m.userData.lf]}})(hubCullStep);
 function LF_px(){try{composer.render()}catch(e){}const c=renderer.domElement,W=Math.floor(c.width/2),H=Math.floor(c.height/2),cv=LF.cv||(LF.cv=document.createElement('canvas'));cv.width=W;cv.height=H;
  const x=cv.getContext('2d',{willReadFrequently:true});x.drawImage(c,0,0,W,H);return{W,H,D:x.getImageData(0,0,W,H).data}}
