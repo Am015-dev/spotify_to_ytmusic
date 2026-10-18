@@ -74,6 +74,12 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
   draw(t){const s=G.pw;if(!s)return;
     const d=s.drop;if(d&&bpos()>=d.cutB){ctx.fillStyle='rgba(8,2,20,.28)';ctx.fillRect(0,0,W,H);}   // the bar without music
     if(s.wv>0){const k=1-s.wv/.7;ctx.strokeStyle='#b36bff';ctx.globalAlpha=1-k;ctx.lineWidth=14*(1-k)+2;ctx.beginPath();ctx.arc(P.x,P.y,k*1300,0,7);ctx.stroke();ctx.globalAlpha=1;}},
+  // phone HUD: one small round chip per active power-up (icon + a ring that runs down), left to right from x; returns nothing
+  chips(t,x,y,k){const s=G.pw;if(!s)return;const cur=this.cur(),r=11*k,items=s.act.map(a=>({k:a.k,f:clamp(1-(cur-a.s)/a.d,0,1)}));
+    if(s.drop){const d=s.drop;items.push({k:'drop',f:clamp((d.blastB-bpos())/(d.blastB-d.b0),0,1)});}
+    let cx=x+r;for(const it of items){const K=PWK[it.k];ctx.save();ctx.translate(cx,y-4*k);ctx.fillStyle='#05030cb0';ctx.beginPath();ctx.arc(0,0,r+3*k,0,7);ctx.fill();
+      ctx.lineWidth=2.6*k;ctx.strokeStyle='#ffffff2a';ctx.beginPath();ctx.arc(0,0,r+1*k,0,7);ctx.stroke();ctx.strokeStyle=K.c;ctx.beginPath();ctx.arc(0,0,r+1*k,-Math.PI/2,-Math.PI/2+6.2832*it.f);ctx.stroke();
+      this.coin(it.k,r-4*k);ctx.restore();cx+=2*r+10*k;}},
   hud(t,x0,y0,k){const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;const cur=this.cur(),items=s.act.map(a=>({k:a.k,rem:a.d-(cur-a.s),tot:a.d,txt:null}));
     if(s.drop){const d=s.drop,p=bpos();items.push({k:'drop',rem:d.blastB-p,tot:d.blastB-d.b0,txt:p<d.cutB?'CUT ON THE DOWNBEAT':'BLAST IN '+Math.max(1,Math.ceil((d.blastB-p)/4))+' BAR'});}
     let y=y0==null?112:y0;

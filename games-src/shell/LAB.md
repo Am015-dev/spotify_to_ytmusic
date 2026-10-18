@@ -1,0 +1,8 @@
+# LAB: test mode for the owner (13 Oct 2026)
+Turn on: the shelf's 🧪 Test mode switch (next to ✔ Test) or `?test=1`. Off = the page is unchanged (no element, no listener).
+- **🧪 LAB** (small, top corner; "⇄ Move 🧪" in the menu swaps the side) lists every scenario of the game by group (Board, Cards, Story, Bosses, UI): ▶ GO opens that mini scenario in place (`?scn=<id>&test=1`), the chip cycles ⬜ → ✅ → ❌ → ⏭. "All scenarios ▶" steps through all of them with "Next ▶ n/N".
+- **📍 n/m** opens the pinned ✔ Test checklist (the game's newest What's new entries from `../updates.json`): 📍 GO, ✅ Works / ❌ Problem (note) / ⏭ Skip, Copy. It folds to the chip while you play and is not shown inside the shelf (the shelf has its own panel).
+- On a scenario page the bar also shows ✅ ❌ ⏭ for that scenario.
+- Results are shared with the shelf: `shelf_ck_res` (shelf format), `shelf_wn_checked`, plus `gx_lab_res` (`<slug>/<scn id>`). `shell/gx-lab-core.js` holds the rules; `games/lab.html` (built by `scripts/lab-page.py`) reads the same keys; `games/scenarios.json` (built by `scripts/lab-index.js`) lists every game's scenarios.
+- Wiring: `build-all.py` inlines `gx-lab-core.js`, `gx-lab.js` and `gx-lab.css` into each staged game (right after the game's own scripts), so a game only needs `gx-scenario.js` + `scn.js` (and a `group:` on a scenario when the guess is wrong). Mainhattan Nightrun: inline `shell/gx-scenario.js`, `scn.js`, then the three LAB files in this order: `gx-lab-core.js`, `gx-lab.js` (with `window.GXLAB_CSS = <contents of gx-lab.css>` set first).
+- Tests: `scripts/lab-test.js <slug>` (off = identical; on = LAB lists GXSLIST, every GO runs its checks with touch taps; pinned checklist ✅ shows on the shelf and in lab.html).

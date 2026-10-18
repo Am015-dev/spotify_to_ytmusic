@@ -150,3 +150,6 @@ html.gxt-on.ph-l .gx-dock[data-bf="buy"] #pacts{grid-template-columns:minmax(0,3
 .gxt-menu span{display:block;margin-top:2px;font-size:.74em;font-weight:600;opacity:.85;line-height:1.2}
 html.ph .bfintro .you .gxt-menu.tutmini{margin:0 0 0 auto;width:auto;max-width:132px;min-height:36px;padding:3px 8px;border-radius:10px;font-size:12px;line-height:1.1;text-align:center;flex:none}
 html.ph .bfintro .you .gxt-menu.tutmini b{font:800 12px/1.1 Nunito,sans-serif;letter-spacing:0;-webkit-text-stroke:0;color:inherit}
+/* menu test v2: one instruction line at a time (the coach bubble replaces the board line); the chip's YOU tag sat on the name */
+html.ph:has(.gxh-bub.on) #bline{display:none}
+html.ph .pchip u{display:none}

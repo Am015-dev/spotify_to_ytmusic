@@ -56,11 +56,13 @@ svg{display:block}
 #hand.two .hc:not(.r2).pk::after,#hand.two .hc:not(.r2).pinged::after{bottom:auto;height:calc(var(--rs) - 2px);border-bottom:0;border-radius:8px 8px 0 0}
 .hc.pk::after{content:'';position:absolute;inset:0;border-radius:8px;border:4px solid var(--ok);box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);pointer-events:none}
 .handnote{color:var(--ink2);font-size:14px;font-weight:700;padding:14px 10px;text-align:center;align-self:center;width:100%}
-.btn{appearance:none;border:2px solid #0b1f3a;background:linear-gradient(180deg,#ffe28a,#e0a31c);color:#2a1d04;font-weight:900;font-size:15px;min-height:44px;min-width:44px;padding:4px 14px;border-radius:12px;cursor:pointer;line-height:1.15}
-.btn.alt{background:linear-gradient(180deg,#27578f,#173f70);color:var(--ink);border-color:#0b1f3a;box-shadow:inset 0 0 0 1px var(--line)}
-.btn.go{background:linear-gradient(180deg,#58d28c,#2a9a5c);color:#04230f}
-.btn.bad{background:linear-gradient(180deg,#f08a70,#c8452c);color:#fff}
-.btn.on{background:linear-gradient(180deg,#9be6ff,#43a8d8);color:#06243a}
+.btn{appearance:none;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;border:solid transparent;border-width:14px 8px;background-origin:border-box;box-shadow:0 0 0 2px #0b1f3a;background:linear-gradient(180deg,#ffe28a,#e0a31c) border-box;color:#2a1d04;font-weight:900;font-size:15px;min-height:44px;min-width:44px;padding:0 6px;border-radius:12px;cursor:pointer;line-height:1.15}
+.btn.alt{background:linear-gradient(180deg,#27578f,#173f70) border-box;color:var(--ink);box-shadow:0 0 0 2px #0b1f3a,inset 0 0 0 1px var(--line)}
+.btn.gxt-menu{border-width:12px 12px 12px 7px}
+.gxh-set button.btn{border:solid transparent;border-width:14px 8px;padding:0 6px;border-radius:12px;min-height:44px}
+.btn.go{background:linear-gradient(180deg,#58d28c,#2a9a5c) border-box;color:#04230f}
+.btn.bad{background:linear-gradient(180deg,#f08a70,#c8452c) border-box;color:#fff}
+.btn.on{background:linear-gradient(180deg,#9be6ff,#43a8d8) border-box;color:#06243a}
 .btn.dis,.btn:disabled{opacity:.42;cursor:default}
 .btn:focus-visible,.hc:focus-visible,.op:focus-visible,.jc:focus-visible,.jcard:focus-visible,.dc:focus-visible,.me:focus-visible,.pbtn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .ppop,.pcard{position:absolute;left:0;right:0;background:var(--panel);display:flex;flex-direction:column;z-index:12;box-shadow:0 -4px 14px rgba(0,0,0,.5);border-top:3px solid #1d4f8c}
@@ -342,7 +344,7 @@ html.ph #prompt{font-size:14px}
 /* buttons and bulbs on the table */
 #acts{position:absolute;left:58px;right:58px;bottom:6px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;z-index:6;pointer-events:none}
 #acts.wide{left:8px;right:8px}
-#acts .btn{pointer-events:auto;min-height:48px;padding:4px 14px;font-size:16px;box-shadow:0 4px 12px rgba(0,0,0,.55)}
+#acts .btn{pointer-events:auto;min-height:48px;padding:0 6px;font-size:16px;box-shadow:0 4px 12px rgba(0,0,0,.55)}
 #acts.many .btn{min-width:48px;padding:4px 10px}
 #pile{position:absolute;right:8px;bottom:6px;z-index:6;display:flex}
 .pbtn{appearance:none;border:2px solid var(--line);background:rgba(7,28,58,.78);color:var(--ink);border-radius:23px;min-height:46px;min-width:46px;padding:2px 10px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px}

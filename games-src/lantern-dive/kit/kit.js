@@ -9,7 +9,7 @@ const SU = D.suits;
 const FONT = "Nunito,'Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif";
 const f = n => Math.round(n * 100) / 100;
 const INK = '#0b1f3a', PAPER = '#f5eed9', PAPER2 = '#e9dfc2', NAVY = '#0e2146', GOLD = '#ffd873';
-const KIT = { SUITS: SU, ART: {}, FONT, INK, PAPER, GOLD };
+const KIT = { SUITS: SU, ART: {}, MARK: {}, FONT, INK, PAPER, GOLD };
 const cached = {}; const key = (...a) => a.join('|');
 let UID = 0; const uid = p => p + (++UID);
 const svgOpen = (w, h, vb, extra) => `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${w}" height="${h}" viewBox="${vb}"${extra || ''}>`;
@@ -136,7 +136,9 @@ function droneSVG(o) {
 // short names for chips and for the table (full wording is in data.js)
 const SHORT = D.tasks.map(t => t.s);
 KIT.SHORT = SHORT;
-function stateMark(st, sz) { return st > 0 ? `<g transform="translate(${sz - 20} 4)"><circle cx="10" cy="10" r="10" fill="#2fb36d" stroke="${INK}" stroke-width="2"/><path d="M5 10.5L8.8 14L15.5 6.5" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g>` : st < 0 ? `<g transform="translate(${sz - 20} 4)"><circle cx="10" cy="10" r="10" fill="#d8453b" stroke="${INK}" stroke-width="2"/><path d="M6 6L14 14M14 6L6 14" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></g>` : ''; }
+// painted tick / cross (media/icon-*.webp) once loaded (KIT.MARK), cut to a disc so the paint blotches around them stay out
+const markImg = (n, sz) => `<clipPath id="ldmk" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".47"/></clipPath><image href="media/icon-${n}.webp" x="${sz - 23}" y="2" width="24" height="24" clip-path="url(#ldmk)"/>`;
+function stateMark(st, sz) { if (st && KIT.MARK[st > 0 ? 'tick' : 'cross']) return markImg(st > 0 ? 'tick' : 'cross', sz); return st > 0 ? `<g transform="translate(${sz - 20} 4)"><circle cx="10" cy="10" r="10" fill="#2fb36d" stroke="${INK}" stroke-width="2"/><path d="M5 10.5L8.8 14L15.5 6.5" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></g>` : st < 0 ? `<g transform="translate(${sz - 20} 4)"><circle cx="10" cy="10" r="10" fill="#d8453b" stroke="${INK}" stroke-width="2"/><path d="M6 6L14 14M14 6L6 14" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/></g>` : ''; }
 function diffDots(d, w, x0, y0) { let s = ''; for (let i = 0; i < d; i++) s += `<circle cx="${f(x0 + i * 9)}" cy="${f(y0)}" r="3.6" fill="#ffd873" stroke="${INK}" stroke-width="1.4"/>`; return s; }
 // a job card as an SVG (used for the mini chips): face with the short name; w x h px
 function jobMini(id, o) {

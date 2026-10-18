@@ -153,6 +153,7 @@
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
+<script src="review-tips.js"></script>
 </head>
 <body>
 <header>
@@ -242,7 +243,7 @@ async function load() {
     if (b.root === 'flow-covers') continue;
     const game = GAMEFIX[b.game] || b.game;
     for (const i of b.items) items.push({ kind: '2d', root: b.root, game, name: i.name, wave: b.wave, ratio: b.ratio, batch: b.kind, file: b.file,
-      status: i.done ? 'done' : 'pending', thumb: i.thumb, full: i.full, prompt: i.prompt, t: i.t, twin: i.twin, vote: i.vote, note: i.note, stage: i.stage, wire: wireOf(b.root, i.stage) });
+      status: i.done ? 'done' : 'pending', thumb: i.thumb, full: i.full, prompt: i.prompt, t: i.t, twin: i.twin, vote: i.vote, note: i.note, stage: i.stage, wire: wireOf(b.root, i.stage), qa: i.qa });
   }
   for (const c of flow.crossed || []) items.push({ kind: '2d', game: c.game, name: c.name, wave: c.wave, ratio: '1:1', status: 'crossed', twin: c.twin,
     prompt: `Not painted: the approved 3D model “${c.twin}” (games-src/facelift-3d) replaces it.` });
@@ -389,6 +390,7 @@ function open(k) {
       ${i.batch ? `<dt>Batch</dt><dd>${esc(i.batch)}</dd>` : ''}${i.kb ? `<dt>Size</dt><dd>${i.kb} KB</dd>` : ''}
       ${i.see != null ? `<dt>Gaps</dt><dd>${(i.see * 100).toFixed(1)}%</dd>` : ''}<dt>Updated</dt><dd>${when}</dd>${path ? `<dt>File</dt><dd>${esc(path)}</dd>` : ''}</dl>
     ${i.prompt ? `<div><div class="pos" style="margin-bottom:6px">Prompt</div><div class="prompt">${esc(i.prompt)}</div></div>` : ''}
+    ${i.kind === '2d' && i.status === 'done' && window.reviewTips ? reviewTips(i) : ''}
     <div class="actions">${i.prompt ? '<button class="btn" id="cpP">Copy prompt</button>' : ''}${path ? '<button class="btn" id="cpF">Copy file path</button>' : ''}
       ${i.kind === '3d' ? '<a class="btn" href="index.html" style="text-decoration:none">Vote in 3D page</a>' : ''}</div>
     ${i.kind === '2d' && i.status === 'done' ? `<div><div class="pos" style="margin-bottom:6px">Review${i.stage ? ' · stage: ' + esc(i.stage) : ''}</div>

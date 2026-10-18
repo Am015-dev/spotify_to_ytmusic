@@ -119,3 +119,7 @@ html.bf #tags .tag .tgl{display:none}
 .gxh-mrow{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.85rem;color:var(--ink)}.gxh-mrow .btn{min-height:40px}.gxh-mrow .btn[aria-pressed=true]{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.35)}
 @media (min-width:1600px){.gx-more .gxh-mrow{flex:0 0 auto;gap:6px}.gx-more .gxh-mrow:last-child>span:first-child{display:none}.gx-more .gxh-mrow .btn{padding:.2rem .5rem;min-height:36px;font-size:.78rem}}
 .gx-more .gxh-mrow .btn,html.ph .gx-more .gxh-mrow .btn{width:auto;flex:0 0 auto;display:inline-flex;justify-content:center;min-width:56px}
+/* menu test v2: text must be hit-testable (topmost); the finger is a pseudo-element so it stays a pure overlay */
+#bftop,#bfhint{pointer-events:auto}
+#bffing{font-size:0}#bffing::before{content:"👆";font-size:38px}
+#tags .tag{pointer-events:auto}

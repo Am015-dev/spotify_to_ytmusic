@@ -211,3 +211,11 @@ html.ph.ph-dice #prompt .dice .die,html.ph.ph-dice #prompt .die{width:38px;heigh
 html.ph.ph-dice #prompt .btn.primary,html.ph.ph-dice #prompt .acts.col>.btn.primary{position:static;box-shadow:none}
 html.ph #tags .tag .tgl{font-size:13px}
 @media (max-height:600px){html.ph #ps .race{display:none}}
+/* menu test v2: 44px icon buttons get a slim painted frame so the icon sits inside it */
+html.sk.ph .gx-bar>.btn[data-gx],html.sk.ph .gx-bar>.btn[data-a="rules"],html.sk.ph .gx-gear{border-width:10px;border-image-width:10px;padding:0}
+/* text keeps 8px from the column the framed rows use */
+html.sk .dlg :is(h1,h2,h3,p,label,.lead){padding-left:8px;padding-right:8px}
+html.sk.ph .btn.gx-gear{border-width:10px;border-image-width:10px;padding:0}
+html.sk .dlg h4{padding-left:8px;padding-right:8px}
+html.sk.ph .btn.gx-gear:not(.sm):not(.ghost){border-width:10px;border-image-width:10px;padding:0}
+html.sk.ph .btn#phcam{border-width:10px;border-image-width:10px;padding:0}

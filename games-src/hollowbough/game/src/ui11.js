@@ -138,5 +138,6 @@ function hlpInit() {
 function hlpAfter() {
   hlpInit(); hlpMarks(); clearTimeout(UI.hmk); UI.hmk = setTimeout(hlpMarks, 200);   // again just before a bubble is placed (things may still be moving) if (typeof GXH === 'undefined') return;
   const st = $('#start'), nb = $('#netbox');
-  GXH.phase(!G || !UI.started || (st && !st.hidden) || (nb && !nb.hidden) ? null : hlpPhase());
+  // the dense board has no free spot for a bubble (it would cover cards and counts); the caption line in the bar already says the same, so no bubble here
+  void st; void nb; GXH.phase(null);
 }

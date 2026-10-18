@@ -30,7 +30,6 @@ const hvis=e=>{if(!e||e.closest('[hidden]'))return false;const r=e.getBoundingCl
 const hfirst=(...sels)=>()=>{for(const s of sels){for(const e of document.querySelectorAll(s)){if(hvis(e))return e}}return null};
 const hmv=act=>`#prompt [data-mv*='"act":"${act}"'],.fbtns [data-mv*='"act":"${act}"']`;
 const HLP_STEPS={
- setup:{target:hfirst('.mine .hand .card.play','#prompt [data-mv*=\'"act":"ready"\']','.mine .hand'),title:'Gear up your hero',text:'Tap a glowing card, then the glowing spot. Tap Ready when you are done.',pic:()=>HP.hero()},
  main:{target:hfirst('.bfdoor','.pile.pl'),title:'Kick the door',text:'Play cards to gear up, then tap the door.',pic:()=>HP.door()},
  after:{target:hfirst(hmv('loot'),'#prompt .acts button'),title:'An empty room',text:'No monster this time. Tap Loot for a free card, or fight a monster from your hand.',pic:()=>HP.back()},
  post:{target:hfirst(hmv('end'),'#prompt .acts button'),title:'Tidy up',text:'Wear new items and sell spares for a level. Then tap End turn.',pic:()=>HP.coin('+1')},
@@ -122,7 +121,7 @@ function hlpPlan0(m,me){if(!m||me<0)return null;
   const b=hlpBtn(m);if(b)return {toE:b};
   if(m.card!=null){const f=hlpCardEl(m.card);if(!hvis(f))return null;const mv=bfMoves(me,m.card).find(x=>mvKey(x.m)===mvKey(m));if(!mv)return null;
     const to=bfEls(mv.z).find(hvis);if(!to)return null;
-    const r=f.getBoundingClientRect();if(r.left<0||r.right>innerWidth){try{f.scrollIntoView({inline:'center',block:'nearest',behavior:'instant'})}catch(e){}}
+    const r=f.getBoundingClientRect();if(r.left<0||r.right>innerWidth){try{dkReveal(f)}catch(e){}}
     return {toE:to,fromE:f}}
   return null}
 // a short reason (<= 15 words) from the advisor's own text; '' when there is no honest short reason
@@ -161,7 +160,7 @@ function hlpSuggest(){try{
 // ---------------------------------------------------------------- wiring
 let _hlpInit=false;
 function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
-  GXH.init({game:'doorkick-dungeon',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse,.bf-tgt'});
+  GXH.init({game:'doorkick-dungeon',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opps .opp,.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse,.bf-tgt'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});if(typeof syncMenu==='function')syncMenu()}
 function hlpClean(){try{const c=GXH.state().cur;if(!(c&&c.kind==='bulb'))document.querySelectorAll('[data-gxh-avoid]').forEach(x=>x.removeAttribute('data-gxh-avoid'))}catch(e){}}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;hlpClean();

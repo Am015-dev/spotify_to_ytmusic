@@ -10,14 +10,14 @@ Class per expected file (heuristic scan of the game source, same scan as `wiring
 
 | Game | Pictures auto | fallback | prefix? | wiring | Poses auto | wiring | Music/sound | 3D source |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| cauldron-fair | 0 | 0 | 0 | 14 | 0 | 38 | 0 | 9 |
+| cauldron-fair | 0 | 0 | 0 | 16 | 0 | 38 | 0 | 9 |
 | crown-city-smash | 0 | 0 | 0 | 20 | 0 | 66 | 0 | 14 |
 | doorkick-dungeon | 0 | 0 | 0 | 29 | 0 | 76 | 8 | 13 |
 | final-approach | 0 | 0 | 0 | 16 | 0 | 34 | 0 | 12 |
 | hollowbough | 0 | 0 | 0 | 13 | 0 | 42 | 0 | 12 |
 | kaiten-kitchen | 0 | 0 | 0 | 17 | 0 | 33 | 0 | 10 |
-| lantern-dive | 0 | 0 | 0 | 19 | 0 | 44 | 0 | 10 |
-| mainhattan-nightrun | 0 | 0 | 16 | 18 | 0 | 50 | 0 | 10 |
+| lantern-dive | 0 | 0 | 5 | 14 | 0 | 44 | 0 | 10 |
+| mainhattan-nightrun | 61 | 0 | 16 | 18 | 0 | 50 | 0 | 10 |
 | nebula-aces | 0 | 0 | 0 | 13 | 0 | 54 | 0 | 15 |
 | rampart-and-vine | 0 | 0 | 0 | 16 | 0 | 47 | 0 | 19 |
 | sands-of-qamar | 0 | 0 | 0 | 22 | 0 | 52 | 0 | 13 |
@@ -26,19 +26,19 @@ Class per expected file (heuristic scan of the game source, same scan as `wiring
 | sunglaze | 0 | 0 | 0 | 12 | 0 | 44 | 0 | 13 |
 | thornbound | 0 | 0 | 5 | 13 | 0 | 41 | 0 | 10 |
 | tidewake | 0 | 0 | 0 | 18 | 0 | 42 | 0 | 9 |
-| **Total** | 0 | 0 | 31 | 277 | 0 | 740 | 8 | 191 |
+| **Total** | 61 | 0 | 36 | 274 | 0 | 740 | 8 | 191 |
 
 Pictures = the 109-item to-make list plus wave 7 art (incl. boss clip). Poses = wave 7 pose sets (cut out to `media/poses/`). Music/sound items are sources for the audio tools (always a manual step). Mainhattan Overdrive is excluded.
 
 ## Pictures that need a fallback or wiring code (per game)
 
-- **cauldron-fair**; wiring (14): `gxh-ok-button-plate`, `tlink-button-plate`, `ttl-bg-picture`, `event-boom-a`, `event-boom-b`, `event-boom-c`, `table-golden-ladle-stage`, `table-golden-ladle-stage-phone`, `table-night-fair`, `table-night-fair-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
+- **cauldron-fair**; wiring (16): `gx-bar-plate`, `gx-drawer-head-plate`, `gxh-ok-button-plate`, `tlink-button-plate`, `ttl-bg-picture`, `event-boom-a`, `event-boom-b`, `event-boom-c`, `table-golden-ladle-stage`, `table-golden-ladle-stage-phone`, `table-night-fair`, `table-night-fair-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
 - **crown-city-smash**; wiring (20): `btn-primary-button-plate`, `gx-bar-plate`, `gx-drawer-head-plate`, `gxh-ok-button-plate`, `newsbtn-button-plate`, `table-harbor-dawn`, `table-harbor-dawn-phone`, `table-spire-night`, `table-spire-night-phone`, `event-portal-opens`, `table-portal-suburbs`, `table-portal-suburbs-phone`, `back-harbor`, `back-spire`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `event-brass-beetle`, `event-evolution`
 - **doorkick-dungeon**; wiring (20): `btn-primary-button-plate`, `gx-app-plate`, `gx-bar-plate`, `gx-dock-plate`, `gxt-b-pri-button-plate`, `gxt-b-pulse-button-plate`, `modal-plate`, `event-door-kick`, `table-flooded-cellar`, `table-flooded-cellar-phone`, `event-curse`, `event-level-up`, `table-bone-crypt`, `table-bone-crypt-phone`, `table-dragon-hoard`, `table-dragon-hoard-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
 - **final-approach**; wiring (16): `gx-bar-plate`, `tlink-button-plate`, `ttl-bg-picture`, `event-go-around`, `event-touchdown`, `table-fog`, `table-fog-phone`, `table-snow`, `table-snow-phone`, `table-sunset`, `table-sunset-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `event-wind-shear`
 - **hollowbough**; wiring (13): `board-plate`, `chipb-button-plate`, `start-plate`, `event-first-snow`, `event-harvest-feast`, `table-autumn-hollow`, `table-autumn-hollow-phone`, `table-summer-brook`, `table-summer-brook-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
 - **kaiten-kitchen**; wiring (17): `chipb-button-plate`, `chipb-seatb-button-plate`, `gx-bar-plate`, `tlink-button-plate`, `ttl-bg-dim-picture`, `ttl-bg-picture`, `belt-b`, `table-breakfast-counter`, `table-breakfast-counter-phone`, `table-rainy-evening`, `table-rainy-evening-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `event-golden-plate`, `event-lunch-rush`
-- **lantern-dive**; wiring (19): `gx-bar-plate`, `tlink-button-plate`, `ttl-bg-picture`, `camp-lampless-2`, `camp-maze-2`, `camp-undertow-2`, `card-face-coral-b`, `card-face-kelp-b`, `card-face-lantern-b`, `card-face-sunstar-b`, `card-face-tide-b`, `table-reef-glow`, `table-reef-glow-phone`, `table-wreck-bridge`, `table-wreck-bridge-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
+- **lantern-dive**; wiring (14): `gx-bar-plate`, `tlink-button-plate`, `ttl-bg-picture`, `camp-lampless-2`, `camp-maze-2`, `camp-undertow-2`, `table-reef-glow`, `table-reef-glow-phone`, `table-wreck-bridge`, `table-wreck-bridge-phone`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
 - **mainhattan-nightrun**; wiring (18): `bemp-plate`, `bpause-plate`, `dailybtn-plate`, `diffbtn-plate`, `gabtn-plate`, `go-dim-plate`, `labbtn-plate`, `missing-picture-fx-bullet-needle-webp`, `missing-picture-fx-bullet-rocket-webp`, `missing-picture-fx-bullet-shell-webp`, `setbtn-plate`, `startbtn-plate`, `storybtn-plate`, `title-plate`, `wpbtn-plate`, `event-boss-warning`, `event-level-clear`, `event-new-record`
 - **nebula-aces**; wiring (13): `gx-bar-plate`, `table-asteroid-belt`, `table-asteroid-belt-phone`, `table-red-rift`, `table-red-rift-phone`, `table-veil-station`, `table-veil-station-phone`, `back-red-streak`, `back-veil-station`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`
 - **rampart-and-vine**; wiring (16): `card-frame`, `scrim-plate`, `top-plate`, `table-castle-hall`, `table-castle-hall-phone`, `table-vineyard-dusk`, `table-vineyard-dusk-phone`, `tex-field-b`, `tex-field-c`, `tex-road-b`, `end-lose-b`, `end-lose-c`, `end-win-b`, `end-win-c`, `tex-hedge-b`, `tex-roof-b`
@@ -55,14 +55,16 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 
 ### cauldron-fair
 
-- `event-boom-*` (3: event-boom-a, event-boom-b, event-boom-c): no loaded sibling: add the load beside the first `media/` load, `games-src/cauldron-fair/ui.js:1429`
-- `table-golden-*` (2: table-golden-ladle-stage, table-golden-ladle-stage-phone): copy the load of `table-phone` at `games-src/cauldron-fair/ui.js:1976`
-- `table-night-*` (2: table-night-fair, table-night-fair-phone): copy the load of `table-phone` at `games-src/cauldron-fair/ui.js:1976`
-- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/cauldron-fair/ui.js:1990`
-- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/cauldron-fair/ui.js:1990`
-- `gxh-ok-*` (1: gxh-ok-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/cauldron-fair/ui.js:1429`
-- `tlink-button-*` (1: tlink-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/cauldron-fair/ui.js:1429`
-- `ttl-bg-*` (1: ttl-bg-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/cauldron-fair/ui.js:1429`
+- `event-boom-*` (3: event-boom-a, event-boom-b, event-boom-c): no loaded sibling: add the load beside the first `media/` load, `games-src/cauldron-fair/src/ui8.js:61`
+- `table-golden-*` (2: table-golden-ladle-stage, table-golden-ladle-stage-phone): copy the load of `table-phone` at `games-src/cauldron-fair/src/ui12.js:21`
+- `table-night-*` (2: table-night-fair, table-night-fair-phone): copy the load of `table-phone` at `games-src/cauldron-fair/src/ui12.js:21`
+- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/cauldron-fair/src/ui12.js:35`
+- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/cauldron-fair/src/ui12.js:35`
+- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/cauldron-fair/src/ui8.js:61`
+- `gx-drawer-*` (1: gx-drawer-head-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/cauldron-fair/src/ui8.js:61`
+- `gxh-ok-*` (1: gxh-ok-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/cauldron-fair/src/ui8.js:61`
+- `tlink-button-*` (1: tlink-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/cauldron-fair/src/ui8.js:61`
+- `ttl-bg-*` (1: ttl-bg-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/cauldron-fair/src/ui8.js:61`
 
 ### crown-city-smash
 
@@ -83,76 +85,76 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 
 ### doorkick-dungeon
 
-- `gxt-b-*` (2: gxt-b-pri-button-plate, gxt-b-pulse-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:143`
-- `table-flooded-*` (2: table-flooded-cellar, table-flooded-cellar-phone): copy the load of `table-tavern` at `games-src/munch/tbl.js:89`
-- `table-bone-*` (2: table-bone-crypt, table-bone-crypt-phone): copy the load of `table-tavern` at `games-src/munch/tbl.js:89`
-- `table-dragon-*` (2: table-dragon-hoard, table-dragon-hoard-phone): copy the load of `table-tavern` at `games-src/munch/tbl.js:89`
-- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/munch/bf.css:145`
-- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/munch/bf.css:145`
-- `btn-primary-*` (1: btn-primary-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:143`
-- `gx-app-*` (1: gx-app-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:143`
-- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:143`
-- `gx-dock-*` (1: gx-dock-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:143`
-- `modal-*` (1: modal-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:143`
-- `event-door-*` (1: event-door-kick): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:143`
-- `event-*` (1: event-curse): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:143`
-- `event-level-*` (1: event-level-up): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:143`
+- `gxt-b-*` (2: gxt-b-pri-button-plate, gxt-b-pulse-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
+- `table-flooded-*` (2: table-flooded-cellar, table-flooded-cellar-phone): copy the load of `table-tavern` at `games-src/munch/tbl.js:94`
+- `table-bone-*` (2: table-bone-crypt, table-bone-crypt-phone): copy the load of `table-tavern` at `games-src/munch/tbl.js:94`
+- `table-dragon-*` (2: table-dragon-hoard, table-dragon-hoard-phone): copy the load of `table-tavern` at `games-src/munch/tbl.js:94`
+- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/munch/bf.css:147`
+- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/munch/bf.css:147`
+- `btn-primary-*` (1: btn-primary-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
+- `gx-app-*` (1: gx-app-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
+- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
+- `gx-dock-*` (1: gx-dock-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
+- `modal-*` (1: modal-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
+- `event-door-*` (1: event-door-kick): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
+- `event-*` (1: event-curse): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
+- `event-level-*` (1: event-level-up): no loaded sibling: add the load beside the first `media/` load, `games-src/munch/bf.css:145`
 
 ### final-approach
 
-- `table-*` (3: table-fog, table-snow, table-sunset): copy the load of `table-default` at `games-src/final-approach/game/ui.js:1646`
-- `end-lose-*` (2: end-lose-b, end-lose-c): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/ui.js:1213`
-- `end-win-*` (2: end-win-b, end-win-c): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/ui.js:1213`
-- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/ui.js:1213`
-- `tlink-button-*` (1: tlink-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/ui.js:1213`
-- `ttl-bg-*` (1: ttl-bg-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/ui.js:1213`
-- `event-go-*` (1: event-go-around): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/ui.js:1213`
-- `event-*` (1: event-touchdown): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/ui.js:1213`
-- `table-fog-*` (1: table-fog-phone): copy the load of `table-default` at `games-src/final-approach/game/ui.js:1646`
-- `table-snow-*` (1: table-snow-phone): copy the load of `table-default` at `games-src/final-approach/game/ui.js:1646`
-- `table-sunset-*` (1: table-sunset-phone): copy the load of `table-default` at `games-src/final-approach/game/ui.js:1646`
-- `event-wind-*` (1: event-wind-shear): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/ui.js:1213`
+- `table-*` (3: table-fog, table-snow, table-sunset): copy the load of `table-default` at `games-src/final-approach/game/src/ui13.js:16`
+- `end-lose-*` (2: end-lose-b, end-lose-c): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/scn.js:76`
+- `end-win-*` (2: end-win-b, end-win-c): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/scn.js:76`
+- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/scn.js:76`
+- `tlink-button-*` (1: tlink-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/scn.js:76`
+- `ttl-bg-*` (1: ttl-bg-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/scn.js:76`
+- `event-go-*` (1: event-go-around): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/scn.js:76`
+- `event-*` (1: event-touchdown): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/scn.js:76`
+- `table-fog-*` (1: table-fog-phone): copy the load of `table-default` at `games-src/final-approach/game/src/ui13.js:16`
+- `table-snow-*` (1: table-snow-phone): copy the load of `table-default` at `games-src/final-approach/game/src/ui13.js:16`
+- `table-sunset-*` (1: table-sunset-phone): copy the load of `table-default` at `games-src/final-approach/game/src/ui13.js:16`
+- `event-wind-*` (1: event-wind-shear): no loaded sibling: add the load beside the first `media/` load, `games-src/final-approach/game/scn.js:76`
 
 ### hollowbough
 
-- `table-autumn-*` (2: table-autumn-hollow, table-autumn-hollow-phone): copy the load of `table-woodland` at `games-src/hollowbough/game/ui.js:1621`
-- `table-summer-*` (2: table-summer-brook, table-summer-brook-phone): copy the load of `table-woodland` at `games-src/hollowbough/game/ui.js:1621`
-- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/hollowbough/game/ui.js:1640`
-- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/hollowbough/game/ui.js:1640`
-- `board-*` (1: board-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/hollowbough/game/ui.js:50`
-- `chipb-button-*` (1: chipb-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/hollowbough/game/ui.js:50`
-- `start-*` (1: start-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/hollowbough/game/ui.js:50`
-- `event-first-*` (1: event-first-snow): no loaded sibling: add the load beside the first `media/` load, `games-src/hollowbough/game/ui.js:50`
-- `event-harvest-*` (1: event-harvest-feast): no loaded sibling: add the load beside the first `media/` load, `games-src/hollowbough/game/ui.js:50`
+- `table-autumn-*` (2: table-autumn-hollow, table-autumn-hollow-phone): copy the load of `table-woodland` at `games-src/hollowbough/game/src/ui13.js:19`
+- `table-summer-*` (2: table-summer-brook, table-summer-brook-phone): copy the load of `table-woodland` at `games-src/hollowbough/game/src/ui13.js:19`
+- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/hollowbough/game/head.html:338`
+- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/hollowbough/game/head.html:338`
+- `board-*` (1: board-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/hollowbough/game/head.html:326`
+- `chipb-button-*` (1: chipb-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/hollowbough/game/head.html:326`
+- `start-*` (1: start-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/hollowbough/game/head.html:326`
+- `event-first-*` (1: event-first-snow): no loaded sibling: add the load beside the first `media/` load, `games-src/hollowbough/game/head.html:326`
+- `event-harvest-*` (1: event-harvest-feast): no loaded sibling: add the load beside the first `media/` load, `games-src/hollowbough/game/head.html:326`
 
 ### kaiten-kitchen
 
-- `ttl-bg-*` (2: ttl-bg-dim-picture, ttl-bg-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/ui.js:1877`
-- `table-breakfast-*` (2: table-breakfast-counter, table-breakfast-counter-phone): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/ui.js:1877`
-- `table-rainy-*` (2: table-rainy-evening, table-rainy-evening-phone): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/ui.js:1877`
-- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/kaiten/game/ui.js:2114`
-- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/kaiten/game/ui.js:2114`
-- `chipb-button-*` (1: chipb-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/ui.js:1877`
-- `chipb-seatb-*` (1: chipb-seatb-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/ui.js:1877`
-- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/ui.js:1877`
-- `tlink-button-*` (1: tlink-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/ui.js:1877`
-- `belt-*` (1: belt-b): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/ui.js:1877`
-- `event-golden-*` (1: event-golden-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/ui.js:1877`
-- `event-lunch-*` (1: event-lunch-rush): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/ui.js:1877`
+- `ttl-bg-*` (2: ttl-bg-dim-picture, ttl-bg-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
+- `table-breakfast-*` (2: table-breakfast-counter, table-breakfast-counter-phone): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
+- `table-rainy-*` (2: table-rainy-evening, table-rainy-evening-phone): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
+- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/kaiten/game/head.html:475`
+- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/kaiten/game/head.html:475`
+- `chipb-button-*` (1: chipb-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
+- `chipb-seatb-*` (1: chipb-seatb-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
+- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
+- `tlink-button-*` (1: tlink-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
+- `belt-*` (1: belt-b): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
+- `event-golden-*` (1: event-golden-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
+- `event-lunch-*` (1: event-lunch-rush): no loaded sibling: add the load beside the first `media/` load, `games-src/kaiten/game/head.html:408`
 
 ### lantern-dive
 
-- `card-face-*` (5: card-face-coral-b, card-face-kelp-b, card-face-lantern-b, card-face-sunstar-b ...): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/ui.js:1757`
-- `table-reef-*` (2: table-reef-glow, table-reef-glow-phone): copy the load of `table-tunnel-glow` at `games-src/lantern-dive/game/ui.js:2265`
-- `table-wreck-*` (2: table-wreck-bridge, table-wreck-bridge-phone): copy the load of `table-tunnel-glow` at `games-src/lantern-dive/game/ui.js:2265`
-- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/lantern-dive/game/ui.js:2195`
-- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/lantern-dive/game/ui.js:2195`
-- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/ui.js:1757`
-- `tlink-button-*` (1: tlink-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/ui.js:1757`
-- `ttl-bg-*` (1: ttl-bg-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/ui.js:1757`
-- `camp-lampless-*` (1: camp-lampless-2): copy the load of `camp-brack` at `games-src/lantern-dive/game/x.js:1305`
-- `camp-maze-*` (1: camp-maze-2): copy the load of `camp-brack` at `games-src/lantern-dive/game/x.js:1305`
-- `camp-undertow-*` (1: camp-undertow-2): copy the load of `camp-brack` at `games-src/lantern-dive/game/x.js:1305`
+- `card-face-*` (5: card-face-coral-b, card-face-kelp-b, card-face-lantern-b, card-face-sunstar-b ...): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/skin.css:3`
+- `table-reef-*` (2: table-reef-glow, table-reef-glow-phone): copy the load of `table-tunnel-glow` at `games-src/lantern-dive/game/src/ui99.js:106`
+- `table-wreck-*` (2: table-wreck-bridge, table-wreck-bridge-phone): copy the load of `table-tunnel-glow` at `games-src/lantern-dive/game/src/ui99.js:106`
+- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/lantern-dive/game/src/ui99.js:36`
+- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/lantern-dive/game/src/ui99.js:36`
+- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/skin.css:3`
+- `tlink-button-*` (1: tlink-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/skin.css:3`
+- `ttl-bg-*` (1: ttl-bg-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/skin.css:3`
+- `camp-lampless-*` (1: camp-lampless-2): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/skin.css:3`
+- `camp-maze-*` (1: camp-maze-2): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/skin.css:3`
+- `camp-undertow-*` (1: camp-undertow-2): no loaded sibling: add the load beside the first `media/` load, `games-src/lantern-dive/game/skin.css:3`
 
 ### mainhattan-nightrun
 
@@ -188,8 +190,8 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 - `tile-small-*` (2: tile-small-b, tile-small-c): copy the load of `tile-city` at `games-src/ft/src/board.css:137`
 - `table-dune-*` (2: table-dune-night, table-dune-night-phone): copy the load of `table-default` at `games-src/ft/src/board.css:146`
 - `table-souk-*` (2: table-souk-dusk, table-souk-dusk-phone): copy the load of `table-default` at `games-src/ft/src/board.css:146`
-- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/ft/src/x.js:4533`
-- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/ft/src/x.js:4533`
+- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/ft/src/paint.js:21`
+- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/ft/src/paint.js:21`
 - `dcard-*` (1: dcard-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/ft/src/board.css:130`
 - `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/ft/src/board.css:130`
 - `gx-drawer-*` (1: gx-drawer-head-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/ft/src/board.css:130`
@@ -221,8 +223,8 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 
 - `event-*` (2: event-boom, event-defused): no loaded sibling: add the load beside the first `media/` load, `games-src/short-fuse/game/start.js:55`
 - `table-clock-*` (2: table-clock-tower, table-clock-tower-phone): no loaded sibling: add the load beside the first `media/` load, `games-src/short-fuse/game/start.js:55`
-- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/short-fuse/game/shortfuse.html:5820`
-- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/short-fuse/game/shortfuse.html:5820`
+- `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/short-fuse/game/extras.js:31`
+- `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/short-fuse/game/extras.js:31`
 - `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/short-fuse/game/start.js:55`
 - `gx-drawer-*` (1: gx-drawer-head-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/short-fuse/game/start.js:55`
 - `plate-mine-*` (1: plate-mine-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/short-fuse/game/start.js:55`
@@ -246,28 +248,28 @@ Pictures only. `prefix?` and `wiring` names; copy the load of the sibling and ad
 
 ### thornbound
 
-- `event-*` (2: event-coronation, event-uprising): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
-- `table-sinks-*` (2: table-sinks-masquerade, table-sinks-masquerade-phone): copy the load of `table-court` at `games-src/thornbound/game/thornbound.html:7158`
-- `end-lose-*` (2: end-lose-b, end-lose-c): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
-- `end-win-*` (2: end-win-b, end-win-c): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
-- `board-*` (1: board-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
-- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
-- `gx-drawer-*` (1: gx-drawer-head-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
-- `gxh-ok-*` (1: gxh-ok-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
-- `tbtn-button-*` (1: tbtn-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
-- `tbtn-story-*` (1: tbtn-story-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
-- `tkey-*` (1: tkey-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
-- `table-*` (1: table-ossuary): copy the load of `table-court` at `games-src/thornbound/game/thornbound.html:7158`
-- `table-ossuary-*` (1: table-ossuary-phone): copy the load of `table-court` at `games-src/thornbound/game/thornbound.html:7158`
-- `back-moth-*` (1: back-moth-ossuary): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/thornbound.html:572`
+- `event-*` (2: event-coronation, event-uprising): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
+- `table-sinks-*` (2: table-sinks-masquerade, table-sinks-masquerade-phone): copy the load of `table-court` at `games-src/thornbound/game/src/ui13.js:15`
+- `end-lose-*` (2: end-lose-b, end-lose-c): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
+- `end-win-*` (2: end-win-b, end-win-c): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
+- `board-*` (1: board-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
+- `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
+- `gx-drawer-*` (1: gx-drawer-head-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
+- `gxh-ok-*` (1: gxh-ok-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
+- `tbtn-button-*` (1: tbtn-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
+- `tbtn-story-*` (1: tbtn-story-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
+- `tkey-*` (1: tkey-picture): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
+- `table-*` (1: table-ossuary): copy the load of `table-court` at `games-src/thornbound/game/src/ui13.js:15`
+- `table-ossuary-*` (1: table-ossuary-phone): copy the load of `table-court` at `games-src/thornbound/game/src/ui13.js:15`
+- `back-moth-*` (1: back-moth-ossuary): no loaded sibling: add the load beside the first `media/` load, `games-src/thornbound/game/scn.js:117`
 
 ### tidewake
 
-- `tile-water-*` (4: tile-water-e, tile-water-f, tile-water-g, tile-water-h): copy the load of `tile-water-a` at `games-src/tidewake/game/tidewake.html:3511`
-- `table-rift-*` (2: table-rift-night, table-rift-night-phone): copy the load of `table-default` at `games-src/tidewake/game/tidewake.html:6004`
+- `tile-water-*` (4: tile-water-e, tile-water-f, tile-water-g, tile-water-h): copy the load of `tile-water-a` at `games-src/tidewake/game/build.py:66`
+- `table-rift-*` (2: table-rift-night, table-rift-night-phone): copy the load of `table-default` at `games-src/tidewake/game/media.js:15`
 - `end-lose-*` (2: end-lose-b, end-lose-c): copy the load of `end-lose` at `games-src/tidewake/game/ui8.js:28`
 - `end-win-*` (2: end-win-b, end-win-c): copy the load of `end-lose` at `games-src/tidewake/game/ui8.js:28`
-- `table-harbor-*` (2: table-harbor-noon, table-harbor-noon-phone): copy the load of `table-default` at `games-src/tidewake/game/tidewake.html:6004`
+- `table-harbor-*` (2: table-harbor-noon, table-harbor-noon-phone): copy the load of `table-default` at `games-src/tidewake/game/media.js:15`
 - `button-button-*` (1: button-button-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/tidewake/game/ui8.js:28`
 - `gx-bar-*` (1: gx-bar-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/tidewake/game/ui8.js:28`
 - `gx-drawer-*` (1: gx-drawer-head-plate): no loaded sibling: add the load beside the first `media/` load, `games-src/tidewake/game/ui8.js:28`

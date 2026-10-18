@@ -140,7 +140,7 @@ const TUTORIAL=[
  {id:'know',t:'What we know',p:'The bulb button opens the full table of what every wire could be. Use it whenever you are unsure.'}];
 // how to play: in the order a player meets things
 const RULES_HTML=`
-<h3>The goal</h3><p>A villain has wired a bomb. Your crew of 2 to 5 defuses it <b>together</b>: you win when <b>every wire on every stand is cut or revealed</b>. You lose if the fuse burns down, if anyone points at a red wire, or if the job's own special rule says so.</p>
+<h3>The goal</h3><p>A villain has wired a bomb. Your crew of 2 to 5 defuses it <b>together</b>: you win when <b>every wire</b> on every stand is cut or revealed. You lose if the fuse burns down, if anyone points at a red wire, or if the job's own special rule says so.</p>
 <h3>How a round goes</h3><ol>
 <li><b>Setup.</b> Each player gets a stand of wires, sorted from low to high. With 2 players each has two stands; with 3, the foreman has two. Your wires face you: you never see a crewmate's wires and they never see yours.</li>
 <li><b>Opening tokens.</b> Starting with the foreman, everyone places one info token in front of one of their own blue wires, showing its number.</li>

@@ -4,7 +4,7 @@
 const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
   dn:['bankenviertel','mainufer','ostend','messe','athina'],
   bossN:['sek-adler','flusskrake','zentral-ice','kronos','bruecken-waechter','schranken-wart','talos','hoplite','tresor-wart','messe-waechter'],
-  artK:e=>e.nm==='TRESOR-WART'?8:e.nm==='MESSE-WÄCHTER'?9:e.k,   // the two mini-bosses with their own paintings
+  artK:e=>e.ak!=null?e.ak:e.nm==='TRESOR-WART'?8:e.nm==='MESSE-WÄCHTER'?9:e.k,   // the two mini-bosses with their own paintings
   shipN:['std','tri','hv','ec','swg','syn'],
   enN:['drone','charger','gunship','gate','flank','swarm','mine','turret-base','turret-barrel'],
   fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine','shield-link','bullet-shell','bullet-needle','bullet-rocket'],

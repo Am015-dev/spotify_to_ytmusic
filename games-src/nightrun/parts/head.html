@@ -132,6 +132,9 @@ button.go:hover,button.go:focus-visible{filter:brightness(1.3);outline:none}
 #touch button#bDash{background-image:url(media/ui-touch-dash.webp)}
 #touch button#bEmp{background-image:url(media/ui-touch-emp.webp)}
 #touch button#bPause{background-image:url(media/ui-touch-pause.webp);border-radius:50%}
+#touch button#bDash,#touch button#bEmp{position:relative;overflow:visible}
+#touch button#bDash::after,#touch button#bEmp::after{content:attr(data-n);position:absolute;inset:-4px;border-radius:50%;pointer-events:none;color:#fff;font:700 12px var(--mono);text-align:right;text-shadow:0 0 3px #000;
+  background:conic-gradient(var(--rc,#19e3ff) calc(var(--f,1)*360deg),#ffffff22 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))}
 </style></head><body>
 
 <div id="stage"><div id="frame">
@@ -165,6 +168,7 @@ button.go:hover,button.go:focus-visible{filter:brightness(1.3);outline:none}
   <div id="pausem" class="ov solid" hidden><div class="in">
     <div class="eyebrow">Paused</div>
     <h1>PAUSE</h1>
+    <div id="pStats" style="margin:6px 0 10px;font:12px var(--mono);color:#c9c4ec;text-align:center"></div>
     <div class="row"><button class="go" id="resumeBtn">RESUME</button><button class="go alt" id="restartBtn">RESTART</button><button class="go dim" id="pSetBtn">SETTINGS</button><button class="go dim" id="quitBtn">TITLE</button></div>
   </div></div>
   <div id="setm" class="ov solid" hidden><div class="card" role="dialog" aria-label="Settings">

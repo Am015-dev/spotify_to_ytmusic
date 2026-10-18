@@ -1,0 +1,17 @@
+{
+"phone": {
+"look": [],
+"axe": [],
+"axe_pages": [
+"menu-phone.json",
+"story-scene-phone.json",
+"tb-art-phone.json",
+"tb-board-phone.json",
+"tb-buttons-phone.json",
+"tb-help-phone.json",
+"tb-rivals-phone.json",
+"tb-story-start-phone.json",
+"tb-zoom-phone.json"
+]
+}
+}

@@ -196,6 +196,9 @@ def build():
             except Exception: continue
             folder = p.parent
             items = []
+            qf = GA / "logs" / "flow_qa" / f"{root}__{folder.name}__{p.stem}.json"  # first-pass auto check (flow_qa.py, outside this project)
+            try: qa = json.loads(qf.read_text(encoding="utf-8")) if qf.exists() else {}
+            except ValueError: qa = {}
             for name, prompt in cards.items():
                 if isinstance(prompt, dict): prompt = prompt.get("prompt", "")  # pose cards: {"prompt": ..., reference fields}
                 f = folder / f"{name}.jpg"
@@ -207,7 +210,8 @@ def build():
                               "twin": TWIN.get((folder.name, name)), "vote": vt.get("v"), "note": vt.get("note", ""),
                               "old": thumb(old) if old.exists() else None,
                               "stage": stage(folder.name, name, f.exists(), vt.get("v")) if root == "flow-2d" else None,
-                              "flags": ["blank"] if root == "flow-2d" and f.exists() and facts(f)[1] else []})
+                              "flags": ["blank"] if root == "flow-2d" and f.exists() and facts(f)[1] else [],
+                              "qa": {k: qa[name][k] for k in ("ok", "issues") if k in qa[name]} if f.exists() and name in qa else None})
             game = "covers" if root == "flow-covers" else folder.parent.name if root == "flow-video" else folder.name
             batches.append({"root": root, "game": game, "kind": kind_of(p.name), "file": p.relative_to(GA).as_posix(),
                             "wave": wave_of(root, p.name), "ratio": ratio_of(p.name),

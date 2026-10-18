@@ -123,7 +123,7 @@ function hlpSuggest() {
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
-  GXH.init({ game: 'cauldron-fair', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '#acts button,#qbox button,.tok,.dpick,.rtg,.rbt,.sbc,#rs .confirm,#ratchip button' });
+  GXH.init({ game: 'cauldron-fair', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoidPad: 10, avoid: '#fortchip,#fort,.ct,#acts button,#qbox button,.tok,.dpick,.rtg,.rbt,.sbc,#rs .confirm,#ratchip button' });
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
 }
 function hlpAfter() {

@@ -16,7 +16,7 @@ const TP_DEF=[
   {id:'rev',n:'Revive Token', p:400,max:5, c:'#ff2d95',pri:92,ic:'M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7z',t:l=>'Return from '+l+' death'+(l>1?'s':'')+' per run'},
   {id:'nmn',n:'Neon Mining',  p:70, max:12,c:'#19e3ff',pri:35,ic:'M12 2l8.5 5v10L12 22l-8.5-5V7z',                                 t:l=>'+'+5*l+'% Neon from kills'}];
 const TP_BY={};for(const d of TP_DEF)TP_BY[d.id]=d;
-const tpPrice=(d,l)=>Math.round(1.5*d.p*(1+.6*l+.12*l*l)/5)*5;                  // price of level l+1: 45, 80, 120, 175 ... 1,000 (Power Core), a full garage costs about 60,000 Neon: many runs
+const tpPrice=(d,l)=>Math.round(1.5*d.p*(1+.6*l+.12*l*l)*(window.RET&&RET.econ?RET.tk:1)/5)*5;                  // price of level l+1: 45, 80, 120, 175 ... 1,000 (Power Core), a full garage costs about 60,000 Neon: many runs
 const TP={revLeft:0,rgnT:0,boost:{},
   raw(id){const v=Math.floor(+GA.tune[id])||0;return Math.max(0,Math.min(TP_BY[id].max,v));},                 // the level you own
   l(id){return GA.eqAll||(GA.eq&&GA.eq[id])?this.raw(id):0;}};                                                       // the level that counts: only equipped perks work (see LOADOUT)
@@ -34,7 +34,7 @@ GA.tab='tune';
 UBY.lp.ok=null;                                              // Long Power works now (power-ups are 50% longer per level, see PW.give below)
 const NEWU=[
   {id:'dm',n:'Overcharge',  t:'+12% shot damage',        p:30,max:5,c:'#ff5a3d',ic:TP_BY.dmg.ic},
-  {id:'cr',n:'Crit Chip',   t:'+5% chance of a 3x hit',  p:32,max:5,c:'#ff5a3d',ic:TP_BY.crt.ic},
+  {id:'cr',n:'Crit Chip',   t:'+5% chance of a heavy hit (about 2.5x)',  p:32,max:5,c:'#ff5a3d',ic:TP_BY.crt.ic},
   {id:'hl',n:'Hull Patch',  t:'Repair 1 hull now',       p:30,max:5,c:'#3dffb0',ic:TP_BY.hul.ic,ok:()=>P&&P.hp<P.max},
   {id:'mh',n:'Hull Plating',t:'+1 max hull, repaired',   p:60,max:3,c:'#3dffb0',ic:TP_BY.hul.ic},
   {id:'dr',n:'Drone',       t:'A wingman fires with you',p:50,max:3,c:'#c08aff',ic:TP_BY.drn.ic},
@@ -101,7 +101,7 @@ const LVT={fr:l=>['Extra shot on every 4th beat step','Extra shot on every 2nd s
   dc:l=>'Dash charges +'+l,mg:l=>'Pickup range +'+(70*l)+' px',sh:l=>l+' shield'+(l>1?'s':'')+' in total',lp:l=>'Power-ups last '+(30*l)+'% longer',
   wd:l=>'On-beat window '+(14*l)+' ms wider',hm:l=>'Shots steer '+['a little','well','strongly','hard','almost always hit'][l-1],ck:l=>'Tier lasts '+(4*l)+' beats longer',
   db:l=>'Dash hits for '+(5*l)+' damage',sb:l=>'Gold pulse shots +'+(30*l)+'%',nx:l=>'Kills drop +'+(30*l)+'% Neon',
-  dm:l=>'Shot damage +'+(12*l)+'%',cr:l=>(5*l)+'% chance of a 3x hit',mh:l=>'Max hull +'+l+', repaired',dr:l=>l+' wingman'+(l>1?' drones':''),rv:l=>'Come back '+l+' time'+(l>1?'s':''),
+  dm:l=>'Shot damage +'+(12*l)+'%',cr:l=>(5*l)+'% chance of a heavy hit (about 2.5x)',mh:l=>'Max hull +'+l+', repaired',dr:l=>l+' wingman'+(l>1?' drones':''),rv:l=>'Come back '+l+' time'+(l>1?'s':''),
   sc:l=>l+' pair'+(l>1?'s':'')+' of wing guns',rg:l=>['Shoots backwards','Backwards fan, more shots','Backwards fan, fires every shot'][l-1],pc:l=>'Shots pierce '+l+' enem'+(l>1?'ies':'y'),
   cl:l=>'On-beat kills arc to '+(l+1)+' foes',bt:l=>'On-beat dash slows time '+(.4+.3*l).toFixed(1)+' s',rc:l=>'Shots bounce '+l+'x',as:l=>l+' auto-shield'+(l>1?'s':''),bd:l=>l+' orbiting gun'+(l>1?'s':'')};
 const lvText=(u,l)=>LVT[u.id]&&u.max>1?(LVT[u.id](l)||u.t):u.t;

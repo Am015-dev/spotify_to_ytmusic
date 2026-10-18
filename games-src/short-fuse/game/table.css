@@ -33,7 +33,7 @@
 @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
 @keyframes burn{0%{background:#fff;transform:scaleY(1.7)}100%{transform:none}}
 .trk{display:grid;grid-template-columns:repeat(6,13px);grid-auto-rows:13px;gap:2px;flex:none}
-.cn12{width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.35);font:700 7px/10px var(--fb);color:#d9e8f2;text-align:center;box-sizing:border-box;font-style:normal;display:block}
+.cn12{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.35);font:700 11px/10px var(--fb);color:#d9e8f2;text-align:center;box-sizing:border-box;font-style:normal;display:block}
 .cn12.done{background:#52c23a;border-color:#1b6a15;color:#fff}
 .cn12.flipc{animation:flipc .8s}
 @keyframes flipc{0%{transform:scale(2.2) rotate(180deg)}100%{transform:none}}
@@ -282,3 +282,9 @@ html.short #over .card2.end .endart{height:16dvh}
 .s3.bb{animation:s3bb 2.3s ease-out forwards}
 @keyframes s3bb{0%{transform:scale(.3);opacity:0}12%{transform:scale(.9);opacity:1}28%{transform:scale(1.25) rotate(-4deg)}40%{transform:scale(1.05) rotate(4deg)}55%{transform:scale(1.5);opacity:1}100%{transform:scale(2);opacity:0}}
 @media (prefers-reduced-motion:reduce){.s3{animation-duration:.01s!important}}
+
+/* the painted skin never changes a box: these sizes used to live in skin.css */
+html .btn{min-height:48px;min-width:60px}
+html .btn.small{min-height:44px}
+html .jobrow .btn{min-width:64px;min-height:48px}
+html .st-main .seg .btn{min-width:60px;min-height:46px}

@@ -35,7 +35,7 @@ const dismissMph=()=>{PH.mphHide=UI.mph;try{phAfter();phStrip()}catch(e){}};
 function tutSteps(){const L=[
  {id:'goal',title:'Last junk afloat',say:'Steer your junk with current tiles. Stay afloat longer than every rival. Leviathans and the chart\'s edge sink you.',target:tq('#board'),wait:null,
    ready:()=>!!G&&UI.started&&G.phase==='setup'&&sideToAct()===0&&!UI.busy},
- {id:'mark',title:'Pick a start mark',say:'Tap the glowing gold mark at the bottom. Your junk starts there.',target:tutPipRect,
+ {id:'mark',title:'Your start',say:'Tap the glowing gold mark.',target:tutPipRect,
    wait:{type:'tap',match:a=>(a.what==='sq'||a.what==='startmark'&&a.e===TS.myStart.e)&&a.x===TS.myStart.x&&a.y===TS.myStart.y},ready:()=>G.phase==='setup'&&!PH.pop&&sideToAct()===0&&!UI.busy&&!!tutPipRect()},
  {id:'mark2',title:'Set sail here',say:'Tap the glowing button to confirm this mark.',target:tq('#ppop [data-a=startmark][data-e="'+TS.myStart.e+'"]'),
    wait:{type:'tap',match:a=>a.what==='startmark'&&a.x===TS.myStart.x&&a.y===TS.myStart.y&&a.e===TS.myStart.e},ready:()=>PH.pop==='start'&&!!tq('#ppop [data-a=startmark][data-e="'+TS.myStart.e+'"]')()},

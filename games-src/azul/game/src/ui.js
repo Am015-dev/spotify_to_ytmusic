@@ -35,8 +35,8 @@ function slotSel(sl){const p=me();if(!p||G.phase!=='offer')return null;let src,k
   const arr=src<0?G.ctr:G.fac[src];const t=arr&&arr[k];if(t==null)return null;if(t===PRISM)return {src,c:PRISM,j:1};return {src,c:t,j:0}}
 // ---------- render ----------
 function render(){renderModal();if(!G){try{phRender()}catch(e){console.error(e)}return}renderDock();renderPopups();renderMap2D();try{phRender()}catch(e){console.error(e)}
-  const pb=$('#pausebtn');if(pb){pb.hidden=human();const h=IC(UI.pause?'play':'pause');if(pb.dataset.h!==h){pb.innerHTML=h;pb.dataset.h=h}}const sb=$('#speedbtn');if(sb){const h=IC('speed')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';if(sb.dataset.h!==h){sb.innerHTML=h;sb.dataset.h=h}}
-  const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',!!UI.coach);
+  const pb=$('#pausebtn');if(pb){pb.hidden=human();const h=IC(UI.pause?'play':'pause')+'<span>'+(UI.pause?'Resume':'Pause')+'</span>';if(pb.dataset.h!==h){pb.innerHTML=h;pb.dataset.h=h}}const sb=$('#speedbtn');if(sb){const h=IC('speed')+'<span>Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';if(sb.dataset.h!==h){sb.innerHTML=h;sb.dataset.h=h}}
+  const cb=$('#coachbtn');if(cb){cb.classList.toggle('on',!!UI.coach);const h=IC('guide')+'<span>Guide: '+(UI.coach?'on':'off')+'</span>';if(cb.dataset.h!==h){cb.innerHTML=h;cb.dataset.h=h}}
   const ch=$('#chip');if(ch){const s=sideToAct();ch.textContent=G.over?'The king’s judgement':`${innerWidth<700?'Round '+G.round:chapter(G.round)} · ${G.phase==='wall'?'setting the mosaics':s>=0?P(s).nm+' to play':''}`}}
 function scoresHtml(){const s=sideToAct();return `<div class="scores">${G.pl.map(p=>`<span class="sc ${p.i===s?'cur':''}" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''} ★${p.score}${phBonus(p)?` <small title="End bonus earned so far">+${phBonus(p)} bonus</small>`:''}${G.markerIn===p.i?' ☀':''}</span>`).join('')}</div>`}
 function thumbsHtml(){const f=focusSeat();const narrow=V3.on?(V3.L&&V3.L.name==='focus'):innerWidth<700;if(!narrow)return '';
@@ -119,14 +119,20 @@ function renderPopups(){if(GX.open==='logd')$('#logbody').innerHTML=`<ol class="
 UI.setup={np:2,seats:['human','ai','ai','ai'],lv:['normal','normal','normal','normal'],ex:{gray:false,prism:false}};
 function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='start'?startHtml():UI.modal==='story'?storyHtml():UI.modal==='lobby'&&NET.on?lobbyHTML():'';m.hidden=!h;if(m.dataset.h!==h){m.innerHTML=h;m.dataset.h=h}}
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
-  return `<div class="mbox"><h2>Sunglaze</h2><p class="lede">Draft glazed tiles from the kilns, dry them on your racks and set them into the palace mosaic. Tiles score by what they touch; finished rows, columns and glazes pay at the end.</p>
-   ${saved&&!NET.on?`<div class="acts"><button class="btn go" data-ui="continue">Continue the saved game</button></div>`:''}
-   <h3>Glaziers</h3><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div>
-   <div class="seats">${NET.on?'<p class="small muted">Online: players take the seats in the order they joined; the computer plays the rest at the levels set here.</p>':''}${Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b>${NET.on?'':`<button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>`}${o.seats[i]==='ai'||NET.on?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('')}</div>
-   <h3>Variants</h3><div class="exs"><label class="chk"><input type="checkbox" data-ex="gray" ${o.ex.gray?'checked':''}> <b>Unmarked mosaic</b> <small>choose where each tile goes; no glaze twice in a row or column</small></label>
+  const lvAll=o.lv[1]||'normal';
+  const seats=Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b>${NET.on?'':`<button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>`}${o.seats[i]==='ai'||NET.on?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('');
+  return `<div class="mbox start"><h2>Sunglaze</h2><p class="lede">Draft glazed tiles and set them into the palace mosaic.</p>
+   <div class="acts">${NET.on?'<button class="btn go bigb" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'}</div>
+   ${saved&&!NET.on?`<div class="acts"><button class="btn" data-ui="continue">Continue saved game</button></div>`:''}
+   <div class="qrow"><span>Glaziers</span><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div></div>
+   <div class="qrow"><span>Computer</span><div class="seg">${['easy','normal','hard'].map(l=>`<button class="${lvAll===l?'on':''}" data-alv="${l}">${l}</button>`).join('')}</div></div>
+   ${NET.on||typeof campOpen!=='function'||!window.CAMPAIGN?'':'<div class="acts"><button class="btn" data-ui="story-map">★ Story</button></div>'}
+   <details class="more"><summary>More options</summary>
+   <div class="seats">${NET.on?'<p class="small muted">Online: players take the seats in the order they joined; the computer plays the rest at the levels set here.</p>':''}${seats}</div>
+   <div class="exs"><label class="chk"><input type="checkbox" data-ex="gray" ${o.ex.gray?'checked':''}> <b>Unmarked mosaic</b> <small>choose where each tile goes; no glaze twice in a row or column</small></label>
    <label class="chk"><input type="checkbox" data-ex="prism" ${o.ex.prism?'checked':''}> <b>Prism tiles</b> <small>wild tiles (promo): ${o.np===2?5:10} in the game</small></label>
    <label class="chk"><input type="checkbox" data-coach="1" ${UI.coach?'checked':''}> <b>Guided game</b> <small>the panel explains each step</small></label></div>
-   ${onlineBlock()}${NET.on||typeof campLine!=='function'?'':campLine()}<div class="acts">${NET.on?'<button class="btn go" data-a="netopen">Back to the online lobby</button>':(typeof tutBtn==='function'?tutBtn('btn bigb'):'')+'<button class="btn go bigb" data-ui="start">Begin ▶</button>'+(typeof campOpen==='function'&&window.CAMPAIGN?'<button class="btn go bigb story-btn" data-ui="story-map">★ Story</button>':'')}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
+   ${onlineBlock()}${NET.on||typeof campLine!=='function'?'':campLine()}${NET.on||typeof tutBtn!=='function'?'':'<div class="acts">'+tutBtn('btn')+'</div>'}</details></div>`}
 function storyPic(){const tiles=[];for(let i=0;i<14;i++)tiles.push(tileSVG(i%5,40+i*38,152,32));const arch=(x)=>`<path d="M${x} 300V210a55 55 0 0 1 110 0V300Z" fill="#5a3a2a" opacity=".85"/><path d="M${x+8} 300V212a47 47 0 0 1 94 0V300Z" fill="url(#shade)"/>`;
   return `<svg viewBox="0 0 600 330" role="img" aria-label="A palace courtyard at sunrise with tiled arches"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7c77c"/><stop offset="1" stop-color="#fde9c4"/></linearGradient><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3f6e"/><stop offset="1" stop-color="#6e4b3a"/></linearGradient></defs>
   <rect width="600" height="330" fill="url(#sky)"/><circle cx="470" cy="70" r="40" fill="#fff1b8"/><circle cx="470" cy="70" r="28" fill="#ffd66b"/><rect x="0" y="120" width="600" height="190" fill="#e9c99a"/><rect x="0" y="120" width="600" height="14" fill="#c98e5a"/>
@@ -184,12 +190,13 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slo
   if(d.slot){return on3DPick({k:'tile',sl:d.slot})}
   if(d.kiln!=null)return on3DPick({k:'kiln',i:+d.kiln});if(d.ctr!=null)return on3DPick({k:'ctr'});
   if(d.np){UI.setup.np=+d.np;render();return}if(d.seat!=null){const i=+d.seat;UI.setup.seats[i]=UI.setup.seats[i]==='human'?'ai':'human';render();return}
+  if(d.alv){for(let i=0;i<4;i++)UI.setup.lv[i]=d.alv;render();return}
   if(d.lv!=null){const i=+d.lv;const L=['easy','normal','hard'];UI.setup.lv[i]=L[(L.indexOf(UI.setup.lv[i])+1)%3];render();return}
   if(d.ex&&b.type==='checkbox'){UI.setup.ex[d.ex]=b.checked;return}if(d.coach&&b.type==='checkbox'){setCoach(b.checked);return}
   if(d.ui)return uiAct(d.ui);
   if(d.a&&d.a.startsWith('net')&&netClick(d.a))return;
   if(d.a==='new'&&NET.on){if(GX.open)GX.close();UI.modal='lobby';render();return}
-  switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':openStart();return;case 'coach':setCoach(!UI.coach);if(G)render();return;case 'gfx':gfxCycle();return}});
+  switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':openStart();return;case 'coach':setCoach(!UI.coach);if(G)render();if(GX.open==='menud')GX.close();if(typeof PHN!=='undefined'&&PHN.more){PHN.more=false;render()}return;case 'tutorial':if(GX.open)GX.close();if(typeof tutStart==='function')tutStart();return;case 'gfx':gfxCycle();return}});
 function gfxBtn(){const b=$('#gfxbtn');if(!b)return;const h=IC('gfx')+'<span>'+(typeof gfxLabel==='function'?gfxLabel():'Graphics')+'</span>';if(b.dataset.h!==h){b.innerHTML=h;b.dataset.h=h}b.title='Graphics quality: '+(typeof gfxLabel==='function'?gfxLabel():'')+' (Auto picks by device and steps down if frames stutter)'}
 function setCoach(v){UI.coach=!!v;try{localStorage.setItem('sgz_coach',v?'1':'0')}catch(e){}const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach)}
 function uiAct(a){switch(a){case 'start':if(typeof tutOffer==='function'&&tutOffer())return;beginGame();return;case 'story-map':if(typeof storyOpen==='function')storyOpen();else campOpen();return;case 'continue':loadSaved();return;case 'new':if(NET.on){UI.modal='lobby';render();return}openStart();return;case 'story-ok':UI.modal=null;render();schedule();return;

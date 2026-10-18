@@ -83,6 +83,7 @@ async function pxTextures() {
 }
 function svgImgP(svg) { return pxLoadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)); }
 // a card face at w CSS px, drawn straight on a canvas (no SVG decoding, so it is ready at once): paper, frame, the painted emblem, crisp numerals
+const FACEC = [[.10, .92, .03, .92], [.075, .972, .029, .9665], [.055, .945, .01, .935], [.10, .90, .055, .935], [.04, .955, .005, .96]];   // per suit: the card area (x0,x1,y0,y1 as fractions) inside each painting's ragged paper edge
 function pxFace(id, w) {
   const r = Math.min(2, Math.max(1, window.devicePixelRatio || 1)), key = id + '|' + w + '|' + r;   // faces are always drawn at the screen's own sharpness (2x phones), whatever the graphics level
   if (PX.tex['f:' + key]) return PX.tex['f:' + key];
@@ -90,10 +91,14 @@ function pxFace(id, w) {
   const c = document.createElement('canvas'); c.width = Math.round(w * r); c.height = Math.round(H * r); const x = c.getContext('2d'); x.scale(r, r);
   const rad = w * .085, bw = Math.max(1.6, w * .026), INK = '#0b1f3a';
   const rr = (X, Y, W2, H2, R) => { x.beginPath(); if (x.roundRect) x.roundRect(X, Y, W2, H2, R); else x.rect(X, Y, W2, H2); };
-  const g = x.createLinearGradient(0, 0, w, H); g.addColorStop(0, lan ? '#16336b' : '#fffaf0'); g.addColorStop(1, lan ? '#0a1730' : '#e9dfc2');
-  rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.fillStyle = g; x.fill(); x.lineWidth = bw; x.strokeStyle = INK; x.stroke();
-  rr(w * .05, w * .05, w * .9, H - w * .1, rad * .7); x.lineWidth = Math.max(1.2, w * .02); x.strokeStyle = lan ? '#d9b04a' : su.c; x.globalAlpha = .85; x.stroke(); x.globalAlpha = 1;
-  if (lan) { x.fillStyle = '#9fd0ff'; for (let i = 0; i < 9; i++) { x.globalAlpha = .5; x.beginPath(); x.arc(w * (.12 + ((i * 37) % 76) / 100), H * (.1 + ((i * 53) % 80) / 100), w * (.008 + (i % 3) * .004), 0, 7); x.fill(); } x.globalAlpha = 1; }
+  const fi = PX.img['face' + s], dk = lan || (fi && (s === 0 || s === 3));   // painted card frame (media/card-face-*.webp), cropped inside its ragged paper edge; coral and sunstar are dark scenes so their numerals go light
+  if (fi) { const C = FACEC[s], iw = fi.naturalWidth, ih = fi.naturalHeight; x.save(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.clip(); x.drawImage(fi, C[0] * iw, C[2] * ih, (C[1] - C[0]) * iw, (C[3] - C[2]) * ih, 0, 0, w, H); x.restore(); rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.lineWidth = bw; x.strokeStyle = INK; x.stroke(); }
+  else {
+    const g = x.createLinearGradient(0, 0, w, H); g.addColorStop(0, lan ? '#16336b' : '#fffaf0'); g.addColorStop(1, lan ? '#0a1730' : '#e9dfc2');
+    rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.fillStyle = g; x.fill(); x.lineWidth = bw; x.strokeStyle = INK; x.stroke();
+    rr(w * .05, w * .05, w * .9, H - w * .1, rad * .7); x.lineWidth = Math.max(1.2, w * .02); x.strokeStyle = lan ? '#d9b04a' : su.c; x.globalAlpha = .85; x.stroke(); x.globalAlpha = 1;
+    if (lan) { x.fillStyle = '#9fd0ff'; for (let i = 0; i < 9; i++) { x.globalAlpha = .5; x.beginPath(); x.arc(w * (.12 + ((i * 37) % 76) / 100), H * (.1 + ((i * 53) % 80) / 100), w * (.008 + (i % 3) * .004), 0, 7); x.fill(); } x.globalAlpha = 1; }
+  }
   const im = PX.img['emb' + s]; const ew = w * .56;
   // the painting is an opaque square: clip it to a framed rounded square (centre) or a disc (corner pip) so it reads as a picture on the card
   const framed = (X, Y, S, big) => { x.save(); x.beginPath(); if (big) rr(X, Y, S, S, S * .14); else x.arc(X + S / 2, Y + S / 2, S / 2, 0, 7); x.clip(); x.drawImage(im, X, Y, S, S); x.restore();
@@ -101,7 +106,7 @@ function pxFace(id, w) {
   if (im) framed((w - ew) / 2, H * .5 - ew * .5, ew, true);
   const FAM = "Nunito,'Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif";
   const corner = rot => { x.save(); if (rot) { x.translate(w / 2, H / 2); x.rotate(Math.PI); x.translate(-w / 2, -H / 2); }
-    x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = lan ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = lan ? '#ffd873' : su.dk; x.fillText(String(v), w * .15, w * .36);
+    x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = dk ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = dk ? '#ffd873' : su.dk; x.fillText(String(v), w * .15, w * .36);
     if (im) framed(w * .1, w * .41, w * .2, false); x.restore(); };
   corner(false); corner(true);
   const tex = PIXI.Texture.from(c); PX.tex['f:' + key] = tex; return tex;
@@ -130,11 +135,11 @@ function pxResize(force) {
 function pxRect(el, B) { const r = el.getBoundingClientRect(); return { x: r.left - B.left, y: r.top - B.top, w: r.width, h: r.height }; }
 function pxDrawFelt(R) {
   const g = PX.mat; g.clear(); if (!R) return;
-  if (PADIMG) pxPad(R); else {
+  if (PADIMG && R.w <= 760 && R.h <= 520) pxPad(R); else {
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).fill({ color: 0x0d3b6e, alpha: .5 });
   g.roundRect(R.x + 4, R.y + 2, R.w - 8, R.h - 4, 22).stroke({ color: 0x8fcdf5, alpha: .3, width: 2 });
   }
-  if (!PADIMG && PX.padS) PX.padS.visible = false;
+  if (!(PADIMG && R.w <= 760 && R.h <= 520) && PX.padS) PX.padS.visible = false;
   g.roundRect(R.x + 12, R.y + 9, R.w - 24, R.h - 18, 16).stroke({ color: 0xffd873, alpha: .16, width: 1.5 });
   PX.caus.x = R.x + 4; PX.caus.y = R.y + 2; PX.caus.width = Math.max(1, R.w - 8); PX.caus.height = Math.max(1, R.h - 4);
   PX.feltR = R;

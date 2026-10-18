@@ -187,3 +187,9 @@ games-src/.sweepdir/
 # asset inbox: the owner's originals and 3D sources stay local; only the READMEs are tracked
 assets-inbox/*/*
 !assets-inbox/*/README.md
+# owner, 13 Oct 2026: no screenshots in the repo
+games-src/**/playtest/*.png
+games-src/**/sweep-shots/
+games-src/**/shots/
+games-src/lab-shots/
+games-src/next-wave/cutout-tests/

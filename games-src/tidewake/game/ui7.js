@@ -43,6 +43,7 @@ function phTargets(c){const fr=[...new Set(c.pl.map(m=>m.s))];if(fr.length<2)ret
 function phZoomBtn(){const c3=$('#c3');if(!c3||c3.hidden)return '';return `<button class="pb zoom${PH.zoom?' on':''}" data-ph="zoom" aria-pressed="${PH.zoom}" aria-label="Zoom to my ship" title="Zoom to my ship">${PH_ICO.zoom}</button>`}
 function phHint(){if(UI.res&&UI.res.text){const w=String(UI.res.text).split(/\s+/);return esc(w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,;:.]$/,'')+'…')}return ''}
 // ---------- the control strip ----------
+var tipOn=function(){try{return GXH.enabled()&&!GXH.seen('start')}catch(e){return false}};
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
   if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-msg"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
   if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
@@ -53,7 +54,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   if(!dh)return `<div class="ps-main"><div class="ps-msg">${dot(d)} ${phWhose(d)} <small>(computer)</small></div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-hint">${phHint()}</div>`;
   if(G.q)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>Decide</b> in the card</div><div class="ps-ctl">${zb}</div></div>`;
   if(G.phase==='setup'){const best='';
-    return `<div class="ps-main"><div class="ps-msg">${hotSeat()?'<b>'+esc(nm(d))+',</b> choose':dot(d)+' <b>Choose</b>'} your start mark.</div><div class="ps-ctl">${best}${zb}</div></div>`}
+    return `<div class="ps-main"><div class="ps-msg">${tipOn()?dot(d)+' <b>'+esc(nm(d))+'</b>':hotSeat()?'<b>'+esc(nm(d))+',</b> choose your start mark.':dot(d)+' <b>Choose</b> your start mark.'}</div><div class="ps-ctl">${best}${zb}</div></div>`}
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';
   hand.forEach((card,t)=>{const on=can&&sel.t===t;
@@ -164,7 +165,7 @@ function phAfter(){if(!PH.on)return;try{phCards();phPopup();phStrip();phZoom()}c
  const _rc=renderCards;renderCards=function(){_rc.apply(this,arguments);if(PH.on)phCards()};
  const _rco=renderCoach;renderCoach=function(){_rco.apply(this,arguments);if(PH.on)phCards()};
  const _rb=renderBar;renderBar=function(){_rb.apply(this,arguments);if(!PH.on||!G)return;const el=$('#barstat');if(!el)return;
-   if(G.phase==='setup'){el.innerHTML='<span class="chip" aria-label="Choose start marks"><b>Pick a start</b></span>';return}
+   if(G.phase==='setup'){el.innerHTML='<span class="chip" aria-label="Choose start marks"><b>Setup</b></span>';return}
    const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length,es=G.variant==='easysolo',so=G.variant==='solo';
    const T=UI.busy&&UI.curTurnN!=null?UI.curTurnN:G.turn;
    el.innerHTML=`<span class="chip" role="status" aria-label="Turn ${T}${es?' of '+G.opts.goal:''}, ${G.deck.length} tiles left, ${L} monsters on the board${so?', '+toRise+' still to rise':''}"><span class="c2"><b>Turn ${T}${es?'/'+G.opts.goal:''}</b><small>${L} monster${L===1?'':'s'}${so?' (+'+toRise+')':''} &middot; ${G.deck.length} tiles</small></span></span>`};

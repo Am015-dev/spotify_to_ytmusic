@@ -23,7 +23,7 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 .bfdoor .bfdi,.bfdoor .bfkick{animation:bfBreathe 1.6s ease-in-out infinite}
 .bfdoor .bfdi{position:absolute;inset:0;border-radius:12px;overflow:hidden}
 .bfdoor .bfdi img,.bfdoor .bfdi svg{width:100%;height:100%;display:block}
-.bfdoor .bfkick{position:relative;font:900 clamp(26px,9vw,46px)/1 var(--title);color:#ffe9a8;letter-spacing:.04em;text-shadow:0 3px 0 #3a1004,0 0 18px #ff7a1a,0 0 2px #000;rotate:-6deg}
+.bfdoor .bfkick{position:relative;font:900 clamp(26px,9vw,46px)/1 var(--title);color:#ffe9a8;letter-spacing:.04em;text-shadow:0 3px 0 #3a1004,0 0 18px #ff7a1a,0 0 2px #000;rotate:-6deg;z-index:2}
 .bfdoor .bfboot{position:absolute;right:-6%;bottom:8%;font-size:clamp(28px,9vw,46px);animation:bfBoot 1.6s ease-in-out infinite}
 .bfdoor:focus-visible{outline:3px solid #7fd0ff}
 @keyframes bfBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
@@ -48,13 +48,15 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 @keyframes bfDoorR{to{transform:translateX(120%) rotate(30deg);opacity:0}}
 .bfrev .bfwho{position:relative;font:700 16px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;animation:bfIn .2s both}
 .bfrev .bfrc{position:relative;perspective:800px}
-.bfrev .bfrc .card{--w:min(46vw,210px);animation:bfFlip .6s .45s cubic-bezier(.2,1.4,.4,1) both;box-shadow:0 18px 40px rgba(0,0,0,.7)}
+.bfrev .bfrc .card{--w:min(46vw,210px);visibility:hidden;box-shadow:0 18px 40px rgba(0,0,0,.7)}
+.bfrev.open .bfrc .card{visibility:visible;animation:bfFlip .6s cubic-bezier(.2,1.4,.4,1) both;box-shadow:0 18px 40px rgba(0,0,0,.7)}
 .bfrev:not(.mine) .bfrc .card{--w:min(36vw,160px)}
 @keyframes bfFlip{from{transform:rotateY(90deg) scale(.3)}to{transform:none}}
-.bfrev .bfban{position:relative;font:900 clamp(30px,11vw,56px)/1 var(--title);color:#fff2c0;letter-spacing:.03em;text-shadow:0 4px 0 #4a0c02,0 0 24px #ff5a1a;animation:bfSlam .45s .75s cubic-bezier(.2,1.6,.4,1) both}
+.bfrev .bfban{position:relative;font:900 clamp(30px,11vw,56px)/1 var(--title);color:#fff2c0;letter-spacing:.03em;text-shadow:0 4px 0 #4a0c02,0 0 24px #ff5a1a;animation:bfSlam .45s .3s cubic-bezier(.2,1.6,.4,1) both;visibility:hidden}
+.bfrev.open .bfban,.bfrev.open .bfsub{visibility:visible}
 .bfrev.k-curse .bfban{text-shadow:0 4px 0 #2a0450,0 0 24px #b04aff}
 .bfrev.k-other .bfban{font-size:clamp(22px,7vw,34px);text-shadow:0 3px 0 #2a1208}
-.bfrev .bfsub{position:relative;font:600 15px var(--ui,system-ui);color:#f3e2c0;text-shadow:0 1px 0 #000;max-width:86vw;text-align:center;animation:bfIn .3s .9s both}
+.bfrev .bfsub{position:relative;font:600 15px var(--ui,system-ui);color:#f3e2c0;text-shadow:0 1px 0 #000;max-width:86vw;text-align:center;visibility:hidden;animation:bfIn .3s .5s both}
 @keyframes bfSlam{from{transform:scale(2.4);opacity:0}to{transform:none;opacity:1}}
 @keyframes bfIn{from{opacity:0}to{opacity:1}}
 /* flying cards, floating numbers, rival bubbles, the ghost finger */
@@ -71,7 +73,7 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 html.ph-p{--ph-dock:calc(104px + env(safe-area-inset-bottom,0px))}
 html.ph-p:has(#prompt.bfq),html.ph-p:has(#prompt .sellbar){--ph-dock:auto}
 html.ph-p:has(#prompt.bfq) .gx-dock,html.ph-p:has(#prompt .sellbar) .gx-dock{max-height:52dvh!important;overflow:auto}
-html.ph .bfline{display:block;margin:0 0 6px!important;font:700 16px/1.25 var(--title)!important;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:20px}
+html.ph .bfline{display:block;margin:0 0 6px!important;font:700 14px/1.25 var(--title)!important;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:20px}
 html.ph #prompt{display:flex;flex-direction:column}
 html.ph #prompt>.bfline{order:1}html.ph #prompt>.acts.main{order:2}html.ph #prompt>*{order:3}
 html.ph #prompt:not(.bfq) p.say,html.ph #prompt>p:not(.bfline):not(.say),html.ph #prompt .hint,html.ph #prompt .lesson,html.ph #prompt>.tip,html.ph #prompt .since{display:none!important}
@@ -98,7 +100,7 @@ html.ph-l .hand{padding-top:14px}
 .bfbig{position:relative;display:grid;place-items:center;width:clamp(60px,min(52vw,calc(100cqh - 84px)),220px);aspect-ratio:1;border-radius:50%;border:4px solid var(--c);background:radial-gradient(#4a2412,#1a0904);box-shadow:0 0 0 3px #1a0904,0 10px 24px rgba(0,0,0,.6)}
 .bfbig .bfbav{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .bfbig .bfbstr{position:absolute;bottom:-12px;left:50%;translate:-50% 0;font:900 26px/1 var(--title);color:#ffd76a;background:#2a1208;border:2px solid #ffd76a;border-radius:20px;padding:4px 12px;text-shadow:0 2px 0 #000;white-space:nowrap}
-.bfbig .bfblv{position:absolute;top:-6px;right:-6px;font:800 15px/1 var(--title);color:#1a0d06;background:#ffd76a;border-radius:14px;padding:5px 8px}
+.bfbig .bfblv{position:absolute;top:2px;right:2px;font:800 15px/1 var(--title);color:#1a0d06;background:#ffd76a;border-radius:14px;padding:5px 8px}
 .bfbig[data-bfl]::after{top:auto;bottom:22%;translate:-50% 0}
 .bfcap{position:relative;z-index:3;white-space:normal;overflow-wrap:anywhere;padding:0 4px;font:700 15px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;margin-top:16px;text-align:center;max-width:100%}
 .bfdoor.small{cursor:default;height:clamp(60px,calc(100cqh - 90px),240px);max-width:40%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7)) brightness(.85)}
@@ -115,7 +117,7 @@ html.ph-l .hand{padding-top:14px}
   html.ph-p .mine .gear{padding-left:76px;min-height:44px!important}
   html.ph-p .hand{padding-top:12px}
   html.ph-p{--ph-dock:calc(96px + env(safe-area-inset-bottom,0px))}
-  html.ph .bfline{font-size:15px!important;margin-bottom:4px!important}
+  html.ph .bfline{font-size:13.5px!important;margin-bottom:4px!important}
 }
 .bfbub.note{max-width:220px;background:#fff6dc}
 .mine .gear .gchip.eqoff{position:relative;opacity:.8}
@@ -161,3 +163,7 @@ html.bf-clipping .arena .row.mons .mon{visibility:hidden}
 @keyframes bfD3{0%{transform:scale(.9);opacity:0}10%{transform:scale(1);opacity:1}24%{transform:scale(1.04) rotate(-1.6deg)}34%{transform:scale(.98) rotate(1.3deg)}46%{transform:scale(1.01) rotate(-.5deg)}100%{transform:rotateY(-82deg) scale(1.08);opacity:0}}
 .bfrev .bfdust{position:absolute;left:50%;bottom:8%;width:34%;aspect-ratio:1;translate:-50% 0;border-radius:50%;background:radial-gradient(circle,rgba(230,205,165,.8),rgba(190,160,120,.35) 55%,rgba(190,160,120,0) 72%);opacity:0;animation:bfDust .7s .3s ease-out both}
 @keyframes bfDust{0%{opacity:.9;transform:translate(0,0) scale(.3)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.5)}}
+.pile.pr .stack .n{right:0}
+
+/* kick order: board copy of the drawn card hidden until the door has opened */
+html.bf-rev .bfstage .row,html.bf-rev .bfstage .bfcap,html.bf-rev .arena .row.mons{visibility:hidden}

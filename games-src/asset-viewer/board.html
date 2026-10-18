@@ -80,6 +80,7 @@
            z-index: 30; opacity: 0; transition: opacity .2s; pointer-events: none; }
   #toast.on { opacity: 1; }
 </style>
+<script src="review-tips.js"></script>
 </head>
 <body>
 <header>
@@ -120,7 +121,7 @@ async function load() {
   ITEMS = [];
   // next-wave batches (source 'next-wave', stage planned) are optional extras: shown as Planned, left out of the ready % below; the 3D ones are source paintings
   for (const b of d.batches) if (b.root === 'flow-2d' || b.source === 'next-wave')
-    for (const i of b.items) ITEMS.push({ game: b.game, wave: b.wave, ratio: b.ratio, batch: b.kind, src: b.source, ...i });
+    for (const i of b.items) ITEMS.push({ game: b.game, root: b.root, wave: b.wave, ratio: b.ratio, batch: b.kind, src: b.source, ...i });
   for (const c of d.crossed || []) ITEMS.push({ game: c.game, name: c.name, wave: c.wave, stage: 'crossed', prompt: `Replaced by the approved 3D model ${c.twin}.` });
   // 3D models: approved -> on GitHub -> wired; votes are cast on the 3D page (index.html)
   for (const m of d.models || []) ITEMS.push({ game: m.game, name: m.name, kind: '3d', wave: '3D models', stage: m.stage, thumb: m.src, glb: m.glb, kb: m.kb,
@@ -178,6 +179,7 @@ function showRv() {
   $('rvSide').innerHTML = `<div class="meta">${QI + 1} / ${QUEUE.length} · ${esc(nice(i.game))} · ${esc(i.wave || '')} · ${esc(i.ratio || '')}</div>
     <h2>${esc(i.name)}</h2><div class="meta">Stage: <b style="color:var(--${i.stage})">${LABEL[i.stage]}</b>${i.twin ? ` · approved 3D model “${esc(i.twin)}” covers this` : ''}</div>
     <div class="prompt">${esc(i.prompt || '')}</div>
+    ${window.reviewTips ? reviewTips(i) : ''}
     ${i.kind === '3d' ? '' : `<label class="meta" for="note">Note for the redo (added to the prompt)</label><textarea id="note" maxlength="300" placeholder="e.g. less dark, no text, rounder shape">${esc(i.note || '')}</textarea>`}
     <div class="acts">${i.kind === '3d' ? `<a class="btn" href="index.html" style="grid-column:1/-1">Vote on the 3D page</a>` : `<button class="keep" id="rvk">Keep (K)</button><button class="redo" id="rvr">Redo (R)</button>
       ${i.vote ? '<button class="clear" id="rvc">Clear my vote</button>' : ''}`}</div>

@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-13T17:42:30.884Z",
+ "generated": "2026-10-13T19:41:28.781Z",
  "items": [
   {
    "game": "crown-city-smash",
@@ -1748,9 +1748,51 @@
   {
    "game": "cauldron-fair",
    "check": "images",
+   "element": "gx bar plate",
+   "sel": "header.gx-bar",
+   "issue": "Gx bar art ui-topbar.webp is blurry: 1024x88 picture drawn at 3072x264 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 8.86,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/cauldron-fair/f1.webp",
+   "sites": [
+    "phone:start",
+    "phone:board",
+    "phone:mid-game",
+    "small:start",
+    "small:board",
+    "small:mid-game"
+   ]
+  },
+  {
+   "game": "cauldron-fair",
+   "check": "images",
+   "element": "gx drawer head plate",
+   "sel": "div.gx-drawer-head",
+   "issue": "Gx drawer head art ui-drawer-head.webp is blurry: 1024x96 picture drawn at 3072x288 px (3x upscale)",
+   "target_px": [
+    1024,
+    512
+   ],
+   "ratio": 6,
+   "transparent": true,
+   "needs_art": true,
+   "img": "img/cauldron-fair/f3.webp",
+   "sites": [
+    "phone:help",
+    "small:help"
+   ]
+  },
+  {
+   "game": "cauldron-fair",
+   "check": "images",
    "element": "ttl bg picture",
    "sel": "img.ttl-bg",
-   "issue": "Ttl bg art 6d21185c-6c97-4666-87e4-9bd8bdff5685 is blurry: 1440x810 picture drawn at 4069x2289 px (2.8x upscale)",
+   "issue": "Ttl bg art 44ae09e1-e57b-4343-825f-881ef1409346 is blurry: 1440x810 picture drawn at 4069x2289 px (2.8x upscale)",
    "target_px": [
     1024,
     1024
@@ -1758,7 +1800,7 @@
    "ratio": 0.51,
    "transparent": false,
    "needs_art": true,
-   "img": "img/cauldron-fair/f6.webp",
+   "img": "img/cauldron-fair/f5.webp",
    "sites": [
     "phone:start"
    ]
@@ -1768,7 +1810,7 @@
    "check": "images",
    "element": "ttl bg picture",
    "sel": "img.ttl-bg",
-   "issue": "Ttl bg art c9489982-8cc9-425b-b583-478928ea5d17 is blurry: 1440x810 picture drawn at 2949x1659 px (2x upscale)",
+   "issue": "Ttl bg art 850e50a7-3cff-4193-9737-4d6950d28d39 is blurry: 1440x810 picture drawn at 2949x1659 px (2x upscale)",
    "target_px": [
     1024,
     1024
@@ -1791,7 +1833,7 @@
     512,
     512
    ],
-   "ratio": 2.05,
+   "ratio": 1.68,
    "transparent": true,
    "needs_art": true,
    "img": "img/cauldron-fair/f8.webp",

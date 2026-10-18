@@ -35,7 +35,7 @@ function slot(){
   if(!UI.tut&&((UI.camp&&UI.camp.boss&&campOn())||G.pl.some(p=>p.vp>=15)))return['fight',0];
   return['main',0]}
 function boot(){
-  try{GXSK.init({dark:true})}catch(e){}
+  try{GXSK.init({dark:true,sets:{'sk-crown':['icon-crown'],'sk-pink':['ui-button-pink-c'],'sk-yellow':['ui-button-yellow-c'],'sk-ghost':['ui-button-ghost-c'],'sk-hudchip':['ui-hud-chip-c'],'sk-tray':['ui-dice-tray-c'],'sk-tail':['ui-bubble-tail']}})}catch(e){}
   try{GXMUS.init({key:'ccs',slots:SLOTS,slot,on:()=>SND.on&&SND.music,toggle:()=>toggleMusic()})}catch(e){}
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-a="musicpick"]');if(b){e.stopPropagation();GXMUS.open()}},true);
   artVars();setInterval(()=>{try{artVars();skin()}catch(e){}},800)}

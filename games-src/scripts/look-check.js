@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Look check: a deterministic visual reviewer (no AI). Opens every shelf game on phone + PC, never plays a full game,
-// and reports what LOOKS wrong: small/low-contrast/cut-off/overlapping text, bad fonts, unlabeled/covered/tiny buttons,
+// and reports what LOOKS wrong: small/cut-off/overlapping text, bad fonts, covered buttons,
 // broken/stretched/blurry art, blank boards, cards that overlap or spill, sideways scroll, page errors.
+// Contrast, tap-target size and unlabeled buttons are NOT checked here any more: scripts/look.spec.js runs axe-core for them.
 //
 //   NODE_PATH=/opt/node-tools/node_modules node games-src/scripts/look-check.js                 # all games -> games/look/
 //   node games-src/scripts/look-check.js --game doorkick-dungeon [--game thornbound] [--sizes phone,small,pc]
@@ -299,6 +300,42 @@ async function pageCollect(o) {
       pend.push(new Promise(res => { const im = new Image(); im.onload = () => { rec.nw = im.naturalWidth; rec.nh = im.naturalHeight; res(); }; im.onerror = () => { rec.broken = true; res(); }; im.src = abs; setTimeout(res, 2500); }));
     });
   }
+
+  // ---- panels that scroll only because of decorations, and painted plates drawn at the wrong aspect (elements AND ::before/::after)
+  out.panels = []; out.plates = [];
+  for (const e of all) {
+    if (e.tagName === 'HTML' || e.tagName === 'BODY' || !inRoot(e)) continue;
+    const s = cs(e); if (s.display === 'none' || s.visibility === 'hidden') continue;
+    const ox = /auto|scroll/.test(s.overflowX), oy = /auto|scroll/.test(s.overflowY);
+    const hiddenBar = s.scrollbarWidth === 'none' || getComputedStyle(e, '::-webkit-scrollbar').display === 'none';   // swipe-only strips (top bar) show no scrollbar
+    if ((ox || oy) && !hiddenBar) {
+      const r = R(e); if (r[2] >= 60 && r[3] >= 40 && chainOk(e) >= 0.3) {
+        const dx = e.scrollWidth - e.clientWidth, dy = e.scrollHeight - e.clientHeight;
+        if (ox && dx > 1 && dx <= Math.max(28, e.clientWidth * 0.08)) out.panels.push({ sel: sel(e), box: r, axis: 'x', over: dx, cls: cls(e) });
+        if (oy && dy > 1 && dy <= 12) out.panels.push({ sel: sel(e), box: r, axis: 'y', over: dy, cls: cls(e) });
+      }
+    }
+    for (const ps of [null, '::before', '::after']) {
+      const c = ps ? getComputedStyle(e, ps) : s; if (ps && (c.content === 'none' || c.content === 'normal' || c.display === 'none')) continue;
+      const r = R(e); if (r[2] < 10 || r[3] < 10 || e.closest('[hidden],[aria-hidden=true]')) continue;   // opacity ignored: entrance animations are frozen at 0
+      const bw = ps ? num(c.width) + num(c.paddingLeft) + num(c.paddingRight) + (c.boxSizing === 'border-box' ? 0 : num(c.borderLeftWidth) + num(c.borderRightWidth)) : r[2], bh = ps ? num(c.height) + num(c.paddingTop) + num(c.paddingBottom) + (c.boxSizing === 'border-box' ? 0 : num(c.borderTopWidth) + num(c.borderBottomWidth)) : r[3];
+      if (!(bw >= 10 && bh >= 10)) continue;
+      const base = { sel: sel(e) + (ps || ''), box: r };
+      const bi = c.borderImageSource; 
+      if (bi && bi !== 'none' && /url\(/.test(bi) && !/svg|gradient/.test(bi) && /stretch/.test(c.borderImageRepeat)) {
+        const u = (bi.match(/url\((["']?)(.*?)\1\)/) || [])[2]; let abs; try { abs = new URL(u, document.baseURI).href; } catch { abs = null; }
+        if (abs) { const rec = { ...base, kind: 'border-image', src: abs.slice(0, 120), bw, bh, slice: c.borderImageSlice, width: c.borderImageWidth, bwid: [num(c.borderTopWidth), num(c.borderRightWidth), num(c.borderBottomWidth), num(c.borderLeftWidth)] }; out.plates.push(rec);
+          pend.push(new Promise(res => { const im = new Image(); im.onload = () => { rec.nw = im.naturalWidth; rec.nh = im.naturalHeight; res(); }; im.onerror = () => res(); im.src = abs; setTimeout(res, 2500); })); }
+      }
+      if (c.backgroundImage !== 'none' && /url\(/.test(c.backgroundImage) && (ps || true)) {
+        const urls = [...c.backgroundImage.matchAll(/url\((["']?)(.*?)\1\)/g)].map(m => m[2]), sizes = c.backgroundSize.split(/,(?![^(]*\))/);
+        urls.forEach((u, k) => { const bs = (sizes[k] || sizes[0]).trim(); if (!/^100%\s+100%$/.test(bs) && bs !== '100% 100%') return; if (/svg|gradient/.test(u)) return;
+          let abs; try { abs = new URL(u, document.baseURI).href; } catch { return; }
+          const rec = { ...base, kind: 'bg', src: abs.slice(0, 120), bw: bw - (ps ? 0 : num(c.borderLeftWidth) + num(c.borderRightWidth)), bh: bh - (ps ? 0 : num(c.borderTopWidth) + num(c.borderBottomWidth)) }; out.plates.push(rec);
+          pend.push(new Promise(res => { const im = new Image(); im.onload = () => { rec.nw = im.naturalWidth; rec.nh = im.naturalHeight; res(); }; im.onerror = () => res(); im.src = abs; setTimeout(res, 2500); })); });
+      }
+    }
+  }
   await Promise.all(pend);
 
   // ---- boards, cards, tokens
@@ -432,7 +469,8 @@ const gridPx = (w, h, dpr) => { const up = v => v <= 512 ? 512 : 1024; return [u
 
 function judge(raw, ctx) {
   const { size, screen, contrastOf } = ctx; const phone = size.mobile; const F = [];
-  const add = (f) => F.push({ size: size.id, screen, ...f });
+  const SKIP = (opt('skip', '') || '').split(',').filter(Boolean);   // --skip size,overflow,...: checks already done by the scenario invariants / menu scenario (build-all.py --deploy)
+  const add = (f) => { if (!SKIP.includes(f.check)) F.push({ size: size.id, screen, ...f }); };
   for (const t of raw.texts) t.ok = !t.skip && (t.selfHit >= 0.4 || (t.__glyph || 0) >= 20);
   // 1 text size
   for (const t of raw.texts) {
@@ -441,16 +479,6 @@ function judge(raw, ctx) {
     if (px < min - 0.01 && th < min * 1.9) {
       add({ check: 'size', sev: px < 9 ? 'severe' : 'warn', sel: t.sel, text: t.text, box: t.box, key: `size|${t.sel}|${px < 9 ? 'xs' : 's'}`, num: Math.round(px * 10) / 10,
         desc: `${cap(nice(t.sel))} text "${t.text.slice(0, 24)}" is ${Math.round(px * 10) / 10} px on ${phone ? 'phone' : 'PC'}` });
-    }
-  }
-  // 2 contrast (+ button label invisible)
-  for (const t of raw.texts) {
-    if (!t.ok || !t.letters || t.dis || t.__ratio == null || t.clipText || t.help) continue;
-    const r = t.__ratio;
-    if (r < 3) {
-      const inBtn = !!t.btn;
-      if (r < 1.3 && inBtn) add({ check: 'button', sev: 'severe', sel: t.sel, text: t.text, box: t.box, key: `labelinvis|${t.sel}`, num: r, desc: `Button label "${t.text.slice(0, 24)}" is invisible: same colour as its background (contrast ${r}:1)` });
-      else add({ check: 'contrast', sev: r < 2 ? 'severe' : 'warn', sel: t.sel, text: t.text, box: t.box, key: `contrast|${t.sel}`, num: r, desc: `${cap(nice(t.sel))} text "${t.text.slice(0, 24)}" is hard to read: contrast ${r}:1` });
     }
   }
   // 3 cut off
@@ -472,9 +500,6 @@ function judge(raw, ctx) {
     if (b.disabled) continue;
     const w = b.box[2], h = b.box[3];
     const label = nice(b.sel);
-    if (phone && !b.inline && !b.isObj && (w < 40 || h < 40) && !b.scrollAnc && (b.text || b.aria || b.hasVisual || b.painted)) add({ check: 'button', sev: Math.min(w, h) < 24 ? 'severe' : 'warn', sel: b.sel, text: b.text || b.aria, box: b.box, key: `tap|${b.sel}`, num: `${Math.round(w)}x${Math.round(h)}`, desc: `${cap(label)} button${b.text ? ' "' + b.text.slice(0, 20) + '"' : ''} is only ${Math.round(w)}x${Math.round(h)} px to tap` });
-    if (!b.hasText && !b.hasVisual && (b.aria || b.textInvisible) && (b.painted || b.bgImg) && w >= 20 && h >= 20 && !b.isObj) add({ check: 'button', sev: 'severe', sel: b.sel, text: b.aria || b.text, box: b.box, key: `nolabel|${b.sel}`, desc: `${cap(b.aria ? b.aria.slice(0, 24) : label)} button has no visible label${b.textInvisible ? ' (' + b.textInvisible + ')' : ''}` });
-    else if (!b.hasText && b.textInvisible && b.hasVisual && /font-size 0|transparent|opacity|clipped/.test(b.textInvisible) === false) { /* fine */ }
     if (b.cover >= 0.6 && !b.coverModal && !b.coverBig) add({ check: 'button', sev: b.cover >= 0.99 ? 'severe' : 'warn', sel: b.sel, text: b.text || b.aria, box: b.box, key: `cover|${b.sel}|${b.coverBy}`, desc: `${cap(label)} button${b.text ? ' "' + b.text.slice(0, 20) + '"' : ''} is covered by ${nice(b.coverBy) || 'another element'}` });
   }
   // 7 images
@@ -505,6 +530,27 @@ function judge(raw, ctx) {
     else if (cutFrac > 0.35 && !big) add({ check: 'images', sev: 'warn', sel: im.sel, text: nm, box: im.box, key: `crop|${im.sel}|${nm}`, desc: `${cap(nice(im.sel))} art ${nm} is cropped hard (${Math.round(cutFrac * 100)}% cut off)`, ...art({ element: e }) });
     const up = Math.max(dw * dpr / im.nw, dh * dpr / im.nh);
     if (up > 1.6 && Math.min(dw, dh) >= 24) add({ check: 'images', sev: up > 3 ? 'warn' : 'warn', sel: im.sel, text: nm, box: im.box, key: `blur|${im.sel}|${nm}`, num: Math.round(up * 10) / 10, desc: `${cap(nice(im.sel))} art ${nm} is blurry: ${im.nw}x${im.nh} picture drawn at ${Math.round(dw * dpr)}x${Math.round(dh * dpr)} px (${Math.round(up * 10) / 10}x upscale)`, ...art({ element: e }) });
+  }
+
+  // 6b panels that scroll for decorations only + plates at the wrong aspect
+  for (const pn of raw.panels || []) add({ check: 'panels', sev: pn.axis === 'x' ? 'severe' : 'warn', sel: pn.sel, text: '', box: pn.box, key: `pscroll|${pn.axis}|${pn.sel}`, num: Math.round(pn.over), desc: `${cap(nice(pn.sel))} shows a ${pn.axis === 'x' ? 'sideways' : 'vertical'} scrollbar for only ${Math.round(pn.over)} px of overflow (decorations poking out)` });
+  const seenPl = new Set();
+  for (const pl of raw.plates || []) {
+    if (!pl.nw || !pl.nh || pl.bw * pl.bh > 0.4 * raw.W * raw.H) continue;
+    let d = 0, how = '';
+    if (pl.kind === 'bg') { const r = Math.max(pl.bw / pl.bh, pl.nw / pl.nh) / Math.min(pl.bw / pl.bh, pl.nw / pl.nh); d = r - 1; how = `box ${Math.round(pl.bw)}x${Math.round(pl.bh)} vs picture ${pl.nw}x${pl.nh}, stretched to fit`; }
+    else {
+      const px = (tok, full) => /%$/.test(tok) ? parseFloat(tok) / 100 * full : parseFloat(tok), exp = (a) => a.length === 1 ? [a[0], a[0], a[0], a[0]] : a.length === 2 ? [a[0], a[1], a[0], a[1]] : a.length === 3 ? [a[0], a[1], a[2], a[1]] : a;
+      const st = exp(pl.slice.replace('fill', '').trim().split(/\s+/)), sl = [px(st[0], pl.nh), px(st[1], pl.nw), px(st[2], pl.nh), px(st[3], pl.nw)];   // top right bottom left (image px)
+      const wd = exp(pl.width.trim().split(/\s+/)).map((t, i) => /px$|%$/.test(t) ? (/%$/.test(t) ? px(t, i % 2 ? pl.bw : pl.bh) : parseFloat(t)) : parseFloat(t) * pl.bwid[i]);   // top right bottom left (css px)
+      if (sl.some(isNaN) || wd.some(isNaN)) continue;
+      const cx = sl[3] > 0 && wd[3] > 0 ? wd[3] / sl[3] : sl[1] > 0 && wd[1] > 0 ? wd[1] / sl[1] : null, cy = sl[0] > 0 && wd[0] > 0 ? wd[0] / sl[0] : sl[2] > 0 && wd[2] > 0 ? wd[2] / sl[2] : null;
+      const mx = (pl.bw - wd[1] - wd[3]) / Math.max(1, pl.nw - sl[1] - sl[3]), my = (pl.bh - wd[0] - wd[2]) / Math.max(1, pl.nh - sl[0] - sl[2]);
+      const sx = cx == null ? mx : cx, sy = cy == null ? my : cy; if (!(sx > 0 && sy > 0)) continue;
+      d = Math.max(sx, sy) / Math.min(sx, sy) - 1; how = `corners scaled ${sx.toFixed(2)} across vs ${sy.toFixed(2)} down on a ${pl.nw}x${pl.nh} picture`;
+    }
+    if (d <= 0.25) continue; const k = `${pl.kind}|${pl.sel}|${pl.src.split('/').pop()}`; if (seenPl.has(k)) continue; seenPl.add(k);
+    add({ check: 'plates', sev: d > 0.4 ? 'severe' : 'warn', sel: pl.sel, text: pl.src.split('/').pop().slice(0, 40), box: pl.box, key: `plate|${pl.sel}|${pl.src.split('/').pop()}`, num: Math.round(d * 100), needs_art: true, element: nice(pl.sel) + ' plate', target_px: [Math.round(pl.bw * 3), Math.round(pl.bh * 3)], ratio: Math.round(pl.bw / pl.bh * 100) / 100, transparent: true, desc: `${cap(nice(pl.sel))} plate ${pl.src.split('/').pop().slice(0, 30)} is distorted by ${Math.round(d * 100)}% (${how})` });
   }
   // 8 boards/cards/tokens
   for (const o of raw.objs) {
@@ -627,6 +673,11 @@ async function checkGame(browser, helper, port, slug, deadline) {
         if (zoomed) await screen('card-zoom', false, true);
         await p.mouse.up();
       }
+      // story scene of the campaign shell (shared ?scn=story-scene scenario; games without a campaign have none)
+      await p.goto(`http://127.0.0.1:${port}/${slug}/index.html?scn=story-scene`, { waitUntil: 'load', timeout: 30000 }).catch(() => {});
+      const scn = await p.waitForFunction(() => window.GXSCN && window.GXSCN.ready ? (window.GXSCN.error ? 'err' : 'ok') : false, null, { timeout: 12000 }).then(h => h.jsonValue()).catch(() => 'none');
+      if (scn === 'ok' && await p.evaluate(() => !!document.querySelector('.gxc-scene'))) { await sleep(1200); await screen('story-scene', false, true); }
+      else screens.push({ id: null, size: size.id, screen: 'story-scene (no campaign)' });
     } catch (e) { findings.push({ size: size.id, screen: 'all', check: 'page', sev: 'warn', sel: 'look-check', text: '', box: [0, 0, 1, 1], key: 'drv|' + String(e.message).slice(0, 40), desc: 'Look check could not drive this screen: ' + String(e.message).slice(0, 80) }); }
     await ctx.close();
     if (flag('no-shots') === false) { /* shots kept in helper until crops are made */ }
@@ -648,7 +699,6 @@ function merge(findings) {
     if (prefer(f, g._best)) g._best = f;
     if (f.needs_art && f.target_px) { const [aw, ah] = f.target_px, [bw, bh] = g.target_px || [0, 0]; if (aw * ah > bw * bh) g.target_px = f.target_px; }
   }
-  for (const g of m.values()) if ((g.check === 'contrast' || /^labelinvis/.test(g.key)) && g.sev === 'severe' && g.sites.length < 2) g.sev = 'warn';  // one-off contrast hits are usually animation noise
   return [...m.values()].map(g => { const b = g._best; const o = { check: g.check, sev: g.sev, sel: b.sel, text: b.text, desc: b.desc, box: b.box.map(v => Math.round(v * 10) / 10), size: b.size, screen: b.screen, shot: b.shot, count: g.count, sites: g.sites, num: b.num };
     if (g.needs_art) Object.assign(o, { needs_art: true, element: g.element, target_px: g.target_px, ratio: g.ratio, transparent: g.transparent }); return o; })
     .sort((a, b) => SEV[b.sev] - SEV[a.sev] || b.count - a.count);

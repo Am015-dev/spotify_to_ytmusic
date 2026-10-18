@@ -3,8 +3,20 @@
 
 /* ===== 1. TEST CHECKLIST (same pattern as the other game: PASS / FAIL + note per item, saved on the device, COPY RESULTS) =====
    Add the items of every new version at the top; NR_VER is the newest version. Results live in localStorage 'mnr_chk'. */
-const NR_VER='L1';
+const NR_VER='L2';
 const NR_CHECKLIST=[
+ {ver:'L4',id:'district-songs',text:'Every district now has several songs, so the same song never plays on two stages in a row, and every boss has its own theme (the first boss too). Do the stages feel less repetitive?'},
+ {ver:'L3',id:'music-reacts',text:'The music now follows your combo: it starts muffled and opens up as your tier rises, drums join at tier 3, a hit muffles the song for a beat, and soft chimes land on the beat for tier-ups, PERFECT hits, bosses and stage clears. Does it feel good, and is anything too loud? (Settings > Audio > Music reacts turns the filter and drums off.)'},
+ {ver:'L3',id:'heat-ladder',text:'After you clear the story, every cleared stage gets a HEAT ladder: tap + on the stage card for Heat 1-10. Each Heat adds one mutator (Turbo, Elite Guard, Hailstorm, Fast Decay, No Heal, -1 Hull ...), pays +20% Neon and a medal the first time. Does each step feel a little harder, never unfair?'},
+ {ver:'L3',id:'daily-streak',text:'Title screen: a daily streak and a weekly challenge. Fly the DAILY RUN once a day to earn Neon (60 on day 1, up to 120 on day 7+); miss one day and the streak holds, miss two and it starts again. WEEKLY RUN: the same two mutators for everyone all week; beat the first boss once a week for 300 Neon. Is the status line clear?'},
+ {ver:'L3',id:'clear-pay',text:'Clearing a stage now pays Neon: 40 plus 12 per stage number the first time, 25 more for each new star, and a tenth of that on later clears. Everything in the garage costs far less (weapons, perks), and kills pay a bit more, so a full build is a matter of hours, not weeks. Fail a stage twice and the next try gets +1 hull; fail four times and it is a little easier too. Do the prices feel fair?'},
+ {ver:'L3',id:'ship-mounts',text:'Your ship now shows the weapons you equip: a coloured circle on slot 1, a triangle on slot 2, a split ring when they fuse, and a flash from the mounts when you fire. See it in WEAPONS and the Garage. Painted mounts come later. Does it read at a glance?'},
+ {ver:'L2',id:'weapon-levels',text:'Weapons grow with your Neon: Garage > WEAPONS has 16 weapons (8 new: Frost Beam, Flame Arc, Plasma Wave, Shrapnel Shell, Echo Drone, Gravity Well, Rail Sniper, Storm Cell). Buy one with Neon, then buy its levels 1 to 10 (a level bar, the power it gives and the next new ability are on every card). In a run the pit-stop pickups add up to 2 more levels on top. Does a higher level feel stronger, and are the prices fair?'},
+ {ver:'L2',id:'fight-back',text:'Enemies now fly in and fight back: they cannot be hit until they are fully on screen (a red ring at the edge shows where they come in), every enemy lives at least about a second on screen even against a maxed build, and chargers glide in before they dash. Do waves feel like a fight now, on Easy too?'},
+ {ver:'L2',id:'no-idle',text:'Standing still is no longer safe: parking in one spot (or nudging a few pixels) now brings the red static discharge that no shield, heal or revive can outlast, plus aimed shots from the edge of the screen. Keep moving and nothing changes. Does it feel fair?'},
+ {ver:'L1',id:'weapons-fusions',text:'Eight weapons now (new: Arc Chain, Orbit Blades, Ricochet Disc, Mine Layer). Put two DIFFERENT weapons in the two slots on the WEAPONS sheet and they fuse: a named fusion with its own effect and +12% damage. The fusion pictures are shapes until the art arrives. Do the new weapons feel different, and is a fusion worth choosing?'},
+ {ver:'L1',id:'phone-hud',text:'On a phone the run shows the city: one slim strip on top (score, combo, hull, heat), small chips for shield, revive and power-ups under it, dash and EMP charge on their buttons. Nothing sits over the middle of the screen. Test link: ?scn=nr-hud-busy.'},
+ {ver:'L1',id:'flight-school',text:'New FLIGHT SCHOOL (title > FLIGHT SCHOOL, or Settings > REPLAY TUTORIAL; new players are offered it once): about 3 minutes of tiny challenges: rings, gold on-beat shots, a slow fan, the on-beat dash, pickups and tier, EMP and heat, your two weapons and their fusion, a leader. SKIP is always top right, you can never lose, and the first clear gives +60 Neon for the Garage.'},
  {ver:'L1',id:'story-map',text:'STORY opens a painted route map: 40 stages in five districts (8 each), mini-bosses and bosses are bigger medallions, your next stage glows, locked stages show a padlock. Tap a stage: a plate shows goal, the three stars, your best and PLAY. Scroll along the road (up on a phone, sideways on a wide screen).'},
  {ver:'L1',id:'challenges',text:'Each district has an optional challenge stage that opens after its mini-boss: a side branch on the map. NO-HIT ends on the first hull hit, SPEED needs the kills before the clock, PERFECT needs a PERFECT count. Each pays up to 3 stars.'},
  {ver:'L1',id:'curve',text:'Difficulty rises a little every stage with no sudden spike: stage 1 to 4 feel gentle, a boss is slightly above the stages around it.'},
@@ -22,11 +34,13 @@ const NR_CHECKLIST=[
  {ver:'J2',id:'ui-menus',text:'Menu, pause, garage, shop and story buttons are painted plates (angular on title and pause, round pills in garage, shop, story and settings); the settings card has a painted frame, header and rows. Every label is readable and every button still reacts to a tap.'},
  {ver:'J2',id:'ui-hud',text:'In a run the score and the hull/heat/dash/EMP bars sit in painted housings and the hint line in a speech bubble; all numbers stay easy to read. On a phone the pause, DASH and EMP buttons are the painted round buttons and still work.'},
  {ver:'J2',id:'ui-story-map',text:'On the story map every stage number sits on a medallion: open, done (laurel), boss (crown) or locked (padlock); garage and shop item icons sit in round chrome buttons.'},
+ {ver:'J2',id:'arcade-cut',text:'New: ARCADE stages. Tap a stage on the map and pick ARCADE (about 3 minutes, boss at the end) or CLASSIC (the full song). Same stars, goals scaled to the length. Is a short stage a better fit for a quick session?'},
  {ver:'J1',id:'music-clean',text:'The music NEVER distorts or changes pitch: grab TEMPO UP (the song stays the same speed, you shoot double-time and score x2), grab SLOW GROOVE (enemies and bullets slow to bullet time, the song only gets a soft muffle), drop to 1 hull, and die. The song is clean every time, no chipmunk, no crackle.'},
  {ver:'J1',id:'no-crops',text:'No picture looks cropped: boss intro portraits and the ship cards in the garage and shop sit in round neon badges, pickups, perks, medals and badges have no square backgrounds, and the phone view has painted rooftops scrolling at the sides.'},
  {ver:'J1',id:'all-painted',text:'Every screen is painted: both mini-bosses (Tresor-Wart, Messe-Waechter) have their own art, the shield link between a leader and its drones is a painted beam. Only the 13 base perk icons are still line icons (they are on the missing-assets page).'},
  {ver:'J1',id:'set-pieces',text:'In one minute of play something new happens every 8 to 10 seconds: a WEAVE of drones crossing on the beat, a LASER FENCE across the screen (find the green gap, it fires on the bar line), a mini-boss about every 50 s. Clear a set piece and a shower of shards sweeps across the screen.'},
  {ver:'J1',id:'drop-moment',text:'Every 16 bars: DROP counts down 4-3-2-1 at the top, and a DASH on the downbeat blows the screen clear (all bullets, score burst, tier up, shard shower). Miss it and only the bullets near you vanish. Does it feel big?'},
+ {ver:'J1',id:'boss-ground',text:'Bosses on wheels and legs now stay on the road with a proper shadow instead of hopping. In portrait mode, where there is no road, they are swapped for a flying boss of the same tier. Do the bosses look grounded now?'},
  {ver:'I9',id:'painted-icons',text:'All the grey placeholder boxes are gone: painted kit perk icons (Garage TUNE and LOAD), painted SOON cards (no PLACEHOLDER tag), difficulty badges, stage medals, squad leader with painted crown, glowing homing orbs and the Drift, Lancer and Nova ships. Anything still a plain shape?'},
  {ver:'I9',id:'painted-chest',text:'Boss chest: painted closed chest and card backs, painted card faces, and the chest opens when you pick a card.'},
  {ver:'I9',id:'painted-surfaces',text:'Garage / pit stop screens and the pause + settings screens now sit on painted backgrounds (dark wash on top). Is every card and button still easy to read, on the phone upright and sideways?'},
@@ -35,7 +49,16 @@ const NR_CHECKLIST=[
  {ver:'I7',id:'bullet-kinds',text:'Enemy fire now varies: thin fast NEEDLES from drones, round ORBS, big slow orange SHELLS that take 2 hull, and ROCKETS that home for a moment and burst into 5 pellets when you shoot them twice.'},
  {ver:'I7',id:'perk-pressure',text:'The more perks and upgrades you own, the tougher the enemies (up to 3x hull). A maxed ship should still have to fight.'},
  {ver:'I6',id:'chest',text:'After every district boss a BOSS CHEST opens: three face-down cards, tap one to flip it and get +1 hull, a shield, EMP, Neon, a revive or a random upgrade. Then the pit stop. LAB can switch it off.'},
+ {ver:'L4',id:'assist-mode',text:'Settings > Assist: slow the world to 85% or 70% (the music keeps its beat), slow enemy bullets, start with +2 hull, widen the beat window by up to 120 ms, and draw bigger bullets. A run that uses speed, bullets, hull or window help is marked ⓐ, still pays Neon and clears stages, but sets no best, daily, weekly or Heat record. Is Assist clear and fair?'},
+ {ver:'I9',id:'polish-flow',text:'Screens now fade in, the game-over and stage-clear screens count the score up (tap to skip) and show a Neon chip top-right, and every 16 bars a grade letter (C, B, A or S) pops from your PERFECTs and hits. Does it feel smooth, and do the letters ever get in the way?'},
+ {ver:'I8',id:'one-more-run',text:'The game-over and stage-clear screens now show a bar to the cheapest thing you can still unlock, and a big ONE MORE RUN button that restarts at once. Does the bar make you want one more go?'},
+ {ver:'R5',id:'no-walls',text:'Kill-goal stages (Roemer, Freight Yard, Loading Dock, Boardroom, Olive Road) ask for fewer kills in Arcade, and Talos fires fewer lasers. Is there still a stage where you get stuck?'},
+ {ver:NR_VER,id:'install-offline',text:'Nightrun can now be installed like an app (MENU > INSTALL APP, or Add to Home Screen on iPhone) and keeps working with no signal: the game, the art and every song you have already heard are saved on your device. MENU shows Offline ready. Does it start fast with the network off?'},
+ {ver:'L2',id:'save-backup',text:'Settings > Save: EXPORT your whole progress as a file or a code, and IMPORT it on another device or after a wipe. Importing asks first and keeps your old save for one UNDO. Try it: export, then import it back. Does it feel safe?'},
+ {ver:'J1',id:'juice',text:'Big moments now land harder: a blink-short hit-stop on boss phase changes, boss kills, gunship kills and PERFECT dashes, plus a white ring on a PERFECT dash. It is off with Reduced motion or Flashing off. Does it feel punchy, not laggy?'},
+ {ver:'N1',id:'fever',text:'FEVER: graze bullets and hit PERFECT beats to fill the thin bar at the top. When it is full, the next bar starts 8 bars of FEVER: score x1.5, the music opens fully and the edges glow gold. Does it feel like a reward?'},
  {ver:'I6',id:'new-ships',text:'Three new ships in Garage > SHIPS: Drift (a wide fan), Lancer (a piercing lance every second shot) and Nova (a ring burst every third shot). They show as shapes until the art arrives. Do they feel different and worth the price?'},
+ {ver:NR_VER,id:'title-diet',text:'The title has only PLAY or CONTINUE (your next stage, in one tap), ENDLESS, DAILY, GARAGE and MENU. Story map, weekly run, weapons, lab, checklist, Flight School, settings and difficulty are in MENU. Is everything easy to find and big enough to hit?'},
  {ver:'I6',id:'badges',text:'The difficulty button on the title and the LAB show a badge per difficulty, and the stage clear screen shows a medal. Garage ship cards now show the painted ship portraits.'},
  {ver:'I6',id:'leader-look',text:'Squad leaders have a gold sheen on top of the crown and the rings so you can spot them at a glance.'},
  {ver:'I5',id:'placeholders',text:'Placeholder art is in: kit perk icons (Garage TUNE and LOAD), the SOON cards and the medal on the stage clear screen show a hatched PLACEHOLDER box with the file name. games-src/nightrun/ASSETS-NEEDED.md lists every file, its size and where it goes.'},
@@ -172,35 +195,126 @@ const WPD={
   pulse:{n:'PULSE SPREAD',s:'PULSE',c:'#ff8ad8',tx:'Wide spread. Best against crowds.'},
   laser:{n:'LASER LANCE',s:'LANCE',c:'#7dffd8',tx:'One beam pierces every enemy in line.'},
   swarm:{n:'HOMING SWARM',s:'SWARM',c:'#ffb020',tx:'Missiles hunt the nearest enemy.'},
-  beat:{n:'BEAT CANNON',s:'CANNON',c:'#ffe14d',tx:'A heavy shell on every beat.'}};
-const WP_IDS=Object.keys(WPD),WP_NEED=[2,3,4,5];                // pickups to go from LV1 to LV2, LV2 to LV3, ...
-const WP={eq:['pulse',null],lv:{},xp:{},vc:0,open:false,mode:'pit',seen:!!load('mnr_wpseen',false),
-  lvOf(id){return this.lv[id]||1;},
+  beat:{n:'BEAT CANNON',s:'CANNON',c:'#ffe14d',tx:'A heavy shell on every beat.'},
+  arc:{n:'ARC CHAIN',s:'ARC',c:'#8fe9ff',tx:'Lightning leaps from foe to foe.'},
+  orbit:{n:'ORBIT BLADES',s:'BLADES',c:'#b6ff5a',tx:'Blades spin round you and slice.'},
+  disc:{n:'RICOCHET DISC',s:'DISC',c:'#ff7a45',tx:'A razor disc bounces off the walls.'},
+  mine:{n:'MINE LAYER',s:'MINES',c:'#c08aff',tx:'Mines you drop blast what they touch.'}};
+/* FUSIONS: two different weapons in the two slots fuse. Every weapon has two tags; the first rule below that fits the pair gives the effect
+   (9 effects for all 28 pairs, plus +12% damage). A rule is [tag of the owner weapon, tag of the partner (null = any), effect]. */
+const WTAG={pulse:['spread','rapid'],laser:['pierce','beam'],swarm:['homing','volley'],beat:['burst','heavy'],arc:['chain','shock'],orbit:['orbit','melee'],disc:['bounce','disc'],mine:['mine','blast']};
+const FU_RULES=[['homing','burst','bomblets'],['bounce','pierce','rebound'],['pierce','spread','split'],['orbit',null,'orbitfire'],['chain',null,'zap'],['mine',null,'shrapnel'],['homing',null,'seek'],['burst',null,'echo'],['bounce',null,'bounce']];
+const FU_TX={split:'Shots pierce, then split once',bomblets:'Each shell frees 3 homing bomblets',rebound:'Piercing shots that bounce back',orbitfire:'Blades also fire as they spin',zap:'Partner hits leap on as lightning',shrapnel:'Mine blasts spit sharp shards',seek:'Partner shots home in on foes',echo:'Each shell adds a partner volley',bounce:'Partner shots bounce once'};
+const FU_NAMES={'arc-beat':'Thunder Drum','arc-disc':'Storm Quoit','arc-laser':'Volt Spear','arc-mine':'Static Field','arc-orbit':'Halo Spark','arc-pulse':'Fork Flash','arc-swarm':'Chain Hornets','beat-disc':'Bass Ricochet','beat-laser':'Kick Lance','beat-mine':'Subwoofer Trap','beat-orbit':'Metronome Ring','beat-pulse':'Drop Fan','beat-swarm':'Bomblet Choir','disc-laser':'Mirror Lance','disc-mine':'Pinball Grave','disc-orbit':'Saw Carousel','disc-pulse':'Rain Bounce','disc-swarm':'Boomerang Bees','laser-mine':'Tripwire Beam','laser-orbit':'Lantern Spin','laser-pulse':'Needle Storm','laser-swarm':'Hunter Needles','mine-orbit':'Satellite Mines','mine-pulse':'Seed Spray','mine-swarm':'Hive Mines','orbit-pulse':'Comet Crown','orbit-swarm':'Wasp Halo','pulse-swarm':'Pollen Burst'};
+const FUSE_ON=true;                                        // switch for the whole fusion feature
+const FU_K=1.12;                                           // fusion damage bonus
+const pbCap=()=>touchUI||rotMode?44:64;                    // most player bullets alive at once; weapon and fusion shots that do not fit are skipped
+const pbRoom=n=>G.pb.length+(n||1)<=pbCap();
+const WP_IDS=Object.keys(WPD),WP_NEED=[2,3];                    // in-run pit-stop pickups: LV1 to LV2, LV2 to LV3 (each in-run level adds one effective level, at most +2; wpx.js)
+const WP_ALL=/[?&]all=1/.test(location.search);                       // test link: every weapon counts as owned
+const WPX={fire:{},demo:{}};                                      // the eight newer weapons (wpx.js) plug into the fire / demo code here
+const WP_MAX=10,WP_RUN_MAX=3;                                    // permanent levels 1..10 (bought in the garage); effective level = permanent + in-run bonus, at most 10
+const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[],fuT:0,lmy:-999,mode:'pit',seen:!!load('mnr_wpseen',false),
+  permOf(id){return Math.max(1,this.pl[id]|0);},          // permanent (garage) level; a weapon that is not owned counts as 1 (test hooks may equip it)
+  has(id){return (this.pl[id]|0)>0||WP_ALL;},
+  runOf(id){return this.lv[id]||1;},                       // in-run pit-stop level 1..3
+  lvOf(id){return Math.min(WP_MAX,this.permOf(id)+Math.min(WP_RUN_MAX-1,this.runOf(id)-1));},   // effective level that drives damage, rate, size and count
   eqIds(){return this.eq.filter(Boolean);},
-  canGain(){return this.eqIds().some(id=>this.lvOf(id)<5);},
+  canGain(){return this.eqIds().some(id=>this.runOf(id)<WP_RUN_MAX&&this.lvOf(id)<WP_MAX);},
   maxLv(){let m=1;for(const id of this.eqIds())m=Math.max(m,this.lvOf(id));return m;},
-  sync(){if(typeof P!=='undefined'&&P)P.wl=this.maxLv();},
-  save(){save('mnr_wp',{eq:this.eq});},
-  reset(){this.lv={};this.xp={};this.vc=0;this.sync();},
-  gain(){const ids=this.eqIds().filter(id=>this.lvOf(id)<5);if(!ids.length){P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');return;}
+  sync(){if(typeof P!=='undefined'&&P)P.wl=1+Math.floor((this.maxLv()-1)/2.25);},   // ships that scale with the weapon level (Half-time Heavy) keep their old 1..5 range,
+  save(){save('mnr_wp',{eq:this.eq});save('mnr_wplv',this.pl);},
+  reset(){this.lv={};this.xp={};this.vc=0;this.bl=[];this.mn=[];this.fuT=4;this.lmy=-999;this.sync();},
+  // the fusion of the two equipped weapons (null when only one, or the same one twice)
+  fu(){const[a,b]=this.eq;if(!FUSE_ON||!a||!b||a===b)return null;const k=a<b?a+'-'+b:b+'-'+a;if(this._fk===k)return this._f;this._fk=k;this._f=null;const[x,y]=k.split('-');
+    for(const[t1,t2,fx]of FU_RULES){const tx=WTAG[x],ty=WTAG[y];let own=null,par=null;
+      if(t1==='*'){own=x;par=y;}
+      else if(t2){if(tx.includes(t1)&&ty.includes(t2)){own=x;par=y;}else if(ty.includes(t1)&&tx.includes(t2)){own=y;par=x;}}
+      else if(tx.includes(t1)){own=x;par=y;}else if(ty.includes(t1)){own=y;par=x;}
+      if(own){this._f={id:'fu-'+k,img:'fx-fuse-'+k,timg:'fx-fuse-tag-'+(t1==='*'?'any':t1)+'-'+(t2||'any'),k,name:FU_NAMES[k]||fuName(x,y),fx,tx:FU_TX[fx],own,par,c1:WPD[x].c,c2:WPD[y].c};break;}}
+    return this._f;},
+  fk(){return this.fu()?FU_K:1;},
+  // options a fusion adds to the bullets of weapon id
+  mod(id,o){const f=this.fu();o=Object.assign({},o);if(!f)return o;const fx=f.fx,mine=id===f.own||id===f.par;
+    if(fx==='split'&&mine){if(!o.px){o.px=new Set();o.pn=1;}o.sp=1;}
+    else if(fx==='rebound'&&mine){if(!o.px){o.px=new Set();o.pn=99;}o.rc=Math.max(o.rc||0,1);}
+    else if(fx==='seek'&&id===f.par)o.hk=Math.max(o.hk||0,1.8);
+    else if(fx==='bounce'&&id===f.par)o.rc=Math.max(o.rc||0,1);
+    else if(fx==='zap'&&id===f.par)o.zp=1;
+    else if(fx==='chill'&&id===f.par)o.cl=1.6;
+    else if(fx==='splash'&&id===f.par)o.ax=1;
+    else if(fx==='wide'&&id===f.par)o.rad=(o.rad||0)+4;
+    else if(fx==='pierce1'&&id===f.par){if(!o.px){o.px=new Set();o.pn=1;}else if(o.pn!=null&&o.pn<90)o.pn++;}
+    return o;},
+  gain(){const ids=this.eqIds().filter(id=>this.runOf(id)<WP_RUN_MAX&&this.lvOf(id)<WP_MAX);if(!ids.length){P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');return;}
     ids.sort((a,b)=>this.lvOf(a)-this.lvOf(b));const id=ids[0],d=WPD[id];this.xp[id]=(this.xp[id]||0)+1;
-    if(this.xp[id]>=WP_NEED[this.lvOf(id)-1]){this.xp[id]=0;this.lv[id]=this.lvOf(id)+1;floater(P.x,P.y-24,d.s+' LV'+this.lv[id],d.c);G.rings.push({x:P.x,y:P.y,l:.5,m:.5,c:d.c});}
-    else floater(P.x,P.y-24,d.s+' '+this.xp[id]+'/'+WP_NEED[this.lvOf(id)-1],d.c);
+    if(this.xp[id]>=WP_NEED[this.runOf(id)-1]){this.xp[id]=0;this.lv[id]=this.runOf(id)+1;floater(P.x,P.y-24,d.s+' LV'+this.lvOf(id),d.c);G.rings.push({x:P.x,y:P.y,l:.5,m:.5,c:d.c});}
+    else floater(P.x,P.y-24,d.s+' '+this.xp[id]+'/'+WP_NEED[this.runOf(id)-1],d.c);
     this.sync();if(this.open)this.draw();},
   // the shots of the equipped weapons, called inside the ship's volley so every upgrade (damage, crits, piercing...) applies to them too
-  shots(std,pf){this.vc++;
-    for(const id of this.eq){if(!id)continue;const L=this.lvOf(id);
-      if(id==='pulse'){const d=.8+.05*(L-1),v=[130];if(L>=2)v.push(240);if(L>=3)v.push(60);if(L>=5)v.push(330);
-        for(const a of v){std(870,-a,d,{col:'#ff8ad8',len:12});std(870,a,d,{col:'#ff8ad8',len:12});}}
-      else if(id==='laser'){if(this.vc%2===0)std(1500,0,1.5+.5*L,{big:1,px:new Set(),pn:99,col:'#7dffd8',len:90,th:3.5});}
-      else if(id==='swarm'){if(this.vc%2===1){const n=1+(L>=2)+(L>=4),d=.75+.12*L;for(let i=0;i<n;i++)std(520,(i-(n-1)/2)*300+rnd(-60,60),d,{hk:2.6+.6*L,col:'#ffb020',len:10,th:4});}}}},
-  beat(){if(!G.live||G.dead||SH.active||P.over||!this.eq.includes('beat'))return;const L=this.lvOf('beat'),dm=(7+3*(L-1))*tpDmg();
-    G.pb.push({x:P.x+28,y:P.y,vx:760,vy:0,dm,pf:1,big:1,rad:8,px:new Set(),pn:Math.floor((L-1)/2),col:'#ffe14d',len:40,th:9});
-    if(L>=4)G.pb.push({x:P.x+20,y:P.y-8,vx:740,vy:-130,dm:dm*.55,pf:1,big:1,px:new Set(),pn:0,col:'#ffe14d',len:24,th:6},{x:P.x+20,y:P.y+8,vx:740,vy:130,dm:dm*.55,pf:1,big:1,px:new Set(),pn:0,col:'#ffe14d',len:24,th:6});
+  shots(std,pf){this.vc++;const f=this.fu(),k=this.fk();
+    const mk=id=>(vx,vy,d,o)=>{if(!pbRoom())return;if(id!=='drone')WPX.last={vx,vy,d,o:o||{}};std(vx,vy,d*k*(window.SC?SC.wk(id):1),this.mod(id,o));};   // WPX.last: the drone repeats it
+    for(const id of this.eq){if(id)this.fire1(id,mk(id),this.lvOf(id));}
+    if(f&&f.fx==='orbitfire'&&this.vc%2===0){const par=f.par,st=mk(par);for(const b of this.bl)st(900,0,.45,{x:b.x,y:b.y,col:WPD[par].c,len:10,th:3});}},
+  // one weapon's part of a volley
+  fire1(id,std,L){
+    if(id==='pulse'){const d=.82+.012*(L-1),v=[L>=3?145:130,L>=3?250:240];if(L>=6)v.push(60);if(L>=10)v.push(330);
+      for(const a of v){std(870,-a,d,{col:'#ff8ad8',len:12});std(870,a,d,{col:'#ff8ad8',len:12});}}
+    else if(id==='laser'){if(L>=8||this.vc%(L>=4?3:2)!==(L>=4?2:1))std(1500,0,2+.04*(L-1),{big:1,px:new Set(),pn:99,rad:L>=6?3:0,col:'#7dffd8',len:90,th:3.5+.25*(L-1)});}
+    else if(id==='swarm'){if(this.vc%2===1){const n=1+(L>=6),d=.85+.015*(L-1);for(let i=0;i<n;i++)std(520,(i-(n-1)/2)*300+rnd(-60,60),d,{hk:2.6+.4*Math.min(L,7),col:'#ffb020',len:10,th:4});}}
+    else if(id==='disc'){if(this.vc%2===0){const rc=2+(L>=10),d=(.95+.02*(L-1))*(L>=6?.4:1),o=()=>({rc,px:new Set(),pn:99,rad:6,big:1,col:'#ff7a45',len:16,th:8});
+      if(L>=6){std(560,-400,d,o());std(560,400,d,o());}else std(560,(this.vc%4===0?-1:1)*400,d,o());}}
+    else if(id==='arc'){if(this.vc%2===0)this.arcZap(L);}
+    else if(id==='mine'){if(this.vc%3===0)this.dropMine(L);}
+    else if(WPX.fire[id])WPX.fire[id](std,L);},
+  // can this foe be hurt by direct (non-bullet) damage right now?
+  tgt(e){return e.hp>0&&!e.dying&&e.type!=='gate'&&e.x<W-6&&(e.type!=='boss'||e.x<W-20);},
+  hurtE(e,dm){e.hp-=dm*(e.shl?.45:1);e.flash=.08;},
+  // ARC CHAIN: the nearest foe in range, then it jumps from foe to foe (1+L jumps)
+  arcZap(L){const R=270+14*L,dm=(1.2+.01*(L-1))*tpDmg()*this.fk();let cx=P.x+18,cy=P.y;const hit=new Set();
+    for(let i=0;i<2+(L>=6)+(L>=10);i++){let best=null,bd=i?150:R;for(const e of G.en){if(hit.has(e)||!this.tgt(e)||e.x<P.x-30)continue;const d=Math.hypot(e.x-cx,e.y-cy);if(d<bd){bd=d;best=e;}}
+      if(!best)break;hit.add(best);this.hurtE(best,dm);AX.arcs.push({x1:cx,y1:cy,x2:best.x,y2:best.y,l:.22});cx=best.x;cy=best.y;}
+    if(hit.size)AU.sfx('graze');},
+  // a lightning leap from foe e to the nearest other foe (zap fusion)
+  leap(e,dm){let best=null,bd=170;for(const o of G.en){if(o===e||!this.tgt(o))continue;const d=Math.hypot(o.x-e.x,o.y-e.y);if(d<bd){bd=d;best=o;}}
+    if(best){this.hurtE(best,dm);AX.arcs.push({x1:e.x,y1:e.y,x2:best.x,y2:best.y,l:.2});}},
+  // MINE LAYER: a mine only drops when the ship has moved since the last one, so sitting still lays nothing new
+  dropMine(L){if(Math.abs(P.y-this.lmy)<14)return;this.lmy=P.y;if(this.mn.length>=(L>=6?5:4))return;this.mn.push({x:P.x-26,y:P.y,vx:70,t:0,L});},
+  boom(m){const f=this.fu(),k=this.fk(),L=m.L,R=62+3*L,dm=(3.6+.1*(L-1))*tpDmg()*k;let first=null;
+    for(const e of G.en){if(!this.tgt(e))continue;if(Math.hypot(e.x-m.x,e.y-m.y)<R+e.r){this.hurtE(e,dm);if(!first)first=e;}}
+    G.rings.push({x:m.x,y:m.y,l:.3,m:.3,c:WPD.mine.c});burst(m.x,m.y,WPD.mine.c,8,200,.35);AU.sfx('hit');
+    if(f&&f.fx==='shrapnel'){for(let i=0;i<4&&pbRoom();i++){const a=i*Math.PI/2+.4;G.pb.push(Object.assign({x:m.x,y:m.y,vx:Math.cos(a)*600,vy:Math.sin(a)*600,dm:.55*tpDmg()*k,pf:0,col:WPD[f.par].c,len:10,th:3,fz:1}));}}
+    if(f&&f.fx==='zap'&&f.par==='mine'&&first)this.leap(first,dm*.5);},
+  // bullet hit hook (called from b.js for bullets that carry sp / zp)
+  hit(b,e){if(b.sp){b.sp=0;for(const s of[-1,1]){if(!pbRoom())break;G.pb.push({x:b.x,y:b.y,vx:640,vy:s*300,dm:b.dm*.5,pf:b.pf,col:b.col,len:10,th:3,fz:1});}}
+    if(b.zp)this.leap(e,b.dm*.5);},
+  // per-tick work of the blades and mines
+  upd(dt){if(!G.live||G.dead||SH.active||P.over)return;if(this.fuT>0)this.fuT-=dt;
+    const ids=this.eqIds(),k=this.fk();
+    if(ids.includes('orbit')){const L=this.lvOf('orbit'),n=2+(L>=3)+(L>=9),r=44+3*Math.min(L,6),a0=bpos()*Math.PI,dm=(.9+.015*(L-1))*tpDmg()*k;this.bl.length=n;
+      for(let i=0;i<n;i++){const a=a0+i*Math.PI*2/n,b=this.bl[i]=this.bl[i]||{};b.x=P.x+Math.cos(a)*r;b.y=P.y+Math.sin(a)*r;b.a=a;
+        for(const e of G.en){if(!this.tgt(e)||G.t-(e.ob||-9)<.28)continue;if(Math.hypot(e.x-b.x,e.y-b.y)<e.r+12){e.ob=G.t;this.hurtE(e,dm);burst(b.x,b.y,WPD.orbit.c,2,120,.2);}}}}
+    else this.bl.length=0;
+    if(!ids.includes('mine'))this.mn.length=0;
+    for(let i=this.mn.length-1;i>=0;i--){const m=this.mn[i];m.t+=dt;m.x+=m.vx*dt;let go=m.t>7||m.x>W+20;
+      if(!go&&m.t>.35)for(const e of G.en){if(this.tgt(e)&&Math.hypot(e.x-m.x,e.y-m.y)<e.r+16){go=2;break;}}
+      if(go){this.mn.splice(i,1);if(go===2)this.boom(m);}}},
+  drawWorld(t){if(!G||!G.live||G.dead)return;const c=ctx;
+    if(this.bl.length){c.save();c.globalCompositeOperation='lighter';c.strokeStyle=WPD.orbit.c;c.fillStyle=WPD.orbit.c;c.lineWidth=2;c.globalAlpha=.25;c.beginPath();c.arc(P.x,P.y,44+3*Math.min(this.lvOf('orbit'),6),0,7);c.stroke();c.globalAlpha=.95;
+      for(const b of this.bl){c.beginPath();c.moveTo(b.x+Math.cos(b.a+1.57)*10,b.y+Math.sin(b.a+1.57)*10);c.lineTo(b.x+Math.cos(b.a)*7,b.y+Math.sin(b.a)*7);c.lineTo(b.x-Math.cos(b.a+1.57)*10,b.y-Math.sin(b.a+1.57)*10);c.closePath();c.fill();}c.restore();}
+    if(this.mn.length){c.save();c.globalCompositeOperation='lighter';for(const m of this.mn){const on=m.t>.35,p=.6+.4*Math.sin(t*8+m.x);c.globalAlpha=on?p:.35;c.strokeStyle=c.fillStyle=WPD.mine.c;c.lineWidth=2;c.beginPath();c.arc(m.x,m.y,6,0,7);c.stroke();c.beginPath();c.arc(m.x,m.y,2.5,0,7);c.fill();
+      for(let i=0;i<6;i++){const a=i*1.047+t;c.beginPath();c.moveTo(m.x+Math.cos(a)*6,m.y+Math.sin(a)*6);c.lineTo(m.x+Math.cos(a)*10,m.y+Math.sin(a)*10);c.stroke();}}c.restore();}},
+  beat(){if(!G.live||G.dead||SH.active||P.over||!this.eq.includes('beat'))return;const L=this.lvOf('beat'),dm=(7+.2*(L-1))*tpDmg()*this.fk();
+    const f=this.fu(),k=this.fk(),mo=o=>this.mod('beat',o);
+    if(pbRoom(3)){G.pb.push(mo({x:P.x+28,y:P.y,vx:760,vy:0,dm,pf:1,big:1,rad:8,px:new Set(),pn:Math.floor(L/3),col:'#ffe14d',len:40,th:9+.3*(L-1)}));
+    if(L>=4)G.pb.push(mo({x:P.x+20,y:P.y-8,vx:740,vy:-130,dm:dm*.35,pf:1,big:1,px:new Set(),pn:0,col:'#ffe14d',len:24,th:6}),mo({x:P.x+20,y:P.y+8,vx:740,vy:130,dm:dm*.35,pf:1,big:1,px:new Set(),pn:0,col:'#ffe14d',len:24,th:6}));}
+    if(f&&f.fx==='bomblets')G.delayed.push({t:BT.spb*.4,f:()=>{if(G.dead||!running||P.over)return;for(const vy of[-170,0,170])if(pbRoom())G.pb.push({x:P.x+110,y:P.y,vx:540,vy,dm:dm*.3,pf:0,hk:3,col:WPD.swarm.c,len:10,th:5,fz:1});}});
+    if(f&&f.fx==='echo'){const par=f.par,st=(vx,vy,d,o)=>{if(pbRoom())G.pb.push(Object.assign({x:P.x+22,y:P.y,vx,vy,dm:d*SH.dmk()*tpDmg()*k,pf:0,fz:1},this.mod(par,o)));};this.fire1(par,st,this.lvOf(par));}
     G.rings.push({x:P.x+24,y:P.y,l:.25,m:.25,c:'#ffe14d'});AU.sfx('shot');},
   // short text for the HUD: "PULSE 2 · LANCE 1"
   hud(c,x,y,k){c.save();c.font=`${Math.round(11*(k||1))}px "Share Tech Mono",monospace`;c.textAlign='left';let xx=x;
-    for(const id of this.eq){const d=id&&WPD[id],t=d?d.s+' '+this.lvOf(id):'-';c.fillStyle=d?d.c:'#dcd8f6';c.fillText(t,xx,y);xx+=c.measureText(t).width+10*(k||1);}c.restore();},
+    for(const id of this.eq){const d=id&&WPD[id],t=d?d.s+' '+this.lvOf(id):'-';if(d)xx+=RIG.chip(c,id,this.eq.indexOf(id),xx,y,k||1);c.fillStyle=d?d.c:'#dcd8f6';c.fillText(t,xx,y);xx+=c.measureText(t).width+10*(k||1);}
+    const f=this.fu();if(f&&this.fuT>0){c.globalAlpha=Math.min(1,this.fuT);c.fillStyle='#ffe14d';c.fillText('FUSION '+f.name.toUpperCase(),x,y+13*(k||1));}c.restore();},
   toggle(id){const i=this.eq.indexOf(id);let m;
     if(i>=0){if(this.eqIds().length<2){this.msg('Keep one weapon equipped');return;}this.eq[i]=null;m=WPD[id].s+' removed';}
     else{let j=this.eq.indexOf(null);if(j<0)j=this.lvOf(this.eq[0])<this.lvOf(this.eq[1])?0:1;this.eq[j]=id;m=WPD[id].s+' in slot '+(j+1);}
@@ -208,7 +322,9 @@ const WP={eq:['pulse',null],lv:{},xp:{},vc:0,open:false,mode:'pit',seen:!!load('
   msg(t){const el=$('wpMsg');if(el)el.textContent=t;}};
 {const ld=load('mnr_wp',null);if(ld&&Array.isArray(ld.eq)){WP.eq=[WP_IDS.includes(ld.eq[0])?ld.eq[0]:null,WP_IDS.includes(ld.eq[1])&&ld.eq[1]!==ld.eq[0]?ld.eq[1]:null];if(!WP.eqIds().length)WP.eq=['pulse',null];}}
 window.__wp=Object.assign(WP,{lvl(id,n){this.lv[id]=n;}});          // test hook
-NR.on('runStart',()=>WP.reset());NR.on('tick',()=>WP.sync());NR.on('beat',()=>WP.beat());
+RIG.ok=true;window.__rig=Object.assign(RIG,{GA,SHIPS,pushPos:()=>[P.x,P.y]});          // test hook
+NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
+{const pd=PW.draw;PW.draw=function(t){pd.call(this,t);WP.drawWorld(t);};const cl=SH.close;SH.close=function(){cl.call(this);WP.fuT=4;};}NR.on('beat',()=>WP.beat());
 
 /* ----- the WEAPONS sheet: one card per weapon with a 2-second looping demo and a few words ----- */
 {const st=document.createElement('style');st.textContent=`
@@ -220,10 +336,12 @@ NR.on('runStart',()=>WP.reset());NR.on('tick',()=>WP.sync());NR.on('beat',()=>WP
 #wpL .card .tx{flex:1 1 0}#wpL .card .slot{position:absolute;top:4px;right:8px;font-family:var(--mono);font-size:11px;color:var(--c);letter-spacing:.06em}
 #wpL .card .pp{display:flex;gap:2px;margin-top:3px}#wpL .card .pp i{display:block;width:clamp(8px,calc(var(--u)*3),14px);height:5px;border-radius:1px;background:#ffffff22}#wpL .card .pp i.on{background:var(--c)}
 #wpL .card.sel{background:#22123f}
+#wpFu{flex:0 0 auto;display:flex;gap:10px;align-items:center;min-height:30px;font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*3.2),15px);color:var(--dim);padding:2px 4px}
+#wpShip{display:block;width:min(100%,300px);height:auto;aspect-ratio:300/96;margin:0 auto 4px;flex:0 0 auto}#wpFu canvas{width:56px;height:56px;flex:0 0 auto}#wpFu .n{color:#ffe14d;font-size:1.05em;letter-spacing:.04em}#wpFu .t{color:var(--ink)}
 #shWpRow{display:flex;gap:10px;align-items:center;flex:0 0 auto;min-height:44px}#shWpRow button{flex:0 0 auto;min-width:44px;padding:.4em 1em}#shWpRow span{font-family:var(--mono);color:var(--dim);font-size:clamp(11px,calc(var(--u)*3.2),15px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #titleRow2{margin-top:2px}#titleRow2 .go{font-size:clamp(12px,min(1.6vw,2.8vh),16px)}`;document.head.appendChild(st);}
 const wpEl=document.createElement('div');wpEl.id='wpm';wpEl.className='ov solid pg';wpEl.hidden=true;
-wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><div id="wpL"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
+wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><canvas id="wpShip" width="300" height="96"></canvas><div id="wpL"></div><div id="wpFu"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
 stage.appendChild(wpEl);
 {const DEMO=(id,c,t,col)=>{                                       // t: 0..2 seconds, the demo loops
    c.clearRect(0,0,108,52);const sy=26;c.fillStyle='#ffffff';c.beginPath();c.moveTo(6,sy-6);c.lineTo(18,sy);c.lineTo(6,sy+6);c.closePath();c.fill();
@@ -233,14 +351,31 @@ stage.appendChild(wpEl);
    else if(id==='laser'){const p=(t%1)/1,len=Math.min(1,p*1.6)*84;foe(50,sy,p*84>32);foe(72,sy,p*84>54);foe(94,sy,p*84>76);c.lineWidth=3;c.beginPath();c.moveTo(20,sy);c.lineTo(20+len,sy);c.stroke();c.globalAlpha=.3;c.lineWidth=7;c.stroke();c.globalAlpha=1;}
    else if(id==='swarm'){const p=(t%1)/1,tg=[[96,10],[100,28],[94,44]];tg.forEach((q,i)=>foe(q[0],q[1],p>.92));
      tg.forEach((q,i)=>{const dir=i===1?0:(i===0?-1:1),x=18+(q[0]-18)*p,y=sy+(q[1]-sy)*p-dir*Math.sin(p*Math.PI)*-16;c.beginPath();c.arc(x,y,2.6,0,7);c.fill();});}
+   else if(id==='arc'){const tg=[[52,12],[78,40],[98,18]],on=(t%.8)<.4;tg.forEach(q=>foe(q[0],q[1],on));if(on){c.beginPath();c.moveTo(18,sy);let px=18,py=sy;for(const q of tg){c.lineTo((px+q[0])/2+rnd(-4,4),(py+q[1])/2+rnd(-6,6));c.lineTo(q[0],q[1]);px=q[0];py=q[1];}c.stroke();}}
+   else if(id==='orbit'){foe(70-((t%2)/2)*30,sy-4,((t%2)/2)>.5);for(let i=0;i<3;i++){const a=t*6.28+i*2.094,x=18+Math.cos(a)*16,y=sy+Math.sin(a)*16;c.beginPath();c.moveTo(x+Math.cos(a+1.57)*5,y+Math.sin(a+1.57)*5);c.lineTo(x+Math.cos(a)*4,y+Math.sin(a)*4);c.lineTo(x-Math.cos(a+1.57)*5,y-Math.sin(a+1.57)*5);c.closePath();c.fill();}}
+   else if(id==='disc'){foe(98,sy,false);const p=(t%2)/2,x=18+p*80,y=sy-20+Math.abs(((p*3)%1)*2-1)*40;c.beginPath();c.arc(x,y,4.5,0,7);c.fill();c.globalAlpha=.4;c.beginPath();c.arc(x-9,y,3,0,7);c.fill();c.globalAlpha=1;}
+   else if(id==='mine'){const p=(t%2)/2;[38,60].forEach(x=>{c.beginPath();c.arc(x,sy,4+Math.sin(t*9+x)*.8,0,7);c.stroke();});const fx=98-p*44;foe(fx,sy,p>.7);if(p>.7){c.globalAlpha=1-(p-.7)/.3;c.beginPath();c.arc(60,sy,10+(p-.7)*60,0,7);c.stroke();c.globalAlpha=1;}}
+   else if(WPX.demo[id])WPX.demo[id](c,t,col,foe,sy);
    else{const p=(t%1)/1,ring=(t%1)<.3?(t%1)/.3:0;c.globalAlpha=1-ring;c.beginPath();c.arc(20,sy,4+ring*14,0,7);c.stroke();c.globalAlpha=1;foe(94,sy,p>.8&&p<.95);
      const x=20+p*70;c.fillRect(x-8,sy-4,18,8);}
  };
- let raf=0;const loop=()=>{raf=0;if(wpEl.hidden)return;const t=(performance.now()/1000)%2;for(const cv of wpEl.querySelectorAll('canvas')){const c=cv.getContext('2d');DEMO(cv.dataset.id,c,t,WPD[cv.dataset.id].c);}raf=requestAnimationFrame(loop);};
- WP.draw=function(){const box=$('wpL');box.innerHTML='';
-   for(const id of WP_IDS){const d=WPD[id],L=this.lvOf(id),slot=this.eq.indexOf(id),b=document.createElement('button');b.type='button';b.className='card'+(slot>=0?' sel':'');b.style.setProperty('--c',d.c);b.dataset.id=id;
-     b.innerHTML=`<canvas width="108" height="52" data-id="${id}"></canvas><div class="tx"><div class="n">${d.n}</div><div class="t">${d.tx}</div><div class="pp">${[1,2,3,4,5].map(i=>`<i class="${i<=L?'on':''}"></i>`).join('')}</div></div><span class="slot">${slot>=0?'SLOT '+(slot+1):'TAP TO EQUIP'}</span>`;
+ WPX.demoFn=(id,c,t,col)=>{c.clearRect(0,0,108,52);DEMO(id,c,t,col);};
+ let raf=0;const loop=()=>{raf=0;if(wpEl.hidden)return;const t=(performance.now()/1000)%2;for(const cv of wpEl.querySelectorAll('canvas[data-id]')){const c=cv.getContext('2d'),n='wp-'+cv.dataset.id;if(ART.have(n)){c.clearRect(0,0,108,52);c.drawImage(ART.bm[n],28,0,52,52);}else DEMO(cv.dataset.id,c,t,WPD[cv.dataset.id].c);}raf=requestAnimationFrame(loop);};
+ WP.fuIcon=function(c,f,z){c.clearRect(0,0,z,z);const m=z/2;
+   if(ART.have(f.img)){c.drawImage(ART.bm[f.img],0,0,z,z);return;}
+   if(f.timg&&ART.have(f.timg)){c.drawImage(ART.bm[f.timg],0,0,z,z);return;}
+   c.save();c.lineCap='round';c.shadowBlur=z*.12;
+   c.strokeStyle=f.c1;c.shadowColor=f.c1;c.lineWidth=z*.1;c.beginPath();c.arc(m,m,z*.36,Math.PI*.5,Math.PI*1.5);c.stroke();
+   c.strokeStyle=f.c2;c.shadowColor=f.c2;c.beginPath();c.arc(m,m,z*.36,-Math.PI*.5,Math.PI*.5);c.stroke();
+   c.shadowBlur=0;c.lineWidth=z*.045;c.strokeStyle=f.c1;c.beginPath();c.moveTo(z*.22,z*.78);c.lineTo(z*.78,z*.22);c.stroke();c.strokeStyle=f.c2;c.beginPath();c.moveTo(z*.22,z*.22);c.lineTo(z*.78,z*.78);c.stroke();
+   c.fillStyle='#ffffff';c.font=`700 ${Math.round(z*.26)}px "Chakra Petch",sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(f.name.split(' ').map(w=>w[0]).join(''),m,m+z*.02);c.restore();};
+ WP.draw=function(){const box=$('wpL');box.innerHTML='';RIG.pic($('wpShip'),GA.ship);
+   for(const id of WP_IDS){const d=WPD[id],L=this.lvOf(id),slot=this.eq.indexOf(id),b=document.createElement('button');b.type='button';b.className='card'+(slot>=0?' sel':'')+(this.has(id)?'':' no');b.style.setProperty('--c',d.c);b.dataset.id=id;
+     b.innerHTML=`<canvas width="108" height="52" data-id="${id}"></canvas><div class="tx"><div class="n">${d.n}</div><div class="t">${d.tx}</div><div class="pp">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<this.permOf(id)&&this.has(id)?'on':i<L?'run':''}"></i>`).join('')}</div></div><span class="slot">${!this.has(id)?'LOCKED':slot>=0?'SLOT '+(slot+1):'TAP TO EQUIP'}</span>`;
      b.addEventListener('click',()=>this.toggle(id));box.appendChild(b);}
+   const fu=this.fu(),fb=$('wpFu');
+   if(fu){fb.innerHTML=`<canvas width="112" height="112" id="wpFuC"></canvas><div><div class="n">FUSION: ${fu.name.toUpperCase()}</div><div class="t">${fu.tx} · +12% damage</div></div>`;WP.fuIcon($('wpFuC').getContext('2d'),fu,112);}
+   else fb.innerHTML='<div>Equip two different weapons to fuse them.</div>';
    $('wpSl').innerHTML=this.eq.map((id,i)=>`<b>${i+1}: ${id?WPD[id].s+' '+this.lvOf(id):'empty'}</b>`).join('');
    if(!raf)raf=requestAnimationFrame(loop);
    const row=$('shWpTx');if(row)row.textContent=this.eq.map(id=>id?WPD[id].s+' '+this.lvOf(id):'-').join(' · ');};

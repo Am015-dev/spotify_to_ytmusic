@@ -8,7 +8,7 @@ html.sk .gx-drawer-head h2{color:#ffe36a;text-shadow:0 2px 3px rgba(0,0,0,.7)}
 html.sk header.gx-bar{background:url(media/ui-topbar.webp) left center/auto 100% repeat-x #241048;border-bottom-color:transparent;box-shadow:0 3px 8px rgba(0,0,0,.5)}
 html.sk header.gx-bar::before{display:none}
 /* icon buttons: phone = round metal knobs, desktop = labelled power pills */
-html.sk header.gx-bar .gx-ibtn.btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#f6ecff;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+html.sk header.gx-bar .gx-ibtn.btn{border-style:solid;border-color:transparent;border-image:url(media/ui-button-power-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#f6ecff;text-shadow:0 1px 2px rgba(0,0,0,.65);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
 html.sk header.gx-bar .gx-ibtn.btn:hover:not([disabled]){box-shadow:none;filter:drop-shadow(0 0 6px rgba(255,140,220,.8))}
 html.sk header.gx-bar .gx-ibtn[aria-expanded="true"]{background:none;box-shadow:none;filter:drop-shadow(0 0 7px #ffd36a)}
 html.sk.ph header.gx-bar .gx-ibtn.btn{border-style:solid;border-color:transparent;border-image:url(media/ui-iconbtn.webp) 34 fill/10px stretch;width:44px;height:44px;color:#2a1650;text-shadow:none}
@@ -19,7 +19,7 @@ html.sk header.gx-bar h1{-webkit-text-stroke:0;text-shadow:0 2px 3px rgba(0,0,0,
 html.sk #modal .dlg:not(.paper){background:none;border-style:solid;border-color:transparent;border-image:url(media/ui-panel-c.webp) 100 fill/34px stretch;border-radius:0;box-shadow:none;filter:drop-shadow(0 14px 26px rgba(0,0,0,.55))}
 html.sk #modal .dlg.paper{box-shadow:0 14px 26px rgba(0,0,0,.55)}
 html.sk #modal .dlg h2{color:#ffe36a;text-shadow:0 2px 3px rgba(0,0,0,.6)}
-html.sk .cc-hero{margin:-6px -14px 6px;border-radius:6px;background:var(--cc-title,none) center/cover;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+html.sk .cc-hero{margin:-6px -12px 6px;border-radius:6px;background:var(--cc-title,none) center/cover;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
 html.sk .cc-endart{margin:-6px -14px 6px}
 html.sk .dlg.start details.custom{border:2px dashed rgba(243,233,255,.45);background:rgba(20,8,48,.35)}
 html.sk .gx-dock{background:none}
@@ -29,7 +29,7 @@ html.sk .gx-dock #prompt.box,html.sk .gx-dock #choice.box,html.sk .gx-dock #youb
 html.sk .gx-dock #prompt .box,html.sk .gx-dock #choice .box{background:rgba(20,8,48,.45);border-color:rgba(243,233,255,.35);box-shadow:none;color:#f3e9ff}
 html.sk #news{color:#f3e9ff}
 /* buttons: cream pill = normal, go (orange) = primary, purple = selected/danger */
-html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.mini{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:#2a1650;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center;animation:none}
+html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.mini{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:#2a1650;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4));text-align:center;animation:none}
 html.sk .btn:hover:not([disabled]){box-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4)) brightness(1.07)}
 html.sk .btn:active:not([disabled]){box-shadow:none;transform:translateY(2px)}
 html.sk .btn[disabled]{opacity:.5}
@@ -39,12 +39,12 @@ html.sk .btn.on,html.sk .btn.danger{border-image-source:url(media/ui-button-powe
 html.sk .btn.on{filter:drop-shadow(0 0 5px #ffcf5a) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .btn.primary:not([disabled]){animation:nudge 1.8s ease-in-out infinite}
 html.sk .btn.rec:not(.primary){outline:0;filter:drop-shadow(0 0 6px #ffd23f) drop-shadow(0 2px 2px rgba(0,0,0,.4))}
-html.sk .btn.mini{border-image-width:0 14px}
-html.sk .pcard .btn,html.sk .pc .btn,html.sk .bm .btn,html.sk #buymini h3 .btn,html.sk #youbox .btn,html.sk .btn.buy{border-image-width:0 16px}
+html.sk .btn.mini{border-image-width:10px 14px}
+html.sk .pcard .btn,html.sk .pc .btn,html.sk .bm .btn,html.sk #buymini h3 .btn,html.sk #youbox .btn,html.sk .btn.buy{border-image-width:11px 16px}
 html.sk .gx-reopen.btn{color:#f6ecff;border-image-source:url(media/ui-button-power-c.webp)}
 /* menu rows */
 html.sk .btn.mrow{border-style:solid;border-color:transparent;border-image:url(media/ui-row-c.webp) 30 fill/12px stretch;color:#f3e9ff;text-align:left;text-shadow:0 1px 2px rgba(0,0,0,.6)}
-html.sk .btn.mrow small{color:#d7c6e8;opacity:1;font-size:.78rem}
+html.sk .btn.mrow small{color:#d7c6e8;opacity:1}
 /* story map / chapter sheet inherit dark ink from gx-skin; keep chip text readable */
 /* fixes after first look */
 html.sk .btn:focus-visible,html.sk header.gx-bar .gx-ibtn:focus-visible{outline:none;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 8px #ffd36a)}
@@ -89,4 +89,36 @@ html.sk .gx-ibtn>span{padding:0}
 html.ph .pchip .v{color:#6b4200}html.ph .pchip .e{color:#0f6b3a}
 html.ph .pchip span em{background:rgba(255,253,245,.9);border-radius:4px;padding:0 1px}
 html.ph-p header.gx-bar .pchip span{font-size:12px;gap:1px;letter-spacing:-.7px}
+@media (max-width:430px){html.ph-p header.gx-bar .pchip{padding:0 2px 1px}html.ph-p header.gx-bar .pchip span{gap:0;letter-spacing:-1px}html.ph-p header.gx-bar .pchip span em{padding:0}}@media (max-width:380px){html.ph-p header.gx-bar .pchip span{font-size:11px}}   /* 375 px phones: the energy number was cut off by the chip edge (scenario invariant) */
 html.ph-p header.gx-bar .pchip{padding-left:2px;padding-right:2px}
+
+/* the painted crown marks the monster in Downtown (the emoji stays if the picture is missing) */
+html.sk-crown .crn{display:inline-block;width:18px;height:18px;font-size:0;vertical-align:-4px;background:url(media/icon-crown.webp) center/contain no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+html.sk-crown .pchip .crn{width:15px;height:15px;font-size:0;vertical-align:-3px}
+/* button colours: pink = chosen, yellow = recommended, see-through = the Panel button over the map */
+html.sk-pink .btn.on{border-image-source:url(media/ui-button-pink-c.webp);color:#fff8ff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+html.sk-yellow .btn.rec:not(.primary){border-image-source:url(media/ui-button-yellow-c.webp);color:#2a1650}
+html.sk-ghost .gx-reopen.btn{border-image-source:url(media/ui-button-ghost-c.webp);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.9)}
+/* top-bar monster chips: the comic chip plate behind each (overlay; the coloured top edge stays) */
+html.sk-hudchip header.gx-bar .pchip{isolation:isolate;border-color:transparent;border-top-color:var(--mc)}
+html.sk-hudchip header.gx-bar .pchip:not(.on){background:transparent}
+html.sk-hudchip header.gx-bar .pchip:not(.on)::before{content:'';position:absolute;inset:-3px;z-index:-1;pointer-events:none;border:solid transparent;border-width:10px;border-image:url(media/ui-hud-chip-c.webp) 26 fill/10px stretch}
+/* dice tray: green felt with a dark wood rim behind the dice */
+html.sk-tray #dicewrap{position:relative;isolation:isolate}
+html.sk-tray #dicewrap::before{content:'';position:absolute;inset:-4px -4px -6px;z-index:-1;pointer-events:none;border:solid transparent;border-width:30px;border-image:url(media/ui-dice-tray-c.webp) 70 fill/30px stretch;filter:drop-shadow(0 3px 4px rgba(0,0,0,.45))}
+/* coach bubble pointer: the painted tail instead of the plain diamond */
+html.sk-tail .gxh-arr{width:26px;height:20px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+html.sk-tail .gxh-a-bottom .gxh-arr{bottom:-18px}
+html.sk-tail .gxh-a-top .gxh-arr{top:-18px;transform:scaleY(-1)}
+html.sk-tail .gxh-a-left .gxh-arr{left:-20px;transform:rotate(90deg)}
+html.sk-tail .gxh-a-right .gxh-arr{right:-20px;transform:rotate(-90deg)}
+/* menu test v2: text starts inside the painted frames (border-width + padding >= border-image-width on every side) */
+html.sk #modal .dlg:not(.paper){border-width:16px;border-image-width:16px;padding:.6rem 12px}
+html.sk .btn,html.sk .btn.cons,html.sk .btn.evo,html.sk .btn.big,html.sk .btn.primary,html.sk .btn.camp,html.sk .btn.on{border-width:8px 10px;border-image-width:8px 10px;padding:0 4px}
+html.sk .btn.mini,html.sk .pcard .btn,html.sk .pc .btn,html.sk .bm .btn,html.sk #buymini h3 .btn,html.sk #youbox .btn,html.sk .btn.buy{border-width:6px 9px;border-image-width:6px 9px;padding:0 1px}
+html.sk .btn.mrow{border-width:8px;border-image-width:8px;padding:1.5px 4px}
+/* UI-BAR 2/9: text sits inside the painted frame, never on it */
+html.sk header.gx-bar .gx-ibtn.btn{border-image-width:10px 14px;padding-inline:14px}
+html.sk.ph header.gx-bar .gx-ibtn.btn{padding-inline:0}
+html.sk .gx-dock #prompt.box,html.sk .gx-dock #youbox.box{border-image-width:12px;padding:14px}
+#news .newsbtn{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere}

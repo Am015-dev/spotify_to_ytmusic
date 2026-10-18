@@ -19,8 +19,8 @@ function tutEl(cls) { const w = document.createElement('div'); w.innerHTML = typ
 function titleEl() {
   const bg = ART.title ? h('img.ttl-bg', { src: ART.title, alt: '' }) : h('div.ttl-bg.ttl-plain'), sv = hasSave();
   return h('div.ttl', bg, h('div.ttl-in', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Final Approach')), h('p.tag', 'Two seats. Eight dice. One runway.'),
-    h('div.tbtns', firstTime() ? tutEl('tbtn go') : null, typeof campLine === 'function' && window.CAMPAIGN ? h('button.tbtn' + (firstTime() ? '' : '.go') + '.story', { 'data-a': 'camp', type: 'button' }, h('b', 'Story'), h('span', campLine())) : null, h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'fly with a computer crewmate')), h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with a friend, free')), sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved flight')) : null),
-    h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
+    h('div.tbtns', h('button.tbtn.go.story', { 'data-a': window.CAMPAIGN && typeof campLine === 'function' ? 'camp' : 'play', type: 'button' }, h('b', 'Play'), typeof campLine === 'function' && window.CAMPAIGN ? h('span', campLine()) : null),
+      h('div.qrow', { role: 'group', 'aria-label': 'Quick game' }, h('span.qlbl', 'Quick game'), h('button.qseg', { 'data-a': 'play', type: 'button' }, 'Computer'), h('button.qseg', { 'data-a': 'online', type: 'button' }, 'Online'), sv ? h('button.qseg', { 'data-a': 'loadsave', type: 'button' }, 'Resume') : null))));
 }
 function roleCard(s) {
   const o = optObj(), c = D.crew[s], on = o.role === s;

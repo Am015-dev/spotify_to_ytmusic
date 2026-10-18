@@ -20,11 +20,11 @@ The **Wired** column says what happens after the drop: `auto` = shows up in the 
 | `camp-lampless-2.png` | 256x256 | 1:1 | no | Painting: camp-lampless-2 | wiring |
 | `camp-maze-2.png` | 256x256 | 1:1 | no | Painting: camp-maze-2 | wiring |
 | `camp-undertow-2.png` | 256x256 | 1:1 | no | Painting: camp-undertow-2 | wiring |
-| `card-face-coral-b.png` | 768x1024 | 3:4 | no | Painting: card-face-coral-b | wiring |
-| `card-face-kelp-b.png` | 768x1024 | 3:4 | no | Painting: card-face-kelp-b | wiring |
-| `card-face-lantern-b.png` | 768x1024 | 3:4 | no | Painting: card-face-lantern-b | wiring |
-| `card-face-sunstar-b.png` | 768x1024 | 3:4 | no | Painting: card-face-sunstar-b | wiring |
-| `card-face-tide-b.png` | 768x1024 | 3:4 | no | Painting: card-face-tide-b | wiring |
+| `card-face-coral-b.png` | 768x1024 | 3:4 | no | Painting: card-face-coral-b | prefix |
+| `card-face-kelp-b.png` | 768x1024 | 3:4 | no | Painting: card-face-kelp-b | prefix |
+| `card-face-lantern-b.png` | 768x1024 | 3:4 | no | Painting: card-face-lantern-b | prefix |
+| `card-face-sunstar-b.png` | 768x1024 | 3:4 | no | Painting: card-face-sunstar-b | prefix |
+| `card-face-tide-b.png` | 768x1024 | 3:4 | no | Painting: card-face-tide-b | prefix |
 | `end-lose-b.png` | 1024x768 | 4:3 | no | Painting: end-lose-b | wiring |
 | `end-lose-c.png` | 1024x768 | 4:3 | no | Painting: end-lose-c | wiring |
 | `end-win-b.png` | 1024x768 | 4:3 | no | Painting: end-win-b | wiring |

@@ -302,7 +302,7 @@ function renderBoard() {
   } else { const strip = placeBox(h('div.strip.city'), cityBox); bd.appendChild(strip);
     const fit = R.strip.city, n = cityList.length;
     if (R.slots) for (let i = 0; i < fit.n; i++) { const sl = h('i.slot'); sl.style.cssText = `left:${fit.x0 + i * fit.step}px;top:${Math.max(1, (cityBox.h - fit.ch) / 2)}px;width:${fit.cw}px;height:${fit.ch}px`; strip.appendChild(sl); }
-    strip.appendChild(h('span.scount', (me.city.length) + '/15'));
+    strip.appendChild(h('span.scount', { 'data-a': 'city' }, (me.city.length) + '/15'));
     const open = h('button.cityopen', { 'data-a': 'city', type: 'button', 'aria-label': 'Open my city' }); placeBox(open, cityBox); open.appendChild(h('span.cx', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg>' })); bd.appendChild(open);
     cityList.forEach((it, i) => {
       const p = R.slots ? { x: fit.x0 + i * fit.step, y: Math.max(1, (cityBox.h - fit.ch) / 2) } : posStripCard(cityBox, fit, n, i);
@@ -327,7 +327,7 @@ function renderBoard() {
     if (v < 0) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
     else if (!n) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
     // readable chips in a sideways-scrolling row: picture thumbnail + name + cost + points (tap = zoom)
-    const vert = handBox.h >= 150, chH = vert ? 56 : Math.max(46, handBox.h - 4), thW = Math.min(40, Math.floor((chH - 6) / 1.406)), chW = vert ? handBox.w - 8 : thW + 160, x0 = vert ? 4 : 40, gapc = 4;
+    const vert = handBox.h >= 150, chH = vert ? 56 : Math.max(46, handBox.h - 4), thW = Math.min(40, Math.floor((chH - 6) / 1.406)), x0 = vert ? 4 : 40, gapc = 4; let chW = vert ? handBox.w - 8 : thW + 160; if (!vert && n * (chW + gapc) + x0 > handBox.w) { const k = Math.max(1, Math.floor((handBox.w - x0) / (chW + gapc))); chW = Math.max(thW + 96, Math.floor((handBox.w - x0) / k) - gapc); }   // whole cards only: the last visible card is never cut by the scroller edge
     const hs = placeBox(h('div.hscroll'), handBox), hin = h('div.hin'); hin.style.cssText = vert ? `width:${handBox.w}px;height:${n * (chH + gapc) + 22}px` : `width:${x0 + n * (chW + gapc) + 2}px;height:${handBox.h}px`; if (vert) hs.classList.add('vert'); hs.appendChild(hin); bd.appendChild(hs);
     hand.forEach((id, i) => {
       const tg = 'p:hand:' + id, sp = spec(id);

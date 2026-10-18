@@ -281,7 +281,7 @@ function palm(P,x,y,z,R,s){s=s||1;if(glbOn()&&V3.glbR.palmA){const a=R()*6.28,sm
   for(let k=1;k<=n;k++){const f=k/n;const p=new THREE.Vector3(x+Math.cos(la)*lean*f*f,y+h*f,z+Math.sin(la)*lean*f*f);P.add(G_.cyl(),k%2?0x8a6a45:0x6f5236,segM(prev,p,(.075-.03*f)*s),.0,.15);prev=p}
   const top=prev;for(let k=0;k<3;k++)P.add(G_.sph(),0x5a3e22,M(top.x+Math.cos(k*2.1)*.07*s,top.y-.07*s,top.z+Math.sin(k*2.1)*.07*s,0,0,0,.065*s),0,.2);
   const fc=[0x3f8a3a,0x4f9a42,0x2f7033,0x5aa347];const nf=7+Math.floor(R()*2);for(let k=0;k<nf;k++){const a=k/nf*6.28+R()*.3;const L=(.85+R()*.3)*s;P.add(G_.frond(),fc[k%4],M(top.x,top.y,top.z,0,-a,(R()-.3)*.35,L,L,L),1,.25)}}
-function flushPalms(grp,P){if(!P.inst)return;const a=[],c=[];P.inst.forEach((e,i)=>(i%2?c:a).push(e));glbInstanced(grp,'palmA',a);glbInstanced(grp,'palmC',c);P.inst=null}
+function flushPalms(grp,P){if(!P.inst)return;const a=[],b=[],c=[];P.inst.forEach((e,i)=>[a,b,c][i%3].push(e));glbInstanced(grp,'palmA',a);glbInstanced(grp,'palmB',b);glbInstanced(grp,'palmC',c);P.inst=null}
 function jtree(P,x,y,z,R,s,dark){s=s||1;const h=(.75+R()*.5)*s;const tc=dark?0x1f2622:0x5b4630;P.add(G_.cyl(),tc,M(x,y,z,0,0,0,.09*s,h,.09*s),0,.3);
   const cols=dark?[0x34463e,0x3c5048,0x2f4038,0x46584e]:[0x245c2a,0x2f6f30,0x3d8237,0x4f9440,0x1d4d24];const L=3+Math.floor(R()*3);
   for(let i=0;i<L;i++){const f=i/L;const a=R()*6.28,o=(.05+R()*.22)*s*(1-f*.5);const r=(.5-f*.22+R()*.12)*s;P.add(G_.leaf(i%3),cols[Math.min(cols.length-1,i+(R()<.4?1:0))],M(x+Math.cos(a)*o,y+h+(f*.55-.05)*s,z+Math.sin(a)*o,R()*3,R()*3,0,r,r*.78,r),.35+f*.4,.45)}}
@@ -442,7 +442,7 @@ function flameMat(){return gq('flameM',()=>new THREE.ShaderMaterial({transparent
 function campMesh(){const g=new THREE.Group();const P=new Parts();const R=seeded(5);
   for(let i=0;i<9;i++){const a=i/9*6.28;P.add(G_.rock(i%3),i%2?0x77716a:0x5f5a55,M(Math.cos(a)*.34,0,Math.sin(a)*.34,R()*3,R()*3,0,.1,.08,.1),0,.4)}
   for(let i=0;i<5;i++){const a=i/5*6.28;P.add(G_.cylS(),i%2?0x4a3322:0x3a2618,M(Math.cos(a)*.2,.02,Math.sin(a)*.2,Math.cos(a)*.9,0,-Math.sin(a)*.9+1.57*0,.035,.42,.035),0,.3)}
-  P.add(G_.sph(),0x1a1310,M(0,0,0,0,0,0,.22,.03,.22),0,0);const base=P.mesh();g.add(base);
+  P.add(G_.sph(),0x1a1310,M(0,0,0,0,0,0,.22,.03,.22),0,0);const base=P.mesh();g.add(base);g.userData.base=base;
   const fire=new THREE.Group();g.add(fire);g.userData.fire=fire;const fl=[];for(let i=0;i<3;i++){const s=new THREE.Mesh(gq('flameG',()=>{const q=new THREE.PlaneGeometry(1,1);q.translate(0,.5,0);return q}),flameMat());s.position.set((i-1)*.06,.02,(i-1)*.03);s.scale.set(.5-i%2*.12,.8+i*.08,1);s.renderOrder=8;s.frustumCulled=false;fire.add(s);fl.push(s)}fire.userData.fl=fl;
   const coal=new THREE.Mesh(gq('coalG',()=>new THREE.SphereGeometry(.16,LO(10,6),LO(6,3),0,Math.PI*2,0,Math.PI/2)),gq('coalM',()=>new THREE.MeshStandardMaterial({color:0x2a1208,emissive:new THREE.Color(2.2,.6,.1),roughness:.9})));coal.scale.y=.4;fire.add(coal);fire.userData.coal=coal;
   // embers: points that rise, drift and fade in the shader
@@ -454,9 +454,12 @@ function campMesh(){const g=new THREE.Group();const P=new Parts();const R=seeded
   const tent=new Parts();tent.add(gq('tarpG',()=>{const s=new THREE.Shape();s.moveTo(-.55,0);s.lineTo(.55,0);s.lineTo(0,.72);s.closePath();const e=new THREE.ExtrudeGeometry(s,{depth:1.2,bevelEnabled:false});e.translate(0,0,-.6);return ni(e)}),0xcdbd98,M(-.95,0,-.35,0,.5,0),0,.35);
   tent.add(G_.cylS(),0x5a4230,M(-.95+Math.sin(.5)*.62,0,-.35+Math.cos(.5)*.62,0,0,0,.025,.8,.025),0,.2);tent.add(G_.cylS(),0x5a4230,M(-.95-Math.sin(.5)*.62,0,-.35-Math.cos(.5)*.62,0,0,0,.025,.8,.025),0,.2);
   const tm=tent.mesh();g.add(tm);g.userData.tent=tm;
-  for(const k of ['shel','pal','roof','pile']){const q=new THREE.Group();g.add(q);g.userData[k]=q}return g}
-function syncCamp(g,G){const u=g.userData;const sh=G.camp.shelter;const key=[glbOn()?1:0,!!sh,Math.min(4,G.camp.roof),Math.min(4,G.camp.pal),Math.min(15,G.pileWood||0)].join();if(u.key===key)return;u.key=key;
-  const GB=glbOn()&&V3.glbR.shelter&&V3.glbR.palisade;u.tent.visible=!sh;for(const k of ['shel','roof','pal','pile'])u[k].clear();const R=seeded(9);
+  for(const k of ['shel','pal','roof','pile','fm','raft']){const q=new THREE.Group();g.add(q);g.userData[k]=q}return g}
+function syncCamp(g,G){const u=g.userData;const sh=G.camp.shelter;const key=[glbOn()?1:0,!!sh,Math.min(4,G.camp.roof),Math.min(4,G.camp.pal),Math.min(15,G.pileWood||0),(G.inv&&G.inv.built&&(G.inv.built.raft||G.inv.built.jraft))?1:0].join();if(u.key===key)return;u.key=key;
+  const GB=glbOn()&&V3.glbR.shelter&&V3.glbR.palisade;u.tent.visible=!sh;for(const k of ['shel','roof','pal','pile','fm','raft'])u[k].clear();const R=seeded(9);
+  const FM=glbOn()&&!!V3.glbR.fire;u.base.visible=!FM;u.fmo=null;u.fire.userData.fl.forEach(s=>{s.visible=!FM});   // painted campfire model replaces the stone ring, logs and flat flames (embers, smoke and light stay)
+  if(FM){const o=glbInst('fire');o.position.set(0,-.02,0);o.userData.sy=o.scale.y;u.fm.add(o);u.fmo=o}
+  if(glbOn()&&V3.glbR.raft&&G.inv&&G.inv.built&&(G.inv.built.raft||G.inv.built.jraft)){const o=glbInst('raft');o.position.set(1.35,0,.85);o.rotation.y=.7;u.raft.add(o)}
   if(sh&&GB){const o=glbInst('shelter');o.position.set(-.8,0,-.62);o.rotation.y=.35;u.shel.add(o)}
   else if(sh){const P=new Parts();for(let i=0;i<6;i++){P.add(G_.cylS(),i%2?0x7a5a36:0x6b4b2a,M(-1.55,.05+i*.13,-.4,Math.PI/2,0,0,.065,1.1,.065),0,.25);P.add(G_.cylS(),i%2?0x6b4b2a:0x7a5a36,M(-.05,.05+i*.13,-.4,Math.PI/2,0,0,.065,1.1,.065),0,.25)}
     for(let i=0;i<5;i++)P.add(G_.cylS(),i%2?0x6f5030:0x7f5f3a,M(-1.55+i*.37,.05+.02*i,-.95,0,0,Math.PI/2*0,.06,.85,.06),0,.25);
@@ -467,7 +470,7 @@ function syncCamp(g,G){const u=g.userData;const sh=G.camp.shelter;const key=[glb
     for(let i=0;i<n-1;i++){const a=(i+.5)/28*Math.PI*2-1;P.add(G_.cylS(),0x5a4028,M(Math.cos(a)*1.6,.28,Math.sin(a)*1.6,Math.PI/2,-a,0,.02,.36,.02),0,.2)}u.pal.add(P.mesh())}
   const pw=Math.min(15,G.pileWood||0);if(pw){const P=new Parts();for(let i=0;i<pw;i++){const row=Math.floor(i/4),k=i%4;P.add(G_.cylS(),i%2?0x8a5a2b:0x7a4d24,M(1.05,.06+row*.11,.25+k*.13-row*.05,Math.PI/2,0,0,.055,.62,.055),0,.25)}u.pile.add(P.mesh())}}
 // ---------- GLB models (High/Medium: real 3D, loaded once and cloned; Low: thumbnail sprites for pawns, procedural props) ----------
-const GLBD={carpenter:['sw-carpenter',1.5],cook:['sw-cook',1.5],explorer:['sw-explorer',1.5],fri:['sw-friday',1.5],palmA:['sw-palm-a',1.9],palmC:['sw-palm-c',1.6],shelter:['sw-shelter',1.45],palisade:['sw-palisade',.95]};
+const GLBD={carpenter:['sw-carpenter',1.5],cook:['sw-cook',1.5],explorer:['sw-explorer',1.5],fri:['sw-friday',1.5],palmA:['sw-palm-a',1.9],palmB:['sw-palm-b',1.7],palmC:['sw-palm-c',1.6],fire:['sw-fire',.62],raft:['sw-raft',.8],shelter:['sw-shelter',1.45],palisade:['sw-palisade',.95]};
 function glbVar(){let ph=false;try{ph=Math.min(innerWidth,innerHeight)<600||(matchMedia('(pointer:coarse)').matches&&Math.max(innerWidth,innerHeight)<1200)}catch(e){}return V3.q==='low'||ph?'-lite':''}
 function glbLoad(){if(typeof GXGLB==='undefined')return;const v=glbVar();if(V3.glbV===v&&V3.glbP)return;const first=!V3.glbP;V3.glbV=v;V3.glbOK=false;if(!first)try{GXGLB.dispose()}catch(e){}V3.glbR={};
   const me=V3.glbP=Promise.all(Object.keys(GLBD).map(k=>GXGLB.load('models/'+GLBD[k][0]+v+'.glb').then(src=>{src.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true;const m=o.material;if(m){m.envMapIntensity=.6;m.side=THREE.FrontSide}}});
@@ -529,7 +532,7 @@ function sync3D(){if(!V3.on||!G)return;hexArtLoad();if(HEXART.done<7&&performanc
     o.g.userData.id=m.id;const ok=overlayKey(m);if(o.ok!==ok){if(o.ov)o.g.remove(o.ov);o.ov=overlayMesh(m);o.g.add(o.ov);o.ok=ok}
     const mv=V3.mist[m.id]||(V3.mist[m.id]={v:0,c:0,to:0});mv.to=v.terr==='unknown'&&!v.down?1:m.fog?.62:0;mv.fog=!!m.fog;if(mv.init==null){mv.init=1;mv.v=mv.to}}
   // camp on the camp tile
-  if(!V3.camp){V3.camp=campMesh();sc.add(V3.camp);if(V3.q==='low')lowNoise(true)}const cp=hexPos(MAP[G.camp.pos].q,MAP[G.camp.pos].r);V3.camp.position.set(cp.x+.3,groundY(cp.x+.3,cp.z+.2),cp.z+.2);syncCamp(V3.camp,{camp:G.camp,pileWood:G.sc&&G.sc.pile||0});
+  if(!V3.camp){V3.camp=campMesh();sc.add(V3.camp);if(V3.q==='low')lowNoise(true)}const cp=hexPos(MAP[G.camp.pos].q,MAP[G.camp.pos].r);V3.camp.position.set(cp.x+.3,groundY(cp.x+.3,cp.z+.2),cp.z+.2);syncCamp(V3.camp,{camp:G.camp,pileWood:G.sc&&G.sc.pile||0,inv:G.inv});
   // pawns: one figure per character pawn, Friday and the dog; they walk to where the plan sends them
   const want=[];for(const c of G.chars){const n=c.dead?0:(c.npc?1:2);for(let k=0;k<n;k++)want.push({id:'c'+c.i+'_'+k,col:PCOL3[c.i%6],out:!!c.out,ck:c.k})}if(G.fri&&!G.fri.dead)want.push({id:'fri',col:0xf4f4f4,kind:'fri'});if(G.dog)want.push({id:'dog',col:0x9b6bd6,kind:'dog'});
   const acts={};for(const a of (G.plan&&G.plan.acts)||[])for(const p of a.pw)acts[p]=a;
@@ -606,7 +609,7 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);
   if(V3.mistL)for(const l of V3.mistL){const u=l.material.uniforms;u.uFlash.value=fl;u.uCol.value.setRGB(.8-.35*S-.62*N,.84-.36*S-.6*N,.88-.33*S-.5*N)}
   // the campfire: flicker, embers, a curl of smoke
   if(V3.camp){const f=V3.camp.userData.fire;const fk=.82+.18*Math.sin(t*11)*Math.sin(t*7.3+1)+.08*Math.sin(t*23);f.userData.fl.forEach((s,i)=>{s.scale.y=(.8+i*.08)*(.9+.2*Math.sin(t*(9+i*2)+i))*(1-rw.rain*.25);s.scale.x=(.5-i%2*.12)*(.95+.1*Math.sin(t*13+i))});
-    f.userData.coal.material.emissive.setRGB(2.2*fk,.6*fk,.1);V3.fire.position.set(V3.camp.position.x,V3.camp.position.y+.7,V3.camp.position.z);V3.fire.intensity=(3+N*16)*fk*(1-rw.rain*.3);
+    f.userData.coal.material.emissive.setRGB(2.2*fk,.6*fk,.1);const fmo=V3.camp.userData.fmo;if(fmo)fmo.scale.y=fmo.userData.sy*(.96+.06*fk);V3.fire.position.set(V3.camp.position.x,V3.camp.position.y+.7,V3.camp.position.z);V3.fire.intensity=(3+N*16)*fk*(1-rw.rain*.3);
     f.userData.smoke.forEach(s=>{const k=(t*.25+s.userData.ph)%1;s.position.set(k*V3.U.wind.value*1.2,.5+k*2.2,0);s.scale.setScalar(.25+k*.9);s.material.opacity=.32*Math.sin(k*Math.PI)*(1-N*.5)})}
   // pickable tiles: a pulsing amber rim, brighter under the pointer
   for(const id in V3.tiles){const o=V3.tiles[id].g;const hot=V3.pickable&&V3.pickable.includes(+id);const hv=V3.hover===+id&&hot;const r=o.userData.ring;if(r){r.visible=!!hot;if(hot)r.material.opacity=hv?.95:.4+.25*Math.sin(t*3.2)}const tm=o.userData.top;if(tm){const e=hv?.16:0;if(tm.emissive.r!==e)tm.emissive.setRGB(e,e*.7,e*.3)}}

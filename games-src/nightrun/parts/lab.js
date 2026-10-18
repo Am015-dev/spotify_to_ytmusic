@@ -116,7 +116,7 @@ function labBuildCheats(body){
   const d=lsec(body,'DIFFICULTY');[['easy','Easy'],['normal','Normal'],['hard','Hard'],['vhard','Very hard'],['legend','Legend']].forEach(([k,n])=>lchip(d,n,()=>{SET.diff=k;saveSet();DF=DIFFS[k];HARD=HARDS.includes(k);diffDraw();},{on:()=>SET.diff===k,html:diffBadge(k)+' '+n}));
   const p=lsec(body,'PLAYER');
   tg(p,'GOD MODE',()=>{godMode=!godMode;},()=>godMode,on=>on?'GOD MODE: ON':'GOD MODE');
-  tg(p,'FPS COUNTER',()=>{SET.fpsc=!SET.fpsc;saveSet();$('fpsEl').hidden=!SET.fpsc;},()=>!!SET.fpsc,on=>on?'FPS COUNTER: ON':'FPS COUNTER');
+  tg(p,'FPS COUNTER',()=>{SET.fpsc=!SET.fpsc;saveSet();$('fpsEl').hidden=!FPSOK();},()=>!!SET.fpsc,on=>on?'FPS COUNTER: ON':'FPS COUNTER');
   tg(p,'BOSS CHEST',()=>{save('mnr_chest',CHEST_ON()?0:1);},()=>CHEST_ON(),on=>on?'BOSS CHEST: ON':'BOSS CHEST: OFF');
   const n=lsec(body,'NEON');lchip(n,'+1,000',()=>{GA.bank+=1000;gsave();garageDirty=true;});lchip(n,'+10,000',()=>{GA.bank+=10000;gsave();garageDirty=true;});lchip(n,'SET 0',()=>{GA.bank=0;gsave();garageDirty=true;});
   const g=lsec(body,'GARAGE');

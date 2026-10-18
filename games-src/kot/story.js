@@ -138,7 +138,7 @@ function recapHTML(){const me=recapMe();if(me<0||!RECAP.snap)return '';
     if(d.length)parts[k===me?'unshift':'push'](`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
   const ev=G.log.filter(l=>l.n>RECAP.n).reverse().map(l=>`<li>${esc(l.t)}</li>`);
   if(!parts.length&&!ev.length)return '';
-  return `⏪ <b>While you waited:</b> ${parts.length?parts.join(' · '):'nothing changed'}${ev.length?` <span class="more">· tap: how</span><ol class="recap">${ev.join('')}</ol>`:''}`}
+  return `⏪ <b>While you waited:</b> ${parts.length?parts.join(' · '):'nothing changed'}${ev.length?`<ol class="recap">${ev.join('')}</ol>`:''}`}
 {const _st=startTurn;startTurn=function(){
   const me=recapMe();const nxt=G&&!G.winner?cur():null;
   if(me>=0&&nxt&&nxt.i!==me&&!RECAP.snap){RECAP.snap=G.pl.map((q,k)=>({hp:q.hp,vp:q.vp,en:q.en,alive:q.alive,city:G.city===k}));RECAP.n=G.lseq||0}

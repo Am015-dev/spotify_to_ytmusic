@@ -2,22 +2,21 @@
    its files loaded, so a missing file keeps the plain CSS. Palette: blueprint blue, brass, copper, warning orange. */
 html.sk{--sk-ink:#2a1a08;--sk-cream:#fff1d2;--gxc-ink:#f6efdc;--gxc-dim:rgba(246,239,220,.78)}
 /* ---- buttons: cream plate (default), orange (go / selected), blue (power / chosen) ---- */
-html.sk .big,html.sk .btn,html.sk .chip{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 0 42 fill/0 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+html.sk .big,html.sk .btn,html.sk .chip{border-style:solid;border-color:transparent;border-image:url(media/ui-button-cream-c.webp) 30 42 fill/14px 22px stretch;border-radius:0;background:none;box-shadow:none;color:var(--sk-ink);text-shadow:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
 html.sk .big{min-height:56px}
-html.sk .btn{min-height:48px;min-width:60px;font-size:.92rem}
-html.sk .btn.small{min-height:44px}
 html.sk .chip{border-image-width:0 20px}
 html.sk .chip.sm{border-image-width:0 16px}
 html.sk .big.go,html.sk .btn.go,html.sk .chip.go,html.sk .btn.on,html.sk .chip.on{border-image-source:url(media/ui-button-go-c.webp);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
 html.sk .big.blue,html.sk .btn.blue{border-image-source:url(media/ui-button-power-c.webp);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7)}
 html.sk .chip.on{border-image-source:url(media/ui-button-power-c.webp)}
 html.sk .chip.x{color:var(--sk-ink);text-shadow:none;border-image-source:url(media/ui-button-cream-c.webp)}
+/* the painted plates hide the background, but contrast checkers read it: a matching flat colour under each light-on-paint button */
+html.sk .big.go,html.sk .btn.go,html.sk .chip.go,html.sk .btn.on{background-color:#c4480a;background-clip:content-box}
+html.sk .big.blue,html.sk .btn.blue,html.sk .chip.on{background-color:#2457b8;background-clip:content-box}
 html.sk .big:active,html.sk .btn:active,html.sk .chip:active{transform:translateY(2px);box-shadow:none}
 html.sk .btn:hover{background:none}
 html.sk .btn[disabled],html.sk .btn.dis{opacity:.5}
 html.sk .chip.glow{box-shadow:none;filter:drop-shadow(0 0 4px #ffe066) drop-shadow(0 0 8px #ffe066)}
-html.sk .jobrow .btn{min-width:64px}
-html.sk .st-main .seg .btn{min-width:60px}
 html.sk .big.gxt-menu,html.sk .btn.gxt-menu{flex-direction:column}
 /* ---- popups: painted frame, parchment inside (the cream body keeps every text dark on light) ---- */
 html.sk .gx-drawer-body{background:#fff6e2;border-radius:5px;padding:6px 8px 12px;color:var(--ink)}
@@ -34,11 +33,11 @@ html.sk-bomb svg.bm,html.sk-bomb .gx-bar h1 span[data-ico=bomb] svg{background:u
 html.sk-bomb svg.bm{width:30px;height:30px}
 html.sk-bomb svg.bm *,html.sk-bomb .gx-bar h1 span[data-ico=bomb] svg *{display:none}
 /* ---- player name plates: brass, the seat colour stays as the bottom edge ---- */
-html.sk-plate .plate{height:26px;padding:0 12px 0 8px;border:0;border-radius:0;background:url(media/ui-nameplate-c.webp) 0 0/100% 100% no-repeat;color:#2a1a08;text-shadow:0 1px 0 rgba(255,235,170,.6);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));position:relative}
-html.sk-plate .plate::after{content:'';position:absolute;left:10px;right:10px;bottom:2px;height:3px;border-radius:2px;background:var(--sc)}
+html.sk-plate .plate{height:26px;padding:0 3px 0 0;border-style:solid;border-color:transparent;border-width:0 9px;border-radius:0;border-image:url(media/ui-nameplate-c.webp) 0 20 fill/0 9px stretch;background:none;color:#2a1a08;text-shadow:0 1px 0 rgba(255,235,170,.6);filter:drop-shadow(0 2px 2px rgba(0,0,0,.45));position:relative}
+html.sk-plate .plate::after{content:'';position:absolute;left:1px;right:-8px;bottom:2px;height:3px;border-radius:2px;background:var(--sc)}
 html.sk-plate .plate em{background:rgba(60,30,0,.18);color:#2a1a08}
 html.sk-plate .plate .star{color:#a3410a}
-html.sk-plate .plate.cur{background:url(media/ui-nameplate-c.webp) 0 0/100% 100% no-repeat;color:#1a0f02;box-shadow:none;filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 9px var(--sc))}
+html.sk-plate .plate.cur{background:none;color:#1a0f02;box-shadow:none;filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 9px var(--sc))}
 html.sk-plate .plate.cur::after{height:4px}
 html.sk-plate .plate.cur em{background:rgba(60,30,0,.25)}
 html.sk-plate .plate.glow{box-shadow:none;filter:drop-shadow(0 0 3px #ffe066) drop-shadow(0 0 7px #ffe066)}
@@ -49,7 +48,7 @@ html.short.sk-plate .plate,html.sk-plate html.short .plate{height:24px}
 /* ---- wire racks: a brass rail with spring clips above each row of tiles ---- */
 html.sk-rack .stand{isolation:isolate}
 html.sk-rack .plate{z-index:2}
-html.sk-rack .stand::before{content:'';position:absolute;left:-3px;right:-3px;top:-9px;height:18px;z-index:-1;background:url(media/ui-rack-c.webp) center/100% 100% no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5));pointer-events:none}
+html.sk-rack .stand::before{content:'';position:absolute;left:-3px;right:-3px;top:-9px;height:18px;z-index:-1;background:url(media/ui-rack-c.webp) center/auto 100% round no-repeat;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5));pointer-events:none}
 /* ---- wire tiles: the painted enamel plate tints with the wire colour (numbers and colours stay code) ---- */
 html.sk-wire .tile{background-image:url(media/wire-tile-frame-c.webp),linear-gradient(#56a6ff,#1c62d9);background-size:100% 100%,100% 100%;background-blend-mode:multiply,normal}
 html.sk-wire .tile.back{background-image:url(media/wire-tile-frame-c.webp),linear-gradient(#4a52a8,#2b2f63)}
@@ -71,3 +70,24 @@ html.sk-key .gxc-node.won .gxc-disc,html.sk-key .gxc-node.won.a2 .gxc-disc,html.
 html.sk-key .gxc-node.locked .gxc-disc,html.sk-key .gxc-node.locked.a2 .gxc-disc,html.sk-key .gxc-node.locked.a3 .gxc-disc{background-image:url(media/ui-node-locked-k.webp)}
 html.sk-key .gxc-node.boss .gxc-disc,html.sk-key .gxc-node.boss.a2 .gxc-disc,html.sk-key .gxc-node.boss.a3 .gxc-disc{background-image:url(media/ui-node-boss-k.webp)}
 @media (prefers-reduced-motion:reduce){html.sk-spark .spark{animation:none}}
+/* wide tap-rows (Tutorial) sit on the painted strip; border widths unchanged, only the paint changes */
+html.sk .btn.gxt-menu{border-image:url(media/ui-row-c.webp) 30 fill/12px 12px 12px 7px stretch;text-align:center;color:#f6efdc;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+html.sk .btn.gxt-menu{background-color:#4a3018;background-clip:content-box}
+html.sk .btn.gxt-menu>*{color:inherit;text-shadow:inherit}
+/* painted speech tail replaces the coach bubble's diamond arrow (art points right; rotated to face the target) */
+html.sk .gxh-arr{pointer-events:none;width:20px;height:14px;border:0;background:url(media/ui-bubble-tail.webp) center/contain no-repeat;transform:rotate(0deg)}
+html.sk .gxh-a-top .gxh-arr{top:-14px;transform:rotate(-90deg)}
+html.sk .gxh-a-bottom .gxh-arr{bottom:-14px;transform:rotate(90deg)}
+html.sk .gxh-a-left .gxh-arr{left:-17px;transform:rotate(180deg)}
+html.sk .gxh-a-right .gxh-arr{right:-17px;transform:rotate(0deg)}
+/* look check: crew tiles are wider than wire tiles; keep the frame's shape instead of stretching it (81% distortion) */
+html.sk-wire .tile.crew{background-size:auto 100%,100% 100%;background-repeat:no-repeat;background-position:center}
+/* look check: story speaker name readable on the painted panel (was 1.98:1) */
+html.sk .gxc-sc-name{color:#1d140c;text-shadow:0 0 3px #fff8e6,0 0 1px #fff8e6}
+/* painted plates: the art's border width must not exceed border+padding, or the label sits on the frame (menu test v2) */
+html.sk .big{border-image-width:9px 12.6px}
+html.sk .btn{border-image-width:8px 11.2px}
+html.sk .btn.small{border-image-width:5px 7px}
+html.sk .btn.gxt-menu{border-image-width:5px 7px}
+#setd .lbl{padding-left:10px}
+#setd .gxh-set{padding-left:10px}

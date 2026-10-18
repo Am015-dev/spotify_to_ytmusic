@@ -5,11 +5,13 @@ Originals move to `done/` (not committed). Run with `--check` first to see what 
 
 The **Wired** column says what happens after the drop: `auto` = shows up in the game, `fallback` = shows up, but the game needs a fallback for the missing-file case (script lists it), `wiring` = a code change is still needed.
 
-## Pictures (the to-make list) (3)
+## Pictures (the to-make list) (5)
 
 | Name | Size | Ratio | Transparent | What it is | Wired |
 |---|---|---|---|---|---|
-| `gxh-ok-button-plate.webp` | 512x512 | 2.05 | yes (flat white background, we key it) | gxh ok button plate | wiring |
+| `gx-bar-plate.webp` | 1024x512 | 8.86 | yes (flat white background, we key it) | gx bar plate | wiring |
+| `gx-drawer-head-plate.webp` | 1024x512 | 6 | yes (flat white background, we key it) | gx drawer head plate | wiring |
+| `gxh-ok-button-plate.webp` | 512x512 | 1.68 | yes (flat white background, we key it) | gxh ok button plate | wiring |
 | `tlink-button-plate.webp` | 1024x512 | 8.14 | yes (flat white background, we key it) | tlink button plate | wiring |
 | `ttl-bg-picture.webp` | 1024x1024 | 0.51 | no | ttl bg picture | wiring |
 

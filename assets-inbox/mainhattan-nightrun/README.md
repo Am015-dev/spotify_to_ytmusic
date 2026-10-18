@@ -5,7 +5,7 @@ Originals move to `done/` (not committed). Run with `--check` first to see what 
 
 The **Wired** column says what happens after the drop: `auto` = shows up in the game, `fallback` = shows up, but the game needs a fallback for the missing-file case (script lists it), `wiring` = a code change is still needed.
 
-## Pictures (the to-make list) (31)
+## Pictures (the to-make list) (92)
 
 | Name | Size | Ratio | Transparent | What it is | Wired |
 |---|---|---|---|---|---|
@@ -16,6 +16,34 @@ The **Wired** column says what happens after the drop: `auto` = shows up in the 
 | `fx-bullet-needle.webp` | 256x64 | 4:1 | no | Enemy bullet effects | prefix |
 | `fx-bullet-rocket.webp` | 256x128 | 2:1 | no | Enemy bullet effects | prefix |
 | `fx-bullet-shell.webp` | 128x128 | 1:1 | no | Enemy bullet effects | prefix |
+| `fx-fuse-arc-beat.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-arc-beat | auto |
+| `fx-fuse-arc-disc.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-arc-disc | auto |
+| `fx-fuse-arc-laser.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-arc-laser | auto |
+| `fx-fuse-arc-mine.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-arc-mine | auto |
+| `fx-fuse-arc-orbit.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-arc-orbit | auto |
+| `fx-fuse-arc-pulse.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-arc-pulse | auto |
+| `fx-fuse-arc-swarm.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-arc-swarm | auto |
+| `fx-fuse-beat-disc.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-beat-disc | auto |
+| `fx-fuse-beat-laser.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-beat-laser | auto |
+| `fx-fuse-beat-mine.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-beat-mine | auto |
+| `fx-fuse-beat-orbit.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-beat-orbit | auto |
+| `fx-fuse-beat-pulse.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-beat-pulse | auto |
+| `fx-fuse-beat-swarm.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-beat-swarm | auto |
+| `fx-fuse-disc-laser.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-disc-laser | auto |
+| `fx-fuse-disc-mine.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-disc-mine | auto |
+| `fx-fuse-disc-orbit.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-disc-orbit | auto |
+| `fx-fuse-disc-pulse.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-disc-pulse | auto |
+| `fx-fuse-disc-swarm.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-disc-swarm | auto |
+| `fx-fuse-laser-mine.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-laser-mine | auto |
+| `fx-fuse-laser-orbit.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-laser-orbit | auto |
+| `fx-fuse-laser-pulse.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-laser-pulse | auto |
+| `fx-fuse-laser-swarm.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-laser-swarm | auto |
+| `fx-fuse-mine-orbit.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-mine-orbit | auto |
+| `fx-fuse-mine-pulse.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-mine-pulse | auto |
+| `fx-fuse-mine-swarm.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-mine-swarm | auto |
+| `fx-fuse-orbit-pulse.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-orbit-pulse | auto |
+| `fx-fuse-orbit-swarm.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-orbit-swarm | auto |
+| `fx-fuse-pulse-swarm.webp` | 512x512 | 1:1 | no | Weapon fusions: fx-fuse-pulse-swarm | auto |
 | `gabtn-plate.webp` | 512x512 | 3.76 | yes (flat white background, we key it) | gaBtn plate | wiring |
 | `go-dim-plate.webp` | 512x512 | 3.68 | yes (flat white background, we key it) | go dim plate | wiring |
 | `kit-ckp.webp` | 128x128 | 1:1 | no | Garage perk icons | prefix |
@@ -36,10 +64,43 @@ The **Wired** column says what happens after the drop: `auto` = shows up in the 
 | `missing-picture-fx-bullet-rocket-webp.webp` | 1024x1024 | 1 | yes (flat white background, we key it) | missing picture fx-bullet-rocket.webp | wiring |
 | `missing-picture-fx-bullet-shell-webp.webp` | 1024x1024 | 1 | yes (flat white background, we key it) | missing picture fx-bullet-shell.webp | wiring |
 | `setbtn-plate.webp` | 512x512 | 3.28 | yes (flat white background, we key it) | setBtn plate | wiring |
+| `ship-drift-armed.webp` | 512x256 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: ship-drift-armed | auto |
+| `ship-ec-armed.webp` | 512x256 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: ship-ec-armed | auto |
+| `ship-hv-armed.webp` | 512x256 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: ship-hv-armed | auto |
+| `ship-lancer-armed.webp` | 512x256 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: ship-lancer-armed | auto |
+| `ship-nova-armed.webp` | 512x256 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: ship-nova-armed | auto |
+| `ship-std-armed.webp` | 512x256 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: ship-std-armed | auto |
+| `ship-swg-armed.webp` | 512x256 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: ship-swg-armed | auto |
+| `ship-syn-armed.webp` | 512x256 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: ship-syn-armed | auto |
+| `ship-tri-armed.webp` | 512x256 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: ship-tri-armed | auto |
 | `startbtn-plate.webp` | 512x512 | 3.09 | yes (flat white background, we key it) | startBtn plate | wiring |
 | `storybtn-plate.webp` | 512x512 | 3.68 | yes (flat white background, we key it) | storyBtn plate | wiring |
 | `title-plate.webp` | 1024x1024 | 0.51 | no | title plate | wiring |
+| `wp-arc.webp` | 256x256 | 1:1 | yes (flat white background, we key it) | Weapons: wp-arc | auto |
+| `wp-beat.webp` | 256x256 | 1:1 | yes (flat white background, we key it) | Weapons: wp-beat | auto |
+| `wp-disc.webp` | 256x256 | 1:1 | yes (flat white background, we key it) | Weapons: wp-disc | auto |
+| `wp-laser.webp` | 256x256 | 1:1 | yes (flat white background, we key it) | Weapons: wp-laser | auto |
+| `wp-mine.webp` | 256x256 | 1:1 | yes (flat white background, we key it) | Weapons: wp-mine | auto |
+| `wp-orbit.webp` | 256x256 | 1:1 | yes (flat white background, we key it) | Weapons: wp-orbit | auto |
+| `wp-pulse.webp` | 256x256 | 1:1 | yes (flat white background, we key it) | Weapons: wp-pulse | auto |
+| `wp-swarm.webp` | 256x256 | 1:1 | yes (flat white background, we key it) | Weapons: wp-swarm | auto |
 | `wpbtn-plate.webp` | 512x512 | 2.82 | yes (flat white background, we key it) | wpBtn plate | wiring |
+| `wpmount-arc.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-arc | auto |
+| `wpmount-beat.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-beat | auto |
+| `wpmount-disc.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-disc | auto |
+| `wpmount-drone.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-drone | auto |
+| `wpmount-flame.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-flame | auto |
+| `wpmount-frost.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-frost | auto |
+| `wpmount-laser.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-laser | auto |
+| `wpmount-mine.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-mine | auto |
+| `wpmount-orbit.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-orbit | auto |
+| `wpmount-pulse.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-pulse | auto |
+| `wpmount-rail.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-rail | auto |
+| `wpmount-shell.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-shell | auto |
+| `wpmount-storm.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-storm | auto |
+| `wpmount-swarm.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-swarm | auto |
+| `wpmount-wave.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-wave | auto |
+| `wpmount-well.webp` | 256x128 | 2:1 | yes (flat white background, we key it) | Ship weapon mounts: wpmount-well | auto |
 
 ## Wave 7 pictures (3)
 

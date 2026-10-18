@@ -5,12 +5,14 @@
 .opp.seat{flex:0 1 150px;min-width:0;min-height:0;max-width:200px;padding:3px 10px 3px 4px;border-radius:30px;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:7px;row-gap:0;align-content:center;align-items:center;position:relative;
   translate:0 calc((1 - var(--q,0)*var(--q,0))*8px)}
 .opp.seat .sav{grid-row:1/3;grid-column:1;position:relative;width:42px;height:42px;border-radius:50%;border:2.5px solid var(--c,#ffd76a);background:#2a1208;box-shadow:0 2px 0 #000;display:block}
-.opp.seat .savi{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.opp.seat .savi{position:absolute;left:0;top:0;width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
 .opp.seat .slv{position:absolute;right:-7px;bottom:-5px;min-width:21px;height:21px;padding:0 4px;border-radius:11px;display:grid;place-items:center;font:800 14px/1 var(--title);color:#2b1405;background:radial-gradient(circle at 35% 28%,#fff6d0,#f0c35a 55%,#9a6620);box-shadow:0 0 0 1.5px #2a170b,0 1px 0 rgba(0,0,0,.5)}
 .opp.seat .sdead{position:absolute;left:-4px;top:-6px;font-style:normal;font-size:16px}
 .opp.seat .snm{grid-column:2;grid-row:1;font:700 13px/1.15 var(--title);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 0 #000;min-width:0}
 .opp.seat .sbd{grid-column:2;grid-row:2;display:flex;gap:7px;font:700 13px/1.15 var(--hand);color:var(--cream2);white-space:nowrap;min-width:0}
 .opp.seat .sw{color:#ffd76a}
+.opp.seat .lb{font-size:11px;font-weight:700;margin-left:2px;opacity:.85;letter-spacing:0}
+html.ph .opp.seat .sbd{gap:5px}
 .opp.seat .sc{color:#c9b4ff}
 .opp.seat .sbd .ic{width:1em;height:1em;vertical-align:-.12em}
 .opp.seat.active{box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),inset 0 0 0 4px #ffd76a,0 0 0 2px #ffd76a,0 0 14px 4px rgba(255,190,70,.5)}
@@ -19,6 +21,8 @@
 .opps.n5 .snm,.opps.n4 .snm{display:none}
 .opps.n5 .opp.seat{padding-right:6px}.opps.n5 .sbd{gap:4px}
 .opps.n5 .opp.seat,.opps.n4 .opp.seat{grid-template-rows:auto auto}
+/* five rivals: the strength and the gear count stack, so a seat never pokes out of the table sideways (it made the clipped board scrollable) */
+.opps.n5 .sbd{grid-row:1/3;flex-direction:column;justify-content:center;gap:1px}
 /* hero strip: your avatar with the big strength number, level medal, gear laid out beside it */
 .mine .slots{display:flex;gap:10px;align-items:center;opacity:.4}
 .mine .slots i{font-style:normal;width:36px;height:36px;border-radius:9px;border:2px dashed rgba(245,231,200,.55);display:grid;place-items:center;color:var(--cream)}
@@ -65,7 +69,7 @@ html.ph .mine.paper::before{display:none}
 html.ph .mine .top{grid-area:top;position:relative;display:block;width:calc(var(--hero) + 14px);height:calc(var(--hero) + 10px);gap:0;padding:0}
 html.ph .mine .top>:not(.bfhero):not(.lv){display:none}
 html.ph .mine .bfhero{position:absolute;left:0;top:0;display:block;width:var(--hero);height:var(--hero)}
-html.ph .mine .bfhero .bfav{width:var(--hero);height:var(--hero);border-width:3px;display:block}
+html.ph .mine .bfhero .bfav{position:absolute;left:0;top:0;width:var(--hero);height:var(--hero);border-width:3px;display:block}
 html.ph .mine .bfhero .bfstr{position:absolute;left:50%;bottom:-9px;translate:-50% 0;font:900 18px/1 var(--title);color:#ffd76a;background:#2a1208;border:2px solid #ffd76a;border-radius:14px;padding:3px 8px;text-shadow:0 1px 0 #000;white-space:nowrap}
 html.ph .mine .lv{position:absolute;right:0;top:-3px;margin:0;min-width:26px;height:26px;padding:0 5px;border-radius:13px;display:grid;place-items:center;grid-auto-flow:column;gap:2px;font:800 15px/1 var(--title);color:#2b1405;background:radial-gradient(circle at 35% 28%,#fff6d0,#f0c35a 55%,#9a6620);box-shadow:0 0 0 1.5px #2a170b,0 2px 0 rgba(0,0,0,.5);text-shadow:none}
 html.ph .mine .lv small{display:none}
@@ -74,6 +78,7 @@ html.ph .mine .gear:not(:has(.gchip)){min-height:calc(var(--hero) + 4px)!importa
 html.ph .mine .hand{grid-area:hand;display:flex;justify-content:center;align-items:flex-end;overflow:visible;gap:0;padding:calc(var(--hw)*.12 + 12px) 0 4px;height:calc(var(--hw)*1.42 + var(--hw)*.12 + 16px);box-sizing:border-box;scroll-snap-type:none;-webkit-mask-image:none;mask-image:none;position:relative}
 html.ph .mine .hand .card{--w:var(--hw);rotate:var(--rot,0deg);translate:0 calc(var(--arc,0px) - 6px);transform-origin:50% 130%;flex:none;touch-action:none}
 html.ph .mine .hand .card+.card{margin-left:var(--ov,-18px)}
+html.ph .mine .hand .card:not(:last-child) .cn{width:var(--vis,100%);max-width:var(--vis,100%);box-sizing:border-box;margin:0 auto 0 0;padding-left:1px;padding-right:1px;overflow:hidden;overflow-wrap:normal;word-break:normal;hyphens:none;letter-spacing:-.02em}
 html.ph .mine .hand .card.play,html.ph .mine .hand .card.sug{translate:0 calc(var(--arc,0px) - 14px)}
 html.ph .mine .hand .card:hover{rotate:var(--rot,0deg);translate:0 calc(var(--arc,0px) - 6px)}
 html.ph .mine .hand .card.bf-picked{translate:0 -24px!important;rotate:0deg!important;z-index:8}
@@ -88,7 +93,7 @@ html.ph #prompt .bfline{color:var(--cream);text-shadow:0 1px 0 #000}
 html.ph-p{--ph-dock:calc(98px + env(safe-area-inset-bottom,0px))}
 html.ph-p #prompt{min-height:78px;justify-content:center}
 html.ph-p .gx-dock{padding-bottom:env(safe-area-inset-bottom,0px)}
-html.ph .gx-dock-body{padding:6px 10px 6px}
+html.ph .gx-dock-body{padding:4px 10px 4px}
 /* the fight on the table: your hero on the left, the monster on the right, strengths as big numbers, buttons under them */
 html.ph .arena:has(>.vs){display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.15fr);grid-template-rows:minmax(0,1fr) auto;column-gap:4px;row-gap:4px;align-content:center;justify-content:stretch;justify-items:center;align-items:center;overflow:visible;--hav:min(var(--cw),calc((100cqw - 2*var(--sw) - 40px)*.42),150px)}
 html.ph .arena:has(>.vs) .vs{display:contents}
@@ -241,3 +246,9 @@ html.ph .arena:has(>.vs){--res:calc(98px + var(--rb,0px) + var(--re,0px) + var(-
 html .arena .vs .score .num{display:none!important}
 html.ph .sline .sl1{gap:5px;padding:1px 10px 2px}html.ph .sline .sy,html.ph .sline .sm{gap:4px}html.ph .sline .sl1 i{font-size:.75rem;letter-spacing:.02em}html.ph .sline .sv{font-size:.9rem}
 html.ph .sline .n{min-width:.9em}
+/* PC: after a bonus card the fight rows outgrow the arena; Fight!/Run/Help stay pinned inside it instead of being cut off and unclickable (scenario dk-fight-bonus @1366x768) */
+html:not(.ph) .arena .fbtns{position:sticky;bottom:0;z-index:3}
+
+/* 9+ cards: slices under 44px, so a card's price tag hides and its name ends in an ellipsis instead of running under the next card */
+html.ph .mine .hand.tight .card:not(:last-child) :is(.gold,.aw){display:none}
+html.ph .mine .hand.tight .card:not(:last-child) .cn{display:none}

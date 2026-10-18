@@ -95,7 +95,7 @@ function kitBoot() {
   GNS.achievements(GAME_ID, ACH);
   AIDELAY = GX.aiDelay(650);
   GX.onPref((k) => { if (k === 'ai' || typeof k === 'object') AIDELAY = GX.aiDelay(650); if (k === 'cb' && G && UI.started) render(); });
-  GX.offline({ sw: '../sw.js', scope: '../' });
+  if (!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) GX.offline({ sw: '../sw.js', scope: '../' });
 }
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a]'); if (!t) return;

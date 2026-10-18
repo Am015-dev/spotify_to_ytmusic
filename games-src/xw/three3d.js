@@ -28,7 +28,7 @@ function perfHooks(){if(!PH)return;
     beforeTest:()=>{if(typeof toggleMenu==='function')toggleMenu(false)}})}
 function urlGfx(){try{const m=/[?&]gfx=(high|medium|low)/.exec(location.search||'');return m?m[1]:null}catch(e){return null}}
 function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE==='undefined'||!window.WebGLRenderingContext||/jsdom/i.test(navigator.userAgent||''))return false;
-  let r;try{r=V3.r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});if(!r.getContext())return false}catch(e){return false}
+  let r;try{r=V3.r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});if(!r.getContext())return false;cv.removeAttribute('data-engine')}catch(e){return false}
   try{const gl=r.getContext();const ext=gl.getExtension('WEBGL_debug_renderer_info');const name=String(ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER));V3.gpu=name;V3.soft=/swiftshader|llvmpipe|software|softpipe/i.test(name)}catch(e){}
   r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.05;r.useLegacyLights=false;
   r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;V3.aniso=Math.min(8,r.capabilities.getMaxAnisotropy()||1);r.setClearColor(0x020108,1);

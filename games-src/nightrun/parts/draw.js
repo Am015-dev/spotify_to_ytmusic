@@ -1,9 +1,39 @@
+/* ===== weapon mounts on the ship: slot 1 = coloured circle, slot 2 = coloured triangle until wpmount-<id>.webp exists; fusion = split ring (or fx-fuse-<a>-<b>.webp).
+   Colours and ids are read from WPD at draw time. Visual only: shots and hits are unchanged. Switch: RIG.on. Hardpoints are ship-local fractions of the ship length (x forward, y down). ===== */
+const RIG={on:true,ok:false,fl:[0,0],armedRun:false,
+  hp:{std:[.30,-.2,.30,.2],tri:[.30,-.22,.30,.22],hv:[.26,-.26,.26,.26],ec:[.30,-.2,.30,.2],swg:[.28,-.24,.28,.24],syn:[.30,-.22,.30,.22],drift:[.28,-.3,.28,.3],lancer:[.36,-.15,.36,.15],nova:[.28,-.26,.28,.26]},   // [x1,y1,x2,y2] per ship id; default = std
+  pt(id,sl){const a=this.hp[id]||this.hp.std;return sl?[a[2],a[3]]:[a[0],a[1]];},
+  mount(c,wid,sl,x,y,L){const d=WPD[wid];if(!d)return;const r=L*.09,nm='wpmount-'+wid;
+    if(ART.have(nm)){const b=ART.bm[nm],w=L*.34,h=w*b.height/b.width;c.drawImage(b,x-w*.5,y-h*.5,w,h);return;}
+    c.fillStyle=d.c;c.beginPath();
+    if(sl){c.moveTo(x+r*1.15,y);c.lineTo(x-r*.8,y-r);c.lineTo(x-r*.8,y+r);c.closePath();c.fill();}
+    else{c.arc(x,y,r,0,7);c.fill();c.strokeStyle='#fff';c.lineWidth=Math.max(1,r*.22);c.globalAlpha=.85;c.beginPath();c.arc(x,y,r*.62,0,7);c.stroke();c.globalAlpha=1;}},
+  fuse(c,L,t){const f=WP.fu();if(!f)return;if(ART.have(f.img)){const b=ART.bm[f.img],w=L*1.15;c.globalCompositeOperation='lighter';c.globalAlpha=.55+.15*Math.sin(t*6);c.drawImage(b,-w*.5,-w*.5,w,w);c.globalAlpha=1;c.globalCompositeOperation='source-over';return;}
+    const r=L*.5;c.lineWidth=Math.max(1.5,L*.04);c.globalAlpha=.6+.25*Math.sin(t*6);c.strokeStyle=f.c1;c.beginPath();c.arc(0,0,r,Math.PI*.5,Math.PI*1.5);c.stroke();
+    c.strokeStyle=f.c2;c.beginPath();c.arc(0,0,r,-Math.PI*.5,Math.PI*.5);c.stroke();c.globalAlpha=1;},
+  // c is already at the ship centre (rotated); L = ship length in world units; flash = muzzle burst at the mounts for the first frames after a volley
+  draw(c,sid,L,t,oy,pv){if(!this.on)return;const eq=WP.eq,ar=pv&&ART.have('ship-'+sid+'-armed');this.fuse(c,L,t);if(ar)return;
+    for(let sl=0;sl<2;sl++){const id=eq[sl];if(!id)continue;const q=this.pt(sid,sl),x=q[0]*L,y=q[1]*L+(oy||0);this.mount(c,id,sl,x,y,L);
+      const fl=pv?0:this.fl[sl];if(fl>0){c.globalCompositeOperation='lighter';c.globalAlpha=Math.min(1,fl*14);c.fillStyle=WPD[id]?WPD[id].c:'#fff';c.beginPath();c.arc(x+L*.1,y,L*(.07+.1*fl*9),0,7);c.fill();c.globalAlpha=1;c.globalCompositeOperation='source-over';}}}};
+NR.on('fire',()=>{if(RIG.on){RIG.fl[0]=RIG.fl[1]=.09;}});
+NR.on('tick',d=>{if(RIG.fl[0]>0)RIG.fl[0]=RIG.fl[1]=Math.max(0,RIG.fl[0]-(d>0&&d<1?d:.016));});RIG.chip=function(c,id,sl,x,y,k){const d=WPD[id],r=4.5*k,cx=x+r,cy=y-4*k,n='wp-'+id;if(!d)return 0;
+  if(ART.have(n)){c.drawImage(ART.bm[n],x,cy-r*1.2,r*2.4,r*2.4);return r*2.4+3*k;}
+  c.save();c.fillStyle=d.c;c.beginPath();if(sl){c.moveTo(cx+r*1.1,cy);c.lineTo(cx-r*.8,cy-r);c.lineTo(cx-r*.8,cy+r);c.closePath();}else c.arc(cx,cy,r,0,7);c.fill();c.restore();return r*2+4*k;};
+RIG.pic=function(cv,sid){if(!cv)return;const c=cv.getContext('2d'),W=cv.width,H=cv.height,L=W*.66,n='spr-ship-'+sid,b=ART.bm[n];c.clearRect(0,0,W,H);
+  if(!b&&!(n in ART.bm))ART.load(n);if(!b)setTimeout(()=>{if(cv.isConnected)RIG.pic(cv,sid);},500);
+  c.save();c.translate(W/2,H/2);const ar=ART.have('ship-'+sid+'-armed')?ART.bm['ship-'+sid+'-armed']:null,im=ar||b;
+  if(im){const w=ar?L*1.1:L,h=w*im.height/im.width;c.drawImage(im,-w/2,-h/2,w,h);}
+  else{c.fillStyle='#16102a';c.strokeStyle='#19e3ff';c.beginPath();c.moveTo(L*.5,0);c.lineTo(-L*.4,-L*.18);c.lineTo(-L*.4,L*.18);c.closePath();c.fill();c.stroke();}
+  RIG.draw(c,sid,L,0,0,true);
+  c.font='700 '+Math.round(H*.13)+'px "Share Tech Mono",monospace';c.textAlign='center';c.fillStyle='#fff';c.globalAlpha=.9;
+  for(let sl=0;sl<2;sl++){if(!WP.eq[sl])continue;const q=RIG.pt(sid,sl);c.fillText(sl+1,q[0]*L,q[1]*L+(sl?H*.3:-H*.2));}   // slot numbers
+  c.restore();};
 function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:Math.floor(t*20)%2))return;const D=DISTRICTS[G.di];
   ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);
   const so=ART.sp('spr-ship-'+shipDef().id,60);
   if(so){const bob=Math.sin(t*5)*1.2,en=ART.sp('fx-engine',46);ctx.globalCompositeOperation='lighter';
     if(en)ART.put(en,-24-en.w*.5*(.8+.2*PUL),bob,0,.7+.3*PUL);                  // painted jet, flickers with the beat
-    G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';ART.put(so,0,bob);ctx.restore();
+    G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';ART.put(so,0,bob);RIG.draw(ctx,shipDef().id,60,t,bob);ctx.restore();
     const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}
     ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();return;}
   ctx.globalCompositeOperation='lighter';G_(-20,2,16+Math.random()*5,D.a,.9);G_(0,0,34,D.a,.18);ctx.globalCompositeOperation='source-over';
@@ -12,6 +42,7 @@ function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%
   ctx.strokeStyle=shv?shv[2]:D.b;ctx.lineWidth=1.5;ctx.stroke();
   ctx.fillStyle=shv?shv[2]:D.b;ctx.globalAlpha=.85;ctx.beginPath();ctx.moveTo(12,-2);ctx.lineTo(4,-8);ctx.lineTo(-6,-7);ctx.lineTo(-4,-1);ctx.closePath();ctx.fill();ctx.globalAlpha=1;
   ctx.fillStyle=D.a;ctx.fillRect(-16,8,26,2);ctx.fillStyle='#fff';ctx.fillRect(22,1,4,2);
+  if(shv)ctx.scale(1/shv[0],1/shv[1]);RIG.draw(ctx,shipDef().id,48*(shv?shv[0]:1),t,0);
   ctx.restore();
   const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}   // each tier: more glow on the ship
   ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();}
@@ -58,8 +89,8 @@ function gatePost(y,up,fl){const o=ART.sp('spr-en-gate',26);if(!o)return false;c
   if(fl)ART.put(ART.sil('spr-en-gate',26,'#ffffff'),0,cy,0,.8,1,up?1:-1);return true;}
 function hpBar(x,y,w,f){ctx.fillStyle='#00000099';ctx.fillRect(x,y,w,4);ctx.fillStyle='#ff3dbb';ctx.fillRect(x,y,w*clamp(f,0,1),4);}
 function bossPaint(e,t,fl,c){const ak=ART.artK(e),nm=ART.bossN[ak],b=nm&&ART.bm['spr-boss-'+nm];if(!b)return false;
-  const wd=e.k===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak],mv=UIK.boss[nm]&&UIK.boss[nm].move||'air',by=mv==='air'?Math.sin(t*1.6)*3:0,tl=mv==='air'?Math.sin(t*.9)*.035:0;   // walkers and swimmers do not hover: no bob, no tilt
-  if(mv!=='air'&&!rotMode)UIK.bossShadow(e,mv,wd);
+  const wd=ak===6?e.r*3.6*b.width/b.height:e.r*[3.6,3.4,3,3.2,3.2,3.6,0,3.4,3.4,3.4][ak],mv=UIK.boss[nm]&&UIK.boss[nm].move||'air',by=mv==='air'?Math.sin(t*1.6)*3:0,tl=mv==='air'?Math.sin(t*.9)*.035:0;   // walkers and swimmers do not hover: no bob, no tilt
+  if(!rotMode)UIK.bossShadow(e,mv,wd);
   if(e._ph===undefined){e._ph=e.ph;e.pp=0;}if(e._ph!==e.ph){e._ph=e.ph;e.pp=1;}e.pp=Math.max(0,e.pp-FD*1.4);       // a phase change pulses a glow in the district colour
   if(e.pp>0||e.ph===3){ctx.globalCompositeOperation='lighter';if(e.pp>0)G_(0,0,e.r*(2.4+1.6*e.pp),c,.6*e.pp);if(e.ph===3)G_(0,0,e.r*2.3,'#ff3040',.16+.12*PUL);ctx.globalCompositeOperation='source-over';}
   if(UIK.bossDraw(e,nm,wd,by,tl,fl))return true;

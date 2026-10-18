@@ -35,8 +35,7 @@ function startHTML(d){const info=startInfo(d),K=knowledge(d),adv=startAdvice(K,d
   let g='';for(const ed of EDGES){const hor=ed==='top'||ed==='bottom';g+=`<span>${ed[0].toUpperCase()+ed.slice(1)}</span>`;for(let i=1;i<=6;i++){const l=by[ed+i]||[];
     g+=`<span style="display:flex;gap:2px">${[0,1].map(k=>{const o=l[k],lab=i+(hor?'LR':'UD')[k];return o?`<button class="btn small" style="min-width:0;flex:1" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}" aria-label="${ed} ${i}, ${o.sideWord} mark">${lab}</button>`:`<button class="btn small" style="min-width:0;flex:1" disabled>${lab}</button>`}).join('')}</span>`}}
   const you=d===viewSeat()||humans().length===1;
-  return `<div class="prompt"><h4>${you?'Choose your start':esc(nm(d))+': choose a start'}</h4><p>Tap one of the big pulsing gold marks on the edge of the board. Each number from 1 to 6 has two marks (<b>L</b> left and <b>R</b> right of the number; on the side edges <b>U</b> upper and <b>D</b> lower).</p>
-  <p class="tiny">Tip: a mark in the middle of an edge is safest. Next to a corner you may run out of room. The dice come later: they only decide when the leviathans (the sea monsters already on the board) move.</p>
+  return `<div class="prompt">
   <details><summary class="tiny">All marks as a list</summary><div class="startpick" style="grid-template-columns:auto repeat(6,1fr)">${g}</div></details></div>`}
 function questionHTML(d,K){const q=G.q;let extra='';const you=d===viewSeat()||humans().length===1;
   if(q.kind==='bonus'&&G.cur===d&&G.pool.length)extra=`<p class="tiny">Sunken crews' tiles (numbered):</p><div class="hand">${G.pool.map((c,j)=>isCur(c)?`<span class="hc"><span class="n">${j+1}</span><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid:'pl'+j,size:96})}"></span>`:`<span class="hc sp"><span class="n">${j+1}</span>${isGate(c)?gateArt():cannonArt()}</span>`).join('')}</div>`;

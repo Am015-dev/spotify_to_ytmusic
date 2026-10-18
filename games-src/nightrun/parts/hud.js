@@ -26,7 +26,8 @@ const HUDX={
     for(const id of SH.order){const u=UBY[id];icon(u.ic,u.c,SH.n(id));}
     c.restore();},
   // round the ship (centre sx, sy in upright screen units)
-  ship(c,sx,sy,k,t){if(G.dead)return;const v=this.vals();c.save();c.lineCap='round';
+  ship(c,sx,sy,k,t,lite){if(G.dead)return;const v=this.vals();c.save();c.lineCap='round';
+    if(lite){if(PW.on('bub')){c.strokeStyle='#7dffd8';c.globalAlpha=.55+.2*Math.sin(t*5);c.lineWidth=2*k;c.beginPath();c.arc(sx,sy,29*k,0,7);c.stroke();c.fillStyle='#7dffd818';c.fill();c.globalAlpha=1;}c.restore();return;}   // phone: hull, dash, shield and power-up timers live in the top strip / on the touch buttons
     // hull pips above the ship
     const pw=7*k,gap=2.5*k,w=v.max*(pw+gap)-gap;for(let i=0;i<v.max;i++){c.fillStyle=i<v.hp?(v.hp<=1?'#ff3040':'#3dffb0'):'#ffffff22';c.fillRect(sx-w/2+i*(pw+gap),sy-37*k,pw,4*k);}
     if(v.rev){c.save();c.translate(sx+w/2+5*k,sy-42*k);c.scale(.5*k,.5*k);c.fillStyle='#ff2d95';c.fill(this.iRev,'evenodd');c.restore();}
@@ -51,3 +52,14 @@ SH.hud=function(c,t,L){L=L||{nx:24,ny:57,dx:214,dy:H-30,sx:18,sy:H-34,ring:true}
   HUDX.strip(c,L.nx+(10+String(this.neon).length*8+14)*k,L.ny+5*k,k);
   if(L.ring)this.ring(c,t);
   HUDLOG.sh=this.sh;HUDLOG.spare=this.spare;};
+
+/* ?scn=nr-hud-busy (owner test link, ✔ Test checklist) and hud-cover-test.js: the worst-case moment of a phone run in one spawn - Legend, Bankenviertel,
+   boss incoming, two power-ups, shield x7, one revive, heat high, combo at x4 - kept topped up so the HUD can be judged while it is on screen. */
+function hudBusy(){
+  if(running)return;SET.diff='legend';SET.hud='full';SET.fpsc=true;applySet();start();godMode=true;
+  const bi=Math.max(0,DISTRICTS.findIndex(d=>d.name==='BANKENVIERTEL'));enterDistrict(bi);G.banner.t=0;G.hint.t=0;
+  P.hp=P.max;SH.sh=7;TP.revLeft=1;SH.neon=16;GA.eqAll=true;G.force=true;G.en=[];
+  const top=()=>{if(!running)return;P.heat=Math.max(P.heat,86);P.over=false;C.n=Math.max(C.n,TS*3+3);C.lb=G.bc;SH.sh=Math.max(SH.sh,7);
+    for(const k of['tempo','drum'])if(!PW.on(k))PW.give(k,true);};
+  top();setInterval(top,150);}
+if(/[?&]scn=nr-hud-busy/.test(location.search))addEventListener('load',()=>setTimeout(hudBusy,600));

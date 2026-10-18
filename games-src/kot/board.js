@@ -58,7 +58,7 @@ function bfMarks(){const el=$bf('bmarks');if(!el)return;
   if(s.c&&s.c.H&&!s.hl)gain.push(`<span class="no">${canHealDice(p)?'♥ full':'♥ ✕ 👑'}</span>`);
   if(!s.vp&&G.rolls>0)['1','2','3'].forEach(f=>{if((s.c&&s.c[f])===2)gain.push(`<span class="pair">one more ${f} → ★</span>`)});
   if(gain.length)at(bfMonXY(p.i,3.6),'gain',gain.join(''));
-  if(G.city<0&&!inCity(p.i)&&(!G.bayOn||G.bay<0))at(bfCityXY(),'city','👑 <span>+1★</span>');
+  if(G.city<0&&!inCity(p.i)&&(!G.bayOn||G.bay<0))at(bfCityXY(),'city','<i class="crn">👑</i> <span>+1★</span>');
   const h=items.join('');if(h!==BF.marks){el.innerHTML=h;BF.marks=h}}
 // ---- the reroll: dice tumble and land one by one ----
 function bfRollWatch(){if(!G||G.rollId===BF.rid)return;const first=BF.rid<0;BF.rid=G.rollId;if(first||!bfAnim()||G.phase!=='roll')return;

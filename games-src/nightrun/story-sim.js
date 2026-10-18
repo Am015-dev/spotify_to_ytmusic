@@ -5,13 +5,13 @@
 // Prints clear-rate, time, hits and perfects per stage. The bot is the sweep's decide() (dodge grid, dash when a shot is near, EMP when swamped) with a ~50 ms reaction.
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
-const RUNS = +process.env.RUNS || 20, PC = process.env.PC != null ? +process.env.PC : .4, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 420;
+const CLASSIC = !!process.env.CLASSIC, RUNS = +process.env.RUNS || 20, PC = process.env.PC != null ? +process.env.PC : .4, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 420;
 const STAGES = (process.env.STAGES || '1,2,3,4,5,6,7,8,9,10,11,12').split(',').map(Number);
 function freePort() { return new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); }); }
 const BOT = (opts) => {
   const m = window.__mnr, rnd = Math.random; const { n, PC, MAXT, endless } = opts;
   if (opts.t2) Object.assign(m.TUNE2, opts.t2);
-  if (endless) m.startStory(1); else m.startStory(n);
+  if (opts.classic) m.ARC.set(false); if (endless) m.startStory(1); else m.startStory(n);
   m.simOn(true);
   const dec = () => {
     const G = m.G, P = m.P; let ty = 270 + 140 * Math.sin(G.t * .9), tx = 220 + 70 * Math.sin(G.t * .55), bd = 1e9;   // a real player never parks: the anti-idle beam would hit the bot
@@ -20,6 +20,7 @@ const BOT = (opts) => {
     for (let ix = -5; ix <= 5; ix++) for (let iy = -5; iy <= 5; iy++) {
       const cx = P.x + ix * 24, cy = P.y + iy * 24; if (cx < 30 || cx > 900 || cy < 40 || cy > 480) continue; let c = 0;
       for (const b of G.eb) { const px = b.x + b.vx * .14, py = b.y + b.vy * .14, d = Math.hypot(px - cx, py - cy); if (d < 70) c += (70 - d) * (70 - d) * (d < 26 ? 30 : 1); }
+      if (G.boss && G.boss.lasers) for (const l of G.boss.lasers) { const vx = Math.cos(l.a), vy = Math.sin(l.a), px = cx - l.x, py = cy - l.y; if (px * vx + py * vy > -20) { const dl = Math.abs(px * vy - py * vx); if (dl < 40) c += (40 - dl) * 120; } }   // read the laser telegraph: stay off its line
       for (const e of G.en) { if (e.type === 'gate') { if (Math.abs(e.x - cx) < 60 && (cy < e.gy - e.gap / 2 + 12 || cy > e.gy + e.gap / 2 - 12)) c += 3000; continue; } const d = Math.hypot(e.x - cx, e.y - cy), r = e.r + 55; if (d < r) c += (r - d) * (r - d) * 3; }
       c += Math.abs(cy - ty) * .6 + Math.abs(cx - tx) * .15 + Math.hypot(ix, iy) * 4; if (c < bc) { bc = c; bx = cx; by = cy; }
     }
@@ -42,7 +43,7 @@ const BOT = (opts) => {
     if (!endless && m.ST.over) { cleared = true; bt1 = m.G.t; break; }
   }
   const G = m.G, P = m.P, ST = m.ST;
-  const r = { n, clear: cleared, dead: G.dead, t: +G.t.toFixed(1), hits: ST.hits, perf: G.perf, score: G.score, kills: G.kills, bars: Math.floor(G.bc / 4), hp: P.hp, stars: cleared ? ST.stars.slice() : null, di: G.di, loop: G.loop, upg: Object.keys(m.SH.got).length, fight: bt0 >= 0 ? +((cleared ? bt1 : G.t) - bt0).toFixed(1) : 0, bhp: G.boss ? Math.round(G.boss.hp) : 0, hb, hw, causes };
+  const r = { n, clear: cleared, dead: G.dead, t: +G.t.toFixed(1), hits: ST.hits, perf: G.perf, score: G.score, kills: G.kills, bars: Math.floor(G.bc / 4), hp: P.hp, stars: cleared ? ST.stars.slice() : null, di: G.di, loop: G.loop, upg: Object.keys(m.SH.got).length, fight: bt0 >= 0 ? +((cleared ? bt1 : G.t) - bt0).toFixed(1) : 0, bhp: G.boss ? Math.round(G.boss.hp) : 0, hb, hw, causes, neon: m.SH.neon + Math.round(m.SH.earned * .3), earned: m.SH.earned };
   m.abort(); return r;
 };
 (async () => {
@@ -53,8 +54,8 @@ const BOT = (opts) => {
   const res = {}; let next = 0;
   await Promise.all(Array.from({ length: PAR }, async () => {
     const p = await browser.newPage({ viewport: { width: 960, height: 540 } }); const errs = []; p.on('pageerror', e => errs.push(e.message));
-    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
-    while (next < jobs.length) { const n = jobs[next++]; const r = await p.evaluate(BOT, { n, PC, MAXT, endless: false, t2: process.env.T2 ? JSON.parse(process.env.T2) : null }); (res[n] = res[n] || []).push(r); if (errs.length) { console.log('PAGE ERROR', errs[0]); errs.length = 0; } }
+    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); if (process.env.CLASSIC) await p.evaluate(() => window.__mnr.ARC && window.__mnr.ARC.set(false));
+    while (next < jobs.length) { const n = jobs[next++]; const r = await p.evaluate(BOT, { n, PC, MAXT, endless: false, classic: CLASSIC, t2: process.env.T2 ? JSON.parse(process.env.T2) : null }); (res[n] = res[n] || []).push(r); if (errs.length) { console.log('PAGE ERROR', errs[0]); errs.length = 0; } }
     await p.close();
   }));
   await browser.close(); srv.kill();

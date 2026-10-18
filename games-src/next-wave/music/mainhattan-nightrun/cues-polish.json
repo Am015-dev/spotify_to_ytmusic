@@ -1,0 +1,275 @@
+{
+ "_readme": "Nightrun polish music slots (POLISH.md 1.3). Make with treblo, Lyrics = None. Save the sources to games-src/nightrun/music-treblo/, then follow the measurement checklist in POLISH.md 1.6 before adding to tracks.json.",
+ "cues": {
+  "d1a": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 118 BPM. Glossy bank-tower nightlife, plucked arps, warm bass, clean claps, hopeful A minor, 8-bar intro then 16-bar sections. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "d1a.mp3",
+   "length": "3:00",
+   "bpm": 118
+  },
+  "d1b": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 120 BPM. Cold corporate pursuit, ticking hi-hats, pulsing saw bass, glassy bell lead, E minor, builds every 16 bars. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "d1b.mp3",
+   "length": "3:00",
+   "bpm": 120
+  },
+  "d2a": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 124 BPM. Rain on a river at night, rolling bassline, wide pads, splashy percussion, D minor, a breakdown at bar 48 then a big return. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "d2a.mp3",
+   "length": "3:00",
+   "bpm": 124
+  },
+  "d2b": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 124 BPM. Speedboat chase on a neon river, driving 16th bass, metallic toms, siren-like synth lead, D minor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "d2b.mp3",
+   "length": "3:00",
+   "bpm": 124
+  },
+  "d3a": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 128 BPM. Industrial cyber zone, distorted kick, gated noise snare, robotic arpeggio, F minor, menacing but danceable. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "d3a.mp3",
+   "length": "3:00",
+   "bpm": 128
+  },
+  "d3b": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 128 BPM. Data heist, glitch stutters on bar ends, acid bassline, crisp claps, F minor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "d3b.mp3",
+   "length": "3:00",
+   "bpm": 128
+  },
+  "d4a": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 132 BPM. Huge trade-fair hall turned battlefield, brass-like synth stabs, marching snare rolls, G minor, triumphant chorus every 32 bars. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "d4a.mp3",
+   "length": "3:00",
+   "bpm": 132
+  },
+  "d4b": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 132 BPM. Rush hour panic, fast arps, sidechained pads, punchy drums, G minor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "d4b.mp3",
+   "length": "3:00",
+   "bpm": 132
+  },
+  "boss-d1": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 120 BPM. Sections: 8-bar intro, 32-bar phase A, 4-bar break with a riser, 32-bar phase B (more intense, same key), 8-bar outro. Police interceptor duel, sirens as synth leads, heavy drums, A minor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "boss-d1.mp3",
+   "length": "2:30",
+   "bpm": 120
+  },
+  "boss-d2": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 124 BPM. Sections: 8-bar intro, 32-bar phase A, 4-bar break with a riser, 32-bar phase B (more intense, same key), 8-bar outro. Deep sub bass, tentacle-like wobbles, river monster duel, D minor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "boss-d2.mp3",
+   "length": "2:30",
+   "bpm": 124
+  },
+  "boss-d3": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 128 BPM. Sections: 8-bar intro, 32-bar phase A, 4-bar break with a riser, 32-bar phase B (more intense, same key), 8-bar outro. Cold digital choir pads without words, bit-crushed lead, firewall guardian duel, F minor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "boss-d3.mp3",
+   "length": "2:30",
+   "bpm": 128
+  },
+  "boss-d4": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 132 BPM. Sections: 8-bar intro, 32-bar phase A, 4-bar break with a riser, 32-bar phase B (more intense, same key), 8-bar outro. Clanking metal percussion, hammer hits on beats 1 and 3, giant hall guardian duel, G minor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "boss-d4.mp3",
+   "length": "2:30",
+   "bpm": 132
+  },
+  "pit": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 100 BPM. Relaxed garage workshop at 2 a.m., soft lo-fi drums, warm Rhodes, gentle bass, C major, seamless loop. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "pit.mp3",
+   "length": "1:30",
+   "bpm": 100
+  },
+  "school": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 110 BPM. Friendly training sim, very clear kick and clap on every beat, simple bright arp, C major, nothing busy. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "school.mp3",
+   "length": "2:00",
+   "bpm": 110
+  },
+  "endless3": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 134 BPM. Night highway at full speed, driving bass, euphoric lead after bar 32, B minor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "endless3.mp3",
+   "length": "3:00",
+   "bpm": 134
+  },
+  "fever-120": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 120 BPM. 8-bar euphoric drop loop, huge supersaw chords, four-on-the-floor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "fever-120.mp3",
+   "length": "8 bars",
+   "bpm": 120
+  },
+  "fever-128": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 128 BPM. 8-bar euphoric drop loop, huge supersaw chords, four-on-the-floor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "fever-128.mp3",
+   "length": "8 bars",
+   "bpm": 128
+  },
+  "fever-132": {
+   "prompt": "Instrumental synthwave/cyberpunk game soundtrack, no vocals, no spoken words, steady tempo, strong kick on every beat from the first bar, 4/4, ends on a whole bar so it loops cleanly, mixed for a phone game. 132 BPM. 8-bar euphoric drop loop, huge supersaw chords, four-on-the-floor. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "fever-132.mp3",
+   "length": "8 bars",
+   "bpm": 132
+  },
+  "st-tierup1": {
+   "prompt": "Short cyberpunk synth game sound effect, short rising synth sweep into one bright chord hit, A minor, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "st-tierup1.mp3",
+   "length": "under 2 s"
+  },
+  "st-tierup2": {
+   "prompt": "Short cyberpunk synth game sound effect, rising sweep into a bigger two-chord hit, A minor, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "st-tierup2.mp3",
+   "length": "under 2 s"
+  },
+  "st-tierup3": {
+   "prompt": "Short cyberpunk synth game sound effect, rising sweep into a huge supersaw chord with a crash, A minor, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "st-tierup3.mp3",
+   "length": "under 2 s"
+  },
+  "st-perfect": {
+   "prompt": "Short cyberpunk synth game sound effect, a tiny glassy tick, very short, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "st-perfect.mp3",
+   "length": "under 2 s"
+  },
+  "st-clear": {
+   "prompt": "Short cyberpunk synth game sound effect, a 4-chord synth victory flourish, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "st-clear.mp3",
+   "length": "under 2 s"
+  },
+  "st-fail": {
+   "prompt": "Short cyberpunk synth game sound effect, a falling filter power-down, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "st-fail.mp3",
+   "length": "under 2 s"
+  },
+  "st-boss-in": {
+   "prompt": "Short cyberpunk synth game sound effect, a siren hit with a deep low boom, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "st-boss-in.mp3",
+   "length": "under 2 s"
+  },
+  "st-phase": {
+   "prompt": "Short cyberpunk synth game sound effect, reversed cymbal into a heavy impact, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "st-phase.mp3",
+   "length": "under 2 s"
+  },
+  "st-unlock": {
+   "prompt": "Short cyberpunk synth game sound effect, a coin chime with a synth bell, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "st-unlock.mp3",
+   "length": "under 2 s"
+  },
+  "st-newbest": {
+   "prompt": "Short cyberpunk synth game sound effect, a quick bright arpeggio going up, under 2 seconds, dry, no reverb tail, no vocals. Make 2 versions (a and b).",
+   "versions": [
+    "a",
+    "b"
+   ],
+   "save_as": "st-newbest.mp3",
+   "length": "under 2 s"
+  }
+ }
+}

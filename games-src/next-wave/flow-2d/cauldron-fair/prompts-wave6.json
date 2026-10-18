@@ -1,5 +1,7 @@
 {
  "cards": {
+  "gx-bar-plate": "a single gx bar plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
+  "gx-drawer-head-plate": "a single gx drawer head plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
   "gxh-ok-button-plate": "a single gxh ok button plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
   "tlink-button-plate": "a single tlink button plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text",
   "ttl-bg-picture": "a single ttl bg picture, game art for a board game, no text"

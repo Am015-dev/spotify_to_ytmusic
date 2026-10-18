@@ -29,7 +29,7 @@ const MK={s:(()=>{const o=load('mnr_mkt',null);return o&&o.day===day()?Object.as
   full(id){return Math.round(UBY[id].p*3.2/5)*5;},
   rerollPrice(){return 40+40*this.s.rr;},max:2,left(){return this.max-this.s.b.length;},save(){save('mnr_mkt',this.s);}};
 const gd0=gaDraw;
-gaDraw=function(){if(garageEl.hidden&&labEl&&!labEl.hidden){garageDirty=true;return;}if(!['load','mkt','soon'].includes(GA.tab)){gd0();return;}
+gaDraw=function(){if(garageEl.hidden&&labEl&&!labEl.hidden){garageDirty=true;return;}$('gaCards').classList.toggle('wpt',GA.tab==='weapons');if(!['load','mkt','soon'].includes(GA.tab)){gd0();if(GA.tab==='weapons'&&window.wpTabDraw)wpTabDraw();return;}
   $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
   const box=$('gaCards');box.innerHTML='';box.classList.add('tune');
   if(GA.tab==='load')loadDraw(box);else if(GA.tab==='mkt')mktDraw(box);else soonDraw(box);affUpd();};

@@ -15,7 +15,7 @@ function titleApply() {
 // ---- table: the campaign unlock (tunnel-glow) replaces the default painting; the embedded default and the dark blue stay underneath
 let tblCur = '';
 function tableApply() {
-  const R = document.documentElement, id = unl('table'), f = id === 'tunnel-glow' && !lowGfx() ? 'table-' + id : '', key = f || 'default'; if (key === tblCur) return;
+  const R = document.documentElement, id = unl('table'), f = id === 'tunnel-glow' && !lowGfx() ? 'table-' + id + (innerWidth < 700 && innerHeight > innerWidth ? '-phone' : '') : '', key = f || 'default'; if (key === tblCur) return;
   if (!f) { if (tblCur) R.style.removeProperty('--tableimg'); tblCur = key; return; }
   preImg(f, () => { tblCur = key; R.style.setProperty('--tableimg', 'url("' + MEDIA + f + '.webp")'); });
 }
@@ -133,7 +133,12 @@ var PADIMG = null;
   const R = document.documentElement;
   function boot() {
     try { GXSK.init({ sets: { 'sk-tank': ['icon-tank-full', 'icon-tank-empty'], 'sk-heart': ['icon-heart'], 'sk-air': ['icon-air'] } }); } catch (e) { }
-    // card frames (media/card-face-*.webp) are NOT wired: the delivered paintings have ragged paper edges and corner lanterns that collide with the numerals
+    // painted card frames (media/card-face-*.webp): drawn by pxFace on the Pixi table, cropped inside their paper edge; the drawn card stays until each file loaded
+    let fr = 0; const faceRefresh = () => { clearTimeout(fr); fr = setTimeout(() => { try { for (const k of Object.keys(PX.tex)) if (k.indexOf('f:') === 0) delete PX.tex[k]; PX.warm = ''; for (const o of PX.objs.values()) if (o.kind === 'card') pxCardTex(o); pxPrewarm(); pxDirty(); } catch (e) { } }, 60); };
+    ['coral', 'tide', 'kelp', 'sunstar', 'lantern'].forEach((n, si) => { const i = new Image(); i.onload = () => { try { PX.img['face' + si] = i; if (PX.on) faceRefresh(); } catch (e) { } }; i.src = MEDIA + 'card-face-' + n + '.webp'; });
+    // tick / cross on done and failed jobs, brass name plate on the seats
+    ['tick', 'cross'].forEach(n => preImg('icon-' + n, () => { KIT.MARK[n] = 1; try { render(); } catch (e) { } }));
+    preImg('ui-seat', () => R.classList.add('sk-seat'));
     const pd = new Image(); pd.onload = () => { PADIMG = pd; try { if (PX && PX.on) { PX.padKey = ""; if (PX.feltR) pxDrawFelt(PX.feltR); pxDirty(); } } catch (e) { } }; pd.src = MEDIA + 'ui-trick-pad-c.webp';
   }
   if (typeof GXSK !== 'undefined' && !/jsdom/i.test(navigator.userAgent || '')) setTimeout(boot, 0);

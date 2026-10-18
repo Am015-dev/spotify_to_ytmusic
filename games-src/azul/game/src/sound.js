@@ -72,4 +72,4 @@ function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(gaMusi
     SND.nextT+=st;SND.beat++}}
 function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('sgz_snd',SND.on?'1':'0')}catch(e){}audioInit();if(HAS_GA)GA.setSfx(SND.on);if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
 function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('sgz_mus',SND.music?'1':'0')}catch(e){}if(HAS_GA)GA.setMusic(SND.music);if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
-function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.innerHTML=IC(SND.on?'snd':'mute');if(b){b.innerHTML=IC(SND.music?'music':'nomusic')}}
+function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.innerHTML=IC(SND.on?'snd':'mute')+'<span>Sound '+(SND.on?'on':'off')+'</span>';if(b){b.innerHTML=IC(SND.music?'music':'nomusic')+'<span>Music '+(SND.music?'on':'off')+'</span>'}}

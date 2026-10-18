@@ -39,7 +39,7 @@ if(window.ResizeObserver)new ResizeObserver(()=>fit()).observe(stage);
 
 function toGame(t){const r=frame.getBoundingClientRect();                  // portrait: the screen's up is the world's right
   return rotMode?[(r.bottom-t.clientY)/r.height*W,(t.clientX-r.left)/r.width*H]:[(t.clientX-r.left)/r.width*W,(t.clientY-r.top)/r.height*H];}
-addEventListener('keydown',e=>{const k=e.code;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(k)&&!(e.target&&e.target.tagName==='INPUT'))e.preventDefault();
+addEventListener('keydown',e=>{const k=e.code;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(k)&&!(e.target&&e.target.tagName==='INPUT')&&!(k==='Space'&&window.RET&&RET.title&&!running&&e.target&&e.target.tagName==='BUTTON'))e.preventDefault();   // RET.title: Space presses a focused menu button
   if(!K[k]){pressed[k]=stampOf(e);if(k==='Space'||k==='KeyJ')pressed.Fire=pressed[k];}
   K[k]=true;AU.unlock();
   if(k==='KeyM'&&!(e.target&&e.target.tagName==='INPUT'))toggleMute();
@@ -85,7 +85,7 @@ function newGame(daily){
 // Story has its own ramp (ST.*, see story.js): sd, sbs, sfr scale it. fan = bullets added to every fan and ring, heal = hull drops, el = elite share.
 const DIFFS={easy:{d:.85,bs:.9,fr:.85,dn:.75,sd:.85,sbs:.92,sfr:.9,fan:-1,heal:1.5,el:0},
   normal:{d:1.9,bs:1.25,fr:1.45,dn:1,sd:1,sbs:1,sfr:1,fan:0,heal:1,el:0},
-  hard:{d:3.6,bs:2,fr:5.6,dn:1.45,sd:1.45,sbs:1.22,sfr:1.35,fan:3,heal:.35,el:1.3,aq:3},
+  hard:{d:3.6,bs:2,fr:5.6,dn:1.45,sd:1.3,sbs:1.1,sfr:1,fan:3,heal:.35,el:1.3,aq:3},
   vhard:{d:4,bs:2.15,fr:5.8,dn:1.6,sd:1.7,sbs:1.35,sfr:1.5,fan:4,heal:.3,el:1.5,aq:4},       // VERY HARD: faster, denser, more elites, almost no repairs
   legend:{d:4.7,bs:2.4,fr:6.6,dn:1.8,sd:2,sbs:1.5,sfr:1.7,fan:5,heal:.15,el:1.9,aq:6}};         // LEGEND: the full set of smart enemy tricks from the start
 const HARDS=['hard','vhard','legend'];
@@ -93,28 +93,57 @@ let DF=DIFFS.normal;
 const STILL={t:0,k:0,fk:1,bk:1,sk:1,ax:0,ay:0,beam:null,nb:0,said:false};   // AFK pressure (h.js): a ship that stops moving is hunted harder and scores less
 const DYE={cur:1,q:1};                                     // dying slows the song (h.js)
 const FIRE_K=.62;                                          // enemy fire cadence: about 40% fewer bullets than before, each one aimed and telegraphed
-const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk*AI.fk();
+const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk*AI.fk()*(DMG.on?DMG.fk*DMG.lf()*(SET.diff==='easy'?.8:1)*(ST.on?1:DMG.fkE):1);   // DMG.fk: enemies live longer now (BALANCE.md), so each fires a little less often
 function diff(){if(ST.on)return ST.d*DF.sd*UPS.d;const ease=G.loop||G.pos?1:clamp(.8+.2*G.t/150,.8,1);return(1+.17*(G.pos+G.dprog)+TUNE2.loopD*G.loop)*ease*DF.d*UPS.d;}   // endless: a smooth ramp over the districts and loops, a gentle first minutes; UPS.d = soft scaling with the player's upgrades
 const bossX=()=>rotMode?690:790;                          // where a boss stops: portrait keeps it clear of the HUD at the top
-const bossStage=k=>k===3?'boss2':k===6?'boss3':'boss';   // final boss gets its own song
+const bossStage=k=>(window.RET&&RET.dpool&&RET.DP.boss(k))||(k===3?'boss2':k===6?'boss3':'boss');   // final boss gets its own song
 // Mini-bosses and the first boss (SEK-ADLER) keep the stage song and get a drum layer; the district bosses switch to the boss song, the final boss to boss2.
-const bossSong=(k,mini)=>mini||k===0?null:bossStage(k);
+const bossSong=(k,mini)=>mini||(k===0&&!(window.RET&&RET.dpool))?null:bossStage(k);
 const ORDER=[0,1,2,4,3];                                  // endless cycle: Bank, Main, Ostend, Athens, then the final-boss district (Messe)
 const posOf=i=>Math.max(0,ORDER.indexOf(i));
 const nextDi=i=>{const p=posOf(i)+1;return p>=ORDER.length?{di:ORDER[0],wrap:true}:{di:ORDER[p],wrap:false};};
-const songFor=(i,loop)=>{const p=posOf(i);return loop?['endless','endless2'][p%2]:DISTRICTS[i]&&DISTRICTS[i].song||['stage1','stage2','stage3'][p%3];};
+const songFor=(i,loop)=>{const p=posOf(i);if(window.RET&&RET.dpool)return RET.DP.endless(i,loop|0);return loop?['endless','endless2'][p%2]:DISTRICTS[i]&&DISTRICTS[i].song||['stage1','stage2','stage3'][p%3];};
 const stageFor=(i,boss)=>ST.on?ST.def.song:boss?bossStage(DISTRICTS[i%DISTRICTS.length].boss):songFor(i,G.loop);
 function enterDistrict(i){G.di=i;G.pos=posOf(i);G.dt=0;G.d0=G.bc;G.dprog=0;G.force=false;G.boss=null;G.bossDone=false;G.waveT=3.2;G.waveWait=false;G.preload=false;const D=DISTRICTS[i];bgFor(i);DIR.begin(i);
   banner(D.name,D.sub+(G.loop?`  ·  SCHICHT ${G.loop+1}`:'')+DIR.tag(),false,3.2);AU.root=D.root;AU.boss=false;
   if(G.live)AU.switchTo(stageFor(i,false));}
 
+/* ---------- the damage model: enemies are seen and fought (BALANCE.md) ----------
+   One pass after all damage of a frame (bullets, chain, orbit, mines, blasts, dash...):
+   1. entry grace: an enemy still entering (x > W-40) takes no damage; bullets fly through it (e.gr);
+   2. soft cap: a single shot's damage above 2 counts at half, ceiling 8 (DMG.hit); the measured-DPS cap (soft) is off, it fed back on itself;
+   3. on-screen floor: a normal enemy cannot lose its hull faster than its minimum life on screen (ml), so it gets to move and shoot.
+   A ramming enemy (e.rk) and the EMP (G.empT) ignore the floor. DMG.on=false switches the whole model off. */
+const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil:4,dps:0,k:1,easyK:.9,hk:2,hc:8,
+  hit(d){return !this.on||d<=this.hk?d:Math.min(this.hc,this.hk+(d-this.hk)*this.half);},   // one shot: damage above x2 counts at half, never more than 8 (crits, sharp beat and damage perks stacked)
+
+  // late stages: several enemies overlap, so each stays a little shorter and fires a little less (level L from story.js; 1 up to lvA, then falls by lvK a level to a floor)
+  lvA:3,lvK:.13,mlFloor:.65,fkFloor:.4,
+  lf(){return ST.on?Math.max(this.fkFloor,1-this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
+  lm(){return ST.on?Math.max(this.mlFloor,1-1.5*this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
+  ml:{drone:1.2,flank:1.2,turret:1.3,charger:1.3,gunship:2.6,gate:1.4,mine:.6,swarm:0},elMl:4,
+  minLife(e){const b=e.el?(e.type==='charger'?2:Math.max(this.elMl,this.ml[e.type]||0)):(this.ml[e.type]||0);return b*this.lm()*(SET.diff==='easy'?this.easyK:1);},
+  pass(dt){if(!this.on)return;let raw=0;
+    for(const e of G.en){if(e.dead)continue;
+      if(e.hq==null)e.hq=e.max||e.hp;
+      if(e.type!=='boss'&&e.x>W-40&&!e.rk){e.hp=e.hq;e.gr=1;continue;}       // entry grace
+      if(e.gr){e.gr=0;e.tin=G.t;e.bf=Math.min(e.bf,window.SC?SC.firstShot():2);}                       // fully inside: hittable, and it gets its shot in soon
+      if(e.tin==null)e.tin=G.t;
+      const loss=e.hq-e.hp;if(loss>0&&!e.rk){const real=Math.min(loss,Math.max(0,e.hq));raw+=real;if(this.soft)e.hp=e.hq-real*this.k;}
+      if(e.type!=='boss'&&!e.rk&&!(G.empT>0)){const ml=this.minLife(e);if(ml>0){const fl=e.max*(1-(G.t-e.tin)/ml);if(e.hp<fl)e.hp=Math.max(e.hp,Math.min(e.hq,fl));}}
+      e.hq=e.hp;}
+    const a=Math.min(1,dt/2);this.dps+=(raw/Math.max(dt,1e-3)-this.dps)*a;
+    const m=this.dps/this.ref;this.k=m<=1?1:Math.min((1+(m-1)*this.half)/m,this.ceil/m);}};
+window.__dmg=DMG;
+NR.on('runStart',()=>{DMG.dps=0;DMG.k=1;});
 /* ---------- spawning ---------- */
 function en(type,o){const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600},flank:{r:13,hp:3,score:180},swarm:{r:9,hp:1,score:60},mine:{r:15,hp:5,score:200}}[type];
-  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK())));
+  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2,gr:DMG.on?1:0},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK()*(window.SC?SC.hpK():1))));
   if(!o.mini&&(type==='drone'||type==='charger'||type==='turret'||type==='flank')&&GX()<eliteP()){e.el=1;e.hp=Math.round(e.hp*2);e.r=Math.round(e.r*1.25);e.score*=2;}   // elites: tougher, gold ring, shoot more
   e.arm=e.bf===1&&type!=='charger';DIR.safe(e);
-  e.max=e.hp;e.by=e.y;G.en.push(e);if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);NR.emit('spawn',e);return e;}
+  e.max=e.hp;e.by=e.y;G.en.push(e);if(DMG.on&&type!=='swarm'&&G.rings.length<24)G.rings.push({x:W-14,y:e.gy||e.y,l:.5,m:.5,c:'#ff3d6a'});   // spawn telegraph at the edge it comes in from
+if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);NR.emit('spawn',e);return e;}
 const WAVES={
   droneLine(){const y=gr(80,H-150);for(let i=0;i<5;i++)en('drone',{x:W+30+i*55,y,amp:0});return 2.6;},
   droneSine(){const y=gr(130,H-170);for(let i=0;i<6;i++)en('drone',{x:W+30+i*46,y,amp:70,ph:i*.6});return 3;},
@@ -146,7 +175,7 @@ function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,min
   const nm=o.nm||D.bossName;
   G.boss={type:'boss',k,mini,nm,lbl:o.lbl,x:W+120,y:H/2,r:o.r||(k===3?54:46),hp,max:hp,t:0,flash:0,lists:[pats.slice(0,Math.max(2,Math.ceil(pats.length/2))),pats,pats],ph:1,pi:0,pc:-2,bt:0,cnt:0,sa:0,lasers:[],score:o.score||5000*(k+1),
     col:o.col||[D.a,D.b,D.a,D.a][k]||D.a,p2:mini?6:14,p3:mini?11:26,minBar:mini?14:BOSS_MIN_BAR,floor:Math.ceil(hp*.62)};
-  G.en.push(G.boss);banner('WARNUNG',nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');
+  UIK.portraitSwap(G.boss);G.en.push(G.boss);banner('WARNUNG',G.boss.nm+' · '+(o.sub||D.bossSub),true,3);AU.boss=true;AU.sfx('warn');NR.emit('bossIn',{mini});
   if(G.live){const sg=bossSong(k,mini);if(sg){AU.switchTo(sg);AU.intense(false);}else AU.intense(true);}
   return G.boss;}
 
@@ -156,7 +185,7 @@ function floater(x,y,txt,c='#ffffff'){G.fl.push({x,y,txt:say(txt),c,l:1});}
 const shake=v=>{G.shake=Math.max(G.shake,v*[0,.45,1][SET.shake]*(SET.rm?.3:1));};
 const TS=6,TIERS=4;                                      // power points per tier, number of tiers
 const tierOf=n=>Math.min(TIERS,1+Math.floor(n/TS));
-const comboK=()=>tierOf(C.n);                            // score multiplier = tier (x1..x4)
+const comboK=()=>tierOf(C.n)*(window.RET&&RET.fever&&RET.fv.on?RET.fv.k:1);                            // score multiplier = tier (x1..x4)
 const TIERC=['#b9b3e6','#19e3ff','#ffe14d','#ff2d95'];  // meter colour per tier
 function tierSet(n,why,x,y){const t0=tierOf(C.n);C.n=clamp(n,0,TIERS*TS-1);const t1=tierOf(C.n);AU.tier=t1;
   if(t1!==t0){G.tpop=.7;G.tdir=t1>t0?1:-1;
@@ -185,7 +214,7 @@ function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false}
   if(GX()<(.009+(SH.lk||0)*.3)*healK()&&P.hp<P.max)drop('hp');}   // a district has 300+ kills now: one hull drop in about 110
 // a dash waiting for its beat already protects the ship (P.dq)
 function hurt(n){n=n>1?n:1;if(P.inv>0||P.dashT>0||P.dq||G.dead||godMode||ST.over)return;if(SH.absorb())return;P.hp=Math.max(0,P.hp-n);if(n>1){shake(12);G.flash=Math.max(G.flash,.3*FX());}   // a heavy shell takes 2 hull
-  ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);tierDrop('hit');G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');
+  ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);tierDrop('hit');G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');NR.emit('hurt');
   burst(P.x,P.y,'#ff3050',24,300);if(P.hp<=0)die();}
 function die(){G.dead=true;G.deadT=0;G.slow=.3;shake(16);burst(P.x,P.y,'#ffffff',40,420,1);burst(P.x,P.y,DISTRICTS[G.di].a,60,500,1.2);AU.sfx('big');}
 
@@ -198,7 +227,7 @@ function beatPump(){const p=bpos(),q=Math.floor(p*4);G.bp=p;
 function onTick(i){const e=G.boss;if(e&&((i%4)+4)%4===0&&e.x<=bossX()&&e.pc>=0&&e.lists[e.ph-1][e.pi%e.lists[e.ph-1].length]==='spiral'&&!G.dead){
   const sp=e.ph===3?1.1:1;e.sa+=.9;const arms=3+(ST.on?(ST.lvl>=6)+(ST.lvl>=10):0)+(DF.el?1:0);eb.src=e;for(let j=0;j<arms;j++)eb(e.x,e.y,e.sa+j*6.2832/arms,(150+10*diff())*sp,'#ff3dbb',5);eb.src=null;}}
 function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit('bar',{i,bar:i/4});
-  if(C.n>0&&G.bc-C.lb>8+SH.ck)tierDrop('idle');                    // the tier slips one step after 8 beats without a gain
+  if(C.n>0&&G.bc-C.lb>8+SH.ck-(window.HEAT?HEAT.td:0))tierDrop('idle');                    // the tier slips one step after 8 beats without a gain
   if(!G.dead&&!ST.over)DIR.beat(i);                     // the director spawns the waves (phrases of the song, density follows its loudness)
   if(G.dead)return;
   for(const e of G.en){
@@ -214,7 +243,7 @@ function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit(
   }}
 function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e.p2?2:1;     // phases change on bar p2 and p3; the boss cannot fall earlier than minBar (armour holds its HP at a floor)
   e.floor=bar>=e.minBar?0:bar>=e.p3?Math.max(1,Math.ceil(e.max*.04)):bar>=e.p2?Math.ceil(e.max*.3):Math.ceil(e.max*.62);e.minBar_=e.minBar;
-  if(ph!==e.ph){e.ph=ph;e.pi=0;e.pc=-2;e.cnt=0;G.eb=[];e.lasers=[];e.arm=false;banner(ph===2?'PHASE 2':'FINAL PHASE',e.nm,true,2.2);G.flash=Math.max(G.flash,.25*FX());shake(10);AU.sfx('phase');
+  if(ph!==e.ph){e.ph=ph;e.pi=0;e.pc=-2;e.cnt=0;G.eb=[];e.lasers=[];e.arm=false;banner(ph===2?'PHASE 2':'FINAL PHASE',e.nm,true,2.2);G.flash=Math.max(G.flash,.25*FX());shake(10);AU.sfx('phase');NR.emit('bossPhase',{ph});
     if(P.hp<P.max||!e.mini)G.pk.push({t:'hp',x:Math.min(e.x,W-80),y:e.y,vx:-150,vy:rnd(-50,50),bob:0});   // a broken armour plate drops a repair
     return;}
   if(e.x>bossX()||G.dead){e.arm=false;return;}
@@ -226,7 +255,7 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e
     case'fan9':if(c%cad===0)fan(e,9,1.5,(190+15*d)*sp,c2);break;
     case'ring':if(c%cad===0){ring(e,14+2*Math.min(e.k,3),(140+10*d)*sp,e.cnt*.21,'#ff3dbb');e.cnt++;}break;
     case'summon':if(c===0||c===4||(e.ph===3&&(c===2||c===6))){en('drone',{x:W+20,y:gx(60,H-100),amp:40,ph:gx(0,6)});en('charger',{x:W+60,y:gx(60,H-100)});}break;
-    case'laser':if(c%(ST.on&&ST.lvl>=8||DF.el?2:3)===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}
+    case'laser':if(c%(ST.on&&ST.lvl>=8&&!(window.RET&&RET.walls)||DF.el?2:3)===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}
   eb.src=null;e.arm=bossNext(e);}
 // what the boss fires on the beat k beats from now (k>=1): {t:'fan',n,sp,spd} / {t:'ring',n,spd,off} / {t:'spiral'} / null. bossBeat fires exactly this; the safe-path check plans against it.
 function bossShot(e,k){let pc=e.pc+k,pi=e.pi;const list=e.lists[e.ph-1];if(pc<0)return null;while(pc>=8){pc-=8;pi=(pi+1)%list.length;}
@@ -243,7 +272,7 @@ function bossNext(e){if(e.x>bossX()||G.dead)return false;const list=e.lists[e.ph
   const cad=e.ph===3?1:2;switch(list[pi%list.length]){
     case'fan5':case'fan7':case'fan9':case'ring':return pc%cad===0;
     case'summon':return pc===0||pc===4||(e.ph===3&&(pc===2||pc===6));
-    case'laser':return pc%(ST.on&&ST.lvl>=8||DF.el?2:3)===0;
+    case'laser':return pc%(ST.on&&ST.lvl>=8&&!(window.RET&&RET.walls)||DF.el?2:3)===0;
     case'spiral':return true;}
   return false;}
 
@@ -251,14 +280,14 @@ function bossNext(e){if(e.x>bossX()||G.dead)return false;const list=e.lists[e.ph
 function update(dt){
   if(SH.active){SH.tick(dt);return;}                      // pit stop: the world waits
   G.t+=dt;const D=DISTRICTS[G.di],d=diff();
-  const btk=G.bt>0?(G.btk||.5):1,sdt=dt*G.slow*btk*PW.wk,pdt=dt*G.slow;if(G.bt>0)G.bt-=dt;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
+  const btk=G.bt>0?(G.btk||.5):1,jk=RET.juice&&RET.JU&&!G.dead?RET.JU.k:1,sdt=dt*G.slow*btk*PW.wk*RET.asW()*jk,pdt=dt*G.slow*jk;if(G.bt>0)G.bt-=dt;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
   
   if(G.banner.t>0)G.banner.t-=dt;if(G.note.t>0)G.note.t-=dt;if(G.hint.t>0)G.hint.t-=dt;
   G.shake=Math.max(0,G.shake-40*dt);G.glitch=Math.max(0,G.glitch-dt);G.flash=Math.max(0,G.flash-dt);G.empT=Math.max(0,G.empT-dt);
   for(const x of G.delayed){x.t-=dt;if(x.t<=0){x.dead=1;x.f();}}G.delayed=G.delayed.filter(x=>!x.dead);
   if(G.dead){G.deadT+=dt;if(G.deadT>2.2)gameOver();}
   if(!G.dead){beatPump();
-    if(G.t>1.5&&!G.hint.txt&&!TIP.done&&!G.lab){G.hint={t:6,txt:say('Dash on the pulse to power up')};}}   // the one hint, until the first on-beat dash
+    if(G.t>1.5&&!G.hint.txt&&!TIP.done&&!G.lab&&!G.tut){G.hint={t:6,txt:say('Dash on the pulse to power up')};}}   // the one hint, until the first on-beat dash
   else G.bp=bpos();
 
   /* player */
@@ -295,7 +324,7 @@ function update(dt){
     if(P.over){P.heat-=48*pdt;if(P.heat<=25)P.over=false;}
     else if(firing&&fresh&&SH.cellOn(cell)){const fr=SH.shot(),x=P.x+22,y=P.y+2,pf=Math.abs(cell*gs-Math.round(cell*gs))<.01?1:0;P.heat+=fr.heat;
       SH.volley(x,y,pf);NR.emit('fire',{x,y,pf});SH.extra(cell,gs);
-      AU.sfx('shot');if(P.heat>=100){P.heat=100;P.over=true;AU.sfx('heat');floater(P.x,P.y-24,'OVERHEAT','#ff5050');}}
+      AU.sfx('shot');if(P.heat>=100){P.heat=100;P.over=true;AU.sfx('heat');if(!rotMode)floater(P.x,P.y-24,'OVERHEAT','#ff5050');}}
     if(firing&&!P.over)P.heat=Math.max(0,P.heat-4*pdt);else if(!firing)P.heat=Math.max(0,P.heat-34*pdt);
     if(!SET.calm&&Math.random()<.7)G.pt.push({x:P.x-18,y:P.y+rnd(-2,2)+2,vx:rnd(-220,-120),vy:rnd(-15,15),l:.3,m:.3,c:D.a,sz:rnd(2,4)});
   }
@@ -303,18 +332,19 @@ function update(dt){
 
   /* waves & boss trigger */
   if(ST.on){ST.tick(dt);}
-  else if(G.lab){}                                        // the LAB stage: no waves, no district clock, no boss timer; the LAB panel decides what appears (lab.js)
+  else if(G.lab||G.tut){}                                        // the LAB stage: no waves, no district clock, no boss timer; the LAB panel decides what appears (lab.js)
   else if(!G.dead&&!G.boss&&!G.bossDone){G.dt+=dt;DIR.tick(dt);                 // the director schedules the waves on bar lines; it also decides when the boss comes
     if(!G.preload&&G.dt>10){G.preload=true;const n=nextDi(G.di).di;loadTrack(stageFor(G.di,true));loadTrack(stageFor(n,false));}}
   else if(!G.dead&&G.boss&&G.boss.mini&&!ST.on){G.dt+=dt;DIR.tick(dt);}
   if(G.transT>=0&&!ST.on){G.transT-=dt;if(G.transT<0){NR.emit('districtEnd',{di:G.di});const nx=nextDi(G.di);if(nx.wrap)G.loop++;SH.pit(()=>enterDistrict(nx.di));}}
 
   /* enemies */
-  for(const e of G.en){e.t+=sdt;e.flash=Math.max(0,e.flash-dt);
-    switch(e.type){
+  const sdtA=sdt;
+  for(const e of G.en){const sdt=e.gnd||!window.LEAK||!RET.leak?sdtA:sdtA*LEAK.es(e);e.t+=sdt;e.flash=Math.max(0,e.flash-dt);   // leak.js: flyers are calmer (LEAK.es), ground enemies keep their own pace
+    switch(window.ZOO&&RET.zoo&&ZOO.mv(e,sdt,d)?'_z':e.type){   // zoo.js: hovering flyers + the new kinds move themselves
       case'drone':e.x-=(120+15*d)*sdt;e.y=e.by+Math.sin(G.bp*Math.PI/2+(e.ph||0))*(e.amp||0);break;
       case'turret':if(e.t<6.5){if(e.x>e.stop)e.x-=150*sdt;}else{e.x-=180*sdt;e.y-=40*sdt;}break;
-      case'charger':{const aw=Math.max(.55,BT.spb*1.05);if(e.t<.7)e.x-=130*sdt;else if(e.t<.7+aw){e.y+=(P.y-e.y)*Math.min(1,sdt*5);e.aimL=1;}else{e.aimL=0;e.x-=(600+60*d)*sdt*(e.el?1.2:1);}}break;
+      case'charger':{const aw=Math.max(.55,BT.spb*1.05);if(DMG.on&&e.x>W-70&&e.t<3){e.x-=Math.max(130,(e.x-W+70)*2.2)*sdt;e.t=Math.min(e.t,.35);}else if(e.t<.7)e.x-=130*sdt;else if(e.t<.7+aw){e.y+=(P.y-e.y)*Math.min(1,sdt*5);e.aimL=1;}else{e.aimL=0;e.x-=(DMG.on?Math.min(DMG.cvMax,DMG.cv+40*d):600+60*d)*sdt*(e.el?1.2:1);}}break;
       case'gunship':if(e.x>W-170)e.x-=60*sdt;else e.y=e.by+Math.sin(e.t*.8)*60;
         if(e.t>13)e.x-=90*sdt;break;
       case'gate':e.x-=95*sdt;if(G.di>=3||G.loop)e.gy+=Math.sin(e.t*1.4)*40*sdt;{const tl=Math.max(.45,BT.spb*1.05),cyc=e.t%(2.8+tl),on0=tl+.4;e.on=cyc>on0;e.tele=cyc>on0-tl&&cyc<=on0;}
@@ -322,34 +352,40 @@ function update(dt){
       case'flank':DIR.moveFlank(e,sdt,d);break;
       case'swarm':DIR.moveSwarm(e,sdt,d);break;
       case'mine':DIR.moveMine(e,sdt,d);break;
-      case'boss':bossUpdate(e,sdt,d);break;}
-    if(e.type!=='gate'&&e.type!=='boss'&&!G.dead&&e.x<W-2&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+(HARD?8:5)){hurt();if(e.type!=='gunship')e.hp=0;}
+      case'boss':bossUpdate(e,sdt,d);break;
+      case'gtank':case'gturret':case'gwalker':if(window.LEAK)LEAK.move(e,sdt);break;}
+    if(e.type!=='gate'&&e.type!=='boss'&&!G.dead&&e.x<W-2&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+(HARD?8:5)){hurt();if(e.type!=='gunship'&&e.type!=='carrier'){e.hp=0;e.rk=1;}}
     if(e.type==='boss'&&!G.dead&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+6)hurt();
   }
   /* player bullets */
   for(const b of G.pb){const hk=Math.min(3,Math.max(b.hk||0,SH.hm||(SET.aim?.6:0)));if(hk)SH.steer(b,sdt,hk);b.x+=b.vx*sdt;b.y+=b.vy*sdt;
-    for(const e of G.en){if(e.hp<=0||e.dying)continue;let hit=false;
+    for(const e of G.en){if(e.hp<=0||e.dying||e.gr)continue;let hit=false;
       if(e.type==='gate'){hit=Math.abs(b.x-e.x)<14&&(Math.abs(b.y-(e.gy-e.gap/2))<16||Math.abs(b.y-(e.gy+e.gap/2))<16);}
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
       if(hit&&b.px&&b.px.has(e))continue;
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=b.dm*(b.pf?SH.sharp:1)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom('hit-spark',b.x,b.y,30,.16);}AU.sfx('hit');break;}}
+      if(hit&&e.zt&&window.ZOO&&ZOO.block(b,e)){b.dead=1;if(Math.random()<.5)burst(b.x,b.y,'#4ad1ff',3,120,.25);AU.sfx('hit');break;}   // zoo.js: a shield absorbs the shot
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom('hit-spark',b.x,b.y,30,.16);}AU.sfx('hit');break;}}
     if(b.rc>0&&(b.y<2&&b.vy<0||b.y>H-2&&b.vy>0)){b.vy=-b.vy;b.rc--;b.y=clamp(b.y,3,H-3);if(b.px)b.px.clear();}
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}
   G.pb=G.pb.filter(b=>!b.dead);
+  {const cap=touchUI||rotMode?44:64;let over=G.pb.length-cap;if(over>0)for(const b of G.pb){if(over<=0)break;if(!b.big&&!b.pf){b.dead=1;over--;}}G.pb=G.pb.filter(b=>!b.dead);}   // player bullets alive at once: the oldest side/spray shots go first (aimed, big and on-beat shots stay), so no weapon fills the screen
+  if(G.pb.length>pbCap())G.pb.splice(0,G.pb.length-pbCap());   // player-bullet cap (g.js): the oldest shots go first
+  DMG.pass(dt);
   for(const e of G.en){if(e.type==='boss'&&e.floor>0&&e.hp<e.floor){e.hp=e.floor;if(!(e.lk>0)){e.lk=.35;if(!e.armN||G.t-e.armN>6){e.armN=G.t;floater(e.x,e.y-e.r-18,'ARMOUR','#19e3ff');}}}
     if(e.lk>0)e.lk-=dt;
+    if(DMG.on&&e.gr&&e.hq!=null&&e.hp<e.hq)e.hp=e.hq;   // a kill's own blast (earlier in this loop) must not finish an enemy still entering
     if(e.hp<=0&&!e.dead){e.dead=1;if(e.type==='boss')bossDown(e);else kill(e);}
     if(e.x<-120||e.y<-120)e.dead=1;}
   G.en=G.en.filter(e=>!e.dead);
 
   /* enemy bullets */
-  for(const b of G.eb){b.x+=b.vx*sdt;b.y+=b.vy*sdt;if(b.x<-30||b.x>W+30||b.y<-30||b.y>H+30){b.dead=1;continue;}
+  for(const b of G.eb){const bdt=sdt*RET.asB();b.x+=b.vx*bdt;b.y+=b.vy*bdt;if(b.x<-30||b.x>W+30||b.y<-30||b.y>H+30){b.dead=1;continue;}
     if(G.dead)continue;const dd=Math.hypot(b.x-P.x,b.y-P.y);
     if(P.dashT>0&&dd<26){b.dead=1;G.score+=Math.round(25*G.mult*(P.dashPf?2:1));P.heat=Math.max(0,P.heat-6);burst(b.x,b.y,D.b,4,120,.3);continue;}
     if(dd<b.r+3){b.dead=1;hurt(b.dmg);continue;}
     if(!b.g&&dd<24+Math.max(0,b.r-6)){b.g=1;const pf=tryPerfect('graze',null,P.x,P.y);G.score+=Math.round(10*G.mult*(pf?2:1));P.heat=Math.max(0,P.heat-4);G.mult=Math.min(9.9,G.mult+.02);
-      if(!SET.calm)G.pt.push({x:(b.x+P.x)/2,y:(b.y+P.y)/2,vx:0,vy:-30,l:.3,m:.3,c:'#ffffff',sz:2});AU.sfx('graze');}}
+      if(!SET.calm)G.pt.push({x:(b.x+P.x)/2,y:(b.y+P.y)/2,vx:0,vy:-30,l:.3,m:.3,c:'#ffffff',sz:2});AU.sfx('graze');NR.emit('graze',{pf:!!pf});}}
   G.eb=G.eb.filter(b=>!b.dead);
 
   /* pickups */
@@ -374,6 +410,7 @@ function update(dt){
 }
 
 function bossUpdate(e,dt,d){
+  if(rotMode&&!e.sub)UIK.portraitSwap(e);                // turned to portrait during the fight: a boss without a road changes to its flyer
   const mv=rotMode?'air':UIK.moveOf(e);if(mv!=='air')UIK.bossMove(e,dt,mv);
   else if(e.x>bossX()){e.x-=110*dt;e.y=H/2-20;return;}
   else e.y=H/2-20+Math.sin(e.t*.7)*150;
