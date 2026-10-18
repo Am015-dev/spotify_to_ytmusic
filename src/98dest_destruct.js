@@ -59,5 +59,8 @@ function DEST_mark(list){if(!list.length)return;if(!DEST_texM){const[pc,pg]=cv(6
 // streamed city tiles add colliders near the player: a shortcut is re-checked once the car is within 350 m, and dropped (markers hidden) if something now blocks it
 function DEST_check(c){if(c.ok!=null)return c.ok;c.ok=!!DEST_open(c.a.x,c.a.z,c.b.x,c.b.z);for(const m of c.mk||[])m.visible=c.ok;return c.ok}
 function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(DEST.scGrp);DEST.scGrp=null;DEST.sc=null;DEST.found=null;DEST.scI=0;DEST.N=HUB.nodes;DEST.gN=null}
-const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.sc){try{DEST_find(4)}catch(e){DEST.sc=[];console.warn('DEST',e)}}else if(DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350)DEST_check(c)};
+// perf-12: the one-off shortcut scan (22.7k nodes in Athens) ran 4 ms every frame for ~35 s; its probes run Maglev-compiled and box every double (~50 MB/s of garbage),
+// so it gets 1.5 ms a frame (~90 s in Athens, same result; GO/tests call DEST_find(1e9))
+const DEST_BUDGET=1.5;
+const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.sc){try{DEST_find(DEST_BUDGET)}catch(e){DEST.sc=[];console.warn('DEST',e)}}else if(DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350)DEST_check(c)};
 smashCheck=(f=>function(dt){DEST_step(dt);return f.apply(this,arguments)})(smashCheck);
