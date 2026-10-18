@@ -4,6 +4,12 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun on-foot street stage engine (W1, flag RET.foot, 18 Oct 2026)
+- `parts/foot.js` (after ret.js in build.py): own full-screen layer #footL, MENU button STREET RUN (unlocked by story stage 3). Stage `street1` = data in `FOOT.STAGES` (waves, 2 arena locks, mid checkpoint, warden boss arena, props). Weapons LV1-5 (`FOOT.WEAPONS`, trait at LV3/LV5, a hit = -1 LV), power-ups with levels (`FOOT.PICKUPS`). Uses FA / FOOT_ENEMIES / FOOT_BOSS when W2/W3 are merged, else built-in fallbacks (`FOOT.FB`). Body coords: x = centre, y = feet.
+- Fairness: telegraph >= 0.4 s and release on the half beat, at most 5 shots winding up (x diff), 40 bullet cap, entry grace 0.9 s, no shots from off-screen, view 480-760 wide on every screen, 8-way aim + 0.3 rad aim assist. Idle hero dies (gangs after 7 s without progress).
+- Test: `foot-test.js` (51 checks, phone 390x763 / 375x553 / desktop + rotation; bot with checkpoint retries clears in ~75 s game time). Weak: the stage is short for the bot (~75 s, a human ~2-3 min); lock B (mech) is the difficulty wall; balance the real W3 enemies once merged.
+- Music: plays 'stage2' for now; wanted cues in `games-src/next-wave/music/mainhattan-nightrun/cues-street.json` (street1, lock, boss, clear). Events for stats/achievements: NR footStart/footKill/footPick/footLevel/footCp/footPhase/footEnd (not yet wired into stats.js).
+
 ## Asset inbox (18 Oct 2026)
 - Owner drops finished files in `assets-inbox/<slug>/`, runs `python3 games-src/scripts/ingest-assets.py` (`--check` = dry run). See `assets-inbox/README.md`, `games-src/ASSET-INBOX.md` (per-game table + code spots).
 - Measured (after merging origin, 18 Oct): of 371 expected pictures/clips only 61 are "just drop it" (all Mainhattan Nightrun, its placeholder pipeline); 36 are prefix-only matches (shipwreck hex-*, thornbound end-/back-, lantern-dive, Nightrun kit-*), 274 need wiring code, and all 740 poses need it (no game loads `media/poses/`). No plain `<img>` without onerror was found, so no fallback code was added and no game code changed (no deploy).
