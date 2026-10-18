@@ -4,7 +4,7 @@
 // within PC.keep m for shadows) are copied from a full source copy into the front of instanceMatrix and .count is set (CTB_step pattern).
 // setMatrixAt / getMatrixAt / setColorAt / getColorAt / raycast are wrapped so writes by the ORIGINAL index (smash, revive, colour) still land:
 // they go to the source copy and to the instance's current slot (slot[] map). ?pc5=0 = off. GO: perf5/compact (src/99c_checklist.js).
-const PC={on:!/[?&]pc5=0/.test(location.search),L:[],grp:null,t:0,f:0,k:0,left:0,x:1e9,y:0,z:1e9,h:1e9,fr:900,keep:60,st:{meshes:0,src:0,vis:0,runs:0,ms:0}};
+const PC={on:!/[?&]pc5=0/.test(location.search),q:[],L:[],grp:null,t:0,f:0,k:0,left:0,x:1e9,y:0,z:1e9,h:1e9,fr:900,keep:60,st:{meshes:0,src:0,vis:0,runs:0,ms:0}};
 const _pcM=new THREE.Matrix4(),_pcPV=new THREE.Matrix4(),_pcF=new THREE.Frustum(),_pcD=new THREE.Vector3(),_pcC=new THREE.Color(),_pcIM=THREE.InstancedMesh.prototype;
 function PC_far(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc5Far??(lv==='min'?380:lv==='low'?480:lv==='med'?700:900)}
 // candidates: full (count = capacity), static, ≥ 16 instances, spread over > 300 m; never pools whose .count other code drives
@@ -32,7 +32,9 @@ function PC_scan(){PC.L.length=0;PC.st.meshes=PC.st.src=0;PC.grp=HUB.grp;if(!HUB
  for(const im of Object.values(HUB.cim||{}))for(const q of[im,im&&im.userData.w,im&&im.userData.g])if(q&&q.isInstancedMesh&&!q.userData.pc&&q.count>=8&&q.count===q.instanceMatrix.count)PC_reg(q,false).dyn=true;
  PC.nch=HUB.grp.children.length;PC_grid()}
 // perf-6: meshes added to HUB.grp after the first scan (lazy 'lz' leaf/filler groups: 18k-instance leaf IM = 217k tris Fra) are picked up when the child count changes
-function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const A=[],w=o=>{if(o===lg)return;if(PC_cand(o)){A.push(PC_reg(o,false));n++}for(const q of o.children)w(q)};w(HUB.grp);if(n)PC_grid(A);return n}
+// boot-1: PC_add only queues the new meshes; PC_drain registers them under a ~3 ms budget per frame (PC_reg + grid were 22-650 ms in one frame on a tile landing)
+function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const Q=PC.q,w=o=>{if(o===lg)return;if(!o.userData.pcQ&&PC_cand(o)){o.userData.pcQ=1;Q.push(o);n++}for(const q of o.children)w(q)};w(HUB.grp);return n}
+function PC_drain(ms){if(!PC.q.length)return 0;const t=performance.now(),A=[];while(PC.q.length&&(!A.length||performance.now()-t<ms)){const o=PC.q.shift();o.userData.pcQ=0;if(o.parent&&PC_cand(o))A.push(PC_reg(o,false))}if(A.length)PC_grid(A);return A.length}
 function PC_grid(add){
  // perf-7: one 80 m world grid (PC.G = x,y,z,r per cell) tested ONCE per pass into PC.cv; each mesh keeps its own cell lists (C.G = [cell, Int32Array ids]).
  // Incremental: PC_add grids only the new meshes (a full rebuild was 460 ms in Athens on every lazy group); an existing cell keeps its centre and grows its radius.
@@ -57,17 +59,19 @@ function PC_mesh(C){const im=C.im;C.dirty=false;if(!im.parent)return 0;const cx=
 // then walks the static meshes over several frames, PC.bud instances tested per frame (each mesh is re-packed whole, so it never shows half a pass).
 // Traffic layers (C.dyn, moving) and clouds are re-packed every 10 frames on their own; a mesh dirtied by setMatrixAt is re-packed alone next frame.
 function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!=='roam')return;if(PC.grp&&PC.grp!==HUB.grp){PC.L.length=0;PC.grp=null;PC.f=0}
- if(!PC.grp){const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return;PC_scan();force=1}
- if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9)&&PC_add())force=1;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
+ {const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return}if(!PC.grp)PC_scan();/* boot-1: the scan normally ran in the loader (PC_prewarm); the first pass is budgeted like any other */
+ if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9))PC_add();const np=PC_drain(force?1e9:3)>0;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
  const t0=performance.now();let tested=0;const snap=()=>{camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);PC.x=cx;PC.y=camera.position.y;PC.z=cz;PC.h=h;const far=PC.fr=PC_far(),cy=PC.y,G=PC.G,V=PC.cv;if(G)for(let q=0;q<V.length;q++){const d=Math.hypot(G[q*4]-cx,G[q*4+1]-cy,G[q*4+2]-cz),r=G[q*4+3];V[q]=d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(G[q*4],G[q*4+1],G[q*4+2]),r+4+d*.25))?0:1}};
- if(force||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){snap();PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
+ if(force||np||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){snap();PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
  else if(++PC.t%10===0&&!PC.left){snap();for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
  const bud=force?1e9:(TUNE.pc7Bud||60000);/* circular: a new pass mid-way carries on from the same mesh, so no mesh starves under constant turning */
  while(PC.left>0&&tested<bud){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
  if(!PC.left)for(const C of PC.L)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
  if(tested){let vis=0;for(const C of PC.L)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();
+// boot-1: register + grid every candidate behind the loading screen (it was 180 ms on the first roam frame); nothing is packed until roam (98sp_simplify reads .count)
+function PC_prewarm(){try{if(PC.on&&HUB.grp&&!PC.grp&&PC_gate())PC_scan()}catch(e){console.warn('PC prewarm',e)}}
 // perf-7 gate: compaction costs ~1.8 ms CPU/frame (A/B), only worth it where the GPU is the limit: quality low/min (phones). med/high skip PC_step entirely
 // (nothing is scanned or wrapped); if quality rises after a pass ran (auto ladder / settings), PC_release puts every mesh back to its full source copy.
 function PC_gate(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc7All||lv==='low'||lv==='min'}
