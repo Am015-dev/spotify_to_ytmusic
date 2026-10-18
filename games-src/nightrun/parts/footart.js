@@ -3,7 +3,7 @@
    FA.has(who,pose)        true when the REAL picture media/foot/<who>-<pose>.webp is loaded (only files listed in media/ready.json are tried, so the hatched placeholder files are never shown)
    FA.draw(ctx,who,pose,x,y,h,flip,t)   x,y = feet position, h = height in px, flip = true faces left (art faces right), t = seconds (run cycle, breathing, flashes).
                            For 'die' pass the SECONDS SINCE DEATH (falls over in 0.6 s, fades to 15% by 1.2 s). 'run' alternates run-a/run-b by itself. Machines (drone, turret, mech) have idle/shoot/hit/die; other poses draw idle.
-   FA.bg(ctx,layer,camX,w,h)  layers sky, far, mid, near, floor (parallax 0.02/0.12/0.35/0.7/1). The street line is FA.floorY(h) = 80% of h. Draw order: sky, far, mid, near, [actors], floor.
+   FA.bg(ctx,layer,camX,w,h)  layers sky, far, mid, near, floor (parallax 0.02/0.12/0.35/0.7/1). The street line is FA.floorY(h) = the on-foot engine road line (h-70 of a 540 view); painted layers are scaled so their 80% line lands on it. Draw order: sky, far, mid, near, [actors], floor.
    FA.pickup(ctx,id,x,y,size,t) / FA.scenery(ctx,id,x,y,h)   centred / feet-anchored placeholders for media/foot/pk-<id>.webp and sc-<id>.webp (the picture when it is real).
    Everything is plain shapes until the painted file exists; no per-frame allocation except small arrays. ---------- */
 (()=>{
@@ -132,11 +132,11 @@ FA.scenery=(ctx,id,x,y,h)=>{const pic=FA._pic('foot/sc-'+id+'.webp');ctx.save();
 /* ---- backgrounds ---- */
 const hh=n=>{n=Math.imul((n|0)^61,0x45d9f3b);n^=n>>>16;n=Math.imul(n,0x45d9f3b);return((n^(n>>>16))>>>0)/4294967296;};   // stable pseudo-random per cell so the street never changes as it scrolls
 const PAR={sky:.02,far:.12,mid:.35,near:.7,floor:1},NEON=['#ff2d95','#19e3ff','#ffb020','#3dff8a'];
-FA.floorY=h=>Math.round(h*.8);
+FA.floorY=h=>Math.round(h*(1-70/540));   // = FOOT's road line (view 540 tall, floor at h-70), so feet stand on the road
 FA.bg=(ctx,layer,camX,w,h)=>{
   const fy=FA.floorY(h),k=h/720,off=(camX||0)*(PAR[layer]||0),pic=FA._pic('foot/bg-'+layer+'.webp');
   ctx.save();
-  if(pic){const tw=h*2;let x0=-(((off%tw)+tw)%tw);for(let x=x0;x<w;x+=tw)ctx.drawImage(pic,x,0,tw,h);ctx.restore();return;}
+  if(pic){const kk=fy/(h*.8),tw=h*2*kk;let x0=-(((off%tw)+tw)%tw);for(let x=x0;x<w;x+=tw)ctx.drawImage(pic,x,0,tw,h*kk);ctx.restore();return;}   // the picture's 80% street line is scaled onto the road line
   if(layer==='sky'){const g=ctx.createLinearGradient(0,0,0,fy);g.addColorStop(0,'#07051a');g.addColorStop(.6,'#2a0f4a');g.addColorStop(1,'#6a1f6a');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
     ctx.fillStyle='rgba(255,255,255,.7)';for(let i=0;i<40;i++){const sx=((hh(i*3)*900*k-off)%(w+40)+w+40)%(w+40)-20;ctx.fillRect(sx,hh(i*7+1)*fy*.55,k*1.6,k*1.6);}
     ctx.fillStyle='rgba(255,210,235,.85)';ctx.beginPath();ctx.arc(((w*.78-off)%(w+200)+w+200)%(w+200)-100,fy*.22,26*k,0,6.3);ctx.fill();}
