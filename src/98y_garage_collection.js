@@ -119,18 +119,19 @@ GAR_tab=(f=>function(){f();const B=$('#gbBody');if(!B)return;const row=B.querySe
 #g9Col .g9Card img{width:100%;aspect-ratio:168/104;border-radius:8px;background:radial-gradient(ellipse at 50% 70%,#3a4a5e,#152232 70%)}
 #g9Col .g9R{position:absolute;left:10px;top:10px;font:900 12px system-ui;font-style:normal;letter-spacing:.04em;color:#05030f;background:var(--tc);border-radius:6px;padding:1px 6px}
 #g9Col .g9Fav{position:absolute;right:8px;top:6px;width:36px;height:36px;border:0;background:none;color:#ffd12c;font-size:22px;cursor:pointer;text-shadow:0 1px 3px #000}
-#g9Col .g9Card b{font:900 13px system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#g9Col .g9Card small{font:700 12px system-ui;color:#8fb3c7}#g9Col .g9Card.on small{color:#5dffb0}
+#g9Col .g9Card b{font:900 12px/1.15 system-ui;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:2.3em}/* r9b: names get 2 lines at 12 px instead of an ellipsis */#g9Col .g9Card small{font:700 12px system-ui;color:#8fb3c7}#g9Col .g9Card.on small{color:#5dffb0}
 #g9Col .g9Ed{justify-self:start;height:30px;margin-top:3px;padding:0 10px;border-radius:9px;border:0;background:linear-gradient(90deg,#ffd12c,#ff7a1c);color:#141413;font:900 12px system-ui;cursor:pointer}
 #g9Col .g9New{min-height:120px;border-radius:12px;border:2px dashed #ffd12c!important;background:rgba(255,209,44,.08)!important;display:grid;place-content:center;text-align:center;gap:4px}#g9Col .g9New b{font:900 13px system-ui;color:#ffd12c}#g9Col .g9New small{font:700 12px system-ui}
 #g9Col .g9None{font:700 12px system-ui;color:#8fb3c7;grid-column:1/-1}
+body:has(#gbx:not([hidden])) :is(#roamExit,#ofExit,#qaBugTop,#odPin){visibility:hidden!important;pointer-events:none!important}/* r9b: no roam EXIT / 🐞 over the garage cards */
 @media (max-height:500px){#g9Col .g9Grid{grid-template-columns:repeat(auto-fill,minmax(138px,1fr))}#g9Col .g9Card{min-height:0}}`;document.head.appendChild(st)}
 window.__g9c={S:G9C,list:f=>G9C_list(f||G9C.type).A.map(e=>e.S.id),eq:f=>G9C_eq(f),T:G9_T,render:(id,f,w,h)=>G9C_render(GAR_set(id),f||'car',w,h),bricks:(id,f)=>G9C_bricks(GAR_set(id),f||'car')};
 /* rv2k garage-car (review 2K #6): landscape phone RIDES = 4-column card grid in a 340 px panel with the header chrome folded away (>= 6 cards in view); the ride is framed by R2_frame (zoom factor below). Flag: window.__RV2K_GAR=0 (before load) turns it off. */
 if(window.__RV2K_GAR!==0){const st=document.createElement('style');st.textContent=`@media (max-height:500px) and (orientation:landscape){
-#gbx.r2.r2m-rides{--r2pw:340px}#gbx.r2.r2m-rides #gbStats{display:none}
+#gbx.r2.r2m-rides{--r2pw:392px}/* r9b: 4 cards in 392 px so names fit on 2 lines */#gbx.r2.r2m-rides #gbStats{display:none}
 #gbx.r2.r2m-rides #g9Col .g9Grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
 #gbx.r2.r2m-rides #g9Col .g9Card{min-height:0;padding:3px 3px 4px;gap:0;border-radius:9px;border-bottom-width:4px}
-#gbx.r2.r2m-rides #g9Col .g9Card img{aspect-ratio:168/96}#gbx.r2.r2m-rides #g9Col .g9Card b{font-size:12px;line-height:1.1;white-space:normal;overflow:visible;text-overflow:clip;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere;min-height:2.2em;overflow:hidden}#gbx.r2.r2m-rides #g9Col .g9Card small{display:none}#gbx.r2.r2m-rides #g9Col .g9Card.on small{display:block;font-size:12px;line-height:1.1}
+#gbx.r2.r2m-rides #g9Col .g9Card img{aspect-ratio:168/96}#gbx.r2.r2m-rides #g9Col .g9Card b{font-size:12px;line-height:1.1;white-space:normal;overflow:visible;text-overflow:clip;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow-wrap:anywhere;min-height:2.2em;overflow:hidden}#gbx.r2.r2m-rides #g9Col .g9Card small{display:none}#gbx.r2.r2m-rides #g9Col .g9Card.on small{display:block;font-size:12px;line-height:1.1}
 #gbx.r2.r2m-rides #g9Col .g9Ed{display:none}#gbx.r2.r2m-rides #g9Col .g9R{left:5px;top:5px;max-width:calc(100% - 10px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;padding:0 4px}
 #gbx.r2.r2m-rides #g9Col .g9Fav{display:none}
 #gbx.r2.r2m-rides #g9Col .g9New{min-height:0;padding:2px 4px}#gbx.r2.r2m-rides #g9Col .g9New small{display:none}
