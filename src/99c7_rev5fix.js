@@ -144,6 +144,15 @@ function R9A_race(C,route,roam){if(RO.sp)try{sprintEnd()}catch(e){}
   if(lead!=null&&best[0]!==lead)lc++;lead=best[0]});
  const hud2=hud||/POS \d\/5\b/.test(sp.hud||''),r=TK.last;try{$('#spRes').hidden=true}catch(e){}if(RO.sp===sp)try{sprintEnd()}catch(e){}K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=K.ArrowDown=false;
  return{n,hud:hud2,fin:!!r&&!r.dnf,place:r&&r.place,t:r&&r.t,lc,ah:Math.round(ah),be:Math.round(be),stall,beAt,ahAt,stuck:bot.R.stuck.length}}
+function R9A_cost(goSay,which){setTimeout(()=>{let C,roam=0,rt='pA';
+  if(which==='akro'){const m=tkMarkOf(ATH_BOSS_EV);C=m&&tkCourseOf(m);roam=30}else C=TK_C;
+  if(!C)return goSay('📍 PACK COST · no course ❌ FAIL');try{__tq.reset()}catch(e){}if(RO.sp)try{sprintEnd()}catch(e){}
+  if(roam){const W=a=>Math.atan2(Math.sin(a),Math.cos(a));for(let t=0;t<roam;t+=1/30){const la=12+RO.v*.9,q=rfSnap(RO.x+Math.sin(RO.h)*la,RO.z+Math.cos(RO.h)*la,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;roamStep(1/30)}K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false}
+  tkStart({kind:C.kind,ev:C.ev||null},C);const sp=RO.sp;sp.cd=0;const bot=tkBot(tkGeoOf(C)[rt],{lag:.15}),all=sp.ai.slice();tkRun(8,bot);   // warm: the pack has spread out on the road
+  const tm=(ai,n)=>{sp.ai=ai;const a=[];for(let i=0;i<n;i++){const t=performance.now();tkStep(0);a.push(performance.now()-t)}a.sort((x,y)=>x-y);return a[n>>1]};
+  tm(all,60);const m5=tm(all,400),m2=tm(all.slice(0,1),400),m5b=tm(all,400),d=Math.max(0,Math.min(m5,m5b)-m2);sp.ai=all;if(RO.sp===sp)try{sprintEnd()}catch(e){}
+  const ok=all.length===4&&d<=.5;   // AI update ms per frame, not wall-clock: tkStep with the pack minus tkStep with the nemesis only (touch is not reduced to 3 racers)
+  goSay('📍 PACK COST · '+C.name+': '+(all.length+1)+' racers · AI update '+d.toFixed(2)+' ms/frame over the 2-racer race ('+m2.toFixed(2)+' → '+Math.min(m5,m5b).toFixed(2)+' ms tkStep; need ≤ 0.5 ms, 5 racers) → '+(ok?'✅ PASS':'❌ FAIL'))},300);return'📍 PACK COST · timing…'}
 const R9A_say=t=>{const C=window.__chk;if(C&&C.goSay)C.goSay(t);else try{say('',t,2.2)}catch(e){}};
 function R9A_go(goSay,which){setTimeout(()=>{let C,rt='pA',roam=0;
   if(which==='akro'){const m=tkMarkOf(ATH_BOSS_EV);C=m&&tkCourseOf(m);roam=30}
@@ -152,5 +161,7 @@ function R9A_go(goSay,which){setTimeout(()=>{let C,rt='pA',roam=0;
   if(!C)return goSay('📍 PACK5 · no course ❌ FAIL');try{__tq.reset()}catch(e){}const o=R9A_race(C,rt,roam),ok=o.n===5&&o.hud&&o.fin&&o.place<=3&&o.lc>=3&&o.ah<120&&o.be<120&&!o.stall;
   goSay('📍 PACK5 · '+C.name+': '+o.n+' racers'+(o.hud?' · HUD /5':' · no /5')+' · bot '+(o.fin?o.place+'. in '+o.t+' s':'DNF')+' · '+o.lc+' lead changes · max ahead '+o.ah+' m / behind '+o.be+' m'+(o.be>=120?' ['+o.beAt+']':'')+(o.ah>=120?' ['+o.ahAt+']':'')+' · '+o.stall+' stalled AI (need 5, /5, 1st-3rd, ≥ 3, < 120 m, 0) → '+(ok?'✅ PASS':'❌ FAIL'))},300);return'📍 PACK5 · racing…'}
 (function R9A_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='r9a')){C.items.push({ver:'r9a',id:'pack5',area:'race',text:'rev9 #1 / N5 · a pack of 5 in every city race: 📍 GO races the human-like bot in Westend, Grand Prix, River Run (fra) and the Akropolis final (ath), one GO each. Pass line: 5 racers, HUD POS n/5, bot 1st-3rd, ≥ 3 lead changes among all 5, max gap ahead and behind < 120 m (sampled each second while the bot drives > 15 m/s, against its furthest progress), no rival stalled > 10 s.'});
- (C.GO['r9a/pack5']=C.GO['r9a/pack5']||[]).push(...[['fra','Westend','west'],['fra','Grand Prix','gp'],['fra','River Run','river'],['ath','Akropolis final','akro']].map(([c,n,w])=>({c,n:'pack of 5: '+n,secs:300,fn:()=>R9A_go(R9A_say,w)})))}return}
+ (C.GO['r9a/pack5']=C.GO['r9a/pack5']||[]).push(...[['fra','Westend','west'],['fra','Grand Prix','gp'],['fra','River Run','river'],['ath','Akropolis final','akro']].map(([c,n,w])=>({c,n:'pack of 5: '+n,secs:300,fn:()=>R9A_go(R9A_say,w)})))
+ C.items.push({ver:'r9a',id:'pack-cost',area:'race',text:'r9a-perf · the pack of 5 stays cheap on touch: 📍 GO times the AI update (tkStep with 5 racers minus tkStep with the nemesis only, ms per frame, no graphics) in Westend (fra) and the Akropolis final (ath). Pass line: 5 racers, ≤ 0.5 ms extra per frame. Measured on the 852×393 touch profile: pack +0.1 ms AI, +15 draw calls, median frame +1.5 ms (Westend) / -0.8 ms (Akropolis), same frames > 50 ms.'});
+ (C.GO['r9a/pack-cost']=C.GO['r9a/pack-cost']||[]).push(...[['fra','Westend','west'],['ath','Akropolis final','akro']].map(([c,n,w])=>({c,n:'pack cost: '+n,secs:30,fn:()=>R9A_cost(R9A_say,w)})))}return}
  if(i<600)setTimeout(()=>R9A_reg(i+1),100)})(0);

@@ -18,3 +18,9 @@
 4. NOT DONE: race frame time on the touch profile (pack vs ?pack=0). The tFrame race run (Westend) was too slow for the timebox. Next lane: copy tFrame with an 852x393 isMobile viewport, compare QS=pack=0 vs pack=1, and lower the AI LOD on touch if the median is over +2 ms.
 5. Shot (852x393 Westend, 7 s in): "5TH /5", rival box, pack ahead on the road; one smashed vehicle lies on the right edge.
 6. After the rebase: unit 0 FAIL. In the tChkGo TAG run, 5 of 6 PASS (pack5 GP, River and Akropolis, race-handsoff, r9c). In the warm tChkGo page, r9a/pack5 Westend (the first item) had a bot that never drove (DNF, 0 m). On a fresh page it is 2/2 PASS (8 lead changes, max gaps 56-86 m). Fix the warm-page start order next.
+
+# HANDOFF r9a-perf: pack cost on touch
+1. tools/perf1/tRaceTouch.js (852x393 isMobile/hasTouch, Graphics Auto, 30 s bot race, render stubbed, desktop CPU): Westend pack vs ?pack=0 median 17.4 vs 15.9 ms (p95 28.6/26.6, >50 ms 9/9); Akropolis 19.4 vs 20.2 (p95 38.3/41.3, >50 ms 31/39). AI update (tkStep) +0.1 ms; +15 draw calls (658 vs 643, 712 vs 695). Run-to-run noise is about 2 ms, so the pack is within the 2 ms budget: no LOD, no 3-racer default.
+2. GO r9a/pack-cost (src/99c7_rev5fix.js, Westend + Akropolis): tkStep with 5 racers minus tkStep with the nemesis only, ms per frame, no graphics; pass = 5 racers and <= 0.5 ms. Measured 0.00-0.10 ms, both PASS.
+3. Gate: unit 0 FAIL; TAG r9a,life1,xf1,terrain on the built page: 44/48. Reds: xf1/grass, xf1/water, life1/people (known). r9a/pack5#2 (River Run) failed once: behind 130 m at 167 s, the last 8 s of a 175 s race (limit 120); not touched by this lane, was 66-112 m before.
+4. Next: River Run end-of-race gap in the pack5 GO (sample only while the bot is under 150 s or the leader has not finished).
