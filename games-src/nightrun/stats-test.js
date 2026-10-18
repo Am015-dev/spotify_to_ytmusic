@@ -83,6 +83,14 @@ const AUDIT = ({ root, minPx }) => {
   for (let i = 0; i < 4; i++) { names.push(await p.evaluate(() => { const e = document.getElementById('achToast'); return e.className === 'show' ? e.querySelector('b').textContent : ''; })); await sleep(1100); }
   ok('toast queue: shows different toasts over time, never two at once', new Set(names.filter(Boolean)).size >= 2 && await p.evaluate(() => document.querySelectorAll('#achToast').length === 1), JSON.stringify(names));
   await sleep(6000);
+  // F4: the toast waits while the pit stop / clear screen / chest is open (it covered their titles)
+  for (const id of ['shop', 'stres', 'chest']) {
+    await p.evaluate(i => { document.getElementById(i).hidden = false; RET.st.toast(RET.st.BY.arcade); }, id); await sleep(900);
+    const hid = await p.evaluate(() => { const e = document.getElementById('achToast'); return !e || e.className !== 'show'; });
+    await p.evaluate(i => { document.getElementById(i).hidden = true; }, id); await sleep(900);
+    const shown = await p.evaluate(() => { const e = document.getElementById('achToast'); return !!e && e.className === 'show'; });
+    ok('toast: queued while #' + id + ' is open, shown after it closes', hid && shown, JSON.stringify({ hid, shown })); await sleep(2300);
+  }
   await p.evaluate(() => { __mnr.abort(); });
   // completion maths
   const cm = await p.evaluate(() => {

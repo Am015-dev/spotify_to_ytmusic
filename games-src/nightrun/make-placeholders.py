@@ -4,7 +4,7 @@
 Reads assets-manifest.json. For every file listed there that does not exist yet in games/mainhattan-nightrun/media/ it writes a labelled placeholder WebP (never overwrites real art),
 and it regenerates ASSETS-NEEDED.md. To replace a placeholder: save your real image under the same file name and size (see the table), run this script (it updates media/ready.json) and commit both.
 To ask for a new asset: add an entry to assets-manifest.json and run this script."""
-import json, os, glob
+import json, os, glob, sys
 from PIL import Image, ImageDraw, ImageFont
 HERE = os.path.dirname(os.path.abspath(__file__)); MEDIA = os.path.normpath(os.path.join(HERE, '..', '..', 'games', 'mainhattan-nightrun', 'media'))
 M = json.load(open(os.path.join(HERE, 'assets-manifest.json')))
@@ -73,6 +73,13 @@ for e in M:
 print('placeholders written:', made, '| total in manifest:', len(M))
 # ready.json: the manifest files whose picture is real art (not the placeholder we wrote). The game draws these and uses its own vector shapes for the rest.
 ready = sorted(e['file'] for e in M if os.path.exists(os.path.join(MEDIA, e['file'])) and md5(os.path.join(MEDIA, e['file'])) != sig.get(e['file']))
+# guard: a file that is not in placeholders.json (written by another tool) but is a placeholder render must never be listed as real art (placeholder_guard.py)
+sys.path.insert(0, HERE); import placeholder_guard
+_man = {e['file']: e for e in M}; refused = []
+for n in list(ready):
+    why = placeholder_guard.is_placeholder(os.path.join(MEDIA, n), _man, sig)
+    if why: ready.remove(n); sig[n] = md5(os.path.join(MEDIA, n)); refused.append((n, why))
+for n, why in refused: print('REFUSED (placeholder picture, not listed in ready.json):', n, '-', why)
 json.dump(sig, open(SIG, 'w'), indent=0); json.dump(ready, open(os.path.join(MEDIA, 'ready.json'), 'w'))
 print('real art found for', len(ready), 'files:', ready)
 # ----- the document -----

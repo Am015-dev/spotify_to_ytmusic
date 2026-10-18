@@ -65,7 +65,9 @@ RET.st=(function(on){
   /* ---- toast queue: one at a time, each shown 2 s, non-blocking ---- */
   const Q=[];let showing=false;
   function toast(a){Q.push(a);if(!showing)next();}
-  function next(){const a=Q.shift();if(!a){showing=false;return;}showing=true;
+  /* the toast waits (queued) while the pit stop, the clear screen or the chest reveal is open: it used to cover their titles */
+  const blocked=()=>['shop','stres','chest'].some(i=>{const o=document.getElementById(i);return !!o&&!o.hidden&&getComputedStyle(o).display!=='none';});
+  function next(){if(!Q.length){showing=false;return;}showing=true;if(blocked()){setTimeout(next,400);return;}const a=Q.shift();
     let e=document.getElementById('achToast');
     if(!e){e=document.createElement('div');e.id='achToast';e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e);}
     e.innerHTML='<span class="ab" style="--c:'+TC[a.t]+'">'+a.g+'</span><span><small>'+TN[a.t]+' ACHIEVEMENT</small><b>'+a.n+'</b></span>';
@@ -90,6 +92,11 @@ RET.st=(function(on){
   NR.on('tick',dt=>{if(!on||!live())return;dt=Math.min(.25,dt||0);const s=S();s.time+=dt;
     try{for(const id of WP.eqIds())D.w[id]=(D.w[id]||0)+dt;if(WP.fu())s.fuse+=dt;}catch(e){}mark();});
   NR.on('kill',d=>{if(!on||!live())return;if(d&&d.boss)S().bosses++;else S().kills++;mark();});
+  /* on-foot STREET RUN (foot.js events, read defensively): runs, kills, boss kills, time. Neon arrives through the bank poll. */
+  let ft0=0;
+  NR.on('footStart',d=>{if(!on||!d)return;ft0=+d.t0||0;if(!d.cp){S().runs++;mark();}});
+  NR.on('footKill',d=>{if(!on||!d)return;if(d.boss)S().bosses++;else S().kills++;mark();});
+  NR.on('footEnd',d=>{if(!on||!d)return;const t=Math.max(0,Math.min(3600,(+d.time||0)-ft0));S().time+=t;if(!d.cleared&&!d.quit)S().deaths++;ft0=0;mark();poll();save();});
   NR.on('graze',()=>{if(!on||!live())return;S().grazes++;mark();});
   NR.on('perfect',d=>{if(!on||!live())return;S().perfects++;if(d&&d.kind==='dash')S().dashes++;mark();});
   let fvSeen=0;
