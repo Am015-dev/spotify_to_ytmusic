@@ -31,7 +31,7 @@ const MEASURE = () => {
     const pad = Math.round(6 * dpr); let bl = 0, bn = 0, br = 0, bgc = 0, bb = 0;
     for (let y = Math.max(0, y0 - pad); y <= Math.min(h - 1, y1 + pad); y++) for (let x = Math.max(0, x0 - pad); x <= Math.min(w - 1, x1 + pad); x++) { const k = (y * w + x) * 4; bl += lum(B, k); br += B[k]; bgc += B[k + 1]; bb += B[k + 2]; bn++; }
     L.sort((a, b) => a - b); const Lb = L[Math.floor(L.length * .9)], Lg = bl / bn, n = px.length;
-    blobs.push({ c: (Math.max(Lb, Lg) + .05) / (Math.min(Lb, Lg) + .05), d: Math.hypot(cr / n - br / bn, cg / n - bgc / bn, cb / n - bb / bn), col: [cr / n, cg / n, cb / n].map(Math.round) }); }
+    blobs.push({ n, x: x0, y: y0, c: (Math.max(Lb, Lg) + .05) / (Math.min(Lb, Lg) + .05), d: Math.hypot(cr / n - br / bn, cg / n - bgc / bn, cb / n - bb / bn), col: [cr / n, cg / n, cb / n].map(Math.round) }); }
   // the backdrop as a whole (no bullets frame): mean luminance and saturation
   let bl = 0, bs = 0, n = 0; for (let i = 0; i < w * h; i += 37) { const k = i * 4, mx = Math.max(B[k], B[k + 1], B[k + 2]), mn = Math.min(B[k], B[k + 1], B[k + 2]); bl += lum(B, k); bs += mx ? (mx - mn) / mx : 0; n++; }
   return { cnt, same, blobs, dot: { n: dn, wCss: dx1 >= dx0 ? (dx1 - dx0 + 1) / dpr : 0 }, bgL: bl / n, bgS: bs / n, stat: Object.assign({}, window.READ ? READ.stat : {}), read: !!m.RET.read };
@@ -45,22 +45,25 @@ const MEASURE = () => {
     await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&${q}`); await p.waitForFunction(() => window.__mnr && __mnr.ART); await sleep(1200);
     await p.evaluate(() => { __mnr.SET.auto = true; __mnr.applySet(); }); await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running);
     await p.evaluate(di => { const m = __mnr; m.god = true; m.skipTo(di); setInterval(() => { if (m.G.live) { m.P.y = 270 + 160 * Math.sin(m.G.t * .7); m.P.x = 200; } }, 30); }, di);
-    let best = null; const t0 = Date.now();
-    while (Date.now() - t0 < 16000) { await sleep(1500); if (Date.now() - t0 < 5000) continue; const n = await p.evaluate(() => __mnr.G.eb.length); if (n >= 6 && (!best || n > best.cnt)) { best = await p.evaluate(MEASURE); if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await p.screenshot({ path: path.join(SHOTS, `read-${size}-${q}-d${di}.png`) }); } } }
-    if (!best) best = await p.evaluate(MEASURE);
-    const k = size + ' ' + q; (R[k] = R[k] || { c: [], d: [], bgL: [], bgS: [], cnt: 0, same: true, dot: [], stat: best.stat, errs: [], read: best.read });
-    R[k].c.push(...best.blobs.map(b => b.c)); R[k].d.push(...best.blobs.map(b => b.d)); R[k].bgL.push(best.bgL); R[k].bgS.push(best.bgS); R[k].cnt += best.cnt; R[k].same = R[k].same && best.same; R[k].dot.push(best.dot); R[k].errs.push(...errs); R[k].stat = best.stat;
+    const k = size + ' ' + q, t0 = Date.now(); let shots = 0;
+    while (Date.now() - t0 < 20000) { await sleep(1500); if (Date.now() - t0 < 5000) continue; const n = await p.evaluate(() => __mnr.G.eb.length); if (n < 4) continue;
+      const best = await p.evaluate(MEASURE); if (SHOTS && !shots++) { fs.mkdirSync(SHOTS, { recursive: true }); await p.screenshot({ path: path.join(SHOTS, `read-${size}-${q}-d${di}.png`) }); }
+      (R[k] = R[k] || { c: [], d: [], bgL: [], bgS: [], cnt: 0, same: true, dot: [], stat: best.stat, errs: [], read: best.read, worst: [] });
+      R[k].c.push(...best.blobs.map(b => b.c)); R[k].d.push(...best.blobs.map(b => b.d)); R[k].worst.push(...best.blobs.map(b => ({ c: +b.c.toFixed(2), n: b.n, x: b.x, y: b.y, col: b.col, di })));
+      R[k].bgL.push(best.bgL); R[k].bgS.push(best.bgS); R[k].cnt += best.cnt; R[k].same = R[k].same && best.same; R[k].dot.push(best.dot); R[k].stat = best.stat; }
+    if (R[k]) R[k].errs.push(...errs);
     await ctx.close();
   }
   for (const size of ['390x763', '1280x720']) {
-    const o = R[size + ' read=0'], n = R[size + ' read=1'], f = x => x.toFixed(2);
+    const o = R[size + ' read=0'], n = R[size + ' read=1'], f = x => x.toFixed(2), f3 = x => x.toFixed(4);
     console.log(`${size}  bullets measured ${o.c.length} / ${n.c.length}`);
     console.log(`  contrast ratio bullet:backdrop  median ${f(med(o.c))} -> ${f(med(n.c))}   worst 10% ${f(pct(o.c, .1))} -> ${f(pct(n.c, .1))}`);
     console.log(`  colour distance (RGB)           median ${med(o.d).toFixed(0)} -> ${med(n.d).toFixed(0)}   worst 10% ${pct(o.d, .1).toFixed(0)} -> ${pct(n.d, .1).toFixed(0)}`);
-    console.log(`  backdrop luminance ${f(med(o.bgL))} -> ${f(med(n.bgL))}   saturation ${f(med(o.bgS))} -> ${f(med(n.bgS))}`);
+    console.log(`  backdrop luminance ${f3(med(o.bgL))} -> ${f3(med(n.bgL))}   saturation ${f(med(o.bgS))} -> ${f(med(n.bgS))}`);
+    if (process.env.WORST) console.log('  worst', JSON.stringify(o.worst.sort((a, b) => a.c - b.c).slice(0, 4)), '\n  worst', JSON.stringify(n.worst.sort((a, b) => a.c - b.c).slice(0, 6)));
     ok(`${size}: flag off draws nothing new (no dim, no dot, no halo)`, !o.read && !o.stat.dim && !o.stat.dot && !o.stat.halo && o.dot.every(d => d.n === 0), JSON.stringify(o.stat));
     ok(`${size}: drawing never changes the bullets (same list, count, radii)`, o.same && n.same);
-    ok(`${size}: flag on dims the backdrop`, n.stat.dim > 0 && med(n.bgL) < med(o.bgL) * .8, f(med(o.bgL)) + ' -> ' + f(med(n.bgL)));
+    ok(`${size}: flag on dims the backdrop`, n.stat.dim > 0 && med(n.bgL) < med(o.bgL) * .8, f3(med(o.bgL)) + ' -> ' + f3(med(n.bgL)));
     ok(`${size}: hitbox dot visible, >= 4 css px wide`, n.dot.every(d => d.n > 0 && d.wCss >= 4), JSON.stringify(n.dot));
     ok(`${size}: median bullet contrast improved`, med(n.c) > med(o.c) && pct(n.c, .1) >= pct(o.c, .1), f(med(o.c)) + ' -> ' + f(med(n.c)));
     ok(`${size}: no page errors`, !o.errs.length && !n.errs.length, (o.errs[0] || n.errs[0] || ''));

@@ -101,7 +101,7 @@ function tierGlow(c){const T=tierOf(C.n);c.save();c.globalCompositeOperation='li
 function shotDraw(b,D){const ang=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0;let o,al=.55,sy;      // the ship's own shots stay thinner and dimmer than the lime enemy bullets
   if(b.hv){o=ART.sp('fx-shot-hv',46);al=.8;}
   else if(b.ec){o=ART.sp('fx-shot-ec',30);al=.65;}
-  else if(b.pf&&!b.big){o=ART.sp('fx-shot-perfect',32);al=.8;}
+  else if(b.pf&&!b.big){o=RET.read?ART.hue('fx-shot-perfect',32,135):ART.sp('fx-shot-perfect',32);al=.8;}
   else{const L=b.len||(b.big?22:b.pn!=null?28:20);o=ART.tint('fx-shot-std',L*(b.big?1.2:1),RET.read?READ.pc(b,D):b.col||(b.big?'#ffffff':D.b));al=b.big?.8:RET.read?.7:.55;if(o)sy=Math.max(.8,Math.min(3,(b.th||(b.big?4:3))*.7/o.h));}
   if(!o)return;const d=o.w/2-10;ART.put(o,b.x+Math.cos(ang)*d,b.y+Math.sin(ang)*d,ang,al,1,sy);
   if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,RET.read?READ.pc(b,D):b.pf?'#ffe14d':D.b,.22);}
