@@ -40,12 +40,14 @@ const _dsO={g:0,deck:null,low:false};// perf-2: scratch result (the shortcut sca
 function DEST_open(ax,az,bx,bz){const L=Math.hypot(bx-ax,bz-az),dx=(bx-ax)/L,dz=(bz-az)/L;let off=0,n=0,g0=groundAt(ax,az,99);for(let s=3;s<=L-3;s+=1.5){const x=ax+dx*s,z=az+dz*s,g=groundAt(x,z,99);n++;if(roamHit(x,z,3.8,g+.6)||inRiver(x,z,2)||roamTerr(x,z,g+.3,_dsO).low||Math.abs(g-g0)>.5||g<-1||Math.abs(groundAt(x+dz*1.6,z-dx*1.6,99)-g)>.6||Math.abs(groundAt(x-dz*1.6,z+dx*1.6,99)-g)>.6)return 0;g0=g;if(!LF_onRoad(x,z))off++;const PL=HUB.pgrid&&HUB.pgrid.get(Math.floor(x/16)*10000+Math.floor(z/16));if(PL)for(const p of PL){const d=HUB.ptypes[p.t];if(d&&d.r>=1.1&&Math.hypot(p.x-x,p.z-z)<d.r+2)return 0}}if(n<6||off/n<.6)return 0;
  const LF=window.__life;if(LF&&LF.cell&&LF.CELL){/* solid LIFE set pieces (crane, carousel, fountain...) near the line; the small ones smash and do not count */try{const C=LF.CELL,seen=new Set();for(let s=0;s<=L;s+=C/2){const x=ax+dx*s,z=az+dz*s,ca=Math.floor(x/C),cb=Math.floor(z/C);for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const k=(ca+da)*100000+cb+db;if(seen.has(k))continue;seen.add(k);for(const it of LF.cell(ca+da,cb+db)){if(it.c!=='set'||DEST_SET[it.t])continue;const t=clamp(((it.x-ax)*dx+(it.z-az)*dz),0,L);if(Math.hypot(ax+dx*t-it.x,az+dz*t-it.z)<it.r+4)return 0}}}}catch(e){}}
  return off/n}
-function DEST_find(budgetMs){const N=HUB.nodes;if(!N||!DEST.on)return;const t0=performance.now(),S=DEST;S.found=S.found||[];
- for(;S.scI<N.length&&performance.now()-t0<budgetMs;S.scI++){const A=N[S.scI];if(!A||A.ab||!A.nb||!A.nb.length)continue;let D=null;
-  if(S.gN!==N){S.gN=N;S.grid=DEST_grid(N)}const C=DEST_cand;C.length=0;const ca=Math.floor(A.x/130),cb=Math.floor(A.z/130);
-  for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const L=S.grid.get((ca+da)*100000+cb+db);if(L)for(let t=0;t<L.length;t++)if(L[t]>S.scI)C.push(L[t])}C.sort((p,q)=>p-q);
-  for(let c=0;c<C.length;c++){const j=C[c],B=N[j];if(!B||B.ab||!B.nb||!B.nb.length)continue;const dx=B.x-A.x,dz=B.z-A.z;if(Math.abs(dx)>130||Math.abs(dz)>130)continue;const L=Math.hypot(dx,dz);if(L<60||L>130)continue;
-   D=D||DEST_dij(N,S.scI,L*2.2);const R=DEST_dget(D,j);if(R==null||R<L*1.7)continue;const o=DEST_open(A.x,A.z,B.x,B.z);if(!o)continue;
+// perf-10: resumable per candidate (S.cj, S.Dd); was budget-checked per node only, so one node's 10-30 DEST_open scans ran in one frame (90+ ms in Frankfurt)
+function DEST_find(budgetMs){const N=HUB.nodes;if(!N||!DEST.on)return;const t0=performance.now(),S=DEST;S.found=S.found||[];let did=0;
+ for(;S.scI<N.length;S.scI++,S.cj=-1){if(did&&performance.now()-t0>=budgetMs)break;const A=N[S.scI];if(!A||A.ab||!A.nb||!A.nb.length)continue;
+  if(S.gN!==N){S.gN=N;S.grid=DEST_grid(N)}const C=DEST_cand;
+  if(!(S.cj>=0)){S.cj=0;S.Dd=false;C.length=0;const ca=Math.floor(A.x/130),cb=Math.floor(A.z/130);
+   for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const L=S.grid.get((ca+da)*100000+cb+db);if(L)for(let t=0;t<L.length;t++)if(L[t]>S.scI)C.push(L[t])}C.sort((p,q)=>p-q)}
+  for(;S.cj<C.length;S.cj++){if(did&&performance.now()-t0>=budgetMs)return;const j=C[S.cj],B=N[j];if(!B||B.ab||!B.nb||!B.nb.length)continue;const dx=B.x-A.x,dz=B.z-A.z;if(Math.abs(dx)>130||Math.abs(dz)>130)continue;const L=Math.hypot(dx,dz);if(L<60||L>130)continue;
+   if(!S.Dd){DEST_dij(N,S.scI,L*2.2);S.Dd=true}did++;const R=DEST_dget(DEST_DJ,j);if(R==null||R<L*1.7)continue;const o=DEST_open(A.x,A.z,B.x,B.z);if(!o)continue;
    S.found.push({a:{x:A.x,z:A.z},b:{x:B.x,z:B.z},len:Math.round(L),road:Math.round(R),save:+(1-L/R).toFixed(2)})}}
  if(S.scI>=N.length&&!S.sc){S.found.sort((p,q)=>q.save*Math.min(q.len,140)-p.save*Math.min(p.len,140));const pick=[];for(const c of S.found){if(pick.length>=9)break;if(pick.every(p=>Math.hypot(p.a.x-c.a.x,p.a.z-c.a.z)>250&&Math.hypot(p.b.x-c.b.x,p.b.z-c.b.z)>250))pick.push(c)}S.sc=pick;DEST_mark(pick)}}
 let DEST_texM=null;
@@ -58,6 +60,6 @@ function DEST_mark(list){if(!list.length)return;if(!DEST_texM){const[pc,pg]=cv(6
  HUB.grp.add(grp)}
 // streamed city tiles add colliders near the player: a shortcut is re-checked once the car is within 350 m, and dropped (markers hidden) if something now blocks it
 function DEST_check(c){if(c.ok!=null)return c.ok;c.ok=!!DEST_open(c.a.x,c.a.z,c.b.x,c.b.z);for(const m of c.mk||[])m.visible=c.ok;return c.ok}
-function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(DEST.scGrp);DEST.scGrp=null;DEST.sc=null;DEST.found=null;DEST.scI=0;DEST.N=HUB.nodes;DEST.gN=null}
-const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.sc){try{DEST_find(4)}catch(e){DEST.sc=[];console.warn('DEST',e)}}else if(DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350)DEST_check(c)};
+function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(DEST.scGrp);DEST.scGrp=null;DEST.sc=null;DEST.found=null;DEST.scI=0;DEST.cj=-1;DEST.N=HUB.nodes;DEST.gN=null}
+const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.sc){try{DEST_find(4)}catch(e){DEST.sc=[];console.warn('DEST',e)}}else if(DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350){DEST_check(c);break}};   /* perf-10: one re-check per 20 frames (was all of them at once) */
 smashCheck=(f=>function(dt){DEST_step(dt);return f.apply(this,arguments)})(smashCheck);

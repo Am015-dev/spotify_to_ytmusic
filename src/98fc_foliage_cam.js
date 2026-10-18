@@ -52,7 +52,7 @@ function FCG_work(c,o){const t0=performance.now();FCG.sg.makeEmpty().expandByPoi
   FCG.st.ms+=performance.now()-t0}
 // distance (from c) of the hit nearest the far end on the segment c -> c+dir*far, -1 = no hit, null = use three's raycast for this mesh
 function FCG_hit(m,c,far){const g=m.geometry;if(!FCG_ok(g)||!m.layers.test(FC.rc.layers))return FCG_ok(g)?-1:null;const e=FCG.W.get(g);
-  if(!e||!e.done||e.pos!==g.attributes.position||e.ver!==g.attributes.position.version||e.ix!==g.index){FCG.st.miss++;return null}
+  if(!e||!e.done||e.pos!==g.attributes.position||e.ver!==g.attributes.position.version||e.ix!==g.index){FCG.st.miss++;return -1}   // perf-10: not indexed yet = no hit until FCG_work has built it (was three's full-triangle raycast: 40-55 ms frames in Frankfurt)
   const rd=FC.rc.ray.direction,ew=FCG.a.copy(rd).multiplyScalar(far).add(c);if(!g.boundingBox)g.computeBoundingBox();
   if(!FCG.bx.copy(g.boundingBox).applyMatrix4(m.matrixWorld).intersectsBox(FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(ew)))return -1;
   const iM=FCG.iM.copy(m.matrixWorld).invert(),lo=FCG.b.copy(c).applyMatrix4(iM),le=ew.applyMatrix4(iM),cs=FCG.cs;
