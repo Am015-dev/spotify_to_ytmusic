@@ -83,8 +83,8 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
       // the beat clock does not change: same frames with and without the power give the same beat count
       fresh(); const c0 = G().bc; step(60 * 8); const without = G().bc - c0; fresh(); giveN('slice', 5); const c1 = G().bc; step(60 * 8); out.sliceClock = [without, G().bc - c1]; out.slice = res; }
     // ---- 2l LIFE LEECH ----
-    { const res = {}; for (const lv of [1, 5]) { fresh(); giveN('leech', lv); m.god = true; P.hp = 1; P.max = 5; const kills = () => { for (let i = 0; i < 30; i++) NR.emit('kill', { e: { x: 300, y: 200 } }); }; let heals = 0, hp = P.hp; const t0 = G().t; const times = [];
-        for (let i = 0; i < 60 * 60; i++) { if (i % 30 === 0 && !PW.on('leech')) giveN('leech', 1); if (act('leech')) { act('leech').s = PW.cur(); } m.STILL.t = 0; if (i % 60 === 0) kills(); m.step(1 / 60); if (P.hp > hp) { heals += P.hp - hp; times.push(+(G().t - t0).toFixed(1)); P.hp = 1; } hp = P.hp; }
+    { const res = {}; for (const lv of [1, 5]) { fresh(); giveN('leech', lv); m.god = true; P.hp = 1; P.max = 5; const kills = () => { for (let i = 0; i < 30; i++) NR.emit('kill', { e: { x: 300, y: 200 } }); }; X.stat.leech = 0; let heals = 0, hp = P.hp; const t0 = G().t; const times = [];
+        for (let i = 0; i < 60 * 60; i++) { if (i % 30 === 0 && !PW.on('leech')) giveN('leech', 1); if (act('leech')) { act('leech').s = PW.cur(); } m.STILL.t = 0; if (i % 60 === 0) kills(); m.step(1 / 60); if (X.stat.leech > heals) { heals = X.stat.leech; times.push(+(G().t - t0).toFixed(1)); } P.hp = Math.min(P.hp, 1); }
         res[lv] = { heals, times, gap: times.length > 1 ? Math.min(...times.slice(1).map((t, i) => t - times[i])) : null }; } m.god = true; out.leech = res; }
     // ---- 3 caps ----
     { fresh(); let mx = 0; for (const k of ['echo', 'wing', 'crate', 'ric', 'drum', 'nova']) { fresh(); giveN(k, 5); if (k === 'echo') giveN('echo', 0); for (let i = 0; i < 60 * 20; i++) { step(1); mx = Math.max(mx, G().pb.length); } } out.capMax = mx; out.capLimit = cap;
