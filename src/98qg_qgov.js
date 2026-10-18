@@ -4,15 +4,18 @@
 // (On a 60 Hz screen the rAF interval never goes below 16.7 ms, so "under 12 ms" is judged on the frame's own work time.)
 // Hysteresis: 22/12 ms gap, 2 s settle after every step, and an up step that has to be undone within 20 s doubles the next up wait (10 → 20 → 40 → 80 s).
 // Manual Graphics (Low/Medium/High) = no governor; the old Auto resolution switch still works there. First 5 s after boot / loading are ignored.
-const GOV={on:false,s:1,d:0,top:0,ring:[],busy:[],bk:0,bad:0,good:0,hold:0,upW:10,lastUp:-1e9,clock:0,warm:0,t0:0,log:[],test:null,mid:0,last:null,th:{dn:22,upP:18,upB:12}};
+const GOV={on:false,s:1,d:0,top:0,ring:[],busy:[],bk:0,bad:0,good:0,hold:0,upW:10,lastUp:-1e9,clock:0,warm:0,t0:0,log:[],test:null,mid:0,last:null,upW0:10,half:null,th:{dn:22,upP:18,upB:12}};
 const GOV_S=[1,.85,.7];
-function GOV_boot(){const g=TQ?null:store.get('mho_gov',null);GOV.s=g&&GOV_S.includes(g.s)?g.s:1;GOV.d=g&&g.d>=0&&g.d<=3?g.d|0:LK_LV.indexOf(SET_DEF.q)}
+// touch (coordinator, 2026-10-18: "not playable even on a fast phone"): START LOW and climb only when proven smooth. Boot at render scale .7, DPR ≤ 1.5 (resize),
+// the min tier (no shadows/AO, bloom and MSAA off, shortest draw distance, low-tier culling), traffic and pedestrians at half; up after 5 s of work p90 < 14 ms. PC keeps start-high + step-down.
+function GOV_touchBoot(){GOV.s=.7;GOV.d=3;GOV.th.upB=14;GOV.upW0=5;if(!GOV.half){GOV.half={traf:TUNE.traf,lvPed:TUNE.lvPed};TUNE.traf=(TUNE.traf??1)*.5;TUNE.lvPed=(TUNE.lvPed??.8)*.5}}
+function GOV_boot(){if(lowGfx){GOV_touchBoot();return}const g=TQ?null:store.get('mho_gov',null);GOV.s=g&&GOV_S.includes(g.s)?g.s:1;GOV.d=g&&g.d>=0&&g.d<=3?g.d|0:LK_LV.indexOf(SET_DEF.q)}
 function GOV_apply(why){DRES.s=GOV.s;LK.userQ='high';LK.drop=GOV.d;LK_apply();resize();if(why&&!TQ)try{store.set('mho_gov',{s:GOV.s,d:GOV.d})}catch(e){}}
 function GOV_lvl(){return{s:GOV.s,q:LK_LV[Math.min(3,GOV.d)],pr:+renderer.getPixelRatio().toFixed(2)}}
 function GOV_reset(){GOV.ring.length=GOV.busy.length=0;GOV.bk=GOV.bad=GOV.good=0}
 function GOV_step(dir){const n=GOV_S.indexOf(GOV.s);let ch=false;
   if(dir<0){if(n<GOV_S.length-1){GOV.s=GOV_S[n+1];ch=true}else if(GOV.d<3){GOV.d++;ch=true}
-    if(ch&&GOV.clock-GOV.lastUp<20000)GOV.upW=Math.min(80,GOV.upW*2)}   // the last up step did not hold: wait longer before trying again
+    if(ch&&GOV.clock-GOV.lastUp<20000)GOV.upW=Math.min(GOV.upW0*8,GOV.upW*2)}   // the last up step did not hold: wait longer before trying again
   else{if(GOV.d>0){GOV.d--;ch=true}else if(n>0){GOV.s=GOV_S[n-1];ch=true}if(ch)GOV.lastUp=GOV.clock}
   if(!ch)return false;GOV.log.push([dir<0?'down':'up',Math.round(GOV.clock/1000),GOV.s,LK_LV[GOV.d]]);if(GOV.log.length>40)GOV.log.shift();GOV_apply(1);GOV_reset();GOV.hold=2000;return true}
 const _gp=(a,k)=>{const b=a.slice().sort((x,y)=>x-y);return b[Math.min(b.length-1,Math.floor(b.length*k))]||0};
@@ -26,7 +29,7 @@ function GOV_feed(ms,busy){if(!GOV.on)return;GOV.clock+=ms;
   const H=GOV.th;if(p90>H.dn){GOV.good=0;if(++GOV.bad>=3)GOV_step(-1)}
   else if(p90<H.upP&&b90<H.upB){GOV.bad=0;if(++GOV.good>=GOV.upW)GOV_step(1)}
   else{GOV.bad=0;GOV.good=0}}
-function GOV_set(on){GOV.on=on;GOV.warm=0;GOV.hold=0;GOV_reset();if(on){GOV.upW=10;GOV_apply(0)}}
+function GOV_set(on){GOV.on=on;GOV.warm=0;GOV.hold=0;GOV_reset();if(on){GOV.upW=GOV.upW0;GOV_apply(0)}}
 // Settings → Graphics: Auto | Low | Medium | High (SET.qm). Manual = that tier, LK auto-drop off, render scale back to 1 unless Auto resolution is on.
 function GOV_pick(){if(SET.qm==='auto'){GOV_set(true);return}GOV.on=false;LK.userQ=null;LK.effQ=null;LK.drop=0;DRES.s=1;SET.q=SET.qm;applyQuality()}
 {const _ds=dresStep;dresStep=ms=>{_ds(ms);GOV.mid=ms}}
