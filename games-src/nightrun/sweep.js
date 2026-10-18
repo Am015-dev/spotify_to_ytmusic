@@ -54,9 +54,9 @@ const INIT = () => {
       const m = window.__mnr, a = m.AU.a, s = playing(); if (!s || m.BT.mode !== 'file' || a.state !== 'running') return null;
       const lat = a.outputLatency || 0, info = m.TR.by[s.stage], want = (s.el.currentTime - lat - m.BT.off) / (60 / info.bpm), p = m.bpos(); let d = p - want; d -= Math.round(d); return d * m.BT.spb * 1000;
     },
-    async grid0() {                                      // audio-clock time at which beat 0 of the playing song played (median of 15 samples; rate 1)
+    async grid0() {                                   
       const m = window.__mnr, a = m.AU.a, xs = []; for (let i = 0; i < 15; i++) { const s = playing(); if (s) xs.push(a.currentTime - ((s.el.currentTime + s.loops * s.D) - m.BT.off) / s.el.playbackRate); await new Promise(r => setTimeout(r, 12)); }
-      xs.sort((x, y) => x - y); const s = playing(), D = s ? s.D / s.el.playbackRate : 0, g = xs[xs.length >> 1]; return D ? g + Math.round((m.BT.t0 + m.BT.off - g) / D) * D : g;   // the element may have looped once (whole bars): same beat, one file length later
+      xs.sort((x, y) => x - y); const s = playing(), D = s ? s.D / s.el.playbackRate : 0, g = xs[xs.length >> 1]; return D ? g + Math.round((m.BT.t0 + m.BT.off - g) / D) * D : g;
     },
     scr(dx, dy) { const r = document.getElementById('frame').getBoundingClientRect(), rot = window.__mnr.rotMode; return rot ? [dy * r.width / 540, -dx * r.height / 960] : [dx * r.width / 960, dy * r.height / 540]; },   // portrait: world +y is screen right, world +x is screen up
     decide() {
@@ -89,10 +89,10 @@ const INIT = () => {
       const sels = ['#touch button', '.ov:not([hidden]) button', '.ov:not([hidden]) input'];
       for (const e of document.querySelectorAll(sels.join(','))) {
         if (!vis(e)) continue; const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
-        const sb = e.closest('.sbody'); if (sb) { const sr = sb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) continue; }   // settings rows scroll: only the ones in view are checked
+        const sb = e.closest('.sbody'); if (sb) { const sr = sb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) continue; }   // settings rows scroll
         const mb = e.closest('.mapbox'); if (mb) { const sr = mb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1 || r.left < sr.left - 1 || r.right > sr.right + 1) continue; const h0 = document.elementFromPoint(x, y); if (h0 && h0.closest('#stDet')) continue; }   // the story map scrolls (and the plate may sit over a node)
-        const tb = e.closest('.pg .tabs'); if (tb && tb.scrollWidth > tb.clientWidth + 1) { const sr = tb.getBoundingClientRect(); if (r.left < sr.left - 1 || r.right > sr.right + 1) continue; }   // the garage tab row scrolls sideways (edge fade); only tabs in view are checked
-        const gb = e.closest('#gaCards.tune'); if (gb) { const sr = gb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) { if (r.left < -1 || r.right > innerWidth + 1) out.bad.push('scroll list sticks out sideways ' + e.dataset.id); continue; } }   // the perk list scrolls: only the cards in view are checked
+        const tb = e.closest('.tabs'); if (tb && tb.scrollWidth > tb.clientWidth + 1) { const sr = tb.getBoundingClientRect(); if (r.left < sr.left - 1 || r.right > sr.right + 1) continue; }   // the tab row scrolls
+        const gb = e.closest('#gaCards.tune'); if (gb) { const sr = gb.getBoundingClientRect(); if (r.top < sr.top - 1 || r.bottom > sr.bottom + 1) { if (r.left < -1 || r.right > innerWidth + 1) out.bad.push('scroll list sticks out sideways ' + e.dataset.id); continue; } }
         if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) { out.bad.push('control off screen ' + (e.id || e.textContent.trim().slice(0, 12)) + ' ' + [r.left, r.top, r.right, r.bottom].map(Math.round)); continue; }
         const h = document.elementFromPoint(x, y); if (!(h && (e === h || e.contains(h) || (h.closest && h.closest('label') && h.closest('label') === e.closest('label'))))) out.bad.push('control covered ' + (e.id || e.textContent.trim().slice(0, 12)) + ' by ' + (h && (h.id || h.className || h.tagName)));
       }
