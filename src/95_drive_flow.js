@@ -104,8 +104,13 @@ function DR_athFill(R){let mat=null;HUB.grp.traverse(o=>{if(!mat&&o.isInstancedM
   if(!I.length)return false;
   const mk=(pos,nor,uv,col,idx,m)=>{const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));if(nor)g.setAttribute('normal',new THREE.Float32BufferAttribute(nor,3));if(uv)g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));
     g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));g.setIndex(pos.length/3>65000?new THREE.Uint32BufferAttribute(idx,1):new THREE.Uint16BufferAttribute(idx,1));if(!nor)g.computeVertexNormals();g.computeBoundingSphere();
-    const o=new THREE.Mesh(g,m);o.castShadow=false;o.receiveShadow=true;o.userData.dr=1;HUB.grp.add(o);return o};
+    let o;for(const q of DR_split(g,TUNE.drCell??200)){o=new THREE.Mesh(q,m);o.castShadow=false;o.receiveShadow=true;o.userData.dr=1;HUB.grp.add(o)}return o};/* perf-5: 200 m cells (one city-wide mesh, R 6.9 km, was never frustum-culled) */
   mk(P,N,U,C,I,mat);mk(rP,null,null,rC,rI,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8}));DR.inS=null;DR.st.solid=R.length;DR.st.fill=st;DR.st.fillV=P.length/3+rP.length/3;return true}
+// perf-5: split an indexed geometry into C m cells by triangle centroid (each cell its own geometry, so per-mesh frustum + hub culling can drop it)
+function DR_split(g,C){const idx=g.index.array,pos=g.attributes.position.array,M=new Map();for(let t=0;t<idx.length;t+=3){const a=idx[t],b=idx[t+1],c=idx[t+2],x=(pos[a*3]+pos[b*3]+pos[c*3])/3,z=(pos[a*3+2]+pos[b*3+2]+pos[c*3+2])/3,k=Math.floor(x/C)*100003+Math.floor(z/C);let L=M.get(k);if(!L)M.set(k,L=[]);L.push(a,b,c)}
+ if(!(C>0)||M.size<2)return[g];const out=[];for(const L of M.values()){const map=new Map(),ni=new Array(L.length);for(let t=0;t<L.length;t++){let j=map.get(L[t]);if(j===undefined){j=map.size;map.set(L[t],j)}ni[t]=j}
+  const q=new THREE.BufferGeometry();for(const nm in g.attributes){const A=g.attributes[nm],s=A.itemSize,src=A.array,dst=new Float32Array(map.size*s);for(const[v,j]of map)for(let e=0;e<s;e++)dst[j*s+e]=src[v*s+e];q.setAttribute(nm,new THREE.BufferAttribute(dst,s))}
+  q.setIndex(map.size>65000?new THREE.Uint32BufferAttribute(ni,1):new THREE.Uint16BufferAttribute(ni,1));q.computeBoundingSphere();out.push(q)}g.dispose();return out}
 function DR_cull(L){const TC=new Set();let j=0,drop=0;for(const p of L){if(p.simp||DR_keep(p.t,p.x,p.z,TC))L[j++]=p;/* simplify-1 gap trees stay */else drop++}L.length=j;DR.st.drop=(DR.st.drop||0)+drop;DR.st.kept=j}
 if(DR.on){
  {const _ce=CE_streets;CE_streets=(add,rnd,D)=>{_ce(add,rnd,D);try{CITY_reidx();DR_solidBuild()}catch(e){console.warn('DR solid',e)}try{DR_cull(HUB.CE_L)}catch(e){console.warn('DR cull',e)}}}

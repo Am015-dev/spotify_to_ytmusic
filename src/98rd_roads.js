@@ -51,11 +51,12 @@ function RD_carPre(){const P=HUB.peds;if(!P)return;const X=[];for(const p of P)i
 function RD_carPost(){for(const c of HUB.cars)if(c.RDfz){if(!(c.dead>0)){c.a=c.RDfz[0];c.b=c.RDfz[1];c.t=c.RDfz[2];c.cv=0}c.v=c.RDfz[3];c.RDfz=null}}
 if(RD_ON){const _ht=hubTrafficStep;hubTrafficStep=function(dt){try{RD_carPre()}catch(e){}const r=_ht.apply(this,arguments);try{RD_carPost()}catch(e){}return r}}
 // zebra crossings on every arm of a Frankfurt junction (Athens has its own, CE_kerbs): band J.r+1.4 … +4.6 from the centre = where walkers cross
-function RD_zebra(){if(CID!=='fra'||!HUB.grp)return;const pos=[];let n=0;
-  for(const J of[...CV.sig,...CV.yl]){if(J.ap.length<3)continue;for(const g of J.ap){const dx=-g.dx,dz=-g.dz,nx=dz,nz=-dx,c0=J.r+1.4,hw=Math.min(12,(g.w||14)/2)-.7;
+function RD_zebra(){if(CID!=='fra'||!HUB.grp)return;const PS={};let n=0;/* perf-5: one mesh per 200 m cell (was one city-wide mesh, R 3.4 km, never frustum-culled) */
+  for(const J of[...CV.sig,...CV.yl]){if(J.ap.length<3)continue;const ck=Math.floor(J.x/200)+','+Math.floor(J.z/200),pos=PS[ck]||(PS[ck]=[]);for(const g of J.ap){const dx=-g.dx,dz=-g.dz,nx=dz,nz=-dx,c0=J.r+1.4,hw=Math.min(12,(g.w||14)/2)-.7;
       for(let o=-hw;o<=hw-.5;o+=1.25){const pts=[[o,c0],[o+.62,c0],[o+.62,c0+3.2],[o,c0+3.2]].map(([a,b])=>{const x=J.x+nx*a+dx*b,z=J.z+nz*a+dz*b;return[x,groundY(x,z)+.07,z]});const[A,B,C,D]=pts;pos.push(...A,...B,...C,...A,...C,...D)}n++}}
-  if(!pos.length)return;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));const nr=new Float32Array(pos.length);for(let i=1;i<nr.length;i+=3)nr[i]=1;g.setAttribute('normal',new THREE.BufferAttribute(nr,3));
-  const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:0xf4f4ee,roughness:.6,metalness:0,polygonOffset:true,polygonOffsetFactor:-6,polygonOffsetUnits:-10,side:THREE.DoubleSide}));m.name='rdZebra';m.receiveShadow=true;HUB.grp.add(m);RD_PS.zebra=n}
+  const mat=new THREE.MeshStandardMaterial({color:0xf4f4ee,roughness:.6,metalness:0,polygonOffset:true,polygonOffsetFactor:-6,polygonOffsetUnits:-10,side:THREE.DoubleSide});
+  for(const ck in PS){const pos=PS[ck];if(!pos.length)continue;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));const nr=new Float32Array(pos.length);for(let i=1;i<nr.length;i+=3)nr[i]=1;g.setAttribute('normal',new THREE.BufferAttribute(nr,3));
+   const m=new THREE.Mesh(g,mat);m.name='rdZebra';m.receiveShadow=true;HUB.grp.add(m)}RD_PS.zebra=n}
 if(RD_ON){const _bt=buildHubTraffic;buildHubTraffic=function(){const r=_bt.apply(this,arguments);try{RD_zebra()}catch(e){console.warn('RD zebra',e)}return r}}
 window.__rd={RD,PS:RD_PS,on:RD_ON,US:()=>RD_US,POLE:()=>RD_POLE};
 // junction box sharing: entry heading + turn (from the chosen exit) at reservation; same approach, or opposite approaches with nobody turning left = compatible
