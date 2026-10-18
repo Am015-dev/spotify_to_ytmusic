@@ -850,6 +850,7 @@ const TIP={done:!!load('mnr_tipdone',false)};
 const FPS={n:0,t:0,worst:0,slow:0};
 const SENS=[1,1.25,1.5,1.9,2.4];                        // touch sensitivity 1..5: ship travel per finger travel
 const say=s=>{s=String(s);if(MSGS.length<500)MSGS.push(s);return s;};
+const hintShow=(txt,t,col)=>{if(window.HINT)return HINT.show(txt,{t,col});G.hint={t:t||3,txt:String(txt)};return true;};window.hintShow=hintShow;   // F6: every in-stage hint goes through here (HINT in uikit.js; the old bubble when it is missing)
 function banner(a,b,warn,t){t=t||3.2;G.banner={t,m:t,a:say(a),b:say(b),warn:!!warn};}
 function newGame(daily){
   GR=daily?mul(todayN()):Math.random;GX=daily?mul(todayN()+7919):Math.random;
@@ -1060,12 +1061,12 @@ function update(dt){
   G.t+=dt;const D=DISTRICTS[G.di],d=diff();
   const btk=G.bt>0?(G.btk||.5):1,jk=RET.juice&&RET.JU&&!G.dead?RET.JU.k:1,sdt=dt*G.slow*btk*PW.wk*RET.asW()*jk,pdt=dt*G.slow*jk;if(G.bt>0)G.bt-=dt;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
   
-  if(G.banner.t>0)G.banner.t-=dt;if(G.note.t>0)G.note.t-=dt;if(G.hint.t>0)G.hint.t-=dt;
+  if(G.banner.t>0)G.banner.t-=dt;if(G.note.t>0)G.note.t-=dt;if(G.hint.t>0)G.hint.t-=dt;if(window.HINT)HINT.tick(dt);
   G.shake=Math.max(0,G.shake-40*dt);G.glitch=Math.max(0,G.glitch-dt);G.flash=Math.max(0,G.flash-dt);G.empT=Math.max(0,G.empT-dt);
   for(const x of G.delayed){x.t-=dt;if(x.t<=0){x.dead=1;x.f();}}G.delayed=G.delayed.filter(x=>!x.dead);
   if(G.dead){G.deadT+=dt;if(G.deadT>2.2)gameOver();}
   if(!G.dead){beatPump();
-    if(G.t>1.5&&!G.hint.txt&&!TIP.done&&!G.lab&&!G.tut){G.hint={t:6,txt:say('Dash on the pulse to power up')};}}   // the one hint, until the first on-beat dash
+    if(G.t>1.5&&!G.hint.txt&&!TIP.done&&!G.lab&&!G.tut){hintShow(say('Dash on the pulse to power up'),6);}}   // the one hint, until the first on-beat dash
   else G.bp=bpos();
 
   /* player */
@@ -1641,7 +1642,7 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
       s.act.push({k:kind,s:this.cur(),d:K.bars*4*(ob?1.5:1),ob,w:performance.now()});
       }
     floater(P.x,P.y-24,K.n,K.c);if(ob)floater(P.x,P.y-42,'ON BEAT +50% TIME','#ffe14d');
-    G.hint={t:3,txt:say(K.tip)};AU.sfx('up');return true;},
+    hintShow(say(K.tip),3);AU.sfx('up');return true;},
   off(kind){},
   reset(){this.bs=1;this.dstep=-1;try{const a=AU.a;if(a&&AU.cutg){const g=AU.cutg.gain;g.cancelScheduledValues(a.currentTime);g.setTargetAtTime(1,a.currentTime,.01);}}catch(e){}
     this.wk=1;AU.slowColour(false);if(G)G.pw=null;},
@@ -2467,7 +2468,7 @@ Object.assign(PWK,{
 {const pick=PW.pick;PW.pick=function(){const s=this.st(),ks=Object.keys(PWK).filter(k=>!this.on(k)&&!(k==='drop'&&s.drop)&&(!PWK[k].need||GA.own[PWK[k].need])&&!(k==='fix'&&P.hp>=P.max));
     if(!ks.length)return pick.call(this);let t=0;for(const k of ks)t+=PWK[k].w;let r=gx(0,t);for(const k of ks){r-=PWK[k].w;if(r<=0)return k;}return ks[0];};
   const give=PW.give;PW.give=function(kind,ob){
-    if(kind==='fix'){if(P.hp<P.max)P.hp++;PW.stat.given++;floater(P.x,P.y-24,'HULL +1','#3dffb0');G.hint={t:3,txt:say(PWK.fix.tip)};AU.sfx('up');return true;}
+    if(kind==='fix'){if(P.hp<P.max)P.hp++;PW.stat.given++;floater(P.x,P.y-24,'HULL +1','#3dffb0');hintShow(say(PWK.fix.tip),3);AU.sfx('up');return true;}
     const r=give.call(this,kind,ob);if(r&&kind!=='drop'){const a=this.st().act.find(x=>x.k===kind);if(a&&NR.mod.pw!==1&&!a.scaled){a.d*=NR.mod.pw;a.scaled=1;}}return r;};
   const gl=PW.glyph;const SH_=(k,r,c)=>{ctx.save();ctx.scale(r/11,r/11);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=2;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();
     if(k==='mag'){ctx.moveTo(-6,-7);ctx.lineTo(-6,2);ctx.arc(0,2,6,Math.PI,0,true);ctx.lineTo(6,-7);}
@@ -3789,7 +3790,7 @@ const FL=window.FL=(function(){
       return n;},
     /* ---- captives ---- */
     spawnCap(){const hp=this.easy()?6:8,y=this.yAway(90,H-140,110),c={id:++this.id,x:W+46,y,by:y,r:28,hp,max:hp,t:0,vx:-52,flash:0};this.cap.push(c);this.s.tot++;
-      if(!(G.hint&&G.hint.t>0))G.hint={t:3,txt:say('SHOOT THE CAGE: FREE THE DATA SPRITE')};},
+      if(!(G.hint&&G.hint.t>0))hintShow(say('SHOOT THE CAGE: FREE THE DATA SPRITE'),3);},
     free(c){this.s.resc++;this.S.resc++;this.store();burst(c.x,c.y,'#7df9ff',26,280,.7);this.flash(c.x,c.y,'#7df9ff',54);floater(c.x,c.y-34,'FREED','#7df9ff');AU.sfx('up');NR.emit('rescue',{n:ST.n});
       let wing=false;
       try{const s=PW.st(),busy=s.act.some(a=>PWK[a.k]&&(PWK[a.k].pw2||a.k==='drum'));
@@ -3813,11 +3814,11 @@ const FL=window.FL=(function(){
     startSet(){if(this.set)return;if(!rotMode&&(G.di+ST.n)%2===1)this.mkTrain();else this.mkBill();},
     mkTrain(){const gy=UIK.groundY(),e=this.easy();
       this.set={k:'train',id:++this.id,ph:'warn',t:0,x:W+30,L:560,gy,v:e?125:160,wp:{hp:e?9:13,max:e?9:13,off:80,r:24,dead:false,flash:0},fire:0,hz:0};
-      floater(W-90,gy-40,'CONVOY','#ff6a7a');if(!(G.hint&&G.hint.t>0))G.hint={t:3,txt:say('SHOOT THE GLOWING ROOF HATCH')};},
+      floater(W-90,gy-40,'CONVOY','#ff6a7a');if(!(G.hint&&G.hint.t>0))hintShow(say('SHOOT THE GLOWING ROOF HATCH'),3);},
     mkBill(){const e=this.easy(),n=e?2:3,lanes=[];let x0=clamp(P.x+this.rnd(-70,70),70,W-70);lanes.push(x0);
       for(let i=0;i<30&&lanes.length<n;i++){const x=this.rnd(80,W-80);if(lanes.every(l=>Math.abs(l-x)>120))lanes.push(x);}
       this.set={k:'bill',id:++this.id,ph:'warn',t:0,need:e?1.2:.9,lanes:lanes.map(x=>({x,hit:false,y:-60})),fall:0};
-      if(!(G.hint&&G.hint.t>0))G.hint={t:3,txt:say('DEBRIS: LEAVE THE RED LANES')};},
+      if(!(G.hint&&G.hint.t>0))hintShow(say('DEBRIS: LEAVE THE RED LANES'),3);},
     endSet(chest){const s=this.set;this.set=null;if(!s||!chest)return;this.spawnBrk('chest',{x:chest.x,y:chest.y,by:chest.y,vx:-70,decoy:false});},
     /* ---- one frame ---- */
     tick(dt){if(!RET.flavor)return;
@@ -5352,7 +5353,7 @@ const ZOO=window.ZOO={
   /* ---- one-time hint ---- */
   hint(e){const id=e.type;if(!this.T[id]||!this.T[id].hint)return;if(this.seen[id])return;this.seen[id]=1;
     try{localStorage.setItem('nr.zoo.seen',JSON.stringify(this.seen));}catch(err){}
-    G.note={t:6,txt:this.T[id].hint};floater(W*.5,H*.2,this.T[id].hint,this.T[id].col);},
+    if(window.HINT&&HINT.on())hintShow(this.T[id].hint,6,this.T[id].col);else{G.note={t:6,txt:this.T[id].hint};floater(W*.5,H*.2,this.T[id].hint,this.T[id].col);}},
   /* ---- shield: blocks a bullet that arrives within 66 degrees of its front; true = absorbed ---- */
   block(b,e){if(e.type!=='shielder'||!(e.shN>0))return false;
     const a=Math.atan2(b.y-e.y,b.x-e.x);if(Math.abs(angD(a,e.fa))>1.15)return false;
@@ -5525,7 +5526,7 @@ if(RET.pw2){
     const r=give.call(this,kind,ob);
     if(r&&PWK[kind]&&PWK[kind].pw2){const a=PW2.act(kind);if(a){a.x={};if(kind==='cres')a.bars=0;if(kind==='chord'){a.used=false;a.rel=false;}}
       PW2.stat[{echo:'echo',nova:'nova',magb:'pull',wing:'wing',cres:'cres',chord:'chord'}[kind]]+=0;
-      if(!PW2.seen[kind]){PW2.seen[kind]=1;PW2.stat.tip++;try{save('mnr_pw2seen',PW2.seen);}catch(e){}G.hint={t:6,txt:say(PW2.K[kind].tip)};}else G.hint={t:1.6,txt:say(PW2.K[kind].tip)};
+      if(!PW2.seen[kind]){PW2.seen[kind]=1;PW2.stat.tip++;try{save('mnr_pw2seen',PW2.seen);}catch(e){}hintShow(say(PW2.K[kind].tip),6);}else hintShow(say(PW2.K[kind].tip),1.6);
       PW2.note(0,.25,.08,'triangle');PW2.note(4,.3,.07,'triangle',AU.a?AU.a.currentTime+.08:0);}
     return r;};}
   /* ----- DRUM BURST: the layer is scheduled from the beat event (drum shots already are), on the song's grid ----- */
@@ -6644,6 +6645,48 @@ UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,gy=UIK.groundY(
     const sw=dw*(.6+.4*f);ctx.globalAlpha=.55*f;ctx.drawImage(UIK._sh,-sw*.6,y-sw*.075,sw*1.2,sw*.15);}}   // width ~0.8 x the boss, flat, centred on the boss x
   ctx.restore();};
 
+/* ---------- ONE hint style (F6, flag RET.hint, ?hint=0 = the old speech bubble at the bottom). Every in-stage hint goes through HINT.show(text, {t, col}):
+   bold white text >= 14 px on a dark rounded pill (alpha .78, thin accent border), at most 8 words (the caller writes it short; short() only cuts a leftover),
+   in the top third under the HUD, never within 120 px of the ship (it slides sideways, or waits), one on screen at a time with at least 1.2 s between two. ---------- */
+if(RET.hint===undefined)RET.hint=!/[?&]hint=0/.test(location.search);
+const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE:120,
+  on(){return RET.hint!==false;},
+  reset(){this.cur=null;this.q.length=0;this.gap=0;this.box=null;},
+  words(s){return String(s).trim().split(/\s+/).filter(Boolean).length;},
+  short(s){const w=String(s==null?'':s).trim().split(/\s+/).filter(Boolean);return w.length>this.MAXW?w.slice(0,this.MAXW).join(' ').replace(/[,;:·+\-]+$/,''):w.join(' ');},
+  show(txt,o){o=o||{};txt=this.short(txt);if(!txt)return false;
+    if(!this.on()){G.hint={t:o.t||3,txt};return true;}                      // flag off: the old bubble
+    const T=o.t||3,dup=this.cur&&this.cur.txt===txt?this.cur:this.q.find(h=>h.txt===txt);
+    if(dup){if(T>dup.t){dup.t=T;if(dup===this.cur&&G.hint)G.hint.t=T;}return false;}   // callers may ask again every frame (a longer first-time ask keeps the longer time)
+    if(this.cur&&this.cur.el<.2&&T>this.cur.t){this.cur={txt,t:T,col:o.col||null,age:0,el:0,bw:0};if(G.hint){G.hint.t=T;G.hint.txt=txt;}return true;}   // the same moment, a longer first-time text: it replaces the short one
+    this.q.push({txt,t:o.t||3,col:o.col||null,age:0,el:0,bw:0});while(this.q.length>3)this.q.shift();this.next();return true;},
+  next(){if(this.cur||this.gap>0||!this.q.length||(G.banner&&G.banner.t>0))return;this.cur=this.q.shift();this.seen.push(this.cur.txt);if(this.seen.length>60)this.seen.shift();if(G.hint){G.hint.t=this.cur.t;G.hint.txt=this.cur.txt;}},   // nothing up and no gap to wait out: starts at once
+  tick(dt){if(!this.on()){this.cur=null;this.q.length=0;this.box=null;return;}
+    if(this.gap>0)this.gap-=dt;for(const h of this.q)h.age+=dt;this.q=this.q.filter(h=>h.age<8);       // a hint nobody saw in 8 s is stale
+    const c=this.cur;
+    if(c){if(G.banner&&G.banner.t>0){}else if(c.blk){c.bw+=dt;if(c.bw>3)c.t=0;}else{c.t-=dt;c.el+=dt;}   // paused under a banner; dropped after 3 s of no free spot
+      if(c.t<=0){this.cur=null;this.box=null;this.gap=this.GAP;}}
+    this.next();
+    if(G.hint){const c2=this.cur;G.hint.t=c2?Math.max(.01,c2.t):0;if(c2)G.hint.txt=c2.txt;}},       // mirror: callers that ask "is a hint up?" keep working
+  // g = {W,H: drawing area (units), cpu: CSS px per unit, top: y of the first free row, x0,x1: free x range, ship:{x,y}, acc: border colour}
+  draw(c,g){const h=this.cur;if(!h||!this.on()||(G.banner&&G.banner.t>0)){this.box=null;return;}
+    const fs=Math.max(15.5,16/g.cpu),pad=fs*.75,lh=fs*1.22,font=`700 ${fs}px "Chakra Petch",sans-serif`;c.save();c.font=font;
+    const maxW=Math.max(120,g.x1-g.x0-2*pad-8),ws=h.txt.split(' ');let lines=[],cur='';
+    for(const w of ws){const t=cur?cur+' '+w:w;if(cur&&c.measureText(t).width>maxW){lines.push(cur);cur=w;}else cur=t;}if(cur)lines.push(cur);
+    if(lines.length===2&&ws.length>3){let best=null;for(let i=1;i<ws.length;i++){const a=ws.slice(0,i).join(' '),b=ws.slice(i).join(' '),m=Math.max(c.measureText(a).width,c.measureText(b).width);if(m<=maxW&&(!best||m<best.m))best={a,b,m};}if(best)lines=[best.a,best.b];}
+    let tw=0;for(const l of lines)tw=Math.max(tw,c.measureText(l).width);tw=Math.min(tw,maxW);
+    const bw=tw+2*pad,bh=lines.length*lh+fs*.7,safe=this.SAFE/g.cpu,sh=g.ship;
+    const dist=(x)=>{if(!sh)return 1e9;const dx=Math.max(x-sh.x,0,sh.x-(x+bw)),dy=Math.max(g.top-sh.y,0,sh.y-(g.top+bh));return Math.hypot(dx,dy);};
+    const mid=(g.x0+g.x1)/2-bw/2,cand=[mid,g.x0+4,g.x1-4-bw,(g.x0+mid)/2,(g.x1-bw+mid)/2];let x=null;
+    for(const cx of cand){if(cx>=g.x0-1&&cx+bw<=g.x1+1&&dist(cx)>=safe){x=cx;break;}}
+    h.blk=x==null;if(h.blk){this.box=null;c.restore();return;}
+    const y=g.top,a=Math.min(1,h.t*3,h.el*6+.001),r=Math.min(bh/2,fs*.7);
+    c.globalAlpha=Math.max(0,a);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+bw,y,x+bw,y+bh,r);c.arcTo(x+bw,y+bh,x,y+bh,r);c.arcTo(x,y+bh,x,y,r);c.arcTo(x,y,x+bw,y,r);c.closePath();
+    c.fillStyle='rgba(5,3,12,.78)';c.fill();c.lineWidth=1.5/g.cpu;c.strokeStyle=h.col||g.acc||'#19e3ff';c.stroke();
+    c.fillStyle='#fff';c.textAlign='center';c.textBaseline='alphabetic';c.font=font;lines.forEach((l,i)=>c.fillText(l,x+bw/2,y+fs*.35+(i+.82)*lh));
+    c.restore();this.box={x,y,w:bw,h:bh,fs,cpu:g.cpu,ship:sh?{x:sh.x,y:sh.y}:null,areaH:g.H,areaW:g.W,txt:h.txt,lines:lines.length,mode:g.mode,hudBottom:g.top};}};
+NR.on('runStart',()=>HINT.reset());
+
 /* ---------- lag fix, part 2: songs are streamed (see parts/a.js "tracks"), nothing is decoded any more, so there is no stall to hide.
    What is left of the old pump: keep the songs a district will need (its own, its boss's, the next one) buffered in their audio slots, ahead of time and one after
    the other. A song that is needed before it is buffered is still asked for at once (urgent), and that is counted in NR.lag.urgent. ---------- */
@@ -6868,7 +6911,7 @@ NR.on('runStart',()=>{for(const k in PWL)delete PWL[k];});
  PW.give=function(kind,ob){const lv=Math.min(PW_LV_MAX,(PWL[kind]||0)+1),r=give.call(this,kind,ob);if(!r)return r;PWL[kind]=lv;
    if(kind==='fix'){if(lv>=3&&P.hp<P.max)P.hp++;}
    else if(kind!=='drop'){const a=this.st().act.find(x=>x.k===kind);if(a){a.lv=lv;a.d*=1+.2*(lv-1);}}
-   if(lv>1){floater(P.x,P.y-60,PWK[kind].n.split(' ')[0]+' LV'+lv,PWK[kind].c);G.hint={t:3,txt:say(PWK[kind].tip+' · LV'+lv)};}
+   if(lv>1){floater(P.x,P.y-60,PWK[kind].n.split(' ')[0]+' LV'+lv,PWK[kind].c);hintShow(say(PWK[kind].n+' LV'+lv),3);}
    return r;};
  const tk=PW.tick;PW.tick=function(dt){const s=this.st(),before=G.score,ls=s.ls,a=s.act.find(x=>x.k==='tempo');tk.call(this,dt);
    if(a&&a.lv>1&&before>ls){G.score+=Math.round((before-ls)*.25*(a.lv-1));s.ls=G.score;}};          // Tempo Up: score x2.0, x2.25 ... x3.0
@@ -7449,16 +7492,16 @@ const PW3L={
   drum:{tx:['auto-shot on every beat','','3 shots: diagonals too','','5 shots: double diagonals']},
   echo:{tx:['1 ghost, a beat later','ghost +15% damage','+ a ghost every half beat','ghost +30% damage','+ a 2nd ghost; ghosts pierce'],
     dm:[1,1.15,1.15,1.3,1.3],half:[0,0,1,1,1],two:[0,0,0,0,1],pn:[0,0,0,0,1],xk:.6},   // xk: the extra (half-beat, 2nd) ghosts hit at this fraction of a ghost
-  nova:{tx:['ring, radius 230','bigger ring','+ 2nd ring on beat 3','bigger, harder','+ a damage field for 1 beat'],
+  nova:{tx:['ring, radius 230','bigger ring','+ 2nd ring','bigger, harder','+ a damage field'],
     R:[230,260,260,290,320],dm:[5,5,6,6,7],ring2:[0,0,1,1,1],field:[0,0,0,0,1],fr:6},   // fr: field damage per second to ordinary enemies (bosses 60%)
   magb:{tx:['pulls pickups on the beat','longer reach','+ stronger pull','','widest reach, strongest pull'],R:[640,760,900,900,1100],k:[1,1,1.3,1.3,1.8]},
   wing:{tx:['2 drones','harder drone shots','3 drones','','4 drones, shots home in'],n:[2,2,3,3,4],dm:[1,1.15,1.15,1.3,1.3],home:[0,0,0,0,1]},
   cres:{tx:['x1.6 at most','x1.7 at most','x1.8 at most','x1.9 at most','x2.0 at most'],cap:[1.6,1.7,1.8,1.9,2.0]},   // still +12% a bar; the DMG.hit / scale ceilings come on top
   chord:{tx:['absorbs 1 hit','','absorbs 2 hits','bigger ring-out','reflects bullets'],ch:[1,1,2,2,2],rel:[170,170,190,230,230],refl:[0,0,0,0,1]},
-  bomb:{tx:['+1 EMP pulse','','+2 EMP pulses','pulses hit harder','pulses hit harder, 1 s shield'],n:[1,1,2,2,2],x:[0,0,0,4,8],inv:[0,0,0,0,1]},   // x: extra damage the fired pulse deals to ordinary enemies; inv: seconds of invulnerability
+  bomb:{tx:['+1 EMP pulse','','+2 EMP pulses','pulses hit harder','harder pulses, 1 s shield'],n:[1,1,2,2,2],x:[0,0,0,4,8],inv:[0,0,0,0,1]},   // x: extra damage the fired pulse deals to ordinary enemies; inv: seconds of invulnerability
   crate:{tx:['heavy shells','bigger shells','shells pierce 1','bigger, pierce 2','biggest, pierce 3'],nb:[2,3,3,4,5],rad:[8,10,12,14,17],pn:[0,0,1,2,3],k:[.8,.85,.9,.95,1]},   // k: the banked normal-gun damage a burst carries
   ric:{tx:['shots bounce once','','bounce twice','','bounce three times'],rc:[1,1,2,2,3]},
-  slice:{tx:['enemy bullets slow on the beat','longer slow','','','slow almost the whole beat'],f:[.55,.5,.45,.4,.35],duty:[.4,.5,.6,.7,.8],hardK:.75},   // f: bullet speed in the slow part of the beat; duty: how much of the beat it lasts
+  slice:{tx:['bullets slow on the beat','longer slow','','','slow almost the whole beat'],f:[.55,.5,.45,.4,.35],duty:[.4,.5,.6,.7,.8],hardK:.75},   // f: bullet speed in the slow part of the beat; duty: how much of the beat it lasts
   leech:{tx:['kills heal a little','','','','']  ,f:[.03,.04,.05,.06,.08],gap:20,hardGap:30}};   // f: hull point per kill in the last bar; at most 1 point per gap seconds
 for(const k in PW3L)if(!PW3L[k].tx.every(Boolean)){const t=PW3L[k].tx;for(let i=0;i<5;i++)if(!t[i])t[i]=t[i-1]||'';}
 const PW3NEW={bomb:{n:'BOMB STOCK',tip:'BOMB STOCK: more EMP pulses',c:'#ffb020'},
@@ -7513,9 +7556,9 @@ if(PW3.on){
     if(kind==='bomb'){const n=PW3L.bomb.n[lv-1];P.emp=Math.min(3,P.emp+n);floater(P.x,P.y-24,'EMP +'+n,K.c);}
     if(lv>(PW3.hi[kind]|0)){PW3.hi[kind]=lv;PW3.persist();}
     if(lv>l0&&l0>0){PW3.stat.up++;PW3.chime(lv);}
-    if(PW3.seen[kind]!==1&&PW3NEW[kind]){PW3.seen[kind]=1;PW3.persist();G.hint={t:6,txt:say(PW3NEW[kind].tip)};}
-    else if(lv===2&&!PW3.seen.rule){PW3.seen.rule=1;PW3.persist();G.hint={t:6,txt:say('Grab it again: level up. Hits cost one.')};}
-    else if(lv>1)G.hint={t:2.4,txt:say(K.n+' LV'+lv+': '+PW3L[kind].tx[lv-1])};
+    if(PW3.seen[kind]!==1&&PW3NEW[kind]){PW3.seen[kind]=1;PW3.persist();hintShow(say(PW3NEW[kind].tip),6);}
+    else if(lv===2&&!PW3.seen.rule){PW3.seen.rule=1;PW3.persist();hintShow(say('Grab again to level up'),6);}
+    else if(lv>1)hintShow(say(K.n+' LV'+lv+': '+PW3L[kind].tx[lv-1]),2.4);
     return r;};}
   /* ----- the drop table: stages 1-2 keep the old pool; in a later stage the first 4 drops come from 3 new + 2 old powers; Endless uses everything ----- */
   {const OLD=['drum','tempo','slow','drop','echo','nova','magb','wing','cres','chord'],NEW=Object.keys(PW3NEW);
@@ -7686,13 +7729,13 @@ const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0
     if(kind==='fence'){if(!this.fence)this.startFence();return;}
     let es;if(kind==='weave')es=this.track(()=>{const y=FY(150,H-190);for(let i=0;i<6;i++)en('drone',{x:W+30+i*56,y,amp:120,ph:(i%2)*Math.PI});});
     else es=this.track(()=>PATS[kind].f());
-    if(es.length){this.sets.push({es,n:es.length,kind});this.stat.sets++;G.hint={t:2.4,txt:say(kind==='weave'?'WEAVE: shoot on the beat':'SET PIECE')};NR.emit('setpiece',{kind});}},
+    if(es.length){this.sets.push({es,n:es.length,kind});this.stat.sets++;hintShow(say(kind==='weave'?'WEAVE: shoot on the beat':'SET PIECE'),2.4);NR.emit('setpiece',{kind});}},
   startFence(){const gy=clamp(P.y+gr(-80,80),110,H-110),rows=this.ROWS.filter(y=>Math.abs(y-gy)>75);
-    this.fence={rows,gy,b0:G.bc,phase:0,fire:0,hit:0};this.stat.fences++;AU.sfx('warn');G.hint={t:2.6,txt:say('LASER FENCE: find the gap')};},
+    this.fence={rows,gy,b0:G.bc,phase:0,fire:0,hit:0};this.stat.fences++;AU.sfx('warn');hintShow(say('LASER FENCE: find the gap'),2.6);},
   bar(){const n=this.n=G.rb;if(PW.on('tempo'))DIR.acc+=.4;if(HARD&&!ST.on&&!G.boss)DIR.acc+=.7;   // Hard: the set pieces and the DROP are extra on top, so the waves keep their bite   // TEMPO UP: faster waves (a bigger wave budget every bar)
     if(G.boss||G.dead||SH.active)return;
     if(n>=3&&n%6===3&&DIR.nonBoss()<8&&(ST.on||G.dbar<DIR.bossBar-6))this.setPiece();
-    if(n%16===15&&n>=15&&!this.dw){this.dropAt=n+1;this.dropB=G.bc+4;G.hint={t:3.4,txt:say('DROP COMING: DASH ON THE DOWNBEAT')};}
+    if(n%16===15&&n>=15&&!this.dw){this.dropAt=n+1;this.dropB=G.bc+4;hintShow(say('DROP COMING: DASH ON THE DOWNBEAT'),3.4);}
     if(n%16===0&&n>=16&&this.dropAt===n)this.dropStart();},
   dropStart(){this.dropAt=-1;this.dw={t:G.t,hit:false,until:G.t+.28};if(this.pdash>0||G.t-this.lastDash<.22)this.drop(true);},
   drop(hit){const w=this.dw;if(!w||w.done)return;w.done=1;this.stat.drops++;const T=tierOf(C.n);
@@ -7792,7 +7835,7 @@ TUT.cur=()=>TUT.on?TUT_S[TUT.i]:null;
 /* ----- the coach bar (DOM, top of the stage) and the cards ----- */
 {const st=document.createElement('style');st.textContent=`
 #tutB{position:absolute;z-index:6;top:58px;left:50%;transform:translateX(-50%);width:min(520px,calc(100% - 16px));display:flex;align-items:center;gap:8px;box-sizing:border-box;
- padding:4px 4px 4px 12px;background:#0d0820e8;border:2px solid var(--cyan);border-radius:12px;font:700 clamp(13px,2.2vw,17px) var(--display);color:var(--ink);pointer-events:none}
+ padding:4px 4px 4px 12px;background:#05030cc7;border:1.5px solid var(--cyan);border-radius:12px;font:700 clamp(14px,2.2vw,17px) var(--display);color:#fff;pointer-events:none}
 #tutB .tl{flex:1 1 0;min-width:0;line-height:1.2}#tutB .tn{font:12px var(--mono);color:var(--dim);flex:0 0 auto}
 #tutB button{pointer-events:auto;flex:0 0 auto;min-width:64px;min-height:44px;border-radius:9px;border:2px solid var(--pink);background:#1a1033;color:#fff;font:700 14px var(--display);letter-spacing:.08em;cursor:pointer}
 #tutB.hid .tl,#tutB.hid .tn{visibility:hidden}#tutB.ok{border-color:#ffe14d}
@@ -7804,7 +7847,7 @@ TUT.cur=()=>TUT.on?TUT_S[TUT.i]:null;
 const tutB=document.createElement('div');tutB.id='tutB';tutB.hidden=true;tutB.innerHTML='<span class="tl" id="tutL"></span><span class="tn" id="tutN"></span><button type="button" id="tutSkip">SKIP</button>';stage.appendChild(tutB);
 const tutC=document.createElement('div');tutC.id='tutC';tutC.hidden=true;document.body.appendChild(tutC);
 for(const ev of['touchstart','touchmove','touchend','pointerdown','mousedown'])tutC.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
-TUT.line=t=>{const el=$('tutL');if(el&&el.textContent!==t)el.textContent=t;};
+TUT.line=t=>{if(window.HINT&&HINT.on())t=HINT.short(t);const el=$('tutL');if(el&&el.textContent!==t)el.textContent=t;};
 function tutCard(html,btns){tutC.innerHTML=`<div class="cc">${html}<div class="rw"></div></div>`;const rw=tutC.querySelector('.rw');
   for(const [id,label,cls,fn] of btns){const b=document.createElement('button');b.type='button';b.className='go '+(cls||'');b.id=id;b.textContent=label;b.addEventListener('click',e=>{e.stopPropagation();fn();});rw.appendChild(b);}
   tutC.hidden=false;const f=rw.querySelector('button');if(f)f.focus();}
@@ -8190,7 +8233,8 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     if(mn)hudMin(ctx,1,18,y0-8,t);});
   if(ku>1.25)tierMeter(W-131*ku-14,H-8,ku);else tierMeter(W/2,H-8,ku);       // big HUD on a small screen: the meter moves to the right corner, clear of the bars frame
   if(G.note.t>0&&G.note.txt)cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12-(ku>1.25?50:0));ctx.globalAlpha=1;});
-  if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(W/2,H-62,15,1,W,26,40);ctx.globalAlpha=1;});
+  if(window.HINT&&HINT.on())HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});   // F6: the one hint style (top third, under the HUD)
+  else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(W/2,H-62,15,1,W,26,40);ctx.globalAlpha=1;});
   if(!mn){SH.hud(ctx,t,{nx:24,ny:90,dx:216,dy:H-52,sx:18,sy:H-60,ring:true});HUDX.ship(ctx,P.x,P.y,1,t);}else HUDX.ship(ctx,P.x,P.y,1,t);
   // boss bar
   if(G.boss&&G.boss.x<W){const b=G.boss;ctx.fillStyle='#00000088';ctx.fillRect(W/2-200*ku,30*ku,400*ku,8*ku);ctx.fillStyle='#ff3040';ctx.fillRect(W/2-200*ku,30*ku,400*ku*clamp(b.hp/b.max,0,1),8*ku);if(b.b2s&&window.B2X)B2X.sheen(W/2-200*ku,30*ku,400*ku*clamp(b.hp/b.max,0,1),8*ku);
@@ -8236,7 +8280,8 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   HUDX.ship(ctx,P.y,PH_-P.x,k,t,true);
   {const v=HUDX.vals();setRing($('bDash'),Math.min(1,(v.dash+(v.dash<v.dashMax&&P.dashCd>0?1-clamp(P.dashCd,0,1):0))/v.dashMax),'#19e3ff',v.dashMax>1?v.dash:'');setRing($('bEmp'),P.emp/3,'#ffb020',P.emp>0?P.emp:'');}
   if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
-  if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(w/2,h-170*k,17*k,k,w,28*k,44*k);ctx.globalAlpha=1;}
+  if(window.HINT&&HINT.on())HINT.draw(ctx,{W:w,H:h,mode:'port',cpu:Math.max(.2,frame.clientWidth/w),top:(G.boss&&G.boss.x<W?112:92)*k,x0:6,x1:w-6,ship:{x:P.y,y:PH_-P.x},acc:D.a});   // F6: the one hint style
+  else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(w/2,h-170*k,17*k,k,w,28*k,44*k);ctx.globalAlpha=1;}
   if(G.banner.t>0){const kk=G.banner.t,m=G.banner.m,a=Math.min(1,kk*2,(m-kk)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
     if(G.banner.pic!=null)ART.portrait(G.banner.pic,w/2,h/2-58*k-100*k,92*k,Math.max(0,a));
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,h/2-58*k,w,96*k);const col=G.banner.warn?'#ff3040':D.a;

@@ -21,7 +21,7 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
       s.act.push({k:kind,s:this.cur(),d:K.bars*4*(ob?1.5:1),ob,w:performance.now()});
       }
     floater(P.x,P.y-24,K.n,K.c);if(ob)floater(P.x,P.y-42,'ON BEAT +50% TIME','#ffe14d');
-    G.hint={t:3,txt:say(K.tip)};AU.sfx('up');return true;},
+    hintShow(say(K.tip),3);AU.sfx('up');return true;},
   off(kind){},
   reset(){this.bs=1;this.dstep=-1;try{const a=AU.a;if(a&&AU.cutg){const g=AU.cutg.gain;g.cancelScheduledValues(a.currentTime);g.setTargetAtTime(1,a.currentTime,.01);}}catch(e){}
     this.wk=1;AU.slowColour(false);if(G)G.pw=null;},

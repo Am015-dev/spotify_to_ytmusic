@@ -33,7 +33,7 @@ if(RET.pw2){
     const r=give.call(this,kind,ob);
     if(r&&PWK[kind]&&PWK[kind].pw2){const a=PW2.act(kind);if(a){a.x={};if(kind==='cres')a.bars=0;if(kind==='chord'){a.used=false;a.rel=false;}}
       PW2.stat[{echo:'echo',nova:'nova',magb:'pull',wing:'wing',cres:'cres',chord:'chord'}[kind]]+=0;
-      if(!PW2.seen[kind]){PW2.seen[kind]=1;PW2.stat.tip++;try{save('mnr_pw2seen',PW2.seen);}catch(e){}G.hint={t:6,txt:say(PW2.K[kind].tip)};}else G.hint={t:1.6,txt:say(PW2.K[kind].tip)};
+      if(!PW2.seen[kind]){PW2.seen[kind]=1;PW2.stat.tip++;try{save('mnr_pw2seen',PW2.seen);}catch(e){}hintShow(say(PW2.K[kind].tip),6);}else hintShow(say(PW2.K[kind].tip),1.6);
       PW2.note(0,.25,.08,'triangle');PW2.note(4,.3,.07,'triangle',AU.a?AU.a.currentTime+.08:0);}
     return r;};}
   /* ----- DRUM BURST: the layer is scheduled from the beat event (drum shots already are), on the song's grid ----- */

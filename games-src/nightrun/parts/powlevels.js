@@ -12,16 +12,16 @@ const PW3L={
   drum:{tx:['auto-shot on every beat','','3 shots: diagonals too','','5 shots: double diagonals']},
   echo:{tx:['1 ghost, a beat later','ghost +15% damage','+ a ghost every half beat','ghost +30% damage','+ a 2nd ghost; ghosts pierce'],
     dm:[1,1.15,1.15,1.3,1.3],half:[0,0,1,1,1],two:[0,0,0,0,1],pn:[0,0,0,0,1],xk:.6},   // xk: the extra (half-beat, 2nd) ghosts hit at this fraction of a ghost
-  nova:{tx:['ring, radius 230','bigger ring','+ 2nd ring on beat 3','bigger, harder','+ a damage field for 1 beat'],
+  nova:{tx:['ring, radius 230','bigger ring','+ 2nd ring','bigger, harder','+ a damage field'],
     R:[230,260,260,290,320],dm:[5,5,6,6,7],ring2:[0,0,1,1,1],field:[0,0,0,0,1],fr:6},   // fr: field damage per second to ordinary enemies (bosses 60%)
   magb:{tx:['pulls pickups on the beat','longer reach','+ stronger pull','','widest reach, strongest pull'],R:[640,760,900,900,1100],k:[1,1,1.3,1.3,1.8]},
   wing:{tx:['2 drones','harder drone shots','3 drones','','4 drones, shots home in'],n:[2,2,3,3,4],dm:[1,1.15,1.15,1.3,1.3],home:[0,0,0,0,1]},
   cres:{tx:['x1.6 at most','x1.7 at most','x1.8 at most','x1.9 at most','x2.0 at most'],cap:[1.6,1.7,1.8,1.9,2.0]},   // still +12% a bar; the DMG.hit / scale ceilings come on top
   chord:{tx:['absorbs 1 hit','','absorbs 2 hits','bigger ring-out','reflects bullets'],ch:[1,1,2,2,2],rel:[170,170,190,230,230],refl:[0,0,0,0,1]},
-  bomb:{tx:['+1 EMP pulse','','+2 EMP pulses','pulses hit harder','pulses hit harder, 1 s shield'],n:[1,1,2,2,2],x:[0,0,0,4,8],inv:[0,0,0,0,1]},   // x: extra damage the fired pulse deals to ordinary enemies; inv: seconds of invulnerability
+  bomb:{tx:['+1 EMP pulse','','+2 EMP pulses','pulses hit harder','harder pulses, 1 s shield'],n:[1,1,2,2,2],x:[0,0,0,4,8],inv:[0,0,0,0,1]},   // x: extra damage the fired pulse deals to ordinary enemies; inv: seconds of invulnerability
   crate:{tx:['heavy shells','bigger shells','shells pierce 1','bigger, pierce 2','biggest, pierce 3'],nb:[2,3,3,4,5],rad:[8,10,12,14,17],pn:[0,0,1,2,3],k:[.8,.85,.9,.95,1]},   // k: the banked normal-gun damage a burst carries
   ric:{tx:['shots bounce once','','bounce twice','','bounce three times'],rc:[1,1,2,2,3]},
-  slice:{tx:['enemy bullets slow on the beat','longer slow','','','slow almost the whole beat'],f:[.55,.5,.45,.4,.35],duty:[.4,.5,.6,.7,.8],hardK:.75},   // f: bullet speed in the slow part of the beat; duty: how much of the beat it lasts
+  slice:{tx:['bullets slow on the beat','longer slow','','','slow almost the whole beat'],f:[.55,.5,.45,.4,.35],duty:[.4,.5,.6,.7,.8],hardK:.75},   // f: bullet speed in the slow part of the beat; duty: how much of the beat it lasts
   leech:{tx:['kills heal a little','','','','']  ,f:[.03,.04,.05,.06,.08],gap:20,hardGap:30}};   // f: hull point per kill in the last bar; at most 1 point per gap seconds
 for(const k in PW3L)if(!PW3L[k].tx.every(Boolean)){const t=PW3L[k].tx;for(let i=0;i<5;i++)if(!t[i])t[i]=t[i-1]||'';}
 const PW3NEW={bomb:{n:'BOMB STOCK',tip:'BOMB STOCK: more EMP pulses',c:'#ffb020'},
@@ -76,9 +76,9 @@ if(PW3.on){
     if(kind==='bomb'){const n=PW3L.bomb.n[lv-1];P.emp=Math.min(3,P.emp+n);floater(P.x,P.y-24,'EMP +'+n,K.c);}
     if(lv>(PW3.hi[kind]|0)){PW3.hi[kind]=lv;PW3.persist();}
     if(lv>l0&&l0>0){PW3.stat.up++;PW3.chime(lv);}
-    if(PW3.seen[kind]!==1&&PW3NEW[kind]){PW3.seen[kind]=1;PW3.persist();G.hint={t:6,txt:say(PW3NEW[kind].tip)};}
-    else if(lv===2&&!PW3.seen.rule){PW3.seen.rule=1;PW3.persist();G.hint={t:6,txt:say('Grab it again: level up. Hits cost one.')};}
-    else if(lv>1)G.hint={t:2.4,txt:say(K.n+' LV'+lv+': '+PW3L[kind].tx[lv-1])};
+    if(PW3.seen[kind]!==1&&PW3NEW[kind]){PW3.seen[kind]=1;PW3.persist();hintShow(say(PW3NEW[kind].tip),6);}
+    else if(lv===2&&!PW3.seen.rule){PW3.seen.rule=1;PW3.persist();hintShow(say('Grab again to level up'),6);}
+    else if(lv>1)hintShow(say(K.n+' LV'+lv+': '+PW3L[kind].tx[lv-1]),2.4);
     return r;};}
   /* ----- the drop table: stages 1-2 keep the old pool; in a later stage the first 4 drops come from 3 new + 2 old powers; Endless uses everything ----- */
   {const OLD=['drum','tempo','slow','drop','echo','nova','magb','wing','cres','chord'],NEW=Object.keys(PW3NEW);

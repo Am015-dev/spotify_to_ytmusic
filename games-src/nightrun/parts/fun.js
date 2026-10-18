@@ -17,13 +17,13 @@ const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0
     if(kind==='fence'){if(!this.fence)this.startFence();return;}
     let es;if(kind==='weave')es=this.track(()=>{const y=FY(150,H-190);for(let i=0;i<6;i++)en('drone',{x:W+30+i*56,y,amp:120,ph:(i%2)*Math.PI});});
     else es=this.track(()=>PATS[kind].f());
-    if(es.length){this.sets.push({es,n:es.length,kind});this.stat.sets++;G.hint={t:2.4,txt:say(kind==='weave'?'WEAVE: shoot on the beat':'SET PIECE')};NR.emit('setpiece',{kind});}},
+    if(es.length){this.sets.push({es,n:es.length,kind});this.stat.sets++;hintShow(say(kind==='weave'?'WEAVE: shoot on the beat':'SET PIECE'),2.4);NR.emit('setpiece',{kind});}},
   startFence(){const gy=clamp(P.y+gr(-80,80),110,H-110),rows=this.ROWS.filter(y=>Math.abs(y-gy)>75);
-    this.fence={rows,gy,b0:G.bc,phase:0,fire:0,hit:0};this.stat.fences++;AU.sfx('warn');G.hint={t:2.6,txt:say('LASER FENCE: find the gap')};},
+    this.fence={rows,gy,b0:G.bc,phase:0,fire:0,hit:0};this.stat.fences++;AU.sfx('warn');hintShow(say('LASER FENCE: find the gap'),2.6);},
   bar(){const n=this.n=G.rb;if(PW.on('tempo'))DIR.acc+=.4;if(HARD&&!ST.on&&!G.boss)DIR.acc+=.7;   // Hard: the set pieces and the DROP are extra on top, so the waves keep their bite   // TEMPO UP: faster waves (a bigger wave budget every bar)
     if(G.boss||G.dead||SH.active)return;
     if(n>=3&&n%6===3&&DIR.nonBoss()<8&&(ST.on||G.dbar<DIR.bossBar-6))this.setPiece();
-    if(n%16===15&&n>=15&&!this.dw){this.dropAt=n+1;this.dropB=G.bc+4;G.hint={t:3.4,txt:say('DROP COMING: DASH ON THE DOWNBEAT')};}
+    if(n%16===15&&n>=15&&!this.dw){this.dropAt=n+1;this.dropB=G.bc+4;hintShow(say('DROP COMING: DASH ON THE DOWNBEAT'),3.4);}
     if(n%16===0&&n>=16&&this.dropAt===n)this.dropStart();},
   dropStart(){this.dropAt=-1;this.dw={t:G.t,hit:false,until:G.t+.28};if(this.pdash>0||G.t-this.lastDash<.22)this.drop(true);},
   drop(hit){const w=this.dw;if(!w||w.done)return;w.done=1;this.stat.drops++;const T=tierOf(C.n);
