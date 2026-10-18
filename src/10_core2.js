@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.113',date:'18 Oct 2026',items:[{t:'FIXED',s:'Fewer stutters while driving: hiding far buildings and moving traffic are spread over several frames (Frankfurt now meets our smoothness target).'},{t:'FIXED',s:'Lane assist no longer tugs the car off line after a standing start; car-to-boat and grass switches work again.'},{t:'FIXED',s:'River Run: race display stays on all race, and rivals get their own finish times.'}]},
 {v:'v90m-beta.112',date:'18 Oct 2026',items:[{t:'FIXED',s:'Pulling away from a standstill no longer makes the car swerve: you drive straight, and Athens pedestrians jump aside again.'}]},
 {v:'v90m-beta.111',date:'18 Oct 2026',items:[{t:'FIXED',s:'Athens first minute: far less memory churn, so about half as many stutters (47 to 24 in our phone test).'}]},
 {v:'v90m-beta.110',date:'18 Oct 2026',items:[{t:'NEW',s:'Every city race is now a pack of 5: four rivals fight for the lead with real overtakes.'},{t:'FIXED',s:'Athens first minute: the big 0.25 s freeze is gone and stutters are roughly halved.'},{t:'FIXED',s:'Smashing props works again.'}]},
