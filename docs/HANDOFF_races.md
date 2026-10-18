@@ -31,3 +31,8 @@
 3. tkStart moves held traffic (yo/stop/wait/hold) within 14 m of route pA away (SIMP_clearTraffic, race-only).
 4. Unit 0 FAIL incl. new tools/unit/logic_rock.js (oscillation fires <= 6 s at dt 1/60..0.5; 8 m/s quiet). tRaces/tGpProbe take CPU=<rate>.
 5. Left: TAG=races,life1,rv2k2 on built out/r8 vs trunk, then merge + push HEAD:alex/od-int2.
+
+# HANDOFF races-9 (2026-10-18, lands races7-wip 89edc55 on trunk alex/od-int2)
+1. Merged trunk faddf7d into branch, build r8 OK, unit 5019 assertions 0 FAIL; TAG=races,life1,rv2k2 on built page: 24/25, only red life1/smash (SLOW 11.9 s > 10 s under full load).
+2. life1/smash re-run: isolated HEAD PASS 6.3 s; trunk faddf7d FAIL in isolation (0 smashes counted), so red on trunk too = not a regression.
+3. Pushed HEAD to alex/od-int2 (fast-forward); next: watch life1/smash timing under load (SMASH burst budget vs full-GO slow frames).
