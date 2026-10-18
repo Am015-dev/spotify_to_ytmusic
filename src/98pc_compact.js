@@ -32,14 +32,15 @@ function PC_scan(){PC.L.length=0;PC.st.meshes=PC.st.src=0;PC.grp=HUB.grp;if(!HUB
  for(const im of Object.values(HUB.cim||{}))for(const q of[im,im&&im.userData.w,im&&im.userData.g])if(q&&q.isInstancedMesh&&!q.userData.pc&&q.count>=8&&q.count===q.instanceMatrix.count)PC_reg(q,false).dyn=true;
  PC.nch=HUB.grp.children.length;PC_grid()}
 // perf-6: meshes added to HUB.grp after the first scan (lazy 'lz' leaf/filler groups: 18k-instance leaf IM = 217k tris Fra) are picked up when the child count changes
-function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const w=o=>{if(o===lg)return;if(PC_cand(o)){PC_reg(o,false);n++}for(const q of o.children)w(q)};w(HUB.grp);if(n)PC_grid();return n}
-function PC_grid(){
- // perf-7: one 80 m world grid (PC.G = x,y,z,r per cell) tested ONCE per pass into PC.cv; each mesh keeps its own cell lists (C.G = [cell, Int32Array ids])
- const M=new Map();const cell=k=>{let q=M.get(k);if(!q)M.set(k,q={id:M.size,x:0,y:0,z:0,r:0,n:0,P:[]});return q};
- for(const C of PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
-  C.G=[];for(const[k,L]of T){const q=cell(k);for(const i of L){q.x+=C.c[i*4];q.y+=C.c[i*4+1];q.z+=C.c[i*4+2];q.n++;q.P.push(C,i)}C.G.push(q.id,Int32Array.from(L))}}
- const G=PC.G=new Float64Array(M.size*4);for(const q of M.values()){const x=q.x/q.n,y=q.y/q.n,z=q.z/q.n;let r=0;for(let e=0;e<q.P.length;e+=2){const C=q.P[e],i=q.P[e+1];r=Math.max(r,Math.hypot(C.c[i*4]-x,C.c[i*4+1]-y,C.c[i*4+2]-z)+Math.max(C.c[i*4+3],2))}
-  G[q.id*4]=x;G[q.id*4+1]=y;G[q.id*4+2]=z;G[q.id*4+3]=r+4}PC.cv=new Uint8Array(M.size);PC.left=0}
+function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const A=[],w=o=>{if(o===lg)return;if(PC_cand(o)){A.push(PC_reg(o,false));n++}for(const q of o.children)w(q)};w(HUB.grp);if(n)PC_grid(A);return n}
+function PC_grid(add){
+ // perf-7: one 80 m world grid (PC.G = x,y,z,r per cell) tested ONCE per pass into PC.cv; each mesh keeps its own cell lists (C.G = [cell, Int32Array ids]).
+ // Incremental: PC_add grids only the new meshes (a full rebuild was 460 ms in Athens on every lazy group); an existing cell keeps its centre and grows its radius.
+ if(!add||!PC.M)PC.M=new Map();const M=PC.M;
+ for(const C of add||PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
+  C.G=[];for(const[k,L]of T){let q=M.get(k);if(!q){let x=0,y=0,z=0;for(const i of L){x+=C.c[i*4];y+=C.c[i*4+1];z+=C.c[i*4+2]}M.set(k,q={id:M.size,x:x/L.length,y:y/L.length,z:z/L.length,r:0})}
+   for(const i of L)q.r=Math.max(q.r,Math.hypot(C.c[i*4]-q.x,C.c[i*4+1]-q.y,C.c[i*4+2]-q.z)+Math.max(C.c[i*4+3],2)+4);C.G.push(q.id,Int32Array.from(L))}}
+ const G=PC.G=new Float64Array(M.size*4);for(const q of M.values()){G[q.id*4]=q.x;G[q.id*4+1]=q.y;G[q.id*4+2]=q.z;G[q.id*4+3]=q.r}PC.cv=new Uint8Array(M.size);PC.left=0}
 // one instance: visible → copied to the next free slot of its mesh
 function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const d=Math.hypot(x-cx,y-cy,z-cz);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
  const s=C.s++,a=C.src,arr=C.im.instanceMatrix.array;if(s!==i){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
