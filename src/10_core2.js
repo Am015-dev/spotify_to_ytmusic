@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.100',date:'18 Oct 2026',items:[{t:'FIXED',s:'Athens: far fewer stutters while driving. Ground tiles and street props now load in small slices (worst load step 120 ms to 19 ms).'},{t:'CHANGED',s:'Ground lighting is computed piece by piece instead of all at once.'}]},
 {v:'v90m-beta.99',date:'18 Oct 2026',items:[{t:'FIXED',s:'Race rivals that get stuck rocking back and forth now free themselves after a few seconds.'},{t:'FIXED',s:'Parked traffic is cleared off the race line when a race starts.'}]},
 {v:'v90m-beta.98',date:'18 Oct 2026',items:[{t:'FIXED',s:'River race: rivals brake in time for the last corner instead of overshooting.'},{t:'FIXED',s:'Westend race: rivals follow the streets instead of trying to drive through buildings.'}]},
 {v:'v90m-beta.97',date:'18 Oct 2026',items:[{t:'CHANGED',s:'Less lag: thousands of far-away street props are no longer drawn.'},{t:'CHANGED',s:'Smash debris costs nothing when nothing is breaking.'}]},
