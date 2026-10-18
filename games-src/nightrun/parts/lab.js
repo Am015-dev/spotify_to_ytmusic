@@ -56,7 +56,7 @@ function labInfo(){const el=$('labInfo');if(!el)return;let s=LAB.note&&LAB.noteT
   if(el.textContent!==s)el.textContent=s;}
 function labSync(){const live=running&&G&&G.lab;for(const {b,o} of LABS){const on=o.on?!!o.on():false;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on?'true':'false');
     if(o.text)b.textContent=o.text(on);b.disabled=o.dis?!!o.dis(live):false;}
-  for(const t of ['boss','foes','items','cheats']){const b=$('labTab_'+t);if(b)b.classList.toggle('on',LAB.tab===t);}labInfo();}
+  for(const t of ['boss','foes','items','cheats','assets']){const b=$('labTab_'+t);if(b)b.classList.toggle('on',LAB.tab===t);}labInfo();}
 /* ----- bosses ----- */
 const labBoss=()=>G&&G.lab&&G.boss&&!G.boss.dead?G.boss:null;
 function labSpawn(){if(!running||!G||!G.lab)return;const B=LAB_B[LAB.bi];G.en=[];G.eb=[];G.pb=[];G.boss=null;G.bossDone=false;G.transT=-1;G.force=false;G.delayed=[];
@@ -128,13 +128,13 @@ function labBuildCheats(body){
 let labBodyEl=null;
 function labShow(tab){LAB.tab=tab;LABS.length=0;labEl.textContent='';
   const bar=lel('div','lbar'),tabs=lel('div','ltabs');
-  for(const [t,n] of [['boss','BOSS'],['foes','FOES'],['items','ITEMS'],['cheats','CHEATS']]){const b=lchip(tabs,n,()=>labShow(t),{cls:'tab'});b.id='labTab_'+t;}
+  for(const [t,n] of [['boss','BOSS'],['foes','FOES'],['items','ITEMS'],['cheats','CHEATS'],...(window.LABX?LABX.tabs():[])]){const b=lchip(tabs,n,()=>labShow(t),{cls:'tab'});b.id='labTab_'+t;}
   const info=lel('div','linfo');info.id='labInfo';info.setAttribute('role','status');
   const fold=lchip(bar,'▾',()=>{LAB.min=!LAB.min;labEl.classList.toggle('min',LAB.min);fold.textContent=LAB.min?'▴':'▾';},{aria:'Fold the panel'});
   const ex=lchip(bar,'EXIT',()=>labExit(),{cls:'x',aria:'Leave the LAB'});
   bar.prepend(tabs);bar.insertBefore(info,fold);
   labBodyEl=lel('div','lbody');labEl.append(bar,labBodyEl);
-  ({boss:labBuildBoss,foes:labBuildFoes,items:labBuildItems,cheats:labBuildCheats})[tab](labBodyEl);
+  labEl.classList.toggle('lax',tab==='assets');({boss:labBuildBoss,foes:labBuildFoes,items:labBuildItems,cheats:labBuildCheats,...(window.LABX?LABX.build:{})})[tab](labBodyEl);   // labassets.js (RET.labassets) adds the ASSETS tab
   if(tab==='boss')labPoseRow();labSync();}
 /* ----- entering and leaving ----- */
 function startLab(bi){if(running)return;AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;selEl.hidden=true;
