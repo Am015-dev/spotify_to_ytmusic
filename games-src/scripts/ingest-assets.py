@@ -240,8 +240,12 @@ def summary(out, a):
     if a.check or not out.stat: return
     ingested = {s for s, st in out.stat.items() if st['names']}
     if 'mainhattan-nightrun' in ingested and os.path.exists('games-src/nightrun/make-placeholders.py'):
-        subprocess.run([sys.executable, 'games-src/nightrun/make-placeholders.py'], capture_output=True)   # updates media/ready.json (its own pipeline)
+        r = subprocess.run([sys.executable, 'games-src/nightrun/make-placeholders.py'], capture_output=True, text=True)   # updates media/ready.json (its own pipeline)
         print('  nightrun: make-placeholders.py run (media/ready.json updated)')
+        for ln in r.stdout.splitlines():
+            if ln.startswith('REFUSED'): print('  ' + ln)
+        g = subprocess.run([sys.executable, 'games-src/nightrun/placeholder_guard.py'], capture_output=True, text=True)   # no placeholder picture in ready.json
+        print('  nightrun: placeholder_guard.py ' + ('ok' if g.returncode == 0 else 'FAILED:\n' + g.stdout[-600:]))
     if a.no_wiring: return
     for cmd in ('wiring-status.py', 'inbox-report.py'):
         r = subprocess.run([sys.executable, os.path.join(HERE, cmd)], capture_output=True, text=True)

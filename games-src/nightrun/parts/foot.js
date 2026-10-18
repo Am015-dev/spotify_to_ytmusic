@@ -507,7 +507,7 @@ function sim(sec,dt){dt=dt||1/60;let n=Math.round(sec/dt);while(n-->0&&S&&!S.end
 /* ===== MENU button: STREET RUN (unlocked after story stage 3) ===== */
 if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)return false;if(document.getElementById('footBtn'))return true;
     const b=document.createElement('button');b.type='button';b.className='go wide';b.id='footBtn';g.appendChild(b);
-    const paint=()=>{const u=ftUnlocked();b.disabled=!u;b.innerHTML=u?'STREET RUN<small style="font-size:14px">on foot · '+(SV.best.street1?'best '+SV.best.street1.score:'new')+'</small>':'STREET RUN<small style="font-size:14px">clear stage 3 to unlock</small>';};
+    const paint=()=>{const u=ftUnlocked();b.disabled=!u;b.innerHTML=u?'STREET RUN<small style="font-size:14px;display:block">on foot · '+(SV.best.street1?'best '+SV.best.street1.score:'new')+'</small>':'STREET RUN<small style="font-size:14px;display:block">clear stage 3 to unlock</small>';};
     paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');start('street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}

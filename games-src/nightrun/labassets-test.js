@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Lab ASSETS tab (parts/labassets.js, flag RET.labassets) through the real page (prints pass/fail only):
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/labassets-test.js      env: GAME_DIR=<dir with index.html>, V=1 (verbose)
+//  (a0) placeholder_guard.py: no placeholder picture listed in ready.json (any media/*.webp)
 //  (a) the ASSETS tab opens in the Lab; sections and their real/placeholder/missing counts match assets-manifest.json + ready.json + placeholders.json;
 //      every manifest file is somewhere in a section; the header counts and the wiring counts are shown
 //  (b) filter chips (REAL / PLACEHOLDER / MISSING) change the tiles, the counter stays right; a tile opens the detail card (dark and light box, save-as name, size, notes)
@@ -37,7 +38,9 @@ const idx = JSON.parse(fs.readFileSync(path.join(GAME, 'media/assets-index.json'
     const { ctx, p } = await open(w, h, touch);
     if (!(await p.$('#labTab_assets'))) { fails.push(nm + ': no ASSETS tab'); await ctx.close(); continue; }
     await tab(p);
-    // (a) data
+    // (a0) no file listed in ready.json may be a generated placeholder picture (placeholder_guard.py checks all media/*.webp: md5, pixels, border + hatching)
+  { const g = cp.spawnSync('python3', [path.join(__dirname, 'placeholder_guard.py')], { encoding: 'utf8' }); if (g.status !== 0) fails.push('ready.json lists placeholder pictures: ' + (g.stdout || g.stderr).split('\n').filter(l => /FAKE-READY|fake-ready/.test(l)).slice(0, 14).join(' | ')); }
+  // (a) data
     const d = await p.evaluate(() => { const L = LABX; return { n: L.data.all.length, files: L.data.all.map(e => e.file), st: Object.fromEntries(L.data.all.map(e => [e.file, e.state])), sec: Object.fromEntries(L.data.all.map(e => [e.file, e.sec])), sum: document.getElementById('laSum').textContent }; });
     const all = idx.manifest.concat(idx.extra.map(file => ({ file, man: 0 })));
     if (d.n !== all.length) fails.push(`${nm}: ${d.n} assets, expected ${all.length}`);

@@ -9,7 +9,7 @@
 if(RET.pw3===undefined)RET.pw3=!/[?&]pw3=0/.test(location.search);
 /* ----- the level table: index 0 = LV1 ... index 4 = LV5. tx = what the level adds (shown in the Stats sheet and the LAB) ----- */
 const PW3L={
-  drum:{tx:['auto-shot on every beat','','3 shots: diagonals too (g.js)','','5 shots: double diagonals (g.js)']},
+  drum:{tx:['auto-shot on every beat','','3 shots: diagonals too','','5 shots: double diagonals']},
   echo:{tx:['1 ghost, a beat later','ghost +15% damage','+ a ghost every half beat','ghost +30% damage','+ a 2nd ghost; ghosts pierce'],
     dm:[1,1.15,1.15,1.3,1.3],half:[0,0,1,1,1],two:[0,0,0,0,1],pn:[0,0,0,0,1],xk:.6},   // xk: the extra (half-beat, 2nd) ghosts hit at this fraction of a ghost
   nova:{tx:['ring, radius 230','bigger ring','+ 2nd ring on beat 3','bigger, harder','+ a damage field for 1 beat'],

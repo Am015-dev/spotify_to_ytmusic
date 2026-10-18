@@ -65,7 +65,9 @@ RET.st=(function(on){
   /* ---- toast queue: one at a time, each shown 2 s, non-blocking ---- */
   const Q=[];let showing=false;
   function toast(a){Q.push(a);if(!showing)next();}
-  function next(){const a=Q.shift();if(!a){showing=false;return;}showing=true;
+  /* the toast waits (queued) while the pit stop, the clear screen or the chest reveal is open: it used to cover their titles */
+  const blocked=()=>['shop','stres','chest'].some(i=>{const o=document.getElementById(i);return !!o&&!o.hidden&&getComputedStyle(o).display!=='none';});
+  function next(){if(!Q.length){showing=false;return;}showing=true;if(blocked()){setTimeout(next,400);return;}const a=Q.shift();
     let e=document.getElementById('achToast');
     if(!e){e=document.createElement('div');e.id='achToast';e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e);}
     e.innerHTML='<span class="ab" style="--c:'+TC[a.t]+'">'+a.g+'</span><span><small>'+TN[a.t]+' ACHIEVEMENT</small><b>'+a.n+'</b></span>';
