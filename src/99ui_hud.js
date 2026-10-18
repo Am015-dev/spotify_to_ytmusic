@@ -43,6 +43,7 @@ html body :is(.touch,.v85) #roamArrow{max-width:calc(100vw - 150px)!important;wh
 }
 body.phHold #spRes{visibility:hidden;pointer-events:none}
 #roam.racing #roamPlate{display:none!important}
+@media (min-width:1000px) and (hover:hover){html body:not(.touch) #roamGauge{left:auto!important;right:calc(24px + env(safe-area-inset-right,0px))!important;transform:none!important;bottom:calc(24px + env(safe-area-inset-bottom,0px))!important}html body #roamGauge small{font-size:12px!important}html body #raceW .gap{min-width:76px;padding:2px 10px}html body #raceW .gap small{max-width:150px!important}}   /* r8b: PC HUD: speed box off the car, KM/H 12 px, a 13-char rival name fits */
 @media (orientation:portrait){html body.spOn #raceW .cp{display:none!important}}   /* rv3C: portrait is 393 px wide: place + time + gap fit, the checkpoint count is in the arrow pill */
 body.v85.spOn[data-mode=roam]:not(.v85b) #raceW:not([hidden]){display:flex!important}   /* rv3C: v85 hides #raceW after its 5 s brief; in a race the place/gap/checkpoint/time pills stay up */
 body.spShow :is(#m1Next,#roamArrow,#roamPlate,#roamPop,#roamPrompt,#crSmHint){visibility:hidden!important}

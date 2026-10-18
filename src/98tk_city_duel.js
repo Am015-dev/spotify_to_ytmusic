@@ -165,9 +165,10 @@ function tkStep(dt){const sp=RO.sp,e=sp.e;TK.C=sp.C;const G=tkGeo();RO.cool=2;TK
   const n=sp.ai.length,ahead=sp.ai.filter(a=>a.fin!=null||a.s/tkLen(tkPath(a))*G.lenA>sp.myS).length,lastFin=TK_FAIR?(sp.ai.some(a=>a.fin!=null)?Math.min(...sp.ai.filter(a=>a.fin!=null).map(a=>a.fin)):null):sp.ai.every(a=>a.fin!=null)?Math.max(...sp.ai.map(a=>a.fin)):null;sp.place=1+ahead;RV3_gap(sp,sp.ai.map(a=>[a,a.fin!=null?G.lenA:Math.min(a.s/tkLen(tkPath(a)),1)*G.lenA]),sp.myS);
   const grace=lastFin!=null?tkGrace(sp,lastFin,G.lenA):0;if(!sp.done&&sp.cd<=0&&(sp.t>=(TK_FAIR?420:235)||(lastFin!=null&&sp.t-lastFin>=grace)))return tkFinish(true);
   sp.hud=`<b>🏁 ${e.name.toUpperCase()}</b><span>POS ${sp.place}/${n+1} · CP ${Math.min(sp.gi,sp.G.length)}/${sp.G.length} · ${fmt(Math.max(0,sp.t))}${sp.shieldT>0?' · 🛡':''}${lastFin!=null?' · DNF in '+Math.ceil(grace-(sp.t-lastFin))+' s':''}</span>`}
+function tkFinPlace(dnf,place){return dnf?null:place}   // r8b: a DNF has no place (the results screen shows DNF)
 function tkFinish(dnf){const sp=RO.sp,C=sp.C,n=sp.ai.length;sp.done=true;const place=dnf?n+1:1+sp.ai.filter(a=>a.fin!=null&&a.fin<sp.t).length,won=place===1;
   const stars=C.kind==='sprint'||C.kind==='quick'?(place===1?3:place===2?2:place===3?1:0):won?(sp.t<120?3:2):0,a=sp.ai[0];
-  TK.last={key:C.key,place,t:+sp.t.toFixed(1),dnf,stars,rival:a.fin,route:a.route,fired:sp.fired||0};
+  TK.last={key:C.key,place:tkFinPlace(dnf,place),t:+sp.t.toFixed(1),dnf,stars,rival:a.fin,route:a.route,fired:sp.fired||0};
   const all=store.get('mho_stars',{}),F=flags();
   if(C.kind==='sprint'){const e=C.ev,o=roamSave();o.sp=o.sp||{};const prev=o.sp[e.id]||{st:0,best:0};o.sp[e.id]={st:Math.max(prev.st,stars),best:!dnf&&(!prev.best||sp.t<prev.best)?sp.t:prev.best};roamStore(o);const key='sprint:'+e.id;if((all[key]||0)<stars){all[key]=stars;store.set('mho_stars',all);addXP(130)}logDone(key,C.name,'sprint',stars,fmt2(sp.t))}
   else if(C.kind==='quick'){const S=season();S.cr+=[300,180,90][place-1]||40;saveSeason(S)}

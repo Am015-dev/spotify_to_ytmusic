@@ -449,7 +449,7 @@ body.bxOn>*:not(#c):not(#bx){visibility:hidden!important}
 #bxTop{position:absolute;left:0;right:0;top:var(--bxT);display:flex;gap:5px;align-items:center;padding:4px max(8px,env(safe-area-inset-right)) 0 max(8px,env(safe-area-inset-left))}
 #bxTop button{min-height:40px}#bxInfo{flex:1;text-align:center;font-size:12px;text-shadow:0 1px 3px #000;white-space:nowrap;overflow:hidden}
 #bxPal{position:absolute;left:0;top:calc(var(--bxT) + 50px);bottom:0;width:164px;padding:2px 6px 8px max(6px,env(safe-area-inset-left));overflow-y:auto;pointer-events:auto;display:grid;grid-template-columns:1fr 1fr;gap:5px;align-content:start;background:linear-gradient(90deg,rgba(8,24,60,.6),rgba(8,24,60,.25))}
-#bxPal button{display:flex;flex-direction:column;align-items:center;justify-content:center;height:66px;padding:2px}#bxPal canvas{width:52px;height:36px}
+#bxPal button{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:66px;height:auto;padding:2px 2px 4px;line-height:1.1;text-align:center;overflow-wrap:anywhere}#bxPal canvas{width:52px;height:36px}
 #bxPal h4{grid-column:1/3;margin:6px 0 0;font-size:12px;color:#f2cd37}
 #bxAct{position:absolute;right:0;top:calc(var(--bxT) + 50px);bottom:0;width:92px;display:flex;flex-direction:column;gap:5px;padding:0 max(6px,env(safe-area-inset-right)) 6px 4px}
 #bxAct button{flex:1;min-height:36px;font-size:13px}#bxAct .go{background:#1f9e3a}
