@@ -12,7 +12,6 @@ function hubCullStep(){if(!HUB.cull)hubCullInit();const C=HUB.cull,cx=camera.pos
   if(mv>600){HUB.cpos=[cx,cz];HUB.cj=0;vis(0,1);return}if(mv>150){HUB.cpos=[cx,cz];HUB.cj=4}
   if(HUB.cj>0){HUB.cj--;vis(HUB.cj,4);return}
   if(C.length>4000){const f=HUB.cf=((HUB.cf||0)+1)%8;if(f===0)HUB.cpos=[cx,cz];vis(f,8);return}if((HUB.cf=(HUB.cf||0)+1)%8!==1)return;HUB.cpos=[cx,cz];vis(0,1)}
-    jump=!HUB.cpos||Math.hypot(cx-HUB.cpos[0],cz-HUB.cpos[1])>150,f=HUB.cf=((HUB.cf||0)+1)%8;if(jump)HUB.cpos=[cx,cz];else if(f===0)HUB.cpos=[cx,cz];
 // districts: a small label when you cross into a new part of Mainhattan
 if(CID!=='fra'){const e=document.querySelector('#roamPlate b');if(e)e.textContent=''}
 const DIST_R=RF.districts.map(([name,r,side],i,A)=>({name,side:side||0,...rfRect(r),dup:A.findIndex(q=>q[0]===name)<i})),DISTRICTS=DIST_R;

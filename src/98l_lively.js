@@ -116,7 +116,7 @@ function LV_init(){if(LV.init||!HUB.grp||!HUB.nodes||!HUB.nodes.length||!HUB.bld
   // v88s perf: pre-warm the shaders of the Life meshes and the (lazily built) pop-up ring, so the first stall / first pop-up does not stall a frame on a shader compile
   try{const M=LVP_mesh(),v=M.g.visible;M.g.visible=true;P2_compile(scene,camera);M.g.visible=v}catch(e){console.warn('LV warm',e)}}
 function LV_step(dt){if(!RO.on)return;LV_init();if(!LV.init)return;LV.t+=dt;LV.fr++;const t0=performance.now();camera.updateMatrixWorld();LV_seenF.setFromProjectionMatrix(_lvPM.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
-  LV_birdStep(dt);LV_flagStep();LV_blimpStep();LV_boatStep(dt);try{LV_clStep(dt)}catch(e){if(!LV.e1){LV.e1=1;console.warn('LV cl',e)}}try{LV_parkStep()}catch(e){if(!LV.e2){LV.e2=1;console.warn('LV park',e)}}LV.ms=LV.ms==null?0:LV.ms*.95+(performance.now()-t0)*.05}
+  LV_birdStep(dt);LV_flagStep();LV_blimpStep();LV_boatStep(dt);try{LV_clStep(dt)}catch(e){if(!LV.e1){LV.e1=1;console.warn('LV cl',e)}}/* perf-17: 4 ms budget, parking waits a frame when the rest ran long */if(performance.now()-t0<4||LV.pkSkip>3){LV.pkSkip=0;try{LV_parkStep()}catch(e){if(!LV.e2){LV.e2=1;console.warn('LV park',e)}}}else LV.pkSkip=(LV.pkSkip|0)+1;LV.ms=LV.ms==null?0:LV.ms*.95+(performance.now()-t0)*.05}
 {const _lvHT=hubTrafficStep;hubTrafficStep=dt=>{_lvHT(dt);LV_step(dt)}}
 // ===== v88p: life you SEE from the chase camera (reviewer on v88n: "subtle in the chase view"). Everything below sits 20-60 m ahead on the route.
 //  7 · life clusters at street corners ahead: crowds (3-6 minifigs chatting, they cheer, wave and leap aside), market stalls, café tables. Same ped pool (PED_N 110).
@@ -190,13 +190,14 @@ function LV_clPeople(k,C,base,P){const n=C.n,rx=Math.sin(C.h),rz=Math.cos(C.h),a
     p.cx=C.x+ox;p.cz=C.z+oz;LV_clear(p,C);p.mx=C.x+rx*(C.k==='crowd'?.9:1.6);p.mz=C.z+rz*(C.k==='crowd'?.9:1.6);p.jy=0;p.jv=0;p.jx=p.jz=0;p.spin=0;p.yc=0;p.y=C.y;p.gs=C.gs}}
 function LV_clStep(dt){const S=LV.cl;if(!S||!HUB.peds)return;const P=HUB.peds,N=LV_cn(),walk=LV_walk(P.length),sp=Math.abs(RO.v),fx=Math.sin(RO.h),fz=Math.cos(RO.h);
   // warp / teleport (> 60 m in one frame) or first frame: re-place every cluster close (no pop-in is visible across a teleport)
-  const jump=LV.px==null||Math.hypot(RO.x-LV.px,RO.z-LV.pz)>60;LV.px=RO.x;LV.pz=RO.z;if(jump)LV.parkJ=90;
+  const jmp=LV.px==null||Math.hypot(RO.x-LV.px,RO.z-LV.pz)>60;LV.px=RO.x;LV.pz=RO.z;if(jmp){LV.parkJ=90;LV.clJ=S.L.length;LV.clC=0}const jump=false;let jn=LV.clJ>0?3:0;/* perf-17: a jump re-places 3 clusters a frame (cursor LV.clC) */
   if(LV.walk!==walk){for(const p of P)if(p.cw){p.cw=0;LV_pedPut(p)}LV.walk=walk}
   let base=walk,moved=0;
   for(let k=0;k<S.L.length;k++){const C=S.L[k];
     if(k>=N||base+C.n>P.length){if(C.on){C.on=false;LV_clDraw(k,C)}for(let j=0;j<C.n;j++){const p=P[base+j];if(p&&p.cw){p.cw=0;LV_pedPut(p)}}base+=C.n;continue}
     const dx=C.x-RO.x,dz=C.z-RO.z,d=Math.hypot(dx,dz),behind=dx*fx+dz*fz<-d*.2;
-    if(jump||!C.on&&(LV.fr+k)%10===0||C.on&&(d>170||behind&&d>30)){if(jump||moved<2){moved++;LV_clPut(k,C,jump||!C.on&&LV.fr<30);if(C.on)LV_clPeople(k,C,base,P);else for(let j=0;j<C.n;j++){const p=P[base+j];if(p&&p.cw){p.cw=0;LV_pedPut(p)}}}}
+    const jk=jn>0&&k===LV.clC%S.L.length&&LV.clJ>0;if(jk){jn--;LV.clJ--;LV.clC++}
+    if(jk||!C.on&&(LV.fr+k)%10===0||C.on&&(d>170||behind&&d>30)){if(jk||moved<2){moved++;LV_clPut(k,C,jk||!C.on&&LV.fr<30);if(C.on)LV_clPeople(k,C,base,P);else for(let j=0;j<C.n;j++){const p=P[base+j];if(p&&p.cw){p.cw=0;LV_pedPut(p)}}}}
     if(C.on){C.t+=dt;if(C.gs<1){C.gs=Math.min(1,C.gs+dt*2.2);LV_clDraw(k,C)}
       // props: the car smashes a stall / café set (brick burst, studs, slight slow-down); slow contact pushes the car out (collider = the drawn size)
       for(const q of C.pr){if(q.dead)continue;const ex=RO.x-q.x,ez=RO.z-q.z,e2=ex*ex+ez*ez,rr2=q.r+1.1;if(e2>rr2*rr2||Math.abs((RO.y||0)-C.y)>3)continue;
