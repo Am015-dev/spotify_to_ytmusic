@@ -57,11 +57,11 @@ function LF_geos(){const g={};
  // mound: smooth dome h(1-q)², radius/height 1 (scaled per instance), 12 sides, 6 rings
  {const P=[];for(let i=0;i<=6;i++){const r=i/6,k=1-r*r;P.push(new THREE.Vector2(r,k*k))}P.reverse();const d=new THREE.LatheGeometry(P,12).toNonIndexed();d.translate(0,-.02,0);g.mound=colorize(d,new THREE.Color('#ffffff'));g.mound.computeVertexNormals()}
  return g}
-function LF_free(x,z,m){const O=RE_o();if(roamHit(x,z,m)||inRiver(x,z,-m))return false;const q=cityAt(x,z,-1,false,O.q);if(q&&q.d<q.road.w/2+m)return false;const f=fillAt(x,z,undefined,O.f);if(f&&f.d<f.r.w/2+m)return false;const a=abAt(x,z,O.a);return !(a&&a.d<a.road.w/2+m)&&trailDist(x,z)>=m}
+function LF_free(x,z,m){if(roamHit(x,z,m)||inRiver(x,z,-m))return false;const q=cityAt(x,z);if(q&&q.d<q.road.w/2+m)return false;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+m)return false;const a=abAt(x,z);return !(a&&a.d<a.road.w/2+m)&&trailDist(x,z)>=m}
 // every fill piece keeps m metres off the asphalt (street, filler road, Autobahn) and off bridge decks; true = too close (coordinator: bushes on road)
-function LF_offRoad(x,z,m){const O=RE_o();const q=cityAt(x,z,-1,false,O.q);if(q&&q.d<q.road.w/2+m)return true;const f=fillAt(x,z,undefined,O.f);if(f&&f.d<f.r.w/2+m)return true;const a=abAt(x,z,O.a);return !!(a&&a.d<a.road.w/2+m)||onAnyDeck(x,z)}
+function LF_offRoad(x,z,m){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+m)return true;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+m)return true;const a=abAt(x,z);return !!(a&&a.d<a.road.w/2+m)||onAnyDeck(x,z)}
 // lite cover needs no collider margin: road / river / Autobahn / trail clearance only (quay walls and plaza edges block LF_free's roamHit(5))
-function LF_liteOk(x,z){const O=RE_o();if(inRiver(x,z,-3.5))return false;const q=cityAt(x,z,-1,false,O.q);if(q&&q.d<q.road.w/2+3.5)return false;const f=fillAt(x,z,undefined,O.f);if(f&&f.d<f.r.w/2+3.5)return false;const a=abAt(x,z,O.a);return !(a&&a.d<a.road.w/2+6)&&trailDist(x,z)>=3.5}
+function LF_liteOk(x,z){if(inRiver(x,z,-3.5))return false;const q=cityAt(x,z);if(q&&q.d<q.road.w/2+3.5)return false;const f=fillAt(x,z);if(f&&f.d<f.r.w/2+3.5)return false;const a=abAt(x,z);return !(a&&a.d<a.road.w/2+6)&&trailDist(x,z)>=3.5}
 // ---- streamed: the fill is NOT built at boot (Athens boot was +5-7 s). Each 1 km tile of the city box is a LAZY region (60_city_build4 lzReg):
 // lazyStep builds it in ≤1.2 ms slices when you come near (scan, mounds, themes, verge, decor meshes, then lzPropsG = the city's smashable props),
 // 98cl_stream frees it when far (STR_lzFree, wrapped below to drop its mounds and grid entries). Only the tiles around the player exist.
@@ -256,7 +256,7 @@ function LF_goSpot(id){const s=LF.SP[id];if(!s)return'no spot '+id;if(s.c!==CID)
 Object.assign(window.__lvf,{goSpot:LF_goSpot,green:LF_green,SP:LF.SP});
 // road-clear check (coordinator 2026-10-14 "bushes on road"): every fill piece (decor instances + fill props) within r m of (cx,cz) that stands on a
 // road surface (street, filler road, Autobahn, bridge deck: inside the asphalt edge + 0.5 m). Pass = 0.
-function LF_onRoad(x,z){const O=RE_o();const q=cityAt(x,z,-1,false,O.q);if(q&&q.d<q.road.w/2+.5)return'street';const f=fillAt(x,z,undefined,O.f);if(f&&f.d<f.r.w/2+.5)return'filler';const a=abAt(x,z,O.a);if(a&&a.d<a.road.w/2+.5)return'autobahn';return onAnyDeck(x,z)?'deck':''}
+function LF_onRoad(x,z){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+.5)return'street';const f=fillAt(x,z);if(f&&f.d<f.r.w/2+.5)return'filler';const a=abAt(x,z);if(a&&a.d<a.road.w/2+.5)return'autobahn';return onAnyDeck(x,z)?'deck':''}
 function LF_roadCheck(cx,cz,r){const M4=new THREE.Matrix4(),P=new THREE.Vector3(),bad=[];let n=0;const chk=(x,z,t)=>{if((x-cx)**2+(z-cz)**2>r*r)return;n++;const w=LF_onRoad(x,z);if(w)bad.push([t,Math.round(x),Math.round(z),w])};
   for(const m of LF.ms||[]){if(!m.parent)continue;const t=m.userData.lf;if(t==='mound')continue;for(let i=0;i<m.count;i++){m.getMatrixAt(i,M4);P.setFromMatrixPosition(M4);chk(P.x,P.z,t)}}
   for(const L of(typeof LAZY!=='undefined'?LAZY:[]))if(L.lf&&L.done)for(const p of L.props||[])chk(p[1],p[2],p[0]);return{n,bad:bad.length,ex:bad.slice(0,6)}}
