@@ -116,3 +116,8 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 2. Not done: DEST_open, allocation-sampling rank, build, unit, TAG gate, 3-run A/B Ath+Fra, od-int2 merge. LF_tileG skipped on purpose (perf-8 lane).
 3. Blocker: tFrame.js HEAP=1 ran over 30 min here (SwiftShader) without finishing. Use run_in_background with a long timeout, SECS<=300, one run at a time.
 4. Next: baseline vs wip, SECS=300 HEAP=1 RACE=0, 3 runs Ath+Fra; then DEST_open; then gate, merge, push.
+
+## perf-9 result (2026-10-18, merged to trunk alex/od-int2)
+1. Gate on built page (merged trunk 540df66): unit 0 FAIL; TAG=life1,xf1,terrain,smash2,cam,mem,perf5 54/56, reds only known (mem/stable, cam/stable).
+2. tFrame Athens q=high SECS=10 HEAP=1 RACE=0, 2 runs each: trunk 2869/2941 MB (287 vs 290 MB/s, within noise), jsMed 20.4/19.0 vs 19.9/20.4, p95 42/39 vs 39/43. The scratch cuts did NOT measurably cut allocation; Frankfurt not measured.
+3. Next: allocation-sampling rank of what still allocates per frame (DEST_open, LF_tileG untouched).
