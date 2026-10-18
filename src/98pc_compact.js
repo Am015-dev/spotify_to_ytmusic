@@ -68,9 +68,15 @@ function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!
  if(!PC.left)for(const C of PC.L)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
  if(tested){let vis=0;for(const C of PC.L)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();
-hubCullStep=(f=>function(){f.apply(this,arguments);try{PC_step()}catch(e){if(!PC.err){PC.err=String(e);console.warn('PC',e)}}})(hubCullStep);
+// perf-7 gate: compaction costs ~1.8 ms CPU/frame (A/B), only worth it where the GPU is the limit: quality low/min (phones). med/high skip PC_step entirely
+// (nothing is scanned or wrapped); if quality rises after a pass ran (auto ladder / settings), PC_release puts every mesh back to its full source copy.
+function PC_gate(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc7All||lv==='low'||lv==='min'}
+function PC_release(){for(const C of PC.L){const im=C.im;if(!im.parent)continue;im.instanceMatrix.array.set(C.src);if(C.col&&im.instanceColor)im.instanceColor.array.set(C.col);
+  for(let i=0;i<C.n;i++)C.slot[i]=i;C.s=C.n;C.dirty=false;im.count=C.n;im.instanceMatrix.clearUpdateRanges();im.instanceMatrix.needsUpdate=true;if(im.instanceColor){im.instanceColor.clearUpdateRanges();im.instanceColor.needsUpdate=true}}
+ PC.left=0;PC.x=1e9;PC.h=1e9;PC.rel=1}
+hubCullStep=(f=>function(){f.apply(this,arguments);try{if(PC_gate()){PC.rel=0;PC_step()}else if(PC.L.length&&!PC.rel)PC_release()}catch(e){if(!PC.err){PC.err=String(e);console.warn('PC',e)}}})(hubCullStep);
 // GO perf5/compact: a smashed instanced prop stays hidden after compaction, a revived one comes back, writes by index land, fewer instances drawn
-function PC_go(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!PC.on)return'📍 perf5 compaction is OFF (?pc5=0) ❌';if(!PC.grp)PC_step(1);
+function PC_go(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!PC.on)return'📍 perf5 compaction is OFF (?pc5=0) ❌';PC.rel=0;if(!PC.grp)PC_step(1);
  const ok=b=>b?' ✅':' ❌';const P=HUB.props.find(p=>p.alive&&p.im&&p.im.userData.pc&&p.gi==null&&p.im.userData.pc.c[p.i*4+3]>0);if(!P)return`📍 no compacted prop (meshes ${PC.st.meshes}) ❌`;
  const C=P.im.userData.pc;/* no roamWarp: a warp clears the props it lands on */camera.position.set(P.x+8,P.y+4,P.z+8);camera.lookAt(P.x,P.y,P.z);camera.updateMatrixWorld();PC_step(1);
  const shown0=C.slot[P.i]>=0;_pcM.makeScale(0,0,0);P.alive=false;P.im.setMatrixAt(P.i,_pcM);PC_step(1);
