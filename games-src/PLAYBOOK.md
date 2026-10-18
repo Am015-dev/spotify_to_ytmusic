@@ -75,6 +75,12 @@ A game inlines them in its `build.py` from `../shell/` (never a local copy). Gam
    then deploy it the same way.
 5. Games still on stale shell copies (see Migration) will NOT get the change until migrated: do the migration first.
 
+## Finished pictures from the owner: the asset inbox
+Owner: drop files in `assets-inbox/<game-slug>/`, run `python3 games-src/scripts/ingest-assets.py` (`--check` = dry run), tell the orchestrator.
+Orchestrator: run the ingest (it also runs `wiring-status.py` and `inbox-report.py`), read the PASS/WARN lines and the per-game "needs wiring code" list
+(each name comes with the code spot to copy, see `games-src/ASSET-INBOX.md`), send one worker per game for the wiring, then ONE `build-all.py --deploy <slugs>` call
+for the affected games; commit the new `games/<slug>/media/` files with the deploy. Details: `assets-inbox/README.md`.
+
 ## After every live deploy
 After every live deploy, run `python3 games-src/scripts/add-update.py <game-id> "headline" "item" ["item"...] --check "what to try"` with 1-5 plain-words items; the shelf's What's new panel shows them to the owner.
 To-make list for the laptop (missing + facelift + look-check, with prompts): rerun `python3 games-src/scripts/next-wave.py` after look-check and after wiring-status; it writes `games/next-wave.html`, `games-src/NEXT-WAVE.md` and the `games-src/next-wave/` prompt files, and refreshes `games/status.json`.

@@ -396,6 +396,9 @@ def main():
     json.dump(dict(generated=datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%MZ'), lookcheck=have_lc,
                    items=[{k: v for k, v in it.items() if k in ('id', 'slug', 'kind', 'priority', 'stem', 'tag', 'wave')} for it in items]),
               open('games/next-wave.json', 'w', encoding='utf-8'), separators=(',', ':'))
+    # expected-asset manifest for ingest-assets.py / asset-inbox-status.py: the drop name, target path, size, ratio, transparency
+    json.dump([{k: it.get(k, '') for k in ('id', 'slug', 'kind', 'stem', 'element', 'save_as', 'repo_target', 'size', 'ratio', 'transparent', 'tag', 'priority')} for it in items],
+              open('games-src/next-wave/expected-assets.json', 'w', encoding='utf-8'), separators=(',', ':'), ensure_ascii=False)
     subprocess.run([sys.executable, 'games-src/scripts/game-status.py'], stdout=subprocess.DEVNULL)
     core = [it for it in items if not it.get('tag')]
     cnt = collections.Counter(it['kind'] for it in core)

@@ -2,25 +2,25 @@
 
 Regenerate: `python3 games-src/scripts/wiring-status.py` (also refreshes the asset viewer).
 
-Wired: 553 paintings, 47 3D models. Still to wire: 162 paintings, 12 models.
+Wired: 570 paintings, 47 3D models. Still to wire: 145 paintings, 12 models.
 
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
 | sands-of-qamar | 31 | 0 |
 | cauldron-fair | 22 | 0 |
-| tidewake | 22 | 0 |
 | hollowbough | 19 | 1 |
 | rampart-and-vine | 18 | 4 |
 | nebula-aces | 11 | 0 |
 | lantern-dive | 11 | 0 |
 | crown-city-smash | 7 | 0 |
 | shipwreck-isle | 6 | 3 |
-| sunglaze | 3 | 0 |
-| thornbound | 3 | 0 |
+| tidewake | 5 | 0 |
 | doorkick-dungeon | 3 | 4 |
-| final-approach | 2 | 0 |
+| thornbound | 3 | 0 |
+| sunglaze | 3 | 0 |
 | kaiten-kitchen | 2 | 0 |
 | short-fuse | 2 | 0 |
+| final-approach | 2 | 0 |
 
 ## sands-of-qamar
 
@@ -88,35 +88,6 @@ Wired: 553 paintings, 47 3D models. Still to wire: 162 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-panel` | a fairground parchment panel with ornate copper corners and a thin copper border, the whole centre plain and e |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of fairground parchment with a thin copper edge and a small potion green diamond at the lef |
 | Wave 4 Wave 4 kit | `ui-topbar` | a long strip of striped painted fair-booth wood, seamless left to right, empty, no text |
-
-## tidewake
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 1 Wave 1 | `board-frame` | a carved dark-wood sea-chart frame with brass corner fittings, centre empty, single object, centred, plain fla |
-| Wave 1 Wave 1 | `compass-rose` | a hand-painted brass-and-gold compass rose with eight points seen from above, no letters, single object, centr |
-| Wave 1 Wave 1 | `ring-slot` | a round brass buoy ring seen from above, centre empty, single object, centred, plain flat white background, no |
-| Wave 1 Wave 1 | `tile-water-a` | a top-down square of deep teal sea water, calm, soft wave crests, seamless tileable, no objects, no text |
-| Wave 1 Wave 1 | `tile-water-b` | a top-down square of deep teal sea water, gentle ripples and a few foam flecks, seamless tileable, no objects, |
-| Wave 1 Wave 1 | `tile-water-c` | a top-down square of deep teal sea water, rolling crests with foam lines, seamless tileable, no objects, no te |
-| Wave 1 Wave 1 | `tile-water-d` | a top-down square of deep teal sea water, a slow swirl and scattered foam, seamless tileable, no objects, no t |
-| Wave 1 Wave 1 (16:9) | `ui-nametag` | a small blank luggage tag with a rope loop and a thin brass rim, single object, centred, plain flat white back |
-| Wave 4 Wave 4 kit | `ui-bubble` | a blank speech-bubble panel made of sea-chart parchment with a brass outline and a tiny curl at one corner, si |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sea-chart parchment with a brass outline, single object, centred, p |
-| Wave 4 Wave 4 kit | `ui-button-cream` | a blank wide horizontal pill-shaped button plate about three times wider than tall, cream lacquer with a brass |
-| Wave 4 Wave 4 kit | `ui-button-go` | a blank wide horizontal pill-shaped button plate about three times wider than tall, lantern-orange lacquer wit |
-| Wave 4 Wave 4 kit | `ui-button-power` | a blank wide horizontal pill-shaped button plate about three times wider than tall, deep-teal lacquer with a b |
-| Wave 4 Wave 4 kit | `ui-drawer-head` | a strip of dark teal lacquered wood with a brass edge line, seamless left to right, empty, no text |
-| Wave 4 Wave 4 kit | `ui-iconbtn` | a blank round brass button with a teal lacquer ring, centre empty, single object, centred, plain flat white ba |
-| Wave 4 Wave 4 kit | `ui-node-boss` | a round brass medallion with a teal lacquer ring, centre blank, larger with a small crown on top, single objec |
-| Wave 4 Wave 4 kit | `ui-node-done` | a round brass medallion with a teal lacquer ring, centre blank, with a small laurel at the bottom, single obje |
-| Wave 4 Wave 4 kit | `ui-node-locked` | a round brass medallion with a teal lacquer ring, centre blank, dull and darkened with a small padlock at the  |
-| Wave 4 Wave 4 kit | `ui-node-open` | a round brass medallion with a teal lacquer ring, centre blank, bright and polished, single object, centred, p |
-| Wave 4 Wave 4 kit | `ui-panel` | a sea-chart parchment panel with ornate brass corners and a thin brass border, the whole centre plain and empt |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sea-chart parchment with a thin brass edge and a small teal lacquer diamond at the left  |
-| Wave 4 Wave 4 kit | `ui-topbar` | a long strip of dark teal lacquered wood, seamless left to right, empty, no text |
 
 ## hollowbough
 
@@ -232,25 +203,17 @@ Wired: 553 paintings, 47 3D models. Still to wire: 162 paintings, 12 models.
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sun-bleached sailcloth with a rope-lashed driftwood outline, single |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sun-bleached sailcloth with a thin rope-lashed driftwood edge and a small turquoise diam |
 
-## sunglaze
+## tidewake
 
 3D: none
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
-| Wave 1 Wave 1 | `ui-rack-frame` | a blank carved wooden tile rack with shallow square dishes, warm oak, seen from above, single object, centred, |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream glazed ceramic with a copper outline, single object, centred, |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream glazed ceramic with a thin copper edge and a small cobalt glaze diamond at the lef |
-
-## thornbound
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 | `ui-sheet` | an aged vellum sheet with a darker burnt edge and a thin crimson border line, centre plain, single object, cen |
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged vellum with a tarnished gold outline, single object, centred,  |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of aged vellum with a thin tarnished gold edge and a small crimson diamond at the left end, |
+| Wave 1 Wave 1 | `board-frame` | a carved dark-wood sea-chart frame with brass corner fittings, centre empty, single object, centred, plain fla |
+| Wave 1 Wave 1 | `ring-slot` | a round brass buoy ring seen from above, centre empty, single object, centred, plain flat white background, no |
+| Wave 1 Wave 1 (16:9) | `ui-nametag` | a small blank luggage tag with a rope loop and a thin brass rim, single object, centred, plain flat white back |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of sea-chart parchment with a brass outline, single object, centred, p |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of sea-chart parchment with a thin brass edge and a small teal lacquer diamond at the left  |
 
 ## doorkick-dungeon
 
@@ -262,14 +225,25 @@ Wired: 553 paintings, 47 3D models. Still to wire: 162 paintings, 12 models.
 | Wave 3 Wave 3 | `icon-level` | a small hand-painted icon of a gold level gem, bold, readable at 24 px, single object, centred, plain flat whi |
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged parchment with a dark iron outline, single object, centred, pl |
 
-## final-approach
+## thornbound
 
 3D: none
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
-| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream instrument-panel plastic with a brushed aluminium outline, si |
-| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream instrument-panel plastic with a thin brushed aluminium edge and a small teal diamo |
+| Wave 3 Wave 3 | `ui-sheet` | an aged vellum sheet with a darker burnt edge and a thin crimson border line, centre plain, single object, cen |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of aged vellum with a tarnished gold outline, single object, centred,  |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of aged vellum with a thin tarnished gold edge and a small crimson diamond at the left end, |
+
+## sunglaze
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 1 Wave 1 | `ui-rack-frame` | a blank carved wooden tile rack with shallow square dishes, warm oak, seen from above, single object, centred, |
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream glazed ceramic with a copper outline, single object, centred, |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream glazed ceramic with a thin copper edge and a small cobalt glaze diamond at the lef |
 
 ## kaiten-kitchen
 
@@ -288,3 +262,12 @@ Wired: 553 paintings, 47 3D models. Still to wire: 162 paintings, 12 models.
 |---|---|---|
 | Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of blueprint paper with a brass outline, single object, centred, plain |
 | Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of blueprint paper with a thin brass edge and a small copper wire diamond at the left end,  |
+
+## final-approach
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 4 Wave 4 kit | `ui-bubble-tail` | a small pointed speech-bubble tail made of cream instrument-panel plastic with a brushed aluminium outline, si |
+| Wave 4 Wave 4 kit | `ui-row` | a blank wide strip of cream instrument-panel plastic with a thin brushed aluminium edge and a small teal diamo |

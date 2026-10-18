@@ -4,6 +4,12 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Asset inbox (18 Oct 2026)
+- Owner drops finished files in `assets-inbox/<slug>/`, runs `python3 games-src/scripts/ingest-assets.py` (`--check` = dry run). See `assets-inbox/README.md`, `games-src/ASSET-INBOX.md` (per-game table + code spots).
+- Measured: of 1,048 expected pictures/poses/clips none is "just drop it" yet: 31 are prefix-only matches (shipwreck hex-*, thornbound end-/back-, Nightrun kit-*), 277 pictures and all 740 poses need wiring code (no game loads `media/poses/`). No game with a plain `<img>` and no onerror was found, so no fallback code was added and no game code changed (no deploy).
+- Next: a worker per game wires the listed code spots (copy the nearest loaded sibling), then one `build-all.py --deploy`. Pose sets need a design decision first (one shared loader).
+- `next-wave.py` now also writes `games-src/next-wave/expected-assets.json` (name, size, ratio, transparent); rerun it, then `inbox-report.py`, after the to-make list changes.
+
 ## Checks: two speeds + scenarios (13 Oct 2026) — read `PLAYBOOK.md` "Iterate fast, check once"
 - `build-all.py --quick <slug>` (phone-check + scenarios + QUICK sweep) to iterate; `--deploy <slug>` = full sweep once, then live. Numbers: `CHECK-SPEED.md`.
 - One shared http server (`scripts/gx-serve.js`, `GX_URL`) for every check; no file://. Skin never changes a box (`GXSK.audit()` in phone-check).

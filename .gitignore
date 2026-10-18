@@ -183,3 +183,7 @@ games-src/*/game/data/ai_*.txt
 games-src/*/game/data/ai.done
 /node_modules
 games-src/.sweepdir/
+
+# asset inbox: the owner's originals and 3D sources stay local; only the READMEs are tracked
+assets-inbox/*/*
+!assets-inbox/*/README.md
