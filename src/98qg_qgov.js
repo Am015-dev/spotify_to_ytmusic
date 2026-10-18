@@ -30,7 +30,7 @@ function GOV_set(on){GOV.on=on;GOV.warm=0;GOV.hold=0;GOV_reset();if(on){GOV.upW=
 // Settings → Graphics: Auto | Low | Medium | High (SET.qm). Manual = that tier, LK auto-drop off, render scale back to 1 unless Auto resolution is on.
 function GOV_pick(){if(SET.qm==='auto'){GOV_set(true);return}GOV.on=false;LK.userQ=null;LK.effQ=null;LK.drop=0;DRES.s=1;SET.q=SET.qm;applyQuality()}
 {const _ds=dresStep;dresStep=ms=>{_ds(ms);GOV.mid=ms}}
-{const _fr=frame;frame=function(now){const a=performance.now();GOV.mid=-1;_fr(now);if(GOV.mid>=0){const tl=GOV.test&&GOV.test.load;if(tl){const e=performance.now()+tl;while(performance.now()<e);}GOV_feed(GOV.mid,performance.now()-a)}}}
+{const _fr=frame;frame=function(now){const a=performance.now();GOV.mid=-1;_fr(now);if(GOV.mid>=0){const tl=GOV.test&&GOV.test.iters;if(tl){let x=0;for(let i=0;i<tl;i++)x+=Math.sqrt(i);GOV.test.x=x}GOV_feed(GOV.mid,performance.now()-a)}}}
 if(TQ)SET.qm=SET.q;else if(SET.qm==='auto'){GOV_boot();GOV_set(true)}else if(SET.qm&&SET.qm!==SET.q)GOV_pick();
 window.__gov={GOV,lvl:GOV_lvl,set:GOV_set,step:GOV_step,feed:(ms,busy,n)=>{for(let i=0;i<(n||1);i++)GOV_feed(ms,busy)},pick:GOV_pick};
 // scale-1 viewport: portrait shrinks the pedal buttons to .78 (00_page.html), so their 15 px labels read 11.7 px: 16 px keeps them ≥ 12 px
