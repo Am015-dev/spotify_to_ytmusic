@@ -3,7 +3,7 @@
 // (2) LIFE "set" pieces (LIFE_slide took 20 % of the speed per frame) and (3) traffic taps. This module: (a) solids deflect / slide along instead of a dead stop (DEST_wall),
 // (b) the small LIFE set pieces (banner, billboard, balloons, sprinkler, swings, seesaw) smash like props under the smash2 gate (DEST_set, called from lx code.js),
 // (c) 3-5 checked shortcuts per city (up to 9 candidates, each re-checked and shown only once streamed tiles are in) over open ground (parks, plazas, lawns between streets) marked with yellow brick arrows. ?dest=0 turns it OFF (default ON). Shortcuts are kept only when the road route is >= 1.7x the straight line (est. save >= 41 %, so the driven save stays >= 20 % with ~30 % wobble).
-const DEST={fr:0,hv:[],on:!/[?&]dest=0/.test(location.search),n:{slide:0,setSmash:0,setBump:0},sc:null,scI:0,scBusy:false,scGrp:null};
+const DEST={fr:0,hv:[],on:!/[?&]dest=0/.test(location.search),n:{slide:0,setSmash:0,setBump:0},sc:null,done:false,scI:0,scBusy:false,scGrp:null};
 const DEST_SET={banner:['#e8502a','#ffffff'],billboard:['#2a7ad8','#ffffff','#ffd12c'],balloons:['#e8502a','#ffd12c','#2a7ad8','#3aa04a'],sprinkler:['#2a7ad8','#bfe3ff'],swings:['#d8302a','#ffd12c','#2f3640'],seesaw:['#ffd12c','#2a7ad8']};
 // LIFE set piece (lx code.js): true = handled here (smashed or bumped), false = the old solid slide (windmill, turbine, fountain, crane, carousel, teacups stay solid landmarks)
 function DEST_set(it,sp,rr){const cols=DEST_SET[it.t];if(!DEST.on||!cols)return false;const tx=it.x-RO.x,tz=it.z-RO.z,LIFE=window.__life.LIFE;/* LIFE lives in the lx chunk's scope */
@@ -41,28 +41,34 @@ function DEST_open(ax,az,bx,bz){const L=Math.hypot(bx-ax,bz-az),dx=(bx-ax)/L,dz=
  const LF=window.__life;if(LF&&LF.cell&&LF.CELL){/* solid LIFE set pieces (crane, carousel, fountain...) near the line; the small ones smash and do not count */try{const C=LF.CELL,seen=new Set();for(let s=0;s<=L;s+=C/2){const x=ax+dx*s,z=az+dz*s,ca=Math.floor(x/C),cb=Math.floor(z/C);for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const k=(ca+da)*100000+cb+db;if(seen.has(k))continue;seen.add(k);for(const it of LF.cell(ca+da,cb+db)){if(it.c!=='set'||DEST_SET[it.t])continue;const t=clamp(((it.x-ax)*dx+(it.z-az)*dz),0,L);if(Math.hypot(ax+dx*t-it.x,az+dz*t-it.z)<it.r+4)return 0}}}}catch(e){}}
  return off/n}
 // perf-10: resumable per candidate (S.cj, S.Dd); was budget-checked per node only, so one node's 10-30 DEST_open scans ran in one frame (90+ ms in Frankfurt)
-function DEST_find(budgetMs){const N=HUB.nodes;if(!N||!DEST.on)return;const t0=performance.now(),S=DEST;S.found=S.found||[];let did=0;
- for(;S.scI<N.length;S.scI++,S.cj=-1){if(did&&performance.now()-t0>=budgetMs)break;const A=N[S.scI];if(!A||A.ab||!A.nb||!A.nb.length)continue;
-  if(S.gN!==N){S.gN=N;S.grid=DEST_grid(N)}const C=DEST_cand;
+// r8a: nodes are scanned nearest-the-player first (S.ord, sorted once), each passing candidate is published at once (DEST.sc grows, DEST_mark adds its arrows) with the 250 m spacing and the cap of 9,
+// and the scan ends (DEST.done) at 9 found or when every node is covered, freeing its tables. Athens used to publish nothing until all 22.7k nodes were scanned (never) and allocated ~9 MB/s forever.
+function DEST_find(budgetMs){const N=HUB.nodes;if(!N||!DEST.on||DEST.done)return;const t0=performance.now(),S=DEST;S.sc=S.sc||[];let did=0;
+ if(S.gN!==N){S.gN=N;S.grid=DEST_grid(N);const px=typeof RO!=='undefined'&&RO.x||0,pz=typeof RO!=='undefined'&&RO.z||0,ix=[],d2=new Float64Array(N.length);for(let i=0;i<N.length;i++){const B=N[i];if(B&&!B.ab&&B.nb&&B.nb.length){ix.push(i);d2[i]=(B.x-px)*(B.x-px)+(B.z-pz)*(B.z-pz)}}
+  ix.sort((p,q)=>d2[p]-d2[q]);S.ord=Int32Array.from(ix);S.seen=new Uint8Array(N.length);S.scI=0;S.cj=-1}
+ for(;S.scI<S.ord.length;S.scI++,S.cj=-1){if(did&&performance.now()-t0>=budgetMs)return;const ai=S.ord[S.scI],A=N[ai],C=DEST_cand;
   if(!(S.cj>=0)){S.cj=0;S.Dd=false;C.length=0;const ca=Math.floor(A.x/130),cb=Math.floor(A.z/130);
-   for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const L=S.grid.get((ca+da)*100000+cb+db);if(L)for(let t=0;t<L.length;t++)if(L[t]>S.scI)C.push(L[t])}C.sort((p,q)=>p-q)}
+   for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const L=S.grid.get((ca+da)*100000+cb+db);if(L)for(let t=0;t<L.length;t++)if(L[t]!==ai&&!S.seen[L[t]])C.push(L[t])}}
   for(;S.cj<C.length;S.cj++){if(did&&performance.now()-t0>=budgetMs)return;const j=C[S.cj],B=N[j];if(!B||B.ab||!B.nb||!B.nb.length)continue;const dx=B.x-A.x,dz=B.z-A.z;if(Math.abs(dx)>130||Math.abs(dz)>130)continue;const L=Math.hypot(dx,dz);if(L<60||L>130)continue;
-   if(!S.Dd){DEST_dij(N,S.scI,L*2.2);S.Dd=true}did++;const R=DEST_dget(DEST_DJ,j);if(R==null||R<L*1.7)continue;const o=DEST_open(A.x,A.z,B.x,B.z);if(!o)continue;
-   S.found.push({a:{x:A.x,z:A.z},b:{x:B.x,z:B.z},len:Math.round(L),road:Math.round(R),save:+(1-L/R).toFixed(2)})}}
- if(S.scI>=N.length&&!S.sc){S.found.sort((p,q)=>q.save*Math.min(q.len,140)-p.save*Math.min(p.len,140));const pick=[];for(const c of S.found){if(pick.length>=9)break;if(pick.every(p=>Math.hypot(p.a.x-c.a.x,p.a.z-c.a.z)>250&&Math.hypot(p.b.x-c.b.x,p.b.z-c.b.z)>250))pick.push(c)}S.sc=pick;DEST_mark(pick)}}
-let DEST_texM=null;
+   if(!S.Dd){DEST_dij(N,ai,L*2.2);S.Dd=true}did++;const R=DEST_dget(DEST_DJ,j);if(R==null||R<L*1.7)continue;
+   if(!S.sc.every(p=>Math.hypot(p.a.x-A.x,p.a.z-A.z)>250&&Math.hypot(p.b.x-B.x,p.b.z-B.z)>250))continue;/* spacing first: it is far cheaper than DEST_open */
+   if(!DEST_open(A.x,A.z,B.x,B.z))continue;
+   const c={a:{x:A.x,z:A.z},b:{x:B.x,z:B.z},len:Math.round(L),road:Math.round(R),save:+(1-L/R).toFixed(2)};S.sc.push(c);DEST_mark([c]);if(S.sc.length>=9){S.scI=S.ord.length;S.cj=-1;break}}
+  S.seen[ai]=1}
+ S.done=true;S.grid=S.ord=S.seen=null;DEST_cand.length=0}
+let DEST_texM=null,DEST_geo=null;
 function DEST_mark(list){if(!list.length)return;if(!DEST_texM){const[pc,pg]=cv(64,128);pg.strokeStyle='#ffd12c';pg.lineWidth=11;pg.lineCap='round';pg.lineJoin='round';for(let k=0;k<2;k++){pg.beginPath();pg.moveTo(10,104-k*44);pg.lineTo(32,66-k*44);pg.lineTo(54,104-k*44);pg.stroke()}
   const t=tex(pc);KEEP_TEX.add(t);DEST_texM=new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false,toneMapped:false,color:new THREE.Color(1.6,1.3,.5)})}
- const grp=DEST.scGrp=new THREE.Group(),geo=new THREE.PlaneGeometry(4.2,7.4);
+ let grp=DEST.scGrp;if(!grp){grp=DEST.scGrp=new THREE.Group();HUB.grp.add(grp)}const geo=DEST_geo||(DEST_geo=new THREE.PlaneGeometry(4.2,7.4));
  for(const c of list){c.mk=[];const L=Math.hypot(c.b.x-c.a.x,c.b.z-c.a.z),ux=(c.b.x-c.a.x)/L,uz=(c.b.z-c.a.z)/L,h=Math.atan2(ux,uz);
   for(const[o,dir]of[[c.a,1],[c.b,-1]])for(let k=0;k<3;k++){const x=o.x+ux*dir*(5+k*6),z=o.z+uz*dir*(5+k*6),m=new THREE.Mesh(geo,DEST_texM);m.rotation.order='YXZ';m.rotation.set(-Math.PI/2,h+(dir>0?0:Math.PI)+Math.PI,0);m.position.set(x,groundAt(x,z,99)+.18,z);m.renderOrder=3;m.visible=false;grp.add(m);c.mk.push(m)}
   for(let s=14;s<L-12;s+=9){const x=c.a.x+ux*s,z=c.a.z+uz*s,m=new THREE.Mesh(new THREE.BoxGeometry(.8,.28,.8),DEST_texM);m.position.set(x,groundAt(x,z,99)+.2,z);m.visible=false;grp.add(m);c.mk.push(m)}}
- HUB.grp.add(grp)}
+ }
 // streamed city tiles add colliders near the player: a shortcut is re-checked once the car is within 350 m, and dropped (markers hidden) if something now blocks it
 function DEST_check(c){if(c.ok!=null)return c.ok;c.ok=!!DEST_open(c.a.x,c.a.z,c.b.x,c.b.z);for(const m of c.mk||[])m.visible=c.ok;return c.ok}
-function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(DEST.scGrp);DEST.scGrp=null;DEST.sc=null;DEST.found=null;DEST.scI=0;DEST.cj=-1;DEST.N=HUB.nodes;DEST.gN=null}
+function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(DEST.scGrp);DEST.scGrp=null;DEST.sc=null;DEST.done=false;DEST.grid=DEST.ord=DEST.seen=null;DEST.scI=0;DEST.cj=-1;DEST.N=HUB.nodes;DEST.gN=null}
 // perf-12: the one-off shortcut scan (22.7k nodes in Athens) ran 4 ms every frame for ~35 s; its probes run Maglev-compiled and box every double (~50 MB/s of garbage),
 // so it gets 1.5 ms a frame (~90 s in Athens, same result; GO/tests call DEST_find(1e9))
 const DEST_BUDGET=1.5;
-const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.sc){try{DEST_find(DEST_BUDGET)}catch(e){DEST.sc=[];console.warn('DEST',e)}}else if(DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350){DEST_check(c);break}};   /* perf-10: one re-check per 20 frames (was all of them at once) */
+const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.done){try{DEST_find(DEST_BUDGET)}catch(e){DEST.sc=DEST.sc||[];DEST.done=true;console.warn('DEST',e)}}if(DEST.sc&&DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350){DEST_check(c);break}};   /* perf-10: one re-check per 20 frames (was all of them at once) */
 smashCheck=(f=>function(dt){DEST_step(dt);return f.apply(this,arguments)})(smashCheck);
