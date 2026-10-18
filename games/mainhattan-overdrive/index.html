@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.98',date:'18 Oct 2026',items:[{t:'FIXED',s:'River race: rivals brake in time for the last corner instead of overshooting.'},{t:'FIXED',s:'Westend race: rivals follow the streets instead of trying to drive through buildings.'}]},
 {v:'v90m-beta.97',date:'18 Oct 2026',items:[{t:'CHANGED',s:'Less lag: thousands of far-away street props are no longer drawn.'},{t:'CHANGED',s:'Smash debris costs nothing when nothing is breaking.'}]},
 {v:'v90m-beta.96',date:'18 Oct 2026',items:[{t:'FIXED',s:'GP rivals no longer get stuck circling at a building: they finish every race.'},{t:'FIXED',s:'River race: the boat no longer stalls on the slipway.'},{t:'FIXED',s:'Rivals keep their speed when cars bump them in a race.'},{t:'CHANGED',s:'Less lag: far-away city props and road markings are no longer drawn.'}]},
 {v:'v90m-beta.95',date:'18 Oct 2026',items:[{t:'FIXED',s:'Athens start: the big ochre walls over the road are gone.'},{t:'FIXED',s:'Smash debris fades out near the camera, so it no longer blocks your view in races.'},{t:'FIXED',s:'The speed gauge hides behind result screens.'},{t:'CHANGED',s:'Low quality draws fewer far-away objects.'}]},
@@ -1544,7 +1545,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"0280461b","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"04017772","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"c5981e20","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"fa921f39"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"2308a0e8","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"c5981e20","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"fa921f39"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -13806,10 +13807,10 @@ const TK={on:(()=>{try{return new URLSearchParams(location.search).get('tk1')!==
 const TK_C={id:'tk_rossi',key:'rival:ROSSI',kind:'rival',ai:['ROSSI'],p:'ROSSI',name:'Westend Split',nA:'Anlagenring',nB:'Neue Mainzer Str.',
   start:[[1900,1005],[1304,862],[760,560]],A:[[760,560],[902,333],[880,170],[660,-33],[573,-310]],B:[[760,560],[700,560],[619,348],[616,125],[608,-105],[573,-310]],fin:[[573,-310],[922,-573],[1338,-792],[1748,-1020],[2200,-1150]],
   ramps:[['start',.5,22,5,16],['B',.45,20,5,14],['fin',.45,26,8,16]],items:[['start',.3],['start',.7],['A',.35],['A',.7],['B',.25],['B',.7],['fin',.25],['fin',.7]],boost:{r:'A',f:[.15,.5,.85]}};
-function tkLeg(a,b){let best=null;for(let si=0;si<CITY_S.length;si++){const S=CITY_S[si];if(S.r.cls==='ped'||S.r.cls==='quay')continue;let ia=-1,da=40,ib=-1,db=40;
+function tkLeg(a,b,R0){const R=R0||40;let best=null;for(let si=0;si<CITY_S.length;si++){const S=CITY_S[si];if(S.r.cls==='ped'||S.r.cls==='quay')continue;let ia=-1,da=R,ib=-1,db=R;
     for(let i=0;i<S.pts.length;i++){const p=S.pts[i],d1=Math.hypot(p.x-a[0],p.z-a[1]),d2=Math.hypot(p.x-b[0],p.z-b[1]);if(d1<da){da=d1;ia=i}if(d2<db){db=d2;ib=i}}
     if(ia>=0&&ib>=0&&(!best||da+db<best[0]))best=[da+db,S,ia,ib]}
-  if(!best)return[a,b];const[,S,ia,ib]=best,st=ib>ia?3:-3,o=[a];for(let i=ia;st>0?i<ib:i>ib;i+=st)o.push([S.pts[i].x,S.pts[i].z]);o.push(b);return o}
+  if(!best)return R<75&&!R0?tkLeg(a,b,75):[a,b];/* races-5: Westend A (660,-33)->(573,-310) had no street within 40 m of both ends: a 290 m straight jump through the city, the bot stalled on a building at (630,-140) */const[,S,ia,ib]=best,st=ib>ia?3:-3,o=[a];for(let i=ia;st>0?i<ib:i>ib;i+=st)o.push([S.pts[i].x,S.pts[i].z]);o.push(b);return o}
 const tkCat=(...L)=>{const o=[];for(const P of L)for(const p of P)if(!o.length||Math.hypot(p[0]-o[o.length-1][0],p[1]-o[o.length-1][1])>2)o.push(p);return o};
 function tkChain(W){const o=[];for(let k=1;k<W.length;k++)for(const p of tkLeg(W[k-1],W[k]))if(!o.length||Math.hypot(p[0]-o[o.length-1][0],p[1]-o[o.length-1][1])>2)o.push(p);return o}
 function tkLen(P){let s=0;for(let i=1;i<P.length;i++)s+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);return s}
@@ -13890,7 +13891,7 @@ function tkItemMesh(){const M=tkArchMats(),G=new THREE.Group(),b=new THREE.Mesh(
   for(const r of[0,Math.PI/2,Math.PI,-Math.PI/2]){const q=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.MeshBasicMaterial({map:t,transparent:true}));q.position.set(Math.sin(r)*1.32,0,Math.cos(r)*1.32);q.rotation.y=r;G.add(q)}
   for(const sx of[-.65,.65])for(const sz of[-.65,.65]){const s=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.35,10),M.box);s.position.set(sx,1.47,sz);G.add(s)}return G}
 const TK_ITEMS=['TURBO','BRICK BLAST','SHIELD'];
-function tkStart(m,C0){const C=C0||tkCourseOf(m)||TK_C;TK.C=C;const Gm=tkGeoOf(C),e={id:C.id,name:C.name,len:Gm.lenA,path:Gm.pA,ai:C.ai||[C.p]};const sp={tk:1,C,e,m,t:0,cd:3,ai:[],objs:[],ramps0:RO.ramps.length,done:false,gi:0,items:[],pads:[],shieldT:0,hitCd:0,warn:null,fx:[],jumps:{A:0,B:0}};
+function tkStart(m,C0){const C=C0||tkCourseOf(m)||TK_C;TK.C=C;/* races-5: a race starts with clean stuck/hop state (stuck and hop windows plus nudge grace carry over from the previous run) */RO.stkT=RO.stkW=0;RO.stkX=null;RO.stkP=false;RO.npT=RO.npW=0;RO.npX=null;RO.npHop=0;RO.stkG=0;RO.nudgeT=0;const Gm=tkGeoOf(C),e={id:C.id,name:C.name,len:Gm.lenA,path:Gm.pA,ai:C.ai||[C.p]};const sp={tk:1,C,e,m,t:0,cd:3,ai:[],objs:[],ramps0:RO.ramps.length,done:false,gi:0,items:[],pads:[],shieldT:0,hitCd:0,warn:null,fx:[],jumps:{A:0,B:0}};
   if(RO.sp)sprintEnd();TK.C=C;RO.sp=sp;RO.pop=null;RO.card=null;$('#roamCard').hidden=true;
   const g0=tkAt(Gm.seg.start,.12),g1=tkAt(Gm.seg.start,.97),g2=tkAt(Gm.seg.fin,.04),g3=tkAt(Gm.seg.fin,.5),g4=tkAt(Gm.seg.fin,.99);
   sp.G=[[g0,Gm.Ls*.12],[g1,Gm.Ls*.97],[g2,Gm.Ls+Gm.LA+Gm.Lf*.04],[g3,Gm.Ls+Gm.LA+Gm.Lf*.5],[g4,Gm.lenA-2]].map(([q,cum],i,a)=>{const fin=i===a.length-1,mesh=tkArch(q.x,q.z,q.h,fin);RO.grp.add(mesh);sp.objs.push(mesh);return{x:q.x,z:q.z,h:q.h,cum,mesh}});
