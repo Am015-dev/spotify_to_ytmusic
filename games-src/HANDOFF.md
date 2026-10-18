@@ -575,3 +575,11 @@ Cause of the extra boss time: damage above the cap was thrown away (the bot's da
 - Tab: ten sections with counters, filters, detail card (dark/light), PREVIEW IN SANDBOX (weapon, fusion, ship armed/unarmed, explosion, enemy, zoo enemy, boss, pickup, on-foot pose canvas), WIRING view (page text scan: wired / hook only / not wired).
 - FXW contract (effect pictures, if that module exists): labassets sets `FXW.preview=true` only inside the Lab with the PREVIEW PLACEHOLDERS switch on, false otherwise and on leaving the Lab; it wraps `FXW.pic(key)` so a missing real picture returns the placeholder file `fx-<key>.webp` while preview is true. The module may also read `FXW.preview` itself. FXW was not on the branch when this was written.
 - Known, not mine: ret-title-test fails 3 menu checks for "clear stage 3 to unlock" (11.7 px, from foot.js).
+
+## Nightrun boss movesets (VARIETY B, flag RET.bossmoves, `?bossmoves=0` = old lists; 18 Oct 2026)
+- `games-src/nightrun/parts/bossmoves.js`: table `BMT` at the top (boss id -> 3 phase lists, owner-editable), 45 verbs (`VB`), hazard engine (bands, columns, circles, beams, walls, wells), counters (boss shielded until: shoot lock / backup / tentacles / gold core / vent, survive the drops, fly through the signals, hide behind the stalls, get above or below, graze to overload).
+- Hooks: b.js `bossBeat` (lazy `BMV.init`, `BMV.beat` instead of the old switch), `bossNext`, `bossShot`; c.js one draw line; build.py after armour.js. armour.js still owns HP, cap, phases, last stand.
+- Tests: `bossmoves-test.js` (table, every fight phone+desktop, telegraph >= 0.5 s, free disc >= 64 px, caps, ten counters, flag off), `bossmoves-audit.js` (overlap matrix, numbers, idle, bot on vs off). balance-test's bot now adds `BMV.cost` (sees telegraphed hazards) and aims at `BMV.target()`.
+- Bot, Normal boss stages, 2 runs x mid/late: 28-30/40 cleared vs 28-31/40 before (noise). Weak: Hoplite 1/4 and Schranke 2/4 in the last run (old 4/4); Talos rose 0/4 -> 2/4.
+- Known, not mine: boss-check's sheet-art step needs scipy (not installed in the cloud box); scale3-test's Legend 20/30/40 band fails with the flag off too (0/0/33).
+- The idle checks die before the boss arrives (waves kill the idle ship first), so they don't prove an idle ship dies to the boss itself.
