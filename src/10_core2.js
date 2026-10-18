@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.111',date:'18 Oct 2026',items:[{t:'FIXED',s:'Athens first minute: far less memory churn, so about half as many stutters (47 to 24 in our phone test).'}]},
 {v:'v90m-beta.110',date:'18 Oct 2026',items:[{t:'NEW',s:'Every city race is now a pack of 5: four rivals fight for the lead with real overtakes.'},{t:'FIXED',s:'Athens first minute: the big 0.25 s freeze is gone and stutters are roughly halved.'},{t:'FIXED',s:'Smashing props works again.'}]},
 {v:'v90m-beta.109',date:'18 Oct 2026',items:[{t:'FIXED',s:'Frankfurt: the Vex Kaiser finale no longer crashes when it starts.'},{t:'FIXED',s:'Smoother start: more graphics effects are prepared on the loading screen, and the smoothness report no longer causes a hitch (Frankfurt stutters in the first minute halved).'}]},
 {v:'v90m-beta.108',date:'18 Oct 2026',items:[{t:'FIXED',s:'First minute is smoother: new city blocks are placed a little each frame instead of freezing the game (Athens worst hitch 0.28 s to about 0.09 s).'},{t:'CHANGED',s:'Map, minimap and shortcut set-up now happen on the loading screen; Graphics Auto only changes sharpness in the first minute.'}]},
