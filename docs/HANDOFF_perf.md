@@ -96,3 +96,9 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 2. Gate on BUILT page: unit 0 FAIL; TAG life1,xf1,terrain,smash2,cam,mem,perf5 54/56, only known reds (fra mem/stable, xf1/grass); perf5/compact passes at q=low (test default).
 3. A/B NOT measured: out of time (3-run both cities x high/low not done; Athens partial runs hit the time limit). Expectation: high = trunk minus ~1.8 ms/frame and no 460 ms PC_add spikes; low = perf-7 WIP numbers.
 4. Next: run tools/perf1/tFrame.js (HEAP=1 Q=high|low CITY=ath|fra RACE=0) trunk vs landed, 3 runs each.
+
+## perf-9 (2026-10-18, alex/perf9-wip): NOT on trunk, NOT gated, NOT measured
+1. Scratch/no-closure cuts: cityAt(out) used by ART7_rd; athRoadD(out) + OC_roadE junction loop without spread/array; RD_road/RD_cityNear without closures or Map iteration.
+2. Not done: DEST_open, allocation-sampling rank, build, unit, TAG gate, 3-run A/B Ath+Fra, od-int2 merge. LF_tileG skipped on purpose (perf-8 lane).
+3. Blocker: tFrame.js HEAP=1 ran over 30 min here (SwiftShader) without finishing. Use run_in_background with a long timeout, SECS<=300, one run at a time.
+4. Next: baseline vs wip, SECS=300 HEAP=1 RACE=0, 3 runs Ath+Fra; then DEST_open; then gate, merge, push.
