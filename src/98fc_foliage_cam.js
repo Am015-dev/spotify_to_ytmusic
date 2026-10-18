@@ -47,7 +47,7 @@ function FCG_build(g,e,t0){const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0
   e.done=true;FCG.st.built++;FCG.st.tris+=e.n}
 // queue meshes whose world box is within 80 m of the camera->car segment; build ≤ FCG.ms per frame (nearest first)
 function FCG_work(c,o){const t0=performance.now();FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(o).expandByScalar(80);
-  for(const m of FC.occ){if(m.isInstancedMesh||m.isBatchedMesh||!FCG_ok(m.geometry))continue;const g=m.geometry,e=FCG_get(g);if(e.done)continue;if(!g.boundingBox)g.computeBoundingBox();
+  for(const m of FC.occ){if(m.isInstancedMesh||m.isBatchedMesh||!FCG_ok(m.geometry))continue;const g=m.geometry,e=FCG_get(g);if(e.done)continue;if(!g.boundingBox){if(performance.now()-t0>FCG.ms)break;GFX_bbox(g)}   // perf-10: boxes inside the budget (one frame boxed every new occluder)
     if(!FCG.bx.copy(g.boundingBox).applyMatrix4(m.matrixWorld).intersectsBox(FCG.sg))continue;FCG_build(g,e,t0);if(performance.now()-t0>FCG.ms)break}
   FCG.st.ms+=performance.now()-t0}
 // distance (from c) of the hit nearest the far end on the segment c -> c+dir*far, -1 = no hit, null = use three's raycast for this mesh
