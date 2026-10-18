@@ -7,7 +7,7 @@ Generated 2026-10-18 by `python3 games-src/scripts/next-wave.py` (rerun after lo
 - Music and sound cues: `games-src/next-wave/music/<game>/cues-wave6.json` (2 versions a and b of each, no vocals).
 - Every picture prompt: our own names, no text, letters or numbers in the picture; a UI piece is one object on a plain flat white background. Make at 1024 px or larger; we crop and convert.
 
-**Total 172**: paintings 163, 3D source paintings 0, music/sound 8, video 1.
+**Total 296**: paintings 287, 3D source paintings 0, music/sound 8, video 1.
 
 Plus 1130 wave 7 items (pose sets, 3D variety, art variety): see `games-src/VARIETY-PLAN.md` and the page.
 
@@ -329,7 +329,7 @@ Style block (in front of every picture prompt): Hand-painted gouache illustratio
 - Size/ratio: 1024x1024, ratio 0.51
 - Prompt: Hand-painted gouache illustration for a calm co-operative deep-sea card game, deep blue and teal water, a small warm golden lantern glow as the only strong warm light, soft rim light, visible gentle brush texture on matte paper, slightly wobbly dark navy ink outline, simple readable silhouette that still works at 40 pixels, rich but not neon colours, centred, plenty of margin, no text. a single ttl bg picture, game art for a board game, no text
 
-## Mainhattan Nightrun (`mainhattan-nightrun`): 92
+## Mainhattan Nightrun (`mainhattan-nightrun`): 216
 
 Style block (in front of every picture prompt): Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers
 
@@ -552,6 +552,998 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Save as: `kit-shd.webp` (laptop) -> `games/mainhattan-nightrun/media/kit-shd.webp`
 - Size/ratio: 128x128, ratio 1:1
 - Prompt: Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers. Shield Plating: a cyan shield made of layered armour plates, no text, letters or numbers
+
+### foot/bg-far: On-foot street stage: foot/bg-far
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bg-far.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bg-far.webp`
+- Size/ratio: 2048x1024, ratio 2:1, transparent (flat white background, we key it)
+- Note: 2:1 landscape, transparent. a distant skyline of dark purple tower silhouettes with many small lit windows (cyan and amber), antenna lights, haze at the base; the sky above the towers is flat plain white (to be cut out); the towers stand on the bottom edge. Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2:1 picture; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Side-view background layer for a run-and-gun game, 2048x1024 landscape, seamless horizontal tiling: a distant skyline of dark purple tower silhouettes with many small lit windows (cyan and amber), antenna lights, haze at the base; the sky above the towers is flat plain white (to be cut out); the towers stand on the bottom edge. No characters, no text, no letters., single object, centred, plain flat white background, no shadow
+
+### foot/bg-floor: On-foot street stage: foot/bg-floor
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bg-floor.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bg-floor.webp`
+- Size/ratio: 2048x1024, ratio 2:1, transparent (flat white background, we key it)
+- Note: 2:1 landscape, transparent. the street surface as a flat strip at the very bottom fifth: dark wet asphalt with a pavement edge, dashed road markings and neon puddle reflections in magenta and teal; the upper four fifths are flat plain white (to be cut out). Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2:1 picture; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Side-view background layer for a run-and-gun game, 2048x1024 landscape, seamless horizontal tiling: the street surface as a flat strip at the very bottom fifth: dark wet asphalt with a pavement edge, dashed road markings and neon puddle reflections in magenta and teal; the upper four fifths are flat plain white (to be cut out). No characters, no text, no letters., single object, centred, plain flat white background, no shadow
+
+### foot/bg-mid: On-foot street stage: foot/bg-mid
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bg-mid.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bg-mid.webp`
+- Size/ratio: 2048x1024, ratio 2:1, transparent (flat white background, we key it)
+- Note: 2:1 landscape, transparent. mid-distance city buildings, dark violet with big neon signs in magenta, cyan and amber, lit windows, fire escapes; everything above the roofs is flat plain white (to be cut out); buildings stand on the bottom edge. Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2:1 picture; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Side-view background layer for a run-and-gun game, 2048x1024 landscape, seamless horizontal tiling: mid-distance city buildings, dark violet with big neon signs in magenta, cyan and amber, lit windows, fire escapes; everything above the roofs is flat plain white (to be cut out); buildings stand on the bottom edge. No characters, no text, no letters., single object, centred, plain flat white background, no shadow
+
+### foot/bg-near: On-foot street stage: foot/bg-near
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bg-near.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bg-near.webp`
+- Size/ratio: 2048x1024, ratio 2:1, transparent (flat white background, we key it)
+- Note: 2:1 landscape, transparent. foreground street props along the bottom edge only: lamp posts with warm glowing lamps, rubbish bins, rolled-down shop shutters with neon trim, wet reflections; the rest of the picture is flat plain white (to be cut out). Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2:1 picture; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Side-view background layer for a run-and-gun game, 2048x1024 landscape, seamless horizontal tiling: foreground street props along the bottom edge only: lamp posts with warm glowing lamps, rubbish bins, rolled-down shop shutters with neon trim, wet reflections; the rest of the picture is flat plain white (to be cut out). No characters, no text, no letters., single object, centred, plain flat white background, no shadow
+
+### foot/bg-sky: On-foot street stage: foot/bg-sky
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bg-sky.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bg-sky.webp`
+- Size/ratio: 2048x1024, ratio 2:1, transparent (flat white background, we key it)
+- Note: 2:1 landscape, opaque. the night sky over a rainy cyberpunk Frankfurt: dark violet at the top to magenta-teal haze at the horizon, low rain clouds, a pale pink moon, a few stars; NO buildings, NO ground; the bottom edge glows magenta. Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2:1 picture; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Side-view background layer for a run-and-gun game, 2048x1024 landscape, seamless horizontal tiling: the night sky over a rainy cyberpunk Frankfurt: dark violet at the top to magenta-teal haze at the horizon, low rain clouds, a pale pink moon, a few stars; NO buildings, NO ground; the bottom edge glows magenta. No characters, no text, no letters., single object, centred, plain flat white background, no shadow
+
+### foot/bruiser-crouch: On-foot street stage: foot/bruiser-crouch
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-crouch.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-crouch.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/bruiser-crouch-shoot: On-foot street stage: foot/bruiser-crouch-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-crouch-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-crouch-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: crouched low and aiming the weapon straight forward, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), crouched low and aiming the weapon straight forward, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/bruiser-die: On-foot street stage: foot/bruiser-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/bruiser-fall: On-foot street stage: foot/bruiser-fall
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-fall.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-fall.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/bruiser-hit: On-foot street stage: foot/bruiser-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), flinching from a hit: head and chest thrown back, arms flung out, pained face. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/bruiser-idle: On-foot street stage: foot/bruiser-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), standing relaxed in a ready stance, weapon held low, weight on both feet. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/bruiser-jump: On-foot street stage: foot/bruiser-jump
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-jump.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-jump.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: jumping up, knees tucked, one arm up, weapon arm forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), jumping up, knees tucked, one arm up, weapon arm forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/bruiser-melee: On-foot street stage: foot/bruiser-melee
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-melee.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-melee.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: swinging the weapon in a hard forward attack, body lunging, motion trail. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), swinging the weapon in a hard forward attack, body lunging, motion trail. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/bruiser-run-a: On-foot street stage: foot/bruiser-run-a
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-run-a.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-run-a.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/bruiser-run-b: On-foot street stage: foot/bruiser-run-b
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-run-b.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-run-b.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/bruiser-shoot: On-foot street stage: foot/bruiser-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/bruiser-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bruiser-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Bruiser, heavy, pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Bruiser, heavy), punching the cyber arm straight forward, a cyan shockwave ring at the fist. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/drone-die: On-foot street stage: foot/drone-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/drone-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/drone-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Drone, hover gun, pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Drone, hover gun), exploding in a fireball, pieces and sparks flying, falling. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/drone-hit: On-foot street stage: foot/drone-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/drone-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/drone-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Drone, hover gun, pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Drone, hover gun), flashing white from a hit, rotors wobbling. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/drone-idle: On-foot street stage: foot/drone-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/drone-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/drone-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Drone, hover gun, pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Drone, hover gun), hovering in place, rotors blurred, red eye glowing. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/drone-shoot: On-foot street stage: foot/drone-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/drone-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/drone-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Drone, hover gun, pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Drone, hover gun), firing its gun forward, muzzle flash, eye flaring white. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-crouch: On-foot street stage: foot/grunt-crouch
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-crouch.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-crouch.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-crouch-shoot: On-foot street stage: foot/grunt-crouch-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-crouch-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-crouch-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: crouched low and aiming the weapon straight forward, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), crouched low and aiming the weapon straight forward, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-die: On-foot street stage: foot/grunt-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-fall: On-foot street stage: foot/grunt-fall
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-fall.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-fall.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-hit: On-foot street stage: foot/grunt-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), flinching from a hit: head and chest thrown back, arms flung out, pained face. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-idle: On-foot street stage: foot/grunt-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), standing relaxed in a ready stance, weapon held low, weight on both feet. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-jump: On-foot street stage: foot/grunt-jump
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-jump.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-jump.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: jumping up, knees tucked, one arm up, weapon arm forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), jumping up, knees tucked, one arm up, weapon arm forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-melee: On-foot street stage: foot/grunt-melee
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-melee.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-melee.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: swinging the weapon in a hard forward attack, body lunging, motion trail. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), swinging the weapon in a hard forward attack, body lunging, motion trail. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-run-a: On-foot street stage: foot/grunt-run-a
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-run-a.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-run-a.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-run-b: On-foot street stage: foot/grunt-run-b
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-run-b.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-run-b.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/grunt-shoot: On-foot street stage: foot/grunt-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/grunt-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/grunt-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Grunt, street thug, pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Grunt, street thug), hurling the steel pipe forward with a straight throwing arm (pipe in mid-air in front of the hand). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-crouch: On-foot street stage: foot/gunman-crouch
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-crouch.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-crouch.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-crouch-shoot: On-foot street stage: foot/gunman-crouch-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-crouch-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-crouch-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: crouched low and aiming the weapon straight forward, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), crouched low and aiming the weapon straight forward, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-die: On-foot street stage: foot/gunman-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-fall: On-foot street stage: foot/gunman-fall
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-fall.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-fall.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-hit: On-foot street stage: foot/gunman-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), flinching from a hit: head and chest thrown back, arms flung out, pained face. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-idle: On-foot street stage: foot/gunman-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), standing relaxed in a ready stance, weapon held low, weight on both feet. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-jump: On-foot street stage: foot/gunman-jump
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-jump.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-jump.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: jumping up, knees tucked, one arm up, weapon arm forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), jumping up, knees tucked, one arm up, weapon arm forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-melee: On-foot street stage: foot/gunman-melee
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-melee.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-melee.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: swinging the weapon in a hard forward attack, body lunging, motion trail. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), swinging the weapon in a hard forward attack, body lunging, motion trail. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-run-a: On-foot street stage: foot/gunman-run-a
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-run-a.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-run-a.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-run-b: On-foot street stage: foot/gunman-run-b
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-run-b.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-run-b.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/gunman-shoot: On-foot street stage: foot/gunman-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/gunman-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/gunman-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Gunman, gang shooter, pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Gunman, gang shooter), standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-crouch: On-foot street stage: foot/kai-crouch
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-crouch.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-crouch.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-crouch-shoot: On-foot street stage: foot/kai-crouch-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-crouch-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-crouch-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: crouched low and aiming the weapon straight forward, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), crouched low and aiming the weapon straight forward, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-die: On-foot street stage: foot/kai-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-fall: On-foot street stage: foot/kai-fall
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-fall.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-fall.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-hit: On-foot street stage: foot/kai-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), flinching from a hit: head and chest thrown back, arms flung out, pained face. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-idle: On-foot street stage: foot/kai-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), standing relaxed in a ready stance, weapon held low, weight on both feet. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-jump: On-foot street stage: foot/kai-jump
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-jump.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-jump.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: jumping up, knees tucked, one arm up, weapon arm forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), jumping up, knees tucked, one arm up, weapon arm forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-melee: On-foot street stage: foot/kai-melee
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-melee.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-melee.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: swinging the weapon in a hard forward attack, body lunging, motion trail. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), swinging the weapon in a hard forward attack, body lunging, motion trail. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-run-a: On-foot street stage: foot/kai-run-a
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-run-a.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-run-a.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-run-b: On-foot street stage: foot/kai-run-b
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-run-b.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-run-b.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/kai-shoot: On-foot street stage: foot/kai-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/kai-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/kai-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Kai, the courier (hero), pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Kai, the courier (hero)), standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-crouch: On-foot street stage: foot/knife-crouch
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-crouch.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-crouch.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-crouch-shoot: On-foot street stage: foot/knife-crouch-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-crouch-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-crouch-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: crouched low and aiming the weapon straight forward, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), crouched low and aiming the weapon straight forward, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-die: On-foot street stage: foot/knife-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-fall: On-foot street stage: foot/knife-fall
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-fall.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-fall.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-hit: On-foot street stage: foot/knife-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), flinching from a hit: head and chest thrown back, arms flung out, pained face. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-idle: On-foot street stage: foot/knife-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), standing relaxed in a ready stance, weapon held low, weight on both feet. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-jump: On-foot street stage: foot/knife-jump
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-jump.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-jump.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: jumping up, knees tucked, one arm up, weapon arm forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), jumping up, knees tucked, one arm up, weapon arm forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-melee: On-foot street stage: foot/knife-melee
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-melee.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-melee.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: swinging the weapon in a hard forward attack, body lunging, motion trail. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), swinging the weapon in a hard forward attack, body lunging, motion trail. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-run-a: On-foot street stage: foot/knife-run-a
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-run-a.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-run-a.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-run-b: On-foot street stage: foot/knife-run-b
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-run-b.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-run-b.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/knife-shoot: On-foot street stage: foot/knife-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/knife-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/knife-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Knife, gang runner, pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Knife, gang runner), throwing the knife forward with a straight throwing arm (knife in mid-air in front of the hand). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/mech-die: On-foot street stage: foot/mech-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/mech-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/mech-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Mech, walker, pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Mech, walker), exploding, torso breaking apart, fireball and sparks. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/mech-hit: On-foot street stage: foot/mech-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/mech-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/mech-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Mech, walker, pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Mech, walker), flashing white from a hit, staggered. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/mech-idle: On-foot street stage: foot/mech-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/mech-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/mech-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Mech, walker, pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Mech, walker), standing, slight sway, cannon lowered. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/mech-shoot: On-foot street stage: foot/mech-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/mech-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/mech-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Mech, walker, pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Mech, walker), firing the arm cannon forward, big muzzle flash, braced legs. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/pk-bomb: On-foot street stage: foot/pk-bomb
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-bomb.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-bomb.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a round black bomb with a lit fuse on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a round black bomb with a lit fuse on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-damage: On-foot street stage: foot/pk-damage
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-damage.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-damage.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a red damage-boost fist or flame glyph on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a red damage-boost fist or flame glyph on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-heal: On-foot street stage: foot/pk-heal
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-heal.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-heal.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a green health cross on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a green health cross on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-magnet: On-foot street stage: foot/pk-magnet
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-magnet.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-magnet.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a purple horseshoe magnet on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a purple horseshoe magnet on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-shield: On-foot street stage: foot/pk-shield
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-shield.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-shield.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a glowing blue energy shield badge on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a glowing blue energy shield badge on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-slow: On-foot street stage: foot/pk-slow
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-slow.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-slow.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a grey-blue snail or hourglass slow-time glyph on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a grey-blue snail or hourglass slow-time glyph on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-speed: On-foot street stage: foot/pk-speed
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-speed.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-speed.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a green speed boost lightning bolt arrow on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a green speed boost lightning bolt arrow on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-weapon-arc: On-foot street stage: foot/pk-weapon-arc
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-weapon-arc.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-weapon-arc.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: an arc gun with blue lightning on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: an arc gun with blue lightning on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-weapon-flame: On-foot street stage: foot/pk-weapon-flame
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-weapon-flame.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-weapon-flame.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a flamethrower with a flame on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a flamethrower with a flame on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-weapon-hmg: On-foot street stage: foot/pk-weapon-hmg
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-weapon-hmg.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-weapon-hmg.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a heavy machine gun on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a heavy machine gun on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-weapon-rocket: On-foot street stage: foot/pk-weapon-rocket
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-weapon-rocket.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-weapon-rocket.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a rocket launcher with a rocket on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a rocket launcher with a rocket on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/pk-weapon-shotgun: On-foot street stage: foot/pk-weapon-shotgun
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/pk-weapon-shotgun.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/pk-weapon-shotgun.webp`
+- Size/ratio: 128x128, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 128x128 pickup icon, transparent, same painted look as the pk-*.webp icons: a pump shotgun on a dark round bezel with a neon rim. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single game pickup icon: a pump shotgun on a dark round gunmetal bezel with a glowing neon rim, centred, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/sc-barrel: On-foot street stage: foot/sc-barrel
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sc-barrel.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sc-barrel.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 256x256 street prop, transparent, side view, base on the bottom edge: a dented green chemical barrel with a hazard stripe. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single street prop for a side-view game: a dented green chemical barrel with a hazard stripe. Side view, the base touching the bottom edge, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/sc-crate: On-foot street stage: foot/sc-crate
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sc-crate.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sc-crate.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 256x256 street prop, transparent, side view, base on the bottom edge: a stacked wooden shipping crate with metal corners. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single street prop for a side-view game: a stacked wooden shipping crate with metal corners. Side view, the base touching the bottom edge, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/sc-door: On-foot street stage: foot/sc-door
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sc-door.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sc-door.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 256x256 street prop, transparent, side view, base on the bottom edge: a steel service door with an amber warning light above it. Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single street prop for a side-view game: a steel service door with an amber warning light above it. Side view, the base touching the bottom edge, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/sc-neon-sign: On-foot street stage: foot/sc-neon-sign
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sc-neon-sign.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sc-neon-sign.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 256x256 street prop, transparent, side view, base on the bottom edge: a wall-mounted neon sign board with an abstract magenta and cyan glyph (no letters). Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single street prop for a side-view game: a wall-mounted neon sign board with an abstract magenta and cyan glyph (no letters). Side view, the base touching the bottom edge, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/sc-vending: On-foot street stage: foot/sc-vending
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sc-vending.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sc-vending.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Square 256x256 street prop, transparent, side view, base on the bottom edge: a street vending machine glowing cyan, with a lit window of drinks (no text). Paint at 1024x1024. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. A single street prop for a side-view game: a street vending machine glowing cyan, with a lit window of drinks (no text). Side view, the base touching the bottom edge, flat plain white background, 1024x1024, no text, no letters.
+
+### foot/shield-crouch: On-foot street stage: foot/shield-crouch
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-crouch.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-crouch.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/shield-crouch-shoot: On-foot street stage: foot/shield-crouch-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-crouch-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-crouch-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: crouched low and aiming the weapon straight forward, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), crouched low and aiming the weapon straight forward, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/shield-die: On-foot street stage: foot/shield-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/shield-fall: On-foot street stage: foot/shield-fall
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-fall.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-fall.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/shield-hit: On-foot street stage: foot/shield-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), flinching from a hit: head and chest thrown back, arms flung out, pained face. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/shield-idle: On-foot street stage: foot/shield-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), standing relaxed in a ready stance, weapon held low, weight on both feet. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/shield-jump: On-foot street stage: foot/shield-jump
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-jump.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-jump.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: jumping up, knees tucked, one arm up, weapon arm forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), jumping up, knees tucked, one arm up, weapon arm forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/shield-melee: On-foot street stage: foot/shield-melee
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-melee.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-melee.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: swinging the weapon in a hard forward attack, body lunging, motion trail. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), swinging the weapon in a hard forward attack, body lunging, motion trail. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/shield-run-a: On-foot street stage: foot/shield-run-a
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-run-a.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-run-a.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/shield-run-b: On-foot street stage: foot/shield-run-b
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-run-b.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-run-b.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/shield-shoot: On-foot street stage: foot/shield-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/shield-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/shield-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Shield, riot cop, pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Shield, riot cop), thrusting the baton forward from behind the riot shield (a shield bash), shield held forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-crouch: On-foot street stage: foot/sniper-crouch
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-crouch.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-crouch.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-crouch-shoot: On-foot street stage: foot/sniper-crouch-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-crouch-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-crouch-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: crouched low and aiming the weapon straight forward, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), crouched low and aiming the weapon straight forward, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-die: On-foot street stage: foot/sniper-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-fall: On-foot street stage: foot/sniper-fall
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-fall.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-fall.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-hit: On-foot street stage: foot/sniper-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), flinching from a hit: head and chest thrown back, arms flung out, pained face. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-idle: On-foot street stage: foot/sniper-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), standing relaxed in a ready stance, weapon held low, weight on both feet. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-jump: On-foot street stage: foot/sniper-jump
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-jump.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-jump.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: jumping up, knees tucked, one arm up, weapon arm forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), jumping up, knees tucked, one arm up, weapon arm forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-melee: On-foot street stage: foot/sniper-melee
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-melee.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-melee.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: swinging the weapon in a hard forward attack, body lunging, motion trail. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), swinging the weapon in a hard forward attack, body lunging, motion trail. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-run-a: On-foot street stage: foot/sniper-run-a
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-run-a.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-run-a.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-run-b: On-foot street stage: foot/sniper-run-b
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-run-b.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-run-b.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/sniper-shoot: On-foot street stage: foot/sniper-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/sniper-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/sniper-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Sniper, rooftop marksman, pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Sniper, rooftop marksman), standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/turret-die: On-foot street stage: foot/turret-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/turret-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/turret-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Turret, street gun, pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Turret, street gun), blowing up in a fireball, dome flying off, smoke. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/turret-hit: On-foot street stage: foot/turret-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/turret-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/turret-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Turret, street gun, pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Turret, street gun), flashing white from a hit, sparks. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/turret-idle: On-foot street stage: foot/turret-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/turret-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/turret-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Turret, street gun, pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Turret, street gun), standing still, barrel slightly raised, a small red light blinking. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/turret-shoot: On-foot street stage: foot/turret-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/turret-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/turret-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Turret, street gun, pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Turret, street gun), firing the barrel forward, muzzle flash, small recoil. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-attack2: On-foot street stage: foot/warden-attack2
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-attack2.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-attack2.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: overhead slam: both hands raising the energy blade above the head, then bringing it down hard, motion trail (draw the strike moment). Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), overhead slam: both hands raising the energy blade above the head, then bringing it down hard, motion trail (draw the strike moment). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-crouch: On-foot street stage: foot/warden-crouch
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-crouch.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-crouch.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), crouched low behind cover, knees deeply bent, body leaning forward, weapon held ready. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-crouch-shoot: On-foot street stage: foot/warden-crouch-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-crouch-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-crouch-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: crouched low and aiming the weapon straight forward, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), crouched low and aiming the weapon straight forward, muzzle flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-die: On-foot street stage: foot/warden-die
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-die.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-die.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), collapsing backwards, nearly horizontal in the air, weapon dropping from the hand. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-enrage: On-foot street stage: foot/warden-enrage
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-enrage.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-enrage.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: enraged roar, arms wide, red cracks of glowing energy across the armour, a red aura around the body. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), enraged roar, arms wide, red cracks of glowing energy across the armour, a red aura around the body. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-fall: On-foot street stage: foot/warden-fall
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-fall.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-fall.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), falling down, legs dangling slightly apart, arms raised, clothes pulled upward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-hit: On-foot street stage: foot/warden-hit
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-hit.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: flinching from a hit: head and chest thrown back, arms flung out, pained face. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), flinching from a hit: head and chest thrown back, arms flung out, pained face. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-idle: On-foot street stage: foot/warden-idle
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-idle.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-idle.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: standing relaxed in a ready stance, weapon held low, weight on both feet. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), standing relaxed in a ready stance, weapon held low, weight on both feet. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-jump: On-foot street stage: foot/warden-jump
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-jump.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-jump.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: jumping up, knees tucked, one arm up, weapon arm forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), jumping up, knees tucked, one arm up, weapon arm forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-melee: On-foot street stage: foot/warden-melee
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-melee.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-melee.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: swinging the weapon in a hard forward attack, body lunging, motion trail. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), slashing the energy blade in a wide arc, motion trail. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-run-a: On-foot street stage: foot/warden-run-a
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-run-a.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-run-a.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), running, mid-stride with the FRONT leg stretched forward and the back leg pushing off, leaning forward, arms swinging (contact frame of a run cycle). Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-run-b: On-foot street stage: foot/warden-run-b
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-run-b.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-run-b.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), running, the OPPOSITE stride to the first running frame: back leg passing under the body, other leg bent up (passing frame of a run cycle), leaning forward. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
+
+### foot/warden-shoot: On-foot street stage: foot/warden-shoot
+- Why: new weapons and fusions. On-foot street stage art (placeholders drawn in code until this exists)
+- Type: painting; priority 3 (missing extra)
+- Save as: `foot/warden-shoot.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/warden-shoot.webp`
+- Size/ratio: 1024x1024, ratio 1:1, transparent (flat white background, we key it)
+- Note: Facing RIGHT, full body, feet at the bottom edge, transparent background (we cut the white out), 1024x1024. Same character as Warden, corporate enforcer (boss), pose: standing and aiming the weapon straight forward with a stiff arm, muzzle flash at the tip. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Same character as the reference (Warden, corporate enforcer (boss)), leaning forward and firing a gold energy bolt from the blade held out, flash at the tip. Keep the same design, colours, proportions and painted style as the reference. 1024x1024, flat plain white background, character facing right, full body, feet near the bottom edge, no text, no letters, no logos.
 
 ### ship-drift-armed: Ship weapon mounts: ship-drift-armed
 - Why: new weapons and fusions. New weapons and fusions: OPTIONAL: the Drift ship with both weapon slots filled; replaces the mounts in the WEAPONS sheet and Garage preview when present

@@ -522,3 +522,6 @@ Next: owner supplies the art; tune `RIG.hp` once the real ship pictures are chec
 
 ## Nightrun boss length tune (18 Oct 2026, worker nr-bosstune)
 Cause of the extra boss time: damage above the cap was thrown away (the bot's damage comes in bursts), hard.js's boss repair ate damage, and the 66% core shield froze the bar. Fix in `parts/armour.js` (`BK` overflow bank, `SHT` shield overload, `REP .2`) and `parts/hard.js` (repair only while camping). Numbers: BALANCE.md "Boss fights, round 4b". scale2/scale3/boss2 tests pass (Legend final window back at 170-260 s). Known, not from this change: scale3 "dodging bot Legend maxed 20/30/40" 0% (bot dies in the first 20-55 s of stage 40, same with `?boss2=0`) and "fresh ship dps no cut" 81.7 vs 79.1; weapon-test "wave alone LV10 clears stage 1" fails; afk-test fails (Hard dodging bot dies at 37 s, stage 42 dies at 25-34 s, no boss involved); it failed before this change too.
+
+## W2 on-foot art (18 Oct 2026)
+`parts/footart.js` = window.FA (draw/bg/has/pickup/scenery; real picture only when listed in media/ready.json). Art list: `make-foot-assets.py` regenerates the 'On-foot street stage' manifest group (124 files in media/foot/), `FOOT-FLOW-PROMPTS.md` and `next-wave/flow-2d/mainhattan-nightrun/prompts-foot.json`; then `make-placeholders.py`. Test: `footart-test.js`. For 'die' pass seconds since death.
