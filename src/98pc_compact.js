@@ -30,6 +30,10 @@ function PC_scan(){PC.L.length=0;PC.st.meshes=PC.st.src=0;PC.grp=HUB.grp;if(!HUB
  if(typeof CLOUDS!=='undefined'&&CLOUDS)CLOUDS.traverse(o=>{if(o.isInstancedMesh&&!o.userData.pc&&o.count>=16&&o.count===o.instanceMatrix.count)PC_reg(o,true)});
  // traffic bodies + their wheel / glass layers (same index c.j): moving, so tested one by one each pass, not in the grid
  for(const im of Object.values(HUB.cim||{}))for(const q of[im,im&&im.userData.w,im&&im.userData.g])if(q&&q.isInstancedMesh&&!q.userData.pc&&q.count>=8&&q.count===q.instanceMatrix.count)PC_reg(q,false).dyn=true;
+ PC.nch=HUB.grp.children.length;PC_grid()}
+// perf-6: meshes added to HUB.grp after the first scan (lazy 'lz' leaf/filler groups: 18k-instance leaf IM = 217k tris Fra) are picked up when the child count changes
+function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const w=o=>{if(o===lg)return;if(PC_cand(o)){PC_reg(o,false);n++}for(const q of o.children)w(q)};w(HUB.grp);if(n)PC_grid();return n}
+function PC_grid(){
  // one 80 m world grid over every static mesh: the step tests a cell's sphere first and only walks the instances of the cells that pass
  const M=new Map();for(const C of PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
   for(const[k,L]of T){let Q=M.get(k);if(!Q)M.set(k,Q={x:0,y:0,z:0,r:0,n:0,E:[]});Q.E.push(C,Int32Array.from(L));for(const i of L){Q.x+=C.c[i*4];Q.y+=C.c[i*4+1];Q.z+=C.c[i*4+2];Q.n++}}}
@@ -39,7 +43,8 @@ function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const 
  const s=C.s++,a=C.src,arr=C.im.instanceMatrix.array;if(s!==i){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
 const _pcS=new THREE.Sphere();
 function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!=='roam')return;if(PC.grp&&PC.grp!==HUB.grp){PC.L.length=0;PC.grp=null;PC.f=0}
- if(!PC.grp){const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return;PC_scan()}/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
+ if(!PC.grp){const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return;PC_scan()}
+ if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9)&&PC_add())force=1;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
  let dirty=false;for(const C of PC.L)if(C.dirty){dirty=true;break}
  if(!force&&++PC.t%10&&!dirty&&dh<.1&&Math.hypot(cx-PC.x,cz-PC.z)<20)return;PC.t=0;PC.x=cx;PC.z=cz;PC.h=h;const t0=performance.now();
