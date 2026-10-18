@@ -251,12 +251,14 @@ const _lfC=new THREE.Color();
 function LIFE_fig(cnt,x,y,z,h,arm,hop,lean,ci){const M=LIFE.M,i=cnt.fig||0;if(LIFE.S||i>=LIFE_CAP.fig)return;LIFE_put(M.fig,cnt,x,y+hop,z,lean||0,h,0,1);LIFE_put(M.torso,cnt,x,y+hop,z,lean||0,h,0,1);
  LIFE_put(M.arms,cnt,x,y+hop+1.38,z,(lean||0)+arm,h,0,1);if(ci!=null&&LIFE.ci[i]!==ci){LIFE.ci[i]=ci;_lfC.set(LIFE_SHIRT[ci%LIFE_SHIRT.length]);M.torso.setColorAt(i,_lfC);M.arms.setColorAt(i,_lfC);LIFE.cd=1}}
 function LIFE_ringCam(x,y,z){const cp=camera.position;return(cp.x-x)**2+(cp.z-z)**2<7.5*7.5&&Math.abs(cp.y-y)<6}
+// perf-r10a: LIFE_draw figure poses go into pooled 6-slot arrays (was a fresh [x,z,h,arm,hop,lean] per figure per frame + one P per group = top Athens allocator)
+const LIFE_PA=[];LIFE_PA.n=0;function LIFE_pp(x,z,h,arm,hop,lean){const P=LIFE_PA;let r=P[P.n];if(!r)r=P[P.n]=[0,0,0,0,0,0];r[0]=x;r[1]=z;r[2]=h;r[3]=arm;r[4]=hop;r[5]=lean;P.n++}
 function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v),air=!!(typeof pl!=='undefined'&&pl&&pl.air),dr=!!RO.dDir,stunt=air||dr&&sp>8;LIFE.ci=LIFE.ci||[];
  let cheer=0;
  for(const it of S?LIFE.L:LIFE.D){const dx=it.x-RO.x,dz=it.z-RO.z,d2=dx*dx+dz*dz;
-  if(it.c==='sm')LIFE_put(M['x_'+it.t],cnt,it.x,it.y,it.z,0,it.h,0,1);
+  if(it.c==='sm')LIFE_put(M[it.kx||(it.kx='x_'+it.t)],cnt,it.x,it.y,it.z,0,it.h,0,1);
   else if(it.c==='pop'){const kk=it.kk,hy=kk?kk.y0-it.y+LIFE_KK.hgt+2.4:3.2;if(kk)LIFE_put(M.kick,cnt,it.x,kk.y0,it.z,0,it.h,0,1);const busy=it.cd>t;if(busy)continue;/* r8: never draw the 6 m marker ring (2.6 x 2.3) with the camera inside it or within 1.5 m of its rim (v88v torus rule): at the Athens spawn the camera sat 1.7 m from a ring centre = the cyan ellipse/arc over the lower screen. 7.5 m from the centre the car (~6 m ahead of the camera) is already in the 4.2 m pickup */if(LIFE_ringCam(it.x,it.y,it.z)){LIFE.ringCam=(LIFE.ringCam||0)+1;continue}const i=LIFE_put(M.ring,cnt,it.x,it.y+.35,it.z,Math.PI/2,0,0,2.3);/* r3E: a flat ground ring like every other marker; the floating translucent sphere over the lane is gone */if(i>=0){_lfC.set(it.K.col);M.ring.setColorAt(i,_lfC)}}
-  else if(it.c==='set'){const T=it.t,tt=t+it.ph;LIFE_put(M['s_'+T],cnt,it.x,it.y,it.z,0,it.h,0,1);const m=M['m_'+T];
+  else if(it.c==='set'){const T=it.t,tt=t+it.ph;LIFE_put(M[it.ks||(it.ks='s_'+T)],cnt,it.x,it.y,it.z,0,it.h,0,1);const m=M[it.km||(it.km='m_'+T)];
    if(T==='windmill')LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.25,it.y+7.2,it.z+Math.cos(it.h)*1.25,0,it.h,tt*1.4,1);
    else if(T==='turbine'){const H=LIFE.TB;if(H){const c=Math.cos(it.h),sn=Math.sin(it.h);LIFE_put(m,cnt,it.x+H.x*c+H.z*sn,it.y+H.y,it.z-H.x*sn+H.z*c,0,it.h,tt*2.2,1)}else LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.2,it.y+13.2,it.z+Math.cos(it.h)*1.2,0,it.h,tt*2.2,1)}
    else if(T==='fountain'){const i=LIFE_put(m,cnt,it.x,it.y+2.2,it.z,0,tt,0,1);if(i>=0){_lfS.set(1,1+Math.sin(tt*5)*.18+Math.sin(tt*3.1)*.12,1);_lfM.compose(_lfP,_lfQ,_lfS);m.setMatrixAt(i,_lfM)}}
@@ -274,29 +276,29 @@ function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v
     else LIFE_put(m,cnt,it.x,it.y+.4,it.z,0,tt*1.8,0,1)}}
   else if(it.c==='grp'){if(d2>130*130)continue;const T=it.t,tt=t+it.ph,near=d2<45*45,ch=near&&stunt;if(ch)cheer++;
    const fx=Math.sin(it.h),fz=Math.cos(it.h),rx=-fz,rz=fx;// fx,fz: toward the road; rx,rz: along the kerb
-   const P=[];// [x,z,h,arm,hop,lean]
-   if(T==='cafe'){LIFE_put(M.q_cafe,cnt,it.x,it.y,it.z,0,0,0,1);for(let k=0;k<3;k++){const a=k*2.1+.4,x=it.x+Math.sin(a)*.95,z=it.z+Math.cos(a)*.95;P.push([x,z,a+Math.PI,-.5-Math.max(0,Math.sin(tt*2+k*2))*.9,0,0])}}
-   else if(T==='market'){LIFE_put(M.q_market,cnt,it.x,it.y,it.z,0,it.h+Math.PI,0,1);P.push([it.x-fx*.9,it.z-fz*.9,it.h+Math.PI,-.4+Math.sin(tt*3)*.3,0,0]);for(let k=0;k<3;k++){const w=Math.sin(tt*.5+k*2)*1.6;P.push([it.x+fx*1.2+rx*(k-1)*1.1+rx*w*.3,it.z+fz*1.2+rz*(k-1)*1.1+rz*w*.3,it.h+Math.PI+Math.sin(tt+k)*.5,-.2,0,0])}}
-   else if(T==='band'){LIFE_put(M.q_band,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<3;k++){const b=Math.abs(Math.sin(tt*6+k))*.12;P.push([it.x+rx*(k-1)*1.1,it.z+rz*(k-1)*1.1,it.h,-1.1+Math.sin(tt*7+k*1.3)*.5,b,0])}}
+   const P=LIFE_PA;P.n=0;// [x,z,h,arm,hop,lean]
+   if(T==='cafe'){LIFE_put(M.q_cafe,cnt,it.x,it.y,it.z,0,0,0,1);for(let k=0;k<3;k++){const a=k*2.1+.4,x=it.x+Math.sin(a)*.95,z=it.z+Math.cos(a)*.95;LIFE_pp(x,z,a+Math.PI,-.5-Math.max(0,Math.sin(tt*2+k*2))*.9,0,0)}}
+   else if(T==='market'){LIFE_put(M.q_market,cnt,it.x,it.y,it.z,0,it.h+Math.PI,0,1);LIFE_pp(it.x-fx*.9,it.z-fz*.9,it.h+Math.PI,-.4+Math.sin(tt*3)*.3,0,0);for(let k=0;k<3;k++){const w=Math.sin(tt*.5+k*2)*1.6;LIFE_pp(it.x+fx*1.2+rx*(k-1)*1.1+rx*w*.3,it.z+fz*1.2+rz*(k-1)*1.1+rz*w*.3,it.h+Math.PI+Math.sin(tt+k)*.5,-.2,0,0)}}
+   else if(T==='band'){LIFE_put(M.q_band,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<3;k++){const b=Math.abs(Math.sin(tt*6+k))*.12;LIFE_pp(it.x+rx*(k-1)*1.1,it.z+rz*(k-1)*1.1,it.h,-1.1+Math.sin(tt*7+k*1.3)*.5,b,0)}}
    else if(T==='football'){LIFE_put(M.q_football,cnt,it.x,it.y,it.z,0,it.h+Math.PI/2,0,1);const bxp=Math.sin(tt*1.3)*2.4,bzp=Math.sin(tt*2.1)*1.3,bx=it.x+rx*bxp+fx*bzp,bz=it.z+rz*bxp+fz*bzp;
-    LIFE_put(M.ball,cnt,bx,it.y+Math.abs(Math.sin(tt*4))*.5,bz,tt*4,0,0,1);for(let k=0;k<4;k++){const a=tt*.9+k*1.57,x=bx+Math.sin(a)*1.4*(1+k*.3),z=bz+Math.cos(a)*1.4*(1+k*.3);P.push([x,z,Math.atan2(bx-x,bz-z),Math.sin(tt*8+k)*.6,Math.abs(Math.sin(tt*8+k))*.1,0])}}
+    LIFE_put(M.ball,cnt,bx,it.y+Math.abs(Math.sin(tt*4))*.5,bz,tt*4,0,0,1);for(let k=0;k<4;k++){const a=tt*.9+k*1.57,x=bx+Math.sin(a)*1.4*(1+k*.3),z=bz+Math.cos(a)*1.4*(1+k*.3);LIFE_pp(x,z,Math.atan2(bx-x,bz-z),Math.sin(tt*8+k)*.6,Math.abs(Math.sin(tt*8+k))*.1,0)}}
    else if(T==='joggers'||T==='dog'){const run=T==='joggers',L=10,u=((tt*(run?.25:.12))%2+2)%2,s=(u<1?u:2-u)*2*L-L,dir=u<1?0:Math.PI,hx=it.h+Math.PI/2+dir;
-    for(let k=0;k<(run?2:1);k++){const x=it.x+rx*(s-k*1.2)-fx*k*.7,z=it.z+rz*(s-k*1.2)-fz*k*.7;P.push([x,z,Math.atan2(rx*(u<1?1:-1),rz*(u<1?1:-1)),Math.sin(tt*(run?9:5))*.7,run?Math.abs(Math.sin(tt*9))*.12:0,run?.12:0])}
+    for(let k=0;k<(run?2:1);k++){const x=it.x+rx*(s-k*1.2)-fx*k*.7,z=it.z+rz*(s-k*1.2)-fz*k*.7;LIFE_pp(x,z,Math.atan2(rx*(u<1?1:-1),rz*(u<1?1:-1)),Math.sin(tt*(run?9:5))*.7,run?Math.abs(Math.sin(tt*9))*.12:0,run?.12:0)}
     if(!run){const x=it.x+rx*(s+(u<1?1.6:-1.6)),z=it.z+rz*(s+(u<1?1.6:-1.6));LIFE_put(M.dog,cnt,x,it.y+Math.abs(Math.sin(tt*10))*.06,z,0,Math.atan2(rx*(u<1?1:-1),rz*(u<1?1:-1)),0,1)}}
-   else if(T==='fans'){LIFE_put(M.q_fans,cnt,it.x-fx*.8,it.y,it.z-fz*.8,0,it.h,0,1);for(let k=0;k<3;k++){const wv=d2<35*35&&sp>3;P.push([it.x+rx*(k-1)*.9,it.z+rz*(k-1)*.9,it.h,wv?-2.7+Math.sin(tt*9+k)*.35:-.15,wv?Math.abs(Math.sin(tt*5+k))*.15:0,0])}}
-   else if(T==='works'){LIFE_put(M.q_works,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<2;k++)P.push([it.x-fx*.9+rx*(k?1:-1)*1.2,it.z-fz*.9+rz*(k?1:-1)*1.2,it.h+(k?-2.2:2.2),-1.3+Math.abs(Math.sin(tt*5+k*1.7))*1.1,0,.25*Math.abs(Math.sin(tt*5+k*1.7))])}
+   else if(T==='fans'){LIFE_put(M.q_fans,cnt,it.x-fx*.8,it.y,it.z-fz*.8,0,it.h,0,1);for(let k=0;k<3;k++){const wv=d2<35*35&&sp>3;LIFE_pp(it.x+rx*(k-1)*.9,it.z+rz*(k-1)*.9,it.h,wv?-2.7+Math.sin(tt*9+k)*.35:-.15,wv?Math.abs(Math.sin(tt*5+k))*.15:0,0)}}
+   else if(T==='works'){LIFE_put(M.q_works,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<2;k++)LIFE_pp(it.x-fx*.9+rx*(k?1:-1)*1.2,it.z-fz*.9+rz*(k?1:-1)*1.2,it.h+(k?-2.2:2.2),-1.3+Math.abs(Math.sin(tt*5+k*1.7))*1.1,0,.25*Math.abs(Math.sin(tt*5+k*1.7)))}
    // life-2 activities
-   else if(T==='picnic'){LIFE_put(M.q_picnic,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<3;k++){const a=k*2.1+.3,x=it.x+Math.sin(a)*.95,z=it.z+Math.cos(a)*.95;P.push([x,z,a+Math.PI,-1+Math.max(0,Math.sin(tt*1.7+k*2.3))*-.9,-.5,0])}}
-   else if(T==='painter'){LIFE_put(M.q_painter,cnt,it.x,it.y,it.z,0,it.h,0,1);P.push([it.x-fx*.75,it.z-fz*.75,it.h,-1.5+Math.sin(tt*4)*.35,0,Math.sin(tt*.7)*.05]);const w=Math.sin(tt*.4)*.6;P.push([it.x-fx*1.7+rx*(1+w),it.z-fz*1.7+rz*(1+w),it.h+.4,-.1,0,.12])}
-   else if(T==='icecream'){LIFE_put(M.q_icecream,cnt,it.x,it.y,it.z,0,it.h,0,1);P.push([it.x-fx*.9,it.z-fz*.9,it.h,-1.3+Math.max(0,Math.sin(tt*2))*-.8,0,0]);const q=((tt*.15)%1+1)%1;
-    for(let k=0;k<3;k++){const d=1.1+k*.8-q*.8;P.push([it.x+fx*1.1+rx*d,it.z+fz*1.1+rz*d,it.h+Math.PI,-.2+(k===0?Math.sin(tt*3)*.3:0),0,0])}const w=q*6;P.push([it.x+fx*1.6-rx*(1+w),it.z+fz*1.6-rz*(1+w),it.h-Math.PI/2,-1.5,Math.abs(Math.sin(tt*6))*.05,0])}
-   else if(T==='juggler'){LIFE_put(M.q_juggler,cnt,it.x,it.y,it.z,0,it.h,0,1);P.push([it.x,it.z,it.h,-1.5+Math.sin(tt*9)*.25,0,0]);if(!LIFE.S)for(let k=0;k<3;k++){const f=tt*3.4+k*2.09,u=Math.sin(f)*.45;LIFE_put(M.ball,cnt,it.x+rx*u+fx*.35,it.y+1.25+Math.abs(Math.cos(f))*1.1,it.z+rz*u+fz*.35,0,0,0,.7)}
-    for(let k=0;k<2;k++){const cl=Math.sin(tt*12+k)>.3;P.push([it.x+fx*2.1+rx*(k?1:-1)*.9,it.z+fz*2.1+rz*(k?1:-1)*.9,it.h+Math.PI,cl?-1.4:-1.1,0,0])}}
-   else if(T==='chess'){LIFE_put(M.q_chess,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<2;k++){const sd=k?1:-1,mv=Math.sin(tt*.8+k*3)>.85;P.push([it.x+fx*.85*sd,it.z+fz*.85*sd,it.h+(k?Math.PI:0),mv?-1.4:-.6,-.38,mv?.15:.05])}P.push([it.x+rx*1.2,it.z+rz*1.2,it.h-Math.PI/2,-.15,0,.18])}
-   else if(T==='dance'){LIFE_put(M.q_dance,cnt,it.x-fx*1.6,it.y,it.z-fz*1.6,0,it.h,0,1);for(let k=0;k<5;k++){const a=tt*.8+k*1.2566,x=it.x+Math.sin(a)*1.4,z=it.z+Math.cos(a)*1.4;P.push([x,z,a+Math.PI/2,-1.6,Math.abs(Math.sin(tt*5+k*.4))*.18,Math.sin(tt*2.5)*.1])}}
-   else if(T==='photo'){LIFE_put(M.q_photo,cnt,it.x-fx*1.2,it.y,it.z-fz*1.2,0,it.h,0,1);P.push([it.x-fx*1.6,it.z-fz*1.6,it.h,-2.2,0,.05]);for(let k=0;k<3;k++){const pose=Math.sin(tt*.9+k)>0;P.push([it.x+fx*1+rx*(k-1)*.8,it.z+fz*1+rz*(k-1)*.8,it.h+Math.PI,pose?-2.8:-.3,pose&&k===1?Math.abs(Math.sin(tt*6))*.2:0,0])}}
+   else if(T==='picnic'){LIFE_put(M.q_picnic,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<3;k++){const a=k*2.1+.3,x=it.x+Math.sin(a)*.95,z=it.z+Math.cos(a)*.95;LIFE_pp(x,z,a+Math.PI,-1+Math.max(0,Math.sin(tt*1.7+k*2.3))*-.9,-.5,0)}}
+   else if(T==='painter'){LIFE_put(M.q_painter,cnt,it.x,it.y,it.z,0,it.h,0,1);LIFE_pp(it.x-fx*.75,it.z-fz*.75,it.h,-1.5+Math.sin(tt*4)*.35,0,Math.sin(tt*.7)*.05);const w=Math.sin(tt*.4)*.6;LIFE_pp(it.x-fx*1.7+rx*(1+w),it.z-fz*1.7+rz*(1+w),it.h+.4,-.1,0,.12)}
+   else if(T==='icecream'){LIFE_put(M.q_icecream,cnt,it.x,it.y,it.z,0,it.h,0,1);LIFE_pp(it.x-fx*.9,it.z-fz*.9,it.h,-1.3+Math.max(0,Math.sin(tt*2))*-.8,0,0);const q=((tt*.15)%1+1)%1;
+    for(let k=0;k<3;k++){const d=1.1+k*.8-q*.8;LIFE_pp(it.x+fx*1.1+rx*d,it.z+fz*1.1+rz*d,it.h+Math.PI,-.2+(k===0?Math.sin(tt*3)*.3:0),0,0)}const w=q*6;LIFE_pp(it.x+fx*1.6-rx*(1+w),it.z+fz*1.6-rz*(1+w),it.h-Math.PI/2,-1.5,Math.abs(Math.sin(tt*6))*.05,0)}
+   else if(T==='juggler'){LIFE_put(M.q_juggler,cnt,it.x,it.y,it.z,0,it.h,0,1);LIFE_pp(it.x,it.z,it.h,-1.5+Math.sin(tt*9)*.25,0,0);if(!LIFE.S)for(let k=0;k<3;k++){const f=tt*3.4+k*2.09,u=Math.sin(f)*.45;LIFE_put(M.ball,cnt,it.x+rx*u+fx*.35,it.y+1.25+Math.abs(Math.cos(f))*1.1,it.z+rz*u+fz*.35,0,0,0,.7)}
+    for(let k=0;k<2;k++){const cl=Math.sin(tt*12+k)>.3;LIFE_pp(it.x+fx*2.1+rx*(k?1:-1)*.9,it.z+fz*2.1+rz*(k?1:-1)*.9,it.h+Math.PI,cl?-1.4:-1.1,0,0)}}
+   else if(T==='chess'){LIFE_put(M.q_chess,cnt,it.x,it.y,it.z,0,it.h,0,1);for(let k=0;k<2;k++){const sd=k?1:-1,mv=Math.sin(tt*.8+k*3)>.85;LIFE_pp(it.x+fx*.85*sd,it.z+fz*.85*sd,it.h+(k?Math.PI:0),mv?-1.4:-.6,-.38,mv?.15:.05)}LIFE_pp(it.x+rx*1.2,it.z+rz*1.2,it.h-Math.PI/2,-.15,0,.18)}
+   else if(T==='dance'){LIFE_put(M.q_dance,cnt,it.x-fx*1.6,it.y,it.z-fz*1.6,0,it.h,0,1);for(let k=0;k<5;k++){const a=tt*.8+k*1.2566,x=it.x+Math.sin(a)*1.4,z=it.z+Math.cos(a)*1.4;LIFE_pp(x,z,a+Math.PI/2,-1.6,Math.abs(Math.sin(tt*5+k*.4))*.18,Math.sin(tt*2.5)*.1)}}
+   else if(T==='photo'){LIFE_put(M.q_photo,cnt,it.x-fx*1.2,it.y,it.z-fz*1.2,0,it.h,0,1);LIFE_pp(it.x-fx*1.6,it.z-fz*1.6,it.h,-2.2,0,.05);for(let k=0;k<3;k++){const pose=Math.sin(tt*.9+k)>0;LIFE_pp(it.x+fx*1+rx*(k-1)*.8,it.z+fz*1+rz*(k-1)*.8,it.h+Math.PI,pose?-2.8:-.3,pose&&k===1?Math.abs(Math.sin(tt*6))*.2:0,0)}}
    // reactions: jump aside from the car (or fly, harmless, on a direct hit) and cheer at stunts
-   for(let k=0;k<P.length;k++){let [x,z,h,arm,hop,lean]=P[k];const fid=it.id*8+k,F=LIFE.fly.get(fid);
+   for(let k=0;k<P.n;k++){let [x,z,h,arm,hop,lean]=P[k];const fid=it.id*8+k,F=LIFE.fly.get(fid);
     if(F){const e=t-F.t0;if(e>F.T){LIFE.fly.delete(fid)}else{const f=e/F.T;x+=F.dx*Math.min(1,f*1.6);z+=F.dz*Math.min(1,f*1.6);hop+=F.up*4*f*(1-f);arm=-2.8;lean=F.fly?e*9:0}}
     else if(near){const ex=x-RO.x,ez=z-RO.z,e2=ex*ex+ez*ez;if(sp>4&&e2<7*7){const vx=Math.sin(RO.vh??RO.h),vz=Math.cos(RO.vh??RO.h),ahead=ex*vx+ez*vz,lat=ex*vz-ez*vx;
       if(ahead>-1){const hit=e2<1.6*1.6,sd=lat>=0?1:-1,D=hit?6:2.6;LIFE.fly.set(fid,{t0:t,T:hit?1.4:.7,dx:vz*sd*D+(hit?vx*4:0),dz:-vx*sd*D+(hit?vz*4:0),up:hit?3.2:.9,fly:hit});LIFE.n[hit?'fly':'dodge']++;if(hit){try{AU.sfx('brick')}catch(e){}}}}

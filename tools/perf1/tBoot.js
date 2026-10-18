@@ -1,7 +1,7 @@
 // boot-1 probe: tBoot.js <outdir> <ver> : the first SECS (60) fake seconds after the car is drivable, touch profile (852x393, isMobile, hasTouch, Graphics Auto via ?gov=1).
 // Stepped frames (rAF stubbed, 60 Hz fake clock); every RN-th (30) frame really renders (software GL is too slow for all) (composer.render timed apart; shader links = renderer.info.programs growth).
 // Prints a per-second timeline of frames > 33 ms (JS + render) with the owner of each long frame (largest wrapped subsystem, 'render+prog' for a first-use shader link, 'gc/other' when the subs explain < half).
-// env: CITY=fra|ath SECS=60 TOUCH=1 (0 = desktop 1280x720) QS=extra query WRAP=extra fns
+// env: CITY=fra|ath SECS=60 TOUCH=1 (0 = desktop 1280x720) QS=extra query WRAP=extra fns LONG=ms threshold for PROF windows (50)
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const http=require('http'),fs=require('fs'),path=require('path');
 const OUT=path.resolve(process.argv[2]),V=process.argv[3],CITY=process.env.CITY||'fra',SECS=+(process.env.SECS||60),TOUCH=process.env.TOUCH!=='0';
 const mime={'.html':'text/html','.js':'application/javascript','.json':'application/json','.mp3':'audio/mpeg'};
@@ -10,7 +10,7 @@ const INIT=`(()=>{const q=[];let t=0;window.requestAnimationFrame=cb=>{q.push(cb
 const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.url.split('?')[0]));fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end()}r.writeHead(200,{'content-type':mime[path.extname(f)]||'application/octet-stream'});r.end(d)})}).listen(0,async()=>{
  const port=srv.address().port;const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});
  const ctx=await b.newContext(TOUCH?{viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true}:{viewport:{width:1280,height:720},deviceScaleFactor:1});
- const p=await ctx.newPage();p.setDefaultTimeout(1800000);await p.addInitScript(INIT);await p.addInitScript('window.__PROGS='+(process.env.PROGS?1:0)+';window.__WRAP='+JSON.stringify(process.env.WRAP||''));
+ const p=await ctx.newPage();p.setDefaultTimeout(1800000);await p.addInitScript(INIT);await p.addInitScript('window.__PROGS='+(process.env.PROGS?1:0)+';window.__WRAP='+JSON.stringify(process.env.WRAP||'')+';window.__LONG='+(+process.env.LONG||50));
  p.on('console',m=>{const t=m.text();if(/TICKERR|PF1/.test(t))console.log(t.slice(0,200))});p.on('pageerror',e=>console.log('ERR',e.message.slice(0,150)));const t0=Date.now();
  await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}&gov=1&warm=1${process.env.QS?'&'+process.env.QS:''}`);
  await p.waitForFunction(()=>window.__tq&&__tq.drv&&window.__oc,null,{polling:100});const boot=Math.round((Date.now()-t0)/1000);
@@ -24,18 +24,19 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  const r=await p.evaluate(async([N,RN])=>{const ev=__ev,RO=ev("RO"),R=__R,G=ev("typeof GOV!=='undefined'?GOV:null"),out=[];
   const drv=ev(`(()=>{const W=a=>Math.atan2(Math.sin(a),Math.cos(a));return()=>{const la=12+RO.v*.9,fx=Math.sin(RO.h),fz=Math.cos(RO.h),q=rfAim(RO.x+fx*la,RO.z+fz*la,fx,fz,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;if(Math.abs(RO.v)<.5&&(window.__stk=(window.__stk|0)+1)>90){window.__stk=0;const s=rfSnap(RO.x+(Math.random()-.5)*400,RO.z+(Math.random()-.5)*400,200);if(s)roamWarp(s[0],s[1],s[2]||0,true)}}})()`);
   const win=[];window.__calib=function __calib(){const e=performance.now()+40;while(performance.now()<e){}};const tc=performance.now();__calib();const CONT=new Set(['roamStep','hubTrafficStep','hubCullStep','miniDraw','PC_step','stepSim','updWorld']);let prog=R.info.programs.length,glog=G?G.log.length:0;
-  for(let i=0;i<N;i++){try{drv()}catch(e){}PF1.b={};PF1.rms=0;PF1.real=i%RN===RN-1;const t=performance.now();__tick(1);const ms=performance.now()-t;if(ms>50)win.push([i,t,t+ms]);
+  for(let i=0;i<N;i++){try{drv()}catch(e){}PF1.b={};PF1.rms=0;PF1.real=i%RN===RN-1;if(i===0||i===N-1||i===Math.floor(N/2))(PF1.hp=PF1.hp||[]).push([i,performance.memory.usedJSHeapSize/1048576]);const t=performance.now();__tick(1);const ms=performance.now()-t;if(ms>+(window.__LONG||50))win.push([i,t,t+ms]);
    const pg=R.info.programs.length,np=pg-prog;if(np>0&&window.__PROGS){const P=R.info.programs,ks=P.slice(0,prog).map(q=>q.cacheKey.split(','));for(const q of P.slice(prog)){const a=q.cacheKey.split(',');let best=null,bd=1e9;for(const b of ks){let d=0;for(let j=0;j<Math.max(a.length,b.length);j++)if(a[j]!==b[j])d++;if(d<bd){bd=d;best=b}}const df=[];if(best)for(let j=0;j<a.length;j++)if(a[j]!==best[j])df.push(j+':'+String(best[j]).slice(0,20)+'>'+String(a[j]).slice(0,20));console.log('PF1PROG f'+i+' '+q.name+' d'+bd+' '+df.slice(0,12).join(' '))}}prog=pg;const b=PF1.b,rm=PF1.rms;let own='',om=0,sum=0;for(const k in b){if(CONT.has(k)||k==='resize'||k==='LK_apply'||k==='PC_grid'||k==='PC_add'||k==='lzFinish'||k==='DEST_mark')continue;sum+=b[k];if(b[k]>om){om=b[k];own=k}}
    if(rm>om&&rm>ms*.4){own='render';om=rm}if(np>0&&rm>20)own='render+prog'+np;
    for(const k of['PC_add','lzFinish','LK_apply','GOV_step','DEST_find','miniPaint'])if(b[k]>ms*.3&&b[k]>15)own=k;
-   if(om+rm<ms*.5)own=(b.roamStep||0)>ms*.5?'roamStep-self':'gc/other';
+   if(om+rm<ms*.5){own=(b.roamStep||0)>ms*.5?'roamStep-self':'gc/other';/* perf-r10a: a container sub (hubTrafficStep, hubCullStep, PC_step ...) that holds > 40 % of the frame owns it: '<name>-self' (most of the old 'roamStep-self' was hubTrafficStep) */let cm=0,ck='';for(const k of CONT)if(k!=='roamStep'&&(b[k]||0)>cm){cm=b[k];ck=k}if(cm>ms*.4)own=ck+'-self'}
    let gl='';if(G&&G.log.length!==glog){gl=G.log.slice(glog).map(x=>x.join(':')).join(',');glog=G.log.length}
    out.push([i,+ms.toFixed(1),+rm.toFixed(1),own,+om.toFixed(1),np,gl,Object.entries(b).filter(e=>e[1]>4).map(e=>e[0]+':'+e[1].toFixed(0)).join(' ')]);
    if(ms>50)console.log('PF1L f'+i+' '+ms.toFixed(0)+' '+own+' '+out[out.length-1][7]);if(i%600===599)console.log('PF1P s'+((i+1)/60)+' '+Math.round(performance.now()/1000));await new Promise(r=>setTimeout(r,0))}
-  return{out,win,tc,gov:G?G.log:null,lvl:ev("typeof GOV_lvl==='function'?GOV_lvl():null")}},[SECS*60,+(process.env.RN||30)]);
+  return{hp:PF1.hp,out,win,tc,gov:G?G.log:null,lvl:ev("typeof GOV_lvl==='function'?GOV_lvl():null")}},[SECS*60,+(process.env.RN||30)]);
  const fr=r.out,js=fr.map(f=>f[1]-f[2]),all=fr.map(f=>f[1]),srt=a=>a.slice().sort((x,y)=>x-y),pc=(a,q)=>srt(a)[Math.floor(a.length*q)];
  console.log(`PF1 city=${CITY} touch=${TOUCH} boot=${boot}s frames=${fr.length} gov=${JSON.stringify(r.gov)} end=${JSON.stringify(r.lvl)}`);
  console.log(`PF1 total(js+render) med ${pc(all,.5).toFixed(1)} p99 ${pc(all,.99).toFixed(1)} max ${Math.max(...all).toFixed(0)} n33 ${all.filter(x=>x>33).length} n50 ${all.filter(x=>x>50).length} n150 ${all.filter(x=>x>150).length} | js med ${pc(js,.5).toFixed(1)} max ${Math.max(...js).toFixed(0)} jsn50 ${js.filter(x=>x>50).length}`);
+ {/* perf-r10a: 0-5 s median, frames >50 ms in the 2nd half (steady), heap MB/s first/second half (fake 60 Hz seconds) */const h=r.hp||[],f5=all.slice(0,300),hf=Math.floor(fr.length/2),mbs=(a,b)=>a&&b?((b[1]-a[1])/((b[0]-a[0])/60)).toFixed(2):'?';console.log(`PF1X 0-5s med ${pc(f5,.5).toFixed(1)} | n50 first half ${all.slice(0,hf).filter(x=>x>50).length} second half ${all.slice(hf).filter(x=>x>50).length} | heap ${h.map(x=>x[1].toFixed(0)).join('>')} MB, MB/s ${mbs(h[0],h[1])} / ${mbs(h[1],h[2])}`)}
  const sec={};for(const f of fr)if(f[1]>33){const s=Math.floor(f[0]/60);(sec[s]=sec[s]||[]).push(f)}
  for(const s of Object.keys(sec))console.log(`PF1T s${String(s).padStart(2)} `+sec[s].map(f=>`${Math.round(f[1])}(${f[3]}${f[6]?' GOV '+f[6]:''})`).join(' '));
  const own={};for(const f of fr)if(f[1]>50){own[f[3]]=(own[f[3]]||0)+1}console.log('PF1OWN>50 '+JSON.stringify(own));

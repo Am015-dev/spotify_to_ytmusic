@@ -26,7 +26,7 @@ html body:not(.touch) #roamPrompt#roamPrompt{bottom:auto!important;top:30%!impor
 @media (orientation:portrait){html body.touch #roamPrompt#roamPrompt{bottom:auto!important;top:calc(268px + env(safe-area-inset-top,0px))!important}}
 body.crMerge #roamArrow{display:none!important}`;document.head.appendChild(st)})();
 
-roamPose=(f=>function(s,dt){f(s,dt);if(s===pl&&state==='roam'&&((CR_hudS.f=(CR_hudS.f||0)+1)&1))try{CR_hud()}catch(e){}})(roamPose);
+roamPose=(f=>function(s,dt){f(s,dt);if(s===pl&&state==='roam'&&(CR_hudS.f=(CR_hudS.f||0)+1)%6===1)try{CR_hud()}/* perf-r10a: was every 2nd frame; CR_hud writes then measures the pill (getComputedStyle + scrollWidth = forced style/layout, ~5-9 ms/call on Athens frames) */catch(e){}})(roamPose);
 
 // ---- (1) race cars on the road
 const CR_RBX=new WeakMap();
