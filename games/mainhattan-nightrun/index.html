@@ -7703,7 +7703,7 @@ BMV.VB=VB;
 /* ---- the beat: b.js bossBeat calls this in place of its own switch when the boss has a moveset (e.bm) ---- */
 BMV.beat=(e,v,c,d)=>{if(e.bmG)e.floor=Math.max(e.floor||0,e.bmG.hp);
   const due=BMV.q.filter(q=>q.e===e&&q.due<=e.bt);BMV.q=BMV.q.filter(q=>!(q.e===e&&q.due<=e.bt));for(const q of due)try{q.f();}catch(x){console.warn(x);}
-  if(c===0&&e.bmG&&e.bmG.v!==v)BMV.unguard(e,0);                              // the counter's slot is over: the shield drops (no reward)
+  if(c===0&&e.bmG&&(e.bmG.v!==v||e.bt>=e.bmG.end))BMV.unguard(e,0);                              // the counter's slot is over: the shield drops (no reward)
   if(e.bmS>e.bt)return;const V=VB[v];if(!V)return;const X=BMX(e),st=BMV.stat();if(c===0){const vs=st.verbs[v]||(st.verbs[v]={uses:0,bul:0,hz:0,tel:9,boss:{}});vs.uses++;vs.boss[e.bm.id]=1;}
   BMV.cur=v;eb.src=null;V.f(e,c,X,e.bm.P[v]||{});eb.src=null;};
 // the glow before a shot: is something of this boss due on the next beat?
@@ -7731,8 +7731,8 @@ NR.on('tick',dt=>{if(!BMV.on)return;const e=G.boss;if(!e||!e.bm){if(BMV.hz.lengt
     if(z.flip!=null&&t>=z.on)z.gaps=BMV.flipGaps(z);
     if(z.s==='well'&&t>=z.on&&t<z.off&&!G.dead){const dx=z.x-P.x,dy=z.y-P.y,d=Math.hypot(dx,dy);if(d>1&&d<z.R){P.x+=dx/d*z.pull*dt;P.y+=dy/d*z.pull*dt;}}
     if(z.pop&&!z.popd&&t>=z.off-.02){z.popd=1;for(let i=0;i<4;i++)bmShot('minefield',z.x,z.y,i*1.5708+.785,(110+8*diff())*1.05);}
-    if(!z.mk&&t>=z.on&&t<z.off&&!G.dead&&!z.hit&&z.x>-60&&BMV.zsd(z,P.x,P.y)<BMPAD){const h0=P.hp;hurt(1);z.hit=1;if(P.hp<h0){st.hits[z.v]=(st.hits[z.v]|0)+1;}}}
-  BMV.hz=BMV.hz.filter(z=>t<z.off&&z.x>-80&&z.x<W+200);
+    if(!z.mk&&t>=z.on&&t<z.off&&!G.dead&&!z.hit&&(z.x==null||z.x>-60)&&BMV.zsd(z,P.x,P.y)<BMPAD){const h0=P.hp;hurt(1);z.hit=1;if(P.hp<h0){st.hits[z.v]=(st.hits[z.v]|0)+1;}}}
+  BMV.hz=BMV.hz.filter(z=>t<z.off&&(z.x==null||z.x>-80&&z.x<W+200));   // bands and markers have no x
   BMV.gh=BMV.gh.filter(g=>t<g.off);
   /* special bullets */
   for(const b of G.eb){if(!b.bmv)continue;
