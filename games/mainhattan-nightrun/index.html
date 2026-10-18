@@ -1141,7 +1141,7 @@ function update(dt){
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
       if(hit&&b.px&&b.px.has(e))continue;
       if(hit&&e.zt&&window.ZOO&&ZOO.block(b,e)){b.dead=1;if(Math.random()<.5)burst(b.x,b.y,'#4ad1ff',3,120,.25);AU.sfx('hit');break;}   // zoo.js: a shield absorbs the shot
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom('hit-spark',b.x,b.y,30,.16);}AU.sfx('hit');break;}}
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.wid)e._wk=b.wid;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom(FXW.hk(b,'hit-spark'),b.x,b.y,30,.16);}AU.sfx('hit');break;}}
     if(b.rc>0&&(b.y<2&&b.vy<0||b.y>H-2&&b.vy>0)){b.vy=-b.vy;b.rc--;b.y=clamp(b.y,3,H-3);if(b.px)b.px.clear();}
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}
@@ -2937,7 +2937,7 @@ ART.load=n=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();
 ART.have=n=>!!ART.bm[n];
 ART.err={};
 ART.frame=()=>{if(Math.abs(S-ART.S)>.01){ART.S=S;ART.sc={};}
-  if(running&&P){if(G.dead&&!ART.dead)ART.boom('explosion-big',P.x,P.y,170,.6);else if(!G.dead&&P.hp<ART.hp)ART.boom('explosion-small',P.x,P.y,76,.4);ART.hp=P.hp;ART.dead=G.dead;}else ART.dead=false;};        // the canvas scale changed (resize / rotation): scaled copies are rebuilt on demand
+  if(running&&P){if(G.dead&&!ART.dead)ART.boom(FXW.bk('explosion-big',null,170),P.x,P.y,170,.6);else if(!G.dead&&P.hp<ART.hp)ART.boom(FXW.bk('explosion-small',null,76),P.x,P.y,76,.4);ART.hp=P.hp;ART.dead=G.dead;}else ART.dead=false;};        // the canvas scale changed (resize / rotation): scaled copies are rebuilt on demand
 /* a copy of image n that is w world units wide, at the pixel size it will be drawn at ({c,w,h}); null while loading */
 ART.sp=(n,w,sc)=>{const b=ART.bm[n];if(!b)return null;sc=sc||S;w=Math.max(1,Math.round(w*2)/2);const k=n+'@'+w+'@'+sc;let o=ART.sc[k];if(o)return o;
   const h=w*b.height/b.width,pw=Math.max(1,Math.round(w*sc)),ph=Math.max(1,Math.round(h*sc));
@@ -2971,7 +2971,7 @@ ART.dflash=(n,w,x,y,rot,fl,col,a)=>{const o=ART.sp(n,w);if(!o)return false;ART.p
 ART.boom=(k,x,y,sz,life)=>{const f=ART.fx;if(f.length>=24)f.shift();f.push({k,x,y,sz,t:0,m:life});};
 ART.fxDraw=()=>{const f=ART.fx;if(!f.length)return;ctx.globalCompositeOperation='lighter';
   for(let i=f.length-1;i>=0;i--){const q=f[i];q.t+=FD;const k=q.t/q.m;if(k>=1){f.splice(i,1);continue;}
-    const b=ART.bm['fx-'+q.k];if(!b)continue;const grow=q.k==='muzzle'||q.k==='hit-spark'?.8+.4*k:.55+.65*k,w=q.sz*grow,h=w*b.height/b.width;
+    const b=ART.bm['fx-'+q.k];if(!b)continue;const grow=q.k==='muzzle'||q.k==='hit-spark'||/-(muzzle|hit)$/.test(q.k)?.8+.4*k:.55+.65*k,w=q.sz*grow,h=w*b.height/b.width;
     ctx.globalAlpha=Math.min(1,(1-k)*1.6)*(q.k==='hit-spark'?.9:1);ctx.drawImage(b,q.x-w/2,q.y-h/2,w,h);}
   ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';};
 ART.wave=(x,y,r,a)=>{const b=ART.bm['fx-shockwave'];if(!b)return false;ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.max(0,Math.min(1,a));ctx.drawImage(b,x-r,y-r,r*2,r*2);ctx.restore();return true;};
@@ -3024,9 +3024,9 @@ ART.portrait=(k,cx,y,sz,al)=>{const b=ART.bm['boss-'+ART.bossN[k]];if(!b)return;
   const rest=[];for(const n of ART.bossN){rest.push('spr-boss-'+n);rest.push('boss-'+n);}
   let i=0;const step=()=>{if(i<rest.length)ART.load(rest[i++]);else if(i<rest.length+DISTRICTS.length){ART.warm(i++-rest.length);}else return;setTimeout(step,350);};setTimeout(step,1500);}
 NR.on('kill',({e,boss})=>{
-  if(boss){const bx=e.x,by=e.y;for(let i=0;i<5;i++)G.delayed.push({t:i*.16,f:()=>ART.boom(i===4?'explosion-boss':'explosion-big',bx+rnd(-40,40),by+rnd(-40,40),i===4?320:170,.6)});return;}
-  ART.boom(e.type==='gunship'||e.type==='mine'?'explosion-big':'explosion-small',e.x,e.y,e.type==='gunship'?150:e.type==='mine'?90:Math.max(54,e.r*3.6),.42);});
-NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom('muzzle',f.x+10,f.y,34,.09);});
+  if(boss){const bx=e.x,by=e.y;for(let i=0;i<5;i++)G.delayed.push({t:i*.16,f:()=>ART.boom(FXW.bk(i===4?'explosion-boss':'explosion-big',e,i===4?320:170),bx+rnd(-40,40),by+rnd(-40,40),i===4?320:170,.6)});return;}
+  {const sz=e.type==='gunship'?150:e.type==='mine'?90:Math.max(54,e.r*3.6);ART.boom(FXW.bk(e.type==='gunship'||e.type==='mine'?'explosion-big':'explosion-small',e,sz),e.x,e.y,sz,.42);}});
+NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom(FXW.mz('muzzle'),f.x+10,f.y,34,.09);});
 {const _b=banner;banner=function(a,b,warn,t){_b(a,b,warn,t);if(warn&&G.boss&&!G.boss.dead&&G.boss.k!=null)G.banner.pic=ART.artK(G.boss);};}   // boss intro / phase banners carry the boss portrait
 {const _e=enterDistrict;enterDistrict=function(i){ART.warm(i);ART.warm(nextDi(i).di);return _e.apply(this,arguments);};}
 /* the scaled copies of the next backdrop are built in calm moments, never in the middle of a fight */
@@ -3678,6 +3678,55 @@ NR.on('bar',()=>{if(!RET.fever)return;FV.tb++;
     if(!RET.fvReady()){AU.fever=false;return;}
     FV.on=true;FV.bars=0;FV.m=0;FV.last=FV.tb;FV.starts++;AU.fever=true;
     floater(W*.5,H*.3,'FEVER ×'+FV.k,'#ffd23d');G.flash=Math.max(G.flash,.25*FX());if(RET.sting)AU.sting('fever');RET.fvDraw();}});
+
+/* ---------- fxwave.js: EFFECTS ASSET WAVE 8 (owner, 18 Oct 2026). Pictures for shots, muzzle flashes, impacts, explosions, enemy fire and power-ups.
+   The list of files is assets-manifest.json group 'Effects (wave 8)' (made by make-fx-assets.py; prompts in FX-FLOW-PROMPTS.md).
+   FXW.pic(key)   the loaded picture of media/fx-<key>.webp, but ONLY when that file is REAL art listed in media/ready.json (the hatched/glowing placeholders written by
+                  make-placeholders.py are never shown: same rule as the weapon mounts and the on-foot art). null otherwise.
+   Every hook below returns false (or the old key) when its picture is not real, so the game looks exactly as before until a real file is dropped. Hooks are one line in the
+   code that used to draw the vector effect: bullet / muzzle / hit (c.js, art.js, b.js), explosions (art.js), zoo enemy fire (zoo.js), power-ups (powerups.js).
+   Nothing is loaded here: shapes.js already loads every ready.json file once through ART.load (light-on-black pictures are keyed to transparency there, cached in ART.bm);
+   scaled copies come from ART.sp (cached per size). No per-frame allocation. FXW.stat counts how often a real picture was used (tests). ---------- */
+const FXW=window.FXW={stat:{bullet:0,muzzle:0,hit:0,boom:0,sniper:0,bomb:0,mine:0,bubble:0,heal:0,aim:0,nova:0,echo:0,magnet:0,wing:0,cresc:0},_n:{},bs:0,mv:0,
+  SOLID:{disc:1,orbit:1,mine:1,shell:1},                                  // weapon shots painted on white (solid objects): drawn normally, not additively
+  SPIN:{disc:1,orbit:1,mine:1,well:1,storm:1},
+  LOOK:{arc:'electric',storm:'electric',laser:'plasma',rail:'plasma',frost:'plasma',wave:'plasma',well:'plasma'}};   // how a kill by this weapon explodes (default fire)
+FXW.name=k=>FXW._n[k]||(FXW._n[k]='fx-'+k);
+FXW.pic=k=>{try{const n=FXW.name(k);return ART.rd&&ART.rd.has(n+'.webp')&&ART.bm[n]?ART.bm[n]:null;}catch(e){return null;}};
+/* additive picture of key k, centred, w world units wide (aspect kept), rotated; false when the picture is not real */
+FXW.add=(k,x,y,w,rot,al,solid)=>{if(!FXW.pic(k))return false;const o=ART.sp(FXW.name(k),w);if(!o)return false;
+  ctx.save();if(!solid)ctx.globalCompositeOperation='lighter';ART.put(o,x,y,rot,al);ctx.restore();return true;};
+/* player shots: b.wid (set in g.js WP.mod) names the weapon. Called inside the additive bullet loop of render(). */
+FXW.bullet=b=>{if(!b.wid)return false;const k='w-'+b.wid+'-bullet';if(!FXW.pic(k))return false;
+  const L=b.len||(b.big?22:b.pn!=null?28:20),w=Math.max(22,Math.min(130,L*1.4+(b.th||3)*2)),ang=((b.vx||b.vy)?Math.atan2(b.vy,b.vx):0)+(FXW.SPIN[b.wid]?G.t*9:0);
+  const o=ART.sp(FXW.name(k),w);if(!o)return false;const solid=FXW.SOLID[b.wid];
+  if(solid)ctx.globalCompositeOperation='source-over';ART.put(o,b.x+(FXW.SPIN[b.wid]?0:Math.cos(ang)*w*.25),b.y+(FXW.SPIN[b.wid]?0:Math.sin(ang)*w*.25),ang,.85);if(solid)ctx.globalCompositeOperation='lighter';
+  FXW.stat.bullet++;return true;};
+/* muzzle flash key: the first equipped weapon (alternating) with a real muzzle picture, else the shared 'muzzle' */
+FXW.mz=base=>{try{const eq=WP.eq;if(!eq)return base;let n=0,pick=null;for(const id of eq)if(id&&FXW.pic('w-'+id+'-muzzle')){if(n++===FXW.mv%2||!pick)pick=id;}
+    if(n>1)FXW.mv++;if(pick){FXW.stat.muzzle++;return'w-'+pick+'-muzzle';}}catch(e){}return base;};
+/* hit spark key: the picture of the weapon that fired the bullet, else the shared 'hit-spark' */
+FXW.hk=(b,base)=>{if(b&&b.wid&&FXW.pic('w-'+b.wid+'-hit')){FXW.stat.hit++;return'w-'+b.wid+'-hit';}return base;};
+/* explosion key by size and look; base = the shared explosion the game asked for, sz = its size in world units, e = the enemy (e._wk = the weapon that last hurt it) */
+FXW.bk=(base,e,sz)=>{try{let sk;if(base==='explosion-boss'){const k=FXW.bs%2?'boom-boss-b':'boom-boss-a';if(FXW.pic(k)){FXW.bs++;FXW.stat.boom++;return k;}return base;}
+    sk=base==='explosion-small'?'small':(sz>=140?'large':'medium');const lk=(e&&e._wk&&FXW.LOOK[e._wk])||'fire';
+    for(const l of lk==='fire'?['fire']:[lk,'fire']){const k='boom-'+sk+'-'+l;if(FXW.pic(k)){FXW.stat.boom++;return k;}}}catch(err){}return base;};
+/* --- enemy fire (zoo.js) --- */
+const fxBeam=(k,x,y,ang,len,th,al)=>{const b=FXW.pic(k);if(!b)return false;ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=al;ctx.translate(x,y);ctx.rotate(ang);ctx.drawImage(b,0,-th/2,len,th);ctx.restore();return true;};
+FXW.sniper=(e,k,lk)=>{if(!fxBeam('eb-sniper-beam',e.x,e.y,e.ang,1500,lk?16:9,lk?.95:.3+.5*k))return false;FXW.stat.sniper++;return true;};
+FXW.aim=(e,left)=>{if(!fxBeam('eb-aim-line',e.x,e.y,e.ang,1500,left<=.3?12:7,left<=.3?.95:.45))return false;FXW.stat.aim++;return true;};
+FXW.bomb=b=>{if(!FXW.add('eb-bomb',b.x,b.y,24,G.t*2,1,true))return false;FXW.stat.bomb++;return true;};
+FXW.mine=(m,t,left)=>{const al=m.armed?(left<=2&&Math.floor(t*8)%2?.4:1):.45;if(!FXW.add('eb-mine',m.x,m.y,m.r*2.8,t*.5,al,true))return false;ctx.globalAlpha=al;FXW.stat.mine++;return true;};
+/* the shielder's bubble: the picture clipped to the front arc the vector shield covered; ctx is at the enemy's centre */
+FXW.bubble=(e,r,f,al)=>{const b=FXW.pic('eb-shield-bubble');if(!b)return false;const rs=r+12;ctx.save();ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,rs*1.3,f-1.15,f+1.15);ctx.closePath();ctx.clip();
+  ctx.globalCompositeOperation='lighter';ctx.globalAlpha=al;ctx.drawImage(b,-rs*1.15,-rs*1.15,rs*2.3,rs*2.3);ctx.restore();FXW.stat.bubble++;return true;};
+FXW.healRing=(e,t)=>{if(!FXW.add('eb-heal-ring',e.x,e.y,310,t*.25,.5+.2*Math.sin(t*3)))return false;FXW.stat.heal++;return true;};
+/* --- power-ups (powerups.js) --- */
+FXW.nova=n=>{if(n.r<6||!FXW.add('pw-nova-ring',n.x,n.y,n.r*2.3,0,Math.max(0,Math.min(1,1-n.r/n.R))*.95))return false;FXW.stat.nova++;return true;};
+FXW.echo=(g,f)=>{if(!FXW.add('pw-echo-ghost',g.x+14,g.y,56,0,.3+.4*f))return false;FXW.stat.echo++;return true;};
+FXW.magnet=(f,k)=>{if(typeof PWK==='undefined'||!PWK.magb||f.c!==PWK.magb.c||!FXW.add('pw-magnet-field',f.x,f.y,2*(f.r+(f.grow||200)*k)*1.1,0,(1-k)*.85))return false;FXW.stat.magnet++;return true;};
+FXW.wing=w=>{if(FXW.add('pw-wingmate-trail',w.x-24,w.y,52,0,.8))FXW.stat.wing++;};     // an addition behind the drone (the vector drone stays)
+FXW.cresc=cr=>{if(!FXW.add('pw-crescendo-glow',P.x,P.y,88+8*Math.min(5,cr.bars|0),0,.3+.1*Math.min(5,cr.bars|0)))return false;FXW.stat.cresc++;return true;};
 
 /* ---------- flavor.js: run-and-gun flavour for the shooter (W5, 18 Oct 2026). Flag RET.flavor; ?flavor=0 = the game as it was (nothing spawns, nothing is drawn, no dice are rolled).
    Story stages only (never the LAB, the tutorial, endless or the daily run), nothing new starts during a boss.
@@ -5292,16 +5341,16 @@ const ZOO=window.ZOO={
   /* ---- looks ---- */
   over(t){if(!RET.zoo||!running)return;ctx.save();
     for(const e of G.en){if(e.dead||e.hp<=0)continue;
-      if(e.type==='healer'){ctx.globalAlpha=.16+.1*Math.sin(t*3);ctx.strokeStyle='#3dffb0';ctx.setLineDash([6,8]);ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(e.x,e.y,150,0,7);ctx.stroke();ctx.setLineDash([]);}
+      if(e.type==='healer'&&!FXW.healRing(e,t)){ctx.globalAlpha=.16+.1*Math.sin(t*3);ctx.strokeStyle='#3dffb0';ctx.setLineDash([6,8]);ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(e.x,e.y,150,0,7);ctx.stroke();ctx.setLineDash([]);}
       if(e.type==='sniper'&&e.aim===1){const k=clamp(1-(e.aimAt-G.bp)*BT.spb/.85,0,1),lk=(e.aimAt-G.bp)*BT.spb<=.4;
-        ctx.globalAlpha=lk?.95:.3+.4*k;ctx.strokeStyle=lk?'#ff3050':'#9dff3a';ctx.lineWidth=lk?2:1;ctx.setLineDash(lk?[]:[10,8]);ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(e.x+Math.cos(e.ang)*1500,e.y+Math.sin(e.ang)*1500);ctx.stroke();ctx.setLineDash([]);}
-      if(e.type==='kamikaze'&&e.tel&&e.zst!==3){const left=(e.diveAt-G.bp)*BT.spb;ctx.globalAlpha=left<=.3?.95:.4;ctx.strokeStyle='#ff3050';ctx.lineWidth=left<=.3?2.5:1.2;ctx.setLineDash(left<=.3?[]:[8,8]);
-        ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(e.x+Math.cos(e.ang)*1500,e.y+Math.sin(e.ang)*1500);ctx.stroke();ctx.setLineDash([]);}}
+        if(!FXW.sniper(e,k,lk)){ctx.globalAlpha=lk?.95:.3+.4*k;ctx.strokeStyle=lk?'#ff3050':'#9dff3a';ctx.lineWidth=lk?2:1;ctx.setLineDash(lk?[]:[10,8]);ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(e.x+Math.cos(e.ang)*1500,e.y+Math.sin(e.ang)*1500);ctx.stroke();ctx.setLineDash([]);}}
+      if(e.type==='kamikaze'&&e.tel&&e.zst!==3){const left=(e.diveAt-G.bp)*BT.spb;if(!FXW.aim(e,left)){ctx.globalAlpha=left<=.3?.95:.4;ctx.strokeStyle='#ff3050';ctx.lineWidth=left<=.3?2.5:1.2;ctx.setLineDash(left<=.3?[]:[8,8]);
+        ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(e.x+Math.cos(e.ang)*1500,e.y+Math.sin(e.ang)*1500);ctx.stroke();ctx.setLineDash([]);}}}
     for(const b of this.bombs){const k=clamp((G.t-b.t0)/.5,0,1),R=this.BR,near=G.bc>=b.b0+1;ctx.globalAlpha=.9;ctx.strokeStyle='#ff4d4d';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(b.x,b.y,R,0,7);ctx.stroke();
       ctx.globalAlpha=.18+.3*k;ctx.fillStyle='#ff304088';ctx.beginPath();ctx.arc(b.x,b.y,R*(near?1:.35+.65*k),0,7);ctx.fill();
-      ctx.globalAlpha=1;ctx.fillStyle='#1a0e0a';ctx.strokeStyle='#ffa02d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(b.x,b.y,7,0,7);ctx.fill();ctx.stroke();}
-    for(const m of this.mines){const left=16-(G.bc-m.b0);ctx.globalAlpha=m.armed?(left<=2&&Math.floor(t*8)%2?.4:1):.45;ctx.fillStyle='#1a1d08';ctx.strokeStyle=m.armed?'#d8ff3d':'#7a8a30';ctx.lineWidth=2;
-      ctx.beginPath();for(let i=0;i<8;i++){const q=i*Math.PI/4+t*.5,rr=i%2?m.r*.6:m.r;ctx.lineTo(m.x+Math.cos(q)*rr,m.y+Math.sin(q)*rr);}ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.globalAlpha=1;if(!FXW.bomb(b)){ctx.fillStyle='#1a0e0a';ctx.strokeStyle='#ffa02d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(b.x,b.y,7,0,7);ctx.fill();ctx.stroke();}}
+    for(const m of this.mines){const left=16-(G.bc-m.b0);if(!FXW.mine(m,t,left)){ctx.globalAlpha=m.armed?(left<=2&&Math.floor(t*8)%2?.4:1):.45;ctx.fillStyle='#1a1d08';ctx.strokeStyle=m.armed?'#d8ff3d':'#7a8a30';ctx.lineWidth=2;
+      ctx.beginPath();for(let i=0;i<8;i++){const q=i*Math.PI/4+t*.5,rr=i%2?m.r*.6:m.r;ctx.lineTo(m.x+Math.cos(q)*rr,m.y+Math.sin(q)*rr);}ctx.closePath();ctx.fill();ctx.stroke();}
       if(!m.armed){ctx.strokeStyle='#ff4d4d';ctx.setLineDash([3,4]);ctx.beginPath();ctx.arc(m.x,m.y,m.r+9,0,7);ctx.stroke();ctx.setLineDash([]);}}
     for(const f of this.fx){const k=1-f.l/f.m;ctx.globalAlpha=Math.max(0,f.l/f.m);ctx.strokeStyle=f.c;ctx.fillStyle=f.c;ctx.lineWidth=3;
       if(f.k==='plus'){ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.fillText('+',f.x,f.y-k*14);}
@@ -5315,7 +5364,7 @@ const ZOO=window.ZOO={
     const glow=(c,a)=>{ctx.globalCompositeOperation='lighter';G_(0,0,r*1.1,c,a);ctx.globalCompositeOperation='source-over';};
     switch(e.type){
       case'shielder':{ctx.beginPath();for(let i=0;i<6;i++){const q=i*Math.PI/3+Math.PI/6;ctx.lineTo(Math.cos(q)*r,Math.sin(q)*r);}ctx.closePath();ctx.fill();ctx.stroke();glow(T.col,.35);
-        if(e.shN>0){const f=e.fa==null?Math.PI:e.fa,rs=r+12;ctx.globalAlpha=(.35+.5*(e.shN/e.shMax))*(e.shF>0?1:.8);ctx.strokeStyle=e.shF>0?'#fff':'#4ad1ff';ctx.fillStyle='#4ad1ff22';ctx.lineWidth=4;
+        if(e.shN>0&&!FXW.bubble(e,r,e.fa==null?Math.PI:e.fa,(.35+.5*(e.shN/e.shMax))*(e.shF>0?1:.8))){const f=e.fa==null?Math.PI:e.fa,rs=r+12;ctx.globalAlpha=(.35+.5*(e.shN/e.shMax))*(e.shF>0?1:.8);ctx.strokeStyle=e.shF>0?'#fff':'#4ad1ff';ctx.fillStyle='#4ad1ff22';ctx.lineWidth=4;
           ctx.beginPath();ctx.arc(0,0,rs,f-1.15,f+1.15);ctx.stroke();ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,rs,f-1.15,f+1.15);ctx.closePath();ctx.fill();ctx.globalAlpha=1;}
         break;}
       case'splitter':{ctx.beginPath();ctx.moveTo(-r,0);ctx.lineTo(0,-r);ctx.lineTo(r,0);ctx.lineTo(0,r);ctx.closePath();ctx.fill();ctx.stroke();ctx.beginPath();ctx.moveTo(0,-r);ctx.lineTo(0,r);ctx.stroke();
@@ -5496,13 +5545,13 @@ if(RET.pw2){
     ctx.stroke();ctx.restore();};}
   {const pd=PW.draw;PW.draw=function(t){pd.call(this,t);const s=G.p2;if(!s||!G.pw)return;
     ctx.save();ctx.lineCap='round';
-    if(PW.on('echo')){for(const g of s.ech){const f=clamp(1-(g.at-G.bc-PHF),0,1);ctx.globalAlpha=.25+.35*f;ctx.strokeStyle=PWK.echo.c;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(g.x-14,g.y-9);ctx.lineTo(g.x+10,g.y);ctx.lineTo(g.x-14,g.y+9);ctx.closePath();ctx.stroke();ctx.setLineDash([3,5]);ctx.beginPath();ctx.moveTo(g.x+12,g.y);ctx.lineTo(g.x+80,g.y);ctx.stroke();ctx.setLineDash([]);}
+    if(PW.on('echo')){for(const g of s.ech){const f=clamp(1-(g.at-G.bc-PHF),0,1);if(FXW.echo(g,f))continue;ctx.globalAlpha=.25+.35*f;ctx.strokeStyle=PWK.echo.c;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(g.x-14,g.y-9);ctx.lineTo(g.x+10,g.y);ctx.lineTo(g.x-14,g.y+9);ctx.closePath();ctx.stroke();ctx.setLineDash([3,5]);ctx.beginPath();ctx.moveTo(g.x+12,g.y);ctx.lineTo(g.x+80,g.y);ctx.stroke();ctx.setLineDash([]);}
       for(const q of s.trl){ctx.globalAlpha=q.l/q.m*.6;ctx.strokeStyle=PWK.echo.c;ctx.lineWidth=5*q.l/q.m+1;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(q.x+260,q.y);ctx.stroke();}}
-    if(PW.on('wing')&&s.wm.on)for(const w of s.wm){ctx.globalAlpha=.95;ctx.fillStyle='#0a0612';ctx.strokeStyle=PWK.wing.c;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(w.x+9,w.y);ctx.lineTo(w.x,w.y-7);ctx.lineTo(w.x-8,w.y);ctx.lineTo(w.x,w.y+7);ctx.closePath();ctx.fill();ctx.stroke();ctx.globalAlpha=.25+.5*Math.pow(1-PHF,2);ctx.globalCompositeOperation='lighter';G_(w.x,w.y,18,PWK.wing.c,.5);ctx.globalCompositeOperation='source-over';}
-    const n=s.nv;if(n){ctx.globalAlpha=clamp(1-n.r/n.R,0,1)*.9;ctx.strokeStyle=n.ch?PWK.chord.c:PWK.nova.c;ctx.lineWidth=7*(1-n.r/n.R)+2;ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,7);ctx.stroke();}
-    for(const f of s.fl){const k=1-f.l/f.m;ctx.globalAlpha=(1-k)*.8;ctx.strokeStyle=f.c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(f.x,f.y,f.r+(f.grow||200)*k,0,7);ctx.stroke();}
+    if(PW.on('wing')&&s.wm.on)for(const w of s.wm){FXW.wing(w);ctx.globalAlpha=.95;ctx.fillStyle='#0a0612';ctx.strokeStyle=PWK.wing.c;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(w.x+9,w.y);ctx.lineTo(w.x,w.y-7);ctx.lineTo(w.x-8,w.y);ctx.lineTo(w.x,w.y+7);ctx.closePath();ctx.fill();ctx.stroke();ctx.globalAlpha=.25+.5*Math.pow(1-PHF,2);ctx.globalCompositeOperation='lighter';G_(w.x,w.y,18,PWK.wing.c,.5);ctx.globalCompositeOperation='source-over';}
+    const n=s.nv;if(n&&!FXW.nova(n)){ctx.globalAlpha=clamp(1-n.r/n.R,0,1)*.9;ctx.strokeStyle=n.ch?PWK.chord.c:PWK.nova.c;ctx.lineWidth=7*(1-n.r/n.R)+2;ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,7);ctx.stroke();}
+    for(const f of s.fl){const k=1-f.l/f.m;if(FXW.magnet(f,k))continue;ctx.globalAlpha=(1-k)*.8;ctx.strokeStyle=f.c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(f.x,f.y,f.r+(f.grow||200)*k,0,7);ctx.stroke();}
     const ch=PW2.act('chord');if(ch&&!ch.used){ctx.globalAlpha=.55+.25*Math.sin(t*6);ctx.strokeStyle=PWK.chord.c;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(P.x,P.y,32,0,7);ctx.stroke();ctx.globalAlpha=.1;ctx.fillStyle=PWK.chord.c;ctx.fill();}
-    const cr=PW2.act('cres');if(cr&&(cr.bars|0)>0){ctx.globalAlpha=.3+.1*cr.bars;ctx.strokeStyle=PWK.cres.c;ctx.lineWidth=2;for(let i=0;i<Math.min(5,cr.bars);i++){ctx.beginPath();ctx.arc(P.x,P.y,36+i*4,Math.PI*.15,Math.PI*.85);ctx.stroke();}}
+    const cr=PW2.act('cres');if(cr&&(cr.bars|0)>0&&!FXW.cresc(cr)){ctx.globalAlpha=.3+.1*cr.bars;ctx.strokeStyle=PWK.cres.c;ctx.lineWidth=2;for(let i=0;i<Math.min(5,cr.bars);i++){ctx.beginPath();ctx.arc(P.x,P.y,36+i*4,Math.PI*.15,Math.PI*.85);ctx.stroke();}}
     ctx.restore();};}
   NR.on('runStart',()=>{G.p2=null;});NR.on('runEnd',()=>{if(G)G.p2=null;});
 }
@@ -6604,7 +6653,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
     return this._f;},
   fk(){return this.fu()?FU_K:1;},
   // options a fusion adds to the bullets of weapon id
-  mod(id,o){const f=this.fu();o=Object.assign({},o);if(!f)return o;const fx=f.fx,mine=id===f.own||id===f.par;
+  mod(id,o){const f=this.fu();o=Object.assign({wid:id},o);if(!f)return o;const fx=f.fx,mine=id===f.own||id===f.par;
     if(fx==='split'&&mine){if(!o.px){o.px=new Set();o.pn=1;}o.sp=1;}
     else if(fx==='rebound'&&mine){if(!o.px){o.px=new Set();o.pn=99;}o.rc=Math.max(o.rc||0,1);}
     else if(fx==='seek'&&id===f.par)o.hk=Math.max(o.hk||0,1.8);
@@ -6638,15 +6687,15 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
     else if(WPX.fire[id])WPX.fire[id](std,L);},
   // can this foe be hurt by direct (non-bullet) damage right now?
   tgt(e){return e.hp>0&&!e.dying&&e.type!=='gate'&&e.x<W-6&&(e.type!=='boss'||e.x<W-20);},
-  hurtE(e,dm){e.hp-=dm*(e.shl?.45:1);e.flash=.08;},
+  hurtE(e,dm,w){e.hp-=dm*(e.shl?.45:1);e.flash=.08;if(w)e._wk=w;},
   // ARC CHAIN: the nearest foe in range, then it jumps from foe to foe (1+L jumps)
   arcZap(L){const R=270+14*L,dm=(1.2+.01*(L-1))*tpDmg()*this.fk();let cx=P.x+18,cy=P.y;const hit=new Set();
     for(let i=0;i<2+(L>=6)+(L>=10);i++){let best=null,bd=i?150:R;for(const e of G.en){if(hit.has(e)||!this.tgt(e)||e.x<P.x-30)continue;const d=Math.hypot(e.x-cx,e.y-cy);if(d<bd){bd=d;best=e;}}
-      if(!best)break;hit.add(best);this.hurtE(best,dm);AX.arcs.push({x1:cx,y1:cy,x2:best.x,y2:best.y,l:.22});cx=best.x;cy=best.y;}
+      if(!best)break;hit.add(best);this.hurtE(best,dm,'arc');AX.arcs.push({x1:cx,y1:cy,x2:best.x,y2:best.y,l:.22});cx=best.x;cy=best.y;}
     if(hit.size)AU.sfx('graze');},
   // a lightning leap from foe e to the nearest other foe (zap fusion)
   leap(e,dm){let best=null,bd=170;for(const o of G.en){if(o===e||!this.tgt(o))continue;const d=Math.hypot(o.x-e.x,o.y-e.y);if(d<bd){bd=d;best=o;}}
-    if(best){this.hurtE(best,dm);AX.arcs.push({x1:e.x,y1:e.y,x2:best.x,y2:best.y,l:.2});}},
+    if(best){this.hurtE(best,dm,'arc');AX.arcs.push({x1:e.x,y1:e.y,x2:best.x,y2:best.y,l:.2});}},
   // MINE LAYER: a mine only drops when the ship has moved since the last one, so sitting still lays nothing new
   dropMine(L){if(Math.abs(P.y-this.lmy)<14)return;this.lmy=P.y;if(this.mn.length>=(L>=6?5:4))return;this.mn.push({x:P.x-26,y:P.y,vx:70,t:0,L});},
   boom(m){const f=this.fu(),k=this.fk(),L=m.L,R=62+3*L,dm=(3.6+.1*(L-1))*tpDmg()*k;let first=null;
@@ -6845,7 +6894,7 @@ WPX.shell=(x,y,L,b)=>{const n=4+Math.floor(L/2)+(L>=10),wide=.9+.03*L,k=WP.fk();
   for(let i=0;i<n&&pbRoom();i++){const a=(n>1?i/(n-1)-.5:0)*wide;G.pb.push({x,y,vx:Math.cos(a)*650,vy:Math.sin(a)*650,dm:(.7+.03*L)*tpDmg()*k,pf:0,col:'#ffa94d',len:10,th:3,fz:1});}
   G.rings.push({x,y,l:.3,m:.3,c:'#ffa94d'});burst(x,y,'#ffa94d',8,220,.35);AU.sfx('hit');if(b)b.dead=1;};
 WPX.railFire=(L)=>{const dm=DMG.hit((8+.3*L)*tpDmg()*WP.fk()),w=10+.6*L;let n=0;
-  for(const e of G.en){if(!WP.tgt(e)||e.x<P.x||Math.abs(e.y-P.y)>e.r+w)continue;WP.hurtE(e,dm);n++;burst(e.x,e.y,WPD.rail.c,4,160,.25);}
+  for(const e of G.en){if(!WP.tgt(e)||e.x<P.x||Math.abs(e.y-P.y)>e.r+w)continue;WP.hurtE(e,dm,'rail');n++;burst(e.x,e.y,WPD.rail.c,4,160,.25);}
   WS.rf={x:P.x,y:P.y,w,l:.3,m:.3};AU.sfx('shot');return n;};
 {const bt=WP.beat;WP.beat=function(){bt.call(this);if(!G.live||G.dead||SH.active||P.over||!this.eq.includes('rail'))return;
   const L=this.lvOf('rail'),need=L>=6?2:3;if(++WS.rc>=need){WS.rc=0;WPX.railFire(L);}};
@@ -6861,7 +6910,7 @@ WPX.upd=function(dt){const ids=WP.eqIds(),k=WP.fk();
   for(const b of G.pb)if(b.sh&&!b.dead&&b.x>b.bx+300)WPX.shell(b.x,b.y,b.sl||1,b);
   if(ids.includes('well')){const L=WP.lvOf('well');for(let i=WS.orb.length-1;i>=0;i--){const o=WS.orb[i];o.t+=dt;o.x+=o.vx*dt;o.vx=Math.max(60,o.vx-120*dt);o.tk-=dt;
       for(const e of G.en){if(!WP.tgt(e)||e.type==='boss')continue;const dx=o.x-e.x,dy=o.y-e.y,d=Math.hypot(dx,dy);if(d<o.R&&d>4){const pull=Math.min(d,(1-d/o.R)*240*dt);e.x+=dx/d*pull;e.y+=dy/d*pull;}}
-      if(o.tk<=0){o.tk=.3;for(const e of G.en)if(WP.tgt(e)&&Math.hypot(e.x-o.x,e.y-o.y)<o.R*.6+e.r)WP.hurtE(e,(.4)*tpDmg()*k);}
+      if(o.tk<=0){o.tk=.3;for(const e of G.en)if(WP.tgt(e)&&Math.hypot(e.x-o.x,e.y-o.y)<o.R*.6+e.r)WP.hurtE(e,(.4)*tpDmg()*k,'well');}
       if(o.t>=o.life||o.x>W-20){WS.orb.splice(i,1);const dm=3.4*tpDmg()*k;for(const e of G.en)if(WP.tgt(e)&&Math.hypot(e.x-o.x,e.y-o.y)<o.R*.8+e.r)WP.hurtE(e,dm);
         G.rings.push({x:o.x,y:o.y,l:.4,m:.4,c:WPD.well.c});burst(o.x,o.y,WPD.well.c,10,240,.4);AU.sfx('hit');}}}
   else WS.orb.length=0;
@@ -6872,7 +6921,7 @@ WPX.upd=function(dt){const ids=WP.eqIds(),k=WP.fk();
   if(ids.includes('storm')){for(let i=WS.fld.length-1;i>=0;i--){const f=WS.fld[i],L=WP.lvOf('storm');f.t+=dt;f.x+=f.vx*dt;f.zt-=dt;
       if(f.t>=f.life||f.x<-40){WS.fld.splice(i,1);continue;}
       if(f.zt<=0){f.zt=.3;const tg=G.en.filter(e=>WP.tgt(e)&&Math.hypot(e.x-f.x,e.y-f.y)<f.R+e.r).sort((a,b)=>Math.hypot(a.x-f.x,a.y-f.y)-Math.hypot(b.x-f.x,b.y-f.y)).slice(0,1);
-        for(const e of tg){WP.hurtE(e,1.6*tpDmg()*k);AX.arcs.push({x1:f.x,y1:f.y,x2:e.x,y2:e.y,l:.18});}if(tg.length)AU.sfx('graze');}}}
+        for(const e of tg){WP.hurtE(e,1.6*tpDmg()*k,'storm');AX.arcs.push({x1:f.x,y1:f.y,x2:e.x,y2:e.y,l:.18});}if(tg.length)AU.sfx('graze');}}}
   else WS.fld.length=0;
   if(WS.rf){WS.rf.l-=dt;if(WS.rf.l<=0)WS.rf=null;}};
 WPX.draw=function(t){const c=ctx,ids=WP.eqIds();c.save();c.globalCompositeOperation='lighter';
@@ -7821,7 +7870,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   ctx.globalCompositeOperation='lighter';const D=DISTRICTS[G.di];
   // the ship's own fire is dim and thin: the enemy bullets (bright lime, dark rim) are what must read
   const PS=ART.have('fx-shot-std');
-  for(const b of G.pb){if(PS){shotDraw(b,D);continue;}ctx.globalAlpha=.5;ctx.fillStyle=b.col||(b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b);const th=(b.th||(b.big?4:3))*.6;ctx.fillRect(b.x-10,b.y-th/2,b.len||(b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16),th);if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,b.pf?'#ffe14d':D.b,.22);}
+  for(const b of G.pb){if(b.wid&&FXW.bullet(b))continue;if(PS){shotDraw(b,D);continue;}ctx.globalAlpha=.5;ctx.fillStyle=b.col||(b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b);const th=(b.th||(b.big?4:3))*.6;ctx.fillRect(b.x-10,b.y-th/2,b.len||(b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16),th);if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,b.pf?'#ffe14d':D.b,.22);}
   ctx.globalAlpha=1;
   if(SET.part)for(const p of G.pt){const a=p.l/p.m;if(p.ghost){G_(p.x,p.y,p.sz*2,p.c,a*.5);}else{ctx.globalAlpha=a;ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.sz,p.sz);}}
   ctx.globalAlpha=1;
