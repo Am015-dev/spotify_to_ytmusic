@@ -4,6 +4,13 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun VARIETY A: formations, stage scripts, rule changes (flag RET.vary, ?vary=0 = old waves, 18 Oct 2026)
+- `parts/formations.js` (after zoo.js): 62 formations with their own spatial behaviour (pincer, X, snake, spiral, moving-gap wall, meteors, shadow, bait, curtain, geyser, scissors, loop, testudo, ambush...). Each declares tags, first stage, cost, telegraph, gap, kinds, role. Path units move in FM.mv (one hook line in b.js's enemy switch); every path ends flying left, so leaks still count.
+- `parts/stagescripts.js`: the editable table `VSCRIPT` (45 stages: 10-13 moments, a '*' set piece unique to the stage, a '~' breather, '+g' ground moments, 'a|b' mixes, '~r' remixes) + 15 rule changes `VMUT` on every even story stage (RULE card after the stage card, name after the HUD goal line; paused while a boss is out; gentler on Easy). The director keeps timing, budget, caps, READY gaps; scripts only pick WHAT spawns.
+- Hard tiers: the old random zoo/ground waves stay on and 25/35/40% (Hard/Very hard/Legend) of the calls use the old pool, or Legend got easier (scale-test 33% -> 75%). Formation swarmers pay 30% Neon (econ was 8.9 h).
+- Tests: `vary-test.js` (library, 45 scripts, gaps >= 120 px, caps, flag off = seeded identical spawns vs the page without the two files), `vary-audit.js` (before/after numbers). zoo-test's deferred-wave check now counts any new unit (formations can enter from top/bottom).
+- Weak / next: endless mode still uses the old pools; Hard+ still mixes in old patterns; set pieces are a named pair + twist, not bespoke choreography; mutators have no art (code shapes only); stage plate on the map does not show the rule yet.
+
 ## Nightrun bullet readability F5 (flag RET.read, ?read=0 = old look, 18 Oct 2026)
 - `parts/readable.js` (built just before c.js): in play the backdrop is desaturated and dimmed to ~55% (one overlay after drawBG/drawBGP); edge beat pulse x0.7. Enemy bullets and hazards use ONE danger hue `READ.D` (#ff2d78, white core, dark ring); real pictures keep the picture and get the ring only. Player shots are cyan / blue-white at 70% (`READ.pc`). The 'up' pickup and the NOVA power-up are no longer pink. Hitbox dot on the ship (Settings > Assist 'Show hitbox', SET.hbox, default on). Telegraphs (ZOO.over, FXW beams, boss laser tells) sit on a dark halo. On-foot enemy shots use the same hue (foot.js hook).
 - Hooks are one line each in c.js, fx.js, draw.js, zoo.js, foot.js. Hit sizes, counts, caps and damage are untouched.

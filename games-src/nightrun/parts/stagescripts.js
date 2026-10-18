@@ -7,7 +7,8 @@
      sig  [name, formation A, formation B, twist]: the set piece no other stage has; twist = mirror | elite | fast | echo
      mut  the stage's rule change (VMUT below), every second stage; '' = none. It is on the intro card and in the HUD and pauses while a boss is out.
    The director keeps its own timing, budget, caps and READY gaps (dir.js, zoo.js, leak.js): it decides WHEN and HOW MUCH, the script decides WHAT.
-   On Hard / Very hard / Legend the old random zoo and ground waves still come between the scripted pieces, so the hard tiers keep their pressure. ---------- */
+   On Hard / Very hard / Legend the old random zoo and ground waves still come between the scripted pieces, and 25 / 35 / 40% of the calls use the stage's old
+   wave pool, so the hard tiers keep their pressure (scale-test, scale2-test, scale3-test). ---------- */
 const VSCRIPT={
  1:{sig:['COURIER LIGHTS','wave','zigzag','mirror'],mut:'',m:['line','snake','zigzag','helix','gates','snake|wave','wave','crossX','echo','~stutter','*','bounce']},
  2:{sig:['PATROL GRID','gates','snake','fast'],mut:'offbeat',m:['vee','fan','turrets','chargers','echo','fan|wave','wave','zigzag','stutter','~hold','*','helix']},
@@ -86,6 +87,7 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
   mom(){return this.st.ms[this.idx()];},
   gnd(){return !!this.mom().g;},
   hard(){return HARDS.includes(SET.diff);},                    // Hard, Very hard, Legend: the old random zoo and ground waves still come between the scripted pieces (Legend must not get easier)
+  oldK(){return {hard:.25,vhard:.35,legend:.4}[SET.diff]||0;},   // ... and this share of the director's calls still uses the stage's old wave pool (its turrets and gunships)
   /* ---- the director's call: one piece of the moment's formation ---- */
   spawn(fill){const st=this.st,i=this.idx(),m=st.ms[i];if(i!==st.i){st.i=i;this.enter(i,m);}
     const c=st.c[i]=(st.c[i]|0)+1;let id,key,tw='';
@@ -148,7 +150,7 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
       ctx.fillStyle=ctx.strokeStyle;ctx.font='700 18px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.fillText(String(o.n),o.x,o.y+6);ctx.globalAlpha=1;}
     ctx.restore();}};
 /* ---- hooks (all inert with the flag off) ---- */
-{const so=DIR.spawnOne;DIR.spawnOne=function(fill){if(VARY.active())return VARY.spawn(fill);return so.call(this,fill);};}   // innermost: zoo.js and leak.js wrap it later (caps, READY gaps)
+{const so=DIR.spawnOne;DIR.spawnOne=function(fill){if(VARY.active()&&!(VARY.hard()&&GR()<VARY.oldK()))return VARY.spawn(fill);return so.call(this,fill);};}   // innermost: zoo.js and leak.js wrap it later (caps, READY gaps)
 {const pt=DIR.pickTheme;DIR.pickTheme=function(bar){pt.call(this,bar);VARY.theme();};}
 {const bl=DIR.barLine;DIR.barLine=function(i){VARY.theme();return bl.call(this,i);};}
 if(window.ZOO){const wo=ZOO.waveOK;ZOO.waveOK=function(){return wo.call(this)&&(!VARY.active()||VARY.hard());};}   // Easy/Normal: the zoo kinds come from the scripts' roles; the hard tiers keep the old random zoo pressure on top

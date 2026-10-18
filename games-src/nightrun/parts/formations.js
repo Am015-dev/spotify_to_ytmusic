@@ -249,5 +249,8 @@ FM.def('ambush',{tags:['elite','rush'],t:34,cost:5,kinds:['sniper','kamikaze'],r
 FM.def('flankers',{tags:['flank'],t:4,cost:2,kinds:['flank'],f(I,k){DIR.flank(2,true);}});
 
 NR.on('runStart',()=>{FM.reset();});
+/* economy: a formation's swarmers are cheap one-hit targets (walls, rivers, tides) and the old story stages had almost none, so each pays FM.swN of a kill's Neon (econ-test) */
+FM.swN=.3;
+{const aw=SH.award;SH.award=function(e,keep){if(!RET.vary||!e||!e.fid||e.type!=='swarm')return aw.call(this,e,keep);const k=this.nx;this.nx=k*FM.swN;try{return aw.call(this,e,keep);}finally{this.nx=k;}};}
 NR.on('beat',()=>{if(RET.vary)FM.tickTel();});
 {const dp=drawPickups;drawPickups=function(t){dp(t);try{FM.draw(t);}catch(err){}};}
