@@ -208,3 +208,10 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 3. tBoot touch, 1 run each (time cap, not the median of 2): Fra >50 ms 18→9, >150 1→0, max 254→137; Ath >50 49→49, >150 3→2, max 406→286, late-link frames 7→3. Goal NOT met in Athens.
 4. Left: Ath f4 hubCullStep 254 ms (d: scene traverse/cull), PC_step+hubCull 70-95 ms frames, one lazy-district instanced tile still links at 2 s (Group{lz} Mesh{lf,pcQ}), major GC (c) untouched.
 5. Gate: unit 0 FAIL; TAG=life1,xf1,terrain,phone2 41/44 (xf1/grass, water, assist = known).
+
+## boot-3 (2026-10-18, on trunk alex/od-int2): Athens first minute
+1. The 254 ms cull frame was hubCullInit (bounding spheres for every hub mesh plus a traverse on the first roam frame) together with LDS_scan; both now run in the loader (98bo_boot1 'cull'). LDS_scan re-traversed the WHOLE hub on every tile landing: it now rescans only the top-level groups that changed (LDS_scan(true) = full scan).
+2. PC_add now walks only the changed top-level groups (a lazy tile root until it is shown), not the hub; PC_grid writes only the touched cells into a doubling PC.G (was a full re-copy, 43 ms). PC_add 40 → 9-15 ms, PC_grid 43 → 26-31 ms.
+3. tBoot touch, Athens, 2 runs each, JS frames >50 ms: before 109/79 (median 94) → after 39/54 (median 46.5); JS max 290/197 → 294/295; total n150 10/7 → 9/7. Frankfurt, 1 run: jsn50 14 → 14, n150 3 → 1, max 170 → 210 (GC noise). Goal (≤10, 0 >150) NOT met.
+4. Remaining long frames are major GC (75-88 % of the profile) landing in PC_step/hubCullStep/roamCam/LV_step, plus render+prog late links at 25-30 s. Next: an allocation-sampling profile of the first 60 s, and the remaining PC_grid per-mesh Maps.
+5. Gate b3c: unit 0 FAIL; TAG=perf17,perf5,life1,xf1,terrain,phone2 46/48 (xf1/grass, xf1/water = known).
