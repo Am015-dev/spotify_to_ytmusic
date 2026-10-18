@@ -120,7 +120,9 @@ function LIFE_free(x,z,r,y){if(LV_onRoad(x,z,Math.max(1,r*.7+.6)))return false;
  {/* slow1: the hub graph is not the drawn road: set pieces stood ON the real street (Athens -2244,-1487 sprinkler, -2241,-1484 balloons: solid, r+1.2 m, 3 s wedge) — also test the city street and fill roads that the car actually drives on */
   const m=r*.7+.6;if(typeof cityAt==='function'){const q=cityAt(x,z);if(q&&q.road&&q.d<q.road.w/2+m)return false}if(typeof fillAt==='function'){const f=fillAt(x,z);if(f&&f.r&&f.d<f.r.w/2+m)return false}}if(roamHit(x,z,r+.4,y+.5))return false;if(typeof inRiver==='function'&&inRiver(x,z,-2))return false;return true}
 // first free spot for something of radius r at this slot: kerb distances tried nearest first (Athens blocks are narrow, so the near ones matter)
-function LIFE_at(p,r){for(const d of p.D){const q=LIFE_side(p.EA,p.EB,p.s,p.sd,d+r),y=LIFE_gy(q.x,q.z);if(!isFinite(y)||y<-2)continue;if(LIFE_free(q.x,q.z,r,y)){q.y=y;return q}}return null}
+// perf-11: the candidate x,z are computed in place (no object per try); the result object is built only for the spot that fits
+function LIFE_at(p,r){const A=p.EA,B=p.EB,D=p.D,L=Math.hypot(B.x-A.x,B.z-A.z)||1,ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20)),s=p.s,sd=p.sd;
+ for(let i=0;i<D.length;i++){const off=W/2+(D[i]+r),x=A.x+ux*s-uz*off*sd,z=A.z+uz*s+ux*off*sd,y=LIFE_gy(x,z);if(!isFinite(y)||y<-2)continue;if(LIFE_free(x,z,r,y)){const q=LIFE_side(A,B,s,sd,D[i]+r);q.y=y;return q}}return null}
 let LIFE_SMT=CID==='fra'?18:15;// smashable groups wanted per 5×5 cells (tuned: 10-40 smashables per 100 m window)
 const LIFE_D={fra:[1.2,3,4.6,6.5],ath:[.5,1.4,2.4,3.6,5,7,9]};// m beyond the carriageway edge (+ the item's radius); LIFE_free keeps lane + 1 m clear
 // kerb slots of a cell (every 16 m, Athens 8 m, both sides), hash-sorted; cached
