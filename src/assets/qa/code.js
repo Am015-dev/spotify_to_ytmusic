@@ -37,7 +37,8 @@ const foot=()=>RO.foot==='walk'||RO.foot==='sit';
 const wheels=ud=>{const host=ud&&ud.m;if(!host)return[];const W=[];host.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let v=true,q=w;while(q&&q!==host){if(!q.visible)v=false;q=q.parent}if(v)W.push(w)});return W};
 const _p=new THREE.Vector3(),_s=new THREE.Vector3();
 // ---- the invariants. Each pushes bug(...) itself.
-function invariants(){
+/* perf-14: lite=true (3 of every 4 ticks) skips the ped colliders (4) and the camera ray (6): ~6 MB of boxed roamHit garbage per tick in Athens; both still run every 2 s and on Q.check */
+function invariants(lite){
   const px=RO.x,pz=RO.z,py=RO.y,onFoot=foot(),gnd=gy(px,pz,py+1.5);
   // NaN positions (player car, on-foot figure, camera, ride mesh)
   {const bad=[];for(const[k,v]of[['x',RO.x],['y',RO.y],['z',RO.z],['h',RO.h],['v',RO.v],['vy',RO.vy],['camx',camera.position.x],['camy',camera.position.y],['camz',camera.position.z],['mx',pl&&pl.mesh.position.x],['my',pl&&pl.mesh.position.y],['mz',pl&&pl.mesh.position.z],['ofx',onFoot?OF.x:0],['ofy',onFoot?OF.y:0],['ofz',onFoot?OF.z:0]])if(!Number.isFinite(v))bad.push(k);
@@ -59,12 +60,12 @@ function invariants(){
   {const fx=onFoot?OF.x:px,fz=onFoot?OF.z:pz,fy=onFoot?OF.y:py;
     const b=roamHit(fx,fz,-.2,fy);if(b&&!boat)bug(onFoot?'foot_in_building':'ride_in_building',fx,fz,fy,'inside collider '+(b.t||b.n||b.id||'box'));
     if(HUB.cars)for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-fx,dz=c.z-fz;if(dx*dx+dz*dz<(onFoot?.3:1.3)*(onFoot?.3:1.3)&&Math.abs((c.y||0)-fy)<2&&!(onFoot&&c.pk&&0)){if(RO.foot==='jack'||RO.foot==='enter'||RO.foot==='exit'||(OF.jk&&OF.jk.c===c))continue;bug(onFoot?'foot_in_car':'ride_in_car',fx,fz,fy,'inside traffic car '+(c.k||c.j))}}
-    let np=0;if(HUB.peds)for(const p of HUB.peds){if(p.x==null||p.dead)continue;const dx=p.x-fx,dz=p.z-fz;if(dx*dx+dz*dz>1600)continue;np++;const hb=roamHit(p.x,p.z,-.2,p.y||0);if(hb)bug('npc_in_building',p.x,p.z,p.y||0,'ped inside collider')}}
+    let np=0;if(HUB.peds&&!lite)for(const p of HUB.peds){if(p.x==null||p.dead)continue;const dx=p.x-fx,dz=p.z-fz;if(dx*dx+dz*dz>1600)continue;np++;const hb=roamHit(p.x,p.z,-.2,p.y||0);if(hb)bug('npc_in_building',p.x,p.z,p.y||0,'ped inside collider')}}
   // 5) prop / fill / tree instance inside a road polygon (props near the player)
   /* perf-12: walk the 16 m prop grid (HUB.pgrid, kept in step with HUB.props) within 60 m, not all ~130k props: this cold (interpreted) loop boxed every dx/dz and iterator step, ~180 MB / 15 s in Athens */
   const PG=HUB.pgrid;if(HUB.props&&PG){const kx=Math.floor(px/16),kz=Math.floor(pz/16);for(let a=-4;a<=4;a++)for(let c=-4;c<=4;c++){const A=PG.get((kx+a)*10000+kz+c);if(!A)continue;for(let i=0;i<A.length;i++){const p=A[i];if(p.alive===false||p.x==null)continue;const dx=p.x-px,dz=p.z-pz;if(dx*dx+dz*dz>3600||Q.pchk.has(p)||ROAD_OK.has(p.t))continue;Q.pchk.add(p);if(CE_onRoad(p.x,p.z))bug('prop_on_road',p.x,p.z,p.y||0,'prop '+p.t+' inside a road polygon','p:'+p.t+':'+Math.round(p.x)+','+Math.round(p.z))}}}
   // 6) camera ray to the player blocked (or camera under the ground)
-  if(!onFoot&&state==='roam'&&!(RO.pOpen||RO.frozen)){const c=camera.position,hx=px,hy=py+1.2,hz=pz,dx=c.x-hx,dy=c.y-hy,dz=c.z-hz,L=Math.hypot(dx,dy,dz);
+  if(!lite&&!onFoot&&state==='roam'&&!(RO.pOpen||RO.frozen)){const c=camera.position,hx=px,hy=py+1.2,hz=pz,dx=c.x-hx,dy=c.y-hy,dz=c.z-hz,L=Math.hypot(dx,dy,dz);
     if(L>2.5&&L<40){let hit=0;for(let s=1.5;s<L-.5;s+=1){const k=s/L,x=hx+dx*k,y=hy+dy*k,z=hz+dz*k;if(roamHit(x,z,.15,y))hit++}
       if(hit>=2)bug('camera_blocked',px,pz,py,'building between camera and car ('+hit+' samples, cam '+r1(L)+' m away)')}
     if(c.y<gy(c.x,c.z,c.y+2)-.2)bug('camera_underground',c.x,c.z,c.y,'camera '+r2(gy(c.x,c.z,c.y+2)-c.y)+' m under the ground')}
@@ -92,7 +93,7 @@ function hudCheck(px,pz,py,onFoot){
 Q.tick=function(dt){Q.t+=dt;Q.acc+=dt;if(Q.acc<.5)return;Q.acc=0;
   if(state!=='roam'||!RO.on||!RO.built||!pl||LD.busy||Q.off.all)return;
   Q.ticks++;try{const c=CTL||{};Q.ctl.push({t:r1(nowS()),st:r2(c.steer||0),g:+!!(c.thr>0||c.gas),b:+!!c.brk,n:+!!(RO.boosting||RO.turbo>0),v:r1(RO.v||0),x:r1(RO.x),z:r1(RO.z),h:r2(RO.h),f:RO.foot});while(Q.ctl.length>60)Q.ctl.shift()}catch(e){}
-  try{invariants()}catch(e){if(!Q.err++)console.warn('[QA] invariant error',e)}};
+  try{invariants(Q.ticks%4!==1)}catch(e){if(!Q.err++)console.warn('[QA] invariant error',e)}};
 roamStep=(f=>function(dt){const r=f.apply(this,arguments);if(dt)try{Q.tick(dt)}catch(e){}return r})(roamStep);
 // ---- bug report: screenshot + state → repro URL
 const b64=s=>btoa(unescape(encodeURIComponent(s))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
