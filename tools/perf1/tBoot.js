@@ -19,10 +19,11 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
   for(const n of names){try{ev(`${n}=(f=>function(){const t=performance.now();try{return f.apply(this,arguments)}finally{PF1.b['${n}']=(PF1.b['${n}']||0)+performance.now()-t}})(${n})`);ok.push(n)}catch(e){}}
   ev(`{const R=composer.render.bind(composer);composer.render=function(){if(!PF1.real)return;const t=performance.now();R();PF1.rms=(PF1.rms||0)+performance.now()-t}}`);window.__R=ev('renderer');window.__ev=ev;return ok});
  console.log('PF1 wrapped',wr.join(','));
+ const cdp=await ctx.newCDPSession(p);if(process.env.PROF){await cdp.send('Profiler.enable');await cdp.send('Profiler.setSamplingInterval',{interval:200});await cdp.send('Profiler.start')}
  const r=await p.evaluate(async([N,RN])=>{const ev=__ev,RO=ev("RO"),R=__R,G=ev("typeof GOV!=='undefined'?GOV:null"),out=[];
   const drv=ev(`(()=>{const W=a=>Math.atan2(Math.sin(a),Math.cos(a));return()=>{const la=12+RO.v*.9,fx=Math.sin(RO.h),fz=Math.cos(RO.h),q=rfAim(RO.x+fx*la,RO.z+fz*la,fx,fz,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;if(Math.abs(RO.v)<.5&&(window.__stk=(window.__stk|0)+1)>90){window.__stk=0;const s=rfSnap(RO.x+(Math.random()-.5)*400,RO.z+(Math.random()-.5)*400,200);if(s)roamWarp(s[0],s[1],s[2]||0,true)}}})()`);
-  const CONT=new Set(['roamStep','hubTrafficStep','hubCullStep','miniDraw','PC_step','stepSim','updWorld']);let prog=R.info.programs.length,glog=G?G.log.length:0;
-  for(let i=0;i<N;i++){try{drv()}catch(e){}PF1.b={};PF1.rms=0;PF1.real=i%RN===RN-1;const t=performance.now();__tick(1);const ms=performance.now()-t;
+  const win=[];window.__calib=function __calib(){const e=performance.now()+40;while(performance.now()<e){}};const tc=performance.now();__calib();const CONT=new Set(['roamStep','hubTrafficStep','hubCullStep','miniDraw','PC_step','stepSim','updWorld']);let prog=R.info.programs.length,glog=G?G.log.length:0;
+  for(let i=0;i<N;i++){try{drv()}catch(e){}PF1.b={};PF1.rms=0;PF1.real=i%RN===RN-1;const t=performance.now();__tick(1);const ms=performance.now()-t;if(ms>50)win.push([i,t,t+ms]);
    const pg=R.info.programs.length,np=pg-prog;prog=pg;const b=PF1.b,rm=PF1.rms;let own='',om=0,sum=0;for(const k in b){if(CONT.has(k)||k==='resize'||k==='LK_apply'||k==='PC_grid'||k==='PC_add'||k==='lzFinish'||k==='DEST_mark')continue;sum+=b[k];if(b[k]>om){om=b[k];own=k}}
    if(rm>om&&rm>ms*.4){own='render';om=rm}if(np>0&&rm>20)own='render+prog'+np;
    for(const k of['PC_add','lzFinish','LK_apply','GOV_step','DEST_find','miniPaint'])if(b[k]>ms*.3&&b[k]>15)own=k;
@@ -30,7 +31,7 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
    let gl='';if(G&&G.log.length!==glog){gl=G.log.slice(glog).map(x=>x.join(':')).join(',');glog=G.log.length}
    out.push([i,+ms.toFixed(1),+rm.toFixed(1),own,+om.toFixed(1),np,gl,Object.entries(b).filter(e=>e[1]>4).map(e=>e[0]+':'+e[1].toFixed(0)).join(' ')]);
    if(ms>50)console.log('PF1L f'+i+' '+ms.toFixed(0)+' '+own+' '+out[out.length-1][7]);if(i%600===599)console.log('PF1P s'+((i+1)/60)+' '+Math.round(performance.now()/1000));await new Promise(r=>setTimeout(r,0))}
-  return{out,gov:G?G.log:null,lvl:ev("typeof GOV_lvl==='function'?GOV_lvl():null")}},[SECS*60,+(process.env.RN||30)]);
+  return{out,win,tc,gov:G?G.log:null,lvl:ev("typeof GOV_lvl==='function'?GOV_lvl():null")}},[SECS*60,+(process.env.RN||30)]);
  const fr=r.out,js=fr.map(f=>f[1]-f[2]),all=fr.map(f=>f[1]),srt=a=>a.slice().sort((x,y)=>x-y),pc=(a,q)=>srt(a)[Math.floor(a.length*q)];
  console.log(`PF1 city=${CITY} touch=${TOUCH} boot=${boot}s frames=${fr.length} gov=${JSON.stringify(r.gov)} end=${JSON.stringify(r.lvl)}`);
  console.log(`PF1 total(js+render) med ${pc(all,.5).toFixed(1)} p99 ${pc(all,.99).toFixed(1)} max ${Math.max(...all).toFixed(0)} n33 ${all.filter(x=>x>33).length} n50 ${all.filter(x=>x>50).length} n150 ${all.filter(x=>x>150).length} | js med ${pc(js,.5).toFixed(1)} max ${Math.max(...js).toFixed(0)} jsn50 ${js.filter(x=>x>50).length}`);
@@ -38,5 +39,13 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  for(const s of Object.keys(sec))console.log(`PF1T s${String(s).padStart(2)} `+sec[s].map(f=>`${Math.round(f[1])}(${f[3]}${f[6]?' GOV '+f[6]:''})`).join(' '));
  const own={};for(const f of fr)if(f[1]>50){own[f[3]]=(own[f[3]]||0)+1}console.log('PF1OWN>50 '+JSON.stringify(own));
  for(const f of fr.filter(f=>f[1]>50).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOPN||12)))console.log(`PF1LONG f${f[0]} ${f[1]} r${f[2]} ${f[3]} prog+${f[5]} ${f[6]} | ${f[7]}`);
+ if(process.env.PROF){const {profile}=await cdp.send('Profiler.stop');const by={};for(const n of profile.nodes)by[n.id]=n;const par={};for(const n of profile.nodes)for(const c of n.children||[])par[c]=n.id;
+  let ts=profile.startTime;const T=profile.samples.map((s,i)=>ts+=profile.timeDeltas[i]);const ci=profile.samples.findIndex(s=>by[s].callFrame.functionName==='__calib');const off=T[ci]/1000-r.tc;/* ms: profile clock - performance.now */
+  const nm=id=>{const c=by[id].callFrame;return(c.functionName||'(anon)')+':'+(c.lineNumber+1)+(c.url?'@'+c.url.split('/').pop().slice(0,12):'')};
+  const own={};for(const [i,a,b] of r.win){const self={},inc={};let n=0;for(let k=0;k<T.length;k++){const t=T[k]/1000-off;if(t<a||t>b)continue;n++;const id=profile.samples[k];self[nm(id)]=(self[nm(id)]||0)+1;
+    const seen=new Set();for(let q=id;q!=null;q=par[q]){const m=by[q].callFrame.functionName;if(m&&!seen.has(m)){seen.add(m);inc[m]=(inc[m]||0)+1}}}
+   const top=Object.entries(self).sort((x,y)=>y[1]-x[1]).slice(0,4).map(e=>e[0]+' '+Math.round(e[1]/n*100)+'%').join(', ');
+   const f=r.out[i];const key=Object.entries(self).sort((x,y)=>y[1]-x[1])[0];if(key)own[key[0]]=(own[key[0]]||0)+1;console.log(`PF1PROF f${i} ${Math.round(f[1])}ms n${n} | ${top}`)}
+  console.log('PF1PROFOWN '+JSON.stringify(Object.entries(own).sort((a,b)=>b[1]-a[1]).slice(0,15)))}
  if(process.env.JSON)fs.writeFileSync(process.env.JSON,JSON.stringify(r));
  await b.close();srv.close()});
