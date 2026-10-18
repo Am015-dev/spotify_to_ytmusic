@@ -53,7 +53,7 @@ function R5F_ok(){return 1}   // lazy-chunk stub export (src/LAZY lists it)
    else if(ph===1){if(L.some(x=>x[0]==='down')){bT=g.last;ph=2;tD=t;window.__cdp('Emulation.setCPUThrottlingRate',{rate:1})}else if(t>20000)fin(false,'no step down while throttled')}
    else if(ph===2){const d=L.findIndex(x=>x[0]==='down'),u=L.findIndex((x,k)=>k>d&&x[0]==='up');if(u>=0)fin(L[0][2]<1,'down then up '+((t-tD)/1000).toFixed(1)+' s after the throttle was removed');else if(t-tD>30000)fin(false,'no step up within 30 s of removing the throttle')}},250);
   return'📍 GOV CPU · measuring…'}}];
- C.GO['scale1/gov-hyst']=[{c:'fra',n:'governor rules: warm-up, order, 30 fps cap, hysteresis, manual',fn:()=>{const o=SV(),g=G(),f=(ms,b,sec)=>{const n=Math.round(sec*1000/ms);for(let k=0;k<n;k++)GOV_feed(ms,b)},R=[];
+ C.GO['scale1/gov-hyst']=[{c:'fra',n:'governor rules: warm-up, order, 30 fps cap, hysteresis, manual',fn:()=>{const o=SV(),g=G(),_pt=(g.pt=6e4),f=(ms,b,sec)=>{const n=Math.round(sec*1000/ms);for(let k=0;k<n;k++)GOV_feed(ms,b)},R=[];
   try{const S0=st=>{SET.qm='auto';g.s=1;g.d=0;GOV_set(true);g.th={dn:22,upP:18,upB:12}};
    S0();f(40,30,4.5);R.push(['warm-up',g.log.length===o.log]);
    S0();g.warm=5000;const n1=g.log.length;f(40,30,3.6);const a=g.s;f(40,30,6.2);const b=g.s,bq=g.d;f(40,30,6.2);R.push(['order 1→.85→.7→tier ('+[a,b,bq,g.d,g.log.length-n1]+')',a===.85&&b===.7&&bq===0&&g.d===1&&g.log.length-n1===3]);
