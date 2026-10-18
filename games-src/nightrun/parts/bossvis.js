@@ -64,7 +64,7 @@ NR.on('bossPhase',d=>{const e=G&&G.boss;if(!BV.on||!e||!d)return;const ph=d.ph||
   try{burst(e.x+s[0]*hw,e.y+s[1]*hh,'#ffd23d',BV.reduced()?4:14,220,.4);}catch(x){}
   const nm=BV.name(e),txt='NEW ATTACK: '+nm,bar=4*(BT.spb||.5);BV.flash=txt;
   if(G.banner&&G.banner.t>0)G.banner.b=e.nm+' · '+nm;       // the banner is on screen first: it carries the name too
-  if(window.HINT&&typeof HINT.show==='function')HINT.show(txt,bar);
+  if(window.HINT&&typeof HINT.show==='function')HINT.show(txt,{t:bar});       // HINT waits under the banner by itself
   else G.hint={t:(G.banner&&G.banner.t>0?G.banner.t:0)+bar,txt:say(txt)};});   // the hint is hidden under the banner, so its clock starts after it
 NR.on('tick',dt=>{const e=G&&G.boss;if(e&&e.bv&&e.bv.t>0)e.bv.t-=dt*1.1;});
 /* the boss bar: phase lines at 1/3 and 2/3, three pips, the counter */

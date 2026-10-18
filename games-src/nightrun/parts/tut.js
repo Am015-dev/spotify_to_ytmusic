@@ -57,7 +57,7 @@ TUT.cur=()=>TUT.on?TUT_S[TUT.i]:null;
 /* ----- the coach bar (DOM, top of the stage) and the cards ----- */
 {const st=document.createElement('style');st.textContent=`
 #tutB{position:absolute;z-index:6;top:58px;left:50%;transform:translateX(-50%);width:min(520px,calc(100% - 16px));display:flex;align-items:center;gap:8px;box-sizing:border-box;
- padding:4px 4px 4px 12px;background:#0d0820e8;border:2px solid var(--cyan);border-radius:12px;font:700 clamp(13px,2.2vw,17px) var(--display);color:var(--ink);pointer-events:none}
+ padding:4px 4px 4px 12px;background:#05030cc7;border:1.5px solid var(--cyan);border-radius:12px;font:700 clamp(14px,2.2vw,17px) var(--display);color:#fff;pointer-events:none}
 #tutB .tl{flex:1 1 0;min-width:0;line-height:1.2}#tutB .tn{font:12px var(--mono);color:var(--dim);flex:0 0 auto}
 #tutB button{pointer-events:auto;flex:0 0 auto;min-width:64px;min-height:44px;border-radius:9px;border:2px solid var(--pink);background:#1a1033;color:#fff;font:700 14px var(--display);letter-spacing:.08em;cursor:pointer}
 #tutB.hid .tl,#tutB.hid .tn{visibility:hidden}#tutB.ok{border-color:#ffe14d}
@@ -69,7 +69,7 @@ TUT.cur=()=>TUT.on?TUT_S[TUT.i]:null;
 const tutB=document.createElement('div');tutB.id='tutB';tutB.hidden=true;tutB.innerHTML='<span class="tl" id="tutL"></span><span class="tn" id="tutN"></span><button type="button" id="tutSkip">SKIP</button>';stage.appendChild(tutB);
 const tutC=document.createElement('div');tutC.id='tutC';tutC.hidden=true;document.body.appendChild(tutC);
 for(const ev of['touchstart','touchmove','touchend','pointerdown','mousedown'])tutC.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
-TUT.line=t=>{const el=$('tutL');if(el&&el.textContent!==t)el.textContent=t;};
+TUT.line=t=>{if(window.HINT&&HINT.on())t=HINT.short(t);const el=$('tutL');if(el&&el.textContent!==t)el.textContent=t;};
 function tutCard(html,btns){tutC.innerHTML=`<div class="cc">${html}<div class="rw"></div></div>`;const rw=tutC.querySelector('.rw');
   for(const [id,label,cls,fn] of btns){const b=document.createElement('button');b.type='button';b.className='go '+(cls||'');b.id=id;b.textContent=label;b.addEventListener('click',e=>{e.stopPropagation();fn();});rw.appendChild(b);}
   tutC.hidden=false;const f=rw.querySelector('button');if(f)f.focus();}

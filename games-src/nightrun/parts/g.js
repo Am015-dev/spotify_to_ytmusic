@@ -176,7 +176,7 @@ NR.on('runStart',()=>{for(const k in PWL)delete PWL[k];});
  PW.give=function(kind,ob){const lv=Math.min(PW_LV_MAX,(PWL[kind]||0)+1),r=give.call(this,kind,ob);if(!r)return r;PWL[kind]=lv;
    if(kind==='fix'){if(lv>=3&&P.hp<P.max)P.hp++;}
    else if(kind!=='drop'){const a=this.st().act.find(x=>x.k===kind);if(a){a.lv=lv;a.d*=1+.2*(lv-1);}}
-   if(lv>1){floater(P.x,P.y-60,PWK[kind].n.split(' ')[0]+' LV'+lv,PWK[kind].c);G.hint={t:3,txt:say(PWK[kind].tip+' · LV'+lv)};}
+   if(lv>1){floater(P.x,P.y-60,PWK[kind].n.split(' ')[0]+' LV'+lv,PWK[kind].c);hintShow(say(PWK[kind].n+' LV'+lv),3);}
    return r;};
  const tk=PW.tick;PW.tick=function(dt){const s=this.st(),before=G.score,ls=s.ls,a=s.act.find(x=>x.k==='tempo');tk.call(this,dt);
    if(a&&a.lv>1&&before>ls){G.score+=Math.round((before-ls)*.25*(a.lv-1));s.ls=G.score;}};          // Tempo Up: score x2.0, x2.25 ... x3.0

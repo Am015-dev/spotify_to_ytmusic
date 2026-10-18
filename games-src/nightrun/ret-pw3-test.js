@@ -98,7 +98,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
       m.ST.on = false; const all = {}; for (let i = 0; i < 4000; i++) { const k = PW.pick(); all[k] = (all[k] || 0) + 1; } m.ST.on = true; out.endless = all; out.w = { slow: m.PWK.slow.w, nw: ['bomb', 'crate', 'ric', 'slice', 'leech'].map(k => m.PWK[k].w) }; }
     // ---- 5 save, tips, sheet ----
     { fresh(); giveN('echo', 3); giveN('crate', 1); out.saved = JSON.parse(window.localStorage.getItem('mnr_pw3') || 'null'); out.sio = m.RET.sioKeys.includes('mnr_pw3'); out.sheet = X.sheet();
-      fresh(); PW.give('ric', false); out.tipNew = G().hint && G().hint.t; out.tipTxt = G().hint && G().hint.txt; PW.give('ric', false); out.tipRule = G().hint && G().hint.txt; PW.give('ric', false); out.tipLater = G().hint && G().hint.t; }
+      fresh(); const nh = () => { G().banner.t = 0; if (window.HINT) HINT.reset(); }; nh(); PW.give('ric', false); out.tipNew = G().hint && G().hint.t; out.tipTxt = G().hint && G().hint.txt; nh(); PW.give('ric', false); out.tipRule = G().hint && G().hint.txt; nh(); PW.give('ric', false); out.tipLater = G().hint && G().hint.t; }
     return out;
   });
   console.log('RAW', JSON.stringify(R));

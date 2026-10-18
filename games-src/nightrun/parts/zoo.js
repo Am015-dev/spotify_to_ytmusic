@@ -145,7 +145,7 @@ const ZOO=window.ZOO={
   /* ---- one-time hint ---- */
   hint(e){const id=e.type;if(!this.T[id]||!this.T[id].hint)return;if(this.seen[id])return;this.seen[id]=1;
     try{localStorage.setItem('nr.zoo.seen',JSON.stringify(this.seen));}catch(err){}
-    G.note={t:6,txt:this.T[id].hint};floater(W*.5,H*.2,this.T[id].hint,this.T[id].col);},
+    if(window.HINT&&HINT.on())hintShow(this.T[id].hint,6,this.T[id].col);else{G.note={t:6,txt:this.T[id].hint};floater(W*.5,H*.2,this.T[id].hint,this.T[id].col);}},
   /* ---- shield: blocks a bullet that arrives within 66 degrees of its front; true = absorbed ---- */
   block(b,e){if(e.type!=='shielder'||!(e.shN>0))return false;
     const a=Math.atan2(b.y-e.y,b.x-e.x);if(Math.abs(angD(a,e.fa))>1.15)return false;

@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.106',date:'18 Oct 2026',items:[{t:'NEW',s:'Graphics Auto (new default): phones start in a light mode and only add detail when the game runs smoothly; PCs lower detail by themselves if frames slow down.'},{t:'FIXED',s:'Screen fits every size we tested, from small Android phones to iPads and ultrawide monitors; no text under 12 px.'}]},
 {v:'v90m-beta.105',date:'18 Oct 2026',items:[{t:'NEW',s:'Athens now has shortcuts too: up to 9 appear near you within a minute.'},{t:'FIXED',s:'iPhone: rotating the phone no longer reloads the graphics again and again; screen sharpness capped for speed.'},{t:'FIXED',s:'No more cyan ring at the Athens start, softer colour fringing at speed, trees no longer block the camera.'},{t:'FIXED',s:'Quest bar keeps the distance, PC speed box moved off the car, a race you do not finish shows DNF.'}]},
 {v:'v90m-beta.104',date:'18 Oct 2026',items:[{t:'FIXED',s:'Much smoother Frankfurt: the longest freezes are 3x shorter and almost all stutter frames are gone.'},{t:'FIXED',s:'Athens: street scenery creates less garbage and the worst hiccup is shorter.'},{t:'FIXED',s:'Scenery effects load at start, so no one-off freeze the first time you see them.'}]},
 {v:'v90m-beta.103',date:'18 Oct 2026',items:[{t:'FIXED',s:'Fewer memory-cleanup hiccups: the shortcut scan now has a strict time budget.'},{t:'FIXED',s:'Prop safety checks only look at nearby props, so Athens and Frankfurt stutter less.'}]},
@@ -1354,7 +1355,7 @@ function MEM_drop(){if(!LOWMEM)return;try{const T=new Set;scene.traverse(o=>{if(
   for(const t of T)t.dispose();scene.clear();composer.dispose&&composer.dispose();renderer.dispose();renderer.forceContextLoss()}catch(e){console.warn('MEM_drop',e)}}
 const adaptR=()=>store.get('mho_adapt',0),adaptMul=()=>SET.adapt==='off'?1:1+.06*adaptR(),diffMul=()=>({relaxed:.93,normal:1,hard:1.06}[SET.diff]||1)*adaptMul();
 function adaptAfter(place,n,margin){if(n<2)return;let d=place===1?(margin>4?.3:.15):place<=3?.05:place>=Math.max(4,Math.ceil(n*.6))?-.25:-.1;const r=clamp(adaptR()+d,-1,1);store.set('mho_adapt',+r.toFixed(2));return r}
-const SET_DEF={cc:'full',perf:false,dres:lowGfx?'on':'off',res:lowGfx?'sharp':'auto',thr:'city',q:lowGfx?'med':'high',fx:'full',fov:'normal',camd:'normal',vol:.8,mus:.6,sfx:.9,diff:'normal',adapt:'on',rcam:'chase',steer:'normal',units:'kph',touch:'buttons',assist:'on',tiltInv:'off',sens:3};
+const SET_DEF={cc:'full',perf:false,dres:lowGfx?'on':'off',qm:'auto',res:lowGfx?'sharp':'auto',thr:'city',q:lowGfx?'med':'high',fx:'full',fov:'normal',camd:'normal',vol:.8,mus:.6,sfx:.9,diff:'normal',adapt:'on',rcam:'chase',steer:'normal',units:'kph',touch:'buttons',assist:'on',tiltInv:'off',sens:3};
 const SET=Object.assign({},SET_DEF,store.get('mho_set',{}));if(!SET.thrV){SET.thr='city';SET.thrV=1}SET.touch='buttons';const thrEff=()=>SET.thr==='city'?(state==='roam'?'pedal':'auto'):SET.thr;const saveSet=()=>store.set('mho_set',SET);
 const fxK=()=>({full:1,reduced:.4,off:0})[SET.fx];let rainScale=1;
 const rt=new THREE.WebGLRenderTarget(16,16,{type:THREE.HalfFloatType,stencilBuffer:true,samples:SET.q==='high'?4:0});
@@ -1380,9 +1381,9 @@ composer.addPass(new OutputPass());
 const SPRSCALE={value:400};
 const pFov=f=>{const a=camera.aspect;return a<.9?Math.min(100,f*(1+.5*Math.min(1,(.9-a)/.45))):f};
 const DPR2=()=>Math.min(devicePixelRatio||1,2);
-const DRES={s:1,t:0,n:0,sum:0,sq:0,skip:0};function dresStep(ms){if(SET.dres!=='on'||paused||document.hidden||!(state==='roam'||state==='race'||state==='countdown')||ms>150||ms<=0){DRES.t=DRES.n=DRES.sum=DRES.sq=0;return}DRES.t+=ms;DRES.sum+=ms;DRES.sq+=ms*ms;DRES.n++;if(DRES.t<2000)return;const a=DRES.sum/DRES.n,sd=Math.sqrt(Math.max(0,DRES.sq/DRES.n-a*a)),cap30=Math.abs(a-33.3)<3&&sd<4;DRES.t=DRES.n=DRES.sum=DRES.sq=0;if(DRES.skip>0){DRES.skip--;return}
+const DRES={s:1,t:0,n:0,sum:0,sq:0,skip:0};function dresStep(ms){if(SET.qm==='auto'||SET.dres!=='on'||paused||document.hidden||!(state==='roam'||state==='race'||state==='countdown')||ms>150||ms<=0){DRES.t=DRES.n=DRES.sum=DRES.sq=0;return}DRES.t+=ms;DRES.sum+=ms;DRES.sq+=ms*ms;DRES.n++;if(DRES.t<2000)return;const a=DRES.sum/DRES.n,sd=Math.sqrt(Math.max(0,DRES.sq/DRES.n-a*a)),cap30=Math.abs(a-33.3)<3&&sd<4;DRES.t=DRES.n=DRES.sum=DRES.sq=0;if(DRES.skip>0){DRES.skip--;return}
   const s=a>22&&!cap30?Math.max(.6,DRES.s-.15):a<15||cap30&&DRES.s<1?Math.min(1,DRES.s+.1):DRES.s;if(s!==DRES.s){const p0=renderer.getPixelRatio();DRES.s=s;resize();if(renderer.getPixelRatio()===p0&&a>22)DRES.s=s+.15;DRES.skip=1}}
-function resize(){const w=innerWidth,h=innerHeight;const cap=Math.min(LOWMEM?1.5:3,{std:1.5,sharp:2,max:3}[SET.res]||{low:1,med:1.5,high:2}[SET.q]),bud=lowGfx?3.4e6:2.8e6;let pr=Math.min(devicePixelRatio||1,cap);if(w*h*pr*pr>bud)pr=Math.sqrt(bud/(w*h));if(SET.dres==='on'&&DRES.s<1)pr=Math.max(Math.min(pr,1),pr*DRES.s);if(lowGfx)pr=Math.min(pr,SET.q==='low'?1:2);RZ.n++;
+function resize(){const w=innerWidth,h=innerHeight;const cap=Math.min(LOWMEM?1.5:3,{std:1.5,sharp:2,max:3}[SET.res]||{low:1,med:1.5,high:2}[SET.q]),bud=lowGfx?3.4e6:2.8e6;let pr=Math.min(devicePixelRatio||1,cap);if(w*h*pr*pr>bud)pr=Math.sqrt(bud/(w*h));if(SET.qm==='auto'&&lowGfx)pr=Math.min(pr,1.5);if(SET.qm==='auto'&&DRES.s<1)pr=Math.max(.5,pr*DRES.s);else if(SET.dres==='on'&&DRES.s<1)pr=Math.max(Math.min(pr,1),pr*DRES.s);   /* scale-1: Auto graphics scales below 1 css px too (98qg_qgov.js) */if(lowGfx)pr=Math.min(pr,SET.q==='low'?1:2);RZ.n++;
   if(w!==RZ.w||h!==RZ.h||pr!==RZ.pr||renderer.getPixelRatio()!==pr||composer._width!==w||composer._height!==h||composer._pixelRatio!==pr){RZ.w=w;RZ.h=h;RZ.pr=pr;RZ.re++;renderer.setDrawingBufferSize(w,h,pr);composer._pixelRatio=pr;composer.setSize(w,h);bloom.resolution.set(w*pr/2,h*pr/2)}
   SPRSCALE.value=h*pr*.5/Math.tan(THREE.MathUtils.degToRad(34));camera.aspect=w/h;camera.updateProjectionMatrix()}
 const RZ={n:0,re:0,req:0,w:0,h:0,pr:0,tm:0,t:0};function RZ_req(){RZ.req++;RZ.t=performance.now();clearTimeout(RZ.tm);RZ.tm=setTimeout(()=>resize(),250)}
@@ -1556,7 +1557,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"2c1a5bf0","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"d627c155"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"2c1a5bf0","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"4a806687"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -3041,7 +3042,7 @@ function closeSettings(){$('#settings').hidden=true;RO.frozen=!!(RO.jOpen||RO.pO
 function buildSettings(){const B=$('#setBody');B.innerHTML='';
   const seg=(label,key,opts,after)=>{const el=document.createElement('div');el.className='seg';el.innerHTML=`<span>${label}</span>`;for(const[v,l]of opts){const b=document.createElement('button');b.textContent=l;b.setAttribute('aria-pressed',SET[key]===v);b.onclick=()=>{SET[key]=v;saveSet();if(after)after();buildSettings()};el.appendChild(b)}B.appendChild(el)};
   const sl=(label,key)=>{const el=document.createElement('label');el.className='sl';el.innerHTML=`<span>${label}</span><input type="range" min="0" max="1" step="0.05" value="${SET[key]}"><output>${Math.round(SET[key]*100)}</output>`;const i=el.querySelector('input'),o=el.querySelector('output');i.oninput=()=>{SET[key]=+i.value;o.textContent=Math.round(SET[key]*100);saveSet();AU.setVol()};B.appendChild(el)};
-  seg('Graphics','q',[['low','Low'],['med','Medium'],['high','High']],applyQuality);
+  seg('Graphics','qm',[['auto','Auto'],['low','Low'],['med','Medium'],['high','High']],()=>GOV_pick());
   seg('Resolution','res',[['auto','By graphics'],['std','Standard'],['sharp','Sharp'],['max','Max']],()=>{DRES.s=1;resize()});
   seg('Auto resolution','dres',[['on','On'],['off','Off']],()=>{DRES.s=1;DRES.t=DRES.n=DRES.sum=0;resize()});
   seg('Motion FX','fx',[['full','Full'],['reduced','Reduced'],['off','Off']]);
@@ -6366,7 +6367,7 @@ const _lkAQ=applyQuality;applyQuality=(...a)=>{if(LK.effQ!==null&&SET.q!==LK.eff
 {const _ht=hubTrafficStep;hubTrafficStep=dt=>{_ht(dt);LK_paint();LK_boost()}}
 {const _he=hubEnter;hubEnter=(...a)=>{const r=_he(...a);LK_roamLook();LK_paint();return r}}
 {const _hc=hubCullStep;hubCullStep=()=>{const p=HUB.cpos;_hc();const L=LK_lvl();if(HUB.cpos!==p&&HUB.cull&&(L==='low'||L==='min')){const cx=camera.position.x,cz=camera.position.z,R2=L==='min'?800:1000,Rs=L==='min'?340:400;/* perf-4: were 1050/1350, 420/520 */for(const c of HUB.cull)if(c.o.visible&&Math.hypot(c.x-cx,c.z-cz)-c.r>(c.small?Rs:Math.min(R2,c.o.userData.cd||R2)))c.o.visible=false}}}
-function LK_feed(ms){if(SET.lkAuto==='off'||paused||document.hidden||!(state==='roam'||state==='race'||state==='countdown')||ms>150||ms<=0){LK.acc={t:0,n:0,sum:0,sq:0};return}
+function LK_feed(ms){if(SET.qm==='auto'||SET.qm&&SET.lkAuto!=='on'||SET.lkAuto==='off'||paused||document.hidden||!(state==='roam'||state==='race'||state==='countdown')||ms>150||ms<=0){LK.acc={t:0,n:0,sum:0,sq:0};return}
   const A=LK.acc;A.t+=ms;A.n++;A.sum+=ms;A.sq+=ms*ms;LK.since+=ms;if(A.t<3000)return;const a=A.sum/A.n,sd=Math.sqrt(Math.max(0,A.sq/A.n-a*a));LK.acc={t:0,n:0,sum:0,sq:0};
   if(Math.abs(a-33.3)<3&&sd<4)return; // steady 30 fps = iOS low-power cap, not the GPU
   const resFloor=SET.dres!=='on'||DRES.s<=.65,top=LK_LV.indexOf(LK.userQ||SET.q);
@@ -15480,6 +15481,35 @@ if(TQ){
  window.__tq=Object.assign(TQS,{o:TQ,skip,reset,draw:()=>{TQ.draw=1;try{composer.render()}finally{TQ.draw=0}}});
 }
 function TQ_url(c,o={}){const q=new URLSearchParams({test:c});for(const k of['car','at','go'])if(o[k])q.set(k,o[k]);return location.pathname+'?'+q}
+const GOV={on:false,s:1,d:0,top:0,ring:[],busy:[],bk:0,bad:0,good:0,hold:0,upW:10,lastUp:-1e9,clock:0,warm:0,t0:0,log:[],test:null,mid:0,last:null,upW0:10,half:null,th:{dn:22,upP:18,upB:12}};
+const GOV_S=[1,.85,.7];
+function GOV_touchBoot(){GOV.s=.7;GOV.d=3;GOV.th.upB=14;GOV.upW0=5;if(!GOV.half){GOV.half={traf:TUNE.traf,lvPed:TUNE.lvPed};TUNE.traf=(TUNE.traf??1)*.5;TUNE.lvPed=(TUNE.lvPed??.8)*.5}}
+function GOV_boot(){if(lowGfx){GOV_touchBoot();return}const g=TQ?null:store.get('mho_gov',null);GOV.s=g&&GOV_S.includes(g.s)?g.s:1;GOV.d=g&&g.d>=0&&g.d<=3?g.d|0:LK_LV.indexOf(SET_DEF.q)}
+function GOV_apply(why){DRES.s=GOV.s;LK.userQ='high';LK.drop=GOV.d;LK_apply();resize();if(why&&!TQ)try{store.set('mho_gov',{s:GOV.s,d:GOV.d})}catch(e){}}
+function GOV_lvl(){return{s:GOV.s,q:LK_LV[Math.min(3,GOV.d)],pr:+renderer.getPixelRatio().toFixed(2)}}
+function GOV_reset(){GOV.ring.length=GOV.busy.length=0;GOV.bk=GOV.bad=GOV.good=0}
+function GOV_step(dir){const n=GOV_S.indexOf(GOV.s);let ch=false;
+  if(dir<0){if(n<GOV_S.length-1){GOV.s=GOV_S[n+1];ch=true}else if(GOV.d<3){GOV.d++;ch=true}
+    if(ch&&GOV.clock-GOV.lastUp<20000)GOV.upW=Math.min(GOV.upW0*8,GOV.upW*2)}   // the last up step did not hold: wait longer before trying again
+  else{if(GOV.d>0){GOV.d--;ch=true}else if(n>0){GOV.s=GOV_S[n-1];ch=true}if(ch)GOV.lastUp=GOV.clock}
+  if(!ch)return false;GOV.log.push([dir<0?'down':'up',Math.round(GOV.clock/1000),GOV.s,LK_LV[GOV.d]]);if(GOV.log.length>40)GOV.log.shift();GOV_apply(1);GOV_reset();GOV.hold=2000;return true}
+const _gp=(a,k)=>{const b=a.slice().sort((x,y)=>x-y);return b[Math.min(b.length-1,Math.floor(b.length*k))]||0};
+function GOV_feed(ms,busy){if(!GOV.on)return;GOV.clock+=ms;
+  if(paused||document.hidden||LD.on||!(state==='roam'||state==='race'||state==='countdown')||ms>250||ms<=0){GOV.warm=0;GOV_reset();return}
+  if((GOV.warm+=ms)<5000)return;if(GOV.hold>0){GOV.hold-=ms;return}
+  GOV.ring.push(ms);GOV.busy.push(busy);if((GOV.bk+=ms)<1000)return;
+  const p90=_gp(GOV.ring,.9),b90=_gp(GOV.busy,.9),med=_gp(GOV.ring,.5),p10=_gp(GOV.ring,.1);GOV.last={p90:+p90.toFixed(1),b90:+b90.toFixed(1),n:GOV.ring.length};GOV.ring.length=GOV.busy.length=0;GOV.bk=0;
+  if(Math.abs(med-33.3)<3&&p90-p10<4&&b90<20){GOV.bad=GOV.good=0;return}   // a steady 30 fps with idle work is the iOS low-power cap, not the GPU
+  const H=GOV.th;if(p90>H.dn){GOV.good=0;if(++GOV.bad>=3)GOV_step(-1)}
+  else if(p90<H.upP&&b90<H.upB){GOV.bad=0;if(++GOV.good>=GOV.upW)GOV_step(1)}
+  else{GOV.bad=0;GOV.good=0}}
+function GOV_set(on){GOV.on=on;GOV.warm=0;GOV.hold=0;GOV_reset();if(on){GOV.upW=GOV.upW0;GOV_apply(0)}}
+function GOV_pick(){if(SET.qm==='auto'){GOV_set(true);return}GOV.on=false;LK.userQ=null;LK.effQ=null;LK.drop=0;DRES.s=1;SET.q=SET.qm;applyQuality()}
+{const _ds=dresStep;dresStep=ms=>{_ds(ms);GOV.mid=ms}}
+{const _fr=frame;frame=function(now){const a=performance.now();GOV.mid=-1;_fr(now);if(GOV.mid>=0){const tl=GOV.test&&GOV.test.iters;if(tl){let x=0;for(let i=0;i<tl;i++)x+=Math.sqrt(i);GOV.test.x=x}GOV_feed(GOV.mid,performance.now()-a)}}}
+if(TQ)SET.qm=SET.q;else if(SET.qm==='auto'){GOV_boot();GOV_set(true)}else if(SET.qm&&SET.qm!==SET.q)GOV_pick();
+window.__gov={GOV,lvl:GOV_lvl,set:GOV_set,step:GOV_step,feed:(ms,busy,n)=>{for(let i=0;i<(n||1);i++)GOV_feed(ms,busy)},pick:GOV_pick};
+{const st=document.createElement('style');st.textContent='@media (orientation:portrait){html body.touch #touch :is(#tB,#tN,#tD,#tF,#tG){font-size:16px!important}}#npcSay#npcSay p{font-size:12px!important}';document.head.appendChild(st)}
 if(!/[?&]qa=0\b/.test(location.search)){const s=document.createElement('script');s.src='models/qa.js';s.onload=()=>{try{eval(window.__QAJ)}catch(e){console.warn('QA load',e)}};document.head.appendChild(s)}
 const RS_OFF=(()=>{const q=location.search;try{if(/[?&]rs=0/.test(q))sessionStorage.setItem('rs0','1');else if(/[?&]rs=1/.test(q))sessionStorage.removeItem('rs0');return sessionStorage.getItem('rs0')==='1'}catch(e){return /[?&]rs=0/.test(q)}})();
 function RS_seams(){if(RS_OFF||CID!=='fra'||!FILL_R||!FILL_R.length)return 0;let n=0;

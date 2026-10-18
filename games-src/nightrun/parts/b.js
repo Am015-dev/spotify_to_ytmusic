@@ -72,6 +72,7 @@ const TIP={done:!!load('mnr_tipdone',false)};
 const FPS={n:0,t:0,worst:0,slow:0};
 const SENS=[1,1.25,1.5,1.9,2.4];                        // touch sensitivity 1..5: ship travel per finger travel
 const say=s=>{s=String(s);if(MSGS.length<500)MSGS.push(s);return s;};
+const hintShow=(txt,t,col)=>{if(window.HINT)return HINT.show(txt,{t,col});G.hint={t:t||3,txt:String(txt)};return true;};window.hintShow=hintShow;   // F6: every in-stage hint goes through here (HINT in uikit.js; the old bubble when it is missing)
 function banner(a,b,warn,t){t=t||3.2;G.banner={t,m:t,a:say(a),b:say(b),warn:!!warn};}
 function newGame(daily){
   GR=daily?mul(todayN()):Math.random;GX=daily?mul(todayN()+7919):Math.random;
@@ -282,12 +283,12 @@ function update(dt){
   G.t+=dt;const D=DISTRICTS[G.di],d=diff();
   const btk=G.bt>0?(G.btk||.5):1,jk=RET.juice&&RET.JU&&!G.dead?RET.JU.k:1,sdt=dt*G.slow*btk*PW.wk*RET.asW()*jk,pdt=dt*G.slow*jk;if(G.bt>0)G.bt-=dt;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
   
-  if(G.banner.t>0)G.banner.t-=dt;if(G.note.t>0)G.note.t-=dt;if(G.hint.t>0)G.hint.t-=dt;
+  if(G.banner.t>0)G.banner.t-=dt;if(G.note.t>0)G.note.t-=dt;if(G.hint.t>0)G.hint.t-=dt;if(window.HINT)HINT.tick(dt);
   G.shake=Math.max(0,G.shake-40*dt);G.glitch=Math.max(0,G.glitch-dt);G.flash=Math.max(0,G.flash-dt);G.empT=Math.max(0,G.empT-dt);
   for(const x of G.delayed){x.t-=dt;if(x.t<=0){x.dead=1;x.f();}}G.delayed=G.delayed.filter(x=>!x.dead);
   if(G.dead){G.deadT+=dt;if(G.deadT>2.2)gameOver();}
   if(!G.dead){beatPump();
-    if(G.t>1.5&&!G.hint.txt&&!TIP.done&&!G.lab&&!G.tut){G.hint={t:6,txt:say('Dash on the pulse to power up')};}}   // the one hint, until the first on-beat dash
+    if(G.t>1.5&&!G.hint.txt&&!TIP.done&&!G.lab&&!G.tut){hintShow(say('Dash on the pulse to power up'),6);}}   // the one hint, until the first on-beat dash
   else G.bp=bpos();
 
   /* player */

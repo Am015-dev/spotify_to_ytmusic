@@ -48,7 +48,7 @@ const FL=window.FL=(function(){
       return n;},
     /* ---- captives ---- */
     spawnCap(){const hp=this.easy()?6:8,y=this.yAway(90,H-140,110),c={id:++this.id,x:W+46,y,by:y,r:28,hp,max:hp,t:0,vx:-52,flash:0};this.cap.push(c);this.s.tot++;
-      if(!(G.hint&&G.hint.t>0))G.hint={t:3,txt:say('SHOOT THE CAGE: FREE THE DATA SPRITE')};},
+      if(!(G.hint&&G.hint.t>0))hintShow(say('SHOOT THE CAGE: FREE THE DATA SPRITE'),3);},
     free(c){this.s.resc++;this.S.resc++;this.store();burst(c.x,c.y,'#7df9ff',26,280,.7);this.flash(c.x,c.y,'#7df9ff',54);floater(c.x,c.y-34,'FREED','#7df9ff');AU.sfx('up');NR.emit('rescue',{n:ST.n});
       let wing=false;
       try{const s=PW.st(),busy=s.act.some(a=>PWK[a.k]&&(PWK[a.k].pw2||a.k==='drum'));
@@ -72,11 +72,11 @@ const FL=window.FL=(function(){
     startSet(){if(this.set)return;if(!rotMode&&(G.di+ST.n)%2===1)this.mkTrain();else this.mkBill();},
     mkTrain(){const gy=UIK.groundY(),e=this.easy();
       this.set={k:'train',id:++this.id,ph:'warn',t:0,x:W+30,L:560,gy,v:e?125:160,wp:{hp:e?9:13,max:e?9:13,off:80,r:24,dead:false,flash:0},fire:0,hz:0};
-      floater(W-90,gy-40,'CONVOY','#ff6a7a');if(!(G.hint&&G.hint.t>0))G.hint={t:3,txt:say('SHOOT THE GLOWING ROOF HATCH')};},
+      floater(W-90,gy-40,'CONVOY','#ff6a7a');if(!(G.hint&&G.hint.t>0))hintShow(say('SHOOT THE GLOWING ROOF HATCH'),3);},
     mkBill(){const e=this.easy(),n=e?2:3,lanes=[];let x0=clamp(P.x+this.rnd(-70,70),70,W-70);lanes.push(x0);
       for(let i=0;i<30&&lanes.length<n;i++){const x=this.rnd(80,W-80);if(lanes.every(l=>Math.abs(l-x)>120))lanes.push(x);}
       this.set={k:'bill',id:++this.id,ph:'warn',t:0,need:e?1.2:.9,lanes:lanes.map(x=>({x,hit:false,y:-60})),fall:0};
-      if(!(G.hint&&G.hint.t>0))G.hint={t:3,txt:say('DEBRIS: LEAVE THE RED LANES')};},
+      if(!(G.hint&&G.hint.t>0))hintShow(say('DEBRIS: LEAVE THE RED LANES'),3);},
     endSet(chest){const s=this.set;this.set=null;if(!s||!chest)return;this.spawnBrk('chest',{x:chest.x,y:chest.y,by:chest.y,vx:-70,decoy:false});},
     /* ---- one frame ---- */
     tick(dt){if(!RET.flavor)return;

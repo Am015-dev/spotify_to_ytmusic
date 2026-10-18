@@ -29,7 +29,7 @@ const mad = (a, b) => { let s = 0; for (let i = 0; i < a.length; i += 4) s += Ma
     for (const ph of [1, 2, 3]) {
       if (ph > 1) {
         await p.evaluate(ph => { const m = __mnr, b = m.G.boss; m.P.hp = 99; m.SET.calm = false; m.G.hint = { t: 0, txt: '' }; const bar = Math.floor(b.bt / 4) + 1; if (ph === 2) b.p2 = bar; else { b.p2 = Math.min(b.p2, 1); b.p3 = bar; } b.bt = bar * 4 - 1; window.__fl = []; }, ph);
-        try { await p.waitForFunction(ph => { const m = __mnr, b = m.G.boss; if (b) { m.P.hp = 99; if (b.ph === ph && !window.__fl.length) window.__fl.push([BV.flash, m.G.hint.txt, m.G.banner.b || '']); } return b && b.ph >= ph; }, ph, { timeout: 15000, polling: 100 }); } catch (e) { bad('phase ' + ph + ' never started'); break; }
+        try { await p.waitForFunction(ph => { const m = __mnr, b = m.G.boss; if (b) { m.P.hp = 99; if (b.ph === ph && !window.__fl.length) window.__fl.push([BV.flash, (window.HINT&&HINT.cur?HINT.cur.txt:'')+' '+(HINT&&HINT.q.map(h=>h.txt).join(' '))+' '+m.G.hint.txt, m.G.banner.b || '']); } return b && b.ph >= ph; }, ph, { timeout: 15000, polling: 100 }); } catch (e) { bad('phase ' + ph + ' never started'); break; }
         await sleep(150);
       }
       const r = await p.evaluate(async ph => {
