@@ -4,6 +4,12 @@
 3. A/B SECS=10 HEAP=1 RACE=0, 2 runs each (runs in parallel, so the ms numbers are noisy): Athens 2604/2650 -> 2164/2140 MB (263 -> 215 MB/s), med/p95/max 23.3/67/310, 24.1/69/461 -> 21.8/70/412, 20.9/72/264; Frankfurt 2164/2273 -> 1919/2064 MB (222 -> 199 MB/s), 17.8/56/350, 16.2/51/359 -> 17.3/46/476, 15.9/37/311. Target 150 MB/s NOT met.
 4. Gate on the built page: unit 0 FAIL; TAG=life1,xf1,terrain,smash2,cam,mem,perf5 49/56, reds are known only (mem/stable, xf1/* x5, life1/people); smash2 is green. There is no dest tag.
 5. Next: what is left is LF_drapeOk/LF_tileG (perf-10 lane), so the DEST scan can only get 0 garbage by moving it off the frame (a worker, or caching the result per city+nodes hash); also athRoadD, cityAt and WB_tpl.
+## perf-10 (2026-10-18, alex/perf10-wip → alex/od-int2)
+1. The Frankfurt 330-640 ms roamStep frames were NOT FCG_build (already sliced). The cause was GFX_cast (every 2.5 s it boxed every new mesh in one traverse: 445 ms). It is now sliced at 3 ms and resumes after 100 ms, with a fast Float32 bbox (GFX_bbox). FCG_work boxes occluders inside its 1.5 ms budget.
+2. Also: DEST_find is resumable per candidate (was ~90 ms when one node's DEST_open scans ran in one frame). DEST_check does 1 re-check per 20 frames. FC_pull treats an unindexed mesh as no hit (was three's full raycast, 40-55 ms; the camera pull may start a few frames late).
+3. tFrame q=high SECS=10 HEAP=0 RACE=0, trunk → mine, Fra runs 1/2: max 638/488 → 161/231 ms, >50 ms frames 46/43 → 38/33, p95 65/55 → 55/53, median ~24 (noise). Ath run 1: max 457 → 642 (FC_pull 400, before the FCG_work fix), >50 ms frames 87 → 67, p95 81 → 64. No Athens re-run after that fix.
+4. Gate on the built page: unit 0 FAIL; TAG=life1,xf1,terrain,smash2,cam,mem,perf5 52/56. Reds: mem/stable, mem/ath-boot, life1/people (known), and terr6/pit-fra SLOW 10.8 s (2/2 PASS when run alone, 7.5 s). Fra 852x393 shot looks normal.
+5. Next: Athens hubTrafficStep/LV_step/hubCullStep spikes (100-200 ms) with LZ.slow-style probes; re-measure Athens FC_pull; DEST_open → LIFE_cell builds cells unbudgeted.
 
 ## perf-11 (2026-10-18, alex/perf11-wip -> alex/od-int2): allocation-sampling rank + LIFE_at / GND_far fixes
 Athens q=high, trunk p11base, 15 s roam, CDP HeapProfiler.startSampling 32768 (tFrame HEAP=1 HEAPINT=32768), 3895 MB sampled; self-size summed per function over the top-40 stacks:
