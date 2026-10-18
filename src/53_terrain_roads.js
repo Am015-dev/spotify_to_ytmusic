@@ -181,8 +181,11 @@ function TR_bridgeEnds(){if(CID!=='fra'||!TR_RG)return;for(const b of[...BRIDGES
 function TR7_cap(h,nx,nz,r,D){if(new URLSearchParams(location.search).get('tr7')==='0')return;const s=Math.tan(27*Math.PI/180)*r,s2=s*Math.SQRT2,ok=k=>!D||D[k]>=180;
   for(let it=0;it<2;it++){for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i;if(!ok(k))continue;let v=h[k];if(i)v=Math.max(v,h[k-1]-s);if(j){v=Math.max(v,h[k-nx]-s);if(i)v=Math.max(v,h[k-nx-1]-s2);if(i<nx-1)v=Math.max(v,h[k-nx+1]-s2)}h[k]=v}
     for(let j=nz-1;j>=0;j--)for(let i=nx-1;i>=0;i--){const k=j*nx+i;if(!ok(k))continue;let v=h[k];if(i<nx-1)v=Math.max(v,h[k+1]-s);if(j<nz-1){v=Math.max(v,h[k+nx]-s);if(i<nx-1)v=Math.max(v,h[k+nx+1]-s2);if(i)v=Math.max(v,h[k+nx-1]-s2)}h[k]=v}}}
-function TR_G(x,z){const W=TR_W||TR_init();let fx=(x-WX0)/W.r,fz=(z-WZS)/W.r;fx=fx<0?0:fx>W.nx-1.001?W.nx-1.001:fx;fz=fz<0?0:fz>W.nz-1.001?W.nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*W.nx+i,h=W.h;
-  return(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+W.nx]*(1-tx)+h[k+W.nx+1]*tx)*tz}
+// perf-3: TR_G read W.r/W.nx/W.nz/W.h by name and its optimized code was thrown away ~600x a second ("insufficient type feedback for generic named access",
+// --trace-deopt), so every sample ran unoptimized and boxed its doubles (~1.8 GB / 30 s in Athens). The grid fields are copied to script lets once per TR_W.
+let TR_Wc=null,TR_r=1,TR_nx=2,TR_nz=2,TR_h=null;
+function TR_G(x,z){if(TR_W!==TR_Wc||!TR_W){const W=TR_W||TR_init();TR_Wc=W;TR_r=W.r;TR_nx=W.nx;TR_nz=W.nz;TR_h=W.h}const nx=TR_nx;let fx=(x-WX0)/TR_r,fz=(z-WZS)/TR_r;fx=fx<0?0:fx>nx-1.001?nx-1.001:fx;fz=fz<0?0:fz>TR_nz-1.001?TR_nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*nx+i,h=TR_h;
+  return(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+nx]*(1-tx)+h[k+nx+1]*tx)*tz}
 const TR_tauH0=tauH;
 // the Taunus keeps its sculpted ridges on top of the real ground; Frankfurt has no road shelves (gentle, smoothed DEM)
 tauH=(x,z)=>{let h=TR_G(x,z)+TR_tauH0(x,z);if(x<TAU_R.x0||z<TAU_R.z0)return h;for(const P of[TAU_SUM,TAU_CAS]){const d=Math.hypot(x-P.x,z-P.z);if(d<P.r){const H=P.trH??(P.trH=TR_G(P.x,P.z)+TR_tauH0(P.x,P.z)),k=clamp((P.r-d)/(P.r*.55),0,1);h+=(H-h)*k*k*(3-2*k)}}return h};
@@ -397,9 +400,10 @@ const inLot=(x,z)=>{const Z=zoneAt(x,z);return !!Z&&(Z.t==='dirt'||Z.t==='grass'
 const slipTop=s=>{if(!TERR.on)return 0;return TR_Y(s.x-s.ix*.6,s.z-s.iz*.6)};  // the bank's ground at the ramp's top end
 function slipY(x,z){for(const s of SLIPS){const dx=x-s.x,dz=z-s.z;if(dx>40||dx<-40||dz>40||dz<-40)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<10&&inw>0&&inw<30){const yT=s.yT??0;return yT+(HWY-yT)*inw/30}}return null}
 // perf-2: optional 4th arg o = a scratch result to fill (groundAt passes one: it only reads .g; it ran millions of times a minute, one object each)
-function roamTerr(x,z,y,o){let low=false;for(const b of ALL_DECKS){const h=deckAt(b,x,z);if(h!=null&&h>.2){if(y>=h-2.4){let g2=h;for(const r of RO.ramps){if(!r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),c=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(c)<r.w/2&&a>-r.len/2&&a<r.len/2)g2=Math.max(g2,r.y0+(a+r.len/2)/r.len*r.hgt)}if(o){o.g=g2;o.deck=b;o.low=undefined;return o}return{g:g2,deck:b}}if(h-y<5.5)low=true}}
+// perf-3: indexed loops (for-of iterators were ~0.9 GB / 30 s of garbage in Athens: the shortcut scan calls this ~100k times)
+function roamTerr(x,z,y,o){let low=false;const AD=ALL_DECKS,RR=RO.ramps;for(let bi=0;bi<AD.length;bi++){const b=AD[bi];const h=deckAt(b,x,z);if(h!=null&&h>.2){if(y>=h-2.4){let g2=h;for(let ri=0;ri<RR.length;ri++){const r=RR[ri];if(!r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),c=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(c)<r.w/2&&a>-r.len/2&&a<r.len/2)g2=Math.max(g2,r.y0+(a+r.len/2)/r.len*r.hgt)}if(o){o.g=g2;o.deck=b;o.low=undefined;return o}return{g:g2,deck:b}}if(h-y<5.5)low=true}}
   let g=groundY(x,z);if(GND_ON)g=GND_far(x,z,g);const sl=slipY(x,z);if(sl!=null)g=Math.max(g,sl);
-  for(const r of RO.ramps){if(r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(b)<r.w/2&&a>-r.len/2&&a<r.len/2)g=Math.max(g,r.y0+(a+r.len/2)/r.len*r.hgt)}
+  for(let ri=0;ri<RR.length;ri++){const r=RR[ri];if(r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(b)<r.w/2&&a>-r.len/2&&a<r.len/2)g=Math.max(g,r.y0+(a+r.len/2)/r.len*r.hgt)}
   if(o){o.g=g;o.deck=null;o.low=low;return o}return{g,deck:null,low}}
 const _gaO={g:0,deck:null,low:false};function groundAt(x,z,y){return roamTerr(x,z,y,_gaO).g}
 const groundY=CID==='fra'?(x,z)=>inRiver(x,z)?HWY:TR_Y(x,z):(x,z)=>TR_Y(x,z);
@@ -408,7 +412,7 @@ function roofAt(){return null}
 function hubAddB(b,to){if(b.ry!=null){const c=Math.cos(b.ry),s=Math.sin(b.ry);if(Math.abs(s)<1e-3||Math.abs(c)<1e-3){if(Math.abs(s)>.5){const t=b.hw;b.hw=b.hd;b.hd=t}}else{b.c=c;b.s=s}}(to||HUB.bld).push(b);return b}
 function bHit(b,x,z,rad){const dx=x-b.x,dz=z-b.z;let lx=dx,lz=dz;if(b.c!=null){lx=dx*b.c-dz*b.s;lz=dx*b.s+dz*b.c}const ex=Math.abs(lx)-b.hw,ez=Math.abs(lz)-b.hd;if(ex>=rad||ez>=rad)return false;if(ex<=0||ez<=0)return true;return ex*ex+ez*ez<rad*rad}
 const bExt=b=>b.c==null?[b.hw,b.hd]:[Math.abs(b.c)*b.hw+Math.abs(b.s)*b.hd,Math.abs(b.s)*b.hw+Math.abs(b.c)*b.hd];
-function roamHit(x,z,rad,y=0){const L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));if(!L)return null;const LP=TUNE.lowProp??1.3;/* race-1: colliders lower than 1.3 m (kerb / barrier / cone pieces) are stepped over, never beach the car */for(const b of L){if(y>=(b.h||999)-.6||(b.y0!=null&&y<b.y0))continue;if(b.h&&bLow(b,LP))continue;if(bHit(b,x,z,rad))return b}return null}
+function roamHit(x,z,rad,y=0){const L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));if(!L)return null;const LP=TUNE.lowProp??1.3;/* race-1: colliders lower than 1.3 m (kerb / barrier / cone pieces) are stepped over, never beach the car */for(let bi=0;bi<L.length;bi++){const b=L[bi];if(y>=(b.h||999)-.6||(b.y0!=null&&y<b.y0))continue;if(b.h&&bLow(b,LP))continue;if(bHit(b,x,z,rad))return b}return null}
 // walls-1: b.h is an ABSOLUTE top (ground + height), so the old `b.h<1.3` never matched above sea level (Frankfurt ground ~30, Athens ~145). Height above ground, cached per collider.
 function bLow(b,LP){if(b.rh===undefined){const g=b.y0!=null?b.y0+1.5:groundY(b.x,b.z);b.rh=b.h-g}return b.rh<LP}
 // push a point out of a collider along its nearest face (local frame for oriented boxes); returns [x,z,'x'|'z' world axis of the push]

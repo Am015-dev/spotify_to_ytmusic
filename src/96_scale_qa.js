@@ -114,7 +114,7 @@ roamCam=(f=>function(dt){f(dt);if(state!=='roam'||(typeof M1!=='undefined'&&M1.c
 // QA4: 30 % more time on every timed story / quest stage
 qvEnter=(f=>function(ch,i){const r=f.apply(this,arguments);try{const V=ch&&ch.v2,S=V&&V.L.st[V.si];if(S&&S.T&&V.left>0&&!S.qaT){S.qaT=1;V.left*=1.3}}catch(e){}return r})(qvEnter);
 // QA5: thinner Athens traffic (cars parked dead stay hidden; hubTrafficStep never revives dead=1e9)
-buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);if(CID!=='fra'&&HUB.cars)HUB.cars.forEach((c,i)=>{if(i%5>1)c.dead=1e9});return r})(buildHubTraffic);
+buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);if(CID!=='fra'&&HUB.cars)HUB.cars.forEach((c,i)=>{if(i%5>3)c.dead=1e9})/* rv4B: was i%5>1 (60 % hidden for ever; with DR_traffic only 37 of 114 cars alive, 5 within 120 m at the start) */;return r})(buildHubTraffic);
 /* ===== QA7 · rotation-proof touch controls (iPhone: "after portrait→landscape the buttons are very unresponsive") =====
    iOS Safari does not always send touchcancel for fingers that were down while the phone rotates. The steering pad and the ◀ ▶ zone
    then keep a stale touch id (TOUCH.sid / TOUCH.bz) and ignore every new touch ("if(TOUCH.bz!=null)return"), and GAS / BRAKE / BOOST
