@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.108',date:'18 Oct 2026',items:[{t:'FIXED',s:'First minute is smoother: new city blocks are placed a little each frame instead of freezing the game (Athens worst hitch 0.28 s to about 0.09 s).'},{t:'CHANGED',s:'Map, minimap and shortcut set-up now happen on the loading screen; Graphics Auto only changes sharpness in the first minute.'}]},
 {v:'v90m-beta.107',date:'18 Oct 2026',items:[{t:'FIXED',s:'Fewer stutters while driving: new streets are built a little each frame instead of all at once.'},{t:'NEW',s:'FPS chip: long-press the gear button (or Settings) to show smoothness on screen. The Beta also sends anonymous smoothness numbers so we can fix lag on real phones.'},{t:'FIXED',s:'Portrait quest bar keeps the distance, full rival names on phone, tidy garage, and the car no longer flips CAR/4x4 on every kerb.'}]},
 {v:'v90m-beta.106',date:'18 Oct 2026',items:[{t:'NEW',s:'Graphics Auto (new default): phones start in a light mode and only add detail when the game runs smoothly; PCs lower detail by themselves if frames slow down.'},{t:'FIXED',s:'Screen fits every size we tested, from small Android phones to iPads and ultrawide monitors; no text under 12 px.'}]},
 {v:'v90m-beta.105',date:'18 Oct 2026',items:[{t:'NEW',s:'Athens now has shortcuts too: up to 9 appear near you within a minute.'},{t:'FIXED',s:'iPhone: rotating the phone no longer reloads the graphics again and again; screen sharpness capped for speed.'},{t:'FIXED',s:'No more cyan ring at the Athens start, softer colour fringing at speed, trees no longer block the camera.'},{t:'FIXED',s:'Quest bar keeps the distance, PC speed box moved off the car, a race you do not finish shows DNF.'}]},
@@ -1558,7 +1559,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"2c1a5bf0","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"430a92f1"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"2c1a5bf0","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"6bf4e5c0"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -15468,7 +15469,7 @@ if(TQ){
  {const s0=store.set;store.set=function(k,v){if(k==='mho_set')return;return s0.apply(this,arguments)}}
  LK_shadow=(f=>function(on){return f.call(this,TQ.q?on:false)})(LK_shadow);
  try{menuTrack=ROAMCFG.track||'grand'}catch(e){}  // the menu backdrop builds the same track free roam needs: built once, not twice
- ldPrewarm=async function(){};SM_upload=async function(){};P2_warm=function(){};warmTextures=function(){};
+ if(!/[?&]warm=1/.test(location.search)){ldPrewarm=async function(){};SM_upload=async function(){};P2_warm=function(){};warmTextures=function(){}}  // &warm=1 (tools/perf1/tBoot.js): keep the real loader warm-up
  {const r0=composer.render.bind(composer);composer.render=function(){let st='';try{st=state}catch(e){}if(st==='loading'||LD.busy||TQ.nodraw&&!TQ.draw)return;return r0.apply(this,arguments)}}
  if(TQ.nodraw){try{avatar=function(){return'data:,'}}catch(e){}}
  if(TQ.nodraw){const rr=renderer.render.bind(renderer);renderer.render=function(){if(!TQ.draw)return;return rr.apply(this,arguments)}}
@@ -15494,7 +15495,7 @@ if(TQ){
  window.__tq=Object.assign(TQS,{o:TQ,skip,reset,draw:()=>{TQ.draw=1;try{composer.render()}finally{TQ.draw=0}}});
 }
 function TQ_url(c,o={}){const q=new URLSearchParams({test:c});for(const k of['car','at','go'])if(o[k])q.set(k,o[k]);return location.pathname+'?'+q}
-const GOV={on:false,s:1,d:0,top:0,ring:[],busy:[],bk:0,bad:0,good:0,hold:0,upW:10,lastUp:-1e9,clock:0,warm:0,t0:0,log:[],test:null,mid:0,last:null,upW0:10,half:null,th:{dn:22,upP:18,upB:12}};
+const GOV={on:false,pt:0,s:1,d:0,top:0,ring:[],busy:[],bk:0,bad:0,good:0,hold:0,upW:10,lastUp:-1e9,clock:0,warm:0,t0:0,log:[],test:null,mid:0,last:null,upW0:10,half:null,th:{dn:22,upP:18,upB:12}};
 const GOV_S=[1,.85,.7];
 function GOV_touchBoot(){GOV.s=.7;GOV.d=3;GOV.th.upB=14;GOV.upW0=5;if(!GOV.half){GOV.half={traf:TUNE.traf,lvPed:TUNE.lvPed};TUNE.traf=(TUNE.traf??1)*.5;TUNE.lvPed=(TUNE.lvPed??.8)*.5}}
 function GOV_boot(){if(lowGfx){GOV_touchBoot();return}const g=TQ?null:store.get('mho_gov',null);GOV.s=g&&GOV_S.includes(g.s)?g.s:1;GOV.d=g&&g.d>=0&&g.d<=3?g.d|0:LK_LV.indexOf(SET_DEF.q)}
@@ -15502,6 +15503,7 @@ function GOV_apply(why){DRES.s=GOV.s;LK.userQ='high';LK.drop=GOV.d;LK_apply();re
 function GOV_lvl(){return{s:GOV.s,q:LK_LV[Math.min(3,GOV.d)],pr:+renderer.getPixelRatio().toFixed(2)}}
 function GOV_reset(){GOV.ring.length=GOV.busy.length=0;GOV.bk=GOV.bad=GOV.good=0}
 function GOV_step(dir){const n=GOV_S.indexOf(GOV.s);let ch=false;
+  if(GOV.pt<60000){if(dir<0&&n<GOV_S.length-1){GOV.s=GOV_S[n+1];ch=true}else if(dir>0&&n>0){GOV.s=GOV_S[n-1];ch=true;GOV.lastUp=GOV.clock}}else
   if(dir<0){if(n<GOV_S.length-1){GOV.s=GOV_S[n+1];ch=true}else if(GOV.d<3){GOV.d++;ch=true}
     if(ch&&GOV.clock-GOV.lastUp<20000)GOV.upW=Math.min(GOV.upW0*8,GOV.upW*2)}   // the last up step did not hold: wait longer before trying again
   else{if(GOV.d>0){GOV.d--;ch=true}else if(n>0){GOV.s=GOV_S[n-1];ch=true}if(ch)GOV.lastUp=GOV.clock}
@@ -15509,7 +15511,7 @@ function GOV_step(dir){const n=GOV_S.indexOf(GOV.s);let ch=false;
 const _gp=(a,k)=>{const b=a.slice().sort((x,y)=>x-y);return b[Math.min(b.length-1,Math.floor(b.length*k))]||0};
 function GOV_feed(ms,busy){if(!GOV.on)return;GOV.clock+=ms;
   if(paused||document.hidden||LD.on||!(state==='roam'||state==='race'||state==='countdown')||ms>250||ms<=0){GOV.warm=0;GOV_reset();return}
-  if((GOV.warm+=ms)<5000)return;if(GOV.hold>0){GOV.hold-=ms;return}
+  GOV.pt+=ms;if((GOV.warm+=ms)<5000)return;if(GOV.hold>0){GOV.hold-=ms;return}
   GOV.ring.push(ms);GOV.busy.push(busy);if((GOV.bk+=ms)<1000)return;
   const p90=_gp(GOV.ring,.9),b90=_gp(GOV.busy,.9),med=_gp(GOV.ring,.5),p10=_gp(GOV.ring,.1);GOV.last={p90:+p90.toFixed(1),b90:+b90.toFixed(1),n:GOV.ring.length};GOV.ring.length=GOV.busy.length=0;GOV.bk=0;
   if(Math.abs(med-33.3)<3&&p90-p10<4&&b90<20){GOV.bad=GOV.good=0;return}   // a steady 30 fps with idle work is the iOS low-power cap, not the GPU
@@ -15520,7 +15522,7 @@ function GOV_set(on){GOV.on=on;GOV.warm=0;GOV.hold=0;GOV_reset();if(on){GOV.upW=
 function GOV_pick(){if(SET.qm==='auto'){GOV_set(true);return}GOV.on=false;LK.userQ=null;LK.effQ=null;LK.drop=0;DRES.s=1;SET.q=SET.qm;applyQuality()}
 {const _ds=dresStep;dresStep=ms=>{_ds(ms);GOV.mid=ms}}
 {const _fr=frame;frame=function(now){const a=performance.now();GOV.mid=-1;_fr(now);if(GOV.mid>=0){const tl=GOV.test&&GOV.test.iters;if(tl){let x=0;for(let i=0;i<tl;i++)x+=Math.sqrt(i);GOV.test.x=x}GOV_feed(GOV.mid,performance.now()-a)}}}
-if(TQ)SET.qm=SET.q;else if(SET.qm==='auto'){GOV_boot();GOV_set(true)}else if(SET.qm&&SET.qm!==SET.q)GOV_pick();
+if(TQ&&!/[?&]gov=1/.test(location.search))SET.qm=SET.q;else if(SET.qm==='auto'){GOV_boot();GOV_set(true)}else if(SET.qm&&SET.qm!==SET.q)GOV_pick();
 window.__gov={GOV,lvl:GOV_lvl,set:GOV_set,step:GOV_step,feed:(ms,busy,n)=>{for(let i=0;i<(n||1);i++)GOV_feed(ms,busy)},pick:GOV_pick};
 {const st=document.createElement('style');st.textContent='@media (orientation:portrait){html body.touch #touch :is(#tB,#tN,#tD,#tF,#tG){font-size:16px!important}}#npcSay#npcSay p{font-size:12px!important}';document.head.appendChild(st)}
 const PB={t0:0,next:0,n:0,max:5,iv:new Float32Array(8192),k:0,slow:0,worst:0,busy:0,sys:{},fs:{sim:0,cam:0,traffic:0,world:0,streets:0,hud:0,render:0},child:0,db:undefined,sent:[],last:0,gpu:null,chip:null,cf:[],ct:0};
@@ -16047,7 +16049,7 @@ function SM2_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam firs
   return `📍 20 km/h TAP: ${res.map(r=>`${r.t} ${r.smash?'SMASHED':'bump'} (${r.bricks} bricks, −${f(r.loss)})`).join(', ')}, car ${cr.burst?'BURST':'bump'} (−${f(cr.loss)})`+ok(pass)}
  const pass=res.every(r=>r.smash)&&cr.burst;return `📍 70 km/h HIT: ${res.map(r=>`${r.t} ${r.smash?'smashed':'NOT smashed'} (impact ${r.imp})`).join(', ')}, car ${cr.burst?'burst into bricks':'NOT burst'}`+ok(pass)}
 (function SM2_reg(i){const C=window.__chk;if(C&&C.GO){for(const k of['tap','hit'])C.GO['smash2/'+k]=[{c:'fra',n:k,fn:()=>SM2_go(k)}];return}if(i<600)setTimeout(()=>SM2_reg(i+1),100)})(0);
-const PC={on:!/[?&]pc5=0/.test(location.search),L:[],grp:null,t:0,f:0,k:0,left:0,x:1e9,y:0,z:1e9,h:1e9,fr:900,keep:60,st:{meshes:0,src:0,vis:0,runs:0,ms:0}};
+const PC={on:!/[?&]pc5=0/.test(location.search),q:[],L:[],grp:null,t:0,f:0,k:0,left:0,x:1e9,y:0,z:1e9,h:1e9,fr:900,keep:60,st:{meshes:0,src:0,vis:0,runs:0,ms:0}};
 const _pcM=new THREE.Matrix4(),_pcPV=new THREE.Matrix4(),_pcF=new THREE.Frustum(),_pcD=new THREE.Vector3(),_pcC=new THREE.Color(),_pcIM=THREE.InstancedMesh.prototype;
 function PC_far(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc5Far??(lv==='min'?380:lv==='low'?480:lv==='med'?700:900)}
 function PC_cand(o){if(!o.isInstancedMesh||o.userData.pc||o.count<16||o.count!==o.instanceMatrix.count||o.instanceMatrix.usage!==THREE.StaticDrawUsage)return false;
@@ -16070,7 +16072,8 @@ function PC_scan(){PC.L.length=0;PC.st.meshes=PC.st.src=0;PC.grp=HUB.grp;if(!HUB
  if(typeof CLOUDS!=='undefined'&&CLOUDS)CLOUDS.traverse(o=>{if(o.isInstancedMesh&&!o.userData.pc&&o.count>=16&&o.count===o.instanceMatrix.count)PC_reg(o,true)});
  for(const im of Object.values(HUB.cim||{}))for(const q of[im,im&&im.userData.w,im&&im.userData.g])if(q&&q.isInstancedMesh&&!q.userData.pc&&q.count>=8&&q.count===q.instanceMatrix.count)PC_reg(q,false).dyn=true;
  PC.nch=HUB.grp.children.length;PC_grid()}
-function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const A=[],w=o=>{if(o===lg)return;if(PC_cand(o)){A.push(PC_reg(o,false));n++}for(const q of o.children)w(q)};w(HUB.grp);if(n)PC_grid(A);return n}
+function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const Q=PC.q,w=o=>{if(o===lg)return;if(!o.userData.pcQ&&PC_cand(o)){o.userData.pcQ=1;Q.push(o);n++}for(const q of o.children)w(q)};w(HUB.grp);return n}
+function PC_drain(ms){if(!PC.q.length)return 0;const t=performance.now(),A=[];while(PC.q.length&&(!A.length||performance.now()-t<ms)){const o=PC.q.shift();o.userData.pcQ=0;if(o.parent&&PC_cand(o))A.push(PC_reg(o,false))}if(A.length)PC_grid(A);return A.length}
 function PC_grid(add){
  if(!add||!PC.M)PC.M=new Map();const M=PC.M;
  for(const C of add||PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
@@ -16088,17 +16091,18 @@ function PC_mesh(C){const im=C.im;C.dirty=false;if(!im.parent)return 0;const cx=
  im.count=C.s;const M=im.instanceMatrix;M.clearUpdateRanges();if(C.s){M.addUpdateRange(0,C.s*16);M.needsUpdate=true}
  const IC=im.instanceColor;if(IC){IC.clearUpdateRanges();if(C.s){IC.addUpdateRange(0,C.s*3);IC.needsUpdate=true}}return n}
 function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!=='roam')return;if(PC.grp&&PC.grp!==HUB.grp){PC.L.length=0;PC.grp=null;PC.f=0}
- if(!PC.grp){const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return;PC_scan();force=1}
- if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9)&&PC_add())force=1;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
+ {const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return}if(!PC.grp)PC_scan();/* boot-1: the scan normally ran in the loader (PC_prewarm); the first pass is budgeted like any other */
+ if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9))PC_add();const np=PC_drain(force?1e9:3)>0;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
  const t0=performance.now();let tested=0;const snap=()=>{camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);PC.x=cx;PC.y=camera.position.y;PC.z=cz;PC.h=h;const far=PC.fr=PC_far(),cy=PC.y,G=PC.G,V=PC.cv;if(G)for(let q=0;q<V.length;q++){const d=Math.hypot(G[q*4]-cx,G[q*4+1]-cy,G[q*4+2]-cz),r=G[q*4+3];V[q]=d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(G[q*4],G[q*4+1],G[q*4+2]),r+4+d*.25))?0:1}};
- if(force||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){snap();PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
+ if(force||np||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){snap();PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
  else if(++PC.t%10===0&&!PC.left){snap();for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
  const bud=force?1e9:(TUNE.pc7Bud||60000);/* circular: a new pass mid-way carries on from the same mesh, so no mesh starves under constant turning */
  while(PC.left>0&&tested<bud){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
  if(!PC.left)for(const C of PC.L)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
  if(tested){let vis=0;for(const C of PC.L)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();
+function PC_prewarm(){try{if(PC.on&&HUB.grp&&!PC.grp&&PC_gate())PC_scan()}catch(e){console.warn('PC prewarm',e)}}
 function PC_gate(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc7All||lv==='low'||lv==='min'}
 function PC_release(){for(const C of PC.L){const im=C.im;if(!im.parent)continue;im.instanceMatrix.array.set(C.src);if(C.col&&im.instanceColor)im.instanceColor.array.set(C.col);
   for(let i=0;i<C.n;i++)C.slot[i]=i;C.s=C.n;C.dirty=false;im.count=C.n;im.instanceMatrix.clearUpdateRanges();im.instanceMatrix.needsUpdate=true;if(im.instanceColor){im.instanceColor.clearUpdateRanges();im.instanceColor.needsUpdate=true}}
@@ -16181,6 +16185,11 @@ function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(
 const DEST_BUDGET=1.5;
 const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.done){try{DEST_find(DEST_BUDGET)}catch(e){DEST.sc=DEST.sc||[];DEST.done=true;console.warn('DEST',e)}}if(DEST.sc&&DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350){DEST_check(c);break}};   /* perf-10: one re-check per 20 frames (was all of them at once) */
 smashCheck=(f=>function(dt){DEST_step(dt);return f.apply(this,arguments)})(smashCheck);
+{const _lp=ldPrewarm;ldPrewarm=async function(...a){const T=(n,f)=>{try{f()}catch(e){console.warn('boot1 '+n,e)}};
+  T('pc',()=>PC_prewarm());
+  T('mini',()=>{if(!HUB.built)return;if(!MINI)MINI=miniBase();if(SM_ON&&MINI&&MINI.smm)SMM_tick(250)});
+  T('dest',()=>{if(!DEST.on||!HUB.nodes)return;if(DEST.N!==HUB.nodes)DEST_reset();DEST_find(100)});
+  return _lp.apply(this,a)}}
 function R3E_builderGo(){if(typeof BX==='undefined')return'📍 builder missing ❌';const T=window.__tq&&__tq.o,was=BX.on,IDS=['#menu','#topBtns','#hud','#touch'],hid=IDS.map(i=>{const e=$(i);return e?e.hidden:null});try{if(!BX.on)BX_open();const ok=b=>b?' ✅':' ❌',cam=BX.cam,d0=T&&T.draw;if(T)T.draw=1;
   cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();BX_camBuild();renderer.setRenderTarget(null);renderer.render(BX.sc,cam);
   const cv=renderer.domElement,w=cv.width,h=cv.height,o=document.createElement('canvas');o.width=w;o.height=h;const x=o.getContext('2d',{willReadFrequently:true});x.drawImage(cv,0,0);if(T)T.draw=d0;
