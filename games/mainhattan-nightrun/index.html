@@ -6442,6 +6442,9 @@ LA.footStart=()=>{LA.footStop();const v=LA.pv,pl=v.pl,fa=window.FA,cv=document.c
 LA.footStop=()=>{if(LA.raf)cancelAnimationFrame(LA.raf);LA.raf=0;if(LA.cv){LA.cv.remove();LA.cv=null;}};
 /* leaving the Lab (any way) resets everything this file touched */
 NR.on('runStart',d=>{if(d&&d.lab)LA.apply();});
+/* safety net: the placeholder preview must never survive outside the Lab (quit paths that skip runEnd) */
+NR.on('tick',()=>{const F=window.FXW;if(F&&typeof F==='object'&&F.preview&&!(running&&G&&G.lab)){F.preview=false;LA.fxOn=false;}});
+setInterval(()=>{const F=window.FXW;if(F&&typeof F==='object'&&F.preview&&!(running&&G&&G.lab)){F.preview=false;LA.fxOn=false;}},500);
 NR.on('runEnd',()=>{LA.stop(true);LA.closeCard();LA.S.ph=true;LA.fxOn=false;if(window.FXW&&typeof FXW==='object'&&FXW._labWrap)FXW.preview=false;LA.host=null;});   // (apply() would still see running+G.lab here)
 NR.on('tick',()=>{if(!G||!G.lab||!RET.labassets)return;if((G.frameLab||0)%60===0)LA.apply();});
 
