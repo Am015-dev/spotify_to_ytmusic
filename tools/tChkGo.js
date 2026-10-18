@@ -12,7 +12,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
 const BASE=process.argv[2],OUT=process.argv[3]||'.',FIL=process.argv[4]||'';fs.mkdirSync(OUT,{recursive:true});
 const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: tools/chkgo_verdict.js (a throwing GO is FAIL)
 (async()=>{const T0=Date.now(),b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});
- const ctx=await b.newContext({viewport:process.env.PORTRAIT?{width:393,height:852}:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const errs=[],boots={},res=[],RS={n:0,ms:0};let nav=0,p=null;const FC={};
+ const ctx=await b.newContext({viewport:process.env.DESKTOP?{width:1280,height:720}:process.env.PORTRAIT?{width:393,height:852}:{width:852,height:393},deviceScaleFactor:1,isMobile:!process.env.DESKTOP,hasTouch:!process.env.DESKTOP});const errs=[],boots={},res=[],RS={n:0,ms:0};let nav=0,p=null;const FC={};
  const newPage=async()=>{p=await ctx.newPage();p.setDefaultTimeout(120000);p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});p.on('framenavigated',f=>{if(f===p.mainFrame())nav++});
   // scale-1: GOs may throttle the CPU (window.__cdp('Emulation.setCPUThrottlingRate',{rate:4})) or resize the viewport (window.__vp(w,h)); both are undone after every item
   const cdp=await ctx.newCDPSession(p);await p.exposeFunction('__cdp',(m,a)=>{EMU.cpu=1;return cdp.send(m,a||{}).then(()=>1,e=>String(e).slice(0,120))});await p.exposeFunction('__vp',(w,h)=>{EMU.vp=1;return p.setViewportSize({width:w,height:h}).then(()=>1)});EMU.cdp=cdp};const EMU={};
@@ -21,6 +21,7 @@ const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: too
   const s=(Date.now()-t)/1000;(boots[c]=boots[c]||[]).push(s);if(!process.env.QUIET)console.log(`BOOT ${c} ${s.toFixed(1)} s`);nav=0};
  const shot=async f=>{await p.evaluate(()=>__tq.draw()).catch(()=>{});await p.screenshot({path:OUT+'/'+f,type:'jpeg',quality:70})};
  await open(process.env.CITY||'fra');
+ if(process.env.THROTTLE)await EMU.cdp.send('Emulation.setCPUThrottlingRate',{rate:+process.env.THROTTLE});   // THROTTLE=4: slow-CPU run for the frame-time-dependent GOs (life1/people, smash)
  // every city VARIANT of a GO runs (id#1 = second variant, e.g. the Athens pace/jam): goJump cycles variants per call, so go(id,j) selects j
  const all=await p.evaluate(()=>window.__chk.items.map(it=>it.ver+'/'+it.id).filter(id=>window.__chk.GO[id]).flatMap(id=>Array.from({length:window.__chk.nvar(id)},(_,j)=>[j?id+'#'+j:id,window.__chk.city(id,j)])));
  // items whose GO only opens the garage (or says "drive here") all do the same thing: run the first, report the rest as the same

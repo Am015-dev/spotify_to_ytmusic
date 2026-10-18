@@ -235,7 +235,8 @@ function LIFE_landmark(){LIFE.lm=null;const fra=CID==='fra';let at=null;
  g.traverse(o=>{o.userData.keep=1});/* not merged by WB city batching: the wheel turns */g.position.set(at.x,at.y,at.z);g.rotation.y=at.h||0;LIFE.grp.add(g);const r=LD?LD.r:fra?6:8.5;LIFE.lm.r=r}
 // ---------- fill: items within LIFE_R m, nearest first, into the pools (every 12 frames or 20 m)
 function LIFE_fill(){const x0=RO.x,z0=RO.z,cr=Math.ceil(LIFE_R/LIFE_CELL),ca=Math.floor(x0/LIFE_CELL),cb=Math.floor(z0/LIFE_CELL),near=[],t0=performance.now();let todo=false;
- for(let a=ca-cr;a<=ca+cr;a++)for(let b=cb-cr;b<=cb+cr;b++){if(!LIFE.C.has(a*100000+b)&&performance.now()-t0>1.5){todo=true;continue}for(const it of LIFE_cell(a,b)){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
+ const cl=[];for(let a=ca-cr;a<=ca+cr;a++)for(let b=cb-cr;b<=cb+cr;b++)cl.push([(a-ca)**2+(b-cb)**2,a,b]);cl.sort((p,q)=>p[0]-q[0]);/* r9d: nearest cells first, so the 1.5 ms budget drops the far ring and never the cells around the car (people near the player react on the same frame) */
+ for(const [,a,b] of cl){if(!LIFE.C.has(a*100000+b)&&performance.now()-t0>1.5){todo=true;continue}for(const it of LIFE_cell(a,b)){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
  const pr=Math.ceil(LIFE_R/LIFE_PG);for(let a=Math.floor(x0/LIFE_PG)-pr;a<=Math.floor(x0/LIFE_PG)+pr;a++)for(let b=Math.floor(z0/LIFE_PG)-pr;b<=Math.floor(z0/LIFE_PG)+pr;b++){const it=LIFE_pop(a,b);if(it){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
  near.sort((p,q)=>p[0]-q[0]);const keep=new Set(),L=[];for(const [,it] of near){keep.add(it.id);if(!LIFE.dead.has(it.id))L.push(it)}
  for(const id of LIFE.dead.keys())if(!keep.has(id))LIFE.dead.delete(id);// smashed things come back once you are out of range
@@ -357,14 +358,14 @@ function LIFE_runup(it,D){const y=it.y+.5,nb=(x,z)=>{if(roamHit(x,z,1.6,y))retur
  for(let k=0;k<24;k++){const h=k*Math.PI/12,bx=it.x-Math.sin(h)*D,bz=it.z-Math.cos(h)*D;if(roamHit(bx,bz,2.5,y))continue;let ok=true;for(let s=3;s<=D&&ok;s+=2)if(nb(it.x-Math.sin(h)*s,it.z-Math.cos(h)*s))ok=false;/* a hill street (Athens, 1933,-1687: 40° rise) stalls the car and rolls it back: the run-up must be drivable, ≤ 20% grade end to end and every 2 m */
   for(let s=0;s<=D&&ok;s+=2)if(Math.abs(groundY(it.x-Math.sin(h)*s,it.z-Math.cos(h)*s)-groundY(it.x-Math.sin(h)*(s+2),it.z-Math.cos(h)*(s+2)))>.4)ok=false;if(ok)return{bx,bz,h}}return null}
 // GO: 25 m in front of a smashable group, real keyboard gas for 4 s straight at it → it bursts into bricks and studs
-function LIFE_goSmash(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_fill();let it=null,R=null;for(const q of LIFE.L){if(q.c!=='sm'||(q.x-RO.x)**2+(q.z-RO.z)**2<30*30)continue;R=LIFE_runup(q,22);if(R){it=q;break}}if(!it)return'📍 no smashable with a clear run-up ❌';
+function LIFE_goSmash(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_fill();for(let k=0;k<30&&LIFE.todo;k++)LIFE_fill();let it=null,R=null;for(const q of LIFE.L){if(q.c!=='sm'||(q.x-RO.x)**2+(q.z-RO.z)**2<30*30)continue;R=LIFE_runup(q,22);if(R){it=q;break}}if(!it)return'📍 no smashable with a clear run-up ❌';
  if(!roamWarp(R.bx,R.bz,R.h))return'📍 Can\'t jump right now';LIFE_aim(R);RO.v=0;const s0=LIFE.n.smash,h0=HUB.smashed;K.ArrowUp=true;
  setTimeout(()=>{K.ArrowUp=false;const n=LIFE.n.smash-s0;say(`📍 SMASH: ${n} LIFE things burst (${HUB.smashed-h0} smashes counted) `+(n>=1?"✅":"❌"))},5500);return'📍 SMASH · driving…'}
 // GO: in front of a people group, real gas through it → people jump aside or fly (harmless) and nobody stands inside the car
-function LIFE_goDodge(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_fill();let it=null,R=null;for(const q of LIFE.L){if(q.c!=='grp'||q.t==='football'||(q.x-RO.x)**2+(q.z-RO.z)**2<30*30)continue;R=LIFE_runup(q,24);if(R){it=q;break}}if(!it)return'📍 no people group with a clear run-up ❌';
- if(!roamWarp(R.bx,R.bz,R.h))return'📍 Can\'t jump right now';LIFE_aim(R);RO.v=0;const d0=LIFE.n.dodge+LIFE.n.fly,t0=performance.now();K.ArrowUp=true;
+function LIFE_goDodge(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_fill();for(let k=0;k<30&&LIFE.todo;k++)LIFE_fill();/* r9d: the GO builds every cell (the per-frame budget would leave the warp target half-built on a slow page) */let it=null,R=null;for(const q of LIFE.L){if(q.c!=='grp'||q.t==='football'||(q.x-RO.x)**2+(q.z-RO.z)**2<30*30)continue;R=LIFE_runup(q,24);if(R){it=q;break}}if(!it)return'📍 no people group with a clear run-up ❌';
+ if(!roamWarp(R.bx,R.bz,R.h))return'📍 Can\'t jump right now';LIFE_aim(R);RO.v=0;const d0=LIFE.n.dodge+LIFE.n.fly,t0=performance.now(),T0=LIFE.t;K.ArrowUp=true;
  /* life-2: gas until somebody reacts or the car is 6 m past the group (max 10 s), so a slow page (low fps) still gets there */
- const iv=setInterval(()=>{const n=LIFE.n.dodge+LIFE.n.fly-d0,past=(RO.x-it.x)*Math.sin(R.h)+(RO.z-it.z)*Math.cos(R.h)>6;if(!(n>=1||past||performance.now()-t0>10000))return;clearInterval(iv);K.ArrowUp=false;
+ const iv=setInterval(()=>{const n=LIFE.n.dodge+LIFE.n.fly-d0,past=(RO.x-it.x)*Math.sin(R.h)+(RO.z-it.z)*Math.cos(R.h)>6;if(!(n>=1||past||performance.now()-t0>10000&&LIFE.t-T0>6||performance.now()-t0>60000))return;clearInterval(iv);K.ArrowUp=false;
   say(`📍 PEOPLE (${it.t}): ${n} jumped aside or flew (${((performance.now()-t0)/1000).toFixed(1)} s) `+(n>=1?'✅':'❌'))},100);return'📍 PEOPLE · driving…'}
 // after roamWarp: keep the GO's run-up spot and heading (the warp may move the car to the right-hand lane of a divided road)
 function LIFE_aim(R){RO.x=R.bx;RO.z=R.bz;RO.h=R.h;if(RO.vh!=null)RO.vh=R.h}

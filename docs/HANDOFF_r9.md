@@ -24,3 +24,9 @@
 2. GO r9a/pack-cost (src/99c7_rev5fix.js, Westend + Akropolis): tkStep with 5 racers minus tkStep with the nemesis only, ms per frame, no graphics; pass = 5 racers and <= 0.5 ms. Measured 0.00-0.10 ms, both PASS.
 3. Gate: unit 0 FAIL; TAG r9a,life1,xf1,terrain on the built page: 44/48. Reds: xf1/grass, xf1/water, life1/people (known). r9a/pack5#2 (River Run) failed once: behind 130 m at 167 s, the last 8 s of a 175 s race (limit 120); not touched by this lane, was 66-112 m before.
 4. Next: River Run end-of-race gap in the pack5 GO (sample only while the bot is under 150 s or the leader has not finished).
+## r9d (N1: life1/people, life1/smash)
+- Bisect (THROTTLE=4, built pages): 6bc1079/c18f1a6/7a85bef/3ba64e9 = people pass but time swings 3.6-11 s (GO had a 10 s WALL limit); 56cb397 (boot-1) = "no people group with a clear run-up" 2/2. Quiet machine at HEAD: both green (desktop + touch). Not scale-1 or perf-17.
+- Root cause: LIFE_fill's 1.5 ms budget skipped unbuilt cells in scan order (not nearest first) and the GOs filled once, so a slow page left the warp target half-built (no group / no smashable); GO also ended on 10 s wall, before a throttled page's car arrived.
+- Fix (src/assets/lx/code.js): LIFE_fill builds cells nearest-first (budget kept); people/smash GOs fill until done; people ends on 6 s sim time (60 s wall cap). Reaction code is per frame, unchanged.
+- tChkGo.js: DESKTOP=1 (no touch, 1280x720) and THROTTLE=n (CPU throttle) env options.
+- Gate: build + unit 0 FAIL; TAG=life1,xf1,terrain,phone2 only known xf1/* reds; life1 7/7 desktop+touch; THROTTLE=6/8 people reacts (only harness SLOW label trips).
