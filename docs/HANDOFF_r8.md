@@ -11,3 +11,10 @@
 - Builder tiles: min-height + wrap, "LONG RAMP UP" fits (src/98b2_builder2.js). DNF: TK.last.place null via tkFinPlace (src/98tk_city_duel.js); results already said DNF.
 - GOs r8b/pill-dist, dnf-noplace, pc-hud in src/99c7_rev5fix.js: all PASS. Unit 0 FAIL; life1/xf1/terrain only the known xf1/grass red.
 - Not done: builder label has no GO; hands-off tool `fin:true` comes from the tRv2k2 helper, not the game.
+
+# HANDOFF r8c (rev8 bugs 2, 3, 5, 7)
+1. Cyan ellipse/arc: the LIFE pop-marker ring (InstancedMesh `ring`, 6 m torus, src/assets/lx/code.js) sat under the camera at the Athens spawn. It is no longer drawn with the camera inside it or within 1.5 m of its rim (LIFE_ringCam); the v88v torus guard never covered instanced rings. Found by bisect: tools/tR8cyan.js.
+2. RGB split (src/10_core4.js FX): the offset is clamped to uCAcap = 0.0015 UV (0 on coarse pointer), and uCAk = FX_caK() fades it in from 85 to 100 % of top speed. Hit/flash uCA can no longer blow past the cap (it was ~15 px).
+3. Near canopy (src/98fc_foliage_cam.js): a crown centre within FC.nearR = 10 m of the camera, above the car and not behind the lens, is hidden like the line-of-sight trees.
+4. GOs r8c/near-ring, chroma-cap, near-canopy (src/99c7_rev5fix.js): 4/4 PASS. Shots before/after: Athens ellipse gone, Akropolis 189 km/h fringing gone, Westend CP4 clean.
+5. Gate: unit 0 FAIL; TAG=r8c,life1,xf1,terrain 45/46. life1/smash is flaky on trunk too (1/2 vs 1/2 here). Left: trees now pop out ~4 m ahead of the car; tune FC.nearR if Alex notices.

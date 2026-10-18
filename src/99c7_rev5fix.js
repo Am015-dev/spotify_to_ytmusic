@@ -18,3 +18,23 @@ function R5F_ok(){return 1}   // lazy-chunk stub export (src/LAZY lists it)
  if(!C.items.some(q=>q.ver==='r8b'))C.items.push({ver:'r8b',id:'pill-dist',area:'ui',text:'r8b · Athens quest pill: 📍 GO forces a long chapter label plus "→ 28 m" into #m1Next. Pass line: the distance span is not clipped and ends inside the pill.'},{ver:'r8b',id:'dnf-noplace',area:'race',text:'r8b · 📍 GO: a DNF has no place (TK.last.place null, results show DNF). Pass line: tkFinish stores place null on dnf.'},{ver:'r8b',id:'pc-hud',area:'ui',text:'r8b · PC HUD (≥ 1000 px): 📍 GO reads KM/H size and the rival-name box. Pass line: KM/H ≥ 12 px, rival name box ≥ 130 px wide.'});
  return}
  if(i<600)setTimeout(()=>R5F_reg(i+1),100)})(0);
+// r8c (docs/REVIEW_2K_8.md bugs 2, 3, 5, 7): GOs r8c/near-ring, chroma-cap, near-canopy. State asserts only.
+(function R8C_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='r8c')){C.items.push(
+{ver:'r8c',id:'near-ring',area:'world',text:'rev8 #2/#3 · cyan ellipse at the Athens spawn / cyan arc over the race frame = the LIFE pop-marker ring (6 m torus) drawn around the camera: 📍 GO reads every drawn marker ring. Pass line: none with the camera inside it or within 1.5 m of its rim; the rule hides a ring under the camera and keeps one 20 m away.'},
+{ver:'r8c',id:'chroma-cap',area:'world',text:'rev8 #5 · RGB split too strong at speed: 📍 GO. Pass line: the offset is capped at 0.0015 UV (0 on phones), the speed fade is 0 at 80 % and 1 at 100 % of top speed, and the shader clamps the offset even during a hit/flash.'},
+{ver:'r8c',id:'near-canopy',area:'world',text:'rev8 #7 · a near tree canopy fills a screen corner: 📍 GO puts the camera 1.5 m outside a tree crown, above the car, looking at it. Pass line: the tree is hidden; looking away or from 14 m it stays.'})}
+ C.GO['r8c/near-ring']=['ath','fra'].map(c=>({c,n:'no marker ring around the camera',secs:2,fn:()=>{const L=window.__life;if(!L||!L.LIFE||!L.LIFE.M||!L.ringCam)return'📍 NEAR RING · LIFE not loaded ❌';
+  setTimeout(()=>{const R=L.LIFE.M.ring,M=new THREE.Matrix4(),P=new THREE.Vector3();let n=0,bad=0;for(let i=0;i<R.count;i++){R.getMatrixAt(i,M);P.setFromMatrixPosition(M);n++;if(L.ringCam(P.x,P.y,P.z))bad++}
+   const cp=camera.position,syn=L.ringCam(cp.x+1.7,cp.y-3,cp.z+.7)&&!L.ringCam(cp.x+20,cp.y-3,cp.z);
+   goSay(`📍 NEAR RING · ${n} marker rings drawn, ${bad} around the camera, ${L.LIFE.ringCam||0} hidden so far; rule: ring 1.8 m from the camera hidden, 20 m kept ${syn?'yes':'NO'} → ${bad===0&&syn?'✅ PASS':'❌ FAIL'}`)},600);return'📍 NEAR RING · checking…'}}));
+ C.GO['r8c/chroma-cap']=[{c:'fra',n:'RGB split capped and speed-gated',fn:()=>{const U=FX.uniforms,coarse=matchMedia('(pointer:coarse)').matches,cap=U.uCAcap.value,v0=RO.v,top=Math.max(30,RO.top||60);
+  RO.v=top*.8;const k80=FX_caK();RO.v=top;const k100=FX_caK();RO.v=top*.925;const k92=FX_caK();RO.v=v0;const src=FX.material.fragmentShader,cl=/if\(ol>uCAcap\)o\*=uCAcap/.test(src)&&!/d\*ab\)/.test(src);
+  const ok=(coarse?cap===0:cap>0&&cap<=.0015)&&k80===0&&k100===1&&k92>.4&&k92<.6&&cl;return`📍 CHROMA · cap ${cap} UV (${coarse?'phone → 0':'PC ≤ 0.0015'}), speed fade 80 %→${k80} 92.5 %→${k92.toFixed(2)} 100 %→${k100}, shader clamp ${cl?'yes':'NO'} → ${ok?'✅ PASS':'❌ FAIL'}`}}];
+ C.GO['r8c/near-canopy']=[{c:'ath',n:'near canopy above the car hidden',fn:()=>{if(typeof FC==='undefined'||!HUB.pgrid)return'📍 NEAR CANOPY · no foliage cam ❌';let T=null;
+  for(const l of HUB.pgrid.values()){for(const p of l){if(p.alive===false||!CVF_RX.test(p.t)||!p.im)continue;const cr=FC_crown(p);if(cr[0]>1&&cr[0]<6&&cr[2]-cr[1]>2){T=p;break}}if(T)break}
+  if(!T)return'📍 NEAR CANOPY · no tree prop found ❌';const cr=FC_crown(T),my=(cr[1]+cr[2])/2,cp=camera.position.clone(),cq=camera.quaternion.clone(),ro=[RO.x,RO.y,RO.z];
+  const run=(d,look)=>{FC_restore(true);camera.position.set(T.x+d,my-1,T.z);camera.lookAt(look?T.x:T.x+2*d,my,T.z);camera.updateMatrixWorld();RO.x=T.x+d+6;RO.y=my-6;RO.z=T.z;FC_step();return T.alive===false};
+  let a,b,c2;const n0=FC.near;try{a=run(cr[0]+1.5,1);b=run(cr[0]+1.5,0);c2=run(14,1)}finally{FC_restore(true);camera.position.copy(cp);camera.quaternion.copy(cq);camera.updateMatrixWorld();RO.x=ro[0];RO.y=ro[1];RO.z=ro[2]}
+  return`📍 NEAR CANOPY · ${T.t} crown r ${cr[0].toFixed(1)} m: camera ${(cr[0]+1.5).toFixed(1)} m away looking at it → ${a?'hidden':'SHOWN'}, looking away → ${b?'HIDDEN':'kept'}, from 14 m → ${c2?'HIDDEN':'kept'} (near rule fired ${FC.near-n0}×) → ${a&&!b&&!c2?'✅ PASS':'❌ FAIL'}`}}];
+ return}
+ if(i<600)setTimeout(()=>R8C_reg(i+1),100)})(0);

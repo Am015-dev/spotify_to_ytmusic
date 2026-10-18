@@ -217,17 +217,19 @@ const SCRUB=new ShaderPass({uniforms:{tDiffuse:{value:null}},vertexShader:'varyi
 composer.addPass(SCRUB);
 // only what is brighter than 1.0 in HDR blooms: unlit neon (toneMapped:false, colour pushed above 1), road glow lines, engine cores
 const bloom=new UnrealBloomPass(new THREE.Vector2(512,512),.95,.6,1.0);composer.addPass(bloom);
-// grade (HDR, before tone mapping) · radial speed blur with RGB split · vignette · grain · flash
-const FX=new ShaderPass({defines:{TAPS:lowGfx?5:9},uniforms:{tDiffuse:{value:null},uSpeed:{value:0},uBoost:{value:0},uCA:{value:0},uTime:{value:0},uFlash:{value:0},uHit:{value:0},uMirror:{value:0}},
+// grade (HDR, before tone mapping) · radial speed blur with RGB split (r8: offset capped at uCAcap UV, 0 on phones; uCAk fades it in above 85 % of top speed) · vignette · grain · flash
+const FX=new ShaderPass({defines:{TAPS:lowGfx?5:9},uniforms:{tDiffuse:{value:null},uSpeed:{value:0},uBoost:{value:0},uCA:{value:0},uCAk:{value:0},uCAcap:{value:matchMedia('(pointer:coarse)').matches?0:.0015},uTime:{value:0},uFlash:{value:0},uHit:{value:0},uMirror:{value:0}},
   vertexShader:'varying vec2 vUv0;void main(){vUv0=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-  fragmentShader:`uniform sampler2D tDiffuse;uniform float uSpeed,uBoost,uCA,uTime,uFlash,uHit,uMirror;varying vec2 vUv0;
+  fragmentShader:`uniform sampler2D tDiffuse;uniform float uSpeed,uBoost,uCA,uCAk,uCAcap,uTime,uFlash,uHit,uMirror;varying vec2 vUv0;
   float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}
   vec3 grade(vec3 c){c=c*vec3(1.03,1.0,.99);c=max(c,0.);float l=dot(c,vec3(.2126,.7152,.0722));c=mix(vec3(l),c,1.3);c=(c-.18)*1.1+.18;return max(c,0.);}
   void main(){vec2 vUv=vec2(uMirror>.5?1.-vUv0.x:vUv0.x,vUv0.y);vec2 d=vUv-vec2(.5,.47);vec2 dq=vec2(d.x,d.y*.62);float r=length(dq)*1.35;float edge=smoothstep(.1,.85,r);
-    float k=(uSpeed*uSpeed*.05+uBoost*.05)*edge;float ab=.0011*(.3+uSpeed*.7+uBoost)*r+uCA*r*r;
-    vec3 col=vec3(0.);if(k*length(d)<.0004)col=vec3(texture2D(tDiffuse,vUv+d*ab).r,texture2D(tDiffuse,vUv).g,texture2D(tDiffuse,vUv-d*ab).b);else{for(int i=0;i<TAPS;i++){float t=float(i)/float(TAPS-1);vec2 uv=vUv-d*k*t;col+=vec3(texture2D(tDiffuse,uv+d*ab).r,texture2D(tDiffuse,uv).g,texture2D(tDiffuse,uv-d*ab).b);}col/=float(TAPS);}
+    float k=(uSpeed*uSpeed*.05+uBoost*.05)*edge;float ab=(.0011*(.3+uSpeed*.7+uBoost)*r+uCA*r*r)*uCAk;vec2 o=d*ab;float ol=length(o);if(ol>uCAcap)o*=uCAcap/max(ol,1e-6);
+    vec3 col=vec3(0.);if(k*length(d)<.0004)col=vec3(texture2D(tDiffuse,vUv+o).r,texture2D(tDiffuse,vUv).g,texture2D(tDiffuse,vUv-o).b);else{for(int i=0;i<TAPS;i++){float t=float(i)/float(TAPS-1);vec2 uv=vUv-d*k*t;col+=vec3(texture2D(tDiffuse,uv+o).r,texture2D(tDiffuse,uv).g,texture2D(tDiffuse,uv-o).b);}col/=float(TAPS);}
     col=grade(col);col*=1.-.32*smoothstep(.28,1.,r*1.3)-uBoost*.12*smoothstep(.4,1.,r);col+=uHit*vec3(.32,0.,.05)*smoothstep(.45,1.,r);
     col+=uFlash*vec3(.5,.6,.9)*.3;col+=(h(vUv*vec2(1733.,997.)+uTime)-.5)*.018;gl_FragColor=vec4(col,1.);}`});
+// r8 (rev8 #5): the RGB split fades in only above 85 % of top speed (0 below, 1 at top speed)
+const FX_caK=()=>{try{return clamp((Math.abs(RO.v||0)/Math.max(30,RO.top||60)-.85)/.15,0,1)}catch(e){return 0}};
 composer.addPass(FX);{const bs=bloom.setSize.bind(bloom);bloom.setSize=(w,h)=>bs(Math.max(64,Math.round(w*(lowGfx?.5:1))),Math.max(64,Math.round(h*(lowGfx?.5:1))))}
 composer.addPass(new OutputPass());
 const SPRSCALE={value:400};

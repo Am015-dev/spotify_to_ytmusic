@@ -249,11 +249,12 @@ function LIFE_put(m,cnt,x,y,z,rx,ry,rz,s,o){const k=m.name||'';if(LIFE.S!==!!m.u
 const _lfC=new THREE.Color();
 function LIFE_fig(cnt,x,y,z,h,arm,hop,lean,ci){const M=LIFE.M,i=cnt.fig||0;if(LIFE.S||i>=LIFE_CAP.fig)return;LIFE_put(M.fig,cnt,x,y+hop,z,lean||0,h,0,1);LIFE_put(M.torso,cnt,x,y+hop,z,lean||0,h,0,1);
  LIFE_put(M.arms,cnt,x,y+hop+1.38,z,(lean||0)+arm,h,0,1);if(ci!=null&&LIFE.ci[i]!==ci){LIFE.ci[i]=ci;_lfC.set(LIFE_SHIRT[ci%LIFE_SHIRT.length]);M.torso.setColorAt(i,_lfC);M.arms.setColorAt(i,_lfC);LIFE.cd=1}}
+function LIFE_ringCam(x,y,z){const cp=camera.position;return(cp.x-x)**2+(cp.z-z)**2<7.5*7.5&&Math.abs(cp.y-y)<6}
 function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v),air=!!(typeof pl!=='undefined'&&pl&&pl.air),dr=!!RO.dDir,stunt=air||dr&&sp>8;LIFE.ci=LIFE.ci||[];
  let cheer=0;
  for(const it of S?LIFE.L:LIFE.D){const dx=it.x-RO.x,dz=it.z-RO.z,d2=dx*dx+dz*dz;
   if(it.c==='sm')LIFE_put(M['x_'+it.t],cnt,it.x,it.y,it.z,0,it.h,0,1);
-  else if(it.c==='pop'){const kk=it.kk,hy=kk?kk.y0-it.y+LIFE_KK.hgt+2.4:3.2;if(kk)LIFE_put(M.kick,cnt,it.x,kk.y0,it.z,0,it.h,0,1);const busy=it.cd>t;if(busy)continue;const i=LIFE_put(M.ring,cnt,it.x,it.y+.35,it.z,Math.PI/2,0,0,2.3);/* r3E: a flat ground ring like every other marker; the floating translucent sphere over the lane is gone */if(i>=0){_lfC.set(it.K.col);M.ring.setColorAt(i,_lfC)}}
+  else if(it.c==='pop'){const kk=it.kk,hy=kk?kk.y0-it.y+LIFE_KK.hgt+2.4:3.2;if(kk)LIFE_put(M.kick,cnt,it.x,kk.y0,it.z,0,it.h,0,1);const busy=it.cd>t;if(busy)continue;/* r8: never draw the 6 m marker ring (2.6 x 2.3) with the camera inside it or within 1.5 m of its rim (v88v torus rule): at the Athens spawn the camera sat 1.7 m from a ring centre = the cyan ellipse/arc over the lower screen. 7.5 m from the centre the car (~6 m ahead of the camera) is already in the 4.2 m pickup */if(LIFE_ringCam(it.x,it.y,it.z)){LIFE.ringCam=(LIFE.ringCam||0)+1;continue}const i=LIFE_put(M.ring,cnt,it.x,it.y+.35,it.z,Math.PI/2,0,0,2.3);/* r3E: a flat ground ring like every other marker; the floating translucent sphere over the lane is gone */if(i>=0){_lfC.set(it.K.col);M.ring.setColorAt(i,_lfC)}}
   else if(it.c==='set'){const T=it.t,tt=t+it.ph;LIFE_put(M['s_'+T],cnt,it.x,it.y,it.z,0,it.h,0,1);const m=M['m_'+T];
    if(T==='windmill')LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.25,it.y+7.2,it.z+Math.cos(it.h)*1.25,0,it.h,tt*1.4,1);
    else if(T==='turbine'){const H=LIFE.TB;if(H){const c=Math.cos(it.h),sn=Math.sin(it.h);LIFE_put(m,cnt,it.x+H.x*c+H.z*sn,it.y+H.y,it.z-H.x*sn+H.z*c,0,it.h,tt*2.2,1)}else LIFE_put(m,cnt,it.x+Math.sin(it.h)*1.2,it.y+13.2,it.z+Math.cos(it.h)*1.2,0,it.h,tt*2.2,1)}
@@ -405,4 +406,4 @@ function LIFE_goLmLd(say){if(!LIFE.on)return'📍 LIFE is OFF';LIFE_init();const
 // by name, so a hot reload of one GO function takes effect
 const LIFE_GOS={'fra-density':{fn:s=>LIFE_go(s)},'ath-density':{fn:s=>LIFE_go(s)},'smash':{fn:s=>LIFE_goSmash(s)},
  'people':{fn:s=>LIFE_goDodge(s)},'popup':{fn:s=>LIFE_goPop(s)},'kicker':{fn:s=>LIFE_goKick(s)},'fra-variety':{fn:s=>LIFE_goVar(s)},'fra-landmark':{fn:s=>LIFE_goLmLd(s)},'ath-landmark':{fn:s=>LIFE_goLmLd(s)},'ath-variety':{fn:s=>LIFE_goVar(s)},'wheel':{fn:s=>LIFE_goLm(s)},'carousel':{fn:s=>LIFE_goLm(s)}};
-window.__life={CELL:LIFE_CELL,hit:LIFE_hit,SETR:LIFE_SETR,ldLm:LIFE_ldLm,setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
+window.__life={ringCam:LIFE_ringCam,CELL:LIFE_CELL,hit:LIFE_hit,SETR:LIFE_SETR,ldLm:LIFE_ldLm,setSMT:v=>{LIFE_SMT=v;LIFE.C.clear();LIFE.SC.clear();LIFE.px=1e9},GOS:LIFE_GOS,side:LIFE_side,free:LIFE_free,gy:LIFE_gy,LIFE,audit:LIFE_audit,win:LIFE_win,cost:LIFE_cost,samples:LIFE_samples,cell:LIFE_cell,T:LIFE_T};
