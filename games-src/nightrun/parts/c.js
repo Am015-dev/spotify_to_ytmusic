@@ -1,3 +1,13 @@
+/* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
+function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;
+  const maxW=Math.max(80,W-2*edge-2*pad);let lines=[txt];
+  if(ctx.measureText(txt).width>maxW){const ws=txt.split(' ');let best=null;const co=txt.indexOf(': ');if(co>0&&Math.max(ctx.measureText(txt.slice(0,co+1)).width,ctx.measureText(txt.slice(co+2)).width)<=maxW)best={a:txt.slice(0,co+1),b:txt.slice(co+2)};   // break after the colon when both halves fit
+    if(!best)for(let i=1;i<ws.length;i++){const a=ws.slice(0,i).join(' '),b=ws.slice(i).join(' '),m=Math.max(ctx.measureText(a).width,ctx.measureText(b).width);if(!best||m<best.m)best={a,b,m};}
+    lines=best?[best.a,best.b]:[txt];}
+  let tw=0;for(const l of lines)tw=Math.max(tw,ctx.measureText(l).width);
+  if(tw>maxW){const f=maxW/tw;ctx.font=`700 ${fs*f}px "Chakra Petch",sans-serif`;tw=maxW;}   // one unbreakable word: shrink it instead of clipping
+  const lh=fs*1.2,ex=(lines.length-1)*lh,x=clamp(cx,edge+pad+tw/2,W-edge-pad-tw/2);
+  UIK.bubble(ctx,x-tw/2-pad,y-up-ex,tw+2*pad,bh+ex);ctx.fillStyle='#fff';lines.forEach((l,i)=>ctx.fillText(l,x,y-ex+i*lh));}
 
 // the tier meter: big x1..x4, four segments (the current one fills), a thin line that runs down before the tier slips. k = size, (cx, by) = bottom-centre
 function tierMeter(cx,by,k){const T=tierOf(C.n),col=TIERC[T-1],w=262*k,h=40*k,x0=cx-w/2,y0=by-h,pop=G.tpop>0?1+G.tpop*.4*(G.tdir>0?1:-.5):1;
@@ -41,7 +51,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     if(mn)hudMin(ctx,1,18,y0-8,t);});
   if(ku>1.25)tierMeter(W-131*ku-14,H-8,ku);else tierMeter(W/2,H-8,ku);       // big HUD on a small screen: the meter moves to the right corner, clear of the bars frame
   if(G.note.t>0&&G.note.txt)cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12-(ku>1.25?50:0));ctx.globalAlpha=1;});
-  if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);ctx.textAlign='center';ctx.font='700 15px "Chakra Petch",sans-serif';{const tw=ctx.measureText(G.hint.txt).width;UIK.bubble(ctx,W/2-tw/2-26,H-62-26,tw+52,40);}ctx.fillStyle='#ffffff';ctx.fillText(G.hint.txt,W/2,H-62);ctx.globalAlpha=1;});
+  if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(W/2,H-62,15,1,W,26,40);ctx.globalAlpha=1;});
   if(!mn){SH.hud(ctx,t,{nx:24,ny:90,dx:216,dy:H-52,sx:18,sy:H-60,ring:true});HUDX.ship(ctx,P.x,P.y,1,t);}else HUDX.ship(ctx,P.x,P.y,1,t);
   // boss bar
   if(G.boss&&G.boss.x<W){const b=G.boss;ctx.fillStyle='#00000088';ctx.fillRect(W/2-200*ku,30*ku,400*ku,8*ku);ctx.fillStyle='#ff3040';ctx.fillRect(W/2-200*ku,30*ku,400*ku*clamp(b.hp/b.max,0,1),8*ku);if(b.b2s&&window.B2X)B2X.sheen(W/2-200*ku,30*ku,400*ku*clamp(b.hp/b.max,0,1),8*ku);
@@ -87,7 +97,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   HUDX.ship(ctx,P.y,PH_-P.x,k,t,true);
   {const v=HUDX.vals();setRing($('bDash'),Math.min(1,(v.dash+(v.dash<v.dashMax&&P.dashCd>0?1-clamp(P.dashCd,0,1):0))/v.dashMax),'#19e3ff',v.dashMax>1?v.dash:'');setRing($('bEmp'),P.emp/3,'#ffb020',P.emp>0?P.emp:'');}
   if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
-  if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);ctx.textAlign='center';ctx.font=`700 ${17*k}px "Chakra Petch",sans-serif`;{const tw=ctx.measureText(G.hint.txt).width;UIK.bubble(ctx,w/2-tw/2-26*k,h-170*k-28*k,tw+52*k,44*k);}ctx.fillStyle='#fff';ctx.fillText(G.hint.txt,w/2,h-170*k);ctx.globalAlpha=1;}
+  if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(w/2,h-170*k,17*k,k,w,28*k,44*k);ctx.globalAlpha=1;}
   if(G.banner.t>0){const kk=G.banner.t,m=G.banner.m,a=Math.min(1,kk*2,(m-kk)*4);ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
     if(G.banner.pic!=null)ART.portrait(G.banner.pic,w/2,h/2-58*k-100*k,92*k,Math.max(0,a));
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,h/2-58*k,w,96*k);const col=G.banner.warn?'#ff3040':D.a;
@@ -101,16 +111,16 @@ function tierGlow(c){const T=tierOf(C.n);c.save();c.globalCompositeOperation='li
 function shotDraw(b,D){const ang=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0;let o,al=.55,sy;      // the ship's own shots stay thinner and dimmer than the lime enemy bullets
   if(b.hv){o=ART.sp('fx-shot-hv',46);al=.8;}
   else if(b.ec){o=ART.sp('fx-shot-ec',30);al=.65;}
-  else if(b.pf&&!b.big){o=ART.sp('fx-shot-perfect',32);al=.8;}
-  else{const L=b.len||(b.big?22:b.pn!=null?28:20);o=ART.tint('fx-shot-std',L*(b.big?1.2:1),b.col||(b.big?'#ffffff':D.b));al=b.big?.8:.55;if(o)sy=Math.max(.8,Math.min(3,(b.th||(b.big?4:3))*.7/o.h));}
+  else if(b.pf&&!b.big){o=RET.read?ART.hue('fx-shot-perfect',32,135):ART.sp('fx-shot-perfect',32);al=.8;}
+  else{const L=b.len||(b.big?22:b.pn!=null?28:20);o=ART.tint('fx-shot-std',L*(b.big?1.2:1),RET.read?READ.pc(b,D):b.col||(b.big?'#ffffff':D.b));al=b.big?.8:RET.read?.7:.55;if(o)sy=Math.max(.8,Math.min(3,(b.th||(b.big?4:3))*.7/o.h));}
   if(!o)return;const d=o.w/2-10;ART.put(o,b.x+Math.cos(ang)*d,b.y+Math.sin(ang)*d,ang,al,1,sy);
-  if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,b.pf?'#ffe14d':D.b,.22);}
+  if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,RET.read?READ.pc(b,D):b.pf?'#ffe14d':D.b,.22);}
 function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);const T_=tierOf(C.n);
   const PT=wcv!==cv;                                     // portrait: the world is drawn on its own canvas (landscape coordinates) and turned upright afterwards
-  if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);drawBGP(bgFor(G.di),t,dt,G.scroll);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
+  if(PT){ctx=vctx;ctx.setTransform(VS,0,0,VS,0,0);drawBGP(bgFor(G.di),t,dt,G.scroll);if(RET.read)READ.dim(PW_,PH_);ctx=wctx;ctx.setTransform(S,0,0,S,0,0);ctx.clearRect(0,0,W,H);}
   else{ctx=vctx;ctx.setTransform(S,0,0,S,0,0);}
   const sh=G.shake;ctx.save();if(sh)ctx.translate(rnd(-sh,sh)*.5,rnd(-sh,sh)*.5);
-  if(!PT){drawBG(bgFor(G.di),t,dt,G.scroll);
+  if(!PT){drawBG(bgFor(G.di),t,dt,G.scroll);if(RET.read)READ.dim(W,H);
   }   // (no rain, no traffic specks: the background stays calm)
   drawPickups(t);
   for(const e of G.en)drawEnemy(e,t);
@@ -118,11 +128,11 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   ctx.globalCompositeOperation='lighter';const D=DISTRICTS[G.di];
   // the ship's own fire is dim and thin: the enemy bullets (bright lime, dark rim) are what must read
   const PS=ART.have('fx-shot-std');
-  for(const b of G.pb){if(b.wid&&FXW.bullet(b))continue;if(PS){shotDraw(b,D);continue;}ctx.globalAlpha=.5;ctx.fillStyle=b.col||(b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b);const th=(b.th||(b.big?4:3))*.6;ctx.fillRect(b.x-10,b.y-th/2,b.len||(b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16),th);if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,b.pf?'#ffe14d':D.b,.22);}
+  for(const b of G.pb){if(b.wid&&FXW.bullet(b))continue;if(PS){shotDraw(b,D);continue;}ctx.globalAlpha=RET.read?.7:.5;ctx.fillStyle=RET.read?READ.pc(b,D):b.col||(b.big?'#ffffff':b.pf?'#ffe14d':b.ec?'#c08aff':D.b);const th=(b.th||(b.big?4:3))*.6;ctx.fillRect(b.x-10,b.y-th/2,b.len||(b.big?(b.hv?46:b.bd?30:22):b.pn!=null?28:16),th);if(b.big||b.hv)G_(b.x,b.y,b.hv?20:9,RET.read?READ.pc(b,D):b.pf?'#ffe14d':D.b,.22);}
   ctx.globalAlpha=1;
   if(SET.part)for(const p of G.pt){const a=p.l/p.m;if(p.ghost){G_(p.x,p.y,p.sz*2,p.c,a*.5);}else{ctx.globalAlpha=a;ctx.fillStyle=p.c;ctx.fillRect(p.x,p.y,p.sz,p.sz);}}
   ctx.globalAlpha=1;
-  for(const b of G.eb)G_(b.x,b.y,b.r*3.2,b.gc||b.c,b.k?.5:.9);
+  if(!RET.read)for(const b of G.eb)G_(b.x,b.y,b.r*3.2,b.gc||b.c,b.k?.5:.9);
   ctx.globalCompositeOperation='source-over';
   FXV.bullets();
   ART.fxDraw();

@@ -117,7 +117,7 @@ const LEAK=window.LEAK={
         if(LEAK.gapOK()&&LEAK.waves%3===0&&!LEAK.gap)LEAK.gap=1;}; }
     { const md=DIR.miniDown;DIR.miniDown=function(){md.call(this);if(RET.leak&&!LEAK.heat()&&SET.diff!=='legend'&&!LEAK.gap)LEAK.gap=1;}; }
     { const st=HUDX.strip;HUDX.strip=function(c,x,y,k){st.call(this,c,x,y,k);try{LEAK.draw(c,x,y+46*k,k);}catch(err){}}; }
-    if(typeof hudMin==='function'){const hm=hudMin;hudMin=function(c,k,x,y,t){hm(c,k,x,y,t);try{LEAK.draw(c,x,y+22*k,k);}catch(err){}};}
+    if(typeof hudMin==='function'){const hm=hudMin;hudMin=function(c,k,x,y,t){hm(c,k,x,y,t);try{LEAK.draw(c,x+312*k,y+66*k,k,true);}catch(err){}};}   // desktop plate: the BREACH meter sits right-aligned on the weapon row under the plate (it used to draw over the HULL label at y+22k)
     if(typeof labBuildFoes==='function'){const lb=labBuildFoes;labBuildFoes=function(body){lb(body);const r=lsec(body,'GROUND ENEMY (on the road)');
       for(const [n,t] of [['TANK','gtank'],['GROUND TURRET','gturret'],['WALKER','gwalker']])lchip(r,n,labFoe(()=>LEAK.mk(t,W-110)));};}
   }};

@@ -26,7 +26,7 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
       else if (P.onGround) { I.jumpP = 1; I.jump = 1; } else if (P.dashCd <= 0 && th.y < P.y - 20) I.dashP = 1; else I.jump = 1; } else I.jump = P.vy < 0 ? 1 : 0;
     if (near && /shield|bruiser|mech|warden/.test(near.id) && Math.abs(near.x - P.x) < 320 && P.bombs > 0 && (!S._bt || S.time - S._bt > 2.5)) { I.bombP = 1; S._bt = S.time; }
     if (S.E.filter(e => !e.dead).length >= 5 && P.bombs > 0 && (!S._bt || S.time - S._bt > 3)) { I.bombP = 1; S._bt = S.time; }
-    for (const p of S.pk) if (Math.abs(p.x - P.x) < 300 && !near) { I.r = p.x > P.x; I.l = p.x < P.x; } }; };
+    for (const p of S.pk) if (Math.abs(p.x - P.x) < 300 && p.x > S.camX + 24 && !near) { I.r = p.x > P.x; I.l = p.x < P.x; } }; };
 (async () => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await sleep(700);
@@ -40,15 +40,23 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
     if (touch) await b.tap(); else await b.click(); await sleep(300);
     for (let i = 0; i < 6 && !(await p.evaluate(() => FOOT.on)); i++) { await p.evaluate(() => { const c = document.getElementById('taleCard'); if (c && !c.hidden) (document.getElementById('taleTc') || c).click(); }); await sleep(250); }
     return (await p.evaluate(() => FOOT.on)) ? 'on' : 'not started'; };
-  const audit = p => p.evaluate(() => { const o = { small: [], out: [], over: [], scroll: document.documentElement.scrollWidth > innerWidth + 1 };
-    const cv = document.getElementById('footC').getBoundingClientRect(), W = innerWidth, H = innerHeight;
+  // layout audit: controls 44px+ inside the screen, never over the play box, no button on another or on the stick circle (8 px gaps), hint strip clear of the HUD, field size
+  const audit = p => p.evaluate(() => { const o = { small: [], out: [], over: [], gap: [], stick: [], hint: [], field: [], scroll: document.documentElement.scrollWidth > innerWidth + 1 };
+    const I = FOOT.hudInfo(), cv = document.getElementById('footC').getBoundingClientRect(), W = innerWidth, H = innerHeight, bx = I.box, touch = I.mode !== 'full';
     if (cv.left < -.5 || cv.top < -.5 || cv.right > W + .5 || cv.bottom > H + .5) o.out.push('canvas');
+    const hit = (a, c, m) => a.left < c.right - 1 + m && a.right > c.left + 1 - m && a.top < c.bottom - 1 + m && a.bottom > c.top + 1 - m;
+    const play = { left: bx.x, top: bx.y, right: bx.x + bx.w, bottom: bx.y + bx.h };
     for (const b of document.querySelectorAll('#footL .fb,#footL .fpad,#fPause')) { if (b.hidden || b.style.display === 'none') continue; const r = b.getBoundingClientRect();
       if (r.width < 44 || r.height < 44) o.small.push(b.id); if (r.left < 0 || r.top < 0 || r.right > W || r.bottom > H) o.out.push(b.id);
-      if (b.id !== 'fPause' && r.left < cv.right - 1 && r.right > cv.left + 1 && r.top < cv.bottom - 1 && r.bottom > cv.top + 1) o.over.push(b.id); }
+      if (b.id !== 'fPause' && hit(r, play, 0)) o.over.push(b.id); }
     const bs = [...document.querySelectorAll('#footL .fb')].filter(b => b.style.display !== 'none').map(b => [b.id, b.getBoundingClientRect()]);
-    for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) { const a = bs[i][1], c = bs[j][1]; if (a.left < c.right - 1 && a.right > c.left + 1 && a.top < c.bottom - 1 && a.bottom > c.top + 1) o.over.push(bs[i][0] + '/' + bs[j][0]); }
+    for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) if (hit(bs[i][1], bs[j][1], 8)) o.gap.push(bs[i][0] + '/' + bs[j][0]);
+    const sk = document.getElementById('fStick'); if (sk.style.display !== 'none') { const c = sk.getBoundingClientRect(), R = c.width / 2, cx = c.left + R, cy = c.top + R;
+      for (const [id, r] of bs) { const nx = Math.max(r.left, Math.min(cx, r.right)), ny = Math.max(r.top, Math.min(cy, r.bottom)); if (Math.hypot(nx - cx, ny - cy) < R + 8) o.stick.push(id); } }
+    const u = 1 / I.sc, h = I.hud; if (h && h.hint) { const t = h.hint; if (t.x < 0 || t.x + t.w > h.vw + .5) o.hint.push('outside'); for (const q of h.hud) if (t.x < q.x + q.w && t.x + t.w > q.x && t.y < q.y + q.h && t.y + t.h > q.y) o.hint.push('HUD'); }
+    if (touch) { if (I.mode === 'port' && bx.h < H * .58) o.field.push('port ' + bx.h + '/' + H); if (I.mode === 'land' && (bx.h < H - 2 || cv.width < W - 1)) o.field.push('land ' + bx.h + '/' + H); if (bx.w < 420 * I.sc - 1) o.field.push('narrow'); }
     return o; });
+  const clean = a => !a.small.length && !a.out.length && !a.over.length && !a.gap.length && !a.stick.length && !a.hint.length && !a.field.length && !a.scroll;
   try {
     // ---- flag off: no UI at all
     { const p = await open(390, 763, '&foot=0', { touch: true }); await p.evaluate(() => document.getElementById('moreBtn').click()); await sleep(300);
@@ -59,9 +67,12 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
     for (const [w, h, name, touch] of [[390, 763, 'phone', true], [375, 553, 'phone-s', true], [1280, 720, 'desktop', false]]) {
       const p = await open(w, h, '', { touch }); const st = await enter(p, touch); ok(name + ': STREET RUN opens the stage', st === 'on', st);
       if (st !== 'on') { await p.ctx.close(); continue; }
-      const a = await audit(p); ok(name + ': canvas + controls inside the screen, 44px+, never over play, no h-scroll', !a.small.length && !a.out.length && !a.over.length && !a.scroll, a);
-      const mode = await p.evaluate(() => [FOOT.S && document.getElementById('fStick').style.display !== 'none', document.getElementById('fFire').style.display !== 'none']);
+      await sleep(300); const a = await audit(p); ok(name + ': layout audit (44px+, 8px gaps, off the stick, hint clear of the HUD, field size)', clean(a), a);
+      const mode = await p.evaluate(() => [FOOT.S && document.getElementById('fStick').style.display !== 'none', document.getElementById('fJump').style.display !== 'none']);
       ok(name + ': touch pad shown only on touch screens', touch ? mode[0] && mode[1] : !mode[0] && !mode[1], mode);
+      if (touch) { const au = await p.evaluate(() => { const o = { on: FOOT.autoOn(), fire: document.getElementById('fFire').style.display }; const S = FOOT.S; S.E.length = 0; const e = FOOT.env.spawn('grunt', S.P.x + 220, null); e.grace = 99; const s0 = S.shots; FOOT.sim(1.2); o.shots = S.shots - s0; S.E.length = 0; S.eb.length = 0; S.P.hp = S.P.max; return o; });
+        ok(name + ': auto-fire is ON by default on touch (FIRE hidden) and shoots at an enemy ahead', au.on && au.fire === 'none' && au.shots >= 3, au);
+        await p.evaluate(() => { FOOT.setAuto(false); FOOT.layout(); }); await sleep(100); const a3 = await audit(p); ok(name + ': auto-fire OFF: FIRE cluster passes the layout audit', clean(a3), a3); }
       // ---- input through the real page
       const x0 = await p.evaluate(() => FOOT.S.P.x);
       if (touch) { const r = await p.$eval('#fStick', e => { const b = e.getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2, b.width]; });
@@ -81,7 +92,7 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
       // ---- scripted bot: full stage
       await p.evaluate(BOT); if (process.env.GOD) await p.evaluate(() => { window.__god = 1; }); if (process.env.TRACE) { await p.evaluate(() => { window.__trace = 1; }); p.on('console', m => { if (/^TR/.test(m.text())) console.log(m.text()); }); } const runs = [];
       for (let r = 0; r < RUNS; r++) { await p.evaluate(() => { document.getElementById('fMenu').hidden = true; FOOT.start('street1'); });
-        let out = null, tries = 0; for (let k = 0; k < 60 && !out; k++) { out = await p.evaluate(() => { FOOT.sim(10); const S = FOOT.S; if (window.__trace) console.log('TR t' + Math.round(S.time) + ' x' + Math.round(S.P.x) + ' cam' + Math.round(S.camX) + ' lock' + (S.lock && S.lock.id) + ' w' + S.P.w + S.P.lv + ' k' + S.kills + ' sh' + S.shots + ' E' + S.E.filter(e => !e.dead).map(e => e.id[0] + Math.round(e.x - S.P.x) + (e.grace > 0 ? 'g' : '')).join(',')); return S.end ? { end: S.end, t: Math.round(S.time), boss: !!S.boss, bossOn: S.bossOn, cp: !!S.cp, x: Math.round(S.P.x), hurts: S.hurts, hl: (S.hlog || []).join(' ') } : null; });
+        let out = null, tries = 0; for (let k = 0; k < 160 && !out; k++) { out = await p.evaluate(() => { FOOT.sim(10); const S = FOOT.S; if (window.__trace) console.log('TR t' + Math.round(S.time) + ' x' + Math.round(S.P.x) + ' cam' + Math.round(S.camX) + ' lock' + (S.lock && S.lock.id) + ' w' + S.P.w + S.P.lv + ' k' + S.kills + ' sh' + S.shots + ' E' + S.E.filter(e => !e.dead).map(e => e.id[0] + Math.round(e.x - S.P.x) + (e.grace > 0 ? 'g' : '')).join(',')); return S.end ? { end: S.end, t: Math.round(S.time), boss: !!S.boss, bossOn: S.bossOn, cp: !!S.cp, x: Math.round(S.P.x), hurts: S.hurts, hl: (S.hlog || []).join(' ') } : null; });
           if (out && !out.end.cleared && tries < 6) { tries++; const cpB = out.cp; await p.evaluate(c => document.getElementById(c ? 'fCp' : 'fAgain').click(), cpB); out = null; } }   // a player retries from the checkpoint
         if (out) out.tries = tries;
         out = out || await p.evaluate(() => ({ stuck: 1, t: FOOT.S.time, x: FOOT.S.P.x, lock: FOOT.S.lock, E: FOOT.S.E.filter(e => !e.dead).map(e => e.id + '@' + Math.round(e.x) + ',' + Math.round(e.y)) }));
@@ -97,12 +108,28 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
       ok(name + ': results screen with RETRY / FLY ON / BACK TO CITY (44px+)', rs.shown && rs.btn.length >= 3 && rs.btn.every(b => b[1] >= 44) && rs.btn.some(b => b[0] === 'FLY ON'), rs);
       if (name === 'phone') { // rotation: landscape keeps the controls off the play area
         await p.setViewportSize({ width: 763, height: 390 }); await sleep(700); await p.evaluate(() => { document.getElementById('fMenu').hidden = true; FOOT.layout(); });
-        const a2 = await audit(p); ok('phone rotated: controls beside the play area', !a2.small.length && !a2.out.length && !a2.over.length && !a2.scroll, a2);
+        const a2 = await audit(p); ok('phone rotated: controls beside the play area, field fills the screen', clean(a2), a2);
         await p.setViewportSize({ width: 390, height: 763 }); await sleep(700); }
       await p.evaluate(() => { document.getElementById('fMenu').hidden = false; }); await p.click('#fCity'); await sleep(400);
       for (let i = 0; i < 6; i++) { await p.evaluate(() => { const c = document.getElementById('taleCard'); if (c && !c.hidden) (document.getElementById('taleTc') || c).click(); }); await sleep(150); }
       ok(name + ': BACK TO CITY closes the layer', await p.evaluate(() => !FOOT.on && document.getElementById('footL').hidden));
       await p.ctx.close(); }
+    // ---- landscape phones: the field is the whole screen, the pad sits over the side bands
+    for (const [w, h] of [[763, 390], [844, 390]]) { const p = await open(w, h, '', { touch: true }); const st = await enter(p, true); ok('land ' + w + 'x' + h + ': STREET RUN opens', st === 'on', st); if (st !== 'on') { await p.ctx.close(); continue; }
+      await sleep(400); for (const au of [true, false]) { await p.evaluate(a => { FOOT.setAuto(a); FOOT.layout(); }, au); await sleep(150); const a = await audit(p); ok('land ' + w + 'x' + h + ' auto-fire ' + (au ? 'ON' : 'OFF') + ': layout audit', clean(a), a); }
+      await p.ctx.close(); }
+    // ---- pause menu toggles auto-fire (touch), the choice is saved
+    { const p = await open(390, 763, '', { touch: true }); const st = await enter(p, true); if (st === 'on') { await p.evaluate(() => { FOOT.step(1 / 60); document.getElementById('fPause').click(); }); await sleep(150);
+        const t0 = await p.evaluate(() => document.getElementById('fAuto') && document.getElementById('fAuto').textContent); await p.click('#fAuto'); await sleep(150);
+        const t1 = await p.evaluate(() => [document.getElementById('fAuto').textContent, document.getElementById('fFire').style.display, JSON.parse(localStorage.getItem('mnr_foot') || '{}').auto]);
+        ok('pause menu: AUTO-FIRE toggle (ON -> OFF), FIRE appears, saved', t0 === 'AUTO-FIRE: ON' && t1[0] === 'AUTO-FIRE: OFF' && t1[1] !== 'none' && t1[2] === 0, [t0, t1]); }
+      else ok('pause toggle: stage opens', false, st); await p.ctx.close(); }
+    // ---- stats see the on-foot run
+    { const p = await open(390, 763, '', { touch: true }); const st = await enter(p, true); if (st === 'on') { const r = await p.evaluate(() => { const g = () => JSON.parse(localStorage.getItem('mnr_stats') || '{"s":{}}').s, a = g(); const S = FOOT.S; S.P.hp = S.P.max;
+          const e = FOOT.env.spawn('grunt', S.P.x + 200, null); e.hp = .01; e.grace = 0; S.E.forEach(x => x.hp = .01); FOOT.sim(1.5); FOOT.S.end || FOOT.stop(); return { a, f: window.RET && RET.st ? 1 : 0 }; }); await sleep(1800);
+        const b = await p.evaluate(() => JSON.parse(localStorage.getItem('mnr_stats') || '{"s":{}}').s);
+        ok('stats: on-foot run counted (runs, kills, time)', (b.runs | 0) > (r.a.runs | 0) && (b.kills | 0) > (r.a.kills | 0) && (b.time | 0) >= (r.a.time | 0), [r.a, b]); }
+      else ok('stats: stage opens', false, st); await p.ctx.close(); }
     // ---- unit checks on the engine (desktop page)
     { const p = await open(1280, 720); await enter(p, false);
       const u = await p.evaluate(() => { const S = FOOT.S, P = S.P, o = {}; P.inv = 0; P.dashIF = 0;
