@@ -135,14 +135,25 @@ Object.assign(WPX.demo,{
 #gaCards.wpt .card .t2{font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.9),13px);color:var(--ink);line-height:1.2}#gaCards.wpt .card .t2 b{color:var(--c);font-weight:400}
 #gaCards.wpt .card .pr{margin-left:0;align-self:center;border:1px solid var(--amber);border-radius:8px;padding:6px 8px;min-width:64px;text-align:center}
 #gaCards.wpt .card.sold .pr{border-color:#8c86b8;color:#8c86b8}
-#wpL .card .pp i.run{background:var(--c);opacity:.45}`;document.head.appendChild(st);}
+#wpL .card .pp i.run{background:var(--c);opacity:.45}
+@media (min-width:700px){
+#gaCards.wpt{grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))}
+#gaCards.wpt .card{display:grid;grid-template-columns:108px minmax(0,1fr);grid-template-rows:auto auto auto 1fr auto;grid-template-areas:"cv n" "cv pb" "t t" "t2 t2" "pr pr";gap:4px 10px;align-items:center;align-content:stretch;padding:10px 12px}
+#gaCards.wpt .card .tx{display:contents}
+#gaCards.wpt .card canvas{grid-area:cv}
+#gaCards.wpt .card .n{grid-area:n;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#gaCards.wpt .card .n .nm{display:block;overflow:hidden;text-overflow:ellipsis}#gaCards.wpt .card .n small{display:block;margin:2px 0 0}
+#gaCards.wpt .card .pb{grid-area:pb;margin:0}
+#gaCards.wpt .card .t{grid-area:t;align-self:start;margin-top:4px}
+#gaCards.wpt .card .t2{grid-area:t2;align-self:start}
+#gaCards.wpt .card .pr{grid-area:pr;align-self:end;width:100%;box-sizing:border-box;min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px}
+}`;document.head.appendChild(st);}
 {const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='weapons';b.type='button';b.textContent='WEAPONS';b.addEventListener('click',()=>{GA.tab='weapons';gaDraw();});tb.appendChild(b);
  window.wpTabDraw=function(){const box=$('gaCards');box.innerHTML='';
   for(const id of WP_IDS){const d=WPD[id],cur=WP.pl[id]|0,own=cur>0,max=cur>=WP_MAX,price=WP.price(id),can=GA.bank>=price,el=document.createElement('button');el.type='button';
    el.className='card'+(max?' sold':'')+(!max&&!can?' no':'');el.style.setProperty('--c',d.c);el.dataset.id=id;el.dataset.kind='weapon';
    const nxt=own?cur+1:1,ab=[3,6,10].find(l=>l>=nxt&&l>cur),abT=ab?`<br>LV${ab}: ${d.ab[[3,6,10].indexOf(ab)]}`:'',
      pw=own?(max?`power <b>${WPX_POWER(cur,id).toFixed(2)}x</b> (max)`:`power <b>${WPX_POWER(cur,id).toFixed(2)}x</b> &rarr; <b>${WPX_POWER(cur+1,id).toFixed(2)}x</b>`):`unlocks at <b>1.00x</b>`;
-   el.innerHTML=`<canvas width="108" height="52" data-w="${id}"></canvas><div class="tx"><div class="n">${d.n}<small>${own?'LV '+cur+'/'+WP_MAX:'LOCKED'}</small></div><div class="t">${d.tx}</div><div class="pb">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<cur?'on':''}"></i>`).join('')}</div><div class="t2">${pw}${max?'':abT}</div></div><div class="pr">${max?'MAX':(own?'BUY LV'+(cur+1):'UNLOCK')+'<br>'+neonI+' '+price}</div>`;
+   el.innerHTML=`<canvas width="108" height="52" data-w="${id}"></canvas><div class="tx"><div class="n"><span class="nm">${d.n}</span><small>${own?'LV '+cur+'/'+WP_MAX:'LOCKED'}</small></div><div class="t">${d.tx}</div><div class="pb">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<cur?'on':''}"></i>`).join('')}</div><div class="t2">${pw}${max?'':abT}</div></div><div class="pr">${max?'MAX':(own?'BUY LV'+(cur+1):'UNLOCK')+'<br>'+neonI+' '+price}</div>`;
    el.addEventListener('click',()=>{const r=WP.buy(id);if(!r.ok){if(r.why==='money'){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');gaMsg('Need '+r.need+' more Neon');}else if(r.why==='max')gaMsg(d.n+' is at max level');return;}
      gaMsg(r.lv===1?d.n+' unlocked':d.s+' is now LV '+r.lv);try{AU.sfx('up')}catch(e){}gaDraw();});
    box.appendChild(el);const c=el.querySelector('canvas').getContext('2d'),n='wp-'+id;if(ART.have(n)){c.drawImage(ART.bm[n],28,0,52,52);}else if(WPX.demoFn)WPX.demoFn(id,c,.7,d.c);}};

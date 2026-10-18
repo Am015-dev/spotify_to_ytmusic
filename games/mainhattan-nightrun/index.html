@@ -26,6 +26,7 @@ canvas{display:block;width:100%;height:100%;}
 h1{font-family:var(--display);font-weight:700;margin:0;line-height:.9;font-size:clamp(30px,min(7.4vw,11.5vh),84px);letter-spacing:.01em;
   color:var(--ink);text-shadow:3px 0 0 #ff2d95aa,-3px 0 0 #19e3ffaa;text-wrap:balance;}
 h1 span{color:var(--pink);text-shadow:0 0 18px #ff2d9599;}
+#overSub{display:block;margin-top:.5em;font:600 clamp(14px,min(4vw,2.6vh),20px)/1.2 var(--mono,monospace);letter-spacing:.14em;text-transform:uppercase;color:#b4d2e2;text-shadow:none}
 .lede{font-family:var(--display);font-weight:500;font-size:clamp(13px,min(1.9vw,3.2vh),18px);line-height:1.35;max-width:52ch;color:#cfc9f2;margin:0;}
 .keys{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-family:var(--mono);font-size:clamp(11px,min(1.35vw,2.4vh),13px);color:var(--dim);}
 .keys b{color:var(--ink);font-weight:400;border:1px solid #3a2b5c;padding:0 6px;border-radius:3px;background:#140c26;}
@@ -40,7 +41,7 @@ button.go:hover,button.go:focus-visible{background:#fff;outline:none;}
 .stat{font-family:var(--mono);font-size:clamp(12px,min(1.7vw,3vh),16px);color:var(--dim);font-variant-numeric:tabular-nums;}
 .stat strong{color:var(--amber);font-weight:400;}
 .set{display:grid;grid-template-columns:minmax(90px,auto) minmax(120px,260px) 52px;align-items:center;gap:8px 12px;font-family:var(--mono);font-size:clamp(12px,min(1.7vw,3vh),15px);color:var(--ink);width:100%}
-.set input[type=range]{width:100%;min-height:30px;accent-color:var(--pink);touch-action:pan-x}
+.set input[type=range]{width:100%;min-height:44px;accent-color:var(--pink);touch-action:pan-x}
 .set label.chk{grid-column:1/-1;display:flex;gap:10px;align-items:center;min-height:34px}
 .set input[type=checkbox]{width:22px;height:22px;accent-color:var(--pink)}
 .set .v{color:var(--amber);text-align:right}
@@ -72,10 +73,10 @@ button.go:hover,button.go:focus-visible{background:#fff;outline:none;}
 #setm h3{margin:12px 0 4px;font:italic 900 14px var(--display);letter-spacing:.12em;color:var(--yel);border-bottom:1px solid rgba(47,156,188,.35);padding-bottom:5px;text-transform:uppercase}
 #setm .seg,#setm .sl{display:flex;gap:6px;flex-wrap:wrap;align-items:center;min-height:36px}
 #setm .seg>span,#setm .sl>span{font:italic 800 11px var(--display);letter-spacing:.14em;color:#b4d2e2;width:112px;flex:none;text-transform:uppercase}
-#setm .seg button{all:unset;box-sizing:border-box;cursor:pointer;font:italic 800 12px var(--display);letter-spacing:.08em;text-transform:uppercase;padding:0 12px;min-height:34px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:#0a2437;border:1px solid #28627a;color:#cfe6f5}
+#setm .seg button{all:unset;box-sizing:border-box;cursor:pointer;font:italic 800 12px var(--display);letter-spacing:.08em;text-transform:uppercase;padding:0 12px;min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:#0a2437;border:1px solid #28627a;color:#cfe6f5}
 #setm .seg button[aria-pressed="true"]{background:linear-gradient(90deg,#00c8ee,#8c55ff);border-color:transparent;color:#021018}
 #setm .seg button:focus-visible,#setm .go:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
-#setm .sl input{flex:1;min-width:90px;min-height:34px;accent-color:#00dfff;touch-action:pan-x}
+#setm .sl input{flex:1;min-width:90px;min-height:44px;accent-color:#00dfff;touch-action:pan-x}
 #setm .sl output{font:800 12px var(--mono);width:64px;text-align:right;color:var(--yel)}
 @media (max-width:520px){#setm .seg>span{width:100%}#setm .sl>span{width:84px}#setm .sl output{width:54px}#setm .sbody{padding:0 14px 6px}#setm h2{padding-left:14px!important}}
 #setm .sfoot{display:flex;gap:10px;padding:10px 22px 12px;border-top:1px solid rgba(76,234,255,.25);background:var(--panel)}
@@ -159,7 +160,7 @@ button.go:hover,button.go:focus-visible{filter:brightness(1.3);outline:none}
   </div></div>
   <div id="over" class="ov" hidden><div class="in">
     <div class="eyebrow" id="overEyebrow">Signal lost</div>
-    <h1 id="overTitle">KURIER<br><span>ABGESTÜRZT</span></h1>
+    <h1 id="overTitle">KURIER<br><span>ABGESTÜRZT</span><small id="overSub">Courier down</small></h1>
     <div class="stat">Score <strong id="oScore">0</strong></div>
     <div class="stat">Reached <strong id="oDist">—</strong> · Perfect <strong id="oPerf">0</strong></div>
     <div class="stat" id="oBest"></div>
@@ -1396,8 +1397,12 @@ const neonI='<svg class="nI" viewBox="0 0 24 24" aria-hidden="true"><path d="'+N
 .pg .bot{display:flex;gap:calc(var(--u)*2.4);flex:0 0 auto;align-items:center}
 .pg .bot button{flex:1 1 0;min-width:0;white-space:nowrap;padding:.4em .6em}
 .pg .msg{font-family:var(--mono);color:var(--amber);font-size:clamp(11px,calc(var(--u)*3.2),15px);text-align:center;min-height:1.2em;flex:0 0 auto}
-.pg .tabs{display:flex;gap:calc(var(--u)*1.6);flex:0 0 auto}
-.pg .tabs button{flex:1 1 0;min-width:0;padding:.35em .3em;letter-spacing:.06em}
+.pg .tabs{display:flex;gap:calc(var(--u)*1.6);flex:0 0 auto;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x}
+.pg .tabs::-webkit-scrollbar{display:none}
+.pg .tabs.fl{-webkit-mask-image:linear-gradient(90deg,transparent,#000 22px);mask-image:linear-gradient(90deg,transparent,#000 22px)}
+.pg .tabs.fr{-webkit-mask-image:linear-gradient(270deg,transparent,#000 22px);mask-image:linear-gradient(270deg,transparent,#000 22px)}
+.pg .tabs.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent)}
+.pg .tabs button{flex:1 0 auto;min-width:44px;min-height:44px;padding:.35em .9em;letter-spacing:.06em;white-space:nowrap}
 .pg .tabs button.on{background:var(--cyan);color:var(--void)}
 .pg .sw{height:clamp(22px,calc(var(--u)*9),56px);aspect-ratio:1;border-radius:50%;background:linear-gradient(135deg,#ff2d95,#19e3ff);flex:0 0 auto}
 .pg .sp{flex:1 1 0}
@@ -1440,6 +1445,10 @@ function gaTap(it,b){const own=!it.k||GA.own[it.k];
 function openGarage(from){GA.from=from||'title';titleEl.hidden=true;overEl.hidden=true;garageEl.hidden=false;gaDraw();}
 function closeGarage(){garageEl.hidden=true;if(GA.from==='over')overEl.hidden=false;else{titleEl.hidden=false;}showBest();gaDraw();}
 for(const b of garageEl.querySelectorAll('.tabs button'))b.addEventListener('click',()=>{GA.tab=b.dataset.t;gaDraw();});
+/* the tab row is a scroller (7 tabs do not fit 390 px): edge fades show where more tabs are, the open tab scrolls into view */
+{const tb=garageEl.querySelector('.tabs'),fade=()=>{tb.classList.toggle('fl',tb.scrollLeft>2);tb.classList.toggle('fr',tb.scrollLeft+tb.clientWidth<tb.scrollWidth-2);};
+ tb.addEventListener('scroll',fade,{passive:true});tb.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b)setTimeout(()=>{if(b.scrollIntoView)b.scrollIntoView({inline:'center',block:'nearest'});fade();},0);});
+ try{new ResizeObserver(fade).observe(tb);new MutationObserver(fade).observe(tb,{childList:true});}catch(e){}addEventListener('resize',fade);}
 $('gaBack').addEventListener('click',closeGarage);
 // entry points: title menu and game-over screen
 {const g=document.createElement('button');g.className='go dim';g.id='gaBtn';g.type='button';$('dailyBtn').after(g);g.addEventListener('click',()=>openGarage('title'));
@@ -1466,6 +1475,8 @@ const NEON_K=.032;                                         // Neon per kill: dis
 const NEON_V={drone:.5,charger:.5,turret:1,gate:1,gunship:3,boss:8};     // fractions add up: about 40 Neon from a first district
 const p2d={};const path2=d=>p2d[d]||(p2d[d]=new Path2D(d));
 
+/* a failed run pays at least this much Neon per stage reached (a story try is one stage, an endless run counts districts); only tops up a poor run */
+const FLOOR_NEON=3;
 const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:null,left:0,lock:0,cards:[],rerolls:0,live:false,flash:0,
   ck:0,hm:0,sharp:1,nx:1,spare:0,dmax:0,sh:0,db:0,dashId:0,wasDash:false,tk:false,prevCur:-1,rch:0,picks:0,pits:0,
   reset(){if(this.live)this.bankRun(true);
@@ -1478,7 +1489,7 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
   // ----- Neon -----
   award(e,keep){if(!this.live)return;let v=NEON_V[e.type]||.5;if(e.pf)v*=1.5;v+=Math.min(3,tierOf(C.n)-1);this.acc=(this.acc||0)+v*this.nx*(window.RET&&RET.econ?RET.nk:NEON_K);   // on-beat kills pay 1.5x, combos add up to +3
     const n=Math.floor(this.acc);if(n<1)return;this.acc-=n;this.neon+=n;this.earned+=n;this.flash=.35;if(n>=3)floater(e.x+14,e.y+8,'+'+n+' NEON','#19e3ff');},
-  bankRun(quiet){if(!this.live)return 0;this.live=false;const add=this.neon+Math.round(this.earned*.3);GA.bank+=add;GA.runs++;gsave();this.lastBank=add;this.lastTotal=GA.bank;
+  bankRun(quiet,stages){if(!this.live)return 0;this.live=false;const fl=stages>0?FLOOR_NEON*stages:0,add=Math.max(this.neon+Math.round(this.earned*.3),fl);GA.bank+=add;GA.runs++;gsave();this.lastBank=add;this.lastFloor=fl;this.lastStages=stages|0;this.lastTotal=GA.bank;
     if(!quiet)NR.emit('banked',add);return add;},
   // ----- pit stop -----
   price(u){return Math.round(1.25*u.p*(1+.5*this.n(u.id)));},
@@ -1561,7 +1572,7 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
 NR.on('kill',d=>SH.award(d.e));
 NR.on('districtEnd',()=>{if(SH.live){SH.neon+=5;SH.earned+=5;SH.flash=.5;}});
 NR.on('runStart',()=>{SH.live=true;SH.neon=0;SH.earned=0;const sd=shipDef();if(sd.id!=='std'&&G.live)G.note={t:4,txt:sd.n+' ready'};});
-NR.on('runEnd',()=>{if(SH.active){SH.active=false;shopEl.hidden=true;}const add=SH.bankRun();const el=$('oNeon');if(el)el.innerHTML=add?'Banked '+neonI+' <strong>+'+add+'</strong> · garage '+GA.bank:'Banked nothing';gaDraw();});
+NR.on('runEnd',d=>{if(SH.active){SH.active=false;shopEl.hidden=true;}const add=SH.bankRun(false,d&&!d.quit&&!d.cleared?(d.story?1:(d.di|0)+1):0);const el=$('oNeon');if(el)el.innerHTML=add?'Banked '+neonI+' <strong>+'+add+'</strong> · garage '+GA.bank:'Banked nothing';gaDraw();});
 
 /* ----- the pit-stop screen ----- */
 const shopEl=document.createElement('div');shopEl.id='shop';shopEl.className='ov solid pg';shopEl.hidden=true;
@@ -3129,7 +3140,7 @@ const qsave=()=>save('mnr_q',GA.queue);
 .pg .tabs button.on{color:var(--ink)}
 `;document.head.appendChild(st);}
 /* ----- tabs ----- */
-{const tabs=garageEl.querySelector('.tabs');for(const [t,l] of [['load','LOAD'],['mkt','SHOP'],['soon','SOON']]){const b=document.createElement('button');b.className='go dim';b.dataset.t=t;b.type='button';b.textContent=l;tabs.append(b);b.addEventListener('click',()=>{GA.tab=t;gaDraw();});}}
+{const tabs=garageEl.querySelector('.tabs');for(const [t,l] of [['load','LOAD'],['mkt','SHOP']]){const b=document.createElement('button');b.className='go dim';b.dataset.t=t;b.type='button';b.textContent=l;tabs.append(b);b.addEventListener('click',()=>{GA.tab=t;gaDraw();});}}
 const day=()=>new Date().toISOString().slice(0,10);
 const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
 const MKP=['dm','cr','mh','dr','rv','sh','hl','fr','mg','ck','wd','hm','dc','sc','pc','cl','bt','as','bd','sm','lk','ni','rc','cool','db','sb','nx'].filter(id=>UBY[id]);
@@ -3207,15 +3218,15 @@ RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct,
 {const st=document.createElement('style');st.textContent=`
 .retBar{width:100%;max-width:min(92%,420px);margin:.5em auto;text-align:center;font-family:var(--mono);font-size:clamp(12px,min(3.4vw,2.4vh),17px);line-height:1.3;color:var(--dim)}
 .retBar b{color:#fff}.retBar .rb{height:.9em;border-radius:99px;background:#ffffff1a;overflow:hidden;margin-top:.3em}
-.retBar .rb i{display:block;height:100%;background:linear-gradient(90deg,#19e3ff,#ffb020)}.retBar.can .rb i{background:#ffb020}
+.retBar .rb{display:flex}.retBar .rb i{display:block;height:100%;background:linear-gradient(90deg,#19e3ff,#ffb020)}.retBar.can .rb i{background:#ffb020}.retBar .rb i.gain{background:#fff;box-shadow:0 0 6px #fff}
 `;document.head.appendChild(st);}
 function retMake(id,host){let e=$(id);if(!e){e=document.createElement('div');e.id=id;e.className='retBar';host.insertBefore(e,host.querySelector('.row'));}return e;}
 function retShow(){
-  const on=RET.oneMore,add=($('oNeon')&&/nothing/.test($('oNeon').textContent))?0:(SH.lastBank|0),nx=on?RET.next():null,pay='Failed runs still pay: '+(add?'+'+add+' Neon banked':'nothing banked this time');
+  const on=RET.oneMore,add=SH.lastBank|0,nx=on?RET.next():null,fl=SH.lastFloor|0,pay='This run: <b>+'+add+' Neon</b>'+(fl&&add<=fl?' · '+SH.lastStages+' stage'+(SH.lastStages>1?'s':'')+' reached':'');
   for(const [id,host] of [['retO',$('over').querySelector('.in')],['retR',$('stres').querySelector('.in')]]){
     const e=retMake(id,host);e.hidden=!on;if(!on)continue;
-    e.className='retBar'+(nx&&nx.can?' can':'');
-    e.innerHTML=(id==='retO'?pay+'<br>':'')+(nx?(nx.can?'Ready in Garage: <b>'+nx.n+'</b> '+nx.price:'Next: <b>'+nx.n+'</b> '+nx.bank+'/'+nx.price)+'<div class="rb"><i style="width:'+nx.pct+'%"></i></div>':'Everything unlocked');}
+    e.className='retBar'+(nx&&nx.can?' can':'');const gp=nx&&add>0?Math.min(nx.pct,Math.max(1,Math.round(100*add/nx.price))):0;
+    e.innerHTML=(id==='retO'?pay+'<br>':'')+(nx?(nx.can?'Ready in Garage: <b>'+nx.n+'</b> '+nx.price:'Next: <b>'+nx.n+'</b> '+nx.bank+'/'+nx.price)+'<div class="rb"><i style="width:'+Math.max(0,nx.pct-gp)+'%"></i>'+(gp?'<i class="gain" style="width:'+gp+'%"></i>':'')+'</div>':'Everything unlocked');}
   $('againBtn').textContent=on?'ONE MORE RUN':'FLY AGAIN';$('srRetry').textContent=on?'ONE MORE RUN':'RETRY';}
 NR.on('runEnd',d=>{if(!d||d.quit)return;retShow();});
 
@@ -7179,14 +7190,25 @@ Object.assign(WPX.demo,{
 #gaCards.wpt .card .t2{font-family:var(--mono);font-size:clamp(10px,calc(var(--u)*2.9),13px);color:var(--ink);line-height:1.2}#gaCards.wpt .card .t2 b{color:var(--c);font-weight:400}
 #gaCards.wpt .card .pr{margin-left:0;align-self:center;border:1px solid var(--amber);border-radius:8px;padding:6px 8px;min-width:64px;text-align:center}
 #gaCards.wpt .card.sold .pr{border-color:#8c86b8;color:#8c86b8}
-#wpL .card .pp i.run{background:var(--c);opacity:.45}`;document.head.appendChild(st);}
+#wpL .card .pp i.run{background:var(--c);opacity:.45}
+@media (min-width:700px){
+#gaCards.wpt{grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))}
+#gaCards.wpt .card{display:grid;grid-template-columns:108px minmax(0,1fr);grid-template-rows:auto auto auto 1fr auto;grid-template-areas:"cv n" "cv pb" "t t" "t2 t2" "pr pr";gap:4px 10px;align-items:center;align-content:stretch;padding:10px 12px}
+#gaCards.wpt .card .tx{display:contents}
+#gaCards.wpt .card canvas{grid-area:cv}
+#gaCards.wpt .card .n{grid-area:n;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#gaCards.wpt .card .n .nm{display:block;overflow:hidden;text-overflow:ellipsis}#gaCards.wpt .card .n small{display:block;margin:2px 0 0}
+#gaCards.wpt .card .pb{grid-area:pb;margin:0}
+#gaCards.wpt .card .t{grid-area:t;align-self:start;margin-top:4px}
+#gaCards.wpt .card .t2{grid-area:t2;align-self:start}
+#gaCards.wpt .card .pr{grid-area:pr;align-self:end;width:100%;box-sizing:border-box;min-height:44px;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px}
+}`;document.head.appendChild(st);}
 {const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='weapons';b.type='button';b.textContent='WEAPONS';b.addEventListener('click',()=>{GA.tab='weapons';gaDraw();});tb.appendChild(b);
  window.wpTabDraw=function(){const box=$('gaCards');box.innerHTML='';
   for(const id of WP_IDS){const d=WPD[id],cur=WP.pl[id]|0,own=cur>0,max=cur>=WP_MAX,price=WP.price(id),can=GA.bank>=price,el=document.createElement('button');el.type='button';
    el.className='card'+(max?' sold':'')+(!max&&!can?' no':'');el.style.setProperty('--c',d.c);el.dataset.id=id;el.dataset.kind='weapon';
    const nxt=own?cur+1:1,ab=[3,6,10].find(l=>l>=nxt&&l>cur),abT=ab?`<br>LV${ab}: ${d.ab[[3,6,10].indexOf(ab)]}`:'',
      pw=own?(max?`power <b>${WPX_POWER(cur,id).toFixed(2)}x</b> (max)`:`power <b>${WPX_POWER(cur,id).toFixed(2)}x</b> &rarr; <b>${WPX_POWER(cur+1,id).toFixed(2)}x</b>`):`unlocks at <b>1.00x</b>`;
-   el.innerHTML=`<canvas width="108" height="52" data-w="${id}"></canvas><div class="tx"><div class="n">${d.n}<small>${own?'LV '+cur+'/'+WP_MAX:'LOCKED'}</small></div><div class="t">${d.tx}</div><div class="pb">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<cur?'on':''}"></i>`).join('')}</div><div class="t2">${pw}${max?'':abT}</div></div><div class="pr">${max?'MAX':(own?'BUY LV'+(cur+1):'UNLOCK')+'<br>'+neonI+' '+price}</div>`;
+   el.innerHTML=`<canvas width="108" height="52" data-w="${id}"></canvas><div class="tx"><div class="n"><span class="nm">${d.n}</span><small>${own?'LV '+cur+'/'+WP_MAX:'LOCKED'}</small></div><div class="t">${d.tx}</div><div class="pb">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<cur?'on':''}"></i>`).join('')}</div><div class="t2">${pw}${max?'':abT}</div></div><div class="pr">${max?'MAX':(own?'BUY LV'+(cur+1):'UNLOCK')+'<br>'+neonI+' '+price}</div>`;
    el.addEventListener('click',()=>{const r=WP.buy(id);if(!r.ok){if(r.why==='money'){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');gaMsg('Need '+r.need+' more Neon');}else if(r.why==='max')gaMsg(d.n+' is at max level');return;}
      gaMsg(r.lv===1?d.n+' unlocked':d.s+' is now LV '+r.lv);try{AU.sfx('up')}catch(e){}gaDraw();});
    box.appendChild(el);const c=el.querySelector('canvas').getContext('2d'),n='wp-'+id;if(ART.have(n)){c.drawImage(ART.bm[n],28,0,52,52);}else if(WPX.demoFn)WPX.demoFn(id,c,.7,d.c);}};
@@ -7947,7 +7969,7 @@ NR.on('tick',dt=>{if(!RET.cp||!running||!ST.on||!G.live)return;
  const pc=RET.payClear;RET.payClear=function(n,sum){const pay=pc.call(this,n,sum);if(!RET.cp||!CHK.marked||!(pay>0))return pay;
    const cut=Math.round(pay*(1-CHK.k));GA.bank=Math.max(0,GA.bank-cut);gsave();if(this.last)this.last.pay=pay-cut;return pay-cut;};}
 NR.on('stageClear',()=>{if(RET.cp&&CHK.marked&&ST.stars)ST.stars[2]=0;});
-NR.on('banked',()=>{if(!RET.cp||!CHK.marked||!(SH.lastBank>0))return;const cut=Math.round(SH.lastBank*(1-CHK.k));GA.bank=Math.max(0,GA.bank-cut);SH.lastBank-=cut;SH.lastTotal=GA.bank;gsave();});
+NR.on('banked',()=>{if(!RET.cp||!CHK.marked||!(SH.lastBank>0))return;const cut=Math.min(Math.round(SH.lastBank*(1-CHK.k)),Math.max(0,SH.lastBank-(SH.lastFloor|0)));GA.bank=Math.max(0,GA.bank-cut);SH.lastBank-=cut;SH.lastTotal=GA.bank;gsave();});
 
 /* the run-end button */
 {const st=document.createElement('style');st.textContent=`

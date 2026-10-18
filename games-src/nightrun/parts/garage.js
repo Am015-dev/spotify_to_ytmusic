@@ -57,8 +57,12 @@ const neonI='<svg class="nI" viewBox="0 0 24 24" aria-hidden="true"><path d="'+N
 .pg .bot{display:flex;gap:calc(var(--u)*2.4);flex:0 0 auto;align-items:center}
 .pg .bot button{flex:1 1 0;min-width:0;white-space:nowrap;padding:.4em .6em}
 .pg .msg{font-family:var(--mono);color:var(--amber);font-size:clamp(11px,calc(var(--u)*3.2),15px);text-align:center;min-height:1.2em;flex:0 0 auto}
-.pg .tabs{display:flex;gap:calc(var(--u)*1.6);flex:0 0 auto}
-.pg .tabs button{flex:1 1 0;min-width:0;padding:.35em .3em;letter-spacing:.06em}
+.pg .tabs{display:flex;gap:calc(var(--u)*1.6);flex:0 0 auto;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:pan-x}
+.pg .tabs::-webkit-scrollbar{display:none}
+.pg .tabs.fl{-webkit-mask-image:linear-gradient(90deg,transparent,#000 22px);mask-image:linear-gradient(90deg,transparent,#000 22px)}
+.pg .tabs.fr{-webkit-mask-image:linear-gradient(270deg,transparent,#000 22px);mask-image:linear-gradient(270deg,transparent,#000 22px)}
+.pg .tabs.fl.fr{-webkit-mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 22px,#000 calc(100% - 22px),transparent)}
+.pg .tabs button{flex:1 0 auto;min-width:44px;min-height:44px;padding:.35em .9em;letter-spacing:.06em;white-space:nowrap}
 .pg .tabs button.on{background:var(--cyan);color:var(--void)}
 .pg .sw{height:clamp(22px,calc(var(--u)*9),56px);aspect-ratio:1;border-radius:50%;background:linear-gradient(135deg,#ff2d95,#19e3ff);flex:0 0 auto}
 .pg .sp{flex:1 1 0}
@@ -101,6 +105,10 @@ function gaTap(it,b){const own=!it.k||GA.own[it.k];
 function openGarage(from){GA.from=from||'title';titleEl.hidden=true;overEl.hidden=true;garageEl.hidden=false;gaDraw();}
 function closeGarage(){garageEl.hidden=true;if(GA.from==='over')overEl.hidden=false;else{titleEl.hidden=false;}showBest();gaDraw();}
 for(const b of garageEl.querySelectorAll('.tabs button'))b.addEventListener('click',()=>{GA.tab=b.dataset.t;gaDraw();});
+/* the tab row is a scroller (7 tabs do not fit 390 px): edge fades show where more tabs are, the open tab scrolls into view */
+{const tb=garageEl.querySelector('.tabs'),fade=()=>{tb.classList.toggle('fl',tb.scrollLeft>2);tb.classList.toggle('fr',tb.scrollLeft+tb.clientWidth<tb.scrollWidth-2);};
+ tb.addEventListener('scroll',fade,{passive:true});tb.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b)setTimeout(()=>{if(b.scrollIntoView)b.scrollIntoView({inline:'center',block:'nearest'});fade();},0);});
+ try{new ResizeObserver(fade).observe(tb);new MutationObserver(fade).observe(tb,{childList:true});}catch(e){}addEventListener('resize',fade);}
 $('gaBack').addEventListener('click',closeGarage);
 // entry points: title menu and game-over screen
 {const g=document.createElement('button');g.className='go dim';g.id='gaBtn';g.type='button';$('dailyBtn').after(g);g.addEventListener('click',()=>openGarage('title'));
