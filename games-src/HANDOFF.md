@@ -530,5 +530,8 @@ Cause of the extra boss time: damage above the cap was thrown away (the bot's da
 - Stats: own counters in `mnr_flavor` (also in the save export list); a SHOOTER FLAVOUR block is added to the Stats sheet when `RET.stats` is on.
 - Open: tune the medal Neon after the owner has played it; SPEED CLEAR is only for boss / kill / score stages (a survive stage cannot award it).
 
+
+## W2 on-foot art (18 Oct 2026)
+`parts/footart.js` = window.FA (draw/bg/has/pickup/scenery; real picture only when listed in media/ready.json). Art list: `make-foot-assets.py` regenerates the 'On-foot street stage' manifest group (124 files in media/foot/), `FOOT-FLOW-PROMPTS.md` and `next-wave/flow-2d/mainhattan-nightrun/prompts-foot.json`; then `make-placeholders.py`. Test: `footart-test.js`. For 'die' pass seconds since death.
 ## Nightrun on-foot enemies and Warden boss (W3, 18 Oct 2026)
 `parts/footen.js` (after ret.js in build.py): `window.FOOT_ENEMIES` (grunt, gunman, shield, bruiser, knife, sniper, drone, turret, mech) and `window.FOOT_BOSS.warden`; inert until `parts/foot.js` calls it. Table and the engine contract: `FOOT-ENEMIES.md`. Gate: `node games-src/nightrun/footen-test.js` (207 checks, fake env). Engine must run `onHit` after `hp -= dmg` and before the death check (it hands hp back for blocked/capped hits), keep calling `ai` on dead enemies until `e.remove`, and honour `canHit`. Not yet run against `foot.js` (not on the branch when this was written). weapon-test "dps well/beat" fail with and without this file.
