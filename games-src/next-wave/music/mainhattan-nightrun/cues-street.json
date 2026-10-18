@@ -1,0 +1,21 @@
+{
+ "_readme": "On-foot street stage 'street1' (parts/foot.js, flag RET.foot). Lyrics = None. Until these exist the stage plays the 'stage2' song. Enemy shots release on the half beat, so keep a steady kick from bar 1.",
+ "cues": {
+  "street1": {
+   "prompt": "Instrumental cyberpunk run-and-gun game soundtrack, no vocals, no spoken words, 4/4, strong kick on every beat from the first bar, 128 BPM, gritty street synth bass, metallic percussion, distorted stabs, tense but fun, rain and neon underpass mood, 4-bar intro then 16-bar sections, ends on a whole bar so it loops cleanly, mixed for a phone game. Make 2 versions (a and b).",
+   "versions": ["a", "b"], "save_as": "street1.mp3", "bpm": 128, "loop": true
+  },
+  "street1-lock": {
+   "prompt": "Same track family as street1, 128 BPM, arena-lock variation: louder drums, rising siren synth, 8-bar loop, no vocals, steady kick every beat, ends on a whole bar.",
+   "versions": ["a"], "save_as": "street1-lock.mp3", "bpm": 128, "loop": true
+  },
+  "street1-boss": {
+   "prompt": "Instrumental cyberpunk boss fight, no vocals, 140 BPM, heavy industrial drums, kick on every beat from bar 1, menacing bass, alarm synth hook, 16-bar loop that ends on a whole bar, mixed for a phone game.",
+   "versions": ["a", "b"], "save_as": "street1-boss.mp3", "bpm": 140, "loop": true
+  },
+  "street1-clear": {
+   "prompt": "Short instrumental victory sting, cyberpunk synth, 128 BPM, 2 bars, bright major chord at the end, no vocals.",
+   "versions": ["a"], "save_as": "street1-clear.mp3", "bpm": 128, "loop": false
+  }
+ }
+}
