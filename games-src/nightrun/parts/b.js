@@ -242,7 +242,7 @@ function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit(
     else if(e.type==='gunship'){const on=e.x<W-100,far=()=>Math.hypot(e.x-P.x,e.y-P.y)>minShot(210);
       if(on){if(--e.bf<=0){if(e.arm&&far()){eb.src=e;e.bn++;if(e.bn%2)ring(e,12+2*G.pos,120+12*d,e.t,'#ff3dbb');else fan(e,3,.3,210,'#ffa02d');eb.src=null;}e.bf=fireIn(1.4/d);}e.arm=e.bf===1;}else e.arm=false;}
   }}
-function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e.p2?2:1;     // phases change on bar p2 and p3; the boss cannot fall earlier than minBar (armour holds its HP at a floor)
+function bossBeat(e,d){if(e.bm===undefined&&window.BMV)BMV.init(e);e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e.p2?2:1;     // phases change on bar p2 and p3; the boss cannot fall earlier than minBar (armour holds its HP at a floor)
   e.floor=bar>=e.minBar?0:bar>=e.p3?Math.max(1,Math.ceil(e.max*.04)):bar>=e.p2?Math.ceil(e.max*.3):Math.ceil(e.max*.62);e.minBar_=e.minBar;
   if(ph!==e.ph){e.ph=ph;e.pi=0;e.pc=-2;e.cnt=0;G.eb=[];e.lasers=[];e.arm=false;banner(ph===2?'PHASE 2':'FINAL PHASE',e.nm,true,2.2);G.flash=Math.max(G.flash,.25*FX());shake(10);AU.sfx('phase');NR.emit('bossPhase',{ph});
     if(P.hp<P.max||!e.mini)G.pk.push({t:'hp',x:Math.min(e.x,W-80),y:e.y,vx:-150,vy:rnd(-50,50),bob:0});   // a broken armour plate drops a repair
@@ -250,7 +250,7 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e
   if(e.x>bossX()||G.dead){e.arm=false;return;}
   const list=e.lists[e.ph-1];e.pc++;if(e.pc<0){e.arm=bossNext(e);return;}if(e.pc>=8){e.pc=0;e.pi=(e.pi+1)%list.length;e.cnt=0;}
   const c=e.pc,cad=e.ph===3?1:2,sp=e.ph===3?1.1:1,c2='#ffa02d',wasArm=e.arm;if(wasArm)e.fireT=.42;eb.src=wasArm?e:{arm:false};
-  switch(list[e.pi%list.length]){
+  if(e.bm)BMV.beat(e,list[e.pi%list.length],c,d);else switch(list[e.pi%list.length]){
     case'fan5':if(c%cad===0)fan(e,5,.9,(190+15*d)*sp,c2);break;
     case'fan7':if(c%cad===0)fan(e,7,1.2,(180+15*d)*sp,c2);break;
     case'fan9':if(c%cad===0)fan(e,9,1.5,(190+15*d)*sp,c2);break;
@@ -259,7 +259,7 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=e.p3?3:bar>=e
     case'laser':if(c%(ST.on&&ST.lvl>=8&&!(window.RET&&RET.walls)||DF.el?2:3)===0)e.lasers.push({x:e.x-30,y:e.y,a:aim(e),t:0});break;}
   eb.src=null;e.arm=bossNext(e);}
 // what the boss fires on the beat k beats from now (k>=1): {t:'fan',n,sp,spd} / {t:'ring',n,spd,off} / {t:'spiral'} / null. bossBeat fires exactly this; the safe-path check plans against it.
-function bossShot(e,k){let pc=e.pc+k,pi=e.pi;const list=e.lists[e.ph-1];if(pc<0)return null;while(pc>=8){pc-=8;pi=(pi+1)%list.length;}
+function bossShot(e,k){if(e.bm)return null;let pc=e.pc+k,pi=e.pi;const list=e.lists[e.ph-1];if(pc<0)return null;while(pc>=8){pc-=8;pi=(pi+1)%list.length;}
   const d=diff(),cad=e.ph===3?1:2,sp=e.ph===3?1.1:1,c=pc;
   switch(list[pi%list.length]){
     case'fan5':return c%cad===0?{t:'fan',n:fanN(5),sp:.9,spd:(190+15*d)*sp}:null;
@@ -269,7 +269,7 @@ function bossShot(e,k){let pc=e.pc+k,pi=e.pi;const list=e.lists[e.ph-1];if(pc<0)
     case'spiral':return{t:'spiral',spd:(150+10*d)*sp};}
   return null;}
 // will the boss fire on the next beat? (the glow and the closing ring show it for the whole beat before)
-function bossNext(e){if(e.x>bossX()||G.dead)return false;const list=e.lists[e.ph-1];let pc=e.pc+1,pi=e.pi;if(pc<0)return false;if(pc>=8){pc=0;pi=(pi+1)%list.length;}
+function bossNext(e){if(e.x>bossX()||G.dead)return false;if(e.bm)return BMV.next(e);const list=e.lists[e.ph-1];let pc=e.pc+1,pi=e.pi;if(pc<0)return false;if(pc>=8){pc=0;pi=(pi+1)%list.length;}
   const cad=e.ph===3?1:2;switch(list[pi%list.length]){
     case'fan5':case'fan7':case'fan9':case'ring':return pc%cad===0;
     case'summon':return pc===0||pc===4||(e.ph===3&&(pc===2||pc===6));
