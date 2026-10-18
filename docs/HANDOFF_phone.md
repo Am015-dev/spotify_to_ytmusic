@@ -11,3 +11,10 @@
 3. tools/tChkGo.js: GOs can call window.__cdp(method,params) (CPU throttle) and window.__vp(w,h); both are undone after every item.
 4. GOs (src/99c7_rev5fix.js): scale1/touch-boot (low boot holds through portrait and back), scale1/gov-cpu (4× CPU → down@.85, up about 12 s after the throttle is removed), scale1/gov-hyst (warm-up, order, 30 fps cap, 170 s of flip-flops make ≤ 4 steps, manual holds), scale1/vp (10 sizes). All ✅. Shots at 360×640 and 2560×1080 looked right.
 5. Left: check on a real iPhone and a PC that Auto settles where it should. On ultrawide the fixed-px HUD looks small and the km/h readout sits on the car (existing layout, r9b's HUD area).
+
+# HANDOFF phone-2 (real-device perf beacon + FPS chip, 2026-10-18)
+1. src/98pb_perfbeacon.js: 20 s after driving starts, then every 60 s (≤ 5/session), one doc → db collection `perf` via the 🐞 path (claude.use('db')); no db → silent. Fields: ua, vp, dpr, pr, gpu (WEBGL_debug_renderer_info), gfx/auto/tier/scale, frames, fps50/fps90, ms50/ms90, over50, worstMs, busyMs, top 3 systems (self ms/frame of sim, cam, traffic, world, streets, hud, render), lifeMs, heap, city, mode, build, iframe, govLog.
+2. FPS chip #pbChip (12 px, top centre, pointer-events none): Settings → "FPS chip", long-press ⚙ (#tuG, any device; #roamSetBtn on PC) or ?fps=1. Shows fps · p90 ms · tier · ×scale · pr. Shot 852×393: clear of the controls.
+3. GOs phone2/beacon (stubbed db: fields, p50/p90, top 3 order, 20 s gate, 60 s next, cap 5, no db) and phone2/chip (top edge, 12 px, no overlap, long-press swallows the ⚙ click) in src/99c7_rev5fix.js, both ✅ on the built page.
+4. WebKit: Playwright has the webkit API but no WebKit browser in /opt/pw-browsers, so no WebKit comparison (not installed, per orders).
+5. Next: read the `perf` docs with ArtifactData after Alex drives the Beta on the iPhone 17 for ~2 min; top[] and worstMs say which system to cut.
