@@ -15,7 +15,7 @@ const res = [], ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' : 'FAI
   try {
     // 1. manifest
     const mj = JSON.parse(fs.readFileSync(path.join(GAMES, 'mainhattan-nightrun/manifest.webmanifest'), 'utf8'));
-    ok('manifest fields', mj.name && mj.short_name && mj.display === 'standalone' && mj.orientation === 'any' && /^#/.test(mj.theme_color) && /^#/.test(mj.background_color) && mj.start_url && mj.scope);
+    ok('manifest fields', mj.name && mj.short_name && (mj.display === 'standalone' || mj.display === 'fullscreen') && mj.orientation === 'any' && /^#/.test(mj.theme_color) && /^#/.test(mj.background_color) && mj.start_url && mj.scope);
     const inside = u => new URL(u, NR).href.startsWith(NR);
     ok('start_url and scope inside games/mainhattan-nightrun/', inside(mj.start_url) && inside(mj.scope) && new URL(mj.scope, NR).href === NR);
     const need = { '192x192': 0, '512x512': 0 }, maskable = mj.icons.some(i => i.purpose === 'maskable');

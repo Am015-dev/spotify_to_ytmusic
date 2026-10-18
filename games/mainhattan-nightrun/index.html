@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Mainhattan Nightrun</title>
+<!doctype html><html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#05030c"><title>Mainhattan Nightrun</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Share+Tech+Mono&display=swap">
@@ -5027,7 +5027,7 @@ function sim(sec,dt){dt=dt||1/60;let n=Math.round(sec/dt);while(n-->0&&S&&!S.end
 /* ===== MENU button: STREET RUN (unlocked after story stage 3) ===== */
 if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)return false;if(document.getElementById('footBtn'))return true;
     const b=document.createElement('button');b.type='button';b.className='go wide';b.id='footBtn';g.appendChild(b);
-    const paint=()=>{const u=ftUnlocked();b.disabled=!u;b.innerHTML=u?'STREET RUN<small>on foot · '+(SV.best.street1?'best '+SV.best.street1.score:'new')+'</small>':'STREET RUN<small>clear stage 3 to unlock</small>';};
+    const paint=()=>{const u=ftUnlocked();b.disabled=!u;b.innerHTML=u?'STREET RUN<small style="font-size:14px">on foot · '+(SV.best.street1?'best '+SV.best.street1.score:'new')+'</small>':'STREET RUN<small style="font-size:14px">clear stage 3 to unlock</small>';};
     paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');start('street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
@@ -7974,6 +7974,35 @@ NR.on('runEnd',d=>{if(!RET.cp)return;const e=chkBox();
    ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#7df9ff';ctx.fillStyle='#7df9ff';
    ctx.globalAlpha=.16*f;ctx.beginPath();ctx.arc(P.x,P.y,34,0,7);ctx.fill();
    ctx.globalAlpha=.85*pulse*Math.min(1,f*2.5);ctx.lineWidth=3;ctx.setLineDash([10,7]);ctx.lineDashOffset=-t*60;ctx.beginPath();ctx.arc(P.x,P.y,34,0,7);ctx.stroke();ctx.restore();};}
+
+/* ---------- Phone full screen, portrait and landscape (owner, 18 Oct 2026). Flag RET.fs (?fs=0 = off).
+   Touch devices: the first tap goes full screen (browsers need a user gesture), a tap after a rotation or a system exit goes back in (unless the player turned it off
+   with the MENU > FULL SCREEN button, which is remembered in mnr_fs). iPhone Safari has no page full screen: there the button explains Add to Home Screen. ---------- */
+RET.fs=RET.fs!==false&&!/[?&]fs=0\b/.test(location.search);
+if(RET.fs){(()=>{
+  const de=document.documentElement,rq=de.requestFullscreen||de.webkitRequestFullscreen,ex=document.exitFullscreen||document.webkitExitFullscreen;
+  const touch=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>1,standalone=matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+  const isFS=()=>!!(document.fullscreenElement||document.webkitFullscreenElement)||matchMedia('(display-mode: fullscreen)').matches;
+  let pref;try{pref=localStorage.getItem('mnr_fs');}catch(e){}
+  let off=pref==='0',lastTry=0;
+  const enter=()=>{if(!rq||isFS()||off)return;const n=Date.now();if(n-lastTry<400)return;lastTry=n;try{const p=rq.call(de,{navigationUI:'hide'});if(p&&p.catch)p.catch(()=>{});}catch(e){}};
+  const leave=()=>{if(ex&&isFS()){try{const p=ex.call(document);if(p&&p.catch)p.catch(()=>{});}catch(e){}}};
+  const save=()=>{try{localStorage.setItem('mnr_fs',off?'0':'1');}catch(e){}};
+  window.FSX={on:()=>!off,isFS,supported:!!rq,standalone:!!standalone,enter,leave,set(v){off=!v;save();if(v)enter();else leave();paint();}};
+  if(touch){
+    const go=()=>enter();
+    addEventListener('pointerup',go,{capture:true,passive:true});addEventListener('touchend',go,{capture:true,passive:true});
+    addEventListener('orientationchange',()=>{lastTry=0;});                       // the next tap re-enters if the rotation dropped full screen
+  }
+  document.addEventListener('fullscreenchange',()=>{paint();try{window.dispatchEvent(new Event('resize'));}catch(e){}});
+  document.addEventListener('webkitfullscreenchange',()=>{paint();try{window.dispatchEvent(new Event('resize'));}catch(e){}});
+  let fsEl=null;
+  function paint(){if(!fsEl)return;const on=isFS();fsEl.textContent=!rq&&!standalone?'FULL SCREEN: ADD TO HOME':on?'FULL SCREEN: ON':'FULL SCREEN: OFF';fsEl.setAttribute('aria-pressed',on?'true':'false');}
+  setTimeout(()=>{const mg=document.querySelector('#mnMore .mg');if(!mg||fsEl)return;
+    fsEl=document.createElement('button');fsEl.type='button';fsEl.className='go dim wide';fsEl.id='fsBtn';
+    fsEl.addEventListener('click',()=>{if(!rq){alert('On iPhone: tap Share, then Add to Home Screen, then open Nightrun from the icon for full screen.');return;}FSX.set(!(isFS()));});
+    mg.appendChild(fsEl);paint();},0);
+})();}
 
 
 // the tier meter: big x1..x4, four segments (the current one fills), a thin line that runs down before the tier slips. k = size, (cx, by) = bottom-centre
