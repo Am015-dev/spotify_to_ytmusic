@@ -40,8 +40,9 @@ const DEFER = () => {   // (c) a busy screen: the new wave waits, then comes
   for (let i = 0; i < Z.CAP() + 2; i++) { const e = window.LEAK.en('drone', { x: 700 + (i % 3) * 40, y: 80 + i * 40, amp: 0 }); e.gr = 0; e.zs = { x: e.x, y: e.y }; e.zph = 0; e.zst = 1; e.hv0 = m.G.bc + 99; }
   const n0 = m.G.en.length, d0 = Z.stat.spawnsDeferred; m.DIR.spawnOne(); if (m.G.en.length !== n0) out.push('a wave spawned on a busy screen'); if (Z.stat.spawnsDeferred !== d0 + 1) out.push('deferral not counted');
   for (const e of m.G.en) e.hv0 = m.G.bc - 99;   // everyone leaves
-  let T = 0; while (T < 25 && m.G.en.filter(e => e.zst !== 2 && e.hp > 0).length < n0 + 1 && T < 25) { m.P.hp = 99; m.step(1 / 30); T += 1 / 30; if (m.G.en.length > n0 + 0 && m.G.en.some(e => e.x > 800)) break; }
-  if (!m.G.en.some(e => e.x > 800 && e.zst === 0 || e.x > 880)) out.push('the deferred wave never came');
+  const seen0 = new Set(m.G.en); let came = false;   // came: an enemy that was not there before the deferral (a scripted formation, stagescripts.js, may enter from the top or bottom edge)
+  let T = 0; while (T < 25 && m.G.en.filter(e => e.zst !== 2 && e.hp > 0).length < n0 + 1 && T < 25) { m.P.hp = 99; m.step(1 / 30); T += 1 / 30; if (m.G.en.some(e => !seen0.has(e))) came = true; if (m.G.en.length > n0 + 0 && m.G.en.some(e => e.x > 800)) break; }
+  if (!came && !m.G.en.some(e => e.x > 800 && e.zst === 0 || e.x > 880)) out.push('the deferred wave never came');
   m.abort(); return out;
 };
 const TYPES = () => {

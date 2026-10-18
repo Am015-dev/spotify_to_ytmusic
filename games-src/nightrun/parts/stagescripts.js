@@ -6,48 +6,49 @@
             'stairs+g'     ground units may roll in during this moment (leak.js)    '*'         the stage's SIGNATURE set piece (below)
      sig  [name, formation A, formation B, twist]: the set piece no other stage has; twist = mirror | elite | fast | echo
      mut  the stage's rule change (VMUT below), every second stage; '' = none. It is on the intro card and in the HUD and pauses while a boss is out.
-   The director keeps its own timing, budget, caps and READY gaps (dir.js, zoo.js, leak.js): it decides WHEN and HOW MUCH, the script decides WHAT. ---------- */
+   The director keeps its own timing, budget, caps and READY gaps (dir.js, zoo.js, leak.js): it decides WHEN and HOW MUCH, the script decides WHAT.
+   On Hard / Very hard / Legend the old random zoo and ground waves still come between the scripted pieces, so the hard tiers keep their pressure. ---------- */
 const VSCRIPT={
  1:{sig:['COURIER LIGHTS','wave','zigzag','mirror'],mut:'',m:['line','snake','zigzag','helix','gates','snake|wave','wave','crossX','echo','~stutter','*','bounce']},
  2:{sig:['PATROL GRID','gates','snake','fast'],mut:'offbeat',m:['vee','fan','turrets','chargers','echo','fan|wave','wave','zigzag','stutter','~hold','*','helix']},
- 3:{sig:['WINDOW DISPLAY','stutter','bounce','echo'],mut:'',m:['hold','pincer','stampede+g','stairs','mirror','pincer|gates','gates','crossX+g','snake','~bounce','*','line']},
- 4:{sig:['GUARD CHANGE','cross','mirror','mirror'],mut:'mirror',m:['chargers','shieldwall','sandwich+g','bloom','cross','orbit','shieldwall|swoop','swoop+g','gunship','turrets','~wave','*','fan']},
- 5:{sig:['VAULT ALARM','bloom','hold','elite'],mut:'',m:['vee','shieldwall','spiral+g','box','scissors','bait','sweep','stampede+g','*','~stutter']},
- 6:{sig:['CONVOY AMBUSH','orbit','pincer','mirror'],mut:'wind',m:['gates','kamikaze','burst+g','braid','arrow','kamikaze|tide','tide','stairs+g','pincer','~hold','*','mirror']},
- 7:{sig:['GLASS ELEVATOR','fan','bloom','echo'],mut:'',m:['cross','kamikaze','fork+g','meteors','comet','kamikaze|bloom','bloom','gunship+g','sandwich','~line','*','orbit']},
- 8:{sig:['SIREN CHASE','meteors','comet','mirror'],mut:'quickdash',m:['vee','shadow','geyser+g','bait','swoop','scissors','box','sweep+g','spiral','*','~bounce']},
+ 3:{sig:['WINDOW DISPLAY','stutter','bounce','echo'],mut:'',m:['hold','pincer','stampede+g','stairs','mirror+g','pincer|gates','gates','crossX+g','snake','~bounce','*','line']},
+ 4:{sig:['GUARD CHANGE','cross','mirror','mirror'],mut:'mirror',m:['chargers','shieldwall','sandwich+g','bloom','cross+g','orbit','shieldwall|swoop','swoop+g','gunship','turrets','~wave','*','fan']},
+ 5:{sig:['VAULT ALARM','bloom','hold','elite'],mut:'',m:['vee','shieldwall','spiral+g','box','scissors+g','bait','sweep','stampede+g','*','~stutter']},
+ 6:{sig:['CONVOY AMBUSH','orbit','pincer','mirror'],mut:'wind',m:['gates','kamikaze','burst+g','braid','arrow+g','kamikaze|tide','tide','stairs+g','pincer','~hold','*','mirror']},
+ 7:{sig:['GLASS ELEVATOR','fan','bloom','echo'],mut:'',m:['cross','kamikaze','fork+g','meteors','comet+g','kamikaze|bloom','bloom','gunship+g','sandwich','~line','*','orbit']},
+ 8:{sig:['SIREN CHASE','meteors','comet','mirror'],mut:'quickdash',m:['vee','shadow','geyser+g','bait','swoop+g','scissors','box','sweep+g','spiral','*','~bounce']},
  9:{sig:['RIVER LANTERNS','burst','echo','fast'],mut:'',m:['crossX','splitterv','river','loop','slalom','splitterv|noose','noose','gates','stairs','~hold','*','stampede']},
  10:{sig:['BRIDGE STRAIN','stampede','box','mirror'],mut:'curve',m:['zigzag','splitterv','snake~r','orbit','pincer','splitterv|gunship','gunship','comet','chargers','~bounce','*','snake']},
- 11:{sig:['MARKET BELLS','arrow','sweep','echo'],mut:'',m:['stutter','bomberrun','spiral+g','sweep','burst','braid','bomberrun|tide','tide+g','mirror','box','~line','*','meteors']},
- 12:{sig:['BOW WAVE','spiral','bounce','mirror'],mut:'nopower',m:['vee','bomberrun','pincer~r+g','scissors','cross','bomberrun|bloom','bloom','fork+g','bait','~bounce','*','sandwich']},
- 13:{sig:['OLD STONES','bounce','splitterv','mirror'],mut:'',m:['echo','shadow','fan+g','helix','geyser','shieldwall','swoop','kamikaze+g','*','~wave']},
- 14:{sig:['FLEET SIGNAL','turrets','noose','elite'],mut:'laser',m:['hold','sniperlanes','snake~r+g','turrets','arrow','sniperlanes|spiral','spiral','river+g','crossX','~line','*','pincer']},
- 15:{sig:['CRANE SWING','fan','arrow','fast'],mut:'',m:['snake','sniperlanes','stampede+g','mirror','sandwich','sniperlanes|stairs','stairs','cross+g','box','~bounce','*','comet']},
- 16:{sig:['UNDERTOW','stairs','river','fast'],mut:'drop',m:['wave','healerpack','pincer~r+g','loop','shadow','scissors','bloom','vee+g','*','~line']},
+ 11:{sig:['MARKET BELLS','arrow','sweep','echo'],mut:'',m:['stutter','bomberrun','spiral+g','sweep','burst+g','braid','bomberrun|tide','tide+g','mirror','box','~line','*','meteors']},
+ 12:{sig:['BOW WAVE','spiral','bounce','mirror'],mut:'nopower',m:['vee','bomberrun','pincer~r+g','scissors','cross+g','bomberrun|bloom','bloom','fork+g','bait','~bounce','*','sandwich']},
+ 13:{sig:['OLD STONES','bounce','splitterv','mirror'],mut:'',m:['echo','shadow','fan+g','helix','geyser+g','shieldwall','swoop','kamikaze+g','*','~wave']},
+ 14:{sig:['FLEET SIGNAL','turrets','noose','elite'],mut:'laser',m:['hold','sniperlanes','snake~r+g','turrets','arrow+g','sniperlanes|spiral','spiral','river+g','crossX','~line','*','pincer']},
+ 15:{sig:['CRANE SWING','fan','arrow','fast'],mut:'',m:['snake','sniperlanes','stampede+g','mirror','sandwich+g','sniperlanes|stairs','stairs','cross+g','box','~bounce','*','comet']},
+ 16:{sig:['UNDERTOW','stairs','river','fast'],mut:'drop',m:['wave','healerpack','pincer~r+g','loop','shadow+g','scissors','bloom','vee+g','*','~line']},
  17:{sig:['RED LIGHTS','stutter','fork','elite'],mut:'',m:['crossX','wall','curtain','sweep','river','wall|slalom','slalom','noose','tide','~bounce','*','bomberrun']},
  18:{sig:['SHUNTING YARD','sniperlanes','meteors','elite'],mut:'split',m:['snake','river~r','helix','pincer','zigzag','river~r|swoop','swoop','comet','braid','~wave','*','gunship']},
- 19:{sig:['FIREWALL BREACH','carrier','turrets','fast'],mut:'',m:['line','carrier','sniperlanes+g','stairs','spiral','carrier|bloom','bloom','echo+g','burst','~hold','*','mirror']},
- 20:{sig:['SIGNAL FAILURE','sandwich','stutter','echo'],mut:'shrink',m:['stutter','carrier','loop~r+g','meteors','stampede','orbit','carrier|sandwich','sandwich+g','arrow','shieldwall','~wave','*','splitterv']},
- 21:{sig:['BARRIER DROP','fan','stairs','echo'],mut:'',m:['chargers','bait','shadow+g','scissors','turrets','fork','geyser','gates+g','*','~bounce']},
- 22:{sig:['LAST CORDON','arrow','slalom','echo'],mut:'beatgap',m:['vee','minefield','river~r+g','box','fan','minefield|kamikaze','kamikaze','cross+g','loop','~hold','*','noose']},
- 23:{sig:['CRATE STACK','minefield','geyser','mirror'],mut:'',m:['snake','minefield','healerpack+g','sandwich','echo','minefield|mirror','mirror','sweep+g','burst','~wave','*','orbit']},
- 24:{sig:['ICE CORE','wave','minefield','fast'],mut:'blackout',m:['zigzag','loop~r','spiral+g','pincer','crossX','tide','bloom','meteors+g','*','~stutter']},
+ 19:{sig:['FIREWALL BREACH','carrier','turrets','fast'],mut:'',m:['line','carrier','sniperlanes+g','stairs','spiral+g','carrier|bloom','bloom','echo+g','burst','~hold','*','mirror']},
+ 20:{sig:['SIGNAL FAILURE','sandwich','stutter','echo'],mut:'shrink',m:['stutter','carrier','loop~r+g','meteors','stampede+g','orbit','carrier|sandwich','sandwich+g','arrow','shieldwall','~wave','*','splitterv']},
+ 21:{sig:['BARRIER DROP','fan','stairs','echo'],mut:'',m:['chargers','bait','shadow+g','scissors','turrets+g','fork','geyser','gates+g','*','~bounce']},
+ 22:{sig:['LAST CORDON','arrow','slalom','echo'],mut:'beatgap',m:['vee','minefield','river~r+g','box','fan+g','minefield|kamikaze','kamikaze','cross+g','loop','~hold','*','noose']},
+ 23:{sig:['CRATE STACK','minefield','geyser','mirror'],mut:'',m:['snake','minefield','healerpack+g','sandwich','echo+g','minefield|mirror','mirror','sweep+g','burst','~wave','*','orbit']},
+ 24:{sig:['ICE CORE','wave','minefield','fast'],mut:'blackout',m:['zigzag','loop~r','spiral+g','pincer','crossX+g','tide','bloom','meteors+g','*','~stutter']},
  25:{sig:['PRESS PASS','slalom','snake','elite'],mut:'',m:['helix','nest','lattice','pulse','splitterv','nest|gates','gates','shadow','noose','~bounce','*','wall']},
  26:{sig:['GRIDLOCK','fork','echo','fast'],mut:'order',m:['snake','escort','nest','wall~r','river','escort|loop','loop','orbit','gunship','~hold','*','mirror']},
- 27:{sig:['HAMMER BEAT','loop','arrow','mirror'],mut:'',m:['zigzag','escort','sweep+g','bomberrun','scissors','escort|curtain','curtain','pincer+g','turrets','~wave','*','crossX']},
- 28:{sig:['SPOTLIGHTS','zigzag','stampede','fast'],mut:'hail',m:['echo','curtain~r','carrier+g','meteors','kamikaze','curtain~r|shieldwall','shieldwall','spiral+g','braid','~line','*','bloom']},
- 29:{sig:['GUARD OF HONOUR','burst','lattice','mirror'],mut:'',m:['stairs','geyser','fork+g','sandwich','slalom','stampede','sniperlanes','minefield+g','*','~bounce']},
- 30:{sig:['HOSTILE TAKEOVER','comet','minefield','fast'],mut:'minefield',m:['vee','wall~r','bait+g','arrow','fan','wall~r|tide','tide','comet+g','cross','~stutter','*','box']},
- 31:{sig:['TOP FLOOR','bounce','nest','echo'],mut:'',m:['wave','chargers','pincer+g','shieldwall','healerpack','chargers|gates','gates','swoop+g','burst','~bounce','*','river']},
- 32:{sig:['MARKET CRASH','burst','snake','echo'],mut:'drop',m:['helix','curtain~r','gunship+g','geyser','snake','sweep','spiral','shadow+g','*','~stutter']},
+ 27:{sig:['HAMMER BEAT','loop','arrow','mirror'],mut:'',m:['zigzag','escort','sweep+g','bomberrun','scissors+g','escort|curtain','curtain','pincer+g','turrets','~wave','*','crossX']},
+ 28:{sig:['SPOTLIGHTS','zigzag','stampede','fast'],mut:'hail',m:['echo','curtain~r','carrier+g','meteors','kamikaze+g','curtain~r|shieldwall','shieldwall','spiral+g','braid','~line','*','bloom']},
+ 29:{sig:['GUARD OF HONOUR','burst','lattice','mirror'],mut:'',m:['stairs','geyser','fork+g','sandwich','slalom+g','stampede','sniperlanes','minefield+g','*','~bounce']},
+ 30:{sig:['HOSTILE TAKEOVER','comet','minefield','fast'],mut:'minefield',m:['vee','wall~r','bait+g','arrow','fan+g','wall~r|tide','tide','comet+g','cross','~stutter','*','box']},
+ 31:{sig:['TOP FLOOR','bounce','nest','echo'],mut:'',m:['wave','chargers','pincer+g','shieldwall','healerpack+g','chargers|gates','gates','swoop+g','burst','~bounce','*','river']},
+ 32:{sig:['MARKET CRASH','burst','snake','echo'],mut:'drop',m:['helix','curtain~r','gunship+g','geyser','snake+g','sweep','spiral','shadow+g','*','~stutter']},
  33:{sig:['ROOFTOP KIOSKS','swoop','nest','echo'],mut:'',m:['stairs','testudo','lattice~r','phalanx','pillars','testudo|bait','bait','orbit','slalom','~wave','*','stampede']},
  34:{sig:['HARBOUR CHAIN','sweep','pillars','mirror'],mut:'laser',m:['vee','ambush','testudo','pulse~r','sniperlanes','ambush|pincer','pincer','noose','pulse','~bounce','*','carrier']},
- 35:{sig:['HILL BEACONS','stairs','ambush','fast'],mut:'',m:['snake','ambush','lattice~r+g','cross','minefield','ambush|arrow','arrow','fork+g','spiral','~wave','*','mirror']},
- 36:{sig:['SACRED STEPS','lattice','fork','echo'],mut:'split',m:['zigzag','pulse~r','bomberrun+g','line','shieldwall','pulse~r|crossX','crossX','box+g','meteors','~stutter','*','sweep']},
- 37:{sig:['BRONZE SHIELDS','mirror','kamikaze','echo'],mut:'',m:['helix','snake~r','burst+g','fan','bloom','shadow','sandwich','gates+g','*','~wave']},
- 38:{sig:['STALL ROWS','scissors','box','elite'],mut:'beatgap',m:['echo','testudo~r','wall+g','curtain','loop','testudo~r|lattice','lattice','splitterv+g','swoop','~hold','*','comet']},
- 39:{sig:['OLIVE GROVE','sandwich','bait','fast'],mut:'',m:['chargers','ambush~r','braid+g','escort','nest','ambush~r|river','river','kamikaze+g','healerpack','~stutter','*','turrets']},
- 40:{sig:['BRONZE DAWN','wall','loop','fast'],mut:'quickdash',m:['zigzag','testudo~r','geyser+g','tide','gunship','shadow','noose','scissors+g','carrier','*','~hold']},
+ 35:{sig:['HILL BEACONS','stairs','ambush','fast'],mut:'',m:['snake','ambush','lattice~r+g','cross','minefield+g','ambush|arrow','arrow','fork+g','spiral','~wave','*','mirror']},
+ 36:{sig:['SACRED STEPS','lattice','fork','echo'],mut:'split',m:['zigzag','pulse~r','bomberrun+g','line','shieldwall+g','pulse~r|crossX','crossX','box+g','meteors','~stutter','*','sweep']},
+ 37:{sig:['BRONZE SHIELDS','mirror','kamikaze','echo'],mut:'',m:['helix','snake~r','burst+g','fan','bloom+g','shadow','sandwich','gates+g','*','~wave']},
+ 38:{sig:['STALL ROWS','scissors','box','elite'],mut:'beatgap',m:['echo','testudo~r','wall+g','curtain','loop+g','testudo~r|lattice','lattice','splitterv+g','swoop','~hold','*','comet']},
+ 39:{sig:['OLIVE GROVE','sandwich','bait','fast'],mut:'',m:['chargers','ambush~r','braid+g','escort','nest+g','ambush~r|river','river','kamikaze+g','healerpack','~stutter','*','turrets']},
+ 40:{sig:['BRONZE DAWN','wall','loop','fast'],mut:'quickdash',m:['zigzag','testudo~r','geyser+g','tide','gunship+g','shadow','noose','scissors+g','carrier','*','~hold']},
  41:{sig:['GLASS CORRIDOR','mirror','bait','fast'],mut:'',m:['turrets','swoop','bloom','gunship','pincer','sandwich','mirror','~orbit','*','cross']},
  42:{sig:['FERRY WAKE','fork','sweep','fast'],mut:'',m:['zigzag','meteors','burst','orbit','sweep','fork','noose','~hold','*','slalom']},
  43:{sig:['RAIL RHYTHM','comet','spiral','echo'],mut:'',m:['vee','wall','comet','curtain','stampede','gunship','arrow','~hold','*','helix']},
@@ -84,6 +85,7 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
     return 1+Math.floor((b-sp)*n/sp)%(n-1);},                     // a kill stage that runs past its song: the moments come round again (not the opening)
   mom(){return this.st.ms[this.idx()];},
   gnd(){return !!this.mom().g;},
+  hard(){return HARDS.includes(SET.diff);},                    // Hard, Very hard, Legend: the old random zoo and ground waves still come between the scripted pieces (Legend must not get easier)
   /* ---- the director's call: one piece of the moment's formation ---- */
   spawn(fill){const st=this.st,i=this.idx(),m=st.ms[i];if(i!==st.i){st.i=i;this.enter(i,m);}
     const c=st.c[i]=(st.c[i]|0)+1;let id,key,tw='';
@@ -98,7 +100,7 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
     if(this.log.length<6000)this.log.push({n:st.n,b:+G.dbar.toFixed(1),t:+G.t.toFixed(1),f:fid,p:m.sig?id:'',i,br:m.br?1:0,mut:st.mut});
     if(DIR.log.spawns.length<400)DIR.log.spawns.push([+G.dbar.toFixed(1),fid]);},
   enter(i,m){if(m.sig){const nm=this.st.s.sig[0];G.note={t:4,txt:'★ '+nm};floater(W*.62,H*.2,'★ '+nm,'#ffe14d');this.st.sigOn=1;NR.emit('setPiece',{n:this.st.n,name:nm});}},
-  theme(){if(!this.active())return;const m=this.mom();DIR.thName=m.br?'breath':DIR.thName==='breath'?'ranks':DIR.thName;if(window.LEAK)LEAK.pg=m.g?.45:this.pg0;},
+  theme(){if(!this.active())return;const m=this.mom();DIR.thName=m.br?'breath':DIR.thName==='breath'?'ranks':DIR.thName;if(window.LEAK)LEAK.pg=m.g&&!this.hard()?.55:this.pg0;},
   /* ---- the rule change ---- */
   mutOn(){return this.active()&&!!this.st.mut&&!G.boss&&!G.dead&&!ST.over&&running;},
   mk(){return SET.diff==='easy'?.65:1;},                        // Easy: every rule change is gentler
@@ -149,12 +151,12 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
 {const so=DIR.spawnOne;DIR.spawnOne=function(fill){if(VARY.active())return VARY.spawn(fill);return so.call(this,fill);};}   // innermost: zoo.js and leak.js wrap it later (caps, READY gaps)
 {const pt=DIR.pickTheme;DIR.pickTheme=function(bar){pt.call(this,bar);VARY.theme();};}
 {const bl=DIR.barLine;DIR.barLine=function(i){VARY.theme();return bl.call(this,i);};}
-if(window.ZOO){const wo=ZOO.waveOK;ZOO.waveOK=function(){return wo.call(this)&&!VARY.active();};}          // the zoo kinds come from the scripts' roles, not at random
-if(window.LEAK){const g0=LEAK.gndOK;LEAK.gndOK=function(){const r=g0.call(this);return r&&(!VARY.active()||VARY.gnd());};}   // ground units only in '+g' moments
+if(window.ZOO){const wo=ZOO.waveOK;ZOO.waveOK=function(){return wo.call(this)&&(!VARY.active()||VARY.hard());};}   // Easy/Normal: the zoo kinds come from the scripts' roles; the hard tiers keep the old random zoo pressure on top
+if(window.LEAK){const g0=LEAK.gndOK;LEAK.gndOK=function(){const r=g0.call(this);return r&&(!VARY.active()||VARY.hard()||VARY.gnd());};}   // Easy/Normal: ground units only in '+g' moments
 {const lb=ST.label;ST.label=function(){const s=lb.call(this);return VARY.mutOn()?s+' · '+VMUT[VARY.st.mut].n:s;};}
 {const dp=drawPlayer;drawPlayer=function(t){try{VARY.draw(t);}catch(err){}dp(t);};}
 NR.on('runStart',d=>{VARY.plan();if(!VARY.active())return;const st=VARY.st,M=VMUT[st.mut];
-  if(M&&!(d&&d.resume)){banner(ST.n+' · '+ST.def.name,ST.def.intro+' · '+M.n,false,3.4);st.card=G.t+3.6;}});
+  if(M&&!(d&&d.resume))st.card=G.t+3.6;});   // the stage card (story.js) keeps its intro; the RULE card follows it (each line 8 words or fewer)
 NR.on('spawn',e=>{if(e&&VARY.mutOn()&&VARY.st.mut==='nopower'&&e.type!=='boss')e.score*=2;});
 NR.on('fmUnit',o=>{if(!o||!o.e)return;const f=o.I&&o.I.id||'?',k=o.e.type;(VARY.kinds[f]=VARY.kinds[f]||{})[k]=1;
   if(VARY.mutOn()&&VARY.st.mut==='drop'&&o.e.fp&&o.e.pt>=0){const e=o.e;let t=0;while(t<6&&e.pth(t,e)[0]+e.ox>W-90)t+=.05;e.pt=t;const p=e.pth(t,e);e.x=p[0]+e.ox;const top=GX()<.5;e.drp={t0:G.t,T:.9,y0:top?-30:H+30};e.y=e.drp.y0;
