@@ -153,6 +153,15 @@ function R9A_cost(goSay,which){setTimeout(()=>{let C,roam=0,rt='pA';
   tm(all,60);const m5=tm(all,400),m2=tm(all.slice(0,1),400),m5b=tm(all,400),d=Math.max(0,Math.min(m5,m5b)-m2);sp.ai=all;if(RO.sp===sp)try{sprintEnd()}catch(e){}
   const ok=all.length===4&&d<=.5;   // AI update ms per frame, not wall-clock: tkStep with the pack minus tkStep with the nemesis only (touch is not reduced to 3 racers)
   goSay('📍 PACK COST · '+C.name+': '+(all.length+1)+' racers · AI update '+d.toFixed(2)+' ms/frame over the 2-racer race ('+m2.toFixed(2)+' → '+Math.min(m5,m5b).toFixed(2)+' ms tkStep; need ≤ 0.5 ms, 5 racers) → '+(ok?'✅ PASS':'❌ FAIL'))},300);return'📍 PACK COST · timing…'}
+// r10d (rev10 N4): GO r9a/pack5-warm: 3 races back to back on ONE page (Westend, Grand Prix, Westend again; no __tq.reset between). For each: 3 s after the green light all 5 AI have moved (s > 20), the bot has moved > 20 m, and over the next 60 s of sim time the nemesis never leads by more than 150 m.
+function R10D_warm(goSay){setTimeout(()=>{try{__tq.reset()}catch(e){}if(RO.sp)try{sprintEnd()}catch(e){}const out=[];let ok=true;
+ for(const w of['west','gp','west']){let C;if(w==='gp'){const sv=menuTrack;menuTrack='grand';C=tkBuild(tkQuickSpec());menuTrack=sv}else C=TK_C;
+  tkStart({kind:C.kind,ev:C.ev||null},C);const sp=RO.sp,G=tkGeoOf(C),bot=tkBot(G.pA,{lag:.15});let nem=0,x0=RO.x,z0=RO.z,sl=999,mv=0,sa=0;
+  tkRun(3.05,bot);   // the countdown (sp.cd = 3 s) runs inside tkStep
+  tkRun(3,bot);sa=Math.min(...sp.ai.map(a=>a.s));mv=Math.hypot(RO.x-x0,RO.z-z0);
+  tkRun(60,s=>{bot(s);const me=s.myS||0,L=tkLen(tkPath(s.ai[0]));nem=Math.max(nem,s.ai[0].s/L*G.lenA-me)});
+  const g=sa>20&&mv>20&&nem<150;ok=ok&&g;out.push(C.name+' · slowest AI s '+Math.round(sa)+' m at 3 s · bot moved '+Math.round(mv)+' m · nemesis max lead '+Math.round(nem)+' m '+(g?'✓':'✗'));if(RO.sp===sp)try{sprintEnd()}catch(e){}K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=K.ArrowDown=false}
+ goSay('📍 PACK5 WARM · '+out.join(' | ')+' (need every AI > 20 m and the bot > 20 m at 3 s, nemesis lead < 150 m) → '+(ok?'✅ PASS':'❌ FAIL'))},300);return'📍 PACK5 WARM · racing…'}
 const R9A_say=t=>{const C=window.__chk;if(C&&C.goSay)C.goSay(t);else try{say('',t,2.2)}catch(e){}};
 function R9A_go(goSay,which){setTimeout(()=>{let C,rt='pA',roam=0;
   if(which==='akro'){const m=tkMarkOf(ATH_BOSS_EV);C=m&&tkCourseOf(m);roam=30}
@@ -162,6 +171,8 @@ function R9A_go(goSay,which){setTimeout(()=>{let C,rt='pA',roam=0;
   goSay('📍 PACK5 · '+C.name+': '+o.n+' racers'+(o.hud?' · HUD /5':' · no /5')+' · bot '+(o.fin?o.place+'. in '+o.t+' s':'DNF')+' · '+o.lc+' lead changes · max ahead '+o.ah+' m / behind '+o.be+' m'+(o.be>=120?' ['+o.beAt+']':'')+(o.ah>=120?' ['+o.ahAt+']':'')+' · '+o.stall+' stalled AI (need 5, /5, 1st-3rd, ≥ 3, < 120 m, 0) → '+(ok?'✅ PASS':'❌ FAIL'))},300);return'📍 PACK5 · racing…'}
 (function R9A_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='r9a')){C.items.push({ver:'r9a',id:'pack5',area:'race',text:'rev9 #1 / N5 · a pack of 5 in every city race: 📍 GO races the human-like bot in Westend, Grand Prix, River Run (fra) and the Akropolis final (ath), one GO each. Pass line: 5 racers, HUD POS n/5, bot 1st-3rd, ≥ 3 lead changes among all 5, max gap ahead and behind < 120 m (sampled each second while the bot drives > 15 m/s, against its furthest progress), no rival stalled > 10 s.'});
  (C.GO['r9a/pack5']=C.GO['r9a/pack5']||[]).push(...[['fra','Westend','west'],['fra','Grand Prix','gp'],['fra','River Run','river'],['ath','Akropolis final','akro']].map(([c,n,w])=>({c,n:'pack of 5: '+n,secs:300,fn:()=>R9A_go(R9A_say,w)})))
+ C.items.push({ver:'r9a',id:'pack5-warm',area:'race',text:'rev10 N4 · the pack starts reliably on a warm page: 📍 GO runs 3 races back to back on one page (Westend, Grand Prix, Westend). Pass line: 3 s after the green light every AI has moved > 20 m and the bot > 20 m, and the nemesis never leads by more than 150 m in the next 60 s.'});
+ (C.GO['r9a/pack5-warm']=C.GO['r9a/pack5-warm']||[]).push({c:'fra',n:'pack warm: 3 races',secs:60,fn:()=>R10D_warm(R9A_say)})
  C.items.push({ver:'r9a',id:'pack-cost',area:'race',text:'r9a-perf · the pack of 5 stays cheap on touch: 📍 GO times the AI update (tkStep with 5 racers minus tkStep with the nemesis only, ms per frame, no graphics) in Westend (fra) and the Akropolis final (ath). Pass line: 5 racers, ≤ 0.5 ms extra per frame. Measured on the 852×393 touch profile: pack +0.1 ms AI, +15 draw calls, median frame +1.5 ms (Westend) / -0.8 ms (Akropolis), same frames > 50 ms.'});
  (C.GO['r9a/pack-cost']=C.GO['r9a/pack-cost']||[]).push(...[['fra','Westend','west'],['ath','Akropolis final','akro']].map(([c,n,w])=>({c,n:'pack cost: '+n,secs:30,fn:()=>R9A_cost(R9A_say,w)})))}return}
  if(i<600)setTimeout(()=>R9A_reg(i+1),100)})(0);
