@@ -4,3 +4,10 @@
 3. Measured (tools/tRot.js, iPhone UA, DPR 3, 852×393↔393×852 ×3 on the built page): composer.setSize 268 → 6, renderer size calls 402 → 6, reloads 0 → 0. The max frame gap cannot be measured in software GL (idle noise 0.8–1.9 s).
 4. Gate: unit 0 FAIL; TAG=rev5fix/rot,life1,xf1,terrain: only xf1/assist red (known xf1/*); rev5fix/rot ✅ (GO in src/99c7_rev5fix.js). Shot after rotating back looked right (full frame, controls clear).
 5. Left: confirm on a real iPhone 17; the "freezes" outside rotation are perf-15's lane (Athens per-frame allocation).
+
+# HANDOFF scale-1 (adaptive quality + any viewport, 2026-10-18)
+1. src/98qg_qgov.js: Graphics = Auto (new default, SET.qm) runs one governor over the existing ladder: render scale 1 → .85 → .7 (DRES.s, may go below 1 css px), then the LK tier high → med → low → min. Down: interval p90 > 22 ms for 3 s; up: interval p90 < 18 and work p90 < 12 ms for 10 s; 5 s warm-up, 2 s settle, failed up doubles the next up wait (10 → 80 s). Settled level saved in mho_gov. Manual Low/Med/High = no governor (old LK auto-drop off; Auto resolution switch still works).
+2. Viewport fix: portrait pedal labels were 11.7 px (15 px × .78 scale) → 16 px. All 10 sizes otherwise passed (fill, buffer/camera aspect, on screen, no HUD over controls).
+3. tools/tChkGo.js: GOs can call window.__cdp(method,params) (CPU throttle) and window.__vp(w,h); both are undone after every item.
+4. GOs (src/99c7_rev5fix.js): scale1/gov-cpu (4× CPU → down@.85, up about 12 s after the throttle is removed), scale1/gov-hyst (warm-up, order, 30 fps cap, 170 s of flip-flops make ≤ 4 steps, manual holds), scale1/vp (10 sizes). All ✅. Shots at 360×640 and 2560×1080 looked right.
+5. Left: check on a real iPhone and a PC that Auto settles where it should. On ultrawide the fixed-px HUD looks small and the km/h readout sits on the car (existing layout, r9b's HUD area).

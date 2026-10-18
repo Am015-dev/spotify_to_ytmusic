@@ -38,3 +38,45 @@ function R5F_ok(){return 1}   // lazy-chunk stub export (src/LAZY lists it)
   return`📍 NEAR CANOPY · ${T.t} crown r ${cr[0].toFixed(1)} m: camera ${(cr[0]+1.5).toFixed(1)} m away looking at it → ${a?'hidden':'SHOWN'}, looking away → ${b?'HIDDEN':'kept'}, from 14 m → ${c2?'HIDDEN':'kept'} (near rule fired ${FC.near-n0}×) → ${a&&!b&&!c2?'✅ PASS':'❌ FAIL'}`}}];
  return}
  if(i<600)setTimeout(()=>R8C_reg(i+1),100)})(0);
+// scale-1 (2026-10-18): adaptive quality governor (src/98qg_qgov.js) + any-viewport sweep. GOs scale1/gov-cpu (real CPU throttle through tChkGo's __cdp bridge), scale1/gov-hyst, scale1/vp.
+(function SC1_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='scale1'))C.items.push(
+{ver:'scale1',id:'gov-cpu',area:'perf',text:'scale-1 · Graphics Auto governor under a real slow CPU: 📍 GO turns Auto on, throttles the CPU 4× (CDP), then removes the throttle. Pass line: at least one step down while throttled (render scale first), and at least one step back up within 30 s after the throttle is removed.'},
+{ver:'scale1',id:'gov-hyst',area:'perf',text:'scale-1 · governor rules on fed frame times: 📍 GO feeds frames. Pass line: no step in the first 5 s; 3 s of p90 > 22 ms → render scale 1 → .85 → .7 before any tier drop; a 30 fps cap is left alone; 10 s fast → one step up; a slow/fast flip-flop for 170 s makes ≤ 4 steps; a manual Graphics choice never moves.'},
+{ver:'scale1',id:'vp',area:'phone',text:'scale-1 · any viewport: 📍 GO resizes the page to 10 phone/tablet/PC sizes (360×640 … 2560×1080). Pass line at each: the canvas fills the window, the drawing buffer and camera aspect match it, every HUD item and control is on screen, no HUD item overlaps a touch control, and no visible text is under 12 px.'});
+ const G=()=>window.__gov.GOV,SV=()=>{const g=G();return{qm:SET.qm,q:SET.q,u:LK.userQ,d:LK.drop,e:LK.effQ,ds:DRES.s,on:g.on,s:g.s,gd:g.d,th:Object.assign({},g.th),fz:RO.frozen,log:g.log.length}},RS=o=>{const g=G();g.on=false;g.test=null;g.th=o.th;g.s=o.s;g.d=o.gd;SET.qm=o.qm;LK.userQ=o.u;LK.drop=o.d;LK.effQ=o.e;DRES.s=o.ds;if(SET.q!==o.q){SET.q=o.q;try{applyQuality()}catch(e){}LK.userQ=o.u;LK.drop=o.d}try{LK_apply()}catch(e){}RO.frozen=o.fz;resize()};
+ C.GO['scale1/gov-cpu']=[{c:'fra',n:'governor steps down on a 4× slow CPU and back up after',secs:45,fn:()=>{if(typeof window.__cdp!=='function')return'📍 GOV CPU · needs tools/tChkGo.js (CDP bridge window.__cdp) ❌ FAIL';const o=SV(),g=G();
+  RO.frozen=true;SET.qm='auto';g.s=1;g.d=Math.max(0,LK_LV.indexOf(LK_lvl()));GOV_set(true);g.warm=5000;const n0=g.log.length,t0=performance.now();let ph=0,tD=0,b0=null,bT=null,done=false;
+  const fin=(ok,why)=>{if(done)return;done=true;clearInterval(iv);window.__cdp('Emulation.setCPUThrottlingRate',{rate:1});const L=g.log.slice(n0).map(x=>x[0]+'@'+x[2]+'/'+x[3]).join(' ');RS(o);goSay(`📍 GOV CPU · base p90 ${b0?b0.p90+' ms (work '+b0.b90+')':'?'} → 4× CPU p90 ${bT?bT.p90+' ms (work '+bT.b90+')':'?'} · steps: ${L||'none'} · ${why} → ${ok?'✅ PASS':'❌ FAIL'}`)};
+  const iv=setInterval(()=>{const t=performance.now()-t0,L=g.log.slice(n0);
+   if(ph===0){if(g.last&&t>2500){b0=g.last;ph=1;window.__cdp('Emulation.setCPUThrottlingRate',{rate:4})}else if(t>8000)fin(false,'no frames measured')}
+   else if(ph===1){if(L.some(x=>x[0]==='down')){bT=g.last;ph=2;tD=t;window.__cdp('Emulation.setCPUThrottlingRate',{rate:1})}else if(t>20000)fin(false,'no step down while throttled')}
+   else if(ph===2){const d=L.findIndex(x=>x[0]==='down'),u=L.findIndex((x,k)=>k>d&&x[0]==='up');if(u>=0)fin(L[0][2]<1,'down then up '+((t-tD)/1000).toFixed(1)+' s after the throttle was removed');else if(t-tD>30000)fin(false,'no step up within 30 s of removing the throttle')}},250);
+  return'📍 GOV CPU · measuring…'}}];
+ C.GO['scale1/gov-hyst']=[{c:'fra',n:'governor rules: warm-up, order, 30 fps cap, hysteresis, manual',fn:()=>{const o=SV(),g=G(),f=(ms,b,sec)=>{const n=Math.round(sec*1000/ms);for(let k=0;k<n;k++)GOV_feed(ms,b)},R=[];
+  try{const S0=st=>{SET.qm='auto';g.s=1;g.d=0;GOV_set(true);g.th={dn:22,upP:18,upB:12}};
+   S0();f(40,30,4.5);R.push(['warm-up',g.log.length===o.log]);
+   S0();g.warm=5000;const n1=g.log.length;f(40,30,3.6);const a=g.s;f(40,30,6.2);const b=g.s,bq=g.d;f(40,30,6.2);R.push(['order 1→.85→.7→tier ('+[a,b,bq,g.d,g.log.length-n1]+')',a===.85&&b===.7&&bq===0&&g.d===1&&g.log.length-n1===3]);
+   S0();g.warm=5000;const n2=g.log.length;f(33.3,8,20);R.push(['30 fps cap left alone',g.log.length===n2]);
+   S0();g.warm=5000;g.s=.85;GOV_apply(0);const n3=g.log.length;f(16.7,6,9.5);const pre=g.log.length===n3;f(16.7,6,3);R.push(['10 s fast → one up',pre&&g.log.length===n3+1&&g.s===1]);
+   S0();g.warm=5000;g.s=.7;g.d=1;GOV_apply(0);const n4=g.log.length;for(let k=0;k<10;k++){f(16.7,6,12);f(40,30,5)}const fl=g.log.length-n4;R.push(['flip-flop 170 s: '+fl+' steps',fl<=4]);
+   SET.qm='med';GOV_pick();const q0=SET.q,p0=renderer.getPixelRatio(),n5=g.log.length;f(60,50,20);R.push(['manual stays',!g.on&&g.log.length===n5&&SET.q===q0&&renderer.getPixelRatio()===p0&&LK_lvl()==='med'])}
+  finally{RS(o)}
+  const ok=R.every(r=>r[1]);return`📍 GOV RULES · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}];
+ C.GO['scale1/vp']=[{c:'fra',n:'10 viewports: fill, aspect, HUD in safe area, no overlap, text ≥ 12 px',secs:30,fn:()=>{if(typeof window.__vp!=='function')return'📍 VIEWPORTS · needs tools/tChkGo.js (window.__vp) ❌ FAIL';
+  const SZ=[[360,640],[640,360],[393,852],[852,393],[430,932],[820,1180],[1180,820],[1280,720],[1920,1080],[2560,1080]],out=[];let i=0;
+  const step=()=>{if(i>=SZ.length){const bad=out.filter(r=>r.err.length);goSay(`📍 VIEWPORTS · ${out.length} sizes, ${bad.length} bad${bad.length?': '+bad.map(r=>r.w+'×'+r.h+' '+r.err.slice(0,4).join(', ')).join(' | '):''} → ${!bad.length&&out.length===SZ.length?'✅ PASS':'❌ FAIL'}`);return}
+   const [w,h]=SZ[i++];window.__vp(w,h).then(()=>{const t0=performance.now(),wt=()=>{if((RZ.w!==innerWidth||RZ.h!==innerHeight||performance.now()-RZ.t<1000||Math.abs(camera.aspect-innerWidth/innerHeight)>.01)&&performance.now()-t0<3500){setTimeout(wt,100);return}setTimeout(()=>{try{out.push(SC1_vpCheck(w,h))}catch(e){out.push({w,h,err:['threw '+e.message]})}step()},150)};setTimeout(wt,300)})};step();return'📍 VIEWPORTS · resizing…'}}];
+ return}
+ if(i<600)setTimeout(()=>SC1_reg(i+1),100)})(0);
+// one viewport: canvas fill + aspect, HUD/control rects on screen, no HUD over a touch control, visible text ≥ 12 px
+function SC1_vpCheck(w,h){const err=[],cv=renderer.domElement,r=cv.getBoundingClientRect(),W=innerWidth,H=innerHeight;
+ if(Math.abs(r.left)>1||Math.abs(r.top)>1||Math.abs(r.width-W)>1||Math.abs(r.height-H)>1)err.push(`canvas ${Math.round(r.width)}×${Math.round(r.height)}`);
+ if(Math.abs(cv.width/cv.height-W/H)>.02*W/H)err.push('buffer aspect '+(cv.width/cv.height).toFixed(2));if(Math.abs(camera.aspect-W/H)>.01*W/H)err.push('camera aspect '+camera.aspect.toFixed(2));
+ const vis=e=>{if(!e||!e.getClientRects().length)return false;for(let q=e;q&&q!==document.body;q=q.parentElement){const cs=getComputedStyle(q);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity===0||q.hidden)return false}return true};
+ const FULL=new Set(['roam','hud','touch','speedFx','warpFade','flash','cine','steerZone','btnZone','topBtns','msg','sub','hitPop','rotateHint','roamPop','roamArrow']);
+ const CT=['tL','tR','tG','tB','tF','tN','tD','tP','steerRail'].map(id=>document.getElementById(id)).filter(vis).map(e=>[e.id,e.getBoundingClientRect()]);
+ const HU=[...document.querySelectorAll('#roam [id], #hud [id], #topBtns [id], #topBtns')].filter(e=>!FULL.has(e.id)&&!e.closest('#touch')&&vis(e)).map(e=>[e.id,e.getBoundingClientRect()]).filter(x=>x[1].width*x[1].height>4);
+ for(const [id,b]of CT.concat(HU))if(b.left<-1||b.top<-1||b.right>W+1||b.bottom>H+1)err.push(id+' off-screen');
+ for(const [hi,a]of HU)for(const [ci,b]of CT){const ox=Math.min(a.right,b.right)-Math.max(a.left,b.left),oy=Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top);if(ox>2&&oy>2)err.push(hi+' over '+ci)}
+ const tw=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n,small=0,sm='';while(n=tw.nextNode()){if(!/[\p{L}\p{N}]/u.test(n.nodeValue))continue;const e=n.parentElement;if(!e.closest('#roam,#hud,#touch,#topBtns')||!vis(e))continue;const fs=parseFloat(getComputedStyle(e).fontSize),k=e.offsetHeight?e.getBoundingClientRect().height/e.offsetHeight:1;if(fs*k<11.9){small++;if(!sm)sm=(e.id||e.className||e.tagName)+(e.id?'':'<'+(e.parentElement.id||e.parentElement.className))+' "'+n.nodeValue.trim().slice(0,10)+'" '+(fs*k).toFixed(1)+'px'}}
+ if(small)err.push(small+' small text ('+sm+')');return{w,h,err}}

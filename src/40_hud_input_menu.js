@@ -106,7 +106,7 @@ function closeSettings(){$('#settings').hidden=true;RO.frozen=!!(RO.jOpen||RO.pO
 function buildSettings(){const B=$('#setBody');B.innerHTML='';
   const seg=(label,key,opts,after)=>{const el=document.createElement('div');el.className='seg';el.innerHTML=`<span>${label}</span>`;for(const[v,l]of opts){const b=document.createElement('button');b.textContent=l;b.setAttribute('aria-pressed',SET[key]===v);b.onclick=()=>{SET[key]=v;saveSet();if(after)after();buildSettings()};el.appendChild(b)}B.appendChild(el)};
   const sl=(label,key)=>{const el=document.createElement('label');el.className='sl';el.innerHTML=`<span>${label}</span><input type="range" min="0" max="1" step="0.05" value="${SET[key]}"><output>${Math.round(SET[key]*100)}</output>`;const i=el.querySelector('input'),o=el.querySelector('output');i.oninput=()=>{SET[key]=+i.value;o.textContent=Math.round(SET[key]*100);saveSet();AU.setVol()};B.appendChild(el)};
-  seg('Graphics','q',[['low','Low'],['med','Medium'],['high','High']],applyQuality);
+  seg('Graphics','qm',[['auto','Auto'],['low','Low'],['med','Medium'],['high','High']],()=>GOV_pick());
   seg('Resolution','res',[['auto','By graphics'],['std','Standard'],['sharp','Sharp'],['max','Max']],()=>{DRES.s=1;resize()});
   seg('Auto resolution','dres',[['on','On'],['off','Off']],()=>{DRES.s=1;DRES.t=DRES.n=DRES.sum=0;resize()});
   seg('Motion FX','fx',[['full','Full'],['reduced','Reduced'],['off','Off']]);
