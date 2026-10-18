@@ -1,3 +1,10 @@
+## perf-12 (2026-10-18, alex/perf12-wip -> alex/od-int2): DEST scan budget + QA prop grid
+1. The DEST probes (roamHit/roamTerr/DEST_open/groundAt/GND_far) run Maglev-compiled, never TurboFan (%GetOptimizationStatus 0b101001), so every double at calls and phis is boxed; inlining bHit and an inline deck bbox reject in roamTerr did NOT cut MB. The Athens scan is one-off (22.7k nodes, ~35 s at 4 ms/frame); it now gets DEST_BUDGET=1.5 ms/frame (~90 s, same result; GO/tests use DEST_find(1e9)).
+2. QA invariants: the prop_on_road check walks HUB.pgrid within 60 m instead of all ~130k HUB.props every 0.5 s (cold code, so it boxed and allocated iterators).
+3. A/B SECS=10 HEAP=1 RACE=0, 2 runs each (runs in parallel, so the ms numbers are noisy): Athens 2604/2650 -> 2164/2140 MB (263 -> 215 MB/s), med/p95/max 23.3/67/310, 24.1/69/461 -> 21.8/70/412, 20.9/72/264; Frankfurt 2164/2273 -> 1919/2064 MB (222 -> 199 MB/s), 17.8/56/350, 16.2/51/359 -> 17.3/46/476, 15.9/37/311. Target 150 MB/s NOT met.
+4. Gate on the built page: unit 0 FAIL; TAG=life1,xf1,terrain,smash2,cam,mem,perf5 49/56, reds are known only (mem/stable, xf1/* x5, life1/people); smash2 is green. There is no dest tag.
+5. Next: what is left is LF_drapeOk/LF_tileG (perf-10 lane), so the DEST scan can only get 0 garbage by moving it off the frame (a worker, or caching the result per city+nodes hash); also athRoadD, cityAt and WB_tpl.
+
 ## perf-11 (2026-10-18, alex/perf11-wip -> alex/od-int2): allocation-sampling rank + LIFE_at / GND_far fixes
 Athens q=high, trunk p11base, 15 s roam, CDP HeapProfiler.startSampling 32768 (tFrame HEAP=1 HEAPINT=32768), 3895 MB sampled; self-size summed per function over the top-40 stacks:
 | # | function (src) | MB | main caller |
