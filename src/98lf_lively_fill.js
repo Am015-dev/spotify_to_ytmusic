@@ -110,10 +110,12 @@ function LF_patchMat(){return LF.pm||(LF.pm=new THREE.MeshStandardMaterial({vert
 const LF_U2=[.97,.5],LF_SX=new Float64Array(256),LF_SZ=new Float64Array(256),LF_SY=new Float64Array(256);LF.gyb=!/[?&]lfb=0\b/.test(location.search);
 function LF_gyB(X,Z,Y,n){if(!n)return;if(CID==='fra'||!LF.gyb){for(let i=0;i<n;i++)Y[i]=groundY(X[i],Z[i])+LF_mound(X[i],Z[i]);return}
  TR_G(X[0],Z[0]);const h=TR_h,nx=TR_nx,nz=TR_nz,r=TR_r,MG=LF.MG,mg=MG.size>0;
- for(let i=0;i<n;i++){const x=X[i],z=Z[i];let fx=(x-WX0)/r,fz=(z-WZS)/r;fx=fx<0?0:fx>nx-1.001?nx-1.001:fx;fz=fz<0?0:fz>nz-1.001?nz-1.001:fz;const a=fx|0,b=fz|0,tx=fx-a,tz=fz-b,k=b*nx+a;
-  let g=(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+nx]*(1-tx)+h[k+nx+1]*tx)*tz;
-  if(SHELF.has(Math.floor(x/32)*100000+Math.floor(z/32)))g=athShelfY(x,z,g);
-  if(mg&&MG.has(Math.floor(x/64)*10000+Math.floor(z/64)))g+=LF_mound(x,z);Y[i]=g}}
+ /* no reassigned double locals (Maglev boxes double phis): clamps as min/max, the result goes straight to Y */
+ const mx=nx-1.001,mz=nz-1.001;
+ for(let i=0;i<n;i++){const x=X[i],z=Z[i],fx=Math.min(Math.max((x-WX0)/r,0),mx),fz=Math.min(Math.max((z-WZS)/r,0),mz),a=fx|0,b=fz|0,tx=fx-a,tz=fz-b,k=b*nx+a;
+  Y[i]=(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+nx]*(1-tx)+h[k+nx+1]*tx)*tz;
+  if(SHELF.has(Math.floor(x/32)*100000+Math.floor(z/32)))Y[i]=athShelfY(x,z,Y[i]);
+  if(mg&&MG.has(Math.floor(x/64)*10000+Math.floor(z/64)))Y[i]+=LF_mound(x,z)}}
 function LF_resid(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,x0=p.x,z0=p.z,SX=LF_SX,SZ=LF_SZ,SY=LF_SY;
  SX[0]=x0;SZ[0]=z0;SX[1]=x0+d;SZ[1]=z0;SX[2]=x0-d;SZ[2]=z0;SX[3]=x0;SZ[3]=z0+d;SX[4]=x0;SZ[4]=z0-d;let m=5;
  for(let i=0;i<LF_PPOLY.length;i++){const q=LF_PPOLY[i];for(let j=0;j<2;j++){const u=LF_U2[j],a=q[0]*p.sx*u,b=q[1]*p.sz*u;SX[m]=x0+(c*a+s*b);SZ[m]=z0+(-s*a+c*b);m++}}
