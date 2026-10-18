@@ -58,7 +58,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
     { fresh(); PW.give('echo', false); PW.give('nova', false); out.ex1 = G().pw.act.map(a => a.k).join(); PW.give('drum', false); out.ex2 = G().pw.act.map(a => a.k).join(); PW.give('wing', false); out.ex3 = G().pw.act.map(a => a.k).join();
       out.len = G().pw.act[0].d; const b0 = bars.length; for (let i = 0; i < 60 * 90 && PW.on('wing'); i++) step(1); out.ended = !PW.on('wing'); out.barsLasted = bars.length - b0; }
     // tips: first time long, once
-    { fresh(); PW.give('echo', false); out.tip1 = G().hint && G().hint.t; PW.give('echo', false); out.tip2 = G().hint && G().hint.t; out.tipTxt = G().hint.txt; }
+    { fresh(); PW.give('echo', false); out.tip1 = G().hint && G().hint.t; G().pw.act.length = 0; PW.give('echo', false); out.tip2 = G().hint && G().hint.t; out.tipTxt = G().hint.txt; }
     // ECHO
     { const a = give('echo'); const g0 = P2.stat.echo; const f0 = fires.length; step(60 * 8); const fp = fires.slice(f0).filter(x => x).length; out.echo = { ghosts: P2.stat.echo - g0, onBeatShots: fp }; }
     // NOVA: a bullet near the ship at a bar line is cleared, an enemy takes light damage

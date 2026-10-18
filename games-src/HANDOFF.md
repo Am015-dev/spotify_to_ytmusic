@@ -522,3 +522,10 @@ Next: owner supplies the art; tune `RIG.hp` once the real ship pictures are chec
 
 ## Nightrun boss length tune (18 Oct 2026, worker nr-bosstune)
 Cause of the extra boss time: damage above the cap was thrown away (the bot's damage comes in bursts), hard.js's boss repair ate damage, and the 66% core shield froze the bar. Fix in `parts/armour.js` (`BK` overflow bank, `SHT` shield overload, `REP .2`) and `parts/hard.js` (repair only while camping). Numbers: BALANCE.md "Boss fights, round 4b". scale2/scale3/boss2 tests pass (Legend final window back at 170-260 s). Known, not from this change: scale3 "dodging bot Legend maxed 20/30/40" 0% (bot dies in the first 20-55 s of stage 40, same with `?boss2=0`) and "fresh ship dps no cut" 81.7 vs 79.1; weapon-test "wave alone LV10 clears stage 1" fails; afk-test fails (Hard dodging bot dies at 37 s, stage 42 dies at 25-34 s, no boss involved); it failed before this change too.
+
+## Nightrun shooter power-ups with levels (W4, 18 Oct 2026)
+- `nightrun/parts/powlevels.js`, flag `RET.pw3` (`?pw3=0` = the old powers). Loaded after `armour.js`; four small `window.PW3` hook lines in `powerups.js`, one in `stats.js`.
+- Level table `PW3L` at the top of powlevels.js (LV1-5 per power). Same power again while running or within 4 bars of its end = +1 level, timer back to 8 bars; a real hit = -1 (min 1); an absorbed hit costs nothing.
+- Leveled: ECHO, NOVA, MAGNET, WINGMATES, CRESCENDO, CHORD SHIELD, DRUM BURST (its LV3/LV5 shots are g.js's, driven by `a.lv`). New: BOMB STOCK, HEAVY CRATE, RICOCHET (uses b.js `b.rc`), TIME SLICE (wraps `RET.asB`, never the beat clock), LIFE LEECH (1 hull per 20 s, 30 s on hard tiers). TEMPO UP / SLOW GROOVE / DROP keep g.js's longer-timer levels.
+- Drop table: stages 1-2 old pool; first 4 drops of a later stage = 3 new + 2 old; Endless everything. Best level per power: `mnr_pw3` (export list, Stats sheet). No Flight School power list existed, so no text change there.
+- Gate: `ret-pw3-test.js` (+ `ret-pw2-test.js`, whose tip check now ends the first ECHO before the second pickup). Damage all goes through `e.hp` / `DMG.hit` / `pbRoom`, so hard.js and armour.js ceilings apply.

@@ -23,7 +23,7 @@ const PW2=PW.p2={stat:{echo:0,echoHit:0,nova:0,novaClr:0,novaHit:0,pull:0,wing:0
   act(k){const s=G&&G.pw;return s?s.act.find(a=>a.k===k)||null:null;},
   any(){const s=G&&G.pw;return !!(s&&s.act.some(a=>PW2.K[a.k]));},
   st(){return G.p2||(G.p2={ech:[],trl:[],nv:null,mp:[],wm:[{x:0,y:0},{x:0,y:0}],h:null,rel:null,fl:[]});},
-  cresK(){const a=PW2.act('cres');return a?1+.12*Math.min(5,a.bars|0):1;}
+  cresK(){const a=PW2.act('cres');return a?(window.PW3&&PW3.on?PW3.cresK(a):1+.12*Math.min(5,a.bars|0)):1;}
 };
 if(RET.pw2){
   for(const k in PW2.K)PWK[k]={n:PW2.K[k].n,tip:PW2.K[k].tip,c:PW2.K[k].c,bars:8,w:2,pw2:1};
@@ -46,31 +46,31 @@ if(RET.pw2){
     if(!PW.on('echo')){s.ech.length=0;}
     else for(let i=s.ech.length-1;i>=0;i--){const g=s.ech[i];if(G.bc<g.at)continue;s.ech.splice(i,1);
       if(typeof pbRoom==='function'&&!pbRoom(2))continue;
-      const dm=1;G.pb.push({x:g.x,y:g.y-4,vx:900,vy:-24,dm,pf:0,gh:1},{x:g.x,y:g.y+4,vx:900,vy:24,dm,pf:0,gh:1});
+      const dm=1,n0=G.pb.length;G.pb.push({x:g.x,y:g.y-4,vx:900,vy:-24,dm,pf:0,gh:1},{x:g.x,y:g.y+4,vx:900,vy:24,dm,pf:0,gh:1});if(window.PW3&&PW3.on)PW3.echoGhost(n0);   // powlevels.js: ghost level
       s.trl.push({x:g.x,y:g.y,l:.32,m:.32});PW2.stat.echo++;PW2.note(5+(G.bc%3),.14,.07,'square',0,24);}});
   /* ----- DOWNBEAT NOVA, CHORD SHIELD release ----- */
-  NR.on('bar',()=>{if(!G.live||G.dead||!PW.on('nova'))return;const s=PW2.st();s.nv={x:P.x,y:P.y,r:0,R:230,hit:new Set(),dm:5};PW2.stat.nova++;
+  NR.on('bar',()=>{if(!G.live||G.dead||!PW.on('nova'))return;const s=PW2.st();s.nv={x:P.x,y:P.y,r:0,R:230,hit:new Set(),dm:5};if(window.PW3&&PW3.on)PW3.novaTag(s.nv);PW2.stat.nova++;
     PW2.note(0,.5,.1,'sawtooth',0,12);PW2.note(7,.35,.07,'triangle',0,24);try{if(AU.a&&AU.a.state==='running')AU.osc(AU.a.currentTime+.003,'sine',110,.3,.5,AU.musv,40);}catch(e){}});
   NR.on('beat',()=>{if(!G.live||G.dead)return;const s=G.p2,a=PW2.act('chord');if(!s||!a||!a.used||a.rel)return;a.rel=true;   // the next beat after the hit
     s.nv={x:P.x,y:P.y,r:0,R:170,hit:new Set(),dm:4,ch:1};PW2.stat.chordRel++;
     for(const [i,dl] of [[0,0],[2,.03],[4,.06],[7,.09]])PW2.note(i,.7,.08,'triangle',AU.a?AU.a.currentTime+dl:0,24);
     {const j=G.pw.act.indexOf(a);if(j>=0){G.pw.act.splice(j,1);PW.stat.ended++;}}});
   {const ab=SH.absorb;SH.absorb=function(){const a=PW2.act('chord');
-    if(a&&!a.used&&!G.dead){a.used=true;P.inv=Math.max(P.inv,1.3);shake(8);G.flash=Math.max(G.flash,.14*FX());burst(P.x,P.y,PWK.chord.c,26,320,.5);floater(P.x,P.y-24,'CHORD SHIELD',PWK.chord.c);AU.sfx('hurt');PW2.stat.chord++;PW2.note(0,.25,.1,'sawtooth',0,12);return true;}
+    if(a&&!a.used&&!G.dead){a.used=true;if(window.PW3&&PW3.on)PW3.chordUse(a);P.inv=Math.max(P.inv,1.3);shake(8);G.flash=Math.max(G.flash,.14*FX());burst(P.x,P.y,PWK.chord.c,26,320,.5);floater(P.x,P.y-24,'CHORD SHIELD',PWK.chord.c);AU.sfx('hurt');PW2.stat.chord++;PW2.note(0,.25,.1,'sawtooth',0,12);return true;}
     return ab.call(this);};}
   /* ----- MAGNET BASS, WINGMATES, nova ring, ghost trails (per frame) ----- */
   NR.on('tick',dt=>{if(!G.live||G.dead)return;const s=PW2.any()?PW2.st():G.p2;
-    if(PW.on('magb')){const e=Math.pow(1-PHF,2.5);for(const p of G.pk){if(p.dead)continue;const dx=P.x-p.x,dy=P.y-p.y,l=Math.hypot(dx,dy);if(l<8||l>640)continue;
-      const v=(150+950*e)*dt;p.x+=dx/l*v;p.y+=dy/l*v;if(e>.5)PW2.stat.pull++;}}
+    if(PW.on('magb')){const e=Math.pow(1-PHF,2.5);for(const p of G.pk){if(p.dead)continue;const dx=P.x-p.x,dy=P.y-p.y,l=Math.hypot(dx,dy);if(l<8||l>(window.PW3&&PW3.on?PW3.magR():640))continue;
+      const v=(150+950*e)*dt*(window.PW3&&PW3.on?PW3.magK():1);p.x+=dx/l*v;p.y+=dy/l*v;if(e>.5)PW2.stat.pull++;}}
     if(!s)return;
     if(PW.on('wing')){if(!s.wm.on){s.wm[0].x=s.wm[1].x=P.x-10;s.wm[0].y=s.wm[1].y=P.y;s.wm.on=1;}
       s.wm.forEach((w,i)=>{const tx=P.x-6,ty=P.y+(i?36:-36);w.x+=(tx-w.x)*Math.min(1,dt*9);w.y+=(ty-w.y)*Math.min(1,dt*9);});
-      const h=Math.floor(bpos()*2);if(s.h==null)s.h=h;if(h!==s.h){s.h=h;if(h%2&&(typeof pbRoom!=='function'||pbRoom(2))){for(const w of s.wm)G.pb.push({x:w.x+10,y:w.y,vx:900,vy:0,dm:.8,pf:0,gh:1});PW2.stat.wing++;PW2.note(7+(h>>1)%3,.1,.06,'square',0,36);}}}
+      const h=Math.floor(bpos()*2);if(s.h==null)s.h=h;if(h!==s.h){s.h=h;if(h%2&&(typeof pbRoom!=='function'||pbRoom(2))){const n0=G.pb.length;for(const w of s.wm)G.pb.push({x:w.x+10,y:w.y,vx:900,vy:0,dm:.8,pf:0,gh:1});if(window.PW3&&PW3.on)PW3.wingShot(n0);PW2.stat.wing++;PW2.note(7+(h>>1)%3,.1,.06,'square',0,36);}}}
     else{s.wm.on=0;s.h=null;}
     const n=s.nv;if(n){n.r+=dt*720;
       for(const b of G.eb){if(!b.dead&&Math.hypot(b.x-n.x,b.y-n.y)<n.r+(b.r||4)){b.dead=1;G.score+=5;PW2.stat.novaClr++;}}
       for(const e of G.en){if(e.hp<=0||e.dying||e.gr||n.hit.has(e))continue;if(Math.hypot(e.x-n.x,e.y-n.y)<n.r+e.r&&(e.type!=='boss'||e.x<W-20)){n.hit.add(e);e.hp-=e.type==='boss'?n.dm*.6:n.dm;e.flash=.1;PW2.stat.novaHit++;}}
-      if(n.r>=n.R){s.nv=null;}}
+      if(n.r>=n.R){if(window.PW3&&PW3.on)PW3.novaEnd(n);s.nv=null;}}
     for(const t of s.trl)t.l-=dt;s.trl=s.trl.filter(t=>t.l>0);for(const f of s.fl)f.l-=dt;s.fl=s.fl.filter(f=>f.l>0);});
   /* ----- MAGNET pulse sound + visual, CRESCENDO ----- */
   NR.on('beat',()=>{if(!G.live||G.dead)return;
