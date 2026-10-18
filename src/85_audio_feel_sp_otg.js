@@ -176,7 +176,9 @@ function FL_apply(t,force){const m=FL_at(t);m.id=t<.22||t>=.82?'night':t<.28?'da
   const idCh=!MOOD||MOOD.id!==m.id;MOOD=m;applyMoodMaterials();if(idCh)ENVD=true;
   const n=Math.min(1,Math.max(0,m.lamps));FL.n=n;FL_emis(n,force);if(cloudsOn&&typeof CLOUDS!=='undefined'&&CLOUDS)CLOUDS.visible=n<.6}
 // window/lamp emissives: scan hub materials once in a while (the city streams in lazily), scale from their base
-function FL_emis(n,force){if(!HUB.grp)return;FL.scanT-=1;if(FL.scanT<=0||force){FL.scanT=40;HUB.grp.traverse(o=>{if(!o.isMesh)return;const ms=Array.isArray(o.material)?o.material:[o.material];for(const mt of ms)if(mt&&mt.emissiveMap&&!FL.mats.has(mt)&&mt.emissive&&mt.emissive.r>.5)FL.mats.set(mt,mt.emissiveIntensity)})}
+function FL_emis(n,force){if(!HUB.grp)return;FL.scanT-=1;const scan=o=>{if(!o.isMesh)return;const ms=Array.isArray(o.material)?o.material:[o.material];for(const mt of ms)if(mt&&mt.emissiveMap&&!FL.mats.has(mt)&&mt.emissive&&mt.emissive.r>.5)FL.mats.set(mt,mt.emissiveIntensity)};
+  /* perf-17: the periodic re-scan walks one top-level hub group per apply (round robin) instead of the whole hub in one frame (up to 112 ms once in Athens); force still walks all */
+  if(force&&!FL.scanned){FL.scanned=1;FL.scanT=40;HUB.grp.traverse(scan)}else if(force)FL.scanT=0;if(FL.scanT<=0){const K=HUB.grp.children,c=K[(FL.scanI=((FL.scanI|0)+1))%Math.max(1,K.length)];if(c)c.traverse(scan);if(FL.scanI%Math.max(1,K.length)===0)FL.scanT=40}
   const k=.55+2.1*n;for(const[mt,b]of FL.mats){const v=b*k;if(Math.abs(mt.emissiveIntensity-v)>1e-3)mt.emissiveIntensity=v}
   const g=HUB.lampGlow;if(g){if(!FL.lc)FL.lc=g.color.clone();g.color.setRGB(.55,.52,.45).lerp(FL.lc,n)}
   FL_headlights(n)}
@@ -187,7 +189,7 @@ function FL_headlights(n){if(!HUB.grp||!HUB.cars)return;let H=FL.hl;const N=HUB.
     const L=[cbox(.42,.26,.12,-.72,.85,2.25,'#fff6d8'),cbox(.42,.26,.12,.72,.85,2.25,'#fff6d8'),cbox(.36,.2,.1,-.74,.9,-2.25,'#ff2a20'),cbox(.36,.2,.1,.74,.9,-2.25,'#ff2a20')];
     const beam=new THREE.PlaneGeometry(3.4,11).rotateX(-Math.PI/2).translate(0,.12,8);const bc=new Float32Array(beam.attributes.position.count*3);for(let i=0;i<beam.attributes.position.count;i++){const zz=beam.attributes.position.getZ(i),k=zz<5?.32:.04;bc.set([k,k*.92,k*.75],i*3)}beam.setAttribute('color',new THREE.BufferAttribute(bc,3));L.push(beam);
     const mat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false,color:0x000000,fog:true});
-    H=FL.hl=new THREE.InstancedMesh(mergeG(L),mat,N+8);H.frustumCulled=false;H.renderOrder=2;HUB.grp.add(H);H.userData.keep=1}
+    H=FL.hl=new THREE.InstancedMesh(mergeG(L),mat,N+48);/* perf-17: headroom, so traffic growing does not rebuild it mid-drive */H.frustumCulled=false;H.renderOrder=2;HUB.grp.add(H);H.userData.keep=1}
   H.material.color.setScalar(2.4*n);let j=0;
   if(pl&&RO.on){FL_hq.setFromAxisAngle(FL_hy,RO.h);FL_hm.compose(FL_hv.set(RO.x,RO.y,RO.z),FL_hq,FL_hs.set(1.2,1.2,1.25));H.setMatrixAt(j++,FL_hm)}
   for(const c of HUB.cars){if(c.dead>0)continue;const im=HUB.cim[c.k];if(!im)continue;im.getMatrixAt(c.j,FL_hm);H.setMatrixAt(j++,FL_hm)}
