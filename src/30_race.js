@@ -122,11 +122,15 @@ function debris(at,vel,n,cols,size=1,floor){if(!DEB)return;size=Math.min(size,1)
     DEB.list.push({i,p:at.clone().add(V3(rr(-1.2,1.2),rr(0,1),rr(-1.2,1.2))),v:vel.clone().add(V3(rr(-11,11),rr(5,17),rr(-11,11))).clampLength(0,22),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-10,10),rr(-10,10),rr(-10,10)),
       s:V3(rr(.45,.9),rr(.35,.65),rr(.45,.9)).multiplyScalar(size),life:rr(1,1.5),floor:Math.min(floor??at.y-1.2,at.y)});DEB.im.setColorAt(i,cols[k%cols.length])}DEB.im.instanceColor.needsUpdate=true}
 // burst-1: transform celebration. A fresh instanced-brick group per swap (named brickfx_burst), 0.3 s life, shared geometry, disposed on expiry.
-const XFB=[];let XFB_GEO=null;
-function xfBurst(at,cols){if(!XFB_GEO)XFB_GEO=brickGeo();const n=16,im=new THREE.InstancedMesh(XFB_GEO,new THREE.MeshStandardMaterial({color:0xffffff,roughness:.32,metalness:.05,transparent:true}),n);im.name='brickfx_burst';im.frustumCulled=false;
+// boot-4: materials are pooled (XFB_MP), not disposed: a disposed last user freed the program, so every burst re-linked it (~25-30 s Athens long frames); xfWarm() links it in the loader
+const XFB=[],XFB_MP=[];let XFB_GEO=null;
+function xfMat(){const m=XFB_MP.pop()||new THREE.MeshStandardMaterial({color:0xffffff,roughness:.32,metalness:.05,transparent:true});m.opacity=1;return m}
+function xfWarm(){if(!XFB_GEO)XFB_GEO=brickGeo();const im=new THREE.InstancedMesh(XFB_GEO,xfMat(),16);im.name='brickfx_burst';im.frustumCulled=false;for(let i=0;i<16;i++)im.setColorAt(i,_xfC);return im}
+const _xfC=new THREE.Color(1,1,1);
+function xfBurst(at,cols){if(!XFB_GEO)XFB_GEO=brickGeo();const n=16,im=new THREE.InstancedMesh(XFB_GEO,xfMat(),n);im.name='brickfx_burst';im.frustumCulled=false;
   const L=[];for(let i=0;i<n;i++){im.setColorAt(i,cols[i%cols.length]);const a=i/n*6.283+rr(-.2,.2);L.push({p:at.clone(),v:V3(Math.cos(a)*rr(7,13),rr(5,11),Math.sin(a)*rr(7,13)),q:new THREE.Quaternion().setFromEuler(new THREE.Euler(rr(0,6),rr(0,6),rr(0,6))),w:V3(rr(-14,14),rr(-14,14),rr(-14,14)),k:rr(.35,.6)})}
   scene.add(im);XFB.push({im,L,t:0});AU.sfx('whoosh');shake=Math.max(shake,.22)}
-function updXfb(dt){for(let j=XFB.length-1;j>=0;j--){const b=XFB[j];b.t+=dt;if(b.t>=.34){scene.remove(b.im);b.im.material.dispose();b.im.dispose();XFB.splice(j,1);continue}
+function updXfb(dt){for(let j=XFB.length-1;j>=0;j--){const b=XFB[j];b.t+=dt;if(b.t>=.34){scene.remove(b.im);XFB_MP.push(b.im.material);b.im.dispose();XFB.splice(j,1);continue}
     const f=1-b.t/.34;b.im.material.opacity=Math.min(1,f*2.2);for(let i=0;i<b.L.length;i++){const d=b.L[i];d.v.y-=22*dt;d.p.addScaledVector(d.v,dt);_e2.set(d.w.x*dt,d.w.y*dt,d.w.z*dt);d.q.multiply(_q2.setFromEuler(_e2));_m.compose(d.p,d.q,_s2.setScalar(d.k*(.4+.6*f)));b.im.setMatrixAt(i,_m)}b.im.instanceMatrix.needsUpdate=true}}
 // rev5fix: smash debris fades out within 4 m of the camera (0 at <= 1.5 m): black/white slabs filled ~25 % of the race frame
 function DEB_near(p){const c=camera.position,d=Math.hypot(p.x-c.x,p.y-c.y,p.z-c.z);return d>=4?1:d<=1.5?0:(d-1.5)/2.5}

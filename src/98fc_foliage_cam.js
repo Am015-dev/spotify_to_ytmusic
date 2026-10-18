@@ -73,10 +73,11 @@ function FCG_hit(m,c,far){const g=m.geometry;if(!FCG_ok(g)||!m.layers.test(FC.rc
 function FC_pull(dt){const c=camera.position;
   if(!FC.pull)return;const o=FC.o.set(RO.x,RO.y+1,RO.z),dv=FC.dv.copy(c).sub(o),d=dv.length();if(d<3.2)return;
   if(FC.t-FC.occT>8)FC_occ();if(FCG.on)FCG_work(c,o);
-  FC.rt+=dt;if(FC.rt>=.05){FC.rt=0;const rc=FC.rc;rc.set(c,dv.clone().multiplyScalar(-1/d));rc.far=d-2.2;rc.near=0;let t=-1;   // camera -> car ; the hit nearest the car wins
-   for(const m of FC.occ){const ms=Array.isArray(m.material)?m.material:[m.material],sd=ms.map(q=>q.side);   // both faces: walls that face away from the camera (camera behind a wall) count too
+  FC.rt+=dt;if(FC.rt>=.05){FC.rt=0;const rc=FC.rc;rc.set(c,(FC.rd||(FC.rd=new THREE.Vector3())).copy(dv).multiplyScalar(-1/d));rc.far=d-2.2;rc.near=0;let t=-1;   // camera -> car ; the hit nearest the car wins
+   /* boot-4: no per-occluder arrays / closures / clone at 20 Hz (FC_pull was the top allocator of the first minute); side save in FC.sd, hits in FC.h */
+   const SD=FC.sd||(FC.sd=[]),H=FC.h||(FC.h=[]);for(let oi=0;oi<FC.occ.length;oi++){const m=FC.occ[oi];   // both faces: walls that face away from the camera (camera behind a wall) count too
     if(FCG.on&&!m.isInstancedMesh&&!m.isBatchedMesh){const r=FCG_hit(m,c,rc.far);if(r!==null){if(r>t)t=r;continue}}   // perf-1: grid path (null = not indexed yet / not usable -> three raycast)
-    let h;try{for(const q of ms)q.side=THREE.DoubleSide;h=rc.intersectObject(m,false)}finally{ms.forEach((q,i)=>q.side=sd[i])}for(const x of h)if(x.distance>t)t=x.distance}
+    const mm=m.material,ma=Array.isArray(mm),nm=ma?mm.length:1;H.length=0;try{for(let i=0;i<nm;i++){const q=ma?mm[i]:mm;SD[i]=q.side;q.side=THREE.DoubleSide}rc.intersectObject(m,false,H)}finally{for(let i=0;i<nm;i++)(ma?mm[i]:mm).side=SD[i]}for(let i=0;i<H.length;i++)if(H[i].distance>t)t=H[i].distance}
    FC.hT=t>=0?(FC.hT||0)+.05:0;FC.kt=t>=0&&FC.hT>=.3?Math.max(3/d,Math.min(1,(d-t-.7)/d)):1}   /* rv4A: a wall must stay on the line 0.3 s (a corner clipped while passing is ignored) */
   FC.k=FC.kt<FC.k?Math.max(FC.kt,FC.k-dt*2):Math.min(FC.kt,FC.k+dt*.5);   /* rv4A: eases in at 2/s (was a snap) and out at 0.5/s (was 0.8): road-follow in Athens swung 18/min */
   if(FC.k<.999){FC.off.copy(dv).multiplyScalar(1-FC.k);c.sub(FC.off);FC.pulls++}}

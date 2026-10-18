@@ -41,20 +41,22 @@ function PC_grid(add){
  // perf-7: one 80 m world grid (PC.G = x,y,z,r per cell) tested ONCE per pass into PC.cv; each mesh keeps its own cell lists (C.G = [cell, Int32Array ids]).
  // Incremental: PC_add grids only the new meshes (a full rebuild was 460 ms in Athens on every lazy group); an existing cell keeps its centre and grows its radius.
  if(!add||!PC.M)PC.M=new Map();const M=PC.M;
- for(const C of add||PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
-  C.G=[];for(const[k,L]of T){let q=M.get(k);if(!q){let x=0,y=0,z=0;for(const i of L){x+=C.c[i*4];y+=C.c[i*4+1];z+=C.c[i*4+2]}M.set(k,q={id:M.size,x:x/L.length,y:y/L.length,z:z/L.length,r:0})}
-   for(const i of L)q.r=Math.max(q.r,Math.hypot(C.c[i*4]-q.x,C.c[i*4+1]-q.y,C.c[i*4+2]-q.z)+Math.max(C.c[i*4+3],2)+4);C.G.push(q.id,Int32Array.from(L))}}
+ // boot-4: no per-mesh Map / per-cell arrays: one sorted Float64Array of cell*2^20+instance, then C.G = Int32Array [cell id, start, end]* over C.I (instance ids in cell order)
+ for(const C of add||PC.L){if(C.sky||C.dyn)continue;const n=C.n,c=C.c,K=new Float64Array(n);for(let i=0;i<n;i++)K[i]=(Math.floor(c[i*4]/80)*100003+Math.floor(c[i*4+2]/80))*1048576+i;K.sort();
+  const I=C.I=new Int32Array(n),Gs=[];for(let s=0;s<n;){const k=Math.floor(K[s]/1048576);let e=s;while(e<n&&Math.floor(K[e]/1048576)===k){I[e]=K[e]-k*1048576;e++}
+   let q=M.get(k);if(!q){let x=0,y=0,z=0;for(let j=s;j<e;j++){const i=I[j];x+=c[i*4];y+=c[i*4+1];z+=c[i*4+2]}const L=e-s;M.set(k,q={id:M.size,x:x/L,y:y/L,z:z/L,r:0})}
+   for(let j=s;j<e;j++){const i=I[j],dx=c[i*4]-q.x,dy=c[i*4+1]-q.y,dz=c[i*4+2]-q.z,rr=Math.sqrt(dx*dx+dy*dy+dz*dz)+Math.max(c[i*4+3],2)+4;if(rr>q.r)q.r=rr}Gs.push(q.id,s,e);s=e}C.G=Int32Array.from(Gs)}
  // boot-3: on an add, write only the touched cells into a capacity-doubling PC.G (was: the whole grid re-copied per landing, 43 ms in Athens); PC.cv keeps one byte per cell
  let G=PC.G;const full=!add||!G;if(full||G.length<M.size*4){const g=new Float64Array(Math.max(M.size*4,full?0:G.length*2));if(!full)g.set(G);G=PC.G=g}
- const W=q=>{G[q.id*4]=q.x;G[q.id*4+1]=q.y;G[q.id*4+2]=q.z;G[q.id*4+3]=q.r};if(full)for(const q of M.values())W(q);else{const U=new Set();for(const C of add)if(C.G)for(let g=0;g<C.G.length;g+=2)U.add(C.G[g]);for(const q of M.values())if(U.has(q.id))W(q)}
+ const W=q=>{G[q.id*4]=q.x;G[q.id*4+1]=q.y;G[q.id*4+2]=q.z;G[q.id*4+3]=q.r};if(full)for(const q of M.values())W(q);else{const U=new Set();for(const C of add)if(C.G)for(let g=0;g<C.G.length;g+=3)U.add(C.G[g]);for(const q of M.values())if(U.has(q.id))W(q)}
  if(!PC.cv||PC.cv.length!==M.size)PC.cv=new Uint8Array(M.size);PC.left=0}
 // one instance: visible → copied to the next free slot of its mesh
-function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const d=Math.hypot(x-cx,y-cy,z-cz);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
+function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const ex=x-cx,ey=y-cy,ez=z-cz,d=Math.sqrt(ex*ex+ey*ey+ez*ez);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
  const s=C.s++,a=C.src,arr=C.im.instanceMatrix.array;if(s!==i){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
 const _pcS=new THREE.Sphere();
 // re-pack one mesh against the pass's camera snapshot (PC.x/y/z, _pcF); returns instances tested. Upload only the drawn range (r164 addUpdateRange), not the whole capacity.
 function PC_mesh(C){const im=C.im;C.dirty=false;if(!im.parent)return 0;const cx=PC.x,cy=PC.y,cz=PC.z,far=PC.fr;C.s=0;C.slot.fill(-1);let n=0;
- if(C.G){const G=C.G,V=PC.cv;for(let g=0;g<G.length;g+=2){if(!V[G[g]])continue;const I=G[g+1];n+=I.length;for(let j=0;j<I.length;j++){const i=I[j];PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}}}
+ if(C.G){const G=C.G,I=C.I,V=PC.cv;for(let g=0;g<G.length;g+=3){if(!V[G[g]])continue;const e=G[g+2];n+=e-G[g+1];for(let j=G[g+1];j<e;j++){const i=I[j];PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}}}
  else if(C.sky){im.updateWorldMatrix(true,false);const W=im.matrixWorld.elements;n=C.n;for(let i=0;i<C.n;i++){const lx=C.c[i*4],ly=C.c[i*4+1],lz=C.c[i*4+2];
    PC_one(C,i,W[0]*lx+W[4]*ly+W[8]*lz+W[12],W[1]*lx+W[5]*ly+W[9]*lz+W[13],W[2]*lx+W[6]*ly+W[10]*lz+W[14],cx,cy,cz,far)}}
  else{n=C.n;for(let i=0;i<C.n;i++)PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}
@@ -67,14 +69,18 @@ function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!
  {const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return}if(!PC.grp)PC_scan();/* boot-1: the scan normally ran in the loader (PC_prewarm); the first pass is budgeted like any other */
  if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9))PC_add();const np=PC_drain(force?1e9:3)>0;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
- const t0=performance.now();let tested=0;const snap=()=>{camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);PC.x=cx;PC.y=camera.position.y;PC.z=cz;PC.h=h;const far=PC.fr=PC_far(),cy=PC.y,G=PC.G,V=PC.cv;if(G)for(let q=0;q<V.length;q++){const d=Math.hypot(G[q*4]-cx,G[q*4+1]-cy,G[q*4+2]-cz),r=G[q*4+3];V[q]=d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(G[q*4],G[q*4+1],G[q*4+2]),r+4+d*.25))?0:1}};
- if(force||np||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){snap();PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
- else if(++PC.t%10===0&&!PC.left){snap();for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
+ const t0=performance.now();let tested=0;
+ if(force||np||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){PC_snap(cx,cz,h);PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
+ else if(++PC.t%10===0&&!PC.left){PC_snap(cx,cz,h);for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
  const bud=force?1e9:(TUNE.pc7Bud||60000);/* circular: a new pass mid-way carries on from the same mesh, so no mesh starves under constant turning */
  while(PC.left>0&&tested<bud){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
  if(!PC.left)for(const C of PC.L)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
  if(tested){let vis=0;for(const C of PC.L)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();
+// boot-4: the pass's camera snapshot + per-cell visibility (was a closure made every frame, Math.hypot per cell)
+function PC_snap(cx,cz,h){camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);PC.x=cx;PC.y=camera.position.y;PC.z=cz;PC.h=h;
+ const far=PC.fr=PC_far(),cy=PC.y,G=PC.G,V=PC.cv,keep=PC.keep;if(G)for(let q=0;q<V.length;q++){const gx=G[q*4],gy=G[q*4+1],gz=G[q*4+2],dx=gx-cx,dy=gy-cy,dz=gz-cz,d=Math.sqrt(dx*dx+dy*dy+dz*dz),r=G[q*4+3];
+  V[q]=d-r>far||d-r>keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(gx,gy,gz),r+4+d*.25))?0:1}}
 // boot-1: register + grid every candidate behind the loading screen (it was 180 ms on the first roam frame); nothing is packed until roam (98sp_simplify reads .count)
 function PC_prewarm(){try{if(PC.on&&HUB.grp&&!PC.grp&&PC_gate())PC_scan()}catch(e){console.warn('PC prewarm',e)}}
 // perf-7 gate: compaction costs ~1.8 ms CPU/frame (A/B), only worth it where the GPU is the limit: quality low/min (phones). med/high skip PC_step entirely
