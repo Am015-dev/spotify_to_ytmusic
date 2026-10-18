@@ -11,7 +11,7 @@ function tkBot(P,o={}){const lagN=Math.round((o.lag||0)*30),q=[],look=o.look||26
     // races-1: also back out when the progress along the route has not grown 3 m in 3 s although the speedo reads > 3 (pinned and jittering, or circling beside the road)
     if(sp.t>2){if(s>pgS+3){pgS=s;pgT=sp.t}else if(sp.t-pgT>3){pgT=sp.t;rec=1.4;R.recov++}}
 
-    if(Math.abs(e)>.035)K[e>0?'ArrowLeft':'ArrowRight']=true;const c1=at(s),c2=at(s+30+RO.v*1.5),cu=Math.abs(angDiff(c2.h,c1.h));   // a driver brakes for the corner ahead
+    if(Math.abs(e)>.035)K[e>0?'ArrowLeft':'ArrowRight']=true;/* races-5: braking horizon grows with v^2, a boost pad put the bot at 56 m/s into the River finish-leg corner (-315,446) and it overshot */const c1=at(s),c2=at(s+30+RO.v*1.5+RO.v*RO.v/25),cu=Math.abs(angDiff(c2.h,c1.h));   // a driver brakes for the corner ahead
     K.ArrowUp=K.KeyW=!((Math.abs(e0)>(wet?.2:.4)&&RO.v>(wet?7:14))||(cu>.6&&RO.v>14)||(cu>.3&&RO.v>24));K.ArrowDown=(Math.abs(e0)>.9&&RO.v>9)||(cu>.6&&RO.v>20);
     if(Math.abs(RO.v)<1.5)still++;else still=0;if(still===60){R.stuck.push([Math.round(RO.x),Math.round(RO.z),+sp.t.toFixed(0),tkRoad(RO.x,RO.z)]);still=0}
     if(pv>14&&RO.v<pv*.5)R.walls++;pv=RO.v};f.R=R;return f}
