@@ -1,6 +1,6 @@
 // tracks-3 test-only code (lazy chunk, src/LAZY): feel check driver, static feel audit, GO tk1/water and tk1/quick. Evaluated in the page's module scope after the game is drivable.
 // tracks-3: feel check. tkBot = pure-pursuit driver on a route (lag = human steering delay in s, no auto-steer: plain arrow keys); tkFeel drives every course with it and logs stuck spots, walls hit, ramps that land in a building, bricks that sit inside a collider.
-function tkBot(P,o={}){const lagN=Math.round((o.lag||0)*30),q=[],look=o.look||26,cum=[0];for(let i=1;i<P.length;i++)cum.push(cum[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const L=cum[cum.length-1];let ix=0,s=0,still=0,pv=0,slow=0,rec=0;const R={stuck:[],walls:0,maxS:0,recov:0};
+function tkBot(P,o={}){const lagN=Math.round((o.lag||0)*30),q=[],look=o.look||26,cum=[0];for(let i=1;i<P.length;i++)cum.push(cum[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));const L=cum[cum.length-1];let ix=0,s=0,still=0,pv=0,slow=0,rec=0,pgS=0,pgT=0;const R={stuck:[],walls:0,maxS:0,recov:0};
   const at=d=>tkAt(P,Math.min(1,d/L));
   const f=function(sp){if(sp.cd>0||sp.done)return;let bd=1e9,bi=ix;for(let i=Math.max(0,ix-2);i<Math.min(P.length-1,ix+40);i++){const a=P[i],b=P[i+1],l2=(b[0]-a[0])**2+(b[1]-a[1])**2||1,t=clamp(((RO.x-a[0])*(b[0]-a[0])+(RO.z-a[1])*(b[1]-a[1]))/l2,0,1),d=Math.hypot(a[0]+(b[0]-a[0])*t-RO.x,a[1]+(b[1]-a[1])*t-RO.z);if(d<bd){bd=d;bi=i;s=cum[i]+t*Math.sqrt(l2)}}ix=bi;
     R.maxS=Math.max(R.maxS,s);const wet=RO.veh==='boat',T0=at(s+(wet?14:look)+Math.abs(RO.v)*(wet?.3:.6)),e0=angDiff(Math.atan2(T0.x-RO.x,T0.z-RO.z),RO.h);q.push(e0);const e=q.length>lagN?q[q.length-1-lagN]:0;
@@ -8,6 +8,9 @@ function tkBot(P,o={}){const lagN=Math.round((o.lag||0)*30),q=[],look=o.look||26
     // fair-1: a human backs out after ~1 s nosed into a bush / car / kerb (reverse, wheel the other way), then drives on; R.stuck still counts any 2 s standstill
     if(rec>0){rec-=1/30;K.ArrowUp=K.KeyW=false;K.ArrowDown=true;if(Math.abs(e0)>.1)K[e0>0?'ArrowRight':'ArrowLeft']=true;pv=0;return}
     if(sp.t>2&&Math.abs(RO.v)<3&&K.ArrowUp){if(++slow>30){slow=0;rec=1;R.recov++}}else slow=0;
+    // races-1: also back out when the progress along the route has not grown 3 m in 3 s although the speedo reads > 3 (pinned and jittering, or circling beside the road)
+    if(sp.t>2){if(s>pgS+3){pgS=s;pgT=sp.t}else if(sp.t-pgT>3){pgT=sp.t;rec=1.4;R.recov++}}
+
     if(Math.abs(e)>.035)K[e>0?'ArrowLeft':'ArrowRight']=true;const c1=at(s),c2=at(s+30+RO.v*1.5),cu=Math.abs(angDiff(c2.h,c1.h));   // a driver brakes for the corner ahead
     K.ArrowUp=K.KeyW=!((Math.abs(e0)>(wet?.2:.4)&&RO.v>(wet?7:14))||(cu>.6&&RO.v>14)||(cu>.3&&RO.v>24));K.ArrowDown=(Math.abs(e0)>.9&&RO.v>9)||(cu>.6&&RO.v>20);
     if(Math.abs(RO.v)<1.5)still++;else still=0;if(still===60){R.stuck.push([Math.round(RO.x),Math.round(RO.z),+sp.t.toFixed(0),tkRoad(RO.x,RO.z)]);still=0}

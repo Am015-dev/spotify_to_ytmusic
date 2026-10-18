@@ -97,6 +97,7 @@
 99c_checklist.js
 99c2_slowspots.js
 99c3_rv3c.js
+99c3_rv2k3.js
 99c4_mem.js
 99c5_camstable.js
 99c6_rv4b.js
@@ -153,3 +154,4 @@
 99_api.js
 99c5_athroads.js
 99c6_rv4a.js
+99c7_rev5fix.js

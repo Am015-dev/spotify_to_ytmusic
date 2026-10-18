@@ -375,7 +375,7 @@ function FX19_camIn(g,H,fx,fz){const b=g.userData.crH;if(!b)return;const c=camer
  b.visible=!(Math.abs(al)<H.L+m&&Math.abs(sd)<H.W+m&&c.y<g.position.y+4.5)}
 function CR_npcPush(){if(typeof RO==='undefined'||!RO.on)return;for(let i=CR_NPCS.length-1;i>=0;i--){const g=CR_NPCS[i];if(!g.parent){CR_NPCS.splice(i,1);continue}if(!g.visible)continue;CR_npcTilt(g);const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dx=RO.x-g.position.x,dz=RO.z-g.position.z;FX19_camIn(g,H,fx,fz);
  if(Math.abs(RO.y-g.position.y)>3)continue;const al=dx*fx+dz*fz,sd=dx*fz-dz*fx,pl=H.L+CR_PLH.l-Math.abs(al),ps=H.W+CR_PLH.w-Math.abs(sd);if(pl<=0||ps<=0)continue;
- if(ps<pl){const k=Math.sign(sd)||1;RO.x+=fz*k*ps;RO.z-=fx*k*ps}else{const k=Math.sign(al)||1;RO.x+=fx*k*pl;RO.z+=fz*k*pl}RO.v*=.6}}
+ if(ps<pl){const k=Math.sign(sd)||1;RO.x+=fz*k*ps;RO.z-=fx*k*ps}else{const k=Math.sign(al)||1;RO.x+=fx*k*pl;RO.z+=fz*k*pl}if(!RO.sp)RO.v*=.6/* races-3: the speed bleed is for free roam; in a race it dragged the player behind the rubber-banded rival at every NPC graze */}}
 
 
 (()=>{const st=document.createElement('style');st.textContent=`

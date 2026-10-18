@@ -400,7 +400,7 @@ function TR_bldFix(){const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
   // terr-3 (Athens boot): pass 2 looks up the full grid only near a lifted building (C2 holds those alone; same result)
   const C2=new Map();for(const b of B){if(!b.trOff)continue;const R=Math.hypot(b.hw,b.hd)+1.8;for(let i=Math.floor((b.x-R)/CS);i<=Math.floor((b.x+R)/CS);i++)for(let j=Math.floor((b.z-R)/CS);j<=Math.floor((b.z+R)/CS);j++)C2.set(K(i,j),1)}
   const near=(x,z)=>C2.has(K(Math.floor(x/CS),Math.floor(z/CS)));
-  if(C2.size)for(const o of meshes){let ch=false;if(!o.isInstancedMesh&&TR_roadMat(o.material))continue;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);if(!near(_p.x,_p.z))continue;const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
+  if(C2.size)for(const o of meshes){if(o.userData.gk)continue;/* rev5fix: the land ground tile is already at ground height; lifting its footprint vertices by trOff doubled them (Athens spawn walls 6-20 m) */let ch=false;if(!o.isInstancedMesh&&TR_roadMat(o.material))continue;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);if(!near(_p.x,_p.z))continue;const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
     const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){if(!near(p[i],p[i+2]))continue;const b=find(p[i],p[i+2],1.6);if(!b||!b.trOff)continue;
       const core=find(p[i],p[i+2],.4)===b;if(!core){const gv=groundY(p[i],p[i+2]);if(p[i+1]>gv-.15&&p[i+1]<gv+.35)continue}p[i+1]+=b.trOff;ch=true}
     if(ch){A.needsUpdate=true;o.geometry.computeBoundingSphere();o.geometry.computeBoundingBox()}}
@@ -414,7 +414,9 @@ function TR_bldFix(){const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
 let TR_bf=0;{const _hg=hubGrid;hubGrid=()=>{if(!TR_bf&&HUB.grp){TR_bf=1;TR_bldFix()}return _hg()}}
 // ---------- drivable slopes (2K-Drive style): gravity along the slope, full grip up to ~29°, fading to none at ~38° (the car then slides back
 // down the fall line, never stuck); the car stays glued to the terrain (no airborne frames on terrain), never sinks below it
-function TR_pre(dt){RO.trSlope=null;const T=roamTerr(RO.x,RO.z,RO.y+.3);if(RO.y>T.g+.5||T.deck||T.g<-1.5){RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);if(!T.deck){const[gx,gz]=TR_grad(RO.x,RO.z,2);TR6_stuck(dt,Math.atan(Math.hypot(gx,gz)))}return}
+/* races-3: the slipway is built on top of the raw terrain grade (groundY), whose 0.8 slope at the quay edge dragged the River boat from 14 m/s to a standstill at the slip top (-245,-157). Drag rests on and 6 m past a slip. */
+function TR_onSlip(x,z){for(const s of SLIPS){const dx=x-s.x,dz=z-s.z;if(dx>50||dx<-50||dz>50||dz<-50)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<12&&inw>-6&&inw<32)return true}return false}
+function TR_pre(dt){RO.trSlope=null;const T=roamTerr(RO.x,RO.z,RO.y+.3);if(RO.y>T.g+.5||T.deck||T.g<-1.5||TR_onSlip(RO.x,RO.z)){RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);if(!T.deck){const[gx,gz]=TR_grad(RO.x,RO.z,2);TR6_stuck(dt,Math.atan(Math.hypot(gx,gz)))}return}
   const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz),th=Math.atan(s),fx=Math.sin(RO.vh??RO.h),fz=Math.cos(RO.vh??RO.h),a=gx*fx+gz*fz;RO.trSlope={gx,gz,th,a};
   RO.v-=9.8*.75*a/Math.sqrt(1+a*a)*dt;const grip=clamp((.665-th)/(.665-.5),0,1);RO.trGrip=grip;
   if(grip<1){if(a>0&&RO.v>-2&&CTL&&(CTL.thr||CTL.boost))RO.v-=(1-grip)*58*dt;RO.trSl=Math.min(9,(RO.trSl||0)+(1-grip)*16*dt)}else RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);TR6_stuck(dt,th)}
