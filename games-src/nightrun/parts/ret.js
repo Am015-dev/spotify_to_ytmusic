@@ -13,15 +13,15 @@ RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct,
 {const st=document.createElement('style');st.textContent=`
 .retBar{width:100%;max-width:min(92%,420px);margin:.5em auto;text-align:center;font-family:var(--mono);font-size:clamp(12px,min(3.4vw,2.4vh),17px);line-height:1.3;color:var(--dim)}
 .retBar b{color:#fff}.retBar .rb{height:.9em;border-radius:99px;background:#ffffff1a;overflow:hidden;margin-top:.3em}
-.retBar .rb i{display:block;height:100%;background:linear-gradient(90deg,#19e3ff,#ffb020)}.retBar.can .rb i{background:#ffb020}
+.retBar .rb{display:flex}.retBar .rb i{display:block;height:100%;background:linear-gradient(90deg,#19e3ff,#ffb020)}.retBar.can .rb i{background:#ffb020}.retBar .rb i.gain{background:#fff;box-shadow:0 0 6px #fff}
 `;document.head.appendChild(st);}
 function retMake(id,host){let e=$(id);if(!e){e=document.createElement('div');e.id=id;e.className='retBar';host.insertBefore(e,host.querySelector('.row'));}return e;}
 function retShow(){
-  const on=RET.oneMore,add=($('oNeon')&&/nothing/.test($('oNeon').textContent))?0:(SH.lastBank|0),nx=on?RET.next():null,pay='Failed runs still pay: '+(add?'+'+add+' Neon banked':'nothing banked this time');
+  const on=RET.oneMore,add=SH.lastBank|0,nx=on?RET.next():null,fl=SH.lastFloor|0,pay='This run: <b>+'+add+' Neon</b>'+(fl&&add<=fl?' · '+SH.lastStages+' stage'+(SH.lastStages>1?'s':'')+' reached':'');
   for(const [id,host] of [['retO',$('over').querySelector('.in')],['retR',$('stres').querySelector('.in')]]){
     const e=retMake(id,host);e.hidden=!on;if(!on)continue;
-    e.className='retBar'+(nx&&nx.can?' can':'');
-    e.innerHTML=(id==='retO'?pay+'<br>':'')+(nx?(nx.can?'Ready in Garage: <b>'+nx.n+'</b> '+nx.price:'Next: <b>'+nx.n+'</b> '+nx.bank+'/'+nx.price)+'<div class="rb"><i style="width:'+nx.pct+'%"></i></div>':'Everything unlocked');}
+    e.className='retBar'+(nx&&nx.can?' can':'');const gp=nx&&add>0?Math.min(nx.pct,Math.max(1,Math.round(100*add/nx.price))):0;
+    e.innerHTML=(id==='retO'?pay+'<br>':'')+(nx?(nx.can?'Ready in Garage: <b>'+nx.n+'</b> '+nx.price:'Next: <b>'+nx.n+'</b> '+nx.bank+'/'+nx.price)+'<div class="rb"><i style="width:'+Math.max(0,nx.pct-gp)+'%"></i>'+(gp?'<i class="gain" style="width:'+gp+'%"></i>':'')+'</div>':'Everything unlocked');}
   $('againBtn').textContent=on?'ONE MORE RUN':'FLY AGAIN';$('srRetry').textContent=on?'ONE MORE RUN':'RETRY';}
 NR.on('runEnd',d=>{if(!d||d.quit)return;retShow();});
 

@@ -59,7 +59,7 @@ NR.on('tick',dt=>{if(!RET.cp||!running||!ST.on||!G.live)return;
  const pc=RET.payClear;RET.payClear=function(n,sum){const pay=pc.call(this,n,sum);if(!RET.cp||!CHK.marked||!(pay>0))return pay;
    const cut=Math.round(pay*(1-CHK.k));GA.bank=Math.max(0,GA.bank-cut);gsave();if(this.last)this.last.pay=pay-cut;return pay-cut;};}
 NR.on('stageClear',()=>{if(RET.cp&&CHK.marked&&ST.stars)ST.stars[2]=0;});
-NR.on('banked',()=>{if(!RET.cp||!CHK.marked||!(SH.lastBank>0))return;const cut=Math.round(SH.lastBank*(1-CHK.k));GA.bank=Math.max(0,GA.bank-cut);SH.lastBank-=cut;SH.lastTotal=GA.bank;gsave();});
+NR.on('banked',()=>{if(!RET.cp||!CHK.marked||!(SH.lastBank>0))return;const cut=Math.min(Math.round(SH.lastBank*(1-CHK.k)),Math.max(0,SH.lastBank-(SH.lastFloor|0)));GA.bank=Math.max(0,GA.bank-cut);SH.lastBank-=cut;SH.lastTotal=GA.bank;gsave();});
 
 /* the run-end button */
 {const st=document.createElement('style');st.textContent=`

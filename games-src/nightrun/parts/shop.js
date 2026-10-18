@@ -18,6 +18,8 @@ const NEON_K=.032;                                         // Neon per kill: dis
 const NEON_V={drone:.5,charger:.5,turret:1,gate:1,gunship:3,boss:8};     // fractions add up: about 40 Neon from a first district
 const p2d={};const path2=d=>p2d[d]||(p2d[d]=new Path2D(d));
 
+/* a failed run pays at least this much Neon per stage reached (a story try is one stage, an endless run counts districts); only tops up a poor run */
+const FLOOR_NEON=3;
 const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:null,left:0,lock:0,cards:[],rerolls:0,live:false,flash:0,
   ck:0,hm:0,sharp:1,nx:1,spare:0,dmax:0,sh:0,db:0,dashId:0,wasDash:false,tk:false,prevCur:-1,rch:0,picks:0,pits:0,
   reset(){if(this.live)this.bankRun(true);
@@ -30,7 +32,7 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
   // ----- Neon -----
   award(e,keep){if(!this.live)return;let v=NEON_V[e.type]||.5;if(e.pf)v*=1.5;v+=Math.min(3,tierOf(C.n)-1);this.acc=(this.acc||0)+v*this.nx*(window.RET&&RET.econ?RET.nk:NEON_K);   // on-beat kills pay 1.5x, combos add up to +3
     const n=Math.floor(this.acc);if(n<1)return;this.acc-=n;this.neon+=n;this.earned+=n;this.flash=.35;if(n>=3)floater(e.x+14,e.y+8,'+'+n+' NEON','#19e3ff');},
-  bankRun(quiet){if(!this.live)return 0;this.live=false;const add=this.neon+Math.round(this.earned*.3);GA.bank+=add;GA.runs++;gsave();this.lastBank=add;this.lastTotal=GA.bank;
+  bankRun(quiet,stages){if(!this.live)return 0;this.live=false;const fl=stages>0?FLOOR_NEON*stages:0,add=Math.max(this.neon+Math.round(this.earned*.3),fl);GA.bank+=add;GA.runs++;gsave();this.lastBank=add;this.lastFloor=fl;this.lastStages=stages|0;this.lastTotal=GA.bank;
     if(!quiet)NR.emit('banked',add);return add;},
   // ----- pit stop -----
   price(u){return Math.round(1.25*u.p*(1+.5*this.n(u.id)));},
@@ -113,7 +115,7 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
 NR.on('kill',d=>SH.award(d.e));
 NR.on('districtEnd',()=>{if(SH.live){SH.neon+=5;SH.earned+=5;SH.flash=.5;}});
 NR.on('runStart',()=>{SH.live=true;SH.neon=0;SH.earned=0;const sd=shipDef();if(sd.id!=='std'&&G.live)G.note={t:4,txt:sd.n+' ready'};});
-NR.on('runEnd',()=>{if(SH.active){SH.active=false;shopEl.hidden=true;}const add=SH.bankRun();const el=$('oNeon');if(el)el.innerHTML=add?'Banked '+neonI+' <strong>+'+add+'</strong> · garage '+GA.bank:'Banked nothing';gaDraw();});
+NR.on('runEnd',d=>{if(SH.active){SH.active=false;shopEl.hidden=true;}const add=SH.bankRun(false,d&&!d.quit&&!d.cleared?(d.story?1:(d.di|0)+1):0);const el=$('oNeon');if(el)el.innerHTML=add?'Banked '+neonI+' <strong>+'+add+'</strong> · garage '+GA.bank:'Banked nothing';gaDraw();});
 
 /* ----- the pit-stop screen ----- */
 const shopEl=document.createElement('div');shopEl.id='shop';shopEl.className='ov solid pg';shopEl.hidden=true;
