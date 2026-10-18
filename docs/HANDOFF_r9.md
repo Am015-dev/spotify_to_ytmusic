@@ -30,3 +30,8 @@
 - Fix (src/assets/lx/code.js): LIFE_fill builds cells nearest-first (budget kept); people/smash GOs fill until done; people ends on 6 s sim time (60 s wall cap). Reaction code is per frame, unchanged.
 - tChkGo.js: DESKTOP=1 (no touch, 1280x720) and THROTTLE=n (CPU throttle) env options.
 - Gate: build + unit 0 FAIL; TAG=life1,xf1,terrain,phone2 only known xf1/* reds; life1 7/7 desktop+touch; THROTTLE=6/8 people reacts (only harness SLOW label trips).
+## people-2 (life1/people flaky ~50%, touch and desktop)
+- No bad commit: bisect not needed. A trace of failing runs showed the car turning in pi/8 steps at v 3-5 right after the warp (the stuck-turn in roamStep, RO.stkT/crTurn), so it drove past the group and nobody reacted. Pedestrian reaction code is fine (same frame, sp>4, within 7 m).
+- Root cause (src/71_roam_drive.js): the 0.5 s (stkP) and 3 s (stkP3) pinned windows keep a stale "pinned" result from the idle time, so gas from rest was read as stuck for up to 1 s and turned the car. Phase-dependent, about half of the starts (also hit life1/smash).
+- Fix: on the gas rising edge from rest (|v|<2) both windows restart longer and the stale results are dropped. Pinned car detection is only delayed by that start window; budgets and Life code untouched.
+- Gate: build + unit 0 FAIL; life1 7/7 on 3 desktop + 3 touch runs in a row; TAG=life1,xf1,terrain,phone2 touch 43/44 (only xf1/grass, known).
