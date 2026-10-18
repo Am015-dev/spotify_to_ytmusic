@@ -95,6 +95,13 @@ function LF_fit(L,p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,y0=p
  const R=Math.max(p.sx,p.sz),e={x:p.x,z:p.z,c,s,sx:p.sx,sz:p.sz,R2:R*R,yt:p.y+.04,gx,gz};if(!L.lfP)L.lfP=[];
  for(let i=Math.floor((p.x-R)/32);i<=Math.floor((p.x+R)/32);i++)for(let j=Math.floor((p.z-R)/32);j<=Math.floor((p.z+R)/32);j++){const k=i*10000+j;let A=LF.PG.get(k);if(!A)LF.PG.set(k,A=[]);A.push(e);L.lfP.push([k,e])}}
 LF.drape=!/[?&]lfd=0\b/.test(location.search);
+function LF_mats(){return LF.mat||(LF.mat={def:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),tuft:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,side:THREE.DoubleSide}),pond:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.12,metalness:.15})})}
+// perf-14: the fill materials were first made inside a tile build, so their programs linked at the first draw of the first tile (a 147 ms frame in Athens).
+// Link them once after the hub props are placed: tiny instanced (with instance colour) + draped stand-ins, compiled for the composer target, then removed. ?lfw=0 off.
+function LF_warm(){if(LF.warmed||/[?&]lfw=0/.test(location.search))return;LF.warmed=1;const M=LF_mats(),G=new THREE.Group(),b=new THREE.BoxGeometry(.1,.1,.1),c=new THREE.Color(),m4=new THREE.Matrix4();
+ for(const k of['def','tuft','pond']){const m=new THREE.InstancedMesh(b,M[k],1);m.setMatrixAt(0,m4);m.setColorAt(0,c);m.frustumCulled=false;G.add(m)}
+ const pg=b.clone();pg.setAttribute('color',new THREE.BufferAttribute(new Float32Array(pg.attributes.position.count*3).fill(1),3));const pm=new THREE.Mesh(pg,LF_patchMat());pm.frustumCulled=false;G.add(pm);
+ scene.add(G);try{P2_compile(scene,camera)}catch(e){console.warn('LF warm',e)}finally{scene.remove(G);b.dispose();pg.dispose();for(const o of G.children)if(o.dispose)o.dispose()}}
 function LF_patchMat(){return LF.pm||(LF.pm=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4}))}
 // patch residual vs its best tilted plane (same samples as LF_fit): small = keep the cheap instanced plane, big = drape it
 function LF_resid(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,g0=gy(p.x,p.z),gx=(gy(p.x+d,p.z)-gy(p.x-d,p.z))/(2*d),gz=(gy(p.x,p.z+d)-gy(p.x,p.z-d))/(2*d);let hi=-9,lo=9;
@@ -190,7 +197,7 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
    else for(let j=0;j<3;j++)di('tuft',px+(LF_h(px,j,4)-.5)*6,pz+(LF_h(pz,j,5)-.5)*6,j,.8,.8,.8,LF_FC[(k+j)%LF_FC.length])}
   if(slice()){yield 'lf6';t0=performance.now()}}
  // 5 · decor meshes (one per type for this tile), then the props through the city's own prop builder
- const GE=LF.geo||(LF.geo=LF_geos()),mat=LF.mat||(LF.mat={def:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),tuft:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,side:THREE.DoubleSide}),pond:new THREE.MeshStandardMaterial({vertexColors:true,roughness:.12,metalness:.15})});
+ const GE=LF.geo||(LF.geo=LF_geos()),mat=LF_mats();
  const M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),S=new THREE.Vector3(),Pv=new THREE.Vector3(),Y=new THREE.Vector3(0,1,0),Co=new THREE.Color();LF.ms=LF.ms||[];
  // art-4: uneven patches are DRAPED (Alex: "patches cut the figure in half"): a patch whose tilted-plane fit is off by > 8 cm becomes part of one merged
  // indexed mesh per tile, every vertex at groundY+3.5 cm (polygon offset against z-fight), walk height = terrain; even ones stay instanced planes. Ponds whose rim varies > 15 cm and beds on > 20 cm are dropped;
@@ -209,7 +216,7 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const D=HUB.ptypes,C=LF_ctx(),fra=C
  st.regs=(st.regs||0)+1;yield* lzPropsG(L)}
 // GO / tests: build the fill tiles around (x,z) now (a GO lands you there before lazyStep would reach them)
 function LF_ensure(x,z,r){if(typeof LAZY==='undefined')return 0;let n=0;for(const L of LAZY)if(L.lf&&!L.done&&lzD(L,x,z)<r){lzRun(L);n++}return n}
-buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{LF_reg()}catch(e){console.warn('LF reg',e)}return r})(buildHubProps);
+buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{LF_reg()}catch(e){console.warn('LF reg',e)}if(LF.on)P2_after(LF_warm);return r})(buildHubProps);
 // distance cull: each decor type hides past LF.R[type] m (checked every 15 frames)
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LF.ms||(LF.fr=(LF.fr|0)+1)%15)return;const cp=camera.position;for(const m of LF.ms){const s=m.boundingSphere;if(!s)continue;m.visible=Math.hypot(s.center.x-cp.x,s.center.z-cp.z)-s.radius<LF.R[m.userData.lf]}})(hubCullStep);
 // flat uniform green % of the frame = visible GROUND that is one flat green: 4×4 blocks (1/2-res) that are green (G > R+12, G > B+12), flat (luma
