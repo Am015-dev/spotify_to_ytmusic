@@ -90,3 +90,9 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 3. Change in src/98pc_compact.js: incremental PC_grid (only new meshes; old cells keep centre, grow radius); a pass starts only on ≥ 20 m / ≥ 15°, then walks meshes circularly at TUNE.pc7Bud (60k) instances/frame; cells tested once per pass (PC.cv); traffic/clouds every 10 frames; uploads only the drawn range (addUpdateRange). tFrame.js: QS env for extra query.
 4. After (p7d, 1 run): Athens 14.4/37.9/224, 193 MB/s, hubCullStep 2.1 ms (−33 %). Median and MB/s beat trunk default, p95/max within noise of it (not a clear win). Gate p7d: unit 0 FAIL; TAG=life1,xf1,terrain,smash2,cam,mem,perf5 54/56, reds known only (fra mem/stable, cam/stable).
 5. Next: 3-run A/B both cities (Frankfurt unmeasured); if p95 still ≥ trunk, gate compaction to q=low/min; then TR_Y/groundY deopt + LF_drapeG normals (not started).
+
+## perf-7 landed (2026-10-18, gate): compaction only on q=low/min
+1. src/98pc_compact.js: PC_gate() (LK_lvl low/min, TUNE.pc7All forces on) wraps PC_step; med/high skip it entirely (no scan, no wrappers); PC_release() restores full counts if quality rises later.
+2. Gate on BUILT page: unit 0 FAIL; TAG life1,xf1,terrain,smash2,cam,mem,perf5 54/56, only known reds (fra mem/stable, xf1/grass); perf5/compact passes at q=low (test default).
+3. A/B NOT measured: out of time (3-run both cities x high/low not done; Athens partial runs hit the time limit). Expectation: high = trunk minus ~1.8 ms/frame and no 460 ms PC_add spikes; low = perf-7 WIP numbers.
+4. Next: run tools/perf1/tFrame.js (HEAP=1 Q=high|low CITY=ath|fra RACE=0) trunk vs landed, 3 runs each.
