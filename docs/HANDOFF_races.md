@@ -17,3 +17,10 @@
 2. GP DNF is not a boat leak: it recurred in run 2 at the same spot (209,259-299, crawls at 5-14 m/s), so it is location/traffic-bound, not run-order state. tkStart now resets the stuck/hop windows (RO.stk*, np*, nudgeT) anyway; GO order is now Grand Prix, River, Westend.
 3. Built page, TAG=races alone, fra, 2 runs with GP first: races/finish green both. Full GO (races,life1,xf1,terrain,rv2k2) before the reorder: only known reds + SLOW-only flags from parallel load (content marks all OK); pace#1 avg 114 km/h OK.
 4. Open: the (209,299) GP crawl (~1 run in 6 when GP is not first); probe there with traffic cars near RO.
+
+# HANDOFF races-7 (2026-10-18, branch alex/races6-wip: NO code fix, GP crawl at (209,259-299) did NOT reproduce)
+1. Built r6 from 44e056a. GP (menu 'grand', route pA) 26 runs on warm pages: 6 GP-first, 4 after River (River x4 -> GP x4 -> Westend x4), 10 more with the probe: all 1st, 86-90 s, stuck 0. No frame with v < 16 within 45 m of (209,279) in the 10 probe runs.
+2. So the ~1-in-6 crawl is not tied to run order or to the 'races' page alone; the earlier hits came in the full GO (races,life1,xf1,terrain,rv2k2 in parallel, slow frames). Likely dt/load-dependent: check with a throttled CPU (--cpu-throttling) or the full GO page, not a clean tRaces page.
+3. Reading found nothing at the source: the GP rival is a pure path-follower (tkStep: a.s += a.v*dt, gap rubber band, no traffic yield, no CR_npcPush). The 5-14 m/s crawl is the player-bot (tkBot) in RV3A_race pushed by traffic/npc at that junction, not the rival.
+4. Added tools/tGpProbe.js (hooks tkBot, logs near-car state x/z/v/yo/k/hold when v < 16 near (209,279)). Run it inside the full-GO page to catch the cause; no gate run was needed (no src change).
+5. Next: run the probe with CPU throttling or inside the GO; if cars with yo/hold sit on the line, clear traffic on the race route in tkStart (race-only).
