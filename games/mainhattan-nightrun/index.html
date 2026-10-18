@@ -1120,7 +1120,7 @@ function update(dt){
   /* enemies */
   const sdtA=sdt;
   for(const e of G.en){const sdt=e.gnd||!window.LEAK||!RET.leak?sdtA:sdtA*LEAK.es(e);e.t+=sdt;e.flash=Math.max(0,e.flash-dt);   // leak.js: flyers are calmer (LEAK.es), ground enemies keep their own pace
-    switch(window.ZOO&&RET.zoo&&ZOO.mv(e,sdt,d)?'_z':e.type){   // zoo.js: hovering flyers + the new kinds move themselves
+    switch(e.fp&&window.FM&&FM.mv(e,sdt,d)||window.ZOO&&RET.zoo&&ZOO.mv(e,sdt,d)?'_z':e.type){   // formations.js: units on a path (RET.vary); zoo.js: hovering flyers + the new kinds move themselves
       case'drone':e.x-=(120+15*d)*sdt;e.y=e.by+Math.sin(G.bp*Math.PI/2+(e.ph||0))*(e.amp||0);break;
       case'turret':if(e.t<6.5){if(e.x>e.stop)e.x-=150*sdt;}else{e.x-=180*sdt;e.y-=40*sdt;}break;
       case'charger':{const aw=Math.max(.55,BT.spb*1.05);if(DMG.on&&e.x>W-70&&e.t<3){e.x-=Math.max(130,(e.x-W+70)*2.2)*sdt;e.t=Math.min(e.t,.35);}else if(e.t<.7)e.x-=130*sdt;else if(e.t<.7+aw){e.y+=(P.y-e.y)*Math.min(1,sdt*5);e.aimL=1;}else{e.aimL=0;e.x-=(DMG.on?Math.min(DMG.cvMax,DMG.cv+40*d):600+60*d)*sdt*(e.el?1.2:1);}}break;
@@ -5466,6 +5466,425 @@ NR.on('spawn',e=>{if(!RET.zoo||!e)return;
 NR.on('kill',o=>{if(!RET.zoo||!o||o.boss||!o.e||!o.e.zt)return;ZOO.died(o.e);});
 NR.on('beat',()=>{if(!RET.zoo||!running||G.dead)return;const d=diff();for(const e of G.en.slice())if(e.zt&&ZOO.T[e.type]&&e.type!=='zdrn')ZOO.beat(e,d);});
 
+/* ---------- formations.js: the formation library (VARIETY A, owner 18 Oct 2026: "Game is extremely repetitive"). Flag RET.vary; ?vary=0 = the old waves exactly.
+   A formation is a SPATIAL idea, not a recolour of one row: pincers from top and bottom, an X that converges, a snake on a path, a spiral, a wall whose gap moves...
+   Every entry declares
+     tags   what it feels like (ranks, flank, swarm, hazard, elite, rush, breath)          t     the first story stage it may appear on
+     cost   enemy-equivalents per piece (the director's budget unit)                        gap   the smallest free gap it leaves ACROSS the screen, px (0 = it never spans it)
+     tele   how it is announced: edge = the red ring where it enters (en), warn = a marker on the top/bottom edge one beat before,
+            line = a lane / wall flash one beat before                                     kinds the enemy kinds it uses;  role = the job a kind does in it
+   The director (stagescripts.js) asks for one PIECE at a time, on its own beats and budget: the formation evolves over its moment (the gap walks, the snake grows,
+   the pincer closes again from the other side). Caps, entry grace, aimed-shot rules and the spawn radius stay the engine's (en, eb, DIR.safe, DMG).
+   Units with a path (e.fp) are moved here (FM.mv, called first in the b.js enemy loop). Every path ends flying left, so a unit that survives still leaks (leak.js).
+   A zoo kind that is not available (?zoo=0, or not unlocked on this stage) is replaced by an old kind (FM.SUB). ---------- */
+if(RET.vary===undefined)RET.vary=!/[?&]vary=0/.test(location.search);
+const FM=window.FM={GAP:130,L:{},TEL:[],cur:null,
+  SUB:{shielder:'turret',kamikaze:'charger',splitter:'drone',bomber:'gunship',sniper:'turret',healer:'drone',carrier:'gunship',minelayer:'mine'},
+  stat:{pieces:0,units:0,minGap:1e9,kinds:{},byF:{}},
+  reset(){this.TEL.length=0;this.cur=null;this.stat={pieces:0,units:0,minGap:1e9,kinds:{},byF:{}};},
+  def(id,o){this.L[id]=Object.assign({id,tags:[],t:1,cost:3,tele:'edge',gap:0,kinds:['drone'],role:''},o);},
+  /* a zoo kind is usable when the zoo is on and the stage has unlocked it (ZOO.T[k].st) */
+  ok(k){const Z=window.ZOO;if(!Z||!Z.T[k]||k==='zdrn')return true;if(!RET.zoo)return false;if(G.lab)return true;return ST.on?ST.n>=Z.T[k].st&&!(ST.def&&ST.def.ch):G.t>=Z.T[k].tt;},
+  k(k){return this.ok(k)?k:this.SUB[k]||'drone';},
+  tk(){return (120+15*diff())/150;},                      // path speed follows the old drone speed (120 + 15 per difficulty step)
+  py(){return P?clamp(P.y,90,H-90):H/2;},                 // the ship's lane when a piece starts (pieces aim at a lane, never at a point)
+  /* ---- instances: one per moment; piece k is the k-th call of the director ---- */
+  make(id,o){const d=this.L[id];if(!d)return null;return Object.assign({id,def:d,k:0,r:0,mir:false,el:0,tk:1,s:{}},o||{});},
+  piece(I){if(!I)return;const c=this.cur;this.cur=I;try{I.def.f(I,I.k);}finally{this.cur=c;}I.k++;this.stat.pieces++;this.stat.byF[I.id]=(this.stat.byF[I.id]|0)+1;},
+  later(I,beats,fn){DIR.later(beats,()=>{if(G.dead||ST.over)return;const c=this.cur;this.cur=I;try{fn();}finally{this.cur=c;}});},
+  /* ---- one unit. pf(t,e) = its position at path time t (seconds); x/y are taken from the path when there is one ---- */
+  u(kind,x,y,pf,o){const I=this.cur||{},Z=window.ZOO;let k=this.k(kind);o=o||{};
+    if(I.r&&k==='drone'&&!o.keep)k='flank';                  // a remix: the drones come back as arrowheads, a little faster
+    const mir=!!I.mir,fy=v=>mir?H-v:v,pt0=o.pt||0;let f=null;
+    if(pf){f=mir?(t,q)=>{const p=pf(t,q);return [p[0],H-p[1]];}:pf;const p=f(Math.max(0,pt0),null);x=p[0];y=p[1];}else y=fy(y);
+    const opt=Object.assign({x,y,amp:0},o);delete opt.pt;delete opt.keep;
+    if(k!==kind&&kind!=='drone'){delete opt.r;delete opt.hp;}
+    const zk=!!(Z&&RET.zoo&&Z.T[k]&&k!=='zdrn');const e=zk?Z.mk(k,opt):en(k,opt);
+    e.fid=I.id||'';if(k==='gate'||k==='turret'||k==='gunship'||k==='charger'||k==='carrier'||k==='bomber'||k==='minelayer'||k==='sniper'||k==='kamikaze')f=null;   // these keep their own AI
+    if(I.el&&!e.el&&(k==='drone'||k==='flank')){e.el=1;e.hp=Math.round(e.hp*2);e.max=e.hp;e.r=Math.round(e.r*1.25);e.score*=2;}
+    if(f){e.pth=f;e.fp=1;e.pt=pt0;e.tk=(I.tk||1)*(I.r?1.12:1)*this.tk();const p=f(Math.max(0,pt0),e);e.ox=e.x-p[0];
+      if(zk&&(k==='shielder'||k==='splitter'||k==='healer'))e.zst=1;}            // they fire / heal while they fly (zoo.js beat)
+    this.stat.units++;this.stat.kinds[k]=(this.stat.kinds[k]|0)+1;NR.emit('fmUnit',{e,I});return e;},
+  /* ---- movement of a path unit (true = done here) ---- */
+  mv(e,dt,d){if(!e.fp||!RET.vary)return false;e.pt+=dt*(e.tk||1);
+    const p=e.pth(Math.max(0,e.pt),e);let x=p[0]+e.ox,y=p[1];
+    if(e.drp){const s=clamp((G.t-e.drp.t0)/e.drp.T,0,1),q=s*s*(3-2*s);y=e.drp.y0+(y-e.drp.y0)*q;if(s>=1)e.drp=null;}
+    e.vx=(x-e.x)/Math.max(dt,1e-4);e.x=x;e.y=y;e.by=y;
+    if(e.type==='shielder'){const fa=Math.atan2(P.y-e.y,P.x-e.x);e.fa=e.fa==null?fa:e.fa+angD(fa,e.fa)*Math.min(1,dt*1.6);}
+    if(e.y>H+60||e.y<-140){e.dead=1;}                        // fell or rose out of the screen (meteors): gone, no leak
+    if(e.pt>45)e.x=-300;                                     // a lost unit counts as a leak and is removed
+    return true;},
+  /* ---- telegraphs: lane flash, wall column with its gap, top/bottom edge markers (DIR's WARN) ---- */
+  tel(o){o.b=G.bc;o.t0=G.t;this.TEL.push(o);return o;},
+  untel(o){const i=this.TEL.indexOf(o);if(i>=0)this.TEL.splice(i,1);},
+  warn(x,side){const w={x,y:side<0?10:H-10,b:G.bc,kind:'flank',side};WARN.push(w);return w;},
+  unwarn(w){const i=WARN.indexOf(w);if(i>=0)WARN.splice(i,1);},
+  edge(e,side){const r=G.rings[G.rings.length-1];if(r&&r.x===W-14){r.x=clamp(e.x,30,W-30);r.y=side<0?14:H-14;}},   // move en()'s entry ring to the edge it really comes in from
+  draw(t){if(!RET.vary||!this.TEL.length)return;ctx.save();
+    for(const o of this.TEL){const k=clamp((G.t-o.t0)/Math.max(.2,o.T||.5),0,1),bl=SET.reduce?1:(Math.floor(t*12)%2?.65:1);ctx.globalAlpha=(.35+.5*k)*bl;ctx.strokeStyle=o.c||'#ff7080';ctx.lineWidth=2;ctx.setLineDash([10,8]);
+      if(o.k==='lane'){ctx.beginPath();ctx.moveTo(W*.35,o.y);ctx.lineTo(W-6,o.y);ctx.stroke();}
+      else if(o.k==='col'){ctx.beginPath();ctx.moveTo(o.x,8);ctx.lineTo(o.x,o.gc-o.g/2);ctx.moveTo(o.x,o.gc+o.g/2);ctx.lineTo(o.x,H-8);ctx.stroke();
+        ctx.setLineDash([]);ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(o.x-8,o.gc-o.g/2);ctx.lineTo(o.x+8,o.gc-o.g/2);ctx.moveTo(o.x-8,o.gc+o.g/2);ctx.lineTo(o.x+8,o.gc+o.g/2);ctx.stroke();}
+      else if(o.k==='dot'){ctx.setLineDash([]);ctx.beginPath();ctx.arc(o.x,o.y,10+14*(1-k),0,7);ctx.stroke();}}
+    ctx.setLineDash([]);ctx.restore();},
+  tickTel(){for(let i=this.TEL.length-1;i>=0;i--)if(G.bc-this.TEL[i].b>=(this.TEL[i].nb||1)+1)this.TEL.splice(i,1);}
+};
+/* ---- path builders (absolute screen coordinates; t in seconds at speed factor 1) ---- */
+const fmSeg=(pts,v)=>{const L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+  const n=pts.length-1,a=pts[n-1],b=pts[n],ll=Math.max(1,L[n]-L[n-1]),ux=(b[0]-a[0])/ll,uy=(b[1]-a[1])/ll;
+  return t=>{const s=t*v;if(s>=L[n]){const q=s-L[n];return [b[0]+ux*q,b[1]+uy*q];}let i=1;while(L[i]<s)i++;const f=(s-L[i-1])/Math.max(1e-6,L[i]-L[i-1]);
+    return [pts[i-1][0]+(pts[i][0]-pts[i-1][0])*f,pts[i-1][1]+(pts[i][1]-pts[i-1][1])*f];};};
+const fmCy=y=>clamp(y,40,H-40);
+const fmBs=()=>Math.max(.3,BT.spb||.5);                     // seconds per beat
+const fmSide=(I,k)=>((k+(I.s.sd||0))&1)?1:-1;
+/* =========================== THE LIBRARY =========================== */
+/* 1 pincer: two arms come in from the top and bottom edges and fold into two lanes 164 px apart around your lane */
+FM.def('pincer',{tags:['flank'],t:3,cost:3,tele:'warn',gap:130,f(I,k){const py=FM.py(),x0=gr(640,820);
+  for(const s of[-1,1]){const w=FM.warn(x0,s);FM.later(I,1,()=>{FM.unwarn(w);const ly=fmCy(py+s*82);
+    for(let i=0;i<(k%2?2:1);i++){const e=FM.u('drone',0,0,fmSeg([[x0+i*50,s<0?-24:H+24],[x0+i*50-90,ly],[x0+i*50-260,ly],[-200,ly]],150),{pt:-i*.3});FM.edge(e,s);}});}}});
+/* 2 crossX: two diagonal lines that cross into an X in the middle of the screen */
+FM.def('crossX',{tags:['ranks'],t:1,cost:4,f(I,k){const s=fmSide(I,k),y0=s<0?70:H-70,vy=-s*58;
+  for(let i=0;i<4;i++){const yy=y0-s*i*44;FM.u('drone',0,0,t=>[W+30+i*40-150*t,fmCy(yy+vy*t)],{});}}});
+/* 3 snake: one long body on an S-shaped path; every piece adds four more links to the same path */
+FM.def('snake',{tags:['ranks','flank'],t:1,cost:4,f(I,k){if(!I.s.p){const a=gr(120,180),y=gr(H*.35,H*.65),pts=[];for(let x=W+40;x>=-200;x-=40)pts.push([x,fmCy(y+a*Math.sin((W+40-x)/170))]);I.s.p=fmSeg(pts,150);}
+  for(let i=0;i<4;i++)FM.u('drone',0,0,I.s.p,{pt:-i*.34});}});
+/* 4 spiral: five swarmers ride in on a ring that winds inwards, then the knot flies left */
+FM.def('spiral',{tags:['swarm'],t:5,cost:3,f(I,k){const cy=gr(150,H-150),dir=fmSide(I,k);
+  for(let i=0;i<5;i++){const a0=i*1.2566;FM.u('swarm',0,0,t=>{const cx=t<1.6?W+170-(W+170-W*.7)*t/1.6:W*.7-130*(t-1.6),r=Math.max(26,150-50*t),a=a0+dir*1.7*t;return [cx+Math.cos(a)*r,cy+Math.sin(a)*r*.8];},{by:cy});}}});
+/* 5 bloom: a tight ring that bursts open into a wide circle and drifts on */
+FM.def('bloom',{tags:['swarm'],t:4,cost:3,f(I,k){const cy=gr(170,H-170);
+  for(let i=0;i<7;i++){const a=i*0.8976;FM.u('swarm',0,0,t=>{const cx=W+60-170*t,r=t<2.4?18:18+Math.min(150,(t-2.4)*110);return [cx+Math.cos(a)*r,cy+Math.sin(a)*r];},{by:cy});}}});
+/* 6 noose: half rings that close on the lane you were in; the free side is behind you */
+FM.def('noose',{tags:['flank','elite'],t:9,cost:3,f(I,k){const py=FM.py(),s=fmSide(I,k);
+  for(let i=0;i<3;i++){const a0=s*(0.6+i*0.55);FM.u('drone',0,0,t=>{const r=Math.max(70,210-55*t),cx=W+120-150*t;return [cx+Math.cos(Math.PI-a0)*r*.6,fmCy(py-Math.sin(a0)*r)];},{});}}});
+/* 7 stairs: a staircase that drops (or climbs) one step on every beat */
+FM.def('stairs',{tags:['ranks','rush'],t:3,cost:4,f(I,k){const s=fmSide(I,k),y0=s<0?gr(80,140):gr(H-140,H-80),bs=fmBs();
+  for(let i=0;i<4;i++)FM.u('drone',0,0,t=>[W+30+i*48-140*t,fmCy(y0-s*Math.min(6,Math.floor(t/bs))*42)],{});}});
+/* 8 zigzag: a column of three that zigzags up and down as it comes */
+FM.def('zigzag',{tags:['ranks'],t:1,cost:3,f(I,k){const yc=gr(170,H-170),ph=GR()*2;
+  for(let i=0;i<3;i++)FM.u('drone',0,0,t=>{const q=((t*.6+ph)%2+2)%2,tri=q<1?q:2-q;return [W+30-140*t,fmCy(yc-110+tri*220+(i-1)*58)];},{});}});
+/* 9 orbit: pairs that circle each other while they drift in on a slow wave */
+FM.def('orbit',{tags:['ranks','elite'],t:4,cost:2,f(I,k){const yc=gr(140,H-140),ph=GR()*6;
+  for(const s of[0,Math.PI])FM.u('drone',0,0,t=>{const cx=W+50-130*t,cy=yc+40*Math.sin(t*.9+ph);return [cx+Math.cos(t*3.2+s)*46,fmCy(cy+Math.sin(t*3.2+s)*46)];},{});}});
+/* 10 wall: a full-height column with one gap (>= 150 px) that moves a step every column; the column is flashed one beat before */
+FM.def('wall',{tags:['hazard'],t:17,cost:4,tele:'line',gap:150,kinds:['swarm'],f(I,k){const g=150;I.s.gc=I.s.gc==null?FM.py():clamp(I.s.gc+(GR()<.5?-1:1)*gr(50,80),g/2+40,H-g/2-40);const gc=I.s.gc;
+  const tl=FM.tel({k:'col',x:W-10,gc,g,nb:1,T:fmBs()});FM.later(I,1,()=>{FM.untel(tl);for(let y=34;y<=H-34;y+=46){if(Math.abs(y-gc)<g/2+9)continue;FM.u('swarm',0,0,t=>[W+20-165*t,y],{by:y});}});}});
+/* 11 echo: a short line that comes back on the next two beats, a lane lower each time (a wave of waves) */
+FM.def('echo',{tags:['ranks','rush'],t:1,cost:3,f(I,k){const s=fmSide(I,k),y0=gr(110,H-110);
+  for(let b=0;b<3;b++)FM.later(I,b,()=>{const y=fmCy(y0+s*b*62);for(let i=0;i<2;i++)FM.u('drone',0,0,t=>[W+30+i*46-175*t,y],{});});}});
+/* 12 carrier: a carrier with two escorts orbiting it (gunship + escorts before the carrier is unlocked) */
+FM.def('carrier',{tags:['elite'],t:19,cost:5,kinds:['carrier','drone'],role:'carrier + escorts',f(I,k){const y=gr(170,H-200),c=FM.u('carrier',W+80,y);
+  for(const s of[0,Math.PI])FM.u('drone',0,0,(t,e)=>{if(e){if(c.hp>0&&!c.dead){e.hx=c.x;e.hy=c.y;}else e.hx=(e.hx==null?W:e.hx)-4;}return [(e&&e.hx!=null?e.hx:W+80)+Math.cos(t*2.2+s)*70,fmCy((e&&e.hy!=null?e.hy:y)+Math.sin(t*2.2+s)*70)];},{});}});
+/* 13 mirror: top and bottom pairs that move as mirror images of each other */
+FM.def('mirror',{tags:['ranks','flank'],t:3,cost:4,f(I,k){const a=gr(40,90),yo=gr(60,170),ph=GR()*6;
+  for(let i=0;i<2;i++)for(const s of[-1,1])FM.u('drone',0,0,t=>[W+30+i*56-140*t,fmCy(H/2+s*(yo+a*Math.sin(t*2+ph)))],{keep:1});}});
+/* 14 meteors: mines fall from the top across the lanes; the column you are in is never used and every drop is marked one beat before */
+FM.def('meteors',{tags:['hazard'],t:7,cost:3,tele:'warn',gap:120,kinds:['mine'],f(I,k){const xs=[];for(let n=0;n<3;n++){let x=gr(W*.3,W-60),tr=0;while((Math.abs(x-P.x)<110||xs.some(q=>Math.abs(q-x)<120))&&tr++<20)x=gr(W*.3,W-60);xs.push(x);}
+  for(const x of xs){const w={x,y:12,b:G.bc,kind:'rain'};WARN.push(w);FM.later(I,1,()=>{FM.unwarn(w);FM.u('mine',0,0,t=>[x-55*t,-26+150*t],{by:-26});});}}});
+/* 15 shadow: two drones that hold at the right and mirror your height (they sit where you are not), then peel away */
+FM.def('shadow',{tags:['elite'],t:8,cost:2,f(I,k){const s=fmSide(I,k);
+  for(let i=0;i<2;i++){const xs=W*(.74+.1*i);FM.u('drone',0,0,(t,e)=>{if(!e)return [W+40,H/2];if(t<1.3)return [W+40-(W+40-xs)*t/1.3,e.my==null?(e.my=H/2):e.my];
+    if(t<6){const tg=clamp(H-P.y+s*(i?60:-60),60,H-60);e.my=(e.my==null?tg:e.my)+clamp(tg-e.my,-110*.033,110*.033);return [xs,e.my];}return [xs-180*(t-6),e.my];},{});}}});
+/* 16 bait: a plain line that peels apart, half up and half down, when it reaches the middle */
+FM.def('bait',{tags:['ranks','rush'],t:5,cost:5,f(I,k){const y=gr(150,H-150);
+  for(let i=0;i<5;i++){const s=i%2?1:-1;FM.u('drone',0,0,t=>{const x=W+30+i*50-150*t,d=x<W*.62?Math.min(1,(W*.62-x)/140):0;return [x,fmCy(y+s*d*d*(110+20*i))];},{});}}});
+/* 17 cross: two horizontal lines, one sliding down and one sliding up, that pass through each other */
+FM.def('cross',{tags:['ranks','flank'],t:4,cost:4,f(I,k){for(const s of[-1,1]){const y0=s<0?H*.22:H*.78;
+  for(let i=0;i<2;i++)FM.u('drone',0,0,t=>[W+30+i*52-150*t,fmCy(y0-s*Math.min(H*.56,40*t))],{});}}});
+/* 18 sandwich: flankers drop in from both edges while a line pushes through the middle */
+FM.def('sandwich',{tags:['flank'],t:4,cost:4,kinds:['flank','drone'],role:'flankers as the bread',f(I,k){DIR.flank(2,true);const y=H/2+gr(-40,40);for(let i=0;i<2;i++)FM.u('drone',0,0,t=>[W+30+i*52-150*t,y],{});}});
+/* 19 shieldwall: shielders as a slow moving wall (gaps between them), drones shooting from behind it */
+FM.def('shieldwall',{tags:['elite','ranks'],t:4,cost:5,kinds:['shielder','drone'],role:'shielder as a moving wall',gap:130,f(I,k){const off=(k%2)*40;
+  for(let i=0;i<2;i++){const y=fmCy(H*.3+i*H*.4+off-20);FM.u('shielder',0,0,t=>[W+40-70*t,y],{});}
+  FM.later(I,2,()=>{for(let i=0;i<2;i++){const y=H/2+(i?55:-55);FM.u('drone',0,0,t=>[W+30-90*t,y],{});}});}});
+/* 20 healerpack: a healer in the middle of a ring of drones (shoot it first) */
+FM.def('healerpack',{tags:['elite'],t:16,cost:5,kinds:['healer','drone'],role:'healer in a pack',f(I,k){const yc=gr(150,H-150);FM.u('healer',0,0,t=>[W+50-110*t,yc],{});
+  for(let i=0;i<4;i++){const a=i*1.5708;FM.u('drone',0,0,t=>[W+50-110*t+Math.cos(a+t*1.4)*64,fmCy(yc+Math.sin(a+t*1.4)*64)],{});}}});
+/* 21 sniperlanes: snipers on the top and bottom lanes; a short line in between */
+FM.def('sniperlanes',{tags:['elite','hazard'],t:14,cost:4,kinds:['sniper','drone'],role:'sniper lanes',f(I,k){const s=fmSide(I,k);FM.u('sniper',W+40,s<0?70:H-70);
+  FM.later(I,2,()=>{const y=H/2+gr(-60,60);for(let i=0;i<3;i++)FM.u('drone',0,0,t=>[W+30+i*48-150*t,y],{});});}});
+/* 22 kamikaze: a wave of divers, one per beat, each lane further from the last */
+FM.def('kamikaze',{tags:['rush'],t:6,cost:3,kinds:['kamikaze'],role:'kamikaze wave',f(I,k){const s=fmSide(I,k);
+  for(let b=0;b<3;b++)FM.later(I,b,()=>FM.u('kamikaze',W+40,fmCy(H/2+s*(b-1)*150)));}});
+/* 23 bomberrun: bombers along the top lane, then the bottom lane */
+FM.def('bomberrun',{tags:['hazard'],t:11,cost:3,kinds:['bomber'],role:'bomber run',f(I,k){const s=fmSide(I,k);FM.u('bomber',W+40,s<0?90:H-120);
+  FM.later(I,4,()=>FM.u('drone',0,0,t=>[W+30-160*t,s<0?H-110:110],{}));}});
+/* 24 splitterv: splitters in a V that burst into drones */
+FM.def('splitterv',{tags:['elite'],t:9,cost:4,kinds:['splitter'],role:'splitter cascade',f(I,k){const y=gr(150,H-150);
+  for(let i=-1;i<=1;i++)FM.u('splitter',0,0,t=>[W+40+Math.abs(i)*70-115*t,fmCy(y+i*90)],{});}});
+/* 25 minefield: a minelayer crossing the middle while old mines drift in from the right */
+FM.def('minefield',{tags:['hazard'],t:22,cost:4,kinds:['minelayer','mine'],role:'minelayer field',f(I,k){FM.u('minelayer',W+40,gr(140,H-140));
+  for(let i=0;i<2;i++){const y=gr(60,H-60);FM.u('mine',0,0,t=>[W+40+i*120-62*t,y+14*Math.sin(t*.9+i)],{by:y});}}});
+/* 26 nest: a pair of turrets with drones circling the nest */
+FM.def('nest',{tags:['turrets'],t:25,cost:5,kinds:['turret','drone'],role:'turret nest',f(I,k){const x=gr(740,820),y=gr(150,H-150);
+  FM.u('turret',W+60,y-70,null,{stop:x});FM.u('turret',W+60,y+70,null,{stop:x+20});
+  for(let i=0;i<2;i++){const a=i*Math.PI;FM.u('drone',0,0,t=>{const cx=t<2.4?W+80-(W+80-x)*t/2.4:t<7?x:x-150*(t-7);return [cx+Math.cos(a+t*1.8)*120,fmCy(y+Math.sin(a+t*1.8)*120)];},{});}}});
+/* 27 escort: a gunship inside a diamond of four drones that keep station on it */
+FM.def('escort',{tags:['elite'],t:26,cost:5,kinds:['gunship','drone'],role:'gunship escort',f(I,k){const y=gr(170,H-200),g=FM.u('gunship',W+90,y);
+  [[-70,0],[0,-80],[0,80],[70,0]].forEach(([dx,dy],i)=>FM.u('drone',0,0,(t,e)=>{const h=g.hp>0&&!g.dead;if(e){if(h){e.hx=g.x;e.hy=g.y;}else{e.hx=(e.hx==null?W:e.hx)-4;}}return [(e&&e.hx!=null?e.hx:W+90)+dx,fmCy((e&&e.hy!=null?e.hy:y)+dy)];},{}));}});
+/* 28 stampede: chargers on consecutive beats, top lane, middle, bottom */
+FM.def('stampede',{tags:['rush'],t:3,cost:3,kinds:['charger'],role:'charger stampede',f(I,k){const s=fmSide(I,k);
+  for(let b=0;b<3;b++)FM.later(I,b,()=>FM.u('charger',W+30,fmCy(H/2+s*(b-1)*(H*.3))));}});
+/* 29 fork: three chargers abreast, then two through the gaps */
+FM.def('fork',{tags:['rush','elite'],t:7,cost:4,kinds:['charger'],f(I,k){for(const f of[.2,.5,.8])FM.u('charger',W+30,H*f);FM.later(I,2,()=>{for(const f of[.35,.65])FM.u('charger',W+30,H*f);});}});
+/* 30 river: a stream of swarmers on a winding river; every piece is another stretch of the same river */
+FM.def('river',{tags:['swarm'],t:9,cost:3,f(I,k){if(!I.s.p){const y=gr(H*.35,H*.65),pts=[];for(let x=W+30;x>=-200;x-=30)pts.push([x,fmCy(y+120*Math.sin((W-x)/120))]);I.s.p=fmSeg(pts,175);}
+  for(let i=0;i<6;i++)FM.u('swarm',0,0,I.s.p,{pt:-i*.2});}});
+/* 31 helix: two strands with opposite waves, a double helix */
+FM.def('helix',{tags:['ranks'],t:1,cost:4,f(I,k){const yc=gr(170,H-170);
+  for(let i=0;i<2;i++)for(const s of[0,Math.PI])FM.u('drone',0,0,t=>[W+30+i*60-140*t,fmCy(yc+80*Math.sin(t*2.2+s+i*.6))],{});}});
+/* 32 box: four drones at the corners of a turning square */
+FM.def('box',{tags:['ranks','elite'],t:5,cost:4,f(I,k){const yc=gr(150,H-150),dir=fmSide(I,k);
+  for(let i=0;i<4;i++){const a=i*1.5708+.785;FM.u('drone',0,0,t=>[W+60-135*t+Math.cos(a+dir*t*1.5)*60,fmCy(yc+Math.sin(a+dir*t*1.5)*60)],{});}}});
+/* 33 arrow: an arrowhead flies fast down the lane you were in; the lane flashes one beat first */
+FM.def('arrow',{tags:['rush'],t:6,cost:5,tele:'line',f(I,k){const y=FM.py(),tl=FM.tel({k:'lane',y,nb:1,T:fmBs()});
+  FM.later(I,1,()=>{FM.untel(tl);[[0,0],[40,-36],[40,36],[80,-72],[80,72]].forEach(([dx,dy])=>FM.u('drone',0,0,t=>[W+30+dx-215*t,fmCy(y+dy)],{}));});}});
+/* 34 bounce: drones on diagonals that bounce off the top and bottom of the screen */
+FM.def('bounce',{tags:['ranks','breath'],t:1,cost:3,f(I,k){const s=fmSide(I,k);
+  for(let i=0;i<3;i++){const y0=gr(80,H-80);FM.u('drone',0,0,t=>{const span=H-120,q=((y0-60+s*95*t)%(2*span)+2*span)%(2*span);return [W+30+i*60-130*t,60+(q<span?q:2*span-q)];},{});}}});
+/* 35 loop: a line that flies a full loop in the middle of the screen, then carries on */
+FM.def('loop',{tags:['ranks','flank'],t:9,cost:4,f(I,k){const y=gr(150,H-150),s=fmSide(I,k),R=85;
+  const pf=t=>{const v=150,x0=W+40,xl=W*.62,tl=(x0-xl)/v,tc=2*Math.PI*R/v;if(t<tl)return [x0-v*t,y];if(t<tl+tc){const a=(t-tl)*v/R;return [xl-Math.sin(a)*R,fmCy(y+s*(R-Math.cos(a)*R))];}return [xl-v*(t-tl-tc),y];};
+  for(let i=0;i<4;i++)FM.u('drone',0,0,pf,{pt:-i*.32});}});
+/* 36 sweep: an arc of five that swings from one edge across the screen to the other */
+FM.def('sweep',{tags:['flank'],t:5,cost:5,f(I,k){const s=fmSide(I,k),cx=W*.15,cy=s<0?-H*.35:H*1.35,R=Math.hypot(W+40-cx,cy-H/2);
+  for(let i=0;i<5;i++)FM.u('drone',0,0,t=>{const a0=Math.atan2((s<0?60:H-60)-cy,W+40-cx),a=a0+s*(.42*t-i*.07);const x=cx+Math.cos(a)*R,y=cy+Math.sin(a)*R;return [x,fmCy(y)];},{});}});
+/* 37 pulse: a ring that breathes with the beat (wide on the beat, tight between) */
+FM.def('pulse',{tags:['swarm','elite'],t:25,cost:4,f(I,k){const yc=gr(170,H-170);
+  for(let i=0;i<6;i++){const a=i*1.0472;FM.u('drone',0,0,t=>{const b=G.bp%1,r=45+40*Math.pow(1-b,2);return [W+60-135*t+Math.cos(a+t)*r,fmCy(yc+Math.sin(a+t)*r)];},{});}}});
+/* 38 slalom: laser gates in a row with gaps high, low, high */
+FM.def('slalom',{tags:['hazard'],t:9,cost:3,gap:130,kinds:['gate'],role:'gate slalom',f(I,k){const s=fmSide(I,k);
+  for(let i=0;i<2;i++)FM.u('gate',W+30+i*300,0,null,{gy:H/2+(i%2?-s:s)*H*.22,gap:130});}});
+/* 39 curtain: a row that lowers from the top like a curtain, then drifts away */
+FM.def('curtain',{tags:['flank','hazard'],t:17,cost:4,tele:'warn',f(I,k){const s=fmSide(I,k),xs=[.5,.62,.74,.86].map(f=>W*f+gr(-14,14)),ws=xs.map(x=>FM.warn(x,s));
+  FM.later(I,1,()=>{ws.forEach(w=>FM.unwarn(w));xs.forEach((x,i)=>{const yt=s<0?H*.28:H*.72;const e=FM.u('drone',0,0,t=>t<1.4?[x,(s<0?-24:H+24)+(yt-(s<0?-24:H+24))*t/1.4]:t<3.4?[x,yt]:[x-150*(t-3.4),yt],{});FM.edge(e,s);});});}});
+/* 40 geyser: a column bursts up from the bottom (or down from the top) and bends left */
+FM.def('geyser',{tags:['flank'],t:8,cost:3,tele:'warn',f(I,k){const s=fmSide(I,k),x=gr(W*.55,W*.85),w=FM.warn(x,-s);
+  FM.later(I,1,()=>{FM.unwarn(w);for(let i=0;i<3;i++){const e=FM.u('drone',0,0,fmSeg([[x,s<0?H+30:-30],[x,s<0?H*.45:H*.55],[x-120,s<0?H*.3:H*.7],[-200,s<0?H*.3:H*.7]],170),{pt:-i*.28});FM.edge(e,-s);}});}});
+/* 41 burst: a tight knot that explodes into six directions, then everything drifts left */
+FM.def('burst',{tags:['swarm'],t:6,cost:3,f(I,k){const yc=gr(170,H-170);
+  for(let i=0;i<6;i++){const a=i*1.0472;FM.u('swarm',0,0,t=>{const x=W+40-160*Math.min(t,2.2),r=t<2.2?6:Math.min(150,(t-2.2)*120);return [x+Math.cos(a)*r-140*Math.max(0,t-2.2),fmCy(yc+Math.sin(a)*r)];},{by:yc});}}});
+/* 42 comet: an elite head on a wave with a tail of swarmers in its wake */
+FM.def('comet',{tags:['elite','swarm'],t:7,cost:4,f(I,k){const y=gr(150,H-150),a=gr(70,120),pf=t=>[W+40-160*t,fmCy(y+a*Math.sin(t*1.4))];
+  const h=FM.u('drone',0,0,pf,{keep:1});if(!h.el){h.el=1;h.hp=Math.round(h.hp*2);h.max=h.hp;h.r=Math.round(h.r*1.25);h.score*=2;}for(let i=1;i<=5;i++)FM.u('swarm',0,0,pf,{pt:-i*.16});}});
+/* 43 scissors: two lines close on the middle, stop 164 px apart, and open again */
+FM.def('scissors',{tags:['flank','rush'],t:5,cost:4,gap:130,f(I,k){for(const s of[-1,1])for(let i=0;i<2;i++)FM.u('drone',0,0,t=>{const c=Math.sin(Math.min(Math.PI,t*.75));return [W+30+i*52-150*t,fmCy(H/2+s*(H*.42-(H*.42-82)*c))];},{});}});
+/* 44 swoop: three dive from high to low and level out along the floor */
+FM.def('swoop',{tags:['flank','rush'],t:4,cost:3,f(I,k){const s=fmSide(I,k),y0=s<0?60:H-60,y1=s<0?H-90:90;
+  for(let i=0;i<3;i++)FM.u('drone',0,0,fmSeg([[W+30,y0],[W*.72,y0],[W*.55,y1],[-200,y1]],175),{pt:-i*.3});}});
+/* 45 braid: three strands that weave through each other */
+FM.def('braid',{tags:['ranks'],t:6,cost:3,f(I,k){const yc=gr(170,H-170);
+  for(let i=0;i<3;i++)FM.u('drone',0,0,t=>[W+30+i*40-140*t,fmCy(yc+70*Math.sin(t*1.8+i*2.094))],{});}});
+/* 46 stutter: a line that only moves on the beat (a hop forward, then a stop) */
+FM.def('stutter',{tags:['ranks','breath'],t:1,cost:4,f(I,k){const y=gr(100,H-100),bs=fmBs();
+  for(let i=0;i<4;i++)FM.u('drone',0,0,t=>{const n=Math.floor(t/bs),f=Math.min(1,(t/bs-n)*3);return [W+30+i*50-(n+f)*bs*170,y];},{});}});
+/* 47 lattice: a 2 x 3 grid whose rows slide against each other */
+FM.def('lattice',{tags:['ranks','elite'],t:25,cost:6,f(I,k){const yc=gr(170,H-170);
+  for(let c=0;c<3;c++)for(const r of[-1,1])FM.u('drone',0,0,t=>[W+30+c*60-135*t,fmCy(yc+r*(52+30*Math.sin(t*1.6+c)))],{});}});
+/* 48 fan: five leave from one point on the right and spread out into five lanes */
+FM.def('fan',{tags:['ranks','flank'],t:2,cost:5,f(I,k){const y=gr(200,H-200);
+  for(let i=-2;i<=2;i++)FM.u('drone',0,0,t=>{const x=W+40-150*t,sp=Math.min(1,Math.max(0,(W*.8-x)/180));return [x,fmCy(y+i*sp*78)];},{});}});
+/* 49 hold: drones that take stations and hover (the zoo's station-and-hover) */
+FM.def('hold',{tags:['ranks','breath'],t:1,cost:3,f(I,k){const y=gr(100,H-100);for(let i=0;i<3;i++)FM.u('drone',W+30+i*55,y+(i-1)*30,null,{});}});
+/* 50 tide: two waves of swarmers, one high one low, pass in opposite sine phase */
+FM.def('tide',{tags:['swarm'],t:6,cost:4,f(I,k){for(const s of[-1,1]){const y=H/2+s*H*.24;for(let i=0;i<4;i++)FM.u('swarm',0,0,t=>[W+30+i*36-185*t,fmCy(y+60*Math.sin(t*2.6+(s>0?Math.PI:0)))],{by:y});}}});
+/* 51 line: the classic straight line of five (kept so the first stage reads simply) */
+FM.def('line',{tags:['ranks','breath'],t:1,cost:5,f(I,k){const y=gr(80,H-150);for(let i=0;i<5;i++)FM.u('drone',0,0,t=>[W+30+i*55-140*t,y],{});}});
+/* 52 vee: the classic V of five */
+FM.def('vee',{tags:['ranks'],t:1,cost:5,f(I,k){const y=gr(150,H-190);for(let i=-2;i<=2;i++)FM.u('drone',0,0,t=>[W+30+Math.abs(i)*50-140*t,y+i*46],{});}});
+/* 53 wave: the classic sine line of six */
+FM.def('wave',{tags:['ranks','breath'],t:1,cost:5,f(I,k){const y=gr(130,H-170);for(let i=0;i<6;i++)FM.u('drone',0,0,t=>[W+30+i*46-140*t,fmCy(y+70*Math.sin(t*2.4+i*.6))],{});}});
+/* 54 turrets: a column of turrets that dig in at the right */
+FM.def('turrets',{tags:['turrets'],t:2,cost:3,kinds:['turret'],f(I,k){const x=gr(760,860),n=k%2?2:3;for(let i=0;i<n;i++)FM.u('turret',W+60+i*110,H*(n===3?.2+.3*i:.3+.4*i)+gr(-20,20),null,{stop:x+i*14,bf:fireIn(1+i)});}});
+/* 55 gunship: a lone gunship */
+FM.def('gunship',{tags:['elite'],t:4,cost:5,kinds:['gunship'],f(I,k){FM.u('gunship',W+90,gr(160,H-220));}});
+/* 56 gates: one laser gate (gap 130) */
+FM.def('gates',{tags:['hazard'],t:1,cost:2,gap:130,kinds:['gate'],f(I,k){FM.u('gate',W+30,0,null,{gy:gr(150,H-200),gap:130});}});
+/* 57 phalanx: a block of drones (Athens) */
+FM.def('phalanx',{tags:['ranks','elite'],t:33,cost:6,f(I,k){const y=gr(150,H-210);for(let c=0;c<2;c++)for(let r=-1;r<=1;r++)FM.u('drone',0,0,t=>[W+30+c*70-120*t,y+r*54],{});}});
+/* 58 pillars: two narrow gates one behind the other (Athens) */
+FM.def('pillars',{tags:['hazard'],t:33,cost:3,gap:124,kinds:['gate'],f(I,k){FM.u('gate',W+30,0,null,{gy:gr(150,H-200),gap:124});FM.u('gate',W+420,0,null,{gy:gr(150,H-200),gap:124});}});
+/* 59 chargers: three chargers on random lanes (the old rush) */
+FM.def('chargers',{tags:['rush'],t:1,cost:3,kinds:['charger'],f(I,k){for(let i=0;i<3;i++)FM.u('charger',W+30+i*110,gr(60,H-110));}});
+/* 61 testudo: shielders in front, a healer and two drones behind them, all moving as one block (Athens) */
+FM.def('testudo',{tags:['elite','ranks'],t:33,cost:6,kinds:['shielder','healer','drone'],role:'shielded testudo',f(I,k){const yc=gr(170,H-170);
+  for(const dy of[-110,0,110])FM.u('shielder',0,0,t=>[W+40-75*t,fmCy(yc+dy)],{});FM.u('healer',0,0,t=>[W+130-75*t,yc],{});
+  for(const dy of[-60,60])FM.u('drone',0,0,t=>[W+110-75*t,fmCy(yc+dy)],{});}});
+/* 62 ambush: snipers on the top and bottom lanes cover two divers from the middle (Athens) */
+FM.def('ambush',{tags:['elite','rush'],t:34,cost:5,kinds:['sniper','kamikaze'],role:'ambush (snipers + divers)',f(I,k){FM.u('sniper',W+40,70);FM.u('sniper',W+40,H-70);
+  for(let b=0;b<2;b++)FM.later(I,2+b,()=>FM.u('kamikaze',W+40,fmCy(H/2+(b?70:-70))));}});
+/* 60 flankers: flankers curl in from both edges */
+FM.def('flankers',{tags:['flank'],t:4,cost:2,kinds:['flank'],f(I,k){DIR.flank(2,true);}});
+
+NR.on('runStart',()=>{FM.reset();});
+NR.on('beat',()=>{if(RET.vary)FM.tickTel();});
+{const dp=drawPickups;drawPickups=function(t){dp(t);try{FM.draw(t);}catch(err){}};}
+
+/* ---------- stagescripts.js: every story stage plays its own script (VARIETY A, owner 18 Oct 2026). Flag RET.vary (formations.js); ?vary=0 = the old shuffled pools.
+   THE SCRIPT TABLE (edit freely; vary-test.js checks it): stage number -> {sig, mut, m}
+     m    the moments in order, spread evenly over the stage (a boss / mini-boss stage: over the build-up before it). One moment is a few bars of one formation:
+            'snake'        a formation from the library in formations.js            'snake~r'   the same formation remixed (arrowheads, faster, mirrored)
+            'pincer|gates' two formations taking turns (the escalation)             '~bounce'   a breather (fewer enemies, light formation)
+            'stairs+g'     ground units may roll in during this moment (leak.js)    '*'         the stage's SIGNATURE set piece (below)
+     sig  [name, formation A, formation B, twist]: the set piece no other stage has; twist = mirror | elite | fast | echo
+     mut  the stage's rule change (VMUT below), every second stage; '' = none. It is on the intro card and in the HUD and pauses while a boss is out.
+   The director keeps its own timing, budget, caps and READY gaps (dir.js, zoo.js, leak.js): it decides WHEN and HOW MUCH, the script decides WHAT. ---------- */
+const VSCRIPT={
+ 1:{sig:['COURIER LIGHTS','wave','zigzag','mirror'],mut:'',m:['line','snake','zigzag','helix','gates','snake|wave','wave','crossX','echo','~stutter','*','bounce']},
+ 2:{sig:['PATROL GRID','gates','snake','fast'],mut:'offbeat',m:['vee','fan','turrets','chargers','echo','fan|wave','wave','zigzag','stutter','~hold','*','helix']},
+ 3:{sig:['WINDOW DISPLAY','stutter','bounce','echo'],mut:'',m:['hold','pincer','stampede+g','stairs','mirror','pincer|gates','gates','crossX+g','snake','~bounce','*','line']},
+ 4:{sig:['GUARD CHANGE','cross','mirror','mirror'],mut:'mirror',m:['chargers','shieldwall','sandwich+g','bloom','cross','orbit','shieldwall|swoop','swoop+g','gunship','turrets','~wave','*','fan']},
+ 5:{sig:['VAULT ALARM','bloom','hold','elite'],mut:'',m:['vee','shieldwall','spiral+g','box','scissors','bait','sweep','stampede+g','*','~stutter']},
+ 6:{sig:['CONVOY AMBUSH','orbit','pincer','mirror'],mut:'wind',m:['gates','kamikaze','burst+g','braid','arrow','kamikaze|tide','tide','stairs+g','pincer','~hold','*','mirror']},
+ 7:{sig:['GLASS ELEVATOR','fan','bloom','echo'],mut:'',m:['cross','kamikaze','fork+g','meteors','comet','kamikaze|bloom','bloom','gunship+g','sandwich','~line','*','orbit']},
+ 8:{sig:['SIREN CHASE','meteors','comet','mirror'],mut:'quickdash',m:['vee','shadow','geyser+g','bait','swoop','scissors','box','sweep+g','spiral','*','~bounce']},
+ 9:{sig:['RIVER LANTERNS','burst','echo','fast'],mut:'',m:['crossX','splitterv','river','loop','slalom','splitterv|noose','noose','gates','stairs','~hold','*','stampede']},
+ 10:{sig:['BRIDGE STRAIN','stampede','box','mirror'],mut:'curve',m:['zigzag','splitterv','snake~r','orbit','pincer','splitterv|gunship','gunship','comet','chargers','~bounce','*','snake']},
+ 11:{sig:['MARKET BELLS','arrow','sweep','echo'],mut:'',m:['stutter','bomberrun','spiral+g','sweep','burst','braid','bomberrun|tide','tide+g','mirror','box','~line','*','meteors']},
+ 12:{sig:['BOW WAVE','spiral','bounce','mirror'],mut:'nopower',m:['vee','bomberrun','pincer~r+g','scissors','cross','bomberrun|bloom','bloom','fork+g','bait','~bounce','*','sandwich']},
+ 13:{sig:['OLD STONES','bounce','splitterv','mirror'],mut:'',m:['echo','shadow','fan+g','helix','geyser','shieldwall','swoop','kamikaze+g','*','~wave']},
+ 14:{sig:['FLEET SIGNAL','turrets','noose','elite'],mut:'laser',m:['hold','sniperlanes','snake~r+g','turrets','arrow','sniperlanes|spiral','spiral','river+g','crossX','~line','*','pincer']},
+ 15:{sig:['CRANE SWING','fan','arrow','fast'],mut:'',m:['snake','sniperlanes','stampede+g','mirror','sandwich','sniperlanes|stairs','stairs','cross+g','box','~bounce','*','comet']},
+ 16:{sig:['UNDERTOW','stairs','river','fast'],mut:'drop',m:['wave','healerpack','pincer~r+g','loop','shadow','scissors','bloom','vee+g','*','~line']},
+ 17:{sig:['RED LIGHTS','stutter','fork','elite'],mut:'',m:['crossX','wall','curtain','sweep','river','wall|slalom','slalom','noose','tide','~bounce','*','bomberrun']},
+ 18:{sig:['SHUNTING YARD','sniperlanes','meteors','elite'],mut:'split',m:['snake','river~r','helix','pincer','zigzag','river~r|swoop','swoop','comet','braid','~wave','*','gunship']},
+ 19:{sig:['FIREWALL BREACH','carrier','turrets','fast'],mut:'',m:['line','carrier','sniperlanes+g','stairs','spiral','carrier|bloom','bloom','echo+g','burst','~hold','*','mirror']},
+ 20:{sig:['SIGNAL FAILURE','sandwich','stutter','echo'],mut:'shrink',m:['stutter','carrier','loop~r+g','meteors','stampede','orbit','carrier|sandwich','sandwich+g','arrow','shieldwall','~wave','*','splitterv']},
+ 21:{sig:['BARRIER DROP','fan','stairs','echo'],mut:'',m:['chargers','bait','shadow+g','scissors','turrets','fork','geyser','gates+g','*','~bounce']},
+ 22:{sig:['LAST CORDON','arrow','slalom','echo'],mut:'beatgap',m:['vee','minefield','river~r+g','box','fan','minefield|kamikaze','kamikaze','cross+g','loop','~hold','*','noose']},
+ 23:{sig:['CRATE STACK','minefield','geyser','mirror'],mut:'',m:['snake','minefield','healerpack+g','sandwich','echo','minefield|mirror','mirror','sweep+g','burst','~wave','*','orbit']},
+ 24:{sig:['ICE CORE','wave','minefield','fast'],mut:'blackout',m:['zigzag','loop~r','spiral+g','pincer','crossX','tide','bloom','meteors+g','*','~stutter']},
+ 25:{sig:['PRESS PASS','slalom','snake','elite'],mut:'',m:['helix','nest','lattice','pulse','splitterv','nest|gates','gates','shadow','noose','~bounce','*','wall']},
+ 26:{sig:['GRIDLOCK','fork','echo','fast'],mut:'order',m:['snake','escort','nest','wall~r','river','escort|loop','loop','orbit','gunship','~hold','*','mirror']},
+ 27:{sig:['HAMMER BEAT','loop','arrow','mirror'],mut:'',m:['zigzag','escort','sweep+g','bomberrun','scissors','escort|curtain','curtain','pincer+g','turrets','~wave','*','crossX']},
+ 28:{sig:['SPOTLIGHTS','zigzag','stampede','fast'],mut:'hail',m:['echo','curtain~r','carrier+g','meteors','kamikaze','curtain~r|shieldwall','shieldwall','spiral+g','braid','~line','*','bloom']},
+ 29:{sig:['GUARD OF HONOUR','burst','lattice','mirror'],mut:'',m:['stairs','geyser','fork+g','sandwich','slalom','stampede','sniperlanes','minefield+g','*','~bounce']},
+ 30:{sig:['HOSTILE TAKEOVER','comet','minefield','fast'],mut:'minefield',m:['vee','wall~r','bait+g','arrow','fan','wall~r|tide','tide','comet+g','cross','~stutter','*','box']},
+ 31:{sig:['TOP FLOOR','bounce','nest','echo'],mut:'',m:['wave','chargers','pincer+g','shieldwall','healerpack','chargers|gates','gates','swoop+g','burst','~bounce','*','river']},
+ 32:{sig:['MARKET CRASH','burst','snake','echo'],mut:'drop',m:['helix','curtain~r','gunship+g','geyser','snake','sweep','spiral','shadow+g','*','~stutter']},
+ 33:{sig:['ROOFTOP KIOSKS','swoop','nest','echo'],mut:'',m:['stairs','testudo','lattice~r','phalanx','pillars','testudo|bait','bait','orbit','slalom','~wave','*','stampede']},
+ 34:{sig:['HARBOUR CHAIN','sweep','pillars','mirror'],mut:'laser',m:['vee','ambush','testudo','pulse~r','sniperlanes','ambush|pincer','pincer','noose','pulse','~bounce','*','carrier']},
+ 35:{sig:['HILL BEACONS','stairs','ambush','fast'],mut:'',m:['snake','ambush','lattice~r+g','cross','minefield','ambush|arrow','arrow','fork+g','spiral','~wave','*','mirror']},
+ 36:{sig:['SACRED STEPS','lattice','fork','echo'],mut:'split',m:['zigzag','pulse~r','bomberrun+g','line','shieldwall','pulse~r|crossX','crossX','box+g','meteors','~stutter','*','sweep']},
+ 37:{sig:['BRONZE SHIELDS','mirror','kamikaze','echo'],mut:'',m:['helix','snake~r','burst+g','fan','bloom','shadow','sandwich','gates+g','*','~wave']},
+ 38:{sig:['STALL ROWS','scissors','box','elite'],mut:'beatgap',m:['echo','testudo~r','wall+g','curtain','loop','testudo~r|lattice','lattice','splitterv+g','swoop','~hold','*','comet']},
+ 39:{sig:['OLIVE GROVE','sandwich','bait','fast'],mut:'',m:['chargers','ambush~r','braid+g','escort','nest','ambush~r|river','river','kamikaze+g','healerpack','~stutter','*','turrets']},
+ 40:{sig:['BRONZE DAWN','wall','loop','fast'],mut:'quickdash',m:['zigzag','testudo~r','geyser+g','tide','gunship','shadow','noose','scissors+g','carrier','*','~hold']},
+ 41:{sig:['GLASS CORRIDOR','mirror','bait','fast'],mut:'',m:['turrets','swoop','bloom','gunship','pincer','sandwich','mirror','~orbit','*','cross']},
+ 42:{sig:['FERRY WAKE','fork','sweep','fast'],mut:'',m:['zigzag','meteors','burst','orbit','sweep','fork','noose','~hold','*','slalom']},
+ 43:{sig:['RAIL RHYTHM','comet','spiral','echo'],mut:'',m:['vee','wall','comet','curtain','stampede','gunship','arrow','~hold','*','helix']},
+ 44:{sig:['TRADE RUSH','box','crossX','elite'],mut:'',m:['echo','bloom','turrets','scissors','wall','cross','crossX','~hold','*','zigzag']},
+ 45:{sig:['MARBLE ECHO','arrow','curtain','echo'],mut:'',m:['chargers','curtain','wall','stairs','orbit','swoop','lattice','~bounce','*','comet']},
+
+};
+/* ---- the rule changes. n = HUD / card name, t = one line (8 words max). Each one is dodgeable and gentler on Easy. ---- */
+const VMUT={
+  offbeat:{n:'OFF-BEAT',t:'Enemy shots wait half a beat'},
+  mirror:{n:'MIRROR',t:'Every formation comes back mirrored'},
+  wind:{n:'CROSSWIND',t:'The wind pushes your ship'},
+  quickdash:{n:'QUICK DASH',t:'Your dash recharges three times faster'},
+  curve:{n:'CURVED SHOTS',t:'Enemy shots bend as they fly'},
+  nopower:{n:'PURE RUN',t:'No power-ups. Double score.'},
+  laser:{n:'LASER CURTAIN',t:'Leave the flashing lane'},
+  drop:{n:'AIR DROP',t:'Enemies drop in from above'},
+  split:{n:'SPLIT SHOTS',t:'Enemy shots split in two'},
+  shrink:{n:'SQUEEZE',t:'The sky closes in. Stay inside.'},
+  beatgap:{n:'FOLLOW THE SONG',t:'Fly through the gap on the beat'},
+  blackout:{n:'BLACKOUT',t:'A dark band sweeps the sky'},
+  order:{n:'TARGET ORDER',t:'Shoot the beacons 1, 2, 3'},
+  hail:{n:'HAILSTORM',t:'Slow rain from above'},
+  minefield:{n:'MINEFIELD',t:'Mines drift in'}};
+const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK?LEAK.pg:.3,X:{},
+  on(){return !!RET.vary;},
+  active(){return !!(RET.vary&&ST.on&&this.st&&this.st.n===ST.n&&!G.lab&&!G.tut);},
+  parse(x){const o={raw:x,br:x[0]==='~',sig:x==='*',g:/\+g$/.test(x)};const b=x.replace(/^~/,'').replace(/\+g$/,'');o.ids=o.sig?[]:b.split('|');return o;},
+  plan(){this.st=null;const s=ST.on&&!G.lab&&!G.tut?this.S[ST.n]:null;if(!RET.vary||!s)return;
+    this.st={n:ST.n,s,ms:s.m.map(x=>this.parse(x)),i:-1,inst:{},c:{},mut:s.mut&&VMUT[s.mut]?s.mut:'',card:0,sigOn:0};this.X={};
+    DIR.mut=this.st.mut==='hail'?['hail']:this.st.mut==='minefield'?['mine']:[];},
+  span(){return Math.max(8,ST.lead>0?ST.lead:ST.ch==='speed'?ST.tb*.55:ST.len);},   // a speed challenge usually ends early: its script is packed into the first half
+  idx(){const n=this.st.ms.length,sp=this.span(),b=Math.max(0,G.dbar);if(b<sp)return clamp(Math.floor(b*n/sp),0,n-1);
+    return 1+Math.floor((b-sp)*n/sp)%(n-1);},                     // a kill stage that runs past its song: the moments come round again (not the opening)
+  mom(){return this.st.ms[this.idx()];},
+  gnd(){return !!this.mom().g;},
+  /* ---- the director's call: one piece of the moment's formation ---- */
+  spawn(fill){const st=this.st,i=this.idx(),m=st.ms[i];if(i!==st.i){st.i=i;this.enter(i,m);}
+    const c=st.c[i]=(st.c[i]|0)+1;let id,key,tw='';
+    if(m.sig){id=st.s.sig[1+((c-1)%2)];tw=st.s.sig[3];key='S'+id;}else{id=m.ids[(c-1)%m.ids.length];key=i+':'+id;}
+    const rm=/~r$/.test(id),base=id.replace(/~r$/,'');if(!FM.L[base]){id='line';key=i+':line';}
+    let I=st.inst[key];if(!I){I=st.inst[key]=FM.make(FM.L[base]?base:'line',{r:rm?1:0});if(rm)I.s.sd=1;
+      if(tw==='elite')I.el=1;if(tw==='fast')I.tk=1.22;}
+    if(rm||tw==='mirror'||st.mut==='mirror')I.mir=(I.k%2===1);
+    const fid=m.sig?'sig:'+st.s.sig[0]:id;
+    FM.piece(I);NR.emit('pattern',{id:fid});
+    if(tw==='echo'&&I.k%2===0)FM.later(I,2,()=>{I.mir=!I.mir;FM.piece(I);});
+    if(this.log.length<6000)this.log.push({n:st.n,b:+G.dbar.toFixed(1),t:+G.t.toFixed(1),f:fid,p:m.sig?id:'',i,br:m.br?1:0,mut:st.mut});
+    if(DIR.log.spawns.length<400)DIR.log.spawns.push([+G.dbar.toFixed(1),fid]);},
+  enter(i,m){if(m.sig){const nm=this.st.s.sig[0];G.note={t:4,txt:'★ '+nm};floater(W*.62,H*.2,'★ '+nm,'#ffe14d');this.st.sigOn=1;NR.emit('setPiece',{n:this.st.n,name:nm});}},
+  theme(){if(!this.active())return;const m=this.mom();DIR.thName=m.br?'breath':DIR.thName==='breath'?'ranks':DIR.thName;if(window.LEAK)LEAK.pg=m.g?.45:this.pg0;},
+  /* ---- the rule change ---- */
+  mutOn(){return this.active()&&!!this.st.mut&&!G.boss&&!G.dead&&!ST.over&&running;},
+  mk(){return SET.diff==='easy'?.65:1;},                        // Easy: every rule change is gentler
+  tick(dt){if(!this.active())return;const st=this.st;
+    if(st.card&&G.t>=st.card){st.card=0;const M=VMUT[st.mut];banner('RULE · '+M.n,M.t,false,2.6);}
+    if(!this.mutOn())return;const id=st.mut,X=this.X,k=this.mk(),bs=fmBs();
+    for(const b of G.eb){if(b.vm)continue;b.vm=1;if(b.lob)continue;
+      if(id==='offbeat'){const f=((G.bp%1)+1)%1;if(f<.25||f>.92){b.hv=[b.vx,b.vy];b.vx=0;b.vy=0;b.ht=bs*.5;}}
+      else if(id==='curve'){b.cw=(GX()<.5?-1:1)*.75*k;b.ct=1;}
+      else if(id==='split')b.st=.7;}
+    for(const b of G.eb){
+      if(b.hv){b.ht-=dt;if(b.ht<=0){b.vx=b.hv[0];b.vy=b.hv[1];b.hv=null;}}
+      if(b.ct>0){b.ct-=dt;const a=b.cw*dt,c=Math.cos(a),s=Math.sin(a),vx=b.vx;b.vx=vx*c-b.vy*s;b.vy=vx*s+b.vy*c;}
+      if(b.st>0){b.st-=dt;if(b.st<=0&&G.eb.length<ebCap()-1&&!b.dead){const sp=Math.hypot(b.vx,b.vy)*.85,a=Math.atan2(b.vy,b.vx),d=.3*k+.1;b.dead=1;
+        for(const s of[-1,1])G.eb.push(Object.assign({},b,{dead:0,vx:Math.cos(a+s*d)*sp,vy:Math.sin(a+s*d)*sp,st:0,g:false}));}}}
+    if(id==='split')G.eb=G.eb.filter(b=>!b.dead);
+    if(id==='wind'){const ph=Math.floor((G.dbar||0)/2)%2?1:-1;X.w=ph*42*k;P.y=clamp(P.y+X.w*dt,22,H-22);}
+    if(id==='quickdash'&&P.dashCd>.36)P.dashCd=.36;
+    if(id==='nopower')G.pk=G.pk.filter(p=>p.t!=='pw'&&p.t!=='up'&&p.t!=='emp');
+    if(id==='shrink'){const c=((G.dbar||0)%8+8)%8,m=c<3?c/3:c<6?1:Math.max(0,1-(c-6)/2);X.m=m*72*k;P.y=clamp(P.y,X.m+20,H-X.m-20);}
+    if(id==='laser'){for(const L of X.lz||[]){if(G.bc>=L.on&&G.bc<L.on+1&&!L.hit&&Math.abs(P.y-L.y)<10){L.hit=1;hurt();}}X.lz=(X.lz||[]).filter(L=>G.bc<L.on+1);}
+    if(id==='beatgap'){const w=X.bw;if(w){w.x-=145*FM.tk()*dt;w.gc+=(w.tg-w.gc)*Math.min(1,dt*10);
+        if(!w.hit&&Math.abs(P.x-w.x)<9&&Math.abs(P.y-w.gc)>w.g/2-6){w.hit=1;hurt();}if(w.x<-20)X.bw=null;}}
+    if(id==='order'){for(const o of X.bc||[]){o.x-=38*dt;for(const b of G.pb){if(b.dead||o.hit)continue;if((b.x-o.x)**2+(b.y-o.y)**2<22*22){b.dead=1;
+        if(o.n===X.nx){o.hit=1;X.nx++;floater(o.x,o.y-20,String(o.n),'#ffe14d');if(X.nx>3){const pts=1500+250*ST.n;G.score+=pts;floater(W*.5,H*.3,'ORDER BONUS +'+pts,'#ffe14d');AU.sfx('up');X.bc=[];}}
+        else{for(const q of X.bc)q.hit=0;X.nx=1;floater(o.x,o.y-20,'WRONG ORDER','#ff6a7a');}}}}
+      X.bc=(X.bc||[]).filter(o=>o.x>-20);}
+    if(id==='blackout'){const c=((G.dbar||0)%8+8)%8;X.bx=c<4?W+120-(W+360)*c/4:null;}},
+  beat(){if(!this.mutOn())return;const id=this.st.mut,X=this.X,bb=((G.bc%4)+4)%4,bar=Math.floor(G.dbar||0);
+    if(id==='laser'&&bb===0&&bar%4===1&&!(X.lz&&X.lz.length)){const y=clamp(P.y,40,H-40),tb=SET.diff==='easy'?3:2;X.lz=[{y,t0:G.t,b0:G.bc,on:G.bc+tb}];}
+    if(id==='beatgap'){const w=X.bw;if(!w&&bb===0&&bar%4===2){const g=SET.diff==='easy'?180:150;X.bw={x:W+10,gc:clamp(P.y,g/2+30,H-g/2-30),tg:0,g,st:0};X.bw.tg=X.bw.gc;}
+      else if(w){w.st++;const g=w.g;w.tg=clamp(w.tg+(Math.sin(w.st*.9)>0?1:-1)*55*this.mk(),g/2+30,H-g/2-30);w.nx=clamp(w.tg+(Math.sin((w.st+1)*.9)>0?1:-1)*55*this.mk(),g/2+30,H-g/2-30);}}
+    if(id==='order'&&bb===0&&bar%8===3&&!(X.bc&&X.bc.length)){X.nx=1;const xs=[.6,.74,.88].sort(()=>GX()-.5);X.bc=[1,2,3].map((n,j)=>({n,x:W*xs[j],y:gx(90,H-90),hit:0}));}},
+  draw(t){if(!this.mutOn())return;const id=this.st.mut,X=this.X;ctx.save();
+    if(id==='blackout'&&X.bx!=null){const x0=X.bx,w=230;ctx.fillStyle='#000';ctx.globalAlpha=.62;ctx.fillRect(x0,0,w,H);ctx.globalAlpha=1;
+      ctx.strokeStyle='#ffffffcc';ctx.lineWidth=1.5;for(const b of G.eb)if(b.x>x0&&b.x<x0+w){ctx.beginPath();ctx.arc(b.x,b.y,b.r+2,0,7);ctx.stroke();}   // shots inside the band keep a white rim: never invisible
+      for(const e of G.en)if(e.x>x0&&e.x<x0+w&&e.hp>0){ctx.strokeStyle='#ff7080aa';ctx.beginPath();ctx.arc(e.x,e.y,e.r+3,0,7);ctx.stroke();}}
+    if(id==='shrink'&&X.m>1){ctx.fillStyle='#ff304030';ctx.fillRect(0,0,W,X.m);ctx.fillRect(0,H-X.m,W,X.m);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,X.m);ctx.lineTo(W,X.m);ctx.moveTo(0,H-X.m);ctx.lineTo(W,H-X.m);ctx.stroke();}
+    if(id==='wind'&&X.w){ctx.strokeStyle='#9ad8ff';ctx.globalAlpha=.55;ctx.lineWidth=2;const s=Math.sign(X.w),o=(t*60)%40;for(let x=60;x<W;x+=160)for(let j=0;j<3;j++){const y=(s>0?o+j*170:H-o-j*170);ctx.beginPath();ctx.moveTo(x-8,y-s*8);ctx.lineTo(x,y);ctx.lineTo(x+8,y-s*8);ctx.stroke();}ctx.globalAlpha=1;}
+    if(id==='laser')for(const L of X.lz||[]){const live=G.bc>=L.on;ctx.strokeStyle=live?'#ff3050':'#ff7080';ctx.globalAlpha=live?1:.45+.35*(Math.floor(t*10)%2);ctx.lineWidth=live?6:2;ctx.setLineDash(live?[]:[12,10]);
+      ctx.beginPath();ctx.moveTo(0,L.y);ctx.lineTo(W,L.y);ctx.stroke();ctx.setLineDash([]);if(live){ctx.globalAlpha=.25;ctx.fillStyle='#ff3050';ctx.fillRect(0,L.y-12,W,24);}ctx.globalAlpha=1;}
+    if(id==='beatgap'&&X.bw){const w=X.bw;ctx.fillStyle='#ff3dbb';ctx.globalAlpha=.85;ctx.fillRect(w.x-5,0,10,w.gc-w.g/2);ctx.fillRect(w.x-5,w.gc+w.g/2,10,H-w.gc-w.g/2);
+      if(w.nx!=null){ctx.globalAlpha=.4;ctx.strokeStyle='#3dffb0';ctx.setLineDash([6,6]);ctx.strokeRect(w.x-14,w.nx-w.g/2,28,w.g);ctx.setLineDash([]);}ctx.globalAlpha=1;}
+    if(id==='order')for(const o of X.bc||[]){ctx.globalAlpha=o.hit?.35:1;ctx.strokeStyle=o.n===X.nx?'#ffe14d':'#9aa7c4';ctx.lineWidth=3;ctx.beginPath();ctx.arc(o.x,o.y,18,0,7);ctx.stroke();
+      ctx.fillStyle=ctx.strokeStyle;ctx.font='700 18px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.fillText(String(o.n),o.x,o.y+6);ctx.globalAlpha=1;}
+    ctx.restore();}};
+/* ---- hooks (all inert with the flag off) ---- */
+{const so=DIR.spawnOne;DIR.spawnOne=function(fill){if(VARY.active())return VARY.spawn(fill);return so.call(this,fill);};}   // innermost: zoo.js and leak.js wrap it later (caps, READY gaps)
+{const pt=DIR.pickTheme;DIR.pickTheme=function(bar){pt.call(this,bar);VARY.theme();};}
+{const bl=DIR.barLine;DIR.barLine=function(i){VARY.theme();return bl.call(this,i);};}
+if(window.ZOO){const wo=ZOO.waveOK;ZOO.waveOK=function(){return wo.call(this)&&!VARY.active();};}          // the zoo kinds come from the scripts' roles, not at random
+if(window.LEAK){const g0=LEAK.gndOK;LEAK.gndOK=function(){const r=g0.call(this);return r&&(!VARY.active()||VARY.gnd());};}   // ground units only in '+g' moments
+{const lb=ST.label;ST.label=function(){const s=lb.call(this);return VARY.mutOn()?s+' · '+VMUT[VARY.st.mut].n:s;};}
+{const dp=drawPlayer;drawPlayer=function(t){try{VARY.draw(t);}catch(err){}dp(t);};}
+NR.on('runStart',d=>{VARY.plan();if(!VARY.active())return;const st=VARY.st,M=VMUT[st.mut];
+  if(M&&!(d&&d.resume)){banner(ST.n+' · '+ST.def.name,ST.def.intro+' · '+M.n,false,3.4);st.card=G.t+3.6;}});
+NR.on('spawn',e=>{if(e&&VARY.mutOn()&&VARY.st.mut==='nopower'&&e.type!=='boss')e.score*=2;});
+NR.on('fmUnit',o=>{if(!o||!o.e)return;const f=o.I&&o.I.id||'?',k=o.e.type;(VARY.kinds[f]=VARY.kinds[f]||{})[k]=1;
+  if(VARY.mutOn()&&VARY.st.mut==='drop'&&o.e.fp&&o.e.pt>=0){const e=o.e;let t=0;while(t<6&&e.pth(t,e)[0]+e.ox>W-90)t+=.05;e.pt=t;const p=e.pth(t,e);e.x=p[0]+e.ox;const top=GX()<.5;e.drp={t0:G.t,T:.9,y0:top?-30:H+30};e.y=e.drp.y0;
+    if(G.rings.length<24)G.rings.push({x:e.x,y:top?14:H-14,l:.5,m:.5,c:'#ff3d6a'});}});
+NR.on('tick',dt=>{try{VARY.tick(dt);}catch(err){}});
+NR.on('beat',()=>{try{VARY.beat();}catch(err){}});
+NR.on('runEnd',()=>{if(window.LEAK)LEAK.pg=VARY.pg0;});
+
 /* ---------- power-aware scale (flag RET.scale; ?scale=0 = the old numbers exactly). BALANCE.md "Power scale". ----------
    The player's power score counts what the Garage sells that upsCalc (dir.js) did not: permanent weapon levels, the fusion, plus shop and garage perks (UPS.u).
    Enemy hull points grow with the power ABOVE what the stage expects, up to a ceiling; a weapon level adds less damage per shot than it used to (LV10 = 1.8x LV1, not 2.5x+). Bosses are not scaled (their armour sets the fight). */
@@ -7477,6 +7896,86 @@ NR.on('tick',()=>{if(!B2X.hz.length)return;const t=G.t;B2X.hz=B2X.hz.filter(z=>t
   return dp(t);};}
 B2X.sheen=(x,y,w,h)=>{ctx.save();ctx.globalAlpha=.55+.25*Math.sin(G.t*18);ctx.fillStyle='#e8f4ff';ctx.fillRect(x,y,w,Math.max(1,h*.35));ctx.restore();};   // armour is absorbing: a thin bright line on the boss bar
 window.__b2={B2X};
+
+/* ---------- bosses that look different in each phase = parts/bossvis.js (flag RET.bossvis; ?bossvis=0 = the bosses before it). Review F10, 18 Oct 2026.
+   Visuals only: no hitbox, HP, armour cap or timing is touched. The phases come from armour.js / b.js bossBeat (e.ph 1..3, NR 'bossPhase').
+   Per phase: a red tint on the boss sprite (stronger in 3), one armour plate gone per change (placeholder shapes drawn over the body from e._dw / e._dh,
+   cracks + sparks where it broke, a plate falls off), a different aura ring (ground bosses: upper arc only, they stay on the road line), the new
+   attack's name flashed for one bar, and 1/3 2/3 3/3 pips with the phase lines on the boss bar. The 45 ms hit-stop is RET.JU 'phase' (ret.js; 0 with reduced motion). */
+if(RET.bossvis===undefined)RET.bossvis=!/[?&]bossvis=0/.test(location.search);
+const BV=window.BV={get on(){return!!RET.bossvis;},pips:0,flash:'',tinted:0,
+  NAMES:{fan5:'FAN SHOT',fan7:'WIDE FAN',fan9:'WALL OF SHOTS',laser:'LASER SWEEP',spiral:'SPIRAL STORM',ring:'RING BURST',summon:'CALLS ESCORTS'},
+  TINT:[null,'#ff3a3a','#ff1020'],TA:[0,.2,.4],
+  RING:[['#19e3ff',1.25,2,0],['#ffb020',1.35,3,1],['#ff3040',1.45,4,2]],
+  SLOTS:[[0,-.5,.34,.16,0],[-.5,0,.16,.36,1],[.46,.18,.16,.3,2]],        // plate slots: x, y (of half size), w, h, id
+  tc:new Map(),
+  name(e){const l=e.lists&&e.lists[e.ph-1];return l?(BV.NAMES[l[0]]||String(l[0]).toUpperCase()):'';},
+  reduced(){return!!(SET.reduce||SET.rm);},
+  tintOf(img,sx,sy,sw,sh,dw,dh,col){const w=Math.max(1,Math.round(dw)),h=Math.max(1,Math.round(dh)),k=sx+'|'+sy+'|'+sw+'|'+sh+'|'+w+'|'+h+'|'+col;
+    let m=BV.tc.get(img);if(!m)BV.tc.set(img,m=new Map());let c=m.get(k);if(c)return c;
+    if(m.size>24)m.clear();c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');g.drawImage(img,sx,sy,sw,sh,0,0,w,h);
+    g.globalCompositeOperation='source-atop';g.fillStyle=col;g.fillRect(0,0,w,h);m.set(k,c);return c;}};
+/* the tint: while the original boss draw runs, every big picture it puts on the canvas gets the same picture drawn again in red on top (same place, only where the picture has pixels) */
+{const db=drawBoss;drawBoss=function(e,t,fl){if(!BV.on||!e||!(e.ph>1)){return db(e,t,fl);}
+  const col=BV.TINT[e.ph-1],a0=BV.TA[e.ph-1]*(e.ph===3&&!BV.reduced()?.85+.15*PUL:1);let n=0;
+  const own=Object.getOwnPropertyDescriptor(ctx,'drawImage'),real=ctx.drawImage;
+  ctx.drawImage=function(img,a,b,c,d,e2,f,g,h){real.apply(ctx,arguments);
+    if(!img||!(img.width>64)||arguments.length<5)return;
+    let sx=0,sy=0,sw=img.width,sh=img.height,dx,dy,dw,dh;
+    if(arguments.length>=9){sx=a;sy=b;sw=c;sh=d;dx=e2;dy=f;dw=g;dh=h;}else{dx=a;dy=b;dw=c;dh=d;}
+    if(!(dw>40)||!(dh>40))return;
+    const ga=ctx.globalAlpha,go=ctx.globalCompositeOperation;if(go!=='source-over')return;
+    ctx.globalAlpha=ga*a0;real.call(ctx,BV.tintOf(img,sx,sy,sw,sh,dw,dh,col),dx,dy,dw,dh);ctx.globalAlpha=ga;n++;};
+  try{db(e,t,fl);}finally{if(own)Object.defineProperty(ctx,'drawImage',own);else delete ctx.drawImage;}
+  BV.tinted=n;
+  if(!n&&!e._dw){ctx.save();ctx.globalAlpha=a0*.8;ctx.fillStyle=col;ctx.beginPath();ctx.arc(0,0,e.r,0,7);ctx.fill();ctx.restore();}   // no picture (placeholder boss): the disc itself goes red
+  };}
+/* plates, cracks, aura: drawn over the boss in its own coordinates (the context is at the boss centre) */
+BV.over=function(e,t){const ph=e.ph||1,mv=UIK.moveOf?UIK.moveOf(e):'air',ground=mv!=='air',dw=e._dw||e.r*3,dh=e._dh||e.r*3,hw=dw/2,hh=dh/2,red=BV.reduced(),by=0;
+  BV.rect={cx:(()=>{const T=ctx.getTransform();return T.e;})(),cy:ctx.getTransform().f,s:Math.hypot(ctx.getTransform().a,ctx.getTransform().b),hw,hh,rot:!!rotMode};
+  ctx.save();
+  // aura ring: phase 1 thin cyan, 2 amber double, 3 red thick and pulsing; a ground boss gets the upper arc only
+  const R=BV.RING[ph-1],rr=Math.max(hw,hh)*.5*R[1]+e.r*.35,pu=red?0:Math.sin(t*(3+ph*2))*(ph-1)*2;
+  ctx.globalCompositeOperation='lighter';ctx.strokeStyle=R[0];ctx.lineWidth=R[2];ctx.globalAlpha=.3+.1*ph;
+  for(let i=0;i<(ph===2?2:1);i++){ctx.beginPath();const r=rr+i*8+pu;if(ground)ctx.ellipse(0,hh*.3,r*1.25,r,0,Math.PI,Math.PI*2);else ctx.arc(0,by,r,0,7);ctx.stroke();}
+  ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
+  // armour plates: slot s is gone in phase s+2 and later (phase 2 loses one, phase 3 two); intact plates are steel chips, gone ones a dark scar with cracks
+  const lost=ph-1,v=e.bv;
+  for(const s of BV.SLOTS){const id=s[4],x=s[0]*hw*(ground&&id===0?1:1),y=(ground&&id===0?-.46:s[1])*hh,w=s[2]*hw,h=s[3]*hh;
+    if(id<lost){
+      ctx.fillStyle='#0a0612cc';ctx.beginPath();ctx.ellipse(x,y,w*.55,h*.55,0,0,7);ctx.fill();
+      ctx.strokeStyle='#ff6a3d';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x-w*.6,y-h*.2);ctx.lineTo(x-w*.1,y+h*.05);ctx.lineTo(x+w*.15,y-h*.3);ctx.lineTo(x+w*.6,y+h*.15);ctx.moveTo(x-w*.1,y+h*.05);ctx.lineTo(x,y+h*.6);ctx.stroke();
+      if(!red&&((Math.floor(t*9)+id)%5===0)){ctx.globalCompositeOperation='lighter';G_(x+rnd(-w*.4,w*.4),y+rnd(-h*.3,h*.3),9+ph*3,'#ffd23d',.9);ctx.globalCompositeOperation='source-over';}
+      else if(red){ctx.globalCompositeOperation='lighter';G_(x,y,10,'#ffd23d',.5);ctx.globalCompositeOperation='source-over';}
+    }else{
+      ctx.fillStyle='#7a84a8aa';ctx.strokeStyle='#dfe6ff';ctx.lineWidth=1.5;ctx.beginPath();
+      ctx.moveTo(x-w*.5,y+h*.5);ctx.lineTo(x-w*.35,y-h*.5);ctx.lineTo(x+w*.5,y-h*.4);ctx.lineTo(x+w*.4,y+h*.5);ctx.closePath();ctx.fill();ctx.stroke();
+    }}
+  // the plate that just broke falls off the boss (ground bosses: it drops to the road line and stops there)
+  if(v&&v.t>0&&v.id!=null){const s=BV.SLOTS[v.id],p=1-v.t,w=s[2]*hw,h=s[3]*hh,x=s[0]*hw+(v.id===2?1:-1)*p*50,fall=Math.min(p*p*260,ground?Math.max(0,hh-(s[1]*hh)-4):260);
+    ctx.save();ctx.globalAlpha=Math.min(1,v.t*2);ctx.translate(x,(ground&&v.id===0?-.46:s[1])*hh+fall);ctx.rotate(red?0:p*4);ctx.fillStyle='#7a84a8';ctx.strokeStyle='#dfe6ff';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(-w*.5,h*.5);ctx.lineTo(-w*.35,-h*.5);ctx.lineTo(w*.5,-h*.4);ctx.lineTo(w*.4,h*.5);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
+  ctx.restore();};
+{const db2=drawBoss;drawBoss=function(e,t,fl){db2(e,t,fl);if(BV.on&&e&&e.ph)BV.over(e,t);};}
+/* the phase change: the broken plate, sparks, and the new attack's name for one bar */
+NR.on('bossPhase',d=>{const e=G&&G.boss;if(!BV.on||!e||!d)return;const ph=d.ph||e.ph,id=Math.max(0,Math.min(2,ph-2));e.bv={t:1,id};
+  const s=BV.SLOTS[id],hw=(e._dw||e.r*3)/2,hh=(e._dh||e.r*3)/2;
+  try{burst(e.x+s[0]*hw,e.y+s[1]*hh,'#ffd23d',BV.reduced()?4:14,220,.4);}catch(x){}
+  const nm=BV.name(e),txt='NEW ATTACK: '+nm,bar=4*(BT.spb||.5);BV.flash=txt;
+  if(G.banner&&G.banner.t>0)G.banner.b=e.nm+' · '+nm;       // the banner is on screen first: it carries the name too
+  if(window.HINT&&typeof HINT.show==='function')HINT.show(txt,{t:bar});       // HINT waits under the banner by itself
+  else G.hint={t:(G.banner&&G.banner.t>0?G.banner.t:0)+bar,txt:say(txt)};});   // the hint is hidden under the banner, so its clock starts after it
+NR.on('tick',dt=>{const e=G&&G.boss;if(e&&e.bv&&e.bv.t>0)e.bv.t-=dt*1.1;});
+/* the boss bar: phase lines at 1/3 and 2/3, three pips, the counter */
+{const pips=(x,y,w,h,k,ph)=>{if(!BV.on||!G.boss)return;
+    const b=G.boss,p=b.ph||1;ctx.save();ctx.fillStyle='#ffffff99';ctx.fillRect(x+w/3-1,y-1,2,h+2);ctx.fillRect(x+w*2/3-1,y-1,2,h+2);
+    const r=Math.max(4,5*k),py=y+h+r+4*k,cx=x+w-r*4.6;
+    for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(cx+i*r*2.6,py,r,0,7);ctx.fillStyle=i<p?BV.RING[p-1][0]:'#ffffff22';ctx.fill();ctx.lineWidth=1.5;ctx.strokeStyle='#ffffffaa';ctx.stroke();}
+    ctx.font=`700 ${Math.max(14,13*k)}px "Chakra Petch",sans-serif`;ctx.textAlign='right';ctx.fillStyle='#fff';ctx.fillText(p+'/3',cx-r*1.6,py+Math.max(14,13*k)*.35);
+    ctx.restore();BV.pips=p;};
+  const hud=drawHUD;drawHUD=function(t){hud(t);const b=G&&G.boss;if(b&&b.x<W)pips(W/2-200*HKL,30*HKL,400*HKL,8*HKL,HKL,b.ph);};
+  const hudp=drawHUDP;drawHUDP=function(t){hudp(t);const b=G&&G.boss;if(!b||b.x>=W)return;const k=HK,w=PW_,bw=Math.min(330,w-120),ny=40*k+6*k;pips((w-bw)/2,ny+12*k,bw,6*k,k,b.ph);};}
+window.__bv={BV};
 
 /* ---------- power-up LEVELS + five new shooter power-ups (flag RET.pw3; ?pw3=0 = parts/powerups.js exactly as before) ----------
    LEVELS (LV1..LV5): the same power picked up again while it runs, or within 4 bars of it ending, goes up one level and its 8-bar timer restarts.

@@ -1,0 +1,11618 @@
+{
+ "arcade-easy": {
+  "gameMinutes": 128.3,
+  "tries": 49,
+  "firstTryFails": 3,
+  "events": 13435,
+  "repeatRatio5min": 0.953,
+  "encounters": 2580,
+  "encountersPerMin": 20.1,
+  "topEncounters": [
+   [
+    "wave:turret",
+    315,
+    12.2
+   ],
+   [
+    "wave:droneSine",
+    311,
+    12.1
+   ],
+   [
+    "set:weave",
+    227,
+    8.8
+   ],
+   [
+    "wave:droneV",
+    196,
+    7.6
+   ],
+   [
+    "wave:droneLine",
+    191,
+    7.4
+   ],
+   [
+    "drop:hit",
+    189,
+    7.3
+   ],
+   [
+    "wave:chargers",
+    185,
+    7.2
+   ],
+   [
+    "fence:fence",
+    173,
+    6.7
+   ]
+  ],
+  "distinctEncounterSigs": 43,
+  "per5min": [
+   [
+    0,
+    6,
+    2
+   ],
+   [
+    5,
+    8,
+    6
+   ],
+   [
+    10,
+    14,
+    7
+   ],
+   [
+    15,
+    9,
+    9
+   ],
+   [
+    20,
+    15,
+    10
+   ],
+   [
+    25,
+    12,
+    10
+   ],
+   [
+    30,
+    11,
+    11
+   ],
+   [
+    35,
+    17,
+    14
+   ],
+   [
+    40,
+    20,
+    17
+   ],
+   [
+    45,
+    13,
+    13
+   ],
+   [
+    50,
+    16,
+    18
+   ],
+   [
+    55,
+    22,
+    19
+   ],
+   [
+    60,
+    17,
+    20
+   ],
+   [
+    65,
+    24,
+    18
+   ],
+   [
+    70,
+    18,
+    18
+   ],
+   [
+    75,
+    21,
+    19
+   ],
+   [
+    80,
+    22,
+    20
+   ],
+   [
+    85,
+    28,
+    19
+   ],
+   [
+    90,
+    20,
+    20
+   ],
+   [
+    95,
+    17,
+    17
+   ],
+   [
+    100,
+    22,
+    18
+   ],
+   [
+    105,
+    17,
+    18
+   ],
+   [
+    110,
+    20,
+    16
+   ],
+   [
+    115,
+    11,
+    11
+   ],
+   [
+    120,
+    11,
+    11
+   ],
+   [
+    125,
+    14,
+    11
+   ]
+  ],
+  "stages": {
+   "1": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 1,
+    "waves": 3,
+    "shotSrc": 1,
+    "newThings": 18,
+    "newList": [
+     "enemy:drone",
+     "wave:droneSine",
+     "wave:droneLine",
+     "set:weave",
+     "pick:pw:tri",
+     "fence:fence",
+     "pick:emp",
+     "pick:pw:chord",
+     "wave:droneV",
+     "drop:hit",
+     "pick:up",
+     "pick:pw:tempo",
+     "pick:hp",
+     "pick:pw:drop",
+     "pick:pw:magb",
+     "pick:pw:nova",
+     "pick:pw:slow",
+     "shot:drone"
+    ],
+    "jaccardPrev": null,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.69
+   },
+   "2": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 1,
+    "waves": 3,
+    "shotSrc": 1,
+    "newThings": 2,
+    "newList": [
+     "pick:pw:echo",
+     "pick:pw:mag"
+    ],
+    "jaccardPrev": 1,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.72
+   },
+   "3": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 4,
+    "waves": 3,
+    "shotSrc": 4,
+    "newThings": 10,
+    "newList": [
+     "enemy:gtank",
+     "enemy:gturret",
+     "enemy:turret",
+     "wave:turret",
+     "pick:pw:crate",
+     "pick:pw:drum",
+     "pick:pw:nr",
+     "shot:gtank",
+     "shot:gturret",
+     "shot:turret"
+    ],
+    "jaccardPrev": 0.33,
+    "song": "stage3",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.6
+   },
+   "4": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 7,
+    "enemyKinds": 5,
+    "waves": 4,
+    "shotSrc": 5,
+    "newThings": 7,
+    "newList": [
+     "zoo:shielder",
+     "enemy:shielder",
+     "pick:pw:bomb",
+     "pick:pw:slice",
+     "enemy:gwalker",
+     "shot:shielder",
+     "shot:gwalker"
+    ],
+    "jaccardPrev": 0.47,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.68
+   },
+   "5": {
+    "mins": 2.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 11,
+    "enemyKinds": 6,
+    "waves": 3,
+    "shotSrc": 8,
+    "newThings": 10,
+    "newList": [
+     "pick:pw:ric",
+     "mini:TRESOR-WART|k5",
+     "verb:laser",
+     "verb:fan5",
+     "verb:ring",
+     "verb:fan7",
+     "shot:none",
+     "shot:boss:fan5",
+     "shot:boss:ring",
+     "shot:boss:fan7"
+    ],
+    "jaccardPrev": 0.46,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.45
+   },
+   "6": {
+    "mins": 4.1,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 7,
+    "waves": 5,
+    "shotSrc": 5,
+    "newThings": 5,
+    "newList": [
+     "zoo:kamikaze",
+     "enemy:kamikaze",
+     "pick:pw:wing",
+     "pick:pw:leech",
+     "pick:pw:fix"
+    ],
+    "jaccardPrev": 0.46,
+    "song": "stage3",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.61
+   },
+   "7": {
+    "mins": 2.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 8,
+    "waves": 5,
+    "shotSrc": 5,
+    "newThings": 5,
+    "newList": [
+     "enemy:drone*",
+     "pick:pw:cres",
+     "enemy:turret*",
+     "shot:drone*",
+     "shot:turret*"
+    ],
+    "jaccardPrev": 0.67,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.67
+   },
+   "8": {
+    "mins": 2,
+    "tries": 1,
+    "cleared": true,
+    "enc": 14,
+    "enemyKinds": 9,
+    "waves": 5,
+    "shotSrc": 10,
+    "newThings": 6,
+    "newList": [
+     "boss:SEK-ADLER|k0",
+     "enemy:charger",
+     "verb:summon",
+     "enemy:charger*",
+     "verb:fan9",
+     "shot:boss:fan9"
+    ],
+    "jaccardPrev": 0.38,
+    "song": "stage2+boss",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.2
+   },
+   "9": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 6,
+    "waves": 6,
+    "shotSrc": 2,
+    "newThings": 4,
+    "newList": [
+     "zoo:splitter",
+     "enemy:splitter",
+     "enemy:zdrn",
+     "pick:pw:bub"
+    ],
+    "jaccardPrev": 0.3,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.61
+   },
+   "10": {
+    "mins": 2.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 8,
+    "waves": 5,
+    "shotSrc": 4,
+    "newThings": 1,
+    "newList": [
+     "drop:miss"
+    ],
+    "jaccardPrev": 0.72,
+    "song": "endless",
+    "bg": "MAINUFER",
+    "plainShare": 0.64
+   },
+   "11": {
+    "mins": 4.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 10,
+    "enemyKinds": 11,
+    "waves": 7,
+    "shotSrc": 6,
+    "newThings": 2,
+    "newList": [
+     "zoo:bomber",
+     "enemy:bomber"
+    ],
+    "jaccardPrev": 0.58,
+    "song": "stage2",
+    "bg": "MAINUFER",
+    "plainShare": 0.6
+   },
+   "12": {
+    "mins": 3.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 10,
+    "enemyKinds": 9,
+    "waves": 7,
+    "shotSrc": 5,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.73,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.64
+   },
+   "13": {
+    "mins": 2.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 14,
+    "enemyKinds": 11,
+    "waves": 6,
+    "shotSrc": 12,
+    "newThings": 4,
+    "newList": [
+     "mini:BRÜCKEN-WÄCHTER|k4",
+     "verb:spiral",
+     "shot:boss:spiral",
+     "shot:rain/hazard"
+    ],
+    "jaccardPrev": 0.54,
+    "song": "endless",
+    "bg": "MAINUFER",
+    "plainShare": 0.38
+   },
+   "14": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 12,
+    "enemyKinds": 12,
+    "waves": 9,
+    "shotSrc": 4,
+    "newThings": 4,
+    "newList": [
+     "wave:chargers",
+     "zoo:sniper",
+     "enemy:sniper",
+     "shot:sniper"
+    ],
+    "jaccardPrev": 0.45,
+    "song": "stage2",
+    "bg": "MAINUFER",
+    "plainShare": 0.72
+   },
+   "15": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 10,
+    "enemyKinds": 13,
+    "waves": 7,
+    "shotSrc": 8,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.66,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.56
+   },
+   "16": {
+    "mins": 1.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 14,
+    "enemyKinds": 10,
+    "waves": 5,
+    "shotSrc": 9,
+    "newThings": 4,
+    "newList": [
+     "enemy:swarm",
+     "set:swarm",
+     "boss:FLUSSKRAKE|k1",
+     "shot:boss:summon"
+    ],
+    "jaccardPrev": 0.33,
+    "song": "endless+boss3",
+    "bg": "MAINUFER",
+    "plainShare": 0.25
+   },
+   "17": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 12,
+    "enemyKinds": 13,
+    "waves": 9,
+    "shotSrc": 4,
+    "newThings": 2,
+    "newList": [
+     "zoo:healer",
+     "enemy:healer"
+    ],
+    "jaccardPrev": 0.34,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.63
+   },
+   "18": {
+    "mins": 3.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 13,
+    "enemyKinds": 13,
+    "waves": 9,
+    "shotSrc": 5,
+    "newThings": 1,
+    "newList": [
+     "set:wedge"
+    ],
+    "jaccardPrev": 0.89,
+    "song": "endless",
+    "bg": "OSTEND",
+    "plainShare": 0.67
+   },
+   "19": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 17,
+    "waves": 11,
+    "shotSrc": 9,
+    "newThings": 6,
+    "newList": [
+     "enemy:gunship",
+     "wave:gunship",
+     "zoo:carrier",
+     "enemy:carrier",
+     "shot:gunship",
+     "shot:carrier"
+    ],
+    "jaccardPrev": 0.64,
+    "song": "endless2",
+    "bg": "OSTEND",
+    "plainShare": 0.75
+   },
+   "20": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 14,
+    "enemyKinds": 17,
+    "waves": 10,
+    "shotSrc": 8,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.76,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.68
+   },
+   "21": {
+    "mins": 2.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 20,
+    "enemyKinds": 17,
+    "waves": 11,
+    "shotSrc": 12,
+    "newThings": 4,
+    "newList": [
+     "enemy:gate",
+     "wave:gate",
+     "mini:SCHRANKEN-WART|k5",
+     "shot:kamikaze"
+    ],
+    "jaccardPrev": 0.72,
+    "song": "endless",
+    "bg": "OSTEND",
+    "plainShare": 0.46
+   },
+   "22": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 18,
+    "waves": 11,
+    "shotSrc": 6,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.61,
+    "song": "endless2",
+    "bg": "OSTEND",
+    "plainShare": 0.74
+   },
+   "23": {
+    "mins": 4.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 6,
+    "newThings": 2,
+    "newList": [
+     "zoo:minelayer",
+     "enemy:minelayer"
+    ],
+    "jaccardPrev": 0.82,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.69
+   },
+   "24": {
+    "mins": 2,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 10,
+    "waves": 5,
+    "shotSrc": 12,
+    "newThings": 3,
+    "newList": [
+     "boss:ZENTRAL-ICE|k2",
+     "shot:charger",
+     "shot:boss:laser"
+    ],
+    "jaccardPrev": 0.37,
+    "song": "endless+boss",
+    "bg": "OSTEND",
+    "plainShare": 0.24
+   },
+   "25": {
+    "mins": 3.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 15,
+    "waves": 12,
+    "shotSrc": 5,
+    "newThings": 1,
+    "newList": [
+     "set:turretLine"
+    ],
+    "jaccardPrev": 0.28,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.7
+   },
+   "26": {
+    "mins": 2.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 14,
+    "waves": 12,
+    "shotSrc": 4,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.82,
+    "song": "stage1",
+    "bg": "MESSE",
+    "plainShare": 0.73
+   },
+   "27": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 18,
+    "waves": 13,
+    "shotSrc": 6,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.76,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.57
+   },
+   "28": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 6,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.83,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.72
+   },
+   "29": {
+    "mins": 2.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 13,
+    "waves": 6,
+    "shotSrc": 11,
+    "newThings": 1,
+    "newList": [
+     "mini:MESSE-WÄCHTER|k4"
+    ],
+    "jaccardPrev": 0.5,
+    "song": "stage1",
+    "bg": "MESSE",
+    "plainShare": 0.45
+   },
+   "30": {
+    "mins": 3.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 8,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.52,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.59
+   },
+   "31": {
+    "mins": 2.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 7,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.88,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.71
+   },
+   "32": {
+    "mins": 2.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 12,
+    "waves": 6,
+    "shotSrc": 9,
+    "newThings": 1,
+    "newList": [
+     "boss:KRONOS|k3"
+    ],
+    "jaccardPrev": 0.41,
+    "song": "stage1+boss2",
+    "bg": "MESSE",
+    "plainShare": 0.22
+   },
+   "33": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 14,
+    "waves": 12,
+    "shotSrc": 6,
+    "newThings": 3,
+    "newList": [
+     "set:phalanx",
+     "wave:phalanx",
+     "shot:splitter"
+    ],
+    "jaccardPrev": 0.44,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.61
+   },
+   "34": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 17,
+    "waves": 14,
+    "shotSrc": 5,
+    "newThings": 2,
+    "newList": [
+     "wave:pillars",
+     "wave:wedge"
+    ],
+    "jaccardPrev": 0.66,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.68
+   },
+   "35": {
+    "mins": 3.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 17,
+    "waves": 13,
+    "shotSrc": 8,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.64,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.7
+   },
+   "36": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 16,
+    "waves": 11,
+    "shotSrc": 7,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.89,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.75
+   },
+   "37": {
+    "mins": 2.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 20,
+    "enemyKinds": 17,
+    "waves": 11,
+    "shotSrc": 14,
+    "newThings": 1,
+    "newList": [
+     "mini:HOPLITE|k7"
+    ],
+    "jaccardPrev": 0.6,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.45
+   },
+   "38": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 16,
+    "waves": 11,
+    "shotSrc": 8,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.65,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.66
+   },
+   "39": {
+    "mins": 3.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 18,
+    "waves": 13,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.83,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.59
+   },
+   "40": {
+    "mins": 2.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 21,
+    "enemyKinds": 17,
+    "waves": 10,
+    "shotSrc": 11,
+    "newThings": 1,
+    "newList": [
+     "boss:TALOS|k6"
+    ],
+    "jaccardPrev": 0.56,
+    "song": "athina2+boss3",
+    "bg": "ATHINA",
+    "plainShare": 0.25
+   },
+   "41": {
+    "mins": 2.5,
+    "tries": 2,
+    "cleared": true,
+    "enc": 7,
+    "enemyKinds": 7,
+    "waves": 4,
+    "shotSrc": 6,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.27,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.58
+   },
+   "42": {
+    "mins": 2.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 7,
+    "waves": 4,
+    "shotSrc": 4,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.45,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.74
+   },
+   "43": {
+    "mins": 3.4,
+    "tries": 2,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 10,
+    "waves": 5,
+    "shotSrc": 6,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.44,
+    "song": "stage1",
+    "bg": "OSTEND",
+    "plainShare": 0.75
+   },
+   "44": {
+    "mins": 5.3,
+    "tries": 3,
+    "cleared": false,
+    "enc": 9,
+    "enemyKinds": 11,
+    "waves": 5,
+    "shotSrc": 8,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.67,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.58
+   },
+   "45": {
+    "mins": 2.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 9,
+    "waves": 5,
+    "shotSrc": 7,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.61,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.68
+   }
+  },
+  "jaccardMedian": 0.61,
+  "jaccardMean": 0.59,
+  "stagesWithZeroNew": 18,
+  "firstSeen": [
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "wave:droneSine",
+    0
+   ],
+   [
+    "wave:droneLine",
+    0.09
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "pick:pw:tri",
+    0.16
+   ],
+   [
+    "fence:fence",
+    0.35
+   ],
+   [
+    "pick:emp",
+    0.46
+   ],
+   [
+    "pick:pw:chord",
+    0.56
+   ],
+   [
+    "wave:droneV",
+    0.57
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "pick:up",
+    0.72
+   ],
+   [
+    "pick:pw:tempo",
+    0.86
+   ],
+   [
+    "pick:hp",
+    1.18
+   ],
+   [
+    "pick:pw:drop",
+    1.19
+   ],
+   [
+    "pick:pw:magb",
+    1.58
+   ],
+   [
+    "pick:pw:nova",
+    1.84
+   ],
+   [
+    "pick:pw:slow",
+    2.32
+   ],
+   [
+    "pick:pw:echo",
+    3.93
+   ],
+   [
+    "pick:pw:mag",
+    4.85
+   ],
+   [
+    "enemy:gtank",
+    4.98
+   ],
+   [
+    "enemy:gturret",
+    5.04
+   ],
+   [
+    "enemy:turret",
+    5.42
+   ],
+   [
+    "wave:turret",
+    5.42
+   ],
+   [
+    "pick:pw:crate",
+    5.6
+   ],
+   [
+    "pick:pw:drum",
+    7.14
+   ],
+   [
+    "pick:pw:nr",
+    7.39
+   ],
+   [
+    "zoo:shielder",
+    7.53
+   ],
+   [
+    "enemy:shielder",
+    7.54
+   ],
+   [
+    "pick:pw:bomb",
+    7.81
+   ],
+   [
+    "pick:pw:slice",
+    8.32
+   ],
+   [
+    "enemy:gwalker",
+    9.26
+   ],
+   [
+    "pick:pw:ric",
+    10.58
+   ],
+   [
+    "mini:TRESOR-WART|k5",
+    11.99
+   ],
+   [
+    "verb:laser",
+    11.99
+   ],
+   [
+    "verb:fan5",
+    12.11
+   ],
+   [
+    "verb:ring",
+    12.27
+   ],
+   [
+    "verb:fan7",
+    12.63
+   ],
+   [
+    "zoo:kamikaze",
+    12.87
+   ],
+   [
+    "enemy:kamikaze",
+    12.88
+   ],
+   [
+    "pick:pw:wing",
+    12.98
+   ],
+   [
+    "pick:pw:leech",
+    13.19
+   ],
+   [
+    "pick:pw:fix",
+    15.69
+   ],
+   [
+    "enemy:drone*",
+    16.84
+   ],
+   [
+    "pick:pw:cres",
+    17.06
+   ],
+   [
+    "enemy:turret*",
+    18.73
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    20.14
+   ],
+   [
+    "enemy:charger",
+    20.28
+   ],
+   [
+    "verb:summon",
+    20.28
+   ],
+   [
+    "enemy:charger*",
+    20.86
+   ],
+   [
+    "verb:fan9",
+    21.18
+   ],
+   [
+    "zoo:splitter",
+    21.43
+   ],
+   [
+    "enemy:splitter",
+    21.44
+   ],
+   [
+    "enemy:zdrn",
+    21.48
+   ],
+   [
+    "pick:pw:bub",
+    23.05
+   ],
+   [
+    "drop:miss",
+    25.78
+   ],
+   [
+    "zoo:bomber",
+    27.12
+   ],
+   [
+    "enemy:bomber",
+    27.12
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    36.41
+   ],
+   [
+    "verb:spiral",
+    36.79
+   ],
+   [
+    "wave:chargers",
+    38.57
+   ],
+   [
+    "zoo:sniper",
+    38.63
+   ],
+   [
+    "enemy:sniper",
+    38.64
+   ],
+   [
+    "enemy:swarm",
+    42.18
+   ],
+   [
+    "set:swarm",
+    42.18
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    42.83
+   ],
+   [
+    "zoo:healer",
+    44.62
+   ],
+   [
+    "enemy:healer",
+    44.62
+   ],
+   [
+    "set:wedge",
+    46.57
+   ],
+   [
+    "enemy:gunship",
+    50.76
+   ],
+   [
+    "wave:gunship",
+    50.76
+   ],
+   [
+    "zoo:carrier",
+    51.14
+   ],
+   [
+    "enemy:carrier",
+    51.14
+   ],
+   [
+    "enemy:gate",
+    56.34
+   ],
+   [
+    "wave:gate",
+    56.34
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    57.02
+   ],
+   [
+    "zoo:minelayer",
+    60.61
+   ],
+   [
+    "enemy:minelayer",
+    60.61
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    65.69
+   ],
+   [
+    "set:turretLine",
+    67.06
+   ],
+   [
+    "mini:MESSE-WÄCHTER|k4",
+    79.71
+   ],
+   [
+    "boss:KRONOS|k3",
+    87.65
+   ],
+   [
+    "set:phalanx",
+    89.54
+   ],
+   [
+    "wave:phalanx",
+    89.99
+   ],
+   [
+    "wave:pillars",
+    93.44
+   ],
+   [
+    "wave:wedge",
+    94.13
+   ],
+   [
+    "mini:HOPLITE|k7",
+    102.75
+   ],
+   [
+    "boss:TALOS|k6",
+    110.46
+   ]
+  ],
+  "mechTimeline": [
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "fence:fence",
+    0.35
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "enemy:gtank",
+    4.98
+   ],
+   [
+    "enemy:gturret",
+    5.04
+   ],
+   [
+    "enemy:turret",
+    5.42
+   ],
+   [
+    "zoo:shielder",
+    7.53
+   ],
+   [
+    "enemy:shielder",
+    7.54
+   ],
+   [
+    "enemy:gwalker",
+    9.26
+   ],
+   [
+    "mini:TRESOR-WART|k5",
+    11.99
+   ],
+   [
+    "verb:laser",
+    11.99
+   ],
+   [
+    "verb:fan5",
+    12.11
+   ],
+   [
+    "verb:ring",
+    12.27
+   ],
+   [
+    "verb:fan7",
+    12.63
+   ],
+   [
+    "zoo:kamikaze",
+    12.87
+   ],
+   [
+    "enemy:kamikaze",
+    12.88
+   ],
+   [
+    "enemy:drone*",
+    16.84
+   ],
+   [
+    "enemy:turret*",
+    18.73
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    20.14
+   ],
+   [
+    "enemy:charger",
+    20.28
+   ],
+   [
+    "verb:summon",
+    20.28
+   ],
+   [
+    "enemy:charger*",
+    20.86
+   ],
+   [
+    "verb:fan9",
+    21.18
+   ],
+   [
+    "zoo:splitter",
+    21.43
+   ],
+   [
+    "enemy:splitter",
+    21.44
+   ],
+   [
+    "enemy:zdrn",
+    21.48
+   ],
+   [
+    "drop:miss",
+    25.78
+   ],
+   [
+    "zoo:bomber",
+    27.12
+   ],
+   [
+    "enemy:bomber",
+    27.12
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    36.41
+   ],
+   [
+    "verb:spiral",
+    36.79
+   ],
+   [
+    "zoo:sniper",
+    38.63
+   ],
+   [
+    "enemy:sniper",
+    38.64
+   ],
+   [
+    "enemy:swarm",
+    42.18
+   ],
+   [
+    "set:swarm",
+    42.18
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    42.83
+   ],
+   [
+    "zoo:healer",
+    44.62
+   ],
+   [
+    "enemy:healer",
+    44.62
+   ],
+   [
+    "set:wedge",
+    46.57
+   ],
+   [
+    "enemy:gunship",
+    50.76
+   ],
+   [
+    "zoo:carrier",
+    51.14
+   ],
+   [
+    "enemy:carrier",
+    51.14
+   ],
+   [
+    "enemy:gate",
+    56.34
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    57.02
+   ],
+   [
+    "zoo:minelayer",
+    60.61
+   ],
+   [
+    "enemy:minelayer",
+    60.61
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    65.69
+   ],
+   [
+    "set:turretLine",
+    67.06
+   ],
+   [
+    "mini:MESSE-WÄCHTER|k4",
+    79.71
+   ],
+   [
+    "boss:KRONOS|k3",
+    87.65
+   ],
+   [
+    "set:phalanx",
+    89.54
+   ],
+   [
+    "mini:HOPLITE|k7",
+    102.75
+   ],
+   [
+    "boss:TALOS|k6",
+    110.46
+   ]
+  ],
+  "longestNoveltyGapMin": 17.8,
+  "lastNewThingMin": 110.46,
+  "newThingsFirst30": 57,
+  "newThingsAfter30": 30,
+  "longestMechGapMin": 17.8,
+  "plainLoopShare": 0.6,
+  "bossShare": 0.09,
+  "specialEventGapMaxS": 113,
+  "specialEventGapMedianS": 11,
+  "bossFights": 10,
+  "bossFightsBig": 5,
+  "distinctBossBehaviours": 10,
+  "distinctBossVerbKits": 8,
+  "bossVerbsTotal": [
+   "fan5",
+   "fan7",
+   "fan9",
+   "laser",
+   "ring",
+   "spiral",
+   "summon"
+  ],
+  "bossList": [
+   [
+    "mini",
+    "TRESOR-WART",
+    "fan5,fan7,laser,ring"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "fan5,fan7,fan9,ring,summon"
+   ],
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "fan5,fan7,ring,spiral"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "fan5,fan7,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "fan7,fan9,laser,ring"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "fan7,fan9,laser,ring,spiral"
+   ],
+   [
+    "mini",
+    "MESSE-WÄCHTER",
+    "fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,ring,spiral"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ]
+  ],
+  "songMinutes": {
+   "stage3": 27.1,
+   "stage2": 26.8,
+   "stage1": 17.1,
+   "athina": 15.1,
+   "endless2": 13.5,
+   "endless": 12.8,
+   "athina2": 8.3,
+   "boss3": 3,
+   "boss": 2.6,
+   "boss2": 1.8
+  },
+  "distinctSongs": 10,
+  "songStartsPerHour": 25.3,
+  "distinctTracksPerHour": 4.7,
+  "backgrounds": [
+   "BANKENVIERTEL",
+   "MAINUFER",
+   "OSTEND",
+   "MESSE",
+   "ATHINA"
+  ],
+  "spawns": 8293,
+  "spawnShare": [
+   [
+    "drone",
+    5582,
+    67.3
+   ],
+   [
+    "charger",
+    847,
+    10.2
+   ],
+   [
+    "turret",
+    556,
+    6.7
+   ],
+   [
+    "gtank",
+    202,
+    2.4
+   ],
+   [
+    "zdrn",
+    200,
+    2.4
+   ],
+   [
+    "gturret",
+    199,
+    2.4
+   ],
+   [
+    "kamikaze",
+    160,
+    1.9
+   ],
+   [
+    "shielder",
+    101,
+    1.2
+   ],
+   [
+    "splitter",
+    64,
+    0.8
+   ],
+   [
+    "gwalker",
+    63,
+    0.8
+   ],
+   [
+    "bomber",
+    57,
+    0.7
+   ],
+   [
+    "swarm",
+    48,
+    0.6
+   ],
+   [
+    "carrier",
+    47,
+    0.6
+   ],
+   [
+    "sniper",
+    44,
+    0.5
+   ],
+   [
+    "gate",
+    40,
+    0.5
+   ],
+   [
+    "healer",
+    35,
+    0.4
+   ],
+   [
+    "minelayer",
+    30,
+    0.4
+   ],
+   [
+    "gunship",
+    18,
+    0.2
+   ]
+  ],
+  "pickups": [
+   [
+    "up",
+    342
+   ],
+   [
+    "emp",
+    141
+   ],
+   [
+    "hp",
+    46
+   ],
+   [
+    "pw:slice",
+    37
+   ],
+   [
+    "pw:bomb",
+    35
+   ],
+   [
+    "pw:crate",
+    23
+   ],
+   [
+    "pw:leech",
+    22
+   ],
+   [
+    "pw:chord",
+    19
+   ],
+   [
+    "pw:tempo",
+    19
+   ],
+   [
+    "pw:nova",
+    19
+   ],
+   [
+    "pw:echo",
+    19
+   ],
+   [
+    "pw:cres",
+    18
+   ],
+   [
+    "pw:drop",
+    17
+   ],
+   [
+    "pw:magb",
+    14
+   ],
+   [
+    "pw:wing",
+    14
+   ],
+   [
+    "pw:drum",
+    13
+   ],
+   [
+    "pw:ric",
+    13
+   ],
+   [
+    "pw:slow",
+    10
+   ],
+   [
+    "pw:nr",
+    10
+   ],
+   [
+    "pw:tri",
+    9
+   ],
+   [
+    "pw:mag",
+    7
+   ],
+   [
+    "pw:bub",
+    7
+   ],
+   [
+    "pw:fix",
+    6
+   ]
+  ],
+  "bulletSources": [
+   [
+    "drone*",
+    5584,
+    40
+   ],
+   [
+    "drone",
+    3732,
+    26.8
+   ],
+   [
+    "boss:ring",
+    1395,
+    10
+   ],
+   [
+    "boss:spiral",
+    479,
+    3.4
+   ],
+   [
+    "boss:fan9",
+    465,
+    3.3
+   ],
+   [
+    "turret*",
+    453,
+    3.2
+   ],
+   [
+    "boss:fan7",
+    432,
+    3.1
+   ],
+   [
+    "gunship",
+    249,
+    1.8
+   ],
+   [
+    "turret",
+    247,
+    1.8
+   ],
+   [
+    "gwalker",
+    195,
+    1.4
+   ],
+   [
+    "boss:fan5",
+    193,
+    1.4
+   ],
+   [
+    "gtank",
+    183,
+    1.3
+   ],
+   [
+    "gturret",
+    165,
+    1.2
+   ],
+   [
+    "none",
+    69,
+    0.5
+   ],
+   [
+    "boss:laser",
+    39,
+    0.3
+   ],
+   [
+    "rain/hazard",
+    24,
+    0.2
+   ],
+   [
+    "sniper",
+    21,
+    0.2
+   ],
+   [
+    "shielder",
+    6,
+    0
+   ],
+   [
+    "boss:summon",
+    3,
+    0
+   ],
+   [
+    "carrier",
+    3,
+    0
+   ],
+   [
+    "charger",
+    3,
+    0
+   ],
+   [
+    "splitter",
+    3,
+    0
+   ],
+   [
+    "kamikaze",
+    1,
+    0
+   ]
+  ],
+  "hints": [
+   [
+    "WEAVE: shoot on the beat",
+    227
+   ],
+   [
+    "DROP COMING: DASH ON THE DOWNBEAT",
+    191
+   ],
+   [
+    "LASER FENCE: find the gap",
+    173
+   ],
+   [
+    "WINGS: two drones shoot the off-beats",
+    172
+   ],
+   [
+    "Dash on the pulse to power up",
+    114
+   ],
+   [
+    "SET PIECE",
+    109
+   ],
+   [
+    "SHOOT THE CAGE: FREE THE DATA SPRITE",
+    60
+   ],
+   [
+    "NOVA: a ring blast on every bar line",
+    24
+   ],
+   [
+    "CHORD: blocks one hit, rings on the beat",
+    22
+   ],
+   [
+    "TIME SLICE: bullets slow on the beat",
+    21
+   ],
+   [
+    "ECHO: shots return on the next beat",
+    20
+   ],
+   [
+    "BOMB STOCK: more EMP pulses",
+    18
+   ],
+   [
+    "CRESCENDO: dodge to stack damage",
+    18
+   ],
+   [
+    "LIFE LEECH: kills heal a little",
+    16
+   ],
+   [
+    "MAGNET: every beat pulls pickups in",
+    14
+   ]
+  ],
+  "mutators": {},
+  "setPieces": {
+   "set:weave": 227,
+   "fence:fence": 173,
+   "drop:hit": 189,
+   "drop:miss": 1,
+   "set:swarm": 4,
+   "set:wedge": 38,
+   "set:turretLine": 35,
+   "set:phalanx": 32
+  },
+  "pitStops": 0
+ },
+ "arcade-normal": {
+  "gameMinutes": 129.1,
+  "tries": 50,
+  "firstTryFails": 3,
+  "events": 14532,
+  "repeatRatio5min": 0.959,
+  "encounters": 2689,
+  "encountersPerMin": 20.8,
+  "topEncounters": [
+   [
+    "wave:turret",
+    305,
+    11.3
+   ],
+   [
+    "wave:droneSine",
+    299,
+    11.1
+   ],
+   [
+    "wave:droneLine",
+    241,
+    9
+   ],
+   [
+    "wave:chargers",
+    209,
+    7.8
+   ],
+   [
+    "wave:droneV",
+    206,
+    7.7
+   ],
+   [
+    "drop:hit",
+    189,
+    7
+   ],
+   [
+    "set:weave",
+    166,
+    6.2
+   ],
+   [
+    "fence:fence",
+    141,
+    5.2
+   ]
+  ],
+  "distinctEncounterSigs": 43,
+  "per5min": [
+   [
+    0,
+    7,
+    3
+   ],
+   [
+    5,
+    9,
+    7
+   ],
+   [
+    10,
+    14,
+    8
+   ],
+   [
+    15,
+    12,
+    9
+   ],
+   [
+    20,
+    14,
+    10
+   ],
+   [
+    25,
+    13,
+    14
+   ],
+   [
+    30,
+    12,
+    14
+   ],
+   [
+    35,
+    19,
+    16
+   ],
+   [
+    40,
+    21,
+    17
+   ],
+   [
+    45,
+    15,
+    16
+   ],
+   [
+    50,
+    17,
+    19
+   ],
+   [
+    55,
+    23,
+    20
+   ],
+   [
+    60,
+    23,
+    20
+   ],
+   [
+    65,
+    22,
+    17
+   ],
+   [
+    70,
+    19,
+    20
+   ],
+   [
+    75,
+    24,
+    20
+   ],
+   [
+    80,
+    19,
+    20
+   ],
+   [
+    85,
+    25,
+    17
+   ],
+   [
+    90,
+    17,
+    16
+   ],
+   [
+    95,
+    18,
+    19
+   ],
+   [
+    100,
+    22,
+    19
+   ],
+   [
+    105,
+    23,
+    19
+   ],
+   [
+    110,
+    15,
+    9
+   ],
+   [
+    115,
+    12,
+    11
+   ],
+   [
+    120,
+    13,
+    11
+   ],
+   [
+    125,
+    9,
+    9
+   ]
+  ],
+  "stages": {
+   "1": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 2,
+    "waves": 3,
+    "shotSrc": 2,
+    "newThings": 20,
+    "newList": [
+     "enemy:drone",
+     "wave:droneLine",
+     "pick:up",
+     "enemy:drone*",
+     "set:weave",
+     "pick:pw:magb",
+     "fence:fence",
+     "wave:droneSine",
+     "pick:emp",
+     "pick:pw:echo",
+     "wave:droneV",
+     "drop:hit",
+     "pick:pw:cres",
+     "pick:pw:drop",
+     "pick:pw:chord",
+     "pick:hp",
+     "pick:pw:wing",
+     "pick:pw:tempo",
+     "shot:drone",
+     "shot:drone*"
+    ],
+    "jaccardPrev": null,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.67
+   },
+   "2": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 1,
+    "waves": 3,
+    "shotSrc": 1,
+    "newThings": 3,
+    "newList": [
+     "pick:pw:drum",
+     "pick:pw:mag",
+     "pick:pw:nr"
+    ],
+    "jaccardPrev": 0.71,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.68
+   },
+   "3": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 4,
+    "waves": 3,
+    "shotSrc": 4,
+    "newThings": 10,
+    "newList": [
+     "enemy:turret",
+     "wave:turret",
+     "pick:pw:slice",
+     "enemy:gtank",
+     "pick:pw:crate",
+     "enemy:gturret",
+     "pick:pw:bomb",
+     "shot:turret",
+     "shot:gtank",
+     "shot:gturret"
+    ],
+    "jaccardPrev": 0.33,
+    "song": "stage3",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.59
+   },
+   "4": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 5,
+    "waves": 4,
+    "shotSrc": 5,
+    "newThings": 7,
+    "newList": [
+     "zoo:shielder",
+     "enemy:shielder",
+     "drop:miss",
+     "enemy:gwalker",
+     "pick:pw:bub",
+     "shot:shielder",
+     "shot:gwalker"
+    ],
+    "jaccardPrev": 0.32,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.64
+   },
+   "5": {
+    "mins": 2.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 11,
+    "enemyKinds": 7,
+    "waves": 3,
+    "shotSrc": 11,
+    "newThings": 9,
+    "newList": [
+     "mini:TRESOR-WART|k5",
+     "verb:laser",
+     "verb:fan5",
+     "verb:ring",
+     "verb:fan7",
+     "shot:boss:fan5",
+     "shot:boss:ring",
+     "shot:rain/hazard",
+     "shot:boss:fan7"
+    ],
+    "jaccardPrev": 0.44,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.39
+   },
+   "6": {
+    "mins": 3.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 7,
+    "waves": 5,
+    "shotSrc": 6,
+    "newThings": 3,
+    "newList": [
+     "zoo:kamikaze",
+     "enemy:kamikaze",
+     "pick:pw:ric"
+    ],
+    "jaccardPrev": 0.48,
+    "song": "stage3",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.57
+   },
+   "7": {
+    "mins": 2.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 7,
+    "waves": 5,
+    "shotSrc": 6,
+    "newThings": 5,
+    "newList": [
+     "set:turretLine",
+     "enemy:turret*",
+     "pick:pw:slow",
+     "shot:turret*",
+     "shot:none"
+    ],
+    "jaccardPrev": 0.57,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.66
+   },
+   "8": {
+    "mins": 2.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 14,
+    "enemyKinds": 9,
+    "waves": 5,
+    "shotSrc": 10,
+    "newThings": 6,
+    "newList": [
+     "boss:SEK-ADLER|k0",
+     "enemy:charger*",
+     "verb:summon",
+     "enemy:charger",
+     "verb:fan9",
+     "shot:boss:fan9"
+    ],
+    "jaccardPrev": 0.52,
+    "song": "stage2+boss",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.2
+   },
+   "9": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 8,
+    "waves": 6,
+    "shotSrc": 6,
+    "newThings": 4,
+    "newList": [
+     "zoo:splitter",
+     "enemy:splitter",
+     "enemy:zdrn",
+     "shot:splitter"
+    ],
+    "jaccardPrev": 0.44,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.62
+   },
+   "10": {
+    "mins": 2.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 8,
+    "waves": 5,
+    "shotSrc": 6,
+    "newThings": 2,
+    "newList": [
+     "pick:pw:nova",
+     "pick:pw:leech"
+    ],
+    "jaccardPrev": 0.95,
+    "song": "endless",
+    "bg": "MAINUFER",
+    "plainShare": 0.61
+   },
+   "11": {
+    "mins": 3.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 12,
+    "enemyKinds": 14,
+    "waves": 8,
+    "shotSrc": 6,
+    "newThings": 5,
+    "newList": [
+     "enemy:swarm",
+     "set:swarm",
+     "wave:chargers",
+     "zoo:bomber",
+     "enemy:bomber"
+    ],
+    "jaccardPrev": 0.52,
+    "song": "stage2",
+    "bg": "MAINUFER",
+    "plainShare": 0.63
+   },
+   "12": {
+    "mins": 3.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 10,
+    "enemyKinds": 9,
+    "waves": 7,
+    "shotSrc": 5,
+    "newThings": 1,
+    "newList": [
+     "pick:pw:fix"
+    ],
+    "jaccardPrev": 0.63,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.61
+   },
+   "13": {
+    "mins": 2.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 14,
+    "waves": 7,
+    "shotSrc": 13,
+    "newThings": 3,
+    "newList": [
+     "mini:BRÜCKEN-WÄCHTER|k4",
+     "verb:spiral",
+     "shot:boss:spiral"
+    ],
+    "jaccardPrev": 0.46,
+    "song": "endless",
+    "bg": "MAINUFER",
+    "plainShare": 0.49
+   },
+   "14": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 13,
+    "enemyKinds": 12,
+    "waves": 9,
+    "shotSrc": 3,
+    "newThings": 2,
+    "newList": [
+     "zoo:sniper",
+     "enemy:sniper"
+    ],
+    "jaccardPrev": 0.47,
+    "song": "stage2",
+    "bg": "MAINUFER",
+    "plainShare": 0.8
+   },
+   "15": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 12,
+    "enemyKinds": 16,
+    "waves": 8,
+    "shotSrc": 9,
+    "newThings": 1,
+    "newList": [
+     "shot:sniper"
+    ],
+    "jaccardPrev": 0.68,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.7
+   },
+   "16": {
+    "mins": 2.2,
+    "tries": 1,
+    "cleared": true,
+    "enc": 14,
+    "enemyKinds": 12,
+    "waves": 5,
+    "shotSrc": 13,
+    "newThings": 2,
+    "newList": [
+     "boss:FLUSSKRAKE|k1",
+     "shot:boss:summon"
+    ],
+    "jaccardPrev": 0.51,
+    "song": "endless+boss3",
+    "bg": "MAINUFER",
+    "plainShare": 0.23
+   },
+   "17": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 13,
+    "enemyKinds": 13,
+    "waves": 9,
+    "shotSrc": 6,
+    "newThings": 4,
+    "newList": [
+     "set:wedge",
+     "zoo:healer",
+     "enemy:healer",
+     "shot:charger"
+    ],
+    "jaccardPrev": 0.34,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.64
+   },
+   "18": {
+    "mins": 3.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 14,
+    "waves": 11,
+    "shotSrc": 7,
+    "newThings": 2,
+    "newList": [
+     "enemy:gate",
+     "wave:gate"
+    ],
+    "jaccardPrev": 0.82,
+    "song": "endless",
+    "bg": "OSTEND",
+    "plainShare": 0.7
+   },
+   "19": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 14,
+    "enemyKinds": 17,
+    "waves": 10,
+    "shotSrc": 6,
+    "newThings": 3,
+    "newList": [
+     "enemy:gunship",
+     "wave:gunship",
+     "shot:gunship"
+    ],
+    "jaccardPrev": 0.67,
+    "song": "endless2",
+    "bg": "OSTEND",
+    "plainShare": 0.76
+   },
+   "20": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 18,
+    "waves": 11,
+    "shotSrc": 9,
+    "newThings": 2,
+    "newList": [
+     "zoo:carrier",
+     "enemy:carrier"
+    ],
+    "jaccardPrev": 0.69,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.63
+   },
+   "21": {
+    "mins": 2.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 19,
+    "enemyKinds": 18,
+    "waves": 10,
+    "shotSrc": 11,
+    "newThings": 2,
+    "newList": [
+     "pick:pw:tri",
+     "mini:SCHRANKEN-WART|k5"
+    ],
+    "jaccardPrev": 0.8,
+    "song": "endless",
+    "bg": "OSTEND",
+    "plainShare": 0.44
+   },
+   "22": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 6,
+    "newThings": 2,
+    "newList": [
+     "zoo:minelayer",
+     "enemy:minelayer"
+    ],
+    "jaccardPrev": 0.62,
+    "song": "endless2",
+    "bg": "OSTEND",
+    "plainShare": 0.76
+   },
+   "23": {
+    "mins": 4.2,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.84,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.65
+   },
+   "24": {
+    "mins": 2.2,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 16,
+    "waves": 8,
+    "shotSrc": 14,
+    "newThings": 4,
+    "newList": [
+     "boss:ZENTRAL-ICE|k2",
+     "shot:charger*",
+     "shot:carrier",
+     "shot:boss:laser"
+    ],
+    "jaccardPrev": 0.54,
+    "song": "endless+boss",
+    "bg": "OSTEND",
+    "plainShare": 0.24
+   },
+   "25": {
+    "mins": 2.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 16,
+    "waves": 11,
+    "shotSrc": 6,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.43,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.61
+   },
+   "26": {
+    "mins": 2.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 17,
+    "waves": 13,
+    "shotSrc": 7,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.84,
+    "song": "stage1",
+    "bg": "MESSE",
+    "plainShare": 0.72
+   },
+   "27": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 11,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.74,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.56
+   },
+   "28": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 11,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.87,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.64
+   },
+   "29": {
+    "mins": 2.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 22,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 16,
+    "newThings": 1,
+    "newList": [
+     "mini:MESSE-WÄCHTER|k4"
+    ],
+    "jaccardPrev": 0.73,
+    "song": "stage1",
+    "bg": "MESSE",
+    "plainShare": 0.46
+   },
+   "30": {
+    "mins": 3.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 11,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.76,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.56
+   },
+   "31": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 10,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.85,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.72
+   },
+   "32": {
+    "mins": 3.1,
+    "tries": 1,
+    "cleared": true,
+    "enc": 21,
+    "enemyKinds": 15,
+    "waves": 10,
+    "shotSrc": 13,
+    "newThings": 1,
+    "newList": [
+     "boss:KRONOS|k3"
+    ],
+    "jaccardPrev": 0.48,
+    "song": "stage1+boss2",
+    "bg": "MESSE",
+    "plainShare": 0.2
+   },
+   "33": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 15,
+    "waves": 13,
+    "shotSrc": 7,
+    "newThings": 1,
+    "newList": [
+     "wave:phalanx"
+    ],
+    "jaccardPrev": 0.52,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.85
+   },
+   "34": {
+    "mins": 3.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 14,
+    "waves": 12,
+    "shotSrc": 6,
+    "newThings": 2,
+    "newList": [
+     "set:phalanx",
+     "wave:pillars"
+    ],
+    "jaccardPrev": 0.81,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.71
+   },
+   "35": {
+    "mins": 3.1,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 19,
+    "waves": 14,
+    "shotSrc": 12,
+    "newThings": 2,
+    "newList": [
+     "wave:wedge",
+     "shot:minelayer"
+    ],
+    "jaccardPrev": 0.64,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.69
+   },
+   "36": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 17,
+    "waves": 11,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.78,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.79
+   },
+   "37": {
+    "mins": 3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 13,
+    "waves": 8,
+    "shotSrc": 14,
+    "newThings": 1,
+    "newList": [
+     "mini:HOPLITE|k7"
+    ],
+    "jaccardPrev": 0.58,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.44
+   },
+   "38": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.51,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.72
+   },
+   "39": {
+    "mins": 2.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 18,
+    "waves": 13,
+    "shotSrc": 11,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.84,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.75
+   },
+   "40": {
+    "mins": 3.1,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 10,
+    "waves": 5,
+    "shotSrc": 13,
+    "newThings": 1,
+    "newList": [
+     "boss:TALOS|k6"
+    ],
+    "jaccardPrev": 0.33,
+    "song": "athina2+boss3",
+    "bg": "ATHINA",
+    "plainShare": 0.19
+   },
+   "41": {
+    "mins": 3.6,
+    "tries": 3,
+    "cleared": false,
+    "enc": 9,
+    "enemyKinds": 9,
+    "waves": 5,
+    "shotSrc": 7,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.41,
+    "song": "stage2+menu",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.6
+   },
+   "42": {
+    "mins": 2.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 7,
+    "waves": 4,
+    "shotSrc": 4,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.64,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.7
+   },
+   "43": {
+    "mins": 1.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 10,
+    "waves": 5,
+    "shotSrc": 7,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.54,
+    "song": "stage1",
+    "bg": "OSTEND",
+    "plainShare": 0.84
+   },
+   "44": {
+    "mins": 5.3,
+    "tries": 3,
+    "cleared": false,
+    "enc": 10,
+    "enemyKinds": 11,
+    "waves": 6,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.78,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.5
+   },
+   "45": {
+    "mins": 4.8,
+    "tries": 2,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 9,
+    "waves": 5,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.63,
+    "song": "athina+menu",
+    "bg": "ATHINA",
+    "plainShare": 0.76
+   }
+  },
+  "jaccardMedian": 0.63,
+  "jaccardMean": 0.62,
+  "stagesWithZeroNew": 15,
+  "firstSeen": [
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "wave:droneLine",
+    0
+   ],
+   [
+    "pick:up",
+    0.03
+   ],
+   [
+    "enemy:drone*",
+    0.09
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "pick:pw:magb",
+    0.17
+   ],
+   [
+    "fence:fence",
+    0.35
+   ],
+   [
+    "wave:droneSine",
+    0.39
+   ],
+   [
+    "pick:emp",
+    0.54
+   ],
+   [
+    "pick:pw:echo",
+    0.61
+   ],
+   [
+    "wave:droneV",
+    0.61
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "pick:pw:cres",
+    1.11
+   ],
+   [
+    "pick:pw:drop",
+    1.25
+   ],
+   [
+    "pick:pw:chord",
+    1.44
+   ],
+   [
+    "pick:hp",
+    1.75
+   ],
+   [
+    "pick:pw:wing",
+    2.11
+   ],
+   [
+    "pick:pw:tempo",
+    2.42
+   ],
+   [
+    "pick:pw:drum",
+    3.52
+   ],
+   [
+    "pick:pw:mag",
+    4.27
+   ],
+   [
+    "pick:pw:nr",
+    4.81
+   ],
+   [
+    "enemy:turret",
+    4.92
+   ],
+   [
+    "wave:turret",
+    4.92
+   ],
+   [
+    "pick:pw:slice",
+    5.24
+   ],
+   [
+    "enemy:gtank",
+    5.26
+   ],
+   [
+    "pick:pw:crate",
+    6.13
+   ],
+   [
+    "enemy:gturret",
+    6.26
+   ],
+   [
+    "pick:pw:bomb",
+    6.81
+   ],
+   [
+    "zoo:shielder",
+    7.56
+   ],
+   [
+    "enemy:shielder",
+    7.57
+   ],
+   [
+    "drop:miss",
+    8.06
+   ],
+   [
+    "enemy:gwalker",
+    9.01
+   ],
+   [
+    "pick:pw:bub",
+    9.35
+   ],
+   [
+    "mini:TRESOR-WART|k5",
+    11.89
+   ],
+   [
+    "verb:laser",
+    11.89
+   ],
+   [
+    "verb:fan5",
+    12.01
+   ],
+   [
+    "verb:ring",
+    12.2
+   ],
+   [
+    "verb:fan7",
+    12.62
+   ],
+   [
+    "zoo:kamikaze",
+    12.86
+   ],
+   [
+    "enemy:kamikaze",
+    12.87
+   ],
+   [
+    "pick:pw:ric",
+    13.01
+   ],
+   [
+    "set:turretLine",
+    16.59
+   ],
+   [
+    "enemy:turret*",
+    16.8
+   ],
+   [
+    "pick:pw:slow",
+    19.07
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    19.91
+   ],
+   [
+    "enemy:charger*",
+    20.05
+   ],
+   [
+    "verb:summon",
+    20.05
+   ],
+   [
+    "enemy:charger",
+    20.09
+   ],
+   [
+    "verb:fan9",
+    21.15
+   ],
+   [
+    "zoo:splitter",
+    22.1
+   ],
+   [
+    "enemy:splitter",
+    22.11
+   ],
+   [
+    "enemy:zdrn",
+    22.14
+   ],
+   [
+    "pick:pw:nova",
+    25.46
+   ],
+   [
+    "pick:pw:leech",
+    26.08
+   ],
+   [
+    "enemy:swarm",
+    26.3
+   ],
+   [
+    "set:swarm",
+    26.3
+   ],
+   [
+    "wave:chargers",
+    26.43
+   ],
+   [
+    "zoo:bomber",
+    26.81
+   ],
+   [
+    "enemy:bomber",
+    26.82
+   ],
+   [
+    "pick:pw:fix",
+    30.77
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    35.14
+   ],
+   [
+    "verb:spiral",
+    35.55
+   ],
+   [
+    "zoo:sniper",
+    36.73
+   ],
+   [
+    "enemy:sniper",
+    36.74
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    41.72
+   ],
+   [
+    "set:wedge",
+    43.24
+   ],
+   [
+    "zoo:healer",
+    43.43
+   ],
+   [
+    "enemy:healer",
+    43.43
+   ],
+   [
+    "enemy:gate",
+    47.19
+   ],
+   [
+    "wave:gate",
+    47.19
+   ],
+   [
+    "enemy:gunship",
+    50.28
+   ],
+   [
+    "wave:gunship",
+    50.28
+   ],
+   [
+    "zoo:carrier",
+    52.66
+   ],
+   [
+    "enemy:carrier",
+    52.66
+   ],
+   [
+    "pick:pw:tri",
+    55.33
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    55.94
+   ],
+   [
+    "zoo:minelayer",
+    57.84
+   ],
+   [
+    "enemy:minelayer",
+    57.84
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    64.29
+   ],
+   [
+    "mini:MESSE-WÄCHTER|k4",
+    77.94
+   ],
+   [
+    "boss:KRONOS|k3",
+    85.85
+   ],
+   [
+    "wave:phalanx",
+    89.49
+   ],
+   [
+    "set:phalanx",
+    90.63
+   ],
+   [
+    "wave:pillars",
+    91.26
+   ],
+   [
+    "wave:wedge",
+    95.19
+   ],
+   [
+    "mini:HOPLITE|k7",
+    101.97
+   ],
+   [
+    "boss:TALOS|k6",
+    109.19
+   ]
+  ],
+  "mechTimeline": [
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "enemy:drone*",
+    0.09
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "fence:fence",
+    0.35
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "enemy:turret",
+    4.92
+   ],
+   [
+    "enemy:gtank",
+    5.26
+   ],
+   [
+    "enemy:gturret",
+    6.26
+   ],
+   [
+    "zoo:shielder",
+    7.56
+   ],
+   [
+    "enemy:shielder",
+    7.57
+   ],
+   [
+    "drop:miss",
+    8.06
+   ],
+   [
+    "enemy:gwalker",
+    9.01
+   ],
+   [
+    "mini:TRESOR-WART|k5",
+    11.89
+   ],
+   [
+    "verb:laser",
+    11.89
+   ],
+   [
+    "verb:fan5",
+    12.01
+   ],
+   [
+    "verb:ring",
+    12.2
+   ],
+   [
+    "verb:fan7",
+    12.62
+   ],
+   [
+    "zoo:kamikaze",
+    12.86
+   ],
+   [
+    "enemy:kamikaze",
+    12.87
+   ],
+   [
+    "set:turretLine",
+    16.59
+   ],
+   [
+    "enemy:turret*",
+    16.8
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    19.91
+   ],
+   [
+    "enemy:charger*",
+    20.05
+   ],
+   [
+    "verb:summon",
+    20.05
+   ],
+   [
+    "enemy:charger",
+    20.09
+   ],
+   [
+    "verb:fan9",
+    21.15
+   ],
+   [
+    "zoo:splitter",
+    22.1
+   ],
+   [
+    "enemy:splitter",
+    22.11
+   ],
+   [
+    "enemy:zdrn",
+    22.14
+   ],
+   [
+    "enemy:swarm",
+    26.3
+   ],
+   [
+    "set:swarm",
+    26.3
+   ],
+   [
+    "zoo:bomber",
+    26.81
+   ],
+   [
+    "enemy:bomber",
+    26.82
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    35.14
+   ],
+   [
+    "verb:spiral",
+    35.55
+   ],
+   [
+    "zoo:sniper",
+    36.73
+   ],
+   [
+    "enemy:sniper",
+    36.74
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    41.72
+   ],
+   [
+    "set:wedge",
+    43.24
+   ],
+   [
+    "zoo:healer",
+    43.43
+   ],
+   [
+    "enemy:healer",
+    43.43
+   ],
+   [
+    "enemy:gate",
+    47.19
+   ],
+   [
+    "enemy:gunship",
+    50.28
+   ],
+   [
+    "zoo:carrier",
+    52.66
+   ],
+   [
+    "enemy:carrier",
+    52.66
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    55.94
+   ],
+   [
+    "zoo:minelayer",
+    57.84
+   ],
+   [
+    "enemy:minelayer",
+    57.84
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    64.29
+   ],
+   [
+    "mini:MESSE-WÄCHTER|k4",
+    77.94
+   ],
+   [
+    "boss:KRONOS|k3",
+    85.85
+   ],
+   [
+    "set:phalanx",
+    90.63
+   ],
+   [
+    "mini:HOPLITE|k7",
+    101.97
+   ],
+   [
+    "boss:TALOS|k6",
+    109.19
+   ]
+  ],
+  "longestNoveltyGapMin": 19.9,
+  "lastNewThingMin": 109.19,
+  "newThingsFirst30": 59,
+  "newThingsAfter30": 28,
+  "longestMechGapMin": 19.9,
+  "plainLoopShare": 0.6,
+  "bossShare": 0.1,
+  "specialEventGapMaxS": 160,
+  "specialEventGapMedianS": 11,
+  "bossFights": 10,
+  "bossFightsBig": 5,
+  "distinctBossBehaviours": 10,
+  "distinctBossVerbKits": 9,
+  "bossVerbsTotal": [
+   "fan5",
+   "fan7",
+   "fan9",
+   "laser",
+   "ring",
+   "spiral",
+   "summon"
+  ],
+  "bossList": [
+   [
+    "mini",
+    "TRESOR-WART",
+    "fan5,fan7,laser,ring"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "fan5,fan7,fan9,ring,summon"
+   ],
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "fan5,fan7,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "fan7,fan9,laser,ring"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "fan7,fan9,laser,ring,spiral"
+   ],
+   [
+    "mini",
+    "MESSE-WÄCHTER",
+    "fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,ring,spiral"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ]
+  ],
+  "songMinutes": {
+   "stage2": 27.2,
+   "stage3": 26.1,
+   "athina": 16.3,
+   "stage1": 15.8,
+   "endless": 13,
+   "endless2": 12.4,
+   "athina2": 9.6,
+   "boss3": 3.6,
+   "boss": 3,
+   "boss2": 2.2,
+   "menu": 0
+  },
+  "distinctSongs": 11,
+  "songStartsPerHour": 26.9,
+  "distinctTracksPerHour": 5.1,
+  "backgrounds": [
+   "BANKENVIERTEL",
+   "MAINUFER",
+   "OSTEND",
+   "MESSE",
+   "ATHINA"
+  ],
+  "spawns": 9264,
+  "spawnShare": [
+   [
+    "drone",
+    5513,
+    59.5
+   ],
+   [
+    "charger",
+    1030,
+    11.1
+   ],
+   [
+    "turret",
+    626,
+    6.8
+   ],
+   [
+    "zdrn",
+    569,
+    6.1
+   ],
+   [
+    "swarm",
+    276,
+    3
+   ],
+   [
+    "kamikaze",
+    231,
+    2.5
+   ],
+   [
+    "gtank",
+    200,
+    2.2
+   ],
+   [
+    "gturret",
+    187,
+    2
+   ],
+   [
+    "splitter",
+    136,
+    1.5
+   ],
+   [
+    "shielder",
+    94,
+    1
+   ],
+   [
+    "gwalker",
+    76,
+    0.8
+   ],
+   [
+    "bomber",
+    61,
+    0.7
+   ],
+   [
+    "gate",
+    50,
+    0.5
+   ],
+   [
+    "sniper",
+    46,
+    0.5
+   ],
+   [
+    "gunship",
+    46,
+    0.5
+   ],
+   [
+    "carrier",
+    42,
+    0.5
+   ],
+   [
+    "minelayer",
+    41,
+    0.4
+   ],
+   [
+    "healer",
+    40,
+    0.4
+   ]
+  ],
+  "pickups": [
+   [
+    "up",
+    358
+   ],
+   [
+    "emp",
+    153
+   ],
+   [
+    "hp",
+    43
+   ],
+   [
+    "pw:crate",
+    36
+   ],
+   [
+    "pw:bomb",
+    34
+   ],
+   [
+    "pw:leech",
+    31
+   ],
+   [
+    "pw:slice",
+    28
+   ],
+   [
+    "pw:drum",
+    25
+   ],
+   [
+    "pw:ric",
+    22
+   ],
+   [
+    "pw:magb",
+    21
+   ],
+   [
+    "pw:echo",
+    21
+   ],
+   [
+    "pw:tempo",
+    21
+   ],
+   [
+    "pw:slow",
+    17
+   ],
+   [
+    "pw:drop",
+    16
+   ],
+   [
+    "pw:cres",
+    14
+   ],
+   [
+    "pw:wing",
+    14
+   ],
+   [
+    "pw:nr",
+    14
+   ],
+   [
+    "pw:nova",
+    14
+   ],
+   [
+    "pw:chord",
+    13
+   ],
+   [
+    "pw:mag",
+    9
+   ],
+   [
+    "pw:tri",
+    9
+   ],
+   [
+    "pw:bub",
+    7
+   ],
+   [
+    "pw:fix",
+    5
+   ]
+  ],
+  "bulletSources": [
+   [
+    "drone*",
+    9741,
+    44.5
+   ],
+   [
+    "drone",
+    4077,
+    18.6
+   ],
+   [
+    "boss:ring",
+    1849,
+    8.4
+   ],
+   [
+    "gunship",
+    1351,
+    6.2
+   ],
+   [
+    "turret*",
+    1077,
+    4.9
+   ],
+   [
+    "turret",
+    675,
+    3.1
+   ],
+   [
+    "boss:fan9",
+    667,
+    3
+   ],
+   [
+    "boss:fan7",
+    645,
+    2.9
+   ],
+   [
+    "boss:spiral",
+    600,
+    2.7
+   ],
+   [
+    "gwalker",
+    337,
+    1.5
+   ],
+   [
+    "boss:fan5",
+    288,
+    1.3
+   ],
+   [
+    "gtank",
+    191,
+    0.9
+   ],
+   [
+    "gturret",
+    173,
+    0.8
+   ],
+   [
+    "sniper",
+    52,
+    0.2
+   ],
+   [
+    "boss:laser",
+    49,
+    0.2
+   ],
+   [
+    "none",
+    42,
+    0.2
+   ],
+   [
+    "splitter",
+    33,
+    0.2
+   ],
+   [
+    "rain/hazard",
+    22,
+    0.1
+   ],
+   [
+    "shielder",
+    18,
+    0.1
+   ],
+   [
+    "boss:summon",
+    9,
+    0
+   ],
+   [
+    "charger*",
+    6,
+    0
+   ],
+   [
+    "charger",
+    5,
+    0
+   ],
+   [
+    "carrier",
+    2,
+    0
+   ],
+   [
+    "minelayer",
+    1,
+    0
+   ]
+  ],
+  "hints": [
+   [
+    "DROP COMING: DASH ON THE DOWNBEAT",
+    190
+   ],
+   [
+    "WINGS: two drones shoot the off-beats",
+    182
+   ],
+   [
+    "WEAVE: shoot on the beat",
+    166
+   ],
+   [
+    "LASER FENCE: find the gap",
+    141
+   ],
+   [
+    "SET PIECE",
+    115
+   ],
+   [
+    "Dash on the pulse to power up",
+    114
+   ],
+   [
+    "SHOOT THE CAGE: FREE THE DATA SPRITE",
+    64
+   ],
+   [
+    "MAGNET: every beat pulls pickups in",
+    26
+   ],
+   [
+    "ECHO: shots return on the next beat",
+    22
+   ],
+   [
+    "HEAVY CRATE: big slow shells",
+    21
+   ],
+   [
+    "NOVA: a ring blast on every bar line",
+    20
+   ],
+   [
+    "TIME SLICE: bullets slow on the beat",
+    18
+   ],
+   [
+    "CHORD: blocks one hit, rings on the beat",
+    16
+   ],
+   [
+    "RICOCHET: shots bounce off edges",
+    14
+   ],
+   [
+    "LIFE LEECH: kills heal a little",
+    14
+   ]
+  ],
+  "mutators": {},
+  "setPieces": {
+   "set:weave": 166,
+   "fence:fence": 141,
+   "drop:hit": 189,
+   "drop:miss": 1,
+   "set:turretLine": 41,
+   "set:swarm": 23,
+   "set:wedge": 32,
+   "set:phalanx": 19
+  },
+  "pitStops": 0
+ },
+ "endless-normal": {
+  "gameMinutes": 30,
+  "tries": 1,
+  "firstTryFails": 0,
+  "events": 2317,
+  "repeatRatio5min": 0.829,
+  "encounters": 554,
+  "encountersPerMin": 18.5,
+  "topEncounters": [
+   [
+    "verb:ring",
+    61,
+    11
+   ],
+   [
+    "verb:fan5",
+    47,
+    8.5
+   ],
+   [
+    "verb:fan7",
+    38,
+    6.9
+   ],
+   [
+    "verb:spiral",
+    35,
+    6.3
+   ],
+   [
+    "verb:laser",
+    30,
+    5.4
+   ],
+   [
+    "wave:droneLine",
+    25,
+    4.5
+   ],
+   [
+    "wave:droneSine",
+    23,
+    4.2
+   ],
+   [
+    "verb:summon",
+    21,
+    3.8
+   ]
+  ],
+  "distinctEncounterSigs": 48,
+  "per5min": [
+   [
+    0,
+    31,
+    15
+   ],
+   [
+    5,
+    31,
+    15
+   ],
+   [
+    10,
+    30,
+    20
+   ],
+   [
+    15,
+    29,
+    20
+   ],
+   [
+    20,
+    31,
+    20
+   ],
+   [
+    25,
+    29,
+    20
+   ]
+  ],
+  "firstSeen": [
+   [
+    "enemy:turret",
+    0
+   ],
+   [
+    "wave:turretPair",
+    0
+   ],
+   [
+    "wave:turret",
+    0.05
+   ],
+   [
+    "enemy:drone",
+    0.09
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "pick:up",
+    0.34
+   ],
+   [
+    "wave:snake",
+    0.35
+   ],
+   [
+    "pick:pw:nr",
+    0.43
+   ],
+   [
+    "wave:droneSine",
+    0.44
+   ],
+   [
+    "wave:droneV",
+    0.52
+   ],
+   [
+    "wave:droneLine",
+    0.61
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "pick:pw:crate",
+    0.68
+   ],
+   [
+    "enemy:charger",
+    0.74
+   ],
+   [
+    "wave:chargers",
+    0.74
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    0.83
+   ],
+   [
+    "verb:fan5",
+    0.83
+   ],
+   [
+    "verb:ring",
+    0.98
+   ],
+   [
+    "verb:fan7",
+    1.6
+   ],
+   [
+    "verb:spiral",
+    1.74
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    2.19
+   ],
+   [
+    "pick:pw:magb",
+    2.19
+   ],
+   [
+    "pick:hp",
+    2.19
+   ],
+   [
+    "verb:summon",
+    2.33
+   ],
+   [
+    "pick:pw:drop",
+    2.41
+   ],
+   [
+    "verb:fan9",
+    3.39
+   ],
+   [
+    "enemy:swarm",
+    3.72
+   ],
+   [
+    "set:swarm",
+    3.72
+   ],
+   [
+    "zoo:splitter",
+    3.78
+   ],
+   [
+    "enemy:splitter",
+    3.79
+   ],
+   [
+    "pick:pw:tempo",
+    3.79
+   ],
+   [
+    "enemy:zdrn",
+    3.83
+   ],
+   [
+    "zoo:shielder",
+    3.87
+   ],
+   [
+    "enemy:shielder",
+    3.87
+   ],
+   [
+    "zoo:bomber",
+    3.94
+   ],
+   [
+    "enemy:bomber",
+    3.95
+   ],
+   [
+    "wave:flankPair",
+    3.96
+   ],
+   [
+    "enemy:flank",
+    3.97
+   ],
+   [
+    "pick:pw:chord",
+    4.03
+   ],
+   [
+    "zoo:kamikaze",
+    4.18
+   ],
+   [
+    "zoo:sniper",
+    4.18
+   ],
+   [
+    "wave:wedge",
+    4.18
+   ],
+   [
+    "enemy:sniper",
+    4.19
+   ],
+   [
+    "enemy:kamikaze",
+    4.19
+   ],
+   [
+    "zoo:healer",
+    4.26
+   ],
+   [
+    "enemy:healer",
+    4.26
+   ],
+   [
+    "zoo:carrier",
+    4.41
+   ],
+   [
+    "enemy:carrier",
+    4.41
+   ],
+   [
+    "wave:phalanx",
+    4.44
+   ],
+   [
+    "enemy:mine",
+    4.48
+   ],
+   [
+    "wave:mines",
+    4.48
+   ],
+   [
+    "enemy:gate",
+    4.48
+   ],
+   [
+    "wave:gate",
+    4.48
+   ],
+   [
+    "mini:HOPLITE|k7",
+    4.51
+   ],
+   [
+    "pick:emp",
+    4.89
+   ],
+   [
+    "pick:pw:leech",
+    5.44
+   ],
+   [
+    "zoo:minelayer",
+    5.47
+   ],
+   [
+    "enemy:minelayer",
+    5.47
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    5.56
+   ],
+   [
+    "pick:pw:cres",
+    6.24
+   ],
+   [
+    "pick:pw:slow",
+    7.03
+   ],
+   [
+    "enemy:gturret",
+    7.13
+   ],
+   [
+    "pick:pw:echo",
+    7.33
+   ],
+   [
+    "set:wedge",
+    7.34
+   ],
+   [
+    "pick:pw:mag",
+    7.49
+   ],
+   [
+    "enemy:gtank",
+    7.51
+   ],
+   [
+    "fence:fence",
+    7.53
+   ],
+   [
+    "wave:pillars",
+    7.56
+   ],
+   [
+    "wave:swarmRing",
+    7.64
+   ],
+   [
+    "wave:swarm",
+    7.66
+   ],
+   [
+    "pick:pw:nova",
+    7.69
+   ],
+   [
+    "pick:pw:drum",
+    7.77
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    7.81
+   ],
+   [
+    "verb:laser",
+    7.81
+   ],
+   [
+    "pick:pw:wing",
+    8.74
+   ],
+   [
+    "wave:turretLine",
+    9.36
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    10.45
+   ],
+   [
+    "pick:pw:fix",
+    11.92
+   ],
+   [
+    "enemy:gwalker",
+    12.08
+   ],
+   [
+    "enemy:drone*",
+    12.11
+   ],
+   [
+    "set:phalanx",
+    12.4
+   ],
+   [
+    "enemy:gunship",
+    12.42
+   ],
+   [
+    "wave:gunship",
+    12.42
+   ],
+   [
+    "enemy:turret*",
+    12.44
+   ],
+   [
+    "enemy:charger*",
+    13.9
+   ],
+   [
+    "boss:TALOS|k6",
+    15.54
+   ],
+   [
+    "pick:pw:slice",
+    17.38
+   ],
+   [
+    "wave:convoy",
+    18.62
+   ],
+   [
+    "boss:KRONOS|k3",
+    18.79
+   ],
+   [
+    "mut:tide",
+    21.08
+   ],
+   [
+    "set:turretLine",
+    21.1
+   ],
+   [
+    "pick:pw:bub",
+    22.7
+   ],
+   [
+    "enemy:flank*",
+    22.86
+   ],
+   [
+    "mut:guard",
+    24.51
+   ],
+   [
+    "pick:pw:tri",
+    24.92
+   ],
+   [
+    "pick:pw:ric",
+    25.45
+   ],
+   [
+    "mut:mine",
+    29.02
+   ]
+  ],
+  "mechTimeline": [
+   [
+    "enemy:turret",
+    0
+   ],
+   [
+    "enemy:drone",
+    0.09
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "enemy:charger",
+    0.74
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    0.83
+   ],
+   [
+    "verb:fan5",
+    0.83
+   ],
+   [
+    "verb:ring",
+    0.98
+   ],
+   [
+    "verb:fan7",
+    1.6
+   ],
+   [
+    "verb:spiral",
+    1.74
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    2.19
+   ],
+   [
+    "verb:summon",
+    2.33
+   ],
+   [
+    "verb:fan9",
+    3.39
+   ],
+   [
+    "enemy:swarm",
+    3.72
+   ],
+   [
+    "set:swarm",
+    3.72
+   ],
+   [
+    "zoo:splitter",
+    3.78
+   ],
+   [
+    "enemy:splitter",
+    3.79
+   ],
+   [
+    "enemy:zdrn",
+    3.83
+   ],
+   [
+    "zoo:shielder",
+    3.87
+   ],
+   [
+    "enemy:shielder",
+    3.87
+   ],
+   [
+    "zoo:bomber",
+    3.94
+   ],
+   [
+    "enemy:bomber",
+    3.95
+   ],
+   [
+    "enemy:flank",
+    3.97
+   ],
+   [
+    "zoo:kamikaze",
+    4.18
+   ],
+   [
+    "zoo:sniper",
+    4.18
+   ],
+   [
+    "enemy:sniper",
+    4.19
+   ],
+   [
+    "enemy:kamikaze",
+    4.19
+   ],
+   [
+    "zoo:healer",
+    4.26
+   ],
+   [
+    "enemy:healer",
+    4.26
+   ],
+   [
+    "zoo:carrier",
+    4.41
+   ],
+   [
+    "enemy:carrier",
+    4.41
+   ],
+   [
+    "enemy:mine",
+    4.48
+   ],
+   [
+    "enemy:gate",
+    4.48
+   ],
+   [
+    "mini:HOPLITE|k7",
+    4.51
+   ],
+   [
+    "zoo:minelayer",
+    5.47
+   ],
+   [
+    "enemy:minelayer",
+    5.47
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    5.56
+   ],
+   [
+    "enemy:gturret",
+    7.13
+   ],
+   [
+    "set:wedge",
+    7.34
+   ],
+   [
+    "enemy:gtank",
+    7.51
+   ],
+   [
+    "fence:fence",
+    7.53
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    7.81
+   ],
+   [
+    "verb:laser",
+    7.81
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    10.45
+   ],
+   [
+    "enemy:gwalker",
+    12.08
+   ],
+   [
+    "enemy:drone*",
+    12.11
+   ],
+   [
+    "set:phalanx",
+    12.4
+   ],
+   [
+    "enemy:gunship",
+    12.42
+   ],
+   [
+    "enemy:turret*",
+    12.44
+   ],
+   [
+    "enemy:charger*",
+    13.9
+   ],
+   [
+    "boss:TALOS|k6",
+    15.54
+   ],
+   [
+    "boss:KRONOS|k3",
+    18.79
+   ],
+   [
+    "mut:tide",
+    21.08
+   ],
+   [
+    "set:turretLine",
+    21.1
+   ],
+   [
+    "enemy:flank*",
+    22.86
+   ],
+   [
+    "mut:guard",
+    24.51
+   ],
+   [
+    "mut:mine",
+    29.02
+   ]
+  ],
+  "longestNoveltyGapMin": 3.6,
+  "lastNewThingMin": 29.02,
+  "newThingsFirst30": 97,
+  "newThingsAfter30": 0,
+  "longestMechGapMin": 4.5,
+  "plainLoopShare": 0.26,
+  "bossShare": 0.69,
+  "specialEventGapMaxS": 137,
+  "specialEventGapMedianS": 21,
+  "bossFights": 17,
+  "bossFightsBig": 7,
+  "distinctBossBehaviours": 9,
+  "distinctBossVerbKits": 8,
+  "bossVerbsTotal": [
+   "fan5",
+   "fan7",
+   "fan9",
+   "laser",
+   "ring",
+   "spiral",
+   "summon"
+  ],
+  "bossList": [
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "fan5,fan7,ring,spiral"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "fan5,fan7,fan9,ring,summon"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "fan5,fan7,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "fan7,fan9,laser,ring"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "fan7,fan9,laser,ring,spiral"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "fan7,fan9,laser,ring"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "fan5,fan7,fan9,ring,summon"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "fan5,fan7,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,ring"
+   ]
+  ],
+  "songMinutes": {
+   "stage3": 6.5,
+   "boss3": 4.5,
+   "boss": 4.4,
+   "stage2": 3.9,
+   "athina": 3.6,
+   "stage1": 2.2,
+   "boss2": 2.2,
+   "endless2": 1.7,
+   "endless": 1.1
+  },
+  "distinctSongs": 9,
+  "songStartsPerHour": 30,
+  "distinctTracksPerHour": 18,
+  "backgrounds": [
+   "BANKENVIERTEL",
+   "MAINUFER",
+   "OSTEND",
+   "ATHINA",
+   "MESSE"
+  ],
+  "spawns": 1371,
+  "spawnShare": [
+   [
+    "drone",
+    588,
+    42.9
+   ],
+   [
+    "swarm",
+    192,
+    14
+   ],
+   [
+    "charger",
+    183,
+    13.3
+   ],
+   [
+    "turret",
+    85,
+    6.2
+   ],
+   [
+    "zdrn",
+    80,
+    5.8
+   ],
+   [
+    "mine",
+    48,
+    3.5
+   ],
+   [
+    "gtank",
+    32,
+    2.3
+   ],
+   [
+    "flank",
+    26,
+    1.9
+   ],
+   [
+    "gturret",
+    25,
+    1.8
+   ],
+   [
+    "kamikaze",
+    24,
+    1.8
+   ],
+   [
+    "minelayer",
+    19,
+    1.4
+   ],
+   [
+    "splitter",
+    10,
+    0.7
+   ],
+   [
+    "carrier",
+    10,
+    0.7
+   ],
+   [
+    "gate",
+    10,
+    0.7
+   ],
+   [
+    "healer",
+    8,
+    0.6
+   ],
+   [
+    "gwalker",
+    7,
+    0.5
+   ],
+   [
+    "gunship",
+    7,
+    0.5
+   ],
+   [
+    "shielder",
+    6,
+    0.4
+   ],
+   [
+    "sniper",
+    6,
+    0.4
+   ],
+   [
+    "bomber",
+    5,
+    0.4
+   ]
+  ],
+  "pickups": [
+   [
+    "emp",
+    43
+   ],
+   [
+    "hp",
+    30
+   ],
+   [
+    "up",
+    12
+   ],
+   [
+    "pw:tempo",
+    8
+   ],
+   [
+    "pw:mag",
+    6
+   ],
+   [
+    "pw:wing",
+    6
+   ],
+   [
+    "pw:crate",
+    5
+   ],
+   [
+    "pw:drum",
+    5
+   ],
+   [
+    "pw:chord",
+    4
+   ],
+   [
+    "pw:cres",
+    4
+   ],
+   [
+    "pw:bub",
+    4
+   ],
+   [
+    "pw:drop",
+    3
+   ],
+   [
+    "pw:nr",
+    2
+   ],
+   [
+    "pw:magb",
+    2
+   ],
+   [
+    "pw:leech",
+    2
+   ],
+   [
+    "pw:slow",
+    2
+   ],
+   [
+    "pw:echo",
+    2
+   ],
+   [
+    "pw:nova",
+    2
+   ],
+   [
+    "pw:fix",
+    2
+   ],
+   [
+    "pw:slice",
+    1
+   ],
+   [
+    "pw:tri",
+    1
+   ],
+   [
+    "pw:ric",
+    1
+   ]
+  ],
+  "bulletSources": [
+   [
+    "boss:ring",
+    2724,
+    34.9
+   ],
+   [
+    "boss:fan7",
+    893,
+    11.4
+   ],
+   [
+    "boss:spiral",
+    762,
+    9.8
+   ],
+   [
+    "boss:fan9",
+    716,
+    9.2
+   ],
+   [
+    "drone*",
+    674,
+    8.6
+   ],
+   [
+    "boss:fan5",
+    546,
+    7
+   ],
+   [
+    "drone",
+    529,
+    6.8
+   ],
+   [
+    "gunship",
+    344,
+    4.4
+   ],
+   [
+    "turret",
+    186,
+    2.4
+   ],
+   [
+    "turret*",
+    83,
+    1.1
+   ],
+   [
+    "rain/hazard",
+    78,
+    1
+   ],
+   [
+    "none",
+    74,
+    0.9
+   ],
+   [
+    "gturret",
+    46,
+    0.6
+   ],
+   [
+    "gtank",
+    45,
+    0.6
+   ],
+   [
+    "gwalker",
+    39,
+    0.5
+   ],
+   [
+    "boss:laser",
+    30,
+    0.4
+   ],
+   [
+    "boss:summon",
+    15,
+    0.2
+   ],
+   [
+    "sniper",
+    14,
+    0.2
+   ],
+   [
+    "shielder",
+    4,
+    0.1
+   ],
+   [
+    "flank*",
+    3,
+    0
+   ],
+   [
+    "splitter",
+    2,
+    0
+   ],
+   [
+    "swarm",
+    1,
+    0
+   ],
+   [
+    "carrier",
+    1,
+    0
+   ],
+   [
+    "minelayer",
+    1,
+    0
+   ],
+   [
+    "zdrn",
+    1,
+    0
+   ]
+  ],
+  "hints": [
+   [
+    "DROP COMING: DASH ON THE DOWNBEAT",
+    15
+   ],
+   [
+    "SET PIECE",
+    8
+   ],
+   [
+    "CHORD: blocks one hit, rings on the beat",
+    8
+   ],
+   [
+    "CRESCENDO: dodge to stack damage",
+    8
+   ],
+   [
+    "WEAVE: shoot on the beat",
+    6
+   ],
+   [
+    "Double-time fire · score ×2",
+    6
+   ],
+   [
+    "HEAVY CRATE: big slow shells",
+    4
+   ],
+   [
+    "Pulls in every pickup",
+    4
+   ],
+   [
+    "WINGS: two drones shoot the off-beats",
+    4
+   ],
+   [
+    "Auto-fire on every beat",
+    3
+   ],
+   [
+    "Kills pay double Neon",
+    2
+   ],
+   [
+    "LIFE LEECH: kills heal a little",
+    2
+   ],
+   [
+    "ECHO: shots return on the next beat",
+    2
+   ],
+   [
+    "LASER FENCE: find the gap",
+    2
+   ],
+   [
+    "Hull +1 at once",
+    2
+   ]
+  ],
+  "mutators": {
+   "tide": 1,
+   "guard": 1,
+   "mine": 1
+  },
+  "setPieces": {
+   "set:weave": 6,
+   "drop:hit": 14,
+   "set:swarm": 1,
+   "set:wedge": 4,
+   "fence:fence": 2,
+   "set:phalanx": 2,
+   "set:turretLine": 1
+  },
+  "pitStops": 7
+ },
+ "endless-natural": {
+  "gameMinutes": 6.4,
+  "tries": 1,
+  "firstTryFails": 0,
+  "events": 418,
+  "repeatRatio5min": 0.716,
+  "encounters": 109,
+  "encountersPerMin": 17.1,
+  "topEncounters": [
+   [
+    "verb:fan5",
+    14,
+    12.8
+   ],
+   [
+    "verb:ring",
+    13,
+    11.9
+   ],
+   [
+    "verb:spiral",
+    10,
+    9.2
+   ],
+   [
+    "verb:fan7",
+    8,
+    7.3
+   ],
+   [
+    "verb:summon",
+    7,
+    6.4
+   ],
+   [
+    "wave:droneSine",
+    6,
+    5.5
+   ],
+   [
+    "wave:turret",
+    5,
+    4.6
+   ],
+   [
+    "wave:droneLine",
+    5,
+    4.6
+   ]
+  ],
+  "distinctEncounterSigs": 31,
+  "per5min": [
+   [
+    0,
+    28,
+    11
+   ],
+   [
+    5,
+    10,
+    5
+   ]
+  ],
+  "firstSeen": [
+   [
+    "enemy:turret",
+    0
+   ],
+   [
+    "wave:turretPair",
+    0
+   ],
+   [
+    "wave:turret",
+    0.05
+   ],
+   [
+    "pick:up",
+    0.06
+   ],
+   [
+    "enemy:drone",
+    0.09
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "fence:fence",
+    0.35
+   ],
+   [
+    "pick:pw:cres",
+    0.37
+   ],
+   [
+    "wave:droneLine",
+    0.39
+   ],
+   [
+    "wave:droneSine",
+    0.44
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "zoo:shielder",
+    0.78
+   ],
+   [
+    "enemy:shielder",
+    0.8
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    0.83
+   ],
+   [
+    "verb:fan5",
+    0.83
+   ],
+   [
+    "pick:emp",
+    0.84
+   ],
+   [
+    "pick:pw:wing",
+    0.85
+   ],
+   [
+    "verb:ring",
+    0.98
+   ],
+   [
+    "verb:fan7",
+    1.17
+   ],
+   [
+    "verb:spiral",
+    1.32
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    1.75
+   ],
+   [
+    "pick:pw:magb",
+    1.75
+   ],
+   [
+    "pick:hp",
+    1.75
+   ],
+   [
+    "enemy:charger",
+    1.89
+   ],
+   [
+    "verb:summon",
+    1.89
+   ],
+   [
+    "verb:fan9",
+    2.95
+   ],
+   [
+    "pick:pw:ric",
+    2.97
+   ],
+   [
+    "pick:pw:slow",
+    3.19
+   ],
+   [
+    "enemy:swarm",
+    3.29
+   ],
+   [
+    "set:swarm",
+    3.29
+   ],
+   [
+    "wave:flankPair",
+    3.35
+   ],
+   [
+    "enemy:flank",
+    3.36
+   ],
+   [
+    "wave:snake",
+    3.51
+   ],
+   [
+    "pick:pw:tri",
+    3.52
+   ],
+   [
+    "wave:chargers",
+    3.61
+   ],
+   [
+    "wave:wedge",
+    3.77
+   ],
+   [
+    "pick:pw:bomb",
+    3.77
+   ],
+   [
+    "enemy:mine",
+    3.78
+   ],
+   [
+    "wave:mines",
+    3.78
+   ],
+   [
+    "zoo:kamikaze",
+    3.78
+   ],
+   [
+    "wave:droneV",
+    3.78
+   ],
+   [
+    "enemy:kamikaze",
+    3.79
+   ],
+   [
+    "zoo:splitter",
+    3.83
+   ],
+   [
+    "enemy:splitter",
+    3.84
+   ],
+   [
+    "wave:swarm",
+    3.84
+   ],
+   [
+    "enemy:zdrn",
+    3.88
+   ],
+   [
+    "pick:pw:fix",
+    3.9
+   ],
+   [
+    "zoo:bomber",
+    3.99
+   ],
+   [
+    "enemy:bomber",
+    3.99
+   ],
+   [
+    "mini:HOPLITE|k7",
+    4.08
+   ],
+   [
+    "pick:pw:echo",
+    4.11
+   ],
+   [
+    "pick:pw:mag",
+    5.01
+   ],
+   [
+    "zoo:sniper",
+    5.08
+   ],
+   [
+    "zoo:healer",
+    5.08
+   ],
+   [
+    "enemy:healer",
+    5.08
+   ],
+   [
+    "enemy:sniper",
+    5.09
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    5.14
+   ]
+  ],
+  "mechTimeline": [
+   [
+    "enemy:turret",
+    0
+   ],
+   [
+    "enemy:drone",
+    0.09
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "fence:fence",
+    0.35
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "zoo:shielder",
+    0.78
+   ],
+   [
+    "enemy:shielder",
+    0.8
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    0.83
+   ],
+   [
+    "verb:fan5",
+    0.83
+   ],
+   [
+    "verb:ring",
+    0.98
+   ],
+   [
+    "verb:fan7",
+    1.17
+   ],
+   [
+    "verb:spiral",
+    1.32
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    1.75
+   ],
+   [
+    "enemy:charger",
+    1.89
+   ],
+   [
+    "verb:summon",
+    1.89
+   ],
+   [
+    "verb:fan9",
+    2.95
+   ],
+   [
+    "enemy:swarm",
+    3.29
+   ],
+   [
+    "set:swarm",
+    3.29
+   ],
+   [
+    "enemy:flank",
+    3.36
+   ],
+   [
+    "enemy:mine",
+    3.78
+   ],
+   [
+    "zoo:kamikaze",
+    3.78
+   ],
+   [
+    "enemy:kamikaze",
+    3.79
+   ],
+   [
+    "zoo:splitter",
+    3.83
+   ],
+   [
+    "enemy:splitter",
+    3.84
+   ],
+   [
+    "enemy:zdrn",
+    3.88
+   ],
+   [
+    "zoo:bomber",
+    3.99
+   ],
+   [
+    "enemy:bomber",
+    3.99
+   ],
+   [
+    "mini:HOPLITE|k7",
+    4.08
+   ],
+   [
+    "zoo:sniper",
+    5.08
+   ],
+   [
+    "zoo:healer",
+    5.08
+   ],
+   [
+    "enemy:healer",
+    5.08
+   ],
+   [
+    "enemy:sniper",
+    5.09
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    5.14
+   ]
+  ],
+  "longestNoveltyGapMin": 1.2,
+  "lastNewThingMin": 5.14,
+  "newThingsFirst30": 57,
+  "newThingsAfter30": 0,
+  "longestMechGapMin": 1.5,
+  "plainLoopShare": 0.22,
+  "bossShare": 0.71,
+  "specialEventGapMaxS": 91,
+  "specialEventGapMedianS": 18,
+  "bossFights": 4,
+  "bossFightsBig": 2,
+  "distinctBossBehaviours": 4,
+  "distinctBossVerbKits": 4,
+  "bossVerbsTotal": [
+   "fan5",
+   "fan7",
+   "fan9",
+   "ring",
+   "spiral",
+   "summon"
+  ],
+  "bossList": [
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "fan5,fan7,ring,spiral"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "fan5,fan7,fan9,ring,summon"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "fan5,fan7,ring,spiral,summon"
+   ]
+  ],
+  "songMinutes": {
+   "stage2": 1.9,
+   "stage1": 1.7,
+   "boss": 1.4,
+   "boss3": 1.2
+  },
+  "distinctSongs": 4,
+  "songStartsPerHour": 37.6,
+  "distinctTracksPerHour": 37.6,
+  "backgrounds": [
+   "BANKENVIERTEL",
+   "MAINUFER"
+  ],
+  "spawns": 228,
+  "spawnShare": [
+   [
+    "drone",
+    118,
+    51.8
+   ],
+   [
+    "charger",
+    31,
+    13.6
+   ],
+   [
+    "swarm",
+    24,
+    10.5
+   ],
+   [
+    "turret",
+    17,
+    7.5
+   ],
+   [
+    "mine",
+    16,
+    7
+   ],
+   [
+    "flank",
+    6,
+    2.6
+   ],
+   [
+    "zdrn",
+    6,
+    2.6
+   ],
+   [
+    "kamikaze",
+    3,
+    1.3
+   ],
+   [
+    "shielder",
+    2,
+    0.9
+   ],
+   [
+    "splitter",
+    2,
+    0.9
+   ],
+   [
+    "bomber",
+    1,
+    0.4
+   ],
+   [
+    "healer",
+    1,
+    0.4
+   ],
+   [
+    "sniper",
+    1,
+    0.4
+   ]
+  ],
+  "pickups": [
+   [
+    "hp",
+    10
+   ],
+   [
+    "up",
+    6
+   ],
+   [
+    "emp",
+    5
+   ],
+   [
+    "pw:cres",
+    1
+   ],
+   [
+    "pw:wing",
+    1
+   ],
+   [
+    "pw:magb",
+    1
+   ],
+   [
+    "pw:ric",
+    1
+   ],
+   [
+    "pw:slow",
+    1
+   ],
+   [
+    "pw:tri",
+    1
+   ],
+   [
+    "pw:bomb",
+    1
+   ],
+   [
+    "pw:fix",
+    1
+   ],
+   [
+    "pw:echo",
+    1
+   ],
+   [
+    "pw:mag",
+    1
+   ]
+  ],
+  "bulletSources": [
+   [
+    "boss:ring",
+    535,
+    37.5
+   ],
+   [
+    "boss:fan7",
+    240,
+    16.8
+   ],
+   [
+    "boss:spiral",
+    183,
+    12.8
+   ],
+   [
+    "boss:fan5",
+    162,
+    11.3
+   ],
+   [
+    "drone",
+    131,
+    9.2
+   ],
+   [
+    "boss:fan9",
+    120,
+    8.4
+   ],
+   [
+    "none",
+    27,
+    1.9
+   ],
+   [
+    "rain/hazard",
+    12,
+    0.8
+   ],
+   [
+    "turret",
+    6,
+    0.4
+   ],
+   [
+    "boss:summon",
+    6,
+    0.4
+   ],
+   [
+    "flank",
+    2,
+    0.1
+   ],
+   [
+    "sniper",
+    2,
+    0.1
+   ],
+   [
+    "splitter",
+    1,
+    0.1
+   ],
+   [
+    "healer",
+    1,
+    0.1
+   ]
+  ],
+  "hints": [
+   [
+    "DROP COMING: DASH ON THE DOWNBEAT",
+    3
+   ],
+   [
+    "WEAVE: shoot on the beat",
+    2
+   ],
+   [
+    "CRESCENDO: dodge to stack damage",
+    2
+   ],
+   [
+    "ECHO: shots return on the next beat",
+    2
+   ],
+   [
+    "LASER FENCE: find the gap",
+    1
+   ],
+   [
+    "RICOCHET: shots bounce off edges",
+    1
+   ],
+   [
+    "SET PIECE",
+    1
+   ],
+   [
+    "Bullet time · enemies slow",
+    1
+   ],
+   [
+    "BOMB STOCK: more EMP pulses",
+    1
+   ],
+   [
+    "Hull +1 at once",
+    1
+   ],
+   [
+    "Pulls in every pickup",
+    1
+   ]
+  ],
+  "mutators": {},
+  "setPieces": {
+   "set:weave": 2,
+   "fence:fence": 1,
+   "drop:hit": 3,
+   "set:swarm": 1
+  },
+  "pitStops": 1
+ },
+ "endless-hard": {
+  "gameMinutes": 30,
+  "tries": 1,
+  "firstTryFails": 0,
+  "events": 4884,
+  "repeatRatio5min": 0.923,
+  "encounters": 1103,
+  "encountersPerMin": 36.8,
+  "topEncounters": [
+   [
+    "wave:droneSine",
+    75,
+    6.8
+   ],
+   [
+    "wave:turret",
+    65,
+    5.9
+   ],
+   [
+    "wave:turretPair",
+    65,
+    5.9
+   ],
+   [
+    "verb:ring",
+    64,
+    5.8
+   ],
+   [
+    "wave:mines",
+    60,
+    5.4
+   ],
+   [
+    "wave:gate",
+    54,
+    4.9
+   ],
+   [
+    "wave:flankPair",
+    52,
+    4.7
+   ],
+   [
+    "wave:convoy",
+    50,
+    4.5
+   ]
+  ],
+  "distinctEncounterSigs": 47,
+  "per5min": [
+   [
+    0,
+    28,
+    17
+   ],
+   [
+    5,
+    29,
+    20
+   ],
+   [
+    10,
+    34,
+    23
+   ],
+   [
+    15,
+    29,
+    23
+   ],
+   [
+    20,
+    29,
+    20
+   ],
+   [
+    25,
+    28,
+    20
+   ]
+  ],
+  "firstSeen": [
+   [
+    "enemy:drone*",
+    0
+   ],
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "wave:droneV",
+    0
+   ],
+   [
+    "wave:droneSine",
+    0.05
+   ],
+   [
+    "pick:up",
+    0.05
+   ],
+   [
+    "wave:droneLine",
+    0.11
+   ],
+   [
+    "pick:pw:echo",
+    0.21
+   ],
+   [
+    "wave:snake",
+    0.35
+   ],
+   [
+    "pick:pw:tempo",
+    0.37
+   ],
+   [
+    "enemy:turret",
+    0.41
+   ],
+   [
+    "wave:turret",
+    0.41
+   ],
+   [
+    "wave:turretPair",
+    0.41
+   ],
+   [
+    "enemy:turret*",
+    0.5
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "pick:emp",
+    0.78
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    0.83
+   ],
+   [
+    "verb:fan5",
+    0.83
+   ],
+   [
+    "pick:pw:wing",
+    0.94
+   ],
+   [
+    "verb:ring",
+    0.98
+   ],
+   [
+    "pick:pw:bomb",
+    1
+   ],
+   [
+    "pick:pw:slow",
+    1.17
+   ],
+   [
+    "verb:fan7",
+    1.25
+   ],
+   [
+    "pick:pw:nr",
+    1.36
+   ],
+   [
+    "verb:spiral",
+    1.39
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    2.15
+   ],
+   [
+    "pick:hp",
+    2.15
+   ],
+   [
+    "enemy:charger",
+    2.29
+   ],
+   [
+    "verb:summon",
+    2.29
+   ],
+   [
+    "pick:pw:leech",
+    2.37
+   ],
+   [
+    "enemy:charger*",
+    2.49
+   ],
+   [
+    "verb:fan9",
+    3.51
+   ],
+   [
+    "pick:pw:tri",
+    3.86
+   ],
+   [
+    "enemy:swarm",
+    3.95
+   ],
+   [
+    "set:swarm",
+    3.95
+   ],
+   [
+    "zoo:shielder",
+    3.97
+   ],
+   [
+    "enemy:shielder",
+    3.98
+   ],
+   [
+    "zoo:kamikaze",
+    4.05
+   ],
+   [
+    "enemy:kamikaze",
+    4.06
+   ],
+   [
+    "zoo:splitter",
+    4.13
+   ],
+   [
+    "enemy:splitter",
+    4.13
+   ],
+   [
+    "enemy:zdrn",
+    4.2
+   ],
+   [
+    "wave:wedge",
+    4.22
+   ],
+   [
+    "wave:chargers",
+    4.25
+   ],
+   [
+    "zoo:bomber",
+    4.3
+   ],
+   [
+    "zoo:sniper",
+    4.3
+   ],
+   [
+    "enemy:sniper",
+    4.31
+   ],
+   [
+    "enemy:bomber",
+    4.31
+   ],
+   [
+    "wave:flankPair",
+    4.43
+   ],
+   [
+    "zoo:healer",
+    4.43
+   ],
+   [
+    "enemy:healer",
+    4.43
+   ],
+   [
+    "enemy:flank",
+    4.44
+   ],
+   [
+    "pick:pw:ric",
+    4.49
+   ],
+   [
+    "zoo:carrier",
+    4.73
+   ],
+   [
+    "enemy:carrier",
+    4.73
+   ],
+   [
+    "mini:HOPLITE|k7",
+    4.75
+   ],
+   [
+    "wave:pincer",
+    4.76
+   ],
+   [
+    "enemy:flank*",
+    4.77
+   ],
+   [
+    "pick:pw:nova",
+    4.88
+   ],
+   [
+    "pick:pw:crate",
+    5.04
+   ],
+   [
+    "pick:pw:fix",
+    5.58
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    6.1
+   ],
+   [
+    "pick:pw:cres",
+    7.69
+   ],
+   [
+    "pick:pw:magb",
+    7.85
+   ],
+   [
+    "wave:phalanx",
+    7.94
+   ],
+   [
+    "enemy:gtank",
+    8.01
+   ],
+   [
+    "pick:pw:chord",
+    8.16
+   ],
+   [
+    "enemy:gturret",
+    8.18
+   ],
+   [
+    "zoo:minelayer",
+    8.18
+   ],
+   [
+    "enemy:minelayer",
+    8.18
+   ],
+   [
+    "pick:pw:drum",
+    8.24
+   ],
+   [
+    "wave:swarmRing",
+    8.43
+   ],
+   [
+    "wave:swarm",
+    8.43
+   ],
+   [
+    "enemy:mine",
+    8.6
+   ],
+   [
+    "wave:mines",
+    8.6
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    8.72
+   ],
+   [
+    "verb:laser",
+    8.72
+   ],
+   [
+    "pick:pw:slice",
+    8.99
+   ],
+   [
+    "enemy:gwalker",
+    10.19
+   ],
+   [
+    "enemy:gate",
+    10.21
+   ],
+   [
+    "wave:gate",
+    10.21
+   ],
+   [
+    "set:wedge",
+    10.22
+   ],
+   [
+    "enemy:gunship",
+    10.27
+   ],
+   [
+    "wave:convoy",
+    10.27
+   ],
+   [
+    "wave:gunship",
+    10.74
+   ],
+   [
+    "pick:pw:drop",
+    10.75
+   ],
+   [
+    "wave:pillars",
+    10.82
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    10.89
+   ],
+   [
+    "pick:pw:bub",
+    13.22
+   ],
+   [
+    "pick:pw:mag",
+    14.34
+   ],
+   [
+    "set:weave",
+    14.62
+   ],
+   [
+    "wave:turretLine",
+    15.25
+   ],
+   [
+    "boss:TALOS|k6",
+    16.53
+   ],
+   [
+    "boss:KRONOS|k3",
+    20.04
+   ],
+   [
+    "mut:tide",
+    23.07
+   ],
+   [
+    "mut:guard",
+    26.74
+   ],
+   [
+    "wave:eliteV",
+    29.02
+   ]
+  ],
+  "mechTimeline": [
+   [
+    "enemy:drone*",
+    0
+   ],
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "enemy:turret",
+    0.41
+   ],
+   [
+    "enemy:turret*",
+    0.5
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    0.83
+   ],
+   [
+    "verb:fan5",
+    0.83
+   ],
+   [
+    "verb:ring",
+    0.98
+   ],
+   [
+    "verb:fan7",
+    1.25
+   ],
+   [
+    "verb:spiral",
+    1.39
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    2.15
+   ],
+   [
+    "enemy:charger",
+    2.29
+   ],
+   [
+    "verb:summon",
+    2.29
+   ],
+   [
+    "enemy:charger*",
+    2.49
+   ],
+   [
+    "verb:fan9",
+    3.51
+   ],
+   [
+    "enemy:swarm",
+    3.95
+   ],
+   [
+    "set:swarm",
+    3.95
+   ],
+   [
+    "zoo:shielder",
+    3.97
+   ],
+   [
+    "enemy:shielder",
+    3.98
+   ],
+   [
+    "zoo:kamikaze",
+    4.05
+   ],
+   [
+    "enemy:kamikaze",
+    4.06
+   ],
+   [
+    "zoo:splitter",
+    4.13
+   ],
+   [
+    "enemy:splitter",
+    4.13
+   ],
+   [
+    "enemy:zdrn",
+    4.2
+   ],
+   [
+    "zoo:bomber",
+    4.3
+   ],
+   [
+    "zoo:sniper",
+    4.3
+   ],
+   [
+    "enemy:sniper",
+    4.31
+   ],
+   [
+    "enemy:bomber",
+    4.31
+   ],
+   [
+    "zoo:healer",
+    4.43
+   ],
+   [
+    "enemy:healer",
+    4.43
+   ],
+   [
+    "enemy:flank",
+    4.44
+   ],
+   [
+    "zoo:carrier",
+    4.73
+   ],
+   [
+    "enemy:carrier",
+    4.73
+   ],
+   [
+    "mini:HOPLITE|k7",
+    4.75
+   ],
+   [
+    "enemy:flank*",
+    4.77
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    6.1
+   ],
+   [
+    "enemy:gtank",
+    8.01
+   ],
+   [
+    "enemy:gturret",
+    8.18
+   ],
+   [
+    "zoo:minelayer",
+    8.18
+   ],
+   [
+    "enemy:minelayer",
+    8.18
+   ],
+   [
+    "enemy:mine",
+    8.6
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    8.72
+   ],
+   [
+    "verb:laser",
+    8.72
+   ],
+   [
+    "enemy:gwalker",
+    10.19
+   ],
+   [
+    "enemy:gate",
+    10.21
+   ],
+   [
+    "set:wedge",
+    10.22
+   ],
+   [
+    "enemy:gunship",
+    10.27
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    10.89
+   ],
+   [
+    "set:weave",
+    14.62
+   ],
+   [
+    "boss:TALOS|k6",
+    16.53
+   ],
+   [
+    "boss:KRONOS|k3",
+    20.04
+   ],
+   [
+    "mut:tide",
+    23.07
+   ],
+   [
+    "mut:guard",
+    26.74
+   ]
+  ],
+  "longestNoveltyGapMin": 3.7,
+  "lastNewThingMin": 29.02,
+  "newThingsFirst30": 96,
+  "newThingsAfter30": 0,
+  "longestMechGapMin": 3.7,
+  "plainLoopShare": 0.23,
+  "bossShare": 0.74,
+  "specialEventGapMaxS": 182,
+  "specialEventGapMedianS": 27,
+  "bossFights": 14,
+  "bossFightsBig": 6,
+  "distinctBossBehaviours": 10,
+  "distinctBossVerbKits": 8,
+  "bossVerbsTotal": [
+   "fan5",
+   "fan7",
+   "fan9",
+   "laser",
+   "ring",
+   "spiral",
+   "summon"
+  ],
+  "bossList": [
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "fan5,fan7,ring,spiral"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "fan5,fan7,fan9,ring,summon"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "fan5,fan7,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "fan7,fan9,laser,ring"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "fan7,fan9,laser,ring,spiral"
+   ],
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "fan7,fan9,laser,ring"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "fan5,fan7,fan9,ring,summon"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "fan7,fan9,laser,ring"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,ring"
+   ]
+  ],
+  "songMinutes": {
+   "stage3": 6.4,
+   "boss": 5.4,
+   "stage2": 4.2,
+   "athina": 3.7,
+   "boss3": 3.6,
+   "boss2": 3,
+   "stage1": 2.1,
+   "endless2": 1.7
+  },
+  "distinctSongs": 8,
+  "songStartsPerHour": 26,
+  "distinctTracksPerHour": 16,
+  "backgrounds": [
+   "BANKENVIERTEL",
+   "MAINUFER",
+   "OSTEND",
+   "ATHINA",
+   "MESSE"
+  ],
+  "spawns": 3362,
+  "spawnShare": [
+   [
+    "drone",
+    1310,
+    39
+   ],
+   [
+    "swarm",
+    494,
+    14.7
+   ],
+   [
+    "turret",
+    325,
+    9.7
+   ],
+   [
+    "flank",
+    288,
+    8.6
+   ],
+   [
+    "mine",
+    240,
+    7.1
+   ],
+   [
+    "charger",
+    215,
+    6.4
+   ],
+   [
+    "gate",
+    130,
+    3.9
+   ],
+   [
+    "zdrn",
+    101,
+    3
+   ],
+   [
+    "gunship",
+    76,
+    2.3
+   ],
+   [
+    "gtank",
+    34,
+    1
+   ],
+   [
+    "kamikaze",
+    32,
+    1
+   ],
+   [
+    "gturret",
+    22,
+    0.7
+   ],
+   [
+    "shielder",
+    18,
+    0.5
+   ],
+   [
+    "minelayer",
+    15,
+    0.4
+   ],
+   [
+    "splitter",
+    14,
+    0.4
+   ],
+   [
+    "bomber",
+    14,
+    0.4
+   ],
+   [
+    "healer",
+    12,
+    0.4
+   ],
+   [
+    "gwalker",
+    10,
+    0.3
+   ],
+   [
+    "carrier",
+    7,
+    0.2
+   ],
+   [
+    "sniper",
+    5,
+    0.1
+   ]
+  ],
+  "pickups": [
+   [
+    "emp",
+    60
+   ],
+   [
+    "hp",
+    25
+   ],
+   [
+    "up",
+    10
+   ],
+   [
+    "pw:echo",
+    8
+   ],
+   [
+    "pw:wing",
+    6
+   ],
+   [
+    "pw:chord",
+    6
+   ],
+   [
+    "pw:tempo",
+    5
+   ],
+   [
+    "pw:magb",
+    5
+   ],
+   [
+    "pw:slice",
+    5
+   ],
+   [
+    "pw:bub",
+    5
+   ],
+   [
+    "pw:bomb",
+    4
+   ],
+   [
+    "pw:nr",
+    4
+   ],
+   [
+    "pw:ric",
+    4
+   ],
+   [
+    "pw:nova",
+    4
+   ],
+   [
+    "pw:crate",
+    4
+   ],
+   [
+    "pw:drum",
+    4
+   ],
+   [
+    "pw:drop",
+    4
+   ],
+   [
+    "pw:mag",
+    4
+   ],
+   [
+    "pw:tri",
+    3
+   ],
+   [
+    "pw:fix",
+    3
+   ],
+   [
+    "pw:cres",
+    3
+   ],
+   [
+    "pw:slow",
+    2
+   ],
+   [
+    "pw:leech",
+    1
+   ]
+  ],
+  "bulletSources": [
+   [
+    "drone*",
+    3734,
+    16.2
+   ],
+   [
+    "boss:ring",
+    3662,
+    15.9
+   ],
+   [
+    "drone",
+    3614,
+    15.7
+   ],
+   [
+    "gunship",
+    1997,
+    8.7
+   ],
+   [
+    "turret",
+    1413,
+    6.1
+   ],
+   [
+    "boss:fan7",
+    1326,
+    5.8
+   ],
+   [
+    "turret*",
+    1246,
+    5.4
+   ],
+   [
+    "boss:fan9",
+    1092,
+    4.7
+   ],
+   [
+    "none",
+    1005,
+    4.4
+   ],
+   [
+    "boss:spiral",
+    962,
+    4.2
+   ],
+   [
+    "boss:fan5",
+    712,
+    3.1
+   ],
+   [
+    "flank",
+    564,
+    2.5
+   ],
+   [
+    "gwalker",
+    472,
+    2.1
+   ],
+   [
+    "flank*",
+    335,
+    1.5
+   ],
+   [
+    "gtank",
+    223,
+    1
+   ],
+   [
+    "gturret",
+    216,
+    0.9
+   ],
+   [
+    "boss:laser",
+    133,
+    0.6
+   ],
+   [
+    "rain/hazard",
+    78,
+    0.3
+   ],
+   [
+    "shielder",
+    64,
+    0.3
+   ],
+   [
+    "boss:summon",
+    31,
+    0.1
+   ],
+   [
+    "mine",
+    31,
+    0.1
+   ],
+   [
+    "splitter",
+    23,
+    0.1
+   ],
+   [
+    "sniper",
+    15,
+    0.1
+   ],
+   [
+    "carrier",
+    15,
+    0.1
+   ],
+   [
+    "charger",
+    12,
+    0.1
+   ],
+   [
+    "charger*",
+    9,
+    0
+   ],
+   [
+    "zdrn",
+    6,
+    0
+   ],
+   [
+    "kamikaze",
+    6,
+    0
+   ],
+   [
+    "minelayer",
+    5,
+    0
+   ],
+   [
+    "bomber",
+    5,
+    0
+   ],
+   [
+    "healer",
+    3,
+    0
+   ]
+  ],
+  "hints": [
+   [
+    "DROP COMING: DASH ON THE DOWNBEAT",
+    12
+   ],
+   [
+    "CHORD: blocks one hit, rings on the beat",
+    12
+   ],
+   [
+    "ECHO: shots return on the next beat",
+    8
+   ],
+   [
+    "WINGS: two drones shoot the off-beats",
+    6
+   ],
+   [
+    "NOVA: a ring blast on every bar line",
+    6
+   ],
+   [
+    "Double-time fire · score ×2",
+    4
+   ],
+   [
+    "MAGNET: every beat pulls pickups in",
+    4
+   ],
+   [
+    "Hits bounce off",
+    4
+   ],
+   [
+    "Two extra side shots",
+    3
+   ],
+   [
+    "RICOCHET: shots bounce off edges",
+    3
+   ],
+   [
+    "Kills pay double Neon",
+    3
+   ],
+   [
+    "Pulls in every pickup",
+    3
+   ],
+   [
+    "Auto-fire on every beat",
+    3
+   ],
+   [
+    "Blast on the downbeat",
+    3
+   ],
+   [
+    "BOMB STOCK: more EMP pulses",
+    2
+   ]
+  ],
+  "mutators": {
+   "tide": 1,
+   "guard": 1
+  },
+  "setPieces": {
+   "drop:hit": 12,
+   "set:swarm": 1,
+   "set:wedge": 1,
+   "set:weave": 2
+  },
+  "pitStops": 6
+ },
+ "classic-normal": {
+  "gameMinutes": 165,
+  "tries": 53,
+  "firstTryFails": 4,
+  "events": 18224,
+  "repeatRatio5min": 0.962,
+  "encounters": 3422,
+  "encountersPerMin": 20.7,
+  "topEncounters": [
+   [
+    "wave:turret",
+    447,
+    13.1
+   ],
+   [
+    "wave:droneSine",
+    373,
+    10.9
+   ],
+   [
+    "wave:droneLine",
+    279,
+    8.2
+   ],
+   [
+    "wave:chargers",
+    274,
+    8
+   ],
+   [
+    "drop:hit",
+    238,
+    7
+   ],
+   [
+    "set:weave",
+    225,
+    6.6
+   ],
+   [
+    "wave:droneV",
+    194,
+    5.7
+   ],
+   [
+    "fence:fence",
+    186,
+    5.4
+   ]
+  ],
+  "distinctEncounterSigs": 43,
+  "per5min": [
+   [
+    0,
+    6,
+    2
+   ],
+   [
+    5,
+    8,
+    6
+   ],
+   [
+    10,
+    12,
+    8
+   ],
+   [
+    15,
+    13,
+    8
+   ],
+   [
+    20,
+    14,
+    11
+   ],
+   [
+    25,
+    14,
+    9
+   ],
+   [
+    30,
+    13,
+    14
+   ],
+   [
+    35,
+    12,
+    15
+   ],
+   [
+    40,
+    19,
+    16
+   ],
+   [
+    45,
+    12,
+    16
+   ],
+   [
+    50,
+    21,
+    17
+   ],
+   [
+    55,
+    15,
+    14
+   ],
+   [
+    60,
+    17,
+    19
+   ],
+   [
+    65,
+    19,
+    18
+   ],
+   [
+    70,
+    22,
+    20
+   ],
+   [
+    75,
+    22,
+    20
+   ],
+   [
+    80,
+    22,
+    16
+   ],
+   [
+    85,
+    17,
+    20
+   ],
+   [
+    90,
+    18,
+    20
+   ],
+   [
+    95,
+    23,
+    20
+   ],
+   [
+    100,
+    23,
+    18
+   ],
+   [
+    105,
+    24,
+    19
+   ],
+   [
+    110,
+    24,
+    17
+   ],
+   [
+    115,
+    19,
+    17
+   ],
+   [
+    120,
+    19,
+    20
+   ],
+   [
+    125,
+    17,
+    18
+   ],
+   [
+    130,
+    21,
+    18
+   ],
+   [
+    135,
+    18,
+    20
+   ],
+   [
+    140,
+    24,
+    19
+   ],
+   [
+    145,
+    14,
+    10
+   ],
+   [
+    150,
+    12,
+    11
+   ],
+   [
+    155,
+    14,
+    11
+   ],
+   [
+    160,
+    10,
+    10
+   ]
+  ],
+  "stages": {
+   "1": {
+    "mins": 2.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 2,
+    "waves": 3,
+    "shotSrc": 2,
+    "newThings": 20,
+    "newList": [
+     "enemy:drone",
+     "enemy:drone*",
+     "wave:droneLine",
+     "wave:droneSine",
+     "set:weave",
+     "pick:up",
+     "pick:pw:slow",
+     "pick:hp",
+     "wave:droneV",
+     "pick:pw:drop",
+     "drop:hit",
+     "pick:pw:fix",
+     "fence:fence",
+     "pick:pw:magb",
+     "pick:pw:nova",
+     "pick:emp",
+     "pick:pw:cres",
+     "pick:pw:echo",
+     "shot:drone",
+     "shot:drone*"
+    ],
+    "jaccardPrev": null,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.69
+   },
+   "2": {
+    "mins": 2.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 1,
+    "waves": 3,
+    "shotSrc": 1,
+    "newThings": 3,
+    "newList": [
+     "pick:pw:tri",
+     "pick:pw:bub",
+     "pick:pw:drum"
+    ],
+    "jaccardPrev": 0.71,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.65
+   },
+   "3": {
+    "mins": 3.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 4,
+    "waves": 3,
+    "shotSrc": 4,
+    "newThings": 11,
+    "newList": [
+     "enemy:gtank",
+     "pick:pw:slice",
+     "enemy:gturret",
+     "enemy:turret",
+     "wave:turret",
+     "pick:pw:ric",
+     "pick:pw:crate",
+     "pick:pw:nr",
+     "shot:gtank",
+     "shot:gturret",
+     "shot:turret"
+    ],
+    "jaccardPrev": 0.33,
+    "song": "stage3",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.57
+   },
+   "4": {
+    "mins": 2.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 7,
+    "enemyKinds": 5,
+    "waves": 4,
+    "shotSrc": 5,
+    "newThings": 7,
+    "newList": [
+     "zoo:shielder",
+     "enemy:shielder",
+     "pick:pw:bomb",
+     "pick:pw:leech",
+     "pick:pw:chord",
+     "pick:pw:wing",
+     "shot:shielder"
+    ],
+    "jaccardPrev": 0.47,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.66
+   },
+   "5": {
+    "mins": 3.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 12,
+    "enemyKinds": 8,
+    "waves": 3,
+    "shotSrc": 13,
+    "newThings": 15,
+    "newList": [
+     "drop:miss",
+     "enemy:gwalker",
+     "enemy:turret*",
+     "mini:TRESOR-WART|k5",
+     "verb:laser",
+     "verb:fan5",
+     "verb:ring",
+     "verb:fan7",
+     "shot:gwalker",
+     "shot:boss:fan5",
+     "shot:none",
+     "shot:boss:ring",
+     "shot:turret*",
+     "shot:rain/hazard",
+     "shot:boss:fan7"
+    ],
+    "jaccardPrev": 0.4,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.38
+   },
+   "6": {
+    "mins": 3.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 6,
+    "waves": 5,
+    "shotSrc": 5,
+    "newThings": 3,
+    "newList": [
+     "zoo:kamikaze",
+     "enemy:kamikaze",
+     "pick:pw:tempo"
+    ],
+    "jaccardPrev": 0.38,
+    "song": "stage3",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.59
+   },
+   "7": {
+    "mins": 2.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 9,
+    "waves": 5,
+    "shotSrc": 8,
+    "newThings": 1,
+    "newList": [
+     "set:turretLine"
+    ],
+    "jaccardPrev": 0.73,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.62
+   },
+   "8": {
+    "mins": 3.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 10,
+    "waves": 5,
+    "shotSrc": 11,
+    "newThings": 6,
+    "newList": [
+     "boss:SEK-ADLER|k0",
+     "enemy:charger",
+     "verb:summon",
+     "enemy:charger*",
+     "verb:fan9",
+     "shot:boss:fan9"
+    ],
+    "jaccardPrev": 0.56,
+    "song": "stage2+boss",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.26
+   },
+   "9": {
+    "mins": 3.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 7,
+    "waves": 6,
+    "shotSrc": 4,
+    "newThings": 4,
+    "newList": [
+     "zoo:splitter",
+     "enemy:splitter",
+     "enemy:zdrn",
+     "shot:splitter"
+    ],
+    "jaccardPrev": 0.33,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.57
+   },
+   "10": {
+    "mins": 3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 8,
+    "waves": 5,
+    "shotSrc": 6,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.8,
+    "song": "endless",
+    "bg": "MAINUFER",
+    "plainShare": 0.67
+   },
+   "11": {
+    "mins": 2.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 11,
+    "enemyKinds": 13,
+    "waves": 7,
+    "shotSrc": 7,
+    "newThings": 5,
+    "newList": [
+     "enemy:swarm",
+     "set:swarm",
+     "wave:chargers",
+     "zoo:bomber",
+     "enemy:bomber"
+    ],
+    "jaccardPrev": 0.53,
+    "song": "stage2",
+    "bg": "MAINUFER",
+    "plainShare": 0.61
+   },
+   "12": {
+    "mins": 3.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 10,
+    "enemyKinds": 9,
+    "waves": 7,
+    "shotSrc": 5,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.6,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.55
+   },
+   "13": {
+    "mins": 3.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 15,
+    "waves": 7,
+    "shotSrc": 15,
+    "newThings": 4,
+    "newList": [
+     "pick:pw:mag",
+     "mini:BRÜCKEN-WÄCHTER|k4",
+     "verb:spiral",
+     "shot:boss:spiral"
+    ],
+    "jaccardPrev": 0.47,
+    "song": "endless",
+    "bg": "MAINUFER",
+    "plainShare": 0.48
+   },
+   "14": {
+    "mins": 2.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 13,
+    "enemyKinds": 12,
+    "waves": 9,
+    "shotSrc": 2,
+    "newThings": 2,
+    "newList": [
+     "zoo:sniper",
+     "enemy:sniper"
+    ],
+    "jaccardPrev": 0.44,
+    "song": "stage2",
+    "bg": "MAINUFER",
+    "plainShare": 0.72
+   },
+   "15": {
+    "mins": 3.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 12,
+    "enemyKinds": 16,
+    "waves": 8,
+    "shotSrc": 8,
+    "newThings": 1,
+    "newList": [
+     "shot:sniper"
+    ],
+    "jaccardPrev": 0.67,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.65
+   },
+   "16": {
+    "mins": 3.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 19,
+    "enemyKinds": 17,
+    "waves": 9,
+    "shotSrc": 14,
+    "newThings": 4,
+    "newList": [
+     "zoo:healer",
+     "enemy:healer",
+     "boss:FLUSSKRAKE|k1",
+     "shot:boss:summon"
+    ],
+    "jaccardPrev": 0.67,
+    "song": "endless+boss3",
+    "bg": "MAINUFER",
+    "plainShare": 0.38
+   },
+   "17": {
+    "mins": 3.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 13,
+    "enemyKinds": 13,
+    "waves": 9,
+    "shotSrc": 8,
+    "newThings": 2,
+    "newList": [
+     "set:wedge",
+     "shot:charger*"
+    ],
+    "jaccardPrev": 0.53,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.64
+   },
+   "18": {
+    "mins": 3.1,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 14,
+    "waves": 11,
+    "shotSrc": 9,
+    "newThings": 4,
+    "newList": [
+     "enemy:gate",
+     "wave:gate",
+     "shot:charger",
+     "shot:kamikaze"
+    ],
+    "jaccardPrev": 0.78,
+    "song": "endless",
+    "bg": "OSTEND",
+    "plainShare": 0.66
+   },
+   "19": {
+    "mins": 3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 18,
+    "waves": 12,
+    "shotSrc": 8,
+    "newThings": 5,
+    "newList": [
+     "zoo:carrier",
+     "enemy:carrier",
+     "enemy:gunship",
+     "wave:gunship",
+     "shot:gunship"
+    ],
+    "jaccardPrev": 0.67,
+    "song": "endless2",
+    "bg": "OSTEND",
+    "plainShare": 0.8
+   },
+   "20": {
+    "mins": 3.9,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 18,
+    "waves": 11,
+    "shotSrc": 11,
+    "newThings": 2,
+    "newList": [
+     "shot:bomber",
+     "shot:healer"
+    ],
+    "jaccardPrev": 0.77,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.64
+   },
+   "21": {
+    "mins": 3.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 20,
+    "enemyKinds": 18,
+    "waves": 11,
+    "shotSrc": 13,
+    "newThings": 1,
+    "newList": [
+     "mini:SCHRANKEN-WART|k5"
+    ],
+    "jaccardPrev": 0.79,
+    "song": "endless",
+    "bg": "OSTEND",
+    "plainShare": 0.45
+   },
+   "22": {
+    "mins": 3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 8,
+    "newThings": 2,
+    "newList": [
+     "zoo:minelayer",
+     "enemy:minelayer"
+    ],
+    "jaccardPrev": 0.65,
+    "song": "endless2",
+    "bg": "OSTEND",
+    "plainShare": 0.73
+   },
+   "23": {
+    "mins": 4.1,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 10,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.91,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.64
+   },
+   "24": {
+    "mins": 3.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 21,
+    "enemyKinds": 18,
+    "waves": 11,
+    "shotSrc": 15,
+    "newThings": 2,
+    "newList": [
+     "boss:ZENTRAL-ICE|k2",
+     "shot:boss:laser"
+    ],
+    "jaccardPrev": 0.69,
+    "song": "endless+boss",
+    "bg": "OSTEND",
+    "plainShare": 0.41
+   },
+   "25": {
+    "mins": 3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 16,
+    "waves": 13,
+    "shotSrc": 7,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.52,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.71
+   },
+   "26": {
+    "mins": 2.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 17,
+    "waves": 14,
+    "shotSrc": 9,
+    "newThings": 2,
+    "newList": [
+     "shot:carrier",
+     "shot:zdrn"
+    ],
+    "jaccardPrev": 0.85,
+    "song": "stage1",
+    "bg": "MESSE",
+    "plainShare": 0.74
+   },
+   "27": {
+    "mins": 2.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 20,
+    "waves": 13,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.78,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.51
+   },
+   "28": {
+    "mins": 3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 7,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.84,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.65
+   },
+   "29": {
+    "mins": 3.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 21,
+    "enemyKinds": 19,
+    "waves": 12,
+    "shotSrc": 15,
+    "newThings": 1,
+    "newList": [
+     "mini:MESSE-WÄCHTER|k4"
+    ],
+    "jaccardPrev": 0.68,
+    "song": "stage1",
+    "bg": "MESSE",
+    "plainShare": 0.42
+   },
+   "30": {
+    "mins": 2.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 12,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.78,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.57
+   },
+   "31": {
+    "mins": 3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 20,
+    "waves": 13,
+    "shotSrc": 10,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.93,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.66
+   },
+   "32": {
+    "mins": 10.8,
+    "tries": 3,
+    "cleared": false,
+    "enc": 24,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 16,
+    "newThings": 1,
+    "newList": [
+     "boss:KRONOS|k3"
+    ],
+    "jaccardPrev": 0.67,
+    "song": "stage1+boss2",
+    "bg": "MESSE",
+    "plainShare": 0.27
+   },
+   "33": {
+    "mins": 4.1,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 15,
+    "waves": 13,
+    "shotSrc": 6,
+    "newThings": 2,
+    "newList": [
+     "set:phalanx",
+     "wave:phalanx"
+    ],
+    "jaccardPrev": 0.6,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.75
+   },
+   "34": {
+    "mins": 4.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 17,
+    "waves": 14,
+    "shotSrc": 10,
+    "newThings": 3,
+    "newList": [
+     "wave:pillars",
+     "wave:wedge",
+     "shot:minelayer"
+    ],
+    "jaccardPrev": 0.74,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.63
+   },
+   "35": {
+    "mins": 4.1,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 19,
+    "waves": 14,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.73,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.61
+   },
+   "36": {
+    "mins": 3.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 18,
+    "waves": 12,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.8,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.75
+   },
+   "37": {
+    "mins": 4.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 20,
+    "enemyKinds": 17,
+    "waves": 11,
+    "shotSrc": 12,
+    "newThings": 1,
+    "newList": [
+     "mini:HOPLITE|k7"
+    ],
+    "jaccardPrev": 0.66,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.59
+   },
+   "38": {
+    "mins": 3.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 16,
+    "waves": 11,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.63,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.69
+   },
+   "39": {
+    "mins": 4.1,
+    "tries": 1,
+    "cleared": true,
+    "enc": 18,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 11,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.8,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.71
+   },
+   "40": {
+    "mins": 4.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 23,
+    "enemyKinds": 18,
+    "waves": 12,
+    "shotSrc": 18,
+    "newThings": 1,
+    "newList": [
+     "boss:TALOS|k6"
+    ],
+    "jaccardPrev": 0.68,
+    "song": "athina2+boss3",
+    "bg": "ATHINA",
+    "plainShare": 0.37
+   },
+   "41": {
+    "mins": 1.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 9,
+    "waves": 5,
+    "shotSrc": 7,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.25,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.56
+   },
+   "42": {
+    "mins": 2.1,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 7,
+    "waves": 4,
+    "shotSrc": 4,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.64,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.65
+   },
+   "43": {
+    "mins": 5.2,
+    "tries": 3,
+    "cleared": false,
+    "enc": 9,
+    "enemyKinds": 10,
+    "waves": 5,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.5,
+    "song": "stage1",
+    "bg": "OSTEND",
+    "plainShare": 0.77
+   },
+   "44": {
+    "mins": 5.3,
+    "tries": 3,
+    "cleared": false,
+    "enc": 10,
+    "enemyKinds": 11,
+    "waves": 6,
+    "shotSrc": 9,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.79,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.47
+   },
+   "45": {
+    "mins": 5.3,
+    "tries": 3,
+    "cleared": false,
+    "enc": 10,
+    "enemyKinds": 10,
+    "waves": 6,
+    "shotSrc": 8,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.72,
+    "song": "athina+menu",
+    "bg": "ATHINA",
+    "plainShare": 0.73
+   }
+  },
+  "jaccardMedian": 0.67,
+  "jaccardMean": 0.65,
+  "stagesWithZeroNew": 17,
+  "firstSeen": [
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "enemy:drone*",
+    0
+   ],
+   [
+    "wave:droneLine",
+    0
+   ],
+   [
+    "wave:droneSine",
+    0.09
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "pick:up",
+    0.14
+   ],
+   [
+    "pick:pw:slow",
+    0.16
+   ],
+   [
+    "pick:hp",
+    0.24
+   ],
+   [
+    "wave:droneV",
+    0.48
+   ],
+   [
+    "pick:pw:drop",
+    0.59
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "pick:pw:fix",
+    0.9
+   ],
+   [
+    "fence:fence",
+    1.13
+   ],
+   [
+    "pick:pw:magb",
+    1.16
+   ],
+   [
+    "pick:pw:nova",
+    1.48
+   ],
+   [
+    "pick:emp",
+    1.5
+   ],
+   [
+    "pick:pw:cres",
+    1.75
+   ],
+   [
+    "pick:pw:echo",
+    2.26
+   ],
+   [
+    "pick:pw:tri",
+    2.99
+   ],
+   [
+    "pick:pw:bub",
+    4.02
+   ],
+   [
+    "pick:pw:drum",
+    5.45
+   ],
+   [
+    "enemy:gtank",
+    5.72
+   ],
+   [
+    "pick:pw:slice",
+    5.83
+   ],
+   [
+    "enemy:gturret",
+    6.04
+   ],
+   [
+    "enemy:turret",
+    6.16
+   ],
+   [
+    "wave:turret",
+    6.16
+   ],
+   [
+    "pick:pw:ric",
+    6.69
+   ],
+   [
+    "pick:pw:crate",
+    7.61
+   ],
+   [
+    "pick:pw:nr",
+    8.68
+   ],
+   [
+    "zoo:shielder",
+    9.7
+   ],
+   [
+    "enemy:shielder",
+    9.71
+   ],
+   [
+    "pick:pw:bomb",
+    9.72
+   ],
+   [
+    "pick:pw:leech",
+    10.16
+   ],
+   [
+    "pick:pw:chord",
+    11.2
+   ],
+   [
+    "pick:pw:wing",
+    11.94
+   ],
+   [
+    "drop:miss",
+    13.39
+   ],
+   [
+    "enemy:gwalker",
+    13.96
+   ],
+   [
+    "enemy:turret*",
+    14.21
+   ],
+   [
+    "mini:TRESOR-WART|k5",
+    14.84
+   ],
+   [
+    "verb:laser",
+    14.84
+   ],
+   [
+    "verb:fan5",
+    14.96
+   ],
+   [
+    "verb:ring",
+    15.15
+   ],
+   [
+    "verb:fan7",
+    15.61
+   ],
+   [
+    "zoo:kamikaze",
+    16.15
+   ],
+   [
+    "enemy:kamikaze",
+    16.16
+   ],
+   [
+    "pick:pw:tempo",
+    19.53
+   ],
+   [
+    "set:turretLine",
+    19.76
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    24.39
+   ],
+   [
+    "enemy:charger",
+    24.53
+   ],
+   [
+    "verb:summon",
+    24.53
+   ],
+   [
+    "enemy:charger*",
+    24.69
+   ],
+   [
+    "verb:fan9",
+    25.59
+   ],
+   [
+    "zoo:splitter",
+    26.59
+   ],
+   [
+    "enemy:splitter",
+    26.6
+   ],
+   [
+    "enemy:zdrn",
+    26.65
+   ],
+   [
+    "enemy:swarm",
+    32.76
+   ],
+   [
+    "set:swarm",
+    32.76
+   ],
+   [
+    "wave:chargers",
+    33.01
+   ],
+   [
+    "zoo:bomber",
+    33.22
+   ],
+   [
+    "enemy:bomber",
+    33.22
+   ],
+   [
+    "pick:pw:mag",
+    41.03
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    42.01
+   ],
+   [
+    "verb:spiral",
+    42.43
+   ],
+   [
+    "zoo:sniper",
+    43.27
+   ],
+   [
+    "enemy:sniper",
+    43.28
+   ],
+   [
+    "zoo:healer",
+    50.03
+   ],
+   [
+    "enemy:healer",
+    50.03
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    51.71
+   ],
+   [
+    "set:wedge",
+    53.22
+   ],
+   [
+    "enemy:gate",
+    57.34
+   ],
+   [
+    "wave:gate",
+    57.34
+   ],
+   [
+    "zoo:carrier",
+    61.58
+   ],
+   [
+    "enemy:carrier",
+    61.58
+   ],
+   [
+    "enemy:gunship",
+    62.86
+   ],
+   [
+    "wave:gunship",
+    62.86
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    69.68
+   ],
+   [
+    "zoo:minelayer",
+    72.05
+   ],
+   [
+    "enemy:minelayer",
+    72.05
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    79.79
+   ],
+   [
+    "mini:MESSE-WÄCHTER|k4",
+    95.29
+   ],
+   [
+    "boss:KRONOS|k3",
+    103.65
+   ],
+   [
+    "set:phalanx",
+    113.51
+   ],
+   [
+    "wave:phalanx",
+    114.6
+   ],
+   [
+    "wave:pillars",
+    119.11
+   ],
+   [
+    "wave:wedge",
+    121.09
+   ],
+   [
+    "mini:HOPLITE|k7",
+    132.67
+   ],
+   [
+    "boss:TALOS|k6",
+    143.23
+   ]
+  ],
+  "mechTimeline": [
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "enemy:drone*",
+    0
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "fence:fence",
+    1.13
+   ],
+   [
+    "enemy:gtank",
+    5.72
+   ],
+   [
+    "enemy:gturret",
+    6.04
+   ],
+   [
+    "enemy:turret",
+    6.16
+   ],
+   [
+    "zoo:shielder",
+    9.7
+   ],
+   [
+    "enemy:shielder",
+    9.71
+   ],
+   [
+    "drop:miss",
+    13.39
+   ],
+   [
+    "enemy:gwalker",
+    13.96
+   ],
+   [
+    "enemy:turret*",
+    14.21
+   ],
+   [
+    "mini:TRESOR-WART|k5",
+    14.84
+   ],
+   [
+    "verb:laser",
+    14.84
+   ],
+   [
+    "verb:fan5",
+    14.96
+   ],
+   [
+    "verb:ring",
+    15.15
+   ],
+   [
+    "verb:fan7",
+    15.61
+   ],
+   [
+    "zoo:kamikaze",
+    16.15
+   ],
+   [
+    "enemy:kamikaze",
+    16.16
+   ],
+   [
+    "set:turretLine",
+    19.76
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    24.39
+   ],
+   [
+    "enemy:charger",
+    24.53
+   ],
+   [
+    "verb:summon",
+    24.53
+   ],
+   [
+    "enemy:charger*",
+    24.69
+   ],
+   [
+    "verb:fan9",
+    25.59
+   ],
+   [
+    "zoo:splitter",
+    26.59
+   ],
+   [
+    "enemy:splitter",
+    26.6
+   ],
+   [
+    "enemy:zdrn",
+    26.65
+   ],
+   [
+    "enemy:swarm",
+    32.76
+   ],
+   [
+    "set:swarm",
+    32.76
+   ],
+   [
+    "zoo:bomber",
+    33.22
+   ],
+   [
+    "enemy:bomber",
+    33.22
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    42.01
+   ],
+   [
+    "verb:spiral",
+    42.43
+   ],
+   [
+    "zoo:sniper",
+    43.27
+   ],
+   [
+    "enemy:sniper",
+    43.28
+   ],
+   [
+    "zoo:healer",
+    50.03
+   ],
+   [
+    "enemy:healer",
+    50.03
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    51.71
+   ],
+   [
+    "set:wedge",
+    53.22
+   ],
+   [
+    "enemy:gate",
+    57.34
+   ],
+   [
+    "zoo:carrier",
+    61.58
+   ],
+   [
+    "enemy:carrier",
+    61.58
+   ],
+   [
+    "enemy:gunship",
+    62.86
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    69.68
+   ],
+   [
+    "zoo:minelayer",
+    72.05
+   ],
+   [
+    "enemy:minelayer",
+    72.05
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    79.79
+   ],
+   [
+    "mini:MESSE-WÄCHTER|k4",
+    95.29
+   ],
+   [
+    "boss:KRONOS|k3",
+    103.65
+   ],
+   [
+    "set:phalanx",
+    113.51
+   ],
+   [
+    "mini:HOPLITE|k7",
+    132.67
+   ],
+   [
+    "boss:TALOS|k6",
+    143.23
+   ]
+  ],
+  "longestNoveltyGapMin": 21.7,
+  "lastNewThingMin": 143.23,
+  "newThingsFirst30": 55,
+  "newThingsAfter30": 32,
+  "longestMechGapMin": 21.7,
+  "plainLoopShare": 0.58,
+  "bossShare": 0.1,
+  "specialEventGapMaxS": 157,
+  "specialEventGapMedianS": 11,
+  "bossFights": 12,
+  "bossFightsBig": 7,
+  "distinctBossBehaviours": 10,
+  "distinctBossVerbKits": 9,
+  "bossVerbsTotal": [
+   "fan5",
+   "fan7",
+   "fan9",
+   "laser",
+   "ring",
+   "spiral",
+   "summon"
+  ],
+  "bossList": [
+   [
+    "mini",
+    "TRESOR-WART",
+    "fan5,fan7,laser,ring"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "fan5,fan7,fan9,ring,summon"
+   ],
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "fan5,fan7,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "fan7,fan9,laser,ring"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "fan7,fan9,laser,ring,spiral"
+   ],
+   [
+    "mini",
+    "MESSE-WÄCHTER",
+    "fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,ring,spiral"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ]
+  ],
+  "songMinutes": {
+   "stage3": 33.4,
+   "stage2": 26.3,
+   "stage1": 24.5,
+   "athina": 22.1,
+   "endless": 17.3,
+   "endless2": 15.1,
+   "athina2": 13.6,
+   "boss2": 6.1,
+   "boss3": 3.6,
+   "boss": 2.9,
+   "menu": 0
+  },
+  "distinctSongs": 11,
+  "songStartsPerHour": 22.2,
+  "distinctTracksPerHour": 4,
+  "backgrounds": [
+   "BANKENVIERTEL",
+   "MAINUFER",
+   "OSTEND",
+   "MESSE",
+   "ATHINA"
+  ],
+  "spawns": 11595,
+  "spawnShare": [
+   [
+    "drone",
+    6752,
+    58.2
+   ],
+   [
+    "charger",
+    1261,
+    10.9
+   ],
+   [
+    "turret",
+    898,
+    7.7
+   ],
+   [
+    "zdrn",
+    726,
+    6.3
+   ],
+   [
+    "kamikaze",
+    307,
+    2.6
+   ],
+   [
+    "swarm",
+    300,
+    2.6
+   ],
+   [
+    "gtank",
+    268,
+    2.3
+   ],
+   [
+    "gturret",
+    242,
+    2.1
+   ],
+   [
+    "splitter",
+    170,
+    1.5
+   ],
+   [
+    "gwalker",
+    114,
+    1
+   ],
+   [
+    "shielder",
+    110,
+    0.9
+   ],
+   [
+    "bomber",
+    69,
+    0.6
+   ],
+   [
+    "gate",
+    67,
+    0.6
+   ],
+   [
+    "sniper",
+    66,
+    0.6
+   ],
+   [
+    "carrier",
+    65,
+    0.6
+   ],
+   [
+    "gunship",
+    65,
+    0.6
+   ],
+   [
+    "healer",
+    62,
+    0.5
+   ],
+   [
+    "minelayer",
+    53,
+    0.5
+   ]
+  ],
+  "pickups": [
+   [
+    "up",
+    463
+   ],
+   [
+    "emp",
+    198
+   ],
+   [
+    "hp",
+    75
+   ],
+   [
+    "pw:crate",
+    36
+   ],
+   [
+    "pw:bomb",
+    36
+   ],
+   [
+    "pw:ric",
+    35
+   ],
+   [
+    "pw:slice",
+    33
+   ],
+   [
+    "pw:echo",
+    30
+   ],
+   [
+    "pw:leech",
+    27
+   ],
+   [
+    "pw:drum",
+    26
+   ],
+   [
+    "pw:slow",
+    25
+   ],
+   [
+    "pw:magb",
+    24
+   ],
+   [
+    "pw:nova",
+    20
+   ],
+   [
+    "pw:tempo",
+    20
+   ],
+   [
+    "pw:cres",
+    19
+   ],
+   [
+    "pw:drop",
+    17
+   ],
+   [
+    "pw:bub",
+    17
+   ],
+   [
+    "pw:chord",
+    16
+   ],
+   [
+    "pw:fix",
+    14
+   ],
+   [
+    "pw:wing",
+    14
+   ],
+   [
+    "pw:nr",
+    13
+   ],
+   [
+    "pw:tri",
+    8
+   ],
+   [
+    "pw:mag",
+    6
+   ]
+  ],
+  "bulletSources": [
+   [
+    "drone*",
+    12478,
+    43.6
+   ],
+   [
+    "drone",
+    4992,
+    17.5
+   ],
+   [
+    "boss:ring",
+    2346,
+    8.2
+   ],
+   [
+    "gunship",
+    1996,
+    7
+   ],
+   [
+    "turret*",
+    1551,
+    5.4
+   ],
+   [
+    "turret",
+    1068,
+    3.7
+   ],
+   [
+    "boss:fan9",
+    935,
+    3.3
+   ],
+   [
+    "boss:spiral",
+    904,
+    3.2
+   ],
+   [
+    "boss:fan7",
+    726,
+    2.5
+   ],
+   [
+    "gwalker",
+    478,
+    1.7
+   ],
+   [
+    "boss:fan5",
+    278,
+    1
+   ],
+   [
+    "gtank",
+    268,
+    0.9
+   ],
+   [
+    "gturret",
+    224,
+    0.8
+   ],
+   [
+    "boss:laser",
+    89,
+    0.3
+   ],
+   [
+    "none",
+    66,
+    0.2
+   ],
+   [
+    "sniper",
+    56,
+    0.2
+   ],
+   [
+    "rain/hazard",
+    51,
+    0.2
+   ],
+   [
+    "shielder",
+    33,
+    0.1
+   ],
+   [
+    "splitter",
+    31,
+    0.1
+   ],
+   [
+    "charger*",
+    11,
+    0
+   ],
+   [
+    "boss:summon",
+    9,
+    0
+   ],
+   [
+    "charger",
+    3,
+    0
+   ],
+   [
+    "kamikaze",
+    1,
+    0
+   ],
+   [
+    "bomber",
+    1,
+    0
+   ],
+   [
+    "healer",
+    1,
+    0
+   ],
+   [
+    "carrier",
+    1,
+    0
+   ],
+   [
+    "zdrn",
+    1,
+    0
+   ],
+   [
+    "minelayer",
+    1,
+    0
+   ]
+  ],
+  "hints": [
+   [
+    "DROP COMING: DASH ON THE DOWNBEAT",
+    240
+   ],
+   [
+    "WEAVE: shoot on the beat",
+    225
+   ],
+   [
+    "LASER FENCE: find the gap",
+    186
+   ],
+   [
+    "WINGS: two drones shoot the off-beats",
+    176
+   ],
+   [
+    "SET PIECE",
+    161
+   ],
+   [
+    "Dash on the pulse to power up",
+    114
+   ],
+   [
+    "SHOOT THE CAGE: FREE THE DATA SPRITE",
+    76
+   ],
+   [
+    "ECHO: shots return on the next beat",
+    36
+   ],
+   [
+    "BOMB STOCK: more EMP pulses",
+    23
+   ],
+   [
+    "MAGNET: every beat pulls pickups in",
+    22
+   ],
+   [
+    "CRESCENDO: dodge to stack damage",
+    22
+   ],
+   [
+    "RICOCHET: shots bounce off edges",
+    20
+   ],
+   [
+    "HEAVY CRATE: big slow shells",
+    17
+   ],
+   [
+    "TIME SLICE: bullets slow on the beat",
+    17
+   ],
+   [
+    "Double-time fire · score ×2",
+    16
+   ]
+  ],
+  "mutators": {},
+  "setPieces": {
+   "set:weave": 225,
+   "drop:hit": 238,
+   "fence:fence": 186,
+   "drop:miss": 2,
+   "set:turretLine": 46,
+   "set:swarm": 25,
+   "set:wedge": 50,
+   "set:phalanx": 40
+  },
+  "pitStops": 0
+ },
+ "arcade-hard": {
+  "gameMinutes": 192.8,
+  "tries": 96,
+  "firstTryFails": 26,
+  "events": 24211,
+  "repeatRatio5min": 0.967,
+  "encounters": 4601,
+  "encountersPerMin": 23.9,
+  "topEncounters": [
+   [
+    "wave:turret",
+    564,
+    12.3
+   ],
+   [
+    "wave:chargers",
+    524,
+    11.4
+   ],
+   [
+    "wave:droneLine",
+    479,
+    10.4
+   ],
+   [
+    "wave:droneSine",
+    456,
+    9.9
+   ],
+   [
+    "wave:droneV",
+    321,
+    7
+   ],
+   [
+    "drop:hit",
+    255,
+    5.5
+   ],
+   [
+    "zoo:shielder",
+    183,
+    4
+   ],
+   [
+    "zoo:kamikaze",
+    145,
+    3.2
+   ]
+  ],
+  "distinctEncounterSigs": 43,
+  "per5min": [
+   [
+    0,
+    6,
+    2
+   ],
+   [
+    5,
+    8,
+    7
+   ],
+   [
+    10,
+    11,
+    8
+   ],
+   [
+    15,
+    14,
+    9
+   ],
+   [
+    20,
+    13,
+    11
+   ],
+   [
+    25,
+    16,
+    11
+   ],
+   [
+    30,
+    13,
+    14
+   ],
+   [
+    35,
+    18,
+    15
+   ],
+   [
+    40,
+    14,
+    16
+   ],
+   [
+    45,
+    20,
+    17
+   ],
+   [
+    50,
+    21,
+    15
+   ],
+   [
+    55,
+    17,
+    18
+   ],
+   [
+    60,
+    18,
+    18
+   ],
+   [
+    65,
+    22,
+    19
+   ],
+   [
+    70,
+    17,
+    20
+   ],
+   [
+    75,
+    17,
+    20
+   ],
+   [
+    80,
+    21,
+    20
+   ],
+   [
+    85,
+    21,
+    19
+   ],
+   [
+    90,
+    15,
+    16
+   ],
+   [
+    95,
+    16,
+    16
+   ],
+   [
+    100,
+    18,
+    20
+   ],
+   [
+    105,
+    17,
+    20
+   ],
+   [
+    110,
+    22,
+    19
+   ],
+   [
+    115,
+    17,
+    20
+   ],
+   [
+    120,
+    18,
+    20
+   ],
+   [
+    125,
+    23,
+    19
+   ],
+   [
+    130,
+    24,
+    14
+   ],
+   [
+    135,
+    20,
+    17
+   ],
+   [
+    140,
+    18,
+    20
+   ],
+   [
+    145,
+    18,
+    19
+   ],
+   [
+    150,
+    17,
+    18
+   ],
+   [
+    155,
+    21,
+    18
+   ],
+   [
+    160,
+    18,
+    20
+   ],
+   [
+    165,
+    18,
+    20
+   ],
+   [
+    170,
+    20,
+    18
+   ],
+   [
+    175,
+    16,
+    10
+   ],
+   [
+    180,
+    10,
+    10
+   ],
+   [
+    185,
+    12,
+    11
+   ],
+   [
+    190,
+    6,
+    9
+   ]
+  ],
+  "stages": {
+   "1": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 2,
+    "waves": 3,
+    "shotSrc": 2,
+    "newThings": 19,
+    "newList": [
+     "enemy:drone",
+     "enemy:drone*",
+     "wave:droneLine",
+     "set:weave",
+     "pick:up",
+     "wave:droneSine",
+     "pick:pw:tempo",
+     "fence:fence",
+     "wave:droneV",
+     "pick:pw:chord",
+     "drop:hit",
+     "pick:hp",
+     "pick:pw:drum",
+     "pick:pw:fix",
+     "pick:pw:cres",
+     "pick:pw:mag",
+     "pick:emp",
+     "shot:drone",
+     "shot:drone*"
+    ],
+    "jaccardPrev": null,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.8
+   },
+   "2": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 2,
+    "waves": 3,
+    "shotSrc": 2,
+    "newThings": 4,
+    "newList": [
+     "pick:pw:tri",
+     "pick:pw:echo",
+     "pick:pw:slow",
+     "pick:pw:nova"
+    ],
+    "jaccardPrev": 1,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.82
+   },
+   "3": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 4,
+    "waves": 3,
+    "shotSrc": 4,
+    "newThings": 11,
+    "newList": [
+     "enemy:gturret",
+     "pick:pw:crate",
+     "enemy:gtank",
+     "pick:pw:drop",
+     "enemy:turret",
+     "wave:turret",
+     "pick:pw:slice",
+     "pick:pw:wing",
+     "shot:gturret",
+     "shot:gtank",
+     "shot:turret"
+    ],
+    "jaccardPrev": 0.29,
+    "song": "stage3",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.57
+   },
+   "4": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 7,
+    "enemyKinds": 6,
+    "waves": 4,
+    "shotSrc": 6,
+    "newThings": 7,
+    "newList": [
+     "pick:pw:leech",
+     "zoo:shielder",
+     "enemy:shielder",
+     "enemy:gwalker",
+     "pick:pw:ric",
+     "shot:gwalker",
+     "shot:shielder"
+    ],
+    "jaccardPrev": 0.42,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.62
+   },
+   "5": {
+    "mins": 8.1,
+    "tries": 3,
+    "cleared": false,
+    "enc": 12,
+    "enemyKinds": 8,
+    "waves": 3,
+    "shotSrc": 13,
+    "newThings": 15,
+    "newList": [
+     "pick:pw:bomb",
+     "drop:miss",
+     "pick:pw:magb",
+     "mini:TRESOR-WART|k5",
+     "verb:laser",
+     "verb:fan5",
+     "enemy:turret*",
+     "verb:ring",
+     "verb:fan7",
+     "shot:boss:fan5",
+     "shot:rain/hazard",
+     "shot:none",
+     "shot:turret*",
+     "shot:boss:ring",
+     "shot:boss:fan7"
+    ],
+    "jaccardPrev": 0.47,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.47
+   },
+   "6": {
+    "mins": 3.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 8,
+    "waves": 5,
+    "shotSrc": 7,
+    "newThings": 2,
+    "newList": [
+     "zoo:kamikaze",
+     "enemy:kamikaze"
+    ],
+    "jaccardPrev": 0.5,
+    "song": "stage3",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.65
+   },
+   "7": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 10,
+    "enemyKinds": 11,
+    "waves": 6,
+    "shotSrc": 10,
+    "newThings": 6,
+    "newList": [
+     "set:turretLine",
+     "enemy:charger",
+     "wave:chargers",
+     "enemy:charger*",
+     "shot:charger",
+     "shot:kamikaze"
+    ],
+    "jaccardPrev": 0.74,
+    "song": "stage1",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.67
+   },
+   "8": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 10,
+    "waves": 6,
+    "shotSrc": 11,
+    "newThings": 5,
+    "newList": [
+     "boss:SEK-ADLER|k0",
+     "verb:summon",
+     "verb:fan9",
+     "pick:pw:bub",
+     "shot:boss:fan9"
+    ],
+    "jaccardPrev": 0.59,
+    "song": "stage2+boss",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.12
+   },
+   "9": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 8,
+    "waves": 6,
+    "shotSrc": 6,
+    "newThings": 4,
+    "newList": [
+     "zoo:splitter",
+     "enemy:splitter",
+     "enemy:zdrn",
+     "shot:splitter"
+    ],
+    "jaccardPrev": 0.41,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.66
+   },
+   "10": {
+    "mins": 2.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 10,
+    "enemyKinds": 11,
+    "waves": 6,
+    "shotSrc": 6,
+    "newThings": 3,
+    "newList": [
+     "enemy:swarm",
+     "set:swarm",
+     "shot:zdrn"
+    ],
+    "jaccardPrev": 0.65,
+    "song": "endless",
+    "bg": "MAINUFER",
+    "plainShare": 0.72
+   },
+   "11": {
+    "mins": 2.7,
+    "tries": 1,
+    "cleared": true,
+    "enc": 12,
+    "enemyKinds": 14,
+    "waves": 8,
+    "shotSrc": 12,
+    "newThings": 4,
+    "newList": [
+     "zoo:bomber",
+     "enemy:bomber",
+     "pick:pw:nr",
+     "shot:bomber"
+    ],
+    "jaccardPrev": 0.63,
+    "song": "stage2",
+    "bg": "MAINUFER",
+    "plainShare": 0.63
+   },
+   "12": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 12,
+    "enemyKinds": 12,
+    "waves": 8,
+    "shotSrc": 13,
+    "newThings": 2,
+    "newList": [
+     "shot:swarm",
+     "shot:charger*"
+    ],
+    "jaccardPrev": 0.76,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.76
+   },
+   "13": {
+    "mins": 3.2,
+    "tries": 1,
+    "cleared": true,
+    "enc": 16,
+    "enemyKinds": 15,
+    "waves": 7,
+    "shotSrc": 21,
+    "newThings": 3,
+    "newList": [
+     "mini:BRÜCKEN-WÄCHTER|k4",
+     "verb:spiral",
+     "shot:boss:spiral"
+    ],
+    "jaccardPrev": 0.62,
+    "song": "endless",
+    "bg": "MAINUFER",
+    "plainShare": 0.46
+   },
+   "14": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 13,
+    "enemyKinds": 13,
+    "waves": 9,
+    "shotSrc": 12,
+    "newThings": 3,
+    "newList": [
+     "zoo:sniper",
+     "enemy:sniper",
+     "shot:sniper"
+    ],
+    "jaccardPrev": 0.55,
+    "song": "stage2",
+    "bg": "MAINUFER",
+    "plainShare": 0.78
+   },
+   "15": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 12,
+    "enemyKinds": 16,
+    "waves": 8,
+    "shotSrc": 11,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.72,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.72
+   },
+   "16": {
+    "mins": 7.1,
+    "tries": 3,
+    "cleared": false,
+    "enc": 20,
+    "enemyKinds": 17,
+    "waves": 10,
+    "shotSrc": 21,
+    "newThings": 5,
+    "newList": [
+     "boss:FLUSSKRAKE|k1",
+     "zoo:healer",
+     "enemy:healer",
+     "shot:boss:summon",
+     "shot:healer"
+    ],
+    "jaccardPrev": 0.66,
+    "song": "endless+boss3",
+    "bg": "MAINUFER",
+    "plainShare": 0.27
+   },
+   "17": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 14,
+    "enemyKinds": 14,
+    "waves": 10,
+    "shotSrc": 12,
+    "newThings": 3,
+    "newList": [
+     "set:wedge",
+     "enemy:gate",
+     "wave:gate"
+    ],
+    "jaccardPrev": 0.59,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.77
+   },
+   "18": {
+    "mins": 2.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 14,
+    "waves": 11,
+    "shotSrc": 13,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.95,
+    "song": "endless",
+    "bg": "OSTEND",
+    "plainShare": 0.78
+   },
+   "19": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 14,
+    "enemyKinds": 16,
+    "waves": 11,
+    "shotSrc": 12,
+    "newThings": 6,
+    "newList": [
+     "zoo:carrier",
+     "enemy:carrier",
+     "enemy:gunship",
+     "wave:gunship",
+     "shot:carrier",
+     "shot:gunship"
+    ],
+    "jaccardPrev": 0.6,
+    "song": "endless2",
+    "bg": "OSTEND",
+    "plainShare": 0.9
+   },
+   "20": {
+    "mins": 2.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 18,
+    "waves": 11,
+    "shotSrc": 18,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.69,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.72
+   },
+   "21": {
+    "mins": 7,
+    "tries": 3,
+    "cleared": false,
+    "enc": 20,
+    "enemyKinds": 18,
+    "waves": 11,
+    "shotSrc": 22,
+    "newThings": 2,
+    "newList": [
+     "mini:SCHRANKEN-WART|k5",
+     "shot:boss:laser"
+    ],
+    "jaccardPrev": 0.85,
+    "song": "endless",
+    "bg": "OSTEND",
+    "plainShare": 0.69
+   },
+   "22": {
+    "mins": 5.8,
+    "tries": 3,
+    "cleared": false,
+    "enc": 17,
+    "enemyKinds": 20,
+    "waves": 13,
+    "shotSrc": 19,
+    "newThings": 3,
+    "newList": [
+     "zoo:minelayer",
+     "enemy:minelayer",
+     "shot:minelayer"
+    ],
+    "jaccardPrev": 0.73,
+    "song": "endless2",
+    "bg": "OSTEND",
+    "plainShare": 0.82
+   },
+   "23": {
+    "mins": 8.4,
+    "tries": 3,
+    "cleared": false,
+    "enc": 17,
+    "enemyKinds": 20,
+    "waves": 13,
+    "shotSrc": 19,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 1,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.81
+   },
+   "24": {
+    "mins": 6.2,
+    "tries": 3,
+    "cleared": false,
+    "enc": 22,
+    "enemyKinds": 19,
+    "waves": 12,
+    "shotSrc": 22,
+    "newThings": 1,
+    "newList": [
+     "boss:ZENTRAL-ICE|k2"
+    ],
+    "jaccardPrev": 0.72,
+    "song": "endless+boss",
+    "bg": "OSTEND",
+    "plainShare": 0.3
+   },
+   "25": {
+    "mins": 5.8,
+    "tries": 3,
+    "cleared": false,
+    "enc": 15,
+    "enemyKinds": 16,
+    "waves": 13,
+    "shotSrc": 15,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.57,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.93
+   },
+   "26": {
+    "mins": 5.5,
+    "tries": 3,
+    "cleared": false,
+    "enc": 16,
+    "enemyKinds": 16,
+    "waves": 13,
+    "shotSrc": 17,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.96,
+    "song": "stage1",
+    "bg": "MESSE",
+    "plainShare": 0.84
+   },
+   "27": {
+    "mins": 4.8,
+    "tries": 3,
+    "cleared": false,
+    "enc": 17,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 20,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.82,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.81
+   },
+   "28": {
+    "mins": 4.7,
+    "tries": 3,
+    "cleared": false,
+    "enc": 14,
+    "enemyKinds": 18,
+    "waves": 12,
+    "shotSrc": 18,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.85,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.86
+   },
+   "29": {
+    "mins": 5.1,
+    "tries": 3,
+    "cleared": false,
+    "enc": 22,
+    "enemyKinds": 19,
+    "waves": 13,
+    "shotSrc": 23,
+    "newThings": 1,
+    "newList": [
+     "mini:MESSE-WÄCHTER|k4"
+    ],
+    "jaccardPrev": 0.75,
+    "song": "stage1",
+    "bg": "MESSE",
+    "plainShare": 0.5
+   },
+   "30": {
+    "mins": 5.9,
+    "tries": 3,
+    "cleared": false,
+    "enc": 16,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 19,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.78,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.82
+   },
+   "31": {
+    "mins": 4.9,
+    "tries": 3,
+    "cleared": false,
+    "enc": 17,
+    "enemyKinds": 20,
+    "waves": 13,
+    "shotSrc": 20,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.96,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.82
+   },
+   "32": {
+    "mins": 6.8,
+    "tries": 3,
+    "cleared": false,
+    "enc": 23,
+    "enemyKinds": 19,
+    "waves": 12,
+    "shotSrc": 25,
+    "newThings": 1,
+    "newList": [
+     "boss:KRONOS|k3"
+    ],
+    "jaccardPrev": 0.74,
+    "song": "stage1+boss2",
+    "bg": "MESSE",
+    "plainShare": 0.3
+   },
+   "33": {
+    "mins": 4.1,
+    "tries": 2,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 15,
+    "waves": 13,
+    "shotSrc": 16,
+    "newThings": 2,
+    "newList": [
+     "set:phalanx",
+     "wave:phalanx"
+    ],
+    "jaccardPrev": 0.63,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.81
+   },
+   "34": {
+    "mins": 5.8,
+    "tries": 3,
+    "cleared": false,
+    "enc": 18,
+    "enemyKinds": 17,
+    "waves": 14,
+    "shotSrc": 15,
+    "newThings": 2,
+    "newList": [
+     "wave:pillars",
+     "wave:wedge"
+    ],
+    "jaccardPrev": 0.8,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.87
+   },
+   "35": {
+    "mins": 6.2,
+    "tries": 3,
+    "cleared": false,
+    "enc": 18,
+    "enemyKinds": 19,
+    "waves": 14,
+    "shotSrc": 20,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.8,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.82
+   },
+   "36": {
+    "mins": 5.1,
+    "tries": 3,
+    "cleared": false,
+    "enc": 17,
+    "enemyKinds": 17,
+    "waves": 13,
+    "shotSrc": 17,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.89,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.86
+   },
+   "37": {
+    "mins": 5.8,
+    "tries": 3,
+    "cleared": false,
+    "enc": 21,
+    "enemyKinds": 18,
+    "waves": 12,
+    "shotSrc": 24,
+    "newThings": 1,
+    "newList": [
+     "mini:HOPLITE|k7"
+    ],
+    "jaccardPrev": 0.74,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.68
+   },
+   "38": {
+    "mins": 4.7,
+    "tries": 3,
+    "cleared": false,
+    "enc": 17,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 20,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.74,
+    "song": "athina2",
+    "bg": "ATHINA",
+    "plainShare": 0.92
+   },
+   "39": {
+    "mins": 6,
+    "tries": 3,
+    "cleared": false,
+    "enc": 18,
+    "enemyKinds": 20,
+    "waves": 14,
+    "shotSrc": 20,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 1,
+    "song": "athina",
+    "bg": "ATHINA",
+    "plainShare": 0.87
+   },
+   "40": {
+    "mins": 6.1,
+    "tries": 3,
+    "cleared": false,
+    "enc": 20,
+    "enemyKinds": 18,
+    "waves": 10,
+    "shotSrc": 21,
+    "newThings": 1,
+    "newList": [
+     "boss:TALOS|k6"
+    ],
+    "jaccardPrev": 0.63,
+    "song": "athina2+boss3",
+    "bg": "ATHINA",
+    "plainShare": 0.42
+   },
+   "41": {
+    "mins": 2.8,
+    "tries": 3,
+    "cleared": false,
+    "enc": 8,
+    "enemyKinds": 9,
+    "waves": 4,
+    "shotSrc": 10,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.3,
+    "song": "stage2",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.63
+   },
+   "42": {
+    "mins": 1.8,
+    "tries": 1,
+    "cleared": true,
+    "enc": 6,
+    "enemyKinds": 7,
+    "waves": 4,
+    "shotSrc": 6,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.6,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.91
+   },
+   "43": {
+    "mins": 4.7,
+    "tries": 3,
+    "cleared": false,
+    "enc": 9,
+    "enemyKinds": 10,
+    "waves": 5,
+    "shotSrc": 10,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.56,
+    "song": "stage1",
+    "bg": "OSTEND",
+    "plainShare": 0.8
+   },
+   "44": {
+    "mins": 3.2,
+    "tries": 3,
+    "cleared": false,
+    "enc": 8,
+    "enemyKinds": 11,
+    "waves": 6,
+    "shotSrc": 11,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.83,
+    "song": "stage2",
+    "bg": "MESSE",
+    "plainShare": 0.79
+   },
+   "45": {
+    "mins": 3.5,
+    "tries": 3,
+    "cleared": false,
+    "enc": 6,
+    "enemyKinds": 9,
+    "waves": 4,
+    "shotSrc": 10,
+    "newThings": 0,
+    "newList": [],
+    "jaccardPrev": 0.7,
+    "song": "athina+menu",
+    "bg": "ATHINA",
+    "plainShare": 0.87
+   }
+  },
+  "jaccardMedian": 0.72,
+  "jaccardMean": 0.7,
+  "stagesWithZeroNew": 19,
+  "firstSeen": [
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "enemy:drone*",
+    0
+   ],
+   [
+    "wave:droneLine",
+    0
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "pick:up",
+    0.11
+   ],
+   [
+    "wave:droneSine",
+    0.15
+   ],
+   [
+    "pick:pw:tempo",
+    0.17
+   ],
+   [
+    "fence:fence",
+    0.35
+   ],
+   [
+    "wave:droneV",
+    0.48
+   ],
+   [
+    "pick:pw:chord",
+    0.64
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "pick:hp",
+    0.76
+   ],
+   [
+    "pick:pw:drum",
+    0.98
+   ],
+   [
+    "pick:pw:fix",
+    1.17
+   ],
+   [
+    "pick:pw:cres",
+    1.46
+   ],
+   [
+    "pick:pw:mag",
+    1.77
+   ],
+   [
+    "pick:emp",
+    2.06
+   ],
+   [
+    "pick:pw:tri",
+    2.92
+   ],
+   [
+    "pick:pw:echo",
+    3.13
+   ],
+   [
+    "pick:pw:slow",
+    3.58
+   ],
+   [
+    "pick:pw:nova",
+    4.17
+   ],
+   [
+    "enemy:gturret",
+    5.04
+   ],
+   [
+    "pick:pw:crate",
+    5.04
+   ],
+   [
+    "enemy:gtank",
+    5.11
+   ],
+   [
+    "pick:pw:drop",
+    5.39
+   ],
+   [
+    "enemy:turret",
+    5.48
+   ],
+   [
+    "wave:turret",
+    5.48
+   ],
+   [
+    "pick:pw:slice",
+    6.05
+   ],
+   [
+    "pick:pw:wing",
+    6.22
+   ],
+   [
+    "pick:pw:leech",
+    7.58
+   ],
+   [
+    "zoo:shielder",
+    7.92
+   ],
+   [
+    "enemy:shielder",
+    7.94
+   ],
+   [
+    "enemy:gwalker",
+    8.23
+   ],
+   [
+    "pick:pw:ric",
+    9.75
+   ],
+   [
+    "pick:pw:bomb",
+    11.26
+   ],
+   [
+    "drop:miss",
+    11.36
+   ],
+   [
+    "pick:pw:magb",
+    11.72
+   ],
+   [
+    "mini:TRESOR-WART|k5",
+    11.9
+   ],
+   [
+    "verb:laser",
+    11.9
+   ],
+   [
+    "verb:fan5",
+    12.02
+   ],
+   [
+    "enemy:turret*",
+    12.29
+   ],
+   [
+    "verb:ring",
+    12.31
+   ],
+   [
+    "verb:fan7",
+    17.68
+   ],
+   [
+    "zoo:kamikaze",
+    18.11
+   ],
+   [
+    "enemy:kamikaze",
+    18.12
+   ],
+   [
+    "set:turretLine",
+    21.82
+   ],
+   [
+    "enemy:charger",
+    22.55
+   ],
+   [
+    "wave:chargers",
+    22.55
+   ],
+   [
+    "enemy:charger*",
+    24.12
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    24.98
+   ],
+   [
+    "verb:summon",
+    25.12
+   ],
+   [
+    "verb:fan9",
+    26.38
+   ],
+   [
+    "pick:pw:bub",
+    26.72
+   ],
+   [
+    "zoo:splitter",
+    26.94
+   ],
+   [
+    "enemy:splitter",
+    26.95
+   ],
+   [
+    "enemy:zdrn",
+    26.99
+   ],
+   [
+    "enemy:swarm",
+    29.26
+   ],
+   [
+    "set:swarm",
+    29.26
+   ],
+   [
+    "zoo:bomber",
+    32.15
+   ],
+   [
+    "enemy:bomber",
+    32.15
+   ],
+   [
+    "pick:pw:nr",
+    32.94
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    38.65
+   ],
+   [
+    "verb:spiral",
+    39.13
+   ],
+   [
+    "zoo:sniper",
+    41.03
+   ],
+   [
+    "enemy:sniper",
+    41.03
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    45.59
+   ],
+   [
+    "zoo:healer",
+    47.17
+   ],
+   [
+    "enemy:healer",
+    47.17
+   ],
+   [
+    "set:wedge",
+    51.94
+   ],
+   [
+    "enemy:gate",
+    52.44
+   ],
+   [
+    "wave:gate",
+    52.44
+   ],
+   [
+    "zoo:carrier",
+    57.97
+   ],
+   [
+    "enemy:carrier",
+    57.97
+   ],
+   [
+    "enemy:gunship",
+    58.71
+   ],
+   [
+    "wave:gunship",
+    58.71
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    64.1
+   ],
+   [
+    "zoo:minelayer",
+    70.49
+   ],
+   [
+    "enemy:minelayer",
+    70.49
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    84.04
+   ],
+   [
+    "mini:MESSE-WÄCHTER|k4",
+    114.12
+   ],
+   [
+    "boss:KRONOS|k3",
+    127
+   ],
+   [
+    "set:phalanx",
+    132.88
+   ],
+   [
+    "wave:phalanx",
+    133.35
+   ],
+   [
+    "wave:pillars",
+    138.09
+   ],
+   [
+    "wave:wedge",
+    139.97
+   ],
+   [
+    "mini:HOPLITE|k7",
+    158.58
+   ],
+   [
+    "boss:TALOS|k6",
+    171.63
+   ]
+  ],
+  "mechTimeline": [
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "enemy:drone*",
+    0
+   ],
+   [
+    "set:weave",
+    0.09
+   ],
+   [
+    "fence:fence",
+    0.35
+   ],
+   [
+    "drop:hit",
+    0.65
+   ],
+   [
+    "enemy:gturret",
+    5.04
+   ],
+   [
+    "enemy:gtank",
+    5.11
+   ],
+   [
+    "enemy:turret",
+    5.48
+   ],
+   [
+    "zoo:shielder",
+    7.92
+   ],
+   [
+    "enemy:shielder",
+    7.94
+   ],
+   [
+    "enemy:gwalker",
+    8.23
+   ],
+   [
+    "drop:miss",
+    11.36
+   ],
+   [
+    "mini:TRESOR-WART|k5",
+    11.9
+   ],
+   [
+    "verb:laser",
+    11.9
+   ],
+   [
+    "verb:fan5",
+    12.02
+   ],
+   [
+    "enemy:turret*",
+    12.29
+   ],
+   [
+    "verb:ring",
+    12.31
+   ],
+   [
+    "verb:fan7",
+    17.68
+   ],
+   [
+    "zoo:kamikaze",
+    18.11
+   ],
+   [
+    "enemy:kamikaze",
+    18.12
+   ],
+   [
+    "set:turretLine",
+    21.82
+   ],
+   [
+    "enemy:charger",
+    22.55
+   ],
+   [
+    "enemy:charger*",
+    24.12
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    24.98
+   ],
+   [
+    "verb:summon",
+    25.12
+   ],
+   [
+    "verb:fan9",
+    26.38
+   ],
+   [
+    "zoo:splitter",
+    26.94
+   ],
+   [
+    "enemy:splitter",
+    26.95
+   ],
+   [
+    "enemy:zdrn",
+    26.99
+   ],
+   [
+    "enemy:swarm",
+    29.26
+   ],
+   [
+    "set:swarm",
+    29.26
+   ],
+   [
+    "zoo:bomber",
+    32.15
+   ],
+   [
+    "enemy:bomber",
+    32.15
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    38.65
+   ],
+   [
+    "verb:spiral",
+    39.13
+   ],
+   [
+    "zoo:sniper",
+    41.03
+   ],
+   [
+    "enemy:sniper",
+    41.03
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    45.59
+   ],
+   [
+    "zoo:healer",
+    47.17
+   ],
+   [
+    "enemy:healer",
+    47.17
+   ],
+   [
+    "set:wedge",
+    51.94
+   ],
+   [
+    "enemy:gate",
+    52.44
+   ],
+   [
+    "zoo:carrier",
+    57.97
+   ],
+   [
+    "enemy:carrier",
+    57.97
+   ],
+   [
+    "enemy:gunship",
+    58.71
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    64.1
+   ],
+   [
+    "zoo:minelayer",
+    70.49
+   ],
+   [
+    "enemy:minelayer",
+    70.49
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    84.04
+   ],
+   [
+    "mini:MESSE-WÄCHTER|k4",
+    114.12
+   ],
+   [
+    "boss:KRONOS|k3",
+    127
+   ],
+   [
+    "set:phalanx",
+    132.88
+   ],
+   [
+    "mini:HOPLITE|k7",
+    158.58
+   ],
+   [
+    "boss:TALOS|k6",
+    171.63
+   ]
+  ],
+  "longestNoveltyGapMin": 30.1,
+  "lastNewThingMin": 171.63,
+  "newThingsFirst30": 58,
+  "newThingsAfter30": 29,
+  "longestMechGapMin": 30.1,
+  "plainLoopShare": 0.69,
+  "bossShare": 0.13,
+  "specialEventGapMaxS": 180,
+  "specialEventGapMedianS": 14,
+  "bossFights": 20,
+  "bossFightsBig": 12,
+  "distinctBossBehaviours": 18,
+  "distinctBossVerbKits": 15,
+  "bossVerbsTotal": [
+   "fan5",
+   "fan7",
+   "fan9",
+   "laser",
+   "ring",
+   "spiral",
+   "summon"
+  ],
+  "bossList": [
+   [
+    "mini",
+    "TRESOR-WART",
+    "fan5,laser,ring"
+   ],
+   [
+    "mini",
+    "TRESOR-WART",
+    "fan5,laser"
+   ],
+   [
+    "mini",
+    "TRESOR-WART",
+    "fan5,fan7,laser,ring"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "fan5,fan7,fan9,ring,summon"
+   ],
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "fan5,fan7,ring,spiral,summon"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "fan5,fan7,ring,spiral,summon"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "fan5,fan7,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "fan7,laser"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "fan7,fan9,laser,ring"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "laser,ring"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "fan7,fan9,laser,ring,spiral"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "fan7,fan9,laser,ring,spiral"
+   ],
+   [
+    "mini",
+    "MESSE-WÄCHTER",
+    "fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "fan5,fan7,fan9,ring,spiral"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "fan7,laser,spiral"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "fan7"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "fan7,fan9,laser,ring,spiral,summon"
+   ]
+  ],
+  "songMinutes": {
+   "stage2": 33.1,
+   "stage3": 28.9,
+   "athina": 25.7,
+   "stage1": 25.6,
+   "endless2": 23.6,
+   "endless": 19.8,
+   "athina2": 18.6,
+   "boss3": 7.9,
+   "boss": 5.6,
+   "boss2": 3.9,
+   "menu": 0
+  },
+  "distinctSongs": 11,
+  "songStartsPerHour": 33.9,
+  "distinctTracksPerHour": 3.4,
+  "backgrounds": [
+   "BANKENVIERTEL",
+   "MAINUFER",
+   "OSTEND",
+   "MESSE",
+   "ATHINA"
+  ],
+  "spawns": 16072,
+  "spawnShare": [
+   [
+    "drone",
+    8295,
+    51.6
+   ],
+   [
+    "charger",
+    2074,
+    12.9
+   ],
+   [
+    "zdrn",
+    1277,
+    7.9
+   ],
+   [
+    "turret",
+    1127,
+    7
+   ],
+   [
+    "kamikaze",
+    575,
+    3.6
+   ],
+   [
+    "gtank",
+    424,
+    2.6
+   ],
+   [
+    "shielder",
+    366,
+    2.3
+   ],
+   [
+    "gturret",
+    313,
+    1.9
+   ],
+   [
+    "swarm",
+    312,
+    1.9
+   ],
+   [
+    "splitter",
+    257,
+    1.6
+   ],
+   [
+    "bomber",
+    232,
+    1.4
+   ],
+   [
+    "gate",
+    159,
+    1
+   ],
+   [
+    "gwalker",
+    137,
+    0.9
+   ],
+   [
+    "sniper",
+    117,
+    0.7
+   ],
+   [
+    "gunship",
+    109,
+    0.7
+   ],
+   [
+    "healer",
+    102,
+    0.6
+   ],
+   [
+    "minelayer",
+    100,
+    0.6
+   ],
+   [
+    "carrier",
+    96,
+    0.6
+   ]
+  ],
+  "pickups": [
+   [
+    "up",
+    602
+   ],
+   [
+    "emp",
+    228
+   ],
+   [
+    "hp",
+    85
+   ],
+   [
+    "pw:leech",
+    51
+   ],
+   [
+    "pw:slice",
+    50
+   ],
+   [
+    "pw:crate",
+    48
+   ],
+   [
+    "pw:bomb",
+    40
+   ],
+   [
+    "pw:ric",
+    39
+   ],
+   [
+    "pw:drum",
+    34
+   ],
+   [
+    "pw:slow",
+    28
+   ],
+   [
+    "pw:tempo",
+    27
+   ],
+   [
+    "pw:wing",
+    25
+   ],
+   [
+    "pw:magb",
+    25
+   ],
+   [
+    "pw:cres",
+    24
+   ],
+   [
+    "pw:chord",
+    22
+   ],
+   [
+    "pw:echo",
+    22
+   ],
+   [
+    "pw:nova",
+    22
+   ],
+   [
+    "pw:drop",
+    20
+   ],
+   [
+    "pw:mag",
+    13
+   ],
+   [
+    "pw:bub",
+    12
+   ],
+   [
+    "pw:tri",
+    10
+   ],
+   [
+    "pw:fix",
+    8
+   ],
+   [
+    "pw:nr",
+    3
+   ]
+  ],
+  "bulletSources": [
+   [
+    "drone*",
+    27623,
+    36.1
+   ],
+   [
+    "drone",
+    9816,
+    12.8
+   ],
+   [
+    "none",
+    8025,
+    10.5
+   ],
+   [
+    "gunship",
+    6766,
+    8.9
+   ],
+   [
+    "turret*",
+    5479,
+    7.2
+   ],
+   [
+    "turret",
+    4483,
+    5.9
+   ],
+   [
+    "boss:ring",
+    3843,
+    5
+   ],
+   [
+    "boss:spiral",
+    2034,
+    2.7
+   ],
+   [
+    "boss:fan7",
+    1412,
+    1.8
+   ],
+   [
+    "gwalker",
+    1357,
+    1.8
+   ],
+   [
+    "boss:fan9",
+    1355,
+    1.8
+   ],
+   [
+    "boss:fan5",
+    835,
+    1.1
+   ],
+   [
+    "gtank",
+    630,
+    0.8
+   ],
+   [
+    "gturret",
+    561,
+    0.7
+   ],
+   [
+    "shielder",
+    364,
+    0.5
+   ],
+   [
+    "sniper",
+    317,
+    0.4
+   ],
+   [
+    "boss:laser",
+    260,
+    0.3
+   ],
+   [
+    "splitter",
+    231,
+    0.3
+   ],
+   [
+    "kamikaze",
+    154,
+    0.2
+   ],
+   [
+    "carrier",
+    139,
+    0.2
+   ],
+   [
+    "zdrn",
+    131,
+    0.2
+   ],
+   [
+    "charger",
+    127,
+    0.2
+   ],
+   [
+    "charger*",
+    114,
+    0.1
+   ],
+   [
+    "bomber",
+    109,
+    0.1
+   ],
+   [
+    "boss:summon",
+    88,
+    0.1
+   ],
+   [
+    "rain/hazard",
+    79,
+    0.1
+   ],
+   [
+    "healer",
+    65,
+    0.1
+   ],
+   [
+    "minelayer",
+    39,
+    0.1
+   ],
+   [
+    "swarm",
+    2,
+    0
+   ]
+  ],
+  "hints": [
+   [
+    "DROP COMING: DASH ON THE DOWNBEAT",
+    262
+   ],
+   [
+    "WINGS: two drones shoot the off-beats",
+    258
+   ],
+   [
+    "Dash on the pulse to power up",
+    114
+   ],
+   [
+    "SHOOT THE CAGE: FREE THE DATA SPRITE",
+    109
+   ],
+   [
+    "SET PIECE",
+    109
+   ],
+   [
+    "WEAVE: shoot on the beat",
+    104
+   ],
+   [
+    "LASER FENCE: find the gap",
+    103
+   ],
+   [
+    "TIME SLICE: bullets slow on the beat",
+    31
+   ],
+   [
+    "HEAVY CRATE: big slow shells",
+    29
+   ],
+   [
+    "CRESCENDO: dodge to stack damage",
+    26
+   ],
+   [
+    "NOVA: a ring blast on every bar line",
+    26
+   ],
+   [
+    "LIFE LEECH: kills heal a little",
+    26
+   ],
+   [
+    "CHORD: blocks one hit, rings on the beat",
+    24
+   ],
+   [
+    "ECHO: shots return on the next beat",
+    22
+   ],
+   [
+    "RICOCHET: shots bounce off edges",
+    22
+   ]
+  ],
+  "mutators": {},
+  "setPieces": {
+   "set:weave": 104,
+   "fence:fence": 103,
+   "drop:hit": 255,
+   "drop:miss": 1,
+   "set:turretLine": 31,
+   "set:swarm": 26,
+   "set:wedge": 32,
+   "set:phalanx": 20
+  },
+  "pitStops": 0
+ },
+ "meta": {
+  "date": "2026-10-18T16:19:50.373Z",
+  "configs": [
+   "arcade-normal",
+   "classic-normal",
+   "arcade-easy",
+   "arcade-hard",
+   "endless-normal",
+   "endless-hard",
+   "endless-natural"
+  ],
+  "stages": [
+   1,
+   45
+  ],
+  "pageErrors": [],
+  "realSecs": 187
+ }
+}
