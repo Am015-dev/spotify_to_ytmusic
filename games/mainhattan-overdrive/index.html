@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.102',date:'18 Oct 2026',items:[{t:'FIXED',s:'Frankfurt: no more half-second freezes when new buildings appear (worst frame 640 ms to about 200 ms).'},{t:'CHANGED',s:'The smash-target search and camera wall check now spread their work over several frames.'}]},
 {v:'v90m-beta.101',date:'18 Oct 2026',items:[{t:'FIXED',s:'Fewer hiccups in Athens: the people and ground checks no longer create throwaway data every frame.'},{t:'CHANGED',s:'Smaller per-frame cleanups for roads and city lookups.'}]},
 {v:'v90m-beta.100',date:'18 Oct 2026',items:[{t:'FIXED',s:'Athens: far fewer stutters while driving. Ground tiles and street props now load in small slices (worst load step 120 ms to 19 ms).'},{t:'CHANGED',s:'Ground lighting is computed piece by piece instead of all at once.'}]},
 {v:'v90m-beta.99',date:'18 Oct 2026',items:[{t:'FIXED',s:'Race rivals that get stuck rocking back and forth now free themselves after a few seconds.'},{t:'FIXED',s:'Parked traffic is cleared off the race line when a race starts.'}]},
@@ -16026,12 +16027,13 @@ const _dsO={g:0,deck:null,low:false};// perf-2: scratch result (the shortcut sca
 function DEST_open(ax,az,bx,bz){const L=Math.hypot(bx-ax,bz-az),dx=(bx-ax)/L,dz=(bz-az)/L;let off=0,n=0,g0=groundAt(ax,az,99);for(let s=3;s<=L-3;s+=1.5){const x=ax+dx*s,z=az+dz*s,g=groundAt(x,z,99);n++;if(roamHit(x,z,3.8,g+.6)||inRiver(x,z,2)||roamTerr(x,z,g+.3,_dsO).low||Math.abs(g-g0)>.5||g<-1||Math.abs(groundAt(x+dz*1.6,z-dx*1.6,99)-g)>.6||Math.abs(groundAt(x-dz*1.6,z+dx*1.6,99)-g)>.6)return 0;g0=g;if(!LF_onRoad(x,z))off++;const PL=HUB.pgrid&&HUB.pgrid.get(Math.floor(x/16)*10000+Math.floor(z/16));if(PL)for(const p of PL){const d=HUB.ptypes[p.t];if(d&&d.r>=1.1&&Math.hypot(p.x-x,p.z-z)<d.r+2)return 0}}if(n<6||off/n<.6)return 0;
  const LF=window.__life;if(LF&&LF.cell&&LF.CELL){/* solid LIFE set pieces (crane, carousel, fountain...) near the line; the small ones smash and do not count */try{const C=LF.CELL,seen=new Set();for(let s=0;s<=L;s+=C/2){const x=ax+dx*s,z=az+dz*s,ca=Math.floor(x/C),cb=Math.floor(z/C);for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const k=(ca+da)*100000+cb+db;if(seen.has(k))continue;seen.add(k);for(const it of LF.cell(ca+da,cb+db)){if(it.c!=='set'||DEST_SET[it.t])continue;const t=clamp(((it.x-ax)*dx+(it.z-az)*dz),0,L);if(Math.hypot(ax+dx*t-it.x,az+dz*t-it.z)<it.r+4)return 0}}}}catch(e){}}
  return off/n}
-function DEST_find(budgetMs){const N=HUB.nodes;if(!N||!DEST.on)return;const t0=performance.now(),S=DEST;S.found=S.found||[];
- for(;S.scI<N.length&&performance.now()-t0<budgetMs;S.scI++){const A=N[S.scI];if(!A||A.ab||!A.nb||!A.nb.length)continue;let D=null;
-  if(S.gN!==N){S.gN=N;S.grid=DEST_grid(N)}const C=DEST_cand;C.length=0;const ca=Math.floor(A.x/130),cb=Math.floor(A.z/130);
-  for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const L=S.grid.get((ca+da)*100000+cb+db);if(L)for(let t=0;t<L.length;t++)if(L[t]>S.scI)C.push(L[t])}C.sort((p,q)=>p-q);
-  for(let c=0;c<C.length;c++){const j=C[c],B=N[j];if(!B||B.ab||!B.nb||!B.nb.length)continue;const dx=B.x-A.x,dz=B.z-A.z;if(Math.abs(dx)>130||Math.abs(dz)>130)continue;const L=Math.hypot(dx,dz);if(L<60||L>130)continue;
-   D=D||DEST_dij(N,S.scI,L*2.2);const R=DEST_dget(D,j);if(R==null||R<L*1.7)continue;const o=DEST_open(A.x,A.z,B.x,B.z);if(!o)continue;
+function DEST_find(budgetMs){const N=HUB.nodes;if(!N||!DEST.on)return;const t0=performance.now(),S=DEST;S.found=S.found||[];let did=0;
+ for(;S.scI<N.length;S.scI++,S.cj=-1){if(did&&performance.now()-t0>=budgetMs)break;const A=N[S.scI];if(!A||A.ab||!A.nb||!A.nb.length)continue;
+  if(S.gN!==N){S.gN=N;S.grid=DEST_grid(N)}const C=DEST_cand;
+  if(!(S.cj>=0)){S.cj=0;S.Dd=false;C.length=0;const ca=Math.floor(A.x/130),cb=Math.floor(A.z/130);
+   for(let da=-1;da<=1;da++)for(let db=-1;db<=1;db++){const L=S.grid.get((ca+da)*100000+cb+db);if(L)for(let t=0;t<L.length;t++)if(L[t]>S.scI)C.push(L[t])}C.sort((p,q)=>p-q)}
+  for(;S.cj<C.length;S.cj++){if(did&&performance.now()-t0>=budgetMs)return;const j=C[S.cj],B=N[j];if(!B||B.ab||!B.nb||!B.nb.length)continue;const dx=B.x-A.x,dz=B.z-A.z;if(Math.abs(dx)>130||Math.abs(dz)>130)continue;const L=Math.hypot(dx,dz);if(L<60||L>130)continue;
+   if(!S.Dd){DEST_dij(N,S.scI,L*2.2);S.Dd=true}did++;const R=DEST_dget(DEST_DJ,j);if(R==null||R<L*1.7)continue;const o=DEST_open(A.x,A.z,B.x,B.z);if(!o)continue;
    S.found.push({a:{x:A.x,z:A.z},b:{x:B.x,z:B.z},len:Math.round(L),road:Math.round(R),save:+(1-L/R).toFixed(2)})}}
  if(S.scI>=N.length&&!S.sc){S.found.sort((p,q)=>q.save*Math.min(q.len,140)-p.save*Math.min(p.len,140));const pick=[];for(const c of S.found){if(pick.length>=9)break;if(pick.every(p=>Math.hypot(p.a.x-c.a.x,p.a.z-c.a.z)>250&&Math.hypot(p.b.x-c.b.x,p.b.z-c.b.z)>250))pick.push(c)}S.sc=pick;DEST_mark(pick)}}
 let DEST_texM=null;
@@ -16043,8 +16045,8 @@ function DEST_mark(list){if(!list.length)return;if(!DEST_texM){const[pc,pg]=cv(6
   for(let s=14;s<L-12;s+=9){const x=c.a.x+ux*s,z=c.a.z+uz*s,m=new THREE.Mesh(new THREE.BoxGeometry(.8,.28,.8),DEST_texM);m.position.set(x,groundAt(x,z,99)+.2,z);m.visible=false;grp.add(m);c.mk.push(m)}}
  HUB.grp.add(grp)}
 function DEST_check(c){if(c.ok!=null)return c.ok;c.ok=!!DEST_open(c.a.x,c.a.z,c.b.x,c.b.z);for(const m of c.mk||[])m.visible=c.ok;return c.ok}
-function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(DEST.scGrp);DEST.scGrp=null;DEST.sc=null;DEST.found=null;DEST.scI=0;DEST.N=HUB.nodes;DEST.gN=null}
-const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.sc){try{DEST_find(4)}catch(e){DEST.sc=[];console.warn('DEST',e)}}else if(DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350)DEST_check(c)};
+function DEST_reset(){if(DEST.scGrp&&DEST.scGrp.parent)DEST.scGrp.parent.remove(DEST.scGrp);DEST.scGrp=null;DEST.sc=null;DEST.found=null;DEST.scI=0;DEST.cj=-1;DEST.N=HUB.nodes;DEST.gN=null}
+const DEST_step=dt=>{DEST.fr++;DEST.hv.push(Math.abs(RO.v));if(DEST.hv.length>9)DEST.hv.shift();if(state!=='roam'||!RO.on||!HUB.nodes||!DEST.on)return;if(DEST.N!==HUB.nodes)DEST_reset();if(!DEST.sc){try{DEST_find(4)}catch(e){DEST.sc=[];console.warn('DEST',e)}}else if(DEST.fr%20===0)for(const c of DEST.sc)if(c.ok==null&&Math.hypot(c.a.x-RO.x,c.a.z-RO.z)<350){DEST_check(c);break}};   /* perf-10: one re-check per 20 frames (was all of them at once) */
 smashCheck=(f=>function(dt){DEST_step(dt);return f.apply(this,arguments)})(smashCheck);
 function R3E_builderGo(){if(typeof BX==='undefined')return'📍 builder missing ❌';const T=window.__tq&&__tq.o,was=BX.on,IDS=['#menu','#topBtns','#hud','#touch'],hid=IDS.map(i=>{const e=$(i);return e?e.hidden:null});try{if(!BX.on)BX_open();const ok=b=>b?' ✅':' ❌',cam=BX.cam,d0=T&&T.draw;if(T)T.draw=1;
   cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();BX_camBuild();renderer.setRenderTarget(null);renderer.render(BX.sc,cam);
@@ -16124,9 +16126,12 @@ function GFX_aoSize(){if(GFX.gtao){const pr=renderer.getPixelRatio();GFX.gtao.se
 resize=(f=>function(){f.apply(this,arguments);GFX_aoSize()})(resize);addEventListener('resize',GFX_aoSize);   // the window listener holds the unwrapped resize
 function GFX_car(){if(!pl||!pl.mesh||!RO.shadowOn)return;pl.mesh.traverse(o=>{if(!o.isMesh)return;for(const m of[].concat(o.material))if(m&&m.isMeshStandardMaterial&&!m.transparent&&m.metalness<.2&&!m.userData.gfxCar){m.userData.gfxCar=1;m.userData.gfx0=m.userData.gfx0||[m.roughness,m.envMapIntensity];m.roughness=Math.min(m.roughness,.18);m.envMapIntensity=1.7;if(!GFX.pm.includes(m))GFX.pm.push(m);GFX.mats.add(m)}if(o.userData.art6c&&!o.userData.gfxUnl){delete o.castShadow;o.userData.gfxUnl=1}o.castShadow=true;o.receiveShadow=false})}
 function GFX_carLock(){if(pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.userData.gfxUnl){o.userData.gfxUnl=0;Object.defineProperty(o,'castShadow',{configurable:true,get(){return false},set(v){}})}})}
-function GFX_cast(){let k=0;scene.traverse(o=>{if(!o.isMesh||o.castShadow||o.userData.gfxNo||!o.geometry||!o.visible||o===sky)return;const g=o.geometry,m0=[].concat(o.material)[0];if(!m0||m0.transparent||m0.isMeshBasicMaterial||m0.isShaderMaterial||o.userData.art6||GFX_flat(o)){o.userData.gfxNo=1;return}if(!g.boundingBox)g.computeBoundingBox();
+function GFX_bbox(g){const p=g.attributes.position;if(!p||p.isInterleavedBufferAttribute||g.morphAttributes.position||!(p.array instanceof Float32Array)||p.itemSize!==3||p.normalized||p.array.length<p.count*3){g.computeBoundingBox();return}
+  const a=p.array,n=p.count*3;let x0=Infinity,y0=Infinity,z0=Infinity,x1=-Infinity,y1=-Infinity,z1=-Infinity;for(let i=0;i<n;i+=3){const x=a[i],y=a[i+1],z=a[i+2];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z}
+  g.boundingBox=(g.boundingBox||new THREE.Box3());if(n)g.boundingBox.min.set(x0,y0,z0),g.boundingBox.max.set(x1,y1,z1);else g.boundingBox.makeEmpty()}
+function GFX_cast(){let k=0;const t0=performance.now();GFX.castMore=false;scene.traverse(o=>{if(GFX.castMore||!o.isMesh||o.castShadow||o.userData.gfxNo||!o.geometry||!o.visible||o===sky)return;if(performance.now()-t0>3){GFX.castMore=true;return}const g=o.geometry,m0=[].concat(o.material)[0];if(!m0||m0.transparent||m0.isMeshBasicMaterial||m0.isShaderMaterial||o.userData.art6||GFX_flat(o)){o.userData.gfxNo=1;return}if(!g.boundingBox)GFX_bbox(g);
   if((g.boundingBox.max.y-g.boundingBox.min.y)*Math.abs(o.scale.y)<1.2){o.userData.gfxNo=1;return}o.castShadow=true;o.receiveShadow=true;o.userData.gfxCast=1;k++});GFX.cast=(GFX.cast||0)+k}
-function GFX_frame(){if(!GFX.on||state!=='roam')return;const now=performance.now();if(now<GFX.t)return;GFX.t=now+2500;GFX.fc=(GFX.fc||0)+1;try{GFX_shadow();GFX_car();if(RO.shadowOn)GFX_cast()}catch(e){GFX.err=String(e)}try{GFX_ao()}catch(e){GFX.aoErr=String(e)}try{GFX_plastic(scene)}catch(e){}}
+function GFX_frame(){if(!GFX.on||state!=='roam')return;const now=performance.now();if(GFX.castMore&&now>=(GFX.tc||0)&&now<GFX.t){GFX.tc=now+100;try{if(RO.shadowOn)GFX_cast();else GFX.castMore=false}catch(e){GFX.castMore=false}return}if(now<GFX.t)return;GFX.t=now+2500;GFX.fc=(GFX.fc||0)+1;try{GFX_shadow();GFX_car();if(RO.shadowOn)GFX_cast()}catch(e){GFX.err=String(e)}try{GFX_ao()}catch(e){GFX.aoErr=String(e)}try{GFX_plastic(scene)}catch(e){}}
 ART_light=(f=>function(){const r=f.apply(this,arguments);try{GFX_light()}catch(e){}return r})(ART_light);
 LK_roamLook=(f=>function(){const r=f.apply(this,arguments);try{GFX.t=0;GFX_frame()}catch(e){}return r})(LK_roamLook);
 function GFX_sunFollow(dt){const GFX_EL=TUNE.gfxEl,GFX_AZ=TUNE.gfxAz,GFX_SLEW=TUNE.gfxSlew;   // elevation ~34°, sun 160° from the view direction (behind, a little left): at 24°/140° Frankfurt's building rows shaded the whole road
@@ -16655,11 +16660,11 @@ function FCG_build(g,e,t0){const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0
     if((k&511)===511&&performance.now()-t0>FCG.ms)return}
   e.done=true;FCG.st.built++;FCG.st.tris+=e.n}
 function FCG_work(c,o){const t0=performance.now();FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(o).expandByScalar(80);
-  for(const m of FC.occ){if(m.isInstancedMesh||m.isBatchedMesh||!FCG_ok(m.geometry))continue;const g=m.geometry,e=FCG_get(g);if(e.done)continue;if(!g.boundingBox)g.computeBoundingBox();
+  for(const m of FC.occ){if(m.isInstancedMesh||m.isBatchedMesh||!FCG_ok(m.geometry))continue;const g=m.geometry,e=FCG_get(g);if(e.done)continue;if(!g.boundingBox){if(performance.now()-t0>FCG.ms)break;GFX_bbox(g)}   // perf-10: boxes inside the budget (one frame boxed every new occluder)
     if(!FCG.bx.copy(g.boundingBox).applyMatrix4(m.matrixWorld).intersectsBox(FCG.sg))continue;FCG_build(g,e,t0);if(performance.now()-t0>FCG.ms)break}
   FCG.st.ms+=performance.now()-t0}
 function FCG_hit(m,c,far){const g=m.geometry;if(!FCG_ok(g)||!m.layers.test(FC.rc.layers))return FCG_ok(g)?-1:null;const e=FCG.W.get(g);
-  if(!e||!e.done||e.pos!==g.attributes.position||e.ver!==g.attributes.position.version||e.ix!==g.index){FCG.st.miss++;return null}
+  if(!e||!e.done||e.pos!==g.attributes.position||e.ver!==g.attributes.position.version||e.ix!==g.index){FCG.st.miss++;return -1}   // perf-10: not indexed yet = no hit until FCG_work has built it (was three's full-triangle raycast: 40-55 ms frames in Frankfurt)
   const rd=FC.rc.ray.direction,ew=FCG.a.copy(rd).multiplyScalar(far).add(c);if(!g.boundingBox)g.computeBoundingBox();
   if(!FCG.bx.copy(g.boundingBox).applyMatrix4(m.matrixWorld).intersectsBox(FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(ew)))return -1;
   const iM=FCG.iM.copy(m.matrixWorld).invert(),lo=FCG.b.copy(c).applyMatrix4(iM),le=ew.applyMatrix4(iM),cs=FCG.cs;
