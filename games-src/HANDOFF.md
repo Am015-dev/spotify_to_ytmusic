@@ -4,6 +4,12 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun bullet readability F5 (flag RET.read, ?read=0 = old look, 18 Oct 2026)
+- `parts/readable.js` (built just before c.js): in play the backdrop is desaturated and dimmed to ~55% (one overlay after drawBG/drawBGP); edge beat pulse x0.7. Enemy bullets and hazards use ONE danger hue `READ.D` (#ff2d78, white core, dark ring); real pictures keep the picture and get the ring only. Player shots are cyan / blue-white at 70% (`READ.pc`). The 'up' pickup and the NOVA power-up are no longer pink. Hitbox dot on the ship (Settings > Assist 'Show hitbox', SET.hbox, default on). Telegraphs (ZOO.over, FXW beams, boss laser tells) sit on a dark halo. On-foot enemy shots use the same hue (foot.js hook).
+- Hooks are one line each in c.js, fx.js, draw.js, zoo.js, foot.js. Hit sizes, counts, caps and damage are untouched.
+- `readable-test.js` renders the same frozen frame with and without bullets. Bullet:backdrop contrast, median (worst 10%): phone 9.41 (5.22) -> 13.85 (7.36), desktop 8.25 (3.42) -> 12.96 (5.49). Weak: shard pickups and player shots share cyan; the painted orb is hue-turned, not repainted (wanted: a pink `fx-bullet-enemy.webp`).
+- Failing before this change, not mine: labassets-test (FXW.preview left on after Lab exit), f-checks (boss-time/telegraph/story-length).
+
 ## Nightrun on-foot street stage engine (W1, flag RET.foot, 18 Oct 2026)
 - `parts/foot.js` (after ret.js in build.py): own full-screen layer #footL, MENU button STREET RUN (unlocked by story stage 3). Stage `street1` = data in `FOOT.STAGES` (waves, 2 arena locks, mid checkpoint, warden boss arena, props). Weapons LV1-5 (`FOOT.WEAPONS`, trait at LV3/LV5, a hit = -1 LV), power-ups with levels (`FOOT.PICKUPS`). Uses FA / FOOT_ENEMIES / FOOT_BOSS when W2/W3 are merged, else built-in fallbacks (`FOOT.FB`). Body coords: x = centre, y = feet.
 - Fairness: telegraph >= 0.4 s and release on the half beat, at most 5 shots winding up (x diff), 40 bullet cap, entry grace 0.9 s, no shots from off-screen, view 480-760 wide on every screen, 8-way aim + 0.3 rad aim assist. Idle hero dies (gangs after 7 s without progress).
