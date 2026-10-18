@@ -88,7 +88,7 @@ STR_lzFree=(f=>function(L){if(L&&L.lf)LF_unreg(L);return f.apply(this,arguments)
 function LF_fit(L,p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,y0=p.y,cl=v=>Math.max(-1.2,Math.min(1.2,v));
  const gx=cl((gy(p.x+d,p.z)-gy(p.x-d,p.z))/(2*d)),gz=cl((gy(p.x,p.z+d)-gy(p.x,p.z-d))/(2*d));let lift=0,ok=false;
  for(let it=0;it<4&&!ok;it++){let hi=-9,lo=9;
-  for(const q of LF_PPOLY)for(const u of[.97,.5]){const a=q[0]*p.sx*u,b=q[1]*p.sz*u,dx=c*a+s*b,dz=-s*a+c*b,r=gy(p.x+dx,p.z+dz)-(y0+gx*dx+gz*dz);hi=Math.max(hi,r);lo=Math.min(lo,r)}
+  for(const q of LF_PPOLY)for(const u of LF_U2){const a=q[0]*p.sx*u,b=q[1]*p.sz*u,dx=c*a+s*b,dz=-s*a+c*b,r=gy(p.x+dx,p.z+dz)-(y0+gx*dx+gz*dz);hi=Math.max(hi,r);lo=Math.min(lo,r)}
   hi=Math.max(hi,0);lo=Math.min(lo,0);if(hi-lo<=.3){ok=true;lift=hi}else{p.sx*=.7;p.sz*=.7}}
  if(!ok){p.sx=p.sz=0;return}
  p.y=y0+lift;p.gx=gx;p.gz=gz;
@@ -104,8 +104,21 @@ function LF_warm(){if(LF.warmed||/[?&]lfw=0/.test(location.search))return;LF.war
  scene.add(G);try{P2_compile(scene,camera)}catch(e){console.warn('LF warm',e)}finally{scene.remove(G);b.dispose();pg.dispose();for(const o of G.children)if(o.dispose)o.dispose()}}
 function LF_patchMat(){return LF.pm||(LF.pm=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-4}))}
 // patch residual vs its best tilted plane (same samples as LF_fit): small = keep the cheap instanced plane, big = drape it
-function LF_resid(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,g0=gy(p.x,p.z),gx=(gy(p.x+d,p.z)-gy(p.x-d,p.z))/(2*d),gz=(gy(p.x,p.z+d)-gy(p.x,p.z-d))/(2*d);let hi=-9,lo=9;
- for(const q of LF_PPOLY)for(const u of[.97,.5]){const a=q[0]*p.sx*u,b=q[1]*p.sz*u,dx=c*a+s*b,dz=-s*a+c*b,r=gy(p.x+dx,p.z+dz)-(g0+gx*dx+gz*dz);hi=Math.max(hi,r);lo=Math.min(lo,r)}return Math.max(hi,0)-Math.min(lo,0)}
+// perf-14: the ground under a patch is sampled in batches (LF_gyB) into typed scratch: the per-sample gy() chain (groundY > TR_Y > athShelfY(TR_G) + LF_mound) runs Maglev-only,
+// so every call boxed ~5 doubles (LF_drapeOk + LF_resid were ~215 MB / 10 s in Athens). Athens inlines TR_G's bilinear (same ops, same result) and calls athShelfY / LF_mound
+// only in cells that have a shelf / a mound; Frankfurt keeps the plain chain. ?lfb=0 = the old per-sample calls.
+const LF_U2=[.97,.5],LF_SX=new Float64Array(256),LF_SZ=new Float64Array(256),LF_SY=new Float64Array(256);LF.gyb=!/[?&]lfb=0\b/.test(location.search);
+function LF_gyB(X,Z,Y,n){if(!n)return;if(CID==='fra'||!LF.gyb){for(let i=0;i<n;i++)Y[i]=groundY(X[i],Z[i])+LF_mound(X[i],Z[i]);return}
+ TR_G(X[0],Z[0]);const h=TR_h,nx=TR_nx,nz=TR_nz,r=TR_r,MG=LF.MG,mg=MG.size>0;
+ for(let i=0;i<n;i++){const x=X[i],z=Z[i];let fx=(x-WX0)/r,fz=(z-WZS)/r;fx=fx<0?0:fx>nx-1.001?nx-1.001:fx;fz=fz<0?0:fz>nz-1.001?nz-1.001:fz;const a=fx|0,b=fz|0,tx=fx-a,tz=fz-b,k=b*nx+a;
+  let g=(h[k]*(1-tx)+h[k+1]*tx)*(1-tz)+(h[k+nx]*(1-tx)+h[k+nx+1]*tx)*tz;
+  if(SHELF.has(Math.floor(x/32)*100000+Math.floor(z/32)))g=athShelfY(x,z,g);
+  if(mg&&MG.has(Math.floor(x/64)*10000+Math.floor(z/64)))g+=LF_mound(x,z);Y[i]=g}}
+function LF_resid(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),d=1.5,x0=p.x,z0=p.z,SX=LF_SX,SZ=LF_SZ,SY=LF_SY;
+ SX[0]=x0;SZ[0]=z0;SX[1]=x0+d;SZ[1]=z0;SX[2]=x0-d;SZ[2]=z0;SX[3]=x0;SZ[3]=z0+d;SX[4]=x0;SZ[4]=z0-d;let m=5;
+ for(let i=0;i<LF_PPOLY.length;i++){const q=LF_PPOLY[i];for(let j=0;j<2;j++){const u=LF_U2[j],a=q[0]*p.sx*u,b=q[1]*p.sz*u;SX[m]=x0+(c*a+s*b);SZ[m]=z0+(-s*a+c*b);m++}}
+ LF_gyB(SX,SZ,SY,m);const g0=SY[0],gx=(SY[1]-SY[2])/(2*d),gz=(SY[3]-SY[4])/(2*d);let hi=-9,lo=9;m=5;
+ for(let i=0;i<LF_PPOLY.length;i++){const q=LF_PPOLY[i];for(let j=0;j<2;j++){const u=LF_U2[j],a=q[0]*p.sx*u,b=q[1]*p.sz*u,dx=c*a+s*b,dz=-s*a+c*b,r=SY[m++]-(g0+gx*dx+gz*dz);hi=Math.max(hi,r);lo=Math.min(lo,r)}}return Math.max(hi,0)-Math.min(lo,0)}
 // one merged INDEXED draped mesh for the uneven patches of a tile: centre + 9 inner (r .5) + 18 rim points, y = ground + .035 at every vertex
 const LF_DT=(()=>{const V=[[0,0]],I=[];for(let i=0;i<9;i++)V.push(LF_PPOLY[i].map(v=>v*.5));for(let i=0;i<18;i++){const a=LF_PPOLY[i>>1],b=LF_PPOLY[((i>>1)+1)%9],t=(i&1)/2;V.push([a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t])}
  const T=(a,b,c)=>{const u=V[b][0]-V[a][0],v=V[b][1]-V[a][1],w=V[c][0]-V[a][0],x=V[c][1]-V[a][1];/* (u,0,v)x(w,0,x).y = v*w-u*x must be > 0 (normal up) */if(v*w-u*x>0)I.push(a,b,c);else I.push(a,c,b)};
@@ -116,11 +129,12 @@ const LF_DT=(()=>{const V=[[0,0]],I=[];for(let i=0;i<9;i++)V.push(LF_PPOLY[i].ma
 // a failing patch is tried at 0.7x and 0.5x its size (the error falls with size squared), then dropped.
 // perf-3: no per-call arrays (was 28 vertex arrays + 5 weight arrays per triangle per try, ~2 GB / 20 s in Athens); scratch buffers, _vy keeps a Float32Array per prop
 const LF_DW=[1/3,1/3,1/3,.5,.5,0,0,.5,.5,.5,0,.5],LF_DX=new Float64Array(LF_DT.V.length),LF_DY=new Float64Array(LF_DT.V.length),LF_DZ=new Float64Array(LF_DT.V.length);
-function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),Q=LF_DT.V,n=Q.length,I=LF_DT.I,X=LF_DX,Y=LF_DY,Z=LF_DZ,W=LF_DW;
- for(let i=0;i<n;i++){const a=Q[i][0]*p.sx,b=Q[i][1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;X[i]=x;Y[i]=gy(x,z);Z[i]=z}
+function LF_drapeOk(p,gy){const c=Math.cos(p.ry||0),s=Math.sin(p.ry||0),Q=LF_DT.V,n=Q.length,I=LF_DT.I,X=LF_DX,Y=LF_DY,Z=LF_DZ,W=LF_DW,SX=LF_SX,SZ=LF_SZ,SY=LF_SY;
+ for(let i=0;i<n;i++){const a=Q[i][0]*p.sx,b=Q[i][1]*p.sz,x=p.x+c*a+s*b,z=p.z-s*a+c*b;X[i]=x;Z[i]=z}LF_gyB(X,Z,Y,n);
  const vy=p._vy&&p._vy.length===n?p._vy:(p._vy=new Float32Array(n));for(let i=0;i<n;i++)vy[i]=Y[i];
- for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];for(let k=0;k<12;k+=3){const u=W[k],v=W[k+1],w=W[k+2],x=X[a]*u+X[b]*v+X[d]*w,z=Z[a]*u+Z[b]*v+Z[d]*w;
-  const e=Y[a]*u+Y[b]*v+Y[d]*w-gy(x,z);if(e>.012||e<-.07)return false}}return true}
+ let m=0;for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];for(let k=0;k<12;k+=3){const u=W[k],v=W[k+1],w=W[k+2];SX[m]=X[a]*u+X[b]*v+X[d]*w;SZ[m]=Z[a]*u+Z[b]*v+Z[d]*w;m++}}
+ LF_gyB(SX,SZ,SY,m);m=0;
+ for(let t=0;t<I.length;t+=3){const a=I[t],b=I[t+1],d=I[t+2];for(let k=0;k<12;k+=3){const e=Y[a]*W[k]+Y[b]*W[k+1]+Y[d]*W[k+2]-SY[m++];if(e>.012||e<-.07)return false}}return true}
 // perf-8: a sliced generator (was one step of 20-75 ms in Athens): patches in ≤1.2 ms slices, typed index, and each patch's vertex normals summed
 // here exactly as BufferGeometry.computeVertexNormals does (area-weighted face normals, patches share no vertices), so no pass over the whole mesh
 function* LF_drapeG(L,A,gy,out){const n=LF_DT.V.length,DI=LF_DT.I,ni=DI.length,pos=new Float32Array(A.length*n*3),col=new Float32Array(A.length*n*3),nor=new Float32Array(A.length*n*3),idx=new (A.length*n>65535?Uint32Array:Uint16Array)(A.length*ni),C=new THREE.Color();if(!L.lfP)L.lfP=[];
