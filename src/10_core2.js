@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.98',date:'18 Oct 2026',items:[{t:'FIXED',s:'River race: rivals brake in time for the last corner instead of overshooting.'},{t:'FIXED',s:'Westend race: rivals follow the streets instead of trying to drive through buildings.'}]},
 {v:'v90m-beta.97',date:'18 Oct 2026',items:[{t:'CHANGED',s:'Less lag: thousands of far-away street props are no longer drawn.'},{t:'CHANGED',s:'Smash debris costs nothing when nothing is breaking.'}]},
 {v:'v90m-beta.96',date:'18 Oct 2026',items:[{t:'FIXED',s:'GP rivals no longer get stuck circling at a building: they finish every race.'},{t:'FIXED',s:'River race: the boat no longer stalls on the slipway.'},{t:'FIXED',s:'Rivals keep their speed when cars bump them in a race.'},{t:'CHANGED',s:'Less lag: far-away city props and road markings are no longer drawn.'}]},
 {v:'v90m-beta.95',date:'18 Oct 2026',items:[{t:'FIXED',s:'Athens start: the big ochre walls over the road are gone.'},{t:'FIXED',s:'Smash debris fades out near the camera, so it no longer blocks your view in races.'},{t:'FIXED',s:'The speed gauge hides behind result screens.'},{t:'CHANGED',s:'Low quality draws fewer far-away objects.'}]},
