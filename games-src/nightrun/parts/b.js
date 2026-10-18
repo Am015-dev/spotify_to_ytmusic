@@ -342,7 +342,7 @@ function update(dt){
   /* enemies */
   const sdtA=sdt;
   for(const e of G.en){const sdt=e.gnd||!window.LEAK||!RET.leak?sdtA:sdtA*LEAK.es(e);e.t+=sdt;e.flash=Math.max(0,e.flash-dt);   // leak.js: flyers are calmer (LEAK.es), ground enemies keep their own pace
-    switch(window.ZOO&&RET.zoo&&ZOO.mv(e,sdt,d)?'_z':e.type){   // zoo.js: hovering flyers + the new kinds move themselves
+    switch(e.fp&&window.FM&&FM.mv(e,sdt,d)||window.ZOO&&RET.zoo&&ZOO.mv(e,sdt,d)?'_z':e.type){   // formations.js: units on a path (RET.vary); zoo.js: hovering flyers + the new kinds move themselves
       case'drone':e.x-=(120+15*d)*sdt;e.y=e.by+Math.sin(G.bp*Math.PI/2+(e.ph||0))*(e.amp||0);break;
       case'turret':if(e.t<6.5){if(e.x>e.stop)e.x-=150*sdt;}else{e.x-=180*sdt;e.y-=40*sdt;}break;
       case'charger':{const aw=Math.max(.55,BT.spb*1.05);if(DMG.on&&e.x>W-70&&e.t<3){e.x-=Math.max(130,(e.x-W+70)*2.2)*sdt;e.t=Math.min(e.t,.35);}else if(e.t<.7)e.x-=130*sdt;else if(e.t<.7+aw){e.y+=(P.y-e.y)*Math.min(1,sdt*5);e.aimL=1;}else{e.aimL=0;e.x-=(DMG.on?Math.min(DMG.cvMax,DMG.cv+40*d):600+60*d)*sdt*(e.el?1.2:1);}}break;
