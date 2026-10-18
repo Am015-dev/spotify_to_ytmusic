@@ -1928,5 +1928,125 @@
   "where": "New enemy kind (coloured shape drawn in parts/zoo.js until this exists)",
   "notes": "Minelayer: yellow-green hull with a round mine hatch on the belly and a rack of mines at the back. Faces LEFT, transparent, 128 px square, same painted style as spr-en-*.",
   "kind": "sprite"
+ },
+ {
+  "file": "fl-captive.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Captive DATA SPRITE in its cage (parts/flavor.js draws a caged diamond drone until this exists)",
+  "notes": "A small hacked courier drone, yellow diamond hull with one red eye, trapped inside a round glowing cyan cage with thin bars. Transparent, centred, painted like spr-en-*.",
+  "kind": "sprite"
+ },
+ {
+  "file": "fl-lamp.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Breakable street lamp drifting in the background lane",
+  "notes": "A tall neon street lamp with a warm glowing bulb, slightly translucent look, dark outline. Transparent, centred.",
+  "kind": "sprite"
+ },
+ {
+  "file": "fl-sign.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Breakable neon sign",
+  "notes": "A rectangular neon shop sign with a bright line of tube light, cyan or magenta glow. Transparent, centred.",
+  "kind": "sprite"
+ },
+ {
+  "file": "fl-billboard.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Breakable billboard",
+  "notes": "A small advert billboard on two legs, dark panel with a bright stripe. Transparent, centred.",
+  "kind": "sprite"
+ },
+ {
+  "file": "fl-crate.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Breakable floating cargo crate and reward chest",
+  "notes": "A cargo crate with cross bracing and a faint amber glow; a gold latch for the chest version. Transparent, centred.",
+  "kind": "sprite"
+ },
+ {
+  "file": "fl-chest.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Reward chest after a convoy or collapse",
+  "notes": "A metal reward chest with a bright gold latch, glowing at the seams. Transparent, centred.",
+  "kind": "sprite"
+ },
+ {
+  "file": "fl-secret.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Secret marker (faint ring) and the medal item",
+  "notes": "A thin dashed golden ring with a sparkle in the middle; also used for the secret medal item. Transparent, centred.",
+  "kind": "icon"
+ },
+ {
+  "file": "fl-medal-noleak.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Clear screen medal NO LEAK (parts/flavor.js draws a coloured glyph until this exists)",
+  "notes": "Round medal badge: a shield-like badge, cyan. Same painted style as ach-*.webp. Transparent, centred.",
+  "kind": "icon"
+ },
+ {
+  "file": "fl-medal-nohit.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Clear screen medal NO HIT (parts/flavor.js draws a coloured glyph until this exists)",
+  "notes": "Round medal badge: a plus/cross badge, green. Same painted style as ach-*.webp. Transparent, centred.",
+  "kind": "icon"
+ },
+ {
+  "file": "fl-medal-rescued.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Clear screen medal ALL RESCUED (parts/flavor.js draws a coloured glyph until this exists)",
+  "notes": "Round medal badge: a heart with a small drone, pink. Same painted style as ach-*.webp. Transparent, centred.",
+  "kind": "icon"
+ },
+ {
+  "file": "fl-medal-secret.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Clear screen medal SECRET (parts/flavor.js draws a coloured glyph until this exists)",
+  "notes": "Round medal badge: a star with a keyhole, gold. Same painted style as ach-*.webp. Transparent, centred.",
+  "kind": "icon"
+ },
+ {
+  "file": "fl-medal-speed.webp",
+  "w": 128,
+  "h": 128,
+  "group": "Shooter flavour",
+  "status": "RESERVED",
+  "where": "Clear screen medal SPEED CLEAR (parts/flavor.js draws a coloured glyph until this exists)",
+  "notes": "Round medal badge: a double chevron, orange. Same painted style as ach-*.webp. Transparent, centred.",
+  "kind": "icon"
  }
 ]

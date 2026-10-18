@@ -153,5 +153,17 @@
 "en-kamikaze.webp": "dcbbf87620254f2efaca31ff4f5f6dc4",
 "en-healer.webp": "cba4aeb64b50ab683d2b7226de9279a5",
 "en-carrier.webp": "62fdf5b271482e7a6e5d95dc5567c948",
-"en-minelayer.webp": "7df5044a51db1649f5bea24e8e2cc0b1"
+"en-minelayer.webp": "7df5044a51db1649f5bea24e8e2cc0b1",
+"fl-captive.webp": "873b86f50f5bb6f829e03656be6f6812",
+"fl-lamp.webp": "903ec4213b42b23dc5967438165e8575",
+"fl-sign.webp": "e95d5e46309670fdff4eee681a123d8a",
+"fl-billboard.webp": "6377d3d08d51d9a4d81043e8575834b3",
+"fl-crate.webp": "355b0d5cf1c24b95fa547731731c33f1",
+"fl-chest.webp": "039573d9c6305c32c738be52cba1811d",
+"fl-secret.webp": "e2fc8b20023420fb1442bc2dde8982f2",
+"fl-medal-noleak.webp": "2ddcc7c30bc932d8aa59ce802a25865c",
+"fl-medal-nohit.webp": "8194872e31fe5ea2578626891d3bb260",
+"fl-medal-rescued.webp": "ce5d47fac45c1d1ccbb67a1bce929081",
+"fl-medal-secret.webp": "9f330ba4de2efb7cccd3c0db8630a1d9",
+"fl-medal-speed.webp": "30e609486c12da5e76b86f2f664f6109"
 }
