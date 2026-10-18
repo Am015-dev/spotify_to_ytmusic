@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.109',date:'18 Oct 2026',items:[{t:'FIXED',s:'Frankfurt: the Vex Kaiser finale no longer crashes when it starts.'},{t:'FIXED',s:'Smoother start: more graphics effects are prepared on the loading screen, and the smoothness report no longer causes a hitch (Frankfurt stutters in the first minute halved).'}]},
 {v:'v90m-beta.108',date:'18 Oct 2026',items:[{t:'FIXED',s:'First minute is smoother: new city blocks are placed a little each frame instead of freezing the game (Athens worst hitch 0.28 s to about 0.09 s).'},{t:'CHANGED',s:'Map, minimap and shortcut set-up now happen on the loading screen; Graphics Auto only changes sharpness in the first minute.'}]},
 {v:'v90m-beta.107',date:'18 Oct 2026',items:[{t:'FIXED',s:'Fewer stutters while driving: new streets are built a little each frame instead of all at once.'},{t:'NEW',s:'FPS chip: long-press the gear button (or Settings) to show smoothness on screen. The Beta also sends anonymous smoothness numbers so we can fix lag on real phones.'},{t:'FIXED',s:'Portrait quest bar keeps the distance, full rival names on phone, tidy garage, and the car no longer flips CAR/4x4 on every kerb.'}]},
 {v:'v90m-beta.106',date:'18 Oct 2026',items:[{t:'NEW',s:'Graphics Auto (new default): phones start in a light mode and only add detail when the game runs smoothly; PCs lower detail by themselves if frames slow down.'},{t:'FIXED',s:'Screen fits every size we tested, from small Android phones to iPads and ultrawide monitors; no text under 12 px.'}]},
@@ -1559,7 +1560,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"2c1a5bf0","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"6bf4e5c0"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"2c1a5bf0","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"051aec55"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -6822,12 +6823,12 @@ M1_rivalStep=(f=>function(ch,dt){if(M3_RACE[ch.m.ev.mid])return M3_rvStep(ch,dt)
 M1_clear=(f=>function(){f();M3_rvClear()})(M1_clear);
 M1_restore=(f=>function(ch,cp){M3.rest=cp;return f(ch,cp)})(M1_restore);
 const M3_SIR=[];function M3_sir(){if(!M3_SIR.length)M3_SIR.push(neonMat('#2d7bff',3),neonMat('#ff2d55',3));return M3_SIR}
-M1_goon=(f=>function(kind,x,z,o){const g=f(kind,x,z,o);if(kind==='police'){g.m.children[1].material=M3_sir()[0];g.siren=1}if(kind==='kaiser'){g.m.children[2].material=neonMat('#ffd12c',3.2);g.m.scale.setScalar(1.12)}return g})(M1_goon);
+M1_goon=(f=>function(kind,x,z,o){const g=f(kind,x,z,o);const bar=g.m.children[g.m.children.length-1];if(kind==='police'){if(bar&&bar.isMesh)bar.material=M3_sir()[0];g.siren=1}if(kind==='kaiser'){if(bar&&bar.isMesh)bar.material=neonMat('#ffd12c',3.2);g.m.scale.setScalar(1.12)}return g})(M1_goon);
 M1_setup=(f=>function(ch,S,i){f(ch,S,i);if(!M3_mine(ch))return;
   if(S.t==='heat'){S.heat=100;S.in=0;const g=new THREE.Group(),Mf=new THREE.MeshStandardMaterial({color:0x2a2f3a,roughness:.6});box(g,Mf,1.5,8,1.5,-9,4,-8);box(g,Mf,1.5,8,1.5,9,4,-8);box(g,Mf,1.5,8,1.5,-9,4,8);box(g,Mf,1.5,8,1.5,9,4,8);box(g,Mf,20,1.2,18,0,8.4,0);const sg=new THREE.Mesh(new THREE.BoxGeometry(20.4,1,18.4),neonMat('#4ceaff',2.4));sg.position.y=7.4;g.add(sg);const fm=new THREE.Mesh(new THREE.CircleGeometry(S.r,24).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x9fe8ff,transparent:true,opacity:.35,depthWrite:false}));fm.position.y=.1;g.add(fm);g.position.set(S.x,groundY(S.x,S.z),S.z);RO.grp.add(g);M1_obj({m:g});S.g=g;M1_spawn(S,'police',S.cops||3,null,90,160);say('POLICE!','LOSE THEM · HIDE IN THE CAR WASH',1.8)}
   if(S.t==='leap'){const b=M1_bridge(S.bridge);let p={x:RO.x,z:RO.z};if(b){const[x,z]=deckPt(b,-b.half-6);p=M1_P(x,z,90);for(const sd of[-1,1]){const[x2,z2]=deckPt(b,-8*sd);const pn=new THREE.Mesh(new THREE.BoxGeometry(b.w-4,1.2,22),new THREE.MeshStandardMaterial({color:0x6b6f78,roughness:.6}));pn.position.set(x2,deckY(b,0)+7,z2);pn.rotation.set(sd*.5,Math.atan2(b.ux,b.uz),0,'YXZ');RO.grp.add(pn);M1_obj({m:pn})}}S.x=p.x;S.z=p.z;S.tk=0;S.to=null;const rg=new THREE.Mesh(new THREE.TorusGeometry(10,.6,8,40),neonMat('#ff9a3c',2.6));rg.rotation.x=Math.PI/2;rg.position.set(S.x,groundY(S.x,S.z)+.6,S.z);RO.grp.add(rg);M1_obj({m:rg})}
   if(S.t==='booths'&&S.gen){for(const o of S.it){const c=new THREE.Mesh(new THREE.CylinderGeometry(1.4,1.4,10,10),neonMat(S.gen,2.6));c.position.y=11;o.m.add(c)}if(S.elite)M1_spawn(S,'shield',1,{x:S.x,z:S.z},90,150)}
-  if(S.t==='thieves'&&S.kz)for(const g of S.th){g.m.children[0].material=g.m.children[0].material.clone();g.m.children[0].material.color.set('#0b0b0e');g.m.children[2].material=neonMat('#ffd12c',3.2);g.m.scale.setScalar(1.15);g.kz=1;g.mT=3}
+  if(S.t==='thieves'&&S.kz)for(const g of S.th){const bar=g.m.children[g.m.children.length-1];if(bar&&bar.isMesh)bar.material=neonMat('#ffd12c',3.2);g.m.scale.setScalar(1.15);g.kz=1;g.mT=3}
   if(S.t==='goons'&&S.bossHp)for(const g of M1.goons)if(g.S===S&&!g.dead){g.hp=g.hp0=S.bossHp}})(M1_setup);
 M1_hooks=(f=>function(ch,S,i){if(M3_mine(ch))for(const g of M1.goons)if(!g.dead&&!g.S&&!g.leave){g.leave=1;g.st='flee';g.ft=99}f(ch,S,i);if(!M3_mine(ch))return;
   if(S.cops&&S.t!=='heat')M1_spawn(S,'police',S.cops,null,140,220);if(S.r3&&!M1.noScene)setTimeout(()=>{if(RO.ch===ch&&!M1.cs)M1_radio(S.r3[0],S.r3[1])},S.scene?300:900);
@@ -6858,7 +6859,7 @@ function M3_tick(dt){if(!RO.on||CID!=='fra')return;M1_st();const s=M3_st();
   M3.hcd=Math.max(0,M3.hcd-dt);if(M3.air){M3.airT+=dt;const g=groundAt(RO.x,RO.z,RO.y+1);if(M3.airT>.3&&RO.vy<=0&&RO.y<=g+.3){M3.air=0;if(s.shock)M3_shock()}}
   M3_eprojStep(dt);const ch=RO.ch;if(ch&&ch.v2&&M3_RACE[ch.m.ev.mid]&&(!M3.R||M3.Rch!==ch)){const S0=ch.v2.L.st[ch.v2.si];if(S0&&S0.race)M3_rvInit(ch)}
   if(M3_mine(ch)&&ch.v2){const S=ch.v2.L.st[ch.v2.si];
-    for(const g of M1.goons){if(g.siren&&!g.dead)g.m.children[2].material=M3_sir()[Math.floor(T*5+g.id)%2];if(g.kz&&!g.dead&&S&&S.mines&&g.S===S){g.mT-=dt;if(g.mT<=0&&Math.hypot(g.x-RO.x,g.z-RO.z)<200){g.mT=2.6;M1.mines.push(M1_mine(g.x-Math.sin(g.h)*7,g.z-Math.cos(g.h)*7,'enemy'))}}}
+    for(const g of M1.goons){if(g.siren&&!g.dead){const sb=g.m.children[g.m.children.length-1];if(sb&&sb.isMesh)sb.material=M3_sir()[Math.floor(T*5+g.id)%2]}if(g.kz&&!g.dead&&S&&S.mines&&g.S===S){g.mT-=dt;if(g.mT<=0&&Math.hypot(g.x-RO.x,g.z-RO.z)<200){g.mT=2.6;M1.mines.push(M1_mine(g.x-Math.sin(g.h)*7,g.z-Math.cos(g.h)*7,'enemy'))}}}
     if(S&&S.esc){const k=M1.goons.find(g=>g.S===S&&g.kind==='kaiser'&&!g.dead);if(k){S.escT-=dt;if(S.escT<=0){S.escT=22;if(M1.goons.filter(g=>!g.dead&&!g.S).length<3){M1_spawn(null,'rammer',2,null,120,200);M1_radio('KAISER',['Boys! <b>Escort!</b>','More of my crew, rookie. Enjoy.','Schattenwerk, to me!'][Math.floor(Math.random()*3)])}}
       if(k.hp<M3.khp){M3.khp=k.hp;if(k.hp>0&&k.hp<k.hp0)M1_radio('KAISER',k.hp>6?'A scratch. <b>Nothing more.</b>':k.hp>2?'My paint! You will <b>pay</b> for that!':'No... not like this!');if(k.hp<=4){for(let q=0;q<3;q++)M1.mines.push(M1_mine(k.x+rr(-8,8),k.z+rr(-8,8),'enemy'))}}}}}
   if((M3.twT=(M3.twT||0)-dt)<=0){M3.twT=.5;M3_tw()}}
@@ -15534,19 +15535,21 @@ function PB_reset(){PB.k=0;PB.slow=0;PB.worst=0;PB.busy=0;PB.sys={}}
 const PB_live=()=>!paused&&!document.hidden&&!LD.on&&(state==='roam'||state==='race'||state==='countdown');
 function PB_gpu(){if(PB.gpu)return PB.gpu;try{const gl=renderer.getContext(),e=gl.getExtension('WEBGL_debug_renderer_info');PB.gpu=String(e?gl.getParameter(e.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER)).slice(0,120)}catch(e){PB.gpu='?'}return PB.gpu}
 const PB_q=(a,k)=>a.length?a[Math.min(a.length-1,Math.floor(a.length*k))]:0,PB_r=x=>Math.round(x*10)/10;
-function PB_doc(){const a=Array.from(PB.iv.subarray(0,PB.k)).sort((x,y)=>x-y),n=a.length,m50=PB_q(a,.5),m90=PB_q(a,.9),top=Object.entries(PB.sys).sort((x,y)=>y[1]-x[1]).slice(0,3).map(([k,v])=>({k,ms:PB_r(v/Math.max(1,n))}));
+function PB_doc(S=PB){const a=S.iv.slice(0,S.k).sort(),n=a.length,m50=PB_q(a,.5),m90=PB_q(a,.9),top=Object.entries(S.sys).sort((x,y)=>y[1]-x[1]).slice(0,3).map(([k,v])=>({k,ms:PB_r(v/Math.max(1,n))}));
   let heap=null;try{const M=performance.memory;if(M)heap={usedMB:Math.round(M.usedJSHeapSize/1048576),limitMB:Math.round(M.jsHeapSizeLimit/1048576)}}catch(e){}
   let L=null;try{const l=window.__life&&window.__life.LIFE;if(l&&l.ms!=null)L=PB_r(l.ms)}catch(e){}
   let ifr=false;try{ifr=window.self!==window.top}catch(e){ifr=true}
-  return{at:new Date().toISOString(),n:PB.n+1,build:(()=>{try{return OD_CHANGELOG[0].v}catch(e){return'?'}})(),city:typeof CID!=='undefined'?CID:'?',mode:state==='race'||state==='countdown'||state==='finished'?'race':'roam',
+  return{at:new Date().toISOString(),n:S.n!=null?S.n:PB.n+1,build:(()=>{try{return OD_CHANGELOG[0].v}catch(e){return'?'}})(),city:typeof CID!=='undefined'?CID:'?',mode:state==='race'||state==='countdown'||state==='finished'?'race':'roam',
     ua:navigator.userAgent.slice(0,200),vp:innerWidth+'x'+innerHeight,dpr:+(devicePixelRatio||1).toFixed(2),pr:+renderer.getPixelRatio().toFixed(2),gpu:PB_gpu(),touch:!!lowGfx,iframe:ifr,
     gfx:SET.qm||SET.q,auto:!!GOV.on,tier:LK_LV[Math.min(3,GOV.d)]||SET.q,scale:+(DRES.s||1).toFixed(2),
-    frames:n,fps50:m50?Math.round(1000/m50):0,fps90:m90?Math.round(1000/m90):0,ms50:PB_r(m50),ms90:PB_r(m90),over50:PB.slow,worstMs:Math.round(PB.worst),busyMs:PB_r(PB.busy/Math.max(1,n)),top,lifeMs:L,heap,govLog:GOV.log.slice(-6)}}
+    frames:n,fps50:m50?Math.round(1000/m50):0,fps90:m90?Math.round(1000/m90):0,ms50:PB_r(m50),ms90:PB_r(m90),over50:S.slow,worstMs:Math.round(S.worst),busyMs:PB_r(S.busy/Math.max(1,n)),top,lifeMs:L,heap,govLog:GOV.log.slice(-6)}}
 async function PB_db(){if(window.__pbDbMock)return window.__pbDbMock;if(PB.db!==undefined)return PB.db;PB.db=null;try{if(window.claude&&claude.use)PB.db=await claude.use('db')||null}catch(e){PB.db=null}return PB.db}
 async function PB_send(doc){try{const db=await PB_db();if(!db||!db.collection)return'nodb';await db.collection('perf').add(doc);PB.sent.push(doc.at);return'sent'}catch(e){return'fail'}}
 function PB_tick(now){if(PB.n>=PB.max)return;
   if(!PB.t0){if(PB_live()&&state!=='countdown'&&Math.abs((state==='roam'?RO.v:pl&&pl.v)||0)>2){PB.t0=now;PB.next=now+20000;PB_reset()}return}
-  if(now>=PB.next&&PB.k>=30){const d=PB_doc();PB.n++;PB.next=now+60000;PB_reset();PB_send(d)}}
+  if(now>=PB.next&&PB.k>=30){const S={iv:PB.iv.slice(0,PB.k),k:PB.k,slow:PB.slow,worst:PB.worst,busy:PB.busy,sys:PB.sys,n:++PB.n};PB.next=now+60000;PB_reset();
+   setTimeout(()=>{try{PB_send(PB_doc(S))}catch(e){}},0)}}
+{const _lp=ldPrewarm;ldPrewarm=async function(...a){try{PB_gpu()}catch(e){}return _lp.apply(this,a)}}
 function PB_chipEl(){if(PB.chip)return PB.chip;const st=document.createElement('style');st.textContent='#pbChip{position:fixed;z-index:9989;left:50%;top:calc(1px + env(safe-area-inset-top,0px));transform:translateX(-50%);pointer-events:none;white-space:nowrap;font:700 12px/15px ui-monospace,monospace;color:#9fe8ff;background:rgba(0,0,0,.6);padding:1px 7px;border-radius:0 0 6px 6px}';document.head.appendChild(st);
   const el=document.createElement('div');el.id='pbChip';el.hidden=true;document.body.appendChild(el);return PB.chip=el}
 function PB_chipStep(now,ms){const el=PB_chipEl();if(!SET.fpsChip){if(!el.hidden)el.hidden=true;return}if(ms>0&&ms<1000)PB.cf.push(ms);if(now-PB.ct<500)return;PB.ct=now;
@@ -16303,6 +16306,17 @@ function GFX_pre(){if(!GFX.on||!GFX_BOOTPRE)return;const ro=RO.on;RO.on=true;
 {const _lp=ldPrewarm,_pc=P2_compile;let on=false;
  ldPrewarm=async function(...a){on=true;try{return await _lp.apply(this,a)}finally{on=false}};
  P2_compile=function(sc,cam){if(on){on=false;GFX_pre()}return _pc.call(this,sc,cam)}}
+const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
+{const _lp=ldPrewarm,_pc=P2_compile;let on=false;
+ ldPrewarm=async function(...a){on=WARMALL.on;try{return await _lp.apply(this,a)}finally{on=false}};
+ P2_compile=function(sc,cam){if(!on)return _pc.call(this,sc,cam);on=false;
+  try{const L=window.__life;if(L&&L.init&&L.LIFE&&L.LIFE.on)WARMALL.life=!!L.init()}catch(e){console.warn('warmall life',e)}
+  let gm=null;try{if(typeof worldGroundGen==='function'){const tx=CID==='fra'?groundTex('grass'):athGrassTex(),m=new THREE.MeshStandardMaterial({map:tx,vertexColors:true,roughness:.92});
+   if(typeof ENV_ground==='function')ENV_ground(m,{kind:'land',tint:true,base:WGC,s:[900,260,70]});m.polygonOffset=true;m.polygonOffsetFactor=1;m.polygonOffsetUnits=2;
+   const g=new THREE.BufferGeometry();for(const[k,n]of[['position',3],['normal',3],['uv',2],['color',3]])g.setAttribute(k,new THREE.Float32BufferAttribute(new Array(n*3).fill(0),n));
+   gm=new THREE.Mesh(g,m);gm.receiveShadow=true;gm.frustumCulled=false;sc.add(gm)}}catch(e){console.warn('warmall ground',e)}
+  const hid=[];sc.traverse(o=>{if(!o.visible){o.visible=true;hid.push(o)}});WARMALL.n=hid.length;
+  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}}}}
 function ENV_on(){if(ENV_on.v!==undefined)return ENV_on.v;let v=true;try{const q=new URLSearchParams(location.search).get('env1');if(q!==null)v=q!=='0';else if(typeof TUNE!=='undefined'&&TUNE.env1===0)v=false}catch(e){}return ENV_on.v=v}
 function ENV_lo(){try{if(typeof LK_lvl==='function'&&LK_lvl()==='low')return true;return typeof SET!=='undefined'&&SET.q==='low'}catch(e){return false}}
 function ENV_vn(x,z){const h=(a,b)=>{const v=Math.sin(a*127.1+b*311.7)*43758.5453;return v-Math.floor(v)},i=Math.floor(x),j=Math.floor(z);let fx=x-i,fz=z-j;fx=fx*fx*(3-2*fx);fz=fz*fz*(3-2*fz);
