@@ -4,7 +4,7 @@
 // within PC.keep m for shadows) are copied from a full source copy into the front of instanceMatrix and .count is set (CTB_step pattern).
 // setMatrixAt / getMatrixAt / setColorAt / getColorAt / raycast are wrapped so writes by the ORIGINAL index (smash, revive, colour) still land:
 // they go to the source copy and to the instance's current slot (slot[] map). ?pc5=0 = off. GO: perf5/compact (src/99c_checklist.js).
-const PC={on:!/[?&]pc5=0/.test(location.search),L:[],grp:null,t:0,f:0,x:1e9,z:1e9,h:1e9,keep:60,st:{meshes:0,src:0,vis:0,runs:0,ms:0}};
+const PC={on:!/[?&]pc5=0/.test(location.search),L:[],grp:null,t:0,f:0,k:0,left:0,x:1e9,y:0,z:1e9,h:1e9,fr:900,keep:60,st:{meshes:0,src:0,vis:0,runs:0,ms:0}};
 const _pcM=new THREE.Matrix4(),_pcPV=new THREE.Matrix4(),_pcF=new THREE.Frustum(),_pcD=new THREE.Vector3(),_pcC=new THREE.Color(),_pcIM=THREE.InstancedMesh.prototype;
 function PC_far(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc5Far??(lv==='min'?380:lv==='low'?480:lv==='med'?700:900)}
 // candidates: full (count = capacity), static, ≥ 16 instances, spread over > 300 m; never pools whose .count other code drives
@@ -34,30 +34,38 @@ function PC_scan(){PC.L.length=0;PC.st.meshes=PC.st.src=0;PC.grp=HUB.grp;if(!HUB
 // perf-6: meshes added to HUB.grp after the first scan (lazy 'lz' leaf/filler groups: 18k-instance leaf IM = 217k tris Fra) are picked up when the child count changes
 function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const w=o=>{if(o===lg)return;if(PC_cand(o)){PC_reg(o,false);n++}for(const q of o.children)w(q)};w(HUB.grp);if(n)PC_grid();return n}
 function PC_grid(){
- // one 80 m world grid over every static mesh: the step tests a cell's sphere first and only walks the instances of the cells that pass
- const M=new Map();for(const C of PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
-  for(const[k,L]of T){let Q=M.get(k);if(!Q)M.set(k,Q={x:0,y:0,z:0,r:0,n:0,E:[]});Q.E.push(C,Int32Array.from(L));for(const i of L){Q.x+=C.c[i*4];Q.y+=C.c[i*4+1];Q.z+=C.c[i*4+2];Q.n++}}}
- PC.G=[...M.values()];for(const Q of PC.G){Q.x/=Q.n;Q.y/=Q.n;Q.z/=Q.n;for(let e=0;e<Q.E.length;e+=2){const C=Q.E[e];for(const i of Q.E[e+1])Q.r=Math.max(Q.r,Math.hypot(C.c[i*4]-Q.x,C.c[i*4+1]-Q.y,C.c[i*4+2]-Q.z)+Math.max(C.c[i*4+3],2))}Q.r+=4}}
+ // perf-7: an 80 m grid PER MESH (C.G = [x,y,z,r, Int32Array ids]): a pass tests a mesh's cell spheres and walks only the instances of passing cells
+ for(const C of PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
+  C.G=[];for(const L of T.values()){let x=0,y=0,z=0,r=0;for(const i of L){x+=C.c[i*4];y+=C.c[i*4+1];z+=C.c[i*4+2]}x/=L.length;y/=L.length;z/=L.length;
+   for(const i of L)r=Math.max(r,Math.hypot(C.c[i*4]-x,C.c[i*4+1]-y,C.c[i*4+2]-z)+Math.max(C.c[i*4+3],2));C.G.push(x,y,z,r+4,Int32Array.from(L))}}
+ PC.left=0}
 // one instance: visible → copied to the next free slot of its mesh
 function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const d=Math.hypot(x-cx,y-cy,z-cz);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
  const s=C.s++,a=C.src,arr=C.im.instanceMatrix.array;if(s!==i){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
 const _pcS=new THREE.Sphere();
+// re-pack one mesh against the pass's camera snapshot (PC.x/y/z, _pcF); returns instances tested. Upload only the drawn range (r164 addUpdateRange), not the whole capacity.
+function PC_mesh(C){const im=C.im;C.dirty=false;if(!im.parent)return 0;const cx=PC.x,cy=PC.y,cz=PC.z,far=PC.fr;C.s=0;C.slot.fill(-1);let n=0;
+ if(C.G){const G=C.G;for(let g=0;g<G.length;g+=5){const d=Math.hypot(G[g]-cx,G[g+1]-cy,G[g+2]-cz),r=G[g+3];n++;if(d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(G[g],G[g+1],G[g+2]),r+4+d*.25)))continue;
+  const I=G[g+4];n+=I.length;for(let j=0;j<I.length;j++){const i=I[j];PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}}}
+ else if(C.sky){im.updateWorldMatrix(true,false);const W=im.matrixWorld.elements;n=C.n;for(let i=0;i<C.n;i++){const lx=C.c[i*4],ly=C.c[i*4+1],lz=C.c[i*4+2];
+   PC_one(C,i,W[0]*lx+W[4]*ly+W[8]*lz+W[12],W[1]*lx+W[5]*ly+W[9]*lz+W[13],W[2]*lx+W[6]*ly+W[10]*lz+W[14],cx,cy,cz,far)}}
+ else{n=C.n;for(let i=0;i<C.n;i++)PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}
+ im.count=C.s;const M=im.instanceMatrix;M.clearUpdateRanges();if(C.s){M.addUpdateRange(0,C.s*16);M.needsUpdate=true}
+ const IC=im.instanceColor;if(IC){IC.clearUpdateRanges();if(C.s){IC.addUpdateRange(0,C.s*3);IC.needsUpdate=true}}return n}
+// perf-7: a pass starts only on a ≥ 20 m camera move or a ≥ 15° turn (perf-5 also ran every 10 frames: ~570k Athens instances re-tested while parked),
+// then walks the static meshes over several frames, PC.bud instances tested per frame (each mesh is re-packed whole, so it never shows half a pass).
+// Traffic layers (C.dyn, moving) and clouds are re-packed every 10 frames on their own; a mesh dirtied by setMatrixAt is re-packed alone next frame.
 function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!=='roam')return;if(PC.grp&&PC.grp!==HUB.grp){PC.L.length=0;PC.grp=null;PC.f=0}
- if(!PC.grp){const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return;PC_scan()}
+ if(!PC.grp){const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return;PC_scan();force=1}
  if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9)&&PC_add())force=1;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
- let dirty=false;for(const C of PC.L)if(C.dirty){dirty=true;break}
- if(!force&&++PC.t%10&&!dirty&&dh<.1&&Math.hypot(cx-PC.x,cz-PC.z)<20)return;PC.t=0;PC.x=cx;PC.z=cz;PC.h=h;const t0=performance.now();
- camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);
- const far=PC_far(),cy=camera.position.y;let vis=0;
- for(const C of PC.L){C.s=0;C.slot.fill(-1);C.dirty=false}
- for(const Q of PC.G){const d=Math.hypot(Q.x-cx,Q.y-cy,Q.z-cz);if(d-Q.r>far||d-Q.r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(Q.x,Q.y,Q.z),Q.r+4+d*.25)))continue;
-  for(let e=0;e<Q.E.length;e+=2){const C=Q.E[e],I=Q.E[e+1];if(!C.im.parent)continue;for(let j=0;j<I.length;j++){const i=I[j];PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}}}
- for(const C of PC.L){const im=C.im;if(C.dyn&&im.parent)for(let i=0;i<C.n;i++)PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far);
-  if(C.sky&&im.parent){im.updateWorldMatrix(true,false);const W=im.matrixWorld.elements;for(let i=0;i<C.n;i++){const lx=C.c[i*4],ly=C.c[i*4+1],lz=C.c[i*4+2];
-   PC_one(C,i,W[0]*lx+W[4]*ly+W[8]*lz+W[12],W[1]*lx+W[5]*ly+W[9]*lz+W[13],W[2]*lx+W[6]*ly+W[10]*lz+W[14],cx,cy,cz,far)}}
-  im.count=C.s;im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;vis+=C.s}
- PC.st.vis=vis;PC.st.runs++;PC.st.ms=+(performance.now()-t0).toFixed(2)}
+ const t0=performance.now();let tested=0;const snap=()=>{camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);PC.x=cx;PC.y=camera.position.y;PC.z=cz;PC.h=h;PC.fr=PC_far()};
+ if(force||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){snap();PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
+ else if(++PC.t%10===0&&!PC.left){snap();for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
+ const bud=force?1e9:(TUNE.pc7Bud||60000);/* circular: a new pass mid-way carries on from the same mesh, so no mesh starves under constant turning */
+ while(PC.left>0&&tested<bud){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
+ if(!PC.left)for(const C of PC.L)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
+ if(tested){let vis=0;for(const C of PC.L)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();
 hubCullStep=(f=>function(){f.apply(this,arguments);try{PC_step()}catch(e){if(!PC.err){PC.err=String(e);console.warn('PC',e)}}})(hubCullStep);
 // GO perf5/compact: a smashed instanced prop stays hidden after compaction, a revived one comes back, writes by index land, fewer instances drawn

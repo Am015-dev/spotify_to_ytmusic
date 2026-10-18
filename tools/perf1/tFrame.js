@@ -13,7 +13,7 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  const ctx=await b.newContext({viewport:{width:1280,height:720},deviceScaleFactor:1});const p=await ctx.newPage();p.setDefaultTimeout(1800000);await p.addInitScript(INIT);await p.addInitScript('window.__WRAP='+JSON.stringify(process.env.WRAP||''));
  p.on('console',m=>{const t=m.text();if(/TICKERR|PF1/.test(t))console.log(t.slice(0,200))});p.on('pageerror',e=>console.log('ERR',e.message.slice(0,150)));
  const cdp=await ctx.newCDPSession(p);const t0=Date.now();
- await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}&q=${Q}${LM?'&lowmem=1':''}`);
+ await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}&q=${Q}${LM?'&lowmem=1':''}${process.env.QS?'&'+process.env.QS:''}`);
  await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:500});const boot=Math.round((Date.now()-t0)/1000);
  // wrap subsystems (outermost binding, so every later wrapper is inside) + composer.render
  const wr=await p.evaluate(()=>{window.__auto=false;window.__ph='drive';const ev=__oc.ev;window.PF1={b:{},n:0};
