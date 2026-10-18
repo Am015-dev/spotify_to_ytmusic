@@ -125,7 +125,7 @@ buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);if(CID!=='fra'&&H
 const QA7={o:null,resets:0};
 function QA7_release(){TOUCH.sid=null;TOUCH.bz=null;TOUCH.target=0;TOUCH.steer=0;TOUCH.lock=0;TOUCH.gas=false;TOUCH.brake=false;TOUCH.boost=false;TOUCH.hb=false;
   try{bzSet(0)}catch(e){}document.querySelectorAll('#touch .down').forEach(e=>e.classList.remove('down'));try{SZ.classList.remove('on')}catch(e){}QA7.resets++}
-function QA7_relayout(){try{resize()}catch(e){}try{if(TOUCH.sid==null)steerHome()}catch(e){}}
+function QA7_relayout(){try{RZ_req()}catch(e){}try{if(TOUCH.sid==null)steerHome()}catch(e){}}
 addEventListener('touchstart',e=>{const act=new Set([...e.touches].map(t=>t.identifier));if(TOUCH.sid!=null&&!act.has(TOUCH.sid)){TOUCH.sid=null;TOUCH.target=0;try{SZ.classList.remove('on')}catch(_){}}
   if(TOUCH.bz!=null&&!act.has(TOUCH.bz)){TOUCH.bz=null;try{bzSet(0)}catch(_){}}},{capture:true,passive:true});
 function QA7_rot(){QA7_release();for(const t of[0,120,350,800])setTimeout(QA7_relayout,t)}

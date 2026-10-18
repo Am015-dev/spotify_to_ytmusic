@@ -1,0 +1,6 @@
+# HANDOFF phone (rotation freeze, 2026-10-18)
+1. Root cause: one iPhone rotation (orientationchange + screen.orientation change + several resize) ran resize() ~19 times (QA7_rot's 0/120/350/800 ms re-layouts, triggered up to 3×), and each call reallocated every composer render target twice (setPixelRatio + setSize) and the canvas twice. MEM_drop has no caller and rotation reloads were 0 (suspect b ruled out); there were 0 shader relinks and 0 texture re-uploads.
+2. Fix: src/10_core4.js RZ_req = one settle pass 250 ms after the last event; resize() only reallocates when w/h/pr really changed (setDrawingBufferSize + composer._pixelRatio, one realloc); phone DPR cap ≤ 2 (≤ 1 on q=low). 96_scale_qa QA7_relayout → RZ_req; 98gx GFX_aoSize guarded and its duplicate listener removed.
+3. Measured (tools/tRot.js, iPhone UA, DPR 3, 852×393↔393×852 ×3 on the built page): composer.setSize 268 → 6, renderer size calls 402 → 6, reloads 0 → 0. The max frame gap cannot be measured in software GL (idle noise 0.8–1.9 s).
+4. Gate: unit 0 FAIL; TAG=rev5fix/rot,life1,xf1,terrain: only xf1/assist red (known xf1/*); rev5fix/rot ✅ (GO in src/99c7_rev5fix.js). Shot after rotating back looked right (full frame, controls clear).
+5. Left: confirm on a real iPhone 17; the "freezes" outside rotation are perf-15's lane (Athens per-frame allocation).

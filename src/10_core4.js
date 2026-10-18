@@ -237,8 +237,13 @@ const DPR2=()=>Math.min(devicePixelRatio||1,2);
 const DRES={s:1,t:0,n:0,sum:0,sq:0,skip:0};function dresStep(ms){if(SET.dres!=='on'||paused||document.hidden||!(state==='roam'||state==='race'||state==='countdown')||ms>150||ms<=0){DRES.t=DRES.n=DRES.sum=DRES.sq=0;return}DRES.t+=ms;DRES.sum+=ms;DRES.sq+=ms*ms;DRES.n++;if(DRES.t<2000)return;const a=DRES.sum/DRES.n,sd=Math.sqrt(Math.max(0,DRES.sq/DRES.n-a*a)),cap30=Math.abs(a-33.3)<3&&sd<4;DRES.t=DRES.n=DRES.sum=DRES.sq=0;if(DRES.skip>0){DRES.skip--;return}
   // a steady ~33 ms is the browser's 30 fps cap (iOS low power mode), not the GPU struggling: keep the resolution
   const s=a>22&&!cap30?Math.max(.6,DRES.s-.15):a<15||cap30&&DRES.s<1?Math.min(1,DRES.s+.1):DRES.s;if(s!==DRES.s){const p0=renderer.getPixelRatio();DRES.s=s;resize();if(renderer.getPixelRatio()===p0&&a>22)DRES.s=s+.15;DRES.skip=1}}
-function resize(){const w=innerWidth,h=innerHeight;const cap=Math.min(LOWMEM?1.5:3,{std:1.5,sharp:2,max:3}[SET.res]||{low:1,med:1.5,high:2}[SET.q]),bud=lowGfx?3.4e6:2.8e6;let pr=Math.min(devicePixelRatio||1,cap);if(w*h*pr*pr>bud)pr=Math.sqrt(bud/(w*h));if(SET.dres==='on'&&DRES.s<1)pr=Math.max(Math.min(pr,1),pr*DRES.s);renderer.setPixelRatio(pr);renderer.setSize(w,h,false);composer.setPixelRatio(pr);composer.setSize(w,h);bloom.resolution.set(w*pr/2,h*pr/2);SPRSCALE.value=h*pr*.5/Math.tan(THREE.MathUtils.degToRad(34));camera.aspect=w/h;camera.updateProjectionMatrix()}
-addEventListener('resize',resize);resize();
+function resize(){const w=innerWidth,h=innerHeight;const cap=Math.min(LOWMEM?1.5:3,{std:1.5,sharp:2,max:3}[SET.res]||{low:1,med:1.5,high:2}[SET.q]),bud=lowGfx?3.4e6:2.8e6;let pr=Math.min(devicePixelRatio||1,cap);if(w*h*pr*pr>bud)pr=Math.sqrt(bud/(w*h));if(SET.dres==='on'&&DRES.s<1)pr=Math.max(Math.min(pr,1),pr*DRES.s);if(lowGfx)pr=Math.min(pr,SET.q==='low'?1:2);RZ.n++;
+  // phone-1: render targets are reallocated only when the size really changed (composer.setPixelRatio + setSize used to reallocate every target twice per call)
+  if(w!==RZ.w||h!==RZ.h||pr!==RZ.pr||renderer.getPixelRatio()!==pr||composer._width!==w||composer._height!==h||composer._pixelRatio!==pr){RZ.w=w;RZ.h=h;RZ.pr=pr;RZ.re++;renderer.setDrawingBufferSize(w,h,pr);composer._pixelRatio=pr;composer.setSize(w,h);bloom.resolution.set(w*pr/2,h*pr/2)}
+  SPRSCALE.value=h*pr*.5/Math.tan(THREE.MathUtils.degToRad(34));camera.aspect=w/h;camera.updateProjectionMatrix()}
+// phone-1: iOS sends several resize / orientationchange events per rotation (and reports the old size for a few hundred ms): one settle pass 250 ms after the last one
+const RZ={n:0,re:0,req:0,w:0,h:0,pr:0,tm:0,t:0};function RZ_req(){RZ.req++;RZ.t=performance.now();clearTimeout(RZ.tm);RZ.tm=setTimeout(()=>resize(),250)}
+addEventListener('resize',RZ_req);resize();
 const hemi=new THREE.HemisphereLight(0x6a5ab0,0x180e2c,.6);scene.add(hemi);
 const moonL=new THREE.DirectionalLight(0xc9d2ff,.45);moonL.position.set(-400,600,-300);scene.add(moonL);
 const shipKey=new THREE.PointLight(0xe4ecff,70,40,2);scene.add(shipKey);

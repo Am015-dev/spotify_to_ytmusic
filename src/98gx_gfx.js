@@ -77,8 +77,8 @@ function GFX_ao(){const want=GFX.aoOk&&GFX.on&&GFX.day&&GFX.tier==='high'&&state
   p.updateGtaoMaterial({radius:1.2,distanceExponent:1.5,thickness:1.5,scale:1,samples:12});p.updatePdMaterial({lumaPhi:10,depthPhi:2,normalPhi:3,radius:6,rings:2,samples:12});
   composer.insertPass(p,1);GFX.gtao=p;resize()}
  GFX.gtao.enabled=want}
-function GFX_aoSize(){if(GFX.gtao){const pr=renderer.getPixelRatio();GFX.gtao.setSize(innerWidth*pr,innerHeight*pr)}}
-resize=(f=>function(){f.apply(this,arguments);GFX_aoSize()})(resize);addEventListener('resize',GFX_aoSize);   // the window listener holds the unwrapped resize
+function GFX_aoSize(){if(GFX.gtao){const pr=renderer.getPixelRatio(),w=innerWidth*pr,h=innerHeight*pr;if(GFX.gtao.width!==w||GFX.gtao.height!==h)GFX.gtao.setSize(w,h)}}
+resize=(f=>function(){f.apply(this,arguments);GFX_aoSize()})(resize);   // phone-1: the window listener (RZ_req) calls the wrapped resize
 // the player car is rebuilt (LEGO model, garage, ride swap) after LK_shadow flagged it, so it lost castShadow: re-flag every pass.
 // It does not receive: self-shadowing small bricks gave red/black acne speckle on the body.
 // ART6_noCast (97_art.js, v86v) locks castShadow to a getter returning false on the player car: unlock it (delete the accessor), re-lock on GFX off.
