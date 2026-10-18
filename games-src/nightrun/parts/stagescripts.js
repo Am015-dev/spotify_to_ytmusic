@@ -84,12 +84,16 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
   span(){return Math.max(8,ST.lead>0?ST.lead:ST.ch==='speed'?ST.tb*.55:ST.len);},   // a speed challenge usually ends early: its script is packed into the first half
   idx(){const n=this.st.ms.length,sp=this.span(),b=Math.max(0,G.dbar);if(b<sp)return clamp(Math.floor(b*n/sp),0,n-1);
     return 1+Math.floor((b-sp)*n/sp)%(n-1);},                     // a kill stage that runs past its song: the moments come round again (not the opening)
-  mom(){return this.st.ms[this.idx()];},
+  cur(){const st=this.st;return st.cur==null?0:st.cur;},          // the moment being played: it follows the bars, but never skips one (a short build-up or a READY bar could)
+  step(){const st=this.st,t=this.idx();if(st.cur==null)st.cur=0;
+    if(t>st.cur&&(st.c[st.cur]|0)>=1){let nx=st.cur+1;if(t-nx>=2)nx=t-1;const sg=st.ms.findIndex(m=>m.sig);if(sg>st.cur&&sg<nx&&!(st.c[sg]>0))nx=sg;st.cur=nx;}   // at most one moment behind; the set piece is never skipped
+    else if(t<st.cur&&G.dbar>=this.span())st.cur=t;return st.cur;},
+  mom(){return this.st.ms[this.cur()];},
   gnd(){return !!this.mom().g;},
   hard(){return HARDS.includes(SET.diff);},                    // Hard, Very hard, Legend: the old random zoo and ground waves still come between the scripted pieces (Legend must not get easier)
   oldK(){return {hard:.25,vhard:.35,legend:.4}[SET.diff]||0;},   // ... and this share of the director's calls still uses the stage's old wave pool (its turrets and gunships)
   /* ---- the director's call: one piece of the moment's formation ---- */
-  spawn(fill){const st=this.st,i=this.idx(),m=st.ms[i];if(i!==st.i){st.i=i;this.enter(i,m);}
+  spawn(fill){const st=this.st,i=this.step(),m=st.ms[i];if(i!==st.i){st.i=i;this.enter(i,m);}
     const c=st.c[i]=(st.c[i]|0)+1;let id,key,tw='';
     if(m.sig){id=st.s.sig[1+((c-1)%2)];tw=st.s.sig[3];key='S'+id;}else{id=m.ids[(c-1)%m.ids.length];key=i+':'+id;}
     const rm=/~r$/.test(id),base=id.replace(/~r$/,'');if(!FM.L[base]){id='line';key=i+':line';}

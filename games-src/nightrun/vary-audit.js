@@ -29,7 +29,7 @@ const PLAY = (o) => {   // inside the page
       if (window.__vaZ) window.__vaId = 'zoo:' + e.type; if (e.fid && window.__vaKind) window.__vaKind(e.fid, e); else if (window.__vaBuf) window.__vaBuf.push(e); });
   }
   let T = 0;
-  window.__vaRec = (id, g) => out.sp.push({ f: id, t: +T.toFixed(2), b: +(m.G.dbar || 0).toFixed(1), g, i: V && V.active() ? V.idx() : -1, br: V && V.active() ? (V.mom().br ? 1 : 0) : 0 });
+  window.__vaRec = (id, g) => out.sp.push({ f: id, t: +T.toFixed(2), b: +(m.G.dbar || 0).toFixed(1), g, i: V && V.active() ? V.cur() : -1, br: V && V.active() ? (V.mom().br ? 1 : 0) : 0 });
   window.__vaKind = (f, e) => { (out.kinds[f] = out.kinds[f] || {})[e.type] = 1; };
   window.__vaFlush = (buf, id) => { window.__vaZid = 0; for (const e of buf) window.__vaKind(id || '?', e); };
   m.startStory(o.n); m.simOn(true);
@@ -91,9 +91,9 @@ function analyse(runs, mode) {
       res[mode] = analyse(runs, mode); res[mode].runs = runs; await ctx.close();
     }
   } finally { await br.close(); srv.kill(); }
-  const f = x => (x * 100).toFixed(0) + '%', row = (k, o, n) => console.log(k.padEnd(52) + String(o).padStart(10) + String(n).padStart(10));
+  const f = x => (x * 100).toFixed(0) + '%', row = (k, o, n) => console.log(k.padEnd(52) + String(o).padStart(13) + String(n).padStart(13));
   const O = res.old, N = res.new;
-  console.log('metric'.padEnd(52) + 'before'.padStart(10) + 'after'.padStart(10));
+  console.log('metric'.padEnd(52) + 'before'.padStart(13) + 'after'.padStart(13));
   const g = (m, fn) => m ? fn(m) : '-';
   row('distinct formations per stage (min / mean)', g(O, m => m.distMin + ' / ' + m.distMean.toFixed(1)), g(N, m => m.distMin + ' / ' + m.distMean.toFixed(1)));
   row('formation ids used over the story', g(O, m => m.allIds), g(N, m => m.allIds));
