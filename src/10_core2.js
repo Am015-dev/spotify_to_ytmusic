@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.103',date:'18 Oct 2026',items:[{t:'FIXED',s:'Fewer memory-cleanup hiccups: the shortcut scan now has a strict time budget.'},{t:'FIXED',s:'Prop safety checks only look at nearby props, so Athens and Frankfurt stutter less.'}]},
 {v:'v90m-beta.102',date:'18 Oct 2026',items:[{t:'FIXED',s:'Frankfurt: no more half-second freezes when new buildings appear (worst frame 640 ms to about 200 ms).'},{t:'CHANGED',s:'The smash-target search and camera wall check now spread their work over several frames.'}]},
 {v:'v90m-beta.101',date:'18 Oct 2026',items:[{t:'FIXED',s:'Fewer hiccups in Athens: the people and ground checks no longer create throwaway data every frame.'},{t:'CHANGED',s:'Smaller per-frame cleanups for roads and city lookups.'}]},
 {v:'v90m-beta.100',date:'18 Oct 2026',items:[{t:'FIXED',s:'Athens: far fewer stutters while driving. Ground tiles and street props now load in small slices (worst load step 120 ms to 19 ms).'},{t:'CHANGED',s:'Ground lighting is computed piece by piece instead of all at once.'}]},
