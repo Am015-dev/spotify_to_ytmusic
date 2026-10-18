@@ -135,3 +135,22 @@ function SC1_vpCheck(w,h){const err=[],cv=renderer.domElement,r=cv.getBoundingCl
   return`📍 FRA ARC · ${n} story missions, order duel3 ${i3} < duel4 ${i4} < finale ${iK}, marks ${seen.join(' | ')}, finale "${dk?M3_DEF.kaiser.name:'?'}" ${ph} phases, bot win ${win} → ${bad.length?'❌ FAIL '+bad.join(', '):'✅ PASS'}`}}];
  return}
  if(i<600)setTimeout(()=>R9C_reg(i+1),100)})(0);
+// r9a (rev9 TOP-6 #1, N5): a pack of 5 in every city race. GO races the human-like bot (tkBot, 0.15 s lag) and samples every second: the leader of all 5, the biggest rival lead and trail (course metres, as tkStep's band), stalled rivals.
+function R9A_race(C,route,roam){if(RO.sp)try{sprintEnd()}catch(e){}
+ if(roam){const W=a=>Math.atan2(Math.sin(a),Math.cos(a));for(let t=0;t<roam;t+=1/30){const la=12+RO.v*.9,q=rfSnap(RO.x+Math.sin(RO.h)*la,RO.z+Math.cos(RO.h)*la,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;roamStep(1/30)}K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false}
+ tkStart({kind:C.kind,ev:C.ev||null},C);const sp=RO.sp;sp.cd=0;const G=tkGeoOf(C),bot=tkBot(G[route],{lag:.15}),n=sp.ai.length+1,hud=/POS \d\/5\b/.test(sp.hud||'')||null;let mx=0,beAt='',ahAt='',acc=0,lead=null,lc=0,ah=0,be=0,stall=0;const last=sp.ai.map(a=>[0,a.s]);
+ tkRun(300,s=>{bot(s);acc+=1/30;if(acc<1)return;acc=0;if(s.t<5)return;const me=mx=Math.max(mx,s.myS||0);   /* the player's furthest progress: myS projects onto the nearer route and can jump back ~100 m inside the split */let best=['me',me];
+  s.ai.forEach((a,i)=>{const x=a.fin!=null?G.lenA+1e3-a.fin:a.s/tkLen(tkPath(a))*G.lenA;if(x>best[1])best=[i,x];if(a.fin==null&&Math.abs(RO.v)>15){if(x-me>ah)ahAt=i+'@'+Math.round(s.t)+'s/'+Math.round(me)+'m/'+(a.route||'')+'/v'+Math.round(a.v)+'/'+Math.round(RO.v)+'/g'+s.gi;ah=Math.max(ah,x-me);if(me-x>be)beAt=i+'@'+Math.round(s.t)+'s/'+Math.round(me)+'m/'+(a.route||'')+(a.stun>0?'S':'')+'/v'+Math.round(a.v)+'/'+Math.round(RO.v);be=Math.max(be,me-x)}if(a.fin==null){const L=last[i];if(a.s>L[1]+15){L[0]=s.t;L[1]=a.s}else if(s.t-L[0]>10&&a.stun<=0)stall++}});
+  if(lead!=null&&best[0]!==lead)lc++;lead=best[0]});
+ const hud2=hud||/POS \d\/5\b/.test(sp.hud||''),r=TK.last;try{$('#spRes').hidden=true}catch(e){}if(RO.sp===sp)try{sprintEnd()}catch(e){}K.ArrowUp=K.KeyW=K.ArrowLeft=K.ArrowRight=K.ArrowDown=false;
+ return{n,hud:hud2,fin:!!r&&!r.dnf,place:r&&r.place,t:r&&r.t,lc,ah:Math.round(ah),be:Math.round(be),stall,beAt,ahAt,stuck:bot.R.stuck.length}}
+const R9A_say=t=>{const C=window.__chk;if(C&&C.goSay)C.goSay(t);else try{say('',t,2.2)}catch(e){}};
+function R9A_go(goSay,which){setTimeout(()=>{let C,rt='pA',roam=0;
+  if(which==='akro'){const m=tkMarkOf(ATH_BOSS_EV);C=m&&tkCourseOf(m);roam=30}
+  else if(which==='gp'){const sv=menuTrack;menuTrack='grand';C=tkBuild(tkQuickSpec());menuTrack=sv}
+  else if(which==='river'){C=tkBuild({key:'rival:water-rv2',kind:'quick',name:'Main River Run',ai:['WEBER'],water:true});rt='pB'}else C=TK_C;
+  if(!C)return goSay('📍 PACK5 · no course ❌ FAIL');try{__tq.reset()}catch(e){}const o=R9A_race(C,rt,roam),ok=o.n===5&&o.hud&&o.fin&&o.place<=3&&o.lc>=3&&o.ah<120&&o.be<120&&!o.stall;
+  goSay('📍 PACK5 · '+C.name+': '+o.n+' racers'+(o.hud?' · HUD /5':' · no /5')+' · bot '+(o.fin?o.place+'. in '+o.t+' s':'DNF')+' · '+o.lc+' lead changes · max ahead '+o.ah+' m / behind '+o.be+' m'+(o.be>=120?' ['+o.beAt+']':'')+(o.ah>=120?' ['+o.ahAt+']':'')+' · '+o.stall+' stalled AI (need 5, /5, 1st-3rd, ≥ 3, < 120 m, 0) → '+(ok?'✅ PASS':'❌ FAIL'))},300);return'📍 PACK5 · racing…'}
+(function R9A_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='r9a')){C.items.push({ver:'r9a',id:'pack5',area:'race',text:'rev9 #1 / N5 · a pack of 5 in every city race: 📍 GO races the human-like bot in Westend, Grand Prix, River Run (fra) and the Akropolis final (ath), one GO each. Pass line: 5 racers, HUD POS n/5, bot 1st-3rd, ≥ 3 lead changes among all 5, max gap ahead and behind < 120 m (sampled each second while the bot drives > 15 m/s, against its furthest progress), no rival stalled > 10 s.'});
+ (C.GO['r9a/pack5']=C.GO['r9a/pack5']||[]).push(...[['fra','Westend','west'],['fra','Grand Prix','gp'],['fra','River Run','river'],['ath','Akropolis final','akro']].map(([c,n,w])=>({c,n:'pack of 5: '+n,secs:300,fn:()=>R9A_go(R9A_say,w)})))}return}
+ if(i<600)setTimeout(()=>R9A_reg(i+1),100)})(0);
