@@ -3536,5 +3536,2002 @@
   "where": "Clear screen medal SPEED CLEAR (parts/flavor.js draws a coloured glyph until this exists)",
   "notes": "Round medal badge: a double chevron, orange. Same painted style as ach-*.webp. Transparent, centred.",
   "kind": "icon"
+ },
+ {
+  "file": "fx-w-pulse-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Pulse Spread shot flies",
+  "notes": "Pulse Spread: the shot, facing right, centred. Painted colour matches the weapon colour #ff8ad8.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff8ad8",
+   "shape": "streak"
+  },
+  "prompt": "A game projectile for the weapon Pulse Spread: a short fat pink energy pellet with a hot white core and a small comet tail, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-pulse-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Pulse Spread (replaces the shared fx-muzzle)",
+  "notes": "Pulse Spread muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff8ad8",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Pulse Spread: a small pink star-shaped muzzle flash fanning to the right, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-pulse-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Pulse Spread shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Pulse Spread impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff8ad8",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Pulse Spread: a pink starburst impact with short spikes and sparkles, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-laser-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Laser Lance shot flies",
+  "notes": "Laser Lance: the shot, facing right, centred. Painted colour matches the weapon colour #7dffd8.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#7dffd8",
+   "shape": "beam"
+  },
+  "prompt": "A game projectile for the weapon Laser Lance: a long thin mint-green laser lance segment, a razor-bright white core and a soft mint halo, fading at both ends, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-laser-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Laser Lance (replaces the shared fx-muzzle)",
+  "notes": "Laser Lance muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#7dffd8",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Laser Lance: a narrow mint flare shooting right with a ring at the barrel, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-laser-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Laser Lance shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Laser Lance impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#7dffd8",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Laser Lance: a mint-green ring and a bright flash where a beam pierces through, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-swarm-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Homing Swarm shot flies",
+  "notes": "Homing Swarm: the shot, facing right, centred. Painted colour matches the weapon colour #ffb020.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffb020",
+   "shape": "missile"
+  },
+  "prompt": "A game projectile for the weapon Homing Swarm: a small amber homing missile seen from the side, glowing exhaust flame and a short smoke-glow trail behind it, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-swarm-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Homing Swarm (replaces the shared fx-muzzle)",
+  "notes": "Homing Swarm muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffb020",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Homing Swarm: a puff of amber flame and sparks, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-swarm-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Homing Swarm shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Homing Swarm impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffb020",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Homing Swarm: a small amber fireball with a ring of tiny sparks, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-beat-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Beat Cannon shot flies",
+  "notes": "Beat Cannon: the shot, facing right, centred. Painted colour matches the weapon colour #ffe14d.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffe14d",
+   "shape": "orb"
+  },
+  "prompt": "A game projectile for the weapon Beat Cannon: a heavy round yellow cannon shell glowing white-hot, a pulsing shockwave arc around its front and a thick gold trail, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-beat-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Beat Cannon (replaces the shared fx-muzzle)",
+  "notes": "Beat Cannon muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffe14d",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Beat Cannon: a big gold muzzle blast with a speed ring, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-beat-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Beat Cannon shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Beat Cannon impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffe14d",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Beat Cannon: a heavy yellow explosion flash with a bold shockwave ring, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-arc-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Arc Chain shot flies",
+  "notes": "Arc Chain: the shot, facing right, centred. Painted colour matches the weapon colour #8fe9ff.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#8fe9ff",
+   "shape": "bolt"
+  },
+  "prompt": "A game projectile for the weapon Arc Chain: a jagged cyan lightning bolt segment with forks and a white core, horizontal, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-arc-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Arc Chain (replaces the shared fx-muzzle)",
+  "notes": "Arc Chain muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#8fe9ff",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Arc Chain: a small crackle of cyan electric sparks, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-arc-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Arc Chain shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Arc Chain impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#8fe9ff",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Arc Chain: a branching cyan electric burst with a bright white centre, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-orbit-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Orbit Blades shot flies",
+  "notes": "Orbit Blades: the shot, facing right, centred. Painted colour matches the weapon colour #b6ff5a.",
+  "kind": "fx",
+  "bg": "white",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#b6ff5a",
+   "shape": "blade"
+  },
+  "prompt": "A game projectile for the weapon Orbit Blades: a single curved lime-green energy blade (crescent) with a glowing edge, facing right, centred, on a plain flat white background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-orbit-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Orbit Blades (replaces the shared fx-muzzle)",
+  "notes": "Orbit Blades muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#b6ff5a",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Orbit Blades: a quick lime-green swish of light, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-orbit-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Orbit Blades shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Orbit Blades impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#b6ff5a",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Orbit Blades: a lime-green slash mark with sparks, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-disc-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Ricochet Disc shot flies",
+  "notes": "Ricochet Disc: the shot, facing right, centred. Painted colour matches the weapon colour #ff7a45.",
+  "kind": "fx",
+  "bg": "white",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff7a45",
+   "shape": "disc"
+  },
+  "prompt": "A game projectile for the weapon Ricochet Disc: a round razor-edged orange disc with a notched rim, spinning, motion arcs around it, facing right, centred, on a plain flat white background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-disc-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Ricochet Disc (replaces the shared fx-muzzle)",
+  "notes": "Ricochet Disc muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff7a45",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Ricochet Disc: a small orange spark flash, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-disc-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Ricochet Disc shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Ricochet Disc impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff7a45",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Ricochet Disc: an orange spark shower from a bounce, a bright flash ring, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-mine-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Mine Layer shot flies",
+  "notes": "Mine Layer: the shot, facing right, centred. Painted colour matches the weapon colour #c08aff.",
+  "kind": "fx",
+  "bg": "white",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#c08aff",
+   "shape": "mine"
+  },
+  "prompt": "A game projectile for the weapon Mine Layer: a round purple proximity mine with a blinking glow and little spikes, facing right, centred, on a plain flat white background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-mine-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Mine Layer (replaces the shared fx-muzzle)",
+  "notes": "Mine Layer muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#c08aff",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Mine Layer: a soft purple drop-ring flash, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-mine-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Mine Layer shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Mine Layer impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#c08aff",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Mine Layer: a purple blast with a ring and floating shards, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-frost-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Frost Beam shot flies",
+  "notes": "Frost Beam: the shot, facing right, centred. Painted colour matches the weapon colour #9fe8ff.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#9fe8ff",
+   "shape": "beam"
+  },
+  "prompt": "A game projectile for the weapon Frost Beam: an icy pale-blue beam segment with ice crystals along it, white-blue glow, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-frost-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Frost Beam (replaces the shared fx-muzzle)",
+  "notes": "Frost Beam muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#9fe8ff",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Frost Beam: a frosty pale-blue puff with snow sparkles, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-frost-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Frost Beam shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Frost Beam impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#9fe8ff",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Frost Beam: a frozen burst of ice crystals and a pale-blue ring, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-flame-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Flame Arc shot flies",
+  "notes": "Flame Arc: the shot, facing right, centred. Painted colour matches the weapon colour #ff5a2d.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff5a2d",
+   "shape": "streak"
+  },
+  "prompt": "A game projectile for the weapon Flame Arc: a short licking jet of orange-red flame flying right, yellow core, ember sparks, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-flame-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Flame Arc (replaces the shared fx-muzzle)",
+  "notes": "Flame Arc muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff5a2d",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Flame Arc: a roaring orange-red flame burst, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-flame-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Flame Arc shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Flame Arc impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff5a2d",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Flame Arc: a small burning fireball splash with embers, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-wave-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Plasma Wave shot flies",
+  "notes": "Plasma Wave: the shot, facing right, centred. Painted colour matches the weapon colour #5b8cff.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#5b8cff",
+   "shape": "crescent"
+  },
+  "prompt": "A game projectile for the weapon Plasma Wave: a big crescent blue plasma wave front curving to the right, white-blue edge, soft glow, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-wave-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Plasma Wave (replaces the shared fx-muzzle)",
+  "notes": "Plasma Wave muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#5b8cff",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Plasma Wave: a blue plasma ripple ring, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-wave-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Plasma Wave shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Plasma Wave impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#5b8cff",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Plasma Wave: a blue plasma splash ring with droplets of light, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-shell-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Shrapnel Shell shot flies",
+  "notes": "Shrapnel Shell: the shot, facing right, centred. Painted colour matches the weapon colour #ffa94d.",
+  "kind": "fx",
+  "bg": "white",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffa94d",
+   "shape": "shell"
+  },
+  "prompt": "A game projectile for the weapon Shrapnel Shell: a stubby orange shell with a bright tip and a small flame, fragments of light flying off it, facing right, centred, on a plain flat white background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-shell-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Shrapnel Shell (replaces the shared fx-muzzle)",
+  "notes": "Shrapnel Shell muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffa94d",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Shrapnel Shell: an orange cone of flame and sparks, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-shell-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Shrapnel Shell shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Shrapnel Shell impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffa94d",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Shrapnel Shell: an orange burst of flying fragments, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-drone-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Echo Drone shot flies",
+  "notes": "Echo Drone: the shot, facing right, centred. Painted colour matches the weapon colour #e6a8ff.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#e6a8ff",
+   "shape": "streak"
+  },
+  "prompt": "A game projectile for the weapon Echo Drone: a lilac echo pulse bolt with two fainter copies trailing behind it, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-drone-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Echo Drone (replaces the shared fx-muzzle)",
+  "notes": "Echo Drone muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#e6a8ff",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Echo Drone: a lilac double-ring flash, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-drone-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Echo Drone shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Echo Drone impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#e6a8ff",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Echo Drone: a lilac ripple with a ghost ring, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-well-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Gravity Well shot flies",
+  "notes": "Gravity Well: the shot, facing right, centred. Painted colour matches the weapon colour #7a4dff.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#7a4dff",
+   "shape": "orb"
+  },
+  "prompt": "A game projectile for the weapon Gravity Well: a swirling violet orb with an inward spiral, dark centre and bright rim, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-well-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Gravity Well (replaces the shared fx-muzzle)",
+  "notes": "Gravity Well muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#7a4dff",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Gravity Well: a violet swirl opening to the right, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-well-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Gravity Well shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Gravity Well impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#7a4dff",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Gravity Well: a violet implosion ring with sparks pulled in, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-rail-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Rail Sniper shot flies",
+  "notes": "Rail Sniper: the shot, facing right, centred. Painted colour matches the weapon colour #ff3d6a.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff3d6a",
+   "shape": "beam"
+  },
+  "prompt": "A game projectile for the weapon Rail Sniper: a very bright crimson-white rail bolt, long and needle-sharp, with a thin trail, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-rail-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Rail Sniper (replaces the shared fx-muzzle)",
+  "notes": "Rail Sniper muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff3d6a",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Rail Sniper: a crimson flash with a shock ring, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-rail-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Rail Sniper shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Rail Sniper impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff3d6a",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Rail Sniper: a crimson pierce flash with a hard white spike, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-storm-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bullet in the player-shot draw (parts/c.js shotDraw) when a Storm Cell shot flies",
+  "notes": "Storm Cell: the shot, facing right, centred. Painted colour matches the weapon colour #fff06a.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#fff06a",
+   "shape": "orb"
+  },
+  "prompt": "A game projectile for the weapon Storm Cell: a crackling yellow electric storm ball with small lightning arcs around it, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-storm-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.muzzle on every volley of the equipped Storm Cell (replaces the shared fx-muzzle)",
+  "notes": "Storm Cell muzzle flash at the gun, pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#fff06a",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the weapon Storm Cell: a yellow spark burst, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-w-storm-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.hit when a Storm Cell shot hits an enemy (replaces fx-hit-spark)",
+  "notes": "Storm Cell impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#fff06a",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the weapon Storm Cell: a yellow lightning burst with arcs, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-small-fire.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (enemy death, by size; look = fire) default look",
+  "notes": "Explosion, small, fire look. Burst centred, fills the square, fades to black at the edges.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff9a2d",
+   "shape": "burst"
+  },
+  "prompt": "A small, quick explosion for a drone: orange-yellow fire with a white-hot core and black-red smoke edges, centred burst filling the square, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-small-electric.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (enemy death, by size; look = electric) when the kill was by arc or storm",
+  "notes": "Explosion, small, electric look. Burst centred, fills the square, fades to black at the edges.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#4fe6ff",
+   "shape": "burst"
+  },
+  "prompt": "A small, quick explosion for a drone: cyan-white electric blast with crackling lightning arcs, centred burst filling the square, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-small-plasma.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (enemy death, by size; look = plasma) when the kill was by laser, rail, frost, wave or well",
+  "notes": "Explosion, small, plasma look. Burst centred, fills the square, fades to black at the edges.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#c46bff",
+   "shape": "burst"
+  },
+  "prompt": "A small, quick explosion for a drone: magenta-violet plasma blast with a glowing ring and drifting energy sparks, centred burst filling the square, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-medium-fire.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (enemy death, by size; look = fire) default look",
+  "notes": "Explosion, medium, fire look. Burst centred, fills the square, fades to black at the edges.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff9a2d",
+   "shape": "burst"
+  },
+  "prompt": "A medium explosion for a gunship or a mine: orange-yellow fire with a white-hot core and black-red smoke edges, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-medium-electric.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (enemy death, by size; look = electric) when the kill was by arc or storm",
+  "notes": "Explosion, medium, electric look. Burst centred, fills the square, fades to black at the edges.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#4fe6ff",
+   "shape": "burst"
+  },
+  "prompt": "A medium explosion for a gunship or a mine: cyan-white electric blast with crackling lightning arcs, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-medium-plasma.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (enemy death, by size; look = plasma) when the kill was by laser, rail, frost, wave or well",
+  "notes": "Explosion, medium, plasma look. Burst centred, fills the square, fades to black at the edges.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#c46bff",
+   "shape": "burst"
+  },
+  "prompt": "A medium explosion for a gunship or a mine: magenta-violet plasma blast with a glowing ring and drifting energy sparks, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-large-fire.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (enemy death, by size; look = fire) default look",
+  "notes": "Explosion, large, fire look. Burst centred, fills the square, fades to black at the edges.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff9a2d",
+   "shape": "burst"
+  },
+  "prompt": "A large, dramatic explosion with a shockwave ring: orange-yellow fire with a white-hot core and black-red smoke edges, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-large-electric.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (enemy death, by size; look = electric) when the kill was by arc or storm",
+  "notes": "Explosion, large, electric look. Burst centred, fills the square, fades to black at the edges.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#4fe6ff",
+   "shape": "burst"
+  },
+  "prompt": "A large, dramatic explosion with a shockwave ring: cyan-white electric blast with crackling lightning arcs, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-large-plasma.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (enemy death, by size; look = plasma) when the kill was by laser, rail, frost, wave or well",
+  "notes": "Explosion, large, plasma look. Burst centred, fills the square, fades to black at the edges.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#c46bff",
+   "shape": "burst"
+  },
+  "prompt": "A large, dramatic explosion with a shockwave ring: magenta-violet plasma blast with a glowing ring and drifting energy sparks, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-boss-a.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (boss death, final blast; alternates with boss-b)",
+  "notes": "Giant boss explosion A: a huge orange-white fireball with a shockwave ring.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffb040",
+   "shape": "burst"
+  },
+  "prompt": "A giant boss explosion: huge orange-white fireball, a thick expanding shockwave ring and flying embers, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-boss-b.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.boom (boss death, final blast; alternates with boss-a)",
+  "notes": "Giant boss explosion B: a cold magenta-cyan energy implosion-then-burst.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff4dd0",
+   "shape": "burst"
+  },
+  "prompt": "A giant boss explosion in cold colours: a magenta and cyan energy blast with a bright white core, a ring and long streaking sparks, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-ground-dust.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (for ground enemies in a later wave)",
+  "notes": "Soft dust and smoke puff for ground explosions, lit from within.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#c8a070",
+   "shape": "burst"
+  },
+  "prompt": "A soft puff of grey-orange dust and smoke lit by a fiery glow, centred, rising slightly, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-boom-debris.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (debris pieces flying out of big kills)",
+  "notes": "A cluster of 6 metal debris pieces (plates, bolts) with a hot orange edge, scattered, as a sprite sheet-free single picture.",
+  "kind": "fx",
+  "bg": "white",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#a0a8b8",
+   "shape": "debris"
+  },
+  "prompt": "A scatter of six torn metal fragments and plates with glowing orange edges, in a ring around the centre, on a plain flat white background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-eb-sniper-beam.webp",
+  "w": 256,
+  "h": 64,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.sniper (the sniper aim line in ZOO.over, stretched along the aim)",
+  "notes": "Tileable red-lime laser line, bright core, soft glow, horizontal, stretched to the player.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff3050",
+   "shape": "line"
+  },
+  "prompt": "A thin horizontal sniper laser line, a bright red-white core and a soft red glow, tileable left to right, on a pure solid black background, tileable left to right, 256x64, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-eb-bomb.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bomb (the bomber's bomb, in ZOO.over)",
+  "notes": "A round black bomb with a glowing orange fuse spark, seen from the side.",
+  "kind": "fx",
+  "bg": "white",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffa02d",
+   "shape": "mine"
+  },
+  "prompt": "A round black cyberpunk bomb with an orange glowing band and a sparking fuse, seen from the side, on a plain flat white background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-eb-mine.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.mine (the minelayer's mine, in ZOO.over; armed mines glow, unarmed are dimmed)",
+  "notes": "A spiked lime-green mine with a red blinking light.",
+  "kind": "fx",
+  "bg": "white",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#d8ff3d",
+   "shape": "mine"
+  },
+  "prompt": "A round spiked proximity mine in dark metal with lime-green glowing lights and a small red blinking light, seen from above, on a plain flat white background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-eb-shield-bubble.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.bubble (the shielder's front bubble, drawn as an arc facing its aim)",
+  "notes": "A cyan energy bubble, hexagon pattern, brighter at the rim, empty centre, facing right.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#4ad1ff",
+   "shape": "ring"
+  },
+  "prompt": "A glowing cyan energy shield bubble, a faint hexagon pattern, bright rim, transparent dark centre, a circle filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-eb-rocket-trail.webp",
+  "w": 512,
+  "h": 128,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (enemy rockets; fx-bullet-rocket is the head)",
+  "notes": "Smoke-fire trail, bright at the right (head) end, fading to the left.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff8040",
+   "shape": "streak"
+  },
+  "prompt": "A rocket exhaust trail, white-yellow at the right end fading through orange to dark red smoke at the left end, horizontal, on a pure solid black background, facing right, pointing to the right, 512x128, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-eb-plasma.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (boss and gunship plasma balls)",
+  "notes": "A lime-pink plasma ball with a swirling core, round, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#9dff3a",
+   "shape": "orb"
+  },
+  "prompt": "A round enemy plasma ball, a swirling lime-green and hot pink core with a dark outline ring and a soft glow, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-eb-laser-sweep.webp",
+  "w": 512,
+  "h": 64,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (boss laser sweeps)",
+  "notes": "A wide sweeping boss laser, bright white core, red edges, horizontal and tileable.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff3050",
+   "shape": "line"
+  },
+  "prompt": "A wide boss laser beam, a white core and red-orange edges with small energy ripples, horizontal, tileable left to right, on a pure solid black background, tileable left to right, 512x64, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-eb-shockwave-ring.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (boss and bomber ring blasts)",
+  "notes": "A thin bright expanding ring, red-orange, even thickness, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff5a3a",
+   "shape": "ring"
+  },
+  "prompt": "A thin bright red-orange shockwave ring with a soft glow, perfectly circular, centred, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-eb-heal-ring.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.healRing (the healer's dashed ring in ZOO.over)",
+  "notes": "A green healing ring with small plus signs drifting around it, soft glow.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "ring"
+  },
+  "prompt": "A soft green healing aura ring with tiny glowing plus shapes around it, circular, centred, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-eb-aim-line.webp",
+  "w": 256,
+  "h": 32,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.aim (the kamikaze's dive line in ZOO.over)",
+  "notes": "A dashed red warning line, tileable.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff3050",
+   "shape": "line"
+  },
+  "prompt": "A thin red warning aim line made of glowing dashes, horizontal, tileable left to right, on a pure solid black background, tileable left to right, 256x32, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-pw-nova-ring.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.nova (the downbeat nova ring in powerups.js, scaled with its radius)",
+  "notes": "A magenta energy ring, thick and bright, empty centre, soft outer glow.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff5fd2",
+   "shape": "ring"
+  },
+  "prompt": "A thick glowing magenta-pink energy ring with a white inner edge, circular, empty centre, soft outer glow, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-pw-echo-ghost.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.echo (the ghost shot of the echo power)",
+  "notes": "A cyan ghost of a small ship shot with a trailing echo, facing right.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#7df9ff",
+   "shape": "streak"
+  },
+  "prompt": "A translucent cyan ghost bolt with two fading echo copies behind it, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-pw-magnet-field.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.magnet (the magnet bass pulse ring)",
+  "notes": "A blue-violet pulse ring with inward-curving field lines.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#7a8cff",
+   "shape": "ring"
+  },
+  "prompt": "A blue-violet magnetic pulse: a glowing ring with curved field lines flowing inwards, circular, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-pw-wingmate-trail.webp",
+  "w": 256,
+  "h": 64,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.wing (trail behind each wingmate drone)",
+  "notes": "A short golden engine trail, bright at the right end, fading left.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffd23d",
+   "shape": "streak"
+  },
+  "prompt": "A short golden-yellow engine trail for a small drone, bright at the right end fading to nothing at the left, horizontal, on a pure solid black background, facing right, pointing to the right, 256x64, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-pw-shield-bubble.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (the shield power around the ship)",
+  "notes": "A pale blue-white energy bubble around the ship, hex pattern, bright rim.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#9fd8ff",
+   "shape": "ring"
+  },
+  "prompt": "A pale blue-white energy bubble, a faint hexagon pattern, bright rim, almost transparent centre, a circle filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-pw-crescendo-glow.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "Hooked: FXW.cresc (the crescendo arcs around the ship)",
+  "notes": "A warm gold glow made of rising arcs, soft, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffb020",
+   "shape": "ring"
+  },
+  "prompt": "A warm golden glow made of three nested rising arcs, soft, centred, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-pw-fever-aura.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (the fever meter aura round the ship)",
+  "notes": "A flame-like magenta-orange aura, rising flames, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff4a8a",
+   "shape": "burst"
+  },
+  "prompt": "A fiery magenta and orange aura with rising flame tongues, centred, soft, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-pw-pickup-glow.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (glow under every pickup)",
+  "notes": "A soft round white-gold glow with 4 tiny sparkles, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#fff0a0",
+   "shape": "orb"
+  },
+  "prompt": "A soft round white-gold glow with four tiny sparkle stars around it, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-pw-level-up.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (weapon level-up flash)",
+  "notes": "A rising golden burst, a ring and light rays pointing up.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffe14d",
+   "shape": "burst"
+  },
+  "prompt": "A rising golden level-up burst: a ring with light rays and small up arrows of light, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-pw-bomb-pulse.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "No hook yet (EMP bomb pulse; the shared fx-shockwave is used today)",
+  "notes": "A big electric-blue pulse ring with crackling edges.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#58b8ff",
+   "shape": "ring"
+  },
+  "prompt": "A large electric blue-white pulse ring with crackling lightning on its edge, circular, centred, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-pistol-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage (parts/foot.js): the pistol shot. No hook yet",
+  "notes": "On-foot pistol projectile, facing right, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffe08a",
+   "shape": "streak"
+  },
+  "prompt": "An on-foot pistol projectile: a small yellow-white tracer bullet with a short streak, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-pistol-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: pistol muzzle flash. No hook yet",
+  "notes": "On-foot pistol muzzle flash pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffe08a",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the on-foot pistol: a small yellow-white flash, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-pistol-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: pistol impact. No hook yet",
+  "notes": "On-foot pistol impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffe08a",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the on-foot pistol: a small yellow spark burst, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-mg-bullet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage (parts/foot.js): the machine gun shot. No hook yet",
+  "notes": "On-foot machine gun projectile, facing right, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffc04a",
+   "shape": "streak"
+  },
+  "prompt": "An on-foot machine gun projectile: a thin orange tracer bullet streak, long and narrow, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-mg-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: machine gun muzzle flash. No hook yet",
+  "notes": "On-foot machine gun muzzle flash pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffc04a",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the on-foot machine gun: a stuttering orange flash with side sparks, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-mg-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: machine gun impact. No hook yet",
+  "notes": "On-foot machine gun impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffc04a",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the on-foot machine gun: a quick orange spark spray, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-shotgun-pellet.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage (parts/foot.js): the shotgun shot. No hook yet",
+  "notes": "On-foot shotgun projectile, facing right, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffd870",
+   "shape": "streak"
+  },
+  "prompt": "An on-foot shotgun projectile: a small round hot yellow pellet with a short glowing tail, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-shotgun-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: shotgun muzzle flash. No hook yet",
+  "notes": "On-foot shotgun muzzle flash pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffd870",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the on-foot shotgun: a wide cone of yellow sparks, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-shotgun-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: shotgun impact. No hook yet",
+  "notes": "On-foot shotgun impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ffd870",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the on-foot shotgun: a small yellow dot burst with tiny sparks, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-flame.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage (parts/foot.js): the flamethrower shot. No hook yet",
+  "notes": "On-foot flamethrower projectile, facing right, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff6a2d",
+   "shape": "streak"
+  },
+  "prompt": "An on-foot flamethrower projectile: a short ball of orange-red fire with a yellow core, licking tail, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-flame-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: flamethrower muzzle flash. No hook yet",
+  "notes": "On-foot flamethrower muzzle flash pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff6a2d",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the on-foot flamethrower: a roaring orange flame cone, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-flame-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: flamethrower impact. No hook yet",
+  "notes": "On-foot flamethrower impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff6a2d",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the on-foot flamethrower: a splash of burning orange flame with embers, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-rocket.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage (parts/foot.js): the rocket launcher shot. No hook yet",
+  "notes": "On-foot rocket launcher projectile, facing right, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff9a4a",
+   "shape": "streak"
+  },
+  "prompt": "An on-foot rocket launcher projectile: a small rocket glowing white-orange with a bright exhaust flame, side view, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-rocket-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: rocket launcher muzzle flash. No hook yet",
+  "notes": "On-foot rocket launcher muzzle flash pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff9a4a",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the on-foot rocket launcher: a fiery backblast cone and smoke glow, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-rocket-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: rocket launcher impact. No hook yet",
+  "notes": "On-foot rocket launcher impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#ff9a4a",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the on-foot rocket launcher: a bright orange explosion burst with a ring, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-arc.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage (parts/foot.js): the arc gun shot. No hook yet",
+  "notes": "On-foot arc gun projectile, facing right, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#58e6ff",
+   "shape": "streak"
+  },
+  "prompt": "An on-foot arc gun projectile: a short jagged cyan lightning bolt with a white core, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-arc-muzzle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: arc gun muzzle flash. No hook yet",
+  "notes": "On-foot arc gun muzzle flash pointing right, base at the left-centre edge.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#58e6ff",
+   "shape": "burst"
+  },
+  "prompt": "A muzzle flash for the on-foot arc gun: a cyan electric crackle, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-arc-hit.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: arc gun impact. No hook yet",
+  "notes": "On-foot arc gun impact burst, centred.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#58e6ff",
+   "shape": "burst"
+  },
+  "prompt": "An impact effect for the on-foot arc gun: a cyan electric burst with branching arcs, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-grenade.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: thrown grenade. No hook yet",
+  "notes": "A round cyberpunk grenade with a glowing green band and a pin ring, side view.",
+  "kind": "fx",
+  "bg": "white",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#6dff7a",
+   "shape": "mine"
+  },
+  "prompt": "A round cyberpunk hand grenade in dark metal with a glowing green band and a small pin ring, side view, on a plain flat white background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-blood-spark.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: hit spark on enemies (neutral cyber spark, no gore). No hook yet",
+  "notes": "A neutral cyber spark burst: cyan-white sparks and a few small circuit-pattern fragments. No blood, no gore.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#5ae6ff",
+   "shape": "burst"
+  },
+  "prompt": "A neutral cyber hit spark: a burst of cyan and white sparks with a few small glowing circuit fragments, no blood, no gore, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-dust.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: landing and running dust. No hook yet",
+  "notes": "A low puff of dust lit by neon from the side.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#b898d0",
+   "shape": "burst"
+  },
+  "prompt": "A low puff of dust and steam from the ground, softly lit by pink and teal neon, centred, flat bottom, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-ft-shield-hit.webp",
+  "w": 512,
+  "h": 512,
+  "group": "Effects (wave 8)",
+  "status": "PLACEHOLDER",
+  "where": "On-foot stage: a bullet hits a riot shield. No hook yet",
+  "notes": "A blue hex ripple with a bright flash at the centre.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Effects asset wave 8 (owner, 18 Oct 2026)",
+  "ph": {
+   "c": "#4a8bff",
+   "shape": "ring"
+  },
+  "prompt": "A blue energy shield hit: a bright white-blue flash with a hexagon ripple spreading out from it, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-shot-std.webp",
+  "w": 256,
+  "h": 32,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Player shots (tinted per colour), the shared shot",
+  "notes": "Thin white bolt, tinted by the code. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-shot-hv.webp",
+  "w": 256,
+  "h": 112,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Heavy ship shots",
+  "notes": "Heavy yellow shell. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-shot-ec.webp",
+  "w": 256,
+  "h": 66,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Echo ship shots",
+  "notes": "Violet shot. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-shot-perfect.webp",
+  "w": 256,
+  "h": 58,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "On-beat perfect shots",
+  "notes": "Gold bolt. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-bullet-enemy.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Enemy bullets (hue-turned for needle and shell)",
+  "notes": "Lime orb with a dark rim. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-bullet-shell.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Enemy shell bullets (a hue-turned copy of the lime orb until this exists)",
+  "notes": "Heavy shell-type enemy bullet. Waits for the file; no placeholder is written because the game would show it. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  },
+  "noph": true,
+  "prompt": "Heavy shell-type enemy bullet, facing right, centred, on a pure solid black background, 256x256, soft glowing edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-bullet-needle.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Enemy needle bullets (a hue-turned copy until this exists)",
+  "notes": "Thin needle-type enemy bullet, pointing right. Waits for the file; no placeholder is written. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  },
+  "noph": true,
+  "prompt": "Thin needle-type enemy bullet, pointing right, facing right, centred, on a pure solid black background, 256x256, soft glowing edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-bullet-rocket.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Enemy rockets (a vector rocket until this exists)",
+  "notes": "Enemy rocket head with flame, pointing right. Waits for the file; no placeholder is written. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  },
+  "noph": true,
+  "prompt": "Enemy rocket head with flame, pointing right, facing right, centred, on a pure solid black background, 256x256, soft glowing edges, no characters, no text, no letters."
+ },
+ {
+  "file": "fx-muzzle.webp",
+  "w": 256,
+  "h": 170,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Shared muzzle flash",
+  "notes": "Muzzle flash. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-hit-spark.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Shared hit spark",
+  "notes": "Hit spark. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-explosion-small.webp",
+  "w": 256,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Shared small explosion",
+  "notes": "Small explosion. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-explosion-big.webp",
+  "w": 512,
+  "h": 480,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Shared big explosion",
+  "notes": "Big explosion. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-explosion-boss.webp",
+  "w": 512,
+  "h": 494,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Shared boss explosion",
+  "notes": "Boss explosion. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-shockwave.webp",
+  "w": 255,
+  "h": 256,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "EMP shockwave ring",
+  "notes": "Shockwave ring. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
+ },
+ {
+  "file": "fx-engine.webp",
+  "w": 256,
+  "h": 68,
+  "group": "Effects (wave 8)",
+  "status": "WIRED",
+  "where": "Ship engine flame",
+  "notes": "Engine flame. Light on black, drawn additively.",
+  "kind": "fx",
+  "bg": "black",
+  "why": "Existing core effect (listed so the whole set is visible)",
+  "ph": {
+   "c": "#3dffb0",
+   "shape": "orb"
+  }
  }
 ]

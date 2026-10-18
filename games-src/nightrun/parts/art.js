@@ -20,7 +20,7 @@ ART.load=n=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();
 ART.have=n=>!!ART.bm[n];
 ART.err={};
 ART.frame=()=>{if(Math.abs(S-ART.S)>.01){ART.S=S;ART.sc={};}
-  if(running&&P){if(G.dead&&!ART.dead)ART.boom('explosion-big',P.x,P.y,170,.6);else if(!G.dead&&P.hp<ART.hp)ART.boom('explosion-small',P.x,P.y,76,.4);ART.hp=P.hp;ART.dead=G.dead;}else ART.dead=false;};        // the canvas scale changed (resize / rotation): scaled copies are rebuilt on demand
+  if(running&&P){if(G.dead&&!ART.dead)ART.boom(FXW.bk('explosion-big',null,170),P.x,P.y,170,.6);else if(!G.dead&&P.hp<ART.hp)ART.boom(FXW.bk('explosion-small',null,76),P.x,P.y,76,.4);ART.hp=P.hp;ART.dead=G.dead;}else ART.dead=false;};        // the canvas scale changed (resize / rotation): scaled copies are rebuilt on demand
 /* a copy of image n that is w world units wide, at the pixel size it will be drawn at ({c,w,h}); null while loading */
 ART.sp=(n,w,sc)=>{const b=ART.bm[n];if(!b)return null;sc=sc||S;w=Math.max(1,Math.round(w*2)/2);const k=n+'@'+w+'@'+sc;let o=ART.sc[k];if(o)return o;
   const h=w*b.height/b.width,pw=Math.max(1,Math.round(w*sc)),ph=Math.max(1,Math.round(h*sc));
@@ -54,7 +54,7 @@ ART.dflash=(n,w,x,y,rot,fl,col,a)=>{const o=ART.sp(n,w);if(!o)return false;ART.p
 ART.boom=(k,x,y,sz,life)=>{const f=ART.fx;if(f.length>=24)f.shift();f.push({k,x,y,sz,t:0,m:life});};
 ART.fxDraw=()=>{const f=ART.fx;if(!f.length)return;ctx.globalCompositeOperation='lighter';
   for(let i=f.length-1;i>=0;i--){const q=f[i];q.t+=FD;const k=q.t/q.m;if(k>=1){f.splice(i,1);continue;}
-    const b=ART.bm['fx-'+q.k];if(!b)continue;const grow=q.k==='muzzle'||q.k==='hit-spark'?.8+.4*k:.55+.65*k,w=q.sz*grow,h=w*b.height/b.width;
+    const b=ART.bm['fx-'+q.k];if(!b)continue;const grow=q.k==='muzzle'||q.k==='hit-spark'||/-(muzzle|hit)$/.test(q.k)?.8+.4*k:.55+.65*k,w=q.sz*grow,h=w*b.height/b.width;
     ctx.globalAlpha=Math.min(1,(1-k)*1.6)*(q.k==='hit-spark'?.9:1);ctx.drawImage(b,q.x-w/2,q.y-h/2,w,h);}
   ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';};
 ART.wave=(x,y,r,a)=>{const b=ART.bm['fx-shockwave'];if(!b)return false;ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.max(0,Math.min(1,a));ctx.drawImage(b,x-r,y-r,r*2,r*2);ctx.restore();return true;};
@@ -107,9 +107,9 @@ ART.portrait=(k,cx,y,sz,al)=>{const b=ART.bm['boss-'+ART.bossN[k]];if(!b)return;
   const rest=[];for(const n of ART.bossN){rest.push('spr-boss-'+n);rest.push('boss-'+n);}
   let i=0;const step=()=>{if(i<rest.length)ART.load(rest[i++]);else if(i<rest.length+DISTRICTS.length){ART.warm(i++-rest.length);}else return;setTimeout(step,350);};setTimeout(step,1500);}
 NR.on('kill',({e,boss})=>{
-  if(boss){const bx=e.x,by=e.y;for(let i=0;i<5;i++)G.delayed.push({t:i*.16,f:()=>ART.boom(i===4?'explosion-boss':'explosion-big',bx+rnd(-40,40),by+rnd(-40,40),i===4?320:170,.6)});return;}
-  ART.boom(e.type==='gunship'||e.type==='mine'?'explosion-big':'explosion-small',e.x,e.y,e.type==='gunship'?150:e.type==='mine'?90:Math.max(54,e.r*3.6),.42);});
-NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom('muzzle',f.x+10,f.y,34,.09);});
+  if(boss){const bx=e.x,by=e.y;for(let i=0;i<5;i++)G.delayed.push({t:i*.16,f:()=>ART.boom(FXW.bk(i===4?'explosion-boss':'explosion-big',e,i===4?320:170),bx+rnd(-40,40),by+rnd(-40,40),i===4?320:170,.6)});return;}
+  {const sz=e.type==='gunship'?150:e.type==='mine'?90:Math.max(54,e.r*3.6);ART.boom(FXW.bk(e.type==='gunship'||e.type==='mine'?'explosion-big':'explosion-small',e,sz),e.x,e.y,sz,.42);}});
+NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom(FXW.mz('muzzle'),f.x+10,f.y,34,.09);});
 {const _b=banner;banner=function(a,b,warn,t){_b(a,b,warn,t);if(warn&&G.boss&&!G.boss.dead&&G.boss.k!=null)G.banner.pic=ART.artK(G.boss);};}   // boss intro / phase banners carry the boss portrait
 {const _e=enterDistrict;enterDistrict=function(i){ART.warm(i);ART.warm(nextDi(i).di);return _e.apply(this,arguments);};}
 /* the scaled copies of the next backdrop are built in calm moments, never in the middle of a fight */

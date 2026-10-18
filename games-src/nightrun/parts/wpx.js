@@ -75,7 +75,7 @@ WPX.shell=(x,y,L,b)=>{const n=4+Math.floor(L/2)+(L>=10),wide=.9+.03*L,k=WP.fk();
   for(let i=0;i<n&&pbRoom();i++){const a=(n>1?i/(n-1)-.5:0)*wide;G.pb.push({x,y,vx:Math.cos(a)*650,vy:Math.sin(a)*650,dm:(.7+.03*L)*tpDmg()*k,pf:0,col:'#ffa94d',len:10,th:3,fz:1});}
   G.rings.push({x,y,l:.3,m:.3,c:'#ffa94d'});burst(x,y,'#ffa94d',8,220,.35);AU.sfx('hit');if(b)b.dead=1;};
 WPX.railFire=(L)=>{const dm=DMG.hit((8+.3*L)*tpDmg()*WP.fk()),w=10+.6*L;let n=0;
-  for(const e of G.en){if(!WP.tgt(e)||e.x<P.x||Math.abs(e.y-P.y)>e.r+w)continue;WP.hurtE(e,dm);n++;burst(e.x,e.y,WPD.rail.c,4,160,.25);}
+  for(const e of G.en){if(!WP.tgt(e)||e.x<P.x||Math.abs(e.y-P.y)>e.r+w)continue;WP.hurtE(e,dm,'rail');n++;burst(e.x,e.y,WPD.rail.c,4,160,.25);}
   WS.rf={x:P.x,y:P.y,w,l:.3,m:.3};AU.sfx('shot');return n;};
 {const bt=WP.beat;WP.beat=function(){bt.call(this);if(!G.live||G.dead||SH.active||P.over||!this.eq.includes('rail'))return;
   const L=this.lvOf('rail'),need=L>=6?2:3;if(++WS.rc>=need){WS.rc=0;WPX.railFire(L);}};
@@ -91,7 +91,7 @@ WPX.upd=function(dt){const ids=WP.eqIds(),k=WP.fk();
   for(const b of G.pb)if(b.sh&&!b.dead&&b.x>b.bx+300)WPX.shell(b.x,b.y,b.sl||1,b);
   if(ids.includes('well')){const L=WP.lvOf('well');for(let i=WS.orb.length-1;i>=0;i--){const o=WS.orb[i];o.t+=dt;o.x+=o.vx*dt;o.vx=Math.max(60,o.vx-120*dt);o.tk-=dt;
       for(const e of G.en){if(!WP.tgt(e)||e.type==='boss')continue;const dx=o.x-e.x,dy=o.y-e.y,d=Math.hypot(dx,dy);if(d<o.R&&d>4){const pull=Math.min(d,(1-d/o.R)*240*dt);e.x+=dx/d*pull;e.y+=dy/d*pull;}}
-      if(o.tk<=0){o.tk=.3;for(const e of G.en)if(WP.tgt(e)&&Math.hypot(e.x-o.x,e.y-o.y)<o.R*.6+e.r)WP.hurtE(e,(.4)*tpDmg()*k);}
+      if(o.tk<=0){o.tk=.3;for(const e of G.en)if(WP.tgt(e)&&Math.hypot(e.x-o.x,e.y-o.y)<o.R*.6+e.r)WP.hurtE(e,(.4)*tpDmg()*k,'well');}
       if(o.t>=o.life||o.x>W-20){WS.orb.splice(i,1);const dm=3.4*tpDmg()*k;for(const e of G.en)if(WP.tgt(e)&&Math.hypot(e.x-o.x,e.y-o.y)<o.R*.8+e.r)WP.hurtE(e,dm);
         G.rings.push({x:o.x,y:o.y,l:.4,m:.4,c:WPD.well.c});burst(o.x,o.y,WPD.well.c,10,240,.4);AU.sfx('hit');}}}
   else WS.orb.length=0;
@@ -102,7 +102,7 @@ WPX.upd=function(dt){const ids=WP.eqIds(),k=WP.fk();
   if(ids.includes('storm')){for(let i=WS.fld.length-1;i>=0;i--){const f=WS.fld[i],L=WP.lvOf('storm');f.t+=dt;f.x+=f.vx*dt;f.zt-=dt;
       if(f.t>=f.life||f.x<-40){WS.fld.splice(i,1);continue;}
       if(f.zt<=0){f.zt=.3;const tg=G.en.filter(e=>WP.tgt(e)&&Math.hypot(e.x-f.x,e.y-f.y)<f.R+e.r).sort((a,b)=>Math.hypot(a.x-f.x,a.y-f.y)-Math.hypot(b.x-f.x,b.y-f.y)).slice(0,1);
-        for(const e of tg){WP.hurtE(e,1.6*tpDmg()*k);AX.arcs.push({x1:f.x,y1:f.y,x2:e.x,y2:e.y,l:.18});}if(tg.length)AU.sfx('graze');}}}
+        for(const e of tg){WP.hurtE(e,1.6*tpDmg()*k,'storm');AX.arcs.push({x1:f.x,y1:f.y,x2:e.x,y2:e.y,l:.18});}if(tg.length)AU.sfx('graze');}}}
   else WS.fld.length=0;
   if(WS.rf){WS.rf.l-=dt;if(WS.rf.l<=0)WS.rf=null;}};
 WPX.draw=function(t){const c=ctx,ids=WP.eqIds();c.save();c.globalCompositeOperation='lighter';

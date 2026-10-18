@@ -7,7 +7,7 @@ Generated 2026-10-18 by `python3 games-src/scripts/next-wave.py` (rerun after lo
 - Music and sound cues: `games-src/next-wave/music/<game>/cues-wave6.json` (2 versions a and b of each, no vocals).
 - Every picture prompt: our own names, no text, letters or numbers in the picture; a UI piece is one object on a plain flat white background. Make at 1024 px or larger; we crop and convert.
 
-**Total 296**: paintings 287, 3D source paintings 0, music/sound 8, video 1.
+**Total 399**: paintings 390, 3D source paintings 0, music/sound 8, video 1.
 
 Plus 1130 wave 7 items (pose sets, 3D variety, art variety): see `games-src/VARIETY-PLAN.md` and the page.
 
@@ -329,7 +329,7 @@ Style block (in front of every picture prompt): Hand-painted gouache illustratio
 - Size/ratio: 1024x1024, ratio 0.51
 - Prompt: Hand-painted gouache illustration for a calm co-operative deep-sea card game, deep blue and teal water, a small warm golden lantern glow as the only strong warm light, soft rim light, visible gentle brush texture on matte paper, slightly wobbly dark navy ink outline, simple readable silhouette that still works at 40 pixels, rich but not neon colours, centred, plenty of margin, no text. a single ttl bg picture, game art for a board game, no text
 
-## Mainhattan Nightrun (`mainhattan-nightrun`): 216
+## Mainhattan Nightrun (`mainhattan-nightrun`): 319
 
 Style block (in front of every picture prompt): Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers
 
@@ -438,8 +438,832 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Size/ratio: 512x512, ratio 2.82, transparent (flat white background, we key it)
 - Prompt: Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers. a single wpBtn plate, game art for a board game, single object, centred, plain flat white background, no shadow, no text
 
+### fx-boom-boss-a: Effects (wave 8): fx-boom-boss-a
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-boss-a.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-boss-a.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Giant boss explosion A: a huge orange-white fireball with a shockwave ring. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A giant boss explosion: huge orange-white fireball, a thick expanding shockwave ring and flying embers, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-boss-b: Effects (wave 8): fx-boom-boss-b
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-boss-b.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-boss-b.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Giant boss explosion B: a cold magenta-cyan energy implosion-then-burst. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A giant boss explosion in cold colours: a magenta and cyan energy blast with a bright white core, a ring and long streaking sparks, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-debris: Effects (wave 8): fx-boom-debris
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-debris.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-debris.webp`
+- Size/ratio: 512x512, ratio 1:1, transparent (flat white background, we key it)
+- Note: A cluster of 6 metal debris pieces (plates, bolts) with a hot orange edge, scattered, as a sprite sheet-free single picture. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A scatter of six torn metal fragments and plates with glowing orange edges, in a ring around the centre, on a plain flat white background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-ground-dust: Effects (wave 8): fx-boom-ground-dust
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-ground-dust.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-ground-dust.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Soft dust and smoke puff for ground explosions, lit from within. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A soft puff of grey-orange dust and smoke lit by a fiery glow, centred, rising slightly, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-large-electric: Effects (wave 8): fx-boom-large-electric
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-large-electric.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-large-electric.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Explosion, large, electric look. Burst centred, fills the square, fades to black at the edges. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A large, dramatic explosion with a shockwave ring: cyan-white electric blast with crackling lightning arcs, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-large-fire: Effects (wave 8): fx-boom-large-fire
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-large-fire.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-large-fire.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Explosion, large, fire look. Burst centred, fills the square, fades to black at the edges. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A large, dramatic explosion with a shockwave ring: orange-yellow fire with a white-hot core and black-red smoke edges, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-large-plasma: Effects (wave 8): fx-boom-large-plasma
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-large-plasma.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-large-plasma.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Explosion, large, plasma look. Burst centred, fills the square, fades to black at the edges. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A large, dramatic explosion with a shockwave ring: magenta-violet plasma blast with a glowing ring and drifting energy sparks, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-medium-electric: Effects (wave 8): fx-boom-medium-electric
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-medium-electric.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-medium-electric.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Explosion, medium, electric look. Burst centred, fills the square, fades to black at the edges. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A medium explosion for a gunship or a mine: cyan-white electric blast with crackling lightning arcs, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-medium-fire: Effects (wave 8): fx-boom-medium-fire
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-medium-fire.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-medium-fire.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Explosion, medium, fire look. Burst centred, fills the square, fades to black at the edges. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A medium explosion for a gunship or a mine: orange-yellow fire with a white-hot core and black-red smoke edges, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-medium-plasma: Effects (wave 8): fx-boom-medium-plasma
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-medium-plasma.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-medium-plasma.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: Explosion, medium, plasma look. Burst centred, fills the square, fades to black at the edges. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A medium explosion for a gunship or a mine: magenta-violet plasma blast with a glowing ring and drifting energy sparks, centred burst filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-small-electric: Effects (wave 8): fx-boom-small-electric
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-small-electric.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-small-electric.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Explosion, small, electric look. Burst centred, fills the square, fades to black at the edges. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A small, quick explosion for a drone: cyan-white electric blast with crackling lightning arcs, centred burst filling the square, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-small-fire: Effects (wave 8): fx-boom-small-fire
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-small-fire.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-small-fire.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Explosion, small, fire look. Burst centred, fills the square, fades to black at the edges. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A small, quick explosion for a drone: orange-yellow fire with a white-hot core and black-red smoke edges, centred burst filling the square, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-boom-small-plasma: Effects (wave 8): fx-boom-small-plasma
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-boom-small-plasma.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-boom-small-plasma.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Explosion, small, plasma look. Burst centred, fills the square, fades to black at the edges. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A small, quick explosion for a drone: magenta-violet plasma blast with a glowing ring and drifting energy sparks, centred burst filling the square, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-eb-aim-line: Effects (wave 8): fx-eb-aim-line
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-eb-aim-line.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-eb-aim-line.webp`
+- Size/ratio: 256x32, ratio 8:1
+- Note: A dashed red warning line, tileable. Wide 256x32 picture; we crop and convert.
+- Prompt: A thin red warning aim line made of glowing dashes, horizontal, tileable left to right, on a pure solid black background, tileable left to right, 256x32, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-eb-bomb: Effects (wave 8): fx-eb-bomb
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-eb-bomb.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-eb-bomb.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: A round black bomb with a glowing orange fuse spark, seen from the side. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A round black cyberpunk bomb with an orange glowing band and a sparking fuse, seen from the side, on a plain flat white background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-eb-heal-ring: Effects (wave 8): fx-eb-heal-ring
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-eb-heal-ring.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-eb-heal-ring.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A green healing ring with small plus signs drifting around it, soft glow. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A soft green healing aura ring with tiny glowing plus shapes around it, circular, centred, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-eb-laser-sweep: Effects (wave 8): fx-eb-laser-sweep
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-eb-laser-sweep.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-eb-laser-sweep.webp`
+- Size/ratio: 512x64, ratio 8:1
+- Note: A wide sweeping boss laser, bright white core, red edges, horizontal and tileable. Wide 512x64 picture; we crop and convert.
+- Prompt: A wide boss laser beam, a white core and red-orange edges with small energy ripples, horizontal, tileable left to right, on a pure solid black background, tileable left to right, 512x64, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-eb-mine: Effects (wave 8): fx-eb-mine
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-eb-mine.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-eb-mine.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: A spiked lime-green mine with a red blinking light. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A round spiked proximity mine in dark metal with lime-green glowing lights and a small red blinking light, seen from above, on a plain flat white background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-eb-plasma: Effects (wave 8): fx-eb-plasma
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-eb-plasma.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-eb-plasma.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: A lime-pink plasma ball with a swirling core, round, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A round enemy plasma ball, a swirling lime-green and hot pink core with a dark outline ring and a soft glow, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-eb-rocket-trail: Effects (wave 8): fx-eb-rocket-trail
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-eb-rocket-trail.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-eb-rocket-trail.webp`
+- Size/ratio: 512x128, ratio 4:1
+- Note: Smoke-fire trail, bright at the right (head) end, fading to the left. Wide 512x128 picture; we crop and convert.
+- Prompt: A rocket exhaust trail, white-yellow at the right end fading through orange to dark red smoke at the left end, horizontal, on a pure solid black background, facing right, pointing to the right, 512x128, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-eb-shield-bubble: Effects (wave 8): fx-eb-shield-bubble
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-eb-shield-bubble.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-eb-shield-bubble.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A cyan energy bubble, hexagon pattern, brighter at the rim, empty centre, facing right. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A glowing cyan energy shield bubble, a faint hexagon pattern, bright rim, transparent dark centre, a circle filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-eb-shockwave-ring: Effects (wave 8): fx-eb-shockwave-ring
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-eb-shockwave-ring.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-eb-shockwave-ring.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A thin bright expanding ring, red-orange, even thickness, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A thin bright red-orange shockwave ring with a soft glow, perfectly circular, centred, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-eb-sniper-beam: Effects (wave 8): fx-eb-sniper-beam
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-eb-sniper-beam.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-eb-sniper-beam.webp`
+- Size/ratio: 256x64, ratio 4:1
+- Note: Tileable red-lime laser line, bright core, soft glow, horizontal, stretched to the player. Wide 256x64 picture; we crop and convert.
+- Prompt: A thin horizontal sniper laser line, a bright red-white core and a soft red glow, tileable left to right, on a pure solid black background, tileable left to right, 256x64, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-arc: Effects (wave 8): fx-ft-arc
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-arc.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-arc.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot arc gun projectile, facing right, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An on-foot arc gun projectile: a short jagged cyan lightning bolt with a white core, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-arc-hit: Effects (wave 8): fx-ft-arc-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-arc-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-arc-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot arc gun impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the on-foot arc gun: a cyan electric burst with branching arcs, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-arc-muzzle: Effects (wave 8): fx-ft-arc-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-arc-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-arc-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot arc gun muzzle flash pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the on-foot arc gun: a cyan electric crackle, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-blood-spark: Effects (wave 8): fx-ft-blood-spark
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-blood-spark.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-blood-spark.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: A neutral cyber spark burst: cyan-white sparks and a few small circuit-pattern fragments. No blood, no gore. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A neutral cyber hit spark: a burst of cyan and white sparks with a few small glowing circuit fragments, no blood, no gore, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-dust: Effects (wave 8): fx-ft-dust
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-dust.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-dust.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A low puff of dust lit by neon from the side. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A low puff of dust and steam from the ground, softly lit by pink and teal neon, centred, flat bottom, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-flame: Effects (wave 8): fx-ft-flame
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-flame.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-flame.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot flamethrower projectile, facing right, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An on-foot flamethrower projectile: a short ball of orange-red fire with a yellow core, licking tail, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-flame-hit: Effects (wave 8): fx-ft-flame-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-flame-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-flame-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot flamethrower impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the on-foot flamethrower: a splash of burning orange flame with embers, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-flame-muzzle: Effects (wave 8): fx-ft-flame-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-flame-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-flame-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot flamethrower muzzle flash pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the on-foot flamethrower: a roaring orange flame cone, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-grenade: Effects (wave 8): fx-ft-grenade
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-grenade.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-grenade.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: A round cyberpunk grenade with a glowing green band and a pin ring, side view. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A round cyberpunk hand grenade in dark metal with a glowing green band and a small pin ring, side view, on a plain flat white background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-mg-bullet: Effects (wave 8): fx-ft-mg-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-mg-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-mg-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot machine gun projectile, facing right, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An on-foot machine gun projectile: a thin orange tracer bullet streak, long and narrow, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-mg-hit: Effects (wave 8): fx-ft-mg-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-mg-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-mg-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot machine gun impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the on-foot machine gun: a quick orange spark spray, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-mg-muzzle: Effects (wave 8): fx-ft-mg-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-mg-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-mg-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot machine gun muzzle flash pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the on-foot machine gun: a stuttering orange flash with side sparks, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-pistol-bullet: Effects (wave 8): fx-ft-pistol-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-pistol-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-pistol-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot pistol projectile, facing right, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An on-foot pistol projectile: a small yellow-white tracer bullet with a short streak, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-pistol-hit: Effects (wave 8): fx-ft-pistol-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-pistol-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-pistol-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot pistol impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the on-foot pistol: a small yellow spark burst, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-pistol-muzzle: Effects (wave 8): fx-ft-pistol-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-pistol-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-pistol-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot pistol muzzle flash pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the on-foot pistol: a small yellow-white flash, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-rocket: Effects (wave 8): fx-ft-rocket
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-rocket.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-rocket.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot rocket launcher projectile, facing right, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An on-foot rocket launcher projectile: a small rocket glowing white-orange with a bright exhaust flame, side view, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-rocket-hit: Effects (wave 8): fx-ft-rocket-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-rocket-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-rocket-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot rocket launcher impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the on-foot rocket launcher: a bright orange explosion burst with a ring, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-rocket-muzzle: Effects (wave 8): fx-ft-rocket-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-rocket-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-rocket-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot rocket launcher muzzle flash pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the on-foot rocket launcher: a fiery backblast cone and smoke glow, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-shield-hit: Effects (wave 8): fx-ft-shield-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-shield-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-shield-hit.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A blue hex ripple with a bright flash at the centre. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A blue energy shield hit: a bright white-blue flash with a hexagon ripple spreading out from it, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-shotgun-hit: Effects (wave 8): fx-ft-shotgun-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-shotgun-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-shotgun-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot shotgun impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the on-foot shotgun: a small yellow dot burst with tiny sparks, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-shotgun-muzzle: Effects (wave 8): fx-ft-shotgun-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-shotgun-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-shotgun-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot shotgun muzzle flash pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the on-foot shotgun: a wide cone of yellow sparks, starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-ft-shotgun-pellet: Effects (wave 8): fx-ft-shotgun-pellet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-ft-shotgun-pellet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-ft-shotgun-pellet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: On-foot shotgun projectile, facing right, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An on-foot shotgun projectile: a small round hot yellow pellet with a short glowing tail, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-pw-bomb-pulse: Effects (wave 8): fx-pw-bomb-pulse
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-pw-bomb-pulse.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-pw-bomb-pulse.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A big electric-blue pulse ring with crackling edges. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A large electric blue-white pulse ring with crackling lightning on its edge, circular, centred, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-pw-crescendo-glow: Effects (wave 8): fx-pw-crescendo-glow
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-pw-crescendo-glow.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-pw-crescendo-glow.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A warm gold glow made of rising arcs, soft, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A warm golden glow made of three nested rising arcs, soft, centred, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-pw-echo-ghost: Effects (wave 8): fx-pw-echo-ghost
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-pw-echo-ghost.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-pw-echo-ghost.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: A cyan ghost of a small ship shot with a trailing echo, facing right. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A translucent cyan ghost bolt with two fading echo copies behind it, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-pw-fever-aura: Effects (wave 8): fx-pw-fever-aura
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-pw-fever-aura.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-pw-fever-aura.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A flame-like magenta-orange aura, rising flames, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A fiery magenta and orange aura with rising flame tongues, centred, soft, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-pw-level-up: Effects (wave 8): fx-pw-level-up
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-pw-level-up.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-pw-level-up.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A rising golden burst, a ring and light rays pointing up. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A rising golden level-up burst: a ring with light rays and small up arrows of light, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-pw-magnet-field: Effects (wave 8): fx-pw-magnet-field
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-pw-magnet-field.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-pw-magnet-field.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A blue-violet pulse ring with inward-curving field lines. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A blue-violet magnetic pulse: a glowing ring with curved field lines flowing inwards, circular, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-pw-nova-ring: Effects (wave 8): fx-pw-nova-ring
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-pw-nova-ring.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-pw-nova-ring.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A magenta energy ring, thick and bright, empty centre, soft outer glow. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A thick glowing magenta-pink energy ring with a white inner edge, circular, empty centre, soft outer glow, filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-pw-pickup-glow: Effects (wave 8): fx-pw-pickup-glow
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-pw-pickup-glow.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-pw-pickup-glow.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A soft round white-gold glow with 4 tiny sparkles, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A soft round white-gold glow with four tiny sparkle stars around it, centred, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-pw-shield-bubble: Effects (wave 8): fx-pw-shield-bubble
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-pw-shield-bubble.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-pw-shield-bubble.webp`
+- Size/ratio: 512x512, ratio 1:1
+- Note: A pale blue-white energy bubble around the ship, hex pattern, bright rim. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A pale blue-white energy bubble, a faint hexagon pattern, bright rim, almost transparent centre, a circle filling the square, on a pure solid black background, centred, 512x512, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-pw-wingmate-trail: Effects (wave 8): fx-pw-wingmate-trail
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-pw-wingmate-trail.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-pw-wingmate-trail.webp`
+- Size/ratio: 256x64, ratio 4:1
+- Note: A short golden engine trail, bright at the right end, fading left. Wide 256x64 picture; we crop and convert.
+- Prompt: A short golden-yellow engine trail for a small drone, bright at the right end fading to nothing at the left, horizontal, on a pure solid black background, facing right, pointing to the right, 256x64, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-arc-bullet: Effects (wave 8): fx-w-arc-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-arc-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-arc-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Arc Chain: the shot, facing right, centred. Painted colour matches the weapon colour #8fe9ff. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Arc Chain: a jagged cyan lightning bolt segment with forks and a white core, horizontal, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-arc-hit: Effects (wave 8): fx-w-arc-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-arc-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-arc-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Arc Chain impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Arc Chain: a branching cyan electric burst with a bright white centre, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-arc-muzzle: Effects (wave 8): fx-w-arc-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-arc-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-arc-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Arc Chain muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Arc Chain: a small crackle of cyan electric sparks, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-beat-bullet: Effects (wave 8): fx-w-beat-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-beat-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-beat-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Beat Cannon: the shot, facing right, centred. Painted colour matches the weapon colour #ffe14d. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Beat Cannon: a heavy round yellow cannon shell glowing white-hot, a pulsing shockwave arc around its front and a thick gold trail, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-beat-hit: Effects (wave 8): fx-w-beat-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-beat-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-beat-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Beat Cannon impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Beat Cannon: a heavy yellow explosion flash with a bold shockwave ring, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-beat-muzzle: Effects (wave 8): fx-w-beat-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-beat-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-beat-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Beat Cannon muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Beat Cannon: a big gold muzzle blast with a speed ring, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-disc-bullet: Effects (wave 8): fx-w-disc-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-disc-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-disc-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Ricochet Disc: the shot, facing right, centred. Painted colour matches the weapon colour #ff7a45. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Ricochet Disc: a round razor-edged orange disc with a notched rim, spinning, motion arcs around it, facing right, centred, on a plain flat white background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-disc-hit: Effects (wave 8): fx-w-disc-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-disc-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-disc-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Ricochet Disc impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Ricochet Disc: an orange spark shower from a bounce, a bright flash ring, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-disc-muzzle: Effects (wave 8): fx-w-disc-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-disc-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-disc-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Ricochet Disc muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Ricochet Disc: a small orange spark flash, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-drone-bullet: Effects (wave 8): fx-w-drone-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-drone-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-drone-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Echo Drone: the shot, facing right, centred. Painted colour matches the weapon colour #e6a8ff. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Echo Drone: a lilac echo pulse bolt with two fainter copies trailing behind it, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-drone-hit: Effects (wave 8): fx-w-drone-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-drone-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-drone-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Echo Drone impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Echo Drone: a lilac ripple with a ghost ring, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-drone-muzzle: Effects (wave 8): fx-w-drone-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-drone-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-drone-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Echo Drone muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Echo Drone: a lilac double-ring flash, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-flame-bullet: Effects (wave 8): fx-w-flame-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-flame-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-flame-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Flame Arc: the shot, facing right, centred. Painted colour matches the weapon colour #ff5a2d. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Flame Arc: a short licking jet of orange-red flame flying right, yellow core, ember sparks, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-flame-hit: Effects (wave 8): fx-w-flame-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-flame-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-flame-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Flame Arc impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Flame Arc: a small burning fireball splash with embers, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-flame-muzzle: Effects (wave 8): fx-w-flame-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-flame-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-flame-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Flame Arc muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Flame Arc: a roaring orange-red flame burst, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-frost-bullet: Effects (wave 8): fx-w-frost-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-frost-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-frost-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Frost Beam: the shot, facing right, centred. Painted colour matches the weapon colour #9fe8ff. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Frost Beam: an icy pale-blue beam segment with ice crystals along it, white-blue glow, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-frost-hit: Effects (wave 8): fx-w-frost-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-frost-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-frost-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Frost Beam impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Frost Beam: a frozen burst of ice crystals and a pale-blue ring, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-frost-muzzle: Effects (wave 8): fx-w-frost-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-frost-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-frost-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Frost Beam muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Frost Beam: a frosty pale-blue puff with snow sparkles, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-laser-bullet: Effects (wave 8): fx-w-laser-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-laser-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-laser-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Laser Lance: the shot, facing right, centred. Painted colour matches the weapon colour #7dffd8. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Laser Lance: a long thin mint-green laser lance segment, a razor-bright white core and a soft mint halo, fading at both ends, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-laser-hit: Effects (wave 8): fx-w-laser-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-laser-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-laser-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Laser Lance impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Laser Lance: a mint-green ring and a bright flash where a beam pierces through, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-laser-muzzle: Effects (wave 8): fx-w-laser-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-laser-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-laser-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Laser Lance muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Laser Lance: a narrow mint flare shooting right with a ring at the barrel, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-mine-bullet: Effects (wave 8): fx-w-mine-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-mine-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-mine-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Mine Layer: the shot, facing right, centred. Painted colour matches the weapon colour #c08aff. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Mine Layer: a round purple proximity mine with a blinking glow and little spikes, facing right, centred, on a plain flat white background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-mine-hit: Effects (wave 8): fx-w-mine-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-mine-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-mine-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Mine Layer impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Mine Layer: a purple blast with a ring and floating shards, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-mine-muzzle: Effects (wave 8): fx-w-mine-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-mine-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-mine-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Mine Layer muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Mine Layer: a soft purple drop-ring flash, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-orbit-bullet: Effects (wave 8): fx-w-orbit-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-orbit-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-orbit-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Orbit Blades: the shot, facing right, centred. Painted colour matches the weapon colour #b6ff5a. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Orbit Blades: a single curved lime-green energy blade (crescent) with a glowing edge, facing right, centred, on a plain flat white background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-orbit-hit: Effects (wave 8): fx-w-orbit-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-orbit-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-orbit-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Orbit Blades impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Orbit Blades: a lime-green slash mark with sparks, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-orbit-muzzle: Effects (wave 8): fx-w-orbit-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-orbit-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-orbit-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Orbit Blades muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Orbit Blades: a quick lime-green swish of light, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-pulse-bullet: Effects (wave 8): fx-w-pulse-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-pulse-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-pulse-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Pulse Spread: the shot, facing right, centred. Painted colour matches the weapon colour #ff8ad8. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Pulse Spread: a short fat pink energy pellet with a hot white core and a small comet tail, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-pulse-hit: Effects (wave 8): fx-w-pulse-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-pulse-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-pulse-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Pulse Spread impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Pulse Spread: a pink starburst impact with short spikes and sparkles, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-pulse-muzzle: Effects (wave 8): fx-w-pulse-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-pulse-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-pulse-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Pulse Spread muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Pulse Spread: a small pink star-shaped muzzle flash fanning to the right, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-rail-bullet: Effects (wave 8): fx-w-rail-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-rail-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-rail-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Rail Sniper: the shot, facing right, centred. Painted colour matches the weapon colour #ff3d6a. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Rail Sniper: a very bright crimson-white rail bolt, long and needle-sharp, with a thin trail, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-rail-hit: Effects (wave 8): fx-w-rail-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-rail-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-rail-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Rail Sniper impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Rail Sniper: a crimson pierce flash with a hard white spike, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-rail-muzzle: Effects (wave 8): fx-w-rail-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-rail-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-rail-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Rail Sniper muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Rail Sniper: a crimson flash with a shock ring, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-shell-bullet: Effects (wave 8): fx-w-shell-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-shell-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-shell-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1, transparent (flat white background, we key it)
+- Note: Shrapnel Shell: the shot, facing right, centred. Painted colour matches the weapon colour #ffa94d. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Shrapnel Shell: a stubby orange shell with a bright tip and a small flame, fragments of light flying off it, facing right, centred, on a plain flat white background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-shell-hit: Effects (wave 8): fx-w-shell-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-shell-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-shell-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Shrapnel Shell impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Shrapnel Shell: an orange burst of flying fragments, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-shell-muzzle: Effects (wave 8): fx-w-shell-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-shell-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-shell-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Shrapnel Shell muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Shrapnel Shell: an orange cone of flame and sparks, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-storm-bullet: Effects (wave 8): fx-w-storm-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-storm-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-storm-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Storm Cell: the shot, facing right, centred. Painted colour matches the weapon colour #fff06a. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Storm Cell: a crackling yellow electric storm ball with small lightning arcs around it, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-storm-hit: Effects (wave 8): fx-w-storm-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-storm-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-storm-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Storm Cell impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Storm Cell: a yellow lightning burst with arcs, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-storm-muzzle: Effects (wave 8): fx-w-storm-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-storm-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-storm-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Storm Cell muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Storm Cell: a yellow spark burst, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-swarm-bullet: Effects (wave 8): fx-w-swarm-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-swarm-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-swarm-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Homing Swarm: the shot, facing right, centred. Painted colour matches the weapon colour #ffb020. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Homing Swarm: a small amber homing missile seen from the side, glowing exhaust flame and a short smoke-glow trail behind it, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-swarm-hit: Effects (wave 8): fx-w-swarm-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-swarm-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-swarm-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Homing Swarm impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Homing Swarm: a small amber fireball with a ring of tiny sparks, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-swarm-muzzle: Effects (wave 8): fx-w-swarm-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-swarm-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-swarm-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Homing Swarm muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Homing Swarm: a puff of amber flame and sparks, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-wave-bullet: Effects (wave 8): fx-w-wave-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-wave-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-wave-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Plasma Wave: the shot, facing right, centred. Painted colour matches the weapon colour #5b8cff. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Plasma Wave: a big crescent blue plasma wave front curving to the right, white-blue edge, soft glow, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-wave-hit: Effects (wave 8): fx-w-wave-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-wave-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-wave-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Plasma Wave impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Plasma Wave: a blue plasma splash ring with droplets of light, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-wave-muzzle: Effects (wave 8): fx-w-wave-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-wave-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-wave-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Plasma Wave muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Plasma Wave: a blue plasma ripple ring, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-well-bullet: Effects (wave 8): fx-w-well-bullet
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-well-bullet.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-well-bullet.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Gravity Well: the shot, facing right, centred. Painted colour matches the weapon colour #7a4dff. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A game projectile for the weapon Gravity Well: a swirling violet orb with an inward spiral, dark centre and bright rim, facing right, centred, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-well-hit: Effects (wave 8): fx-w-well-hit
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-well-hit.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-well-hit.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Gravity Well impact burst, centred. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: An impact effect for the weapon Gravity Well: a violet implosion ring with sparks pulled in, centred, on a pure solid black background, centred, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
+### fx-w-well-muzzle: Effects (wave 8): fx-w-well-muzzle
+- Why: new weapons and fusions. Effects asset wave 8 (owner, 18 Oct 2026)
+- Type: painting; priority 3 (missing extra)
+- Save as: `fx-w-well-muzzle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-w-well-muzzle.webp`
+- Size/ratio: 256x256, ratio 1:1
+- Note: Gravity Well muzzle flash at the gun, pointing right, base at the left-centre edge. Paint at 1024x1024 or larger; we crop and convert.
+- Prompt: A muzzle flash for the weapon Gravity Well: a violet swirl opening to the right, the flash starting at the left-centre edge and pointing right, on a pure solid black background, facing right, pointing to the right, 256x256, soft transparent-friendly edges, no characters, no text, no letters.
+
 ### fx-bullet-needle: Enemy bullet effects
-- Why: missing. Missing: picture not yet made
+- Why: missing + new weapons and fusions. Missing: picture not yet made | Existing core effect (listed so the whole set is visible)
 - Type: painting; priority 3 (missing extra)
 - Save as: `fx-bullet-needle.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-bullet-needle.webp`
 - Size/ratio: 256x64, ratio 4:1
@@ -447,7 +1271,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Prompt: Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers. a thin fast lime-yellow energy needle pointing RIGHT with a short fading tail, light on black, no text, letters or numbers
 
 ### fx-bullet-rocket: Enemy bullet effects
-- Why: missing. Missing: picture not yet made
+- Why: missing + new weapons and fusions. Missing: picture not yet made | Existing core effect (listed so the whole set is visible)
 - Type: painting; priority 3 (missing extra)
 - Save as: `fx-bullet-rocket.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-bullet-rocket.webp`
 - Size/ratio: 256x128, ratio 2:1
@@ -455,7 +1279,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Prompt: Painted neon cyberpunk game icon, dark gunmetal bezel ring with glowing cyan, magenta and amber neon accents, crisp dark outline, same painted look as the other Nightrun garage icons, single centred object, transparent background, no text, no letters, no numbers. a glowing missile flying RIGHT, pale blue-white body, red nose, orange exhaust flame trailing left, light on black, no text, letters or numbers
 
 ### fx-bullet-shell: Enemy bullet effects
-- Why: missing. Missing: picture not yet made
+- Why: missing + new weapons and fusions. Missing: picture not yet made | Existing core effect (listed so the whole set is visible)
 - Type: painting; priority 3 (missing extra)
 - Save as: `fx-bullet-shell.webp` (laptop) -> `games/mainhattan-nightrun/media/fx-bullet-shell.webp`
 - Size/ratio: 128x128, ratio 1:1
@@ -558,7 +1382,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `foot/bg-far.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bg-far.webp`
 - Size/ratio: 2048x1024, ratio 2:1, transparent (flat white background, we key it)
-- Note: 2:1 landscape, transparent. a distant skyline of dark purple tower silhouettes with many small lit windows (cyan and amber), antenna lights, haze at the base; the sky above the towers is flat plain white (to be cut out); the towers stand on the bottom edge. Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2:1 picture; we crop and convert.
+- Note: 2:1 landscape, transparent. a distant skyline of dark purple tower silhouettes with many small lit windows (cyan and amber), antenna lights, haze at the base; the sky above the towers is flat plain white (to be cut out); the towers stand on the bottom edge. Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2048x1024 picture; we crop and convert.
 - Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Side-view background layer for a run-and-gun game, 2048x1024 landscape, seamless horizontal tiling: a distant skyline of dark purple tower silhouettes with many small lit windows (cyan and amber), antenna lights, haze at the base; the sky above the towers is flat plain white (to be cut out); the towers stand on the bottom edge. No characters, no text, no letters., single object, centred, plain flat white background, no shadow
 
 ### foot/bg-floor: On-foot street stage: foot/bg-floor
@@ -566,7 +1390,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `foot/bg-floor.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bg-floor.webp`
 - Size/ratio: 2048x1024, ratio 2:1, transparent (flat white background, we key it)
-- Note: 2:1 landscape, transparent. the street surface as a flat strip at the very bottom fifth: dark wet asphalt with a pavement edge, dashed road markings and neon puddle reflections in magenta and teal; the upper four fifths are flat plain white (to be cut out). Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2:1 picture; we crop and convert.
+- Note: 2:1 landscape, transparent. the street surface as a flat strip at the very bottom fifth: dark wet asphalt with a pavement edge, dashed road markings and neon puddle reflections in magenta and teal; the upper four fifths are flat plain white (to be cut out). Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2048x1024 picture; we crop and convert.
 - Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Side-view background layer for a run-and-gun game, 2048x1024 landscape, seamless horizontal tiling: the street surface as a flat strip at the very bottom fifth: dark wet asphalt with a pavement edge, dashed road markings and neon puddle reflections in magenta and teal; the upper four fifths are flat plain white (to be cut out). No characters, no text, no letters., single object, centred, plain flat white background, no shadow
 
 ### foot/bg-mid: On-foot street stage: foot/bg-mid
@@ -574,7 +1398,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `foot/bg-mid.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bg-mid.webp`
 - Size/ratio: 2048x1024, ratio 2:1, transparent (flat white background, we key it)
-- Note: 2:1 landscape, transparent. mid-distance city buildings, dark violet with big neon signs in magenta, cyan and amber, lit windows, fire escapes; everything above the roofs is flat plain white (to be cut out); buildings stand on the bottom edge. Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2:1 picture; we crop and convert.
+- Note: 2:1 landscape, transparent. mid-distance city buildings, dark violet with big neon signs in magenta, cyan and amber, lit windows, fire escapes; everything above the roofs is flat plain white (to be cut out); buildings stand on the bottom edge. Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2048x1024 picture; we crop and convert.
 - Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Side-view background layer for a run-and-gun game, 2048x1024 landscape, seamless horizontal tiling: mid-distance city buildings, dark violet with big neon signs in magenta, cyan and amber, lit windows, fire escapes; everything above the roofs is flat plain white (to be cut out); buildings stand on the bottom edge. No characters, no text, no letters., single object, centred, plain flat white background, no shadow
 
 ### foot/bg-near: On-foot street stage: foot/bg-near
@@ -582,7 +1406,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `foot/bg-near.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bg-near.webp`
 - Size/ratio: 2048x1024, ratio 2:1, transparent (flat white background, we key it)
-- Note: 2:1 landscape, transparent. foreground street props along the bottom edge only: lamp posts with warm glowing lamps, rubbish bins, rolled-down shop shutters with neon trim, wet reflections; the rest of the picture is flat plain white (to be cut out). Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2:1 picture; we crop and convert.
+- Note: 2:1 landscape, transparent. foreground street props along the bottom edge only: lamp posts with warm glowing lamps, rubbish bins, rolled-down shop shutters with neon trim, wet reflections; the rest of the picture is flat plain white (to be cut out). Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2048x1024 picture; we crop and convert.
 - Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Side-view background layer for a run-and-gun game, 2048x1024 landscape, seamless horizontal tiling: foreground street props along the bottom edge only: lamp posts with warm glowing lamps, rubbish bins, rolled-down shop shutters with neon trim, wet reflections; the rest of the picture is flat plain white (to be cut out). No characters, no text, no letters., single object, centred, plain flat white background, no shadow
 
 ### foot/bg-sky: On-foot street stage: foot/bg-sky
@@ -590,7 +1414,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `foot/bg-sky.webp` (laptop) -> `games/mainhattan-nightrun/media/foot/bg-sky.webp`
 - Size/ratio: 2048x1024, ratio 2:1, transparent (flat white background, we key it)
-- Note: 2:1 landscape, opaque. the night sky over a rainy cyberpunk Frankfurt: dark violet at the top to magenta-teal haze at the horizon, low rain clouds, a pale pink moon, a few stars; NO buildings, NO ground; the bottom edge glows magenta. Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2:1 picture; we crop and convert.
+- Note: 2:1 landscape, opaque. the night sky over a rainy cyberpunk Frankfurt: dark violet at the top to magenta-teal haze at the horizon, low rain clouds, a pale pink moon, a few stars; NO buildings, NO ground; the bottom edge glows magenta. Must tile seamlessly left to right. The street line (where feet stand) is at 80% of the height. Wide 2048x1024 picture; we crop and convert.
 - Prompt: Painted cyberpunk Frankfurt 2099, hand-painted game art, rain, teal and magenta neon, readable silhouettes, crisp dark outline, chunky shapes that read at small size. Side-view background layer for a run-and-gun game, 2048x1024 landscape, seamless horizontal tiling: the night sky over a rainy cyberpunk Frankfurt: dark violet at the top to magenta-teal haze at the horizon, low rain clouds, a pale pink moon, a few stars; NO buildings, NO ground; the bottom edge glows magenta. No characters, no text, no letters., single object, centred, plain flat white background, no shadow
 
 ### foot/bruiser-crouch: On-foot street stage: foot/bruiser-crouch
@@ -1550,7 +2374,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `ship-drift-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-drift-armed.webp`
 - Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
-- Note: Drift ship, same pose and painted style as ship-drift.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Drift ship, same pose and painted style as ship-drift.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 512x256 picture; we crop and convert.
 - Prompt: the Drift spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### ship-ec-armed: Ship weapon mounts: ship-ec-armed
@@ -1558,7 +2382,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `ship-ec-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-ec-armed.webp`
 - Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
-- Note: Echo ship, same pose and painted style as ship-ec.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Echo ship, same pose and painted style as ship-ec.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 512x256 picture; we crop and convert.
 - Prompt: the Echo spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### ship-hv-armed: Ship weapon mounts: ship-hv-armed
@@ -1566,7 +2390,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `ship-hv-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-hv-armed.webp`
 - Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
-- Note: Half-time Heavy ship, same pose and painted style as ship-hv.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Half-time Heavy ship, same pose and painted style as ship-hv.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 512x256 picture; we crop and convert.
 - Prompt: the Half-time Heavy spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### ship-lancer-armed: Ship weapon mounts: ship-lancer-armed
@@ -1574,7 +2398,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `ship-lancer-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-lancer-armed.webp`
 - Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
-- Note: Lancer ship, same pose and painted style as ship-lancer.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Lancer ship, same pose and painted style as ship-lancer.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 512x256 picture; we crop and convert.
 - Prompt: the Lancer spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### ship-nova-armed: Ship weapon mounts: ship-nova-armed
@@ -1582,7 +2406,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `ship-nova-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-nova-armed.webp`
 - Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
-- Note: Nova ship, same pose and painted style as ship-nova.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Nova ship, same pose and painted style as ship-nova.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 512x256 picture; we crop and convert.
 - Prompt: the Nova spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### ship-std-armed: Ship weapon mounts: ship-std-armed
@@ -1590,7 +2414,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `ship-std-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-std-armed.webp`
 - Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
-- Note: Courier ship, same pose and painted style as ship-std.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Courier ship, same pose and painted style as ship-std.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 512x256 picture; we crop and convert.
 - Prompt: the Courier spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### ship-swg-armed: Ship weapon mounts: ship-swg-armed
@@ -1598,7 +2422,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `ship-swg-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-swg-armed.webp`
 - Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
-- Note: Swing ship, same pose and painted style as ship-swg.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Swing ship, same pose and painted style as ship-swg.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 512x256 picture; we crop and convert.
 - Prompt: the Swing spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### ship-syn-armed: Ship weapon mounts: ship-syn-armed
@@ -1606,7 +2430,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `ship-syn-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-syn-armed.webp`
 - Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
-- Note: Syncopator ship, same pose and painted style as ship-syn.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Syncopator ship, same pose and painted style as ship-syn.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 512x256 picture; we crop and convert.
 - Prompt: the Syncopator spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### ship-tri-armed: Ship weapon mounts: ship-tri-armed
@@ -1614,7 +2438,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `ship-tri-armed.webp` (laptop) -> `games/mainhattan-nightrun/media/ship-tri-armed.webp`
 - Size/ratio: 512x256, ratio 2:1, transparent (flat white background, we key it)
-- Note: Triplet ship, same pose and painted style as ship-tri.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Triplet ship, same pose and painted style as ship-tri.webp, with four small neutral guns fitted (two on top, two below), nose pointing RIGHT. 512x256, transparent. Paint at 2048x1024 or larger, we convert. Wide 512x256 picture; we crop and convert.
 - Prompt: the Triplet spaceship seen from the side, nose pointing right, fitted with four small neutral guns, two above and two below the hull, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-arc: Ship weapon mounts: wpmount-arc
@@ -1622,7 +2446,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-arc.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-arc.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Arc Chain mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #8fe9ff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Arc Chain mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #8fe9ff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for arc chain, side view, muzzle pointing right, compact single part, accent glow #8fe9ff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-beat: Ship weapon mounts: wpmount-beat
@@ -1630,7 +2454,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-beat.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-beat.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Beat Cannon mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffe14d. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Beat Cannon mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffe14d. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for beat cannon, side view, muzzle pointing right, compact single part, accent glow #ffe14d, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-disc: Ship weapon mounts: wpmount-disc
@@ -1638,7 +2462,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-disc.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-disc.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Ricochet Disc mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff7a45. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Ricochet Disc mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff7a45. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for ricochet disc, side view, muzzle pointing right, compact single part, accent glow #ff7a45, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-drone: Ship weapon mounts: wpmount-drone
@@ -1646,7 +2470,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-drone.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-drone.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Echo Drone mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #e6a8ff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Echo Drone mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #e6a8ff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for echo drone, side view, muzzle pointing right, compact single part, accent glow #e6a8ff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-flame: Ship weapon mounts: wpmount-flame
@@ -1654,7 +2478,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-flame.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-flame.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Flame Arc mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff5a2d. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Flame Arc mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff5a2d. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for flame arc, side view, muzzle pointing right, compact single part, accent glow #ff5a2d, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-frost: Ship weapon mounts: wpmount-frost
@@ -1662,7 +2486,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-frost.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-frost.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Frost Beam mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #9fe8ff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Frost Beam mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #9fe8ff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for frost beam, side view, muzzle pointing right, compact single part, accent glow #9fe8ff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-laser: Ship weapon mounts: wpmount-laser
@@ -1670,7 +2494,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-laser.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-laser.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Laser Lance mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #7dffd8. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Laser Lance mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #7dffd8. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for laser lance, side view, muzzle pointing right, compact single part, accent glow #7dffd8, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-mine: Ship weapon mounts: wpmount-mine
@@ -1678,7 +2502,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-mine.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-mine.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Mine Layer mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #c08aff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Mine Layer mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #c08aff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for mine layer, side view, muzzle pointing right, compact single part, accent glow #c08aff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-orbit: Ship weapon mounts: wpmount-orbit
@@ -1686,7 +2510,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-orbit.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-orbit.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Orbit Blades mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #b6ff5a. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Orbit Blades mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #b6ff5a. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for orbit blades, side view, muzzle pointing right, compact single part, accent glow #b6ff5a, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-pulse: Ship weapon mounts: wpmount-pulse
@@ -1694,7 +2518,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-pulse.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-pulse.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Pulse Spread mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff8ad8. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Pulse Spread mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff8ad8. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for pulse spread, side view, muzzle pointing right, compact single part, accent glow #ff8ad8, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-rail: Ship weapon mounts: wpmount-rail
@@ -1702,7 +2526,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-rail.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-rail.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Rail Sniper mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff3d6a. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Rail Sniper mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ff3d6a. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for rail sniper, side view, muzzle pointing right, compact single part, accent glow #ff3d6a, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-shell: Ship weapon mounts: wpmount-shell
@@ -1710,7 +2534,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-shell.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-shell.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Shrapnel Shell mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffa94d. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Shrapnel Shell mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffa94d. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for shrapnel shell, side view, muzzle pointing right, compact single part, accent glow #ffa94d, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-storm: Ship weapon mounts: wpmount-storm
@@ -1718,7 +2542,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-storm.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-storm.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Storm Cell mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #fff06a. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Storm Cell mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #fff06a. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for storm cell, side view, muzzle pointing right, compact single part, accent glow #fff06a, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-swarm: Ship weapon mounts: wpmount-swarm
@@ -1726,7 +2550,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-swarm.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-swarm.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Homing Swarm mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffb020. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Homing Swarm mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #ffb020. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for homing swarm, side view, muzzle pointing right, compact single part, accent glow #ffb020, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-wave: Ship weapon mounts: wpmount-wave
@@ -1734,7 +2558,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-wave.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-wave.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Plasma Wave mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #5b8cff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Plasma Wave mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #5b8cff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for plasma wave, side view, muzzle pointing right, compact single part, accent glow #5b8cff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### wpmount-well: Ship weapon mounts: wpmount-well
@@ -1742,7 +2566,7 @@ Style block (in front of every picture prompt): Painted neon cyberpunk game icon
 - Type: painting; priority 3 (missing extra)
 - Save as: `wpmount-well.webp` (laptop) -> `games/mainhattan-nightrun/media/wpmount-well.webp`
 - Size/ratio: 256x128, ratio 2:1, transparent (flat white background, we key it)
-- Note: Gravity Well mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #7a4dff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 2:1 picture; we crop and convert.
+- Note: Gravity Well mount: ONE small attachment (gun, pod, hub or rack) seen from the side, nose pointing RIGHT, centred, accent colour #7a4dff. 256x128, transparent. Paint at 1024x512 or larger, we convert. Wide 256x128 picture; we crop and convert.
 - Prompt: a small spaceship weapon attachment for gravity well, side view, muzzle pointing right, compact single part, accent glow #7a4dff, centred, painted neon cyberpunk look like the existing ship sprites, no text, letters or numbers, transparent background, single object, centred, plain flat white background, no shadow
 
 ### fx-fuse-arc-beat: Weapon fusions: fx-fuse-arc-beat

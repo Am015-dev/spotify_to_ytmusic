@@ -235,7 +235,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
     return this._f;},
   fk(){return this.fu()?FU_K:1;},
   // options a fusion adds to the bullets of weapon id
-  mod(id,o){const f=this.fu();o=Object.assign({},o);if(!f)return o;const fx=f.fx,mine=id===f.own||id===f.par;
+  mod(id,o){const f=this.fu();o=Object.assign({wid:id},o);if(!f)return o;const fx=f.fx,mine=id===f.own||id===f.par;
     if(fx==='split'&&mine){if(!o.px){o.px=new Set();o.pn=1;}o.sp=1;}
     else if(fx==='rebound'&&mine){if(!o.px){o.px=new Set();o.pn=99;}o.rc=Math.max(o.rc||0,1);}
     else if(fx==='seek'&&id===f.par)o.hk=Math.max(o.hk||0,1.8);
@@ -269,15 +269,15 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
     else if(WPX.fire[id])WPX.fire[id](std,L);},
   // can this foe be hurt by direct (non-bullet) damage right now?
   tgt(e){return e.hp>0&&!e.dying&&e.type!=='gate'&&e.x<W-6&&(e.type!=='boss'||e.x<W-20);},
-  hurtE(e,dm){e.hp-=dm*(e.shl?.45:1);e.flash=.08;},
+  hurtE(e,dm,w){e.hp-=dm*(e.shl?.45:1);e.flash=.08;if(w)e._wk=w;},
   // ARC CHAIN: the nearest foe in range, then it jumps from foe to foe (1+L jumps)
   arcZap(L){const R=270+14*L,dm=(1.2+.01*(L-1))*tpDmg()*this.fk();let cx=P.x+18,cy=P.y;const hit=new Set();
     for(let i=0;i<2+(L>=6)+(L>=10);i++){let best=null,bd=i?150:R;for(const e of G.en){if(hit.has(e)||!this.tgt(e)||e.x<P.x-30)continue;const d=Math.hypot(e.x-cx,e.y-cy);if(d<bd){bd=d;best=e;}}
-      if(!best)break;hit.add(best);this.hurtE(best,dm);AX.arcs.push({x1:cx,y1:cy,x2:best.x,y2:best.y,l:.22});cx=best.x;cy=best.y;}
+      if(!best)break;hit.add(best);this.hurtE(best,dm,'arc');AX.arcs.push({x1:cx,y1:cy,x2:best.x,y2:best.y,l:.22});cx=best.x;cy=best.y;}
     if(hit.size)AU.sfx('graze');},
   // a lightning leap from foe e to the nearest other foe (zap fusion)
   leap(e,dm){let best=null,bd=170;for(const o of G.en){if(o===e||!this.tgt(o))continue;const d=Math.hypot(o.x-e.x,o.y-e.y);if(d<bd){bd=d;best=o;}}
-    if(best){this.hurtE(best,dm);AX.arcs.push({x1:e.x,y1:e.y,x2:best.x,y2:best.y,l:.2});}},
+    if(best){this.hurtE(best,dm,'arc');AX.arcs.push({x1:e.x,y1:e.y,x2:best.x,y2:best.y,l:.2});}},
   // MINE LAYER: a mine only drops when the ship has moved since the last one, so sitting still lays nothing new
   dropMine(L){if(Math.abs(P.y-this.lmy)<14)return;this.lmy=P.y;if(this.mn.length>=(L>=6?5:4))return;this.mn.push({x:P.x-26,y:P.y,vx:70,t:0,L});},
   boom(m){const f=this.fu(),k=this.fk(),L=m.L,R=62+3*L,dm=(3.6+.1*(L-1))*tpDmg()*k;let first=null;

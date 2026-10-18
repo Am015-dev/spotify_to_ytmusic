@@ -52,7 +52,7 @@ def expected():
             stem = e['file'].rsplit('.', 1)[0]; k = norm(stem)
             if k not in by['mainhattan-nightrun']:
                 by['mainhattan-nightrun'][k] = dict(id='mainhattan-nightrun:' + stem, slug='mainhattan-nightrun', kind='art', stem=stem, element=e.get('group', ''), save_as=e['file'],
-                    repo_target=f"games/mainhattan-nightrun/media/{e['file']}", size=f"{e['w']}x{e['h']}", ratio='', transparent=e.get('kind') != 'fx', tag='')
+                    repo_target=f"games/mainhattan-nightrun/media/{e['file']}", size=f"{e['w']}x{e['h']}", ratio='', transparent=e.get('kind') != 'fx' or e.get('bg') == 'white', tag='')       # fx: light on a black square stays RGB; bg 'white' (solid objects) is keyed to transparent
     return by
 
 class Out:
@@ -207,11 +207,14 @@ def handle(slug, fp, f, ext, k, it, check, posesets):
         posesets[(slug, ch)].append((fp, it, f)); r['queued'] = True; r['done'] = False; r['info'] = (r['info'] + ' ' if r['info'] else '') + 'pose, cut out with the set'
         if has_alpha(im): r['info'] += ' (already transparent)'
         return r
+    if slug == 'mainhattan-nightrun' and it['stem'].startswith('fx-') and not need_t and not has_alpha(im):   # light effect: the game keys the black square at load, so the corners must be pure black
+        a = np.array(im.convert('RGB')); n = max(2, min(a.shape[0], a.shape[1]) // 16); cor = np.concatenate([a[:n, :n].reshape(-1, 3), a[:n, -n:].reshape(-1, 3), a[-n:, :n].reshape(-1, 3), a[-n:, -n:].reshape(-1, 3)])
+        if cor.max(axis=1).mean() > 40: r['warn'].append('light effect must be on a pure solid black background (the corners are not black), repaint on black')
     if need_t:
         if has_alpha(im): r['info'] = (r['info'] + ' ' if r['info'] else '') + 'already transparent'
         else:
             im, note = key_image(im, slug)
-            if not has_alpha(im): r['warn'].append('not transparent and could not key it: ' + note)
+            if not has_alpha(im): r['warn'].append('not transparent and could not key it: ' + note); r['done'] = False; return r      # (was: crashed in fit_save)
             else: r['warn'].append(f'not transparent as delivered: {note}, check the edges')
     dest = it['repo_target'] or f"games/{slug}/media/{it['stem']}.webp"
     size = fit_save(im, it, target, dest, check, need_t)
