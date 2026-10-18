@@ -3674,7 +3674,6 @@ NR.on('bar',()=>{if(!RET.fever)return;FV.tb++;
     FV.on=true;FV.bars=0;FV.m=0;FV.last=FV.tb;FV.starts++;AU.fever=true;
     floater(W*.5,H*.3,'FEVER ×'+FV.k,'#ffd23d');G.flash=Math.max(G.flash,.25*FX());if(RET.sting)AU.sting('fever');RET.fvDraw();}});
 
-<<<<<<< HEAD
 /* ---------- flavor.js: run-and-gun flavour for the shooter (W5, 18 Oct 2026). Flag RET.flavor; ?flavor=0 = the game as it was (nothing spawns, nothing is drawn, no dice are rolled).
    Story stages only (never the LAB, the tutorial, endless or the daily run), nothing new starts during a boss.
    1. CAPTIVES: a hacked courier drone (DATA SPRITE) in a glowing cage drifts in from the right, 1 (stages 1-4) or 2 per stage, none in the first minute of stages 1-2.
@@ -3914,7 +3913,7 @@ NR.on('stageClear',()=>{if(RET.flavor&&ST.on)try{FL.clear();}catch(e){}});
     h.parentNode.insertBefore(d,h);}catch(e){}};
   const watch=()=>{const sh=document.getElementById('stSheet');if(!sh)return false;put(sh);new MutationObserver(()=>put(sh)).observe(sh,{childList:true});return true;};
   if(!watch()){const o=new MutationObserver(()=>{if(watch())o.disconnect();});o.observe(document.body,{childList:true});}}
-=======
+
 /* ---------- ON-FOOT ART: window.FA (the street stage's pictures). Inert until games-src/nightrun/parts/foot.js calls it.
    FA.POSES / FA.WHO       the 11 poses and the 11 characters (kai hero; enemies; warden boss also has 'attack2' and 'enrage': FA.POSES_BOSS)
    FA.has(who,pose)        true when the REAL picture media/foot/<who>-<pose>.webp is loaded (only files listed in media/ready.json are tried, so the hatched placeholder files are never shown)
@@ -4076,7 +4075,6 @@ FA.bg=(ctx,layer,camX,w,h)=>{
   ctx.restore();
 };
 })();
->>>>>>> origin/alex/brave-carson-rbpmlk
 
 /* footen.js: on-foot street stage enemies + boss library (W3). Pure data + behaviour, inert until the on-foot engine (foot.js) calls it.
    Defines window.FOOT_ENEMIES {grunt,gunman,shield,bruiser,knife,sniper,drone,turret,mech} and window.FOOT_BOSS {warden}; helpers in window.FOOT_EN_UTIL.
