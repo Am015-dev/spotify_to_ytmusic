@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.97',date:'18 Oct 2026',items:[{t:'CHANGED',s:'Less lag: thousands of far-away street props are no longer drawn.'},{t:'CHANGED',s:'Smash debris costs nothing when nothing is breaking.'}]},
 {v:'v90m-beta.96',date:'18 Oct 2026',items:[{t:'FIXED',s:'GP rivals no longer get stuck circling at a building: they finish every race.'},{t:'FIXED',s:'River race: the boat no longer stalls on the slipway.'},{t:'FIXED',s:'Rivals keep their speed when cars bump them in a race.'},{t:'CHANGED',s:'Less lag: far-away city props and road markings are no longer drawn.'}]},
 {v:'v90m-beta.95',date:'18 Oct 2026',items:[{t:'FIXED',s:'Athens start: the big ochre walls over the road are gone.'},{t:'FIXED',s:'Smash debris fades out near the camera, so it no longer blocks your view in races.'},{t:'FIXED',s:'The speed gauge hides behind result screens.'},{t:'CHANGED',s:'Low quality draws fewer far-away objects.'}]},
 {v:'v90m-beta.94',date:'18 Oct 2026',items:[{t:'FIXED',s:'Smoother Athens: typical frame time down about 28% (21 ms to 15 ms).'},{t:'FIXED',s:'The ground-height check under your car runs at full speed again, instead of slowing down over and over.'},{t:'CHANGED',s:'Half the throwaway data in Athens, so fewer cleanup pauses.'}]},
@@ -2269,6 +2270,7 @@ function DEB_near(p){const c=camera.position,d=Math.hypot(p.x-c.x,p.y-c.y,p.z-c.
 function updDebris(dt){updXfb(dt);if(!DEB)return;const L=DEB.list;for(let j=L.length-1;j>=0;j--){const d=L[j];d.life-=dt;if(d.life<=0){_m.makeScale(0,0,0);DEB.im.setMatrixAt(d.i,_m);L.splice(j,1);DEB.dirty=true;continue}
     d.v.y-=32*dt;d.p.addScaledVector(d.v,dt);if(d.p.y<d.floor){d.p.y=d.floor;if(d.v.y<0)d.v.y*=-.32;d.v.x*=.72;d.v.z*=.72;d.w.multiplyScalar(.65)}
     _e2.set(d.w.x*dt,d.w.y*dt,d.w.z*dt);d.q.multiply(_q2.setFromEuler(_e2));_m.compose(d.p,d.q,_s2.copy(d.s).multiplyScalar((d.life<.5?d.life/.5:1)*DEB_near(d.p)));DEB.im.setMatrixAt(d.i,_m)}
+  let top=0;for(const d of L)if(d.i>=top)top=d.i+1;DEB.im.count=top;
   if(L.length||DEB.dirty){DEB.im.instanceMatrix.needsUpdate=true;DEB.dirty=false}}
 const teamCols=t=>[new THREE.Color(t.a),new THREE.Color(t.b),new THREE.Color('#2a2e40'),new THREE.Color(t.a).multiplyScalar(.6)];
 function pointPool(n,size){const pos=new Float32Array(n*3),col=new Float32Array(n*3);const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));g.setAttribute('color',new THREE.BufferAttribute(col,3));
@@ -15928,6 +15930,9 @@ function PC_sph(C,i){const a=C.src,o=i*16,W=C.sky?null:C.im.matrixWorld.elements
 function PC_scan(){PC.L.length=0;PC.st.meshes=PC.st.src=0;PC.grp=HUB.grp;if(!HUB.grp)return;HUB.grp.traverse(o=>{if(PC_cand(o))PC_reg(o,false)});
  if(typeof CLOUDS!=='undefined'&&CLOUDS)CLOUDS.traverse(o=>{if(o.isInstancedMesh&&!o.userData.pc&&o.count>=16&&o.count===o.instanceMatrix.count)PC_reg(o,true)});
  for(const im of Object.values(HUB.cim||{}))for(const q of[im,im&&im.userData.w,im&&im.userData.g])if(q&&q.isInstancedMesh&&!q.userData.pc&&q.count>=8&&q.count===q.instanceMatrix.count)PC_reg(q,false).dyn=true;
+ PC.nch=HUB.grp.children.length;PC_grid()}
+function PC_add(){PC.nch=HUB.grp.children.length;let n=0;const lg=typeof LIFE!=='undefined'&&LIFE.grp;/* LIFE drives its own pool .count */const w=o=>{if(o===lg)return;if(PC_cand(o)){PC_reg(o,false);n++}for(const q of o.children)w(q)};w(HUB.grp);if(n)PC_grid();return n}
+function PC_grid(){
  const M=new Map();for(const C of PC.L){if(C.sky||C.dyn)continue;const T=new Map();for(let i=0;i<C.n;i++){const k=Math.floor(C.c[i*4]/80)*100003+Math.floor(C.c[i*4+2]/80);let L=T.get(k);if(!L)T.set(k,L=[]);L.push(i)}
   for(const[k,L]of T){let Q=M.get(k);if(!Q)M.set(k,Q={x:0,y:0,z:0,r:0,n:0,E:[]});Q.E.push(C,Int32Array.from(L));for(const i of L){Q.x+=C.c[i*4];Q.y+=C.c[i*4+1];Q.z+=C.c[i*4+2];Q.n++}}}
  PC.G=[...M.values()];for(const Q of PC.G){Q.x/=Q.n;Q.y/=Q.n;Q.z/=Q.n;for(let e=0;e<Q.E.length;e+=2){const C=Q.E[e];for(const i of Q.E[e+1])Q.r=Math.max(Q.r,Math.hypot(C.c[i*4]-Q.x,C.c[i*4+1]-Q.y,C.c[i*4+2]-Q.z)+Math.max(C.c[i*4+3],2))}Q.r+=4}}
@@ -15935,7 +15940,8 @@ function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const 
  const s=C.s++,a=C.src,arr=C.im.instanceMatrix.array;if(s!==i){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
 const _pcS=new THREE.Sphere();
 function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!=='roam')return;if(PC.grp&&PC.grp!==HUB.grp){PC.L.length=0;PC.grp=null;PC.f=0}
- if(!PC.grp){const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return;PC_scan()}/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
+ if(!PC.grp){const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return;PC_scan()}
+ if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9)&&PC_add())force=1;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
  let dirty=false;for(const C of PC.L)if(C.dirty){dirty=true;break}
  if(!force&&++PC.t%10&&!dirty&&dh<.1&&Math.hypot(cx-PC.x,cz-PC.z)<20)return;PC.t=0;PC.x=cx;PC.z=cz;PC.h=h;const t0=performance.now();
