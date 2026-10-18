@@ -2,7 +2,7 @@
 // fra: roam shot + road-follow 30 s + Westend Split (bot 150 ms lag, then hands-off) + Main River Run (boat) + garage + builder. ath: roam + Akropolis final. por: 393x852. cold: real menu path timing.
 // Prints one JSON line per measurement (R {...}). Shots 852x393 jpg.
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');const [BASE,OUT,mode]=process.argv.slice(2);fs.mkdirSync(OUT,{recursive:true});
-const BOT=(t=>t.slice(t.indexOf('function tkBot'),t.indexOf('function tkStaticFeel')))(fs.readFileSync(__dirname+'/../src/98tk_go.js','utf8'));
+const BOT=(t=>t.slice(t.indexOf('function tkRock'),t.indexOf('function tkStaticFeel')))(fs.readFileSync(__dirname+'/../src/98tk_go.js','utf8'));
 (async()=>{const por=mode==='por',b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const c=await b.newContext({viewport:por?{width:393,height:852}:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await c.newPage();p.setDefaultTimeout(900000);
  const errs=[];p.on('pageerror',e=>errs.push(String(e).slice(0,160)));const R=(k,o)=>console.log('R '+k+' '+JSON.stringify(o));const shot=n=>p.screenshot({path:OUT+'/'+(por?'por_':'')+n+'.jpg',type:'jpeg',quality:80});const T0=Date.now();
