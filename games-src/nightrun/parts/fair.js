@@ -18,7 +18,8 @@ const CAMP={buf:[],acc:0,ct:0,on:0};
 /* A. auto-aim */
 {const st0=SH.steer;SH.steer=function(b,dt,k){if(!S2.on)return st0.call(this,b,dt,k);k=k||this.hm;b.ag=(b.ag||0)+dt;const hd=S2.hard();
   if(b.ag<(hd?.18:.1))return;                                                  // lock-on delay: a missile flies straight first
-  const cur=Math.atan2(b.vy,b.vx),cone=hd?.7:1.05,R=hd?300:380;let best=null,bd=1e9;
+  const cur=Math.atan2(b.vy,b.vx),nh=hd||MM.on,cone=nh?.7:1.05,R=nh?300:380;   // MM (must move): every tier gets the narrow cone
+  let best=null,bd=1e9;
   for(const e of G.en){if(e.type==='gate'||e.hp<=0||e.dying||e.gr||e.wpt||e.x<b.x-10||e.x>W-20||e.y<0||e.y>H)continue;
     const dx=e.x-b.x,dy=e.y-b.y,d=Math.hypot(dx,dy);if(d>=R||d>=bd)continue;let da=Math.atan2(dy,dx)-cur;da=Math.atan2(Math.sin(da),Math.cos(da));if(Math.abs(da)>cone)continue;bd=d;best=e;}
   if(!best)return;if(!b.au&&(b.hk||SH.hm)){b.au=1;const a=S2.ak();b.dm*=(b.hk?a:(1+a)/2)*S2.park();}   // weapon homing pays the full price, the shop's Homing perk half
@@ -53,3 +54,29 @@ NR.on('beat',()=>{if(!S2.on||!G.live||G.dead||G.transT>=0||G.lab||G.tut||SH.acti
 /* stage 30 was a wall: a kill goal with round 1's hull could not be met inside the song; kill-goal stages keep the old hull */
 {const h0=SC.hpK.bind(SC);SC.hpK=()=>{const v=h0();return S2.on&&ST.on&&ST.def&&ST.def.goal&&ST.def.goal.k==='kill'?1:v;};}
 window.__s2={S2,CAMP,B2};
+/* D. must move (flag RET.mustmove, ?mustmove=0 = before; BALANCE.md "Must move"). Owner, 19 Oct 2026: on Normal a ship that only lines up with the next foe
+   and never dodges cleared most stages with any weapon (mustmove-test.js 'track': 60%). A ship that keeps its x inside 70 px for MM.win() seconds gets a COLUMN
+   STRIKE: a vertical lane locks on its x, pulses for MM.tel() s (>= .6), then fires for .25 s. One sidestep of ~45 px (or a dash) clears it, the rest of the
+   screen stays free, so a moving ship is never hit. Strikes repeat while the ship stays in the column zone and hit harder from the third one on.
+   Homing on Normal and Easy also gets the narrower cone and shorter reach of the hard tiers: a missile needs the ship to point at its target. */
+if(RET.mustmove===undefined)RET.mustmove=!/[?&]mustmove=0/.test(location.search);
+const MM=window.MM={get on(){return!!RET.mustmove;},COL:24,buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0,
+  win(){return{easy:5,normal:4,hard:3.4,vhard:3.2,legend:3}[SET.diff]||4;},
+  tel(){return{easy:1.1,normal:.95,hard:.8,vhard:.75,legend:.7}[SET.diff]||.95;},
+  live(){return this.on&&G.live&&!G.dead&&G.transT<0&&!G.lab&&!G.tut&&!SH.active&&!ST.over&&!G.over&&!godMode&&(ST.on?ST.n>=3:G.t>20);},
+  cost(x){const c=this.col;return c&&Math.abs(x-c.x)<this.COL+30?(c.fire>0||c.t<.4?6000:1500):0;}};   // for test bots: the lane as a player sees it
+NR.on('runStart',()=>{Object.assign(MM,{buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0});});
+NR.on('tick',dt=>{if(!MM.live()){MM.col=null;MM.buf=[];MM.n=0;return;}
+  MM.acc+=dt;const k=Math.round(MM.win()*10);if(MM.acc>=.1){MM.acc=0;MM.buf.push(P.x);if(MM.buf.length>k)MM.buf.splice(0,MM.buf.length-k);}
+  let lo=1e9,hi=-1e9;for(const x of MM.buf){if(x<lo)lo=x;if(x>hi)hi=x;}if(hi-lo>140)MM.n=0;   // a real move resets the escalation
+  const c=MM.col;if(c){c.t-=dt;if(c.t<=0&&!c.fire&&!c.done){c.fire=.25;AU.sfx('big');shake(4);}
+    if(c.fire>0){c.fire-=dt;if(!c.hit&&Math.abs(P.x-c.x)<MM.COL){c.hit=1;MM.hits++;hurt(c.dmg);}if(c.fire<=0){c.done=1;MM.col=null;MM.cd=SET.diff==='easy'?2.4:1.6;}}return;}
+  MM.cd-=dt;if(MM.cd>0||MM.buf.length<k||hi-lo>=70)return;
+  MM.n++;MM.strikes++;MM.col={x:P.x,t:MM.tel(),fire:0,hit:0,dmg:MM.n>=3&&SET.diff!=='easy'?2:1};AU.sfx('warn');
+  if(MM.strikes===1)floater(P.x,P.y-44,'SIDESTEP!','#ff6a7a');});
+{const dp=drawPickups;drawPickups=function(t){dp(t);const c=MM.col;if(!c||G.dead)return;const w=MM.COL;
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  if(c.fire>0){ctx.globalAlpha=.95;ctx.fillStyle='#ffffff';ctx.fillRect(c.x-w*.5,0,w,H);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}
+  else{const lock=c.t<.4,pulse=SET.reduce?1:Math.floor(t*(lock?18:8))%2?1:.6;ctx.globalAlpha=(lock?.9:.5)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);
+    for(const dx of[-w,w]){ctx.beginPath();ctx.moveTo(c.x+dx,0);ctx.lineTo(c.x+dx,H);ctx.stroke();}ctx.setLineDash([]);ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}
+  ctx.restore();};}

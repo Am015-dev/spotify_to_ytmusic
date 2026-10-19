@@ -4,6 +4,11 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun must move (flag RET.mustmove, ?mustmove=0 = before, 19 Oct 2026)
+- Owner: "I can win without moving on Normal (swarm)". `nightrun/mustmove-test.js`: Normal, stages 1/5/10/20/30/40, mid+max builds, all 16 weapons + Swarm, bots park / hop / track (lines up with the next foe, never dodges).
+- Before: park/hop already died (h.js discharge); track cleared 60% of stages >= 3 with every weapon. After: track 0-10%, park/hop 0%. Dodging bot (balance-test Normal mid/late) 100%.
+- `parts/fair.js` D (`MM`): a ship whose x stays inside 70 px for 4 s (Normal) gets a telegraphed column strike on its x (.95 s pulse, 1 hull, 2 from the third in a row). Homing uses the narrow cone/reach on every tier. BALANCE.md "Must move".
+- Weak / next: the tracker still lives ~100 s before dying (hull, not skill, decides when); no reward yet for moving (graze/close-range bonus would make it feel clever, not just safe); column has code art only.
 ## Nightrun VARIETY A: formations, stage scripts, rule changes (flag RET.vary, ?vary=0 = old waves, 18 Oct 2026)
 - `parts/formations.js` (after zoo.js): 62 formations with their own spatial behaviour (pincer, X, snake, spiral, moving-gap wall, meteors, shadow, bait, curtain, geyser, scissors, loop, testudo, ambush...). Each declares tags, first stage, cost, telegraph, gap, kinds, role. Path units move in FM.mv (one hook line in b.js's enemy switch); every path ends flying left, so leaks still count.
 - `parts/stagescripts.js`: the editable table `VSCRIPT` (45 stages: 10-13 moments, a '*' set piece unique to the stage, a '~' breather, '+g' ground moments, 'a|b' mixes, '~r' remixes) + 15 rule changes `VMUT` on every even story stage (RULE card after the stage card, name after the HUD goal line; paused while a boss is out; gentler on Easy). The director keeps timing, budget, caps, READY gaps; scripts only pick WHAT spawns.
