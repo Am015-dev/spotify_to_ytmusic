@@ -154,13 +154,16 @@ function ldHide(){clearInterval(LD.ti);LD.on=false;LD.fly=null;const el=$('#ld2'
 async function ldPrewarm(a,b){if(ENVD)buildEnv();try{if(typeof FL_apply==='function'&&HUB.grp)FL_apply(FL_time(),true)}catch(e){}/* perf-17: the first full emissive scan + headlight mesh during loading, not on the first roam frame */await nextFrame();try{P2_compile(scene,camera)}catch(e){return}const P=renderer.info.programs.slice();let t=performance.now(),i=0;
   for(const p of P){let w=0;while(!p.isReady()&&w++<120){await nextFrame();t=performance.now()}try{p.getUniforms()}catch(e){}i++;if(performance.now()-t>12){ldSet(a+(b-a)*i/P.length);await nextFrame();t=performance.now()}}}
 const SM3={n:0,mb:0,ms:0,on:CID==='ath'&&(()=>{try{return localStorage.getItem('mho_sm3')!=='0'}catch(e){return true}})()};
-const SMM={T:250,N:13,q:[],have:new Set(),st:{tiles:0,max:0,ms:0,shift:0}};
+const SMM={T:250,N:13,q:[],have:new Set(),st:{tiles:0,max:0,ms:0,shift:0},src:{bld:null,st:null,shade:null}};
 function SMM_grids(){if(SMM.bg)return;const K=(x,z)=>Math.floor(x/250)*100000+Math.floor(z/250),G=new Map(),S=new Map();
   for(const b of HUB.bld){const k=K(b.x,b.z);let L=G.get(k);if(!L)G.set(k,L=[]);L.push(b)}
   for(const s of CITY_S){const ks=new Set();for(const p of s.pts)ks.add(K(p.x,p.z));for(const k of ks){let L=S.get(k);if(!L)S.set(k,L=[]);L.push(s)}}SMM.bg=G;SMM.sg=S}
 function SMM_tile(tx,tz){const T=SMM.T,x0=tx*T,x1=x0+T,z0=tz*T,z1=z0+T,m=60,B=[],Ss=new Set();
   for(let a=Math.floor((x0-m)/250);a<=Math.floor((x1+m)/250);a++)for(let c=Math.floor((z0-m)/250);c<=Math.floor((z1+m)/250);c++){const k=a*100000+c,L=SMM.bg.get(k),Q=SMM.sg.get(k);if(L)for(const b of L)B.push(b);if(Q)for(const s of Q)Ss.add(s)}
   for(const L of LAZY){const r=L.rect;if(r[1]<x0-m||r[0]>x1+m||r[3]<z0-m||r[2]>z1+m)continue;for(const b of L.bld)if(b.x>x0-m&&b.x<x1+m&&b.z>z0-m&&b.z<z1+m)B.push(b)}
+  // perf-r13h (TUNE.callCap): lists go in as arguments; grid buildings pre-filtered to the ones whose circle touches the tile (same pixels)
+  if(TUNE.callCap){const C=[];for(const b of B){const r=(b.c==null?b.hw+b.hd:Math.hypot(b.hw,b.hd))+4;if(b.x+r>x0&&b.x-r<x1&&b.z+r>z0&&b.z-r<z1)C.push(b)}SMM.src.bld=C;SMM.src.st=Ss;SMM.src.shade=SMM_shade;
+    let t;try{t=miniPaint(x0,x1,z0,z1,SMM.k,0,SMM.src)}finally{SMM.src.bld=SMM.src.st=null}MINI.c.getContext('2d').drawImage(t.c,Math.round((MINI.x1-x1)*SMM.k),Math.round((MINI.z1-z1)*SMM.k));SMM.have.add(tx+'|'+tz);SMM.st.tiles++;return}
   const sb=HUB.bld,sl=LAZY.splice(0),ss=CITY_S.splice(0,CITY_S.length,...Ss),sh=TR_shade;HUB.bld=B;TR_shade=SMM_shade;let t;
   try{t=miniPaint(x0,x1,z0,z1,SMM.k)}finally{HUB.bld=sb;LAZY.push(...sl);CITY_S.splice(0,CITY_S.length,...ss);TR_shade=sh}
   // canvas pixel of world (x,z) = ((MINI.x1-x)*k, (MINI.z1-z)*k)
@@ -176,7 +179,7 @@ function SMM_center(x,z){const T=SMM.T,h=SMM.N>>1,tx=Math.floor(x/T),tz=Math.flo
   const old=SMM.have;SMM.have=new Set();SMM.q=[];for(let a=tx-h;a<=tx+h;a++)for(let b=tz-h;b<=tz+h;b++){const key=a+'|'+b;if(old.has(key))SMM.have.add(key);else SMM.q.push([a,b])}
   SMM.q.sort((p,q)=>Math.hypot(p[0]-tx,p[1]-tz)-Math.hypot(q[0]-tx,q[1]-tz));SMM.ct=[tx,tz];MINI={c,k,x1,z1,w:null,smm:1};return MINI}
 function SMM_tick(budget){if(!MINI||!MINI.smm)return;const tx=Math.floor(RO.x/SMM.T),tz=Math.floor(RO.z/SMM.T);if(Math.abs(tx-SMM.ct[0])>1||Math.abs(tz-SMM.ct[1])>1)SMM_center(RO.x,RO.z);
-  const t0=performance.now();while(SMM.q.length){const[a,b]=SMM.q.shift();const t1=performance.now();SMM_tile(a,b);const d=performance.now()-t1;SMM.st.ms+=d;if(d>SMM.st.max)SMM.st.max=d;if(performance.now()-t0>(budget||4))break}}
+  const t0=performance.now();while(SMM.q.length){const[a,b]=SMM.q.shift();const t1=performance.now();SMM_tile(a,b);const d=performance.now()-t1;SMM.st.ms+=d;if(d>SMM.st.max)SMM.st.max=d;if(TUNE.callCap||performance.now()-t0>(budget||4))break}}
 miniBase=(f=>function(){if(!SM_ON)return f();SMM_grids();SMM.k=SET.q==='low'?.25:.34;MINI=null;SMM_center(RO.x,RO.z);return MINI})(miniBase);
 miniDraw=(f=>function(){if(SM_ON&&MINI&&MINI.smm&&RO.on&&!(HUB.mf&1))SMM_tick(4);return f()})(miniDraw);
 async function SM_qvLoad(a,b){const N=HUB.nodes;if(!N||!N.length||(QV.g&&QV.g.N===N))return;if(!QV.gi||QV.giN!==N){QV.gi=qvGraphGen(N);QV.giN=N}
