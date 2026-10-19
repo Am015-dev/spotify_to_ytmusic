@@ -117,7 +117,9 @@ const LIFE_STG=!/[?&]lifestage=0/.test(location.search);
 function LIFE_pre(){if(!LIFE_STG)return true;if(!HUB.grp||!HUB.nodes||!HUB.nodes.length||typeof LV_eGrid!=='function')return false;
  const Q=LIFE.pre&&LIFE.pre.c===CID?LIFE.pre:(LIFE.pre={c:CID,k:0}),t0=performance.now();try{return LIFE_pre1(Q)}finally{(LIFE.preMs=LIFE.preMs||[]).push(+(performance.now()-t0).toFixed(1))}}
 function LIFE_pre1(Q){
- if(Q.k===0){Q.tb=LIFE_ldTurb();Q.k=1;return false}
+ if(Q.k===0){if(LIFE_LD()&&LD_MODELS.lxwt_base)Q.tbB=LIFE_ldM(LD_br('lxwt_base'));Q.k=.3;return false}// the turbine's two LDraw halves on two frames (Athens: 105-158 ms together)
+ if(Q.k===.3){if(Q.tbB)Q.tbR=LIFE_ldM(LD_br('lxwt_rotor'));Q.k=.6;return false}
+ if(Q.k===.6){Q.tb=LIFE_ldTurb();Q.tbB=Q.tbR=null;Q.k=1;return false}
  if(Q.k===1){Q.G=LIFE_geos();Q.k=2;return false}
  if(Q.k===2){try{Q.lm=LIFE_ldLm(CID==='fra')}catch(e){console.warn('LIFE lm',e)}Q.k=3;return false}
  return true}
@@ -211,7 +213,7 @@ function LIFE_ldBox(L){const b=new THREE.Box3();for(const[g]of L){g.computeBound
 // flag: real sets on (default) unless ?ldlm=0; the turbine: 7747's pylon + head, blades turn about local z, height 16 m
 const LIFE_LD=()=>LIFE.ldOn!==false&&!/[?&]ldlm=0/.test(location.search)&&typeof LD_MODELS!=='undefined'&&typeof LDW_geo==='function';
 function LIFE_ldTurb(){if(!LIFE_LD()||!LD_MODELS.lxwt_base)return null;const one=L=>{const G=L.map(([g])=>g);const g=G.length>1?mergeGeometries(G):G[0];return g};
- const base=one(LIFE_ldM(LD_br('lxwt_base'))),rot=one(LIFE_ldM(LD_br('lxwt_rotor')));rot.computeBoundingBox();let rs=rot.boundingBox.getSize(new THREE.Vector3());
+ const P=LIFE.pre||{},base=one(P.tbB||LIFE_ldM(LD_br('lxwt_base'))),rot=one(P.tbR||LIFE_ldM(LD_br('lxwt_rotor')));rot.computeBoundingBox();let rs=rot.boundingBox.getSize(new THREE.Vector3());
  if(rs.x<rs.z){base.rotateY(Math.PI/2);rot.rotateY(Math.PI/2)}base.computeBoundingBox();rot.computeBoundingBox();const bb=base.boundingBox.clone().union(rot.boundingBox),c=rot.boundingBox.getCenter(new THREE.Vector3()),bc=bb.getCenter(new THREE.Vector3()),S=16/(bb.max.y-bb.min.y);
  base.translate(-bc.x,-bb.min.y,-bc.z);base.scale(S,S,S);rot.translate(-c.x,-c.y,-c.z);rot.scale(S,S,S);
  for(const g of[base,rot])g.setAttribute('uv',new THREE.BufferAttribute(new Float32Array(g.attributes.position.count*2),2));
