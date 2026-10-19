@@ -16,6 +16,8 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  const cdp=await ctx.newCDPSession(p);const t0=Date.now();
  await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}${Q?'&q='+Q:''}${LM?'&lowmem=1':''}${process.env.QS?'&'+process.env.QS:''}`);
  await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:500});const boot=Math.round((Date.now()-t0)/1000);
+ // perf-r14a: the real loader is gated (LKG: links + warm frames, render off) before the first drivable frame; ?test sets ready earlier, so drain the gate here before measuring (PF1GATE = gate frames ticked)
+ console.log('PF1GATE '+await p.evaluate(async()=>{window.__auto=false;let n=0;const A=()=>{try{return __oc.ev('typeof LKG!=="undefined"&&LKG.arm')}catch(e){return 0}};while(A()&&n<2000){__tick(1);n++;await new Promise(r=>setTimeout(r,0))}window.__auto=true;return n}));
  // perf-r13f: programs linked after ready (PF1LINK: count after ready / after the LKG roam gate, and the material types of the late ones)
  const pid0=await p.evaluate(()=>{const R=__oc.ev('renderer');return Math.max(0,...R.info.programs.map(q=>q.id))});
  // wrap subsystems (outermost binding, so every later wrapper is inside) + composer.render

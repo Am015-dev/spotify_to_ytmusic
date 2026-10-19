@@ -286,6 +286,16 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   return`📍 PC POST-READY LINK · ${n>=0&&n<=24?'✓':'✗'} ${n} programs linked after the gate ≤ 24 (gate end id ${LKG.idEnd}, ${P.length} programs) → ${n>=0&&n<=24?'✅ PASS':'❌ FAIL'}`};
  C.GO['perf/pc-post-ready-link']=[{c:'fra',n:'Desktop: programs linked after ready',fn:go}];C.GO['perf/pc-post-ready-link-ath']=[{c:'ath',n:'Desktop (Athens): programs linked after ready',fn:go}]}return}
  if(i<600)setTimeout(()=>R13F_reg(i+1),100)})(0);
+// perf-r14a: GO perf/pc-roam-30s. Desktop: the roam-start gate ended on its own (not the 900-frame cap) with LKG.idEnd set, ran its warm frames (render off) so first-frame init lands before
+// the first drivable frame, and LIFE gets the touch/LOWMEM defer budget (?lkwf=0 / ?lvpc=0 = off). The real frame bound is tools/perf1/tFrame.js (no JS frame > 200 ms in 30 s, see docs/HANDOFF_perf.md).
+(function R14A_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-roam-30s')){
+ C.items.push({ver:'perf',id:'pc-roam-30s',area:'perf',text:'perf-r14a · PC roam first 30 s: 📍 GO checks the desktop roam-start gate: it ended by itself with a gate end id, ran its warm frames (render off) before the first drivable frame, and LIFE has the desktop defer budget. Pass line: gate done, not timed out, idEnd > 0, warm frames = LKG.wf, LV_pcb() on. Touch/low-mem: info only. Frame bound: tFrame max JS frame ≤ 200 ms (Athens 1024 → 145, Frankfurt 151 → 57).'});
+ const go=()=>{if(LKG.arm&&!LOWMEM){let k=0;const w=()=>{if(LKG.arm&&k++<300)return setTimeout(w,100);goSay(go())};setTimeout(w,100);return'📍 PC ROAM 30 S · gate…'}
+  if(LOWMEM||!LKG.on)return`📍 PC ROAM 30 S · touch / low-mem: info (gate off) → ✅ PASS`;
+  const ok=!LKG.arm&&!LKG.to&&LKG.idEnd>0&&(LKG.wfN|0)>=LKG.wf&&LV_pcb();
+  return`📍 PC ROAM 30 S · ${ok?'✓':'✗'} gate done${LKG.to?' (TIMED OUT)':''}, end id ${LKG.idEnd}, warm frames ${LKG.wfN|0}/${LKG.wf} (slowest ${LKG.wfMs|0} ms), LIFE desktop budget ${LV_pcb()?'on':'off'} → ${ok?'✅ PASS':'❌ FAIL'}`};
+ C.GO['perf/pc-roam-30s']=[{c:'fra',n:'Desktop: roam-start gate + warm frames before drivable',fn:go}]}return}
+ if(i<600)setTimeout(()=>R14A_reg(i+1),100)})(0);
 // perf-r13e: single-call cap. An Athens minimap tile (SMM, 250 m) paints only the lines that touch it (TUNE.callCap, ?cc=1).
 (function R13E_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='single-call-cap')){C.items.push({ver:'perf',id:'single-call-cap',area:'perf',text:'perf-r13e · single-call cap: 📍 GO paints the 3×3 Athens minimap tiles around the car (SMM_tile, as in play) with TUNE.callCap off (globals swapped in), then on (perf-r13h: tile lists passed as arguments, buildings pre-filtered, one tile per frame). Pass line: every pixel is the same with the flag on; the line also prints the slowest tile off/on and the time split (report only) (the ≤ 30 ms cap is NOT met yet, see docs/HANDOFF_perf.md perf-r13e) (default OFF; the real metric is tools/perf1/tBoot.js PF1MAX).'});
  C.GO['perf/single-call-cap']=[{c:'ath',n:'minimap tiles paint the same pixels, each ≤ 30 ms',fn:()=>{const f0=TUNE.callCap,R=[];let mp=null;try{const T=250,k=SET.q==='low'?.25:.34,tx=Math.floor(RO.x/T),tz=Math.floor(RO.z/T);
