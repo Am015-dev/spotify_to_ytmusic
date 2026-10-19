@@ -161,7 +161,9 @@ function pedInit(){const P=HUB.peds=[];const mk=(geo,col,vc)=>{const m=new THREE
   for(const p of P)LV_pedPut(p)}
 function pedPlace(p,min,max){const i=hubNear(min,max,false);if(i<0||HUB.nodes[i].ab||!HUB.nodes[i].nb.length)return;const n=HUB.nodes[i];p.a=i;p.b=n.nb[Math.floor(R()*n.nb.length)];p.t=R();p.dir=1;p.side=R()<.5?-1:1;p.jy=0;p.jv=0;p.spin=0}
 const _pB=new THREE.Matrix4(),_pL=new THREE.Matrix4(),_pR=new THREE.Matrix4(),_pq=new THREE.Quaternion(),_pe=new THREE.Euler(),_pv=new THREE.Vector3(),_ps=new THREE.Vector3();
-function pedPart(im,i,ox,oy,oz,rx,rz){_pe.set(rx||0,0,rz||0);_pq.setFromEuler(_pe);_pL.compose(_pv.set(ox,oy,oz),_pq,_ps.set(1,1,1));_pR.multiplyMatrices(_pB,_pL);im.setMatrixAt(i,_pR)}
+// perf-r13j: pedPart / L3_part read offset + angles from _pA (written by the caller) instead of float args, which a non-inlined call boxed (~137 MB / 60 s in pedStep)
+const _pA=new Float64Array(6);
+function pedPart(im,i){const A=_pA;_pe.set(A[3]||0,0,A[4]||0);_pq.setFromEuler(_pe);_pL.compose(_pv.set(A[0],A[1],A[2]),_pq,_ps.set(1,1,1));_pR.multiplyMatrices(_pB,_pL);im.setMatrixAt(i,_pR)}
 function pedStep(dt){const P=HUB.peds;if(!P)return;const N=HUB.nodes,up=_hup,sp=Math.abs(RO.v),Q=HUB.pP;
   const PN=LV_pn(P.length);for(const k in Q)if(Q[k].count!==PN)Q[k].count=PN;for(let i=0;i<PN;i++){const p=P[i],A=N[p.a],B=N[p.b];if(!A||!B){pedPlace(p,40,380);continue}const L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gN=A.g&&B.g,W=Math.min(A.w||20,B.w||20);
     const S=p.ofS;/* foot-1: p.ofS = stand here (x,z,h), wave while S.w>0 (98of_onfoot.js) */
@@ -177,7 +179,7 @@ function pedStep(dt){const P=HUB.peds;if(!P)return;const N=HUB.nodes,up=_hup,sp=
     const air=p.jy>0,sw=air||p.cw||S?0:Math.sin(p.ph)*.55,bob=air?0:Math.abs(Math.cos(p.ph))*.06,h=(S?S.h:p.cw?p.ch:Math.atan2(dx,dz))+(p.spin?performance.now()/1000*p.spin:0),S2=(SC_S&&SC_S.on?SC_K.ped:.66)*(p.cw?p.gs:1);
     if(L3_ON&&L3_pose(p,i,x,z,h,S2,air,S,d,sp,dt))continue;/* life-3: natural minifig walk + idles (98l3) */
     _pq.setFromAxisAngle(up,h);_pB.compose(_pv.set(x,p.y+p.jy+bob,z),_pq,_ps.set(S2,S2,S2));
-    pedPart(Q.legL,i,-.3,1.25,0,air?-.5:sw);pedPart(Q.legR,i,.3,1.25,0,air?.4:-sw);pedPart(Q.hip,i,0,1.36,0);pedPart(Q.tor,i,0,2.22,0);
-    const wv=!air&&(S?S.w>0:p.cw?LV_cwave(i,d):LV_wave(i,d,sp)),wa=wv?Math.sin(performance.now()/95+i)*.4:0,ct=p.cw&&!wv&&!air?Math.max(0,Math.sin(performance.now()/420+i*1.7)):0,aL=air?-2.7:wv&&i%2?-2.8+wa:p.cw?-.15-ct*1.1:-sw*.9,aR=air?-2.7:wv?-2.8-wa:sw*.9;pedPart(Q.armL,i,-.86,2.78,0,aL,-.12);pedPart(Q.armR,i,.86,2.78,0,aR,.12);pedPart(Q.handL,i,-.86,2.78,0,aL,-.12);pedPart(Q.handR,i,.86,2.78,0,aR,.12);
-    pedPart(Q.head,i,0,3.32,0);pedPart(Q.hair,i,0,3.62,0)}
+    (_pA[0]=-.3,_pA[1]=1.25,_pA[2]=0,_pA[3]=air?-.5:sw,_pA[4]=0,pedPart(Q.legL,i));(_pA[0]=.3,_pA[1]=1.25,_pA[2]=0,_pA[3]=air?.4:-sw,_pA[4]=0,pedPart(Q.legR,i));(_pA[0]=0,_pA[1]=1.36,_pA[2]=0,_pA[3]=0,_pA[4]=0,pedPart(Q.hip,i));(_pA[0]=0,_pA[1]=2.22,_pA[2]=0,_pA[3]=0,_pA[4]=0,pedPart(Q.tor,i));
+    const wv=!air&&(S?S.w>0:p.cw?LV_cwave(i,d):LV_wave(i,d,sp)),wa=wv?Math.sin(performance.now()/95+i)*.4:0,ct=p.cw&&!wv&&!air?Math.max(0,Math.sin(performance.now()/420+i*1.7)):0,aL=air?-2.7:wv&&i%2?-2.8+wa:p.cw?-.15-ct*1.1:-sw*.9,aR=air?-2.7:wv?-2.8-wa:sw*.9;(_pA[0]=-.86,_pA[1]=2.78,_pA[2]=0,_pA[3]=aL,_pA[4]=-.12,pedPart(Q.armL,i));(_pA[0]=.86,_pA[1]=2.78,_pA[2]=0,_pA[3]=aR,_pA[4]=.12,pedPart(Q.armR,i));(_pA[0]=-.86,_pA[1]=2.78,_pA[2]=0,_pA[3]=aL,_pA[4]=-.12,pedPart(Q.handL,i));(_pA[0]=.86,_pA[1]=2.78,_pA[2]=0,_pA[3]=aR,_pA[4]=.12,pedPart(Q.handR,i));
+    (_pA[0]=0,_pA[1]=3.32,_pA[2]=0,_pA[3]=0,_pA[4]=0,pedPart(Q.head,i));(_pA[0]=0,_pA[1]=3.62,_pA[2]=0,_pA[3]=0,_pA[4]=0,pedPart(Q.hair,i))}
   HUB.fr=(HUB.fr||0)+1;for(const k in Q)Q[k].instanceMatrix.needsUpdate=true}

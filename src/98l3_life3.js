@@ -72,7 +72,7 @@ function L3_pedPre(dt){const P=HUB.peds;if(!P)return;L3.pacc+=dt;const tk=L3.pac
       if(p.l3k||!p.l3H)continue;const fx=Math.sin(p.l3H),fz=Math.cos(p.l3H),al=dx*fx+dz*fz;if(al>0&&al<3.2){const lat=-dx*fz+dz*fx;o+=lat>0?-.7:.7}}p.l3o=Math.max(-1,Math.min(1,o))}}
 function L3_pedPost(){const P=HUB.peds;if(!P)return;for(const p of P)if(p.l3k)p.v=p.l3v}
 const _l3e=new THREE.Euler(),_l3q=new THREE.Quaternion();
-function L3_part(im,i,ox,oy,oz,rx,ry,rz){_l3e.set(rx||0,ry||0,rz||0);_l3q.setFromEuler(_l3e);_pL.compose(_pv.set(ox,oy,oz),_l3q,_ps.set(1,1,1));_pR.multiplyMatrices(_pB,_pL);im.setMatrixAt(i,_pR)}
+function L3_part(im,i){const A=_pA;_l3e.set(A[3]||0,A[4]||0,A[5]||0);_l3q.setFromEuler(_l3e);_pL.compose(_pv.set(A[0],A[1],A[2]),_l3q,_ps.set(1,1,1));_pR.multiplyMatrices(_pB,_pL);im.setMatrixAt(i,_pR)}
 // returns true when it posed the ped (plain walkers and idlers); jumpers, crowd peds, on-foot standers and wavers keep the old pose
 function L3_pose(p,i,x,z,h,S2,air,S,d,sp,dt){if(air||p.cw||S||p.spin)return false;if(typeof LV_wave==='function'&&LV_wave(i,d,sp))return false;const Q=HUB.pP,now=performance.now()/1000;
   if(p.l3k===3&&p.l3f!=null)h=p.l3f;if(p.l3a==null)p.l3a=h;p.l3a+=L3_ad(h,p.l3a)*Math.min(1,dt*(p.l3k?3:5));const H=p.l3a;p.l3H=H;/* smooth turns */
@@ -80,14 +80,14 @@ function L3_pose(p,i,x,z,h,S2,air,S,d,sp,dt){if(air||p.cw||S||p.spin)return fals
   const v=p.l3k?0:p.l3v,wk=v>.05,amp=wk?Math.min(.75,.32+.2*v):0,s=Math.sin(p.ph),sw=s*amp,bob=wk?(1-Math.abs(s))*.12*Math.min(1,v):0,roll=wk?Math.cos(p.ph)*.035:0,tw=sw*.18;
   _pq.setFromAxisAngle(_hup,H);_pB.compose(_pv.set(x+sx,p.y+bob,z+sz),_pq,_ps.set(S2,S2,S2));
   const kn=wk?Math.max(0,-Math.cos(p.ph))*.25:0;/* trailing leg lifts a touch */
-  L3_part(Q.legL,i,-.3,1.25,0,sw-(s<0?kn:0),0,0);L3_part(Q.legR,i,.3,1.25,0,-sw-(s>0?kn:0),0,0);L3_part(Q.hip,i,0,1.36,0,0,tw*.4,roll);L3_part(Q.tor,i,0,2.22,0,wk?.05:0,tw,roll);
+  (_pA[0]=-.3,_pA[1]=1.25,_pA[2]=0,_pA[3]=sw-(s<0?kn:0),_pA[4]=0,_pA[5]=0,L3_part(Q.legL,i));(_pA[0]=.3,_pA[1]=1.25,_pA[2]=0,_pA[3]=-sw-(s>0?kn:0),_pA[4]=0,_pA[5]=0,L3_part(Q.legR,i));(_pA[0]=0,_pA[1]=1.36,_pA[2]=0,_pA[3]=0,_pA[4]=tw*.4,_pA[5]=roll,L3_part(Q.hip,i));(_pA[0]=0,_pA[1]=2.22,_pA[2]=0,_pA[3]=wk?.05:0,_pA[4]=tw,_pA[5]=roll,L3_part(Q.tor,i));
   let aL=-sw*.95,aR=sw*.95,hx=0,hy=0;const ph2=now*.9+i;
   if(p.l3k===1){aR=-1.35+Math.sin(now*2+i)*.04;aL=-.1;hx=.38}/* looks at the phone in the right hand */
   else if(p.l3k===2){hy=Math.sin(ph2*.7)*.75;aL=aR=.05}/* looks around */
   else if(p.l3k===3){const g=Math.max(0,Math.sin(now*2.6+i*1.3));aL=-.15-g*.9;aR=-.1;hy=Math.sin(now*.6+i)*.15}/* chatting, gesturing */
   else hy=Math.sin(ph2*.35)*.22*(i%3?1:0);
-  L3_part(Q.armL,i,-.86,2.78,0,aL,tw,-.12);L3_part(Q.armR,i,.86,2.78,0,aR,tw,.12);L3_part(Q.handL,i,-.86,2.78,0,aL,tw,-.12);L3_part(Q.handR,i,.86,2.78,0,aR,tw,.12);
-  L3_part(Q.head,i,0,3.32,0,hx,hy+tw,0);L3_part(Q.hair,i,0,3.62,0,hx,hy+tw,0);return true}
+  (_pA[0]=-.86,_pA[1]=2.78,_pA[2]=0,_pA[3]=aL,_pA[4]=tw,_pA[5]=-.12,L3_part(Q.armL,i));(_pA[0]=.86,_pA[1]=2.78,_pA[2]=0,_pA[3]=aR,_pA[4]=tw,_pA[5]=.12,L3_part(Q.armR,i));(_pA[0]=-.86,_pA[1]=2.78,_pA[2]=0,_pA[3]=aL,_pA[4]=tw,_pA[5]=-.12,L3_part(Q.handL,i));(_pA[0]=.86,_pA[1]=2.78,_pA[2]=0,_pA[3]=aR,_pA[4]=tw,_pA[5]=.12,L3_part(Q.handR,i));
+  (_pA[0]=0,_pA[1]=3.32,_pA[2]=0,_pA[3]=hx,_pA[4]=hy+tw,_pA[5]=0,L3_part(Q.head,i));(_pA[0]=0,_pA[1]=3.62,_pA[2]=0,_pA[3]=hx,_pA[4]=hy+tw,_pA[5]=0,L3_part(Q.hair,i));return true}
 if(L3_ON){
   buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);L3.E=null;try{L3_pedInit()}catch(e){console.warn('L3',e)}return r})(buildHubTraffic);
   hubTrafficStep=(f=>function(dt){if(!HUB.cars||!HUB.nodes)return f.apply(this,arguments);try{L3.acc+=dt;if(L3.acc>=.2){L3.acc=0;L3_tick()}for(const c of HUB.cars){if(c.l3t==null)continue;if(c.l3c>0)c.l3c-=dt;const e=c.l3t-c.l3s;if(e&&(c.cv||0)>1/* lights-3: a stopped car does not slide sideways (it drifted into the box at the line) */)c.l3s+=Math.sign(e)*Math.min(Math.abs(e),dt*.8)}L3_pedPre(dt);if(CV.G&&L3_LT)L3_guard()}catch(e){console.warn('L3',e)}

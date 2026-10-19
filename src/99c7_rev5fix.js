@@ -301,6 +301,12 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
 (function R13I_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='alloc-rate')){C.items.push({ver:'perf',id:'alloc-rate',area:'perf',text:'perf-r13i: roam per-frame garbage (studs one shape, rain on the array)',go:'perf/alloc-rate'});
  C.GO['perf/alloc-rate']=[{c:'ath',n:'stud shapes = 1, rain fast path',fn:()=>{const R=[];try{const sh=new Set();for(const st of RO.studs||[])sh.add(Object.keys(st).join(','));R.push([RO.studs.length+' studs, '+sh.size+' shape(s)',RO.studs.length>0&&sh.size===1]);
    const p=rain.geometry.attributes.position;R.push(['rain fast path',p.itemSize===3&&!p.normalized&&!p.isInterleavedBufferAttribute&&p.array instanceof Float32Array]);
+   /* perf-r13j: ped / LIFE pose helpers take numbers through Float64Array slots (no boxed float args), and pose exactly as the old (ox,oy,oz,rx,rz) form */
+   R.push(['slot helpers pedPart/L3_part/LIFE_put/LIFE_fig/LIFE_pp arity '+[pedPart.length,L3_part.length,typeof LIFE_put==='function'?LIFE_put.length+'/'+LIFE_fig.length+'/'+LIFE_pp.length:'lx not loaded'].join('/'),pedPart.length===2&&L3_part.length===2&&(typeof LIFE_put!=='function'||LIFE_put.length===3&&LIFE_fig.length===2&&LIFE_pp.length===0)]);
+   {const im=new THREE.InstancedMesh(new THREE.BufferGeometry(),new THREE.MeshBasicMaterial(),1),B0=_pB.clone();_pB.compose(new THREE.Vector3(3,1,-2),new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),.7),new THREE.Vector3(.66,.66,.66));
+    _pA[0]=-.86;_pA[1]=2.78;_pA[2]=0;_pA[3]=-1.3;_pA[4]=-.12;pedPart(im,0);const a=new THREE.Matrix4();im.getMatrixAt(0,a);
+    const e=new THREE.Matrix4().multiplyMatrices(_pB,new THREE.Matrix4().compose(new THREE.Vector3(-.86,2.78,0),new THREE.Quaternion().setFromEuler(new THREE.Euler(-1.3,0,-.12)),new THREE.Vector3(1,1,1)));_pB.copy(B0);
+    let dm=0;for(let k=0;k<16;k++)dm=Math.max(dm,Math.abs(a.elements[k]-e.elements[k]));R.push(['pedPart pose = reference (max diff '+dm.toExponential(1)+')',dm<1e-6]);im.geometry.dispose();im.material.dispose()}
 }
   catch(e){R.push(['threw '+e,false])}const ok=R.every(r=>r[1]);return`📍 ALLOC RATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R13I_reg(i+1),100)})(0);
