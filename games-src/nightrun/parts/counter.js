@@ -14,8 +14,8 @@
 if(RET.counter===undefined)RET.counter=!/[?&]counter=0/.test(location.search);
 const CTR=window.CTR={get on(){return!!RET.counter;},
   stat:{seek:0,parry:0,early:0,wall:0,wallHit:0,wallDash:0,curt:0,curtHit:0,curtDash:0,curtEmp:0,ward:0,strip:0,good:0,waste:0,combo:0,vent:0},
-  UN:{seek:3,wall:5,curt:7,ward:9},EV:{easy:9,normal:7,hard:5,vhard:5,legend:4},
-  HK:{easy:5,normal:9,hard:9,vhard:9,legend:9},WK:{easy:.8,normal:1,hard:1.3,vhard:1.5,legend:1.7},
+  UN:{seek:3,wall:5,curt:7,ward:9},EV:{easy:10,normal:9,hard:6,vhard:5,legend:4},
+  HK:{easy:4,normal:6,hard:9,vhard:9,legend:9},WK:{easy:.8,normal:1,hard:1.3,vhard:1.5,legend:1.7},
   reset(){this.tells=[];this.walls=[];this.curts=[];this.bars=0;this.k=0;this.lastDash=-9;this.pend=0;this.fx=[];},
   live(){return this.on&&G&&G.live&&!G.dead&&!G.lab&&!G.tut&&!(SH&&SH.active);},
   kinds(){const s=S2.stg(),e=SET.diff==='easy',o=[];if(s>=this.UN.seek)o.push('seek');if(!e&&s>=this.UN.wall)o.push('wall');if(!e&&s>=this.UN.curt)o.push('curt');if(s>=this.UN.ward)o.push('ward');return o;},
