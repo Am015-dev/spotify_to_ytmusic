@@ -32,7 +32,7 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
    let gl='';if(G&&G.log.length!==glog){gl=G.log.slice(glog).map(x=>x.join(':')).join(',');glog=G.log.length}
    out.push([i,+ms.toFixed(1),+rm.toFixed(1),own,+om.toFixed(1),np,gl,Object.entries(b).filter(e=>e[1]>4).map(e=>e[0]+':'+e[1].toFixed(0)).join(' ')]);
    if(ms>50)console.log('PF1L f'+i+' '+ms.toFixed(0)+' '+own+' '+out[out.length-1][7]);if(i%600===599)console.log('PF1P s'+((i+1)/60)+' '+Math.round(performance.now()/1000));await new Promise(r=>setTimeout(r,0))}
-  return{hp:PF1.hp,out,win,tc,gov:G?G.log:null,lvl:ev("typeof GOV_lvl==='function'?GOV_lvl():null"),lz:ev("({max:+LZ.max.toFixed(1),over:LZ.over,slow:LZ.slow||[],lf:LF.st.relMB||0})")}},[SECS*60,+(process.env.RN||30)]);
+  return{hp:PF1.hp,out,win,tc,gov:G?G.log:null,lvl:ev("typeof GOV_lvl==='function'?GOV_lvl():null"),lz:ev("({max:+LZ.max.toFixed(1),over:LZ.over,slow:LZ.slow||[]})")}},[SECS*60,+(process.env.RN||30)]);
  const fr=r.out,js=fr.map(f=>f[1]-f[2]),all=fr.map(f=>f[1]),srt=a=>a.slice().sort((x,y)=>x-y),pc=(a,q)=>srt(a)[Math.floor(a.length*q)];
  console.log(`PF1 city=${CITY} touch=${TOUCH} boot=${boot}s frames=${fr.length} gov=${JSON.stringify(r.gov)} end=${JSON.stringify(r.lvl)}`);
  console.log(`PF1 total(js+render) med ${pc(all,.5).toFixed(1)} p99 ${pc(all,.99).toFixed(1)} max ${Math.max(...all).toFixed(0)} n33 ${all.filter(x=>x>33).length} n50 ${all.filter(x=>x>50).length} n150 ${all.filter(x=>x>150).length} | js med ${pc(js,.5).toFixed(1)} max ${Math.max(...js).toFixed(0)} jsn50 ${js.filter(x=>x>50).length}`);

@@ -241,14 +241,8 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const C=LF_ctx(),fra=CID==='fra',[X
   I.bed=I.bed.filter(p=>{const c=Math.cos(p.ry||0),sn=Math.sin(p.ry||0);let lo=9e9,hi=-9e9;for(const[a,b]of[[-2,-1.2],[2,-1.2],[2,1.2],[-2,1.2]]){const u=a*p.sx,v=b*p.sz,y=gy(p.x+c*u+sn*v,p.z-sn*u+c*v);lo=Math.min(lo,y);hi=Math.max(hi,y)}if(hi-lo>.2)return false;p.y=lo;return true})}
  for(const t in I){const A=I[t];if(!A.length)continue;const m=new THREE.InstancedMesh(GE[t],t==='tuft'||t==='reed'?mat.tuft:t==='pond'?mat.pond:mat.def,A.length);
   for(let i=0;i<A.length;i++){const p=A[i];if(t==='patch')LF_fit(L,p,gy);LF_inst(m,i,p);if(slice()){yield 'lf10';t0=performance.now()}}
-  m.computeBoundingSphere();m.castShadow=t==='mound';m.receiveShadow=true;m.userData.lf=t;m.userData.lfR=L.id;m.userData.nsh=t!=='mound';if(t!=='mound')LF_rel(m);L.root.add(m);LF.ms.push(m);yield 'lf11'}
+  m.computeBoundingSphere();m.castShadow=t==='mound';m.receiveShadow=true;m.userData.lf=t;m.userData.lfR=L.id;m.userData.nsh=t!=='mound';L.root.add(m);LF.ms.push(m);yield 'lf11'}
  st.regs=(st.regs||0)+1;LF.rp=K.rp;yield* lzPropsG(L)}
-// perf-r11f: a fill tile's instance matrices + colours (76 B per tuft / bed / patch / pond / reed, ~2 MB a tile) stayed on the CPU after upload (MEMF skips 'lf').
-// Nothing writes them again, so the arrays are dropped by onUpload (the STR strFree trick); x/z are kept (8 B) for LF_roadCheck. Mounds keep theirs (camera raycasts).
-// Freed meshes get a no-op raycast. TUNE.strFree=0 or ?lff=0 keeps the arrays.
-const LF_REL=function(){LF.st.relMB=(LF.st.relMB||0)+this.array.byteLength/1048576;this.array=null};
-function LF_rel(m){if(!TUNE.strFree||/[?&]lff=0/.test(location.search))return;const n=m.count,a=m.instanceMatrix.array,xz=new Float32Array(n*2);for(let i=0;i<n;i++){xz[2*i]=a[16*i+12];xz[2*i+1]=a[16*i+14]}
-  m.userData.lfXZ=xz;m.raycast=()=>{};m.instanceMatrix.onUpload(LF_REL);if(m.instanceColor)m.instanceColor.onUpload(LF_REL)}
 // GO / tests: build the fill tiles around (x,z) now (a GO lands you there before lazyStep would reach them)
 function LF_ensure(x,z,r){if(typeof LAZY==='undefined')return 0;let n=0;for(const L of LAZY)if(L.lf&&!L.done&&lzD(L,x,z)<r){lzRun(L);n++}return n}
 buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{LF_reg()}catch(e){console.warn('LF reg',e)}if(LF.on)P2_after(LF_warm);return r})(buildHubProps);
@@ -277,7 +271,7 @@ Object.assign(window.__lvf,{goSpot:LF_goSpot,green:LF_green,SP:LF.SP});
 // road surface (street, filler road, Autobahn, bridge deck: inside the asphalt edge + 0.5 m). Pass = 0.
 function LF_onRoad(x,z){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+.5)return'street';const f=fillAt(x,z);if(f&&f.d<f.r.w/2+.5)return'filler';const a=abAt(x,z);if(a&&a.d<a.road.w/2+.5)return'autobahn';return onAnyDeck(x,z)?'deck':''}
 function LF_roadCheck(cx,cz,r){const M4=new THREE.Matrix4(),P=new THREE.Vector3(),bad=[];let n=0;const chk=(x,z,t)=>{if((x-cx)**2+(z-cz)**2>r*r)return;n++;const w=LF_onRoad(x,z);if(w)bad.push([t,Math.round(x),Math.round(z),w])};
-  for(const m of LF.ms||[]){if(!m.parent)continue;const t=m.userData.lf;if(t==='mound')continue;const xz=m.userData.lfXZ;for(let i=0;i<m.count;i++){if(xz){chk(xz[2*i],xz[2*i+1],t);continue}m.getMatrixAt(i,M4);P.setFromMatrixPosition(M4);chk(P.x,P.z,t)}}
+  for(const m of LF.ms||[]){if(!m.parent)continue;const t=m.userData.lf;if(t==='mound')continue;for(let i=0;i<m.count;i++){m.getMatrixAt(i,M4);P.setFromMatrixPosition(M4);chk(P.x,P.z,t)}}
   for(const L of(typeof LAZY!=='undefined'?LAZY:[]))if(L.lf&&L.done)for(const p of L.props||[])chk(p[1],p[2],p[0]);return{n,bad:bad.length,ex:bad.slice(0,6)}}
 function LF_goRoad(){const s=LF.SP[CID==='fra'?'fra-2':'ath-1'];LF_go(s);LF_ensure(s.x,s.z,900);LF.lastR=null;setTimeout(()=>{const m=LF_roadCheck(RO.x,RO.z,900);m.pass=m.bad===0&&m.n>500;LF.lastR=m;
   try{say('',(m.pass?'✅ PASS':'❌ FAIL')+` · ${m.bad} fill pieces on a road (of ${m.n} within 900 m)`,4)}catch(e){}},1500);return'📍 FILL OFF THE ROADS · checking 900 m around'}
