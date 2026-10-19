@@ -17,5 +17,5 @@ function C1_build(){const A=HUB.H1;if(!C1.on||!A||!A.length)return;const A2=A.le
       else{inst.push([hx,y+h/2-.1,hz,ry,1.5,h,6.4,C1_G[Math.floor(C1_h(hx,hz,8)*C1_G.length)]]);if(r<.7)inst.push([hx,y+h-.05,hz,ry,1.2,.25,6,C1_F[Math.floor(C1_h(hx,hz,9)*C1_F.length)]])}}
     const im=new THREE.InstancedMesh(g,mat,inst.length);inst.forEach((o,i)=>{M.compose(P.set(o[0],o[1],o[2]),Q.setFromAxisAngle(Y,o[3]),S.set(o[4],o[5],o[6]));im.setMatrixAt(i,M);im.setColorAt(i,c.set(o[7]))});
     im.receiveShadow=true;im.userData.c1h=1;im.userData.cd=420;im.userData.nsh=1;im.computeBoundingSphere();HUB.grp.add(im);C1.meshes++;C1.n+=inst.length}}
-buildHubProps=(f=>function(){HUB.H1=[];const r=f.apply(this,arguments);try{C1.meshes=C1.n=0;C1_build()}catch(e){console.warn('C1',e)}return r})(buildHubProps);
+buildHubProps=(f=>function(){HUB.H1=[];const r=f.apply(this,arguments);return BH_post(()=>{try{C1.meshes=C1.n=0;C1_build()}catch(e){console.warn('C1',e)}return r})})(buildHubProps);
 window.__c1={C1,build:C1_build,dr:()=>DR.solid,h1:()=>HUB.H1,rd:(x,z)=>{const q=cityAt(x,z);return q?q.d-q.road.w/2:999}};

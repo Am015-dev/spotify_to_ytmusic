@@ -56,7 +56,7 @@ function DT_flush(){for(const m of DT.ms)if(m.parent)m.parent.remove(m);DT.ms=[]
  for(const[,A]of DT.mw)A.forEach((a,k)=>{const n=a.length/6;if(!n)return;const im=new THREE.InstancedMesh(pg,DT.mm[k],n);for(let i=0;i<n;i++){const o=i*6;Q.setFromAxisAngle(Y,a[o+3]);M4.compose(Pv.set(a[o],a[o+1],a[o+2]),Q,S.set(a[o+4],a[o+5],1));im.setMatrixAt(i,M4)}
   im.computeBoundingSphere();im.receiveShadow=true;im.userData.bvL=1;im.userData.cd=500;im.userData.dt='mural';HUB.grp.add(im);DT.ms.push(im)});
  const st={};for(const r of DT.P)st[r.t]=(st[r.t]||0)+1;DT.st={by:st,meshes:DT.ms.length};DT.glow=new Map();DT.mw=new Map()}
-buildHubProps=(f=>function(){DT.P=[];DT.glow=new Map();DT.mw=new Map();const r=f.apply(this,arguments);try{if(DT.on&&CID==='fra')DT_flush()}catch(e){console.warn('DT',e)}return r})(buildHubProps);
+buildHubProps=(f=>function(){DT.P=[];DT.glow=new Map();DT.mw=new Map();const r=f.apply(this,arguments);return BH_post(()=>{try{if(DT.on&&CID==='fra')DT_flush()}catch(e){console.warn('DT',e)}return r})})(buildHubProps);
 // ---- GO tests (src/99c_checklist.js dt/*): car parked on the road at the densest spot of the district's pieces, looking at one; verdict after 600 ms
 function DT_go(dz,say){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!DT.on)return'📍 PENDING · district themes are OFF (?dt=0)';if(CID!=='fra')return'📍 Frankfurt only';
  const kinds=DT_K[dz],R=dz==='ost'?300:150,mine=DT.P.filter(r=>kinds.includes(r.t));if(!mine.length)return`📍 No ${dz} theme pieces built ❌`;

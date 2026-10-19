@@ -200,7 +200,7 @@ function AS_tuftGeo(){const P=[],C=[],k=.018,leaf=(a0,y0,s)=>{for(let i=0;i<3;i+
  leaf(15,0,1);leaf(75,30,.72);const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(P,3));g.setAttribute('color',new THREE.Float32BufferAttribute(C,3));g.computeVertexNormals();g.computeBoundingSphere();g.userData.as='tuft 6255';return g}
 function AS_tufts(){if(typeof LF==='undefined'||typeof LF_geos!=='function'||ASSET.off)return;const GE=LF.geo||(LF.geo=LF_geos());if(GE.tuft.userData.as)return;const old=GE.tuft;GE.tuft=ASSET.tuft||(ASSET.tuft=AS_tuftGeo());GE.tuftOld=old;
  scene.traverse(o=>{if(o.isInstancedMesh&&o.geometry===old)o.geometry=GE.tuft})}
-buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{AS_apply()}catch(e){console.warn('AS apply',e)}return r})(buildHubProps);
+buildHubProps=(f=>function(){const r=f.apply(this,arguments);return BH_post(()=>{try{AS_apply()}catch(e){console.warn('AS apply',e)}return r})})(buildHubProps);
 // perf-8: the asset tail runs as three lazy steps (was one unsliced step)
 lzPropsG=(f=>function*(L){yield* f.apply(this,arguments);let T;try{const P=HUB.props,n=L.nProps|0;T=P.slice(P.length-n);if(HUB.ptypes)AS_defs(HUB.ptypes);AS_assign(T)}catch(e){console.warn('AS lz',e);return}yield 'as1';try{AS_fix(T)}catch(e){console.warn('AS lz',e)}yield 'as2';try{AS_far(T);ASSET.cx=1e9}catch(e){console.warn('AS lz',e)}})(lzPropsG);
 propRevive=(f=>function(p){f.apply(this,arguments);if(p.av&&p.im&&ASSET.V[p.av]){p.im.setMatrixAt(p.i,AS_farM(p,new THREE.Matrix4()));ASSET.cx=1e9}})(propRevive);

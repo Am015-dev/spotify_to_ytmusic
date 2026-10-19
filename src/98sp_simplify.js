@@ -120,7 +120,7 @@ function SIMP_farClean(only){const S=SIMP_S();if(!S.on)return;const t0=performan
   const fc=S.st.farClean||{ctb:0,ghost:0,left:0,ms:0};S.st.farClean={ctb:fc.ctb+ctb,ghost:fc.ghost+ghost,left:only?fc.left:F.size-ghost,ms:fc.ms+Math.round(performance.now()-t0)}}
 // hooks: pockets after the biome plan (city grid + biome roads known), pocket trees after the props, SOLID once the roam world is up and after each biome
 if(typeof lzPlanAll==='function'){const _f=lzPlanAll;lzPlanAll=function(){const r=_f.apply(this,arguments);try{SIMP_pockets()}catch(e){console.warn('SIMP pockets',e)}return r}}
-if(typeof buildHubProps==='function'){const _f=buildHubProps;buildHubProps=function(){const r=_f.apply(this,arguments);try{SIMP_pocketTrees()}catch(e){console.warn('SIMP trees',e)}return r}}
+if(typeof buildHubProps==='function'){const _f=buildHubProps;buildHubProps=function(){const r=_f.apply(this,arguments);return BH_post(()=>{try{SIMP_pocketTrees()}catch(e){console.warn('SIMP trees',e)}return r})}}
 if(typeof lzFinish==='function'){const _f=lzFinish;lzFinish=function(L){const r=_f.apply(this,arguments);try{if(L&&L.root)SIMP_solid(L.root);if(L&&L.bld&&L.bld.length)SIMP_farClean(new Set(L.bld))}catch(e){}return r}}
 if(typeof lazyStep==='function'){const _f=lazyStep;lazyStep=function(){const S=SIMP_S();if(HUB.built&&HUB.grid&&S.solidGrp===HUB.grp&&++S.sf%300===0){try{SIMP_solid()}catch(e){}}/* late dressing (Athens kiosks) */if(HUB.built&&HUB.grid&&SIMP_S().solidGrp!==HUB.grp){S.sf=0;SIMP_S().solidGrp=HUB.grp;try{SIMP_solid()}catch(e){console.warn('SIMP solid',e)}try{SIMP_farClean()}catch(e){console.warn('SIMP far',e)}}return _f.apply(this,arguments)}}
 

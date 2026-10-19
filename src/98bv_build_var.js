@@ -82,4 +82,4 @@ function BV_life(){if(!BV.on||BV.L||/[?&]bvl=0\b/.test(location.search))return;c
   const g=BV.geo||(BV.geo=new THREE.BoxGeometry(1,1,1)),m=BV.mat||(BV.mat=new THREE.MeshStandardMaterial({roughness:.55,metalness:.05})),M4=new THREE.Matrix4(),Q=new THREE.Quaternion(),Y=new THREE.Vector3(0,1,0),Pv=new THREE.Vector3(),S=new THREE.Vector3(),Co=new THREE.Color();
   for(const[,a]of I){const n=a.length/8,im=new THREE.InstancedMesh(g,m,n);for(let i=0;i<n;i++){const o=i*8;Q.setFromAxisAngle(Y,a[o+3]);M4.compose(Pv.set(a[o],a[o+1],a[o+2]),Q,S.set(a[o+4],a[o+5],a[o+6]));im.setMatrixAt(i,M4);im.setColorAt(i,Co.setHex(a[o+7]))}
     im.computeBoundingSphere();im.userData.bvL=1;im.userData.cd=500;HUB.grp.add(im)}hubGridAdd(HUB.bld.slice(nb0));BV.st={life:BV.L.length,meshes:I.size,cols:HUB.bld.length-nb0}}
-buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{BV_life()}catch(e){console.warn('BV life',e)}return r})(buildHubProps);
+buildHubProps=(f=>function(){const r=f.apply(this,arguments);return BH_post(()=>{try{BV_life()}catch(e){console.warn('BV life',e)}return r})})(buildHubProps);

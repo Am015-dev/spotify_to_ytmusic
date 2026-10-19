@@ -186,7 +186,7 @@ function OC_altFix(){const R=LM_BY['Römer'],K=LM_BY['Kaiserdom'];if(!R||!K)retu
   const M=new THREE.Matrix4(),P=V3();for(const o of HUB.grp.children){if(!(o.isMesh||o.isInstancedMesh)||!o.geometry||!o.geometry.attributes.position)continue;let ch=false;
     if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);P.setFromMatrixPosition(M);const k=find(P.x,P.z);if(!k||P.y>1)continue;const e=M.elements;e[4]*=k;e[5]*=k;e[6]*=k;e[13]*=k;o.setMatrixAt(i,M);ch=true}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere()}continue}
     const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){const k=find(p[i],p[i+2]);if(k&&p[i+1]>.05){p[i+1]*=k;ch=true}}if(ch){A.needsUpdate=true;o.geometry.computeBoundingBox();o.geometry.computeBoundingSphere()}}}
-{const _bp=buildHubProps;buildHubProps=function(){const r=_bp.apply(this,arguments);try{OC_lampsBuild();OC_traffic()}catch(e){console.warn('OC lamps',e)}return r}}
+{const _bp=buildHubProps;buildHubProps=function(){const r=_bp.apply(this,arguments);return BH_post(()=>{try{OC_lampsBuild();OC_traffic()}catch(e){console.warn('OC lamps',e)}return r})}}
 // ---------- 4 · height audit (both cities): props, traffic, buildings (storeys), named landmarks, floating / buried
 const OC_REAL={Commerzbank:259,'Main Tower':240,Messeturm:257,'Athens Tower':103,Lycabettus:277,Parthenon:13.72+1.53+3.7};
 const OC_RANGE={tree:[6,12],lamp:CID==='ath'?[4.5,6.5]:[6.5,9.5],car:[1.2,2.1],storey:[3,3.4],poly_c:[5,8],poly_o:[3,6],neo:[2,4],plaka:[1,3],fraAlt:[3,5],tower:[.9,1.1]};

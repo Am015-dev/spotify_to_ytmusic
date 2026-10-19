@@ -21,7 +21,7 @@ function CVF_apply(){if(!CVF.on||CVF.done||!HUB.props)return;CVF.done=1;const c=
   const mat=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.45,metalness:0});CVF.im=mk(CVF_bedGeo(0),mat);CVF.imF=mk(CVF_bedGeo(1),mat);
   beds.forEach((p,i)=>{_m.compose(V3(p.x,p.y-.02,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));CVF.im.setMatrixAt(i,_m);CVF.imF.setMatrixAt(i,_m);
     c.set(CVF_FL[Math.floor(CVF_h(p.x,p.z,7)*CVF_FL.length)]);CVF.imF.setColorAt(i,c)});CVF.beds=beds.length;CVF.B=beds}
-buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{CVF.done=0;CVF.n=CVF.beds=0;if(CVF.im){HUB.grp.remove(CVF.im);HUB.grp.remove(CVF.imF);CVF.im=CVF.imF=null}CVF_apply()}catch(e){console.warn('CVF',e)}return r})(buildHubProps);
+buildHubProps=(f=>function(){const r=f.apply(this,arguments);return BH_post(()=>{try{CVF.done=0;CVF.n=CVF.beds=0;if(CVF.im){HUB.grp.remove(CVF.im);HUB.grp.remove(CVF.imF);CVF.im=CVF.imF=null}CVF_apply()}catch(e){console.warn('CVF',e)}return r})})(buildHubProps);
 // a smashed tree that respawns keeps its own size (propRevive writes scale 1)
 if(typeof propRevive==='function'){const _pr=propRevive;propRevive=function(p){const r=_pr.apply(this,arguments);try{if(CVF.on&&p&&p.cvs&&p.im)CVF_mat(p)}catch(e){}return r}}
 // ---- audit (numbers for docs/CITY_VARIETY.md): what the player sees within R m
