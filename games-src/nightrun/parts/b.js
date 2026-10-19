@@ -308,6 +308,7 @@ function update(dt){
       if(!j.ok)goDash(false,j);
       else{const rem=(j.beat-bpos())*BT.spb;if(rem>.006&&!SET.all)P.dq={beat:j.beat,j,t:.3};else goDash(true,j);}}
     else if(P.dq){P.dq.t-=dt;if(bpos()>=P.dq.beat-.002||P.dq.t<=0){const q=P.dq;P.dq=null;if(canDash())goDash(true,q.j);}}}
+    if(P.dashT===.2&&window.CTR)CTR.dash();   // counter.js: parry / vent on the frame a dash starts
     P.dashT=Math.max(0,P.dashT-pdt);P.dashCd=Math.max(0,P.dashCd-pdt);P.inv=Math.max(0,P.inv-pdt);if(P.dashT<=0)P.dashPf=false;
     const py0=P.y;
     if(P.dashT>0){P.x+=P.dx*1050*pdt;P.y+=P.dy*1050*pdt;if(!SET.calm&&Math.random()<.9)G.pt.push({x:P.x,y:P.y,vx:0,vy:0,l:.25,m:.25,c:D.b,sz:10,ghost:1});}
@@ -318,6 +319,7 @@ function update(dt){
     if(touch){if(cx!==P.x||P.dashT>0){touch.sx=touch.x;touch.px=cx;}if(cy!==P.y||P.dashT>0){touch.sy=touch.y;touch.py=cy;}}   // finger past the edge: re-anchor, no dead zone
     P.x=cx;P.y=cy;
     P.tilt+=(clamp((P.y-py0)/(pdt*300||1),-1,1)*.25-P.tilt)*Math.min(1,dt*10);
+    if((pressed.KeyX||pressed.KeyL||pressed.Emp)&&P.emp>0&&window.CTR)CTR.emp();   // counter.js: shield strip, good EMP, combo (before the clear)
     if(pressed.KeyX||pressed.KeyL||pressed.Emp){if(window.ABIL&&ABIL.on)ABIL.emp();else if(P.emp>0){P.emp--;G.empT=.6;G.flash=Math.max(G.flash,.3*FX());shake(9);AU.sfx('emp');
       for(const b of G.eb){burst(b.x,b.y,D.b,2,80,.4);G.score+=5;}G.eb=[];G.en.forEach(e=>{if(e.type!=='boss')e.hp-=10;else e.hp-=25;e.flash=.2;});if(G.boss)G.boss.lasers=[];}}
     // the ship shoots itself on a grid of the beat (a 16th note for the Courier): one shot per grid cell, shots on the beat itself are gold pulse shots

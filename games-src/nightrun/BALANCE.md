@@ -231,3 +231,12 @@ every weapon (the weapon did not matter: enemies hardly threaten a ship that kee
   tutorial/lab/god mode. A 45 px sidestep or a dash clears it; the rest of the screen is free.
 - Homing (S2 steer): every tier now uses the hard tiers' narrow cone (.7 rad) and reach (300 px), so missiles need the ship pointed at a target.
 - Test bots see the lane (`MM.cost(x)`) like STILL.beam and the boss telegraphs: balance-test dec()/camp(), afk-test bot.
+
+## Counter threats: DASH and EMP as answers (flag RET.counter, ?counter=0 = abilities only; 19 Oct 2026)
+- One threat every EV bars (Easy 9, Normal 7, Hard/Very hard 5, Legend 4), in turn from the unlocked ones; never with a boss, pit stop, lab or tutorial.
+  Unlock by story stage: seeker 3, wall 5 (not Easy), curtain 7 (not Easy), warden 9. Endless uses S2.stg().
+- Seeker: .7 s red-ring tell, 300 px/s (Easy 240), turns 9 rad/s (Easy 5) for 4 s; 1 hull (2 on hard tiers); parry window .15 s (+1 frame); parry shot 15 dmg (player shot, DMG caps).
+- Laser wall: 1.3 s tell, 420 px/s, 1 hull once; 110 px gap when there is no dash charge. Curtain: .9 s tell, 2 layers, 96 px gaps >= 270 px apart, .45 s apart (.9 s with no dash and no EMP), 230 px/s.
+- Warden: 60 hull x (Easy .8, Normal 1, Hard 1.3, Very hard 1.5, Legend 1.7); shield takes 70% of each hit; EMP strips it for 8 s; stays up to 20 s.
+- GOOD EMP (>= 6 bullets, a curtain, or a shielded warden): +400 x mult, +.25 meter. COMBO = EMP <= 1 s after a dash start: +12 to ordinary foes within 300 px.
+- counter-test (dodging bot without vs with the timed answer, hull lost): seeker 7 vs 0, wall 6 vs 0, curtain 4 vs 1; warden kill 6.1 s vs 1.9 s; combo 110 vs 50 damage; random presses 3.7 vs timed 0.
