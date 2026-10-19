@@ -25,7 +25,7 @@ function L3_tick(){if(typeof RO!=='undefined'){let b=false;for(const c of HUB.ca
   if(want!==c.l3t&&L3_free(c,A,B,want)){c.l3t=want;c.l3c=4;L3.lc++}}}
 // red-light audit: a car entering a signalled box on red without a reservation granted before the red = a run
 function L3_near(c){if(c.dead>0||c.pk)return null;const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B||A.ab||B.ab||c.a>=N.ng||c.b>=N.ng)return null;if(Math.abs(c.x-RO.x)>320||Math.abs(c.z-RO.z)>320)return null;
-  const L=Math.hypot(B.x-A.x,B.z-A.z)||1;return[(B.x-A.x)/L,(B.z-A.z)/L]}
+  const L=Math.hypot(B.x-A.x,B.z-A.z)||1,h=c.l3h||(c.l3h=[0,0]);h[0]=(B.x-A.x)/L;h[1]=(B.z-A.z)/L;return h}   // perf-r12b: one pair per car (used within the call only), not 78 arrays per step
 // red-light audit: a car that was outside every signalled box on the previous step and is inside one now, on an approach whose light is red, with
 // no reservation from before the line. Cars that spawn or jump into a box (no "outside" step before) are not entries.
 function L3_audit(){if(!CV.sig.length)return;for(const c of HUB.cars){const h=L3_near(c);if(!h){c.l3Q=null;continue}let In=null;CV_near(c.x,c.z,J=>J.sig&&Math.hypot(J.x-c.x,J.z-c.z)<J.R0&&(In=J));
@@ -39,14 +39,16 @@ function L3_edges(){const N=HUB.nodes,NG=N.ng,K=CV.K,E=new Map();for(let i=0;i<N
   const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L,ln=A.g||B.g?0:Math.min(A.w||20,B.w||20)*.31;const all=[];for(const J of CV.sig){if(J.ap.length<2)continue;const rx=J.x-A.x,rz=J.z-A.z;if(Math.abs(rx)>L+40||Math.abs(rz)>L+40)continue;
     const p=rx*hx+rz*hz,q=Math.abs(-rx*hz+rz*hx-ln)/* lights-3: from the lane the car drives in, not the centreline (93>105 missed box 608,-97 by 1.5 m while its cars cut 3 m into it) */,R=J.R0+3/* the audit box is a bit wider than R0: edges that only graze the corner still enter it */;if(p<=0||q>=R)continue;/* heading away: leaving that box */const s=Math.max(0,p-Math.sqrt(R*R-q*q));/* 0: starts inside a big merged box but still heads in (lane-offset cars are outside) */if(s>L)continue;
     let k=-1,bd=.3;J.ap.forEach((g,m)=>{const v=g.dx*hx+g.dz*hz;if(v>bd){bd=v;k=m}});if(k>=0)all.push({J,k,s})}if(all.length)E.set(i*K+j,all.sort((a,b)=>a.s-b.s))/* every box on the edge in order (long edges cross two) */}}L3.E=E;return E}
+// perf-r12b: no per-call closure / filter array / empty-list literals (hubTrafficStep-self GC frames); a stop object is only made on a hit
+const L3_E0=[];
+function L3_at(c,h,J,k,d0){const rx=J.x-c.x,rz=J.z-c.z,l=Math.hypot(rx,rz);if(l<J.R0)return null;const p=rx*h[0]+rz*h[1],q=Math.abs(rx*h[1]-rz*h[0]);return{J,k,d:q<J.R0&&p>0?p-Math.sqrt(J.R0*J.R0-q*q):Math.max(d0,l-J.R0)}}
 function L3_stop(c,h){const N=HUB.nodes,K=CV.K,E=L3.E||L3_edges(),A=N[c.a],B=N[c.b];if(!A||!B)return null;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,pos=(c.t||0)*L,rem=L-pos;
-  const at=(J,k,d0)=>{const rx=J.x-c.x,rz=J.z-c.z,l=Math.hypot(rx,rz);if(l<J.R0)return null;const p=rx*h[0]+rz*h[1],q=Math.abs(rx*h[1]-rz*h[0]);return{J,k,d:q<J.R0&&p>0?p-Math.sqrt(J.R0*J.R0-q*q):Math.max(d0,l-J.R0)}};
-  let best=null;for(const e of E.get(c.a*K+c.b)||[]){if(pos>=e.s+12)continue;const S=at(e.J,e.k,e.s-pos);if(S){best=S;break}}/* nearest stop line ahead wins: current edge's box vs the boxes on the next edges */if(rem>45)return best;const nx=c.route&&c.route.length?[c.route[0]]:B.nb.filter(n=>n!==c.a);
-  for(const n of nx){const f=(E.get(c.b*K+n)||[])[0];if(!f)continue;const S=at(f.J,f.k,rem+f.s);if(S&&(!best||S.d<best.d))best=S}return best}
+  let best=null;for(const e of E.get(c.a*K+c.b)||L3_E0){if(pos>=e.s+12)continue;const S=L3_at(c,h,e.J,e.k,e.s-pos);if(S){best=S;break}}/* nearest stop line ahead wins: current edge's box vs the boxes on the next edges */if(rem>45)return best;const rt=c.route&&c.route.length,nb=rt?c.route:B.nb,nn=rt?1:nb.length;
+  for(let i=0;i<nn;i++){const n=nb[i];if(!rt&&n===c.a)continue;const L2=E.get(c.b*K+n),f=L2&&L2[0];if(!f)continue;const S=L3_at(c,h,f.J,f.k,rem+f.s);if(S&&(!best||S.d<best.d))best=S}return best}
 // spacing (lights-1): the CV box hold only stops a follower once its leader is < 6 m ahead, so queued cars end up 2.6-3.5 m nose to nose. Cap every
 // car's speed so it stops 5.2 m (centre to centre) behind the nearest car ahead in its lane.
 function L3_space(c){if(!CV.G||c.pk)return;const kx=Math.floor(c.x/16),kz=Math.floor(c.z/16),hx=c.CVhx,hz=c.CVhz;if(hx==null)return;let vm=1e9;
-  for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of CV.G.get((kx+a)*100000+kz+e)||[]){if(o===c||o.dead>0)continue;const rx=o.x-c.x,rz=o.z-c.z,al=rx*hx+rz*hz;if(al<=0||al>16)continue;if(Math.abs(-rx*hz+rz*hx)>1.6||o.CVhx*hx+o.CVhz*hz<.8)continue;vm=Math.min(vm,Math.sqrt(6.4*Math.max(0,al-5.2)+(o.cv||0)*(o.cv||0)))}
+  for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)for(const o of CV.G.get((kx+a)*100000+kz+e)||L3_E0){if(o===c||o.dead>0)continue;const rx=o.x-c.x,rz=o.z-c.z,al=rx*hx+rz*hz;if(al<=0||al>16)continue;if(Math.abs(-rx*hz+rz*hx)>1.6||o.CVhx*hx+o.CVhz*hz<.8)continue;vm=Math.min(vm,Math.sqrt(6.4*Math.max(0,al-5.2)+(o.cv||0)*(o.cv||0)))}
   if(vm<(c.cv||0)){if(c.l3V==null)c.l3V=c.v;c.v=Math.min(c.v,vm);c.cv=Math.min(c.cv||0,vm);L3.sp=(L3.sp||0)+1}}
 function L3_guard(){for(const c of HUB.cars){c.l3V=null;c.l3S=null;const h=L3_near(c);if(!h)continue;L3_space(c);const S=c.l3S=L3_stop(c,h);if(!S||S.d>60)continue;const{J,k,d}=S,v0=c.cv||0,res=J.res||(J.res=new Map());
   if(res.has(c))continue;const st=CV_st(J,k),go=st==='g'||st==='y'&&d<v0*v0/12+1.5;if(go){if(d<6||st==='y'){res.set(c,CV.t);if(c.l3G!==J){c.l3G=J;c.l3Gt=CV.t}}/* amber: committed. l3G keeps the FIRST commit time: CV drops the reservation of a car on an edge that only grazes the box (centre behind it) and the guard re-adds it every step */continue}

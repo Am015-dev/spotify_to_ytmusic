@@ -88,7 +88,7 @@ function LIFE_geos(){const fra=CID==='fra',P=Math.PI;
   planter:LIFE_g([[LB(.9,.55,.9),'#b85a3a',0,.28,0],[LS(.42,7),'#3aa046',0,.75,0],[LS(.14,5),'#ff4c8c',.2,1,.1],[LS(.14,5),'#ffd12c',-.2,.95,-.1]]),
   bin:LIFE_g([[LC(.32,.28,.95,10),'#3a8a4a',0,.48,0],[LC(.35,.35,.08,10),'#2a6a3a',0,.98,0]])};
  const pop=new THREE.IcosahedronGeometry(1.4,1),ring=new THREE.TorusGeometry(2.6,.22,6,24);colorize(pop,new THREE.Color('#ffffff'));colorize(ring,new THREE.Color('#ffffff'));
- const TB=LIFE_ldTurb();LIFE.TB=TB&&TB.hub;if(TB)S.turbine=TB.geo;/* life-2: real 7747 turbine */
+ const TB=LIFE.pre&&'tb'in LIFE.pre?LIFE.pre.tb:LIFE_ldTurb();LIFE.TB=TB&&TB.hub;if(TB)S.turbine=TB.geo;/* life-2: real 7747 turbine */
  return{S,Q,ball,dog,fig,torso,arms,M,pop,ring}}
 // ---------- pools: name → InstancedMesh (count set per frame; invisible while empty, so an empty pool costs no draw call)
 const LIFE_CAP={set:14,setM:14,prop:18,ball:14,dog:6,fig:180,sm:44,pop:8,bm:8};if(typeof LOWMEM!=='undefined'&&LOWMEM)LIFE_CAP.bm=3;// crash-5: the batched pools copy every geometry bm times (no addInstance before three r166): 8 -> 3 copies on low-mem phones = -23 MB CPU+GPU in Athens// bm: copies of each type in the batched pools (one draw call for all types)
@@ -101,7 +101,7 @@ function LIFE_bm(G,st,name,mul={}){let nv=0,n=0;for(const k in G){const c=LIFE_C
  B.userData.P=P;O[name]=B;return O}
 function LIFE_im(geo,n,mat){const m=new THREE.InstancedMesh(geo,mat||LV_mat(),n);m.instanceMatrix.setUsage(THREE.DynamicDrawUsage);m.userData.keep=1;m.frustumCulled=false;m.castShadow=false;m.receiveShadow=false;m.count=0;m.visible=false;LIFE.grp.add(m);return m}
 function LIFE_init(){if(LIFE.grp===HUB.grp)return true;if(!HUB.grp||!HUB.nodes||!HUB.nodes.length||typeof LV_eGrid!=='function')return false;
- const G=LIFE_geos(),M={};LIFE.grp=HUB.grp;LIFE.C.clear();LIFE.SL=new Map();LIFE.CA=new Map();LIFE.SC.clear();LIFE.dead.clear();LIFE.KK=new Set();LIFE.fly.clear();LIFE.L=[];LIFE.px=1e9;
+ const G=LIFE.pre&&LIFE.pre.G||LIFE_geos(),M={};LIFE.grp=HUB.grp;LIFE.C.clear();LIFE.SL=new Map();LIFE.CA=new Map();LIFE.SC.clear();LIFE.dead.clear();LIFE.KK=new Set();LIFE.fly.clear();LIFE.L=[];LIFE.px=1e9;
  // life-2: set-piece bases + group props share ONE BatchedMesh, the moving set-piece parts another (2 draw calls for every type instead of 1-2 each)
  const bs={},bm={};for(const k of LIFE_SET){bs['s_'+k]=G.S[k][0];bm['m_'+k]=G.S[k][1]}for(const k in G.Q)bs['q_'+k]=G.Q[k];
  Object.assign(M,LIFE_bm(bs,true,'bm_s'),LIFE_bm(bm,false,'bm_m',{m_swings:2}));M.ball=LIFE_im(G.ball,LIFE_CAP.ball);M.dog=LIFE_im(G.dog,LIFE_CAP.dog);
@@ -110,7 +110,17 @@ function LIFE_init(){if(LIFE.grp===HUB.grp)return true;if(!HUB.grp||!HUB.nodes||
  for(const k of LIFE_SM)M['x_'+k]=LIFE_im(G.M[k],LIFE_CAP.sm);
  const pm=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.3,emissive:'#ffffff',emissiveIntensity:.35,transparent:true,opacity:.82});
  M.kick=LIFE_im(LIFE_kickGeo(),LIFE_CAP.pop);M.pop=LIFE_im(G.pop,LIFE_CAP.pop,pm);M.ring=LIFE_im(G.ring,LIFE_CAP.pop,pm.clone());
- for(const k in M){M[k].name=k;M[k].userData.st=/^[xsq]_/.test(k)}LIFE.M=M;LIFE_landmark();return true}
+ for(const k in M){M[k].name=k;M[k].userData.st=/^[xsq]_/.test(k)}LIFE.M=M;LIFE_landmark();LIFE.pre=null;return true}
+// perf-r12a: when the loader did not build LIFE (low-mem 12 s wait, lx.js after the loader, ?test pages) LIFE_init ran in ONE roam frame: 150-260 ms
+// (LDraw turbine + Ferris wheel / carousel geometry, the batched pools). LIFE_pre does one heavy piece per frame first; LIFE_init then reuses them. ?lifestage=0 = old.
+const LIFE_STG=!/[?&]lifestage=0/.test(location.search);
+function LIFE_pre(){if(!LIFE_STG)return true;if(!HUB.grp||!HUB.nodes||!HUB.nodes.length||typeof LV_eGrid!=='function')return false;
+ const Q=LIFE.pre&&LIFE.pre.c===CID?LIFE.pre:(LIFE.pre={c:CID,k:0}),t0=performance.now();try{return LIFE_pre1(Q)}finally{(LIFE.preMs=LIFE.preMs||[]).push(+(performance.now()-t0).toFixed(1))}}
+function LIFE_pre1(Q){
+ if(Q.k===0){Q.tb=LIFE_ldTurb();Q.k=1;return false}
+ if(Q.k===1){Q.G=LIFE_geos();Q.k=2;return false}
+ if(Q.k===2){try{Q.lm=LIFE_ldLm(CID==='fra')}catch(e){console.warn('LIFE lm',e)}Q.k=3;return false}
+ return true}
 // ---------- placement: slots every 16 m on both sides of every street edge (no motorways), owned by the 40 m cell they fall in
 // a kerb point s m along edge A→B on side sd, dist m beyond the carriageway edge; h faces the road
 function LIFE_side(A,B,s,sd,dist){const L=Math.hypot(B.x-A.x,B.z-A.z)||1,ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,W=Math.min(A.w||(A.g?8:20),B.w||(B.g?8:20)),
@@ -224,7 +234,7 @@ function LIFE_landmark(){LIFE.lm=null;const fra=CID==='fra';let at=null;
  if(fra&&typeof MAINR!=='undefined'&&MAINR&&MAINR.pts){const P=MAINR.pts;let bp=P[0],bd=1e18;for(const p of P){const d=(p.x-150)**2+(p.z+120)**2;if(d<bd){bd=d;bp=p}}
   tryAt(bp.x-bp.tz*(bp.hw+22),bp.z+bp.tx*(bp.hw+22),9);if(at)at.h=Math.atan2(bp.tx,bp.tz)}
  else if(!fra)tryAt(1250,-60,7);if(!at)return;
- const g=new THREE.Group(),P=Math.PI,LD=LIFE_ldLm(fra);if(LD){g.add(LD.inner);LIFE.lm={g,spin:LD.piv,ax:LD.ax,upd:LD.upd,ld:LD,k:fra?'Ferris wheel':'big carousel',...at}}
+ const g=new THREE.Group(),P=Math.PI,LD=LIFE.pre&&'lm'in LIFE.pre?LIFE.pre.lm:LIFE_ldLm(fra);if(LD){g.add(LD.inner);LIFE.lm={g,spin:LD.piv,ax:LD.ax,upd:LD.upd,ld:LD,k:fra?'Ferris wheel':'big carousel',...at}}
  else if(fra){const base=LIFE_g([[LB(1.2,24,1.2),'#e8e8f0',-3,11,0,0,0,.25],[LB(1.2,24,1.2),'#e8e8f0',3,11,0,0,0,-.25],[LB(1.2,24,1.2),'#e8e8f0',-3,11,4,0,0,.25],[LB(1.2,24,1.2),'#e8e8f0',3,11,4,0,0,-.25],[LB(10,1,7),'#7a7e86',0,.5,2]]);
    const sp=[];for(let i=0;i<16;i++){const a=i*P/8;sp.push([LB(.35,21,.35),'#f2f2f2',0,0,0,0,0,a]);sp.push([LB(1.6,1.6,1.6),LIFE_SHIRT[i%8],Math.sin(a)*10.5,Math.cos(a)*10.5-1.2,0])}
    sp.push([new THREE.TorusGeometry(10.5,.3,6,40),'#e8302a',0,0,0]);sp.push([LC(.8,.8,5,10),'#666',0,0,2,P/2]);const wheel=LIFE_g(sp);
@@ -323,7 +333,7 @@ function LIFE_hit(){const sp=Math.abs(RO.v),y0=RO.y||0;for(const it of LIFE.H||[
 // ---------- per frame (after LV_step: free roam only)
 function LIFE_step(dt){if(!LIFE.on||!RO.on||RO.wk){if(LIFE.KK&&LIFE.KK.size)LIFE_kickSync([]);if(LIFE.M&&LIFE.grp)for(const k in LIFE.M){LIFE.M[k].visible=false}if(LIFE.lm)LIFE.lm.g.visible=!!LIFE.on;return}
  if(typeof LOWMEM!=='undefined'&&LOWMEM&&LIFE.grp!==HUB.grp&&(LIFE.w=(LIFE.w||0)+dt)<12)return;// crash-5: low-mem phones build LIFE 12 s into roam, after the boot peak has been collected
- const t0=performance.now();if(!LIFE_init())return;LIFE.t+=dt;LIFE.fr++;
+ const t0=performance.now();if(LIFE.grp!==HUB.grp&&!LIFE_pre())return;if(!LIFE_init())return;LIFE.t+=dt;LIFE.fr++;
  const P=LIFE.pf||(LIFE.pf={fill:0,hit:0,draw:0,n:0});let q=performance.now();if(LIFE.fr%12===0||LIFE.todo&&LIFE.fr>=LIFE.todo||Math.hypot(RO.x-LIFE.px,RO.z-LIFE.pz)>20){LIFE.px=RO.x;LIFE.pz=RO.z;LIFE_fill()}
  P.fill+=performance.now()-q;q=performance.now();LIFE_hit();P.hit+=performance.now()-q;q=performance.now();LIFE_draw();P.draw+=performance.now()-q;P.n++;/* where LIFE's time goes (window.__life.LIFE.pf) */const lm=LIFE.lm;if(lm){lm.g.visible=(lm.x-RO.x)**2+(lm.z-RO.z)**2<900*900;const a=LIFE.t*(lm.ax==='y'?.5:.12);lm.spin.rotation[lm.ax]=a;if(lm.upd&&lm.g.visible)lm.upd(a)}
  const ms=performance.now()-t0;LIFE.ms=LIFE.ms*.95+ms*.05;LIFE.msN++;if(LIFE.rec){const w=LIFE.tw?t0-LIFE.tw:dt*1000;LIFE.rec.push([ms,w/1000])}LIFE.tw=t0/* life-2: wall-clock frame time (the game's dt is clamped at 50 ms on a slow page) */}
