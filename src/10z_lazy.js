@@ -10,9 +10,9 @@ function XC_eval(c){return eval(c)}   // direct eval: sees every module-level bi
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
  return XC.q[name]||(XC.q[name]=new Promise(res=>{const s=document.createElement('script');s.src='xc/'+name+'.js?'+(XCV[name]||0);
-  s.onload=()=>{try{const c=window.__XC&&window.__XC[name];if(c){delete window.__XC[name];const o=XC_eval(c);if(XC.apply[name]&&o)XC.apply[name](o);else if(o&&typeof o==='object')for(const k in o)if(typeof o[k]==='function'&&!(k in window))window[k]=o[k]}}catch(e){XC.err.push(name+': '+e);console.warn('XC '+name,e)}res()};
+  s.onload=()=>{try{const c=window.__XC&&window.__XC[name];if(c){delete window.__XC[name];if(typeof BMK==='function')BMK('xc '+name);const o=XC_eval(c);if(XC.apply[name]&&o)XC.apply[name](o);else if(o&&typeof o==='object')for(const k in o)if(typeof o[k]==='function'&&!(k in window))window[k]=o[k]}}catch(e){XC.err.push(name+': '+e);console.warn('XC '+name,e)}res()};
   s.onerror=()=>{XC.err.push(name+': 404');res()};document.head.appendChild(s)}))}
-function XC_go(){if(XC.p)return XC.p;XC.t0=performance.now();return XC.p=(async()=>{for(const n of Object.keys(XCV))await XC_need(n);XC.done=true;XC.t1=performance.now()})()}
+function XC_go(){if(XC.p)return XC.p;XC.t0=performance.now();return XC.p=(async()=>{/* perf-r14e: desktop chunk evals (1-4 s tasks) wait for the roam-start gate (LKG, 98bp) to end */for(let k=0;k<600&&typeof LKG!=='undefined'&&LKG.arm;k++)await new Promise(r=>setTimeout(r,100));for(const n of Object.keys(XCV))await XC_need(n);XC.done=true;XC.t1=performance.now()})()}
 if(!XC.done&&!TQ){const iv=setInterval(()=>{try{if(state==='loading'||LD.on||LD.busy)return}catch(e){return}clearInterval(iv);setTimeout(XC_go,1500)},300)}
 window.__xc={XC,need:XC_need,go:XC_go,ev:XC_eval};   // ev = test hook: eval in module scope
 // per-city boot data (52_terrain_data.js awaits these): start the downloads NOW, ~40 modules before the await, so they run parallel to the rest of the page's start-up
