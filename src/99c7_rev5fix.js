@@ -385,3 +385,19 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   catch(e){R.push(['threw '+e,false])}
   const ok=R.every(r=>r[1]);return`📍 HEAP 30 S · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R15C_reg(i+1),100)})(0);
+// ios-r17b: GO perf/beacon-boot. Boot doc at the first playable frame, 'killed' doc from a stale localStorage heartbeat, 'freeze' doc for a 1.5 s frame gap (stubbed db, window.__pbDbMock).
+(function R17B_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='beacon-boot'))C.items.push({ver:'perf',id:'beacon-boot',area:'perf',text:'ios-r17b · perf beacon boot/killed/freeze: 📍 GO uses the stubbed db. Pass line: a "boot" doc (city, ua, dpr, vp, gpu, bootMs, renderer counts) at the first playable frame, before any 20 s drive report; a planted stale heartbeat gives exactly one "killed" doc (carrying that snapshot) sent before the boot doc and the heartbeat is cleared; a simulated 1.5 s frame gap gives exactly one "freeze" doc with the frame-system timers, a hidden-tab gap gives none, at most 3 per session; every storage access is try/catch.'});
+  C.GO['perf/beacon-boot']=[{c:'fra',n:'boot + killed + freeze docs into a stubbed db',secs:3,fn:()=>{const B=window.__pb;if(!B)return'📍 BEACON BOOT · window.__pb missing ❌ FAIL';const P=B.PB,o={booted:P.booted,fz:P.fz,hid:P.hid,hb:P.hb,db:P.db,on:P.on},prevMock=window.__pbDbMock,hb0=B.hbGet(),got=[],R=[];
+   window.__pbDbMock={collection:n=>({add:async d=>{got.push([n,d]);return{}}})};P.on=true;P.booted=0;P.fz=0;P.hid=0;
+   B.hbSet({t:Date.now()-60000,state:'roam',city:'fra',sec:42,worstMs:310,ri:{geo:1,tex:2,prog:3},orient:'land'});B.boot(performance.now());
+   setTimeout(()=>{const k=got.filter(g=>g[1].kind==='killed'),b=got.filter(g=>g[1].kind==='boot');
+    R.push(['killed docs '+k.length+(k[0]?' last.sec '+k[0][1].last.sec:''),k.length===1&&k[0][0]==='perf'&&k[0][1].last.sec===42&&k[0][1].last.worstMs===310]);
+    R.push(['boot docs '+b.length,b.length===1&&got[0][1].kind==='killed'&&got[1][1].kind==='boot']);
+    const d=b[0]&&b[0][1],need=['city','ua','dpr','vp','gpu','bootMs','at','build'],miss=d?need.filter(x=>d[x]==null||d[x]===''):need;R.push(['boot fields '+(miss.length?'missing '+miss.join(','):'all')+(d?' · '+d.vp+' · '+d.gpu:''),!miss.length&&!!d.ri]);
+    R.push(['heartbeat cleared',B.hbGet()==null]);
+    const n0=got.length;B.life(performance.now(),1500);
+    setTimeout(()=>{const f=got.slice(n0).filter(g=>g[1].kind==='freeze'),fd=f[0]&&f[0][1];R.push(['freeze docs '+f.length+(fd?' gap '+fd.gapMs+' fs '+Object.keys(fd.fs).length:''),f.length===1&&fd.gapMs===1500&&Object.keys(fd.fs).length>=5]);
+     const n1=got.length;P.hid=1;B.life(performance.now(),1500);for(let k=0;k<5;k++){P.hid=0;B.life(performance.now(),1500)}
+     setTimeout(()=>{const f2=got.slice(n1).filter(g=>g[1].kind==='freeze').length;R.push(['hidden gap none, cap 3 → +'+f2+' more',f2===2]);
+      delete window.__pbDbMock;if(prevMock)window.__pbDbMock=prevMock;Object.assign(P,o);B.hbSet(hb0);const ok=R.every(r=>r[1]);goSay(`📍 BEACON BOOT · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`)},50)},50)},50);return'📍 BEACON BOOT · sending…'}}];return}
+ if(i<600)setTimeout(()=>R17B_reg(i+1),100)})(0);

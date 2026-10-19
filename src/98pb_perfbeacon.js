@@ -46,7 +46,28 @@ function PB_chipStep(now,ms){const el=PB_chipEl();if(!SET.fpsChip){if(!el.hidden
   const a=PB.cf.splice(0).sort((x,y)=>x-y),avg=a.length?a.reduce((s,x)=>s+x,0)/a.length:0;el.hidden=false;
   el.textContent=`${avg?Math.round(1000/avg):0} fps · p90 ${Math.round(PB_q(a,.9))} ms · ${GOV.on?'auto ':''}${LK_LV[Math.min(3,GOV.d)]||SET.q} · ×${(DRES.s||1).toFixed(2)} · pr ${renderer.getPixelRatio().toFixed(2)}`}
 function PB_toggleChip(){SET.fpsChip=!SET.fpsChip;saveSet();PB.ct=0;PB_chipStep(performance.now(),0);}
-{const _fr=frame;frame=function(now){const a=performance.now();PB.child=0;const ms=PB.last?now-PB.last:0;PB.last=now;_fr(now);
+// ios-r17b (Alex: iPhone 17 freezes, `perf` stayed empty because the first doc came 20 s into a drive): (1) a 'boot' doc at the first playable frame, (2) a localStorage heartbeat every 2 s while playing,
+// cleared when the page hides; a heartbeat found at the next boot = the tab froze or was killed -> 'killed' doc with that snapshot, sent before the boot doc, (3) a 'freeze' doc per frame gap > 1 s while visible (≤ 3)
+// with the frame-system timers of that frame. Default ON, ?pbb=0 = off. Every storage access is try/catch.
+PB.on=!/[?&]pbb=0/.test(location.search);PB.booted=0;PB.fz=0;PB.hb=0;PB.hw=0;PB.hid=0;PB.t1=0;PB.HK='od_pb_hb';
+const PB_play=()=>!paused&&!document.hidden&&!LD.on&&(state==='roam'||state==='race'||state==='countdown');
+function PB_ri(){try{const i=renderer.info,m=i.memory||{};return{geo:m.geometries,tex:m.textures,prog:i.programs?i.programs.length:0,calls:i.render&&i.render.calls,tris:i.render&&i.render.triangles}}catch(e){return null}}
+function PB_heap(){try{const M=performance.memory;if(M)return{usedMB:Math.round(M.usedJSHeapSize/1048576),limitMB:Math.round(M.jsHeapSizeLimit/1048576)}}catch(e){}return null}
+function PB_base(kind){let ifr=false;try{ifr=window.self!==window.top}catch(e){ifr=true}
+  return{kind,at:new Date().toISOString(),build:(()=>{try{return OD_CHANGELOG[0].v}catch(e){return'?'}})(),city:typeof CID!=='undefined'?CID:'?',state,ua:navigator.userAgent.slice(0,200),vp:innerWidth+'x'+innerHeight,dpr:+(devicePixelRatio||1).toFixed(2),gpu:PB_gpu(),iframe:ifr,ri:PB_ri(),heap:PB_heap()}}
+function PB_hbGet(){try{const r=localStorage.getItem(PB.HK);return r?JSON.parse(r):null}catch(e){return null}}
+function PB_hbSet(o){try{if(o)localStorage.setItem(PB.HK,JSON.stringify(o));else localStorage.removeItem(PB.HK)}catch(e){}}
+function PB_boot(now){if(PB.booted)return;PB.booted=1;PB.t1=now;const old=PB_hbGet();
+  setTimeout(()=>{try{if(old){PB_hbSet(null);PB_post(Object.assign(PB_base('killed'),{last:old}))}const d=PB_base('boot');d.bootMs=Math.round(now);PB_post(d)}catch(e){}},0)}
+function PB_life(now,ms){if(!PB.on)return;
+  if(ms>PB.hw)PB.hw=ms;
+  if(ms>1000&&!PB.hid&&!document.hidden&&PB.fz<3){PB.fz++;const fs={};for(const k in PB.fs)fs[k]=PB_r(PB.fs[k]);const d=PB_base('freeze');d.gapMs=Math.round(ms);d.fs=fs;d.n=PB.fz;setTimeout(()=>{try{PB_post(d)}catch(e){}},0)}
+  PB.hid=0;
+  if(!PB_play())return;
+  if(!PB.booted)PB_boot(now);
+  if(now-PB.hb>=2000){PB.hb=now;PB_hbSet({t:Date.now(),state,city:typeof CID!=='undefined'?CID:'?',sec:Math.round((now-PB.t1)/1000),worstMs:Math.round(PB.hw),ri:PB_ri(),heap:PB_heap(),orient:innerWidth>=innerHeight?'land':'port',vp:innerWidth+'x'+innerHeight});PB.hw=0}}
+{const clr=()=>{PB.hid=1;PB_hbSet(null)};addEventListener('pagehide',clr);document.addEventListener('visibilitychange',()=>{if(document.hidden)clr();else{PB.hid=1;PB.hb=0}})}
+{const _fr=frame;frame=function(now){const a=performance.now();PB.child=0;const ms=PB.last?now-PB.last:0;PB.last=now;_fr(now);try{PB_life(now,ms)}catch(e){}
   if(ms>0&&ms<1000&&PB_live()&&PB.t0&&PB.k<PB.iv.length){PB.iv[PB.k++]=ms;if(ms>50)PB.slow++;if(ms>PB.worst)PB.worst=ms;PB.busy+=performance.now()-a;for(const k in PB.fs)PB.sys[k]=(PB.sys[k]||0)+PB.fs[k]}
   for(const k in PB.fs)PB.fs[k]=0;
   PB_tick(now);PB_chipStep(now,ms)}}
@@ -57,4 +78,4 @@ if(/[?&]fps=1/.test(location.search))SET.fpsChip=true;
   document.addEventListener('pointerdown',e=>{if(!hit(e))return;fired=0;clearTimeout(tm);tm=setTimeout(()=>{fired=1;PB_toggleChip()},600)},true);
   for(const ev of['pointerup','pointercancel'])document.addEventListener(ev,()=>clearTimeout(tm),true);
   document.addEventListener('click',e=>{if(fired&&hit(e)){fired=0;e.stopImmediatePropagation();e.preventDefault()}},true)}
-window.__pb={PB,doc:PB_doc,send:PB_send,post:PB_post,flush:PB_flush,perm:PB_perm,tick:PB_tick,toggle:PB_toggleChip,reset:PB_reset};
+window.__pb={PB,life:PB_life,boot:PB_boot,hbGet:PB_hbGet,hbSet:PB_hbSet,doc:PB_doc,send:PB_send,post:PB_post,flush:PB_flush,perm:PB_perm,tick:PB_tick,toggle:PB_toggleChip,reset:PB_reset};

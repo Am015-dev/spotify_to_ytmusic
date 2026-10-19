@@ -421,3 +421,10 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Measured after (2 runs/city): Athens 16 / 15 / 31 ms, Frankfurt 16 / 22 ms (all ≤ 40). Frankfurt JS max 55 / 83 is N1 (roamCam/FC_pull, other lane).
 4. Next: if a loaded-box run shows it again, try TUNE.htGc for the first 60 frames; N1 Frankfurt roamCam is the real first-second spike. No shot: nothing visible changed.
 5. Tests: unit 0 FAIL; TAG=r13/sky-blue,r13/sky-blue-frame,life1,xf1,terrain,phone2,perf/touch-first-frames,perf/heap-30s,perf/traffic-hitch 50/50 on the built page.
+
+## ios-r17b (2026-10-19): perf beacon survives freezes and kills
+- src/98pb_perfbeacon.js: `boot` doc at the first playable frame (city, UA, DPR, vp, GPU, bootMs, renderer.info counts, heap); localStorage heartbeat `od_pb_hb` every 2 s while playing, cleared on pagehide/hidden.
+- A heartbeat found at the next boot = tab froze or was killed: one `killed` doc with that snapshot is sent before the boot doc. A frame gap > 1000 ms while visible gives a `freeze` doc with PB.fs timers (max 3 per session).
+- Default ON, `?pbb=0` = off. All storage access is try/catch. Docs use PB_post, so the existing retry queue applies.
+- GO perf/beacon-boot (src/99c7_rev5fix.js) PASS on fra; TAG set (beacon-boot, sky-blue x2, life1, xf1, terrain, phone2) 48/48 on the built page, unit 0 FAIL.
+- Left: a tab killed while hidden/backgrounded leaves no heartbeat (cleared on hide by design); read `perf` docs with kind killed/freeze after Alex's next iPhone session.
