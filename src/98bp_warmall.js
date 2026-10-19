@@ -60,3 +60,12 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
   // linked after the gate. Apply it here, with the twins in the scene (as the inner path did). ?lkgfx=1 = on.
   if(LKG.on){try{if(LKG.gfx&&typeof GFX_pre==='function')GFX_pre();LKG_begin(sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o)}LKG.fin=disp;return}
   try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o);disp()}}}
+// perf-r15b (REVIEW_2K_15 N1): touch (no LKG gate) had 106-154 ms frames in the first 2 s after the curtain (Athens f7 first lazy build 89 ms, f9 first minimap paint 63 ms,
+// traffic/cull first steps). roamLoad now runs TWG.n real game frames under the curtain (render off, car held in place), then lazyStep gets no slot for the first TWG.lz
+// drivable frames (the nearby districts were built under the curtain). ?twg=0|1, ?twgn=<frames>
+const TWG={on:(q=>q?q==='1':false)(new URLSearchParams(location.search).get('twg')),n:(q=>q==null?12:+q|0)(new URLSearchParams(location.search).get('twgn')),lz:60,run:0,fr:-1,ms:0,nf:0,held:0};   // default OFF: target (no frame > 60 ms in f0-f120) not met yet, see docs/HANDOFF_perf.md
+async function TWG_run(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)return;const t0=performance.now(),x=RO.x,z=RO.z,h=RO.h;TWG.run=1;const lo=LD.on;LD.on=false;   // frame() skips while LD.on; the #ld2 curtain itself stays up until roamLoad's ldHide
+ try{for(let i=0;i<TWG.n;i++){RO.v=0;await nextFrame();TWG.nf++}}catch(e){console.warn('TWG',e)}finally{TWG.run=0;LD.on=lo;RO.x=x;RO.z=z;RO.h=h;RO.v=0;TWG.fr=0;TWG.ms=Math.round(performance.now()-t0)}}
+{const r0=composer.render;composer.render=function(){if(TWG.run)return;return r0.apply(this,arguments)}}
+frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;return f(now)})(frame);
+{const _ls=lazyStep;lazyStep=function(){if(TWG.fr>=0&&TWG.fr<=TWG.lz){TWG.held++;return}return _ls.apply(this,arguments)}}

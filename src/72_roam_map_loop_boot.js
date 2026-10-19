@@ -204,7 +204,7 @@ async function roamLoad(atMark){const st=state;ldShow('Warming up the engine');t
     let t=performance.now(),ts=t,lb0='start';const BS=window.__bhSt={max:0,lab:'',L:[]};for(const [f,lab,sub] of buildHubG()){{const n=performance.now(),d=n-ts;if(d>BS.max){BS.max=d;BS.lab=lb0}if(d>200&&BS.L.length<200)BS.L.push([Math.round(d),lb0,Math.round(ts)]);if(sub||(lab&&lab.length>2))lb0=sub||lab;ts=n}if(performance.now()-t>12){ldSet(.06+f*.6,lab);await nextFrame();t=ts=performance.now()}else if(lab)$('#ldStep').textContent=lab}
     ldSet(.68,'Switching on the street lights');await nextFrame();hubEnter();P2_warm(scene,camera);ldSet(.74,'Placing rivals & events');await nextFrame();if(!RO.built)buildRoam();{const sv=roamSave(),fm=RO.arrive&&flightMark(),sp=atMark&&atMark.x!=null?[atMark.x,atMark.z]:fm?[fm.x,fm.z]:sv.pos&&sv.lay===LAYOUT_VER?[sv.pos.x,sv.pos.z]:null,need=sp?lzNeed(sp[0],sp[1]):[];if(need.length){ldSet(.76,LZT[need[0].id]||'Outskirts');await lzLoad(need,.76,.8)}}
     ldSet(.8,'Painting the sky');await nextFrame();await SM_qvLoad(.82,.86);await ldPrewarm(.86,.95);await SM_upload(.95,.99);ldSet(1,'Ready');await nextFrame();
-    BMK('roamPost');roamPost(atMark);BMK('render1');try{composer.render()}catch(e){}BMK('render1 end')}
+    BMK('roamPost');roamPost(atMark);BMK('render1');try{composer.render()}catch(e){}BMK('render1 end');if(typeof TWG_run==='function')await TWG_run()}
   catch(e){console.error(e);if(state==='loading')state=st;throw e}finally{LD.busy=null;ldHide()}}
 // far fast travel: short loader instead of the black flash
 async function ldFlash(fn){ldShow('Fast travel');fn();LD.on=false;try{P2_compile(scene,camera)}catch(e){}ldSet(.45,'Arriving');for(const f of[.7,.9,1]){await nextFrame();ldSet(f)}ldHide()}
