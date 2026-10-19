@@ -432,3 +432,12 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
    .catch(e=>{IOSM_wrap(false);goSay('📍 iOS MEM · threw '+e+' ❌ FAIL')});
   return'📍 iOS MEM · rotating…'}}))}return}
  if(i<600)setTimeout(()=>IOSM_reg(i+1),100)})(0);
+// ios-r17h: GO perf/pc-shrink (touch/lowmem): compacted meshes keep instanceMatrix at their drawn size, grow on demand, and a regrown mesh still maps every visible instance to its own matrix
+(function PCS_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-shrink')){C.items.push({ver:'perf',id:'pc-shrink',area:'perf',text:'ios-r17h · 📍 GO: perf-5 compacted instanced meshes hold instanceMatrix/instanceColor at the drawn count (×1.5), not the source count; shrinking to 8 and re-packing grows it back and every drawn slot carries its own instance matrix. Pass line: ≥ 80 % of the compacted instance bytes released, 0 wrong slots.',go:'perf/pc-shrink'});
+ C.GO['perf/pc-shrink']=['fra','ath'].map(c=>({c,n:'pc shrink + grow',secs:30,fn:()=>{if(!PC.shr)return'📍 PC SHRINK · needs the touch/lowmem tier (?lowmem=1) ❌ FAIL';if(state!=='roam')return'📍 PC SHRINK · start free roam first ❌ FAIL';
+  PC_step(1);let n=0,sh=0,cap=0,src=0,bad=0;for(const X of PC.L)if(!X.dyn&&!X.sky){n++;src+=X.n;cap+=X.im.instanceMatrix.count;if(X.shr)sh++;if(X.im.instanceMatrix.array.length!==X.im.instanceMatrix.count*16||X.im.count>X.im.instanceMatrix.count)bad++}
+  const X=PC.L.find(q=>q.shr&&!q.dyn&&!q.sky&&q.s>12&&q.im.parent);let wrong=0,grew='none';
+  if(X){PC_cap(X,8);PC_mesh(X);const a=X.im.instanceMatrix.array;for(let k=0;k<X.n;k++){const s=X.slot[k];if(s>=0&&(s>=X.im.instanceMatrix.count||a[s*16+12]!==X.src[k*16+12]||a[s*16+14]!==X.src[k*16+14]))wrong++}grew=X.im.instanceMatrix.count+'/'+X.n}
+  const rel=1-cap/Math.max(1,src),heap=performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576):0,ok=sh>0&&bad===0&&wrong===0&&rel>=.5&&!!X;
+  return`📍 PC SHRINK ${CID} · ${n} static compacted meshes, ${sh} shrunk, instance slots ${cap}/${src} (${Math.round(rel*100)} % released), bad arrays ${bad}, regrown ${grew}, wrong slots ${wrong}, grow events ${PC.st.shr|0}, heap ${heap} MB → ${ok?'✅ PASS':'❌ FAIL'}`}}))}return}
+ if(i<600)setTimeout(()=>PCS_reg(i+1),100)})(0);

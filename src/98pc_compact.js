@@ -4,7 +4,7 @@
 // within PC.keep m for shadows) are copied from a full source copy into the front of instanceMatrix and .count is set (CTB_step pattern).
 // setMatrixAt / getMatrixAt / setColorAt / getColorAt / raycast are wrapped so writes by the ORIGINAL index (smash, revive, colour) still land:
 // they go to the source copy and to the instance's current slot (slot[] map). ?pc5=0 = off. GO: perf5/compact (src/99c_checklist.js).
-const PC={on:!/[?&]pc5=0/.test(location.search),q:[],L:[],grp:null,t:0,f:0,k:0,left:0,x:1e9,y:0,z:1e9,h:1e9,fr:900,keep:60,st:{meshes:0,src:0,vis:0,runs:0,ms:0}};
+const PC={on:!/[?&]pc5=0/.test(location.search),shr:LOWMEM&&!/[?&]pcs=0/.test(location.search),q:[],L:[],grp:null,t:0,f:0,k:0,left:0,x:1e9,y:0,z:1e9,h:1e9,fr:900,keep:60,st:{meshes:0,src:0,vis:0,runs:0,ms:0}};
 const _pcM=new THREE.Matrix4(),_pcPV=new THREE.Matrix4(),_pcF=new THREE.Frustum(),_pcD=new THREE.Vector3(),_pcC=new THREE.Color(),_pcIM=THREE.InstancedMesh.prototype;
 function PC_far(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc5Far??(lv==='min'?380:lv==='low'?480:lv==='med'?700:900)}
 // candidates: full (count = capacity), static, ≥ 16 instances, spread over > 300 m; never pools whose .count other code drives
@@ -52,7 +52,15 @@ function PC_grid(add){
  if(!PC.cv||PC.cv.length!==M.size)PC.cv=new Uint8Array(M.size);PC.left=0}
 // one instance: visible → copied to the next free slot of its mesh
 function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const ex=x-cx,ey=y-cy,ez=z-cz,d=Math.sqrt(ex*ex+ey*ey+ez*ez);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
- const s=C.s++,a=C.src,arr=C.im.instanceMatrix.array;if(s!==i){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
+ const s=C.s++,a=C.src;if(C.shr&&s>=C.im.instanceMatrix.count)PC_cap(C,Math.max(s+1,Math.ceil(s*1.5)));const arr=C.im.instanceMatrix.array;
+ if(s!==i||C.shr){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
+// ios-r17h (cut 1+2): in the low-mem tier a compacted mesh keeps instanceMatrix / instanceColor at its drawn size (x1.5), not at the full source count (the source copy C.src
+// holds every instance): ath -30 MB. It grows on demand inside PC_one (copy + GPU buffer re-created via the mesh 'dispose' event); a shrunk slot always re-copies (no s===i shortcut).
+function PC_cap(C,cap){const im=C.im,M=im.instanceMatrix;cap=Math.min(C.n,Math.max(8,cap));if(cap===M.count)return;const k=Math.min(cap,M.count),a=new Float32Array(cap*16);a.set(M.array.subarray(0,k*16));M.array=a;M.count=cap;M.clearUpdateRanges();
+ const IC=im.instanceColor;if(IC){const b=new Float32Array(cap*3);b.set(IC.array.subarray(0,k*3));IC.array=b;IC.count=cap;IC.clearUpdateRanges()}
+ im.dispatchEvent({type:'dispose'});M.needsUpdate=true;if(IC)IC.needsUpdate=true;PC.st.shr=(PC.st.shr|0)+1}
+function PC_shrink(C){C.shr=1;const cap=Math.ceil(C.s*1.5)+8;if(cap<C.n*.8)PC_cap(C,cap)}
+
 const _pcS=new THREE.Sphere();
 // re-pack one mesh against the pass's camera snapshot (PC.x/y/z, _pcF); returns instances tested. Upload only the drawn range (r164 addUpdateRange), not the whole capacity.
 function PC_mesh(C){const im=C.im;C.dirty=false;if(!im.parent)return 0;const cx=PC.x,cy=PC.y,cz=PC.z,far=PC.fr;C.s=0;C.slot.fill(-1);let n=0;
@@ -60,6 +68,7 @@ function PC_mesh(C){const im=C.im;C.dirty=false;if(!im.parent)return 0;const cx=
  else if(C.sky){im.updateWorldMatrix(true,false);const W=im.matrixWorld.elements;n=C.n;for(let i=0;i<C.n;i++){const lx=C.c[i*4],ly=C.c[i*4+1],lz=C.c[i*4+2];
    PC_one(C,i,W[0]*lx+W[4]*ly+W[8]*lz+W[12],W[1]*lx+W[5]*ly+W[9]*lz+W[13],W[2]*lx+W[6]*ly+W[10]*lz+W[14],cx,cy,cz,far)}}
  else{n=C.n;for(let i=0;i<C.n;i++)PC_one(C,i,C.c[i*4],C.c[i*4+1],C.c[i*4+2],cx,cy,cz,far)}
+ if(PC.shr&&!C.shr&&!C.dyn&&!C.sky)PC_shrink(C);
  im.count=C.s;const M=im.instanceMatrix;M.clearUpdateRanges();if(C.s){M.addUpdateRange(0,C.s*16);M.needsUpdate=true}
  const IC=im.instanceColor;if(IC){IC.clearUpdateRanges();if(C.s){IC.addUpdateRange(0,C.s*3);IC.needsUpdate=true}}return n}
 // perf-7: a pass starts only on a ≥ 20 m camera move or a ≥ 15° turn (perf-5 also ran every 10 frames: ~570k Athens instances re-tested while parked),
@@ -86,7 +95,7 @@ function PC_prewarm(){try{if(PC.on&&HUB.grp&&!PC.grp&&PC_gate())PC_scan()}catch(
 // perf-7 gate: compaction costs ~1.8 ms CPU/frame (A/B), only worth it where the GPU is the limit: quality low/min (phones). med/high skip PC_step entirely
 // (nothing is scanned or wrapped); if quality rises after a pass ran (auto ladder / settings), PC_release puts every mesh back to its full source copy.
 function PC_gate(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc7All||lv==='low'||lv==='min'}
-function PC_release(){for(const C of PC.L){const im=C.im;if(!im.parent)continue;im.instanceMatrix.array.set(C.src);if(C.col&&im.instanceColor)im.instanceColor.array.set(C.col);
+function PC_release(){for(const C of PC.L){const im=C.im;if(!im.parent)continue;if(C.shr){C.shr=0;PC_cap(C,C.n)}im.instanceMatrix.array.set(C.src);if(C.col&&im.instanceColor)im.instanceColor.array.set(C.col);
   for(let i=0;i<C.n;i++)C.slot[i]=i;C.s=C.n;C.dirty=false;im.count=C.n;im.instanceMatrix.clearUpdateRanges();im.instanceMatrix.needsUpdate=true;if(im.instanceColor){im.instanceColor.clearUpdateRanges();im.instanceColor.needsUpdate=true}}
  PC.left=0;PC.x=1e9;PC.h=1e9;PC.rel=1}
 hubCullStep=(f=>function(){f.apply(this,arguments);try{if(PC_gate()){PC.rel=0;PC_step()}else if(PC.L.length&&!PC.rel)PC_release()}catch(e){if(!PC.err){PC.err=String(e);console.warn('PC',e)}}})(hubCullStep);
