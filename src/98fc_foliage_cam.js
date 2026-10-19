@@ -29,7 +29,7 @@ function FC_step(){const c=camera.position,ox=RO.x,oy=RO.y+1,oz=RO.z;
 // k eases back out at ~1.2/s. Orientation is kept (translation along the line only). The offset is removed at the start of the next frame so the
 // follow-spring in roamCam never sees the pulled position. ?fcam=0 turns it off, ?fcpull=0 only the pull-in.
 FC.pull=!/[?&]fcpull=0/.test(location.search);FC.k=1;FC.off=new THREE.Vector3();FC.rc=new THREE.Raycaster();FC.o=new THREE.Vector3();FC.dv=new THREE.Vector3();FC.occ=[];FC.occT=-99;FC.rt=0;FC.kt=1;FC.pulls=0;
-function FC_occ(){FC.occT=FC.t;const L=[];scene.traverse(o=>{if(!o.isMesh||!o.visible||o===pl.mesh||pl.mesh.getObjectById(o.id))return;const m=o.material,mm=Array.isArray(m)?m[0]:m;if(mm&&mm.transparent&&mm.opacity<.5)return;
+function FC_occ(){FC.occT=FC.t;const L=[];scene.traverse(o=>{if(!o.isMesh||!o.visible||o===pl.mesh)return;if(!o.raycast.length)return;let q=o.parent;while(q&&q!==pl.mesh)q=q.parent;if(q)return;/* perf-r10e: meshes with a no-op raycast (raycast=()=>{}: 1384 of Athens' 1393 instanced occluders) are not occluders; parent walk (was pl.mesh.getObjectById per scene mesh = a car-subtree traverse each, 33 ms) */const m=o.material,mm=Array.isArray(m)?m[0]:m;if(mm&&mm.transparent&&mm.opacity<.5)return;
   const g=o.geometry,n=g&&g.attributes&&g.attributes.position?g.attributes.position.count:0;if(o.isInstancedMesh?(o.userData.bvL||o.userData.cv||o.userData.athB):n>=4000)L.push(o)});FC.occ=L}
 // perf-1 (2026-10-17): FC_pull tested the camera->car ray against EVERY triangle of the merged city meshes (three's Mesh.raycast has no spatial index; the
 // merged chunks' bounding spheres always contain the ray): 215 occluders, 3.6 M triangles, 66 ms per pull, every 3rd frame (p95 frame 109 ms, desktop).
@@ -85,3 +85,10 @@ roamCam=(f=>function(dt){if(FC.off.lengthSq()){camera.position.add(FC.off);FC.of
   // foliage over / around the camera
   FC.t+=dt;FC.n+=dt;if(FC.n>=.125){FC.n=0;try{FC_step()}catch(e){}}try{FC_pull(dt)}catch(e){}})(roamCam);
 window.__fcam=FC;
+// perf-r10e GO r10e/fcpull: the camera wall-pull list holds only meshes that can be hit (no raycast=()=>{} no-ops), FC_occ is cheap, and one 20 Hz raycast pass is cheap.
+// Pass line: 0 no-op occluders, FC_occ < 15 ms, raycast pass (median of 20, camera 9 m behind the car) < 5 ms.
+function FC_r10eGo(){if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';let t0=performance.now();FC_occ();const occMs=performance.now()-t0,nop=FC.occ.filter(m=>!m.raycast.length).length;
+ const c=camera.position,c0=c.clone(),T=[],pull=FC.pull,k=FC.k;FC.pull=true;try{for(let i=0;i<20;i++){c.set(RO.x-Math.sin(RO.h)*9,RO.y+4,RO.z-Math.cos(RO.h)*9);FC.rt=1;FC.occT=FC.t;t0=performance.now();FC_pull(1/60);T.push(performance.now()-t0)}}finally{c.copy(c0);FC.pull=pull;FC.k=k}
+ T.sort((a,b)=>a-b);const r={occ:FC.occ.length,nop,occMs:+occMs.toFixed(1),passMs:+T[10].toFixed(2)};window.__chk=window.__chk||{};window.__chk.r10e=r;
+ return`📍 camera occluders ${r.occ}, no-op raycast ones ${nop}; FC_occ ${r.occMs} ms; one raycast pass ${r.passMs} ms (median of 20)`+(nop===0&&occMs<15&&r.passMs<5?' ✅':' ❌')}
+(function FC_r10eReg(i){const C=window.__chk;if(C&&C.GO){if(Array.isArray(C.items)&&!C.items.some(x=>x.ver==='r10e'))C.items.push({ver:'r10e',id:'fcpull',area:'perf',text:'perf-r10e · the camera wall-pull only raycasts meshes that can be hit, and one pass stays under 5 ms'});C.GO['r10e/fcpull']=[{c:'fra',n:'fcpull',fn:()=>FC_r10eGo()},{c:'ath',n:'fcpull',fn:()=>FC_r10eGo()}];return}if(i<600)setTimeout(()=>FC_r10eReg(i+1),100)})(0);

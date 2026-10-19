@@ -48,7 +48,8 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
     const seen=new Set();for(let q=id;q!=null;q=par[q]){const m=by[q].callFrame.functionName;if(m&&!seen.has(m)){seen.add(m);inc[m]=(inc[m]||0)+1}}}
    const top=Object.entries(self).sort((x,y)=>y[1]-x[1]).slice(0,4).map(e=>e[0]+' '+Math.round(e[1]/n*100)+'%').join(', ');
    const f=r.out[i];const key=Object.entries(self).sort((x,y)=>y[1]-x[1])[0];if(key)own[key[0]]=(own[key[0]]||0)+1;console.log(`PF1PROF f${i} ${Math.round(f[1])}ms n${n} | ${top}`)}
-  console.log('PF1PROFOWN '+JSON.stringify(Object.entries(own).sort((a,b)=>b[1]-a[1]).slice(0,15)))}
+  console.log('PF1PROFOWN '+JSON.stringify(Object.entries(own).sort((a,b)=>b[1]-a[1]).slice(0,15)));
+  if(process.env.PROFOUT)fs.writeFileSync(process.env.PROFOUT,JSON.stringify({profile,off,win:r.win,out:r.out}))/* perf-r10e: profile + long-frame windows for tools/perf1/profwin.js */}
  if(process.env.HEAP){/* boot-4: sampled allocation over the run (MB incl. collected), by self function and by innermost wrapped subsystem */const {profile}=await cdp.send('HeapProfiler.stopSampling');if(process.env.HEAPOUT)fs.writeFileSync(process.env.HEAPOUT,JSON.stringify(profile));const self={},sub={};let tot=0;const SUBS=new Set(wr);
   const walk=(n,st,sb)=>{const k=(n.callFrame.functionName||'(anon)')+':'+(n.callFrame.lineNumber+1);const f=n.callFrame.functionName;const sb2=SUBS.has(f)?f:sb;const kk=k+'  <'+st.slice(-2).join('<');self[kk]=(self[kk]||0)+n.selfSize;sub[sb2]=(sub[sb2]||0)+n.selfSize;tot+=n.selfSize;for(const c of n.children||[])walk(c,st.concat(k),sb2)};walk(profile.head,[],'(none)');
   console.log('PF1HEAP total '+(tot/1048576).toFixed(0)+' MB | by sub: '+Object.entries(sub).sort((a,b)=>b[1]-a[1]).slice(0,14).map(e=>e[0]+' '+(e[1]/1048576).toFixed(1)).join(', '));
