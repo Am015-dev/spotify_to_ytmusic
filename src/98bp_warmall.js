@@ -97,3 +97,5 @@ async function TWG_run(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)retu
 {const r0=composer.render;composer.render=function(){if(TWG.run)return;return r0.apply(this,arguments)}}
 frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;return f(now)})(frame);
 {const _ls=lazyStep;lazyStep=function(){if(TWG.fr>=0&&TWG.fr<=TWG.lz){TWG.held++;return}return _ls.apply(this,arguments)}}
+// perf-r16b (review 2K-16 N2): hubTrafficStep time in the first 60 drivable frames (max ms, its frame, car count at f0 / f60), so GO perf/touch-first-frames reads the number tBoot reads (PF1HT).
+TWG.ht=0;TWG.htF=-1;TWG.htN=0;TWG.c0=-1;TWG.c60=-1;{const _ht=hubTrafficStep;hubTrafficStep=function(){if(!(TWG.fr>=0&&TWG.fr<=60))return _ht.apply(this,arguments);const t=performance.now();try{return _ht.apply(this,arguments)}finally{const d=performance.now()-t;TWG.htN++;if(d>TWG.ht){TWG.ht=Math.round(d);TWG.htF=TWG.fr}const n=HUB.cars?HUB.cars.length:0;if(TWG.c0<0)TWG.c0=n;TWG.c60=n}}}
