@@ -47,7 +47,10 @@ function FCG_build(g,e,t0){const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0
     if((x1-x0+1)*(z1-z0+1)>256){e.bigT.push(k);continue}   // huge triangles (ground sheets): tested on every ray
     for(let x=x0;x<=x1;x++)for(let z=z0;z<=z1;z++){const kk=(x+32768)*65536+(z+32768);let L=M.get(kk);if(!L)M.set(kk,L=[]);L.push(k)}
     if((k&511)===511&&performance.now()-t0>FCG.ms)return}
-  e.done=true;FCG.st.built++;FCG.st.tris+=e.n}
+  e.done=true;FCG.st.built++;FCG.st.tris+=e.n;if(MEMC_ON)FCG_pack(e)}
+// perf-r15c: a finished grid is packed into one Int32Array ([count, tri...] per cell; the Map keeps the start offset): one small JS array per 8 m cell was ~26 MB of
+// retained heap after 30 s of Frankfurt roam (216 k cells, 1.1 M entries). Same cells, same triangle order, same hits.
+function FCG_pack(e){let n=0;for(const L of e.cells.values())n+=L.length+1;const I=new Int32Array(n),M=new Map();let o=0;for(const[k,L]of e.cells){M.set(k,o);I[o++]=L.length;for(const t of L)I[o++]=t}e.cells=M;e.I=I}
 // queue meshes whose world box is within 80 m of the camera->car segment; build ≤ FCG.ms per frame (nearest first)
 function FCG_work(c,o){const t0=performance.now();FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(o).expandByScalar(80);
   for(const m of FC.occ){if(m.isInstancedMesh||m.isBatchedMesh||!FCG_ok(m.geometry))continue;const g=m.geometry,e=FCG_get(g);if(e.done)continue;if(!g.boundingBox){if(performance.now()-t0>FCG.ms)break;GFX_bbox(g)}   // perf-10: boxes inside the budget (one frame boxed every new occluder)
@@ -62,8 +65,8 @@ function FCG_hit(m,c,far){const g=m.geometry;if(!FCG_ok(g)||!m.layers.test(FC.rc
   const ox=lo.x,oy=lo.y,oz=lo.z,dx=le.x-ox,dy=le.y-oy,dz=le.z-oz,x0=Math.floor(Math.min(ox,le.x)/cs),x1=Math.floor(Math.max(ox,le.x)/cs),z0=Math.floor(Math.min(oz,le.z)/cs),z1=Math.floor(Math.max(oz,le.z)/cs);
   if((x1-x0+1)*(z1-z0+1)>400)return null;
   const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0],B=[0,0,0],C=[0,0,0],sn=++e.stamp>>>0;let best=-1;FCG.st.hits++;
-  for(let x=x0-1;x<=x1;x++)for(let z=z0;z<=z1;z++){const L=x<x0?e.bigT:e.cells.get((x+32768)*65536+(z+32768));if(!L)continue;if(x<x0&&z>z0)continue;
-    for(const k of L){if(e.seen[k]===sn)continue;e.seen[k]=sn;V(ix?ix[k*3]:k*3,A);V(ix?ix[k*3+1]:k*3+1,B);V(ix?ix[k*3+2]:k*3+2,C);
+  for(let x=x0-1;x<=x1;x++)for(let z=z0;z<=z1;z++){let L=x<x0?e.bigT:e.cells.get((x+32768)*65536+(z+32768));if(L===undefined)continue;if(x<x0&&z>z0)continue;let i0=0,i1=L.length;if(typeof L==='number'){i0=L+1;i1=i0+e.I[L];L=e.I}
+    for(let ii=i0;ii<i1;ii++){const k=L[ii];if(e.seen[k]===sn)continue;e.seen[k]=sn;V(ix?ix[k*3]:k*3,A);V(ix?ix[k*3+1]:k*3+1,B);V(ix?ix[k*3+2]:k*3+2,C);
       // Moller-Trumbore, both faces, t in [0,1] along the local segment (affine: same fraction of the world segment)
       const e1x=B[0]-A[0],e1y=B[1]-A[1],e1z=B[2]-A[2],e2x=C[0]-A[0],e2y=C[1]-A[1],e2z=C[2]-A[2],px=dy*e2z-dz*e2y,py=dz*e2x-dx*e2z,pz=dx*e2y-dy*e2x,det=e1x*px+e1y*py+e1z*pz;
       if(det>-1e-12&&det<1e-12)continue;const inv=1/det,tx=ox-A[0],ty=oy-A[1],tz=oz-A[2],u=(tx*px+ty*py+tz*pz)*inv;if(u<0||u>1)continue;

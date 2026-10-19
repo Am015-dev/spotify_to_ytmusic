@@ -253,7 +253,12 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
  const sk=()=>{const U=SKYU,f=v=>v.toArray().map(x=>+x.toFixed(2)),b=scene.background;return{top:f(U.uTop.value),mid:f(U.uMid.value),hor:f(U.uHor.value),bg:b&&b.isColor?'#'+b.getHexString():String(b),ro:RO.on,gfx:GFX.on,day:GFX.day,mood:MOOD&&MOOD.id,cloud:U.uCloud.value,lm:!!LOWMEM}};
  const go=city=>({c:city,n:city+' sky is blue',secs:2,fn:()=>{const s=sk(),bl=a=>a[2]>a[0]+.15&&a[2]>.45,bg=s.bg==='null'||/^#[0-9a-f]{6}$/.test(s.bg)&&bl(s.bg.slice(1).match(/../g).map(h=>parseInt(h,16)/255)),ok=s.day&&bl(s.mid)&&bl(s.hor)&&bg;
   return'📍 SKY '+city.toUpperCase()+' · lowmem '+(s.lm?'on':'off')+' · mid '+s.mid+' hor '+s.hor+' background '+s.bg+' · sky mesh flagged '+!!sky.userData.sky+' → '+(ok&&sky.userData.sky?'✅ PASS':'❌ FAIL')}});
- C.GO['r13/sky-blue']=[go('fra'),go('ath')]}return}
+ C.GO['r13/sky-blue']=[go('fra'),go('ath')]}
+ if(!C.items.some(q=>q.ver==='r13'&&q.id==='sky-blue-frame')){C.items.push({ver:'r13',id:'sky-blue-frame',area:'look',text:'bisect-black · Athens frame is not black on PC: 📍 GO (Athens) checks the desktop roam-start gate is down, draws one frame and reads its pixels back. Pass line: gate down (LKG.arm 0) and the mean frame brightness > 40 (black page was 9-11, normal ~90-107).'});
+  C.GO['r13/sky-blue-frame']=[{c:'ath',n:'Athens frame not black',secs:30,fn:()=>{let arm=0;try{arm=LKG.arm|0}catch(e){}const T=typeof TQ!=='undefined'&&TQ,d0=T?T.draw:0;let m=-1;
+   try{if(T)T.draw=1;composer.render();const gl=renderer.getContext(),W=gl.drawingBufferWidth,H=gl.drawingBufferHeight,px=new Uint8Array(4);let s=0,n=0;
+    for(let i=1;i<16;i++)for(let j=1;j<16;j++){gl.readPixels(Math.floor(W*i/16),Math.floor(H*j/16),1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);s+=(px[0]+px[1]+px[2])/3;n++}m=s/n}catch(e){m=-2}finally{if(T)T.draw=d0}
+   const ok=!arm&&m>40;return'📍 ATH FRAME · gate '+(arm?'UP':'down')+' · mean '+m.toFixed(1)+' → '+(ok?'✅ PASS':'❌ FAIL')}}]}return}
  if(i<600)setTimeout(()=>R13_reg(i+1),100)})(0);
 // perf-r13d: one frame budget shared by hubCullStep, pedStep and LV_step on touch/LOWMEM (TUNE.roamBudget, src/98rb_roam_budget.js).
 (function R13D_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='roam-budget')){C.items.push({ver:'perf',id:'roam-budget',area:'perf',text:'perf-r13d · roam frame budget: 📍 GO forces the touch profile in Athens with TUNE.roamBudget on and a 0 ms budget, then steps the streets 120 frames. Pass line: hubCullStep, pedStep and LIFE each wait some frames but never more than 2 in a row (each runs at least every 3rd frame), traffic (HT_cars) runs every frame, and with the flag off nothing waits (default OFF; the real metric is tools/perf1/tBoot.js PF1OWN>50).'});
@@ -268,22 +273,22 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
  if(i<600)setTimeout(()=>R13D_reg(i+1),100)})(0);
 // perf-r13b (REVIEW_2K_13 N2): GO perf/pc-boot-lt (+ -ath). Desktop q=high: loader program links one at a time (LKG, src/98bp_warmall.js), first roam frame gated until linked.
 (function R13B_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-boot-lt')){
- C.items.push({ver:'perf',id:'pc-boot-lt',area:'perf',text:'r13b · PC boot long tasks (review 13 N2: 59.6 s and 20.1 s tasks on desktop q=high): 📍 GO (Frankfurt, then -ath for Athens) reads the link log. Pass line: desktop links every loader / first-frame program one at a time (longest link step < 3 s on SwiftShader; one program is one link and cannot be split, the heaviest lit Standard+gfx program takes 0.7-2.6 s there), the first-frame gate has finished, and the GPU string was read before any program was queued. Info: the longest boot task and its owner.'},
+ C.items.push({ver:'perf',id:'pc-boot-lt',area:'perf',text:'r13b · PC boot long tasks (review 13 N2: 59.6 s and 20.1 s tasks on desktop q=high): 📍 GO (Frankfurt, then -ath for Athens) reads the link log. Pass line: desktop links every loader / first-frame program one at a time (longest link step < 3 s on SwiftShader; one program is one link and cannot be split, the heaviest lit Standard+gfx program takes 0.7-2.6 s there), the first-frame gate has finished, and the GPU string was read before any program was queued. Info: the longest boot task and its owner. bhs (?bhs=1, default OFF): only with it on must the longest boot task up to the gate end and each buildHubG step be < 3 s; with it off those lines are info.'},
   {ver:'perf',id:'pc-boot-lt-ath',area:'perf',text:'r13b · PC boot long tasks, Athens: same pass line as perf/pc-boot-lt.'});
  const go=()=>{const L=LKG;if(L.arm&&!LOWMEM){let k=0;const w=()=>{if(LKG.arm&&k++<300)return setTimeout(w,100);LKG.arm=LKG.arm?-1:0;goSay(go())};setTimeout(w,100);return'📍 PC BOOT LT · linking…'}if(LOWMEM)return'📍 PC BOOT LT · low-mem / touch page: the one-at-a-time linker is desktop only (touch keeps its path) → ✅ PASS';
   const R=[['desktop linker on',L.on],['roam-start gate done ('+L.fr+' frames)',!L.arm],['longest link step '+Math.round(L.maxMs)+' ms < 3000 ('+L.n+' programs, '+L.steps+' steps; slowest single program '+Math.round(L.oMs|0)+' ms = '+L.oLab+')',L.maxMs<3000],['GPU string read early',!!(PB&&PB.gpu)]];{/* perf-r14b: with ?bhs=1 the buildHubG steps must stay < 3 s each (Athens 9.5 s, Frankfurt 3.6 s before) */const S=window.__bhSt,m=S?Math.round(S.max):-1;R.push(BHQ.en?['buildHubG longest step '+m+' ms ('+(S&&S.lab)+') < 3000 (bhs on)',m>=0&&m<3000]:['buildHubG longest step '+m+' ms (bhs off: info)',true])}
-  const lt=L.lt.slice().sort((a,b)=>b[1]-a[1]);{/* perf-r14d: with bhs (default ON on desktop) every boot task up to the end of the roam gate must be < 3 s */const B=L.lt.filter(x=>x[0]<(L.tEnd||1e12)).sort((a,b)=>b[1]-a[1]),m=B[0]?B[0][1]:0;R.push(BHS_EN?['longest boot task '+m+' ms (at '+(B[0]?B[0][0]:0)+') < 3000 (bhs on)',m<3000]:['longest boot task '+m+' ms (bhs off: info)',true])}const ok=R.every(r=>r[1]);
-  return`📍 PC BOOT LT · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} · info: longest boot task ${lt[0]?lt[0][1]:0} ms, ${lt.filter(x=>x[1]>2000).length} > 2 s → ${ok?'✅ PASS':'❌ FAIL'}`};
+  const lt=L.lt.slice().sort((a,b)=>b[1]-a[1]);{/* perf-r14d: with bhs (default ON on desktop) every boot task up to the end of the roam gate must be < 3 s */const B=L.lt.filter(x=>x[0]<(L.tEnd||1e12)).sort((a,b)=>b[1]-a[1]),m=B[0]?B[0][1]:0;var own=x=>{if(!x)return'';const bm=window.__bmk||[],S=(window.__bhSt||{}).L||[],pre=bm.filter(q=>q[0]<=x[0]).pop(),st=S.filter(q=>q[2]>=x[0]&&q[2]<=x[0]+x[1]+5).sort((a,b)=>b[0]-a[0])[0];const ins=bm.filter(q=>q[0]>x[0]&&q[0]<x[0]+x[1]).slice(0,4).map(q=>'+'+(q[0]-x[0])+' '+q[1]).join(', ');return(pre?pre[1]:'?')+(ins?' [then '+ins+']':'')+(st?' / step '+st[1]+' '+st[0]+' ms':'')};/* perf-r14e: owner = last boot mark before the task + the slowest buildHubG step inside it */R.push(BHS_EN?['longest boot task '+m+' ms (at '+(B[0]?B[0][0]:0)+', '+own(B[0])+') < 3000 (bhs on)',m<3000]:['bhs is OFF (default; ?bhs=1 turns it on): longest boot task '+m+' ms is info only',true])}const ok=R.every(r=>r[1]);
+  return`📍 PC BOOT LT · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} · info: longest boot task ${lt[0]?lt[0][1]:0} ms (at ${lt[0]?lt[0][0]:0}, ${lt[0]?own(lt[0]):''}), ${lt.filter(x=>x[1]>2000).length} > 2 s → ${ok?'✅ PASS':'❌ FAIL'}`};
  C.GO['perf/pc-boot-lt']=[{c:'fra',n:'Desktop boot: programs linked one at a time',fn:go}];C.GO['perf/pc-boot-lt-ath']=[{c:'ath',n:'Desktop boot (Athens): programs linked one at a time',fn:go}]}return}
  if(i<600)setTimeout(()=>R13B_reg(i+1),100)})(0);
 // perf-r13f: GO perf/pc-post-ready-link (+ -ath). Desktop: programs linked after the roam-start gate (renderer.info.programs id > LKG.idEnd). ?lkgfx default ON since r13g (?lkgfx=0 = off).
 (function R13F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-post-ready-link')){
- C.items.push({ver:'perf',id:'pc-post-ready-link',area:'perf',text:'r13f · PC programs linked after ready: 📍 GO (Frankfurt, then -ath) counts shader programs linked after the roam-start gate. Pass line (r13g, measured 17-23): at most 24 programs linked after the gate (was ~50 before lkgfx). ?lkgfx=0 or touch: info only.'},
+ C.items.push({ver:'perf',id:'pc-post-ready-link',area:'perf',text:'r13f · PC programs linked after ready: 📍 GO (Frankfurt, then -ath) counts shader programs linked after the roam-start gate. Pass line (r15d, measured 0-4): at most 5 programs linked in the 30 frames right after the gate (was ~50 before lkgfx, 21-30 before the gate pass 2: shadow-depth kinds, post passes, objects the warm frames made). ?lkgfx=0, ?lkp2=0 or touch: info only.'},
   {ver:'perf',id:'pc-post-ready-link-ath',area:'perf',text:'r13f · PC programs linked after ready, Athens: same pass line as perf/pc-post-ready-link.'});
  const go=()=>{if(LKG.arm&&!LOWMEM){let k=0;const w=()=>{if(LKG.arm&&k++<300)return setTimeout(w,100);goSay(go())};setTimeout(w,100);return'📍 PC POST-READY LINK · gate…'}
   const P=renderer.info.programs,n=LKG.idEnd?P.filter(p=>p.id>LKG.idEnd).length:-1;
-  if(LOWMEM||!LKG.on||!LKG.gfx)return`📍 PC POST-READY LINK · ${LOWMEM?'touch / low-mem':'?lkgfx=0'}: info ${n} programs linked after the gate → ✅ PASS`;
-  return`📍 PC POST-READY LINK · ${n>=0&&n<=24?'✓':'✗'} ${n} programs linked after the gate ≤ 24 (gate end id ${LKG.idEnd}, ${P.length} programs) → ${n>=0&&n<=24?'✅ PASS':'❌ FAIL'}`};
+  if(LOWMEM||!LKG.on||!LKG.gfx||!LKG.p2On)return`📍 PC POST-READY LINK · ${LOWMEM?'touch / low-mem':'?lkgfx=0'}: info ${n} programs linked after the gate → ✅ PASS`;
+  const m=LKG.p30!=null?LKG.p30:n,ok=n>=0&&m<=5;return`📍 PC POST-READY LINK · ${ok?'✓':'✗'} ${m} programs linked in the 30 frames right after the gate ≤ 5 (gate end id ${LKG.idEnd}, pass 2 ${LKG.p2On?'on':'off'}) · info: ${n} linked since the gate (incl. places other GO items drove to), ${P.length} programs → ${ok?'✅ PASS':'❌ FAIL'}`};
  C.GO['perf/pc-post-ready-link']=[{c:'fra',n:'Desktop: programs linked after ready',fn:go}];C.GO['perf/pc-post-ready-link-ath']=[{c:'ath',n:'Desktop (Athens): programs linked after ready',fn:go}]}return}
  if(i<600)setTimeout(()=>R13F_reg(i+1),100)})(0);
 // perf-r14a: GO perf/pc-roam-30s. Desktop: the roam-start gate ended on its own (not the 900-frame cap) with LKG.idEnd set, ran its warm frames (render off) so first-frame init lands before
@@ -335,3 +340,46 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   catch(e){R.push(['threw '+e,false])}finally{TUNE.htGc=g0}
   const ok=R.every(r=>r[1]);return`📍 TRAFFIC GROUND · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R15A_reg(i+1),100)})(0);
+// perf-r15b (review 2K-15 N1): touch warm gate (TWG, ?twg=1, default OFF): game frames under the curtain, then no lazyStep slot for the first 60 drivable frames.
+(function R15B_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='touch-first-frames')){C.items.push({ver:'perf',id:'touch-first-frames',area:'perf',text:'perf-r15b · touch first frames: 📍 GO checks the touch warm gate (?twg=1) wiring: lazyStep holds while TWG.fr ≤ 60, and if the gate ran this boot it ran all its frames. Pass line ends ✅ PASS.',go:'perf/touch-first-frames'});
+ C.GO['perf/touch-first-frames']=[{c:'ath',n:'touch warm gate wiring',fn:()=>{const R=[],f0=TWG.fr,h0=TWG.held;try{R.push(['gate '+(TWG.on?'on':'off')+', n '+TWG.n+', lazy hold '+TWG.lz,TWG.n>0&&TWG.lz===60]);
+   TWG.fr=0;lazyStep();const a=TWG.held-h0;TWG.fr=TWG.lz+1;lazyStep();const b=TWG.held-h0-a;R.push(['lazyStep held in the hold window ('+a+'), runs after it ('+b+')',a===1&&b===0]);
+   if(TWG.nf)R.push(['gate ran '+TWG.nf+'/'+TWG.n+' frames in '+TWG.ms+' ms',TWG.nf===TWG.n&&TWG.ms<5000]);
+   /* perf-r15e: with the gate on, the minimap takes the callCap path and its tiles paint under the curtain within TWG.mb */
+   /* perf-r15f: default ON on touch; when the gate ran, the far-street merge finished under the curtain (its ~50 MB garbage + major GC no longer land in the first drivable second) */
+   R.push(['default '+(TWG.on?'on':'off')+' (touch '+matchMedia('(pointer:coarse)').matches+', ?twg '+new URLSearchParams(location.search).get('twg')+')',/[?&]twg=/.test(location.search)||TWG.on===matchMedia('(pointer:coarse)').matches]);
+   if(TWG.on&&TWG.nf&&TWG.wb&&TUNE.wbCity)R.push(['far-street merge under the curtain: built '+(WBC.built===HUB.grp)+', waited '+TWG.wbMs+' ms, busy '+WBC.busy,WBC.built===HUB.grp&&!WBC.busy&&TWG.wbMs<8000]);
+   if(TWG.on)R.push(['minimap: callCap '+TUNE.callCap+', '+TWG.mm+' tiles under the curtain in '+TWG.mms+' ms (cap '+TWG.mb+'), '+TWG.mq+' left',!!TUNE.callCap&&TWG.mms<=TWG.mb+60&&(CID!=='ath'||!SM_ON||!TWG.nf||TWG.mm>0)])}
+  catch(e){R.push(['threw '+e,false])}finally{TWG.fr=f0}
+  const ok=R.every(r=>r[1]);return`📍 TOUCH WARM GATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R15B_reg(i+1),100)})(0);
+// perf-r15c (review 15 N2): Frankfurt touch LOWMEM retained heap in the first 30 s of roam (+78 MB after GC) was the outer-ground leaf lists (boxed numbers in
+// JS arrays until the generator's last cell) and the camera-pull triangle grid (one JS array per 8 m cell). Both are packed now (MEMC_ON, ?memc=0 = off).
+// The GO checks the packed forms answer exactly like the old ones and, on LOWMEM, that nothing is left unpacked. Measured bound: tools/perf1/tBoot.js HEAP=ret (PF1RET).
+(function R15C_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='heap-30s')){C.items.push({ver:'perf',id:'heap-30s',area:'perf',text:'perf-r15c: touch LOWMEM heap growth in the first 30 s (ground leaf lists + camera-pull grid packed)',go:'perf/heap-30s'});
+ C.GO['perf/heap-30s']=[{c:'fra',n:'packed ground leaves and camera-pull grids, same answers',fn:()=>{const R=[];try{
+   // 1) ground: a Float32Array cell answers GND_in like the JS-array cell (2000 points over 40 cells of the hilly grounds)
+   let n=0,bad=0,cells=0;const rnd=(()=>{let s=7;return()=>(s=(s*16807)%2147483647)/2147483647})();
+   for(const G of GND_L){if(!G.c&&!G.P)continue;for(let t=0;t<400&&cells<40;t++){const c=Math.floor(rnd()*G.nx*G.nz);let L=G.c?G.c[c]:null;
+     if(!L&&G.P){const s=G.s[2*c],e=G.s[2*c+1];if(s<0)continue;L=G.P.slice(s,e)}if(!L||!L.length)continue;cells++;const ox=G.x0+Math.floor(c/G.nz)*G.dx,oz=G.z0+c%G.nz*G.dz;
+     const A=[];if(L instanceof Float32Array)for(let k=0;k<L.length;k++)A.push(k%9===0?L[k]+ox:k%9===1?L[k]+oz:L[k]);else A.push(...L);for(let k=8;k<A.length;k+=9)A[k]=-1;const F=GND_cellF32(A,ox,oz);
+     const g1={x0:G.x0,z0:G.z0,dx:G.dx,dz:G.dz,nx:G.nx,nz:G.nz,c:[]},g2={...g1,c:[]};g1.c[c]=A;g2.c[c]=F;
+     for(let q=0;q<50;q++){const x=ox+rnd()*G.dx,z=oz+rnd()*G.dz,a=GND_in(g1,x,z),b=GND_in(g2,x,z);n++;const ya=a?GND_tri(a.L,a.k,a.u,a.v):a,yb=b?GND_tri(b.L,b.k,b.u,b.v):b;
+       if((a===null)!==(b===null)||a&&(Math.abs(ya-yb)>1e-3||a.L[a.k+8]!==b.L[b.k+8]))bad++}}}
+   R.push(['ground: typed cell = array cell on '+n+' points / '+cells+' cells, mismatches '+bad,n>=500&&bad===0]);
+   // 2) camera pull: a packed grid hits exactly like the unpacked one (rays through 3 occluder meshes)
+   if(FC.t-FC.occT>8||!FC.occ.length)FC_occ();const M=FC.occ.filter(m=>!m.isInstancedMesh&&!m.isBatchedMesh&&FCG_ok(m.geometry)).slice(0,3),on=MEMC_ON;let rays=0,hb=0,hits=0;
+   for(const m of M){const g=m.geometry,old=FCG.W.get(g);if(!g.boundingBox)g.computeBoundingBox();
+     const run=pk=>{MEMC_ON=pk;FCG.W.delete(g);const e=FCG_get(g);FCG_build(g,e,performance.now()+1e9);const out=[];const r2=(()=>{let s=11;return()=>(s=(s*16807)%2147483647)/2147483647})();
+       const P=g.attributes.position,ix=g.index,nt=ix?ix.count/3|0:P.count/3|0;for(let q=0;q<40;q++){const t=Math.floor(r2()*nt)*3,tg=new THREE.Vector3();for(let j=0;j<3;j++){const v=ix?ix.getX(t+j):t+j;tg.x+=P.getX(v)/3;tg.y+=P.getY(v)/3;tg.z+=P.getZ(v)/3}tg.applyMatrix4(m.matrixWorld);const o=tg.clone().add(new THREE.Vector3(r2()-.5,r2()*.3,r2()-.5).normalize().multiplyScalar(40));
+         const d=tg.clone().sub(o),far=d.length()*1.5;FC.rc.ray.direction.copy(d.normalize());out.push(FCG_hit(m,o,far))}return out};
+     const a=run(false),b=run(true);for(let q=0;q<a.length;q++){rays++;if(a[q]>=0)hits++;if(a[q]!==b[q])hb++}FCG.W.delete(g);if(old)FCG.W.set(g,old)}
+   MEMC_ON=on;R.push(['camera pull: packed = unpacked on '+rays+' rays ('+hits+' hits) over '+M.length+' meshes, mismatches '+hb,rays>=40&&hits>0&&hb===0]);
+   // 3) LOWMEM: no JS-array leaf list and no unpacked finished grid left (desktop keeps the old forms for the ground: info)
+   let js=0,tot=0;for(const G of GND_L)if(G.c)for(const L of G.c)if(L){tot++;if(!(L instanceof Float32Array))js++}
+   let fd=0,fp=0;for(const m of FC.occ){const e=m.geometry&&FCG.W.get(m.geometry);if(e&&e.done){fd++;if(e.I)fp++}}
+   const pm=performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576):0;
+   R.push([(LOWMEM?'':'(info, not LOWMEM) ')+'unpacked ground cells '+js+'/'+tot+', packed camera grids '+fp+'/'+fd+', JS heap '+pm+' MB',!LOWMEM||!MEMC_ON||(js===0&&fp===fd)])}
+  catch(e){R.push(['threw '+e,false])}
+  const ok=R.every(r=>r[1]);return`📍 HEAP 30 S · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R15C_reg(i+1),100)})(0);
