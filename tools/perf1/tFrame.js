@@ -16,6 +16,8 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  const cdp=await ctx.newCDPSession(p);const t0=Date.now();
  await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}${Q?'&q='+Q:''}${LM?'&lowmem=1':''}${process.env.QS?'&'+process.env.QS:''}`);
  await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:500});const boot=Math.round((Date.now()-t0)/1000);
+ // perf-r13f: programs linked after ready (PF1LINK: count after ready / after the LKG roam gate, and the material types of the late ones)
+ const pid0=await p.evaluate(()=>{const R=__oc.ev('renderer');return Math.max(0,...R.info.programs.map(q=>q.id))});
  // wrap subsystems (outermost binding, so every later wrapper is inside) + composer.render
  const wr=await p.evaluate(()=>{window.__auto=false;window.__ph='drive';const ev=__oc.ev;window.PF1={b:{},n:0};
   const names=['roamStep','roamCam','hubCullStep','roamHud','drawTraffic','updWorld','hubTrafficStep','miniDraw','studSync','waterTick','updDebris','updStreaks','updPool','dresStep','lapLogic','stepSim','lazyStep','hubRecycle','pedStep','districtStep','LV_step','L3_tick','CV_pre','CV_post','STR_step','STR_lzStep','SIMP_solid','lzFinish','lzStart','TRN_ridgeFit','DR_unjam','RD_carPre','RD_carPost','RD_unstack','LK_paint','OC_traffic','FC_pull','FC_step','FC_occ','LF_step','MEMF_step','GS_step','CTB_step','LIFE_draw','ART_step','FL_step','OG_tick','miniPaint','QS_clear','BC_upd','W12_chk','storyCheck'].concat((window.__WRAP||'').split(',').filter(Boolean));const ok=[];
@@ -52,6 +54,7 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  if(process.env.PROBE)console.log('PF1PROBE '+JSON.stringify(await p.evaluate(s=>__ev(s),process.env.PROBE)));
  const lt=await p.evaluate(()=>__lt);
  for(const r of res){r.city=CITY;r.q=Q;r.lowmem=LM;r.boot=boot;r.longtasks=lt.filter(x=>x[2]===r.ph).sort((a,b)=>b[1]-a[1]).slice(0,10);r.nLong=lt.filter(x=>x[2]===r.ph).length;console.log('PF1RES '+JSON.stringify(r))}
+ console.log('PF1LINK '+JSON.stringify(await p.evaluate(id0=>{const ev=__oc.ev,P=ev('renderer').info.programs;let ge=0;try{ge=ev('LKG.idEnd')||0}catch(e){}const L=P.filter(q=>q.id>id0),G=P.filter(q=>q.id>Math.max(id0,ge)),c={};for(const q of G){const k=q.name+(/gfxg/.test(q.cacheKey)?'+gs':'')+(/gfxao/.test(q.cacheKey)?'+ao':'');c[k]=(c[k]||0)+1}const E=P.filter(q=>q.id<=id0),df={};for(const q of L){const t=q.cacheKey.split(',');let best=null,bn=1e9;for(const e of E){if(e.name!==q.name)continue;const u=e.cacheKey.split(',');let n=0;const d=[];for(let i=0;i<Math.max(t.length,u.length);i++)if(t[i]!==u[i]){n++;if(d.length<4)d.push(i+':'+String(u[i]).slice(0,24)+'>'+String(t[i]).slice(0,24))}if(n<bn){bn=n;best=d.join(' ')}}const k=q.name+' '+(best===null?'new':best);df[k]=(df[k]||0)+1}return{afterReady:L.length,afterGate:G.length,gateEnd:ge,id0,kinds:c,diff:df}},pid0)));
  console.log('PF1BOOTLT '+JSON.stringify(lt.filter(x=>!x[2]).sort((a,b)=>b[1]-a[1]).slice(0,8)));
  if(process.env.PROF){const {profile}=await cdp.send('Profiler.stop');const byId={};for(const n of profile.nodes)byId[n.id]=n;const self={};const dts=profile.timeDeltas;
   profile.samples.forEach((s,i)=>{const n=byId[s],k=(n.callFrame.functionName||'(anon)')+':'+n.callFrame.lineNumber+':'+n.callFrame.columnNumber;self[k]=(self[k]||0)+(dts[i]||0)});
