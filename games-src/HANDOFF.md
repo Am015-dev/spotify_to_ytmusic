@@ -4,6 +4,14 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun DASH + EMP abilities (W4, flag RET.abil, ?abil=0 = the old dash/EMP, 19 Oct 2026)
+- `parts/abilities.js` (after powlevels.js). Hooks: b.js dash block -> `ABIL.dashIn`, EMP key -> `ABIL.emp`; c.js button rings + draw; hud.js dash count.
+- DASH: 3 charges (4 from LV3), one refills every 1.7 s (LV1) to 1.2 s (LV5), fires at once in the move/last stick direction; on the beat = old bonus + 0.2 charge back, off the beat no tier drop. LV = 1 + shop extra-dash + running power-up LV3/LV5.
+  Trait from the running power-up: NOVA/DRUM/TEMPO burn trail, CHORD/CRATE/LEECH shield ram (strips zoo shields, elites x2), SLICE/ECHO/RICOCHET phase (bullets -> shards, a kill refunds a charge), WING decoy (aimed shots go for the afterimage), MAGNET/SLOW pickup magnet. Dash damage goes in as player shots, so DMG + armour caps book it.
+- EMP: meter fills from kills (.035, elite .08), grazes (.04/.07), on-beat dash (.04), power-up pickups (.34), x1.2 Easy .. x.6 Legend; 3 stored. Base = the old EMP. Adds: NOVA shockwave (bullets -> 8 shards), SLICE/SLOW slow bubble 2.5 s, WING/ECHO/LEECH chain lightning, DRUM/TEMPO/RIC/CRATE 3 s overdrive, CHORD/BOMB boss core breaker (cores only), MAGNET pull.
+- Test `nightrun/abil-test.js` (25 checks). Stationary spam bot 0% on and off (stages 3/8/20 Normal); Legend max 20/30/40 9/18 on and off; balance/scale/scale2 green.
+- Weak: no hit-stop in the main game (shake + flash only, reduced by SET.reduce); the trait has no icon on the button yet (a floater names it on each dash); decoy only re-aims shots fired straight at the ship.
+
 ## Nightrun VARIETY A: formations, stage scripts, rule changes (flag RET.vary, ?vary=0 = old waves, 18 Oct 2026)
 - `parts/formations.js` (after zoo.js): 62 formations with their own spatial behaviour (pincer, X, snake, spiral, moving-gap wall, meteors, shadow, bait, curtain, geyser, scissors, loop, testudo, ambush...). Each declares tags, first stage, cost, telegraph, gap, kinds, role. Path units move in FM.mv (one hook line in b.js's enemy switch); every path ends flying left, so leaks still count.
 - `parts/stagescripts.js`: the editable table `VSCRIPT` (45 stages: 10-13 moments, a '*' set piece unique to the stage, a '~' breather, '+g' ground moments, 'a|b' mixes, '~r' remixes) + 15 rule changes `VMUT` on every even story stage (RULE card after the stage card, name after the HUD goal line; paused while a boss is out; gentler on Easy). The director keeps timing, budget, caps, READY gaps; scripts only pick WHAT spawns.
