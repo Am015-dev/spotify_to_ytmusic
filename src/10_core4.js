@@ -271,7 +271,7 @@ void main(){vec3 d=normalize(vD);float h=d.y;vec3 top=uTop,mid=uMid,hor=uHor;
 const V=(r,g,b)=>new THREE.Vector3(r,g,b);
 const SKYU={uT:{value:0},uTop:{value:V(.016,.012,.05)},uMid:{value:V(.07,.04,.17)},uHor:{value:V(.30,.10,.34)},uGround:{value:V(.03,.02,.06)},uSun:{value:V(0,0,0)},uStar:{value:1},uBand:{value:1},uMoon:{value:1},uLit:{value:0},uCloud:{value:0}};
 const skyMat=new THREE.ShaderMaterial({vertexShader:SKY_VS,fragmentShader:SKY_FS,uniforms:SKYU,side:THREE.BackSide,depthWrite:false,fog:false,extensions:{derivatives:true}});
-const sky=new THREE.Mesh(new THREE.SphereGeometry(8000,48,24),skyMat);sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);sky.onBeforeRender=(r,sc,cam)=>{sky.position.copy(cam.position);sky.updateMatrixWorld()};
+const sky=new THREE.Mesh(new THREE.SphereGeometry(8000,48,24),skyMat);sky.frustumCulled=false;sky.userData.sky=1;sky.renderOrder=-1;scene.add(sky);sky.onBeforeRender=(r,sc,cam)=>{sky.position.copy(cam.position);sky.updateMatrixWorld()};
 // reflections: a prefiltered environment of the sky plus a ring of neon so metal and wet road pick up the city colours
 const ENVSC=new THREE.Scene();(function(){const env=ENVSC;env.add(new THREE.Mesh(new THREE.SphereGeometry(100,32,16),new THREE.ShaderMaterial({vertexShader:SKY_VS,fragmentShader:SKY_FS,uniforms:SKYU,side:THREE.BackSide,depthWrite:false})));
   const cols=['#ff2d95','#22e4ff','#ffb46a','#8c55ff','#4ceaff'];for(let i=0;i<40;i++){const a=i/40*Math.PI*2,h=rr(4,26);const m=new THREE.Mesh(new THREE.BoxGeometry(rr(4,10),h,1),new THREE.MeshBasicMaterial({color:glowCol(cols[i%5],rr(.6,1.6))}));m.position.set(Math.cos(a)*80,h/2-8,Math.sin(a)*80);m.lookAt(0,m.position.y,0);env.add(m)}

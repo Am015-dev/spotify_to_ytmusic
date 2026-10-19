@@ -22,8 +22,8 @@ function GFX_light(){if(!GFX.on)return;const day=GFX_isDay();GFX.day=day;
  // brighter ground bounce = mid-tone blue-grey shade like 2K Drive, sunlit vs shaded still clearly differ (sun 4.2)
  hemi.color.set('#9cbcff');hemi.groundColor.set(ath?'#8a7656':'#6f7a60');hemi.intensity=TUNE.gfxHemi;
  scene.environmentIntensity=TUNE.gfxEnv;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
- const U=SKYU;U.uTop.value.set(.004,.045,.40);U.uMid.value.set(.025,.16,.72);U.uHor.value.set(ath?.62:.48,ath?.66:.68,ath?.78:.92);U.uSun.value.set(1.0,.8,.5);
- scene.fog.color.set(ath?'#cfd6e2':'#b9cff0');
+ const U=SKYU;U.uTop.value.set(.004,.045,.40);U.uMid.value.set(.025,.16,.72);U.uHor.value.set(ath?.62:.30,ath?.66:.56,ath?.78:.95);U.uSun.value.set(1.0,.8,.5);
+ scene.fog.color.set(ath?'#cfd6e2':'#a6c4ee');
  GFX.U.value=.15;GFX_GRADE.uniforms.uOn.value=1;bloom.strength=.16;bloom.radius=.45;
 for(const m of GFX.gm)m.roughness=.88}   // applyMoodMaterials resets the road's roughness on every mood change
 // 98_garage_driver forces bloom.threshold=1 before every roam render: by GFX day the threshold reads 2.2 whatever is written

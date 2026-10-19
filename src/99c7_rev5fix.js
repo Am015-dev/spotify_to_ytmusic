@@ -248,3 +248,10 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   catch(e){R.push(['threw '+e,false])}finally{TOUCH.on=t0;TUNE.htFar=h0}
   const ok=R.every(r=>r[1]);return`📍 TRAFFIC HITCH · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R13A_reg(i+1),100)})(0);
+(function R13_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='r13')){C.items.push(
+{ver:'r13',id:'sky-blue',area:'look',text:'r13 · deep 2K blue sky in both cities, with and without ?lowmem=1: 📍 GO puts the city in its day mood, runs the day light (GFX_light) and reads the sky colours (top, mid, horizon) and scene.background. Pass line: the sky mid and horizon colours are blue (b > r + .15 and b > .45) and scene.background is not a dark colour.'});
+ const sk=()=>{const U=SKYU,f=v=>v.toArray().map(x=>+x.toFixed(2)),b=scene.background;return{top:f(U.uTop.value),mid:f(U.uMid.value),hor:f(U.uHor.value),bg:b&&b.isColor?'#'+b.getHexString():String(b),ro:RO.on,gfx:GFX.on,day:GFX.day,mood:MOOD&&MOOD.id,cloud:U.uCloud.value,lm:!!LOWMEM}};
+ const go=city=>({c:city,n:city+' sky is blue',secs:2,fn:()=>{const s=sk(),bl=a=>a[2]>a[0]+.15&&a[2]>.45,bg=s.bg==='null'||/^#[0-9a-f]{6}$/.test(s.bg)&&bl(s.bg.slice(1).match(/../g).map(h=>parseInt(h,16)/255)),ok=s.day&&bl(s.mid)&&bl(s.hor)&&bg;
+  return'📍 SKY '+city.toUpperCase()+' · lowmem '+(s.lm?'on':'off')+' · mid '+s.mid+' hor '+s.hor+' background '+s.bg+' · sky mesh flagged '+!!sky.userData.sky+' → '+(ok&&sky.userData.sky?'✅ PASS':'❌ FAIL')}});
+ C.GO['r13/sky-blue']=[go('fra'),go('ath')]}return}
+ if(i<600)setTimeout(()=>R13_reg(i+1),100)})(0);
