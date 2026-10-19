@@ -12,6 +12,12 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Test `nightrun/abil-test.js` (25 checks). Stationary spam bot 0% on and off (stages 3/8/20 Normal); Legend max 20/30/40 dodging bot 10/18 on and off, camper 4/18 on and off; balance, boss2, tutorial, ret, stats, econ green.
 - Red after merging W2's fun.js/dir.js (not re-checked on the old build): scale-test Legend band 83% > 75%, scale2 camper 22% > 15%, weapon 'wave alone LV1' (passed before the merge), readable 1280 contrast (flaky under load).
 - Weak: no hit-stop in the main game (shake + flash only, reduced by SET.reduce); the trait has no icon on the button yet (a floater names it on each dash); decoy only re-aims shots fired straight at the ship.
+## Nightrun must move (flag RET.mustmove, ?mustmove=0 = before, 19 Oct 2026)
+- Owner: "I can win without moving on Normal (swarm)". `nightrun/mustmove-test.js`: Normal, stages 1/5/10/20/30/40, mid+max builds, all 16 weapons + Swarm, bots park / hop / track (lines up with the next foe, never dodges).
+- Before: park/hop already died (h.js discharge); track cleared 60% of stages >= 3 with every weapon. After: track 0-10%, park/hop 0%. Dodging bot (balance-test Normal mid/late) 100%.
+- `parts/fair.js` D (`MM`): a ship whose x stays inside 70 px for 3.5 s (Normal) gets a telegraphed column strike on its x (.95 s pulse, 1 hull, 2 from the second in a row). Homing uses the narrow cone/reach on every tier. BALANCE.md "Must move".
+- Weak / next: the tracker still lives ~100 s before dying (hull, not skill, decides when); no reward yet for moving (graze/close-range bonus would make it feel clever, not just safe); column has code art only.
+
 ## Nightrun repetition remedies V1 V2 V3 V10 (W2, flags RET.deck / hintdiet / roster / songspread, ?flag=0 = old, 19 Oct 2026)
 - V1 `parts/fun.js`: EVENT DECK of 15 cards (weave, fence, DROP, supply drop, lane closes, gate run, mines, rescue capsule, wind gust, blackout strip, crossfire, swarm, turret line, meteors, wedge), shuffled, no repeats until empty, one event per 25-31 s, never with a boss out. `FUN.ev` is the running non-enemy event (the audit's plain-loop counter reads it).
 - V2 `parts/uikit.js` `HINT.diet`: each hint text at most twice per profile (localStorage `mnr_hintseen`), never twice within 3 min of play; not in tutorial/Lab.

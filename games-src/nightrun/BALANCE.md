@@ -219,3 +219,15 @@ scale2-test / scale3-test Legend final window is back at 170-260 s; boss2-test's
 Owner: "Game is extremely repetitive". All ten fights used the same 6 verbs. Now 45 verbs, every boss 8-10 in three phases, pairwise overlap <= 2, one signature + one counter each. HP, cap and phases unchanged (armour.js).
 Measured (bossmoves-audit.js): shortest telegraph 0.60 s, smallest free disc 96 px, bullets <= ebCap, speed <= BCAP, stress fight lengths at the armour floor (Normal mini ~52 s, district ~85 s, final ~127 s).
 Bot (balance-test bot, Normal, mid+late, 2 runs): 28/40 boss-stage clears vs 31/40 with ?bossmoves=0 in the last run (30 vs 28 in the run before). Weakest: Hoplite 1/4, Schranke 2/4; Talos 2/4 (was 0/4).
+
+## Must move (flag RET.mustmove, ?mustmove=0 = before; 19 Oct 2026)
+Owner: "there are weapons like swarm that I can win the game without moving on Normal". Gate: `mustmove-test.js` (Normal, stages 1/5/10/20/30/40,
+mid + max builds, every weapon paired with the homing Swarm; bots: park = never moves, hop = 48 px every 1.5 s blind to bullets, track = lines up
+with the nearest foe and never dodges). Before: park and hop already died (h.js static discharge, ~25 s); **track cleared 60%** of stages >= 3 with
+every weapon (the weapon did not matter: enemies hardly threaten a ship that keeps its x). After: track 0-10% per weapon, park/hop 0%.
+- Column strike (`parts/fair.js` D, object `MM`): a ship whose x stays inside 70 px for `MM.win()` s (Easy 5, Normal 3.5, Hard 3.2, VH 3, Legend 2.8)
+  gets a vertical lane on its x: pulses `MM.tel()` s (Easy 1.1 .. Legend .7, always >= .6), fires .25 s, 1 hull (2 from the second strike in a row
+  unless the ship really moved 140 px; Easy always 1). 1.6 s pause between strikes (Easy 2.4). Story stage >= 3, endless after 20 s, not in
+  tutorial/lab/god mode. A 45 px sidestep or a dash clears it; the rest of the screen is free.
+- Homing (S2 steer): every tier now uses the hard tiers' narrow cone (.7 rad) and reach (300 px), so missiles need the ship pointed at a target.
+- Test bots see the lane (`MM.cost(x)`) like STILL.beam and the boss telegraphs: balance-test dec()/camp(), afk-test bot.
