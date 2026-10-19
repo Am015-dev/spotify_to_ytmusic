@@ -144,7 +144,7 @@ if(typeof gndBuild==='function')gndBuild=(f=>function(grp,x0,x1,z0,z1,o){const o
 const TRN_RX=CID==='fra'?1:+(new URLSearchParams(location.search).get('athx')||1.6);
 // ...and its pre-hazed violet/beige vertex colours matched the pale horizon sky (invisible in shots even where the test counted it):
 // slate blue at the ridge line, grey-blue at the foot
-function TRN_athRecolor(R){R.userData.rc=1;const top=new THREE.Color('#4f5d80'),low=new THREE.Color('#8a90a2');R.traverse(o=>{if(!o.isMesh||!o.userData.ridge)return;const p=o.geometry.attributes.position,c=o.geometry.attributes.color;if(!c)return;
+function TRN_athRecolor(R){R.userData.rc=1;const top=new THREE.Color('#4f5d80'),low=new THREE.Color('#8a90a2');R.traverse(o=>{if(!o.isMesh||!o.userData.ridge)return;const p=o.geometry.attributes.position,c=o.geometry.attributes.color;if(!c)return;if(!c.array)c.array=new Float32Array(p.count*3);   /* r11e (rev11 N5): the colour array can already be freed after its GPU upload (TICKERR 'setting 0' once in the Athens first minute) */
   for(let i=0;i<p.count;i++){const C=p.getY(i)>-39?top:low;c.setXYZ(i,C.r,C.g,C.b)}c.needsUpdate=true})}
 const TRN_TAUX=+(new URLSearchParams(location.search).get('taux')||2.2),TRN_TAU=(()=>{try{return TR_H4.on&&new URLSearchParams(location.search).get('tau')!=='0'}catch(e){return false}})();
 function TRN_fraRidge(){const g0=new THREE.Group(),r=mul(5150),pos=[],col=[],c=new THREE.Color(),c2=new THREE.Color(),Q=TRN_RD*Math.tan(.3*Math.PI/180);
