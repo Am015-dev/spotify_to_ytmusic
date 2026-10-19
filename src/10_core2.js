@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.120',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC loading no longer freezes for seconds while it prepares graphics: they now load one at a time.'}]},
 {v:'v90m-beta.119',date:'19 Oct 2026',items:[{t:'FIXED',s:'Athens sky is blue again on phones (it could turn black on the low-memory setting).'},{t:'CHANGED',s:'Deeper LEGO-blue sky over Frankfurt.'}]},
 {v:'v90m-beta.118',date:'19 Oct 2026',items:[{t:'FIXED',s:'No more freeze about 12 seconds into free roam: city life now builds over several frames.'},{t:'FIXED',s:'Fewer stutters right after loading: more graphics are prepared during the loading screen.'},{t:'FIXED',s:'River race arrival times match the real race, Frankfurt start no longer on the centre line, traffic yields to racers.'}]},
 {v:'v90m-beta.117',date:'19 Oct 2026',items:[{t:'FIXED',s:'The white blocks on Athens roads were uncoloured scooters: they now have their colours.'},{t:'FIXED',s:'A rare error in the first minute of Athens is fixed.'},{t:'FIXED',s:'River Run: rivals finish with their own realistic times, and the rubber-banding at the end of races is gentler.'}]},
