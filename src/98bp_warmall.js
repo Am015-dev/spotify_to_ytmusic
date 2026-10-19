@@ -13,5 +13,10 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
    gm=new THREE.Mesh(g,m);gm.receiveShadow=true;gm.frustumCulled=false;sc.add(gm)}}catch(e){console.warn('warmall ground',e)}
   // boot-4: the transform burst (pooled material, 30_race xfWarm) linked its program on the first swap
   let bm=null;try{if(typeof xfWarm==='function'){bm=xfWarm();sc.add(bm)}}catch(e){console.warn('warmall burst',e)}
+  // perf-r11c: LF_warm links the fill materials right after the hub props, but Athens still linked the instanced fill program (instance colour + vertex colours + env map)
+  // at f59 of driving (~65-85 ms): the lights / environment were not final then. Link a twin here, in the loader's last compile.
+  let lf=null;try{if(typeof LF!=='undefined'&&LF.on&&typeof LF_mats==='function'){const M=LF_mats(),g=new THREE.BoxGeometry(.1,.1,.1);g.setAttribute('color',new THREE.Float32BufferAttribute(new Array(g.attributes.position.count*3).fill(1),3));lf=new THREE.Group();
+   for(const k of['def','tuft','pond']){const m=new THREE.InstancedMesh(g,M[k],1);m.setMatrixAt(0,new THREE.Matrix4());m.setColorAt(0,new THREE.Color());m.frustumCulled=false;m.receiveShadow=true;lf.add(m)}
+   if(typeof LF_patchMat==='function'){const pm=new THREE.Mesh(g,LF_patchMat());pm.frustumCulled=false;pm.receiveShadow=true;lf.add(pm)}sc.add(lf)}}catch(e){console.warn('warmall lf',e)}
   const hid=[];sc.traverse(o=>{if(!o.visible){o.visible=true;hid.push(o)}});WARMALL.n=hid.length;
-  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}if(bm){sc.remove(bm);XFB_MP.push(bm.material);bm.dispose()}}}}
+  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}if(lf){sc.remove(lf);lf.children[0].geometry.dispose();for(const o of lf.children)if(o.isInstancedMesh)o.dispose()}if(bm){sc.remove(bm);XFB_MP.push(bm.material);bm.dispose()}}}}

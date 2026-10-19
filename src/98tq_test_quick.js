@@ -35,7 +35,7 @@ if(TQ){
   T('card',()=>{RO.card=null;RO.cardPin=0;RO.wwTest=0;const c=document.getElementById('roamCard');if(c)c.hidden=true});T('map',()=>{if(RO.mapOpen&&typeof roamMap==='function')roamMap(false);RO.mapOpen=false});
   T('ch',()=>{if(RO.ch)chAbort()});T('sp',()=>{if(RO.sp)sprintEnd()});T('wk',()=>{RO.wk=null});skip();
   let st='';try{st=state}catch(e){}if(st!=='roam')T('roam',()=>enterRoam());
-  T('home',()=>{const H=TQS.home;if(H){roamWarp(H[0],H[1],H[2])}RO.v=0;RO.vy=0;RO.frozen=false});
+  T('home',()=>{const H=TQS.home;if(H){roamWarp(H[0],H[1],H[2])}RO.v=0;RO.vy=0;RO.frozen=false;if(H&&!TQS.pre&&/[?&]warm=1/.test(location.search)&&typeof BOOT1_pre==='function'){TQS.pre=1;BOOT1_pre()}});   // perf-r11c: tBoot (warm=1) moves the car home after the loader; give that spot the same pre-run the real start gets
   return{ms:Math.round(performance.now()-t),state:(()=>{try{return state}catch(e){return'?'}})(),log}};
  window.__tq=Object.assign(TQS,{o:TQ,skip,reset,draw:()=>{TQ.draw=1;try{composer.render()}finally{TQ.draw=0}}});
 }

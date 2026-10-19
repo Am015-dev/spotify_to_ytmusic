@@ -18,8 +18,13 @@ function STR_step(){if(!STR_on()||!WBC.on||state!=='roam'||!WBC.sup||typeof came
   // catch-up: a missing cell INSIDE draw range (after a warp, flight, garage or roam start) gets up to STR.msC minus this frame's LAZY time (instead of STR.ms), so the frame's stream work stays under 16 ms
   // a frame whose LAZY step was already big builds nothing (frees still run): the frame's stream work stays under 16 ms
   let n=0,bud=STR.lzT>16-STR.ms-STR.sl-2?0:STR.ms;while(performance.now()-t0<bud){if(!STR.it){let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;if(bd<R)bud=Math.max(bud,STR.msC-STR.lzT);STR.S=b;STR.it=WB_supMk(b,true)}else if(STR_d(STR.S,cx,cz)<R)bud=Math.max(bud,STR.msC-STR.lzT);
-    n++;if(STR.it.next().done){STR.it=null;STR.S=null;STR.st.b++;WBC.sig=''}}
+    n++;if(STR.it.next().done){STR_up(STR.S);STR.it=null;STR.S=null;STR.st.b++;WBC.sig=''}}
   if(!n)return;const dt=performance.now()-t0;if(dt>STR.st.max)STR.st.max=dt;if(dt>8)STR.st.over++;STR.st.hist.push(+dt.toFixed(2));if(STR.st.hist.length>600)STR.st.hist.shift()}
+// perf-r11c: a streamed super cell's CPU copy (54 B per far triangle) was only dropped at its first DRAW, and the cells behind the camera or inside wbLodD
+// are not drawn, so ~43 MB of far-city arrays stayed in the Athens heap after 30 s. Upload it right after the build (SM_upload's trick: a 1x1 target, draw count 0), so onUpload frees it now.
+function STR_up(S){const m=S&&(S.lod||S.cells.find(c=>c.lod)&&S.cells.find(c=>c.lod).lod);if(!m||!TUNE.strFree||typeof renderer==='undefined')return;const g=m.geometry;if(!g.attributes.position.array)return;
+  const U=STR.up||(STR.up={sc:new THREE.Scene(),mt:new THREE.MeshBasicMaterial(),rt:new THREE.WebGLRenderTarget(1,1)});const q=new THREE.Mesh(g,U.mt),dr=g.drawRange.count,prev=renderer.getRenderTarget();q.frustumCulled=false;g.drawRange.count=0;U.sc.add(q);
+  try{renderer.setRenderTarget(U.rt);renderer.render(U.sc,camera)}catch(e){}finally{renderer.setRenderTarget(prev);g.drawRange.count=dr;U.sc.clear();STR.st.up=(STR.st.up||0)+1}}
 {const _ls=lazyStep;lazyStep=function(){const t=performance.now(),r=_ls.apply(this,arguments);STR.lzT=(STR.lzT0||0)+performance.now()-t;try{STR_step()}catch(e){console.warn('STR',e);TUNE.strOn=0}return r}}
 window.__str={st:STR.st,sup:()=>{let b=0,mb=0;for(const S of WBC.sup||[])if(S.built){b++;mb+=S.mb}return{sup:(WBC.sup||[]).length,built:b,mb:+mb.toFixed(1),lodT:WBC.st.lodT}}};
 // LAZY unload: only regions built by the plain lzBuildG (their build has no side effects beyond L.root + props); Taunus/Wald/Attiki corridors stay
