@@ -73,11 +73,22 @@ const CHALL=[
  {di:2,req:21,name:'RAIL RHYTHM', intro:'Land PERFECTs. Hold the beat.',  ch:'perfect',goal:{k:'survive',v:46}, perf:28,s3:450000, waves:['gate','droneLine','chargers','turret','droneSine']},
  {di:3,req:29,name:'FAIR DASH',   intro:'Beat the clock. Kill fast.',     ch:'speed',  goal:{k:'kill',v:120},    perf:22,s3:600000, waves:['droneV','chargers','turret','gunship','gate'],tb:1.05},
  {di:4,req:37,name:'MARBLE LANE', intro:'One hit ends it. Stay clean.',  ch:'nohit',  goal:{k:'survive',v:46}, perf:26,s3:800000, waves:['phalanx','wedge','turret','droneSine','gunship']}];
+/* V10 music spread (flag RET.songspread, ?songspread=0 = the old n%3 rotation): the stage songs were stage1/2/3 for 36 of 40 stages, so four tracks carried two thirds of a run.
+   Now every non-Athens stage draws from the five stage tracks (stage1-3, endless, endless2) in a seeded shuffle per block of five, and a track never plays in two stages in a row;
+   Athens keeps its two own songs. The song only sets the district length and the energy curve (SONGM), so the stage length changes by at most a minute. */
+const SONGSPREAD=()=>window.RET&&window.RET.songspread!==undefined?window.RET.songspread:!/[?&]songspread=0/.test(location.search);   // (ret.js builds RET later)
+const SONGSEL=(()=>{const POOL=['stage2','endless','stage3','stage1','endless2'],seq=[];let seed=7,prev='';
+  const rnd=()=>(seed=(seed*1103515245+12345)&0x7fffffff)/0x7fffffff;
+  return(n,di,old)=>{if(!SONGSPREAD()||di===4||n<=4)return old;   // the first four stages keep the gentle opening songs
+    while(seq.length<n){const blk=POOL.slice();for(let i=blk.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[blk[i],blk[j]]=[blk[j],blk[i]];}
+      if(blk[0]===prev){const k=1+Math.floor(rnd()*(blk.length-1));[blk[0],blk[k]]=[blk[k],blk[0]];}
+      for(const t of blk){seq.push(t);}prev=blk[blk.length-1];}
+    return seq[n-1];};})();
 const STAGES=[];
 CITYS.forEach((c,ci)=>c.st.forEach((r,k)=>{const n=STAGES.length+1,d={n,di:c.di,name:r[0],intro:r[1],goal:r[2],perf:r[3],waves:r[4],act:ci,pos:k};
-  if(r[2].k==='boss'||r[2].k==='mini')d.lead=r[2].k==='boss'?24:30;if(r[5])d.mini=r[5];d.song=c.di===4?(n%2?'athina':'athina2'):n<=8?['stage1','stage2'][(n-1)%2]:['stage1','stage2','stage3'][(n-1)%3];d.kit=Math.min(24,n-1);STAGES.push(d);}));
+  if(r[2].k==='boss'||r[2].k==='mini')d.lead=r[2].k==='boss'?24:30;if(r[5])d.mini=r[5];d.song=SONGSEL(n,c.di,c.di===4?(n%2?'athina':'athina2'):n<=8?['stage1','stage2'][(n-1)%2]:['stage1','stage2','stage3'][(n-1)%3]);d.kit=Math.min(24,n-1);STAGES.push(d);}));
 const MAIN=STAGES.length;                                  // 40 story stages; the challenge stages come after them
-CHALL.forEach((c,i)=>{const n=STAGES.length+1;STAGES.push({n,di:c.di,name:c.name,intro:c.intro,goal:c.goal,perf:c.perf,waves:c.waves,act:c.di,pos:8+i,ch:c.ch,from:c.req,s3:c.s3,tb:c.tb||0,song:c.di===4?(n%2?'athina':'athina2'):['stage1','stage2','stage3'][(n-1)%3],kit:Math.min(24,c.req-1)});});
+CHALL.forEach((c,i)=>{const n=STAGES.length+1;STAGES.push({n,di:c.di,name:c.name,intro:c.intro,goal:c.goal,perf:c.perf,waves:c.waves,act:c.di,pos:8+i,ch:c.ch,from:c.req,s3:c.s3,tb:c.tb||0,song:SONGSEL(n,c.di,c.di===4?(n%2?'athina':'athina2'):['stage1','stage2','stage3'][(n-1)%3]),kit:Math.min(24,c.req-1)});});
 /* the story grew from 16 to 30 and then to 40 stages: progress saved under the old numbers moves to the same stage by name (once) */
 if(!sSave.v40){const OLD16=['FIRST RUN','PATROL','SEK-ADLER','RIVER ROAD','BRIDGE GUARD','FLUSSKRAKE','GATE RUN','GATE KEEPER','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','HOPLITE','TALOS'],
   OLD30=['FIRST RUN','PATROL','ZEIL','TRESOR-WART','KONVOI','SEK-ADLER','RIVER ROAD','EISERNER STEG','BRIDGE GUARD','ROEMER','FLOTTE','FLUSSKRAKE','GATE RUN','FREIGHT YARD','GATE KEEPER','FIREWALL','CORDON','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','HAMMERING MAN','MESSE-WÄCHTER','BOARDROOM','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','LYCABETTUS','HOPLITE','AGORA','TALOS'],

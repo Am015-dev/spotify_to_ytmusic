@@ -37,7 +37,7 @@ const PLAY = (o) => {
     NR.on('pitStart', () => window.__ev('shop', (m.SH.cards || []).map(c => c.id || c.k || c.n).join('+')));
     if (window.ZOO) { const z = window.ZOO, pk = z.pick; z.pick = function () { const id = pk.apply(this, arguments); if (id) window.__ev('zoo', id); return id; }; }
     { const f = m.FUN, sf = f.startFence; f.startFence = function () { window.__ev('fence', 'fence'); return sf.apply(this, arguments); }; }
-    if (window.HINT) { const h = window.HINT, sh = h.show; h.show = function (txt) { window.__ev('hint', String(txt).slice(0, 60)); return sh.apply(this, arguments); }; }
+    if (window.HINT) { const h = window.HINT, sh = h.show; h.show = function (txt) { const r = sh.apply(this, arguments); if (r) window.__ev('hint', String(txt).slice(0, 60)); return r; }; }
   }
   m.NR.watch = { shots: [], spawns: [] };
   const dec = () => {
@@ -73,7 +73,7 @@ const PLAY = (o) => {
       const b = g.boss; if (b && b.lists) { const v = b.lists[b.ph - 1][b.pi % b.lists[b.ph - 1].length]; const sig = b.nm + '|p' + b.ph + '|' + v; if (sig !== verb) { verb = sig; add('verb', sig); } } else verb = '';
       for (const p of g.pk) if (!pkSeen.has(p)) { pkSeen.add(p); if (p.t !== 'shard') add('pick', p.t + (p.k ? ':' + p.k : '')); }
       const w = m.NR.watch; if (w) { for (const s of w.shots) { const by = s.by; const k = !by ? 'none' : by.type === 'boss' ? 'boss:' + (by.lists ? by.lists[by.ph - 1][by.pi % by.lists[by.ph - 1].length] : '?') : (by.type || (by.arm != null ? 'rain/hazard' : '?')) + (by.el ? '*' : ''); shots[k] = (shots[k] || 0) + 1; } w.shots.length = 0; w.spawns.length = 0; }
-      if (g.boss) bossT += 6 * dt; else if (!m.FUN.fence && !m.FUN.dw && !(m.FUN.sets && m.FUN.sets.length)) plain += 6 * dt;
+      if (g.boss) bossT += 6 * dt; else if (!m.FUN.fence && !m.FUN.dw && !m.FUN.ev && !(m.FUN.sets && m.FUN.sets.length)) plain += 6 * dt;
     }
     if (m.G.dead) break;
     if (!o.endless && m.ST.over) { cleared = true; break; }

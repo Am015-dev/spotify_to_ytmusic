@@ -4,6 +4,15 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun repetition remedies V1 V2 V3 V10 (W2, flags RET.deck / hintdiet / roster / songspread, ?flag=0 = old, 19 Oct 2026)
+- V1 `parts/fun.js`: EVENT DECK of 15 cards (weave, fence, DROP, supply drop, lane closes, gate run, mines, rescue capsule, wind gust, blackout strip, crossfire, swarm, turret line, meteors, wedge), shuffled, no repeats until empty, one event per 25-31 s, never with a boss out. `FUN.ev` is the running non-enemy event (the audit's plain-loop counter reads it).
+- V2 `parts/uikit.js` `HINT.diet`: each hint text at most twice per profile (localStorage `mnr_hintseen`), never twice within 3 min of play; not in tutorial/Lab.
+- V3 `parts/dir.js` `ROSTER` (hook: first line of `en()` in b.js): each stage has a signature + second kind (charger/flank/swarm/mine, neighbours share neither); drones capped at 33% per stage. Stages 1-4 untouched (hover drones, zoo-test).
+- V10 `parts/story.js` `SONGSEL`: non-Athens stages from stage 5 draw from the five stage tracks in a seeded shuffle, never the same track twice in a row. (The baseline audit already showed no track above 17%, so the gain here is small.)
+- repeat-audit.js: hints are logged only when queued/shown; `FUN.ev` counts as non-plain. zoo-test.js clears the hint diet before its hint check.
+- Numbers (arcade-normal, before -> after): set pieces 706 -> 280, drone spawns 56% -> 27%, drone bullets 17% -> 11%, top hint repeats 207 -> max 2 per hint, top track 15% -> 17%, plain loop 56% -> 71% (fewer, longer-spaced events; the audit counts only set/fence/drop windows), jaccard 0.24 -> 0.27, repeat-in-5-min 83% -> 76%, first-try fails 9 -> 9.
+- Still weak: plain loop is higher (events are rarer by design); fun-test fails 9-10 checks on the old build too (it expects the 6-bar metronome); afk-test is flaky on Hard.
+
 ## Nightrun VARIETY A: formations, stage scripts, rule changes (flag RET.vary, ?vary=0 = old waves, 18 Oct 2026)
 - `parts/formations.js` (after zoo.js): 62 formations with their own spatial behaviour (pincer, X, snake, spiral, moving-gap wall, meteors, shadow, bait, curtain, geyser, scissors, loop, testudo, ambush...). Each declares tags, first stage, cost, telegraph, gap, kinds, role. Path units move in FM.mv (one hook line in b.js's enemy switch); every path ends flying left, so leaks still count.
 - `parts/stagescripts.js`: the editable table `VSCRIPT` (45 stages: 10-13 moments, a '*' set piece unique to the stage, a '~' breather, '+g' ground moments, 'a|b' mixes, '~r' remixes) + 15 rule changes `VMUT` on every even story stage (RULE card after the stage card, name after the HUD goal line; paused while a boss is out; gentler on Easy). The director keeps timing, budget, caps, READY gaps; scripts only pick WHAT spawns.

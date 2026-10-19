@@ -59,6 +59,7 @@ UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,gy=UIK.groundY(
    bold white text >= 14 px on a dark rounded pill (alpha .78, thin accent border), at most 8 words (the caller writes it short; short() only cuts a leftover),
    in the top third under the HUD, never within 120 px of the ship (it slides sideways, or waits), one on screen at a time with at least 1.2 s between two. ---------- */
 if(RET.hint===undefined)RET.hint=!/[?&]hint=0/.test(location.search);
+if(RET.hintdiet===undefined)RET.hintdiet=!/[?&]hintdiet=0/.test(location.search);
 const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE:120,
   on(){return RET.hint!==false;},
   reset(){this.cur=null;this.q.length=0;this.gap=0;this.box=null;},
@@ -68,10 +69,18 @@ const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE
     if(!this.on()){G.hint={t:o.t||3,txt};return true;}                      // flag off: the old bubble
     const T=o.t||3,dup=this.cur&&this.cur.txt===txt?this.cur:this.q.find(h=>h.txt===txt);
     if(dup){if(T>dup.t){dup.t=T;if(dup===this.cur&&G.hint)G.hint.t=T;}return false;}   // callers may ask again every frame (a longer first-time ask keeps the longer time)
+    if(!this.diet(txt))return false;
     if(this.cur&&this.cur.el<.2&&T>this.cur.t){this.cur={txt,t:T,col:o.col||null,age:0,el:0,bw:0};if(G.hint){G.hint.t=T;G.hint.txt=txt;}return true;}   // the same moment, a longer first-time text: it replaces the short one
     this.q.push({txt,t:o.t||3,col:o.col||null,age:0,el:0,bw:0});while(this.q.length>3)this.q.shift();this.next();return true;},
+  /* V2 hint diet (flag RET.hintdiet, ?hintdiet=0 = every ask shows): a hint text shows at most twice per profile (counts in localStorage 'mnr_hintseen') and never twice within 3 minutes of play.
+     Not in the tutorial or the Lab (the tutorial teaches by hints). A refused ask returns false like a repeat ask, so callers that retry every frame cost nothing. */
+  clk:0,hs:null,
+  diet(txt){if(RET.hintdiet===false||G.tut||G.lab)return true;
+    if(!this.hs){try{this.hs=JSON.parse(localStorage.getItem('mnr_hintseen')||'{}')||{};}catch(e){this.hs={};}this.hl={};}
+    const n=this.hs[txt]|0;if(n>=2)return false;if(n>0&&this.clk-(this.hl[txt]==null?-1e9:this.hl[txt])<180)return false;
+    this.hs[txt]=n+1;this.hl[txt]=this.clk;try{localStorage.setItem('mnr_hintseen',JSON.stringify(this.hs));}catch(e){}return true;},
   next(){if(this.cur||this.gap>0||!this.q.length||(G.banner&&G.banner.t>0))return;this.cur=this.q.shift();this.seen.push(this.cur.txt);if(this.seen.length>60)this.seen.shift();if(G.hint){G.hint.t=this.cur.t;G.hint.txt=this.cur.txt;}},   // nothing up and no gap to wait out: starts at once
-  tick(dt){if(!this.on()){this.cur=null;this.q.length=0;this.box=null;return;}
+  tick(dt){this.clk+=dt;if(!this.on()){this.cur=null;this.q.length=0;this.box=null;return;}
     if(this.gap>0)this.gap-=dt;for(const h of this.q)h.age+=dt;this.q=this.q.filter(h=>h.age<8);       // a hint nobody saw in 8 s is stale
     const c=this.cur;
     if(c){if(G.banner&&G.banner.t>0){}else if(c.blk){c.bw+=dt;if(c.bw>3)c.t=0;}else{c.t-=dt;c.el+=dt;}   // paused under a banner; dropped after 3 s of no free spot
