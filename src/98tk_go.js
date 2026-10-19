@@ -8,7 +8,7 @@ function tkBot(P,o={}){const lagN=Math.round((o.lag||0)*30),q=[],look=o.look||26
     R.maxS=Math.max(R.maxS,s);const wet=RO.veh==='boat',T0=at(s+(wet?14:look)+Math.abs(RO.v)*(wet?.3:.6)),e0=angDiff(Math.atan2(T0.x-RO.x,T0.z-RO.z),RO.h);q.push(e0);const e=q.length>lagN?q[q.length-1-lagN]:0;
     K.ArrowLeft=K.ArrowRight=false;
     // fair-1: a human backs out after ~1 s nosed into a bush / car / kerb (reverse, wheel the other way), then drives on; R.stuck still counts any 2 s standstill
-    if(rec>0){rec-=1/30;K.ArrowUp=K.KeyW=false;K.ArrowDown=true;if(Math.abs(e0)>.1)K[e0>0?'ArrowRight':'ArrowLeft']=true;pv=0;return}
+    if(rec>0){R.recT=sp.t;rec-=1/30;K.ArrowUp=K.KeyW=false;K.ArrowDown=true;if(Math.abs(e0)>.1)K[e0>0?'ArrowRight':'ArrowLeft']=true;pv=0;return}
     if(sp.t>2&&Math.abs(RO.v)<3&&K.ArrowUp){if(++slow>30){slow=0;rec=1;R.recov++}}else slow=0;
     // races-1: also back out when the progress along the route has not grown 3 m in 3 s although the speedo reads > 3 (pinned and jittering, or circling beside the road)
     /* races-8: rocking (net progress < 15 m in 6 s sim time, any gas): hop via the roam unstick and back out */
