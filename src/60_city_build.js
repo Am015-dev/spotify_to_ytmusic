@@ -19,12 +19,17 @@ var GND_L=[],GND_ON=new URLSearchParams(location.search).get('t7g')!=='0',GND_B=
 // Athens had 7.5 M boxed numbers in per-cell JS arrays (~60-85 MB heap). g.s[2c],g.s[2c+1] = start/end in g.P; -1 = not built (undefined), -2 = flat (null).
 function GND_pack(g){let n=0;for(const L of g.c)if(L)n+=L.length;const P=new Float32Array(n),S=new Int32Array(g.c.length*2);let o=0;
   for(let c=0;c<g.c.length;c++){const L=g.c[c];if(!L){S[2*c]=S[2*c+1]=L===undefined?-1:-2;continue}const ox=g.x0+Math.floor(c/g.nz)*g.dx,oz=g.z0+c%g.nz*g.dz;S[2*c]=o;
-    for(let k=0;k<L.length;k+=9){P[o]=L[k]-ox;P[o+1]=L[k+1]-oz;for(let q=2;q<9;q++)P[o+q]=L[k+q];o+=9}S[2*c+1]=o}g.P=P;g.s=S;g.c=null}
+    if(L instanceof Float32Array){P.set(L,o);o+=L.length}else for(let k=0;k<L.length;k+=9){P[o]=L[k]-ox;P[o+1]=L[k+1]-oz;for(let q=2;q<9;q++)P[o+q]=L[k+q];o+=9}S[2*c+1]=o}g.P=P;g.s=S;g.c=null}
+// perf-r15c: LOWMEM packs each finished cell at once (Float32Array, x/z relative to the cell corner like GND_pack), so a ground still building in the first 30 s of roam
+// does not hold millions of boxed numbers in JS arrays (Frankfurt outer land: 3.9 M = ~31 MB heap) until its last cell. ?memc=0 = off
+var MEMC_ON=!/[?&]memc=0/.test(location.search);
+function GND_cellF32(L,ox,oz){const P=new Float32Array(L);for(let k=0;k<P.length;k+=9){P[k]=L[k]-ox;P[k+1]=L[k+1]-oz}return P}
 // perf-11: optional out = a reused {L,k,u,v} (GND_far: no object per ground sample)
 function GND_in(g,x,z,out){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)return undefined;
   if(g.P){const c=i*g.nz+j,s=g.s[2*c],e=g.s[2*c+1];if(s<0)return s===-1?undefined:null;const L=g.P,ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz;
     for(let k=s;k<e;k+=9){const u=(rx-L[k])/L[k+2],v=(rz-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(ox+L[k],oz+L[k+1],L[k+2],L[k+3])||!ART7_near(ox+L[k],oz+L[k+1],L[k+2],L[k+3])?1:0;if(out){out.L=L;out.k=k;out.u=u;out.v=v;return out}return{L,k,u,v}}return null}
   const L=g.c[i*g.nz+j];if(!L)return L;
+  if(L instanceof Float32Array){const ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz;for(let k=0;k<L.length;k+=9){const u=(rx-L[k])/L[k+2],v=(rz-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(ox+L[k],oz+L[k+1],L[k+2],L[k+3])||!ART7_near(ox+L[k],oz+L[k+1],L[k+2],L[k+3])?1:0;if(out){out.L=L;out.k=k;out.u=u;out.v=v;return out}return{L,k,u,v}}return null}/* perf-r15c */
   for(let k=0;k<L.length;k+=9){const u=(x-L[k])/L[k+2],v=(z-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(L[k],L[k+1],L[k+2],L[k+3])||!ART7_near(L[k],L[k+1],L[k+2],L[k+3])?1:0;if(out){out.L=L;out.k=k;out.u=u;out.v=v;return out}return{L,k,u,v}}return null}
 function GND_leaf(x,z){for(const g of GND_L){const q=GND_in(g,x,z);if(q!==undefined)return q}return null}
 function GND_tri(L,k,u,v){const A=L[k+4],Bv=L[k+5],C=L[k+6],D=L[k+7];return u+v<=1?A+(C-A)*u+(Bv-A)*v:D+(Bv-D)*(1-u)+(C-D)*(1-v)}
@@ -61,7 +66,8 @@ function* gndGen(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1-
     const ix=[];for(const v of V){const kk=Q?Math.round(v[0]*16)+','+Math.round(v[2]*16):null;if(kk!==null&&G.m.has(kk)){ix.push(G.m.get(kk));continue}ix.push(G.p.length/3);if(kk!==null)G.m.set(kk,G.p.length/3);G.p.push(v[0],v[1],v[2]);G.u.push(v[0]/o.uv,v[2]/o.uv);if(o.col){const c=o.col(v[0],v[2]);G.c.push(c.r,c.g,c.b)}
       if(v[3])G.n.push(0,1,0);else{const e=2,hx=tH(v[0]+e,v[2])-tH(v[0]-e,v[2]),hz=tH(v[0],v[2]+e)-tH(v[0],v[2]-e),l=Math.hypot(hx,2*e,hz);G.n.push(-hx/l,2*e/l,-hz/l)}}
     if(LL&&n===1&&!sn)LL.push(lx,lz,lw,lh,G.p[ix[0]*3+1],G.p[ix[1]*3+1],G.p[ix[2]*3+1],G.p[ix[3]*3+1],-1);
-    for(let a=0;a<n;a++)for(let b=0;b<n;b++){const q=a*(n+1)+b;if(V[q][3]&&V[q+1][3]&&V[q+n+1][3]&&V[q+n+2][3])continue;G.i.push(ix[q],ix[q+1],ix[q+n+1],ix[q+1],ix[q+n+2],ix[q+n+1])}}}
+    for(let a=0;a<n;a++)for(let b=0;b<n;b++){const q=a*(n+1)+b;if(V[q][3]&&V[q+1][3]&&V[q+n+1][3]&&V[q+n+2][3])continue;G.i.push(ix[q],ix[q+1],ix[q+n+1],ix[q+1],ix[q+n+2],ix[q+n+1])}}
+    if(LL&&LOWMEM&&MEMC_ON)GL.c[i*nz+j]=GND_cellF32(LL,ax,az)}
     if(o.near&&cc.end){const tk=tkOf(i,j);for(const[key,G]of B)if(key.endsWith(tk)&&key.length>tk.length&&!key.slice(0,-tk.length).includes('|')){mk(G);B.delete(key)}}}
   for(const G of B.values())mk(G);if(GL&&LOWMEM)GND_pack(GL);return out}
 // the Main and the Osthafen basin: water ribbons (~1.2 km pieces so they cull) with the distance to the bank as a vertex attribute (quay foam)

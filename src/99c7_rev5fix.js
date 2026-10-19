@@ -343,3 +343,33 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   catch(e){R.push(['threw '+e,false])}finally{TWG.fr=f0}
   const ok=R.every(r=>r[1]);return`📍 TOUCH WARM GATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R15B_reg(i+1),100)})(0);
+// perf-r15c (review 15 N2): Frankfurt touch LOWMEM retained heap in the first 30 s of roam (+78 MB after GC) was the outer-ground leaf lists (boxed numbers in
+// JS arrays until the generator's last cell) and the camera-pull triangle grid (one JS array per 8 m cell). Both are packed now (MEMC_ON, ?memc=0 = off).
+// The GO checks the packed forms answer exactly like the old ones and, on LOWMEM, that nothing is left unpacked. Measured bound: tools/perf1/tBoot.js HEAP=ret (PF1RET).
+(function R15C_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='heap-30s')){C.items.push({ver:'perf',id:'heap-30s',area:'perf',text:'perf-r15c: touch LOWMEM heap growth in the first 30 s (ground leaf lists + camera-pull grid packed)',go:'perf/heap-30s'});
+ C.GO['perf/heap-30s']=[{c:'fra',n:'packed ground leaves and camera-pull grids, same answers',fn:()=>{const R=[];try{
+   // 1) ground: a Float32Array cell answers GND_in like the JS-array cell (2000 points over 40 cells of the hilly grounds)
+   let n=0,bad=0,cells=0;const rnd=(()=>{let s=7;return()=>(s=(s*16807)%2147483647)/2147483647})();
+   for(const G of GND_L){if(!G.c&&!G.P)continue;for(let t=0;t<400&&cells<40;t++){const c=Math.floor(rnd()*G.nx*G.nz);let L=G.c?G.c[c]:null;
+     if(!L&&G.P){const s=G.s[2*c],e=G.s[2*c+1];if(s<0)continue;L=G.P.slice(s,e)}if(!L||!L.length)continue;cells++;const ox=G.x0+Math.floor(c/G.nz)*G.dx,oz=G.z0+c%G.nz*G.dz;
+     const A=[];if(L instanceof Float32Array)for(let k=0;k<L.length;k++)A.push(k%9===0?L[k]+ox:k%9===1?L[k]+oz:L[k]);else A.push(...L);for(let k=8;k<A.length;k+=9)A[k]=-1;const F=GND_cellF32(A,ox,oz);
+     const g1={x0:G.x0,z0:G.z0,dx:G.dx,dz:G.dz,nx:G.nx,nz:G.nz,c:[]},g2={...g1,c:[]};g1.c[c]=A;g2.c[c]=F;
+     for(let q=0;q<50;q++){const x=ox+rnd()*G.dx,z=oz+rnd()*G.dz,a=GND_in(g1,x,z),b=GND_in(g2,x,z);n++;const ya=a?GND_tri(a.L,a.k,a.u,a.v):a,yb=b?GND_tri(b.L,b.k,b.u,b.v):b;
+       if((a===null)!==(b===null)||a&&(Math.abs(ya-yb)>1e-3||a.L[a.k+8]!==b.L[b.k+8]))bad++}}}
+   R.push(['ground: typed cell = array cell on '+n+' points / '+cells+' cells, mismatches '+bad,n>=500&&bad===0]);
+   // 2) camera pull: a packed grid hits exactly like the unpacked one (rays through 3 occluder meshes)
+   if(FC.t-FC.occT>8||!FC.occ.length)FC_occ();const M=FC.occ.filter(m=>!m.isInstancedMesh&&!m.isBatchedMesh&&FCG_ok(m.geometry)).slice(0,3),on=MEMC_ON;let rays=0,hb=0,hits=0;
+   for(const m of M){const g=m.geometry,old=FCG.W.get(g);if(!g.boundingBox)g.computeBoundingBox();
+     const run=pk=>{MEMC_ON=pk;FCG.W.delete(g);const e=FCG_get(g);FCG_build(g,e,performance.now()+1e9);const out=[];const r2=(()=>{let s=11;return()=>(s=(s*16807)%2147483647)/2147483647})();
+       const P=g.attributes.position,ix=g.index,nt=ix?ix.count/3|0:P.count/3|0;for(let q=0;q<40;q++){const t=Math.floor(r2()*nt)*3,tg=new THREE.Vector3();for(let j=0;j<3;j++){const v=ix?ix.getX(t+j):t+j;tg.x+=P.getX(v)/3;tg.y+=P.getY(v)/3;tg.z+=P.getZ(v)/3}tg.applyMatrix4(m.matrixWorld);const o=tg.clone().add(new THREE.Vector3(r2()-.5,r2()*.3,r2()-.5).normalize().multiplyScalar(40));
+         const d=tg.clone().sub(o),far=d.length()*1.5;FC.rc.ray.direction.copy(d.normalize());out.push(FCG_hit(m,o,far))}return out};
+     const a=run(false),b=run(true);for(let q=0;q<a.length;q++){rays++;if(a[q]>=0)hits++;if(a[q]!==b[q])hb++}FCG.W.delete(g);if(old)FCG.W.set(g,old)}
+   MEMC_ON=on;R.push(['camera pull: packed = unpacked on '+rays+' rays ('+hits+' hits) over '+M.length+' meshes, mismatches '+hb,rays>=40&&hits>0&&hb===0]);
+   // 3) LOWMEM: no JS-array leaf list and no unpacked finished grid left (desktop keeps the old forms for the ground: info)
+   let js=0,tot=0;for(const G of GND_L)if(G.c)for(const L of G.c)if(L){tot++;if(!(L instanceof Float32Array))js++}
+   let fd=0,fp=0;for(const m of FC.occ){const e=m.geometry&&FCG.W.get(m.geometry);if(e&&e.done){fd++;if(e.I)fp++}}
+   const pm=performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576):0;
+   R.push([(LOWMEM?'':'(info, not LOWMEM) ')+'unpacked ground cells '+js+'/'+tot+', packed camera grids '+fp+'/'+fd+', JS heap '+pm+' MB',!LOWMEM||!MEMC_ON||(js===0&&fp===fd)])}
+  catch(e){R.push(['threw '+e,false])}
+  const ok=R.every(r=>r[1]);return`📍 HEAP 30 S · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R15C_reg(i+1),100)})(0);
