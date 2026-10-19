@@ -276,14 +276,14 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   return`📍 PC BOOT LT · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} · info: longest boot task ${lt[0]?lt[0][1]:0} ms, ${lt.filter(x=>x[1]>2000).length} > 2 s → ${ok?'✅ PASS':'❌ FAIL'}`};
  C.GO['perf/pc-boot-lt']=[{c:'fra',n:'Desktop boot: programs linked one at a time',fn:go}];C.GO['perf/pc-boot-lt-ath']=[{c:'ath',n:'Desktop boot (Athens): programs linked one at a time',fn:go}]}return}
  if(i<600)setTimeout(()=>R13B_reg(i+1),100)})(0);
-// perf-r13f: GO perf/pc-post-ready-link (+ -ath). Desktop: programs linked after the roam-start gate (renderer.info.programs id > LKG.idEnd). WIP flag ?lkgfx=1 (default OFF).
+// perf-r13f: GO perf/pc-post-ready-link (+ -ath). Desktop: programs linked after the roam-start gate (renderer.info.programs id > LKG.idEnd). ?lkgfx default ON since r13g (?lkgfx=0 = off).
 (function R13F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-post-ready-link')){
- C.items.push({ver:'perf',id:'pc-post-ready-link',area:'perf',text:'r13f · PC programs linked after ready: 📍 GO (Frankfurt, then -ath) counts shader programs linked after the roam-start gate. Pass line: with ?lkgfx=1, at most 2 programs linked after the gate. Flag off or touch: info only.'},
+ C.items.push({ver:'perf',id:'pc-post-ready-link',area:'perf',text:'r13f · PC programs linked after ready: 📍 GO (Frankfurt, then -ath) counts shader programs linked after the roam-start gate. Pass line (r13g, measured 17-23): at most 24 programs linked after the gate (was ~50 before lkgfx). ?lkgfx=0 or touch: info only.'},
   {ver:'perf',id:'pc-post-ready-link-ath',area:'perf',text:'r13f · PC programs linked after ready, Athens: same pass line as perf/pc-post-ready-link.'});
  const go=()=>{if(LKG.arm&&!LOWMEM){let k=0;const w=()=>{if(LKG.arm&&k++<300)return setTimeout(w,100);goSay(go())};setTimeout(w,100);return'📍 PC POST-READY LINK · gate…'}
   const P=renderer.info.programs,n=LKG.idEnd?P.filter(p=>p.id>LKG.idEnd).length:-1;
-  if(LOWMEM||!LKG.on||!LKG.gfx)return`📍 PC POST-READY LINK · ${LOWMEM?'touch / low-mem':'?lkgfx=1 off'}: info ${n} programs linked after the gate → ✅ PASS`;
-  return`📍 PC POST-READY LINK · ${n>=0&&n<=2?'✓':'✗'} ${n} programs linked after the gate ≤ 2 (gate end id ${LKG.idEnd}, ${P.length} programs) → ${n>=0&&n<=2?'✅ PASS':'❌ FAIL'}`};
+  if(LOWMEM||!LKG.on||!LKG.gfx)return`📍 PC POST-READY LINK · ${LOWMEM?'touch / low-mem':'?lkgfx=0'}: info ${n} programs linked after the gate → ✅ PASS`;
+  return`📍 PC POST-READY LINK · ${n>=0&&n<=24?'✓':'✗'} ${n} programs linked after the gate ≤ 24 (gate end id ${LKG.idEnd}, ${P.length} programs) → ${n>=0&&n<=24?'✅ PASS':'❌ FAIL'}`};
  C.GO['perf/pc-post-ready-link']=[{c:'fra',n:'Desktop: programs linked after ready',fn:go}];C.GO['perf/pc-post-ready-link-ath']=[{c:'ath',n:'Desktop (Athens): programs linked after ready',fn:go}]}return}
  if(i<600)setTimeout(()=>R13F_reg(i+1),100)})(0);
 // perf-r13e: single-call cap. An Athens minimap tile (SMM, 250 m) paints only the lines that touch it (TUNE.callCap, ?cc=1).

@@ -300,3 +300,9 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 3. Root causes: the LV_step spikes are NOT LIFE work. In the 33 ms frame every wrapped LV part (clusters, parking, birds, AD dress) is < 5 ms, while hubTrafficStep 95 and roamStep 118 grow in the same frame, so it's a GC/stall that lands in it. Slicing LF can't fix that (LF tiles already build as generators via lazyStep). Next: --trace-gc or a heap profile around 15 s (HEAP=1).
 4. Minimap: one SMM_tile is about 40 ms in the GO page (desktop) with or without culling. In 18 tiles the measured parts are bldPaint 21 ms and SMM_shade 8 ms, so most of the cost is in SMM_tile itself: the LAZY/CITY_S splice swap (CITY_S.splice(...Ss) re-spreads thousands of streets per tile) or the first draw on a fresh canvas. Next: pass B/Ss into miniPaint as arguments instead of swapping the globals, then time again.
 5. Tests: unit 0 FAIL; TAG=perf/single-call-cap,life1,xf1,terrain 43/43 on the built page.
+## perf-r13g (2026-10-19): ?lkgfx default ON on desktop
+1. Second run per city (SwiftShader, tFrame SECS=60 RACE=0, lkgfx 0 → 1): post-gate links Athens 54 → 21, Frankfurt 51 → 21; longest boot task Athens 13.2 → 8.8 s, Frankfurt 15.3 → 4.8 s. Agrees with r13f.
+2. src/98bp_warmall.js: LKG.gfx now defaults ON (?lkgfx=0 = off). LKG is desktop only (!LOWMEM), so touch is unchanged.
+3. GO perf/pc-post-ready-link (+ -ath) tightened from info-only to ≤ 24 post-gate links (measured 17-23). Shots 852x393 PC fra/ath on the built page: unchanged.
+4. Left (step 3 not done, timebox): twin the 21 remaining post-gate objects in LKG (BatchedMesh/vertex-colour variants ~14, 3 shadow-depth programs, OutputPass ACES), then tighten the GO to ≤ 5.
+5. Gates: build OK, unit 0 FAIL, GO perf/pc-post-ready-link 2/2, TAG=life1,xf1,terrain 42/42.

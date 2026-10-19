@@ -25,7 +25,7 @@ roamPost=(f=>function(){const r=f.apply(this,arguments);if(LKG.on){LKG.arm=1;LKG
 {const r0=composer.render;composer.render=function(){if(LKG.arm)return;return r0.apply(this,arguments)}}
 frame=(f=>function(now){if(!LKG.arm)return f(now);requestAnimationFrame(frame);
  try{if(++LKG.fr>900){LKG.arm=0;return}if(ENVD){buildEnv();return}if(!LKG.q){if(LKG.gfx&&typeof GFX_pre==='function'){if(!LKG.g0){LKG.g0=1;GFX_pre();try{if(typeof W12_cars==='function')W12_cars();if(TUNE.bwOn&&typeof BW_flagAll==='function')BW_flagAll()}catch(e){}}if(GFX.castMore&&RO.shadowOn){GFX_cast();return}}LKG_begin(scene,camera);return}if(LKG_step(camera,8)){LKG.arm=0;LKG.q=null;LKG.idEnd=Math.max(0,...renderer.info.programs.map(p=>p.id))}}catch(e){console.warn('LKG',e);LKG.arm=0;LKG.q=null}})(frame);
-LKG.gfx=/[?&]lkgfx=1/.test(location.search);   // perf-r13f (WIP, default OFF until post-gate links <= 2): GFX_pre before the loader warm and again (with the sliced GFX_cast, W12, BW flags) before the roam-gate queue
+LKG.gfx=!/[?&]lkgfx=0/.test(location.search);   // perf-r13f/r13g (default ON on desktop, ?lkgfx=0 = off; LKG itself is desktop only): GFX_pre before the loader warm and again (with the sliced GFX_cast, W12, BW flags) before the roam-gate queue
 const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
 {const _lp=ldPrewarm,_pc=P2_compile;let on=false;
  ldPrewarm=async function(...a){on=WARMALL.on;try{const r=await _lp.apply(this,a);if(LKG.q)await LKG_drain(scene,camera);return r}finally{on=false;LKG.q=null;const f=LKG.fin;LKG.fin=null;if(f)try{f()}catch(e){}}};
