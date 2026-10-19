@@ -38,6 +38,7 @@ function PB_tick(now){if(PB.q.length)PB_flush(now);if(PB.n>=PB.max)return;
    setTimeout(()=>{try{PB_post(PB_doc(S))}catch(e){}},0)}}
 // the GPU string (a GL query = a pipeline sync) is read once in the loader, not inside the 20 s frame
 {const _lp=ldPrewarm;ldPrewarm=async function(...a){try{PB_gpu()}catch(e){}return _lp.apply(this,a)}}
+try{PB_gpu()}catch(e){}   // perf-r13b: and once now, before any program is queued: in the loader that sync waited for every queued link (5.2 s Athens PC)
 // chip: fps (last ~1 s), p90 ms, tier, render scale, pixel ratio
 function PB_chipEl(){if(PB.chip)return PB.chip;const st=document.createElement('style');st.textContent='#pbChip{position:fixed;z-index:9989;left:50%;top:calc(1px + env(safe-area-inset-top,0px));transform:translateX(-50%);pointer-events:none;white-space:nowrap;font:700 12px/15px ui-monospace,monospace;color:#9fe8ff;background:rgba(0,0,0,.6);padding:1px 7px;border-radius:0 0 6px 6px}';document.head.appendChild(st);
   const el=document.createElement('div');el.id='pbChip';el.hidden=true;document.body.appendChild(el);return PB.chip=el}

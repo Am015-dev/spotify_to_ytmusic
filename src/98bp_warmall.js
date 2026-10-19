@@ -1,9 +1,33 @@
 // boot-2 (2026-10-18): the loader's program warm-up (ldPrewarm → P2_compile) used renderer.compile, which walks only VISIBLE objects, and LIFE built its
 // meshes on the first roam frame. So pooled/hidden meshes (LIFE batches, instanced pools, shown later) still linked their programs at 0.5-7 s of driving (85-250 ms frames).
 // Inside the loader: build LIFE now (lazy models/lx.js, if it has arrived) and compile with every object in the scene made visible for that one call.
+// perf-r13b (REVIEW_2K_13 N2): desktop q=high boot had 6-60 s long tasks (SwiftShader). P2_warm / P2_compile queued every program at once and, without
+// KHR_parallel_shader_compile, the next sync call (PB_gpu's getParameter, the first getUniforms or draw) waited for ALL of them in one task.
+// LKG compiles one program-distinct object at a time and links it (getUniforms) before the next, yielding every ~8 ms: in the loader (ldPrewarm), and in a
+// gate after roamPost that builds the environment and links what the first roam frame draws before it draws. Desktop only (touch keeps its path); ?lkg=0|1.
+const LKG={on:(()=>{const q=new URLSearchParams(location.search).get('lkg');return q?q==='1':!LOWMEM})(),q:null,i:0,ts:null,fin:null,arm:0,fr:0,n:0,steps:0,maxMs:0,lt:[]};
+try{new PerformanceObserver(l=>{for(const e of l.getEntries())if(LKG.lt.length<400)LKG.lt.push([Math.round(e.startTime),Math.round(e.duration)])}).observe({type:'longtask',buffered:true})}catch(e){}
+function LKG_begin(sc,cam){const Q=[],K=new Set(),add=o=>{const ms=[].concat(o.material||[]);if(!ms.length||o.isScene)return;const g=o.geometry,a=g&&g.attributes||{};
+  const k=ms.map(m=>m.id).join('.')+'|'+o.type+(o.instanceColor?'c':'')+(a.color?'v':'')+(a.uv1?'u':'')+(a.tangent?'t':'')+(g&&g.morphAttributes&&Object.keys(g.morphAttributes).length?'m':'');
+  if(!K.has(k)){K.add(k);Q.push(o)}};sc.traverse(add);
+ // compile(obj, cam, target) walks target's visible lights once per call: a light-only stand-in scene keeps that O(lights), not O(scene)
+ const L=[];sc.traverseVisible(o=>{if(o.isLight&&o.layers.test(cam.layers))L.push(o)});const T=new THREE.Scene();T.fog=sc.fog;T.environment=sc.environment;T.environmentIntensity=sc.environmentIntensity;
+ T.traverseVisible=f=>{for(const o of L)f(o)};LKG.q=Q;LKG.i=0;LKG.ts=T}
+function LKG_step(cam,bud){const R=renderer,t0=performance.now(),rt=R.getRenderTarget(),f=R.getActiveCubeFace(),l=R.getActiveMipmapLevel();R.setRenderTarget(composer.readBuffer);LKG.steps++;
+ try{while(LKG.i<LKG.q.length&&performance.now()-t0<bud){const o=LKG.q[LKG.i++],P=R.info.programs,n0=P.length,v=o.visible;o.visible=true;
+   try{R.compile(o,cam,LKG.ts)}catch(e){}finally{o.visible=v}
+   for(let j=n0;j<P.length;j++){try{P[j].getUniforms()}catch(e){}LKG.n++}}}
+ finally{R.setRenderTarget(rt,f,l)}const d=performance.now()-t0;if(d>LKG.maxMs)LKG.maxMs=d;return LKG.i>=LKG.q.length}
+async function LKG_drain(sc,cam){let k=0;while(LKG.q&&!LKG_step(cam,8)&&k++<3000)await nextFrame()}
+// the loader's mid-way whole-scene warm (hubEnter → P2_warm) only queued links for the next sync point: ldPrewarm links them one by one instead
+P2_warm=(f=>function(){if(LKG.on&&typeof state!=='undefined'&&state==='loading')return;return f.apply(this,arguments)})(P2_warm);
+roamPost=(f=>function(){const r=f.apply(this,arguments);if(LKG.on){LKG.arm=1;LKG.fr=0;LKG.q=null}return r})(roamPost);
+{const r0=composer.render;composer.render=function(){if(LKG.arm)return;return r0.apply(this,arguments)}}
+frame=(f=>function(now){if(!LKG.arm)return f(now);requestAnimationFrame(frame);
+ try{if(++LKG.fr>900){LKG.arm=0;return}if(ENVD){buildEnv();return}if(!LKG.q){LKG_begin(scene,camera);return}if(LKG_step(camera,8)){LKG.arm=0;LKG.q=null;LKG.idEnd=Math.max(0,...renderer.info.programs.map(p=>p.id))}}catch(e){console.warn('LKG',e);LKG.arm=0;LKG.q=null}})(frame);
 const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
 {const _lp=ldPrewarm,_pc=P2_compile;let on=false;
- ldPrewarm=async function(...a){on=WARMALL.on;try{return await _lp.apply(this,a)}finally{on=false}};
+ ldPrewarm=async function(...a){on=WARMALL.on;try{const r=await _lp.apply(this,a);if(LKG.q)await LKG_drain(scene,camera);return r}finally{on=false;LKG.q=null;const f=LKG.fin;LKG.fin=null;if(f)try{f()}catch(e){}}};
  P2_compile=function(sc,cam){if(!on)return _pc.call(this,sc,cam);on=false;
   try{const L=window.__life;if(L&&L.init&&L.LIFE&&L.LIFE.on)WARMALL.life=!!L.init()}catch(e){console.warn('warmall life',e)}
   // the outer land's ground material is only made by worldGroundGen after the first roam frame (98bt_boot2 slices): link a twin of it now (same params → same program)
@@ -28,4 +52,7 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
      const t=m.clone();t.onBeforeCompile=m.onBeforeCompile;t.customProgramCacheKey=m.customProgramCacheKey;t.userData={};if(sp)GFX_gspec(t);   // not disposed: that would release the warmed program
      const o=new THREE.Mesh(g,t);o.frustumCulled=false;o.receiveShadow=true;bt.add(o)}}sc.add(bt)}}catch(e){console.warn('warmall bw',e)}
   const hid=[];sc.traverse(o=>{if(!o.visible){o.visible=true;hid.push(o)}});WARMALL.n=hid.length;
-  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}if(lf){sc.remove(lf);lf.children[0].geometry.dispose();for(const o of lf.children)if(o.isInstancedMesh)o.dispose()}if(bt){sc.remove(bt);if(bt.children[0])bt.children[0].geometry.dispose()}if(bm){sc.remove(bm);XFB_MP.push(bm.material);bm.dispose()}}}}
+  const disp=()=>{if(gm)gm.geometry.dispose();if(lf){lf.children[0].geometry.dispose();for(const o of lf.children)if(o.isInstancedMesh)o.dispose()}if(bt&&bt.children[0])bt.children[0].geometry.dispose();if(bm){XFB_MP.push(bm.material);bm.dispose()}};
+  // perf-r13b: desktop queues the objects here and ldPrewarm (below) links them one at a time; the twins are compiled out of the scene and disposed after
+  if(LKG.on){try{LKG_begin(sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o)}LKG.fin=disp;return}
+  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o);disp()}}}

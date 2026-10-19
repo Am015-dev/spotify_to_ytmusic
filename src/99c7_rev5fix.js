@@ -266,3 +266,13 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   catch(e){R.push(['threw '+e,false])}finally{TOUCH.on=t0;TUNE.roamBudget=f0;RB.ms=m0;HT_cars=h0}
   const ok=R.every(r=>r[1]);return`📍 ROAM BUDGET · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R13D_reg(i+1),100)})(0);
+// perf-r13b (REVIEW_2K_13 N2): GO perf/pc-boot-lt (+ -ath). Desktop q=high: loader program links one at a time (LKG, src/98bp_warmall.js), first roam frame gated until linked.
+(function R13B_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-boot-lt')){
+ C.items.push({ver:'perf',id:'pc-boot-lt',area:'perf',text:'r13b · PC boot long tasks (review 13 N2: 59.6 s and 20.1 s tasks on desktop q=high): 📍 GO (Frankfurt, then -ath for Athens) reads the link log. Pass line: desktop links every loader / first-frame program one at a time (longest link step < 2 s on SwiftShader), the first-frame gate has finished, and the GPU string was read before any program was queued. Info: the longest boot task and its owner.'},
+  {ver:'perf',id:'pc-boot-lt-ath',area:'perf',text:'r13b · PC boot long tasks, Athens: same pass line as perf/pc-boot-lt.'});
+ const go=()=>{const L=LKG;if(L.arm&&!LOWMEM){let k=0;const w=()=>{if(LKG.arm&&k++<300)return setTimeout(w,100);LKG.arm=LKG.arm?-1:0;goSay(go())};setTimeout(w,100);return'📍 PC BOOT LT · linking…'}if(LOWMEM)return'📍 PC BOOT LT · low-mem / touch page: the one-at-a-time linker is desktop only (touch keeps its path) → ✅ PASS';
+  const R=[['desktop linker on',L.on],['roam-start gate done ('+L.fr+' frames)',!L.arm],['longest link step '+Math.round(L.maxMs)+' ms < 2000 ('+L.n+' programs, '+L.steps+' steps)',L.maxMs<2000],['GPU string read early',!!(PB&&PB.gpu)]];
+  const lt=L.lt.slice().sort((a,b)=>b[1]-a[1]),ok=R.every(r=>r[1]);
+  return`📍 PC BOOT LT · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} · info: longest boot task ${lt[0]?lt[0][1]:0} ms, ${lt.filter(x=>x[1]>2000).length} > 2 s → ${ok?'✅ PASS':'❌ FAIL'}`};
+ C.GO['perf/pc-boot-lt']=[{c:'fra',n:'Desktop boot: programs linked one at a time',fn:go}];C.GO['perf/pc-boot-lt-ath']=[{c:'ath',n:'Desktop boot (Athens): programs linked one at a time',fn:go}]}return}
+ if(i<600)setTimeout(()=>R13B_reg(i+1),100)})(0);
