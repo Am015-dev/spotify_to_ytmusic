@@ -750,6 +750,7 @@ const TUNE={callCap:0/* perf-r13e single-call cap: minimap tiles paint only what
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.125',date:'19 Oct 2026',items:[{t:'FIXED',s:'Phones: the first seconds of driving are smooth; the city finishes building under the loading screen instead of stuttering after you start.'},{t:'CHANGED',s:'Athens loads about 8 seconds faster on phones.'}]},
 {v:'v90m-beta.124',date:'19 Oct 2026',items:[{t:'FIXED',s:'Phones: Frankfurt no longer piles up memory in the first 30 seconds (two thirds less), so iPhones are much less likely to close the game.'}]},
 {v:'v90m-beta.123',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC: smoother start, with fewer graphics rebuilds and first-frame stalls after loading.'},{t:'FIXED',s:'Phones: lighter on memory while driving (pedestrians and city life churn less).'}]},
 {v:'v90m-beta.122',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC: no more long freezes in the first seconds of driving (worst frame in Athens down from about 1 s to under 0.15 s in tests).'},{t:'FIXED',s:'Phones: much less memory churn while driving (pedestrians, world updates), so fewer hiccups.'}]},
@@ -1575,7 +1576,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"29b0e06e","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"f840b77f"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"29b0e06e","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"dea9d92c"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -16448,12 +16449,14 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
   const disp=()=>{if(gm)gm.geometry.dispose();if(lf){lf.children[0].geometry.dispose();for(const o of lf.children)if(o.isInstancedMesh)o.dispose()}if(bt&&bt.children[0])bt.children[0].geometry.dispose();if(bm){XFB_MP.push(bm.material);bm.dispose()}};
   if(LKG.on){try{if(LKG.gfx&&typeof GFX_pre==='function')GFX_pre();LKG_begin(sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o)}LKG.fin=disp;return}
   try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o);disp()}}}
-const TWG={on:(q=>q?q==='1':false)(new URLSearchParams(location.search).get('twg')),n:(q=>q==null?12:+q|0)(new URLSearchParams(location.search).get('twgn')),lz:60,run:0,fr:-1,ms:0,nf:0,held:0,mm:0,mq:0,mms:0,mb:700,idle:(q=>q==null?0:+q|0)(new URLSearchParams(location.search).get('twgi'))};   // idle default 0: 8×50 ms only moved the GC (f48 → f41-44), see docs/HANDOFF_perf.md perf-r15e   // default OFF: target (no frame > 60 ms in f0-f120) not met yet, see docs/HANDOFF_perf.md
+const TWG={on:(q=>q?q==='1':matchMedia('(pointer:coarse)').matches)(new URLSearchParams(location.search).get('twg')),n:(q=>q==null?12:+q|0)(new URLSearchParams(location.search).get('twgn')),lz:60,run:0,fr:-1,ms:0,nf:0,held:0,mm:0,mq:0,mms:0,mb:700,idle:(q=>q==null?0:+q|0)(new URLSearchParams(location.search).get('twgi'))};   // idle default 0: 8×50 ms only moved the GC (f48 → f41-44), see docs/HANDOFF_perf.md perf-r15e   // perf-r15f: default ON on touch (pointer:coarse), ?twg=0|1 wins: JS max f0-f119 ≤ 80 ms in 2 runs/city once the far-street merge moved under the curtain
 if(TWG.on&&!/[?&]cc=0/.test(location.search))TUNE.callCap=1;
 function TWG_mini(cap){if(typeof SM_ON==='undefined'||!SM_ON||!MINI||!MINI.smm)return;const t0=performance.now();while(SMM.q.length&&performance.now()-t0<cap&&TWG.mms+performance.now()-t0<TWG.mb){const[a,b]=SMM.q.shift();SMM_tile(a,b);TWG.mm++}TWG.mq=SMM.q.length}
+TWG.wb=new URLSearchParams(location.search).get('twgwb')!=='0';TWG.wbMs=0;
 async function TWG_run(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)return;const t0=performance.now(),x=RO.x,z=RO.z,h=RO.h;TWG.run=1;const lo=LD.on;LD.on=false;   // frame() skips while LD.on; the #ld2 curtain itself stays up until roamLoad's ldHide
+ const wb=TWG.wb&&typeof WB_cityBuild==='function'?WB_cityBuild(.99,.99).catch(e=>{WBC.err=String(e);if(e!=='WBabort')console.warn('TWG wb',e)}):null;
  try{for(let i=0;i<TWG.n;i++){RO.v=0;await nextFrame();TWG.nf++;const tm=performance.now();try{TWG_mini(40)}catch(e){console.warn('TWG mini',e)}TWG.mms+=performance.now()-tm}
-  LD.on=lo;for(let i=0;i<TWG.idle;i++)await new Promise(r=>setTimeout(r,50))}catch(e){console.warn('TWG',e)}finally{TWG.run=0;LD.on=lo;RO.x=x;RO.z=z;RO.h=h;RO.v=0;TWG.fr=0;TWG.mms=Math.round(TWG.mms);TWG.ms=Math.round(performance.now()-t0)}}
+  LD.on=lo;if(wb){const tw=performance.now();await wb;TWG.wbMs=Math.round(performance.now()-tw)}for(let i=0;i<TWG.idle;i++)await new Promise(r=>setTimeout(r,50))}catch(e){console.warn('TWG',e)}finally{TWG.run=0;LD.on=lo;RO.x=x;RO.z=z;RO.h=h;RO.v=0;TWG.fr=0;TWG.mms=Math.round(TWG.mms);TWG.ms=Math.round(performance.now()-t0)}}
 {const r0=composer.render;composer.render=function(){if(TWG.run)return;return r0.apply(this,arguments)}}
 frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;return f(now)})(frame);
 {const _ls=lazyStep;lazyStep=function(){if(TWG.fr>=0&&TWG.fr<=TWG.lz){TWG.held++;return}return _ls.apply(this,arguments)}}
