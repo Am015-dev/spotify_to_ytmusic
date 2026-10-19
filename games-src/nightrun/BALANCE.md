@@ -231,3 +231,13 @@ every weapon (the weapon did not matter: enemies hardly threaten a ship that kee
   tutorial/lab/god mode. A 45 px sidestep or a dash clears it; the rest of the screen is free.
 - Homing (S2 steer): every tier now uses the hard tiers' narrow cone (.7 rad) and reach (300 px), so missiles need the ship pointed at a target.
 - Test bots see the lane (`MM.cost(x)`) like STILL.beam and the boss telegraphs: balance-test dec()/camp(), afk-test bot.
+
+## Enemies that react (parts/react.js, flag RET.react, ?react=0 = old fixed paths and timers; 19 Oct 2026)
+- Brains on drones, flankers, turrets, gunships (formation path units get fire brains only; zoo kinds, ground units, bosses, tutorial untouched):
+  HUNT (leads PV), FEINT (tell, cancel '?', slide to the other side, real shot), RETREAT (backs off when you close in, then a dive with a dashed-line tell),
+  PRESS (fills the half you hug), BAIT (holds fire until you cross a lane, then shoots where the dodge goes), WINDOW (steel ring: shots bounce off except 1 s after it fires).
+- Squads (spawned on one frame): PIN + EXIT pair (same tell; exit line >= 114 px from the pin line, far side open), LEADER (crown, 1.5x HP; death = 3 s ENRAGED, faster cycle, same tells), shield BEARER (covers a turret/gunship from the ship's line; flank it).
+- Parking on a gun's line for 0.6 s cuts its cooldown (still a full tell). Fire periods = the old mean periods x (1 +-25%), shots land on a beat; tells >= 0.6 s; at most 3 tells at once on Normal (2 Easy, 4 Hard+). Easy: no squads, no BAIT/WINDOW/RETREAT.
+- Per-run seed (daily/weekly runs: fixed seed from the date; ?rseed=N forces one; ?rxs=<state> forces a state for tests).
+- react-test (stage 7, 5 attempts, same dice): enemy position gap between attempts 10.3 -> 40.0 px, fire-time spread 0.96 -> 5.06 s.
+  Normal stages 3/7/12 x6: dodging bot 89%, tracker bot 11%. Escape gap min 116 px, tells min 0.61 s, flag off = identical to the page without react.js.
