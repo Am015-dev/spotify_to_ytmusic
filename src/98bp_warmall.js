@@ -18,5 +18,12 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
   let lf=null;try{if(typeof LF!=='undefined'&&LF.on&&typeof LF_mats==='function'){const M=LF_mats(),g=new THREE.BoxGeometry(.1,.1,.1);g.setAttribute('color',new THREE.Float32BufferAttribute(new Array(g.attributes.position.count*3).fill(1),3));lf=new THREE.Group();
    for(const k of['def','tuft','pond']){const m=new THREE.InstancedMesh(g,M[k],1);m.setMatrixAt(0,new THREE.Matrix4());m.setColorAt(0,new THREE.Color());m.frustumCulled=false;m.receiveShadow=true;lf.add(m)}
    if(typeof LF_patchMat==='function'){const pm=new THREE.Mesh(g,LF_patchMat());pm.frustumCulled=false;pm.receiveShadow=true;lf.add(pm)}sc.add(lf)}}catch(e){console.warn('warmall lf',e)}
+  // perf-r12b (N5): the hub glass (HUB.BM.glass, BW key bw3) first drew on a ground-like mesh at f239 of driving (85-367 ms link): the warm had only the bw1 twin.
+  // Flag now (WB_cityPre would on the first roam frame) and twin every hub building material as is, and with the ground spec GFX_plastic may add later.
+  let bt=null;try{if(typeof HUB!=='undefined'&&HUB.BM&&typeof BW_flag==='function'){if(typeof TUNE!=='undefined'&&TUNE.bwOn&&typeof BW_flagAll==='function')BW_flagAll();
+   const g=new THREE.BufferGeometry();for(const[k,n]of[['position',3],['normal',3],['uv',2],['color',3]])g.setAttribute(k,new THREE.Float32BufferAttribute(new Array(n*3).fill(0),n));bt=new THREE.Group();
+   for(const k in HUB.BM){const m=HUB.BM[k];if(!m||!m.isMeshStandardMaterial)continue;for(const sp of[0,1]){if(sp&&(m.userData.gfxSpec||typeof GFX_gspec!=='function'))continue;
+     const t=m.clone();t.onBeforeCompile=m.onBeforeCompile;t.customProgramCacheKey=m.customProgramCacheKey;t.userData={};if(sp)GFX_gspec(t);   // not disposed: that would release the warmed program
+     const o=new THREE.Mesh(g,t);o.frustumCulled=false;o.receiveShadow=true;bt.add(o)}}sc.add(bt)}}catch(e){console.warn('warmall bw',e)}
   const hid=[];sc.traverse(o=>{if(!o.visible){o.visible=true;hid.push(o)}});WARMALL.n=hid.length;
-  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}if(lf){sc.remove(lf);lf.children[0].geometry.dispose();for(const o of lf.children)if(o.isInstancedMesh)o.dispose()}if(bm){sc.remove(bm);XFB_MP.push(bm.material);bm.dispose()}}}}
+  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}if(lf){sc.remove(lf);lf.children[0].geometry.dispose();for(const o of lf.children)if(o.isInstancedMesh)o.dispose()}if(bt){sc.remove(bt);if(bt.children[0])bt.children[0].geometry.dispose()}if(bm){sc.remove(bm);XFB_MP.push(bm.material);bm.dispose()}}}}
