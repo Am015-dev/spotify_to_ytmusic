@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.122',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC: no more long freezes in the first seconds of driving (worst frame in Athens down from about 1 s to under 0.15 s in tests).'},{t:'FIXED',s:'Phones: much less memory churn while driving (pedestrians, world updates), so fewer hiccups.'}]},
 {v:'v90m-beta.121',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC: far fewer graphics rebuilds right after loading, so the first seconds of driving are smoother.'}]},
 {v:'v90m-beta.120',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC loading no longer freezes for seconds while it prepares graphics: they now load one at a time.'}]},
 {v:'v90m-beta.119',date:'19 Oct 2026',items:[{t:'FIXED',s:'Athens sky is blue again on phones (it could turn black on the low-memory setting).'},{t:'CHANGED',s:'Deeper LEGO-blue sky over Frankfurt.'}]},
