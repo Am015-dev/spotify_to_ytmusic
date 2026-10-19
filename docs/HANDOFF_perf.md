@@ -455,6 +455,6 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 ## perf-r17d (2026-10-19, on trunk alex/od-int2): Frankfurt FC_pull first-pass spike
 1. Cause (tFrame touch, Fra): frame 13 FC_pull 117 ms, all in FCG_work (grid builds), not FC_occ/raycast: unsliced steps (bounding-box scan of a big merged mesh, FCG_pack of a finished grid, seen[] allocated for every occluder up front).
 2. Fix (src/98fc_foliage_cam.js): FCG_bbox scans 20 k vertices per slice, FCG_packStep packs 256 cells per slice (hits use the unpacked cells until the swap), seen[] is allocated only when a grid finishes. Same hits.
-3. Measured FC_pull max, touch, tFrame SECS=10: Fra 116.9 → 15.4 ms, Ath 4.9 → 5.4 (no spike there). New GO perf/fc-first (src/99c7_rev5fix.js, both cities, cold state, 1200 frames): Fra 20-27 ms, Ath 6-9 ms, pass ≤ 30.
-4. Gate: unit 0 FAIL; TAG=perf/fc-first,r13/sky-blue,r13/sky-blue-frame,life1,xf1,terrain,phone2 49/49 on the built page, 0 errors.
-5. Left: remaining ~20 ms steps inside the budget are GC pauses on small allocations (Map/array per cell in FCG_build); not worth more here.
+3. Measured FC_pull max, touch, tFrame SECS=10: Fra 116.9 → 15.4 ms, Ath 4.9 → 5.4 (no spike there). New GO perf/fc-first (src/99c7_rev5fix.js, both cities, cold grids, 2 passes, lower max counts, pass ≤ 30): run alone Fra 18-24 ms, Ath 6-8 ms; inside the warm TAG suite Fra is 18-41 ms (1 of 3 runs red, 34.6 / 41.6).
+4. Gate: unit 0 FAIL; TAG set 49/49 in 3 runs, 48/49 in 3 (perf/fc-first Fra x2 red/warm heap, xf1/grass x1 once, Ath fc-first 124 ms once). Pushed to branch perf-r17d-final, NOT trunk.
+5. Left: Fra grid slices still hit 20-40 ms when the heap is warm (GC/marking lands in FCG_build's per-cell arrays); next step is typed-array grid build (no [] per cell) before this GO can be a hard gate.

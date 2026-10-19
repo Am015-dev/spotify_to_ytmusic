@@ -46,13 +46,13 @@ function FCG_build(g,e,t0){const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0
     const x0=Math.floor(Math.min(A[0],B[0],C[0])/cs),x1=Math.floor(Math.max(A[0],B[0],C[0])/cs),z0=Math.floor(Math.min(A[2],B[2],C[2])/cs),z1=Math.floor(Math.max(A[2],B[2],C[2])/cs);
     if((x1-x0+1)*(z1-z0+1)>256){e.bigT.push(k);continue}   // huge triangles (ground sheets): tested on every ray
     for(let x=x0;x<=x1;x++)for(let z=z0;z<=z1;z++){const kk=(x+32768)*65536+(z+32768);let L=M.get(kk);if(!L){M.set(kk,L=[]);e.tot++}L.push(k);e.tot++}
-    if((k&511)===511&&performance.now()-t0>FCG.ms)return}
+    if((k&63)===63&&performance.now()-t0>FCG.ms)return}
   e.seen=new Uint32Array(e.n);e.done=true;FCG.st.built++;FCG.st.tris+=e.n;if(MEMC_ON)FCG.pq.push(e)}
 // perf-r15c: a finished grid is packed into one Int32Array ([count, tri...] per cell; the Map keeps the start offset): one small JS array per 8 m cell was ~26 MB of
 // retained heap after 30 s of Frankfurt roam (216 k cells, 1.1 M entries). Same cells, same triangle order, same hits.
 // perf-r17d: the pack runs in slices inside the FCG.ms budget (one big mesh was a 47 ms step; the first Frankfurt pass hit 117 ms with every occluder's seen[] allocated up front); hits use the unpacked cells until the swap.
 function FCG_packStep(t0){const q=FCG.pq;while(q.length){const e=q[0],P=e.pk||(e.pk={it:e.cells.entries(),I:new Int32Array(e.tot),M:new Map(),o:0});
-  for(let j=0;j<256;j++){const nx=P.it.next();if(nx.done){e.cells=P.M;e.I=P.I;e.pk=null;q.shift();break}const k=nx.value[0],L=nx.value[1];P.M.set(k,P.o);P.I[P.o++]=L.length;for(let i=0;i<L.length;i++)P.I[P.o++]=L[i]}
+  for(let j=0;j<64;j++){const nx=P.it.next();if(nx.done){e.cells=P.M;e.I=P.I;e.pk=null;q.shift();break}const k=nx.value[0],L=nx.value[1];P.M.set(k,P.o);P.I[P.o++]=L.length;for(let i=0;i<L.length;i++)P.I[P.o++]=L[i]}
   if(performance.now()-t0>FCG.ms)return}}
 // perf-r17d: the bounding box of a big merged mesh is scanned 20 k vertices at a time inside the budget (same box as GFX_bbox)
 function FCG_bbox(g,e,t0){const p=g.attributes.position,a=p.array;if(p.isInterleavedBufferAttribute||!(a instanceof Float32Array)||p.itemSize!==3||p.normalized||g.morphAttributes.position||a.length<p.count*3){GFX_bbox(g);return true}
