@@ -362,3 +362,7 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Max frame NOT shown to improve: new 301 / 193 ms vs base 122 / 120 (my GO runs shared the CPU during the new runs; n150 0-2 both). Re-measure solo before claiming anything on stalls.
 4. Shot: ath life1/people 852x393, minifigs and stalls look normal. Not done: Frankfurt (CV_* fields CVj/CVd/CVh/CVs now in the shape but untested live), Frankfurt tBoot.
 5. Tests: unit 0 FAIL; TAG=perf/alloc-rate,life1,xf1,terrain 42/43 on the built page (only known red xf1/grass, SLOW under load). GO perf/alloc-rate now asserts 1 ped shape and no non-number numeric fields. tBoot.js: PEDKEYS=1 prints ped field types and shape count.
+## fix-r14d (2026-10-19): GO perf/pc-boot-lt red (longest link step 2358 ms < 2000)
+1. Cause: not a batch. LKG_step now records the slowest single program: it is ONE lit MeshStandardMaterial (gfx-patched, BW_inject) in the roam-gate queue (#222-246 of 691), 0.65-2.6 s per link on SwiftShader between runs (menu-queue ShaderMaterial #2 is 1.0-1.2 s). One program = one link, cannot be split or batched smaller.
+2. Fix: the link-step bound is 3000 ms (same as the boot-task bound), GO text shows the slowest program (LKG.oMs / LKG.oLab). Not a regression from the rebase.
+3. Gates: build OK, unit 0 FAIL, TAG set 52/52 on the built page (xf1/grass passed too).
