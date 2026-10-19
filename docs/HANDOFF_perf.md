@@ -464,3 +464,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Measured FC_pull max, touch, tFrame SECS=10: Fra 116.9 → 15.4 ms, Ath 4.9 → 5.4 (no spike there). New GO perf/fc-first (src/99c7_rev5fix.js, both cities, cold grids, 2 passes, lower max counts, pass ≤ 30): run alone Fra 18-24 ms, Ath 6-8 ms; inside the warm TAG suite Fra is 18-41 ms (1 of 3 runs red, 34.6 / 41.6).
 4. Gate: unit 0 FAIL; TAG set 49/49 in 3 runs, 48/49 in 3 (perf/fc-first Fra x2 red/warm heap, xf1/grass x1 once, Ath fc-first 124 ms once). Pushed to branch perf-r17d-final, NOT trunk.
 5. Left: Fra grid slices still hit 20-40 ms when the heap is warm (GC/marking lands in FCG_build's per-cell arrays); next step is typed-array grid build (no [] per cell) before this GO can be a hard gate.
+## perf-r17f (2026-10-19): bhs NOT default ON · deliverable NOT met (50 ms goal) · GO perf/pc-bhs added
+1. Measured buildHubG max gap (tFrame bhs=1): Frankfurt 1512 → 1217 ms (rfGrid at 'start'; the skyline gap 1001 → ~430 by building the LEGO set variants one per step, 'ctbK'), Athens 1277 → 1277 (post steps bhp49s/bhp50/post+ 0.9-1.3 s, streets 0.8, olive trees 0.8). 26 gaps still > 50 ms in fra.
+2. Change (bhs only): BH_due slice 400 → 35 ms (?bhms=N), CTB_kind prebuild per variant, BS.L records gaps > 50 ms. tFrame PF1BHS prints the top 14. GO perf/pc-bhs (+ -ath) is a < 1500 ms guard with ?bhs=1, info when off.
+3. Tried and reverted: rfGrid as a generator (yields inside) broke terr1/terr5 terrain-grade/edge/flush/sky/crown on fra (re-entrancy / order); needs a non-generator slicing (e.g. cache per grid) with the terrain GO as check.
+4. Left for 50 ms: rfGrid, Athens post steps (AS_apply, CE_streets, DR_solid), gndBuild 340 ms, CTB_kind 130-430 ms, bt.flush 160.
+5. Gate (DESKTOP=1, built): unit 0 FAIL; the 8 TAG sets 48/51, reds xf1/grass+slope SLOW and terrain-tyre-ath = known trunk reds.

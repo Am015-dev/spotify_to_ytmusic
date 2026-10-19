@@ -452,3 +452,12 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
    const S=T.slice().sort((a,b)=>a-b),mx=Math.min(M2[0],M2[1]),ok=mx<=30;window.__chk.fcFirst=window.__chk.fcFirst||{};window.__chk.fcFirst[c]=+mx.toFixed(1);
    return`📍 FC COLD START · ${c==='fra'?'Frankfurt':'Athens'}: slowest of ${T.length} FC_pull frames ${mx.toFixed(1)} ms (≤ 30; passes ${M2.map(x=>x.toFixed(1)).join(' / ')}), p99 ${S[Math.floor(S.length*.99)].toFixed(1)} ms, grids built ${FCG.st.built}; slowest at frame ${mxi}, of it grid work ${mxw.toFixed(1)} ms → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
  if(i<600)setTimeout(()=>R17D_reg(i+1),100)})(0);
+
+// perf-r17f: GO perf/pc-bhs (+ -ath). buildHubG gap = time between two yields (window.__bhSt, src/72). bhs (?bhs=1, default OFF): both cities < 1500 ms (r17f measured fra 1217 = rfGrid at 'start', ath 1277; was 1512 / 1277). Info: steps over 50 ms. Off: info only.
+(function R17F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-bhs')){
+ C.items.push({ver:'perf',id:'pc-bhs',area:'perf',text:'r17f · PC boot slicing (bhs): 📍 GO reads the longest gap between two buildHubG yields. Pass line with ?bhs=1: longest gap < 1500 ms (a regression guard: fra 1217 ms is rfGrid, ath 1277 ms is the post steps). Info: steps > 50 ms (the 50 ms goal is NOT met). bhs stays default OFF.'},
+  {ver:'perf',id:'pc-bhs-ath',area:'perf',text:'r17f · PC boot slicing, Athens: same as perf/pc-bhs.'});
+ const go=()=>{const S=window.__bhSt,m=S?Math.round(S.max):-1,n=S?S.L.filter(x=>x[0]>50).length:0,lim=1500;if(!BHQ.en)return`📍 PC BHS · bhs is OFF (default; ?bhs=1 turns it on): longest buildHubG gap ${m} ms, ${n} gaps > 50 ms (info) → ✅ PASS`;
+  const ok=m>=0&&m<lim;return`📍 PC BHS · ${ok?'✓':'✗'} longest buildHubG gap ${m} ms (${S&&S.lab}) < ${lim} · info: ${n} gaps > 50 ms (goal 0, not met) → ${ok?'✅ PASS':'❌ FAIL'}`};
+ C.GO['perf/pc-bhs']=[{c:'fra',n:'Desktop boot slicing (buildHubG gaps)',fn:go}];C.GO['perf/pc-bhs-ath']=[{c:'ath',n:'Desktop boot slicing (Athens)',fn:go}]}return}
+ if(i<600)setTimeout(()=>R17F_reg(i+1),100)})(0);
