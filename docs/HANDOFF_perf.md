@@ -266,3 +266,10 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 3. tFrame TOUCH=1 QS=lowmem=1 SECS=30, max frame / n50: before fra 272/16, 502/4; ath 279/28, 346/29 (freeze 238-502 ms at f689-713). After: fra 163/24, 101/10 (worst LIFE frame 109); ath 258/46, 170/47 (worst LIFE frame 141-176; the other big frames are hubCullStep/pedStep at f259/1403).
 4. Left: Athens turbine stage alone is 105-158 ms. Splitting it into base/rotor frames was tried and reverted (the merge stage hit 327 ms, likely GC). Next: pre-build the turbine LD in the loader for LOWMEM too, or merge it over more frames. Goal (<120 ms) met in fra, not yet in ath.
 5. Gate: build OK, unit 0 FAIL, TAG life1,xf1,terrain,phone2,perf17,r11c 47/48; perf17/stream#1 (ath) red in the full set but passes alone on both trunk and this build (timing flake).
+
+## perf-r13a (2026-10-19) · review 13 N1, hubTrafficStep hitches · flag TUNE.htFar (default OFF)
+1. Change: on touch/LOWMEM with TUNE.htFar=1, cars > 120 m step every 4th frame (summed dt); past 24 car steps per frame, cars > 60 m wait (the start index rotates); LV_step waits ≤ 2 frames when the streets already took > 14 ms. Files: 70_roam_world.js HT_cars/HT_lo, 98l_lively.js, GO perf/traffic-hitch in 99c7.
+2. Split (tBoot ath lowmem, WRAP): there is no single owner. A > 50 ms streets frame is hubCullStep 17-35 + LV_step 6-34 + HT_cars 8-18 + pedStep 6-13 + L3_guard 5-10 ms; HT_cars alone is never > 18 ms.
+3. Measured hubTrafficStep-self frames > 50 ms: base 17 and 16 (sequential runs), flag ON 24 (sequential); side by side under load: base 57 vs flag 35 (jsn50 94 vs 67). The GO in a warm page shows a mean streets frame of 10.4 vs 10.1 ms. Target (≤ 10 or halved) NOT met, so the flag stays OFF.
+4. Next: the spikes are coincident periodic work, so a frame budget is needed across hubCullStep, LV_step and pedStep (spread their heavy passes onto different frames), not per-car LOD. Start with hubCullStep, the biggest single sub.
+5. Tests: unit 0 FAIL; TAG=perf/traffic-hitch,life1,xf1,terrain 43/43 on the built page.

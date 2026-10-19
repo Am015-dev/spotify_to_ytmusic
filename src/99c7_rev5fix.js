@@ -235,3 +235,16 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   finally{g.upW0=u0;g.pt=pt0;RS11(o)}
   const ok=R.every(r=>r[1]);return`📍 GOV CLIMB · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R11D_reg(i+1),100)})(0);
+
+// perf-r13a (review 13 N1): on touch/LOWMEM traffic > 120 m away steps every 4th frame (summed dt) and LIFE waits up to 2 frames after a long streets frame (TUNE.htFar).
+(function R13A_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='traffic-hitch')){C.items.push({ver:'perf',id:'traffic-hitch',area:'perf',text:'perf-r13a · traffic hitch: 📍 GO forces the touch profile in Athens and steps the streets 240 frames. Pass line: cars > 120 m away step ≈ 1 frame in 4 and still move, past 24 car steps a frame cars > 60 m wait a frame, ≤ 2 streets frames > 50 ms after a 30-frame warm-up and the mean streets frame no more than 10 % above the flag-off run (TUNE.htFar, default OFF; the real metric is tools/perf1/tBoot.js PF1OWN>50).'});
+ C.GO['perf/traffic-hitch']=[{c:'ath',n:'far traffic at 1/4 rate, near traffic every frame, no streets hitch',fn:()=>{const t0=TOUCH.on,h0=TUNE.htFar,R=[];try{TOUCH.on=true;TUNE.htFar=1;const C=HUB.cars||[],ok=c=>!(c.dead>0)&&!c.route&&!c.pk&&!c.tr&&c.x!=null,far=c=>ok(c)&&(c.x-RO.x)**2+(c.z-RO.z)**2>14400;
+   const F=C.filter(far),P=F.map(c=>[c.a,c.b,c.t]),n=[];let nNear=0,nFar=0,long=0,mx=0;
+   for(let k=0;k<240;k++){nNear+=C.filter(c=>!(c.dead>0)&&!far(c)).length;nFar+=C.filter(far).length;const s=performance.now();hubTrafficStep(1/60);const ms=performance.now()-s;if(k>=30){mx=Math.max(mx,ms);if(ms>50)long++}n.push(HUB.htN);if(k===7)R.push(['far cars moved in 8 frames '+F.filter((c,j)=>c.a!==P[j][0]||c.b!==P[j][1]||c.t!==P[j][2]).length+'/'+F.length,F.length>0&&F.filter((c,j)=>c.a!==P[j][0]||c.b!==P[j][1]||c.t!==P[j][2]).length>=F.length*.8])}
+   const avg=n.reduce((a,b)=>a+b,0)/n.length,near=nNear/240,fa=nFar/240;
+   R.push(['car steps/frame '+avg.toFixed(1)+' (cars within 120 m '+near.toFixed(1)+', beyond '+fa.toFixed(1)+'; cap 24 past 60 m)',avg>=Math.min(near,24)-1&&avg<=Math.max(24,near)+fa*.35+1]);
+   const AB=f=>{TUNE.htFar=f;let l=0,sm=0;for(let k=0;k<270;k++){const s=performance.now();hubTrafficStep(1/60);const ms=performance.now()-s;if(k>=30){sm+=ms;if(ms>50)l++}}return[l,sm/240]},off=AB(0),on=AB(1);
+   R.push(['streets frames > 50 ms after a 30-frame warm-up: '+on[0]+'/240 with, '+off[0]+'/240 without (mean '+on[1].toFixed(1)+' vs '+off[1].toFixed(1)+' ms, LIFE deferred '+(LV.nDef|0)+')',on[0]<=2&&on[1]<=off[1]*1.1])}
+  catch(e){R.push(['threw '+e,false])}finally{TOUCH.on=t0;TUNE.htFar=h0}
+  const ok=R.every(r=>r[1]);return`📍 TRAFFIC HITCH · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R13A_reg(i+1),100)})(0);
