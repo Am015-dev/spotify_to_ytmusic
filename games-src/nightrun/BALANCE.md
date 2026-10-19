@@ -225,8 +225,8 @@ Owner: "there are weapons like swarm that I can win the game without moving on N
 mid + max builds, every weapon paired with the homing Swarm; bots: park = never moves, hop = 48 px every 1.5 s blind to bullets, track = lines up
 with the nearest foe and never dodges). Before: park and hop already died (h.js static discharge, ~25 s); **track cleared 60%** of stages >= 3 with
 every weapon (the weapon did not matter: enemies hardly threaten a ship that keeps its x). After: track 0-10% per weapon, park/hop 0%.
-- Column strike (`parts/fair.js` D, object `MM`): a ship whose x stays inside 70 px for `MM.win()` s (Easy 5, Normal 4, Hard 3.4, VH 3.2, Legend 3)
-  gets a vertical lane on its x: pulses `MM.tel()` s (Easy 1.1 .. Legend .7, always >= .6), fires .25 s, 1 hull (2 from the third strike in a row
+- Column strike (`parts/fair.js` D, object `MM`): a ship whose x stays inside 70 px for `MM.win()` s (Easy 5, Normal 3.5, Hard 3.2, VH 3, Legend 2.8)
+  gets a vertical lane on its x: pulses `MM.tel()` s (Easy 1.1 .. Legend .7, always >= .6), fires .25 s, 1 hull (2 from the second strike in a row
   unless the ship really moved 140 px; Easy always 1). 1.6 s pause between strikes (Easy 2.4). Story stage >= 3, endless after 20 s, not in
   tutorial/lab/god mode. A 45 px sidestep or a dash clears it; the rest of the screen is free.
 - Homing (S2 steer): every tier now uses the hard tiers' narrow cone (.7 rad) and reach (300 px), so missiles need the ship pointed at a target.

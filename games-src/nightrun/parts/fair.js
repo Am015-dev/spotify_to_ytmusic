@@ -57,11 +57,11 @@ window.__s2={S2,CAMP,B2};
 /* D. must move (flag RET.mustmove, ?mustmove=0 = before; BALANCE.md "Must move"). Owner, 19 Oct 2026: on Normal a ship that only lines up with the next foe
    and never dodges cleared most stages with any weapon (mustmove-test.js 'track': 60%). A ship that keeps its x inside 70 px for MM.win() seconds gets a COLUMN
    STRIKE: a vertical lane locks on its x, pulses for MM.tel() s (>= .6), then fires for .25 s. One sidestep of ~45 px (or a dash) clears it, the rest of the
-   screen stays free, so a moving ship is never hit. Strikes repeat while the ship stays in the column zone and hit harder from the third one on.
+   screen stays free, so a moving ship is never hit. Strikes repeat while the ship stays in the column zone and hit harder from the second one on.
    Homing on Normal and Easy also gets the narrower cone and shorter reach of the hard tiers: a missile needs the ship to point at its target. */
 if(RET.mustmove===undefined)RET.mustmove=!/[?&]mustmove=0/.test(location.search);
 const MM=window.MM={get on(){return!!RET.mustmove;},COL:24,buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0,
-  win(){return{easy:5,normal:4,hard:3.4,vhard:3.2,legend:3}[SET.diff]||4;},
+  win(){return{easy:5,normal:3.5,hard:3.2,vhard:3,legend:2.8}[SET.diff]||4;},
   tel(){return{easy:1.1,normal:.95,hard:.8,vhard:.75,legend:.7}[SET.diff]||.95;},
   live(){return this.on&&G.live&&!G.dead&&G.transT<0&&!G.lab&&!G.tut&&!SH.active&&!ST.over&&!G.over&&!godMode&&(ST.on?ST.n>=3:G.t>20);},
   cost(x){const c=this.col;return c&&Math.abs(x-c.x)<this.COL+30?(c.fire>0||c.t<.4?6000:1500):0;}};   // for test bots: the lane as a player sees it
@@ -72,7 +72,7 @@ NR.on('tick',dt=>{if(!MM.live()){MM.col=null;MM.buf=[];MM.n=0;return;}
   const c=MM.col;if(c){c.t-=dt;if(c.t<=0&&!c.fire&&!c.done){c.fire=.25;AU.sfx('big');shake(4);}
     if(c.fire>0){c.fire-=dt;if(!c.hit&&Math.abs(P.x-c.x)<MM.COL){c.hit=1;MM.hits++;hurt(c.dmg);}if(c.fire<=0){c.done=1;MM.col=null;MM.cd=SET.diff==='easy'?2.4:1.6;}}return;}
   MM.cd-=dt;if(MM.cd>0||MM.buf.length<k||hi-lo>=70)return;
-  MM.n++;MM.strikes++;MM.col={x:P.x,t:MM.tel(),fire:0,hit:0,dmg:MM.n>=3&&SET.diff!=='easy'?2:1};AU.sfx('warn');
+  MM.n++;MM.strikes++;MM.col={x:P.x,t:MM.tel(),fire:0,hit:0,dmg:MM.n>=2&&SET.diff!=="easy"?2:1};AU.sfx('warn');
   if(MM.strikes===1)floater(P.x,P.y-44,'SIDESTEP!','#ff6a7a');});
 {const dp=drawPickups;drawPickups=function(t){dp(t);const c=MM.col;if(!c||G.dead)return;const w=MM.COL;
   ctx.save();ctx.globalCompositeOperation='lighter';

@@ -750,6 +750,7 @@ const TUNE={callCap:0/* perf-r13e single-call cap: minimap tiles paint only what
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.127',date:'19 Oct 2026',items:[{t:'NEW',s:'Phone reports: the Beta now tells us when a game starts, when it freezes for over a second, and when iPhone closed the page'},{t:'CHANGED',s:'Athens phone traffic checked: no stutter when you start driving'}]},
 {v:'v90m-beta.126',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC: almost no graphics are built after loading any more, so the first seconds of driving stay smooth.'}]},
 {v:'v90m-beta.125',date:'19 Oct 2026',items:[{t:'FIXED',s:'Phones: the first seconds of driving are smooth; the city finishes building under the loading screen instead of stuttering after you start.'},{t:'CHANGED',s:'Athens loads about 8 seconds faster on phones.'}]},
 {v:'v90m-beta.124',date:'19 Oct 2026',items:[{t:'FIXED',s:'Phones: Frankfurt no longer piles up memory in the first 30 seconds (two thirds less), so iPhones are much less likely to close the game.'}]},
@@ -1577,7 +1578,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"29b0e06e","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"f9a8d3cf"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"29b0e06e","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"f365690e"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -15640,7 +15641,25 @@ function PB_chipStep(now,ms){const el=PB_chipEl();if(!SET.fpsChip){if(!el.hidden
   const a=PB.cf.splice(0).sort((x,y)=>x-y),avg=a.length?a.reduce((s,x)=>s+x,0)/a.length:0;el.hidden=false;
   el.textContent=`${avg?Math.round(1000/avg):0} fps · p90 ${Math.round(PB_q(a,.9))} ms · ${GOV.on?'auto ':''}${LK_LV[Math.min(3,GOV.d)]||SET.q} · ×${(DRES.s||1).toFixed(2)} · pr ${renderer.getPixelRatio().toFixed(2)}`}
 function PB_toggleChip(){SET.fpsChip=!SET.fpsChip;saveSet();PB.ct=0;PB_chipStep(performance.now(),0);}
-{const _fr=frame;frame=function(now){const a=performance.now();PB.child=0;const ms=PB.last?now-PB.last:0;PB.last=now;_fr(now);
+PB.on=!/[?&]pbb=0/.test(location.search);PB.booted=0;PB.fz=0;PB.hb=0;PB.hw=0;PB.hid=0;PB.t1=0;PB.HK='od_pb_hb';
+const PB_play=()=>!paused&&!document.hidden&&!LD.on&&(state==='roam'||state==='race'||state==='countdown');
+function PB_ri(){try{const i=renderer.info,m=i.memory||{};return{geo:m.geometries,tex:m.textures,prog:i.programs?i.programs.length:0,calls:i.render&&i.render.calls,tris:i.render&&i.render.triangles}}catch(e){return null}}
+function PB_heap(){try{const M=performance.memory;if(M)return{usedMB:Math.round(M.usedJSHeapSize/1048576),limitMB:Math.round(M.jsHeapSizeLimit/1048576)}}catch(e){}return null}
+function PB_base(kind){let ifr=false;try{ifr=window.self!==window.top}catch(e){ifr=true}
+  return{kind,at:new Date().toISOString(),build:(()=>{try{return OD_CHANGELOG[0].v}catch(e){return'?'}})(),city:typeof CID!=='undefined'?CID:'?',state,ua:navigator.userAgent.slice(0,200),vp:innerWidth+'x'+innerHeight,dpr:+(devicePixelRatio||1).toFixed(2),gpu:PB_gpu(),iframe:ifr,ri:PB_ri(),heap:PB_heap()}}
+function PB_hbGet(){try{const r=localStorage.getItem(PB.HK);return r?JSON.parse(r):null}catch(e){return null}}
+function PB_hbSet(o){try{if(o)localStorage.setItem(PB.HK,JSON.stringify(o));else localStorage.removeItem(PB.HK)}catch(e){}}
+function PB_boot(now){if(PB.booted)return;PB.booted=1;PB.t1=now;const old=PB_hbGet();
+  setTimeout(()=>{try{if(old){PB_hbSet(null);PB_post(Object.assign(PB_base('killed'),{last:old}))}const d=PB_base('boot');d.bootMs=Math.round(now);PB_post(d)}catch(e){}},0)}
+function PB_life(now,ms){if(!PB.on)return;
+  if(ms>PB.hw)PB.hw=ms;
+  if(ms>1000&&!PB.hid&&!document.hidden&&PB.fz<3){PB.fz++;const fs={};for(const k in PB.fs)fs[k]=PB_r(PB.fs[k]);const d=PB_base('freeze');d.gapMs=Math.round(ms);d.fs=fs;d.n=PB.fz;setTimeout(()=>{try{PB_post(d)}catch(e){}},0)}
+  PB.hid=0;
+  if(!PB_play())return;
+  if(!PB.booted)PB_boot(now);
+  if(now-PB.hb>=2000){PB.hb=now;PB_hbSet({t:Date.now(),state,city:typeof CID!=='undefined'?CID:'?',sec:Math.round((now-PB.t1)/1000),worstMs:Math.round(PB.hw),ri:PB_ri(),heap:PB_heap(),orient:innerWidth>=innerHeight?'land':'port',vp:innerWidth+'x'+innerHeight});PB.hw=0}}
+{const clr=()=>{PB.hid=1;PB_hbSet(null)};addEventListener('pagehide',clr);document.addEventListener('visibilitychange',()=>{if(document.hidden)clr();else{PB.hid=1;PB.hb=0}})}
+{const _fr=frame;frame=function(now){const a=performance.now();PB.child=0;const ms=PB.last?now-PB.last:0;PB.last=now;_fr(now);try{PB_life(now,ms)}catch(e){}
   if(ms>0&&ms<1000&&PB_live()&&PB.t0&&PB.k<PB.iv.length){PB.iv[PB.k++]=ms;if(ms>50)PB.slow++;if(ms>PB.worst)PB.worst=ms;PB.busy+=performance.now()-a;for(const k in PB.fs)PB.sys[k]=(PB.sys[k]||0)+PB.fs[k]}
   for(const k in PB.fs)PB.fs[k]=0;
   PB_tick(now);PB_chipStep(now,ms)}}
@@ -15649,7 +15668,7 @@ if(/[?&]fps=1/.test(location.search))SET.fpsChip=true;
   document.addEventListener('pointerdown',e=>{if(!hit(e))return;fired=0;clearTimeout(tm);tm=setTimeout(()=>{fired=1;PB_toggleChip()},600)},true);
   for(const ev of['pointerup','pointercancel'])document.addEventListener(ev,()=>clearTimeout(tm),true);
   document.addEventListener('click',e=>{if(fired&&hit(e)){fired=0;e.stopImmediatePropagation();e.preventDefault()}},true)}
-window.__pb={PB,doc:PB_doc,send:PB_send,post:PB_post,flush:PB_flush,perm:PB_perm,tick:PB_tick,toggle:PB_toggleChip,reset:PB_reset};
+window.__pb={PB,life:PB_life,boot:PB_boot,hbGet:PB_hbGet,hbSet:PB_hbSet,doc:PB_doc,send:PB_send,post:PB_post,flush:PB_flush,perm:PB_perm,tick:PB_tick,toggle:PB_toggleChip,reset:PB_reset};
 if(!/[?&]qa=0\b/.test(location.search)){const s=document.createElement('script');s.src='models/qa.js';s.onload=()=>{try{eval(window.__QAJ)}catch(e){console.warn('QA load',e)}};document.head.appendChild(s)}
 const RS_OFF=(()=>{const q=location.search;try{if(/[?&]rs=0/.test(q))sessionStorage.setItem('rs0','1');else if(/[?&]rs=1/.test(q))sessionStorage.removeItem('rs0');return sessionStorage.getItem('rs0')==='1'}catch(e){return /[?&]rs=0/.test(q)}})();
 function RS_seams(){if(RS_OFF||CID!=='fra'||!FILL_R||!FILL_R.length)return 0;let n=0;
@@ -16476,6 +16495,7 @@ async function TWG_run(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)retu
 {const r0=composer.render;composer.render=function(){if(TWG.run)return;return r0.apply(this,arguments)}}
 frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;return f(now)})(frame);
 {const _ls=lazyStep;lazyStep=function(){if(TWG.fr>=0&&TWG.fr<=TWG.lz){TWG.held++;return}return _ls.apply(this,arguments)}}
+TWG.ht=0;TWG.htF=-1;TWG.htN=0;TWG.c0=-1;TWG.c60=-1;{const _ht=hubTrafficStep;hubTrafficStep=function(){if(!(TWG.fr>=0&&TWG.fr<=60))return _ht.apply(this,arguments);const t=performance.now();try{return _ht.apply(this,arguments)}finally{const d=performance.now()-t;TWG.htN++;if(d>TWG.ht){TWG.ht=Math.round(d);TWG.htF=TWG.fr}const n=HUB.cars?HUB.cars.length:0;if(TWG.c0<0)TWG.c0=n;TWG.c60=n}}}
 function ENV_on(){if(ENV_on.v!==undefined)return ENV_on.v;let v=true;try{const q=new URLSearchParams(location.search).get('env1');if(q!==null)v=q!=='0';else if(typeof TUNE!=='undefined'&&TUNE.env1===0)v=false}catch(e){}return ENV_on.v=v}
 function ENV_lo(){try{if(typeof LK_lvl==='function'&&LK_lvl()==='low')return true;return typeof SET!=='undefined'&&SET.q==='low'}catch(e){return false}}
 function ENV_vn(x,z){const h=(a,b)=>{const v=Math.sin(a*127.1+b*311.7)*43758.5453;return v-Math.floor(v)},i=Math.floor(x),j=Math.floor(z);let fx=x-i,fz=z-j;fx=fx*fx*(3-2*fx);fz=fz*fz*(3-2*fz);

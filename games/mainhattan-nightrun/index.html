@@ -916,7 +916,7 @@ const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil
 window.__dmg=DMG;
 NR.on('runStart',()=>{DMG.dps=0;DMG.k=1;});
 /* ---------- spawning ---------- */
-function en(type,o){const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
+function en(type,o){if(window.ROSTER)type=ROSTER.sub(type,o);const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600},flank:{r:13,hp:3,score:180},swarm:{r:9,hp:1,score:60},mine:{r:15,hp:5,score:200}}[type];
   const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2,gr:DMG.on?1:0},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK()*(window.SC?SC.hpK():1))));
   if(!o.mini&&(type==='drone'||type==='charger'||type==='turret'||type==='flank')&&GX()<eliteP()){e.el=1;e.hp=Math.round(e.hp*2);e.r=Math.round(e.r*1.25);e.score*=2;}   // elites: tougher, gold ring, shoot more
@@ -1797,11 +1797,22 @@ const CHALL=[
  {di:2,req:21,name:'RAIL RHYTHM', intro:'Land PERFECTs. Hold the beat.',  ch:'perfect',goal:{k:'survive',v:46}, perf:28,s3:450000, waves:['gate','droneLine','chargers','turret','droneSine']},
  {di:3,req:29,name:'FAIR DASH',   intro:'Beat the clock. Kill fast.',     ch:'speed',  goal:{k:'kill',v:120},    perf:22,s3:600000, waves:['droneV','chargers','turret','gunship','gate'],tb:1.05},
  {di:4,req:37,name:'MARBLE LANE', intro:'One hit ends it. Stay clean.',  ch:'nohit',  goal:{k:'survive',v:46}, perf:26,s3:800000, waves:['phalanx','wedge','turret','droneSine','gunship']}];
+/* V10 music spread (flag RET.songspread, ?songspread=0 = the old n%3 rotation): the stage songs were stage1/2/3 for 36 of 40 stages, so four tracks carried two thirds of a run.
+   Now every non-Athens stage draws from the five stage tracks (stage1-3, endless, endless2) in a seeded shuffle per block of five, and a track never plays in two stages in a row;
+   Athens keeps its two own songs. The song only sets the district length and the energy curve (SONGM), so the stage length changes by at most a minute. */
+const SONGSPREAD=()=>window.RET&&window.RET.songspread!==undefined?window.RET.songspread:!/[?&]songspread=0/.test(location.search);   // (ret.js builds RET later)
+const SONGSEL=(()=>{const POOL=['stage2','endless','stage3','stage1','endless2'],seq=[];let seed=7,prev='';
+  const rnd=()=>(seed=(seed*1103515245+12345)&0x7fffffff)/0x7fffffff;
+  return(n,di,old)=>{if(!SONGSPREAD()||di===4||n<=4)return old;   // the first four stages keep the gentle opening songs
+    while(seq.length<n){const blk=POOL.slice();for(let i=blk.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[blk[i],blk[j]]=[blk[j],blk[i]];}
+      if(blk[0]===prev){const k=1+Math.floor(rnd()*(blk.length-1));[blk[0],blk[k]]=[blk[k],blk[0]];}
+      for(const t of blk){seq.push(t);}prev=blk[blk.length-1];}
+    return seq[n-1];};})();
 const STAGES=[];
 CITYS.forEach((c,ci)=>c.st.forEach((r,k)=>{const n=STAGES.length+1,d={n,di:c.di,name:r[0],intro:r[1],goal:r[2],perf:r[3],waves:r[4],act:ci,pos:k};
-  if(r[2].k==='boss'||r[2].k==='mini')d.lead=r[2].k==='boss'?24:30;if(r[5])d.mini=r[5];d.song=c.di===4?(n%2?'athina':'athina2'):n<=8?['stage1','stage2'][(n-1)%2]:['stage1','stage2','stage3'][(n-1)%3];d.kit=Math.min(24,n-1);STAGES.push(d);}));
+  if(r[2].k==='boss'||r[2].k==='mini')d.lead=r[2].k==='boss'?24:30;if(r[5])d.mini=r[5];d.song=SONGSEL(n,c.di,c.di===4?(n%2?'athina':'athina2'):n<=8?['stage1','stage2'][(n-1)%2]:['stage1','stage2','stage3'][(n-1)%3]);d.kit=Math.min(24,n-1);STAGES.push(d);}));
 const MAIN=STAGES.length;                                  // 40 story stages; the challenge stages come after them
-CHALL.forEach((c,i)=>{const n=STAGES.length+1;STAGES.push({n,di:c.di,name:c.name,intro:c.intro,goal:c.goal,perf:c.perf,waves:c.waves,act:c.di,pos:8+i,ch:c.ch,from:c.req,s3:c.s3,tb:c.tb||0,song:c.di===4?(n%2?'athina':'athina2'):['stage1','stage2','stage3'][(n-1)%3],kit:Math.min(24,c.req-1)});});
+CHALL.forEach((c,i)=>{const n=STAGES.length+1;STAGES.push({n,di:c.di,name:c.name,intro:c.intro,goal:c.goal,perf:c.perf,waves:c.waves,act:c.di,pos:8+i,ch:c.ch,from:c.req,s3:c.s3,tb:c.tb||0,song:SONGSEL(n,c.di,c.di===4?(n%2?'athina':'athina2'):['stage1','stage2','stage3'][(n-1)%3]),kit:Math.min(24,c.req-1)});});
 /* the story grew from 16 to 30 and then to 40 stages: progress saved under the old numbers moves to the same stage by name (once) */
 if(!sSave.v40){const OLD16=['FIRST RUN','PATROL','SEK-ADLER','RIVER ROAD','BRIDGE GUARD','FLUSSKRAKE','GATE RUN','GATE KEEPER','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','HOPLITE','TALOS'],
   OLD30=['FIRST RUN','PATROL','ZEIL','TRESOR-WART','KONVOI','SEK-ADLER','RIVER ROAD','EISERNER STEG','BRIDGE GUARD','ROEMER','FLOTTE','FLUSSKRAKE','GATE RUN','FREIGHT YARD','GATE KEEPER','FIREWALL','CORDON','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','HAMMERING MAN','MESSE-WÄCHTER','BOARDROOM','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','LYCABETTUS','HOPLITE','AGORA','TALOS'],
@@ -2198,6 +2209,20 @@ const MUTS=[{id:'hail',n:'HAILSTORM',t:'Slow rain from above'},{id:'mine',n:'MIN
 const MINIS=[{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B',sub:'Bridge sentinel, twin cannon'},
   {k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S',sub:'Gate warden, laser rig'},
   {k:7,nm:'HOPLITE',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'H',sub:'Shield wall, spear rig'}];
+/* ---------- V3 rosters and drone cap (flag RET.roster, ?roster=0 = old mix). Drones were 59% of the spawns and 63% of the enemy bullets, every stage alike.
+   Each stage has a ROSTER: a signature kind and a second kind (charger / flanker / swarm / mine), chosen so the two stages next to it share neither. en() (b.js) asks ROSTER.sub()
+   for every drone: about 35% turn into the signature (65%) or the second kind, and a drone that would lift the stage's drone share above 33% always does. Counted per stage (story) or per district (Endless).
+   Bosses, mini-boss summons, zoo units, the Lab and the tutorial are never touched. The shape of the wave (formation, path, count) stays; only the unit type changes. ---------- */
+const ROSTER=window.ROSTER={KINDS:['charger','flank','swarm','mine'],CAP:.33,P:.35,c:{key:'',total:0,drone:0},stat:{sub:0,drone:0,total:0},
+  idx(){return ST.on?ST.n:20+G.di*3+(G.loop|0);},
+  kinds(i){const K=this.KINDS,s=(i*3)%4;return[K[s],K[(s+2)%4]];},   // signature, second: the stages i-1 and i+1 have {s-1,s+1}
+  sub(type,o){if(!RET.roster||G.lab||G.tut||(o&&(o.mini||o.zt))||G.boss||(ST.on&&ST.n<=4))return type;   // stages 1-4 keep the hovering drones (zoo-test, onboarding)
+    const key=ST.on?'s'+ST.n:'e'+G.di+'_'+G.loop,c=this.c;if(c.key!==key){c.key=key;c.total=0;c.drone=0;}
+    let out=type;
+    if(type==='drone'){const over=(c.drone+1)/(c.total+1)>this.CAP&&c.total>=3;
+      if(over||GX()<this.P){const ks=this.kinds(this.idx());out=GX()<.65?ks[0]:ks[1];}}
+    c.total++;this.stat.total++;if(out==='drone'){c.drone++;this.stat.drone++;}else if(type==='drone')this.stat.sub++;
+    return out;}};
 const WARN=[];                                           // spawn markers: shown for one beat before something enters from an edge or falls
 const DIR={
   sb:72,stage:'stage1',bossBar:40,bar:-1,theme:null,thName:'',acc:0,idle:0,emptyB:0,ldt:0,q:[],mut:[],bsK:1,spd:1,nextMini:20,minis:0,lastTheme:'',log:{spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0},
@@ -6449,6 +6474,7 @@ RET.st=(function(on){
      +'<div class="stGrid">'+cell('Runs',fmtN(s.runs))+cell('Play time',fmtT(s.time))+cell('Enemies',fmtN(s.kills))+cell('Bosses beaten',fmtN(s.bosses))+cell('Grazes',fmtN(s.grazes))+cell('PERFECT dashes',fmtN(s.dashes))+cell('PERFECT hits',fmtN(s.perfects))+cell('FEVERs',fmtN(s.fevers))+cell('Deaths',fmtN(s.deaths))+cell('Best score',fmtN(s.bestScore))+cell('Best stage',bestStage||'-')+cell('Neon earned',fmtN(s.neon))+cell('Daily streak best',fmtN(s.daily))+cell('Stage clears',fmtN(s.clears))+'</div>'
      +(wt.length?'<h3>WEAPONS USED</h3><div class="stParts">'+wt.map(id=>'<div><span>'+esc((window.WPD&&WPD[id]&&WPD[id].n)||id)+'</span><i><u style="width:'+Math.round(100*D.w[id]/wmax)+'%"></u></i><em>'+fmtT(D.w[id])+'</em></div>').join('')+'</div>':'')
      +(window.PW3&&PW3.on&&PW3.sheet?PW3.sheet():'')
+     +(typeof FB!=='undefined'&&FB.on?FB.sheet():'')
      +'<h3>ACHIEVEMENTS <span id="stAchN">'+got+'/'+A.length+'</span></h3><div class="stAch">'
      +A.map(a=>{const g=!!D.a[a.id];return '<div class="ac'+(g?' got':'')+'" data-id="'+a.id+'">'+badge(a,g)+'<span><b>'+esc(a.n)+'</b><small>'+(g?'':'🔒 ')+esc(a.d)+(a.skill?' · no Assist':'')+'</small></span></div>';}).join('')+'</div>'
      +'<h3>CREDITS &amp; PRIVACY</h3><div class="stCred"><p><b>Music</b> original, made for this game</p><p><b>Code and art</b> original, made for this game</p><p><b>Privacy</b> saved only on this device. No data is collected.</p></div>'
@@ -6493,6 +6519,55 @@ RET.st=(function(on){
     setTimeout(()=>{check(true);if(dirty||fresh)save();},400);}
   return{on,A,BY,D:()=>D,S,parts,completion,check,toast,open,shut,save,poll,toastQ:()=>Q.length,reset:()=>{parse(null);dirty=true;lw=rawGet();save();}};
 })(RET.stats);
+
+/* ---------- FEEDBACK: one optional tap at the end of a run (FUN / SAME AGAIN / BORING). Flag RET.feedback (?feedback=0 = nothing shown, nothing stored).
+   Answers go to localStorage 'mnr_fb' (newest last, capped at 500): {stage, mode, diff, wp, sec, ts}. The STATS sheet lists the counts per stage and has a COPY button for the JSON.
+   The strip sits under the buttons of #over / #stres, so it never delays or covers NEXT STAGE / RETRY; it is shown once per run. ---------- */
+if(RET.feedback===undefined)RET.feedback=!/[?&]feedback=0/.test(location.search);
+RET.sioKeys.push('mnr_fb');
+const FB=(function(on){
+  const KEY='mnr_fb',CAP=500,ANS=[['fun','FUN'],['same','SAME AGAIN'],['bore','BORING']];
+  let run=null,id=0;
+  const load=()=>{try{const a=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(a)?a.filter(x=>x&&typeof x==='object'&&typeof x.a==='string'):[];}catch(e){return[];}};
+  const add=(e)=>{const a=load();a.push(e);while(a.length>CAP)a.shift();try{localStorage.setItem(KEY,JSON.stringify(a));}catch(x){}return a;};
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const hosts=()=>[['fbO',document.getElementById('over')],['fbR',document.getElementById('stres')]];
+  function strip(hid,host){let e=document.getElementById(hid);if(!e){const h=host&&host.querySelector('.in');if(!h)return null;
+      e=document.createElement('div');e.id=hid;e.className='fbBar';e.hidden=true;h.appendChild(e);
+      e.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('button[data-a]');if(b)FB.answer(b.dataset.a);});}return e;}
+  function render(e,done){e.innerHTML=done?'<span class="fbQ">Thanks, noted.</span>':'<span class="fbQ">How did this run feel? (optional)</span><div class="fbR">'+ANS.map(a=>'<button type="button" class="fbB" data-a="'+a[0]+'">'+a[1]+'</button>').join('')+'</div>';}
+  function show(){if(!on||!run||run.shown)return;run.shown=true;for(const [hid,host] of hosts()){const e=strip(hid,host);if(e){render(e,false);e.hidden=false;}}}
+  function hide(){for(const [hid] of hosts()){const e=document.getElementById(hid);if(e)e.hidden=true;}}
+  function answer(a){if(!on||!run||run.done||!ANS.some(x=>x[0]===a))return false;run.done=true;
+    add({a,stage:run.stage,mode:run.mode,diff:run.diff,wp:run.wp,sec:Math.max(0,Math.round((Date.now()-run.t0)/1000)),ts:Date.now()});
+    for(const [hid] of hosts()){const e=document.getElementById(hid);if(e&&!e.hidden)render(e,true);}return true;}
+  function counts(){const m={};for(const x of load()){const k=x.stage;(m[k]||(m[k]={fun:0,same:0,bore:0}))[x.a]++;}return m;}
+  function sheet(){if(!on)return'';const m=counts(),ks=Object.keys(m).sort((a,b)=>(+a||0)-(+b||0)||(a<b?-1:1));
+    return '<h3>FEEDBACK</h3><div class="stParts fbList">'+(ks.length?ks.map(k=>'<div><span>'+(/^\d+$/.test(k)?'Stage '+k:esc(k))+'</span><em>Fun '+m[k].fun+' · Same '+m[k].same+' · Boring '+m[k].bore+'</em></div>').join(''):'<div><span>No answers yet</span></div>')+'</div>'
+      +'<button type="button" class="go dim" id="fbCopy">COPY FEEDBACK</button>';}
+  function copy(b){const t=JSON.stringify(load());const ok=()=>{b.textContent='COPIED';setTimeout(()=>{if(b.isConnected)b.textContent='COPY FEEDBACK';},1800);};
+    const fall=()=>{try{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-999px;top:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();ok();}catch(e){b.textContent='COPY FAILED';}};
+    try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fall);else fall();}catch(e){fall();}}
+  if(on){
+    const st=document.createElement('style');st.textContent=`
+.fbBar{margin-top:10px;text-align:center;font-family:var(--mono,monospace)}.fbBar[hidden]{display:none}
+.fbQ{display:block;font-size:14px;color:#c9c4ec;margin-bottom:6px}
+.fbR{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.fbB{min-height:48px;min-width:96px;flex:1 1 96px;max-width:170px;padding:6px 10px;border-radius:10px;border:2px solid #ffffff55;background:#ffffff14;color:#fff;font:700 15px/1.1 var(--mono,monospace);letter-spacing:.06em;cursor:pointer}
+.fbB:active{background:#19e3ff44;border-color:#19e3ff}
+.fbList em{font-style:normal}
+#stSheet #fbCopy{min-height:48px}`;
+    document.head.appendChild(st);
+    NR.on('runStart',d=>{id++;hide();
+      if(!d||d.tut||d.lab){run=null;return;}
+      run={id,shown:false,done:false,t0:Date.now(),stage:d.story?d.story:'endless',mode:d.story?'story':(d.daily?'daily':(typeof G!=='undefined'&&G.weekly?'weekly':'arcade')),
+        diff:(typeof SET!=='undefined'&&SET.diff)||'normal',wp:(()=>{try{return WP.eqIds().slice();}catch(e){return[];}})()};});
+    NR.on('runEnd',d=>{if(!d||d.quit||!run)return;run.sec=Math.round((Date.now()-run.t0)/1000);setTimeout(show,0);});
+    document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#fbCopy');if(b)copy(b);});
+  }
+  return{on,answer,load,counts,sheet,show,hide};
+})(RET.feedback);
+window.FB=FB;
 
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
    The LAB is a real run with G.lab set: no waves, no district clock, no boss timer, no chest or pit stop, god mode on. What appears is decided by the panel at the bottom:
@@ -7079,6 +7154,7 @@ UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,gy=UIK.groundY(
    bold white text >= 14 px on a dark rounded pill (alpha .78, thin accent border), at most 8 words (the caller writes it short; short() only cuts a leftover),
    in the top third under the HUD, never within 120 px of the ship (it slides sideways, or waits), one on screen at a time with at least 1.2 s between two. ---------- */
 if(RET.hint===undefined)RET.hint=!/[?&]hint=0/.test(location.search);
+if(RET.hintdiet===undefined)RET.hintdiet=!/[?&]hintdiet=0/.test(location.search);
 const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE:120,
   on(){return RET.hint!==false;},
   reset(){this.cur=null;this.q.length=0;this.gap=0;this.box=null;},
@@ -7088,10 +7164,18 @@ const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE
     if(!this.on()){G.hint={t:o.t||3,txt};return true;}                      // flag off: the old bubble
     const T=o.t||3,dup=this.cur&&this.cur.txt===txt?this.cur:this.q.find(h=>h.txt===txt);
     if(dup){if(T>dup.t){dup.t=T;if(dup===this.cur&&G.hint)G.hint.t=T;}return false;}   // callers may ask again every frame (a longer first-time ask keeps the longer time)
+    if(!this.diet(txt))return false;
     if(this.cur&&this.cur.el<.2&&T>this.cur.t){this.cur={txt,t:T,col:o.col||null,age:0,el:0,bw:0};if(G.hint){G.hint.t=T;G.hint.txt=txt;}return true;}   // the same moment, a longer first-time text: it replaces the short one
     this.q.push({txt,t:o.t||3,col:o.col||null,age:0,el:0,bw:0});while(this.q.length>3)this.q.shift();this.next();return true;},
+  /* V2 hint diet (flag RET.hintdiet, ?hintdiet=0 = every ask shows): a hint text shows at most twice per profile (counts in localStorage 'mnr_hintseen') and never twice within 3 minutes of play.
+     Not in the tutorial or the Lab (the tutorial teaches by hints). A refused ask returns false like a repeat ask, so callers that retry every frame cost nothing. */
+  clk:0,hs:null,
+  diet(txt){if(RET.hintdiet===false||G.tut||G.lab)return true;
+    if(!this.hs){try{this.hs=JSON.parse(localStorage.getItem('mnr_hintseen')||'{}')||{};}catch(e){this.hs={};}this.hl={};}
+    const n=this.hs[txt]|0;if(n>=2)return false;if(n>0&&this.clk-(this.hl[txt]==null?-1e9:this.hl[txt])<180)return false;
+    this.hs[txt]=n+1;this.hl[txt]=this.clk;try{localStorage.setItem('mnr_hintseen',JSON.stringify(this.hs));}catch(e){}return true;},
   next(){if(this.cur||this.gap>0||!this.q.length||(G.banner&&G.banner.t>0))return;this.cur=this.q.shift();this.seen.push(this.cur.txt);if(this.seen.length>60)this.seen.shift();if(G.hint){G.hint.t=this.cur.t;G.hint.txt=this.cur.txt;}},   // nothing up and no gap to wait out: starts at once
-  tick(dt){if(!this.on()){this.cur=null;this.q.length=0;this.box=null;return;}
+  tick(dt){this.clk+=dt;if(!this.on()){this.cur=null;this.q.length=0;this.box=null;return;}
     if(this.gap>0)this.gap-=dt;for(const h of this.q)h.age+=dt;this.q=this.q.filter(h=>h.age<8);       // a hint nobody saw in 8 s is stale
     const c=this.cur;
     if(c){if(G.banner&&G.banner.t>0){}else if(c.blk){c.bw+=dt;if(c.bw>3)c.t=0;}else{c.t-=dt;c.el+=dt;}   // paused under a banner; dropped after 3 s of no free spot
@@ -7787,11 +7871,11 @@ window.__s2={S2,CAMP,B2};
 /* D. must move (flag RET.mustmove, ?mustmove=0 = before; BALANCE.md "Must move"). Owner, 19 Oct 2026: on Normal a ship that only lines up with the next foe
    and never dodges cleared most stages with any weapon (mustmove-test.js 'track': 60%). A ship that keeps its x inside 70 px for MM.win() seconds gets a COLUMN
    STRIKE: a vertical lane locks on its x, pulses for MM.tel() s (>= .6), then fires for .25 s. One sidestep of ~45 px (or a dash) clears it, the rest of the
-   screen stays free, so a moving ship is never hit. Strikes repeat while the ship stays in the column zone and hit harder from the third one on.
+   screen stays free, so a moving ship is never hit. Strikes repeat while the ship stays in the column zone and hit harder from the second one on.
    Homing on Normal and Easy also gets the narrower cone and shorter reach of the hard tiers: a missile needs the ship to point at its target. */
 if(RET.mustmove===undefined)RET.mustmove=!/[?&]mustmove=0/.test(location.search);
 const MM=window.MM={get on(){return!!RET.mustmove;},COL:24,buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0,
-  win(){return{easy:5,normal:4,hard:3.4,vhard:3.2,legend:3}[SET.diff]||4;},
+  win(){return{easy:5,normal:3.5,hard:3.2,vhard:3,legend:2.8}[SET.diff]||4;},
   tel(){return{easy:1.1,normal:.95,hard:.8,vhard:.75,legend:.7}[SET.diff]||.95;},
   live(){return this.on&&G.live&&!G.dead&&G.transT<0&&!G.lab&&!G.tut&&!SH.active&&!ST.over&&!G.over&&!godMode&&(ST.on?ST.n>=3:G.t>20);},
   cost(x){const c=this.col;return c&&Math.abs(x-c.x)<this.COL+30?(c.fire>0||c.t<.4?6000:1500):0;}};   // for test bots: the lane as a player sees it
@@ -7802,7 +7886,7 @@ NR.on('tick',dt=>{if(!MM.live()){MM.col=null;MM.buf=[];MM.n=0;return;}
   const c=MM.col;if(c){c.t-=dt;if(c.t<=0&&!c.fire&&!c.done){c.fire=.25;AU.sfx('big');shake(4);}
     if(c.fire>0){c.fire-=dt;if(!c.hit&&Math.abs(P.x-c.x)<MM.COL){c.hit=1;MM.hits++;hurt(c.dmg);}if(c.fire<=0){c.done=1;MM.col=null;MM.cd=SET.diff==='easy'?2.4:1.6;}}return;}
   MM.cd-=dt;if(MM.cd>0||MM.buf.length<k||hi-lo>=70)return;
-  MM.n++;MM.strikes++;MM.col={x:P.x,t:MM.tel(),fire:0,hit:0,dmg:MM.n>=3&&SET.diff!=='easy'?2:1};AU.sfx('warn');
+  MM.n++;MM.strikes++;MM.col={x:P.x,t:MM.tel(),fire:0,hit:0,dmg:MM.n>=2&&SET.diff!=="easy"?2:1};AU.sfx('warn');
   if(MM.strikes===1)floater(P.x,P.y-44,'SIDESTEP!','#ff6a7a');});
 {const dp=drawPickups;drawPickups=function(t){dp(t);const c=MM.col;if(!c||G.dead)return;const w=MM.COL;
   ctx.save();ctx.globalCompositeOperation='lighter';
@@ -8562,11 +8646,14 @@ NR.on('beat',()=>{if(G.dead||!G.live)return;const B=STILL.beam;
                 miss the dash and you still get a small blast round the ship (never a punishment)
    MINI-BOSS    about every 26 bars (~50 s, see dir.js)
    Never touches the music: only game logic, light and a clean effect sound. */
-const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0,stat:{sets:0,fences:0,drops:0,dropsHit:0,rewards:0},
-  reset(){this.n=0;this.sets=[];this.fence=null;this.dw=null;this.dropAt=-1;this.lastDash=-9;this.pdash=0;this.shower=0;},
+if(RET.deck===undefined)RET.deck=!/[?&]deck=0/.test(location.search);
+if(RET.roster===undefined)RET.roster=!/[?&]roster=0/.test(location.search);   // dir.js ROSTER (V3)
+if(RET.songspread===undefined)RET.songspread=!/[?&]songspread=0/.test(location.search);   // story.js SONGSEL (V10)
+const FUN={n:0,sets:[],fence:null,dw:null,ev:null,deck:[],nextAt:22,lastK:'',dropAt:-1,lastDash:-9,pdash:0,shower:0,stat:{sets:0,fences:0,drops:0,dropsHit:0,rewards:0},
+  reset(){this.ev=null;this.deck=[];this.nextAt=20+gr(0,6);this.lastK='';this.n=0;this.sets=[];this.fence=null;this.dw=null;this.dropAt=-1;this.lastDash=-9;this.pdash=0;this.shower=0;},
   ROWS:[30,90,150,210,270,330,390,450,510],
   /* the bot (sweep.js / d-sim.js) asks: is a ship at height y on a firing beam row? */
-  cost(y){const f=this.fence;if(!f||f.phase<1)return 0;for(const r of f.rows)if(Math.abs(y-r)<26)return 3000;return 0;},
+  cost(y){const l=this.ev;if(l&&l.k==='lane'&&Math.abs(y-l.y)<l.h/2+12)return 3000;const f=this.fence;if(!f||f.phase<1)return 0;for(const r of f.rows)if(Math.abs(y-r)<26)return 3000;return 0;},
   shardShower(n,x0){for(let i=0;i<n;i++)G.pk.push({t:'shard',x:(x0==null?W-40:x0)+gr(-30,30),y:gr(50,H-50),vx:-gr(120,300),vy:gr(-40,40),bob:0});this.shower=.9;},
   track(f){const n0=G.en.length;f();return G.en.slice(n0);},
   setPiece(){const di=G.di,sig=['turretLine','swarm','wedge','turretLine','phalanx'][di%5],k=Math.floor(this.n/6)%3,t=DIR.tierv();
@@ -8579,6 +8666,7 @@ const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0
     this.fence={rows,gy,b0:G.bc,phase:0,fire:0,hit:0};this.stat.fences++;AU.sfx('warn');hintShow(say('LASER FENCE: find the gap'),2.6);},
   bar(){const n=this.n=G.rb;if(PW.on('tempo'))DIR.acc+=.4;if(HARD&&!ST.on&&!G.boss)DIR.acc+=.7;   // Hard: the set pieces and the DROP are extra on top, so the waves keep their bite   // TEMPO UP: faster waves (a bigger wave budget every bar)
     if(G.boss||G.dead||SH.active)return;
+    if(RET.deck!==false){this.deckBar(n);return;}   // V1: the event deck replaces the 6-bar metronome and the 16-bar DROP
     if(n>=3&&n%6===3&&DIR.nonBoss()<8&&(ST.on||G.dbar<DIR.bossBar-6))this.setPiece();
     if(n%16===15&&n>=15&&!this.dw){this.dropAt=n+1;this.dropB=G.bc+4;hintShow(say('DROP COMING: DASH ON THE DOWNBEAT'),3.4);}
     if(n%16===0&&n>=16&&this.dropAt===n)this.dropStart();},
@@ -8601,6 +8689,7 @@ const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0
       const killed=s.es.filter(e=>e.hp<=0).length;if(killed>=s.n*.5){this.stat.rewards++;G.score+=250*s.n;floater(W*.6,H*.4,'SET CLEARED +'+250*s.n,'#ffe14d');this.shardShower(6+s.n);AU.sfx('up');}}
     const f=this.fence;if(f){const ph=G.bc-f.b0;if(f.phase<1&&ph>=3){f.phase=1;AU.sfx('warn');}
       if(f.fire>0){f.fire-=dt;if(!f.hit&&!G.dead)for(const r of f.rows)if(Math.abs(P.y-r)<13){f.hit=1;hurt(1);break;}if(f.fire<=0)this.endFence();}}
+    if(this.ev)this.evTick(dt);
     if(this.shower>0)this.shower-=dt;},
   endFence(){const f=this.fence;if(!f)return;this.fence=null;if(!f.hit){this.stat.rewards++;G.score+=1000;floater(W*.5,H*.45,'FENCE CLEARED +1000','#19e3ff');this.shardShower(10);AU.sfx('up');}},
   beat(){const f=this.fence;if(f&&f.phase>=1&&f.fire<=0&&G.bc-f.b0>=4&&!f.fired){f.fired=1;f.fire=.35;AU.sfx('big');shake(7);}},
@@ -8612,9 +8701,72 @@ const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0
           if(lock){ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,r-10,W,20);}}}
       ctx.globalAlpha=lock?.5:.3;ctx.strokeStyle='#19ffb0';ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.strokeRect(10,f.gy-70,W-20,140);ctx.setLineDash([]);   // the safe gap
       ctx.restore();}
+    if(this.ev)this.evDraw(t);
     if(this.dropAt>0&&!this.dw){const cnt=Math.max(1,Math.min(4,this.dropB-G.bc));ctx.save();ctx.textAlign='center';ctx.font='700 46px "Chakra Petch",sans-serif';ctx.globalAlpha=.55+.4*PUL;ctx.fillStyle='#b36bff';wtxt('DROP '+cnt,W/2,92);ctx.restore();
       ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.min(.5,(4-cnt)*.14+.06);ctx.strokeStyle='#b36bff';ctx.lineWidth=10;ctx.strokeRect(5,5,W-10,H-10);ctx.restore();}}
 };
+
+/* ---------- V1 EVENT DECK (flag RET.deck, ?deck=0 = the old 6-bar WEAVE / FENCE / 16-bar DROP metronome) ----------
+   One event at most every 25-31 s (and never with a boss out or about to come): the cards of DECK are shuffled and drawn without repeats until the deck is empty, then it is reshuffled
+   (the last card never opens the next deck). A card whose enemies the stage has not unlocked yet goes to the bottom. Every card is dodgeable or harmless and shows its warning for >= 1 s
+   (the enemy cards use the markers and entry paths of the pattern library): weave, fence, DROP (dash on the downbeat), supply drop (fly to the beacon), lane closes, gate run (fly through rings),
+   mines, rescue capsule (shoot it open), wind gust, blackout strip (shots keep a white rim), crossfire from both edges, swarm, turret line, meteors, wedge. */
+FUN.DECK=['weave','fence','drop','supply','lane','gaterun','mines','rescue','gust','blackout','crossfire','swarm','turrets','hail','wedge'];
+FUN.NEED={mines:'mines',crossfire:'pincer',swarm:'swarm',turrets:'turretLine',wedge:'wedge'};
+Object.assign(FUN,{
+  deckBar(n){if(this.dropAt===n&&!this.dw)this.dropStart();
+    if(this.ev||this.dw||this.fence||this.dropAt>0||G.t<this.nextAt||n<3||DIR.nonBoss()>=8||!(ST.on||G.dbar<DIR.bossBar-6))return;
+    const k=this.draw1();if(k)this.start(k,n);},
+  draw1(){const t=DIR.tierv();for(let i=0;i<2;i++){
+      if(!this.deck.length){const d=this.DECK.slice();for(let j=d.length-1;j>0;j--){const q=Math.floor(gr(0,j+1));[d[j],d[q]]=[d[q],d[j]];}if(d[d.length-1]===this.lastK)d.unshift(d.pop());this.deck=d;}
+      const k=this.deck.pop(),pk=this.NEED[k];if(!pk||(PATS[pk]&&PATS[pk].t<=t+.01))return k;this.deck.unshift(k);}
+    return null;},
+  start(k,n){this.lastK=k;this.nextAt=G.t+gr(25,31);this.stat.sets++;const T=G.t,hs=(s,d)=>hintShow(say(s),d||3);
+    const pat=(id,msg)=>{const es=this.track(()=>PATS[id].f());if(es.length)this.sets.push({es,n:es.length,kind:k});hs(msg);};
+    if(k==='weave'){const es=this.track(()=>{const y=FY(150,H-190);for(let i=0;i<6;i++)en('drone',{x:W+30+i*56,y,amp:120,ph:(i%2)*Math.PI});});if(es.length)this.sets.push({es,n:es.length,kind:k});hs('WEAVE: shoot on the beat',2.4);}
+    else if(k==='fence')this.startFence();
+    else if(k==='drop'){this.dropAt=n+1;this.dropB=G.bc+4;hs('DROP COMING: DASH ON THE DOWNBEAT',3.4);}
+    else if(k==='mines')pat('mines','MINEFIELD: SLIP THROUGH');
+    else if(k==='crossfire')pat('pincer','CROSSFIRE FROM BOTH EDGES');
+    else if(k==='swarm')pat('swarm','SWARM: KEEP MOVING');
+    else if(k==='turrets')pat('turretLine','TURRET LINE: FIND THE GAP');
+    else if(k==='wedge')pat('wedge','WEDGE: SHOOT THE TIP');
+    else if(k==='hail'){DIR.rain(4);this.ev={k,end:T+4};hs('METEORS: LEAVE THE MARKED LANES');}
+    else if(k==='supply'){this.ev={k,t0:T,end:T+9,x:gr(520,800),y:gr(100,H-100),gave:0};hs('SUPPLY DROP: FLY TO THE BEACON',3.4);}
+    else if(k==='lane'){this.ev={k,t0:T,end:T+5.4,y:clamp(P.y+gr(-70,70),70,H-70),h:84,hit:0};hs('LANE CLOSING: LEAVE IT',3);AU.sfx('warn');}
+    else if(k==='gaterun'){const r=[];for(let i=0;i<5;i++)r.push({x:W+80+i*150,y:clamp(H/2+Math.sin(i*1.7+gr(0,1))*150,70,H-70),got:0});this.ev={k,t0:T,end:T+12,rings:r,n:0};hs('GATE RUN: FLY THROUGH THE RINGS',3.4);}
+    else if(k==='rescue'){this.ev={k,t0:T,end:T+13,x:W+30,y:gr(110,H-110),hp:6,done:0};hs('SHOOT THE RESCUE CAPSULE',3.4);}
+    else if(k==='gust'){this.ev={k,t0:T,end:T+4.6,dir:GR()<.5?-1:1};hs('WIND GUST: STEER AGAINST IT');}
+    else if(k==='blackout'){this.ev={k,t0:T,end:T+5.8,x:W+10};hs('BLACKOUT STRIP: WATCH THE RIMS');}
+    NR.emit('setpiece',{kind:k});},
+  evTick(dt){const e=this.ev;if(!e)return;if(G.boss||G.dead||G.t>e.end){this.ev=null;return;}const age=G.t-e.t0;
+    if(e.k==='supply'){if(age>=1&&!e.gave){e.gave=1;AU.sfx('up');for(let i=0;i<9;i++)G.pk.push({t:'shard',x:e.x+gr(-34,34),y:clamp(e.y+gr(-34,34),40,H-40),vx:-45,vy:0,bob:0});}}
+    else if(e.k==='lane'){if(age>=1.3&&age<5.3&&!e.hit&&Math.abs(P.y-e.y)<e.h/2){e.hit=1;hurt(1);}
+      if(age>=5.3&&!e.done){e.done=1;if(!e.hit){this.stat.rewards++;G.score+=800;floater(W*.5,H*.45,'LANE CLEARED +800','#19e3ff');this.shardShower(6);}}}
+    else if(e.k==='gaterun'){let live=0;for(const r of e.rings){r.x-=170*dt;if(r.got)continue;if(r.x>-40)live++;if((r.x-P.x)**2+(r.y-P.y)**2<34*34){r.got=1;e.n++;G.score+=300*e.n;floater(r.x,r.y-20,'+'+300*e.n,'#ffe14d');AU.sfx('up');}}
+      if(e.n>=5&&!e.done){e.done=1;this.stat.rewards++;G.score+=1500;floater(W*.5,H*.4,'GATE RUN +1500','#ffe14d');this.shardShower(10);}
+      if(!live)this.ev=null;}
+    else if(e.k==='rescue'){if(e.x>W*.62)e.x-=48*dt;
+      for(const b of G.pb){if(b.dead||e.done)continue;if((b.x-e.x)**2+(b.y-e.y)**2<26*26){b.dead=1;e.hp--;e.fl=.12;AU.sfx('hit');
+          if(e.hp<=0){e.done=1;this.stat.rewards++;G.score+=1200;floater(e.x,e.y-26,'RESCUED +1200','#3dffb0');this.shardShower(8,e.x);if(P.hp<P.max&&GR()<.6)G.pk.push({t:'hp',x:e.x,y:e.y,vx:-60,vy:0,bob:0});e.end=G.t+.6;}}}
+      if(e.fl>0)e.fl-=dt;}
+    else if(e.k==='gust'){if(age>=1&&age<4.2)P.y=clamp(P.y+e.dir*62*dt,22,H-22);}
+    else if(e.k==='blackout'){if(age>=1)e.x=W+10-(W+260)*(age-1)/4.5;}},
+  evDraw(t){const e=this.ev;if(!e)return;const age=G.t-e.t0,pulse=SET.reduce?1:(Math.floor(t*10)%2?1:.6);ctx.save();
+    if(e.k==='supply'){const k=Math.max(0,1-age);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.globalAlpha=.8*pulse;ctx.beginPath();ctx.arc(e.x,e.y,22+90*k,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(e.x,0);ctx.lineTo(e.x,e.y-22);ctx.stroke();}
+    else if(e.k==='lane'){const live=age>=1.3&&age<5.3;if(live){ctx.globalAlpha=.95;ctx.fillStyle='#fff';ctx.fillRect(0,e.y-3,W,6);ctx.globalAlpha=.4;ctx.fillStyle='#ff3050';ctx.fillRect(0,e.y-e.h/2,W,e.h);}
+      else if(age<1.3){ctx.globalAlpha=.5*pulse;ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.setLineDash([14,10]);ctx.strokeRect(2,e.y-e.h/2,W-4,e.h);ctx.setLineDash([]);}}
+    else if(e.k==='gaterun'){ctx.globalCompositeOperation='lighter';for(const r of e.rings){if(r.got||r.x<-40||r.x>W+40)continue;ctx.globalAlpha=.9;ctx.strokeStyle='#ffe14d';ctx.lineWidth=4;ctx.beginPath();ctx.arc(r.x,r.y,26,0,7);ctx.stroke();ctx.globalAlpha=.25;ctx.fillStyle='#ffe14d';ctx.beginPath();ctx.arc(r.x,r.y,26,0,7);ctx.fill();}}
+    else if(e.k==='rescue'){const f=e.fl>0;ctx.globalAlpha=1;ctx.fillStyle=f?'#fff':'#0e2a22';ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,22,0,7);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#3dffb0';ctx.fillRect(e.x-15,e.y+30,30*Math.max(0,e.hp)/6,4);ctx.strokeRect(e.x-15,e.y+30,30,4);}
+    else if(e.k==='gust'){const live=age>=1&&age<4.2,s=e.dir;ctx.strokeStyle='#9ad8ff';ctx.lineWidth=2;ctx.globalAlpha=live?.6:.3*pulse;const o=(t*(live?90:0))%40;
+      for(let x=60;x<W;x+=160)for(let j=0;j<3;j++){const y=((s>0?o+j*170:H-o-j*170)+H)%H;ctx.beginPath();ctx.moveTo(x-8,y-s*8);ctx.lineTo(x,y);ctx.lineTo(x+8,y-s*8);ctx.stroke();}}
+    else if(e.k==='blackout'){const w=230,x0=e.x;if(age<1){ctx.globalAlpha=.5*pulse;ctx.strokeStyle='#ffffffcc';ctx.setLineDash([10,8]);ctx.strokeRect(W-w,2,w-4,H-4);ctx.setLineDash([]);}
+      else{ctx.fillStyle='#000';ctx.globalAlpha=.62;ctx.fillRect(x0,0,w,H);ctx.globalAlpha=1;ctx.strokeStyle='#ffffffcc';ctx.lineWidth=1.5;
+        for(const b of G.eb)if(b.x>x0&&b.x<x0+w){ctx.beginPath();ctx.arc(b.x,b.y,b.r+2,0,7);ctx.stroke();}
+        for(const q of G.en)if(q.x>x0&&q.x<x0+w&&q.hp>0){ctx.strokeStyle='#ff7080aa';ctx.beginPath();ctx.arc(q.x,q.y,q.r+3,0,7);ctx.stroke();}}}
+    ctx.restore();}
+});
 NR.on('runStart',()=>FUN.reset());NR.on('runEnd',()=>FUN.reset());
 NR.on('tick',dt=>FUN.tick(dt));NR.on('beat',()=>FUN.beat());
 NR.on('tier',({tier,why})=>{if(why==='drop'||!G.live||tier<2)return;FUN.shardShower(2+tier*2,P.x+260);if(tier>=3){shake(4);G.flash=Math.max(G.flash,.12*FX());}});   // every tier up pays out a few shards
