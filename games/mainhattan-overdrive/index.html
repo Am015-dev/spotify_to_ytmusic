@@ -744,12 +744,13 @@ body.touch #roamPlate small{white-space:nowrap}
 <script>/* rev-3: the 🐞 note box. Registered before every game key handler (capture, first): keys typed in #qaNote never reach the game (WASD/space/E/Esc were taken); the QA kit gets Enter = SEND, Esc = close */(function(){const f=e=>{const t=e.target;if(t&&t.id==='qaNote'){e.stopImmediatePropagation();if(e.type==='keydown'&&window.__qaKey)window.__qaKey(e)}};for(const k of['keydown','keyup','keypress'])addEventListener(k,f,true)})()</script>
 <script type="module">
 const W14_ST={k0:.25,rk:1.5,hbCity:34.7},W14_PIV=1.6;
-const TUNE={htFar:0/* perf-r13a far-traffic LOD + LIFE budget on touch/LOWMEM; OFF until tBoot shows a clear win (docs/HANDOFF_perf.md) */,shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIcon:1,wbNear:70,wbFar:900,wbCell:.06,wbCity:1,wbMerged:1,wbNfc:1,wbFig:260,wbRingCam:6,wbLodD:190,wbLodCell:3,bwOn:1,bwFade:90,bwCourse:.48,bwStud:1,bwStudD:60,bwStudP:1.2,bwStudH:2,bwStudTop:16,bwStudMax:8000,bwCar:1,wbSuperD:700,wbTerr:1,wbLzD:420,wbRuns:1,bwRampSh:70,perfHud:0,lvPed:.8,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:1,lvFac:1,lvCrowd:.67,lvPark:1,lvPop:1,lvPopGap:28,lvPopRw:1,stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
+const TUNE={roamBudget:0/* perf-r13d shared roam frame budget (src/98rb_roam_budget.js); OFF until tBoot shows a clear win */,htFar:0/* perf-r13a far-traffic LOD + LIFE budget on touch/LOWMEM; OFF until tBoot shows a clear win (docs/HANDOFF_perf.md) */,shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIcon:1,wbNear:70,wbFar:900,wbCell:.06,wbCity:1,wbMerged:1,wbNfc:1,wbFig:260,wbRingCam:6,wbLodD:190,wbLodCell:3,bwOn:1,bwFade:90,bwCourse:.48,bwStud:1,bwStudD:60,bwStudP:1.2,bwStudH:2,bwStudTop:16,bwStudMax:8000,bwCar:1,wbSuperD:700,wbTerr:1,wbLzD:420,wbRuns:1,bwRampSh:70,perfHud:0,lvPed:.8,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:1,lvFac:1,lvCrowd:.67,lvPark:1,lvPop:1,lvPopGap:28,lvPopRw:1,stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
   fxFlS:1,fxFlL:1,fxFlI:1,fxSpk:1,fxSpkN:1,fxSpkS:1,fxLines:1,fxGlow:1,fxFov:1,fxShake:1,
   musOn:1,musVol:.5,sfxVol:1,duckOn:1,duckAmt:.7,
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.120',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC loading no longer freezes for seconds while it prepares graphics: they now load one at a time.'}]},
 {v:'v90m-beta.119',date:'19 Oct 2026',items:[{t:'FIXED',s:'Athens sky is blue again on phones (it could turn black on the low-memory setting).'},{t:'CHANGED',s:'Deeper LEGO-blue sky over Frankfurt.'}]},
 {v:'v90m-beta.118',date:'19 Oct 2026',items:[{t:'FIXED',s:'No more freeze about 12 seconds into free roam: city life now builds over several frames.'},{t:'FIXED',s:'Fewer stutters right after loading: more graphics are prepared during the loading screen.'},{t:'FIXED',s:'River race arrival times match the real race, Frankfurt start no longer on the centre line, traffic yields to racers.'}]},
 {v:'v90m-beta.117',date:'19 Oct 2026',items:[{t:'FIXED',s:'The white blocks on Athens roads were uncoloured scooters: they now have their colours.'},{t:'FIXED',s:'A rare error in the first minute of Athens is fixed.'},{t:'FIXED',s:'River Run: rivals finish with their own realistic times, and the rubber-banding at the end of races is gentler.'}]},
@@ -1570,7 +1571,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"8f13ec23"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"124be086"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -15596,6 +15597,7 @@ function PB_tick(now){if(PB.q.length)PB_flush(now);if(PB.n>=PB.max)return;
   if(now>=PB.next&&PB.k>=30){const S={iv:PB.iv.slice(0,PB.k),k:PB.k,slow:PB.slow,worst:PB.worst,busy:PB.busy,sys:PB.sys,n:++PB.n};PB.next=now+60000;PB_reset();
    setTimeout(()=>{try{PB_post(PB_doc(S))}catch(e){}},0)}}
 {const _lp=ldPrewarm;ldPrewarm=async function(...a){try{PB_gpu()}catch(e){}return _lp.apply(this,a)}}
+try{PB_gpu()}catch(e){}   // perf-r13b: and once now, before any program is queued: in the loader that sync waited for every queued link (5.2 s Athens PC)
 function PB_chipEl(){if(PB.chip)return PB.chip;const st=document.createElement('style');st.textContent='#pbChip{position:fixed;z-index:9989;left:50%;top:calc(1px + env(safe-area-inset-top,0px));transform:translateX(-50%);pointer-events:none;white-space:nowrap;font:700 12px/15px ui-monospace,monospace;color:#9fe8ff;background:rgba(0,0,0,.6);padding:1px 7px;border-radius:0 0 6px 6px}';document.head.appendChild(st);
   const el=document.createElement('div');el.id='pbChip';el.hidden=true;document.body.appendChild(el);return PB.chip=el}
 function PB_chipStep(now,ms){const el=PB_chipEl();if(!SET.fpsChip){if(!el.hidden)el.hidden=true;return}if(ms>0&&ms<1000)PB.cf.push(ms);if(now-PB.ct<500)return;PB.ct=now;
@@ -16369,9 +16371,27 @@ function GFX_pre(){if(!GFX.on||!GFX_BOOTPRE)return;const ro=RO.on;RO.on=true;
 {const _lp=ldPrewarm,_pc=P2_compile;let on=false;
  ldPrewarm=async function(...a){on=true;try{return await _lp.apply(this,a)}finally{on=false}};
  P2_compile=function(sc,cam){if(on){on=false;GFX_pre()}return _pc.call(this,sc,cam)}}
+const LKG={on:(()=>{const q=new URLSearchParams(location.search).get('lkg');return q?q==='1':!LOWMEM})(),q:null,i:0,ts:null,fin:null,arm:0,fr:0,n:0,steps:0,maxMs:0,lt:[]};
+try{new PerformanceObserver(l=>{for(const e of l.getEntries())if(LKG.lt.length<400)LKG.lt.push([Math.round(e.startTime),Math.round(e.duration)])}).observe({type:'longtask',buffered:true})}catch(e){}
+function LKG_begin(sc,cam){const Q=[],K=new Set(),add=o=>{const ms=[].concat(o.material||[]);if(!ms.length||o.isScene)return;const g=o.geometry,a=g&&g.attributes||{};
+  const k=ms.map(m=>m.id).join('.')+'|'+o.type+(o.instanceColor?'c':'')+(a.color?'v':'')+(a.uv1?'u':'')+(a.tangent?'t':'')+(g&&g.morphAttributes&&Object.keys(g.morphAttributes).length?'m':'');
+  if(!K.has(k)){K.add(k);Q.push(o)}};sc.traverse(add);
+ const L=[];sc.traverseVisible(o=>{if(o.isLight&&o.layers.test(cam.layers))L.push(o)});const T=new THREE.Scene();T.fog=sc.fog;T.environment=sc.environment;T.environmentIntensity=sc.environmentIntensity;
+ T.traverseVisible=f=>{for(const o of L)f(o)};LKG.q=Q;LKG.i=0;LKG.ts=T}
+function LKG_step(cam,bud){const R=renderer,t0=performance.now(),rt=R.getRenderTarget(),f=R.getActiveCubeFace(),l=R.getActiveMipmapLevel();R.setRenderTarget(composer.readBuffer);LKG.steps++;
+ try{while(LKG.i<LKG.q.length&&performance.now()-t0<bud){const o=LKG.q[LKG.i++],P=R.info.programs,n0=P.length,v=o.visible;o.visible=true;
+   try{R.compile(o,cam,LKG.ts)}catch(e){}finally{o.visible=v}
+   for(let j=n0;j<P.length;j++){try{P[j].getUniforms()}catch(e){}LKG.n++}}}
+ finally{R.setRenderTarget(rt,f,l)}const d=performance.now()-t0;if(d>LKG.maxMs)LKG.maxMs=d;return LKG.i>=LKG.q.length}
+async function LKG_drain(sc,cam){let k=0;while(LKG.q&&!LKG_step(cam,8)&&k++<3000)await nextFrame()}
+P2_warm=(f=>function(){if(LKG.on&&typeof state!=='undefined'&&state==='loading')return;return f.apply(this,arguments)})(P2_warm);
+roamPost=(f=>function(){const r=f.apply(this,arguments);if(LKG.on){LKG.arm=1;LKG.fr=0;LKG.q=null}return r})(roamPost);
+{const r0=composer.render;composer.render=function(){if(LKG.arm)return;return r0.apply(this,arguments)}}
+frame=(f=>function(now){if(!LKG.arm)return f(now);requestAnimationFrame(frame);
+ try{if(++LKG.fr>900){LKG.arm=0;return}if(ENVD){buildEnv();return}if(!LKG.q){LKG_begin(scene,camera);return}if(LKG_step(camera,8)){LKG.arm=0;LKG.q=null;LKG.idEnd=Math.max(0,...renderer.info.programs.map(p=>p.id))}}catch(e){console.warn('LKG',e);LKG.arm=0;LKG.q=null}})(frame);
 const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
 {const _lp=ldPrewarm,_pc=P2_compile;let on=false;
- ldPrewarm=async function(...a){on=WARMALL.on;try{return await _lp.apply(this,a)}finally{on=false}};
+ ldPrewarm=async function(...a){on=WARMALL.on;try{const r=await _lp.apply(this,a);if(LKG.q)await LKG_drain(scene,camera);return r}finally{on=false;LKG.q=null;const f=LKG.fin;LKG.fin=null;if(f)try{f()}catch(e){}}};
  P2_compile=function(sc,cam){if(!on)return _pc.call(this,sc,cam);on=false;
   try{const L=window.__life;if(L&&L.init&&L.LIFE&&L.LIFE.on)WARMALL.life=!!L.init()}catch(e){console.warn('warmall life',e)}
   let gm=null;try{if(typeof worldGroundGen==='function'){const tx=CID==='fra'?groundTex('grass'):athGrassTex(),m=new THREE.MeshStandardMaterial({map:tx,vertexColors:true,roughness:.92});
@@ -16390,7 +16410,9 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
      const t=m.clone();t.onBeforeCompile=m.onBeforeCompile;t.customProgramCacheKey=m.customProgramCacheKey;t.userData={};if(sp)GFX_gspec(t);   // not disposed: that would release the warmed program
      const o=new THREE.Mesh(g,t);o.frustumCulled=false;o.receiveShadow=true;bt.add(o)}}sc.add(bt)}}catch(e){console.warn('warmall bw',e)}
   const hid=[];sc.traverse(o=>{if(!o.visible){o.visible=true;hid.push(o)}});WARMALL.n=hid.length;
-  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}if(lf){sc.remove(lf);lf.children[0].geometry.dispose();for(const o of lf.children)if(o.isInstancedMesh)o.dispose()}if(bt){sc.remove(bt);if(bt.children[0])bt.children[0].geometry.dispose()}if(bm){sc.remove(bm);XFB_MP.push(bm.material);bm.dispose()}}}}
+  const disp=()=>{if(gm)gm.geometry.dispose();if(lf){lf.children[0].geometry.dispose();for(const o of lf.children)if(o.isInstancedMesh)o.dispose()}if(bt&&bt.children[0])bt.children[0].geometry.dispose();if(bm){XFB_MP.push(bm.material);bm.dispose()}};
+  if(LKG.on){try{LKG_begin(sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o)}LKG.fin=disp;return}
+  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o);disp()}}}
 function ENV_on(){if(ENV_on.v!==undefined)return ENV_on.v;let v=true;try{const q=new URLSearchParams(location.search).get('env1');if(q!==null)v=q!=='0';else if(typeof TUNE!=='undefined'&&TUNE.env1===0)v=false}catch(e){}return ENV_on.v=v}
 function ENV_lo(){try{if(typeof LK_lvl==='function'&&LK_lvl()==='low')return true;return typeof SET!=='undefined'&&SET.q==='low'}catch(e){return false}}
 function ENV_vn(x,z){const h=(a,b)=>{const v=Math.sin(a*127.1+b*311.7)*43758.5453;return v-Math.floor(v)},i=Math.floor(x),j=Math.floor(z);let fx=x-i,fz=z-j;fx=fx*fx*(3-2*fx);fz=fz*fz*(3-2*fz);
@@ -16929,6 +16951,16 @@ function FC_r10eGo(){if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam 
  T.sort((a,b)=>a-b);const r={occ:FC.occ.length,nop,occMs:+occMs.toFixed(1),passMs:+T[10].toFixed(2)};window.__chk=window.__chk||{};window.__chk.r10e=r;
  return`📍 camera occluders ${r.occ}, no-op raycast ones ${nop}; FC_occ ${r.occMs} ms; one raycast pass ${r.passMs} ms (median of 20)`+(nop===0&&occMs<15&&r.passMs<5?' ✅':' ❌')}
 (function FC_r10eReg(i){const C=window.__chk;if(C&&C.GO){if(Array.isArray(C.items)&&!C.items.some(x=>x.ver==='r10e'))C.items.push({ver:'r10e',id:'fcpull',area:'perf',text:'perf-r10e · the camera wall-pull only raycasts meshes that can be hit, and one pass stays under 5 ms'});C.GO['r10e/fcpull']=[{c:'fra',n:'fcpull',fn:()=>FC_r10eGo()},{c:'ath',n:'fcpull',fn:()=>FC_r10eGo()}];return}if(i<600)setTimeout(()=>FC_r10eReg(i+1),100)})(0);
+{const m=/[?&]rb=([01])/.exec(location.search);if(m)TUNE.roamBudget=+m[1]}
+const RB={ms:12,t0:0,dep:0,rot:0,pri:'',fr:0,K:['cull','ped','lv'],S:{}};
+for(const k of RB.K)RB.S[k]={skip:0,ema:0,dt:0,run:0,def:0};
+const RB_on=()=>!!TUNE.roamBudget&&(TOUCH.on||!!LOWMEM);
+function RB_frame(){RB.t0=performance.now();RB.fr++;RB.pri=RB.K[RB.rot++%RB.K.length]}
+function RB_gate(k){const s=RB.S[k];if(!RB_on()||!RB.t0)return true;if(s.skip>=2||RB.pri===k||performance.now()-RB.t0+s.ema<=RB.ms)return true;s.skip++;s.def++;return false}
+function RB_wrap(k,f,dtArg){return function(dt){if(!RB_on())return f.apply(this,arguments);const s=RB.S[k];if(dtArg)s.dt+=dt||0;if(!RB_gate(k))return;s.skip=0;s.run++;const a=performance.now();try{return dtArg?f.call(this,Math.min(s.dt,.2)):f.apply(this,arguments)}finally{s.dt=0;const d=performance.now()-a;s.ema=s.ema*.7+d*.3;if(d>s.ema)s.ema=d*.6+s.ema*.4}}}
+pedStep=RB_wrap('ped',pedStep,1);hubCullStep=RB_wrap('cull',hubCullStep,0);LV_step=RB_wrap('lv',LV_step,1);
+roamStep=(f=>function(){RB_frame();RB.dep++;try{return f.apply(this,arguments)}finally{RB.dep--}})(roamStep);
+hubTrafficStep=(f=>function(){if(!RB.dep)RB_frame();return f.apply(this,arguments)})(hubTrafficStep);
 {const ORD=['m1Next','roamArrow','npcSay','roamPop','roamPlate','crSmHint'];
  const st=document.createElement('style');st.textContent='.ui1X{display:none!important}body.ui1Mv #rotateHint{display:none!important}';document.head.appendChild(st);
  const vis=e=>{if(!e)return false;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity===0&&!(e.getAnimations&&e.getAnimations().length))return false;const r=e.getBoundingClientRect();return r.width>=2&&r.height>=2&&r.right>0&&r.left<innerWidth&&r.bottom>0&&r.top<innerHeight};
