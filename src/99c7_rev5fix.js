@@ -296,3 +296,11 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   catch(e){R.push(['threw '+e,false])}finally{TUNE.callCap=f0;if(mp)miniPaint=mp}
   const ok=R.every(r=>r[1]);return`📍 SINGLE-CALL CAP · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R13E_reg(i+1),100)})(0);
+// perf-r13i: allocation rate. roamStuds ran interpreted (4+ stud shapes → endless "wrong map" deopts) and boxed every double; the rain loop boxed 2400 getY/setY calls a frame.
+// The MB/s itself is measured outside the page (tBoot HEAP=1, CDP sampling); this GO pins the two causes: one stud shape, and the rain fast path applies.
+(function R13I_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='alloc-rate')){C.items.push({ver:'perf',id:'alloc-rate',area:'perf',text:'perf-r13i: roam per-frame garbage (studs one shape, rain on the array)',go:'perf/alloc-rate'});
+ C.GO['perf/alloc-rate']=[{c:'ath',n:'stud shapes = 1, rain fast path',fn:()=>{const R=[];try{const sh=new Set();for(const st of RO.studs||[])sh.add(Object.keys(st).join(','));R.push([RO.studs.length+' studs, '+sh.size+' shape(s)',RO.studs.length>0&&sh.size===1]);
+   const p=rain.geometry.attributes.position;R.push(['rain fast path',p.itemSize===3&&!p.normalized&&!p.isInterleavedBufferAttribute&&p.array instanceof Float32Array]);
+}
+  catch(e){R.push(['threw '+e,false])}const ok=R.every(r=>r[1]);return`📍 ALLOC RATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R13I_reg(i+1),100)})(0);

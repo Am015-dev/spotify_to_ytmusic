@@ -8,7 +8,7 @@ const mime={'.html':'text/html','.js':'application/javascript','.json':'applicat
 const INIT=`(()=>{const q=[];let t=0;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};window.__dbg=1;
  window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){console.log('TICKERR '+e.message)}}}return t};window.__auto=true;setInterval(()=>{if(window.__auto)window.__tick(1)},16);})();`;
 const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.url.split('?')[0]));fs.readFile(f,(e,d)=>{if(e){r.writeHead(404);return r.end()}r.writeHead(200,{'content-type':mime[path.extname(f)]||'application/octet-stream'});r.end(d)})}).listen(0,async()=>{
- const port=srv.address().port;const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});
+ const port=srv.address().port;const b=await chromium.launch({args:[...(process.env.OPTST?['--js-flags=--allow-natives-syntax'+(process.env.JSF||'')]:[]),'--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});
  const ctx=await b.newContext(TOUCH?{viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true}:{viewport:{width:1280,height:720},deviceScaleFactor:1});
  const p=await ctx.newPage();p.setDefaultTimeout(1800000);await p.addInitScript(INIT);await p.addInitScript('window.__PROGS='+(process.env.PROGS?1:0)+';window.__WRAP='+JSON.stringify(process.env.WRAP||'')+';window.__LONG='+(+process.env.LONG||50));
  p.on('console',m=>{const t=m.text();if(/TICKERR|PF1/.test(t))console.log(t.slice(0,/^PF1MAT/.test(t)?1500:200))});p.on('pageerror',e=>console.log('ERR',e.message.slice(0,150)));const t0=Date.now();
@@ -56,4 +56,5 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
   console.log('PF1HEAP total '+(tot/1048576).toFixed(0)+' MB | by sub: '+Object.entries(sub).sort((a,b)=>b[1]-a[1]).slice(0,14).map(e=>e[0]+' '+(e[1]/1048576).toFixed(1)).join(', '));
   Object.entries(self).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOPH||30)).forEach(([k,v])=>console.log('PF1HEAP '+(v/1048576).toFixed(1).padStart(6)+'MB '+k.slice(0,170)))}
  if(process.env.JSON)fs.writeFileSync(process.env.JSON,JSON.stringify(r));
+ if(process.env.OPTST){/* perf-r13i: V8 optimisation status of named fns (bit 16 = TurboFan, 32 = interpreted, 0x8000 = baseline) */for(const f of process.env.OPTST.split(','))console.log('PF1OPT '+f+' '+await p.evaluate(`(()=>{try{return __oc.ev("(%GetOptimizationStatus(${f})).toString(16)")}catch(e){return 'ERR '+e.message}})()`))}
  await b.close();srv.close()});

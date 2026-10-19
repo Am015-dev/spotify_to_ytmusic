@@ -465,7 +465,7 @@ function TR_summitBuild(){const L=TR_summits();if(!L.length||!RO.grp)return;cons
   for(const S of L){const g=new THREE.Group();g.position.set(S.x,S.y,S.z);const ring=new THREE.Mesh(new THREE.TorusGeometry(9,.6,8,40),neonMat(V[S.id]?'#ffd12c':'#5dffb0',2.4));ring.rotation.x=Math.PI/2;ring.position.y=.4;g.add(ring);S.m=ring;
     g.add(new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,14,8).translate(0,7,0),new THREE.MeshStandardMaterial({color:0xeeeeee})));const fl=new THREE.Mesh(new THREE.BoxGeometry(4,2.4,.2),neonMat('#2f9bff',2));fl.position.set(2,12.6,0);g.add(fl);RO.grp.add(g);
     if(src){const n=13,im=new THREE.InstancedMesh(src.geometry,src.material,n);im.frustumCulled=false;RO.grp.add(im);RO.sim.push(im);for(let i=0;i<n;i++){const a=i/12*Math.PI*2,r=i<12?11:0,x=S.x+Math.cos(a)*r,z=S.z+Math.sin(a)*r,y=groundY(x,z)+1.4;
-      RO.studs.push({x,y,z,v:i<12?10:40,big:i===12,m:{position:V3(x,y,z),rotation:{z:0},visible:true},alive:true,t:0,im,i})}}}}
+      RO.studs.push({x,y,z,v:i<12?10:40,big:i===12,m:{position:V3(x,y,z),rotation:{z:0},visible:true},alive:true,t:0,im,i,pull:false})}}}}
 // ---------- minimap relief: hillshade (light from the north-west) multiplied over the painted map
 {const _mp=miniPaint;miniPaint=(x0,x1,z0,z1,k,wt,src)=>{const R=_mp(x0,x1,z0,z1,k,wt,src);try{(src&&src.shade||TR_shade)(R.c,x1,z1,k)}catch(e){console.warn('TR shade',e)}return R}}
 function TR_shade(c,x1,z1,k){const W=c.width,H=c.height,st=4,sw=Math.ceil(W/st),sh=Math.ceil(H/st),[c2,g2]=cv(sw,sh),im=g2.createImageData(sw,sh),d=im.data,cs=st/k,L=[.55,.64,-.55],ll=Math.hypot(...L);

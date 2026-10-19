@@ -263,7 +263,9 @@ function LIFE_fig(cnt,x,y,z,h,arm,hop,lean,ci){const M=LIFE.M,i=cnt.fig||0;if(LI
 function LIFE_ringCam(x,y,z){const cp=camera.position;return(cp.x-x)**2+(cp.z-z)**2<7.5*7.5&&Math.abs(cp.y-y)<6}
 // perf-r10a: LIFE_draw figure poses go into pooled 6-slot arrays (was a fresh [x,z,h,arm,hop,lean] per figure per frame + one P per group = top Athens allocator)
 const LIFE_PA=[];LIFE_PA.n=0;function LIFE_pp(x,z,h,arm,hop,lean){const P=LIFE_PA;let r=P[P.n];if(!r)r=P[P.n]=[0,0,0,0,0,0];r[0]=x;r[1]=z;r[2]=h;r[3]=arm;r[4]=hop;r[5]=lean;P.n++}
-function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt={},sp=Math.abs(RO.v),air=!!(typeof pl!=='undefined'&&pl&&pl.air),dr=!!RO.dDir,stunt=air||dr&&sp>8;LIFE.ci=LIFE.ci||[];
+// perf-r13i: the per-pool instance counters are two reused objects (static / dynamic pass), zeroed per call, not a fresh dictionary per frame
+const LIFE_CN=[{},{}];function LIFE_cnt(S){const o=LIFE_CN[S?1:0];for(const k in o)o[k]=0;return o}
+function LIFE_draw(S){LIFE.S=!!S;const M=LIFE.M,t=LIFE.t,cnt=LIFE_cnt(S),sp=Math.abs(RO.v),air=!!(typeof pl!=='undefined'&&pl&&pl.air),dr=!!RO.dDir,stunt=air||dr&&sp>8;LIFE.ci=LIFE.ci||[];
  let cheer=0;
  for(const it of S?LIFE.L:LIFE.D){const dx=it.x-RO.x,dz=it.z-RO.z,d2=dx*dx+dz*dz;
   if(it.c==='sm')LIFE_put(M[it.kx||(it.kx='x_'+it.t)],cnt,it.x,it.y,it.z,0,it.h,0,1);
