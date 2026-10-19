@@ -40,6 +40,7 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  const sec={};for(const f of fr)if(f[1]>33){const s=Math.floor(f[0]/60);(sec[s]=sec[s]||[]).push(f)}
  for(const s of Object.keys(sec))console.log(`PF1T s${String(s).padStart(2)} `+sec[s].map(f=>`${Math.round(f[1])}(${f[3]}${f[6]?' GOV '+f[6]:''})`).join(' '));
  const own={};for(const f of fr)if(f[1]>50){own[f[3]]=(own[f[3]]||0)+1}console.log('PF1OWN>50 '+JSON.stringify(own));
+{/* perf-r13e: largest per-frame time of each wrapped sub (one call per frame for most subs) */const mx={};for(const f of fr)for(const e of String(f[7]).split(' ')){const [k,v]=e.split(':');if(k&&+v>(mx[k]||0))mx[k]=+v}console.log('PF1MAX '+Object.entries(mx).sort((x,y)=>y[1]-x[1]).slice(0,14).map(e=>e[0]+':'+e[1]).join(' '))}
  for(const f of fr.filter(f=>f[1]>50).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOPN||12)))console.log(`PF1LONG f${f[0]} ${f[1]} r${f[2]} ${f[3]} prog+${f[5]} ${f[6]} | ${f[7]}`);
  if(process.env.PROF){const {profile}=await cdp.send('Profiler.stop');const by={};for(const n of profile.nodes)by[n.id]=n;const par={};for(const n of profile.nodes)for(const c of n.children||[])par[c]=n.id;
   let ts=profile.startTime;const T=profile.samples.map((s,i)=>ts+=profile.timeDeltas[i]);const ci=profile.samples.findIndex(s=>by[s].callFrame.functionName==='__calib');const off=T[ci]/1000-r.tc;/* ms: profile clock - performance.now */

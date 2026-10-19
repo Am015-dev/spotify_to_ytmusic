@@ -464,7 +464,7 @@ function TR_summitBuild(){const L=TR_summits();if(!L.length||!RO.grp)return;cons
     if(src){const n=13,im=new THREE.InstancedMesh(src.geometry,src.material,n);im.frustumCulled=false;RO.grp.add(im);RO.sim.push(im);for(let i=0;i<n;i++){const a=i/12*Math.PI*2,r=i<12?11:0,x=S.x+Math.cos(a)*r,z=S.z+Math.sin(a)*r,y=groundY(x,z)+1.4;
       RO.studs.push({x,y,z,v:i<12?10:40,big:i===12,m:{position:V3(x,y,z),rotation:{z:0},visible:true},alive:true,t:0,im,i})}}}}
 // ---------- minimap relief: hillshade (light from the north-west) multiplied over the painted map
-{const _mp=miniPaint;miniPaint=(x0,x1,z0,z1,k,wt)=>{const R=_mp(x0,x1,z0,z1,k,wt);try{TR_shade(R.c,x1,z1,k)}catch(e){console.warn('TR shade',e)}return R}}
+{const _mp=miniPaint;miniPaint=(x0,x1,z0,z1,k,wt,src)=>{const R=_mp(x0,x1,z0,z1,k,wt,src);try{(src&&src.shade||TR_shade)(R.c,x1,z1,k)}catch(e){console.warn('TR shade',e)}return R}}
 function TR_shade(c,x1,z1,k){const W=c.width,H=c.height,st=4,sw=Math.ceil(W/st),sh=Math.ceil(H/st),[c2,g2]=cv(sw,sh),im=g2.createImageData(sw,sh),d=im.data,cs=st/k,L=[.55,.64,-.55],ll=Math.hypot(...L);
   for(let j=0;j<sh;j++)for(let i=0;i<sw;i++){const x=x1-(i+.5)*cs,z=z1-(j+.5)*cs,hx=(tH(x-cs,z)-tH(x+cs,z))/(2*cs),hz=(tH(x,z-cs)-tH(x,z+cs))/(2*cs),nl=Math.hypot(hx,1,hz),
       l=(-hx*L[0]+L[1]-hz*L[2])/(nl*ll)-L[1]/ll,o=(j*sw+i)*4;if(l<0){d[o]=d[o+1]=d[o+2]=30;d[o+3]=Math.min(95,-l*300)}else{d[o]=d[o+1]=d[o+2]=255;d[o+3]=Math.min(55,l*180)}}

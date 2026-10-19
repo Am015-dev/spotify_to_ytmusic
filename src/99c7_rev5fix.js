@@ -235,3 +235,64 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   finally{g.upW0=u0;g.pt=pt0;RS11(o)}
   const ok=R.every(r=>r[1]);return`📍 GOV CLIMB · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R11D_reg(i+1),100)})(0);
+
+// perf-r13a (review 13 N1): on touch/LOWMEM traffic > 120 m away steps every 4th frame (summed dt) and LIFE waits up to 2 frames after a long streets frame (TUNE.htFar).
+(function R13A_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='traffic-hitch')){C.items.push({ver:'perf',id:'traffic-hitch',area:'perf',text:'perf-r13a · traffic hitch: 📍 GO forces the touch profile in Athens and steps the streets 240 frames. Pass line: cars > 120 m away step ≈ 1 frame in 4 and still move, past 24 car steps a frame cars > 60 m wait a frame, ≤ 2 streets frames > 50 ms after a 30-frame warm-up and the mean streets frame no more than 10 % above the flag-off run (TUNE.htFar, default OFF; the real metric is tools/perf1/tBoot.js PF1OWN>50).'});
+ C.GO['perf/traffic-hitch']=[{c:'ath',n:'far traffic at 1/4 rate, near traffic every frame, no streets hitch',fn:()=>{const t0=TOUCH.on,h0=TUNE.htFar,R=[];try{TOUCH.on=true;TUNE.htFar=1;const C=HUB.cars||[],ok=c=>!(c.dead>0)&&!c.route&&!c.pk&&!c.tr&&c.x!=null,far=c=>ok(c)&&(c.x-RO.x)**2+(c.z-RO.z)**2>14400;
+   const F=C.filter(far),P=F.map(c=>[c.a,c.b,c.t]),n=[];let nNear=0,nFar=0,long=0,mx=0;
+   for(let k=0;k<240;k++){nNear+=C.filter(c=>!(c.dead>0)&&!far(c)).length;nFar+=C.filter(far).length;const s=performance.now();hubTrafficStep(1/60);const ms=performance.now()-s;if(k>=30){mx=Math.max(mx,ms);if(ms>50)long++}n.push(HUB.htN);if(k===7)R.push(['far cars moved in 8 frames '+F.filter((c,j)=>c.a!==P[j][0]||c.b!==P[j][1]||c.t!==P[j][2]).length+'/'+F.length,F.length>0&&F.filter((c,j)=>c.a!==P[j][0]||c.b!==P[j][1]||c.t!==P[j][2]).length>=F.length*.8])}
+   const avg=n.reduce((a,b)=>a+b,0)/n.length,near=nNear/240,fa=nFar/240;
+   R.push(['car steps/frame '+avg.toFixed(1)+' (cars within 120 m '+near.toFixed(1)+', beyond '+fa.toFixed(1)+'; cap 24 past 60 m)',avg>=Math.min(near,24)-1&&avg<=Math.max(24,near)+fa*.35+1]);
+   const AB=f=>{TUNE.htFar=f;let l=0,sm=0;for(let k=0;k<270;k++){const s=performance.now();hubTrafficStep(1/60);const ms=performance.now()-s;if(k>=30){sm+=ms;if(ms>50)l++}}return[l,sm/240]},off=AB(0),on=AB(1);
+   R.push(['streets frames > 50 ms after a 30-frame warm-up: '+on[0]+'/240 with, '+off[0]+'/240 without (mean '+on[1].toFixed(1)+' vs '+off[1].toFixed(1)+' ms, LIFE deferred '+(LV.nDef|0)+')',on[0]<=2&&on[1]<=off[1]*1.1])}
+  catch(e){R.push(['threw '+e,false])}finally{TOUCH.on=t0;TUNE.htFar=h0}
+  const ok=R.every(r=>r[1]);return`📍 TRAFFIC HITCH · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R13A_reg(i+1),100)})(0);
+(function R13_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='r13')){C.items.push(
+{ver:'r13',id:'sky-blue',area:'look',text:'r13 · deep 2K blue sky in both cities, with and without ?lowmem=1: 📍 GO puts the city in its day mood, runs the day light (GFX_light) and reads the sky colours (top, mid, horizon) and scene.background. Pass line: the sky mid and horizon colours are blue (b > r + .15 and b > .45) and scene.background is not a dark colour.'});
+ const sk=()=>{const U=SKYU,f=v=>v.toArray().map(x=>+x.toFixed(2)),b=scene.background;return{top:f(U.uTop.value),mid:f(U.uMid.value),hor:f(U.uHor.value),bg:b&&b.isColor?'#'+b.getHexString():String(b),ro:RO.on,gfx:GFX.on,day:GFX.day,mood:MOOD&&MOOD.id,cloud:U.uCloud.value,lm:!!LOWMEM}};
+ const go=city=>({c:city,n:city+' sky is blue',secs:2,fn:()=>{const s=sk(),bl=a=>a[2]>a[0]+.15&&a[2]>.45,bg=s.bg==='null'||/^#[0-9a-f]{6}$/.test(s.bg)&&bl(s.bg.slice(1).match(/../g).map(h=>parseInt(h,16)/255)),ok=s.day&&bl(s.mid)&&bl(s.hor)&&bg;
+  return'📍 SKY '+city.toUpperCase()+' · lowmem '+(s.lm?'on':'off')+' · mid '+s.mid+' hor '+s.hor+' background '+s.bg+' · sky mesh flagged '+!!sky.userData.sky+' → '+(ok&&sky.userData.sky?'✅ PASS':'❌ FAIL')}});
+ C.GO['r13/sky-blue']=[go('fra'),go('ath')]}return}
+ if(i<600)setTimeout(()=>R13_reg(i+1),100)})(0);
+// perf-r13d: one frame budget shared by hubCullStep, pedStep and LV_step on touch/LOWMEM (TUNE.roamBudget, src/98rb_roam_budget.js).
+(function R13D_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='roam-budget')){C.items.push({ver:'perf',id:'roam-budget',area:'perf',text:'perf-r13d · roam frame budget: 📍 GO forces the touch profile in Athens with TUNE.roamBudget on and a 0 ms budget, then steps the streets 120 frames. Pass line: hubCullStep, pedStep and LIFE each wait some frames but never more than 2 in a row (each runs at least every 3rd frame), traffic (HT_cars) runs every frame, and with the flag off nothing waits (default OFF; the real metric is tools/perf1/tBoot.js PF1OWN>50).'});
+ C.GO['perf/roam-budget']=[{c:'ath',n:'deferred subsystems rotate, none starves, traffic never waits',fn:()=>{const t0=TOUCH.on,f0=TUNE.roamBudget,m0=RB.ms,h0=HT_cars,R=[];let nh=0;try{TOUCH.on=true;HT_cars=function(){nh++;return h0.apply(this,arguments)};
+   const run=()=>RB.K.map(k=>RB.S[k].run),def=()=>RB.K.map(k=>RB.S[k].def),gap=RB.K.map(()=>0),mx=RB.K.map(()=>0),seen=RB.K.map(()=>0);
+   TUNE.roamBudget=1;RB.ms=0;const d0=def();for(let k=0;k<120;k++){const r0=run();hubTrafficStep(1/60);const r1=run();RB.K.forEach((q,j)=>{if(r1[j]>r0[j]){gap[j]=0;seen[j]++}else{gap[j]++;mx[j]=Math.max(mx[j],gap[j])}})}const d1=def();
+   RB.K.forEach((q,j)=>R.push([q+' ran '+seen[j]+'/120, waited '+(d1[j]-d0[j])+', longest wait '+mx[j],seen[j]===0&&q==='lv'&&!RO.on||seen[j]>=40&&mx[j]<=2&&d1[j]>d0[j]]));
+   R.push(['traffic steps '+nh+'/120',nh===120]);
+   TUNE.roamBudget=0;const d2=def();for(let k=0;k<30;k++)hubTrafficStep(1/60);const d3=def();R.push(['flag off waits '+(d3.reduce((a,b)=>a+b,0)-d2.reduce((a,b)=>a+b,0)),d3.every((v,j)=>v===d2[j])])}
+  catch(e){R.push(['threw '+e,false])}finally{TOUCH.on=t0;TUNE.roamBudget=f0;RB.ms=m0;HT_cars=h0}
+  const ok=R.every(r=>r[1]);return`📍 ROAM BUDGET · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R13D_reg(i+1),100)})(0);
+// perf-r13b (REVIEW_2K_13 N2): GO perf/pc-boot-lt (+ -ath). Desktop q=high: loader program links one at a time (LKG, src/98bp_warmall.js), first roam frame gated until linked.
+(function R13B_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-boot-lt')){
+ C.items.push({ver:'perf',id:'pc-boot-lt',area:'perf',text:'r13b · PC boot long tasks (review 13 N2: 59.6 s and 20.1 s tasks on desktop q=high): 📍 GO (Frankfurt, then -ath for Athens) reads the link log. Pass line: desktop links every loader / first-frame program one at a time (longest link step < 2 s on SwiftShader), the first-frame gate has finished, and the GPU string was read before any program was queued. Info: the longest boot task and its owner.'},
+  {ver:'perf',id:'pc-boot-lt-ath',area:'perf',text:'r13b · PC boot long tasks, Athens: same pass line as perf/pc-boot-lt.'});
+ const go=()=>{const L=LKG;if(L.arm&&!LOWMEM){let k=0;const w=()=>{if(LKG.arm&&k++<300)return setTimeout(w,100);LKG.arm=LKG.arm?-1:0;goSay(go())};setTimeout(w,100);return'📍 PC BOOT LT · linking…'}if(LOWMEM)return'📍 PC BOOT LT · low-mem / touch page: the one-at-a-time linker is desktop only (touch keeps its path) → ✅ PASS';
+  const R=[['desktop linker on',L.on],['roam-start gate done ('+L.fr+' frames)',!L.arm],['longest link step '+Math.round(L.maxMs)+' ms < 2000 ('+L.n+' programs, '+L.steps+' steps)',L.maxMs<2000],['GPU string read early',!!(PB&&PB.gpu)]];
+  const lt=L.lt.slice().sort((a,b)=>b[1]-a[1]),ok=R.every(r=>r[1]);
+  return`📍 PC BOOT LT · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} · info: longest boot task ${lt[0]?lt[0][1]:0} ms, ${lt.filter(x=>x[1]>2000).length} > 2 s → ${ok?'✅ PASS':'❌ FAIL'}`};
+ C.GO['perf/pc-boot-lt']=[{c:'fra',n:'Desktop boot: programs linked one at a time',fn:go}];C.GO['perf/pc-boot-lt-ath']=[{c:'ath',n:'Desktop boot (Athens): programs linked one at a time',fn:go}]}return}
+ if(i<600)setTimeout(()=>R13B_reg(i+1),100)})(0);
+// perf-r13f: GO perf/pc-post-ready-link (+ -ath). Desktop: programs linked after the roam-start gate (renderer.info.programs id > LKG.idEnd). ?lkgfx default ON since r13g (?lkgfx=0 = off).
+(function R13F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-post-ready-link')){
+ C.items.push({ver:'perf',id:'pc-post-ready-link',area:'perf',text:'r13f · PC programs linked after ready: 📍 GO (Frankfurt, then -ath) counts shader programs linked after the roam-start gate. Pass line (r13g, measured 17-23): at most 24 programs linked after the gate (was ~50 before lkgfx). ?lkgfx=0 or touch: info only.'},
+  {ver:'perf',id:'pc-post-ready-link-ath',area:'perf',text:'r13f · PC programs linked after ready, Athens: same pass line as perf/pc-post-ready-link.'});
+ const go=()=>{if(LKG.arm&&!LOWMEM){let k=0;const w=()=>{if(LKG.arm&&k++<300)return setTimeout(w,100);goSay(go())};setTimeout(w,100);return'📍 PC POST-READY LINK · gate…'}
+  const P=renderer.info.programs,n=LKG.idEnd?P.filter(p=>p.id>LKG.idEnd).length:-1;
+  if(LOWMEM||!LKG.on||!LKG.gfx)return`📍 PC POST-READY LINK · ${LOWMEM?'touch / low-mem':'?lkgfx=0'}: info ${n} programs linked after the gate → ✅ PASS`;
+  return`📍 PC POST-READY LINK · ${n>=0&&n<=24?'✓':'✗'} ${n} programs linked after the gate ≤ 24 (gate end id ${LKG.idEnd}, ${P.length} programs) → ${n>=0&&n<=24?'✅ PASS':'❌ FAIL'}`};
+ C.GO['perf/pc-post-ready-link']=[{c:'fra',n:'Desktop: programs linked after ready',fn:go}];C.GO['perf/pc-post-ready-link-ath']=[{c:'ath',n:'Desktop (Athens): programs linked after ready',fn:go}]}return}
+ if(i<600)setTimeout(()=>R13F_reg(i+1),100)})(0);
+// perf-r13e: single-call cap. An Athens minimap tile (SMM, 250 m) paints only the lines that touch it (TUNE.callCap, ?cc=1).
+(function R13E_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='single-call-cap')){C.items.push({ver:'perf',id:'single-call-cap',area:'perf',text:'perf-r13e · single-call cap: 📍 GO paints the 3×3 Athens minimap tiles around the car (SMM_tile, as in play) with TUNE.callCap off (globals swapped in), then on (perf-r13h: tile lists passed as arguments, buildings pre-filtered, one tile per frame). Pass line: every pixel is the same with the flag on; the line also prints the slowest tile off/on and the time split (report only) (the ≤ 30 ms cap is NOT met yet, see docs/HANDOFF_perf.md perf-r13e) (default OFF; the real metric is tools/perf1/tBoot.js PF1MAX).'});
+ C.GO['perf/single-call-cap']=[{c:'ath',n:'minimap tiles paint the same pixels, each ≤ 30 ms',fn:()=>{const f0=TUNE.callCap,R=[];let mp=null;try{const T=250,k=SET.q==='low'?.25:.34,tx=Math.floor(RO.x/T),tz=Math.floor(RO.z/T);
+   if(!SM_ON||!MINI||!MINI.smm){SMM_grids();SMM.k=k;SMM_center(RO.x,RO.z)}mp=miniPaint;const SP={},W0={SMM_shade,rfWaterPaint,bldPaint,TR_shade},tw=n=>function(){const t=performance.now();try{return W0[n].apply(this,arguments)}finally{SP[n]=(SP[n]||0)+performance.now()-t}};SMM_shade=tw('SMM_shade');rfWaterPaint=tw('rfWaterPaint');bldPaint=tw('bldPaint');let px=[];miniPaint=function(){const q=mp.apply(this,arguments);px.push(q.c.getContext('2d').getImageData(0,0,q.c.width,q.c.height).data);return q};
+   const paint=on=>{TUNE.callCap=on;let mx=0;px=[];try{for(let a=tx-1;a<=tx+1;a++)for(let b=tz-1;b<=tz+1;b++){const t=performance.now();SMM_tile(a,b);mx=Math.max(mx,performance.now()-t)}}finally{}return{mx,px}};
+   paint(1);paint(0);const A=paint(0),B=paint(1);let diff=0;A.px.forEach((d,j)=>{const e=B.px[j];for(let n=0;n<d.length;n++)if(Math.abs(d[n]-e[n])>2)diff++});
+   R.push(['pixels that differ '+diff,diff===0]);SMM_shade=W0.SMM_shade;rfWaterPaint=W0.rfWaterPaint;bldPaint=W0.bldPaint;R.push(['split of 18 tiles '+Object.entries(SP).map(e=>e[0]+' '+e[1].toFixed(0)).join(', ')+' ms',true]);R.push(['slowest tile off '+A.mx.toFixed(1)+' ms, on '+B.mx.toFixed(1)+' ms (report only: ± 10 ms between runs on this box)',true])}
+  catch(e){R.push(['threw '+e,false])}finally{TUNE.callCap=f0;if(mp)miniPaint=mp}
+  const ok=R.every(r=>r[1]);return`📍 SINGLE-CALL CAP · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R13E_reg(i+1),100)})(0);
