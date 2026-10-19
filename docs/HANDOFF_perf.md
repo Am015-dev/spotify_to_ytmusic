@@ -428,3 +428,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 - Default ON, `?pbb=0` = off. All storage access is try/catch. Docs use PB_post, so the existing retry queue applies.
 - GO perf/beacon-boot (src/99c7_rev5fix.js) PASS on fra; TAG set (beacon-boot, sky-blue x2, life1, xf1, terrain, phone2) 48/48 on the built page, unit 0 FAIL.
 - Left: a tab killed while hidden/backgrounded leaves no heartbeat (cleared on hide by design); read `perf` docs with kind killed/freeze after Alex's next iPhone session.
+## perf-r17c (2026-10-19): perf-r16c landed default ON (player pages skip GO chunks; ground 'ld 8' stepped in ~250 ms slices) · deliverable met
+1. Rebased 3 commits on alex/od-int2 e57aaea, no conflicts. build.sh: all 14 xc chunks still in out/<ver>/xc (same list as trunk, 700392 B), so deploy/Beta get every chunk; test pages (?test) and ?xcall=1 still load all, player pages load the GO chunks when the 📋 panel opens (XC_go(true)).
+2. PC boot longest main task (tBootTrace fra, same box): 5072 ms → 3858 ms (the remaining one is the single 3.8 s MeshPhysical link in the gate). Touch boot (tBoot, boot=): fra 37 s → 37 s, ath 52 s → 46 s; frames f0-60 same shape (OG_tick ~0.5-1.1 s first frame as before).
+3. Built page, DESKTOP=1 tGo fra+ath parallel, the 9 requested tags: new 42/52, trunk 47/52 under the same parallel load; extra reds on new (xf1/slope,assist, terrain-fps-fra, life1/smash,people, pc-boot-lt link 3836 ms) are load noise: solo fra+ath re-run on new = xf1/terrain/life1/pc-boot-lt 42/44, only xf1/grass SLOW 12.6 s and ath-density, both red on trunk too. sky-blue, sky-blue-frame, phone2, pc-post-ready-link, touch-first-frames green.
+4. Unit 0 FAIL (5015 pass, 13 known). Flags: ?gndy=0 = old ground build, ?xcall=1 = load all chunks.
+5. Left: the 3.8 s single link in the gate; no OD_CHANGELOG entry added (coordinator does it on deploy).
