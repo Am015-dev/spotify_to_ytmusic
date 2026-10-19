@@ -245,7 +245,7 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const C=LF_ctx(),fra=CID==='fra',[X
  st.regs=(st.regs||0)+1;LF.rp=K.rp;yield* lzPropsG(L)}
 // GO / tests: build the fill tiles around (x,z) now (a GO lands you there before lazyStep would reach them)
 function LF_ensure(x,z,r){if(typeof LAZY==='undefined')return 0;let n=0;for(const L of LAZY)if(L.lf&&!L.done&&lzD(L,x,z)<r){lzRun(L);n++}return n}
-buildHubProps=(f=>function(){const r=f.apply(this,arguments);try{LF_reg()}catch(e){console.warn('LF reg',e)}if(LF.on)P2_after(LF_warm);return r})(buildHubProps);
+buildHubProps=(f=>function(){const r=f.apply(this,arguments);return BH_post(()=>{try{LF_reg()}catch(e){console.warn('LF reg',e)}if(LF.on)P2_after(LF_warm);return r})})(buildHubProps);
 // distance cull: each decor type hides past LF.R[type] m (checked every 15 frames)
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LF.ms||(LF.fr=(LF.fr|0)+1)%15)return;const cp=camera.position;for(const m of LF.ms){const s=m.boundingSphere;if(!s)continue;m.visible=Math.hypot(s.center.x-cp.x,s.center.z-cp.z)-s.radius<LF.R[m.userData.lf]}})(hubCullStep);
 // flat uniform green % of the frame = visible GROUND that is one flat green: 4×4 blocks (1/2-res) that are green (G > R+12, G > B+12), flat (luma

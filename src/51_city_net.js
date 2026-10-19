@@ -288,7 +288,10 @@ function RD_fillTrim(){if(!RD_ON||!FILL_R||!FILL_R.length)return;const O=RD.ops;
     let prot=false;for(let u=Math.min(t,tj);u<=Math.max(t,tj);u+=20){const[x,z]=OB_fpt(r,u);if(RD_keep(x,z)){prot=true;break}}if(prot)continue;
     if(e){r.x1=r.x0+r.ux*tj;r.z1=r.z0+r.uz*tj}else{r.x0=r.x0+r.ux*tj;r.z0=r.z0+r.uz*tj;I.J=I.J.map(c=>c-tj)}r.L=Math.hypot(r.x1-r.x0,r.z1-r.z0);O.gtrim++}}
   for(let k=FILL_R.length-1;k>=0;k--)if(FILL_R[k].L<12){FILL_R.splice(k,1);O.gdel++}OB_fillIdx()}
-OB_fix();RD_net();
+/* perf-r14c: BHS_EN (?bhs) splits the PC boot: top-level awaits cut the page's module evaluation (one 3-3.5 s task) into several tasks, boot() yields once, buildHubG yields inside its long steps (src/60_city_build4.js) */
+/* perf-r14d: default ON on desktop (all 4 tFrame boots < 3 s); touch/low-mem keeps the old path unless ?bhs=1; ?bhs=0 = off */
+var BHS_EN=(q=>q?q==='1':!LOWMEM)(new URLSearchParams(location.search).get('bhs'));function BHS_y(){return new Promise(r=>setTimeout(r,0))}
+if(BHS_EN)await BHS_y();OB_fix();RD_net();
 window.__ob=Object.assign(window.__ob||{},{roadAudit:()=>OB_audit(),RA:OB_RA,RD,
   // debug: drawn street samples within R of (x,z): [segment index, class, width, sample index, x, z, junction key]
   roadsNear:(x,z,R=20)=>{const o=[];CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(Math.hypot(p.x-x,p.z-z)<R)o.push([si,S.r.cls,S.r.w,i,+p.x.toFixed(1),+p.z.toFixed(1),p.k==null?null:OB_kf(p.k)])}));return o}});

@@ -380,7 +380,7 @@ window.__SP={S:SP_S,open:SP_open,go:SP_go,start:(o={})=>{Object.assign(SP_S,{m:o
 function TR_res(a,b,c,d){const N=6,h00=tH(a,c),h10=tH(b,c),h01=tH(a,d),h11=tH(b,d);let e=0;
   for(let i=1;i<N;i++)for(let j=1;j<N;j++){const u=i/N,v=j/N,l=(h00*(1-u)+h10*u)*(1-v)+(h01*(1-u)+h11*u)*v;e=Math.max(e,Math.abs(tH(a+(b-a)*u,c+(d-c)*v)-l))}
   if(e<.05)return false;const n=Math.min(Math.ceil((b-a)/8),Math.ceil(Math.sqrt(e/.05)));return n<=1?false:(b-a)/n}
-{const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{const out=_g(grp,x0,x1,z0,z1,{...o,hilly:(a,b,c,d)=>ART7_t6()||TR_res(a,b,c,d),y0:(o.y0||0)-.005});for(const m of out)m.userData.trG=1;return out}}
+{const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{const out=_g(grp,x0,x1,z0,z1,{...o,hilly:(a,b,c,d)=>ART7_t6()||TR_res(a,b,c,d),y0:(o.y0||0)-.005});return BH_post(()=>{for(const m of out)m.userData.trG=1;return out})}}
 // buildings: most city builders place bodies at y=0. Right after the city merge (first hubGrid) every collider footprint gets its ground
 // (min/max over corners, edges, centre). Bodies that start below their ground are lifted to max(lowest corner, highest corner - 0.8 m)
 // (vertices of merged meshes and instance origins inside the footprint, + 1.6 m for balconies/eaves); a stone plinth fills down to the
@@ -388,24 +388,27 @@ function TR_res(a,b,c,d){const N=6,h00=tH(a,c),h10=tH(b,c),h01=tH(a,d),h11=tH(b,
 const TR_PL=[];
 // ramp-2: road surfaces already lie on groundY; a building lift (TR_bldFix pass 2, OC_unbury) that moves every vertex inside a footprint lifted them a second time: a 30 m road wedge
 function TR_roadMat(m){const M=HUB.M;if(Array.isArray(m))m=m[0];return!!(M&&m&&(m===M.road||m===M.street||m===M.resSt||m===M.cobble||(M.jn&&m.map&&m.map===M.jn.map)))}
-function TR_bldFix(){const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
+/* perf-r14b: generator (buildHubG steps it on the desktop boot, one 2.5-3.3 s task before); TR_bldFix runs it to the end */
+function TR_bldFix(){for(const _ of TR_bldFixG());}
+function* TR_bldFixG(){let yt=performance.now();const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
   for(const b of B){const c=b.c??1,s=b.s??0,P=[];for(const u of[-1,0,1])for(const v of[-1,0,1]){const lx=u*b.hw,lz=v*b.hd;P.push(groundY(b.x+lx*c+lz*s,b.z-lx*s+lz*c))}
     b.trMin=Math.min(...P);b.trMax=Math.max(...P);b.trY=1e9;const R=Math.hypot(b.hw,b.hd)+1.8;
     for(let i=Math.floor((b.x-R)/CS);i<=Math.floor((b.x+R)/CS);i++)for(let j=Math.floor((b.z-R)/CS);j<=Math.floor((b.z+R)/CS);j++){const k=K(i,j);let L=C.get(k);if(!L)C.set(k,L=[]);L.push(b)}}
   const find=(x,z,m)=>{const L=C.get(K(Math.floor(x/CS),Math.floor(z/CS)));if(!L)return null;let best=null,bo=1e9;for(const b of L){const dx=x-b.x,dz=z-b.z,lx=b.c==null?dx:dx*b.c-dz*b.s,lz=b.c==null?dz:dx*b.s+dz*b.c,o=Math.max(Math.abs(lx)-b.hw,Math.abs(lz)-b.hd);if(o<=m&&o<bo){bo=o;best=b}}return best};
-  const meshes=HUB.grp.children.filter(o=>(o.isMesh||o.isInstancedMesh)&&!o.userData.trG&&o.geometry&&o.geometry.attributes.position),_M=new THREE.Matrix4(),_p=V3();
-  for(const o of meshes){if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);const b=find(_p.x,_p.z,.4);if(b&&_p.y<b.trY)b.trY=_p.y}continue}
+  yield [.78,,'trFix'];yt=performance.now();const meshes=HUB.grp.children.filter(o=>(o.isMesh||o.isInstancedMesh)&&!o.userData.trG&&o.geometry&&o.geometry.attributes.position),_M=new THREE.Matrix4(),_p=V3();
+  for(const o of meshes){if(performance.now()-yt>30){yield [.78,,'trFix'];yt=performance.now()}if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);const b=find(_p.x,_p.z,.4);if(b&&_p.y<b.trY)b.trY=_p.y}continue}
     const p=o.geometry.attributes.position.array;for(let i=0;i<p.length;i+=3){const b=find(p[i],p[i+2],.4);if(b&&p[i+1]<b.trY)b.trY=p[i+1]}}
-  for(const b of B){b.trBot=b.trMin;if(b.trY===1e9){b.trOff=0;continue}const base=Math.max(b.trMin,b.trMax-.8),lo=b.trY<Math.max(b.trMin-1,.3)&&b.trMin>-1&&base>.05;if(lo){b.trOff=base;
+  yield [.78,,'trFix'];yt=performance.now();for(const b of B){b.trBot=b.trMin;if(b.trY===1e9){b.trOff=0;continue}const base=Math.max(b.trMin,b.trMax-.8),lo=b.trY<Math.max(b.trMin-1,.3)&&b.trMin>-1&&base>.05;if(lo){b.trOff=base;
       b.h+=base;b.y0=b.y0!=null?b.y0+base:b.trMin-1;b.trBase=b.trY+base;b.trDoor=base}else{const up=b.trMin>-1?base-b.trY:0;b.trOff=up>.05&&up<6?up:0;if(b.trOff){b.h+=up;if(b.y0!=null)b.y0+=up}b.trBase=b.trY+b.trOff;b.trDoor=b.trBase}
     if(b.trBase>b.trMin+.06){TR_PL.push(b);b.trBot=b.trMin-.4}else b.trBot=Math.min(b.trBase,b.trMin)}
   // terr-3 (Athens boot): pass 2 looks up the full grid only near a lifted building (C2 holds those alone; same result)
   const C2=new Map();for(const b of B){if(!b.trOff)continue;const R=Math.hypot(b.hw,b.hd)+1.8;for(let i=Math.floor((b.x-R)/CS);i<=Math.floor((b.x+R)/CS);i++)for(let j=Math.floor((b.z-R)/CS);j<=Math.floor((b.z+R)/CS);j++)C2.set(K(i,j),1)}
   const near=(x,z)=>C2.has(K(Math.floor(x/CS),Math.floor(z/CS)));
-  if(C2.size)for(const o of meshes){if(o.userData.gk)continue;/* rev5fix: the land ground tile is already at ground height; lifting its footprint vertices by trOff doubled them (Athens spawn walls 6-20 m) */let ch=false;if(!o.isInstancedMesh&&TR_roadMat(o.material))continue;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);if(!near(_p.x,_p.z))continue;const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
+  if(C2.size)for(const o of meshes){if(performance.now()-yt>30){yield [.78,,'trFix'];yt=performance.now()}if(o.userData.gk)continue;/* rev5fix: the land ground tile is already at ground height; lifting its footprint vertices by trOff doubled them (Athens spawn walls 6-20 m) */let ch=false;if(!o.isInstancedMesh&&TR_roadMat(o.material))continue;if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,_M);_p.setFromMatrixPosition(_M);if(!near(_p.x,_p.z))continue;const b=find(_p.x,_p.z,1.6);if(b&&b.trOff){_M.elements[13]+=b.trOff;o.setMatrixAt(i,_M);ch=true}}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere&&o.computeBoundingSphere()}continue}
     const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){if(!near(p[i],p[i+2]))continue;const b=find(p[i],p[i+2],1.6);if(!b||!b.trOff)continue;
       const core=find(p[i],p[i+2],.4)===b;if(!core){const gv=groundY(p[i],p[i+2]);if(p[i+1]>gv-.15&&p[i+1]<gv+.35)continue}p[i+1]+=b.trOff;ch=true}
     if(ch){A.needsUpdate=true;o.geometry.computeBoundingSphere();o.geometry.computeBoundingBox()}}
+  yield [.78,,'trFix'];
   // plinths: 4 stone sides per lifted/floating building, merged per 800 m tile
   const T=new Map();for(const b of TR_PL){const k=hubTile(b.x,b.z);let a=T.get(k);if(!a)T.set(k,a={p:[],n:[]});const c=b.c??1,s=b.s??0,hw=b.hw+.35,hd=b.hd+.35,y0=b.trMin-.4,y1=b.trBase+.05,
       Q=[[-hw,-hd],[hw,-hd],[hw,hd],[-hw,hd]].map(([lx,lz])=>[b.x+lx*c+lz*s,b.z-lx*s+lz*c]);
@@ -462,7 +465,7 @@ function TR_summitBuild(){const L=TR_summits();if(!L.length||!RO.grp)return;cons
   for(const S of L){const g=new THREE.Group();g.position.set(S.x,S.y,S.z);const ring=new THREE.Mesh(new THREE.TorusGeometry(9,.6,8,40),neonMat(V[S.id]?'#ffd12c':'#5dffb0',2.4));ring.rotation.x=Math.PI/2;ring.position.y=.4;g.add(ring);S.m=ring;
     g.add(new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,14,8).translate(0,7,0),new THREE.MeshStandardMaterial({color:0xeeeeee})));const fl=new THREE.Mesh(new THREE.BoxGeometry(4,2.4,.2),neonMat('#2f9bff',2));fl.position.set(2,12.6,0);g.add(fl);RO.grp.add(g);
     if(src){const n=13,im=new THREE.InstancedMesh(src.geometry,src.material,n);im.frustumCulled=false;RO.grp.add(im);RO.sim.push(im);for(let i=0;i<n;i++){const a=i/12*Math.PI*2,r=i<12?11:0,x=S.x+Math.cos(a)*r,z=S.z+Math.sin(a)*r,y=groundY(x,z)+1.4;
-      RO.studs.push({x,y,z,v:i<12?10:40,big:i===12,m:{position:V3(x,y,z),rotation:{z:0},visible:true},alive:true,t:0,im,i})}}}}
+      RO.studs.push({x,y,z,v:i<12?10:40,big:i===12,m:{position:V3(x,y,z),rotation:{z:0},visible:true},alive:true,t:0,im,i,pull:false})}}}}
 // ---------- minimap relief: hillshade (light from the north-west) multiplied over the painted map
 {const _mp=miniPaint;miniPaint=(x0,x1,z0,z1,k,wt,src)=>{const R=_mp(x0,x1,z0,z1,k,wt,src);try{(src&&src.shade||TR_shade)(R.c,x1,z1,k)}catch(e){console.warn('TR shade',e)}return R}}
 function TR_shade(c,x1,z1,k){const W=c.width,H=c.height,st=4,sw=Math.ceil(W/st),sh=Math.ceil(H/st),[c2,g2]=cv(sw,sh),im=g2.createImageData(sw,sh),d=im.data,cs=st/k,L=[.55,.64,-.55],ll=Math.hypot(...L);

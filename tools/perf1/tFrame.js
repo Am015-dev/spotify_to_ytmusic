@@ -16,6 +16,8 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  const cdp=await ctx.newCDPSession(p);const t0=Date.now();
  await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${CITY}${Q?'&q='+Q:''}${LM?'&lowmem=1':''}${process.env.QS?'&'+process.env.QS:''}`);
  await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:500});const boot=Math.round((Date.now()-t0)/1000);
+ // perf-r14a: the real loader is gated (LKG: links + warm frames, render off) before the first drivable frame; ?test sets ready earlier, so drain the gate here before measuring (PF1GATE = gate frames ticked)
+ console.log('PF1GATE '+await p.evaluate(async()=>{window.__auto=false;let n=0;const A=()=>{try{return __oc.ev('typeof LKG!=="undefined"&&LKG.arm')}catch(e){return 0}};while(A()&&n<2000){__tick(1);n++;await new Promise(r=>setTimeout(r,0))}window.__auto=true;return n}));
  // perf-r13f: programs linked after ready (PF1LINK: count after ready / after the LKG roam gate, and the material types of the late ones)
  const pid0=await p.evaluate(()=>{const R=__oc.ev('renderer');return Math.max(0,...R.info.programs.map(q=>q.id))});
  // wrap subsystems (outermost binding, so every later wrapper is inside) + composer.render
@@ -56,6 +58,8 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  for(const r of res){r.city=CITY;r.q=Q;r.lowmem=LM;r.boot=boot;r.longtasks=lt.filter(x=>x[2]===r.ph).sort((a,b)=>b[1]-a[1]).slice(0,10);r.nLong=lt.filter(x=>x[2]===r.ph).length;console.log('PF1RES '+JSON.stringify(r))}
  console.log('PF1LINK '+JSON.stringify(await p.evaluate(id0=>{const ev=__oc.ev,P=ev('renderer').info.programs;let ge=0;try{ge=ev('LKG.idEnd')||0}catch(e){}const L=P.filter(q=>q.id>id0),G=P.filter(q=>q.id>ge),c={};for(const q of G){const k=q.name+(/gfxg/.test(q.cacheKey)?'+gs':'')+(/gfxao/.test(q.cacheKey)?'+ao':'');c[k]=(c[k]||0)+1}const E=P.filter(q=>q.id<=ge),df={};for(const q of G){const t=q.cacheKey.split(',');let best=null,bn=1e9;for(const e of E){if(e.name!==q.name)continue;const u=e.cacheKey.split(',');let n=0;const d=[];for(let i=0;i<Math.max(t.length,u.length);i++)if(t[i]!==u[i]){n++;if(d.length<4)d.push(i+':'+String(u[i]).slice(0,24)+'>'+String(t[i]).slice(0,24))}if(n<bn){bn=n;best=d.join(' ')}}const k=q.name+' '+(best===null?'new':best);df[k]=(df[k]||0)+1}return{afterReady:L.length,afterGate:G.length,gateEnd:ge,id0,kinds:c,diff:df}},pid0)));
  console.log('PF1BOOTLT '+JSON.stringify(lt.filter(x=>!x[2]).sort((a,b)=>b[1]-a[1]).slice(0,8)));
+ // perf-r14d: boot marks (BMK) inside each long boot task: [start,dur,first mark before it,marks inside]
+ { const bm=await p.evaluate(()=>window.__bmk||[]);console.log('PF1BMK '+JSON.stringify(lt.filter(x=>!x[2]&&x[1]>1000).map(x=>{const pre=bm.filter(m=>m[0]<=x[0]).pop();return [x[0],x[1],pre?pre[1]:'',bm.filter(m=>m[0]>x[0]&&m[0]<x[0]+x[1]).map(m=>(m[0]-x[0])+':'+m[1])]})))}
  if(process.env.PROF){const {profile}=await cdp.send('Profiler.stop');const byId={};for(const n of profile.nodes)byId[n.id]=n;const self={};const dts=profile.timeDeltas;
   profile.samples.forEach((s,i)=>{const n=byId[s],k=(n.callFrame.functionName||'(anon)')+':'+n.callFrame.lineNumber+':'+n.callFrame.columnNumber;self[k]=(self[k]||0)+(dts[i]||0)});
   const tot=Object.values(self).reduce((a,b)=>a+b,0);console.log('PF1PROF total '+(tot/1e6).toFixed(1)+' s');Object.entries(self).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOPN||30)).forEach(([k,v])=>console.log('PF1PROF '+(v/tot*100).toFixed(1).padStart(5)+'% '+k));

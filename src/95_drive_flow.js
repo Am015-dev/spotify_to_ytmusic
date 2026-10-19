@@ -113,7 +113,7 @@ function DR_split(g,C){const idx=g.index.array,pos=g.attributes.position.array,M
   q.setIndex(map.size>65000?new THREE.Uint32BufferAttribute(ni,1):new THREE.Uint16BufferAttribute(ni,1));q.computeBoundingSphere();out.push(q)}g.dispose();return out}
 function DR_cull(L){const TC=new Set();let j=0,drop=0;for(const p of L){if(p.simp||DR_keep(p.t,p.x,p.z,TC))L[j++]=p;/* simplify-1 gap trees stay */else drop++}L.length=j;DR.st.drop=(DR.st.drop||0)+drop;DR.st.kept=j}
 if(DR.on){
- {const _ce=CE_streets;CE_streets=(add,rnd,D)=>{_ce(add,rnd,D);try{CITY_reidx();DR_solidBuild()}catch(e){console.warn('DR solid',e)}try{DR_cull(HUB.CE_L)}catch(e){console.warn('DR cull',e)}}}
+ {const _ce=CE_streets;CE_streets=(add,rnd,D)=>{_ce(add,rnd,D);const a=()=>{try{CITY_reidx();DR_solidBuild()}catch(e){console.warn('DR solid',e)}},b=()=>{try{DR_cull(HUB.CE_L)}catch(e){console.warn('DR cull',e)}};/* perf-r14c: under bhs the props generator runs these as their own steps, right after CE_streets */if(BHQ.ce){BHQ.ce.push(a,b);return}a();b()}}
  {const _lz=lzPropsG;lzPropsG=function*(L){try{const TC=new Set();L.props=L.props.filter(([t,x,z])=>DR_keep(t,x,z,TC))}catch(e){}yield* _lz(L)}}
  {const _sc=smashCheck;smashCheck=dt=>{DR.t+=dt||0;const v0=RO.v,n0=HUB.smashed;_sc(dt);if(HUB.smashed>n0&&Math.abs(v0)>.5){if(DR.t-DR.ct>1){DR.ct=DR.t;DR.vref=Math.abs(v0)}
    const fl=Math.max(Math.abs(v0)*.95,DR.vref*.85);if(Math.abs(RO.v)<fl)RO.v=Math.sign(v0)*fl}}}

@@ -186,7 +186,7 @@ function OC_altFix(){const R=LM_BY['Römer'],K=LM_BY['Kaiserdom'];if(!R||!K)retu
   const M=new THREE.Matrix4(),P=V3();for(const o of HUB.grp.children){if(!(o.isMesh||o.isInstancedMesh)||!o.geometry||!o.geometry.attributes.position)continue;let ch=false;
     if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,M);P.setFromMatrixPosition(M);const k=find(P.x,P.z);if(!k||P.y>1)continue;const e=M.elements;e[4]*=k;e[5]*=k;e[6]*=k;e[13]*=k;o.setMatrixAt(i,M);ch=true}if(ch){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere()}continue}
     const A=o.geometry.attributes.position,p=A.array;for(let i=0;i<p.length;i+=3){const k=find(p[i],p[i+2]);if(k&&p[i+1]>.05){p[i+1]*=k;ch=true}}if(ch){A.needsUpdate=true;o.geometry.computeBoundingBox();o.geometry.computeBoundingSphere()}}}
-{const _bp=buildHubProps;buildHubProps=function(){const r=_bp.apply(this,arguments);try{OC_lampsBuild();OC_traffic()}catch(e){console.warn('OC lamps',e)}return r}}
+{const _bp=buildHubProps;buildHubProps=function(){const r=_bp.apply(this,arguments);return BH_post(()=>{try{OC_lampsBuild();OC_traffic()}catch(e){console.warn('OC lamps',e)}return r})}}
 // ---------- 4 · height audit (both cities): props, traffic, buildings (storeys), named landmarks, floating / buried
 const OC_REAL={Commerzbank:259,'Main Tower':240,Messeturm:257,'Athens Tower':103,Lycabettus:277,Parthenon:13.72+1.53+3.7};
 const OC_RANGE={tree:[6,12],lamp:CID==='ath'?[4.5,6.5]:[6.5,9.5],car:[1.2,2.1],storey:[3,3.4],poly_c:[5,8],poly_o:[3,6],neo:[2,4],plaka:[1,3],fraAlt:[3,5],tower:[.9,1.1]};
@@ -321,7 +321,7 @@ function CV_pedPre(dt){const P=HUB.peds,N=HUB.nodes;if(!P)return;for(const p of 
   const bx=A.x+(B.x-A.x)*p.t,bz=A.z+(B.z-A.z)*p.t;if(p.CVh){p.v=p.CVh;p.CVh=0}const In=CV_near(bx,bz,J=>J.sig&&Math.hypot(J.x-bx,J.z-bz)<J.R0);if(In){p.CVh=p.v;p.v*=2.2}
   if(!J)continue;const dr=Math.hypot(bx-J.x,bz-J.z)-J.R0;p.CVj=J;p.CVd=dr;if(dr<=0)continue;const w=CV_walk(J);if(w>=0&&w<3.5)continue;
   const L=Math.hypot(B.x-A.x,B.z-A.z)||1;if(dr-p.v*dt*2-.4<0){p.CVs=p.v;p.v=0}}}
-function CV_pedPost(){const P=HUB.peds,N=HUB.nodes;if(!P)return;for(const p of P){if(p.CVs!=null){p.v=p.CVs;p.CVs=null}const J=p.CVj;if(!J||!(p.CVd>0))continue;const A=N[p.a],B=N[p.b];if(!A||!B)continue;
+function CV_pedPost(){const P=HUB.peds,N=HUB.nodes;if(!P)return;for(const p of P){if(p.CVs===p.CVs){p.v=p.CVs;p.CVs=NaN}const J=p.CVj;if(!J||!(p.CVd>0))continue;const A=N[p.a],B=N[p.b];if(!A||!B)continue;
   const bx=A.x+(B.x-A.x)*p.t,bz=A.z+(B.z-A.z)*p.t;if(Math.hypot(bx-J.x,bz-J.z)<J.R0&&Math.hypot(bx-J.x,bz-J.z)>J.R0-6){if(CV_walk(J)>=0)CV.pedOK++;else CV.pedBad++}}}
 {const _bt=buildHubTraffic;buildHubTraffic=()=>{_bt();try{CV_sigBuild();if(CID==='fra')CV_fraVar()}catch(e){console.warn('CV',e)}}
  const _ht=hubTrafficStep;hubTrafficStep=dt=>{if(!CV.sig.length&&!CV.yl.length||!HUB.cars)return _ht(dt);CV.t+=dt;CV_pre(dt);_ht(dt);CV_post(dt)}

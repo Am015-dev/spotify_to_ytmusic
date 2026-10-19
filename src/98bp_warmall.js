@@ -14,18 +14,19 @@ function LKG_begin(sc,cam){const Q=[],K=new Set(),add=o=>{const ms=[].concat(o.m
  const L=[];sc.traverseVisible(o=>{if(o.isLight&&o.layers.test(cam.layers))L.push(o)});const T=new THREE.Scene();T.fog=sc.fog;T.environment=sc.environment;T.environmentIntensity=sc.environmentIntensity;
  T.traverseVisible=f=>{for(const o of L)f(o)};LKG.q=Q;LKG.i=0;LKG.ts=T}
 function LKG_step(cam,bud){const R=renderer,t0=performance.now(),rt=R.getRenderTarget(),f=R.getActiveCubeFace(),l=R.getActiveMipmapLevel();R.setRenderTarget(composer.readBuffer);LKG.steps++;
- try{while(LKG.i<LKG.q.length&&performance.now()-t0<bud){const o=LKG.q[LKG.i++],P=R.info.programs,n0=P.length,v=o.visible;o.visible=true;
+ try{while(LKG.i<LKG.q.length&&performance.now()-t0<bud){const o=LKG.q[LKG.i++],P=R.info.programs,n0=P.length,v=o.visible,t1=performance.now();o.visible=true;
    try{R.compile(o,cam,LKG.ts)}catch(e){}finally{o.visible=v}
-   for(let j=n0;j<P.length;j++){try{P[j].getUniforms()}catch(e){}LKG.n++}}}
+   for(let j=n0;j<P.length;j++){try{P[j].getUniforms()}catch(e){}LKG.n++}{const d1=performance.now()-t1;if(d1>(LKG.oMs|0)){LKG.oMs=d1;LKG.oLab=[].concat(o.material)[0].type+' #'+LKG.i+'/'+LKG.q.length}}}}
  finally{R.setRenderTarget(rt,f,l)}const d=performance.now()-t0;if(d>LKG.maxMs)LKG.maxMs=d;return LKG.i>=LKG.q.length}
 async function LKG_drain(sc,cam){let k=0;while(LKG.q&&!LKG_step(cam,8)&&k++<3000)await nextFrame()}
 // the loader's mid-way whole-scene warm (hubEnter → P2_warm) only queued links for the next sync point: ldPrewarm links them one by one instead
 P2_warm=(f=>function(){if(LKG.on&&typeof state!=='undefined'&&state==='loading')return;return f.apply(this,arguments)})(P2_warm);
-roamPost=(f=>function(){const r=f.apply(this,arguments);if(LKG.on){LKG.arm=1;LKG.fr=0;LKG.q=null;LKG.g0=0}return r})(roamPost);
+roamPost=(f=>function(){const r=f.apply(this,arguments);if(LKG.on){LKG.arm=1;LKG.fr=0;LKG.q=null;LKG.g0=0;LKG.wq=0}return r})(roamPost);
 {const r0=composer.render;composer.render=function(){if(LKG.arm)return;return r0.apply(this,arguments)}}
-frame=(f=>function(now){if(!LKG.arm)return f(now);requestAnimationFrame(frame);
- try{if(++LKG.fr>900){LKG.arm=0;return}if(ENVD){buildEnv();return}if(!LKG.q){if(LKG.gfx&&typeof GFX_pre==='function'){if(!LKG.g0){LKG.g0=1;GFX_pre();try{if(typeof W12_cars==='function')W12_cars();if(TUNE.bwOn&&typeof BW_flagAll==='function')BW_flagAll()}catch(e){}}if(GFX.castMore&&RO.shadowOn){GFX_cast();return}}LKG_begin(scene,camera);return}if(LKG_step(camera,8)){LKG.arm=0;LKG.q=null;LKG.idEnd=Math.max(0,...renderer.info.programs.map(p=>p.id))}}catch(e){console.warn('LKG',e);LKG.arm=0;LKG.q=null}})(frame);
-LKG.gfx=!/[?&]lkgfx=0/.test(location.search);   // perf-r13f/r13g (default ON on desktop, ?lkgfx=0 = off; LKG itself is desktop only): GFX_pre before the loader warm and again (with the sliced GFX_cast, W12, BW flags) before the roam-gate queue
+// perf-r14a: after the links, LKG.wf real game frames run with render still off (first-frame init: OG_build, LIFE's first step, traffic spawn), so they land before the first drivable frame (?lkwf=0 = off)
+frame=(f=>function(now){if(!LKG.arm)return f(now);if(LKG.wq>0){LKG.wq--;BMK('gate wf '+LKG.wq);const t=performance.now();try{return f(now)}finally{LKG.wfMs=Math.max(LKG.wfMs|0,performance.now()-t);LKG.wfN=(LKG.wfN|0)+1;if(LKG.wq<=0){LKG.arm=0;LKG.tEnd=performance.now();LKG.idEnd=Math.max(0,...renderer.info.programs.map(p=>p.id))}}}requestAnimationFrame(frame);
+ try{if(++LKG.fr>900){LKG.arm=0;LKG.to=1;LKG.tEnd=performance.now();LKG.idEnd=Math.max(0,...renderer.info.programs.map(p=>p.id));return}if(ENVD){BMK('gate env');buildEnv();return}if(!LKG.q){if(LKG.gfx&&typeof GFX_pre==='function'){if(!LKG.g0){LKG.g0=1;BMK('gate gfx_pre');GFX_pre();try{if(typeof W12_cars==='function')W12_cars();if(TUNE.bwOn&&typeof BW_flagAll==='function')BW_flagAll()}catch(e){}}if(GFX.castMore&&RO.shadowOn){GFX_cast();return}}LKG_begin(scene,camera);return}if(LKG_step(camera,8)){LKG.q=null;LKG.idEnd=Math.max(0,...renderer.info.programs.map(p=>p.id));LKG.wq=LKG.wf;if(!LKG.wq){LKG.arm=0;LKG.tEnd=performance.now()}}}catch(e){console.warn('LKG',e);LKG.arm=0;LKG.q=null}})(frame);
+LKG.gfx=!/[?&]lkgfx=0/.test(location.search);LKG.wf=(q=>q==null?8:+q|0)(new URLSearchParams(location.search).get('lkwf'));LKG.wq=0;   // perf-r13f/r13g (default ON on desktop, ?lkgfx=0 = off; LKG itself is desktop only): GFX_pre before the loader warm and again (with the sliced GFX_cast, W12, BW flags) before the roam-gate queue
 const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
 {const _lp=ldPrewarm,_pc=P2_compile;let on=false;
  ldPrewarm=async function(...a){on=WARMALL.on;try{const r=await _lp.apply(this,a);if(LKG.q)await LKG_drain(scene,camera);return r}finally{on=false;LKG.q=null;const f=LKG.fin;LKG.fin=null;if(f)try{f()}catch(e){}}};

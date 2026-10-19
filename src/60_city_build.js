@@ -41,7 +41,7 @@ function GND_far(x,z,g){let r=null;for(let gi=0;gi<GND_L.length;gi++){const G=GN
 // boot-3: gndGen = gndBuild as a generator. With o.near (()=>[x,z]) the cells run tile by tile, nearest tile first, one yield per cell, and each
 // tile's meshes are added as soon as its last cell is done (same groups as the one-shot build: a group never spans tiles). GND_L cells stay
 // undefined until built, so GND_far falls back to the analytic ground there. gndBuild runs it to the end (unchanged order and output).
-function gndBuild(grp,x0,x1,z0,z1,o){const g=gndGen(grp,x0,x1,z0,z1,o);let r;while(!(r=g.next()).done);return r.value}
+function gndBuild(grp,x0,x1,z0,z1,o){if(BHQ.gnd===1){BHQ.gnd=gndGen(grp,x0,x1,z0,z1,o);return BHQ.gout=[]}/* perf-r14b: buildHubG steps the generator itself */const g=gndGen(grp,x0,x1,z0,z1,o);let r;while(!(r=g.next()).done);return r.value}
 function* gndGen(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1-x0)/cs),nz=Math.round((z1-z0)/cs),dx=(x1-x0)/nx,dz=(z1-z0)/nz;
   const GL=o.hilly?{x0,z0,dx,dz,nx,nz,c:new Array(nx*nz)}:null;if(GL)GND_L.push(GL);
   const out=[],mk=G=>{if(!G.i.length)return;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(G.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(G.n,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(G.u,2));if(o.col)g.setAttribute('color',new THREE.Float32BufferAttribute(G.c,3));g.setIndex(G.i);
@@ -49,7 +49,7 @@ function* gndGen(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1-
   let C=[];for(let i=0;i<nx;i++)for(let j=0;j<nz;j++)C.push([i,j]);const tkOf=(i,j)=>'|'+Math.floor((x0+i*dx+dx/2-x0)/o.tile)+'|'+Math.floor((z0+j*dz+dz/2-z0)/o.tile);
   if(o.near){const[px,pz]=o.near(),T=new Map();for(const c of C){const k=tkOf(c[0],c[1]);let L=T.get(k);if(!L)T.set(k,L={c:[],d:Infinity});L.c.push(c);L.d=Math.min(L.d,Math.hypot(x0+c[0]*dx+dx/2-px,z0+c[1]*dz+dz/2-pz))}
     C=[];for(const L of[...T.values()].sort((a,b)=>a.d-b.d)){for(const c of L.c)C.push(c);L.c[L.c.length-1].end=1}}
-  for(const cc of C){const i=cc[0],j=cc[1];if(o.near)yield;const ax=x0+i*dx,az=z0+j*dz,cx=ax+dx/2,cz=az+dz/2;if(!(o.hole&&o.hole(cx,cz))){
+  for(const cc of C){const i=cc[0],j=cc[1];if(o.near||o.yc)yield;const ax=x0+i*dx,az=z0+j*dz,cx=ax+dx/2,cz=az+dz/2;if(!(o.hole&&o.hole(cx,cz))){
     let n=1,f=cs,Q=null;if(rivClear(cx,cz)<Math.hypot(dx,dz)/2+o.fine*1.5){n=Math.ceil(dx/o.fine);f=o.fine;if(o.hilly)Q=ART8_riv(ax,az,dx,dz,n)}else if(o.hilly){Q=[];ART7_quad(ax,az,dx,dz,Q)}let LL=null;if(GL)GL.c[i*nz+j]=Q?(LL=[]):null;
     const k0=o.cls(cx,cz),tk='|'+Math.floor((cx-x0)/o.tile)+'|'+Math.floor((cz-z0)/o.tile);let G=null;
     for(const[lx,lz,lw,lh,ln,sn]of Q||[[ax,az,dx,dz]]){if(Q){n=ln||1;f=lw/n}

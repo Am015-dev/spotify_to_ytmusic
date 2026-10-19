@@ -79,7 +79,7 @@ window.__P1={P1,off:P1_off,draw:P1_draw,gb:()=>GB,R:renderer,ctx:()=>P1,progs:()
 // ============================================================ PERF2 (v89i): shader warm-up off the critical path
 // renderer.compile only issues compile/link to the GPU process; the main thread blocks later, at the first draw that needs a program
 // (three reads its uniforms). So: link programs early and in the background (the existing ldPrewarm polls KHR_parallel_shader_compile where the browser has it), and never ask for programs the next frame does not draw.
-function P2_after(fn){requestAnimationFrame(()=>requestAnimationFrame(()=>{try{fn()}catch(e){console.warn('P2',e)}}))}
+function P2_after(fn){requestAnimationFrame(()=>requestAnimationFrame(()=>{BMK('P2_after');try{fn()}catch(e){console.warn('P2',e)}BMK('P2_after end')}))}
 // every warm-up compiled with no render target bound, i.e. the canvas variant (sRGB out + tone mapping). The game draws the scene through the
 // composer (RenderPass -> linear HalfFloat target, no tone mapping): a different program. So each warm-up linked ~50 programs that were never used,
 // and the real ones still linked at the first frame. P2_compile compiles for the composer's target.

@@ -48,7 +48,7 @@ function RD_kerb(p,bx,bz,dt){const key=RD_key(p);if(p.rdK!==key){p.rdK=key;p.sd=
   RD_KR[0]=bx+p.rdcx;RD_KR[1]=bz+p.rdcz;return RD_KR}
 function RD_maySig(x,z){return !!CV_near(x,z,Q=>Q.sig&&Math.hypot(Q.x-x,Q.z-z)<Q.R0+14)}
 // cars stop for a walker on a crossing ahead of them (frozen like a CV red: speed 0, position kept)
-function RD_carPre(){const P=HUB.peds;if(!P)return;const X=[];for(const p of P)if(p.rdX&&p._x!=null&&Math.abs(p._x-RO.x)<330&&Math.abs(p._z-RO.z)<330)X.push(p);if(!X.length)return;const N=HUB.nodes;
+function RD_carPre(){const P=HUB.peds;if(!P)return;const X=[];for(const p of P)if(p.rdX&&p._x===p._x&&Math.abs(p._x-RO.x)<330&&Math.abs(p._z-RO.z)<330)X.push(p);if(!X.length)return;const N=HUB.nodes;
   for(const c of HUB.cars){if(c.dead>0||c.x==null||c.route&&!c.CVr)continue;const A=N[c.a],B=N[c.b];if(!A||!B||A.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L;
     for(const p of X){const rx=p._x-c.x,rz=p._z-c.z,al=rx*hx+rz*hz;if(al<-.5||al>18)continue;if(Math.abs(rx*hz-rz*hx)<3.6){c.RDfz=[c.a,c.b,c.t,c.v];c.RDy2='ped';c.v=0;c.cv=0;RD_PS.carHold++;break}}}}
 function RD_carPost(){for(const c of HUB.cars)if(c.RDfz){if(!(c.dead>0)){c.a=c.RDfz[0];c.b=c.RDfz[1];c.t=c.RDfz[2];c.cv=0}c.v=c.RDfz[3];c.RDfz=null}}
