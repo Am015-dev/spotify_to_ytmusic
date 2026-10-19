@@ -291,7 +291,7 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
 (function R14A_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-roam-30s')){
  C.items.push({ver:'perf',id:'pc-roam-30s',area:'perf',text:'perf-r14a · PC roam first 30 s: 📍 GO checks the desktop roam-start gate: it ended by itself with a gate end id, ran its warm frames (render off) before the first drivable frame, and LIFE has the desktop defer budget. Pass line: gate done, not timed out, idEnd > 0, warm frames = LKG.wf, LV_pcb() on. Touch/low-mem: info only. Frame bound: tFrame max JS frame ≤ 200 ms (Athens 1024 → 145, Frankfurt 151 → 57).'});
  const go=()=>{if(LKG.arm&&!LOWMEM){let k=0;const w=()=>{if(LKG.arm&&k++<300)return setTimeout(w,100);goSay(go())};setTimeout(w,100);return'📍 PC ROAM 30 S · gate…'}
-  if(LOWMEM||!LKG.on)return`📍 PC ROAM 30 S · touch / low-mem: info (gate off) → ✅ PASS`;
+  if(LOWMEM||!LKG.on||(TOUCH&&TOUCH.on))return`📍 PC ROAM 30 S · touch / low-mem: info (gate ${LKG.on?'on':'off'}, idEnd ${LKG.idEnd}, warm ${LKG.wfN|0}/${LKG.wf}; desktop-only check, DESKTOP=1) → ✅ PASS`;
   const ok=!LKG.arm&&!LKG.to&&LKG.idEnd>0&&(LKG.wfN|0)>=LKG.wf&&LV_pcb();
   return`📍 PC ROAM 30 S · ${ok?'✓':'✗'} gate done${LKG.to?' (TIMED OUT)':''}, end id ${LKG.idEnd}, warm frames ${LKG.wfN|0}/${LKG.wf} (slowest ${LKG.wfMs|0} ms), LIFE desktop budget ${LV_pcb()?'on':'off'} → ${ok?'✅ PASS':'❌ FAIL'}`};
  C.GO['perf/pc-roam-30s']=[{c:'fra',n:'Desktop: roam-start gate + warm frames before drivable',fn:go}]}return}

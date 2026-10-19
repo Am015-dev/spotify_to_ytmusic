@@ -346,3 +346,7 @@ Order: 1 v88u hotfix · 2 instancing/LOD root cause · 3 2× brick detail (cars 
 3. Measured (tFrame SECS=30 RACE=0, SwiftShader, one run each; the 60 s x2 plan did not fit the timebox): Athens max JS frame 1024/1182 → 145 ms, OG_tick 409 → 12, LV_step 310 → 11, afterReady 25 → 24 (gate-drained harness); Frankfurt 151 → 57 ms, frames > 50 ms 8 → 3, LV_step 53 → 12.5.
 4. Not met: roam long tasks are still ~6–7 s on EVERY real-render sample (render submit median 42 ms; with SAMPLE=100000 they drop to < 1 s), i.e. SwiftShader raster of the q=high frame, not JS; the first sample is ~10 s (it also links the ~18–24 post-gate programs). Next: twin the post-gate objects in LKG (r13g item 4) and measure long tasks on a GPU, not SwiftShader.
 5. Gates: build OK, unit 0 FAIL, GO perf/pc-roam-30s + perf/pc-post-ready-link 3/3 (desktop), TAG=life1,xf1,terrain 42/42 on the built page.
+
+## fix-r14a (2026-10-19): GO perf/pc-roam-30s red on the touch harness
+Root cause: tChkGo defaults to a touch context (isMobile), so TOUCH.on is true and LV_pcb() (desktop-only by design) is false; the GO only short-circuited on LOWMEM, so it demanded the desktop budget on touch. Not a rebase regression (lvpc/LV_pcb intact). The GO measured the wrong context: it is now info-only when TOUCH.on (as its text says); real check = DESKTOP=1 (3/3 incl. pc-post-ready-link).
+Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass red).
