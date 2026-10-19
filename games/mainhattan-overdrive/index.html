@@ -744,12 +744,13 @@ body.touch #roamPlate small{white-space:nowrap}
 <script>/* rev-3: the 🐞 note box. Registered before every game key handler (capture, first): keys typed in #qaNote never reach the game (WASD/space/E/Esc were taken); the QA kit gets Enter = SEND, Esc = close */(function(){const f=e=>{const t=e.target;if(t&&t.id==='qaNote'){e.stopImmediatePropagation();if(e.type==='keydown'&&window.__qaKey)window.__qaKey(e)}};for(const k of['keydown','keyup','keypress'])addEventListener(k,f,true)})()</script>
 <script type="module">
 const W14_ST={k0:.25,rk:1.5,hbCity:34.7},W14_PIV=1.6;
-const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIcon:1,wbNear:70,wbFar:900,wbCell:.06,wbCity:1,wbMerged:1,wbNfc:1,wbFig:260,wbRingCam:6,wbLodD:190,wbLodCell:3,bwOn:1,bwFade:90,bwCourse:.48,bwStud:1,bwStudD:60,bwStudP:1.2,bwStudH:2,bwStudTop:16,bwStudMax:8000,bwCar:1,wbSuperD:700,wbTerr:1,wbLzD:420,wbRuns:1,bwRampSh:70,perfHud:0,lvPed:.8,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:1,lvFac:1,lvCrowd:.67,lvPark:1,lvPop:1,lvPopGap:28,lvPopRw:1,stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
+const TUNE={htFar:0/* perf-r13a far-traffic LOD + LIFE budget on touch/LOWMEM; OFF until tBoot shows a clear win (docs/HANDOFF_perf.md) */,shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,wbCarLod:1,wbLoShare:1.35,wbIcon:1,wbNear:70,wbFar:900,wbCell:.06,wbCity:1,wbMerged:1,wbNfc:1,wbFig:260,wbRingCam:6,wbLodD:190,wbLodCell:3,bwOn:1,bwFade:90,bwCourse:.48,bwStud:1,bwStudD:60,bwStudP:1.2,bwStudH:2,bwStudTop:16,bwStudMax:8000,bwCar:1,wbSuperD:700,wbTerr:1,wbLzD:420,wbRuns:1,bwRampSh:70,perfHud:0,lvPed:.8,lvWave:1,lvTraf:1,lvBird:1,lvFlag:1,lvBlimp:1,lvBoat:1,lvFac:1,lvCrowd:.67,lvPark:1,lvPop:1,lvPopGap:28,lvPopRw:1,stAng:.55,stFall:14,stIn:60,stOut:45,stMax:1.35,stSpd:.75,tRet:14,assist:1.5,gripRoad:40,drSlip:1.5,drGrip:.049,drConv:.55,drFill:24,acc:1.15,abTop:1.22,rev:18,bPush:20,bTop:1,bDrain:22,bRegen:4,bashT:2,hop:12,grav:30,camK:1/.15,camY:10,fov:66,fovSpd:14,rSpd:1.2,rub:1,traf:1,carW:1,carL:1,ride:0,
   fxFlS:1,fxFlL:1,fxFlI:1,fxSpk:1,fxSpkN:1,fxSpkS:1,fxLines:1,fxGlow:1,fxFov:1,fxShake:1,
   musOn:1,musVol:.5,sfxVol:1,duckOn:1,duckAmt:.7,
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.119',date:'19 Oct 2026',items:[{t:'FIXED',s:'Athens sky is blue again on phones (it could turn black on the low-memory setting).'},{t:'CHANGED',s:'Deeper LEGO-blue sky over Frankfurt.'}]},
 {v:'v90m-beta.118',date:'19 Oct 2026',items:[{t:'FIXED',s:'No more freeze about 12 seconds into free roam: city life now builds over several frames.'},{t:'FIXED',s:'Fewer stutters right after loading: more graphics are prepared during the loading screen.'},{t:'FIXED',s:'River race arrival times match the real race, Frankfurt start no longer on the centre line, traffic yields to racers.'}]},
 {v:'v90m-beta.117',date:'19 Oct 2026',items:[{t:'FIXED',s:'The white blocks on Athens roads were uncoloured scooters: they now have their colours.'},{t:'FIXED',s:'A rare error in the first minute of Athens is fixed.'},{t:'FIXED',s:'River Run: rivals finish with their own realistic times, and the rubber-banding at the end of races is gentler.'}]},
 {v:'v90m-beta.116',date:'19 Oct 2026',items:[{t:'FIXED',s:'Less memory used while driving through Athens (far city blocks no longer keep a second copy), which helps phones stay smooth.'},{t:'FIXED',s:'Fewer hitches in the first seconds: the camera, traffic and one last graphics effect are prepared on the loading screen.'}]},
@@ -1424,7 +1425,7 @@ void main(){vec3 d=normalize(vD);float h=d.y;vec3 top=uTop,mid=uMid,hor=uHor;
 const V=(r,g,b)=>new THREE.Vector3(r,g,b);
 const SKYU={uT:{value:0},uTop:{value:V(.016,.012,.05)},uMid:{value:V(.07,.04,.17)},uHor:{value:V(.30,.10,.34)},uGround:{value:V(.03,.02,.06)},uSun:{value:V(0,0,0)},uStar:{value:1},uBand:{value:1},uMoon:{value:1},uLit:{value:0},uCloud:{value:0}};
 const skyMat=new THREE.ShaderMaterial({vertexShader:SKY_VS,fragmentShader:SKY_FS,uniforms:SKYU,side:THREE.BackSide,depthWrite:false,fog:false,extensions:{derivatives:true}});
-const sky=new THREE.Mesh(new THREE.SphereGeometry(8000,48,24),skyMat);sky.frustumCulled=false;sky.renderOrder=-1;scene.add(sky);sky.onBeforeRender=(r,sc,cam)=>{sky.position.copy(cam.position);sky.updateMatrixWorld()};
+const sky=new THREE.Mesh(new THREE.SphereGeometry(8000,48,24),skyMat);sky.frustumCulled=false;sky.userData.sky=1;sky.renderOrder=-1;scene.add(sky);sky.onBeforeRender=(r,sc,cam)=>{sky.position.copy(cam.position);sky.updateMatrixWorld()};
 const ENVSC=new THREE.Scene();(function(){const env=ENVSC;env.add(new THREE.Mesh(new THREE.SphereGeometry(100,32,16),new THREE.ShaderMaterial({vertexShader:SKY_VS,fragmentShader:SKY_FS,uniforms:SKYU,side:THREE.BackSide,depthWrite:false})));
   const cols=['#ff2d95','#22e4ff','#ffb46a','#8c55ff','#4ceaff'];for(let i=0;i<40;i++){const a=i/40*Math.PI*2,h=rr(4,26);const m=new THREE.Mesh(new THREE.BoxGeometry(rr(4,10),h,1),new THREE.MeshBasicMaterial({color:glowCol(cols[i%5],rr(.6,1.6))}));m.position.set(Math.cos(a)*80,h/2-8,Math.sin(a)*80);m.lookAt(0,m.position.y,0);env.add(m)}
 })();
@@ -1569,7 +1570,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"5f371c49"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"33c32ed1","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"8f13ec23"}/*end*/,XC={q:{},apply:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -5211,7 +5212,10 @@ function districtStep(){HUB.df=(HUB.df||0)+1;if(HUB.df%30)return;athDistStep();c
 const _hfw=new THREE.Vector3(),_hrt=new THREE.Vector3(),_hup=new THREE.Vector3(0,1,0);
 function TR_smashFx(c,x,z,dx,dz){c.dead=25;CR_tumbleStart(c,x,z,dx,dz);const at=V3(x,c.y+1.5,z),f2=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,V3(0,9,0).addScaledVector(f2,Math.abs(RO.v)*.5),18,[new THREE.Color(HCOL[(c.j*3+c.k)%HCOL.length]),new THREE.Color('#22252f'),new THREE.Color('#d0e8ff')],1.1,c.y);for(let k=0;k<8;k++)studBurst(at,f2,Math.abs(RO.v));return f2}
 function hubTrafficStep(dt){CR_npcPush();if(HUB.ridge)HUB.ridge.position.set(camera.position.x,0,camera.position.z);if(RO.on&&!RO.frozen){const v=Math.abs(RO.v);RO.pdist=(RO.pdist||0)+v*dt;RO.ptop=Math.max(RO.ptop||0,v*3.6);RO.pfT=(RO.pfT||0)+dt;if(RO.pfT>8){RO.pfT=0;pstatFlush()}}if(CLOUDS)CLOUDS.position.x+=dt*3;miniDraw();if(HUB.waterU)HUB.waterU.value=T;waterFx(dt);hubRecycle();pedStep(dt);hubCullStep();lazyStep();districtStep();const N=HUB.nodes;HT_cars(N,dt);HT_flush()}
-function HT_cars(N,dt){const C=HUB.cars;for(let i=0;i<C.length;i++){const c=C[i],im=HUB.cim[c.k];if(c.dead>0)HT_dead(c,im,N,dt);else HT_car(c,im,N,dt)}}
+function HT_cars(N,dt){const C=HUB.cars,lo=HT_lo(),n=C.length,o=lo&&n?(HUB.htO|0)%n:0;let cap=-1;HUB.htN=0;for(let k=0;k<n;k++){const i=(k+o)%n,c=C[i],im=HUB.cim[c.k];if(c.dead>0){HT_dead(c,im,N,dt);continue}
+  if(lo&&!c.route&&!c.pk&&!c.tr&&!(c.hitT>0)){const d2=(c.x-RO.x)**2+(c.z-RO.z)**2;if(d2>3600){c.fdt=(c.fdt||0)+dt;if(d2>14400&&(HUB.fr+c.j+c.k)&3)continue;if(HUB.htN>=24){if(cap<0)cap=i;continue}const d=Math.min(c.fdt,.25);c.fdt=0;HUB.htN++;HT_car(c,im,N,d);continue}}
+  c.fdt=0;HUB.htN++;HT_car(c,im,N,dt)}if(lo)HUB.htO=cap<0?o:cap}
+function HT_lo(){return!!TUNE.htFar&&(TOUCH.on||!!LOWMEM)}
 function HT_dead(c,im,N,dt){c.dead-=dt;if(CR_tumble(c,im,dt))return;_m.makeScale(0,0,0);im.setMatrixAt(c.j,_m);if(im.userData.w)im.userData.w.setMatrixAt(c.j,_m);if(im.userData.g)im.userData.g.setMatrixAt(c.j,_m);if(c.dead<=0){c.dead=0;/* rv2k2 respawn1: was left at -dt (truthy), so every `!c.dead` alive-check skipped revived cars */c.a=Math.floor(R()*N.length);if(RD_ON)for(let k=0;k<12&&!HT_exit(N[c.a].nb,c.a);k++)c.a=Math.floor(R()*N.ng);/* RD: never respawn on a node without exits */c.b=N[c.a].nb[0];c.t=0;if(c.tr){const T=HUB.trn;c.a=T[Math.floor(R()*T.length)];c.b=N[c.a].nb.find(n=>N[n].tr)}}}
 function HT_exit(nb,a){for(let i=0;i<nb.length;i++)if(nb[i]!==a)return true;return false}
 function HT_car(c,im,N,dt){if(!N[c.b]||!N[c.a]){c.a=Math.floor(R()*N.ng);c.b=N[c.a].nb[0]??c.a;c.t=0;return}const A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1;
@@ -11082,7 +11086,7 @@ function LV_init(){if(LV.init||!HUB.grp||!HUB.nodes||!HUB.nodes.length||!HUB.bld
   try{const M=LVP_mesh(),v=M.g.visible;M.g.visible=true;P2_compile(scene,camera);M.g.visible=v}catch(e){console.warn('LV warm',e)}}
 function LV_step(dt){if(!RO.on)return;LV_init();if(!LV.init)return;LV.t+=dt;LV.fr++;const t0=performance.now();camera.updateMatrixWorld();LV_seenF.setFromProjectionMatrix(_lvPM.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse));
   LV_birdStep(dt);LV_flagStep();LV_blimpStep();LV_boatStep(dt);try{LV_clStep(dt)}catch(e){if(!LV.e1){LV.e1=1;console.warn('LV cl',e)}}/* perf-17: 4 ms budget, parking waits a frame when the rest ran long */if(performance.now()-t0<4||LV.pkSkip>3){LV.pkSkip=0;try{LV_parkStep()}catch(e){if(!LV.e2){LV.e2=1;console.warn('LV park',e)}}}else LV.pkSkip=(LV.pkSkip|0)+1;LV.ms=LV.ms==null?0:LV.ms*.95+(performance.now()-t0)*.05}
-{const _lvHT=hubTrafficStep;hubTrafficStep=dt=>{_lvHT(dt);LV_step(dt)}}
+{const _lvHT=hubTrafficStep;hubTrafficStep=dt=>{const t0=performance.now();_lvHT(dt);LV.dta=(LV.dta||0)+dt;/* perf-r13a: on touch/LOWMEM, when the streets already took > 14 ms this frame, LIFE waits (at most 2 frames) and then steps with the summed dt */if(HT_lo()&&performance.now()-t0>14&&(LV.dfr|0)<2){LV.dfr=(LV.dfr|0)+1;LV.nDef=(LV.nDef|0)+1;return}LV.dfr=0;const d=Math.min(LV.dta,.2);LV.dta=0;LV_step(d)}}
 const LV_CPP=[4,5,6,3,5,4];// people per cluster
 const LV_seenF=new THREE.Frustum(),_lvPM=new THREE.Matrix4(),_lvV=new THREE.Vector3();
 const LV_seen=(x,y,z)=>LV_seenF.containsPoint(_lvV.set(x,y+1,z));
@@ -16288,8 +16292,8 @@ function GFX_light(){if(!GFX.on)return;const day=GFX_isDay();GFX.day=day;
  const ath=CID==='ath';moonL.color.set(ath?'#ffd9a8':'#ffe1b4');moonL.intensity=TUNE.gfxSun;
  hemi.color.set('#9cbcff');hemi.groundColor.set(ath?'#8a7656':'#6f7a60');hemi.intensity=TUNE.gfxHemi;
  scene.environmentIntensity=TUNE.gfxEnv;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
- const U=SKYU;U.uTop.value.set(.004,.045,.40);U.uMid.value.set(.025,.16,.72);U.uHor.value.set(ath?.62:.48,ath?.66:.68,ath?.78:.92);U.uSun.value.set(1.0,.8,.5);
- scene.fog.color.set(ath?'#cfd6e2':'#b9cff0');
+ const U=SKYU;U.uTop.value.set(.004,.045,.40);U.uMid.value.set(.025,.16,.72);U.uHor.value.set(ath?.62:.30,ath?.66:.56,ath?.78:.95);U.uSun.value.set(1.0,.8,.5);
+ scene.fog.color.set(ath?'#cfd6e2':'#a6c4ee');
  GFX.U.value=.15;GFX_GRADE.uniforms.uOn.value=1;bloom.strength=.16;bloom.radius=.45;
 for(const m of GFX.gm)m.roughness=.88}   // applyMoodMaterials resets the road's roughness on every mood change
 {let thr=bloom.threshold;Object.defineProperty(bloom,'threshold',{configurable:true,get(){return GFX.on&&GFX.day&&RO.on?2.2:thr},set(v){thr=v}})}
