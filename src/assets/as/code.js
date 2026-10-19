@@ -191,7 +191,7 @@ function AS_defs(D){const C=CID==='fra'?'fra':'ath';AS_variants();ASSET.far=ASSE
 // after the city's props are built (or when this file arrives later): far blobs, variants, rebalance, tints, near/mid meshes
 function AS_apply(){const D=HUB.ptypes;if(!D||!HUB.props||!HUB.grp)return;const C=CID==='fra'?'fra':'ath',old=new Map();for(const t in AS_POOL[C]){const d=D[t];if(d&&!d.asB)for(const g of[d.g,d.gFar,d.gOld])if(g)old.set(g,t)}
  AS_defs(D);if(old.size)scene.traverse(o=>{if(o.isInstancedMesh&&old.has(o.geometry)){const d=D[old.get(o.geometry)];if(!d.mAS0)d.mAS0=o.material;o.userData.asOld=o.geometry;o.userData.asOldM=o.material;o.geometry=d.g;o.material=d.mat;o.castShadow=false}});ASSET.ag=new Map();ASSET.agId=(ASSET.agId|0)+1;ASSET.hid.clear();
- ASSET.nA=AS_assign(HUB.props);ASSET.nFix=AS_fix(HUB.props);AS_far(HUB.props);AS_mk();ASSET.cx=1e9;AS_tufts()}
+ ASSET.nA=AS_assign(HUB.props);const r=()=>{ASSET.nFix=AS_fix(HUB.props);AS_far(HUB.props);AS_mk();ASSET.cx=1e9;AS_tufts()};/* perf-r14c: under ?bhs the loader runs the rest as its own step */if(typeof BHQ!=='undefined'&&BHQ.sub){BHQ.sub.push(()=>{try{r()}catch(e){console.warn('AS apply',e)}});return}r()}
 // fill grass tufts (98lf, ~216k in Frankfurt, two open 5-sided cones = 10 tris each) -> a low-poly copy of LEGO 6255 Plant 1x1 Round with 3 Large Leaves:
 // 3 kite leaves 120° apart (centre r 4 -> sides r 28 ±16 -> tip r 54 LDU as measured on the LDraw part; tips arched up to 27-33 LDU so the tuft keeps the old ~0.9 m height), a second one turned 60° on a
 // 1x1 round stem above it (plants stacked on round bricks, as in LEGO bushes): 12 tris, white (the fill's instance colour picks the green), double-sided material

@@ -274,7 +274,7 @@ function athRoadProfile(S,pinH){const P=S.pts,n=P.length,y=P.map(p=>athBlurH(p.x
   const sm=(k)=>{const o=y.slice();for(let i=0;i<n;i++){if(pin[i])continue;let a=0,c=0;for(let j=Math.max(0,i-k);j<=Math.min(n-1,i+k);j++){a+=y[j];c++}o[i]=a/c}for(let i=0;i<n;i++)y[i]=o[i]};sm(4);
   const G=TR_GR;for(let it=0;it<3;it++){for(let i=1;i<n;i++){const ds=Math.max(.5,P[i].s-P[i-1].s);if(!pin[i])y[i]=Math.min(Math.max(y[i],y[i-1]-G*ds),y[i-1]+G*ds)}for(let i=n-2;i>=0;i--){const ds=Math.max(.5,P[i+1].s-P[i].s);if(!pin[i])y[i]=Math.min(Math.max(y[i],y[i+1]-G*ds),y[i+1]+G*ds)}}sm(2);sm(2);
   for(let i=0;i<n;i++)P[i].y=y[i];for(let i=0;i<n;i++){const a=P[Math.max(0,i-1)],b=P[Math.min(n-1,i+1)];P[i].dy=(b.y-a.y)/Math.max(1,b.s-a.s)}S.prof=1}
-if(CID!=='fra')athRoadProfiles();
+if(BHS_EN)await BHS_y();if(CID!=='fra')athRoadProfiles();if(BHS_EN)await BHS_y();
 function shelfY(x,z,h){if(CID!=='fra')return athShelfY(x,z,h);const L=SHELF.get(Math.floor(x/32)*100000+Math.floor(z/32));if(!L)return h;let bd=1e18,bS=null,bi=0;for(let j=0;j<L.length;j+=2){const p=L[j].pts[L[j+1]],d=(p.x-x)**2+(p.z-z)**2;if(d<bd){bd=d;bS=L[j];bi=L[j+1]}}
   const p=bS.pts[bi],a0=(x-p.x)*p.tx+(z-p.z)*p.tz,al=clamp(a0,-6,6),lat=Math.hypot((x-p.x)*p.tz-(z-p.z)*p.tx,Math.max(0,Math.abs(a0)-6)),y=p.y+al*p.dy,t=clamp((lat-bS.r.w/2-6)/18,0,1),k=t*t*(3-2*t);return y+(h-y)*k}
 // ground mesh resolution for a ground cell: 10 m next to a hill street, 20 m on a hill, else coarse
@@ -389,7 +389,7 @@ function abAt(x,z){const S0=abSamples();if(!AB_G){AB_G=new Map();S0.forEach((S,s
 function abBridgesAuto(){const out=[];for(const S of abSamples()){const r=S.r;if(!r.ab||r.c)continue;const P=S.pts,step=S.L/(P.length-1);let i=0;while(i<P.length){if(!inRiver(P[i].x,P[i].z)){i++;continue}let j=i;while(j+1<P.length&&inRiver(P[j+1].x,P[j+1].z))j++;const m=P[(i+j)>>1],wl=(j-i+1)*step,L=160,half=wl/2+40+L;
     out.push({id:'ab_'+r.id,name:r.id==='A5'?'Schwanheimer Brücke (A5)':r.id==='A661'?'Kaiserleibrücke (A661)':r.id+' Mainbrücke',kind:'ab',cx:m.x,cz:m.z,ux:m.tx,uz:m.tz,w:r.w+2,H:12,prof:'ramp',L,half,road:r,r:half+r.w});i=j+1}}
   {const S=abSamples().find(q=>q.r.id==='A5'),X=AB_X.find(q=>q.name==='Frankfurter Kreuz');if(S&&X){const p=S.pts[abNearI(S,X.x,X.z)[0]];out.push({id:'ab_fk',name:'Frankfurter Kreuz (A5 über A3)',kind:'ab',cx:p.x,cz:p.z,ux:p.tx,uz:p.tz,w:40,H:9,prof:'ramp',L:120,half:180,road:AB[0],r:220})}}return out}
-AB_BRIDGES=abBridgesAuto();for(const b of AB_BRIDGES){b.yA=TR_Y(b.cx-b.ux*b.half,b.cz-b.uz*b.half);b.yB=TR_Y(b.cx+b.ux*b.half,b.cz+b.uz*b.half)}ALL_DECKS=[...BRIDGES,...AB_BRIDGES];
+if(BHS_EN)await BHS_y();AB_BRIDGES=abBridgesAuto();for(const b of AB_BRIDGES){b.yA=TR_Y(b.cx-b.ux*b.half,b.cz-b.uz*b.half);b.yB=TR_Y(b.cx+b.ux*b.half,b.cz+b.uz*b.half)}ALL_DECKS=[...BRIDGES,...AB_BRIDGES];
 const abSkip=(x,z,m=0)=>(abSamples(),AB_X).some(q=>Math.hypot(x-q.x,z-q.z)<520)||AB_BRIDGES.some(b=>{if(Math.abs(x-b.cx)>b.r+40+m||Math.abs(z-b.cz)>b.r+40+m)return false;const[a,c]=deckLocal(b,x,z);return Math.abs(a)<b.half+20+m&&Math.abs(c)<b.w+m});
 function abClear(x,z){const a=abAt(x,z);if(a&&a.d<a.road.w/2+10)return false;return !GARAGES.some(g=>g.x!=null&&Math.hypot(x-g.x,z-g.z)<70)&&mtnDist(x,z)>20}
 let MTN_S=null;function mtnSamples(){if(MTN_S)return MTN_S;MTN_S=MTN.map(r=>{const c=new THREE.CatmullRomCurve3(r.pts.map(p=>V3(p[0],0,p[1])));const L=c.getLength(),n=Math.ceil(L/6);return{r,pts:c.getSpacedPoints(n).map(v=>({x:v.x,z:v.z})),L}});return MTN_S}

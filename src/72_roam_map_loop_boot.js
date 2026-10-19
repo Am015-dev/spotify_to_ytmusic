@@ -209,7 +209,7 @@ async function ldFlash(fn){ldShow('Fast travel');fn();LD.on=false;try{P2_compile
 
 /* ============================================================ boot */
 let booted=false;
-function boot(){MAT.roof=new THREE.MeshStandardMaterial({color:0x0c0e1e,roughness:.6,metalness:.4});buildAmbient();buildTrafficMeshes();loadTrack(menuTrack);
+async function boot(){MAT.roof=new THREE.MeshStandardMaterial({color:0x0c0e1e,roughness:.6,metalness:.4});buildAmbient();buildTrafficMeshes();loadTrack(menuTrack);if(BHS_EN)await BHS_y();/* perf-r14c: boot = two tasks (loadTrack | menu), the PC boot had one 2.5-3 s task */
   SPARK=linePool(700);FIRE=pointPool(900,5);SMOKE=spritePool(520,false);FIREB=spritePool(320,true);buildDebris();buildPropMeshes();buildStreaks();GLOWP=pointPool(120,6);WATER=pointPool(400,3);
   toMenu();const done=()=>{booted=true;$('#loading').hidden=true;{const d=document.createElement('div');d.id='gfxNote';d.textContent='Graphics: '+TEXVAR.name;d.style.cssText='font:11px system-ui,sans-serif;opacity:.5;margin-top:10px;letter-spacing:.04em';$('.mpanel').appendChild(d)}$('#topBtns').hidden=false;$('#muteBtn').textContent=$('#pMute').textContent=AU.muted?'SOUND OFF':'SOUND ON';requestAnimationFrame(frame);if(BOOTF&&BOOTF.go==='roam'){if(BOOTF.arrive){RO.arrive=BOOTF.arrive;LD.fly={a:BOOTF.from==='ath'?'ATH':'FRA',b:CCF.code,to:CID,arr:1}}setTimeout(()=>{homeShow(false);enterRoam()},0)}};
   warmTextures(scene);
