@@ -255,3 +255,14 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   return'📍 SKY '+city.toUpperCase()+' · lowmem '+(s.lm?'on':'off')+' · mid '+s.mid+' hor '+s.hor+' background '+s.bg+' · sky mesh flagged '+!!sky.userData.sky+' → '+(ok&&sky.userData.sky?'✅ PASS':'❌ FAIL')}});
  C.GO['r13/sky-blue']=[go('fra'),go('ath')]}return}
  if(i<600)setTimeout(()=>R13_reg(i+1),100)})(0);
+// perf-r13d: one frame budget shared by hubCullStep, pedStep and LV_step on touch/LOWMEM (TUNE.roamBudget, src/98rb_roam_budget.js).
+(function R13D_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='roam-budget')){C.items.push({ver:'perf',id:'roam-budget',area:'perf',text:'perf-r13d · roam frame budget: 📍 GO forces the touch profile in Athens with TUNE.roamBudget on and a 0 ms budget, then steps the streets 120 frames. Pass line: hubCullStep, pedStep and LIFE each wait some frames but never more than 2 in a row (each runs at least every 3rd frame), traffic (HT_cars) runs every frame, and with the flag off nothing waits (default OFF; the real metric is tools/perf1/tBoot.js PF1OWN>50).'});
+ C.GO['perf/roam-budget']=[{c:'ath',n:'deferred subsystems rotate, none starves, traffic never waits',fn:()=>{const t0=TOUCH.on,f0=TUNE.roamBudget,m0=RB.ms,h0=HT_cars,R=[];let nh=0;try{TOUCH.on=true;HT_cars=function(){nh++;return h0.apply(this,arguments)};
+   const run=()=>RB.K.map(k=>RB.S[k].run),def=()=>RB.K.map(k=>RB.S[k].def),gap=RB.K.map(()=>0),mx=RB.K.map(()=>0),seen=RB.K.map(()=>0);
+   TUNE.roamBudget=1;RB.ms=0;const d0=def();for(let k=0;k<120;k++){const r0=run();hubTrafficStep(1/60);const r1=run();RB.K.forEach((q,j)=>{if(r1[j]>r0[j]){gap[j]=0;seen[j]++}else{gap[j]++;mx[j]=Math.max(mx[j],gap[j])}})}const d1=def();
+   RB.K.forEach((q,j)=>R.push([q+' ran '+seen[j]+'/120, waited '+(d1[j]-d0[j])+', longest wait '+mx[j],seen[j]===0&&q==='lv'&&!RO.on||seen[j]>=40&&mx[j]<=2&&d1[j]>d0[j]]));
+   R.push(['traffic steps '+nh+'/120',nh===120]);
+   TUNE.roamBudget=0;const d2=def();for(let k=0;k<30;k++)hubTrafficStep(1/60);const d3=def();R.push(['flag off waits '+(d3.reduce((a,b)=>a+b,0)-d2.reduce((a,b)=>a+b,0)),d3.every((v,j)=>v===d2[j])])}
+  catch(e){R.push(['threw '+e,false])}finally{TOUCH.on=t0;TUNE.roamBudget=f0;RB.ms=m0;HT_cars=h0}
+  const ok=R.every(r=>r[1]);return`📍 ROAM BUDGET · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R13D_reg(i+1),100)})(0);
