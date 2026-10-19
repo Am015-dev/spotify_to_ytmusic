@@ -21,10 +21,11 @@ function LKG_step(cam,bud){const R=renderer,t0=performance.now(),rt=R.getRenderT
 async function LKG_drain(sc,cam){let k=0;while(LKG.q&&!LKG_step(cam,8)&&k++<3000)await nextFrame()}
 // the loader's mid-way whole-scene warm (hubEnter → P2_warm) only queued links for the next sync point: ldPrewarm links them one by one instead
 P2_warm=(f=>function(){if(LKG.on&&typeof state!=='undefined'&&state==='loading')return;return f.apply(this,arguments)})(P2_warm);
-roamPost=(f=>function(){const r=f.apply(this,arguments);if(LKG.on){LKG.arm=1;LKG.fr=0;LKG.q=null}return r})(roamPost);
+roamPost=(f=>function(){const r=f.apply(this,arguments);if(LKG.on){LKG.arm=1;LKG.fr=0;LKG.q=null;LKG.g0=0}return r})(roamPost);
 {const r0=composer.render;composer.render=function(){if(LKG.arm)return;return r0.apply(this,arguments)}}
 frame=(f=>function(now){if(!LKG.arm)return f(now);requestAnimationFrame(frame);
- try{if(++LKG.fr>900){LKG.arm=0;return}if(ENVD){buildEnv();return}if(!LKG.q){LKG_begin(scene,camera);return}if(LKG_step(camera,8)){LKG.arm=0;LKG.q=null;LKG.idEnd=Math.max(0,...renderer.info.programs.map(p=>p.id))}}catch(e){console.warn('LKG',e);LKG.arm=0;LKG.q=null}})(frame);
+ try{if(++LKG.fr>900){LKG.arm=0;return}if(ENVD){buildEnv();return}if(!LKG.q){if(LKG.gfx&&typeof GFX_pre==='function'){if(!LKG.g0){LKG.g0=1;GFX_pre();try{if(typeof W12_cars==='function')W12_cars();if(TUNE.bwOn&&typeof BW_flagAll==='function')BW_flagAll()}catch(e){}}if(GFX.castMore&&RO.shadowOn){GFX_cast();return}}LKG_begin(scene,camera);return}if(LKG_step(camera,8)){LKG.arm=0;LKG.q=null;LKG.idEnd=Math.max(0,...renderer.info.programs.map(p=>p.id))}}catch(e){console.warn('LKG',e);LKG.arm=0;LKG.q=null}})(frame);
+LKG.gfx=/[?&]lkgfx=1/.test(location.search);   // perf-r13f (WIP, default OFF until post-gate links <= 2): GFX_pre before the loader warm and again (with the sliced GFX_cast, W12, BW flags) before the roam-gate queue
 const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
 {const _lp=ldPrewarm,_pc=P2_compile;let on=false;
  ldPrewarm=async function(...a){on=WARMALL.on;try{const r=await _lp.apply(this,a);if(LKG.q)await LKG_drain(scene,camera);return r}finally{on=false;LKG.q=null;const f=LKG.fin;LKG.fin=null;if(f)try{f()}catch(e){}}};
@@ -54,5 +55,7 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
   const hid=[];sc.traverse(o=>{if(!o.visible){o.visible=true;hid.push(o)}});WARMALL.n=hid.length;
   const disp=()=>{if(gm)gm.geometry.dispose();if(lf){lf.children[0].geometry.dispose();for(const o of lf.children)if(o.isInstancedMesh)o.dispose()}if(bt&&bt.children[0])bt.children[0].geometry.dispose();if(bm){XFB_MP.push(bm.material);bm.dispose()}};
   // perf-r13b: desktop queues the objects here and ldPrewarm (below) links them one at a time; the twins are compiled out of the scene and disposed after
-  if(LKG.on){try{LKG_begin(sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o)}LKG.fin=disp;return}
+  // perf-r13f: this path skipped the inner P2_compile, so GFX_pre (98gx: plastic, ground spec, ACES, sun shadow) never ran before the warm on desktop and ~45 GFX variants
+  // linked after the gate. Apply it here, with the twins in the scene (as the inner path did). ?lkgfx=1 = on.
+  if(LKG.on){try{if(LKG.gfx&&typeof GFX_pre==='function')GFX_pre();LKG_begin(sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o)}LKG.fin=disp;return}
   try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;for(const o of[gm,lf,bt,bm])if(o)sc.remove(o);disp()}}}
