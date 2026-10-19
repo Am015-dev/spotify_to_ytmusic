@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.126',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC: almost no graphics are built after loading any more, so the first seconds of driving stay smooth.'}]},
 {v:'v90m-beta.125',date:'19 Oct 2026',items:[{t:'FIXED',s:'Phones: the first seconds of driving are smooth; the city finishes building under the loading screen instead of stuttering after you start.'},{t:'CHANGED',s:'Athens loads about 8 seconds faster on phones.'}]},
 {v:'v90m-beta.124',date:'19 Oct 2026',items:[{t:'FIXED',s:'Phones: Frankfurt no longer piles up memory in the first 30 seconds (two thirds less), so iPhones are much less likely to close the game.'}]},
 {v:'v90m-beta.123',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC: smoother start, with fewer graphics rebuilds and first-frame stalls after loading.'},{t:'FIXED',s:'Phones: lighter on memory while driving (pedestrians and city life churn less).'}]},
