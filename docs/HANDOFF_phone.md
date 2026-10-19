@@ -18,3 +18,10 @@
 3. GOs phone2/beacon (stubbed db: fields, p50/p90, top 3 order, 20 s gate, 60 s next, cap 5, no db) and phone2/chip (top edge, 12 px, no overlap, long-press swallows the ⚙ click) in src/99c7_rev5fix.js, both ✅ on the built page.
 4. WebKit: Playwright has the webkit API but no WebKit browser in /opt/pw-browsers, so no WebKit comparison (not installed, per orders).
 5. Next: read the `perf` docs with ArtifactData after Alex drives the Beta on the iPhone 17 for ~2 min; top[] and worstMs say which system to cut.
+
+# HANDOFF r11d (empty `perf` collection + Auto climb on touch, 2026-10-19)
+1. Root cause of the empty `perf` (the API, doc shape and trigger are fine: the built page with a stubbed `claude.use('db')` writes a doc at 20 s and again at 80 s; not verifiable against the live artifact from here): `bugs` is written inside a tap, where the platform's lazy consent dialog can show; the beacon's first db call came from a timer 20 s into a drive with no gesture, `PB_db` cached the first null/failed lookup for the whole session, and `PB_send` swallowed every error, so 5 sends could fail silently.
+2. src/98pb_perfbeacon.js: consent asked once on the first tap (`permissions.request(['db'])`, menu time), null/failed lookups never cached, failed docs queued and retried (3 tries, 30 s apart), last reason in `__pb.PB.err`. No per-frame cost added (one `q.length` check).
+3. src/98qg_qgov.js: step-up uses the frame work p75 (`b75`, JS + render submit) instead of p90; step-down, hysteresis, 60 s scale-only and the 30 fps rule are unchanged. `GOV.last` now shows b75.
+4. GOs in src/99c7_rev5fix.js: r11d/beacon-write (null db then rejected add then written to "perf" via claude.use('db'), consent on tap) and r11d/gov-climb (p75 11 / p90 18 climbs, all-18 does not). Gate: unit 0 FAIL; TAG=r11d,phone2,scale1,life1,xf1,terrain 48/50 then r11d,phone2 4/4 (only xf1/grass, a known red).
+5. Next: after Alex plays the Beta once, read `perf` with ArtifactData; if it is still empty, check the Permissions menu of the artifact (db may be denied) and `__pb.PB.err` / `PB.perm` via ?fps=1 console.

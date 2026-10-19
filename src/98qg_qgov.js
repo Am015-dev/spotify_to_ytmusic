@@ -1,6 +1,6 @@
 // scale-1 (2026-10-18): adaptive quality governor for Graphics = Auto (the default). One ladder, reusing what exists:
 // render scale (DRES.s) 1 → .85 → .7, then the LK tier (high → med → low → min: shadows, AO, draw distance, density).
-// Down: frame-interval p90 > 22 ms in 3 one-second buckets in a row. Up: interval p90 < 18 ms (no missed vsync) AND busy p90 < 12 ms for 10 buckets.
+// Down: frame-interval p90 > 22 ms in 3 one-second buckets in a row. Up: interval p90 < 18 ms (no missed vsync) AND busy p75 < 12 ms (touch 14) for 10 buckets.
 // (On a 60 Hz screen the rAF interval never goes below 16.7 ms, so "under 12 ms" is judged on the frame's own work time.)
 // Hysteresis: 22/12 ms gap, 2 s settle after every step, and an up step that has to be undone within 20 s doubles the next up wait (10 → 20 → 40 → 80 s).
 // Manual Graphics (Low/Medium/High) = no governor; the old Auto resolution switch still works there. First 5 s after boot / loading are ignored.
@@ -26,10 +26,11 @@ function GOV_feed(ms,busy){if(!GOV.on)return;GOV.clock+=ms;
   if(paused||document.hidden||LD.on||!(state==='roam'||state==='race'||state==='countdown')||ms>250||ms<=0){GOV.warm=0;GOV_reset();return}
   GOV.pt+=ms;if((GOV.warm+=ms)<5000)return;if(GOV.hold>0){GOV.hold-=ms;return}
   GOV.ring.push(ms);GOV.busy.push(busy);if((GOV.bk+=ms)<1000)return;
-  const p90=_gp(GOV.ring,.9),b90=_gp(GOV.busy,.9),med=_gp(GOV.ring,.5),p10=_gp(GOV.ring,.1);GOV.last={p90:+p90.toFixed(1),b90:+b90.toFixed(1),n:GOV.ring.length};GOV.ring.length=GOV.busy.length=0;GOV.bk=0;
+  const p90=_gp(GOV.ring,.9),b90=_gp(GOV.busy,.9),b75=_gp(GOV.busy,.75),med=_gp(GOV.ring,.5),p10=_gp(GOV.ring,.1);GOV.last={p90:+p90.toFixed(1),b90:+b90.toFixed(1),b75:+b75.toFixed(1),n:GOV.ring.length};GOV.ring.length=GOV.busy.length=0;GOV.bk=0;
   if(Math.abs(med-33.3)<3&&p90-p10<4&&b90<20){GOV.bad=GOV.good=0;return}   // a steady 30 fps with idle work is the iOS low-power cap, not the GPU
+  // r11d (review 11 N6): step UP on the frame's own work p75 (JS + render submit), not p90: one 18 ms hub-traffic frame in five kept Athens at .7 for good; step DOWN still uses the interval p90
   const H=GOV.th;if(p90>H.dn){GOV.good=0;if(++GOV.bad>=3)GOV_step(-1)}
-  else if(p90<H.upP&&b90<H.upB){GOV.bad=0;if(++GOV.good>=GOV.upW)GOV_step(1)}
+  else if(p90<H.upP&&b75<H.upB){GOV.bad=0;if(++GOV.good>=GOV.upW)GOV_step(1)}
   else{GOV.bad=0;GOV.good=0}}
 function GOV_set(on){GOV.on=on;GOV.warm=0;GOV.hold=0;GOV_reset();if(on){GOV.upW=GOV.upW0;GOV_apply(0)}}
 // Settings → Graphics: Auto | Low | Medium | High (SET.qm). Manual = that tier, LK auto-drop off, render scale back to 1 unless Auto resolution is on.

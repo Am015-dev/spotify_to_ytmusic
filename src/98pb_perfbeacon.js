@@ -3,7 +3,7 @@
 // (same window.claude db path as the 🐞 button, src/assets/qa/code.js). No db (live site) → nothing, silently.
 // Per-system ms = self time (children subtracted) of the wrapped frame stages, averaged per recorded frame.
 // FPS chip (#pbChip, 12 px, top edge, pointer-events none): Settings → "FPS chip", long-press ⚙ (0.6 s) or ?fps=1.
-const PB={t0:0,next:0,n:0,max:5,iv:new Float32Array(8192),k:0,slow:0,worst:0,busy:0,sys:{},fs:{sim:0,cam:0,traffic:0,world:0,streets:0,hud:0,render:0},child:0,db:undefined,sent:[],last:0,gpu:null,chip:null,cf:[],ct:0};
+const PB={t0:0,next:0,n:0,max:5,iv:new Float32Array(8192),k:0,slow:0,worst:0,busy:0,sys:{},fs:{sim:0,cam:0,traffic:0,world:0,streets:0,hud:0,render:0},child:0,db:undefined,sent:[],q:[],qt:0,err:'',perm:'',last:0,gpu:null,chip:null,cf:[],ct:0};
 if(SET.fpsChip==null)SET.fpsChip=false;
 function PB_wrap(name,fn){return function(){const t0=performance.now(),sv=PB.child;PB.child=0;try{return fn.apply(this,arguments)}finally{const d=performance.now()-t0;PB.fs[name]+=d-PB.child;PB.child=sv+d}}}
 roamStep=PB_wrap('sim',roamStep);roamCam=PB_wrap('cam',roamCam);drawTraffic=PB_wrap('traffic',drawTraffic);updWorld=PB_wrap('world',updWorld);hubTrafficStep=PB_wrap('streets',hubTrafficStep);updHud=PB_wrap('hud',updHud);
@@ -21,13 +21,21 @@ function PB_doc(S=PB){const a=S.iv.slice(0,S.k).sort(),n=a.length,m50=PB_q(a,.5)
     ua:navigator.userAgent.slice(0,200),vp:innerWidth+'x'+innerHeight,dpr:+(devicePixelRatio||1).toFixed(2),pr:+renderer.getPixelRatio().toFixed(2),gpu:PB_gpu(),touch:!!lowGfx,iframe:ifr,
     gfx:SET.qm||SET.q,auto:!!GOV.on,tier:LK_LV[Math.min(3,GOV.d)]||SET.q,scale:+(DRES.s||1).toFixed(2),
     frames:n,fps50:m50?Math.round(1000/m50):0,fps90:m90?Math.round(1000/m90):0,ms50:PB_r(m50),ms90:PB_r(m90),over50:S.slow,worstMs:Math.round(S.worst),busyMs:PB_r(S.busy/Math.max(1,n)),top,lifeMs:L,heap,govLog:GOV.log.slice(-6)}}
-async function PB_db(){if(window.__pbDbMock)return window.__pbDbMock;if(PB.db!==undefined)return PB.db;PB.db=null;try{if(window.claude&&claude.use)PB.db=await claude.use('db')||null}catch(e){PB.db=null}return PB.db}
-async function PB_send(doc){try{const db=await PB_db();if(!db||!db.collection)return'nodb';await db.collection('perf').add(doc);PB.sent.push(doc.at);return'sent'}catch(e){return'fail'}}
-function PB_tick(now){if(PB.n>=PB.max)return;
+// r11d (Alex: the Beta `perf` collection stayed empty for 4 builds while 🐞 -> `bugs` worked): same API (claude.use('db') + collection().add), but 🐞 runs inside a tap, which is where the
+// platform's lazy consent dialog can show; the beacon's first db call came from a timer 20 s into a drive (no gesture), and PB_db cached the first null/failure for good while PB_send swallowed the error.
+// Now: (1) the consent is asked once on the first tap of the page (PB_perm, menu time, never while driving), (2) null/failed lookups are never cached, (3) a failed doc is queued and retried (3 tries, 30 s apart), (4) PB.err keeps the last reason.
+async function PB_db(){if(window.__pbDbMock)return window.__pbDbMock;if(PB.db)return PB.db;try{if(window.claude&&claude.use)PB.db=await claude.use('db')||null}catch(e){PB.db=null;PB.err=String(e&&e.message||e).slice(0,120)}return PB.db}
+async function PB_send(doc){try{const db=await PB_db();if(!db||!db.collection){PB.err=PB.err||'nodb';return'nodb'}await db.collection('perf').add(doc);PB.sent.push(doc.at);PB.err='';return'sent'}catch(e){PB.err=String(e&&(e.code||e.message)||e).slice(0,120);return'fail'}}
+// failed/nodb docs wait in PB.q (max 5, 3 tries each, 30 s apart); the retry is a setTimeout task like the first send
+function PB_flush(now){if(!PB.q.length||now<PB.qt)return;PB.qt=now+30000;const d=PB.q[0];setTimeout(async()=>{try{if(await PB_send(d.doc)==='sent')PB.q.shift();else if(++d.tries>=3)PB.q.shift()}catch(e){PB.q.shift()}},0)}
+async function PB_post(doc){const r=await PB_send(doc);if(r!=='sent'&&PB.q.length<5)PB.q.push({doc,tries:1});return r}
+async function PB_perm(){try{if(!window.claude||!claude.use)return;const p=await claude.use('permissions');if(!p)return;PB.perm=await p.state('db');if(PB.perm==='prompt')PB.perm=(await p.request(['db'])).db}catch(e){}}
+{const f=()=>{document.removeEventListener('pointerdown',f,true);PB_perm()};document.addEventListener('pointerdown',f,true)}
+function PB_tick(now){if(PB.q.length)PB_flush(now);if(PB.n>=PB.max)return;
   if(!PB.t0){if(PB_live()&&state!=='countdown'&&Math.abs((state==='roam'?RO.v:pl&&pl.v)||0)>2){PB.t0=now;PB.next=now+20000;PB_reset()}return}
   // boot-2: the tick only snapshots the counters (a typed-array copy, <0.1 ms); the sort, the doc and the db write run in a later task, off the frame
   if(now>=PB.next&&PB.k>=30){const S={iv:PB.iv.slice(0,PB.k),k:PB.k,slow:PB.slow,worst:PB.worst,busy:PB.busy,sys:PB.sys,n:++PB.n};PB.next=now+60000;PB_reset();
-   setTimeout(()=>{try{PB_send(PB_doc(S))}catch(e){}},0)}}
+   setTimeout(()=>{try{PB_post(PB_doc(S))}catch(e){}},0)}}
 // the GPU string (a GL query = a pipeline sync) is read once in the loader, not inside the 20 s frame
 {const _lp=ldPrewarm;ldPrewarm=async function(...a){try{PB_gpu()}catch(e){}return _lp.apply(this,a)}}
 // chip: fps (last ~1 s), p90 ms, tier, render scale, pixel ratio
@@ -48,4 +56,4 @@ if(/[?&]fps=1/.test(location.search))SET.fpsChip=true;
   document.addEventListener('pointerdown',e=>{if(!hit(e))return;fired=0;clearTimeout(tm);tm=setTimeout(()=>{fired=1;PB_toggleChip()},600)},true);
   for(const ev of['pointerup','pointercancel'])document.addEventListener(ev,()=>clearTimeout(tm),true);
   document.addEventListener('click',e=>{if(fired&&hit(e)){fired=0;e.stopImmediatePropagation();e.preventDefault()}},true)}
-window.__pb={PB,doc:PB_doc,send:PB_send,tick:PB_tick,toggle:PB_toggleChip,reset:PB_reset};
+window.__pb={PB,doc:PB_doc,send:PB_send,post:PB_post,flush:PB_flush,perm:PB_perm,tick:PB_tick,toggle:PB_toggleChip,reset:PB_reset};
