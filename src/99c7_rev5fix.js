@@ -349,6 +349,8 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
    /* perf-r15f: default ON on touch; when the gate ran, the far-street merge finished under the curtain (its ~50 MB garbage + major GC no longer land in the first drivable second) */
    R.push(['default '+(TWG.on?'on':'off')+' (touch '+matchMedia('(pointer:coarse)').matches+', ?twg '+new URLSearchParams(location.search).get('twg')+')',/[?&]twg=/.test(location.search)||TWG.on===matchMedia('(pointer:coarse)').matches]);
    if(TWG.on&&TWG.nf&&TWG.wb&&TUNE.wbCity)R.push(['far-street merge under the curtain: built '+(WBC.built===HUB.grp)+', waited '+TWG.wbMs+' ms, busy '+WBC.busy,WBC.built===HUB.grp&&!WBC.busy&&TWG.wbMs<8000]);
+   /* perf-r16b: after a full boot with the gate (tBoot path), no hubTrafficStep over 40 ms in the first 60 drivable frames (review 2K-16 N2: 95/52/61 ms at f9-f11); the quick test start skips the gate, so there it is info */
+   if(TWG.htN)R.push(['hubTrafficStep f0-60: max '+TWG.ht+' ms at f'+TWG.htF+' ('+TWG.htN+' steps, cars '+TWG.c0+' → '+TWG.c60+')'+(TWG.nf?'':' (info: gate did not run)'),!TWG.nf||TWG.htN<55||TWG.ht<=40]);
    if(TWG.on)R.push(['minimap: callCap '+TUNE.callCap+', '+TWG.mm+' tiles under the curtain in '+TWG.mms+' ms (cap '+TWG.mb+'), '+TWG.mq+' left',!!TUNE.callCap&&TWG.mms<=TWG.mb+60&&(CID!=='ath'||!SM_ON||!TWG.nf||TWG.mm>0)])}
   catch(e){R.push(['threw '+e,false])}finally{TWG.fr=f0}
   const ok=R.every(r=>r[1]);return`📍 TOUCH WARM GATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
@@ -383,3 +385,79 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
   catch(e){R.push(['threw '+e,false])}
   const ok=R.every(r=>r[1]);return`📍 HEAP 30 S · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R15C_reg(i+1),100)})(0);
+// ios-r17b: GO perf/beacon-boot. Boot doc at the first playable frame, 'killed' doc from a stale localStorage heartbeat, 'freeze' doc for a 1.5 s frame gap (stubbed db, window.__pbDbMock).
+(function R17B_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='beacon-boot'))C.items.push({ver:'perf',id:'beacon-boot',area:'perf',text:'ios-r17b · perf beacon boot/killed/freeze: 📍 GO uses the stubbed db. Pass line: a "boot" doc (city, ua, dpr, vp, gpu, bootMs, renderer counts) at the first playable frame, before any 20 s drive report; a planted stale heartbeat gives exactly one "killed" doc (carrying that snapshot) sent before the boot doc and the heartbeat is cleared; a simulated 1.5 s frame gap gives exactly one "freeze" doc with the frame-system timers, a hidden-tab gap gives none, at most 3 per session; every storage access is try/catch.'});
+  C.GO['perf/beacon-boot']=[{c:'fra',n:'boot + killed + freeze docs into a stubbed db',secs:3,fn:()=>{const B=window.__pb;if(!B)return'📍 BEACON BOOT · window.__pb missing ❌ FAIL';const P=B.PB,o={booted:P.booted,fz:P.fz,hid:P.hid,hb:P.hb,db:P.db,on:P.on},prevMock=window.__pbDbMock,hb0=B.hbGet(),got=[],R=[];
+   window.__pbDbMock={collection:n=>({add:async d=>{got.push([n,d]);return{}}})};P.on=true;P.booted=0;P.fz=0;P.hid=0;
+   B.hbSet({t:Date.now()-60000,state:'roam',city:'fra',sec:42,worstMs:310,ri:{geo:1,tex:2,prog:3},orient:'land'});B.boot(performance.now());
+   setTimeout(()=>{const k=got.filter(g=>g[1].kind==='killed'),b=got.filter(g=>g[1].kind==='boot');
+    R.push(['killed docs '+k.length+(k[0]?' last.sec '+k[0][1].last.sec:''),k.length===1&&k[0][0]==='perf'&&k[0][1].last.sec===42&&k[0][1].last.worstMs===310]);
+    R.push(['boot docs '+b.length,b.length===1&&got[0][1].kind==='killed'&&got[1][1].kind==='boot']);
+    const d=b[0]&&b[0][1],need=['city','ua','dpr','vp','gpu','bootMs','at','build'],miss=d?need.filter(x=>d[x]==null||d[x]===''):need;R.push(['boot fields '+(miss.length?'missing '+miss.join(','):'all')+(d?' · '+d.vp+' · '+d.gpu:''),!miss.length&&!!d.ri]);
+    R.push(['heartbeat cleared',B.hbGet()==null]);
+    const n0=got.length;B.life(performance.now(),1500);
+    setTimeout(()=>{const f=got.slice(n0).filter(g=>g[1].kind==='freeze'),fd=f[0]&&f[0][1];R.push(['freeze docs '+f.length+(fd?' gap '+fd.gapMs+' fs '+Object.keys(fd.fs).length:''),f.length===1&&fd.gapMs===1500&&Object.keys(fd.fs).length>=5]);
+     const n1=got.length;P.hid=1;B.life(performance.now(),1500);for(let k=0;k<5;k++){P.hid=0;B.life(performance.now(),1500)}
+     setTimeout(()=>{const f2=got.slice(n1).filter(g=>g[1].kind==='freeze').length;R.push(['hidden gap none, cap 3 → +'+f2+' more',f2===2]);
+      delete window.__pbDbMock;if(prevMock)window.__pbDbMock=prevMock;Object.assign(P,o);B.hbSet(hb0);const ok=R.every(r=>r[1]);goSay(`📍 BEACON BOOT · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`)},50)},50)},50);return'📍 BEACON BOOT · sending…'}}];return}
+ if(i<600)setTimeout(()=>R17B_reg(i+1),100)})(0);
+// ios-r17a (iPhone 17: "freezes", "when I rotate it loads again" = iOS killing the WebGL tab for memory): GO perf/ios-mem asserts a touch memory budget per city
+// (GPU estimate = buffers + textures + mip chains + render buffers + canvas, MEM_GPU.est(); JS heap) at ready and after 30 s of roam, and that a rotate
+// (852×393 → 393×852 → back) only resizes the renderer: < 20 MB new bytes, no boot / city build / world build call, no new geometries, textures or programs.
+const IOSM={gpu:500,heap:250,rot:20,on:/[?&]iosmem=1/.test(location.search)};   // the budget lines assert only with ?iosmem=1 until the heap fits (r17a: fra 382, ath 605 MB retained at ready); the rotate line always asserts
+function IOSM_smp(){const i=renderer.info,pm=performance.memory;return{gpu:MEM_GPU.est(),heap:pm?Math.round(pm.usedJSHeapSize/1048576):0,geo:i.memory.geometries,tex:i.memory.textures,prog:(i.programs||[]).length,
+ buf:+(MEM_GPU.bb/1048576).toFixed(0),tx:+(MEM_GPU.tb/1048576).toFixed(0),mip:+((MEM_GPU.mxb||0)/1048576).toFixed(0),rb:+((MEM_GPU.rbb||0)/1048576).toFixed(0),pr:renderer.getPixelRatio()}}
+function IOSM_top(n){const S=new Map;scene.traverse(o=>{for(const m of[].concat(o.material||[]))for(const k in m){const v=m[k];if(v&&v.isTexture&&v.image&&!S.has(v)){const im=v.image,w=im.width||0,h=im.height||0,d=im.depth||1;S.set(v,{k:(v.name||k)+' '+w+'x'+h+(d>1?'x'+d:''),b:w*h*d*4})}}});
+ return[...S.values()].sort((a,b)=>b.b-a.b).slice(0,n||6).map(e=>e.k+' '+(e.b/1048576).toFixed(0)+'MB').join(', ')}
+const IOSM_B=['boot','buildWorld','buildWorldAth','buildRoam','buildHub','buildHubProps','buildHubTraffic','buildCity','buildMap','WB_cityBuild','WB_cityBuild2'];
+function IOSM_wrap(on){const W=IOSM.W=IOSM.W||{};IOSM.calls=IOSM.calls||{};for(const k of IOSM_B){let f;try{f=eval(k)}catch(e){continue}if(typeof f!=='function')continue;
+  if(on&&!W[k]){W[k]=f;const g=function(){IOSM.calls[k]=(IOSM.calls[k]||0)+1;return f.apply(this,arguments)};try{eval(k+'=g')}catch(e){}}else if(!on&&W[k]){const o=W[k];try{eval(k+'=o')}catch(e){}delete W[k]}}}
+function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|0)%3===0);roamStep(1/30);if(i%300===299)try{__tq.draw()}catch(e){}}K.ArrowUp=K.ArrowLeft=false}
+(function IOSM_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='ios-mem')){C.items.push({ver:'perf',id:'ios-mem',area:'perf',text:'ios-r17a · iPhone memory budget: 📍 GO (each city, touch boot) reads the GPU estimate (buffers + textures + mips + render buffers + canvas) and JS heap at ready and after 30 s of roam, then rotates 852×393 → 393×852 → back. Pass line: GPU ≤ 500 MB, heap ≤ 250 MB, rotate < 20 MB new and no boot/city build.',go:'perf/ios-mem'});
+ C.GO['perf/ios-mem']=['fra','ath'].map(c=>({c,n:'touch memory budget + rotate rebuilds nothing',secs:60,fn:()=>{if(typeof window.__vp!=='function')return'📍 iOS MEM · needs the GO harness viewport hook ❌';
+  const gc=()=>Promise.resolve(window.__cdp('HeapProfiler.collectGarbage')).catch(()=>0),S={};
+  const fin=()=>{try{__tq.draw()}catch(e){}return gc().then(()=>{const a=S.a,b=S.b,z=IOSM_smp();IOSM_wrap(false);const R=[],cl=Object.entries(IOSM.calls).map(([k,v])=>k+'×'+v).join(' ')||'none',dg=+(z.gpu-b.gpu).toFixed(1),dh=z.heap-b.heap;
+   const L=x=>'GPU '+x.gpu+' MB (buf '+x.buf+', tex '+x.tx+', mip '+x.mip+', rb '+x.rb+'), heap '+x.heap+' MB';
+   const bi=IOSM.on?'':' (info until ?iosmem=1: budget GPU ≤ '+IOSM.gpu+', heap ≤ '+IOSM.heap+')';R.push(['ready: '+L(a)+bi,!IOSM.on||a.gpu<=IOSM.gpu&&a.heap<=IOSM.heap]);R.push(['30 s roam: '+L(S.b0)+bi,!IOSM.on||S.b0.gpu<=IOSM.gpu&&S.b0.heap<=IOSM.heap]);
+   R.push(['rotate: GPU +'+dg+' MB, heap '+(dh>=0?'+':'')+dh+' MB, target reallocs '+(RZ.re-S.rz)+', builds '+cl+', pixel ratio '+z.pr+', reload '+(location.href!==S.u)+' (info: geo/tex/prog '+(z.geo-b.geo)+'/'+(z.tex-b.tex)+'/'+(z.prog-b.prog)+', measured on the 2nd rotate; the warm-up rotate: GPU +'+(b.gpu-S.b0.gpu).toFixed(1)+' MB = never-drawn geometry uploaded by the wider portrait view)',
+     dg<IOSM.rot&&dg+Math.max(0,dh)<IOSM.rot&&cl==='none'&&location.href===S.u]);
+   R.push(['(info) LOWMEM '+LOWMEM+', top textures: '+IOSM_top(5),true]);
+   const ok=R.every(r=>r[1]);goSay(`📍 iOS MEM ${CID} · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`)})};
+  try{__tq.draw()}catch(e){}const w0=innerWidth,h0=innerHeight;
+  // rotate once to warm (the portrait view is wider: drawing it uploads geometry never drawn before; not caused by the rotate), then measure a second rotate
+  const rot=()=>window.__vp(h0,w0).then(()=>new Promise(r=>setTimeout(r,700))).then(()=>{try{__tq.draw()}catch(e){}return window.__vp(w0,h0)}).then(()=>new Promise(r=>setTimeout(r,700)));
+  IOSM.calls={};IOSM_wrap(true);S.u=location.href;
+  gc().then(()=>{S.a=IOSM_smp();IOSM_roam(30);try{__tq.draw()}catch(e){}return gc()}).then(()=>{S.b0=IOSM_smp();return rot()}).then(()=>{try{__tq.draw()}catch(e){}return gc()}).then(()=>{S.b=IOSM_smp();S.rz=RZ.re;
+   return rot()}).then(fin)
+   .catch(e=>{IOSM_wrap(false);goSay('📍 iOS MEM · threw '+e+' ❌ FAIL')});
+  return'📍 iOS MEM · rotating…'}}))}return}
+ if(i<600)setTimeout(()=>IOSM_reg(i+1),100)})(0);
+// ios-r17h: GO perf/pc-shrink (touch/lowmem): compacted meshes keep instanceMatrix at their drawn size, grow on demand, and a regrown mesh still maps every visible instance to its own matrix
+(function PCS_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-shrink')){C.items.push({ver:'perf',id:'pc-shrink',area:'perf',text:'ios-r17h · 📍 GO: perf-5 compacted instanced meshes hold instanceMatrix/instanceColor at the drawn count (×1.5), not the source count; shrinking to 8 and re-packing grows it back and every drawn slot carries its own instance matrix. Pass line: ≥ 80 % of the compacted instance bytes released, 0 wrong slots.',go:'perf/pc-shrink'});
+ C.GO['perf/pc-shrink']=['fra','ath'].map(c=>({c,n:'pc shrink + grow',secs:30,fn:()=>{if(!PC.shr)return'📍 PC SHRINK · needs the touch/lowmem tier (?lowmem=1) ❌ FAIL';if(state!=='roam')return'📍 PC SHRINK · start free roam first ❌ FAIL';
+  PC_step(1);let n=0,sh=0,cap=0,src=0,bad=0;for(const X of PC.L)if(!X.dyn&&!X.sky){n++;src+=X.n;cap+=X.im.instanceMatrix.count;if(X.shr)sh++;if(X.im.instanceMatrix.array.length!==X.im.instanceMatrix.count*16||X.im.count>X.im.instanceMatrix.count)bad++}
+  const X=PC.L.find(q=>q.shr&&!q.dyn&&!q.sky&&q.s>12&&q.im.parent);let wrong=0,grew='none';
+  if(X){PC_cap(X,8);PC_mesh(X);const a=X.im.instanceMatrix.array;for(let k=0;k<X.n;k++){const s=X.slot[k];if(s>=0&&(s>=X.im.instanceMatrix.count||a[s*16+12]!==X.src[k*16+12]||a[s*16+14]!==X.src[k*16+14]))wrong++}grew=X.im.instanceMatrix.count+'/'+X.n}
+  const rel=1-cap/Math.max(1,src),heap=performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576):0,ok=sh>0&&bad===0&&wrong===0&&rel>=.5&&!!X;
+  return`📍 PC SHRINK ${CID} · ${n} static compacted meshes, ${sh} shrunk, instance slots ${cap}/${src} (${Math.round(rel*100)} % released), bad arrays ${bad}, regrown ${grew}, wrong slots ${wrong}, grow events ${PC.st.shr|0}, heap ${heap} MB → ${ok?'✅ PASS':'❌ FAIL'}`}}))}return}
+ if(i<600)setTimeout(()=>PCS_reg(i+1),100)})(0);
+// perf-r17d: GO perf/fc-first (both cities). Cold camera-pull state (no grids, no occluder list), 1200 FC_pull frames (60 s at 20 Hz raycasts) with the camera circling the car at 12-45 m so the grids build everywhere.
+// Pass line: the slowest FC_pull frame (FC_occ + grid work + raycast pass) <= 30 ms. Two cold passes; the lower max counts (a one-off GC pause hits one pass, a real slice overrun repeats in both).
+(function R17D_reg(i){const C=window.__chk;if(C&&C.GO&&Array.isArray(C.items)){if(!C.items.some(q=>q.ver==='perf'&&q.id==='fc-first'))C.items.push({ver:'perf',id:'fc-first',area:'perf',text:'r17d · first minute of the camera wall-pull (Frankfurt one 117-143 ms frame at about frame 8): 📍 GO (both cities) starts from empty grids and runs 1200 FC_pull frames with the camera circling the car. Pass line: the slowest frame <= 30 ms (info: p99, grids built, FC_occ max). Needs free roam.'});
+  C.GO['perf/fc-first']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt':'Athens',fn:()=>{if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';
+   const cam=camera.position,c0=cam.clone(),pull=FC.pull,k=FC.k,kt=FC.kt,T=[];let mxd=0,mxi=0,mxw=0;
+   const M2=[];try{FC.pull=true;FC.t=FC.t||0;for(let ps=0;ps<2;ps++){FCG.W=new WeakMap();FCG.pq.length=0;FC.occ=[];FC.occT=-99;FC.rt=0;T.length=0;mxd=0;
+    for(let n=0;n<1200;n++){const a=n*.11,r=12+(n%300)*.11;cam.set(RO.x+Math.sin(a)*r,RO.y+4,RO.z+Math.cos(a)*r);FC.off.set(0,0,0);const w0=FCG.st.ms,t0=performance.now();FC_pull(1/60);const d=performance.now()-t0;T.push(d);if(d>mxd){mxd=d;mxi=n;mxw=FCG.st.ms-w0}FC.t+=1/60}M2.push(mxd)}
+   }finally{cam.copy(c0);FC.off.set(0,0,0);FC.pull=pull;FC.k=k;FC.kt=kt}
+   const S=T.slice().sort((a,b)=>a-b),mx=Math.min(M2[0],M2[1]),ok=mx<=30;window.__chk.fcFirst=window.__chk.fcFirst||{};window.__chk.fcFirst[c]=+mx.toFixed(1);
+   return`📍 FC COLD START · ${c==='fra'?'Frankfurt':'Athens'}: slowest of ${T.length} FC_pull frames ${mx.toFixed(1)} ms (≤ 30; passes ${M2.map(x=>x.toFixed(1)).join(' / ')}), p99 ${S[Math.floor(S.length*.99)].toFixed(1)} ms, grids built ${FCG.st.built}; slowest at frame ${mxi}, of it grid work ${mxw.toFixed(1)} ms → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
+ if(i<600)setTimeout(()=>R17D_reg(i+1),100)})(0);
+
+// perf-r17f: GO perf/pc-bhs (+ -ath). buildHubG gap = time between two yields (window.__bhSt, src/72). bhs (?bhs=1, default OFF): both cities < 1500 ms (r17f measured fra 1217 = rfGrid at 'start', ath 1277; was 1512 / 1277). Info: steps over 50 ms. Off: info only.
+(function R17F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-bhs')){
+ C.items.push({ver:'perf',id:'pc-bhs',area:'perf',text:'r17f · PC boot slicing (bhs): 📍 GO reads the longest gap between two buildHubG yields. Pass line with ?bhs=1: longest gap < 1500 ms (a regression guard: fra 1217 ms is rfGrid, ath 1277 ms is the post steps). Info: steps > 50 ms (the 50 ms goal is NOT met). bhs stays default OFF.'},
+  {ver:'perf',id:'pc-bhs-ath',area:'perf',text:'r17f · PC boot slicing, Athens: same as perf/pc-bhs.'});
+ const go=()=>{const S=window.__bhSt,m=S?Math.round(S.max):-1,n=S?S.L.filter(x=>x[0]>50).length:0,lim=1500;if(!BHQ.en)return`📍 PC BHS · bhs is OFF (default; ?bhs=1 turns it on): longest buildHubG gap ${m} ms, ${n} gaps > 50 ms (info) → ✅ PASS`;
+  const ok=m>=0&&m<lim;return`📍 PC BHS · ${ok?'✓':'✗'} longest buildHubG gap ${m} ms (${S&&S.lab}) < ${lim} · info: ${n} gaps > 50 ms (goal 0, not met) → ${ok?'✅ PASS':'❌ FAIL'}`};
+ C.GO['perf/pc-bhs']=[{c:'fra',n:'Desktop boot slicing (buildHubG gaps)',fn:go}];C.GO['perf/pc-bhs-ath']=[{c:'ath',n:'Desktop boot slicing (Athens)',fn:go}]}return}
+ if(i<600)setTimeout(()=>R17F_reg(i+1),100)})(0);

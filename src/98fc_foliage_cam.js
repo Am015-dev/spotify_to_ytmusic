@@ -35,25 +35,33 @@ function FC_occ(){FC.occT=FC.t;const L=[];scene.traverse(o=>{if(!o.isMesh||!o.vi
 // merged chunks' bounding spheres always contain the ray): 215 occluders, 3.6 M triangles, 66 ms per pull, every 3rd frame (p95 frame 109 ms, desktop).
 // Each occluder geometry now gets a 2D triangle grid (local x/z, 8 m cells), built lazily for meshes whose box is near the car, ≤ 1.5 ms per frame.
 // Instanced and batched meshes (per-instance matrices) keep three's raycast. Same answer as the raycast: double-sided triangles, hits between 0 and far, distance from the camera. ?fcbvh=0 = the old path.
-const FCG={on:!/[?&]fcbvh=0/.test(location.search),W:new WeakMap(),cs:8,ms:1.5,q:[],iM:new THREE.Matrix4(),a:new THREE.Vector3(),b:new THREE.Vector3(),bx:new THREE.Box3(),sg:new THREE.Box3(),st:{built:0,tris:0,hits:0,miss:0,ms:0}};
+const FCG={on:!/[?&]fcbvh=0/.test(location.search),W:new WeakMap(),cs:8,ms:1.5,q:[],pq:[],iM:new THREE.Matrix4(),a:new THREE.Vector3(),b:new THREE.Vector3(),bx:new THREE.Box3(),sg:new THREE.Box3(),st:{built:0,tris:0,hits:0,miss:0,ms:0}};
 function FCG_ok(g){const p=g&&g.attributes&&g.attributes.position;return!!p&&p.itemSize>=3&&!g.morphAttributes.position}
 function FCG_get(g){const e=FCG.W.get(g),p=g.attributes.position;if(e&&e.pos===p&&e.ver===p.version&&e.ix===g.index)return e;
-  const n=g.index?g.index.count/3|0:p.count/3|0,ne={pos:p,ver:p.version,ix:g.index,n,i:0,cells:new Map(),bigT:[],done:false,seen:new Uint32Array(n),stamp:0};FCG.W.set(g,ne);return ne}
+  const n=g.index?g.index.count/3|0:p.count/3|0,ne={pos:p,ver:p.version,ix:g.index,n,i:0,cells:new Map(),bigT:[],done:false,seen:null,tot:0,pk:null,stamp:0};FCG.W.set(g,ne);return ne}
 function FCG_vtx(g){const p=g.attributes.position,f=!p.isInterleavedBufferAttribute&&!p.normalized&&p.array instanceof Float32Array&&p.itemSize===3?p.array:null;
   return f?(i,o)=>{o[0]=f[i*3];o[1]=f[i*3+1];o[2]=f[i*3+2]}:(i,o)=>{o[0]=p.getX(i);o[1]=p.getY(i);o[2]=p.getZ(i)}}
 function FCG_build(g,e,t0){const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0],B=[0,0,0],C=[0,0,0],cs=FCG.cs,M=e.cells;
   while(e.i<e.n){const k=e.i++,a=ix?ix[k*3]:k*3,b=ix?ix[k*3+1]:k*3+1,c=ix?ix[k*3+2]:k*3+2;V(a,A);V(b,B);V(c,C);
     const x0=Math.floor(Math.min(A[0],B[0],C[0])/cs),x1=Math.floor(Math.max(A[0],B[0],C[0])/cs),z0=Math.floor(Math.min(A[2],B[2],C[2])/cs),z1=Math.floor(Math.max(A[2],B[2],C[2])/cs);
     if((x1-x0+1)*(z1-z0+1)>256){e.bigT.push(k);continue}   // huge triangles (ground sheets): tested on every ray
-    for(let x=x0;x<=x1;x++)for(let z=z0;z<=z1;z++){const kk=(x+32768)*65536+(z+32768);let L=M.get(kk);if(!L)M.set(kk,L=[]);L.push(k)}
-    if((k&511)===511&&performance.now()-t0>FCG.ms)return}
-  e.done=true;FCG.st.built++;FCG.st.tris+=e.n;if(MEMC_ON)FCG_pack(e)}
+    for(let x=x0;x<=x1;x++)for(let z=z0;z<=z1;z++){const kk=(x+32768)*65536+(z+32768);let L=M.get(kk);if(!L){M.set(kk,L=[]);e.tot++}L.push(k);e.tot++}
+    if((k&63)===63&&performance.now()-t0>FCG.ms)return}
+  e.seen=new Uint32Array(e.n);e.done=true;FCG.st.built++;FCG.st.tris+=e.n;if(MEMC_ON)FCG.pq.push(e)}
 // perf-r15c: a finished grid is packed into one Int32Array ([count, tri...] per cell; the Map keeps the start offset): one small JS array per 8 m cell was ~26 MB of
 // retained heap after 30 s of Frankfurt roam (216 k cells, 1.1 M entries). Same cells, same triangle order, same hits.
-function FCG_pack(e){let n=0;for(const L of e.cells.values())n+=L.length+1;const I=new Int32Array(n),M=new Map();let o=0;for(const[k,L]of e.cells){M.set(k,o);I[o++]=L.length;for(const t of L)I[o++]=t}e.cells=M;e.I=I}
+// perf-r17d: the pack runs in slices inside the FCG.ms budget (one big mesh was a 47 ms step; the first Frankfurt pass hit 117 ms with every occluder's seen[] allocated up front); hits use the unpacked cells until the swap.
+function FCG_packStep(t0){const q=FCG.pq;while(q.length){const e=q[0],P=e.pk||(e.pk={it:e.cells.entries(),I:new Int32Array(e.tot),M:new Map(),o:0});
+  for(let j=0;j<64;j++){const nx=P.it.next();if(nx.done){e.cells=P.M;e.I=P.I;e.pk=null;q.shift();break}const k=nx.value[0],L=nx.value[1];P.M.set(k,P.o);P.I[P.o++]=L.length;for(let i=0;i<L.length;i++)P.I[P.o++]=L[i]}
+  if(performance.now()-t0>FCG.ms)return}}
+// perf-r17d: the bounding box of a big merged mesh is scanned 20 k vertices at a time inside the budget (same box as GFX_bbox)
+function FCG_bbox(g,e,t0){const p=g.attributes.position,a=p.array;if(p.isInterleavedBufferAttribute||!(a instanceof Float32Array)||p.itemSize!==3||p.normalized||g.morphAttributes.position||a.length<p.count*3){GFX_bbox(g);return true}
+  const B=e.bb||(e.bb={i:0,n:p.count,v:[Infinity,Infinity,Infinity,-Infinity,-Infinity,-Infinity]}),v=B.v;let x0=v[0],y0=v[1],z0=v[2],x1=v[3],y1=v[4],z1=v[5];
+  while(B.i<B.n){const end=Math.min(B.n,B.i+20000);for(let i=B.i*3,ie=end*3;i<ie;i+=3){const x=a[i],y=a[i+1],z=a[i+2];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z}B.i=end;v[0]=x0;v[1]=y0;v[2]=z0;v[3]=x1;v[4]=y1;v[5]=z1;if(B.i<B.n&&performance.now()-t0>FCG.ms)return false}
+  g.boundingBox=B.n?new THREE.Box3(new THREE.Vector3(x0,y0,z0),new THREE.Vector3(x1,y1,z1)):new THREE.Box3();e.bb=null;return true}
 // queue meshes whose world box is within 80 m of the camera->car segment; build ≤ FCG.ms per frame (nearest first)
-function FCG_work(c,o){const t0=performance.now();FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(o).expandByScalar(80);
-  for(const m of FC.occ){if(m.isInstancedMesh||m.isBatchedMesh||!FCG_ok(m.geometry))continue;const g=m.geometry,e=FCG_get(g);if(e.done)continue;if(!g.boundingBox){if(performance.now()-t0>FCG.ms)break;GFX_bbox(g)}   // perf-10: boxes inside the budget (one frame boxed every new occluder)
+function FCG_work(c,o){const t0=performance.now();FCG_packStep(t0);FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(o).expandByScalar(80);
+  for(const m of FC.occ){if(m.isInstancedMesh||m.isBatchedMesh||!FCG_ok(m.geometry))continue;const g=m.geometry,e=FCG_get(g);if(e.done)continue;if(!g.boundingBox&&!FCG_bbox(g,e,t0))break;   // perf-10: boxes inside the budget (one frame boxed every new occluder)
     if(!FCG.bx.copy(g.boundingBox).applyMatrix4(m.matrixWorld).intersectsBox(FCG.sg))continue;FCG_build(g,e,t0);if(performance.now()-t0>FCG.ms)break}
   FCG.st.ms+=performance.now()-t0}
 // distance (from c) of the hit nearest the far end on the segment c -> c+dir*far, -1 = no hit, null = use three's raycast for this mesh

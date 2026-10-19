@@ -189,7 +189,7 @@ function LOWMEM_is(u,tp,q){if(q==='0'||q==='1')return q==='1';return /iPhone|iPa
 const LOWMEM=LOWMEM_is(navigator.userAgent,navigator.maxTouchPoints,new URLSearchParams(location.search).get('lowmem'));window.__lowmem=LOWMEM;
 // crash-2: live GPU bytes (buffers + textures), counted at the GL calls; renderer.info counts objects, not bytes, and a first-visit upload of
 // boot-built city geometry raises the count while memFree drops the CPU copy (no growth in bytes). MEM_GPU.mb() = live MB..
-const MEM_GPU={b:new Map,t:new Map,bb:0,tb:0,mb(){return+((this.bb+this.tb)/1048576).toFixed(1)}};window.MEM_GPU=MEM_GPU;
+const MEM_GPU={b:new Map,t:new Map,bb:0,tb:0,mb(){return+((this.bb+this.tb)/1048576).toFixed(1)},est(){const c=renderer.domElement,cv=c.width*c.height*12;return+((this.bb+this.tb+(this.rbb||0)+(this.mxb||0)+cv)/1048576).toFixed(1)}};window.MEM_GPU=MEM_GPU;
 // crash-3: boot peak (JS heap + GPU MB, sampled every 250 ms from the first frame); kept per city in localStorage so GO mem/ath-boot can compare Athens with Frankfurt
 MEM_GPU.pk=0;setInterval(()=>{const pm=performance.memory;if(!pm)return;const t=pm.usedJSHeapSize/1048576+MEM_GPU.mb();if(t>MEM_GPU.pk)MEM_GPU.pk=t;if(performance.now()>6e4&&MEM_GPU.pks!==MEM_GPU.pk)try{MEM_GPU.pks=MEM_GPU.pk;localStorage.setItem('mho_mempk_'+CID,Math.round(MEM_GPU.pk))}catch(e){}},250);   // stored only after 60 s (boot + settle)
 {const gl=renderer.getContext(),G=MEM_GPU,cur={},tb={},BPP=f=>({6408:4,32856:4,35907:4,6407:3,32849:3,6410:2,6409:1,6406:1,33321:1,33323:2,34842:8,34836:16,33326:4,33328:8,33325:2,33327:4,35898:4,36012:4,35056:4,33190:4,33189:2,6402:4,36168:1})[f]||4;let unit=33984;
@@ -197,6 +197,11 @@ MEM_GPU.pk=0;setInterval(()=>{const pm=performance.memory;if(!pm)return;const t=
  W('bindBuffer',(k,b)=>{cur[k]=b});W('bufferData',(k,x)=>{const b=cur[k],n=typeof x==='number'?x:x&&x.byteLength||0;if(b){G.bb+=n-(G.b.get(b)||0);G.b.set(b,n)}});W('deleteBuffer',b=>{G.bb-=G.b.get(b)||0;G.b.delete(b)});
  W('activeTexture',u=>{unit=u});W('bindTexture',(k,t)=>{tb[unit+':'+k]=t});W('deleteTexture',t=>{G.tb-=G.t.get(t)||0;G.t.delete(t)});
  if(gl.texStorage2D)W('texStorage2D',(k,L,f,w,h)=>setT(T(k),Math.round(w*h*BPP(f)*(k===34067?6:1)*(L>1?4/3:1))));if(gl.texStorage3D)W('texStorage3D',(k,L,f,w,h,d)=>setT(T(k),w*h*d*BPP(f)));
+ // ios-r17a: render buffers (MSAA / depth-stencil targets) and generated mip chains, kept apart from mb() so the old mem GOs compare like before; MEM_GPU.est() adds them + the canvas
+ const rb={};G.r=new Map;G.rbb=0;G.mx=new Map;G.mxb=0;const setR=(r,n)=>{if(!r)return;G.rbb+=n-(G.r.get(r)||0);G.r.set(r,n)};
+ W('bindRenderbuffer',(k,r)=>{rb.c=r});W('deleteRenderbuffer',r=>{G.rbb-=G.r.get(r)||0;G.r.delete(r)});W('renderbufferStorage',(k,f,w,h)=>setR(rb.c,w*h*BPP(f)));
+ if(gl.renderbufferStorageMultisample)W('renderbufferStorageMultisample',(k,s,f,w,h)=>setR(rb.c,w*h*BPP(f)*Math.max(1,s)));
+ W('generateMipmap',k=>{const t=T(k);if(!t)return;const n=Math.round((G.t.get(t)||0)/3);G.mxb+=n-(G.mx.get(t)||0);G.mx.set(t,n)});W('deleteTexture',t=>{G.mxb-=G.mx.get(t)||0;G.mx.delete(t)});
  W('texImage2D',function(k,L,f){if(L!==0)return;const a=arguments,im=a[5],w=a.length>=8?a[3]:im&&(im.width||im.videoWidth)||0,h=a.length>=8?a[4]:im&&(im.height||im.videoHeight)||0,cf=k>=34069&&k<=34074,t=T(cf?34067:k);if(!t)return;setT(t,(cf&&k>34069?G.t.get(t)||0:0)+w*h*BPP(f))});
 }
 // crash-3: a city switch is a page reload; iOS keeps the old page's WebGL buffers and heap alive while the new city boots (two cities at once = the Athens crash).
