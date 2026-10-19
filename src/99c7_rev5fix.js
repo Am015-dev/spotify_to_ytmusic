@@ -322,3 +322,16 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
 }
   catch(e){R.push(['threw '+e,false])}const ok=R.every(r=>r[1]);return`📍 ALLOC RATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R13I_reg(i+1),100)})(0);
+// perf-r15a (review 2K-14 N2): traffic ground cache (TUNE.htGc): a car re-probes the ground only after 1.5 m or on a new edge, slope-extrapolated in between.
+(function R15A_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='traffic-gnd')){C.items.push({ver:'perf',id:'traffic-gnd',area:'perf',text:'perf-r15a · traffic ground cache: 📍 GO steps the Frankfurt streets 180 frames with TUNE.htGc on and off. Pass line: ground probes ≤ 35 % of car steps, every live car within 0.3 m of the exact ground height, no car lost (count and alive as before), ≥ 80 % moving, mean car-loop time ≥ 20 % below the flag-off run (ground + tyre-seat cache) (the real metric is tools/perf1/tBoot.js PF1OWN>50 hubTrafficStep-self).'});
+ C.GO['perf/traffic-gnd']=[{c:'fra',n:'cars probe the ground ≤ 1 step in 3, heights exact to 0.3 m, no cars lost',fn:()=>{const g0=TUNE.htGc,R=[];try{const C=HUB.cars||[],N=HUB.nodes,live=c=>!(c.dead>0)&&c.x!=null&&N[c.a]&&N[c.b];
+   const AB=f=>{TUNE.htGc=f;HUB.gnP=0;let st=0,sm=0;for(let k=0;k<180;k++){const s=performance.now();HT_cars(N,1/60);if(k>=20)sm+=performance.now()-s;st+=HUB.htN}return[HUB.gnP/Math.max(1,st),sm/160]};
+   const n0=C.length,a0=C.filter(live).length,off=AB(0),P=C.map(c=>[c.a,c.b,c.t]),on=AB(1);
+   R.push(['ground probes per car step '+(on[0]*100).toFixed(0)+' % (flag off '+(off[0]*100).toFixed(0)+' %)',on[0]<=.35]);
+   let me=0,n=0;for(const c of C){if(!live(c)||c.hga!==c.a)continue;const A=N[c.a],B=N[c.b],gA=A.g||B.g;const y=A.ab||gA?groundAt(c.x,c.z,c.hgy+4):groundY(c.x,c.z);if(!isFinite(y))continue;n++;me=Math.max(me,Math.abs(c.y-y))}
+   R.push(['max height error '+me.toFixed(2)+' m over '+n+' cars',n>=10&&me<.3]);
+   const mv=C.filter((c,j)=>c.a!==P[j][0]||c.b!==P[j][1]||c.t!==P[j][2]).length,al=C.filter(live).length;R.push(['cars '+C.length+' (before '+n0+'), alive '+al+' (before '+a0+'), moved in 180 frames '+mv,C.length>=n0&&n0>=40&&al>=a0-2&&mv>=al*.8]);
+   R.push(['mean car loop '+on[1].toFixed(2)+' ms vs '+off[1].toFixed(2)+' ms flag off (incl. the 4 tyre probes)',on[1]<=off[1]*.8+.02])}
+  catch(e){R.push(['threw '+e,false])}finally{TUNE.htGc=g0}
+  const ok=R.every(r=>r[1]);return`📍 TRAFFIC GROUND · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R15A_reg(i+1),100)})(0);
