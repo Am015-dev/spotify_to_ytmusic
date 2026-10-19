@@ -339,7 +339,9 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
 (function R15B_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='touch-first-frames')){C.items.push({ver:'perf',id:'touch-first-frames',area:'perf',text:'perf-r15b · touch first frames: 📍 GO checks the touch warm gate (?twg=1) wiring: lazyStep holds while TWG.fr ≤ 60, and if the gate ran this boot it ran all its frames. Pass line ends ✅ PASS.',go:'perf/touch-first-frames'});
  C.GO['perf/touch-first-frames']=[{c:'ath',n:'touch warm gate wiring',fn:()=>{const R=[],f0=TWG.fr,h0=TWG.held;try{R.push(['gate '+(TWG.on?'on':'off (default)')+', n '+TWG.n+', lazy hold '+TWG.lz,TWG.n>0&&TWG.lz===60]);
    TWG.fr=0;lazyStep();const a=TWG.held-h0;TWG.fr=TWG.lz+1;lazyStep();const b=TWG.held-h0-a;R.push(['lazyStep held in the hold window ('+a+'), runs after it ('+b+')',a===1&&b===0]);
-   if(TWG.nf)R.push(['gate ran '+TWG.nf+'/'+TWG.n+' frames in '+TWG.ms+' ms',TWG.nf===TWG.n&&TWG.ms<5000])}
+   if(TWG.nf)R.push(['gate ran '+TWG.nf+'/'+TWG.n+' frames in '+TWG.ms+' ms',TWG.nf===TWG.n&&TWG.ms<5000]);
+   /* perf-r15e: with the gate on, the minimap takes the callCap path and its tiles paint under the curtain within TWG.mb */
+   if(TWG.on)R.push(['minimap: callCap '+TUNE.callCap+', '+TWG.mm+' tiles under the curtain in '+TWG.mms+' ms (cap '+TWG.mb+'), '+TWG.mq+' left',!!TUNE.callCap&&TWG.mms<=TWG.mb+60&&(CID!=='ath'||!SM_ON||!TWG.nf||TWG.mm>0)])}
   catch(e){R.push(['threw '+e,false])}finally{TWG.fr=f0}
   const ok=R.every(r=>r[1]);return`📍 TOUCH WARM GATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
  if(i<600)setTimeout(()=>R15B_reg(i+1),100)})(0);

@@ -63,9 +63,14 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
 // perf-r15b (REVIEW_2K_15 N1): touch (no LKG gate) had 106-154 ms frames in the first 2 s after the curtain (Athens f7 first lazy build 89 ms, f9 first minimap paint 63 ms,
 // traffic/cull first steps). roamLoad now runs TWG.n real game frames under the curtain (render off, car held in place), then lazyStep gets no slot for the first TWG.lz
 // drivable frames (the nearby districts were built under the curtain). ?twg=0|1, ?twgn=<frames>
-const TWG={on:(q=>q?q==='1':false)(new URLSearchParams(location.search).get('twg')),n:(q=>q==null?12:+q|0)(new URLSearchParams(location.search).get('twgn')),lz:60,run:0,fr:-1,ms:0,nf:0,held:0};   // default OFF: target (no frame > 60 ms in f0-f120) not met yet, see docs/HANDOFF_perf.md
+const TWG={on:(q=>q?q==='1':false)(new URLSearchParams(location.search).get('twg')),n:(q=>q==null?12:+q|0)(new URLSearchParams(location.search).get('twgn')),lz:60,run:0,fr:-1,ms:0,nf:0,held:0,mm:0,mq:0,mms:0,mb:700,idle:(q=>q==null?0:+q|0)(new URLSearchParams(location.search).get('twgi'))};   // idle default 0: 8×50 ms only moved the GC (f48 → f41-44), see docs/HANDOFF_perf.md perf-r15e   // default OFF: target (no frame > 60 ms in f0-f120) not met yet, see docs/HANDOFF_perf.md
+// perf-r15e: with the gate on, the minimap uses the callCap path (1 tile per frame, same pixels; ?cc=0 still turns it off), and the tiles around the car paint under the
+// curtain (nearest first, ≤ TWG.mb ms in all), so the first drivable frames only paint the far ring; then optional TWG.idle × 50 ms with frames paused (?twgi=<n>, default 0).
+if(TWG.on&&!/[?&]cc=0/.test(location.search))TUNE.callCap=1;
+function TWG_mini(cap){if(typeof SM_ON==='undefined'||!SM_ON||!MINI||!MINI.smm)return;const t0=performance.now();while(SMM.q.length&&performance.now()-t0<cap&&TWG.mms+performance.now()-t0<TWG.mb){const[a,b]=SMM.q.shift();SMM_tile(a,b);TWG.mm++}TWG.mq=SMM.q.length}
 async function TWG_run(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)return;const t0=performance.now(),x=RO.x,z=RO.z,h=RO.h;TWG.run=1;const lo=LD.on;LD.on=false;   // frame() skips while LD.on; the #ld2 curtain itself stays up until roamLoad's ldHide
- try{for(let i=0;i<TWG.n;i++){RO.v=0;await nextFrame();TWG.nf++}}catch(e){console.warn('TWG',e)}finally{TWG.run=0;LD.on=lo;RO.x=x;RO.z=z;RO.h=h;RO.v=0;TWG.fr=0;TWG.ms=Math.round(performance.now()-t0)}}
+ try{for(let i=0;i<TWG.n;i++){RO.v=0;await nextFrame();TWG.nf++;const tm=performance.now();try{TWG_mini(40)}catch(e){console.warn('TWG mini',e)}TWG.mms+=performance.now()-tm}
+  LD.on=lo;for(let i=0;i<TWG.idle;i++)await new Promise(r=>setTimeout(r,50))}catch(e){console.warn('TWG',e)}finally{TWG.run=0;LD.on=lo;RO.x=x;RO.z=z;RO.h=h;RO.v=0;TWG.fr=0;TWG.mms=Math.round(TWG.mms);TWG.ms=Math.round(performance.now()-t0)}}
 {const r0=composer.render;composer.render=function(){if(TWG.run)return;return r0.apply(this,arguments)}}
 frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;return f(now)})(frame);
 {const _ls=lazyStep;lazyStep=function(){if(TWG.fr>=0&&TWG.fr<=TWG.lz){TWG.held++;return}return _ls.apply(this,arguments)}}
