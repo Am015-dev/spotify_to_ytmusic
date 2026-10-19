@@ -750,6 +750,7 @@ const TUNE={shEvery:2,farMed:2600,life:1,cvFol:0,lvDress:1,lvAthCr:1.5,lvLod:1,w
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.116',date:'19 Oct 2026',items:[{t:'FIXED',s:'Less memory used while driving through Athens (far city blocks no longer keep a second copy), which helps phones stay smooth.'},{t:'FIXED',s:'Fewer hitches in the first seconds: the camera, traffic and one last graphics effect are prepared on the loading screen.'}]},
 {v:'v90m-beta.115',date:'19 Oct 2026',items:[{t:'FIXED',s:'Smoothness reports now really send: on your first tap the Beta may ask to save data. Please allow it so we can fix lag on your exact phone.'},{t:'CHANGED',s:'Graphics Auto now raises detail on phones when the game keeps up, instead of staying on the lowest setting.'},{t:'FIXED',s:'Athens camera work is much lighter: it now checks about 50 walls instead of almost 1,400 every frame.'}]},
 {v:'v90m-beta.114',date:'19 Oct 2026',items:[{t:'FIXED',s:'Racing again in the same session: all rivals are fully reset at the start, so the pack starts together.'}]},
 {v:'v90m-beta.113',date:'18 Oct 2026',items:[{t:'FIXED',s:'Fewer stutters while driving: hiding far buildings and moving traffic are spread over several frames (Frankfurt now meets our smoothness target).'},{t:'FIXED',s:'Lane assist no longer tugs the car off line after a standing start; car-to-boat and grass switches work again.'},{t:'FIXED',s:'River Run: race display stays on all race, and rivals get their own finish times.'}]},
@@ -11523,7 +11524,7 @@ async function WB_cityBuild2(a,b){const t0=performance.now(),SL=a==null?6:14,grp
     if(!STR_on())for(const _ of WB_supMk(S,false));
     WBC.sup.push(S);WB_big(ti,'super '+nt);i+=S.cells.length;if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.5+.5*i/WBC.cells.size)}
   if(STR_on()&&typeof camera!=='undefined')for(;;){const cx=camera.position.x,cz=camera.position.z,LD=STR_R()+TUNE.strLoad;let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;
-    for(const _ of WB_supMk(b,true))if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(1);STR.st.b++}
+    for(const _ of WB_supMk(b,true))if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(1);STR.st.b++;if(typeof STR_up==='function')STR_up(b)}   // perf-r11c: upload now, frees the CPU copy
   {const sl=performance.now()-tt,S=WBC.st;if(sl>(S.slMax||0))S.slMax=Math.round(sl);if(sl>50)S.sl50=(S.sl50||0)+1;if(sl>100)S.sl100=(S.sl100||0)+1}
   WBC.on=true;WBC.sig='';WBC.st.ms=Math.round(performance.now()-t0);WBC.st.objs=WBC.objs.length;WBC.st.mobjs=WBC.mobjs.length;WBC.st.cells=WBC.cells.size}
 function WB_cnew(k,x0,z0){return{k,x0,z0,objs:new Set(),n:0,T:new Uint16Array(16),M:new Float32Array(16*12),C:new Float32Array(16*3),lod:null}}
@@ -11612,8 +11613,11 @@ function STR_step(){if(!STR_on()||!WBC.on||state!=='roam'||!WBC.sup||typeof came
   if(STR.S&&(STR.S.grp!==WBC.grp||!WBC.sup.includes(STR.S))){STR.S=null;STR.it=null}
   let nf=0;for(const S of WBC.sup)if(S.built&&S!==STR.S&&STR_d(S,cx,cz)>UL){WB_supFree(S);STR.st.f++;if(++nf>=2)break}
   let n=0,bud=STR.lzT>16-STR.ms-STR.sl-2?0:STR.ms;while(performance.now()-t0<bud){if(!STR.it){let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;if(bd<R)bud=Math.max(bud,STR.msC-STR.lzT);STR.S=b;STR.it=WB_supMk(b,true)}else if(STR_d(STR.S,cx,cz)<R)bud=Math.max(bud,STR.msC-STR.lzT);
-    n++;if(STR.it.next().done){STR.it=null;STR.S=null;STR.st.b++;WBC.sig=''}}
+    n++;if(STR.it.next().done){STR_up(STR.S);STR.it=null;STR.S=null;STR.st.b++;WBC.sig=''}}
   if(!n)return;const dt=performance.now()-t0;if(dt>STR.st.max)STR.st.max=dt;if(dt>8)STR.st.over++;STR.st.hist.push(+dt.toFixed(2));if(STR.st.hist.length>600)STR.st.hist.shift()}
+function STR_up(S){const m=S&&(S.lod||S.cells.find(c=>c.lod)&&S.cells.find(c=>c.lod).lod);if(!m||!TUNE.strFree||typeof renderer==='undefined')return;const g=m.geometry;if(!g.attributes.position.array)return;
+  const U=STR.up||(STR.up={sc:new THREE.Scene(),mt:new THREE.MeshBasicMaterial(),rt:new THREE.WebGLRenderTarget(1,1)});const q=new THREE.Mesh(g,U.mt),dr=g.drawRange.count,prev=renderer.getRenderTarget();q.frustumCulled=false;g.drawRange.count=0;U.sc.add(q);
+  try{renderer.setRenderTarget(U.rt);renderer.render(U.sc,camera)}catch(e){}finally{renderer.setRenderTarget(prev);g.drawRange.count=dr;U.sc.clear();STR.st.up=(STR.st.up||0)+1}}
 {const _ls=lazyStep;lazyStep=function(){const t=performance.now(),r=_ls.apply(this,arguments);STR.lzT=(STR.lzT0||0)+performance.now()-t;try{STR_step()}catch(e){console.warn('STR',e);TUNE.strOn=0}return r}}
 window.__str={st:STR.st,sup:()=>{let b=0,mb=0;for(const S of WBC.sup||[])if(S.built){b++;mb+=S.mb}return{sup:(WBC.sup||[]).length,built:b,mb:+mb.toFixed(1),lodT:WBC.st.lodT}}};
 const STR_lzOk=L=>(L.build===lzBuildG||L.lf)&&!L.pre&&L.done&&!L.it&&L.root&&LZ.cur!==L;
@@ -15519,7 +15523,7 @@ if(TQ){
   T('card',()=>{RO.card=null;RO.cardPin=0;RO.wwTest=0;const c=document.getElementById('roamCard');if(c)c.hidden=true});T('map',()=>{if(RO.mapOpen&&typeof roamMap==='function')roamMap(false);RO.mapOpen=false});
   T('ch',()=>{if(RO.ch)chAbort()});T('sp',()=>{if(RO.sp)sprintEnd()});T('wk',()=>{RO.wk=null});skip();
   let st='';try{st=state}catch(e){}if(st!=='roam')T('roam',()=>enterRoam());
-  T('home',()=>{const H=TQS.home;if(H){roamWarp(H[0],H[1],H[2])}RO.v=0;RO.vy=0;RO.frozen=false});
+  T('home',()=>{const H=TQS.home;if(H){roamWarp(H[0],H[1],H[2])}RO.v=0;RO.vy=0;RO.frozen=false;if(H&&!TQS.pre&&/[?&]warm=1/.test(location.search)&&typeof BOOT1_pre==='function'){TQS.pre=1;BOOT1_pre()}});   // perf-r11c: tBoot (warm=1) moves the car home after the loader; give that spot the same pre-run the real start gets
   return{ms:Math.round(performance.now()-t),state:(()=>{try{return state}catch(e){return'?'}})(),log}};
  window.__tq=Object.assign(TQS,{o:TQ,skip,reset,draw:()=>{TQ.draw=1;try{composer.render()}finally{TQ.draw=0}}});
 }
@@ -16170,6 +16174,12 @@ let P17A=0;function P17_go(){if(state!=='roam'||!RO.on)return'📍 Start free ro
     return`📍 stream p99 (max): lazyStep ${r.lz} (${r.mlz}) ms, hubCullStep own cull ${r.cu} (${r.mcu}) ms, LV_step ${r.lv} (${r.mlv}) ms; unbuilt tiles < 600 m: ${holes.length}${holes.length?' ('+holes.slice(0,3).join(',')+')':''}; hidden cull entries < 300 m: ${hid}; sub ${JSON.stringify(SUB)} slow lazy steps ${JSON.stringify((LZ.slow||[]).slice(0,6))}`+ok(r.lz<15&&r.cu<10&&r.lv<10&&!holes.length&&!hid)}
   finally{for(const n in W)eval(n+'=W[n]');RO.x=x0;RO.z=z0;RO.h=h0;HUB.cpos=null}}
 (function P17_regGo(i){const C=window.__chk;if(C&&C.GO){if(Array.isArray(C.items)&&!C.items.some(x=>x.ver==='perf17'))C.items.push({ver:'perf17',id:'stream',area:'perf',text:'streaming (lazy tiles, Life, hub cull) stays within a per-frame budget and keeps up at 150 km/h'});C.GO['perf17/stream']=[{c:'fra',n:'stream',fn:()=>P17_go()},{c:'ath',n:'stream',fn:()=>P17_go()}];return}if(i<600)setTimeout(()=>P17_regGo(i+1),100)})(0);
+function R11C_go(){const ok=b=>b?' ✅':' ❌';if(typeof WBC==='undefined'||!WBC.on||!WBC.sup||!STR_on())return'📍 far city not built yet / streaming off: nothing to check (run with other items first)'+ok(true);
+  const TQ=window.__tq&&__tq.o,d0=TQ&&TQ.draw,old=new Set(WBC.sup.filter(S=>S.built)),far=WBC.sup.filter(S=>S.nt&&!S.built).sort((A,B)=>STR_d(B,RO.x,RO.z)-STR_d(A,RO.x,RO.z))[0],q=far&&rfSnap((far.x0+far.x1)/2,(far.z0+far.z1)/2,600);if(q)roamWarp(q[0],q[1],RO.h);camera.position.set(RO.x,RO.y+6,RO.z);
+  try{if(TQ)TQ.draw=1;for(let i=0;i<400;i++)lazyStep()}finally{if(TQ)TQ.draw=d0}const cx=camera.position.x,cz=camera.position.z,R=STR_R();let built=0,kept=0,holes=0;
+  for(const S of WBC.sup){if(!S.nt)continue;if(S.built&&!old.has(S)){built++;const m=S.lod||(S.cells.find(c=>c.lod)||{}).lod;if(m&&m.geometry.attributes.position.array&&S!==STR.S)kept++}else if(!S.built&&STR_d(S,cx,cz)<R)holes++}
+  return`📍 far super cells built after a move to an unbuilt area ${built}, still holding a CPU copy ${kept}, unbuilt inside draw range ${holes}, uploads ${STR.st.up||0}`+ok(built>0&&!kept&&!holes)}
+(function R11C_regGo(i){const C=window.__chk;if(C&&C.GO){if(Array.isArray(C.items)&&!C.items.some(x=>x.ver==='r11c'))C.items.push({ver:'r11c',id:'str-up',area:'perf',text:'streamed far city cells free their CPU copy at once and leave no holes inside draw range'});C.GO['r11c/str-up']=[{c:'fra',n:'str-up',fn:()=>R11C_go()},{c:'ath',n:'str-up',fn:()=>R11C_go()}];return}if(i<600)setTimeout(()=>R11C_regGo(i+1),100)})(0);
 // (c) 3-5 checked shortcuts per city (up to 9 candidates, each re-checked and shown only once streamed tiles are in) over open ground (parks, plazas, lawns between streets) marked with yellow brick arrows. ?dest=0 turns it OFF (default ON). Shortcuts are kept only when the road route is >= 1.7x the straight line (est. save >= 41 %, so the driven save stays >= 20 % with ~30 % wobble).
 const DEST={fr:0,hv:[],on:!/[?&]dest=0/.test(location.search),n:{slide:0,setSmash:0,setBump:0},sc:null,done:false,scI:0,scBusy:false,scGrp:null};
 const DEST_SET={banner:['#e8502a','#ffffff'],billboard:['#2a7ad8','#ffffff','#ffd12c'],balloons:['#e8502a','#ffd12c','#2a7ad8','#3aa04a'],sprinkler:['#2a7ad8','#bfe3ff'],swings:['#d8302a','#ffd12c','#2f3640'],seesaw:['#ffd12c','#2a7ad8']};
@@ -16233,6 +16243,9 @@ smashCheck=(f=>function(dt){DEST_step(dt);return f.apply(this,arguments)})(smash
   T('cull',()=>{if(!HUB.built||!HUB.grp)return;if(!HUB.cull)hubCullInit();if(typeof LDS_scan==='function'&&LDS.st&&HUB.ptypes)LDS_scan(true)});/* boot-3: the cull list (every hub mesh's bounding sphere, Athens 130 ms) and the tree-LOD scan, built here, not in the first roam frame */
   T('dest',()=>{if(!DEST.on||!HUB.nodes)return;if(DEST.N!==HUB.nodes)DEST_reset();DEST_find(100)});
   return _lp.apply(this,a)}}
+function BOOT1_pre(){if(state!=='roam'||/[?&]bootpre=0/.test(location.search))return;const T=(n,f)=>{try{f()}catch(e){console.warn('boot1 '+n,e)}};
+  T('cam',()=>{const sn=camSnap;roamCam(1/60);camSnap=sn});T('traffic',()=>hubTrafficStep(1/60))}
+{const _rp=roamPost;roamPost=function(...a){const r=_rp.apply(this,a);if(LD.busy)BOOT1_pre();return r}}
 function R3E_builderGo(){if(typeof BX==='undefined')return'📍 builder missing ❌';const T=window.__tq&&__tq.o,was=BX.on,IDS=['#menu','#topBtns','#hud','#touch'],hid=IDS.map(i=>{const e=$(i);return e?e.hidden:null});try{if(!BX.on)BX_open();const ok=b=>b?' ✅':' ❌',cam=BX.cam,d0=T&&T.draw;if(T)T.draw=1;
   cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();BX_camBuild();renderer.setRenderTarget(null);renderer.render(BX.sc,cam);
   const cv=renderer.domElement,w=cv.width,h=cv.height,o=document.createElement('canvas');o.width=w;o.height=h;const x=o.getContext('2d',{willReadFrequently:true});x.drawImage(cv,0,0);if(T)T.draw=d0;
@@ -16356,8 +16369,11 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
    const g=new THREE.BufferGeometry();for(const[k,n]of[['position',3],['normal',3],['uv',2],['color',3]])g.setAttribute(k,new THREE.Float32BufferAttribute(new Array(n*3).fill(0),n));
    gm=new THREE.Mesh(g,m);gm.receiveShadow=true;gm.frustumCulled=false;sc.add(gm)}}catch(e){console.warn('warmall ground',e)}
   let bm=null;try{if(typeof xfWarm==='function'){bm=xfWarm();sc.add(bm)}}catch(e){console.warn('warmall burst',e)}
+  let lf=null;try{if(typeof LF!=='undefined'&&LF.on&&typeof LF_mats==='function'){const M=LF_mats(),g=new THREE.BoxGeometry(.1,.1,.1);g.setAttribute('color',new THREE.Float32BufferAttribute(new Array(g.attributes.position.count*3).fill(1),3));lf=new THREE.Group();
+   for(const k of['def','tuft','pond']){const m=new THREE.InstancedMesh(g,M[k],1);m.setMatrixAt(0,new THREE.Matrix4());m.setColorAt(0,new THREE.Color());m.frustumCulled=false;m.receiveShadow=true;lf.add(m)}
+   if(typeof LF_patchMat==='function'){const pm=new THREE.Mesh(g,LF_patchMat());pm.frustumCulled=false;pm.receiveShadow=true;lf.add(pm)}sc.add(lf)}}catch(e){console.warn('warmall lf',e)}
   const hid=[];sc.traverse(o=>{if(!o.visible){o.visible=true;hid.push(o)}});WARMALL.n=hid.length;
-  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}if(bm){sc.remove(bm);XFB_MP.push(bm.material);bm.dispose()}}}}
+  try{return _pc.call(this,sc,cam)}finally{for(const o of hid)o.visible=false;if(gm){sc.remove(gm);gm.geometry.dispose()}if(lf){sc.remove(lf);lf.children[0].geometry.dispose();for(const o of lf.children)if(o.isInstancedMesh)o.dispose()}if(bm){sc.remove(bm);XFB_MP.push(bm.material);bm.dispose()}}}}
 function ENV_on(){if(ENV_on.v!==undefined)return ENV_on.v;let v=true;try{const q=new URLSearchParams(location.search).get('env1');if(q!==null)v=q!=='0';else if(typeof TUNE!=='undefined'&&TUNE.env1===0)v=false}catch(e){}return ENV_on.v=v}
 function ENV_lo(){try{if(typeof LK_lvl==='function'&&LK_lvl()==='low')return true;return typeof SET!=='undefined'&&SET.q==='low'}catch(e){return false}}
 function ENV_vn(x,z){const h=(a,b)=>{const v=Math.sin(a*127.1+b*311.7)*43758.5453;return v-Math.floor(v)},i=Math.floor(x),j=Math.floor(z);let fx=x-i,fz=z-j;fx=fx*fx*(3-2*fx);fz=fz*fz*(3-2*fz);
