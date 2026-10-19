@@ -208,7 +208,7 @@ function LV_clStep(dt){const S=LV.cl;if(!S||!HUB.peds)return;const P=HUB.peds,N=
         else{const e=Math.sqrt(e2)||1,o=rr2-e;RO.x+=ex/e*o;RO.z+=ez/e*o;RO.v*=typeof DEST!=='undefined'&&DEST.on?DEST_slide(ex/e,ez/e):.7}}/* dest-1: the into-the-stall part only, and the car turns along the rim */
       // people: face the car once it is within 35 m, otherwise face the group; cheer-hop as it passes
       for(let j=0;j<C.n;j++){const p=P[base+j];if(!p||!p.cw)continue;p.gs=C.gs;const pd=Math.hypot(p.cx-RO.x,p.cz-RO.z);
-        const th=pd<35?Math.atan2(RO.x-p.cx,RO.z-p.cz):Math.atan2(p.mx-p.cx,p.mz-p.cz);let dh=th-(p.ch??th);dh=Math.atan2(Math.sin(dh),Math.cos(dh));p.ch=(p.ch??th)+dh*Math.min(1,dt*5);
+        const th=pd<35?Math.atan2(RO.x-p.cx,RO.z-p.cz):Math.atan2(p.mx-p.cx,p.mz-p.cz);let dh=th-(p.ch===p.ch?p.ch:th);dh=Math.atan2(Math.sin(dh),Math.cos(dh));p.ch=(p.ch===p.ch?p.ch:th)+dh*Math.min(1,dt*5);
         if(p.jy<=0&&pd<30&&sp>6&&R()<dt*1.3){p.jv=5.5;p.jy=.01;p.kx=p.kz=0;p.spin=0}}}
     base+=C.n}LV_clUpd()}
 // walkers (70 at 1×, lvPed) + cluster people never exceed PED_N
@@ -299,5 +299,5 @@ function LVP_hud(){const C=LVP.c;if(!C||RO.ch||RO.sp)return;const a=huQ('#roamAr
 window.__lv={LV,n:()=>({peds:HUB.peds?LV_pn(HUB.peds.length):0,flags:LV.flags?LV.flags.L.length:0,roofs:LV.n.flags||0,boats:LV.n.boats||0,birds:LV.birds?LV.birds.fl.filter(f=>f.on).length:0,blimp:!!LV.blimp,ms:LV.ms}),
   view:()=>{// people / cars / birds / boats inside the camera view within 120 m (the "is anything happening" count of the research doc)
     const fr=new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse)),v=new THREE.Vector3(),c={peds:0,cars:0,birds:0,boats:0},inV=(x,y,z)=>fr.containsPoint(v.set(x,y+1,z))&&v.distanceTo(camera.position)<120;
-    for(const p of HUB.peds||[])if(p._x!=null&&inV(p._x,p.y,p._z))c.peds++;for(const k of HUB.cars||[])if(k.dead<=0&&inV(k.x,k.y||0,k.z))c.cars++;
+    for(const p of HUB.peds||[])if(p._x===p._x&&inV(p._x,p.y,p._z))c.peds++;for(const k of HUB.cars||[])if(k.dead<=0&&inV(k.x,k.y||0,k.z))c.cars++;
     if(LV.birds)for(const F of LV.birds.fl)if(F.on)for(const b of F.b)if(inV(b.x,b.y,b.z))c.birds++;if(LV.boats)for(const b of LV.boats.bt)if(inV(b.x,0,b.z))c.boats++;return c}};

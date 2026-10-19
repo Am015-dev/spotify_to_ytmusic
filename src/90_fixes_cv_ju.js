@@ -321,7 +321,7 @@ function CV_pedPre(dt){const P=HUB.peds,N=HUB.nodes;if(!P)return;for(const p of 
   const bx=A.x+(B.x-A.x)*p.t,bz=A.z+(B.z-A.z)*p.t;if(p.CVh){p.v=p.CVh;p.CVh=0}const In=CV_near(bx,bz,J=>J.sig&&Math.hypot(J.x-bx,J.z-bz)<J.R0);if(In){p.CVh=p.v;p.v*=2.2}
   if(!J)continue;const dr=Math.hypot(bx-J.x,bz-J.z)-J.R0;p.CVj=J;p.CVd=dr;if(dr<=0)continue;const w=CV_walk(J);if(w>=0&&w<3.5)continue;
   const L=Math.hypot(B.x-A.x,B.z-A.z)||1;if(dr-p.v*dt*2-.4<0){p.CVs=p.v;p.v=0}}}
-function CV_pedPost(){const P=HUB.peds,N=HUB.nodes;if(!P)return;for(const p of P){if(p.CVs!=null){p.v=p.CVs;p.CVs=null}const J=p.CVj;if(!J||!(p.CVd>0))continue;const A=N[p.a],B=N[p.b];if(!A||!B)continue;
+function CV_pedPost(){const P=HUB.peds,N=HUB.nodes;if(!P)return;for(const p of P){if(p.CVs===p.CVs){p.v=p.CVs;p.CVs=NaN}const J=p.CVj;if(!J||!(p.CVd>0))continue;const A=N[p.a],B=N[p.b];if(!A||!B)continue;
   const bx=A.x+(B.x-A.x)*p.t,bz=A.z+(B.z-A.z)*p.t;if(Math.hypot(bx-J.x,bz-J.z)<J.R0&&Math.hypot(bx-J.x,bz-J.z)>J.R0-6){if(CV_walk(J)>=0)CV.pedOK++;else CV.pedBad++}}}
 {const _bt=buildHubTraffic;buildHubTraffic=()=>{_bt();try{CV_sigBuild();if(CID==='fra')CV_fraVar()}catch(e){console.warn('CV',e)}}
  const _ht=hubTrafficStep;hubTrafficStep=dt=>{if(!CV.sig.length&&!CV.yl.length||!HUB.cars)return _ht(dt);CV.t+=dt;CV_pre(dt);_ht(dt);CV_post(dt)}

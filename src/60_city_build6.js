@@ -149,6 +149,9 @@ function hubRecycle(){const C=HUB.cars;if(!C||!C.length)return;for(let k=0;k<6;k
 // LEGO minifig pedestrians on the pavements; they leap out of the way (nobody gets hurt)
 const PED_N=110,PED_COL=['#e8412c','#2f7de1','#ffd12c','#3dbb5c','#ff8a1c','#9b5de5','#ffffff','#1fb5b0','#ff5fa2','#5a6b7d','#c0392b','#2c3e50'],PED_PANTS=['#2b3a67','#3b2f2f','#1e1e24','#4a5a3a','#6b4a2a','#7a7f8a'],PED_HAIR=['#3b2414','#111111','#d9a23a','#a8401c','#9aa0a6','#5a3a1c','#e01e2b','#2f7de1'];
 // LEGO minifig pedestrians (about 2.6 m tall, the ship's scale): legs/arms swing while walking, arms up when they leap aside
+// perf-r13k: every field a ped ever gets exists from the start, as a number (NaN = unset; test with v!==v), null (object slots) or an object, always in this order, so the ~30 shapes collapse to one and no double is stored into a Tagged field (each store boxed a HeapNumber: pedStep ~131 MB / 60 s)
+function pedNew(){return{e:-1,t:0,dir:1,v:rr(1.1,1.8),side:1,x:0,z:0,y:0,jy:0,jv:0,jx:0,jz:0,spin:0,ph:R()*6,a:-1,b:-1,yc:0,kx:0,kz:0,_x:NaN,_z:NaN,cw:0,cx:0,cz:0,mx:0,mz:0,gs:0,ch:NaN,ofS:null,
+  l3v:NaN,l3n:NaN,l3o:0,l3a:NaN,l3k:0,l3i:0,l3q:null,l3f:NaN,l3H:NaN,l3so:0,l3kn:0,l3rk:NaN,l3tx:0,l3tz:0,l3kx:0,l3kz:0,rdK:NaN,sd:0,rdM:null,rdX:null,rdH:0,rdW:0,rdcx:0,rdcz:0,rdTB:null,rdRv:null,CVj:null,CVd:0,CVh:0,CVs:NaN}}
 function pedInit(){const P=HUB.peds=[];const mk=(geo,col,vc)=>{const m=new THREE.InstancedMesh(geo,new THREE.MeshStandardMaterial({color:col,roughness:.42,vertexColors:!!vc}),PED_N);m.frustumCulled=false;HUB.grp.add(m);return m};
   const leg=new THREE.BoxGeometry(.56,1.25,.72).translate(0,-.62,.02),hip=new THREE.BoxGeometry(1.2,.32,.72),tor=new THREE.BoxGeometry(1.4,1.4,.72),tp=tor.attributes.position;for(let i=0;i<tp.count;i++)if(tp.getY(i)>0)tp.setX(i,tp.getX(i)*.78);tor.computeVertexNormals();
   const arm=new THREE.BoxGeometry(.34,1.1,.42).translate(0,-.5,0),hand=new THREE.CylinderGeometry(.17,.17,.26,8).rotateX(Math.PI/2).translate(0,-1.12,.05);
@@ -157,7 +160,7 @@ function pedInit(){const P=HUB.peds=[];const mk=(geo,col,vc)=>{const m=new THREE
   HUB.pP={legL:mk(leg,'#ffffff'),legR:mk(leg,'#ffffff'),hip:mk(hip,'#ffffff'),tor:mk(tor,'#ffffff'),armL:mk(arm,'#ffffff'),armR:mk(arm,'#ffffff'),handL:mk(hand,'#ffd84a'),handR:mk(hand,'#ffd84a'),head:mk(head,'#ffffff',1),hair:mk(hair,'#ffffff')};
   const c=new THREE.Color();for(let i=0;i<PED_N;i++){const sh=PED_COL[(i*7)%PED_COL.length],pa=PED_PANTS[(i*5)%PED_PANTS.length],hr=PED_HAIR[(i*3)%PED_HAIR.length];
     for(const k of['legL','legR','hip']){c.set(pa);HUB.pP[k].setColorAt(i,c)}for(const k of['tor','armL','armR']){c.set(sh);HUB.pP[k].setColorAt(i,c)}c.set(hr);HUB.pP.hair.setColorAt(i,c);
-    P.push({e:-1,t:0,dir:1,v:rr(1.1,1.8),side:1,x:0,z:0,y:0,jy:0,jv:0,jx:0,jz:0,spin:0,ph:R()*6})}
+    P.push(pedNew())}
   for(const p of P)LV_pedPut(p)}
 function pedPlace(p,min,max){const i=hubNear(min,max,false);if(i<0||HUB.nodes[i].ab||!HUB.nodes[i].nb.length)return;const n=HUB.nodes[i];p.a=i;p.b=n.nb[Math.floor(R()*n.nb.length)];p.t=R();p.dir=1;p.side=R()<.5?-1:1;p.jy=0;p.jv=0;p.spin=0}
 const _pB=new THREE.Matrix4(),_pL=new THREE.Matrix4(),_pR=new THREE.Matrix4(),_pq=new THREE.Quaternion(),_pe=new THREE.Euler(),_pv=new THREE.Vector3(),_ps=new THREE.Vector3();
@@ -171,7 +174,7 @@ function pedStep(dt){const P=HUB.peds;if(!P)return;const N=HUB.nodes,up=_hup,sp=
     const off=(gN?(A.pw??4):p.side*(W/2+(CID==='fra'?3.2:2.1)))*(RD_ON?RD_sd(p):1);let bx=S?S.x:p.cw?p.cx:A.x+(B.x-A.x)*p.t-dz*off,bz=S?S.z:p.cw?p.cz:A.z+(B.z-A.z)*p.t+dx*off;/* v88p: crowd peds (LV clusters) stand at p.cx/p.cz */
     let d=Math.hypot(bx+p.jx-RO.x,bz+p.jz-RO.z);
     if(!p.cw&&!S&&d>LV_pedFar()){LV_pedPut(p);continue}
-    if(TUNE.lvLod&&d>90&&p.jy<=0&&p._x!=null&&(i+HUB.fr)%3)continue;/* v88u perf: people > 90 m away re-pose every 3rd frame (9-13 px tall there) */
+    if(TUNE.lvLod&&d>90&&p.jy<=0&&p._x===p._x&&(i+HUB.fr)%3)continue;/* v88u perf: people > 90 m away re-pose every 3rd frame (9-13 px tall there) */
     if(RD_ON&&!p.cw&&!S&&p.jy<=0){const k=RD_kerb(p,bx,bz,dt);bx=k[0];bz=k[1]}
     if(p.jy<=0&&(!RO.foot||RO.foot==='car')&&d<(sp>12?14:2.6)&&Math.abs(RO.y-p.y)<4){const ax=bx-RO.x,az=bz-RO.z,al=Math.hypot(ax,az)||1;p.jv=d<5?10:7.5;p.jy=.01;p.kx=ax/al*(d<5?8:5.5);p.kz=az/al*(d<5?8:5.5);p.spin=d<5?(R()<.5?-1:1)*8:0;if(R()<.35)AU.sfx('pick');if(d<5&&sp>20&&R()<.5){feed(['HEY!','WATCH IT!','PASS AUF!','OI!'][Math.floor(R()*4)],0,'#ffd12c')}}
     if(p.jy>0){p.jv-=26*dt;p.jy+=p.jv*dt;p.jx+=p.kx*dt;p.jz+=p.kz*dt;if(p.jy<=0){p.jy=0;p.spin=0}}else{p.jx*=Math.max(0,1-dt*.5);p.jz*=Math.max(0,1-dt*.5)}

@@ -57,4 +57,5 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
   Object.entries(self).sort((a,b)=>b[1]-a[1]).slice(0,+(process.env.TOPH||30)).forEach(([k,v])=>console.log('PF1HEAP '+(v/1048576).toFixed(1).padStart(6)+'MB '+k.slice(0,170)))}
  if(process.env.JSON)fs.writeFileSync(process.env.JSON,JSON.stringify(r));
  if(process.env.OPTST){/* perf-r13i: V8 optimisation status of named fns (bit 16 = TurboFan, 32 = interpreted, 0x8000 = baseline) */for(const f of process.env.OPTST.split(','))console.log('PF1OPT '+f+' '+await p.evaluate(`(()=>{try{return __oc.ev("(%GetOptimizationStatus(${f})).toString(16)")}catch(e){return 'ERR '+e.message}})()`))}
+ if(process.env.PEDKEYS){/* perf-r13k: ped field union + distinct key orders (shapes) + non-number values */console.log('PF1PEDKEYS '+await p.evaluate(`(()=>{const P=__oc.ev("HUB.peds"),u={},sh=new Set();for(const q of P){sh.add(Object.keys(q).join());for(const k in q){const t=q[k]===null?'null':typeof q[k];(u[k]=u[k]||new Set()).add(t)}}return 'shapes '+sh.size+' | '+Object.entries(u).map(([k,v])=>k+':'+[...v].join('/')).join(' ')})()`))}
  await b.close();srv.close()});
