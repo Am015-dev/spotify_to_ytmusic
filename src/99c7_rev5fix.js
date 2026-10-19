@@ -432,3 +432,14 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
    .catch(e=>{IOSM_wrap(false);goSay('📍 iOS MEM · threw '+e+' ❌ FAIL')});
   return'📍 iOS MEM · rotating…'}}))}return}
  if(i<600)setTimeout(()=>IOSM_reg(i+1),100)})(0);
+// perf-r17d: GO perf/fc-first (both cities). Cold camera-pull state (no grids, no occluder list), 1200 FC_pull frames (60 s at 20 Hz raycasts) with the camera circling the car at 12-45 m so the grids build everywhere.
+// Pass line: the slowest FC_pull frame (FC_occ + grid work + raycast pass) <= 30 ms.
+(function R17D_reg(i){const C=window.__chk;if(C&&C.GO&&Array.isArray(C.items)){if(!C.items.some(q=>q.ver==='perf'&&q.id==='fc-first'))C.items.push({ver:'perf',id:'fc-first',area:'perf',text:'r17d · first minute of the camera wall-pull (Frankfurt one 117-143 ms frame at about frame 8): 📍 GO (both cities) starts from empty grids and runs 1200 FC_pull frames with the camera circling the car. Pass line: the slowest frame <= 30 ms (info: p99, grids built, FC_occ max). Needs free roam.'});
+  C.GO['perf/fc-first']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt':'Athens',fn:()=>{if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';
+   const cam=camera.position,c0=cam.clone(),pull=FC.pull,k=FC.k,kt=FC.kt,T=[];let mxd=0,mxi=0,mxw=0;
+   try{FC.pull=true;FCG.W=new WeakMap();FCG.pq.length=0;FC.occ=[];FC.occT=-99;FC.rt=0;FC.t=FC.t||0;
+    for(let n=0;n<1200;n++){const a=n*.11,r=12+(n%300)*.11;cam.set(RO.x+Math.sin(a)*r,RO.y+4,RO.z+Math.cos(a)*r);FC.off.set(0,0,0);const w0=FCG.st.ms,t0=performance.now();FC_pull(1/60);const d=performance.now()-t0;T.push(d);if(d>mxd){mxd=d;mxi=n;mxw=FCG.st.ms-w0}FC.t+=1/60}
+   }finally{cam.copy(c0);FC.off.set(0,0,0);FC.pull=pull;FC.k=k;FC.kt=kt}
+   const S=T.slice().sort((a,b)=>a-b),mx=S[S.length-1],ok=mx<=30;window.__chk.fcFirst=window.__chk.fcFirst||{};window.__chk.fcFirst[c]=+mx.toFixed(1);
+   return`📍 FC COLD START · ${c==='fra'?'Frankfurt':'Athens'}: slowest of ${T.length} FC_pull frames ${mx.toFixed(1)} ms (≤ 30), p99 ${S[Math.floor(S.length*.99)].toFixed(1)} ms, grids built ${FCG.st.built}; slowest at frame ${mxi}, of it grid work ${mxw.toFixed(1)} ms → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
+ if(i<600)setTimeout(()=>R17D_reg(i+1),100)})(0);
