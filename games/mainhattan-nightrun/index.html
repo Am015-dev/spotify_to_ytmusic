@@ -8577,7 +8577,7 @@ if(PW3.on){
        SLICE / ECHO / RICOCHET   phase: bullets it passes turn into shards; a kill during the dash refunds a charge
        WINGMATES                 decoy: an afterimage stays behind 1.2 s and newly aimed shots go for it
        MAGNET BASS / SLOW        magnet: pickups near the path fly to the ship
-   EMP: P.emp charges (3 max) as before, plus a meter that fills from kills, grazes, on-beat dashes and power-up pickups (less on hard tiers).
+   EMP: P.emp charges (3 max) as before, plus a meter that fills from kills, grazes, on-beat dashes and power-up pickups (x.35 on Legend; the dash refills up to 1.4x slower there).
      Every EMP clears the bullets and hits like the old one (10 / boss 25, booked by the same caps); the running power-up adds:
        NOVA          shockwave: the cleared bullets become shards (8 at most)
        SLICE / SLOW  slow bubble: 2.5 s, bullets inside move at 35%
@@ -8591,13 +8591,13 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
   stat:{dash:0,onb:0,burn:0,ram:0,phase:0,refund:0,decoy:0,mag:0,emp:0,conv:0,slow:0,chain:0,od:0,core:0,fill:0},
   MOD:{nova:'burn',drum:'burn',tempo:'burn',chord:'ram',crate:'ram',leech:'ram',slice:'phase',echo:'phase',ric:'phase',wing:'decoy',magb:'mag',slow:'mag'},
   EMOD:{nova:'wave',slice:'bubble',slow:'bubble',wing:'chain',echo:'chain',drum:'od',tempo:'od',ric:'od',crate:'od',chord:'core',bomb:'core',magb:'pull',leech:'chain'},
-  FILL:{easy:1.2,normal:1,hard:.8,vhard:.7,legend:.6},
+  FILL:{easy:1.2,normal:1,hard:.7,vhard:.5,legend:.35},RK:{hard:1.15,vhard:1.3,legend:1.4},   // hard tiers: slower EMP meter and dash refill, so Legend does not get easier
   st(){return G.ab||(G.ab={n:3,r:0,trail:[],dec:null,rings:[],bub:null,arcs:[],od:0,odT:0,hit:null,ref:0,ph:0,m:0,tip:0});},
   keys(){return G.pw?G.pw.act.map(a=>a.k):[];},
   pwLv(){let m=0;if(G.pw)for(const a of G.pw.act)m=Math.max(m,a.l3||1);return m;},
   lv(){const m=this.pwLv();return Math.max(1,Math.min(5,1+(SH.dmax|0)+(m>=5?2:m>=3?1:0)));},
   max(){return this.lv()>=3?4:3;},
-  refill(){return 1.7-.12*(this.lv()-1);},
+  refill(){return(1.7-.12*(this.lv()-1))*(this.RK[SET.diff]||1);},
   mods(map){const o={};for(const k of this.keys())if(map[k])o[map[k]]=1;return o;},
   dashMod(){const k=this.keys();for(let i=k.length-1;i>=0;i--)if(this.MOD[k[i]])return this.MOD[k[i]];return'';},
   /* b.js: replaces the beat-snapped dash. ts = the press stamp (or undefined), mx/my = the keys this frame */
