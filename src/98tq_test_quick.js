@@ -27,7 +27,8 @@ if(TQ){
  const iv=setInterval(()=>{skip();if(TQS.busy||TQS.drv)return;let st='';try{st=state}catch(e){}if(st!=='roam'||!RO.on||!RO.built||LD.busy)return;TQS.busy=1;
   ride().then(()=>{const w2=()=>{let s2='';try{s2=state}catch(e){}if(s2!=='roam'||!RO.on||LD.busy)return setTimeout(w2,200);spot();skip();RO.v=0;
    TQS.drv=true;TQS.tReady=Math.round(performance.now()-TQS.t0);TQS.home=[RO.x,RO.z,RO.h];  // drv = the player can drive; ready also waits for the lazy code chunks (src/LAZY, 10z_lazy.js: __chk etc.)
-   XC_go().then(()=>{TQS.ready=true;if(TQ.go)setTimeout(()=>{try{TQS.goSaid=window.__chk&&__chk.go(TQ.go)}catch(e){TQS.log.push('go: '+e)}},300)})};w2()})},250);
+   /* bisect-black: since fix-bhs XC_go no longer waits for the desktop roam-start gate (LKG, 98bp), so ready came while LKG.arm still blocked composer.render (black GO page) and before the gate's GFX_pre (warm Athens horizon: r13/sky-blue failed when it ran first). Ready now also waits for the gate (≤ 120 s) */
+   XC_go().then(()=>new Promise(r=>{let k=0;const w=()=>{let a=0;try{a=LKG.arm}catch(e){}if(!a||k++>1200)return r();setTimeout(w,100)};w()})).then(()=>{TQS.ready=true;if(TQ.go)setTimeout(()=>{try{TQS.goSaid=window.__chk&&__chk.go(TQ.go)}catch(e){TQS.log.push('go: '+e)}},300)})};w2()})},250);
  setTimeout(()=>clearInterval(iv),120000);
  // warm page (dev-5): back to a clean roam at the boot spot WITHOUT a reload (~0.2 s instead of a 20-40 s city boot); the GO runner calls it between items
  const reset=()=>{const t=performance.now(),log=[];const T=(n,f)=>{try{f()}catch(e){log.push(n+': '+String(e).slice(0,60))}};

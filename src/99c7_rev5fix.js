@@ -253,7 +253,12 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
  const sk=()=>{const U=SKYU,f=v=>v.toArray().map(x=>+x.toFixed(2)),b=scene.background;return{top:f(U.uTop.value),mid:f(U.uMid.value),hor:f(U.uHor.value),bg:b&&b.isColor?'#'+b.getHexString():String(b),ro:RO.on,gfx:GFX.on,day:GFX.day,mood:MOOD&&MOOD.id,cloud:U.uCloud.value,lm:!!LOWMEM}};
  const go=city=>({c:city,n:city+' sky is blue',secs:2,fn:()=>{const s=sk(),bl=a=>a[2]>a[0]+.15&&a[2]>.45,bg=s.bg==='null'||/^#[0-9a-f]{6}$/.test(s.bg)&&bl(s.bg.slice(1).match(/../g).map(h=>parseInt(h,16)/255)),ok=s.day&&bl(s.mid)&&bl(s.hor)&&bg;
   return'📍 SKY '+city.toUpperCase()+' · lowmem '+(s.lm?'on':'off')+' · mid '+s.mid+' hor '+s.hor+' background '+s.bg+' · sky mesh flagged '+!!sky.userData.sky+' → '+(ok&&sky.userData.sky?'✅ PASS':'❌ FAIL')}});
- C.GO['r13/sky-blue']=[go('fra'),go('ath')]}return}
+ C.GO['r13/sky-blue']=[go('fra'),go('ath')]}
+ if(!C.items.some(q=>q.ver==='r13'&&q.id==='sky-blue-frame')){C.items.push({ver:'r13',id:'sky-blue-frame',area:'look',text:'bisect-black · Athens frame is not black on PC: 📍 GO (Athens) checks the desktop roam-start gate is down, draws one frame and reads its pixels back. Pass line: gate down (LKG.arm 0) and the mean frame brightness > 40 (black page was 9-11, normal ~90-107).'});
+  C.GO['r13/sky-blue-frame']=[{c:'ath',n:'Athens frame not black',secs:30,fn:()=>{let arm=0;try{arm=LKG.arm|0}catch(e){}const T=typeof TQ!=='undefined'&&TQ,d0=T?T.draw:0;let m=-1;
+   try{if(T)T.draw=1;composer.render();const gl=renderer.getContext(),W=gl.drawingBufferWidth,H=gl.drawingBufferHeight,px=new Uint8Array(4);let s=0,n=0;
+    for(let i=1;i<16;i++)for(let j=1;j<16;j++){gl.readPixels(Math.floor(W*i/16),Math.floor(H*j/16),1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);s+=(px[0]+px[1]+px[2])/3;n++}m=s/n}catch(e){m=-2}finally{if(T)T.draw=d0}
+   const ok=!arm&&m>40;return'📍 ATH FRAME · gate '+(arm?'UP':'down')+' · mean '+m.toFixed(1)+' → '+(ok?'✅ PASS':'❌ FAIL')}}]}return}
  if(i<600)setTimeout(()=>R13_reg(i+1),100)})(0);
 // perf-r13d: one frame budget shared by hubCullStep, pedStep and LV_step on touch/LOWMEM (TUNE.roamBudget, src/98rb_roam_budget.js).
 (function R13D_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='roam-budget')){C.items.push({ver:'perf',id:'roam-budget',area:'perf',text:'perf-r13d · roam frame budget: 📍 GO forces the touch profile in Athens with TUNE.roamBudget on and a 0 ms budget, then steps the streets 120 frames. Pass line: hubCullStep, pedStep and LIFE each wait some frames but never more than 2 in a row (each runs at least every 3rd frame), traffic (HT_cars) runs every frame, and with the flag off nothing waits (default OFF; the real metric is tools/perf1/tBoot.js PF1OWN>50).'});
