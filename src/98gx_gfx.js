@@ -5,25 +5,38 @@
 // Fix (all behind GFX.on, default ON; ?gfx=1 / ?gfx=0 overrides, else store 'mho_gfx'): ACES filmic, a warm lower sun (~33°) with a fitted shadow map
 // around the player on high AND med (2048 PCFSoft / 1024 PCF), a weak blue-sky/green-ground fill, glossy LEGO plastic (roughness .3-.42,
 // env 1.0) on everything that casts a shadow (buildings, cars, props; never the ground), deeper sky, subtle bloom on highlights.
-const GFX={on:(()=>{try{const q=new URLSearchParams(location.search).get('gfx');if(q!==null)return q!=='0';return store.get('mho_gfx',1)===1}catch(e){return true}})(),   // gfx-2 (2026-10-14): ON by default for everyone (coordinator); ?gfx=0 / store 0 = old look
+const GFX={on:(()=>{try{const P=new URLSearchParams(location.search),o=P.get('gfxold');if(o!==null)return o!=='1';const q=P.get('gfx');if(q!==null&&!/^[0-3]$/.test(q))return q!=='off';return store.get('mho_gfx',1)===1}catch(e){return true}})(),   // tier-r22a: ?gfx=0..3 is the PC tier override (98gt_gfxtier); the old look is ?gfxold=1
+ tod:(()=>{try{const q=new URLSearchParams(location.search).get('tod');if(q!==null)return q==='1';return store.get('mho_gfxtod',0)===1}catch(e){return false}})(),   // tier-r22a: time-of-day light owner, WIP, default OFF (?tod=1)
+   // gfx-2 (2026-10-14): ON by default for everyone (coordinator); ?gfx=0 / store 0 = old look
  day:false,keyOrig:new Map(),mats:new WeakSet(),pm:[],gm:[],U:{value:1},G:{value:new THREE.Vector4(0,0,0,0)},t:0,n:0,tier:null};
 // light-1 (2026-10-16): beta.40 brightness back. Live knobs (TUNE drawer "Light", tune.json): fill, sun, sun height / angle behind the view, slew, snap.
 Object.assign(TUNE,Object.assign({gfxHemi:.8,gfxSun:4.2,gfxEnv:.3,gfxEl:.6,gfxAz:2.8,gfxSlew:.8,gfxSnap:1},TUNE));
 const GFX_SUN=[600,300,380];   // ~30° elevation (GFX_sunFollow; coordinator: shadows must read clearly, 2K-style long shadows under cars, buildings, trees)
 function GFX_tier(){try{const L=LK_lvl();return L==='high'?'high':L==='med'?'med':'off'}catch(e){return SET.q==='high'?'high':SET.q==='med'?'med':'off'}}
 function GFX_isDay(){return RO.on&&MOOD&&!(typeof FL!=='undefined'&&FL.n>.5)&&MOOD.id!=='night'&&MOOD.id!=='flnight'}
+// tier-r22a: the ONE owner of the roam day light (sun, fill, env, sky, fog, sun elevation). GFX_light and GFX_sunFollow only write what this returns.
+// GFX.tod off (default) = the fixed noon look of beta.140, value for value. GFX.tod on = the same noon look on FL's day plateau (t .31-.66, so the
+// golden views at t=.45 do not move), blended towards FL_at(t) (dawn, golden hour, dusk, night) outside it, with a lower sun. Later tier lanes read this.
+function GFX_todL(t){const ath=CID==='ath';
+ // light-1: hemi .4 (gfx-2) made every face away from the sun near-black (beta.50-.63 Athens trees/facades, black shadow wedges); .8 with a warm,
+ // brighter ground bounce = mid-tone blue-grey shade like 2K Drive, sunlit vs shaded still clearly differ (sun 4.2)
+ const N={sunC:ath?'#ffd9a8':'#ffe1b4',sunI:TUNE.gfxSun,hemiC:'#9cbcff',hemiG:ath?'#8a7656':'#6f7a60',hemiI:TUNE.gfxHemi,env:TUNE.gfxEnv,
+  top:[.004,.045,.40],mid:[.025,.16,.72],hor:[ath?.62:.30,ath?.66:.56,ath?.78:.95],sun:[1.0,.8,.5],fog:ath?'#cfd6e2':'#a6c4ee',el:TUNE.gfxEl,w:1};
+ if(!GFX.tod)return N;if(t==null)t=typeof FL_time==='function'?FL_time():.45;
+ const w=t>=.31&&t<=.66?1:Math.max(0,Math.min(1,t<.31?(t-.2)/.11:(.82-t)/.16)),k=w*w*(3-2*w);N.w=+k.toFixed(3);if(k>=1)return N;
+ const m=FL_at(t),c=new THREE.Color(),C=(a,b)=>'#'+c.set(b).lerp(new THREE.Color(a),k).getHexString(),V=(a,b)=>a.map((v,i)=>b[i]+(v-b[i])*k),F=(a,b)=>b+(a-b)*k;
+ return{sunC:C(N.sunC,m.key[0]),sunI:F(N.sunI,m.key[1]),hemiC:C(N.hemiC,m.hemi[0]),hemiG:C(N.hemiG,m.hemi[1]),hemiI:F(N.hemiI,m.hemi[2]),env:F(N.env,m.env),
+  top:V(N.top,m.top),mid:V(N.mid,m.mid),hor:V(N.hor,m.hor),sun:V(N.sun,m.sun),fog:C(N.fog,m.fog),el:Math.max(.07,N.el*(.25+.75*k)),w:N.w}}
 // lights, tone mapping, sky, fog: applied after ART_light (which runs after every mood / day-cycle update while roaming)
 function GFX_light(){if(!GFX.on)return;const day=GFX_isDay();GFX.day=day;
  if(!day){GFX.U.value=1;GFX_GRADE.uniforms.uOn.value=0;if(renderer.toneMapping!==THREE.NeutralToneMapping)renderer.toneMapping=THREE.NeutralToneMapping;return}
  if(!GFX.keyOrig.has(MOOD)){GFX.keyOrig.set(MOOD,MOOD.key[2]);MOOD.key[2]=GFX_SUN}moonL.position.copy(moonL.target.position).add(new THREE.Vector3(...GFX_SUN).setLength(400));   // relative to the shadow target (71_roam_drive), not world 0
  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.0;
- const ath=CID==='ath';moonL.color.set(ath?'#ffd9a8':'#ffe1b4');moonL.intensity=TUNE.gfxSun;
- // light-1: hemi .4 (gfx-2) made every face away from the sun near-black (beta.50-.63 Athens trees/facades, black shadow wedges); .8 with a warm,
- // brighter ground bounce = mid-tone blue-grey shade like 2K Drive, sunlit vs shaded still clearly differ (sun 4.2)
- hemi.color.set('#9cbcff');hemi.groundColor.set(ath?'#8a7656':'#6f7a60');hemi.intensity=TUNE.gfxHemi;
- scene.environmentIntensity=TUNE.gfxEnv;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
- const U=SKYU;U.uTop.value.set(.004,.045,.40);U.uMid.value.set(.025,.16,.72);U.uHor.value.set(ath?.62:.30,ath?.66:.56,ath?.78:.95);U.uSun.value.set(1.0,.8,.5);
- scene.fog.color.set(ath?'#cfd6e2':'#a6c4ee');
+ const L=GFX_todL();moonL.color.set(L.sunC);moonL.intensity=L.sunI;
+ hemi.color.set(L.hemiC);hemi.groundColor.set(L.hemiG);hemi.intensity=L.hemiI;
+ scene.environmentIntensity=L.env;   // ground/road: weak sky reflection (1.0 washed the grass white). Plastic gets its own env, below
+ const U=SKYU;U.uTop.value.set(...L.top);U.uMid.value.set(...L.mid);U.uHor.value.set(...L.hor);U.uSun.value.set(...L.sun);
+ scene.fog.color.set(L.fog);
  GFX.U.value=.15;GFX_GRADE.uniforms.uOn.value=1;bloom.strength=.16;bloom.radius=.45;
 for(const m of GFX.gm)m.roughness=.88}   // applyMoodMaterials resets the road's roughness on every mood change
 // 98_garage_driver forces bloom.threshold=1 before every roam render: by GFX day the threshold reads 2.2 whatever is written
@@ -95,16 +108,17 @@ function GFX_bbox(g){const p=g.attributes.position;if(!p||p.isInterleavedBufferA
 function GFX_cast(){let k=0;const t0=performance.now();GFX.castMore=false;scene.traverse(o=>{if(GFX.castMore||!o.isMesh||o.castShadow||o.userData.gfxNo||!o.geometry||!o.visible||o===sky)return;if(performance.now()-t0>3){GFX.castMore=true;return}const g=o.geometry,m0=[].concat(o.material)[0];if(!m0||m0.transparent||m0.isMeshBasicMaterial||m0.isShaderMaterial||o.userData.art6||GFX_flat(o)){o.userData.gfxNo=1;return}if(!g.boundingBox)GFX_bbox(g);
   if((g.boundingBox.max.y-g.boundingBox.min.y)*Math.abs(o.scale.y)<1.2){o.userData.gfxNo=1;return}o.castShadow=true;o.receiveShadow=true;o.userData.gfxCast=1;k++});GFX.cast=(GFX.cast||0)+k}
 function GFX_frame(){if(!GFX.on||state!=='roam')return;const now=performance.now();if(GFX.castMore&&now>=(GFX.tc||0)&&now<GFX.t){GFX.tc=now+100;try{if(RO.shadowOn)GFX_cast();else GFX.castMore=false}catch(e){GFX.castMore=false}return}if(now<GFX.t)return;GFX.t=now+2500;GFX.fc=(GFX.fc||0)+1;try{GFX_shadow();GFX_car();if(RO.shadowOn)GFX_cast()}catch(e){GFX.err=String(e)}try{GFX_ao()}catch(e){GFX.aoErr=String(e)}try{GFX_plastic(scene)}catch(e){}}
-ART_light=(f=>function(){const r=f.apply(this,arguments);try{GFX_light()}catch(e){}return r})(ART_light);
+ART_light=(f=>function(){const r=f.apply(this,arguments);try{GFX_light()}catch(e){}return r})(ART_light);   // GFX_light (via GFX_todL) runs last and overwrites every light ART_light sets: GFX_todL is the owner
 LK_roamLook=(f=>function(){const r=f.apply(this,arguments);try{GFX.t=0;GFX_frame()}catch(e){}return r})(LK_roamLook);
 // sun follows the camera slowly from behind-left (gfx-2): a fixed world sun was backlit on half the headings (v90m Frankfurt start: we saw only
 // shaded faces, the car's shadow hid under it, sun glare greyed the sky). Now lit faces + shadows falling forward-right on screen, every heading.
 // Azimuth slews at most GFX_SLEW rad/s (smoothed), so shadows creep while turning instead of swinging.
 // light-1: at .35 rad/s the sun was still ahead of the camera seconds after spawn / a camera cut (beta.63 Athens start: 69° = backlit, black faces).
 // Now: an error > gfxSnap rad (spawn, respawn, camera cut, U-turn) snaps the sun behind the view; smaller errors slew at gfxSlew rad/s or faster.
-function GFX_sunFollow(dt){const GFX_EL=TUNE.gfxEl,GFX_AZ=TUNE.gfxAz,GFX_SLEW=TUNE.gfxSlew;   // elevation ~34°, sun 160° from the view direction (behind, a little left): at 24°/140° Frankfurt's building rows shaded the whole road
+function GFX_sunFollow(dt){const GFX_EL=GFX.tod?GFX_todL().el:TUNE.gfxEl,GFX_AZ=TUNE.gfxAz,GFX_SLEW=TUNE.gfxSlew;   // elevation ~34°, sun 160° from the view direction (behind, a little left): at 24°/140° Frankfurt's building rows shaded the whole road
  if(!GFX.on||!GFX.day||!camera)return;const d=GFX.cd||(GFX.cd=new THREE.Vector3());camera.getWorldDirection(d);
- hemi.intensity=TUNE.gfxHemi;moonL.intensity=TUNE.gfxSun;scene.environmentIntensity=TUNE.gfxEnv;   // live TUNE (other code may rewrite them between moods)
+ if(GFX.tod){const L=GFX_todL();hemi.intensity=L.hemiI;moonL.intensity=L.sunI;scene.environmentIntensity=L.env}   // tier-r22a: the light owner (no per-frame object when off)
+ else{hemi.intensity=TUNE.gfxHemi;moonL.intensity=TUNE.gfxSun;scene.environmentIntensity=TUNE.gfxEnv}   // live TUNE (other code may rewrite them between moods)
  const want=Math.atan2(d.z,d.x)-GFX_AZ;if(GFX.az===undefined||dt>1)GFX.az=want;let e=want-GFX.az;e=Math.atan2(Math.sin(e),Math.cos(e));
  if(Math.abs(e)>TUNE.gfxSnap){GFX.az=want;e=0}
  GFX.az+=Math.sign(e)*Math.min(Math.abs(e),Math.max(GFX_SLEW,Math.abs(e)*1.5)*Math.min(dt,.1));
