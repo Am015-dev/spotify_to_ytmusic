@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 // Endless ramp test (parts/endramp.js): effective difficulty climbs by wave to the Legend values, pattern sets change from wave to wave, ?endramp=0 and the story are as before, bot numbers.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/endramp-test.js     (pass/fail lines only)
-//   env: BOTS=0 skips the bot measurement; RUNS=10 (bot runs per cell); BASE=<git ref of the build before endramp> (default 2246fa5); WAVES=30 (waves the live run plays)
+//   env: BOTS=0 skips the bot measurement; RUNS=10 (bot runs per cell); BASE=<git ref of the build before endramp> (default 39baa56); WAVES=30 (waves the live run plays)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), cp = require('child_process'), fs = require('fs'), os = require('os');
 const DIR = path.resolve(__dirname, '../../games/mainhattan-nightrun'), ROOT = path.resolve(__dirname, '../..');
-const BASE = process.env.BASE || '2246fa5', WAVES = +process.env.WAVES || 30, RUNS = +process.env.RUNS || 10;
+const BASE = process.env.BASE || '39baa56', WAVES = +process.env.WAVES || 30, RUNS = +process.env.RUNS || 10;
 const port = 8890 + (process.pid % 50), port2 = port + 50;
 const serve = (dir, p) => cp.spawn('python3', ['-m', 'http.server', String(p), '--bind', '127.0.0.1', '--directory', dir], { stdio: 'ignore' });
 // pure curve, read from the page
@@ -35,7 +35,7 @@ const LIVE = new Function('o', `
   const srv = serve(DIR, port); let srv2 = null, tmp = null;
   await new Promise(r => setTimeout(r, 800));
   const b = await PW.chromium.launch(); let fails = 0, errs = 0; const ck = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!ok) fails++; };
-  const open = async q => { const p = await b.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { errs++; if (errs < 4) console.log('FAIL page error ' + e.message); });
+  const open = async q => { const p = await (await b.newContext({ viewport: { width: 960, height: 540 } })).newPage(); p.on('pageerror', e => { errs++; if (errs < 4) console.log('FAIL page error ' + e.message); });
     await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${q}`);
     await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 15000 }).catch(() => { }); return p; };
   const live = async (p, o) => p.evaluate(`(${LIVE.toString().replace(/^function anonymous\(o\s*\)\s*\{/, 'function(o){')})(${JSON.stringify(o)})`);
@@ -67,7 +67,7 @@ const LIVE = new Function('o', `
   await p.close();
   const one = async (q, o) => { const pg = await open(q), x = await live(pg, o); await pg.close(); return x; };   // a fresh page per run: the novelty clock and codex are session state
   const a2 = await one('', { diff: 'normal', seed: 7, t: 6000, n: 12 }), a3 = await one('', { diff: 'normal', seed: 7, t: 6000, n: 12 });
-  ck(a2.sig === a3.sig && JSON.stringify(a2.sets) === JSON.stringify(a3.sets), 'same seed = same waves and pattern sets (seeded GR)');
+  ck(a2.sig === a3.sig && JSON.stringify(a2.sets) === JSON.stringify(a3.sets), 'same seed = same waves and pattern sets (seeded GR)' + (a2.sig === a3.sig ? '' : ' sig differs') + (a2.t !== a3.t ? ' t ' + a2.t + ' vs ' + a3.t : ''));
   // 3. flag off and the story are as before: compare with the build before endramp
   tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'nr-old-')); try {
     fs.writeFileSync(path.join(tmp, 'index.html'), cp.execSync(`git -C ${ROOT} show ${BASE}:games/mainhattan-nightrun/index.html`, { maxBuffer: 1 << 28 }));
@@ -75,7 +75,7 @@ const LIVE = new Function('o', `
   } catch (e) { tmp = null; console.log('SKIP old build comparison: ' + e.message.slice(0, 80)); }
   if (tmp) {
     srv2 = serve(tmp, port2); await new Promise(r => setTimeout(r, 800));
-    const openOld = async () => { const q = await b.newPage({ viewport: { width: 960, height: 540 } }); q.on('pageerror', e => { errs++; }); await q.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+    const openOld = async () => { const q = await (await b.newContext({ viewport: { width: 960, height: 540 } })).newPage(); q.on('pageerror', e => { errs++; }); await q.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
       await q.goto(`http://127.0.0.1:${port2}/index.html?sim=1&all=1`); await q.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 15000 }).catch(() => { }); return q; };
     const oneOld = async o => { const q = await openOld(), y = await live(q, o); await q.close(); return y; };
     const cmp = async (o, name) => { const x = await one('&endramp=0', o), y = await oneOld(o); ck(x.sig === y.sig && x.log === y.log && x.t === y.t, `${name}: identical to the build before endramp (${x.log.split(',').length} spawns, ${x.sig.split(',').length} samples)`); return x; };

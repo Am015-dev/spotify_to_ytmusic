@@ -70,7 +70,7 @@ const LEAK=window.LEAK={
   draw(c,x,y3,k,right){if(!this.on()||!running||G.lab||G.tut||ST.over)return;const f=Math.min(1,this.M/this.cap()),t=c.getTransform(),u=Math.hypot(t.a,t.b)*(c.canvas.getBoundingClientRect().width/c.canvas.width||1),
       fs=Math.max(14*k,14.5/Math.max(.05,u)),q=fs/14;c.save();                       // text is at least 14 css px on a phone
     c.font=`700 ${fs.toFixed(1)}px "Share Tech Mono",monospace`;c.textAlign='left';
-    const hot=f>=.75,col=hot?'#ff5060':f>=.5?'#ffb020':'#c4cde6',lab=this.txtT>0?this.txt:'BREACH';c.fillStyle=this.txtT>0?'#ff6a7a':col;
+    const hot=f>=.75,col=hot?'#ff5060':f>=.5?'#ffb020':'#c4cde6',lab=this.txtT>0?this.txt:(RET.holdline&&this.lab||'BREACH');c.fillStyle=this.txtT>0?'#ff6a7a':col;
     const w0=c.measureText(lab).width+8*q,bw=this.txtT>0?0:64*q,bh=5*q;
     if(right)x-=w0+bw;c.fillStyle='#05030ccc';c.fillRect(x-4*q,y3-fs*.5-1*q,w0+bw+6*q,fs+4*q);   // dark backing: the label sits over bright art
     c.fillStyle=this.txtT>0?'#ff6a7a':col;c.fillText(lab,x,y3+4*q);

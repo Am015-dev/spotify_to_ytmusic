@@ -14,7 +14,7 @@ const freePort = () => new Promise(r => { const s = net.createServer(); s.listen
 const BOT = (o) => {
   const process_noBossGod = !!o.noBossGod;
   const m = window.__mnr, { n, build, bot, seed } = o; m.SET.diff = o.diff || 'normal'; try { m.applySet(); } catch (e) { }
-  if (o.endless) document.getElementById('startBtn').click(); else m.startStory(n); m.simOn(true); const e0 = window.ABIL ? window.ABIL.stat.emp : 0;
+  if (o.endless) { m.ST.on = false; document.getElementById('startBtn').click(); } else if(n>0)m.startStory(n);else{m.ST.on=false;document.getElementById('startBtn').click();} m.simOn(true); const e0 = window.ABIL ? window.ABIL.stat.emp : 0;
   let sd = seed * 7919 + 13; const rnd = () => { sd = (sd * 1103515245 + 12345) & 0x7fffffff; return sd / 0x7fffffff; };   // own dice: a run is repeatable
   const gauss = () => { let s = 0; for (let i = 0; i < 4; i++) s += rnd(); return (s - 2) * 1.73; };
   const WP = window.__wp, SH = m.SH, late = build === 'late';
@@ -33,9 +33,8 @@ const BOT = (o) => {
   const hist = []; let delay = H.dMin + rnd() * (H.dMax - H.dMin), blindUntil = -1, wasThreat = false, lapseAt = H.lapseEvery * (.5 + rnd()), lapseUntil = -1, aimY = 270, aimT = -9, nx = 0, ny = 0, nT = -9, hold = null;
   const snap = () => { const G = m.G; return { t: G.t, px: m.P.x, py: m.P.y, eb: G.eb.map(b => [b.x, b.y, b.vx, b.vy]), en: G.en.map(e => [e.type, e.x, e.y, e.r, e.gy, e.gap]) }; };
   let BM = null; const bmUpd = () => { BM = window.BMV && window.BMV.on && m.G.boss ? window.BMV : null; };   // endless meets bosses mid-run: look each decision
-  let PULL = .6, XW = .15;
+  let PULL = .6, XW = .15;   // as balance-test: a boss counter target is chased only between telegraphs
   const pickHp = () => { if (!o.endless || m.P.hp >= m.P.max) return null; let b = null; for (const q of m.G.pk) if (q.t === 'hp' && q.x > 40 && q.x < 700 && (!b || q.x < b.x)) b = q; return b; };   // endless: a hurt ship goes for a hull drop, as a player does
-    // as balance-test: a boss counter target is chased only between telegraphs
   const cost = (S, cx, cy, ty, tx, look) => {   // same grid cost as the oracle, but over what a human sees
     let c = BM ? BM.cost(cx, cy) : 0, dtp = .14 + (S.age || 0);
     for (const b of S.eb) { if (look && (b.x - S.px > look || b.x - S.px < -120)) continue; const px = b[0] + b[2] * dtp, py = b[1] + b[3] * dtp, d = Math.hypot(px - cx, py - cy); if (d < 70) c += (70 - d) * (70 - d) * (d < 26 ? 30 : 1); }
@@ -73,7 +72,8 @@ const BOT = (o) => {
     return { bx: bx + nx, by: by + ny, dash: near && P.dashCd <= 0 && G.t > blindUntil && rnd() < H.dash * .5, emp: P.emp > 0 && cnt >= H.emp };
   };
   const human = bot === 'human', rec = new Map(); let i = 0, lastBeat = -1, tapAt = -1, d = null, cleared = false; const dt = 1 / 60;
-  while (m.running && m.G.t < o.MAXT && !(o.endless && window.ENDR.w >= n)) {
+  const LK = window.LEAK;
+  while (m.running && m.G.t < o.MAXT && !(n === 0 && !o.endless && LK && LK.waves >= 10) && !(o.endless && window.ENDR.w >= n)) {   // ENDLESS=1: n = the endramp wave to reach (endramp-test.js)
     if (SH.active) { SH.close(); ups(); }
     if (o.endless && window.ENDR.w !== window.__lw) { window.__lw = window.ENDR.w; (window.__wt = window.__wt || []).push([window.__lw, Math.round(m.G.t), m.G.eb.length, m.P.hp, m.G.boss ? 'B' : '']); }
     if (o.endless && !process_noBossGod) m.god = !!m.G.boss;   // endless: the bot cannot play the boss gates (BOSSGOD=0 turns this off); the ramp is measured on the waves between bosses
@@ -84,13 +84,14 @@ const BOT = (o) => {
     if (tapAt >= 0 && bp >= tapAt) { m.press('Fire'); tapAt = -1; }
     const G = m.G;
     for (const e of G.en) { let r = rec.get(e); if (!r) { r = { ty: e.type + (e.el ? '*' : ''), in: -1, end: -1, boss: e.type === 'boss', mini: !!e.mini }; rec.set(e, r); } if (r.in < 0 && e.x < 960 - (e.r || 14)) r.in = G.t; }
-    m.step(dt); i++; if (o.endless) { const hp = m.P.hp; if (hp < (window.__hp0 = window.__hp0 == null ? hp : window.__hp0)) { const G = m.G, P = m.P; (window.__hl = window.__hl || []).push([+G.t.toFixed(1), hp, G.boss ? 'boss' : '', G.eb.filter(b => Math.hypot(b.x - P.x, b.y - P.y) < 40).length, G.en.filter(e => Math.hypot(e.x - P.x, e.y - P.y) < e.r + 30).map(e => e.type).join('/'), Math.round(P.x), Math.round(P.y), G.boss ? [G.boss.nm, G.boss.ph, Math.round(G.boss.hp), (G.boss.lasers || []).length, G.eb.length] : 0, (() => { const q = G.eb.slice().sort((a, b) => Math.hypot(a.x - P.x, a.y - P.y) - Math.hypot(b.x - P.x, b.y - P.y))[0]; return q ? [Math.round(Math.hypot(q.x - P.x, q.y - P.y)), q.k, q.r, Object.keys(q).join(',')] : 0; })()]); } window.__hp0 = hp; }
+    m.step(dt); i++;
     for (const [e, r] of rec) if (r.end < 0 && (e.dead || !m.G.en.includes(e))) { r.end = m.G.t; r.killed = e.hp <= 0; }
     if (m.ST.over || m.G.dead) { cleared = !!m.ST.over && !m.G.dead; break; }
   }
   const life = []; for (const [e, r] of rec) { if (r.boss || r.mini || !r.killed || r.in < 0 || r.end - r.in <= 0) continue; life.push([r.ty, +(r.end - r.in).toFixed(2)]); }
+  let sp = 0, lk = 0, lw = 0; for (const [e, r] of rec) { if (r.boss || r.mini || !LK || !(LK.weight(e) > 0)) continue; sp++; if (e.lkd) { lk++; lw += LK.weight(e); } }
   if (o.endless) cleared = window.ENDR.w >= n && !m.G.dead;
-  const res = { wt: window.__wt, hl: window.__hl, n, build, bot, w: o.endless ? window.ENDR.w : 0, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0) };
+  const res = { w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0) };
   m.abort(); return res;
 };
 (async () => {
@@ -116,6 +117,7 @@ const BOT = (o) => {
     const lifes = Object.keys(by).sort().filter(t => by[t].length >= 3).map(t => `${t}:${med(by[t]).toFixed(1)}`).join(' ');
     console.log(`${bot}/${build} clear% ` + STAGES.map(n => n + ':' + pct(cell(bot, build, n))).join(' ') + ' | hits med ' + STAGES.map(n => n + ':' + med(cell(bot, build, n).map(r => r.hits))).join(' ') + ' | life med s ' + lifes + ` | all-kill med ${med([].concat(...a.map(r => r.life.map(l => l[1])))).toFixed(2)} (n=${a.length})`);
   }
+  for (const bot of BOTS) for (const build of BUILDS) for (const n of STAGES) { const a = cell(bot, build, n); if (!a.length) continue; const sp = a.reduce((x, r) => x + r.sp, 0), lk = a.reduce((x, r) => x + r.lk, 0), mins = a.reduce((x, r) => x + r.t, 0) / 60; console.log(`leaks ${bot}/${build} stage ${n}: ${(lk / Math.max(mins, .01)).toFixed(1)}/min, share ${(100 * lk / Math.max(sp, 1)).toFixed(1)}% of ${sp} spawns, clear ${pct(a)}%`); }
   // calibration gate: the human bot clears Normal stage 3 about 95% on the fresh/mid/late builds
   if (BOTS.includes('human') && STAGES.includes(3)) for (const build of BUILDS) if (build !== 'owner') { const c = pct(cell('human', build, 3)); line(c >= 85, `human ${build} Normal stage 3 clear ${c}% (calibration target ~95%, gate >= 85% at small RUNS)`); }
   console.log(fails ? `FAIL humanbot-test: ${fails} check(s)` : 'PASS humanbot-test'); process.exit(fails ? 1 : 0);
