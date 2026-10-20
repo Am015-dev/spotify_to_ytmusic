@@ -601,3 +601,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Before (JS max f0-f119, 4 runs ath): 39/35/84/118/41 ·  rcbud=1: 37/32/98/33 (fra 32/54). 3 of 4 clean, 1 still 98 → stays OFF. The existing GO assert (JS max ≤ 50) is unchanged.
 4. Gates (built): unit 0 FAIL; r13/sky-blue*,life1,xf1,terrain,phone2 47/47; lowmem life1+start-life pass, touch-first-frames ath red only on the known TWG 6.2 s line.
 5. Left: allocation in the car loop (HT_pose/CR_susp matrices) and LV_step 31 ms in bad frames; run PROF on a bad frame to see GC vs code before flipping.
+
+## ui-r18c (speed + boost HUD off the car)
+- Change: src/99c7_rev5fix.js: landscape touch puts #roamGauge and the boost bar #b2kM in a top-right band (safe-area insets, scale with vh, KM/H 12 px); PC keeps the speed bottom-right and lifts the boost bar above it; portrait unchanged. `?hudc=0` turns it off.
+- GO ui/hud-clear (fra+ath) resizes to 852x393, 393x852, 1366x1024, 1920x1080 and asserts gauge/speed/bar/boost rects vs the projected car box and all controls. Before (?hudc=0): FAIL at 852x393 and 1366x1024 (speed, boost on car); after: PASS both cities.
+- Checks on the built page: unit 0 FAIL, ui/hud-clear + phone2 4/4, r13/sky-blue(+frame) life1 xf1 terrain 45/45. Shots: tools/tHudShots.js (before/after, 8 each, looked at all).
+- Left: roamMsg (top-centre message) can still cross the speed pill when long; Athens/Frankfurt shots in tablet portrait not taken.
