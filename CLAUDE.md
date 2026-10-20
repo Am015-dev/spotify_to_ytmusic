@@ -18,3 +18,9 @@ Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-in
 - Phone first: iPhone landscape + portrait, no HUD over controls, 12 px minimum text.
 - Keep `ALL_OPEN=true`, the credits "Made with ❤ by Alex" and "3D models by Alex", English UI, gas default on touch. No model names in files or commits.
 - Every deploy prepends an `OD_CHANGELOG` entry (version, date, 2-4 plain lines). Never deploy an unsplit build (3.6 MB cap). The coordinator deploys with `deploy.sh`, then republishes the Beta artifact with all chunks (km.js, models.js, tune.json, models/{lx,as,xf,qa}.js, xc/*.js).
+
+## Branches (Alex, 2026-10-20: never let branches pile up again)
+- Only these live on origin: `main`, trunk `alex/od-int2`, live `alex/brave-carson-rbpmlk` (deploy.sh target), plus the current coordinator session's own branch.
+- Workers push ONLY to `alex/od-int2` (fetch + rebase). A `<lane>-final` branch is allowed only when that push is denied; the coordinator cherry-picks it into trunk and deletes it in the same check.
+- Reviewers commit `docs/REVIEW_2K_<n>.md` + `docs/shots/rev<n>/` straight to `alex/od-int2` (docs-only commit). No `alex/rev<n>` branches.
+- Coordinator, at every deploy: delete remote branches whose head is already in trunk, live or main; tag anything else older than 12 h as `archive/<branch>` and delete it. Nothing else creates branches.
