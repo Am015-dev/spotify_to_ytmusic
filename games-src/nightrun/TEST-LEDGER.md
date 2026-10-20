@@ -10,6 +10,7 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 |---|---|---|---|---|
 | abil-test | PASS | - | obsolete-fixed: dash-trait scenario opens with ?timing=0 (off-beat dash is a plain hop with timing ON) | W31 2026-10-20 |
 | afk-test | FAIL | - | not bisected (budget) | W31 2026-10-20 |
+| anticamp-test | FAIL | - | FAIL Normal: no-oracle dodger clears >= 55%; rerun also FAIL (bold vs dodger line); not bisected | 0e03771 2026-10-20 |
 | audio-test | FLAKY | - | passed on rerun (first: FAIL after hidden/visible: grid within 40 ms of the song (max 281.7 ms, 41 samples)) | f696692 2026-10-20 |
 | balance-test | PASS | - | PASS balance-test | f696692 2026-10-20 |
 | boss2-test | PASS | - | PASS boss2-test | f696692 2026-10-20 |
@@ -19,8 +20,10 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 | choices-test | PASS | - | PASS no page errors  | f696692 2026-10-20 |
 | counter-test | PASS | - | passed on rerun (was FLAKY) | W31 2026-10-20 |
 | dash-dir-test | PASS | - | ALL PASS | f696692 2026-10-20 |
+| density-test | FAIL | - | FAIL curtain columns keep a free gap >= 96 px (min 9; stage 10 scripts split and curve bullets); rerun also FAIL; not bisected | 0e03771 2026-10-20 |
 | econ-test | PASS | - | PASS hours in 9-13 | f696692 2026-10-20 |
 | feedback-test | PASS | - | PASS no page errors | f696692 2026-10-20 |
+| flankers-test | PASS | - | PASS flag on with ?flankers=1 | 0e03771 2026-10-20 |
 | foot-test | PASS | - | PASS no page errors | f696692 2026-10-20 |
 | footart-test | PASS | - | footart-test: all passed (924 draws, bg layers, picture swap) | f696692 2026-10-20 |
 | footen-test | PASS | - | footen-test: all 207 checks passed | f696692 2026-10-20 |
@@ -29,6 +32,7 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 | fun-test | PASS | - | obsolete-fixed: opens with ?deck=0 (old WEAVE/FENCE/DROP) + STILL reset so the parked ship survives; 40 s set-piece window | W31 2026-10-20 |
 | fxkey-test | PASS | - | PASS no page errors | f696692 2026-10-20 |
 | fxwave-test | PASS | - | PASS the 3 missing core effects (bullet-shell/needle/rocket) get NO placeholder (the game would show it) | f696692 2026-10-20 |
+| grit-test | PASS | - | PASS EMP charges/min 0.49 <= 1.5 | 0e03771 2026-10-20 |
 | ground-test | PASS | - | PASS ground-test | f696692 2026-10-20 |
 | hint-test | PASS | - | PASS (d) HINT missing: safe fallback to the old draw | f696692 2026-10-20 |
 | hud-cover-test | FAIL | - | REAL: harness fixed (defaults to the built game); phone HUD covers 27.0% at 375x553 (max 20%), 108/327 HUD cells in the middle band -> W12 | W31 2026-10-20 |
@@ -38,6 +42,7 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 | nofile-text-test | PASS | - | PASS (first run, no rerun needed) | 4920087 2026-10-20 |
 | react-test | PASS | - | PASS (first run, no rerun needed) | 4920087 2026-10-20 |
 | readable-test | FAIL | - | worst-10% bullet contrast drops with ?read=1 (3.19->1.98 at 390x763) while the median rises; hitbox-dot diff under ?read=0 not zero. Needs a look by the readable owner | W31 2026-10-20 |
+| remix-test | PASS | - | PASS ?remix=0 spawns exactly what the page without remix.js spawns (d) | 0e03771 2026-10-20 |
 | ret-arcade-test | PASS | - | PASS arcade mean stage length 150 s <= 190 (classic 172) | 4920087 2026-10-20 |
 | ret-assist-test | PASS | - | PASS defaults: all factors neutral | 4920087 2026-10-20 |
 | ret-clear-test | PASS | - | PASS B1 first clear of stage 1 pays base + 3 new stars | 4920087 2026-10-20 |
@@ -58,8 +63,9 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 | ret-test | PASS | - | PASS 1280x720 flag on: no page errors | 4920087 2026-10-20 |
 | ret-title-test | PASS | - | PASS no page errors | 4920087 2026-10-20 |
 | ret-trans-test | PASS | - | PASS no page errors (flag on) | 4920087 2026-10-20 |
-| ret-walls-test | FAIL | - | still fails with vis=0 (stage 11/22/23 clear 0-25%): not bisected further | W31 2026-10-20 |
+| ret-walls-test | FAIL | old | still fails with every flag off (W37 bisect: each of the 17 flags run once with flag=0, all FAIL; stage 11/22/23 clear 0-25%) | W31 2026-10-20 |
 | reward-test | FAIL | - | left to W30 | W31 2026-10-20 |
+| rules-test | PASS | - | PASS portrait 390x763: 31 mechanic runs (15 mechanics x plain/twist) spawn, tick, draw, take DASH + EMP | 0e03771 2026-10-20 |
 | scale-test | PASS | - |  | 4920087 2026-10-20 |
 | scale2-test | PASS | - |  | 4920087 2026-10-20 |
 | scale3-test | FAIL | - | Legend/fresh dps rows: 69.5 and 60.1 dps, stages 20/30/40 0/0/100% - balance numbers moved by vis/variants; not bisected | W31 2026-10-20 |
@@ -68,12 +74,14 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 | tale-test | PASS | - | PASS no page errors | 4920087 2026-10-20 |
 | timing-test | FAIL | - | random DASH/EMP bot clears 92% (was 42%) with timing ON: EMP spam looks too strong (W28 grit); Hard mid all 0% | W31 2026-10-20 |
 | tutorial-test | PASS | - | PASS desktop: skip run, no page errors | 4920087 2026-10-20 |
-| ui-align-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ui-weapons-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| vary-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| wcard-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| weapon-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| zoo-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
+| ui-align-test | FAIL | - | FAIL 390x763 title (10); rerun also FAIL: title (4), story-map (1); not bisected | 0e03771 2026-10-20 |
+| ui-weapons-test | PASS | - | PASS weapons: sheet opaque, nothing shows through 390x763 fused | 0e03771 2026-10-20 |
+| variants-test | PASS | - | PASS no page errors | 0e03771 2026-10-20 |
+| vary-test | PASS | - | PASS library and the 45 scripts are well formed (a, b) | 0e03771 2026-10-20 |
+| visible-test | PASS | - | PASS killed before visible (PULSE 3 + SWARM 10, Normal st 3,10,20): 0/202 | 0e03771 2026-10-20 |
+| wcard-test | PASS | - | PASS 1280x720: 16 weapon cards, 130 text nodes, no narrow text / overlap / overflow | 0e03771 2026-10-20 |
+| weapon-test | PASS | - | PASS fusions: 48/48 pairs equip, fire, draw, stay under the bullet cap | 0e03771 2026-10-20 |
+| zoo-test | FAIL | - | FAIL easy/normal 0 hovers in 70 s; speed normal 1.06 (wanted 0.78); enemy bullet 471 px/s > 445 on vhard; rerun also FAIL; not bisected | 0e03771 2026-10-20 |
 
 ## Run caveats
 
