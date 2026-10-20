@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(timeout 600 bash tools/deploy.sh *)",
+      "Bash(bash tools/deploy.sh *)"
+    ]
+  }
+}
