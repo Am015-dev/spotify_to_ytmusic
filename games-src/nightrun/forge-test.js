@@ -10,7 +10,7 @@
 // (bots that must not clear Normal: mustmove-test.js with Q='&fgt=all&fgm=heavy,zap'; the dodger: balance-test.js with the same Q)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
-const RUNS = +process.env.RUNS || 2, PAR = +process.env.PAR || 4;
+const RUNS = +process.env.RUNS || 4, PAR = +process.env.PAR || 4;
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const src = fs.readFileSync(path.join(__dirname, 'story-sim.js'), 'utf8'), i0 = src.indexOf('const BOT = '), i1 = src.indexOf('\n(async');
 const BOTSRC = src.slice(i0 + 'const BOT = '.length, i1).trim().replace(/;$/, '');
