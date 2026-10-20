@@ -1,5 +1,5 @@
 # Mainhattan Overdrive (LEGO-2K-Drive-style, Frankfurt + Athens): read first
-Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-int2. Beta page: claude.ai/artifact/P6zT2b2SwfHYguRTtb67Ug. Owner: Alex (iPhone 16 landscape + PC). Full history and old rules: docs/LESSONS_and_old_rules.md (read only when needed).
+Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-int2. Beta page: claude.ai/artifact/P6zT2b2SwfHYguRTtb67Ug. Owner: Alex (iPhone 17 landscape + PC). Full history and old rules: docs/LESSONS_and_old_rules.md (read only when needed).
 
 ## Production model (2026-10-14, after $700+ and many reverts)
 1. Few lanes, short tasks: at least 5 fixers plus 1 reviewer at once (Alex, 2026-10-19; the coordinator integrates and deploys). Each task is timeboxed to ~30 min or ~100k context, with ONE deliverable; then the worker writes 5 lines in docs/HANDOFF_<lane>.md, pushes and STOPS. No idle or self-waking workers, no queues, no open-ended lanes.
@@ -11,6 +11,8 @@ Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-in
 7. The coordinator only routes and deploys. It deploys at most every 30 min (batch builds), never does technical work, and stays under 100k context (/compact).
 8. Bugs come from the in-game 🐞 button → artifact db collection `bugs` (read with ArtifactData). Triage sets status/owner/fixedIn on the doc so Alex sees it in "My reports".
 
+9. Cost discipline (Alex, 2026-10-20, see docs/COST_LEDGER.md): two lanes per target, then a design plan or drop it; Sonnet by default, no Haiku on fixes; the coordinator hands off at 200k context; the ledger gets one row per lane at every deploy.
+10. iPhone truth first: no build counts as smooth on phones without the throttled iPhone-like gate (perf/ios-reveal: 6x CPU, 0 shader links and no long frames in the first 3 s after reveal) or real iPhone reports from the Beta page.
 ## Standing orders from Alex
 - Never ask Alex anything; take the recommended option and note it in one line.
 - Reuse first: grep the repo, then three.js addons, LDraw/OMR, Yuka, etc. Note the licence in the commit.
