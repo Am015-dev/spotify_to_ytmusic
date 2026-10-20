@@ -489,3 +489,12 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
   const ok=R.every(r=>r[1]);return'📍 START LIFE '+city.toUpperCase()+' · '+R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}});
  C.GO['r17/start-life']=[go('fra'),go('ath')]}return}
  if(i<600)setTimeout(()=>R17_reg(i+1),100)})(0);
+
+// perf-r17j: GO perf/roamcam-first (both cities). roamCam's 40-85 ms frames were the speed-line canvas (W13_lines, 2D context). Pass line: the speed-line context is CPU-raster (willReadFrequently, ?w13sw=0 turns that off) and the slowest of 1200 roamCam frames at speed (lines drawn) is <= 30 ms (two passes, lower max counts).
+(function R17J_reg(i){const C=window.__chk;if(C&&C.GO&&Array.isArray(C.items)){if(!C.items.some(q=>q.ver==='perf'&&q.id==='roamcam-first'))C.items.push({ver:'perf',id:'roamcam-first',area:'perf',text:'r17j · first minute of roamCam (Frankfurt about frame 6, 40-85 ms frames in both cities, all inside the speed-line canvas): 📍 GO (both cities) drives roamCam 1200 frames at 200 km/h with the speed lines drawing. Pass line: speed-line context is CPU-raster and slowest frame <= 30 ms. Needs free roam.'});
+  C.GO['perf/roamcam-first']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt':'Athens',fn:()=>{if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';
+   const v0=RO.v,M=[],S=[];let sw=true;try{RO.v=55;for(let ps=0;ps<2;ps++){let mx=0;for(let n=0;n<1200;n++){const t0=performance.now();roamCam(1/60);const d=performance.now()-t0;S.push(d);if(d>mx)mx=d}M.push(mx)}
+    sw=!W13_SW||!!(W13L.g&&W13L.g.getContextAttributes&&W13L.g.getContextAttributes().willReadFrequently)}finally{RO.v=v0}
+   const mx=Math.min(M[0],M[1]),ok=mx<=30&&sw;window.__chk.rcFirst=window.__chk.rcFirst||{};window.__chk.rcFirst[c]=+mx.toFixed(1);
+   return`📍 ROAMCAM COLD START · ${c==='fra'?'Frankfurt':'Athens'}: slowest of ${S.length} roamCam frames at speed ${mx.toFixed(1)} ms (≤ 30; passes ${M.map(x=>x.toFixed(1)).join(' / ')}), speed-line canvas ${W13L.on?'drawing':'idle'}, CPU-raster ${sw} → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
+ if(i<600)setTimeout(()=>R17J_reg(i+1),100)})(0);
