@@ -90,12 +90,38 @@ function TWG_mini(cap){if(typeof SM_ON==='undefined'||!SM_ON||!MINI||!MINI.smm)r
 // perf-r15f: the far-street merge (WB_cityBuild, ~50 MB garbage, normally a setTimeout 1.5 s after roamPost) ran into the first drivable second and its major GC hit f41-51 (Athens).
 // With ?twg=1 it starts with the TWG frames and is awaited under the curtain (14 ms slices, frames paused), so its GC lands before drivable. ?twgwb=0 = old timing.
 TWG.wb=new URLSearchParams(location.search).get('twgwb')!=='0';TWG.wbMs=0;
-async function TWG_run(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)return;const t0=performance.now(),x=RO.x,z=RO.z,h=RO.h;TWG.run=1;const lo=LD.on;LD.on=false;   // frame() skips while LD.on; the #ld2 curtain itself stays up until roamLoad's ldHide
+// r17q (review 17 N5, 4th review): the start road was empty (hubNear/LV_trNear spawn traffic BEHIND the player, so nothing is ever ahead at drivable). R17_seed runs once under the curtain (after TWG_run, before frame 1):
+// it moves the 3 farthest idle cars onto the player's road 55/85/112 m ahead (two same-way, one oncoming). R17_open samples the start view's top-right region (where the pause button and minimap sit) with a depth march and reports how much is open. ?r17=0 turns it off.
+const R17={pose:new URLSearchParams(location.search).get('r17pose')==='1'/* default OFF: at load the streamed tower is not drawn yet (99 % open then, 75 % at drivable), so the pose search cannot see it; needs a post-stream pass */,on:new URLSearchParams(location.search).get('r17')!=='0',ms:0,st:null,home:null};
+R17.fn={seed:()=>R17_seed(),ahead:()=>R17_ahead(RO.x,RO.z,RO.h),open:()=>R17_open()};window.R17=R17;
+function R17_ahead(x,z,h){const C=HUB.cars;if(!C)return 0;const fx=Math.sin(h),fz=Math.cos(h);let n=0;for(let i=0;i<C.length;i++){const c=C[i];if(c.dead>0||c.route||c.pk||c.tr)continue;const dx=c.x-x,dz=c.z-z,f=dx*fx+dz*fz;if(f>=40&&f<=120&&Math.abs(dx*fz-dz*fx)<10)n++}return n}
+function R17_open(){const T=typeof TQ!=='undefined'&&TQ,d0=T?T.draw:0,l0=LD.on,b0=LD.busy,k0=LKG.arm;try{LKG.arm=0;if(T)T.draw=1;LD.on=false;LD.busy=false;composer.render();const gl=renderer.getContext(),W=gl.drawingBufferWidth,H=gl.drawingBufferHeight,px=new Uint8Array(4);let n=0,o=0,m=0;
+  for(let i=0;i<12;i++)for(let j=0;j<8;j++){gl.readPixels(Math.floor(W*(.02+.34*i/11)),Math.floor(H*(.52+.43*j/7)),1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);n++;m+=px[0]+px[1]+px[2];if(!(px[0]>150&&px[0]>px[2]+60))o++}   /* a warm, saturated block (yellow/orange/red/tan facade) = building; sky, road, grass, glass are open */
+  R17.mean=Math.round(m/n/3);return{open:o/n,near:null}}catch(e){return{open:1,near:null,err:String(e)}}finally{LD.on=l0;LD.busy=b0;LKG.arm=k0;if(T)T.draw=d0}}
+function R17_min(){const sn=camSnap;camSnap=true;roamCam(1/60);camSnap=sn;return R17_open().open}
+/* the pause button and minimap sit top-LEFT: if a building fills that part of the start view (Frankfurt), try the spawn 30-100 m along / back the road, then the opposite heading, and keep the first pose that is open */
+function R17_pose(){const x0=RO.x,z0=RO.z,h0=RO.h,y0=RO.y;let best=[R17_min(),x0,z0,h0];R17.pose0=Math.round(best[0]*100);if(best[0]>=.9)return;
+ for(const H of[h0,h0+Math.PI])for(const d of[30,-30,60,-60,100,-100]){const x=x0+Math.sin(h0)*d,z=z0+Math.cos(h0)*d;if(roamHit(x,z,3,y0)){continue}RO.x=x;RO.z=z;RO.h=RO.vh=H;RO.y=groundAt(x,z,y0);const m=R17_min();if(m>best[0]){best=[m,x,z,H];if(m>=.9)break}}
+ RO.x=best[1];RO.z=best[2];RO.h=RO.vh=best[3];RO.y=groundAt(RO.x,RO.z,y0);RO.spawn0=[RO.x,RO.z,RO.h];R17_min();R17.pose1=Math.round(best[0]*100)}
+function R17_seed(){if(!R17.on||state!=='roam'||!RO.on||!HUB.cars||!HUB.nodes)return;if(R17.pose&&CID==='fra'&&!RO.wk)try{R17_pose()}catch(e){console.warn('R17 pose',e)}const t0=performance.now(),N=HUB.nodes,C=HUB.cars,fx=Math.sin(RO.h),fz=Math.cos(RO.h),W=[55,85,112],T=[];R17.home=[RO.x,RO.z,RO.h];
+ const idle=C.filter(c=>!(c.dead>0)&&!c.route&&!c.pk&&!c.tr).sort((a,b)=>Math.hypot(b.x-RO.x,b.z-RO.z)-Math.hypot(a.x-RO.x,a.z-RO.z));
+ const K=[];for(let a=0;a<N.length;a++){const A=N[a];if(Math.abs(A.x-RO.x)>160||Math.abs(A.z-RO.z)>160)continue;
+  for(const b of A.nb){const B=N[b];if(!B)continue;const ex=B.x-A.x,ez=B.z-A.z,L=Math.hypot(ex,ez);if(L<10)continue;const al=(ex*fx+ez*fz)/L;if(Math.abs(al)<.8)continue;
+   for(const t of[.25,.5,.75]){const px=A.x+ex*t,pz=A.z+ez*t,dx=px-RO.x,dz=pz-RO.z,f=dx*fx+dz*fz,l=Math.abs(dx*fz-dz*fx);if(l<=7&&f>=35&&f<=125)K.push({a,b,t,x:px,z:pz,al,f,l})}}}
+ for(let w=0;w<W.length&&w<idle.length;w++){let best=null,bs=1e9;for(const k of K){if(T.some(q=>Math.hypot(q.x-k.x,q.z-k.z)<18))continue;const s=Math.abs(k.f-W[w])+2*k.l;if(s<bs){bs=s;best=k}}
+  if(!best)continue;const c=idle[w],rev=w===2?best.al>0:best.al<0;c.a=rev?best.b:best.a;c.b=rev?best.a:best.b;c.t=rev?1-best.t:best.t;c.x=best.x;c.z=best.z;c.hga=c.hgb=c.fsa=c.fsb=-1;c.dead=0;T.push(best)}
+ R17.st={n:T.length,ahead:R17_ahead(RO.x,RO.z,RO.h)};R17.ms=Math.round(performance.now()-t0)}
+async function TWG_run(){try{return await TWG_run0()}finally{try{R17_seed()}catch(e){console.warn('R17',e)}}}
+async function TWG_run0(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)return;const t0=performance.now(),x=RO.x,z=RO.z,h=RO.h;TWG.run=1;const lo=LD.on;LD.on=false;   // frame() skips while LD.on; the #ld2 curtain itself stays up until roamLoad's ldHide
  const wb=TWG.wb&&typeof WB_cityBuild==='function'?WB_cityBuild(.99,.99).catch(e=>{WBC.err=String(e);if(e!=='WBabort')console.warn('TWG wb',e)}):null;
  try{for(let i=0;i<TWG.n;i++){RO.v=0;await nextFrame();TWG.nf++;const tm=performance.now();try{TWG_mini(40)}catch(e){console.warn('TWG mini',e)}TWG.mms+=performance.now()-tm}
+  /* ios-r17k: the first parked-car compaction pass (PC_add + PC_grid + the per-mesh pack, 100-180 ms in Athens at f85) runs here under the curtain, not in the first drivable second */
+  if(TWG.pcw&&typeof PC_step==='function'&&PC.on&&PC_gate()){const tp=performance.now();try{PC.rel=0;PC_step(1)}catch(e){console.warn('TWG pc',e)}TWG.pcMs=Math.round(performance.now()-tp)}
   LD.on=lo;if(wb){const tw=performance.now();await wb;TWG.wbMs=Math.round(performance.now()-tw)}for(let i=0;i<TWG.idle;i++)await new Promise(r=>setTimeout(r,50))}catch(e){console.warn('TWG',e)}finally{TWG.run=0;LD.on=lo;RO.x=x;RO.z=z;RO.h=h;RO.v=0;TWG.fr=0;TWG.mms=Math.round(TWG.mms);TWG.ms=Math.round(performance.now()-t0)}}
-{const r0=composer.render;composer.render=function(){if(TWG.run)return;return r0.apply(this,arguments)}}
-frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;return f(now)})(frame);
+TWG.jm=0;TWG.jf=-1;TWG.jn=0;TWG.rm=0;/* ios-r17k: JS ms (frame minus composer.render) of the first 120 drivable frames: max, its frame, frames measured */
+{const r0=composer.render;composer.render=function(){if(TWG.run)return;if(!(TWG.fr>=1&&TWG.fr<=120))return r0.apply(this,arguments);const t=performance.now();try{return r0.apply(this,arguments)}finally{TWG.rm+=performance.now()-t}}}
+frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;if(!(TWG.fr>=1&&TWG.fr<=120))return f(now);const t=performance.now();TWG.rm=0;try{return f(now)}finally{const d=performance.now()-t-TWG.rm;TWG.jn++;if(d>TWG.jm){TWG.jm=Math.round(d);TWG.jf=TWG.fr}}})(frame);
 {const _ls=lazyStep;lazyStep=function(){if(TWG.fr>=0&&TWG.fr<=TWG.lz){TWG.held++;return}return _ls.apply(this,arguments)}}
 // perf-r16b (review 2K-16 N2): hubTrafficStep time in the first 60 drivable frames (max ms, its frame, car count at f0 / f60), so GO perf/touch-first-frames reads the number tBoot reads (PF1HT).
+TWG.pcw=new URLSearchParams(location.search).get('twgpc')!=='0';TWG.pcMs=-1;TWG.pcB=TWG.pcw?10:0;TWG.pcF=300;/* ios-r17k: ?twgpc=0 = old behaviour */
 TWG.ht=0;TWG.htF=-1;TWG.htN=0;TWG.c0=-1;TWG.c60=-1;{const _ht=hubTrafficStep;hubTrafficStep=function(){if(!(TWG.fr>=0&&TWG.fr<=60))return _ht.apply(this,arguments);const t=performance.now();try{return _ht.apply(this,arguments)}finally{const d=performance.now()-t;TWG.htN++;if(d>TWG.ht){TWG.ht=Math.round(d);TWG.htF=TWG.fr}const n=HUB.cars?HUB.cars.length:0;if(TWG.c0<0)TWG.c0=n;TWG.c60=n}}}

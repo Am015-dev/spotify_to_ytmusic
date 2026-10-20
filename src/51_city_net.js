@@ -219,7 +219,11 @@ function OB_fillFix(){const t0=performance.now(),O=OB_RA.ops;O.fExt=0;O.fTrim=0;
   {const nB=BRIDGES.length,ext=OB_ext(FILL_R,nB),M=OB_net(null,ext),cl=new Map(M.comps);FILL_R.forEach((r,k)=>{const R=M.find(M.segs.length+nB+k);cl.set(R,(cl.get(R)||0)+r.L)});let main=-1,mL=-1;for(const[r,l]of cl)if(l>mL){mL=l;main=r}
     const keep=FILL_R.filter((r,k)=>M.find(M.segs.length+nB+k)===main);for(const r of FILL_R)if(!keep.includes(r))OB_log('fdel',(r.x0+r.x1)/2,(r.z0+r.z1)/2,r.L);O.fDel+=FILL_R.length-keep.length;FILL_R.length=0;FILL_R.push(...keep);OB_fillIdx()}
   O.fillMs=Math.round(performance.now()-t0)}
-{const _g=rfGrid;rfGrid=function(){if(FILL_R)return;_g();if(OB_RA.on&&FILL_R.length)OB_fillFix();RD_fillTrim();RD_fillLoop()}}// dev1: repeat until no end changes (a join/trim can leave the next end dead)
+// perf-r17i: rfGrid post-passes are RFS.S (run in order); rfGrid runs them all, buildHubG with bhs runs rfGridBegin() then one RFS.S entry per step (rfGridNext) so no step is the whole 0.6-1.2 s. Same calls in the same order.
+const RFS={base:rfGrid,st:0,S:[()=>{if(OB_RA.on&&FILL_R.length)OB_fillFix()},()=>RD_fillTrim(),()=>RD_fillLoop()]};
+rfGrid=function(){if(FILL_R)return;RFS.base();for(const f of RFS.S)f()};
+function rfGridBegin(){if(FILL_R)return 0;RFS.st=0;RFS.base();return 1}
+function rfGridNext(){if(RFS.st>=RFS.S.length)return 0;RFS.S[RFS.st++]();return RFS.st<RFS.S.length}// dev1: repeat until no end changes (a join/trim can leave the next end dead)
 // runtime audit of the CURRENT drawn network: CITY_S drivable streets + filler grid + bridges + Autobahn links, junction plates, GPS coverage
 function OB_audit(){const t0=performance.now(),FR=typeof hubRoads==='function'?hubRoads():[],nF=FR.length,nB=BRIDGES.length;
   const ext=OB_ext(FR,nB),N=OB_net(null,ext),segs=N.segs;

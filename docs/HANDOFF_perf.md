@@ -1,3 +1,10 @@
+## r17q (2026-10-20, alex/od-int2): lively start road (review 17 N5)
+1. src/98bp_warmall.js R17_seed (called from TWG_run's wrapper, under the curtain): 3 idle far cars go onto the player's road 55/85/112 m ahead (2 same-way, 1 oncoming); seed 1-11 ms, none on frame 1. ?r17=0 turns it off.
+2. GO r17/start-life (src/99c7_rev5fix.js): cars ahead at boot 0 -> 3 in Frankfurt and Athens (PASS both). Gate: unit 0 FAIL, TAG r17/start-life,perf/touch-first-frames 3/3, r13/sky-blue*,life1,xf1,terrain,phone2 47/47 on the built page.
+3. NOT fixed: the tall yellow tower behind pause/minimap (top-LEFT, not right) in Frankfurt. It is no collider (HUB.grid) and is not drawn yet at load (pose probe sees 99 % open then, 75 % at drivable). R17_pose (move spawn 30-100 m / turn 180 deg) exists behind ?r17pose=1, default OFF.
+4. Shots: docs/shots/r17q/fra_{before,after}.jpg (Athens shots not taken: boot timeout). Seeded cars sit 55+ m out and are small at 852x393.
+5. Next: run the pose search after the first streamed frames (or set a fixed Frankfurt spawn offset), then flip r17pose ON.
+
 ## perf-16 (2026-10-18, alex/od-int2): LF_tileG bodies out of the generator, pooled decor records, cached colours
 1. src/98lf_lively_fill.js: the per-cell/lite/verge/mound bodies of LF_tileG are small top-level functions (LF_cell, LF_litePt, LF_lite1, LF_verge1, LF_mound1, LF_open1; ring/R closures gone), decor records come from a pool checked out per build (LF.rp, fixed shape incl. gx/gz/_vy), pk without filter(), instance matrices via LF_inst, fill colours parsed once (LF_col; was Color.set(string) per instance). Same math and order: per-tile props + instance-matrix hashes identical trunk vs mine on 12 shared tiles.
 2. heapOwner Athens (1 run each): LF_tileG-owned ~134 MB (LF_tileG 97, di 30, P/G16/tryP 7) -> ~77 MB (LF_tileG 32 + helpers 45) while building 14-15 tiles instead of 11-12 in 10 s. hubTrafficStep 430 is now the top allocator by far.
@@ -470,3 +477,35 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Tried and reverted: rfGrid as a generator (yields inside) broke terr1/terr5 terrain-grade/edge/flush/sky/crown on fra (re-entrancy / order); needs a non-generator slicing (e.g. cache per grid) with the terrain GO as check.
 4. Left for 50 ms: rfGrid, Athens post steps (AS_apply, CE_streets, DR_solid), gndBuild 340 ms, CTB_kind 130-430 ms, bt.flush 160.
 5. Gate (DESKTOP=1, built): unit 0 FAIL; the 8 TAG sets 48/51, reds xf1/grass+slope SLOW and terrain-tyre-ath = known trunk reds.
+## ios-r17m (2026-10-20): quantized ground + far-chunk deflate landed (ON in lowmem/touch; ?gq=0 ?trq=0 ?zfar=0 off) · GO perf/mem-quant
+1. GND_L packed tiles Float32→Int16 (src/60_city_build.js GND_quant/GND_inQ: xz 1/256 m, heights 16-bit over the grid range, decode into a per-out scratch so GND_tri/GND_far/GND_edge are unchanged; u/v window widened by the quantum, no cracks): err h 0.12-0.26 cm, saved fra 4.4 / ath 14.4 MB. TR_HA.M.m Uint16 (err 0.08 cm). TR_h NOT done: TR_grade/TR_roadsInit rewrite W.h in place after init.
+2. Far chunks (src/98mf_memfree.js MEMF_zip/MEMF_unzip): an off chunk > Rout+250 m is deflated (CompressionStream), arrays dropped, inflated when back inside Rout and applied as zero-copy views (≤5 ms), shown only after. Gated 45 s after first roam frame because TR_bldFix and roam builders read hub mesh positions.
+3. Heap at ready→after-roam (touch, lowmem, GC'd, GO perf/ios-mem): fra 388/405 → 381/399 (gq+trq) → 378/397 (+zfar); ath 539/557 → 518/536 → 519/542. zfar gain is ~0-3 MB within 60 s (few chunks are off yet); it grows with roaming.
+4. GO perf/mem-quant (both cities): errors ≤ 1 cm, 0 holes, a chunk round-trips byte-identical. 250 MB budget still unmet (fra -10, ath -20 total).
+5. Left: TR_h freeze after the last grade pass; zfar numbers after a 5-min roam.
+
+## ios-r17k (2026-10-20): touch first 120 frames JS max (review 2K-16) · first parked-car compaction pass moved under the curtain
+1. Owner (tBoot lowmem SECS=2, JS = frame minus render, f0-f119): Athens 107-197 ms in 6 of 8 runs, always the first PC_step pass at ~f85 (PC_add + PC_grid 50-84 + per-mesh pack, 104-133 ms) inside hubCullStep/hubTrafficStep; Frankfurt 111 once (hubTrafficStep-self + DEST_find 23-65).
+2. Change: TWG_run (src/98bp_warmall.js) runs PC_step(1) behind the curtain (?twgpc=0 = off), and PC_step stops a pass after 10 ms (TWG.pcB) while TWG.fr ≤ 300 (src/98pc_compact.js). Same traffic and life; no spawn change. TWG.jm/jf/jn = in-game JS max over f1-f120.
+3. After (4 runs, 2/city): Athens 47, 38 ms (was 107-197); Frankfurt 50, 40 (was 111, 86-194 earlier). A loaded box still gives one 56-100 ms frame in ~1 of 3 runs (hubTrafficStep-self with no named sub = GC; DEST_find 11-65; LV_step 109 once at f10).
+4. GO perf/touch-first-frames: new line "JS max f0-f119 <= 50 ms", asserted only when the gate and >= 110 frames ran (full boot), info on the quick start. In-game jm showed 63-68 ms at f1 in 2 of 4 runs (not seen by tBoot, cause not found; the GO would fail on such a boot).
+5. Next: f1 outlier; DEST_find first-use cost; the unnamed GC share in hubTrafficStep-self. Tests: unit 0 FAIL; perf/touch-first-frames,life1 8/8; sky-blue,sky-blue-frame,life1,xf1,terrain,phone2 47/47 on the built page.
+
+## perf-r17i (2026-10-20): bhs stays default OFF · 300 ms NOT met · rfGrid staged
+1. Max buildHubG gap, ?bhs=1 (tools/perf1/tBhs.js, new): Frankfurt 1126 → 529-569 ms (rfBase/rfPass), Athens 1124 → unchanged (~1.1-1.2 s: bhp49s/bhp50/post+ AS_apply/CE_streets/DR_solid not sliced).
+2. Change: rfGrid post-passes are now RFS.S (src/51, the terrain grade pass moved from a src/53 wrapper into it); rfGrid runs them all (output identical), buildHubG with bhs runs rfGridBegin + one pass per step (src/60). No generator.
+3. Left for 300 ms: OB_fillFix ~370 ms and TR_grade ~540 ms are monolithic (need internal cursors); then ctbK 330, gnd 290, post+ 280, streets 210; Athens post steps + olive trees 800, streets 600.
+4. GO perf/pc-bhs limits: fra < 700, ath < 1500 (guards, not 300). bhs ON: xf1/grass FAIL on fra (OFF: pass), so no flip.
+5. Gate (DESKTOP=1, built): unit 0 FAIL; pc-bhs/pc-boot-lt 4/4 off, pass on; r13+life1+xf1+terrain+phone2 off 47/47; on ath 19/19, fra 27/28 (xf1/grass).
+## ios-r17n (2026-10-20): touch streaming design + slice 1 (?tstream=1, default OFF) · deliverable: design met, ≥ 80 MB Athens NOT met
+1. docs/STREAM_TOUCH.md: owners by unique ArrayBuffer (ath/fra): streamed chunks hidden 68/43 MB, far ground/drive meshes 58/7, rest ~330 MB non-geometry. The GO test page (draw=0) never runs STR_up, so the WB far city keeps 28/44 MB that a device frees: GO heap overstates the device heap (ath 535→508, fra 381→338).
+2. Slice 1 (src/98mf_memfree.js MEMF.ts): chunk radii follow camera.far (touch 1500: off at far+50, show at far-50, deflate at far+200, inflate from far+150), deflate starts 4 s after first roam frame (was 45 s), 2 zips in flight; fixed the zip range check for the new radius.
+3. Measured (touch, lowmem, GC'd, 60 s real roam): Athens ready 531→531, after 60 s 539→532; 813 chunks 57.3→10.7 MB deflated; Frankfurt after 60 s 445. Gain ~45 MB of arrays, masked by roam growth: below 80 MB → OFF.
+4. Gates (built page): unit 0 FAIL; life1/xf1/terrain/phone2/sky-blue 46/47 (xf1/grass known red); perf/ios-mem PASS; mem-quant + touch-first-frames red only in the combined run after ios-mem, same on base r17n0, PASS alone. No shot (default OFF).
+5. Next: zip off chunks under the load curtain (moves the gain to "ready"), slice 2 far trG/gk/dr deflate after a reader audit, slice 3 per-cell block plans; fix the GO heap measure (run STR_up with drawing on).
+
+## ios-r17p (heap growth first 30 s of roam, touch)
+- Measured with the real touch tier (`?lowmem=1`): Frankfurt 378 → 397 MB (+19), Athens 528 → 545 MB (+17). Review #17's +77..+112 came from tChkGo booting the desktop tier (GO prints `LOWMEM false`), not from the iPhone profile.
+- Top retained growth owners (fra, sampling-profile diff): FCG_packStep packed-grid Map 5.7 MB, LF_di/LF_tileG tile caches ~4 MB, propRespawn 1.3 MB; no unbounded list or undisposed geometry found.
+- GO perf/ios-mem now asserts heap growth over the 30 s roam ≤ +30 MB when LOWMEM (info only on the desktop tier). Run it as `tChkGo.js "<url>?lowmem=1"`.
+- Left: desktop-tier growth (+86 fra) is not asserted; FCG pack Map could become a typed hash (~5 MB).

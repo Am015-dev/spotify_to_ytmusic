@@ -82,7 +82,8 @@ function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!
  if(force||np||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){PC_snap(cx,cz,h);PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
  else if(++PC.t%10===0&&!PC.left){PC_snap(cx,cz,h);for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
  const bud=force?1e9:(TUNE.pc7Bud||60000);/* circular: a new pass mid-way carries on from the same mesh, so no mesh starves under constant turning */
- while(PC.left>0&&tested<bud){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
+ const mb=typeof TWG!=='undefined'&&TWG.pcB&&!force&&TWG.fr>=0&&TWG.fr<=TWG.pcF?TWG.pcB:0;/* ios-r17k: first drivable seconds on touch: also stop a pass at TWG.pcB ms (a mesh is re-packed whole, so the pass just resumes next frame) */
+ while(PC.left>0&&tested<bud&&(!mb||performance.now()-t0<mb)){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
  if(!PC.left)for(const C of PC.L)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
  if(tested){let vis=0;for(const C of PC.L)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();

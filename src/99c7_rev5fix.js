@@ -351,6 +351,8 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
    if(TWG.on&&TWG.nf&&TWG.wb&&TUNE.wbCity)R.push(['far-street merge under the curtain: built '+(WBC.built===HUB.grp)+', waited '+TWG.wbMs+' ms, busy '+WBC.busy,WBC.built===HUB.grp&&!WBC.busy&&TWG.wbMs<8000]);
    /* perf-r16b: after a full boot with the gate (tBoot path), no hubTrafficStep over 40 ms in the first 60 drivable frames (review 2K-16 N2: 95/52/61 ms at f9-f11); the quick test start skips the gate, so there it is info */
    if(TWG.htN)R.push(['hubTrafficStep f0-60: max '+TWG.ht+' ms at f'+TWG.htF+' ('+TWG.htN+' steps, cars '+TWG.c0+' → '+TWG.c60+')'+(TWG.nf?'':' (info: gate did not run)'),!TWG.nf||TWG.htN<55||TWG.ht<=40]);
+   /* ios-r17k: JS max (frame minus render) over the first 120 drivable frames <= 50 ms after a full boot with the gate (both cities; first parked-car compaction pass runs under the curtain, then 10 ms slices); the quick start has no gate / no frames, so it is info there */
+   R.push(['JS max f0-f119: '+TWG.jm+' ms at f'+TWG.jf+' ('+TWG.jn+' frames), compaction prewarm '+TWG.pcMs+' ms'+(TWG.nf&&TWG.jn>=110?'':' (info: gate/frames did not run)'),!(TWG.nf&&TWG.jn>=110)||TWG.jm<=50]);
    if(TWG.on)R.push(['minimap: callCap '+TUNE.callCap+', '+TWG.mm+' tiles under the curtain in '+TWG.mms+' ms (cap '+TWG.mb+'), '+TWG.mq+' left',!!TUNE.callCap&&TWG.mms<=TWG.mb+60&&(CID!=='ath'||!SM_ON||!TWG.nf||TWG.mm>0)])}
   catch(e){R.push(['threw '+e,false])}finally{TWG.fr=f0}
   const ok=R.every(r=>r[1]);return`📍 TOUCH WARM GATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
@@ -362,7 +364,7 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
  C.GO['perf/heap-30s']=[{c:'fra',n:'packed ground leaves and camera-pull grids, same answers',fn:()=>{const R=[];try{
    // 1) ground: a Float32Array cell answers GND_in like the JS-array cell (2000 points over 40 cells of the hilly grounds)
    let n=0,bad=0,cells=0;const rnd=(()=>{let s=7;return()=>(s=(s*16807)%2147483647)/2147483647})();
-   for(const G of GND_L){if(!G.c&&!G.P)continue;for(let t=0;t<400&&cells<40;t++){const c=Math.floor(rnd()*G.nx*G.nz);let L=G.c?G.c[c]:null;
+   for(const G of GND_L){if(G.Q||!G.c&&!G.P)continue;for(let t=0;t<400&&cells<40;t++){const c=Math.floor(rnd()*G.nx*G.nz);let L=G.c?G.c[c]:null;
      if(!L&&G.P){const s=G.s[2*c],e=G.s[2*c+1];if(s<0)continue;L=G.P.slice(s,e)}if(!L||!L.length)continue;cells++;const ox=G.x0+Math.floor(c/G.nz)*G.dx,oz=G.z0+c%G.nz*G.dz;
      const A=[];if(L instanceof Float32Array)for(let k=0;k<L.length;k++)A.push(k%9===0?L[k]+ox:k%9===1?L[k]+oz:L[k]);else A.push(...L);for(let k=8;k<A.length;k+=9)A[k]=-1;const F=GND_cellF32(A,ox,oz);
      const g1={x0:G.x0,z0:G.z0,dx:G.dx,dz:G.dz,nx:G.nx,nz:G.nz,c:[]},g2={...g1,c:[]};g1.c[c]=A;g2.c[c]=F;
@@ -404,7 +406,7 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
 // ios-r17a (iPhone 17: "freezes", "when I rotate it loads again" = iOS killing the WebGL tab for memory): GO perf/ios-mem asserts a touch memory budget per city
 // (GPU estimate = buffers + textures + mip chains + render buffers + canvas, MEM_GPU.est(); JS heap) at ready and after 30 s of roam, and that a rotate
 // (852×393 → 393×852 → back) only resizes the renderer: < 20 MB new bytes, no boot / city build / world build call, no new geometries, textures or programs.
-const IOSM={gpu:500,heap:250,rot:20,on:/[?&]iosmem=1/.test(location.search)};   // the budget lines assert only with ?iosmem=1 until the heap fits (r17a: fra 382, ath 605 MB retained at ready); the rotate line always asserts
+const IOSM={gpu:500,heap:250,rot:20,grow:30,on:/[?&]iosmem=1/.test(location.search)};   // the budget lines assert only with ?iosmem=1 until the heap fits (r17a: fra 382, ath 605 MB retained at ready); the rotate line always asserts
 function IOSM_smp(){const i=renderer.info,pm=performance.memory;return{gpu:MEM_GPU.est(),heap:pm?Math.round(pm.usedJSHeapSize/1048576):0,geo:i.memory.geometries,tex:i.memory.textures,prog:(i.programs||[]).length,
  buf:+(MEM_GPU.bb/1048576).toFixed(0),tx:+(MEM_GPU.tb/1048576).toFixed(0),mip:+((MEM_GPU.mxb||0)/1048576).toFixed(0),rb:+((MEM_GPU.rbb||0)/1048576).toFixed(0),pr:renderer.getPixelRatio()}}
 function IOSM_top(n){const S=new Map;scene.traverse(o=>{for(const m of[].concat(o.material||[]))for(const k in m){const v=m[k];if(v&&v.isTexture&&v.image&&!S.has(v)){const im=v.image,w=im.width||0,h=im.height||0,d=im.depth||1;S.set(v,{k:(v.name||k)+' '+w+'x'+h+(d>1?'x'+d:''),b:w*h*d*4})}}});
@@ -419,6 +421,7 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
   const fin=()=>{try{__tq.draw()}catch(e){}return gc().then(()=>{const a=S.a,b=S.b,z=IOSM_smp();IOSM_wrap(false);const R=[],cl=Object.entries(IOSM.calls).map(([k,v])=>k+'×'+v).join(' ')||'none',dg=+(z.gpu-b.gpu).toFixed(1),dh=z.heap-b.heap;
    const L=x=>'GPU '+x.gpu+' MB (buf '+x.buf+', tex '+x.tx+', mip '+x.mip+', rb '+x.rb+'), heap '+x.heap+' MB';
    const bi=IOSM.on?'':' (info until ?iosmem=1: budget GPU ≤ '+IOSM.gpu+', heap ≤ '+IOSM.heap+')';R.push(['ready: '+L(a)+bi,!IOSM.on||a.gpu<=IOSM.gpu&&a.heap<=IOSM.heap]);R.push(['30 s roam: '+L(S.b0)+bi,!IOSM.on||S.b0.gpu<=IOSM.gpu&&S.b0.heap<=IOSM.heap]);
+   {const g=S.b0.heap-S.a.heap;R.push(['heap growth over the 30 s roam '+(g>=0?'+':'')+g+' MB'+(LOWMEM?' (≤ +'+IOSM.grow+')':' (info: the desktop tier is not asserted; run with ?lowmem=1)'),!LOWMEM||g<=IOSM.grow])}
    R.push(['rotate: GPU +'+dg+' MB, heap '+(dh>=0?'+':'')+dh+' MB, target reallocs '+(RZ.re-S.rz)+', builds '+cl+', pixel ratio '+z.pr+', reload '+(location.href!==S.u)+' (info: geo/tex/prog '+(z.geo-b.geo)+'/'+(z.tex-b.tex)+'/'+(z.prog-b.prog)+', measured on the 2nd rotate; the warm-up rotate: GPU +'+(b.gpu-S.b0.gpu).toFixed(1)+' MB = never-drawn geometry uploaded by the wider portrait view)',
      dg<IOSM.rot&&dg+Math.max(0,dh)<IOSM.rot&&cl==='none'&&location.href===S.u]);
    R.push(['(info) LOWMEM '+LOWMEM+', top textures: '+IOSM_top(5),true]);
@@ -455,9 +458,33 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
 
 // perf-r17f: GO perf/pc-bhs (+ -ath). buildHubG gap = time between two yields (window.__bhSt, src/72). bhs (?bhs=1, default OFF): both cities < 1500 ms (r17f measured fra 1217 = rfGrid at 'start', ath 1277; was 1512 / 1277). Info: steps over 50 ms. Off: info only.
 (function R17F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='pc-bhs')){
- C.items.push({ver:'perf',id:'pc-bhs',area:'perf',text:'r17f · PC boot slicing (bhs): 📍 GO reads the longest gap between two buildHubG yields. Pass line with ?bhs=1: longest gap < 1500 ms (a regression guard: fra 1217 ms is rfGrid, ath 1277 ms is the post steps). Info: steps > 50 ms (the 50 ms goal is NOT met). bhs stays default OFF.'},
+ C.items.push({ver:'perf',id:'pc-bhs',area:'perf',text:'r17f · PC boot slicing (bhs): 📍 GO reads the longest gap between two buildHubG yields. Pass line with ?bhs=1: longest gap < 1500 ms (a regression guard; r17i: fra < 700 ms (was 1126, rfGrid staged), ath < 1500 ms (1124, post steps not sliced yet)). Info: steps > 50 ms (the 50 ms goal is NOT met). bhs stays default OFF.'},
   {ver:'perf',id:'pc-bhs-ath',area:'perf',text:'r17f · PC boot slicing, Athens: same as perf/pc-bhs.'});
- const go=()=>{const S=window.__bhSt,m=S?Math.round(S.max):-1,n=S?S.L.filter(x=>x[0]>50).length:0,lim=1500;if(!BHQ.en)return`📍 PC BHS · bhs is OFF (default; ?bhs=1 turns it on): longest buildHubG gap ${m} ms, ${n} gaps > 50 ms (info) → ✅ PASS`;
+ const go=lim=>()=>{const S=window.__bhSt,m=S?Math.round(S.max):-1,n=S?S.L.filter(x=>x[0]>50).length:0;if(!BHQ.en)return`📍 PC BHS · bhs is OFF (default; ?bhs=1 turns it on): longest buildHubG gap ${m} ms, ${n} gaps > 50 ms (info) → ✅ PASS`;
   const ok=m>=0&&m<lim;return`📍 PC BHS · ${ok?'✓':'✗'} longest buildHubG gap ${m} ms (${S&&S.lab}) < ${lim} · info: ${n} gaps > 50 ms (goal 0, not met) → ${ok?'✅ PASS':'❌ FAIL'}`};
- C.GO['perf/pc-bhs']=[{c:'fra',n:'Desktop boot slicing (buildHubG gaps)',fn:go}];C.GO['perf/pc-bhs-ath']=[{c:'ath',n:'Desktop boot slicing (Athens)',fn:go}]}return}
+ C.GO['perf/pc-bhs']=[{c:'fra',n:'Desktop boot slicing (buildHubG gaps)',fn:go(700)}];C.GO['perf/pc-bhs-ath']=[{c:'ath',n:'Desktop boot slicing (Athens)',fn:go(1500)}]}return}
  if(i<600)setTimeout(()=>R17F_reg(i+1),100)})(0);
+// ios-r17m: GO perf/mem-quant (touch/lowmem): GND_L packed tiles + the crown mask are quantized within 1 cm (and no tile crack: every sampled tile centre still resolves), and a far streamed
+// chunk round-trips through its deflated copy byte for byte (arrays dropped while compressed, identical after the restore). Prints the heap and the bytes released.
+(function MQ_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='mem-quant')){C.items.push({ver:'perf',id:'mem-quant',area:'perf',text:'ios-r17m · 📍 GO: touch/lowmem ground tiles (GND_L) and the crown mask are Int16/Uint16 with max height error ≤ 1 cm and every tile centre still resolves; one far streamed chunk is deflated, drops its arrays, and comes back identical. Pass line: errors ≤ 1 cm, 0 holes, 0 byte mismatches.',go:'perf/mem-quant'});
+ C.GO['perf/mem-quant']=['fra','ath'].map(c=>({c,n:'quantized ground + far chunk deflate',secs:40,fn:()=>{if(!LOWMEM)return'📍 MEM QUANT · needs the touch/lowmem tier (?lowmem=1) ❌ FAIL';if(state!=='roam')return'📍 MEM QUANT · start free roam first ❌ FAIL';
+  let q=0,eh=0,ex=0,mb=0,holes=0,smp=0,np=0;for(const G of GND_L){if(!G.Q)continue;q++;eh=Math.max(eh,G.qe.h);ex=Math.max(ex,G.qe.xz);mb+=G.qe.mb;
+   for(let t=0;t<60;t++){const c2=Math.floor(Math.random()*G.nx*G.nz),s=G.s[2*c2];if(s<0)continue;const e=G.s[2*c2+1],i2=Math.floor(c2/G.nz),j2=c2%G.nz,Qa=G.P,k=s+9*Math.floor(Math.random()*((e-s)/9));
+    const x=G.x0+i2*G.dx+(Qa[k]+Qa[k+2]/2)*G.qis,z=G.z0+j2*G.dz+(Qa[k+1]+Qa[k+3]/2)*G.qis;smp++;const r=GND_in(G,x,z);if(!r||!isFinite(GND_tri(r.L,r.k,r.u,r.v)))holes++}}
+  const K=TR_HA.M,mq=K?K.qe||0:0,mU=K&&K.m instanceof Uint16Array,gs=GND_L.length,nQ=q;
+  const e=MEMF.S.find(z=>!z.on&&!z.cz&&!z.zfail&&z.m.geometry.attributes.position&&z.m.geometry.attributes.position.array),heapNow=()=>performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576):0;
+  const fin=(zr)=>`📍 MEM QUANT ${CID} · GND grids ${nQ}/${gs} Int16 (saved ${mb.toFixed(1)} MB, err h ${(eh*100).toFixed(2)} cm xz ${(ex*100).toFixed(2)} cm, holes ${holes}/${smp}), crown mask ${mU?'Uint16 err '+(mq*100).toFixed(2)+' cm':'Float32'}, far chunks ${zr} · zfar ${MEMF.zst.n} zipped ${MEMF.zst.rawMB.toFixed(1)}→${MEMF.zst.zMB.toFixed(1)} MB, ${MEMF.zst.back} back, max ${MEMF.zst.maxMs.toFixed(0)} ms · heap ${heapNow()} MB`;
+  const g1=nQ>0&&eh<=.01&&ex<=.005&&holes===0&&smp>50&&(!K||mq<=.01);
+  if(!MEMF.zOn||!e)return fin(MEMF.zOn?'no off chunk':'off')+' → '+(g1&&(!MEMF.zOn||MEMF.S.length===0)?'✅ PASS':'❌ FAIL');
+  const g=e.m.geometry,names=Object.keys(g.attributes),hash=()=>{let h=0,n=0;for(const k of names.concat(g.index?['@i']:[])){const a=k==='@i'?g.index:g.attributes[k],A=a.array;if(!A)return'null';for(let t=0;t<A.length;t+=Math.max(1,A.length>>8)){h=(h*31+A[t]*1000|0)|0}n+=A.length}return h+':'+n},h0=hash();
+  return MEMF_zip(e).then(()=>{const zipped=!!e.cz,nulled=names.every(k=>!g.attributes[k].array);return(zipped?MEMF_unzip(e):Promise.resolve()).then(()=>{const same=hash()===h0,ok=g1&&zipped&&nulled&&same&&!e.cz;
+   return fin(`zip ${zipped?'ok':'FAILED'} dropped ${nulled} restored-identical ${same}`)+' → '+(ok?'✅ PASS':'❌ FAIL')})})}}))}return}
+ if(i<600)setTimeout(()=>MQ_reg(i+1),100)})(0);
+(function R17_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='r17'&&q.id==='start-life')){C.items.push({ver:'r17',id:'start-life',area:'life',text:'r17 · a lively start in both cities: 📍 GO reads the start state the seed left under the curtain. Pass line: ≥ 2 traffic cars 40–120 m ahead on the player\'s road, and, with ?r17pose=1 (default OFF, the Frankfurt tower behind the pause button is NOT fixed), the start view\'s top-left region is mostly open: ≥ 90 % of a 96-pixel grid is not a warm building facade, (non-warm pixels of the rendered frame, current viewport). The seed itself took ≤ 10 ms.'});
+ const go=city=>({c:city,n:city+' lively start',secs:2,fn:()=>{const R=[],s=R17.st,h=R17.home;
+  R.push(['seeded '+(s?s.n:'none')+' cars, ahead '+(s?s.ahead:'-')+' at boot (seed '+R17.ms+' ms)',!!s&&s.ahead>=2&&R17.ms<=10]);
+  
+  {const o=R17_open();R.push([innerWidth+'x'+innerHeight+' top-left open '+Math.round(o.open*100)+'% (info unless ?r17pose=1) (start pose moved: '+(R17.pose0==null?'-':R17.pose0+'% -> '+R17.pose1+'%')+')',!R17.pose||o.open>=.9])}
+  const ok=R.every(r=>r[1]);return'📍 START LIFE '+city.toUpperCase()+' · '+R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}});
+ C.GO['r17/start-life']=[go('fra'),go('ath')]}return}
+ if(i<600)setTimeout(()=>R17_reg(i+1),100)})(0);

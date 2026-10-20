@@ -66,13 +66,13 @@ function TR_hills4(h,nx,nz,r,D){if(!TR_H4.on)return;const s=Math.max(1,Math.roun
     const b=.6*Math.sin(x/TR_HA.w+1.1)*Math.sin(z/(TR_HA.w*1.07)+.3)+.4*Math.sin((x*.8-z*.6)/(TR_HA.w*.82)+2),m0=ss(.1,.85,b);if(m0<=0)continue;
     let fx=Math.min(cx-1.001,Math.max(0,i/s-.5)),fz=Math.min(cz-1.001,Math.max(0,j/s-.5));const a=fx|0,c=fz|0,tx=fx-a,tz=fz-c,q=c*cx+a,f=(F[q]*(1-tx)+F[q+1]*tx)*(1-tz)+(F[q+cx]*(1-tx)+F[q+cx+1]*tx)*tz;
     let m=m0*f;if(m<=0)continue;if(D)m*=ss(250,700,D[j*nx+i]);if(A&&athHill1(A,x,z)>0)m=0;for(const L of LM){if(Math.abs(x-L[0])>L[2]+100||Math.abs(z-L[1])>L[2]+100)continue;const d=Math.hypot(x-L[0],z-L[1]);if(d<L[2]+100)m*=ss(L[2],L[2]+100,d)}
-    if(m>0){const v=TR_HA.h*m;h[j*nx+i]+=v;MK.m[j*nx+i]=m;n++;if(v>top)top=v}}TR_HA.cells=n;TR_HA.top=+top.toFixed(1)}
+    if(m>0){const v=TR_HA.h*m;h[j*nx+i]+=v;MK.m[j*nx+i]=m;n++;if(v>top)top=v}}TR_HA.cells=n;TR_HA.top=+top.toFixed(1);MK.ms=1;if(LOWMEM&&!/[?&]trq=0/.test(location.search)){const F=MK.m,U=new Uint16Array(F.length);let e=0;for(let q=0;q<F.length;q++){U[q]=Math.round(F[q]*65535);const d=Math.abs(U[q]/65535-F[q]);if(d>e)e=d}MK.m=U;MK.ms=1/65535;MK.qe=e*TR_HA.h}}   // perf-r17m: crown mask Uint16 (touch/lowmem, ?trq=0 off), height error <= 0.2 cm
 // terr-5 (Alex must SEE hills: terr-4 mounds were covered by city blocks and read as "the street climbs"): mound CROWNS (mound share m >=
 // TR_GT.m, i.e. >= 35 m fra / 50 m ath of extra height) are green: park ground, trees, no buildings (fpOK + block type), like Lycabettus.
 // ?tgt=0 = terr-4 look (buildings on the crowns). TR_crown(x,z) = the mound share 0..1 there (bilinear on the terrain raster).
 const TR_GT=(()=>{const q=new URLSearchParams(location.search);return{on:TR_H4.on&&q.get('tgt')!=='0',m:+(q.get('tgtm')||.5)}})();
 function TR_crown(x,z){const K=TR_HA.M;if(!K)return 0;let fx=(x-WX0)/K.r,fz=(z-WZS)/K.r;if(fx<0||fz<0||fx>K.nx-1.001||fz>K.nz-1.001)return 0;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,q=j*K.nx+i,m=K.m;
-  return(m[q]*(1-tx)+m[q+1]*tx)*(1-tz)+(m[q+K.nx]*(1-tx)+m[q+K.nx+1]*tx)*tz}
+  return((m[q]*(1-tx)+m[q+1]*tx)*(1-tz)+(m[q+K.nx]*(1-tx)+m[q+K.nx+1]*tx)*tz)*K.ms}
 const TR_onCrown=(x,z)=>TR_GT.on&&TR_crown(x,z)>=TR_GT.m;
 // trees for the crowns (Athens interior pass): a jittered 22 m grid, kept off the streets (cityAt) and filler roads
 function TR_crownTrees(rnd){const o=[];if(!TR_GT.on||!TR_HA.M)return o;for(let z=HZS-1000;z<HZN+1000;z+=22)for(let x=HX0-1000;x<HX1+1000;x+=22){if(rnd()<.45)continue;const px=x+(rnd()-.5)*16,pz=z+(rnd()-.5)*16;
@@ -445,8 +445,8 @@ function rfGrid(){if(FILL_R)return;FILL_R=[];FILL_G=new Map();BLOCK_C=[];
   for(const r of FILL_R){const a=Math.min(r.x0,r.x1)-r.w,b=Math.max(r.x0,r.x1)+r.w,c=Math.min(r.z0,r.z1)-r.w,d=Math.max(r.z0,r.z1)+r.w;for(let k=Math.floor(a/64);k<=Math.floor(b/64);k++)for(let j=Math.floor(c/64);j<=Math.floor(d/64);j++){const key=k*100000+j;let L=FILL_G.get(key);if(!L)FILL_G.set(key,L=[]);L.push(r)}}}
 function hubRoads(){rfGrid();return FILL_R}
 // terr-1: Frankfurt filler roads are graded into the raster as soon as the grid exists
-{const _rg=rfGrid;rfGrid=function(){const was=FILL_R;_rg();if(!was&&FILL_R&&CID==='fra'&&TR_RG)try{const W=TR_W||TR_init(),T0=performance.now();const R=FILL_R.map(f=>({P:[[f.x0,f.z0],[f.x1,f.z1]],hw:f.w/2}));for(const S of CITY_S)if(S.r.cls!=='hill')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
-    W.trf={n:TR_grade(W,R,{skip:TR_rivSkip,pin:TR_rivPin,flat:W.r+4,junc:TR_padList()})};W.trf.ms=Math.round(performance.now()-T0);TR_bridgeEnds()}catch(e){(TR_W||{}).trf={err:String(e)}}}}
+RFS.S.push(()=>{if(CID==='fra'&&TR_RG)try{const W=TR_W||TR_init(),T0=performance.now();const R=FILL_R.map(f=>({P:[[f.x0,f.z0],[f.x1,f.z1]],hw:f.w/2}));for(const S of CITY_S)if(S.r.cls!=='hill')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
+    W.trf={n:TR_grade(W,R,{skip:TR_rivSkip,pin:TR_rivPin,flat:W.r+4,junc:TR_padList()})};W.trf.ms=Math.round(performance.now()-T0);TR_bridgeEnds()}catch(e){(TR_W||{}).trf={err:String(e)}}});// perf-r17i: was an rfGrid wrapper; now the last RFS.S pass (src/51)
 // footprint test for buildings (9 points of the rotated rectangle): off streets, filler roads, water, plazas/parks/landmarks
 // athroads: true when a street or filler road reaches within r m of (x,z) (kerb included)
 function fpRoad(x,z,r){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+r)return true;const f=fillAt(x,z);return!!(f&&f.d<f.r.w/2+r)}
