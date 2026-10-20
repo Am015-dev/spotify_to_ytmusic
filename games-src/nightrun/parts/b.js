@@ -76,7 +76,7 @@ const hintShow=(txt,t,col)=>{if(window.HINT)return HINT.show(txt,{t,col});G.hint
 function banner(a,b,warn,t){t=t||3.2;G.banner={t,m:t,a:say(a),b:say(b),warn:!!warn};}
 function newGame(daily){
   GR=daily?mul(todayN()):Math.random;GX=daily?mul(todayN()+7919):Math.random;
-  P={x:140,y:H/2,hp:5,max:5,inv:2,dashT:0,dashCd:0,dx:1,dy:0,heat:0,over:false,wl:1,emp:2,fg:-1e9,dq:null,tilt:0,dashPf:false};
+  P={x:140,y:H/2,hp:5,max:5,inv:2,dashT:0,dashCd:0,dx:1,dy:0,mvT:-9,heat:0,over:false,wl:1,emp:2,fg:-1e9,dq:null,tilt:0,dashPf:false};
   C={n:0,best:0,last:-999,lb:0};
   G={spawnB:[],t:0,scroll:0,di:0,pos:0,d0:0,dprog:0,force:false,loop:0,dt:0,waveT:3.5,waveWait:false,en:[],eb:[],pb:[],pk:[],pt:[],fl:[],rings:[],delayed:[],score:0,mult:1,kills:0,boss:null,bossDone:false,
      banner:{t:0,m:3.2,a:'',b:'',warn:false},shake:0,glitch:0,flash:0,slow:1,dead:false,deadT:0,transT:-1,empT:0,
@@ -214,6 +214,15 @@ function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false}
   else if(e.type==='gate'){for(let i=0;i<3;i++)drop('shard',0,rnd(-30,30));}
   if(GX()<(.009+(SH.lk||0)*.3)*healK()&&P.hp<P.max)drop('hp');}   // a district has 300+ kills now: one hull drop in about 110
 // a dash waiting for its beat already protects the ship (P.dq)
+/* DASH direction with no input (and no move in the last 0.3 s): never a stale heading. Picks the 8-way direction whose landing spot has the most free space,
+   away from bullets and foes (predicted .25 s ahead) and from walls; ties go up the screen (world right, the way the ship faces). */
+function dashSafeDir(){const L=210,x0=P.x,y0=P.y,x1=rotMode?64:24,x2=W-60,y1=36,y2=H-54;let best=[1,0],bs=-1e9;
+  for(let i=0;i<8;i++){const a=i*Math.PI/4,dx=Math.round(Math.cos(a)),dy=Math.round(Math.sin(a)),n=Math.hypot(dx,dy);const ux=dx/n,uy=dy/n;
+    const ex=clamp(x0+ux*L,x1,x2),ey=clamp(y0+uy*L,y1,y2);let sc=ux*.15-Math.hypot(x0+ux*L-ex,y0+uy*L-ey)/L*2;
+    for(const b of G.eb){const d=Math.hypot(b.x+b.vx*.25-ex,b.y+b.vy*.25-ey);if(d<150)sc-=(150-d)/150;}
+    for(const e of G.en){const d=Math.hypot(e.x-ex,e.y-ey);if(d<120)sc-=(120-d)/240;}
+    if(sc>bs+1e-9){bs=sc;best=[ux,uy];}}
+  return best;}
 function hurt(n){n=n>1?n:1;if(P.inv>0||P.dashT>(P.dashSh||0)||P.dq||G.dead||godMode||ST.over)return;if(SH.absorb())return;P.hp=Math.max(0,P.hp-n);if(n>1){shake(12);G.flash=Math.max(G.flash,.3*FX());}   // a heavy shell takes 2 hull
   ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);tierDrop('hit');G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');NR.emit('hurt');
   burst(P.x,P.y,'#ff3050',24,300);if(P.hp<=0)die();}
@@ -294,12 +303,12 @@ function update(dt){
   /* player */
   if(!G.dead){
     let mx=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0),my=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0);
-    if(mx||my){const l=Math.hypot(mx,my);P.dx=mx/l;P.dy=my/l;}
+    if(mx||my){const l=Math.hypot(mx,my);P.dx=mx/l;P.dy=my/l;P.mvT=G.t;}
     const dashTs=pressed.ShiftLeft||pressed.ShiftRight||pressed.KeyK||pressed.Dash;
     if(window.ABIL&&ABIL.on)ABIL.dashIn(dashTs,mx,my,pdt);else{   // abilities.js: dash charges + power-up traits (?abil=0 = this old dash)
     const canDash=()=>P.dashCd<=0||SH.spare>0;
     // DASH is snapped to the beat: a press inside the window waits for the beat (at most the window), then counts as on-beat. Outside the window it dashes at once, off-beat, and the tier drops.
-    const goDash=(on,j)=>{if(P.dashCd>0)SH.spare--;P.dashT=.2;P.dashCd=1;if(!(mx||my)&&!touch){P.dx=1;P.dy=0;}AU.sfx('dash');
+    const goDash=(on,j)=>{if(P.dashCd>0)SH.spare--;P.dashT=.2;P.dashCd=1;if(!(mx||my)&&G.t-P.mvT>.3){const d=dashSafeDir();P.dx=d[0];P.dy=d[1];}AU.sfx('dash');
       P.dashPf=on;
       if(on){P.dashCd=.5;G.score+=Math.round(200*G.mult*comboK());J.n++;J.last={kind:'dash',ok:true,dt:Math.round(j.dt),beat:j.beat,at:performance.now()};onPerfect('dash',j,P.x,P.y);
         if(!TIP.done){TIP.done=true;save('mnr_tipdone',true);}}
@@ -313,7 +322,7 @@ function update(dt){
     const py0=P.y;
     if(P.dashT>0){P.x+=P.dx*1050*pdt;P.y+=P.dy*1050*pdt;if(!SET.calm&&Math.random()<.9)G.pt.push({x:P.x,y:P.y,vx:0,vy:0,l:.25,m:.25,c:D.b,sz:10,ghost:1});}
     else if(touch){const sk=SENS[SET.sens-1]||1.5,tx=touch.px+(touch.x-touch.sx)*sk,ty=touch.py+(touch.y-touch.sy)*sk;const ddx=tx-P.x,ddy=ty-P.y,l=Math.hypot(ddx,ddy);
-      if(l>1){P.dx=ddx/l;P.dy=ddy/l;}const s=Math.min(l,520*pdt);if(l>0){P.x+=ddx/l*s;P.y+=ddy/l*s;}}
+      if(l>3){P.dx=ddx/l;P.dy=ddy/l;P.mvT=G.t;}const s=Math.min(l,520*pdt);if(l>0){P.x+=ddx/l*s;P.y+=ddy/l*s;}}
     else{const l=Math.hypot(mx,my)||1;P.x+=mx/l*300*pdt;P.y+=my/l*300*pdt;}
     const cx=clamp(P.x,rotMode?64:24,W-60),cy=clamp(P.y,36,H-54);   // portrait keeps the ship above the tier meter
     if(touch){if(cx!==P.x||P.dashT>0){touch.sx=touch.x;touch.px=cx;}if(cy!==P.y||P.dashT>0){touch.sy=touch.y;touch.py=cy;}}   // finger past the edge: re-anchor, no dead zone
