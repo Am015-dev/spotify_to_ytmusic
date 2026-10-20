@@ -18,7 +18,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
     const p = await br.newPage({ viewport: vp }); p.on('pageerror', e => errs.push(e.message + ' @' + String(e.stack).split('\n').slice(1, 3).join(' '))); p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });
     const pe0 = errs.push.bind(errs); errs.push = (x) => /slotFor/.test(x) ? errs.length : pe0(x);
     await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
-    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&nomusic=1${q}`); await p.waitForFunction(() => window.__mnr && window.__mnr.RET, null, { timeout: 10000 }); return p;
+    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&nomusic=1&hint=0&timing=0${q}`);  /* obsolete-fixed (timing=0: BOMB STOCK measures the old one-charge EMP; timing ON spends every charge): these checks read the old G.hint bubble; hints now go through the HINT pill queue (?hint=0 = the old bubble) */ await p.waitForFunction(() => window.__mnr && window.__mnr.RET, null, { timeout: 10000 }); return p;
   };
   const p = await open({ width: 390, height: 763 });
   const R = await p.evaluate(() => {

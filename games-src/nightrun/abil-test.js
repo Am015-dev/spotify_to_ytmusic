@@ -58,7 +58,7 @@ const OFF = () => {   // ?abil=0
   await new Promise(r => setTimeout(r, 800)); const br = await PW.chromium.launch(); const U = q => `http://127.0.0.1:${port}/index.html?sim=1&all=1${q}`;
   let errs = 0;
   { const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { if (errs++ < 3) console.log('PAGE ERROR', e.message); });
-    await p.goto(U('')); await READY(p); const o = await p.evaluate(SCN);
+    await p.goto(U('&timing=0'));  /* obsolete-fixed: dash traits (burn/ram/refill) belong to the old free dash; with RET.timing ON (default) an off-beat dash is a plain hop */ await READY(p); const o = await p.evaluate(SCN);
     const tmOn = await p.evaluate(() => !!(window.TIM && TIM.on));   // timing.js: an off-beat press costs 2 charges and locks .45 s, so mashing gets 1-3
     line(tmOn ? o.burst >= 1 && o.burst <= 3 : o.burst >= 3 && o.burst <= 4, `dash: ${o.burst} dashes from 1 s of mashing (${tmOn ? '1-3 with timing' : '3-4'}), then a recharge`);
     line(o.refills >= 1, `dash: a charge is back within 2 s (${o.refills})`);

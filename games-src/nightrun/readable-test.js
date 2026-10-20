@@ -61,7 +61,7 @@ const MEASURE = () => {
     console.log(`  colour distance (RGB)           median ${med(o.d).toFixed(0)} -> ${med(n.d).toFixed(0)}   worst 10% ${pct(o.d, .1).toFixed(0)} -> ${pct(n.d, .1).toFixed(0)}`);
     console.log(`  backdrop luminance ${f3(med(o.bgL))} -> ${f3(med(n.bgL))}   saturation ${f(med(o.bgS))} -> ${f(med(n.bgS))}`);
     if (process.env.WORST) console.log('  worst', JSON.stringify(o.worst.sort((a, b) => a.c - b.c).slice(0, 4)), '\n  worst', JSON.stringify(n.worst.sort((a, b) => a.c - b.c).slice(0, 6)));
-    ok(`${size}: flag off draws nothing new (no dim, no dot, no halo)`, !o.read && !o.stat.dim && !o.stat.dot && !o.stat.halo && o.dot.every(d => d.n === 0), JSON.stringify(o.stat));
+    ok(`${size}: flag off draws nothing new (no dim, no dot, no halo)`, !o.read && !o.stat.dim && !o.stat.dot && !o.stat.halo && o.dot.every(d => d.n === 0), JSON.stringify(o.stat) + JSON.stringify(o.dot.slice(0,4)));
     ok(`${size}: drawing never changes the bullets (same list, count, radii)`, o.same && n.same);
     ok(`${size}: flag on dims the backdrop`, n.stat.dim > 0 && med(n.bgL) < med(o.bgL) * .8, f3(med(o.bgL)) + ' -> ' + f3(med(n.bgL)));
     ok(`${size}: hitbox dot visible, >= 4 css px wide`, n.dot.every(d => d.n > 0 && d.wCss >= 4), JSON.stringify(n.dot));

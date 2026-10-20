@@ -707,3 +707,6 @@ parts/density.js: per-stage bullets-on-screen budget via slow curtains (dir.js b
 ## Nightrun REMIX: every run a different cut of the stage script (W26, flag RET.remix, ?remix=0 = old, 20 Oct 2026)
 - `parts/remix.js` (after stagescripts.js): one seeded stream per run (one GR draw, so daily/?seed= stays reproducible) shuffles free moments, swaps formations for 3 equivalents, picks 1 of 3 set-piece variants, +-25% moment lengths, random entry side / speed +-10% / lane shift +-18 px (never on gap formations). Intro, first-30 s order/timing, set piece and breathers anchored; hull sum within +-5% else re-rolled. Gate `remix-test.js`; `industry-audit.js` has PREDN=3,10,20.
 - Jaccard over 5 seeds: stage 3/10/20 0.61(s10, old) -> 0.21/0.17/0.18. Repeat within 5 min 0.84 -> 0.82: NOT fixed (enemy/shot/drop signatures dominate, not formation order). Sim spawn timing drifts a little between identical runs even with ?remix=0.
+
+## W31 Nightrun test triage (2026-10-20)
+Obsolete tests rewritten (see games-src/nightrun/TEST-LEDGER.md "W31 triage"). Open: hud-cover (phone HUD 27% at 375x553), readable worst-10% contrast, timing random bot 92%, ret-walls, scale3, afk, ret-leak (speed sampler). Forge recipe trims in parts/forge.js; forge Hard-30 check is noisy. Never run: ui-align, ui-weapons, vary, wcard, weapon, zoo.
