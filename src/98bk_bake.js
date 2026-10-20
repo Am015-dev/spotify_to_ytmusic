@@ -31,11 +31,11 @@ let BK_rv=null;rivClear=function(x,z){if(!BK.on)return BK0.rivClear(x,z);BK.st.q
 let BK_mt=null;mtnDist=function(x,z){if(!BK.on)return BK0.mtnDist(x,z);if(x<TAU_R.x0-200||z<TAU_R.z0-200)return 1e9;BK.st.q++;if(!BK_mt){const P=[];for(const S of mtnSamples())for(let i=0;i<S.pts.length;i+=2)P.push(S.pts[i].x,S.pts[i].z,0,0);BK_mt=BK_two(Float64Array.from(P),4,true,1e9)}
   const C=BK_mt(x,z);let best=1e9;for(let o=0;o<C.length;o+=4){const d=(C[o]-x)**2+(C[o+1]-z)**2;if(d<best)best=d}return Math.sqrt(best)};
 // city streets: nearest sample in the 3×3 64 m neighbourhood (skip = a street index); payload = [si, i]
-const BK_ci=BK_cache();cityAt=function(x,z,skip=-1){if(!BK.on)return BK0.cityAt(x,z,skip);BK.st.q++;const kx=Math.floor(x/64),kz=Math.floor(z/64),k=kx*100000+kz;let C=BK_ci.get(k);
+const BK_ci=BK_cache();cityAt=function(x,z,skip=-1,np=false,out=null){if(!BK.on)return BK0.cityAt(x,z,skip,np,out);BK.st.q++;const kx=Math.floor(x/64),kz=Math.floor(z/64),k=kx*100000+kz;let C=BK_ci.get(k);
   if(!C){const P=[];for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=CITY_G.get((kx+a)*100000+kz+b);if(!L)continue;for(let j=0;j<L.length;j+=2){const p=CITY_S[L[j]].pts[L[j+1]];P.push(p.x,p.z,0,L[j],L[j+1])}}
     if(BK_ci.size>BK_cap())BK_ci.clear();C=BK_cand(P,5,kx*64,kz*64,kx*64+64,kz*64+64,true,1e12);BK_ci.set(k,C);BK.st.c++}
   let bd=1e12,bs=-1,bi=0;for(let o=0;o<C.length;o+=5){if(C[o+3]===skip)continue;const dx=C[o]-x,dz=C[o+1]-z,d=dx*dx+dz*dz;if(d<bd){bd=d;bs=C[o+3];bi=C[o+4]}}
-  if(bs<0)return null;const S=CITY_S[bs],p=S.pts[bi];return{d:Math.sqrt(bd),lat:(x-p.x)*p.tz-(z-p.z)*p.tx,s:p.s,road:S.r,si:bs,i:bi,S,p}};
+  if(bs<0)return null;const S=CITY_S[bs],p=S.pts[bi];if(out){out.d=Math.sqrt(bd);out.lat=(x-p.x)*p.tz-(z-p.z)*p.tx;out.s=p.s;out.road=S.r;out.si=bs;out.i=bi;out.S=S;out.p=p;return out}return{d:Math.sqrt(bd),lat:(x-p.x)*p.tz-(z-p.z)*p.tx,s:p.s,road:S.r,si:bs,i:bi,S,p}};
 // Autobahn: nearest sample within 60 m in the 3×3 100 m neighbourhood
 let BK_abG=null;const BK_ab=BK_cache(100,10000);abAt=function(x,z){if(!BK.on)return BK0.abAt(x,z);if(!AB_G)BK0.abAt(0,0);if(BK_abG!==AB_G){BK_ab.clear();BK_abG=AB_G}BK.st.q++;const S0=abSamples(),kx=Math.floor(x/100),kz=Math.floor(z/100),k=kx*10000+kz;let C=BK_ab.get(k);
   if(!C){const P=[];for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=AB_G.get((kx+a)*10000+kz+b);if(!L)continue;for(let j=0;j<L.length;j+=2){const p=S0[L[j]].pts[L[j+1]];P.push(p.x,p.z,0,L[j],L[j+1])}}

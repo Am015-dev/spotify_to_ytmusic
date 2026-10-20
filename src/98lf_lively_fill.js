@@ -271,7 +271,8 @@ function LF_goSpot(id){const s=LF.SP[id];if(!s)return'no spot '+id;if(s.c!==CID)
 Object.assign(window.__lvf,{goSpot:LF_goSpot,green:LF_green,SP:LF.SP});
 // road-clear check (coordinator 2026-10-14 "bushes on road"): every fill piece (decor instances + fill props) within r m of (cx,cz) that stands on a
 // road surface (street, filler road, Autobahn, bridge deck: inside the asphalt edge + 0.5 m). Pass = 0.
-function LF_onRoad(x,z){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+.5)return'street';const f=fillAt(x,z);if(f&&f.d<f.r.w/2+.5)return'filler';const a=abAt(x,z);if(a&&a.d<a.road.w/2+.5)return'autobahn';return onAnyDeck(x,z)?'deck':''}
+const _lfC={d:0,lat:0,s:0,road:null,si:0,i:0,S:null,p:null};/* perf-r18y: scratch result, no object per probe */
+function LF_onRoad(x,z){const q=cityAt(x,z,-1,false,_lfC);if(q&&q.d<q.road.w/2+.5)return'street';const f=fillAt(x,z);if(f&&f.d<f.r.w/2+.5)return'filler';const a=abAt(x,z);if(a&&a.d<a.road.w/2+.5)return'autobahn';return onAnyDeck(x,z)?'deck':''}
 function LF_roadCheck(cx,cz,r){const M4=new THREE.Matrix4(),P=new THREE.Vector3(),bad=[];let n=0;const chk=(x,z,t)=>{if((x-cx)**2+(z-cz)**2>r*r)return;n++;const w=LF_onRoad(x,z);if(w)bad.push([t,Math.round(x),Math.round(z),w])};
   for(const m of LF.ms||[]){if(!m.parent)continue;const t=m.userData.lf;if(t==='mound')continue;for(let i=0;i<m.count;i++){m.getMatrixAt(i,M4);P.setFromMatrixPosition(M4);chk(P.x,P.z,t)}}
   for(const L of(typeof LAZY!=='undefined'?LAZY:[]))if(L.lf&&L.done)for(const p of L.props||[])chk(p[1],p[2],p[0]);return{n,bad:bad.length,ex:bad.slice(0,6)}}

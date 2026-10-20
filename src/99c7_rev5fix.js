@@ -679,3 +679,22 @@ roamCam=(f=>function(dt){const sn=camSnap,r=f(dt);try{if(!CFIT.on||state!=='roam
   return`📍 TOUCH LATE LINKS · ${ok?'✓':'✗'} player-car warm ${TWG.ll?'on':'off'}, ${TWG.llMs} ms (≤ 300), ${TWG.llN} programs linked under the curtain · ${bad.length} of ${ms.length} player-car materials on a non-linear-target program (0) · info: ${n} linked since the curtain (harness draw included), ${P.length} programs → ${ok?'✅ PASS':'❌ FAIL'}`};
  C.GO['perf/touch-late-links']=[{c:'ath',n:'touch late links (Athens)',fn:go},{c:'fra',n:'touch late links (Frankfurt)',fn:go}]}return}
  if(i<600)setTimeout(()=>R18U_reg(i+1),100)})(0);
+// ---- perf-r18y: allocation-free ground chain (TR_Ys / GND_fars / cityAt out / LF_onRoad scratch). GO perf/alloc-chain: new == reference on 100k random points per city.
+(function A18Y_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='alloc-chain')){C.items.push({ver:'perf',id:'alloc-chain',area:'perf',text:'perf-r18y: ground chain (TR_Y, groundY, GND_far, cityAt out, LF_onRoad) equals the returning-object reference on 100k points',go:'perf/alloc-chain'})}
+ const refFar=(x,z,g)=>{let r=null;for(let gi=0;gi<GND_L.length;gi++){const G=GND_L[gi],q=GND_in(G,x,z,{L:null,k:0,u:0,v:0});if(q===undefined)continue;let y=g;
+   if(q&&q.L[q.k+8]){const L=q.L,k=q.k,w=L[k+2],h=L[k+3],qu=q.u,qv=q.v,m=GND_tri(L,k,qu,qv);let f=1;f=GND_edge(G,x,z,qu*w,-1,0,f);f=GND_edge(G,x,z,(1-qu)*w,1,0,f);f=GND_edge(G,x,z,qv*h,0,-1,f);f=GND_edge(G,x,z,(1-qv)*h,0,1,f);y=g+(m-g)*f}
+   r=r===null?y:Math.max(r,y)}return r===null?g:r};
+ const refRoad=(x,z)=>{const q=cityAt(x,z);if(q&&q.d<q.road.w/2+.5)return'street';const f=fillAt(x,z);if(f&&f.d<f.r.w/2+.5)return'filler';const a=abAt(x,z);if(a&&a.d<a.road.w/2+.5)return'autobahn';return onAnyDeck(x,z)?'deck':''};
+ const same=(a,b)=>a===b||(a!==a&&b!==b);
+ const go=city=>({c:city,n:'ground chain equals reference',fn:()=>{const R=[];try{const N=HUB.nodes.filter(q=>q&&!q.ab);let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9;for(const q of N){if(q.x<x0)x0=q.x;if(q.x>x1)x1=q.x;if(q.z<z0)z0=q.z;if(q.z>z1)z1=q.z}
+   let s=4242,bad=[0,0,0,0],n=0,H=2166136261>>>0;const r=()=>(s=(s*1103515245+12345)&0x7fffffff)/0x7fffffff,F=new Float64Array(1),U=new Uint32Array(F.buffer);
+   for(;n<100000;n++){const x=x0-200+r()*(x1-x0+400),z=z0-200+r()*(z1-z0+400);
+    const y1=TR_Y(x,z),y2=CID==='fra'?tauH(x,z):athShelfY(x,z,TR_G(x,z));if(!same(y1,y2))bad[0]++;
+    const gy=groundY(x,z),ry=CID==='fra'?(inRiver(x,z)?HWY:y2):y2;if(!same(gy,ry))bad[1]++;
+    const f1=GND_far(x,z,ry),f2=refFar(x,z,ry);if(!same(f1,f2))bad[2]++;
+    if(n%4===0&&LF_onRoad(x,z)!==refRoad(x,z))bad[3]++;
+    if(n%10===0){F[0]=groundAt(x,z,99);H=Math.imul(H^U[0],16777619)>>>0;H=Math.imul(H^U[1],16777619)>>>0}}
+   R.push([n+' pts TR_Y '+bad[0]+' groundY '+bad[1]+' GND_far '+bad[2]+' LF_onRoad(25k) '+bad[3]+' bad',bad.every(b=>b===0)]);R.push(['groundAt hash '+H.toString(16),true])}
+  catch(e){R.push(['threw '+e,false])}const ok=R.every(r=>r[1]);return`📍 ALLOC CHAIN ${city.toUpperCase()} · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}});
+ C.GO['perf/alloc-chain']=[go('fra'),go('ath')];return}
+ if(i<600)setTimeout(()=>A18Y_reg(i+1),100)})(0);

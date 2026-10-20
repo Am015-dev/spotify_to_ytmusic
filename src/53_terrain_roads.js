@@ -189,7 +189,14 @@ function TR_G(x,z){if(TR_W!==TR_Wc||!TR_W){const W=TR_W||TR_init();TR_Wc=W;TR_r=
 const TR_tauH0=tauH;
 // the Taunus keeps its sculpted ridges on top of the real ground; Frankfurt has no road shelves (gentle, smoothed DEM)
 tauH=(x,z)=>{let h=TR_G(x,z)+TR_tauH0(x,z);if(x<TAU_R.x0||z<TAU_R.z0)return h;for(const P of[TAU_SUM,TAU_CAS]){const d=Math.hypot(x-P.x,z-P.z);if(d<P.r){const H=P.trH??(P.trH=TR_G(P.x,P.z)+TR_tauH0(P.x,P.z)),k=clamp((P.r-d)/(P.r*.55),0,1);h+=(H-h)*k*k*(3-2*k)}}return h};
-function TR_Y(x,z){return CID==='fra'?tauH(x,z):athShelfY(x,z,TR_G(x,z))}
+// perf-r18y: the ground chain writes its result to a scratch Float64Array instead of returning a double (every double that crosses a call boundary in
+// interpreted / Maglev code is a 16 B HeapNumber; the shortcut scan, car physics and life probes make ~100k calls/s). TR_Y keeps its signature; same maths as
+// athShelfY(x,z,TR_G(x,z)) (an empty SHELF returns h untouched, which is the whole of Athens once the streets are graded into the raster).
+const _G=new Float64Array(4);
+function TR_Ys(x,z){if(CID==='fra'){_G[0]=tauH(x,z);return}
+  if(TR_W!==TR_Wc||!TR_W){const W=TR_W||TR_init();TR_Wc=W;TR_r=W.r;TR_nx=W.nx;TR_nz=W.nz;TR_h=W.h}const nx=TR_nx;let fx=(x-WX0)/TR_r,fz=(z-WZS)/TR_r;fx=fx<0?0:fx>nx-1.001?nx-1.001:fx;fz=fz<0?0:fz>TR_nz-1.001?TR_nz-1.001:fz;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,k=j*nx+i,hh=TR_h;
+  const hv=(hh[k]*(1-tx)+hh[k+1]*tx)*(1-tz)+(hh[k+nx]*(1-tx)+hh[k+nx+1]*tx)*tz;_G[0]=SHELF.size===0?hv:athShelfY(x,z,hv)}
+function TR_Y(x,z){TR_Ys(x,z);return _G[0]}
 function TR_grad(x,z,e=1.5){return[(groundY(x+e,z)-groundY(x-e,z))/(2*e),(groundY(x,z+e)-groundY(x,z-e))/(2*e)]}
 // Athens road shelves follow the real ground: every street (pedestrian lanes too) gets a graded profile (TR_GR cap, TR_GJ between junctions);
 // the hill trails follow the smoothed ground without the old "monotone to the top" rule
@@ -407,11 +414,12 @@ const _DK={a:null,n:-1,B:null};
 function DK_build(AD){const B=new Int32Array(AD.length*4+4);for(let i=0;i<AD.length;i++){const b=AD[i],k=i*4,ok=b.r>=0&&isFinite(b.cx)&&isFinite(b.cz)&&isFinite(b.r);B[k]=ok?Math.floor(b.cx-b.r)-1:-1073741824;B[k+1]=ok?Math.ceil(b.cx+b.r)+1:1073741824;B[k+2]=ok?Math.floor(b.cz-b.r)-1:-1073741824;B[k+3]=ok?Math.ceil(b.cz+b.r)+1:1073741824}_DK.a=AD;_DK.n=AD.length;_DK.B=B;return B}
 function DK_any(x,z){const AD=ALL_DECKS,DB=_DK.a===AD&&_DK.n===AD.length?_DK.B:DK_build(AD),xi=x|0,zi=z|0;for(let bi=0;bi<AD.length;bi++){const k=bi*4;if(xi>=DB[k]&&xi<=DB[k+1]&&zi>=DB[k+2]&&zi<=DB[k+3])return true}return false}
 function roamTerr(x,z,y,o){let low=false;const AD=ALL_DECKS,RR=RO.ramps,DB=_DK.a===AD&&_DK.n===AD.length?_DK.B:DK_build(AD),xi=x|0,zi=z|0;for(let bi=0;bi<AD.length;bi++){const k=bi*4;if(xi<DB[k]||xi>DB[k+1]||zi<DB[k+2]||zi>DB[k+3])continue;const b=AD[bi];if(x-b.cx>b.r||b.cx-x>b.r||z-b.cz>b.r||b.cz-z>b.r)continue;const h=deckAt(b,x,z);if(h!=null&&h>.2){if(y>=h-2.4){let g2=h;for(let ri=0;ri<RR.length;ri++){const r=RR[ri];if(!r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),c=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(c)<r.w/2&&a>-r.len/2&&a<r.len/2)g2=Math.max(g2,r.y0+(a+r.len/2)/r.len*r.hgt)}if(o){o.g=g2;o.deck=b;o.low=undefined;return o}return{g:g2,deck:b}}if(h-y<5.5)low=true}}
-  let g=groundY(x,z);if(GND_ON)g=GND_far(x,z,g);const sl=slipY(x,z);if(sl!=null)g=Math.max(g,sl);
+  groundYs(x,z);if(GND_ON)GND_fars(x,z);let g=_G[0];const sl=slipY(x,z);if(sl!=null)g=Math.max(g,sl);
   for(let ri=0;ri<RR.length;ri++){const r=RR[ri];if(r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(b)<r.w/2&&a>-r.len/2&&a<r.len/2)g=Math.max(g,r.y0+(a+r.len/2)/r.len*r.hgt)}
   if(o){o.g=g;o.deck=null;o.low=low;return o}return{g,deck:null,low}}
 const _gaO={g:0,deck:null,low:false};function groundAt(x,z,y){return roamTerr(x,z,y,_gaO).g}
-const groundY=CID==='fra'?(x,z)=>inRiver(x,z)?HWY:TR_Y(x,z):(x,z)=>TR_Y(x,z);
+const groundYs=CID==='fra'?(x,z)=>{if(inRiver(x,z))_G[0]=HWY;else TR_Ys(x,z)}:TR_Ys;/* perf-r18y: scratch form, result in _G[0] */
+const groundY=(x,z)=>{groundYs(x,z);return _G[0]};
 function roofAt(){return null}
 // building colliders: axis-aligned {x,z,hw,hd,h}, or oriented when built with ry (c=cos, s=sin; local x = width)
 function hubAddB(b,to){if(b.ry!=null){const c=Math.cos(b.ry),s=Math.sin(b.ry);if(Math.abs(s)<1e-3||Math.abs(c)<1e-3){if(Math.abs(s)>.5){const t=b.hw;b.hw=b.hd;b.hd=t}}else{b.c=c;b.s=s}}(to||HUB.bld).push(b);return b}

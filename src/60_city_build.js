@@ -53,11 +53,13 @@ function GND_Y(x,z){const q=GND_leaf(x,z);return q?GND_tri(q.L,q.k,q.u,q.v):null
 // where two hilly ground builds overlap (Athens grass 'g' over 'w') the highest drawn one wins
 const _gfQ={L:null,k:0,u:0,v:0},_gfN={L:null,k:0,u:0,v:0};
 function GND_edge(G,x,z,d,ex,ez,f){if(d>=GND_B)return f;const n=GND_in(G,x+ex*(d+.3),z+ez*(d+.3),_gfN);return !n||!n.L[n.k+8]?Math.min(f,d/GND_B):f}
-function GND_far(x,z,g){let r=null;for(let gi=0;gi<GND_L.length;gi++){const G=GND_L[gi],q=GND_in(G,x,z,_gfQ);if(q===undefined)continue;let y=g;
+// perf-r18y: GND_fars reads g from _G[0] and writes the result there (no boxed double in / out); the leaf range test is done here so out-of-range leaves cost no call
+function GND_far(x,z,g){_G[0]=g;GND_fars(x,z);return _G[0]}
+function GND_fars(x,z){const g=_G[0];let r=null;for(let gi=0;gi<GND_L.length;gi++){const G=GND_L[gi],ci=Math.floor((x-G.x0)/G.dx),cj=Math.floor((z-G.z0)/G.dz);if(ci<0||cj<0||ci>=G.nx||cj>=G.nz)continue;const q=GND_in(G,x,z,_gfQ);if(q===undefined)continue;let y=g;
   if(q&&q.L[q.k+8]){const L=q.L,k=q.k,w=L[k+2],h=L[k+3],qu=q.u,qv=q.v,m=GND_tri(L,k,qu,qv);let f=1;
     f=GND_edge(G,x,z,qu*w,-1,0,f);f=GND_edge(G,x,z,(1-qu)*w,1,0,f);f=GND_edge(G,x,z,qv*h,0,-1,f);f=GND_edge(G,x,z,(1-qv)*h,0,1,f);
     y=g+(m-g)*f}
-  r=r===null?y:Math.max(r,y)}return r===null?g:r}
+  r=r===null?y:Math.max(r,y)}_G[0]=r===null?g:r}
 // boot-3: gndGen = gndBuild as a generator. With o.near (()=>[x,z]) the cells run tile by tile, nearest tile first, one yield per cell, and each
 // tile's meshes are added as soon as its last cell is done (same groups as the one-shot build: a group never spans tiles). GND_L cells stay
 // undefined until built, so GND_far falls back to the analytic ground there. gndBuild runs it to the end (unchanged order and output).
