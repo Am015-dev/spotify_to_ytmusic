@@ -63,7 +63,7 @@ const BOT = ({ n, mode, MAXT, off }) => {
     const bn = Math.floor(m.bpos()); if (bn !== lastBeat) { lastBeat = bn; m.press('Fire'); }
     m.step(dt); i++; if (m.G.dead) break; if (m.ST.over) { cleared = true; break; }
   }
-  const G = m.G, r = { n, mode, clear: cleared, t: +G.t.toFixed(0), score: G.score, kills: G.kills, hits: m.ST.hits, gz: window.RWD ? RWD.stat.graze : 0, tier: window.RWD ? RWD.stat.maxTier : 0, close: window.RWD ? RWD.stat.close : 0, pb: window.RWD ? RWD.stat.pb : 0, bold: window.RWD ? RWD.stat.bold : 0 };
+  const G = m.G, r = { n, mode, clear: cleared, t: +G.t.toFixed(0), score: G.score, scoreOk: Number.isFinite(G.score), kills: G.kills, hits: m.ST.hits, gz: window.RWD ? RWD.stat.graze : 0, tier: window.RWD ? RWD.stat.maxTier : 0, close: window.RWD ? RWD.stat.close : 0, pb: window.RWD ? RWD.stat.pb : 0, bold: window.RWD ? RWD.stat.bold : 0 };
   m.abort(); return r;
 };
 (async () => {
@@ -78,9 +78,10 @@ const BOT = ({ n, mode, MAXT, off }) => {
   for (const n of STAGES) for (let k = 0; k < RUNS; k++) jobs.push({ n, mode: 'dodge', MAXT, off: true, tag: 'dodge-off' });
   const res = []; let next = 0;
   await Promise.all(Array.from({ length: PAR }, async () => { const p = await mk(); while (next < jobs.length) { const j = jobs[next++]; try { const r = await p.evaluate(BOT, j); r.mode = j.tag || r.mode; res.push(r); } catch (e) { console.log('RUN ERROR', JSON.stringify(j), e.message.slice(0, 120)); } await p.reload(); await p.waitForFunction(() => window.__mnr, null, { timeout: 8000 }).catch(() => { }); } await p.close(); }));
-  const agg = {}; for (const r of res) { const a = agg[r.mode] = agg[r.mode] || { n: 0, cl: 0, sc: 0, k: 0, h: 0, gz: 0, t: 0, tier: 0 }; a.n++; a.cl += r.clear ? 1 : 0; a.sc += r.score; a.k += r.kills; a.h += r.hits; a.gz += r.gz; a.t += r.t; a.tier = Math.max(a.tier, r.tier); }
-  for (const m in agg) { const a = agg[m]; console.log('REPORT ' + m.padEnd(9) + ' runs ' + a.n + ' clear ' + Math.round(100 * a.cl / a.n) + '% score ' + Math.round(a.sc / a.n) + ' kills ' + Math.round(a.k / a.n) + ' hits ' + (a.h / a.n).toFixed(1) + ' grazes ' + Math.round(a.gz / a.n) + ' maxChain x' + a.tier + ' t ' + Math.round(a.t / a.n)); }
-  const g = (m, k) => agg[m] ? agg[m][k] / agg[m].n : 0, cl = m => g(m, 'cl');
+  // score: only finite scores are averaged (ns counts them); a run whose page gave no score is printed, not folded in as NaN
+  const agg = {}; for (const r of res) { const a = agg[r.mode] = agg[r.mode] || { n: 0, ns: 0, cl: 0, sc: 0, k: 0, h: 0, gz: 0, t: 0, tier: 0 }; a.n++; a.cl += r.clear ? 1 : 0; if (r.scoreOk) { a.sc += r.score; a.ns++; } else console.log('NOSCORE ' + JSON.stringify(r).slice(0, 200)); a.k += r.kills; a.h += r.hits; a.gz += r.gz; a.t += r.t; a.tier = Math.max(a.tier, r.tier); }
+  for (const m in agg) { const a = agg[m]; console.log('REPORT ' + m.padEnd(9) + ' runs ' + a.n + ' clear ' + Math.round(100 * a.cl / a.n) + '% score ' + (a.ns ? Math.round(a.sc / a.ns) : 'n/a') + (a.ns < a.n ? ' (' + (a.n - a.ns) + ' run(s) without score)' : '') + ' kills ' + Math.round(a.k / a.n) + ' hits ' + (a.h / a.n).toFixed(1) + ' grazes ' + Math.round(a.gz / a.n) + ' maxChain x' + a.tier + ' t ' + Math.round(a.t / a.n)); }
+  const g = (m, k) => agg[m] ? agg[m][k] / (k === 'sc' ? agg[m].ns || 1 : agg[m].n) : 0, cl = m => g(m, 'cl');
   const chk = (n, c) => { console.log((c ? 'PASS ' : 'FAIL ') + n); if (!c) fails++; };
   chk('bold bot scores more than camping bot', g('bold', 'sc') > g('camp', 'sc'));
   chk('bold bot clears at least as often as camping bot', cl('bold') >= cl('camp'));
