@@ -488,7 +488,7 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
    return fin(`zip ${zipped?'ok':'FAILED'} dropped ${nulled} restored-identical ${same}`)+' → '+(ok?'✅ PASS':'❌ FAIL')})})}}))}return}
  if(i<600)setTimeout(()=>MQ_reg(i+1),100)})(0);
 (function R17_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='r17'&&q.id==='start-life')){C.items.push({ver:'r17',id:'start-life',area:'life',text:'r17 · a lively start in both cities: 📍 GO reads the start state the seed left under the curtain. Pass line: ≥ 2 traffic cars 40–120 m ahead on the player\'s road, ≥ 2 of them inside the camera frustum, and the start view\'s top-left region (behind the pause button and minimap) is open: ≥ 90 % in Frankfurt (≥ 80 % in Athens, where a low yellow facade stays in view at 82 %, unchanged) of a 96-pixel grid is not a warm building facade (Frankfurt starts facing the other way on the same road, 40 m back, so the yellow tower is out of view). The seed itself took ≤ 10 ms.'});
- const go=city=>({c:city,n:city+' lively start',secs:2,fn:()=>{const R=[],s=R17.st,h=R17.home;
+ const go=city=>({c:city,n:city+' lively start',secs:15,fn:()=>{const R=[],s=R17.st,h=R17.home;
   R.push(['seeded '+(s?s.n:'none')+' cars, ahead '+(s?s.ahead:'-')+' at boot (seed '+R17.ms+' ms)',!!s&&s.ahead>=2&&R17.ms<=10]);
   
   {if(h&&Math.hypot(RO.x-h[0],RO.z-h[1])>15){RO.x=h[0];RO.z=h[1];RO.h=RO.vh=h[2];RO.y=groundAt(RO.x,RO.z,RO.y);const sn=camSnap;camSnap=true;roamCam(1/60);camSnap=sn}   /* GO after a drive: back to the start pose */
