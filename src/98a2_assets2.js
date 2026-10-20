@@ -2,10 +2,10 @@
 // merged into ONE vertex-coloured geometry per prop and drawn instanced with ONE shared material. Alex: "more variety on assets (city, race)".
 // Catalogue = A2_DEF below (data table: id, name, category, city tag, collider kind, parts); docs/ASSET_CATALOGUE.md is generated from window.__a2.table().
 // Limits (GO assets/catalogue): <= 400 triangles, <= 3 palette colours per prop, one shared material. All brick-built by us: no external licence.
-// Placement is OFF unless ?assets2=1 (the coordinator flips the default after review): roam = kerb slots like 98la_ath_dress (Athens set only
+// Placement is ON by default after review #9 (?assets2=0 turns it off): roam = kerb slots like 98la_ath_dress (Athens set only
 // Athens/both-tagged props, Frankfurt set only Frankfurt/both), <= A2.K instanced draws; race = every prop baked into ONE static mesh per track (1 draw).
 // Colliders: roam solids get a plain push-out here; the box/radius recorded in the table is what the collision lane wires.
-const A2={on:/[?&]assets2=1\b/.test(location.search),K:5,R:115,mat:null,G:null,T:null,M:null,C:new Map(),occ:new Set(),fr:0,px:1e9,pz:1e9,grp:null,n:{},race:null};
+const A2={on:!/[?&]assets2=0\b/.test(location.search),K:5,R:115,mat:null,G:null,T:null,M:null,C:new Map(),occ:new Set(),fr:0,px:1e9,pz:1e9,grp:null,n:{},race:null};
 const A2_PAL={w:'#F4F4F4',st:'#A0A5A9',k:'#1B2A34',tc:'#B8552B',wd:'#8A5A32',ol:'#6F7F3A',ol2:'#A3AE5E',lg:'#00852B',dg:'#00451A',pn:'#2F6B3A',ag:'#5E8F7A',mg:'#C2307E',bl:'#0D5EAF',y:'#FAC80A',r:'#B40000',o:'#E8761C',
  tn:'#D7BA8C',cc:'#9AA0A3',tb:'#4A2E1A',cr:'#EFE3C8',tk:'#7A6B5A',mb:'#E9E4D8',gr:'#58AB41',bz:'#7C8FB0'};
 // part helpers: y = base of the part (centre for rotated parts is the centre of the unrotated part); r = [rx,ry,rz] ('YXZ')
@@ -140,7 +140,7 @@ function A2_scan(){if(!HUB.nodes||!HUB.nodes.length)return null;const save=[A2.C
  A2.C=save[0];A2.occ=save[1];A2.px=1e9;return{n,cells:cells.size,kinds,bad}}
 window.__a2={parks:()=>PARKS.map(R=>[R.name,Math.round(R.x0),Math.round(R.x1),Math.round(R.z0),Math.round(R.z1)]),verge:A2_verge,scan:A2_scan,info:()=>({calls:renderer.info.render.calls,tris:renderer.info.render.triangles,vis:Object.values(A2.M||{}).filter(q=>q.visible).length,inst:Object.values(A2.M||{}).reduce((s,q)=>s+q.count,0)}),sheet:A2_sheet,state:A2,def:A2_DEF,pool:A2_POOL,table:A2_table,geos:A2_geos,pal:A2_PAL,hash:()=>A2.on?1:0};
 // ---- GO assets/catalogue: state asserts only (no graphics, no play). Pass line: every prop <= 400 tris, <= 3 palette colours, 1 shared material, box + city tag + collider kind recorded,
-// Athens pool = Athens/both tags only (no palm), Frankfurt pool = Frankfurt/both only, placement hook off unless ?assets2=1.
+// Athens pool = Athens/both tags only (no palm), Frankfurt pool = Frankfurt/both only, placement hook on by default (?assets2=0 off).
 (function A2_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='assets2'&&q.id==='catalogue')){
  C.items.push({ver:'assets2',id:'catalogue',area:'world',text:'assets-r21p · prop catalogue (docs/ASSET_CATALOGUE.md): 📍 GO checks all 29 part-list props (no graphics). Pass line: every prop ≤ 400 triangles, ≤ 3 palette colours, 1 shared material, box + city tag + collider kind set; the Athens set has only Athens/both props and no palm; the Frankfurt set only Frankfurt/both; placement is off unless ?assets2=1.'});
  C.items.push({ver:'assets2',id:'scan',area:'world',text:'assets-r21p · props stay off the road (review fix): 📍 GO generates every placed prop of the whole city (no graphics). Pass line: 0 props on a carriageway, within 6 m of a park/slipway or at an open verge (nothing solid 30 m behind the kerb) (street graph + Athens streets, fill, autobahn) and ≥ 6 prop kinds placed in Athens / ≥ 3 in Frankfurt.'});
