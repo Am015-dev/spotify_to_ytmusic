@@ -47,3 +47,20 @@ Source: every `OD <n>` session from 14 Oct 09:00 to 20 Oct 06:19 (320 sessions, 
 4. **Sonnet by default.** Opus only for a design lane or after two Sonnet misses on a reproduced bug. No Haiku on fixes.
 5. **Coordinator stays small.** Hand off to a fresh coordinator at 200k context.
 6. **This ledger is updated at every deploy.** Each row is a lane, its cost and its outcome.
+
+## Lane log (OD 315–325)
+Model and status come from the session list. Cost is blank: the session list does not report it. Status for OD 315–319 is the outcome from `docs/COST_SESSIONS.csv`. For OD 320–325 it is the session state when this log was written.
+
+| Lane | OD | Model | Purpose | Status |
+|---|---|---|---|---|
+| ios-r20b | 315 | Sonnet | Touch first minute: no frame > 50 ms (Athens mid-minute GC) | no fix (completed) |
+| perf-r20c | 316 | Sonnet | Athens PC boot longest gap ≤ 1.17 s (pc-boot-lt) | no fix (completed) |
+| test-r20d | 317 | Sonnet | Make flaky gates read the same solo and in the suite | no fix (completed) |
+| ios-r20e | 318 | Opus | Frankfurt touch heap growth steady ≤ +25 MB / 30 s (Opus retry) | no fix (completed) |
+| ios-r20f | 319 | Opus | REAL iPhone 17: freeze in the first 2 s after the city appears | no fix (completed) |
+| telemetry-r20g | 320 | Sonnet | Automatic perf and crash reports from real phone sessions | working at log time |
+| boot-r20h | 321 | Sonnet | iPhone boot 12 s → budget (throttled iPhone-like lab) | working at log time |
+| bot-r20i | 322 | Sonnet | Automated bot playtester (laps, races, stuck and fall-through checks) | working at log time |
+| golden-r20j | 323 | Sonnet | Golden-screenshot regression (portrait and landscape, both cities) | working at log time |
+| review-r20k | 324 | Opus | Industry-benchmark feel review against LEGO 2K Drive and Forza Horizon | working at log time |
+| chores-r20l | 325 | Haiku | Branch cleanup, ledger rows, fix-lane brief template (mechanical) | in progress (this lane) |
