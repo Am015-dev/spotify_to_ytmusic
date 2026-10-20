@@ -79,3 +79,10 @@ The range is for a Normal-difficulty, mid-build player unless stated.
 - The audit bot dodges and dashes at a bullet; it is not a skilled player. Numbers that depend on skill (S22, S23, S24) are lower bounds on difficulty.
 - S01 is dominated by the shortest-lived kind (`lifeByKind` in the json names it).
 - Review the standards once per quarter: each time a source gives a number, replace the (est.) range.
+
+## 7. Audit fixes (measurement only, 20 Oct 2026, head d690123)
+- S20 (EMP per minute): the audit bot now presses EMP when 4+ enemy bullets are within 200 px (humanbot.js rule, radius 200). Full run: 2.22/min, now above the 0.3-1.5 band (the bot is too eager). Read as a finding for the bot, not as a game result. Not tuned here.
+- S27 (choice points): the audit sets `SH.live` before a story run so a stage end reaches the pit stop (`SH.pit`). Still 0 pit stops in 14.4 game-min of sim, so the pit stop does not fire in the sim even with that set. Recorded as SKIP. Card screens are counted per 10 game-min as `cardScreensPer10Min` once a pit fires (needs the choices flag on). Not diagnosed further; the cause is in the stage-end / shop path.
+- S30 (ability value): the abil-test "stationary DASH/EMP spam bot" over three runs: with abilities 0% / 0% / 0%, without 0% / 0% / 33%. Median 0% with, 0% without. The gate (S30) itself is the counter-test hull ratio, not this clear rate; its 0.5x FAIL is the noisy edge the S30 note already flagged.
+- S31 (weapon spread): per-weapon median on-screen life at LV10 (visible-test ALL=1), the spread is worst weapon vs median of all weapons. Table (median s, all = 3.08): storm 3.90 (worst, +27%), mine 3.45, arc 3.43, orbit 3.42, rail 3.38, drone 3.38, frost 3.37, flame 3.23, well 3.23, beat 3.07, laser 3.03, wave 2.97, disc 2.92, swarm 2.90, shell 2.73, pulse 2.68. FAIL 0.27 against the 15% target.
+- The audit bot's storm and mine runs make the largest gap; use the table to pick which weapon to tune first.

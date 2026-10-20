@@ -1,5 +1,10 @@
 # Handoff: start a new session from this file
 
+## Nightrun HARD wall (W54, 20 Oct 2026): cause = the stage-5 boss fight, not grit/heat/timing
+- Bisect (timing-test Hard st5 mid, beat bot, n=8-12): baseline 0-13%. `&grit=0 &anticamp=0 &flankers=0 &react=0 &strike2=0 &density=0 &novelty=0 &vis=0` all stay 0%; `&bossplay=0` and `&bossmoves=0` give 58% (n=12). The bot reaches the boss at t=126 with 4-11 hits and dies 30-60 s later with the boss at 50-95% (a bot that ignores the gates fights ~2x longer; pre-boss hit rate ~1 per 15 s, in the boss ~1 per 6 s).
+- Tried (Hard only, via PRE): BMV.DK.hard 1.0, BPL.PT.hard 45, BPL.FB 3/FBW 14, LEAK .4/.55: no effect (0-13%). Hard boss mercy (grit.js GRIT.mcH/mcHMax, flag `?gritboss=1`, OFF): .5 x 3 hits 0%, .5 x 6 17%, .6 x 8 25%; plus PT 30 / FB 3 / LEAK .55 33%. Target 50% NOT reached; the lever that works is bossplay's shield slog (W53's file), so no default change was made.
+- timing-test.js knobs: `Q='&flag=0'` (bot pages), `HMODES=beat`, `MODES=` (skip Normal bots), `PRE='GRIT.x=1;BPL.y=2'` (eval before the run), REPORT=1 prints boss start, hits at boss, boss hp at death.
+- Next: W53 should let a dodge-only bot finish a Hard boss (gate-ignoring should cost ~1.4x time, measured 2x+), then re-run the Hard mid gate.
 ## Nightrun HUMAN BOT + visibility floors x1.3 (W32, flag RET.grit, ?grit=0 = old, 20 Oct 2026)
 - `nightrun/humanbot.js`: human-model bot (view 180-200 ms old, bullets only within 260 px ahead, 10% missed dodges per threat episode, steering noise, dash on 40% of threats, EMP at 4+ bullets within 150 px, manual aim with error, 1 s lapse about every 30 s) next to the oracle dodger; builds fresh / mid / late / owner (PULSE 3 + SWARM 10); prints clear %, hits, median on-screen life per kind (REPORT lines always). env: BOTS BUILDS STAGES RUNS PRE='GRIT.fk0=1.2' HP='{"miss":.15}' Q='&grit=0'.
 - Calibration: human clears Normal stage 3 at 96 / 75-88 / 92-100% (fresh / mid / late). Delay below 150 ms or no miss rolls makes it 100%; every ablation moves it 10-20 points (n=12-24 noise +-15).

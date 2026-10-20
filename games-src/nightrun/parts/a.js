@@ -101,7 +101,13 @@ const bpos=ts=>(audible(ts)-BT.t0-BT.off)/BT.spb;       // beats since beat 0
 const WINS={tight:70,normal:110,loose:160};
 const winMs=()=>(WINS[SET.win]||110)+NR.mod.win+RET.asWinMs();         // half-width of the on-beat window in ms
 function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:(SET.all||Math.abs(dt)<=winMs())&&p>-.3,dt,beat:n};}
-const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beats at the current tempo
+/* fire-timing jitter (owner 20 Oct 2026: enemies "very predictable"): the refire interval (whole beats, as before) is x(0.7..1.3), 5% of volleys are skipped (x2) and 5% doubled (x0.5, never under 2 beats);
+   fractions of a beat are rounded up or down by chance, and K keeps the mean shot rate (checked +-1% for 2..8 beats), so the shots per stage stay put. Private stream seeded by one GX draw per run object,
+   so daily / ?seed= runs stay reproducible. ?fjit=0 = the old fixed intervals. */
+const FJ={on:!/[?&]fjit=0/.test(location.search),g:null,r:null,K:1.06,
+  r0(){if(this.g!==G||!this.r){this.g=G;let a=(GX()*4294967296)>>>0||1;this.r=()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}return this.r;},
+  beats(n0){const r=this.r0(),u=r(),m=u<.05?2:u<.1?.5:(.7+.6*r())*this.K,x=n0*m,f=Math.floor(x);return Math.max(m===.5?2:1,f+(r()<x-f?1:0));}};
+const fireIn=s=>{const n0=Math.max(1,Math.round(s*BT.bpm/60));return FJ.on&&s>=.9?FJ.beats(n0):n0;};    // seconds -> whole beats at the current tempo (jittered, see FJ)
 
 /* ---------- tracks: streamed, never decoded ----------
    The mp3 file is downloaded once into a blob (3-5 MB, compressed) and given to the element, so seeking and looping never wait for the network and servers without Range support work.
