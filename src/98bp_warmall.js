@@ -93,9 +93,13 @@ TWG.wb=new URLSearchParams(location.search).get('twgwb')!=='0';TWG.wbMs=0;
 async function TWG_run(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)return;const t0=performance.now(),x=RO.x,z=RO.z,h=RO.h;TWG.run=1;const lo=LD.on;LD.on=false;   // frame() skips while LD.on; the #ld2 curtain itself stays up until roamLoad's ldHide
  const wb=TWG.wb&&typeof WB_cityBuild==='function'?WB_cityBuild(.99,.99).catch(e=>{WBC.err=String(e);if(e!=='WBabort')console.warn('TWG wb',e)}):null;
  try{for(let i=0;i<TWG.n;i++){RO.v=0;await nextFrame();TWG.nf++;const tm=performance.now();try{TWG_mini(40)}catch(e){console.warn('TWG mini',e)}TWG.mms+=performance.now()-tm}
+  /* ios-r17k: the first parked-car compaction pass (PC_add + PC_grid + the per-mesh pack, 100-180 ms in Athens at f85) runs here under the curtain, not in the first drivable second */
+  if(TWG.pcw&&typeof PC_step==='function'&&PC.on&&PC_gate()){const tp=performance.now();try{PC.rel=0;PC_step(1)}catch(e){console.warn('TWG pc',e)}TWG.pcMs=Math.round(performance.now()-tp)}
   LD.on=lo;if(wb){const tw=performance.now();await wb;TWG.wbMs=Math.round(performance.now()-tw)}for(let i=0;i<TWG.idle;i++)await new Promise(r=>setTimeout(r,50))}catch(e){console.warn('TWG',e)}finally{TWG.run=0;LD.on=lo;RO.x=x;RO.z=z;RO.h=h;RO.v=0;TWG.fr=0;TWG.mms=Math.round(TWG.mms);TWG.ms=Math.round(performance.now()-t0)}}
-{const r0=composer.render;composer.render=function(){if(TWG.run)return;return r0.apply(this,arguments)}}
-frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;return f(now)})(frame);
+TWG.jm=0;TWG.jf=-1;TWG.jn=0;TWG.rm=0;/* ios-r17k: JS ms (frame minus composer.render) of the first 120 drivable frames: max, its frame, frames measured */
+{const r0=composer.render;composer.render=function(){if(TWG.run)return;if(!(TWG.fr>=1&&TWG.fr<=120))return r0.apply(this,arguments);const t=performance.now();try{return r0.apply(this,arguments)}finally{TWG.rm+=performance.now()-t}}}
+frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;if(!(TWG.fr>=1&&TWG.fr<=120))return f(now);const t=performance.now();TWG.rm=0;try{return f(now)}finally{const d=performance.now()-t-TWG.rm;TWG.jn++;if(d>TWG.jm){TWG.jm=Math.round(d);TWG.jf=TWG.fr}}})(frame);
 {const _ls=lazyStep;lazyStep=function(){if(TWG.fr>=0&&TWG.fr<=TWG.lz){TWG.held++;return}return _ls.apply(this,arguments)}}
 // perf-r16b (review 2K-16 N2): hubTrafficStep time in the first 60 drivable frames (max ms, its frame, car count at f0 / f60), so GO perf/touch-first-frames reads the number tBoot reads (PF1HT).
+TWG.pcw=new URLSearchParams(location.search).get('twgpc')!=='0';TWG.pcMs=-1;TWG.pcB=TWG.pcw?10:0;TWG.pcF=300;/* ios-r17k: ?twgpc=0 = old behaviour */
 TWG.ht=0;TWG.htF=-1;TWG.htN=0;TWG.c0=-1;TWG.c60=-1;{const _ht=hubTrafficStep;hubTrafficStep=function(){if(!(TWG.fr>=0&&TWG.fr<=60))return _ht.apply(this,arguments);const t=performance.now();try{return _ht.apply(this,arguments)}finally{const d=performance.now()-t;TWG.htN++;if(d>TWG.ht){TWG.ht=Math.round(d);TWG.htF=TWG.fr}const n=HUB.cars?HUB.cars.length:0;if(TWG.c0<0)TWG.c0=n;TWG.c60=n}}}

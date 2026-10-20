@@ -351,6 +351,8 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
    if(TWG.on&&TWG.nf&&TWG.wb&&TUNE.wbCity)R.push(['far-street merge under the curtain: built '+(WBC.built===HUB.grp)+', waited '+TWG.wbMs+' ms, busy '+WBC.busy,WBC.built===HUB.grp&&!WBC.busy&&TWG.wbMs<8000]);
    /* perf-r16b: after a full boot with the gate (tBoot path), no hubTrafficStep over 40 ms in the first 60 drivable frames (review 2K-16 N2: 95/52/61 ms at f9-f11); the quick test start skips the gate, so there it is info */
    if(TWG.htN)R.push(['hubTrafficStep f0-60: max '+TWG.ht+' ms at f'+TWG.htF+' ('+TWG.htN+' steps, cars '+TWG.c0+' → '+TWG.c60+')'+(TWG.nf?'':' (info: gate did not run)'),!TWG.nf||TWG.htN<55||TWG.ht<=40]);
+   /* ios-r17k: JS max (frame minus render) over the first 120 drivable frames <= 50 ms after a full boot with the gate (both cities; first parked-car compaction pass runs under the curtain, then 10 ms slices); the quick start has no gate / no frames, so it is info there */
+   R.push(['JS max f0-f119: '+TWG.jm+' ms at f'+TWG.jf+' ('+TWG.jn+' frames), compaction prewarm '+TWG.pcMs+' ms'+(TWG.nf&&TWG.jn>=110?'':' (info: gate/frames did not run)'),!(TWG.nf&&TWG.jn>=110)||TWG.jm<=50]);
    if(TWG.on)R.push(['minimap: callCap '+TUNE.callCap+', '+TWG.mm+' tiles under the curtain in '+TWG.mms+' ms (cap '+TWG.mb+'), '+TWG.mq+' left',!!TUNE.callCap&&TWG.mms<=TWG.mb+60&&(CID!=='ath'||!SM_ON||!TWG.nf||TWG.mm>0)])}
   catch(e){R.push(['threw '+e,false])}finally{TWG.fr=f0}
   const ok=R.every(r=>r[1]);return`📍 TOUCH WARM GATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}

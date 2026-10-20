@@ -476,3 +476,10 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Heap at ready→after-roam (touch, lowmem, GC'd, GO perf/ios-mem): fra 388/405 → 381/399 (gq+trq) → 378/397 (+zfar); ath 539/557 → 518/536 → 519/542. zfar gain is ~0-3 MB within 60 s (few chunks are off yet); it grows with roaming.
 4. GO perf/mem-quant (both cities): errors ≤ 1 cm, 0 holes, a chunk round-trips byte-identical. 250 MB budget still unmet (fra -10, ath -20 total).
 5. Left: TR_h freeze after the last grade pass; zfar numbers after a 5-min roam.
+
+## ios-r17k (2026-10-20): touch first 120 frames JS max (review 2K-16) · first parked-car compaction pass moved under the curtain
+1. Owner (tBoot lowmem SECS=2, JS = frame minus render, f0-f119): Athens 107-197 ms in 6 of 8 runs, always the first PC_step pass at ~f85 (PC_add + PC_grid 50-84 + per-mesh pack, 104-133 ms) inside hubCullStep/hubTrafficStep; Frankfurt 111 once (hubTrafficStep-self + DEST_find 23-65).
+2. Change: TWG_run (src/98bp_warmall.js) runs PC_step(1) behind the curtain (?twgpc=0 = off), and PC_step stops a pass after 10 ms (TWG.pcB) while TWG.fr ≤ 300 (src/98pc_compact.js). Same traffic and life; no spawn change. TWG.jm/jf/jn = in-game JS max over f1-f120.
+3. After (4 runs, 2/city): Athens 47, 38 ms (was 107-197); Frankfurt 50, 40 (was 111, 86-194 earlier). A loaded box still gives one 56-100 ms frame in ~1 of 3 runs (hubTrafficStep-self with no named sub = GC; DEST_find 11-65; LV_step 109 once at f10).
+4. GO perf/touch-first-frames: new line "JS max f0-f119 <= 50 ms", asserted only when the gate and >= 110 frames ran (full boot), info on the quick start. In-game jm showed 63-68 ms at f1 in 2 of 4 runs (not seen by tBoot, cause not found; the GO would fail on such a boot).
+5. Next: f1 outlier; DEST_find first-use cost; the unnamed GC share in hubTrafficStep-self. Tests: unit 0 FAIL; perf/touch-first-frames,life1 8/8; sky-blue,sky-blue-frame,life1,xf1,terrain,phone2 47/47 on the built page.
