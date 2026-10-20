@@ -7989,7 +7989,7 @@ NR.on('runStart',()=>RX.reset());
 NR.on('spawn',e=>{if(!RX.on||!G.live||G.tut||G.lab||e.zt||e.gnd||e.wpt||e.mini)return;
   if(!['drone','flank','turret','gunship'].includes(e.type))return;
   let st=RX.pick(e);if(e.fp&&(st==='retreat'||st==='press'))st=RX.rng()<.5?'hunt':'bait';   // formation units keep their path: fire brains only
-  e.rx={fx:!!e.fp,st,c:RX.per(e)*RX.r(.45,1)*RX.jit(),tl:0,hold:0,rt:0,dv:0,sl:0,ty:null,mate:null,role:null,sq:null,enr:0,vw:-9};
+  e.rx={fx:!!e.fp,st,c:RX.r(.2,.8),tl:0,hold:0,rt:0,dv:0,sl:0,ty:null,mate:null,role:null,sq:null,enr:0,vw:-9};
   Object.defineProperty(e,'bf',{get:()=>1e9,set(){},configurable:true});e.arm=false;   // the old beat timer never fires this one
  if(e.type==='drone'||e.type==='gunship'){e.amp=0;}
   if(st==='window'){e.rxA=1;}
@@ -8000,10 +8000,12 @@ RX.mvY=function(e,ty,v,dt){ty=clamp(ty,40,H-40);const d=clamp(ty-e.y,-v*dt,v*dt)
 RX.far=(x,y,r)=>Math.hypot(x-P.x,y-P.y)>(r||130);
 RX.canShoot=e=>e.x<W-30&&e.x>P.x+60&&e.y>14&&e.y<H-14&&Math.hypot(e.x-P.x,e.y-P.y)>minShot(160);
 /* squads: the enemies spawned on one frame */
-RX.squad=function(g){if(this.easy()||g.length<2)return;const s={m:g.slice(),ld:null,t:0};this.sq.push(s);for(const e of g)e.rx.sq=s;
+RX.squad=function(g){if(this.easy()||!g.length)return;if(g.length<2&&!(g[0].type==='turret'||g[0].type==='gunship'))return;const s={m:g.slice(),ld:null,t:0};this.sq.push(s);for(const e of g)e.rx.sq=s;
   const gun=g.find(e=>e.type==='turret'||e.type==='gunship'),sm=g.filter(e=>e.type==='drone'||e.type==='flank');
-  if(gun&&sm.length&&this.rng()<.6){const b=sm[0];b.rx.role='bear';b.rx.mate=gun;gun.rx.cov=b;b.rx.st='cover';this.stat.cover++;}
+  if(gun&&this.rng()<.6){const b=sm[0]||G.en.find(x=>x.rx&&!x.rx.role&&!x.rx.fx&&(x.type==='drone'||x.type==='flank')&&this.ok(x)&&Math.hypot(x.x-gun.x,x.y-gun.y)<400);   // a drone already on screen can be recruited
+    if(b&&!b.rx.fx){b.rx.role='bear';b.rx.mate=gun;gun.rx.cov=b;b.rx.st='cover';this.stat.cover++;}}
   const fr=sm.filter(e=>!e.rx.role);
+
   if(fr.length>=2&&this.rng()<.6){const[a,b]=fr;a.rx.role='pin';b.rx.role='exit';a.rx.mate=b;b.rx.mate=a;b.rx.c=a.rx.c;a.rx.st=b.rx.st='hunt';this.stat.pin++;this.stat.exit++;}
   if(g.length>=3&&this.rng()<.6){const l=g.find(e=>!e.rx.role)||g[0];s.ld=l;l.rx.ld=1;l.hp=l.max=Math.round(l.max*1.5);this.stat.leader++;}};
 /* the fire itself: through eb(), so caps hold */
@@ -8024,7 +8026,7 @@ NR.on('tick',dt=>{if(!RX.on||!G.live||G.dead||G.tut||G.lab)return;
   if(RX.pend.length){const g=RX.pend.filter(e=>RX.ok(e));RX.pend=[];RX.squad(g);}
   RX.fav+=(P.y-RX.fav)*Math.min(1,dt/4);
   const enr=e=>e.rx.enr>0?1.6:1;let telling=0;for(const e of G.en)if(e.rx&&e.rx.tl>0)telling++;
-  const tmax=RX.easy()?2:RX.hard()?4:3;
+  const tmax=RX.easy()?3:RX.hard()?6:4;
   for(const e of G.en){const r=e.rx;if(!r||e.dead||e.hp<=0)continue;if(e.type!=='drone'&&e.type!=='gunship'&&e.type!=='turret'&&e.type!=='flank')continue;
     r.enr=Math.max(0,r.enr-dt);if(r.role==='exit'&&!RX.ok(r.mate))r.role=null;
     /* leader down: the squad enrages */
@@ -8074,6 +8076,7 @@ RX.over=function(t){if(!RX.on||!running)return;const mo=RET.motion?RET.motion():
     if(r.enr>0){ctx.strokeStyle=mo&&Math.sin(t*20)>0?'#ff3d6a':'rgba(255,61,106,.6)';ctx.beginPath();ctx.arc(e.x,e.y,e.r+2,0,6.283);ctx.stroke();}}
   ctx.restore();};
 {const dp=drawPickups;drawPickups=function(t){dp(t);try{RX.over(t);}catch(err){}};}
+RX.spawn=(t,o)=>en(t,o);   // test hook (react-test)
 
 /* ---------- boss fights that last = parts/armour.js (flag RET.boss2; ?boss2=0 = the fights before it). BALANCE.md "Boss fights, round 4". ----------
    Owner, 17 Oct 2026: "Legend is still easy ... boss fights are still short", "even boss I can beat in seconds".

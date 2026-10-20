@@ -17,8 +17,9 @@ const TRACE = (o) => {
   const G = m.G, P = m.P, dt = 1 / 60, ys = [], fires = [], spawns = []; let i = 0, nb = 0, maxEb = 0, maxV = 0, minGap = 1e9, gaps = 0;
   const cap = typeof ebCap === 'function' ? ebCap() : 25;
   while (m.running && G.t < o.T) {
-    if (m.SH.active) m.SH.close(); P.hp = Math.max(P.hp, 3); P.inv = 9;
+    if (m.SH.active) m.SH.close(); P.hp = 99;
     m.touchTo((o.fx || 220) + 60 * Math.sin(G.t * .7), 270 + 170 * Math.sin(G.t * 1.1)); if (i % 20 === 0) m.press('Fire');
+    if (o.pair && i % 300 === 150) { RX.spawn('turret', { y: 160 + 200 * Math.random(), stop: 760 }); RX.spawn('drone', { x: 1000, y: 300 }); }   // a gunner + a drone on one frame (bearer squad)
     const n0 = G.eb.length; m.step(dt); i++;
     if (G.eb.length > n0) fires.push(+G.t.toFixed(2));
     maxEb = Math.max(maxEb, G.eb.length); for (const b of G.eb) if (b.rxb) maxV = Math.max(maxV, Math.hypot(b.vx, b.vy));
@@ -37,6 +38,7 @@ const BOT = (o) => {
       for (const b of G.eb) { const px = b.x + b.vx * .14, py = b.y + b.vy * .14, d = Math.hypot(px - cx, py - cy); if (d < 70) c += (70 - d) * (70 - d) * (d < 26 ? 30 : 1); }
       if (G.boss && G.boss.lasers) for (const l of G.boss.lasers) { const vx = Math.cos(l.a), vy = Math.sin(l.a), px = cx - l.x, py = cy - l.y; if (px * vx + py * vy > -20) { const dl = Math.abs(px * vy - py * vx); if (dl < 50) c += (50 - dl) * 80; } }
       for (const e of G.en) { if (e.type === 'gate') { if (Math.abs(e.x - cx) < 60 && (cy < e.gy - e.gap / 2 + 12 || cy > e.gy + e.gap / 2 - 12)) c += 3000; continue; } const d = Math.hypot(e.x - cx, e.y - cy); if (d < e.r + 50) c += (e.r + 50 - d) * 60; if (e.rx && e.rx.tl > 0 && e.rx.kind === 'dive') { const d2 = Math.hypot(e.rx.lx - cx, e.rx.ly - cy); if (d2 < 60) c += (60 - d2) * 40; } }
+      if (window.MM && MM.col) c += MM.cost(cx);   // the column strike (fair.js, must move), as story-sim sees it
       c += Math.abs(cy - ty) * .6 + Math.abs(cx - tx) * .15 + Math.hypot(ix, iy) * 4; if (c < bc) { bc = c; bx = cx; by = cy; } }
     return { bx, by }; };
   let i = 0, lastBeat = -1, tapAt = -1, d = null, cleared = false;
@@ -69,7 +71,7 @@ const BOT = (o) => {
   // (b) + (c)
   const acts = {}, st = {}; let caps = true, minGap = 1e9, minTell = 9, gaps = 0;
   const all = res[''].slice();
-  for (const s of ['hunt', 'feint', 'retreat', 'press', 'bait', 'window']) { const p = await open(U('&rxs=' + s), true); const r = await p.evaluate(TRACE, { n: s === 'window' ? 12 : 7, seed: 77, T: 60, rs: 5, fx: s === 'retreat' ? 520 : 0 }); all.push(r); acts[s] = r.rx ? r.rx.act[s] : 0; await p.close(); }
+  for (const s of ['hunt', 'feint', 'retreat', 'press', 'bait', 'window']) { const p = await open(U('&rxs=' + s), true); const r = await p.evaluate(TRACE, { n: s === 'window' ? 12 : 7, seed: 77, T: 60, rs: 5, fx: s === 'retreat' ? 520 : 0, pair: s === 'hunt' }); all.push(r); acts[s] = r.rx ? r.rx.act[s] : 0; await p.close(); }
   for (const r of all) { if (!r.rx) continue; for (const k in r.rx.stat) st[k] = (st[k] || 0) + (k === 'minTell' ? 0 : r.rx.stat[k]); minTell = Math.min(minTell, r.rx.stat.minTell); if (r.maxEb > r.cap || r.maxV > 401) caps = false; minGap = Math.min(minGap, r.minGap); gaps += r.gaps; }
   console.log('  state actions (forced): ' + JSON.stringify(acts) + '  squads: pin ' + st.pin + ' leader ' + st.leader + ' enrage ' + st.enrage + ' cover ' + st.cover + ' blocks ' + st.block);
   for (const s in acts) ok(acts[s] > 0, `(b) state ${s.toUpperCase()} acts in its scenario (${+(+acts[s]).toFixed(1)})`);
