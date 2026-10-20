@@ -31,7 +31,7 @@ const FM=window.FM={GAP:130,L:{},TEL:[],cur:null,
     if(pf){f=mir?(t,q)=>{const p=pf(t,q);return [p[0],H-p[1]];}:pf;const p=f(Math.max(0,pt0),null);x=p[0];y=p[1];}else y=fy(y);
     const opt=Object.assign({x,y,amp:0},o);delete opt.pt;delete opt.keep;
     if(k!==kind&&kind!=='drone'){delete opt.r;delete opt.hp;}
-    const zk=!!(Z&&RET.zoo&&Z.T[k]&&k!=='zdrn');const e=zk?Z.mk(k,opt):en(k,opt);
+    const zk=!!(Z&&RET.zoo&&Z.T[k]&&k!=='zdrn');let e;if(window.VAR)VAR.st.fm++;try{e=zk?Z.mk(k,opt):en(k,opt);}finally{if(window.VAR)VAR.st.fm--;}
     e.fid=I.id||'';if(k==='gate'||k==='turret'||k==='gunship'||k==='charger'||k==='carrier'||k==='bomber'||k==='minelayer'||k==='sniper'||k==='kamikaze')f=null;   // these keep their own AI
     if(I.el&&!e.el&&(k==='drone'||k==='flank')){e.el=1;e.hp=Math.round(e.hp*2);e.max=e.hp;e.r=Math.round(e.r*1.25);e.score*=2;}
     if(f){e.pth=f;e.fp=1;e.pt=pt0;e.tk=(I.tk||1)*(I.r?1.12:1)*this.tk();const p=f(Math.max(0,pt0),e);e.ox=e.x-p[0];

@@ -17,7 +17,7 @@ const FIGHT = ({ n, diff }) => {   // a weaving god ship, 1e6 damage a frame (ar
   let free = 1e9, id = null, drawn = 0, err = '';
   for (let i = 0; i < 400 * 60 && m.running; i++) { if (m.SH.active) m.SH.close(); m.touchTo(200 + 60 * Math.sin(i / 140), 270 + 190 * Math.sin(i / 90));
     const e = m.G.boss; if (e && e.x < 940) e.hp -= 1e6; m.step(1 / 60); const b = m.G.boss; if (b && b.bm) id = b.bm.id;
-    if (b && b.bm && i % 8 === 0 && B.hz.some(z => !z.mk && m.G.t >= z.on && m.G.t < z.off)) { const x1 = b.x - b.r - 24; let best = -1e9; for (let x = 30; x <= x1; x += 20) for (let y = 20; y <= 520; y += 15) { const c = B.clear(x, y, 0); if (c > best) best = c; if (best > 200) break; } free = Math.min(free, best);
+    if (b && b.bm && i % 8 === 0 && B.hz.some(z => !z.mk && m.G.t >= z.on && m.G.t < z.off)) { const x1 = b.x - b.r - 24; if (x1 < 30) continue; let best = -1e9; for (let x = 30; x <= x1; x += 20) for (let y = 20; y <= 520; y += 15) { const c = B.clear(x, y, 0); if (c > best) best = c; if (best > 200) break; } free = Math.min(free, best);
       if (drawn < 40) { try { m.render(m.G.t, 1 / 60); drawn++; } catch (x) { err = x.message; } } }
     if (i > 600 && !m.G.boss && id) break; }
   const st = B.st || { verbs: {} }, out = { n, id, free: Math.round(free), drawn, err, verbs: Object.keys(st.verbs), tel: Math.min(9, ...Object.values(st.verbs).map(v => v.tel)), maxEb: st.maxEb, cap: st.cap, maxV: st.maxV, BCAP: m.BCAP, want: id ? [...new Set(B.T[id].ph.flat().map(x => Array.isArray(x) ? x[0] : x))] : [] };
