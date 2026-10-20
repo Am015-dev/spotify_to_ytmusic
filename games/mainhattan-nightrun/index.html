@@ -2229,7 +2229,7 @@ const MINIS=[{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral
 const ROSTER=window.ROSTER={KINDS:['charger','flank','swarm','mine'],CAP:.33,P:.35,c:{key:'',total:0,drone:0},stat:{sub:0,drone:0,total:0},
   idx(){return ST.on?ST.n:20+G.di*3+(G.loop|0);},
   kinds(i){const K=this.KINDS,s=(i*3)%4;return[K[s],K[(s+2)%4]];},   // signature, second: the stages i-1 and i+1 have {s-1,s+1}
-  sub(type,o){if(!RET.roster||G.lab||G.tut||(o&&(o.mini||o.zt))||G.boss||(ST.on&&ST.n<=4))return type;   // stages 1-4 keep the hovering drones (zoo-test, onboarding)
+  sub(type,o){if(!RET.roster||G.lab||G.tut||(o&&(o.mini||o.zt))||G.boss||(ST.on&&ST.n<=(RET.density?2:4)))return type;   // stages 1-4 keep the hovering drones (zoo-test, onboarding)
     const key=ST.on?'s'+ST.n:'e'+G.di+'_'+G.loop,c=this.c;if(c.key!==key){c.key=key;c.total=0;c.drone=0;}
     let out=type;
     if(type==='drone'){const over=(c.drone+1)/(c.total+1)>this.CAP&&c.total>=3;
@@ -2264,6 +2264,7 @@ const DIR={
     const nb=this.nonBoss();if(nb===0&&!G.boss&&!G.bossDone&&(ST.on||G.dbar<this.bossBar-.5)){this.emptyB++;this.log.emptyRun=this.emptyB/4;this.log.maxEmptyBars=Math.max(this.log.maxEmptyBars,this.log.emptyRun);}else{this.emptyB=0;this.log.emptyRun=0;}
     if(G.boss&&!G.boss.mini)return;
     if(G.bossDone||SH.active)return;
+    if(window.DENS)DENS.beat();                                // density.js: slow curtains when the screen holds fewer bullets than the stage's budget
     const bb=((i%4)+4)%4;
     if(!ST.on&&G.dbar>=this.bossBar)return;                // the boss is about to come: no new waves
     if(ST.on&&ST.spawned)return;
@@ -8555,7 +8556,7 @@ BMV.idOf=e=>{if(e.mini)return BM_MINI[G.di]||null;return BM_DIST[e.k]||null;};
 BMV.norm=x=>Array.isArray(x)?{v:x[0],p:x[1]||{}}:{v:x,p:{}};
 /* lazily on the boss's first beat (armour.js and fair.js have set the hull and the phase lists by then) */
 BMV.init=e=>{e.bm=null;if(!BMV.on)return;const id=BMV.idOf(e),T=id&&BMT[id];if(!T)return;
-  const L=T.ph.map(l=>l.map(BMV.norm));e.bm={id,T,P:{}};for(const l of L)for(const o of l)e.bm.P[o.v]=o.p;e.lists=L.map(l=>l.map(o=>o.v));
+  const L=T.ph.map(l=>l.map(BMV.norm));e.bm={id,T,P:{}};for(const l of L)for(const o of l)e.bm.P[o.v]=o.p;e.lists=L.map(l=>l.map(o=>o.v));if(window.DENS)DENS.trimBoss(e);
   const s=BMV.stat();s.boss=id;if(window.BPL)BPL.init(e);};   // bossplay.js: the encounter mechanics, the seeded order
 /* ---- shared helpers ---- */
 BMV.tel=()=>{const sb=BT.spb||.5;return Math.max(Math.ceil(.55/sb-1e-6),HARDS.includes(SET.diff)?1:2);};   // telegraph beats: >= 0.55 s at any tempo, 2 beats on Easy / Normal
@@ -9129,7 +9130,7 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
       if(m==='decoy'){S.dec={x:P.x,y:P.y,t:1.2};this.stat.decoy++;}
       if(m)floater(P.x,P.y-30,{burn:'BURN',ram:'RAM',phase:'PHASE',decoy:'DECOY',mag:'MAGNET'}[m],'#19e3ff');}
     P.dashCd=S.n>=1?0:(1-S.r)*this.refill();},   // the old field still tells bots and the HUD when the next dash is ready
-  gain(v){if(!this.on||!G||G.dead)return;const S=this.st();if(P.emp>=3){S.m=1;return;}S.m+=v*(this.FILL[SET.diff]||1);this.stat.fill+=v;
+  gain(v){if(!this.on||!G||G.dead)return;if(window.TIM&&TIM.blocked())return;const S=this.st();if(P.emp>=3){S.m=1;return;}S.m+=v*(this.FILL[SET.diff]||1);this.stat.fill+=v;
     if(S.m>=1){S.m-=1;P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');AU.sfx('up');S.ping=.6;
       if(!this.tipE){this.tipE=1;this.tip('EMP charged: tap EMP');}}},
   tip(t){try{const o=load('mnr_abiltip',{})||{};if(o[t]||G.tut||G.lab)return;o[t]=1;save('mnr_abiltip',o);hintShow(t,4);}catch(e){}},
@@ -9593,12 +9594,13 @@ NR.on('tick',dt=>CTR.tick(dt));
    Damage goes in as player shots (DMG / armour caps book it); bullets only ever leave G.eb (ebCap, BCAP untouched). */
 if(RET.timing===undefined)RET.timing=/[?&]timing=1/.test(location.search);   // OFF by default until timing-test's bot gates pass (reflex <= 70%, random <= 40%): ?timing=1 to play it
 const TIM=window.TIM={get on(){return!!(RET.timing&&window.ABIL&&ABIL.on);},
-  stat:{pf:0,parry:0,refl:0,mark:0,off:0,late:0,brk:0,emp:0,e1:0,e2:0,e3:0,waste:0,used:0},
-  R:110,PEN:.45,HOP:.09,PK:.6,ER:{1:160,2:320,3:0},   // PK: the parry window is the inner 60% of the beat window; HOP: length of an off-beat / GOOD dash in s (a full dash is .2 s), unshielded (b.js hurt() and the bullet loop read P.dashSh); ER: EMP clear radius by charges spent (0 = whole screen)
+  stat:{pf:0,parry:0,refl:0,mark:0,off:0,panic:0,late:0,brk:0,emp:0,e1:0,e2:0,e3:0,waste:0,used:0},
+  R:110,PEN:.45,HOP:.04,PK:.4,ER:{1:160,2:320,3:0},PANIC:60,NEED:[4,99,12,5],PLOCK:2,WLOCK:15,GREF:.2,   // PK: the parry window is the inner 60% of the beat window; HOP: length of an off-beat / GOOD dash in s (a full dash is .2 s), unshielded (b.js hurt() and the bullet loop read P.dashSh); ER: EMP clear radius by charges spent (0 = whole screen)
   pk(j){return SET.all||Math.abs(j.dt)<=winMs()*this.PK&&j.ok;},
   
-  st(){return G.tm||(G.tm={pen:0,late:0,ch:0,hint:0});},
+  st(){return G.tm||(G.tm={pen:0,late:0,ch:0,hint:0,em:0});},
   near(){let tg=null,bd=1e9;for(const e of G.en){if(e.dead||e.hp<=0||e.gr||e.dying)continue;const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<bd){bd=d;tg=e;}}return tg;},
+  blocked(){return this.on&&G.tm&&G.tm.em>0;},
   ready(){return!this.on||!G.tm||G.tm.pen<=0;},
   /* ABIL.dashIn, after the charge is taken: j = judge(ts), S = ABIL.st() */
   dash(j,S){const T=this.st(),mx=ABIL.max(),pk=this.pk(j);P.dashSh=pk?0:9;   // only a dead-on-beat dash is shielded
@@ -9613,18 +9615,23 @@ const TIM=window.TIM={get on(){return!!(RET.timing&&window.ABIL&&ABIL.on);},
       if(n){G.eb=G.eb.filter(b=>!b.dead);S.n=Math.min(mx,S.n+1);P.inv=Math.max(P.inv,.5);T.ch++;this.stat.parry++;this.stat.refl+=n;this.stat.mark+=mk;
         G.score+=Math.round((150*n+(mk?600:0))*G.mult);ABIL.gain(.1+.02*n);floater(P.x,P.y-30,mk?'PARRY!':'PARRY x'+n,'#ffffff');AU.sfx('up');if(!SET.reduce)shake(3);}
       return;}
-    this.stat.off++;T.ch=0;T.pen=this.PEN;if(S.n>=1)S.n--;else S.r=Math.min(S.r,0)-.5;floater(P.x,P.y-30,say('OFF BEAT')+' -2','#8c86b8');
+    this.stat.off++;T.ch=0;T.pen=this.PEN;if(S.n>=1)S.n--;else S.r=Math.min(S.r,0)-.5;
+    const th=G.eb.some(b=>!b.dead&&Math.hypot(b.x-P.x,b.y-P.y)<this.PANIC);   // PANIC: off the beat with no bullet within PANIC px = a wasted button press, locks the dash longer
+    if(!th){this.stat.panic++;T.pen=this.PLOCK;S.n=0;S.r=Math.min(S.r,0)-.3;}
+    floater(P.x,P.y-30,say(th?'OFF BEAT':'PANIC')+' -2','#8c86b8');
     if(j.dt>0){this.stat.late++;if(++T.late>=2){T.late=0;this.stat.brk++;if(typeof tierDrop==='function')tierDrop('late');G.mult=Math.max(1,G.mult*.8);floater(P.x,P.y-48,say('CHAIN BROKEN'),'#ff2d78');}}else T.late=0;},
   /* the burst size an EMP press would have now (all held charges) and whether it would be worth it */
   tier(){return Math.max(0,Math.min(3,P.emp|0));},
-  worth(){const R=this.ER[this.tier()]||9999;return G.eb.filter(b=>Math.hypot(b.x-P.x,b.y-P.y)<=R).length>=4||(window.CTR&&CTR.on&&(CTR.goodAt===G.t||CTR.walls.some(w=>w.cur&&w.x<W+10)||G.en.some(e=>e.ctw&&e.wsh&&e.x<W)))||G.en.some(e=>e.el&&(e.sh||e.shl)&&e.x<W)||(G.boss&&G.boss.cores&&G.boss.cores.some(c=>!c.dead&&c.hp>0)&&P.emp>=3);},
+  worth(){const t=this.tier(),R=this.ER[t]||9999,nr=o=>t>=2||Math.hypot(o.x-P.x,o.y-P.y)<=R;   // tier 1 only counts what is inside its radius; the shield / wall reasons need a bigger burst or a close target
+    return G.eb.filter(b=>Math.hypot(b.x-P.x,b.y-P.y)<=R).length>=this.NEED[t]||(window.CTR&&CTR.on&&(CTR.goodAt===G.t||(t>=2&&CTR.walls.some(w=>w.cur&&w.x<W+10))||G.en.some(e=>e.ctw&&e.wsh&&e.x<W&&nr(e))))||G.en.some(e=>e.el&&(e.sh||e.shl)&&e.x<W&&nr(e))||(G.boss&&G.boss.cores&&G.boss.cores.some(c=>!c.dead&&c.hp>0)&&P.emp>=3);},
   /* ABIL.emp: spends every held charge, returns {n, M} (extra mods for the burst), or null = wasted */
   emp(M){const n=this.tier(),ok=this.worth();P.emp=0;this.stat.emp++;this.stat.used+=n;
-    if(!ok){this.stat.waste++;floater(P.x,P.y-30,say('WASTED')+' x'+n,'#8c86b8');return null;}
-    this.stat['e'+n]++;M.wave=1;if(n>=2)M.bubble=1;if(n>=3){M.chain=1;M.core=1;M.wide=1;
+    if(!ok){this.stat.waste++;const S=ABIL.st();S.m=0;this.st().em=this.WLOCK;floater(P.x,P.y-30,say('WASTED')+' x'+n,'#8c86b8');return null;}
+    this.stat['e'+n]++;{const S=ABIL.st();S.m=Math.min(.6,S.m+this.GREF*n);}   // a good EMP gives part of the meter back
+    M.wave=1;if(n>=2)M.bubble=1;if(n>=3){M.chain=1;M.core=1;M.wide=1;
       for(const e of G.en){if(e.dead)continue;if(e.el||e.ctw){if(e.sh)e.sh=0;if(e.shl)e.shl=0;e.flash=.3;}}}
     floater(P.x,P.y-30,'EMP x'+n,n>=3?'#ff5fd2':'#ffb020');return{n,M,R:this.ER[n]||0};},
-  tick(dt){if(!this.on||!G||!P||!running)return;const T=this.st();if(T.pen>0)T.pen-=dt;
+  tick(dt){if(!this.on||!G||!P||!running)return;const T=this.st();if(T.pen>0)T.pen-=dt;if(T.em>0)T.em-=dt;
     const d=$('bDash'),e=$('bEmp');
     if(d&&touchUI){const ph=typeof PHF==='number'?PHF:0,ms=(ph<.5?ph:ph-1)*BT.spb*1000,win=SET.all||Math.abs(ms)<=winMs()*this.PK,k=SET.reduce?0:Math.max(0,Math.min(1,(1-ph)));
       d.style.setProperty('--tb',(win?2:3+9*k).toFixed(1)+'px');d.classList.toggle('tmWin',!!win);d.classList.toggle('tmPen',T.pen>0);}
@@ -9657,6 +9664,44 @@ const VIS=window.VIS={get on(){return!!RET.vis&&!(typeof G==='object'&&G&&G.tut)
   life(e){if(G.t-(e.dk==null?-9:e.dk)<this.dk||(e.ctw&&!e.wsh))return 0;   // an EMP-stripped warden has no floor: its shield was its protection
     const b=this.ml[e.type]!=null?this.ml[e.type]:e.zt?Math.max(this.zoo,DMG.ml[e.type]||0):(DMG.ml[e.type]||0);
     return(e.el?(e.type==='charger'?Math.max(this.elC,b):Math.max(this.el,b)):b)*(SET.diff==='easy'?DMG.easyK:HARDS.includes(SET.diff)?Math.max(this.hk,DMG.lm()):1);}};
+
+/* ---------- DENSITY: a per-stage budget of enemy bullets on screen (flag RET.density, default ON; ?density=0 = the old rules). Test: nightrun/density-test.js. BALANCE.md "Density".
+   Industry practice: a shooter ramps the amount of readable fire, not its speed, and alternates heavy and light stretches. The budget (Normal): planned bullets on screen in a HEAVY
+   stretch rise from about 9 at stage 3 to 22 at stage 30; a LIGHT stretch (a breather, every 40 s: 28 s heavy, 12 s light, the first 10 s of a stage light) is half of it.
+   Easy x.75, Hard x1.45, Very hard x1.6 (DF.dn); never above ebCap()-3 so enemy fire keeps its room.
+   When the screen holds fewer bullets than the budget, the director (dir.js beat hook) sends a SLOW CURTAIN: 3 to 6 columns of slow bullets that fall from the top, announced by a marker for
+   >= .65 s; columns are >= 110 px apart (also from columns still falling) so the free gap is >= 96 px, none above the ship's column, speed 105-135 (BCAP and ebCap still apply: eb()).
+   Not during bosses, the tutorial, the Lab or the pit stop. ---------- */
+if(RET.density===undefined)RET.density=!/[?&]density=0/.test(location.search);
+const DENS=window.DENS={st:{curtains:0,bul:0,maxGap:0},busy:0,last:-9,px:[],
+  get on(){return!!RET.density&&!G.tut&&!G.lab&&!G.boss&&!G.bossDone&&!SH.active&&!(ST.on&&ST.n<=2);},
+  idx(){return ST.on?ST.n:20+G.di*3+(G.loop|0);},
+  heavy(){const t=(G.t+30)%40;return t<28;},                         // false = a breather
+  budget(){const n=this.idx(),h=clamp(8.5+(24-8.5)*Math.pow(Math.max(0,n-3)/27,1.5),5,24.5)*(DF.dn||1),cap=ebCap()-2;
+    return Math.min(this.heavy()?h:h*.6,cap);},
+  lead(){return Math.max(2,Math.ceil(.7/(BT.spb||.5)));},            // marker beats: >= .65 s at any tempo
+  cols(k){const xs=this.px.slice();for(const b of G.eb)if(b.dn&&!b.dead)xs.push(b.x);const out=[];let tries=0;
+    while(out.length<k&&tries++<60){const x=gr(150,W-60);if(Math.abs(x-P.x)<90)continue;if(xs.some(q=>Math.abs(q-x)<115)||out.some(q=>Math.abs(q-x)<115))continue;out.push(x);}return out;},
+  beat(){const w=this.st.why||(this.st.why={call:0,off:0,cool:0,full:0,nocol:0,ok:0});w.call++;if(!RET.density||!this.on||G.dbar<2&&!ST.on){w.off++;return;}
+    if(G.bc<this.last+2){w.cool++;return;}
+    const want=this.budget(),have=G.eb.length+this.busy*3,def=want-have;if(def<3){w.full++;return;}
+    const k=clamp(Math.ceil(def/3.2),2,7),xs=this.cols(k);if(!xs.length){w.nocol++;return;}w.ok++;
+    this.last=G.bc;this.busy+=xs.length;for(const x of xs)this.px.push(x);this.st.curtains++;
+    const sp=gr(105,135),per=this.idx()>=10?4:3;
+    for(const x of xs)WARN.push({x,y:12,b:G.bc,kind:'rain'});
+    DIR.later(this.lead(),()=>{for(const x of xs){const w=WARN.findIndex(q=>q.x===x&&q.kind==='rain');if(w>=0)WARN.splice(w,1);const pi=this.px.indexOf(x);if(pi>=0)this.px.splice(pi,1);this.busy=Math.max(0,this.busy-1);if(G.dead||G.boss||Math.abs(x-P.x)<70)continue;
+      for(let j=0;j<per;j++){const n=G.eb.length;eb.src={arm:true};eb(x,8+j*40,Math.PI/2,sp,'#ffa02d',5);eb.src=null;if(G.eb.length>n){G.eb[n].dn=1;this.st.bul++;}}}});}};
+/* boss fights show at most MAXV distinct attacks (industry: 6-12): the rarest ones are gated out of every phase list (never a list left empty); armour.js HP and caps are untouched */
+DENS.MAXV=12;
+DENS.trimBoss=function(e){if(!RET.density||!e.lists)return;const cnt={};for(const l of e.lists)for(const v of l)cnt[v]=(cnt[v]||0)+1;
+  const ks=Object.keys(cnt);this.st.k=ks.length;if(ks.length<=this.MAXV)return;
+  ks.sort((a,b)=>cnt[a]-cnt[b]||(e.lists[e.lists.length-1].indexOf(b)-e.lists[e.lists.length-1].indexOf(a)));
+  for(const v of ks){if(Object.keys(cnt).length<=this.MAXV)break;
+    if(e.lists.some(l=>l.length>1||l[0]!==v)&&e.lists.every(l=>l.filter(x=>x!==v).length>0)){e.lists=e.lists.map(l=>l.filter(x=>x!==v));delete cnt[v];}}
+  this.st.trim=(this.st.trim||0)+1;};
+NR.on('runStart',()=>{DENS.busy=0;DENS.last=-9;DENS.px.length=0;});
+/* a boss gets its moveset (and so its trimmed list) at spawn, not on its first beat: the old phase lists never show next to the new ones */
+{const sb=spawnBoss;spawnBoss=function(o){const b=sb(o);if(RET.density&&b&&b.bm===undefined&&window.BMV&&!(window.BPL&&BPL.on))try{BMV.init(b);}catch(e){}return b;};}
 
 /* ---------- boss ENCOUNTER MECHANICS = parts/bossplay.js (flag RET.bossplay, default off for now; ?bossplay=1 = on, ?bossplay=0 / off = the fights before it, exactly). Test: nightrun/bossplay-test.js.
    Owner, 20 Oct 2026: "the enemies, bosses are also very predictable and repeatable; I beat the game very easy on normal ... the game needs to be more creative".
