@@ -5,8 +5,8 @@
    BAIT    circle drone that hovers in the camp lane (>= 110 px off the ship's row) and drops a mine, then flies away.
    Rules: only while camp level > .5 for 3 s with >= 75% of the last 6 s in the left 22% of the field; 12 s cool-down; max 2 alive; tell >= 0.8 s;
    hp from the stage curve (en()); kill drops shards; shots go through eb() so ebCap/BCAP hold. Shapes are code placeholders (ids flanker-diver / -crawler / -bait). */
-if(RET.flankers===undefined)RET.flankers=/[?&]flankers=1/.test(location.search);
-const FLK=window.FLK={get on(){return!!RET.flankers&&!!RET.anticamp;},HOLD:3,SHARE:.22,CD:12,MAX:2,TELL:.8,
+if(RET.flankers===undefined)RET.flankers=!/[?&]flankers=0/.test(location.search);
+const FLK=window.FLK={get on(){return!!RET.flankers&&!!RET.anticamp;},HOLD:2,SHARE:.22,CD:8,MAX:3,LV:.4,TELL:.8,
   hold:0,cd:6,n:0,tells:[],stat:{spawn:0,diver:0,crawler:0,bait:0,kill:0,mine:0,dodgerFlag:0},
   K:{diver:{id:'flanker-diver',r:15,hp:5,score:260,col:'#ff9a3d',sh:3},crawler:{id:'flanker-crawler',r:14,hp:6,score:240,col:'#c8ff3d'},bait:{id:'flanker-bait',r:13,hp:3,score:200,col:'#ff5acf'}},
   alive(){let n=0;for(const e of G.en)if(e.fk&&!e.dead&&e.hp>0)n++;return n+this.tells.length;},
@@ -41,7 +41,8 @@ const FLK=window.FLK={get on(){return!!RET.flankers&&!!RET.anticamp;},HOLD:3,SHA
       if(e.leave){e.x+=170*dt;e.y-=40*dt;if(e.x>W+30||e.y<-30)e.dead=1;}}},
   tick(dt){
     if(!this.on||!AC.live()){this.reset();return;}
-    this.cd-=dt;if(AC.lv>.5)this.hold+=dt;else this.hold=0;
+    this.cd-=dt;if(AC.lv>this.LV)this.hold+=dt;else this.hold=0;
+    if(AC.lv>this.LV)this.ask();
     for(const t of this.tells){t.t-=dt;if(t.t<=0){t.done=1;try{this.mk(t);}catch(err){}}}this.tells=this.tells.filter(t=>!t.done);
     for(const e of G.en)if(e.fk&&!e.dead&&e.hp>0)this.move(e,dt);},
   draw(e,t){const K=this.K[e.fk],fl=e.flash>0,line=fl?'#fff':K.col,fill=fl?'#fff':'#12081f',s=e.sd||1;

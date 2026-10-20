@@ -39,6 +39,7 @@ const AC=window.AC={get on(){return!!RET.anticamp;},LEFT:.25,WIN:6,SD:40,TELL:.8
     if(!this.live()){this.buf=[];this.lv=0;this.tells=[];this.fl=0;this.sc=null;return;}
     this.stat.live+=dt;this.acc+=dt;if(this.acc>=.1){this.acc=0;this.buf.push(P.x);if(this.buf.length>this.WIN*10)this.buf.shift();this.lv=this.level(this.buf);}
     if(this.lv>.5)this.stat.camp+=dt;
+    this.hl=this.lv>.5?(this.hl||0)+dt:0;   // a streak of camping before any flush: a dodger's passing dwell at the edge never gets one
     // payout: score gained while parked is scaled down
     if(this.sc!==null&&G.score>this.sc&&this.lv>0)G.score-=Math.floor((G.score-this.sc)*(1-this.payK()));this.sc=G.score;
     // pickups wait in the mid field while the ship camps
@@ -47,7 +48,7 @@ const AC=window.AC={get on(){return!!RET.anticamp;},LEFT:.25,WIN:6,SD:40,TELL:.8
     // the ground-fire wall only sweeps the edge
     if(this.sw.length){for(const b of this.sw)if(b.x>.32*W)b.dead=1;this.sw=this.sw.filter(b=>!b.dead&&G.eb.includes(b));}
     for(const t of this.tells){t.t-=dt;if(t.t<=0){t.done=1;this.fire(t);}}this.tells=this.tells.filter(t=>!t.done);
-    if(this.lv>.5){this.cd-=dt*this.lv;if(this.cd<=0&&!this.tells.length){if(!(window.FLK&&FLK.ask()))this.flush();this.cd=this.per();}}   // flankers.js (RET.flankers): real enemies replace the bullet streams
+    if(this.lv>.5&&this.hl>=2){this.cd-=dt*this.lv;if(this.cd<=0&&!this.tells.length){this.flush();this.cd=this.per();}}   // flankers.js (RET.flankers) adds real enemies on top of the streams
     else{this.cd=Math.max(this.cd,1.2);if(this.lv<.2)this.fl=0;}
     // strike: Easy/Normal get a long beat-aligned tell, graded damage, and no strike while aiming or collecting
     if(window.MM&&MM.col&&this.soft()){const c=MM.col;

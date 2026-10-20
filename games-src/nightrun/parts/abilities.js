@@ -28,7 +28,7 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
   pwLv(){let m=0;if(G.pw)for(const a of G.pw.act)m=Math.max(m,a.l3||1);return m;},
   lv(){const m=this.pwLv();return Math.max(1,Math.min(5,1+(SH.dmax|0)+(m>=5?2:m>=3?1:0)));},
   max(){return this.lv()>=3?4:3;},
-  refill(){return(1.7-.12*(this.lv()-1))*(this.RK[SET.diff]||1);},
+  refill(){return(1.7-.12*(this.lv()-1))*(this.RK[SET.diff]||1)*(window.TIM&&TIM.on?TIM.RF:1);},   // timing.js: charges refill slower, a parry refunds its charge
   mods(map){const o={};for(const k of this.keys())if(map[k])o[map[k]]=1;return o;},
   dashMod(){const k=this.keys();for(let i=k.length-1;i>=0;i--)if(this.MOD[k[i]])return this.MOD[k[i]];return'';},
   /* b.js: replaces the beat-snapped dash. ts = the press stamp (or undefined), mx/my = the keys this frame */
@@ -41,7 +41,7 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
       if(m==='decoy'){S.dec={x:P.x,y:P.y,t:1.2};this.stat.decoy++;}
       if(m)floater(P.x,P.y-30,{burn:'BURN',ram:'RAM',phase:'PHASE',decoy:'DECOY',mag:'MAGNET'}[m],'#19e3ff');}
     P.dashCd=S.n>=1?0:(1-S.r)*this.refill();},   // the old field still tells bots and the HUD when the next dash is ready
-  gain(v,src,e){if(!this.on||!G||G.dead)return;if(window.TIM&&TIM.blocked())return;if(window.GRIT&&GRIT.on){v=GRIT.emp(v,src,e);if(!(v>0))return;}const S=this.st();if(P.emp>=3){S.m=1;return;}S.m+=v*(this.FILL[SET.diff]||1);this.stat.fill+=v;
+  gain(v,src,e){if(!this.on||!G||G.dead)return;if(window.TIM&&TIM.blocked())return;if(window.GRIT&&GRIT.on){v=GRIT.emp(v,src,e);if(!(v>0))return;}const S=this.st();if(P.emp>=3){S.m=1;return;}S.m+=v*(this.FILL[SET.diff]||1)*(window.TIM&&TIM.on?TIM.EF:1);this.stat.fill+=v;
     if(S.m>=1){S.m-=1;P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');AU.sfx('up');S.ping=.6;
       if(!this.tipE){this.tipE=1;this.tip('EMP charged: tap EMP');}}},
   tip(t){try{const o=load('mnr_abiltip',{})||{};if(o[t]||G.tut||G.lab)return;o[t]=1;save('mnr_abiltip',o);hintShow(t,4);}catch(e){}},
