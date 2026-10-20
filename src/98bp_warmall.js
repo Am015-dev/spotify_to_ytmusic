@@ -126,19 +126,26 @@ function TLL_warm(){const t0=performance.now(),R=renderer,root=typeof pl!=='unde
 /* ios-r20m: WebKit/Metal builds the pipeline state on the first DRAW, not at linkProgram/compile (real iPhone 17: 1.06-1.09 s freeze in `loading` right after the city appears; 60 programs at the freeze, 123 at roam).
    PREW_run draws one representative per program (distinct currentProgram.cacheKey) through the composer's real passes/targets/MSAA/fog/shadow state, every other renderable hidden for that one frame,
    then reads 1 px so the GPU has finished before the curtain lifts. Touch/lowmem path only (TWG gate, no LKG). Default OFF until the lab gates pass (software GL pays the whole pipeline build under the curtain: 3.7 s at 6x vs the 1.5 s budget); ?prewarm=1 = on. */
-const PREW={on:new URLSearchParams(location.search).get('prewarm')==='1',n:-1,prog:-1,p0:-1,p1:-1,ms:-1};
+const PREW={q:new URLSearchParams(location.search).get('prewarm'),cap:(q=>q==null?1800:+q|0)(new URLSearchParams(location.search).get('prewcap')),on:false,ran:0,ab:-1,arm:'',n:-1,prog:-1,p0:-1,p1:-1,ms:-1};
+/* ios-r21f: ?prewarm=1 on, ?prewarm=0 off. No flag: ON only on the Beta page (the session perf doc has a db) and, there, alternating per device (localStorage od_prew_arm, first run ON) so the perf db collects an A/B
+   without anyone adding URL flags; the live site (no db) stays OFF. The draw aborts after PREW.cap ms of wall clock (?prewcap=N), checked between small batches of programs. */
+async function PREW_decide(){const q=PREW.q;if(q==='1'){PREW.arm='forced-on';return true}if(q==='0'){PREW.arm='forced-off';return false}
+ try{if(typeof PS==='undefined'||!PS.on||typeof PB_db!=='function')return false;const db=await Promise.race([PB_db(),new Promise(r=>setTimeout(()=>r(null),800))]);if(!db||!db.collection)return false}catch(e){return false}
+ let on=true,k='od_prew_arm';try{on=localStorage.getItem(k)!=='off';localStorage.setItem(k,on?'off':'on')}catch(e){}PREW.arm=on?'on':'off';return on}
 /* scissor every composer target (and the screen) to 1 px for the prewarm frame: pipelines are keyed by formats/samples, not size, so the fragment work (the lab's whole cost) disappears */
 function PREW_sc(on){const R=renderer,rt=[composer.renderTarget1,composer.renderTarget2].filter(Boolean);PREW.sv=PREW.sv||[];
  if(on){PREW.sv=rt.map(t=>[t,t.scissorTest,t.scissor.clone()]);for(const t of rt){t.scissorTest=true;t.scissor.set(0,0,1,1)}PREW.ss=[R.getScissorTest(),new THREE.Vector4()];R.getScissor(PREW.ss[1]);R.setScissorTest(true);R.setScissor(0,0,1,1)}
  else{for(const[t,f,v]of PREW.sv){t.scissorTest=f;t.scissor.copy(v)}PREW.sv=[];if(PREW.ss){R.setScissor(PREW.ss[1]);R.setScissorTest(PREW.ss[0]);PREW.ss=null}}}
-function PREW_run(){const t0=performance.now(),R=renderer,P=R.info.programs;PREW.p0=P.length;const seen=new Set(),all=[],keep=new Set();
- scene.traverse(o=>{if(!(o.isMesh||o.isPoints||o.isLine||o.isSprite))return;all.push(o);const m=Array.isArray(o.material)?o.material:[o.material];if(!o.layers.test(camera.layers))return;for(const q of m){if(!q)continue;const pr=R.properties.get(q).currentProgram;if(!pr)continue;const k=pr.cacheKey||q.type+q.id;if(!seen.has(k)){seen.add(k);keep.add(o)}}});
- const sv=[],T=typeof TQ!=='undefined'&&TQ,d0=T?T.draw:0,l0=LD.on,b0=LD.busy,k0=LKG.arm,r0=TWG.run;
+function PREW_run(){const t0=performance.now(),R=renderer,P=R.info.programs;PREW.p0=P.length;PREW.ran=1;const seen=new Set(),all=[],keep=[];
+ scene.traverse(o=>{if(!(o.isMesh||o.isPoints||o.isLine||o.isSprite))return;all.push(o);const m=Array.isArray(o.material)?o.material:[o.material];if(!o.layers.test(camera.layers))return;let add=false;for(const q of m){if(!q)continue;const pr=R.properties.get(q).currentProgram;if(!pr)continue;const k=pr.cacheKey||q.type+q.id;if(!seen.has(k)){seen.add(k);add=true}}if(add)keep.push(o)});
+ const sv=[],T=typeof TQ!=='undefined'&&TQ,d0=T?T.draw:0,l0=LD.on,b0=LD.busy,k0=LKG.arm,r0=TWG.run;let drawn=0;
  for(const o of all)sv.push([o,o.visible,o.frustumCulled]);
- try{for(const o of all){if(keep.has(o)){o.visible=true;o.frustumCulled=false}else o.visible=false}
-  LKG.arm=0;if(T)T.draw=1;LD.on=false;LD.busy=false;TWG.run=0;PREW_sc(1);composer.render();
-  const gl=R.getContext(),px=new Uint8Array(4);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px)}   // the 1-px read blocks until the GPU has finished the frame
- finally{PREW_sc(0);for(const[o,v,f]of sv){o.visible=v;o.frustumCulled=f}LD.on=l0;LD.busy=b0;LKG.arm=k0;if(T)T.draw=d0;TWG.run=r0;PREW.n=keep.size;PREW.prog=seen.size;PREW.p1=P.length;PREW.ms=Math.round(performance.now()-t0)}}
+ try{for(const o of all)o.visible=false;
+  LKG.arm=0;if(T)T.draw=1;LD.on=false;LD.busy=false;TWG.run=0;PREW_sc(1);const gl=R.getContext(),px=new Uint8Array(4);
+  /* batches of 4 representatives: each ends in a 1-px read, which blocks until the GPU has finished, so the wall clock between batches is real and the cap can bite */
+  for(let i=0;i<keep.length;i+=4){const b=keep.slice(i,i+4);for(const o of b){o.visible=true;o.frustumCulled=false}composer.render();gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);for(const o of b)o.visible=false;drawn+=b.length;
+   const dt=performance.now()-t0;if(dt>PREW.cap&&i+4<keep.length){PREW.ab=Math.round(dt);break}}}
+ finally{PREW_sc(0);for(const[o,v,f]of sv){o.visible=v;o.frustumCulled=f}LD.on=l0;LD.busy=b0;LKG.arm=k0;if(T)T.draw=d0;TWG.run=r0;PREW.n=drawn;PREW.prog=seen.size;PREW.p1=P.length;PREW.ms=Math.round(performance.now()-t0)}}
 /* ios-r20f: a player page evaluated the lazy code chunks (99c_checklist 212 KB, the city chunks; direct eval, 0.3-1.6 s on a slow CPU) 1.5 s AFTER the curtain lifted (10z_lazy.js),
    the iPhone freeze ~2 s after the city appears. They now load and eval here, under the curtain, before the gate frames. Touch/lowmem path only (desktop has LKG). ?twgxc=0 = old timing */
 TWG.xc=new URLSearchParams(location.search).get('twgxc')!=='0';TWG.xcMs=-1;
@@ -152,6 +159,7 @@ async function TWG_run0(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)ret
   if(TWG.dd&&typeof DEST_find==='function'&&DEST.on){const td=performance.now();try{if(DEST.N!==HUB.nodes)DEST_reset();DEST_find(0)}catch(e){console.warn('TWG dest',e)}TWG.destMs=Math.round(performance.now()-td)}
   /* ios-r18u: touch late links. renderer.compile skips invisible objects, and the player car keeps alternate parts (translucent glass, opacity .7) in a hidden group until a state change shows it -> 1 program linked ~20-40 s into the roam (review 20: 180 ms frame). Show them, apply the w12 paint, compile+link under the curtain, restore. ?twgll=0 = off */
   if(TWG.ll)try{TLL_warm()}catch(e){console.warn('TWG ll',e)}
+  try{PREW.on=await PREW_decide()}catch(e){PREW.on=false}
   if(PREW.on)try{PREW_run()}catch(e){console.warn('TWG prew',e)}
   LD.on=lo;if(wb){const tw=performance.now();await wb;TWG.wbMs=Math.round(performance.now()-tw)}for(let i=0;i<TWG.idle;i++)await new Promise(r=>setTimeout(r,50))}catch(e){console.warn('TWG',e)}finally{TWG.run=0;LD.on=lo;RO.x=x;RO.z=z;RO.h=h;RO.v=0;TWG.fr=0;TWG.mms=Math.round(TWG.mms);TWG.ms=Math.round(performance.now()-t0)}}
 {const q=new URLSearchParams(location.search);TWG.dd=q.get('twgdest')!=='0';TWG.pa=q.get('twgpa')!=='0';TWG.lvc=q.get('twglv')!=='0';TWG.destMs=-1;TWG.fw=120;/* ios-r17o: ?twgdest=0 / ?twgpa=0 / ?twglv=0 = off */}
@@ -174,7 +182,7 @@ function RVL_new(t){return{t,link:0,linkMs:0,comp:0,compMs:0,tex:0,texMs:0,buf:0
 function RVL_start(){RVL.st=1;RVL.t0=performance.now();RVL.p0=renderer.info.programs.length;RVL.p5=-1;setTimeout(()=>{RVL.p5=renderer.info.programs.length},5000);RVL.cur=RVL_new(0);let last=RVL.t0;const tick=now=>{const n=performance.now();RVL.cur.dt=n-last;last=n;RVL.fr.push(RVL.cur);
   if(n-RVL.t0<RVL.win){RVL.cur=RVL_new(Math.round(n-RVL.t0));requestAnimationFrame(tick)}else RVL_end()};requestAnimationFrame(tick)}
 function RVL_end(){RVL.st=2;const F=RVL.fr,s=k=>F.reduce((a,f)=>a+f[k],0),r=v=>Math.round(v);RVL.sum={city:typeof CID!=='undefined'?CID:'?',frames:F.length,link:s('link'),linkMs:r(s('linkMs')),comp:s('comp'),tex:s('tex'),texMs:r(s('texMs')),buf:s('buf'),bufMs:r(s('bufMs')),
-  long:F.filter(f=>f.dt>100).length,maxDt:r(Math.max(0,...F.map(f=>f.dt))),longAt:F.filter(f=>f.dt>100).slice(0,6).map(f=>f.t+':'+r(f.dt)+(f.link?'L'+f.link:'')+(f.tex?'T'+f.tex:'')),curtainMs:RVL.cms|0,prew:{n:PREW.n,prog:PREW.prog,p0:PREW.p0,p1:PREW.p1,ms:PREW.ms},xcMs:TWG.xcMs,lt:LKG.lt.filter(q=>q[0]>=RVL.t0-50&&q[0]<RVL.t0+RVL.win).map(q=>Math.round(q[0]-RVL.t0)+"+"+q[1]),bm:(window.__bmk||[]).filter(q=>q[0]>=RVL.t0&&q[0]<RVL.t0+RVL.win).map(q=>Math.round(q[0]-RVL.t0)+":"+q[1]).slice(0,12),jsMax:r(Math.max(0,...F.map(f=>f.fMs-f.rMs)))};
+  long:F.filter(f=>f.dt>100).length,maxDt:r(Math.max(0,...F.map(f=>f.dt))),longAt:F.filter(f=>f.dt>100).slice(0,6).map(f=>f.t+':'+r(f.dt)+(f.link?'L'+f.link:'')+(f.tex?'T'+f.tex:'')),curtainMs:RVL.cms|0,prew:{n:PREW.n,prog:PREW.prog,p0:PREW.p0,p1:PREW.p1,ms:PREW.ms,ran:PREW.ran,ab:PREW.ab,arm:PREW.arm},xcMs:TWG.xcMs,lt:LKG.lt.filter(q=>q[0]>=RVL.t0-50&&q[0]<RVL.t0+RVL.win).map(q=>Math.round(q[0]-RVL.t0)+"+"+q[1]),bm:(window.__bmk||[]).filter(q=>q[0]>=RVL.t0&&q[0]<RVL.t0+RVL.win).map(q=>Math.round(q[0]-RVL.t0)+":"+q[1]).slice(0,12),jsMax:r(Math.max(0,...F.map(f=>f.fMs-f.rMs)))};
  RVL.done=1;console.log('RVL '+JSON.stringify(RVL.sum));RVL_thr(1)}
 async function RVL_thr(rate){try{const f=window.__rvlThr||(window.parent!==window&&window.parent.__cdp?((m,a)=>window.parent.__cdp(m,a)):null);if(f&&RVL.cpu>1)await f('Emulation.setCPUThrottlingRate',{rate:rate||RVL.cpu})}catch(e){}}
 if(RVL.on){ldHide=(f=>function(){const go=!RVL.st&&state==='roam'&&RO.on;const r=f.apply(this,arguments);if(go){RVL.cms=Math.round(performance.now()-(RVL.tc||0));RVL_start()}return r})(ldHide);

@@ -767,9 +767,23 @@ updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{
    if(!R||!R.done)return`📍 iOS REVEAL ${c} · no reveal window recorded in ${Math.round((performance.now()-t0)/1000)} s → ❌ FAIL`;
    const F=R.fr,s=R.sum,g=F.map(q=>q.dt).sort((a,b)=>a-b),med=g[g.length>>1]||0,big=F.filter(q=>q.dt>100&&(q.dt>2.5*med||q.dt>1500)),tx=F.filter(q=>q.texMs>20).length;
    for(let w=0;w<60&&R.p5<0;w++)await new Promise(r=>setTimeout(r,500));/* ios-r20m: programs at reveal must equal programs at roam + 5 s (every pipeline was drawn once under the curtain) */
-   const pOk=R.p5>=0&&R.p0===R.p5,ok=s.link===0&&tx===0&&big.length===0&&pOk;
-   return`📍 iOS REVEAL ${c} · 6x CPU, 3 s after reveal: ${s.frames} frames, ${s.link} program links (0), ${s.tex} tex uploads ${s.texMs} ms (${tx} > 20 ms, 0), ${s.buf} buffer uploads ${s.bufMs} ms · median gap ${Math.round(med)} ms, max ${s.maxDt} ms, stalls ${big.length} (0)${big.length?' '+big.map(q=>q.t+':'+Math.round(q.dt)).join(','):''} · curtain gate ${s.curtainMs} ms (chunks ${s.xcMs} ms, prewarm ${s.prew.ms} ms, ${s.prew.prog} programs drawn) · programs at reveal ${R.p0} = at +5 s ${R.p5} ${pOk?'(0 late)':'(LATE)'} → ${ok?'✅ PASS':'❌ FAIL'}`}
+   const pOk=R.p5>=0&&R.p0===R.p5,pwOk=s.prew.ran===1&&(s.prew.ab>=0?s.prew.ab<=3500:true),ok=s.link===0&&tx===0&&big.length===0&&pOk&&pwOk;
+   return`📍 iOS REVEAL ${c} · 6x CPU, 3 s after reveal: ${s.frames} frames, ${s.link} program links (0), ${s.tex} tex uploads ${s.texMs} ms (${tx} > 20 ms, 0), ${s.buf} buffer uploads ${s.bufMs} ms · median gap ${Math.round(med)} ms, max ${s.maxDt} ms, stalls ${big.length} (0)${big.length?' '+big.map(q=>q.t+':'+Math.round(q.dt)).join(','):''} · curtain gate ${s.curtainMs} ms (chunks ${s.xcMs} ms, prewarm ${s.prew.ms} ms, ${s.prew.prog} programs drawn) · programs at reveal ${R.p0} = at +5 s ${R.p5} ${pOk?'(0 late)':'(LATE)'} · prewarm ran ${s.prew.ran}${s.prew.ab>=0?' ABORTED at '+s.prew.ab+' ms ('+s.prew.n+'/'+s.prew.prog+' programs)':''} ${pwOk?'':'(NOT RUN / OVER CAP)'} → ${ok?'✅ PASS':'❌ FAIL'}`}
   catch(e){return`📍 iOS REVEAL · threw ${String(e&&e.message).slice(0,80)} → ❌ FAIL`}finally{f.remove();try{if(window.__cdp)await window.__cdp('Emulation.setCPUThrottlingRate',{rate:1})}catch(e){}}};
  const go=c=>()=>{run(c).then(r=>goSay(r));return'📍 iOS REVEAL · booting '+c+' throttled…'};
  C.GO['perf/ios-reveal']=[{c:'fra',n:'iPhone reveal (Frankfurt)',fn:go('fra'),secs:300}];C.GO['perf/ios-reveal-ath']=[{c:'ath',n:'iPhone reveal (Athens)',fn:go('ath'),secs:300}]}return}
  if(i<600)setTimeout(()=>R20F_reg(i+1),100)})(0);
+// ios-r21f: GO perf/prewarm-default. State asserts on PREW_decide (no graphics): no db (live site) -> OFF; db (Beta page) -> ON, then OFF, then ON (per-device alternation, localStorage od_prew_arm, first run ON);
+// ?prewarm=0 forces OFF and ?prewarm=1 forces ON whatever the db; the arm lands in the session doc as prewArm and doc.prew carries {ran,abortedAtMs,programs,ms}.
+(function R21F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='prewarm-default')){
+ C.items.push({ver:'perf',id:'prewarm-default',area:'perf',text:'ios-r21f · prewarm default: 📍 GO runs PREW_decide with a stub db. Pass line: no db → off; db → on/off/on alternating per device; ?prewarm=0 forces off, =1 forces on; session doc has prewArm + prew{ran,abortedAtMs,programs,ms}; the draw cap is 1800 ms.'});
+ C.GO['perf/prewarm-default']=[{c:'fra',n:'prewarm default arm',secs:20,fn:()=>{(async()=>{const R=[],q0=PREW.q,a0=PREW.arm,m0=window.__pbDbMock,d0=PB.db,k='od_prew_arm',v0=(()=>{try{return localStorage.getItem(k)}catch(e){return null}})();
+   const arms=[];try{try{localStorage.removeItem(k)}catch(e){}
+    window.__pbDbMock=null;PB.db=null;PREW.q=null;const pc=window.claude;let nodb=await PREW_decide();R.push(['no db → '+nodb,nodb===false]);
+    window.__pbDbMock={collection:()=>({add:async()=>1})};for(let j=0;j<3;j++){arms.push(await PREW_decide()+':'+PREW.arm)}R.push(['db alternation '+arms.join(' '),arms.join(' ')==='true:on false:off true:on']);
+    PREW.q='0';const f0=await PREW_decide();PREW.q='1';const f1=await PREW_decide();R.push(['forced 0/1 → '+f0+'/'+f1,f0===false&&f1===true]);
+    PREW.q=null;const d=PS_doc();R.push(['doc fields '+JSON.stringify(d.prew)+' arm '+d.prewArm,d.prew&&'ran' in d.prew&&'abortedAtMs' in d.prew&&'programs' in d.prew&&'ms' in d.prew&&'prewArm' in d]);
+    R.push(['cap '+PREW.cap+' ms',PREW.cap===1800||/[?&]prewcap=/.test(location.search)])}
+   finally{PREW.q=q0;PREW.arm=a0;window.__pbDbMock=m0;PB.db=d0;try{if(v0==null)localStorage.removeItem(k);else localStorage.setItem(k,v0)}catch(e){}}
+   goSay(`📍 PREWARM DEFAULT · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${R.every(r=>r[1])?'✅ PASS':'❌ FAIL'}`)})();return'📍 PREWARM DEFAULT · running…'}}]}return}
+ if(i<600)setTimeout(()=>R21F_reg(i+1),100)})(0);
