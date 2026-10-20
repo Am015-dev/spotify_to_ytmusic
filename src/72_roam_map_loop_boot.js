@@ -125,7 +125,7 @@ $('#startBtn').onclick=startRace;
 
 const PERF={js:0};let last=performance.now(),acc=0,T=0;
 function frame(now){requestAnimationFrame(frame);if(LD.on)return;if(window.__dbg&&(frame.n=(frame.n|0)+1)<5)BMK('frame '+frame.n+' '+state);if(ENVD)buildEnv();const pf0=performance.now(),fms=now-last;let dt=fms>0?Math.min(.05,fms/1000):0;/* ath-push: a clock that runs backwards (rAF stamp before the last one, e.g. a test clock or a resumed tab) is a 0 s frame: a negative dt ran the sim backwards (terrain slide 385 m/s, car 13 km out of the world, T and the story timers rewound) */last=now;dresStep(fms);if(paused)dt=0;T+=dt;
-  ccCool=Math.max(0,ccCool-dt);if(CC){CC.t+=dt;dt*=.2;if(CC.t>=CC.dur||state!=='race')endCrashCam()}else if(slowmo>0){slowmo-=dt;dt*=.35}
+  ccCool=Math.max(0,ccCool-dt);if(CC){CC.t+=dt;dt*=.2;if(CC.t>=CC.dur||state!=='race')endCrashCam()}else if(slowmo>0){slowmo-=dt;dt*=.35}dt=HIT_dt(dt);
   if(state==='countdown'){cdT-=dt;const lit=clamp(Math.floor((4.2-cdT)/.8),0,5);startLights.forEach((l,i)=>l.material.color.set(cdT<=0?glowCol('#2dff7a',2.5):i<lit?glowCol('#ff2030',2.5):new THREE.Color(0x220a0e)));
     if(lastLit!==lit&&lit>=1&&lit<=4&&cdT>0){AU.sfx('beep');say(String(5-lit),'',.6)}lastLit=lit;
     if(cdT<=0){state='race';AU.sfx('go');const held=CTL.thr>0||K.ArrowUp||K.KeyW;

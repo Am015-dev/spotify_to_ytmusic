@@ -414,7 +414,7 @@ const JU_ss=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
 feed=(f=>function(l,p,c){if(JU_roam())JU_ev(/NEAR MISS/.test(l)?'near':/^AIR /.test(l)?'air':'feed');return f(l,p,c)})(feed);
 say=(f=>function(a,b,t){if(JU_roam()&&(a||b))JU_ev('say');return f(a,b,t)})(say);
 studGain=(f=>function(v,b){if(JU_roam())JU_ev('stud');return f(v,b)})(studGain);
-function JU_hit(s){if(!JU.on||!JU_roam()||JU_busy()||JU_split())return;const k=fxK();JU.kick=Math.max(JU.kick,Math.min(1,s/JU_C.hsTd)*k);if(JU.hsCd>0||!k)return;JU.hs=Math.max(JU.hs,s);JU.hsCd=.35}
+function JU_hit(s){if(!JU.on||!JU_roam()||JU_busy()||JU_split())return;const k=fxK();JU.kick=Math.max(JU.kick,Math.min(1,s/JU_C.hsTd)*k);if(JU.hsCd>0||!k)return;HIT_stop(s);JU.hsCd=.35}/* sfx-r21c: the old full freeze (dt 0 for 75-90 ms) is now the shared 70 ms time dip */
 function JU_gate(rt){JU.hsCd=Math.max(0,JU.hsCd-rt);if(JU.hs>0){JU.hs-=rt;JU.frz=true}else JU.frz=false;return JU.frz}
 frame=(f=>function(now){if(JU.hold){requestAnimationFrame(frame);composer.render();return}const rt=Math.min(.05,Math.max(0,(now-(JU.ln??now))/1000));JU.ln=now;JU.rt=rt;if(JU_gate(rt))JU.off+=rt*1000;f(now-JU.off);if(state!=='roam'&&pl&&pl.mesh.scale.y!==1)pl.mesh.scale.set(1,1,1)})(frame);
 AU.sfx=(f=>function(n){if(JU.on&&state==='roam'&&n==='takedown')JU_hit(JU_C.hsTd);return f.call(this,n)})(AU.sfx);
@@ -458,7 +458,7 @@ AU.engine=(f=>function(s,thr,on){f.call(this,s,thr,on);if(!JU.on||!this.a||state
   if(!this.juR){try{const a=this.a,src=a.createBufferSource();src.buffer=this.nb;src.loop=true;const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=110;const g=a.createGain();g.gain.value=0;src.connect(lp);lp.connect(g);g.connect(this.fx);src.start();this.juR=g}catch(e){this.juR={gain:{setTargetAtTime(){}}}}}
   this.wind.g.gain.setTargetAtTime(on?x*x*.3+(s.nitro?.1:0)+(s.air?.1:0):0,t,.1);this.wind.f.frequency.setTargetAtTime(500+x*2200,t,.1);this.juR.gain.setTargetAtTime(on&&!s.air?Math.min(.35,x*.3+JU.sq):0,t,.08)})(AU.engine);
 // one deterministic roam frame at 1/60 s (tests), the same order as frame(): hit-stop gate, sim, camera, particles, decays
-function JU_step1(){const h=1/60;JU.rt=h;let dt=(paused||JU_gate(h))?0:h;if(dt&&slowmo>0){slowmo-=dt;dt*=.35}T+=dt;if(!RO.frozen)roamStep(dt);roamCam(dt);updPool(SPARK,dt,20);updPool(FIRE,dt,-2);updPool(SMOKE,dt,-1.5);updPool(FIREB,dt,-3);updDebris(dt);updPool(WATER,dt,24);updPool(GLOWP,0);shake=Math.max(0,shake-dt*3);flash=Math.max(0,flash-dt*2.2);hitFx=Math.max(0,hitFx-dt*2.5);FX.uniforms.uCA.value=hitFx*.035+flash*.02}
+function JU_step1(){const h=1/60;JU.rt=h;let dt=(paused||JU_gate(h))?0:h;if(dt&&slowmo>0){slowmo-=dt;dt*=.35}dt=HIT_dt(dt);T+=dt;if(!RO.frozen)roamStep(dt);roamCam(dt);updPool(SPARK,dt,20);updPool(FIRE,dt,-2);updPool(SMOKE,dt,-1.5);updPool(FIREB,dt,-3);updDebris(dt);updPool(WATER,dt,24);updPool(GLOWP,0);shake=Math.max(0,shake-dt*3);flash=Math.max(0,flash-dt*2.2);hitFx=Math.max(0,hitFx-dt*2.5);FX.uniforms.uCA.value=hitFx*.035+flash*.02}
 window.__ju={get JU(){return JU},C:JU_C,on:b=>{JU.on=!!b;if(!JU.on&&pl)pl.mesh.scale.set(1,1,1)},hold:b=>{JU.hold=!!b;JU.ln=null},
   tier:()=>{const d=RO.dDir?RO.dT||0:0;return JU.on?JU_tier(d):d>2?3:d>1.1?2:d>.5?1:0},setBm:v=>{if(pl)pl.bm=v},
   // tests drive like a player: a popped-up card / story panel is dismissed with its own close control

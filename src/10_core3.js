@@ -4,7 +4,13 @@ var CR_LS=1;const CR_LGV=12;
 
 const CR_SPDCAM={b:2.2,h:.9};
 // SMASH feedback: one-shot big hit (no continuous shake)
-function CR_smashHit(){const t=performance.now();if(t-(CR_smashHit.t||0)<250)return;CR_smashHit.t=t;shake=Math.max(shake,.75);fovKick=Math.max(fovKick,10);slowmo=Math.max(slowmo,.18);try{AU.sfx('takedown')}catch(e){}try{hitPop('💥 SMASH!','#ffd12c')}catch(e){}}
+// sfx-r21c: hit-stop = a short time DIP (sim dt x HIT_K for HIT_T s of real time), never a freeze: the frame still advances and renders. Smash >= 80 km/h: dip + shake .55 + fovKick; bump < 40 km/h: shake <= .15, no dip
+let hitDip=0;const HIT_T=.07,HIT_K=.15;
+function HIT_dt(dt){if(hitDip>0){hitDip-=dt;return dt*HIT_K}return dt}
+function HIT_stop(s){if(typeof fxK==='function'&&!fxK())return;hitDip=Math.max(hitDip,Math.min(HIT_T,s))}
+function CR_smashHit(){const t=performance.now();if(t-(CR_smashHit.t||0)<250)return;CR_smashHit.t=t;const kmh=state==='roam'?Math.abs(RO.v||0)*3.6:100;
+  if(kmh<40){shake=Math.max(shake,.15)}else{shake=Math.max(shake,.45+.1*Math.min(1,(kmh-80)/60));fovKick=Math.max(fovKick,6+Math.min(3,Math.max(0,kmh-80)/20));HIT_stop(HIT_T)}
+  try{AU.sfx('takedown')}catch(e){}try{hitPop('💥 SMASH!','#ffd12c')}catch(e){}}
 // city victims tumble for 0.9 s (barrel roll + flight) before they burst into bricks
 const _crTQ=new THREE.Quaternion(),_crTE=new THREE.Euler(),_crTS=new THREE.Vector3(1,1,1),_crTP=new THREE.Vector3(),_crTM=new THREE.Matrix4();
 function CR_tumbleStart(c,x,z,dx,dz){const f=Math.hypot(dx,dz)||1,rx=x-RO.x,rz=z-RO.z,rl=Math.hypot(rx,rz)||1,v=Math.max(12,Math.abs(RO.v)),sd=(rx*Math.cos(RO.vh)-rz*Math.sin(RO.vh))<0?-1:1,lx=Math.cos(RO.vh)*sd,lz=-Math.sin(RO.vh)*sd/* rv2k3/debris-por: thrown to the side of the road, not along it into the camera */;c.crW={t:0,x,y:c.y,z,h:Math.atan2(dx,dz),vx:Math.sin(RO.vh)*v*.15+lx*9,vz:Math.cos(RO.vh)*v*.15+lz*9,vy:6+v*.05,r:0,p:0,sr:(Math.random()<.5?-1:1)*9,sp:(Math.random()-.5)*5}}
