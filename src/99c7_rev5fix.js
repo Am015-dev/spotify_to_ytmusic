@@ -480,3 +480,11 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
   return MEMF_zip(e).then(()=>{const zipped=!!e.cz,nulled=names.every(k=>!g.attributes[k].array);return(zipped?MEMF_unzip(e):Promise.resolve()).then(()=>{const same=hash()===h0,ok=g1&&zipped&&nulled&&same&&!e.cz;
    return fin(`zip ${zipped?'ok':'FAILED'} dropped ${nulled} restored-identical ${same}`)+' → '+(ok?'✅ PASS':'❌ FAIL')})})}}))}return}
  if(i<600)setTimeout(()=>MQ_reg(i+1),100)})(0);
+(function R17_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='r17'&&q.id==='start-life')){C.items.push({ver:'r17',id:'start-life',area:'life',text:'r17 · a lively start in both cities: 📍 GO reads the start state the seed left under the curtain. Pass line: ≥ 2 traffic cars 40–120 m ahead on the player\'s road, and, with ?r17pose=1 (default OFF, the Frankfurt tower behind the pause button is NOT fixed), the start view\'s top-left region is mostly open: ≥ 90 % of a 96-pixel grid is not a warm building facade, (non-warm pixels of the rendered frame, current viewport). The seed itself took ≤ 10 ms.'});
+ const go=city=>({c:city,n:city+' lively start',secs:2,fn:()=>{const R=[],s=R17.st,h=R17.home;
+  R.push(['seeded '+(s?s.n:'none')+' cars, ahead '+(s?s.ahead:'-')+' at boot (seed '+R17.ms+' ms)',!!s&&s.ahead>=2&&R17.ms<=10]);
+  
+  {const o=R17_open();R.push([innerWidth+'x'+innerHeight+' top-left open '+Math.round(o.open*100)+'% (info unless ?r17pose=1) (start pose moved: '+(R17.pose0==null?'-':R17.pose0+'% -> '+R17.pose1+'%')+')',!R17.pose||o.open>=.9])}
+  const ok=R.every(r=>r[1]);return'📍 START LIFE '+city.toUpperCase()+' · '+R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}});
+ C.GO['r17/start-life']=[go('fra'),go('ath')]}return}
+ if(i<600)setTimeout(()=>R17_reg(i+1),100)})(0);

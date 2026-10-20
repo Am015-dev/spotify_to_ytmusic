@@ -1,3 +1,10 @@
+## r17q (2026-10-20, alex/od-int2): lively start road (review 17 N5)
+1. src/98bp_warmall.js R17_seed (called from TWG_run's wrapper, under the curtain): 3 idle far cars go onto the player's road 55/85/112 m ahead (2 same-way, 1 oncoming); seed 1-11 ms, none on frame 1. ?r17=0 turns it off.
+2. GO r17/start-life (src/99c7_rev5fix.js): cars ahead at boot 0 -> 3 in Frankfurt and Athens (PASS both). Gate: unit 0 FAIL, TAG r17/start-life,perf/touch-first-frames 3/3, r13/sky-blue*,life1,xf1,terrain,phone2 47/47 on the built page.
+3. NOT fixed: the tall yellow tower behind pause/minimap (top-LEFT, not right) in Frankfurt. It is no collider (HUB.grid) and is not drawn yet at load (pose probe sees 99 % open then, 75 % at drivable). R17_pose (move spawn 30-100 m / turn 180 deg) exists behind ?r17pose=1, default OFF.
+4. Shots: docs/shots/r17q/fra_{before,after}.jpg (Athens shots not taken: boot timeout). Seeded cars sit 55+ m out and are small at 852x393.
+5. Next: run the pose search after the first streamed frames (or set a fixed Frankfurt spawn offset), then flip r17pose ON.
+
 ## perf-16 (2026-10-18, alex/od-int2): LF_tileG bodies out of the generator, pooled decor records, cached colours
 1. src/98lf_lively_fill.js: the per-cell/lite/verge/mound bodies of LF_tileG are small top-level functions (LF_cell, LF_litePt, LF_lite1, LF_verge1, LF_mound1, LF_open1; ring/R closures gone), decor records come from a pool checked out per build (LF.rp, fixed shape incl. gx/gz/_vy), pk without filter(), instance matrices via LF_inst, fill colours parsed once (LF_col; was Color.set(string) per instance). Same math and order: per-tile props + instance-matrix hashes identical trunk vs mine on 12 shared tiles.
 2. heapOwner Athens (1 run each): LF_tileG-owned ~134 MB (LF_tileG 97, di 30, P/G16/tryP 7) -> ~77 MB (LF_tileG 32 + helpers 45) while building 14-15 tiles instead of 11-12 in 10 s. hubTrafficStep 430 is now the top allocator by far.
