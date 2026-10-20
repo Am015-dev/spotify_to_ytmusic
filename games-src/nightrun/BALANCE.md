@@ -219,3 +219,37 @@ scale2-test / scale3-test Legend final window is back at 170-260 s; boss2-test's
 Owner: "Game is extremely repetitive". All ten fights used the same 6 verbs. Now 45 verbs, every boss 8-10 in three phases, pairwise overlap <= 2, one signature + one counter each. HP, cap and phases unchanged (armour.js).
 Measured (bossmoves-audit.js): shortest telegraph 0.60 s, smallest free disc 96 px, bullets <= ebCap, speed <= BCAP, stress fight lengths at the armour floor (Normal mini ~52 s, district ~85 s, final ~127 s).
 Bot (balance-test bot, Normal, mid+late, 2 runs): 28/40 boss-stage clears vs 31/40 with ?bossmoves=0 in the last run (30 vs 28 in the run before). Weakest: Hoplite 1/4, Schranke 2/4; Talos 2/4 (was 0/4).
+
+## Must move (flag RET.mustmove, ?mustmove=0 = before; 19 Oct 2026)
+Owner: "there are weapons like swarm that I can win the game without moving on Normal". Gate: `mustmove-test.js` (Normal, stages 1/5/10/20/30/40,
+mid + max builds, every weapon paired with the homing Swarm; bots: park = never moves, hop = 48 px every 1.5 s blind to bullets, track = lines up
+with the nearest foe and never dodges). Before: park and hop already died (h.js static discharge, ~25 s); **track cleared 60%** of stages >= 3 with
+every weapon (the weapon did not matter: enemies hardly threaten a ship that keeps its x). After: track 0-10% per weapon, park/hop 0%.
+- Column strike (`parts/fair.js` D, object `MM`): a ship whose x stays inside 70 px for `MM.win()` s (Easy 5, Normal 3.5, Hard 3.2, VH 3, Legend 2.8)
+  gets a vertical lane on its x: pulses `MM.tel()` s (Easy 1.1 .. Legend .7, always >= .6), fires .25 s, 1 hull (2 from the second strike in a row
+  unless the ship really moved 140 px; Easy always 1). 1.6 s pause between strikes (Easy 2.4). Story stage >= 3, endless after 20 s, not in
+  tutorial/lab/god mode. A 45 px sidestep or a dash clears it; the rest of the screen is free.
+- Homing (S2 steer): every tier now uses the hard tiers' narrow cone (.7 rad) and reach (300 px), so missiles need the ship pointed at a target.
+- Test bots see the lane (`MM.cost(x)`) like STILL.beam and the boss telegraphs: balance-test dec()/camp(), afk-test bot.
+
+## Enemies that react (parts/react.js, flag RET.react, ?react=0 = old fixed paths and timers; 19-20 Oct 2026)
+- Brains on drones, flankers, turrets, gunships (formation path units and units on their way out get fire brains only; zoo kinds, ground units, bosses, tutorial untouched):
+  HUNT (leads PV), FEINT (tell, cancel '?', slide to the other side, real shot), RETREAT (backs off while you press in; when you back away it dives, dashed-line tell),
+  PRESS (fills the half you hug), BAIT (holds fire until you cross a lane, then shoots where the dodge goes), WINDOW (Hard+: steel ring, shots bounce off except 1 s after it fires).
+- Squads (spawned on one frame; a turret/gunship can recruit an on-screen drone): PIN + EXIT pair (same tell; exit line >= 114 px from the pin line), LEADER (crown; Hard+ 1.5x HP; death = 3 s ENRAGED, faster cycle, same tells), shield BEARER (covers a gunner from the ship's line; flank it).
+- Reads the ship: camping on a gun's line from > 300 px for 0.6 s cuts its cooldown (still a full tell); a ship that hangs back (x < 170) for 3 s gets full lead and loses the Normal easing;
+  a ship within 250 px flusters it on Easy/Normal (one plain shot, no lead, +0.15 s tell), so pressing in pays (reward-test: bold >= camp in 3/3 runs).
+- Fire period = old mean x (1 +-25%), Easy/Normal x1.25 (not while hanging back); flankers keep their own sweep (fire brains only); tells >= 0.6 s (Easy/Normal 0.7 s), shots land on a beat; at most 3 tells at once (Hard+ 6). First shot 0.1-0.4 s + tell after entry, never held by the tell cap. Easy: no squads.
+- Per-run seed (daily/weekly: fixed from the date; ?rseed=N forces one; ?rxs=<state> forces a state for tests).
+- react-test on the merged build (stage 7 + a scripted turret/drone pair every 10 s, 5 attempts, same dice, fresh page each): enemy position gap between attempts 0.0 -> 62.5 px, fire-time spread 0.00 -> 1.49 s.
+  Normal stages 3/7/12 x10: dodging bot 100% -> 93%, tracker bot 0% -> 0% (react=0 -> on). Escape gap >= 96 px, tells >= 0.6 s, flag off = identical to the page without react.js.
+
+## Counter threats: DASH and EMP as answers (flag RET.counter, ?counter=0 = abilities only; 19 Oct 2026)
+- One threat every EV bars (Easy 10, Normal 9, Hard 6, Very hard 5, Legend 4), in turn from the unlocked ones; never with a boss, pit stop, lab or tutorial.
+  Unlock by story stage: seeker 3, wall 5 (not Easy), curtain 7 (not Easy), warden 9. Endless uses S2.stg().
+- Seeker: .7 s red-ring tell, 300 px/s (Easy 240), turns 9 rad/s on the hard tiers (Normal 6 = can be outrun, Easy 4) for 4 s; 1 hull (2 on hard tiers); parry window .15 s (+1 frame); parry shot 15 dmg (player shot, DMG caps).
+- Laser wall: 1.3 s tell, 420 px/s, 1 hull once; 110 px gap below Hard or when there is no dash charge. Curtain: .9 s tell, 2 layers, 96 px gaps >= 270 px apart, .45 s apart (.9 s below Hard or with no dash and no EMP), 230 px/s.
+- Warden: 60 hull x (Easy .8, Normal 1, Hard 1.3, Very hard 1.5, Legend 1.7); shield takes 70% of each hit; EMP strips it for 8 s; stays up to 20 s.
+- GOOD EMP (>= 6 bullets, a curtain, or a shielded warden): +400 x mult, +.25 meter. COMBO = EMP <= 1 s after a dash start: +12 to ordinary foes within 300 px.
+- counter-test (threat scenarios on Hard; dodging bot without vs with the timed answer, hull lost): seeker (Hard) 5 vs 0, wall 5 vs 0, curtain 3 vs 1; warden kill 3.5 s vs 1.2 s; combo 110 vs 50 damage; random presses 5.7 vs timed 2.5.
+- balance-test Normal stage 20 (RUNS=6): first tuning (EV 7, turn 9) 67%/67% vs 100%/100% flag off; now late 83%, mid 100%.

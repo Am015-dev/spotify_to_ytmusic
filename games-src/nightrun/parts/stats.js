@@ -5,7 +5,7 @@
 if(RET.stats===undefined)RET.stats=!/[?&]stats=0/.test(location.search);
 RET.sioKeys.push('mnr_stats');
 RET.st=(function(on){
-  const KEY='mnr_stats',NUM=['runs','time','kills','bosses','grazes','perfects','dashes','fevers','deaths','bestScore','neon','daily','fuse','clears','arcClears','hardClear','noHit'];
+  const KEY='mnr_stats',NUM=['runs','time','kills','bosses','grazes','perfects','dashes','fevers','deaths','bestScore','neon','daily','fuse','clears','arcClears','hardClear','noHit','choices'];
   const blank=()=>({v:1,s:Object.fromEntries(NUM.map(k=>[k,0])),w:{},a:{},arc:{}});
   let D=blank(),fresh=true,dirty=false,cur=null,lastBank=null,gotLoad=false;
   const clampN=v=>typeof v==='number'&&isFinite(v)?Math.max(0,Math.min(1e9,v)):0;
@@ -98,6 +98,7 @@ RET.st=(function(on){
   NR.on('footKill',d=>{if(!on||!d)return;if(d.boss)S().bosses++;else S().kills++;mark();});
   NR.on('footEnd',d=>{if(!on||!d)return;const t=Math.max(0,Math.min(3600,(+d.time||0)-ft0));S().time+=t;if(!d.cleared&&!d.quit)S().deaths++;ft0=0;mark();poll();save();});
   NR.on('graze',()=>{if(!on||!live())return;S().grazes++;mark();});
+  NR.on('choice',()=>{if(!on||!live())return;S().choices++;mark();});   // choices.js (RET.build2): cards and pickup pairs taken
   NR.on('perfect',d=>{if(!on||!live())return;S().perfects++;if(d&&d.kind==='dash')S().dashes++;mark();});
   let fvSeen=0;
   NR.on('bar',()=>{if(!on||!live())return;try{const n=RET.fv.starts|0;if(n>fvSeen){S().fevers+=n-fvSeen;mark();}fvSeen=n;}catch(e){}});
@@ -156,6 +157,7 @@ RET.st=(function(on){
      +'<div class="stGrid">'+cell('Runs',fmtN(s.runs))+cell('Play time',fmtT(s.time))+cell('Enemies',fmtN(s.kills))+cell('Bosses beaten',fmtN(s.bosses))+cell('Grazes',fmtN(s.grazes))+cell('PERFECT dashes',fmtN(s.dashes))+cell('PERFECT hits',fmtN(s.perfects))+cell('FEVERs',fmtN(s.fevers))+cell('Deaths',fmtN(s.deaths))+cell('Best score',fmtN(s.bestScore))+cell('Best stage',bestStage||'-')+cell('Neon earned',fmtN(s.neon))+cell('Daily streak best',fmtN(s.daily))+cell('Stage clears',fmtN(s.clears))+'</div>'
      +(wt.length?'<h3>WEAPONS USED</h3><div class="stParts">'+wt.map(id=>'<div><span>'+esc((window.WPD&&WPD[id]&&WPD[id].n)||id)+'</span><i><u style="width:'+Math.round(100*D.w[id]/wmax)+'%"></u></i><em>'+fmtT(D.w[id])+'</em></div>').join('')+'</div>':'')
      +(window.PW3&&PW3.on&&PW3.sheet?PW3.sheet():'')
+     +(typeof FB!=='undefined'&&FB.on?FB.sheet():'')
      +'<h3>ACHIEVEMENTS <span id="stAchN">'+got+'/'+A.length+'</span></h3><div class="stAch">'
      +A.map(a=>{const g=!!D.a[a.id];return '<div class="ac'+(g?' got':'')+'" data-id="'+a.id+'">'+badge(a,g)+'<span><b>'+esc(a.n)+'</b><small>'+(g?'':'🔒 ')+esc(a.d)+(a.skill?' · no Assist':'')+'</small></span></div>';}).join('')+'</div>'
      +'<h3>CREDITS &amp; PRIVACY</h3><div class="stCred"><p><b>Music</b> original, made for this game</p><p><b>Code and art</b> original, made for this game</p><p><b>Privacy</b> saved only on this device. No data is collected.</p></div>'
