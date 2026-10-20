@@ -8,7 +8,7 @@
       MEDIC (heals the foes around it while they are not being hit), EVASIVE (steps out of the way of straight shots; homing and area weapons still land). Every kind has a drawn tell from the first frame.
    Nothing here touches hard.js, armour.js, the DMG caps or the W13 floors: shield and plate only shave damage, the floor still lets a foe die no sooner than VIS.ml. */
 if(RET.grit===undefined)RET.grit=!/[?&]grit=0/.test(location.search);
-if(RET.gritBoss===undefined)RET.gritBoss=/[?&]gritboss=1/.test(location.search);   // W54: Hard boss mercy, OFF by default (reaches 17-25% beat-bot clear, target 50%)
+if(RET.gritBoss===undefined)RET.gritBoss=!/[?&]gritboss=0/.test(location.search);   // W54: Hard boss mercy, OFF by default (reaches 17-25% beat-bot clear, target 50%)
 const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.tut||G.lab));},
   rate0:1/50,burst:.25,stK:.03,maxK:4,hk0:.3,hkS:.5,lvTop:.62,from:3,
   /* W47 Normal ease: special kinds thin out before stage 12 (dens), at most maxE alive there, a lower hull slope; stages 1-3 assist: wider beat window, slower enemy shots (humanbot.js: human clear 39% -> 70+% at st3-7) */
@@ -16,7 +16,7 @@ const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.
   st:{charges:0,gain:0,kill:0,fod:0,spec:0},
   fkM:{},fk0:1.15,fkEnd:1.05,fkA:10,fkB:20,   // on-screen floor x1.3 to stage 10, tapering to x1.1 at stage 20 (humanbot.js: median life 2.4 -> 3.0 s; a flat x1.3 cost the stage-20 oracle dodger 20-30 points)
   fk(e){const k=this.fkM[e.type]||this.fk0,s=this.stg();return s<=this.fkA?k:1+(k-1)*Math.max(0,1-(1-(this.fkEnd-1)/Math.max(.001,k-1))*Math.min(1,(s-this.fkA)/(this.fkB-this.fkA)));},
-  mcH:.5,mcHMax:6,   // W54 Hard boss mercy: .5 of a hit per hit taken during a boss fight, at most 3 per run
+  mcH:.7,mcHMax:8,   // W54 Hard boss mercy: .7 of a hit per hit taken during a boss fight, at most 8 per run
   hardBoss(){return this.on&&RET.gritBoss&&SET.diff==='hard'&&!!G.boss&&!G.boss.dead;},
   norm(){return this.on&&SET.diff==='normal';},
   dens(){if(!this.norm())return 1;const s=this.stg();return s>=this.densB?1:s<=this.densA?this.dens0:this.dens0+(1-this.dens0)*(s-this.densA)/(this.densB-this.densA);},

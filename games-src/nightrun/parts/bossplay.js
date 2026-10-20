@@ -46,6 +46,8 @@ const BP_GATES=['nodes','medic','emp','parry','back'];
 const BPL=window.BPL={get on(){return!!RET.bossplay&&!!RET.bossmoves;},T:BPT,N:BPN,BREATH:10,OPEN:18,FB:7,FBW:9,LEAK:.25,LEAKH:.45,LEAKT:40,PT:{easy:0,normal:70,hard:95,vhard:95,legend:0},OPENE:14,EASYN:12,RF:3,RF2:3,GR:3,GRP:4.5,PIN:.75,RB:.35,OPENQ:4,QK:.5,FLANK:.8,TEL:.8,GAP:96,auto:/[?&]bpauto=1/.test(location.search)?1.5:0,seed:null,
   st:null,hz:[]};
 BPL.fb=()=>BPL.FB;
+BPL.RFD={hard:[3,3]};   // enrage fill seconds [to tier 1, to tier 2] per difficulty (Hard has its own row)
+BPL.LKN=[BPL.LEAK,BPL.LEAKH,BPL.LEAKT];BPL.LK={hard:[.25,.45,40]};   // shield leak [base, after LEAKT s shielded, LEAKT] per difficulty; Hard has its own row (a beat-timed bot died 30-60 s into the t=126 boss)
 /* W53 ENRAGE: ignoring a gate is DANGEROUS, not slow. While a gate is up and you are not working on it, the meter b.rg fills (RF s to the first tier, RF2 s to the next);
    each fill fires one bounded BURST (three aimed fans, telegraphed >= 0.6 s, gaps >= GAP px) and raises the tier b.rt (stage <= 12: tier 1 at most). Enraged shots (red) hit for 2 hull and break through the last .75 s of the hit shield.
    Tier 1: an aimed 3-shot volley every 2 beats (stage <= 12: every bar, and no shield break-through); tier 2 (stage 13+): every beat plus one extra bullet verb from the boss's own moveset layered half a slot later; verb telegraphs
@@ -58,7 +60,7 @@ BPL.RE=!/[?&]bprage=0/.test(location.search);   // stage <= 12: ?bprage=0 turns 
 BPL.rage=(e,b,g,dt,sb)=>{const s=BPL.stat();if(!BPL.tier()&&!BPL.RE){b.rg=0;b.rt=0;return;}if(BPL.tier()>0&&P.inv>0&&P.inv<BPL.PIN)for(const x of G.eb)if(x.bpR&&!x.dead&&Math.hypot(x.x-P.x,x.y-P.y)<x.r+10){P.inv=0;break;}   // an enraged shot breaks through the hit shield after its first PIN s
   if(e.b2&&e.b2.ls>0){b.rg=0;b.rt=0;return;}
   const bz=g&&g.up&&BPL.busy(e,g);if(bz)g.gr=(g.gr||0)+dt;const ign=g&&g.up&&(!bz||g.gr>(g.m==='parry'?BPL.GRP:BPL.GR)),fbw=g&&!g.up&&g.open&&G.t<g.open&&g.fbw;
-  if(ign)b.rg=(b.rg||0)+dt/(b.rt?BPL.RF2:BPL.RF);else if(!fbw&&!(g&&g.up))b.rg=Math.max(0,(b.rg||0)-dt/BPL.RF);
+  const rf=BPL.RFD[SET.diff]||[BPL.RF,BPL.RF2];if(ign)b.rg=(b.rg||0)+dt/(b.rt?rf[1]:rf[0]);else if(!fbw&&!(g&&g.up))b.rg=Math.max(0,(b.rg||0)-dt/rf[0]);
   if(b.rg>=1){b.rg=BPL.RB;b.rt=Math.min(BPL.rmax(),(b.rt|0)+1);s.bursts=(s.bursts|0)+1;s.rt=Math.max(s.rt|0,b.rt);const v=250+15*diff();
     for(let i=0;i<3;i++)BPL.vol(e,5,0,v,Math.max(.6,sb*Math.ceil(.6/sb))+i*.3);floater(e.x,e.y-e.r-48,'ENRAGED '+b.rt,'#ff3d6e');AU.sfx('warn');}
   if(!(b.rt>0)||!(ign||fbw)||e.bmS>e.bt)return;const k=b.rt>1?1:BPL.tier()?2:4;if((e.bt|0)!==b.rb&&(e.bt|0)%k===0){b.rb=e.bt|0;BPL.vol(e,3,0,220+15*diff());s.vol=(s.vol|0)+1;}};
@@ -77,7 +79,7 @@ BPL.stat=()=>BPL.st||(BPL.st={boss:null,seed:0,pick:[],order:[],seen:{},res:{},h
 NR.on('runStart',()=>{BPL.st=null;BPL.hz=[];});
 /* a small seeded generator per attempt (the attack order and the picks; the game's own random stays untouched) */
 BPL.rng=s=>{let a=s>>>0||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};};
-BPL.k=e=>{const b=e&&e.bp;if(!BPL.on||!b)return 1;if(e.b2&&e.b2.ls>0||e.bmS>e.bt)return 1;   /* the last stand and a bossmoves STUN are always open */if(b.g&&b.g.open&&G.t<b.g.open)return 1;const pt=BPL.PT[SET.diff]||0;if(pt&&G.t-(b.p0||0)>pt)return 1;return(b.sh||0)>BPL.LEAKT?BPL.LEAKH:BPL.LEAK;};   // W40: outside the OPEN window (gate up, rising, between chained gates or phases) only LEAK of the damage gets through
+BPL.k=e=>{const b=e&&e.bp;if(!BPL.on||!b)return 1;if(e.b2&&e.b2.ls>0||e.bmS>e.bt)return 1;   /* the last stand and a bossmoves STUN are always open */if(b.g&&b.g.open&&G.t<b.g.open)return 1;const pt=BPL.PT[SET.diff]||0;if(pt&&G.t-(b.p0||0)>pt)return 1;const L=BPL.LK[SET.diff]||BPL.LKN;return(b.sh||0)>L[2]?L[1]:L[0];};   // W40: outside the OPEN window (gate up, rising, between chained gates or phases) only LEAK of the damage gets through
 /* called at the end of BMV.init (the movesets are set): the seed, the picks per phase, the shuffled order */
 BPL.init=e=>{e.bp=null;if(!BPL.on||!e.bm)return;const T=BPT[e.bm.id];if(!T)return;
   const seed=BPL.seed!=null?BPL.seed:(Math.random()*4294967295)>>>0,R=BPL.rng(seed),sig=e.bm.T.sig;
@@ -182,7 +184,8 @@ BPL.arena=(e,b,t,sb,dt)=>{const m=b.ar;if(!m)return;const S=b.arS,s=BPL.stat(),b
   if(m==='zone'){if(!S.n||t>=S.n){S.cx=clamp(P.x,140,x1-140);S.cy=clamp(P.y,140,H-140);S.t0=t;S.n=t+bar*2;}
     S.r=Math.max(130,260-(t-S.t0)/(bar*2)*150);s.gap=Math.min(s.gap,2*S.r);
     if(t-S.t0>BPL.TEL&&Math.hypot(P.x-S.cx,P.y-S.cy)>S.r){S.out=(S.out||0)+dt;if(S.out>.8){S.out=0;BPL.hit();}}else S.out=0;s.tel=Math.min(s.tel,BPL.TEL);}};
-BPL.hit=()=>{const h=P.hp;hurt(1);if(P.hp<h)BPL.stat().hits++;};
+BPL.AM={hard:.9};   // share of arena hits absorbed per difficulty (hull restored, short grace); Hard only
+BPL.hit=()=>{const h=P.hp,s=BPL.stat();hurt(1);if(P.hp<h){s.hits++;const am=BPL.AM[SET.diff]||0;if(am&&h>1&&!G.dead){s.am=(s.am||0)+am;if(s.am>=1){s.am-=1;P.hp=h;P.inv=Math.max(P.inv||0,.6);s.absorbed=(s.absorbed|0)+1;}}}};
 /* ---- placeholder shapes (circles / triangles / squares); drawn after the boss hazards ---- */
 BPL.draw=()=>{const e=G.boss;if(!BPL.on||!e||!e.bp||e.x>W+40)return;const b=e.bp,g=b.g,t=G.t,rm=!!SET.reduce,pul=rm?.5:.5+.5*Math.sin(t*8);ctx.save();
   const S=b.arS||{},x1=e.x-e.r-10,m=b.ar;

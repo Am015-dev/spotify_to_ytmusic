@@ -74,7 +74,7 @@ const OFF = ({ n }) => { const m = window.__mnr, L = window.BPL; m.SET.diff = 'e
     line(p.hints.length >= 2 && p.hints.every(h => h.length <= 60), `${id}: intro / phase / outro hints shown (${p.hints.length}), longest ${Math.max(...p.hints.map(h => h.length))} chars (<= 60)`); }
   // 6 W40: hull loss with real hits (no god mode), play vs ignore, Normal
   { const HN = +process.env.HN || 12, ONLY = process.env.ONLY ? process.env.ONLY.split(',').map(Number) : null, HB = BOSSES.filter(([n]) => !ONLY || ONLY.includes(n)), hj = [];
-    for (const [n] of HB) for (let k = 0; k < HN; k++) for (const play of [true, false]) hj.push({ n, diff: 'normal', play, seed: 2000 + n * 31 + k, hull: 1 });
+    for (const [n] of HB) for (let k = 0; k < HN; k++) for (const play of [true, false]) hj.push({ n, diff: process.env.HDIFF || 'normal', play, seed: 2000 + n * 31 + k, hull: 1 });
     const hr = await run(hj, FIGHT, '&bossplay=1'), sum = (a, f) => a.reduce((x, r) => x + f(r), 0);
     for (const [n, id] of HB) { const P = hr.filter(r => r.n === n && r.play), I = hr.filter(r => r.n === n && !r.play), tm = a => sum(a, r => r.ttk != null ? r.ttk : r.cut) / a.length, hm = a => sum(a, r => r.hits) / a.length, lm = a => sum(a, r => r.lost) / a.length;
       const rt = tm(I) / tm(P), rh = lm(I) / Math.max(1, lm(P)), done = P.every(r => r.ttk != null);
