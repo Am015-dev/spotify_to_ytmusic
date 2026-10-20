@@ -613,3 +613,13 @@ function CRVC_drop(){const u=CRVC_used(),gb=g=>{let z=0;if(!g||!g.attributes)ret
    const t0=(g=>g&&g.m?g.m.attributes.position.count:0);const G0=CR_grp(CR_OFF,'off'),a=CR_VC.off?t0(CR_VC.off):0;const sv=CR_VC.off;delete CR_VC.off;const G1=CR_grp(CR_OFF,'off'),b=t0(CR_VC.off);if(sv)CR_VC.off=sv;else delete CR_VC.off;void G0;void G1;
    const ok=(!LOWMEM||CRVC.on)&&left===0&&a>0&&a===b;return`📍 MEM OWN · ${c==='fra'?'Frankfurt':'Athens'}: crvc ${CRVC.on?'on':'off'}, dropped ${CRVC.n} forms (${CRVC.mb} MB), kept ${kept} on meshes, unused left ${left}, rebuild verts ${a} → ${b} → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
  if(i<600)setTimeout(()=>CRVC_reg(i+1),100)})(0);
+
+// perf-r18o: shortcut-scan probes use Int32 pre-bounds (DEST_hit, DK_any); GO = same answers as roamHit / the full roamTerr deck test on a fixed point set, DEST_open deterministic
+(function R18O_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='dest-int')){C.items.push({ver:'perf',id:'dest-int',area:'perf',text:'perf-r18o: DEST_hit == roamHit, DK_any == deck bbox test',go:'perf/dest-int'});
+ C.GO['perf/dest-int']=[{c:'ath',n:'DEST_hit and DK_any equal their full tests',fn:()=>{const R=[];try{const N=HUB.nodes;let s=777,n=0,bad=0,badD=0,hits=0;const r=()=>(s=(s*1103515245+12345)&0x7fffffff)/0x7fffffff;
+   for(let k=0;k<3000;k++){const a=N[Math.floor(r()*N.length)];if(!a)continue;const x=a.x+(r()-.5)*60,z=a.z+(r()-.5)*60,y=groundAt(x,z,99)+.6;n++;const e=!!roamHit(x,z,3.8,y),g=DEST_hit(x,z,3.8,y);if(e!==g)bad++;if(e)hits++;
+    let d=false;for(const b of ALL_DECKS)if(!(x-b.cx>b.r||b.cx-x>b.r||z-b.cz>b.r||b.cz-z>b.r)){d=true;break}if(d!==DK_any(x,z))badD++}
+   R.push([n+' points, '+hits+' collider hits, DEST_hit mismatches '+bad,n>500&&bad===0]);R.push(['DK_any mismatches '+badD,badD===0]);
+   const a=N.find(q=>q&&!q.ab&&q.nb&&q.nb.length);if(a){const o1=DEST_open(a.x,a.z,a.x+80,a.z+30),o2=DEST_open(a.x,a.z,a.x+80,a.z+30);R.push(['DEST_open repeatable',o1===o2])}}
+  catch(e){R.push(['threw '+e,false])}const ok=R.every(r=>r[1]);return`📍 DEST INT · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+ if(i<600)setTimeout(()=>R18O_reg(i+1),100)})(0);

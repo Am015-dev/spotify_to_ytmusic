@@ -690,3 +690,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. HT_cars spike (26-28 ms in hubTrafficStep) NOT touched: no PROF=1 pass done in the timebox.
 4. Gate (built): unit 0 FAIL; r13 sky + life1 xf1 terrain phone2 47/47; life1 + minimap2 green, perf/touch-first-frames PASS solo in ath (red only when fra+ath run in parallel).
 5. Left: no GO assert added for smq; PROF=1 tBoot over the hubTrafficStep spike frames, cap far-car pose updates; re-measure on an idle box.
+## ios-r18o (2026-10-20): shortcut scan probes on Int32 pre-bounds (DEST_find -26 % allocation)
+1. Change: roamTerr deck loop and the new DK_any use an Int32Array bbox per deck (Smi compares, no boxed subtractions); DEST_hit = roamHit with per-grid-cell Int32 pre-bounds (WeakMap, hw+hd+4 margin, same tests after); DEST_open checks slope first and skips the 2nd roamTerr when no deck bbox covers the point. Results identical: 4000 seeded pairs Ath hash 627916 / Fra 2705 pairs hash 309601 before = after.
+2. Measured Ath touch lowmem 30 s (sampled, incl. collected): DEST_find 312 -> 231 MB (-26 %), total 2258 -> 2121 MB; roamHit under DEST 68 -> gone from top, top-5 now MEMF_gstep 73, LIFE_draw 52, CTB_step 37, traverse 37, roamTerr(DEST) 36. 4000-pair scan time 1.68 s -> 1.44 s.
+3. tBoot ath lowmem 60 s jsn50 / JS max: old 22/197, new 20/232 (run 1 each; 2nd runs not complete at push, max is GC noise).
+4. GO perf/dest-int (src/99c7_rev5fix.js): DEST_hit == roamHit and DK_any == full deck test on 3000 points. perf/alloc-rate NOT tightened (it has no MB metric; the MB/min is measured by tBoot HEAP=1).
+5. Gate: unit 0 FAIL; perf/alloc-rate, dest-int, life1 green; perf/touch-first-frames red both cities (curtain 5.6-6.0 s, known on trunk); r13 sky + life1 xf1 terrain phone2 47/47. Left: TR_Y/TR_G/athShelfY, cityAt and LF_onRoad still interpreted-boxing (~100 MB); DEST_open lateral groundAt x2 per step.
