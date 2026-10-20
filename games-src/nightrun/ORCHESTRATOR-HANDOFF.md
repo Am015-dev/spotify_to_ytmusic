@@ -60,6 +60,7 @@ Test column = test file and its status in `TEST-LEDGER.md`: P PASS, F FAIL, Fl F
 | scale / scale2 / scale3 | scale.js, fair.js, hard.js | power-aware enemy hull, rounds 1-3 | scale-test P, scale2-test P, scale3-test F |
 | pw2 | powerups.js | six music-tied powers + drum burst | ret-pw2-test F |
 | pw3 | powlevels.js | power-up levels + 5 new shooter powers | ret-pw3-test F |
+| powers | arsenal.js | 12 more power-ups (defensive, offensive, utility, risky), context picker, max 2 timed + 1 stored charge | powers-test - |
 | read | readable.js | bullets and threats readable at a glance | readable-test F |
 | zoo | zoo.js | time to kill + 8 enemy kinds | zoo-test NR |
 | leak | leak.js | ground enemies, calmer pacing, escape penalty | ret-leak-test F |
