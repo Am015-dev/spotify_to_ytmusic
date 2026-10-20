@@ -368,7 +368,7 @@ function update(dt){
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
       if(hit&&b.px&&b.px.has(e))continue;
       if(hit&&e.zt&&window.ZOO&&ZOO.block(b,e)){b.dead=1;if(Math.random()<.5)burst(b.x,b.y,'#4ad1ff',3,120,.25);AU.sfx('hit');break;}   // zoo.js: a shield absorbs the shot
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.wid)e._wk=b.wid;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom(FXW.hk(b,'hit-spark'),b.x,b.y,30,.16);}AU.sfx('hit');break;}}
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.wid)e._wk=b.wid;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh||b.fg)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom(FXW.hk(b,'hit-spark'),b.x,b.y,30,.16);}AU.sfx('hit');break;}}
     if(b.rc>0&&(b.y<2&&b.vy<0||b.y>H-2&&b.vy>0)){b.vy=-b.vy;b.rc--;b.y=clamp(b.y,3,H-3);if(b.px)b.px.clear();}
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}
