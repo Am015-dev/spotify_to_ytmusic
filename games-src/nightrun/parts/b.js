@@ -396,7 +396,7 @@ function update(dt){
   for(const p of G.pk){p.bob+=dt*4;const dx=P.x-p.x,dy=P.y-p.y,l=Math.hypot(dx,dy);
     if(l<NR.mod.mag&&!G.dead){p.vx+=dx/l*1400*sdt;p.vy+=dy/l*1400*sdt;}else{p.vx+=(-70-p.vx)*sdt*2;p.vy*=1-sdt*2;}
     p.x+=p.vx*sdt;p.y+=p.vy*sdt;
-    if(l<22&&!G.dead){p.dead=1;AU.sfx('pick');
+    if(l<22&&!G.dead){p.dead=1;AU.sfx('pick');if(window.RWD)RWD.pick(p);
       if(p.t==='shard'){const sk=SH.smk||1;G.mult=Math.min(9.9,+(G.mult+.1*sk).toFixed(2));G.score+=Math.round(50*G.mult*sk);}
       if(p.t==='hp'){P.hp=Math.min(P.max,P.hp+1);floater(P.x,P.y-24,'HULL +1','#3dffb0');}
       if(p.t==='up'){WP.gain();AU.sfx('up');}
