@@ -30,7 +30,7 @@ function urbDraw(g,P,sc,col){const U=urbLayer(),[x,y]=P(U.x1,U.z1),w=U.c.width/U
 {const m=/[?&]cc=([01])/.exec(location.search);if(m)TUNE.callCap=+m[1]}{const m=/[?&]htgc=([01])/.exec(location.search);if(m)TUNE.htGc=+m[1]}
 const MP_BB=new WeakMap();function mpBox(pts){let b=MP_BB.get(pts);if(!b){b=[1e9,-1e9,1e9,-1e9];for(const q of pts){if(q.x<b[0])b[0]=q.x;if(q.x>b[1])b[1]=q.x;if(q.z<b[2])b[2]=q.z;if(q.z>b[3])b[3]=q.z}MP_BB.set(pts,b)}return b}
 // perf-r13h: src = {bld,st,shade} from SMM_tile: the tile's own buildings/streets as arguments (no LAZY/CITY_S splice-swap). A reused tile canvas changed pixels (GPU/CPU raster), so each tile keeps a fresh one
-function miniPaint(x0,x1,z0,z1,k,wt,src){const W=Math.ceil((x1-x0)*k),H=Math.ceil((z1-z0)*k),[c,g]=cv(W,H);const P=(x,z)=>[(x1-x)*k,(z1-z)*k];
+function miniPaint(x0,x1,z0,z1,k,wt,src){const W=Math.ceil((x1-x0)*k),H=Math.ceil((z1-z0)*k);let c,g;/* ios-r18q: SMM tile scratch canvas reused (no per-tile alloc -> no GC in a tile paint) */if(src&&src.reuse&&src.rc&&src.rc[0].width===W&&src.rc[0].height===H){[c,g]=src.rc;g.setTransform(1,0,0,1,0,0);g.globalAlpha=1}else{[c,g]=cv(W,H);if(src&&src.reuse)src.rc=[c,g]}const P=(x,z)=>[(x1-x)*k,(z1-z)*k];
   const BL=src?src.bld:HUB.bld,LZL=src?[]:LAZY,CS=src?src.st:CITY_S;
   const cut=(!!TUNE.callCap||!!src)&&!wt,miss=(a,b,cc,d)=>cut&&(Math.max(a,b)<x0-60||Math.min(a,b)>x1+60||Math.max(cc,d)<z0-60||Math.min(cc,d)>z1+60),out=pts=>{if(!cut)return false;const b=mpBox(pts);return miss(b[0],b[1],b[2],b[3])};
   const rect=(a,b,cc,d,col)=>{const p=P(a,d),q=P(cc,b);g.fillStyle=col;g.fillRect(Math.min(p[0],q[0]),Math.min(p[1],q[1]),Math.abs(q[0]-p[0]),Math.abs(q[1]-p[1]))};

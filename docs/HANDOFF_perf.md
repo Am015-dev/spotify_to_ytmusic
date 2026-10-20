@@ -683,3 +683,10 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Change: GO perf/pc-heap-60s now counts growth device-like (IOSM_dev before gc), caps fra 60 / ath 56 (measured max +20 %, was 110 / 106). tPcHeap DEV=1, EVAL0=, new tHeapDiff.js (DEPTH=, DEV=1).
 4. Gate (built): unit 0 FAIL; perf pc-heap/heap-30s/pc-roam-30s/pc-boot-lt 7/7; r13 sky + life1 xf1 terrain phone2 47/47. No render path touched, so no new shot.
 5. Left: with real draws the remaining owners are PC.L ~7, LF.ms ~6, FCG/occ ~10 (all small); fra +55 in tPcHeap is near the 60 line. Next: free FCG/occ WeakMap geometry on LF tile unload.
+
+## ios-r18q (2026-10-20): minimap tile paint no longer allocates / stacks on heavy frames (?smq=0 = old; default ON) · JS max target NOT met
+1. Change: src/70 miniPaint reuses one scratch canvas for SMM tiles (src.reuse), src/72 SMM_shade reuses its canvas + ImageData, and the SMM_tick call on touch/lowmem paints one tile per frame and is skipped (max 3 in a row) when the frame already spent > 6 ms since RB_frame.
+2. Measured tBoot ath lowmem 60 s, 3 paired runs (box was loaded, noisy): ?smq=0 jsn50 4/7/6, JS max 91/87/153; smq on jsn50 8/4/12, JS max 120/82/109. SMM tile total ms 84/88/109 → 61/72/64 and tile max 4-14 → 3-5 ms: tile paint is cheaper, but JS max / jsn50 show no gain (other owners dominate in these runs).
+3. HT_cars spike (26-28 ms in hubTrafficStep) NOT touched: no PROF=1 pass done in the timebox.
+4. Gate (built): unit 0 FAIL; r13 sky + life1 xf1 terrain phone2 47/47; life1 + minimap2 green, perf/touch-first-frames PASS solo in ath (red only when fra+ath run in parallel).
+5. Left: no GO assert added for smq; PROF=1 tBoot over the hubTrafficStep spike frames, cap far-car pose updates; re-measure on an idle box.

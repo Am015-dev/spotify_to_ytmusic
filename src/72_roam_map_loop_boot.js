@@ -164,14 +164,15 @@ function SMM_tile(tx,tz){const T=SMM.T,x0=tx*T,x1=x0+T,z0=tz*T,z1=z0+T,m=60,B=[]
   for(let a=Math.floor((x0-m)/250);a<=Math.floor((x1+m)/250);a++)for(let c=Math.floor((z0-m)/250);c<=Math.floor((z1+m)/250);c++){const k=a*100000+c,L=SMM.bg.get(k),Q=SMM.sg.get(k);if(L)for(const b of L)B.push(b);if(Q)for(const s of Q)Ss.add(s)}
   for(const L of LAZY){const r=L.rect;if(r[1]<x0-m||r[0]>x1+m||r[3]<z0-m||r[2]>z1+m)continue;for(const b of L.bld)if(b.x>x0-m&&b.x<x1+m&&b.z>z0-m&&b.z<z1+m)B.push(b)}
   // perf-r13h (TUNE.callCap): lists go in as arguments; grid buildings pre-filtered to the ones whose circle touches the tile (same pixels)
-  if(TUNE.callCap){const C=[];for(const b of B){const r=(b.c==null?b.hw+b.hd:Math.hypot(b.hw,b.hd))+4;if(b.x+r>x0&&b.x-r<x1&&b.z+r>z0&&b.z-r<z1)C.push(b)}SMM.src.bld=C;SMM.src.st=Ss;SMM.src.shade=SMM_shade;
+  if(TUNE.callCap){const C=[];for(const b of B){const r=(b.c==null?b.hw+b.hd:Math.hypot(b.hw,b.hd))+4;if(b.x+r>x0&&b.x-r<x1&&b.z+r>z0&&b.z-r<z1)C.push(b)}SMM.src.bld=C;SMM.src.st=Ss;SMM.src.shade=SMM_shade;SMM.src.reuse=SMQ;
     let t;try{t=miniPaint(x0,x1,z0,z1,SMM.k,0,SMM.src)}finally{SMM.src.bld=SMM.src.st=null}MINI.c.getContext('2d').drawImage(t.c,Math.round((MINI.x1-x1)*SMM.k),Math.round((MINI.z1-z1)*SMM.k));SMM.have.add(tx+'|'+tz);SMM.st.tiles++;return}
   const sb=HUB.bld,sl=LAZY.splice(0),ss=CITY_S.splice(0,CITY_S.length,...Ss),sh=TR_shade;HUB.bld=B;TR_shade=SMM_shade;let t;
   try{t=miniPaint(x0,x1,z0,z1,SMM.k)}finally{HUB.bld=sb;LAZY.push(...sl);CITY_S.splice(0,CITY_S.length,...ss);TR_shade=sh}
   // canvas pixel of world (x,z) = ((MINI.x1-x)*k, (MINI.z1-z)*k)
   MINI.c.getContext('2d').drawImage(t.c,Math.round((MINI.x1-x1)*SMM.k),Math.round((MINI.z1-z1)*SMM.k));SMM.have.add(tx+'|'+tz);SMM.st.tiles++}
 // tile relief: same hillshade as TR_shade, sampled from the terrain raster (TR_G) instead of the road-shelf ground (7k shelf queries per tile)
-function SMM_shade(c,x1,z1,k){const W=c.width,H=c.height,st=4,sw=Math.ceil(W/st),sh=Math.ceil(H/st),[c2,g2]=cv(sw,sh),im=g2.createImageData(sw,sh),d=im.data,cs=st/k,L=[.55,.64,-.55],ll=Math.hypot(...L);
+const SMQ=!/[?&]smq=0/.test(location.search);let SMQ_sc=null;
+function SMM_shade(c,x1,z1,k){const W=c.width,H=c.height,st=4,sw=Math.ceil(W/st),sh=Math.ceil(H/st);let c2,g2,im;if(SMQ&&SMQ_sc&&SMQ_sc.sw===sw&&SMQ_sc.sh===sh){c2=SMQ_sc.c;g2=SMQ_sc.g;im=SMQ_sc.im}else{[c2,g2]=cv(sw,sh);im=g2.createImageData(sw,sh);if(SMQ)SMQ_sc={sw,sh,c:c2,g:g2,im}}const d=im.data,cs=st/k,L=[.55,.64,-.55],ll=Math.hypot(...L);
   for(let j=0;j<sh;j++)for(let i=0;i<sw;i++){const x=x1-(i+.5)*cs,z=z1-(j+.5)*cs,hx=(TR_G(x-cs,z)-TR_G(x+cs,z))/(2*cs),hz=(TR_G(x,z-cs)-TR_G(x,z+cs))/(2*cs),nl=Math.hypot(hx,1,hz),
       l=(-hx*L[0]+L[1]-hz*L[2])/(nl*ll)-L[1]/ll,o=(j*sw+i)*4;if(l<0){d[o]=d[o+1]=d[o+2]=30;d[o+3]=Math.min(95,-l*300)}else{d[o]=d[o+1]=d[o+2]=255;d[o+3]=Math.min(55,l*180)}}
   g2.putImageData(im,0,0);const g=c.getContext('2d');g.save();g.imageSmoothingEnabled=true;g.drawImage(c2,0,0,W,H);g.restore()}
@@ -183,7 +184,8 @@ function SMM_center(x,z){const T=SMM.T,h=SMM.N>>1,tx=Math.floor(x/T),tz=Math.flo
 function SMM_tick(budget){if(!MINI||!MINI.smm)return;const tx=Math.floor(RO.x/SMM.T),tz=Math.floor(RO.z/SMM.T);if(Math.abs(tx-SMM.ct[0])>1||Math.abs(tz-SMM.ct[1])>1)SMM_center(RO.x,RO.z);
   const t0=performance.now();while(SMM.q.length){const[a,b]=SMM.q.shift();const t1=performance.now();SMM_tile(a,b);const d=performance.now()-t1;SMM.st.ms+=d;if(d>SMM.st.max)SMM.st.max=d;if(TUNE.callCap||performance.now()-t0>(budget||4))break}}
 miniBase=(f=>function(){if(!SM_ON)return f();SMM_grids();SMM.k=SET.q==='low'?.25:.34;MINI=null;SMM_center(RO.x,RO.z);return MINI})(miniBase);
-miniDraw=(f=>function(){if(SM_ON&&MINI&&MINI.smm&&RO.on&&!(HUB.mf&1))SMM_tick(4);return f()})(miniDraw);
+/* ios-r18q: on touch/lowmem a tile never stacks on a heavy frame: skip while the frame already spent > 6 ms since RB_frame (max 3 skips in a row), one tile per frame */
+let SMQ_sk=0;miniDraw=(f=>function(){if(SM_ON&&MINI&&MINI.smm&&RO.on&&!(HUB.mf&1)){if(SMQ&&RB_on()&&RB.t0&&SMM.q.length&&SMQ_sk<3&&performance.now()-RB.t0>6){SMQ_sk++;SMM.st.skip=(SMM.st.skip||0)+1}else{SMQ_sk=0;SMM_tick(SMQ&&RB_on()?1:4)}}return f()})(miniDraw);
 async function SM_qvLoad(a,b){const N=HUB.nodes;if(!N||!N.length||(QV.g&&QV.g.N===N))return;if(!QV.gi||QV.giN!==N){QV.gi=qvGraphGen(N);QV.giN=N}
   let t=performance.now();const t0=t;while(!(QV.g&&QV.g.N===N)){if(QV.gi.next().done)break;if(performance.now()-t>12){ldSet(a+(b-a)*Math.min(1,(performance.now()-t0)/6000),'Mapping every street');await nextFrame();t=performance.now()}}
   SM3.qvMs=Math.round(performance.now()-t0);try{if(HUB.built&&SM_ON){const t1=performance.now();SMM_grids();SM3.miniMs=Math.round(performance.now()-t1)}else if(!MINI&&HUB.built){const t1=performance.now();MINI=miniBase();SM3.miniMs=Math.round(performance.now()-t1)}}catch(e){console.error(e)}}
