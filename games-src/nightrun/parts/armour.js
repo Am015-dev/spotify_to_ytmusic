@@ -56,7 +56,7 @@ NR.on('runStart',()=>{B2X.hz=[];B2X.st={abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,l
   if(e.ph===3&&!s.lsd&&e.hp<=e.max*.12){s.lsd=1;s.ls=B2X.LS;B2X.st.ls++;floater(e.x,e.y-e.r-34,'EXPOSED!','#ffe14d');G.flash=Math.max(G.flash,.2*FX());shake(8);}
   if(s.sh>0)s.sh-=dt;e.b2s=s.sh>0?1:0;return r;};}
 /* phase 3: a lane beam aimed at the ship's row on every 2nd bar (warned for 1 beat on the hard tiers, 2 on Normal / Easy), never in the last stand */
-NR.on('bar',()=>{if(!B2X.on||!G.live||G.dead)return;const e=G.boss;if(!e||!e.b2||e.ph!==3||e.b2.ls>0||e.x>bossX())return;e.b2.hb=(e.b2.hb|0)+1;if(e.b2.hb%2)return;
+NR.on('bar',()=>{if(!B2X.on||!G.live||G.dead)return;const e=G.boss;if(!e||!e.b2||e.ph!==3||e.b2.ls>0||e.x>bossX())return;e.b2.hb=(e.b2.hb|0)+1;if(e.b2.hb%(window.BPL&&BPL.on&&BPL.easy()?4:2))return;   // bossplay on, Easy/Normal early stages: every 4th bar
   const sb=60/BT.bpm,w=HARDS.includes(SET.diff)?1:2;B2X.hz.push({y:clamp(P.y,40,H-40),h:44,t0:G.t,on:G.t+w*sb,off:G.t+w*sb+.35,hit:0});B2X.st.hz++;AU.sfx('warn');});
 NR.on('tick',()=>{if(!B2X.hz.length)return;const t=G.t;B2X.hz=B2X.hz.filter(z=>t<z.off);if(!G.boss){B2X.hz=[];return;}
   for(const z of B2X.hz)if(t>=z.on&&!z.hit&&Math.abs(P.y-z.y)<z.h/2+6&&P.x<G.boss.x){z.hit=1;const h0=P.hp;hurt(1);if(P.hp<h0)B2X.st.hzHit++;}});

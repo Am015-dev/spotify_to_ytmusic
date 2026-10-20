@@ -45,7 +45,7 @@ const COUNTER = ({ n, v }) => {   // force the counter verb and do the thing; th
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800)); const br = await PW.chromium.launch(); let perr = 0;
   const page = async (q, vp) => { const ph = vp && vp.width < 500; const p = await br.newPage({ viewport: vp || { width: 960, height: 540 }, hasTouch: !!ph, isMobile: !!ph });
-    p.on('pageerror', e => { perr++; console.log('FAIL page error ' + e.message); }); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1${q || ''}`);
+    p.on('pageerror', e => { perr++; console.log('FAIL page error ' + e.message); }); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1${q || ''}${process.env.QS || ''}`);
     await p.waitForFunction(() => window.__mnr && window.__mnr.startStory && window.BMV, null, { timeout: 30000 }); return p; };
   // 1 the table
   const p0 = await page(); const TB = await p0.evaluate(() => { const { BMT, VB } = window.__bmv, o = {}; for (const id in BMT) o[id] = { v: [...new Set(BMT[id].ph.flat().map(x => Array.isArray(x) ? x[0] : x))], sig: BMT[id].sig, ctr: BMT[id].ctr }; return { o, lib: Object.keys(VB).length, sig: Object.keys(VB).filter(k => VB[k].sig), ctr: Object.keys(VB).filter(k => VB[k].ctr) }; }); await p0.close();
