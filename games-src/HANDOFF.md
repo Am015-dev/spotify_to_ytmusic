@@ -4,6 +4,17 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun counter threats (W6, flag RET.counter, ?counter=0 = abilities only, 19 Oct 2026)
+- Owner: "the dash button and emp still useless, the game needs to be more strategic and timing". `parts/counter.js` (after abilities.js) adds threats whose answer is a button:
+  SEEKER (marked homing shot, PARRY = dash in the last .15 s: it flies back, +1 charge), LASER WALL (full height, only a dash crosses), CURTAIN (2 walls, gaps too far apart to slide between: dash a layer or EMP),
+  WARDEN (shield takes 70%, only EMP strips it for 8 s). GOOD EMP bonus / no bonus on an empty screen, EMP button pulses (abHot) when worth it, DASH->EMP in 1 s = COMBO blast, dash vents an overheat.
+- Hooks: b.js `CTR.dash()` (dash start frame) and `CTR.emp()` (EMP press, before the clear); c.js `CTR.draw()`. Numbers: BALANCE.md "Counter threats". Test: `nightrun/counter-test.js`.
+- Below Hard the wall and curtain leave a gap and the seeker turns slower (dash/EMP pay, not required: balance Normal stage 20 fell to 67% when they were required); on Hard+ they demand the answer.
+- Weak: walls/curtains are code-drawn; the balance bot only parries by luck (it dashes at near bullets); no ram-charge stagger (enemy AI belongs to W5); hint texts show once per save.
+## Nightrun risk pays (W7, flag RET.reward, ?reward=0 = old, 20 Oct 2026)
+- `parts/reward.js` (after armour.js; one hook line in b.js pickups, none elsewhere): graze chain x1..x5 (1.5 s window, beat graze = 2 points, ring + counter by the ship, feeds score, ABIL.gain and a +10%/tier damage buff cap +40% for 4 s; a hit resets), close-range +35% (full <= 40 px, 0 at 140 px) for manual shots only plus an extra shard on a point-blank kill, risk pickups (3+ bullets within 100 px) pay double with a gold ring. Damage sits inside the DMG.hit chain, buff x close clamped per tier (CAPK: 1.6 Normal, 1.4 Hard, 1.3 Very hard, 1.25 Legend), so hard.js S3.cap and armour.js still bound the sum.
+- Test: `reward-test.js` (unit checks + bots). Normal stages 3/6/10, 18 runs: bold (hugs enemies) clear 100%, score 447k, 183 s; camp (parked far left) clear 94%, score 314k, 209 s; dodge 100% 299k; flag off dodge 94% 338k; parked ship 0%.
+- Weak: camping still clears on Normal (the bot cannot be hit while parked far left on the early stages; must-move covers that); Legend/hard clear rates rose slightly (scale-test hardest 83% -> 92%, that check already failed with the flag off); the chain ring is code-drawn only.
 ## Nightrun DASH + EMP abilities (W4, flag RET.abil, ?abil=0 = the old dash/EMP, 19 Oct 2026)
 - `parts/abilities.js` (after powlevels.js). Hooks: b.js dash block -> `ABIL.dashIn`, EMP key -> `ABIL.emp`; c.js button rings + draw; hud.js dash count.
 - DASH: 3 charges (4 from LV3), one refills every 1.7 s (LV1) to 1.2 s (LV5), fires at once in the move/last stick direction; on the beat = old bonus + 0.2 charge back, off the beat no tier drop. LV = 1 + shop extra-dash + running power-up LV3/LV5.
@@ -28,9 +39,9 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Still weak: plain loop is higher (events are rarer by design); fun-test fails 9-10 checks on the old build too (it expects the 6-bar metronome); afk-test is flaky on Hard.
 
 ## Nightrun enemies that react (W5, flag RET.react, ?react=0 = old, 19 Oct 2026)
-- `parts/react.js` (built after hard.js): per-enemy brains HUNT/FEINT/RETREAT(+dive)/PRESS/BAIT/WINDOW, squads PIN+EXIT, LEADER (enrage 3 s), shield BEARER; per-run seed (+-25% timing, states, sides). Base fire timer is disabled per brained enemy (e.bf getter), all shots via eb() so caps hold. Hooks: NR spawn/tick, DMG.hit wrap (WINDOW/BEARER blocks), drawPickups (tells). No change to abilities.js, armour.js, bossmoves.js, economy.
+- `parts/react.js` (built after hard.js): per-enemy brains HUNT/FEINT/RETREAT(+dive)/PRESS/BAIT/WINDOW (Hard+), squads PIN+EXIT, LEADER (enrage 3 s), shield BEARER; Normal eased (x1.25 period, 0.7 s tells) so the dodging bot stays at 70% (73% off); per-run seed (+-25% timing, states, sides). Base fire timer is disabled per brained enemy (e.bf getter), all shots via eb() so caps hold. Hooks: NR spawn/tick, DMG.hit wrap (WINDOW/BEARER blocks), drawPickups (tells). No change to abilities.js, armour.js, bossmoves.js, economy.
 - Test `nightrun/react-test.js` (a-f all PASS). Numbers: BALANCE.md "Enemies that react".
-- Weak / next: blocks only stop bullet hits (EMP, rails, beams still hurt armoured foes); formation units keep their paths (fire brains only); zoo kinds untouched; tells are code shapes (ring + dashed line), no art or sound cue yet.
+- Weak / next: blocks only stop bullet hits (EMP, rails, beams still hurt armoured foes); formation units keep their paths (fire brains only); zoo kinds untouched; predictability gain is modest on formation-heavy stages (25 px position gap) because most units there are path units; tells are code shapes (ring + dashed line), no art or sound cue yet.
 
 ## Nightrun VARIETY A: formations, stage scripts, rule changes (flag RET.vary, ?vary=0 = old waves, 18 Oct 2026)
 - `parts/formations.js` (after zoo.js): 62 formations with their own spatial behaviour (pincer, X, snake, spiral, moving-gap wall, meteors, shadow, bait, curtain, geyser, scissors, loop, testudo, ambush...). Each declares tags, first stage, cost, telegraph, gap, kinds, role. Path units move in FM.mv (one hook line in b.js's enemy switch); every path ends flying left, so leaks still count.

@@ -1086,6 +1086,7 @@ function update(dt){
       if(!j.ok)goDash(false,j);
       else{const rem=(j.beat-bpos())*BT.spb;if(rem>.006&&!SET.all)P.dq={beat:j.beat,j,t:.3};else goDash(true,j);}}
     else if(P.dq){P.dq.t-=dt;if(bpos()>=P.dq.beat-.002||P.dq.t<=0){const q=P.dq;P.dq=null;if(canDash())goDash(true,q.j);}}}
+    if(P.dashT===.2&&window.CTR)CTR.dash();   // counter.js: parry / vent on the frame a dash starts
     P.dashT=Math.max(0,P.dashT-pdt);P.dashCd=Math.max(0,P.dashCd-pdt);P.inv=Math.max(0,P.inv-pdt);if(P.dashT<=0)P.dashPf=false;
     const py0=P.y;
     if(P.dashT>0){P.x+=P.dx*1050*pdt;P.y+=P.dy*1050*pdt;if(!SET.calm&&Math.random()<.9)G.pt.push({x:P.x,y:P.y,vx:0,vy:0,l:.25,m:.25,c:D.b,sz:10,ghost:1});}
@@ -1096,6 +1097,7 @@ function update(dt){
     if(touch){if(cx!==P.x||P.dashT>0){touch.sx=touch.x;touch.px=cx;}if(cy!==P.y||P.dashT>0){touch.sy=touch.y;touch.py=cy;}}   // finger past the edge: re-anchor, no dead zone
     P.x=cx;P.y=cy;
     P.tilt+=(clamp((P.y-py0)/(pdt*300||1),-1,1)*.25-P.tilt)*Math.min(1,dt*10);
+    if((pressed.KeyX||pressed.KeyL||pressed.Emp)&&P.emp>0&&window.CTR)CTR.emp();   // counter.js: shield strip, good EMP, combo (before the clear)
     if(pressed.KeyX||pressed.KeyL||pressed.Emp){if(window.ABIL&&ABIL.on)ABIL.emp();else if(P.emp>0){P.emp--;G.empT=.6;G.flash=Math.max(G.flash,.3*FX());shake(9);AU.sfx('emp');
       for(const b of G.eb){burst(b.x,b.y,D.b,2,80,.4);G.score+=5;}G.eb=[];G.en.forEach(e=>{if(e.type!=='boss')e.hp-=10;else e.hp-=25;e.flash=.2;});if(G.boss)G.boss.lasers=[];}}
     // the ship shoots itself on a grid of the beat (a 16th note for the Courier): one shot per grid cell, shots on the beat itself are gold pulse shots
@@ -1172,7 +1174,7 @@ function update(dt){
   for(const p of G.pk){p.bob+=dt*4;const dx=P.x-p.x,dy=P.y-p.y,l=Math.hypot(dx,dy);
     if(l<NR.mod.mag&&!G.dead){p.vx+=dx/l*1400*sdt;p.vy+=dy/l*1400*sdt;}else{p.vx+=(-70-p.vx)*sdt*2;p.vy*=1-sdt*2;}
     p.x+=p.vx*sdt;p.y+=p.vy*sdt;
-    if(l<22&&!G.dead){p.dead=1;AU.sfx('pick');
+    if(l<22&&!G.dead){p.dead=1;AU.sfx('pick');if(window.RWD)RWD.pick(p);
       if(p.t==='shard'){const sk=SH.smk||1;G.mult=Math.min(9.9,+(G.mult+.1*sk).toFixed(2));G.score+=Math.round(50*G.mult*sk);}
       if(p.t==='hp'){P.hp=Math.min(P.max,P.hp+1);floater(P.x,P.y-24,'HULL +1','#3dffb0');}
       if(p.t==='up'){WP.gain();AU.sfx('up');}
@@ -7957,7 +7959,7 @@ window.__s3={S3};
    always with a visible tell of at least RX.TELL s before any shot or dive:
      HUNT    leads the ship's velocity instead of aiming at where it is now, and drifts towards the line it will be on
      FEINT   starts a tell, cancels it ('?'), slides to the other side of the ship, then fires for real
-     RETREAT backs off when the ship closes in, then dives at it (dashed line = the dive path, locked at the end of the tell)
+     RETREAT backs off while the ship presses in; when the ship backs away it dives at it (dashed line = the dive path, locked at the end of the tell)
      PRESS   fills the half of the screen the ship has been hugging
      BAIT    holds fire while the ship is still; when it crosses a lane it fires where that dodge is going
      WINDOW  armoured (steel ring): shots bounce off, except for 1 s after it fires (gold ring) = timing
@@ -7978,11 +7980,12 @@ const RX=window.RX={get on(){return!!RET.react;},TELL:.6,GAP:96,J:.25,rng:Math.r
   ok(e){return!!e.rx&&!e.dead&&e.hp>0&&G.en.includes(e);},
   pick(e){const t=e.type,R=this.rng(),ez=this.easy();   // which brain this enemy gets
     if(this.force)return this.force;
-    if(t==='turret')return ez?(R<.5?'feint':'hunt'):R<.35?'window':R<.7?'feint':'bait';
-    if(t==='gunship')return ez?'feint':R<.4?'window':R<.75?'feint':'retreat';
+    const wn=this.hard()?'window':'feint';   // WINDOW armour: Hard tiers only
+    if(t==='turret')return ez?(R<.5?'feint':'hunt'):R<.35?wn:R<.7?'feint':'bait';
+    if(t==='gunship')return ez?'feint':R<.4?wn:R<.75?'feint':'retreat';
     return ez?(R<.5?'hunt':'press'):R<.28?'hunt':R<.48?'retreat':R<.68?'press':R<.88?'bait':'feint';},
-  per(e){const d=diff(),k=frK(),t=e.type;return(t==='turret'?1.5:t==='gunship'?1.4:2.4)/d/Math.max(.2,k)/(e.el?1.3:1);},   // the old mean fire period in seconds
-  tell(e){const sp=BT.spb||.5,b=bpos()+this.TELL/sp,fr=b-Math.floor(b);return this.TELL+(fr>1e-3?(1-fr)*sp:0);}   // >= TELL, and the shot lands on a beat
+  per(e){const d=diff(),k=frK(),t=e.type;return(t==='turret'?1.5:t==='gunship'?1.4:2.4)/d/Math.max(.2,k)/(e.el?1.3:1)*(this.hard()?1:1.25);},   // the old mean fire period in seconds (Easy/Normal x1.25: smarter shots, fewer of them)
+  tell(e){const T0=this.hard()?this.TELL:this.TELL+.1,sp=BT.spb||.5,b=bpos()+T0/sp,fr=b-Math.floor(b);return T0+(fr>1e-3?(1-fr)*sp:0);}   // >= TELL, and the shot lands on a beat
 };
 RX.reset();
 NR.on('runStart',()=>RX.reset());
@@ -8007,9 +8010,9 @@ RX.squad=function(g){if(this.easy()||!g.length)return;if(g.length<2&&!(g[0].type
   const fr=sm.filter(e=>!e.rx.role);
 
   if(fr.length>=2&&this.rng()<.6){const[a,b]=fr;a.rx.role='pin';b.rx.role='exit';a.rx.mate=b;b.rx.mate=a;b.rx.c=a.rx.c;a.rx.st=b.rx.st='hunt';this.stat.pin++;this.stat.exit++;}
-  if(g.length>=3&&this.rng()<.6){const l=g.find(e=>!e.rx.role)||g[0];s.ld=l;l.rx.ld=1;l.hp=l.max=Math.round(l.max*1.5);this.stat.leader++;}};
+  if(g.length>=3&&this.rng()<.6){const l=g.find(e=>!e.rx.role)||g[0];s.ld=l;l.rx.ld=1;if(this.hard())l.hp=l.max=Math.round(l.max*1.5);this.stat.leader++;}};
 /* the fire itself: through eb(), so caps hold */
-RX.fire=function(e,dir){const d=diff(),s=(e.type==='turret'?170+15*d:e.type==='gunship'?190:150+22*d),r=e.rx,lk=this.hard()?.85:.55;
+RX.fire=function(e,dir){const d=diff(),s=(e.type==='turret'?170+15*d:e.type==='gunship'?190:150+22*d),r=e.rx,lk=this.hard()?.85:.45;
   let tx=P.x,ty=P.y;const dist=Math.hypot(P.x-e.x,P.y-e.y),t=Math.min(.9,dist/Math.max(120,s));
   if(r.st==='hunt'||r.role==='pin'||r.role==='exit'){tx+=PV.x*t*lk;ty+=PV.y*t*lk;}
   if(r.st==='bait'){ty=P.y+Math.sign(r.bd||PV.y||1)*Math.min(110,Math.abs(r.bdv||PV.y)*.45+40);}
@@ -8026,7 +8029,7 @@ NR.on('tick',dt=>{if(!RX.on||!G.live||G.dead||G.tut||G.lab)return;
   if(RX.pend.length){const g=RX.pend.filter(e=>RX.ok(e));RX.pend=[];RX.squad(g);}
   RX.fav+=(P.y-RX.fav)*Math.min(1,dt/4);
   const enr=e=>e.rx.enr>0?1.6:1;let telling=0;for(const e of G.en)if(e.rx&&e.rx.tl>0)telling++;
-  const tmax=RX.easy()?3:RX.hard()?6:4;
+  const tmax=RX.easy()?3:RX.hard()?6:3;
   for(const e of G.en){const r=e.rx;if(!r||e.dead||e.hp<=0)continue;if(e.type!=='drone'&&e.type!=='gunship'&&e.type!=='turret'&&e.type!=='flank')continue;
     if(e.fp&&!r.fx){r.fx=true;if(r.role==='bear'){r.role=null;if(r.mate&&r.mate.rx)r.mate.rx.cov=null;}if(r.st==='retreat'||r.st==='press'||r.st==='cover')r.st='hunt';}   // formations set fp after the spawn event: path units keep their path
     r.enr=Math.max(0,r.enr-dt);if(r.role==='exit'&&!RX.ok(r.mate))r.role=null;
@@ -8053,9 +8056,9 @@ NR.on('tick',dt=>{if(!RX.on||!G.live||G.dead||G.tut||G.lab)return;
         else{if(RX.canShoot(e))RX.fire(e);r.c=RX.per(e)*RX.jit()/enr(e);}}
       continue;}
     e.arm=false;r.c-=dt;
-    if(e.x>P.x+60&&Math.abs(P.y-e.y)<26){r.lin=(r.lin||0)+dt;if(r.lin>.6&&r.c>.2&&!RX.easy()){r.c=.2;r.lin=0;RX.stat.reacts++;}}else r.lin=0;   // parking in front of a gun is read and punished (after a full tell)
+    if(e.x>P.x+300&&Math.abs(P.y-e.y)<26&&Math.abs(PV.x)<120){r.lin=(r.lin||0)+dt;if(r.lin>.6&&r.c>.2&&!RX.easy()){r.c=.2;r.lin=0;RX.stat.reacts++;}}else r.lin=0;   // camping on a gun's line from range is read and punished (after a full tell); close-in bold play is not
     if(r.st==='bait'&&r.c<=0){if(Math.abs(PV.y)<100&&r.hold<RX.per(e)*1.2){r.hold+=dt;continue;}r.bd=Math.sign(PV.y)||1;r.bdv=PV.y;if(r.hold>0){RX.stat.reacts++;RX.act.bait++;}r.hold=0;}
-    if(r.st==='retreat'&&!lv&&r.rt>1&&(r.rt>2.2||Math.hypot(P.x-e.x,P.y-e.y)>260)&&telling<tmax&&!RX.easy()){r.kind='dive';r.lx=P.x+PV.x*.3;r.ly=P.y+PV.y*.3;r.tl=Math.max(RX.TELL+.1,RX.tell(e));RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,r.tl);telling++;continue;}
+    if(r.st==='retreat'&&!lv&&r.rt>1&&Math.hypot(P.x-e.x,P.y-e.y)>260&&telling<tmax&&!RX.easy()){r.kind='dive';r.lx=P.x+PV.x*.3;r.ly=P.y+PV.y*.3;r.tl=Math.max(RX.TELL+.1,RX.tell(e));RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,r.tl);telling++;continue;}
     if(r.c>0||!RX.canShoot(e)||telling>=tmax)continue;
     if(r.role==='exit')continue;   // the exit gun fires with its pin partner
     const go=x=>{x.rx.kind=x.rx.st==='feint'&&!x.rx.fk?'feint':'shot';x.rx.fk=0;x.rx.tl=RX.tell(x);RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,x.rx.tl);telling++;};
@@ -8149,6 +8152,61 @@ NR.on('tick',()=>{if(!B2X.hz.length)return;const t=G.t;B2X.hz=B2X.hz.filter(z=>t
   return dp(t);};}
 B2X.sheen=(x,y,w,h)=>{ctx.save();ctx.globalAlpha=.55+.25*Math.sin(G.t*18);ctx.fillStyle='#e8f4ff';ctx.fillRect(x,y,w,Math.max(1,h*.35));ctx.restore();};   // armour is absorbing: a thin bright line on the boss bar
 window.__b2={B2X};
+
+/* ---------- RISK PAYS (flag RET.reward, ?reward=0 = the old play exactly). Moving and taking risks must beat sitting far away. Built after hard.js / armour.js.
+   GRAZE CHAIN   grazes within 1.5 s of each other chain a multiplier x1..x5 (a graze on the beat counts double: 2 points, x2 at 2 points, x5 at 8). A hit drops it to x1.
+                 It feeds score (+10 pts x combo per tier above 1), the EMP meter (ABIL.gain, hook only) and a damage buff (+10% per tier above 1, cap +40%, 4 s).
+   CLOSE RANGE   manual shots that damage an enemy within 140 px of the ship deal up to +35% (full inside 40 px, linear to 0 at 140). Homing / auto shots, weapon
+                 chains and ability zaps get nothing (keeps the must-move rule). A non-boss enemy killed by such a hit drops one extra shard.
+   NEAR-MISS     the graze already carries pf (judge() on the beat grid): the chain counts it double.
+   RISK PICKUPS  a pickup that drifts through a strip with 3+ enemy bullets within 100 px, or is taken with 3+ bullets around the ship, pays double ("BOLD").
+   Caps: the damage multiplier of buff x close is clamped per tier (CAPK) and sits inside the DMG.hit chain, so the ordinary-enemy ceiling in hard.js (S3.cap)
+   and the boss damage-rate caps in armour.js still bound the total. ebCap / BCAP are not touched. Test: nightrun/reward-test.js. */
+if(RET.reward===undefined)RET.reward=!/[?&]reward=0/.test(location.search);
+const RWD=window.RWD={get on(){return!!RET.reward;},
+  WIN:1.5,BUFF_T:4,CLOSE_R:140,CLOSE_FULL:40,CLOSE_MAX:.35,
+  CAPK:{easy:1.6,normal:1.6,hard:1.4,vhard:1.3,legend:1.25},   // buff x close never above this per tier: the hard tiers keep their DPS ceiling
+  stat:{graze:0,beat:0,maxTier:1,close:0,pb:0,bold:0,drop:0},
+  s(){return G.rw||(G.rw={n:0,t:-9,tier:1,bf:0,bt:0});},
+  tier(){if(!this.on||!G||!G.rw)return 1;const s=G.rw;return G.t-s.t>this.WIN?1:s.tier;},
+  buff(){if(!this.on||!G||!G.rw)return 0;const s=G.rw;return s.bt>0?s.bf:0;},
+  auto(b){return!b||b.hk||b.au||b.tg||b.ab;},   // a homing, locked, or ability shot is not a positioned shot
+  close(b,e){if(this.auto(b)||!e||e.gr)return 0;const d=Math.hypot(P.x-e.x,P.y-e.y);return d>=this.CLOSE_R?0:this.CLOSE_MAX*Math.min(1,(this.CLOSE_R-d)/(this.CLOSE_R-this.CLOSE_FULL));},
+  dmK(b,e){const bf=b&&!b.ab?this.buff():0,cl=this.close(b,e);if(cl>.02&&e){e._rwC=G.t;this.stat.close++;}
+    const k=(1+bf)*(1+cl);return k<=1?1:Math.min(k,this.CAPK[SET.diff]||1.6);},
+  graze(pf){const s=this.s();if(G.t-s.t>this.WIN)s.n=0;s.n+=pf?2:1;s.t=G.t;this.stat.graze++;if(pf)this.stat.beat++;
+    const t=Math.min(5,1+(s.n>>1)),x=t-1;if(t>s.tier&&t>=2){floater(P.x,P.y-52,'CHAIN x'+t,pf?'#ffe14d':'#19e3ff');}
+    s.tier=t;this.stat.maxTier=Math.max(this.stat.maxTier,t);
+    if(x>0){G.score+=Math.round(10*G.mult*x);if(window.ABIL&&ABIL.on)ABIL.gain(.012*x);s.bf=Math.min(.4,.1*x);s.bt=this.BUFF_T;}},
+  hurt(){const s=G.rw;if(s){s.n=0;s.tier=1;s.bf=0;s.bt=0;s.t=-9;}},
+  nearBul(x,y,r){let n=0;const r2=r*r;for(const b of G.eb)if(!b.dead&&(b.x-x)**2+(b.y-y)**2<r2&&++n>=3)break;return n;},
+  tick(dt){const s=G.rw;if(s&&s.bt>0)s.bt-=dt;
+    for(const p of G.pk){if(p.x<0||p.x>W)continue;if(this.nearBul(p.x,p.y,100)>=3){p.rk=1;p.rkT=G.t;}}},
+  pick(p){if(!this.on||!p||G.dead)return;
+    const bold=(p.rk&&G.t-p.rkT<1.2)||this.nearBul(P.x,P.y,120)>=3;if(!bold||p.t==='hp')return;
+    this.stat.bold++;floater(P.x,P.y-40,'BOLD x2','#ffe14d');
+    if(p.t==='shard'){G.mult=Math.min(9.9,+(G.mult+.1*(SH.smk||1)).toFixed(2));G.score+=Math.round(50*G.mult*(SH.smk||1));}
+    else G.score+=Math.round(150*G.mult);
+    if(window.ABIL&&ABIL.on)ABIL.gain(.05);},
+  draw(t){if(!this.on||!G||G.dead)return;
+    for(const p of G.pk){if(!p.rk||G.t-p.rkT>1.2)continue;const y=p.y+Math.sin(p.bob)*3;ctx.save();ctx.strokeStyle='#ffe14d';ctx.globalAlpha=.55+.35*Math.sin(t*10);ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,y,17+Math.sin(t*8)*2,0,7);ctx.stroke();ctx.restore();}
+    const s=G.rw;if(!s||s.n<=0)return;const age=G.t-s.t;if(age>this.WIN)return;const tr=s.tier,fr=1-age/this.WIN,col=['#19e3ff','#19e3ff','#7dff7a','#ffe14d','#ff9a3d','#ff2d78'][tr];
+    ctx.save();ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.55)';ctx.beginPath();ctx.arc(P.x,P.y,32,0,7);ctx.stroke();
+    ctx.strokeStyle=col;ctx.globalAlpha=.95;ctx.beginPath();ctx.arc(P.x,P.y,32,-Math.PI/2,-Math.PI/2+Math.PI*2*fr);ctx.stroke();
+    if(tr>=2){ctx.globalAlpha=1;ctx.textAlign='center';ctx.font='700 16px "Chakra Petch",sans-serif';ctx.lineWidth=4;ctx.strokeStyle='rgba(0,0,0,.8)';
+      const txt='x'+tr+(s.bt>0?' +'+Math.round(s.bf*100)+'%':'');
+      if(wcv===cv){ctx.strokeText(txt,P.x,P.y-40);ctx.fillStyle=col;ctx.fillText(txt,P.x,P.y-40);}
+      else{ctx.translate(P.x+40,P.y);ctx.rotate(Math.PI/2);ctx.strokeText(txt,0,0);ctx.fillStyle=col;ctx.fillText(txt,0,0);}}
+    ctx.restore();}};
+/* damage: inside the DMG.hit chain (after hard.js's auto/manual split), so every later cap still sees the final number */
+{const h=DMG.hit;DMG.hit=function(d,b,e){const v=h.call(this,d,b,e);if(!RWD.on||!G||!G.live||!b)return v;return v*RWD.dmK(b,e);};}
+NR.on('graze',d=>{if(RWD.on&&G&&G.live&&!G.dead)RWD.graze(!!(d&&d.pf));});
+NR.on('hurt',()=>{if(RWD.on&&G)RWD.hurt();});
+NR.on('tick',dt=>{if(RWD.on&&G&&G.live&&!G.dead)RWD.tick(dt);});
+NR.on('kill',d=>{const e=d&&d.e;if(!RWD.on||!G||!e||d.boss||e.dummy||e.type==='boss'||!e._rwC||G.t-e._rwC>.35)return;
+  let n=0;for(const p of G.pk)if(p.t==='shard')n++;if(n>=30)return;RWD.stat.pb++;RWD.stat.drop++;
+  G.pk.push({t:'shard',x:e.x,y:e.y,vx:rnd(-40,10),vy:rnd(-40,40),bob:0});});
+{const dp=drawPlayer;drawPlayer=function(t){dp(t);if(running)RWD.draw(t);};}
 
 /* ---------- boss movesets = parts/bossmoves.js (flag RET.bossmoves; ?bossmoves=0 = the old ring / fan / spiral / laser lists, exactly).
    Owner, 18 Oct 2026: "Game is extremely repetitive". All ten boss fights were built from the same six attack verbs. Now every fight has its own moveset:
@@ -8825,6 +8883,104 @@ NR.on('kill',d=>{if(!ABIL.on||!d||d.boss)return;const e=d.e||{};ABIL.gain(e.el||
 NR.on('graze',d=>ABIL.gain(d&&d.pf?.07:.04));
 NR.on('pickup',()=>ABIL.gain(.34));
 NR.on('runStart',()=>{if(ABIL.on)setTimeout(()=>{if(running&&G&&!G.dead)ABIL.tip('DASH has charges, EMP fills from kills');},4000);});
+
+/* ---------- COUNTER threats: DASH and EMP as the answers (flag RET.counter, ?counter=0 = the abilities without these threats). Test: nightrun/counter-test.js.
+   Owner, 19 Oct 2026: "the dash button and emp still useless, the game needs to be more strategic and timing". A button only matters when some threat needs it.
+   One threat every few bars (never with a boss out, in a pit stop, the lab or the tutorial), in turn from the ones the stage has unlocked:
+     SEEKER   (story stage 3+)  a shooter glows a red ring for .7 s, then fires a marked homing shot (red ring; 300 px/s, turns 9 rad/s for 4 s, 2 hull on the hard tiers). Dash in the last .15 s before it hits = PARRY:
+                                it flies back as a big player shot, refunds a charge and adds meter. Too early wastes the charge (it keeps homing), too late is a hit.
+     WALL     (5+, not Easy)    a full-height laser line, 1.3 s warning on the right edge, then it sweeps left: only a dash (i-frames) crosses it.
+                                With no dash charge when it starts, or below Hard, it gets a 110 px gap (Normal: dash or find the gap).
+     CURTAIN  (7+, not Easy)    .9 s tell (gap chevrons), then two dotted walls drawn as bullets (one hazard each, not eb(), so ebCap stays free) .45 s apart, gaps 96 px and >= 270 px apart (too far to slide between even at touch speed; .9 s apart below Hard or with no dash and no EMP): dash a layer or spend the EMP.
+     WARDEN   (9+)              an armoured gunner whose shield takes 70% of every hit; only an EMP strips it, for 8 s, then it comes back.
+   EMP timing: 6+ enemy bullets or a shielded warden on screen = GOOD EMP (score + a quarter of the meter back); on a near-empty screen it pays nothing extra.
+     The EMP button pulses (class abHot) while it would be worth it. DASH then EMP inside 1 s = COMBO blast (12 more to every ordinary foe within 300 px).
+   Dash while overheated vents the gun (VENT). Hooks: b.js dash start (CTR.dash) and EMP press (CTR.emp), c.js draw. Boss HP, armour caps, bossmoves untouched;
+   bullets go through eb() (ebCap, BCAP); tells >= .7 s; reduce motion = no pulse/flash. */
+if(RET.counter===undefined)RET.counter=!/[?&]counter=0/.test(location.search);
+const CTR=window.CTR={get on(){return!!RET.counter;},
+  stat:{seek:0,parry:0,early:0,wall:0,wallHit:0,wallDash:0,curt:0,curtHit:0,curtDash:0,curtEmp:0,ward:0,strip:0,good:0,waste:0,combo:0,vent:0},
+  UN:{seek:3,wall:5,curt:7,ward:9},EV:{easy:10,normal:9,hard:6,vhard:5,legend:4},
+  HK:{easy:4,normal:6,hard:9,vhard:9,legend:9},WK:{easy:.8,normal:1,hard:1.3,vhard:1.5,legend:1.7},
+  reset(){this.tells=[];this.walls=[];this.curts=[];this.bars=0;this.k=0;this.lastDash=-9;this.pend=0;this.fx=[];},
+  live(){return this.on&&G&&G.live&&!G.dead&&!G.lab&&!G.tut&&!(SH&&SH.active);},
+  kinds(){const s=S2.stg(),e=SET.diff==='easy',o=[];if(s>=this.UN.seek)o.push('seek');if(!e&&s>=this.UN.wall)o.push('wall');if(!e&&s>=this.UN.curt)o.push('curt');if(s>=this.UN.ward)o.push('ward');return o;},
+  charges(){return window.ABIL&&ABIL.on?ABIL.st().n:(P.dashCd<=0?1:0);},
+  red(){return window.READ&&READ.D||'#ff2d78';},
+  start(k){if(k==='seek')this.seek();else if(k==='wall')this.wall();else if(k==='curt')this.curt();else if(k==='ward')this.ward();},
+  seek(){const c=G.en.filter(e=>e.type!=='gate'&&e.type!=='boss'&&!e.gr&&!e.wpt&&e.x<W-40&&e.x>P.x+150&&e.hp>0);
+    const e=c.length?c[Math.floor(Math.random()*c.length)]:null,n=HARDS.includes(SET.diff)?2:1;
+    for(let i=0;i<n;i++)this.tells.push({e,x:e?e.x:W-30,y:e?e.y:60+Math.random()*(H-120),t:.7+.45*i,T:.7+.45*i});this.stat.seek++;},
+  fire(t){const x=t.e&&!t.e.dead&&t.e.hp>0?t.e.x-10:t.x,y=t.e&&!t.e.dead&&t.e.hp>0?t.e.y:t.y,k=G.eb.length;
+    eb(x,y,Math.atan2(P.y-y,P.x-x),SET.diff==='easy'?240:300,this.red(),7);if(G.eb.length>k){const b=G.eb[k];b.cxM=1;b.cxH=4;b.dmg=HARDS.includes(SET.diff)?2:1;}},
+  wall(){this.walls.push({x:W-30,warn:1.3,v:420,gap:null,hit:0,dash:0});this.stat.wall++;this.tip('Laser wall: DASH through it');},
+  curt(){const m=60,g1=m+Math.random()*(H-2*m);const g2=g1<H/2?clamp(g1+270+Math.random()*60,m,H-m):clamp(g1-270-Math.random()*60,m,H-m);
+    const d=this.charges()<1&&P.emp<1||!HARDS.includes(SET.diff)?.9:.45;this.curts.push({t:.9+d,g:[g1,g2],T0:.9});[g1,g2].forEach((gy,i)=>this.walls.push({x:W+8,warn:.9+d*i,v:230,gap:{y:gy,h:96},cur:1,hit:0,dash:0}));this.stat.curt++;this.tip('Bullet curtain: EMP clears it');},
+  ward(){const e=en('turret',{x:W+30,y:90+Math.random()*(H-180),stop:W-220});if(!e)return;const hp=Math.round(60*(this.WK[SET.diff]||1));
+    e.hp=e.max=e.hq=hp;e.ctw=1;e.wsh=1;e.wshT=0;e._ph=hp;e.age=0;e.score=Math.max(e.score||0,800);this.stat.ward++;this.tip('Shielded: EMP strips the shield');},
+  tip(t){try{const o=load('mnr_ctrtip',{})||{};if(o[t]||G.tut||G.lab||document.webdriver||navigator.webdriver)return;o[t]=1;save('mnr_ctrtip',o);hintShow(t,4);}catch(e){}},
+  /* b.js, the frame a dash starts (before the bullets move): parry, vent */
+  dash(){if(!this.live())return;this.lastDash=G.t;
+    if(P.over){P.over=false;P.heat=Math.min(P.heat,35);floater(P.x,P.y-36,'VENT','#19e3ff');this.stat.vent++;}
+    let got=0;for(const b of G.eb){if(!b.cxM||b.dead)continue;const sp=Math.hypot(b.vx,b.vy)||1,tt=(Math.hypot(b.x-P.x,b.y-P.y)-(b.r+3))/sp;
+      if(tt<=.17){b.dead=1;got++;let tg=null,bd=1e9;for(const e of G.en){if(e.dead||e.hp<=0||e.gr)continue;const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<bd){bd=d;tg=e;}}
+        const a=tg?Math.atan2(tg.y-P.y,tg.x-P.x):0;G.pb.push({x:P.x+10,y:P.y,vx:Math.cos(a)*700,vy:Math.sin(a)*700,dm:15,pf:1,big:1,ab:1,hk:1.5});
+        burst(b.x,b.y,'#ffffff',10,240,.35);this.stat.parry++;}
+      else if(tt<=.6)this.stat.early++;}
+    if(got){G.eb=G.eb.filter(b=>!b.dead);G.score+=Math.round(300*got*G.mult);floater(P.x,P.y-30,'PARRY!','#ffffff');AU.sfx('up');if(!SET.reduce)shake(4);
+      if(window.ABIL&&ABIL.on){const S=ABIL.st();S.n=Math.min(ABIL.max(),S.n+1);ABIL.gain(.1);}else P.dashCd=0;}},
+  /* b.js, the frame EMP is pressed with a charge (before it clears): strip, good/waste, combo */
+  emp(){if(!this.live())return;const cs=this.walls.filter(w=>w.cur&&w.x<W+10),n=G.eb.length+6*cs.length,ws=G.en.filter(e=>e.ctw&&e.wsh&&!e.dead&&e.x<W);
+    for(const w of cs){let k=0;for(let y=30;y<H&&k<4;y+=120)if(Math.abs(y-w.gap.y)>48){G.pk.push({t:'shard',x:w.x,y,vx:-40,vy:0,bob:0});k++;}this.stat.curtEmp++;}
+    this.walls=this.walls.filter(w=>!cs.includes(w));this.curts=[];
+    for(const e of G.en)if(e.ctw&&!e.dead){if(e.wsh)this.stat.strip++;e.wsh=0;e.wshT=8;e.flash=.3;}
+    if(n>=6||ws.length){this.stat.good++;G.score+=Math.round(400*G.mult);floater(P.x,P.y-44,'GOOD EMP','#ffe14d');this.pend+=.25;}else this.stat.waste++;
+    if(G.t-this.lastDash<=1){this.stat.combo++;floater(P.x,P.y-58,'COMBO BLAST','#ff5fd2');this.fx.push({x:P.x,y:P.y,t:0});
+      for(const e of G.en){if(e.type==='boss'||e.dead||e.hp<=0||e.gr)continue;if(Math.hypot(e.x-P.x,e.y-P.y)<300){e.hp-=12;e.flash=.25;}}}},
+  hot(){return P.emp>0&&(G.eb.length>=6||this.walls.some(w=>w.cur&&w.x<W+10)||G.en.some(e=>e.ctw&&e.wsh&&e.x<W));},
+  tick(dt){if(!this.on||!G||!P)return;const b=$('bEmp');if(b)b.classList.toggle('abHot',!!(running&&!G.dead&&!SET.reduce&&this.hot()));
+    if(this.pend>0&&window.ABIL&&ABIL.on){ABIL.gain(this.pend);this.pend=0;}
+    for(const f of this.fx)f.t+=dt;this.fx=this.fx.filter(f=>f.t<.5);
+    if(!G.live||G.dead){this.tells=[];this.walls=[];this.curts=[];return;}
+    for(const t of this.tells){t.t-=dt;if(t.t<=0){t.dead=1;this.fire(t);}}this.tells=this.tells.filter(t=>!t.dead);
+    const hk=this.HK[SET.diff]||3;
+    for(const b of G.eb){if(!b.cxM||!(b.cxH>0))continue;b.cxH-=dt;const sp=Math.hypot(b.vx,b.vy),cur=Math.atan2(b.vy,b.vx);let w=Math.atan2(P.y-b.y,P.x-b.x)-cur;w=Math.atan2(Math.sin(w),Math.cos(w));
+      const a=cur+clamp(w,-hk*dt,hk*dt);b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;}
+    for(const w of this.walls){if(w.warn>0){w.warn-=dt;if(w.warn<=0&&!w.cur&&(this.charges()<1||!HARDS.includes(SET.diff)))w.gap={y:clamp(P.y+(Math.random()-.5)*160,70,H-70),h:110};continue;}
+      const x0=w.x;w.x-=w.v*dt;if(w.hit||w.done)continue;
+      if(P.x>=w.x-14&&P.x<=x0+14){const inGap=w.gap&&Math.abs(P.y-w.gap.y)<w.gap.h/2-8;
+        if(P.dashT>0||inGap){if(P.dashT>0&&!w.dash){w.dash=1;this.stat[w.cur?'curtDash':'wallDash']++;G.score+=Math.round(200*G.mult);floater(P.x,P.y-30,'THROUGH','#19e3ff');}}
+        else if(P.inv<=0){w.hit=1;this.stat[w.cur?'curtHit':'wallHit']++;hurt(1);}}
+      if(w.x<P.x-20)w.done=1;}
+    this.walls=this.walls.filter(w=>w.x>-30);
+    for(const c of this.curts){c.t-=dt;if(c.t<=0)c.dead=1;}this.curts=this.curts.filter(c=>!c.dead);
+    for(const e of G.en){if(!e.ctw||e.dead)continue;e.age+=dt;if(e.age<20&&e.t>5)e.t=5;   // a warden stays up to 20 s
+      if(e.wsh&&e.hp<e._ph&&e.hp>0)e.hp=e._ph-(e._ph-e.hp)*.3;
+      if(!e.wsh){e.wshT-=dt;if(e.wshT<=0){e.wsh=1;floater(e.x,e.y-e.r-20,'SHIELD UP','#7df9ff');}}e._ph=e.hp;}},
+  bar(){if(!this.live()||this.noAuto||G.boss||G.transT>=0)return;this.bars++;const ev=this.EV[SET.diff]||7;if(this.bars%ev!==ev-2)return;
+    const o=this.kinds();if(!o.length)return;this.start(o[this.k++%o.length]);},
+  draw(){if(!this.on||!G||!G.live)return;const r=this.red(),t=G.t;ctx.save();
+    for(const s of this.tells){const f=1-s.t/s.T,x=s.e&&!s.e.dead?s.e.x:s.x,y=s.e&&!s.e.dead?s.e.y:s.y;ctx.globalAlpha=.4+.6*f;ctx.strokeStyle=r;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,34-16*f,0,7);ctx.stroke();}
+    for(const b of G.eb)if(b.cxM){ctx.globalAlpha=1;ctx.strokeStyle=r;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(b.x,b.y,13+(SET.reduce?0:2*Math.sin(t*20)),0,7);ctx.stroke();}
+    for(const w of this.walls){if(w.cur){if(w.warn>0)continue;ctx.globalAlpha=1;ctx.fillStyle=r;for(let y=14;y<H;y+=26)if(Math.abs(y-w.gap.y)>48){ctx.beginPath();ctx.arc(w.x,y,7,0,7);ctx.fill();}continue;}
+      if(w.warn>0){ctx.globalAlpha=.35+.35*(SET.reduce?1:Math.abs(Math.sin(t*10)));ctx.strokeStyle=r;ctx.lineWidth=3;ctx.setLineDash([10,10]);ctx.beginPath();ctx.moveTo(w.x,0);ctx.lineTo(w.x,H);ctx.stroke();ctx.setLineDash([]);
+        ctx.globalAlpha=.9;ctx.fillStyle='#ffffff';ctx.font='bold 16px sans-serif';ctx.textAlign='right';ctx.fillText(say('DASH THROUGH'),w.x-10,H/2);continue;}
+      ctx.globalAlpha=.85;ctx.fillStyle=r;const g=w.gap;if(g){ctx.fillRect(w.x-6,0,12,g.y-g.h/2);ctx.fillRect(w.x-6,g.y+g.h/2,12,H-g.y-g.h/2);}else ctx.fillRect(w.x-6,0,12,H);
+      ctx.globalAlpha=.25;ctx.fillRect(w.x-14,0,28,H);}
+    for(const c of this.curts){ctx.globalAlpha=.5+.4*(SET.reduce?1:Math.abs(Math.sin(t*8)));ctx.fillStyle='#4dff9a';c.g.forEach((gy,i)=>{ctx.globalAlpha=i?.45:.95;ctx.beginPath();ctx.moveTo(W-6,gy-48);ctx.lineTo(W-26,gy);ctx.lineTo(W-6,gy+48);ctx.closePath();ctx.fill();});
+      ctx.globalAlpha=.4;ctx.fillStyle=r;ctx.fillRect(W-4,0,4,H);}
+    for(const e of G.en){if(!e.ctw||e.dead)continue;ctx.globalAlpha=1;ctx.lineWidth=4;const R=(e.r||20)+10;
+      if(e.wsh){ctx.strokeStyle='#7df9ff';ctx.beginPath();for(let i=0;i<7;i++){const a=i*Math.PI/3+t*.6;ctx[i?'lineTo':'moveTo'](e.x+Math.cos(a)*R,e.y+Math.sin(a)*R);}ctx.stroke();}
+      else{ctx.strokeStyle='#5a6b7a';ctx.beginPath();ctx.arc(e.x,e.y,R,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-e.wshT/8));ctx.stroke();}}
+    for(const f of this.fx){ctx.globalAlpha=Math.max(0,1-f.t/.5);ctx.strokeStyle='#ff5fd2';ctx.lineWidth=8;ctx.beginPath();ctx.arc(f.x,f.y,300*Math.min(1,f.t/.3),0,7);ctx.stroke();}
+    ctx.restore();}
+};
+CTR.reset();
+{const st=document.createElement('style');st.textContent=`@keyframes abHot{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+#touch button.abHot#bEmp{animation:abHot .5s ease-in-out infinite;filter:drop-shadow(0 0 10px #ffe14d)}`;document.head.appendChild(st);}
+NR.on('runStart',()=>CTR.reset());
+NR.on('bar',()=>CTR.bar());
+NR.on('tick',dt=>CTR.tick(dt));
 
 /* ---------- H: no AFK wins, a dying ship slows the song ----------
    STILL (declared in b.js): a ship that stays within 50 px of one spot for more than 3 s is hunted: enemies fire faster and their bullets are quicker,
@@ -9569,7 +9725,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   drawPlayer(t);HUDX.drones(t);
   if(running&&!G.dead)FXV.ring(t);
   PW.draw(t);
-  if(window.ABIL)ABIL.draw(t);
+  if(window.ABIL)ABIL.draw(t);if(window.CTR)CTR.draw();
   for(const r of G.rings){const k=1-r.l/r.m;ctx.strokeStyle=r.c;ctx.globalAlpha=1-k;ctx.lineWidth=3*(1-k)+1;ctx.beginPath();ctx.arc(r.x,r.y,18+k*52,0,7);ctx.stroke();ctx.globalAlpha=1;}
   ctx.textAlign='center';ctx.font='700 13px "Chakra Petch",sans-serif';for(const f of G.fl){ctx.globalAlpha=Math.min(1,f.l*2);ctx.fillStyle=f.c;wtxt(f.txt,f.x,f.y);}ctx.globalAlpha=1;
   if(PT)SH.ring(ctx,t);

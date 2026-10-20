@@ -7,7 +7,7 @@
 // (e) Normal: dodging bot clears >= 66%, a tracker/camper bot (sits on the nearest foe's line, never dodges) <= 20%
 // (f) no page errors
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs'), os = require('os');
-const GAME_DIR = path.resolve(__dirname, '../../games/mainhattan-nightrun'), RUNS = +process.env.RUNS || 6, STAGES = (process.env.STAGES || '3,7,12').split(',').map(Number);
+const GAME_DIR = path.resolve(__dirname, '../../games/mainhattan-nightrun'), RUNS = +process.env.RUNS || 10, STAGES = (process.env.STAGES || '3,7,12').split(',').map(Number);
 const SEED = `(()=>{let a=12345;Math.random=function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};window.__reseed=v=>{a=v;};})();`;
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const pass = [], fail = [], ok = (c, m) => (c ? pass : fail).push(m);
@@ -71,7 +71,7 @@ const BOT = (o) => {
   // (b) + (c)
   const acts = {}, st = {}; let caps = true, minGap = 1e9, minTell = 9, gaps = 0;
   const all = res[''].slice();
-  for (const s of ['hunt', 'feint', 'retreat', 'press', 'bait', 'window']) { const p = await open(U('&rxs=' + s), true); const r = await p.evaluate(TRACE, { n: s === 'window' ? 12 : 7, seed: 77, T: 60, rs: 5, fx: s === 'retreat' ? 520 : 0, pair: s === 'hunt' || s === 'retreat' }); all.push(r); acts[s] = r.rx ? r.rx.act[s] : 0; await p.close(); }
+  for (const s of ['hunt', 'feint', 'retreat', 'press', 'bait', 'window']) { const p = await open(U('&rxs=' + s), true); const r = await p.evaluate(TRACE, { n: s === 'window' ? 12 : 7, seed: 77, T: 60, rs: 5, fx: s === 'retreat' ? 520 : 0, pair: s === 'hunt' || s === 'retreat' || s === 'press' }); all.push(r); acts[s] = r.rx ? r.rx.act[s] : 0; await p.close(); }
   for (const r of all) { if (!r.rx) continue; for (const k in r.rx.stat) st[k] = (st[k] || 0) + (k === 'minTell' ? 0 : r.rx.stat[k]); minTell = Math.min(minTell, r.rx.stat.minTell); if (r.maxEb > r.cap || r.maxV > 401) caps = false; minGap = Math.min(minGap, r.minGap); gaps += r.gaps; }
   console.log('  state actions (forced): ' + JSON.stringify(acts) + '  squads: pin ' + st.pin + ' leader ' + st.leader + ' enrage ' + st.enrage + ' cover ' + st.cover + ' blocks ' + st.block);
   for (const s in acts) ok(acts[s] > 0, `(b) state ${s.toUpperCase()} acts in its scenario (${+(+acts[s]).toFixed(1)})`);
@@ -84,9 +84,9 @@ const BOT = (o) => {
     for (const n of [3, 12, 20]) { const ra = await a.evaluate(TRACE, { n, seed: 555, T: 30 }), rb = await b.evaluate(TRACE, { n, seed: 555, T: 30 }); if (JSON.stringify([ra.spawns, ra.fires, ra.ys]) === JSON.stringify([rb.spawns, rb.fires, rb.ys])) same++; else console.log('  diff stage ' + n); }
     ok(same === 3, `(d) ?react=0 = the page without react.js (stages 3/12/20, seeded spawns, shots and positions) ${same}/3`); await a.close(); await b.close(); }
   // (e)
-  const clr = async (track) => { let c = 0, n = 0; const p = await open(U('')); for (const s of STAGES) for (let k = 0; k < RUNS; k++) { const r = await p.evaluate(BOT, { n: s, track }).catch(() => ({ clear: false })); n++; if (r.clear) c++; } await p.close(); return c / n; };
-  const [cd, ct] = await Promise.all([clr(false), clr(true)]);
-  console.log(`  Normal clear, stages ${STAGES}: dodging bot ${(100 * cd).toFixed(0)}%, tracker bot ${(100 * ct).toFixed(0)}%`);
+  const clr = async (track, q) => { let c = 0, n = 0; const p = await open(U(q || '')); for (const s of STAGES) for (let k = 0; k < RUNS; k++) { const r = await p.evaluate(BOT, { n: s, track }).catch(() => ({ clear: false })); n++; if (r.clear) c++; } await p.close(); return c / n; };
+  const [cd, ct, c0, t0] = await Promise.all([clr(false), clr(true), clr(false, '&react=0'), clr(true, '&react=0')]);
+  console.log(`  Normal clear, stages ${STAGES} x${RUNS}: dodging bot ${(100 * c0).toFixed(0)}% -> ${(100 * cd).toFixed(0)}%, tracker bot ${(100 * t0).toFixed(0)}% -> ${(100 * ct).toFixed(0)}% (react=0 -> on)`);
   ok(cd >= .66, `(e) dodging bot clears >= 66% on Normal (${(100 * cd).toFixed(0)}%)`); ok(ct <= .2, `(e) tracker/camper bot <= 20% (${(100 * ct).toFixed(0)}%)`);
   ok(!errs.length, '(f) no page errors' + (errs.length ? ': ' + errs[0] : ''));
   await br.close(); srv.kill(); srv2.kill();

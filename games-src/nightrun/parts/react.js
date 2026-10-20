@@ -4,7 +4,7 @@
    always with a visible tell of at least RX.TELL s before any shot or dive:
      HUNT    leads the ship's velocity instead of aiming at where it is now, and drifts towards the line it will be on
      FEINT   starts a tell, cancels it ('?'), slides to the other side of the ship, then fires for real
-     RETREAT backs off when the ship closes in, then dives at it (dashed line = the dive path, locked at the end of the tell)
+     RETREAT backs off while the ship presses in; when the ship backs away it dives at it (dashed line = the dive path, locked at the end of the tell)
      PRESS   fills the half of the screen the ship has been hugging
      BAIT    holds fire while the ship is still; when it crosses a lane it fires where that dodge is going
      WINDOW  armoured (steel ring): shots bounce off, except for 1 s after it fires (gold ring) = timing
@@ -25,11 +25,12 @@ const RX=window.RX={get on(){return!!RET.react;},TELL:.6,GAP:96,J:.25,rng:Math.r
   ok(e){return!!e.rx&&!e.dead&&e.hp>0&&G.en.includes(e);},
   pick(e){const t=e.type,R=this.rng(),ez=this.easy();   // which brain this enemy gets
     if(this.force)return this.force;
-    if(t==='turret')return ez?(R<.5?'feint':'hunt'):R<.35?'window':R<.7?'feint':'bait';
-    if(t==='gunship')return ez?'feint':R<.4?'window':R<.75?'feint':'retreat';
+    const wn=this.hard()?'window':'feint';   // WINDOW armour: Hard tiers only
+    if(t==='turret')return ez?(R<.5?'feint':'hunt'):R<.35?wn:R<.7?'feint':'bait';
+    if(t==='gunship')return ez?'feint':R<.4?wn:R<.75?'feint':'retreat';
     return ez?(R<.5?'hunt':'press'):R<.28?'hunt':R<.48?'retreat':R<.68?'press':R<.88?'bait':'feint';},
-  per(e){const d=diff(),k=frK(),t=e.type;return(t==='turret'?1.5:t==='gunship'?1.4:2.4)/d/Math.max(.2,k)/(e.el?1.3:1);},   // the old mean fire period in seconds
-  tell(e){const sp=BT.spb||.5,b=bpos()+this.TELL/sp,fr=b-Math.floor(b);return this.TELL+(fr>1e-3?(1-fr)*sp:0);}   // >= TELL, and the shot lands on a beat
+  per(e){const d=diff(),k=frK(),t=e.type;return(t==='turret'?1.5:t==='gunship'?1.4:2.4)/d/Math.max(.2,k)/(e.el?1.3:1)*(this.hard()?1:1.25);},   // the old mean fire period in seconds (Easy/Normal x1.25: smarter shots, fewer of them)
+  tell(e){const T0=this.hard()?this.TELL:this.TELL+.1,sp=BT.spb||.5,b=bpos()+T0/sp,fr=b-Math.floor(b);return T0+(fr>1e-3?(1-fr)*sp:0);}   // >= TELL, and the shot lands on a beat
 };
 RX.reset();
 NR.on('runStart',()=>RX.reset());
@@ -54,9 +55,9 @@ RX.squad=function(g){if(this.easy()||!g.length)return;if(g.length<2&&!(g[0].type
   const fr=sm.filter(e=>!e.rx.role);
 
   if(fr.length>=2&&this.rng()<.6){const[a,b]=fr;a.rx.role='pin';b.rx.role='exit';a.rx.mate=b;b.rx.mate=a;b.rx.c=a.rx.c;a.rx.st=b.rx.st='hunt';this.stat.pin++;this.stat.exit++;}
-  if(g.length>=3&&this.rng()<.6){const l=g.find(e=>!e.rx.role)||g[0];s.ld=l;l.rx.ld=1;l.hp=l.max=Math.round(l.max*1.5);this.stat.leader++;}};
+  if(g.length>=3&&this.rng()<.6){const l=g.find(e=>!e.rx.role)||g[0];s.ld=l;l.rx.ld=1;if(this.hard())l.hp=l.max=Math.round(l.max*1.5);this.stat.leader++;}};
 /* the fire itself: through eb(), so caps hold */
-RX.fire=function(e,dir){const d=diff(),s=(e.type==='turret'?170+15*d:e.type==='gunship'?190:150+22*d),r=e.rx,lk=this.hard()?.85:.55;
+RX.fire=function(e,dir){const d=diff(),s=(e.type==='turret'?170+15*d:e.type==='gunship'?190:150+22*d),r=e.rx,lk=this.hard()?.85:.45;
   let tx=P.x,ty=P.y;const dist=Math.hypot(P.x-e.x,P.y-e.y),t=Math.min(.9,dist/Math.max(120,s));
   if(r.st==='hunt'||r.role==='pin'||r.role==='exit'){tx+=PV.x*t*lk;ty+=PV.y*t*lk;}
   if(r.st==='bait'){ty=P.y+Math.sign(r.bd||PV.y||1)*Math.min(110,Math.abs(r.bdv||PV.y)*.45+40);}
@@ -73,7 +74,7 @@ NR.on('tick',dt=>{if(!RX.on||!G.live||G.dead||G.tut||G.lab)return;
   if(RX.pend.length){const g=RX.pend.filter(e=>RX.ok(e));RX.pend=[];RX.squad(g);}
   RX.fav+=(P.y-RX.fav)*Math.min(1,dt/4);
   const enr=e=>e.rx.enr>0?1.6:1;let telling=0;for(const e of G.en)if(e.rx&&e.rx.tl>0)telling++;
-  const tmax=RX.easy()?3:RX.hard()?6:4;
+  const tmax=RX.easy()?3:RX.hard()?6:3;
   for(const e of G.en){const r=e.rx;if(!r||e.dead||e.hp<=0)continue;if(e.type!=='drone'&&e.type!=='gunship'&&e.type!=='turret'&&e.type!=='flank')continue;
     if(e.fp&&!r.fx){r.fx=true;if(r.role==='bear'){r.role=null;if(r.mate&&r.mate.rx)r.mate.rx.cov=null;}if(r.st==='retreat'||r.st==='press'||r.st==='cover')r.st='hunt';}   // formations set fp after the spawn event: path units keep their path
     r.enr=Math.max(0,r.enr-dt);if(r.role==='exit'&&!RX.ok(r.mate))r.role=null;
@@ -100,9 +101,9 @@ NR.on('tick',dt=>{if(!RX.on||!G.live||G.dead||G.tut||G.lab)return;
         else{if(RX.canShoot(e))RX.fire(e);r.c=RX.per(e)*RX.jit()/enr(e);}}
       continue;}
     e.arm=false;r.c-=dt;
-    if(e.x>P.x+60&&Math.abs(P.y-e.y)<26){r.lin=(r.lin||0)+dt;if(r.lin>.6&&r.c>.2&&!RX.easy()){r.c=.2;r.lin=0;RX.stat.reacts++;}}else r.lin=0;   // parking in front of a gun is read and punished (after a full tell)
+    if(e.x>P.x+300&&Math.abs(P.y-e.y)<26&&Math.abs(PV.x)<120){r.lin=(r.lin||0)+dt;if(r.lin>.6&&r.c>.2&&!RX.easy()){r.c=.2;r.lin=0;RX.stat.reacts++;}}else r.lin=0;   // camping on a gun's line from range is read and punished (after a full tell); close-in bold play is not
     if(r.st==='bait'&&r.c<=0){if(Math.abs(PV.y)<100&&r.hold<RX.per(e)*1.2){r.hold+=dt;continue;}r.bd=Math.sign(PV.y)||1;r.bdv=PV.y;if(r.hold>0){RX.stat.reacts++;RX.act.bait++;}r.hold=0;}
-    if(r.st==='retreat'&&!lv&&r.rt>1&&(r.rt>2.2||Math.hypot(P.x-e.x,P.y-e.y)>260)&&telling<tmax&&!RX.easy()){r.kind='dive';r.lx=P.x+PV.x*.3;r.ly=P.y+PV.y*.3;r.tl=Math.max(RX.TELL+.1,RX.tell(e));RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,r.tl);telling++;continue;}
+    if(r.st==='retreat'&&!lv&&r.rt>1&&Math.hypot(P.x-e.x,P.y-e.y)>260&&telling<tmax&&!RX.easy()){r.kind='dive';r.lx=P.x+PV.x*.3;r.ly=P.y+PV.y*.3;r.tl=Math.max(RX.TELL+.1,RX.tell(e));RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,r.tl);telling++;continue;}
     if(r.c>0||!RX.canShoot(e)||telling>=tmax)continue;
     if(r.role==='exit')continue;   // the exit gun fires with its pin partner
     const go=x=>{x.rx.kind=x.rx.st==='feint'&&!x.rx.fk?'feint':'shot';x.rx.fk=0;x.rx.tl=RX.tell(x);RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,x.rx.tl);telling++;};
