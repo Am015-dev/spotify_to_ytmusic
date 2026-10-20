@@ -95,6 +95,8 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
 {const st=document.createElement('style');st.textContent=`#touch button#bDash,#touch button#bEmp{min-width:48px;min-height:48px}
 #touch button#bDash::after,#touch button#bEmp::after{font-size:15px}
 #touch button.abRdy#bEmp{filter:drop-shadow(0 0 6px #ffb020)}#touch button.abRdy#bDash{filter:drop-shadow(0 0 5px #19e3ff)}`;document.head.appendChild(st);}
+ART.uiIcons=()=>{const q=[['dash','Dash'],['emp','Emp']].filter(k=>ART.rd&&ART.rd.has('ui-'+k[0]+'-icon.webp'));if(!q.length)return;const st=document.createElement('style');st.textContent=q.map(k=>'#touch button#b'+k[1]+'{background:center/62% no-repeat url('+ART.base+'ui-'+k[0]+'-icon.webp)}').join('');document.head.appendChild(st);};   // W34: real DASH / EMP icons, only when listed in ready.json
+if(ART.rd)ART.uiIcons();
 NR.on('tick',dt=>ABIL.tick(dt));
 NR.on('kill',d=>{if(!ABIL.on||!d||d.boss)return;const e=d.e||{};ABIL.gain(e.el||e.type==='gunship'?.08:.035,'kill',e);});
 NR.on('graze',d=>ABIL.gain(d&&d.pf?.07:.04,'graze'));

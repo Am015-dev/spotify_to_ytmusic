@@ -134,7 +134,7 @@ RU.T={
       for(const h of o.h){if(h.dn>0){h.dn-=dt;continue;}const q=o.tr[Math.max(0,o.tr.length-h.d)];h.x=q[0];h.y=q[1];if(h.cd>0)h.cd-=dt;
         if(o.tr.length>=h.d&&h.cd<=0&&Math.hypot(h.x-P.x,h.y-P.y)<20&&P.dashT<=0){h.cd=2;RU.sting('STUNG');RU.use('hunter');}
         for(const b of G.pb)if(!b.dead&&Math.hypot(b.x-h.x,b.y-h.y)<16){b.dead=1;h.hp-=1;if(h.hp<=0){h.dn=9;h.hp=20;RU.shard(h.x,h.y);G.score+=Math.round(300*G.mult);RU.use('hunter');}}}},
-    draw(m){for(const h of m.o.h){if(h.dn>0||h.x==null)continue;ctx.fillStyle=this.c;ctx.globalAlpha*=.75;RU.tri(h.x,h.y,12,3.14);ctx.fill();ctx.globalAlpha/=.75;RU.ring(h.x,h.y,17,this.c,1.5);}},
+    draw(m){for(const h of m.o.h){if(h.dn>0||h.x==null)continue;if(ART.pic('rule-hunter',30,h.x,h.y,Math.PI))continue;ctx.fillStyle=this.c;ctx.globalAlpha*=.75;RU.tri(h.x,h.y,12,3.14);ctx.fill();ctx.globalAlpha/=.75;RU.ring(h.x,h.y,17,this.c,1.5);}},
     dash(m){for(const h of m.o.h)if(!(h.dn>0)&&h.x!=null&&Math.hypot(h.x-P.x,h.y-P.y)<90){h.dn=9;RU.shard(h.x,h.y);G.score+=Math.round(300*G.mult);floater(h.x,h.y-20,'HUNTER DOWN','#ffe14d');RU.use('hunter');}}},
   gate:{n:'RHYTHM GATE',t:'shots wait at the gate for the beat',tt:'released shots home in',c:'#ff8a3d',
     init(m){m.o.hold=[];},
@@ -149,7 +149,7 @@ RU.T={
       o.rc-=dt;if(o.rc<=0){o.rc=.9/RU.gk();if(G.eb.length<ebCap()-6){const x=gx(150,W-60);if(Math.abs(x-P.x)>96){eb.src=null;eb(x,-8,1.5708,110,null,5);RU.use('cover');}}}
       for(const k of o.b){k.x-=20*dt;for(const b of G.eb)if(!b.dead&&Math.abs(b.x-k.x)<k.w/2&&Math.abs(b.y-k.y)<10){b.dead=1;k.hp--;RU.use('cover');}if(k.hp<=0||k.x<-40)k.dead=1;}o.b=o.b.filter(k=>!k.dead);},
     drop(m){if(m.o.b.length<4)m.o.b.push({x:P.x,y:Math.max(30,P.y-50),w:70,hp:6});},
-    draw(m){for(const k of m.o.b){ctx.fillStyle=this.c;ctx.globalAlpha*=.4+.1*k.hp;ctx.fillRect(k.x-k.w/2,k.y-6,k.w,12);ctx.globalAlpha/=.4+.1*k.hp;}},
+    draw(m){for(const k of m.o.b){if(ART.pic('rule-cover',k.w,k.x,k.y,0,.5+.1*k.hp))continue;ctx.fillStyle=this.c;ctx.globalAlpha*=.4+.1*k.hp;ctx.fillRect(k.x-k.w/2,k.y-6,k.w,12);ctx.globalAlpha/=.4+.1*k.hp;}},
     dash(m){this.drop(m);},
     emp(m){if(!m.tw)return;for(const k of m.o.b){for(let i=0;i<4;i++)RU.shot(k.x,k.y,-.6+i*.4,7);}m.o.b=[];RU.use('cover');}},
   bumper:{n:'BUMPER ORBS',t:'your shots ricochet off them at foes',tt:'dash into one to launch it',c:'#5affb4',
@@ -157,7 +157,7 @@ RU.T={
     tick(m,dt){for(const q of m.o.o){if(q.l){q.l-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;for(const e of G.en)if(!e.dead&&e.type!=='boss'&&Math.hypot(e.x-q.x,e.y-q.y)<e.r+16){RU.shot(e.x-10,e.y,0,25);q.l=0;}if(q.l<=0){q.l=0;q.x=W*.55;q.y=H*.5;q.vx=40;q.vy=60;}continue;}
       q.x+=q.vx*dt;q.y+=q.vy*dt;if(q.y<60||q.y>H-60)q.vy=-q.vy;if(q.x<W*.35||q.x>W*.8)q.vx=-q.vx;
       for(const b of G.pb){if(b.dead||b.bo||Math.hypot(b.x-q.x,b.y-q.y)>18)continue;b.bo=1;const e=RU.near(q.x,q.y);if(e){const a=Math.atan2(e.y-q.y,e.x-q.x),s=Math.hypot(b.vx,b.vy)||600;b.vx=Math.cos(a)*s;b.vy=Math.sin(a)*s;RU.use('bumper');}}}},
-    draw(m){for(const q of m.o.o){ctx.fillStyle=this.c;ctx.beginPath();ctx.arc(q.x,q.y,14,0,7);ctx.fill();RU.ring(q.x,q.y,20,this.c,2);}},
+    draw(m){for(const q of m.o.o){if(ART.pic('rule-bumper',42,q.x,q.y))continue;ctx.fillStyle=this.c;ctx.beginPath();ctx.arc(q.x,q.y,14,0,7);ctx.fill();RU.ring(q.x,q.y,20,this.c,2);}},
     dash(m){if(!m.tw)return;for(const q of m.o.o)if(!q.l&&Math.hypot(q.x-P.x,q.y-P.y)<110){q.l=1.5;q.vx=700;q.vy=0;RU.use('bumper');}}},
   pads:{n:'BOOST PADS',t:'fly over arrows: a dash charge back',tt:'the arrows flip, follow them',c:'#a6ff3d',
     init(m){m.o.p=[];m.o.cd=1;},
@@ -165,7 +165,7 @@ RU.T={
       for(const p of o.p){p.x-=90*dt;const dir=m.tw&&Math.floor(G.t/3)%2?-1:1;p.dir=dir;
         if(!p.u&&Math.hypot(p.x-P.x,p.y-P.y)<30){p.u=1;if(G.ab)G.ab.n=Math.min(4,(G.ab.n||0)+(m.tw?1:.6)*RU.gk());P.y=clamp(P.y+dir*40,30,H-30);RU.use('pads');floater(P.x,P.y-24,'BOOST','#a6ff3d');}
         if(p.x<-30)p.dead=1;}o.p=o.p.filter(p=>!p.dead);},
-    draw(m){for(const p of m.o.p){ctx.fillStyle=this.c;ctx.globalAlpha*=p.u?.3:1;RU.tri(p.x,p.y,14,(p.dir||1)>0?1.5708:-1.5708);ctx.fill();RU.tri(p.x+14,p.y,10,(p.dir||1)>0?1.5708:-1.5708);ctx.fill();ctx.globalAlpha/=p.u?.3:1;}}}};
+    draw(m){for(const p of m.o.p){if(ART.pic('rule-pads',44,p.x,p.y,(p.dir||1)>0?0:Math.PI,p.u?.3:1))continue;ctx.fillStyle=this.c;ctx.globalAlpha*=p.u?.3:1;RU.tri(p.x,p.y,14,(p.dir||1)>0?1.5708:-1.5708);ctx.fill();RU.tri(p.x+14,p.y,10,(p.dir||1)>0?1.5708:-1.5708);ctx.fill();ctx.globalAlpha/=p.u?.3:1;}}}};
 RU.ORDER=['well','lane','echo','gold','portal','bounce','pocket','hunter','gate','tide','cash','cover','bumper','hulls','pads'];
 /* ---- hooks (all inert with the flag off) ---- */
 NR.on('runStart',()=>{RU.st=null;if(RET.rules)RU.start();});

@@ -121,7 +121,8 @@ const FG=window.FG={get on(){return!!RET.forge;},s:null,ver:0,mn:[],kills:[0,0],
     for(const m of this.mn){c.globalAlpha=Math.min(1,m.t*2)*.9;c.fillStyle=m.c;this.shape(c,'tri',m.x,m.y,6);c.fill();}
     c.restore();},
   // icon of an inventory item: weapon = its colour circle, hybrid = circle A + triangle B + mini shapes, mod = its shape, core = hexagon, passive = square
-  icon(c,it,S){c.clearRect(0,0,S,S);const m=S/2;c.save();c.lineWidth=Math.max(2,S/16);
+  icon(c,it,S){c.clearRect(0,0,S,S);{const pi=typeof ART==='object'&&ART.img('fg-'+it.replace(':','-'));if(pi){c.drawImage(pi,0,0,S,S);return;}}   // real picture fg-<h|m|k|p>-<id> when listed in ready.json
+    const m=S/2;c.save();c.lineWidth=Math.max(2,S/16);
     const ty=it.split(':')[0],id=it.split(':')[1];
     if(ty==='w'){const col=WPD[id]?WPD[id].c:'#fff';c.fillStyle=col;this.shape(c,'o',m,m,S*.3);c.fill();c.fillStyle='#0b0820';c.font='700 '+Math.round(S*.24)+'px "Share Tech Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.fillText((WPD[id]?WPD[id].s:'?').slice(0,2),m,m+1);}
     else if(ty==='h'){const R=this.rid(id);if(R){const c1=WPD[R[0]].c,c2=WPD[R[1]].c,sh=FG_SH[FGR.indexOf(R)%FG_SH.length];c.fillStyle=c1;this.shape(c,'o',m-S*.08,m,S*.28);c.fill();
