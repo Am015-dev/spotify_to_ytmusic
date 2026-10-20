@@ -854,7 +854,7 @@ const hintShow=(txt,t,col)=>{if(window.HINT)return HINT.show(txt,{t,col});G.hint
 function banner(a,b,warn,t){t=t||3.2;G.banner={t,m:t,a:say(a),b:say(b),warn:!!warn};}
 function newGame(daily){
   GR=daily?mul(todayN()):Math.random;GX=daily?mul(todayN()+7919):Math.random;
-  P={x:140,y:H/2,hp:5,max:5,inv:2,dashT:0,dashCd:0,dx:1,dy:0,heat:0,over:false,wl:1,emp:2,fg:-1e9,dq:null,tilt:0,dashPf:false};
+  P={x:140,y:H/2,hp:5,max:5,inv:2,dashT:0,dashCd:0,dx:1,dy:0,mvT:-9,heat:0,over:false,wl:1,emp:2,fg:-1e9,dq:null,tilt:0,dashPf:false};
   C={n:0,best:0,last:-999,lb:0};
   G={spawnB:[],t:0,scroll:0,di:0,pos:0,d0:0,dprog:0,force:false,loop:0,dt:0,waveT:3.5,waveWait:false,en:[],eb:[],pb:[],pk:[],pt:[],fl:[],rings:[],delayed:[],score:0,mult:1,kills:0,boss:null,bossDone:false,
      banner:{t:0,m:3.2,a:'',b:'',warn:false},shake:0,glitch:0,flash:0,slow:1,dead:false,deadT:0,transT:-1,empT:0,
@@ -901,11 +901,11 @@ const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil
   lf(){return ST.on?Math.max(this.fkFloor,1-this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
   lm(){return ST.on?Math.max(this.mlFloor,1-1.5*this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
   ml:{drone:1.2,flank:1.2,turret:1.3,charger:1.3,gunship:2.6,gate:1.4,mine:.6,swarm:0},elMl:4,
-  minLife(e){const b=e.el?(e.type==='charger'?2:Math.max(this.elMl,this.ml[e.type]||0)):(this.ml[e.type]||0);return b*this.lm()*(SET.diff==='easy'?this.easyK:1);},
+  minLife(e){if(window.VIS&&VIS.on)return VIS.life(e);const b=e.el?(e.type==='charger'?2:Math.max(this.elMl,this.ml[e.type]||0)):(this.ml[e.type]||0);return b*this.lm()*(SET.diff==='easy'?this.easyK:1);},
   pass(dt){if(!this.on)return;let raw=0;
     for(const e of G.en){if(e.dead)continue;
       if(e.hq==null)e.hq=e.max||e.hp;
-      if(e.type!=='boss'&&e.x>W-40&&!e.rk){e.hp=e.hq;e.gr=1;continue;}       // entry grace
+      if(e.type!=='boss'&&(e.x>W-40||(window.VIS&&VIS.on&&!VIS.ok(e)))&&!e.rk){e.hp=e.hq;e.gr=1;continue;}       // entry grace
       if(e.gr){e.gr=0;e.tin=G.t;e.bf=Math.min(e.bf,window.SC?SC.firstShot():2);}                       // fully inside: hittable, and it gets its shot in soon
       if(e.tin==null)e.tin=G.t;
       const loss=e.hq-e.hp;if(loss>0&&!e.rk){const real=Math.min(loss,Math.max(0,e.hq));raw+=real;if(this.soft)e.hp=e.hq-real*this.k;}
@@ -992,6 +992,15 @@ function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false}
   else if(e.type==='gate'){for(let i=0;i<3;i++)drop('shard',0,rnd(-30,30));}
   if(GX()<(.009+(SH.lk||0)*.3)*healK()&&P.hp<P.max)drop('hp');}   // a district has 300+ kills now: one hull drop in about 110
 // a dash waiting for its beat already protects the ship (P.dq)
+/* DASH direction with no input (and no move in the last 0.3 s): never a stale heading. Picks the 8-way direction whose landing spot has the most free space,
+   away from bullets and foes (predicted .25 s ahead) and from walls; ties go up the screen (world right, the way the ship faces). */
+function dashSafeDir(){const L=210,x0=P.x,y0=P.y,x1=rotMode?64:24,x2=W-60,y1=36,y2=H-54;let best=[1,0],bs=-1e9;
+  for(let i=0;i<8;i++){const a=i*Math.PI/4,dx=Math.round(Math.cos(a)),dy=Math.round(Math.sin(a)),n=Math.hypot(dx,dy);const ux=dx/n,uy=dy/n;
+    const ex=clamp(x0+ux*L,x1,x2),ey=clamp(y0+uy*L,y1,y2);let sc=ux*.15-Math.hypot(x0+ux*L-ex,y0+uy*L-ey)/L*2;
+    for(const b of G.eb){const d=Math.hypot(b.x+b.vx*.25-ex,b.y+b.vy*.25-ey);if(d<150)sc-=(150-d)/150;}
+    for(const e of G.en){const d=Math.hypot(e.x-ex,e.y-ey);if(d<120)sc-=(120-d)/240;}
+    if(sc>bs+1e-9){bs=sc;best=[ux,uy];}}
+  return best;}
 function hurt(n){n=n>1?n:1;if(P.inv>0||P.dashT>(P.dashSh||0)||P.dq||G.dead||godMode||ST.over)return;if(SH.absorb())return;P.hp=Math.max(0,P.hp-n);if(n>1){shake(12);G.flash=Math.max(G.flash,.3*FX());}   // a heavy shell takes 2 hull
   ST.hits++;P.inv=1.5;G.mult=Math.max(1,Math.floor(G.mult*5)/10);tierDrop('hit');G.glitch=.45*FX();G.flash=.25*FX();AU.sfx('hurt');NR.emit('hurt');
   burst(P.x,P.y,'#ff3050',24,300);if(P.hp<=0)die();}
@@ -1072,12 +1081,12 @@ function update(dt){
   /* player */
   if(!G.dead){
     let mx=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0),my=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0);
-    if(mx||my){const l=Math.hypot(mx,my);P.dx=mx/l;P.dy=my/l;}
+    if(mx||my){const l=Math.hypot(mx,my);P.dx=mx/l;P.dy=my/l;P.mvT=G.t;}
     const dashTs=pressed.ShiftLeft||pressed.ShiftRight||pressed.KeyK||pressed.Dash;
     if(window.ABIL&&ABIL.on)ABIL.dashIn(dashTs,mx,my,pdt);else{   // abilities.js: dash charges + power-up traits (?abil=0 = this old dash)
     const canDash=()=>P.dashCd<=0||SH.spare>0;
     // DASH is snapped to the beat: a press inside the window waits for the beat (at most the window), then counts as on-beat. Outside the window it dashes at once, off-beat, and the tier drops.
-    const goDash=(on,j)=>{if(P.dashCd>0)SH.spare--;P.dashT=.2;P.dashCd=1;if(!(mx||my)&&!touch){P.dx=1;P.dy=0;}AU.sfx('dash');
+    const goDash=(on,j)=>{if(P.dashCd>0)SH.spare--;P.dashT=.2;P.dashCd=1;if(!(mx||my)&&G.t-P.mvT>.3){const d=dashSafeDir();P.dx=d[0];P.dy=d[1];}AU.sfx('dash');
       P.dashPf=on;
       if(on){P.dashCd=.5;G.score+=Math.round(200*G.mult*comboK());J.n++;J.last={kind:'dash',ok:true,dt:Math.round(j.dt),beat:j.beat,at:performance.now()};onPerfect('dash',j,P.x,P.y);
         if(!TIP.done){TIP.done=true;save('mnr_tipdone',true);}}
@@ -1091,7 +1100,7 @@ function update(dt){
     const py0=P.y;
     if(P.dashT>0){P.x+=P.dx*1050*pdt;P.y+=P.dy*1050*pdt;if(!SET.calm&&Math.random()<.9)G.pt.push({x:P.x,y:P.y,vx:0,vy:0,l:.25,m:.25,c:D.b,sz:10,ghost:1});}
     else if(touch){const sk=SENS[SET.sens-1]||1.5,tx=touch.px+(touch.x-touch.sx)*sk,ty=touch.py+(touch.y-touch.sy)*sk;const ddx=tx-P.x,ddy=ty-P.y,l=Math.hypot(ddx,ddy);
-      if(l>1){P.dx=ddx/l;P.dy=ddy/l;}const s=Math.min(l,520*pdt);if(l>0){P.x+=ddx/l*s;P.y+=ddy/l*s;}}
+      if(l>3){P.dx=ddx/l;P.dy=ddy/l;P.mvT=G.t;}const s=Math.min(l,520*pdt);if(l>0){P.x+=ddx/l*s;P.y+=ddy/l*s;}}
     else{const l=Math.hypot(mx,my)||1;P.x+=mx/l*300*pdt;P.y+=my/l*300*pdt;}
     const cx=clamp(P.x,rotMode?64:24,W-60),cy=clamp(P.y,36,H-54);   // portrait keeps the ship above the tier meter
     if(touch){if(cx!==P.x||P.dashT>0){touch.sx=touch.x;touch.px=cx;}if(cy!==P.y||P.dashT>0){touch.sy=touch.y;touch.py=cy;}}   // finger past the edge: re-anchor, no dead zone
@@ -1147,7 +1156,7 @@ function update(dt){
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
       if(hit&&b.px&&b.px.has(e))continue;
       if(hit&&e.zt&&window.ZOO&&ZOO.block(b,e)){b.dead=1;if(Math.random()<.5)burst(b.x,b.y,'#4ad1ff',3,120,.25);AU.sfx('hit');break;}   // zoo.js: a shield absorbs the shot
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.wid)e._wk=b.wid;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh||b.fg)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom(FXW.hk(b,'hit-spark'),b.x,b.y,30,.16);}AU.sfx('hit');break;}}
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.tm)e.dk=G.t;if(b.wid)e._wk=b.wid;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh||b.fg)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom(FXW.hk(b,'hit-spark'),b.x,b.y,30,.16);}AU.sfx('hit');break;}}
     if(b.rc>0&&(b.y<2&&b.vy<0||b.y>H-2&&b.vy>0)){b.vy=-b.vy;b.rc--;b.y=clamp(b.y,3,H-3);if(b.px)b.px.clear();}
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}
@@ -1535,10 +1544,10 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
     const g=this.ship==='tri'?1/3:this.ship==='hv'?2:0;
     if(g){const cur=Math.floor(G.bp/g);this.tk=cur!==this.prevCur&&this.prevCur!==-1;this.prevCur=cur;}else this.tk=true;
     const dn=P.dashT>0;if(dn&&!this.wasDash)this.dashId++;this.wasDash=dn;
-    if(dn&&this.db){const dm=5*this.db*(1+(typeof SYN==='object'?SYN.v.db||0:0));for(const e of G.en){if(e.dashHit===this.dashId||e.hp<=0)continue;if(Math.hypot(P.x-e.x,P.y-e.y)<e.r+34){e.dashHit=this.dashId;e.hp-=dm;e.flash=.12;burst(e.x,e.y,'#ff5a3d',8,200,.35);AU.sfx('hit');}}}},
+    if(dn&&this.db){const dm=5*this.db*(1+(typeof SYN==='object'?SYN.v.db||0:0));for(const e of G.en){if(e.dashHit===this.dashId||e.hp<=0)continue;if(Math.hypot(P.x-e.x,P.y-e.y)<e.r+34){e.dashHit=this.dashId;e.dk=G.t;e.hp-=dm;e.flash=.12;burst(e.x,e.y,'#ff5a3d',8,200,.35);AU.sfx('hit');}}}},
   absorb(){if(this.sh>0){this.sh--;P.inv=1.3;shake(8);G.flash=Math.max(G.flash,.12*FX());burst(P.x,P.y,'#19e3ff',26,320,.5);floater(P.x,P.y-24,'SHIELD','#19e3ff');AU.sfx('hurt');
       return true;}return false;},
-  steer(b,dt,k){k=k||this.hm;let best=null,bd=1e9;for(const e of G.en){if(e.type==='gate'||e.hp<=0||e.x<b.x-10||e.x>W+10)continue;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<bd&&d<420){bd=d;best=e;}}
+  steer(b,dt,k){k=k||this.hm;const vo=window.VIS&&VIS.on;if(vo&&(b.ha=(b.ha||0)+dt)<VIS.lock)return;let best=null,bd=1e9;for(const e of G.en){if(e.type==='gate'||e.hp<=0||e.x<b.x-10||e.x>W+10||(vo&&!VIS.ok(e)))continue;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<bd&&d<420){bd=d;best=e;}}
     if(!best)return;const sp=Math.hypot(b.vx,b.vy),cur=Math.atan2(b.vy,b.vx);let want=Math.atan2(best.y-b.y,best.x-b.x)-cur;want=Math.atan2(Math.sin(want),Math.cos(want));
     const a=cur+clamp(want,-dt*2.2*k,dt*2.2*k);b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;},
   // ----- weapon rhythms: the garage ships -----
@@ -1838,7 +1847,7 @@ const KIT=['fr','sh','mg','wd','fr','hm','ck','dc','sh','hm','wd','ck','fr','sh'
 const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20,dk:1,d:1,d0:1,dens:1,x:0,bs:1,eh:1,el:0,heal:1,hp0:5,hits:0,over:false,spawned:false,fin:false,cT:0,stars:[1,0,0],
   setLevel(n){this.n=n;this.def=STAGES[n-1];const L=this.lvl=TUNE.lv[n-1]+dmOf().lv+TUNE.lenK*(89-stLenC(this.def))-(window.RET&&RET.mercy&&!(window.HEAT&&HEAT.lv(n))?RET.mercyLvl(n):0)+(window.HEAT?HEAT.lvK*HEAT.lv(n):0);   // a long stage (a long song) gives more chances to be hit: its level is eased, a short one tightened
     this.d0=TUNE.d0+TUNE.dd*L;this.d=this.d0*.8;this.dens=Math.max(.5,TUNE.dens0-TUNE.densd*L);this.x=Math.max(0,Math.min(2,(L-TUNE.xs)*TUNE.xd));this.bs=1+TUNE.bsd*L;this.eh=(1+TUNE.eh*L)*dmOf().hp;
-    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1]+(window.RET&&RET.mercy&&!(window.HEAT&&HEAT.lv(n))?RET.mercyHull(n):0);
+    this.el=L<TUNE.el0?0:Math.min(.6,TUNE.eld*(L-TUNE.el0+1));this.heal=Math.max(.15,1-TUNE.hd*L);this.hp0=TUNE.hull[n-1]+(window.RET&&RET.mercy&&!(window.HEAT&&HEAT.lv(n))?RET.mercyHull(n):0)+(window.VIS?VIS.hullD(n):0);
     this.hits=0;this.over=false;this.spawned=false;this.fin=false;this.pre=false;this.cT=0;
     const df=this.def;this.len=stLen(df);this.kv=stKill(df);this.sv=stScore(df);this.pn=stPerf(df);   // stage = song length; boss in its last 32 bars (mini-boss: 14)
     this.lead=df.goal.k==='boss'?Math.max(20,this.len-BOSS_BARS):df.goal.k==='mini'?Math.max(20,this.len-MINI_BARS):0;
@@ -6646,6 +6655,7 @@ RET.st=(function(on){
      +'<div class="stGrid">'+cell('Runs',fmtN(s.runs))+cell('Play time',fmtT(s.time))+cell('Enemies',fmtN(s.kills))+cell('Bosses beaten',fmtN(s.bosses))+cell('Grazes',fmtN(s.grazes))+cell('PERFECT dashes',fmtN(s.dashes))+cell('PERFECT hits',fmtN(s.perfects))+cell('FEVERs',fmtN(s.fevers))+cell('Deaths',fmtN(s.deaths))+cell('Best score',fmtN(s.bestScore))+cell('Best stage',bestStage||'-')+cell('Neon earned',fmtN(s.neon))+cell('Daily streak best',fmtN(s.daily))+cell('Stage clears',fmtN(s.clears))+'</div>'
      +(wt.length?'<h3>WEAPONS USED</h3><div class="stParts">'+wt.map(id=>'<div><span>'+esc((window.WPD&&WPD[id]&&WPD[id].n)||id)+'</span><i><u style="width:'+Math.round(100*D.w[id]/wmax)+'%"></u></i><em>'+fmtT(D.w[id])+'</em></div>').join('')+'</div>':'')
      +(window.PW3&&PW3.on&&PW3.sheet?PW3.sheet():'')
+     +(window.BPL&&BPL.on?BPL.sheet():'')
      +(typeof FB!=='undefined'&&FB.on?FB.sheet():'')
      +'<h3>ACHIEVEMENTS <span id="stAchN">'+got+'/'+A.length+'</span></h3><div class="stAch">'
      +A.map(a=>{const g=!!D.a[a.id];return '<div class="ac'+(g?' got':'')+'" data-id="'+a.id+'">'+badge(a,g)+'<span><b>'+esc(a.n)+'</b><small>'+(g?'':'🔒 ')+esc(a.d)+(a.skill?' · no Assist':'')+'</small></span></div>';}).join('')+'</div>'
@@ -7757,12 +7767,19 @@ NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
 #wpL .card .tx{flex:1 1 0}#wpL .card .slot{position:absolute;top:4px;right:8px;font-family:var(--mono);font-size:11px;color:var(--c);letter-spacing:.06em}
 #wpL .card .pp{display:flex;gap:2px;margin-top:3px}#wpL .card .pp i{display:block;width:clamp(8px,calc(var(--u)*3),14px);height:5px;border-radius:1px;background:#ffffff22}#wpL .card .pp i.on{background:var(--c)}
 #wpL .card.sel{background:#22123f}
-#wpFu{flex:0 0 auto;display:flex;gap:10px;align-items:center;min-height:30px;font-family:var(--mono);font-size:clamp(11px,calc(var(--u)*3.2),15px);color:var(--dim);padding:2px 4px}
+#wpm.ov.solid{background:#05030c;z-index:9}
+#wpm .card{height:96px;min-height:96px;box-sizing:border-box;overflow:hidden}
+#wpm .card .tx{min-width:0;overflow:hidden}#wpm .card .n{font-size:14px;line-height:1.1}#wpm .card .t{font-size:14px;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#wpm .card .slot{font-size:14px;top:3px}#wpm .msg,#wpm .slots{font-size:14px}
+#wpL #wpFu{grid-column:1/-1;min-height:64px;box-sizing:border-box;padding:6px 10px;border:1px solid #3a2b5c;border-radius:10px;font-size:14px}
+#wpm #wpGo{min-height:44px}
+@media (max-height:700px){#wpShip{display:none}}
+#wpFu{flex:0 0 auto;display:flex;gap:10px;align-items:center;min-height:30px;font-family:var(--mono);font-size:14px;color:var(--dim);padding:2px 4px}
 #wpShip{display:block;width:min(100%,300px);height:auto;aspect-ratio:300/96;margin:0 auto 4px;flex:0 0 auto}#wpFu canvas{width:56px;height:56px;flex:0 0 auto}#wpFu .n{color:#ffe14d;font-size:1.05em;letter-spacing:.04em}#wpFu .t{color:var(--ink)}
 #shWpRow{display:flex;gap:10px;align-items:center;flex:0 0 auto;min-height:44px}#shWpRow button{flex:0 0 auto;min-width:44px;padding:.4em 1em}#shWpRow span{font-family:var(--mono);color:var(--dim);font-size:clamp(11px,calc(var(--u)*3.2),15px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #titleRow2{margin-top:2px}#titleRow2 .go{font-size:clamp(12px,min(1.6vw,2.8vh),16px)}`;document.head.appendChild(st);}
 const wpEl=document.createElement('div');wpEl.id='wpm';wpEl.className='ov solid pg';wpEl.hidden=true;
-wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><canvas id="wpShip" width="300" height="96"></canvas><div id="wpL"></div><div id="wpFu"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
+wpEl.innerHTML='<div class="top"><span class="ttl">WEAPONS</span><span class="slots" id="wpSl"></span></div><canvas id="wpShip" width="300" height="96"></canvas><div id="wpL"></div><div class="msg" id="wpMsg"></div><div class="bot"><button class="go alt" id="wpGo" type="button">DONE</button></div>';
 stage.appendChild(wpEl);
 {const DEMO=(id,c,t,col)=>{                                       // t: 0..2 seconds, the demo loops
    c.clearRect(0,0,108,52);const sy=26;c.fillStyle='#ffffff';c.beginPath();c.moveTo(6,sy-6);c.lineTo(18,sy);c.lineTo(6,sy+6);c.closePath();c.fill();
@@ -7781,10 +7798,10 @@ stage.appendChild(wpEl);
      const x=20+p*70;c.fillRect(x-8,sy-4,18,8);}
  };
  WPX.demoFn=(id,c,t,col)=>{c.clearRect(0,0,108,52);DEMO(id,c,t,col);};
- let raf=0;const loop=()=>{raf=0;if(wpEl.hidden)return;const t=(performance.now()/1000)%2;for(const cv of wpEl.querySelectorAll('canvas[data-id]')){const c=cv.getContext('2d'),n='wp-'+cv.dataset.id;if(ART.have(n)){c.clearRect(0,0,108,52);c.drawImage(ART.bm[n],28,0,52,52);}else DEMO(cv.dataset.id,c,t,WPD[cv.dataset.id].c);}raf=requestAnimationFrame(loop);};
+ let raf=0;const loop=()=>{raf=0;if(wpEl.hidden)return;const t=(performance.now()/1000)%2;for(const cv of wpEl.querySelectorAll('canvas[data-id]')){const c=cv.getContext('2d'),n='wp-'+cv.dataset.id;if(ART.have(n)&&ART.isReal(n)){c.clearRect(0,0,108,52);c.drawImage(ART.bm[n],28,0,52,52);}else DEMO(cv.dataset.id,c,t,WPD[cv.dataset.id].c);}raf=requestAnimationFrame(loop);};
  WP.fuIcon=function(c,f,z){c.clearRect(0,0,z,z);const m=z/2;
-   if(ART.have(f.img)){c.drawImage(ART.bm[f.img],0,0,z,z);return;}
-   if(f.timg&&ART.have(f.timg)){c.drawImage(ART.bm[f.timg],0,0,z,z);return;}
+   if(ART.have(f.img)&&ART.isReal(f.img)){c.drawImage(ART.bm[f.img],0,0,z,z);return;}
+   if(f.timg&&ART.have(f.timg)&&ART.isReal(f.timg)){c.drawImage(ART.bm[f.timg],0,0,z,z);return;}
    c.save();c.lineCap='round';c.shadowBlur=z*.12;
    c.strokeStyle=f.c1;c.shadowColor=f.c1;c.lineWidth=z*.1;c.beginPath();c.arc(m,m,z*.36,Math.PI*.5,Math.PI*1.5);c.stroke();
    c.strokeStyle=f.c2;c.shadowColor=f.c2;c.beginPath();c.arc(m,m,z*.36,-Math.PI*.5,Math.PI*.5);c.stroke();
@@ -7794,7 +7811,7 @@ stage.appendChild(wpEl);
    for(const id of WP_IDS){const d=WPD[id],L=this.lvOf(id),slot=this.eq.indexOf(id),b=document.createElement('button');b.type='button';b.className='card'+(slot>=0?' sel':'')+(this.has(id)?'':' no');b.style.setProperty('--c',d.c);b.dataset.id=id;
      b.innerHTML=`<canvas width="108" height="52" data-id="${id}"></canvas><div class="tx"><div class="n">${d.n}</div><div class="t">${d.tx}</div><div class="pp">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<this.permOf(id)&&this.has(id)?'on':i<L?'run':''}"></i>`).join('')}</div></div><span class="slot">${!this.has(id)?'LOCKED':slot>=0?'SLOT '+(slot+1):'TAP TO EQUIP'}</span>`;
      b.addEventListener('click',()=>this.toggle(id));box.appendChild(b);}
-   const fu=this.fu(),fb=$('wpFu');
+   const fu=this.fu(),fb=document.createElement('div');fb.id='wpFu';box.appendChild(fb);
    if(fu){fb.innerHTML=`<canvas width="112" height="112" id="wpFuC"></canvas><div><div class="n">FUSION: ${fu.name.toUpperCase()}</div><div class="t">${fu.tx} · +12% damage</div></div>`;WP.fuIcon($('wpFuC').getContext('2d'),fu,112);}
    else fb.innerHTML='<div>Equip two different weapons to fuse them.</div>';
    $('wpSl').innerHTML=this.eq.map((id,i)=>`<b>${i+1}: ${id?WPD[id].s+' '+this.lvOf(id):'empty'}</b>`).join('');
@@ -7978,7 +7995,7 @@ Object.assign(WPX.demo,{
    el.innerHTML=`<canvas width="108" height="52" data-w="${id}"></canvas><div class="tx"><div class="n"><span class="nm">${d.n}</span><small>${own?'LV '+cur+'/'+WP_MAX:'LOCKED'}</small></div><div class="t">${d.tx}</div><div class="pb">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<cur?'on':''}"></i>`).join('')}</div><div class="t2">${pw}${max?'':abT}</div></div><div class="pr">${max?'MAX':(own?'BUY LV'+(cur+1):'UNLOCK')+'<br>'+neonI+' '+price}</div>`;
    el.addEventListener('click',()=>{const r=WP.buy(id);if(!r.ok){if(r.why==='money'){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');gaMsg('Need '+r.need+' more Neon');}else if(r.why==='max')gaMsg(d.n+' is at max level');return;}
      gaMsg(r.lv===1?d.n+' unlocked':d.s+' is now LV '+r.lv);try{AU.sfx('up')}catch(e){}gaDraw();});
-   box.appendChild(el);const c=el.querySelector('canvas').getContext('2d'),n='wp-'+id;if(ART.have(n)){c.drawImage(ART.bm[n],28,0,52,52);}else if(WPX.demoFn)WPX.demoFn(id,c,.7,d.c);}};
+   box.appendChild(el);const c=el.querySelector('canvas').getContext('2d'),n='wp-'+id;if(ART.have(n)&&ART.isReal(n)){c.drawImage(ART.bm[n],28,0,52,52);}else if(WPX.demoFn)WPX.demoFn(id,c,.7,d.c);}};
  gaDraw();}
 // painted weapon icons and fusion pictures: only the files that are real art (media/ready.json) are loaded
 try{fetch(ART.base+'ready.json').then(r=>r.ok?r.json():[]).then(l=>{for(const n of l)if(/^(wp-|fx-fuse)/.test(n))ART.load(n.replace(/\.webp$/,''));}).catch(()=>{});}catch(e){}
@@ -8316,7 +8333,7 @@ NR.on('runStart',()=>{B2X.hz=[];B2X.st={abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,l
   const need=s.ref/Math.max(4,B2X.LATE*B2X.tf(e)-s.act);
   s.amp=s.rate>1e-3?clamp(need/s.rate,1,B2X.AMP):B2X.AMP;     // only damage that lands is raised (a ship that does not hit gets nothing)
   const loss=raw*s.amp+s.bk;const now=G.t,cap=B2X.cap(e);s.w=s.w.filter(x=>now-x[0]<1);let used=0;for(const x of s.w)used+=x[1];
-  const room=Math.max(0,cap-used),take=Math.min(loss,room),left=loss-take;   // damage above the cap waits in the armour (up to BK s of the cap) and goes in at the cap's pace: bursts (a salvo, a bomb) are not lost, so the cap, not the bot's rhythm, sets the length
+  const room=Math.max(0,cap-used)*(window.BPL?BPL.k(e):1),take=Math.min(loss,room),left=loss-take;   // damage above the cap waits in the armour (up to BK s of the cap) and goes in at the cap's pace: bursts (a salvo, a bomb) are not lost, so the cap, not the bot's rhythm, sets the length
   s.bk=Math.min(left,cap*B2X.BK);
   if(raw>0){B2X.st.dealt+=raw;if(s.amp>1)B2X.st.amp+=take-Math.min(raw,take);}
   if(left>s.bk+.01)B2X.st.abs+=left-s.bk;
@@ -8539,7 +8556,7 @@ BMV.norm=x=>Array.isArray(x)?{v:x[0],p:x[1]||{}}:{v:x,p:{}};
 /* lazily on the boss's first beat (armour.js and fair.js have set the hull and the phase lists by then) */
 BMV.init=e=>{e.bm=null;if(!BMV.on)return;const id=BMV.idOf(e),T=id&&BMT[id];if(!T)return;
   const L=T.ph.map(l=>l.map(BMV.norm));e.bm={id,T,P:{}};for(const l of L)for(const o of l)e.bm.P[o.v]=o.p;e.lists=L.map(l=>l.map(o=>o.v));
-  const s=BMV.stat();s.boss=id;};
+  const s=BMV.stat();s.boss=id;if(window.BPL)BPL.init(e);};   // bossplay.js: the encounter mechanics, the seeded order
 /* ---- shared helpers ---- */
 BMV.tel=()=>{const sb=BT.spb||.5;return Math.max(Math.ceil(.55/sb-1e-6),HARDS.includes(SET.diff)?1:2);};   // telegraph beats: >= 0.55 s at any tempo, 2 beats on Easy / Normal
 const BMX=e=>{const ph=e.ph||1,d=diff(),dk=BMV.DK[SET.diff]||1,pk=[1,1.08,1.18][ph-1];
@@ -8580,7 +8597,7 @@ BMV.cost=(x,y)=>{if(!BMV.on||!G.boss)return 0;let c=0;for(const z of BMV.hz){if(
     if(z.vx)for(const k of[.3,.6]){const x0=z.x;z.x+=z.vx*k;let d2=1e9;for(const p of BMV.prims(z))d2=Math.min(d2,BMV.sd(p,x,y));z.x=x0;if(d2<30)c+=(30-d2)*40;}}   // a moving wall or wave: where it will be
   const g=BMV.goal();if(g)c+=Math.hypot(g.x-x,g.y-y)*.8;return c;};
 BMV.goal=()=>{const e=G.boss;if(!e||!e.bmG)return null;return e.bmG.goal?e.bmG.goal():null;};
-BMV.target=()=>{const e=G.boss;if(!e||!e.bmG||!e.bmG.tg)return null;const t=e.bmG.tg.find(x=>!x.dead&&x.hp>0&&G.en.includes(x));return t||null;};
+BMV.target=()=>{const e=G.boss,t=e&&e.bmG&&e.bmG.tg?e.bmG.tg.find(x=>!x.dead&&x.hp>0&&G.en.includes(x)):null;return t||(window.BPL&&BPL.on?BPL.target():null);};   // bossplay.js: a gate's node / medic / flank row
 /* ---- counters: the boss is shielded (no HP loss) until the ship does the thing, or the slot ends ---- */
 BMV.guard=(e,v,hint,o)=>{if(e.bmG)return;e.bmG=Object.assign({v,hp:e.hp,b0:e.bt,end:e.bt+8-(e.pc|0),t0:G.t,tg:[],p:0},o||{});floater(e.x,e.y-e.r-30,hint,'#19e3ff');AU.sfx('warn');BMV.stat().counter++;};
 BMV.unguard=(e,won)=>{const g=e.bmG;if(!g)return;e.bmG=null;BMV.stat().guardT+=G.t-g.t0;for(const t of g.tg)if(!t.dead){t.dead=1;burst(t.x,t.y,'#19e3ff',10,200,.4);}
@@ -9105,7 +9122,7 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
   /* b.js: replaces the beat-snapped dash. ts = the press stamp (or undefined), mx/my = the keys this frame */
   dashIn(ts,mx,my,dt){const S=this.st(),mx0=this.max();S.n=Math.min(S.n,mx0);
     if(S.n<mx0){S.r+=dt/this.refill();if(S.r>=1){S.r=0;S.n++;}}else S.r=0;
-    const TM=window.TIM&&TIM.on;if(ts&&S.n>=1&&P.dashT<=0&&(!TM||TIM.ready())){S.n=Math.max(0,S.n-1);const j=judge(ts);P.dashT=.2;if(!(mx||my)&&!touch&&!(P.dx||P.dy)){P.dx=1;P.dy=0;}AU.sfx('dash');P.dashPf=j.ok;this.stat.dash++;J.n++;
+    const TM=window.TIM&&TIM.on;if(ts&&S.n>=1&&P.dashT<=0&&(!TM||TIM.ready())){S.n=Math.max(0,S.n-1);const j=judge(ts);P.dashT=.2;if(!(mx||my)&&G.t-P.mvT>.3){const d=dashSafeDir();P.dx=d[0];P.dy=d[1];}AU.sfx('dash');P.dashPf=j.ok;this.stat.dash++;J.n++;
       J.last={kind:'dash',ok:j.ok,dt:Math.round(j.dt),beat:j.beat,at:performance.now()};
       if(j.ok){this.stat.onb++;G.score+=Math.round(200*G.mult*comboK());onPerfect('dash',j,P.x,P.y);if(!TM){S.r+=.2;if(S.r>=1&&S.n<mx0){S.r-=1;S.n++;}}this.gain(.04);if(!TIP.done){TIP.done=true;save('mnr_tipdone',true);}}
       if(TM)TIM.dash(j,S);S.hit=new Set();S.ref=0;S.ph=0;const m=this.dashMod();S.mod=m;
@@ -9511,10 +9528,10 @@ const CTR=window.CTR={get on(){return!!RET.counter;},
   emp(){if(!this.live())return;const cs=this.walls.filter(w=>w.cur&&w.x<W+10),n=G.eb.length+6*cs.length,ws=G.en.filter(e=>e.ctw&&e.wsh&&!e.dead&&e.x<W);
     for(const w of cs){let k=0;for(let y=30;y<H&&k<4;y+=120)if(Math.abs(y-w.gap.y)>48){G.pk.push({t:'shard',x:w.x,y,vx:-40,vy:0,bob:0});k++;}this.stat.curtEmp++;}
     this.walls=this.walls.filter(w=>!cs.includes(w));this.curts=[];
-    for(const e of G.en)if(e.ctw&&!e.dead){if(e.wsh)this.stat.strip++;e.wsh=0;e.wshT=8;e.flash=.3;}
+    for(const e of G.en)if(e.ctw&&!e.dead){if(e.wsh)this.stat.strip++;e.wsh=0;e.wshT=8;e.flash=.3;e.dk=G.t;}
     if(n>=6||ws.length){this.stat.good++;this.goodAt=G.t;G.score+=Math.round(400*G.mult);floater(P.x,P.y-44,'GOOD EMP','#ffe14d');this.pend+=.25;}else this.stat.waste++;
     if(G.t-this.lastDash<=1){this.stat.combo++;floater(P.x,P.y-58,'COMBO BLAST','#ff5fd2');this.fx.push({x:P.x,y:P.y,t:0});
-      for(const e of G.en){if(e.type==='boss'||e.dead||e.hp<=0||e.gr)continue;if(Math.hypot(e.x-P.x,e.y-P.y)<300){e.hp-=12;e.flash=.25;}}}},
+      for(const e of G.en){if(e.type==='boss'||e.dead||e.hp<=0||e.gr)continue;if(Math.hypot(e.x-P.x,e.y-P.y)<300){e.hp-=12;e.flash=.25;e.dk=G.t;}}}},
   hot(){return P.emp>0&&(G.eb.length>=6||this.walls.some(w=>w.cur&&w.x<W+10)||G.en.some(e=>e.ctw&&e.wsh&&e.x<W));},
   tick(dt){if(!this.on||!G||!P)return;const b=$('bEmp');if(b)b.classList.toggle('abHot',!!(running&&!G.dead&&!SET.reduce&&this.hot()));
     if(this.pend>0&&window.ABIL&&ABIL.on){ABIL.gain(this.pend);this.pend=0;}
@@ -9621,6 +9638,182 @@ const TIM=window.TIM={get on(){return!!(RET.timing&&window.ABIL&&ABIL.on);},
 #touch button#bEmp[data-t="0"]::before{content:''}#touch button.tmBig#bEmp::before{color:#ff5fd2}`;document.head.appendChild(st);}
 NR.on('tick',dt=>TIM.tick(dt));
 NR.on('runStart',()=>{if(G)G.tm=null;});
+
+/* ---------- VISIBLE: enemies live on screen long enough to be seen, read and fought (flag RET.vis, default ON; ?vis=0 = the old rules). Test: nightrun/visible-test.js. BALANCE.md "Visible".
+   1. on-screen floor per kind (DMG.minLife asks VIS.ml): a foe cannot lose its hull faster than this, whatever hits it (spread, chain, arc, homing, blades),
+      so a maxed area weapon caps out at hull/second per target instead of deleting the screen. The old floor shrank to .65x on late stages; this one does not.
+   2. abilities skip the floor: EMP (G.empT) and rams already did; a DASH hit, a beat-parried shot, a COMBO blast or an EMP warden strip (e.dk) now do too, for .25 s: DASH/EMP/timing are the way through a tough wave.
+   3. homing (SH.steer) never locks on a foe outside the playfield (x > W-30) and flies straight for its first VIS.lock s, so a missile cannot pick a target before you can see it.
+   4. no damage outside the playfield: the DMG entry grace (x > W-40) also covers a foe that has left the screen (VIS.ok), so nothing dies unseen.
+   5. Normal from stage 10 has a hull of 5 (was 6) (VIS.hullD in story.js). Entry keeps the edge telegraph ring. Bosses keep armour.js. */
+if(RET.vis===undefined)RET.vis=!/[?&]vis=0/.test(location.search);
+const VIS=window.VIS={get on(){return!!RET.vis&&!(typeof G==='object'&&G&&G.tut);},   // the tutorial keeps its own pacing
+  edge:W-30,lock:.18,dk:.25,hk:.8,   // hk: Hard+ late stages still shorten the floor (dense waves), never below .8
+
+  ml:{drone:1.6,charger:2.1,flank:2.1,gunship:5.2,gate:3.1,turret:3.1,gtank:3.1,gturret:3.1,gwalker:2.6,swarm:1.05,mine:1.05},zoo:2.1,el:4,elC:2.1,
+  ok(e){return e.type==='boss'||!(e.x>this.edge||e.x<-20||e.y<-10||e.y>H+10);},   // only a foe clearly outside counts (a position not yet set does not)
+  // Normal from stage 10: hull at most 5 (was 6 to stage 26; the stage-8 boss stays on 7): a hit costs more, so DASH timing, EMP and reading the wave matter (mercy still adds +1)
+  hull:5,hullD(n){return this.on&&SET.diff==='normal'&&n>=10?Math.min(0,this.hull-TUNE.hull[n-1]):0;},
+  life(e){if(G.t-(e.dk==null?-9:e.dk)<this.dk||(e.ctw&&!e.wsh))return 0;   // an EMP-stripped warden has no floor: its shield was its protection
+    const b=this.ml[e.type]!=null?this.ml[e.type]:e.zt?Math.max(this.zoo,DMG.ml[e.type]||0):(DMG.ml[e.type]||0);
+    return(e.el?(e.type==='charger'?Math.max(this.elC,b):Math.max(this.el,b)):b)*(SET.diff==='easy'?DMG.easyK:HARDS.includes(SET.diff)?Math.max(this.hk,DMG.lm()):1);}};
+
+/* ---------- boss ENCOUNTER MECHANICS = parts/bossplay.js (flag RET.bossplay, default off for now; ?bossplay=1 = on, ?bossplay=0 / off = the fights before it, exactly). Test: nightrun/bossplay-test.js.
+   Owner, 20 Oct 2026: "the enemies, bosses are also very predictable and repeatable; I beat the game very easy on normal ... the game needs to be more creative".
+   Every boss had its own moveset (bossmoves.js) but every fight was still "dodge while shooting the bar". Now each boss brings three MECHANICS that change how
+   you play, built from placeholder shapes (circles, triangles, squares; real art can replace BPL.draw later):
+     GATES (the boss's shield; while a gate is up its armour lets nothing through, B2X room x 0; resolve it and the boss is OPEN for OPEN s, then the next gate rises)
+       nodes  : shield nodes orbit the boss; shoot every node (they fire at you while they live)
+       medic  : a medic drone holds a link beam on the boss; kill the medic or DASH through the beam
+       emp    : an armour plate locks the core; only an EMP strips it
+       parry  : a slow signal orb is the only thing that can crack the shell; DASH as it reaches you to send it back
+       back   : the shield turns to face you; flank (get above / below) for FLANK s to reach the back
+     ARENA rules (the battlefield changes; ignoring them costs hull)
+       slab (barrier rises / falls), conveyor (deck pushes you into the boss), grid (laser columns on the bar line), ghost (a mirrored ship hunts you),
+       gravity (lanes pull you up / down), blackout (only the beat-lit lane can be seen), zone (a safe ring shrinks)
+   Each fight picks 2 of its 3 mechanics per phase (each boss has two gates and one arena rule, so a gate is always up) and shuffles its attack order with a
+   seed per attempt (signature verb kept first). A gate that is ignored overloads by itself after FB s, so no fight can lock; armour.js still owns HP, the cap,
+   the phase lines and the last stand (EXPOSED = always open). Hooks: armour.js room x BPL.k(e); bossmoves.js BMV.init -> BPL.init; c.js draw; stats.js sheet. */
+if(RET.bossplay===undefined)RET.bossplay=/[?&]bossplay=1/.test(location.search);   // OFF by default until balance-test stage 8 Normal and bossmoves-test pass with it on (HANDOFF.md)
+if(RET.bossplay)RET.sioKeys.push('mnr_bpcodex');
+const BPT={
+  tresor:  {m:['nodes','emp','slab'],     line:'BREAK THE BOLTS, EMP THE PLATE'},
+  bruecke: {m:['medic','back','conveyor'],line:'CUT THE LINK, FLANK THE SHIELD'},
+  schranke:{m:['parry','nodes','grid'],   line:'PARRY THE SIGNAL, SHOOT NODES'},
+  messe:   {m:['back','medic','ghost'],   line:'FLANK IT, KILL THE MEDIC'},
+  hoplite: {m:['back','parry','slab'],    line:'GET BEHIND IT, PARRY THE SPEAR'},
+  adler:   {m:['nodes','medic','blackout'],line:'SHOOT THE DRONES, CUT THE LINK'},
+  krake:   {m:['medic','nodes','gravity'],line:'KILL THE MEDIC, RIDE THE PULL'},
+  ice:     {m:['emp','parry','blackout'], line:'EMP THE FIREWALL, PARRY THE PACKET'},
+  kronos:  {m:['nodes','emp','zone'],     line:'SHOOT THE COINS, STAY IN THE RING'},
+  talos:   {m:['back','parry','grid'],    line:'FLANK THE GIANT, PARRY THE SPEAR'}};
+const BPN={nodes:'SHIELD NODES',medic:'MEDIC LINK',emp:'ARMOUR PLATE',parry:'PARRY ORB',back:'TURNING SHIELD',slab:'MOVING BARRIER',conveyor:'CONVEYOR DECK',
+  grid:'LASER GRID',ghost:'MIRROR GHOST',gravity:'GRAVITY LANES',blackout:'BLACKOUT',zone:'SHRINKING RING'};
+const BPH={nodes:'SHOOT THE NODES',medic:'KILL THE MEDIC OR DASH THE LINK',emp:'EMP THE PLATE',parry:'DASH TO PARRY THE ORB',back:'FLANK: GET ABOVE OR BELOW'};
+const BP_GATES=['nodes','medic','emp','parry','back'];
+const BPL=window.BPL={get on(){return!!RET.bossplay&&!!RET.bossmoves;},T:BPT,N:BPN,OPEN:8,FB:24,FLANK:.8,TEL:.8,GAP:96,auto:/[?&]bpauto=1/.test(location.search)?1.5:0,seed:null,
+  st:null,hz:[]};
+BPL.stat=()=>BPL.st||(BPL.st={boss:null,seed:0,pick:[],order:[],seen:{},res:{},how:{},fb:0,open:0,closed:0,tel:9,gap:1e9,hits:0,eb:0,maxV:0,cap:0,maxEb:0,hints:[]});
+NR.on('runStart',()=>{BPL.st=null;BPL.hz=[];});
+/* a small seeded generator per attempt (the attack order and the picks; the game's own random stays untouched) */
+BPL.rng=s=>{let a=s>>>0||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};};
+BPL.k=e=>{const b=e&&e.bp;if(!BPL.on||!b)return 1;if(e.b2&&e.b2.ls>0||e.bmS>e.bt)return 1;   /* the last stand and a bossmoves STUN are always open */return b.g&&b.g.up?0:1;};
+/* called at the end of BMV.init (the movesets are set): the seed, the picks per phase, the shuffled order */
+BPL.init=e=>{e.bp=null;if(!BPL.on||!e.bm)return;const T=BPT[e.bm.id];if(!T)return;
+  const seed=BPL.seed!=null?BPL.seed:(Math.random()*4294967295)>>>0,R=BPL.rng(seed),sig=e.bm.T.sig;
+  e.lists=e.lists.map((l,i)=>{const a=l.slice();for(let j=a.length-1;j>0;j--){const k=Math.floor(R()*(j+1));[a[j],a[k]]=[a[k],a[j]];}
+    if(i>0&&a.includes(sig)){a.splice(a.indexOf(sig),1);a.unshift(sig);}return a;});           // phases 2-3 still open with the signature verb
+  const pick=[0,1,2].map(()=>{const drop=Math.floor(R()*3);return T.m.filter((_,j)=>j!==drop);});
+  e.bp={id:e.bm.id,T,seed,R,pick,g:null,gi:0,ar:null,cy:0};
+  const s=BPL.stat();s.boss=e.bm.id;s.seed=seed;s.pick=pick.map(p=>p.slice());s.order=e.lists.map(l=>l.slice());
+  BPL.phase(e,1);BPL.say(e.nm+': '+T.line,5);};
+BPL.say=(t,d)=>{BPL.stat().hints.push(t);try{hintShow(t,d||3.5);}catch(x){}};
+BPL.codex=()=>{try{return JSON.parse(localStorage.getItem('mnr_bpcodex')||'{}')||{};}catch(x){return{};}};
+BPL.seen=(e,m)=>{const s=BPL.stat();s.seen[m]=1;const c=BPL.codex(),id=e.bp.id,o=c[id]||(c[id]={nm:String(e.nm||id),m:[]});if(!o.m.includes(m)){o.m.push(m);try{localStorage.setItem('mnr_bpcodex',JSON.stringify(c));}catch(x){}}};
+BPL.sheet=()=>{const c=BPL.codex(),ids=Object.keys(BPT).filter(id=>c[id]);if(!ids.length)return'';
+  const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  return'<h3>BOSS CODEX <span>'+ids.length+'/'+Object.keys(BPT).length+'</span></h3><div class="stParts">'+ids.map(id=>'<div><span>'+esc(c[id].nm)+'</span><em>'+c[id].m.map(m=>esc(BPN[m]||m)).join(' · ')+'</em></div>').join('')+'</div>';};
+/* a phase: its two mechanics (gates take turns; an arena rule runs the whole phase) */
+BPL.phase=(e,ph)=>{const b=e.bp;if(!b)return;const p=b.pick[ph-1]||b.pick[0];b.gs=p.filter(m=>BP_GATES.includes(m));b.ar=p.find(m=>!BP_GATES.includes(m))||null;b.gi=0;b.arS={};
+  BPL.drop(e);BPL.hz=[];if(b.ar)BPL.seen(e,b.ar);BPL.gate(e,G.t+(ph===1?1.5:2*(BT.spb||.5)*4));
+  if(ph>1)BPL.say('PHASE '+ph+': '+p.map(m=>BPN[m]).join(' + '),3.5);};
+BPL.drop=e=>{const g=e.bp&&e.bp.g;if(!g)return;for(const t of g.tg||[])if(!t.dead&&G.en.includes(t)){t.dead=1;G.en.splice(G.en.indexOf(t),1);}e.bp.g=null;};
+/* a gate rises at time t0 (telegraphed TEL s: shapes fade in, damage still counts), then holds until it is resolved or overloads after FB s */
+BPL.gate=(e,t0)=>{const b=e.bp,m=b.gs[b.gi%b.gs.length];b.gi++;BPL.drop(e);b.g={m,t0,up:0,tg:[],ct:0,fl:0,orb:null,ob:0,sa:Math.PI,shot:0,open:0};};
+BPL.raise=(e,g)=>{g.up=1;g.tu=G.t;BPL.seen(e,g.m);const ph=e.ph||1,s=BPL.stat();s.closed++;
+  if(g.m==='nodes'){const n=ph===3?4:3;for(let i=0;i<n;i++)g.tg.push(BPL.add(e,{fx:clamp(e.x-60-i*90,120,W-40),fy:i%2?H-55:55,hk:.010,role:'node'}));}   // out of the centre line: fly up / down to reach them
+  if(g.m==='medic')g.tg.push(BPL.add(e,{fx:clamp(e.x+30,0,W-30),fy:e.y>H/2?50:H-50,hk:.022,role:'medic'}));
+  BPL.say(BPH[g.m],3);AU.sfx('warn');};
+BPL.add=(e,o)=>{const t=en('mine',{x:e.x,y:e.y,wpt:1,bpRole:o.role});t.hp=t.max=t.hq=Math.max(4,Math.round(e.max*o.hk));t.gr=0;t.bpAt=Object.assign({e},o);t.score=0;return t;};
+BPL.resolve=(e,how)=>{const b=e.bp,g=b&&b.g;if(!g||!g.up)return;const s=BPL.stat(),k=g.m+':'+how;s.how[k]=(s.how[k]||0)+1;if(how!=='fb'&&how!=='ls'&&how!=='auto')s.res[g.m]=(s.res[g.m]||0)+1;if(how==='fb')s.fb++;else s.open++;
+  for(const t of g.tg)if(!t.dead){t.dead=1;burst(t.x,t.y,'#19e3ff',10,200,.4);}g.up=0;g.open=G.t+BPL.OPEN;
+  floater(e.x,e.y-e.r-34,how==='fb'?'SHIELD OVERLOAD':'OPEN!','#ffe14d');if(how!=='fb'){shake(6);AU.sfx('tier');G.score+=Math.round(800*(1+G.pos));}
+  G.rings.push({x:e.x,y:e.y,l:.6,m:.6,c:'#ffe14d'});NR.emit('bpOpen',{m:g.m,how});};
+/* test / assist hook: a player that does the thing (?bpauto=1 or BPL.auto = seconds of reaction) */
+BPL.solve=e=>BPL.resolve(e,'auto');
+/* where a player should be: the live node / medic (its row), or the far side of the turning shield (for bots and the aim assist) */
+BPL.target=()=>{const e=G.boss,g=e&&e.bp&&e.bp.g;if(!g||!g.up)return null;const x=g.tg.find(q=>!q.dead&&q.hp>0&&G.en.includes(q));if(x)return x;
+  if(g.m==='back'&&g.sy!=null)return{x:P.x,y:g.sy<H/2?H-50:50};return null;};
+/* ---- every frame ---- */
+NR.on('tick',dt=>{if(!BPL.on)return;const e=G.boss;if(!e||!e.bp||e.dead){if(BPL.hz.length)BPL.hz=[];return;}const b=e.bp,g=b.g,t=G.t,s=BPL.stat(),sb=BT.spb||.5;
+  if(e.x>bossX())return;
+  const dash=P.dashT>0&&!b.dw;b.dw=P.dashT>0;
+  if(e.b2&&e.b2.ls>0){if(g&&g.up)BPL.resolve(e,'ls');}
+  else if(g){
+    if(!g.up&&!g.open&&t>=g.t0+BPL.TEL)BPL.raise(e,g);
+    if(g.up){s.tel=Math.min(s.tel,g.tu-g.t0);
+      for(const x of g.tg){const A=x.bpAt;if(A.orb){A.a+=A.w*dt;x.x=A.e.x+Math.cos(A.a)*A.orb;x.y=clamp(A.e.y+Math.sin(A.a)*A.orb,30,H-30);}else{x.x=A.fx;x.y=A.fy+Math.sin(t*1.3+A.fx)*(A.role==='node'?18:30);}}
+      const live=g.tg.filter(x=>!x.dead&&x.hp>0&&G.en.includes(x));
+      for(const x of live){x.bpOpen=Math.abs(P.y-x.y)<(x.bpRole==='medic'?110:80);if(!x.bpOpen)x.hp=x.hq=x.max;}   // closing weak points: a node / the medic only opens to a ship in its row (stray and homing fire does nothing)
+      if((g.m==='nodes'||g.m==='medic')&&g.tg.length&&!live.length)BPL.resolve(e,'shot');
+      if(g.m==='medic'&&dash&&live.length){const m=live[0];if(BPL.segD(P.x,P.y,e.x,e.y,m.x,m.y)<34){s.cut=(s.cut|0)+1;BPL.resolve(e,'dash');}}
+      if(g.m==='emp'&&G.empT>0)BPL.resolve(e,'emp');
+      if(g.m==='back'){const w=(e.ph===3?220:160)*dt;if(g.sy==null)g.sy=P.y;g.sy+=clamp(P.y-g.sy,-w,w);g.sa=Math.atan2(g.sy-e.y,-(e.r+80));   // the shield follows your height, slower than you fly
+        if(Math.abs(P.y-g.sy)>110){g.fl+=dt;if(g.fl>=BPL.FLANK)BPL.resolve(e,'flank');}else g.fl=Math.max(0,g.fl-dt*.5);}
+      if(g.m==='parry')BPL.orb(e,g,dash,sb);
+      if(g.m==='nodes'&&live.length&&(e.bt|0)!==g.shot&&(e.bt|0)%(HARDS.includes(SET.diff)?2:4)===0){g.shot=e.bt|0;BPL.aim(live[(e.bt>>2)%live.length],sb);}   // one node shoots back each bar (each 2 beats on the hard tiers): tell .6 s, then one aimed shot
+      if(g.up&&BPL.auto&&t-g.tu>=BPL.auto)BPL.solve(e);
+      if(g.up&&t-g.tu>=BPL.FB)BPL.resolve(e,'fb');}
+    else if(g.open&&t>=g.open)BPL.gate(e,t);}
+  BPL.arena(e,b,t,sb,dt);
+  for(const z of BPL.hz)if(z.aim&&t>=z.on&&!z.done){z.done=1;const n=G.eb.length;eb.src=BPSRC;eb(z.x,z.y,Math.atan2(P.y-z.y,P.x-z.x),z.v,'#19e3ff',6);eb.src=null;if(G.eb.length>n){G.eb[n].bpl=1;s.eb++;}}
+  BPL.hz=BPL.hz.filter(z=>t<z.off);
+  let nl=0;for(const x of G.eb)if(!x.dead)nl++;s.maxEb=Math.max(s.maxEb,nl);s.cap=Math.max(s.cap,ebCap());for(const x of G.eb)if(x.bpl)s.maxV=Math.max(s.maxV,Math.hypot(x.vx,x.vy));});
+const BPSRC={type:'bossmv',arm:true};
+BPL.ang=a=>Math.atan2(Math.sin(a),Math.cos(a));
+BPL.segD=(px,py,ax,ay,bx,by)=>{const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy||1,u=clamp(((px-ax)*dx+(py-ay)*dy)/l,0,1);return Math.hypot(px-ax-u*dx,py-ay-u*dy);};
+BPL.aim=(x,sb)=>{const tl=Math.max(.6,sb*Math.ceil(.6/sb));BPL.hz.push({aim:1,x:x.x,y:x.y,on:G.t+tl,off:G.t+tl+.05,t0:G.t,v:150+20*diff()});BPL.stat().tel=Math.min(BPL.stat().tel,tl);};
+/* the parry orb: launched on a bar (tell TEL s), flies slow at the ship; a dash while it is within 110 px sends it back and cracks the shell; touching it hurts */
+BPL.orb=(e,g,dash,sb)=>{const t=G.t,s=BPL.stat();let o=g.orb;
+  if(!o&&t>=g.ob){g.orb=o={x:e.x-e.r,y:e.y,t0:t,on:t+BPL.TEL,v:150+15*diff(),back:0};s.tel=Math.min(s.tel,BPL.TEL);return;}
+  if(!o||t<o.on)return;const dt=1/60,tx=o.back?e.x:P.x,ty=o.back?e.y:P.y,a=Math.atan2(ty-o.y,tx-o.x),v=o.back?520:o.v;o.x+=Math.cos(a)*v*dt;o.y+=Math.sin(a)*v*dt;
+  const d=Math.hypot(P.x-o.x,P.y-o.y);
+  if(!o.back&&dash&&d<110){o.back=1;s.parry=(s.parry|0)+1;floater(P.x,P.y-30,'PARRY!','#19e3ff');AU.sfx('perfect');}
+  else if(!o.back&&d<20){hurt(1);s.hits++;g.orb=null;g.ob=t+2*sb*4/2;}
+  else if(o.back&&Math.hypot(e.x-o.x,e.y-o.y)<e.r){g.orb=null;BPL.resolve(e,'parry');}
+  else if(t-o.t0>9){g.orb=null;g.ob=t+sb*2;}};
+/* ---- arena rules ---- */
+BPL.arena=(e,b,t,sb,dt)=>{const m=b.ar;if(!m)return;const S=b.arS,s=BPL.stat(),bar=4*sb,x1=e.x-e.r-10;
+  if(m==='slab'){if(!S.n||t>=S.n){S.top=!S.top;S.h=Math.round(H*.32);S.t0=t;S.on=t+Math.max(BPL.TEL,bar*.5);S.off=S.on+bar*1.5;S.n=S.off+bar*.5;s.tel=Math.min(s.tel,S.on-S.t0);s.gap=Math.min(s.gap,H-S.h);}
+    if(t>=S.on&&t<S.off&&P.x<x1&&(S.top?P.y<S.h:P.y>H-S.h))BPL.hit();}
+  if(m==='conveyor'){const lane=P.y<H/2?1:-1;P.x=clamp(P.x+(lane>0?110:-70)*dt,20,W-20);}
+  if(m==='gravity'){const k=Math.floor(P.y/(H/3)),dir=(k+Math.floor(t/(bar*2)))%2?1:-1;P.y=clamp(P.y+dir*85*dt,20,H-20);}
+  if(m==='grid'){if(!S.n||t>=S.n){const n=e.ph===3?4:3,sp=Math.max(150,(x1-60)/n),o=Math.random()*40;S.c=[];for(let i=0;i<n;i++){const x=60+o+i*sp;if(x<x1-30)S.c.push(x);}
+      S.t0=t;S.on=t+Math.max(BPL.TEL,bar*.5);S.off=S.on+.45;S.n=t+bar*2;s.tel=Math.min(s.tel,S.on-S.t0);s.gap=Math.min(s.gap,sp-18);}
+    if(t>=S.on&&t<S.off&&S.c.some(x=>Math.abs(P.x-x)<9+10))BPL.hit();}
+  if(m==='ghost'){S.tr=S.tr||[];S.tr.push([t,P.x,H-P.y]);while(S.tr.length&&S.tr[0][0]<t-1.2)S.tr.shift();const q=S.tr[0];S.gx=q[1];S.gy=q[2];
+    if(t-(S.t0||(S.t0=t))>BPL.TEL&&Math.hypot(P.x-S.gx,P.y-S.gy)<26)BPL.hit();s.tel=Math.min(s.tel,BPL.TEL);}
+  if(m==='blackout'){S.lane=Math.floor((e.bt|0)/2)%3;}
+  if(m==='zone'){if(!S.n||t>=S.n){S.cx=clamp(P.x,140,x1-140);S.cy=clamp(P.y,140,H-140);S.t0=t;S.n=t+bar*2;}
+    S.r=Math.max(130,260-(t-S.t0)/(bar*2)*150);s.gap=Math.min(s.gap,2*S.r);
+    if(t-S.t0>BPL.TEL&&Math.hypot(P.x-S.cx,P.y-S.cy)>S.r){S.out=(S.out||0)+dt;if(S.out>.8){S.out=0;BPL.hit();}}else S.out=0;s.tel=Math.min(s.tel,BPL.TEL);}};
+BPL.hit=()=>{const h=P.hp;hurt(1);if(P.hp<h)BPL.stat().hits++;};
+/* ---- placeholder shapes (circles / triangles / squares); drawn after the boss hazards ---- */
+BPL.draw=()=>{const e=G.boss;if(!BPL.on||!e||!e.bp||e.x>W+40)return;const b=e.bp,g=b.g,t=G.t,rm=!!SET.reduce,pul=rm?.5:.5+.5*Math.sin(t*8);ctx.save();
+  const S=b.arS||{},x1=e.x-e.r-10,m=b.ar;
+  if(m==='blackout'){const lh=H/3;ctx.globalAlpha=rm?.55:.72;ctx.fillStyle='#02030a';for(let i=0;i<3;i++)if(i!==S.lane)ctx.fillRect(0,i*lh,x1,lh);
+    ctx.globalAlpha=.35;ctx.strokeStyle='#19e3ff';ctx.lineWidth=2;ctx.strokeRect(2,S.lane*lh+2,x1-4,lh-4);}
+  if(m==='slab'&&S.t0!=null&&t<S.off){const live=t>=S.on,y0=S.top?0:H-S.h;ctx.globalAlpha=live?.8:.18+.15*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';ctx.fillRect(0,y0,x1,S.h);
+    if(!live){ctx.globalAlpha=.9;ctx.fillStyle='#ffe14d';for(let x=40;x<x1;x+=90)BPL.tri(x,S.top?S.h+12:H-S.h-12,9,S.top?Math.PI/2:-Math.PI/2);}}
+  if(m==='conveyor'){ctx.globalAlpha=.22;ctx.fillStyle='#ffb020';const o=(t*110)%60;for(let x=-60+o;x<x1;x+=60){BPL.tri(x,H*.25,10,0);}ctx.fillStyle='#19e3ff';for(let x=x1-(t*70)%60;x>0;x-=60)BPL.tri(x,H*.75,10,Math.PI);}
+  if(m==='gravity'){ctx.globalAlpha=.2;for(let k=0;k<3;k++){const dir=(k+Math.floor(t/((BT.spb||.5)*8)))%2?1:-1;ctx.fillStyle=dir>0?'#ff7ad9':'#7ad9ff';for(let x=50;x<x1;x+=110)BPL.tri(x,(k+.5)*H/3,11,dir*Math.PI/2);}}
+  if(m==='grid'&&S.c&&t<S.off){const live=t>=S.on;for(const x of S.c){ctx.globalAlpha=live?.85:.2+.2*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';ctx.fillRect(x-(live?9:2),0,live?18:4,H);}}
+  if(m==='ghost'&&S.gx!=null){ctx.globalAlpha=.55;ctx.strokeStyle='#c78cff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(S.gx+16,S.gy);ctx.lineTo(S.gx-12,S.gy-12);ctx.lineTo(S.gx-12,S.gy+12);ctx.closePath();ctx.stroke();}
+  if(m==='zone'&&S.r){ctx.globalAlpha=.6;ctx.strokeStyle='#ffe14d';ctx.lineWidth=4;ctx.setLineDash([14,10]);ctx.beginPath();ctx.arc(S.cx,S.cy,S.r,0,7);ctx.stroke();ctx.setLineDash([]);}
+  if(g){const rise=g.up?1:clamp((t-g.t0)/BPL.TEL,0,1);ctx.globalAlpha=g.up?.9:.4*rise;
+    if(g.up&&g.m!=='back'){ctx.strokeStyle='#19e3ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,e.r+12+2*pul,0,7);ctx.stroke();}
+    if(g.m==='back'){ctx.strokeStyle='#19e3ff';ctx.lineWidth=8;ctx.beginPath();ctx.arc(e.x,e.y,e.r+16,g.sa-.8,g.sa+.8);ctx.stroke();ctx.fillStyle='#ffe14d';BPL.tri(e.x+Math.cos(g.sa+Math.PI)*(e.r+22),e.y+Math.sin(g.sa+Math.PI)*(e.r+22),9,g.sa);}
+    if(g.m==='emp'&&(g.up||rise)){ctx.fillStyle='#8a96a8';ctx.fillRect(e.x-e.r*.9-14,e.y-22,28,44);ctx.strokeStyle='#ffb020';ctx.lineWidth=2;ctx.strokeRect(e.x-e.r*.9-14,e.y-22,28,44);}
+    for(const x of g.tg)if(!x.dead){if(x.bpRole==='medic'){ctx.strokeStyle='#4dff9a';ctx.lineWidth=4;ctx.globalAlpha=.5+.3*pul;ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(x.x,x.y);ctx.stroke();ctx.globalAlpha=1;
+        ctx.fillStyle='#4dff9a';ctx.beginPath();ctx.arc(x.x,x.y,18,0,7);ctx.fill();ctx.fillStyle='#0b1a10';ctx.fillRect(x.x-3,x.y-10,6,20);ctx.fillRect(x.x-10,x.y-3,20,6);}
+      else{ctx.globalAlpha=1;ctx.strokeStyle='#19e3ff';ctx.lineWidth=3;if(x.bpOpen){ctx.beginPath();ctx.arc(x.x,x.y,18,0,7);ctx.stroke();}else{ctx.fillStyle='#19e3ff55';ctx.fillRect(x.x-15,x.y-15,30,30);ctx.strokeRect(x.x-15,x.y-15,30,30);}}}
+    if(g.orb){const o=g.orb,live=t>=o.on;ctx.globalAlpha=live?1:.4+.3*pul;ctx.strokeStyle=o.back?'#19e3ff':'#ffe14d';ctx.lineWidth=4;ctx.beginPath();ctx.arc(o.x,o.y,16,0,7);ctx.stroke();ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(o.x,o.y,6,0,7);ctx.fill();}}
+  for(const z of BPL.hz)if(z.aim){ctx.globalAlpha=.6;ctx.strokeStyle='#19e3ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(z.x,z.y,10+12*clamp((z.on-t)/.6,0,1),0,7);ctx.stroke();}
+  ctx.restore();};
+BPL.tri=(x,y,r,a)=>{ctx.beginPath();for(let i=0;i<3;i++){const q=a+i*2.094;ctx[i?'lineTo':'moveTo'](x+Math.cos(q)*r,y+Math.sin(q)*r);}ctx.closePath();ctx.fill();};
+NR.on('bossPhase',({ph})=>{const e=G.boss;if(BPL.on&&e&&e.bp)BPL.phase(e,ph);});
+NR.on('kill',({e,boss})=>{if(!boss||!e||!e.bp)return;BPL.drop(e);BPL.hz=[];const c=BPL.codex()[e.bp.id];BPL.say(e.nm+' DOWN · CODEX '+((c&&c.m)||[]).length+' MECHANICS',4);});
+window.__bpl={BPT,BPL};
 
 /* ---------- H: no AFK wins, a dying ship slows the song ----------
    STILL (declared in b.js): a ship that stays within 50 px of one spot for more than 3 s is hunted: enemies fire faster and their bullets are quicker,
@@ -10361,7 +10554,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   ctx.globalCompositeOperation='source-over';
   FXV.bullets();
   ART.fxDraw();
-  if(window.BMV&&BMV.on)BMV.draw(t);   // bossmoves.js: boss hazards and their telegraphs
+  if(window.BMV&&BMV.on)BMV.draw(t);if(window.BPL&&BPL.on)BPL.draw();   // bossmoves.js: boss hazards and their telegraphs
   drawPlayer(t);HUDX.drones(t);
   if(running&&!G.dead)FXV.ring(t);
   PW.draw(t);
@@ -10492,7 +10685,7 @@ function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){req
 applySet();syncSet();requestAnimationFrame(loop);
 document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];});
         // build the other districts' skylines while the title is up
-window.__mnr={RET,ARC,render,hudBusy,get hudOff(){return HUDOFF},set hudOff(v){HUDOFF=!!v},ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
+window.__mnr={RET,ARC,render,hudBusy,get hudOff(){return HUDOFF},set hudOff(v){HUDOFF=!!v},ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get rotMode(){return rotMode},dashSafeDir,get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},get TP(){return TP},TP_DEF,HUDX,UBY,PWK,hurt,NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
   get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},MAIN,get K(){return K},startStory,unlockedN:unlocked,sSave,

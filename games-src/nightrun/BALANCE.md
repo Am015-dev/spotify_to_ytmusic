@@ -257,3 +257,15 @@ every weapon (the weapon did not matter: enemies hardly threaten a ship that kee
 ## Weapon Forge (flag RET.forge, ?forge=0 = old; 20 Oct 2026)
 - Hybrid damage factor = clamp(.95 - 1.6 x trait cost, .5, .9) x (1 + .03 x (level-1)); trait costs in forge.js `FGC` (seeds .2, trail .18, ring .15, nova .1, burst .15, zp .12, zp2 .3, sp .12, grav .05, px .04, rc .1, hk .06, rad .01 per unit). Mods trade damage for effect (k .85-.97; HEAVY 1.2 with x.7 shot speed; BEAT x1.3 on the beat, x.9 off it).
 - Gates (forge-test.js): LV5 hybrid + HEAVY <= 1.35x its parent (dummy DPS); Hard stage 30 clear time vs the parents alone within 15% of the median ratio for the top 10. Results in HANDOFF.md.
+
+## Visible (parts/visible.js, flag RET.vis, default ON; ?vis=0 = old) - 20 Oct 2026
+Owner on Normal with PULSE 3 + SWARM 10: "enemies do not survive to show on screen, EMP and dash are useless". Probe + gate: `visible-test.js` (ALL=1 = all 16 weapons at L10, VIS=0 = old rules).
+- Floor per kind replaces DMG.ml when on (DMG.minLife asks VIS.life): drone 1.6 s, charger/flank 2.1, gunship 5.2, gate/turret/tank 3.1, walker 2.6, swarm 1.05, mine 1.05, zoo kinds >= 2.1, elites 4 (charger 2.1).
+  The old floor shrank to .65x on late stages; now only Hard+ shrinks it, never below .8. This is also the per-target area cap: spread/chain/arc/homing cannot strip hull faster.
+- DASH hits and beat-parried shots (e.dk) skip the floor for .25 s; EMP and rams already did.
+- Homing (SH.steer) locks only on foes inside the playfield (x <= W-30, y in -10..H+10) and flies straight its first .18 s.
+- No damage outside the playfield: the DMG entry grace also covers a foe that has left the screen.
+- Normal from stage 10: hull 5 (was 6). A hull cut from stage 3 sank the stage-8 boss fight for the late build (balance 67% -> 0-33%), so stages 1-9 keep 7.
+- Before -> after (PULSE 3 + SWARM 10, Normal st 3/10/20/30, median s on screen): drone 1.48 -> 1.90, charger 1.50 -> 2.60, swarm .78 -> 1.37, gunship 6.5 -> 6.7, mine 2.1 -> 3.2; killed before visible 0 -> 0.
+  All 16 weapons at L10: median 2.30 -> 2.87 s, spread pulse 2.33 .. storm 3.63 (all within +-40%).
+- RET.timing stays OFF: with this Normal the timing-test bots read reflex 75-92%, random 58-67% (gates 70% / 40%); the random bot lives on 5-6 EMP/min. Next: price the EMP (a wasted EMP should cost meter) before flipping it.
