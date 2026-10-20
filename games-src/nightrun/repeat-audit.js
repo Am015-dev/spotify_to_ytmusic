@@ -33,6 +33,7 @@ const PLAY = (o) => {
     NR.on('bossIn', x => { const b = m.G.boss; window.__ev(x.mini ? 'mini' : 'boss', (b && b.nm) + '|k' + (b && b.k)); });
     NR.on('bossPhase', x => window.__ev('phase', ((m.G.boss && m.G.boss.nm) || '?') + '|p' + x.ph));
     NR.on('setpiece', x => window.__ev('set', x.kind));
+    NR.on('rule', x => window.__ev('rule', x.id));   // rules.js: a new mechanic / its twist / a combination
     NR.on('drop', x => window.__ev('drop', x.hit ? 'hit' : 'miss'));
     NR.on('pitStart', () => window.__ev('shop', (m.SH.cards || []).map(c => c.id || c.k || c.n).join('+')));
     if (window.ZOO) { const z = window.ZOO, pk = z.pick; z.pick = function () { const id = pk.apply(this, arguments); if (id) window.__ev('zoo', id); return id; }; }
@@ -131,7 +132,7 @@ const FRAMESEQ = async (p, o, dir, tag) => {
 // ---------- analysis (pure) ----------
 const ENC = new Set(['wave', 'zoo', 'set', 'fence', 'drop', 'mini', 'boss', 'verb']);             // an "encounter": something the player has to answer
 const NOVEL = new Set(['wave', 'zoo', 'enemy', 'set', 'fence', 'drop', 'mini', 'boss', 'verb', 'mut', 'pick', 'shot']);   // a "new thing" if seen for the first time
-const MECH = new Set(['zoo', 'fence', 'drop', 'mini', 'boss', 'mut', 'set']);                       // categories that bring a new rule/decision, not only a new shape
+const MECH = new Set(['zoo', 'fence', 'drop', 'mini', 'boss', 'mut', 'set', 'rule']);                       // categories that bring a new rule/decision, not only a new shape
 function analyse(raw) {
   const out = {};
   for (const c in raw) {

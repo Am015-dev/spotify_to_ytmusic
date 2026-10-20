@@ -75,7 +75,7 @@ const harness = (file, env, ms) => { const r = cp.spawnSync('node', [path.join(_
     await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ''}`);
     await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 15000 }).catch(() => { }); return p; };
   const jobs = STAGES.map(n => ({ n, seed: 1000 + n, maxt: MAXT }));
-  for (let s = 0; s < SEEDS; s++) jobs.push({ n: 10, seed: 7 + s * 101, maxt: 90, pred: 1 });
+  for (const pn of (process.env.PREDN || '10').split(',').map(Number)) for (let s = 0; s < SEEDS; s++) jobs.push({ n: pn, seed: 7 + s * 101, maxt: 90, pred: 1 });   // PREDN=3,10,20: more stages (S17 reads stage 10, the others go to predByStage)
   for (const n of NOGOD) jobs.push({ n, seed: 2000 + n, maxt: MAXT, god: false, nogod: 1 });
   const runs = [], queue = jobs.slice();
   await Promise.all(Array.from({ length: Math.min(PAR, queue.length) }, async () => { const p = await newPage();
@@ -118,9 +118,11 @@ const harness = (file, env, ms) => { const r = cp.spawnSync('node', [path.join(_
   const pitN = main.reduce((a, r) => a + r.pits, 0); M.pitStopsPerHour = pitN ? r2(pitN / (mins / 60)) : null;
   if (!pitN) WHY.S27 = `pit stop never fired in ${r2(mins)} game-min of arcade sim (0 pitStart); not changed here, see choices-test.js`;
   M.assistKeys = [...new Set(main[0].setKeys)].filter(k => /assist|slow|speed|invinc|aim|easy|auto|hit/i.test(k));
+  { const jc = (a, b) => { let i = 0; for (const x of a) if (b.has(x)) i++; return i / (a.size + b.size - i || 1); }, sc = r => new Set(r.spawns.map(q => q[1] + '@' + Math.floor(q[0] / 3))); M.predByStage = {};
+    for (const n of [...new Set(pred.map(r => r.n))]) { const g = pred.filter(r => r.n === n), js = []; for (let i = 0; i < g.length; i++) for (let j = i + 1; j < g.length; j++) js.push(jc(sc(g[i]), sc(g[j]))); M.predByStage[n] = r2(mean(js)); } }
   if (pred.length >= 2) {
     const sched = r => new Set(r.spawns.map(s => s[1] + '@' + Math.floor(s[0] / 3))), jac = (a, b) => { let i = 0; for (const x of a) if (b.has(x)) i++; return i / (a.size + b.size - i || 1); };
-    const js = []; for (let i = 0; i < pred.length; i++) for (let j = i + 1; j < pred.length; j++) js.push(jac(sched(pred[i]), sched(pred[j])));
+    const p10 = pred.filter(r => r.n === 10), js = []; for (let i = 0; i < p10.length; i++) for (let j = i + 1; j < p10.length; j++) js.push(jac(sched(p10[i]), sched(p10[j])));
     M.predJaccard = r2(mean(js)); M.predDistinctOrders = new Set(pred.map(r => r.spawns.slice(0, 15).map(s => s[1]).join(','))).size; M.predSeeds = pred.length;
     const cv = pred.flatMap(r => r.fireCV); M.fireCV = r2(med(cv)); M.fireCVn = cv.length;
   }
