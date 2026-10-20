@@ -1155,7 +1155,7 @@ function update(dt){
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
       if(hit&&b.px&&b.px.has(e))continue;
       if(hit&&e.zt&&window.ZOO&&ZOO.block(b,e)){b.dead=1;if(Math.random()<.5)burst(b.x,b.y,'#4ad1ff',3,120,.25);AU.sfx('hit');break;}   // zoo.js: a shield absorbs the shot
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.wid)e._wk=b.wid;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom(FXW.hk(b,'hit-spark'),b.x,b.y,30,.16);}AU.sfx('hit');break;}}
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.wid)e._wk=b.wid;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh||b.fg)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom(FXW.hk(b,'hit-spark'),b.x,b.y,30,.16);}AU.sfx('hit');break;}}
     if(b.rc>0&&(b.y<2&&b.vy<0||b.y>H-2&&b.vy>0)){b.vy=-b.vy;b.rc--;b.y=clamp(b.y,3,H-3);if(b.px)b.px.clear();}
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}
@@ -6536,6 +6536,7 @@ RET.st=(function(on){
      +'<div class="stGrid">'+cell('Runs',fmtN(s.runs))+cell('Play time',fmtT(s.time))+cell('Enemies',fmtN(s.kills))+cell('Bosses beaten',fmtN(s.bosses))+cell('Grazes',fmtN(s.grazes))+cell('PERFECT dashes',fmtN(s.dashes))+cell('PERFECT hits',fmtN(s.perfects))+cell('FEVERs',fmtN(s.fevers))+cell('Deaths',fmtN(s.deaths))+cell('Best score',fmtN(s.bestScore))+cell('Best stage',bestStage||'-')+cell('Neon earned',fmtN(s.neon))+cell('Daily streak best',fmtN(s.daily))+cell('Stage clears',fmtN(s.clears))+'</div>'
      +(wt.length?'<h3>WEAPONS USED</h3><div class="stParts">'+wt.map(id=>'<div><span>'+esc((window.WPD&&WPD[id]&&WPD[id].n)||id)+'</span><i><u style="width:'+Math.round(100*D.w[id]/wmax)+'%"></u></i><em>'+fmtT(D.w[id])+'</em></div>').join('')+'</div>':'')
      +(window.PW3&&PW3.on&&PW3.sheet?PW3.sheet():'')
+     +(window.BPL&&BPL.on?BPL.sheet():'')
      +(typeof FB!=='undefined'&&FB.on?FB.sheet():'')
      +'<h3>ACHIEVEMENTS <span id="stAchN">'+got+'/'+A.length+'</span></h3><div class="stAch">'
      +A.map(a=>{const g=!!D.a[a.id];return '<div class="ac'+(g?' got':'')+'" data-id="'+a.id+'">'+badge(a,g)+'<span><b>'+esc(a.n)+'</b><small>'+(g?'':'🔒 ')+esc(a.d)+(a.skill?' · no Assist':'')+'</small></span></div>';}).join('')+'</div>'
@@ -8213,7 +8214,7 @@ NR.on('runStart',()=>{B2X.hz=[];B2X.st={abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,l
   const need=s.ref/Math.max(4,B2X.LATE*B2X.tf(e)-s.act);
   s.amp=s.rate>1e-3?clamp(need/s.rate,1,B2X.AMP):B2X.AMP;     // only damage that lands is raised (a ship that does not hit gets nothing)
   const loss=raw*s.amp+s.bk;const now=G.t,cap=B2X.cap(e);s.w=s.w.filter(x=>now-x[0]<1);let used=0;for(const x of s.w)used+=x[1];
-  const room=Math.max(0,cap-used),take=Math.min(loss,room),left=loss-take;   // damage above the cap waits in the armour (up to BK s of the cap) and goes in at the cap's pace: bursts (a salvo, a bomb) are not lost, so the cap, not the bot's rhythm, sets the length
+  const room=Math.max(0,cap-used)*(window.BPL?BPL.k(e):1),take=Math.min(loss,room),left=loss-take;   // damage above the cap waits in the armour (up to BK s of the cap) and goes in at the cap's pace: bursts (a salvo, a bomb) are not lost, so the cap, not the bot's rhythm, sets the length
   s.bk=Math.min(left,cap*B2X.BK);
   if(raw>0){B2X.st.dealt+=raw;if(s.amp>1)B2X.st.amp+=take-Math.min(raw,take);}
   if(left>s.bk+.01)B2X.st.abs+=left-s.bk;
@@ -8436,7 +8437,7 @@ BMV.norm=x=>Array.isArray(x)?{v:x[0],p:x[1]||{}}:{v:x,p:{}};
 /* lazily on the boss's first beat (armour.js and fair.js have set the hull and the phase lists by then) */
 BMV.init=e=>{e.bm=null;if(!BMV.on)return;const id=BMV.idOf(e),T=id&&BMT[id];if(!T)return;
   const L=T.ph.map(l=>l.map(BMV.norm));e.bm={id,T,P:{}};for(const l of L)for(const o of l)e.bm.P[o.v]=o.p;e.lists=L.map(l=>l.map(o=>o.v));
-  const s=BMV.stat();s.boss=id;};
+  const s=BMV.stat();s.boss=id;if(window.BPL)BPL.init(e);};   // bossplay.js: the encounter mechanics, the seeded order
 /* ---- shared helpers ---- */
 BMV.tel=()=>{const sb=BT.spb||.5;return Math.max(Math.ceil(.55/sb-1e-6),HARDS.includes(SET.diff)?1:2);};   // telegraph beats: >= 0.55 s at any tempo, 2 beats on Easy / Normal
 const BMX=e=>{const ph=e.ph||1,d=diff(),dk=BMV.DK[SET.diff]||1,pk=[1,1.08,1.18][ph-1];
@@ -8477,7 +8478,7 @@ BMV.cost=(x,y)=>{if(!BMV.on||!G.boss)return 0;let c=0;for(const z of BMV.hz){if(
     if(z.vx)for(const k of[.3,.6]){const x0=z.x;z.x+=z.vx*k;let d2=1e9;for(const p of BMV.prims(z))d2=Math.min(d2,BMV.sd(p,x,y));z.x=x0;if(d2<30)c+=(30-d2)*40;}}   // a moving wall or wave: where it will be
   const g=BMV.goal();if(g)c+=Math.hypot(g.x-x,g.y-y)*.8;return c;};
 BMV.goal=()=>{const e=G.boss;if(!e||!e.bmG)return null;return e.bmG.goal?e.bmG.goal():null;};
-BMV.target=()=>{const e=G.boss;if(!e||!e.bmG||!e.bmG.tg)return null;const t=e.bmG.tg.find(x=>!x.dead&&x.hp>0&&G.en.includes(x));return t||null;};
+BMV.target=()=>{const e=G.boss,t=e&&e.bmG&&e.bmG.tg?e.bmG.tg.find(x=>!x.dead&&x.hp>0&&G.en.includes(x)):null;return t||(window.BPL&&BPL.on?BPL.target():null);};   // bossplay.js: a gate's node / medic / flank row
 /* ---- counters: the boss is shielded (no HP loss) until the ship does the thing, or the slot ends ---- */
 BMV.guard=(e,v,hint,o)=>{if(e.bmG)return;e.bmG=Object.assign({v,hp:e.hp,b0:e.bt,end:e.bt+8-(e.pc|0),t0:G.t,tg:[],p:0},o||{});floater(e.x,e.y-e.r-30,hint,'#19e3ff');AU.sfx('warn');BMV.stat().counter++;};
 BMV.unguard=(e,won)=>{const g=e.bmG;if(!g)return;e.bmG=null;BMV.stat().guardT+=G.t-g.t0;for(const t of g.tg)if(!t.dead){t.dead=1;burst(t.x,t.y,'#19e3ff',10,200,.4);}
@@ -9069,6 +9070,296 @@ NR.on('graze',d=>ABIL.gain(d&&d.pf?.07:.04));
 NR.on('pickup',()=>ABIL.gain(.34));
 NR.on('runStart',()=>{if(ABIL.on)setTimeout(()=>{if(running&&G&&!G.dead)ABIL.tip('DASH has charges, EMP fills from kills');},4000);});
 
+/* ---------- WEAPON FORGE (flag RET.forge, default ON; ?forge=0 = the old weapons exactly). Owner, 20 Oct 2026: "weapons maybe can be combined and users can
+   organize their inventories ... the game needs to be more creative".
+   - HYBRIDS: two owned weapons + 3 scrap + 120 Neon forge a named hybrid from the recipe table FGR (one row per pair; add rows to extend). A hybrid sits in a
+     weapon slot and fires its first parent's volley with the recipe's traits (seeds, mine trail, edge bounce, beat rings, ...). Its damage factor is
+     .95 minus 1.6x the cost of its traits (FGC, .5-.9), x1.03 per level (LV1-5): with its traits no hybrid passes 1.35x its parent (forge-test); hard.js's damage ceiling and
+     S3's auto-aim cut book every trait hit (they go through DMG.hit or WP.hurtE inside S3.ctx).
+   - MODS (FGM): 12 small mods; a plain weapon slot takes 2, a hybrid slot 1. Every mod trades damage for its effect (k < 1), except HEAVY (slower shots)
+     and BEAT (x1.3 on the beat, x.9 off it).
+   - CORES (dash / EMP trait when no power-up is running, via ABIL.keys) and PASSIVES. Loadout = 2 weapon slots + 1 core + 1 passive, 3 named presets.
+   - SCRAP: +1 per district cleared, +1 per boss, pit-stop / level-up card FORGE SCRAP (choices.js, flag build2). Save: localStorage mnr_forge.
+   b.js calls WP.hit for bullets with b.fg (one hook); the inventory UI is inventory.js. Test: nightrun/forge-test.js. */
+if(RET.forge===undefined)RET.forge=!/[?&]forge=0/.test(location.search);
+/* recipe table: [weapon A (fires), weapon B, id, name, traits, one line]. Traits: seeds n, trail, rc n (edge bounce), px n (pierce), hk (homing), sp (split),
+   zp (leap), zp2 (two leaps), ring (pulse ring on the beat), nova (blast on kill), burst (4 shards on hit), grav (pulls foes in), wob (weaving path), rad (wider) */
+const FGR=[
+ ['pulse','swarm','seedfan','Seed Fan',{seeds:2},'Spread shots burst into homing seeds on hit'],
+ ['laser','mine','minelance','Mine Lance',{px:2,trail:1},'A piercing lance that leaves a trail of mines'],
+ ['arc','disc','edgearc','Edge Arc',{rc:2,zp:1},'Lightning that bounces off the screen edges and leaps'],
+ ['beat','pulse','ringshell','Ring Shell',{ring:1},'Shells release a pulse ring on every beat'],
+ ['swarm','beat','choirbomb','Choir Bomb',{hk:1.4,nova:1},'Homing shells that blast when they kill'],
+ ['disc','laser','prismdisc','Prism Disc',{rc:1,sp:1},'A bouncing disc that splits in two on hit'],
+ ['orbit','arc','halocoil','Halo Coil',{wob:1,zp:1},'Weaving sparks that leap to the next foe'],
+ ['mine','swarm','huntermines','Hunter Mines',{trail:1,hk:1},'Seeking shots that drop mines as they fly'],
+ ['flame','wave','heatwave','Heat Wave',{rad:6,px:1},'A wide hot wave that burns through one foe'],
+ ['frost','rail','iceneedle','Ice Needle',{px:3},'A thin needle that pierces three foes'],
+ ['drone','swarm','hivemind','Hive Mind',{seeds:1,hk:.8},'Seeking shots that hatch one more seeker on hit'],
+ ['rail','arc','voltrail','Volt Rail',{px:2,zp:1},'A rail slug that pierces and arcs on'],
+ ['shell','pulse','clustershell','Cluster Shell',{burst:1},'Shells crack into four shards on hit'],
+ ['storm','disc','squalldisc','Squall Disc',{rc:2,wob:1},'A weaving disc that bounces twice'],
+ ['wave','beat','bassswell','Bass Swell',{ring:1,rad:3},'A fat wave that rings out on the beat'],
+ ['well','mine','gravmines','Gravity Mines',{trail:1,grav:1},'Shots pull foes together and lay mines'],
+ ['well','swarm','horizon','Event Horizon',{grav:1,hk:1},'Seeking shots that drag foes into a knot'],
+ ['flame','mine','firefield','Fire Field',{trail:1,nova:1},'Burning mines; kills explode'],
+ ['frost','orbit','shardring','Shard Ring',{wob:1,burst:1},'Weaving shards that shatter on hit'],
+ ['laser','beat','pulselance','Pulse Lance',{px:1,ring:1},'A lance that rings out on the beat'],
+ ['storm','arc','thunderhead','Thunderhead',{zp2:1},'Every hit leaps twice'],
+ ['rail','disc','railric','Rail Ricochet',{px:1,rc:2},'A piercing slug that ricochets twice'],
+ ['pulse','frost','snowburst','Snowburst',{burst:1,rad:3},'A wide frost spread that shatters on hit'],
+ ['shell','well','blackshell','Black Shell',{nova:1,grav:1},'Shells pull foes in, kills blow up']];
+const FGC={seeds:.2,trail:.18,ring:.15,nova:.1,burst:.15,zp:.12,zp2:.3,sp:.12,grav:.05,px:.04,rc:.1,hk:.06,rad:.01,wob:0};   // damage cost per trait (x its number)
+const FG_SH=['tri','dia','ring','dot','cross','star'];
+/* mods: id, name, traits, damage factor, line, icon shape */
+const FGM=[
+ ['pierce','PIERCE',{px:1},.95,'Shots pass through one more foe','tri'],
+ ['bounce','BOUNCE',{rc:1},.97,'Shots bounce off the edges once','dia'],
+ ['beat','BEAT SYNC',{beat:1},1,'On-beat shots x1.3, off-beat x0.9','ring'],
+ ['shield','KILL SHIELD',{shield:1},.95,'Every 10th kill shields you for 1 s','hex'],
+ ['homing','SEEKER',{hk:.9},.88,'Shots curve towards foes','tri'],
+ ['split','SPLITTER',{sp:1},.85,'Shots split in two on hit','cross'],
+ ['zap','ARC TIP',{zp:1},.85,'Hits leap to a nearby foe','star'],
+ ['wide','WIDE BORE',{rad:4},.92,'Bigger shots, easier hits','dot'],
+ ['heavy','HEAVY',{heavy:1},1.2,'x1.2 damage, shots fly slower','sq'],
+ ['seed','SEED',{seeds:1},.85,'Each hit hatches a homing seed','tri'],
+ ['nova','NOVA',{nova:1},.9,'Kills explode','star'],
+ ['ring','RINGER',{ring:1},.88,'Live shots ring out on the beat','ring']];
+/* cores: the dash / EMP trait while no power-up runs (abilities.js reads ABIL.keys); passives */
+const FGK=[['burn','BURN CORE','nova','Dash leaves a burning trail'],['ram','RAM CORE','chord','Dash rams; EMP breaks cores'],['phase','PHASE CORE','slice','Dash turns bullets to shards'],
+ ['decoy','DECOY CORE','wing','Dash leaves a decoy; EMP chains'],['magnet','MAGNET CORE','magb','Dash and EMP pull pickups']];
+const FGP=[['salvage','SALVAGER','+1 scrap per district cleared'],['showman','SHOWMAN','+6% score from kills'],['spare','SPARE CELL','Start each run with +1 EMP']];
+const FG_T=((location.search.match(/[?&]fgt=([a-z,]+)/)||[])[1]||'').split(',').filter(Boolean),FG_TM=((location.search.match(/[?&]fgm=([a-z,]+)/)||[])[1]||'').split(',').filter(Boolean);
+const FG_MAXLV=5,FG_COST={scrap:3,neon:120},FG_MODC=2,FG_CORC=4;
+const FG=window.FG={get on(){return!!RET.forge;},s:null,ver:0,mn:[],kills:[0,0],stat:{forged:0,seeds:0,mines:0,rings:0,novas:0,bursts:0,grav:0,trait:0},
+  key(a,b){return a<b?a+'-'+b:b+'-'+a;},
+  rec(a,b){if(!this._rk){this._rk={};for(const r of FGR)this._rk[this.key(r[0],r[1])]=r;}return this._rk[this.key(a,b)]||null;},
+  rid(id){return FGR.find(r=>r[2]===id)||null;},
+  st(){if(this.s)return this.s;const d={scrap:0,gift:0,hy:{},mods:{},cores:{},pas:{},lo:{w:[null,null],m:[[],[]],core:null,pas:null},pre:[null,null,null],made:0};
+    let v=null;try{v=JSON.parse(localStorage.getItem('mnr_forge')||'null');}catch(e){}
+    if(v&&typeof v==='object')for(const k in d)if(v[k]!=null&&typeof v[k]===typeof d[k])d[k]=v[k];
+    if(!Array.isArray(d.lo.w)||d.lo.w.length!==2)d.lo.w=[null,null];if(!Array.isArray(d.lo.m)||d.lo.m.length!==2)d.lo.m=[[],[]];if(!Array.isArray(d.pre)||d.pre.length!==3)d.pre=[null,null,null];
+    if(!d.gift){d.gift=1;d.scrap+=4;}                                                        // a first forge is free to try
+    return this.s=d;},
+  save(){try{localStorage.setItem('mnr_forge',JSON.stringify(this.st()));}catch(e){}this.ver++;},
+  owner(it){return it&&it.startsWith('h:')?(this.rid(it.slice(2))||[])[0]||null:it;},
+  hlv(rid){return Math.max(1,Math.min(FG_MAXLV,this.st().hy[rid]|0));},
+  sockets(it){return it&&it.startsWith('h:')?1:2;},
+  // the loadout follows the WEAPONS sheet: a slot whose weapon changed there holds that weapon (its mods stay if they fit)
+  sync(){const s=this.st(),lo=s.lo;let ch=0;for(let i=0;i<2;i++){const id=WP.eq[i]||null;if(this.owner(lo.w[i])!==id){lo.w[i]=id;ch=1;}lo.m[i]=(lo.m[i]||[]).slice(0,this.sockets(lo.w[i]));}if(ch)this.save();},
+  // traits for bullets of weapon id: hybrid traits + mods of the slot that fires it
+  tr(id){if(!this.on)return null;const ck=WP.eq.join()+'/'+this.ver;if(this._ck!==ck){this._ck=ck;this._tc={};this.sync();}
+    if(id in this._tc)return this._tc[id];const s=this.st(),i=WP.eq[0]===id?0:WP.eq[1]===id?1:-1;let r=null;
+    if(i>=0&&FG_T.length){const R=FGR.find(r=>r[0]===id&&(FG_T[0]==='all'||FG_T.includes(r[2]))),t={};let k=1;if(R){Object.assign(t,R[4]);k=this.hk(R)*(1+.03*(FG_MAXLV-1))/(1+.03*(this.hlv(R[2])-1));}   // test link ?fgt=<ids|all>&fgm=<mods>: every slot gets its hybrid and the mods
+      for(const m of FG_TM.slice(0,R?1:2)){const M=FGM.find(x=>x[0]===m);if(M){for(const q in M[2])t[q]=(t[q]||0)+M[2][q];k*=M[3];}}
+      return this._tc[id]=Object.keys(t).length?{t,k,sh:R?FG_SH[FGR.indexOf(R)%FG_SH.length]:null,c2:R?WPD[R[1]].c:null,slot:i}:null;}
+    if(i>=0){const it=s.lo.w[i],t={};let k=1,sh=null,c2=null;
+      if(it&&it.startsWith('h:')){const R=this.rid(it.slice(2));if(R&&R[0]===id&&s.hy[R[2]]){Object.assign(t,R[4]);k=this.hk(R);sh=FG_SH[FGR.indexOf(R)%FG_SH.length];c2=WPD[R[1]].c;}}
+      for(const m of s.lo.m[i]||[]){const M=FGM.find(x=>x[0]===m);if(!M||!(s.mods[m]>0))continue;for(const q in M[2])t[q]=(t[q]||0)+M[2][q];k*=M[3];}
+      if(Object.keys(t).length)r={t,k,sh,c2,slot:i};}
+    return this._tc[id]=r;},
+  hk(R){let c=0;for(const q in R[4])c+=(FGC[q]||0)*R[4][q];return Math.max(.5,Math.min(.9,.95-1.6*c))*(1+.03*(this.hlv(R[2])-1));},
+  put(o,r){const t=r.t;o.fg=r;o.fgk=(o.fgk||1)*r.k;
+    if(t.px){if(!o.px){o.px=new Set();o.pn=t.px;}else if(o.pn!=null&&o.pn<90)o.pn+=t.px;}
+    if(t.rc)o.rc=(o.rc||0)+t.rc;if(t.hk)o.hk=Math.max(o.hk||0,t.hk);if(t.sp)o.sp=1;if(t.zp||t.zp2)o.zp=1;if(t.rad)o.rad=(o.rad||0)+t.rad;
+    if(r.c2)o.fc2=r.c2;if(r.sh)o.fgs=r.sh;return o;},
+  hurt(e,dm){if(window.S3)S3.ctx++;try{WP.hurtE(e,dm);}finally{if(window.S3)S3.ctx--;}this.stat.trait+=dm;},
+  near(x,y,R,f){for(const e of G.en)if(WP.tgt(e)&&e.type!=='gate'&&(e.x-x)**2+(e.y-y)**2<(R+e.r)**2)f(e);},
+  // one bullet hit (b.js -> WP.hit)
+  hit(b,e){const r=b.fg,t=r.t,c=b.fc2||b.col||'#fff';
+    if(t.seeds&&!b.fgsd){b.fgsd=1;for(let i=0;i<t.seeds&&pbRoom();i++){G.pb.push({x:b.x,y:b.y,vx:420,vy:(i%2?1:-1)*260,dm:b.dm*.28,pf:0,col:c,len:6,th:3,hk:2.2,fz:1,wid:b.wid});this.stat.seeds++;}}
+    if(t.burst&&!b.fgbu){b.fgbu=1;for(let i=0;i<4&&pbRoom();i++){const a=Math.PI/4+i*Math.PI/2;G.pb.push({x:b.x,y:b.y,vx:Math.cos(a)*560,vy:Math.sin(a)*560,dm:b.dm*.3,pf:0,col:c,len:8,th:2,fz:1,wid:b.wid});}this.stat.bursts++;}
+    if(t.zp2)WP.leap(e,b.dm*.3);
+    if(t.grav){let n=0;this.near(e.x,e.y,90,o=>{if(o===e||o.type==='boss'||n>=4)return;n++;const d=Math.hypot(e.x-o.x,e.y-o.y)||1;o.x+=(e.x-o.x)/d*10;o.y+=(e.y-o.y)/d*10;});this.stat.grav+=n;}
+    if(t.nova&&e.hp<=0&&!e.fgnv){e.fgnv=1;this.near(e.x,e.y,50,o=>{if(o!==e)this.hurt(o,b.dm*.5);});G.rings.push({x:e.x,y:e.y,l:.3,m:.3,c});this.stat.novas++;}},
+  tick(dt){if(!this.on||!G.live||G.dead)return;const s=this.st();
+    for(const b of G.pb){const r=b.fg;if(!r)continue;const t=r.t;
+      if(t.wob){if(b.fgw==null){b.fgw=b.vy;b.fgt=G.t;}b.vy=b.fgw+170*Math.cos((G.t-b.fgt)*13);}
+      if(t.trail){b.fgm=(b.fgm||0)+dt;if(b.fgm>.14&&this.mn.length<14){b.fgm=0;this.mn.push({x:b.x,y:b.y,t:2.4,dm:b.dm*.45,c:b.fc2||b.col||'#c08aff'});}}}
+    for(let i=this.mn.length-1;i>=0;i--){const m=this.mn[i];m.t-=dt;let hit=null;this.near(m.x,m.y,10,e=>{if(!hit)hit=e;});
+      if(hit){this.near(m.x,m.y,30,e=>this.hurt(e,m.dm));if(G.rings.length<24)G.rings.push({x:m.x,y:m.y,l:.25,m:.25,c:m.c});this.stat.mines++;this.mn.splice(i,1);}else if(m.t<=0)this.mn.splice(i,1);}},
+  beat(){if(!this.on||!G.live||G.dead)return;let n=0;
+    for(const b of G.pb){const r=b.fg;if(!r||!r.t.ring||n>=6||b.x>W-10)continue;n++;this.near(b.x,b.y,56,e=>this.hurt(e,b.dm*.5));if(G.rings.length<24)G.rings.push({x:b.x,y:b.y,l:.3,m:.3,c:b.fc2||b.col||'#ffe14d'});this.stat.rings++;}},
+  shape(c,sh,x,y,R){c.beginPath();
+    if(sh==='tri'){c.moveTo(x+R,y);c.lineTo(x-R*.7,y-R*.8);c.lineTo(x-R*.7,y+R*.8);c.closePath();}
+    else if(sh==='dia'){c.moveTo(x+R,y);c.lineTo(x,y-R);c.lineTo(x-R,y);c.lineTo(x,y+R);c.closePath();}
+    else if(sh==='cross'){c.rect(x-R,y-R*.28,2*R,R*.56);c.rect(x-R*.28,y-R,R*.56,2*R);}
+    else if(sh==='star'){for(let i=0;i<10;i++){const a=i*Math.PI/5-Math.PI/2,q=i%2?R*.45:R;c.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q);}c.closePath();}
+    else if(sh==='hex'){for(let i=0;i<6;i++){const a=i*Math.PI/3;c.lineTo(x+Math.cos(a)*R,y+Math.sin(a)*R);}c.closePath();}
+    else if(sh==='sq')c.rect(x-R*.8,y-R*.8,1.6*R,1.6*R);
+    else c.arc(x,y,sh==='dot'?R*.6:R,0,Math.PI*2);},
+  draw(){if(!this.on)return;const c=ctx;c.save();c.globalCompositeOperation='lighter';c.lineWidth=2;
+    for(const b of G.pb){if(!b.fgs)continue;c.strokeStyle=c.fillStyle=b.fc2||'#fff';c.globalAlpha=.85;this.shape(c,b.fgs,b.x,b.y,6+(b.rad||0)*.5);b.fgs==='ring'?c.stroke():c.fill();}
+    for(const m of this.mn){c.globalAlpha=Math.min(1,m.t*2)*.9;c.fillStyle=m.c;this.shape(c,'tri',m.x,m.y,6);c.fill();}
+    c.restore();},
+  // icon of an inventory item: weapon = its colour circle, hybrid = circle A + triangle B + mini shapes, mod = its shape, core = hexagon, passive = square
+  icon(c,it,S){c.clearRect(0,0,S,S);const m=S/2;c.save();c.lineWidth=Math.max(2,S/16);
+    const ty=it.split(':')[0],id=it.split(':')[1];
+    if(ty==='w'){const col=WPD[id]?WPD[id].c:'#fff';c.fillStyle=col;this.shape(c,'o',m,m,S*.3);c.fill();c.fillStyle='#0b0820';c.font='700 '+Math.round(S*.24)+'px "Share Tech Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.fillText((WPD[id]?WPD[id].s:'?').slice(0,2),m,m+1);}
+    else if(ty==='h'){const R=this.rid(id);if(R){const c1=WPD[R[0]].c,c2=WPD[R[1]].c,sh=FG_SH[FGR.indexOf(R)%FG_SH.length];c.fillStyle=c1;this.shape(c,'o',m-S*.08,m,S*.28);c.fill();
+      c.globalCompositeOperation='lighter';c.fillStyle=c2;this.shape(c,'tri',m+S*.12,m,S*.24);c.fill();c.strokeStyle=c2;this.shape(c,sh,m+S*.3,m-S*.3,S*.1);sh==='ring'?c.stroke():c.fill();c.fillStyle=c1;this.shape(c,'dot',m-S*.32,m+S*.3,S*.12);c.fill();}}
+    else if(ty==='m'){const M=FGM.find(x=>x[0]===id);c.strokeStyle=c.fillStyle='#e6e1ff';this.shape(c,M?M[5]:'dot',m,m,S*.3);(M&&M[5]==='ring')?c.stroke():c.fill();c.strokeStyle='#19e3ff';this.shape(c,'o',m,m,S*.44);c.stroke();}
+    else if(ty==='k'){c.strokeStyle='#ffe14d';this.shape(c,'hex',m,m,S*.38);c.stroke();c.fillStyle='#ffe14d';this.shape(c,'dot',m,m,S*.24);c.fill();}
+    else{c.strokeStyle='#3dffb0';this.shape(c,'sq',m,m,S*.38);c.stroke();c.fillStyle='#3dffb0';this.shape(c,'tri',m,m,S*.2);c.fill();}
+    c.restore();},
+  // actions (the inventory UI calls these; each returns '' or a message)
+  canForge(a,b){const s=this.st(),R=a&&b&&a!==b?this.rec(a,b):null;if(!R)return'No recipe for this pair';if(s.hy[R[2]])return'Already forged';if(!WP.has(a)||!WP.has(b))return'Own both weapons first';
+    if(s.scrap<FG_COST.scrap)return'Need '+FG_COST.scrap+' scrap';if(GA.bank<FG_COST.neon)return'Need '+FG_COST.neon+' Neon';return'';},
+  forge(a,b){const m=this.canForge(a,b);if(m)return m;const s=this.st(),R=this.rec(a,b);s.scrap-=FG_COST.scrap;GA.bank-=FG_COST.neon;try{gsave();}catch(e){}s.hy[R[2]]=1;s.made++;this.stat.forged++;this.save();NR.emit('forge',{id:R[2]});return'';},
+  lvCost(rid){return 2*this.hlv(rid);},
+  levelUp(rid){const s=this.st();if(!s.hy[rid])return'Not forged';if(s.hy[rid]>=FG_MAXLV)return'Max level';const c=this.lvCost(rid);if(s.scrap<c)return'Need '+c+' scrap';s.scrap-=c;s.hy[rid]++;this.save();return'';},
+  craft(ty,id){const s=this.st(),c=ty==='m'?FG_MODC:FG_CORC,bag=ty==='m'?s.mods:ty==='k'?s.cores:s.pas;if(ty!=='m'&&bag[id])return'Owned';if(s.scrap<c)return'Need '+c+' scrap';s.scrap-=c;bag[id]=(bag[id]|0)+1;this.save();return'';},
+  used(id){const lo=this.st().lo;return lo.m[0].filter(x=>x===id).length+lo.m[1].filter(x=>x===id).length;},
+  scrapIt(ty,id){const s=this.st();
+    if(ty==='h'){if(!s.hy[id])return'Not owned';const back=1+s.hy[id];delete s.hy[id];for(let i=0;i<2;i++)if(s.lo.w[i]==='h:'+id){s.lo.w[i]=WP.eq[i]||null;}s.scrap+=back;this.save();return'';}
+    if(ty==='m'){if(!(s.mods[id]>0))return'Not owned';if(s.mods[id]<=this.used(id))return'Take it out of the slot first';s.mods[id]--;GA.bank+=30;try{gsave();}catch(e){}this.save();return'';}
+    const bag=ty==='k'?s.cores:s.pas;if(!bag[id])return'Not owned';delete bag[id];if(s.lo.core===id)s.lo.core=null;if(s.lo.pas===id)s.lo.pas=null;s.scrap+=2;this.save();return'';},
+  // put an item into a loadout slot: 0/1 weapon slots, 'core', 'pas'
+  equip(slot,it){const s=this.st(),lo=s.lo;
+    if(slot==='core'){lo.core=lo.core===it?null:it;this.save();return'';}if(slot==='pas'){lo.pas=lo.pas===it?null:it;this.save();return'';}
+    const own=this.owner(it);if(!own||!WP.has(own))return'Not owned';if(it.startsWith('h:')&&!s.hy[it.slice(2)])return'Not forged';
+    const o=1-slot;if(this.owner(lo.w[o])===own){lo.w[o]=lo.w[slot];lo.m[o]=[];}                           // the same weapon cannot fire from both slots: swap
+    lo.w[slot]=it;lo.m[slot]=(lo.m[slot]||[]).slice(0,this.sockets(it));this.apply();return'';},
+  socket(slot,mod){const s=this.st(),lo=s.lo,a=lo.m[slot]||(lo.m[slot]=[]);if(a.includes(mod)){a.splice(a.indexOf(mod),1);this.save();return'';}
+    if(a.length>=this.sockets(lo.w[slot]))return'Slot full ('+this.sockets(lo.w[slot])+' mod'+(this.sockets(lo.w[slot])>1?'s':'')+')';
+    if(!(s.mods[mod]>this.used(mod)))return'Craft another '+mod.toUpperCase()+' first';a.push(mod);this.save();return'';},
+  apply(){const lo=this.st().lo;WP.eq=[this.owner(lo.w[0])||WP.eq[0]||'pulse',this.owner(lo.w[1])];if(WP.eq[0]===WP.eq[1])WP.eq[1]=null;WP._fk=null;try{WP.save();WP.sync();}catch(e){}this.save();},
+  savePre(i,name){const s=this.st();s.pre[i]={n:String(name||'').slice(0,14)||('BUILD '+(i+1)),lo:JSON.parse(JSON.stringify(s.lo))};this.save();return'';},
+  usePre(i){const s=this.st(),p=s.pre[i];if(!p)return'Empty preset';const lo=JSON.parse(JSON.stringify(p.lo));
+    for(let j=0;j<2;j++){const it=lo.w[j];if(it&&(!WP.has(this.owner(it))||(it.startsWith('h:')&&!s.hy[it.slice(2)])))lo.w[j]=null;lo.m[j]=(lo.m[j]||[]).filter(m=>s.mods[m]>0).slice(0,this.sockets(lo.w[j]));}
+    if(lo.core&&!s.cores[lo.core])lo.core=null;if(lo.pas&&!s.pas[lo.pas])lo.pas=null;s.lo=lo;this.apply();NR.emit('forgePreset',{i});return'';},
+  gain(n,why){if(!this.on||G.lab||G.tut)return;const s=this.st();s.scrap+=n;this.save();if(G.live&&!G.dead)floater(P.x,P.y-44,'SCRAP +'+n,'#c9c3e6');}};
+/* hooks: volley (traits + damage factor), WP.mod, bullet hits, ticks, beats, drawing, kills, cores, passives, scrap */
+{const s0=WP.shots;WP.shots=function(std,pf){const n0=G.pb.length;s0.call(this,std,pf);if(!FG.on)return;
+  for(let i=0;i<2;i++){const id=this.eq[i],r=id&&FG.tr(id);if(!r||(i&&id===this.eq[0]))continue;let has=false;for(let j=Math.max(0,n0);j<G.pb.length;j++)if(G.pb[j].fg===r){has=true;break;}
+    if(!has&&pbRoom())std(860,0,.45,FG.put({wid:id,col:WPD[id].c,len:10,th:4,y:P.y+(i?9:-9)},r));}   // weapons without plain shots (arc, orbit, mines, beams...) carry the traits on a light carrier shot
+  for(let i=Math.max(0,n0);i<G.pb.length;i++){const b=G.pb[i];if(!b.fg)continue;let k=b.fgk||1;if(b.fg.t.beat)k*=pf?1.3:.9;if(b.fg.t.heavy){b.vx*=.7;b.vy*=.7;}b.dm*=k;b.fgk=1;}};
+ const m0=WP.mod;WP.mod=function(id,o){o=m0.call(this,id,o);const r=FG.tr(id);return r?FG.put(o,r):o;};
+ const h0=WP.hit;WP.hit=function(b,e){h0.call(this,b,e);if(b.fg&&FG.on)FG.hit(b,e);};
+ const dw=WP.drawWorld;WP.drawWorld=function(t){dw.call(this,t);if(G&&G.live&&!G.dead)FG.draw();};}
+NR.on('tick',dt=>FG.tick(dt));NR.on('beat',()=>FG.beat());
+NR.on('runStart',()=>{FG.mn=[];FG.kills=[0,0];FG.got=0;if(!FG.on)return;FG._ck=null;const s=FG.st();if(s.lo.pas==='spare'&&s.pas.spare)P.emp=Math.min(3,(P.emp|0)+1);});
+NR.on('kill',d=>{if(!FG.on||!G.live)return;const e=d&&d.e;if(!e)return;const s=FG.st();
+  if(d.boss)FG.gain(1,'boss');
+  else if(s.lo.pas==='showman'&&s.pas.showman)G.score+=Math.round((e.score||0)*.06*(G.mult||1));
+  for(let i=0;i<2;i++){const r=FG.tr(WP.eq[i]);if(r&&r.t.shield&&e._wk===WP.eq[i]&&++FG.kills[i]%10===0){P.inv=Math.max(P.inv||0,1);floater(P.x,P.y-30,'SHIELD','#19e3ff');}}});
+NR.on('districtEnd',()=>{if(!FG.on)return;const s=FG.st();FG.gain(1+(s.lo.pas==='salvage'&&s.pas.salvage?1:0),'district');});
+if(window.ABIL){const k0=ABIL.keys;ABIL.keys=function(){const k=k0.call(this);if(!FG.on||k.length)return k;const s=FG.st(),c=s.lo.core&&s.cores[s.lo.core]?FGK.find(x=>x[0]===s.lo.core):null;return c?[c[2]]:k;};}
+if(window.CHO){CHO.DECK.push({id:'scrap',n:'FORGE SCRAP',d:'+2 forge scrap for the Garage forge',fg:1});
+  const a0=CHO.apply;CHO.apply=function(id){if(id==='scrap'){FG.gain(2,'card');return;}return a0.apply(this,arguments);};
+  const o0=CHO.offer;CHO.offer=function(k){const d=this.DECK,keep=d.slice();if(!FG.on)this.DECK=d.filter(c=>!c.fg);try{return o0.call(this,k);}finally{this.DECK=keep;}};}
+window.__fg={FG,FGR,FGM,FGK,FGP};
+
+/* ---------- INVENTORY + LOADOUT (Garage tab FORGE, flag RET.forge; forge.js holds the data and the actions). Phone first: tiles >= 44 px, text >= 14 px.
+   Tap an item, then tap a slot (or use the item's buttons); tap a slot first to filter the grid to what fits it. 4 slots: 2 weapons (weapon or hybrid,
+   with 2 / 1 mod sockets), 1 ability core, 1 passive. 3 named presets; the pit stop shows a quick preset row. */
+const INV=window.INV={f:'all',sort:'type',sel:null,msg:'',a:null,b:null};
+{const st=document.createElement('style');st.textContent=`
+#gaCards.fgbox{display:block!important;overflow-y:auto;-webkit-overflow-scrolling:touch;font-size:14px}
+#gaCards.fgbox .fgs{margin:0 0 12px;padding:8px;border:1px solid rgba(140,134,184,.35);border-radius:10px}
+#gaCards.fgbox h4{margin:0 0 6px;font:700 14px var(--mono,monospace);letter-spacing:.08em;color:#19e3ff}
+#gaCards.fgbox .fgrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#gaCards.fgbox button.fb{min-height:44px;min-width:44px;padding:4px 10px;font:700 14px var(--mono,monospace);color:#e6e1ff;background:rgba(25,227,255,.08);border:1px solid rgba(25,227,255,.5);border-radius:8px}
+#gaCards.fgbox button.fb.on{background:#19e3ff;color:#0b0820}
+#gaCards.fgbox button.fb[disabled]{opacity:.45}
+#gaCards.fgbox .fglo{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px}
+#gaCards.fgbox .fgslot{display:flex;flex-direction:column;gap:4px;padding:6px;border:1px dashed rgba(230,225,255,.4);border-radius:10px;min-height:44px}
+#gaCards.fgbox .fgslot.hot{border-style:solid;border-color:#ffe14d}
+#gaCards.fgbox .fgslot>button{display:flex;align-items:center;gap:8px;text-align:left;min-height:52px;background:none;border:0;color:#e6e1ff;font:14px var(--mono,monospace);padding:0}
+#gaCards.fgbox .fgslot small,#gaCards.fgbox .fgt small{display:block;font-size:14px;color:#a9a3cf;line-height:1.2}
+#gaCards.fgbox .fggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px}
+#gaCards.fgbox button.fgt{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:96px;min-width:44px;padding:6px 4px;background:rgba(11,8,32,.6);border:1px solid rgba(140,134,184,.45);border-radius:10px;color:#e6e1ff;font:14px var(--mono,monospace);line-height:1.15;overflow-wrap:anywhere;text-align:center}
+#gaCards.fgbox button.fgt.sel{border-color:#ffe14d;box-shadow:0 0 0 2px #ffe14d inset}
+#gaCards.fgbox button.fgt.no{opacity:.55;border-style:dashed}
+#gaCards.fgbox .fgd{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;padding:8px;border-radius:10px;background:rgba(255,225,77,.07)}
+#gaCards.fgbox .fgd .tx{flex:1 1 180px;min-width:0}
+#gaCards.fgbox select,#gaCards.fgbox input{min-height:44px;font:14px var(--mono,monospace);background:#0b0820;color:#e6e1ff;border:1px solid rgba(140,134,184,.6);border-radius:8px;padding:0 6px;max-width:100%}
+#gaCards.fgbox input{width:9.5em}
+#gaCards.fgbox small{display:block;font-size:14px;color:#a9a3cf;line-height:1.2}
+#gaCards.fgbox .fgmsg{min-height:20px;color:#ffe14d}
+#shop .fgq{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center;font:14px var(--mono,monospace);color:#a9a3cf}
+#shop .fgq button{min-height:44px;min-width:44px;padding:2px 10px;font:700 14px var(--mono,monospace)}`;document.head.appendChild(st);}
+const fgEsc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+INV.items=function(){const s=FG.st(),L=[];
+  for(const id of WP_IDS)if(WP.has(id))L.push({it:'w:'+id,ty:'w',n:WPD[id].n,lv:WP.permOf(id),d:WPD[id].tx,own:1});
+  for(const R of FGR)if(s.hy[R[2]])L.push({it:'h:'+R[2],ty:'h',n:R[3].toUpperCase(),lv:FG.hlv(R[2]),d:R[5]+' ('+WPD[R[0]].s+' + '+WPD[R[1]].s+')',own:1});
+  for(const M of FGM)L.push({it:'m:'+M[0],ty:'m',n:M[1],lv:s.mods[M[0]]|0,d:M[4],own:(s.mods[M[0]]|0)>0});
+  for(const K of FGK)L.push({it:'k:'+K[0],ty:'k',n:K[1],lv:s.cores[K[0]]?1:0,d:K[3]+' (when no power-up runs)',own:!!s.cores[K[0]]});
+  for(const p of FGP)L.push({it:'p:'+p[0],ty:'p',n:p[1],lv:s.pas[p[0]]?1:0,d:p[2],own:!!s.pas[p[0]]});
+  const f=this.f,F=L.filter(x=>f==='all'||(f==='k'?x.ty==='k'||x.ty==='p':x.ty===f)),O='whmkp';
+  F.sort(this.sort==='name'?(a,b)=>a.n.localeCompare(b.n):this.sort==='level'?(a,b)=>b.lv-a.lv||O.indexOf(a.ty)-O.indexOf(b.ty):(a,b)=>O.indexOf(a.ty)-O.indexOf(b.ty)||(b.own-a.own));return F;};
+INV.say=function(m){this.msg=m||'';};
+INV.act=function(fn){const m=fn();this.say(m||'');gaDraw();};
+INV.tapSlot=function(sl){const x=this.sel,ty=x&&x.split(':')[0],id=x&&x.split(':')[1];
+  if(x&&(sl===0||sl===1)&&(ty==='w'||ty==='h'))return this.act(()=>FG.equip(sl,ty==='w'?id:x));
+  if(x&&(sl===0||sl===1)&&ty==='m')return this.act(()=>FG.socket(sl,id));
+  if(x&&sl==='core'&&ty==='k')return this.act(()=>FG.st().cores[id]?FG.equip('core',id):'Craft it first');
+  if(x&&sl==='pas'&&ty==='p')return this.act(()=>FG.st().pas[id]?FG.equip('pas',id):'Craft it first');
+  this.f=sl==='core'?'k':sl==='pas'?'k':x&&ty==='m'?'m':'all';this.sel=null;this.say(sl==='core'||sl==='pas'?'Pick a core or passive below':'Pick a weapon, hybrid or mod below, then tap the slot');gaDraw();};
+INV.slotHtml=function(sl){const s=FG.st(),lo=s.lo;let it=null,n='EMPTY',sub=sl===0?'WEAPON SLOT 1':sl===1?'WEAPON SLOT 2':sl==='core'?'ABILITY CORE':'PASSIVE';
+  if(sl===0||sl===1){const w=lo.w[sl];if(w){it=w.startsWith('h:')?w:'w:'+w;n=w.startsWith('h:')?FG.rid(w.slice(2))[3].toUpperCase()+' LV'+FG.hlv(w.slice(2)):WPD[w].n;}}
+  else{const id=sl==='core'?lo.core:lo.pas;if(id){it=(sl==='core'?'k:':'p:')+id;n=(sl==='core'?FGK:FGP).find(x=>x[0]===id)[1];}}
+  return{it,n,sub};};
+INV.draw=function(box){const s=FG.st(),lo=s.lo;FG.sync();box.innerHTML='';const sec=(t,h)=>{const d=document.createElement('div');d.className='fgs';d.innerHTML='<h4>'+t+'</h4>'+(h||'');box.appendChild(d);return d;};
+  const top=sec('FORGE · SCRAP '+s.scrap,'<div class="fgmsg" id="fgMsg">'+fgEsc(this.msg||'Forge two weapons into a hybrid, slot mods, save builds.')+'</div>');top.id='fgTop';
+  // loadout
+  const L=sec('LOADOUT');const g=document.createElement('div');g.className='fglo';L.appendChild(g);
+  for(const sl of[0,1,'core','pas']){const q=this.slotHtml(sl),d=document.createElement('div');d.className='fgslot';d.dataset.slot=sl;
+    const b=document.createElement('button');b.type='button';b.className='fgsb';b.innerHTML=`<canvas width="44" height="44" style="width:44px;height:44px;flex:0 0 44px"></canvas><span><small>${q.sub}</small>${fgEsc(q.n)}</span>`;
+    if(q.it)FG.icon(b.querySelector('canvas').getContext('2d'),q.it,44);b.addEventListener('click',()=>this.tapSlot(sl));d.appendChild(b);
+    if(sl===0||sl===1){const r=document.createElement('div');r.className='fgrow';const n=FG.sockets(lo.w[sl]);
+      for(let i=0;i<n;i++){const m=(lo.m[sl]||[])[i],k=document.createElement('button');k.type='button';k.className='fb';k.textContent=m?FGM.find(x=>x[0]===m)[1]:'+ MOD';
+        k.addEventListener('click',()=>{if(m)this.act(()=>FG.socket(sl,m));else{this.f='m';this.sel=null;this.say('Pick a mod, then tap SOCKET '+(sl+1));gaDraw();}});r.appendChild(k);}d.appendChild(r);}
+    g.appendChild(d);}
+  // presets
+  const Pr=sec('PRESETS');for(let i=0;i<3;i++){const p=s.pre[i],r=document.createElement('div');r.className='fgrow';r.style.marginBottom='4px';
+    r.innerHTML=`<input maxlength="14" aria-label="preset ${i+1} name" value="${fgEsc(p?p.n:'BUILD '+(i+1))}"><button type="button" class="fb" data-a="load"${p?'':' disabled'}>LOAD</button><button type="button" class="fb" data-a="save">SAVE</button>`;
+    r.querySelector('[data-a=load]').addEventListener('click',()=>this.act(()=>FG.usePre(i)||(this.say((p?p.n:'')+' loaded'),this.msg)));
+    r.querySelector('[data-a=save]').addEventListener('click',()=>{const n=r.querySelector('input').value;this.act(()=>FG.savePre(i,n)||'Saved to '+(n||'BUILD '+(i+1)));});Pr.appendChild(r);}
+  // forge
+  const own=WP_IDS.filter(id=>WP.has(id));if(!own.includes(this.a))this.a=own[0];if(!own.includes(this.b)||this.b===this.a)this.b=own.find(id=>id!==this.a&&FG.rec(this.a,id))||own.find(id=>id!==this.a)||null;
+  const Fo=sec('FORGE A HYBRID ('+Object.keys(s.hy).length+'/'+FGR.length+')');const opt=(sel,ex)=>own.map(id=>`<option value="${id}"${id===sel?' selected':''}>${WPD[id].n}${ex&&id!==ex&&FG.rec(ex,id)?' ★':''}</option>`).join('');
+  const R=this.a&&this.b?FG.rec(this.a,this.b):null,why=FG.canForge(this.a,this.b);
+  Fo.insertAdjacentHTML('beforeend',`<div class="fgrow"><select id="fgA" aria-label="first weapon">${opt(this.a)}</select><span>+</span><select id="fgB" aria-label="second weapon">${opt(this.b,this.a)}</select></div>
+    <div class="fgd"><canvas width="56" height="56" id="fgPrev" style="width:56px;height:56px"></canvas><div class="tx">${R?'<b>'+R[3].toUpperCase()+'</b><small>'+R[5]+'</small><small>'+FG_COST.scrap+' scrap + '+FG_COST.neon+' Neon · parents stay</small>':'<small>No recipe for this pair. ★ marks partners with a recipe.</small>'}</div><button type="button" class="fb" id="fgGo"${why?' disabled':''}>FORGE</button></div>`);
+  if(R)FG.icon(Fo.querySelector('#fgPrev').getContext('2d'),'h:'+R[2],56);
+  Fo.querySelector('#fgA').addEventListener('change',e=>{this.a=e.target.value;this.b=null;gaDraw();});Fo.querySelector('#fgB').addEventListener('change',e=>{this.b=e.target.value;gaDraw();});
+  Fo.querySelector('#fgGo').addEventListener('click',()=>this.act(()=>FG.forge(this.a,this.b)||(R[3]+' forged: tap it below, then a weapon slot')));
+  if(why&&R)Fo.insertAdjacentHTML('beforeend','<small>'+why+'</small>');
+  // inventory grid
+  const I=sec('INVENTORY');const fr=document.createElement('div');fr.className='fgrow';fr.style.marginBottom='6px';
+  for(const[k,l]of[['all','ALL'],['w','WEAPONS'],['h','HYBRIDS'],['m','MODS'],['k','CORES']]){const b=document.createElement('button');b.type='button';b.className='fb'+(this.f===k?' on':'');b.textContent=l;b.addEventListener('click',()=>{this.f=k;gaDraw();});fr.appendChild(b);}
+  const so=document.createElement('button');so.type='button';so.className='fb';so.textContent='SORT: '+this.sort.toUpperCase();so.addEventListener('click',()=>{this.sort={type:'level',level:'name',name:'type'}[this.sort];gaDraw();});fr.appendChild(so);I.appendChild(fr);
+  const grid=document.createElement('div');grid.className='fggrid';I.appendChild(grid);const items=this.items();
+  for(const x of items){const b=document.createElement('button');b.type='button';b.className='fgt'+(this.sel===x.it?' sel':'')+(x.own?'':' no');b.dataset.it=x.it;
+    const sub=x.ty==='m'?(x.own?'x'+x.lv+(FG.used(x.it.slice(2))?' · '+FG.used(x.it.slice(2))+' in use':''):'CRAFT '+FG_MODC):(x.ty==='k'||x.ty==='p')?(x.own?'OWNED':'CRAFT '+FG_CORC):'LV'+x.lv;
+    b.innerHTML=`<canvas width="40" height="40" style="width:40px;height:40px"></canvas><span>${fgEsc(x.n)}</span><small>${sub}</small>`;FG.icon(b.querySelector('canvas').getContext('2d'),x.it,40);
+    b.addEventListener('click',()=>{this.sel=this.sel===x.it?null:x.it;this.say('');gaDraw();});grid.appendChild(b);}
+  // detail of the selected item
+  const x=items.find(q=>q.it===this.sel)||(this.sel&&this.items.call({f:'all',sort:'type'}).find(q=>q.it===this.sel));
+  if(x){const d=document.createElement('div');d.className='fgd';d.id='fgDet';const ty=x.ty,id=x.it.slice(2),B=[];
+    if(ty==='w'||ty==='h'){B.push(['TO SLOT 1',()=>FG.equip(0,ty==='w'?id:x.it)],['TO SLOT 2',()=>FG.equip(1,ty==='w'?id:x.it)]);
+      if(ty==='h'){const lv=FG.hlv(id);if(lv<FG_MAXLV)B.push(['LEVEL UP ('+FG.lvCost(id)+')',()=>FG.levelUp(id)]);B.push(['SCRAP +'+(1+lv),()=>FG.scrapIt('h',id)]);}}
+    else if(ty==='m'){if(x.own)B.push(['SOCKET 1',()=>FG.socket(0,id)],['SOCKET 2',()=>FG.socket(1,id)],['SELL +30',()=>FG.scrapIt('m',id)]);B.push(['CRAFT ('+FG_MODC+')',()=>FG.craft('m',id)]);}
+    else{if(x.own)B.push([(ty==='k'?FG.st().lo.core:FG.st().lo.pas)===id?'UNEQUIP':'EQUIP',()=>FG.equip(ty==='k'?'core':'pas',id)],['SCRAP +2',()=>FG.scrapIt(ty,id)]);else B.push(['CRAFT ('+FG_CORC+')',()=>FG.craft(ty,id)]);}
+    d.innerHTML=`<div class="tx"><b>${fgEsc(x.n)}</b><small>${fgEsc(x.d)}</small></div>`;
+    for(const[l,f]of B){const b=document.createElement('button');b.type='button';b.className='fb';b.textContent=l;b.addEventListener('click',()=>this.act(f));d.appendChild(b);}
+    I.insertBefore(d,grid);}
+  for(const d of box.querySelectorAll('.fgslot'))d.classList.toggle('hot',!!this.sel);};
+/* the Garage tab and the gaDraw route */
+{const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='forge';b.type='button';b.textContent='FORGE';b.hidden=!FG.on;
+ b.addEventListener('click',()=>{GA.tab='forge';gaDraw();});tb.appendChild(b);
+ const g0=gaDraw;gaDraw=function(){const box=$('gaCards');if(GA.tab!=='forge'||!FG.on){box.classList.remove('fgbox');return g0.apply(this,arguments);}
+   if(garageEl.hidden&&typeof labEl!=='undefined'&&labEl&&!labEl.hidden){garageDirty=true;return;}
+   $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';for(const q of garageEl.querySelectorAll('.tabs button'))q.classList.toggle('on',q.dataset.t===GA.tab);
+   const gp=$('gaPic');if(gp)gp.style.display='none';box.classList.remove('tune','wpt');box.classList.add('fgbox');const y=box.scrollTop;INV.draw(box);box.scrollTop=y;};}
+/* pit stop: quick preset swap */
+{const q=document.createElement('div');q.className='fgq';q.id='fgQuick';q.hidden=true;const bot=shopEl.querySelector('.bot');shopEl.insertBefore(q,bot);
+ INV.pit=function(){const s=FG.st();q.hidden=!FG.on||!s.pre.some(Boolean);if(q.hidden)return;q.innerHTML='<span>BUILD</span>';
+   s.pre.forEach((p,i)=>{if(!p)return;const b=document.createElement('button');b.type='button';b.className='go dim';b.textContent=p.n;b.addEventListener('click',e=>{e.stopPropagation();const m=FG.usePre(i);if(typeof floater==='function'&&!m)floater(P.x,P.y-30,p.n,'#ffe14d');for(const o of q.querySelectorAll('button'))o.classList.toggle('on',o===b);});q.appendChild(b);});};
+ NR.on('pitStart',()=>INV.pit());}
+window.__inv={INV,draw:()=>gaDraw(),open:f=>openGarage(f),close:()=>closeGarage()};          // test hook
+
 /* ---------- COUNTER threats: DASH and EMP as the answers (flag RET.counter, ?counter=0 = the abilities without these threats). Test: nightrun/counter-test.js.
    Owner, 19 Oct 2026: "the dash button and emp still useless, the game needs to be more strategic and timing". A button only matters when some threat needs it.
    One threat every few bars (never with a boss out, in a pit stop, the lab or the tutorial), in turn from the ones the stage has unlocked:
@@ -9228,6 +9519,163 @@ const TIM=window.TIM={get on(){return!!(RET.timing&&window.ABIL&&ABIL.on);},
 #touch button#bEmp[data-t="0"]::before{content:''}#touch button.tmBig#bEmp::before{color:#ff5fd2}`;document.head.appendChild(st);}
 NR.on('tick',dt=>TIM.tick(dt));
 NR.on('runStart',()=>{if(G)G.tm=null;});
+
+/* ---------- boss ENCOUNTER MECHANICS = parts/bossplay.js (flag RET.bossplay, default off for now; ?bossplay=1 = on, ?bossplay=0 / off = the fights before it, exactly). Test: nightrun/bossplay-test.js.
+   Owner, 20 Oct 2026: "the enemies, bosses are also very predictable and repeatable; I beat the game very easy on normal ... the game needs to be more creative".
+   Every boss had its own moveset (bossmoves.js) but every fight was still "dodge while shooting the bar". Now each boss brings three MECHANICS that change how
+   you play, built from placeholder shapes (circles, triangles, squares; real art can replace BPL.draw later):
+     GATES (the boss's shield; while a gate is up its armour lets nothing through, B2X room x 0; resolve it and the boss is OPEN for OPEN s, then the next gate rises)
+       nodes  : shield nodes orbit the boss; shoot every node (they fire at you while they live)
+       medic  : a medic drone holds a link beam on the boss; kill the medic or DASH through the beam
+       emp    : an armour plate locks the core; only an EMP strips it
+       parry  : a slow signal orb is the only thing that can crack the shell; DASH as it reaches you to send it back
+       back   : the shield turns to face you; flank (get above / below) for FLANK s to reach the back
+     ARENA rules (the battlefield changes; ignoring them costs hull)
+       slab (barrier rises / falls), conveyor (deck pushes you into the boss), grid (laser columns on the bar line), ghost (a mirrored ship hunts you),
+       gravity (lanes pull you up / down), blackout (only the beat-lit lane can be seen), zone (a safe ring shrinks)
+   Each fight picks 2 of its 3 mechanics per phase (each boss has two gates and one arena rule, so a gate is always up) and shuffles its attack order with a
+   seed per attempt (signature verb kept first). A gate that is ignored overloads by itself after FB s, so no fight can lock; armour.js still owns HP, the cap,
+   the phase lines and the last stand (EXPOSED = always open). Hooks: armour.js room x BPL.k(e); bossmoves.js BMV.init -> BPL.init; c.js draw; stats.js sheet. */
+if(RET.bossplay===undefined)RET.bossplay=/[?&]bossplay=1/.test(location.search);   // OFF by default until balance-test stage 8 Normal and bossmoves-test pass with it on (HANDOFF.md)
+if(RET.bossplay)RET.sioKeys.push('mnr_bpcodex');
+const BPT={
+  tresor:  {m:['nodes','emp','slab'],     line:'BREAK THE BOLTS, EMP THE PLATE'},
+  bruecke: {m:['medic','back','conveyor'],line:'CUT THE LINK, FLANK THE SHIELD'},
+  schranke:{m:['parry','nodes','grid'],   line:'PARRY THE SIGNAL, SHOOT NODES'},
+  messe:   {m:['back','medic','ghost'],   line:'FLANK IT, KILL THE MEDIC'},
+  hoplite: {m:['back','parry','slab'],    line:'GET BEHIND IT, PARRY THE SPEAR'},
+  adler:   {m:['nodes','medic','blackout'],line:'SHOOT THE DRONES, CUT THE LINK'},
+  krake:   {m:['medic','nodes','gravity'],line:'KILL THE MEDIC, RIDE THE PULL'},
+  ice:     {m:['emp','parry','blackout'], line:'EMP THE FIREWALL, PARRY THE PACKET'},
+  kronos:  {m:['nodes','emp','zone'],     line:'SHOOT THE COINS, STAY IN THE RING'},
+  talos:   {m:['back','parry','grid'],    line:'FLANK THE GIANT, PARRY THE SPEAR'}};
+const BPN={nodes:'SHIELD NODES',medic:'MEDIC LINK',emp:'ARMOUR PLATE',parry:'PARRY ORB',back:'TURNING SHIELD',slab:'MOVING BARRIER',conveyor:'CONVEYOR DECK',
+  grid:'LASER GRID',ghost:'MIRROR GHOST',gravity:'GRAVITY LANES',blackout:'BLACKOUT',zone:'SHRINKING RING'};
+const BPH={nodes:'SHOOT THE NODES',medic:'KILL THE MEDIC OR DASH THE LINK',emp:'EMP THE PLATE',parry:'DASH TO PARRY THE ORB',back:'FLANK: GET ABOVE OR BELOW'};
+const BP_GATES=['nodes','medic','emp','parry','back'];
+const BPL=window.BPL={get on(){return!!RET.bossplay&&!!RET.bossmoves;},T:BPT,N:BPN,OPEN:8,FB:24,FLANK:.8,TEL:.8,GAP:96,auto:/[?&]bpauto=1/.test(location.search)?1.5:0,seed:null,
+  st:null,hz:[]};
+BPL.stat=()=>BPL.st||(BPL.st={boss:null,seed:0,pick:[],order:[],seen:{},res:{},how:{},fb:0,open:0,closed:0,tel:9,gap:1e9,hits:0,eb:0,maxV:0,cap:0,maxEb:0,hints:[]});
+NR.on('runStart',()=>{BPL.st=null;BPL.hz=[];});
+/* a small seeded generator per attempt (the attack order and the picks; the game's own random stays untouched) */
+BPL.rng=s=>{let a=s>>>0||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};};
+BPL.k=e=>{const b=e&&e.bp;if(!BPL.on||!b)return 1;if(e.b2&&e.b2.ls>0||e.bmS>e.bt)return 1;   /* the last stand and a bossmoves STUN are always open */return b.g&&b.g.up?0:1;};
+/* called at the end of BMV.init (the movesets are set): the seed, the picks per phase, the shuffled order */
+BPL.init=e=>{e.bp=null;if(!BPL.on||!e.bm)return;const T=BPT[e.bm.id];if(!T)return;
+  const seed=BPL.seed!=null?BPL.seed:(Math.random()*4294967295)>>>0,R=BPL.rng(seed),sig=e.bm.T.sig;
+  e.lists=e.lists.map((l,i)=>{const a=l.slice();for(let j=a.length-1;j>0;j--){const k=Math.floor(R()*(j+1));[a[j],a[k]]=[a[k],a[j]];}
+    if(i>0&&a.includes(sig)){a.splice(a.indexOf(sig),1);a.unshift(sig);}return a;});           // phases 2-3 still open with the signature verb
+  const pick=[0,1,2].map(()=>{const drop=Math.floor(R()*3);return T.m.filter((_,j)=>j!==drop);});
+  e.bp={id:e.bm.id,T,seed,R,pick,g:null,gi:0,ar:null,cy:0};
+  const s=BPL.stat();s.boss=e.bm.id;s.seed=seed;s.pick=pick.map(p=>p.slice());s.order=e.lists.map(l=>l.slice());
+  BPL.phase(e,1);BPL.say(e.nm+': '+T.line,5);};
+BPL.say=(t,d)=>{BPL.stat().hints.push(t);try{hintShow(t,d||3.5);}catch(x){}};
+BPL.codex=()=>{try{return JSON.parse(localStorage.getItem('mnr_bpcodex')||'{}')||{};}catch(x){return{};}};
+BPL.seen=(e,m)=>{const s=BPL.stat();s.seen[m]=1;const c=BPL.codex(),id=e.bp.id,o=c[id]||(c[id]={nm:String(e.nm||id),m:[]});if(!o.m.includes(m)){o.m.push(m);try{localStorage.setItem('mnr_bpcodex',JSON.stringify(c));}catch(x){}}};
+BPL.sheet=()=>{const c=BPL.codex(),ids=Object.keys(BPT).filter(id=>c[id]);if(!ids.length)return'';
+  const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  return'<h3>BOSS CODEX <span>'+ids.length+'/'+Object.keys(BPT).length+'</span></h3><div class="stParts">'+ids.map(id=>'<div><span>'+esc(c[id].nm)+'</span><em>'+c[id].m.map(m=>esc(BPN[m]||m)).join(' · ')+'</em></div>').join('')+'</div>';};
+/* a phase: its two mechanics (gates take turns; an arena rule runs the whole phase) */
+BPL.phase=(e,ph)=>{const b=e.bp;if(!b)return;const p=b.pick[ph-1]||b.pick[0];b.gs=p.filter(m=>BP_GATES.includes(m));b.ar=p.find(m=>!BP_GATES.includes(m))||null;b.gi=0;b.arS={};
+  BPL.drop(e);BPL.hz=[];if(b.ar)BPL.seen(e,b.ar);BPL.gate(e,G.t+(ph===1?1.5:2*(BT.spb||.5)*4));
+  if(ph>1)BPL.say('PHASE '+ph+': '+p.map(m=>BPN[m]).join(' + '),3.5);};
+BPL.drop=e=>{const g=e.bp&&e.bp.g;if(!g)return;for(const t of g.tg||[])if(!t.dead&&G.en.includes(t)){t.dead=1;G.en.splice(G.en.indexOf(t),1);}e.bp.g=null;};
+/* a gate rises at time t0 (telegraphed TEL s: shapes fade in, damage still counts), then holds until it is resolved or overloads after FB s */
+BPL.gate=(e,t0)=>{const b=e.bp,m=b.gs[b.gi%b.gs.length];b.gi++;BPL.drop(e);b.g={m,t0,up:0,tg:[],ct:0,fl:0,orb:null,ob:0,sa:Math.PI,shot:0,open:0};};
+BPL.raise=(e,g)=>{g.up=1;g.tu=G.t;BPL.seen(e,g.m);const ph=e.ph||1,s=BPL.stat();s.closed++;
+  if(g.m==='nodes'){const n=ph===3?4:3;for(let i=0;i<n;i++)g.tg.push(BPL.add(e,{fx:clamp(e.x-60-i*90,120,W-40),fy:i%2?H-55:55,hk:.010,role:'node'}));}   // out of the centre line: fly up / down to reach them
+  if(g.m==='medic')g.tg.push(BPL.add(e,{fx:clamp(e.x+30,0,W-30),fy:e.y>H/2?50:H-50,hk:.022,role:'medic'}));
+  BPL.say(BPH[g.m],3);AU.sfx('warn');};
+BPL.add=(e,o)=>{const t=en('mine',{x:e.x,y:e.y,wpt:1,bpRole:o.role});t.hp=t.max=t.hq=Math.max(4,Math.round(e.max*o.hk));t.gr=0;t.bpAt=Object.assign({e},o);t.score=0;return t;};
+BPL.resolve=(e,how)=>{const b=e.bp,g=b&&b.g;if(!g||!g.up)return;const s=BPL.stat(),k=g.m+':'+how;s.how[k]=(s.how[k]||0)+1;if(how!=='fb'&&how!=='ls'&&how!=='auto')s.res[g.m]=(s.res[g.m]||0)+1;if(how==='fb')s.fb++;else s.open++;
+  for(const t of g.tg)if(!t.dead){t.dead=1;burst(t.x,t.y,'#19e3ff',10,200,.4);}g.up=0;g.open=G.t+BPL.OPEN;
+  floater(e.x,e.y-e.r-34,how==='fb'?'SHIELD OVERLOAD':'OPEN!','#ffe14d');if(how!=='fb'){shake(6);AU.sfx('tier');G.score+=Math.round(800*(1+G.pos));}
+  G.rings.push({x:e.x,y:e.y,l:.6,m:.6,c:'#ffe14d'});NR.emit('bpOpen',{m:g.m,how});};
+/* test / assist hook: a player that does the thing (?bpauto=1 or BPL.auto = seconds of reaction) */
+BPL.solve=e=>BPL.resolve(e,'auto');
+/* where a player should be: the live node / medic (its row), or the far side of the turning shield (for bots and the aim assist) */
+BPL.target=()=>{const e=G.boss,g=e&&e.bp&&e.bp.g;if(!g||!g.up)return null;const x=g.tg.find(q=>!q.dead&&q.hp>0&&G.en.includes(q));if(x)return x;
+  if(g.m==='back'&&g.sy!=null)return{x:P.x,y:g.sy<H/2?H-50:50};return null;};
+/* ---- every frame ---- */
+NR.on('tick',dt=>{if(!BPL.on)return;const e=G.boss;if(!e||!e.bp||e.dead){if(BPL.hz.length)BPL.hz=[];return;}const b=e.bp,g=b.g,t=G.t,s=BPL.stat(),sb=BT.spb||.5;
+  if(e.x>bossX())return;
+  const dash=P.dashT>0&&!b.dw;b.dw=P.dashT>0;
+  if(e.b2&&e.b2.ls>0){if(g&&g.up)BPL.resolve(e,'ls');}
+  else if(g){
+    if(!g.up&&!g.open&&t>=g.t0+BPL.TEL)BPL.raise(e,g);
+    if(g.up){s.tel=Math.min(s.tel,g.tu-g.t0);
+      for(const x of g.tg){const A=x.bpAt;if(A.orb){A.a+=A.w*dt;x.x=A.e.x+Math.cos(A.a)*A.orb;x.y=clamp(A.e.y+Math.sin(A.a)*A.orb,30,H-30);}else{x.x=A.fx;x.y=A.fy+Math.sin(t*1.3+A.fx)*(A.role==='node'?18:30);}}
+      const live=g.tg.filter(x=>!x.dead&&x.hp>0&&G.en.includes(x));
+      for(const x of live){x.bpOpen=Math.abs(P.y-x.y)<(x.bpRole==='medic'?110:80);if(!x.bpOpen)x.hp=x.hq=x.max;}   // closing weak points: a node / the medic only opens to a ship in its row (stray and homing fire does nothing)
+      if((g.m==='nodes'||g.m==='medic')&&g.tg.length&&!live.length)BPL.resolve(e,'shot');
+      if(g.m==='medic'&&dash&&live.length){const m=live[0];if(BPL.segD(P.x,P.y,e.x,e.y,m.x,m.y)<34){s.cut=(s.cut|0)+1;BPL.resolve(e,'dash');}}
+      if(g.m==='emp'&&G.empT>0)BPL.resolve(e,'emp');
+      if(g.m==='back'){const w=(e.ph===3?220:160)*dt;if(g.sy==null)g.sy=P.y;g.sy+=clamp(P.y-g.sy,-w,w);g.sa=Math.atan2(g.sy-e.y,-(e.r+80));   // the shield follows your height, slower than you fly
+        if(Math.abs(P.y-g.sy)>110){g.fl+=dt;if(g.fl>=BPL.FLANK)BPL.resolve(e,'flank');}else g.fl=Math.max(0,g.fl-dt*.5);}
+      if(g.m==='parry')BPL.orb(e,g,dash,sb);
+      if(g.m==='nodes'&&live.length&&(e.bt|0)!==g.shot&&(e.bt|0)%(HARDS.includes(SET.diff)?2:4)===0){g.shot=e.bt|0;BPL.aim(live[(e.bt>>2)%live.length],sb);}   // one node shoots back each bar (each 2 beats on the hard tiers): tell .6 s, then one aimed shot
+      if(g.up&&BPL.auto&&t-g.tu>=BPL.auto)BPL.solve(e);
+      if(g.up&&t-g.tu>=BPL.FB)BPL.resolve(e,'fb');}
+    else if(g.open&&t>=g.open)BPL.gate(e,t);}
+  BPL.arena(e,b,t,sb,dt);
+  for(const z of BPL.hz)if(z.aim&&t>=z.on&&!z.done){z.done=1;const n=G.eb.length;eb.src=BPSRC;eb(z.x,z.y,Math.atan2(P.y-z.y,P.x-z.x),z.v,'#19e3ff',6);eb.src=null;if(G.eb.length>n){G.eb[n].bpl=1;s.eb++;}}
+  BPL.hz=BPL.hz.filter(z=>t<z.off);
+  let nl=0;for(const x of G.eb)if(!x.dead)nl++;s.maxEb=Math.max(s.maxEb,nl);s.cap=Math.max(s.cap,ebCap());for(const x of G.eb)if(x.bpl)s.maxV=Math.max(s.maxV,Math.hypot(x.vx,x.vy));});
+const BPSRC={type:'bossmv',arm:true};
+BPL.ang=a=>Math.atan2(Math.sin(a),Math.cos(a));
+BPL.segD=(px,py,ax,ay,bx,by)=>{const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy||1,u=clamp(((px-ax)*dx+(py-ay)*dy)/l,0,1);return Math.hypot(px-ax-u*dx,py-ay-u*dy);};
+BPL.aim=(x,sb)=>{const tl=Math.max(.6,sb*Math.ceil(.6/sb));BPL.hz.push({aim:1,x:x.x,y:x.y,on:G.t+tl,off:G.t+tl+.05,t0:G.t,v:150+20*diff()});BPL.stat().tel=Math.min(BPL.stat().tel,tl);};
+/* the parry orb: launched on a bar (tell TEL s), flies slow at the ship; a dash while it is within 110 px sends it back and cracks the shell; touching it hurts */
+BPL.orb=(e,g,dash,sb)=>{const t=G.t,s=BPL.stat();let o=g.orb;
+  if(!o&&t>=g.ob){g.orb=o={x:e.x-e.r,y:e.y,t0:t,on:t+BPL.TEL,v:150+15*diff(),back:0};s.tel=Math.min(s.tel,BPL.TEL);return;}
+  if(!o||t<o.on)return;const dt=1/60,tx=o.back?e.x:P.x,ty=o.back?e.y:P.y,a=Math.atan2(ty-o.y,tx-o.x),v=o.back?520:o.v;o.x+=Math.cos(a)*v*dt;o.y+=Math.sin(a)*v*dt;
+  const d=Math.hypot(P.x-o.x,P.y-o.y);
+  if(!o.back&&dash&&d<110){o.back=1;s.parry=(s.parry|0)+1;floater(P.x,P.y-30,'PARRY!','#19e3ff');AU.sfx('perfect');}
+  else if(!o.back&&d<20){hurt(1);s.hits++;g.orb=null;g.ob=t+2*sb*4/2;}
+  else if(o.back&&Math.hypot(e.x-o.x,e.y-o.y)<e.r){g.orb=null;BPL.resolve(e,'parry');}
+  else if(t-o.t0>9){g.orb=null;g.ob=t+sb*2;}};
+/* ---- arena rules ---- */
+BPL.arena=(e,b,t,sb,dt)=>{const m=b.ar;if(!m)return;const S=b.arS,s=BPL.stat(),bar=4*sb,x1=e.x-e.r-10;
+  if(m==='slab'){if(!S.n||t>=S.n){S.top=!S.top;S.h=Math.round(H*.32);S.t0=t;S.on=t+Math.max(BPL.TEL,bar*.5);S.off=S.on+bar*1.5;S.n=S.off+bar*.5;s.tel=Math.min(s.tel,S.on-S.t0);s.gap=Math.min(s.gap,H-S.h);}
+    if(t>=S.on&&t<S.off&&P.x<x1&&(S.top?P.y<S.h:P.y>H-S.h))BPL.hit();}
+  if(m==='conveyor'){const lane=P.y<H/2?1:-1;P.x=clamp(P.x+(lane>0?110:-70)*dt,20,W-20);}
+  if(m==='gravity'){const k=Math.floor(P.y/(H/3)),dir=(k+Math.floor(t/(bar*2)))%2?1:-1;P.y=clamp(P.y+dir*85*dt,20,H-20);}
+  if(m==='grid'){if(!S.n||t>=S.n){const n=e.ph===3?4:3,sp=Math.max(150,(x1-60)/n),o=Math.random()*40;S.c=[];for(let i=0;i<n;i++){const x=60+o+i*sp;if(x<x1-30)S.c.push(x);}
+      S.t0=t;S.on=t+Math.max(BPL.TEL,bar*.5);S.off=S.on+.45;S.n=t+bar*2;s.tel=Math.min(s.tel,S.on-S.t0);s.gap=Math.min(s.gap,sp-18);}
+    if(t>=S.on&&t<S.off&&S.c.some(x=>Math.abs(P.x-x)<9+10))BPL.hit();}
+  if(m==='ghost'){S.tr=S.tr||[];S.tr.push([t,P.x,H-P.y]);while(S.tr.length&&S.tr[0][0]<t-1.2)S.tr.shift();const q=S.tr[0];S.gx=q[1];S.gy=q[2];
+    if(t-(S.t0||(S.t0=t))>BPL.TEL&&Math.hypot(P.x-S.gx,P.y-S.gy)<26)BPL.hit();s.tel=Math.min(s.tel,BPL.TEL);}
+  if(m==='blackout'){S.lane=Math.floor((e.bt|0)/2)%3;}
+  if(m==='zone'){if(!S.n||t>=S.n){S.cx=clamp(P.x,140,x1-140);S.cy=clamp(P.y,140,H-140);S.t0=t;S.n=t+bar*2;}
+    S.r=Math.max(130,260-(t-S.t0)/(bar*2)*150);s.gap=Math.min(s.gap,2*S.r);
+    if(t-S.t0>BPL.TEL&&Math.hypot(P.x-S.cx,P.y-S.cy)>S.r){S.out=(S.out||0)+dt;if(S.out>.8){S.out=0;BPL.hit();}}else S.out=0;s.tel=Math.min(s.tel,BPL.TEL);}};
+BPL.hit=()=>{const h=P.hp;hurt(1);if(P.hp<h)BPL.stat().hits++;};
+/* ---- placeholder shapes (circles / triangles / squares); drawn after the boss hazards ---- */
+BPL.draw=()=>{const e=G.boss;if(!BPL.on||!e||!e.bp||e.x>W+40)return;const b=e.bp,g=b.g,t=G.t,rm=!!SET.reduce,pul=rm?.5:.5+.5*Math.sin(t*8);ctx.save();
+  const S=b.arS||{},x1=e.x-e.r-10,m=b.ar;
+  if(m==='blackout'){const lh=H/3;ctx.globalAlpha=rm?.55:.72;ctx.fillStyle='#02030a';for(let i=0;i<3;i++)if(i!==S.lane)ctx.fillRect(0,i*lh,x1,lh);
+    ctx.globalAlpha=.35;ctx.strokeStyle='#19e3ff';ctx.lineWidth=2;ctx.strokeRect(2,S.lane*lh+2,x1-4,lh-4);}
+  if(m==='slab'&&S.t0!=null&&t<S.off){const live=t>=S.on,y0=S.top?0:H-S.h;ctx.globalAlpha=live?.8:.18+.15*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';ctx.fillRect(0,y0,x1,S.h);
+    if(!live){ctx.globalAlpha=.9;ctx.fillStyle='#ffe14d';for(let x=40;x<x1;x+=90)BPL.tri(x,S.top?S.h+12:H-S.h-12,9,S.top?Math.PI/2:-Math.PI/2);}}
+  if(m==='conveyor'){ctx.globalAlpha=.22;ctx.fillStyle='#ffb020';const o=(t*110)%60;for(let x=-60+o;x<x1;x+=60){BPL.tri(x,H*.25,10,0);}ctx.fillStyle='#19e3ff';for(let x=x1-(t*70)%60;x>0;x-=60)BPL.tri(x,H*.75,10,Math.PI);}
+  if(m==='gravity'){ctx.globalAlpha=.2;for(let k=0;k<3;k++){const dir=(k+Math.floor(t/((BT.spb||.5)*8)))%2?1:-1;ctx.fillStyle=dir>0?'#ff7ad9':'#7ad9ff';for(let x=50;x<x1;x+=110)BPL.tri(x,(k+.5)*H/3,11,dir*Math.PI/2);}}
+  if(m==='grid'&&S.c&&t<S.off){const live=t>=S.on;for(const x of S.c){ctx.globalAlpha=live?.85:.2+.2*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';ctx.fillRect(x-(live?9:2),0,live?18:4,H);}}
+  if(m==='ghost'&&S.gx!=null){ctx.globalAlpha=.55;ctx.strokeStyle='#c78cff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(S.gx+16,S.gy);ctx.lineTo(S.gx-12,S.gy-12);ctx.lineTo(S.gx-12,S.gy+12);ctx.closePath();ctx.stroke();}
+  if(m==='zone'&&S.r){ctx.globalAlpha=.6;ctx.strokeStyle='#ffe14d';ctx.lineWidth=4;ctx.setLineDash([14,10]);ctx.beginPath();ctx.arc(S.cx,S.cy,S.r,0,7);ctx.stroke();ctx.setLineDash([]);}
+  if(g){const rise=g.up?1:clamp((t-g.t0)/BPL.TEL,0,1);ctx.globalAlpha=g.up?.9:.4*rise;
+    if(g.up&&g.m!=='back'){ctx.strokeStyle='#19e3ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,e.r+12+2*pul,0,7);ctx.stroke();}
+    if(g.m==='back'){ctx.strokeStyle='#19e3ff';ctx.lineWidth=8;ctx.beginPath();ctx.arc(e.x,e.y,e.r+16,g.sa-.8,g.sa+.8);ctx.stroke();ctx.fillStyle='#ffe14d';BPL.tri(e.x+Math.cos(g.sa+Math.PI)*(e.r+22),e.y+Math.sin(g.sa+Math.PI)*(e.r+22),9,g.sa);}
+    if(g.m==='emp'&&(g.up||rise)){ctx.fillStyle='#8a96a8';ctx.fillRect(e.x-e.r*.9-14,e.y-22,28,44);ctx.strokeStyle='#ffb020';ctx.lineWidth=2;ctx.strokeRect(e.x-e.r*.9-14,e.y-22,28,44);}
+    for(const x of g.tg)if(!x.dead){if(x.bpRole==='medic'){ctx.strokeStyle='#4dff9a';ctx.lineWidth=4;ctx.globalAlpha=.5+.3*pul;ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(x.x,x.y);ctx.stroke();ctx.globalAlpha=1;
+        ctx.fillStyle='#4dff9a';ctx.beginPath();ctx.arc(x.x,x.y,18,0,7);ctx.fill();ctx.fillStyle='#0b1a10';ctx.fillRect(x.x-3,x.y-10,6,20);ctx.fillRect(x.x-10,x.y-3,20,6);}
+      else{ctx.globalAlpha=1;ctx.strokeStyle='#19e3ff';ctx.lineWidth=3;if(x.bpOpen){ctx.beginPath();ctx.arc(x.x,x.y,18,0,7);ctx.stroke();}else{ctx.fillStyle='#19e3ff55';ctx.fillRect(x.x-15,x.y-15,30,30);ctx.strokeRect(x.x-15,x.y-15,30,30);}}}
+    if(g.orb){const o=g.orb,live=t>=o.on;ctx.globalAlpha=live?1:.4+.3*pul;ctx.strokeStyle=o.back?'#19e3ff':'#ffe14d';ctx.lineWidth=4;ctx.beginPath();ctx.arc(o.x,o.y,16,0,7);ctx.stroke();ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(o.x,o.y,6,0,7);ctx.fill();}}
+  for(const z of BPL.hz)if(z.aim){ctx.globalAlpha=.6;ctx.strokeStyle='#19e3ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(z.x,z.y,10+12*clamp((z.on-t)/.6,0,1),0,7);ctx.stroke();}
+  ctx.restore();};
+BPL.tri=(x,y,r,a)=>{ctx.beginPath();for(let i=0;i<3;i++){const q=a+i*2.094;ctx[i?'lineTo':'moveTo'](x+Math.cos(q)*r,y+Math.sin(q)*r);}ctx.closePath();ctx.fill();};
+NR.on('bossPhase',({ph})=>{const e=G.boss;if(BPL.on&&e&&e.bp)BPL.phase(e,ph);});
+NR.on('kill',({e,boss})=>{if(!boss||!e||!e.bp)return;BPL.drop(e);BPL.hz=[];const c=BPL.codex()[e.bp.id];BPL.say(e.nm+' DOWN · CODEX '+((c&&c.m)||[]).length+' MECHANICS',4);});
+window.__bpl={BPT,BPL};
 
 /* ---------- H: no AFK wins, a dying ship slows the song ----------
    STILL (declared in b.js): a ship that stays within 50 px of one spot for more than 3 s is hunted: enemies fire faster and their bullets are quicker,
@@ -9968,7 +10416,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   ctx.globalCompositeOperation='source-over';
   FXV.bullets();
   ART.fxDraw();
-  if(window.BMV&&BMV.on)BMV.draw(t);   // bossmoves.js: boss hazards and their telegraphs
+  if(window.BMV&&BMV.on)BMV.draw(t);if(window.BPL&&BPL.on)BPL.draw();   // bossmoves.js: boss hazards and their telegraphs
   drawPlayer(t);HUDX.drones(t);
   if(running&&!G.dead)FXV.ring(t);
   PW.draw(t);

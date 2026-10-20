@@ -138,7 +138,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   ctx.globalCompositeOperation='source-over';
   FXV.bullets();
   ART.fxDraw();
-  if(window.BMV&&BMV.on)BMV.draw(t);   // bossmoves.js: boss hazards and their telegraphs
+  if(window.BMV&&BMV.on)BMV.draw(t);if(window.BPL&&BPL.on)BPL.draw();   // bossmoves.js: boss hazards and their telegraphs
   drawPlayer(t);HUDX.drones(t);
   if(running&&!G.dead)FXV.ring(t);
   PW.draw(t);
