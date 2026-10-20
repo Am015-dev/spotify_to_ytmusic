@@ -142,9 +142,9 @@ function en(type,o){if(window.ROSTER)type=ROSTER.sub(type,o);const d=diff();cons
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600},flank:{r:13,hp:3,score:180},swarm:{r:9,hp:1,score:60},mine:{r:15,hp:5,score:200}}[type];
   const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2,gr:DMG.on?1:0},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK()*(window.SC?SC.hpK():1))));
   if(!o.mini&&(type==='drone'||type==='charger'||type==='turret'||type==='flank')&&GX()<eliteP()){e.el=1;e.hp=Math.round(e.hp*2);e.r=Math.round(e.r*1.25);e.score*=2;}   // elites: tougher, gold ring, shoot more
-  e.arm=e.bf===1&&type!=='charger';DIR.safe(e);
+  e.arm=e.bf===1&&type!=='charger';DIR.safe(e);if(window.VAR)VAR.apply(e,o);   // variants.js: class / orientation / tint
   e.max=e.hp;e.by=e.y;G.en.push(e);if(DMG.on&&type!=='swarm'&&G.rings.length<24)G.rings.push({x:W-14,y:e.gy||e.y,l:.5,m:.5,c:'#ff3d6a'});   // spawn telegraph at the edge it comes in from
-if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);NR.emit('spawn',e);return e;}
+if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);NR.emit('spawn',e);if(window.VAR&&VAR.pack)VAR.after(e,o);return e;}
 const WAVES={
   droneLine(){const y=gr(80,H-150);for(let i=0;i<5;i++)en('drone',{x:W+30+i*55,y,amp:0});return 2.6;},
   droneSine(){const y=gr(130,H-170);for(let i=0;i<6;i++)en('drone',{x:W+30+i*46,y,amp:70,ph:i*.6});return 3;},
@@ -158,7 +158,7 @@ const eliteP=()=>ST.on?ST.el:Math.min(.55,Math.max(DF.el?.2+.1*G.pos:0,.09*Math.
 const bsM=()=>ST.on?ST.bs*DF.sbs*UPS.bs:DF.bs*DIR.bsK*UPS.bs*STILL.bk*(1+TUNE2.loopSpd*Math.min(3,G.loop));                    // bullet speed: rises stage by stage in Story; Easy -12%, Hard +20%
 const ebCap=()=>(touchUI||rotMode?18:HARD?35:25)+(G.boss&&G.boss.x<=bossX()?5:0);   // most enemy bullets alive at once; a fan or ring that does not fit is made smaller (odd, still aimed), never cut off                                // most enemy bullets alive at once: a fan or ring that does not fit is thinned, never faster
 const BCAP=400;                                            // no enemy bullet is faster than this (the ship flies 300 to 520)
-function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=ebCap())return;G.eb.push(AI.kind({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1,hm:0},eb.src));}
+function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=ebCap())return;if(eb.src&&eb.src.vz){const q=VAR.shot(eb.src,x,y,a,s,c,r);if(!q)return;r=q.r;s=q.s;}G.eb.push(AI.kind({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1,hm:0},eb.src));}
 const PV={x:0,y:0,px:0,py:0};   // the ship's smoothed velocity (h.js), for Hard's lead shots
 const aim=e=>{if((HARD||AIQ()>=4)&&e.type!=='boss'){const t=Math.min(.8,Math.hypot(P.x-e.x,P.y-e.y)/260)*.75;return Math.atan2(P.y+PV.y*t-e.y,P.x+PV.x*t-e.x);}return Math.atan2(P.y-e.y,P.x-e.x);};
 const minShot=s=>Math.max(MINSHOT,Math.min(BCAP,s*PW.bs*bsM())*.9);   // s = the bullet's speed before the global factors
@@ -358,6 +358,7 @@ function update(dt){
       case'mine':DIR.moveMine(e,sdt,d);break;
       case'boss':bossUpdate(e,sdt,d);break;
       case'gtank':case'gturret':case'gwalker':if(window.LEAK)LEAK.move(e,sdt);break;}
+    if(e.vz)VAR.pace(e,sdt,d);   // variants.js: mini / large pace, medic link
     if(e.type!=='gate'&&e.type!=='boss'&&!G.dead&&e.x<W-2&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+(HARD?8:5)){hurt();if(e.type!=='gunship'&&e.type!=='carrier'){e.hp=0;e.rk=1;}}
     if(e.type==='boss'&&!G.dead&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+6)hurt();
   }

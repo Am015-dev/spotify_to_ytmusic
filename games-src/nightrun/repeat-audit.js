@@ -29,7 +29,7 @@ const PLAY = (o) => {
   if (!window.__hooked) {
     window.__hooked = 1; const NR = m.NR;
     NR.on('pattern', p => window.__ev('wave', p.id));
-    NR.on('spawn', e => window.__ev('enemy', e.type + (e.el ? '*' : '')));
+    NR.on('spawn', e => { window.__ev('enemy', e.type + (e.el ? '*' : '')); if (e.vk) window.__ev('look', e.vk); });   // look = variants.js: kind|class+orientation+tint
     NR.on('bossIn', x => { const b = m.G.boss; window.__ev(x.mini ? 'mini' : 'boss', (b && b.nm) + '|k' + (b && b.k)); });
     NR.on('bossPhase', x => window.__ev('phase', ((m.G.boss && m.G.boss.nm) || '?') + '|p' + x.ph));
     NR.on('setpiece', x => window.__ev('set', x.kind));
@@ -157,7 +157,7 @@ function analyse(raw) {
         const jac = prev ? +([...set].filter(x => prev.has(x)).length / new Set([...set, ...prev]).size).toFixed(2) : null; prev = set;
         const tr = runs.filter(r => r.n === n);
         byStage[n] = { mins: +(tr.reduce((a, r) => a + r.t, 0) / 60).toFixed(1), tries: tr.length, cleared: tr.some(r => r.clear && !r.god), enc: new Set(se.filter(e => ENC.has(e[2])).map(sigOf)).size,
-          enemyKinds: new Set(se.filter(e => e[2] === 'enemy').map(e => e[3])).size, waves: new Set(se.filter(e => e[2] === 'wave' || e[2] === 'zoo').map(e => e[3])).size, shotSrc: Object.keys(shotsN).length,
+          enemyKinds: new Set(se.filter(e => e[2] === 'enemy').map(e => e[3])).size, enemyLooks: new Set(se.filter(e => e[2] === 'look').map(e => e[3])).size, waves: new Set(se.filter(e => e[2] === 'wave' || e[2] === 'zoo').map(e => e[3])).size, shotSrc: Object.keys(shotsN).length,
           newThings: nov.length, newList: nov, jaccardPrev: jac, song: [...new Set(se.filter(e => e[2] === 'song').map(e => e[3]))].join('+'), bg: [...new Set(se.filter(e => e[2] === 'bg').map(e => e[3]))].join('+'),
           plainShare: +(tr.reduce((a, r) => a + r.plain, 0) / Math.max(1, tr.reduce((a, r) => a + r.t, 0))).toFixed(2) };
       }
