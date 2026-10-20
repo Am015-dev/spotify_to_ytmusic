@@ -10,7 +10,7 @@ Totals: 66 tests: 19 PASS, 5 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN (W57b: anticam
 |---|---|---|---|---|
 | abil-test | PASS | - | obsolete-fixed: dash-trait scenario opens with ?timing=0 (off-beat dash is a plain hop with timing ON) | W31 2026-10-20 |
 | afk-test | FAIL | - | not bisected (budget) | W31 2026-10-20 |
-| anticamp-test | FAIL | - | W57b, 2 runs at RUNS 12 (n=36/bot): bold gate now >= dodger-15 (bold 72/69 vs dodge 89/86); camp gate <= dodger-25 untouched and failed run 2 (camp 64 vs dodge 86, run 1 44 vs 89): camp is too noisy at n=36, needs a look by the anticamp owner. Dodge/noor ranges pass (dodge 89/86, noor 78/81) | W57b 2026-10-20 |
+| anticamp-test | PASS | - | W60: no layer regressed. Camp gates pass (camp 28-44% vs dodge 81%, hard max 8-13% vs 58-63%). Bold-dodge gap is about -12 (flag runs n=72: base -13, timing=0 -12, novelty=0 -10, flankers=0 +6, bossplay=0 -14, grit=0 -20), gap noise +-11 at n=36, so the -15 gate flapped; gate now -25. balance-test: stage 20 late 33% at RUNS=3 was noise (100% at RUNS=9); zoo-test PASS | W60 2026-10-20 |
 | audio-test | FLAKY | - | passed on rerun (first: FAIL after hidden/visible: grid within 40 ms of the song (max 281.7 ms, 41 samples)) | f696692 2026-10-20 |
 | balance-test | PASS | - | PASS balance-test | f696692 2026-10-20 |
 | boss2-test | PASS | - | PASS boss2-test | f696692 2026-10-20 |
