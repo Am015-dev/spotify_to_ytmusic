@@ -75,11 +75,34 @@ let QS_RD=null;function QS_roads(){if(QS_RD)return QS_RD;const R=[],add=(P,w,cls
   const n=Math.max(1,Math.ceil(L/8));for(let k=0;k<n;k++)Q.push({x:a.x+(b.x-a.x)*k/n,z:a.z+(b.z-a.z)*k/n,tx:(b.x-a.x)/L,tz:(b.z-a.z)/L})}if(Q.length>8)R.push({pts:Q,w,cls})};
  for(const S of CITY_S)if(S.r.cls!=='ped')add(S.pts,S.r.w,S.r.cls);try{for(const S of LZ.roads||[])add(S.pts,S.w||(S.r&&S.r.w)||8,'lz')}catch(e){}try{for(const S of mtnSamples())add(S.pts,(S.r&&S.r.w)||9,'mtn')}catch(e){}
  return QS_RD=R}
+// ramps-r21q (2026-10-20): "the roads and streets are unusable": 18 of 33 Athens ramps spanned the whole carriageway (7 m walls on 7.5 m streets). Athens street ramps now
+// sit on ONE side, at most 40 % of the road width (clear lane beside); a ramp on a street narrower than 14 m moves to the nearest wide street within 400 m (permanent
+// ramps only, QS_PERM) or, if none fits, is narrowed in place. Count is unchanged. TUNE.rampSide 0 = the old centre-line fit.
+TUNE.rampSide=1;let QS_PERM=0;
+/* worst share of any street's carriageway cross-section (2 m steps, 0.5 m across) that the ramp footprint covers, over every street near it: a ramp on one street can still cut a side street */
+function QS_cover(cx,cz,hh,len,W){const s=Math.sin(hh),c=Math.cos(hh);let worst=0;
+ for(const r of QS_roads()){if(r.cls==='lz'||r.cls==='mtn')continue;const P=r.pts,R=len/2+W/2+r.w/2+14;if(!P.some(p=>Math.hypot(p.x-cx,p.z-cz)<R))continue;
+  for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1];if(Math.hypot(a.x-cx,a.z-cz)>R+8)continue;
+   for(let t=0;t<8;t+=2){const x=a.x+(b.x-a.x)*t/8,z=a.z+(b.z-a.z)*t/8;let n=0,m=0;for(let l=-r.w/2;l<=r.w/2;l+=.5){m++;const ex=x-a.tz*l-cx,ez=z+a.tx*l-cz;if(Math.abs(ex*s+ez*c)<len/2&&Math.abs(ex*c-ez*s)<W/2)n++}worst=Math.max(worst,n/m)}}}
+ return worst}
+function QS_sideFit(x,z,h,len,w,B){const side=(r,i0,rng,away)=>{const P=r.pts,W=Math.max(3,Math.min(w,r.w*.38));
+  for(let k=0;k<=rng;k++)for(const sg of k?[1,-1]:[1]){const j=i0+sg*k*2;if(j<3||j>P.length-4)continue;const p=P[j];if(RO.ramps&&RO.ramps.some(q=>Math.hypot(q.x-p.x,q.z-p.z)<120))continue;
+   if(away){const a=abAt(p.x,p.z);if(a&&a.road&&a.road.ab)continue}
+   const f=Math.sin(h)*p.tx+Math.cos(h)*p.tz>=0?1:-1,hh=Math.atan2(p.tx*f,p.tz*f),s1=(j>>1)&1?1:-1;
+   for(const ins of r.w>=14?[2.4,.8]:[.8])for(const sd of[s1,-s1]){const off=r.w/2-W/2-ins,cx=p.x-p.tz*sd*off,cz=p.z+p.tx*sd*off;if(!QS_rampOk(cx,cz,hh,len,W).filter(m=>m[0]!=='s').length&&QS_cover(cx,cz,hh,len,W)<=.4)return{q:[cx,cz,hh,W],r,j}   /* a slope alone is fine (the lip sits on the ground at the low end) */}}
+  return null};
+ let res=null;if(B.r.w>=14)res=side(B.r,B.i,20,0);
+ if(!res&&B.r.w<14&&QS_PERM){const C=[];for(const r of QS_roads()){if(r.w<14||r.cls==='lz'||r.cls==='mtn')continue;let b=null;for(let i=0;i<r.pts.length;i++){const d=Math.hypot(r.pts[i].x-x,r.pts[i].z-z);if(!b||d<b[1])b=[i,d]}if(b&&b[1]<400)C.push([r,b[0],b[1]])}
+  C.sort((a,b)=>a[2]-b[2]);for(const[r,i]of C){res=side(r,i,10,1);if(res)break}}
+ if(!res)res=side(B.r,B.i,20,0);
+ if(!res){const P=B.r.pts,p=P[Math.min(P.length-4,Math.max(3,B.i))],W=Math.max(3,Math.min(w,B.r.w*.38)),off=B.r.w/2-W/2-.8,f=Math.sin(h)*p.tx+Math.cos(h)*p.tz>=0?1:-1;res={q:[p.x-p.tz*off,p.z+p.tx*off,Math.atan2(p.tx*f,p.tz*f),W],r:B.r,bad:1}}
+ return res}
 function QS_rampFit(x,z,h,len,w){const o={x0:Math.round(x),z0:Math.round(z),w0:w};
- const ab=typeof abAt==='function'?abAt(x,z):null;if(ab&&ab.road&&ab.road.ab&&Math.abs(ab.lat)<ab.road.w/2+2){o.keep='autobahn';QS_RL.push(o);return null}
+ const ab=typeof abAt==='function'?abAt(x,z):null;if(ab&&ab.road&&ab.road.ab&&Math.abs(ab.lat)<ab.road.w/2+2&&!(CID==='ath'&&TUNE.rampSide&&w>ab.road.w*.4)){o.keep='autobahn';QS_RL.push(o);return null}
  let B=null;for(const r of QS_roads())for(let i=0;i<r.pts.length;i++){const p=r.pts[i],d=Math.hypot(p.x-x,p.z-z);if(!B||d<B.d)B={r,i,d}}
  if(!B||B.d>400){o.keep='no road within 400 m';QS_RL.push(o);return null}
  if(B.d>B.r.w/2+4){const why=QS_rampOk(x,z,h,len,w);if(!why.length){o.keep='off-road ok';QS_RL.push(o);return null}o.why0=why.slice(0,3).join(',')}
+ if(CID==='ath'&&TUNE.rampSide&&B.r.cls!=='lz'&&B.r.cls!=='mtn'){const F=QS_sideFit(x,z,h,len,w,B);Object.assign(o,{x:Math.round(F.q[0]),z:Math.round(F.q[1]),w:F.q[3],road:F.r.cls,rw:F.r.w,moved:Math.round(Math.hypot(F.q[0]-x,F.q[1]-z)),side:1,bad:F.bad?1:0});QS_RL.push(o);return F.q}
  const P=B.r.pts,W=Math.max(5,Math.min(w,B.r.w-1));let best=null;
  for(let k=0;k<=20&&!best;k++)for(const sg of k?[1,-1]:[1]){const j=B.i+sg*k*2;if(j<3||j>P.length-4)continue;const p=P[j],f=Math.sin(h)*p.tx+Math.cos(h)*p.tz>=0?1:-1,hh=Math.atan2(p.tx*f,p.tz*f);
   if(RO.ramps&&RO.ramps.some(r=>Math.hypot(r.x-p.x,r.z-p.z)<120))continue;if(!QS_rampOk(p.x,p.z,hh,len,W).length){best=[p.x,p.z,hh];break}}

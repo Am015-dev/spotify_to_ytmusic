@@ -188,6 +188,8 @@ const LIFE_KK={len:9,hgt:1.8,gap:5,w:6,half:11.5,col:'#ffc800'};
 function LIFE_kick(it){if(it.kk!==undefined)return it.kk;const K=LIFE_KK,fx=Math.sin(it.h),fz=Math.cos(it.h);it.kk=null;
   // sink-1: never on a garage forecourt (the city starts at a garage: Athens put this kicker under the parked start car, two tyres in its side rail)
   if((RO.marks||[]).some(m=>m.kind==='garage'&&Math.hypot(m.x-it.x,m.z-it.z)<35+K.half))return null;let y0=1e9;
+  // ramps-r21q: the 6 m wedge pair spans an 8 m Athens street (75 %); a kicker needs a street >= 15 m wide (<= 40 %, a clear lane beside it)
+  {const q=cityAt(it.x,it.z);if(q&&q.road&&q.d<q.road.w/2+8&&q.road.w<K.w/.4)return null}
  for(const a of[-K.half,-K.gap/2,0,K.gap/2,K.half])for(const b of[-K.w/2,K.w/2]){const x=it.x+fx*a+fz*b,z=it.z+fz*a-fx*b,g=LIFE_gy(x,z);
   if(!isFinite(g)||Math.abs(g-it.y)>.8||Math.abs(groundAt(x,z,it.y+1)-g)>.3||roamHit(x,z,.8,g+1))return null;y0=Math.min(y0,g)}
  const m=K.gap/2+K.len/2,R=s=>({x:it.x+fx*m*s,z:it.z+fz*m*s,h:s<0?it.h:it.h+Math.PI,len:K.len,hgt:K.hgt,w:K.w,y0,dk:false,col:0xffcd03,lx:1});
