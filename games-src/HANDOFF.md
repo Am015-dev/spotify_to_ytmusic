@@ -718,3 +718,9 @@ parts/density.js: per-stage bullets-on-screen budget via slow curtains (dir.js b
 
 ## W31 Nightrun test triage (2026-10-20)
 Obsolete tests rewritten (see games-src/nightrun/TEST-LEDGER.md "W31 triage"). Open: hud-cover (phone HUD 27% at 375x553), readable worst-10% contrast, timing random bot 92%, ret-walls, scale3, afk, ret-leak (speed sampler). Forge recipe trims in parts/forge.js; forge Hard-30 check is noisy. Never run: ui-align, ui-weapons, vary, wcard, weapon, zoo.
+
+## Nightrun novelty layer (W41, flag RET.novelty default OFF, `?novelty=1` = on, 20 Oct 2026)
+`parts/novelty.js` (after rules.js in build.py). Session clock = game seconds over stages (sessionStorage), codex of seen combos (localStorage `nr-novelty`), private RNG (no GR draws).
+Twists (ease in from session min 8, all repeats by min 28; armored / leader / gilded kills pay extra Neon): a wave repeated inside 5 min comes back swift / armored / gilded / tiny / lead or a combo (unseen first, then least recent); the wave id becomes `id^twist`.
+Epochs every 20 min (skin set + one combo twist, rule `epoch:n:skin`); mini-events every 5 min with a 1.2 s tell (ambush with 140 px gap, convoy x3, rest +1 hull, rush gunship x2, rival duel); unlocks every 12 min with a NEW banner.
+Blocker to turn it on: with it on, vary-test fails sandwich/wave (1 unit appears inside the screen near the ship) and variants-test stage 45 looks 14-18 < 20 (stage 30 bullets 41 > 35 once); old build passes both. Rival duel now an elite drone (was flank, suspect for the spawn-near-ship fail). Not done: per-epoch bullet colours, backdrop palette and music variant; rival duel is an elite arrowhead, not the echo-ship. Gate: `novelty-test.js`. Audit arcade-normal: repeat 82% -> 40%, mech gap 9.3 -> 6.9 min, plain 30%; new things after min 150 are mostly wave^twist combos (non-twist 21/30 min). econ-test is noisy at RUNS=2 (old build 10.4-13.3 h); use RUNS=6. Art ids: ASSETS-NEEDED-2.md "Novelty layer".
