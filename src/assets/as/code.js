@@ -160,7 +160,7 @@ function AS_fix(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=AS
   for(const i of T)cnt[i]=0;T.length=0}sw+=ch;if(!ch)break}return sw}
 function AS_farM(p,m){const V=ASSET.V[p.av];TR1_s(p);return m.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),V.cls==='keep'?_ts.set(1,1,1):_ts.set(V.rx*(p.cvs?p.cvs[0]:1),V.H*(p.cvs?p.cvs[1]:1),V.rx*(p.cvs?p.cvs[0]:1)))/* city-var: p.cvs = foliage-mix size (98cv) */}
 // far instances of assigned props: variant scale + crown tint (+ debris colour)
-function AS_far(L){const M=new THREE.Matrix4(),dirty=new Set();for(const p of L){if(!p.av||!p.im)continue;const V=ASSET.V[p.av];if(V.cls==='keep')continue;if(p.alive)p.im.setMatrixAt(p.i,AS_farM(p,M));if(p.im.geometry.userData.asImp){p.im.setColorAt(p.i,_asC.setRGB(V.cell/255,0,0));if(p.im.material!==ASSET.imp.mat)p.im.material=ASSET.imp.mat;p.im.castShadow=false}else if(p.im.instanceColor)p.im.setColorAt(p.i,V.leaf);p.col=V.leaf.clone();dirty.add(p.im)}
+function AS_far(L){const M=new THREE.Matrix4(),dirty=new Set();for(const p of L){if(!p.av||!p.im)continue;const V=ASSET.V[p.av];if(V.cls==='keep')continue;if(p.alive)p.im.setMatrixAt(p.i,AS_farM(p,M));if(p.im.geometry.userData.asImp){p.im.setColorAt(p.i,_asC.setRGB(V.cell/255,0,0));if(p.im.material!==ASSET.imp.mat)p.im.material=ASSET.imp.mat;p.im.castShadow=false}else if(p.im.instanceColor)p.im.setColorAt(p.i,V.leaf);p.col=typeof SOA!=='undefined'&&SOA.on?(V._lc||(V._lc=V.leaf.clone())):V.leaf.clone();dirty.add(p.im)}
  for(const im of dirty){im.instanceMatrix.needsUpdate=true;if(im.instanceColor)im.instanceColor.needsUpdate=true;im.computeBoundingSphere()}}
 // far LOD = LEGO impostors (asset-2; Alex: replace the cone trees in the far distance): every tree/bush variant's simplified build is rendered once into
 // a 4x4 atlas (256 px cells, render target with mipmaps, cleared to the crown colour at alpha 0 so mips have no dark fringe) from 22° above (as the player sees far trees) under a fixed sun + sky,
@@ -263,3 +263,9 @@ window.__as={impMesh:AS_impMesh,impAtlas:AS_impAtlas,A:ASSET,R:AS_R,build:AS_bui
   S.sort((a,b)=>a-b);const q=f=>+(S[Math.min(S.length-1,Math.floor(S.length*f))]||0).toFixed(2);// share of the most common variant among the trees in a 30 m disc (≥5 trees)
   return{trees:T.length,variants:Object.keys(by).length,by,p50:q(.5),p95:q(.95),worst:q(1),over:+(S.filter(v=>v>.3).length/Math.max(S.length,1)).toFixed(3),samples:S.length}}};
 try{AS_apply()}catch(e){console.warn('AS apply',e)}
+// perf-r18g: STR_lzFree drops a freed LAZY region's props from HUB.props / pgrid, but ASSET.ag (the 30 m variant grid) kept them and their disposed meshes
+// (~15 MB after 60 s desktop roam). Drop them with the region: only the 30 m cells over its rect (+60 m). ?asg=0 = off
+if(!/[?&]asg=0\b/.test(location.search))STR_lzFree=(f=>function(L){const R=L&&L.root,r=f.apply(this,arguments),G=ASSET.ag,q=L&&L.rect;if(!R||!G||!q)return r;
+ const inR=o=>{for(let t=o;t;t=t.parent)if(t===R)return true;return false};
+ for(let i=Math.floor((q[0]-60)/30);i<=Math.floor((q[1]+60)/30);i++)for(let j=Math.floor((q[2]-60)/30);j<=Math.floor((q[3]+60)/30);j++){const k=i*100000+j,A=G.get(k);if(!A)continue;
+  let n=0;for(const p of A)if(!(p.im&&inR(p.im)))A[n++]=p;if(!n)G.delete(k);else A.length=n}return r})(STR_lzFree);

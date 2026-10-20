@@ -10,7 +10,7 @@ const BK={on:/[?&]bk=0\b/.test(location.search)?0:1,st:{q:0,c:0},C:[]},BK_MAX=80
 // builds the cap is 30000 (~1.4 KB per cityAt cell), and hubEnter trims every cache back to BK_MAX
 let BK_boot=1;const BK_cap=()=>BK_boot?30000:BK_MAX;
 const BK0={trailDist,fillAt,cityAt,abAt,rivClear,mtnDist};
-const BK_cache=()=>{const M=new Map();BK.C.push(M);return M};
+const BK_cache=(cs=64,D=100000)=>{const M=new Map();M.cs=cs;M.D=D;BK.C.push(M);return M};
 // point candidates for cell [x0,x1]×[z0,z1]: P = flat [x,z,off,grp,payload…] (stride st), lim = initial best (squared when sq)
 function BK_cand(P,st,x0,z0,x1,z1,sq,lim,grp=true){const n=P.length/st;let u1=lim,g1=-1,u2=lim;const lb=new Float64Array(n);
   for(let j=0,o=0;j<n;j++,o+=st){const px=P[o],pz=P[o+1],dx=Math.max(x0-px,0,px-x1),dz=Math.max(z0-pz,0,pz-z1),ax=Math.max(Math.abs(px-x0),Math.abs(px-x1)),az=Math.max(Math.abs(pz-z0),Math.abs(pz-z1));
@@ -18,7 +18,7 @@ function BK_cand(P,st,x0,z0,x1,z1,sq,lim,grp=true){const n=P.length/st;let u1=li
     if(u<u1){if(g!==g1)u2=u1;g1=g;u1=u}else if(u<u2&&g!==g1)u2=u}
   const U=grp?u2:u1,lim2=(sq?U*(1+1e-9)+1e-6:U+1e-6),keep=[];for(let j=0;j<n;j++)if(lb[j]<=lim2)keep.push(j);const out=new Float64Array(keep.length*st);keep.forEach((j,k)=>{for(let a=0;a<st;a++)out[k*st+a]=P[j*st+a]});return out}
 // whole-map point list → two-level lookup (512 m coarse, 64 m fine)
-function BK_two(P,st,sq,lim){const CO=BK_cache(),FI=BK_cache();return(x,z)=>{const fx=Math.floor(x/64),fz=Math.floor(z/64),fk=fx*100000+fz;let c=FI.get(fk);if(c)return c;
+function BK_two(P,st,sq,lim){const CO=BK_cache(512),FI=BK_cache();return(x,z)=>{const fx=Math.floor(x/64),fz=Math.floor(z/64),fk=fx*100000+fz;let c=FI.get(fk);if(c)return c;
   const cx=Math.floor(x/512),cz=Math.floor(z/512),ck=cx*100000+cz;let C=CO.get(ck);if(!C){if(CO.size>BK_cap())CO.clear();C=BK_cand(P,st,cx*512,cz*512,cx*512+512,cz*512+512,sq,lim,false);CO.set(ck,C)}
   if(FI.size>BK_cap())FI.clear();c=BK_cand(C,st,fx*64,fz*64,fx*64+64,fz*64+64,sq,lim,false);FI.set(fk,c);BK.st.c++;return c}}
 // trails: min over every 2nd sample of (dx²+dz²), then sqrt
@@ -37,7 +37,7 @@ const BK_ci=BK_cache();cityAt=function(x,z,skip=-1){if(!BK.on)return BK0.cityAt(
   let bd=1e12,bs=-1,bi=0;for(let o=0;o<C.length;o+=5){if(C[o+3]===skip)continue;const dx=C[o]-x,dz=C[o+1]-z,d=dx*dx+dz*dz;if(d<bd){bd=d;bs=C[o+3];bi=C[o+4]}}
   if(bs<0)return null;const S=CITY_S[bs],p=S.pts[bi];return{d:Math.sqrt(bd),lat:(x-p.x)*p.tz-(z-p.z)*p.tx,s:p.s,road:S.r,si:bs,i:bi,S,p}};
 // Autobahn: nearest sample within 60 m in the 3×3 100 m neighbourhood
-let BK_abG=null;const BK_ab=BK_cache();abAt=function(x,z){if(!BK.on)return BK0.abAt(x,z);if(!AB_G)BK0.abAt(0,0);if(BK_abG!==AB_G){BK_ab.clear();BK_abG=AB_G}BK.st.q++;const S0=abSamples(),kx=Math.floor(x/100),kz=Math.floor(z/100),k=kx*10000+kz;let C=BK_ab.get(k);
+let BK_abG=null;const BK_ab=BK_cache(100,10000);abAt=function(x,z){if(!BK.on)return BK0.abAt(x,z);if(!AB_G)BK0.abAt(0,0);if(BK_abG!==AB_G){BK_ab.clear();BK_abG=AB_G}BK.st.q++;const S0=abSamples(),kx=Math.floor(x/100),kz=Math.floor(z/100),k=kx*10000+kz;let C=BK_ab.get(k);
   if(!C){const P=[];for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const L=AB_G.get((kx+a)*10000+kz+b);if(!L)continue;for(let j=0;j<L.length;j+=2){const p=S0[L[j]].pts[L[j+1]];P.push(p.x,p.z,0,L[j],L[j+1])}}
     if(BK_ab.size>BK_cap())BK_ab.clear();C=BK_cand(P,5,kx*100,kz*100,kx*100+100,kz*100+100,true,3600,false);BK_ab.set(k,C);BK.st.c++}
   let bd=3600,bs=-1,bi=0;for(let o=0;o<C.length;o+=5){const dx=C[o]-x,dz=C[o+1]-z,d=dx*dx+dz*dz;if(d<bd){bd=d;bs=C[o+3];bi=C[o+4]}}
@@ -63,5 +63,10 @@ window.__bk={BK,clear:()=>BK.C.forEach(M=>M.clear()),cells:()=>BK.C.reduce((a,M)
   out.cells=window.__bk.cells();return out}};
 // the caches only help while something is being built: 5 s without a query in roam → drop them (lazy regions rebuild them on demand)
 {let q0=-1;setInterval(()=>{if(BK.st.q===q0&&state==='roam'&&window.__bk.cells())window.__bk.clear();q0=BK.st.q},5000)}
+// perf-r18g: while you keep driving the caches never go idle, so they grew with the area visited (~7 MB after 60 s desktop roam). Every 5 s in roam each cache drops
+// the cells farther than BK.far m from the car (a later query there re-bakes them: same answers). ?bkd=0 = off
+BK.far=/[?&]bkd=0\b/.test(location.search)?0:1200;BK.st.ev=0;
+function BK_trim(x,z,R){for(const M of BK.C){const cs=M.cs,D=M.D,h=cs/2;for(const k of M.keys()){const i=Math.round(k/D),j=k-i*D;if(Math.hypot(i*cs+h-x,j*cs+h-z)>R+cs){M.delete(k);BK.st.ev++}}}}
+setInterval(()=>{if(BK.far&&state==='roam'&&typeof RO!=='undefined'&&RO.on)BK_trim(RO.x,RO.z,BK.far)},5000);
 
 hubEnter=(f=>function(){BK_boot=0;for(const M of BK.C)if(M.size>BK_MAX)M.clear();return f.apply(this,arguments)})(hubEnter);

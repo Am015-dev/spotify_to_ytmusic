@@ -35,32 +35,42 @@ function FC_occ(){FC.occT=FC.t;const L=[];scene.traverse(o=>{if(!o.isMesh||!o.vi
 // merged chunks' bounding spheres always contain the ray): 215 occluders, 3.6 M triangles, 66 ms per pull, every 3rd frame (p95 frame 109 ms, desktop).
 // Each occluder geometry now gets a 2D triangle grid (local x/z, 8 m cells), built lazily for meshes whose box is near the car, ≤ 1.5 ms per frame.
 // Instanced and batched meshes (per-instance matrices) keep three's raycast. Same answer as the raycast: double-sided triangles, hits between 0 and far, distance from the camera. ?fcbvh=0 = the old path.
-const FCG={on:!/[?&]fcbvh=0/.test(location.search),W:new WeakMap(),cs:8,ms:1.5,q:[],pq:[],iM:new THREE.Matrix4(),a:new THREE.Vector3(),b:new THREE.Vector3(),bx:new THREE.Box3(),sg:new THREE.Box3(),st:{built:0,tris:0,hits:0,miss:0,ms:0}};
+const FCG={on:!/[?&]fcbvh=0/.test(location.search),W:new WeakMap(),cs:8,ms:1.5,q:[],pq:[],iM:new THREE.Matrix4(),a:new THREE.Vector3(),b:new THREE.Vector3(),bx:new THREE.Box3(),sg:new THREE.Box3(),st:{built:0,tris:0,hits:0,miss:0,ms:0,mb:0},R:new Int32Array(4)};
 function FCG_ok(g){const p=g&&g.attributes&&g.attributes.position;return!!p&&p.itemSize>=3&&!g.morphAttributes.position}
 function FCG_get(g){const e=FCG.W.get(g),p=g.attributes.position;if(e&&e.pos===p&&e.ver===p.version&&e.ix===g.index)return e;
-  const n=g.index?g.index.count/3|0:p.count/3|0,ne={pos:p,ver:p.version,ix:g.index,n,i:0,cells:new Map(),bigT:[],done:false,seen:null,tot:0,pk:null,stamp:0};FCG.W.set(g,ne);return ne}
+  const n=g.index?g.index.count/3|0:p.count/3|0,ne={pos:p,ver:p.version,ix:g.index,n,i:0,bigT:[],done:false,seen:null,tot:0,stamp:0};FCG.W.set(g,ne);return ne}
 function FCG_vtx(g){const p=g.attributes.position,f=!p.isInterleavedBufferAttribute&&!p.normalized&&p.array instanceof Float32Array&&p.itemSize===3?p.array:null;
   return f?(i,o)=>{o[0]=f[i*3];o[1]=f[i*3+1];o[2]=f[i*3+2]}:(i,o)=>{o[0]=p.getX(i);o[1]=p.getY(i);o[2]=p.getZ(i)}}
-function FCG_build(g,e,t0){const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0],B=[0,0,0],C=[0,0,0],cs=FCG.cs,M=e.cells;
-  while(e.i<e.n){const k=e.i++,a=ix?ix[k*3]:k*3,b=ix?ix[k*3+1]:k*3+1,c=ix?ix[k*3+2]:k*3+2;V(a,A);V(b,B);V(c,C);
-    const x0=Math.floor(Math.min(A[0],B[0],C[0])/cs),x1=Math.floor(Math.max(A[0],B[0],C[0])/cs),z0=Math.floor(Math.min(A[2],B[2],C[2])/cs),z1=Math.floor(Math.max(A[2],B[2],C[2])/cs);
-    if((x1-x0+1)*(z1-z0+1)>256){e.bigT.push(k);continue}   // huge triangles (ground sheets): tested on every ray
-    for(let x=x0;x<=x1;x++)for(let z=z0;z<=z1;z++){const kk=(x+32768)*65536+(z+32768);let L=M.get(kk);if(!L){M.set(kk,L=[]);e.tot++}L.push(k);e.tot++}
-    if((k&63)===63&&performance.now()-t0>FCG.ms)return}
-  e.seen=new Uint32Array(e.n);e.done=true;FCG.st.built++;FCG.st.tris+=e.n;if(MEMC_ON)FCG.pq.push(e)}
-// perf-r15c: a finished grid is packed into one Int32Array ([count, tri...] per cell; the Map keeps the start offset): one small JS array per 8 m cell was ~26 MB of
-// retained heap after 30 s of Frankfurt roam (216 k cells, 1.1 M entries). Same cells, same triangle order, same hits.
-// perf-r17d: the pack runs in slices inside the FCG.ms budget (one big mesh was a 47 ms step; the first Frankfurt pass hit 117 ms with every occluder's seen[] allocated up front); hits use the unpacked cells until the swap.
-function FCG_packStep(t0){const q=FCG.pq;while(q.length){const e=q[0],P=e.pk||(e.pk={it:e.cells.entries(),I:new Int32Array(e.tot),M:new Map(),o:0});
-  for(let j=0;j<64;j++){const nx=P.it.next();if(nx.done){e.cells=P.M;e.I=P.I;e.pk=null;q.shift();break}const k=nx.value[0],L=nx.value[1];P.M.set(k,P.o);P.I[P.o++]=L.length;for(let i=0;i<L.length;i++)P.I[P.o++]=L[i]}
-  if(performance.now()-t0>FCG.ms)return}}
+// perf-r18i: the grid is typed arrays only (no [] or Map per cell): a dense cell table over the mesh's x/z box, counting sort in three sliced phases
+// (0 count per cell, 1 prefix sum, 2 fill one Int32Array, triangles in ascending order per cell). S[c]..S[c+1] = the triangles of cell c = cx*H+cz. Same cells, same hits.
+// A box with more than 2^19 cells doubles this grid's cell size (e.cs) until it fits: coarser cells only add candidates, the exact test is unchanged.
+function FCG_rng(V,ix,k,A,B,C,R,cs,ox,oz){const a=ix?ix[k*3]:k*3,b=ix?ix[k*3+1]:k*3+1,c=ix?ix[k*3+2]:k*3+2;V(a,A);V(b,B);V(c,C);
+  R[0]=Math.floor(Math.min(A[0],B[0],C[0])/cs)-ox;R[1]=Math.floor(Math.max(A[0],B[0],C[0])/cs)-ox;R[2]=Math.floor(Math.min(A[2],B[2],C[2])/cs)-oz;R[3]=Math.floor(Math.max(A[2],B[2],C[2])/cs)-oz}
+function FCG_build(g,e,t0){const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0],B=[0,0,0],C=[0,0,0],R=FCG.R;
+  if(e.ph===undefined){if(!g.boundingBox)g.computeBoundingBox();const bb=g.boundingBox;let cs=FCG.cs,ox,oz,W,H;
+    for(;;){ox=Math.floor(bb.min.x/cs);oz=Math.floor(bb.min.z/cs);W=Math.floor(bb.max.x/cs)-ox+1;H=Math.floor(bb.max.z/cs)-oz+1;if(!(W*H>524288))break;cs*=2}
+    if(!(W>0&&H>0)){W=1;H=1}   // empty box
+    e.cs=cs;e.ox=ox;e.oz=oz;e.W=W;e.H=H;e.S=new Int32Array(W*H+1);e.ph=0;e.i=0;e.tot=0}
+  const cs=e.cs,ox=e.ox,oz=e.oz,W=e.W,H=e.H,S=e.S,n=e.n;
+  if(e.ph===0){while(e.i<n){const k=e.i++;FCG_rng(V,ix,k,A,B,C,R,cs,ox,oz);
+      if((R[1]-R[0]+1)*(R[3]-R[2]+1)>256){e.bigT.push(k);continue}   // huge triangles (ground sheets): tested on every ray
+      for(let x=Math.max(R[0],0),xe=Math.min(R[1],W-1);x<=xe;x++)for(let z=Math.max(R[2],0),ze=Math.min(R[3],H-1);z<=ze;z++){S[x*H+z]++;e.tot++}
+      if((k&63)===63&&performance.now()-t0>FCG.ms)return}
+    e.ph=1;e.i=0;e.run=0;e.I=new Int32Array(e.tot)}
+  if(e.ph===1){const N=W*H;while(e.i<N){const end=Math.min(N,e.i+32768);let r=e.run;for(let c=e.i;c<end;c++){r+=S[c];S[c]=r}e.run=r;e.i=end;if(performance.now()-t0>FCG.ms&&e.i<N)return}
+    S[N]=e.tot;e.ph=2;e.i=n-1}
+  if(e.ph===2){const I=e.I,bt=e.bigT;let bi=bt.length-1;   // descending k: --S[c] leaves S[c] = the cell's start, triangles ascending
+    while(e.i>=0){const k=e.i--;if(bi>=0&&bt[bi]===k){bi--;continue}FCG_rng(V,ix,k,A,B,C,R,cs,ox,oz);
+      for(let x=Math.max(R[0],0),xe=Math.min(R[1],W-1);x<=xe;x++)for(let z=Math.max(R[2],0),ze=Math.min(R[3],H-1);z<=ze;z++)I[--S[x*H+z]]=k;
+      if((k&63)===63&&performance.now()-t0>FCG.ms)return}}
+  e.seen=new Uint32Array(e.n);e.done=true;e.ph=3;FCG.st.built++;FCG.st.tris+=e.n;FCG.st.mb+=(S.byteLength+e.I.byteLength+e.seen.byteLength)/1048576}
 // perf-r17d: the bounding box of a big merged mesh is scanned 20 k vertices at a time inside the budget (same box as GFX_bbox)
 function FCG_bbox(g,e,t0){const p=g.attributes.position,a=p.array;if(p.isInterleavedBufferAttribute||!(a instanceof Float32Array)||p.itemSize!==3||p.normalized||g.morphAttributes.position||a.length<p.count*3){GFX_bbox(g);return true}
   const B=e.bb||(e.bb={i:0,n:p.count,v:[Infinity,Infinity,Infinity,-Infinity,-Infinity,-Infinity]}),v=B.v;let x0=v[0],y0=v[1],z0=v[2],x1=v[3],y1=v[4],z1=v[5];
   while(B.i<B.n){const end=Math.min(B.n,B.i+20000);for(let i=B.i*3,ie=end*3;i<ie;i+=3){const x=a[i],y=a[i+1],z=a[i+2];if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;if(z<z0)z0=z;if(z>z1)z1=z}B.i=end;v[0]=x0;v[1]=y0;v[2]=z0;v[3]=x1;v[4]=y1;v[5]=z1;if(B.i<B.n&&performance.now()-t0>FCG.ms)return false}
   g.boundingBox=B.n?new THREE.Box3(new THREE.Vector3(x0,y0,z0),new THREE.Vector3(x1,y1,z1)):new THREE.Box3();e.bb=null;return true}
 // queue meshes whose world box is within 80 m of the camera->car segment; build ≤ FCG.ms per frame (nearest first)
-function FCG_work(c,o){const t0=performance.now();FCG_packStep(t0);FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(o).expandByScalar(80);
+function FCG_work(c,o){const t0=performance.now();FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(o).expandByScalar(80);
   for(const m of FC.occ){if(m.isInstancedMesh||m.isBatchedMesh||!FCG_ok(m.geometry))continue;const g=m.geometry,e=FCG_get(g);if(e.done)continue;if(!g.boundingBox&&!FCG_bbox(g,e,t0))break;   // perf-10: boxes inside the budget (one frame boxed every new occluder)
     if(!FCG.bx.copy(g.boundingBox).applyMatrix4(m.matrixWorld).intersectsBox(FCG.sg))continue;FCG_build(g,e,t0);if(performance.now()-t0>FCG.ms)break}
   FCG.st.ms+=performance.now()-t0}
@@ -69,11 +79,11 @@ function FCG_hit(m,c,far){const g=m.geometry;if(!FCG_ok(g)||!m.layers.test(FC.rc
   if(!e||!e.done||e.pos!==g.attributes.position||e.ver!==g.attributes.position.version||e.ix!==g.index){FCG.st.miss++;return -1}   // perf-10: not indexed yet = no hit until FCG_work has built it (was three's full-triangle raycast: 40-55 ms frames in Frankfurt)
   const rd=FC.rc.ray.direction,ew=FCG.a.copy(rd).multiplyScalar(far).add(c);if(!g.boundingBox)g.computeBoundingBox();
   if(!FCG.bx.copy(g.boundingBox).applyMatrix4(m.matrixWorld).intersectsBox(FCG.sg.makeEmpty().expandByPoint(c).expandByPoint(ew)))return -1;
-  const iM=FCG.iM.copy(m.matrixWorld).invert(),lo=FCG.b.copy(c).applyMatrix4(iM),le=ew.applyMatrix4(iM),cs=FCG.cs;
+  const iM=FCG.iM.copy(m.matrixWorld).invert(),lo=FCG.b.copy(c).applyMatrix4(iM),le=ew.applyMatrix4(iM),cs=e.cs;
   const ox=lo.x,oy=lo.y,oz=lo.z,dx=le.x-ox,dy=le.y-oy,dz=le.z-oz,x0=Math.floor(Math.min(ox,le.x)/cs),x1=Math.floor(Math.max(ox,le.x)/cs),z0=Math.floor(Math.min(oz,le.z)/cs),z1=Math.floor(Math.max(oz,le.z)/cs);
   if((x1-x0+1)*(z1-z0+1)>400)return null;
   const ix=g.index&&g.index.array,V=FCG_vtx(g),A=[0,0,0],B=[0,0,0],C=[0,0,0],sn=++e.stamp>>>0;let best=-1;FCG.st.hits++;
-  for(let x=x0-1;x<=x1;x++)for(let z=z0;z<=z1;z++){let L=x<x0?e.bigT:e.cells.get((x+32768)*65536+(z+32768));if(L===undefined)continue;if(x<x0&&z>z0)continue;let i0=0,i1=L.length;if(typeof L==='number'){i0=L+1;i1=i0+e.I[L];L=e.I}
+  for(let x=x0-1;x<=x1;x++)for(let z=z0;z<=z1;z++){let L,i0,i1;if(x<x0){if(z>z0)continue;L=e.bigT;i0=0;i1=L.length}else{const cx=x-e.ox,cz=z-e.oz;if(cx<0||cz<0||cx>=e.W||cz>=e.H)continue;const c=cx*e.H+cz;L=e.I;i0=e.S[c];i1=e.S[c+1]}
     for(let ii=i0;ii<i1;ii++){const k=L[ii];if(e.seen[k]===sn)continue;e.seen[k]=sn;V(ix?ix[k*3]:k*3,A);V(ix?ix[k*3+1]:k*3+1,B);V(ix?ix[k*3+2]:k*3+2,C);
       // Moller-Trumbore, both faces, t in [0,1] along the local segment (affine: same fraction of the world segment)
       const e1x=B[0]-A[0],e1y=B[1]-A[1],e1z=B[2]-A[2],e2x=C[0]-A[0],e2y=C[1]-A[1],e2z=C[2]-A[2],px=dy*e2z-dz*e2y,py=dz*e2x-dx*e2z,pz=dx*e2y-dy*e2x,det=e1x*px+e1y*py+e1z*pz;

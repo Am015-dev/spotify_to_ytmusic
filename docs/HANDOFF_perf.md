@@ -1,3 +1,10 @@
+## r18j (2026-10-20, alex/od-int2): Athens start pose + 5 seeded cars
+1. src/98bp_warmall.js: R17_off also moves the Athens start 40 m back on the same road (?r17ao=0 = old); R17_seed seeds 5 cars at 50-120 m (?r17n5=0 = 3 cars; finer slot grid, 14 m spacing).
+2. GO r17/start-life (src/99c7_rev5fix.js): top-left open >= 90 % in both cities, >= 3 cars in the frustum 40-120 m ahead.
+3. Measured (open %, cars in frustum), before -> after: ath 852x393 83,20 -> 95,23; ath 393x852 94,0 -> 95,5 (5 frames in; 2 after 90 frames as seeded cars drive off); fra 852x393 / 393x852 95,20 / 97,12 unchanged.
+4. Shots docs/shots/r18j/ (fra|ath _land|port _before|after). tools/perf1/tR17v.js CAND=[[d,dh,lat]] chose -40 m (96 % vs 83 % at 0).
+5. Left: portrait cars are tiny dots at 50-120 m; seeded ones leave the 120 m band in ~2 s.
+
 ## r17v (2026-10-20, alex/od-int2): Frankfurt start pose clears the top-left tower
 1. src/98bp_warmall.js R17_off (before R17_seed): Frankfurt spawn turned 180 deg on the same road and moved 40 m back along the new heading (spawn0 updated, camera snapped); ?r17turn=0&r17off=0 = old pose. +40/+60/+80 forward hit the side-challenge ring/card, -80 faces a blue tower, so they were rejected by shot.
 2. GO r17/start-life: top-left open >= 90 % (Athens >= 80 %) and >= 2 cars in the camera frustum 40-120 m ahead (R17_vis). tools/perf1/tR17v.js measures + shoots (CAND=[[d,dh,lat],..] pose search).
@@ -582,3 +589,67 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Shots docs/shots/r17z (852x393 ath/fra lodc 3 vs 7, ath 393x852 lodc 7): looked at, skyline and fog line identical, no holes, no visible pop-in; stationary car only (no roam pop-in test).
 4. tBoot lowmem=1 60 s solo, render-owned >50 ms frames (PF1OWN): fra lodc3 1 / lodc7 0; ath lodc3 2 render / lodc7 2 render (+2 hubTrafficStep-self); all ≤ 20/min. Governor end quality stayed q:min in tDraw at 45 s: NOT met, software GL is fill-bound; needs on-device numbers.
 5. Gates (built r17zb): unit 0 FAIL; perf/touch-render,touch-first-frames 3/3 with ?lowmem=1; r13/sky-blue*,life1,xf1,terrain,phone2 47/47.
+
+## ios-r18d: HUB.bld / HUB.props SoA, measured first (no engine change)
+1. Measured (tools/perf1/soaProbe.js, built page, ?lowmem=1, Athens ready, CDP GC'd heap 192 MB): HUB.bld 67,230 rows, 19 numeric fields, shallow 19 MB; HUB.props 111,131 rows, shallow 15 MB plus 111 k THREE.Color in p.col (one per prop, ~6-8 MB) plus 106,808 two-number p.cvs arrays (4.7-5.6 MB). All together that is ~45 MB. ios-mem device-like ready baseline 520 MB (test page 541).
+2. So SoA can save ~30-35 MB at best (520 → ~485), not the ~70 MB gap to 450. The rest of the heap is somewhere else: take a heap snapshot by constructor next, before more SoA work.
+3. Tried and reverted (not green): one shared colour per prop type (PCOL in the build4:150 / build6:88 paths). Only 3,089 lamps share it. The 106 k tree/olive/cypress props end up with their own Color from another path I did not find in the time box (grep "p.col=" / "col:" did not show it).
+4. Full bld SoA is ~45 reader sites in 20 files, plus the HUB.grid / BI maps that hold row references, plus fields that get written later (trMin/trBase/y0). Props hold live state (alive, rt, im, gi) and pgrid/DEST keep references, so props should go index-based last.
+5. Next: (a) heap snapshot by constructor at Athens ready; (b) find the per-prop tree Color and share it (~6-8 MB, small); (c) bld SoA with grid holding indices, behind ?soa, ~2 lanes of work.
+## perf-r18e (2026-10-20): PC fill-tile heap — target NOT reachable from LF alone; no engine change (nothing to flip)
+1. Before (built r18e, 60 s driven roam, tPcHeap): fra +173, ath +149; ?lfr=500 fra +95 (6 tiles live, cache ~13 MB typed + ~5 MB objects); ?lf=0 (no fill at all) fra +38, ath +54, so ath is already > +40 without any fill tile.
+2. Tile content is small and frees cleanly: tools/perf1/tLfTile.js builds all 48 fra tiles (+126 MB, ~2.6 MB avg) and STR_lzFree returns the tile meshes; tLfSnap.js (PATH_MODE=1, snapshot id diff) shows what stays after free (16 tiles): GND_L ground layers 12 MB, solidGrp geometry 9, BK.C.table (BK_cand cache) 7, AS ag table ~15, LF.rp 2.7, LF.dc 3-4 (LF.G/PG/props gone). Those are other systems' unbounded caches that grow with area visited, not LF tiles.
+3. So a tile radius / typed-array repack cannot reach +40 (floor +38 fra / +54 ath); lfr=500 stays OFF (not green, no shot taken). GO perf/pc-heap-60s stays info-only.
+4. Tools added: tPcHeap.js EVAL=<expr>, tLfTile.js, tLfSnap.js. Unit 0 FAIL; no src change so the built page is identical to trunk (GOs not re-run).
+5. Left: bound BK.C / AS ag / GND_L caches (LRU by distance), then re-measure; only then flip lfr=500 with a 1920x1080 shot per city.
+## ios-r18b (2026-10-20): Athens touch f0-f119 JS max ≤ 50 — NOT met 4/4; ?rcbud=1 added, default OFF
+1. hubRecycle (src/60_city_build6.js): with TUNE.rcBud on touch/lowmem the first 400 recycle calls do 2 recycles a frame within 1.5 ms (was 6, LV_trNear/hubNear up to 11 ms in one frame); flag in src/99c7_rev5fix.js, ?rcbud=1 = on, default OFF.
+2. Owners (tBoot ath lowmem, WRAP): hubRecycle is only 11 ms of a 91 ms frame; the bad frames inflate every part at once (HT_cars 17-30, miniDraw 10, pedStep 10, hubCullStep 9, LV_step 31, ~27 ms unattributed = GC/box noise), at a different frame each run (f9..f106), not a fixed f80 wave.
+3. Before (JS max f0-f119, 4 runs ath): 39/35/84/118/41 ·  rcbud=1: 37/32/98/33 (fra 32/54). 3 of 4 clean, 1 still 98 → stays OFF. The existing GO assert (JS max ≤ 50) is unchanged.
+4. Gates (built): unit 0 FAIL; r13/sky-blue*,life1,xf1,terrain,phone2 47/47; lowmem life1+start-life pass, touch-first-frames ath red only on the known TWG 6.2 s line.
+5. Left: allocation in the car loop (HT_pose/CR_susp matrices) and LV_step 31 ms in bad frames; run PROF on a bad frame to see GC vs code before flipping.
+
+## ui-r18c (speed + boost HUD off the car)
+- Change: src/99c7_rev5fix.js: landscape touch puts #roamGauge and the boost bar #b2kM in a top-right band (safe-area insets, scale with vh, KM/H 12 px); PC keeps the speed bottom-right and lifts the boost bar above it; portrait unchanged. `?hudc=0` turns it off.
+- GO ui/hud-clear (fra+ath) resizes to 852x393, 393x852, 1366x1024, 1920x1080 and asserts gauge/speed/bar/boost rects vs the projected car box and all controls. Before (?hudc=0): FAIL at 852x393 and 1366x1024 (speed, boost on car); after: PASS both cities.
+- Checks on the built page: unit 0 FAIL, ui/hud-clear + phone2 4/4, r13/sky-blue(+frame) life1 xf1 terrain 45/45. Shots: tools/tHudShots.js (before/after, 8 each, looked at all).
+- Left: roamMsg (top-centre message) can still cross the speed pill when long; Athens/Frankfurt shots in tablet portrait not taken.
+
+## ios-r18f: HUB.props in typed columns + shared colours (soa-1, ?soa=0 = off, default ON all tiers)
+1. src/98so_soa.js: props are SOA_Row (id + im + col) with accessors over typed columns (x/y/z/ry/rt/alive/gp/t/i, cvs packed in one Float32Array), so all ~43 readers of HUB.props keep working unchanged (no reader rewrite). One shared THREE.Color per prop def and per asset variant (the tree colour was `p.col=V.leaf.clone()` in as/code.js AS_far, 106 k clones); 35-44 distinct colours now.
+2. Measured (built page, ?lowmem=1, device-like ready heap, GO perf/ios-mem): ath 531 → 514 MB, fra 389 → 374 MB (-15..-17); boot fra 45.7 → 38.9 s, ath 52.5 → 47.0 s (swiftshader, noisy, not a claim). Prop data identical on/off (111,131 rows, x/z/y/ry/alive/types equal; cvs sums differ by float32 rounding). Shots docs/shots/r18f_{fra,ath}_soa1.png look right.
+3. Top owners at Athens ready (tools/perf1/heapCtor.js, snapshot): (native) 368 MB (geometry/typed-array backing, GPU-side copies), (array) 52, (heap number) 34 (2.9 M boxed doubles), (code) 16, Object 12 (418 k), Array 11 (725 k), (hidden) 11, (string) 6, ArrayBuffer 2.6, SOA_Row 2.5 (111 k), Float32Array 2.2. The 450 MB line is still ~65 MB away: next owners are native geometry (368) and the 2.9 M boxed doubles.
+4. Tests: unit 0 FAIL; GO perf/soa-1 PASS fra+ath; TAG=r13/sky-blue,r13/sky-blue-frame,life1,xf1,terrain,phone2,perf/pc-boot-lt 49/49. perf/touch-first-frames (curtain 5.1-5.9 s vs 4.4 s limit) and one ios-mem heap-growth +31 (≤ 30) fail identically with ?soa=0 under this sandbox, so they are not from this change.
+5. Left: HUB.bld (19 MB) is untouched; rows are still objects (111 k x ~24 B); freed stream rows do not reuse column slots (small leak under churn).
+## perf-r18g (2026-10-20): PC heap caches bounded — ≤ +60 MB / 60 s NOT met; lfr=500 stays OFF
+1. Owners found (EVAL on built page, fra 60 s): no LAZY region is ever freed in a 60 s roam (STR.st.lzF 0), so growth is build-only; desktop ground cells stayed boxed JS arrays (GND_pack runs only at the generator's end; per-cell F32 was LOWMEM only); BK caches 21k cells, never idle while driving.
+2. Landed ON: BK caches drop cells > 1200 m from the car every 5 s (?bkd=0 off; 21k → 4k cells); desktop ground cells packed per cell like LOWMEM (src/60_city_build.js, ?memc=0 off; Athens ready 701 → 665 MB); ASSET.ag drops a freed region's props (?asg=0 off; idle until regions free).
+3. Measured tPcHeap 60 s, 2-4 runs in parallel (frames >50 meaningless there): before (all off) fra +204 / ath +128; after with ?lfr=500 fra +115 / ath +80 (lfr is the biggest single cut, BK+memc ~-40 fra / -10 ath).
+4. lfr=500 NOT flipped (no 1920x1080 roam pop-in shots taken in the timebox); GND quant on desktop tried and reverted. GO perf/pc-heap-60s stays info + asserts the new caps are on. Gates: unit 0 FAIL; perf/* 6/6; r13/sky-blue*,life1,xf1,terrain,phone2 47/47.
+5. Left: (a) shots at start/30/60 s per city then flip lfr=500; (b) what else grows in fra (~+55 after lfr): heap snapshot by constructor at +60 s (propRespawn / LF_di / FCG_build sampled owners).
+## perf-r18i (2026-10-20): camera-pull grid in typed arrays
+1. Change (src/98fc_foliage_cam.js): FCG_build is a sliced counting sort (count per cell, prefix sum, fill one Int32Array) over a dense x/z cell table (S); no [] / Map per cell, FCG_packStep gone (a box over 2^19 cells doubles that grid's cell size); same hits.
+2. GO perf/fc-grid (src/99c7_rev5fix.js, both cities): 180 fixed rays on 3 meshes = brute-force triangle test, 0 mismatches, typed arrays only; perf/fc-first now also prints grid MB.
+3. Measured fc-first (cold, min of 2 passes), solo Fra 49.1 / 77.0 / 46.2 → 7.9 / 8.2 ms, Ath ≈6 → 5.7 / 6.4; in the full TAG suite (3 runs) Fra 4.1 / 4.1 / 4.2, Ath 6.7 / 8.5 / 20.3. Grid MB: see the fc-first line (typed arrays, last pass).
+4. Gate (built): unit 0 FAIL; perf + r13 sky + life1 xf1 terrain phone2 sets 52/54, 53/54, 51/54; reds only the known xf1/grass, terrain-tyre-ath SLOW, life1/ath-density SLOW.
+5. Left: pass 1 of a cold run can still show one 37-84 ms frame with 0 ms grid work (JIT/GC outside the grid; the GO takes the lower pass).
+## ios-r18h (2026-10-20): touch allocation by function · NOT met, no engine change pushed
+1. Measured (tBoot CITY=ath HEAP=1 ?lowmem=1, 15 s, sampled incl. collected): 1277 MB. By sub: DEST_find 223 (roamHit 47+21, roamTerr 37+26+16+12+10, cityAt 13, DEST_open 12), hubTrafficStep 218, roamStep 181, LV_step 147, lazyStep 140, pedStep 52, PC_step 38, hubCullStep 37. Top self: roamHit 47, roamTerr 37, LIFE_draw 27, MEMF_gstep 22, CTB_step 20, PC_step 18, LF_drapeG 16, traverse 15, pedStep 14, L3_space 13.
+2. Why: OPTST shows roamHit/roamTerr/TR_Y/groundAt/DEST_open still INTERPRETED (status 0x29/0x19, never baseline/TurboFan) after 10 s: the DEST scan gets only 1.5 ms/frame, so tier-up never arrives and every double op boxes a HeapNumber. Fix = fewer ops per scan step or a compiled-hot path, not scratch vectors.
+3. Tried and dropped (no effect, 1277 → 1282 MB, not pushed): Math.hypot→sqrt in MEMF_gstep and DEST_open, RD_unstack heading closure/arrays → scratch pairs. JS max f0-f119 in that one run 162 → 121 ms is box noise, not a result; 4-run tables NOT taken.
+4. GO perf/alloc-rate not tightened (nothing improved). No src change, built page identical to trunk.
+5. Next: DEST_find on touch: give it a larger budget only while idle (stationary) so it tiers up and finishes, or precompute per-node ground/onRoad once into a Float32Array; then re-measure (expect −220 MB/15 s).
+
+## ios-r18l: minimap v2 (src/70_roam_world.js MM2, src/41 qvMini; ?mm2=0 = old path; default ON)
+1. Change: touch redraw capped at ~20 Hz (time gate; desktop keeps 30 Hz); shared coord array instead of [x,z] per point; pin / north glyphs cached as sprites; route polyline in one Float32Array; no per-frame closures/arrays. The static base was already one prepainted canvas (MINI.c), so no extra bucket cache was added.
+2. GO perf/minimap2 (src/99c7_rev5fix.js, both cities): same state drawn with old and new path, 99.5-99.7% pixels match, coord array reused, ring avg < 3 ms. Shots 852x393 Fra + Ath before/after look identical.
+3. Measured Ath tBoot lowmem 60 s: miniDraw itself avg 0.21 ms / p95 0.4 / max 2.1 (old) vs avg 0.24 / p95 0.4 / max 1.7-4.3 (new); draws per run 1809 → ~1170 (-35%). jsn50 / JS max: old 1/73, 1/63; new 4/84, 1/91, 7/79 (run noise, no gain).
+4. Gate (built): unit 0 FAIL; r13 sky + life1 xf1 terrain phone2 47/47; perf/touch-first-frames red in both cities, same with ?mm2=0 (gate 5.9 s curtain timing here), others green.
+5. Left: miniDraw is NOT the owner of the long frames (its wrapped 13 ms max was SMM_tick tile paints, max 5-12 ms); the >50 ms JS frames are hubTrafficStep / hubCullStep / roamStep / PC_step. tBoot now prints PF1MM (ring + SMM.st).
+
+## ios-r18n (2026-10-20): touch-first-frames bisect + Athens mid-minute owners · no culprit, no engine change
+1. No culprit: perf/touch-first-frames on the BUILT page with ?lowmem=1, SOLO (one tChkGo at a time): trunk 38158b4 ath 4148/4018 ms, fra 3875/4562 ms, JS max f0-119 38/23 and 30/35, PASS 2/2 per city; beta.132 52bbf1c ath 4078, fra 3759, PASS. 7431bb1 and 3a06942 are both before beta.132 (in it), so the only src change after it is 38158b4. The red reports came from runs in parallel (curtain 5.1-6.9 s on a loaded box), so run this GO solo.
+2. tBoot ath lowmem 60 s on trunk, 3 runs: jsn50 1 / 1 / 1, JS max 56 / 57 / 85 (review #19 line ≤ 5 and ≤ 60 ms met in 2 of 3). The one > 50 ms JS frame per run has a different owner each time: hubTrafficStep self 26-28 ms (f2543, f8 with pedStep 20), or one SMM minimap tile paint at 55-64 ms (miniPaint inside LK_paint inside hubTrafficStep; SMM tile max is 7 / 17 / 64 ms across the runs, so a GC landing in a tile, not a heavy tile).
+3. With WRAP of every hubTrafficStep wrapper (L3_tick, CV_*, AYD_*, RD_*, LK_*, QS_clear, OC_traffic, TRN_ridgeFit, CR_npcPush, DR_unjam): none of them is over 5 ms max; the 26-28 ms is the core HT_cars step. hubCullStep max 17-19, PC_step 16-19, never > 50 alone.
+4. Not done (timebox): no change pushed, built page identical to trunk. Candidate next: gate SMM_tick tile paint by RB (skip while RB.t0 elapsed > RB.ms, ≤ 2 frames) so a tile never stacks on a heavy traffic frame; and a PROF=1 tBoot over the core hubTrafficStep spike frames.
+5. Tool: scratch runner = build commit in a worktree, then tChkGo CITY=<c> TAG=perf/touch-first-frames with ?lowmem=1 one at a time; grep "curtain" and "JS max f0-f119".
