@@ -3,7 +3,7 @@
 //   env: GAME_DIR=<dir with index.html>, ONLY=kronos,hoplite, SHOTS=<dir> (writes boss-<id>-<vp>-p<N>.png, keep it out of git), THR=<min mean abs diff, default 3>
 // For every boss (air + ground) on desktop 1280x720 and phone 390x763 (touch):
 //  - each phase 1/2/3 is forced on a bar line (as review-tour does); the frame is re-rendered at a frozen time with the flag on and off, so (on - off) isolates what bossvis adds
-//  - the added picture differs from zero in every phase and between every two phases (three distinct looks, mean |diff| in the boss rect above THR)
+//  - the added picture differs from zero in phases 2 and 3 (phase 1 is the base look: its pip 1/3 is checked below; with bossplay on the boss is silent in the open window, so shots cannot be counted) and between every two phases (three distinct looks, mean |diff| in the boss rect above THR)
 //  - pips 1/3 2/3 3/3 on the boss bar; "NEW ATTACK: <name>" through the hint (or banner) at every change; hit-stop 40-60 ms per change, 0 with reduced motion
 //  - a ground boss stays on the road line in every phase; no page errors; ?bossvis=0 = nothing added, no flash text, no pips
 const PW = require('playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
@@ -21,7 +21,7 @@ const mad = (a, b) => { let s = 0; for (let i = 0; i < a.length; i += 4) s += Ma
     const tag = `${id} ${vp.tag}${flagOff ? ' flag-off' : ''}${reduce ? ' reduced' : ''}`, bad = m => fails.push(`${tag}: ${m}`);
     const ctx = await br.newContext({ viewport: { width: vp.w, height: vp.h }, hasTouch: vp.touch, isMobile: vp.touch, deviceScaleFactor: 1, userAgent: vp.touch ? UA : undefined }), p = await ctx.newPage();
     p.on('pageerror', e => bad('page error ' + e.message)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
-    await p.goto(url('&boss=' + id + (flagOff ? '&bossvis=0' : '')));
+    await p.goto(url('&bpauto=1' + (process.env.QS || '') + '&boss=' + id + (flagOff ? '&bossvis=0' : '')));   // bpauto: each boss gate resolves 1.5 s after it rises (a player who plays); QS='&bossplay=1' tests with the encounter rules on
     try { await p.waitForFunction(() => window.__mnr && __mnr.G.boss && __mnr.G.boss.x <= 791, null, { timeout: 25000 }); } catch (e) { bad('boss did not arrive'); await ctx.close(); return; }
     await p.addStyleTag({ content: '#labP{display:none!important}' });
     await p.evaluate(rd => { const m = __mnr; m.SET.calm = false; if (rd) m.SET.rm = true; }, reduce);
@@ -54,7 +54,7 @@ const mad = (a, b) => { let s = 0; for (let i = 0; i < a.length; i += 4) s += Ma
       if (D.every(Boolean)) {
         const z = D.map(zero), pr = [pdiff(D[0], D[1]), pdiff(D[1], D[2]), pdiff(D[0], D[2])];
         console.log(`  ${tag}: added-picture size per phase ${z.map(v => v.toFixed(1)).join(' / ')}; between phases ${pr.map(v => v.toFixed(1)).join(' / ')}`);
-        z.forEach((v, i) => { if (v < THR / 3) bad(`phase ${i + 1}: bossvis adds almost nothing (${v.toFixed(2)})`); });
+        z.forEach((v, i) => { if (i > 0 && v < THR / 3) bad(`phase ${i + 1}: bossvis adds almost nothing (${v.toFixed(2)})`); });
         pr.forEach((v, i) => { if (v < THR) bad(`phases ${['1-2', '2-3', '1-3'][i]} look the same (${v.toFixed(2)} < ${THR})`); });
       } else bad('no boss rect captured');
       if (reduce) { if (jt - jn0[1] > 0) bad('hit-stop with reduced motion: ' + (jt - jn0[1]) + ' ms'); }

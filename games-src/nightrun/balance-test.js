@@ -6,6 +6,7 @@
 // Prints pass/fail lines against the targets in BALANCE.md (late build).
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
+// bpauto: this bot never plays a boss gate; ?bpauto=1 resolves each 1.5 s after it rises (bossplay.js)
 const RUNS = +process.env.RUNS || 3, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 600;   // 600: a Legend final boss lasts 170-260 s (boss fights round 4)
 const STAGES = (process.env.STAGES || '1,8,20,30,42').split(',').map(Number);
 const DFS = (process.env.DIFFS || 'easy,normal,hard').split(','), BUILDS = (process.env.BUILDS || 'fresh,mid,late').split(',');
@@ -92,7 +93,7 @@ const BOT = (opts) => {
   const res = []; let next = 0, errs = 0;
   await Promise.all(Array.from({ length: PAR }, async () => {
     const p = await browser.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { errs++; if (errs < 4) console.log('PAGE ERROR', e.message); });
-    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ""}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
+    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&bpauto=1${process.env.Q || ""}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
     if (process.env.PRE) await p.evaluate(process.env.PRE);   // e.g. PRE='window.SC.k=0' to bisect a tuning change
     while (next < jobs.length) { const j = jobs[next++]; try { res.push(await p.evaluate(BOT, j)); } catch (e) { console.log('RUN ERROR', j.n, j.build, e.message.slice(0, 200)); } }
     await p.close();
