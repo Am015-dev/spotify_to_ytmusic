@@ -4,3 +4,6 @@
 3. Proof: GO bot/escape (src/99c8_bot.js BOT_esc, tag `bot`): scans groundY on a 60 m grid, 8 deepest basin floors + 4 steepest wall cells per city, car dropped in with gas held, must be on a road or open ground within 6 s. Before: Frankfurt 9/12 (stuck: -420,640 wall 1.04; 180,-1160 wall 0.76; -540,-1160 wall 1.25 = sliding on 37-51 deg walls). After: 24/24 (fra 12, ath 12), every one freed by the reset rung at 4.0 s; the assist alone frees none of these (all basins are 3-16 m deep with spill 40-60 m away); it only matters for small holes.
 4. Left: assist is untested on small pockets (none found by the scan, depth < 3 m is treated as open ground); reset is the guarantee. `BOT_dbg(x,z)` in the bot prints a per-frame trace for one pit.
 5. Trap cells found + ladder step: docs/BOT_REPORT_escape.md.
+
+## Review fix (false reset while driving)
+- The age timer now clears when the car is really moving (> 8 m/s for 1 s, or >= 20 m net in 2 s; not during the assist), plus an 8 s bound on slow time within 40 m of the first trap point. The lift picks a clear landing (not inside a building, 7 m from cars; tries 8-32 m along the road). GO bot/escape also asserts no false reset in free-driving cases (docs/BOT_REPORT_escape.md).

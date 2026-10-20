@@ -71,7 +71,7 @@ function chkQuick(R){const bad=[RO.x,RO.y,RO.z,RO.v].some(v=>!isFinite(v));if(ba
 // escape-1 (lane escape-r21h, 2026-10-20): "the car MUST be able to get out of ANY hill hole". bot/escape scans groundY on a grid for the deepest terrain pockets
 // (24 headings, 2-10 m out: the pocket score is the slope of the EASIEST way out, so high = enclosed on every side), puts the car at the N worst per city, holds the gas
 // with the game's own roamStep and asserts it is on a road or on open ground within 6 sim-s. Reports each trap cell and the ladder step that freed it (RO.escLog).
-const BESC={n:12,secs:6,step:60,open:1.5};
+const BESC={keep:{fra:[[2100,400]],ath:[[-2530,1300],[-1990,820]]},n:12,secs:6,step:60,open:1.5};
 /* pit depth: rise the car must climb over the EASIEST of 24 headings within 60 m (a flat or sloping spot reads ~0, a basin reads its spill height); wall: steepest local slope */
 function BOT_pocket(x,z){const g0=groundY(x,z);let mn=1e9,mx=0;for(let k=0;k<24;k++){const a=k*Math.PI/12,sx=Math.sin(a),sz=Math.cos(a);let m=-1e9;for(const r of[4,8,12,18,26,36,48,60]){const q=groundY(x+sx*r,z+sz*r)-g0;if(q>m)m=q}mn=Math.min(mn,m);mx=Math.max(mx,m)}
  const[gx,gz]=TR_grad(x,z,2);return{depth:mn,rim:mx,wall:Math.hypot(gx,gz)}}
@@ -82,7 +82,9 @@ function BOT_escScan(n=BESC.n){const out=[],B=[WX0+80,WX1-80,WZS+80,WZN-80],st={
  for(const o of out){if(pick.length>=n*2/3)break;if(far(o,150))pick.push(o)}   // the deepest basin floors
  const wl=out.filter(o=>o.w>.9).sort((a,b)=>b.w-a.w);for(const o of wl){if(pick.length>=n)break;if(far(o,60)){o.wall=1;pick.push(o)}}   // + the steepest hill pockets (> 42° at the car)
  for(const o of out){if(pick.length>=n)break;if(far(o,150))pick.push(o)}
- return{found:out.length,pick,st}}
+ return{found:out.length,pick,st,all:out.slice(0,120)}}
+/* the heading with the longest free run (16 tries of 1.5 s at 20 m/s): the keep-moving cases drive where a driver would */
+function BOT_freeDir(R,x,z,need){let bd=0,bp=-1;for(let k=0;k<16;k++){const a=k*Math.PI/8;roamWarp(x,z,0,true);RO.x=x;RO.z=z;RO.y=groundAt(x,z,99);RO.vy=0;RO.h=RO.vh=a;RO.v=20;ESC.E.age=0;ESC.E.as=0;ESC.E.ax=null;let pp=0,px=x,pz=z;for(let i=0;i<45;i++){CTL.thr=1;CTL.brk=0;if(R.step())break;pp+=Math.hypot(RO.x-px,RO.z-pz);px=RO.x;pz=RO.z}if(pp>bp){bp=pp;bd=a}}return need&&bp<27?null:bd}
 function BOT_esc(say){const R=BOT_rec(),out={kind:'escape',city:CID,ok:false,rows:[]};
  try{if(RO.sp)try{sprintEnd()}catch(e){}if(RO.ch)try{chAbort()}catch(e){}
   const S=BOT_escScan(),thr=CTL.thr;out.found=S.found;out.st=S.st;
@@ -91,13 +93,20 @@ function BOT_esc(say){const R=BOT_rec(),out={kind:'escape',city:CID,ok:false,row
    for(let i=0;i<BESC.secs*30;i++){CTL.thr=1;CTL.brk=0;const bad=R.step();t+=1/30;if(bad){why=bad;break}
     dm=Math.max(dm,Math.hypot(RO.x-x0,RO.z-z0));if(TR8_onRoad(RO.x,RO.z)){ok=true;why='road';break}
     if(dm>=15&&BOT_pocket(RO.x,RO.z).depth<BESC.open){ok=true;why='open';break}}
-   out.rows.push({x:o.x,z:o.z,depth:+o.d.toFixed(1),wall:+o.w.toFixed(2),ok,t:+t.toFixed(1),why,step:(ESC.E.log&&ESC.E.log.step)||'drove out',dm:Math.round(dm),end:[Math.round(RO.x),Math.round(RO.z)]})}}
+   out.rows.push({x:o.x,z:o.z,depth:+o.d.toFixed(1),wall:+o.w.toFixed(2),ok,t:+t.toFixed(1),why,step:(ESC.E.log&&ESC.E.log.step)||'drove out',clear:!(ESC.E.log&&ESC.E.log.to)||ESC_clear(ESC.E.log.to[0],ESC.E.log.to[1],groundAt(ESC.E.log.to[0],ESC.E.log.to[1],99)),dm:Math.round(dm),end:[Math.round(RO.x),Math.round(RO.z)]})}}
   finally{CTL.thr=thr;CTL.brk=0}
-  out.ok=out.rows.length>=6&&out.rows.every(r=>r.ok)&&!R.errs.length&&!R.M.nan&&!R.M.fall}
+  /* must NOT reset (reviewer, c1286c5): driving freely through gentle off-road dips deeper than 2.5 m must never trigger the lift; from rest, at 20 m/s, and circling */
+  out.keep=[];try{CTL.thr=1;const free=[];for(const o of S.all){if(free.length>=2)break;if(o.d<2.6||o.d>12||free.some(q=>Math.hypot(q[0]-o.x,q[1]-o.z)<100))continue;/* a dip the car can really drive through: >= 27 m in 1.5 s at 20 m/s */RO.v=20;const dir=BOT_freeDir(R,o.x,o.z,1);if(dir!=null)free.push([o.x,o.z])}out.free=free;for(const[x,z]of[...(BESC.keep[CID]||[]),...free])for(const mode of['rest','fast','circle']){roamWarp(x,z,0,true);RO.x=x;RO.z=z;RO.y=groundAt(x,z,99);RO.vy=0;const dir=BOT_freeDir(R,x,z);RO.x=x;RO.z=z;RO.y=groundAt(x,z,99);RO.vy=0;RO.h=RO.vh=dir;RO.v=mode==='rest'?0:20;ESC.E.log=null;ESC.E.age=0;ESC.E.as=0;ESC.E.ax=null;ESC.E.done=0;ESC.E.p0=null;ESC.E.ring=null;RO.stkT=0;
+   /* a lift is a FALSE reset when, in the 2 s before it, the car travelled >= 20 m net or was above 8 m/s for a whole second (the reviewer's rule: only a pinned or rocking car may be lifted) */
+   let path=0,jump=0,px=RO.x,pz=RO.z,fl=null;const H=[],vs=[];for(let i=0;i<180;i++){CTL.thr=1;CTL.brk=0;K.ArrowLeft=mode==='circle'&&i%20<5;H.push([RO.x,RO.z,Math.abs(RO.v),ESC.E.as>0]);if(H.length>61)H.shift();const had=!!(ESC.E.log&&ESC.E.log.step==='reset');const bad=R.step();if(bad)break;const d=Math.hypot(RO.x-px,RO.z-pz);if(i%15==0)vs.push(Math.round(RO.v));
+    if(!had&&ESC.E.log&&ESC.E.log.step==='reset'&&!fl){const asd=H.some(h=>h[3]);/* the assist's own 10 m/s is by design: not judged */const net=Math.hypot(H[H.length-1][0]-H[0][0],H[H.length-1][1]-H[0][1]);let run=0,fast=false;for(const h of H){run=h[2]>8?run+1:0;if(run>=30)fast=true}fl={net:Math.round(net),fast:fast&&!asd,asd,t:+(i/30).toFixed(1)}}
+    if(!(ESC.E.log&&ESC.E.log.step==='reset'&&d>25)){path+=d}px=RO.x;pz=RO.z}
+   K.ArrowLeft=false;const bad=!!fl&&!fl.asd&&(fl.net>=20||fl.fast);out.keep.push({x,z,mode,ok:!bad,path:Math.round(path),lift:fl,v:vs.join(' ')})}}finally{CTL.thr=thr;CTL.brk=0;K.ArrowLeft=false}
+  out.ok=out.rows.length>=6&&out.rows.every(r=>r.ok&&r.clear)&&out.keep.every(k=>k.ok)&&!R.errs.length&&!R.M.nan&&!R.M.fall}
  catch(e){R.errs.push('BOT '+String(e&&e.stack||e).slice(0,160))}
  R.done();out.err=R.errs.slice(0,4);(window.__chk.bot=window.__chk.bot||{})[CID+'/escape']=out;
  const bad=out.rows.filter(r=>!r.ok);
- return'📍 BOT ESCAPE '+(CID==='fra'?'Frankfurt':'Athens')+' · '+out.rows.filter(r=>r.ok).length+'/'+out.rows.length+' deepest pockets (of '+out.found+' scanned deeper than 2 m) back on a road or open ground within '+BESC.secs+' s · '+out.rows.map(r=>r.x+','+r.z+' d'+r.depth+'m '+(r.ok?r.step+' '+r.t+'s':'TRAPPED at '+r.end)).join(' | ')+(R.errs.length?' · '+R.errs[0]:'')+(out.ok?' ✅':' ❌')}
+ return'📍 BOT ESCAPE '+(CID==='fra'?'Frankfurt':'Athens')+' · '+out.rows.filter(r=>r.ok).length+'/'+out.rows.length+' deepest pockets (of '+out.found+' scanned deeper than 2 m) back on a road or open ground within '+BESC.secs+' s · '+out.rows.map(r=>r.x+','+r.z+' d'+r.depth+'m '+(r.ok?r.step+' '+r.t+'s':'TRAPPED at '+r.end)).join(' | ')+' · no false reset (lift only if pinned: <20 m net in 2 s and no second >8 m/s): '+out.keep.filter(k=>k.ok).length+'/'+out.keep.length+(out.keep.some(k=>!k.ok)?' ('+out.keep.filter(k=>!k.ok).map(k=>k.x+','+k.z+' '+k.mode+' FALSE RESET '+JSON.stringify(k.lift)).join(' ')+')':'')+(R.errs.length?' · '+R.errs[0]:'')+(out.ok?' ✅':' ❌')}
 function BOT_dbg(x,z){const o=[],thr=CTL.thr;roamWarp(x,z,0,true);RO.x=x;RO.z=z;RO.y=groundAt(x,z,99);RO.v=0;RO.vy=0;ESC.E.log=null;ESC.E.age=0;ESC.E.as=0;ESC.E.ax=null;ESC.E.done=0;try{for(let i=0;i<150;i++){CTL.thr=1;roamStep(1/30);if(i%8==0)o.push((i/30).toFixed(2)+' age '+ESC.E.age.toFixed(2)+' as '+ESC.E.as.toFixed(2)+' h '+(ESC.E.h==null?'-':ESC.E.h.toFixed(2))+' v '+RO.v.toFixed(1)+' hd '+RO.h.toFixed(2)+' pos '+Math.round(RO.x)+','+Math.round(RO.z)+' y '+RO.y.toFixed(1)+' trGrip '+(RO.trGrip||0).toFixed(2)+' log '+JSON.stringify(ESC.E.log))}}finally{CTL.thr=thr}return o}
 // ramps-r21q (2026-10-20, Alex: "the roads and streets are unusable"): roads/ath-clear, no graphics. (1) every Athens street centreline + 2 lane offsets (+-w/4) every 2 m outside ramp footprints:
 // second difference of groundAt <= 8 cm (counts and worst reported); (2) no ramp covers more than 40 % of any carriageway cross-section within 12 m of a road (all ramps unioned);
