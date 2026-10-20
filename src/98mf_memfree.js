@@ -11,7 +11,7 @@ function MEMF_free(m,part){const g=m.geometry;if(!g||g.userData.mfDone)return;g.
   const A=part?MEMF.attrs.map(k=>g.attributes[k]).filter(Boolean):Object.values(g.attributes);if(g.index&&!part)A.push(g.index);let b=0;for(const a of A){if(!a.array||a.isInstancedBufferAttribute||a.isInterleavedBufferAttribute||a.usage!==THREE.StaticDrawUsage)continue;b+=a.array.byteLength;a.array=null;a.getX=a.getY=a.getZ=a.getW=BA_freed}
   MEMF.n++;MEMF.mb+=b/1048576}
 function MEMF_sweep(){if(!TUNE.memFree)return;const hook=m=>{if(m.isInstancedMesh&&TUNE.gpuStr&&m.geometry&&!MEMF.seen.has(m)&&!m.userData.sky){MEMF.seen.add(m);MEMF_ipack(m);return}
-  if(m.isMesh&&!m.isInstancedMesh&&!m.isSkinnedMesh&&m.geometry&&!MEMF.seen.has(m)){MEMF.seen.add(m);const u=m.userData;let part=0,cd=0;for(const s of MEMF.skip)if(u[s]){if(LOWMEM&&MEMF.part.includes(s)){part=1;break}if(s==='cd'&&TUNE.gpuStr){cd=1;continue}return}
+  if(m.isMesh&&!m.isInstancedMesh&&!m.isSkinnedMesh&&m.geometry&&!MEMF.seen.has(m)){MEMF.seen.add(m);const u=m.userData;let part=0,cd=0;for(const s of MEMF.skip)if(u[s]){if(LOWMEM&&MEMF.part.includes(s)){part=1;MEMF_gadd(m);break}if(s==='cd'&&TUNE.gpuStr){cd=1;continue}return}
     if(!part&&TUNE.gpuStr){const g=m.geometry,w=MEMF.gu.get(g);if(w===undefined){MEMF.gu.set(g,m);m.updateMatrixWorld();MEMF_pack(m,cd?u.cd:0);return}if(w){MEMF.gu.set(g,null);const i=MEMF.S.findIndex(e=>e.m===w);if(i>=0){const e=MEMF.S.splice(i,1)[0];e.m.layers.enable(0)}}if(cd)return}   // crash-5: shared geometry -> memFree as before (crash-6: a shared cd geometry is left alone)
     const f=m.onAfterRender;m.onAfterRender=function(){MEMF_free(this,part);this.onAfterRender=f}}};
   const walk=o=>{if(o===RO.grp||o.userData.keep&&!o.isMesh||o.userData.gb)return;hook(o);for(const c of o.children)walk(c)};walk(scene)}
@@ -49,19 +49,19 @@ function MEMF_zready(){if(!(typeof booted!=='undefined'&&booted&&state==='roam')
 MEMF.ts=MEMF.zOn&&/[?&]tstream=1/.test(location.search);
 async function MEMF_zip(e){const g=e.m.geometry,P=[];let tot=0;e.zb=1;MEMF.zbusy++;
   try{const A=Object.entries(g.attributes);if(g.index)A.push(['@i',g.index]);
-    for(const[k,a]of A){if(!a.array||a.isInterleavedBufferAttribute||a.isInstancedBufferAttribute||a.usage!==THREE.StaticDrawUsage){e.zfail=1;return}const b=a.array.byteLength;P.push({k,a,T:a.array.constructor,n:a.array.length,off:tot,b});tot+=(b+3)&~3}
+    for(const[k,a]of A){if(!a.array&&e.g)continue;if(!a.array||a.isInterleavedBufferAttribute||a.isInstancedBufferAttribute||a.usage!==THREE.StaticDrawUsage){e.zfail=1;return}const b=a.array.byteLength;P.push({k,a,T:a.array.constructor,n:a.array.length,off:tot,b});tot+=(b+3)&~3}
     const t0=performance.now(),buf=new Uint8Array(tot);for(const p of P)buf.set(new Uint8Array(p.a.array.buffer,p.a.array.byteOffset,p.b),p.off);
     const z=new Uint8Array(await new Response(new Blob([buf]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());
     if(e.on||e.zb!==1||Math.hypot(e.x-camera.position.x,e.z-camera.position.z)-e.r<(e.zr||e.ro))return;   // came back into range meanwhile: keep the raw arrays
-    e.cz={z,P:P.map(p=>({k:p.k,T:p.T,n:p.n,off:p.off})),st:1};for(const p of P){p.a.array=null;p.a.getX=p.a.getY=p.a.getZ=p.a.getW=BA_freed}
+    if(e.g&&(MEMF.gHold>performance.now()||!P.length))return;e.cz={z,P:P.map(p=>({k:p.k,T:p.T,n:p.n,off:p.off})),st:1};if(e.g){e.lm=e.m.layers.mask;e.m.layers.disableAll();MEMF.gst.n++;MEMF.gst.rawMB+=tot/1048576;MEMF.gst.zMB+=z.length/1048576}for(const p of P){p.a.array=null;p.a.getX=p.a.getY=p.a.getZ=p.a.getW=BA_freed}
     const st=MEMF.zst;st.n++;st.rawMB+=tot/1048576;st.zMB+=z.length/1048576;st.maxMs=Math.max(st.maxMs,performance.now()-t0)}
   catch(err){e.zfail=1}finally{MEMF.zbusy--;e.zb=0}}
 async function MEMF_unzip(e){const c=e.cz;c.st=2;MEMF.ubusy++;
   try{const ab=await new Response(new Blob([c.z]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer(),g=e.m.geometry,t0=performance.now();
     for(const p of c.P){const a=p.k==='@i'?g.index:g.attributes[p.k];delete a.getX;delete a.getY;delete a.getZ;delete a.getW;a.array=new p.T(ab,p.off,p.n)}
-    g.dispose();e.cz=null;MEMF.zst.back++;MEMF.zst.maxMs=Math.max(MEMF.zst.maxMs,performance.now()-t0)}
+    if(e.g){e.m.layers.mask=e.lm;MEMF.gst.back++}else g.dispose();e.cz=null;MEMF.zst.back++;MEMF.zst.maxMs=Math.max(MEMF.zst.maxMs,performance.now()-t0)}
   catch(err){c.st=1;e.zfail=1}finally{MEMF.ubusy--}}
-(function MEMF_raf(){try{MEMF_gstep()}catch(e){}requestAnimationFrame(MEMF_raf)})();
+(function MEMF_raf(){try{MEMF_gstep()}catch(e){}try{MEMF_Gstep()}catch(e){}requestAnimationFrame(MEMF_raf)})();
 // ios-r17r (?tstream=1): the off chunks are deflated under the load curtain, so the gain shows at ready. roamLoad starts MEMF_cur next to TWG_run and awaits
 // both: the chunk copy is one memcpy per zip (≤ 8 ms of zip starts per frame, then a frame), up to MEMF.czN in flight, and the curtain waits at most
 // MEMF.cms ms past TWG (?tscur=<ms>, default 250); whatever is left is zipped after ready by MEMF_gstep as before. Distances from the car (RO), not the camera.
@@ -69,8 +69,26 @@ Object.assign(MEMF,{cms:(q=>q==null?250:+q)(new URLSearchParams(location.search)
 async function MEMF_cur(){if(!MEMF.ts||!TUNE.gpuStr)return;const t0=performance.now();try{MEMF_sweep()}catch(e){}{const inS=o=>{while(o.parent)o=o.parent;return o===scene};MEMF.S=MEMF.S.filter(e=>inS(e.m))}   // not the meshes of a city just left
   const x=RO.x,z=RO.z,cf=camera.far,L=[];for(const e of MEMF.S){const d=Math.hypot(e.x-x,e.z-z)-e.r,ro=Math.min(e.ro,cf+50);
     if(d>ro&&e.on){e.on=false;e.m.layers.disableAll();e.m.geometry.dispose();MEMF.st.dn++}if(!e.on&&!e.cz&&!e.zb&&!e.zfail&&d>ro+150){e.zr=ro;L.push(e)}}
+  {const g=[];for(const e of MEMF.G){if(!e.cz&&!e.zb&&!e.zfail&&Math.hypot(e.x-x,e.z-z)-e.r>cf+200){e.zr=cf+150;g.push(e)}}L.unshift(...g)}   // ground first (r17y)
   const P=[];let t=performance.now();MEMF.cur=1;
   try{for(const e of L){if(MEMF.cend&&performance.now()>MEMF.cend)break;while(MEMF.zbusy>=MEMF.czN||performance.now()-t>8){await nextFrame();t=performance.now()}
-      if(e.on||e.cz||e.zb)continue;P.push(MEMF_zip(e).then(()=>{if(e.cz)MEMF.zst.cur++}))}
+      if((e.on&&!e.g)||e.cz||e.zb)continue;P.push(MEMF_zip(e).then(()=>{if(e.cz)MEMF.zst.cur++}))}
     await Promise.race([Promise.all(P),new Promise(r=>{const w=()=>MEMF.cend&&performance.now()>MEMF.cend?r():setTimeout(w,20);w()})])}
   finally{MEMF.cur=0;MEMF.cms0=Math.round(performance.now()-t0)}}
+// ios-r17y touch streaming slice 2 (?tstream=1): far ground / drive meshes (trG, gk, dr: ~58 MB in Athens, most never drawn) keep position + index for CPU
+// readers, but only GO tests read them far from the car (docs/STREAM_TOUCH.md). Past camera.far + 200 m from the camera (or the car, under the curtain) their
+// remaining arrays are deflated like chunks; the GPU buffers stay, the mesh is hidden via layers (nothing past the far plane is drawn; raycasts skip it) and
+// is inflated from far + 150 m (zero-copy views, layers restored). MEMF_gall() is the inflate-all hook: the GO runner awaits it before a non-perf GO and no
+// ground is zipped for MEMF.gHoldMs after it.
+Object.assign(MEMF,{G:[],gg:new WeakMap(),gHold:0,gHoldMs:180000,gst:{n:0,rawMB:0,zMB:0,back:0}});
+function MEMF_gadd(m){if(!MEMF.ts||m.isInstancedMesh)return;const g=m.geometry,P=g.attributes.position;if(!P||!P.array)return;const w=MEMF.gg.get(g);if(w){w.zfail=1;return}   // shared geometry: left alone
+  if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingBox)g.computeBoundingBox();m.updateMatrixWorld();const s=g.boundingSphere,v=new THREE.Vector3().copy(s.center).applyMatrix4(m.matrixWorld);
+  const e={m,g:1,x:v.x,z:v.z,r:s.radius};MEMF.gg.set(g,e);MEMF.G.push(e)}
+function MEMF_Gstep(){const G=MEMF.G;if(!G.length||!MEMF.ts)return;if((MEMF.gfr=(MEMF.gfr||0)+1)%300===0){const inS=o=>{while(o.parent)o=o.parent;return o===scene};MEMF.G=G.filter(e=>inS(e.m))}
+  const cx=camera.position.x,cz=camera.position.z,cf=camera.far,hold=MEMF.gHold>performance.now(),ok=!hold&&MEMF_zready();let zs=0;
+  for(const e of G){const d=Math.hypot(e.x-cx,e.z-cz)-e.r;if(e.cz){if(e.cz.st===1&&(hold||d<cf+150)&&MEMF.ubusy<3)MEMF_unzip(e)}
+    else if(ok&&!e.zb&&!e.zfail&&zs<1&&MEMF.zbusy<2&&d>cf+200){zs++;e.zr=cf+150;MEMF_zip(e)}}}
+async function MEMF_gall(){MEMF.gHold=performance.now()+MEMF.gHoldMs;const t0=performance.now();
+  while((MEMF.zbusy||MEMF.ubusy||MEMF.G.some(e=>e.cz))&&performance.now()-t0<10000){for(const e of MEMF.G)if(e.cz&&e.cz.st===1&&MEMF.ubusy<4)MEMF_unzip(e);await new Promise(r=>setTimeout(r,16))}
+  return !MEMF.G.some(e=>e.cz)}
+function MEMF_gpre(id,run,say){if(!MEMF.ts||/^perf\//.test(id))return false;say('📍 Restoring ground arrays…');MEMF_gall().then(run,run);return true}   // called by the GO runner (99c goJump)
