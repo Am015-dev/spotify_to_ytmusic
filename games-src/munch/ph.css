@@ -1,0 +1,161 @@
+/* ===== phone layout: every rule starts with html.ph (desktop and the 768x1024 tablet are untouched) ===== */
+.ph-chip,.phopps{display:none}
+html.ph{--ph-bar:44px;--ph-rail:clamp(290px,41vw,340px);--ph-dock:clamp(150px,30dvh,270px);--ph-tb:62dvh}
+html.ph .gx-app{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+/* top bar: status chip + 3 icon buttons (44 px) */
+html.ph .gx-bar{height:calc(var(--ph-bar) + env(safe-area-inset-top,0px));min-height:0;padding:env(safe-area-inset-top,0px) 6px 0;gap:6px;overflow:hidden;align-items:center}
+html.ph .gx-bar h1,html.ph .gx-bar .gx-sp,html.ph .gx-bar .gx-lbl,html.ph .gx-bar .dk-wide,html.ph .gx-bar [data-gx="dkOpp"]{display:none!important}
+html.ph .gx-bar .gx-ibtn{min-width:44px;min-height:44px;width:44px;padding:0;border-radius:10px;flex:none}
+html.ph .ph-chip{display:block;flex:1 1 0;min-width:0;font:700 14px/1.2 var(--title);color:var(--cream);text-shadow:0 1px 0 #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px}
+/* player chips: rivals (and me in landscape): level, strength, cards, items; tap = their cards */
+html.ph .phopps{display:flex;gap:6px;padding:4px 6px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;min-width:0}
+html.ph .phopps::-webkit-scrollbar{display:none}
+html.ph .phc{flex:1 0 108px;max-width:190px;min-height:46px;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;align-content:center;padding:3px 8px 3px 11px;border-radius:10px;border:1px solid #0d0603;color:var(--cream);font:inherit;text-align:left;cursor:pointer;
+  background:linear-gradient(#5a2f1a,#3a1c0e);box-shadow:inset 4px 0 0 var(--c),inset 0 1px 0 rgba(255,220,160,.18),0 2px 0 rgba(0,0,0,.4)}
+html.ph .phc .n{display:flex;align-items:center;gap:4px;min-width:0;font-size:13px;line-height:1.2}
+html.ph .phc .n b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+html.ph .phc .l{font:800 13px/1 var(--title);font-style:normal;color:#ffd76a;text-shadow:0 1px 0 #000;margin-right:2px}
+html.ph .phc .s{font-size:13px;line-height:1.2;color:var(--cream2);white-space:nowrap;overflow:hidden}
+html.ph .phc .s .ic{width:1em;height:1em;vertical-align:-.12em}
+html.ph .phc.act{outline:2px solid #ffd76a;outline-offset:1px}
+html.ph .phc.me{cursor:default;background:linear-gradient(#6a3a1c,#44230f)}
+/* table first */
+html.ph .gx-board{padding:4px;gap:4px}
+html.ph .table{perspective:none;--sw:clamp(34px,min(15cqh,12cqw),54px)}
+html.ph .felt{transform:none;padding:6px;gap:4px;border-radius:12px}
+html.ph .pile{gap:3px}html.ph .pile .lbl{font-size:13px}
+html.ph .pile .lbl{font-size:13px}
+html.ph .arena{--cw:clamp(56px,calc((100cqh - var(--res,110px))/1.42),230px)}
+html.ph .arena .vs{font-size:14px}
+html.ph .score .sl{font-size:13px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}html.ph .score .num{font-size:1.1rem}
+html.ph .arena .mon>.small,html.ph .arena .small{font-size:13px}
+html.ph .empty{font-size:15px}html.ph .empty.small{font-size:13px}
+html.ph .outcome{padding:6px 14px}html.ph .outcome .oh{font-size:1.2rem}html.ph .outcome .os,html.ph .outcome .story{font-size:14px}
+/* my mat: one status line (portrait), gear chips, hand as a compact fan */
+html.ph .mine{padding:3px 6px 2px;--hw:64px;gap:2px}
+html.ph .mine.paper::before{display:none}
+html.ph .mine .top .who{font-size:14px}html.ph .mine .top .str{font-size:13px}html.ph .mine .lv{font-size:1.2rem}
+html.ph-l .mine .top{display:none}
+html.ph .gear{min-height:46px;gap:6px;padding:1px 2px}
+html.ph .gear:not(:has(.gchip)){min-height:20px}
+html.ph .gear .gl{display:none}
+html.ph .gear>.small{font-size:13px}
+html.ph .gchip{min-height:44px;font-size:13px;padding:2px 10px 2px 7px}html.ph .gchip b{font-size:13px}
+html.ph .hand{gap:0;padding:12px 8px 4px;scroll-snap-type:none;-webkit-mask-image:none;mask-image:none}
+html.ph .hand .card{--w:var(--hw);rotate:none;translate:0 0}
+html.ph .hand .card+.card{margin-left:-14px}
+html.ph .hand .card.play,html.ph .hand .card.sug{translate:0 -6px}
+html.ph .hand .card .sugb{display:none}
+html.ph .card:hover{transform:none}
+html.ph .swipe{display:none}
+html.ph-l .mine{--hw:60px}
+/* one action card (the dock) under the table / in the right rail */
+html.ph .gx-dock-head,html.ph .gx-reopen{display:none!important}
+html.ph .gx-dock{border:0;border-top:2px solid var(--brass2);border-radius:0;box-shadow:none;visibility:visible!important}
+html.ph .gx-dock-body{display:block!important;padding:6px 10px 8px;font-size:15px}
+html.ph #prompt .order,html.ph #prompt .steps,html.ph #prompt>.who,html.ph #prompt ol,html.ph #prompt>.fightnote,html.ph #prompt>.tip:last-child,html.ph .recent,html.ph .hint .hx{display:none}
+html.ph #prompt p{margin:2px 0 4px;font-size:15px;line-height:1.25}
+html.ph #prompt .acts.main{position:static;background:none;box-shadow:none;padding:2px 0;margin:4px 0;gap:8px}
+html.ph #prompt .acts .btn{min-height:48px;font-size:16px;flex:1 1 auto;justify-content:center;text-align:center;padding:6px 12px}
+html.ph .hint{padding:5px 8px;font-size:13px;margin:4px 0}
+html.ph .hint .hl{font-size:13px;line-height:1.25}
+html.ph .toast{font-size:14px}
+html.ph .rec::after{font-size:13px}
+html.ph .btn{min-height:44px}
+html.ph .btn.rec{box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 2px 0 #3a2213,0 0 0 3px #7fd0ff}
+html.ph #prompt .asks{margin:0;box-sizing:border-box;position:fixed;z-index:35;left:0;right:0;bottom:0;max-height:calc(100dvh - var(--ph-tb));overflow:auto;border-radius:14px 14px 0 0;background:var(--paper);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));font-size:15px;box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+html.ph #prompt .asks .small{font-size:13px}
+/* portrait grid: bar / chips / (table+mat | action card) */
+html.ph-p .gx-app{grid-template-rows:auto auto minmax(0,1fr)}
+html.ph-p .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) var(--ph-dock)}
+html.ph-p .gx-dock{height:var(--ph-dock)!important;max-height:none!important;padding-bottom:env(safe-area-inset-bottom,0px)}
+/* landscape grid: board full height on the left; bar + chips + action card in the right rail */
+html.ph-l .gx-app{grid-template-columns:minmax(0,1fr) var(--ph-rail);grid-template-rows:auto auto minmax(0,1fr)}
+html.ph-l .gx-main{display:contents}
+html.ph-l .gx-board{grid-column:1;grid-row:1/4;padding-top:calc(4px + env(safe-area-inset-top,0px))}
+html.ph-l .gx-bar{grid-column:2;grid-row:1}
+html.ph-l .phopps{grid-column:2;grid-row:2;flex-wrap:wrap;overflow:hidden;max-height:104px}
+html.ph-l .phc{flex:1 1 calc(50% - 6px);max-width:none}
+html.ph-l .gx-dock{grid-column:2;grid-row:3;height:auto!important;max-height:none!important;min-height:0;border-top:2px solid var(--brass2);border-left:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+/* landscape fight: the two totals sit beside the monster card instead of above it */
+html.ph-l .arena:has(>.vs){--res:34px!important;display:grid;grid-template-columns:auto minmax(0,auto) auto;grid-template-rows:auto auto;column-gap:6px;align-content:center;justify-content:center;align-items:center}
+html.ph-l .arena:has(>.vs) .vs{display:contents}
+html.ph-l .arena:has(>.vs) .vs .score.hero{grid-column:1;grid-row:1}
+html.ph-l .arena:has(>.vs) .vs .vsx{position:absolute;left:50%;top:2px;translate:-50% 0;width:1.6em;height:1.6em;opacity:.9}
+html.ph-l .arena:has(>.vs) .vs .score.mons{grid-column:3;grid-row:1}
+html.ph-l .arena:has(>.vs) .row.mons{grid-column:2;grid-row:1}
+html.ph-l .arena:has(>.vs)>.row.small,html.ph-l .arena:has(>.vs)>.rollbox{grid-column:1/4}
+/* pop-ups (card, rival, ask) live in the free zone: under the table (portrait) / in the right rail (landscape) */
+html.ph .gx-scrim{background:rgba(0,0,0,.18)}
+html.ph .gx-drawer-head{padding:4px 6px 4px 12px;min-height:48px}
+html.ph .gx-drawer-head h2{font-size:1.05rem}
+html.ph .gx-x{min-width:44px;min-height:44px}
+html.ph-p #dkCard,html.ph-p #dkOpp{top:auto;left:0;right:0;bottom:0;width:auto;height:auto;max-height:calc(100dvh - var(--ph-tb))}
+html.ph-l #dkCard,html.ph-l #dkOpp{top:0;bottom:0;right:0;left:auto;width:var(--ph-rail);height:auto;max-height:none;border-radius:14px 0 0 14px;transform:translateX(105%);padding-bottom:env(safe-area-inset-bottom,0px)}
+html.ph-l #dkCard.on,html.ph-l #dkOpp.on{transform:none}
+html.ph .gx-drawer-body{padding:8px 10px 12px;font-size:15px}
+html.ph .zgrid{grid-template-columns:auto minmax(0,1fr);gap:10px}
+html.ph .zoom .card{--w:168px;margin:0;font-size:15px}
+html.ph-l .zoom .card{--w:calc(var(--ph-rail)*.44)}
+html.ph .zoom .card .cx{font-size:13px;line-height:1.15;-webkit-line-clamp:unset}
+html.ph .zoom .card .cn{font-size:14px}html.ph .zoom .card .kind{font-size:13px}html.ph .zoom .card .gold{font-size:13px}html.ph .zoom .card .tag small{display:none}
+html.ph .zoom .small,html.ph .zoom p{font-size:14px;line-height:1.3;margin:.25rem 0}
+html.ph .zoom .why{background:linear-gradient(#eef7ff,#d6ebfb);color:#10263e;border:1px solid #4a86c0;border-radius:8px;padding:4px 8px}
+html.ph .zoom .opts{gap:8px;margin-top:6px}
+html.ph .zoom .opts .btn,html.ph .zoom .acts .btn{width:100%;min-height:48px;white-space:normal;text-align:left;justify-content:flex-start;font-size:15px;line-height:1.2;padding:6px 12px}
+html.ph .zoom .acts{margin:8px 0 0}
+html.ph .oppfull .small,html.ph .oppfull{font-size:14px}
+/* dialogs: start / pass / end */
+html.ph .dlg{padding:12px 14px;font-size:15px}
+html.ph .dlg .small{font-size:13px}
+html.ph .dlg .btn{min-height:46px}
+
+.phlist{display:none}
+html.ph .oppfull .tableau{display:none}
+html.ph .phlist{display:grid;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+html.ph .phlist .gchip{width:100%;justify-content:flex-start;white-space:normal;font-size:14px;min-height:44px}
+html.ph .oppfull .chip{font-size:13px}
+html.ph .phc .n .ptok,html.ph .dlg .ptok,html.ph .mine .ptok,html.ph .oppfull .ptok,html.ph #prompt .ptok{font-size:13px}
+html.ph .seg .btn,html.ph .grid2 .btn{min-width:44px}
+html.ph .zoom .card .tag{font-size:max(13px,calc(var(--u)*10.5))}
+html.ph .zgrid>div:last-child{display:flex;flex-direction:column;min-width:0}
+html.ph .zgrid .opts{order:-2;margin-top:0}
+html.ph .zgrid .why{order:-1;margin-top:8px}
+html.ph .zgrid .acts{display:none}
+html.ph .zgrid .opts .rec::after{display:none}
+html.ph .zgrid .opts .rec::before{content:"";width:1.05em;height:1.05em;flex:none;margin-right:4px;background:currentColor;-webkit-mask:var(--bulb) center/contain no-repeat;mask:var(--bulb) center/contain no-repeat}
+html.ph-l #prompt .asks{left:auto;right:0;top:0;bottom:0;width:var(--ph-rail);max-height:none;border-radius:14px 0 0 14px}
+/* real usable heights: primary action rows stay pinned while a dialog / ask panel scrolls */
+html.ph .dlg .acts{position:sticky;bottom:-12px;z-index:2;margin:10px -14px -12px!important;padding:8px 14px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(240,228,200,0),var(--paper) 14px)}
+html.ph #prompt .asks>div:last-child{position:sticky;bottom:calc(-10px - env(safe-area-inset-bottom,0px));padding:8px 0 calc(10px + env(safe-area-inset-bottom,0px));margin-bottom:calc(-10px - env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(240,228,200,0),var(--paper) 12px)}
+/* landscape rail on short screens: the action buttons share a row so the hint under them is not cut */
+@media (max-height:420px){html.ph-l #prompt .acts.main{flex-wrap:wrap;gap:6px}html.ph-l #prompt .acts .btn{flex:1 1 calc(50% - 6px);min-width:0;min-height:44px;font-size:14px;padding:4px 6px}html.ph-l #prompt p{margin:1px 0 3px;font-size:14px}}
+/* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
+html.ph .mbox,html.ph .dlg{box-sizing:border-box}
+/* clarity: the action buttons always sit at the top of the action card, then the lesson / recap, then the hint */
+html.ph #prompt{display:flex;flex-direction:column}
+html.ph #prompt>.acts.main{order:-3}
+html.ph #prompt>.toast{order:-4}
+html.ph #prompt>.since,html.ph #prompt>.lesson{order:-1;font-size:14px}
+html.ph #prompt>.say{order:-2}
+html.ph #prompt .acts .btn.good{font-size:15px}
+html.ph .hint .hl{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+html.ph .dlg.start .cast{display:none}
+html.ph .rollbox .small{white-space:normal;overflow:visible}
+html.ph .dlg.start .intro{display:none}
+html.ph .dlg.start h2{font-size:1.6rem!important;margin:0 0 4px}
+html.ph .dlg.start>p{margin:0 0 6px;font-size:14px;line-height:1.3}
+html.ph .dlg.start h3{margin:6px 0 3px;font-size:15px}
+html.ph .dlg.start .seg .btn{min-height:44px;padding:4px 10px;font-size:15px}
+html.ph .dlg.start .btn.learn{min-height:44px;padding:4px 10px;font-size:14px;white-space:normal}
+html.ph .dlg.start .acts{flex-wrap:nowrap;gap:6px}
+html.ph .dlg.start .acts .btn{flex:1 1 0;min-width:0;padding:4px 6px;font-size:14px;white-space:normal;line-height:1.15}
+html.ph #prompt:has(>.lesson) .hint{display:none}
+html.ph #prompt>.acts .btn[disabled]{display:none}
+html.ph .lesson .lbtn{font-size:14px;min-height:44px;padding:2px 12px}
+html.ph-p .phc{flex:1 0 86px;padding:3px 5px 3px 9px}
+html.ph-p .phc .s{font-size:13px}
+html.ph-p .phc .hc{display:none}
+html.ph #prompt>.sellbar{order:-5;margin:2px 0}
+html.ph #prompt:has(>.sellbar)>:is(.acts.main,.hint,.since,.lesson,.say){display:none}
+html.ph #prompt>.sellbar .acts{display:flex;gap:8px;margin-top:6px}html.ph #prompt>.sellbar .btn{flex:1 1 0;min-height:48px}

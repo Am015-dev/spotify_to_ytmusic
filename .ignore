@@ -1,0 +1,17 @@
+# Read by ripgrep (so the Grep tool), fd and ag. Keeps searches on real sources.
+# Also see games/.ignore and games-src/.ignore (nearest file wins when you search a folder).
+games/*/index.html
+games/**/media/
+games/reference.html
+games/shots.html
+*.min.js
+vendor/
+node_modules/
+audio-data.js
+games-src/.staging/
+games-src/.stg-*/
+playtest/
+shots/
+shots-*/
+*-shots/
+licence-snapshots/

@@ -1,0 +1,25 @@
+{
+ "cards": {
+  "table-harbor-noon-phone": "a tall painted tabletop seen from above: a bright harbour at noon with pier planks and rope coils, calm empty space in the middle, no text, letters or numbers"
+ },
+ "style": "Hand-painted gouache illustration for a sea-tile navigation game with giant sea leviathans, deep teal water, warm lantern light, foam and scales, matte paper texture, slightly wobbly dark navy outline, simple readable silhouette, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 9",
+ "meta": {
+  "table-harbor-noon-phone": {
+   "element": "Painting: table-harbor-noon-phone",
+   "why": "phone version",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-harbor-noon-phone.png",
+   "target": "games/tidewake/media/table-harbor-noon-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art",
+   "wave": "Wave 9"
+  }
+ }
+}

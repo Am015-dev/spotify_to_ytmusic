@@ -1,0 +1,21 @@
+name: Cost guard
+
+# Fails a push to the work branch that brings back big files, built artefacts or new override layer files.
+# Same script the build runs: games-src/scripts/guard.py (one-line fix hints in the log).
+on:
+  push:
+    branches: [alex/brave-carson-rbpmlk]
+  workflow_dispatch:
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Guard (sizes, layers, tracked build outputs)
+        run: python3 games-src/scripts/guard.py
+      - name: Code maps still generate
+        run: python3 games-src/scripts/modmap.py

@@ -1,0 +1,25 @@
+{
+ "cards": {
+  "event-portal-opens": "a huge purple portal ripping open in the night sky above a city skyline with the silhouettes of monsters climbing out, dramatic, no text, letters or numbers"
+ },
+ "style": "Bold hand-painted gouache illustration for a cheerful giant-monster city-brawl dice game, thick dark ink outline, saturated neon-night city colours, playful and a little menacing but never gory, simple readable silhouette, centred, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "event-portal-opens": {
+   "element": "Painting: event-portal-opens",
+   "why": "chapter intro splash",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "event-portal-opens.png",
+   "target": "games/crown-city-smash/media/event-portal-opens.webp",
+   "size": "1024x768",
+   "ratio": "4:3",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

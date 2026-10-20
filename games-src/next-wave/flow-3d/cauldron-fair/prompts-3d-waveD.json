@@ -1,0 +1,28 @@
+{
+ "cards": {
+  "chip-spark": "a round fair chip with a lightning spark symbol in gold, glossy, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a cosy fantasy-fair board game, warm brown ink outline with a slightly wobbly brush edge, soft rim light, matte paper texture, rich but warm colours, simple readable silhouette that still works at 60 px wide, centred, plenty of margin, no text, no numbers",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave D",
+ "meta": {
+  "chip-spark": {
+   "element": "3D model: chip-spark",
+   "why": "special chip look",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "chip-spark.png",
+   "target": "games/cauldron-fair/models/chip-spark.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  }
+ },
+ "targets": {
+  "chip-spark": "games/cauldron-fair/models/chip-spark.glb"
+ }
+}

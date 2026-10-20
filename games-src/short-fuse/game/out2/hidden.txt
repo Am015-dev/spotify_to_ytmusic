@@ -1,0 +1,3 @@
+hidden-test: 262 games, 4256 poisoned decisions; knowledge differs 0, decision differs 0, what-we-know differs 0; 300s
+control: a peeking chooser was caught in 363 of 394 poisoned checks
+PASS: the AI never reads hidden state (and the test does catch a peeking AI)

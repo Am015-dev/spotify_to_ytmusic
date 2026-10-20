@@ -1,0 +1,79 @@
+{
+ "cards": {
+  "diver-bram": "Bram: a pump fixer in a patched diving suit with a big wrench, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "diver-dag": "Dag: a new cheerful diver with a too-big helmet and a big grin, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "diver-nerea": "Nerea: a harbour pilot in a brass diving helmet with the visor up and a yellow suit, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "diver-sumi": "Sumi: a fish scientist in a diving suit holding a glowing sample jar, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a calm co-operative deep-sea card game, deep blue and teal water, a small warm golden lantern glow as the only strong warm light, soft rim light, visible gentle brush texture on matte paper, slightly wobbly dark navy ink outline, simple readable silhouette that still works at 40 pixels, rich but not neon colours, centred, plenty of margin, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave B",
+ "meta": {
+  "diver-bram": {
+   "element": "3D model: diver-bram",
+   "why": "a diver piece",
+   "pri": 1,
+   "ref": "games/lantern-dive/media/camp-bram.webp",
+   "thumb": "lantern-dive/media/camp-bram.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "diver-bram.png",
+   "target": "games/lantern-dive/models/diver-bram.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "diver-dag": {
+   "element": "3D model: diver-dag",
+   "why": "a diver piece",
+   "pri": 1,
+   "ref": "games/lantern-dive/media/camp-dag.webp",
+   "thumb": "lantern-dive/media/camp-dag.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "diver-dag.png",
+   "target": "games/lantern-dive/models/diver-dag.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "diver-nerea": {
+   "element": "3D model: diver-nerea",
+   "why": "a diver piece",
+   "pri": 1,
+   "ref": "games/lantern-dive/media/camp-nerea.webp",
+   "thumb": "lantern-dive/media/camp-nerea.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "diver-nerea.png",
+   "target": "games/lantern-dive/models/diver-nerea.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "diver-sumi": {
+   "element": "3D model: diver-sumi",
+   "why": "a diver piece",
+   "pri": 1,
+   "ref": "games/lantern-dive/media/camp-sumi.webp",
+   "thumb": "lantern-dive/media/camp-sumi.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "diver-sumi.png",
+   "target": "games/lantern-dive/models/diver-sumi.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  }
+ },
+ "targets": {
+  "diver-bram": "games/lantern-dive/models/diver-bram.glb",
+  "diver-dag": "games/lantern-dive/models/diver-dag.glb",
+  "diver-nerea": "games/lantern-dive/models/diver-nerea.glb",
+  "diver-sumi": "games/lantern-dive/models/diver-sumi.glb"
+ }
+}

@@ -1,0 +1,79 @@
+{
+ "cards": {
+  "city-bus": "a chunky red city bus, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "parked-car": "a small round retro blue city car, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "street-lamp": "a retro cast-iron street lamp with a warm glowing lantern, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "street-tree": "a round leafy city street tree in a square planter, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Bold hand-painted gouache illustration for a cheerful giant-monster city-brawl dice game, thick dark ink outline, saturated neon-night city colours, playful and a little menacing but never gory, simple readable silhouette, centred, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave D",
+ "meta": {
+  "city-bus": {
+   "element": "3D model: city-bus",
+   "why": "monsters step over buses",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "city-bus.png",
+   "target": "games/crown-city-smash/models/city-bus.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  },
+  "parked-car": {
+   "element": "3D model: parked-car",
+   "why": "monsters step over cars",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "parked-car.png",
+   "target": "games/crown-city-smash/models/parked-car.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  },
+  "street-lamp": {
+   "element": "3D model: street-lamp",
+   "why": "board-edge prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "street-lamp.png",
+   "target": "games/crown-city-smash/models/street-lamp.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  },
+  "street-tree": {
+   "element": "3D model: street-tree",
+   "why": "board-edge prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "street-tree.png",
+   "target": "games/crown-city-smash/models/street-tree.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  }
+ },
+ "targets": {
+  "city-bus": "games/crown-city-smash/models/city-bus.glb",
+  "parked-car": "games/crown-city-smash/models/parked-car.glb",
+  "street-lamp": "games/crown-city-smash/models/street-lamp.glb",
+  "street-tree": "games/crown-city-smash/models/street-tree.glb"
+ }
+}

@@ -1,0 +1,62 @@
+{
+ "cards": {
+  "junk-b": "a small wooden sea junk with red-orange batten sails and a lantern at the bow, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "junk-c": "a small wooden sea junk with blue-white batten sails and a carved dragon head, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "rift-gate": "a stone sea arch gate with a swirling blue-violet portal in the middle, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a sea-tile navigation game with giant sea leviathans, deep teal water, warm lantern light, foam and scales, matte paper texture, slightly wobbly dark navy outline, simple readable silhouette, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave B",
+ "meta": {
+  "junk-b": {
+   "element": "3D model: junk-b",
+   "why": "per-player ship look 2",
+   "pri": 1,
+   "ref": "games/tidewake/models/junk.webp",
+   "thumb": "tidewake/models/junk.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "junk-b.png",
+   "target": "games/tidewake/models/junk-b.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "junk-c": {
+   "element": "3D model: junk-c",
+   "why": "per-player ship look 3",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "junk-c.png",
+   "target": "games/tidewake/models/junk-c.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  },
+  "rift-gate": {
+   "element": "3D model: rift-gate",
+   "why": "the Rift Gate landmark",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "rift-gate.png",
+   "target": "games/tidewake/models/rift-gate.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave B"
+  }
+ },
+ "targets": {
+  "junk-b": "games/tidewake/models/junk-b.glb",
+  "junk-c": "games/tidewake/models/junk-c.glb",
+  "rift-gate": "games/tidewake/models/rift-gate.glb"
+ }
+}

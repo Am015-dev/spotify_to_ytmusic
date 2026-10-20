@@ -1,0 +1,62 @@
+{
+ "cards": {
+  "fair-lantern": "a hanging paper lantern strung with a ribbon, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "fizz-jar": "a glass jar of tiny glowing green seed pods, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "potion-bottle": "a round-bellied potion bottle with a cork and a glowing violet brew, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a cosy fantasy-fair board game, warm brown ink outline with a slightly wobbly brush edge, soft rim light, matte paper texture, rich but warm colours, simple readable silhouette that still works at 60 px wide, centred, plenty of margin, no text, no numbers",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave E",
+ "meta": {
+  "fair-lantern": {
+   "element": "3D model: fair-lantern",
+   "why": "tent prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "fair-lantern.png",
+   "target": "games/cauldron-fair/models/fair-lantern.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "fizz-jar": {
+   "element": "3D model: fizz-jar",
+   "why": "stall prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "fizz-jar.png",
+   "target": "games/cauldron-fair/models/fizz-jar.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "potion-bottle": {
+   "element": "3D model: potion-bottle",
+   "why": "stall prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "potion-bottle.png",
+   "target": "games/cauldron-fair/models/potion-bottle.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  }
+ },
+ "targets": {
+  "fair-lantern": "games/cauldron-fair/models/fair-lantern.glb",
+  "fizz-jar": "games/cauldron-fair/models/fizz-jar.glb",
+  "potion-bottle": "games/cauldron-fair/models/potion-bottle.glb"
+ }
+}

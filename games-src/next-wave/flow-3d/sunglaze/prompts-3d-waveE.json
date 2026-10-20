@@ -1,0 +1,45 @@
+{
+ "cards": {
+  "glaze-pot": "a clay pot of glossy glaze with a brush resting on the rim, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "trowel": "a small tile-setter trowel with a wooden handle, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a glazed-tile mosaic workshop game, jewel-bright glaze colours, warm kiln glow, matte paper texture, slightly wobbly dark ink outline, simple readable silhouette, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave E",
+ "meta": {
+  "glaze-pot": {
+   "element": "3D model: glaze-pot",
+   "why": "edge prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "glaze-pot.png",
+   "target": "games/sunglaze/models/glaze-pot.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "trowel": {
+   "element": "3D model: trowel",
+   "why": "edge prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "trowel.png",
+   "target": "games/sunglaze/models/trowel.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  }
+ },
+ "targets": {
+  "glaze-pot": "games/sunglaze/models/glaze-pot.glb",
+  "trowel": "games/sunglaze/models/trowel.glb"
+ }
+}

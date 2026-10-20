@@ -1,0 +1,214 @@
+// ===================== part 6: board first: the bag, the pull, the danger meter, the boil, the explosion, the ghost finger, the shop =====================
+// The brew is played on the bag: tap it, a hand rummages (longer when the pot is risky), the chip pops out of the bag and flies onto the
+// spiral. The danger meter under it ticks up with every white chip; the pot boils harder as the risk grows. Stop is the one big button.
+// Nothing here changes the rules: it only times and shows the same moves (act() / CF.moves()).
+const BF = { pulling: false, fast: false, seq: 0, lastWs: {}, fxUntil: 0, heat: 0, launch: null, repT: 0 };
+const bfAnim = () => ANIM && !UI.sim && !(typeof pxRM === 'function' && pxRM()) && !/jsdom/i.test(navigator.userAgent || '');
+// how long the hand rummages in the bag: a short beat, longer when the next chip may explode the pot
+function pullMs(p) { if (!bfAnim() || UI.pullMs === 0) return 0; const r = CF.risk(G, p.seat); return Math.round(480 + 820 * Math.min(1, r.pBoom * 2.4)); }
+function heatOf(p) { if (!p || !G) return 0; const lim = CF.limitOf(G, p), ws = CF.whiteSum(p); if (p.boom) return 1; let pb = 0; try { if (G.phase === 'brew' && p.st === 'draw' && p.bag.length && p.bag[0]) pb = CF.risk(G, p.seat).pBoom; } catch (e) { } return Math.max(0, Math.min(1, Math.max(ws / Math.max(1, lim + 1), pb * 2.2))); }
+const bfHand = () => '<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 60 C14 50 12 40 16 30 L18 14 C18 10 24 10 24 14 L25 28 L27 8 C27 3 34 3 34 8 L34 27 L37 10 C37 5 44 5 44 10 L42 29 L46 18 C47 13 53 14 52 19 L48 40 C46 50 42 56 38 60 Z" fill="#f3d2b0" stroke="#5a3a1a" stroke-width="2.4" stroke-linejoin="round"/></svg>';
+function bfPull(m, v) {
+  if (BF.pulling) { BF.fast = true; return; }              // a second tap hurries the hand, it never draws twice
+  const p = G.players[v], ms = pullMs(p);
+  if (!ms) { act(m, v); return; }
+  BF.pulling = true; BF.fast = false; BF.seq = UI.seq; document.documentElement.classList.add('pulling');
+  $$('.bagb').forEach(b => b.classList.add('pull')); snd('draw'); if (ms > 900) setTimeout(() => { if (BF.pulling) snd('tick'); }, ms * .55);
+  const t0 = Date.now();
+  const step = () => {
+    if (BF.seq !== UI.seq || !G || G.phase !== 'brew') { bfEndPull(); return; }
+    if (!BF.fast && Date.now() - t0 < ms) { setTimeout(step, 30); return; }
+    bfEndPull(); const dm = mvList(v).find(x => x.t === 'draw'); if (dm) act(dm, v); else render();
+  };
+  setTimeout(step, 30);
+}
+function bfEndPull() { BF.pulling = false; BF.fast = false; document.documentElement.classList.remove('pulling'); $$('.bagb').forEach(b => b.classList.remove('pull')); }
+// a tumbling 3D clay chip (one sprite, recoloured by a CSS filter) flips out of the bag just before the painted chip lands
+const CHIP_TINT = { W: 'grayscale(1) brightness(2.3) contrast(.75)', K: 'grayscale(1) brightness(.4)', R: 'none', O: 'hue-rotate(22deg) saturate(1.2)', Y: 'hue-rotate(48deg) brightness(1.25)', G: 'hue-rotate(115deg)', B: 'hue-rotate(195deg)', P: 'hue-rotate(262deg)' };
+function bfTumble(c, sz, x0, y0, x1, y1) {
+  try {
+    const big = Math.round(sz * 1.25), e = h('img.bftum', { src: MODELS + 'chip.webp', alt: '', draggable: 'false', 'aria-hidden': 'true' });
+    e.style.cssText = 'left:' + (x1 - big / 2) + 'px;top:' + (y1 - big / 2) + 'px;width:' + big + 'px;height:' + big + 'px;filter:' + (CHIP_TINT[c] || 'none') + ' drop-shadow(0 4px 5px rgba(0,0,0,.45))';
+    document.body.appendChild(e); const dy = y0 - y1;
+    e.animate([{ transform: 'translateY(' + dy + 'px) scale(.3) rotate(-120deg)', opacity: 0 }, { transform: 'translateY(' + (dy * .35) + 'px) scale(1) rotate(160deg)', opacity: 1, offset: .35 }, { transform: 'translateY(-10px) scale(1.15) rotate(330deg)', opacity: 1, offset: .75 }, { transform: 'translateY(0) scale(1.1) rotate(360deg)', opacity: 0 }], { duration: 520, easing: 'ease-out', fill: 'forwards' });
+    setTimeout(() => e.remove(), 560); return e;
+  } catch (x) { return null; }
+}
+// the chip pops out of the bag, hangs for a beat, then the painted layer flies it onto the spiral
+function bfReveal(chip) {
+  if (!bfAnim()) return 0; const bag = document.querySelector('.bagb'); if (!bag) return 0;
+  const r = bag.getBoundingClientRect(); if (r.width < 4) return 0;
+  const key = chip.c + chip.v, sz = Math.round(Math.min(84, Math.max(56, r.height * .8)));
+  const x0 = r.left + r.width / 2, y0 = r.top + r.height * .35, x1 = x0, y1 = Math.max(70, r.top - sz * .9);
+  const e = h('div.bfchip' + (chip.c === 'W' ? '.w' : ''), { html: chipHTML(key, sz), 'aria-hidden': 'true' });
+  e.style.left = (x1 - sz / 2) + 'px'; e.style.top = (y1 - sz / 2) + 'px'; document.body.appendChild(e);
+  const dy = y0 - y1;
+  const tum = bfTumble(chip.c, sz, x0, y0, x1, y1);
+  try {
+    e.animate([{ transform: 'translateY(' + dy + 'px) scale(.3) rotate(-30deg)', opacity: 0 }, { transform: 'translateY(-8px) scale(1.25) rotate(6deg)', opacity: 1, offset: .45 }, { transform: 'translateY(0) scale(1.1) rotate(0)', opacity: 1, offset: .7 }, { transform: 'translateY(0) scale(1.1)', opacity: 1 }], { duration: 560, easing: 'cubic-bezier(.2,.8,.3,1)', fill: 'forwards' });
+    setTimeout(() => { try { e.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(-14px) scale(.9)' }], { duration: 160, fill: 'forwards' }); } catch (x) { } setTimeout(() => e.remove(), 180); }, 560);
+  } catch (x) { setTimeout(() => e.remove(), 700); }
+  const bd = $('#bd'); if (bd) { const B = bd.getBoundingClientRect(); BF.launch = { x: x1 - B.left, y: y1 - B.top, t: Date.now() }; }
+  return 520;
+}
+// ---------- the brew deck: one line, the danger meter, the bag and Stop ----------
+// ONE decision object feeds both the hint line and the ghost finger: {act:'draw'|'stop'|'flask'|null, text}. Unsure (middling risk) = no act, no text.
+function bfDecide(p, r, fm) {
+  if (!p || !G || G.phase !== 'brew' || p.st !== 'draw') return { act: null, text: '' };
+  if (p.lock) return { act: null, text: 'Decided. Waiting for the others…' };
+  if (!p.pot.length) return { act: 'draw', text: G.round === 1 ? 'Tap the bag to pull a chip!' : 'Tap the bag to start brewing' };
+  r = r || CF.risk(G, p.seat); const pct = Math.round(r.pBoom * 100);
+  if (fm && p.pot[p.pot.length - 1].c === 'W' && CF.whiteSum(p) >= r.limit - 2 && pct >= 20) return { act: 'flask', text: 'Too hot? Tap the flask' };
+  if (pct >= 40) return { act: 'stop', text: 'Very risky! Tap Stop' };
+  if (pct <= 15) return { act: 'draw', text: pct ? 'Low risk. Pull another chip' : 'Safe! Pull another chip' };
+  return { act: null, text: '' };
+}
+function bfLine(p, r, fm) { return tutOn() ? '' : bfDecide(p, r, fm).text; }
+function bfMeter(p, v, fm, legal) {
+  const lim = CF.limitOf(G, p), ws = CF.whiteSum(p), r = CF.risk(G, v), pct = Math.round(r.pBoom * 100);
+  const prev = BF.lastWs[p.seat + ':' + G.round] || 0; BF.lastWs[p.seat + ':' + G.round] = ws;
+  const lv = ws > lim ? 'over' : ws >= lim - 1 ? 'hi' : ws >= lim - 3 ? 'mid' : 'lo';
+  const cells = h('span.mcells', { 'aria-hidden': 'true' });
+  const n = Math.max(lim, ws);
+  for (let i = 1; i <= n; i++) { const c = h('i' + (i <= ws ? '.on' : '') + (i > lim ? '.x' : '') + (i <= ws && i > prev ? '.new' : '')); if (i <= ws && i > prev) c.style.animationDelay = ((i - prev - 1) * 110) + 'ms'; cells.appendChild(c); }
+  cells.appendChild(h('b.mboom', { html: ico('boom', 22) }));
+  const m = h('div.meter.' + lv + (ws > prev ? '.up' : ''), { 'data-priv': v, role: 'meter', 'aria-valuemin': 0, 'aria-valuemax': lim, 'aria-valuenow': ws, 'aria-label': 'White chips ' + ws + ' of ' + lim + '. Next chip: ' + pct + '% to explode.' },
+    h('span.mw', { html: KIT.chipSVG('W', 0, { size: 22 }) }), cells, h('span.mn', h('b', ws), '/' + lim),
+    G.phase === 'brew' && p.st === 'draw' && !p.lock ? h('span.mp.' + (pct < 15 ? 'lo' : pct < 30 ? 'mid' : 'hi'), pct + '%') : null,
+    fm ? h('button.flb', { 'data-a': 'mv', 'data-i': legal.indexOf(fm), type: 'button', 'aria-label': 'Flask: put the last white chip back in the bag', title: 'Flask: put the last white chip back' }, h('span', { html: ico('flask', 22, true) })) : null);
+  return m;
+}
+function brewDeck(p, v, legal) {
+  renderRat(p, legal);
+  const dm = legal.find(x => x.t === 'draw'), sm = legal.find(x => x.t === 'stop'), fm = legal.find(x => x.t === 'flask');
+  const r = CF.risk(G, v), sp = CF.spaceOf(p), heat = heatOf(p);
+  const deck = h('div.bdeck' + (heat > .7 ? '.hot' : ''));
+  deck.appendChild(h('div.bline', { 'aria-live': 'polite' }, bfLine(p, r, fm)));
+  deck.appendChild(bfMeter(p, v, p.lock ? null : fm, legal));
+  const extras = [legal.find(x => x.t === 'froth') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'froth')), type: 'button' }, '↩ White chip back, free') : null,
+    legal.find(x => x.t === 'restart') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'restart')), type: 'button' }, 'Do-over: tip the chips back, once') : null].filter(Boolean);
+  const bagArt = KIT.ART.bag ? h('img.bagimg', { src: KIT.ART.bag, alt: '' }) : h('span.bagimg', { html: ico('bag', 80) });
+  const bag3 = !KIT.ART.bag || bagCur ? null : h('img.bag3d', { src: MODELS + 'bag.webp', alt: '', draggable: 'false', decoding: 'async' });   // the 3D bag swings in while the hand rummages (default bag only, not the unlocked skins)
+  const bag = dm ? h('button.btn.drawb.bagb' + (BF.pulling ? '.pull' : ''), { 'data-a': 'mv', 'data-i': legal.indexOf(dm), type: 'button', 'aria-label': 'Draw: pull a chip from your bag (' + bagN(p) + ' chips inside)' },
+    h('span.bagwrap', bagArt, bag3, h('span.hand', { html: bfHand() }), h('span.bagn', bagN(p))), h('span.bl', 'Draw'))
+    : h('button.btn.drawb.bagb.off', { type: 'button', disabled: true }, h('span.bagwrap', bagArt, h('span.bagn', bagN(p))), h('span.bl', p.lock ? 'Waiting' : 'Draw'));
+  const keep = h('small.keep', h('span', { html: ico('vp', 15) }), D.VP[sp], h('span', { html: ico('coin', 15) }), D.COINS[sp], D.RUBY[sp] ? h('span', { html: ico('ruby', 15) }) : null);
+  const stop = sm ? h('button.btn.stopb', { 'data-a': 'mv', 'data-i': legal.indexOf(sm), type: 'button', disabled: BF.pulling ? true : null, 'aria-label': 'Stop and keep ' + D.VP[sp] + ' points and ' + D.COINS[sp] + ' coins' }, h('b', 'Stop'), keep)
+    : h('button.btn.stopb.off', { type: 'button', disabled: true, title: 'Pull your first chip first' }, h('b', 'Stop'), p.pot.length ? keep : h('small.keep', 'after a chip'));
+  deck.appendChild(h('div.brow', bag, stop));
+  if (extras.length) deck.appendChild(h('div.bextra', extras));   // below Draw/Stop, so the two big buttons never move
+  return deck;
+}
+// ---------- the boil: the pot reacts to the risk (CSS on #cwrap, the painted layer reads BF.heat) ----------
+function bfHeat() {
+  const cw = $('#cwrap'); if (!cw || !G) return; const f = focusSeat(), p = G.players[f];
+  const ht = G.phase === 'brew' || p.boom ? heatOf(p) : 0; BF.heat = ht;
+  cw.style.setProperty('--heat', ht.toFixed(2)); cw.dataset.heat = ht > .75 ? 3 : ht > .5 ? 2 : ht > .25 ? 1 : 0;
+}
+// ---------- the explosion ----------
+function bfBoom(e) {
+  if (!bfAnim()) return; const mine = isMine(e.seat), f = focusSeat(); if (e.seat !== f && !mine) return;
+  const big = mine, T = big ? 460 : 220, TOT = big ? 1600 : 1000;           // a tension beat on the deciding draw, then the bang, then the result
+  BF.fxUntil = Date.now() + TOT + 40; clearTimeout(BF.repT);
+  const o = h('div.boomfx' + (e.prot ? '.prot' : '') + (big ? '' : '.small'), { 'aria-hidden': 'true' }, h('div.btense'), h('div.bflash'), h('div.bword', e.prot ? 'BOOM… safe!' : 'BOOM!'), h('div.bsub', 'White ' + CF.whiteSum(G.players[e.seat]) + ' > ' + CF.limitOf(G, G.players[e.seat])));
+  o.style.setProperty('--T', T + 'ms'); o.style.setProperty('--S', big ? 1 : .6);
+  const cols = ['#f8f2e0', '#ff8a2a', '#7fd65a', '#ffd23a', '#8a5cf0'], n = big ? 30 : 16;
+  for (let i = 0; i < n; i++) {
+    const w = i % 5 === 0 ? h('i.shard.chipy') : h('i.shard'); const a = -Math.PI / 2 + (Math.random() - .5) * 2.6, d = (big ? 140 : 90) + Math.random() * (big ? 260 : 150);
+    w.style.setProperty('--dx', Math.round(Math.cos(a) * d) + 'px'); w.style.setProperty('--dy', Math.round(Math.sin(a) * d * 1.2 + d * .5) + 'px'); w.style.setProperty('--c', cols[i % cols.length]);
+    w.style.animationDelay = (T + Math.round(Math.random() * 140)) + 'ms'; o.appendChild(w);
+  }
+  document.body.appendChild(o);
+  const cw = $('#cwrap'), app = document.querySelector('.gx-app'); let done = false;
+  const end = byTap => { if (done) return; done = true; document.removeEventListener('pointerdown', onTap, true); o.remove(); if (cw) cw.classList.remove('tense'); if (app) app.classList.remove('quake'); if (byTap) { BF.fxUntil = 0; if (typeof checkReport === 'function') checkReport(); } };
+  const onTap = () => end(true); document.addEventListener('pointerdown', onTap, true);   // any tap skips it (and still reaches what it hit)
+  if (cw) cw.classList.add('tense'); snd('tick'); setTimeout(() => { if (!done) snd('tick'); }, T * .55);
+  setTimeout(() => {
+    if (done) return; if (cw) cw.classList.remove('tense'); snd('boom'); o.classList.add('bang');
+    if (app) { app.classList.remove('quake'); void app.offsetWidth; app.classList.add('quake'); }
+    try { if (navigator.vibrate) navigator.vibrate([90, 40, 160]); } catch (x) { }
+  }, T);
+  setTimeout(() => end(false), TOT);
+}
+// ---------- events: called from playEvents ----------
+function bfEvent(e) {
+  if (!G || UI.sim) return;
+  if (e.t === 'place' && isMine(e.seat) && focusSeat() === e.seat && e.chip) { const d = bfReveal(e.chip); if (d && typeof PX !== 'undefined') PX.flyIds[e.chip.i] = d; }
+  else if (e.t === 'boom') bfBoom(e);
+}
+// ---------- the ghost finger: shows the very first moves, then goes away ----------
+function bfGhost() {
+  let g = $('#ghost'); const tgt = bfGhostTarget();
+  if (!tgt) { if (g) g.hidden = true; return; }
+  if (!g) { g = h('div#ghost', { 'aria-hidden': 'true', html: bfHand() }); document.body.appendChild(g); }
+  const r = tgt.getBoundingClientRect(); if (r.width < 4) { g.hidden = true; return; }
+  g.hidden = false; g.style.left = Math.round(Math.min(innerWidth - 52, r.left + r.width * .62)) + 'px'; g.style.top = Math.round(Math.min(innerHeight - 64, r.top + r.height * .5)) + 'px';
+}
+function bfGhostTarget() {
+  if (!G || !UI.started || G.phase === 'over' || hotSeat() || UI.coach.level === 'off' || tutOn()) return null;
+  const p = mineP(); if (!p) return null; const fresh = UI.mode === 'guided' || !UI.prefs.drew;
+  if (UI.rsOpen && UI.rsMode === 'report') {
+    if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && !(UI.shopSel || []).length) return document.querySelector('#rs .tok.sug:not([disabled])') || document.querySelector('#rs .tok:not([disabled])');
+    if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && (UI.shopSel || []).length) return document.querySelector('#rs [data-a=shopbuy]');
+    return null;
+  }
+  if (UI.rsOpen || G.phase !== 'brew' || p.st !== 'draw' || p.lock || p.q || focusSeat() !== p.seat || BF.pulling) return null;
+  const fm = mvList(p.seat).find(x => x.t === 'flask'), dec = bfDecide(p, null, fm);
+  if (dec.act === 'draw' && fresh && !p.pot.length && G.round === 1) return document.querySelector('#acts .bagb:not([disabled])');
+  if (dec.act === 'stop' && UI.mode === 'guided' && G.round === 1 && !UI.prefs.stopped && p.pot.length >= 3) return document.querySelector('#acts .stopb:not([disabled])');
+  return null;
+}
+// ---------- rubies, on the same panel as the shop ----------
+const nextLabel = () => G.round >= LASTD() ? 'See final scores' : 'Start day ' + (G.round + 1);
+function rubyOpts(p) { const mx = Math.floor(p.rubies / D.rubySpend), out = []; for (let n = 0; n <= mx; n++) { out.push({ drop: n, flask: false }); if (!p.flask && n < mx) out.push({ drop: n, flask: true }); } return out; }
+function rubyBest(p) { try { const g = JSON.parse(JSON.stringify(G)); g.players[p.seat].q = { h: 'ruby', d: {} }; const m = CF.AI.choose(g, p.seat, 'normal'); if (m && m.t === 'ruby') return { drop: m.drop, flask: !!m.flask }; } catch (e) { } return { drop: 0, flask: false }; }
+const rubyKey = o => o.drop + (o.flask ? 'f' : '');
+function rubyPick(p) { if (UI.rubyFor !== p.seat + ':' + G.round) { UI.rubyFor = p.seat + ':' + G.round; UI.rubySel = tutOn() ? { drop: 0, flask: false } : rubyBest(p); UI.rubyBest = tutOn() ? '' : rubyKey(UI.rubySel); } return UI.rubySel; }
+function rubySelect(k) { const p = mineP(); if (!p) return; const o = rubyOpts(p).find(x => rubyKey(x) === k); if (o) { UI.rubySel = o; snd('click'); renderReport(); bfGhost(); } }
+// the one confirm button: buys the picked chips, spends the picked rubies, and starts the next day
+function rubyGo() { const p = mineP(); if (!p) return; UI.rubyAuto = Object.assign({}, rubyPick(p)); UI.advFor = G.rep ? G.rep.round : 0; autoDecisions(); }
+function autoDecisions() {
+  if (!G || !UI.started) return; const v = viewSeat(); if (v < 0) return; const me = G.players[v];
+  if (UI.rubyAuto && me.q && me.q.h === 'ruby') { const m = UI.rubyAuto; UI.rubyAuto = null; const L = mvList(v), mm = L.find(x => x.t === 'ruby' && x.drop === m.drop && !!x.flask === !!m.flask) || L.find(x => x.t === 'ruby' && x.drop === 0 && !x.flask); if (mm) act(mm, v); return; }
+  if (UI.advFor && G.rep && UI.advFor === G.rep.round && G.phase !== 'eval' && UI.rsOpen && UI.rsMode === 'report' && !hotSeat() && !(typeof NET !== 'undefined' && NET.on) && !UI.advT) {
+    UI.rubyAuto = null; const sq = UI.seq; UI.advT = setTimeout(() => { UI.advT = 0; UI.advFor = 0; if (sq === UI.seq && UI.rsOpen && UI.rsMode === 'report') repContinue(); }, 80);
+  }
+}
+// ---------- the shop (the market stall itself is built in part 9): tap a chip, it drops into your bag ----------
+function bfFly(fromR, toEl, key, size) {
+  if (!bfAnim() || !fromR || !toEl) return; const to = toEl.getBoundingClientRect(); if (to.width < 4) return;
+  const e = h('div.bfchip', { html: chipHTML(key, size || 40), 'aria-hidden': 'true' }); e.style.left = fromR.left + 'px'; e.style.top = fromR.top + 'px'; document.body.appendChild(e);
+  toEl.style.visibility = 'hidden';
+  try { const a = e.animate([{ transform: 'translate(0,0) scale(1)' }, { transform: 'translate(' + ((to.left - fromR.left) / 2) + 'px,' + ((to.top - fromR.top) / 2 - 60) + 'px) scale(1.3)', offset: .5 }, { transform: 'translate(' + (to.left - fromR.left) + 'px,' + (to.top - fromR.top) + 'px) scale(1)' }], { duration: 420, easing: 'ease-in-out' }); a.onfinish = () => { e.remove(); toEl.style.visibility = ''; }; }
+  catch (x) { e.remove(); toEl.style.visibility = ''; }
+}
+function shopToggle(key) {
+  const c = key[0]; let sel = UI.shopSel.slice(); const i = sel.indexOf(key), adding = i < 0;
+  const src = document.querySelector('#rs .tok[data-k="' + key + '"] svg'), fromR = src ? src.getBoundingClientRect() : null;
+  if (i >= 0) sel.splice(i, 1); else { sel = sel.filter(k => k[0] !== c); sel.push(key); if (sel.length > 2) sel.shift(); }
+  UI.shopSel = sel; snd(adding ? 'coin' : 'click'); renderReport();
+  if (adding) { const t = document.querySelector('#rs .sbc[data-k="' + key + '"]'); bfFly(fromR, t, key, 40); setTimeout(() => snd('plop'), 380); }
+  bfGhost();
+}
+function shopBuy() {
+  const v = viewSeat(); if (v < 0) return; const items = UI.shopSel.slice();
+  const go = () => { UI.shopSel = []; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) toast('That purchase did not work.'); };
+  const cs = $$('#rs .sbc'), img = document.querySelector('#rs .sbimg');
+  if (!items.length || !bfAnim() || !cs.length || !img) { go(); return; }
+  if (UI.buying) return; UI.buying = true;
+  const ir = img.getBoundingClientRect();
+  cs.forEach((c, k) => { const r = c.getBoundingClientRect(); try { c.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + (ir.left + ir.width / 2 - r.left - r.width / 2) + 'px,' + (ir.top + ir.height * .3 - r.top - r.height / 2 - 40) + 'px) scale(.8)', offset: .55 }, { transform: 'translate(' + (ir.left + ir.width / 2 - r.left - r.width / 2) + 'px,' + (ir.top + ir.height * .45 - r.top - r.height / 2) + 'px) scale(.2)', opacity: 0 }], { duration: 520, delay: k * 120, fill: 'forwards', easing: 'ease-in' }); } catch (x) { } });
+  try { img.animate([{ transform: 'none' }, { transform: 'scale(1.12,.9)' }, { transform: 'none' }], { duration: 300, delay: 480 + (cs.length - 1) * 120 }); } catch (x) { }
+  snd('buy'); setTimeout(() => { UI.buying = false; go(); }, 720 + (cs.length - 1) * 120);
+}
+
+// the rat stone's head start is a little pill on the board (never in the dock): tap it, pick how much of it to use
+function renderRat(p, legal) {
+  let c = $('#ratchip'); const rat = p && legal ? legal.filter(x => x.t === 'ratset') : [];
+  if (!rat.length) { if (c) c.remove(); return; }
+  if (UI.ratDay !== G.round) { UI.ratDay = G.round; UI.ratOpen = false; }
+  const bd = $('#bd'); if (!bd) return; if (!c) { c = h('div#ratchip'); bd.appendChild(c); }
+  const k = p.rat - p.droplet, open = !!UI.ratOpen; c.innerHTML = '';
+  if (open) c.appendChild(h('div.ratrow', rat.map(x => h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(x), type: 'button' }, x.n ? 'Only +' + x.n : 'None'))));
+  c.appendChild(h('button.ratb' + (open ? '.on' : ''), { 'data-a': 'ratopen', type: 'button', 'aria-expanded': open ? 'true' : 'false', 'aria-label': 'Rat head start +' + k + ': tap to use less' }, h('span', { html: ico('rat', 26) }), '+' + k));
+}

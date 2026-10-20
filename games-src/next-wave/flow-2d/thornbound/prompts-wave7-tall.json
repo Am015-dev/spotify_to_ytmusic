@@ -1,0 +1,41 @@
+{
+ "cards": {
+  "table-ossuary-phone": "a tall painted tabletop seen from above: a stone ossuary floor with moths around candles, calm empty space in the middle, no text, letters or numbers",
+  "table-sinks-masquerade-phone": "a tall painted tabletop seen from above: a candle-lit court floor with scattered masks and dark velvet, calm empty space in the middle, no text, letters or numbers"
+ },
+ "style": "Dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit, painterly brushwork, rich shadows, no text, no lettering, no frame.",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "table-ossuary-phone": {
+   "element": "Painting: table-ossuary-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-ossuary-phone.png",
+   "target": "games/thornbound/media/table-ossuary-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "table-sinks-masquerade-phone": {
+   "element": "Painting: table-sinks-masquerade-phone",
+   "why": "phone version",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-sinks-masquerade-phone.png",
+   "target": "games/thornbound/media/table-sinks-masquerade-phone.webp",
+   "size": "1080x1920",
+   "ratio": "9:16",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

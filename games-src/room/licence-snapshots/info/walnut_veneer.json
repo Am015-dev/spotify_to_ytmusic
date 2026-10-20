@@ -1,0 +1,48 @@
+{
+ "type": 1,
+ "name": "Walnut Veneer",
+ "tags": [
+  "smooth",
+  "grain",
+  "wood grain",
+  "raw",
+  "raw wood",
+  "veneer",
+  "veneer wood",
+  "walnut",
+  "timber",
+  "walnut wood"
+ ],
+ "authors": {
+  "Jenelle van Heerden": "All"
+ },
+ "max_resolution": [
+  16384,
+  16384
+ ],
+ "dimensions": [
+  1799.9999523162842,
+  1799.9999523162842
+ ],
+ "staging": null,
+ "files_hash": "ec8241081b595af3d65be98c1314d5df09394eba",
+ "description": "Free 16K walnut veneer texture with smooth, fine grain and raw wood surface - warm timber ideal for furniture, cabinetry, and interior visualizations.",
+ "category_id": "11f97979-30ff-513c-97e0-916d1b9f37ac",
+ "category": "Wood/Veneer/Walnut Veneer",
+ "attributes": {
+  "surface_use": "object",
+  "origin": "man_made",
+  "condition": [
+   "clean"
+  ]
+ },
+ "date_published": 1786448942,
+ "categories": [
+  "wood",
+  "raw wood"
+ ],
+ "vault": "wood",
+ "img_version": "e9e6f9fb",
+ "download_count": 1040,
+ "thumbnail_url": "https://cdn.polyhaven.com/asset_img/thumbs/walnut_veneer.png?width=256&height=256&v=e9e6f9fb"
+}

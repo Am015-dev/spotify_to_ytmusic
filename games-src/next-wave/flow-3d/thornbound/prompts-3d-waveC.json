@@ -1,0 +1,96 @@
+{
+ "cards": {
+  "banner-clans": "a tall banner on a pole in deep green and crimson with a stag emblem (no text), front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "banner-nobility": "a tall banner on a pole in crimson and gold with a crown emblem (no text), front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "pawn-priest": "a court pawn figure of a robed priest holding a candle, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "pawn-rebel": "a court pawn figure of a rebel in a ragged cloak holding a pitchfork, standing, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "stag-statue": "a dark stone statue of a stag with tall antlers on a plinth, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit, painterly brushwork, rich shadows, no text, no lettering, no frame.",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave C",
+ "meta": {
+  "banner-clans": {
+   "element": "3D model: banner-clans",
+   "why": "hall prop for the clans",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "banner-clans.png",
+   "target": "games/thornbound/models/banner-clans.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "banner-nobility": {
+   "element": "3D model: banner-nobility",
+   "why": "hall prop for the nobility",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "banner-nobility.png",
+   "target": "games/thornbound/models/banner-nobility.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "pawn-priest": {
+   "element": "3D model: pawn-priest",
+   "why": "court pawn look",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "pawn-priest.png",
+   "target": "games/thornbound/models/pawn-priest.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "pawn-rebel": {
+   "element": "3D model: pawn-rebel",
+   "why": "court pawn look",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "pawn-rebel.png",
+   "target": "games/thornbound/models/pawn-rebel.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  },
+  "stag-statue": {
+   "element": "3D model: stag-statue",
+   "why": "hall prop",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "stag-statue.png",
+   "target": "games/thornbound/models/stag-statue.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave C"
+  }
+ },
+ "targets": {
+  "banner-clans": "games/thornbound/models/banner-clans.glb",
+  "banner-nobility": "games/thornbound/models/banner-nobility.glb",
+  "pawn-priest": "games/thornbound/models/pawn-priest.glb",
+  "pawn-rebel": "games/thornbound/models/pawn-rebel.glb",
+  "stag-statue": "games/thornbound/models/stag-statue.glb"
+ }
+}

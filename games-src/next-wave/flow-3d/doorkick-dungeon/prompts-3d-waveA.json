@@ -1,0 +1,62 @@
+{
+ "cards": {
+  "hero-wrenna": "Wrenna the Schemer: a silver-haired woman with a small gold crown, fur-trimmed cloak and a golden goblet, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "hero-bodkin": "Bodkin the Braggart: a moustached knight in shiny plate armour with a red plumed helmet and a brass trumpet, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "hero-hobb": "Old Hobb the Doorwarden: a bearded old doorkeeper with a lantern and a ring of big iron keys, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted medieval storybook gouache illustration for a rowdy dungeon-door card game, warm torchlight, chunky readable shapes, slightly wobbly dark ink outline, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave A",
+ "meta": {
+  "hero-wrenna": {
+   "element": "3D model: hero-wrenna",
+   "why": "the final boss in 3D",
+   "pri": 1,
+   "ref": "games/doorkick-dungeon/media/camp-wrenna.webp",
+   "thumb": "doorkick-dungeon/media/camp-wrenna.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "hero-wrenna.png",
+   "target": "games/doorkick-dungeon/models/hero-wrenna.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  },
+  "hero-bodkin": {
+   "element": "3D model: hero-bodkin",
+   "why": "the fourth hero is missing in 3D",
+   "pri": 2,
+   "ref": "games/doorkick-dungeon/media/camp-bodkin.webp",
+   "thumb": "doorkick-dungeon/media/camp-bodkin.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "hero-bodkin.png",
+   "target": "games/doorkick-dungeon/models/hero-bodkin.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  },
+  "hero-hobb": {
+   "element": "3D model: hero-hobb",
+   "why": "the guide in 3D",
+   "pri": 2,
+   "ref": "games/doorkick-dungeon/media/camp-hobb.webp",
+   "thumb": "doorkick-dungeon/media/camp-hobb.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "hero-hobb.png",
+   "target": "games/doorkick-dungeon/models/hero-hobb.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave A"
+  }
+ },
+ "targets": {
+  "hero-wrenna": "games/doorkick-dungeon/models/hero-wrenna.glb",
+  "hero-bodkin": "games/doorkick-dungeon/models/hero-bodkin.glb",
+  "hero-hobb": "games/doorkick-dungeon/models/hero-hobb.glb"
+ }
+}

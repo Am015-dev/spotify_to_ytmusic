@@ -1,0 +1,572 @@
+[
+ {
+  "g": "cauldron-fair",
+  "i": "bag",
+  "kb": 483,
+  "liteKb": 131,
+  "tris": 19777,
+  "before": 19777,
+  "simplified": false,
+  "srcKb": 2341
+ },
+ {
+  "g": "cauldron-fair",
+  "i": "chip",
+  "kb": 835,
+  "liteKb": 79,
+  "tris": 19462,
+  "before": 19462,
+  "simplified": false,
+  "srcKb": 2734
+ },
+ {
+  "g": "crown-city-smash",
+  "i": "clampede",
+  "kb": 557,
+  "liteKb": 178,
+  "tris": 19449,
+  "before": 19449,
+  "simplified": false,
+  "srcKb": 3065
+ },
+ {
+  "g": "crown-city-smash",
+  "i": "dot",
+  "kb": 427,
+  "liteKb": 129,
+  "tris": 19235,
+  "before": 19235,
+  "simplified": false,
+  "srcKb": 2256
+ },
+ {
+  "g": "crown-city-smash",
+  "i": "fountain",
+  "kb": 573,
+  "liteKb": 156,
+  "tris": 19696,
+  "before": 19696,
+  "simplified": false,
+  "srcKb": 2839
+ },
+ {
+  "g": "crown-city-smash",
+  "i": "token-energy",
+  "kb": 235,
+  "liteKb": 14,
+  "tris": 19882,
+  "before": 19882,
+  "simplified": false,
+  "srcKb": 1316
+ },
+ {
+  "g": "crown-city-smash",
+  "i": "token-heart",
+  "kb": 293,
+  "liteKb": 14,
+  "tris": 19292,
+  "before": 19292,
+  "simplified": false,
+  "srcKb": 1541
+ },
+ {
+  "g": "crown-city-smash",
+  "i": "token-star",
+  "kb": 226,
+  "liteKb": 12,
+  "tris": 19316,
+  "before": 19316,
+  "simplified": false,
+  "srcKb": 1249
+ },
+ {
+  "g": "crown-city-smash",
+  "i": "tower-a",
+  "kb": 640,
+  "liteKb": 145,
+  "tris": 18681,
+  "before": 18681,
+  "simplified": false,
+  "srcKb": 3888
+ },
+ {
+  "g": "crown-city-smash",
+  "i": "tower-b",
+  "kb": 737,
+  "liteKb": 212,
+  "tris": 19836,
+  "before": 19836,
+  "simplified": false,
+  "srcKb": 2803
+ },
+ {
+  "g": "crown-city-smash",
+  "i": "tower-c",
+  "kb": 291,
+  "liteKb": 76,
+  "tris": 19289,
+  "before": 19289,
+  "simplified": false,
+  "srcKb": 1890
+ },
+ {
+  "g": "crown-city-smash",
+  "i": "tower-d",
+  "kb": 550,
+  "liteKb": 136,
+  "tris": 19071,
+  "before": 19071,
+  "simplified": false,
+  "srcKb": 2806
+ },
+ {
+  "g": "doorkick-dungeon",
+  "i": "die",
+  "kb": 976,
+  "liteKb": 82,
+  "tris": 19237,
+  "before": 19237,
+  "simplified": false,
+  "srcKb": 4164
+ },
+ {
+  "g": "doorkick-dungeon",
+  "i": "door",
+  "kb": 618,
+  "liteKb": 177,
+  "tris": 19743,
+  "before": 19743,
+  "simplified": false,
+  "srcKb": 2801
+ },
+ {
+  "g": "doorkick-dungeon",
+  "i": "hero-grub",
+  "kb": 480,
+  "liteKb": 121,
+  "tris": 19611,
+  "before": 19611,
+  "simplified": false,
+  "srcKb": 2695
+ },
+ {
+  "g": "doorkick-dungeon",
+  "i": "hero-morwen",
+  "kb": 458,
+  "liteKb": 106,
+  "tris": 19860,
+  "before": 19860,
+  "simplified": false,
+  "srcKb": 2511
+ },
+ {
+  "g": "doorkick-dungeon",
+  "i": "hero-pip",
+  "kb": 482,
+  "liteKb": 123,
+  "tris": 18597,
+  "before": 18597,
+  "simplified": false,
+  "srcKb": 2514
+ },
+ {
+  "g": "doorkick-dungeon",
+  "i": "hero-tansy",
+  "kb": 547,
+  "liteKb": 136,
+  "tris": 19335,
+  "before": 19335,
+  "simplified": false,
+  "srcKb": 2716
+ },
+ {
+  "g": "final-approach",
+  "i": "plane",
+  "kb": 315,
+  "liteKb": 107,
+  "tris": 19522,
+  "before": 19522,
+  "simplified": false,
+  "srcKb": 1817
+ },
+ {
+  "g": "hollowbough",
+  "i": "ever-tree",
+  "kb": 516,
+  "liteKb": 167,
+  "tris": 19630,
+  "before": 19630,
+  "simplified": false,
+  "srcKb": 2584
+ },
+ {
+  "g": "hollowbough",
+  "i": "worker",
+  "kb": 302,
+  "liteKb": 23,
+  "tris": 18869,
+  "before": 18869,
+  "simplified": false,
+  "srcKb": 1881
+ },
+ {
+  "g": "kaiten-kitchen",
+  "i": "cloche",
+  "kb": 231,
+  "liteKb": 46,
+  "tris": 19574,
+  "before": 19574,
+  "simplified": false,
+  "srcKb": 1212
+ },
+ {
+  "g": "kaiten-kitchen",
+  "i": "plate",
+  "kb": 322,
+  "liteKb": 71,
+  "tris": 19680,
+  "before": 19680,
+  "simplified": false,
+  "srcKb": 1911
+ },
+ {
+  "g": "lantern-dive",
+  "i": "lantern",
+  "kb": 586,
+  "liteKb": 148,
+  "tris": 18669,
+  "before": 18669,
+  "simplified": false,
+  "srcKb": 3544
+ },
+ {
+  "g": "nebula-aces",
+  "i": "na-lancer",
+  "kb": 571,
+  "liteKb": 225,
+  "tris": 19596,
+  "before": 19596,
+  "simplified": false,
+  "srcKb": 2950
+ },
+ {
+  "g": "nebula-aces",
+  "i": "na-talon",
+  "kb": 617,
+  "liteKb": 245,
+  "tris": 19590,
+  "before": 19590,
+  "simplified": false,
+  "srcKb": 3957
+ },
+ {
+  "g": "nebula-aces",
+  "i": "na-rock-a",
+  "kb": 458,
+  "liteKb": 30,
+  "tris": 19256,
+  "before": 19256,
+  "simplified": false,
+  "srcKb": 2387
+ },
+ {
+  "g": "nebula-aces",
+  "i": "na-rock-b",
+  "kb": 498,
+  "liteKb": 34,
+  "tris": 19001,
+  "before": 19001,
+  "simplified": false,
+  "srcKb": 2762
+ },
+ {
+  "g": "nebula-aces",
+  "i": "na-rock-c",
+  "kb": 434,
+  "liteKb": 28,
+  "tris": 18987,
+  "before": 18987,
+  "simplified": false,
+  "srcKb": 2234
+ },
+ {
+  "g": "rampart-and-vine",
+  "i": "piece-champ",
+  "kb": 283,
+  "liteKb": 32,
+  "tris": 19236,
+  "before": 19236,
+  "simplified": false,
+  "srcKb": 1612
+ },
+ {
+  "g": "rampart-and-vine",
+  "i": "piece-hog",
+  "kb": 297,
+  "liteKb": 28,
+  "tris": 19835,
+  "before": 19835,
+  "simplified": false,
+  "srcKb": 2011
+ },
+ {
+  "g": "rampart-and-vine",
+  "i": "piece-mason",
+  "kb": 361,
+  "liteKb": 36,
+  "tris": 19142,
+  "before": 19142,
+  "simplified": false,
+  "srcKb": 2337
+ },
+ {
+  "g": "rampart-and-vine",
+  "i": "piece-meeple",
+  "kb": 250,
+  "liteKb": 22,
+  "tris": 19302,
+  "before": 19302,
+  "simplified": false,
+  "srcKb": 1555
+ },
+ {
+  "g": "sands-of-qamar",
+  "i": "camel",
+  "kb": 347,
+  "liteKb": 79,
+  "tris": 19727,
+  "before": 19727,
+  "simplified": false,
+  "srcKb": 1959
+ },
+ {
+  "g": "sands-of-qamar",
+  "i": "lamp",
+  "kb": 477,
+  "liteKb": 284,
+  "tris": 19134,
+  "before": 19134,
+  "simplified": false,
+  "srcKb": 3176
+ },
+ {
+  "g": "sands-of-qamar",
+  "i": "meeple",
+  "kb": 469,
+  "liteKb": 43,
+  "tris": 19158,
+  "before": 19158,
+  "simplified": false,
+  "srcKb": 2628
+ },
+ {
+  "g": "sands-of-qamar",
+  "i": "palace",
+  "kb": 561,
+  "liteKb": 139,
+  "tris": 19839,
+  "before": 19839,
+  "simplified": false,
+  "srcKb": 3149
+ },
+ {
+  "g": "sands-of-qamar",
+  "i": "palm",
+  "kb": 1136,
+  "liteKb": 285,
+  "tris": 19319,
+  "before": 19319,
+  "simplified": false,
+  "srcKb": 3533
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-carpenter",
+  "kb": 772,
+  "liteKb": 267,
+  "tris": 19426,
+  "before": 19426,
+  "simplified": false,
+  "srcKb": 2959
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-cook",
+  "kb": 605,
+  "liteKb": 212,
+  "tris": 19118,
+  "before": 19118,
+  "simplified": false,
+  "srcKb": 2972
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-explorer",
+  "kb": 547,
+  "liteKb": 195,
+  "tris": 19843,
+  "before": 19843,
+  "simplified": false,
+  "srcKb": 2816
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-friday",
+  "kb": 532,
+  "liteKb": 191,
+  "tris": 18793,
+  "before": 18793,
+  "simplified": false,
+  "srcKb": 2774
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-fire",
+  "kb": 412,
+  "liteKb": 95,
+  "tris": 19514,
+  "before": 19514,
+  "simplified": false,
+  "srcKb": 2412
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-palisade",
+  "kb": 578,
+  "liteKb": 127,
+  "tris": 19148,
+  "before": 19148,
+  "simplified": false,
+  "srcKb": 2966
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-raft",
+  "kb": 631,
+  "liteKb": 147,
+  "tris": 19466,
+  "before": 19466,
+  "simplified": false,
+  "srcKb": 3104
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-shelter",
+  "kb": 501,
+  "liteKb": 120,
+  "tris": 19497,
+  "before": 19497,
+  "simplified": false,
+  "srcKb": 2423
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-palm-a",
+  "kb": 790,
+  "liteKb": 82,
+  "tris": 19015,
+  "before": 19015,
+  "simplified": false,
+  "srcKb": 3346
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-palm-b",
+  "kb": 335,
+  "liteKb": 41,
+  "tris": 19179,
+  "before": 19179,
+  "simplified": false,
+  "srcKb": 1988
+ },
+ {
+  "g": "shipwreck-isle",
+  "i": "sw-palm-c",
+  "kb": 419,
+  "liteKb": 45,
+  "tris": 19393,
+  "before": 19393,
+  "simplified": false,
+  "srcKb": 2287
+ },
+ {
+  "g": "short-fuse",
+  "i": "bomb",
+  "kb": 794,
+  "liteKb": 199,
+  "tris": 19002,
+  "before": 19002,
+  "simplified": false,
+  "srcKb": 4353
+ },
+ {
+  "g": "short-fuse",
+  "i": "pliers",
+  "kb": 1018,
+  "liteKb": 180,
+  "tris": 19676,
+  "before": 19676,
+  "simplified": false,
+  "srcKb": 3928
+ },
+ {
+  "g": "sunglaze",
+  "i": "plate",
+  "kb": 409,
+  "liteKb": 100,
+  "tris": 19914,
+  "before": 19914,
+  "simplified": false,
+  "srcKb": 2641
+ },
+ {
+  "g": "sunglaze",
+  "i": "sun",
+  "kb": 293,
+  "liteKb": 30,
+  "tris": 19941,
+  "before": 19941,
+  "simplified": false,
+  "srcKb": 1751
+ },
+ {
+  "g": "thornbound",
+  "i": "crown",
+  "kb": 585,
+  "liteKb": 137,
+  "tris": 19826,
+  "before": 19826,
+  "simplified": false,
+  "srcKb": 2919
+ },
+ {
+  "g": "thornbound",
+  "i": "throne",
+  "kb": 739,
+  "liteKb": 189,
+  "tris": 19088,
+  "before": 19088,
+  "simplified": false,
+  "srcKb": 4104
+ },
+ {
+  "g": "tidewake",
+  "i": "junk",
+  "kb": 587,
+  "liteKb": 209,
+  "tris": 19248,
+  "before": 19248,
+  "simplified": false,
+  "srcKb": 2952
+ },
+ {
+  "g": "tidewake",
+  "i": "leviathan",
+  "kb": 904,
+  "liteKb": 181,
+  "tris": 19334,
+  "before": 19334,
+  "simplified": false,
+  "srcKb": 3215
+ }
+]

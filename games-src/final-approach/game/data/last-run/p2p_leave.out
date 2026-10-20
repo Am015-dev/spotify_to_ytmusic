@@ -1,0 +1,4 @@
+host {"avail":true,"trystero":"object"}
+lobby after 1801 ms host sees ["Hosty","Friend1"]
+{"tag":"forged messages, leave, rejoin","host":{"over":true,"win":true,"why":"landed","round":6,"logN":121,"seat":0,"shown":true},"guests":[{"seat":1,"over":true}],"agree":true,"exactStrip":true,"finalCardEverywhere":true,"stats":{"remote":33,"rejected":41,"inv":0},"nErrors":0,"errors":[],"clicks":80,"remoteClicks":41,"checks":25,"viol":[],"secs":71,"bad":{"junkRejected":37,"stateUnchanged":true,"invariants":0,"protoPolluted":false},"leave":{"aiTookOver":true},"rejoin":{"prefilled":{"code":"8hu3a","field":"8hu3a"},"back":true,"mine":{"seat":1,"g":true,"started":true}},"remoteMovesAfterRejoin":18}
+SUMMARY leave desktop 1 runs, 0 bad

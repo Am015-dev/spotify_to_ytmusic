@@ -1,0 +1,17 @@
+{
+  "name": "Game Night Shelf",
+  "short_name": "Game Night",
+  "description": "Board games to play in the browser, against the computer, hot-seat or online with friends.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#1d1411",
+  "theme_color": "#1d1411",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

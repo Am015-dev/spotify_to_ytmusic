@@ -1,0 +1,25 @@
+{
+ "cards": {
+  "back-moth-ossuary": "a card back design: a pale moth emblem over a skull ring on deep green, ornate border, symmetrical, no text, letters or numbers"
+ },
+ "style": "Dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit, painterly brushwork, rich shadows, no text, no lettering, no frame.",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 9",
+ "meta": {
+  "back-moth-ossuary": {
+   "element": "Painting: back-moth-ossuary",
+   "why": "chapter card backs",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "back-moth-ossuary.png",
+   "target": "games/thornbound/media/back-moth-ossuary.webp",
+   "size": "768x1024",
+   "ratio": "3:4",
+   "tag": "art",
+   "wave": "Wave 9"
+  }
+ }
+}

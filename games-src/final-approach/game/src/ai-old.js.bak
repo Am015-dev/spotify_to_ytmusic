@@ -1,0 +1,357 @@
+// ===================== Final Approach computer crew member =====================
+// The computer plays FAIRLY: every decision starts from FA.stripView(G, seat), so it sees only its own dice plus everything public
+// (placed dice, tracks, tokens, how many dice the partner still holds, what the partner said in the briefing). The partner's unplaced
+// dice are unknown: every risk is an expectation over the partner holding k independent d6 (the partner picks its best die).
+//   FA.AI.move(G, seat, level, opt)  -> one legal move for that seat   (level: 'easy' | 'normal' | 'hard')
+//   FA.AI.say(G, seat)               -> up to 2 briefing phrases (codes from FA.SAYS), derived from public state only
+// Method: apply each candidate to a light copy of the real engine, then score the state with a hand-built cost model:
+//   schedule cost (can the remaining rounds still deliver the exact distance to the airport at the engine thresholds the markers will have),
+//   planes to clear, gear / flaps / brakes still to deploy, free-dice capacity of each seat, axis balance, fuel, trainee, coffee and reroll tokens,
+//   plus the expected cost of the mandatory axis and engine pairs that are still half done (partner's die unknown).
+// 'hard' additionally runs a small Monte Carlo over the partner's unknown dice for the best few candidates.
+(function (g) {
+'use strict';
+const FA = g.FA = g.FA || {};
+const D = FA.DATA || (typeof require === 'function' ? require('./data.js') : null);
+const AI = FA.AI = FA.AI || {};
+
+// ---------- tunable weights ----------
+const W = AI.W = {
+  disaster: 7, choice: 2.6,                       // certain loss in nats; boost for "best of my dice" in the engine table
+  planeS: 0.30, flapQ: 0.333, flapM: 3.0, gearM: 2.6, brakeM: 3.2, brakeCoffee: 0.30, iceP: 0.30, internP: 0.8,   // per-round success rates of the task models
+  ax0: 0.86, ax1: 0.66, ax2: 0.42, axR: 0.05, axCoffee: 0.05,                                                      // final axis balance chances
+  axis1: 0.15, axis2: 0.5, tab: 0.5, coffee: 0.10, reroll: 0.15, fuelK: 1.1, leakAvg: 2.4, keroAvg: 2.2, spent: 0.05, eff: 0.8, overload: 0.9, lag: 1
+};
+// sum distribution of two dice
+const PS = new Array(14).fill(0); for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) PS[a + b] += 1 / 36;
+const cdf = x => { let s = 0; for (let i = 2; i <= Math.min(12, Math.floor(x)); i++) s += PS[i]; return s; };
+
+// ---------- state readers ----------
+const trk = S => D.tracks[S.tk];
+const sizeOf = S => trk(S).sp.length;
+const finalIdx = S => D.rounds - 1 - S.row0;
+const enginesDone = S => !!(S.slots.en0 && S.slots.en1);
+const axisDone = S => !!(S.slots.ax0 && S.slots.ax1);
+function remAdv(S) { if (FA.isFinal(S)) return 0; return (enginesDone(S) ? 0 : 1) + Math.max(0, finalIdx(S) - 1 - S.round); }
+const unplaced = (S, s) => FA.unusedDice(S, s).length;
+const wm = S => FA.windMod(S);
+
+// P(adv type) with thresholds, a modest "choice of dice" boost
+function advProbs(blue, orange, w) {
+  const bl = blue - w, orr = orange - w;
+  const p0 = cdf(bl), p1 = Math.max(0, cdf(orr) - cdf(bl)), p2 = Math.max(0, 1 - cdf(orr));
+  const f = p => 1 - Math.pow(1 - p, W.choice);
+  return [f(p0), f(p1), f(p2)];
+}
+const cache = new Map();
+// nats of failure of the schedule: the best plan of x two-step, y one-step and z standing rounds delivers exactly distance d
+function schedCost(d, r, blue, orange, w) {
+  if (r <= 0) return d === 0 ? 0 : W.disaster;
+  if (d > 2 * r) return W.disaster;
+  const key = d * 100000 + r * 10000 + blue * 400 + orange * 20 + (w + 5);
+  let c = cache.get(key); if (c !== undefined) return c;
+  const P = advProbs(blue, orange, w);
+  let best = 0;
+  for (let x = 0; x <= r; x++) { const y = d - 2 * x; if (y < 0) break; const z = r - x - y; if (z < 0) continue; const p = Math.pow(P[2], x) * Math.pow(P[1], y) * Math.pow(P[0], z); if (p > best) best = p; }
+  c = Math.min(W.disaster, -Math.log(Math.max(best, 1e-3))); cache.set(key, c); if (cache.size > 20000) cache.clear(); return c;
+}
+// probability that at least k of n independent attempts succeed (p each)
+function binAtLeast(n, p, k) { if (k <= 0) return 1; if (n < k) return 0; let c = 0, t = Math.pow(1 - p, n); for (let i = 0; i < k; i++) { c += t; t *= (n - i) / (i + 1) * p / (1 - p); } return Math.max(0, Math.min(1, 1 - c)); }
+const nats = p => -Math.log(Math.max(p, 1e-3));
+function advOutcome(S, s) {   // speed s (wind included) -> {ok, adv} for a non-final round using the current axis and planes
+  const adv = s <= S.pl.aeroB ? 0 : s <= S.pl.aeroO ? 1 : 2, sp = trk(S).sp, size = sp.length;
+  for (let i = 0; i < adv; i++) {
+    const p = S.pl.pos + i; if (p >= size) return { ok: false, adv };
+    const cur = sp[p - 1];
+    if (S.mods.tabs && cur[2] && !cur[2].includes(S.pl.axis)) return { ok: false, adv };
+    if (S.planes[p - 1] > 0) return { ok: false, adv };
+  }
+  return { ok: true, adv };
+}
+function axisBase(S, a) {
+  const A = Math.abs(a);
+  if (A >= 3) return W.disaster;
+  if (FA.isFinal(S)) return a === 0 ? 0 : W.disaster;
+  let c = A === 0 ? 0 : A === 1 ? W.axis1 : W.axis2;
+  if (S.mods.tabs) { const sp = trk(S).sp, cur = sp[Math.min(S.pl.pos, sp.length) - 1]; if (cur && cur[2] && !cur[2].includes(a)) c += W.tab; }
+  return c;
+}
+// expected cost of the best of k unknown dice, given the cost of each face value 1..6 (ascending sort, order statistics)
+function expMin(costs, k) {   // costs in nats per face; returns nats of the expected survival chance of the best of k unknown dice
+  if (k <= 0) return W.disaster;
+  const p = costs.map(c => c >= W.disaster ? 0 : Math.exp(-c)).sort((x, y) => y - x); let e = 0;
+  for (let j = 0; j < 6; j++) e += p[j] * (Math.pow((6 - j) / 6, k) - Math.pow((5 - j) / 6, k));
+  return Math.min(W.disaster, -Math.log(Math.max(e, 1e-3)));
+}
+// cost of my own known dice when the pending die must come from them (coffee reach included)
+function myMin(costFn, dice, coffee) {
+  let best = W.disaster;
+  for (const v of dice) for (let c = -Math.min(coffee, v - 1); c <= Math.min(coffee, 6 - v); c++) { const x = costFn(v + c) + Math.abs(c) * 0.12; if (x < best) best = x; }
+  return best;
+}
+// faces the partner could end up with, with coffee reach (public token count): returns cost per face 1..6
+function faceCosts(costFn, coffee) { const o = []; for (let v = 1; v <= 6; v++) { let b = 1e9; for (let c = -Math.min(coffee, v - 1); c <= Math.min(coffee, 6 - v); c++) { const x = costFn(v + c) + Math.abs(c) * 0.12; if (x < b) b = x; } o.push(b); } return o; }
+
+// cost per partner face when the partner will place a die and f(face) is the cost of the outcome (coffee reach included)
+function pairsCost(S, me, dist) {
+  const o = 1 - me, final = FA.isFinal(S), w = wm(S), a0 = S.pl.axis, kp = unplaced(S, o), coffee = S.coffee;
+  const mine = FA.unusedDice(S, me).map(i => S.dice[me][i].v);
+  const val = (kind, seat) => { const sl = S.slots[(kind === 'A' ? 'ax' : 'en') + seat]; return sl ? sl.v : 0; };
+  const fA = (p, c) => axisBase(S, a0 + c - p);
+  const fE = (e0, e1) => {
+    const s = e0 + e1 + w;
+    if (final) { const br = FA.brakeVal(S); return (s <= br && br >= 2) ? 0 : W.disaster; }
+    const out = advOutcome(S, s); if (!out.ok) return W.disaster;
+    return schedCost(dist - out.adv, remAdv(S) - 1, S.pl.aeroB, S.pl.aeroO, w);
+  };
+  const tA = {}, tE = {};
+  for (let d = -5; d <= 5; d++) tA[d] = axisBase(S, a0 + d);
+  for (let t = 2; t <= 12; t++) tE[t] = fE(t, 0);
+  const F = { A: (p, c) => tA[c - p], E: (e0, e1) => tE[e0 + e1] };
+  const f2 = (kind, vMe, vO) => me === 0 ? F[kind](vMe, vO) : F[kind](vO, vMe);
+  const needMe = { A: !val('A', me), E: !val('E', me) }, needO = { A: !val('A', o), E: !val('E', o) };
+  const bothO = needO.A && needO.E;
+  let total = 0;
+  // while both of a pair's dice are still open, the partner will have spent another die elsewhere before it is their turn again
+  const kEff = (kind) => { let k = kp; if (needMe[kind] && needO[kind]) k = Math.max(1, kp - W.lag); if (bothO && kind === 'E') k = Math.max(1, k - 1); return k; };
+  for (const kind of ['A', 'E']) {
+    if (!needMe[kind] && needO[kind]) total += expMin(faceCosts(y => f2(kind, val(kind, me), y), coffee), kEff(kind));
+  }
+  const costMe = (kind, v) => {
+    if (!needO[kind]) return f2(kind, v, val(kind, o));
+    return expMin(faceCosts(y => f2(kind, v, y), coffee), kEff(kind));
+  };
+  const reach = v => { const r = []; for (let c = -Math.min(coffee, v - 1); c <= Math.min(coffee, 6 - v); c++) r.push([v + c, Math.abs(c) * 0.12]); return r; };
+  const best = (kind, v) => { let b = 1e9; for (const [x, pen] of reach(v)) { const c = costMe(kind, x) + pen; if (c < b) b = c; } return b; };
+  const N = ['A', 'E'].filter(k => needMe[k]);
+  const memo = {}; const bestM = (kind, v) => { const k = kind + v; return memo[k] !== undefined ? memo[k] : (memo[k] = best(kind, v)); };
+  if (N.length === 1) { let b = W.disaster; for (const v of mine) { const c = bestM(N[0], v); if (c < b) b = c; } total += b; }
+  else if (N.length === 2) { let b = W.disaster * 2; for (let i = 0; i < mine.length; i++) for (let j = 0; j < mine.length; j++) { if (i === j) continue; const c = bestM('A', mine[i]) + bestM('E', mine[j]); if (c < b) b = c; } total += b; }
+  return total;
+}
+
+// ---------- the state value (lower cost = better); me = the seat being advised ----------
+function cost(S, me, ctx) {
+  if (S.result) return S.result.win ? -5000 : 10000;
+  const sp = trk(S).sp, size = sp.length, pos = S.pl.pos, dist = size - pos, idx = S.round;
+  let C = 0;
+  const inPlace = S.phase === 'place';
+  // --- mandatory pairs (axis, engines): expected cost of finishing them. My dice are known, the partner's are k unknown d6 (partner picks its best).
+  const other = 1 - me;
+  if (inPlace) {
+    for (let s = 0; s < 2; s++) { const need = (S.slots['ax' + s] ? 0 : 1) + (S.slots['en' + s] ? 0 : 1), have = unplaced(S, s); if (have < need) C += W.disaster; }
+    C += pairsCost(S, me, dist);
+  } else if (!FA.isFinal(S)) C += schedCost(dist, remAdv(S), S.pl.aeroB, S.pl.aeroO, wm(S));
+  // --- static tasks, all in nats (minus the log of the chance that the job still gets done)
+  const rem = D.rounds - S.row0 - S.round;                 // rounds left including this one
+  const Rf = Math.max(0, rem - (inPlace ? 0.5 : 0));        // current round counts half once dice are on the table
+  // planes: each one needs a radio die with the right value before the plane's space is left
+  const avgAdv = remAdv(S) > 0 ? Math.max(1, dist / remAdv(S)) : 1;
+  for (let i = pos - 1; i < size; i++) {
+    const n = S.planes[i]; if (!n) continue;
+    const q = i - (pos - 1), avail = Math.max(1, Math.min(rem, Math.ceil((q + 1) / avgAdv)));
+    const per = 1 - Math.pow(1 - W.planeS * (q > 5 ? 0.3 : 1), avail);
+    C += n * nats(per);
+  }
+  const gl = 3 - S.pl.sw.lg[0] - S.pl.sw.lg[1] - S.pl.sw.lg[2], fl = 4 - S.pl.sw.fl[0] - S.pl.sw.fl[1] - S.pl.sw.fl[2] - S.pl.sw.fl[3];
+  const cb = Math.min(S.coffee, 2) * 0.04 + (S.rrHand ? 0.04 : 0);
+  if (fl > 0) C += nats(binAtLeast(Math.round(W.flapM * Rf), Math.min(0.9, W.flapQ + cb), fl));
+  if (gl > 0) C += nats(gearProb(gl, Math.round(W.gearM * Rf), cb));
+  let brLeft = 0;
+  if (S.mods.ice) { brLeft = 4 - S.pl.ice; if (brLeft > 0) C += nats(binAtLeast(Math.round(Rf * 2), W.iceP + cb, brLeft)); }
+  else { const nb = S.pl.sw.br[0] + S.pl.sw.br[1] + S.pl.sw.br[2]; brLeft = Math.max(0, 2 - nb); if (brLeft > 0) C += nats(binAtLeast(Math.round(W.brakeM * Rf), 1 / 6 + (S.coffee > 0 ? W.brakeCoffee : 0) + cb * 0.5, brLeft)); }
+  let internLeft = 0; if (S.mods.intern) { internLeft = S.intern.length; if (internLeft > 0) C += nats(binAtLeast(Math.round(2 * Rf), W.internP, internLeft)); }
+  // dice budget per seat: pilot-only jobs (gear, brakes), co-pilot-only jobs (flaps) and shared jobs (clearing planes, trainee) against the dice
+  // each seat still has beyond its mandatory axis and engine dice (2 per round); a die only fits a job with probability < 1, hence the 0.8
+  { const after = Math.max(0, rem - 1), mand = s => (S.slots['ax' + s] ? 0 : 1) + (S.slots['en' + s] ? 0 : 1);
+    const free = s => Math.max(0, (inPlace ? unplaced(S, s) - mand(s) : 2) + 2 * after);
+    const pF = free(0) * W.eff, cF = free(1) * W.eff, pN = gl + brLeft, cN = fl, sN = P2(S) + internLeft;
+    const over = Math.max(0, pN - pF) + Math.max(0, cN - cF) + Math.max(0, pN + cN + sN - pF - cF);
+    if (over > 0) C += over * W.overload + (pN > free(0) || cN > free(1) || pN + cN + sN > free(0) + free(1) ? W.disaster * 0.5 : 0);
+  }
+  C -= S.coffee * W.coffee + S.rrHand * W.reroll;
+  // --- axis
+  { const A = Math.abs(S.pl.axis); const base = A === 0 ? W.ax0 : A === 1 ? W.ax1 : W.ax2; const pa = Math.min(0.97, base + (A ? W.axR * Math.max(0, rem - 1) : 0) + W.axCoffee * S.coffee); C += nats(pa) * (FA.isFinal(S) && axisDone(S) ? 0 : 1); }
+  if (S.mods.kero) {
+    const ahead = rem - (S.fl.keroUsed ? 1 : 0);
+    const m = S.pl.kero - Math.max(0, ahead) * W.keroAvg - ((S.fl.keroUsed || !inPlace) ? 0 : 2.5);
+    C += nats(1 / (1 + Math.exp(-m * W.fuelK / 2)) * 0.999 + 0.0005);
+  }
+  if (S.mods.leak) { const m = S.pl.kero - Math.max(0, rem - (enginesDone(S) ? 1 : 0)) * W.leakAvg; C += nats(1 / (1 + Math.exp(-m * W.fuelK / 2)) * 0.999 + 0.0005); }
+  if (S.mods.tabs && !FA.isFinal(S)) { const cur = sp[Math.min(pos, size) - 1]; if (cur && cur[2] && !cur[2].includes(S.pl.axis)) C += W.tab; }
+  return C;
+}
+const P2 = S => { let n = 0; for (let i = S.pl.pos - 1; i < S.planes.length; i++) n += S.planes[i]; return n; };
+// chance to finish g landing-gear spaces with n attempts (each die fits one of the missing spaces with probability missing/3)
+function gearProb(g, n, boost) { let dist = [0, 0, 0, 0]; dist[g] = 1; for (let i = 0; i < n; i++) { const nd = [0, 0, 0, 0]; for (let k = 0; k <= 3; k++) { if (!dist[k]) continue; const p = Math.min(0.95, k / 3 + boost); if (k === 0) nd[0] += dist[0]; else { nd[k] += dist[k] * (1 - p); nd[k - 1] += dist[k] * p; } } dist = nd; } return dist[0]; }
+
+// ---------- candidate handling ----------
+function distinct(moves, G, seat) {
+  const seen = new Set(), out = [];
+  for (const m of moves) {
+    let k;
+    if (m.t === 'place') { const v = m.d === 'p' ? (G.pend.d.val) : G.dice[seat][m.d].v; k = 'p|' + v + '|' + m.to + '|' + m.c; }
+    else if (m.t === 'toss') k = 't|' + (m.d === 'p' ? 'p' : G.dice[seat][m.d].v);
+    else if (m.t === 'adapt' || m.t === 'antic' || m.t === 'wt' || m.t === 'wt2') k = m.t + '|' + G.dice[seat][m.d].v;
+    else k = m.t + (m.c || '');
+    if (seen.has(k)) continue; seen.add(k); out.push(m);
+  }
+  return out;
+}
+function afterMove(G, m, seat) { const S = FA.cloneLite(G); FA.performMove(S, m, seat, true); return S; }
+// value of a state for the seat (a state that already started the next round is judged the same way)
+const score = (S, me, ctx) => cost(S, me, ctx);
+
+// how much a die of value v is worth for this seat right now: the best score gain over its legal placements
+function bestFor(G, seat, v, base, ctx) {
+  const S0 = FA.cloneLite(G); const d = S0.dice[seat].findIndex(x => !x.u); if (d < 0) return 0;
+  S0.dice[seat][d].v = v;
+  const mv = []; const coffee = S0.coffee;
+  for (let c = -Math.min(coffee, v - 1); c <= Math.min(coffee, 6 - v); c++) for (const key of S0.keys) if (FA.fits(S0, seat, key, v + c, 'die')) mv.push({ t: 'place', d, to: key, c });
+  let best = -1e9;
+  for (const m of mv) { const S = FA.cloneLite(S0); FA.performMove(S, m, seat, true); const sc = base - score(S, seat, ctx); if (sc > best) best = sc; }
+  return mv.length ? best : -50;
+}
+
+// ---------- level handling ----------
+function rngOf(G, opt) { return opt && opt.rand ? opt.rand : Math.random; }
+function pickTop(scored, k, rand) { scored.sort((a, b) => b.s - a.s); const n = Math.min(k, scored.length); return scored[Math.floor(rand() * n)]; }
+
+// ---------- briefing talk ----------
+function sayCodes(G, seat) {
+  const V = FA.stripView(G, seat), out = [], sp = trk(V).sp, size = sp.length, pos = V.pl.pos, dist = size - pos, r = remAdv(V);
+  if (V.round === 0 && V.rrHand > 0) { }
+  // wanted advance: the cheapest of 0/1/2 by schedule cost
+  const w = wm(V), P = [0, 1, 2].map(a => (dist - a < 0 || (V.planes[pos - 1] > 0 && a > 0)) ? 1e9 : schedCost(dist - a, r - 1, V.pl.aeroB, V.pl.aeroO, w));
+  if (!FA.isFinal(V)) { const a = P.indexOf(Math.min(...P)); if (Math.min(...P) < 900) out.push('adv' + a); }
+  const near = V.planes.slice(pos - 1, pos + 1).reduce((s, x) => s + x, 0); if (near > 0) out.push('plane');
+  if (Math.abs(V.pl.axis) >= 1) out.push('level');
+  const rem = D.rounds - V.row0 - V.round;
+  if (FA.isFinal(V)) { out.push('brakes'); out.push('slow'); }
+  else if (rem <= 3) { if (V.pl.sw.fl.some(x => !x)) out.push('flaps'); if (V.pl.sw.lg.some(x => !x)) out.push('gear'); if (V.pl.sw.br[0] + V.pl.sw.br[1] === 0 && !V.mods.ice) out.push('brakes'); }
+  if (V.mods.intern && V.intern.length > rem * 1.5) out.push('trainee');
+  if (V.mods.fuel && V.pl.kero < 10) out.push('fuel');
+  return out.filter((c, i, a) => a.indexOf(c) === i).slice(0, 2);
+}
+// what the partner said (public)
+function partnerPlan(V, me) {
+  const s = V.say[1 - me] || [], o = {};
+  for (const c of s) { if (/^adv(\d)$/.test(c)) o.adv = +c[3]; if (c === 'plane') o.plane = 1; if (c === 'level') o.level = 1; if (c === 'slow') o.slow = 1; }
+  return o;
+}
+
+// ---------- the move chooser ----------
+function move(G0, seat, level, opt) {
+  level = level || 'normal'; opt = opt || {}; const rand = rngOf(G0, opt);
+  const G = FA.stripView(G0, seat);                      // fairness: only what this seat may know
+  G.nolog = true;
+  const all = FA.validMoves(G, seat); if (!all.length) return null;
+  if (G.phase === 'brief') {
+    const sg = sayCodes(G, seat).filter(c => all.some(m => m.t === 'say' && m.c === c) && !G.say[seat].includes(c));
+    if (level !== 'easy' && sg.length && G.say[seat].length < 2 && rand() < 0.95) return { t: 'say', c: sg[0] };
+    return { t: 'ready' };
+  }
+  const ctx = { plan: partnerPlan(G, seat), level };
+  // pending questions
+  if (G.pend) {
+    const rr = all.find(m => m.t === 'rrpick'); if (rr) return rrMask(G, seat, ctx, level, rand);
+    const w2 = all.filter(m => m.t === 'wt2'); if (w2.length) return wtPick(G, seat, ctx, w2);
+    const base = score(G, seat, ctx);
+    const sc = distinct(all, G, seat).map(m => ({ m, s: base - score(afterMove(G, m, seat), seat, ctx) }));
+    return (level === 'easy' && rand() < 0.3 ? pickTop(sc, 3, rand) : pickTop(sc, 1, rand)).m;
+  }
+  const timeoutless = all.filter(m => m.t !== 'timeout');
+  const cand = distinct(timeoutless, G, seat);
+  const base = score(G, seat, ctx);
+  const places = cand.filter(m => m.t === 'place' || m.t === 'toss');
+  const scored = places.map(m => ({ m, s: base - score(afterMove(G, m, seat), seat, ctx) }));
+  scored.sort((a, b) => b.s - a.s);
+  const bestPlace = scored[0];
+  // free actions: reroll, flip, second look, hand-over
+  if (level !== 'easy') {
+    const free = freeAction(G, seat, ctx, cand, scored, base, level);
+    if (free) return free;
+  }
+  if (level === 'easy') {
+    // careless: sometimes ignores the best move and plays one of the better ones; never takes a move the engine says loses at once
+    const safe = scored.filter(x => x.s > -400);
+    const pool = safe.length ? safe : scored;
+    if (rand() < 0.35) return pickTop(pool, 4, rand).m;
+    return pool[0].m;
+  }
+  if (level === 'hard' && scored.length > 1 && !opt.noMC) return monteCarlo(G, seat, ctx, scored, rand, opt);
+  return bestPlace.m;
+}
+
+function freeAction(G, seat, ctx, cand, scored, base, level) {
+  const mine = FA.unusedDice(G, seat); if (!mine.length) return null;
+  const rem = D.rounds - G.row0 - G.round;
+  const evalHand = () => {
+    // usefulness of each of my unplaced dice and of a fresh die
+    const val = {}; for (let v = 1; v <= 6; v++) val[v] = bestFor(G, seat, v, base, ctx);
+    const fresh = (val[1] + val[2] + val[3] + val[4] + val[5] + val[6]) / 6;
+    return { val, fresh };
+  };
+  const can = t => cand.filter(m => m.t === t);
+  let H = null;
+  const wantRR = can('rr').length && (() => { H = H || evalHand(); const gain = mine.reduce((s, i) => s + Math.max(0, H.fresh - H.val[G.dice[seat][i].v] - 2), 0); return gain > (rem <= 2 ? 6 : 13) ? gain : 0; })();
+  // flip / second look / hand-over first (they are cheap), reroll last
+  if (can('adapt').length) { H = H || evalHand(); let best = null; for (const m of can('adapt')) { const v = G.dice[seat][m.d].v, gain = H.val[7 - v] - H.val[v]; if (gain > 10 && (!best || gain > best.g)) best = { m, g: gain }; } if (best) return best.m; }
+  if (can('antic').length) { H = H || evalHand(); let best = null; for (const m of can('antic')) { const v = G.dice[seat][m.d].v, gain = H.fresh - H.val[v]; if (gain > 5 && (!best || gain > best.g)) best = { m, g: gain }; } if (best) return best.m; }
+  if (can('wt').length) { H = H || evalHand(); let best = null; for (const m of can('wt')) { const v = G.dice[seat][m.d].v, gain = H.fresh - H.val[v]; if (gain > 9 && (!best || gain > best.g)) best = { m, g: gain }; } if (best) return best.m; }
+  if (wantRR) return can('rr')[0];
+  return null;
+}
+function rrMask(G, seat, ctx, level, rand) {
+  const mine = FA.unusedDice(G, seat); const base = score(G, seat, ctx); const val = {}; for (let v = 1; v <= 6; v++) val[v] = bestFor(G, seat, v, base, ctx);
+  const fresh = (val[1] + val[2] + val[3] + val[4] + val[5] + val[6]) / 6, m = [false, false, false, false];
+  if (level === 'easy') { for (const i of mine) m[i] = G.dice[seat][i].v <= 2 && rand() < 0.7; return { t: 'rrpick', m }; }
+  for (const i of mine) m[i] = val[G.dice[seat][i].v] < fresh - 2.5;
+  return { t: 'rrpick', m };
+}
+function wtPick(G, seat, ctx, w2) {
+  const base = score(G, seat, ctx); const val = {}; for (let v = 1; v <= 6; v++) val[v] = bestFor(G, seat, v, base, ctx);
+  let best = w2[0], b = 1e9; for (const m of w2) { const v = val[G.dice[seat][m.d].v]; if (v < b) { b = v; best = m; } } return best;
+}
+
+// ---------- Monte Carlo over the partner's unknown dice (hard) ----------
+function sampleWorld(G, seat, rand) {
+  const W2 = FA.cloneLite(G); W2.rng = (Math.floor(rand() * 4294967296) | 0);
+  const o = 1 - seat; for (const i of FA.unusedDice(W2, o)) W2.dice[o][i].v = 1 + Math.floor(rand() * 6);
+  return W2;
+}
+function quickMove(S, seat, ctx) {
+  const mv = FA.validMoves(S, seat).filter(m => m.t === 'place' || m.t === 'toss' || m.t === 'rrpick' || m.t === 'wt2' || m.t === 'ready');
+  if (!mv.length) return null;
+  const places = distinct(mv, S, seat); if (places.length === 1) return places[0];
+  const base = score(S, seat, ctx); let best = places[0], b = -1e9;
+  for (const m of places) { const sc = base - score(afterMove(S, m, seat), seat, ctx); if (sc > b) { b = sc; best = m; } }
+  return best;
+}
+function rollout(S, ctx, startRound) {
+  let guard = 0;
+  while (!S.result && S.round === startRound && S.phase === 'place' && guard++ < 24) {
+    const seats = FA.pending(S); if (!seats.length) break; const s = seats[0];
+    const m = quickMove(S, s, ctx); if (!m) break; FA.performMove(S, m, s, true);
+  }
+  return S;
+}
+function monteCarlo(G, seat, ctx, scored, rand, opt) {
+  const K = Math.min(opt.top || 5, scored.length), N = opt.samples || 10, top = scored.slice(0, K);
+  const r0 = G.round;
+  const tot = top.map(() => 0);
+  for (let n = 0; n < N; n++) {
+    const W0 = sampleWorld(G, seat, rand);
+    for (let i = 0; i < K; i++) {
+      const S = FA.cloneLite(W0); FA.performMove(S, top[i].m, seat, true);
+      rollout(S, ctx, r0);
+      tot[i] += score(S, seat, ctx);
+    }
+  }
+  let bi = 0; for (let i = 1; i < K; i++) if (tot[i] < tot[bi] - 1e-9) bi = i;
+  return top[bi].m;
+}
+
+AI.move = move; AI.say = (G, seat) => sayCodes(G, seat); AI.cost = cost; AI.score = score; AI.W = W; AI.schedCost = schedCost;
+if (typeof module === 'object' && module.exports) module.exports = FA;
+})(typeof globalThis !== 'undefined' ? globalThis : this);

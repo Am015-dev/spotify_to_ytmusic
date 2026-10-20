@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+<head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saves &amp; Offline</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1d1411">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Game Night">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rammetto+One&family=Chivo:wght@400;600;800&family=Chivo+Mono:wght@500&display=swap">
+<style>
+/* Layout: the shelf's walnut room; two brass-trimmed ledgers on the desk, one for games to carry, one for saves to move. */
+:root{
+  --wood:#1d1411; --wood2:#2b1d17; --plank:#5a3a26; --ink:#f4ead8; --muted:#bca78c;
+  --brass:#e0a948; --brassink:#1d1411; --line:#4a3326; --shadow:rgba(0,0,0,.55); --panel:#2b1d17; --field:#1d1411;
+  --ok:#8fcf7a; --err:#ff9c85; --paper:#f1e6d0;
+  --display:"Rammetto One","Arial Black",Impact,sans-serif; --body:"Chivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:"Chivo Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--wood:#efe3cc;--wood2:#e4d3b4;--plank:#a4744b;--ink:#2a1a10;--muted:#6d5640;--brass:#9c6412;--brassink:#fff;--line:#d2bb95;--shadow:rgba(80,50,20,.28);--panel:#f7eedb;--field:#fffaf0;--ok:#2f6a1c;--err:#a3341c;color-scheme:light}}
+:root[data-theme="light"]{--wood:#efe3cc;--wood2:#e4d3b4;--plank:#a4744b;--ink:#2a1a10;--muted:#6d5640;--brass:#9c6412;--brassink:#fff;--line:#d2bb95;--shadow:rgba(80,50,20,.28);--panel:#f7eedb;--field:#fffaf0;--ok:#2f6a1c;--err:#a3341c;color-scheme:light}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:radial-gradient(120% 70% at 50% -10%,var(--wood2),var(--wood) 70%);background-color:var(--wood);color:var(--ink);font:16px/1.5 var(--body);overflow-x:hidden}
+.page{max-width:760px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px),env(safe-area-inset-right,0px));padding-block:calc(18px + env(safe-area-inset-top,0px)) calc(40px + env(safe-area-inset-bottom,0px))}
+.back{font:600 .95rem var(--body);color:var(--muted);text-decoration:none;display:inline-flex;gap:6px;align-items:center;min-height:44px}
+.back:hover,.back:focus-visible{color:var(--brass)}
+h1{font:400 clamp(1.8rem,6vw,2.6rem)/1.05 var(--display);margin:.2rem 0 0;text-wrap:balance}
+h2{font:400 1.3rem/1.15 var(--display);margin:0 0 6px;color:var(--brass)}
+h3{font:600 1rem/1.3 var(--body);margin:0 0 4px}
+p{margin:.4rem 0}
+.lede{color:var(--muted);max-width:60ch;margin:.6rem 0 0}
+.net{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:6px 14px;min-height:36px;border:1px solid var(--line);border-radius:999px;font:600 .875rem var(--body);background:var(--panel)}
+.net i{width:10px;height:10px;border-radius:50%;background:var(--ok);display:inline-block}
+.net.off i{background:var(--err)}
+section.card{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-top:6px solid var(--plank);border-radius:6px;padding:18px 16px 18px;box-shadow:0 14px 26px var(--shadow)}
+.small{font-size:.875rem;color:var(--muted)}
+.note{font-size:.9rem;color:var(--muted);border-left:3px solid var(--brass);padding:2px 0 2px 10px;margin:10px 0}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px}
+.btn{font:700 1rem var(--body);min-height:48px;padding:10px 18px;border-radius:8px;border:1px solid var(--line);background:var(--wood);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;text-align:center;touch-action:manipulation}
+.btn:hover{border-color:var(--brass)}
+.btn.pri{background:var(--brass);color:var(--brassink);border-color:var(--brass)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible,input:focus-visible,.sw:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.meter{height:10px;border-radius:5px;background:var(--wood);border:1px solid var(--line);overflow:hidden;margin-top:6px}
+.meter b{display:block;height:100%;width:0;background:var(--brass);transition:width .2s}
+.stor{margin:12px 0 0;font-size:.9rem}
+.stor strong{font-family:var(--mono);font-weight:500}
+ul.list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}
+.g{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--wood)}
+.g img{width:52px;height:52px;border-radius:6px;object-fit:cover;background:var(--plank);display:block}
+.g .nm{font-weight:600;line-height:1.25;overflow-wrap:anywhere}
+.g .st{font-size:.875rem;color:var(--muted)}
+.g .st.ok{color:var(--ok)} .g .st.bad{color:var(--err)}
+.g .meter{grid-column:1/-1;margin:0;height:8px}
+.sw{min-height:44px;min-width:44px;padding:0 6px 0 12px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;background:var(--wood2);color:var(--ink);font:600 .875rem var(--body);cursor:pointer;touch-action:manipulation}
+.sw .trk{width:40px;height:24px;border-radius:12px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.sw .trk::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--ink);transition:left .15s}
+.sw[aria-checked="true"] .trk{background:var(--brass)} .sw[aria-checked="true"] .trk::after{left:19px;background:var(--brassink)}
+.sw:disabled{opacity:.6}
+.saves{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+.saves li{display:flex;justify-content:space-between;gap:12px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--wood);font-size:.95rem}
+.saves li span:last-child{color:var(--muted);font:500 .875rem var(--mono);text-align:right;flex:none}
+.drop{margin-top:10px;border:2px dashed var(--line);border-radius:8px;padding:14px;text-align:center;color:var(--muted);font-size:.9rem}
+.drop.over{border-color:var(--brass);color:var(--ink)}
+.sub{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+input.code{font:500 1.6rem/1 var(--mono);letter-spacing:.3em;text-transform:uppercase;text-align:center;width:11ch;max-width:100%;min-height:52px;padding:6px 8px;border-radius:8px;border:2px solid var(--line);background:var(--field);color:var(--ink)}
+.bigcode{font:500 2.2rem/1.1 var(--mono);letter-spacing:.28em;color:var(--brass);margin:6px 0;padding-left:.28em;user-select:all;overflow-wrap:anywhere}
+.qr{display:inline-block;background:#fff;padding:6px;border-radius:8px;line-height:0}
+.qr svg{width:min(60vw,200px);height:auto}
+.msg{margin:10px 0 0;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--wood);font-size:.95rem}
+.msg.ok{border-color:var(--ok)} .msg.err{border-color:var(--err);color:var(--err)}
+.imp{margin-top:16px;padding:14px;border:2px solid var(--brass);border-radius:8px;background:var(--wood)}
+.imp ul{list-style:none;margin:8px 0;padding:0;display:grid;gap:4px}
+.imp li{display:flex;justify-content:space-between;gap:10px;font-size:.95rem}
+.imp li span:last-child{font:500 .875rem var(--mono);color:var(--muted);text-align:right}
+.priv{margin-top:22px;font-size:.875rem;color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:420px){h2{font-size:1.15rem}.btn{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<div class="page">
+<a class="back" href="./">← Back to the shelf</a>
+<h1>Saves &amp; Offline</h1>
+<p class="lede">Keep games on this device so they open without internet, and move your saved games between your phone and your computer.</p>
+<div class="net" id="net" role="status"><i></i><span id="nettxt">Online</span></div>
+
+<section class="card" id="offline" aria-labelledby="h-off">
+  <h2 id="h-off">Take games with you</h2>
+  <p>Switch on <b>Keep on this device</b> and the game is stored here. Offline you can play against the computer or pass one device around. <b>Online play with friends needs internet.</b></p>
+  <div class="stor" id="stor">Checking storage…</div>
+  <div class="row"><button class="btn pri" id="dlall" type="button">Download all</button><button class="btn" id="rmall" type="button">Remove all</button></div>
+  <div class="msg" id="offmsg" hidden role="status"></div>
+  <ul class="list" id="games"></ul>
+  <p class="note">The shelf itself, its covers and these pages are stored too, so the shelf opens offline as soon as one game is kept. Phones may clear stored data if they run low on space; if a game is gone, just download it again. Saves are not affected by this, but see below for backups.</p>
+</section>
+
+<section class="card" id="saves" aria-labelledby="h-sav">
+  <h2 id="h-sav">Move your saves</h2>
+  <p>Saved games stay in the browser they were made in. Use this to copy them from your phone to your computer, or back.</p>
+  <h3 style="margin-top:12px">Saves on this device</h3>
+  <ul class="saves" id="savelist"></ul>
+
+  <div class="sub">
+    <h3>Method 1: a saves file</h3>
+    <div class="row"><button class="btn pri" id="dlsaves" type="button">Download saves file</button><label class="btn" for="file" id="filebtn">Load saves file</label><input class="sr" type="file" id="file" accept=".json,application/json"></div>
+    <div class="drop" id="drop">…or drop a saves file here</div>
+    <p class="small">Send the file to yourself by email, a chat app or cloud storage, then load it on the other device.</p>
+  </div>
+
+  <div class="sub">
+    <h3>Method 2: device to device</h3>
+    <p class="small">No file needed. Both devices must be online and open this page.</p>
+    <div class="row"><button class="btn pri" id="send" type="button">Send to another device</button><button class="btn" id="recv" type="button">Receive from another device</button></div>
+    <div id="p2p" hidden>
+      <div id="sendbox" hidden>
+        <p>On the other device, tap <b>Receive</b> and type this code, or scan the picture.</p>
+        <div class="bigcode" id="code" aria-live="polite"></div>
+        <div class="qr" id="qr"></div>
+        <p class="small" id="exp"></p>
+      </div>
+      <div id="recvbox" hidden>
+        <label for="rcode" style="display:block;margin-bottom:6px">Code shown on the sending device</label>
+        <div class="row" style="margin-top:0"><input class="code" id="rcode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" aria-label="6-character code"><button class="btn pri" id="rgo" type="button">Connect</button></div>
+      </div>
+      <div class="msg" id="p2pmsg" role="status" aria-live="polite" hidden></div>
+      <div class="meter" id="p2pbar" hidden><b></b></div>
+      <div id="accept" class="imp" hidden>
+        <h3 id="acctitle"></h3>
+        <p class="small">Only accept saves from a device you own. Nothing is changed until you choose Merge or Replace on the next step.</p>
+        <div class="row"><button class="btn pri" id="accyes" type="button">Accept</button><button class="btn" id="accno" type="button">Decline</button></div>
+      </div>
+      <div class="row"><button class="btn" id="p2pcancel" type="button">Close</button></div>
+    </div>
+    <p class="note">iPhone: the Home Screen app and Safari keep separate saves. This tool moves saves between them too: in the app, tap Receive and type the code instead of scanning.</p>
+  </div>
+
+  <div class="imp" id="imp" hidden>
+    <h3 id="imptitle">Saves found</h3>
+    <ul id="implist"></ul>
+    <p class="small" id="impnote"></p>
+    <div class="row"><button class="btn pri" id="merge" type="button">Merge</button><button class="btn" id="replace" type="button">Replace all</button><button class="btn" id="impcancel" type="button">Cancel</button></div>
+    <p class="small"><b>Merge</b> adds new saves and overwrites matching ones with the incoming copy; saves only on this device are kept. <b>Replace all</b> makes this device match the file exactly. Your current saves are backed up first.</p>
+  </div>
+  <div class="msg" id="impmsg" hidden role="status"></div>
+  <div class="row" id="bkrow" hidden><button class="btn" id="bkdl" type="button">Download backup file</button><button class="btn" id="bkrestore" type="button">Undo: restore backup</button></div>
+</section>
+
+<p class="priv">Privacy: your saves never go to a server. Device-to-device transfer only uses the same public peer-to-peer matchmaking as online play; the saves travel straight between your two devices.</p>
+</div>
+
+<script>/* Trystero 0.25.4 (MIT, github.com/dmotz/trystero), bundled with esbuild. Loaded only where WebRTC exists. */
+var Trystero;if(typeof RTCPeerConnection!=="undefined"&&typeof TextEncoder!=="undefined"&&typeof crypto!=="undefined"&&crypto.subtle)try{Trystero=(()=>{var nn=Object.defineProperty;var qr=Object.getOwnPropertyDescriptor;var Kr=Object.getOwnPropertyNames;var Wr=Object.prototype.hasOwnProperty;var Fr=(e,n,t)=>n in e?nn(e,n,{enumerable:!0,configurable:!0,writable:!0,value:t}):e[n]=t;var Jr=(e,n)=>{for(var t in n)nn(e,t,{get:n[t],enumerable:!0})},zr=(e,n,t,o)=>{if(n&&typeof n=="object"||typeof n=="function")for(let a of Kr(n))!Wr.call(e,a)&&a!==t&&nn(e,a,{get:()=>n[a],enumerable:!(o=qr(n,a))||o.enumerable});return e};var Vr=e=>zr(nn({},"__esModule",{value:!0}),e);var Q=(e,n,t)=>Fr(e,typeof n!="symbol"?n+"":n,t);var Hs={};Jr(Hs,{joinRoom:()=>Lr,selfId:()=>Z});var An=Object.freeze,Se=0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn,We=0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n,Pt=0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798n,kt=0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n,Gr=An({p:Se,n:We,h:1n,a:0n,b:7n,Gx:Pt,Gy:kt}),de=32,ut=e=>e instanceof Uint8Array||ArrayBuffer.isView(e)&&e.constructor.name==="Uint8Array"&&e.BYTES_PER_ELEMENT===1,ce=(e,n,t="")=>{if(ut(e)&&(n===void 0||e.length===n))return e;let o=ut(e),a=n!==void 0?` of length ${n}`:"",s=o?`length=${e.length}`:`type=${typeof e}`,r=(t?`"${t}" `:"")+"expected Uint8Array"+a+", got "+s;throw o?new RangeError(r):new TypeError(r)},Zr=e=>Uint8Array.from(e),Xr=(e,n,t)=>Zr(ce(e,t,n)),vt=(e,n)=>e.toString(16).padStart(n,"0"),St=e=>{let n="";for(let t of ce(e))n+=vt(t,2);return n},bt=e=>{let n="hex invalid";if(typeof e!="string")throw new TypeError(n);if(e.length%2||!/^[\da-f]*$/i.test(e))throw new RangeError(n);let t=new Uint8Array(e.length/2);for(let o=0,a=0;o<t.length;o++,a+=2){let s=e.charCodeAt(a),r=e.charCodeAt(a+1);t[o]=((s&15)+(s>>6)*9)*16+(r&15)+(r>>6)*9}return t},dt=()=>{let e=globalThis?.crypto?.subtle;if(e)return e;throw new Error("crypto.subtle must be defined, consider polyfill")},_e=(...e)=>{let n=0;for(let a of e)n+=ce(a).length;let t=new Uint8Array(n),o=0;for(let a of e)t.set(a,o),o+=a.length;return t},Rn=(e=de)=>{let n=globalThis?.crypto;if(typeof n?.getRandomValues!="function")throw new Error("crypto.getRandomValues must be defined, consider polyfill");return n.getRandomValues(new Uint8Array(e))},Yr=BigInt,Fe=(e,n,t,o="bad number: out of range")=>{if(typeof e!="bigint")throw new TypeError(o);if(n<=e&&e<t)return e;throw new RangeError(o)},M=(e,n=Se)=>(e%=n)>=0n?e:n+e,rn=e=>M(e,We),Qr=(e,n)=>{if(e===0n)throw new Error("invert: expected non-zero number");if(n<=1n)throw new Error("invert: expected modulus > 1, got "+n);let t=M(e,n),o=n,a=0n,s=1n;for(;t!==0n;){let i=o/t,c=o-t*i,m=a-s*i;o=t,t=c,a=s,s=m}if(o!==1n)throw new Error("invert: does not exist");return M(a,n)},Tt=e=>{let n=ro[e];if(typeof n!="function")throw new Error("hashes."+e+" not set");return n},mt=(e,n,t)=>ce(Tt(e)(n,t),de,"digest"),gt=async(e,n,t)=>ce(await Tt(e)(n,t),de,"digest");var vn=e=>{if(e instanceof be)return e;throw new TypeError("Point expected")},Sn="bad point: not on curve",At=e=>M(M(e*e)*e+7n),ht=e=>Fe(e,0n,Se),qe=e=>Fe(e,1n,Se),Rt=e=>Fe(e,1n,We),on=e=>!(e&1n),eo=e=>Uint8Array.of(on(e)?2:3),Et=e=>{let n=At(qe(e)),t=1n;for(let o=n,a=(Se+1n)/4n;a>0n;a>>=1n)a&1n&&(t=t*o%Se),o=o*o%Se;if(M(t*t)!==n)throw new Error("sqrt invalid");return new be(e,on(t)?t:M(-t),1n)},ye=class ye{constructor(n,t,o){Q(this,"X");Q(this,"Y");Q(this,"Z");this.X=ht(n),this.Y=qe(t),this.Z=ht(o),An(this)}static CURVE(){return Gr}static fromAffine(n){let{x:t,y:o}=n;return t===0n&&o===0n?Ke:new ye(t,o,1n)}static fromBytes(n){ce(n);let t=n.length,o=n[0],a=tn(n,1,33);try{if(t===33&&(o===2||o===3)){let s=Et(a);return o===3?s.negate():s}if(t===65&&o===4)return new ye(a,tn(n,33,65),1n).assertValidity()}catch{throw new Error(Sn)}throw new Error(Sn)}static fromHex(n){return ye.fromBytes(bt(n))}get x(){return this.toAffine().x}get y(){return this.toAffine().y}equals(n){let{X:t,Y:o,Z:a}=this,{X:s,Y:r,Z:i}=vn(n);return M(t*i)===M(s*a)&&M(o*i)===M(r*a)}is0(){return this.Z===0n}negate(){return new ye(this.X,M(-this.Y),this.Z)}double(){return this.add(this)}add(n){let{X:t,Y:o,Z:a}=this,{X:s,Y:r,Z:i}=vn(n),c=0n,m=7n,u=0n,f=0n,d=0n,h=M(m*3n),y=M(t*s),A=M(o*r),T=M(a*i),B=M(t+o),w=M(s+r);B=M(B*w),w=M(y+A),B=M(B-w),w=M(t+a);let O=M(s+i);return w=M(w*O),O=M(y+T),w=M(w-O),O=M(o+a),u=M(r+i),O=M(O*u),u=M(A+T),O=M(O-u),d=M(c*w),u=M(h*T),d=M(u+d),u=M(A-d),d=M(A+d),f=M(u*d),A=M(y+y),A=M(A+y),T=M(c*T),w=M(h*w),A=M(A+T),T=M(y-T),T=M(c*T),w=M(w+T),y=M(A*w),f=M(f+y),y=M(O*w),u=M(B*u),u=M(u-y),y=M(B*A),d=M(O*d),d=M(d+y),new ye(u,f,d)}subtract(n){return this.add(vn(n).negate())}multiply(n,t=!0){if(!t&&n===0n)return Ke;if(Rt(n),n===1n)return this;if(this.equals(Be))return uo(n).p;let o=Ke,a=Be,s=this;for(let r=0;t?r<256:n>0n;r++)n&1n?o=o.add(s):t&&(a=a.add(s)),s=s.double(),n>>=1n;return o}multiplyUnsafe(n){return this.multiply(n,!1)}toAffine(){let{X:n,Y:t,Z:o}=this;if(o===0n)return{x:0n,y:0n};if(o===1n)return{x:n,y:t};let a=Qr(o,Se);if(M(o*a)!==1n)throw new Error("inverse invalid");return{x:M(n*a),y:M(t*a)}}assertValidity(){let{x:n,y:t}=this.toAffine();if(qe(n),qe(t),M(t*t)!==At(n))throw new Error(Sn);return this}toBytes(n=!0){let{x:t,y:o}=this.assertValidity().toAffine(),a=pe(t);return n?_e(eo(o),a):_e(Uint8Array.of(4),a,pe(o))}toHex(n){return St(this.toBytes(n))}};Q(ye,"BASE"),Q(ye,"ZERO");var be=ye,Be=new be(Pt,kt,1n),Ke=new be(0n,1n,0n);be.BASE=Be;be.ZERO=Ke;var no=(e,n,t)=>Be.multiply(n,!1).add(e.multiply(t,!1)).assertValidity(),Oe=e=>Yr("0x"+(St(e)||"0")),tn=(e,n,t)=>Oe(e.subarray(n,t)),pe=e=>bt(vt(Fe(e,0n,2n**256n),de*2)),to=e=>{let n=Oe(ce(e,de,"secret key"));return Fe(n,1n,We,"invalid secret key: outside of range")};var yt="SHA-256",ro={hmacSha256Async:async(e,n)=>{let t=dt(),o=await t.importKey("raw",e,{name:"HMAC",hash:yt},!1,["sign"]);return new Uint8Array(await t.sign("HMAC",o,n))},hmacSha256:void 0,sha256Async:async e=>new Uint8Array(await dt().digest(yt,e)),sha256:void 0};var oo=e=>{if(e=e===void 0?Rn(48):e,ce(e),e.length<48||e.length>1024)throw new RangeError("expected 48-1024b");let n=M(Oe(e),We-1n);return pe(n+1n)},so=e=>n=>{let t=oo(n);return{secretKey:t,publicKey:e(t)}};var Mt=e=>Uint8Array.from("BIP0340/"+e,n=>n.charCodeAt(0)),bn=(e,...n)=>{let t=mt("sha256",Mt(e));return mt("sha256",_e(t,t,...n))},Tn=(e,...n)=>gt("sha256Async",Mt(e)).then(t=>gt("sha256Async",_e(t,t,...n))),En=e=>{let n=to(e),t=Be.multiply(n),{x:o,y:a}=t.assertValidity().toAffine(),s=on(a)?n:rn(-n),r=pe(o);return{d:s,px:r}},Mn=e=>rn(Oe(e)),Bt=(...e)=>Mn(bn("challenge",...e)),Ot=async(...e)=>Mn(await Tn("challenge",...e)),Ct=e=>En(e).px,ao=so(Ct),Dt=(e,n,t)=>{let o=Xr(e,"message"),{px:a,d:s}=En(n);return{m:o,px:a,d:s,a:ce(t,de)}},Lt=e=>{let n=Mn(e);if(n===0n)throw new Error("sign failed: k is zero");let{px:t,d:o}=En(pe(n));return{rx:t,k:o}},Ht=(e,n,t,o)=>_e(n,pe(rn(e+t*o))),xt="invalid signature produced",io=(e,n,t=Rn(de))=>{let{m:o,px:a,d:s,a:r}=Dt(e,n,t),i=pe(s^Oe(bn("aux",r))),{rx:c,k:m}=Lt(bn("nonce",i,a,o)),u=Ht(m,c,Bt(c,a,o),s);if(!It(u,o,a))throw new Error(xt);return u},co=async(e,n,t=Rn(de))=>{let{m:o,px:a,d:s,a:r}=Dt(e,n,t),i=pe(s^Oe(await Tn("aux",r))),{rx:c,k:m}=Lt(await Tn("nonce",i,a,o)),u=Ht(m,c,await Ot(c,a,o),s);if(!await Ut(u,o,a))throw new Error(xt);return u},fo=(e,n)=>e instanceof Promise?e.then(n):n(e),_t=(e,n,t,o)=>{let a=ce(e,64,"signature"),s=ce(n,void 0,"message"),r=ce(t,de,"publicKey"),i,c,m,u;try{let f=Oe(r);i=Et(f),c=qe(tn(a,0,de)),m=Rt(tn(a,de,64)),u=_e(pe(c),r,s)}catch{return!1}return fo(o(u),f=>{try{let{x:d,y:h}=no(i,m,rn(-f)).toAffine();return!(!on(h)||d!==c)}catch{return!1}})},It=(e,n,t)=>_t(e,n,t,Bt),Ut=async(e,n,t)=>_t(e,n,t,Ot),Bn=An({keygen:ao,getPublicKey:Ct,sign:io,verify:It,signAsync:co,verifyAsync:Ut}),lo=()=>{let e=[],n=Be,t=n;for(let o=0;o<33;o++){t=n,e.push(t);for(let a=1;a<128;a++)t=t.add(n),e.push(t);n=t.double()}return e},pt,wt=(e,n)=>{let t=n.negate();return e?t:n},uo=e=>{let n=pt||(pt=lo()),t=Ke,o=Be;for(let a=0;a<33;a++){let s=Number(e&255n);e>>=8n,s>128&&(s-=256,e+=1n);let r=a*128,i=r+Math.abs(s)-1,c=a%2!==0,m=s<0;s===0?o=o.add(wt(c,n[r])):t=t.add(wt(m,n[i]))}if(e!==0n)throw new Error("invalid wnaf");return{p:t,f:o}};var{floor:On,min:mo,sin:go}=Math,G="Trystero",Te=(e,n)=>Array(e).fill(void 0).map(n),ho="0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz",fe=e=>Te(e,()=>ho[On(Math.random()*62)]??"").join(""),Z=fe(20),se=Promise.all.bind(Promise),Dn=typeof window<"u",{entries:me,fromEntries:Ln,keys:ne,values:we}=Object,V=()=>{},sn="candidate",_=e=>(e!==null&&clearTimeout(e),null),I=e=>new Error(`${G}: ${e}`),Pe=(e,n)=>e instanceof Error&&e.message?e.message:typeof e=="string"&&e?e:X(e??n),le=(e,n)=>e instanceof Error?e:I(Pe(e,n)),yo=new TextEncoder,po=new TextDecoder,ue=e=>yo.encode(e),ge=e=>po.decode(e),ke=e=>e.reduce((n,t)=>n+t.toString(16).padStart(2,"0"),""),Ce=(...e)=>e.join("@"),wo=(e,n)=>{let t=[...e],o=()=>{let s=go(n++)*1e4;return s-On(s)},a=t.length;for(;a;){let s=On(o()*a--),r=t[a];t[a]=t[s],t[s]=r}return t},Hn=(e,n,t,o=!1)=>e.relayConfig?.urls||(o?wo(n,an(e.appId)):n).slice(0,e.relayConfig?.redundancy??t),X=JSON.stringify,he=e=>{try{return JSON.parse(e)}catch{throw I(`failed to parse JSON: ${e}`)}},an=(e,n=Number.MAX_SAFE_INTEGER)=>e.split("").reduce((t,o)=>t+o.charCodeAt(0),0)%n,Nt=3333,$t=6e4,Je={},ze=null,Cn=null,xn=()=>{ze||(ze=new Promise(e=>{Cn=e}).finally(()=>{Cn=null,ze=null}))},_n=()=>{Cn?.()},In=(e,n,t)=>{let o={},a=!1,s=!1,r,i=V;o.isClosed=!1,o.ready=new Promise(m=>i=m);let c=()=>{if(o.isClosed)return;r=void 0,s=!1;let m=new WebSocket(e);m.onclose=()=>{if(o.isClosed||s)return;if(s=!0,ze){ze.then(c);return}let u=Je[e]??(Je[e]=Nt);if(u>=$t){o.isClosed=!0;return}r=setTimeout(c,Math.random()*u),Je[e]=mo(u*2,$t)},m.onmessage=u=>n(String(u.data)),o.socket=m,o.url=m.url,m.onopen=()=>{let u=a;a=!0,i(o),Je[e]=Nt,u&&t?.()},o.send=u=>{m.readyState===1&&m.send(u)}};return o.close=()=>{o.isClosed=!0,r!==void 0&&(clearTimeout(r),r=void 0),o.socket.close()},c(),o};var Un=e=>{let n={},t=new WeakMap,o=r=>{let i=t.get(r);if(!i)throw I("relay bookkeeping missing registration for relay client");return i},a=()=>{let r={},i=c=>r[c]??(r[c]={});return{forKey:i,forRelay:c=>i(o(c))}},s=(r,i)=>(n[r]=i,t.set(i,r),i);return{register:(r,i)=>{let c=n[r];return c||s(r,i())},keyOf:o,scoped:a,getSockets:()=>Ln(me(n).flatMap(([r,i])=>{let c=e(i);return c?[[r,c]]:[]}))}},jt=()=>{if(Dn){let e=new AbortController;return addEventListener("online",_n,{signal:e.signal}),addEventListener("offline",xn,{signal:e.signal}),()=>e.abort()}return V};var $n="AES-GCM",Nn={},Po=e=>btoa(String.fromCharCode.apply(null,Array.from(new Uint8Array(e)))),ko=e=>{let n=atob(e);return new Uint8Array(n.length).map((t,o)=>n.charCodeAt(o)).buffer},De=async(e,n)=>new Uint8Array(await crypto.subtle.digest(e,ue(n))),Ae=async e=>Nn[e]??(Nn[e]=Array.from(await De("SHA-1",e)).map(n=>n.toString(36)).join("")),qt=async(e,n,t)=>crypto.subtle.importKey("raw",await crypto.subtle.digest({name:"SHA-256"},ue(`${e}:${n}:${t}`)),{name:$n},!1,["encrypt","decrypt"]),Kt=async(e,n)=>ke(await De("SHA-256",`${G}:${e}:${n}`)),Wt="$",Ft=",",Jt=async(e,n)=>{let t=crypto.getRandomValues(new Uint8Array(16));return t.join(Ft)+Wt+Po(await crypto.subtle.encrypt({name:$n,iv:t},await e,ue(n)))},zt=async(e,n)=>{let[t,o]=n.split(Wt);return ge(await crypto.subtle.decrypt({name:$n,iv:new Uint8Array(t?.split(Ft).map(Number)??[])},await e,ko(o??"")))};var Ve=57333,vo=18e4,So=20,Vt=class{constructor(e){Q(this,"makeOffer");Q(this,"pool",[]);Q(this,"pooled",new Set);Q(this,"leased",new Map);Q(this,"recycling",new Set);Q(this,"cleanupTimer",null);Q(this,"active",!1);this.makeOffer=e}get isActive(){return this.active}warmup(){this.pool=[],this.pooled.clear(),Te(So,this.makeOffer).forEach(e=>this.push(e)),this.active=!0,this.cleanupTimer=setInterval(()=>{this.pool=this.pool.filter(e=>e.isDead?(this.pooled.delete(e),!1):!0)},Ve)}push(e){e.isDead||this.pooled.has(e)||this.leased.has(e)||(this.pool.push(e),this.pooled.add(e))}shift(e){let n=[];for(;n.length<e&&this.pool.length>0;){let t=this.pool.shift();if(!t)break;this.pooled.delete(t),n.push(t)}return n}claimLeased(e){let n=this.leased.get(e);n&&(_(n),this.leased.delete(e))}recycle(e){if(!(e.isDead||this.recycling.has(e))){if(e.connection.remoteDescription){e.destroy();return}if(!this.active){e.destroy();return}this.recycling.add(e),e.setHandlers({connect:V,close:V,error:V}),e.getOffer(!0).then(n=>{if(!n||n.type!=="offer"||e.isDead||!this.active){e.destroy();return}this.push(e)}).catch(()=>e.destroy()).finally(()=>this.recycling.delete(e))}}reclaimLeased(e){let n=this.leased.get(e);n&&(_(n),this.leased.delete(e),this.recycle(e))}lease(e){this.claimLeased(e),this.leased.set(e,setTimeout(()=>{this.leased.delete(e),this.recycle(e)},vo))}checkout(e,n,t){let o=this.shift(e),a=Math.max(0,e-o.length);a>0&&o.push(...Te(a,this.makeOffer));let s=async(r,i=!1)=>{try{let c=await t(r);return n?(this.lease(r),{peer:r,offer:c,claim:()=>this.claimLeased(r),reclaim:()=>this.reclaimLeased(r)}):{peer:r,offer:c}}catch(c){if(this.claimLeased(r),this.pooled.delete(r),r.destroy(),!i)return s(this.makeOffer(),!0);throw c}};return se(o.map(r=>s(r)))}getOffers(e,n){return this.checkout(e,!0,n)}destroy(){this.active=!1,this.cleanupTimer&&(clearInterval(this.cleanupTimer),this.cleanupTimer=null),this.pool.forEach(e=>e.destroy()),this.pool=[],this.pooled.clear(),this.leased.forEach((e,n)=>{_(e),n.destroy()}),this.leased.clear(),this.recycling.forEach(e=>e.destroy()),this.recycling.clear()}};var jn=I("incorrect password for overlapping room"),Gt=(e,n,t)=>{let o=r=>De("SHA-256",`${r}:${e}:${n}:${t}`).then(ke),a=async(r,i,c)=>{if(!e)return;if(c){let u=fe(36);await r({__trystero_pw:"challenge",c:u});let{data:f}=await i();if(!f||typeof f!="object"||f.__trystero_pw!=="response"||typeof f.h!="string")throw jn;let d=await o(u);if(f.h!==d)throw jn;return}let{data:m}=await i();if(!m||typeof m!="object"||m.__trystero_pw!=="challenge"||typeof m.c!="string")throw jn;await r({__trystero_pw:"response",h:await o(m.c)})};return{run:a,compose:r=>e||r?async(i,c,m,u)=>{await a(c,m,u),await r?.(i,c,m,u)}:void 0}},bo=e=>{let n=Pe(e,"unknown error");return n.startsWith("handshake ")?n:`handshake failed: ${n}`},Zt=({onPeerHandshake:e,onHandshakeError:n,handshakeTimeoutMs:t,sendHandshakeData:o,sendHandshakeReady:a,onActivate:s,onFailure:r})=>{let i={},c=(f,d)=>{let h=i[f];!h||d&&h.peer!==d||h.isActive||!h.didLocalHandshakePass||!h.didReceiveRemoteReady||(h.isActive=!0,h.handshakeTimer=_(h.handshakeTimer),s(f,h.peer))},m=(f,d,h)=>{let y=i[f];if(!y||y.peer!==d)return;let A=bo(h);n?.(f,A),r(f,d,I(A))},u=(f,d)=>{let h=i[f];!h||h.peer!==d||h.isActive||(h.didLocalHandshakePass=!0,a("",f).catch(y=>m(f,d,I(`failed sending handshake readiness: ${Pe(y,"unknown send failure")}`))),c(f,d))};return{addPeer:(f,d)=>{i[f]={peer:d,isActive:!1,didLocalHandshakePass:!1,didReceiveRemoteReady:!1,handshakeTimer:null,pendingHandshakePayloads:[],handshakeWaiters:[]}},clearPeer:(f,d)=>{let h=i[f];h&&(h.handshakeTimer=_(h.handshakeTimer),h.pendingHandshakePayloads.length=0,h.handshakeWaiters.splice(0).forEach(y=>y.reject(d)),delete i[f])},canReceiveFromPeer:(f,d)=>{let h=i[f];return!!(h&&(h.isActive||d))},start:(f,d)=>{let h=i[f];if(!h||h.peer!==d)return;h.handshakeTimer=setTimeout(()=>m(f,d,I(`handshake timed out after ${t}ms`)),t);let y=async(B,w)=>{await o(B,f,w)},A=()=>new Promise((B,w)=>{let O=i[f];if(!O||O.peer!==d){w(I("peer disconnected during handshake"));return}let x=O.pendingHandshakePayloads.shift();if(x){B(x);return}O.handshakeWaiters.push({resolve:B,reject:P=>w(P)})}),T=Z<f;Promise.resolve(e?.(f,y,A,T)).then(()=>u(f,d)).catch(B=>m(f,d,le(B,"handshake failed")))},receiveHandshakeData:(f,d,h)=>{let y=i[d];if(!y||y.isActive)return;let A=h===void 0?{data:f}:{data:f,metadata:h},T=y.handshakeWaiters.shift();if(T){T.resolve(A);return}y.pendingHandshakePayloads.push(A)},receiveHandshakeReady:f=>{let d=i[f];!d||d.isActive||(d.didReceiveRemoteReady=!0,c(f))}}};var To=15e3,Ao=5e3,Xt="icegatheringstatechange",Ro="iceconnectionstatechange",Ge="offer",Eo="answer",Mo=/out of range/i,Yt=e=>e.replace(/ (\S+\.local) (\d+) typ host/g," 127.0.0.1 $2 typ host"),qn=(e,{trickleIce:n,rtcConfig:t,rtcPolyfill:o,turnConfig:a,_test_only_mdnsHostFallbackToLoopback:s})=>{let r=new(o??RTCPeerConnection)({iceServers:Bo.concat(a??[]),...t}),i={},c=[],m=[],u=n!==!1,f=[],d=[],h=!1,y=!1,A=null,T=null,B=!1,w=()=>T=_(T),O=()=>{B||(B=!0,w(),i.close?.())},x=g=>{i.signal?i.signal(g):c.push(g)},P=g=>{let v=i.signal;i.signal=H=>{v?.(H),g(H)},c.length>0&&c.splice(0).forEach(H=>i.signal?.(H))},R=g=>s?Yt(g):g,$=g=>{if(!s||typeof g.candidate!="string")return g;let v=Yt(g.candidate);return v===g.candidate?g:{...g,candidate:v}},S=g=>({type:g.localDescription?.type??Ge,sdp:R(g.localDescription?.sdp??"")}),K=()=>{let g=r.remoteDescription?.sdp;return g?g.match(/a=ice-ufrag:([^\s]+)/)?.[1]??null:null},W=()=>(r.remoteDescription?.sdp?.match(/^m=/gm)??[]).length,q=g=>{if(!r.remoteDescription)return!1;let v=W();if(typeof g.sdpMLineIndex=="number"&&v>0&&g.sdpMLineIndex>=v)return!1;let H=K();return!(H&&g.usernameFragment&&g.usernameFragment!==H)},F=async g=>{try{return await r.addIceCandidate(g),!0}catch(v){if(v instanceof Error&&Mo.test(v.message)&&typeof g.sdpMLineIndex=="number")return!1;throw v}},J=async()=>{if(!r.remoteDescription||f.length===0)return;let g=f.splice(0),v=[];for(let H of g){if(!q(H)){v.push(H);continue}await F(H)||v.push(H)}v.length>0&&f.push(...v)},l=async g=>{if(q(g)){await F(g)||f.push(g);return}f.push(g)},p=g=>{g.binaryType="arraybuffer",g.bufferedAmountLowThreshold=65535,g.onmessage=v=>{let H=v.data;i.data?i.data(H):m.push(H)},g.onopen=()=>i.connect?.(),g.onclose=O,g.onerror=({error:v})=>i.error?.(le(v,"data channel error"))},b=async g=>{let v=null;try{await Promise.race([new Promise(H=>{let ee=()=>{g.iceGatheringState==="complete"&&(g.removeEventListener(Xt,ee),H())};g.addEventListener(Xt,ee),ee()}),new Promise(H=>{v=setTimeout(H,To)})])}finally{_(v)}return S(g)},k=async()=>{let g=u?S(r):await b(r);return x(g),g};e?(A=r.createDataChannel("data"),p(A)):r.ondatachannel=({channel:g})=>{A=g,p(g)};let E=async(g=!1)=>{if(r.connectionState!=="closed")try{return h=!0,g&&(r.signalingState!=="stable"&&r.signalingState!=="closed"&&r.localDescription?.type===Ge&&await r.setLocalDescription({type:"rollback"}),typeof r.restartIce=="function"&&r.restartIce()),await r.setLocalDescription(g?await r.createOffer({iceRestart:!0}):void 0),await k()}catch(v){i.error?.(le(v,"failed to create local offer"))}finally{h=!1}};r.onnegotiationneeded=async()=>E(!1),r.onicecandidate=({candidate:g})=>{if(!u||!g)return;let v=$(typeof g.toJSON=="function"?g.toJSON():{candidate:g.candidate,sdpMid:g.sdpMid,sdpMLineIndex:g.sdpMLineIndex,usernameFragment:g.usernameFragment});x({type:sn,sdp:JSON.stringify(v)})};let U=()=>{if(r.connectionState==="failed"||r.connectionState==="closed"||r.iceConnectionState==="failed"||r.iceConnectionState==="closed"){O();return}if(r.connectionState==="connected"||r.connectionState==="connecting"||r.iceConnectionState==="connected"||r.iceConnectionState==="completed"||r.iceConnectionState==="checking"){w();return}if(r.connectionState==="disconnected"||r.iceConnectionState==="disconnected"){T||(T=setTimeout(()=>{T=null,(r.connectionState==="disconnected"||r.iceConnectionState==="disconnected")&&O()},Ao));return}};r.onconnectionstatechange=U,r.addEventListener(Ro,U),r.ontrack=g=>{let v=g.streams[0];if(v){if(!i.track&&!i.stream){d.push({track:g.track,stream:v});return}i.track?.(g.track,v),i.stream?.(v)}},r.onremovestream=g=>i.stream?.(g.stream);let j=e?new Promise(g=>P(v=>{v.type===Ge&&g(v)})):Promise.resolve();return e&&queueMicrotask(()=>{!h&&r.signalingState==="stable"&&!r.localDescription&&r.connectionState!=="closed"&&r.onnegotiationneeded?.(new Event("negotiationneeded"))}),{created:Date.now(),connection:r,get channel(){return A},get isDead(){return r.connectionState==="closed"},getOffer:async(g=!1)=>{if(e)return g?E(!0):r.localDescription?.type===Ge?u?S(r):b(r):j},async signal(g){if(g.type==="candidate"){try{let v=JSON.parse(g.sdp);v&&typeof v=="object"&&await l($(v))}catch(v){i.error?.(le(v,"failed to parse remote candidate"))}return}if(!(A?.readyState==="open"&&!g.sdp?.includes("a=rtpmap")))try{let v={...g,sdp:R(g.sdp)};if(g.type===Ge){if(h||r.signalingState!=="stable"&&!y){if(e)return;await se([r.setLocalDescription({type:"rollback"}),r.setRemoteDescription(v)])}else await r.setRemoteDescription(v);return await J(),await r.setLocalDescription(),await k()}if(g.type===Eo){y=!0;try{await r.setRemoteDescription(v),await J()}finally{y=!1}}}catch(v){i.error?.(le(v,"failed to apply remote signal"))}},sendData:g=>A?.send(g),destroy:()=>{w(),A?.close(),r.close(),h=!1,y=!1,O()},setHandlers:g=>{let{signal:v,...H}=g;Object.assign(i,H),i.data&&m.length>0&&m.splice(0).forEach(ee=>i.data?.(ee)),v&&P(v),(i.track||i.stream)&&d.length>0&&d.splice(0).forEach(({track:ee,stream:te})=>{i.track?.(ee,te),i.stream?.(te)})},offerPromise:j,addStream:g=>g.getTracks().forEach(v=>r.addTrack(v,g)),removeStream:g=>r.getSenders().filter(v=>v.track&&g.getTracks().includes(v.track)).forEach(v=>r.removeTrack(v)),addTrack:(g,v)=>r.addTrack(g,v),removeTrack:g=>{let v=r.getSenders().find(H=>H.track===g);v&&r.removeTrack(v)},replaceTrack:(g,v)=>{let H=r.getSenders().find(ee=>ee.track===g);if(H)return H.replaceTrack(v)}}},Bo=[...Te(3,(e,n)=>`stun:stun${n||""}.l.google.com:19302`),"stun:stun.cloudflare.com:3478"].map(e=>({urls:e}));var Oo=Object.getPrototypeOf(Uint8Array),Kn=32,Co=0,Wn=32,Qt=34,Fn=35,cn=36,Le=16*2**10-cn,Ze=255,Do=65535,er="bufferedamountlow",nr="close",tr="error",Lo=1e4,Ho=e=>e instanceof ArrayBuffer?new Uint8Array(e):new Uint8Array(e.buffer,e.byteOffset,e.byteLength),xo=(e,n=Lo)=>e.readyState!=="open"||e.bufferedAmount<=e.bufferedAmountLowThreshold?Promise.resolve(e.readyState==="open"):new Promise(t=>{let o=!1,a=null,s=c=>{o||(o=!0,e.removeEventListener(er,r),e.removeEventListener(nr,i),e.removeEventListener(tr,i),_(a),t(c))},r=()=>s(!0),i=()=>s(!1);if(e.addEventListener(er,r),e.addEventListener(nr,i),e.addEventListener(tr,i),a=setTimeout(()=>s(!1),n),e.readyState!=="open"){s(!1);return}e.bufferedAmount<=e.bufferedAmountLowThreshold&&s(!0)}),rr=({getPeer:e,getPeerIds:n,canReceiveFromPeer:t,throwIfAborted:o})=>{let a={},s={},r={},i={},c=(f,d,{includePending:h=!1}={})=>(f?Array.isArray(f)?f:[f]:n(h)).flatMap(y=>{let A=e(y,h);return A?[Promise.resolve(d(y,A))]:(console.warn(`${G}: no peer with id ${y} found`),[])});return{makeInternalAction:(f,d={})=>{let h=s[f];if(a[f]&&h){let w=a[f].options;if(w.sendToPending!==!!d.sendToPending||w.receiveWhilePending!==!!d.receiveWhilePending)throw I(`action type "${f}" cannot be redefined`);return h}if(!f)throw I("action type argument is required");let y=ue(f);if(y.byteLength>Kn)throw I(`action type string "${f}" (${y.byteLength}b) exceeds byte limit (${Kn}). Hint: choose a shorter name.`);let A={sendToPending:!!d.sendToPending,receiveWhilePending:!!d.receiveWhilePending},T=new Uint8Array(Kn);T.set(y);let B=0;return a[f]={onComplete:V,onProgress:V,setOnComplete:w=>{a[f].onComplete=w;let O=i[f];O?.length&&(delete i[f],O.forEach(({payload:x,peerId:P,metadata:R})=>w(x,P,R)))},setOnProgress:w=>{a[f].onProgress=w},send:async(w,O,x,P,R)=>{o(R);let $=typeof w;if($==="undefined")throw I("action data cannot be undefined");let S=$!=="string",K=w instanceof Blob,W=K||w instanceof ArrayBuffer||w instanceof Oo,q=x!==void 0,F=W?Ho(K?await w.arrayBuffer():w):ue(S?X(w):w),J=q?ue(X(x)):null,l=Math.ceil(F.byteLength/Le)+(q?1:0)||1,p=Te(l,(b,k)=>{let E=k===l-1,U=!!(q&&k===0),j=new Uint8Array(cn+(U?J?.byteLength??0:E?F.byteLength-Le*(l-(q?2:1)):Le));return j.set(T),j.set([B>>8,B&Ze],Wn),j.set([Number(E)|Number(U)<<1|Number(W)<<2|Number(S)<<3],Qt),j.set([Math.round((k+1)/l*Ze)],Fn),j.set(q?U?J??new Uint8Array:F.subarray((k-1)*Le,k*Le):F.subarray(k*Le,(k+1)*Le),cn),j});return B=B+1&Do,await se(c(O,async(b,k)=>{let{channel:E}=k,U=0;for(;U<l;){o(R);let j=p[U];if(!j)break;if(E&&E.bufferedAmount>E.bufferedAmountLowThreshold){let H=await xo(E);if(o(R),!H)break}let g=e(b,A.sendToPending);if(!g||g!==k)break;k.sendData(j),U++;let v=j[Fn]??Ze;P?.(v/Ze,b,x)}},{includePending:A.sendToPending})),[]},options:A},s[f]={send:a[f].send,onMessage:a[f].setOnComplete,onProgress:a[f].setOnProgress}},handleData:(f,d)=>{var q,F;let h=new Uint8Array(d),y=ge(h.subarray(Co,Wn)).replaceAll("\0",""),A=a[y];if(!t(f,!!A?.options.receiveWhilePending))return;let T=(h[Wn]??0)<<8|(h[33]??0),B=h[Qt]??0,w=h[Fn]??0,O=h.subarray(cn),x=!!(B&1),P=!!(B&2),R=!!(B&4),$=!!(B&8);r[f]??(r[f]={}),(q=r[f])[y]??(q[y]={});let S=(F=r[f][y])[T]??(F[T]={chunks:[]});if(P?S.meta=he(ge(O)):S.chunks.push(O),A?.onProgress(w/Ze,f,S.meta),!x)return;let K=new Uint8Array(S.chunks.reduce((J,l)=>J+l.byteLength,0));S.chunks.reduce((J,l)=>(K.set(l,J),J+l.byteLength),0),delete r[f][y][T];let W=R?K:$?he(ge(K)):ge(K);if(A){A.onComplete(W,f,S.meta);return}(i[y]??(i[y]=[])).push({payload:W,peerId:f,...S.meta===void 0?{}:{metadata:S.meta}})},clearPeer:f=>{delete r[f]}}};var _o=500,Ie=(e,n)=>{let t=I(n);return t.kind=e,t.name=e==="aborted"?"AbortError":t.name,t},Jn=e=>{if(e?.aborted)throw Ie("aborted","operation aborted")},or=e=>e&&typeof e=="object"&&!Array.isArray(e)&&typeof e.r=="string"?{r:e.r,...Object.hasOwn(e,"m")?{m:e.m}:{}}:null,Io=e=>e&&typeof e=="object"&&!Array.isArray(e)&&typeof e.r=="string"?{r:e.r,...typeof e.e=="string"?{e:e.e}:{}}:null,fn=(e,n)=>n===void 0?e:{...e,metadata:n},sr=({getPeer:e,getPeerIds:n,canReceiveFromPeer:t})=>{let o={},a={},s=rr({getPeer:e,getPeerIds:n,canReceiveFromPeer:t,throwIfAborted:Jn}),r=s.makeInternalAction,i=s.handleData,c=h=>{let y=a[h];y&&(_(y.timer),y.signal&&y.abortHandler&&y.signal.removeEventListener("abort",y.abortHandler),delete a[h])},m=(h,y)=>{me(a).forEach(([A,T])=>{T.peerId===h&&(c(A),T.reject(y))})},u=(h,y)=>{s.clearPeer(h),m(h,Ie("disconnected",Pe(y,"peer disconnected")))},f=r("@_response");return f.onMessage((h,y,A)=>{let T=Io(A);if(!T)return;let B=a[T.r];if(!(!B||B.peerId!==y)){if(c(T.r),T.e!==void 0){B.reject(Ie("rejected",T.e));return}B.resolve(h)}}),{makeAction:(h,y)=>{if(y&&"onRequest"in y&&y.kind!=="request")throw I('request actions must use kind: "request"');let A=y?.kind??"message",T=r(h),B=o[h];if(B){if(B.kind!==A)throw I(`action type "${h}" cannot be redefined`);return B.action}let w={kind:A,action:null,pendingMessages:[],pendingRequests:[],onReceiveProgress:y?.onReceiveProgress??null},O=(l,p)=>l?(b,k)=>l(b,fn({peerId:k},p)):void 0,x=l=>{w.onReceiveProgress=l},P=(l,p,b)=>{let k=w.kind==="request"?or(b):null;w.onReceiveProgress?.(l,fn({peerId:p},k?k.m:b))};if(T.onProgress(P),A==="message"){let l=y?.onMessage??null,p=()=>{if(!l)return;let k=l;w.pendingMessages.splice(0).forEach(({payload:E,peerId:U,metadata:j})=>{Promise.resolve().then(()=>k(E,fn({peerId:U},j))).catch(g=>console.error(`${G} action handler error:`,g))})},b={send:async(k,E={})=>{await T.send(k,E.target,E.metadata,O(E.onProgress,E.metadata),E.signal)},get onMessage(){return l},set onMessage(k){l=k,p()},get onReceiveProgress(){return w.onReceiveProgress},set onReceiveProgress(k){x(k)}};return T.onMessage((k,E,U)=>{if(!l){w.pendingMessages.push(U===void 0?{payload:k,peerId:E}:{payload:k,peerId:E,metadata:U});return}let j=l;Promise.resolve().then(()=>j(k,fn({peerId:E},U))).catch(g=>console.error(`${G} action handler error:`,g))}),w.action=b,o[h]=w,p(),b}let R=y?.onRequest??null,$=l=>{_(l.timer);let p=w.pendingRequests.indexOf(l);p>-1&&w.pendingRequests.splice(p,1)},S=(l,p,b)=>{f.send(null,l,{r:p,e:Pe(b,"request failed")})},K=(l,p)=>{$(l),Promise.resolve().then(()=>p(l.payload,{peerId:l.peerId,...l.metadata===void 0?{}:{metadata:l.metadata},signal:l.controller.signal})).then(async b=>{if(b===void 0)throw I("request handler returned undefined");await f.send(b,l.peerId,{r:l.requestId})}).catch(b=>S(l.peerId,l.requestId,b)).finally(()=>l.controller.abort())},W=()=>{R&&w.pendingRequests.slice().forEach(l=>K(l,R))},q=(l,p,b,k)=>{if(R){let U={payload:l,peerId:p,...b===void 0?{}:{metadata:b},requestId:k,controller:new AbortController,timer:null};K(U,R);return}let E={payload:l,peerId:p,...b===void 0?{}:{metadata:b},requestId:k,controller:new AbortController,timer:setTimeout(()=>{$(E),E.controller.abort(),S(p,k,"request handler unavailable")},_o)};w.pendingRequests.push(E)},F=async(l,p)=>{let{target:b,metadata:k,onProgress:E,signal:U,timeoutMs:j}=p;if(Jn(U),!e(b,!1))throw Ie("disconnected",`no active peer with id ${b}`);let g=fe(20),v=new Promise((H,ee)=>{let te={peerId:b,resolve:H,reject:ee,timer:null,...U===void 0?{}:{signal:U}},$e=()=>{c(g),ee(Ie("aborted","operation aborted"))};U&&(te.abortHandler=$e,U.addEventListener("abort",$e,{once:!0})),a[g]=te}).catch(H=>{throw H});try{await T.send(l,b,k===void 0?{r:g}:{r:g,m:k},O(E,k),U);let H=a[g];return H&&j!==void 0&&(H.timer=setTimeout(()=>{c(g),H.reject(Ie("timeout","request timed out"))},j)),await v}catch(H){throw c(g),H}},J={request:F,requestMany:async(l,p)=>(Jn(p.signal),await se(p.targets.map(async b=>{try{let k={peerId:b,status:"fulfilled",value:await F(l,{target:b,...p.metadata===void 0?{}:{metadata:p.metadata},...p.timeoutMs===void 0?{}:{timeoutMs:p.timeoutMs},...p.onProgress===void 0?{}:{onProgress:p.onProgress},...p.signal===void 0?{}:{signal:p.signal}})};return p.onResult?.(k),k}catch(k){let E=le(k,"request failed");if(E.kind==="aborted"||!E.kind)throw E;let U=E.kind==="timeout"?{peerId:b,status:"timeout"}:E.kind==="disconnected"?{peerId:b,status:"disconnected"}:{peerId:b,status:"rejected",error:E};return p.onResult?.(U),U}}))),get onRequest(){return R},set onRequest(l){R=l,W()},get onReceiveProgress(){return w.onReceiveProgress},set onReceiveProgress(l){x(l)}};return T.onMessage((l,p,b)=>{let k=or(b);k&&q(l,p,k.m,k.r)}),w.action=J,o[h]=w,W(),J},makeInternalAction:r,handleData:i,clearPeer:u}};var ar=e=>e&&typeof e=="object"&&!Array.isArray(e)&&typeof e.k=="string"?{key:e.k,...typeof e.s=="string"?{streamId:e.s}:{},...typeof e.t=="string"?{trackId:e.t}:{},...Object.hasOwn(e,"m")?{metadata:e.m}:{}}:null,ir=e=>n=>{let t=e.get(n);return t||(t=fe(20),e.set(n,t)),t},zn=()=>{let e=new WeakMap,n=new WeakMap,t=new Map,o=new Map,a=new Map,s=new Map;return{getStreamKey:ir(e),getTrackKey:ir(n),rememberRemoteStream:(r,i,c)=>{t.set(r,i),c&&o.set(c,i)},getRemoteStream:(r,i)=>t.get(r)??(i?o.get(i):void 0),rememberRemoteTrack:(r,i,c,m,u)=>{let f={track:i,stream:c};a.set(r,f),m&&s.set(m,f),u&&o.set(u,c)},getRemoteTrack:(r,i)=>a.get(r)??(i?s.get(i):void 0),clearRemote:()=>{t.clear(),o.clear(),a.clear(),s.clear()}}},cr=({iterate:e,isActive:n,getSharedMediaPeer:t})=>{let o={},a={},s=zn(),r={onPeerStream:null,onPeerTrack:null},i=(u,f,d,h)=>{n(u)&&(t(u)?.__trysteroMedia?.rememberRemoteStream(f,d,typeof d.id=="string"?d.id:void 0),r.onPeerStream?.(d,u,h))},c=(u,f,d,h,y)=>{n(u)&&(t(u)?.__trysteroMedia?.rememberRemoteTrack(f,d,h,typeof d.id=="string"?d.id:void 0,typeof h.id=="string"?h.id:void 0),r.onPeerTrack?.(d,h,u,y))},m=(u,f,d,h,y,A={})=>{let T={k:f,...A,...d===void 0?{}:{m:d}};return e(u,async(B,w)=>{await h(T,B),y(w)})};return{addStream:(u,f,d)=>m(f.target,s.getStreamKey(u),f.metadata,d,h=>h.addStream(u),{s:u.id}),removeStream:(u,f)=>{e(f,(d,h)=>h.removeStream(u))},addTrack:(u,f,d,h)=>m(d.target,s.getTrackKey(u),d.metadata,h,y=>y.addTrack(u,f),{s:f.id,t:u.id}),removeTrack:(u,f)=>{e(f,(d,h)=>h.removeTrack(u))},replaceTrack:(u,f,d,h)=>m(d.target,s.getTrackKey(f),d.metadata,h,y=>y.replaceTrack(u,f),{t:u.id}),receiveStreamMeta:(u,f)=>{if(!n(f))return;let d=ar(u);if(!d)return;let h=t(f)?.__trysteroMedia?.getRemoteStream(d.key,d.streamId);if(h){i(f,d.key,h,d.metadata);return}(o[f]??(o[f]=[])).push(d)},receiveTrackMeta:(u,f)=>{if(!n(f))return;let d=ar(u);if(!d)return;let h=t(f)?.__trysteroMedia?.getRemoteTrack(d.key,d.trackId);if(h){c(f,d.key,h.track,h.stream,d.metadata);return}(a[f]??(a[f]=[])).push(d)},receiveRemoteStream:(u,f)=>{if(!n(u))return;let d=o[u]?.shift();d&&i(u,d.key,f,d.metadata)},receiveRemoteTrack:(u,f,d)=>{if(!n(u))return;let h=a[u]?.shift();h&&c(u,h.key,f,d,h.metadata)},clearPeer:u=>{delete o[u],delete a[u]},get onPeerStream(){return r.onPeerStream},set onPeerStream(u){r.onPeerStream=u},get onPeerTrack(){return r.onPeerTrack},set onPeerTrack(u){r.onPeerTrack=u}}};var fr="beforeunload",Uo=1e4,Re=e=>"@_"+e,Xe=new Set,lr=()=>Xe.forEach(e=>e()),No=e=>(Xe.add(e),Xe.size===1&&addEventListener(fr,lr),()=>{Xe.delete(e),Xe.size||removeEventListener(fr,lr)}),ur=(e,n,t,{onPeerHandshake:o,onHandshakeError:a,handshakeTimeoutMs:s=Uo,isPassive:r=!1}={})=>{let i={},c={},m={},u={onPeerJoin:null,onPeerLeave:null},f=V,d=null,h=(l,p,{includePending:b=!1}={})=>(l?Array.isArray(l)?l:[l]:ne(b?i:c)).flatMap(k=>{let E=b?i[k]:c[k];return E?[Promise.resolve(p(k,E))]:(console.warn(`${G}: no peer with id ${k} found`),[])}),y=cr({iterate:(l,p)=>h(l,(b,k)=>p(b,k)),isActive:l=>!!c[l],getSharedMediaPeer:l=>i[l]??null}),A=sr({getPeer:(l,p)=>(p?i:c)[l],getPeerIds:l=>ne(l?i:c),canReceiveFromPeer:(l,p)=>!!d?.canReceiveFromPeer(l,p)}),T=A.makeInternalAction,B=A.handleData,w=A.makeAction,O=(l,p=I("peer disconnected"))=>{let b=le(p,"peer disconnected");d?.clearPeer(l,b),delete i[l],delete c[l],A.clearPeer(l,b),m[l]?.splice(0).forEach(k=>k.reject(b)),delete m[l],y.clearPeer(l)},x=(l,p,b)=>{let k=i[l];if(!k||p&&k!==p)return;let E=!!c[l];O(l,b),k.destroy(),E&&u.onPeerLeave?.(l),n(l)},P=async()=>{await q.send(""),await new Promise(l=>setTimeout(l,99)),me(i).forEach(([l,p])=>{p.destroy(),O(l,I("room left"))}),f(),t()},R=T(Re("ping")),$=T(Re("pong")),S=T(Re("signal")),K=T(Re("stream")),W=T(Re("track")),q=T(Re("leave"),{sendToPending:!0,receiveWhilePending:!0}),F=T(Re("hsdata"),{sendToPending:!0,receiveWhilePending:!0}),J=T(Re("hsready"),{sendToPending:!0,receiveWhilePending:!0});return d=Zt({...o===void 0?{}:{onPeerHandshake:o},...a===void 0?{}:{onHandshakeError:a},handshakeTimeoutMs:s,sendHandshakeData:F.send,sendHandshakeReady:J.send,onActivate:(l,p)=>{c[l]=p,u.onPeerJoin?.(l)},onFailure:(l,p,b)=>x(l,p,b)}),R.onMessage((l,p)=>$.send("",p)),$.onMessage((l,p)=>{let b=m[p];b?.shift()?.resolve(),b&&!b.length&&delete m[p]}),S.onMessage((l,p)=>{c[p]&&i[p]?.signal(l)}),K.onMessage((l,p)=>y.receiveStreamMeta(l,p)),W.onMessage((l,p)=>y.receiveTrackMeta(l,p)),q.onMessage((l,p)=>x(p,void 0,I("peer left room"))),F.onMessage((l,p,b)=>d?.receiveHandshakeData(l,p,b)),J.onMessage((l,p)=>d?.receiveHandshakeReady(p)),e((l,p)=>{let b=i[p];if(b){if(b===l)return;b.destroy(),O(p,I("peer replaced"))}i[p]=l,d?.addPeer(p,l),l.setHandlers({data:k=>B(p,k),stream:k=>y.receiveRemoteStream(p,k),track:(k,E)=>y.receiveRemoteTrack(p,k,E),signal:k=>{c[p]&&S.send(k,p)},close:()=>x(p,l,I("peer disconnected")),error:k=>{console.error(`${G} peer error:`,k),x(p,l,k)}}),d?.start(p,l)}),Dn&&(f=No(()=>P().catch(V))),{makeAction:w,leave:P,ping:async l=>{if(!c[l])throw I(`no active peer with id ${l}`);let p=Date.now();return await new Promise((b,k)=>{let E=m[l]??(m[l]=[]),U=()=>{let g=m[l];if(!g)return;let v=g.indexOf(j);v>-1&&g.splice(v,1),g.length||delete m[l]},j={resolve:()=>{U(),b()},reject:g=>{U(),k(g)}};E.push(j),R.send("",l).catch(g=>j.reject(le(g,"peer disconnected")))}),Date.now()-p},isPassive:()=>r,getPeers:()=>Ln(me(c).map(([l,p])=>[l,p.connection])),addStream:(l,p={})=>y.addStream(l,p,K.send),removeStream:(l,p={})=>{y.removeStream(l,p.target)},addTrack:(l,p,b={})=>y.addTrack(l,p,b,W.send),removeTrack:(l,p={})=>{y.removeTrack(l,p.target)},replaceTrack:(l,p,b={})=>y.replaceTrack(l,p,b,W.send),get onPeerJoin(){return u.onPeerJoin},set onPeerJoin(l){u.onPeerJoin=l,l&&ne(c).forEach(p=>l(p))},get onPeerLeave(){return u.onPeerLeave},set onPeerLeave(l){u.onPeerLeave=l},get onPeerStream(){return y.onPeerStream},set onPeerStream(l){y.onPeerStream=l},get onPeerTrack(){return y.onPeerTrack},set onPeerTrack(l){y.onPeerTrack=l}}};var mr=1,gr=2,dr=(e,n)=>{let t=ue(e),o=new Uint8Array(3+t.byteLength+n.byteLength);return o[0]=mr,o[1]=t.byteLength>>>8&255,o[2]=t.byteLength&255,o.set(t,3),o.set(n,3+t.byteLength),o},$o=(e,n)=>{let t=ue(e),o=new Uint8Array(4+t.byteLength);return o[0]=gr,o[1]=Number(n),o[2]=t.byteLength>>>8&255,o[3]=t.byteLength&255,o.set(t,4),o},jo=e=>{let n=new Uint8Array(e);if(n.byteLength<3)return null;if(n[0]===mr){let a=(n[1]??0)<<8|(n[2]??0),s=3+a;return a<=0||n.byteLength<s?null:{type:"room",roomToken:ge(n.subarray(3,s)),payload:n.subarray(s).slice().buffer}}if(n[0]!==gr||n.byteLength<4)return null;let t=(n[2]??0)<<8|(n[3]??0),o=4+t;return t<=0||n.byteLength<o?null:{type:"presence",roomToken:ge(n.subarray(4,o)),isPresent:n[1]===1}},hr=e=>{let{connection:n,channel:t}=e;return e.isDead||n.connectionState==="closed"||n.connectionState==="failed"||n.iceConnectionState==="closed"||n.iceConnectionState==="failed"||t?.readyState==="closing"||t?.readyState==="closed"},yr=e=>{if(hr(e))return"stale";let{channel:n}=e;return!n||n.readyState!=="open"?"transient":"live"},pr=class{constructor(){Q(this,"byApp",{});Q(this,"roomPresenceHandlers",{})}getMap(e){var n;return(n=this.byApp)[e]??(n[e]={})}get(e,n){return this.byApp[e]?.[n]}isPeerStale(e){return hr(e)}getHealth(e){return this.isPeerStale(e)?"stale":"live"}setRoomPresenceHandler(e,n){return this.roomPresenceHandlers[e]=n,()=>{this.roomPresenceHandlers[e]===n&&delete this.roomPresenceHandlers[e]}}sendRoomPresence(e,n,t){e.isClosing||e.peer.isDead||e.peer.sendData($o(n,t))}clear(e,n,{destroyPeer:t}){let o=this.byApp[e],a=o?.[n];if(!a||a.isClosing)return;a.idleTimer=_(a.idleTimer),a.isClosing=!0,t&&!a.peer.isDead&&a.peer.destroy();let s=we(a.bindings);a.bindings={},a.bindingsByToken={},a.controlRoomId=null,delete o[n],s.forEach(r=>{r.handlers.close?.(),r.pendingData.length=0,r.pendingSendData.length=0,r.pendingTracks.length=0}),a.media.clearRemote(),a.pendingDataByToken.clear(),a.remoteRoomTokens.clear(),ne(o).length===0&&delete this.byApp[e]}register(e,n,t,o){let a=this.getMap(e),s=a[n];if(s){if(s.idleTimer=_(s.idleTimer),s.peer===t)return s;this.clear(e,n,{destroyPeer:!0})}let r={appId:e,peerId:n,peer:t,bindings:{},bindingsByToken:{},pendingDataByToken:new Map,remoteRoomTokens:new Set,idleTimer:null,controlRoomId:null,streamOwners:new Map,trackOwners:new Map,media:zn(),idleMs:o,isClosing:!1};return t.setHandlers({data:i=>this.dispatchData(r,i),signal:i=>this.dispatchSignal(r,i),close:()=>this.clear(e,n,{destroyPeer:!1}),error:i=>{console.error(`${G} peer error:`,i),this.clear(e,n,{destroyPeer:!1})},track:(i,c)=>this.dispatchTrack(r,i,c)}),a[n]=r,r}bind(e,n,t,{onDetach:o}){let a=t.bindings[e];if(a)return t.idleTimer=_(t.idleTimer),{proxy:a.proxy,isNew:!1};let s={roomId:e,roomToken:null,roomTokenPromise:n,handlers:{},pendingData:[],pendingSendData:[],pendingTracks:[],detach:V,proxy:{}},r=()=>{t.bindings[e]&&(this.pruneRoomOwnership(t,e),delete t.bindings[e],s.roomToken&&t.bindingsByToken[s.roomToken]===s&&delete t.bindingsByToken[s.roomToken],t.controlRoomId===e&&(t.controlRoomId=ne(t.bindings)[0]??null),o(),this.scheduleIdleTimer(t))},i={created:t.peer.created,get connection(){return t.peer.connection},get channel(){return t.peer.channel},get isDead(){return t.peer.isDead},getOffer:c=>t.peer.getOffer(c),signal:c=>t.peer.signal(c),sendData:c=>{if(!s.roomToken){s.pendingSendData.push(c);return}t.peer.sendData(dr(s.roomToken,c))},destroy:()=>r(),setHandlers:c=>{let{signal:m,...u}=c;Object.assign(s.handlers,u),m&&(s.handlers.signal=m),this.flushBindingQueues(s)},offerPromise:t.peer.offerPromise,addStream:c=>{let m=t.streamOwners.get(c)??new Set,u=m.size===0;m.add(e),t.streamOwners.set(c,m),u&&t.peer.addStream(c)},removeStream:c=>{let m=t.streamOwners.get(c);m&&(m.delete(e),m.size===0&&(t.streamOwners.delete(c),t.peer.removeStream(c)))},addTrack:(c,m)=>{let u=t.trackOwners.get(c)??{stream:m,rooms:new Set},f=u.rooms.size===0;return u.stream=m,u.rooms.add(e),t.trackOwners.set(c,u),f?t.peer.addTrack(c,m):t.peer.connection.getSenders().find(d=>d.track===c)??t.peer.addTrack(c,m)},removeTrack:c=>{let m=t.trackOwners.get(c);m&&(m.rooms.delete(e),m.rooms.size===0&&(t.trackOwners.delete(c),t.peer.removeTrack(c)))},replaceTrack:(c,m)=>{let u=t.trackOwners.get(c);if(u){t.trackOwners.delete(c);let f=t.trackOwners.get(m)??{stream:u.stream,rooms:new Set};u.rooms.forEach(d=>f.rooms.add(d)),t.trackOwners.set(m,f)}return t.peer.replaceTrack(c,m)},__trysteroMedia:t.media};return s.proxy=i,s.detach=r,t.bindings[e]=s,t.controlRoomId??(t.controlRoomId=e),t.idleTimer=_(t.idleTimer),n.then(c=>{if(t.isClosing||t.bindings[e]!==s)return;s.roomToken=c,t.bindingsByToken[c]=s;let m=t.pendingDataByToken.get(c);m?.length&&(s.pendingData.push(...m),t.pendingDataByToken.delete(c)),s.pendingSendData.splice(0).forEach(u=>t.peer.sendData(dr(c,u))),this.flushBindingQueues(s)}),{proxy:i,isNew:!0}}pruneRoomOwnership(e,n){e.streamOwners.forEach((t,o)=>{t.delete(n),t.size===0&&(e.streamOwners.delete(o),e.peer.removeStream(o))}),e.trackOwners.forEach((t,o)=>{t.rooms.delete(n),t.rooms.size===0&&(e.trackOwners.delete(o),e.peer.removeTrack(o))})}scheduleIdleTimer(e){e.isClosing||ne(e.bindings).length>0||(e.idleTimer=_(e.idleTimer),e.idleTimer=setTimeout(()=>{let n=this.byApp[e.appId]?.[e.peerId];!n||ne(n.bindings).length>0||this.clear(e.appId,e.peerId,{destroyPeer:!0})},e.idleMs))}getSignalBinding(e){if(e.controlRoomId){let t=e.bindings[e.controlRoomId];if(t?.handlers.signal)return t}let n=we(e.bindings).find(t=>!!t.handlers.signal);return n?(e.controlRoomId=n.roomId,n):null}flushBindingQueues(e){let{handlers:n}=e;n.data&&e.pendingData.length>0&&e.pendingData.splice(0).forEach(t=>n.data?.(t)),(n.track||n.stream)&&e.pendingTracks.length&&e.pendingTracks.splice(0).forEach(({track:t,stream:o})=>{n.track?.(t,o),n.stream?.(o)})}dispatchData(e,n){let t=jo(n);if(!t)return;if(t.type==="presence"){t.isPresent?e.remoteRoomTokens.add(t.roomToken):e.remoteRoomTokens.delete(t.roomToken),this.roomPresenceHandlers[e.appId]?.(e.peerId,t.roomToken,t.isPresent);return}let o=e.bindingsByToken[t.roomToken];if(!o){let a=e.pendingDataByToken.get(t.roomToken)??[];a.push(t.payload),e.pendingDataByToken.set(t.roomToken,a);return}o.handlers.data?o.handlers.data(t.payload):o.pendingData.push(t.payload)}dispatchSignal(e,n){this.getSignalBinding(e)?.handlers.signal?.(n)}dispatchTrack(e,n,t){we(e.bindings).forEach(o=>{if(o.handlers.track||o.handlers.stream){o.handlers.track?.(n,t),o.handlers.stream?.(t);return}o.pendingTracks.push({track:n,stream:t})})}};var qo=23333,Ko=12,Wo=7533,Fo=23333,Vn="__legacy__",un="offer-placeholder",Jo=["offer","answer","candidate"],zo=e=>{if(typeof e=="string")try{let n=he(e);return n&&typeof n=="object"?n:null}catch{return null}return e&&typeof e=="object"?e:null},Ye=(e,n)=>typeof e[n]=="string"&&e[n]?e[n]:void 0,Vo=e=>Jo.some(n=>n in e&&(typeof e[n]!="string"||e[n]==="")),Pr=(e,n,t,o,a,s)=>{e.toCipher(n).then(r=>{e.isLeaving()||!s()||o(t,X(a(r.sdp)))})},Go=()=>({status:"idle",offerPeer:null,offerId:null,offerSdp:null,offerInitPromise:null,offerAnswered:!1,offerRelays:[],offerSignalRelays:[],offerSignalBacklog:[],offerRelayTimers:[],offerExpiryTimer:null,connectedPeer:null,connectedPeerUnhealthySinceMs:null,answeringExpiryTimer:null,answeringPeer:null,answerSent:!1,connectionErrorReported:!1,pendingCandidates:{}}),Zo=e=>[...e.turnConfig??[],...e.rtcConfig?.iceServers??[]].some(({urls:n})=>(Array.isArray(n)?n:[n]).some(t=>/^turns?:/i.test(t))),Xo=(e,n)=>`could not connect to peer ${e} after exchanging SDP; ${Zo(n)?"check that your TURN server URLs and credentials are reachable by both peers":"configure TURN servers with turnConfig or rtcConfig.iceServers"}`,mn=(e,n,t)=>{e.isLeaving()||n.connectedPeer||n.connectionErrorReported||(n.connectionErrorReported=!0,e.onJoinError?.({error:Xo(t,e.config),appId:e.appId,peerId:t,roomId:e.roomId}))},Ue=(e,n)=>e[n]??(e[n]=Go()),ie=e=>{e.connectedPeer?e.status="connected":e.answeringPeer?e.status="answering":e.offerPeer||e.offerRelays.some(Boolean)?e.status="offering":e.status="idle"},ln=(e,n)=>{e.answeringPeer===n&&(e.answeringExpiryTimer=_(e.answeringExpiryTimer),e.answeringPeer=null,e.answerSent=!1,ie(e))},dn=(e,n,t)=>{e.connectedPeer&&(e.connectedPeer.isDead||e.connectedPeer.destroy(),e.connectedPeer=null,e.connectedPeerUnhealthySinceMs=null,ie(e))},Gn=(e,n)=>{e.offerRelayTimers[n]=_(e.offerRelayTimers[n]),e.offerRelays[n]&&(e.offerRelays[n]=void 0,ie(e))},wr=(e,n)=>{e?.offerRelays[n]===un&&Gn(e,n)},Yo=e=>{if(e.isDead||e.connection.connectionState==="closed")return!0;try{return!!e.connection.remoteDescription}catch{return!0}},Ne=(e,n)=>{let t=e.offerAnswered;e.offerExpiryTimer=_(e.offerExpiryTimer),e.offerInitPromise=null,e.offerRelays.forEach((o,a)=>Gn(e,a)),e.offerRelays=[],e.offerSignalRelays=[],e.offerRelayTimers=[],e.offerSignalBacklog=[],e.offerPeer&&e.offerPeer!==e.connectedPeer&&(t||Yo(e.offerPeer)?e.offerPeer.isDead||e.offerPeer.destroy():n.recycle(e.offerPeer)),e.offerPeer=null,e.offerId=null,e.offerSdp=null,e.offerAnswered=!1,e.connectionErrorReported=!1,ie(e)},Qo=(e,n,t,o)=>{_(n.answeringExpiryTimer),n.answeringExpiryTimer=setTimeout(()=>{let a=e.peerStates[t];!a||a.connectedPeer||a.answeringPeer!==o||(a.answerSent&&mn(e,a,t),o.destroy(),ln(a,o),e.checkDeactivate())},Fo)},es=async(e,n,t)=>{let o=t?[t,Vn]:[Vn];for(let a of o){let s=e.pendingCandidates[a];if(s?.length){delete e.pendingCandidates[a];for(let r of s)await n.signal(r)}}},kr=(e,n,t,o=Ve)=>{_(n.offerExpiryTimer);let a=n.offerId;n.offerExpiryTimer=setTimeout(()=>{let s=e.peerStates[t];!s||s.connectedPeer||s.offerId!==a||(s.offerAnswered&&mn(e,s,t),Ne(s,e.offerPool),e.checkDeactivate())},o)},ns=(e,n,t,o)=>n.offerPeer&&n.offerId&&n.offerSdp?Promise.resolve({peer:n.offerPeer,offer:n.offerSdp,offerId:n.offerId}):(n.offerInitPromise||(n.offerInitPromise=(async()=>{let a=(await e.offerPool.checkout(1,!1,e.encryptOffer))[0];if(!a)throw I("failed to allocate offer peer");let{peer:s,offer:r}=a;n.offerPeer=s,n.offerId=fe(Ko),n.offerSdp=r,n.offerAnswered=!1,n.connectionErrorReported=!1,n.offerSignalBacklog=[],ie(n);let i=()=>{n.offerPeer===s&&!n.connectedPeer&&(n.offerAnswered&&mn(e,n,t),Ne(n,e.offerPool)),e.disconnectPeer(s,t),e.checkDeactivate()};return s.setHandlers({connect:()=>e.connectPeer(s,t,o),signal:c=>{n.offerPeer===s&&(n.offerSignalBacklog.push(c),n.offerSignalRelays.forEach(m=>m?.(c)))},close:i,error:i}),kr(e,n,t),{peer:s,offer:r,offerId:n.offerId}})().finally(()=>n.offerInitPromise=null)),n.offerInitPromise),ts=async(e,n,t,o,a)=>{if(o){e.attachSharedPeerToRoom(t,o);return}let s=e.peerStates[t];if(!s||s.connectedPeer||s.answeringPeer||s.offerAnswered){wr(s,n);return}if(s.offerRelays[n]!==un)return;let[r,i]=await se([Ae(Ce(e.rootTopicPlaintext,t)),ns(e,s,t,n)]);if(e.isLeaving())return;if(s.connectedPeer||s.answeringPeer||s.offerAnswered||s.offerRelays[n]!==un){wr(s,n);return}s.offerRelayTimers[n]=_(s.offerRelayTimers[n]),s.offerRelays[n]=!0,ie(s),s.offerRelayTimers[n]=setTimeout(()=>as(e,t,n),(e.announceIntervals[n]??e.announceIntervalMs)*.9);let c=!1;s.offerSignalRelays[n]=m=>{c&&(e.isLeaving()||s.connectedPeer||s.offerPeer!==i.peer||s.offerId!==i.offerId||m.type!=="candidate"||Pr(e,m,r,a,u=>({peerId:Z,offerId:i.offerId,candidate:u,...e.isPassive?{passive:!0}:{}}),()=>!s.connectedPeer&&s.offerPeer===i.peer&&s.offerId===i.offerId))},a(r,X({peerId:Z,offerId:i.offerId,offer:i.offer,...e.isPassive?{passive:!0}:{}})),c=!0,s.offerSignalBacklog.forEach(m=>s.offerSignalRelays[n]?.(m))},rs=async(e,n,t,o,a,s,r)=>{let i=Ue(e.peerStates,t);if(i.answeringPeer||i.offerAnswered)return;let c=!!(i.offerPeer||i.offerRelays.some(Boolean));if((c||s)&&Z<t)return;c&&Ne(i,e.offerPool);let m=e.initPeer(!1,e.config);i.answeringPeer=m,i.answerSent=!1,i.connectionErrorReported=!1,Qo(e,i,t,m),ie(i);let u=()=>{i.answeringPeer===m&&!i.connectedPeer&&i.answerSent&&mn(e,i,t),ln(i,m),e.disconnectPeer(m,t),e.checkDeactivate()};m.setHandlers({connect:()=>e.connectPeer(m,t,n),close:u,error:u});let f;try{f=await e.toPlain({type:"offer",sdp:o})}catch{ln(i,m),e.onJoinError?.({error:"incorrect room password when decrypting offer",appId:e.appId,peerId:t,roomId:e.roomId});return}if(m.isDead){ln(i,m);return}let d=await Ae(Ce(e.rootTopicPlaintext,t));e.isLeaving()||(m.setHandlers({signal:h=>{e.isLeaving()||i.answeringPeer!==m||m.isDead||h.type!=="answer"&&h.type!=="candidate"||Pr(e,h,d,r,y=>{let A={peerId:Z};return h.type==="answer"?(i.answerSent=!0,A.answer=y):A.candidate=y,a&&(A.offerId=a),e.isPassive&&(A.passive=!0),A},()=>i.answeringPeer===m&&!m.isDead)}}),await m.signal(f),await es(i,m,a))},os=async(e,n,t,o,a)=>{var f;let s;try{s=await e.toPlain({type:sn,sdp:t})}catch{return}let r=Ue(e.peerStates,n),i=o&&r?.offerPeer&&r.offerId===o?r.offerPeer:null,c=r?.answeringPeer??null,m=!o&&r?.offerPeer?r.offerPeer:null,u=a&&!a.isDead?a:i??c??m;if(!u||u.isDead){let d=o??Vn;((f=r.pendingCandidates)[d]??(f[d]=[])).push(s);return}u.signal(s)},ss=async(e,n,t,o,a,s)=>{let r;try{r=await e.toPlain({type:"answer",sdp:o})}catch{e.onJoinError?.({error:"incorrect room password when decrypting answer",appId:e.appId,peerId:t,roomId:e.roomId});return}if(s)e.offerPool.claimLeased(s),s.setHandlers({connect:()=>e.connectPeer(s,t,n),close:()=>e.disconnectPeer(s,t)}),s.signal(r);else{let i=e.peerStates[t];if(!i||!i.offerPeer||i.offerAnswered||a&&i.offerId&&a!==i.offerId||i.offerPeer.isDead)return;i.offerAnswered=!0,kr(e,i,t,qo),i.offerPeer.signal(r)}},as=(e,n,t)=>{let o=e.peerStates[n];!o||o.connectedPeer||o.offerRelays[t]&&(Gn(o,t),e.checkDeactivate())},vr=e=>n=>async(t,o,a)=>{if(e.isLeaving())return;let s=zo(o);if(!s||Vo(s))return;let r=Ye(s,"peerId")??"",i=Ye(s,"offer"),c=Ye(s,"answer"),m=Ye(s,"candidate"),u=Ye(s,"offerId"),f=s.peer,d=s.hasOutgoingOffer===!0,h=s.passive===!0;if(!r||r===Z)return;let[y,A]=await se([e.rootTopicP,e.selfTopicP]);if(e.isLeaving()||t!==y&&t!==A||e.isPassive&&h||(e.isPassive&&!e.isActive&&!c&&!m&&(e.isActive=!0,e.requeueAnnounce?.()),e.isPassive&&!e.isActive))return;let T=e.peerStates[r],B=T?.connectedPeer;if(B&&T){let x=yr(B);if(x==="live"){T.connectedPeerUnhealthySinceMs=null;return}if(x==="stale")dn(T,r,"message-from-stale-peer");else{let P=Date.now(),R=T.connectedPeerUnhealthySinceMs??P;if(T.connectedPeerUnhealthySinceMs=R,P-R<Wo)return;dn(T,r,"message-from-prolonged-disconnect")}}let w=e.sharedPeers.get(e.appId,r);w&&e.sharedPeers.getHealth(w.peer)==="stale"&&(e.sharedPeers.clear(e.appId,r,{destroyPeer:!0}),w=void 0);let O=!!(r&&!i&&!c&&!m);if(O&&!w){let x=Ue(e.peerStates,r),P=Z<r;if(x.answeringPeer||x.connectedPeer||x.offerAnswered)return;if(!P&&!x.offerPeer){let R=await Ae(Ce(e.rootTopicPlaintext,r));!e.isLeaving()&&!x.connectedPeer&&a(R,X({peerId:Z}));return}if(x.offerRelays[n])return;x.offerRelays[n]=un,ie(x)}if(w&&(i||c||m)){if(w.bindings[e.roomId])return;e.attachSharedPeerToRoom(r,w);return}if(O)return ts(e,n,r,w,a);if(i)return rs(e,n,r,i,u,d,a);if(m)return os(e,r,m,u,f);if(c)return ss(e,n,r,c,u,f)};var gn=5333,is=[233,533,1333],cs=7533,fs=123333,Zn=({init:e,subscribe:n,announce:t,deactivate:o})=>{let a={},s={},r={},i={},c=new pr,m=()=>we(a).some(P=>ne(P).length>0),u=P=>s[P]??(s[P]={}),f=P=>r[P]??(r[P]={}),d=(P,R,$)=>{c.getHealth(P.peer)==="live"&&c.sendRoomPresence(P,R,$)},h=(P,R)=>{me(s[P]??{}).forEach(([$,S])=>{if(!S.shouldAdvertise())return;let{roomToken:K,roomTokenPromise:W}=S;if(K){d(R,K,!0);return}W.then(q=>{s[P]?.[$]===S&&S.roomToken===q&&(c.get(P,R.peerId)!==R||R.isClosing||S.shouldAdvertise()&&d(R,q,!0))})})},y=(P,R,$)=>we(c.getMap(P)).forEach(S=>d(S,R,$)),A=P=>{i[P]||(i[P]=c.setRoomPresenceHandler(P,(R,$,S)=>{if(!S)return;let K=c.get(P,R),W=r[P]?.[$];!K||!W||s[P]?.[W]?.attachSharedPeerToRoom(R,K)}))},T=P=>{a[P]&&ne(a[P]).length>0||(i[P]?.(),delete i[P],delete s[P],delete r[P])},B=!1,w=[],O=null,x=V;return(P,R,$)=>{if(!P)throw I("requires a config map as the first argument");if($&&typeof $!="object")throw I("third argument must be a callbacks object");let{appId:S}=P,K=$?.onJoinError,W=$?.onPeerHandshake,q=$?.handshakeTimeoutMs;if(!S)throw I("config map is missing appId field");if(!R)throw I("roomId argument required");if(q!==void 0&&(!Number.isFinite(q)||q<=0))throw I("handshakeTimeoutMs must be a positive number");if(a[S]?.[R])return a[S][R];A(S);let F=Ce(G,S,R),J=Ae(F),l=Ae(Ce(F,Z)),p=qt(P.password??"",S,R),b=Kt(S,R),k=P._test_only_sharedPeerIdleMs??fs,E=!1,U=C=>async D=>({type:D.type,sdp:await C(p,D.sdp)}),j=U(zt),g=U(Jt),v=c.getMap(S),H=()=>qn(!0,P),ee=!1;O||(O=new Vt(H));let te=O,$e=async C=>{let D=await C.getOffer(Date.now()-C.created>Ve);if(!D||D.type!=="offer")throw I("failed to get offer for peer");return(await g(D)).sdp},je=(C,D)=>{let L=Ue(z.peerStates,C);L.answeringExpiryTimer=_(L.answeringExpiryTimer),L.answeringPeer=null;let{proxy:Y,isNew:N}=c.bind(R,b,D,{onDetach:()=>{let re=z.peerStates[C];re?.connectedPeer===D.peer&&(re.connectedPeer=null,re.connectedPeerUnhealthySinceMs=null,ie(re))}});L.connectedPeer=D.peer,L.connectedPeerUnhealthySinceMs=null,ie(L),N&&kn(Y,C),Ne(L,te)},Hr=(C,D,L)=>{if(E){C.destroy();return}let Y=Ue(z.peerStates,D);if(Y.connectedPeer){let oe=v[D];if(oe&&Y.connectedPeer===oe.peer&&oe.bindings[R])return;Y.connectedPeer!==C&&!C.isDead&&C.destroy();return}let N=v[D];if(N&&c.getHealth(N.peer)==="stale"&&(c.clear(S,D,{destroyPeer:!0}),N=void 0),N&&N.peer!==C){C.isDead||C.destroy(),je(D,N);return}let re=!N;N||(N=c.register(S,D,C,k)),je(D,N),re&&h(S,N)},xr=(C,D)=>{if(E)return;let L=z.peerStates[D];L?.connectedPeer===C&&(dn(L,D,"close-event"),en(),!ae&&ee&&z.requeueAnnounce?.())},ae=!!P.passive,Ee=null,Me,ot=V,en=()=>{if(!ae||!z.isActive)return;let C=!1;me(z.peerStates).forEach(([D,L])=>{L.connectedPeer||L.answeringPeer||L.offerInitPromise||L.offerPeer||L.offerRelays.some(Boolean)?C=!0:L.status==="idle"&&delete z.peerStates[D]}),C||(z.isActive=!1,Me=_(Me),xe.forEach(_),xe.length=0,ot(),Ee?.roomToken&&y(S,Ee.roomToken,!1))},z={appId:S,roomId:R,config:P,peerStates:{},rootTopicPlaintext:F,rootTopicP:J,selfTopicP:l,toPlain:j,toCipher:g,isLeaving:()=>E,isPassive:ae,isActive:!ae,onJoinError:K,sharedPeers:c,offerPool:te,encryptOffer:$e,initPeer:qn,connectPeer:Hr,disconnectPeer:xr,attachSharedPeerToRoom:je,checkDeactivate:en,announceIntervals:[],announceIntervalMs:gn},yn={config:P,appId:S,roomId:R,isPassive:ae},_r=vr(z);if(!B){let C=e(P);w=(Array.isArray(C)?C:[C]).map(D=>Promise.resolve(D)),B=!0,x=P.relayConfig?.manualReconnection?V:jt()}!ae&&!te.isActive&&te.warmup(),z.announceIntervals=w.map(()=>gn);let pn=w.map(()=>gn),wn=w.map(()=>0),Pn=w.map(()=>0),xe=[],st=w.map(async(C,D)=>n(await C,await J,await l,_r(D),L=>te.getOffers(L,$e),yn));se([J,l]).then(([C,D])=>{if(E)return;let L=async(Y,N)=>{if(E||ae&&!z.isActive)return;let re=ae?{passive:!0}:void 0,oe;try{oe=await t(Y,C,D,re,yn),Pn[N]=0}catch(jr){let lt=Pn[N]??0;lt===0&&P.relayConfig?.warnOnRelayFailure!==!1&&console.warn(`${G}: announce failed - ${Pe(jr,"")}`),Pn[N]=lt+1}if(E||ae&&!z.isActive||oe&&typeof oe!="number"&&"stopAnnouncing"in oe)return;typeof oe=="number"?(z.announceIntervals[N]=oe,pn[N]=oe):oe&&(pn[N]=oe.nextAnnounceMs,ee||(ee=oe.reannounceOnDisconnect===!0));let it=wn[N]??0;wn[N]=it+1;let ct=pn[N]??gn,ft=is[it];xe[N]=setTimeout(()=>{L(Y,N)},typeof ft=="number"?Math.min(ct,ft):ct)};ot=()=>{o&&w.forEach(async Y=>{let N=await Y;E||o(N,C,D,yn)})},z.requeueAnnounce=()=>{xe.forEach(_),xe.length=0,Me=_(Me),te.isActive||te.warmup(),Ee?.roomToken&&y(S,Ee.roomToken,!0),Me=setTimeout(en,cs),w.forEach(async(Y,N)=>{let re=await Y;re&&!E&&(wn[N]=0,L(re,N))})},st.forEach(async(Y,N)=>{if(await Y,E)return;let re=await w[N];re&&!E&&(!ae||z.isActive)&&L(re,N)})});let kn=V,{compose:Ir}=Gt(P.password??"",S,R),at=Ir(W),Ur={...at?{onPeerHandshake:at}:{},...q===void 0?{}:{handshakeTimeoutMs:q},isPassive:ae,onHandshakeError:(C,D)=>K?.({error:D.replace(/^handshake failed: /,""),appId:S,peerId:C,roomId:R})};a[S]??(a[S]={});let Nr=u(S),$r=ur(C=>kn=C,C=>{if(E)return;let D=z.peerStates[C];D?.connectedPeer&&(D.connectedPeer=null,ie(D),en())},()=>{E=!0,kn=V;let C=s[S]?.[R];C?.roomToken&&(y(S,C.roomToken,!1),delete r[S]?.[C.roomToken],r[S]&&!ne(r[S]).length&&delete r[S]),s[S]&&(delete s[S][R],ne(s[S]).length||delete s[S]),me(z.peerStates).forEach(([D,L])=>{if(L.answeringExpiryTimer=_(L.answeringExpiryTimer),L.connectedPeer&&!L.connectedPeer.isDead){let Y=v[D];(!Y||Y.peer!==L.connectedPeer)&&L.connectedPeer.destroy()}L.answeringPeer&&!L.answeringPeer.isDead&&L.answeringPeer.destroy(),Ne(L,te),L.connectedPeer=null,L.answeringPeer=null,ie(L)}),a[S]&&(delete a[S][R],ne(a[S]).length===0&&delete a[S]),xe.forEach(_),Me=_(Me),st.forEach(async D=>{(await D)()}),!m()&&(B=!1,te.destroy(),O=null,x(),T(S))},Ur);return Ee={roomToken:null,roomTokenPromise:b,attachSharedPeerToRoom:je,shouldAdvertise:()=>!ae||z.isActive},Nr[R]=Ee,b.then(C=>{let D=Ee;!D||E||s[S]?.[R]!==D||(D.roomToken=C,f(S)[C]=R,we(v).forEach(L=>{L.remoteRoomTokens.has(C)&&je(L.peerId,L)}),(!ae||z.isActive)&&y(S,C,!0))}),a[S][R]=$r}};var ls=["offer","answer","candidate"],us=6e4,ds=e=>{if(typeof e=="string")try{let n=he(e);return n&&typeof n=="object"?n:null}catch{return null}return e},Xn=(e,n)=>typeof e[n]=="string"&&e[n]?e[n]:void 0,ms=e=>ls.some(n=>n in e&&(typeof e[n]!="string"||e[n]==="")),gs=e=>{let n=ds(e);if(!n||ms(n))return!1;let t=Xn(n,"peerId");return!!(t&&t!==Z&&n.passive!==!0&&!Xn(n,"answer")&&!Xn(n,"candidate"))},Yn=e=>{if(!e)throw I("topic strategy missing room context");return e},Sr=(e,n,t,o)=>({kind:n,appId:e.appId,roomId:e.roomId,rootTopic:t,selfTopic:o}),Qn=(e,n,t,o)=>({kind:n,appId:e.appId,roomId:e.roomId,rootTopic:t,selfTopic:o}),et=({steadyAnnounceIntervalMs:e=us,reannounceOnDisconnect:n=!0,init:t,subscribeTopic:o,publishTopic:a,unpublishTopic:s})=>Zn({init:t,subscribe:async(r,i,c,m,u,f)=>{let d=Yn(f),h=(P,R)=>{a(r,P,R,Qn(d,"signal",i,c))},y=null,A=!1,T=null,B=!1,w=P=>{A||(A=!0,P())},O=()=>(T||(T=Promise.resolve(o(r,c,(P,R)=>{B||m(P,R,h)},Sr(d,"self",i,c))).then(P=>{y=P,B&&w(P)})),T);d.isPassive||await O();let x=await o(r,i,async(P,R)=>{B||(d.isPassive&&gs(R)&&await O(),B||await m(P,R,h))},Sr(d,"root",i,c));return()=>{B=!0,y&&w(y),x()}},announce:async(r,i,c,m,u)=>{let f=Yn(u),d=await a(r,i,X({peerId:Z,...m}),Qn(f,"announce",i,c));return typeof d=="number"||d!==void 0&&"stopAnnouncing"in d?d:{nextAnnounceMs:d?.nextAnnounceMs??e,reannounceOnDisconnect:d?.reannounceOnDisconnect??n}},...s?{deactivate:(r,i,c,m)=>{let u=Yn(m);return s(r,i,Qn(u,"announce",i,c))}}:{}});var Ar=Un(e=>e.socket),hs=5,Rr="x",Er="EVENT",{secretKey:ys,publicKey:ps}=Bn.keygen(),ws=ke(ps),Ps={},ks={},nt={},br=250,hn=6e4,vs=15*6e4,Ss=5333,Qe=new WeakMap,rt=new WeakSet,He=new WeakMap,Tr=e=>{let n=Qe.get(e),t=Math.min(n?.delayMs?Math.max(hn,n.delayMs*2):hn,vs);return Qe.set(e,{delayMs:t,untilMs:Date.now()+t}),t},bs=e=>{let n=Qe.get(e);if(!n)return 0;let t=n.untilMs-Date.now();return t>0?t:0},tt=e=>({nextAnnounceMs:e}),Ts={stopAnnouncing:!0},As=e=>{if(rt.has(e))return!1;let n=He.get(e);return n&&(clearTimeout(n.timer),He.delete(e)),rt.add(e),Qe.delete(e),e.close?.(),!0},Rs=(e,n)=>{let t=He.get(e);t&&(clearTimeout(t.timer),t.eventIds.add(n));let o=t?.eventIds??new Set([n]),a=setTimeout(()=>{He.delete(e)},Ss);He.set(e,{eventIds:o,timer:a})},Es=(e,n)=>{let t=He.get(e);return t?.eventIds.has(n)?(clearTimeout(t.timer),He.delete(e),!0):!1},Mr=()=>Math.floor(Date.now()/1e3),Br=e=>nt[e]??(nt[e]=an(e,1e4)+2e4),Ms=async(e,n)=>{let t={kind:Br(e),tags:[[Rr,e]],created_at:Mr(),content:n,pubkey:ws},o=await De("SHA-256",X([0,t.pubkey,t.created_at,t.kind,t.tags,t.content]));return X([Er,{...t,id:ke(o),sig:ke(await Bn.signAsync(o,ys))}])};var ve={},Or=e=>{e.flushWaiters.forEach(n=>n()),e.flushWaiters.clear()},Bs=(e,n,t)=>{var a;let o=ve[a=e.url]??(ve[a]={subIds:[],topics:new Map,updateTimer:null,flushWaiters:new Set});o.topics.set(n,t),Cr(e,o)},Os=(e,n)=>{let t=ve[e.url];t&&(t.topics.delete(n),t.topics.size===0?(t.updateTimer!==null&&(clearTimeout(t.updateTimer),t.updateTimer=null),Or(t),t.subIds.forEach(o=>e.send(X(["CLOSE",o]))),delete ve[e.url]):Cr(e,t))},Cr=(e,n)=>{n.updateTimer===null&&(n.updateTimer=setTimeout(()=>{n.updateTimer=null;try{Dr(e)}finally{Or(n)}},0))},Cs=e=>{let n=ve[e.url];return!n||n.updateTimer===null?Promise.resolve():new Promise(t=>n.flushWaiters.add(t))},Dr=e=>{let n=ve[e.url];if(!n||n.topics.size===0)return;let t=[...n.topics.keys()],o=[],a=Mr();for(let s=0;s<t.length;s+=br)o.push(t.slice(s,s+br));for(;n.subIds.length>o.length;){let s=n.subIds.pop();s&&e.send(X(["CLOSE",s]))}o.forEach((s,r)=>{var c;let i=(c=n.subIds)[r]??(c[r]=fe(64));e.send(X(["REQ",i,{kinds:[...new Set(s.map(Br))],since:a,"#x":s}]))})},Ds=e=>{let n=ve[e.url];n&&n.topics.size>0&&Dr(e)},Lr=et({init:e=>Hn(e,Ls,hs,!0).map(n=>{let t=Ar.register(n,()=>In(n,o=>{let[a,s,r,i]=he(o);if(a!==Er){let c=`${G}: relay failure from ${t.url} - `,m=a==="CLOSED"&&typeof r=="string"?r:i,u=a==="OK"&&r===!1,f=u&&m?.startsWith("rate-limited:"),d=u&&m?.startsWith("duplicate:"),h=a==="CLOSED"||u&&!f&&!d,y=a==="OK"&&Es(t,s);if(h&&!As(t))return;f?Tr(t):y&&Qe.delete(t),!d&&e.relayConfig?.warnOnRelayFailure!==!1&&(a==="NOTICE"?console.warn(c+s):(u||a==="CLOSED")&&console.warn(c+m));return}if(r&&typeof r=="object"&&"content"in r){let{content:c}=r,m=ks[s];if(m){m(Ps[s]??"",c);return}let u=ve[t.url];if(u?.subIds.includes(s)&&r.tags){let f=r.tags.find(d=>d[0]===Rr);f?.[1]&&u.topics.get(f[1])?.(f[1],c)}}},()=>Ds(t)));return t.ready}),subscribeTopic:(e,n,t,o)=>{Bs(e,n,(r,i)=>{t(r,i)});let s=()=>{Os(e,n)};return o.kind==="root"?Cs(e).then(()=>s):s},publishTopic:async(e,n,t,o)=>{if(rt.has(e)||e.isClosed)return o.kind==="announce"?Ts:void 0;if(o.kind==="announce"){let i=bs(e);if(i>0)return tt(Math.max(hn,i))}let a=await Ms(n,typeof t=="string"?t:X(t)),s=e.socket.readyState===1;if(e.send(a),o.kind!=="announce")return;if(!s)return tt(Tr(e));let r=he(a)[1].id;return Rs(e,r),tt(hn)}}),Ua=Ar.getSockets,Ls=["basspistol.org","bucket.coracle.social","chorus.pjv.me","koru.bitcointxoko.org","nos.lol","nostr-01.uid.ovh","nostr-01.yakihonne.com","nostr-relay.corb.net","nostr.data.haus","nostr.islandarea.net","nostr.sathoarder.com","nostr.tegila.com.br","nostr.vulpem.com","purplerelay.com","relay-can.zombi.cloudrodion.com","relay-rpi.edufeed.org","relay.agorist.space","relay.artio.inf.unibe.ch","relay.mostr.pub","relay.mostro.network","relay.sigit.io","relay02.lnfi.network","schnorr.me","social.amanah.eblessing.co","staging.yabu.me","strfry.shock.network","top.testrelay.top","yabu.me/v2"].map(e=>"wss://"+e);return Vr(Hs);})();
+/*! Bundled license information:
+
+@noble/secp256k1/index.js:
+  (*! noble-secp256k1 - MIT License (c) 2019 Paul Miller (paulmillr.com) *)
+*/}catch(e){Trystero=undefined}
+</script>
+<script>// ---------- NetRoom: free peer-to-peer game rooms (WebRTC through Trystero, MIT) ----------
+// Players find each other through public Nostr relays; after that the moves go browser to browser.
+// The room object has the same shape as the claude.ai "room" capability, so a game's net code runs on either:
+//   lobby.join(name) -> room {presence(o), on(type,fn), emit(type,data), onPeers(fn), onConnection(fn), leave()}
+//   messages: {peer, data, isMe:false, by}   peers: {peer, isMe, sameTab, kind:'viewer', presence, by, guest:false}
+// Tests can point it at a local relay with window.NETROOM_RELAYS=['ws://127.0.0.1:17700'].
+const NetRoom=(()=>{
+  const APP='game-night-shelf-v1';
+  const rand=n=>{const a='abcdefghijkmnpqrstuvwxyz23456789',u=new Uint8Array(n);crypto.getRandomValues(u);return [...u].map(x=>a[x%a.length]).join('')};
+  const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+  let myUid=null;
+  function uid(){if(myUid)return myUid;myUid=store.get('gns-uid');if(!myUid){myUid='p'+rand(15);store.set('gns-uid',myUid)}return myUid}
+  function name(){return (store.get('gns-name')||'').slice(0,24)}
+  function setName(n){n=String(n||'').replace(/[<>&"]/g,'').trim().slice(0,24);store.set('gns-name',n);return n}
+  function available(){return typeof Trystero!=='undefined'&&typeof RTCPeerConnection!=='undefined'&&!!(window.crypto&&crypto.subtle)}
+  // invite codes: 5 letters/digits without look-alikes
+  function newCode(){return rand(5)}
+  function cleanCode(c){return String(c||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,10)}
+  // one room per page: joining again (a retry, or another code) first closes the old room, so the host
+  // can't stay connected to an abandoned copy while the game listens on the new one
+  let active=null;
+  function lobby(game){return {join:async roomName=>{if(active){const old=active;active=null;try{await old.leave()}catch(e){}await new Promise(r=>setTimeout(r,250))}
+    const r=makeRoom(game,String(roomName));active=r;return r}}}
+  function makeRoom(game,roomName){
+    const cfg={appId:APP,password:game+'/'+roomName,relayConfig:{redundancy:6,warnOnRelayFailure:false}};
+    if(window.NETROOM_RELAYS)cfg.relayConfig.urls=window.NETROOM_RELAYS;
+    if(window.NETROOM_ICE)cfg.rtcConfig={iceServers:window.NETROOM_ICE};
+    if(window.NETROOM_TURN)cfg.turnConfig=window.NETROOM_TURN;
+    const tr=Trystero.joinRoom(cfg,game+'/'+roomName);
+    const me=Trystero.selfId,by=uid();
+    let pres={name:name()},left=false;
+    const remote=new Map(),handlers={},peerFns=[],connFns=[];
+    const gA=tr.makeAction('g'),pA=tr.makeAction('p');
+    const entry=(p,v)=>({peer:p,isMe:false,sameTab:false,kind:'viewer',presence:v.presence,by:v.by,guest:false});
+    const list=()=>[{peer:me,isMe:true,sameTab:true,kind:'viewer',presence:pres,by,guest:false},...[...remote].map(([p,v])=>entry(p,v))];
+    const fire=(joined,gone)=>{const ch={peers:list(),joined,left:gone};peerFns.forEach(f=>{try{f(ch)}catch(e){console.error(e)}})};
+    const sendPres=target=>{try{pA.send({pr:pres,by},target?{target}:undefined)}catch(e){}};
+    const gone=new Set();
+    tr.onPeerJoin=p=>{if(left)return;gone.delete(p);sendPres(p)};
+    tr.onPeerLeave=p=>{if(left)return;gone.add(p);const v=remote.get(p);if(!v)return;remote.delete(p);fire([],[entry(p,v)])};
+    pA.onMessage=(d,info)=>{const p=info&&info.peerId;if(left||!p||gone.has(p)||!d||typeof d!=='object')return;
+      const pr=d.pr&&typeof d.pr==='object'&&!Array.isArray(d.pr)?Object.assign({},d.pr):{};if('name' in pr)pr.name=String(pr.name||'').replace(/[<>&"]/g,'').slice(0,24);
+      const v={presence:pr,by:typeof d.by==='string'?d.by.slice(0,40):null};
+      const old=remote.get(p);remote.set(p,v);if(!old){sendPres(p);fire([entry(p,v)],[]);return}
+      // presence is re-sent every few seconds in case one was lost; only a real change is reported
+      if(JSON.stringify(old)!==JSON.stringify(v))fire([],[])};
+    gA.onMessage=(d,info)=>{const p=info&&info.peerId;if(left||!p||!d||typeof d.t!=='string')return;
+      // a message can arrive just before that peer's presence does
+      const v=remote.get(p)||{presence:{},by:null};(handlers[d.t]||[]).forEach(f=>{try{f({peer:p,data:d.d,isMe:false,by:v.by})}catch(e){console.error(e)}})};
+    setTimeout(()=>connFns.forEach(f=>f(true)),0);
+    const hb=setInterval(()=>{if(!left)sendPres()},5000);
+    // closing the tab tells the others at once, instead of after WebRTC's ~10 s timeout
+    const bye=()=>{if(left)return;left=true;clearInterval(hb);try{tr.leave()}catch(e){}};window.addEventListener('pagehide',bye);
+    return {
+      self:me,
+      presence(o){pres=Object.assign({},pres,o||{});sendPres();fire([],[]);return Promise.resolve()},
+      on(t,f){(handlers[t]=handlers[t]||[]).push(f)},
+      emit(t,d){if(left)return Promise.resolve();try{return Promise.resolve(gA.send({t,d})).then(()=>{},()=>{})}catch(e){return Promise.resolve()}},
+      sendTo(peer,t,d){if(left)return Promise.resolve();try{return Promise.resolve(gA.send({t,d},{target:peer})).then(()=>{},()=>{})}catch(e){return Promise.resolve()}},
+      onPeers(f){peerFns.push(f);setTimeout(()=>f({peers:list(),joined:[],left:[]}),0)},
+      onConnection(f){connFns.push(f)},
+      peerCount(){return remote.size},
+      leave(){window.removeEventListener('pagehide',bye);left=true;clearInterval(hb);try{return Promise.resolve(tr.leave())}catch(e){return Promise.resolve()}}};
+  }
+  // an invite link opens the game with the code filled in: …/game/#join-abcde
+  function linkCode(){const m=/^#join-([a-z0-9]{3,10})$/i.exec(location.hash||'');return m?m[1].toLowerCase():''}
+  function inviteLink(code){return location.href.split('#')[0]+'#join-'+code}
+  return {available,lobby,uid,name,setName,newCode,cleanCode,linkCode,inviteLink};
+})();
+</script>
+<script>// Small QR Code encoder written for this shelf (byte mode, error correction M, versions 1-10). No third-party code.
+// QR.matrix(text) -> array of rows of booleans (true = dark); QR.svg(text, px) -> SVG markup with a 4-module quiet zone.
+const QR=(()=>{
+  const ECC=[10,16,26,18,24,16,18,22,22,26], NB=[1,1,1,2,2,4,4,4,5,5];
+  const EXP=new Array(512),LOG=new Array(256);
+  (function(){let x=1;for(let i=0;i<255;i++){EXP[i]=x;LOG[x]=i;x<<=1;if(x&256)x^=0x11D}for(let i=255;i<512;i++)EXP[i]=EXP[i-255]})();
+  const mul=(a,b)=>a&&b?EXP[LOG[a]+LOG[b]]:0;
+  function gen(d){let p=[1];for(let i=0;i<d;i++){const q=new Array(p.length+1).fill(0);for(let j=0;j<p.length;j++){q[j]^=p[j];q[j+1]^=mul(p[j],EXP[i])}p=q}return p}
+  function rs(data,d){const g=gen(d),r=new Array(d).fill(0);for(const b of data){const f=b^r.shift();r.push(0);for(let i=0;i<d;i++)r[i]^=mul(g[i+1],f)}return r}
+  const raw=v=>{let r=(16*v+128)*v+64;if(v>=2){const n=Math.floor(v/7)+2;r-=(25*n-10)*n-55;if(v>=7)r-=36}return r};
+  const dataCW=v=>Math.floor(raw(v)/8)-ECC[v-1]*NB[v-1];
+  const bit=(x,i)=>((x>>>i)&1)!==0;
+  function matrix(text){
+    const bytes=[...new TextEncoder().encode(text)];let ver=1;
+    for(;ver<=10;ver++){if(4+(ver<10?8:16)+bytes.length*8<=dataCW(ver)*8)break}
+    if(ver>10)throw new Error('QR: text too long');
+    const bits=[];const put=(v,n)=>{for(let i=n-1;i>=0;i--)bits.push((v>>>i)&1)};
+    put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+    const cap=dataCW(ver)*8;put(0,Math.min(4,cap-bits.length));while(bits.length%8)bits.push(0);
+    for(let p=0xEC;bits.length<cap;p^=0xEC^0x11)put(p,8);
+    const cw=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=b<<1|bits[i+j];cw.push(b)}
+    const nb=NB[ver-1],el=ECC[ver-1],rc=Math.floor(raw(ver)/8),ns=nb-rc%nb,sl=Math.floor(rc/nb);
+    const blocks=[];let k=0;
+    for(let i=0;i<nb;i++){const dl=sl-el+(i<ns?0:1);const d=cw.slice(k,k+dl);k+=dl;blocks.push({d,e:rs(d,el)})}
+    const all=[];for(let i=0;i<=sl-el;i++)blocks.forEach(b=>{if(i<b.d.length)all.push(b.d[i])});
+    for(let i=0;i<el;i++)blocks.forEach(b=>all.push(b.e[i]));
+    const size=ver*4+17;const M=[],F=[];for(let i=0;i<size;i++){M.push(new Array(size).fill(false));F.push(new Array(size).fill(false))}
+    const set=(x,y,v)=>{M[y][x]=v;F[y][x]=true};
+    for(let i=0;i<size;i++){set(6,i,i%2===0);set(i,6,i%2===0)}
+    const finder=(cx,cy)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const x=cx+dx,y=cy+dy;if(x<0||y<0||x>=size||y>=size)continue;const d=Math.max(Math.abs(dx),Math.abs(dy));set(x,y,d!==2&&d!==4)}};
+    finder(3,3);finder(size-4,3);finder(3,size-4);
+    if(ver>1){const n=Math.floor(ver/7)+2,step=Math.ceil((ver*4+4)/(n*2-2))*2,pos=[6];for(let p=size-7;pos.length<n;p-=step)pos.splice(1,0,p);
+      for(let i=0;i<n;i++)for(let j=0;j<n;j++){if((i===0&&j===0)||(i===0&&j===n-1)||(i===n-1&&j===0))continue;
+        for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)set(pos[i]+dx,pos[j]+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1)}}
+    const fmt=mask=>{const d=mask;let r=d;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=((d<<10)|r)^0x5412;
+      for(let i=0;i<=5;i++)set(8,i,bit(b,i));set(8,7,bit(b,6));set(8,8,bit(b,7));set(7,8,bit(b,8));for(let i=9;i<15;i++)set(14-i,8,bit(b,i));
+      for(let i=0;i<8;i++)set(size-1-i,8,bit(b,i));for(let i=8;i<15;i++)set(8,size-15+i,bit(b,i));set(8,size-8,true)};
+    fmt(0);
+    if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=(ver<<12)|r;for(let i=0;i<18;i++){const a=size-11+i%3,c=Math.floor(i/3);set(a,c,bit(b,i));set(c,a,bit(b,i))}}
+    let i=0;const total=all.length*8;
+    for(let right=size-1;right>=1;right-=2){if(right===6)right=5;
+      for(let v=0;v<size;v++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?size-1-v:v;if(!F[y][x]&&i<total){M[y][x]=bit(all[i>>3],7-(i&7));i++}}}
+    const masks=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+    const base=M.map(r=>r.slice());let best=null,bp=1e9;
+    for(let m=0;m<8;m++){const T=base.map(r=>r.slice());for(let y=0;y<size;y++)for(let x=0;x<size;x++)if(!F[y][x]&&masks[m](x,y))T[y][x]=!T[y][x];
+      for(let y=0;y<size;y++)for(let x=0;x<size;x++)M[y][x]=T[y][x];fmt(m);const R=M.map(r=>r.slice());const p=penalty(R,size);if(p<bp){bp=p;best=R}}
+    return best;
+  }
+  function penalty(R,n){let p=0;
+    for(let t=0;t<2;t++){const g=(a,b)=>t?R[b][a]:R[a][b];
+      for(let a=0;a<n;a++){let run=1;for(let b=1;b<n;b++){if(g(a,b)===g(a,b-1)){run++}else{if(run>=5)p+=run-2;run=1}}if(run>=5)p+=run-2;
+        for(let b=0;b+10<n;b++){const s=[];for(let q=0;q<11;q++)s.push(g(a,b+q)?1:0);const j=s.join('');if(j==='10111010000'||j==='00001011101')p+=40}}}
+    let dark=0;for(let y=0;y<n;y++)for(let x=0;x<n;x++){if(R[y][x])dark++;if(x&&y&&R[y][x]===R[y][x-1]&&R[y][x]===R[y-1][x]&&R[y][x]===R[y-1][x-1])p+=3}
+    p+=Math.floor(Math.abs(dark*20-n*n*10)/(n*n))*10;return p}
+  function svg(text,px){const m=matrix(text),n=m.length,q=4;let d='';
+    for(let y=0;y<n;y++){let x=0;while(x<n){if(m[y][x]){let e=x;while(e<n&&m[y][e])e++;d+='M'+(x+q)+' '+(y+q)+'h'+(e-x)+'v1h-'+(e-x)+'z';x=e}else x++}}
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+(n+q*2)+' '+(n+q*2)+'" width="'+px+'" height="'+px+'" shape-rendering="crispEdges" role="img" aria-label="QR code"><rect width="100%" height="100%" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>'}
+  return {matrix,svg};
+})();
+if(typeof module!=='undefined')module.exports=QR;
+</script>
+<script>
+(()=>{
+'use strict';
+const GAMES=[{"id":"crown","name":"Crown City Smash","src":"crown-city-smash/index.html","cover":"covers/crown.jpg","bytes":2472904},{"id":"nebula","name":"Nebula Aces","src":"nebula-aces/index.html","cover":"covers/nebula.jpg","bytes":2974154},{"id":"doorkick","name":"Doorkick Dungeon","src":"doorkick-dungeon/index.html","cover":"covers/doorkick.jpg","bytes":1859705},{"id":"shipwreck","name":"Shipwreck Isle","src":"shipwreck-isle/index.html","cover":"covers/shipwreck.jpg","bytes":3860581},{"id":"sands","name":"Sands of Qamar","src":"sands-of-qamar/index.html","cover":"covers/sands.jpg","bytes":2212819},{"id":"sunglaze","name":"Sunglaze","src":"sunglaze/index.html","cover":"covers/sunglaze.jpg","bytes":2956061},{"id":"rampart","name":"Rampart & Vine","src":"rampart-and-vine/index.html","cover":"covers/rampart.jpg","bytes":2445504},{"id":"shortfuse","name":"Short Fuse (preview)","src":"short-fuse/index.html","cover":"covers/short-fuse.jpg","bytes":2551400},{"id":"tidewake","name":"Tidewake (preview)","src":"tidewake/index.html","cover":"covers/tidewake.jpg","bytes":1915051},{"id":"hollowbough","name":"Hollowbough (preview)","src":"hollowbough/index.html","cover":"covers/hollowbough.jpg","bytes":796657},{"id":"thornbound","name":"The Thornbound Throne (preview)","src":"thornbound/index.html","cover":"covers/thornbound.jpg","bytes":953053},{"id":"kaiten","name":"Kaiten Kitchen (preview)","src":"kaiten-kitchen/index.html","cover":"covers/kaiten.jpg","bytes":2456358},{"id":"lantern","name":"Lantern Dive (preview)","src":"lantern-dive/index.html","cover":"covers/lantern.jpg","bytes":1992373},{"id":"cauldron","name":"Cauldron Fair (preview)","src":"cauldron-fair/index.html","cover":"covers/cauldron.jpg","bytes":1879104},{"id":"approach","name":"Final Approach (preview)","src":"final-approach/index.html","cover":"covers/approach.jpg","bytes":3039150},{"id":"mainhattan","name":"Mainhattan Nightrun","src":"mainhattan-nightrun/index.html","cover":"covers/nightrun.jpg","bytes":53695},{"id":"overdrive","name":"Mainhattan Overdrive","src":"mainhattan-overdrive/index.html","cover":"covers/overdrive.jpg","bytes":3548040}];
+const $=id=>document.getElementById(id);
+const SHELF_CACHE='gns-shelf-v1',GAME_CACHE='gns-games-v1'; // keep in step with VER in sw.js
+const BACKUP_KEY='gns_backup_last';
+const EXCLUDE=new Set([BACKUP_KEY,'gns-uid']);
+// localStorage key prefixes of each game (found by scanning the game files); anything else goes under "Other"
+const PREFIX=[['ccs_','crown'],['na_','nebula'],['dkd_','doorkick'],['swi_','shipwreck'],['soq_','sands'],['sgz_','sunglaze'],['rv_','rampart'],['shortfuse_','shortfuse'],['sf_','shortfuse'],['tidewake_','tidewake'],['tw_','tidewake'],['hb_','hollowbough'],['tb_','thornbound'],['kk_','kaiten'],['ld_','lantern'],['cf_','cauldron'],['fa_','approach'],['mnr_','mainhattan'],['mho_','overdrive']];
+const NAMES={};GAMES.forEach(g=>NAMES[g.id]=g.name);NAMES.shelf='Shelf settings';NAMES.other='Other';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=b=>b==null?'':b<1024?b+' B':b<1048576?(b/1024).toFixed(0)+' KB':(b/1048576).toFixed(1)+' MB';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){localStorage.setItem(k,v)},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+function owner(k){if(k.startsWith('gns'))return 'shelf';for(const [p,id] of PREFIX)if(k.startsWith(p))return id;return 'other'}
+
+// ---------- online / offline ----------
+function setNet(){const on=navigator.onLine!==false;$('net').classList.toggle('off',!on);$('nettxt').textContent=on?'Online':'Offline: stored games still work';
+  for(const id of ['send','recv'])$(id).disabled=!on||!p2pOK();updateButtons()}
+addEventListener('online',setNet);addEventListener('offline',setNet);
+const p2pOK=()=>typeof NetRoom!=='undefined'&&NetRoom.available();
+
+// ---------- service worker ----------
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{});
+
+// ---------- downloads ----------
+const state={}; // id -> {have:bool,size:number|null,busy:bool,pct:number,err:string}
+const abs=u=>new URL(u,location.href).href;
+const HAVE_CACHES='caches' in window;
+function render(){
+  const ul=$('games');ul.innerHTML='';
+  for(const g of GAMES){const s=state[g.id]||(state[g.id]={have:false,size:null,busy:false,pct:0,err:''});
+    const li=document.createElement('li');li.className='g';li.dataset.id=g.id;
+    const st=s.busy?'Downloading '+s.pct+'%':s.err?s.err:s.have?'On this device · '+fmt(s.size):'About '+fmt(g.bytes);
+    li.innerHTML='<img alt="" width="52" height="52" loading="lazy" src="'+esc(g.cover)+'"><div><div class="nm">'+esc(g.name)+'</div><div class="st'+(s.have&&!s.busy?' ok':'')+(s.err?' bad':'')+'">'+esc(st)+'</div></div>'+
+      '<button type="button" class="sw" role="switch" aria-checked="'+(s.have||s.busy)+'" aria-label="Keep '+esc(g.name)+' on this device"'+(HAVE_CACHES?'':' disabled')+'><span>Keep</span><span class="trk"></span></button>'+
+      (s.busy?'<div class="meter"><b style="width:'+s.pct+'%"></b></div>':'');
+    li.querySelector('.sw').onclick=()=>toggle(g);ul.appendChild(li)}
+  updateButtons();
+}
+function updateButtons(){const all=GAMES.every(g=>state[g.id]&&state[g.id].have),none=GAMES.every(g=>!(state[g.id]&&state[g.id].have)),busy=GAMES.some(g=>state[g.id]&&state[g.id].busy),off=navigator.onLine===false;
+  $('dlall').disabled=!HAVE_CACHES||all||busy||off;$('rmall').disabled=!HAVE_CACHES||none||busy}
+const msgOff=(t,cls)=>{const m=$('offmsg');m.hidden=!t;m.textContent=t||'';m.className='msg'+(cls?' '+cls:'')};
+async function scan(){
+  if(!HAVE_CACHES){msgOff('This browser cannot store games for offline use.','err');render();return}
+  try{const c=await caches.open(GAME_CACHE);
+    for(const g of GAMES){const s=state[g.id]||(state[g.id]={have:false,size:null,busy:false,pct:0,err:''});const r=await c.match(abs(g.src));
+      s.have=!!r;s.size=null;if(r){const h=r.headers.get('x-gns-size');s.size=h?+h:(await r.blob()).size}}}catch(e){}
+  render();usage();
+}
+async function usage(){
+  const el=$('stor');let txt='';
+  const used=GAMES.reduce((a,g)=>a+((state[g.id]&&state[g.id].have&&state[g.id].size)||0),0),n=GAMES.filter(g=>state[g.id]&&state[g.id].have).length;
+  txt='<b>'+n+' of '+GAMES.length+'</b> games stored, <strong>'+fmt(used)+'</strong>.';
+  try{if(navigator.storage&&navigator.storage.estimate){const e=await navigator.storage.estimate();if(e.quota)txt+=' This browser has used <strong>'+fmt(e.usage)+'</strong> of about <strong>'+fmt(e.quota)+'</strong> available.';
+    if(navigator.storage.persisted){const p=await navigator.storage.persisted();txt+=p?' Storage is protected from automatic clearing.':' Storage may be cleared by the browser if the device runs low.'}}}catch(e){}
+  el.innerHTML=txt;
+}
+async function persist(){try{if(navigator.storage&&navigator.storage.persist&&!(await navigator.storage.persisted()))await navigator.storage.persist()}catch(e){}}
+async function cacheShelf(){ // covers and shelf pages, so the shelf opens offline
+  try{const c=await caches.open(SHELF_CACHE);const urls=GAMES.map(g=>g.cover).concat(['./','index.html','classic.html','sync.html','suggest.html','reference.html','manifest.webmanifest','icons/icon-180.png','icons/icon-192.png','icons/icon-512.png']);
+    await Promise.all(urls.map(async u=>{const k=abs(u);const key=k.endsWith('/')?k+'index.html':k;try{if(await c.match(key))return;const r=await fetch(u);if(r.ok)await c.put(key,r)}catch(e){}}))}catch(e){}}
+async function download(g){
+  const s=state[g.id];if(s.busy)return;Object.assign(s,{busy:true,pct:0,err:''});render();
+  try{
+    const url=abs(g.src),r=await fetch(url,{cache:'reload'});if(!r.ok)throw new Error('HTTP '+r.status);
+    const total=+r.headers.get('content-length')||g.bytes||0,parts=[];let got=0;
+    if(r.body&&r.body.getReader){const rd=r.body.getReader();for(;;){const {done,value}=await rd.read();if(done)break;parts.push(value);got+=value.length;const p=Math.min(99,Math.floor(got/Math.max(total,got)*100));if(p!==s.pct){s.pct=p;const li=document.querySelector('[data-id="'+g.id+'"]');if(li){const b=li.querySelector('.meter b'),t=li.querySelector('.st');if(b)b.style.width=p+'%';if(t)t.textContent='Downloading '+p+'%'}}}}
+    else parts.push(await r.arrayBuffer());
+    const blob=new Blob(parts,{type:r.headers.get('content-type')||'text/html; charset=utf-8'});
+    if(blob.size<1000)throw new Error('empty');
+    const c=await caches.open(GAME_CACHE);
+    await c.put(url,new Response(blob,{status:200,headers:{'content-type':blob.type,'x-gns-size':String(blob.size)}}));
+    Object.assign(s,{have:true,size:blob.size,busy:false,pct:100});persist();cacheShelf();
+  }catch(e){Object.assign(s,{busy:false,have:false,err:navigator.onLine===false?'You are offline. Try again when connected.':'Download failed. Try again.'})}
+  render();usage();
+}
+async function remove(g){const s=state[g.id];try{const c=await caches.open(GAME_CACHE);await c.delete(abs(g.src))}catch(e){}Object.assign(s,{have:false,size:null,err:''});render();usage()}
+function toggle(g){const s=state[g.id];if(s.busy)return;if(s.have)remove(g);else{if(navigator.onLine===false){s.err='You are offline. Try again when connected.';render();return}download(g)}}
+$('dlall').onclick=async()=>{msgOff('');persist();for(const g of GAMES)if(!state[g.id].have)await download(g);const f=GAMES.filter(g=>!state[g.id].have).length;msgOff(f?f+' could not be downloaded. Try again.':'All games are stored on this device.',f?'err':'ok')};
+$('rmall').onclick=async()=>{for(const g of GAMES)if(state[g.id].have)await remove(g);msgOff('Removed. Your saves were not touched.','ok')};
+
+// ---------- saves ----------
+function deviceName(){
+  const ua=navigator.userAgent||'',touch=navigator.maxTouchPoints>1;
+  const os=/iPhone/.test(ua)?'iPhone':/iPad/.test(ua)||(/Macintosh/.test(ua)&&touch)?'iPad':/Android/.test(ua)?'Android':/Windows/.test(ua)?'Windows PC':/Mac/.test(ua)?'Mac':/CrOS/.test(ua)?'Chromebook':/Linux/.test(ua)?'Linux PC':'Device';
+  const app=(window.matchMedia&&matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches)||navigator.standalone;
+  const br=/Edg\//.test(ua)?'Edge':/Firefox|FxiOS/.test(ua)?'Firefox':/Chrome|CriOS/.test(ua)?'Chrome':/Safari/.test(ua)?'Safari':'browser';
+  return (os+' ('+(app?'app':br)+')').slice(0,24)}
+function localEntries(){const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k==null||EXCLUDE.has(k))continue;o[k]=localStorage.getItem(k)}}catch(e){}return o}
+function makeExport(){const d=localEntries();return {app:'game-night-shelf',v:1,at:new Date().toISOString(),from:deviceName(),keys:Object.keys(d).length,data:d}}
+function groupBy(d){const g={};for(const k of Object.keys(d)){const id=owner(k);(g[id]||(g[id]={keys:0,bytes:0})).keys++;g[id].bytes+=k.length+String(d[k]).length}return g}
+const order=id=>{const i=GAMES.findIndex(g=>g.id===id);return i<0?(id==='shelf'?1000:1001):i};
+function listSaves(){
+  const g=groupBy(localEntries()),ids=Object.keys(g).sort((a,b)=>order(a)-order(b)),ul=$('savelist');
+  ul.innerHTML=ids.length?ids.map(id=>'<li><span>'+esc(NAMES[id]||id)+'</span><span>'+g[id].keys+(g[id].keys===1?' item · ':' items · ')+fmt(g[id].bytes)+'</span></li>').join(''):'<li><span>No saves on this device yet</span><span></span></li>';
+  const bk=LS.get(BACKUP_KEY);$('bkrow').hidden=!bk;
+}
+function validate(txt){
+  let o;try{o=JSON.parse(txt)}catch(e){throw new Error('That is not a saves file (it could not be read).')}
+  if(!o||typeof o!=='object'||o.app!=='game-night-shelf')throw new Error('That file is not from the Game Night Shelf.');
+  if(typeof o.v!=='number'||o.v>1)throw new Error('That saves file is from a newer version. Update this page and try again.');
+  if(!o.data||typeof o.data!=='object'||Array.isArray(o.data))throw new Error('That saves file has no saves in it.');
+  const d={};let n=0,size=0;
+  for(const k of Object.keys(o.data)){const v=o.data[k];
+    if(typeof v!=='string'||k.length>200||k==='__proto__')throw new Error('That saves file looks damaged.');
+    if(EXCLUDE.has(k))continue;d[k]=v;n++;size+=k.length+v.length;if(n>5000||size>40e6)throw new Error('That saves file is too large.')}
+  return {from:typeof o.from==='string'?o.from.replace(/[<>]/g,'').slice(0,60):'',at:typeof o.at==='string'?o.at.slice(0,40):'',data:d};
+}
+let pending=null;
+function preview(inc,label){
+  pending=inc;const loc=localEntries(),rows={};
+  for(const k of Object.keys(inc.data)){const id=owner(k),r=rows[id]||(rows[id]={n:0,c:0,s:0});if(!(k in loc))r.n++;else if(loc[k]!==inc.data[k])r.c++;else r.s++}
+  const gone=Object.keys(loc).filter(k=>!(k in inc.data)),ids=Object.keys(rows).sort((a,b)=>order(a)-order(b));
+  $('imptitle').textContent='Saves from '+(inc.from||label||'a file')+(inc.at?' ('+inc.at.slice(0,10)+')':'');
+  $('implist').innerHTML=ids.length?ids.map(id=>{const r=rows[id],t=[];if(r.n)t.push(r.n+' new');if(r.c)t.push(r.c+' overwritten');if(r.s)t.push(r.s+' same');return '<li><span>'+esc(NAMES[id]||id)+'</span><span>'+t.join(' · ')+'</span></li>'}).join(''):'<li><span>The file has no saves.</span><span></span></li>';
+  $('impnote').textContent=gone.length?'Replace all would also remove '+gone.length+' item'+(gone.length===1?' that exists':'s that exist')+' only on this device.':'';
+  $('imp').hidden=false;$('impmsg').hidden=true;$('merge').disabled=$('replace').disabled=!ids.length;
+  $('imp').scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function writeAll(data,replace){
+  if(replace){for(const k of Object.keys(localEntries()))LS.del(k)}
+  for(const k of Object.keys(data))LS.set(k,data[k]);
+}
+function apply(mode){
+  const inc=pending;if(!inc)return;
+  const cur=makeExport();let backupOk=true;
+  try{LS.set(BACKUP_KEY,JSON.stringify(cur))}catch(e){backupOk=false}
+  lastBackup=cur;
+  try{writeAll(inc.data,mode==='replace')}
+  catch(e){try{writeAll(cur.data,true)}catch(_){}
+    return say('Could not save: this browser has no room left. Nothing was changed.','err')}
+  pending=null;$('imp').hidden=true;
+  say((mode==='replace'?'Replaced: ':'Merged: ')+Object.keys(inc.data).length+' items from '+(inc.from||'the file')+'. '+(backupOk?'Your previous saves were backed up.':'Backup was too large to keep in the browser; use Download backup file.'),'ok');
+  listSaves();$('bkrow').hidden=false;
+}
+let lastBackup=null;
+function say(t,cls){const m=$('impmsg');m.hidden=!t;m.textContent=t||'';m.className='msg'+(cls?' '+cls:'')}
+$('merge').onclick=()=>apply('merge');$('replace').onclick=()=>apply('replace');
+$('impcancel').onclick=()=>{pending=null;$('imp').hidden=true};
+function fileName(pre){const d=new Date(),p=n=>String(n).padStart(2,'0');return pre+'-'+d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'.json'}
+async function saveFile(obj,name){
+  const txt=JSON.stringify(obj),blob=new Blob([txt],{type:'application/json'});
+  const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+  if(ios&&navigator.share&&window.File){try{const f=new File([blob],name,{type:'application/json'});if(!navigator.canShare||navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Game Night saves'});return}}catch(e){if(e&&e.name==='AbortError')return}}
+  const url=URL.createObjectURL(blob);
+  if(ios){window.open(url,'_blank');return}
+  const a=document.createElement('a');a.href=url;a.download=name;a.style.display='none';document.body.appendChild(a);a.click();
+  setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},60000);
+}
+$('dlsaves').onclick=async()=>{const o=makeExport();if(!o.keys){say('There are no saves on this device to download yet.','err');return}await saveFile(o,fileName('gns-saves'));say('Saves file ready ('+o.keys+' items).','ok')};
+$('bkdl').onclick=()=>{const b=LS.get(BACKUP_KEY)||(lastBackup&&JSON.stringify(lastBackup));if(b)saveFile(JSON.parse(b),fileName('gns-backup'))};
+$('bkrestore').onclick=()=>{const b=LS.get(BACKUP_KEY);if(!b)return;try{const inc=validate(b);inc.from='the backup';pending=inc;preview(inc,'the backup')}catch(e){say(e.message,'err')}};
+async function loadFile(f){
+  say('');if(!f)return;if(f.size>40e6){say('That file is too large to be a saves file.','err');return}
+  try{preview(validate(await f.text()),f.name)}catch(e){say(e.message,'err')}
+}
+$('file').onchange=e=>{loadFile(e.target.files[0]);e.target.value=''};
+const drop=$('drop');['dragenter','dragover'].forEach(t=>addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(t=>addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
+addEventListener('drop',e=>{const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f)loadFile(f)});
+
+// ---------- device to device ----------
+const ALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789',CHUNK=6000;
+const newCode=()=>{const u=new Uint8Array(6);crypto.getRandomValues(u);return [...u].map(x=>ALPHA[x%ALPHA.length]).join('')};
+const cleanCode=c=>[...String(c||'').toUpperCase()].filter(ch=>ALPHA.includes(ch)).join('').slice(0,6);
+const EXPIRY=()=>window.SYNC_EXPIRY_MS||600000,FIND=()=>window.SYNC_FIND_MS||30000;
+let sess=null; // {role,room,timers[],stopped}
+function pmsg(t,cls){const m=$('p2pmsg');m.hidden=!t;m.textContent=t||'';m.className='msg'+(cls?' '+cls:'')}
+function pbar(p){const b=$('p2pbar');b.hidden=p==null;if(p!=null)b.firstElementChild.style.width=Math.round(p*100)+'%'}
+async function endSession(keepUI){const s=sess;sess=null;if(s){s.stopped=true;s.timers.forEach(t=>{clearTimeout(t);clearInterval(t)});try{await s.room.leave()}catch(e){}}
+  if(!keepUI){$('p2p').hidden=true;$('sendbox').hidden=true;$('recvbox').hidden=true;$('accept').hidden=true;pmsg('');pbar(null);if(location.hash)history.replaceState(null,'',location.pathname+location.search)}}
+async function openRoom(role,code){
+  await endSession(true);$('accept').hidden=true;pbar(null);pmsg('');$('p2p').hidden=false;
+  let room;try{room=await NetRoom.lobby('sync').join('sv-'+code)}catch(e){pmsg('Could not open a connection. Check your internet and try again.','err');return null}
+  sess={role,room,code,timers:[],stopped:false,peer:null,got:0};
+  return sess;
+}
+// -- sender
+$('send').onclick=async()=>{
+  if(!p2pOK())return;const data=makeExport();
+  if(!data.keys){say('');pmsg('');$('p2p').hidden=false;$('sendbox').hidden=true;$('recvbox').hidden=true;pmsg('There are no saves on this device to send yet.','err');return}
+  const code=newCode(),s=await openRoom('send',code);if(!s)return;
+  $('recvbox').hidden=true;$('sendbox').hidden=false;$('code').textContent=code;
+  const link=location.href.split('#')[0]+'#receive='+code;
+  try{$('qr').innerHTML=QR.svg(link,200)}catch(e){$('qr').innerHTML=''}
+  const t0=Date.now(),exp=EXPIRY();
+  const tick=()=>{const left=Math.max(0,exp-(Date.now()-t0));if(!s.busy)$('exp').textContent='Code works for '+(left>60000?Math.ceil(left/60000)+' more minutes':Math.ceil(left/1000)+' more seconds')+'. Waiting for the other device…'};
+  tick();s.timers.push(setInterval(tick,1000));
+  s.timers.push(setTimeout(()=>{if(sess===s&&!s.busy){endSession(true);$('sendbox').hidden=true;pmsg('This code expired. Tap Send to another device for a new one.','err')}},exp));
+  s.room.presence({role:'send',name:deviceName()});
+  s.room.on('want',m=>{if(sess!==s||s.busy)return;s.busy=true;s.peer=m.peer;sendData(s,data,m.data&&m.data.name)});
+  s.room.on('no',m=>{if(sess===s&&!s.busy)pmsg('The other device declined. The code still works if you want to try again.','err')});
+  s.room.on('got',m=>{if(sess===s&&m.peer===s.peer&&m.data&&typeof m.data.n==='number')s.acked=m.data.n});
+  s.room.on('done',m=>{if(sess===s&&m.peer===s.peer){s.done=m.data&&m.data.ok?1:2}});
+  pmsg('');
+};
+async function pack(txt){
+  const raw=new TextEncoder().encode(txt);let bytes=raw,gz=false;
+  if(typeof CompressionStream!=='undefined'){try{const cs=new CompressionStream('gzip'),w=cs.writable.getWriter();w.write(raw).catch(()=>{});w.close().catch(()=>{});bytes=new Uint8Array(await new Response(cs.readable).arrayBuffer());gz=true}catch(e){bytes=raw;gz=false}}
+  let b='';for(let i=0;i<bytes.length;i+=0x8000)b+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+  return {b64:btoa(b),gz,raw:raw.length};
+}
+async function sendData(s,data,peerName){
+  $('qr').innerHTML='';$('code').textContent='';$('sendbox').hidden=true;
+  try{
+    pmsg('Sending to '+(peerName||'the other device')+'…');pbar(0);
+    const p=await pack(JSON.stringify(data)),n=Math.ceil(p.b64.length/CHUNK);
+    await s.room.sendTo(s.peer,'meta',{n,gz:p.gz,raw:p.raw,keys:data.keys,len:p.b64.length});
+    for(let i=0;i<n;i++){if(sess!==s)return;await s.room.sendTo(s.peer,'chunk',{i,d:p.b64.slice(i*CHUNK,(i+1)*CHUNK)});pbar((i+1)/n);if(i%8===7)await sleep(10)}
+    await s.room.sendTo(s.peer,'end',{n});
+    for(let k=0;k<200&&!s.done&&sess===s;k++)await sleep(100);
+    if(sess!==s)return;
+    if(s.done===1){pmsg('Sent '+data.keys+' items to '+(peerName||'the other device')+'. Finish on that device.','ok')}
+    else if(s.done===2)pmsg('The other device could not read the saves. Try again.','err');
+    else pmsg('Sent, but the other device did not confirm. Check that it shows the saves.','err');
+    pbar(null);await endSession(true);
+  }catch(e){pmsg('Sending failed. Try again.','err');pbar(null);await endSession(true)}
+}
+// -- receiver
+function showRecv(code){$('sendbox').hidden=true;$('p2p').hidden=false;$('recvbox').hidden=false;$('rcode').value=code||'';if(!code)$('rcode').focus()}
+$('recv').onclick=async()=>{await endSession(true);pending=null;$('imp').hidden=true;pmsg('');showRecv('')};
+$('rcode').addEventListener('input',e=>{const p=e.target.selectionStart;e.target.value=cleanCode(e.target.value)});
+$('rcode').addEventListener('keydown',e=>{if(e.key==='Enter')$('rgo').click()});
+$('rgo').onclick=async()=>{
+  const code=cleanCode($('rcode').value);if(code.length!==6){pmsg('The code has 6 letters and numbers. Check the other screen.','err');return}
+  if(!p2pOK()||navigator.onLine===false){pmsg('You need to be online for this.','err');return}
+  $('rgo').disabled=true;const s=await openRoom('recv',code);$('recvbox').hidden=false;$('rgo').disabled=false;if(!s)return;
+  pmsg('Looking for the sending device…');
+  let accepted=false;const parts=[];let meta=null;
+  const fail=t=>{if(sess!==s)return;pmsg(t,'err');pbar(null);$('accept').hidden=true;endSession(true)};
+  s.timers.push(setTimeout(()=>{if(!s.peer)fail('No device is showing that code. Check the code, make sure the other device is still showing it and has not expired (10 minutes).')},FIND()));
+  s.room.presence({role:'recv',name:deviceName()});
+  s.room.onPeers(ch=>{if(sess!==s)return;
+    const sp=(ch.peers||[]).find(p=>!p.isMe&&p.presence&&p.presence.role==='send');
+    if(sp&&!s.peer){s.peer=sp.peer;const nm=(sp.presence.name||'').slice(0,24)||'another device';s.peerName=nm;$('acctitle').textContent='Accept saves from '+nm+'?';$('accept').hidden=false;pmsg('Found '+nm+'.')}
+    if(s.peer&&(ch.left||[]).some(p=>p.peer===s.peer)&&!s.finished)fail('The other device went away before the saves arrived.')});
+  $('accyes').onclick=()=>{if(sess!==s||!s.peer)return;$('accept').hidden=true;accepted=true;pmsg('Waiting for '+s.peerName+' to send…');pbar(0);s.last=Date.now();
+    s.room.sendTo(s.peer,'want',{name:deviceName()});
+    s.timers.push(setInterval(()=>{if(sess===s&&!s.finished&&Date.now()-s.last>25000)fail('The transfer stalled. Try again.')},2000))};
+  $('accno').onclick=async()=>{if(sess!==s)return;$('accept').hidden=true;try{await s.room.sendTo(s.peer,'no',{});await sleep(250)}catch(e){}if(sess!==s)return;pmsg('Declined. Nothing was changed.');endSession(true)};
+  s.room.on('meta',m=>{if(sess!==s||!accepted||m.peer!==s.peer||meta)return;const d=m.data;
+    if(!d||!Number.isInteger(d.n)||d.n<1||d.n>5000||!Number.isInteger(d.len)||d.len>CHUNK*d.n||typeof d.gz!=='boolean'){fail('The other device sent something unexpected.');return}
+    meta=d;s.last=Date.now()});
+  s.room.on('chunk',m=>{if(sess!==s||!meta||m.peer!==s.peer)return;const d=m.data;if(!d||!Number.isInteger(d.i)||d.i<0||d.i>=meta.n||typeof d.d!=='string'||d.d.length>CHUNK||parts[d.i]!==undefined)return;
+    parts[d.i]=d.d;s.got=(s.got||0)+1;s.last=Date.now();pbar(s.got/meta.n);pmsg('Receiving from '+s.peerName+': '+Math.round(s.got/meta.n*100)+'%');
+    if(s.got%8===0)s.room.sendTo(s.peer,'got',{n:s.got})});
+  s.room.on('end',async m=>{if(sess!==s||!meta||m.peer!==s.peer||s.finished)return;
+    if(s.got!==meta.n){fail('Some parts went missing. Try again.');return}
+    s.finished=true;let inc;
+    try{const bin=atob(parts.join('')),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);let txt;
+      if(meta.gz){if(typeof DecompressionStream==='undefined')throw new Error('This browser cannot unpack the data.');const ds=new DecompressionStream('gzip'),w=ds.writable.getWriter();w.write(u).catch(()=>{});w.close().catch(()=>{});
+        const rd=ds.readable.getReader(),out=[];let tot=0;for(;;){const {done,value}=await rd.read();if(done)break;tot+=value.length;if(tot>60e6)throw new Error('too large');out.push(value)}
+        txt=new TextDecoder().decode(await new Blob(out).arrayBuffer())}else txt=new TextDecoder().decode(u);
+      inc=validate(txt)}catch(e){try{s.room.sendTo(s.peer,'done',{ok:false})}catch(_){}pbar(null);pmsg(e&&e.message&&/^That/.test(e.message)?e.message:'The saves could not be read. Try again.','err');await endSession(true);return}
+    try{s.room.sendTo(s.peer,'done',{ok:true})}catch(_){}
+    const from=s.peerName;pbar(null);pmsg('Received '+Object.keys(inc.data).length+' items from '+from+'. Choose what to do with them below.','ok');
+    await sleep(300);await endSession(true);inc.from=inc.from||from;preview(inc,from)});
+};
+$('p2pcancel').onclick=()=>endSession(false);
+// a QR link or invite opens the receive box with the code filled in
+function fromHash(){const m=/^#receive=([A-Za-z0-9]{6})$/.exec(location.hash||'');if(m&&p2pOK()){const c=cleanCode(m[1]);if(c.length===6){history.replaceState(null,'',location.pathname+location.search);showRecv(c);$('rgo').click()}}}
+
+// ---------- start ----------
+setNet();listSaves();render();scan();
+if(!p2pOK()){const n=document.createElement('p');n.className='msg';n.textContent='Device-to-device transfer is not available in this browser. Use a saves file instead.';$('send').parentNode.after(n)}
+fromHash();
+addEventListener('storage',listSaves);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)listSaves()});
+})();
+</script>
+</body>
+</html>

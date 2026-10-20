@@ -1,0 +1,8 @@
+job 44 2p  win 0/10  turns 21  2.6s  10x the fuse burnt down
+job 44 3p  win 4/10  turns 25  2.9s  6x the fuse burnt down
+job 44 4p  win 2/10  turns 22  2.9s  8x the fuse burnt down
+SLOW 44/5 0 8223 ms turns 29 act
+SLOW 44/5 5 8286 ms turns 29 act
+job 44 5p  win 4/10  turns 26  6.4s  6x the fuse burnt down
+TOTAL games 40 wins 10 (25%) errors 0 stalls 0 invariant-fails 0 time 149s level hard
+loss reasons {"the fuse burnt down":30}

@@ -1,0 +1,62 @@
+{
+ "cards": {
+  "buoy": "a red and white sea buoy with a bell on top, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "sea-stack": "a tall rock stack with seabirds and foam at the base, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "treasure-barrel": "a floating wooden barrel with a rope and a lantern tied on, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a sea-tile navigation game with giant sea leviathans, deep teal water, warm lantern light, foam and scales, matte paper texture, slightly wobbly dark navy outline, simple readable silhouette, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave E",
+ "meta": {
+  "buoy": {
+   "element": "3D model: buoy",
+   "why": "water prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "buoy.png",
+   "target": "games/tidewake/models/buoy.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "sea-stack": {
+   "element": "3D model: sea-stack",
+   "why": "water prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "sea-stack.png",
+   "target": "games/tidewake/models/sea-stack.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "treasure-barrel": {
+   "element": "3D model: treasure-barrel",
+   "why": "water prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "treasure-barrel.png",
+   "target": "games/tidewake/models/treasure-barrel.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  }
+ },
+ "targets": {
+  "buoy": "games/tidewake/models/buoy.glb",
+  "sea-stack": "games/tidewake/models/sea-stack.glb",
+  "treasure-barrel": "games/tidewake/models/treasure-barrel.glb"
+ }
+}

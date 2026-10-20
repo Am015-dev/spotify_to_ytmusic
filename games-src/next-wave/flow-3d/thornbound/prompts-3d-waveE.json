@@ -1,0 +1,62 @@
+{
+ "cards": {
+  "brazier": "an iron brazier on three legs with glowing coals and sparks, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "cairn": "a stack of stones forming a cairn with a candle on top, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "candelabra": "a tall iron candelabra with five lit candles, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Dark-fairytale court painting in deep green, crimson and tarnished gold, candlelit, painterly brushwork, rich shadows, no text, no lettering, no frame.",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave E",
+ "meta": {
+  "brazier": {
+   "element": "3D model: brazier",
+   "why": "hall prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "brazier.png",
+   "target": "games/thornbound/models/brazier.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "cairn": {
+   "element": "3D model: cairn",
+   "why": "the Cairn Field prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "cairn.png",
+   "target": "games/thornbound/models/cairn.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  },
+  "candelabra": {
+   "element": "3D model: candelabra",
+   "why": "hall prop",
+   "pri": 3,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "candelabra.png",
+   "target": "games/thornbound/models/candelabra.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave E"
+  }
+ },
+ "targets": {
+  "brazier": "games/thornbound/models/brazier.glb",
+  "cairn": "games/thornbound/models/cairn.glb",
+  "candelabra": "games/thornbound/models/candelabra.glb"
+ }
+}

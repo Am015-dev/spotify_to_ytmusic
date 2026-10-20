@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "rules": [
+      "Captain takes the Captain card; others choose freely (missions 14, 17, 34 deal them randomly).",
+      "Each personal item is usable once per mission; flip the card face down after use. Recharge (eq7) restores up to 2.",
+      "From mission 31 (rule sticker B) non-captains may take one of the 4 new characters instead of a base one.",
+      "Base character cards 2-5 have no printed names; our names are invented."
+    ],
+    "personal_item_restrictions": {
+      "27": "nobody has a personal item",
+      "28": "the Captain has none",
+      "34": "none until the weak link is exposed",
+      "58": "Twin Probe is unlimited; new characters are banned",
+      "new_character_ban_two_value_probe": [
+        44,
+        45,
+        47,
+        49,
+        51,
+        54,
+        59,
+        63,
+        65
+      ]
+    }
+  },
+  "personal_items": {
+    "double_probe": {
+      "timing": "your_turn (during a Dual Cut)",
+      "uses": "once per mission",
+      "effect": "During a dual cut, name a number (1-12, never yellow or red) and point at two wires on the same stand of one teammate (not necessarily adjacent). If either matches, the cut succeeds: if both match, the teammate quietly picks which one to cut, and you cut one of your own matching wires. If neither matches, the dial advances 1 and the teammate places one info token in front of one of the two (their choice). If exactly one of the two is red, nothing explodes and the token must go on the non-red wire; if both are red, the bomb explodes.",
+      "structured": {
+        "kind": "multi_target_dual_cut",
+        "targets": 2,
+        "same_stand": true,
+        "adjacent_required": false,
+        "values": "number_only",
+        "both_red": "explode",
+        "one_red": "no_explosion_token_on_other"
+      },
+      "sources": [
+        "RB p.6",
+        "FAQ Twin Probe"
+      ]
+    },
+    "sweep": {
+      "timing": "any_time",
+      "uses": "once per mission",
+      "effect": "Same as the Sweep equipment card (eq8).",
+      "structured": {
+        "as_equipment": "eq8"
+      },
+      "sources": [
+        "CARD character_e1",
+        "rule sticker B"
+      ]
+    },
+    "handsets": {
+      "timing": "any_time",
+      "uses": "once per mission",
+      "effect": "Same as the Handsets equipment card (eq2).",
+      "structured": {
+        "as_equipment": "eq2"
+      },
+      "sources": [
+        "CARD character_e2",
+        "rule sticker B"
+      ]
+    },
+    "triple_probe": {
+      "timing": "your_turn",
+      "uses": "once per mission",
+      "effect": "Same as the Triple Probe equipment card (eq3).",
+      "structured": {
+        "as_equipment": "eq3"
+      },
+      "sources": [
+        "CARD character_e3",
+        "rule sticker B"
+      ]
+    },
+    "two_value_probe": {
+      "timing": "your_turn",
+      "uses": "once per mission",
+      "effect": "Same as the Two-Value Probe equipment card (eq10).",
+      "structured": {
+        "as_equipment": "eq10"
+      },
+      "sources": [
+        "CARD character_e4",
+        "rule sticker B"
+      ],
+      "notes": [
+        "Excluded in missions 44, 45, 47, 49, 51, 54, 59, 63, 65."
+      ]
+    }
+  },
+  "characters": [
+    {
+      "id": "ch_captain",
+      "name": "Squad Lead",
+      "is_captain": true,
+      "personal_item": "double_probe",
+      "availability": {
+        "from_mission": 1
+      },
+      "notes": [
+        "Captain card; also the role marker used by missions 14, 17, 28, 34."
+      ]
+    },
+    {
+      "id": "ch_base1",
+      "name": "Wren",
+      "is_captain": false,
+      "personal_item": "double_probe",
+      "availability": {
+        "from_mission": 1
+      }
+    },
+    {
+      "id": "ch_base2",
+      "name": "Pike",
+      "is_captain": false,
+      "personal_item": "double_probe",
+      "availability": {
+        "from_mission": 1
+      }
+    },
+    {
+      "id": "ch_base3",
+      "name": "Moss",
+      "is_captain": false,
+      "personal_item": "double_probe",
+      "availability": {
+        "from_mission": 1
+      }
+    },
+    {
+      "id": "ch_base4",
+      "name": "Tally",
+      "is_captain": false,
+      "personal_item": "double_probe",
+      "availability": {
+        "from_mission": 1
+      }
+    },
+    {
+      "id": "ch_new1",
+      "name": "Echo",
+      "is_captain": false,
+      "personal_item": "sweep",
+      "availability": {
+        "from_mission": 31,
+        "non_captain_only": true
+      }
+    },
+    {
+      "id": "ch_new2",
+      "name": "Relay",
+      "is_captain": false,
+      "personal_item": "handsets",
+      "availability": {
+        "from_mission": 31,
+        "non_captain_only": true
+      }
+    },
+    {
+      "id": "ch_new3",
+      "name": "Trident",
+      "is_captain": false,
+      "personal_item": "triple_probe",
+      "availability": {
+        "from_mission": 31,
+        "non_captain_only": true
+      }
+    },
+    {
+      "id": "ch_new4",
+      "name": "Prism",
+      "is_captain": false,
+      "personal_item": "two_value_probe",
+      "availability": {
+        "from_mission": 31,
+        "non_captain_only": true
+      }
+    }
+  ]
+}

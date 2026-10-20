@@ -1,0 +1,62 @@
+{
+ "cards": {
+  "anglerfish": "a round anglerfish with a glowing lure and a big toothy grin, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "echo-drone": "Echo: a small round brass drone with one glowing eye and a little propeller, front three-quarter view, one single object, centred, on a thin round base disc, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers.",
+  "wreck-hull": "a sunken ship hull piece with brass rivets and barnacles, front three-quarter view, one single object, centred, whole object visible, matte painted look matching the game's other models, game-ready proportions, plain light-grey (#d9d9d9) background, even soft studio light, no cast shadow, 1024x1024. No text, letters or numbers."
+ },
+ "style": "Hand-painted gouache illustration for a calm co-operative deep-sea card game, deep blue and teal water, a small warm golden lantern glow as the only strong warm light, soft rim light, visible gentle brush texture on matte paper, slightly wobbly dark navy ink outline, simple readable silhouette that still works at 40 pixels, rich but not neon colours, centred, plenty of margin, no text",
+ "notes": "Source paintings for the image-to-3D step. Save each as <name>.png (1024x1024), run image-to-3D, export the FULL-DETAIL glb as the target path (games/<slug>/models/<item>.glb); the lite copy is made by us. Light-grey background on purpose: the 3D step removes it and a green background would tint the model colours. Keys are <slug>--<item>. Where \"ref\" is set, an existing painting of the same thing is in the repo: use it as the image-to-image reference for the same look.",
+ "wave": "3D wave D",
+ "meta": {
+  "anglerfish": {
+   "element": "3D model: anglerfish",
+   "why": "deep prop",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "anglerfish.png",
+   "target": "games/lantern-dive/models/anglerfish.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  },
+  "echo-drone": {
+   "element": "3D model: echo-drone",
+   "why": "the drone companion",
+   "pri": 2,
+   "ref": "games/lantern-dive/media/camp-echo.webp",
+   "thumb": "lantern-dive/media/camp-echo.webp",
+   "bg": "grey",
+   "align": "",
+   "save_as": "echo-drone.png",
+   "target": "games/lantern-dive/models/echo-drone.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  },
+  "wreck-hull": {
+   "element": "3D model: wreck-hull",
+   "why": "deep prop",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "grey",
+   "align": "",
+   "save_as": "wreck-hull.png",
+   "target": "games/lantern-dive/models/wreck-hull.glb",
+   "size": "1024x1024",
+   "ratio": "1:1",
+   "tag": "3d",
+   "wave": "3D wave D"
+  }
+ },
+ "targets": {
+  "anglerfish": "games/lantern-dive/models/anglerfish.glb",
+  "echo-drone": "games/lantern-dive/models/echo-drone.glb",
+  "wreck-hull": "games/lantern-dive/models/wreck-hull.glb"
+ }
+}

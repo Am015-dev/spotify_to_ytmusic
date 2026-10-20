@@ -1,0 +1,7995 @@
+[
+ {
+  "tag": "390x763-idle",
+  "kind": "idle",
+  "cfg": "390x763",
+  "timeline": [
+   {
+    "t": 5,
+    "score": 0,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 1,
+    "combo": 1,
+    "fps": 55,
+    "pt": 0,
+    "eb": 0,
+    "en": 0,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 10,
+    "score": 520,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 1,
+    "combo": 0,
+    "fps": 57,
+    "pt": 0,
+    "eb": 3,
+    "en": 6,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 15,
+    "score": 898,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 11,
+    "Jok": 2,
+    "combo": 1,
+    "fps": 55,
+    "pt": 0,
+    "eb": 3,
+    "en": 9,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 20.1,
+    "score": 2144,
+    "hp": 1,
+    "di": 0,
+    "loop": 0,
+    "J": 20,
+    "Jok": 3,
+    "combo": 1,
+    "fps": 56,
+    "pt": 4,
+    "eb": 0,
+    "en": 5,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 25.1,
+    "score": 2376,
+    "hp": 1,
+    "di": 0,
+    "loop": 0,
+    "J": 20,
+    "Jok": 3,
+    "combo": 0,
+    "fps": 57,
+    "pt": 0,
+    "eb": 3,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   }
+  ],
+  "hurts": [
+   {
+    "t": 12.3,
+    "cause": "bullet",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 14.3,
+    "cause": "bullet",
+    "hpLeft": 3,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 16.1,
+    "cause": "drone",
+    "hpLeft": 2,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 17.6,
+    "cause": "bullet",
+    "hpLeft": 1,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 26.9,
+    "cause": "bullet",
+    "hpLeft": 0,
+    "di": 0,
+    "boss": false
+   }
+  ],
+  "judged": [],
+  "errs": [],
+  "shots": [
+   "390x763-idle-banner-d0.png",
+   "390x763-idle-t02.png",
+   "390x763-idle-t09.png",
+   "390x763-idle-t20.png",
+   "390x763-idle-dead.png",
+   "390x763-idle-gameover.png"
+  ],
+  "startMs": 42,
+  "bt": {
+   "mode": "synth",
+   "bpm": 92,
+   "stage": "stage1",
+   "outLat": 0.032,
+   "baseLat": 0.01
+  },
+  "ban0": 1,
+  "deadAt": 26.9,
+  "final": {
+   "J": 21,
+   "Jok": 4,
+   "perf": 4,
+   "score": 2460,
+   "best": 1,
+   "lat": [
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -35,
+     "lat": 1
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 238,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -105,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -187,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 222,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -221,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -139,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 12,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 292,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -307,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -160,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 244,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 269,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 269,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -184,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -84,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 67,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -104,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 279,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -203,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -50,
+     "lat": null
+    }
+   ],
+   "raf": 1698,
+   "t0": 24.8,
+   "now": 29630.400000000023,
+   "jsum": {
+    "n": 21,
+    "ok": 4,
+    "last": {
+     "kind": "graze",
+     "ok": true,
+     "dt": -50,
+     "beat": 33,
+     "at": 28624.099999999977
+    }
+   }
+  },
+  "dashN": 0,
+  "fps": 57,
+  "over": true,
+  "dur": 27.8
+ },
+ {
+  "tag": "390x763-natural",
+  "kind": "natural",
+  "cfg": "390x763",
+  "timeline": [
+   {
+    "t": 5,
+    "score": 0,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 1,
+    "combo": 1,
+    "fps": 58,
+    "pt": 0,
+    "eb": 0,
+    "en": 0,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 10.8,
+    "score": 738,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 1,
+    "combo": 0,
+    "fps": 58,
+    "pt": 0,
+    "eb": 1,
+    "en": 4,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 15.8,
+    "score": 1789,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 1,
+    "combo": 0,
+    "fps": 57,
+    "pt": 0,
+    "eb": 0,
+    "en": 6,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 20.8,
+    "score": 3190,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 2,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 58,
+    "pt": 0,
+    "eb": 1,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 25.9,
+    "score": 4874,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 2,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 58,
+    "pt": 17,
+    "eb": 3,
+    "en": 2,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 30.9,
+    "score": 6073,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 4,
+    "Jok": 3,
+    "combo": 1,
+    "fps": 59,
+    "pt": 0,
+    "eb": 1,
+    "en": 6,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 35.9,
+    "score": 8492,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 4,
+    "Jok": 3,
+    "combo": 0,
+    "fps": 59,
+    "pt": 0,
+    "eb": 4,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 40.9,
+    "score": 9819,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 5,
+    "Jok": 3,
+    "combo": 0,
+    "fps": 59,
+    "pt": 17,
+    "eb": 1,
+    "en": 3,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 46,
+    "score": 12588,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 6,
+    "Jok": 4,
+    "combo": 1,
+    "fps": 59,
+    "pt": 0,
+    "eb": 2,
+    "en": 6,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 51,
+    "score": 15512,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 7,
+    "Jok": 4,
+    "combo": 0,
+    "fps": 59,
+    "pt": 0,
+    "eb": 6,
+    "en": 8,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 56,
+    "score": 18870,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 7,
+    "Jok": 4,
+    "combo": 0,
+    "fps": 59,
+    "pt": 0,
+    "eb": 7,
+    "en": 4,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 61.1,
+    "score": 22539,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 8,
+    "Jok": 4,
+    "combo": 0,
+    "fps": 59,
+    "pt": 2,
+    "eb": 2,
+    "en": 3,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 66.2,
+    "score": 25620,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 8,
+    "Jok": 4,
+    "combo": 0,
+    "fps": 59,
+    "pt": 2,
+    "eb": 2,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": 2.749899999999995,
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 71.2,
+    "score": 26709,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 8,
+    "Jok": 4,
+    "combo": 0,
+    "fps": 59,
+    "pt": 0,
+    "eb": 10,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 76.2,
+    "score": 28110,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 8,
+    "Jok": 4,
+    "combo": 0,
+    "fps": 59,
+    "pt": 0,
+    "eb": 4,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 81.3,
+    "score": 29285,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 9,
+    "Jok": 5,
+    "combo": 1,
+    "fps": 59,
+    "pt": 2,
+    "eb": 11,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 86.3,
+    "score": 29650,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 12,
+    "Jok": 6,
+    "combo": 1,
+    "fps": 59,
+    "pt": 1,
+    "eb": 6,
+    "en": 3,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 91.4,
+    "score": 32500,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 14,
+    "Jok": 7,
+    "combo": 2,
+    "fps": 59,
+    "pt": 0,
+    "eb": 6,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 96.5,
+    "score": 32896,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 20,
+    "Jok": 8,
+    "combo": 0,
+    "fps": 59,
+    "pt": 0,
+    "eb": 8,
+    "en": 3,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 101.5,
+    "score": 33460,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 22,
+    "Jok": 8,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 5,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 106.5,
+    "score": 33661,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 22,
+    "Jok": 8,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 8,
+    "en": 3,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 111.5,
+    "score": 39973,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 22,
+    "Jok": 8,
+    "combo": 0,
+    "fps": 59,
+    "pt": 0,
+    "eb": 0,
+    "en": 0,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   }
+  ],
+  "hurts": [
+   {
+    "t": 20.8,
+    "cause": "bullet",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 50,
+    "cause": "bullet",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 92.6,
+    "cause": "bullet",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": true
+   },
+   {
+    "t": 94.1,
+    "cause": "bullet",
+    "hpLeft": 3,
+    "di": 0,
+    "boss": true
+   }
+  ],
+  "judged": [],
+  "errs": [],
+  "shots": [
+   "390x763-natural-01-title.png",
+   "390x763-natural-banner-d0.png",
+   "390x763-natural-t02.png",
+   "390x763-natural-t09.png",
+   "390x763-natural-t20.png",
+   "390x763-natural-boss.png",
+   "390x763-natural-shop.png"
+  ],
+  "startMs": 57,
+  "bt": {
+   "mode": "synth",
+   "bpm": 92,
+   "stage": "stage1",
+   "outLat": 0.032,
+   "baseLat": 0.01
+  },
+  "ban0": 1,
+  "bossAt": 67.5,
+  "shopSeen": 113.021,
+  "shopT": 5.999999999999998,
+  "final": {
+   "J": 22,
+   "Jok": 8,
+   "perf": 8,
+   "score": 39973,
+   "best": 2,
+   "lat": [
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -13,
+     "lat": 1
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 38,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": -158,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -55,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 115,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -50,
+     "lat": 12
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 273,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -148,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -67,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 156,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -47,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 116,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -317,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -8,
+     "lat": 8
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -189,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 92,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 177,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 295,
+     "lat": 7
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 6,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -217,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 187,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -204,
+     "lat": 8
+    }
+   ],
+   "raf": 7293,
+   "t0": 16.1,
+   "now": 122637.40000000002,
+   "jsum": {
+    "n": 22,
+    "ok": 8,
+    "last": {
+     "kind": "fire",
+     "ok": false,
+     "dt": -204,
+     "beat": 151,
+     "at": 103312.5
+    }
+   }
+  },
+  "dashN": 2,
+  "fps": 59,
+  "over": false,
+  "dur": 120.4
+ },
+ {
+  "tag": "390x763-trying",
+  "kind": "trying",
+  "cfg": "390x763",
+  "timeline": [
+   {
+    "t": 5,
+    "score": 400,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 9,
+    "Jok": 4,
+    "combo": 4,
+    "fps": 59,
+    "pt": 0,
+    "eb": 0,
+    "en": 0,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 10,
+    "score": 1728,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 19,
+    "Jok": 8,
+    "combo": 8,
+    "fps": 60,
+    "pt": 0,
+    "eb": 1,
+    "en": 3,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 15.1,
+    "score": 4043,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 30,
+    "Jok": 12,
+    "combo": 4,
+    "fps": 59,
+    "pt": 0,
+    "eb": 2,
+    "en": 2,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 20.2,
+    "score": 5552,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 40,
+    "Jok": 15,
+    "combo": 2,
+    "fps": 59,
+    "pt": 1,
+    "eb": 0,
+    "en": 5,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 25.2,
+    "score": 7239,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 51,
+    "Jok": 19,
+    "combo": 6,
+    "fps": 59,
+    "pt": 0,
+    "eb": 4,
+    "en": 0,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 30.2,
+    "score": 10722,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 60,
+    "Jok": 25,
+    "combo": 12,
+    "fps": 59,
+    "pt": 11,
+    "eb": 0,
+    "en": 4,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 35.4,
+    "score": 13999,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 67,
+    "Jok": 29,
+    "combo": 16,
+    "fps": 59,
+    "pt": 0,
+    "eb": 0,
+    "en": 0,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 40.5,
+    "score": 17043,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 75,
+    "Jok": 33,
+    "combo": 20,
+    "fps": 59,
+    "pt": 0,
+    "eb": 3,
+    "en": 0,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 45.5,
+    "score": 19932,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 86,
+    "Jok": 36,
+    "combo": 23,
+    "fps": 59,
+    "pt": 0,
+    "eb": 0,
+    "en": 0,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 50.6,
+    "score": 24661,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 96,
+    "Jok": 39,
+    "combo": 26,
+    "fps": 60,
+    "pt": 10,
+    "eb": 2,
+    "en": 5,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 55.6,
+    "score": 32477,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 106,
+    "Jok": 44,
+    "combo": 31,
+    "fps": 60,
+    "pt": 10,
+    "eb": 3,
+    "en": 5,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 60.6,
+    "score": 38206,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 114,
+    "Jok": 48,
+    "combo": 35,
+    "fps": 60,
+    "pt": 0,
+    "eb": 6,
+    "en": 8,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 65.7,
+    "score": 49659,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 125,
+    "Jok": 52,
+    "combo": 39,
+    "fps": 60,
+    "pt": 14,
+    "eb": 1,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 70.7,
+    "score": 53507,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 133,
+    "Jok": 56,
+    "combo": 43,
+    "fps": 60,
+    "pt": 0,
+    "eb": 5,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 75.9,
+    "score": 56659,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 145,
+    "Jok": 61,
+    "combo": 48,
+    "fps": 60,
+    "pt": 0,
+    "eb": 9,
+    "en": 3,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 81,
+    "score": 59002,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 158,
+    "Jok": 66,
+    "combo": 4,
+    "fps": 60,
+    "pt": 0,
+    "eb": 6,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 86,
+    "score": 62694,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 167,
+    "Jok": 72,
+    "combo": 9,
+    "fps": 60,
+    "pt": 19,
+    "eb": 11,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 91.1,
+    "score": 66818,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 176,
+    "Jok": 75,
+    "combo": 12,
+    "fps": 60,
+    "pt": 0,
+    "eb": 10,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 96.1,
+    "score": 69054,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 191,
+    "Jok": 81,
+    "combo": 2,
+    "fps": 60,
+    "pt": 0,
+    "eb": 5,
+    "en": 2,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 101.1,
+    "score": 71792,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 199,
+    "Jok": 85,
+    "combo": 6,
+    "fps": 60,
+    "pt": 0,
+    "eb": 16,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 106.1,
+    "score": 74442,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 211,
+    "Jok": 91,
+    "combo": 12,
+    "fps": 60,
+    "pt": 0,
+    "eb": 10,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 111.2,
+    "score": 76189,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 220,
+    "Jok": 95,
+    "combo": 16,
+    "fps": 60,
+    "pt": 10,
+    "eb": 4,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 116.2,
+    "score": 77960,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 234,
+    "Jok": 103,
+    "combo": 23,
+    "fps": 60,
+    "pt": 0,
+    "eb": 13,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   }
+  ],
+  "hurts": [
+   {
+    "t": 10.7,
+    "cause": "charger",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 16.5,
+    "cause": "bullet",
+    "hpLeft": 3,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 76.5,
+    "cause": "bullet",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": true
+   },
+   {
+    "t": 93.8,
+    "cause": "bullet",
+    "hpLeft": 3,
+    "di": 0,
+    "boss": true
+   },
+   {
+    "t": 117.5,
+    "cause": "bullet",
+    "hpLeft": 2,
+    "di": 0,
+    "boss": true
+   }
+  ],
+  "judged": [],
+  "errs": [],
+  "shots": [
+   "390x763-trying-banner-d0.png",
+   "390x763-trying-t02.png",
+   "390x763-trying-t09.png",
+   "390x763-trying-t20.png",
+   "390x763-trying-boss.png"
+  ],
+  "startMs": 78,
+  "bt": {
+   "mode": "synth",
+   "bpm": 92,
+   "stage": "stage1",
+   "outLat": 0.032,
+   "baseLat": 0.01
+  },
+  "ban0": 1,
+  "bossAt": 68.7,
+  "final": {
+   "J": 242,
+   "Jok": 107,
+   "perf": 107,
+   "score": 78669,
+   "best": 49,
+   "lat": [
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -17,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -15,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 95,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 107,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": -250,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -141,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 36,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -2,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 198,
+     "lat": 16
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 9,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 202,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 222,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 67,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 222,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -1,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 123,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 138,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 236,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 36,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 70,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 212,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -162,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 88,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 292,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -4,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 93,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 34,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 110,
+     "lat": 5
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 37,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 151,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -205,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -70,
+     "lat": 0
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 33,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 98,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 61,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 196,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 115,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -22,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 136,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 319,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 111,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -15,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 92,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 244,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -44,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 86,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -8,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 170,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -234,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 79,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 267,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -7,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 108,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 54,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 38,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 142,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 39,
+     "lat": 7
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 42,
+     "lat": 15
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 20,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 197,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 11,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 97,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 125,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 71,
+     "lat": 13
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 36,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 227,
+     "lat": 2
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -5,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 128,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -175,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 79,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 2,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 67,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 250,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 41,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 229,
+     "lat": 6
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 201,
+     "lat": 4
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -174,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 53,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 227,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -210,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 205,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -3,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 150,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -233,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 39,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 196,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -6,
+     "lat": 15
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 33,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 254,
+     "lat": 5
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 238,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -127,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 108,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 311,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 176,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 31,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 142,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -145,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -5,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 122,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 117,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -20,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 113,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 35,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 38,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 219,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -17,
+     "lat": 16
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 1,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 110,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 72,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 40,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 278,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -117,
+     "lat": 7
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 42,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 192,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 47,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 268,
+     "lat": 6
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -206,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -110,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 44,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 201,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -82,
+     "lat": 10
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 293,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 59,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 283,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 12,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -6,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 105,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 29,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 102,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 51,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 169,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -200,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 18,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 144,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 291,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 75,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 2,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 162,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -290,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 39,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 134,
+     "lat": 8
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -295,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 104,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 39,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 40,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -176,
+     "lat": 10
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 1,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 100,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 264,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 45,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 212,
+     "lat": 14
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -90,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 69,
+     "lat": 2
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -120,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 35,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 205,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -1,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 97,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 244,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 74,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 23,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 144,
+     "lat": 0
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -58,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 72,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 43,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 8,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 183,
+     "lat": 6
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 148,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 51,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 153,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 112,
+     "lat": 7
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 254,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 63,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 222,
+     "lat": 5
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 25,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 10,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 209,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 83,
+     "lat": 8
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -19,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 64,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -247,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -142,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 108,
+     "lat": 11
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 189,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 3,
+     "lat": 14
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 116,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 195,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 37,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -138,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 2,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 140,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -126,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 41,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 150,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -2,
+     "lat": 13
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 8,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 217,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 33,
+     "lat": 8
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 166,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 121,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 9,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 130,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 207,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 83,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -38,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 56,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -236,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -33,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 9,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 120,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -163,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 78,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 23,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 131,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 29,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 3,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 202,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -176,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 56,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 170,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 70,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 26,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 242,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -56,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -18,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 74,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 292,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 32,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 105,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -18,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 89,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -282,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 64,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 37,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 212,
+     "lat": 10
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -298,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -184,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 116,
+     "lat": 6
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -8,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -17,
+     "lat": 11
+    }
+   ],
+   "raf": 7291,
+   "t0": 28,
+   "now": 122096.80000000005,
+   "jsum": {
+    "n": 242,
+    "ok": 107,
+    "last": {
+     "kind": "dash",
+     "ok": true,
+     "dt": -17,
+     "beat": 189,
+     "at": 121806.90000000002
+    }
+   }
+  },
+  "dashN": 84,
+  "fps": 60,
+  "over": false,
+  "dur": 120
+ },
+ {
+  "tag": "844x390-idle",
+  "kind": "idle",
+  "cfg": "844x390",
+  "timeline": [
+   {
+    "t": 5,
+    "score": 0,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 1,
+    "combo": 1,
+    "fps": 54,
+    "pt": 0,
+    "eb": 0,
+    "en": 0,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 10,
+    "score": 730,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 1,
+    "combo": 0,
+    "fps": 57,
+    "pt": 12,
+    "eb": 3,
+    "en": 5,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 15,
+    "score": 1402,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 4,
+    "Jok": 3,
+    "combo": 1,
+    "fps": 56,
+    "pt": 0,
+    "eb": 5,
+    "en": 4,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 20.3,
+    "score": 1773,
+    "hp": 1,
+    "di": 0,
+    "loop": 0,
+    "J": 10,
+    "Jok": 4,
+    "combo": 0,
+    "fps": 57,
+    "pt": 0,
+    "eb": 6,
+    "en": 12,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   }
+  ],
+  "hurts": [
+   {
+    "t": 10.6,
+    "cause": "drone",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 12.9,
+    "cause": "bullet",
+    "hpLeft": 3,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 15.9,
+    "cause": "bullet",
+    "hpLeft": 2,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 17.6,
+    "cause": "drone",
+    "hpLeft": 1,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 21.4,
+    "cause": "bullet",
+    "hpLeft": 0,
+    "di": 0,
+    "boss": false
+   }
+  ],
+  "judged": [],
+  "errs": [],
+  "shots": [
+   "844x390-idle-banner-d0.png",
+   "844x390-idle-t02.png",
+   "844x390-idle-t09.png",
+   "844x390-idle-t20.png",
+   "844x390-idle-dead.png",
+   "844x390-idle-gameover.png"
+  ],
+  "startMs": 91,
+  "bt": {
+   "mode": "synth",
+   "bpm": 92,
+   "stage": "stage1",
+   "outLat": 0.032,
+   "baseLat": 0.01
+  },
+  "ban0": 1,
+  "deadAt": 21.4,
+  "final": {
+   "J": 11,
+   "Jok": 4,
+   "perf": 4,
+   "score": 2024,
+   "best": 2,
+   "lat": [
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 9,
+     "lat": 6
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -36,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 240,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -18,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 51,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 93,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 194,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 312,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 193,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -228,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -272,
+     "lat": null
+    }
+   ],
+   "raf": 1386,
+   "t0": 13.5,
+   "now": 24176.599999999977,
+   "jsum": {
+    "n": 11,
+    "ok": 4,
+    "last": {
+     "kind": "graze",
+     "ok": false,
+     "dt": -272,
+     "beat": 25,
+     "at": 23182.199999999953
+    }
+   }
+  },
+  "dashN": 0,
+  "fps": 57,
+  "over": true,
+  "dur": 22.3
+ },
+ {
+  "tag": "844x390-natural",
+  "kind": "natural",
+  "cfg": "844x390",
+  "timeline": [
+   {
+    "t": 5,
+    "score": 0,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 1,
+    "combo": 1,
+    "fps": 58,
+    "pt": 0,
+    "eb": 0,
+    "en": 0,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 10,
+    "score": 525,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 3,
+    "Jok": 1,
+    "combo": 0,
+    "fps": 59,
+    "pt": 0,
+    "eb": 3,
+    "en": 5,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 15,
+    "score": 1780,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 3,
+    "Jok": 1,
+    "combo": 0,
+    "fps": 59,
+    "pt": 2,
+    "eb": 0,
+    "en": 3,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 20.3,
+    "score": 4268,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 3,
+    "Jok": 1,
+    "combo": 0,
+    "fps": 59,
+    "pt": 23,
+    "eb": 1,
+    "en": 0,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 25.3,
+    "score": 6469,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 4,
+    "Jok": 1,
+    "combo": 0,
+    "fps": 59,
+    "pt": 4,
+    "eb": 4,
+    "en": 6,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 30.3,
+    "score": 13131,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 6,
+    "Jok": 2,
+    "combo": 1,
+    "fps": 59,
+    "pt": 0,
+    "eb": 6,
+    "en": 6,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 35.4,
+    "score": 20521,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 7,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 59,
+    "pt": 0,
+    "eb": 2,
+    "en": 5,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 40.4,
+    "score": 26611,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 8,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 6,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 45.4,
+    "score": 29270,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 8,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 2,
+    "en": 3,
+    "hint": "Slower beat and bullets",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 50.5,
+    "score": 32143,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 8,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 1,
+    "en": 0,
+    "hint": "Slower beat and bullets",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 55.5,
+    "score": 35407,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 9,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 1,
+    "en": 5,
+    "hint": "Slower beat and bullets",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 60.6,
+    "score": 38585,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 9,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 3,
+    "en": 3,
+    "hint": "Slower beat and bullets",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 65.6,
+    "score": 41984,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 9,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 6,
+    "en": 5,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 71.5,
+    "score": 47495,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 9,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 5,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": 0.30010000000001213,
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 76.6,
+    "score": 48314,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 9,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 60,
+    "pt": 1,
+    "eb": 13,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 81.6,
+    "score": 50664,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 13,
+    "Jok": 4,
+    "combo": 2,
+    "fps": 60,
+    "pt": 0,
+    "eb": 1,
+    "en": 3,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 86.7,
+    "score": 52346,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 15,
+    "Jok": 5,
+    "combo": 1,
+    "fps": 60,
+    "pt": 0,
+    "eb": 11,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 91.7,
+    "score": 54064,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 15,
+    "Jok": 5,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 1,
+    "en": 3,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 96.8,
+    "score": 55478,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 15,
+    "Jok": 5,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 14,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 101.8,
+    "score": 59135,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 17,
+    "Jok": 6,
+    "combo": 1,
+    "fps": 60,
+    "pt": 1,
+    "eb": 2,
+    "en": 3,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 106.8,
+    "score": 61241,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 17,
+    "Jok": 6,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 16,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 111.9,
+    "score": 63071,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 17,
+    "Jok": 6,
+    "combo": 0,
+    "fps": 60,
+    "pt": 7,
+    "eb": 0,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": 0.9000000000000039,
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 116.9,
+    "score": 64699,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 19,
+    "Jok": 8,
+    "combo": 1,
+    "fps": 60,
+    "pt": 0,
+    "eb": 14,
+    "en": 1,
+    "hint": "Auto-fire on every beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   }
+  ],
+  "hurts": [
+   {
+    "t": 118.5,
+    "cause": "bullet",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": true
+   }
+  ],
+  "judged": [],
+  "errs": [],
+  "shots": [
+   "844x390-natural-01-title.png",
+   "844x390-natural-banner-d0.png",
+   "844x390-natural-t02.png",
+   "844x390-natural-t09.png",
+   "844x390-natural-t20.png",
+   "844x390-natural-boss.png"
+  ],
+  "startMs": 60,
+  "bt": {
+   "mode": "synth",
+   "bpm": 92,
+   "stage": "stage1",
+   "outLat": 0.032,
+   "baseLat": 0.01
+  },
+  "ban0": 1,
+  "bossAt": 70.5,
+  "final": {
+   "J": 20,
+   "Jok": 9,
+   "perf": 9,
+   "score": 65773,
+   "best": 2,
+   "lat": [
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -8,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 271,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -119,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 213,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 143,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 39,
+     "lat": 2
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 129,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 280,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -321,
+     "lat": 8
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -222,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": -151,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -44,
+     "lat": 11
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 38,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": -147,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -20,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 9,
+     "lat": 12
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 151,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -3,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 70,
+     "lat": 1
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -27,
+     "lat": null
+    }
+   ],
+   "raf": 7294,
+   "t0": 23.2,
+   "now": 122197.59999999998,
+   "jsum": {
+    "n": 20,
+    "ok": 9,
+    "last": {
+     "kind": "graze",
+     "ok": true,
+     "dt": -27,
+     "beat": 173,
+     "at": 120452.19999999995
+    }
+   }
+  },
+  "dashN": 4,
+  "fps": 60,
+  "over": false,
+  "dur": 120.1
+ },
+ {
+  "tag": "844x390-trying",
+  "kind": "trying",
+  "cfg": "844x390",
+  "timeline": [
+   {
+    "t": 5,
+    "score": 600,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 10,
+    "Jok": 7,
+    "combo": 7,
+    "fps": 58,
+    "pt": 0,
+    "eb": 0,
+    "en": 0,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 10.1,
+    "score": 2506,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 17,
+    "Jok": 11,
+    "combo": 11,
+    "fps": 59,
+    "pt": 0,
+    "eb": 0,
+    "en": 2,
+    "hint": "Drag to fly. DASH on the beat",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 15.4,
+    "score": 4366,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 35,
+    "Jok": 18,
+    "combo": 7,
+    "fps": 59,
+    "pt": 0,
+    "eb": 3,
+    "en": 0,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 20.5,
+    "score": 6673,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 52,
+    "Jok": 23,
+    "combo": 12,
+    "fps": 59,
+    "pt": 3,
+    "eb": 1,
+    "en": 4,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 26,
+    "score": 11208,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 60,
+    "Jok": 27,
+    "combo": 16,
+    "fps": 59,
+    "pt": 15,
+    "eb": 6,
+    "en": 3,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 31,
+    "score": 15583,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 75,
+    "Jok": 31,
+    "combo": 20,
+    "fps": 59,
+    "pt": 0,
+    "eb": 2,
+    "en": 3,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 36.1,
+    "score": 23689,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 89,
+    "Jok": 37,
+    "combo": 2,
+    "fps": 60,
+    "pt": 0,
+    "eb": 4,
+    "en": 4,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 41.1,
+    "score": 27178,
+    "hp": 2,
+    "di": 0,
+    "loop": 0,
+    "J": 103,
+    "Jok": 41,
+    "combo": 0,
+    "fps": 60,
+    "pt": 0,
+    "eb": 5,
+    "en": 3,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 46.2,
+    "score": 34898,
+    "hp": 2,
+    "di": 0,
+    "loop": 0,
+    "J": 115,
+    "Jok": 46,
+    "combo": 5,
+    "fps": 60,
+    "pt": 8,
+    "eb": 6,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 51.2,
+    "score": 40922,
+    "hp": 2,
+    "di": 0,
+    "loop": 0,
+    "J": 129,
+    "Jok": 50,
+    "combo": 9,
+    "fps": 60,
+    "pt": 0,
+    "eb": 3,
+    "en": 6,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 56.3,
+    "score": 46936,
+    "hp": 2,
+    "di": 0,
+    "loop": 0,
+    "J": 135,
+    "Jok": 52,
+    "combo": 11,
+    "fps": 60,
+    "pt": 0,
+    "eb": 0,
+    "en": 1,
+    "hint": "Blast on the downbeat",
+    "ban": 1.8498999999999972,
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 61.3,
+    "score": 48840,
+    "hp": 2,
+    "di": 0,
+    "loop": 0,
+    "J": 145,
+    "Jok": 57,
+    "combo": 16,
+    "fps": 60,
+    "pt": 0,
+    "eb": 15,
+    "en": 1,
+    "hint": "Blast on the downbeat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 66.4,
+    "score": 51895,
+    "hp": 2,
+    "di": 0,
+    "loop": 0,
+    "J": 157,
+    "Jok": 61,
+    "combo": 20,
+    "fps": 60,
+    "pt": 0,
+    "eb": 4,
+    "en": 1,
+    "hint": "Blast on the downbeat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 71.4,
+    "score": 55209,
+    "hp": 2,
+    "di": 0,
+    "loop": 0,
+    "J": 168,
+    "Jok": 67,
+    "combo": 26,
+    "fps": 60,
+    "pt": 0,
+    "eb": 10,
+    "en": 1,
+    "hint": "Blast on the downbeat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 76.4,
+    "score": 57726,
+    "hp": 2,
+    "di": 0,
+    "loop": 0,
+    "J": 179,
+    "Jok": 70,
+    "combo": 29,
+    "fps": 60,
+    "pt": 0,
+    "eb": 5,
+    "en": 1,
+    "hint": "Blast on the downbeat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 81.6,
+    "score": 60686,
+    "hp": 2,
+    "di": 0,
+    "loop": 0,
+    "J": 191,
+    "Jok": 74,
+    "combo": 33,
+    "fps": 60,
+    "pt": 0,
+    "eb": 11,
+    "en": 2,
+    "hint": "Blast on the downbeat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 87,
+    "score": 64683,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 205,
+    "Jok": 80,
+    "combo": 39,
+    "fps": 60,
+    "pt": 0,
+    "eb": 3,
+    "en": 2,
+    "hint": "Blast on the downbeat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 92.1,
+    "score": 69001,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 217,
+    "Jok": 84,
+    "combo": 43,
+    "fps": 60,
+    "pt": 0,
+    "eb": 11,
+    "en": 1,
+    "hint": "Blast on the downbeat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 97.2,
+    "score": 72676,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 224,
+    "Jok": 89,
+    "combo": 47,
+    "fps": 60,
+    "pt": 0,
+    "eb": 0,
+    "en": 1,
+    "hint": "Blast on the downbeat",
+    "ban": 1.4000000000000015,
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 102.4,
+    "score": 75214,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 238,
+    "Jok": 94,
+    "combo": 52,
+    "fps": 60,
+    "pt": 0,
+    "eb": 14,
+    "en": 1,
+    "hint": "Blast on the downbeat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 107.4,
+    "score": 79168,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 250,
+    "Jok": 98,
+    "combo": 56,
+    "fps": 60,
+    "pt": 16,
+    "eb": 1,
+    "en": 1,
+    "hint": "Blast on the downbeat",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 112.4,
+    "score": 142350,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 264,
+    "Jok": 103,
+    "combo": 61,
+    "fps": 60,
+    "pt": 41,
+    "eb": 0,
+    "en": 0,
+    "hint": "Blast on the downbeat",
+    "ban": 2.3500000000000023,
+    "bpm": 92,
+    "boss": false
+   }
+  ],
+  "hurts": [
+   {
+    "t": 10.7,
+    "cause": "charger",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 35.3,
+    "cause": "bullet",
+    "hpLeft": 3,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 40.8,
+    "cause": "bullet",
+    "hpLeft": 2,
+    "di": 0,
+    "boss": false
+   }
+  ],
+  "judged": [],
+  "errs": [],
+  "shots": [
+   "844x390-trying-banner-d0.png",
+   "844x390-trying-t02.png",
+   "844x390-trying-t09.png",
+   "844x390-trying-t20.png",
+   "844x390-trying-boss.png",
+   "844x390-trying-shop.png"
+  ],
+  "startMs": 61,
+  "bt": {
+   "mode": "synth",
+   "bpm": 92,
+   "stage": "stage1",
+   "outLat": 0.032,
+   "baseLat": 0.01
+  },
+  "ban0": 1,
+  "bossAt": 56.8,
+  "shopSeen": 116.333,
+  "shopT": 2.9999999999999996,
+  "final": {
+   "J": 269,
+   "Jok": 105,
+   "perf": 105,
+   "score": 143590,
+   "best": 63,
+   "lat": [
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -56,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -18,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 89,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 49,
+     "lat": 2
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -2,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 107,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 50,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -10,
+     "lat": 14
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 110,
+     "lat": 15
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 21,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -16,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 90,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 137,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -41,
+     "lat": 15
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 92,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 36,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 33,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 200,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -283,
+     "lat": 5
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 53,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 283,
+     "lat": 14
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -282,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 36,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 296,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 73,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 252,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -249,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -24,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 177,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 37,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 166,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 262,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -45,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 262,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 3,
+     "lat": 20
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 241,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 316,
+     "lat": 14
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -255,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -95,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 199,
+     "lat": 7
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 27,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 119,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 203,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 79,
+     "lat": 6
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 8,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 98,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 228,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -203,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 55,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 185,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 51,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 166,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 59,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -143,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 47,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 220,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -160,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 58,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 254,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -8,
+     "lat": 2
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -207,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 85,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 95,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 311,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -17,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 166,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -207,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -4,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 129,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 309,
+     "lat": 4
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -55,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 112,
+     "lat": 9
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -314,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 8,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 90,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 210,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -246,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 85,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -1,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 2,
+     "lat": 21
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 187,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -255,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -75,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 247,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 40,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 149,
+     "lat": 0
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -208,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 74,
+     "lat": 7
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 23,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 161,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -245,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 109,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -18,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 128,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 66,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 77,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 290,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -272,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 32,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 139,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 219,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 105,
+     "lat": 11
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 209,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 102,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 8,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 153,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 87,
+     "lat": 7
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 85,
+     "lat": 13
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -32,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 49,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -2,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 118,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 2,
+     "lat": 6
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 97,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 209,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 100,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 243,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 81,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 206,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 59,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 182,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 97,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 23,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 132,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -175,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 64,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 182,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 7,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 135,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 75,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -225,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": -224,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -108,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 111,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 5,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 154,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -178,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 31,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 29,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 151,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -243,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 119,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 3,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -8,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -14,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -15,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 160,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -209,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 11,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 187,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 89,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 269,
+     "lat": 17
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 4,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 218,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -165,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 19,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 232,
+     "lat": 14
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 44,
+     "lat": 18
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 163,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 256,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 73,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -1,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 113,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 68,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 11,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 137,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 261,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 8,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -25,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 98,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 241,
+     "lat": 2
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 87,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 85,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 236,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 87,
+     "lat": 14
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 10,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 200,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 306,
+     "lat": 15
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 22,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 163,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 232,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 25,
+     "lat": 14
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 181,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 298,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -10,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 122,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -227,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 5,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 213,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -101,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -10,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 20,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 126,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 241,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 71,
+     "lat": 14
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 19,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 146,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 20,
+     "lat": 7
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 52,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 283,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -231,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 115,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 219,
+     "lat": 8
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -259,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 71,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 325,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 23,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 250,
+     "lat": 7
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 13,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 111,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -235,
+     "lat": 2
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 48,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 151,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -165,
+     "lat": 1
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -92,
+     "lat": null
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 96,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 3,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 220,
+     "lat": 7
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -17,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 74,
+     "lat": 11
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 30,
+     "lat": 14
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 138,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 77,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 55,
+     "lat": 13
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 194,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 27,
+     "lat": 14
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 46,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 169,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 258,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 90,
+     "lat": 8
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 3,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 199,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -15,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 198,
+     "lat": 16
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -321,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -136,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 84,
+     "lat": 10
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -19,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 91,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 277,
+     "lat": 4
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -127,
+     "lat": 12
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 24,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 22,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -252,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 67,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 157,
+     "lat": 14
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 45,
+     "lat": 11
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 131,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -186,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 92,
+     "lat": 14
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 61,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 171,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -98,
+     "lat": 7
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -16,
+     "lat": 14
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 210,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 29,
+     "lat": 10
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 139,
+     "lat": 4
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -238,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 10,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 103,
+     "lat": 3
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 253,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 62,
+     "lat": 5
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 250,
+     "lat": 7
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -266,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 18,
+     "lat": 9
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 130,
+     "lat": 9
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 0,
+     "lat": 12
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": -243,
+     "lat": 8
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 81,
+     "lat": 10
+    }
+   ],
+   "raf": 7290,
+   "t0": 59.4,
+   "now": 122106.59999999998,
+   "jsum": {
+    "n": 269,
+    "ok": 105,
+    "last": {
+     "kind": "fire",
+     "ok": false,
+     "dt": 81,
+     "beat": 0,
+     "at": 118188.69999999995
+    }
+   }
+  },
+  "dashN": 85,
+  "fps": 60,
+  "over": false,
+  "dur": 120
+ },
+ {
+  "tag": "1280x800-idle",
+  "kind": "idle",
+  "cfg": "1280x800",
+  "timeline": [
+   {
+    "t": 5,
+    "score": 0,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 1,
+    "combo": 1,
+    "fps": 37,
+    "pt": 11,
+    "eb": 0,
+    "en": 0,
+    "hint": "WASD fly, SPACE fire, SHIFT dash",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 10,
+    "score": 319,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 1,
+    "combo": 0,
+    "fps": 43,
+    "pt": 7,
+    "eb": 5,
+    "en": 8,
+    "hint": "WASD fly, SPACE fire, SHIFT dash",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 15,
+    "score": 930,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 9,
+    "Jok": 2,
+    "combo": 0,
+    "fps": 40,
+    "pt": 10,
+    "eb": 3,
+    "en": 4,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 20.6,
+    "score": 2077,
+    "hp": 2,
+    "di": 0,
+    "loop": 0,
+    "J": 15,
+    "Jok": 5,
+    "combo": 2,
+    "fps": 42,
+    "pt": 15,
+    "eb": 1,
+    "en": 5,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   }
+  ],
+  "hurts": [
+   {
+    "t": 10.6,
+    "cause": "bullet",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 12.4,
+    "cause": "bullet",
+    "hpLeft": 3,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 16.5,
+    "cause": "bullet",
+    "hpLeft": 2,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 23.6,
+    "cause": "bullet",
+    "hpLeft": 1,
+    "di": 0,
+    "boss": false
+   },
+   {
+    "t": 25.1,
+    "cause": "bullet",
+    "hpLeft": 0,
+    "di": 0,
+    "boss": false
+   }
+  ],
+  "judged": [],
+  "errs": [],
+  "shots": [
+   "1280x800-idle-banner-d0.png",
+   "1280x800-idle-t02.png",
+   "1280x800-idle-t09.png",
+   "1280x800-idle-t20.png",
+   "1280x800-idle-dead.png",
+   "1280x800-idle-gameover.png"
+  ],
+  "startMs": 51,
+  "bt": {
+   "mode": "synth",
+   "bpm": 92,
+   "stage": "stage1",
+   "outLat": 0.032,
+   "baseLat": 0.01
+  },
+  "ban0": 1,
+  "deadAt": 25.1,
+  "final": {
+   "J": 21,
+   "Jok": 6,
+   "perf": 6,
+   "score": 3045,
+   "best": 2,
+   "lat": [
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 3,
+     "lat": 1
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -63,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 242,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -250,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 93,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -227,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -150,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 238,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -24,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -135,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 38,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 135,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 159,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 74,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -107,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": 10,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 168,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 141,
+     "lat": null
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 196,
+     "lat": null
+    }
+   ],
+   "raf": 1225,
+   "t0": 28,
+   "now": 27980.900000000023,
+   "jsum": {
+    "n": 21,
+    "ok": 6,
+    "last": {
+     "kind": "graze",
+     "ok": false,
+     "dt": 196,
+     "beat": 30,
+     "at": 26879.599999999977
+    }
+   }
+  },
+  "dashN": 0,
+  "fps": 44,
+  "over": true,
+  "dur": 26.1
+ },
+ {
+  "tag": "1280x800-natural",
+  "kind": "natural",
+  "cfg": "1280x800",
+  "timeline": [
+   {
+    "t": 5,
+    "score": 0,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 43,
+    "pt": 9,
+    "eb": 0,
+    "en": 0,
+    "hint": "WASD fly, SPACE fire, SHIFT dash",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 10.1,
+    "score": 938,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 46,
+    "pt": 41,
+    "eb": 0,
+    "en": 0,
+    "hint": "WASD fly, SPACE fire, SHIFT dash",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 15.1,
+    "score": 1250,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 46,
+    "pt": 45,
+    "eb": 1,
+    "en": 2,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 20.6,
+    "score": 3208,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 47,
+    "pt": 13,
+    "eb": 3,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 25.6,
+    "score": 4820,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 47,
+    "pt": 70,
+    "eb": 1,
+    "en": 3,
+    "hint": "Slower beat and bullets",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 30.6,
+    "score": 7367,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 34,
+    "eb": 1,
+    "en": 5,
+    "hint": "Slower beat and bullets",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 35.6,
+    "score": 10837,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 10,
+    "eb": 2,
+    "en": 0,
+    "hint": "Slower beat and bullets",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 40.7,
+    "score": 14340,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 11,
+    "eb": 6,
+    "en": 0,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 45.7,
+    "score": 21746,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 7,
+    "eb": 1,
+    "en": 7,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 50.7,
+    "score": 29434,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 34,
+    "eb": 2,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": 2.7834000000000017,
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 55.7,
+    "score": 30699,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 1,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 11,
+    "eb": 10,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 60.8,
+    "score": 31218,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 2,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 10,
+    "eb": 6,
+    "en": 3,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 65.8,
+    "score": 32382,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 2,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 10,
+    "eb": 5,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 70.8,
+    "score": 32806,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 2,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 15,
+    "eb": 9,
+    "en": 3,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 75.8,
+    "score": 34130,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 2,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 11,
+    "eb": 7,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 80.8,
+    "score": 34162,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 2,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 48,
+    "pt": 14,
+    "eb": 10,
+    "en": 3,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 85.8,
+    "score": 37010,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 3,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 47,
+    "pt": 9,
+    "eb": 12,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 90.8,
+    "score": 37468,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 3,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 47,
+    "pt": 11,
+    "eb": 6,
+    "en": 3,
+    "hint": "Faster beat · score ×2",
+    "ban": 0.8333000000000055,
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 95.8,
+    "score": 40106,
+    "hp": 4,
+    "di": 0,
+    "loop": 0,
+    "J": 3,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 47,
+    "pt": 23,
+    "eb": 7,
+    "en": 2,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 100.8,
+    "score": 41559,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 4,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 47,
+    "pt": 9,
+    "eb": 17,
+    "en": 1,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 105.8,
+    "score": 49252,
+    "hp": 3,
+    "di": 0,
+    "loop": 0,
+    "J": 4,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 47,
+    "pt": 9,
+    "eb": 0,
+    "en": 0,
+    "hint": "Faster beat · score ×2",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 116.7,
+    "score": 49252,
+    "hp": 3,
+    "di": 1,
+    "loop": 0,
+    "J": 4,
+    "Jok": 0,
+    "combo": 0,
+    "fps": 47,
+    "pt": 14,
+    "eb": 0,
+    "en": 0,
+    "hint": "Faster beat · score ×2",
+    "ban": 3.0666999999999978,
+    "bpm": 126,
+    "boss": false
+   }
+  ],
+  "hurts": [
+   {
+    "t": 59.9,
+    "cause": "bullet",
+    "hpLeft": 4,
+    "di": 0,
+    "boss": true
+   },
+   {
+    "t": 99.1,
+    "cause": "bullet",
+    "hpLeft": 3,
+    "di": 0,
+    "boss": true
+   }
+  ],
+  "judged": [],
+  "errs": [],
+  "shots": [
+   "1280x800-natural-01-title.png",
+   "1280x800-natural-banner-d0.png",
+   "1280x800-natural-t02.png",
+   "1280x800-natural-t09.png",
+   "1280x800-natural-t20.png",
+   "1280x800-natural-boss.png",
+   "1280x800-natural-shop.png",
+   "1280x800-natural-banner-d1.png"
+  ],
+  "startMs": 90,
+  "bt": {
+   "mode": "synth",
+   "bpm": 92,
+   "stage": "stage1",
+   "outLat": 0.032,
+   "baseLat": 0.01
+  },
+  "ban0": 1,
+  "bossAt": 52.1,
+  "shopSeen": 106.611,
+  "shopT": 8.7,
+  "ban1": 1,
+  "final": {
+   "J": 4,
+   "Jok": 0,
+   "perf": 0,
+   "score": 49342,
+   "best": 0,
+   "lat": [
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 133,
+     "lat": 0
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -105,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 183,
+     "lat": 1
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 186,
+     "lat": null
+    }
+   ],
+   "raf": 5742,
+   "t0": 192.7,
+   "now": 122914,
+   "jsum": {
+    "n": 4,
+    "ok": 0,
+    "last": {
+     "kind": "graze",
+     "ok": false,
+     "dt": 186,
+     "beat": 150,
+     "at": 98706.70000000007
+    }
+   }
+  },
+  "dashN": 1,
+  "fps": 47,
+  "over": false,
+  "dur": 120
+ },
+ {
+  "tag": "1280x800-trying",
+  "kind": "trying",
+  "cfg": "1280x800",
+  "timeline": [
+   {
+    "t": 5,
+    "score": 800,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 8,
+    "Jok": 8,
+    "combo": 7,
+    "fps": 46,
+    "pt": 10,
+    "eb": 0,
+    "en": 0,
+    "hint": "WASD fly, SPACE fire, SHIFT dash",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 10,
+    "score": 2049,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 15,
+    "Jok": 15,
+    "combo": 13,
+    "fps": 48,
+    "pt": 20,
+    "eb": 0,
+    "en": 0,
+    "hint": "WASD fly, SPACE fire, SHIFT dash",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 15.5,
+    "score": 3788,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 21,
+    "Jok": 20,
+    "combo": 18,
+    "fps": 47,
+    "pt": 19,
+    "eb": 1,
+    "en": 0,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 20.6,
+    "score": 7648,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 28,
+    "Jok": 25,
+    "combo": 23,
+    "fps": 47,
+    "pt": 39,
+    "eb": 1,
+    "en": 0,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 25.6,
+    "score": 12966,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 35,
+    "Jok": 32,
+    "combo": 30,
+    "fps": 48,
+    "pt": 38,
+    "eb": 1,
+    "en": 2,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 30.6,
+    "score": 18698,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 42,
+    "Jok": 39,
+    "combo": 37,
+    "fps": 48,
+    "pt": 44,
+    "eb": 0,
+    "en": 3,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 35.6,
+    "score": 24403,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 47,
+    "Jok": 44,
+    "combo": 42,
+    "fps": 48,
+    "pt": 8,
+    "eb": 4,
+    "en": 5,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 40.6,
+    "score": 31637,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 54,
+    "Jok": 51,
+    "combo": 49,
+    "fps": 48,
+    "pt": 8,
+    "eb": 3,
+    "en": 0,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 45.6,
+    "score": 37259,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 60,
+    "Jok": 56,
+    "combo": 54,
+    "fps": 48,
+    "pt": 7,
+    "eb": 1,
+    "en": 7,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 50.6,
+    "score": 49020,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 69,
+    "Jok": 62,
+    "combo": 59,
+    "fps": 48,
+    "pt": 22,
+    "eb": 4,
+    "en": 0,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 55.7,
+    "score": 59766,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 76,
+    "Jok": 68,
+    "combo": 65,
+    "fps": 48,
+    "pt": 39,
+    "eb": 1,
+    "en": 3,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 60.7,
+    "score": 74552,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 81,
+    "Jok": 73,
+    "combo": 70,
+    "fps": 49,
+    "pt": 40,
+    "eb": 1,
+    "en": 7,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 65.8,
+    "score": 91213,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 88,
+    "Jok": 80,
+    "combo": 77,
+    "fps": 49,
+    "pt": 11,
+    "eb": 3,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": false
+   },
+   {
+    "t": 70.8,
+    "score": 98028,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 94,
+    "Jok": 85,
+    "combo": 82,
+    "fps": 49,
+    "pt": 18,
+    "eb": 5,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 75.8,
+    "score": 102800,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 101,
+    "Jok": 92,
+    "combo": 89,
+    "fps": 49,
+    "pt": 13,
+    "eb": 8,
+    "en": 3,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 81,
+    "score": 115756,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 109,
+    "Jok": 100,
+    "combo": 97,
+    "fps": 49,
+    "pt": 11,
+    "eb": 7,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 86,
+    "score": 118443,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 116,
+    "Jok": 104,
+    "combo": 101,
+    "fps": 49,
+    "pt": 13,
+    "eb": 9,
+    "en": 3,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 91,
+    "score": 131294,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 123,
+    "Jok": 111,
+    "combo": 108,
+    "fps": 49,
+    "pt": 11,
+    "eb": 7,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 96,
+    "score": 136991,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 130,
+    "Jok": 118,
+    "combo": 115,
+    "fps": 49,
+    "pt": 16,
+    "eb": 11,
+    "en": 3,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 101.1,
+    "score": 147823,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 136,
+    "Jok": 123,
+    "combo": 120,
+    "fps": 49,
+    "pt": 13,
+    "eb": 1,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 106.1,
+    "score": 152663,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 143,
+    "Jok": 129,
+    "combo": 126,
+    "fps": 49,
+    "pt": 10,
+    "eb": 13,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 111.2,
+    "score": 162084,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 151,
+    "Jok": 135,
+    "combo": 132,
+    "fps": 49,
+    "pt": 24,
+    "eb": 9,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": "",
+    "bpm": 92,
+    "boss": true
+   },
+   {
+    "t": 116.2,
+    "score": 292538,
+    "hp": 5,
+    "di": 0,
+    "loop": 0,
+    "J": 158,
+    "Jok": 141,
+    "combo": 138,
+    "fps": 49,
+    "pt": 150,
+    "eb": 0,
+    "en": 1,
+    "hint": "Hit the beat for PERFECT",
+    "ban": 2.5666999999999986,
+    "bpm": 92,
+    "boss": false
+   }
+  ],
+  "hurts": [],
+  "judged": [],
+  "errs": [],
+  "shots": [
+   "1280x800-trying-banner-d0.png",
+   "1280x800-trying-t02.png",
+   "1280x800-trying-t09.png",
+   "1280x800-trying-t20.png",
+   "1280x800-trying-boss.png"
+  ],
+  "startMs": 58,
+  "bt": {
+   "mode": "synth",
+   "bpm": 92,
+   "stage": "stage1",
+   "outLat": 0.032,
+   "baseLat": 0.01
+  },
+  "ban0": 1,
+  "bossAt": 67.9,
+  "final": {
+   "J": 163,
+   "Jok": 146,
+   "perf": 146,
+   "score": 301953,
+   "best": 143,
+   "lat": [
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 5,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -17,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 4,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -24,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 76,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -20,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 70,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -3,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 4,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 3,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 5,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 14,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -8,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -12,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 69,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -21,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -23,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -8,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -15,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -7,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 85,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -20,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -11,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -22,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 57,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -10,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 106,
+     "lat": 1
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 247,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 64,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 11,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -21,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -12,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 1,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -7,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 13,
+     "lat": 2
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -15,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 54,
+     "lat": 5
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -19,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 2,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 17,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 26,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -10,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -18,
+     "lat": 6
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -3,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -6,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -22,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 60,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -8,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 2,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -19,
+     "lat": 7
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -19,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 0,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -14,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -8,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 147,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 11,
+     "lat": 2
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -20,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -9,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -4,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -19,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -13,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 44,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 54,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 156,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 17,
+     "lat": 0
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": -277,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 35,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 135,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -14,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -1,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 21,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -5,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 49,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 44,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 147,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -22,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -9,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -23,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -15,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -21,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 58,
+     "lat": 5
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -8,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -5,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -4,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 12,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -13,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 13,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -18,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -19,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 6,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 34,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 100,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -2,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -2,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -20,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -1,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -19,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 29,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 24,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 1,
+     "lat": 4
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 3,
+     "lat": 2
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -7,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 30,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -13,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -8,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -15,
+     "lat": 2
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 21,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -19,
+     "lat": 3
+    },
+    {
+     "k": "dash",
+     "ok": false,
+     "dt": 124,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 196,
+     "lat": 0
+    },
+    {
+     "k": "graze",
+     "ok": true,
+     "dt": -75,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -19,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 102,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 30,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 26,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -19,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -2,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -16,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -13,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 4,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 1,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 6,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -23,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 40,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -12,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 56,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -23,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 43,
+     "lat": 4
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 13,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -21,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 0,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 110,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 9,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 16,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -20,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 17,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -11,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 14,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -21,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -9,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 124,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 11,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 13,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -24,
+     "lat": 2
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 11,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -18,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 97,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -22,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": false,
+     "dt": 95,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": 0,
+     "lat": 3
+    },
+    {
+     "k": "graze",
+     "ok": false,
+     "dt": 90,
+     "lat": null
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -23,
+     "lat": 3
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 39,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -10,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -6,
+     "lat": 2
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -24,
+     "lat": 0
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": 7,
+     "lat": 0
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -24,
+     "lat": 1
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -14,
+     "lat": 2
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -20,
+     "lat": 1
+    },
+    {
+     "k": "dash",
+     "ok": true,
+     "dt": -21,
+     "lat": 6
+    },
+    {
+     "k": "fire",
+     "ok": true,
+     "dt": -8,
+     "lat": 0
+    }
+   ],
+   "raf": 6023,
+   "t0": 51.1,
+   "now": 122128,
+   "jsum": {
+    "n": 163,
+    "ok": 146,
+    "last": {
+     "kind": "fire",
+     "ok": true,
+     "dt": -8,
+     "beat": 0,
+     "at": 122113.69999999995
+    }
+   }
+  },
+  "dashN": 90,
+  "fps": 49,
+  "over": false,
+  "dur": 120.1
+ }
+]

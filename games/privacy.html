@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Privacy · Game Night Shelf</title><meta name="description" content="What the Game Night Shelf stores on your device and which outside services see what.">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/icon-192.png"><meta name="theme-color" content="#1d1411">
+<style>
+:root{--bg:#1d1411;--card:#2b1d17;--ink:#f4ead8;--muted:#bca78c;--brass:#e0a948;--line:#4a3326;color-scheme:dark}
+@media (prefers-color-scheme:light){:root{--bg:#efe3cc;--card:#f8f0e0;--ink:#2a1a10;--muted:#6d5640;--brass:#8a5a0e;--line:#d2bb95;color-scheme:light}}
+*{box-sizing:border-box}
+body{margin:0;overflow-wrap:anywhere;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:0 16px calc(32px + env(safe-area-inset-bottom,0px))}
+main{max-width:46em;margin:0 auto}
+nav.top{display:flex;flex-wrap:wrap;gap:4px 14px;max-width:46em;margin:0 auto;padding:calc(12px + env(safe-area-inset-top,0px)) 0 4px}
+nav.top a,footer a{color:var(--brass);font-weight:600;display:inline-flex;align-items:center;min-height:44px}
+nav.top a[aria-current]{color:var(--ink);text-decoration:none}
+h1{font-size:1.9rem;line-height:1.15;margin:12px 0 4px}
+h2{font-size:1.25rem;margin:28px 0 6px}
+h3{font-size:1.02rem;margin:18px 0 4px}
+p,li{max-width:42em}
+.upd{color:var(--muted);margin-top:0}
+.box{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:.92rem;margin:8px 0}
+th,td{text-align:left;vertical-align:top;padding:6px 8px;border-bottom:1px solid var(--line)}
+.tw{overflow-x:auto}
+details{background:var(--card);border:1px solid var(--line);border-radius:10px;margin:8px 0}
+summary{cursor:pointer;padding:10px 14px;min-height:44px;font-weight:600}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;margin:0;padding:0 14px 14px}
+footer{max-width:46em;margin:36px auto 0;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);padding-top:8px}
+a{color:var(--brass)}
+</style></head><body>
+<nav class="top" aria-label="Shelf pages"><a href="./">← Shelf</a><a href="credits.html">Credits &amp; licences</a><a href="privacy.html" aria-current="page">Privacy</a><a href="terms.html">Terms</a></nav>
+<main>
+<h1>Privacy</h1>
+<p class="upd">Last updated 4 October 2026</p>
+<div class="box"><p><b>In short:</b> no account, no ads, no tracking, no analytics and no cookies of our own. Your saves, settings and statistics stay in your browser on this device. A few outside services see your IP address when you use certain features; they are all listed below.</p></div>
+
+<h2>Who runs the shelf</h2>
+<p>The Game Night Shelf is a free, non-commercial hobby project by Am015-dev, published on GitHub Pages. You can reach the maker through <a href="suggest.html">the suggestion box</a>.</p>
+
+<h2>What is stored on your device</h2>
+<p>The games use your browser's local storage and, if you choose offline play, its cache. Nothing of this is sent to us.</p>
+<div class="tw"><table><thead><tr><th>What</th><th>Why</th></tr></thead><tbody>
+<tr><td>Saved games, one per game (for example <code>hb_save1</code>)</td><td>So you can continue where you stopped</td></tr>
+<tr><td>Game settings (sound, speed, guide level, graphics)</td><td>So each game remembers your choices</td></tr>
+<tr><td>Shared settings <code>gns-prefs</code>: volumes, animation and computer speed, text size, colour-blind help, left-handed layout, reduce motion, vibration</td><td>Set once, used by every game</td></tr>
+<tr><td>Results, statistics and achievements: <code>gns-results</code>, <code>gns-stats</code>, <code>gns-ach</code>, <code>gns-achdef</code>, <code>gns-saves</code></td><td>The "Stats &amp; achievements" panel and the Continue row on the shelf</td></tr>
+<tr><td>How often you opened each game and your shelf trophies (<code>room_plays</code>, <code>room_trophies</code>), the last game you played, list or room view</td><td>The living-room shelf</td></tr>
+<tr><td>Your online name (<code>gns-name</code>) and a random player code (<code>gns-uid</code>)</td><td>Online play: lets a game recognise you when you rejoin a room</td></tr>
+<tr><td>Copies of the shelf and of the games you download (browser cache, through a service worker)</td><td>Playing without internet, and faster start-up</td></tr>
+</tbody></table></div>
+<p>To delete all of it, clear this site's data in your browser settings. The <a href="sync.html">Saves &amp; Offline</a> page shows what is stored, lets you remove downloaded games and lets you move your saves to another device yourself.</p>
+
+<h2>Outside services and what they see</h2>
+<h3>GitHub Pages (hosting)</h3>
+<p>The pages are served by GitHub. Like any web server, GitHub receives your IP address, browser type and the pages you request, and may keep these in its server logs. See GitHub's privacy statement.</p>
+<h3>Google Fonts</h3>
+<p>Most pages load their lettering from Google Fonts (<code>fonts.googleapis.com</code> and <code>fonts.gstatic.com</code>). Your browser then sends Google your IP address, browser type and the address of the page. If the fonts cannot load (for example offline), the pages use your device's own fonts.</p>
+<h3>Online play and save transfer</h3>
+<p>Online games and the device-to-device save transfer connect browsers directly (WebRTC). To find each other:</p>
+<ul>
+<li><b>Public Nostr relays</b>, run by third parties, pass short connection messages between the players' browsers. They see your IP address and an encrypted connection offer with a scrambled room tag. They do not see your game, your moves or your name.</li>
+<li><b>STUN servers</b> from Google (<code>stun.l.google.com</code>) and Cloudflare (<code>stun.cloudflare.com</code>) tell your browser its public address. They see your IP address.</li>
+<li><b>The other players</b> in your room see your online name, and their browsers connect to yours directly, so they can learn your IP address, as with any direct connection.</li>
+</ul>
+<p>Nothing is sent to these services unless you host or join an online game, or use the save transfer.</p>
+<h3>Suggestion box</h3>
+<p>The <a href="suggest.html">suggestion box</a> sends what you write (your message, and your name and email only if you give them) through the form service Web3Forms (<code>api.web3forms.com</code>), which emails it to the maker. Web3Forms receives your IP address and the message. Your email is used only to reply to you. Ask through the suggestion box and your message will be deleted.</p>
+<h3>Ko-fi</h3>
+<p>The "Support on Ko-fi" link opens Ko-fi's own site only when you tap it. Nothing is shared before that.</p>
+
+<h2>Children</h2>
+<p>The shelf asks nobody for personal details, and nothing about players is collected by us, so it is suitable for families. Online play shows the name a player types; younger players should use a nickname.</p>
+
+<h2>Changes</h2>
+<p>If what is stored or shared changes, this page will say so, with a new date at the top.</p>
+</main>
+<footer>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers. Questions: <a href="suggest.html">the suggestion box</a>.</footer>
+<script>if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{});</script>
+</body></html>

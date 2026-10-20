@@ -1,0 +1,6 @@
+job 43 2p  win 1/10  turns 17  2.3s  2x X pointed at a red wire; 6x the fuse burnt down; 1x a crew member had no legal cut left (the bomb goes off, as t
+job 43 3p  win 3/10  turns 23  2.2s  1x X pointed at a red wire; 6x the fuse burnt down
+job 43 4p  win 3/10  turns 25  2.7s  4x X pointed at a red wire; 3x the fuse burnt down
+job 43 5p  win 6/10  turns 29  2.5s  3x X pointed at a red wire; 1x X pointed at only red wires
+TOTAL games 40 wins 13 (33%) errors 0 stalls 0 invariant-fails 0 time 97s level hard
+loss reasons {"X pointed at a red wire":10,"the fuse burnt down":15,"a crew member had no legal cut left (the bomb goes off, as t":1,"X pointed at only red wires":1}

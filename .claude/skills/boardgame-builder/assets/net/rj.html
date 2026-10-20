@@ -1,0 +1,3 @@
+<!doctype html><meta charset=utf-8><script src="trystero.min.js"></script><script src="netroom.js"></script><script>
+window.SEEN=new Set();window.go=async(n)=>{window.R=await NetRoom.lobby('rj').join('abc');R.presence({name:n});R.onPeers(ch=>{ch.peers.forEach(p=>{if(!p.isMe)SEEN.add(p.presence.name||'?')});window.PEERS=ch.peers.filter(p=>!p.isMe).map(p=>p.presence.name)})};
+</script>

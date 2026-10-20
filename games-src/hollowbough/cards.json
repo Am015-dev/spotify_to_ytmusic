@@ -1,0 +1,2135 @@
+{
+ "game": "Hollowbough (own-name adaptation of the original base game)",
+ "notes": [
+  "Original role keys follow the base game card roles; new_name and new_text are original.",
+  "Every number (cost, base_points, copies, type, unique/common, kind) was asserted equal across two independent sources; see sources.md."
+ ],
+ "vocabulary": {
+  "timing": {
+   "on_play": "resolves once when the card enters the city",
+   "production": "also resolves in spring and autumn Prepare for Season (green cards)",
+   "visit": "worker placement on this card",
+   "ongoing": "triggered or continuous while in city",
+   "ongoing_discount": "card-playing ability, only one per card played",
+   "end_game": "scored at game end"
+  },
+  "resource_keys": [
+   "twig",
+   "resin",
+   "pebble",
+   "berry"
+  ],
+  "gain_any": "choose any of the four resources, not points or cards",
+  "point_tokens": "take from general supply",
+  "color_map": {
+   "traveler": "tan",
+   "production": "green",
+   "destination": "red",
+   "governance": "blue",
+   "prosperity": "purple"
+  }
+ },
+ "deck": {
+  "distinct": 48,
+  "copies_total": 128,
+  "critter_copies": 63,
+  "construction_copies": 65
+ },
+ "cards": [
+  {
+   "role": "architect",
+   "new_name": "Master Lathwright",
+   "copies": 2,
+   "type": "prosperity",
+   "color": "purple",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 4
+   },
+   "base_points": 2,
+   "linked": "crane",
+   "spec": {
+    "timing": "end_game",
+    "ops": [
+     {
+      "op": "bonus_points",
+      "per": "each unused resin or pebble in your supply",
+      "each": 1,
+      "cap": 6
+     }
+    ],
+    "note": "Resources sitting on a Storehouse do not count."
+   },
+   "new_text": "At the end of the game, score 1 point per resin and per pebble you still hold, to a maximum of 6."
+  },
+  {
+   "role": "bard",
+   "new_name": "Ballad Finch",
+   "copies": 2,
+   "type": "traveler",
+   "color": "tan",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 3
+   },
+   "base_points": 0,
+   "linked": "theatre",
+   "spec": {
+    "timing": [
+     "on_play"
+    ],
+    "ops": [
+     {
+      "op": "discard_from_hand_for_points",
+      "max_cards": 5,
+      "point_tokens_each": 1
+     }
+    ]
+   },
+   "new_text": "Sing away up to 5 cards from your hand and take a point token for each."
+  },
+  {
+   "role": "barge_toad",
+   "new_name": "Reedpunt Toad",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "critter",
+   "unique": false,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 1,
+   "linked": "twig_barge",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "gain",
+      "res": {
+       "twig": 2
+      },
+      "per": "each Farm in your city"
+     }
+    ]
+   },
+   "new_text": "Gain 2 twigs for every Allotment (Farm-role card) in your city."
+  },
+  {
+   "role": "chip_sweep",
+   "new_name": "Tinder Chipmunk",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "critter",
+   "unique": false,
+   "cost": {
+    "berry": 3
+   },
+   "base_points": 2,
+   "linked": "resin_refinery",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "activate_production",
+      "target": "any 1 other production card in your own city"
+     }
+    ],
+    "note": "ASSUMPTION: cannot target itself or another Tinder Chipmunk recursively beyond one level (source silent)."
+   },
+   "new_text": "Re-run one other production card in your own city."
+  },
+  {
+   "role": "doctor",
+   "new_name": "Poultice Badger",
+   "copies": 2,
+   "type": "production",
+   "color": "green",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 4
+   },
+   "base_points": 4,
+   "linked": "university",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "pay_for_points",
+      "pay": "berry",
+      "max": 3,
+      "point_tokens_each": 1
+     }
+    ]
+   },
+   "new_text": "Spend up to 3 berries and take a point token for each one spent."
+  },
+  {
+   "role": "fool",
+   "new_name": "Mudpie Jester",
+   "copies": 2,
+   "type": "traveler",
+   "color": "tan",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 3
+   },
+   "base_points": -2,
+   "linked": "fairgrounds",
+   "spec": {
+    "timing": [
+     "on_play"
+    ],
+    "ops": [
+     {
+      "op": "place_in_opponent_city",
+      "needs_free_space": true,
+      "owner_scores_base_points": true
+     }
+    ],
+    "note": "Cannot be played into your own city. Also playable into a city that has passed. Solo: Old Grimbeard may play it into your city; if you play it, discard it and remove 1 Old Grimbeard card instead."
+   },
+   "new_text": "Plant this prankster in a rival village; it takes one of their spaces and costs them 2 points."
+  },
+  {
+   "role": "historian",
+   "new_name": "Chronicle Owl",
+   "copies": 3,
+   "type": "governance",
+   "color": "blue",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 1,
+   "linked": "clock_tower",
+   "spec": {
+    "timing": "ongoing",
+    "ops": [
+     {
+      "op": "draw",
+      "n": 1,
+      "trigger": "after you play another Critter or Construction (after the played card resolves)"
+     }
+    ]
+   },
+   "new_text": "Whenever you play another card, draw 1 card afterwards."
+  },
+  {
+   "role": "husband",
+   "new_name": "Goodman Vole",
+   "copies": 4,
+   "type": "production",
+   "color": "green",
+   "kind": "critter",
+   "unique": false,
+   "cost": {
+    "berry": 3
+   },
+   "base_points": 2,
+   "linked": "farm",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "gain_any",
+      "n": 1,
+      "condition": "paired with a Wife AND you have at least 1 Farm in city"
+     }
+    ],
+    "pairing": {
+     "partner": "wife",
+     "shares_space": true,
+     "decided_when_second_card_played": true,
+     "cannot_pair_later": true,
+     "one_partner_each": true
+    }
+   },
+   "new_text": "Shares a space with one Goodwife. If paired and you own an Allotment, gain any 1 resource on play and every production."
+  },
+  {
+   "role": "innkeeper",
+   "new_name": "Hostler Hedgehog",
+   "copies": 3,
+   "type": "governance",
+   "color": "blue",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 1
+   },
+   "base_points": 1,
+   "linked": "inn",
+   "spec": {
+    "timing": "ongoing_discount",
+    "ops": [
+     {
+      "op": "discard_self_to_reduce_cost",
+      "applies_to": "critter",
+      "reduce": {
+       "berry": 3
+      },
+      "no_refund": true
+     }
+    ],
+    "exclusive_with_other_card_playing_abilities": true
+   },
+   "new_text": "When you play a Critter you may send this hedgehog away to cut 3 berries off its price."
+  },
+  {
+   "role": "judge",
+   "new_name": "Gavel Marten",
+   "copies": 2,
+   "type": "governance",
+   "color": "blue",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 3
+   },
+   "base_points": 2,
+   "linked": "courthouse",
+   "spec": {
+    "timing": "ongoing_discount",
+    "ops": [
+     {
+      "op": "swap_one_cost_resource",
+      "applies_to": "critter or construction",
+      "swap": "1 resource in cost may be paid with 1 different resource you own"
+     }
+    ],
+    "exclusive_with_other_card_playing_abilities": true
+   },
+   "new_text": "When playing any card, pay one required resource with a different resource of your choice."
+  },
+  {
+   "role": "king",
+   "new_name": "Bramble Sovereign",
+   "copies": 2,
+   "type": "prosperity",
+   "color": "purple",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 6
+   },
+   "base_points": 4,
+   "linked": "castle",
+   "spec": {
+    "timing": "end_game",
+    "ops": [
+     {
+      "op": "bonus_points",
+      "per": "basic event achieved",
+      "each": 1
+     },
+     {
+      "op": "bonus_points",
+      "per": "special event achieved",
+      "each": 2
+     }
+    ]
+   },
+   "new_text": "End of game: 1 point per basic event and 2 points per special event you achieved."
+  },
+  {
+   "role": "miner_mole",
+   "new_name": "Echo Mole",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "critter",
+   "unique": false,
+   "cost": {
+    "berry": 3
+   },
+   "base_points": 1,
+   "linked": "mine",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "copy_production",
+      "source": "any 1 green production card in an opponent city",
+      "evaluate_in": "that opponent city",
+      "solo_source": "Old Grimbeard's city"
+     }
+    ],
+    "note": "Cannot copy a Storehouse. May copy another Echo Mole."
+   },
+   "new_text": "Mimic any one production card in a rival village, as though it were theirs."
+  },
+  {
+   "role": "monk",
+   "new_name": "Brother Moss",
+   "copies": 2,
+   "type": "production",
+   "color": "green",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 1
+   },
+   "base_points": 0,
+   "linked": "monastery",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "give_to_opponent_for_points",
+      "give": "berry",
+      "max": 2,
+      "point_tokens_per_given": 2
+     }
+    ],
+    "unlocks": "monastery second slot"
+   },
+   "new_text": "Give up to 2 berries to a rival and take 2 point tokens for each. Opens the second Cloister slot."
+  },
+  {
+   "role": "peddler",
+   "new_name": "Haggle Magpie",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "critter",
+   "unique": false,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 1,
+   "linked": "ruins",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "trade_with_supply",
+      "pay_up_to": 2,
+      "gain_same_number_of_any": true,
+      "resources_need_not_match": true
+     }
+    ]
+   },
+   "new_text": "Swap up to 2 of your resources for any 2 resources from the supply."
+  },
+  {
+   "role": "postal_pigeon",
+   "new_name": "Parcel Dove",
+   "copies": 3,
+   "type": "traveler",
+   "color": "tan",
+   "kind": "critter",
+   "unique": false,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 0,
+   "linked": "post_office",
+   "spec": {
+    "timing": [
+     "on_play"
+    ],
+    "ops": [
+     {
+      "op": "reveal_from_deck",
+      "n": 2
+     },
+     {
+      "op": "may_play_free",
+      "filter": "base_points<=3"
+     },
+     {
+      "op": "discard_rest"
+     }
+    ],
+    "note": "The free card triggers Courthouse/Historian-type triggers. Solo: counts as 2 cards played for Old Grimbeard."
+   },
+   "new_text": "Reveal 2 cards; you may play one worth up to 3 base points free; discard the other."
+  },
+  {
+   "role": "queen",
+   "new_name": "Thistle Regent",
+   "copies": 2,
+   "type": "destination",
+   "color": "red",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 5
+   },
+   "base_points": 4,
+   "linked": "palace",
+   "spec": {
+    "timing": "visit",
+    "visitable_by": "owner only",
+    "ops": [
+     {
+      "op": "play_free",
+      "source": "hand or meadow",
+      "filter": "base_points<=3"
+     }
+    ]
+   },
+   "new_text": "Send a worker here to play any card worth up to 3 base points from hand or meadow without paying."
+  },
+  {
+   "role": "ranger",
+   "new_name": "Trailwarden Fox",
+   "copies": 2,
+   "type": "traveler",
+   "color": "tan",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 1,
+   "linked": "dungeon",
+   "spec": {
+    "timing": [
+     "on_play"
+    ],
+    "ops": [
+     {
+      "op": "move_deployed_worker",
+      "rule": "to a new location following normal placement rules"
+     }
+    ],
+    "unlocks": "dungeon second cell",
+    "note": "Cannot be the prisoner in the 2nd cell."
+   },
+   "new_text": "Relocate one of your deployed workers to another legal spot. Opens the second Thornhold cell."
+  },
+  {
+   "role": "shepherd",
+   "new_name": "Crook Shrew",
+   "copies": 2,
+   "type": "traveler",
+   "color": "tan",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 3
+   },
+   "base_points": 1,
+   "linked": "chapel",
+   "spec": {
+    "timing": [
+     "on_play"
+    ],
+    "ops": [
+     {
+      "op": "gain",
+      "res": {
+       "berry": 3
+      }
+     },
+     {
+      "op": "point_tokens",
+      "n": "equal to point tokens currently on your Chapel"
+     }
+    ],
+    "payment_rule": "If paid with resources (not occupied by Chapel), the cost is given to an opponent instead of the supply.",
+    "note": "Italic clause printed on card; absent from rulebook index (see disagreements)."
+   },
+   "new_text": "Gain 3 berries plus 1 point token per token on your Shrine. If bought with berries, they go to a rival."
+  },
+  {
+   "role": "shopkeeper",
+   "new_name": "Tallyshop Mouse",
+   "copies": 3,
+   "type": "governance",
+   "color": "blue",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 1,
+   "linked": "general_store",
+   "spec": {
+    "timing": "ongoing",
+    "ops": [
+     {
+      "op": "gain",
+      "res": {
+       "berry": 1
+      },
+      "trigger": "after you play another Critter into your city"
+     }
+    ]
+   },
+   "new_text": "Gain 1 berry whenever you play another Critter."
+  },
+  {
+   "role": "teacher",
+   "new_name": "Slate Schoolmarm",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "critter",
+   "unique": false,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 2,
+   "linked": "school",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "draw",
+      "n": 2
+     },
+     {
+      "op": "keep_one_give_other_to_opponent"
+     }
+    ],
+    "note": "Hand limit 8 applies (draw only what fits)."
+   },
+   "new_text": "Draw 2 cards, keep one, and hand the other to a rival."
+  },
+  {
+   "role": "undertaker",
+   "new_name": "Hollow Sexton",
+   "copies": 2,
+   "type": "traveler",
+   "color": "tan",
+   "kind": "critter",
+   "unique": true,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 1,
+   "linked": "cemetary",
+   "spec": {
+    "timing": [
+     "on_play"
+    ],
+    "ops": [
+     {
+      "op": "discard_meadow",
+      "n": 3
+     },
+     {
+      "op": "replenish_meadow"
+     },
+     {
+      "op": "draw_from_meadow",
+      "n": 1
+     }
+    ],
+    "unlocks": "cemetery second plot"
+   },
+   "new_text": "Clear 3 meadow cards, refill, then take 1 meadow card. Opens the second Grove plot."
+  },
+  {
+   "role": "wanderer",
+   "new_name": "Footsore Drifter",
+   "copies": 3,
+   "type": "traveler",
+   "color": "tan",
+   "kind": "critter",
+   "unique": false,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 1,
+   "linked": "lookout",
+   "spec": {
+    "timing": [
+     "on_play"
+    ],
+    "ops": [
+     {
+      "op": "draw",
+      "n": 3
+     }
+    ],
+    "takes_city_space": false
+   },
+   "new_text": "Draw 3 cards. Does not use up a city space."
+  },
+  {
+   "role": "wife",
+   "new_name": "Goodwife Vole",
+   "copies": 4,
+   "type": "prosperity",
+   "color": "purple",
+   "kind": "critter",
+   "unique": false,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 2,
+   "linked": "farm",
+   "spec": {
+    "timing": "end_game",
+    "ops": [
+     {
+      "op": "bonus_points",
+      "amount": 3,
+      "condition": "paired with a Husband"
+     }
+    ],
+    "pairing": {
+     "partner": "husband",
+     "shares_space": true
+    },
+    "note": "Purple: base 2 plus the bonus 3."
+   },
+   "new_text": "Shares a space with a Goodman; if paired, worth 3 extra points at the end."
+  },
+  {
+   "role": "woodcarver",
+   "new_name": "Whittle Beaver",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "critter",
+   "unique": false,
+   "cost": {
+    "berry": 2
+   },
+   "base_points": 2,
+   "linked": "storehouse",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "pay_for_points",
+      "pay": "twig",
+      "max": 3,
+      "point_tokens_each": 1
+     }
+    ]
+   },
+   "new_text": "Spend up to 3 twigs and take a point token for each."
+  },
+  {
+   "role": "castle",
+   "new_name": "Stonecrown Keep",
+   "copies": 2,
+   "type": "prosperity",
+   "color": "purple",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 2,
+    "resin": 3,
+    "pebble": 3
+   },
+   "base_points": 4,
+   "linked": "king",
+   "spec": {
+    "timing": "end_game",
+    "ops": [
+     {
+      "op": "bonus_points",
+      "per": "Common Construction in your city",
+      "each": 1
+     }
+    ]
+   },
+   "new_text": "End of game: 1 point per common construction in your city."
+  },
+  {
+   "role": "cemetery",
+   "new_name": "Mossgrave Glade",
+   "copies": 2,
+   "type": "destination",
+   "color": "red",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "pebble": 2
+   },
+   "base_points": 0,
+   "linked": "undertaker",
+   "spec": {
+    "timing": "visit",
+    "visitable_by": "owner only",
+    "slots": {
+     "base": 1,
+     "second_unlocked_by": "undertaker"
+    },
+    "ops": [
+     {
+      "op": "reveal",
+      "n": 4,
+      "from": "deck or discard (choose)"
+     },
+     {
+      "op": "play_free",
+      "choose": 1
+     },
+     {
+      "op": "discard_rest"
+     },
+     {
+      "op": "worker_stays_permanently"
+     }
+    ]
+   },
+   "new_text": "A worker settles here forever; reveal 4 cards from deck or discard pile and play one free, discarding the rest."
+  },
+  {
+   "role": "chapel",
+   "new_name": "Candlewick Shrine",
+   "copies": 2,
+   "type": "destination",
+   "color": "red",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 2,
+    "resin": 1,
+    "pebble": 1
+   },
+   "base_points": 2,
+   "linked": "shepherd",
+   "spec": {
+    "timing": "visit",
+    "visitable_by": "owner only",
+    "ops": [
+     {
+      "op": "place_point_token_on_card",
+      "n": 1,
+      "source": "general supply"
+     },
+     {
+      "op": "draw",
+      "n": 2,
+      "per": "each point token on this card (after adding)"
+     }
+    ],
+    "note": "Tokens on the card are lost if the card leaves the city; they score at game end."
+   },
+   "new_text": "Add a point token here, then draw 2 cards for every token now on the Shrine."
+  },
+  {
+   "role": "clock_tower",
+   "new_name": "Dewdrop Belfry",
+   "copies": 3,
+   "type": "governance",
+   "color": "blue",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 3,
+    "pebble": 1
+   },
+   "base_points": 0,
+   "linked": "historian",
+   "spec": {
+    "timing": "on_prepare_for_season",
+    "ops": [
+     {
+      "op": "on_play_place_point_tokens_on_card",
+      "n": 3
+     },
+     {
+      "op": "before_recalling_workers_remove_token_to_activate",
+      "target": "a basic or forest location where you have a deployed worker",
+      "optional": true
+     }
+    ],
+    "end_game": "tokens left on the card score 1 each"
+   },
+   "new_text": "Place 3 tokens here when built. Before recalling workers each season, spend one to repeat a basic or forest spot you occupy. Leftover tokens score."
+  },
+  {
+   "role": "courthouse",
+   "new_name": "Mosswood Assize",
+   "copies": 2,
+   "type": "governance",
+   "color": "blue",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 1,
+    "resin": 1,
+    "pebble": 2
+   },
+   "base_points": 2,
+   "linked": "judge",
+   "spec": {
+    "timing": "ongoing",
+    "ops": [
+     {
+      "op": "gain_choice",
+      "res": [
+       "twig",
+       "resin",
+       "pebble"
+      ],
+      "n": 1,
+      "trigger": "after you play another Construction"
+     }
+    ]
+   },
+   "new_text": "Gain 1 twig, resin or pebble each time you build another construction."
+  },
+  {
+   "role": "crane",
+   "new_name": "Pulley Lift",
+   "copies": 3,
+   "type": "governance",
+   "color": "blue",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "pebble": 1
+   },
+   "base_points": 1,
+   "linked": "architect",
+   "spec": {
+    "timing": "ongoing_discount",
+    "ops": [
+     {
+      "op": "discard_self_to_reduce_cost",
+      "applies_to": "construction",
+      "reduce_any": 3,
+      "no_refund": true
+     }
+    ],
+    "exclusive_with_other_card_playing_abilities": true
+   },
+   "new_text": "When building a Construction, dismantle this lift to cut 3 resources of your choice off the price."
+  },
+  {
+   "role": "dungeon",
+   "new_name": "Thornhold Cells",
+   "copies": 2,
+   "type": "governance",
+   "color": "blue",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "resin": 1,
+    "pebble": 2
+   },
+   "base_points": 0,
+   "linked": "ranger",
+   "spec": {
+    "timing": "ongoing_discount",
+    "ops": [
+     {
+      "op": "imprison_critter_to_reduce_cost",
+      "applies_to": "critter or construction",
+      "reduce_any": 3,
+      "no_refund": true,
+      "prisoner_not_in_city": true,
+      "prisoner_worth_0": true
+     }
+    ],
+    "slots": {
+     "base": 1,
+     "second_unlocked_by": "ranger"
+    },
+    "exclusive_with_other_card_playing_abilities": true,
+    "note": "Only one cell per played card even with both open."
+   },
+   "new_text": "Lock one of your Critters beneath this card to cut 3 resources off the price of a card. Opens a second cell with a Trailwarden."
+  },
+  {
+   "role": "ever_tree",
+   "new_name": "Elderheart Oak",
+   "copies": 2,
+   "type": "prosperity",
+   "color": "purple",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 3,
+    "resin": 3,
+    "pebble": 3
+   },
+   "base_points": 5,
+   "linked": "any critter",
+   "spec": {
+    "timing": "end_game",
+    "ops": [
+     {
+      "op": "bonus_points",
+      "per": "Prosperity (purple) card in your city, including this one",
+      "each": 1
+     }
+    ],
+    "occupy": "its occupied token can host any one Critter for free"
+   },
+   "new_text": "End of game: 1 point per purple card in your city (itself included). Can house any one Critter for free."
+  },
+  {
+   "role": "fair_grounds",
+   "new_name": "Midsummer Green",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 1,
+    "resin": 2,
+    "pebble": 1
+   },
+   "base_points": 3,
+   "linked": "fool",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "draw",
+      "n": 2
+     }
+    ]
+   },
+   "new_text": "Draw 2 cards."
+  },
+  {
+   "role": "farm",
+   "new_name": "Bramble Allotment",
+   "copies": 8,
+   "type": "production",
+   "color": "green",
+   "kind": "construction",
+   "unique": false,
+   "cost": {
+    "twig": 2,
+    "resin": 1
+   },
+   "base_points": 1,
+   "linked": null,
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "gain",
+      "res": {
+       "berry": 1
+      }
+     }
+    ]
+   },
+   "new_text": "Gain 1 berry."
+  },
+  {
+   "role": "general_store",
+   "new_name": "Cranny Market",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "construction",
+   "unique": false,
+   "cost": {
+    "resin": 1,
+    "pebble": 1
+   },
+   "base_points": 1,
+   "linked": "shopkeeper",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "gain",
+      "res": {
+       "berry": 1
+      }
+     },
+     {
+      "op": "gain",
+      "res": {
+       "berry": 1
+      },
+      "condition": "you have at least 1 Farm (flat +1, not per Farm)"
+     }
+    ]
+   },
+   "new_text": "Gain 1 berry, or 2 berries if you own any Allotment."
+  },
+  {
+   "role": "inn",
+   "new_name": "Lantern Rest",
+   "copies": 3,
+   "type": "destination",
+   "color": "red",
+   "kind": "construction",
+   "unique": false,
+   "cost": {
+    "twig": 2,
+    "resin": 1
+   },
+   "base_points": 2,
+   "linked": "innkeeper",
+   "spec": {
+    "timing": "visit",
+    "visitable_by": "owner and opponents",
+    "owner_gains_when_visited_by_opponent": {
+     "point_tokens": 1
+    },
+    "ops": [
+     {
+      "op": "play_from_meadow",
+      "filter": "critter or construction",
+      "discount_any": 3
+     }
+    ],
+    "exclusive_with_other_card_playing_abilities": true
+   },
+   "new_text": "Send a worker to play a meadow card for 3 fewer resources. Rivals may visit too and pay you 1 point."
+  },
+  {
+   "role": "lookout",
+   "new_name": "Spyglass Perch",
+   "copies": 2,
+   "type": "destination",
+   "color": "red",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 1,
+    "resin": 1,
+    "pebble": 1
+   },
+   "base_points": 2,
+   "linked": "wanderer",
+   "spec": {
+    "timing": "visit",
+    "visitable_by": "owner only",
+    "ops": [
+     {
+      "op": "copy_location",
+      "source": "any basic or forest location",
+      "ignore_occupancy": true,
+      "note": "even if one of your own workers is there"
+     }
+    ]
+   },
+   "new_text": "Copy any one basic or forest spot, even if it is occupied."
+  },
+  {
+   "role": "mine",
+   "new_name": "Flintpit",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "construction",
+   "unique": false,
+   "cost": {
+    "twig": 1,
+    "resin": 1,
+    "pebble": 1
+   },
+   "base_points": 2,
+   "linked": "miner_mole",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "gain",
+      "res": {
+       "pebble": 1
+      }
+     }
+    ]
+   },
+   "new_text": "Gain 1 pebble."
+  },
+  {
+   "role": "monastery",
+   "new_name": "Quietstone Cloister",
+   "copies": 2,
+   "type": "destination",
+   "color": "red",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 1,
+    "resin": 1,
+    "pebble": 1
+   },
+   "base_points": 1,
+   "linked": "monk",
+   "spec": {
+    "timing": "visit",
+    "visitable_by": "owner only",
+    "slots": {
+     "base": 1,
+     "second_unlocked_by": "monk"
+    },
+    "ops": [
+     {
+      "op": "give_any_to_opponent",
+      "n": 2
+     },
+     {
+      "op": "point_tokens",
+      "n": 4
+     },
+     {
+      "op": "worker_stays_permanently"
+     }
+    ]
+   },
+   "new_text": "A worker settles here forever: give 2 resources to a rival and take 4 point tokens."
+  },
+  {
+   "role": "palace",
+   "new_name": "Gildenfern Court",
+   "copies": 2,
+   "type": "prosperity",
+   "color": "purple",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 2,
+    "resin": 3,
+    "pebble": 3
+   },
+   "base_points": 4,
+   "linked": "queen",
+   "spec": {
+    "timing": "end_game",
+    "ops": [
+     {
+      "op": "bonus_points",
+      "per": "Unique Construction in your city, including this one",
+      "each": 1
+     }
+    ]
+   },
+   "new_text": "End of game: 1 point per unique construction, itself included."
+  },
+  {
+   "role": "post_office",
+   "new_name": "Dovecote Depot",
+   "copies": 3,
+   "type": "destination",
+   "color": "red",
+   "kind": "construction",
+   "unique": false,
+   "cost": {
+    "twig": 1,
+    "resin": 2
+   },
+   "base_points": 2,
+   "linked": "postal_pigeon",
+   "spec": {
+    "timing": "visit",
+    "visitable_by": "owner and opponents",
+    "owner_gains_when_visited_by_opponent": {
+     "point_tokens": 1
+    },
+    "needs": "at least 2 cards in hand",
+    "ops": [
+     {
+      "op": "give_cards_to_opponent",
+      "n": 2
+     },
+     {
+      "op": "discard_any_from_hand"
+     },
+     {
+      "op": "draw_up_to_hand_limit"
+     }
+    ],
+    "solo": "may visit Old Grimbeard Post Office; Old Grimbeard gains 1 point token"
+   },
+   "new_text": "Give a rival 2 cards, discard any others you like, then refill your hand from the deck. Visitors pay you 1 point."
+  },
+  {
+   "role": "resin_refinery",
+   "new_name": "Amber Still",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "construction",
+   "unique": false,
+   "cost": {
+    "resin": 1,
+    "pebble": 1
+   },
+   "base_points": 1,
+   "linked": "chip_sweep",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "gain",
+      "res": {
+       "resin": 1
+      }
+     }
+    ]
+   },
+   "new_text": "Gain 1 resin."
+  },
+  {
+   "role": "ruins",
+   "new_name": "Toppled Hall",
+   "copies": 3,
+   "type": "traveler",
+   "color": "tan",
+   "kind": "construction",
+   "unique": false,
+   "cost": {},
+   "base_points": 0,
+   "linked": "peddler",
+   "spec": {
+    "timing": [
+     "on_play"
+    ],
+    "ops": [
+     {
+      "op": "replace_construction_in_city",
+      "discard": "1 Construction of yours; this card takes its space (works in a full city)"
+     },
+     {
+      "op": "refund_exact_cost_of_discarded"
+     },
+     {
+      "op": "draw",
+      "n": 2
+     }
+    ],
+    "cost_note": "Free card; needs a Construction to replace.",
+    "worker_note": "Workers permanently on a replaced card are lost; a normal worker moves to this card."
+   },
+   "new_text": "Raze one of your constructions, build here in its place, regain its exact cost, and draw 2 cards."
+  },
+  {
+   "role": "school",
+   "new_name": "Acorn Academy",
+   "copies": 2,
+   "type": "prosperity",
+   "color": "purple",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 2,
+    "resin": 2
+   },
+   "base_points": 2,
+   "linked": "teacher",
+   "spec": {
+    "timing": "end_game",
+    "ops": [
+     {
+      "op": "bonus_points",
+      "per": "Common Critter in your city",
+      "each": 1
+     }
+    ]
+   },
+   "new_text": "End of game: 1 point per common critter."
+  },
+  {
+   "role": "storehouse",
+   "new_name": "Hoard Cellar",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "construction",
+   "unique": false,
+   "cost": {
+    "twig": 1,
+    "resin": 1,
+    "pebble": 1
+   },
+   "base_points": 2,
+   "linked": "woodcarver",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "stock_card_from_supply",
+      "choose_one": [
+       {
+        "twig": 3
+       },
+       {
+        "resin": 2
+       },
+       {
+        "pebble": 1
+       },
+       {
+        "berry": 2
+       }
+      ]
+     }
+    ],
+    "visit": {
+     "visitable_by": "owner only",
+     "op": "take all resources stored on this card"
+    },
+    "note": "Cannot be copied by Echo Mole; stored resources do not count for Architect."
+   },
+   "new_text": "Each production adds a stack (3 twigs, 2 resin, 1 pebble or 2 berries) to this card; send a worker to haul it all away."
+  },
+  {
+   "role": "theater",
+   "new_name": "Glowworm Playhouse",
+   "copies": 2,
+   "type": "prosperity",
+   "color": "purple",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "twig": 3,
+    "resin": 1,
+    "pebble": 1
+   },
+   "base_points": 3,
+   "linked": "bard",
+   "spec": {
+    "timing": "end_game",
+    "ops": [
+     {
+      "op": "bonus_points",
+      "per": "Unique Critter in your city",
+      "each": 1
+     }
+    ]
+   },
+   "new_text": "End of game: 1 point per unique critter."
+  },
+  {
+   "role": "twig_barge",
+   "new_name": "Kindling Raft",
+   "copies": 3,
+   "type": "production",
+   "color": "green",
+   "kind": "construction",
+   "unique": false,
+   "cost": {
+    "twig": 1,
+    "pebble": 1
+   },
+   "base_points": 1,
+   "linked": "barge_toad",
+   "spec": {
+    "timing": [
+     "on_play",
+     "production"
+    ],
+    "ops": [
+     {
+      "op": "gain",
+      "res": {
+       "twig": 2
+      }
+     }
+    ]
+   },
+   "new_text": "Gain 2 twigs."
+  },
+  {
+   "role": "university",
+   "new_name": "Lorewood College",
+   "copies": 2,
+   "type": "destination",
+   "color": "red",
+   "kind": "construction",
+   "unique": true,
+   "cost": {
+    "resin": 1,
+    "pebble": 2
+   },
+   "base_points": 3,
+   "linked": "doctor",
+   "spec": {
+    "timing": "visit",
+    "visitable_by": "owner only",
+    "ops": [
+     {
+      "op": "discard_from_city",
+      "what": "1 Critter or Construction"
+     },
+     {
+      "op": "refund_exact_cost_of_discarded"
+     },
+     {
+      "op": "gain_any",
+      "n": 1
+     },
+     {
+      "op": "point_tokens",
+      "n": 1
+     }
+    ],
+    "worker_note": "If the discarded card held permanent workers, they move here permanently."
+   },
+   "new_text": "Disband one of your cards, regain its exact cost, plus any 1 resource and 1 point."
+  }
+ ],
+ "forest_locations": [
+  {
+   "role": "forest_two_berry_one_card",
+   "new_name": "Berry Thicket",
+   "effect": {
+    "gain": {
+     "berry": 2
+    },
+    "draw": 1
+   },
+   "new_text": "Gain 2 berries and draw 1 card.",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  },
+  {
+   "role": "forest_two_any",
+   "new_name": "Foragers Crossing",
+   "effect": {
+    "gain_any": 2
+   },
+   "new_text": "Gain any 2 resources (twig/resin/pebble/berry, mix allowed).",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  },
+  {
+   "role": "forest_discard_any_draw_two_each",
+   "new_name": "Rummage Hollow",
+   "effect": {
+    "discard_any_from_hand": true,
+    "draw_per_discarded": 2,
+    "hand_limit_applies": true
+   },
+   "new_text": "Discard any number of cards, then draw 2 for each one discarded (limit 8).",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  },
+  {
+   "role": "forest_copy_basic_plus_card",
+   "new_name": "Echoing Meadow",
+   "effect": {
+    "copy_basic_location": true,
+    "draw": 1,
+    "note": "ASSUMPTION: ignores occupancy like the Lookout card (only the basic locations in play, i.e. all 8)."
+   },
+   "new_text": "Repeat any one basic location and also draw 1 card.",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  },
+  {
+   "role": "forest_pebble_three_cards",
+   "new_name": "Quarry Burrow",
+   "effect": {
+    "gain": {
+     "pebble": 1
+    },
+    "draw": 3
+   },
+   "new_text": "Gain 1 pebble and draw 3 cards.",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  },
+  {
+   "role": "forest_twig_resin_berry",
+   "new_name": "Mixed Glade",
+   "effect": {
+    "gain": {
+     "twig": 1,
+     "resin": 1,
+     "berry": 1
+    }
+   },
+   "new_text": "Gain 1 twig, 1 resin and 1 berry.",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  },
+  {
+   "role": "forest_three_berries",
+   "new_name": "Bumper Bramble",
+   "effect": {
+    "gain": {
+     "berry": 3
+    }
+   },
+   "new_text": "Gain 3 berries.",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  },
+  {
+   "role": "forest_two_resin_one_twig",
+   "new_name": "Sapwell Copse",
+   "effect": {
+    "gain": {
+     "resin": 2,
+     "twig": 1
+    }
+   },
+   "new_text": "Gain 2 resin and 1 twig.",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  },
+  {
+   "role": "forest_two_cards_one_any",
+   "new_name": "Postbag Clearing",
+   "effect": {
+    "draw": 2,
+    "gain_any": 1
+   },
+   "new_text": "Draw 2 cards and gain any 1 resource.",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  },
+  {
+   "role": "forest_discard_up_to_three_gain_any_each",
+   "new_name": "Barter Stump",
+   "effect": {
+    "discard_from_hand_max": 3,
+    "gain_any_per_discarded": 1
+   },
+   "new_text": "Discard up to 3 cards; gain 1 resource of your choice for each.",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  },
+  {
+   "role": "forest_meadow_two_play_one_discounted",
+   "new_name": "Meadow Bazaar",
+   "effect": {
+    "draw_from_meadow": 2,
+    "then_may_play_one_of_those_drawn": true,
+    "discount_any": 1,
+    "optional": true,
+    "counts_as_card_playing_ability": true,
+    "hand_limit_applies_to_draw": true
+   },
+   "new_text": "Take 2 meadow cards; you may immediately play one of them for 1 fewer resource.",
+   "exclusive": true,
+   "shared": false,
+   "worker_slots_2p_3p": 1,
+   "worker_slots_4p": 2,
+   "usable_in_2p": true,
+   "note": "ASSUMPTION (2 sources agree): all 11 are exclusive, any can be drawn at any player count; 2p/3p use only first slot, 4p opens a second slot (two different players, never twice the same player)."
+  }
+ ],
+ "basic_events": [
+  {
+   "role": "basic_event_four_production",
+   "new_name": "Harvest Gathering",
+   "requires": {
+    "production": 4
+   },
+   "points": 3
+  },
+  {
+   "role": "basic_event_three_destination",
+   "new_name": "Wayfarers' Fair",
+   "requires": {
+    "destination": 3
+   },
+   "points": 3
+  },
+  {
+   "role": "basic_event_three_governance",
+   "new_name": "Elders Council",
+   "requires": {
+    "governance": 3
+   },
+   "points": 3
+  },
+  {
+   "role": "basic_event_three_traveler",
+   "new_name": "Wanderers' Moot",
+   "requires": {
+    "traveler": 3
+   },
+   "points": 3
+  }
+ ],
+ "special_events": [
+  {
+   "role": "special_grand_market_scheme",
+   "new_name": "Grand Market Scheme",
+   "requires_cards": [
+    "shopkeeper",
+    "post_office"
+   ],
+   "base_points": 0,
+   "on_achieve": {
+    "give_to_opponents_resources_max": 3,
+    "point_tokens_per_resource_given": 2,
+    "tokens_immediate": true
+   },
+   "end_game_scoring": null,
+   "new_text": "Hand up to 3 resources to rivals and take 2 point tokens for each, immediately.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_hurry_scurry_dash",
+   "new_name": "Hurry-Scurry Dash",
+   "requires_cards": [
+    "chip_sweep",
+    "clock_tower"
+   ],
+   "base_points": 4,
+   "on_achieve": {
+    "recall_one_deployed_worker": true
+   },
+   "end_game_scoring": {
+    "flat": 4
+   },
+   "new_text": "Return one of your deployed workers to hand at once. Worth 4 points.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_night_of_sparklers",
+   "new_name": "Night of Sparklers",
+   "requires_cards": [
+    "lookout",
+    "miner_mole"
+   ],
+   "base_points": 0,
+   "on_achieve": {
+    "place_from_own_supply_on_event": {
+     "twig": 3,
+     "max": true
+    }
+   },
+   "end_game_scoring": {
+    "per_twig_on_event": 2
+   },
+   "new_text": "Stack up to 3 of your twigs here; each is worth 2 points at the end.",
+   "errata": "printed as Tower+Echo Mole in 1st printing; correct is Lookout+Echo Mole",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_lost_parchments_unearthed",
+   "new_name": "Lost Parchments Unearthed",
+   "requires_cards": [
+    "historian",
+    "ruins"
+   ],
+   "base_points": 0,
+   "on_achieve": {
+    "reveal_from_deck": 5,
+    "each_revealed": "draw to hand OR place face down beneath event",
+    "leftover": "ASSUMPTION: discard"
+   },
+   "end_game_scoring": {
+    "per_card_beneath": 1
+   },
+   "new_text": "Reveal 5 cards; keep any in hand or tuck any under this event (1 point each at the end).",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_acorn_bandits_seized",
+   "new_name": "Acorn Bandits Seized",
+   "requires_cards": [
+    "courthouse",
+    "ranger"
+   ],
+   "base_points": 0,
+   "on_achieve": {
+    "move_critters_from_city_beneath_event_max": 2
+   },
+   "end_game_scoring": {
+    "per_critter_beneath": 3
+   },
+   "new_text": "Tuck up to 2 Critters from your city under this event; each is worth 3 points.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_marsh_fever_remedy",
+   "new_name": "Marsh Fever Remedy",
+   "requires_cards": [
+    "undertaker",
+    "barge_toad"
+   ],
+   "base_points": 6,
+   "on_achieve": {
+    "pay": {
+     "berry": 2
+    },
+    "discard_cards_from_city": 2
+   },
+   "end_game_scoring": {
+    "flat": 6
+   },
+   "new_text": "Pay 2 berries and discard 2 cards from your city. Worth 6 points.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_wingborne_healers",
+   "new_name": "Wingborne Healers",
+   "requires_cards": [
+    "doctor",
+    "postal_pigeon"
+   ],
+   "base_points": 0,
+   "on_achieve": {},
+   "end_game_scoring": {
+    "per_husband_wife_pair_in_all_cities": 3
+   },
+   "new_text": "Worth 3 points for every Goodman Vole and Goodwife Vole pair in every city, yours and rivals.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_commencement_of_pupils",
+   "new_name": "Commencement of Pupils",
+   "requires_cards": [
+    "teacher",
+    "university"
+   ],
+   "base_points": 0,
+   "on_achieve": {
+    "move_critters_from_hand_beneath_event_max": 3
+   },
+   "end_game_scoring": {
+    "per_critter_beneath": 2
+   },
+   "new_text": "Tuck up to 3 Critters from your hand under this event; each is worth 2 points.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_counsel_for_scoundrels",
+   "new_name": "Counsel for Scoundrels",
+   "requires_cards": [
+    "monk",
+    "dungeon"
+   ],
+   "base_points": 0,
+   "on_achieve": {},
+   "end_game_scoring": {
+    "per_dungeon_prisoner": 3
+   },
+   "new_text": "Worth 3 points per prisoner in your Thornhold Cells at game end.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_pilgrims_trail",
+   "new_name": "Pilgrims Trail",
+   "requires_cards": [
+    "monastery",
+    "wanderer"
+   ],
+   "base_points": 0,
+   "on_achieve": {},
+   "end_game_scoring": {
+    "per_worker_in_monastery": 3
+   },
+   "new_text": "Worth 3 points per worker in your Quietstone Cloister at game end.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_resident_minstrel",
+   "new_name": "Resident Minstrel",
+   "requires_cards": [
+    "inn",
+    "bard"
+   ],
+   "base_points": 0,
+   "on_achieve": {
+    "place_from_own_supply_on_event": {
+     "berry": 3,
+     "max": true
+    }
+   },
+   "end_game_scoring": {
+    "per_berry_on_event": 2
+   },
+   "new_text": "Stack up to 3 of your berries here; each is worth 2 points.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_gilded_shrine_vault",
+   "new_name": "Gilded Shrine Vault",
+   "requires_cards": [
+    "woodcarver",
+    "chapel"
+   ],
+   "base_points": 0,
+   "on_achieve": {
+    "draw_cards": "1 per point token on your Chapel (hand limit applies)",
+    "gain_any": "1 per point token on your Chapel"
+   },
+   "end_game_scoring": {
+    "per_token_on_chapel": 2
+   },
+   "new_text": "Immediately draw 1 card and gain 1 resource per token on your Shrine; also 2 points per token at game end.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_vigil_of_remembrance",
+   "new_name": "Vigil of Remembrance",
+   "requires_cards": [
+    "cemetery",
+    "shepherd"
+   ],
+   "base_points": 0,
+   "on_achieve": {},
+   "end_game_scoring": {
+    "per_cemetery_worker": 3
+   },
+   "new_text": "Worth 3 points per worker buried in your Mossgrave Glade.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_toll_holiday",
+   "new_name": "Toll Holiday",
+   "requires_cards": [
+    "judge",
+    "queen"
+   ],
+   "base_points": 3,
+   "on_achieve": {
+    "activate_production": "all production cards in your city"
+   },
+   "end_game_scoring": {
+    "flat": 3
+   },
+   "new_text": "Run all your production cards now. Worth 3 points.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_grand_hollow_games",
+   "new_name": "Grand Hollow Games",
+   "requires_cards": [],
+   "base_points": 9,
+   "on_achieve": {},
+   "end_game_scoring": {
+    "flat": 9
+   },
+   "new_text": "Requires at least 2 cards of each of the five colors in your city. Worth 9 points.",
+   "requires_colors": {
+    "production": 2,
+    "traveler": 2,
+    "governance": 2,
+    "prosperity": 2,
+    "destination": 2
+   },
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  },
+  {
+   "role": "special_change_of_proprietors",
+   "new_name": "Change of Proprietors",
+   "requires_cards": [
+    "peddler",
+    "general_store"
+   ],
+   "base_points": 0,
+   "on_achieve": {
+    "place_from_own_supply_on_event": "up to 3 resources of any kind"
+   },
+   "end_game_scoring": {
+    "per_resource_on_event": {
+     "berry": 1,
+     "twig": 1,
+     "resin": 2,
+     "pebble": 2
+    }
+   },
+   "new_text": "Stack up to 3 of your resources here; berry/twig = 1 point, resin/pebble = 2 points each at the end.",
+   "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
+  }
+ ],
+ "locations": {
+  "basic": [
+   {
+    "role": "basic_one_berry",
+    "gain": {
+     "berry": 1
+    },
+    "shared": true
+   },
+   {
+    "role": "basic_one_berry_one_card",
+    "gain": {
+     "berry": 1,
+     "draw": 1
+    },
+    "shared": false
+   },
+   {
+    "role": "basic_one_resin_one_card",
+    "gain": {
+     "resin": 1,
+     "draw": 1
+    },
+    "shared": true
+   },
+   {
+    "role": "basic_one_pebble",
+    "gain": {
+     "pebble": 1
+    },
+    "shared": false
+   },
+   {
+    "role": "basic_three_twigs",
+    "gain": {
+     "twig": 3
+    },
+    "shared": false
+   },
+   {
+    "role": "basic_two_cards_one_point",
+    "gain": {
+     "draw": 2,
+     "point_tokens": 1
+    },
+    "shared": true
+   },
+   {
+    "role": "basic_two_resin",
+    "gain": {
+     "resin": 2
+    },
+    "shared": false
+   },
+   {
+    "role": "basic_two_twigs_one_card",
+    "gain": {
+     "twig": 2,
+     "draw": 1
+    },
+    "shared": true
+   }
+  ],
+  "haven": {
+   "shared": true,
+   "op": "discard any number of cards from hand; gain 1 any resource per 2 discarded"
+  },
+  "journey": [
+   {
+    "points": 5,
+    "discard": 5,
+    "shared": false
+   },
+   {
+    "points": 4,
+    "discard": 4,
+    "shared": false
+   },
+   {
+    "points": 3,
+    "discard": 3,
+    "shared": false
+   },
+   {
+    "points": 2,
+    "discard": 2,
+    "shared": true
+   }
+  ],
+  "journey_rules": "Autumn only; discard cards equal to the spot value; worker stays there for the rest of the game and scores its value at the end."
+ },
+ "components": {
+  "workers_total": 24,
+  "workers_per_player": 6,
+  "resources": {
+   "berry": 30,
+   "twig": 30,
+   "resin": 25,
+   "pebble": 20
+  },
+  "point_tokens": {
+   "1pt": 20,
+   "3pt": 10
+  },
+  "occupied_tokens": 20,
+  "basic_event_tiles": 4,
+  "special_event_cards": 16,
+  "forest_cards": 11,
+  "deck_cards": 128,
+  "die": "1 eight-sided die (solo)",
+  "other": [
+   "1 game board",
+   "1 Elderheart Oak piece",
+   "1 victory (scoring) card"
+  ]
+ }
+}

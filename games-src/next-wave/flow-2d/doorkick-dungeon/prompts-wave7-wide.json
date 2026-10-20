@@ -1,0 +1,57 @@
+{
+ "cards": {
+  "table-flooded-cellar": "a wide painted tavern cellar tabletop seen from above: wet flagstones, barrels and puddles with torch reflections, calm empty space in the middle for cards, no text, letters or numbers",
+  "table-bone-crypt": "a wide painted crypt tabletop seen from above: cracked stone floor, scattered bones and cobwebs, cold green candlelight, calm empty space in the middle for cards, no text, letters or numbers",
+  "table-dragon-hoard": "a wide painted dragon hoard tabletop seen from above: mountains of gold coins and gems with a giant claw print, warm gold light, calm empty space in the middle for cards, no text, letters or numbers"
+ },
+ "style": "Hand-painted medieval storybook gouache illustration for a rowdy dungeon-door card game, warm torchlight, chunky readable shapes, slightly wobbly dark ink outline, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "table-flooded-cellar": {
+   "element": "Painting: table-flooded-cellar",
+   "why": "three tables for the whole run",
+   "pri": 1,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-flooded-cellar.png",
+   "target": "games/doorkick-dungeon/media/table-flooded-cellar.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "table-bone-crypt": {
+   "element": "Painting: table-bone-crypt",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-bone-crypt.png",
+   "target": "games/doorkick-dungeon/media/table-bone-crypt.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "table-dragon-hoard": {
+   "element": "Painting: table-dragon-hoard",
+   "why": "final chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-dragon-hoard.png",
+   "target": "games/doorkick-dungeon/media/table-dragon-hoard.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

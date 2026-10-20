@@ -1,0 +1,12 @@
+job 60 2p  win 6/10  turns 21  2.9s  3x the fuse burnt down; 1x X pointed at a red wire
+job 60 3p  win 3/10  turns 16  3.6s  6x the fuse burnt down; 1x X pointed at a red wire
+SLOW 60/4 1 8232 ms turns 29 act
+SLOW 60/4 3 8387 ms turns 28 act
+job 60 4p  win 6/10  turns 21  5.8s  2x X pointed at a red wire; 2x the fuse burnt down
+SLOW 60/5 0 9951 ms turns 24 act
+SLOW 60/5 1 9557 ms turns 28 start
+SLOW 60/5 3 8103 ms turns 19 act
+SLOW 60/5 6 8526 ms turns 30 act
+job 60 5p  win 3/10  turns 19  7.1s  4x X pointed at a red wire; 3x the fuse burnt down
+TOTAL games 40 wins 18 (45%) errors 0 stalls 0 invariant-fails 0 time 194s level hard
+loss reasons {"the fuse burnt down":14,"X pointed at a red wire":8}

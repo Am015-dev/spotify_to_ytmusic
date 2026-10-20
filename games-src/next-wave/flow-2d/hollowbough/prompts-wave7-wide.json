@@ -1,0 +1,41 @@
+{
+ "cards": {
+  "table-autumn-hollow": "a wide painted tabletop seen from above: an autumn woodland floor with fallen leaves, acorns and moss, calm empty space in the middle for a game board, no text, letters or numbers",
+  "table-summer-brook": "a wide painted tabletop seen from above: a sunny woodland brook bank with ferns and pebbles, calm empty space in the middle for a game board, no text, letters or numbers"
+ },
+ "style": "Hand-painted woodland gouache illustration for a cosy forest-critter game, warm autumn earth colours, soft rim light, matte paper texture, no text",
+ "notes": "Painted variety. Ratio and size are in meta; paint at 1024 px or larger on the long side, we crop and convert. Tables and boards: calm empty middle for the game. Style block: the one in \"style\". Items with meta.bg set are cut-outs on a flat chroma colour for cutout.py.",
+ "wave": "Wave 7",
+ "meta": {
+  "table-autumn-hollow": {
+   "element": "Painting: table-autumn-hollow",
+   "why": "three tables for ten chapters",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-autumn-hollow.png",
+   "target": "games/hollowbough/media/table-autumn-hollow.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  },
+  "table-summer-brook": {
+   "element": "Painting: table-summer-brook",
+   "why": "chapter table",
+   "pri": 2,
+   "ref": "",
+   "thumb": "",
+   "bg": "",
+   "align": "",
+   "save_as": "table-summer-brook.png",
+   "target": "games/hollowbough/media/table-summer-brook.webp",
+   "size": "1920x1080",
+   "ratio": "16:9",
+   "tag": "art",
+   "wave": "Wave 7"
+  }
+ }
+}

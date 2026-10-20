@@ -1,0 +1,1334 @@
+{
+  "game": "sands",
+  "title": "The Empty Throne of Qamar",
+  "version": 1,
+  "cast": {
+    "hadiya": {
+      "name": "Old Hadiya",
+      "portrait": "camp-hadiya.webp",
+      "emoji": "🧓",
+      "color": "#b0702a"
+    },
+    "you": {
+      "name": "You",
+      "portrait": "camp-you.webp",
+      "emoji": "🐪",
+      "color": "#2b2b2b"
+    },
+    "farid": {
+      "name": "Farid the Water-Boy",
+      "portrait": "camp-farid.webp",
+      "emoji": "🧒",
+      "color": "#4f8fbf"
+    },
+    "layla": {
+      "name": "Layla Coin-Counter",
+      "portrait": "camp-layla.webp",
+      "emoji": "🪙",
+      "color": "#c9a227"
+    },
+    "yusra": {
+      "name": "Yusra of the Copper Scales",
+      "portrait": "camp-yusra.webp",
+      "emoji": "⚖️",
+      "color": "#b5532c"
+    },
+    "tahir": {
+      "name": "Master Tahir",
+      "portrait": "camp-tahir.webp",
+      "emoji": "🔨",
+      "color": "#7a4fa0"
+    },
+    "sabah": {
+      "name": "Sabah the Silk-Seller",
+      "portrait": "camp-sabah.webp",
+      "emoji": "🧣",
+      "color": "#c2457a"
+    },
+    "marwan": {
+      "name": "Grand Advisor Marwan",
+      "portrait": "camp-marwan.webp",
+      "emoji": "📜",
+      "color": "#2f5f8f"
+    },
+    "zubaida": {
+      "name": "Zubaida of the Lamp",
+      "portrait": "camp-zubaida.webp",
+      "emoji": "🪔",
+      "color": "#d08a1e"
+    },
+    "qays": {
+      "name": "Qays and Kamil",
+      "portrait": "camp-qays.webp",
+      "emoji": "👬",
+      "color": "#4c7a3a"
+    },
+    "nimr": {
+      "name": "Nimr of the Night Roads",
+      "portrait": "camp-nimr.webp",
+      "emoji": "🗡️",
+      "color": "#3a3a52"
+    },
+    "qadira": {
+      "name": "Qadira the Uncrowned",
+      "portrait": "camp-qadira.webp",
+      "emoji": "👑",
+      "color": "#6a2c70"
+    }
+  },
+  "acts": [
+    {
+      "act": 1,
+      "title": "The Empty Throne",
+      "blurb": "The old Sultan is dead. Learn to lead the tribes across the sands."
+    },
+    {
+      "act": 2,
+      "title": "The Bazaar Wars",
+      "blurb": "Crafters, cutpurses and wonder cities: the sultanate grows crowded."
+    },
+    {
+      "act": 3,
+      "title": "Night of the Djinns",
+      "blurb": "The strongest claimants play to win. Only one will take the throne."
+    }
+  ],
+  "twists": [
+    {
+      "id": "head-start",
+      "where": "setup",
+      "how": "Right after newGame(), add param coins to the human seat: G.pl[0].coins += param (a gift, shown on the card as 'Gift: ...')."
+    },
+    {
+      "id": "boss-purse",
+      "where": "setup",
+      "how": "Right after newGame(), add param coins to the boss seat: G.pl[bossSeat].coins += param."
+    },
+    {
+      "id": "boss-goods",
+      "where": "setup",
+      "how": "Right after newGame(), shift param cards off G.rdeck into the boss seat (a 'fakir' card does p.fk++, any other card is pushed to p.res), then call refillMarket()."
+    },
+    {
+      "id": "boss-djinn",
+      "where": "setup",
+      "how": "Right after newGame(), take the djinn key param out of G.djDeck (or out of G.djRow, then refillDjinns()) and push it to the boss seat's p.dj. If the twist has a coins field, the boss seat also gets that many coins."
+    },
+    {
+      "id": "short-road",
+      "where": "setup",
+      "how": "Right after newGame(), set every seat's p.camels = Math.max(4, p.camels - param), so the normal last-camel end trigger fires sooner."
+    },
+    {
+      "id": "boss-favour",
+      "where": "ai",
+      "how": "In ai.js evalOutcome(p,o), when p is the boss seat and o.c === param (a tribe key such as 'vizier' or 'assassin'), add 6 to v before returning."
+    }
+  ],
+  "chapters": [
+    {
+      "boss": false,
+      "twist": {
+        "id": "head-start",
+        "param": 25,
+        "text": "Gift: Old Hadiya lends you 25 extra coins to start, and coins are points."
+      },
+      "hints": true,
+      "id": "c1",
+      "act": 1,
+      "title": "The First Caravan",
+      "intro": [
+        {
+          "who": "hadiya",
+          "text": "The Sultan of Qamar is dead, and he named no heir. Every family is reaching for the throne."
+        },
+        {
+          "who": "hadiya",
+          "text": "Lift the people off one tile and walk them across the sands, one left on each tile you pass."
+        },
+        {
+          "who": "hadiya",
+          "text": "Where the last one stops, take that tribe. Empty the tile and your camel claims it."
+        },
+        {
+          "who": "farid",
+          "text": "I'm only here to carry the water! Go easy on me."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hadiya",
+          "text": "Every tile under your camels pays you points at the end. You have begun well."
+        },
+        {
+          "who": "farid",
+          "text": "I'll tell everyone at the well about you!"
+        }
+      ],
+      "opponent": {
+        "name": "Farid the Water-Boy",
+        "portrait": "camp-farid.webp",
+        "emoji": "🧒",
+        "cast": "farid",
+        "personality": "Cheerful and careless; moves whoever is closest and forgets to bid.",
+        "aiLevel": "easy",
+        "aiStyle": "balanced"
+      },
+      "setup": {
+        "np": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "lv": [
+          "normal",
+          "easy"
+        ],
+        "names": [
+          "You",
+          "Farid"
+        ],
+        "ex": {
+          "artisans": false,
+          "sultan": false,
+          "thieves": false,
+          "promos": false
+        }
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the game."
+      },
+      "stars": [
+        {
+          "text": "Win the game",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Claim 6 or more tiles with your camels",
+          "test": {
+            "k": "tiles",
+            "op": ">=",
+            "v": 6
+          }
+        },
+        {
+          "text": "Score 180 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 180
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": {
+          "id": "head-start",
+          "param": 70,
+          "text": "Gift: Old Hadiya lends you 70 extra coins to start."
+        },
+        "setup": {},
+        "maxStars": 2,
+        "text": "Hadiya lends you even more coins."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "farid",
+          "text": "Farid's portrait"
+        },
+        {
+          "type": "chapter",
+          "id": "c2",
+          "text": "Chapter 2: The Price of Going First"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": null,
+      "hints": true,
+      "id": "c2",
+      "act": 1,
+      "title": "The Price of Going First",
+      "intro": [
+        {
+          "who": "hadiya",
+          "text": "Before each round you bid for your place in line. Going first costs coins."
+        },
+        {
+          "who": "hadiya",
+          "text": "Every coin you keep is a point at the end. Pay only when the best tile is worth it."
+        },
+        {
+          "who": "layla",
+          "text": "I count every coin twice. Let us see who still has a purse when the camels stop."
+        }
+      ],
+      "outro": [
+        {
+          "who": "layla",
+          "text": "You spent less and earned more. I will be watching your purse."
+        },
+        {
+          "who": "hadiya",
+          "text": "A cheap spot in line is often the wisest one."
+        }
+      ],
+      "opponent": {
+        "name": "Layla Coin-Counter",
+        "portrait": "camp-layla.webp",
+        "emoji": "🪙",
+        "cast": "layla",
+        "personality": "Thrifty to a fault; almost never pays for the front of the line.",
+        "aiLevel": "easy",
+        "aiStyle": "balanced"
+      },
+      "setup": {
+        "np": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "lv": [
+          "normal",
+          "easy"
+        ],
+        "names": [
+          "You",
+          "Layla"
+        ],
+        "ex": {
+          "artisans": false,
+          "sultan": false,
+          "thieves": false,
+          "promos": false
+        }
+      },
+      "goal": {
+        "type": "custom",
+        "value": 40,
+        "test": {
+          "k": "coins",
+          "op": ">=",
+          "v": 40
+        },
+        "text": "Win with at least 40 coins left in your purse."
+      },
+      "stars": [
+        {
+          "text": "Win with at least 40 coins left",
+          "test": {
+            "k": "goal"
+          }
+        },
+        {
+          "text": "End with 60 coins or more",
+          "test": {
+            "k": "coins",
+            "op": ">=",
+            "v": 60
+          }
+        },
+        {
+          "text": "Score 190 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 190
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": {
+          "id": "head-start",
+          "param": 20,
+          "text": "Gift: you start with 20 extra coins."
+        },
+        "setup": {},
+        "maxStars": 2,
+        "text": "You start with 20 extra coins."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "layla",
+          "text": "Layla's portrait"
+        },
+        {
+          "type": "title",
+          "id": "thrifty",
+          "text": "Title: The Thrifty"
+        }
+      ]
+    },
+    {
+      "boss": true,
+      "twist": {
+        "id": "boss-goods",
+        "param": 2,
+        "text": "Boss rule: Yusra starts with 2 goods cards already in her stall."
+      },
+      "hints": true,
+      "id": "c3",
+      "act": 1,
+      "title": "The Copper Scales",
+      "intro": [
+        {
+          "who": "hadiya",
+          "text": "Yusra rules the old bazaar. She buys goods cheap and sells sets dear."
+        },
+        {
+          "who": "hadiya",
+          "text": "Traders bring you goods cards. A set of different kinds scores far more than doubles."
+        },
+        {
+          "who": "yusra",
+          "text": "Silk, spice and ivory: I have them all. What will you bring, little claimant?"
+        }
+      ],
+      "outro": [
+        {
+          "who": "yusra",
+          "text": "Hmph. A fine set. The bazaar will speak your name."
+        },
+        {
+          "who": "hadiya",
+          "text": "The first great family bows. Word is spreading across Qamar."
+        }
+      ],
+      "opponent": {
+        "name": "Yusra of the Copper Scales",
+        "portrait": "camp-yusra.webp",
+        "emoji": "⚖️",
+        "cast": "yusra",
+        "personality": "Shrewd and greedy for goods; always takes the Traders when she can.",
+        "aiLevel": "easy",
+        "aiStyle": "balanced",
+        "taunt": "Your sets were thin. Come back when you know the market.",
+        "praise": "You read the market better than I did. Take my scales."
+      },
+      "setup": {
+        "np": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "lv": [
+          "normal",
+          "easy"
+        ],
+        "names": [
+          "You",
+          "Yusra"
+        ],
+        "ex": {
+          "artisans": false,
+          "sultan": false,
+          "thieves": false,
+          "promos": false
+        }
+      },
+      "goal": {
+        "type": "custom",
+        "value": 30,
+        "test": {
+          "k": "goods",
+          "op": ">=",
+          "v": 30
+        },
+        "text": "Win with at least 30 points from goods sets."
+      },
+      "stars": [
+        {
+          "text": "Win with 30+ points from goods",
+          "test": {
+            "k": "goal"
+          }
+        },
+        {
+          "text": "Score 50+ points from goods",
+          "test": {
+            "k": "goods",
+            "op": ">=",
+            "v": 50
+          }
+        },
+        {
+          "text": "Win by 20 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 20
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Yusra starts with no extra goods."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "yusra",
+          "text": "Yusra's portrait"
+        },
+        {
+          "type": "act",
+          "id": "2",
+          "text": "Act 2: The Bazaar Wars"
+        },
+        {
+          "type": "cardback",
+          "id": "copper",
+          "text": "Copper-scale card back"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": null,
+      "hints": false,
+      "id": "c4",
+      "act": 2,
+      "title": "The Crafters' Quarter",
+      "intro": [
+        {
+          "who": "hadiya",
+          "text": "Purple-robed Crafters have come from the mountains with workshops and fine items."
+        },
+        {
+          "who": "tahir",
+          "text": "Keep my Crafters and they score. Keep the most, and they score more."
+        },
+        {
+          "who": "hadiya",
+          "text": "Shrines still summon djinns: two Sages, or a Sage and a Mystic. Try it."
+        }
+      ],
+      "outro": [
+        {
+          "who": "tahir",
+          "text": "My workshops are yours to use. Spend your items wisely."
+        },
+        {
+          "who": "hadiya",
+          "text": "Djinns remember who called them. They will remember you."
+        }
+      ],
+      "opponent": {
+        "name": "Master Tahir",
+        "portrait": "camp-tahir.webp",
+        "emoji": "🔨",
+        "cast": "tahir",
+        "personality": "Patient and steady; plays the full plan every turn.",
+        "aiLevel": "normal",
+        "aiStyle": "balanced"
+      },
+      "setup": {
+        "np": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "lv": [
+          "normal",
+          "normal"
+        ],
+        "names": [
+          "You",
+          "Tahir"
+        ],
+        "ex": {
+          "artisans": true,
+          "sultan": false,
+          "thieves": false,
+          "promos": false
+        }
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the game with the Crafters in play."
+      },
+      "stars": [
+        {
+          "text": "Win the game",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Own 3 or more djinns",
+          "test": {
+            "k": "djinns",
+            "op": ">=",
+            "v": 3
+          }
+        },
+        {
+          "text": "Score 210 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 210
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Tahir plays gently."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "tahir",
+          "text": "Tahir's portrait"
+        },
+        {
+          "type": "table",
+          "id": "workshop",
+          "text": "Workshop table skin"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": {
+        "id": "head-start",
+        "param": 10,
+        "text": "Gift: Old Hadiya lends you 10 extra coins against two rivals."
+      },
+      "hints": false,
+      "id": "c5",
+      "act": 2,
+      "title": "Cutpurses in the Souk",
+      "intro": [
+        {
+          "who": "hadiya",
+          "text": "Three claimants now, and cutpurses for hire at the Shrines."
+        },
+        {
+          "who": "sabah",
+          "text": "My silk buys loyalty, and my purse is deep. Nimr and I will squeeze you out."
+        },
+        {
+          "who": "hadiya",
+          "text": "With three at the table, Advisors are a race: 10 points for each rival with fewer."
+        }
+      ],
+      "outro": [
+        {
+          "who": "sabah",
+          "text": "You outbid me with half my coins. How?"
+        },
+        {
+          "who": "hadiya",
+          "text": "Two rivals beaten at once. The souk is yours."
+        }
+      ],
+      "opponent": {
+        "name": "Sabah the Silk-Seller",
+        "portrait": "camp-sabah.webp",
+        "emoji": "🧣",
+        "cast": "sabah",
+        "personality": "Flashy and rich; spends freely to go first and hires every cutpurse she can.",
+        "aiLevel": "normal",
+        "aiStyle": "balanced"
+      },
+      "setup": {
+        "np": 3,
+        "seats": [
+          "human",
+          "ai",
+          "ai"
+        ],
+        "lv": [
+          "normal",
+          "normal",
+          "normal"
+        ],
+        "names": [
+          "You",
+          "Sabah",
+          "Nimr"
+        ],
+        "ex": {
+          "artisans": false,
+          "sultan": false,
+          "thieves": true,
+          "promos": false
+        }
+      },
+      "goal": {
+        "type": "score",
+        "value": 140,
+        "text": "Win with at least 140 points."
+      },
+      "stars": [
+        {
+          "text": "Win with 140+ points",
+          "test": {
+            "k": "goal"
+          }
+        },
+        {
+          "text": "Collect 5 or more Advisors",
+          "test": {
+            "k": "advisors",
+            "op": ">=",
+            "v": 5
+          }
+        },
+        {
+          "text": "Win by 15 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 15
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Both rivals play gently and Sabah has no extra coins."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "sabah",
+          "text": "Sabah's portrait"
+        },
+        {
+          "type": "title",
+          "id": "souk",
+          "text": "Title: Terror of the Souk"
+        }
+      ]
+    },
+    {
+      "boss": true,
+      "twist": {
+        "id": "boss-favour",
+        "param": "vizier",
+        "text": "Boss rule: Marwan values Advisors far more than other tribes."
+      },
+      "hints": false,
+      "id": "c6",
+      "act": 2,
+      "title": "The Patient Advisor",
+      "intro": [
+        {
+          "who": "hadiya",
+          "text": "Marwan served the old Sultan for forty years. Now he wants the throne himself."
+        },
+        {
+          "who": "hadiya",
+          "text": "Wonder Cities have risen from the sand. Each one you hold is worth more than the last."
+        },
+        {
+          "who": "marwan",
+          "text": "I collect Advisors as others collect coins. A court is won by whispers, not swords."
+        }
+      ],
+      "outro": [
+        {
+          "who": "marwan",
+          "text": "My court has gone quiet. Perhaps it was always yours."
+        },
+        {
+          "who": "hadiya",
+          "text": "The old court is broken. Only the strongest claimants remain."
+        }
+      ],
+      "opponent": {
+        "name": "Grand Advisor Marwan",
+        "portrait": "camp-marwan.webp",
+        "emoji": "📜",
+        "cast": "marwan",
+        "personality": "Calm and calculating; hoards Advisors to win the court race.",
+        "aiLevel": "normal",
+        "aiStyle": "balanced",
+        "taunt": "Forty years at court. Did you think you could hurry me?",
+        "praise": "Well played. The court will whisper your name now."
+      },
+      "setup": {
+        "np": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "lv": [
+          "normal",
+          "normal"
+        ],
+        "names": [
+          "You",
+          "Marwan"
+        ],
+        "ex": {
+          "artisans": false,
+          "sultan": true,
+          "thieves": false,
+          "promos": false
+        }
+      },
+      "goal": {
+        "type": "margin",
+        "value": 15,
+        "text": "Win by 15 points or more."
+      },
+      "stars": [
+        {
+          "text": "Win by 15 or more",
+          "test": {
+            "k": "goal"
+          }
+        },
+        {
+          "text": "Hold 2 or more Wonder Cities",
+          "test": {
+            "k": "cities",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Score 30+ points from palaces",
+          "test": {
+            "k": "palaces",
+            "op": ">=",
+            "v": 30
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Marwan plays gently and has no favourite tribe."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "marwan",
+          "text": "Marwan's portrait"
+        },
+        {
+          "type": "act",
+          "id": "3",
+          "text": "Act 3: Night of the Djinns"
+        },
+        {
+          "type": "table",
+          "id": "court",
+          "text": "Court table skin"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": {
+        "id": "head-start",
+        "param": 10,
+        "text": "Gift: Old Hadiya gives you 10 extra coins for the hard road ahead."
+      },
+      "hints": false,
+      "id": "c7",
+      "act": 3,
+      "title": "Djinn-Smoke",
+      "intro": [
+        {
+          "who": "hadiya",
+          "text": "The last claimants are no fools. From here on, every rival plays its best."
+        },
+        {
+          "who": "zubaida",
+          "text": "I keep three djinns in a lamp, and I can always find room for one more."
+        },
+        {
+          "who": "hadiya",
+          "text": "Take this purse, and summon djinns early. Their powers last the whole game."
+        }
+      ],
+      "outro": [
+        {
+          "who": "zubaida",
+          "text": "The smoke has cleared and your lamp is fuller than mine."
+        },
+        {
+          "who": "hadiya",
+          "text": "Two claimants left, then the last one."
+        }
+      ],
+      "opponent": {
+        "name": "Zubaida of the Lamp",
+        "portrait": "camp-zubaida.webp",
+        "emoji": "🪔",
+        "cast": "zubaida",
+        "personality": "Mysterious and greedy for djinns; heads for the Shrines every chance she gets.",
+        "aiLevel": "hard",
+        "aiStyle": "balanced"
+      },
+      "setup": {
+        "np": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "lv": [
+          "normal",
+          "hard"
+        ],
+        "names": [
+          "You",
+          "Zubaida"
+        ],
+        "ex": {
+          "artisans": false,
+          "sultan": false,
+          "thieves": false,
+          "promos": true
+        }
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the game."
+      },
+      "stars": [
+        {
+          "text": "Win the game",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Own 4 or more djinns",
+          "test": {
+            "k": "djinns",
+            "op": ">=",
+            "v": 4
+          }
+        },
+        {
+          "text": "Score 220 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 220
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": {
+          "id": "head-start",
+          "param": 30,
+          "text": "Gift: you start with 30 extra coins."
+        },
+        "setup": {},
+        "maxStars": 2,
+        "text": "Zubaida plays a little softer and your purse is bigger."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "zubaida",
+          "text": "Zubaida's portrait"
+        },
+        {
+          "type": "cardback",
+          "id": "lamp",
+          "text": "Lamp card back"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": {
+        "id": "head-start",
+        "param": 15,
+        "text": "Gift: Old Hadiya slips you 15 extra coins against the two brothers."
+      },
+      "hints": false,
+      "id": "c8",
+      "act": 3,
+      "title": "The Long Afternoon",
+      "intro": [
+        {
+          "who": "qays",
+          "text": "We are two brothers and one plan: whatever you want, one of us takes it first."
+        },
+        {
+          "who": "hadiya",
+          "text": "Every expansion is in play. Three seats, Crafters and cutpurses: the sands are crowded."
+        },
+        {
+          "who": "hadiya",
+          "text": "Don't wait for the perfect move. Place your camels before the brothers do."
+        }
+      ],
+      "outro": [
+        {
+          "who": "qays",
+          "text": "Two against one, and still we lost? Our mother will laugh."
+        },
+        {
+          "who": "hadiya",
+          "text": "One rival remains, and she is the worst of them."
+        }
+      ],
+      "opponent": {
+        "name": "Qays and Kamil",
+        "portrait": "camp-qays.webp",
+        "emoji": "👬",
+        "cast": "qays",
+        "personality": "Two cheeky brothers who play the same hard plan from two seats.",
+        "aiLevel": "hard",
+        "aiStyle": "balanced"
+      },
+      "setup": {
+        "np": 3,
+        "seats": [
+          "human",
+          "ai",
+          "ai"
+        ],
+        "lv": [
+          "normal",
+          "hard",
+          "hard"
+        ],
+        "names": [
+          "You",
+          "Qays",
+          "Kamil"
+        ],
+        "ex": {
+          "artisans": true,
+          "sultan": false,
+          "thieves": true,
+          "promos": false
+        }
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the game against both brothers."
+      },
+      "stars": [
+        {
+          "text": "Win against both brothers",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Finish before round 11",
+          "test": {
+            "k": "rounds",
+            "op": "<=",
+            "v": 10
+          }
+        },
+        {
+          "text": "Score 170 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 170
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "lv": [
+            "normal",
+            "normal",
+            "normal"
+          ]
+        },
+        "maxStars": 2,
+        "text": "The brothers play at normal strength."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "qays",
+          "text": "The brothers' portrait"
+        },
+        {
+          "type": "title",
+          "id": "crowded",
+          "text": "Title: Master of the Crowded Sands"
+        }
+      ]
+    },
+    {
+      "boss": false,
+      "twist": {
+        "id": "short-road",
+        "param": 3,
+        "text": "Night rule: every claimant starts with 3 fewer camels, so the game ends sooner."
+      },
+      "hints": false,
+      "id": "c9",
+      "act": 3,
+      "title": "The Night Roads",
+      "intro": [
+        {
+          "who": "nimr",
+          "text": "I am the shortest road to the throne. Few camels, fast feet, no mercy."
+        },
+        {
+          "who": "hadiya",
+          "text": "Tonight everyone travels light: 3 fewer camels each, so the game ends sooner."
+        },
+        {
+          "who": "hadiya",
+          "text": "Every claim counts double in a short game. Watch his Shadows."
+        }
+      ],
+      "outro": [
+        {
+          "who": "nimr",
+          "text": "You were faster in the dark than I was. I did not expect that."
+        },
+        {
+          "who": "hadiya",
+          "text": "Only Qadira stands between you and the throne."
+        }
+      ],
+      "opponent": {
+        "name": "Nimr of the Night Roads",
+        "portrait": "camp-nimr.webp",
+        "emoji": "🗡️",
+        "cast": "nimr",
+        "personality": "Quiet and ruthless; races to place his camels and end the game.",
+        "aiLevel": "hard",
+        "aiStyle": "balanced"
+      },
+      "setup": {
+        "np": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "lv": [
+          "normal",
+          "hard"
+        ],
+        "names": [
+          "You",
+          "Nimr"
+        ],
+        "ex": {
+          "artisans": false,
+          "sultan": false,
+          "thieves": false,
+          "promos": false
+        }
+      },
+      "goal": {
+        "type": "before-round",
+        "value": 8,
+        "text": "Win and finish before round 8."
+      },
+      "stars": [
+        {
+          "text": "Win before round 8",
+          "test": {
+            "k": "goal"
+          }
+        },
+        {
+          "text": "Claim 7 or more tiles",
+          "test": {
+            "k": "tiles",
+            "op": ">=",
+            "v": 7
+          }
+        },
+        {
+          "text": "Score 180 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 180
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": {
+          "id": "short-road",
+          "param": 3,
+          "text": "Night rule: 3 fewer camels each."
+        },
+        "setup": {},
+        "maxStars": 2,
+        "text": "Nimr plays at normal strength."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "nimr",
+          "text": "Nimr's portrait"
+        },
+        {
+          "type": "table",
+          "id": "night",
+          "text": "Night-sands table skin"
+        }
+      ]
+    },
+    {
+      "boss": true,
+      "twist": {
+        "id": "boss-djinn",
+        "param": "hikma",
+        "coins": 50,
+        "text": "Boss rule: Qadira starts with the djinn Hikma (her Sages score 4 each) and 50 extra coins."
+      },
+      "hints": false,
+      "id": "c10",
+      "act": 3,
+      "title": "The Uncrowned",
+      "intro": [
+        {
+          "who": "hadiya",
+          "text": "Qadira was the old Sultan's niece. She thinks the throne is hers by blood."
+        },
+        {
+          "who": "qadira",
+          "text": "I have bargained with djinns since I could walk. The Sage-djinn already serves me."
+        },
+        {
+          "who": "hadiya",
+          "text": "The whole sultanate is in play: Crafters, cutpurses, Wonder Cities and every djinn."
+        },
+        {
+          "who": "hadiya",
+          "text": "Win this, and Qamar has a ruler again."
+        }
+      ],
+      "outro": [
+        {
+          "who": "qadira",
+          "text": "Blood was not enough. Take the throne, then. Rule it well."
+        },
+        {
+          "who": "hadiya",
+          "text": "The sands are quiet. Qamar has a ruler at last, and it is you."
+        },
+        {
+          "who": "hadiya",
+          "text": "Long may you reign."
+        }
+      ],
+      "opponent": {
+        "name": "Qadira the Uncrowned",
+        "portrait": "camp-qadira.webp",
+        "emoji": "👑",
+        "cast": "qadira",
+        "personality": "Proud, clever and relentless; summons djinns early and hoards Sages.",
+        "aiLevel": "hard",
+        "aiStyle": "balanced",
+        "taunt": "The throne was never yours to take. Kneel.",
+        "praise": "I yield. Qamar is yours, Sultan."
+      },
+      "setup": {
+        "np": 2,
+        "seats": [
+          "human",
+          "ai"
+        ],
+        "lv": [
+          "normal",
+          "hard"
+        ],
+        "names": [
+          "You",
+          "Qadira"
+        ],
+        "ex": {
+          "artisans": true,
+          "sultan": true,
+          "thieves": true,
+          "promos": true
+        }
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the game and take the throne."
+      },
+      "stars": [
+        {
+          "text": "Win and take the throne",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Win by 20 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 20
+          }
+        },
+        {
+          "text": "Score 230 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 230
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Qadira plays at normal strength and has no djinn at the start."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "qadira",
+          "text": "Qadira's portrait"
+        },
+        {
+          "type": "title",
+          "id": "sultan",
+          "text": "Title: Sultan of Qamar"
+        },
+        {
+          "type": "table",
+          "id": "palace",
+          "text": "Palace table skin"
+        }
+      ]
+    }
+  ]
+}

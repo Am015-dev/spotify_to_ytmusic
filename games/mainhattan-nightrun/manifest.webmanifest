@@ -1,0 +1,17 @@
+{
+  "name": "Mainhattan Nightrun",
+  "short_name": "Nightrun",
+  "description": "A rhythm shoot-'em-up: fly the neon night to the beat.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#05030c",
+  "theme_color": "#05030c",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
