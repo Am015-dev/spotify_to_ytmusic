@@ -8002,8 +8002,8 @@ RX.canShoot=e=>e.x<W-30&&e.x>P.x+60&&e.y>14&&e.y<H-14&&Math.hypot(e.x-P.x,e.y-P.
 /* squads: the enemies spawned on one frame */
 RX.squad=function(g){if(this.easy()||!g.length)return;if(g.length<2&&!(g[0].type==='turret'||g[0].type==='gunship'))return;const s={m:g.slice(),ld:null,t:0};this.sq.push(s);for(const e of g)e.rx.sq=s;
   const gun=g.find(e=>e.type==='turret'||e.type==='gunship'),sm=g.filter(e=>e.type==='drone'||e.type==='flank');
-  if(gun&&this.rng()<.6){const b=sm[0]||G.en.find(x=>x.rx&&!x.rx.role&&!x.rx.fx&&(x.type==='drone'||x.type==='flank')&&this.ok(x)&&Math.hypot(x.x-gun.x,x.y-gun.y)<400);   // a drone already on screen can be recruited
-    if(b&&!b.rx.fx){b.rx.role='bear';b.rx.mate=gun;gun.rx.cov=b;b.rx.st='cover';this.stat.cover++;}}
+  if(gun&&this.rng()<.6){const b=sm[0]||G.en.find(x=>x.rx&&!x.rx.role&&!x.rx.fx&&!x.fp&&(x.type==='drone'||x.type==='flank')&&this.ok(x)&&Math.hypot(x.x-gun.x,x.y-gun.y)<400);   // a drone already on screen can be recruited
+    if(b&&!b.rx.fx&&!b.fp){b.rx.role='bear';b.rx.mate=gun;gun.rx.cov=b;b.rx.st='cover';this.stat.cover++;}}
   const fr=sm.filter(e=>!e.rx.role);
 
   if(fr.length>=2&&this.rng()<.6){const[a,b]=fr;a.rx.role='pin';b.rx.role='exit';a.rx.mate=b;b.rx.mate=a;b.rx.c=a.rx.c;a.rx.st=b.rx.st='hunt';this.stat.pin++;this.stat.exit++;}
@@ -8028,14 +8028,17 @@ NR.on('tick',dt=>{if(!RX.on||!G.live||G.dead||G.tut||G.lab)return;
   const enr=e=>e.rx.enr>0?1.6:1;let telling=0;for(const e of G.en)if(e.rx&&e.rx.tl>0)telling++;
   const tmax=RX.easy()?3:RX.hard()?6:4;
   for(const e of G.en){const r=e.rx;if(!r||e.dead||e.hp<=0)continue;if(e.type!=='drone'&&e.type!=='gunship'&&e.type!=='turret'&&e.type!=='flank')continue;
+    if(e.fp&&!r.fx){r.fx=true;if(r.role==='bear'){r.role=null;if(r.mate&&r.mate.rx)r.mate.rx.cov=null;}if(r.st==='retreat'||r.st==='press'||r.st==='cover')r.st='hunt';}   // formations set fp after the spawn event: path units keep their path
     r.enr=Math.max(0,r.enr-dt);if(r.role==='exit'&&!RX.ok(r.mate))r.role=null;
     /* leader down: the squad enrages */
     if(r.sq&&r.sq.ld&&r.sq.ld!==e&&!RX.ok(r.sq.ld)&&!r.sq.done){r.sq.done=1;for(const m of r.sq.m)if(RX.ok(m)){m.rx.enr=3;floater(m.x,m.y-20,'ENRAGED','#ff3d6a');}RX.stat.enrage++;}
     /* movement */
     const v=(e.type==='turret'?60:90)*enr(e);
-    if(r.fx){}
+    const lv=e.t>(e.type==='turret'?6.5:e.type==='gunship'?13:12);if(lv){r.dv=0;r.rt=0;}
+    if(r.fx||lv){}   // leaving: the old exit path wins, nothing is held on screen
     else if(r.dv>0){r.dv-=dt;e.x+=r.vx*dt;RX.mvY(e,e.y+r.vy*dt,Math.abs(r.vy)+1,dt);if(e.stop!=null)e.stop=Math.min(e.stop,e.x);continue;}
-    if(r.role==='bear'&&RX.ok(r.mate)){const g=r.mate,dx=P.x-g.x,dy=P.y-g.y,L=Math.hypot(dx,dy)||1,tx=g.x+dx/L*70,ty=g.y+dy/L*70;
+    if(r.fx||lv){}
+    else if(r.role==='bear'&&RX.ok(r.mate)){const g=r.mate,dx=P.x-g.x,dy=P.y-g.y,L=Math.hypot(dx,dy)||1,tx=g.x+dx/L*70,ty=g.y+dy/L*70;
       e.x+=clamp(tx-e.x,-150*dt,150*dt);RX.mvY(e,ty,150,dt);}
     else if(r.st==='press'){const k=RX.sq.indexOf(r.sq),ty=RX.fav+(k%2?-60:60)*(e.id1=e.id1||(RX.rng()<.5?1:-1));if(RX.far(e.x,ty,140)&&Math.abs(ty-e.y)>20){RX.mvY(e,ty,v,dt);RX.act.press+=dt;}}
     else if(r.st==='hunt'&&!r.role){const ty=P.y+PV.y*.6;if(RX.far(e.x,ty,140))RX.mvY(e,ty,v*.7,dt);}
@@ -8052,7 +8055,7 @@ NR.on('tick',dt=>{if(!RX.on||!G.live||G.dead||G.tut||G.lab)return;
     e.arm=false;r.c-=dt;
     if(e.x>P.x+60&&Math.abs(P.y-e.y)<26){r.lin=(r.lin||0)+dt;if(r.lin>.6&&r.c>.2&&!RX.easy()){r.c=.2;r.lin=0;RX.stat.reacts++;}}else r.lin=0;   // parking in front of a gun is read and punished (after a full tell)
     if(r.st==='bait'&&r.c<=0){if(Math.abs(PV.y)<100&&r.hold<RX.per(e)*1.2){r.hold+=dt;continue;}r.bd=Math.sign(PV.y)||1;r.bdv=PV.y;if(r.hold>0){RX.stat.reacts++;RX.act.bait++;}r.hold=0;}
-    if(r.st==='retreat'&&r.rt>1&&(r.rt>2.2||Math.hypot(P.x-e.x,P.y-e.y)>260)&&telling<tmax&&!RX.easy()){r.kind='dive';r.lx=P.x+PV.x*.3;r.ly=P.y+PV.y*.3;r.tl=Math.max(RX.TELL+.1,RX.tell(e));RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,r.tl);telling++;continue;}
+    if(r.st==='retreat'&&!lv&&r.rt>1&&(r.rt>2.2||Math.hypot(P.x-e.x,P.y-e.y)>260)&&telling<tmax&&!RX.easy()){r.kind='dive';r.lx=P.x+PV.x*.3;r.ly=P.y+PV.y*.3;r.tl=Math.max(RX.TELL+.1,RX.tell(e));RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,r.tl);telling++;continue;}
     if(r.c>0||!RX.canShoot(e)||telling>=tmax)continue;
     if(r.role==='exit')continue;   // the exit gun fires with its pin partner
     const go=x=>{x.rx.kind=x.rx.st==='feint'&&!x.rx.fk?'feint':'shot';x.rx.fk=0;x.rx.tl=RX.tell(x);RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,x.rx.tl);telling++;};

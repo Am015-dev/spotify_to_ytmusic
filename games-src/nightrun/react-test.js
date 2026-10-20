@@ -71,7 +71,7 @@ const BOT = (o) => {
   // (b) + (c)
   const acts = {}, st = {}; let caps = true, minGap = 1e9, minTell = 9, gaps = 0;
   const all = res[''].slice();
-  for (const s of ['hunt', 'feint', 'retreat', 'press', 'bait', 'window']) { const p = await open(U('&rxs=' + s), true); const r = await p.evaluate(TRACE, { n: s === 'window' ? 12 : 7, seed: 77, T: 60, rs: 5, fx: s === 'retreat' ? 520 : 0, pair: s === 'hunt' }); all.push(r); acts[s] = r.rx ? r.rx.act[s] : 0; await p.close(); }
+  for (const s of ['hunt', 'feint', 'retreat', 'press', 'bait', 'window']) { const p = await open(U('&rxs=' + s), true); const r = await p.evaluate(TRACE, { n: s === 'window' ? 12 : 7, seed: 77, T: 60, rs: 5, fx: s === 'retreat' ? 520 : 0, pair: s === 'hunt' || s === 'retreat' }); all.push(r); acts[s] = r.rx ? r.rx.act[s] : 0; await p.close(); }
   for (const r of all) { if (!r.rx) continue; for (const k in r.rx.stat) st[k] = (st[k] || 0) + (k === 'minTell' ? 0 : r.rx.stat[k]); minTell = Math.min(minTell, r.rx.stat.minTell); if (r.maxEb > r.cap || r.maxV > 401) caps = false; minGap = Math.min(minGap, r.minGap); gaps += r.gaps; }
   console.log('  state actions (forced): ' + JSON.stringify(acts) + '  squads: pin ' + st.pin + ' leader ' + st.leader + ' enrage ' + st.enrage + ' cover ' + st.cover + ' blocks ' + st.block);
   for (const s in acts) ok(acts[s] > 0, `(b) state ${s.toUpperCase()} acts in its scenario (${+(+acts[s]).toFixed(1)})`);
