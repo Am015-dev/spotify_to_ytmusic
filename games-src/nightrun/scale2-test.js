@@ -21,7 +21,7 @@ const WALLS = ({ n, diff, secs }) => {   // fly a stage in god mode, collect the
   m.abort(); return { gaps, walls: S2 ? S2.walls.length : 0, on: !!(S2 && S2.on), GAP: S2 ? S2.GAP : 0, cores };
 };
 const bal = (env) => { const js = path.join(os.tmpdir(), 's2-' + process.pid + '-' + Math.random().toString(36).slice(2) + '.json');
-  cp.spawnSync('node', [path.join(__dirname, 'balance-test.js')], { env: Object.assign({}, process.env, { RUNS, PAR: '4', JSON: js, GAME_DIR }, env), stdio: 'ignore' });
+  cp.spawnSync('node', [path.join(__dirname, 'balance-test.js')], { env: Object.assign({}, process.env, { RUNS, PAR: '4', JSON: js, GAME_DIR, Q: '&bpauto=1' + (process.env.Q || '') }, env), stdio: 'ignore' });
   let r = []; try { r = JSON.parse(fs.readFileSync(js, 'utf8')); fs.unlinkSync(js); } catch (e) { } return r; };
 const rate = a => a.length ? a.filter(x => x.clear).length / a.length : NaN;
 (async () => {

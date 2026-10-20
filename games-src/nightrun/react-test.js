@@ -56,7 +56,7 @@ const BOT = (o) => {
   const srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' }), srv2 = cp.spawn('python3', ['-m', 'http.server', String(port2), '--bind', '127.0.0.1', '--directory', tmp], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 900)); const br = await PW.chromium.launch(), errs = [];
   const open = async (url, seed) => { const p = await br.newPage({ viewport: { width: 1280, height: 720 } }); p.on('pageerror', e => errs.push(e.message)); if (seed) await p.addInitScript(SEED); await p.goto(url); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 15000 }).catch(() => { }); return p; };
-  const U = (q, pt) => `http://127.0.0.1:${pt || port}/index.html?sim=1&all=1${q}`;
+  const U = (q, pt) => `http://127.0.0.1:${pt || port}/index.html?sim=1&all=1${q}${process.env.Q || ""}`;
   // (a)
   const spread = rs => { let s = 0, k = 0; for (let a = 0; a < rs.length; a++) for (let b = a + 1; b < rs.length; b++) { const L = Math.min(rs[a].ys.length, rs[b].ys.length); for (let j = 0; j < L; j++) for (const p of rs[a].ys[j]) { let md = 200; for (const q of rs[b].ys[j]) md = Math.min(md, Math.hypot(p[0] - q[0], p[1] - q[1])); s += md; k++; } } return s / Math.max(1, k); };
   const spreadOld = rs => { let sy = 0, k = 0; const L = Math.min(...rs.map(r => r.ys.length)); for (let j = 0; j < L; j++) { const ms = rs.map(r => r.ys[j].length ? r.ys[j].reduce((a, p) => a + p[1], 0) / r.ys[j].length : 270); const mu = ms.reduce((a, b) => a + b, 0) / ms.length; sy += Math.sqrt(ms.reduce((a, b) => a + (b - mu) ** 2, 0) / ms.length); k++; } return sy / Math.max(1, k); };

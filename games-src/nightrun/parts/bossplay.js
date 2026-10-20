@@ -1,4 +1,4 @@
-/* ---------- boss ENCOUNTER MECHANICS = parts/bossplay.js (flag RET.bossplay, default off for now; ?bossplay=1 = on, ?bossplay=0 / off = the fights before it, exactly). Test: nightrun/bossplay-test.js.
+/* ---------- boss ENCOUNTER MECHANICS = parts/bossplay.js (flag RET.bossplay, default ON; ?bossplay=0 = off, ?bossplay=0 / off = the fights before it, exactly). Test: nightrun/bossplay-test.js.
    Owner, 20 Oct 2026: "the enemies, bosses are also very predictable and repeatable; I beat the game very easy on normal ... the game needs to be more creative".
    Every boss had its own moveset (bossmoves.js) but every fight was still "dodge while shooting the bar". Now each boss brings three MECHANICS that change how
    you play, built from placeholder shapes (circles, triangles, squares; real art can replace BPL.draw later):
@@ -14,7 +14,7 @@
    Each fight picks 2 of its 3 mechanics per phase (each boss has two gates and one arena rule, so a gate is always up) and shuffles its attack order with a
    seed per attempt (signature verb kept first). A gate that is ignored overloads by itself after FB s, so no fight can lock; armour.js still owns HP, the cap,
    the phase lines and the last stand (EXPOSED = always open). Hooks: armour.js room x BPL.k(e); bossmoves.js BMV.init -> BPL.init; c.js draw; stats.js sheet. */
-if(RET.bossplay===undefined)RET.bossplay=/[?&]bossplay=1/.test(location.search);   // OFF by default: with it on scale2 / bossvis / counter fail (HANDOFF.md W40)
+if(RET.bossplay===undefined)RET.bossplay=!/[?&]bossplay=(0|off)/.test(location.search);   // ON by default; ?bossplay=0 = the fights before it, exactly
 if(RET.bossplay)RET.sioKeys.push('mnr_bpcodex');
 const BPT={
   tresor:  {m:['nodes','emp','slab'],     line:'BREAK THE BOLTS, EMP THE PLATE'},

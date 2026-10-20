@@ -51,7 +51,7 @@ const STATIC = () => {   // (a) + (b), inside the page
 const FORM = (o) => {   // (c) + (d): one formation alone, a few pieces, unarmed ship parked at the left
   const m = window.__mnr, out = [];
   if (m.running) m.abort(); m.SET.diff = 'normal'; m.SET.auto = false; m.startStory(o.n); m.simOn(true); m.ST.spawned = true; m.G.en.length = 0; m.G.eb.length = 0; m.P.x = 120; m.P.y = 270;   // ST.spawned: the stage's own waves and boss stay away
-  const I = FM.make(o.id); const born = new Map(); let T = 0, minFree = 1e9, nan = 0, near = 0;
+  const I = FM.make(o.id); const born = new Map(); let T = 0, minFree = 1e9, nan = 0, near = 0, nearI = '';
   const gapOf = (xs, us) => { let best = 0; const iv = us.map(e => e.type === 'gate' ? null : [e.y - e.r, e.y + e.r]).filter(Boolean);
     for (const g of xs) { iv.push([-99, g.gy - g.gap / 2]); iv.push([g.gy + g.gap / 2, H + 99]); }
     iv.sort((a, b) => a[0] - b[0]); let y = 0; for (const [a, b] of iv) { if (a > y) best = Math.max(best, a - y); y = Math.max(y, b); } best = Math.max(best, H - y); return best; };
@@ -59,13 +59,13 @@ const FORM = (o) => {   // (c) + (d): one formation alone, a few pieces, unarmed
   for (let k = 0; k < (o.pieces || 3); k++) { FM.piece(I); for (let s = 0; s < 75; s++) { m.P.hp = 99; m.P.inv = 1; m.step(1 / 30); T += 1 / 30; scan(); } }
   while (T < 60 && m.G.en.some(e => e.type !== 'boss' && e.hp > 0)) { m.P.hp = 99; m.P.inv = 1; m.step(1 / 30); T += 1 / 30; scan(); }
   function scan() {
-    for (const e of m.G.en) { if (!born.has(e)) { born.set(e, T); if (e.x < W - 60 && e.y > 30 && e.y < H - 30 && e.type !== 'zdrn' && Math.hypot(e.x - m.P.x, e.y - m.P.y) < 200) near++; }
+    for (const e of m.G.en) { if (!born.has(e)) { born.set(e, T); if (e.x < W - 60 && e.y > 30 && e.y < H - 30 && e.type !== 'zdrn' && Math.hypot(e.x - m.P.x, e.y - m.P.y) < 200) { near++; if (!nearI) nearI = e.type + '@' + Math.round(e.x) + ',' + Math.round(e.y) + (e.nvx ? '^' + e.nvx : '') + (e.el ? ' el' : ''); } }
       if (!isFinite(e.x) || !isFinite(e.y)) nan++; }
     if (o.gap > 0) for (let x = m.P.x + 40; x < W - 20; x += 24) { const us = m.G.en.filter(e => e.hp > 0 && e.type !== 'gate' && Math.abs(e.x - x) < e.r + 16 && e.y > -10 && e.y < H + 10), gs = m.G.en.filter(e => e.type === 'gate' && e.on && Math.abs(e.x - x) < 12);
       if (us.length + gs.length >= 3 || gs.length) minFree = Math.min(minFree, gapOf(gs, us)); }
   }
   const left = m.G.en.filter(e => e.type !== 'boss' && e.hp > 0 && !e.dead).length;
-  m.abort(); return { id: o.id, minFree, nan, near, left, T: +T.toFixed(1) };
+  m.abort(); return { id: o.id, minFree, nan, near, nearI, ev: window.NOV ? NOV.stat.ev : 0, T: window.NOV ? Math.round(NOV.T) : 0, left, T: +T.toFixed(1) };
 };
 const CAPS = (o) => {   // (e)
   const m = window.__mnr; if (m.running) m.abort(); m.SET.diff = o.diff; m.SET.auto = true; m.applySet && m.applySet(); m.startStory(o.n); m.simOn(true);
@@ -94,14 +94,14 @@ const SPAWNS = (o) => {   // (f)
   const br = await PW.chromium.launch();
   const open = async (q, pt, seed) => { const ctx = await br.newContext({ viewport: { width: 1280, height: 720 } }), p = await ctx.newPage(); if (seed) await p.addInitScript(SEED);
     p.on('pageerror', e => errs.push((q || '') + ' ' + e.message)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
-    await p.goto(`http://127.0.0.1:${pt || port}/index.html?sim=1&all=1&nomusic=1${q || ''}`); await p.waitForFunction(() => window.__mnr && __mnr.TR.list.length > 0, null, { timeout: 20000 }); return { ctx, p }; };
+    await p.goto(`http://127.0.0.1:${pt || port}/index.html?sim=1&all=1&nomusic=1${q || ''}${process.env.QX || ''}`); await p.waitForFunction(() => window.__mnr && __mnr.TR.list.length > 0, null, { timeout: 20000 }); return { ctx, p }; };
   try {
     { const { ctx, p } = await open('');
       const st = await p.evaluate(STATIC); st.forEach(x => fails.push(x)); if (!st.length) pass.push('library and the 45 scripts are well formed (a, b)');
       const lib = await p.evaluate(() => Object.values(FM.L).map(d => ({ id: d.id, gap: d.gap, t: d.t })));
       let worst = 1e9, bad = 0;
       for (const d of lib) { const n = Math.min(40, Math.max(d.t, 34)); const r = await p.evaluate(FORM, { id: d.id, n, gap: d.gap, pieces: 3 });
-        if (r.nan) fails.push(`${d.id}: NaN positions`); if (r.left) fails.push(`${d.id}: ${r.left} units still on screen after ${r.T} s`); if (r.near) fails.push(`${d.id}: ${r.near} units appeared inside the screen near the ship`);
+        if (r.nan) fails.push(`${d.id}: NaN positions`); if (r.left) fails.push(`${d.id}: ${r.left} units still on screen after ${r.T} s`); if (r.near) fails.push(`${d.id}: ${r.near} units appeared inside the screen near the ship (${r.nearI}; NOV ev ${r.ev} T ${r.T})`);
         if (d.gap > 0) { worst = Math.min(worst, r.minFree); if (r.minFree < Math.min(d.gap, 120) - 1) { bad++; fails.push(`${d.id}: free gap ${Math.round(r.minFree)} px < ${Math.min(d.gap, 120)}`); } } }
       if (!bad) pass.push(`gap guarantee: every screen-spanning formation leaves >= 120 px (smallest seen ${Math.round(worst)} px) (c)`);
       pass.push(`${lib.length} formations each entered from an edge and left within 60 s (d)`);
