@@ -9909,7 +9909,8 @@ const RU=window.RU={st:null,stat:{seen:{},use:{},card:0,obj:0},TEL:.8,
   dash(){const S=this.st;if(!S||!this.on())return;for(const m of S.list)if(m.on&&m.age>=this.TEL&&this.T[m.id].dash){this.T[m.id].dash(m);}},
   emp(){const S=this.st;if(!S||!this.on())return;for(const m of S.list)if(m.on&&m.age>=this.TEL&&this.T[m.id].emp){this.T[m.id].emp(m);}},
   /* ---- helpers ---- */
-  shot(x,y,a,dm){if(G.pb.length>=40)return;G.pb.push({x,y,vx:Math.cos(a)*620,vy:Math.sin(a)*620,dm:dm||6,pf:0,ab:1});},
+  shot(x,y,a,dm){if(G.pb.length>=24)return;   // never crowd the ship's own weapon out of the player-shot cap (b.js trims the oldest)
+    G.pb.push({x,y,vx:Math.cos(a)*620,vy:Math.sin(a)*620,dm:dm||6,pf:0,ab:1});},
   near(x,y){let b=null,bd=1e9;for(const e of G.en){if(e.dead||e.type==='boss'||e.x>W-10)continue;const d=Math.hypot(e.x-x,e.y-y);if(d<bd){bd=d;b=e;}}return b;},
   shard(x,y){if(G.pk.length<30)G.pk.push({t:'shard',x,y,vx:-60,vy:0,bob:0});},
   sting(txt){G.mult=Math.max(1,G.mult*.6);if(G.ab)G.ab.m=Math.max(0,(G.ab.m||0)-.15);floater(P.x,P.y-28,txt,'#ff3d6a');},
