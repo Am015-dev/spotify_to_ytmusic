@@ -127,14 +127,18 @@ function TLL_warm(){const t0=performance.now(),R=renderer,root=typeof pl!=='unde
    PREW_run draws one representative per program (distinct currentProgram.cacheKey) through the composer's real passes/targets/MSAA/fog/shadow state, every other renderable hidden for that one frame,
    then reads 1 px so the GPU has finished before the curtain lifts. Touch/lowmem path only (TWG gate, no LKG). ?prewarm=0 = off. */
 const PREW={on:new URLSearchParams(location.search).get('prewarm')!=='0',n:-1,prog:-1,p0:-1,p1:-1,ms:-1};
+/* scissor every composer target (and the screen) to 1 px for the prewarm frame: pipelines are keyed by formats/samples, not size, so the fragment work (the lab's whole cost) disappears */
+function PREW_sc(on){const R=renderer,rt=[composer.renderTarget1,composer.renderTarget2].filter(Boolean);PREW.sv=PREW.sv||[];
+ if(on){PREW.sv=rt.map(t=>[t,t.scissorTest,t.scissor.clone()]);for(const t of rt){t.scissorTest=true;t.scissor.set(0,0,1,1)}PREW.ss=[R.getScissorTest(),new THREE.Vector4()];R.getScissor(PREW.ss[1]);R.setScissorTest(true);R.setScissor(0,0,1,1)}
+ else{for(const[t,f,v]of PREW.sv){t.scissorTest=f;t.scissor.copy(v)}PREW.sv=[];if(PREW.ss){R.setScissor(PREW.ss[1]);R.setScissorTest(PREW.ss[0]);PREW.ss=null}}}
 function PREW_run(){const t0=performance.now(),R=renderer,P=R.info.programs;PREW.p0=P.length;const seen=new Set(),all=[],keep=new Set();
  scene.traverse(o=>{if(!(o.isMesh||o.isPoints||o.isLine||o.isSprite))return;all.push(o);const m=Array.isArray(o.material)?o.material:[o.material];if(!o.layers.test(camera.layers))return;for(const q of m){if(!q)continue;const pr=R.properties.get(q).currentProgram;if(!pr)continue;const k=pr.cacheKey||q.type+q.id;if(!seen.has(k)){seen.add(k);keep.add(o)}}});
  const sv=[],T=typeof TQ!=='undefined'&&TQ,d0=T?T.draw:0,l0=LD.on,b0=LD.busy,k0=LKG.arm,r0=TWG.run;
  for(const o of all)sv.push([o,o.visible,o.frustumCulled]);
  try{for(const o of all){if(keep.has(o)){o.visible=true;o.frustumCulled=false}else o.visible=false}
-  LKG.arm=0;if(T)T.draw=1;LD.on=false;LD.busy=false;TWG.run=0;composer.render();
+  LKG.arm=0;if(T)T.draw=1;LD.on=false;LD.busy=false;TWG.run=0;PREW_sc(1);composer.render();
   const gl=R.getContext(),px=new Uint8Array(4);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px)}   // the 1-px read blocks until the GPU has finished the frame
- finally{for(const[o,v,f]of sv){o.visible=v;o.frustumCulled=f}LD.on=l0;LD.busy=b0;LKG.arm=k0;if(T)T.draw=d0;TWG.run=r0;PREW.n=keep.size;PREW.prog=seen.size;PREW.p1=P.length;PREW.ms=Math.round(performance.now()-t0)}}
+ finally{PREW_sc(0);for(const[o,v,f]of sv){o.visible=v;o.frustumCulled=f}LD.on=l0;LD.busy=b0;LKG.arm=k0;if(T)T.draw=d0;TWG.run=r0;PREW.n=keep.size;PREW.prog=seen.size;PREW.p1=P.length;PREW.ms=Math.round(performance.now()-t0)}}
 /* ios-r20f: a player page evaluated the lazy code chunks (99c_checklist 212 KB, the city chunks; direct eval, 0.3-1.6 s on a slow CPU) 1.5 s AFTER the curtain lifted (10z_lazy.js),
    the iPhone freeze ~2 s after the city appears. They now load and eval here, under the curtain, before the gate frames. Touch/lowmem path only (desktop has LKG). ?twgxc=0 = old timing */
 TWG.xc=new URLSearchParams(location.search).get('twgxc')!=='0';TWG.xcMs=-1;
