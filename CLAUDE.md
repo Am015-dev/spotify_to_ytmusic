@@ -16,7 +16,10 @@ Old rules and lessons (read only when needed): `games-src/RULES-ARCHIVE.md`.
 - Workers: owner (20 Oct 2026) wants at least 5 workers + 1 reviewer at once on Nightrun, models chosen by task (see Cheapest model line). Never 15 in parallel.
 - One task = ~30 min and ONE deliverable, fully briefed up front (games-src/BRIEF-TEMPLATE.md). Then 5 report lines and stop.
   No idle workers, no self-wake-ups, no follow-up messages except the owner's new bug reports.
-- Cheapest model that can do it: Haiku for mechanical work, Sonnet for bugs and UI, Opus only for design and feel. Always set it.
+- Model by task complexity (owner, 20 Oct 2026), always set it: HAIKU = mechanical, checklist, no judgement (run tests, bisect by flag,
+  copy, list, wire known ids, data-table edits). SONNET = well-specified code, bugs, tuning to a measurable gate, research.
+  OPUS = open design/feel, cross-system changes, reviewer scoring, anything a cheaper tier failed twice. Escalate one tier after a
+  failed attempt; never Opus for chores.
 - Push only what passes: phone-check + the change's key ?scn= tests on a full build before push; unfinished work is switched off
   by default (flag), so nothing gets reverted.
 - Done = the independent audit passes (games-src/scripts/ui-audit.spec.js), never a worker's self-report.
