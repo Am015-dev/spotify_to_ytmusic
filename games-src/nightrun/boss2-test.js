@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // Boss fights that last (BALANCE.md "Boss fights, round 4"; code parts/armour.js, flag RET.boss2, ?boss2=0 = before). Prints PASS/FAIL lines.
+// bossplay.js: the pages run with ?bpauto=1 (each boss gate is resolved 1.5 s after it rises, like a player who plays the mechanic); the length bands are for that player.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/boss2-test.js      env: GAME_DIR, STAGES=5,8,13,16,21,24,29,32,37,40
 // 1 god-damage stress: every frame the boss loses 1e6 HP (any source goes through the same e.hp): the fight still lasts >= its floor (B2X.T), every boss, Normal + Legend
 // 2 phases: 2 and 3 start on a bar line (bt % 4 == 0), in order, with calm after; the armour absorbed damage and the bar sheen showed
@@ -29,7 +30,7 @@ const OFF = ({ n }) => { const m = window.__mnr; m.SET.diff = 'legend'; try { m.
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800));
   const br = await PW.chromium.launch();
-  const page = async (q, vp) => { const p = await br.newPage({ viewport: vp || { width: 960, height: 540 } }); p.on('pageerror', e => { fails++; console.log('FAIL page error ' + e.message); }); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1${q}`); await p.waitForFunction(() => window.__mnr && window.__mnr.startStory, null, { timeout: 30000 }); return p; };
+  const page = async (q, vp) => { const p = await br.newPage({ viewport: vp || { width: 960, height: 540 } }); p.on('pageerror', e => { fails++; console.log('FAIL page error ' + e.message); }); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1&bpauto=1${q}`); await p.waitForFunction(() => window.__mnr && window.__mnr.startStory, null, { timeout: 30000 }); return p; };
   // 1 + 2: stress, every boss, both difficulties (4 pages in parallel)
   const jobs = []; for (const diff of ['normal', 'legend']) for (const n of STAGES) jobs.push({ n, diff, dmg: 1e6 });
   const res = []; const pages = await Promise.all([0, 1, 2, 3].map(() => page('')));

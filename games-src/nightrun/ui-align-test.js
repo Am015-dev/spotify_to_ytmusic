@@ -68,14 +68,14 @@ function pageAudit(opts) {
     const px = [[.5, .5], [.2, .5], [.8, .5], [.5, .2], [.5, .8]], ins = inter(tr, vr); let cov = 0, by = null;
     for (const [fx, fy] of px) { const x = ins.left + (ins.right - ins.left) * fx, y = ins.top + (ins.bottom - ins.top) * fy; if (x < 0 || y < 0 || x >= vw || y >= vh) continue;
       const st = document.elementsFromPoint(x, y); let k = st.findIndex(e => e === el || e.contains(el) || el.contains(e)); if (k < 0) k = st.length;
-      const above = st.slice(0, k).filter(e => { if (e.closest('#labP') && e.closest('#labP').contains(el)) return false; const c = getComputedStyle(e); return e.tagName === 'IMG' || e.tagName === 'CANVAS' || e.tagName === 'VIDEO' || e.tagName === 'svg' || (c.backgroundImage !== 'none') || (/rgba?\(/.test(c.backgroundColor) && !/rgba\(\d+, \d+, \d+, 0\)/.test(c.backgroundColor) && +(c.backgroundColor.split(',')[3] || 1) > .35); });
+      const above = st.slice(0, k).filter(e => { if (e.closest('#stDet') && !el.closest('#stDet')) return false; if (e.closest('#labP') && e.closest('#labP').contains(el)) return false; const c = getComputedStyle(e); return e.tagName === 'IMG' || e.tagName === 'CANVAS' || e.tagName === 'VIDEO' || e.tagName === 'svg' || (c.backgroundImage !== 'none') || (/rgba?\(/.test(c.backgroundColor) && !/rgba\(\d+, \d+, \d+, 0\)/.test(c.backgroundColor) && +(c.backgroundColor.split(',')[3] || 1) > .35); });
       if (above.length) { cov++; by = above[0]; } }
     if (cov >= 3) out.push(['covered', `${tag} is under ${desc(by)}`]);
     it.vis = ins;
   }
   // overlaps between different texts
-  const live = items.filter(i => !i.skip && i.vis);
-  for (let i = 0; i < live.length; i++) for (let j = i + 1; j < live.length; j++) { const a = live[i], b = live[j]; if (a.el === b.el || a.el.contains(b.el) || b.el.contains(a.el)) continue;
+  const live = items.filter(i => !i.skip && i.vis && !i.el.closest('#fsCard'));   // the full-screen install card is a modal sheet over the title; it covers the buttons by design
+  for (let i = 0; i < live.length; i++) for (let j = i + 1; j < live.length; j++) { const a = live[i], b = live[j]; if (a.el === b.el || a.el.contains(b.el) || b.el.contains(a.el)) continue; if (!!a.el.closest('#stDet') !== !!b.el.closest('#stDet')) continue;   // the stage-map detail sheet sits over the map nodes by design
     const o = inter(a.vis, b.vis), ar = area(o); if (ar > 6 && ar > .12 * Math.min(area(a.vis), area(b.vis))) out.push(['overlap', `"${a.t.slice(0, 22)}" (${desc(a.el)}) overlaps "${b.t.slice(0, 22)}" (${desc(b.el)}) by ${Math.round(ar)} px2`]); }
   // contrast candidates (decided outside, on the screenshot)
   const cc = live.filter(i => !i.el.closest('.lock,:disabled')).map(i => ({ t: i.t.slice(0, 30), r: [i.vis.left, i.vis.top, i.vis.right, i.vis.bottom].map(Math.round), col: i.col, big: i.fs >= 24 || (i.fs >= 18.66 && i.fw >= 700), el: desc(i.el) }));
@@ -151,8 +151,7 @@ const SCREENS = [
   ['title', async p => { }],
   ['settings', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#setBtn'); await sleep(300); }],
   ['settings-scrolled', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#setBtn'); await sleep(300); await p.evaluate(() => { const b = document.getElementById('setBody'); if (b) b.scrollTop = b.scrollHeight; }); await sleep(200); }],
-  ['story-map', async p => { await p.click('#moreBtn'); await sleep(200); await clickText(p, '#mnMore button', 'STAGE MAP');   // STORY button moved into the MENU sheet and was renamed STAGE MAP
-    await sleep(500); }],
+  ['story-map', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#storyBtn'); await sleep(500); }],   // STORY moved into the MENU sheet (B25)
   ['story-stage', async p => { await p.evaluate(() => { __mnr.sSave.all = true; __mnr.startStory(1); }); await sleep(900); }, 'canvas'],
   ['hud-run', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = true; }); await sleep(2500); }, 'canvas'],
   ['hud-boss', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = true; __mnr.G.dt = 1e9; }); await p.waitForFunction(() => __mnr.G.boss && __mnr.G.boss.x <= 800, null, { timeout: 40000 }); await sleep(1800); }, 'canvas'],

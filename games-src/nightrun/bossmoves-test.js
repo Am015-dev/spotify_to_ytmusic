@@ -15,9 +15,9 @@ let fails = 0; const line = (ok, s) => { if (!ok) fails++; console.log((ok ? 'PA
 const FIGHT = ({ n, diff }) => {   // a weaving god ship, 1e6 damage a frame (armour.js holds the length at its floor), all phases
   const m = window.__mnr, B = window.BMV; m.SET.diff = diff; try { m.applySet(); } catch (e) { } m.startStory(n); m.simOn(true); m.god = true;
   let free = 1e9, id = null, drawn = 0, err = '';
-  for (let i = 0; i < 400 * 60 && m.running; i++) { if (m.SH.active) m.SH.close(); m.touchTo(200 + 60 * Math.sin(i / 140), 270 + 190 * Math.sin(i / 90));
+  for (let i = 0; i < 1000 * 60 && m.running; i++) { if (m.SH.active) m.SH.close(); m.touchTo(200 + 60 * Math.sin(i / 140), 270 + 190 * Math.sin(i / 90));   // 1000 s: with bossplay on, a bot that ignores the boss gates takes 2-3x as long (by design)
     const e = m.G.boss; if (e && e.x < 940) e.hp -= 1e6; m.step(1 / 60); const b = m.G.boss; if (b && b.bm) id = b.bm.id;
-    if (b && b.bm && i % 8 === 0 && B.hz.some(z => !z.mk && m.G.t >= z.on && m.G.t < z.off)) { const x1 = b.x - b.r - 24; let best = -1e9; for (let x = 30; x <= x1; x += 20) for (let y = 20; y <= 520; y += 15) { const c = B.clear(x, y, 0); if (c > best) best = c; if (best > 200) break; } free = Math.min(free, best);
+    if (b && b.bm && i % 8 === 0 && B.hz.some(z => !z.mk && m.G.t >= z.on && m.G.t < z.off)) { const x1 = b.x - b.r - 24; if (x1 < 30) continue; let best = -1e9; for (let x = 30; x <= x1; x += 20) for (let y = 20; y <= 520; y += 15) { const c = B.clear(x, y, 0); if (c > best) best = c; if (best > 200) break; } free = Math.min(free, best);
       if (drawn < 40) { try { m.render(m.G.t, 1 / 60); drawn++; } catch (x) { err = x.message; } } }
     if (i > 600 && !m.G.boss && id) break; }
   const st = B.st || { verbs: {} }, out = { n, id, free: Math.round(free), drawn, err, verbs: Object.keys(st.verbs), tel: Math.min(9, ...Object.values(st.verbs).map(v => v.tel)), maxEb: st.maxEb, cap: st.cap, maxV: st.maxV, BCAP: m.BCAP, want: id ? [...new Set(B.T[id].ph.flat().map(x => Array.isArray(x) ? x[0] : x))] : [] };
@@ -45,7 +45,7 @@ const COUNTER = ({ n, v }) => {   // force the counter verb and do the thing; th
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800)); const br = await PW.chromium.launch(); let perr = 0;
   const page = async (q, vp) => { const ph = vp && vp.width < 500; const p = await br.newPage({ viewport: vp || { width: 960, height: 540 }, hasTouch: !!ph, isMobile: !!ph });
-    p.on('pageerror', e => { perr++; console.log('FAIL page error ' + e.message); }); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1${q || ''}`);
+    p.on('pageerror', e => { perr++; console.log('FAIL page error ' + e.message); }); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1${q || ''}${process.env.QS || ''}`);
     await p.waitForFunction(() => window.__mnr && window.__mnr.startStory && window.BMV, null, { timeout: 30000 }); return p; };
   // 1 the table
   const p0 = await page(); const TB = await p0.evaluate(() => { const { BMT, VB } = window.__bmv, o = {}; for (const id in BMT) o[id] = { v: [...new Set(BMT[id].ph.flat().map(x => Array.isArray(x) ? x[0] : x))], sig: BMT[id].sig, ctr: BMT[id].ctr }; return { o, lib: Object.keys(VB).length, sig: Object.keys(VB).filter(k => VB[k].sig), ctr: Object.keys(VB).filter(k => VB[k].ctr) }; }); await p0.close();

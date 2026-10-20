@@ -47,7 +47,7 @@ NR.on('beat',()=>{if(!G.live||G.dead||ST.over||!P||P.hp>1||!AU.a||AU.a.state!=='
    shell  r11 big and slow, orange, takes 2 hull (gunship rings, elite turrets, bosses)
    rocket r7  a missile that homes for 1.3 s, can be shot down (2 hits) and bursts into 5 pellets */
 AI.n=0;
-AI.kind=function(o,src){const q=AIQ(),n=++AI.n,sp=Math.hypot(o.vx,o.vy);const scale=f=>{const t=Math.min(f*sp,BCAP)/Math.max(1,sp);o.vx*=t;o.vy*=t;};
+AI.kind=function(o,src){const q=AIQ(),n=++AI.n,sp=Math.hypot(o.vx,o.vy);const scale=f=>{const c=Math.hypot(o.vx,o.vy),t=Math.min(f*c,BCAP)/Math.max(1,c);o.vx*=t;o.vy*=t;};   // from the CURRENT speed, so a second scale (leader x1.1) never stacks past BCAP
   if(!src)return o;const ty=src.type;
   if((ty==='drone'||ty==='flank')&&q>=2){o.k='n';o.r=3.2;o.dmg=1;o.gc='#e8ffb0';scale(1.3);if(src.ldr){o.r=3.6;scale(1.1);}}
   else if(ty==='gunship'){if(q>=4&&n%5===0){o.k='r';o.r=7;o.dmg=1;o.hp=2;o.hm=1.3;o.gc='#9fb0ff';scale(.8);}
@@ -59,7 +59,7 @@ AI.kind=function(o,src){const q=AIQ(),n=++AI.n,sp=Math.hypot(o.vx,o.vy);const sc
 /* shooting a rocket down: two hits, then it bursts into five pellets */
 NR.on('tick',()=>{if(!G.live||G.dead)return;let any=false;for(const b of G.eb)if(b.k==='r'){any=true;break;}if(!any)return;
   for(const r of G.eb){if(r.k!=='r'||r.dead)continue;for(const b of G.pb){if(b.dead)continue;if((b.x-r.x)**2+(b.y-r.y)**2<(r.r+5+(b.rad||0))**2){if(!b.px)b.dead=1;r.hp-=1;burst(r.x,r.y,'#9fb0ff',3,100,.25);
-        if(r.hp<=0){r.dead=1;G.score+=60;for(let i=0;i<5;i++){const a=i*Math.PI*2/5+Math.random();G.eb.push({x:r.x,y:r.y,vx:Math.cos(a)*130,vy:Math.sin(a)*130,r:3.5,c:BULLET,g:true,sl:false,hm:0,dmg:1});}ART.boom('explosion-small',r.x,r.y,44,.3);AU.sfx('hit');}break;}}}});
+        if(r.hp<=0){r.dead=1;G.score+=60;for(let i=0;i<5&&G.eb.length<ebCap();i++){const a=i*Math.PI*2/5+Math.random();G.eb.push({x:r.x,y:r.y,vx:Math.cos(a)*130,vy:Math.sin(a)*130,r:3.5,c:BULLET,g:true,sl:false,hm:0,dmg:1});}ART.boom('explosion-small',r.x,r.y,44,.3);AU.sfx('hit');}break;}}}});
 /* drawing the three kinds that are not orbs (the base pass draws the orbs; c.js draws a glow under every bullet) */
 {const fb2=FXV.bullets;FXV.bullets=function(){const all=G.eb;let sp=false;for(const b of all)if(b.k){sp=true;break;}
   if(!sp){fb2.call(this);return;}G.eb=all.filter(b=>!b.k);fb2.call(this);G.eb=all;

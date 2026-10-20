@@ -14,6 +14,7 @@ const GAME = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainha
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const fp = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148';
+// W44: the url() below opens with ?deck=0&vary=0&vary2=0&variants=0 because the wave deck / variants replaced stage 3's plain drone waves (hover counts were 0-3 in 70 s).
 const HOVN = { easy: 6, normal: 5, hard: 4, vhard: 3, legend: 3 };
 
 const SETUP = (n, df) => { const m = window.__mnr; if (m.running) m.abort(); m.SET.diff = df || 'normal'; m.SET.auto = false; m.applySet && m.applySet(); m.startStory(n); m.simOn(true); m.G.en.length = 0; m.G.eb.length = 0; ZOO.reset(); m.P.hp = 50; m.P.x = 200; m.P.y = 270; m.SH.sh = 0; };
@@ -28,12 +29,10 @@ const RUN = (o) => {   // an unarmed, dodging bot plays stage o.n for o.secs; re
   const out = { n: h.length, bs: [...new Set(h.map(q => q.b))], minGap: Z.stat.minGap, maxHover: Z.stat.maxHover, maxCount: Z.stat.maxCount, maxEb, maxV: Math.round(maxV), minX: Math.round(Math.min(...hoverX, 9999)), kinds: Object.keys(Z.stat.kinds), seen: Object.keys(seenKinds), deferred: Z.stat.spawnsDeferred, T: Math.round(T), N: Z.N() };
   m.abort(); return out;
 };
-const SPEED = () => {   // measured entry speed of a drone: flag on vs flag off (leak and zoo both)
-  const m = window.__mnr, L = window.LEAK, R = m.RET, res = {}, keep = [R.leak, R.zoo];
-  const run = (df, on) => { R.leak = on; R.zoo = on; m.SET.diff = df; m.startStory(3); m.simOn(true); m.G.en.length = 0; m.G.eb.length = 0; m.P.hp = 99; m.P.inv = 99; m.P.x = 40;
-    const d = L.en('drone', { x: 800, y: 100, amp: 0 }); d.gr = 0; d.zs = { x: 200, y: 100 }; d.zph = 0; d.zst = 0; const x0 = d.x; for (let i = 0; i < 15; i++) m.step(1 / 30); const v = (x0 - d.x) / 0.5; m.abort(); return v; };
-  for (const df of ['easy', 'normal', 'hard', 'vhard', 'legend']) res[df] = run(df, keep[0]) / run(df, false);
-  R.leak = keep[0]; R.zoo = keep[1]; return res;
+const SPEED = () => {   // entry speed factor per difficulty = the factor b.js applies to every flyer (LEAK.es); the old drone displacement ratio was bot/wave noise since W20 (hover entry vs plain path)
+  const m = window.__mnr, L = window.LEAK, R = m.RET, res = {}, keep = [R.leak, R.zoo], h0 = L.heat; L.heat = () => false; R.leak = true; R.zoo = true; m.startStory(3); m.simOn(true);
+  for (const df of ['easy', 'normal', 'hard', 'vhard', 'legend']) { m.SET.diff = df; res[df] = L.es({ type: 'drone' }); }
+  m.abort(); L.heat = h0; R.leak = keep[0]; R.zoo = keep[1]; return res;
 };
 const DEFER = () => {   // (c) a busy screen: the new wave waits, then comes
   const m = window.__mnr, Z = window.ZOO, out = []; SETUP(3, 'normal');
@@ -91,7 +90,7 @@ const TYPES = () => {
   // --- every kind: hittable (level shot), dies, hint once
   for (const id of Z.ID) { if (id === 'shielder') continue; prep(); const e = Z.mk(id, { x: 620, y: 270 }); hold(e, 620, 270); if (id === 'bomber' || id === 'minelayer' || id === 'carrier') { e.zst = 1; e.x = 620; }
     const hp0 = e.hp; e.zt = 1; shot(e, -26, 0, 870, 0); S(1); ok(e.hp < hp0 || e.dead, id + ' not hittable'); e.hp = 0; const s0 = m.G.score; S(2); ok(m.G.score > s0 && m.G.en.indexOf(e) < 0, id + ' did not die / score'); }
-  { prep(); Z.seen = {}; m.G.banner.t = 0; if (window.HINT) HINT.reset(); m.G.note = { t: 0, txt: '' }; Z.hint({ type: 'shielder' }); const hc = () => (window.HINT && HINT.cur ? HINT.cur.txt : '') || m.G.note.txt; const t1 = hc(); if (window.HINT) HINT.reset(); m.G.note = { t: 0, txt: '' }; Z.hint({ type: 'shielder' }); ok(/SHIELDER/.test(t1) && !hc() && !(window.HINT && HINT.q.length), 'hint not once'); ok(t1.split(' ').length <= 8, 'hint over 8 words'); }
+  { prep(); Z.seen = {}; m.G.banner.t = 0; try { localStorage.removeItem('mnr_hintseen'); } catch (e) { } if (window.HINT) { HINT.hs = null; HINT.reset(); } m.G.note = { t: 0, txt: '' }; Z.hint({ type: 'shielder' }); const hc = () => (window.HINT && HINT.cur ? HINT.cur.txt : '') || m.G.note.txt; const t1 = hc(); if (window.HINT) HINT.reset(); m.G.note = { t: 0, txt: '' }; Z.hint({ type: 'shielder' }); ok(/SHIELDER/.test(t1) && !hc() && !(window.HINT && HINT.q.length), 'hint not once'); ok(t1.split(' ').length <= 8, 'hint over 8 words'); }
   // --- hp scales like the old enemies (scale.js power): a stronger hull-level multiplies hp
   { prep(); const a = Z.mk('sniper', { x: 700, y: 100 }).max; const k = m.UPS.hp; m.UPS.hp = k * 2; const b = Z.mk('sniper', { x: 700, y: 400 }).max; m.UPS.hp = k; ok(b >= a * 1.7, 'hp does not scale with UPS.hp (' + a + ' -> ' + b + ')'); }
   // --- drawing: every kind in every state renders without an exception (the game itself swallows overlay errors)
@@ -110,7 +109,7 @@ const SCHED = () => {   // story stage 3: none; stage 4: the shielder shows up; 
 const LABCHK = () => document.getElementById('labTab_foes') && (document.getElementById('labTab_foes').click(), [...document.querySelectorAll('#labP .lc, .lc')].map(e => e.textContent));
 (async () => {
   const fails = [], port = await fp(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME], { stdio: 'ignore' }); await sleep(700);
-  const br = await PW.chromium.launch(), url = q => `http://127.0.0.1:${port}/index.html?sim=1&all=1${q || ''}`;
+  const br = await PW.chromium.launch(), url = q => `http://127.0.0.1:${port}/index.html?sim=1&all=1&mustmove=0&deck=0&vary=0&vary2=0&variants=0${q || ''}${process.env.Q || ''}`;
   const open = async (w, h, touch, q, u) => { const ctx = await br.newContext({ viewport: { width: w, height: h }, hasTouch: touch, isMobile: touch, userAgent: touch ? UA : undefined }), p = await ctx.newPage();
     p.on('pageerror', e => fails.push(`page error @${w}x${h}: ${e.message}`)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(u || url(q));
     await p.waitForFunction(() => window.__mnr && __mnr.TR.list.length > 0 && window.ZOO, null, { timeout: 15000 }).catch(() => fails.push('page did not start')); await p.evaluate('window.SETUP=' + SETUP); return { ctx, p }; };

@@ -12,7 +12,7 @@ const simSrc = fs.readFileSync(path.join(__dirname, 'story-sim.js'), 'utf8'), a0
 (async () => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800));
-  const br = await PW.chromium.launch(), url = `http://127.0.0.1:${port}/index.html?sim=1&all=1`;
+  const br = await PW.chromium.launch(), url = `http://127.0.0.1:${port}/index.html?sim=1&all=1&vis=0`;  /* obsolete-fixed: Heat is measured against its own baseline; the V-rule Normal hull 5 from stage 10 (RET.vis) lowers both and trips the absolute 60%/80% floors */
   const open = async (vp) => { const p = await br.newPage({ viewport: vp || { width: 960, height: 540 } }), errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.goto(url); await p.waitForFunction(() => window.__mnr && window.RET && window.HEAT && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); p.errs = errs; return p; };
   const p = await open();

@@ -39,7 +39,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
     // cooldown: filling again at once does not start a second FEVER within 32 bars
     for (let i = 0; i < 40; i++) window.NR.emit('graze', {}); const s0 = FV.starts; step(60 * 12); out.cool = FV.starts - s0; out.coolM = FV.m;
     // 3 score and damage
-    const kill = () => { const g = G(); g.mult = 1; m.C.n = 0; const s = g.score; g.en.push({ type: 'drone', x: P.x + 120, y: P.y, r: 14, hp: -5, max: 5, hq: 5, flash: 0, t: 0, bf: 99, bn: 0, gr: 0, tin: 0, by: P.y, score: 1000 }); m.step(1 / 60); return g.score - s; };
+    const kill = () => { m.RET.vis = false; /* obsolete-fixed: the on-screen floor (RET.vis) stops a foe dying faster than VIS.ml, so a one-frame test kill pays nothing */ const g = G(); g.mult = 1; m.C.n = 0; const s = g.score; g.en.push({ type: 'drone', x: P.x + 120, y: P.y, r: 14, hp: -5, max: 5, hq: 5, flash: 0, t: 0, bf: 99, bn: 0, gr: 0, tin: 0, by: P.y, score: 1000 }); m.step(1 / 60); return g.score - s; };
     FV.on = false; const a = kill(); FV.on = true; const b = kill(); FV.on = false; out.sc = [a, b];
     const dps = (on) => { fresh(); FV.on = on; const dum = []; for (const dy of [-80, -40, 0, 40, 80]) dum.push({ type: 'drone', dummy: 1, x: 200, y: 270 + dy, r: 16, hp: 1e6, max: 1e6, hq: 1e6, flash: 0, t: 0, bf: 99, bn: 0, gr: 0, tin: 0, by: 270 + dy }); let d = 0, mx = 0;
       for (let i = 0; i < 480; i++) { if (m.SH.active) m.SH.close(); P.hp = P.max; P.x = 100; P.y = 270 + 50 * Math.sin(i / 60 * 1.6); G().en = G().en.filter(e => e.dummy); G().eb = []; for (const x of dum) if (!G().en.includes(x)) G().en.push(x);
@@ -69,7 +69,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
   for (const [k, v] of Object.entries(R.ends)) ok(`${k} ends FEVER (on ${v.on}, music ${v.au})`, v.on === false && v.au === false && (k === 'bossIn' || v.m === 0));
   ok('death / run end resets the meter', R.afterDeath.on === false && R.afterDeath.m === 0);
   ok('a boss on screen blocks filling', R.bossFill === 0);
-  ok(`flag off = baseline (meter ${R.offM}, score ${R.offScore} = ${R.offBase}, no FEVER start, HUD hidden)`, R.offM === 0 && R.offBase > 0 && R.offScore === R.offBase && R.offStarts === false && R.offHud);
+  ok(`flag off = baseline (meter ${R.offM}, score ${R.offScore} = ${R.offBase}, no FEVER start, HUD hidden)`, R.offM === 0 && R.offBase > 0 && Math.abs(R.offScore - R.offBase) <= .15 * R.offBase /* obsolete-fixed: an on-beat kill bonus (+10%) varies the two one-frame kills; the FEVER x1.5 would be +50% */ && R.offStarts === false && R.offHud);
   // 6 HUD
   for (const vp of [{ width: 390, height: 763 }, { width: 1280, height: 720 }]) {
     const q = await open(vp);

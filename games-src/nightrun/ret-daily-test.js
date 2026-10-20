@@ -48,7 +48,8 @@ const res = [], ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' : 'FAI
   // a daily run end claims the daily bonus once
   const dr = await p.evaluate(() => { const m = __mnr; m.abort && m.abort(); RET.setClock(new Date(2026, 9, 5 + 40, 12).getTime()); document.getElementById('dailyBtn').click();
     const b0 = m.GA.bank; NR.emit('runEnd', { score: 10, di: 0, kills: 1 }); const a = m.GA.bank - b0; NR.emit('runEnd', { score: 11, di: 0, kills: 1 }); return { a, b: m.GA.bank - b0 - a, daily: m.G.daily, weekly: !!m.G.weekly, txt: document.getElementById('retDy').textContent }; });
-  ok('daily run end pays once (60 after a reset) and shows it', dr.daily && !dr.weekly && dr.a === 60 && dr.b === 0 && /Daily bonus/.test(dr.txt), JSON.stringify(dr));
+  // obsolete-fixed: failed runs now pay a small floor on top of the 60 daily bonus (0643c3a), so the first payout is 60..70, the second 0
+  ok('daily run end pays once (60 + the small failed-run floor, after a reset) and shows it', dr.daily && !dr.weekly && dr.a >= 60 && dr.a <= 70 && dr.b === 0 && /Daily bonus/.test(dr.txt), JSON.stringify(dr));
   const sv = await p.evaluate(() => { const s = JSON.parse(localStorage.getItem('mnr_streak')); return Object.values(s).every(Number.isFinite) && s.streak >= 1; }); ok('streak saved in local storage', sv);
   const nn = await p.evaluate(() => { const b = __mnr.GA.bank; DY.pay(-50); DY.pay(NaN); return __mnr.GA.bank === b && __mnr.GA.bank >= 0; }); ok('wallet: no negative or NaN pay', nn);
   // flag off = old screen
