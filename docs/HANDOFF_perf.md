@@ -540,3 +540,8 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Change: ?lfr=N (desktop, src/98lf_lively_fill.js) builds fill tiles within N m, frees past N+200. lfr=500: fra +206→+87, ath +141→+84 (lfr=250 fra +88); not ≤ +40, no visual shot taken → OFF.
 4. GO perf/pc-heap-60s (info/plumbing only; src/99c7_rev5fix.js). Gate (built, desktop): unit 0 FAIL; all tagged GOs pass except xf1/grass (known red on base).
 5. Left: ~60 MB outside fill tiles (unattributed by sampling, likely strings/code/IC); fill-tile heap per tile (LF_fit/drape arrays → typed); shot to flip lfr=500 ON; assert once ≤ +40 is reachable.
+## ios-r17s (render cost, Athens touch)
+- Measured (tools/perf1/tDraw.js, tTop.js; Athens lowmem, software GL): 331 calls / 742K tris at start, 382 / 1.5M after 30 s; biggest cost = far building LOD cells (wbLod, 195 meshes, ~930K tris) and instanced city; shadows/bloom already off at min.
+- Shipped ON for lowmem: TUNE.wbLodRt=900 (far-LOD range cap, ?lodrt=0 off) -> 1.57M -> 1.41M tris (-10%). GO perf/touch-render in src/99c7_rev5fix.js.
+- OPT-IN, OFF: ?lodc=7 (wbLodCell 3->7 m coarser far LOD) -> 1.15M tris (-27%), not eyeballed on a shot, so not flipped.
+- NOT met: render-owned long frames and governor end q (still min at 30 s); software GL fill-bound, needs on-device numbers. Left: judge lodc=7 on a shot, then flip.
