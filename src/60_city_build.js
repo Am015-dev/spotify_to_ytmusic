@@ -19,14 +19,29 @@ var GND_L=[],GND_ON=new URLSearchParams(location.search).get('t7g')!=='0',GND_B=
 // Athens had 7.5 M boxed numbers in per-cell JS arrays (~60-85 MB heap). g.s[2c],g.s[2c+1] = start/end in g.P; -1 = not built (undefined), -2 = flat (null).
 function GND_pack(g){let n=0;for(const L of g.c)if(L)n+=L.length;const P=new Float32Array(n),S=new Int32Array(g.c.length*2);let o=0;
   for(let c=0;c<g.c.length;c++){const L=g.c[c];if(!L){S[2*c]=S[2*c+1]=L===undefined?-1:-2;continue}const ox=g.x0+Math.floor(c/g.nz)*g.dx,oz=g.z0+c%g.nz*g.dz;S[2*c]=o;
-    if(L instanceof Float32Array){P.set(L,o);o+=L.length}else for(let k=0;k<L.length;k+=9){P[o]=L[k]-ox;P[o+1]=L[k+1]-oz;for(let q=2;q<9;q++)P[o+q]=L[k+q];o+=9}S[2*c+1]=o}g.P=P;g.s=S;g.c=null}
+    if(L instanceof Float32Array){P.set(L,o);o+=L.length}else for(let k=0;k<L.length;k+=9){P[o]=L[k]-ox;P[o+1]=L[k+1]-oz;for(let q=2;q<9;q++)P[o+q]=L[k+q];o+=9}S[2*c+1]=o}g.P=P;g.s=S;g.c=null;if(GNDQ_ON)GND_quant(g)}
 // perf-r15c: LOWMEM packs each finished cell at once (Float32Array, x/z relative to the cell corner like GND_pack), so a ground still building in the first 30 s of roam
 // does not hold millions of boxed numbers in JS arrays (Frankfurt outer land: 3.9 M = ~31 MB heap) until its last cell. ?memc=0 = off
 var MEMC_ON=!/[?&]memc=0/.test(location.search);
 function GND_cellF32(L,ox,oz){const P=new Float32Array(L);for(let k=0;k<P.length;k+=9){P[k]=L[k]-ox;P[k+1]=L[k+1]-oz}return P}
+// perf-r17m: touch/lowmem only (?gq=0 off): the packed Float32 records (9 per tile) become Int16 (half the bytes). x/z/w/h at 1/256 m (or finer), the four heights
+// as 16 bit steps over the grid's own range (<= 640 m = <= 1 cm step, error <= 0.5 cm), the lazy flag stays in slot 8. GND_in decodes into a per-out scratch, so every
+// reader (GND_tri / GND_far / GND_edge) sees the same L,k,u,v API. The u/v window is widened by the quantum so neighbouring tiles never leave a crack. G.qe = worst error.
+var GNDQ_ON=LOWMEM&&!/[?&]gq=0/.test(location.search);
+function GND_quant(g){const P=g.P,n=P.length;if(!n||n%9)return;let hl=1e9,hh=-1e9,mx=0;
+  for(let k=0;k<n;k+=9){for(let q=4;q<8;q++){const v=P[k+q];if(v<hl)hl=v;if(v>hh)hh=v}for(let q=0;q<4;q++){const v=Math.abs(P[k+q]);if(v>mx)mx=v}}
+  const sc=Math.min(256,32000/Math.max(mx,1));if(!(hh-hl<=640)||sc<64)return;const hs=65534/Math.max(hh-hl,1e-3),Q=new Int16Array(n);let eh=0,ex=0;
+  for(let k=0;k<n;k+=9){for(let q=0;q<4;q++){const z=Math.round(P[k+q]*sc);Q[k+q]=z;const e=Math.abs(z/sc-P[k+q]);if(e>ex)ex=e}
+    for(let q=4;q<8;q++){const z=Math.round((P[k+q]-hl)*hs)-32767;Q[k+q]=z;const e=Math.abs((z+32767)/hs+hl-P[k+q]);if(e>eh)eh=e}Q[k+8]=P[k+8]}
+  g.P=Q;g.Q=1;g.qis=1/sc;g.qhs=1/hs;g.qhb=hl+32767/hs;g.qt=1.5/sc;g.qe={h:eh,xz:ex,mb:(P.byteLength-Q.byteLength)/1048576}}
+function GND_inQ(g,s,e,i,j,x,z,out){const Q=g.P,ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz,is=g.qis,hs=g.qhs,hb=g.qhb,tl=g.qt;
+  for(let k=s;k<e;k+=9){const w=Q[k+2]*is,h=Q[k+3]*is,x0=Q[k]*is,z0=Q[k+1]*is;if(!(w>0)||!(h>0))continue;let u=(rx-x0)/w,v=(rz-z0)/h;const tu=tl/w,tv=tl/h;if(u<-tu||v<-tv||u>1+tu||v>1+tv)continue;
+    if(Q[k+8]<0)Q[k+8]=ART7_far(ox+x0,oz+z0,w,h)||!ART7_near(ox+x0,oz+z0,w,h)?1:0;
+    const L=out?(out.S||(out.S=new Float32Array(9))):new Float32Array(9);L[0]=x0;L[1]=z0;L[2]=w;L[3]=h;L[4]=Q[k+4]*hs+hb;L[5]=Q[k+5]*hs+hb;L[6]=Q[k+6]*hs+hb;L[7]=Q[k+7]*hs+hb;L[8]=Q[k+8];
+    u=u<0?0:u>1?1:u;v=v<0?0:v>1?1:v;if(out){out.L=L;out.k=0;out.u=u;out.v=v;return out}return{L,k:0,u,v}}return null}
 // perf-11: optional out = a reused {L,k,u,v} (GND_far: no object per ground sample)
 function GND_in(g,x,z,out){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)return undefined;
-  if(g.P){const c=i*g.nz+j,s=g.s[2*c],e=g.s[2*c+1];if(s<0)return s===-1?undefined:null;const L=g.P,ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz;
+  if(g.P){const c=i*g.nz+j,s=g.s[2*c],e=g.s[2*c+1];if(s<0)return s===-1?undefined:null;if(g.Q)return GND_inQ(g,s,g.s[2*c+1],i,j,x,z,out);const L=g.P,ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz;
     for(let k=s;k<e;k+=9){const u=(rx-L[k])/L[k+2],v=(rz-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(ox+L[k],oz+L[k+1],L[k+2],L[k+3])||!ART7_near(ox+L[k],oz+L[k+1],L[k+2],L[k+3])?1:0;if(out){out.L=L;out.k=k;out.u=u;out.v=v;return out}return{L,k,u,v}}return null}
   const L=g.c[i*g.nz+j];if(!L)return L;
   if(L instanceof Float32Array){const ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz;for(let k=0;k<L.length;k+=9){const u=(rx-L[k])/L[k+2],v=(rz-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(ox+L[k],oz+L[k+1],L[k+2],L[k+3])||!ART7_near(ox+L[k],oz+L[k+1],L[k+2],L[k+3])?1:0;if(out){out.L=L;out.k=k;out.u=u;out.v=v;return out}return{L,k,u,v}}return null}/* perf-r15c */

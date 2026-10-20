@@ -470,3 +470,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Tried and reverted: rfGrid as a generator (yields inside) broke terr1/terr5 terrain-grade/edge/flush/sky/crown on fra (re-entrancy / order); needs a non-generator slicing (e.g. cache per grid) with the terrain GO as check.
 4. Left for 50 ms: rfGrid, Athens post steps (AS_apply, CE_streets, DR_solid), gndBuild 340 ms, CTB_kind 130-430 ms, bt.flush 160.
 5. Gate (DESKTOP=1, built): unit 0 FAIL; the 8 TAG sets 48/51, reds xf1/grass+slope SLOW and terrain-tyre-ath = known trunk reds.
+## ios-r17m (2026-10-20): quantized ground + far-chunk deflate landed (ON in lowmem/touch; ?gq=0 ?trq=0 ?zfar=0 off) · GO perf/mem-quant
+1. GND_L packed tiles Float32→Int16 (src/60_city_build.js GND_quant/GND_inQ: xz 1/256 m, heights 16-bit over the grid range, decode into a per-out scratch so GND_tri/GND_far/GND_edge are unchanged; u/v window widened by the quantum, no cracks): err h 0.12-0.26 cm, saved fra 4.4 / ath 14.4 MB. TR_HA.M.m Uint16 (err 0.08 cm). TR_h NOT done: TR_grade/TR_roadsInit rewrite W.h in place after init.
+2. Far chunks (src/98mf_memfree.js MEMF_zip/MEMF_unzip): an off chunk > Rout+250 m is deflated (CompressionStream), arrays dropped, inflated when back inside Rout and applied as zero-copy views (≤5 ms), shown only after. Gated 45 s after first roam frame because TR_bldFix and roam builders read hub mesh positions.
+3. Heap at ready→after-roam (touch, lowmem, GC'd, GO perf/ios-mem): fra 388/405 → 381/399 (gq+trq) → 378/397 (+zfar); ath 539/557 → 518/536 → 519/542. zfar gain is ~0-3 MB within 60 s (few chunks are off yet); it grows with roaming.
+4. GO perf/mem-quant (both cities): errors ≤ 1 cm, 0 holes, a chunk round-trips byte-identical. 250 MB budget still unmet (fra -10, ath -20 total).
+5. Left: TR_h freeze after the last grade pass; zfar numbers after a 5-min roam.

@@ -362,7 +362,7 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
  C.GO['perf/heap-30s']=[{c:'fra',n:'packed ground leaves and camera-pull grids, same answers',fn:()=>{const R=[];try{
    // 1) ground: a Float32Array cell answers GND_in like the JS-array cell (2000 points over 40 cells of the hilly grounds)
    let n=0,bad=0,cells=0;const rnd=(()=>{let s=7;return()=>(s=(s*16807)%2147483647)/2147483647})();
-   for(const G of GND_L){if(!G.c&&!G.P)continue;for(let t=0;t<400&&cells<40;t++){const c=Math.floor(rnd()*G.nx*G.nz);let L=G.c?G.c[c]:null;
+   for(const G of GND_L){if(G.Q||!G.c&&!G.P)continue;for(let t=0;t<400&&cells<40;t++){const c=Math.floor(rnd()*G.nx*G.nz);let L=G.c?G.c[c]:null;
      if(!L&&G.P){const s=G.s[2*c],e=G.s[2*c+1];if(s<0)continue;L=G.P.slice(s,e)}if(!L||!L.length)continue;cells++;const ox=G.x0+Math.floor(c/G.nz)*G.dx,oz=G.z0+c%G.nz*G.dz;
      const A=[];if(L instanceof Float32Array)for(let k=0;k<L.length;k++)A.push(k%9===0?L[k]+ox:k%9===1?L[k]+oz:L[k]);else A.push(...L);for(let k=8;k<A.length;k+=9)A[k]=-1;const F=GND_cellF32(A,ox,oz);
      const g1={x0:G.x0,z0:G.z0,dx:G.dx,dz:G.dz,nx:G.nx,nz:G.nz,c:[]},g2={...g1,c:[]};g1.c[c]=A;g2.c[c]=F;
@@ -461,3 +461,19 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
   const ok=m>=0&&m<lim;return`📍 PC BHS · ${ok?'✓':'✗'} longest buildHubG gap ${m} ms (${S&&S.lab}) < ${lim} · info: ${n} gaps > 50 ms (goal 0, not met) → ${ok?'✅ PASS':'❌ FAIL'}`};
  C.GO['perf/pc-bhs']=[{c:'fra',n:'Desktop boot slicing (buildHubG gaps)',fn:go}];C.GO['perf/pc-bhs-ath']=[{c:'ath',n:'Desktop boot slicing (Athens)',fn:go}]}return}
  if(i<600)setTimeout(()=>R17F_reg(i+1),100)})(0);
+// ios-r17m: GO perf/mem-quant (touch/lowmem): GND_L packed tiles + the crown mask are quantized within 1 cm (and no tile crack: every sampled tile centre still resolves), and a far streamed
+// chunk round-trips through its deflated copy byte for byte (arrays dropped while compressed, identical after the restore). Prints the heap and the bytes released.
+(function MQ_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='mem-quant')){C.items.push({ver:'perf',id:'mem-quant',area:'perf',text:'ios-r17m · 📍 GO: touch/lowmem ground tiles (GND_L) and the crown mask are Int16/Uint16 with max height error ≤ 1 cm and every tile centre still resolves; one far streamed chunk is deflated, drops its arrays, and comes back identical. Pass line: errors ≤ 1 cm, 0 holes, 0 byte mismatches.',go:'perf/mem-quant'});
+ C.GO['perf/mem-quant']=['fra','ath'].map(c=>({c,n:'quantized ground + far chunk deflate',secs:40,fn:()=>{if(!LOWMEM)return'📍 MEM QUANT · needs the touch/lowmem tier (?lowmem=1) ❌ FAIL';if(state!=='roam')return'📍 MEM QUANT · start free roam first ❌ FAIL';
+  let q=0,eh=0,ex=0,mb=0,holes=0,smp=0,np=0;for(const G of GND_L){if(!G.Q)continue;q++;eh=Math.max(eh,G.qe.h);ex=Math.max(ex,G.qe.xz);mb+=G.qe.mb;
+   for(let t=0;t<60;t++){const c2=Math.floor(Math.random()*G.nx*G.nz),s=G.s[2*c2];if(s<0)continue;const e=G.s[2*c2+1],i2=Math.floor(c2/G.nz),j2=c2%G.nz,Qa=G.P,k=s+9*Math.floor(Math.random()*((e-s)/9));
+    const x=G.x0+i2*G.dx+(Qa[k]+Qa[k+2]/2)*G.qis,z=G.z0+j2*G.dz+(Qa[k+1]+Qa[k+3]/2)*G.qis;smp++;const r=GND_in(G,x,z);if(!r||!isFinite(GND_tri(r.L,r.k,r.u,r.v)))holes++}}
+  const K=TR_HA.M,mq=K?K.qe||0:0,mU=K&&K.m instanceof Uint16Array,gs=GND_L.length,nQ=q;
+  const e=MEMF.S.find(z=>!z.on&&!z.cz&&!z.zfail&&z.m.geometry.attributes.position&&z.m.geometry.attributes.position.array),heapNow=()=>performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576):0;
+  const fin=(zr)=>`📍 MEM QUANT ${CID} · GND grids ${nQ}/${gs} Int16 (saved ${mb.toFixed(1)} MB, err h ${(eh*100).toFixed(2)} cm xz ${(ex*100).toFixed(2)} cm, holes ${holes}/${smp}), crown mask ${mU?'Uint16 err '+(mq*100).toFixed(2)+' cm':'Float32'}, far chunks ${zr} · zfar ${MEMF.zst.n} zipped ${MEMF.zst.rawMB.toFixed(1)}→${MEMF.zst.zMB.toFixed(1)} MB, ${MEMF.zst.back} back, max ${MEMF.zst.maxMs.toFixed(0)} ms · heap ${heapNow()} MB`;
+  const g1=nQ>0&&eh<=.01&&ex<=.005&&holes===0&&smp>50&&(!K||mq<=.01);
+  if(!MEMF.zOn||!e)return fin(MEMF.zOn?'no off chunk':'off')+' → '+(g1&&(!MEMF.zOn||MEMF.S.length===0)?'✅ PASS':'❌ FAIL');
+  const g=e.m.geometry,names=Object.keys(g.attributes),hash=()=>{let h=0,n=0;for(const k of names.concat(g.index?['@i']:[])){const a=k==='@i'?g.index:g.attributes[k],A=a.array;if(!A)return'null';for(let t=0;t<A.length;t+=Math.max(1,A.length>>8)){h=(h*31+A[t]*1000|0)|0}n+=A.length}return h+':'+n},h0=hash();
+  return MEMF_zip(e).then(()=>{const zipped=!!e.cz,nulled=names.every(k=>!g.attributes[k].array);return(zipped?MEMF_unzip(e):Promise.resolve()).then(()=>{const same=hash()===h0,ok=g1&&zipped&&nulled&&same&&!e.cz;
+   return fin(`zip ${zipped?'ok':'FAILED'} dropped ${nulled} restored-identical ${same}`)+' → '+(ok?'✅ PASS':'❌ FAIL')})})}}))}return}
+ if(i<600)setTimeout(()=>MQ_reg(i+1),100)})(0);
