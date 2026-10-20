@@ -66,7 +66,7 @@ function A2_geos(){if(A2.G)return A2.G;A2.G={};for(const d of A2_DEF){try{A2.G[d
 function A2_table(){const G=A2_geos();return A2_DEF.map(d=>{const g=G[d.id],a=g&&g.userData.a2,bb=a&&a.bb;return{id:d.id,name:d.n,cat:d.cat,city:d.city,tris:a?a.tris:-1,colours:a?a.cols.length:-1,cols:a?a.cols.join(','):'',mats:1,
   box:bb?[+(bb.max.x-bb.min.x).toFixed(2),+(bb.max.y-bb.min.y).toFixed(2),+(bb.max.z-bb.min.z).toFixed(2)]:null,off:bb?[+((bb.max.x+bb.min.x)/2).toFixed(2),+((bb.max.z+bb.min.z)/2).toFixed(2)]:null,collider:d.col||'none',cr:d.cr||0,scale:d.sc}})}
 // pools per city: [id, weight, extra kerb offset]; Athens uses ONLY ath/both-tagged props, Frankfurt only fra/both (race props are never in a city pool)
-const A2_POOL={ath:[['olive',.16,.6],['cypress',.1,.6],['aleppo',.06,.6],['plane',.08,.6],['bougain',.1,.5],['agave',.07,.5],['kiosk',.02,.5],['taverna',.05,.9],['column',.025,.6],['wall',.07,.7],['scooter',.06,.5],['taxi',.03,.3],['trolley',.025,.5],['apt1',.012,1.5],['apt2',.012,1.5],['church',.004,2],['temple',.005,2]],
+const A2_POOL={ath:[['olive',.16,.6],['cypress',.1,.6],['aleppo',.06,.6],['plane',.08,.6],['bougain',.1,.5],['agave',.07,.5],['kiosk',.02,.5],['taverna',.05,.9],['column',.025,.6],['wall',.07,.7],['scooter',.06,.5],['taxi',.03,1],['trolley',.025,.5],['apt1',.012,1.5],['apt2',.012,1.5],['church',.004,2],['temple',.005,2]],
  fra:[['plane',.1,.8],['timber',.018,1.5],['tram',.025,.5],['ebbelwoi',.05,.9]]};
 function A2_city(){return CID==='fra'?'fra':'ath'}
 // park / plaza edges and slipways: a car leaving the road there must not meet a prop (xf1/grass, xf1/water): keep m metres clear of every PARKS rectangle and slipway
@@ -81,7 +81,7 @@ function A2_cell(cx,cz){const key=cx*100000+cz;let a=A2.C.get(key);if(a)return a
    for(let s=rn()*8;s<L;s+=8){const q=rn(),h0=rn(),sc=rn(),ku=rn()*PT;if(s<j0||s>j1||q>.5)continue;let u=ku,pick=null;for(const it of P){if(u<it[1]){pick=it;break}u-=it[1]}if(!pick)continue;
     const d=A2_BY[pick[0]],g=G[pick[0]];if(!g)continue;const a2=g.userData.a2,bb=a2.bb,fw=bb.max.x-bb.min.x,fd=bb.max.z-bb.min.z,rad=Math.max(.5,Math.hypot(fw,fd)/2),o=off+pick[2]+(d.cat==='building'?fd/2:0),
      X=A.x+ux*s-uz*o*sd,Z=A.z+uz*s+ux*o*sd;if(Math.floor(X/40)!==cx||Math.floor(Z/40)!==cz)continue;if(A2_open(X,Z,-uz*sd,ux*sd))continue;if(!A2_free(X,Z,rad))continue;
-    const y=Math.max(0,groundY(X,Z)),hh=d.cat==='building'||d.id==='kiosk'||d.id==='trolley'||d.id==='tram'?A2_faceRoad(ux,uz,sd):d.id==='wall'?Math.atan2(-uz,ux):h0*6.28;// street-facing props look at the road, the wall runs along it
+    const y=Math.max(0,groundY(X,Z)),hh=d.cat==='building'||d.id==='kiosk'||d.id==='trolley'||d.id==='tram'?A2_faceRoad(ux,uz,sd):d.id==='wall'?Math.atan2(-uz,ux):d.cat==='vehicle'?Math.atan2(ux,uz)+(sd>0?0:Math.PI):h0*6.28;/* parked vehicles lie parallel to the street: a random yaw swung a 4 m taxi into the lane and stalled bot/nav */// street-facing props look at the road, the wall runs along it
     const s0=d.sc[0]+(d.sc[1]-d.sc[0])*sc;a.push({d:pick[0],x:X,z:Z,nx:-uz*sd,nz:ux*sd,y,h:hh,s:s0,r:d.col==='c'?d.cr*s0:rad,hw:fw/2*s0,hd:fd/2*s0,ox:(bb.max.x+bb.min.x)/2*s0,oz:(bb.max.z+bb.min.z)/2*s0})}}}
  A2.n.items=(A2.n.items||0)+a.length;A2.n.cells=A2.C.size;return a}
 // yaw so the prop's +z side looks at the road: the prop sits at kerb + n*o with n = (-uz*sd, ux*sd), so the road is in direction -n
