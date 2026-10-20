@@ -63,7 +63,7 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 | ret-test | PASS | - | PASS 1280x720 flag on: no page errors | 4920087 2026-10-20 |
 | ret-title-test | PASS | - | PASS no page errors | 4920087 2026-10-20 |
 | ret-trans-test | PASS | - | PASS no page errors (flag on) | 4920087 2026-10-20 |
-| ret-walls-test | FAIL | - | still fails with vis=0 (stage 11/22/23 clear 0-25%): not bisected further | W31 2026-10-20 |
+| ret-walls-test | FAIL | old | still fails with every flag off (W37 bisect: each of the 17 flags run once with flag=0, all FAIL; stage 11/22/23 clear 0-25%) | W31 2026-10-20 |
 | reward-test | FAIL | - | left to W30 | W31 2026-10-20 |
 | rules-test | PASS | - | PASS portrait 390x763: 31 mechanic runs (15 mechanics x plain/twist) spawn, tick, draw, take DASH + EMP | 0e03771 2026-10-20 |
 | scale-test | PASS | - |  | 4920087 2026-10-20 |
