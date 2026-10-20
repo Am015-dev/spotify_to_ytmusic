@@ -597,3 +597,17 @@ window.__hudClear=function(){const R=e=>{e=typeof e==='string'?document.getEleme
    const p1=MM2.toF(RO.x,RO.z),p2=MM2.toF(RO.x+9,RO.z),same=p1===p2,sp=MM2.spr.size,st=MM2.stat(),ok=diff/n<.03&&same&&st&&st.avg<3;
    return`📍 MINIMAP2 · ${c==='fra'?'Frankfurt':'Athens'}: ${(100-100*diff/n).toFixed(1)}% pixels match v1, shared coord array ${same}, ${sp} cached glyphs, draw ms avg ${st&&st.avg.toFixed(2)} p95 ${st&&st.p95.toFixed(1)} max ${st&&st.max.toFixed(1)} (n ${st&&st.n}) → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
  if(i<600)setTimeout(()=>R18L_reg(i+1),100)})(0);
+// ios-r18s: CR_VC caches one merged brick geometry per car form (rival 4x4/boat forms, garage builds). At Athens ready 22 of 24 are on no mesh
+// (18.7 MB, only the cache holds them: heap snapshot by retainer, tools/perf1/heapOwn.js). Touch/lowmem drops those once the roam is ready
+// (?crvc=0 off); every CR_grp caller passes its bricks, so a dropped form is rebuilt on its next use (race start, garage).
+const CRVC={on:LOWMEM&&!/[?&]crvc=0/.test(location.search),done:0,n:0,mb:0,ok:0};
+function CRVC_used(){const u=new Set();scene.traverse(o=>{if(o.geometry)u.add(o.geometry)});return u}
+function CRVC_drop(){const u=CRVC_used(),gb=g=>{let z=0;if(!g||!g.attributes)return 0;for(const k in g.attributes)z+=g.attributes[k].array.byteLength;if(g.index)z+=g.index.array.byteLength;return z};let n=0,z=0;
+ for(const k in CR_VC){const v=CR_VC[k];if(!v||u.has(v.m)||u.has(v.l)||u.has(v.g))continue;z+=gb(v.m)+gb(v.l)+gb(v.g);delete CR_VC[k];n++}CRVC.n+=n;CRVC.mb=+(CRVC.mb+z/1048576).toFixed(1);CRVC.done=1;return n}
+(function CRVC_arm(){if(!CRVC.on)return;const go=()=>{let st='';try{st=state}catch(e){}if(st!=='roam'||!RO.on)return false;try{CRVC_drop()}catch(e){console.warn('CRVC',e)}return true};   // this chunk loads after drivable (src/LAZY)
+ if(go())return;const iv=setInterval(()=>{if(go())clearInterval(iv)},1000)})();
+(function CRVC_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='mem-own')){C.items.push({ver:'perf',id:'mem-own',area:'perf',text:'ios-r18s · heap owners after ready: 📍 GO (each city, touch/lowmem) checks that the car-form cache (CR_VC) keeps only forms on a mesh once the roam is ready, and that a dropped form rebuilds with the same triangle count. Pass line: on with lowmem, 0 unused forms left, rebuild same.',go:'perf/mem-own'})}
+ C.GO['perf/mem-own']=['fra','ath'].map(c=>({c,n:'car-form cache freed after ready',secs:20,fn:()=>{if(!CRVC.done&&CRVC.on)CRVC_drop();const u=CRVC_used();let left=0,kept=0;for(const k in CR_VC){const v=CR_VC[k];if(v&&(u.has(v.m)||u.has(v.l)||u.has(v.g)))kept++;else left++}
+   const t0=(g=>g&&g.m?g.m.attributes.position.count:0);const G0=CR_grp(CR_OFF,'off'),a=CR_VC.off?t0(CR_VC.off):0;const sv=CR_VC.off;delete CR_VC.off;const G1=CR_grp(CR_OFF,'off'),b=t0(CR_VC.off);if(sv)CR_VC.off=sv;else delete CR_VC.off;void G0;void G1;
+   const ok=(!LOWMEM||CRVC.on)&&left===0&&a>0&&a===b;return`📍 MEM OWN · ${c==='fra'?'Frankfurt':'Athens'}: crvc ${CRVC.on?'on':'off'}, dropped ${CRVC.n} forms (${CRVC.mb} MB), kept ${kept} on meshes, unused left ${left}, rebuild verts ${a} → ${b} → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
+ if(i<600)setTimeout(()=>CRVC_reg(i+1),100)})(0);
