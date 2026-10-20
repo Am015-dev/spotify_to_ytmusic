@@ -1,8 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "mcp__claude-code-remote__get_session",
-      "Bash(git fetch *)"
+      "Bash(timeout 600 bash tools/deploy.sh *)",
+      "Bash(bash tools/deploy.sh *)"
     ]
   }
 }
