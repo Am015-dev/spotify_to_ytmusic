@@ -669,3 +669,13 @@ roamCam=(f=>function(dt){const sn=camSnap,r=f(dt);try{if(!CFIT.on||state!=='roam
   const ok=s.same&&ok0&&ok1&&plain<=B.length*.05&&s.rows>1000;
   return'📍 SOAB · '+s.rows+' rows · '+s.cols+' cols · '+s.own+' own props · '+plain+' plain after · '+s.colMB+' MB cols · freeze '+s.ms+' ms · sig '+(s.same?'equal':'DIFF')+' (hits '+(s.pre&&s.pre.nh)+'/'+(s.post&&s.post.nh)+') '+(ok?'✅ PASS':'❌ FAIL')}}))}return}
  if(i<600)setTimeout(()=>SOAB_reg(i+1),100)})(0);
+// ios-r18u: GO perf/touch-late-links (+ -fra). Touch/lowmem: the player car's hidden translucent glass linked a program 20-40 s into the roam (renderer.compile ran against the canvas: srgb + tone map, not the linear composer target). TLL_warm (98bp, under the TWG curtain) compiles it with the runtime state.
+// Pass line: warm ran (llMs >= 0) in <= 300 ms and every player-car material's current program was built for the runtime target (srgb-linear). The 60 s count is tools/perf1/tBoot.js PROGS=1 QS=lowmem=1 SECS=60 (fra 1 -> 0, ath 1 -> 0 late links); the GO harness' own first draw links ~30 programs, so a count after idEnd is info only here. ?twgll=0 = old behaviour.
+(function R18U_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='touch-late-links')){C.items.push({ver:'perf',id:'touch-late-links',area:'perf',text:'ios-r18u · touch late links: 📍 GO (Athens, then -fra) checks that the player-car warm under the touch curtain ran (≤ 300 ms) and that at most 1 shader program linked after it. Info only on desktop. Pass line ends ✅ PASS.',go:'perf/touch-late-links'});
+ const go=()=>{const P=renderer.info.programs,n=TWG.idEnd?P.filter(p=>p.id>TWG.idEnd).length:-1;
+  if(!TWG.on)return`📍 TOUCH LATE LINKS · touch warm gate off (desktop): info → ✅ PASS`;
+  const ms=[],bad=[];pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material))if(m&&!ms.includes(m))ms.push(m)});for(const m of ms){const cp=renderer.properties.get(m).currentProgram;if(cp&&!/,srgb-linear,/.test(cp.cacheKey))bad.push(m.id)}
+  const ok=TWG.ll&&TWG.llMs>=0&&TWG.llMs<=300&&bad.length===0;
+  return`📍 TOUCH LATE LINKS · ${ok?'✓':'✗'} player-car warm ${TWG.ll?'on':'off'}, ${TWG.llMs} ms (≤ 300), ${TWG.llN} programs linked under the curtain · ${bad.length} of ${ms.length} player-car materials on a non-linear-target program (0) · info: ${n} linked since the curtain (harness draw included), ${P.length} programs → ${ok?'✅ PASS':'❌ FAIL'}`};
+ C.GO['perf/touch-late-links']=[{c:'ath',n:'touch late links (Athens)',fn:go},{c:'fra',n:'touch late links (Frankfurt)',fn:go}]}return}
+ if(i<600)setTimeout(()=>R18U_reg(i+1),100)})(0);

@@ -709,3 +709,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Gates (built, flag OFF): unit 0 FAIL; ios-mem,soa-1,mem-own,life1,bld-soa (?lowmem=1) fra 8/8, ath 7/7; r13 sky + life1 xf1 terrain phone2 pc-boot-lt fra 29/29, ath 20/20.
 4. Left: find the last holder of the old rows (heap-snapshot retainer path of a marked old row; tools in scratch were a BFS over module-scope names), then flip SOAB.on default and re-measure; ~15 MB expected only once rows are really freed. Float32 x/z/h can differ from the old doubles by <1e-3 (queries equal).
 5. Flag: ?soab=1 on; default OFF.
+
+## ios-r18u (touch late links)
+- Cause: on touch/lowmem one program (player car translucent glass, MeshPhysical op .7, `|w12`) linked 20-40 s into the roam (f1349 ath / f2519 fra, 63 ms render+prog frame). The warm compiled it against the canvas (srgb + tone map); the game renders into the linear composer target, and both are part of the program key.
+- Fix: `TLL_warm` (src/98bp_warmall.js) runs at the end of TWG_run0 under the curtain: shows the player car's hidden parts, W12_cars, setRenderTarget(composer.readBuffer), compile + getUniforms, restore. ~190 ms, ?twgll=0 = off.
+- Measured (tBoot PROGS=1 QS=lowmem=1 SECS=60): late links fra 1 -> 0, ath 1 -> 0. GO perf/touch-late-links (src/99c7_rev5fix.js).
+- Left: TLL compiles 17 programs under the curtain (~190 ms, many probably already cached by key); traffic-car variants not scanned (none linked late in 60 s).
