@@ -4,6 +4,12 @@ Why: the owner does not have time to test; so the genre's common practice is tur
 Every target is a RANGE. **hard** = must hold (a FAIL blocks a release); **guide** = tune towards it, a FAIL is a work item.
 Measured by `games-src/nightrun/industry-audit.js` (writes `review/industry-audit.json`). Run:
 `NODE_PATH=$(npm root -g) node games-src/nightrun/industry-audit.js` (about 5 min; `RUN_REPEAT=1` first refreshes the cross-session numbers, about 15 min).
+
+**How to run**
+- Full: `NODE_PATH=$(npm root -g) node games-src/nightrun/industry-audit.js`. Sims, then counter-test, abil-test, tutorial-test and weapon-test one after another; writes `review/industry-audit.json` (`standards`, `measures`, `harness`).
+- Quick, about 1 min: add `--quick`. One stage, no seeds, no non-god runs, no tutorial or weapon tests. Use it while developing; its numbers are not gate-grade.
+- Gate: add `--gate`. Exit code 1 when any **hard** standard FAILs. Without it the audit only prints.
+- Each SKIP line says why it is not measured. A SKIP is not a PASS.
 Ids S01-S32 match the audit's output. Genre references are called A-J here (horizontal and vertical shooters, bullet-hell, run-and-gun, rhythm-action, dash-based action and roguelite shooters).
 Where a number comes from a source it is the source's own; where the sources were qualitative the range is a practitioner estimate and is marked (est.).
 The range is for a Normal-difficulty, mid-build player unless stated.
@@ -42,9 +48,9 @@ The range is for a Normal-difficulty, mid-build player unless stated.
 | S15 | Longest gap with no new mechanic | <= 15 min | hard | The references add one or two mechanics per boss or level, a new idea every 5-10 min (ref. B) | `repeat-audit.js` (longestMechGapMin) |
 | S16 | New things per 30 game-min | >= 40, never below 20 | guide | | `repeat-audit.js` |
 | S25 | Stage length, median | 90-240 s | hard | Stage = one clear idea; arcade stages 2-4 min; the roguelite shooter's first full run is 15-20 min over about 10 areas (ref. G) | audit |
-| S26 | Checkpoints per stage of 150 s or longer | >= 1 | guide | Room-sized checkpoints and no life limit in ref. D; classic arcade has none but a 7-stage loop | `ret-cp-test.js`; audit reads `CHK.bars` when present |
+| S26 | Checkpoints per stage of 150 s or longer | >= 1 | guide | Room-sized checkpoints and no life limit in ref. D; classic arcade has none but a 7-stage loop | audit: checkpoint plan the page builds per story stage (CPPROBE), worst stage of 150 s or longer; `ret-cp-test.js` checks the behaviour |
 | - | Run length (until a natural stop) | 10-30 min | guide | Session length of the references; 30 min is also the target of the survival-style reference (ref. H) | `repeat-audit.js` gameMinutes per session |
-| S27 | Choice points per hour (cards, forks, loadout swaps) | >= 6 | guide | The roguelite references offer 3-4 options per level-up (ref. G: 4) or per room | `repeat-audit.js` pitStops (`pitStart` must fire in sim) |
+| S27 | Choice points per hour (cards, forks, loadout swaps) | >= 6 | guide | The roguelite references offer 3-4 options per level-up (ref. G: 4) or per room | audit: `pitStart` count in the arcade sim; SKIP with the reason while the pit stop never fires there (0 in repeat-audit arcade-normal); `choices-test.js` for the card logic |
 
 ## 4. Player verbs: dash, panic button, power-ups, risk and reward
 | Id | Standard | Range | Level | Practice behind it | Measured how |
@@ -52,20 +58,20 @@ The range is for a Normal-difficulty, mid-build player unless stated.
 | S20 | Panic button (EMP / bomb) uses per minute, competent bot | 0.3-1.5 (est.) | guide | A bomb is scarce and valuable (ref. C), but a never-used one is dead UI | audit |
 | S21 | Dash uses per minute | 3-10 (est.) | guide | | audit |
 | S22 | Share of dashes that are last-moment reflexes (bullet within 60 px) | <= 70% | guide | Dash with invulnerability frames became the core verb in two references (ref. E, F); a patch that gave them was called the most significant change and was then trimmed, not removed (ref. E) | audit; `abil-test.js` for value |
-| S30 | Answer value: hull lost without the right answer vs with it, per threat | ratio >= 2x on every threat, parry included | hard | One right answer per threat is fine, only if it pays | `counter-test.js`, `abil-test.js` |
-| S31 | Weapon spread: best weapon's stage time within 15% of the median | <= 15% | guide | | `reward-test.js` (REPORT=1) |
+| S30 | Answer value: hull lost without the right answer vs with it, per threat | ratio >= 2x on every threat, parry included | hard | One right answer per threat is fine, only if it pays | audit: worst threat of `counter-test.js` (hull lost without / with the timed answer; denominator at least 1). `abil-test.js` clear rates are logged in `harness.abilClear` |
+| S31 | Weapon spread: best weapon's stage time within 15% of the median | <= 15% | guide | | audit: `weapon-test.js` stage-1 clear time per weapon at LV1; (median - fastest) / median |
 | - | Death penalty on power-ups | lose some, not all; a rank system eases the next life | guide | Ref. A strips every power-up and lowers rank; a recovery wave follows. Players call the cycle a trap if the rank cannot keep up | `strategy-test.js`, `choices-test.js` |
 | - | Scoring: chain or graze reward with a visible cap | chain doubles per link, 9 links (ref. B); graze gauge (ref. C) | guide | | `ret-test.js` (reward) |
-| S29 | Real decisions per minute (a choice with a trade-off) | >= 6 (est.) | guide | | not measurable yet: needs a decision log |
+| S29 | Real decisions per minute (a choice with a trade-off) | >= 6 (est.) | guide | | SKIP: the harnesses log presses and hull, not decisions; needs a decision log first (dash and EMP rates are S20, S21) |
 
 ## 5. Fairness, forgiveness, accessibility, onboarding
 | Id | Standard | Range | Level | Practice behind it | Measured how |
 |---|---|---|---|---|---|
 | S23 | First-try stage clear, a competent bot with no oracle (Normal) | 55-90% | hard | A reflex player should clear most stages first try, not 11% | `repeat-audit.js` (firstTryFails) |
-| S24 | Bullet contacts per stage, competent bot | 3-8 (est.) | guide | | audit (needs a non-god run; reads 0 in god mode) |
+| S24 | Bullet contacts per stage, competent bot | 3-8 (est.) | guide | | audit: non-god runs on stages 3, 8, 20; contacts counted until clear or death |
 | S28 | Assist options (game speed, hit tolerance, auto-aim, extra dashes, ...) | >= 3 | guide | Ref. D ships slow-down, extra dashes and invincibility, achievements stay on; its hidden aids are input buffering, grace windows and corner correction | audit (setting keys); `ret-assist-test.js` |
 | - | Input forgiveness: buffer or grace window on dash and EMP | present | guide | Ref. D | `timing-test.js` |
-| S32 | Time to first kill in a new session | <= 20 s | guide | A one-stick, one-button rhythm game (ref. I) is playable at once; the references teach one idea per fight | `tutorial-test.js` |
+| S32 | Time to first kill in a new session | <= 20 s | guide | A one-stick, one-button rhythm game (ref. I) is playable at once; the references teach one idea per fight | audit: `FIRSTKILL` line of `tutorial-test.js` (kill event, from the flight school start; worst of desktop and phone) |
 | - | Hint lines per session, no hint more than 3 times | <= 60 | guide | | `repeat-audit.js` |
 
 ## 6. Reading the results

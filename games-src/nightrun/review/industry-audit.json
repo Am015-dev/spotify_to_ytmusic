@@ -1,7 +1,8 @@
 {
  "meta": {
-  "date": "2026-10-20T06:36:57.220Z",
-  "head": "7573c3e",
+  "date": "2026-10-20T06:55:27.096Z",
+  "head": "4d980f6",
+  "quick": false,
   "stages": [
    3,
    8,
@@ -10,7 +11,12 @@
    30
   ],
   "seeds": 3,
-  "realSecs": 9,
+  "nogod": [
+   3,
+   8,
+   20
+  ],
+  "realSecs": 242,
   "pageErrors": []
  },
  "standards": [
@@ -19,6 +25,15 @@
    "level": "guide",
    "topic": "Panic button (EMP) uses per minute, competent bot",
    "range": "0.3 - 1.5",
+   "value": 0,
+   "status": "FAIL",
+   "gap": 1
+  },
+  {
+   "id": "S24",
+   "level": "guide",
+   "topic": "Bullet contacts per stage (bullet inside the ship hit radius; dash/invuln not excluded), competent bot",
+   "range": "3 - 8",
    "value": 0,
    "status": "FAIL",
    "gap": 1
@@ -33,40 +48,40 @@
    "gap": 0.8933333333333332
   },
   {
-   "id": "S01",
+   "id": "S23",
    "level": "hard",
-   "topic": "Median on-screen life of the shortest-lived enemy kind (s)",
-   "range": ">= 1.5",
-   "value": 0.4,
+   "topic": "First-try stage clear, bot with no oracle (Normal)",
+   "range": "0.55 - 0.90",
+   "value": 0.11,
    "status": "FAIL",
-   "gap": 0.7333333333333334
-  },
-  {
-   "id": "S04",
-   "level": "guide",
-   "topic": "Enemy bullets on screen, mean (non-boss + boss)",
-   "range": "12 - 60",
-   "value": 4.6,
-   "status": "FAIL",
-   "gap": 0.6166666666666667
+   "gap": 0.8
   },
   {
    "id": "S17",
    "level": "hard",
    "topic": "Spawn-schedule Jaccard across seeds, stage 10",
    "range": "<= 0.35",
-   "value": 0.51,
+   "value": 0.62,
    "status": "FAIL",
-   "gap": 0.45714285714285724
+   "gap": 0.7714285714285716
+  },
+  {
+   "id": "S04",
+   "level": "guide",
+   "topic": "Enemy bullets on screen, mean (non-boss + boss)",
+   "range": "12 - 60",
+   "value": 4.96,
+   "status": "FAIL",
+   "gap": 0.5866666666666667
   },
   {
    "id": "S22",
    "level": "guide",
    "topic": "Share of dashes that are last-moment reflexes (bullet within 60 px)",
    "range": "<= 0.70",
-   "value": 0.96,
+   "value": 0.95,
    "status": "FAIL",
-   "gap": 0.37142857142857144
+   "gap": 0.35714285714285715
   },
   {
    "id": "S28",
@@ -78,49 +93,31 @@
    "gap": 0.3333333333333333
   },
   {
-   "id": "S03",
-   "level": "guide",
-   "topic": "Median on-screen life, all kinds (s)",
-   "range": "3 - 10",
-   "value": 2.12,
-   "status": "FAIL",
-   "gap": 0.2933333333333333
-  },
-  {
    "id": "S06",
    "level": "guide",
    "topic": "Bullet density ramp, late stage / early stage",
    "range": "1.5 - 3.5",
-   "value": 1.09,
+   "value": 1.08,
    "status": "FAIL",
-   "gap": 0.27333333333333326
-  },
-  {
-   "id": "S23",
-   "level": "hard",
-   "topic": "First-try stage clear, bot with no oracle (Normal)",
-   "range": "0.55 - 0.90",
-   "value": 0.49,
-   "status": "FAIL",
-   "gap": 0.10909090909090918
-  },
-  {
-   "id": "S13",
-   "level": "hard",
-   "topic": "Repeat within 5 min (arcade-normal)",
-   "range": "< 0.75",
-   "value": 0.818,
-   "status": "FAIL",
-   "gap": 0.0906666666666666
+   "gap": 0.27999999999999997
   },
   {
    "id": "S09",
    "level": "hard",
    "topic": "Single enemy kind share of spawns",
    "range": "<= 0.35",
-   "value": 0.38,
+   "value": 0.4,
    "status": "FAIL",
-   "gap": 0.0857142857142858
+   "gap": 0.142857142857143
+  },
+  {
+   "id": "S13",
+   "level": "hard",
+   "topic": "Repeat within 5 min (arcade-normal)",
+   "range": "< 0.75",
+   "value": 0.841,
+   "status": "FAIL",
+   "gap": 0.1213333333333333
   },
   {
    "id": "S12",
@@ -132,20 +129,38 @@
    "gap": 0.08333333333333333
   },
   {
-   "id": "S08",
-   "level": "guide",
-   "topic": "Spawns per minute",
-   "range": "20 - 80",
-   "value": 84.22,
+   "id": "S14",
+   "level": "hard",
+   "topic": "Plain-loop share of play time",
+   "range": "< 0.35",
+   "value": 0.37,
    "status": "FAIL",
-   "gap": 0.052749999999999984
+   "gap": 0.0571428571428572
+  },
+  {
+   "id": "S01",
+   "level": "hard",
+   "topic": "Median on-screen life of the shortest-lived enemy kind (s)",
+   "range": ">= 1.5",
+   "value": 2.09,
+   "status": "PASS",
+   "gap": 0
   },
   {
    "id": "S02",
    "level": "hard",
    "topic": "Enemies killed < 0.7 s after entering view (share of kills)",
    "range": "<= 0.15",
-   "value": 0.11,
+   "value": 0,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S03",
+   "level": "guide",
+   "topic": "Median on-screen life, all kinds (s)",
+   "range": "3 - 10",
+   "value": 3.13,
    "status": "PASS",
    "gap": 0
   },
@@ -163,7 +178,16 @@
    "level": "guide",
    "topic": "Enemies on screen at once, mean",
    "range": "3 - 10",
-   "value": 5.22,
+   "value": 6.22,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S08",
+   "level": "guide",
+   "topic": "Spawns per minute",
+   "range": "20 - 80",
+   "value": 78.57,
    "status": "PASS",
    "gap": 0
   },
@@ -172,7 +196,7 @@
    "level": "hard",
    "topic": "Median stage boss fight length (s)",
    "range": "40 - 110",
-   "value": 88.15,
+   "value": 88.55,
    "status": "PASS",
    "gap": 0
   },
@@ -186,20 +210,11 @@
    "gap": 0
   },
   {
-   "id": "S14",
-   "level": "hard",
-   "topic": "Plain-loop share of play time",
-   "range": "< 0.35",
-   "value": 0.34,
-   "status": "PASS",
-   "gap": 0
-  },
-  {
    "id": "S16",
    "level": "guide",
    "topic": "New things in the first 30 game-min",
    "range": ">= 40",
-   "value": 145,
+   "value": 120,
    "status": "PASS",
    "gap": 0
   },
@@ -208,7 +223,7 @@
    "level": "guide",
    "topic": "Median enemy fire-interval CV, stage 10",
    "range": ">= 0.25",
-   "value": 0.35,
+   "value": 0.29,
    "status": "PASS",
    "gap": 0
   },
@@ -226,17 +241,8 @@
    "level": "guide",
    "topic": "Dash uses per minute, competent bot",
    "range": "3 - 10",
-   "value": 3.84,
+   "value": 4.77,
    "status": "PASS",
-   "gap": 0
-  },
-  {
-   "id": "S24",
-   "level": "guide",
-   "topic": "Bullet contacts per stage (bullet inside the ship hit radius; dash/invuln not excluded), competent bot",
-   "range": "3 - 8",
-   "value": null,
-   "status": "SKIP",
    "gap": 0
   },
   {
@@ -244,7 +250,7 @@
    "level": "hard",
    "topic": "Stage length, median (s)",
    "range": "90 - 240",
-   "value": 147.6,
+   "value": 149.1,
    "status": "PASS",
    "gap": 0
   },
@@ -255,158 +261,162 @@
    "range": ">= 1",
    "value": null,
    "status": "SKIP",
-   "gap": 0
+   "gap": 0,
+   "reason": "no story stage of 150 s or longer (CPPROBE: 3=125s 8=89s 10=101s 20=125s 30=89s)"
   },
   {
    "id": "S27",
    "level": "guide",
    "topic": "Choice points (pit-stop cards) per hour",
    "range": ">= 6",
+   "value": null,
    "status": "SKIP",
+   "gap": 0,
+   "reason": "pit stop never fired in 12.16 game-min of arcade sim (0 pitStart); not changed here, see choices-test.js"
+  },
+  {
+   "id": "S30",
+   "level": "hard",
+   "topic": "Answer value: hull lost without the timed answer / with it, worst threat (counter-test)",
+   "range": ">= 2x",
+   "value": 2,
+   "status": "PASS",
    "gap": 0
   },
   {
    "id": "S29",
    "level": "guide",
-   "topic": "skill decisions / min (needs a decision log)",
-   "range": "see INDUSTRY-STANDARDS.md",
+   "topic": "Real decisions per minute",
+   "range": ">= 6 (est.)",
    "value": null,
    "status": "SKIP",
-   "gap": 0
-  },
-  {
-   "id": "S30",
-   "level": "guide",
-   "topic": "ability value vs random (abil-test, counter-test)",
-   "range": "see INDUSTRY-STANDARDS.md",
-   "value": null,
-   "status": "SKIP",
-   "gap": 0
+   "gap": 0,
+   "reason": "no decision log: the harnesses report presses and hull, not choices (dash and EMP rates are S20 and S21)"
   },
   {
    "id": "S31",
    "level": "guide",
-   "topic": "weapon spread (reward-test)",
-   "range": "see INDUSTRY-STANDARDS.md",
-   "value": null,
-   "status": "SKIP",
+   "topic": "Weapon spread: fastest single weapon to clear stage 1 vs the median weapon, LV1 (weapon-test)",
+   "range": "<= 15%",
+   "value": 0,
+   "status": "PASS",
    "gap": 0
   },
   {
    "id": "S32",
    "level": "guide",
-   "topic": "tutorial time-to-first-kill (tutorial-test)",
-   "range": "see INDUSTRY-STANDARDS.md",
-   "value": null,
-   "status": "SKIP",
+   "topic": "Time to first kill in a new session, worst of desktop and phone, s (tutorial-test)",
+   "range": "<= 20",
+   "value": 2.3,
+   "status": "PASS",
    "gap": 0
   }
  ],
  "measures": {
   "lifeByKind": {
    "drone": {
-    "n": 324,
-    "median": 2.04,
+    "n": 309,
+    "median": 2.67,
     "killedShare": 1,
     "killedWithin07": 0
    },
    "gate": {
-    "n": 13,
-    "median": 4.2,
-    "killedShare": 0.62,
+    "n": 17,
+    "median": 11.27,
+    "killedShare": 0.35,
     "killedWithin07": 0
    },
    "gturret": {
-    "n": 13,
-    "median": 1.62,
+    "n": 10,
+    "median": 3.46,
     "killedShare": 1,
     "killedWithin07": 0
    },
    "swarm": {
-    "n": 183,
-    "median": 1.23,
-    "killedShare": 1,
-    "killedWithin07": 0.32
+    "n": 150,
+    "median": 2.09,
+    "killedShare": 0.99,
+    "killedWithin07": 0
    },
    "charger": {
-    "n": 94,
-    "median": 1.87,
-    "killedShare": 1,
+    "n": 88,
+    "median": 2.47,
+    "killedShare": 0.97,
     "killedWithin07": 0
    },
    "charger*": {
     "n": 34,
-    "median": 2.27,
-    "killedShare": 1,
+    "median": 2.89,
+    "killedShare": 0.88,
     "killedWithin07": 0
    },
    "gwalker": {
-    "n": 10,
-    "median": 3.42,
-    "killedShare": 1,
+    "n": 12,
+    "median": 4.19,
+    "killedShare": 0.92,
     "killedWithin07": 0
    },
    "shielder": {
-    "n": 30,
-    "median": 3.17,
+    "n": 23,
+    "median": 3.55,
     "killedShare": 1,
     "killedWithin07": 0
    },
    "drone*": {
-    "n": 56,
-    "median": 3.16,
-    "killedShare": 0.98,
+    "n": 61,
+    "median": 4.4,
+    "killedShare": 0.93,
     "killedWithin07": 0
    },
    "mine": {
-    "n": 89,
-    "median": 2.02,
-    "killedShare": 0.99,
-    "killedWithin07": 0.04
+    "n": 93,
+    "median": 4.15,
+    "killedShare": 1,
+    "killedWithin07": 0
    },
    "gunship": {
-    "n": 37,
-    "median": 8.92,
-    "killedShare": 0.78,
+    "n": 32,
+    "median": 13.54,
+    "killedShare": 0.88,
     "killedWithin07": 0
    },
    "splitter": {
-    "n": 13,
-    "median": 2.27,
+    "n": 11,
+    "median": 4.38,
     "killedShare": 1,
     "killedWithin07": 0
    },
    "zdrn": {
-    "n": 53,
-    "median": 0.4,
-    "killedShare": 1,
-    "killedWithin07": 0.75
+    "n": 28,
+    "median": 2.13,
+    "killedShare": 0.96,
+    "killedWithin07": 0
    },
    "sniper": {
     "n": 14,
-    "median": 9.22,
-    "killedShare": 0.86,
+    "median": 8.92,
+    "killedShare": 0.93,
     "killedWithin07": 0
    }
   },
-  "lifeMedianAll": 2.12,
-  "kindMedianMin": 0.4,
-  "kindMedianMinKind": "zdrn",
-  "killedShare": 0.97,
-  "killedUnder07": 0.11,
-  "ebMean": 4.6,
+  "lifeMedianAll": 3.13,
+  "kindMedianMin": 2.09,
+  "kindMedianMinKind": "swarm",
+  "killedShare": 0.95,
+  "killedUnder07": 0,
+  "ebMean": 4.96,
   "ebP95": 14,
-  "ebBossP95": 5,
-  "ebMax": 31,
-  "enMean": 5.22,
-  "ebRamp": 1.09,
+  "ebBossP95": 6,
+  "ebMax": 23,
+  "enMean": 6.22,
+  "ebRamp": 1.08,
   "ebRampStages": [
    3,
    30
   ],
-  "gameMinutes": 11.97,
-  "spawnsPerMin": 84.22,
-  "droneShare": 0.38,
+  "gameMinutes": 12.16,
+  "spawnsPerMin": 78.57,
+  "droneShare": 0.4,
   "stageSecs": [
    [
     3,
@@ -415,7 +425,7 @@
    ],
    [
     8,
-    132,
+    136.2,
     true
    ],
    [
@@ -430,253 +440,424 @@
    ],
    [
     30,
-    147.6,
+    154.6,
     true
    ]
   ],
-  "stageSecsMedian": 147.6,
+  "stageSecsMedian": 149.1,
   "bosses": [
    {
     "n": 8,
     "nm": "SEK-ADLER",
-    "secs": 88.15,
+    "secs": 88.55,
     "phases": 3,
     "verbs": 13,
     "mini": false
    }
   ],
-  "bossSecsMedian": 88.15,
+  "bossSecsMedian": 88.55,
   "bossPhasesMin": 3,
   "bossPhasesMedian": 3,
   "bossesWithPhaseData": 1,
   "bossVerbsMedian": 13,
-  "dashPerMin": 3.84,
+  "dashPerMin": 4.77,
   "empPerMin": 0,
-  "laneChangesPerMin": 98.68,
-  "dashReflexShare": 0.96,
-  "hitsPerStage": null,
+  "laneChangesPerMin": 90.09,
+  "dashReflexShare": 0.95,
+  "hitsPerStage": 0,
+  "nogodRuns": [
+   [
+    8,
+    80.4,
+    false,
+    0
+   ],
+   [
+    3,
+    149.1,
+    true,
+    0
+   ],
+   [
+    20,
+    149.1,
+    true,
+    0
+   ]
+  ],
   "checkpointsPerStage": null,
+  "cpRows": [
+   {
+    "n": 3,
+    "len": 125,
+    "cps": 2
+   },
+   {
+    "n": 8,
+    "len": 89,
+    "cps": 2
+   },
+   {
+    "n": 10,
+    "len": 101,
+    "cps": 2
+   },
+   {
+    "n": 20,
+    "len": 125,
+    "cps": 2
+   },
+   {
+    "n": 30,
+    "len": 89,
+    "cps": 2
+   }
+  ],
+  "pitStopsPerHour": null,
   "assistKeys": [
    "auto",
    "aim"
   ],
-  "predJaccard": 0.51,
+  "predJaccard": 0.62,
   "predDistinctOrders": 3,
   "predSeeds": 3,
-  "fireCV": 0.35,
-  "fireCVn": 7,
-  "repeatFile": "../../../tmp/claude-0/-home-user-spotify-to-ytmusic/051fd965-fb89-561c-a655-607d03407a78/scratchpad/ra-head.json",
-  "repeat5": 0.818,
-  "plainLoop": 0.34,
-  "jaccardStages": 0.24,
+  "fireCV": 0.29,
+  "fireCVn": 8,
+  "repeatFile": "review/repeat-audit-3.json",
+  "repeat5": 0.841,
+  "plainLoop": 0.37,
+  "jaccardStages": 0.25,
   "longestMechGapMin": 28.4,
-  "newThingsPer30": 145,
-  "firstTryClear": 0.49,
-  "bossKits": 23,
-  "bossFights": 26,
+  "newThingsPer30": 120,
+  "firstTryClear": 0.11,
+  "bossKits": 20,
+  "bossFights": 22,
   "pitStops": 0,
-  "gameMinSession": 199.3,
+  "gameMinSession": 226.6,
   "per5min": [
    [
     0,
-    22,
+    21,
     4
    ],
    [
     5,
-    27,
-    11
+    16,
+    4
    ],
    [
     10,
-    26,
-    9
-   ],
-   [
-    15,
-    26,
-    7
-   ],
-   [
-    20,
-    31,
-    11
-   ],
-   [
-    25,
-    49,
-    12
-   ],
-   [
-    30,
-    39,
-    14
-   ],
-   [
-    35,
-    30,
-    14
-   ],
-   [
-    40,
-    37,
-    17
-   ],
-   [
-    45,
-    41,
-    18
-   ],
-   [
-    50,
-    43,
-    16
-   ],
-   [
-    55,
-    36,
-    14
-   ],
-   [
-    60,
-    25,
-    9
-   ],
-   [
-    65,
-    54,
-    13
-   ],
-   [
-    70,
-    43,
-    15
-   ],
-   [
-    75,
-    46,
-    15
-   ],
-   [
-    80,
-    49,
-    21
-   ],
-   [
-    85,
-    31,
-    18
-   ],
-   [
-    90,
-    29,
-    15
-   ],
-   [
-    95,
-    37,
-    19
-   ],
-   [
-    100,
-    42,
-    14
-   ],
-   [
-    105,
-    44,
-    11
-   ],
-   [
-    110,
-    35,
-    13
-   ],
-   [
-    115,
-    47,
-    15
-   ],
-   [
-    120,
-    37,
-    18
-   ],
-   [
-    125,
-    47,
-    20
-   ],
-   [
-    130,
-    44,
-    17
-   ],
-   [
-    135,
     30,
     10
    ],
    [
-    140,
-    42,
-    13
+    15,
+    32,
+    11
    ],
    [
-    145,
+    20,
+    25,
+    7
+   ],
+   [
+    25,
+    28,
+    12
+   ],
+   [
+    30,
+    37,
+    12
+   ],
+   [
+    35,
+    42,
+    14
+   ],
+   [
+    40,
     31,
     12
    ],
    [
-    150,
-    26,
-    12
-   ],
-   [
-    155,
-    41,
+    45,
+    36,
     17
    ],
    [
-    160,
-    33,
-    19
-   ],
-   [
-    165,
-    41,
-    19
-   ],
-   [
-    170,
-    42,
+    50,
+    40,
     18
    ],
    [
-    175,
-    33,
+    55,
+    28,
+    13
+   ],
+   [
+    60,
+    26,
+    10
+   ],
+   [
+    65,
+    38,
+    14
+   ],
+   [
+    70,
+    36,
+    14
+   ],
+   [
+    75,
+    47,
+    13
+   ],
+   [
+    80,
+    42,
+    14
+   ],
+   [
+    85,
+    45,
+    13
+   ],
+   [
+    90,
+    29,
+    13
+   ],
+   [
+    95,
+    36,
+    18
+   ],
+   [
+    100,
+    30,
+    20
+   ],
+   [
+    105,
+    47,
+    20
+   ],
+   [
+    110,
+    36,
+    19
+   ],
+   [
+    115,
+    44,
+    15
+   ],
+   [
+    120,
+    40,
+    11
+   ],
+   [
+    125,
+    30,
     12
    ],
    [
-    180,
-    28,
-    9
-   ],
-   [
-    185,
+    130,
     25,
     11
    ],
    [
+    135,
+    28,
+    13
+   ],
+   [
+    140,
+    32,
+    15
+   ],
+   [
+    145,
+    35,
+    17
+   ],
+   [
+    150,
+    45,
+    18
+   ],
+   [
+    155,
+    29,
+    16
+   ],
+   [
+    160,
+    29,
+    9
+   ],
+   [
+    165,
+    41,
+    12
+   ],
+   [
+    170,
+    36,
+    13
+   ],
+   [
+    175,
+    34,
+    16
+   ],
+   [
+    180,
+    28,
+    13
+   ],
+   [
+    185,
+    32,
+    17
+   ],
+   [
     190,
-    44,
-    14
+    27,
+    11
    ],
    [
     195,
     23,
+    18
+   ],
+   [
+    200,
+    35,
     14
+   ],
+   [
+    205,
+    38,
+    12
+   ],
+   [
+    210,
+    35,
+    11
+   ],
+   [
+    215,
+    35,
+    14
+   ],
+   [
+    220,
+    29,
+    14
+   ],
+   [
+    225,
+    12,
+    13
    ]
+  ]
+ },
+ "harness": {
+  "threats": [
+   {
+    "threat": "SEEKER (parry dash)",
+    "without": 2,
+    "with": 0,
+    "ratio": 2
+   },
+   {
+    "threat": "LASER WALL (dash through)",
+    "without": 9,
+    "with": 0,
+    "ratio": 9
+   },
+   {
+    "threat": "CURTAIN (EMP)",
+    "without": 5,
+    "with": 0,
+    "ratio": 5
+   }
+  ],
+  "abilClear": {
+   "with": 0,
+   "without": 0
+  },
+  "firstKill": 2.3,
+  "weapons": [
+   {
+    "id": "arc",
+    "secs": 147.4
+   },
+   {
+    "id": "beat",
+    "secs": 147.4
+   },
+   {
+    "id": "disc",
+    "secs": 147.4
+   },
+   {
+    "id": "laser",
+    "secs": 147.4
+   },
+   {
+    "id": "mine",
+    "secs": 147.4
+   },
+   {
+    "id": "orbit",
+    "secs": 147.4
+   },
+   {
+    "id": "pulse",
+    "secs": 147.4
+   },
+   {
+    "id": "swarm",
+    "secs": 147.4
+   },
+   {
+    "id": "flame",
+    "secs": 147.4
+   },
+   {
+    "id": "frost",
+    "secs": 147.4
+   },
+   {
+    "id": "drone",
+    "secs": 147.4
+   },
+   {
+    "id": "rail",
+    "secs": 147.4
+   },
+   {
+    "id": "shell",
+    "secs": 147.4
+   },
+   {
+    "id": "storm",
+    "secs": 147.4
+   },
+   {
+    "id": "wave",
+    "secs": 147.4
+   },
+   {
+    "id": "well",
+    "secs": 147.4
+   }
   ]
  }
 }
