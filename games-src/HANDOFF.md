@@ -1,5 +1,12 @@
 # Handoff: start a new session from this file
 
+## Nightrun enemy variants (W16, flag RET.variants, ?variants=0 = exact old spawns and draws, 20 Oct 2026)
+- `parts/variants.js` (after stagescripts.js): table `VAR.TAB` (stage bands: mini / large / giant / flip / rot / tint / elite chances) + `VAR.CL` (class numbers) + `VAR.KINDS` (which kind may be which class / orientation). Every enemy en() builds is rolled once (own dice, never Math.random): CLASS mini (r x.6, hull x.5, single shots every 2nd, pack of 3-5) | normal | large (r x1.5, hull x2.5, slower, double fire, drops a shard) | giant (r x2.2, plates, gapped ring every 3rd shot, 1 per stage, drops an upgrade); ORIENT N | V (vertical mirror) | T / B (rotated 90, comes down / up) | L (rotated 180: enters from the left, U-turn, flies back left); TINT 0 | 1 / 2 (hue + 1 / 2 pips) | 3 ELITE (dashed ring + diamond, x1.5 hull, shield | split into 2 minis on death | medic link).
+- T / B / L are paths on the formations.js rails (drones only), pictures are turned by canvas transform in drawEnemy (VAR.in / VAR.out), so placeholders and pictures both work. Hull ledger steers the rolls so a stage stays within +-10% of the old total hull.
+- Hooks (one line each): b.js en() (VAR.apply / VAR.after), enemy loop (VAR.pace), eb() (VAR.shot); draw.js drawEnemy; c.js (VAR.mark overlay); formations.js (VAR.st.fm guard: no orientation or packs inside formations).
+- Tests: `variants-test.js` (combos draw in phone + landscape, flag-off seeded identical, looks per stage, hull +-10%, caps, mini life vs DMG floor). repeat-audit.js now also logs 'look' events and `enemyLooks` per stage.
+- Weak: dash-feint elite not done; giant counts as mini-boss only by flag e.mb (no stats event); formation units get class / tint but no orientation or packs; mini packs only for plain waves; hue shift uses ctx.filter (missing on older iOS: pips and rings still tell them apart); lab Enemy preview does not list variants yet; normal enemies still die at ~1.2 s on screen (old DMG floor, W13's area).
+
 Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never merge to main). The site is
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
