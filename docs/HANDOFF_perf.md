@@ -496,3 +496,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Measured (touch, lowmem, GC'd, 60 s real roam): Athens ready 531→531, after 60 s 539→532; 813 chunks 57.3→10.7 MB deflated; Frankfurt after 60 s 445. Gain ~45 MB of arrays, masked by roam growth: below 80 MB → OFF.
 4. Gates (built page): unit 0 FAIL; life1/xf1/terrain/phone2/sky-blue 46/47 (xf1/grass known red); perf/ios-mem PASS; mem-quant + touch-first-frames red only in the combined run after ios-mem, same on base r17n0, PASS alone. No shot (default OFF).
 5. Next: zip off chunks under the load curtain (moves the gain to "ready"), slice 2 far trG/gk/dr deflate after a reader audit, slice 3 per-cell block plans; fix the GO heap measure (run STR_up with drawing on).
+
+## ios-r17p (heap growth first 30 s of roam, touch)
+- Measured with the real touch tier (`?lowmem=1`): Frankfurt 378 → 397 MB (+19), Athens 528 → 545 MB (+17). Review #17's +77..+112 came from tChkGo booting the desktop tier (GO prints `LOWMEM false`), not from the iPhone profile.
+- Top retained growth owners (fra, sampling-profile diff): FCG_packStep packed-grid Map 5.7 MB, LF_di/LF_tileG tile caches ~4 MB, propRespawn 1.3 MB; no unbounded list or undisposed geometry found.
+- GO perf/ios-mem now asserts heap growth over the 30 s roam ≤ +30 MB when LOWMEM (info only on the desktop tier). Run it as `tChkGo.js "<url>?lowmem=1"`.
+- Left: desktop-tier growth (+86 fra) is not asserted; FCG pack Map could become a typed hash (~5 MB).

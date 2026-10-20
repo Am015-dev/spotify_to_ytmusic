@@ -406,7 +406,7 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
 // ios-r17a (iPhone 17: "freezes", "when I rotate it loads again" = iOS killing the WebGL tab for memory): GO perf/ios-mem asserts a touch memory budget per city
 // (GPU estimate = buffers + textures + mip chains + render buffers + canvas, MEM_GPU.est(); JS heap) at ready and after 30 s of roam, and that a rotate
 // (852×393 → 393×852 → back) only resizes the renderer: < 20 MB new bytes, no boot / city build / world build call, no new geometries, textures or programs.
-const IOSM={gpu:500,heap:250,rot:20,on:/[?&]iosmem=1/.test(location.search)};   // the budget lines assert only with ?iosmem=1 until the heap fits (r17a: fra 382, ath 605 MB retained at ready); the rotate line always asserts
+const IOSM={gpu:500,heap:250,rot:20,grow:30,on:/[?&]iosmem=1/.test(location.search)};   // the budget lines assert only with ?iosmem=1 until the heap fits (r17a: fra 382, ath 605 MB retained at ready); the rotate line always asserts
 function IOSM_smp(){const i=renderer.info,pm=performance.memory;return{gpu:MEM_GPU.est(),heap:pm?Math.round(pm.usedJSHeapSize/1048576):0,geo:i.memory.geometries,tex:i.memory.textures,prog:(i.programs||[]).length,
  buf:+(MEM_GPU.bb/1048576).toFixed(0),tx:+(MEM_GPU.tb/1048576).toFixed(0),mip:+((MEM_GPU.mxb||0)/1048576).toFixed(0),rb:+((MEM_GPU.rbb||0)/1048576).toFixed(0),pr:renderer.getPixelRatio()}}
 function IOSM_top(n){const S=new Map;scene.traverse(o=>{for(const m of[].concat(o.material||[]))for(const k in m){const v=m[k];if(v&&v.isTexture&&v.image&&!S.has(v)){const im=v.image,w=im.width||0,h=im.height||0,d=im.depth||1;S.set(v,{k:(v.name||k)+' '+w+'x'+h+(d>1?'x'+d:''),b:w*h*d*4})}}});
@@ -421,6 +421,7 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
   const fin=()=>{try{__tq.draw()}catch(e){}return gc().then(()=>{const a=S.a,b=S.b,z=IOSM_smp();IOSM_wrap(false);const R=[],cl=Object.entries(IOSM.calls).map(([k,v])=>k+'×'+v).join(' ')||'none',dg=+(z.gpu-b.gpu).toFixed(1),dh=z.heap-b.heap;
    const L=x=>'GPU '+x.gpu+' MB (buf '+x.buf+', tex '+x.tx+', mip '+x.mip+', rb '+x.rb+'), heap '+x.heap+' MB';
    const bi=IOSM.on?'':' (info until ?iosmem=1: budget GPU ≤ '+IOSM.gpu+', heap ≤ '+IOSM.heap+')';R.push(['ready: '+L(a)+bi,!IOSM.on||a.gpu<=IOSM.gpu&&a.heap<=IOSM.heap]);R.push(['30 s roam: '+L(S.b0)+bi,!IOSM.on||S.b0.gpu<=IOSM.gpu&&S.b0.heap<=IOSM.heap]);
+   {const g=S.b0.heap-S.a.heap;R.push(['heap growth over the 30 s roam '+(g>=0?'+':'')+g+' MB'+(LOWMEM?' (≤ +'+IOSM.grow+')':' (info: the desktop tier is not asserted; run with ?lowmem=1)'),!LOWMEM||g<=IOSM.grow])}
    R.push(['rotate: GPU +'+dg+' MB, heap '+(dh>=0?'+':'')+dh+' MB, target reallocs '+(RZ.re-S.rz)+', builds '+cl+', pixel ratio '+z.pr+', reload '+(location.href!==S.u)+' (info: geo/tex/prog '+(z.geo-b.geo)+'/'+(z.tex-b.tex)+'/'+(z.prog-b.prog)+', measured on the 2nd rotate; the warm-up rotate: GPU +'+(b.gpu-S.b0.gpu).toFixed(1)+' MB = never-drawn geometry uploaded by the wider portrait view)',
      dg<IOSM.rot&&dg+Math.max(0,dh)<IOSM.rot&&cl==='none'&&location.href===S.u]);
    R.push(['(info) LOWMEM '+LOWMEM+', top textures: '+IOSM_top(5),true]);
