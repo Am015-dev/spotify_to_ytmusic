@@ -59,9 +59,9 @@ const AC=window.AC={get on(){return!!RET.anticamp;},LEFT:.25,WIN:6,SD:40,TELL:.8
     if(this.tells.length){ctx.save();const pulse=SET.reduce?1:.6+.4*Math.sin(t*14);ctx.strokeStyle='#ff9a3d';ctx.fillStyle='#ff9a3d';
       for(const q of this.tells){const fr=1-q.t/this.TELL,S=q.n>1?[0,-this.GAP,this.GAP]:[0];ctx.globalAlpha=(.45+.5*fr)*pulse;ctx.lineWidth=2;ctx.setLineDash([8,10]);
         if(q.k==='rear')for(const o of S){const y=q.y+o;if(y<20||y>H-20)continue;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(this.LEFT*W,y);ctx.stroke();
-          ctx.beginPath();ctx.moveTo(4,y-12);ctx.lineTo(22,y);ctx.lineTo(4,y+12);ctx.closePath();ctx.fill();}
+          if(!ART.pic('ac-flank-tell',32,13,y)){ctx.beginPath();ctx.moveTo(4,y-12);ctx.lineTo(22,y);ctx.lineTo(4,y+12);ctx.closePath();ctx.fill();}}
         else if(q.k==='dive')for(const o of S){const x=q.x+o;if(x<16||x>W*.4)continue;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();
-          ctx.beginPath();ctx.moveTo(x-12,4);ctx.lineTo(x,22);ctx.lineTo(x+12,4);ctx.closePath();ctx.fill();}
+          if(!ART.pic('ac-flank-tell',32,x,13,Math.PI/2)){ctx.beginPath();ctx.moveTo(x-12,4);ctx.lineTo(x,22);ctx.lineTo(x+12,4);ctx.closePath();ctx.fill();}}
         else{ctx.setLineDash([]);ctx.globalAlpha=(.2+.35*fr)*pulse;ctx.fillRect(0,0,10+30*fr,q.gy-this.GAP/2);ctx.fillRect(0,q.gy+this.GAP/2,10+30*fr,H-q.gy-this.GAP/2);}}
       ctx.setLineDash([]);ctx.restore();}}};
 NR.on('runStart',()=>{Object.assign(AC,{fk:0,fkT:-99,buf:[],acc:0,lv:0,cd:2,fl:0,tells:[],sw:[],lastFire:-9,sc:null,col:null});});

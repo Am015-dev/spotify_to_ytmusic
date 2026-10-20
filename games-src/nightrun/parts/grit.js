@@ -54,9 +54,9 @@ const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.
         else if(e.gcd<=0&&e.x<W-60&&e.x>P.x+60){for(const b of G.pb){if(b.vx<=0||b.hm||b.hk||b.au||b.tg||b.ab)continue;const dx=e.x-b.x;if(dx>0&&dx<190&&Math.abs(b.y-e.y)<e.r+8){e.gv=(b.y<e.y?1:-1)*(e.y<90?1:e.y>H-90?-1:1)*300;e.gvt=.2;e.gcd=1.1;break;}}}}}},
   draw(){if(!this.on||!G||G.dead)return;ctx.save();
     for(const e of G.en){if(!e.gk||e.hp<=0||e.x<-20||e.x>W+20)continue;const r=e.r+6,t=G.t;
-      if(e.gk==='plate'){ctx.strokeStyle='#e8f4ff';ctx.lineWidth=5;ctx.beginPath();ctx.arc(e.x,e.y,r,Math.PI*.62,Math.PI*1.38);ctx.stroke();ctx.strokeStyle='#7a8fa6';ctx.lineWidth=2;ctx.stroke();}
+      if((e.gk==='plate'&&ART.pic('gk-plate',r*2.2,e.x,e.y))||(e.gk==='shield'&&e.gs>0&&ART.pic('fx-w34-gk-shield',r*4,e.x,e.y))||(e.gk==='eva'&&ART.pic('gk-evasive',r*3.2,e.x,e.y))){}else if(e.gk==='plate'){ctx.strokeStyle='#e8f4ff';ctx.lineWidth=5;ctx.beginPath();ctx.arc(e.x,e.y,r,Math.PI*.62,Math.PI*1.38);ctx.stroke();ctx.strokeStyle='#7a8fa6';ctx.lineWidth=2;ctx.stroke();}
       else if(e.gk==='shield'&&e.gs>0){ctx.globalAlpha=.4+.5*Math.min(1,e.gs/(e.max*.7))+(e.gsf>0?.3:0);ctx.strokeStyle='#19e3ff';ctx.lineWidth=2.5;ctx.setLineDash([6,4]);ctx.beginPath();ctx.arc(e.x,e.y,r+2,0,7);ctx.stroke();ctx.setLineDash([]);}
-      else if(e.gk==='med'){const p=.6+.4*Math.sin(t*6);ctx.globalAlpha=p;ctx.fillStyle='#3dff7a';ctx.fillRect(e.x-2,e.y-r-12,4,12);ctx.fillRect(e.x-6,e.y-r-8,12,4);ctx.globalAlpha=.15;ctx.strokeStyle='#3dff7a';ctx.beginPath();ctx.arc(e.x,e.y,230,0,7);ctx.stroke();}
+      else if(e.gk==='med'){const p=.6+.4*Math.sin(t*6);ctx.globalAlpha=p;ctx.fillStyle='#3dff7a';if(!ART.pic('gk-medic',24,e.x,e.y-r-8)){ctx.fillRect(e.x-2,e.y-r-12,4,12);ctx.fillRect(e.x-6,e.y-r-8,12,4);}ctx.globalAlpha=.15;ctx.strokeStyle='#3dff7a';ctx.beginPath();ctx.arc(e.x,e.y,230,0,7);ctx.stroke();}
       else if(e.gk==='eva'){ctx.strokeStyle='#d36bff';ctx.lineWidth=2;ctx.globalAlpha=e.gvt>0?.9:.55;for(let i=1;i<=2;i++){ctx.beginPath();ctx.moveTo(e.x+r+i*5,e.y-8);ctx.lineTo(e.x+r+i*5-6,e.y);ctx.lineTo(e.x+r+i*5,e.y+8);ctx.stroke();}}}
     ctx.restore();}};
 /* meter fill time on the EMP button */
