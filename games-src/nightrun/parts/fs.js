@@ -23,7 +23,7 @@ if(RET.fs){(()=>{
     cardEl.innerHTML='<div style="font:700 17px/1.2 system-ui,sans-serif;margin-bottom:6px">PLAY FULL SCREEN</div>'+
       '<div>Safari and Chrome on iPhone cannot hide their bars. Install the game and it opens full screen:</div>'+
       '<ol style="margin:8px 0 10px 20px;padding:0"><li>Tap <b>Share</b> (the square with the arrow, bottom or top bar)</li><li>Tap <b>Add to Home Screen</b></li><li>Open <b>Nightrun</b> from your home screen</li></ol>'+
-      '<div style="display:flex;gap:10px"><button type="button" id="fsOk" style="flex:1;min-height:48px;border:0;border-radius:10px;background:#ff2d78;color:#fff;font:700 15px system-ui">GOT IT</button><button type="button" id="fsNo" style="flex:1;min-height:48px;border:1px solid #6a5a8a;border-radius:10px;background:#0000;color:#cfc9f2;font:600 15px system-ui">DON\'T SHOW AGAIN</button></div>';
+      '<div style="display:flex;gap:10px"><button type="button" id="fsOk" style="flex:1;min-height:48px;border:0;border-radius:10px;background:#c8175c;color:#fff;font:700 15px system-ui">GOT IT</button><button type="button" id="fsNo" style="flex:1;min-height:48px;border:1px solid #6a5a8a;border-radius:10px;background:#0000;color:#cfc9f2;font:600 15px system-ui">DON\'T SHOW AGAIN</button></div>';
     document.body.appendChild(cardEl);cardEl.querySelector('#fsOk').addEventListener('click',()=>closeCard(false));cardEl.querySelector('#fsNo').addEventListener('click',()=>closeCard(true));};
   FSX.ios=ios;
   if(ios&&!standalone)setTimeout(()=>{try{const t=document.getElementById('title');if(t&&!t.hidden&&typeof running!=='undefined'&&!running)FSX.card(false);}catch(e){}},2500);

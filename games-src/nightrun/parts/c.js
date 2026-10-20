@@ -89,7 +89,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   Object.assign(HUDLOG,{x:HUDX.vals()});
   let ny=sH+6*k;
   if(G.boss&&G.boss.x<W){const b=G.boss,bw=Math.min(330,w-120);ctx.fillStyle='#00000088';ctx.fillRect((w-bw)/2,ny+12*k,bw,6*k);ctx.fillStyle='#ff3040';ctx.fillRect((w-bw)/2,ny+12*k,bw*clamp(b.hp/b.max,0,1),6*k);if(b.b2s&&window.B2X)B2X.sheen((w-bw)/2,ny+12*k,bw*clamp(b.hp/b.max,0,1),6*k);
-    ctx.textAlign='center';ctx.font=`700 ${11*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),w/2,ny+9*k);ny+=21*k;}
+    ctx.textAlign='center';ctx.font=`700 ${11*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),w/2,ny+9*k);ny+=31*k;}   // 31k: clears the phase counter (bossvis.js) under the bar for the BREACH meter
   {let cx=pad;const cy=ny+12*k;ctx.save();
     if(SH.sh>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iShield,'#19e3ff','×'+SH.sh);
     if(TP.revLeft>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iRev,'#ff2d95','×'+TP.revLeft);
@@ -143,7 +143,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   if(running&&!G.dead)FXV.ring(t);
   PW.draw(t);
   for(const r of G.rings){const k=1-r.l/r.m;ctx.strokeStyle=r.c;ctx.globalAlpha=1-k;ctx.lineWidth=3*(1-k)+1;ctx.beginPath();ctx.arc(r.x,r.y,18+k*52,0,7);ctx.stroke();ctx.globalAlpha=1;}
-  ctx.textAlign='center';ctx.font='700 13px "Chakra Petch",sans-serif';for(const f of G.fl){ctx.globalAlpha=Math.min(1,f.l*2);ctx.fillStyle=f.c;wtxt(f.txt,f.x,f.y);}ctx.globalAlpha=1;
+  ctx.textAlign='center';{const tf=ctx.getTransform(),u=Math.hypot(tf.a,tf.b)*(ctx.canvas.getBoundingClientRect().width/ctx.canvas.width||1);ctx.font=`700 ${Math.max(13,11.5/Math.max(.05,u)).toFixed(1)}px "Chakra Petch",sans-serif`;}for(const f of G.fl){ctx.globalAlpha=Math.min(1,f.l*2);ctx.fillStyle=f.c;wtxt(f.txt,f.x,f.y);}ctx.globalAlpha=1;
   if(PT)SH.ring(ctx,t);
   ctx.restore();
   if(G.empT>0&&ART.wave(P.x,P.y,(0.6-G.empT)*1400,G.empT*2.2)){}
