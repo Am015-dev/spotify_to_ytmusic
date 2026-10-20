@@ -131,7 +131,7 @@ const FRAMESEQ = async (p, o, dir, tag) => {
 
 // ---------- analysis (pure) ----------
 const ENC = new Set(['wave', 'zoo', 'set', 'fence', 'drop', 'mini', 'boss', 'verb']);             // an "encounter": something the player has to answer
-const NOVEL = new Set(['wave', 'zoo', 'enemy', 'set', 'fence', 'drop', 'mini', 'boss', 'verb', 'mut', 'pick', 'shot']);   // a "new thing" if seen for the first time
+const NOVEL = new Set(['wave', 'zoo', 'enemy', 'set', 'fence', 'drop', 'mini', 'boss', 'verb', 'mut', 'pick', 'shot', 'rule']);   // a "new thing" if seen for the first time
 const MECH = new Set(['zoo', 'fence', 'drop', 'mini', 'boss', 'mut', 'set', 'rule']);                       // categories that bring a new rule/decision, not only a new shape
 function analyse(raw) {
   const out = {};

@@ -9972,7 +9972,7 @@ RU.T={
     pos(m,w,i){if(!m.tw)return w;const a=m.o.ph+i*3.14;return {x:W*.58+Math.cos(a)*120,y:H*.5+Math.sin(a)*130};},
     tick(m,dt){m.o.ph+=dt*.5;m.o.w.forEach((w0,i)=>{const w=this.pos(m,w0,i);w.x0=w.x;w.y0=w.y;
       for(const b of G.pb){const dx=w.x-b.x,dy=w.y-b.y,d=Math.hypot(dx,dy);if(d<150&&d>8){b.vx+=dx/d*900*dt;b.vy+=dy/d*900*dt;}}
-      for(const b of G.eb){const dx=w.x-b.x,dy=w.y-b.y,d=Math.hypot(dx,dy);if(d<130&&d>8){b.vx+=dx/d*160*dt;b.vy+=dy/d*160*dt;}if(d<16&&!b.dead){b.dead=1;RU.use('well');}}});},
+      for(const b of G.eb){const dx=w.x-b.x,dy=w.y-b.y,d=Math.hypot(dx,dy);if(d<130&&d>8){b.vx+=dx/d*110*dt;b.vy+=dy/d*110*dt;}if(d<16&&!b.dead){b.dead=1;RU.use('well');}}});},
     draw(m,t){m.o.w.forEach((w0,i)=>{const w=this.pos(m,w0,i);RU.ring(w.x,w.y,22,this.c,4);ctx.globalAlpha*=.4;RU.ring(w.x,w.y,150,this.c,1.5);ctx.globalAlpha/=.4;
       if(!t&&!RU.rm())RU.ring(w.x,w.y,22+((G.t*40)%120),this.c,1);});},
     emp(m){for(const [i,w0] of m.o.w.entries()){const w=this.pos(m,w0,i);for(let k=0;k<6;k++)RU.shot(w.x,w.y,k*1.047,8);burst(w.x,w.y,this.c,10,200,.5);}RU.use('well');}},
@@ -10002,7 +10002,7 @@ RU.T={
   hulls:{n:'BEAT HULLS',t:'ringed foes open only on the beat',tt:'EMP opens every hull for 4 s',c:'#ff5ad8',
     init(m){m.o.open=0;m.o.mk=new WeakSet();m.o.n=0;},
     tick(m,dt){if(m.o.open>0)m.o.open-=dt;const op=m.o.open>0||BT0()<.38||BT0()>.9;
-      for(const e of G.en){if(e.dead||e.type==='boss'||e.rh===0)continue;if(e.rh==null){e.rh=(m.o.n++%4===0)?6:0;continue;}
+      for(const e of G.en){if(e.dead||e.type==='boss'||e.rh===0)continue;if(e.rh==null){e.rh=(m.o.n++%5===0)?4:0;continue;}
         if(op)continue;for(const b of G.pb){if(b.dead||b.ab)continue;if(Math.hypot(b.x-e.x,b.y-e.y)<e.r+16){b.dead=1;e.rh--;RU.use('hulls');burst(b.x,b.y,this.c,3,90,.2);if(e.rh<=0){e.rh=0;break;}}}}},
     draw(m){const op=m.o.open>0||BT0()<.38||BT0()>.9;for(const e of G.en){if(!(e.rh>0)||e.dead)continue;ctx.strokeStyle=this.c;ctx.lineWidth=3;ctx.beginPath();
       if(op)ctx.arc(e.x,e.y,e.r+10,.6,5.7);else ctx.arc(e.x,e.y,e.r+10,0,7);ctx.stroke();}},
