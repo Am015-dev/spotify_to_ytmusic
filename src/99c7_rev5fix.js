@@ -762,7 +762,7 @@ updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{
 (function R20F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='ios-reveal')){
  C.items.push({ver:'perf',id:'ios-reveal',area:'perf',text:'ios-r20f · iPhone reveal: 📍 GO boots Frankfurt (then -ath) in a touch lowmem iframe with 6x CPU throttling and counts program links, uploads and stalls in the first 3 s after the curtain. Pass line: programs at reveal == at +5 s, 0 links, no upload > 20 ms, no frame gap > 2.5x median or > 1.5 s (before r20f: fra 1 link + a 5.7 s gap at 2.9 s, the lazy chunk eval).'},
   {ver:'perf',id:'ios-reveal-ath',area:'perf',text:'ios-r20f · iPhone reveal, Athens: same pass line as perf/ios-reveal.'});
- const run=async c=>{const f=document.createElement('iframe');f.style.cssText='position:fixed;left:0;top:0;width:100vw;height:100vh;border:0;z-index:99999';f.src=location.pathname+'?test='+c+'&lowmem=1&rvl=1';document.body.appendChild(f);
+ const run=async c=>{const f=document.createElement('iframe');f.style.cssText='position:fixed;left:0;top:0;width:100vw;height:100vh;border:0;z-index:99999';f.src=location.pathname+'?test='+c+'&lowmem=1&rvl=1&prewarm=1';document.body.appendChild(f);
   try{const t0=performance.now();let R=null;while(performance.now()-t0<280000){await new Promise(r=>setTimeout(r,1000));try{R=f.contentWindow.RVL}catch(e){}if(R&&R.done)break}
    if(!R||!R.done)return`📍 iOS REVEAL ${c} · no reveal window recorded in ${Math.round((performance.now()-t0)/1000)} s → ❌ FAIL`;
    const F=R.fr,s=R.sum,g=F.map(q=>q.dt).sort((a,b)=>a-b),med=g[g.length>>1]||0,big=F.filter(q=>q.dt>100&&(q.dt>2.5*med||q.dt>1500)),tx=F.filter(q=>q.texMs>20).length;
