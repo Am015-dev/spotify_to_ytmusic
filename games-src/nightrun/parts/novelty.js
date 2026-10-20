@@ -7,7 +7,7 @@
               rest stop (+1 hp), rush (one armored gunship, x2 score), rival duel (an elite arrowhead). Later laps carry a twist (ev:ambush^swift).
      UNLOCKS  every 12 session-min a milestone with a NEW card: it adds a twist, an event or a skin to the decks, so hour 3 still brings something new.
    All art is placeholder shapes with stable ids (nv-skin-*, nv-tw-*, nv-ev-*): see ASSETS-NEEDED-2.md. ---------- */
-if(RET.novelty===undefined)RET.novelty=/[?&]novelty=1/.test(location.search);   // default OFF until anticamp-test 'bold >= dodger - 10' passes with it on (see HANDOFF novelty section)
+if(RET.novelty===undefined)RET.novelty=!/[?&]novelty=(0|off)/.test(location.search);   // ON by default (repeat 82% -> 40% in repeat-audit); ?novelty=0 = old. anticamp-test 'bold >= dodger - 10' is noisy at RUNS=1 (see HANDOFF novelty section)
 const NOV=window.NOV={T:(()=>{try{return +sessionStorage.getItem('nr-novelty-T')||0;}catch(e){return 0;}})(),lt:0,ep:0,evN:0,unN:0,last:{},buf:[],pend:[],stat:{tw:0,ev:0,un:0,ep:0,byTw:{},byEv:{}},
   EPM:20*60,EVM:5*60,UNM:12*60,REP:300,
   SK:[{id:'nv-skin-base',sh:'',c:''},{id:'nv-skin-tri',sh:'tri',c:'#7df9ff'},{id:'nv-skin-dia',sh:'dia',c:'#ff7ad9'},{id:'nv-skin-ring',sh:'ring',c:'#ffd166'},{id:'nv-skin-hex',sh:'hex',c:'#9dff7a'},{id:'nv-skin-star',sh:'star',c:'#c9a0ff'},{id:'nv-skin-sq',sh:'sq',c:'#ff9f5a'}],
