@@ -83,7 +83,7 @@ const BOT = ({ n, mode, diff, mid, MAXT, k }) => {
     const bn = Math.floor(m.bpos()); if (bn !== lastBeat) { lastBeat = bn; m.press('Fire'); }
     m.step(dt); i++; if (m.G.dead) break; if (m.ST.over) { cleared = true; break; }
   }
-  const T = window.TIM.stat, r = { n, mode, diff, clear: cleared, t: m.G.t, hits: m.ST.hits, nd, ne, parry: T.parry, off: T.off, e: T.emp, waste: T.waste, tiers: [T.e1, T.e2, T.e3] };
+  const T = window.TIM.stat, r = { n, mode, diff, clear: cleared, dead: !!m.G.dead, t: m.G.t, hits: m.ST.hits, hpmax: m.P.max, nd, ne, parry: T.parry, off: T.off, e: T.emp, waste: T.waste, tiers: [T.e1, T.e2, T.e3] };
   m.abort(); return r;
 };
 (async () => {
@@ -99,8 +99,8 @@ const BOT = ({ n, mode, diff, mid, MAXT, k }) => {
   if (process.env.HARD !== '0') for (const mode of ['reflex', 'beat', 'rand', 'nodash']) for (let k = 0; k < RUNS; k++) jobs.push({ n: +(process.env.HARD_ST || 5), mode, diff: 'hard', mid: 1, MAXT, k });
   const res = []; let next = 0;
   await Promise.all(Array.from({ length: PAR }, async () => { const p = await mk(); while (next < jobs.length) { const j = jobs[next++]; try { const r = await p.evaluate(BOT, j); r.key = (j.diff === 'hard' ? 'H-' : '') + j.mode; res.push(r); if (process.env.REPORT) console.log('RUN', j.mode, j.diff, j.n, j.k, r.clear ? 'clear' : 'fail', 'hits', r.hits); } catch (e) { console.log('RUN ERROR', JSON.stringify(j), e.message.slice(0, 120)); } await p.reload(); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); } await p.close(); }));
-  const agg = {}; for (const r of res) { const a = agg[r.key] = agg[r.key] || { n: 0, cl: 0, h: 0, t: 0, nd: 0, ne: 0, pa: 0, off: 0, w: 0, ti: [0, 0, 0] }; a.n++; a.cl += r.clear ? 1 : 0; a.h += r.hits; a.t += r.t; a.nd += r.nd; a.ne += r.e; a.pa += r.parry; a.off += r.off; a.w += r.waste; r.tiers.forEach((x, i) => a.ti[i] += x); }
-  for (const k in agg) { const a = agg[k]; console.log('REPORT ' + k.padEnd(9) + ' runs ' + a.n + ' clear ' + Math.round(100 * a.cl / a.n) + '% hits ' + (a.h / a.n).toFixed(1) + ' dash/min ' + (a.nd / (a.t / 60)).toFixed(1) + ' parry ' + (a.pa / a.n).toFixed(1) + ' offbeat ' + (a.off / a.n).toFixed(1) + ' EMP/min ' + (a.ne / (a.t / 60)).toFixed(2) + ' wasted ' + a.w + ' tiers ' + a.ti.join('/')); }
+  const agg = {}; for (const r of res) { const a = agg[r.key] = agg[r.key] || { n: 0, cl: 0, h: 0, t: 0, nd: 0, ne: 0, pa: 0, off: 0, w: 0, ti: [0, 0, 0] }; a.n++; a.cl += r.clear ? 1 : 0; a.dd = (a.dd || 0) + (r.dead ? 1 : 0); a.hm = (a.hm || 0) + r.hpmax; a.h += r.hits; a.t += r.t; a.nd += r.nd; a.ne += r.e; a.pa += r.parry; a.off += r.off; a.w += r.waste; r.tiers.forEach((x, i) => a.ti[i] += x); }
+  for (const k in agg) { const a = agg[k]; console.log('REPORT ' + k.padEnd(9) + ' runs ' + a.n + ' clear ' + Math.round(100 * a.cl / a.n) + '% dead ' + a.dd + ' hull ' + (a.hm / a.n).toFixed(1) + ' t ' + (a.t / a.n).toFixed(0) + ' hits ' + (a.h / a.n).toFixed(1) + ' dash/min ' + (a.nd / (a.t / 60)).toFixed(1) + ' parry ' + (a.pa / a.n).toFixed(1) + ' offbeat ' + (a.off / a.n).toFixed(1) + ' EMP/min ' + (a.ne / (a.t / 60)).toFixed(2) + ' wasted ' + a.w + ' tiers ' + a.ti.join('/')); }
   const cl = k => agg[k] ? agg[k].cl / agg[k].n : NaN, epm = k => agg[k] ? agg[k].ne / (agg[k].t / 60) : 0;
   const hp = k => agg[k] ? agg[k].h / agg[k].n : NaN;
   chk(`hits per run: beat ${hp('beat').toFixed(1)} < reflex ${hp('reflex').toFixed(1)} < no DASH/EMP ${hp('nodash').toFixed(1)}, random ${hp('rand').toFixed(1)} > beat`, hp('beat') < hp('reflex') && hp('reflex') < hp('nodash') && hp('rand') > hp('beat'));

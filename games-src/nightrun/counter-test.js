@@ -30,7 +30,8 @@ const SCN = () => {
     while (i < secs * 60 && m.running) { pump && pump(i);
       const w = wallNear();
       if (mode === 'with' && w && w.x - m.P.x < 340) { m.touchTo(m.P.x + 120, m.P.y); m.P.dx = 1; m.P.dy = 0; } else dodge();
-      if (mode === 'with') { if (parryNow() || (w && w.x - m.P.x < 190 && w.x - m.P.x > 20)) { m.press('Dash'); presses.d++; } if (m.P.emp > 0 && (curtOn() || m.G.en.some(e => e.ctw && e.wsh && e.x < 900))) { m.press('Emp'); presses.e++; } }
+      if (mode === 'with') { if ((parryNow() || (w && w.x - m.P.x < 45 && w.x - m.P.x > 0)) && window.ABIL.st().n >= 1 && m.P.dashT <= 0 && (!window.TIM || window.TIM.ready())) {   // W39: one press when a dash is ready (spam now runs the slower refill dry)
+        m.press('Dash'); presses.d++; } if (m.P.emp > 0 && (curtOn() || m.G.en.some(e => e.ctw && e.wsh && e.x < 900))) { m.press('Emp'); presses.e++; } }
       if (mode === 'rand') { if (rnd() < pump.rd) { m.press('Dash'); presses.d++; } if (m.P.emp > 0 && rnd() < pump.re) { m.press('Emp'); presses.e++; } }
       if (i % 15 === 0) m.press('Fire');
       m.step(1 / 60); i++; ebMax = Math.max(ebMax, m.G.eb.length); for (const b of m.G.eb) { const v = Math.hypot(b.vx, b.vy); if (v === v && (b.cxM || m.SET.diff === "normal")) vMax = Math.max(vMax, v); }; }

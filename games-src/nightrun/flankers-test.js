@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Flankers gate (flag RET.flankers, ?flankers=0 = W29 bullet-stream flush). Prints pass/fail lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/flankers-test.js     env: PW=playwright GAME_DIR=<dir>
-// Each kind spawns after the tell, draws (phone portrait + landscape), is killable (drops a shard), obeys ebCap; max 2 alive, 12 s cool-down,
+// Each kind spawns after the tell, draws (phone portrait + landscape), is killable (drops a shard), obeys ebCap; max 3 alive, 8 s cool-down,
 // only while camping 3 s; a dodger swing never sees one; flag off = the old bullet-stream flush.
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
@@ -22,9 +22,9 @@ const UNIT = (flagOn) => {
   ok('flag on with ?flankers=1', F.on);
   ok('tell >= 0.6 s', F.TELL >= .6, F.TELL);
   G.en.length = 0; G.eb.length = 0; A.tells = []; F.reset(); F.cd = 0;
-  run(2.5); ok('no flanker before camping 3 s', fk().length === 0 && F.stat.spawn === 0);
+  run(1.5); ok('no flanker before camping 2 s', fk().length === 0 && F.stat.spawn === 0);
   F.cd = 0; let sawTell = false; for (let i = 0; i < 600 && F.stat.spawn === 0; i++) { camp(); m.touchTo(70, P.y); m.step(1 / 60); }
-  sawTell = F.tells.length > 0; ok('camping 3 s -> a flanker tell', F.stat.spawn === 1 && sawTell, 'spawn=' + F.stat.spawn);
+  sawTell = F.tells.length > 0; ok('camping 2 s -> a flanker tell', F.stat.spawn === 1 && sawTell, 'spawn=' + F.stat.spawn);
   const t0 = F.tells[0] ? F.tells[0].t : 0; ok('tell lasts >= 0.6 s before the enemy exists', fk().length === 0 && t0 >= .6, t0.toFixed(2));
   // each kind: force-spawn, draw, hit, kill
   for (const k of ['diver', 'crawler', 'bait']) {
@@ -43,17 +43,17 @@ const UNIT = (flagOn) => {
   G.en.length = 0; G.eb.length = 0; P.hp = P.max; const cr = F.mk({ k: 'crawler', x: 30, y: 100 }); cr.hp = 999; cr.sf = 0; let mx = 0;
   for (let i = 0; i < 1200; i++) { P.inv = 9; P.hp = P.max; G.eb.length < 200 && 0; if (cr.dead) break; m.step(1 / 60); mx = Math.max(mx, G.eb.length); }
   ok('crawler shots obey ebCap', mx <= 35, 'max ' + mx);
-  // max 2 alive, 12 s cool-down
+  // max 3 alive, 8 s cool-down
   G.en.length = 0; G.eb.length = 0; G.pk.length = 0; F.reset(); F.hold = 9; F.cd = 0; F.stat.spawn = 0; F.n = 0; A.tells = [];
   A.cd = 0; run(.3); const a1 = F.stat.spawn; A.cd = 0; run(.3);
-  ok('12 s cool-down between flankers', a1 === 1 && F.stat.spawn === 1, a1 + '/' + F.stat.spawn);
-  F.cd = 0; F.mk({ k: 'diver', x: 70, y: P.y }); F.mk({ k: 'bait', x: 70, y: P.y, bx: 300, by: 100 });
+  ok('8 s cool-down between flankers', a1 === 1 && F.stat.spawn === 1, a1 + '/' + F.stat.spawn);
+  F.cd = 0; F.mk({ k: 'diver', x: 70, y: P.y }); F.mk({ k: 'bait', x: 70, y: P.y, bx: 300, by: 100 }); F.mk({ k: 'crawler', x: 30, y: 100 });
   F.cd = 0; F.tells = []; const before = F.stat.spawn; A.cd = 0; run(.5);
-  ok('max 2 alive', F.stat.spawn === before && fk().length <= 2, fk().length);
+  ok('max 3 alive', F.stat.spawn === before && fk().length <= 3, fk().length);
   // dodger: swing 150-290 never flagged, never sees one
   G.en.length = 0; F.reset(); F.stat.spawn = 0; A.buf = []; A.lv = 0;
   for (let i = 0; i < 1800; i++) { m.touchTo(220 + 70 * Math.sin(i / 60 * .55), 270 + 100 * Math.sin(i / 60 * .9)); m.step(1 / 60); }
-  ok('dodger swing: no flanker', F.stat.spawn === 0 && F.hold < 3, F.hold.toFixed(1));
+  ok('dodger swing: no flanker', F.stat.spawn === 0 && F.hold < 2, F.hold.toFixed(1));
   // gap: dive column is a single lane and the bait sits >= 96 px off the ship row
   F.reset(); F.cd = 0; F.hold = 9; A.cd = 0; P.y = 270; for (let i = 0; i < 40 && !F.tells.length; i++) { F.n = 2; camp(); m.touchTo(70, 270); m.step(1 / 60); A.cd = 0; }
   const bt = F.tells.find(q => q.k === 'bait'); ok('bait hovers >= 96 px off the ship row', !bt || Math.abs(bt.by - 270) >= 96, bt ? bt.by : 'n/a');
@@ -73,7 +73,7 @@ const SHAPES = () => {   // phone portrait + landscape draw check
   const br = await PW.chromium.launch(); let fails = 0; const errs = [];
   const mk = async (q, vp) => { const p = await br.newPage({ viewport: vp || { width: 960, height: 540 } }); p.on('pageerror', e => errs.push(e.message)); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${q || ''}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); return p; };
   const pr = l => { console.log(l); if (l.startsWith('FAIL')) fails++; };
-  for (const [q, f] of [['&flankers=1', true], ['', false]]) { const u = await mk(q); for (const l of await u.evaluate(UNIT, f)) pr((f ? '' : '[off] ') + l); await u.close(); }
+  for (const [q, f] of [['&flankers=1', true], ['&flankers=0', false]]) { const u = await mk(q); for (const l of await u.evaluate(UNIT, f)) pr((f ? '' : '[off] ') + l); await u.close(); }
   for (const [nm, vp] of [['phone portrait', { width: 390, height: 844 }], ['phone landscape', { width: 844, height: 390 }]]) { const u = await mk('&flankers=1', vp); for (const l of await u.evaluate(SHAPES)) pr(nm + ': ' + l); await u.close(); }
   pr((errs.length ? 'FAIL ' : 'PASS ') + 'no page errors' + (errs.length ? ' ' + errs[0] : ''));
   await br.close(); srv.kill(); console.log(fails ? 'FLANKERS FAIL ' + fails : 'FLANKERS PASS'); process.exit(fails ? 1 : 0);
