@@ -339,12 +339,12 @@ function OF_starHud(){let e=document.getElementById('ofStar');if(!e){const G=$('
 // --- Athens: kerb-parked cars on g-streets (LV_park1 skips them: their traffic runs on the centre line). Athens blocks are short (26–30 m edges,
 // 8.5 m wide): park ≥ 7.5 m from a node, kerb offset W/2 − 1.3 m (car edge ~0.3 m inside the kerb, ~0.9 m clear of centre-line traffic)
 function OF_athPark1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);let cand=null;
-  for(let k=0;k<12&&!cand;k++){const c=C[Math.floor(R()*C.length)];if(c.pk||c.route||c.tr||c.dead>0||c.crW||c.ofJ||HCAR[c.k][0]==='#')continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);if(d>200||dx*fx+dz*fz<-d*.3&&!LV_seen(c.x,c.y||0,c.z))cand=c}
-  if(!cand)return;const nd=LV_edges(far?30:70,far?100:130,.6).filter(e=>Math.min(e.s,e.L-e.s)>=7.5);
-  for(let k=0;k<Math.min(12,nd.length);k++){const E=nd[k],A=N[E.i],B=N[E.bi],L=E.L,W=Math.min(A.w||9,B.w||9);if(W<8)continue;const t=E.s/L,off=W/2-1.3,ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,
+  for(let k=0;k<12&&!cand;k++){const c=C[Math.floor(R()*C.length)];if(c.pk||c.route||c.tr||c.dead>0||c.crW||c.ofJ||HCAR[c.k][0]==='#')continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);if((d>200||dx*fx+dz*fz<-d*.3&&!LV_seen(c.x,c.y||0,c.z))&&HT_canPop(c.x,c.z,c.y))cand=c}/* traffic-law-r21m: a driving car turns into a parked one only out of sight (HT_canPop): it jumped 100-450 m in view */
+  if(!cand)return;const nd=LV_edges(far?30:HT_POP.on?120:70,far?100:HT_POP.on?190:130,.6).filter(e=>Math.min(e.s,e.L-e.s)>=7.5);
+  for(let k=0;k<Math.min(12,nd.length);k++){const E=nd[k],A=N[E.i],B=N[E.bi],L=E.L,W=Math.min(A.w||9,B.w||9);if(W<8)continue;const t=E.s/L,off=W/2-(typeof HT_POP!=='undefined'&&HT_POP.on?1:1.3)/* traffic-law-r21m: 0.3 m nearer the kerb, clear of the right-hand lane of a two-way street (HT_g2) */,ux=(B.x-A.x)/L,uz=(B.z-A.z)/L,
       cx=A.x+(B.x-A.x)*t,cz=A.z+(B.z-A.z)*t,x=cx-uz*off,z=cz+ux*off,y=groundAt(x,z,groundAt(cx,cz,999)+2),d=Math.hypot(x-RO.x,z-RO.z);
     if(Math.abs(y-groundAt(cx,cz,y+2))>.35)continue;if(LV.cl&&LV.cl.L.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<14*14))continue;if(C.some(o=>o.pk&&(o.x-x)**2+(o.z-z)**2<9*9))continue;
-    if(roamHit(x,z,1.4,y+.5)||roamHit(x+ux*2.2,z+uz*2.2,1.2,y+.5)||roamHit(x-ux*2.2,z-uz*2.2,1.2,y+.5))continue;if(typeof QS_rampNear==='function'&&QS_rampNear(x,z))continue;if(!far&&LV_seen(x,0,z)&&d<90)continue;
+    if(roamHit(x,z,1.4,y+.5)||roamHit(x+ux*2.2,z+uz*2.2,1.2,y+.5)||roamHit(x-ux*2.2,z-uz*2.2,1.2,y+.5))continue;if(typeof QS_rampNear==='function'&&QS_rampNear(x,z))continue;if(!far&&LV_seen(x,0,z)&&d<90)continue;if(HT_POP.on&&(far?LV_seen(x,y,z):!HT_canPop(x,z,y)))continue;/* traffic-law-r21m: never park a car into view */
     Object.assign(cand,{pk:1,pv:cand.pv||cand.v,v:0,cv:0,a:E.i,b:E.bi,t,lane:off/W,ofW:W,hitT:0,x,z});LV.n.park=(LV.n.park||0)+1;OF.athPk=(OF.athPk||0)+1;return}}
 if(typeof LV_park1==='function')LV_park1=(f=>function(C,far){if(CID==='ath')return OF_athPark1(C,far);return f.apply(this,arguments)})(LV_park1);
 

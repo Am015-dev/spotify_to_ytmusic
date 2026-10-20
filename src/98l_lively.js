@@ -221,11 +221,11 @@ function LV_parkStep(){const C=HUB.cars;if(!C||!C.length)return;const want=Math.
   if(n>=want)return;if(LV.parkJ>0){LV.parkJ--;for(let r=n;r<want;r++)LV_park1(C,true);return}if(LV.fr%15)return;LV_park1(C,LV.fr<30)}
 function LV_park1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);
   // take a car the player cannot see (behind or > 200 m), park it on a street ahead, never on top of a cluster
-  let cand=null;for(let k=0;k<12&&!cand;k++){const c=C[Math.floor(R()*C.length)];if(c.pk||c.route||c.tr||c.dead>0||c.crW)continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);if(d>200||dx*fx+dz*fz<-d*.3&&!LV_seen(c.x,c.y||0,c.z))cand=c}
-  if(!cand)return;const nd=LV_edges(far?30:70,far?100:130,.6).filter(e=>Math.min(e.s,e.L-e.s)>14&&!N[e.i].g&&!N[e.bi].g)/* g streets (all of Athens): traffic drives at lane 0, no kerb lane to park in */;for(let k=0;k<Math.min(10,nd.length);k++){const E=nd[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L,W=Math.min(A.w||20,B.w||20);if(W<9)continue;const d=Math.hypot(A.x+(B.x-A.x)*E.s/L-RO.x,A.z+(B.z-A.z)*E.s/L-RO.z);
+  let cand=null;for(let k=0;k<12&&!cand;k++){const c=C[Math.floor(R()*C.length)];if(c.pk||c.route||c.tr||c.dead>0||c.crW)continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);if((d>200||dx*fx+dz*fz<-d*.3&&!LV_seen(c.x,c.y||0,c.z))&&HT_canPop(c.x,c.z,c.y))cand=c}/* traffic-law-r21m: only out of sight (HT_canPop) */
+  if(!cand)return;const nd=LV_edges(far?30:HT_POP.on?120:70,far?100:HT_POP.on?190:130,.6).filter(e=>Math.min(e.s,e.L-e.s)>14&&!N[e.i].g&&!N[e.bi].g)/* g streets (all of Athens): traffic drives at lane 0, no kerb lane to park in */;for(let k=0;k<Math.min(10,nd.length);k++){const E=nd[k],i=E.i,bi=E.bi,A=N[i],B=N[bi],L=E.L,W=Math.min(A.w||20,B.w||20);if(W<9)continue;const d=Math.hypot(A.x+(B.x-A.x)*E.s/L-RO.x,A.z+(B.z-A.z)*E.s/L-RO.z);
     const t=E.s/L,lane=(W/2+.3)/W,x=A.x+(B.x-A.x)*t-(B.z-A.z)/L*lane*W,z=A.z+(B.z-A.z)*t+(B.x-A.x)/L*lane*W;
     if(LV.cl&&LV.cl.L.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<14*14))continue;if(C.some(o=>o.pk&&(o.x-x)**2+(o.z-z)**2<9*9))continue;if(roamHit(x,z,1.4,groundY(x,z)+.5))continue;if(QS_rampNear(x,z))continue;/* v88z: never park on a ramp run-up */
-    if(!far&&LV_seen(x,0,z)&&d<90)continue;
+    if(!far&&LV_seen(x,0,z)&&d<90)continue;if(HT_POP.on&&(far?LV_seen(x,groundY(x,z),z):!HT_canPop(x,z,groundY(x,z))))continue;/* traffic-law-r21m: never park a car into view */
     Object.assign(cand,{pk:1,pv:cand.pv||cand.v,v:0,cv:0,a:i,b:bi,t,lane,hitT:0,x,z});LV.n.park=(LV.n.park||0)+1;return}}
 // ---------- 9 · roadside pop-up challenges (2K "On-the-Go" style, but no stop): one at a time, ring 45-75 m ahead in your lane
 const LVP={c:null,cd:14,k:0,ok:0,miss:0};
