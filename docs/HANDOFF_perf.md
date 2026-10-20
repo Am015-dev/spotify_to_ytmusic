@@ -582,3 +582,10 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Shots docs/shots/r17z (852x393 ath/fra lodc 3 vs 7, ath 393x852 lodc 7): looked at, skyline and fog line identical, no holes, no visible pop-in; stationary car only (no roam pop-in test).
 4. tBoot lowmem=1 60 s solo, render-owned >50 ms frames (PF1OWN): fra lodc3 1 / lodc7 0; ath lodc3 2 render / lodc7 2 render (+2 hubTrafficStep-self); all ≤ 20/min. Governor end quality stayed q:min in tDraw at 45 s: NOT met, software GL is fill-bound; needs on-device numbers.
 5. Gates (built r17zb): unit 0 FAIL; perf/touch-render,touch-first-frames 3/3 with ?lowmem=1; r13/sky-blue*,life1,xf1,terrain,phone2 47/47.
+
+## ios-r18d: HUB.bld / HUB.props SoA, measured first (no engine change)
+1. Measured (tools/perf1/soaProbe.js, built page, ?lowmem=1, Athens ready, CDP GC'd heap 192 MB): HUB.bld 67,230 rows, 19 numeric fields, shallow 19 MB; HUB.props 111,131 rows, shallow 15 MB plus 111 k THREE.Color in p.col (one per prop, ~6-8 MB) plus 106,808 two-number p.cvs arrays (4.7-5.6 MB). All together that is ~45 MB. ios-mem device-like ready baseline 520 MB (test page 541).
+2. So SoA can save ~30-35 MB at best (520 → ~485), not the ~70 MB gap to 450. The rest of the heap is somewhere else: take a heap snapshot by constructor next, before more SoA work.
+3. Tried and reverted (not green): one shared colour per prop type (PCOL in the build4:150 / build6:88 paths). Only 3,089 lamps share it. The 106 k tree/olive/cypress props end up with their own Color from another path I did not find in the time box (grep "p.col=" / "col:" did not show it).
+4. Full bld SoA is ~45 reader sites in 20 files, plus the HUB.grid / BI maps that hold row references, plus fields that get written later (trMin/trBase/y0). Props hold live state (alive, rt, im, gi) and pgrid/DEST keep references, so props should go index-based last.
+5. Next: (a) heap snapshot by constructor at Athens ready; (b) find the per-prop tree Color and share it (~6-8 MB, small); (c) bld SoA with grid holding indices, behind ?soa, ~2 lanes of work.
