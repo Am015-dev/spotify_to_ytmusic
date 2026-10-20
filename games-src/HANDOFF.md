@@ -698,3 +698,7 @@ Cause of the extra boss time: damage above the cap was thrown away (the bot's da
 
 ## Nightrun density (W20, flag RET.density, ?density=0 = old)
 parts/density.js: per-stage bullets-on-screen budget via slow curtains (dir.js beat hook), roster cap from stage 3, boss attacks trimmed to <= 12 (moveset built at spawn). Audit S04 4.99->11.15 (target 12, near; raise the stage-30 heavy budget or curtain size to close it), S06 1.08->1.73, S09 0.41->0.23, S12 13->8, S08 78.4. Linear curve cost stage 8 (50% clear); convex keeps it at 67% = flag off. Tests: density-test.js.
+
+## Nightrun REMIX: every run a different cut of the stage script (W26, flag RET.remix, ?remix=0 = old, 20 Oct 2026)
+- `parts/remix.js` (after stagescripts.js): one seeded stream per run (one GR draw, so daily/?seed= stays reproducible) shuffles free moments, swaps formations for 3 equivalents, picks 1 of 3 set-piece variants, +-25% moment lengths, random entry side / speed +-10% / lane shift +-18 px (never on gap formations). Intro, first-30 s order/timing, set piece and breathers anchored; hull sum within +-5% else re-rolled. Gate `remix-test.js`; `industry-audit.js` has PREDN=3,10,20.
+- Jaccard over 5 seeds: stage 3/10/20 0.61(s10, old) -> 0.21/0.17/0.18. Repeat within 5 min 0.84 -> 0.82: NOT fixed (enemy/shot/drop signatures dominate, not formation order). Sim spawn timing drifts a little between identical runs even with ?remix=0.
