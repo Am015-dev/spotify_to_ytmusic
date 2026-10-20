@@ -7,3 +7,5 @@
 5. **Athens: lost leg, cell 1400,-2400 (seed+2, leg 1: 1537,-2694 → 1760,-2832, `no arrival in 76 s`, 571 m left, car ended 300 m off route).** No stuck seconds: the car drove but never reached the waypoint (path crosses a stretch the car cannot take, or a one-way/blocked connector). Needs a trace with `__bot.trace=[]` before `BOT_go('nav',…)`. Passed on an earlier run of the same seed (timing). Owner: Athens roads lane, together with finding 1.
 
 No JS errors, NaN, fall-through or race-finish failures in any run. Both races finish with all 5 gates passed.
+
+6. **roads-r21e re-check (12 Athens seeds on one page, 2026-10-20):** the pocket at 1500,-2900 did not reproduce; failures repeat at cells 1100,-2300 (leg 1257,-2381 -> 1545,-2702, car pins at 1287,-2366 turning round in the street), 900,-3100, 900,-1900. Athens has 46 isolated road islands (1830 nodes) so `navPath` can snap a parked car into a graph hole. Details and next step: docs/HANDOFF_roads-r21e.md.
