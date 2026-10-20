@@ -483,3 +483,10 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. After (4 runs, 2/city): Athens 47, 38 ms (was 107-197); Frankfurt 50, 40 (was 111, 86-194 earlier). A loaded box still gives one 56-100 ms frame in ~1 of 3 runs (hubTrafficStep-self with no named sub = GC; DEST_find 11-65; LV_step 109 once at f10).
 4. GO perf/touch-first-frames: new line "JS max f0-f119 <= 50 ms", asserted only when the gate and >= 110 frames ran (full boot), info on the quick start. In-game jm showed 63-68 ms at f1 in 2 of 4 runs (not seen by tBoot, cause not found; the GO would fail on such a boot).
 5. Next: f1 outlier; DEST_find first-use cost; the unnamed GC share in hubTrafficStep-self. Tests: unit 0 FAIL; perf/touch-first-frames,life1 8/8; sky-blue,sky-blue-frame,life1,xf1,terrain,phone2 47/47 on the built page.
+
+## perf-r17i (2026-10-20): bhs stays default OFF · 300 ms NOT met · rfGrid staged
+1. Max buildHubG gap, ?bhs=1 (tools/perf1/tBhs.js, new): Frankfurt 1126 → 529-569 ms (rfBase/rfPass), Athens 1124 → unchanged (~1.1-1.2 s: bhp49s/bhp50/post+ AS_apply/CE_streets/DR_solid not sliced).
+2. Change: rfGrid post-passes are now RFS.S (src/51, the terrain grade pass moved from a src/53 wrapper into it); rfGrid runs them all (output identical), buildHubG with bhs runs rfGridBegin + one pass per step (src/60). No generator.
+3. Left for 300 ms: OB_fillFix ~370 ms and TR_grade ~540 ms are monolithic (need internal cursors); then ctbK 330, gnd 290, post+ 280, streets 210; Athens post steps + olive trees 800, streets 600.
+4. GO perf/pc-bhs limits: fra < 700, ath < 1500 (guards, not 300). bhs ON: xf1/grass FAIL on fra (OFF: pass), so no flip.
+5. Gate (DESKTOP=1, built): unit 0 FAIL; pc-bhs/pc-boot-lt 4/4 off, pass on; r13+life1+xf1+terrain+phone2 off 47/47; on ath 19/19, fra 27/28 (xf1/grass).
