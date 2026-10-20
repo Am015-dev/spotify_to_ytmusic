@@ -32,10 +32,10 @@ function ESC_trapped(H){const n=H.length;if(!n)return'';const c=H[n-1];
   let rev=0,sg=0;for(let k=i;k<n;k++){const v=H[k][3];if(v>.5){if(sg<0)rev++;sg=1}else if(v<-.5){if(sg>0)rev++;sg=-1}}
   return rev>=ESC.rock.rev?'rocking':''}
 function ESC_end(){const E=ESC.E;E.H.length=0;E.as=0;E.done=0;E.tp=0}
-/* the lift never lands in a building or on a car: the nearest road point, else points 8-32 m along the road (heading q[2]) both ways, else the nearest point as is */
+/* the lift never lands in a building or on a car: the nearest road point, else points 8-48 m along the road (heading q[2]) both ways, else the nearest point as is */
 function ESC_clear(x,z,y){if(roamHit(x,z,2.8,y))return false;for(const q of(HUB.cars||[]))if(!q.dead&&q.x!=null&&Math.hypot(q.x-x,q.z-z)<7)return false;return true}
 function ESC_spot(){const q=TR8_near(RO.x,RO.z);if(!q)return null;const sx=Math.sin(q[2]),sz=Math.cos(q[2]);
-  for(const d of[0,8,-8,16,-16,24,-24,32,-32]){const x=q[0]+sx*d,z=q[1]+sz*d,y=groundAt(x,z,99);if(d&&!TR8_onRoad(x,z))continue;if(ESC_clear(x,z,y))return[x,z,q[2],d]}return q}
+  for(const d of[0,8,-8,16,-16,24,-24,32,-32,40,-40,48,-48]){const x=q[0]+sx*d,z=q[1]+sz*d,y=groundAt(x,z,99);if(d&&!TR8_onRoad(x,z))continue;if(ESC_clear(x,z,y))return[x,z,q[2],d]}return q}
 function ESC_lift(why,how){const q=ESC_spot();if(!q)return false;const H=ESC.E.H,c=H[H.length-1],i=H.length?ESC_at(H,2):-1;
   const log={step:why,how:how||'',t:H.length?+(c[0]-H[0][0]).toFixed(1):0,v:c?+Math.abs(c[3]).toFixed(1):0,far2:i>=0?+ESC_far(H,i,c[1],c[2]).toFixed(1):null,to:[Math.round(q[0]),Math.round(q[1])],at:q[3]==null?'near':q[3]};TR8_fade();
   if(!roamWarp(q[0],q[1],q[2])){RO.x=q[0];RO.z=q[1];RO.h=RO.vh=q[2];RO.y=groundAt(q[0],q[1],99);RO.vy=0}
