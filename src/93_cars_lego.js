@@ -398,7 +398,7 @@ let CR_WB=2.7,CR_PLH={l:1.3,w:1.05};const CR_CAMK=1/.15; // CR_WB: let, set per 
 const C26_cityMu=(terr,veh)=>(C26.muCity[terr]||C26.muCity.road)*(veh==='offroad'&&terr!=='road'?C26.muOff:1)*((carStat().han)||1);
 function CR_yaw(c,dt,ytg,maxR,air){const v=RO.v||0,sp=Math.abs(v),st=clamp(c.steer||0,-1,1),base=-st*maxR*Math.sign(v||1),dm=TUNE.stAng/(1+sp/TUNE.stFall),tg=st*dm,d0=RO.dl||0;
  RO.dl=d0+(tg-d0)*Math.min(1,dt*(Math.abs(tg)>Math.abs(d0)&&tg*d0>=0?TUNE.stIn:TUNE.stOut));
- if(RO.dDir||air)return(RO.yr||0)+(ytg-(RO.yr||0))*Math.min(1,dt*6.5);
+ if(RO.dDir||air)return(RO.yr||0)+(ytg-(RO.yr||0))*Math.min(1,dt*(RO.dDir&&!air?TUNE.drSnap:6.5))/* handling-r21d: TUNE.drSnap = drift yaw build-up rate (was 6.5) */;
  const cap=Math.max(.35,maxR),pv=Math.max(0,1-sp/9),dS=v>.3?1:v<-.3?-1:(c.brk&&!c.thr?-1:1);return clamp(-(v/CR_WB)*Math.tan(RO.dl)-st*1.15*pv*pv*dS,-Math.max(cap,1.15),Math.max(cap,1.15))+(ytg-base)}
 const CR_roll=()=>clamp(-(RO.yr||0)*(RO.v||0)/26,-1,1)*.055;
 const CR_PS={};
