@@ -1,0 +1,818 @@
+[
+ {
+  "nm": "fra_852x393_day.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 0.8,
+     "c": "9cbcff",
+     "g": "6f7a60",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 4.2,
+     "c": "ffe1b4",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1,
+   "tm": 4,
+   "pr": 1,
+   "fog": {
+    "c": "a6c4ee",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.16,
+    "r": 0.45,
+    "t": 2.2,
+    "on": false
+   },
+   "fov": 65.99301683094163,
+   "far": 1500,
+   "mood": "brick",
+   "flT": 0.4504166666666667,
+   "n": 0,
+   "clouds": 2,
+   "tris": 0,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 93.1,
+   "contrast": 55.4,
+   "sat": 0.627,
+   "black": 0.011,
+   "sky": [
+    39,
+    93,
+    158
+   ],
+   "jag": 0.031
+  }
+ },
+ {
+  "nm": "fra_852x393_dusk.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 0.8,
+     "c": "9cbcff",
+     "g": "6f7a60",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 4.2,
+     "c": "ffe1b4",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1,
+   "tm": 4,
+   "pr": 1,
+   "fog": {
+    "c": "a6c4ee",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.16,
+    "r": 0.45,
+    "t": 2.2,
+    "on": false
+   },
+   "fov": 65.99999735538202,
+   "far": 1500,
+   "mood": "golden",
+   "flT": 0.7403819444444445,
+   "n": 0.44767563245296893,
+   "clouds": 2,
+   "tris": 1,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 98.2,
+   "contrast": 57.3,
+   "sat": 0.602,
+   "black": 0.011,
+   "sky": [
+    40,
+    94,
+    159
+   ],
+   "jag": 0.034
+  }
+ },
+ {
+  "nm": "fra_852x393_night.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 1.05,
+     "c": "8a90c8",
+     "g": "3a2c26",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 0.7,
+     "c": "c8d4ff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1.12,
+   "tm": 7,
+   "pr": 1,
+   "fog": {
+    "c": "202238",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.75,
+    "r": 0.55,
+    "t": 1,
+    "on": false
+   },
+   "fov": 65.99999999788142,
+   "far": 1500,
+   "mood": "night",
+   "flT": 0.05034722222222225,
+   "n": 1,
+   "clouds": 2,
+   "tris": 1,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 58.6,
+   "contrast": 54,
+   "sat": 0.707,
+   "black": 0.012,
+   "sky": [
+    46,
+    52,
+    94
+   ],
+   "jag": 0.029
+  }
+ },
+ {
+  "nm": "fra_402x812_day.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 0.8,
+     "c": "9cbcff",
+     "g": "6f7a60",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 4.2,
+     "c": "ffe1b4",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1,
+   "tm": 4,
+   "pr": 1,
+   "fog": {
+    "c": "a6c4ee",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.16,
+    "r": 0.45,
+    "t": 2.2,
+    "on": false
+   },
+   "fov": 95.6249881094007,
+   "far": 1500,
+   "mood": "brick",
+   "flT": 0.45038194444444446,
+   "n": 0,
+   "clouds": 2,
+   "tris": 1,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 82.6,
+   "contrast": 55.8,
+   "sat": 0.604,
+   "black": 0.002,
+   "sky": [
+    34,
+    59,
+    151
+   ],
+   "jag": 0.029
+  }
+ },
+ {
+  "nm": "fra_402x812_dusk.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 0.8,
+     "c": "9cbcff",
+     "g": "6f7a60",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 4.2,
+     "c": "ffe1b4",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1,
+   "tm": 4,
+   "pr": 1,
+   "fog": {
+    "c": "a6c4ee",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.16,
+    "r": 0.45,
+    "t": 2.2,
+    "on": false
+   },
+   "fov": 95.69441301482466,
+   "far": 1500,
+   "mood": "golden",
+   "flT": 0.7402777777777778,
+   "n": 0.4464895196375991,
+   "clouds": 2,
+   "tris": 1,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 84.1,
+   "contrast": 56.7,
+   "sat": 0.601,
+   "black": 0.002,
+   "sky": [
+    34,
+    59,
+    151
+   ],
+   "jag": 0.029
+  }
+ },
+ {
+  "nm": "fra_402x812_night.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 1.05,
+     "c": "8a90c8",
+     "g": "3a2c26",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 0.7,
+     "c": "c8d4ff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1.12,
+   "tm": 7,
+   "pr": 1,
+   "fog": {
+    "c": "202238",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.75,
+    "r": 0.55,
+    "t": 1,
+    "on": false
+   },
+   "fov": 95.69458111136936,
+   "far": 1500,
+   "mood": "night",
+   "flT": 0.05034722222222225,
+   "n": 1,
+   "clouds": 2,
+   "tris": 1,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 48.7,
+   "contrast": 47.9,
+   "sat": 0.747,
+   "black": 0.005,
+   "sky": [
+    76,
+    55,
+    95
+   ],
+   "jag": 0.029
+  }
+ },
+ {
+  "nm": "ath_852x393_day.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 0.8,
+     "c": "9cbcff",
+     "g": "8a7656",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 4.2,
+     "c": "ffd9a8",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1,
+   "tm": 4,
+   "pr": 1,
+   "fog": {
+    "c": "cfd6e2",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.16,
+    "r": 0.45,
+    "t": 2.2,
+    "on": false
+   },
+   "fov": 65.98909466891448,
+   "far": 1500,
+   "mood": "athens",
+   "flT": 0.45038194444444446,
+   "n": 0,
+   "clouds": 2,
+   "tris": 0,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 93.6,
+   "contrast": 57,
+   "sat": 0.565,
+   "black": 0.028,
+   "sky": [
+    58,
+    83,
+    136
+   ],
+   "jag": 0.034
+  }
+ },
+ {
+  "nm": "ath_852x393_dusk.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 0.8,
+     "c": "9cbcff",
+     "g": "8a7656",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 4.2,
+     "c": "ffd9a8",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1,
+   "tm": 4,
+   "pr": 1,
+   "fog": {
+    "c": "cfd6e2",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.16,
+    "r": 0.45,
+    "t": 2.2,
+    "on": false
+   },
+   "fov": 65.9999831248175,
+   "far": 1500,
+   "mood": "golden",
+   "flT": 0.7403472222222223,
+   "n": 0.26277465820312557,
+   "clouds": 2,
+   "tris": 1,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 95,
+   "contrast": 57.4,
+   "sat": 0.563,
+   "black": 0.027,
+   "sky": [
+    58,
+    84,
+    139
+   ],
+   "jag": 0.034
+  }
+ },
+ {
+  "nm": "ath_852x393_night.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 1.05,
+     "c": "8a90c8",
+     "g": "3a2c26",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 0.7,
+     "c": "c8d4ff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1.12,
+   "tm": 7,
+   "pr": 1,
+   "fog": {
+    "c": "202238",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.75,
+    "r": 0.55,
+    "t": 1,
+    "on": false
+   },
+   "fov": 65.9999999790991,
+   "far": 1500,
+   "mood": "night",
+   "flT": 0.05031250000000003,
+   "n": 1,
+   "clouds": 2,
+   "tris": 1,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 49.6,
+   "contrast": 50.9,
+   "sat": 0.673,
+   "black": 0.032,
+   "sky": [
+    52,
+    46,
+    74
+   ],
+   "jag": 0.03
+  }
+ },
+ {
+  "nm": "ath_402x812_day.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 0.8,
+     "c": "9cbcff",
+     "g": "8a7656",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 4.2,
+     "c": "ffd9a8",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1,
+   "tm": 4,
+   "pr": 1,
+   "fog": {
+    "c": "cfd6e2",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.16,
+    "r": 0.45,
+    "t": 2.2,
+    "on": false
+   },
+   "fov": 95.6703001539808,
+   "far": 1500,
+   "mood": "athens",
+   "flT": 0.4504166666666667,
+   "n": 0,
+   "clouds": 2,
+   "tris": 0,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 76.8,
+   "contrast": 55.1,
+   "sat": 0.617,
+   "black": 0.006,
+   "sky": [
+    33,
+    55,
+    154
+   ],
+   "jag": 0.028
+  }
+ },
+ {
+  "nm": "ath_402x812_dusk.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 0.8,
+     "c": "9cbcff",
+     "g": "8a7656",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 4.2,
+     "c": "ffd9a8",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1,
+   "tm": 4,
+   "pr": 1,
+   "fog": {
+    "c": "cfd6e2",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.16,
+    "r": 0.45,
+    "t": 2.2,
+    "on": false
+   },
+   "fov": 95.69454370756434,
+   "far": 1500,
+   "mood": "golden",
+   "flT": 0.7403472222222223,
+   "n": 0.26277465820312557,
+   "clouds": 2,
+   "tris": 1,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 77.1,
+   "contrast": 55.3,
+   "sat": 0.617,
+   "black": 0.006,
+   "sky": [
+    33,
+    55,
+    154
+   ],
+   "jag": 0.028
+  }
+ },
+ {
+  "nm": "ath_402x812_night.jpg",
+  "pr": {
+   "L": [
+    {
+     "t": "HemisphereLight",
+     "i": 1.05,
+     "c": "8a90c8",
+     "g": "3a2c26",
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "DirectionalLight",
+     "i": 0.7,
+     "c": "c8d4ff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    },
+    {
+     "t": "PointLight",
+     "i": 70,
+     "c": "e4ecff",
+     "g": null,
+     "sh": false,
+     "ms": 0,
+     "sc": 0
+    }
+   ],
+   "exp": 1.12,
+   "tm": 7,
+   "pr": 1,
+   "fog": {
+    "c": "202238",
+    "d": 0.00045
+   },
+   "bloom": {
+    "s": 0.75,
+    "r": 0.55,
+    "t": 1,
+    "on": false
+   },
+   "fov": 95.69458125499668,
+   "far": 1500,
+   "mood": "night",
+   "flT": 0.05034722222222225,
+   "n": 1,
+   "clouds": 2,
+   "tris": 1,
+   "calls": 1,
+   "bg": null
+  },
+  "im": {
+   "lum": 38.5,
+   "contrast": 45.6,
+   "sat": 0.774,
+   "black": 0.012,
+   "sky": [
+    64,
+    46,
+    86
+   ],
+   "jag": 0.024
+  }
+ }
+]

@@ -1,0 +1,6 @@
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs'),path=require('path'),http=require('http');
+const DIR=process.argv[2],OUT=process.argv[3],CITY=process.argv[4]||'ath';
+const serve=dir=>new Promise(res=>{const T={'.html':'text/html','.js':'text/javascript','.json':'application/json'};const s=http.createServer((q,r)=>{let f=path.join(dir,decodeURIComponent(q.url.split('?')[0]));if(f.endsWith('/'))f+='index.html';fs.readFile(f,(e,b)=>{if(e){r.writeHead(404);return r.end()}r.writeHead(200,{'content-type':T[path.extname(f)]||'application/octet-stream'});r.end(b)})}).listen(0,'127.0.0.1',()=>res([s,s.address().port]))});
+(async()=>{const[s,port]=await serve(DIR);const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const p=await (await b.newContext({viewport:{width:640,height:360}})).newPage();await p.addInitScript(()=>{window.__dbg=1});
+ await p.goto(`http://127.0.0.1:${port}/index.html?test=${CITY}&draw=0`);await p.waitForFunction(()=>window.__tq&&__tq.ready,null,{polling:250,timeout:240000});await p.waitForTimeout(3000);
+ const r=await p.evaluate(c=>__oc.ev(c),fs.readFileSync(path.join(__dirname,'rdscan_in.js'),'utf8'));fs.writeFileSync(OUT,r);const o=JSON.parse(r);console.log(JSON.stringify(o.tot));await b.close();s.close()})();
