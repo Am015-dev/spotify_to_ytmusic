@@ -39,13 +39,14 @@ const UNIT = () => {
 };
 const OFF = () => { const m = window.__mnr, A = window.ABIL; m.SET.diff = 'normal'; try { m.applySet(); } catch (e) { } m.startStory(10); m.simOn(true); for (let i = 0; i < 20; i++) m.step(1 / 60);
   m.G.eb = []; m.P.emp = 3; m.press('Emp'); m.step(1 / 60); const r = { on: window.TIM.on, emp: m.P.emp }; m.abort(); return r; };
-const BOT = ({ n, mode, diff, mid, MAXT, k }) => {
+const BOT = ({ n, mode, diff, mid, MAXT, k, pre }) => {
+  if (pre) (0, eval)(pre);
   const m = window.__mnr, dt = 1 / 60; let s = n * 7919 + mode.length * 131 + 1; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
   m.SET.diff = diff; try { m.applySet(); } catch (e) { } m.startStory(n); m.simOn(true);
   if (mid) { const wp = window.__wp, GA = window.__ga.GA; GA.eqAll = true; for (const d of m.TP_DEF) GA.tune[d.id] = Math.floor((d.max || 3) / 2); wp.lv = {}; wp.xp = {}; wp.pl = { pulse: 4, swarm: 4 }; wp.eq = ['pulse', 'swarm']; wp._fk = null; wp.reset(); wp.sync();
     for (const id of ['fr', 'dm', 'hm']) for (let k = 0; k < 2; k++) { try { m.SH.add(id); } catch (e) { } } try { m.SH.recalc(); } catch (e) { } }
   if (!mid) { const WP = window.__wp, w = ['laser', 'disc', 'flame'][k % 3]; WP.eq = [w]; WP.lv = {}; WP.lv[w] = 3; WP._fk = null; try { WP.reset(); } catch (e) { } WP.sync(); }   // one plain weapon each (the review probe: 3 weapons x runs)
-  let i = 0, lastBeat = -1, cleared = false, nd = 0, ne = 0;
+  window.__tb = 0; let i = 0, lastBeat = -1, cleared = false, nd = 0, ne = 0;
   const C = window.CTR;
   const dec = () => {
     const G = m.G, P = m.P; let ty = 270 + 140 * Math.sin(G.t * .9), tx = 220 + 70 * Math.sin(G.t * .55), bd = 1e9;
@@ -84,9 +85,10 @@ const BOT = ({ n, mode, diff, mid, MAXT, k }) => {
     if (dsh && (mode !== 'beat' || ready())) { m.press('Dash'); nd++; }
     if (emp) { m.press('Emp'); ne++; }
     const bn = Math.floor(m.bpos()); if (bn !== lastBeat) { lastBeat = bn; m.press('Fire'); }
+    if (m.G.boss && !window.__tb) { window.__tb = m.G.t; window.__hb = m.ST.hits; }
     m.step(dt); i++; if (m.G.dead) break; if (m.ST.over) { cleared = true; break; }
   }
-  const T = window.TIM.stat, r = { n, mode, diff, clear: cleared, dead: !!m.G.dead, t: m.G.t, hits: m.ST.hits, hpmax: m.P.max, nd, ne, parry: T.parry, off: T.off, e: T.emp, waste: T.waste, lk: T.lock || 0, ew: T.ew || 0, tiers: [T.e1, T.e2, T.e3] };
+  const T = window.TIM.stat, r = { n, mode, diff, clear: cleared, dead: !!m.G.dead, t: m.G.t, hits: m.ST.hits, hpmax: m.P.max, nd, ne, parry: T.parry, off: T.off, e: T.emp, waste: T.waste, lk: T.lock || 0, bs: !!m.G.boss, tb: Math.round(window.__tb || -1), bh: JSON.stringify((window.BMV && BMV.st && BMV.st.hits) || {}) + " mH " + (window.GRIT && GRIT.st.mercyH) + " mN " + (window.GRIT && GRIT.st.mercy), hb: window.__hb | 0, bhp: m.G.boss ? Math.round(100 * m.G.boss.hp / m.G.boss.max) : -1, ew: T.ew || 0, tiers: [T.e1, T.e2, T.e3] };
   m.abort(); return r;
 };
 (async () => {
@@ -94,14 +96,14 @@ const BOT = ({ n, mode, diff, mid, MAXT, k }) => {
   await new Promise(r => setTimeout(r, 800));
   const br = await PW.chromium.launch(); let fails = 0; const errs = [];
   const chk = (n, c) => { console.log((c ? 'PASS ' : 'FAIL ') + n); if (!c) fails++; };
-  const mk = async q => { const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => errs.push(e.message)); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1${q === undefined ? '&timing=1' : q}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); return p; };
+  const mk = async q => { const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => errs.push(e.message)); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1${q === undefined ? '&timing=1' + (process.env.Q || '') : q}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); return p; };
   const u = await mk(); for (const l of await u.evaluate(UNIT)) { console.log(l); if (l.startsWith('FAIL')) fails++; } await u.close();
   const off = await mk('&timing=0'); const o = await off.evaluate(OFF); chk('?timing=0: flag off, EMP spends one charge (' + JSON.stringify(o) + ')', !o.on && o.emp === 2); await off.close();
   const jobs = []; if (process.env.UNIT_ONLY) { await br.close(); srv.kill(); process.exit(fails ? 1 : 0); }
-  for (const mode of (process.env.MODES || 'reflex,beat,rand,nodash,park').split(',')) for (const n of STAGES) for (let k = 0; k < (mode === 'park' ? 1 : RUNS); k++) jobs.push({ n: n + 0, mode, diff: 'normal', MAXT, k });
-  if (process.env.HARD !== '0') for (const mode of ['reflex', 'beat', 'rand', 'nodash']) for (let k = 0; k < RUNS; k++) jobs.push({ n: +(process.env.HARD_ST || 5), mode, diff: 'hard', mid: 1, MAXT, k });
+  for (const mode of (process.env.MODES === undefined ? 'reflex,beat,rand,nodash,park' : process.env.MODES).split(',').filter(Boolean)) for (const n of STAGES) for (let k = 0; k < (mode === 'park' ? 1 : RUNS); k++) jobs.push({ n: n + 0, mode, diff: 'normal', MAXT, k });
+  if (process.env.HARD !== '0') for (const mode of (process.env.HMODES || 'reflex,beat,rand,nodash').split(',')) for (let k = 0; k < RUNS; k++) jobs.push({ n: +(process.env.HARD_ST || 5), mode, diff: 'hard', mid: 1, MAXT, k, pre: process.env.PRE || '' });
   const res = []; let next = 0;
-  await Promise.all(Array.from({ length: PAR }, async () => { const p = await mk(); while (next < jobs.length) { const j = jobs[next++]; try { const r = await p.evaluate(BOT, j); r.key = (j.diff === 'hard' ? 'H-' : '') + j.mode; res.push(r); if (process.env.REPORT) console.log('RUN', j.mode, j.diff, j.n, j.k, r.clear ? 'clear' : 'fail', 'hits', r.hits); } catch (e) { console.log('RUN ERROR', JSON.stringify(j), e.message.slice(0, 120)); } await p.reload(); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); } await p.close(); }));
+  await Promise.all(Array.from({ length: PAR }, async () => { const p = await mk(); while (next < jobs.length) { const j = jobs[next++]; try { const r = await p.evaluate(BOT, j); r.key = (j.diff === 'hard' ? 'H-' : '') + j.mode; res.push(r); if (process.env.REPORT) console.log('RUN', j.mode, j.diff, j.n, j.k, r.clear ? 'clear' : 'fail', 'hits', r.hits, 't', Math.round(r.t), 'boss', r.bs, 'bhp', r.bhp, 'tb', r.tb, 'hitsAtBoss', r.hb, r.bh); } catch (e) { console.log('RUN ERROR', JSON.stringify(j), e.message.slice(0, 120)); } await p.reload(); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); } await p.close(); }));
   const agg = {}; for (const r of res) { const a = agg[r.key] = agg[r.key] || { n: 0, cl: 0, h: 0, t: 0, nd: 0, ne: 0, pa: 0, off: 0, w: 0, ti: [0, 0, 0] }; a.n++; a.cl += r.clear ? 1 : 0; a.dd = (a.dd || 0) + (r.dead ? 1 : 0); a.hm = (a.hm || 0) + r.hpmax; a.h += r.hits; a.t += r.t; a.nd += r.nd; a.ne += r.e; a.pa += r.parry; a.off += r.off; a.w += r.waste; a.lk = (a.lk || 0) + r.lk; r.tiers.forEach((x, i) => a.ti[i] += x); }
   for (const k in agg) { const a = agg[k]; console.log('REPORT ' + k.padEnd(9) + ' runs ' + a.n + ' clear ' + Math.round(100 * a.cl / a.n) + '% dead ' + a.dd + ' hull ' + (a.hm / a.n).toFixed(1) + ' t ' + (a.t / a.n).toFixed(0) + ' hits ' + (a.h / a.n).toFixed(1) + ' dash/min ' + (a.nd / (a.t / 60)).toFixed(1) + ' parry ' + (a.pa / a.n).toFixed(1) + ' offbeat ' + (a.off / a.n).toFixed(1) + ' EMP/min ' + (a.ne / (a.t / 60)).toFixed(2) + ' locks ' + (a.lk / a.n).toFixed(1) + ' wasted ' + a.w + ' tiers ' + a.ti.join('/')); }
   const cl = k => agg[k] ? agg[k].cl / agg[k].n : NaN, epm = k => agg[k] ? agg[k].ne / (agg[k].t / 60) : 0;
