@@ -15,7 +15,8 @@
 if(RET.timing===undefined)RET.timing=!/[?&]timing=0/.test(location.search);   // ON by default (review 4: beat 100%, reflex 67%, no dash 17%); ?timing=0 = old abilities
 const TIM=window.TIM={get on(){return!!(RET.timing&&window.ABIL&&ABIL.on);},
   stat:{pf:0,parry:0,refl:0,mark:0,off:0,panic:0,late:0,brk:0,emp:0,e1:0,e2:0,e3:0,waste:0,used:0},
-  R:110,PEN:.45,HOP:.04,PK:.4,ER:{1:160,2:320,3:0},PANIC:60,NEED:[4,99,12,5],PLOCK:2,WLOCK:15,GREF:.2,   // PK: the parry window is the inner 60% of the beat window; HOP: length of an off-beat / GOOD dash in s (a full dash is .2 s), unshielded (b.js hurt() and the bullet loop read P.dashSh); ER: EMP clear radius by charges spent (0 = whole screen)
+  R:110,PEN:.45,HOP:.04,PK:.4,ER:{1:160,2:320,3:0},PANIC:60,NEED:[4,99,12,5],PLOCK:2,WLOCK:15,GREF:.2,RF:2.4,EF:.5,CH:6,CHCD:20,   // W39: CH/CHCD = CH parries in a row (an off-beat press resets the run) repair 1 hull, once per CHCD s; RF = dash refill x2.4 (a parry still refunds its charge, so beat play stays full and spam runs dry), EF = EMP meter x.5 (owner: EMP charged too fast)
+     // PK: the parry window is the inner 60% of the beat window; HOP: length of an off-beat / GOOD dash in s (a full dash is .2 s), unshielded (b.js hurt() and the bullet loop read P.dashSh); ER: EMP clear radius by charges spent (0 = whole screen)
   pk(j){return SET.all||Math.abs(j.dt)<=winMs()*this.PK&&j.ok;},
   
   st(){return G.tm||(G.tm={pen:0,late:0,ch:0,hint:0,em:0});},
@@ -32,7 +33,7 @@ const TIM=window.TIM={get on(){return!!(RET.timing&&window.ABIL&&ABIL.on);},
         if(typeof pbRoom==='function'&&!pbRoom(1))continue;const t=b.cxM?tg:(this.near()||tg),a=t?Math.atan2(t.y-b.y,t.x-b.x):0;
         G.pb.push({x:b.x,y:b.y,vx:Math.cos(a)*720,vy:Math.sin(a)*720,dm:b.cxM?40:5,pf:1,big:b.cxM?1:0,ab:1,tm:1});
         if(!SET.calm)burst(b.x,b.y,'#ffffff',b.cxM?10:3,200,.3);}
-      if(n){G.eb=G.eb.filter(b=>!b.dead);S.n=Math.min(mx,S.n+1);P.inv=Math.max(P.inv,.5);T.ch++;this.stat.parry++;this.stat.refl+=n;this.stat.mark+=mk;
+      if(n){G.eb=G.eb.filter(b=>!b.dead);S.n=Math.min(mx,S.n+1);P.inv=Math.max(P.inv,.5);T.ch++;this.stat.parry++;if(T.ch>=this.CH&&G.t-(T.rp||-99)>=this.CHCD&&P.hp<P.max){T.rp=G.t;T.ch=0;P.hp++;this.stat.rep=(this.stat.rep||0)+1;floater(P.x,P.y-62,say('RHYTHM')+' +1','#7dff9a');}this.stat.refl+=n;this.stat.mark+=mk;
         G.score+=Math.round((150*n+(mk?600:0))*G.mult);ABIL.gain(.1+.02*n);floater(P.x,P.y-30,mk?'PARRY!':'PARRY x'+n,'#ffffff');AU.sfx('up');if(!SET.reduce)shake(3);}
       return;}
     this.stat.off++;T.ch=0;T.pen=this.PEN;if(S.n>=1)S.n--;else S.r=Math.min(S.r,0)-.5;
