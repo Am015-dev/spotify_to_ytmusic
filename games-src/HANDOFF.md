@@ -4,6 +4,10 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun risk pays (W7, flag RET.reward, ?reward=0 = old, 20 Oct 2026)
+- `parts/reward.js` (after armour.js; one hook line in b.js pickups, none elsewhere): graze chain x1..x5 (1.5 s window, beat graze = 2 points, ring + counter by the ship, feeds score, ABIL.gain and a +10%/tier damage buff cap +40% for 4 s; a hit resets), close-range +35% (full <= 40 px, 0 at 140 px) for manual shots only plus an extra shard on a point-blank kill, risk pickups (3+ bullets within 100 px) pay double with a gold ring. Damage sits inside the DMG.hit chain, buff x close clamped per tier (CAPK: 1.6 Normal, 1.4 Hard, 1.3 Very hard, 1.25 Legend), so hard.js S3.cap and armour.js still bound the sum.
+- Test: `reward-test.js` (unit checks + bots). Normal stages 3/6/10, 18 runs: bold (hugs enemies) clear 100%, score 447k, 183 s; camp (parked far left) clear 94%, score 314k, 209 s; dodge 100% 299k; flag off dodge 94% 338k; parked ship 0%.
+- Weak: camping still clears on Normal (the bot cannot be hit while parked far left on the early stages; must-move covers that); Legend/hard clear rates rose slightly (scale-test hardest 83% -> 92%, that check already failed with the flag off); the chain ring is code-drawn only.
 ## Nightrun DASH + EMP abilities (W4, flag RET.abil, ?abil=0 = the old dash/EMP, 19 Oct 2026)
 - `parts/abilities.js` (after powlevels.js). Hooks: b.js dash block -> `ABIL.dashIn`, EMP key -> `ABIL.emp`; c.js button rings + draw; hud.js dash count.
 - DASH: 3 charges (4 from LV3), one refills every 1.7 s (LV1) to 1.2 s (LV5), fires at once in the move/last stick direction; on the beat = old bonus + 0.2 charge back, off the beat no tier drop. LV = 1 + shop extra-dash + running power-up LV3/LV5.
