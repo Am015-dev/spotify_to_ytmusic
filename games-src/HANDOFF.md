@@ -4,6 +4,12 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun VISIBLE (flag RET.vis, default ON, ?vis=0 = old; W13, 20 Oct 2026)
+- `parts/visible.js` (after timing.js): per-kind on-screen floor (drone 1.6 s, charger/flank 2.1, gunship 5.2, gate/turret/tank 3.1, swarm/mine 1.05, zoo >= 2.1) read by DMG.minLife (b.js); no damage to a foe outside the playfield (DMG grace + VIS.ok); homing locks only on visible foes after .18 s (shop.js SH.steer); DASH, beat-parried shots, COMBO blast and an EMP warden strip skip the floor (e.dk); Normal hull 5 from stage 10 (story.js, VIS.hullD).
+- Gate `nightrun/visible-test.js` (ALL=1 = 16 weapons, VIS=0 = old). Numbers in BALANCE.md "Visible".
+- RET.timing stays OFF: timing-test bots still reflex 75-92% / random 58-67% (gates 70/40); random lives on 5-6 EMP/min. Next: make a wasted EMP cost meter, then flip.
+- Weak: weapon level curve itself unchanged (the floor is the cap); Hard+ floor still shrinks to .8x on late stages.
+
 ## Nightrun phone fixes: dash heading + WEAPONS sheet (W12, 20 Oct 2026)
 - Dash bug (portrait touch): `goDash` kept the last heading in `P.dx/dy` when a finger was down, so a still ship dashed along a stale heading (e.g. world left = sideways/back on a portrait screen). Now `P.mvT` stamps the last real move (keys, or touch offset > 3 px); no move in 0.3 s -> `dashSafeDir()` (b.js): 8-way landing spot with most free space, away from bullets (predicted 0.25 s) and foes and walls, ties go forward (world right = screen up in portrait). Test `dash-dir-test.js` (portrait, landscape, desktop).
 - WEAPONS sheet (`#wpm`, g.js): the ghost text was the pit-stop panel showing through `.ov.solid` (90% alpha); `#wpm` is now opaque, z-index 9. Cards are a fixed 96 px, text 14 px, fusion info is the last row INSIDE `#wpL` (`#wpFu`, no longer a separate block), ship picture hidden under 700 px height. Test `ui-weapons-test.js`.
