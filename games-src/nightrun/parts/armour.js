@@ -40,7 +40,7 @@ NR.on('runStart',()=>{B2X.hz=[];B2X.st={abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,l
   const need=s.ref/Math.max(4,B2X.LATE*B2X.tf(e)-s.act);
   s.amp=s.rate>1e-3?clamp(need/s.rate,1,B2X.AMP):B2X.AMP;     // only damage that lands is raised (a ship that does not hit gets nothing)
   const loss=raw*s.amp+s.bk;const now=G.t,cap=B2X.cap(e);s.w=s.w.filter(x=>now-x[0]<1);let used=0;for(const x of s.w)used+=x[1];
-  const room=Math.max(0,cap-used)*(window.BPL?BPL.k(e):1),take=Math.min(loss,room),left=loss-take;   // damage above the cap waits in the armour (up to BK s of the cap) and goes in at the cap's pace: bursts (a salvo, a bomb) are not lost, so the cap, not the bot's rhythm, sets the length
+  const room=Math.max(0,cap*(window.BPL?BPL.k(e):1)-used),take=Math.min(loss,room),left=loss-take;   // damage above the cap waits in the armour (up to BK s of the cap) and goes in at the cap's pace: bursts (a salvo, a bomb) are not lost, so the cap, not the bot's rhythm, sets the length; bossplay scales the cap itself (k x cap per second; scaling the leftover room let ~94% through at k=.25)
   s.bk=Math.min(left,cap*B2X.BK);
   if(raw>0){B2X.st.dealt+=raw;if(s.amp>1)B2X.st.amp+=take-Math.min(raw,take);}
   if(left>s.bk+.01)B2X.st.abs+=left-s.bk;

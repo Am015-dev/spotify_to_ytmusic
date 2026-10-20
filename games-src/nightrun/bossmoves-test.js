@@ -15,7 +15,7 @@ let fails = 0; const line = (ok, s) => { if (!ok) fails++; console.log((ok ? 'PA
 const FIGHT = ({ n, diff }) => {   // a weaving god ship, 1e6 damage a frame (armour.js holds the length at its floor), all phases
   const m = window.__mnr, B = window.BMV; m.SET.diff = diff; try { m.applySet(); } catch (e) { } m.startStory(n); m.simOn(true); m.god = true;
   let free = 1e9, id = null, drawn = 0, err = '';
-  for (let i = 0; i < 400 * 60 && m.running; i++) { if (m.SH.active) m.SH.close(); m.touchTo(200 + 60 * Math.sin(i / 140), 270 + 190 * Math.sin(i / 90));
+  for (let i = 0; i < 1000 * 60 && m.running; i++) { if (m.SH.active) m.SH.close(); m.touchTo(200 + 60 * Math.sin(i / 140), 270 + 190 * Math.sin(i / 90));   // 1000 s: with bossplay on, a bot that ignores the boss gates takes 2-3x as long (by design)
     const e = m.G.boss; if (e && e.x < 940) e.hp -= 1e6; m.step(1 / 60); const b = m.G.boss; if (b && b.bm) id = b.bm.id;
     if (b && b.bm && i % 8 === 0 && B.hz.some(z => !z.mk && m.G.t >= z.on && m.G.t < z.off)) { const x1 = b.x - b.r - 24; if (x1 < 30) continue; let best = -1e9; for (let x = 30; x <= x1; x += 20) for (let y = 20; y <= 520; y += 15) { const c = B.clear(x, y, 0); if (c > best) best = c; if (best > 200) break; } free = Math.min(free, best);
       if (drawn < 40) { try { m.render(m.G.t, 1 / 60); drawn++; } catch (x) { err = x.message; } } }
