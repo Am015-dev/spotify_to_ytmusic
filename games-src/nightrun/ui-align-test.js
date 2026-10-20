@@ -179,7 +179,7 @@ const SCREENS = [
       const ctx = await br.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, hasTouch: !!touch, isMobile: !!touch, userAgent: touch ? UA : undefined });
       const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
       await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
-      await p.addInitScript(installCanvasSpy); await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); } catch (e) { } });
+      await p.addInitScript(installCanvasSpy); await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); /* the iOS add-to-home card pops up 2.5 s after load and covers the title: it is not part of what this test measures */ } catch (e) { } });
       await p.goto(`http://127.0.0.1:${port}/index.html` + (process.env.QUERY || ''), { waitUntil: 'domcontentloaded' });
       await p.waitForFunction(() => window.__mnr, null, { timeout: 15000 });
       await p.waitForFunction(() => document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }).catch(() => { });

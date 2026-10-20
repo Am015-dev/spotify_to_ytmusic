@@ -105,9 +105,9 @@ VAR.nf=0;
 VAR.out=function(e,t){if(e._rr!=null){e.r=e._rr;e._rr=null;}if(e._flt!=null){ctx.filter=e._flt;e._flt=null;}};
 /* overlay (screen space, after the enemy picture): pips, elite aura + diamond, medic link. Shape-coded, not colour only. */
 VAR.mark=function(e,t){if(!e.vz||e.hp<=0)return;ctx.save();ctx.translate(e.x,e.y);const r=e.r,st=VAR.reduced();
-  if(e.vt===1||e.vt===2){ctx.fillStyle='#fff';ctx.strokeStyle='#101020';ctx.lineWidth=1.5;for(let i=0;i<e.vt;i++){const px=(i-(e.vt-1)/2)*7;ctx.beginPath();ctx.moveTo(px,-r-9);ctx.lineTo(px+3.5,-r-3);ctx.lineTo(px-3.5,-r-3);ctx.closePath();ctx.stroke();ctx.fill();}}
-  if(e.vt===3){const k=st?.7:.6+.4*Math.sin(t*5);ctx.strokeStyle='#ffd23d';ctx.globalAlpha=k;ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.beginPath();ctx.arc(0,0,r+7,0,7);ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
-    ctx.fillStyle='#ffd23d';ctx.strokeStyle='#101020';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,-r-17);ctx.lineTo(5,-r-11);ctx.lineTo(0,-r-5);ctx.lineTo(-5,-r-11);ctx.closePath();ctx.stroke();ctx.fill();
+  if(e.vt===1||e.vt===2){ctx.fillStyle='#fff';ctx.strokeStyle='#101020';ctx.lineWidth=1.5;for(let i=0;i<e.vt;i++){const px=(i-(e.vt-1)/2)*7;if(ART.pic('var-pip',8,px,-r-6))continue;ctx.beginPath();ctx.moveTo(px,-r-9);ctx.lineTo(px+3.5,-r-3);ctx.lineTo(px-3.5,-r-3);ctx.closePath();ctx.stroke();ctx.fill();}}
+  if(e.vt===3){const k=st?.7:.6+.4*Math.sin(t*5);ctx.strokeStyle='#ffd23d';ctx.globalAlpha=k;ctx.lineWidth=2;ctx.setLineDash([5,4]);if(!ART.pic('fx-w34-elite-aura',(r+7)*2,0,0,0,k)){ctx.beginPath();ctx.arc(0,0,r+7,0,7);ctx.stroke();}ctx.setLineDash([]);ctx.globalAlpha=1;
+    ctx.fillStyle='#ffd23d';ctx.strokeStyle='#101020';ctx.lineWidth=1.5;if(!ART.pic('var-elite-diamond',24,0,-r-11)){ctx.beginPath();ctx.moveTo(0,-r-17);ctx.lineTo(5,-r-11);ctx.lineTo(0,-r-5);ctx.lineTo(-5,-r-11);ctx.closePath();ctx.stroke();ctx.fill();}
     if(e.vel==='sh'){ctx.strokeStyle='#4ad1ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,r+3,-2.2,-.9);ctx.stroke();}}
   if(e.vc==='G'){ctx.strokeStyle='#9fb4ff';ctx.lineWidth=4;for(let i=0;i<3;i++){const a=i*2.094+.5;ctx.beginPath();ctx.arc(0,0,r+3,a,a+.9);ctx.stroke();}}
   ctx.restore();

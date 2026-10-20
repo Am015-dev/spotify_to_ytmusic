@@ -93,7 +93,7 @@ if(RET.tale){
 #moreBtn,#taleBtn{position:relative}
 .tpv{display:flex;align-items:center;gap:8px;min-height:44px;font:14px/1.25 var(--mono);color:var(--ink);overflow:hidden}
 .tpv .tp{width:36px;height:36px;font-size:17px;border-width:2px}
-.tpv span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpv span{min-width:0}
 .tpv b{color:var(--c)}
 `;document.head.appendChild(TS);
  const reduceMo=()=>{try{return !!(RM||SET.rm||matchMedia('(prefers-reduced-motion: reduce)').matches);}catch(e){return false;}};
@@ -157,7 +157,7 @@ if(RET.tale){
  /* ----- one preview line on the stage plate ----- */
  {const o=mapDetail;mapDetail=function(n){o(n);try{const el=$('stDet'),b=beforeFor(n);if(!el||el.hidden||!b||T.b[b.id]||!unlocked(n)||noSim)return;
    const l=b.lines[0],wo=whoOf(l.who,n),pv=document.createElement('div');pv.className='tpv';pv.id='talePv';pv.style.setProperty('--c',wo.c);
-   const sp=document.createElement('span');const bb=document.createElement('b');bb.textContent=wo.n+': ';sp.append(bb,document.createTextNode(l.text));
+   const sp=document.createElement('span');const bb=document.createElement('b');bb.textContent=wo.n+': ';sp.append(bb,document.createTextNode(l.text.split(/(?<=[.!?])\s/)[0]));   // first sentence only; the line wraps instead of being cut
    pv.append(portrait(wo,'sm'),sp);const pl=$('stPlay');if(pl)pl.before(pv);}catch(e){}};}
  /* ----- the STORY LOG ----- */
  const log=document.createElement('div');log.id='taleLog';log.hidden=true;log.setAttribute('role','dialog');log.setAttribute('aria-label','Story log');
