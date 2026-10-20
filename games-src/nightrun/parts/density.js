@@ -34,4 +34,6 @@ DENS.trimBoss=function(e){if(!RET.density||!e.lists)return;const cnt={};for(cons
   this.st.trim=(this.st.trim||0)+1;};
 NR.on('runStart',()=>{DENS.busy=0;DENS.last=-9;DENS.px.length=0;});
 /* a boss gets its moveset (and so its trimmed list) at spawn, not on its first beat: the old phase lists never show next to the new ones */
-{const sb=spawnBoss;spawnBoss=function(o){const b=sb(o);if(RET.density&&b&&b.bm===undefined&&window.BMV&&!(window.BPL&&BPL.on))try{BMV.init(b);}catch(e){}return b;};}
+{const sb=spawnBoss;spawnBoss=function(o){const b=sb(o);if(RET.density&&b&&b.bm===undefined&&window.BMV&&!(window.BPL&&BPL.on))try{BMV.init(b);}catch(e){}
+  else if(RET.density&&b&&b.bm===undefined&&window.BMV&&BMV.on)try{const id=BMV.idOf(b),T=id&&BMV.T[id];if(T)b.lists=T.ph.map(l=>l.map(x=>BMV.norm(x).v));}catch(e){}   // bossplay inits on the first beat: until then show the boss's own table, not the old fan5 / ring lists (S12 counted both = 13)
+  return b;};}
