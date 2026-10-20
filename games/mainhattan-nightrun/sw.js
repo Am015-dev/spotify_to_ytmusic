@@ -1,10 +1,10 @@
-/* Mainhattan Nightrun service worker (B30). Built by parts/build.py: 98f324d586 is replaced by a hash of the page, so every deploy makes a new worker and new cache names.
+/* Mainhattan Nightrun service worker (B30). Built by parts/build.py: 8fe075a229 is replaced by a hash of the page, so every deploy makes a new worker and new cache names.
    - shell (index.html, manifest, icons, title art): precached; index.html is NETWORK FIRST (3 s) with the cache as fallback, so a stale page is never served while online
    - tracks.json: network first, cache fallback
    - music/*.mp3 and media/*: cached when first used (size capped), served from the cache, then quietly re-checked with a conditional request (304 = nothing downloaded)
    - Range requests (a plain <audio src>) are answered from the cached file as 206; the game itself fetches songs whole into a blob, which needs no special case
    - other origins (fonts) are never touched; on activate the old shell cache goes and the asset cache is carried over to the new name */
-const BUILD = '98f324d586';
+const BUILD = '8fe075a229';
 const SHELF = 'nr-shell-' + BUILD, ASSETS = 'nr-assets-' + BUILD;
 const CAP = { music: 24, media: 420 };
 const BASE = new URL('./', self.registration.scope).href;
