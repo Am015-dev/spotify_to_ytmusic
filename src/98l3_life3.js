@@ -22,7 +22,7 @@ function L3_tick(){if(typeof RO!=='undefined'){let b=false;for(const c of HUB.ca
   if(c.CVi&&c.CViT>0&&c.RDy!=='box')want=-c.CVi;/* turning soon: be in the lane on the turn side (blinker side = -lane) */
   else if(L3_yieldP(c))want=-c.l3t;/* yield-1: the player closes fast from behind in my lane: take the other lane */
   else{const l=c.CVl;if(l&&!(l.dead>0)&&!c.RDy){const al=(l.x-c.x)*c.CVhx+(l.z-c.z)*c.CVhz;if(al<24&&(l.cv||0)>.5&&(l.cv||0)<(c.v||0)*.75&&!l.RDy)want=-c.l3t}}/* slower car ahead (not queued at a light): pass it */
-  if(want!==c.l3t&&L3_free(c,A,B,want)){c.l3t=want;c.l3c=4;L3.lc++}}}
+  if(want!==c.l3t&&!c.CVin/* traf-r21k2: never inside a junction box */&&L3_free(c,A,B,want)){c.l3t=want;c.l3c=12/* <= 2 changes a minute, was 4 s */;c.CVi=-want;c.CViT=Math.max(c.CViT||0,3.5)/* blinker on the side we move to for the whole change */;L3.lc++}}}
 // red-light audit: a car entering a signalled box on red without a reservation granted before the red = a run
 function L3_near(c){if(c.dead>0||c.pk)return null;const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B||A.ab||B.ab||c.a>=N.ng||c.b>=N.ng)return null;if(Math.abs(c.x-RO.x)>320||Math.abs(c.z-RO.z)>320)return null;
   const L=Math.hypot(B.x-A.x,B.z-A.z)||1,h=c.l3h||(c.l3h=[0,0]);h[0]=(B.x-A.x)/L;h[1]=(B.z-A.z)/L;return h}   // perf-r12b: one pair per car (used within the call only), not 78 arrays per step
@@ -90,7 +90,7 @@ function L3_pose(p,i,x,z,h,S2,air,S,d,sp,dt){if(air||p.cw||S||p.spin)return fals
   (_pA[0]=0,_pA[1]=3.32,_pA[2]=0,_pA[3]=hx,_pA[4]=hy+tw,_pA[5]=0,L3_part(Q.head,i));(_pA[0]=0,_pA[1]=3.62,_pA[2]=0,_pA[3]=hx,_pA[4]=hy+tw,_pA[5]=0,L3_part(Q.hair,i));return true}
 if(L3_ON){
   buildHubTraffic=(f=>function(){const r=f.apply(this,arguments);L3.E=null;try{L3_pedInit()}catch(e){console.warn('L3',e)}return r})(buildHubTraffic);
-  hubTrafficStep=(f=>function(dt){if(!HUB.cars||!HUB.nodes)return f.apply(this,arguments);try{L3.acc+=dt;if(L3.acc>=.2){L3.acc=0;L3_tick()}for(const c of HUB.cars){if(c.l3t==null)continue;if(c.l3c>0)c.l3c-=dt;const e=c.l3t-c.l3s;if(e&&(c.cv||0)>1/* lights-3: a stopped car does not slide sideways (it drifted into the box at the line) */)c.l3s+=Math.sign(e)*Math.min(Math.abs(e),dt*.8)}L3_pedPre(dt);if(CV.G&&L3_LT)L3_guard()}catch(e){console.warn('L3',e)}
+  hubTrafficStep=(f=>function(dt){if(!HUB.cars||!HUB.nodes)return f.apply(this,arguments);try{L3.acc+=dt;if(L3.acc>=.2){L3.acc=0;L3_tick()}for(const c of HUB.cars){if(c.l3t==null)continue;if(c.l3c>0)c.l3c-=dt;const e=c.l3t-c.l3s;if(e&&(c.cv||0)>1/* lights-3: a stopped car does not slide sideways (it drifted into the box at the line) */)c.l3s+=Math.sign(e)*Math.min(Math.abs(e),dt*.45)}L3_pedPre(dt);if(CV.G&&L3_LT)L3_guard()}catch(e){console.warn('L3',e)}
     const r=f.apply(this,arguments);try{for(const c of HUB.cars)if(c.l3V!=null){c.v=c.l3V;c.l3V=null}L3_pedPost();if(L3_LT)L3_audit();L3_hazards()}catch(e){console.warn('L3',e)}return r})(hubTrafficStep)}
 // kerb fix (life-4): RD_kerb keeps people at the RD road's own half width; where the city street is wider (ath 1899,-1663: an 8.5 m "sec" street on a
 // g-chain) that is still on the lane. Every 2nd call per person (every call while pushed out) check the city street and ease them out to its kerb + 0.9 m (not on crossings/boxes).

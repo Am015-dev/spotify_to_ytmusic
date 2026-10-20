@@ -1,0 +1,6 @@
+# HANDOFF traffic-r21k2 (NOT GREEN, not on trunk)
+1. Cause of the "switch": a turn at a junction put a car from its lane line on the old edge onto the lane line of the new edge in one step (3-5 m on 30 m Athens streets), and the hand-off step skipped the pose (doubled move). Before: 159 steps > 0.15 m in 60 s Athens (max 3.7 m), 3-6 overlapping pairs.
+2. Changed: HT_lat residual smoother in HT_pose (70_roam_world.js, ?lat=0 off; c.yo dodge stays outside it), pose on hand-off, HT_blocked (wait for the first 8 m of the next edge, 3 s max), hubRecycle never respawns into a car, lane change: 0.45/s, 12 s cooldown, never inside a box, blinker, CV leader gap 8.5 m.
+3. GO traffic/behaviour (src/99ctf_traffic_go.js, lazy, hooked via BOT_rows): jump 0.02-0.06 m/step, 0 same-frame lane changes, gap held 0.5 s 7.6-8.6 m. FLAKY: Athens lateral speed 2.48 and 3.56 m/s in two runs (limit 2.5); Frankfurt held overlaps 0 / 3 in two runs (sim not deterministic).
+4. Left: find the 1-step lateral spikes (ev list in R.ev), Frankfurt merge overlaps near nodes 1636/66; then unit + TAG=life1,xf1,terrain,bot,r17/start-life not run yet.
+5. Pushed only as traffic-r21k2-final (trunk push withheld: not green). Coordinator: cherry-pick after review, delete the branch.
