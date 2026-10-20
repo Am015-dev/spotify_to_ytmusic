@@ -9667,13 +9667,13 @@ const TIM=window.TIM={get on(){return!!(RET.timing&&window.ABIL&&ABIL.on);},
      EMP WINDOW: every EWI s of stage time (not bosses / tutorial / Lab) an OVERLOAD: an EWT s prompt ring round the ship + the EMP button,
        a charge if none is held (below Hard), then a ring of EWN slow bullets closes in with one gap: EMP it (shards + score), parry it on the beat, or find the gap.
      OFFC: charges an off-beat hop with a bullet near costs (W39: 2). */
-  HD:1,HP:.5,HE:1.5,HC:.8,HX:3.5,HL:2,PKA:.6,EWI:90,EW0:35,EWT:1.4,EWN:14,EWR:250,EWV:105,OFFC:1,
+  HD:1,HP:.5,HE:1.5,HC:.8,HX:3.5,HL:2,PKA:.6,EWI:90,EW0:35,OHC:40,EWT:1.4,EWN:14,EWR:250,EWV:105,OFFC:1,
   easyT(){return typeof HARDS==='undefined'||!HARDS.includes(SET.diff);},   // Hard+ get no assist and no free OVERLOAD charge (Legend must not get easier)
   pkW(){return(SET.tassist||(window.ST&&ST.on&&ST.n<=3&&this.easyT()))?this.PKA:this.PK;},
   pk(j){return SET.all||Math.abs(j.dt)<=winMs()*this.pkW()&&j.ok;},
   /* a DASH / EMP press: k 'd' | 'e', on = dead on the beat; false = locked by heat (the press does nothing) */
   heat(k,on){if(!this.on)return true;const T=this.st();if(T.hl>0){if(k==='d')this.stat.hot++;return false;}
-    T.h=(T.h||0)+(k==='e'?this.HE:on?this.HP:this.HD);if(T.h>this.HX){T.h=0;T.hl=this.HL;this.stat.lock++;floater(P.x,P.y-30,say('OVERHEAT'),'#ff5050');AU.sfx('heat');return false;}return true;},
+    T.h=(T.h||0)+(k==='e'?this.HE:on?this.HP:this.HD);if(T.h>this.HX){T.h=0;T.hl=this.HL;this.stat.lock++;P.emp=0;if(P.hp>1&&G.t-(T.oh||-99)>=this.OHC){T.oh=G.t;P.hp--;this.stat.burn=(this.stat.burn||0)+1;}floater(P.x,P.y-30,say('OVERHEAT'),'#ff5050');AU.sfx('heat');return false;}return true;},
   
   st(){return G.tm||(G.tm={pen:0,late:0,ch:0,hint:0,em:0});},
   near(){let tg=null,bd=1e9;for(const e of G.en){if(e.dead||e.hp<=0||e.gr||e.dying)continue;const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<bd){bd=d;tg=e;}}return tg;},
