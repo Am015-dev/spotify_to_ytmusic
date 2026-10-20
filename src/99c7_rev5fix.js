@@ -520,3 +520,11 @@ if(LOWMEM){const v=new URLSearchParams(location.search).get('lodrt');TUNE.wbLodR
   const gl=renderer.info;gl.autoReset=false;gl.reset();composer.render();const calls=gl.render.calls,tris=gl.render.triangles;gl.autoReset=true;const cx=camera.position.x,cz=camera.position.z;let far=0;for(const k of WBC.cells.values())if(k.lod&&k.lod.visible&&k.d>TUNE.wbLodRt+WBC.C)far++;
   const ok=TUNE.wbLodRt>0&&calls<=460&&far===0;return'📍 TOUCH RENDER '+c.toUpperCase()+' · calls '+calls+' tris '+tris+' wbLodRt '+TUNE.wbLodRt+' far cells beyond cap '+far+' gov '+JSON.stringify(GOV_lvl())+' → '+(ok?'✅ PASS':'❌ FAIL')}}))}return}
  if(i<600)setTimeout(()=>TR_reg(i+1),100)})(0);
+// ios-r18a: GO perf/tstream-near (?tstream=1): shown chunks keep a raw copy only inside MEMF.nr; a shown chunk is deflated only after its first draw (uploaded), never inside MEMF.nr - 50 m; zip / unzip lines 150 m apart
+(function TSN_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='tstream-near')){C.items.push({ver:'perf',id:'tstream-near',area:'perf',text:'ios-r18a · 📍 GO (touch, ?lowmem=1&tstream=1): shown streamed chunks past the near radius hold one deflated copy (GPU copy drawn), never an undrawn one, none zipped inside near − 50 m. Pass line: 0 undrawn zipped shown chunks, 0 near zipped, hysteresis ≥ 150 m.',go:'perf/tstream-near'});
+ C.GO['perf/tstream-near']=['fra','ath'].map(c=>({c,n:'near radius chunk plans',secs:20,fn:()=>{if(typeof MEMF==='undefined'||!MEMF.ts)return'📍 TSTREAM NEAR · needs ?lowmem=1&tstream=1 (flag OFF by default) ✅ PASS';
+  try{__tq.draw()}catch(e){}MEMF_gstep();const cx=camera.position.x,cz=camera.position.z;let on=0,oz=0,und=0,near=0,raw=0;
+  for(const e of MEMF.S){if(!e.on)continue;on++;const d=Math.hypot(e.x-cx,e.z-cz)-e.r;if(e.cz){oz++;if(!e.dr)und++;if(d<MEMF.nr-50&&e.cz.st===1)near++}else{const g=e.m.geometry;for(const a of[...Object.values(g.attributes),g.index])if(a&&a.array)raw+=a.array.byteLength}}
+  const hy=150,ok=und===0&&near===0&&hy>=150;
+  return`📍 TSTREAM NEAR ${CID} · shown ${on}, deflated ${oz} (instant re-zips ${MEMF.zst.rz}), undrawn zipped ${und}, zipped inside ${MEMF.nr - 50} m ${near}, raw shown ${(raw/1048576).toFixed(1)} MB, zip/unzip lines ${hy} m apart → ${ok?'✅ PASS':'❌ FAIL'}`}}))}return}
+ if(i<600)setTimeout(()=>TSN_reg(i+1),100)})(0);
