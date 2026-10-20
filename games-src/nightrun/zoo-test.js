@@ -110,7 +110,7 @@ const SCHED = () => {   // story stage 3: none; stage 4: the shielder shows up; 
 const LABCHK = () => document.getElementById('labTab_foes') && (document.getElementById('labTab_foes').click(), [...document.querySelectorAll('#labP .lc, .lc')].map(e => e.textContent));
 (async () => {
   const fails = [], port = await fp(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME], { stdio: 'ignore' }); await sleep(700);
-  const br = await PW.chromium.launch(), url = q => `http://127.0.0.1:${port}/index.html?sim=1&all=1${q || ''}`;
+  const br = await PW.chromium.launch(), url = q => `http://127.0.0.1:${port}/index.html?sim=1&all=1&mustmove=0${q || ''}${process.env.Q || ''}`;
   const open = async (w, h, touch, q, u) => { const ctx = await br.newContext({ viewport: { width: w, height: h }, hasTouch: touch, isMobile: touch, userAgent: touch ? UA : undefined }), p = await ctx.newPage();
     p.on('pageerror', e => fails.push(`page error @${w}x${h}: ${e.message}`)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(u || url(q));
     await p.waitForFunction(() => window.__mnr && __mnr.TR.list.length > 0 && window.ZOO, null, { timeout: 15000 }).catch(() => fails.push('page did not start')); await p.evaluate('window.SETUP=' + SETUP); return { ctx, p }; };

@@ -5633,7 +5633,7 @@ FM.def('sniperlanes',{tags:['elite','hazard'],t:14,cost:4,kinds:['sniper','drone
   FM.later(I,2,()=>{const y=H/2+gr(-60,60);for(let i=0;i<3;i++)FM.u('drone',0,0,t=>[W+30+i*48-150*t,y],{});});}});
 /* 22 kamikaze: a wave of divers, one per beat, each lane further from the last */
 FM.def('kamikaze',{tags:['rush'],t:6,cost:3,kinds:['kamikaze'],role:'kamikaze wave',f(I,k){const s=fmSide(I,k);
-  for(let b=0;b<3;b++)FM.later(I,b,()=>FM.u('kamikaze',W+40,fmCy(H/2+s*(b-1)*150)));}});
+  for(let b=0;b<2;b++)FM.later(I,b*2,()=>FM.u('kamikaze',W+40,fmCy(H/2+s*(b-1)*150)));}});
 /* 23 bomberrun: bombers along the top lane, then the bottom lane */
 FM.def('bomberrun',{tags:['hazard'],t:11,cost:3,kinds:['bomber'],role:'bomber run',f(I,k){const s=fmSide(I,k);FM.u('bomber',W+40,s<0?90:H-120);
   FM.later(I,4,()=>FM.u('drone',0,0,t=>[W+30-160*t,s<0?H-110:110],{}));}});
@@ -5744,6 +5744,39 @@ FM.def('ambush',{tags:['elite','rush'],t:34,cost:5,kinds:['sniper','kamikaze'],r
 /* 60 flankers: flankers curl in from both edges */
 FM.def('flankers',{tags:['flank'],t:4,cost:2,kinds:['flank'],f(I,k){DIR.flank(2,true);}});
 
+/* ---- VARY2 micro-events (owner 19 Oct 2026: "boring, extremely repetitive"): small encounters of their own, each with a different job. stagescripts.js swaps them in for
+   a formation piece (same director call, same caps), tracks them as set pieces and rotates a window of them per stage. Flag RET.vary2; ?vary2=0 = the VARY A table. ---- */
+if(RET.vary2===undefined)RET.vary2=RET.vary&&!/[?&]vary2=0/.test(location.search);
+const fmEv=(id,o)=>FM.def(id,Object.assign({tags:['event'],ev:1,cost:3},o));
+const fmGnd=()=>!!(window.LEAK&&ST.on&&ST.def&&(ST.def.pos|0)>=2);          // ground units only where the ground waves are allowed (leak.js)
+const fmGu=(ty,x,alt)=>{if(!fmGnd()||G.en.filter(e=>e.gnd&&e.hp>0).length>=3)return (alt||'drone')==='drone'?fmD(W+60,gr(70,H-70)):FM.u(alt,W+60,gr(70,H-70));return LEAK.mk(ty,x);};
+const fmH=(k,x,y)=>FM.u(G.en.filter(e=>e.zt&&e.hp>0&&e.zst!==2).length>=2?'drone':k,x,y);   // at most two zoo hover stations alive at once: they never crowd each other
+const fmD=(x,y)=>FM.u('drone',0,0,t=>[x-120*t,y],{});   // a plain drone on a straight path (a path unit never hovers: zoo.js would park a free drone)
+const fmHover=(a,k)=>{const ks=a.filter(q=>FM.ok(q));return ks.length?ks[k%ks.length]:'shielder';};
+fmEv('evsway',{t:1,name:'SWAY LINE',f(I,k){const y=gr(160,H-200),a=k%2?-1:1;for(let i=0;i<5;i++)FM.u('drone',0,0,t=>[W+30+i*54-120*t,fmCy(y+a*Math.sin(t*1.5-i*.6)*50)],{});}});
+fmEv('evdoor',{t:1,name:'DOUBLE DOOR',cost:2,f(I,k){let g=gr(160,H-160);for(let b=0;b<2;b++){const y=g;FM.later(I,b*3,()=>{for(const s of[-1,1])for(let q=0;q<2;q++)fmD(W+30+q*46,fmCy(y+s*(95+q*44)));});g=fmCy(g+(g>H/2?-80:80));}}});
+fmEv('evlanterns',{t:1,name:'LANTERNS',f(I,k){const y=gr(150,H-190);for(let i=0;i<4;i++)FM.u('drone',0,0,t=>[W+30+i*70-70*t,fmCy(y+Math.sin(t*1.6+i*1.2)*50)],{});}});
+fmEv('evbracket',{t:2,name:'BRACKET',f(I,k){for(let b=0;b<2;b++)FM.later(I,b*2,()=>{fmD(W+40,60);fmD(W+40,H-60);});}});
+fmEv('evgrid',{t:2,name:'PATROL GRID',f(I,k){const x=gr(740,820);FM.u('turret',W+60,70,null,{stop:x,bf:fireIn(.3)});FM.u('turret',W+60,H-70,null,{stop:x+30,bf:fireIn(.6)});fmD(W+90,H/2);}});
+fmEv('evtline',{t:3,name:'ROAD GUNS',kinds:['gturret'],f(I,k){for(let i=0;i<2;i++)fmGu('gturret',W+40+i*210,'drone');}});
+fmEv('evwindow',{t:3,name:'WINDOW DISPLAY',f(I,k){const y=gr(110,H-210),x0=gr(700,790);for(let i=0;i<5;i++)FM.u('drone',0,0,t=>{const x=t<1.5?W+30-(W+30-x0)*t/1.5:t<3.5?x0:x0-170*(t-3.5);return [x+i*20,y+i*44];},{});}});
+fmEv('evstation',{t:4,name:'STATION',kinds:['sniper','shielder'],f(I,k){fmH(fmHover(['sniper','shielder'],k),W+50,gr(90,H/2-30));fmH(fmHover(['shielder','sniper'],k+1),W+90,gr(H/2+30,H-90));}});
+fmEv('evguard',{t:4,name:'GUARD CHANGE',cost:4,kinds:['shielder','turret'],f(I,k){fmH('shielder',W+60,gr(150,H-150));fmD(W+60,k%2?70:H-70);fmD(W+110,k%2?H-70:70);}});
+fmEv('evshieldv',{t:4,name:'SHIELD VEE',cost:4,kinds:['shielder'],f(I,k){const y=gr(170,H-170);for(let i=-1;i<=1;i++)fmH('shielder',W+50+Math.abs(i)*40,fmCy(y+i*110));}});
+fmEv('evfunnel',{t:5,name:'FUNNEL',cost:4,f(I,k){const g=gr(190,H-190);for(let i=0;i<6;i++)for(const s of[-1,1])FM.u('drone',0,0,t=>{const w=Math.max(60,230-i*30-t*38);return [W+30+i*38-130*t,fmCy(g+s*w)];},{});}});
+fmEv('evmines',{t:6,name:'DRIFT MINES',kinds:['mine'],f(I,k){const y0=gr(70,H-250),d=k%2?-1:1;for(let i=0;i<4;i++){const y=fmCy(y0+i*d*58+(d<0?190:0));FM.u('mine',0,0,t=>[W+40+i*90-62*t,y+14*Math.sin(t*.9+i)],{by:y});}}});
+fmEv('evdive',{t:6,name:'DIVE LINE',kinds:['charger'],f(I,k){for(let b=0;b<2;b++)FM.later(I,b*2,()=>{for(let q=0;q<2;q++)FM.u('charger',W+40+q*70,b%2?H-70:70);});}});
+fmEv('evtank',{t:6,name:'TANK RUN',kinds:['gtank'],f(I,k){fmGu('gtank',W+40,'charger');fmGu('gtank',W+190,'charger');}});
+fmEv('evram',{t:7,name:'RAM & SHIELD',cost:4,kinds:['charger','shielder'],f(I,k){fmH('shielder',W+50,gr(120,H-120));for(let i=0;i<2;i++)FM.u('charger',W+30+i*110,gr(60,H-110));}});
+fmEv('evwalker',{t:8,name:'WALKER',cost:4,kinds:['gwalker','gturret'],f(I,k){fmGu('gwalker',W+40,'gunship');fmGu('gturret',W+260,'drone');}});
+fmEv('evsplit',{t:9,name:'SPLIT PAIR',kinds:['splitter'],f(I,k){fmH('splitter',W+50,gr(90,H/2-30));fmH('splitter',W+90,gr(H/2+30,H-90));}});
+fmEv('evconvoy',{t:10,name:'CONVOY',cost:5,kinds:['gtank','gturret','gwalker'],f(I,k){fmGu('gtank',W+40,'charger');fmGu('gturret',W+200,'drone');fmGu('gwalker',W+360,'gunship');}});
+fmEv('evbombers',{t:11,name:'GUNSHIP & SNIPE',kinds:['gunship','sniper'],f(I,k){FM.u('gunship',W+90,k%2?150:H-170);fmH('sniper',W+90,k%2?H-70:70);}});
+fmEv('evsnipe',{t:14,name:'LANE SNIPERS',cost:4,kinds:['sniper','gate'],f(I,k){fmH('sniper',W+40,70);fmH('sniper',W+80,H-70);FM.u('gate',W+30,0,null,{gy:gr(150,H-200),gap:130});}});
+fmEv('evheal',{t:16,name:'MEDIC SQUAD',cost:5,kinds:['healer','shielder','gunship'],f(I,k){const y=gr(150,H-150);fmH('healer',W+50,y);fmH('shielder',W+90,fmCy(y>H/2?y-110:y+110));FM.u('gunship',W+130,fmCy(y>H/2?y+10:y-110));}});
+fmEv('evrelay',{t:17,name:'RELAY',cost:4,kinds:['sniper','charger'],f(I,k){fmD(W+50,gr(120,H-120));fmH('sniper',W+80,k%2?70:H-70);FM.later(I,3,()=>FM.u('charger',W+40,H/2));}});
+fmEv('evcargo',{t:19,name:'CARGO',cost:5,kinds:['carrier','shielder'],f(I,k){FM.u('carrier',W+80,gr(170,H-200));fmD(W+60,k%2?90:H-90);}});
+fmEv('evlayer',{t:22,name:'MINE BELT',cost:5,kinds:['minelayer','mine','gate'],f(I,k){FM.u('minelayer',W+40,gr(140,H-140));FM.u('gate',W+30,0,null,{gy:gr(150,H-200),gap:130});for(let i=0;i<2;i++){const y=gr(60,H-60);FM.u('mine',0,0,t=>[W+40+i*120-62*t,y+14*Math.sin(t*.9+i)],{by:y});}}});
 NR.on('runStart',()=>{FM.reset();});
 /* economy: a formation's swarmers are cheap one-hit targets (walls, rivers, tides) and the old story stages had almost none, so each pays FM.swN of a kill's Neon (econ-test) */
 FM.swN=.3;
@@ -5827,12 +5860,14 @@ const VMUT={
   order:{n:'TARGET ORDER',t:'Shoot the beacons 1, 2, 3'},
   hail:{n:'HAILSTORM',t:'Slow rain from above'},
   minefield:{n:'MINEFIELD',t:'Mines drift in'}};
+const VSIG2={1:['COURIER LIGHTS','evlanterns','evlanterns','mirror'],2:['PATROL GRID','evgrid','evbracket','fast'],3:['WINDOW DISPLAY','evwindow','evtline','echo'],4:['GUARD CHANGE','evguard','evshieldv','mirror']};
+const VSIGS=['evlanterns','evsway','evgrid','evbracket','evwindow','evtline','evguard','evshieldv'];
 const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK?LEAK.pg:.3,X:{},
   on(){return !!RET.vary;},
   active(){return !!(RET.vary&&ST.on&&this.st&&this.st.n===ST.n&&!G.lab&&!G.tut);},
   parse(x){const o={raw:x,br:x[0]==='~',sig:x==='*',g:/\+g$/.test(x)};const b=x.replace(/^~/,'').replace(/\+g$/,'');o.ids=o.sig?[]:b.split('|');return o;},
   plan(){this.st=null;const s=ST.on&&!G.lab&&!G.tut?this.S[ST.n]:null;if(!RET.vary||!s)return;
-    this.st={n:ST.n,s,ms:s.m.map(x=>this.parse(x)),i:-1,inst:{},c:{},mut:s.mut&&VMUT[s.mut]?s.mut:'',card:0,sigOn:0};this.X={};
+    this.st={n:ST.n,s,ms:s.m.map(x=>this.parse(x)),i:-1,inst:{},c:{},mut:s.mut&&VMUT[s.mut]?s.mut:'',card:0,sigOn:0};this.X={};if(RET.vary2)this.evPlan(this.st);
     DIR.mut=this.st.mut==='hail'?['hail']:this.st.mut==='minefield'?['mine']:[];},
   span(){return Math.max(8,ST.lead>0?ST.lead:ST.ch==='speed'?ST.tb*.55:ST.len);},   // a speed challenge usually ends early: its script is packed into the first half
   idx(){const n=this.st.ms.length,sp=this.span(),b=Math.max(0,G.dbar);if(b<sp)return clamp(Math.floor(b*n/sp),0,n-1);
@@ -5842,6 +5877,17 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
     if(t>st.cur&&(st.c[st.cur]|0)>=1){let nx=st.cur+1;if(t-nx>=2)nx=t-1;const sg=st.ms.findIndex(m=>m.sig);if(sg>st.cur&&sg<nx&&!(st.c[sg]>0))nx=sg;st.cur=nx;}   // at most one moment behind; the set piece is never skipped
     else if(t<st.cur&&G.dbar>=this.span())st.cur=t;return st.cur;},
   mom(){return this.st.ms[this.cur()];},
+  /* ---- VARY2: micro-events swapped into the script (flag RET.vary2) ---- */
+  evVar(i){return this.st.n<6?'':['','mirror','fast','elite'][(this.st.n+i)%4];},
+  evPlan(st){const n=st.n,sg=VSIG2[n];if(sg)st.s=Object.assign({},st.s,{sig:sg});
+    const el=Object.keys(FM.L).filter(id=>FM.L[id].ev&&FM.L[id].t<=n&&!(n<=4&&VSIGS.includes(id))).sort((a,b)=>FM.L[a].t-FM.L[b].t||(a<b?-1:1));if(!el.length)return;
+    const w=el.filter(id=>FM.L[id].t===n).slice(0,2);for(let j=0;w.length<Math.min(4,el.length)&&j<el.length*2;j++){const id=el[(n*3+j)%el.length];if(!w.includes(id))w.push(id);}
+    st.ev=w;let c=0;st.ms=st.ms.map((m,i)=>(i===0||m.sig||m.br||i%3===0)?m:this.parse(w[c++%w.length]));},
+  evTrack(I,n0,fid,d){const es=G.en.slice(n0).filter(e=>e&&e.hp>0);if(!es.length)return;
+    FUN.sets.push({es,n:es.length*3,kind:fid});   // n x3: it counts as a set piece on screen but never pays the SET CLEARED bonus (economy unchanged)
+    const sn=(this.seen=this.seen||{});if(!sn[d.id]){sn[d.id]=1;hintShow(d.name,2);}NR.emit('setpiece',{kind:fid});},
+  pace(bar){const st=this.st;if(!RET.vary2||!st)return 1;const p=clamp(bar/this.span(),0,1.2),n=st.n;
+    switch((n*7)%5){case 0:return .8+.4*p;case 1:return 1.2-.4*p;case 2:return 1+.22*Math.sin(p*15.7+n);case 3:return p>.3&&p<.5?.72:p>.5&&p<.7?1.25:1;default:return 1+.2*Math.cos(p*6.3);}},
   gnd(){return !!this.mom().g;},
   hard(){return HARDS.includes(SET.diff);},                    // Hard, Very hard, Legend: the old random zoo and ground waves still come between the scripted pieces (Legend must not get easier)
   oldK(){return {hard:.25,vhard:.35,legend:.4}[SET.diff]||0;},   // ... and this share of the director's calls still uses the stage's old wave pool (its turrets and gunships)
@@ -5852,9 +5898,10 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
     const rm=/~r$/.test(id),base=id.replace(/~r$/,'');if(!FM.L[base]){id='line';key=i+':line';}
     let I=st.inst[key];if(!I){I=st.inst[key]=FM.make(FM.L[base]?base:'line',{r:rm?1:0});if(rm)I.s.sd=1;
       if(tw==='elite')I.el=1;if(tw==='fast')I.tk=1.22;}
+    const evd=RET.vary2&&FM.L[base].ev?FM.L[base]:null,vv=evd&&!m.sig?this.evVar(i):'';if(vv==='fast'&&!I.tk1){I.tk1=1;I.tk=1.22;}if(vv==='elite')I.el=1;if(vv==='mirror')tw='mirror';
     if(rm||tw==='mirror'||st.mut==='mirror')I.mir=(I.k%2===1);
-    const fid=m.sig?'sig:'+st.s.sig[0]:id;
-    FM.piece(I);NR.emit('pattern',{id:fid});
+    const fid=m.sig?'sig:'+st.s.sig[0]:evd&&vv?id+'·'+vv:id,n0=G.en.length;
+    FM.piece(I);NR.emit('pattern',{id:fid});if(evd||(m.sig&&FM.L[base].ev))this.evTrack(I,n0,fid,FM.L[base]);
     if(tw==='echo'&&I.k%2===0)FM.later(I,2,()=>{I.mir=!I.mir;FM.piece(I);});
     if(this.log.length<6000)this.log.push({n:st.n,b:+G.dbar.toFixed(1),t:+G.t.toFixed(1),f:fid,p:m.sig?id:'',i,br:m.br?1:0,mut:st.mut});
     if(DIR.log.spawns.length<400)DIR.log.spawns.push([+G.dbar.toFixed(1),fid]);},
@@ -5908,6 +5955,8 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
     ctx.restore();}};
 /* ---- hooks (all inert with the flag off) ---- */
 {const so=DIR.spawnOne;DIR.spawnOne=function(fill){if(VARY.active()&&!(VARY.hard()&&GR()<VARY.oldK()))return VARY.spawn(fill);return so.call(this,fill);};}   // innermost: zoo.js and leak.js wrap it later (caps, READY gaps)
+{const en0=DIR.energy;DIR.energy=function(bar){const e=en0.call(this,bar);return RET.vary2&&VARY.active()?e*VARY.pace(bar):e;};}   // a pace curve per stage (calm / surge / breather), mean 1: Normal is not harder overall
+{const db=drawBG;drawBG=function(bg,t,dt,scroll){db(bg,t,dt,scroll);if(!RET.vary2||!ST.on||G.lab||G.tut)return;ctx.save();ctx.globalAlpha=.13;ctx.fillStyle='hsl('+((ST.n*137)%360)+',70%,45%)';ctx.fillRect(0,0,W,H);ctx.restore();};}   // the five backdrops get a different tint on every stage
 {const pt=DIR.pickTheme;DIR.pickTheme=function(bar){pt.call(this,bar);VARY.theme();};}
 {const bl=DIR.barLine;DIR.barLine=function(i){VARY.theme();return bl.call(this,i);};}
 if(window.ZOO){const wo=ZOO.waveOK;ZOO.waveOK=function(){return wo.call(this)&&(!VARY.active()||VARY.hard());};}   // Easy/Normal: the zoo kinds come from the scripts' roles; the hard tiers keep the old random zoo pressure on top
@@ -7968,7 +8017,7 @@ window.__s3={S3};
    Each run has its own seed (daily / weekly runs: a fixed seed, so they stay the same for everyone); timing varies +-25%, states and sides vary.
    Fire still goes through eb(), so ebCap/BCAP hold. Formation path units, zoo kinds, ground units, bosses and the tutorial keep their old code. */
 if(RET.react===undefined)RET.react=!/[?&]react=0/.test(location.search);
-const RX=window.RX={get on(){return!!RET.react;},TELL:.6,GAP:96,J:.25,rng:Math.random,seed:0,fav:270,force:null,pend:[],sq:[],stat:{},
+const RX=window.RX={get on(){return!!RET.react;},TELL:.6,GAP:96,J:.25,rng:Math.random,seed:0,fav:270,back:0,force:null,pend:[],sq:[],stat:{},
   reset(){this.act={hunt:0,feint:0,retreat:0,press:0,bait:0,window:0};this.stat={hunt:0,feint:0,retreat:0,dive:0,press:0,bait:0,window:0,pin:0,exit:0,leader:0,enrage:0,cover:0,block:0,tells:0,minTell:9,fires:0,reacts:0};this.pend=[];this.sq=[];this.fav=H/2;
     const q=/[?&]rseed=(\d+)/.exec(location.search),f=/[?&]rxs=(\w+)/.exec(location.search);this.force=f?f[1]:null;
     if(!this.on)return;   // flag off: not even one draw from the dice
@@ -7984,15 +8033,15 @@ const RX=window.RX={get on(){return!!RET.react;},TELL:.6,GAP:96,J:.25,rng:Math.r
     if(t==='turret')return ez?(R<.5?'feint':'hunt'):R<.35?wn:R<.7?'feint':'bait';
     if(t==='gunship')return ez?'feint':R<.4?wn:R<.75?'feint':'retreat';
     return ez?(R<.5?'hunt':'press'):R<.28?'hunt':R<.48?'retreat':R<.68?'press':R<.88?'bait':'feint';},
-  per(e){const d=diff(),k=frK(),t=e.type;return(t==='turret'?1.5:t==='gunship'?1.4:2.4)/d/Math.max(.2,k)/(e.el?1.3:1)*(this.hard()?1:1.25);},   // the old mean fire period in seconds (Easy/Normal x1.25: smarter shots, fewer of them)
-  tell(e){const T0=this.hard()?this.TELL:this.TELL+.1,sp=BT.spb||.5,b=bpos()+T0/sp,fr=b-Math.floor(b);return T0+(fr>1e-3?(1-fr)*sp:0);}   // >= TELL, and the shot lands on a beat
+  per(e){const d=diff(),k=frK(),t=e.type;return(t==='turret'?1.5:t==='gunship'?1.4:2.4)/d/Math.max(.2,k)/(e.el?1.3:1)*(this.hard()||this.back>3?1:1.25);},   // the old mean fire period in seconds (Easy/Normal x1.25: smarter shots, fewer of them; not for a ship that hangs back)
+  tell(e){const T0=(this.hard()?this.TELL:this.TELL+.1)+(Math.hypot(P.x-e.x,P.y-e.y)<250?.15:0),sp=BT.spb||.5,b=bpos()+T0/sp,fr=b-Math.floor(b);return T0+(fr>1e-3?(1-fr)*sp:0);}   // >= TELL, and the shot lands on a beat
 };
 RX.reset();
 NR.on('runStart',()=>RX.reset());
 NR.on('spawn',e=>{if(!RX.on||!G.live||G.tut||G.lab||e.zt||e.gnd||e.wpt||e.mini)return;
   if(!['drone','flank','turret','gunship'].includes(e.type))return;
-  let st=RX.pick(e);if(e.fp&&(st==='retreat'||st==='press'))st=RX.rng()<.5?'hunt':'bait';   // formation units keep their path: fire brains only
-  e.rx={fx:!!e.fp,st,c:RX.r(.2,.8),tl:0,hold:0,rt:0,dv:0,sl:0,ty:null,mate:null,role:null,sq:null,enr:0,vw:-9};
+  let st=RX.pick(e);if((e.fp||e.type==='flank')&&(st==='retreat'||st==='press'))st=RX.rng()<.5?'hunt':'bait';   // formation units keep their path: fire brains only
+  e.rx={fx:!!e.fp||e.type==='flank',st,c:RX.r(.1,.4),n:0,tl:0,hold:0,rt:0,dv:0,sl:0,ty:null,mate:null,role:null,sq:null,enr:0,vw:-9};
   Object.defineProperty(e,'bf',{get:()=>1e9,set(){},configurable:true});e.arm=false;   // the old beat timer never fires this one
  if(e.type==='drone'||e.type==='gunship'){e.amp=0;}
   if(st==='window'){e.rxA=1;}
@@ -8012,22 +8061,24 @@ RX.squad=function(g){if(this.easy()||!g.length)return;if(g.length<2&&!(g[0].type
   if(fr.length>=2&&this.rng()<.6){const[a,b]=fr;a.rx.role='pin';b.rx.role='exit';a.rx.mate=b;b.rx.mate=a;b.rx.c=a.rx.c;a.rx.st=b.rx.st='hunt';this.stat.pin++;this.stat.exit++;}
   if(g.length>=3&&this.rng()<.6){const l=g.find(e=>!e.rx.role)||g[0];s.ld=l;l.rx.ld=1;if(this.hard())l.hp=l.max=Math.round(l.max*1.5);this.stat.leader++;}};
 /* the fire itself: through eb(), so caps hold */
-RX.fire=function(e,dir){const d=diff(),s=(e.type==='turret'?170+15*d:e.type==='gunship'?190:150+22*d),r=e.rx,lk=this.hard()?.85:.45;
-  let tx=P.x,ty=P.y;const dist=Math.hypot(P.x-e.x,P.y-e.y),t=Math.min(.9,dist/Math.max(120,s));
+RX.fire=function(e,dir){const d=diff(),s=(e.type==='turret'?170+15*d:e.type==='gunship'?190:150+22*d),r=e.rx;let lk=this.hard()?.85:.45;
+  let tx=P.x,ty=P.y;const dist=Math.hypot(P.x-e.x,P.y-e.y),t=Math.min(.9,dist/Math.max(120,s)),fl=dist<250&&!this.hard();if(fl)lk=0;else if(RX.back>3)lk=.9;   // a ship that presses in flusters it (no lead: risk pays); one that hangs back for 3 s is read (full lead)
   if(r.st==='hunt'||r.role==='pin'||r.role==='exit'){tx+=PV.x*t*lk;ty+=PV.y*t*lk;}
-  if(r.st==='bait'){ty=P.y+Math.sign(r.bd||PV.y||1)*Math.min(110,Math.abs(r.bdv||PV.y)*.45+40);}
-  if(r.role==='exit'){const up=P.y>H/2;ty=P.y+(up?-1:1)*(RX.GAP+18);}   // the open side: one bullet line RX.GAP+ away from the pin line, the far side stays free
+  if(r.st==='bait'&&!fl){ty=P.y+Math.sign(r.bd||PV.y||1)*Math.min(110,Math.abs(r.bdv||PV.y)*.45+40);}
+  if(r.role==='exit'&&!fl){const up=P.y>H/2;ty=P.y+(up?-1:1)*(RX.GAP+18);}   // the open side: one bullet line RX.GAP+ away from the pin line, the far side stays free
   if(r.role==='pin')ty=P.y;
   const a=Math.atan2(ty-e.y,tx-e.x),n0=G.eb.length;eb.src=e;
-  if(e.type==='turret'||e.el)fan0(e,3,a,s,e.el?'#ffd23d':'#ffa02d');
+  if(fl)eb(e.x-10,e.y,a,s);   // flustered: one plain shot
+  else if(e.type==='turret'||e.el)fan0(e,3,a,s,e.el?'#ffd23d':'#ffa02d');
   else if(e.type==='gunship')fan0(e,3,a,210,'#ffa02d');
   else eb(e.x-10,e.y,a,s);
-  for(let i=n0;i<G.eb.length;i++)G.eb[i].rxb=1;eb.src=null;r.vw=G.t;this.stat.fires++;if(r.st==='hunt')this.act.hunt++;};
+  for(let i=n0;i<G.eb.length;i++)G.eb[i].rxb=1;eb.src=null;r.vw=G.t;this.stat.fires++;if(r.st==='hunt')this.act.hunt++;if(r.st==='bait')this.act.bait++;};
 function fan0(e,n,a,s,c){const room=ebCap()-G.eb.length;if(room<n)n=room>=3?3:room>=1?1:0;for(let i=0;i<n;i++)eb(e.x-20,e.y,a+fanAngle(n,.42,i)*1.6,s,c);}   // fanAngle step x1.6: bullets >= 96 px apart at 300 px
 /* every frame, after the old movement */
 NR.on('tick',dt=>{if(!RX.on||!G.live||G.dead||G.tut||G.lab)return;
   if(RX.pend.length){const g=RX.pend.filter(e=>RX.ok(e));RX.pend=[];RX.squad(g);}
   RX.fav+=(P.y-RX.fav)*Math.min(1,dt/4);
+  RX.back=P.x<170?(RX.back||0)+dt:0;
   const enr=e=>e.rx.enr>0?1.6:1;let telling=0;for(const e of G.en)if(e.rx&&e.rx.tl>0)telling++;
   const tmax=RX.easy()?3:RX.hard()?6:3;
   for(const e of G.en){const r=e.rx;if(!r||e.dead||e.hp<=0)continue;if(e.type!=='drone'&&e.type!=='gunship'&&e.type!=='turret'&&e.type!=='flank')continue;
@@ -8047,7 +8098,7 @@ NR.on('tick',dt=>{if(!RX.on||!G.live||G.dead||G.tut||G.lab)return;
     else if(r.st==='hunt'&&!r.role){const ty=P.y+PV.y*.6;if(RX.far(e.x,ty,140))RX.mvY(e,ty,v*.7,dt);}
     else if(r.st==='feint'&&r.ty!=null){RX.mvY(e,r.ty,180*enr(e),dt);if(Math.abs(e.y-r.ty)<4)r.ty=null;}
     else if(r.st==='retreat'){const close=Math.hypot(P.x-e.x,P.y-e.y)<230&&e.x-P.x<260;
-      if(close&&r.tl<=0&&e.x<W-50){e.x+=150*dt;if(e.stop!=null)e.stop=Math.max(e.stop,e.x);r.rt+=dt;}
+      if(close&&r.tl<=0&&e.x<W-50){e.x+=150*dt;if(e.stop!=null)e.stop=Math.max(e.stop,e.x);r.rt+=dt;RX.act.retreat+=dt;}
       else if(r.rt>0)r.rt+=dt;}
     /* the fire cycle: cool -> tell (e.arm, >= RX.TELL) -> shot / dive / feint */
     if(r.tl>0){r.tl-=dt;e.arm=true;if(r.tl<=0){e.arm=false;
@@ -8057,9 +8108,10 @@ NR.on('tick',dt=>{if(!RX.on||!G.live||G.dead||G.tut||G.lab)return;
       continue;}
     e.arm=false;r.c-=dt;
     if(e.x>P.x+300&&Math.abs(P.y-e.y)<26&&Math.abs(PV.x)<120){r.lin=(r.lin||0)+dt;if(r.lin>.6&&r.c>.2&&!RX.easy()){r.c=.2;r.lin=0;RX.stat.reacts++;}}else r.lin=0;   // camping on a gun's line from range is read and punished (after a full tell); close-in bold play is not
-    if(r.st==='bait'&&r.c<=0){if(Math.abs(PV.y)<100&&r.hold<RX.per(e)*1.2){r.hold+=dt;continue;}r.bd=Math.sign(PV.y)||1;r.bdv=PV.y;if(r.hold>0){RX.stat.reacts++;RX.act.bait++;}r.hold=0;}
+    if(r.st==='bait'&&r.c<=0){if(r.n&&Math.abs(PV.y)<100&&r.hold<RX.per(e)*1.2){r.hold+=dt;continue;}r.bd=Math.sign(PV.y)||1;r.bdv=PV.y;if(r.hold>0)RX.stat.reacts++;r.hold=0;}
     if(r.st==='retreat'&&!lv&&r.rt>1&&Math.hypot(P.x-e.x,P.y-e.y)>260&&telling<tmax&&!RX.easy()){r.kind='dive';r.lx=P.x+PV.x*.3;r.ly=P.y+PV.y*.3;r.tl=Math.max(RX.TELL+.1,RX.tell(e));RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,r.tl);telling++;continue;}
-    if(r.c>0||!RX.canShoot(e)||telling>=tmax)continue;
+    if(r.c>0||!RX.canShoot(e)||(telling>=tmax&&r.n))continue;   // an enemy's first shot is never held back by the cap on tells
+    r.n++;
     if(r.role==='exit')continue;   // the exit gun fires with its pin partner
     const go=x=>{x.rx.kind=x.rx.st==='feint'&&!x.rx.fk?'feint':'shot';x.rx.fk=0;x.rx.tl=RX.tell(x);RX.stat.tells++;RX.stat.minTell=Math.min(RX.stat.minTell,x.rx.tl);telling++;};
     if(r.st==='feint'&&!r.fk&&RX.rng()<.4)r.fk=1;   // not every cycle is a feint (fk 2: the real shot right after a feint)

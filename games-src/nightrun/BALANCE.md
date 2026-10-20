@@ -237,11 +237,12 @@ every weapon (the weapon did not matter: enemies hardly threaten a ship that kee
   HUNT (leads PV), FEINT (tell, cancel '?', slide to the other side, real shot), RETREAT (backs off while you press in; when you back away it dives, dashed-line tell),
   PRESS (fills the half you hug), BAIT (holds fire until you cross a lane, then shoots where the dodge goes), WINDOW (Hard+: steel ring, shots bounce off except 1 s after it fires).
 - Squads (spawned on one frame; a turret/gunship can recruit an on-screen drone): PIN + EXIT pair (same tell; exit line >= 114 px from the pin line), LEADER (crown; Hard+ 1.5x HP; death = 3 s ENRAGED, faster cycle, same tells), shield BEARER (covers a gunner from the ship's line; flank it).
-- Camping on a gun's line from > 300 px for 0.6 s cuts its cooldown (still a full tell); close, bold play is not punished (reward.js pays it).
-- Fire period = old mean x (1 +-25%), Easy/Normal x1.25; tells >= 0.6 s (Easy/Normal 0.7 s), shots land on a beat; at most 3 tells at once (Hard+ 6). First shot 0.2-0.8 s + tell after entry. Easy: no squads.
+- Reads the ship: camping on a gun's line from > 300 px for 0.6 s cuts its cooldown (still a full tell); a ship that hangs back (x < 170) for 3 s gets full lead and loses the Normal easing;
+  a ship within 250 px flusters it on Easy/Normal (one plain shot, no lead, +0.15 s tell), so pressing in pays (reward-test: bold >= camp in 3/3 runs).
+- Fire period = old mean x (1 +-25%), Easy/Normal x1.25 (not while hanging back); flankers keep their own sweep (fire brains only); tells >= 0.6 s (Easy/Normal 0.7 s), shots land on a beat; at most 3 tells at once (Hard+ 6). First shot 0.1-0.4 s + tell after entry, never held by the tell cap. Easy: no squads.
 - Per-run seed (daily/weekly: fixed from the date; ?rseed=N forces one; ?rxs=<state> forces a state for tests).
-- react-test after merging must-move, abilities, counter, reward (stage 7, 5 attempts, same dice): enemy position gap between attempts 8.4 -> 25.1 px, fire-time spread 0.71 -> 2.55 s.
-  Normal stages 3/7/12 x10: dodging bot 73% -> 70%, tracker bot 0% -> 0% (react=0 -> on). Escape gap >= 96 px, tells >= 0.6 s, flag off = identical to the page without react.js.
+- react-test on the merged build (stage 7 + a scripted turret/drone pair every 10 s, 5 attempts, same dice, fresh page each): enemy position gap between attempts 0.0 -> 62.5 px, fire-time spread 0.00 -> 1.49 s.
+  Normal stages 3/7/12 x10: dodging bot 100% -> 93%, tracker bot 0% -> 0% (react=0 -> on). Escape gap >= 96 px, tells >= 0.6 s, flag off = identical to the page without react.js.
 
 ## Counter threats: DASH and EMP as answers (flag RET.counter, ?counter=0 = abilities only; 19 Oct 2026)
 - One threat every EV bars (Easy 10, Normal 9, Hard 6, Very hard 5, Legend 4), in turn from the unlocked ones; never with a boss, pit stop, lab or tutorial.

@@ -62,11 +62,11 @@ const BOT = (o) => {
   const spreadOld = rs => { let sy = 0, k = 0; const L = Math.min(...rs.map(r => r.ys.length)); for (let j = 0; j < L; j++) { const ms = rs.map(r => r.ys[j].length ? r.ys[j].reduce((a, p) => a + p[1], 0) / r.ys[j].length : 270); const mu = ms.reduce((a, b) => a + b, 0) / ms.length; sy += Math.sqrt(ms.reduce((a, b) => a + (b - mu) ** 2, 0) / ms.length); k++; } return sy / Math.max(1, k); };
   const fspread = rs => { const L = Math.min(...rs.map(r => r.fires.length), 40); let s = 0; for (let j = 0; j < L; j++) { const v = rs.map(r => r.fires[j]), mu = v.reduce((a, b) => a + b, 0) / v.length; s += Math.sqrt(v.reduce((a, b) => a + (b - mu) ** 2, 0) / v.length); } return s / Math.max(1, L); };
   const res = {};
-  for (const q of ['&react=0', '']) { const p = await open(U(q), true); res[q] = [];
-    for (let s = 0; s < 5; s++) res[q].push(await p.evaluate(TRACE, { n: 7, seed: 4242, T: 45, rs: 1000 + 37 * s }).catch(e => ({ ys: [], fires: [], err: '' + e })));   // same dice: only react's own per-run seed differs
-    await p.close(); }
+  for (const q of ['&react=0', '']) { res[q] = [];
+    for (let s = 0; s < 5; s++) { const ctx = await br.newContext({ viewport: { width: 1280, height: 720 } }), p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); await p.addInitScript(SEED); await p.goto(U(q)); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 15000 }).catch(() => { });   // a fresh page per attempt: no saved state carries over
+      res[q].push(await p.evaluate(TRACE, { n: 7, seed: 4242, T: 45, rs: 1000 + 37 * s, pair: 1 }).catch(e => ({ ys: [], fires: [], err: '' + e }))); await ctx.close(); } }   // same dice: only react's own per-run seed differs
   const s0 = spread(res['&react=0']), s1 = spread(res['']), f0 = fspread(res['&react=0']), f1 = fspread(res['']);
-  console.log(`  predictability, stage 7 x5 (same dice): enemy position gap between attempts ${s0.toFixed(1)} -> ${s1.toFixed(1)} px, fire-time spread ${f0.toFixed(2)} -> ${f1.toFixed(2)} s`);
+  console.log(`  predictability, stage 7 + a scripted turret/drone pair every 10 s, x5 (same dice): enemy position gap between attempts ${s0.toFixed(1)} -> ${s1.toFixed(1)} px, fire-time spread ${f0.toFixed(2)} -> ${f1.toFixed(2)} s`);
   ok(s1 > s0 + 15 && f1 > f0 + .3, `(a) enemy position/fire-time spread rose (${s0.toFixed(1)}->${s1.toFixed(1)} px, ${f0.toFixed(2)}->${f1.toFixed(2)} s)`);
   // (b) + (c)
   const acts = {}, st = {}; let caps = true, minGap = 1e9, minTell = 9, gaps = 0;

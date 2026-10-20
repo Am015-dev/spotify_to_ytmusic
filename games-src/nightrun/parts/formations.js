@@ -137,7 +137,7 @@ FM.def('sniperlanes',{tags:['elite','hazard'],t:14,cost:4,kinds:['sniper','drone
   FM.later(I,2,()=>{const y=H/2+gr(-60,60);for(let i=0;i<3;i++)FM.u('drone',0,0,t=>[W+30+i*48-150*t,y],{});});}});
 /* 22 kamikaze: a wave of divers, one per beat, each lane further from the last */
 FM.def('kamikaze',{tags:['rush'],t:6,cost:3,kinds:['kamikaze'],role:'kamikaze wave',f(I,k){const s=fmSide(I,k);
-  for(let b=0;b<3;b++)FM.later(I,b,()=>FM.u('kamikaze',W+40,fmCy(H/2+s*(b-1)*150)));}});
+  for(let b=0;b<2;b++)FM.later(I,b*2,()=>FM.u('kamikaze',W+40,fmCy(H/2+s*(b-1)*150)));}});
 /* 23 bomberrun: bombers along the top lane, then the bottom lane */
 FM.def('bomberrun',{tags:['hazard'],t:11,cost:3,kinds:['bomber'],role:'bomber run',f(I,k){const s=fmSide(I,k);FM.u('bomber',W+40,s<0?90:H-120);
   FM.later(I,4,()=>FM.u('drone',0,0,t=>[W+30-160*t,s<0?H-110:110],{}));}});
@@ -248,6 +248,39 @@ FM.def('ambush',{tags:['elite','rush'],t:34,cost:5,kinds:['sniper','kamikaze'],r
 /* 60 flankers: flankers curl in from both edges */
 FM.def('flankers',{tags:['flank'],t:4,cost:2,kinds:['flank'],f(I,k){DIR.flank(2,true);}});
 
+/* ---- VARY2 micro-events (owner 19 Oct 2026: "boring, extremely repetitive"): small encounters of their own, each with a different job. stagescripts.js swaps them in for
+   a formation piece (same director call, same caps), tracks them as set pieces and rotates a window of them per stage. Flag RET.vary2; ?vary2=0 = the VARY A table. ---- */
+if(RET.vary2===undefined)RET.vary2=RET.vary&&!/[?&]vary2=0/.test(location.search);
+const fmEv=(id,o)=>FM.def(id,Object.assign({tags:['event'],ev:1,cost:3},o));
+const fmGnd=()=>!!(window.LEAK&&ST.on&&ST.def&&(ST.def.pos|0)>=2);          // ground units only where the ground waves are allowed (leak.js)
+const fmGu=(ty,x,alt)=>{if(!fmGnd()||G.en.filter(e=>e.gnd&&e.hp>0).length>=3)return (alt||'drone')==='drone'?fmD(W+60,gr(70,H-70)):FM.u(alt,W+60,gr(70,H-70));return LEAK.mk(ty,x);};
+const fmH=(k,x,y)=>FM.u(G.en.filter(e=>e.zt&&e.hp>0&&e.zst!==2).length>=2?'drone':k,x,y);   // at most two zoo hover stations alive at once: they never crowd each other
+const fmD=(x,y)=>FM.u('drone',0,0,t=>[x-120*t,y],{});   // a plain drone on a straight path (a path unit never hovers: zoo.js would park a free drone)
+const fmHover=(a,k)=>{const ks=a.filter(q=>FM.ok(q));return ks.length?ks[k%ks.length]:'shielder';};
+fmEv('evsway',{t:1,name:'SWAY LINE',f(I,k){const y=gr(160,H-200),a=k%2?-1:1;for(let i=0;i<5;i++)FM.u('drone',0,0,t=>[W+30+i*54-120*t,fmCy(y+a*Math.sin(t*1.5-i*.6)*50)],{});}});
+fmEv('evdoor',{t:1,name:'DOUBLE DOOR',cost:2,f(I,k){let g=gr(160,H-160);for(let b=0;b<2;b++){const y=g;FM.later(I,b*3,()=>{for(const s of[-1,1])for(let q=0;q<2;q++)fmD(W+30+q*46,fmCy(y+s*(95+q*44)));});g=fmCy(g+(g>H/2?-80:80));}}});
+fmEv('evlanterns',{t:1,name:'LANTERNS',f(I,k){const y=gr(150,H-190);for(let i=0;i<4;i++)FM.u('drone',0,0,t=>[W+30+i*70-70*t,fmCy(y+Math.sin(t*1.6+i*1.2)*50)],{});}});
+fmEv('evbracket',{t:2,name:'BRACKET',f(I,k){for(let b=0;b<2;b++)FM.later(I,b*2,()=>{fmD(W+40,60);fmD(W+40,H-60);});}});
+fmEv('evgrid',{t:2,name:'PATROL GRID',f(I,k){const x=gr(740,820);FM.u('turret',W+60,70,null,{stop:x,bf:fireIn(.3)});FM.u('turret',W+60,H-70,null,{stop:x+30,bf:fireIn(.6)});fmD(W+90,H/2);}});
+fmEv('evtline',{t:3,name:'ROAD GUNS',kinds:['gturret'],f(I,k){for(let i=0;i<2;i++)fmGu('gturret',W+40+i*210,'drone');}});
+fmEv('evwindow',{t:3,name:'WINDOW DISPLAY',f(I,k){const y=gr(110,H-210),x0=gr(700,790);for(let i=0;i<5;i++)FM.u('drone',0,0,t=>{const x=t<1.5?W+30-(W+30-x0)*t/1.5:t<3.5?x0:x0-170*(t-3.5);return [x+i*20,y+i*44];},{});}});
+fmEv('evstation',{t:4,name:'STATION',kinds:['sniper','shielder'],f(I,k){fmH(fmHover(['sniper','shielder'],k),W+50,gr(90,H/2-30));fmH(fmHover(['shielder','sniper'],k+1),W+90,gr(H/2+30,H-90));}});
+fmEv('evguard',{t:4,name:'GUARD CHANGE',cost:4,kinds:['shielder','turret'],f(I,k){fmH('shielder',W+60,gr(150,H-150));fmD(W+60,k%2?70:H-70);fmD(W+110,k%2?H-70:70);}});
+fmEv('evshieldv',{t:4,name:'SHIELD VEE',cost:4,kinds:['shielder'],f(I,k){const y=gr(170,H-170);for(let i=-1;i<=1;i++)fmH('shielder',W+50+Math.abs(i)*40,fmCy(y+i*110));}});
+fmEv('evfunnel',{t:5,name:'FUNNEL',cost:4,f(I,k){const g=gr(190,H-190);for(let i=0;i<6;i++)for(const s of[-1,1])FM.u('drone',0,0,t=>{const w=Math.max(60,230-i*30-t*38);return [W+30+i*38-130*t,fmCy(g+s*w)];},{});}});
+fmEv('evmines',{t:6,name:'DRIFT MINES',kinds:['mine'],f(I,k){const y0=gr(70,H-250),d=k%2?-1:1;for(let i=0;i<4;i++){const y=fmCy(y0+i*d*58+(d<0?190:0));FM.u('mine',0,0,t=>[W+40+i*90-62*t,y+14*Math.sin(t*.9+i)],{by:y});}}});
+fmEv('evdive',{t:6,name:'DIVE LINE',kinds:['charger'],f(I,k){for(let b=0;b<2;b++)FM.later(I,b*2,()=>{for(let q=0;q<2;q++)FM.u('charger',W+40+q*70,b%2?H-70:70);});}});
+fmEv('evtank',{t:6,name:'TANK RUN',kinds:['gtank'],f(I,k){fmGu('gtank',W+40,'charger');fmGu('gtank',W+190,'charger');}});
+fmEv('evram',{t:7,name:'RAM & SHIELD',cost:4,kinds:['charger','shielder'],f(I,k){fmH('shielder',W+50,gr(120,H-120));for(let i=0;i<2;i++)FM.u('charger',W+30+i*110,gr(60,H-110));}});
+fmEv('evwalker',{t:8,name:'WALKER',cost:4,kinds:['gwalker','gturret'],f(I,k){fmGu('gwalker',W+40,'gunship');fmGu('gturret',W+260,'drone');}});
+fmEv('evsplit',{t:9,name:'SPLIT PAIR',kinds:['splitter'],f(I,k){fmH('splitter',W+50,gr(90,H/2-30));fmH('splitter',W+90,gr(H/2+30,H-90));}});
+fmEv('evconvoy',{t:10,name:'CONVOY',cost:5,kinds:['gtank','gturret','gwalker'],f(I,k){fmGu('gtank',W+40,'charger');fmGu('gturret',W+200,'drone');fmGu('gwalker',W+360,'gunship');}});
+fmEv('evbombers',{t:11,name:'GUNSHIP & SNIPE',kinds:['gunship','sniper'],f(I,k){FM.u('gunship',W+90,k%2?150:H-170);fmH('sniper',W+90,k%2?H-70:70);}});
+fmEv('evsnipe',{t:14,name:'LANE SNIPERS',cost:4,kinds:['sniper','gate'],f(I,k){fmH('sniper',W+40,70);fmH('sniper',W+80,H-70);FM.u('gate',W+30,0,null,{gy:gr(150,H-200),gap:130});}});
+fmEv('evheal',{t:16,name:'MEDIC SQUAD',cost:5,kinds:['healer','shielder','gunship'],f(I,k){const y=gr(150,H-150);fmH('healer',W+50,y);fmH('shielder',W+90,fmCy(y>H/2?y-110:y+110));FM.u('gunship',W+130,fmCy(y>H/2?y+10:y-110));}});
+fmEv('evrelay',{t:17,name:'RELAY',cost:4,kinds:['sniper','charger'],f(I,k){fmD(W+50,gr(120,H-120));fmH('sniper',W+80,k%2?70:H-70);FM.later(I,3,()=>FM.u('charger',W+40,H/2));}});
+fmEv('evcargo',{t:19,name:'CARGO',cost:5,kinds:['carrier','shielder'],f(I,k){FM.u('carrier',W+80,gr(170,H-200));fmD(W+60,k%2?90:H-90);}});
+fmEv('evlayer',{t:22,name:'MINE BELT',cost:5,kinds:['minelayer','mine','gate'],f(I,k){FM.u('minelayer',W+40,gr(140,H-140));FM.u('gate',W+30,0,null,{gy:gr(150,H-200),gap:130});for(let i=0;i<2;i++){const y=gr(60,H-60);FM.u('mine',0,0,t=>[W+40+i*120-62*t,y+14*Math.sin(t*.9+i)],{by:y});}}});
 NR.on('runStart',()=>{FM.reset();});
 /* economy: a formation's swarmers are cheap one-hit targets (walls, rivers, tides) and the old story stages had almost none, so each pays FM.swN of a kill's Neon (econ-test) */
 FM.swN=.3;
