@@ -34,10 +34,10 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
   /* b.js: replaces the beat-snapped dash. ts = the press stamp (or undefined), mx/my = the keys this frame */
   dashIn(ts,mx,my,dt){const S=this.st(),mx0=this.max();S.n=Math.min(S.n,mx0);
     if(S.n<mx0){S.r+=dt/this.refill();if(S.r>=1){S.r=0;S.n++;}}else S.r=0;
-    if(ts&&S.n>=1&&P.dashT<=0){S.n--;const j=judge(ts);P.dashT=.2;if(!(mx||my)&&!touch&&!(P.dx||P.dy)){P.dx=1;P.dy=0;}AU.sfx('dash');P.dashPf=j.ok;this.stat.dash++;J.n++;
+    const TM=window.TIM&&TIM.on;if(ts&&S.n>=1&&P.dashT<=0&&(!TM||TIM.ready())){S.n=Math.max(0,S.n-1);const j=judge(ts);P.dashT=.2;if(!(mx||my)&&!touch&&!(P.dx||P.dy)){P.dx=1;P.dy=0;}AU.sfx('dash');P.dashPf=j.ok;this.stat.dash++;J.n++;
       J.last={kind:'dash',ok:j.ok,dt:Math.round(j.dt),beat:j.beat,at:performance.now()};
-      if(j.ok){this.stat.onb++;G.score+=Math.round(200*G.mult*comboK());onPerfect('dash',j,P.x,P.y);S.r+=.2;if(S.r>=1&&S.n<mx0){S.r-=1;S.n++;}this.gain(.04);if(!TIP.done){TIP.done=true;save('mnr_tipdone',true);}}
-      S.hit=new Set();S.ref=0;S.ph=0;const m=this.dashMod();S.mod=m;
+      if(j.ok){this.stat.onb++;G.score+=Math.round(200*G.mult*comboK());onPerfect('dash',j,P.x,P.y);if(!TM){S.r+=.2;if(S.r>=1&&S.n<mx0){S.r-=1;S.n++;}}this.gain(.04);if(!TIP.done){TIP.done=true;save('mnr_tipdone',true);}}
+      if(TM)TIM.dash(j,S);S.hit=new Set();S.ref=0;S.ph=0;const m=this.dashMod();S.mod=m;
       if(m==='decoy'){S.dec={x:P.x,y:P.y,t:1.2};this.stat.decoy++;}
       if(m)floater(P.x,P.y-30,{burn:'BURN',ram:'RAM',phase:'PHASE',decoy:'DECOY',mag:'MAGNET'}[m],'#19e3ff');}
     P.dashCd=S.n>=1?0:(1-S.r)*this.refill();},   // the old field still tells bots and the HUD when the next dash is ready
@@ -46,14 +46,15 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
       if(!this.tipE){this.tipE=1;this.tip('EMP charged: tap EMP');}}},
   tip(t){try{const o=load('mnr_abiltip',{})||{};if(o[t]||G.tut||G.lab)return;o[t]=1;save('mnr_abiltip',o);hintShow(t,4);}catch(e){}},
   /* b.js: the EMP key or button */
-  emp(){if(P.emp<=0){AU.sfx('heat');return;}const S=this.st();P.emp--;this.stat.emp++;
-    G.empT=.6;if(!SET.reduce)G.flash=Math.max(G.flash,.3*FX());shake(SET.reduce?3:9);AU.sfx('emp');const M=this.mods(this.EMOD),lv=this.lv();
-    S.rings.push({x:P.x,y:P.y,r:0,R:M.wave?520:360,t:0,c:M.wave?'#ff5fd2':'#ffb020'});
-    let sh=0;for(const b of G.eb){if(M.wave&&sh<8&&b.x>0&&b.x<W){G.pk.push({t:'shard',x:b.x,y:b.y,vx:rnd(-60,0),vy:rnd(-40,40),bob:0});sh++;this.stat.conv++;}else burst(b.x,b.y,'#19e3ff',2,80,.4);G.score+=M.wave?10:5;}G.eb=[];
+  emp(){if(P.emp<=0){AU.sfx('heat');return;}const S=this.st(),M=this.mods(this.EMOD),lv=this.lv();let TT=null;
+    if(window.TIM&&TIM.on){TT=TIM.emp(M);if(!TT){AU.sfx('heat');return;}}else P.emp--;this.stat.emp++;   // timing.js: one press spends every held charge, the burst grows with them
+    G.empT=.6;if(!SET.reduce)G.flash=Math.max(G.flash,.3*FX());shake(SET.reduce?3:9);AU.sfx('emp');
+    S.rings.push({x:P.x,y:P.y,r:0,R:TT?Math.min(TT.R||900,900):M.wave?520:360,t:0,c:M.wave?'#ff5fd2':'#ffb020'});
+    let sh=0;const shM=TT?4+4*TT.n:8,TR=TT?TT.R:0,out=TR?(b=>Math.hypot(b.x-P.x,b.y-P.y)>TR):(()=>false);for(const b of G.eb){if(out(b))continue;if(M.wave&&sh<shM&&b.x>0&&b.x<W){G.pk.push({t:'shard',x:b.x,y:b.y,vx:rnd(-60,0),vy:rnd(-40,40),bob:0});sh++;this.stat.conv++;}else burst(b.x,b.y,'#19e3ff',2,80,.4);G.score+=M.wave?10:5;}G.eb=TR?G.eb.filter(out):[];
     G.en.forEach(e=>{if(e.type!=='boss')e.hp-=10;else e.hp-=25;e.flash=.2;});if(G.boss)G.boss.lasers=[];
     if(M.bubble){S.bub={x:P.x,y:P.y,r:180,t:2.5};this.stat.slow++;}
-    if(M.chain){let x=P.x,y=P.y;const done=new Set(),N=3+lv;S.arcs=[];for(let i=0;i<N;i++){let best=null,bd=1e9;
-        for(const e of G.en){if(done.has(e)||e.dead||e.hp<=0||e.dying)continue;const d=Math.hypot(e.x-x,e.y-y);if(d<bd&&d<520){bd=d;best=e;}}
+    if(M.chain){let x=P.x,y=P.y;const done=new Set(),N=M.wide?99:3+lv,RR=M.wide?2000:520;S.arcs=[];for(let i=0;i<N;i++){let best=null,bd=1e9;
+        for(const e of G.en){if(done.has(e)||e.dead||e.hp<=0||e.dying)continue;const d=Math.hypot(e.x-x,e.y-y);if(d<bd&&d<RR){bd=d;best=e;}}
         if(!best)break;done.add(best);best.hp-=best.type==='boss'?2:8;best.flash=.2;S.arcs.push({x0:x,y0:y,x1:best.x,y1:best.y,t:.35});x=best.x;y=best.y;this.stat.chain++;}}
     if(M.od){S.od=3;this.stat.od++;}
     if(M.core&&G.boss&&G.boss.cores)for(const c of G.boss.cores){if(c.dead||c.hp<=0)continue;c.hp-=Math.ceil((c.max||c.hp)*.6);c.flash=.3;this.stat.core++;}
