@@ -109,10 +109,10 @@ function HT_car(c,im,N,dt){if(!N[c.b]||!N[c.a]){c.a=Math.floor(R()*N.ng);c.b=N[c
 function HT_speed(c,A,B,L,dt){const ahead=Math.hypot(RO.x-(c.x+(B.x-A.x)/L*8),RO.z-(c.z+(B.z-A.z)/L*8))<9;const V=A.ab?(c.hv||(c.hv=rr(28,36))):c.v;if(c.hitT>0){c.hitT-=dt;c.cv=W10_brake(c.cv||0,dt)}else c.cv=(c.cv??V)+Math.min(((ahead?Math.min(2,V):V)-(c.cv??V))*Math.min(1,dt*3),4*dt)}
 function HT_next(c,B,N){if(c.route){c.a=c.b;c.b=c.route.length?c.route.shift():c.a;c.t=0;c.rn=(c.rn||0)+1;return}let nx=B.nb.filter(n=>n!==c.a&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);c.a=c.b;c.b=nx.length?nx[Math.floor(R()*nx.length)]:c.a;c.t=0}
 // traf-r21k2: lane-line handoffs (a turn at a junction moved a car 3-5 m sideways in one step on a 2-lane street, all cars at a green light together) and any other step
-// jump are absorbed into a residual r that closes at <= HT_LAT.v m/s (eased below 1 m): the car slides to its lane line instead of snapping. Teleports (> 25 m: recycle/respawn) reset it. ?lat=0 = off.
+// jump are absorbed into a residual r that closes at <= HT_LAT.v m/s (eased below 1 m): the car slides to its lane line instead of snapping. Teleports (> 6 m: recycle/respawn) reset it. ?lat=0 = off.
 const HT_LAT={on:!/[?&]lat=0/.test(location.search),v:.9,k:1.2,n:0};let _hlx=0,_hlz=0;
 function HT_lat(c,x,z,dx,dz,dt){if(!HT_LAT.on||!(dt>0)||c.pk){_hlx=x;_hlz=z;c.tgx=NaN;c.lrx=c.lrz=0;return}
-  if(c.tgx<1e9){const e=(c.cv||0)*dt,jx=x-c.tgx-c.thx*e,jz=z-c.tgz-c.thz*e,jm=Math.hypot(jx,jz);if(jm>25){c.lrx=c.lrz=0}else if(jm>.06){c.lrx-=jx;c.lrz-=jz;HT_LAT.n++}}
+  if(c.tgx<1e9){const e=(c.cv||0)*dt,jx=x-c.tgx-c.thx*e,jz=z-c.tgz-c.thz*e,jm=Math.hypot(jx,jz);if(jm>6){c.lrx=c.lrz=0}else if(jm>.06){c.lrx-=jx;c.lrz-=jz;HT_LAT.n++}}
   c.tgx=x;c.tgz=z;c.thx=dx;c.thz=dz;let rx=c.lrx||0,rz=c.lrz||0;const m=Math.hypot(rx,rz);if(m>0){const st=Math.min(m,Math.min(HT_LAT.v,HT_LAT.k*m)*dt),f=(m-st)/m;rx*=f;rz*=f;if(m-st<.005)rx=rz=0;c.lrx=rx;c.lrz=rz}
   _hlx=x+rx;_hlz=z+rz}
 function HT_pose(c,A,B,dx,dz,gA,W,dt,im){const lane=W*(c.l3s!=null&&!c.pk&&W>=14?.27+.09*c.l3s:c.lane)/* life-3: inner/outer lane, smooth lane changes (98l3) */+(RD_ON&&gA&&!c.pk&&!c.tr&&(A.w||0)>=14?(c.l3s??(c.lane<.27?-1:1))*Math.min(A.w,B.w||A.w)*.11:0)/* RD: two lanes per direction on wide streets */,yo=c.yo||0/* ayd: give way sideways (98ayd_yield.js), added after the smoother so a dodge stays fast */;let x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;

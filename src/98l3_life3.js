@@ -22,7 +22,7 @@ function L3_tick(){if(typeof RO!=='undefined'){let b=false;for(const c of HUB.ca
   if(c.CVi&&c.CViT>0&&c.RDy!=='box')want=-c.CVi;/* turning soon: be in the lane on the turn side (blinker side = -lane) */
   else if(L3_yieldP(c))want=-c.l3t;/* yield-1: the player closes fast from behind in my lane: take the other lane */
   else{const l=c.CVl;if(l&&!(l.dead>0)&&!c.RDy){const al=(l.x-c.x)*c.CVhx+(l.z-c.z)*c.CVhz;if(al<24&&(l.cv||0)>.5&&(l.cv||0)<(c.v||0)*.75&&!l.RDy)want=-c.l3t}}/* slower car ahead (not queued at a light): pass it */
-  if(want!==c.l3t&&!c.CVin/* traf-r21k2: never inside a junction box */&&L3_free(c,A,B,want)){c.l3t=want;c.l3c=12/* <= 2 changes a minute, was 4 s */;c.CVi=-want;c.CViT=Math.max(c.CViT||0,3.5)/* blinker on the side we move to for the whole change */;L3.lc++}}}
+  if(want!==c.l3t&&!c.CVin/* traf-r21k2: never inside a junction box */&&L3_free(c,A,B,want)){c.l3t=want;c.l3c=31/* <= 2 changes a minute, was 4 s */;c.CVi=-want;c.CViT=Math.max(c.CViT||0,3.5)/* blinker on the side we move to for the whole change */;L3.lc++}}}
 // red-light audit: a car entering a signalled box on red without a reservation granted before the red = a run
 function L3_near(c){if(c.dead>0||c.pk)return null;const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B||A.ab||B.ab||c.a>=N.ng||c.b>=N.ng)return null;if(Math.abs(c.x-RO.x)>320||Math.abs(c.z-RO.z)>320)return null;
   const L=Math.hypot(B.x-A.x,B.z-A.z)||1,h=c.l3h||(c.l3h=[0,0]);h[0]=(B.x-A.x)/L;h[1]=(B.z-A.z)/L;return h}   // perf-r12b: one pair per car (used within the call only), not 78 arrays per step
