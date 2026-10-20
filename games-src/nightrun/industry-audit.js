@@ -9,7 +9,10 @@
 // Predictability: stage 10 played with SEEDS different Math.random seeds (spawn-schedule Jaccard, first-15 spawn orders, fire-interval CV).
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
-const STAGES = (process.env.STAGES || '3,8,10,20,30').split(',').map(Number), SEEDS = +process.env.SEEDS || 3, MAXT = +process.env.MAXT || 400, PAR = +process.env.PAR || 4;
+// --quick: one stage, no seeds, no non-god runs, plus the cheap harnesses (counter-test, abil-test, ~1 min total)   --gate: exit 1 when any hard standard FAILs
+const QUICK = process.argv.includes('--quick'), GATE = process.argv.includes('--gate');
+const STAGES = (process.env.STAGES || (QUICK ? '3' : '3,8,10,20,30')).split(',').map(Number), SEEDS = process.env.SEEDS != null ? +process.env.SEEDS : (QUICK ? 0 : 3), MAXT = +process.env.MAXT || (QUICK ? 120 : 400), PAR = +process.env.PAR || 4;
+const NOGOD = QUICK ? [] : (process.env.NOGOD || '3,8,20').split(',').filter(Boolean).map(Number);   // bot not in god mode: bullet contacts (S24)
 const OUT = process.env.OUT || path.join(__dirname, 'review', 'industry-audit.json');
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const med = a => { if (!a.length) return null; const s = a.slice().sort((x, y) => x - y), h = s.length >> 1; return s.length % 2 ? s[h] : (s[h - 1] + s[h]) / 2; };
@@ -25,7 +28,7 @@ const DEC = RA.slice(a0, a1);
 const RUN = new Function('o', `
   const m = window.__mnr; let sd = o.seed >>> 0; const rnd = () => { sd = (sd + 0x6D2B79F5) >>> 0; let t = sd; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
   const realRnd = Math.random; Math.random = rnd;
-  m.SET.diff = 'normal'; m.applySet(); if (m.ARC) m.ARC.set(true); m.god = true;
+  m.SET.diff = 'normal'; m.applySet(); if (m.ARC) m.ARC.set(true); m.god = o.god !== false;
   const NR = m.NR, sp = [], pits = [], bossIn = [];
   if (!window.__ia) { window.__ia = { on: 1 }; }
   window.__iaH = window.__iaH || [];
@@ -53,8 +56,14 @@ const RUN = new Function('o', `
   }
   if (bossNow) { bossNow.dur = m.G.t - bossNow.t0; bossNow.verbs = [...bossNow.verbs]; bossNow.open = 1; bossWin.push(bossNow); }
   const cvs = []; for (const [, a] of fireBy) if (a.length >= 3) { const g = []; for (let j = 1; j < a.length; j++) g.push(a[j] - a[j - 1]); const mu = g.reduce((x, y) => x + y, 0) / g.length; if (mu > 0) cvs.push(Math.sqrt(g.reduce((x, y) => x + (y - mu) * (y - mu), 0) / g.length) / mu); }
-  const r = { n: o.n, seed: o.seed, t: +m.G.t.toFixed(1), clear: cleared, hits: wouldHit, life, ebN, enN, bossEbN, bossWin, spawns: sp, dashes, reflex, emps, lanes, pits: pits.length, fireCV: cvs, cps: (window.CHK && window.CHK.bars) ? window.CHK.bars.length : null, setKeys: Object.keys(m.SET || {}) };
+  const r = { n: o.n, seed: o.seed, t: +m.G.t.toFixed(1), clear: cleared, hits: wouldHit, life, ebN, enN, bossEbN, bossWin, spawns: sp, dashes, reflex, emps, lanes, pits: pits.length, fireCV: cvs, setKeys: Object.keys(m.SET || {}) };
   m.NR.watch = null; m.abort(); m.god = false; Math.random = realRnd; return r;`);
+
+// checkpoints (S26) are built per story stage (never in arcade), so this reads the plan the page builds for each stage; no sim runs
+const CPPROBE = (stages) => { const m = window.__mnr, out = []; for (const n of stages) { m.ARC.on = false; m.ST.setLevel(n); m.ST.on = true; window.CHK.build(); out.push({ n, len: Math.round(m.ST.len), cps: window.CHK.plan.length }); } return out; };
+
+// the harnesses print their numbers in PASS/FAIL lines; these are read back from the output
+const harness = (file, env, ms) => { const r = cp.spawnSync('node', [path.join(__dirname, file)], { cwd: __dirname, env: Object.assign({}, process.env, env || {}), encoding: 'utf8', timeout: ms || 600000 }); return (r.stdout || '') + (r.stderr || ''); };   // a timeout keeps the lines printed so far
 
 (async () => {
   const t0 = Date.now(), errors = [];
@@ -67,11 +76,13 @@ const RUN = new Function('o', `
     await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 15000 }).catch(() => { }); return p; };
   const jobs = STAGES.map(n => ({ n, seed: 1000 + n, maxt: MAXT }));
   for (let s = 0; s < SEEDS; s++) jobs.push({ n: 10, seed: 7 + s * 101, maxt: 90, pred: 1 });
+  for (const n of NOGOD) jobs.push({ n, seed: 2000 + n, maxt: MAXT, god: false, nogod: 1 });
   const runs = [], queue = jobs.slice();
   await Promise.all(Array.from({ length: Math.min(PAR, queue.length) }, async () => { const p = await newPage();
-    while (queue.length) { const j = queue.shift(); const r = await p.evaluate(`(${RUN.toString().replace(/^function anonymous\(o\s*\)\s*\{/, 'function(o){')})(${JSON.stringify(j)})`).catch(e => ({ err: String(e).slice(0, 200), n: j.n })); r.pred = j.pred; runs.push(r); console.log(`stage ${j.n} seed ${j.seed}${j.pred ? ' (pred)' : ''}: ${r.err || r.t + ' s, ' + (r.clear ? 'clear' : 'not cleared')}`); } }));
+    while (queue.length) { const j = queue.shift(); const r = await p.evaluate(`(${RUN.toString().replace(/^function anonymous\(o\s*\)\s*\{/, 'function(o){')})(${JSON.stringify(j)})`).catch(e => ({ err: String(e).slice(0, 200), n: j.n })); r.pred = j.pred; r.nogod = j.nogod; runs.push(r); console.log(`stage ${j.n} seed ${j.seed}${j.pred ? ' (pred)' : ''}: ${r.err || r.t + ' s, ' + (r.clear ? 'clear' : 'not cleared')}`); } }));
+  const cpRows = await newPage().then(p => p.evaluate(CPPROBE, STAGES)).catch(e => { errors.push('cp probe: ' + String(e).slice(0, 160)); return []; });
   await browser.close(); srv.kill();
-  const main = runs.filter(r => !r.pred && !r.err).sort((a, b) => a.n - b.n), pred = runs.filter(r => r.pred && !r.err);
+  const main = runs.filter(r => !r.pred && !r.nogod && !r.err).sort((a, b) => a.n - b.n), pred = runs.filter(r => r.pred && !r.err), nog = runs.filter(r => r.nogod && !r.err);
   if (!main.length) { console.error('no stage run succeeded', runs.map(r => r.err)); process.exit(2); }
 
   // ---------- measures ----------
@@ -95,8 +106,17 @@ const RUN = new Function('o', `
   const secs = main.reduce((a, r) => a + r.t, 0) / 60;
   M.dashPerMin = r2(main.reduce((a, r) => a + r.dashes, 0) / secs); M.empPerMin = r2(main.reduce((a, r) => a + r.emps, 0) / secs); M.laneChangesPerMin = r2(main.reduce((a, r) => a + r.lanes, 0) / secs);
   M.dashReflexShare = r2(main.reduce((a, r) => a + r.reflex, 0) / Math.max(1, main.reduce((a, r) => a + r.dashes, 0)));
-  M.hitsPerStage = r2(mean(main.map(r => r.hits))); if (!M.hitsPerStage) M.hitsPerStage = null;   // 0 = the god-mode bot never touched a bullet: not a usable reading (see the non-god clear rate in S23) M.pitStopsPerHour = r2(main.reduce((a, r) => a + r.pits, 0) / (mins / 60));
-  M.checkpointsPerStage = main.some(r => r.cps != null) ? r2(mean(main.filter(r => r.cps != null).map(r => r.cps))) : null;
+  // WHY[id] = the reason a SKIP is a SKIP (printed next to it)
+  const WHY = {};
+  // S24: bullet contacts come from the non-god runs only (the god-mode bot is never hit by design)
+  M.hitsPerStage = nog.length ? r2(mean(nog.map(r => r.hits))) : null; M.nogodRuns = nog.map(r => [r.n, r.t, r.clear, r.hits]);
+  if (!nog.length) WHY.S24 = 'no non-god run (NOGOD empty)';
+  // S26: checkpoints per story stage of 150 s or longer (the worst such stage counts)
+  const cpLong = cpRows.filter(x => x.len >= 150); M.checkpointsPerStage = cpLong.length ? Math.min(...cpLong.map(x => x.cps)) : null; M.cpRows = cpRows;
+  if (!cpLong.length) WHY.S26 = 'no story stage of 150 s or longer (CPPROBE: ' + cpRows.map(x => x.n + '=' + x.len + 's').join(' ') + ')';
+  // S27: pit stops in the arcade sim (every main run is arcade)
+  const pitN = main.reduce((a, r) => a + r.pits, 0); M.pitStopsPerHour = pitN ? r2(pitN / (mins / 60)) : null;
+  if (!pitN) WHY.S27 = `pit stop never fired in ${r2(mins)} game-min of arcade sim (0 pitStart); not changed here, see choices-test.js`;
   M.assistKeys = [...new Set(main[0].setKeys)].filter(k => /assist|slow|speed|invinc|aim|easy|auto|hit/i.test(k));
   if (pred.length >= 2) {
     const sched = r => new Set(r.spawns.map(s => s[1] + '@' + Math.floor(s[0] / 3))), jac = (a, b) => { let i = 0; for (const x of a) if (b.has(x)) i++; return i / (a.size + b.size - i || 1); };
@@ -108,6 +128,18 @@ const RUN = new Function('o', `
   const rf = process.env.REPEAT || (() => { const d = path.join(__dirname, 'review'); const f = fs.readdirSync(d).filter(x => /^repeat-audit.*\.json$/.test(x)).map(x => [x, fs.statSync(path.join(d, x)).mtimeMs]).sort((a, b) => b[1] - a[1]); return f.length ? path.join(d, f[0][0]) : ''; })();
   let RA3 = null; if (rf && fs.existsSync(rf)) { try { RA3 = JSON.parse(fs.readFileSync(rf, 'utf8'))['arcade-normal']; M.repeatFile = path.relative(process.cwd(), rf); } catch (e) { } }
   if (RA3) { const st = Object.values(RA3.stages || {}); Object.assign(M, { repeat5: RA3.repeatRatio5min, plainLoop: RA3.plainLoopShare, jaccardStages: RA3.jaccardMedian, longestMechGapMin: RA3.longestMechGapMin, newThingsPer30: RA3.newThingsFirst30, firstTryClear: r2(1 - RA3.firstTryFails / Math.max(1, st.length)), bossKits: RA3.distinctBossVerbKits, bossFights: RA3.bossFights, pitStops: RA3.pitStops, gameMinSession: RA3.gameMinutes, per5min: RA3.per5min }); }
+
+  // ---------- harness probes: run one after another (never in parallel with the sims above) ----------
+  const H = { threats: [], abilClear: null, firstKill: null, weapons: [] };
+  { const cnt = harness('counter-test.js');   // per threat: "PASS SEEKER (...): hull lost without 4, with the timed answer 0"
+    H.threats = [...cnt.matchAll(/^(?:PASS|FAIL) ([^:\n]+):[^\n]*?without (\d+), with the timed (?:answer|EMP) (\d+)/gm)].map(m => ({ threat: m[1].trim(), without: +m[2], with: +m[3], ratio: +m[2] / Math.max(+m[3], 1) }));
+    const ab = harness('abil-test.js').match(/clears (\d+)% with abilities, (\d+)% without/);   // logged for reference; S30 itself is the hull ratio (its own definition)
+    H.abilClear = ab ? { with: +ab[1], without: +ab[2] } : null; }
+  if (!QUICK) {
+    const tu = harness('tutorial-test.js');   // "FIRSTKILL desktop 12.3" / "FIRSTKILL phone 14.0": seconds from the flight school start to the first kill
+    const fk = [...tu.matchAll(/FIRSTKILL (\w+) ([\d.]+)/g)].map(m => +m[2]); H.firstKill = fk.length ? Math.max(...fk) : null;
+    const wp = harness('weapon-test.js', { BOT: '1' }, 420000);   // "PASS pulse alone at level 1 clears stage 1 (41 s, hits 3, kills 22)"; capped at 7 min
+    H.weapons = [...wp.matchAll(/^(?:PASS|FAIL) (\S+) alone at level 1 clears stage 1 \(([\d.]+) s/gm)].map(m => ({ id: m[1], secs: +m[2] })); }
 
   // ---------- standards ----------  [id, level, topic, range text, value, ok(value)]
   const S = [];
@@ -141,16 +173,27 @@ const RUN = new Function('o', `
   add('S26', 'guide', 'Checkpoints per stage of 150 s or longer', '>= 1', M.checkpointsPerStage, v => v >= 1, v => (1 - v));
   add('S27', 'guide', 'Choice points (pit-stop cards) per hour', '>= 6', M.pitStopsPerHour, v => v >= 6, v => (6 - v) / 6);
   add('S28', 'guide', 'Assist options in settings (count)', '>= 3', M.assistKeys.length, v => v >= 3, v => (3 - v) / 3);
-  for (const k of ['S29 skill decisions / min (needs a decision log)', 'S30 ability value vs random (abil-test, counter-test)', 'S31 weapon spread (reward-test)', 'S32 tutorial time-to-first-kill (tutorial-test)']) S.push({ id: k.slice(0, 3), level: 'guide', topic: k.slice(4), range: 'see INDUSTRY-STANDARDS.md', value: null, status: 'SKIP', gap: 0 });
+  const minRatio = H.threats.length ? Math.min(...H.threats.map(t => t.ratio)) : null;
+  if (!H.threats.length) WHY.S30 = 'counter-test printed no threat lines';
+  add('S30', 'hard', 'Answer value: hull lost without the timed answer / with it, worst threat (counter-test)', '>= 2x', minRatio, v => v >= 2, v => (2 - v) / 2);
+  WHY.S29 = 'no decision log: the harnesses report presses and hull, not choices (dash and EMP rates are S20 and S21)';
+  S.push({ id: 'S29', level: 'guide', topic: 'Real decisions per minute', range: '>= 6 (est.)', value: null, status: 'SKIP', gap: 0 });
+  const wMed = med(H.weapons.map(w => w.secs)), wBest = H.weapons.length ? Math.min(...H.weapons.map(w => w.secs)) : null;
+  const spread = wMed && wBest != null ? (wMed - wBest) / wMed : null;
+  if (spread == null) WHY.S31 = QUICK ? 'not run in --quick (weapon-test)' : 'weapon-test printed no stage-1 clear times';
+  add('S31', 'guide', 'Weapon spread: fastest single weapon to clear stage 1 vs the median weapon, LV1 (weapon-test)', '<= 15%', spread, v => v <= .15, v => (v - .15) / .15);
+  if (H.firstKill == null) WHY.S32 = QUICK ? 'not run in --quick (tutorial-test)' : 'tutorial-test printed no FIRSTKILL line';
+  add('S32', 'guide', 'Time to first kill in a new session, worst of desktop and phone, s (tutorial-test)', '<= 20', H.firstKill, v => v <= 20, v => (v - 20) / 20);
+  for (const s of S) if (s.status === 'SKIP') s.reason = WHY[s.id];
 
   const order = S.slice().sort((a, b) => b.gap - a.gap);
   console.log('\n=== Nightrun industry audit (largest gaps first) ===');
-  for (const s of order) console.log(`${s.status.padEnd(4)} ${s.id} [${s.level}] ${s.topic}: ${s.value == null ? 'not measured' : r2(s.value)}  (target ${s.range})${s.gap ? '  gap ' + r2(s.gap * 100) + '%' : ''}`);
+  for (const s of order) console.log(`${s.status.padEnd(4)} ${s.id} [${s.level}] ${s.topic}: ${s.value == null ? 'not measured' : r2(s.value)}  (target ${s.range})${s.gap ? '  gap ' + r2(s.gap * 100) + '%' : ''}${s.reason ? '  - ' + s.reason : ''}`);
   const f = S.filter(s => s.status === 'FAIL'), p = S.filter(s => s.status === 'PASS');
   console.log(`\nPASS ${p.length}  FAIL ${f.length} (hard ${f.filter(s => s.level === 'hard').length})  SKIP ${S.filter(s => s.status === 'SKIP').length}`);
   const git = cp.spawnSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: __dirname }).stdout.toString().trim();
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
-  fs.writeFileSync(OUT, JSON.stringify({ meta: { date: new Date().toISOString(), head: git, stages: STAGES, seeds: SEEDS, realSecs: Math.round((Date.now() - t0) / 1000), pageErrors: errors.slice(0, 5) }, standards: order, measures: M }, null, 1));
+  fs.writeFileSync(OUT, JSON.stringify({ meta: { date: new Date().toISOString(), head: git, quick: QUICK, stages: STAGES, seeds: SEEDS, nogod: NOGOD, realSecs: Math.round((Date.now() - t0) / 1000), pageErrors: errors.slice(0, 5) }, standards: order, measures: M, harness: H }, null, 1));
   console.log('wrote ' + path.relative(process.cwd(), OUT));
-  if (f.some(s => s.level === 'hard')) process.exitCode = 1;
+  if (GATE && f.some(s => s.level === 'hard')) { console.log('--gate: hard FAIL, exit 1'); process.exitCode = 1; }
 })().catch(e => { console.error(e); process.exit(2); });

@@ -46,6 +46,7 @@ async function fullRun(br, port, opt, mode, label) {
   await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); if (mode === 'touch') await p.tap('#tutBtn'); else await p.click('#tutBtn');
   await p.waitForFunction(() => window.__tut.on, null, { timeout: 5000 });
   await p.evaluate(BOT, mode);
+  await p.evaluate(() => { window.__fk = null; window.__fkT0 = performance.now(); window.__mnr.NR.on('kill', () => { if (window.__fk == null) window.__fk = performance.now(); }); });
   const t0 = Date.now(), lim = mode === 'idle' ? 300000 : 240000; let died = false, clip = [], stuck = 0, lastI = -1, lastC = Date.now();
   while (Date.now() - t0 < lim) { await sleep(500);
     const st = await p.evaluate(() => ({ on: window.__tut.on, i: window.__tut.i, end: window.__tut.endShown, dead: !!(window.__mnr.G && window.__mnr.G.dead) }));
@@ -53,6 +54,7 @@ async function fullRun(br, port, opt, mode, label) {
     if (Date.now() - lastC > 30000) stuck = 1;
     if (st.end || !st.on) break; }
   const secs = (Date.now() - t0) / 1000, log = await p.evaluate(() => window.__tut.log), end = await p.evaluate(() => window.__tut.endShown);
+  const fk = await p.evaluate(() => window.__fk == null ? null : (window.__fk - window.__fkT0) / 1000); if (fk != null && mode !== 'idle') console.log(`FIRSTKILL ${mode} ${fk.toFixed(1)}`);   // read by industry-audit.js (S32)
   clip = clip.concat(await clipCheck(p));
   if (mode === 'idle') { ok(`${label}: idle ship finishes by timeouts in < 5 min (${secs.toFixed(0)} s)`, end && secs < 300, JSON.stringify(log));
     ok(`${label}: idle ship never dies, never stuck`, !died && !stuck); }
