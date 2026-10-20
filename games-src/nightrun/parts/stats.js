@@ -5,7 +5,7 @@
 if(RET.stats===undefined)RET.stats=!/[?&]stats=0/.test(location.search);
 RET.sioKeys.push('mnr_stats');
 RET.st=(function(on){
-  const KEY='mnr_stats',NUM=['runs','time','kills','bosses','grazes','perfects','dashes','fevers','deaths','bestScore','neon','daily','fuse','clears','arcClears','hardClear','noHit'];
+  const KEY='mnr_stats',NUM=['runs','time','kills','bosses','grazes','perfects','dashes','fevers','deaths','bestScore','neon','daily','fuse','clears','arcClears','hardClear','noHit','choices'];
   const blank=()=>({v:1,s:Object.fromEntries(NUM.map(k=>[k,0])),w:{},a:{},arc:{}});
   let D=blank(),fresh=true,dirty=false,cur=null,lastBank=null,gotLoad=false;
   const clampN=v=>typeof v==='number'&&isFinite(v)?Math.max(0,Math.min(1e9,v)):0;
@@ -98,6 +98,7 @@ RET.st=(function(on){
   NR.on('footKill',d=>{if(!on||!d)return;if(d.boss)S().bosses++;else S().kills++;mark();});
   NR.on('footEnd',d=>{if(!on||!d)return;const t=Math.max(0,Math.min(3600,(+d.time||0)-ft0));S().time+=t;if(!d.cleared&&!d.quit)S().deaths++;ft0=0;mark();poll();save();});
   NR.on('graze',()=>{if(!on||!live())return;S().grazes++;mark();});
+  NR.on('choice',()=>{if(!on||!live())return;S().choices++;mark();});   // choices.js (RET.build2): cards and pickup pairs taken
   NR.on('perfect',d=>{if(!on||!live())return;S().perfects++;if(d&&d.kind==='dash')S().dashes++;mark();});
   let fvSeen=0;
   NR.on('bar',()=>{if(!on||!live())return;try{const n=RET.fv.starts|0;if(n>fvSeen){S().fevers+=n-fvSeen;mark();}fvSeen=n;}catch(e){}});
