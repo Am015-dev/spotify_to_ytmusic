@@ -346,6 +346,8 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
  C.GO['perf/touch-first-frames']=[{c:'ath',n:'touch warm gate wiring',fn:()=>{const R=[],f0=TWG.fr,h0=TWG.held;try{R.push(['gate '+(TWG.on?'on':'off')+', n '+TWG.n+', lazy hold '+TWG.lz,TWG.n>0&&TWG.lz===60]);
    TWG.fr=0;lazyStep();const a=TWG.held-h0;TWG.fr=TWG.lz+1;lazyStep();const b=TWG.held-h0-a;R.push(['lazyStep held in the hold window ('+a+'), runs after it ('+b+')',a===1&&b===0]);
    if(TWG.nf)R.push(['gate ran '+TWG.nf+'/'+TWG.n+' frames in '+TWG.ms+' ms',TWG.nf===TWG.n&&TWG.ms<5000]);
+   /* ios-r17w: curtain time <= the beta.130 (85e7116) build + 0.5 s per city; beta.130 on lowmem=1 swiftshader, built page, solo: Athens 4247/4103/4360 ms (mean 4237), Frankfurt 4778/3972 (mean 4375); trunk at r17w 3.7-4.3 s. A loaded box (fra+ath plus another run) reads 5.9-6.7 s and fails here by design */
+   if(TWG.nf){const B=CID==='fra'?4375:4237;R.push(['curtain '+TWG.ms+' ms <= beta.130 '+B+' + 500 ms ('+CID+')',TWG.ms<=B+500])}
    /* perf-r15e: with the gate on, the minimap takes the callCap path and its tiles paint under the curtain within TWG.mb */
    /* perf-r15f: default ON on touch; when the gate ran, the far-street merge finished under the curtain (its ~50 MB garbage + major GC no longer land in the first drivable second) */
    R.push(['default '+(TWG.on?'on':'off')+' (touch '+matchMedia('(pointer:coarse)').matches+', ?twg '+new URLSearchParams(location.search).get('twg')+')',/[?&]twg=/.test(location.search)||TWG.on===matchMedia('(pointer:coarse)').matches]);
@@ -357,7 +359,7 @@ const G11=()=>window.__gov.GOV,SV11=()=>{const g=G11();return{qm:SET.qm,q:SET.q,
    R.push(['shortcut scan set-up ran under the curtain ('+TWG.destMs+' ms), DEST_find sleeps f0-f'+TWG.fw+', flags dest/pa/lv '+[TWG.dd,TWG.pa,TWG.lvc].map(Number).join('/'),!(TWG.nf&&TWG.jn>=110)||(TWG.destMs>=0&&TWG.dd&&TWG.pa&&TWG.lvc)]);
    if(TWG.on)R.push(['minimap: callCap '+TUNE.callCap+', '+TWG.mm+' tiles under the curtain in '+TWG.mms+' ms (cap '+TWG.mb+'), '+TWG.mq+' left',!!TUNE.callCap&&TWG.mms<=TWG.mb+60&&(CID!=='ath'||!SM_ON||!TWG.nf||TWG.mm>0)])}
   catch(e){R.push(['threw '+e,false])}finally{TWG.fr=f0}
-  const ok=R.every(r=>r[1]);return`📍 TOUCH WARM GATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}]}return}
+  const ok=R.every(r=>r[1]);return`📍 TOUCH WARM GATE · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}];C.GO['perf/touch-first-frames'].push(Object.assign({},C.GO['perf/touch-first-frames'][0],{c:'fra'}))/* ios-r17w: Frankfurt runs the same checks (curtain time per city) */}return}
  if(i<600)setTimeout(()=>R15B_reg(i+1),100)})(0);
 // perf-r15c (review 15 N2): Frankfurt touch LOWMEM retained heap in the first 30 s of roam (+78 MB after GC) was the outer-ground leaf lists (boxed numbers in
 // JS arrays until the generator's last cell) and the camera-pull triangle grid (one JS array per 8 m cell). Both are packed now (MEMC_ON, ?memc=0 = off).
