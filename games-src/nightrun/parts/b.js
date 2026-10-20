@@ -123,11 +123,11 @@ const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil
   lf(){return ST.on?Math.max(this.fkFloor,1-this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
   lm(){return ST.on?Math.max(this.mlFloor,1-1.5*this.lvK*Math.max(0,ST.lvl-this.lvA)):1;},
   ml:{drone:1.2,flank:1.2,turret:1.3,charger:1.3,gunship:2.6,gate:1.4,mine:.6,swarm:0},elMl:4,
-  minLife(e){const b=e.el?(e.type==='charger'?2:Math.max(this.elMl,this.ml[e.type]||0)):(this.ml[e.type]||0);return b*this.lm()*(SET.diff==='easy'?this.easyK:1);},
+  minLife(e){if(window.VIS&&VIS.on)return VIS.life(e);const b=e.el?(e.type==='charger'?2:Math.max(this.elMl,this.ml[e.type]||0)):(this.ml[e.type]||0);return b*this.lm()*(SET.diff==='easy'?this.easyK:1);},
   pass(dt){if(!this.on)return;let raw=0;
     for(const e of G.en){if(e.dead)continue;
       if(e.hq==null)e.hq=e.max||e.hp;
-      if(e.type!=='boss'&&e.x>W-40&&!e.rk){e.hp=e.hq;e.gr=1;continue;}       // entry grace
+      if(e.type!=='boss'&&(e.x>W-40||(window.VIS&&VIS.on&&!VIS.ok(e)))&&!e.rk){e.hp=e.hq;e.gr=1;continue;}       // entry grace
       if(e.gr){e.gr=0;e.tin=G.t;e.bf=Math.min(e.bf,window.SC?SC.firstShot():2);}                       // fully inside: hittable, and it gets its shot in soon
       if(e.tin==null)e.tin=G.t;
       const loss=e.hq-e.hp;if(loss>0&&!e.rk){const real=Math.min(loss,Math.max(0,e.hq));raw+=real;if(this.soft)e.hp=e.hq-real*this.k;}
@@ -142,9 +142,9 @@ function en(type,o){if(window.ROSTER)type=ROSTER.sub(type,o);const d=diff();cons
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600},flank:{r:13,hp:3,score:180},swarm:{r:9,hp:1,score:60},mine:{r:15,hp:5,score:200}}[type];
   const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2,gr:DMG.on?1:0},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK()*(window.SC?SC.hpK():1))));
   if(!o.mini&&(type==='drone'||type==='charger'||type==='turret'||type==='flank')&&GX()<eliteP()){e.el=1;e.hp=Math.round(e.hp*2);e.r=Math.round(e.r*1.25);e.score*=2;}   // elites: tougher, gold ring, shoot more
-  e.arm=e.bf===1&&type!=='charger';DIR.safe(e);
+  e.arm=e.bf===1&&type!=='charger';DIR.safe(e);if(window.VAR)VAR.apply(e,o);   // variants.js: class / orientation / tint
   e.max=e.hp;e.by=e.y;G.en.push(e);if(DMG.on&&type!=='swarm'&&G.rings.length<24)G.rings.push({x:W-14,y:e.gy||e.y,l:.5,m:.5,c:'#ff3d6a'});   // spawn telegraph at the edge it comes in from
-if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);NR.emit('spawn',e);return e;}
+if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);NR.emit('spawn',e);if(window.VAR&&VAR.pack)VAR.after(e,o);return e;}
 const WAVES={
   droneLine(){const y=gr(80,H-150);for(let i=0;i<5;i++)en('drone',{x:W+30+i*55,y,amp:0});return 2.6;},
   droneSine(){const y=gr(130,H-170);for(let i=0;i<6;i++)en('drone',{x:W+30+i*46,y,amp:70,ph:i*.6});return 3;},
@@ -158,7 +158,7 @@ const eliteP=()=>ST.on?ST.el:Math.min(.55,Math.max(DF.el?.2+.1*G.pos:0,.09*Math.
 const bsM=()=>ST.on?ST.bs*DF.sbs*UPS.bs:DF.bs*DIR.bsK*UPS.bs*STILL.bk*(1+TUNE2.loopSpd*Math.min(3,G.loop));                    // bullet speed: rises stage by stage in Story; Easy -12%, Hard +20%
 const ebCap=()=>(touchUI||rotMode?18:HARD?35:25)+(G.boss&&G.boss.x<=bossX()?5:0);   // most enemy bullets alive at once; a fan or ring that does not fit is made smaller (odd, still aimed), never cut off                                // most enemy bullets alive at once: a fan or ring that does not fit is thinned, never faster
 const BCAP=400;                                            // no enemy bullet is faster than this (the ship flies 300 to 520)
-function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=ebCap())return;G.eb.push(AI.kind({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1,hm:0},eb.src));}
+function eb(x,y,a,s,c,r=5){const k=Math.min(PW.bs*bsM(),BCAP/Math.max(60,s));if(NR.watch)NR.watch.shots.push({by:eb.src||null,armed:eb.src?!!eb.src.arm:null,bar:(G.bc-G.d0)/4,t:G.t});if(G.eb.length>=ebCap())return;if(eb.src&&eb.src.vz){const q=VAR.shot(eb.src,x,y,a,s,c,r);if(!q)return;r=q.r;s=q.s;}G.eb.push(AI.kind({x,y,vx:Math.cos(a)*s*k,vy:Math.sin(a)*s*k,r,c:BULLET,g:false,sl:PW.bs!==1,hm:0},eb.src));}
 const PV={x:0,y:0,px:0,py:0};   // the ship's smoothed velocity (h.js), for Hard's lead shots
 const aim=e=>{if((HARD||AIQ()>=4)&&e.type!=='boss'){const t=Math.min(.8,Math.hypot(P.x-e.x,P.y-e.y)/260)*.75;return Math.atan2(P.y+PV.y*t-e.y,P.x+PV.x*t-e.x);}return Math.atan2(P.y-e.y,P.x-e.x);};
 const minShot=s=>Math.max(MINSHOT,Math.min(BCAP,s*PW.bs*bsM())*.9);   // s = the bullet's speed before the global factors
@@ -367,6 +367,7 @@ function update(dt){
       case'mine':DIR.moveMine(e,sdt,d);break;
       case'boss':bossUpdate(e,sdt,d);break;
       case'gtank':case'gturret':case'gwalker':if(window.LEAK)LEAK.move(e,sdt);break;}
+    if(e.vz)VAR.pace(e,sdt,d);   // variants.js: mini / large pace, medic link
     if(e.type!=='gate'&&e.type!=='boss'&&!G.dead&&e.x<W-2&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+(HARD?8:5)){hurt();if(e.type!=='gunship'&&e.type!=='carrier'){e.hp=0;e.rk=1;}}
     if(e.type==='boss'&&!G.dead&&Math.hypot(P.x-e.x,P.y-e.y)<e.r+6)hurt();
   }
@@ -377,7 +378,7 @@ function update(dt){
       else hit=(b.x-e.x)**2+(b.y-e.y)**2<(e.r+4+(b.rad||0))**2;
       if(hit&&b.px&&b.px.has(e))continue;
       if(hit&&e.zt&&window.ZOO&&ZOO.block(b,e)){b.dead=1;if(Math.random()<.5)burst(b.x,b.y,'#4ad1ff',3,120,.25);AU.sfx('hit');break;}   // zoo.js: a shield absorbs the shot
-      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.wid)e._wk=b.wid;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh||b.fg)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom(FXW.hk(b,'hit-spark'),b.x,b.y,30,.16);}AU.sfx('hit');break;}}
+      if(hit&&(e.type!=='boss'||e.x<W-20)){e.hp-=DMG.hit(b.dm*(b.pf?SH.sharp:1),b,e)*(e.shl?.45:1);e.flash=.06;e.pf=b.pf;if(b.tm)e.dk=G.t;if(b.wid)e._wk=b.wid;if(b.px){b.px.add(e);if(b.pn!=null&&--b.pn<0)b.dead=1;}else b.dead=1;G.score+=2;if(b.sp||b.zp||b.cl||b.ax||b.sh||b.fg)WP.hit(b,e);if(Math.random()<.1)burst(b.x,b.y,'#ffffff',2,120,.2);if(G.t-(e.sk||0)>.1&&ART.fx.length<14){e.sk=G.t;ART.boom(FXW.hk(b,'hit-spark'),b.x,b.y,30,.16);}AU.sfx('hit');break;}}
     if(b.rc>0&&(b.y<2&&b.vy<0||b.y>H-2&&b.vy>0)){b.vy=-b.vy;b.rc--;b.y=clamp(b.y,3,H-3);if(b.px)b.px.clear();}
     else if(b.rc>0&&b.x>W-4&&b.vx>0){b.vx=-b.vx*.9;b.rc--;if(b.px)b.px.clear();}
     if(b.x>W+30||b.x<-30||b.y<-20||b.y>H+20)b.dead=1;}

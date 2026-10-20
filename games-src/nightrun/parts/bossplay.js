@@ -14,7 +14,7 @@
    Each fight picks 2 of its 3 mechanics per phase (each boss has two gates and one arena rule, so a gate is always up) and shuffles its attack order with a
    seed per attempt (signature verb kept first). A gate that is ignored overloads by itself after FB s, so no fight can lock; armour.js still owns HP, the cap,
    the phase lines and the last stand (EXPOSED = always open). Hooks: armour.js room x BPL.k(e); bossmoves.js BMV.init -> BPL.init; c.js draw; stats.js sheet. */
-if(RET.bossplay===undefined)RET.bossplay=/[?&]bossplay=1/.test(location.search);   // OFF by default until balance-test stage 8 Normal and bossmoves-test pass with it on (HANDOFF.md)
+if(RET.bossplay===undefined)RET.bossplay=/[?&]bossplay=1/.test(location.search);   // OFF by default: bossmoves-test still misses a phase-3 verb now and then with it on, stage 8 Normal ~58-67% (HANDOFF.md)
 if(RET.bossplay)RET.sioKeys.push('mnr_bpcodex');
 const BPT={
   tresor:  {m:['nodes','emp','slab'],     line:'BREAK THE BOLTS, EMP THE PLATE'},
@@ -31,17 +31,20 @@ const BPN={nodes:'SHIELD NODES',medic:'MEDIC LINK',emp:'ARMOUR PLATE',parry:'PAR
   grid:'LASER GRID',ghost:'MIRROR GHOST',gravity:'GRAVITY LANES',blackout:'BLACKOUT',zone:'SHRINKING RING'};
 const BPH={nodes:'SHOOT THE NODES',medic:'KILL THE MEDIC OR DASH THE LINK',emp:'EMP THE PLATE',parry:'DASH TO PARRY THE ORB',back:'FLANK: GET ABOVE OR BELOW'};
 const BP_GATES=['nodes','medic','emp','parry','back'];
-const BPL=window.BPL={get on(){return!!RET.bossplay&&!!RET.bossmoves;},T:BPT,N:BPN,OPEN:8,FB:24,FLANK:.8,TEL:.8,GAP:96,auto:/[?&]bpauto=1/.test(location.search)?1.5:0,seed:null,
+const BPL=window.BPL={get on(){return!!RET.bossplay&&!!RET.bossmoves;},T:BPT,N:BPN,OPEN:8,FB:24,FBE:4,LEAK:.45,OPENE:14,EASYN:12,FLANK:.8,TEL:.8,GAP:96,auto:/[?&]bpauto=1/.test(location.search)?1.5:0,seed:null,
   st:null,hz:[]};
+BPL.fb=()=>BPL.easy()?BPL.FBE:BPL.FB;   /* Easy/Normal early stages: an ignored gate overloads quickly, so a player who only dodges still wins (slowly) */
+BPL.easy=()=>ST.on&&ST.n<=BPL.EASYN&&!HARDS.includes(SET.diff);
+BPL.opn=()=>BPL.easy()?BPL.OPENE:BPL.OPEN;
 BPL.stat=()=>BPL.st||(BPL.st={boss:null,seed:0,pick:[],order:[],seen:{},res:{},how:{},fb:0,open:0,closed:0,tel:9,gap:1e9,hits:0,eb:0,maxV:0,cap:0,maxEb:0,hints:[]});
 NR.on('runStart',()=>{BPL.st=null;BPL.hz=[];});
 /* a small seeded generator per attempt (the attack order and the picks; the game's own random stays untouched) */
 BPL.rng=s=>{let a=s>>>0||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};};
-BPL.k=e=>{const b=e&&e.bp;if(!BPL.on||!b)return 1;if(e.b2&&e.b2.ls>0||e.bmS>e.bt)return 1;   /* the last stand and a bossmoves STUN are always open */return b.g&&b.g.up?0:1;};
+BPL.k=e=>{const b=e&&e.bp;if(!BPL.on||!b)return 1;if(e.b2&&e.b2.ls>0||e.bmS>e.bt)return 1;   /* the last stand and a bossmoves STUN are always open */return b.g&&b.g.up?(BPL.easy()?BPL.LEAK:0):1;};   // Easy/Normal early stages: a raised gate still lets LEAK of the damage through, so the fight takes about as long as before
 /* called at the end of BMV.init (the movesets are set): the seed, the picks per phase, the shuffled order */
 BPL.init=e=>{e.bp=null;if(!BPL.on||!e.bm)return;const T=BPT[e.bm.id];if(!T)return;
   const seed=BPL.seed!=null?BPL.seed:(Math.random()*4294967295)>>>0,R=BPL.rng(seed),sig=e.bm.T.sig;
-  e.lists=e.lists.map((l,i)=>{const a=l.slice();for(let j=a.length-1;j>0;j--){const k=Math.floor(R()*(j+1));[a[j],a[k]]=[a[k],a[j]];}
+  e.lists=e.lists.map((l,i)=>{const a=l.slice(),lo=i===2?1:0;for(let j=a.length-1;j>lo;j--){const k=lo+Math.floor(R()*(j-lo+1));[a[j],a[k]]=[a[k],a[j]];}   // phase 3 keeps its second verb (the one verb only it has)
     if(i>0&&a.includes(sig)){a.splice(a.indexOf(sig),1);a.unshift(sig);}return a;});           // phases 2-3 still open with the signature verb
   const pick=[0,1,2].map(()=>{const drop=Math.floor(R()*3);return T.m.filter((_,j)=>j!==drop);});
   e.bp={id:e.bm.id,T,seed,R,pick,g:null,gi:0,ar:null,cy:0};
@@ -61,12 +64,12 @@ BPL.drop=e=>{const g=e.bp&&e.bp.g;if(!g)return;for(const t of g.tg||[])if(!t.dea
 /* a gate rises at time t0 (telegraphed TEL s: shapes fade in, damage still counts), then holds until it is resolved or overloads after FB s */
 BPL.gate=(e,t0)=>{const b=e.bp,m=b.gs[b.gi%b.gs.length];b.gi++;BPL.drop(e);b.g={m,t0,up:0,tg:[],ct:0,fl:0,orb:null,ob:0,sa:Math.PI,shot:0,open:0};};
 BPL.raise=(e,g)=>{g.up=1;g.tu=G.t;BPL.seen(e,g.m);const ph=e.ph||1,s=BPL.stat();s.closed++;
-  if(g.m==='nodes'){const n=ph===3?4:3;for(let i=0;i<n;i++)g.tg.push(BPL.add(e,{fx:clamp(e.x-60-i*90,120,W-40),fy:i%2?H-55:55,hk:.010,role:'node'}));}   // out of the centre line: fly up / down to reach them
-  if(g.m==='medic')g.tg.push(BPL.add(e,{fx:clamp(e.x+30,0,W-30),fy:e.y>H/2?50:H-50,hk:.022,role:'medic'}));
+  if(g.m==='nodes'){const n=ph===3?4:3;for(let i=0;i<n;i++)g.tg.push(BPL.add(e,{fx:clamp(e.x-60-i*90,120,W-40),fy:i%2?H-110:110,hk:.010,role:'node'}));}   // out of the centre line: fly up / down to reach them
+  if(g.m==='medic')g.tg.push(BPL.add(e,{fx:clamp(e.x+30,0,W-30),fy:e.y>H/2?110:H-110,hk:.022,role:'medic'}));
   BPL.say(BPH[g.m],3);AU.sfx('warn');};
 BPL.add=(e,o)=>{const t=en('mine',{x:e.x,y:e.y,wpt:1,bpRole:o.role});t.hp=t.max=t.hq=Math.max(4,Math.round(e.max*o.hk));t.gr=0;t.bpAt=Object.assign({e},o);t.score=0;return t;};
 BPL.resolve=(e,how)=>{const b=e.bp,g=b&&b.g;if(!g||!g.up)return;const s=BPL.stat(),k=g.m+':'+how;s.how[k]=(s.how[k]||0)+1;if(how!=='fb'&&how!=='ls'&&how!=='auto')s.res[g.m]=(s.res[g.m]||0)+1;if(how==='fb')s.fb++;else s.open++;
-  for(const t of g.tg)if(!t.dead){t.dead=1;burst(t.x,t.y,'#19e3ff',10,200,.4);}g.up=0;g.open=G.t+BPL.OPEN;
+  for(const t of g.tg)if(!t.dead){t.dead=1;burst(t.x,t.y,'#19e3ff',10,200,.4);}g.up=0;g.open=G.t+BPL.opn();
   floater(e.x,e.y-e.r-34,how==='fb'?'SHIELD OVERLOAD':'OPEN!','#ffe14d');if(how!=='fb'){shake(6);AU.sfx('tier');G.score+=Math.round(800*(1+G.pos));}
   G.rings.push({x:e.x,y:e.y,l:.6,m:.6,c:'#ffe14d'});NR.emit('bpOpen',{m:g.m,how});};
 /* test / assist hook: a player that does the thing (?bpauto=1 or BPL.auto = seconds of reaction) */
@@ -93,7 +96,7 @@ NR.on('tick',dt=>{if(!BPL.on)return;const e=G.boss;if(!e||!e.bp||e.dead){if(BPL.
       if(g.m==='parry')BPL.orb(e,g,dash,sb);
       if(g.m==='nodes'&&live.length&&(e.bt|0)!==g.shot&&(e.bt|0)%(HARDS.includes(SET.diff)?2:4)===0){g.shot=e.bt|0;BPL.aim(live[(e.bt>>2)%live.length],sb);}   // one node shoots back each bar (each 2 beats on the hard tiers): tell .6 s, then one aimed shot
       if(g.up&&BPL.auto&&t-g.tu>=BPL.auto)BPL.solve(e);
-      if(g.up&&t-g.tu>=BPL.FB)BPL.resolve(e,'fb');}
+      if(g.up&&t-g.tu>=BPL.fb())BPL.resolve(e,'fb');}
     else if(g.open&&t>=g.open)BPL.gate(e,t);}
   BPL.arena(e,b,t,sb,dt);
   for(const z of BPL.hz)if(z.aim&&t>=z.on&&!z.done){z.done=1;const n=G.eb.length;eb.src=BPSRC;eb(z.x,z.y,Math.atan2(P.y-z.y,P.x-z.x),z.v,'#19e3ff',6);eb.src=null;if(G.eb.length>n){G.eb[n].bpl=1;s.eb++;}}
