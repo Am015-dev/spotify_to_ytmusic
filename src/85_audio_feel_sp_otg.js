@@ -391,7 +391,7 @@ function TR_roadMat(m){const M=HUB.M;if(Array.isArray(m))m=m[0];return!!(M&&m&&(
 /* perf-r14b: generator (buildHubG steps it on the desktop boot, one 2.5-3.3 s task before); TR_bldFix runs it to the end */
 function TR_bldFix(){for(const _ of TR_bldFixG());}
 function* TR_bldFixG(){let yt=performance.now();const B=HUB.bld,C=new Map(),CS=8,K=(i,j)=>i*100000+j;
-  for(const b of B){const c=b.c??1,s=b.s??0,P=[];for(const u of[-1,0,1])for(const v of[-1,0,1]){const lx=u*b.hw,lz=v*b.hd;P.push(groundY(b.x+lx*c+lz*s,b.z-lx*s+lz*c))}
+  for(const b of B){if(BHQ.cu&&performance.now()-yt>30){yield [.78,,'trFix0'];yt=performance.now()}const c=b.c??1,s=b.s??0,P=[];for(const u of[-1,0,1])for(const v of[-1,0,1]){const lx=u*b.hw,lz=v*b.hd;P.push(groundY(b.x+lx*c+lz*s,b.z-lx*s+lz*c))}
     b.trMin=Math.min(...P);b.trMax=Math.max(...P);b.trY=1e9;const R=Math.hypot(b.hw,b.hd)+1.8;
     for(let i=Math.floor((b.x-R)/CS);i<=Math.floor((b.x+R)/CS);i++)for(let j=Math.floor((b.z-R)/CS);j<=Math.floor((b.z+R)/CS);j++){const k=K(i,j);let L=C.get(k);if(!L)C.set(k,L=[]);L.push(b)}}
   const find=(x,z,m)=>{const L=C.get(K(Math.floor(x/CS),Math.floor(z/CS)));if(!L)return null;let best=null,bo=1e9;for(const b of L){const dx=x-b.x,dz=z-b.z,lx=b.c==null?dx:dx*b.c-dz*b.s,lz=b.c==null?dz:dx*b.s+dz*b.c,o=Math.max(Math.abs(lx)-b.hw,Math.abs(lz)-b.hd);if(o<=m&&o<bo){bo=o;best=b}}return best};

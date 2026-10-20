@@ -145,7 +145,8 @@ function AS_assign(L){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=ASSET.ag
 // rebalance (local search): a tree takes the variant with the fewest same-variant trees within 45 m, nearer ones weigh more (its pool first, then the city pool)
 // terr-3 (Athens boot: 4.7 s of 5 full passes over ~100k trees): a tree is re-scored only when a variant changed within its 5x5 cells since its
 // last scoring (cell stamps; same result as re-scoring all), distances squared first
-function AS_fix(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=ASSET.ag;let sw=0,step=0;const all={};for(const b in POOL)if(b!=='bush')Object.assign(all,POOL[b]);delete all.palm;
+/* perf-r18x: AS_fixG yields (BH_dueP, ~35 ms) inside the pass loop under the boot step runner (?bhc=0 off); AS_fix drains it */function AS_fix(L,passes=5){const g=AS_fixG(L,passes);let r;while(!(r=g.next()).done);return r.value}
+function* AS_fixG(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=ASSET.ag;let sw=0,step=0;const all={};for(const b in POOL)if(b!=='bush')Object.assign(all,POOL[b]);delete all.palm;
  // numeric variant ids + one reused counter (sums in the same order as the old cnt object, so the same swaps); bush-free cell lists
  const VI=new Map(),vi=v=>{let k=VI.get(v);if(k==null){k=VI.size;VI.set(v,k)}return k},GF=new Map(),NK=new Set();for(const p of L){const kx=Math.floor(p.x/30),kz=Math.floor(p.z/30);for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++)NK.add((kx+a)*100000+kz+b)}
  // perf-8: only the 5x5 cells around L (was every cell in the city on each streamed tile: 25-90 ms per LF tile in Athens)
@@ -153,7 +154,7 @@ function AS_fix(L,passes=5){const C=CID==='fra'?'fra':'ath',POOL=AS_POOL[C],G=AS
  for(const p of L)p._vi=vi(p.av);const PL=P=>Object.keys(P).map(v=>[v,vi(v)]),PA=PL(all),PP={};for(const t in POOL)PP[t]=PL(POOL[t]);
  const cnt=new Float64Array(VI.size+1),T=[];
  const ST=new Map(),EV=new Map();
- for(let k=0;k<passes;k++){let ch=0;for(const p of L){if(!p.av||p.t==='bush'||AS_R[p.av].prop)continue;const kx=Math.floor(p.x/30),kz=Math.floor(p.z/30);step++;
+ for(let k=0;k<passes;k++){let ch=0;for(const p of L){if(typeof BHQ!=='undefined'&&BHQ.cu&&BHQ.sub&&BH_dueP())yield 1;if(!p.av||p.t==='bush'||AS_R[p.av].prop)continue;const kx=Math.floor(p.x/30),kz=Math.floor(p.z/30);step++;
   const e0=EV.get(p);if(e0!=null){let st=false;for(let a=-2;a<=2&&!st;a++)for(let b=-2;b<=2;b++){const t=ST.get((kx+a)*100000+kz+b);if(t!=null&&t>e0){st=true;break}}if(!st)continue}EV.set(p,step);
   for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const A=GF.get((kx+a)*100000+kz+b);if(A)for(const q of A){if(q===p)continue;const dx=q.x-p.x,dz=q.z-p.z,d2=dx*dx+dz*dz;if(d2>3600)continue;const d=Math.sqrt(d2),i=q._vi;if(cnt[i]===0)T.push(i);cnt[i]+=(d<30?1.5:1)-d/80}}
   const c0=cnt[p._vi];if(c0){let best=p.av,bv=p._vi,bc=c0;for(const P of[PP[p.t]||[],PA]){for(const[v,i]of P){const c=cnt[i];if(c<bc-1e-6){bc=c;best=v;bv=i}}if(bc===0)break}if(best!==p.av){p.av=best;p._vi=bv;ch++;ST.set(kx*100000+kz,step)}}
@@ -191,7 +192,7 @@ function AS_defs(D){const C=CID==='fra'?'fra':'ath';AS_variants();ASSET.far=ASSE
 // after the city's props are built (or when this file arrives later): far blobs, variants, rebalance, tints, near/mid meshes
 function AS_apply(){const D=HUB.ptypes;if(!D||!HUB.props||!HUB.grp)return;const C=CID==='fra'?'fra':'ath',old=new Map();for(const t in AS_POOL[C]){const d=D[t];if(d&&!d.asB)for(const g of[d.g,d.gFar,d.gOld])if(g)old.set(g,t)}
  AS_defs(D);if(old.size)scene.traverse(o=>{if(o.isInstancedMesh&&old.has(o.geometry)){const d=D[old.get(o.geometry)];if(!d.mAS0)d.mAS0=o.material;o.userData.asOld=o.geometry;o.userData.asOldM=o.material;o.geometry=d.g;o.material=d.mat;o.castShadow=false}});ASSET.ag=new Map();ASSET.agId=(ASSET.agId|0)+1;ASSET.hid.clear();
- ASSET.nA=AS_assign(HUB.props);const r=()=>{ASSET.nFix=AS_fix(HUB.props);AS_far(HUB.props);AS_mk();ASSET.cx=1e9;AS_tufts()};/* perf-r14c: under ?bhs the loader runs the rest as its own step */if(typeof BHQ!=='undefined'&&BHQ.sub){/* perf-r18p: one step per stage (fix, far, mk, tufts) */const w=f=>()=>{try{f()}catch(e){console.warn('AS apply',e)}};BHQ.sub.push(w(()=>{ASSET.nFix=AS_fix(HUB.props)}),w(()=>AS_far(HUB.props)),w(AS_mk),w(()=>{ASSET.cx=1e9;AS_tufts()}));return}r()}
+ ASSET.nA=AS_assign(HUB.props);const r=()=>{ASSET.nFix=AS_fix(HUB.props);AS_far(HUB.props);AS_mk();ASSET.cx=1e9;AS_tufts()};/* perf-r14c: under ?bhs the loader runs the rest as its own step */if(typeof BHQ!=='undefined'&&BHQ.sub){/* perf-r18p: one step per stage (fix, far, mk, tufts) */const w=f=>()=>{try{f()}catch(e){console.warn('AS apply',e)}};BHQ.sub.push(function*(){try{ASSET.nFix=yield* AS_fixG(HUB.props)}catch(e){console.warn('AS apply',e)}},w(()=>AS_far(HUB.props)),w(AS_mk),w(()=>{ASSET.cx=1e9;AS_tufts()}));return}r()}
 // fill grass tufts (98lf, ~216k in Frankfurt, two open 5-sided cones = 10 tris each) -> a low-poly copy of LEGO 6255 Plant 1x1 Round with 3 Large Leaves:
 // 3 kite leaves 120° apart (centre r 4 -> sides r 28 ±16 -> tip r 54 LDU as measured on the LDraw part; tips arched up to 27-33 LDU so the tuft keeps the old ~0.9 m height), a second one turned 60° on a
 // 1x1 round stem above it (plants stacked on round bricks, as in LEGO bushes): 12 tris, white (the fill's instance colour picks the green), double-sided material

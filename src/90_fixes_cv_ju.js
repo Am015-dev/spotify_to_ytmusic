@@ -98,7 +98,8 @@ function OC_segE(x,z){if(!OC.sg){OC.sg=new Map();const L=[...TRAILS.map(T=>[T.pt
 function OC_junc(x,z){if(!OC.jg||OC.jgn!==JUNC.length){OC.jg=new Map();OC.jgn=JUNC.length;for(const J of JUNC){if(!(J.r>0))continue;const k=Math.floor(J.x/64)*100000+Math.floor(J.z/64);let A=OC.jg.get(k);if(!A)OC.jg.set(k,A=[]);A.push(J)}}
   const out=[],kx=Math.floor(x/64),kz=Math.floor(z/64);for(let a=-1;a<=1;a++)for(let b=-1;b<=1;b++){const A=OC.jg.get((kx+a)*100000+kz+b);if(A)out.push(...A)}return out}
 function OC_minG(x,z,r){let m=groundY(x,z);for(let k=0;k<6;k++){const a=k/6*Math.PI*2;m=Math.min(m,groundY(x+Math.cos(a)*r,z+Math.sin(a)*r))}return m}
-function OC_props(L,D){OC_scaleDefs(D);let j=0;for(const p of L){let ground=Math.abs(p.y-groundY(p.x,p.z))<.05;
+/* perf-r18x: OC_props is a generator (BH_dueP yields every ~35 ms inside the props step, ?bhc=0 off); OC_props drains it */function OC_props(L,D){const g=OC_propsG(L,D);let r;while(!(r=g.next()).done);return r.value}
+function* OC_propsG(L,D){OC_scaleDefs(D);let j=0;for(const p of L){if(BHQ.cu&&BH_dueP())yield [.8,,'ocp'];let ground=Math.abs(p.y-groundY(p.x,p.z))<.05;
     if(!OC_GAME.has(p.t)){const fp=OC_fp(p.t,D),m=.35;let e=OC_roadE(p.x,p.z);
       if(e<fp+m){const car=p.t.startsWith('car')||/^CE_(car|taxi)/.test(p.t);let ok=false;
         if(!car&&p.t!=='lamp'){const h=.8,gx=OC_roadE(p.x+h,p.z)-OC_roadE(p.x-h,p.z),gz=OC_roadE(p.x,p.z+h)-OC_roadE(p.x,p.z-h),gl=Math.hypot(gx,gz);
