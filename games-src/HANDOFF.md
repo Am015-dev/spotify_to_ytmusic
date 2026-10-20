@@ -9,6 +9,7 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
   SEEKER (marked homing shot, PARRY = dash in the last .15 s: it flies back, +1 charge), LASER WALL (full height, only a dash crosses), CURTAIN (2 walls, gaps too far apart to slide between: dash a layer or EMP),
   WARDEN (shield takes 70%, only EMP strips it for 8 s). GOOD EMP bonus / no bonus on an empty screen, EMP button pulses (abHot) when worth it, DASH->EMP in 1 s = COMBO blast, dash vents an overheat.
 - Hooks: b.js `CTR.dash()` (dash start frame) and `CTR.emp()` (EMP press, before the clear); c.js `CTR.draw()`. Numbers: BALANCE.md "Counter threats". Test: `nightrun/counter-test.js`.
+- Below Hard the wall and curtain leave a gap and the seeker turns slower (dash/EMP pay, not required: balance Normal stage 20 fell to 67% when they were required); on Hard+ they demand the answer.
 - Weak: walls/curtains are code-drawn; the balance bot only parries by luck (it dashes at near bullets); no ram-charge stagger (enemy AI belongs to W5); hint texts show once per save.
 ## Nightrun DASH + EMP abilities (W4, flag RET.abil, ?abil=0 = the old dash/EMP, 19 Oct 2026)
 - `parts/abilities.js` (after powlevels.js). Hooks: b.js dash block -> `ABIL.dashIn`, EMP key -> `ABIL.emp`; c.js button rings + draw; hud.js dash count.
