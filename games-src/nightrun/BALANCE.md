@@ -253,3 +253,7 @@ every weapon (the weapon did not matter: enemies hardly threaten a ship that kee
 - GOOD EMP (>= 6 bullets, a curtain, or a shielded warden): +400 x mult, +.25 meter. COMBO = EMP <= 1 s after a dash start: +12 to ordinary foes within 300 px.
 - counter-test (threat scenarios on Hard; dodging bot without vs with the timed answer, hull lost): seeker (Hard) 5 vs 0, wall 5 vs 0, curtain 3 vs 1; warden kill 3.5 s vs 1.2 s; combo 110 vs 50 damage; random presses 5.7 vs timed 2.5.
 - balance-test Normal stage 20 (RUNS=6): first tuning (EV 7, turn 9) 67%/67% vs 100%/100% flag off; now late 83%, mid 100%.
+
+## Weapon Forge (flag RET.forge, ?forge=0 = old; 20 Oct 2026)
+- Hybrid damage factor = clamp(.95 - 1.6 x trait cost, .5, .9) x (1 + .03 x (level-1)); trait costs in forge.js `FGC` (seeds .2, trail .18, ring .15, nova .1, burst .15, zp .12, zp2 .3, sp .12, grav .05, px .04, rc .1, hk .06, rad .01 per unit). Mods trade damage for effect (k .85-.97; HEAVY 1.2 with x.7 shot speed; BEAT x1.3 on the beat, x.9 off it).
+- Gates (forge-test.js): LV5 hybrid + HEAVY <= 1.35x its parent (dummy DPS); Hard stage 30 clear time vs the parents alone within 15% of the median ratio for the top 10. Results in HANDOFF.md.
