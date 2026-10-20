@@ -4,6 +4,13 @@ Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never me
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun phone fixes: dash heading + WEAPONS sheet (W12, 20 Oct 2026)
+- Dash bug (portrait touch): `goDash` kept the last heading in `P.dx/dy` when a finger was down, so a still ship dashed along a stale heading (e.g. world left = sideways/back on a portrait screen). Now `P.mvT` stamps the last real move (keys, or touch offset > 3 px); no move in 0.3 s -> `dashSafeDir()` (b.js): 8-way landing spot with most free space, away from bullets (predicted 0.25 s) and foes and walls, ties go forward (world right = screen up in portrait). Test `dash-dir-test.js` (portrait, landscape, desktop).
+- WEAPONS sheet (`#wpm`, g.js): the ghost text was the pit-stop panel showing through `.ov.solid` (90% alpha); `#wpm` is now opaque, z-index 9. Cards are a fixed 96 px, text 14 px, fusion info is the last row INSIDE `#wpL` (`#wpFu`, no longer a separate block), ship picture hidden under 700 px height. Test `ui-weapons-test.js`.
+- Placeholder pictures: `wp-*` and fusion pictures are drawn into the UI only when `ART.isReal` (g.js, wpx.js); otherwise the code icon / demo is used. The Lab ASSETS tab is untouched.
+- For W14 (rebuilding this layout): keep `#wpm` opaque, fusion row inside `#wpL`, and run `ui-weapons-test.js`.
+- Not mine: readable-test fails on the old build too (flag-off check, contrast). `abil-test.js` and `mustmove-test.js` do not exist in the repo.
+
 ## Nightrun VARIETY A: formations, stage scripts, rule changes (flag RET.vary, ?vary=0 = old waves, 18 Oct 2026)
 - `parts/formations.js` (after zoo.js): 62 formations with their own spatial behaviour (pincer, X, snake, spiral, moving-gap wall, meteors, shadow, bait, curtain, geyser, scissors, loop, testudo, ambush...). Each declares tags, first stage, cost, telegraph, gap, kinds, role. Path units move in FM.mv (one hook line in b.js's enemy switch); every path ends flying left, so leaks still count.
 - `parts/stagescripts.js`: the editable table `VSCRIPT` (45 stages: 10-13 moments, a '*' set piece unique to the stage, a '~' breather, '+g' ground moments, 'a|b' mixes, '~r' remixes) + 15 rule changes `VMUT` on every even story stage (RULE card after the stage card, name after the HUD goal line; paused while a boss is out; gentler on Easy). The director keeps timing, budget, caps, READY gaps; scripts only pick WHAT spawns.
