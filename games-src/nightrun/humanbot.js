@@ -13,7 +13,7 @@ const HP = process.env.HP ? JSON.parse(process.env.HP) : {};   // human paramete
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const BOT = (o) => {
   const m = window.__mnr, { n, build, bot, seed } = o; m.SET.diff = 'normal'; try { m.applySet(); } catch (e) { }
-  m.startStory(n); m.simOn(true); const e0 = window.ABIL ? window.ABIL.stat.emp : 0;
+  if(n>0)m.startStory(n);else{m.ST.on=false;document.getElementById('startBtn').click();} m.simOn(true); const e0 = window.ABIL ? window.ABIL.stat.emp : 0;
   let sd = seed * 7919 + 13; const rnd = () => { sd = (sd * 1103515245 + 12345) & 0x7fffffff; return sd / 0x7fffffff; };   // own dice: a run is repeatable
   const gauss = () => { let s = 0; for (let i = 0; i < 4; i++) s += rnd(); return (s - 2) * 1.73; };
   const WP = window.__wp, SH = m.SH, late = build === 'late';
@@ -69,7 +69,8 @@ const BOT = (o) => {
     return { bx: bx + nx, by: by + ny, dash: near && P.dashCd <= 0 && G.t > blindUntil && rnd() < H.dash * .5, emp: P.emp > 0 && cnt >= H.emp };
   };
   const human = bot === 'human', rec = new Map(); let i = 0, lastBeat = -1, tapAt = -1, d = null, cleared = false; const dt = 1 / 60;
-  while (m.running && m.G.t < o.MAXT) {
+  const LK = window.LEAK;
+  while (m.running && m.G.t < o.MAXT && !(n === 0 && LK && LK.waves >= 10)) {
     if (SH.active) { SH.close(); ups(); }
     if (i % 60 === 0) keepPw();
     if (i % 3 === 0) { d = decide(human); m.touchTo(d.bx, d.by); if (d.dash) m.press('Dash'); if (d.emp) m.press('Emp'); }
@@ -83,7 +84,8 @@ const BOT = (o) => {
     if (m.ST.over || m.G.dead) { cleared = !!m.ST.over && !m.G.dead; break; }
   }
   const life = []; for (const [e, r] of rec) { if (r.boss || r.mini || !r.killed || r.in < 0 || r.end - r.in <= 0) continue; life.push([r.ty, +(r.end - r.in).toFixed(2)]); }
-  const res = { n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0) };
+  let sp = 0, lk = 0, lw = 0; for (const [e, r] of rec) { if (r.boss || r.mini || !LK || !(LK.weight(e) > 0)) continue; sp++; if (e.lkd) { lk++; lw += LK.weight(e); } }
+  const res = { sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0) };
   m.abort(); return res;
 };
 (async () => {
@@ -109,6 +111,7 @@ const BOT = (o) => {
     const lifes = Object.keys(by).sort().filter(t => by[t].length >= 3).map(t => `${t}:${med(by[t]).toFixed(1)}`).join(' ');
     console.log(`${bot}/${build} clear% ` + STAGES.map(n => n + ':' + pct(cell(bot, build, n))).join(' ') + ' | hits med ' + STAGES.map(n => n + ':' + med(cell(bot, build, n).map(r => r.hits))).join(' ') + ' | life med s ' + lifes + ` | all-kill med ${med([].concat(...a.map(r => r.life.map(l => l[1])))).toFixed(2)} (n=${a.length})`);
   }
+  for (const bot of BOTS) for (const build of BUILDS) for (const n of STAGES) { const a = cell(bot, build, n); if (!a.length) continue; const sp = a.reduce((x, r) => x + r.sp, 0), lk = a.reduce((x, r) => x + r.lk, 0), mins = a.reduce((x, r) => x + r.t, 0) / 60; console.log(`leaks ${bot}/${build} stage ${n}: ${(lk / Math.max(mins, .01)).toFixed(1)}/min, share ${(100 * lk / Math.max(sp, 1)).toFixed(1)}% of ${sp} spawns, clear ${pct(a)}%`); }
   // calibration gate: the human bot clears Normal stage 3 about 95% on the fresh/mid/late builds
   if (BOTS.includes('human') && STAGES.includes(3)) for (const build of BUILDS) if (build !== 'owner') { const c = pct(cell('human', build, 3)); line(c >= 85, `human ${build} Normal stage 3 clear ${c}% (calibration target ~95%, gate >= 85% at small RUNS)`); }
   console.log(fails ? `FAIL humanbot-test: ${fails} check(s)` : 'PASS humanbot-test'); process.exit(fails ? 1 : 0);
