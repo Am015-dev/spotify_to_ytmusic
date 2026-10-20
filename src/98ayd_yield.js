@@ -3,7 +3,7 @@
 // player (road-follow, 100+ km/h) rammed 30+ cars per 2 min. Root fix: any car the player is closing on within ~10 m + 1.3 s of travel, lateral < 3.2 m, eases sideways
 // (c.yo, added to the lane offset in hubTrafficStep) away from the player's line until it clears 3.4 m, held 1 s so it does not swing back as the player passes.
 // ?ayd=0 turns it off. Cars never leave the road: the shift is cut to 35 % when cityAt() says the kerb is near.
-const AYD={on:!/[?&]ayd=0/.test(location.search),lane:/[?&]law=1/.test(location.search),n:0};
+const AYD={on:!/[?&]ayd=0/.test(location.search),lane:HT_lawQ('lane'),n:0};
 function AYD_pre(dt){if(!AYD.on||typeof RO==='undefined'||!RO.on||RO.foot&&RO.foot!=='car'||!HUB.cars||!HUB.nodes)return;const N=HUB.nodes,h=RO.vh??RO.h,fx=Math.sin(h),fz=Math.cos(h),act=RO.v>3;
  for(const c of HUB.cars){if(c.pk||c.tr||c.route&&!c.CVr||c.dead>0){if(c.yo)c.yo=0;continue}const rx=c.x-RO.x,rz=c.z-RO.z;if(!c.yo&&!c.yoH&&(!act||rx*rx+rz*rz>10000))continue;
   let tg=0;const A=N[c.a],B=N[c.b];

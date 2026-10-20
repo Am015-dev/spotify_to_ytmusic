@@ -12,6 +12,8 @@ const CT_SWAP={fra:{'sedan':'ld:car:v6633_1','su:t_sc_hy':'ld:car:v75878_1','tax
 if(!/[?&]ct=0/.test(location.search)){const S=CT_SWAP[CID==='fra'?'fra':'ath'];const ex=(location.search.match(/[?&]ctx=([^&]*)/)||[])[1]||'';/* test: ctx=<old kinds kept> */for(let i=0;i<HCAR.length;i++){const v=!ex.split(',').includes(HCAR[i])&&S[HCAR[i]];if(v){CT.fb[v]=HCAR[i];HCAR[i]=v}}}
 // target body widths per class (m): Town sets are 4–6 studs wide, Speed Champions 8, so each is scaled uniformly to a road width
 const CT_SC=LD_SCRE;// Speed Champions (shared rule, 98ld_import.js)
+// traffic-law-r21q: widest moving LEGO body (m); ?wcap=0 off
+const CT_WMAX={on:!/[?&]wcap=0/.test(location.search),w:2.4};
 const CT_W={tx:1.72/* 6-wide 40468: keep its height near the others */,car:1.9,police:1.95,van:2.1,delivery:2.2,truck:2.4};
 // lazy models (v89z LD_need): start loading the traffic sets of both cities at boot, so they are in before roam builds (else: CT_FB fallback)
 try{LD_need([...new Set(Object.values(CT_SWAP.fra).concat(Object.values(CT_SWAP.ath)).map(n=>n.split(':')[2]).filter(id=>id!=='tx'))])}catch(e){}
@@ -22,7 +24,8 @@ function CT_build(nm){const src=nm.split(':')[2],B=CT_bricks(src).filter(b=>!['d
  const strip=g=>{if(!g)return g;for(const k of Object.keys(g.attributes))if(!['position','normal','color'].includes(k))g.deleteAttribute(k);return g.index?g.toNonIndexed():g};
  const body=mergeGeometries([G.m,G.l].filter(Boolean).map(strip)),wheels=mergeGeometries(Wg.map(strip)),glass=G.g?strip(G.g):null;
  const box=new THREE.Box3().setFromBufferAttribute(body.attributes.position),bw=new THREE.Box3().setFromBufferAttribute(wheels.attributes.position),y0=Math.min(box.min.y,bw.min.y),
-  cx=(box.min.x+box.max.x)/2,cz=(box.min.z+box.max.z)/2,s=src==='tx'?CT_W.tx/(box.max.x-box.min.x):LD_SW*(CT_SC.test(src)?1:LD_FIG);/* size-1 rule: City/Town sets minifig scale (×LD_FIG), Speed Champions 0.408 like rides */
+  cx=(box.min.x+box.max.x)/2,cz=(box.min.z+box.max.z)/2,s0=src==='tx'?CT_W.tx/(box.max.x-box.min.x):LD_SW*(CT_SC.test(src)?1:LD_FIG);/* size-1 rule: City/Town sets minifig scale (×LD_FIG), Speed Champions 0.408 like rides */
+ const sw=(box.max.x-box.min.x)*s0,s=CT_WMAX.on&&!/truck/.test(nm)&&sw>CT_WMAX.w?s0*CT_WMAX.w/sw:s0;/* traffic-law-r21q: body <= 2.4 m (the Athens van 7639 was 3.15 m: 0.97 of a 2-way lane); the Big Rig keeps CT_wide */
  for(const g of[body,wheels,glass].filter(Boolean)){g.translate(-cx,-y0,-cz);g.scale(s,s,s);g.rotateY(Math.PI);g.translate(0,.04,0);g.computeBoundingBox();g.computeBoundingSphere()}
  const W=(box.max.x-box.min.x)*s,L=(box.max.z-box.min.z)*s,H=(box.max.y-y0)*s;CT.dim[nm]=[W/2,L/2];if(SC_K.carL)SC_K.carL[nm]=L+.1;
  const tri=g=>g?(g.index?g.index.count:g.attributes.position.count)/3:0;CT.stat.push({nm,W:+W.toFixed(2),L:+L.toFixed(2),H:+H.toFixed(2),tris:tri(body)+tri(wheels)+tri(glass)});
