@@ -24,7 +24,7 @@ const FGR=[
  ['flame','wave','heatwave','Heat Wave',{rad:6,px:1},'A wide hot wave that burns through one foe'],
  ['frost','rail','iceneedle','Ice Needle',{px:3},'A thin needle that pierces three foes'],
  ['drone','swarm','hivemind','Hive Mind',{seeds:1,hk:.8},'Seeking shots that hatch one more seeker on hit'],
- ['rail','arc','voltrail','Volt Rail',{px:2,zp:1},'A rail slug that pierces and arcs on'],
+ ['rail','arc','voltrail','Volt Rail',{px:1,zp:1},'A rail slug that pierces one foe and arcs on'],
  ['shell','pulse','clustershell','Cluster Shell',{burst:1},'Shells crack into four shards on hit'],
  ['storm','disc','squalldisc','Squall Disc',{rc:2,wob:1},'A weaving disc that bounces twice'],
  ['wave','beat','bassswell','Bass Swell',{ring:1,rad:3},'A fat wave that rings out on the beat'],
@@ -37,7 +37,7 @@ const FGR=[
  ['rail','disc','railric','Rail Ricochet',{px:1,rc:2},'A piercing slug that ricochets twice'],
  ['pulse','frost','snowburst','Snowburst',{burst:1,rad:3},'A wide frost spread that shatters on hit'],
  ['shell','well','blackshell','Black Shell',{nova:1,grav:1},'Shells pull foes in, kills blow up']];
-const FGC={seeds:.2,trail:.18,ring:.15,nova:.1,burst:.15,zp:.12,zp2:.3,sp:.12,grav:.05,px:.04,rc:.1,hk:.06,rad:.01,wob:0};   // damage cost per trait (x its number)
+const FGC={seeds:.2,trail:.18,ring:.12,nova:.1,burst:.15,zp:.2,zp2:.3,sp:.12,grav:.05,px:.04,rc:.1,hk:.06,rad:.01,wob:0};   // damage cost per trait (x its number)
 const FG_SH=['tri','dia','ring','dot','cross','star'];
 /* mods: id, name, traits, damage factor, line, icon shape */
 const FGM=[
@@ -97,7 +97,7 @@ const FG=window.FG={get on(){return!!RET.forge;},s:null,ver:0,mn:[],kills:[0,0],
   hit(b,e){const r=b.fg,t=r.t,c=b.fc2||b.col||'#fff';
     if(t.seeds&&!b.fgsd){b.fgsd=1;for(let i=0;i<t.seeds&&pbRoom();i++){G.pb.push({x:b.x,y:b.y,vx:420,vy:(i%2?1:-1)*260,dm:b.dm*.28,pf:0,col:c,len:6,th:3,hk:2.2,fz:1,wid:b.wid});this.stat.seeds++;}}
     if(t.burst&&!b.fgbu){b.fgbu=1;for(let i=0;i<4&&pbRoom();i++){const a=Math.PI/4+i*Math.PI/2;G.pb.push({x:b.x,y:b.y,vx:Math.cos(a)*560,vy:Math.sin(a)*560,dm:b.dm*.3,pf:0,col:c,len:8,th:2,fz:1,wid:b.wid});}this.stat.bursts++;}
-    if(t.zp2)WP.leap(e,b.dm*.3);
+    if(t.zp2)WP.leap(e,b.dm*.2);
     if(t.grav){let n=0;this.near(e.x,e.y,90,o=>{if(o===e||o.type==='boss'||n>=4)return;n++;const d=Math.hypot(e.x-o.x,e.y-o.y)||1;o.x+=(e.x-o.x)/d*10;o.y+=(e.y-o.y)/d*10;});this.stat.grav+=n;}
     if(t.nova&&e.hp<=0&&!e.fgnv){e.fgnv=1;this.near(e.x,e.y,50,o=>{if(o!==e)this.hurt(o,b.dm*.5);});G.rings.push({x:e.x,y:e.y,l:.3,m:.3,c});this.stat.novas++;}},
   tick(dt){if(!this.on||!G.live||G.dead)return;const s=this.st();
@@ -121,7 +121,8 @@ const FG=window.FG={get on(){return!!RET.forge;},s:null,ver:0,mn:[],kills:[0,0],
     for(const m of this.mn){c.globalAlpha=Math.min(1,m.t*2)*.9;c.fillStyle=m.c;this.shape(c,'tri',m.x,m.y,6);c.fill();}
     c.restore();},
   // icon of an inventory item: weapon = its colour circle, hybrid = circle A + triangle B + mini shapes, mod = its shape, core = hexagon, passive = square
-  icon(c,it,S){c.clearRect(0,0,S,S);const m=S/2;c.save();c.lineWidth=Math.max(2,S/16);
+  icon(c,it,S){c.clearRect(0,0,S,S);{const pi=typeof ART==='object'&&ART.img('fg-'+it.replace(':','-'));if(pi){c.drawImage(pi,0,0,S,S);return;}}   // real picture fg-<h|m|k|p>-<id> when listed in ready.json
+    const m=S/2;c.save();c.lineWidth=Math.max(2,S/16);
     const ty=it.split(':')[0],id=it.split(':')[1];
     if(ty==='w'){const col=WPD[id]?WPD[id].c:'#fff';c.fillStyle=col;this.shape(c,'o',m,m,S*.3);c.fill();c.fillStyle='#0b0820';c.font='700 '+Math.round(S*.24)+'px "Share Tech Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.fillText((WPD[id]?WPD[id].s:'?').slice(0,2),m,m+1);}
     else if(ty==='h'){const R=this.rid(id);if(R){const c1=WPD[R[0]].c,c2=WPD[R[1]].c,sh=FG_SH[FGR.indexOf(R)%FG_SH.length];c.fillStyle=c1;this.shape(c,'o',m-S*.08,m,S*.28);c.fill();
