@@ -4,3 +4,4 @@
 - GO ui1/governor (registered by the module when the lazy checklist chunk appears; state asserts, 7 checks, pass line "📍 ui1/governor ✅ PASS").
 - NOTE: modules ordered AFTER 99_api.js in src/ORDER and not in src/LAZY land after `</script>` and never run (99c8_sfxhit.js is one). New modules go BEFORE 99_api.js.
 - Left: story cards, top line merge, minimap size, rotate hint, DRIFT HERE (review items 3-8) not done.
+- Review fix: only hints are gated (say() with text, QV_COACH balloon). Quest/story/race npcSay lines and say('','') clears pass untouched. Queue is per key (max 4, oldest first). GO asserts added: quest step survives an Ambush line at 100 km/h; a clear does not use the budget.
