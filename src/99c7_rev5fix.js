@@ -413,11 +413,14 @@ function IOSM_smp(){const i=renderer.info,pm=performance.memory;return{gpu:MEM_G
  buf:+(MEM_GPU.bb/1048576).toFixed(0),tx:+(MEM_GPU.tb/1048576).toFixed(0),mip:+((MEM_GPU.mxb||0)/1048576).toFixed(0),rb:+((MEM_GPU.rbb||0)/1048576).toFixed(0),pr:renderer.getPixelRatio()}}
 function IOSM_top(n){const S=new Map;scene.traverse(o=>{for(const m of[].concat(o.material||[]))for(const k in m){const v=m[k];if(v&&v.isTexture&&v.image&&!S.has(v)){const im=v.image,w=im.width||0,h=im.height||0,d=im.depth||1;S.set(v,{k:(v.name||k)+' '+w+'x'+h+(d>1?'x'+d:''),b:w*h*d*4})}}});
  return[...S.values()].sort((a,b)=>b.b-a.b).slice(0,n||6).map(e=>e.k+' '+(e.b/1048576).toFixed(0)+'MB').join(', ')}
+// ios-r17r: the GO page stubs renderer.render (draw=0), so STR_up never uploads a far super cell and its CPU arrays stay (a device frees them at once).
+// IOSM_dev re-runs STR_up with drawing on for every built super cell that still holds arrays, so the next sample is what a device would hold.
+function IOSM_dev(){const T=window.__tq&&__tq.o,d0=T?T.draw:0;let n=0;if(T)T.draw=1;try{for(const S of (typeof WBC!=='undefined'&&WBC.sup)||[]){if(!S.built)continue;const m=S.lod||S.cells.find(c=>c.lod)&&S.cells.find(c=>c.lod).lod;if(m&&m.geometry.attributes.position&&m.geometry.attributes.position.array){STR_up(S);n++}}}finally{if(T)T.draw=d0}return n}
 const IOSM_B=['boot','buildWorld','buildWorldAth','buildRoam','buildHub','buildHubProps','buildHubTraffic','buildCity','buildMap','WB_cityBuild','WB_cityBuild2'];
 function IOSM_wrap(on){const W=IOSM.W=IOSM.W||{};IOSM.calls=IOSM.calls||{};for(const k of IOSM_B){let f;try{f=eval(k)}catch(e){continue}if(typeof f!=='function')continue;
   if(on&&!W[k]){W[k]=f;const g=function(){IOSM.calls[k]=(IOSM.calls[k]||0)+1;return f.apply(this,arguments)};try{eval(k+'=g')}catch(e){}}else if(!on&&W[k]){const o=W[k];try{eval(k+'=o')}catch(e){}delete W[k]}}}
 function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|0)%3===0);roamStep(1/30);if(i%300===299)try{__tq.draw()}catch(e){}}K.ArrowUp=K.ArrowLeft=false}
-(function IOSM_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='ios-mem')){C.items.push({ver:'perf',id:'ios-mem',area:'perf',text:'ios-r17a · iPhone memory budget: 📍 GO (each city, touch boot) reads the GPU estimate (buffers + textures + mips + render buffers + canvas) and JS heap at ready and after 30 s of roam, then rotates 852×393 → 393×852 → back. Pass line: GPU ≤ 500 MB, heap ≤ 250 MB, rotate < 20 MB new and no boot/city build.',go:'perf/ios-mem'});
+(function IOSM_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='ios-mem')){C.items.push({ver:'perf',id:'ios-mem',area:'perf',text:'ios-r17a · iPhone memory budget: 📍 GO (each city, touch boot) reads the GPU estimate (buffers + textures + mips + render buffers + canvas) and JS heap at ready, after 30 s and 60 s of roam (test-page heap and device-like heap: far super cells uploaded + freed as on a device, ios-r17r), then rotates 852×393 → 393×852 → back. Pass line: GPU ≤ 500 MB, heap ≤ 250 MB, rotate < 20 MB new and no boot/city build.',go:'perf/ios-mem'});
  C.GO['perf/ios-mem']=['fra','ath'].map(c=>({c,n:'touch memory budget + rotate rebuilds nothing',secs:60,fn:()=>{if(typeof window.__vp!=='function')return'📍 iOS MEM · needs the GO harness viewport hook ❌';
   const gc=()=>Promise.resolve(window.__cdp('HeapProfiler.collectGarbage')).catch(()=>0),S={};
   const fin=()=>{try{__tq.draw()}catch(e){}return gc().then(()=>{const a=S.a,b=S.b,z=IOSM_smp();IOSM_wrap(false);const R=[],cl=Object.entries(IOSM.calls).map(([k,v])=>k+'×'+v).join(' ')||'none',dg=+(z.gpu-b.gpu).toFixed(1),dh=z.heap-b.heap;
@@ -426,13 +429,13 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
    {const g=S.b0.heap-S.a.heap;R.push(['heap growth over the 30 s roam '+(g>=0?'+':'')+g+' MB'+(LOWMEM?' (≤ +'+IOSM.grow+')':' (info: the desktop tier is not asserted; run with ?lowmem=1)'),!LOWMEM||g<=IOSM.grow])}
    R.push(['rotate: GPU +'+dg+' MB, heap '+(dh>=0?'+':'')+dh+' MB, target reallocs '+(RZ.re-S.rz)+', builds '+cl+', pixel ratio '+z.pr+', reload '+(location.href!==S.u)+' (info: geo/tex/prog '+(z.geo-b.geo)+'/'+(z.tex-b.tex)+'/'+(z.prog-b.prog)+', measured on the 2nd rotate; the warm-up rotate: GPU +'+(b.gpu-S.b0.gpu).toFixed(1)+' MB = never-drawn geometry uploaded by the wider portrait view)',
      dg<IOSM.rot&&dg+Math.max(0,dh)<IOSM.rot&&cl==='none'&&location.href===S.u]);
-   R.push(['(info) LOWMEM '+LOWMEM+', top textures: '+IOSM_top(5),true]);
+   R.push(['(info) heap test page → device-like (far LOD uploaded + freed): ready '+S.ar.heap+' → '+S.a.heap+' MB ('+S.an+' cells), 30 s '+S.b0r.heap+' → '+S.b0.heap+' MB ('+S.bn+'), 60 s '+S.c0r.heap+' → '+S.c0.heap+' MB, tstream '+(typeof MEMF!=='undefined'&&MEMF.ts?1:0)+', zipped '+(typeof MEMF!=='undefined'&&MEMF.zst?MEMF.zst.n+' ('+MEMF.zst.rawMB.toFixed(1)+' → '+MEMF.zst.zMB.toFixed(1)+' MB, '+(MEMF.zst.cur||0)+' under the curtain)':'-'),true]);R.push(['(info) LOWMEM '+LOWMEM+', top textures: '+IOSM_top(5),true]);
    const ok=R.every(r=>r[1]);goSay(`📍 iOS MEM ${CID} · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`)})};
   try{__tq.draw()}catch(e){}const w0=innerWidth,h0=innerHeight;
   // rotate once to warm (the portrait view is wider: drawing it uploads geometry never drawn before; not caused by the rotate), then measure a second rotate
   const rot=()=>window.__vp(h0,w0).then(()=>new Promise(r=>setTimeout(r,700))).then(()=>{try{__tq.draw()}catch(e){}return window.__vp(w0,h0)}).then(()=>new Promise(r=>setTimeout(r,700)));
   IOSM.calls={};IOSM_wrap(true);S.u=location.href;
-  gc().then(()=>{S.a=IOSM_smp();IOSM_roam(30);try{__tq.draw()}catch(e){}return gc()}).then(()=>{S.b0=IOSM_smp();return rot()}).then(()=>{try{__tq.draw()}catch(e){}return gc()}).then(()=>{S.b=IOSM_smp();S.rz=RZ.re;
+  gc().then(()=>{S.ar=IOSM_smp();S.an=IOSM_dev();return gc()}).then(()=>{S.a=IOSM_smp();IOSM_roam(30);try{__tq.draw()}catch(e){}return gc()}).then(()=>{S.b0r=IOSM_smp();S.bn=IOSM_dev();return gc()}).then(()=>{S.b0=IOSM_smp();IOSM_roam(30);try{__tq.draw()}catch(e){}return gc()}).then(()=>{S.c0r=IOSM_smp();IOSM_dev();return gc()}).then(()=>{S.c0=IOSM_smp();return rot()}).then(()=>{try{__tq.draw()}catch(e){}return gc()}).then(()=>{S.b=IOSM_smp();S.rz=RZ.re;
    return rot()}).then(fin)
    .catch(e=>{IOSM_wrap(false);goSay('📍 iOS MEM · threw '+e+' ❌ FAIL')});
   return'📍 iOS MEM · rotating…'}}))}return}
@@ -474,11 +477,13 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
    for(let t=0;t<60;t++){const c2=Math.floor(Math.random()*G.nx*G.nz),s=G.s[2*c2];if(s<0)continue;const e=G.s[2*c2+1],i2=Math.floor(c2/G.nz),j2=c2%G.nz,Qa=G.P,k=s+9*Math.floor(Math.random()*((e-s)/9));
     const x=G.x0+i2*G.dx+(Qa[k]+Qa[k+2]/2)*G.qis,z=G.z0+j2*G.dz+(Qa[k+1]+Qa[k+3]/2)*G.qis;smp++;const r=GND_in(G,x,z);if(!r||!isFinite(GND_tri(r.L,r.k,r.u,r.v)))holes++}}
   const K=TR_HA.M,mq=K?K.qe||0:0,mU=K&&K.m instanceof Uint16Array,gs=GND_L.length,nQ=q;
-  const e=MEMF.S.find(z=>!z.on&&!z.cz&&!z.zfail&&z.m.geometry.attributes.position&&z.m.geometry.attributes.position.array),heapNow=()=>performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576):0;
+  const zR=z=>Math.hypot(z.x-camera.position.x,z.z-camera.position.z)-z.r>(MEMF.ts?Math.min(z.ro,camera.far+50):z.ro);   /* ios-r17r: only a chunk MEMF_zip would keep zipped from here */
+  const e=MEMF.S.find(z=>!z.on&&!z.cz&&!z.zfail&&zR(z)&&z.m.geometry.attributes.position&&z.m.geometry.attributes.position.array),heapNow=()=>performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576):0;
   const fin=(zr)=>`📍 MEM QUANT ${CID} · GND grids ${nQ}/${gs} Int16 (saved ${mb.toFixed(1)} MB, err h ${(eh*100).toFixed(2)} cm xz ${(ex*100).toFixed(2)} cm, holes ${holes}/${smp}), crown mask ${mU?'Uint16 err '+(mq*100).toFixed(2)+' cm':'Float32'}, far chunks ${zr} · zfar ${MEMF.zst.n} zipped ${MEMF.zst.rawMB.toFixed(1)}→${MEMF.zst.zMB.toFixed(1)} MB, ${MEMF.zst.back} back, max ${MEMF.zst.maxMs.toFixed(0)} ms · heap ${heapNow()} MB`;
   const g1=nQ>0&&eh<=.01&&ex<=.005&&holes===0&&smp>50&&(!K||mq<=.01);
   if(!MEMF.zOn||!e)return fin(MEMF.zOn?'no off chunk':'off')+' → '+(g1&&(!MEMF.zOn||MEMF.S.length===0)?'✅ PASS':'❌ FAIL');
   const g=e.m.geometry,names=Object.keys(g.attributes),hash=()=>{let h=0,n=0;for(const k of names.concat(g.index?['@i']:[])){const a=k==='@i'?g.index:g.attributes[k],A=a.array;if(!A)return'null';for(let t=0;t<A.length;t+=Math.max(1,A.length>>8)){h=(h*31+A[t]*1000|0)|0}n+=A.length}return h+':'+n},h0=hash();
+  if(MEMF.ts)e.zr=Math.min(e.ro,camera.far+50);   /* ios-r17r: tstream turns chunks off at far + 50 m; zip range as MEMF_gstep */
   return MEMF_zip(e).then(()=>{const zipped=!!e.cz,nulled=names.every(k=>!g.attributes[k].array);return(zipped?MEMF_unzip(e):Promise.resolve()).then(()=>{const same=hash()===h0,ok=g1&&zipped&&nulled&&same&&!e.cz;
    return fin(`zip ${zipped?'ok':'FAILED'} dropped ${nulled} restored-identical ${same}`)+' → '+(ok?'✅ PASS':'❌ FAIL')})})}}))}return}
  if(i<600)setTimeout(()=>MQ_reg(i+1),100)})(0);

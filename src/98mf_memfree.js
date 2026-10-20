@@ -62,3 +62,15 @@ async function MEMF_unzip(e){const c=e.cz;c.st=2;MEMF.ubusy++;
     g.dispose();e.cz=null;MEMF.zst.back++;MEMF.zst.maxMs=Math.max(MEMF.zst.maxMs,performance.now()-t0)}
   catch(err){c.st=1;e.zfail=1}finally{MEMF.ubusy--}}
 (function MEMF_raf(){try{MEMF_gstep()}catch(e){}requestAnimationFrame(MEMF_raf)})();
+// ios-r17r (?tstream=1): the off chunks are deflated under the load curtain, so the gain shows at ready. roamLoad starts MEMF_cur next to TWG_run and awaits
+// both: the chunk copy is one memcpy per zip (≤ 8 ms of zip starts per frame, then a frame), up to MEMF.czN in flight, and the curtain waits at most
+// MEMF.cms ms past TWG (?tscur=<ms>, default 250); whatever is left is zipped after ready by MEMF_gstep as before. Distances from the car (RO), not the camera.
+Object.assign(MEMF,{cms:(q=>q==null?250:+q)(new URLSearchParams(location.search).get('tscur')),czN:6});MEMF.zst.cur=0;
+async function MEMF_cur(){if(!MEMF.ts||!TUNE.gpuStr)return;const t0=performance.now();try{MEMF_sweep()}catch(e){}{const inS=o=>{while(o.parent)o=o.parent;return o===scene};MEMF.S=MEMF.S.filter(e=>inS(e.m))}   // not the meshes of a city just left
+  const x=RO.x,z=RO.z,cf=camera.far,L=[];for(const e of MEMF.S){const d=Math.hypot(e.x-x,e.z-z)-e.r,ro=Math.min(e.ro,cf+50);
+    if(d>ro&&e.on){e.on=false;e.m.layers.disableAll();e.m.geometry.dispose();MEMF.st.dn++}if(!e.on&&!e.cz&&!e.zb&&!e.zfail&&d>ro+150){e.zr=ro;L.push(e)}}
+  const P=[];let t=performance.now();MEMF.cur=1;
+  try{for(const e of L){if(MEMF.cend&&performance.now()>MEMF.cend)break;while(MEMF.zbusy>=MEMF.czN||performance.now()-t>8){await nextFrame();t=performance.now()}
+      if(e.on||e.cz||e.zb)continue;P.push(MEMF_zip(e).then(()=>{if(e.cz)MEMF.zst.cur++}))}
+    await Promise.race([Promise.all(P),new Promise(r=>{const w=()=>MEMF.cend&&performance.now()>MEMF.cend?r():setTimeout(w,20);w()})])}
+  finally{MEMF.cur=0;MEMF.cms0=Math.round(performance.now()-t0)}}
