@@ -2054,7 +2054,7 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 {const st=document.createElement('style');st.textContent=`
 #stsel .mapbox{display:block!important;flex:1 1 0;min-height:0;position:relative;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:10px;background:#05030c;touch-action:pan-x pan-y;scrollbar-width:thin}
 #stsel .mp{position:relative;overflow:hidden}
-#stDet .arc{display:flex;gap:6px;margin:4px 0}#stDet .arc button{flex:1;min-height:40px;border:1px solid #5a4a7a;background:#120a24;color:#cfc3e8;border-radius:8px;font:700 13px/1.1 inherit;letter-spacing:.06em}#stDet .arc button small{display:block;font-size:10px;font-weight:600;opacity:.8}#stDet .arc button.on{background:#ff3fa4;border-color:#ff9bd2;color:#fff}
+#stDet .arc{display:flex;gap:6px;margin:4px 0}#stDet .arc button{flex:1;min-height:40px;border:1px solid #5a4a7a;background:#120a24;color:#cfc3e8;border-radius:8px;font:700 13px/1.1 inherit;letter-spacing:.06em}#stDet .arc button small{display:block;font-size:10px;font-weight:600;opacity:.8}#stDet .arc button.on{background:#c4106a;border-color:#ff9bd2;color:#fff}#stDet .arc button.on small{opacity:1}
 #stsel .band{position:absolute;background-size:cover;background-position:center;opacity:1;border-top:2px solid var(--c);border-image:none}
 #stsel .band::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 40px #05030c}
 #stsel .ban{position:absolute;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 18px;text-align:center;white-space:nowrap;color:var(--ink);
@@ -2095,7 +2095,7 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 #stsel .nd[data-nd=locked] .nm{color:var(--dim)}
 #stsel .nd.shake{animation:pgsh .3s}
 #stDet{position:absolute;z-index:6;left:50%;bottom:calc(var(--u)*2);transform:translateX(-50%);width:min(94%,520px);box-sizing:border-box;display:flex;flex-direction:column;gap:5px;padding:2px 4px;
-  border:16px solid transparent;border-image:url(media/ui-panel.webp) 70 fill/16px stretch;background:#05030ce8;color:var(--ink);font-family:var(--display)}
+  border:16px solid transparent;border-image:url(media/ui-panel.webp) 70 fill/16px stretch;background:#05030cfa;color:var(--ink);font-family:var(--display)}
 #stDet[hidden]{display:none}
 #stDet .dh{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em}
 #stDet .ac{color:var(--c);font-weight:700;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -5186,10 +5186,11 @@ const LEAK=window.LEAK={
   /* ---- HUD: a thin BREACH meter in the stat strip, red as it fills ---- */
   draw(c,x,y3,k,right){if(!this.on()||!running||G.lab||G.tut||ST.over)return;const f=Math.min(1,this.M/this.cap()),t=c.getTransform(),u=Math.hypot(t.a,t.b)*(c.canvas.getBoundingClientRect().width/c.canvas.width||1),
       fs=Math.max(14*k,14.5/Math.max(.05,u)),q=fs/14;c.save();                       // text is at least 14 css px on a phone
-    c.globalAlpha=this.M>0||this.txtT>0?1:.5;c.font=`700 ${fs.toFixed(1)}px "Share Tech Mono",monospace`;c.textAlign='left';
-    const hot=f>=.75,col=hot?'#ff3040':f>=.5?'#ffb020':'#9aa7c4',lab=this.txtT>0?this.txt:'BREACH';c.fillStyle=this.txtT>0?'#ff6a7a':col;
+    c.font=`700 ${fs.toFixed(1)}px "Share Tech Mono",monospace`;c.textAlign='left';
+    const hot=f>=.75,col=hot?'#ff5060':f>=.5?'#ffb020':'#c4cde6',lab=this.txtT>0?this.txt:'BREACH';c.fillStyle=this.txtT>0?'#ff6a7a':col;
     const w0=c.measureText(lab).width+8*q,bw=this.txtT>0?0:64*q,bh=5*q;
-    if(right)x-=w0+bw;c.fillText(lab,x,y3+4*q);
+    if(right)x-=w0+bw;c.fillStyle='#05030ccc';c.fillRect(x-4*q,y3-fs*.5-1*q,w0+bw+6*q,fs+4*q);   // dark backing: the label sits over bright art
+    c.fillStyle=this.txtT>0?'#ff6a7a':col;c.fillText(lab,x,y3+4*q);
     if(this.txtT<=0){c.fillStyle='#ffffff22';c.fillRect(x+w0,y3-bh/2+1*q,bw,bh);c.fillStyle=col;c.fillRect(x+w0,y3-bh/2+1*q,bw*f,bh);
       c.fillStyle='#ffffff66';c.fillRect(x+w0+bw*this.free/this.cap(),y3-bh/2-1*q,1.5*q,bh+2*q);                         // the tick marks where the free warning ends
       if(hot&&!SET.reduce&&Math.floor(G.t*6)%2){c.strokeStyle='#ff3040';c.lineWidth=1.5*q;c.strokeRect(x+w0-1,y3-bh/2,bw+2,bh+2*q);}}
@@ -10798,7 +10799,8 @@ if(RET.title)setTimeout(()=>{
 #ttMain{width:100%;max-width:min(94%,440px);display:flex;flex-direction:column;gap:10px}
 #ttMain .row{flex-wrap:nowrap;gap:10px}#ttMain .row .go{flex:1 1 0;min-width:0;padding-left:calc(2.1em + .12em)!important;padding-right:2.1em!important;white-space:nowrap}#ttMain #playBtn{padding-left:1.9em!important;padding-right:1.9em!important}#retTt{text-align:left!important;margin:.8em 0 0!important}
 #playBtn{width:100%;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:clamp(20px,min(5.4vw,3.8vh),28px)}
-#playBtn small,#dailyBtn small{display:block;font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.02em;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#playBtn small,#dailyBtn small{display:block;font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.02em;line-height:1.15;max-width:100%;overflow:hidden;white-space:normal;text-align:center}   /* a long stage line wraps instead of ending in "..." */
+#retTt{background:#05030ce6;color:#d6d2f5;border-radius:8px;padding:.3em .55em}   /* dark backing: the streak line sits over the title art */
 #dailyBtn small{font-size:14px}
 #mnMore{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 5%;overflow-y:auto;background:#05030c}
 #mnMore[hidden]{display:none}
@@ -10962,7 +10964,7 @@ if(RET.fs){(()=>{
     cardEl.innerHTML='<div style="font:700 17px/1.2 system-ui,sans-serif;margin-bottom:6px">PLAY FULL SCREEN</div>'+
       '<div>Safari and Chrome on iPhone cannot hide their bars. Install the game and it opens full screen:</div>'+
       '<ol style="margin:8px 0 10px 20px;padding:0"><li>Tap <b>Share</b> (the square with the arrow, bottom or top bar)</li><li>Tap <b>Add to Home Screen</b></li><li>Open <b>Nightrun</b> from your home screen</li></ol>'+
-      '<div style="display:flex;gap:10px"><button type="button" id="fsOk" style="flex:1;min-height:48px;border:0;border-radius:10px;background:#ff2d78;color:#fff;font:700 15px system-ui">GOT IT</button><button type="button" id="fsNo" style="flex:1;min-height:48px;border:1px solid #6a5a8a;border-radius:10px;background:#0000;color:#cfc9f2;font:600 15px system-ui">DON\'T SHOW AGAIN</button></div>';
+      '<div style="display:flex;gap:10px"><button type="button" id="fsOk" style="flex:1;min-height:48px;border:0;border-radius:10px;background:#c8175c;color:#fff;font:700 15px system-ui">GOT IT</button><button type="button" id="fsNo" style="flex:1;min-height:48px;border:1px solid #6a5a8a;border-radius:10px;background:#0000;color:#cfc9f2;font:600 15px system-ui">DON\'T SHOW AGAIN</button></div>';
     document.body.appendChild(cardEl);cardEl.querySelector('#fsOk').addEventListener('click',()=>closeCard(false));cardEl.querySelector('#fsNo').addEventListener('click',()=>closeCard(true));};
   FSX.ios=ios;
   if(ios&&!standalone)setTimeout(()=>{try{const t=document.getElementById('title');if(t&&!t.hidden&&typeof running!=='undefined'&&!running)FSX.card(false);}catch(e){}},2500);
@@ -11146,7 +11148,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   let ny=sH+6*k;
   const short=h*Math.max(.2,frame.clientWidth/w)<800;   // short phone (390x763 and below): the secondary HUD collapses to hull / score / meters + one thin boss bar, and the hint moves to the bottom band
   if(G.boss&&G.boss.x<W){const b=G.boss,bw=Math.min(330,w-120),by=short?ny+2*k:ny+12*k,bh=(short?5:6)*k;ctx.fillStyle='#00000088';ctx.fillRect((w-bw)/2,by,bw,bh);ctx.fillStyle='#ff3040';ctx.fillRect((w-bw)/2,by,bw*clamp(b.hp/b.max,0,1),bh);if(b.b2s&&window.B2X)B2X.sheen((w-bw)/2,by,bw*clamp(b.hp/b.max,0,1),bh);
-    if(short)ny+=9*k;else{ctx.textAlign='center';ctx.font=`700 ${11*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),w/2,ny+9*k);ny+=21*k;}}
+    if(short)ny+=21*k;else{ctx.textAlign='center';ctx.font=`700 ${11*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(b.nm+(b.ph>1?'  ·  PHASE '+b.ph:''),w/2,ny+9*k);ny+=31*k;}}
   {let cx=pad;const cy=ny+12*k;ctx.save();
     if(SH.sh>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iShield,'#19e3ff','×'+SH.sh);
     if(TP.revLeft>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iRev,'#ff2d95','×'+TP.revLeft);
@@ -11201,7 +11203,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   PW.draw(t);
   if(window.ABIL)ABIL.draw(t);if(window.CTR)CTR.draw();if(window.TIM&&TIM.draw)TIM.draw();
   for(const r of G.rings){const k=1-r.l/r.m;ctx.strokeStyle=r.c;ctx.globalAlpha=1-k;ctx.lineWidth=3*(1-k)+1;ctx.beginPath();ctx.arc(r.x,r.y,18+k*52,0,7);ctx.stroke();ctx.globalAlpha=1;}
-  ctx.textAlign='center';ctx.font='700 13px "Chakra Petch",sans-serif';for(const f of G.fl){ctx.globalAlpha=Math.min(1,f.l*2);ctx.fillStyle=f.c;wtxt(f.txt,f.x,f.y);}ctx.globalAlpha=1;
+  ctx.textAlign='center';{const tf=ctx.getTransform(),u=Math.hypot(tf.a,tf.b)*(ctx.canvas.getBoundingClientRect().width/ctx.canvas.width||1);ctx.font=`700 ${Math.max(13,11.5/Math.max(.05,u)).toFixed(1)}px "Chakra Petch",sans-serif`;}for(const f of G.fl){ctx.globalAlpha=Math.min(1,f.l*2);ctx.fillStyle=f.c;wtxt(f.txt,f.x,f.y);}ctx.globalAlpha=1;
   if(PT)SH.ring(ctx,t);
   ctx.restore();
   if(G.empT>0&&ART.wave(P.x,P.y,(0.6-G.empT)*1400,G.empT*2.2)){}

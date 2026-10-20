@@ -89,7 +89,7 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 {const st=document.createElement('style');st.textContent=`
 #stsel .mapbox{display:block!important;flex:1 1 0;min-height:0;position:relative;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:10px;background:#05030c;touch-action:pan-x pan-y;scrollbar-width:thin}
 #stsel .mp{position:relative;overflow:hidden}
-#stDet .arc{display:flex;gap:6px;margin:4px 0}#stDet .arc button{flex:1;min-height:40px;border:1px solid #5a4a7a;background:#120a24;color:#cfc3e8;border-radius:8px;font:700 13px/1.1 inherit;letter-spacing:.06em}#stDet .arc button small{display:block;font-size:10px;font-weight:600;opacity:.8}#stDet .arc button.on{background:#ff3fa4;border-color:#ff9bd2;color:#fff}
+#stDet .arc{display:flex;gap:6px;margin:4px 0}#stDet .arc button{flex:1;min-height:40px;border:1px solid #5a4a7a;background:#120a24;color:#cfc3e8;border-radius:8px;font:700 13px/1.1 inherit;letter-spacing:.06em}#stDet .arc button small{display:block;font-size:10px;font-weight:600;opacity:.8}#stDet .arc button.on{background:#c4106a;border-color:#ff9bd2;color:#fff}#stDet .arc button.on small{opacity:1}
 #stsel .band{position:absolute;background-size:cover;background-position:center;opacity:1;border-top:2px solid var(--c);border-image:none}
 #stsel .band::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 40px #05030c}
 #stsel .ban{position:absolute;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 18px;text-align:center;white-space:nowrap;color:var(--ink);
@@ -130,7 +130,7 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 #stsel .nd[data-nd=locked] .nm{color:var(--dim)}
 #stsel .nd.shake{animation:pgsh .3s}
 #stDet{position:absolute;z-index:6;left:50%;bottom:calc(var(--u)*2);transform:translateX(-50%);width:min(94%,520px);box-sizing:border-box;display:flex;flex-direction:column;gap:5px;padding:2px 4px;
-  border:16px solid transparent;border-image:url(media/ui-panel.webp) 70 fill/16px stretch;background:#05030ce8;color:var(--ink);font-family:var(--display)}
+  border:16px solid transparent;border-image:url(media/ui-panel.webp) 70 fill/16px stretch;background:#05030cfa;color:var(--ink);font-family:var(--display)}
 #stDet[hidden]{display:none}
 #stDet .dh{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em}
 #stDet .ac{color:var(--c);font-weight:700;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
