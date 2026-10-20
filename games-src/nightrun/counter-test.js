@@ -37,7 +37,7 @@ const SCN = () => {
   const shooter = () => { const e = { type: 'drone', x: 820, y: 270, r: 14, hp: 9999, max: 9999, hq: 9999, flash: 0, t: 0, bf: 99, bn: 0, gr: 0, tin: 0, score: 0, vx: 0, vy: 0, dummy: 1 }; m.G.en.push(e); return e; };
   const pin = (e, x, y) => () => { e.x = x; e.y = y; e.hp = 9999; e.bf = 99; };
   const S = () => JSON.parse(JSON.stringify(C.stat));
-  const threat = (k, mode, sec, every) => { set(false, k === 'seek' ? 'hard' : 'normal'); let e = null; if (k === 'seek') e = shooter(); const pe = e && pin(e, 820, 270), s0 = S();
+  const threat = (k, mode, sec, every) => { set(false, 'hard'); let e = null; if (k === 'seek') e = shooter(); const pe = e && pin(e, 820, 270), s0 = S();
     const pump = i => { pe && pe(); if (i % (every * 60) === 30) { if (k === 'curt') m.P.emp = 1; C.start(k); } };
     const r = run(sec, mode, pump), s1 = C.stat, d = {}; for (const x in s1) d[x] = s1[x] - s0[x]; r.d = d; m.abort(); return r; };
   for (const k of ['seek', 'wall', 'curt']) out[k] = { without: threat(k, 'without', 24, k === 'seek' ? 3 : 4), with: threat(k, 'with', 24, k === 'seek' ? 3 : 4) };
@@ -58,8 +58,8 @@ const SCN = () => {
   // vent: dash out of an overheat
   { set(true); m.P.heat = 100; m.P.over = true; m.press('Dash'); m.step(1 / 60); out.vent = !m.P.over; m.abort(); }
   // c: timed vs random on a mixed sequence (same press budget)
-  const mixed = (mode, rd, re) => { set(false); const e = shooter(), pe = pin(e, 820, 270); const ks = ['seek', 'wall', 'curt', 'seek', 'wall', 'curt', 'seek', 'wall', 'curt', 'seek', 'wall', 'curt', 'seek'];
-    const pump = i => { pe(); if (i % 240 === 30) { const k = ks[(i / 240) | 0]; if (k) { if (k === 'curt') m.P.emp = 1; C.start(k); } } }; pump.rd = rd; pump.re = re; const r = run(52, mode, pump); m.abort(); return r; };
+  const mixed = (mode, rd, re) => { set(false, 'hard'); const e = shooter(), pe = pin(e, 820, 270); const ks = ['seek', 'wall', 'curt', 'seek', 'wall', 'curt', 'seek', 'wall', 'curt', 'seek', 'wall', 'curt', 'seek'];
+    const pump = i => { pe(); if (i % 240 === 30) { const k = ks[(i / 240) | 0]; if (k) { if (k === 'curt') m.P.emp = 1; C.start(k); } } }; pump.rd = rd; pump.re = re; const r = run(52, mode, pump); m.abort(); return r; };  // threats on Hard: below Hard walls and curtains leave a gap
   const tm = mixed('with'), t2 = mixed('with'); tm.lost = (tm.lost + t2.lost) / 2; const rd = tm.presses.d / (52 * 60), re = Math.max(.002, tm.presses.e / (52 * 60) * 3);
   let rs = [0, 0]; for (let k = 0; k < 3; k++) { seed = 11 + k * 97; const r = mixed('rand', rd, re); rs[0] += r.lost; rs[1] += r.presses.d; }
   out.mix = { timed: tm.lost, tpress: tm.presses, rand: +(rs[0] / 3).toFixed(1), rpress: Math.round(rs[1] / 3) };
@@ -77,7 +77,7 @@ const OFF = () => { const m = window.__mnr, C = window.CTR; m.SET.diff = 'normal
   { const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { if (errs++ < 3) console.log('PAGE ERROR', e.message); });
     await p.goto(U('')); await READY(p); const o = await p.evaluate(SCN);
     const cmp = (k, label) => { const a = o[k].without, b = o[k].with; line(a.lost >= b.lost + 2 && a.lost >= 2 * Math.max(1, b.lost), `${label}: hull lost without ${a.lost}, with the timed answer ${b.lost} (${JSON.stringify(b.d)} / ${JSON.stringify(a.d)})`); };
-    cmp('seek', 'SEEKER on Hard (parry dash; Normal turns slower and can be outrun)'); cmp('wall', 'LASER WALL (dash through)'); cmp('curt', 'CURTAIN (EMP)');
+    cmp('seek', 'SEEKER (parry dash)'); cmp('wall', 'LASER WALL (dash through)'); { const a = o.curt.without, b = o.curt.with; line(a.d.curtHit >= b.d.curtHit + 3, `CURTAIN (EMP): curtain hits without ${a.d.curtHit}, with the timed EMP ${b.d.curtHit} (hull lost ${a.lost} vs ${b.lost}; the rest is Hard's anti-camping)`); }
     line(o.ward.without.t >= 2 * o.ward.with.t && o.ward.with.strip > 0, `WARDEN (EMP strip): time to kill ${o.ward.without.t} s without EMP, ${o.ward.with.t} s with (${o.ward.with.strip} strips)`);
     line(o.combo.pair.combo === 1 && o.combo.pair.dmg >= o.combo.emp.dmg + 30, `COMBO dash->EMP: damage ${o.combo.pair.dmg} vs EMP alone ${o.combo.emp.dmg}`);
     line(o.timing.waste === 1 && o.timing.good === 1 && o.timing.hot, `EMP timing: empty screen = wasted (${o.timing.waste}), curtain = good (${o.timing.good}), button pulse ${o.timing.hot}`);

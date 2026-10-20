@@ -236,8 +236,8 @@ every weapon (the weapon did not matter: enemies hardly threaten a ship that kee
 - One threat every EV bars (Easy 10, Normal 9, Hard 6, Very hard 5, Legend 4), in turn from the unlocked ones; never with a boss, pit stop, lab or tutorial.
   Unlock by story stage: seeker 3, wall 5 (not Easy), curtain 7 (not Easy), warden 9. Endless uses S2.stg().
 - Seeker: .7 s red-ring tell, 300 px/s (Easy 240), turns 9 rad/s on the hard tiers (Normal 6 = can be outrun, Easy 4) for 4 s; 1 hull (2 on hard tiers); parry window .15 s (+1 frame); parry shot 15 dmg (player shot, DMG caps).
-- Laser wall: 1.3 s tell, 420 px/s, 1 hull once; 110 px gap when there is no dash charge. Curtain: .9 s tell, 2 layers, 96 px gaps >= 270 px apart, .45 s apart (.9 s with no dash and no EMP), 230 px/s.
+- Laser wall: 1.3 s tell, 420 px/s, 1 hull once; 110 px gap below Hard or when there is no dash charge. Curtain: .9 s tell, 2 layers, 96 px gaps >= 270 px apart, .45 s apart (.9 s below Hard or with no dash and no EMP), 230 px/s.
 - Warden: 60 hull x (Easy .8, Normal 1, Hard 1.3, Very hard 1.5, Legend 1.7); shield takes 70% of each hit; EMP strips it for 8 s; stays up to 20 s.
 - GOOD EMP (>= 6 bullets, a curtain, or a shielded warden): +400 x mult, +.25 meter. COMBO = EMP <= 1 s after a dash start: +12 to ordinary foes within 300 px.
-- counter-test (dodging bot without vs with the timed answer, hull lost): seeker (Hard) 5 vs 0, wall 5 vs 0, curtain 3 vs 1; warden kill 3.5 s vs 1.2 s; combo 110 vs 50 damage; random presses 5.7 vs timed 2.5.
+- counter-test (threat scenarios on Hard; dodging bot without vs with the timed answer, hull lost): seeker (Hard) 5 vs 0, wall 5 vs 0, curtain 3 vs 1; warden kill 3.5 s vs 1.2 s; combo 110 vs 50 damage; random presses 5.7 vs timed 2.5.
 - balance-test Normal stage 20 (RUNS=6): first tuning (EV 7, turn 9) 67%/67% vs 100%/100% flag off; now late 83%, mid 100%.

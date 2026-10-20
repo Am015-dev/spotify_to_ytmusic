@@ -8704,8 +8704,8 @@ NR.on('runStart',()=>{if(ABIL.on)setTimeout(()=>{if(running&&G&&!G.dead)ABIL.tip
      SEEKER   (story stage 3+)  a shooter glows a red ring for .7 s, then fires a marked homing shot (red ring; 300 px/s, turns 9 rad/s for 4 s, 2 hull on the hard tiers). Dash in the last .15 s before it hits = PARRY:
                                 it flies back as a big player shot, refunds a charge and adds meter. Too early wastes the charge (it keeps homing), too late is a hit.
      WALL     (5+, not Easy)    a full-height laser line, 1.3 s warning on the right edge, then it sweeps left: only a dash (i-frames) crosses it.
-                                With no dash charge when it starts it gets a 110 px gap, so it is never unanswerable.
-     CURTAIN  (7+, not Easy)    .9 s tell (gap chevrons), then two dotted walls drawn as bullets (one hazard each, not eb(), so ebCap stays free) .45 s apart, gaps 96 px and >= 270 px apart (too far to slide between even at touch speed; .9 s apart when you have no dash and no EMP): dash a layer or spend the EMP.
+                                With no dash charge when it starts, or below Hard, it gets a 110 px gap (Normal: dash or find the gap).
+     CURTAIN  (7+, not Easy)    .9 s tell (gap chevrons), then two dotted walls drawn as bullets (one hazard each, not eb(), so ebCap stays free) .45 s apart, gaps 96 px and >= 270 px apart (too far to slide between even at touch speed; .9 s apart below Hard or with no dash and no EMP): dash a layer or spend the EMP.
      WARDEN   (9+)              an armoured gunner whose shield takes 70% of every hit; only an EMP strips it, for 8 s, then it comes back.
    EMP timing: 6+ enemy bullets or a shielded warden on screen = GOOD EMP (score + a quarter of the meter back); on a near-empty screen it pays nothing extra.
      The EMP button pulses (class abHot) while it would be worth it. DASH then EMP inside 1 s = COMBO blast (12 more to every ordinary foe within 300 px).
@@ -8729,7 +8729,7 @@ const CTR=window.CTR={get on(){return!!RET.counter;},
     eb(x,y,Math.atan2(P.y-y,P.x-x),SET.diff==='easy'?240:300,this.red(),7);if(G.eb.length>k){const b=G.eb[k];b.cxM=1;b.cxH=4;b.dmg=HARDS.includes(SET.diff)?2:1;}},
   wall(){this.walls.push({x:W-30,warn:1.3,v:420,gap:null,hit:0,dash:0});this.stat.wall++;this.tip('Laser wall: DASH through it');},
   curt(){const m=60,g1=m+Math.random()*(H-2*m);const g2=g1<H/2?clamp(g1+270+Math.random()*60,m,H-m):clamp(g1-270-Math.random()*60,m,H-m);
-    const d=this.charges()<1&&P.emp<1?.9:.45;this.curts.push({t:.9+d,g:[g1,g2],T0:.9});[g1,g2].forEach((gy,i)=>this.walls.push({x:W+8,warn:.9+d*i,v:230,gap:{y:gy,h:96},cur:1,hit:0,dash:0}));this.stat.curt++;this.tip('Bullet curtain: EMP clears it');},
+    const d=this.charges()<1&&P.emp<1||!HARDS.includes(SET.diff)?.9:.45;this.curts.push({t:.9+d,g:[g1,g2],T0:.9});[g1,g2].forEach((gy,i)=>this.walls.push({x:W+8,warn:.9+d*i,v:230,gap:{y:gy,h:96},cur:1,hit:0,dash:0}));this.stat.curt++;this.tip('Bullet curtain: EMP clears it');},
   ward(){const e=en('turret',{x:W+30,y:90+Math.random()*(H-180),stop:W-220});if(!e)return;const hp=Math.round(60*(this.WK[SET.diff]||1));
     e.hp=e.max=e.hq=hp;e.ctw=1;e.wsh=1;e.wshT=0;e._ph=hp;e.age=0;e.score=Math.max(e.score||0,800);this.stat.ward++;this.tip('Shielded: EMP strips the shield');},
   tip(t){try{const o=load('mnr_ctrtip',{})||{};if(o[t]||G.tut||G.lab||document.webdriver||navigator.webdriver)return;o[t]=1;save('mnr_ctrtip',o);hintShow(t,4);}catch(e){}},
@@ -8760,7 +8760,7 @@ const CTR=window.CTR={get on(){return!!RET.counter;},
     const hk=this.HK[SET.diff]||3;
     for(const b of G.eb){if(!b.cxM||!(b.cxH>0))continue;b.cxH-=dt;const sp=Math.hypot(b.vx,b.vy),cur=Math.atan2(b.vy,b.vx);let w=Math.atan2(P.y-b.y,P.x-b.x)-cur;w=Math.atan2(Math.sin(w),Math.cos(w));
       const a=cur+clamp(w,-hk*dt,hk*dt);b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;}
-    for(const w of this.walls){if(w.warn>0){w.warn-=dt;if(w.warn<=0&&!w.cur&&this.charges()<1)w.gap={y:clamp(P.y+(Math.random()-.5)*160,70,H-70),h:110};continue;}
+    for(const w of this.walls){if(w.warn>0){w.warn-=dt;if(w.warn<=0&&!w.cur&&(this.charges()<1||!HARDS.includes(SET.diff)))w.gap={y:clamp(P.y+(Math.random()-.5)*160,70,H-70),h:110};continue;}
       const x0=w.x;w.x-=w.v*dt;if(w.hit||w.done)continue;
       if(P.x>=w.x-14&&P.x<=x0+14){const inGap=w.gap&&Math.abs(P.y-w.gap.y)<w.gap.h/2-8;
         if(P.dashT>0||inGap){if(P.dashT>0&&!w.dash){w.dash=1;this.stat[w.cur?'curtDash':'wallDash']++;G.score+=Math.round(200*G.mult);floater(P.x,P.y-30,'THROUGH','#19e3ff');}}
