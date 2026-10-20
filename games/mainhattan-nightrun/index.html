@@ -7926,24 +7926,42 @@ window.__s2={S2,CAMP,B2};
    screen stays free, so a moving ship is never hit. Strikes repeat while the ship stays in the column zone and hit harder from the second one on.
    Homing on Normal and Easy also gets the narrower cone and shorter reach of the hard tiers: a missile needs the ship to point at its target. */
 if(RET.mustmove===undefined)RET.mustmove=!/[?&]mustmove=0/.test(location.search);
-const MM=window.MM={get on(){return!!RET.mustmove;},COL:24,buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0,
-  win(){return{easy:5,normal:3.5,hard:3.2,vhard:3,legend:2.8}[SET.diff]||4;},
+/* D2. readable + graded strike (flag RET.strike2, ?strike2=0 = D as above; BALANCE.md "Strike 2"). Owner/review, 20 Oct 2026: the strike was the one wall (a bot that did not read it failed 40 of 45
+   Normal stages). Now: a faint dotted line shows at 65% of the still-timer (the first one of a stage also hints MOVE, once per profile); the lock-on pulses on the beat for 3 beats (hard tiers 2) and
+   the strike lands on a beat. Normal stages <= 8: the first strike of a stage only scorches (-250 score). Damage: Easy 1; Normal 1, 2 from the third in a row; Hard/Very hard 2 from the second (a camper must still die); Legend 3 from the
+   third. A repeat strike needs half the still-time and follows after .9 s. The timer is x range < 70 px for win() s (Normal 5 s in stages 3-5, then 3.5 s); it pauses while a pickup is within 70 px (collecting). */
+if(RET.strike2===undefined)RET.strike2=!/[?&]strike2=0/.test(location.search);
+const MM=window.MM={get on(){return!!RET.mustmove;},COL:24,buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0,sn:0,stk:null,still:0,anc:null,pre:null,scorch:[],
+  s2(){return!!RET.strike2;},
+  win(){const w={easy:5,normal:3.5,hard:3.2,vhard:3,legend:2.8}[SET.diff]||4;return this.s2()&&SET.diff==='normal'&&ST.on&&ST.n<=5?5:w;},
+  rate(){for(const k of G.pk)if(Math.hypot(k.x-P.x,k.y-P.y)<70)return 0;return 1;},   // a ship that is collecting is not camping (a foe lined up ahead does NOT slow it: the tracker bot does exactly that)
+  dmg(){const d=SET.diff;if(!this.s2())return this.n>=2&&d!=='easy'?2:1;if(d==='normal'&&ST.on&&ST.n<=8&&this.sn===1)return 0;if(d==='easy')return 1;if(d==='normal')return this.n>=3?2:1;return d==='legend'&&this.n>=3?3:this.n>=2?2:1;},
   tel(){return{easy:1.1,normal:.95,hard:.8,vhard:.75,legend:.7}[SET.diff]||.95;},
   live(){return this.on&&G.live&&!G.dead&&G.transT<0&&!G.lab&&!G.tut&&!SH.active&&!ST.over&&!G.over&&!godMode&&(ST.on?ST.n>=3:G.t>20);},
-  cost(x){const c=this.col;return c&&Math.abs(x-c.x)<this.COL+30?(c.fire>0||c.t<.4?6000:1500):0;}};   // for test bots: the lane as a player sees it
-NR.on('runStart',()=>{Object.assign(MM,{buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0});});
-NR.on('tick',dt=>{if(!MM.live()){MM.col=null;MM.buf=[];MM.n=0;return;}
-  MM.acc+=dt;const k=Math.round(MM.win()*10);if(MM.acc>=.1){MM.acc=0;MM.buf.push(P.x);if(MM.buf.length>k)MM.buf.splice(0,MM.buf.length-k);}
+  cost(x){const c=this.col;return c&&Math.abs(x-c.x)<(c.w||this.COL)+30?(c.fire>0||c.t<.4?6000:1500):0;}};   // for test bots: the lane as a player sees it
+NR.on('runStart',()=>{Object.assign(MM,{buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0,sn:0,stk:null,still:0,anc:null,pre:null,scorch:[]});});
+NR.on('tick',dt=>{if(!MM.live()){MM.col=null;MM.buf=[];MM.n=0;MM.still=0;MM.anc=null;MM.pre=null;return;}
+  const s2=MM.s2();if(s2){const key=ST.on?ST.n:0;if(MM.stk!==key){MM.stk=key;MM.sn=0;MM.still=0;MM.anc=null;MM.scorch=[];}
+    for(const q of MM.scorch)q.t-=dt;MM.scorch=MM.scorch.filter(q=>q.t>0);
+}
+  MM.acc+=dt;const k=Math.round(MM.win()*10);if(MM.acc>=.1){MM.acc=0;if(!s2||MM.rate())MM.buf.push(P.x);if(MM.buf.length>k)MM.buf.splice(0,MM.buf.length-k);}
   let lo=1e9,hi=-1e9;for(const x of MM.buf){if(x<lo)lo=x;if(x>hi)hi=x;}if(hi-lo>140)MM.n=0;   // a real move resets the escalation
+  MM.pre=s2&&!MM.col&&MM.cd<=0&&MM.buf.length>=.65*k&&hi-lo<70?P.x:null;
+  if(MM.pre!==null&&MM.sn===0&&!MM.hinted){MM.hinted=1;let seen=0;try{seen=localStorage.getItem('mnr_mmhint');if(!seen)localStorage.setItem('mnr_mmhint','1');}catch(e){}if(!seen)hintShow('MOVE! Standing still draws a strike',3.5,'#ff7080');}
   const c=MM.col;if(c){c.t-=dt;if(c.t<=0&&!c.fire&&!c.done){c.fire=.25;AU.sfx('big');shake(4);}
-    if(c.fire>0){c.fire-=dt;if(!c.hit&&Math.abs(P.x-c.x)<MM.COL){c.hit=1;MM.hits++;hurt(c.dmg);}if(c.fire<=0){c.done=1;MM.col=null;MM.cd=SET.diff==='easy'?2.4:1.6;}}return;}
-  MM.cd-=dt;if(MM.cd>0||MM.buf.length<k||hi-lo>=70)return;
-  MM.n++;MM.strikes++;MM.col={x:P.x,t:MM.tel(),fire:0,hit:0,dmg:MM.n>=2&&SET.diff!=="easy"?2:1};AU.sfx('warn');
+    if(c.fire>0){c.fire-=dt;if(!c.hit&&Math.abs(P.x-c.x)<c.w){c.hit=1;MM.hits++;if(c.dmg>0)hurt(c.dmg);else{G.score=Math.max(0,G.score-250);MM.scorch.push({x:c.x,t:6});floater(P.x,P.y-30,'SCORCHED -250','#ff7080');shake(3);}}if(c.fire<=0){c.done=1;MM.col=null;MM.cd=SET.diff==='easy'?2.4:MM.s2()&&MM.n>=2?.9:1.6;}}return;}
+  MM.cd-=dt;if(MM.cd>0)return;const kk=s2&&MM.n>=2?Math.round(k*.5):k;if(MM.buf.length<kk||hi-lo>=70)return;
+  MM.n++;MM.strikes++;MM.sn++;let tl=MM.tel();
+  if(s2){const bp=bpos(),nb=SET.diff==='hard'||SET.diff==='vhard'||SET.diff==='legend'?2:3;if(isFinite(bp)){tl=(Math.ceil(bp)+nb-bp)*BT.spb;while(tl<.6)tl+=BT.spb;tl=Math.min(tl,2);}MM.buf=[];}   // lands on a beat
+  MM.col={x:P.x,t:tl,tl,fire:0,hit:0,dmg:MM.dmg(),w:s2?MM.COL*(1+.5*Math.min(3,Math.max(0,MM.n-1))):MM.COL};AU.sfx('warn');
   if(MM.strikes===1)floater(P.x,P.y-44,'SIDESTEP!','#ff6a7a');});
-{const dp=drawPickups;drawPickups=function(t){dp(t);const c=MM.col;if(!c||G.dead)return;const w=MM.COL;
+{const dp=drawPickups;drawPickups=function(t){dp(t);if(G.dead)return;const w0=MM.COL;
+  if(MM.scorch.length||MM.pre!==null){ctx.save();for(const q of MM.scorch){ctx.globalAlpha=Math.min(.5,q.t/6*.5);ctx.fillStyle='#401018';ctx.fillRect(q.x-w0*.5,0,w0,H);}
+    if(MM.pre!==null){ctx.globalAlpha=SET.reduce?.4:.25+.2*Math.sin(t*9);ctx.strokeStyle='#ff7080';ctx.lineWidth=1.5;ctx.setLineDash([3,12]);ctx.beginPath();ctx.moveTo(MM.pre,0);ctx.lineTo(MM.pre,H);ctx.stroke();ctx.setLineDash([]);}ctx.restore();}
+  const c=MM.col;if(!c)return;const w=c.w||MM.COL;
   ctx.save();ctx.globalCompositeOperation='lighter';
   if(c.fire>0){ctx.globalAlpha=.95;ctx.fillStyle='#ffffff';ctx.fillRect(c.x-w*.5,0,w,H);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}
-  else{const lock=c.t<.4,pulse=SET.reduce?1:Math.floor(t*(lock?18:8))%2?1:.6;ctx.globalAlpha=(lock?.9:.5)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);
+  else{const lock=c.t<(c.tl&&MM.s2()?BT.spb:.4),pulse=SET.reduce?1:MM.s2()&&c.tl?(bpos()%1<.5?1:.55):Math.floor(t*(lock?18:8))%2?1:.6;ctx.globalAlpha=(lock?.9:.5)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);
     for(const dx of[-w,w]){ctx.beginPath();ctx.moveTo(c.x+dx,0);ctx.lineTo(c.x+dx,H);ctx.stroke();}ctx.setLineDash([]);ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}
   ctx.restore();};}
 

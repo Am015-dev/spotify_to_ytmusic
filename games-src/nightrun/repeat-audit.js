@@ -78,7 +78,7 @@ const PLAY = (o) => {
     if (m.G.dead) break;
     if (!o.endless && m.ST.over) { cleared = true; break; }
   }
-  const G = m.G, r = { n, t: +G.t.toFixed(1), clear: cleared, dead: !!G.dead, hits: m.ST.hits, kills: G.kills, shots, plain: +plain.toFixed(1), bossT: +bossT.toFixed(1), ev };
+  const G = m.G, r = { n, t: +G.t.toFixed(1), clear: cleared, dead: !!G.dead, hits: m.ST.hits, kills: G.kills, mm: window.MM ? [window.MM.strikes, window.MM.hits] : null, shots, plain: +plain.toFixed(1), bossT: +bossT.toFixed(1), ev };
   m.NR.watch = null; m.abort(); m.god = false; return r;
 };
 
@@ -99,7 +99,7 @@ const FRAMESEQ = async (p, o, dir, tag) => {
   await new Promise(r => setTimeout(r, 800));
   const browser = await PW.chromium.launch(), t0 = Date.now(), errors = [];
   const newPage = async (vp) => { const ctx = await browser.newContext(vp || { viewport: { width: 960, height: 540 } }); const p = await ctx.newPage(); p.on('pageerror', e => errors.push(e.message.slice(0, 160)));
-    await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1`);
+    await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ""}`);
     await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 15000 }).catch(() => { }); return p; };
   // one session per config; configs run in parallel pages
   const raw = {}, queue = CONFIGS.slice();
@@ -114,7 +114,7 @@ const FRAMESEQ = async (p, o, dir, tag) => {
         if (!r.clear) { retries++; r = await p.evaluate(PLAY, { n, diff, classic: mode === 'classic', god: false, maxt: MAXT, T0: T }); r.retry = 1; runs.push(r); T += r.t;
           if (!r.clear) { r = await p.evaluate(PLAY, { n, diff, classic: mode === 'classic', god: true, maxt: MAXT, T0: T }); r.retry = 2; r.god = 1; runs.push(r); T += r.t; } }
       }
-      raw[c] = { runs, T, retries }; console.log(`${c}: ${(T / 60).toFixed(1)} game-min, ${runs.length} tries, ${retries} stages failed first try  (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
+      raw[c] = { runs, T, retries }; if (process.env.FAILS) console.log(runs.filter(r => !r.retry && !r.clear).map(r => `s${r.n}:${r.dead ? 'd' : 't'}${r.hits}h mm${r.mm}`).join(' ')); console.log(`${c}: ${(T / 60).toFixed(1)} game-min, ${runs.length} tries, ${retries} stages failed first try  (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
     }
   }));
   if (FRAMES) {
