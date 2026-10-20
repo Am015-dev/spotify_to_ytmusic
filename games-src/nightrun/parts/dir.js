@@ -26,7 +26,7 @@ const MINIS=[{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral
 const ROSTER=window.ROSTER={KINDS:['charger','flank','swarm','mine'],CAP:.33,P:.35,c:{key:'',total:0,drone:0},stat:{sub:0,drone:0,total:0},
   idx(){return ST.on?ST.n:20+G.di*3+(G.loop|0);},
   kinds(i){const K=this.KINDS,s=(i*3)%4;return[K[s],K[(s+2)%4]];},   // signature, second: the stages i-1 and i+1 have {s-1,s+1}
-  sub(type,o){if(!RET.roster||G.lab||G.tut||(o&&(o.mini||o.zt))||G.boss||(ST.on&&ST.n<=4))return type;   // stages 1-4 keep the hovering drones (zoo-test, onboarding)
+  sub(type,o){if(!RET.roster||G.lab||G.tut||(o&&(o.mini||o.zt))||G.boss||(ST.on&&ST.n<=(RET.density?2:4)))return type;   // stages 1-4 keep the hovering drones (zoo-test, onboarding)
     const key=ST.on?'s'+ST.n:'e'+G.di+'_'+G.loop,c=this.c;if(c.key!==key){c.key=key;c.total=0;c.drone=0;}
     let out=type;
     if(type==='drone'){const over=(c.drone+1)/(c.total+1)>this.CAP&&c.total>=3;
@@ -61,6 +61,7 @@ const DIR={
     const nb=this.nonBoss();if(nb===0&&!G.boss&&!G.bossDone&&(ST.on||G.dbar<this.bossBar-.5)){this.emptyB++;this.log.emptyRun=this.emptyB/4;this.log.maxEmptyBars=Math.max(this.log.maxEmptyBars,this.log.emptyRun);}else{this.emptyB=0;this.log.emptyRun=0;}
     if(G.boss&&!G.boss.mini)return;
     if(G.bossDone||SH.active)return;
+    if(window.DENS)DENS.beat();                                // density.js: slow curtains when the screen holds fewer bullets than the stage's budget
     const bb=((i%4)+4)%4;
     if(!ST.on&&G.dbar>=this.bossBar)return;                // the boss is about to come: no new waves
     if(ST.on&&ST.spawned)return;

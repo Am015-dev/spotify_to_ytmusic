@@ -41,7 +41,7 @@ BMV.idOf=e=>{if(e.mini)return BM_MINI[G.di]||null;return BM_DIST[e.k]||null;};
 BMV.norm=x=>Array.isArray(x)?{v:x[0],p:x[1]||{}}:{v:x,p:{}};
 /* lazily on the boss's first beat (armour.js and fair.js have set the hull and the phase lists by then) */
 BMV.init=e=>{e.bm=null;if(!BMV.on)return;const id=BMV.idOf(e),T=id&&BMT[id];if(!T)return;
-  const L=T.ph.map(l=>l.map(BMV.norm));e.bm={id,T,P:{}};for(const l of L)for(const o of l)e.bm.P[o.v]=o.p;e.lists=L.map(l=>l.map(o=>o.v));
+  const L=T.ph.map(l=>l.map(BMV.norm));e.bm={id,T,P:{}};for(const l of L)for(const o of l)e.bm.P[o.v]=o.p;e.lists=L.map(l=>l.map(o=>o.v));if(window.DENS)DENS.trimBoss(e);
   const s=BMV.stat();s.boss=id;if(window.BPL)BPL.init(e);};   // bossplay.js: the encounter mechanics, the seeded order
 /* ---- shared helpers ---- */
 BMV.tel=()=>{const sb=BT.spb||.5;return Math.max(Math.ceil(.55/sb-1e-6),HARDS.includes(SET.diff)?1:2);};   // telegraph beats: >= 0.55 s at any tempo, 2 beats on Easy / Normal

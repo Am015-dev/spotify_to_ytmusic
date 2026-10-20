@@ -269,3 +269,10 @@ Owner on Normal with PULSE 3 + SWARM 10: "enemies do not survive to show on scre
 - Before -> after (PULSE 3 + SWARM 10, Normal st 3/10/20/30, median s on screen): drone 1.48 -> 1.90, charger 1.50 -> 2.60, swarm .78 -> 1.37, gunship 6.5 -> 6.7, mine 2.1 -> 3.2; killed before visible 0 -> 0.
   All 16 weapons at L10: median 2.30 -> 2.87 s, spread pulse 2.33 .. storm 3.63 (all within +-40%).
 - RET.timing stays OFF: with this Normal the timing-test bots read reflex 75-92%, random 58-67% (gates 70% / 40%); the random bot lives on 5-6 EMP/min. Next: price the EMP (a wasted EMP should cost meter) before flipping it.
+
+## Density (W20, flag RET.density, default ON; ?density=0 = old)
+Industry audit S04/S06/S08/S09/S12 (before): bullets on screen mean 4.99, ramp 1.08, spawns/min 78.6, one kind 41% of spawns, 13 distinct boss attacks.
+parts/density.js: a per-stage budget of bullets on screen (heavy stretch: ~9 at stage 3 to ~24 at stage 30 on Normal; breather = 60% of it, 12 s of every 40 s, first 10 s of a stage light; Easy x.75, Hard x1.45, Very hard x1.6; never above ebCap()-2).
+When the screen holds fewer, the director beat hook (dir.js) sends a slow curtain: 2 to 7 columns of 3-4 bullets, speed 105-135, marker >= .7 s, columns >= 115 px apart (also from columns still pending or falling), none above the ship; ebCap/BCAP apply through eb().
+Roster substitution now also covers stages 3-4 (only stages 1-2 keep the plain drones) so no kind passes 35% of spawns. Boss movesets are built at spawn and trimmed to <= 12 distinct attacks (DENS.trimBoss; hulls and caps in armour.js untouched).
+Test: density-test.js (curve, caps, gaps, difficulty order, flag off).
