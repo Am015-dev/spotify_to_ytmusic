@@ -1,0 +1,1159 @@
+{
+ "meta": {
+  "date": "2026-10-20T11:44:33.177Z",
+  "head": "d47d783",
+  "quick": false,
+  "stages": [
+   3,
+   8,
+   10,
+   20,
+   30
+  ],
+  "seeds": 5,
+  "nogod": [
+   3,
+   8,
+   20
+  ],
+  "realSecs": 289,
+  "pageErrors": []
+ },
+ "standards": [
+  {
+   "id": "S20",
+   "level": "guide",
+   "topic": "Panic button (EMP) uses per minute, competent bot",
+   "range": "0.3 - 1.5",
+   "value": 0,
+   "status": "FAIL",
+   "gap": 1
+  },
+  {
+   "id": "S23",
+   "level": "hard",
+   "topic": "First-try stage clear, bot with no oracle (Normal)",
+   "range": "0.55 - 0.90",
+   "value": 0.18,
+   "status": "FAIL",
+   "gap": 0.6727272727272727
+  },
+  {
+   "id": "S10",
+   "level": "hard",
+   "topic": "Median stage boss fight length (s)",
+   "range": "40 - 110",
+   "value": 180.65,
+   "status": "FAIL",
+   "gap": 0.6422727272727273
+  },
+  {
+   "id": "S31",
+   "level": "guide",
+   "topic": "Weapon spread: worst weapon's median on-screen life at LV10 vs all weapons (visible-test ALL=1)",
+   "range": "<= 15%",
+   "value": 0.22364217252396168,
+   "status": "FAIL",
+   "gap": 0.49094781682641125
+  },
+  {
+   "id": "S22",
+   "level": "guide",
+   "topic": "Share of dashes that are last-moment reflexes (bullet within 60 px)",
+   "range": "<= 0.70",
+   "value": 0.94,
+   "status": "FAIL",
+   "gap": 0.34285714285714286
+  },
+  {
+   "id": "S28",
+   "level": "guide",
+   "topic": "Assist options in settings (count)",
+   "range": ">= 3",
+   "value": 2,
+   "status": "FAIL",
+   "gap": 0.3333333333333333
+  },
+  {
+   "id": "S29",
+   "level": "guide",
+   "topic": "Real decisions per minute, proxy: dash charges + EMP uses + card picks (page counters; bot presses)",
+   "range": ">= 6 (est.)",
+   "value": 4.67,
+   "status": "FAIL",
+   "gap": 0.22166666666666668
+  },
+  {
+   "id": "S18",
+   "level": "guide",
+   "topic": "Median enemy fire-interval CV, stage 10",
+   "range": ">= 0.25",
+   "value": 0.2,
+   "status": "FAIL",
+   "gap": 0.19999999999999996
+  },
+  {
+   "id": "S12",
+   "level": "guide",
+   "topic": "Median distinct boss attacks per fight",
+   "range": "6 - 12",
+   "value": 13,
+   "status": "FAIL",
+   "gap": 0.08333333333333333
+  },
+  {
+   "id": "S01",
+   "level": "hard",
+   "topic": "Median on-screen life of the shortest-lived enemy kind (s)",
+   "range": ">= 1.5",
+   "value": 2.3,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S02",
+   "level": "hard",
+   "topic": "Enemies killed < 0.7 s after entering view (share of kills)",
+   "range": "<= 0.15",
+   "value": 0,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S03",
+   "level": "guide",
+   "topic": "Median on-screen life, all kinds (s)",
+   "range": "3 - 10",
+   "value": 3.67,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S04",
+   "level": "guide",
+   "topic": "Enemy bullets on screen, mean (non-boss + boss)",
+   "range": "12 - 60",
+   "value": 12.03,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S05",
+   "level": "hard",
+   "topic": "Enemy bullets on screen, p95 (non-boss)",
+   "range": "<= 150",
+   "value": 23,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S06",
+   "level": "guide",
+   "topic": "Bullet density ramp, late stage / early stage",
+   "range": "1.5 - 3.5",
+   "value": 1.85,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S07",
+   "level": "guide",
+   "topic": "Enemies on screen at once, mean",
+   "range": "3 - 10",
+   "value": 7.4,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S08",
+   "level": "guide",
+   "topic": "Spawns per minute",
+   "range": "20 - 80",
+   "value": 67.73,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S09",
+   "level": "hard",
+   "topic": "Single enemy kind share of spawns",
+   "range": "<= 0.35",
+   "value": 0.26,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S11",
+   "level": "hard",
+   "topic": "Fewest phases in a stage boss",
+   "range": ">= 3",
+   "value": 3,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S13",
+   "level": "hard",
+   "topic": "Repeat within 5 min (arcade-normal)",
+   "range": "< 0.75",
+   "value": 0.431,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S14",
+   "level": "hard",
+   "topic": "Plain-loop share of play time",
+   "range": "< 0.35",
+   "value": 0.26,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S15",
+   "level": "hard",
+   "topic": "Longest gap with no new mechanic (min)",
+   "range": "<= 15",
+   "value": 11,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S16",
+   "level": "guide",
+   "topic": "New things in the first 30 game-min",
+   "range": ">= 40",
+   "value": 250,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S17",
+   "level": "hard",
+   "topic": "Spawn-schedule Jaccard across seeds, stage 10",
+   "range": "<= 0.35",
+   "value": 0.33,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S19",
+   "level": "guide",
+   "topic": "Distinct first-15 spawn orders across seeds (share of seeds)",
+   "range": ">= 0.67",
+   "value": 1,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S21",
+   "level": "guide",
+   "topic": "Dash uses per minute, competent bot",
+   "range": "3 - 10",
+   "value": 5.12,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S24",
+   "level": "guide",
+   "topic": "Hull hits per stage (P.hp drops; dash, invuln and god mode excluded), non-god competent bot",
+   "range": "3 - 8",
+   "value": 5.67,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S25",
+   "level": "hard",
+   "topic": "Stage length, median (s)",
+   "range": "90 - 240",
+   "value": 149.1,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S26",
+   "level": "guide",
+   "topic": "Checkpoints per stage of 150 s or longer",
+   "range": ">= 1",
+   "value": null,
+   "status": "SKIP",
+   "gap": 0,
+   "reason": "no story stage of 150 s or longer (CPPROBE: 3=125s 8=89s 10=101s 20=125s 30=89s)"
+  },
+  {
+   "id": "S27",
+   "level": "guide",
+   "topic": "Choice points (pit-stop cards) per hour",
+   "range": ">= 6",
+   "value": null,
+   "status": "SKIP",
+   "gap": 0,
+   "reason": "pit stop never fired in 15.43 game-min of arcade sim (0 pitStart); not changed here, see choices-test.js"
+  },
+  {
+   "id": "S30",
+   "level": "hard",
+   "topic": "Answer value: hull lost without the timed answer / with it, worst threat (counter-test)",
+   "range": ">= 2x",
+   "value": 2,
+   "status": "PASS",
+   "gap": 0
+  },
+  {
+   "id": "S32",
+   "level": "guide",
+   "topic": "Time to first kill in a new session, worst of desktop and phone, s (tutorial-test)",
+   "range": "<= 20",
+   "value": 3.6,
+   "status": "PASS",
+   "gap": 0
+  }
+ ],
+ "measures": {
+  "lifeByKind": {
+   "drone": {
+    "n": 201,
+    "median": 2.92,
+    "killedShare": 0.98,
+    "killedWithin07": 0
+   },
+   "flank": {
+    "n": 119,
+    "median": 3.38,
+    "killedShare": 0.98,
+    "killedWithin07": 0
+   },
+   "mine": {
+    "n": 187,
+    "median": 4.3,
+    "killedShare": 0.95,
+    "killedWithin07": 0
+   },
+   "gate": {
+    "n": 22,
+    "median": 11.27,
+    "killedShare": 0.27,
+    "killedWithin07": 0
+   },
+   "gturret": {
+    "n": 13,
+    "median": 3.98,
+    "killedShare": 0.92,
+    "killedWithin07": 0
+   },
+   "drone*": {
+    "n": 65,
+    "median": 5.42,
+    "killedShare": 0.88,
+    "killedWithin07": 0
+   },
+   "charger": {
+    "n": 92,
+    "median": 2.77,
+    "killedShare": 0.98,
+    "killedWithin07": 0
+   },
+   "swarm": {
+    "n": 92,
+    "median": 2.39,
+    "killedShare": 0.98,
+    "killedWithin07": 0
+   },
+   "charger*": {
+    "n": 44,
+    "median": 3.22,
+    "killedShare": 0.91,
+    "killedWithin07": 0
+   },
+   "gwalker": {
+    "n": 12,
+    "median": 6.22,
+    "killedShare": 0.83,
+    "killedWithin07": 0
+   },
+   "shielder": {
+    "n": 18,
+    "median": 4.6,
+    "killedShare": 1,
+    "killedWithin07": 0
+   },
+   "gunship": {
+    "n": 46,
+    "median": 16.9,
+    "killedShare": 0.59,
+    "killedWithin07": 0
+   },
+   "zdrn": {
+    "n": 52,
+    "median": 2.3,
+    "killedShare": 0.58,
+    "killedWithin07": 0.02
+   },
+   "splitter": {
+    "n": 12,
+    "median": 5.85,
+    "killedShare": 1,
+    "killedWithin07": 0
+   },
+   "sniper": {
+    "n": 30,
+    "median": 11.01,
+    "killedShare": 0.9,
+    "killedWithin07": 0
+   }
+  },
+  "lifeMedianAll": 3.67,
+  "kindMedianMin": 2.3,
+  "kindMedianMinKind": "zdrn",
+  "killedShare": 0.91,
+  "killedUnder07": 0,
+  "ebMean": 12.03,
+  "ebP95": 23,
+  "ebBossP95": 8,
+  "ebMax": 25,
+  "enMean": 7.4,
+  "ebRamp": 1.85,
+  "ebRampStages": [
+   3,
+   30
+  ],
+  "gameMinutes": 15.43,
+  "spawnsPerMin": 67.73,
+  "droneShare": 0.26,
+  "stageSecs": [
+   [
+    3,
+    149.1,
+    true
+   ],
+   [
+    8,
+    228.3,
+    true
+   ],
+   [
+    10,
+    140.3,
+    true
+   ],
+   [
+    20,
+    149.1,
+    true
+   ],
+   [
+    30,
+    258.9,
+    true
+   ]
+  ],
+  "stageSecsMedian": 149.1,
+  "bosses": [
+   {
+    "n": 8,
+    "nm": "SEK-ADLER",
+    "secs": 180.65,
+    "phases": 3,
+    "verbs": 13,
+    "mini": false
+   }
+  ],
+  "bossSecsMedian": 180.65,
+  "bossPhasesMin": 3,
+  "bossPhasesMedian": 3,
+  "bossesWithPhaseData": 1,
+  "bossVerbsMedian": 13,
+  "dashPerMin": 5.12,
+  "empPerMin": 0,
+  "laneChangesPerMin": 88.41,
+  "dashReflexShare": 0.94,
+  "decisionsPerMin": 4.67,
+  "cardPicksPerMin": 0,
+  "cardsOn": false,
+  "hitsPerStage": 5.67,
+  "nogodRuns": [
+   [
+    3,
+    149.1,
+    true,
+    5
+   ],
+   [
+    8,
+    112.7,
+    false,
+    7
+   ],
+   [
+    20,
+    108.5,
+    false,
+    5
+   ]
+  ],
+  "checkpointsPerStage": null,
+  "cpRows": [
+   {
+    "n": 3,
+    "len": 125,
+    "cps": 2
+   },
+   {
+    "n": 8,
+    "len": 89,
+    "cps": 2
+   },
+   {
+    "n": 10,
+    "len": 101,
+    "cps": 2
+   },
+   {
+    "n": 20,
+    "len": 125,
+    "cps": 2
+   },
+   {
+    "n": 30,
+    "len": 89,
+    "cps": 2
+   }
+  ],
+  "pitStopsPerHour": null,
+  "assistKeys": [
+   "auto",
+   "aim"
+  ],
+  "predByStage": {
+   "10": 0.33
+  },
+  "predJaccard": 0.33,
+  "predDistinctOrders": 5,
+  "predSeeds": 5,
+  "fireCV": 0.2,
+  "fireCVn": 28,
+  "repeatFile": "../../../tmp/claude-0/r5/rep-on2.json",
+  "repeat5": 0.431,
+  "plainLoop": 0.26,
+  "jaccardStages": 0.1,
+  "longestMechGapMin": 11,
+  "newThingsPer30": 250,
+  "firstTryClear": 0.18,
+  "bossKits": 21,
+  "bossFights": 25,
+  "pitStops": 0,
+  "gameMinSession": 280.4,
+  "per5min": [
+   [
+    0,
+    18,
+    9
+   ],
+   [
+    5,
+    28,
+    14
+   ],
+   [
+    10,
+    42,
+    12
+   ],
+   [
+    15,
+    38,
+    11
+   ],
+   [
+    20,
+    79,
+    14
+   ],
+   [
+    25,
+    67,
+    14
+   ],
+   [
+    30,
+    64,
+    14
+   ],
+   [
+    35,
+    58,
+    14
+   ],
+   [
+    40,
+    108,
+    14
+   ],
+   [
+    45,
+    95,
+    20
+   ],
+   [
+    50,
+    95,
+    17
+   ],
+   [
+    55,
+    84,
+    15
+   ],
+   [
+    60,
+    100,
+    18
+   ],
+   [
+    65,
+    74,
+    13
+   ],
+   [
+    70,
+    61,
+    14
+   ],
+   [
+    75,
+    110,
+    17
+   ],
+   [
+    80,
+    78,
+    17
+   ],
+   [
+    85,
+    45,
+    13
+   ],
+   [
+    90,
+    9,
+    2
+   ],
+   [
+    95,
+    105,
+    16
+   ],
+   [
+    100,
+    98,
+    13
+   ],
+   [
+    105,
+    95,
+    15
+   ],
+   [
+    110,
+    116,
+    21
+   ],
+   [
+    115,
+    109,
+    24
+   ],
+   [
+    120,
+    66,
+    18
+   ],
+   [
+    125,
+    92,
+    18
+   ],
+   [
+    130,
+    100,
+    17
+   ],
+   [
+    135,
+    87,
+    17
+   ],
+   [
+    140,
+    10,
+    2
+   ],
+   [
+    145,
+    99,
+    12
+   ],
+   [
+    150,
+    109,
+    16
+   ],
+   [
+    155,
+    110,
+    16
+   ],
+   [
+    160,
+    127,
+    20
+   ],
+   [
+    165,
+    101,
+    19
+   ],
+   [
+    170,
+    86,
+    20
+   ],
+   [
+    175,
+    72,
+    15
+   ],
+   [
+    180,
+    95,
+    21
+   ],
+   [
+    185,
+    93,
+    19
+   ],
+   [
+    190,
+    48,
+    9
+   ],
+   [
+    195,
+    9,
+    2
+   ],
+   [
+    200,
+    74,
+    14
+   ],
+   [
+    205,
+    94,
+    15
+   ],
+   [
+    210,
+    102,
+    17
+   ],
+   [
+    215,
+    96,
+    14
+   ],
+   [
+    220,
+    107,
+    17
+   ],
+   [
+    225,
+    97,
+    22
+   ],
+   [
+    230,
+    40,
+    16
+   ],
+   [
+    235,
+    85,
+    17
+   ],
+   [
+    240,
+    104,
+    20
+   ],
+   [
+    245,
+    83,
+    19
+   ],
+   [
+    250,
+    29,
+    8
+   ],
+   [
+    255,
+    20,
+    6
+   ],
+   [
+    260,
+    99,
+    16
+   ],
+   [
+    265,
+    117,
+    14
+   ],
+   [
+    270,
+    114,
+    17
+   ],
+   [
+    275,
+    108,
+    16
+   ],
+   [
+    280,
+    5,
+    5
+   ]
+  ],
+  "weaponLife": [
+   {
+    "id": "pulse",
+    "med": 2.62,
+    "all": 3.13
+   },
+   {
+    "id": "laser",
+    "med": 2.9,
+    "all": 3.13
+   },
+   {
+    "id": "swarm",
+    "med": 3.18,
+    "all": 3.13
+   },
+   {
+    "id": "beat",
+    "med": 3.17,
+    "all": 3.13
+   },
+   {
+    "id": "arc",
+    "med": 2.92,
+    "all": 3.13
+   },
+   {
+    "id": "orbit",
+    "med": 3.7,
+    "all": 3.13
+   },
+   {
+    "id": "disc",
+    "med": 3.5,
+    "all": 3.13
+   },
+   {
+    "id": "mine",
+    "med": 3.63,
+    "all": 3.13
+   },
+   {
+    "id": "frost",
+    "med": 3.67,
+    "all": 3.13
+   },
+   {
+    "id": "flame",
+    "med": 3.68,
+    "all": 3.13
+   },
+   {
+    "id": "wave",
+    "med": 3.03,
+    "all": 3.13
+   },
+   {
+    "id": "shell",
+    "med": 2.7,
+    "all": 3.13
+   },
+   {
+    "id": "drone",
+    "med": 3.22,
+    "all": 3.13
+   },
+   {
+    "id": "well",
+    "med": 3.83,
+    "all": 3.13
+   },
+   {
+    "id": "rail",
+    "med": 3.18,
+    "all": 3.13
+   },
+   {
+    "id": "storm",
+    "med": 3.05,
+    "all": 3.13
+   }
+  ],
+  "stageClearSecs": [
+   [
+    "arc",
+    147.4
+   ],
+   [
+    "beat",
+    147.4
+   ],
+   [
+    "disc",
+    147.4
+   ],
+   [
+    "laser",
+    147.4
+   ],
+   [
+    "mine",
+    147.4
+   ],
+   [
+    "orbit",
+    147.4
+   ],
+   [
+    "pulse",
+    147.4
+   ],
+   [
+    "swarm",
+    147.4
+   ],
+   [
+    "flame",
+    134.4
+   ],
+   [
+    "frost",
+    147.4
+   ],
+   [
+    "drone",
+    147.4
+   ],
+   [
+    "rail",
+    147.4
+   ],
+   [
+    "shell",
+    147.4
+   ],
+   [
+    "storm",
+    147.4
+   ],
+   [
+    "wave",
+    147.4
+   ],
+   [
+    "well",
+    147.4
+   ]
+  ]
+ },
+ "harness": {
+  "threats": [
+   {
+    "threat": "SEEKER (parry dash)",
+    "without": 2,
+    "with": 0,
+    "ratio": 2
+   },
+   {
+    "threat": "LASER WALL (dash through)",
+    "without": 6,
+    "with": 1,
+    "ratio": 6
+   },
+   {
+    "threat": "CURTAIN (EMP)",
+    "without": 5,
+    "with": 0,
+    "ratio": 5
+   }
+  ],
+  "abilClear": {
+   "with": 0,
+   "without": 11
+  },
+  "firstKill": 3.6,
+  "weapons": [
+   {
+    "id": "arc",
+    "secs": 147.4
+   },
+   {
+    "id": "beat",
+    "secs": 147.4
+   },
+   {
+    "id": "disc",
+    "secs": 147.4
+   },
+   {
+    "id": "laser",
+    "secs": 147.4
+   },
+   {
+    "id": "mine",
+    "secs": 147.4
+   },
+   {
+    "id": "orbit",
+    "secs": 147.4
+   },
+   {
+    "id": "pulse",
+    "secs": 147.4
+   },
+   {
+    "id": "swarm",
+    "secs": 147.4
+   },
+   {
+    "id": "flame",
+    "secs": 134.4
+   },
+   {
+    "id": "frost",
+    "secs": 147.4
+   },
+   {
+    "id": "drone",
+    "secs": 147.4
+   },
+   {
+    "id": "rail",
+    "secs": 147.4
+   },
+   {
+    "id": "shell",
+    "secs": 147.4
+   },
+   {
+    "id": "storm",
+    "secs": 147.4
+   },
+   {
+    "id": "wave",
+    "secs": 147.4
+   },
+   {
+    "id": "well",
+    "secs": 147.4
+   }
+  ],
+  "weaponLife": [
+   {
+    "id": "pulse",
+    "med": 2.62,
+    "all": 3.13
+   },
+   {
+    "id": "laser",
+    "med": 2.9,
+    "all": 3.13
+   },
+   {
+    "id": "swarm",
+    "med": 3.18,
+    "all": 3.13
+   },
+   {
+    "id": "beat",
+    "med": 3.17,
+    "all": 3.13
+   },
+   {
+    "id": "arc",
+    "med": 2.92,
+    "all": 3.13
+   },
+   {
+    "id": "orbit",
+    "med": 3.7,
+    "all": 3.13
+   },
+   {
+    "id": "disc",
+    "med": 3.5,
+    "all": 3.13
+   },
+   {
+    "id": "mine",
+    "med": 3.63,
+    "all": 3.13
+   },
+   {
+    "id": "frost",
+    "med": 3.67,
+    "all": 3.13
+   },
+   {
+    "id": "flame",
+    "med": 3.68,
+    "all": 3.13
+   },
+   {
+    "id": "wave",
+    "med": 3.03,
+    "all": 3.13
+   },
+   {
+    "id": "shell",
+    "med": 2.7,
+    "all": 3.13
+   },
+   {
+    "id": "drone",
+    "med": 3.22,
+    "all": 3.13
+   },
+   {
+    "id": "well",
+    "med": 3.83,
+    "all": 3.13
+   },
+   {
+    "id": "rail",
+    "med": 3.18,
+    "all": 3.13
+   },
+   {
+    "id": "storm",
+    "med": 3.05,
+    "all": 3.13
+   }
+  ]
+ }
+}
