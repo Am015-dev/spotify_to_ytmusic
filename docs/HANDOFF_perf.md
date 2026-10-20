@@ -595,3 +595,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. So a tile radius / typed-array repack cannot reach +40 (floor +38 fra / +54 ath); lfr=500 stays OFF (not green, no shot taken). GO perf/pc-heap-60s stays info-only.
 4. Tools added: tPcHeap.js EVAL=<expr>, tLfTile.js, tLfSnap.js. Unit 0 FAIL; no src change so the built page is identical to trunk (GOs not re-run).
 5. Left: bound BK.C / AS ag / GND_L caches (LRU by distance), then re-measure; only then flip lfr=500 with a 1920x1080 shot per city.
+## ios-r18b (2026-10-20): Athens touch f0-f119 JS max ≤ 50 — NOT met 4/4; ?rcbud=1 added, default OFF
+1. hubRecycle (src/60_city_build6.js): with TUNE.rcBud on touch/lowmem the first 400 recycle calls do 2 recycles a frame within 1.5 ms (was 6, LV_trNear/hubNear up to 11 ms in one frame); flag in src/99c7_rev5fix.js, ?rcbud=1 = on, default OFF.
+2. Owners (tBoot ath lowmem, WRAP): hubRecycle is only 11 ms of a 91 ms frame; the bad frames inflate every part at once (HT_cars 17-30, miniDraw 10, pedStep 10, hubCullStep 9, LV_step 31, ~27 ms unattributed = GC/box noise), at a different frame each run (f9..f106), not a fixed f80 wave.
+3. Before (JS max f0-f119, 4 runs ath): 39/35/84/118/41 ·  rcbud=1: 37/32/98/33 (fra 32/54). 3 of 4 clean, 1 still 98 → stays OFF. The existing GO assert (JS max ≤ 50) is unchanged.
+4. Gates (built): unit 0 FAIL; r13/sky-blue*,life1,xf1,terrain,phone2 47/47; lowmem life1+start-life pass, touch-first-frames ath red only on the known TWG 6.2 s line.
+5. Left: allocation in the car loop (HT_pose/CR_susp matrices) and LV_step 31 ms in bad frames; run PROF on a bad frame to see GC vs code before flipping.

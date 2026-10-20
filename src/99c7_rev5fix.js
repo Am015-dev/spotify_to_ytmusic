@@ -528,3 +528,6 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
   const hy=150,ok=und===0&&near===0&&hy>=150;
   return`📍 TSTREAM NEAR ${CID} · shown ${on}, deflated ${oz} (instant re-zips ${MEMF.zst.rz}), undrawn zipped ${und}, zipped inside ${MEMF.nr - 50} m ${near}, raw shown ${(raw/1048576).toFixed(1)} MB, zip/unzip lines ${hy} m apart → ${ok?'✅ PASS':'❌ FAIL'}`}}))}return}
  if(i<600)setTimeout(()=>TSN_reg(i+1),100)})(0);
+
+// ios-r18b: hubRecycle spread: touch/lowmem, the first 400 recycle calls (~6 s) do 2 recycles a frame within 1.5 ms (was 6 uncapped, 11 ms at ~f75 in Athens); ?rcbud=1 = on (default OFF: 3 of 4 Athens runs clean, not 4 of 4).
+{const v=new URLSearchParams(location.search).get('rcbud');TUNE.rcBud=v==null?0:+v||0}
