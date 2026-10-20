@@ -79,8 +79,8 @@ function LF_reg(){if(!LF.on||LF.regs||!HUB.ptypes)return;LF.regs=[];for(let x=Ma
   LF.regs.push(lzReg('lf_'+x+'_'+z,'',[x,x+1000,z,z+1000],{lf:1,build:LF_tileG,inR:LF.inR,outR:LF.outR}))}
 // crash-4: low-mem tier builds a fill tile within 400 m (tufts show to 350 m; Athens boot -115 MB with LF off) and frees it past 1000 m; elsewhere the LAZY ring (draw range + 100 / + 800)
 LF.inR=LOWMEM?400:0;LF.outR=LOWMEM?600:0;
-// perf-r17u: desktop heap — fill tiles hold ~140 MB of JS heap after 30 s of roam; ?lfr=N (m) builds them within N and frees past N+200 (default OFF until GO perf/pc-heap-60s is green)
-{const m=!LOWMEM&&location.search.match(/[?&]lfr=(\d+)/);if(m){LF.inR=+m[1];LF.outR=+m[1]+200}}   // perf-r18g: stays OFF (no 1920x1080 pop-in check yet)   // crash-7: was 1000
+// perf-r17u: desktop heap — fill tiles hold ~140 MB of JS heap after 30 s of roam; perf-r18k: desktop builds them within 500 m and frees past 700 m by default (1920x1080 start/+30/+60 s shots, both cities, docs/shots/r18k: no holes, no pop-in); ?lfr=N sets N m, ?lfr=0 = old unbounded fill
+{const m=!LOWMEM&&location.search.match(/[?&]lfr=(\d+)/),r=m?+m[1]:500;if(r>0){LF.inR=r;LF.outR=r+200}}   // crash-7: was 1000
 // ...and starts 15 s after the first roam frame (inR -1 = never queued until then), so its build garbage does not stack on the other post-drivable builds (Athens boot peak)
 if(LOWMEM){LF.inR=-1;const _c=hubCullStep;hubCullStep=function(){const r=_c.apply(this,arguments);if(LF.inR<0&&typeof state!=='undefined'&&state==='roam'){const t=performance.now();if(!LF.t0)LF.t0=t;else if(t-LF.t0>15e3){LF.inR=400;for(const L of LF.regs||[])L.inR=400}}return r}}
 function LF_unreg(L){if(L.lfM&&L.lfM.length){const S=new Set(L.lfM);LF.M=LF.M.filter(m=>!S.has(m));for(const[k,A]of LF.MG){const B=A.filter(m=>!S.has(m));if(B.length)LF.MG.set(k,B);else LF.MG.delete(k)}}

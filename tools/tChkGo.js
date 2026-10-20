@@ -11,7 +11,7 @@
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
 const BASE=process.argv[2],OUT=process.argv[3]||'.',FIL=process.argv[4]||'';fs.mkdirSync(OUT,{recursive:true});
 const {verdict,evalError}=require('./chkgo_verdict.js');   // judging rules: tools/chkgo_verdict.js (a throwing GO is FAIL)
-(async()=>{const T0=Date.now(),b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});
+(async()=>{const T0=Date.now(),b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info','--js-flags=--expose-gc']});
  const ctx=await b.newContext({viewport:process.env.DESKTOP?{width:1280,height:720}:process.env.PORTRAIT?{width:393,height:852}:{width:852,height:393},deviceScaleFactor:1,isMobile:!process.env.DESKTOP,hasTouch:!process.env.DESKTOP});const errs=[],boots={},res=[],RS={n:0,ms:0};let nav=0,p=null;const FC={};
  const newPage=async()=>{p=await ctx.newPage();p.setDefaultTimeout(120000);p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});p.on('framenavigated',f=>{if(f===p.mainFrame())nav++});
   // scale-1: GOs may throttle the CPU (window.__cdp('Emulation.setCPUThrottlingRate',{rate:4})) or resize the viewport (window.__vp(w,h)); both are undone after every item

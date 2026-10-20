@@ -653,3 +653,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. With WRAP of every hubTrafficStep wrapper (L3_tick, CV_*, AYD_*, RD_*, LK_*, QS_clear, OC_traffic, TRN_ridgeFit, CR_npcPush, DR_unjam): none of them is over 5 ms max; the 26-28 ms is the core HT_cars step. hubCullStep max 17-19, PC_step 16-19, never > 50 alone.
 4. Not done (timebox): no change pushed, built page identical to trunk. Candidate next: gate SMM_tick tile paint by RB (skip while RB.t0 elapsed > RB.ms, ≤ 2 frames) so a tile never stacks on a heavy traffic frame; and a PROF=1 tBoot over the core hubTrafficStep spike frames.
 5. Tool: scratch runner = build commit in a worktree, then tChkGo CITY=<c> TAG=perf/touch-first-frames with ?lowmem=1 one at a time; grep "curtain" and "JS max f0-f119".
+## perf-r18k (2026-10-20): ?lfr=500 is now the desktop default (?lfr=0 = old unbounded fill)
+1. Shots (docs/shots/r18k, 1920x1080, tools/perf1/tLfrShots.js, side-by-side in pairs/): start, +30 s, +60 s of driven roam and 3 fixed warp anchors per city, default vs ?lfr=500: every pair looked at, no holes, no bare ground near the car, no fill pop-in within ~300 m (the stepped green ridge at the far horizon is in both).
+2. Change: src/98lf_lively_fill.js desktop LF.inR 500 / outR 700 unless ?lfr=N; LOWMEM unchanged.
+3. Measured tPcHeap 60 s (single run): before fra +170 / ath +154, after fra +94 / ath +79 MB.
+4. GO perf/pc-heap-60s (src/99c7_rev5fix.js PCH60, tools/tChkGo.js now passes --expose-gc): drives 60 s, GC'd growth, caps fra +110 / ath +106 (measured +91 / +88, +20 %). Inside a long warm TAG run the growth reads lower (+8 / +19) because tiles already exist, so the cap only bites standalone.
+5. Gates (built): unit 0 FAIL; perf/pc-heap-60s,heap-30s,pc-roam-30s,pc-boot-lt + r13/sky-blue*,life1,xf1,terrain,phone2 54/54. Left: ≤ +60 MB target still not met (what grows after lfr: heap snapshot by constructor at +60 s).
