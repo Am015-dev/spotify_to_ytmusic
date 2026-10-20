@@ -274,7 +274,7 @@ function M2_stage(ch,S,dt){const kmh=Math.abs(RO.v)*3.6;
  if(S.t==='boats'){if(S.th.every(g=>g.dead)){M2.log.boat+=S.th.length;return qvNext(ch)}return}
  if(S.t==='stacks'){S.cd-=dt;for(const o of S.it){if(o.done)continue;if(Math.hypot(o.x-RO.x,o.z-RO.z)<8&&Math.abs(RO.y-o.m.position.y)<7&&S.cd<=0){S.cd=1.1;if(kmh>=90){o.hp--;const at=V3(o.x,4+o.hp*3,o.z);debris(at,V3(Math.sin(RO.vh)*RO.v*.4,12,Math.cos(RO.vh)*RO.v*.4),26,[new THREE.Color('#d9472b'),new THREE.Color('#2f7bff'),new THREE.Color('#ffb000')],1.4,0);M1_snd('crash');shake=.7;slowmo=Math.max(slowmo,.3);
      if(o.hp<=0){o.done=true;o.m.visible=false;S.n++;M2.log.stack++;for(let q=0;q<6;q++)studBurst(at,V3(0,0,0),30);studGain(120,1);hitPop(`📦 STACK ${S.n}/${S.it.length} DOWN`,'#5dffb0')}else{o.m.scale.y=.62;hitPop('📦 TOP CONTAINER OFF · hit it again!','#ffd400')}RO.v=-Math.max(8,Math.abs(RO.v)*.3)}
-    else{RO.v=-Math.max(6,Math.abs(RO.v)*.3);M1_snd('bump');say('','TOO SLOW · '+Math.round(kmh)+' km/h · need 90',1.2)}}}const nx=S.it.find(o=>!o.done);if(nx){S.x=nx.x;S.z=nx.z}if(S.n>=S.it.length)return qvNext(ch);return}
+    else{RO.v=-Math.max(6,Math.abs(RO.v)*.3);M1_snd('bump');say('','TOO SLOW · '+Math.round(kmh)+' km/h · need 90',1.2,{must:1})}}}const nx=S.it.find(o=>!o.done);if(nx){S.x=nx.x;S.z=nx.z}if(S.n>=S.it.length)return qvNext(ch);return}
  if(S.t==='m2boss'){S.el+=dt;S.spT-=dt;if(S.bg.dead)return qvNext(ch);const al=M1.goons.filter(g=>!g.dead&&g.S===S&&g!==S.bg);if(S.spT<=0&&al.length<(S.max||2)){S.spT=7;M1_spawn(S,'rammer',1,null,140,220)}return}}
 M1_setup=(f=>function(ch,S,i){if(M2_T.has(S.t))return M2_setup(ch,S,i);return f(ch,S,i)})(M1_setup);
 M1_stage=(f=>function(ch,S,dt){if(M2_T.has(S.t))return M2_stage(ch,S,dt);return f(ch,S,dt)})(M1_stage);
