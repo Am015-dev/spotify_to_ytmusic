@@ -3,6 +3,7 @@
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/counter-test.js
 // a for each threat: the dodging bot WITHOUT the answer loses clearly more hull (or time) than the same bot WITH the timed answer
 // c a bot that presses DASH / EMP at random (same number of presses) loses more than the one that times them
+// (with timing.js on, an EMP spends every held charge: the warden and EMP-timing checks give one charge per press)
 // e caps (ebCap, BCAP) under curtains, threats appear in a real Normal stage, ?counter=0 = no threats, no page errors
 // b/d: mustmove-test, balance-test, scale-test, scale2-test (run them next to this one)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
@@ -43,7 +44,7 @@ const SCN = () => {
   for (const k of ['seek', 'wall', 'curt']) out[k] = { without: threat(k, 'without', 24, k === 'seek' ? 3 : 4), with: threat(k, 'with', 24, k === 'seek' ? 3 : 4) };
   // warden: time to kill with the gun alone vs with an EMP whenever it is shielded
   const ward = (useEmp) => { set(true); C.start('ward'); const e = m.G.en.find(x => x.ctw); let t = 0; m.P.emp = useEmp ? 3 : 0; const s0 = S();
-    while (t < 40 && e && !e.dead && e.hp > 0) { e.age = 0; if (e.x > 900) { m.step(1 / 60); continue; } m.touchTo(220, e.y); if (useEmp && e.wsh && e.x < 900 && m.P.emp > 0) m.press('Emp'); if (!useEmp) m.P.emp = 0; m.press('Fire'); m.step(1 / 60); t += 1 / 60; }
+    while (t < 40 && e && !e.dead && e.hp > 0) { e.age = 0; if (e.x > 900) { m.step(1 / 60); continue; } m.touchTo(220, e.y); if (useEmp && e.wsh && e.x < 900 && window.TIM && TIM.on && m.P.emp === 0) m.P.emp = 1; if (useEmp && e.wsh && e.x < 900 && m.P.emp > 0) m.press('Emp'); if (!useEmp) m.P.emp = 0; m.press('Fire'); m.step(1 / 60); t += 1 / 60; }
     const r = { t: +t.toFixed(1), strip: C.stat.strip - s0.strip }; m.abort(); return r; };
   const avg = (f) => { let a = 0, st = 0; for (let k = 0; k < 3; k++) { const r = f(); a += r.t; st += r.strip; } return { t: +(a / 3).toFixed(1), strip: st }; };
   out.ward = { without: avg(() => ward(false)), with: avg(() => ward(true)) };
@@ -53,7 +54,7 @@ const SCN = () => {
     m.press('Emp'); for (let i = 0; i < 4; i++) { for (const [e, x, y] of fs) { e.x = x; e.y = y; } m.step(1 / 60); } const dmg = fs.reduce((a, [e]) => a + (30 - Math.max(0, e.hp)), 0); const r = { dmg, combo: C.stat.combo - s0 }; m.abort(); return r; };
   out.combo = { emp: combo(false), pair: combo(true) };
   // EMP timing: one press on an empty screen, one in a curtain
-  { set(true); m.P.emp = 2; const g0 = C.stat.good, w0 = C.stat.waste; m.press('Emp'); m.step(1 / 60); C.start('curt'); for (let i = 0; i < 80; i++) m.step(1 / 60); const hot = document.getElementById('bEmp') ? document.getElementById('bEmp').classList.contains('abHot') || C.hot() : C.hot(); m.press('Emp'); m.step(1 / 60);
+  { set(true); m.P.emp = 2; const g0 = C.stat.good, w0 = C.stat.waste; m.press('Emp'); m.step(1 / 60); if (window.TIM && TIM.on) m.P.emp = 1; C.start('curt'); for (let i = 0; i < 80; i++) m.step(1 / 60); const hot = document.getElementById('bEmp') ? document.getElementById('bEmp').classList.contains('abHot') || C.hot() : C.hot(); m.press('Emp'); m.step(1 / 60);
     out.timing = { waste: C.stat.waste - w0, good: C.stat.good - g0, hot }; m.abort(); }
   // vent: dash out of an overheat
   { set(true); m.P.heat = 100; m.P.over = true; m.press('Dash'); m.step(1 / 60); out.vent = !m.P.over; m.abort(); }

@@ -38,7 +38,7 @@ const CTR=window.CTR={get on(){return!!RET.counter;},
     if(P.over){P.over=false;P.heat=Math.min(P.heat,35);floater(P.x,P.y-36,'VENT','#19e3ff');this.stat.vent++;}
     let got=0;for(const b of G.eb){if(!b.cxM||b.dead)continue;const sp=Math.hypot(b.vx,b.vy)||1,tt=(Math.hypot(b.x-P.x,b.y-P.y)-(b.r+3))/sp;
       if(tt<=.17){b.dead=1;got++;let tg=null,bd=1e9;for(const e of G.en){if(e.dead||e.hp<=0||e.gr)continue;const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<bd){bd=d;tg=e;}}
-        const a=tg?Math.atan2(tg.y-P.y,tg.x-P.x):0;G.pb.push({x:P.x+10,y:P.y,vx:Math.cos(a)*700,vy:Math.sin(a)*700,dm:15,pf:1,big:1,ab:1,hk:1.5});
+        const a=tg?Math.atan2(tg.y-P.y,tg.x-P.x):0;G.pb.push({x:P.x+10,y:P.y,vx:Math.cos(a)*700,vy:Math.sin(a)*700,dm:window.TIM&&TIM.on?40:15,pf:1,big:1,ab:1,hk:1.5});
         burst(b.x,b.y,'#ffffff',10,240,.35);this.stat.parry++;}
       else if(tt<=.6)this.stat.early++;}
     if(got){G.eb=G.eb.filter(b=>!b.dead);G.score+=Math.round(300*got*G.mult);floater(P.x,P.y-30,'PARRY!','#ffffff');AU.sfx('up');if(!SET.reduce)shake(4);
@@ -48,7 +48,7 @@ const CTR=window.CTR={get on(){return!!RET.counter;},
     for(const w of cs){let k=0;for(let y=30;y<H&&k<4;y+=120)if(Math.abs(y-w.gap.y)>48){G.pk.push({t:'shard',x:w.x,y,vx:-40,vy:0,bob:0});k++;}this.stat.curtEmp++;}
     this.walls=this.walls.filter(w=>!cs.includes(w));this.curts=[];
     for(const e of G.en)if(e.ctw&&!e.dead){if(e.wsh)this.stat.strip++;e.wsh=0;e.wshT=8;e.flash=.3;}
-    if(n>=6||ws.length){this.stat.good++;G.score+=Math.round(400*G.mult);floater(P.x,P.y-44,'GOOD EMP','#ffe14d');this.pend+=.25;}else this.stat.waste++;
+    if(n>=6||ws.length){this.stat.good++;this.goodAt=G.t;G.score+=Math.round(400*G.mult);floater(P.x,P.y-44,'GOOD EMP','#ffe14d');this.pend+=.25;}else this.stat.waste++;
     if(G.t-this.lastDash<=1){this.stat.combo++;floater(P.x,P.y-58,'COMBO BLAST','#ff5fd2');this.fx.push({x:P.x,y:P.y,t:0});
       for(const e of G.en){if(e.type==='boss'||e.dead||e.hp<=0||e.gr)continue;if(Math.hypot(e.x-P.x,e.y-P.y)<300){e.hp-=12;e.flash=.25;}}}},
   hot(){return P.emp>0&&(G.eb.length>=6||this.walls.some(w=>w.cur&&w.x<W+10)||G.en.some(e=>e.ctw&&e.wsh&&e.x<W));},
