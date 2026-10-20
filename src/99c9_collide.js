@@ -1,0 +1,67 @@
+// collide-r21i (2026-10-20): city/collide-audit, a no-graphics audit of buildings vs colliders (Frankfurt + Athens).
+// Visual side = the wall triangles of every building-like mesh in the scene (merged tile batches AND instanced footprints, world space, >= 3.5 m above the ground);
+// collider side = the unique rows of HUB.grid (what roamHit / the car actually bumps into). window.__ca is the exploration hook.
+// ghostMin: smaller colliders carry LDraw/brick models whose walls are 1 m instanced parts (not measurable here), so only blocks >= 16 m are judged for a missing visual
+const CA={rad:1.6,minH:3.5,maxUnc:.1,ghostMin:16,maxGhost:3,maxBig:0,maxOver:5,maxPass:0};
+function CA_cat(o){const u=o.userData||{};if(HUB.BM)for(const k in HUB.BM)if(HUB.BM[k]===o.material)return'BM:'+k+(o.isInstancedMesh?'+i':'');for(const k of['athB','dr','cv','bvL','c1h','c3','trPl','gk','trG','keep','asLod','as','lf','simp','ocPool','bmk'])if(u[k]!==undefined)return k+(k==='athB'?':'+u[k]:'');let p=o.parent,pk='';while(p&&!pk){pk=Object.keys(p.userData||{}).join('.');p=p.parent}const m=o.material;return'-'+(m&&m.type.replace('Mesh','').replace('Material','')||'')+(m&&m.map?'+map':'')+(m&&m.vertexColors?'+vc':'')+(o.isInstancedMesh?'+inst':'')+(pk?'^'+pk:'')+'/'+(m&&m.name||'')}
+// wall samples [x,z,ymin,ymax,cat,mesh] on a 2 m raster: every vertical triangle of every building-like mesh marks the cells along its foot line; a cell counts as a building wall when its column is >= 3.5 m tall
+// (facades are cut into 1-2 m bands, so single triangles are too short to judge)
+function CA_walls(){const cats=[],ci={},meshes=[],cell=new Map();const Mx=new THREE.Matrix4(),IM=new THREE.Matrix4(),a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3();const root=HUB.grp&&HUB.grp.parent?HUB.grp:scene;root.updateMatrixWorld(true);let mi=0,cat=0;const lzR=new Set();if(typeof LAZY!=='undefined')for(const L of LAZY)if(L.root)lzR.add(L.root);const inLz=o=>{if(!lzR.size)return false;for(let q=o.parent;q;q=q.parent)if(lzR.has(q))return true;return false};
+ const lw=new WeakMap();
+ const walls=g=>{let w=lw.get(g);if(w)return w;w=[];const P=g.attributes.position,I=g.index,n=I?I.count:P.count;if(!g.boundingBox)g.computeBoundingBox();if(g.boundingBox.max.y-g.boundingBox.min.y<.3){lw.set(g,w);return w}
+  for(let i=0;i<n;i+=3){const i0=I?I.getX(i):i,i1=I?I.getX(i+1):i+1,i2=I?I.getX(i+2):i+2;w.push(P.getX(i0),P.getY(i0),P.getZ(i0),P.getX(i1),P.getY(i1),P.getZ(i1),P.getX(i2),P.getY(i2),P.getZ(i2))}lw.set(g,w);return w};
+ const tri=(w,k,M)=>{a.set(w[k],w[k+1],w[k+2]).applyMatrix4(M);b.set(w[k+3],w[k+4],w[k+5]).applyMatrix4(M);c.set(w[k+6],w[k+7],w[k+8]).applyMatrix4(M);
+  const ymin=Math.min(a.y,b.y,c.y),ymax=Math.max(a.y,b.y,c.y);if(ymax-ymin<.3)return;
+  const ux=b.x-a.x,uy=b.y-a.y,uz=b.z-a.z,vx=c.x-a.x,vy=c.y-a.y,vz=c.z-a.z,nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,nl=Math.hypot(nx,ny,nz)||1;if(Math.abs(ny)/nl>.2)return;
+  const xs=[a.x,b.x,c.x],zs=[a.z,b.z,c.z];let bi=0,bj=1,bd=-1;for(let i=0;i<3;i++)for(let j=i+1;j<3;j++){const d=Math.hypot(xs[i]-xs[j],zs[i]-zs[j]);if(d>bd){bd=d;bi=i;bj=j}}if(bd<.3)return;
+  const n=Math.max(1,Math.ceil(bd/1.5));for(let q=0;q<=n;q++){const x=xs[bi]+(xs[bj]-xs[bi])*q/n,z=zs[bi]+(zs[bj]-zs[bi])*q/n,key=Math.floor(x/2)*100000+Math.floor(z/2);let e=cell.get(key);if(!e)cell.set(key,e=[x,z,ymin,ymax,cat,mi]);else{if(ymin<e[2])e[2]=ymin;if(ymax>e[3])e[3]=ymax}}};
+ root.traverse(o=>{if(!(o.isMesh||o.isInstancedMesh)||!o.geometry||!o.geometry.attributes.position)return;const u=o.userData||{};if(inLz(o))return;if(u.gk||u.trG||u.sky||o.material&&o.material.type==='ShaderMaterial'&&!u.a8s)return;
+  const g=o.geometry,w=walls(g);if(!w.length)return;const cn=CA_cat(o);cat=ci[cn];if(cat===undefined){cat=ci[cn]=cats.length;cats.push(cn)}mi=meshes.length;meshes.push(o);
+  if(o.isInstancedMesh){const bh=g.boundingBox.max.y-g.boundingBox.min.y;for(let i=0;i<o.count;i++){o.getMatrixAt(i,IM);Mx.multiplyMatrices(o.matrixWorld,IM);const sy=Math.hypot(Mx.elements[4],Mx.elements[5],Mx.elements[6]);if(bh*sy<CA.minH)continue;for(let k=0;k<w.length;k+=9)tri(w,k,Mx)}}
+  else for(let k=0;k<w.length;k+=9)tri(w,k,o.matrixWorld)});
+ const S=[];for(const e of cell.values()){const gy=groundY(e[0],e[1]);if(e[3]-e[2]>=CA.minH&&e[3]-gy>=CA.minH&&e[2]<gy+8)S.push(e)}
+ return{S,cats,meshes}}
+function CA_cols(){const seen=new Set(),out=[];if(!HUB.grid)return out;for(const L of HUB.grid.values())for(const b of L){if(seen.has(b))continue;seen.add(b);if(b.y0!=null)continue;const gy=groundY(b.x,b.z),hh=(b.h||0)-gy;if(!b.h||hh<CA.minH)continue;out.push(b)}return out}
+// lazy regions (98cl_stream.js: meshes stream in and out, colliders are plan data and stay) are out of scope: their state depends on where the car has been. Their colliders and meshes are skipped both ways
+function CA_lazyOff(){const S=new Set();if(typeof LAZY!=='undefined')for(const L of LAZY)if(L.bld)for(const b of L.bld)S.add(b);return S}
+// wall hash (8 m cells) over the samples; nearest sample within r
+function CA_hash(W){const G=new Map();W.S.forEach((s,i)=>{const key=Math.floor(s[0]/8)*100000+Math.floor(s[1]/8);let A=G.get(key);if(!A)G.set(key,A=[]);A.push(i)});return G}
+function CA_near(W,G,x,z,r){let bd=r*r,bi=-1;for(let a=Math.floor((x-r)/8);a<=Math.floor((x+r)/8);a++)for(let b=Math.floor((z-r)/8);b<=Math.floor((z+r)/8);b++){const A=G.get(a*100000+b);if(A)for(const i of A){const s=W.S[i],d=(s[0]-x)**2+(s[1]-z)**2;if(d<=bd){bd=d;bi=i}}}return bi}
+function CA_perim(b){const P=[],c=b.c==null?1:b.c,s=b.s==null?0:b.s;for(const[ex,ez,ax]of[[b.hw,0,1],[-b.hw,0,1],[0,b.hd,0],[0,-b.hd,0]]){const m=Math.max(1,Math.ceil((ax?b.hd:b.hw)*2/3));for(let i=0;i<m;i++){const t=(i+.5)/m*2-1,lx=ax?ex:t*b.hw,lz=ax?t*b.hd:ez;P.push([b.x+lx*c+lz*s,b.z-lx*s+lz*c])}}return P}
+const CA_id=b=>Math.round(b.x)+','+Math.round(b.z)+' '+Math.round(b.hw*2)+'x'+Math.round(b.hd*2);
+// A: wall samples with no collider within CA.rad (roamHit, what the car feels). Cells of 50 m listed worst first.
+const CA_bldCat=/^(athB:|dr$|BM:(office|brick|glass|gable|roof|plaka))/;// categories that are certainly buildings (the rest: bridges, trees, props, far LOD)
+function CA_cover(W){const cells={},by={};let unc=0,n=0;for(const s of W.S){const c=W.cats[s[4]],r=by[c]||(by[c]={n:0,unc:0});r.n++;if(!CA_bldCat.test(c)||c==='BM:brick'&&Math.hypot(s[0],s[1])>3000)continue;// outskirts brick sheds (Frankfurt, > 3 km out): listed in docs/HANDOFF_collide-r21i.md, not judged
+n++;const gy=groundY(s[0],s[1]),hit=!!roamHit(s[0],s[1],CA.rad,gy);if(!hit){r.unc++;unc++;const k=Math.floor(s[0]/50)*50+','+Math.floor(s[1]/50)*50,e=cells[k]||(cells[k]={n:0,x:0,z:0,cat:c});e.n++;e.x+=s[0];e.z+=s[1]}}
+ const top=Object.entries(cells).sort((a,b)=>b[1].n-a[1].n).slice(0,8).map(([k,e])=>k+' n'+e.n+' '+e.cat+' @'+Math.round(e.x/e.n)+','+Math.round(e.z/e.n));return{n,unc,by,top,cells}}
+// B: colliders with no wall near their outline (ghost) and colliders bigger than the visual they carry (> 1.3x footprint, or > 60 m wide)
+function CA_ghost(W,G){const off=CA_lazyOff(),gh=[],big=[],over=[];let n=0,small=0;for(const b of CA_cols()){if(off.has(b))continue;n++;const P=CA_perim(b);let hit=0;for(const[x,z]of P)if(CA_near(W,G,x,z,3)>=0)hit++;const f=hit/P.length;if(f<.25){if(Math.max(b.hw,b.hd)*2>=CA.ghostMin)gh.push(CA_id(b)+' h'+Math.round(b.h-groundY(b.x,b.z)));else small++}
+  if(Math.max(b.hw,b.hd)*2>60&&f<.5)big.push(CA_id(b)+' cov'+f.toFixed(2));
+  // footprint of the visual: walls inside the collider outline grown 3 m, in the collider frame
+  if(f>=.25){const c=b.c==null?1:b.c,s=b.s==null?0:b.s;let x0=1e9,x1=-1e9,z0=1e9,z1=-1e9,k=0;const R=Math.hypot(b.hw,b.hd)+4;for(let a=Math.floor((b.x-R)/8);a<=Math.floor((b.x+R)/8);a++)for(let q=Math.floor((b.z-R)/8);q<=Math.floor((b.z+R)/8);q++){const A=G.get(a*100000+q);if(A)for(const i of A){const w=W.S[i],dx=w[0]-b.x,dz=w[1]-b.z,lx=dx*c-dz*s,lz=dx*s+dz*c;if(Math.abs(lx)<=b.hw+3&&Math.abs(lz)<=b.hd+3){k++;if(lx<x0)x0=lx;if(lx>x1)x1=lx;if(lz<z0)z0=lz;if(lz>z1)z1=lz}}}
+   if(k>=4){const vw=Math.max(x1-x0,4),vd=Math.max(z1-z0,4);if(b.hw*2*b.hd*2>1.3*(vw+2)*(vd+2)&&b.hw*2*b.hd*2>200)over.push(CA_id(b)+' vis'+Math.round(vw)+'x'+Math.round(vd))}}}
+ return{n,small,gh,big,over}}
+// C: 8 rays into a target from ~14 m out: the car (real roamStep, gas held) must stop before the first visual wall on its line.
+function CA_ray(W,G,tx,tz,hw,hd,out){const res={rays:0,skip:0,pass:[],stop:0};const R=Math.hypot(hw,hd)+14;
+ for(let a=0;a<8;a++){const ang=a*Math.PI/4,sx=tx+Math.sin(ang)*R,sz=tz+Math.cos(ang)*R,h=Math.atan2(tx-sx,tz-sz);if(roamHit(sx,sz,4,groundY(sx,sz))||inRiver(sx,sz,2)||onAnyDeck(sx,sz)){res.skip++;continue}
+  roamWarp(sx,sz,h,true);RO.x=sx;RO.z=sz;RO.h=h;RO.v=10;RO.y=groundY(sx,sz);let still=0,steps=0;K.ArrowUp=true;for(;steps<100;steps++){roamStep(1/30);if(!isFinite(RO.x))break;if(steps>6&&Math.abs(RO.v)<.4){if(++still>4)break}else still=0}K.ArrowUp=false;
+  res.rays++;const ex=RO.x,ez=RO.z,L=Math.hypot(ex-sx,ez-sz);if(Math.abs(RO.v)<1.5)res.stop++;
+  // visual wall on the path (<= 1.6 m off the line) closer than the car's end point => the car went through it
+  let pass=null;const dx=(ex-sx)/(L||1),dz=(ez-sz)/(L||1);for(let d=2;d<L-1.5&&!pass;d+=2){const px=sx+dx*d,pz=sz+dz*d,i=CA_near(W,G,px,pz,1.4);if(i>=0&&CA_bldCat.test(W.cats[W.S[i][4]]))pass=Math.round(px)+','+Math.round(pz)+' '+W.cats[W.S[i][4]]}
+  if(pass)res.pass.push(pass)}
+ return res}
+function CA_run(opt={}){const t0=performance.now(),W=CA_walls(),G=CA_hash(W),cov=CA_cover(W),gh=CA_ghost(W,G),t1=performance.now();const out={city:CID,ms:[Math.round(t1-t0)],cov,gh};
+ if(opt.rays===false)return out;const rays={rays:0,skip:0,stop:0,pass:[]};const off=CA_lazyOff(),cols=CA_cols().filter(b=>!off.has(b)),pick=[];const N=opt.nCol??4;for(let i=0;i<N&&cols.length;i++)pick.push(cols[Math.floor(i*cols.length/N)]);
+ const tg=pick.map(b=>[b.x,b.z,b.hw,b.hd,'col '+CA_id(b)]);for(const[k,e]of Object.entries(cov.cells).sort((a,b)=>b[1].n-a[1].n).slice(0,opt.nVis??4))tg.push([e.x/e.n,e.z/e.n,6,6,'vis '+k+' '+e.cat]);
+ const save={x:RO.x,z:RO.z,h:RO.h,v:RO.v};for(const[x,z,hw,hd,id]of tg){const r=CA_ray(W,G,x,z,hw,hd);rays.rays+=r.rays;rays.skip+=r.skip;rays.stop+=r.stop;for(const p of r.pass)rays.pass.push(id+' through '+p)}
+ roamWarp(save.x,save.z,save.h,true);RO.x=save.x;RO.z=save.z;RO.h=save.h;RO.v=0;out.rays=rays;out.ms.push(Math.round(performance.now()-t1));return out}
+function CA_brief(o){const c=o.cov,g=o.gh;let s=o.city+' · '+c.n+' visual wall cells, '+c.unc+' with no collider ('+(100*c.unc/Math.max(1,c.n)).toFixed(1)+' %) · '+g.n+' tall colliders: '+g.gh.length+' blocks (>= '+CA.ghostMin+' m) with no visual wall ('+g.small+' small ones not judged: brick-built models), '+g.big.length+' over 60 m, '+g.over.length+' bigger than 1.3x their visual';if(o.rays)s+=' · rays '+o.rays.rays+' (skipped '+o.rays.skip+'), '+o.rays.stop+' stopped, '+o.rays.pass.length+' went through a visual wall';return s}
+function CA_go(say){const o=CA_run();window.__ca.last=o;const c=o.cov,g=o.gh,bad=[];const uncPct=100*c.unc/Math.max(1,c.n);if(uncPct>CA.maxUnc)bad.push('uncovered walls '+uncPct.toFixed(1)+' % > '+CA.maxUnc+' ('+c.top.slice(0,4).join('; ')+')');if(g.gh.length>CA.maxGhost)bad.push('ghost colliders '+g.gh.length+' > '+CA.maxGhost+' ('+g.gh.slice(0,5).join('; ')+')');if(g.big.length>CA.maxBig)bad.push('colliders > 60 m '+g.big.length+' > '+CA.maxBig+' ('+g.big.slice(0,4).join('; ')+')');if(g.over.length>CA.maxOver)bad.push('colliders > 1.3x visual '+g.over.length+' > '+CA.maxOver+' ('+g.over.slice(0,4).join('; ')+')');
+ const pc=o.rays?o.rays.pass.filter(p=>p.startsWith('col ')):[];if(pc.length>CA.maxPass)bad.push('car went through '+pc.length+' walls of colliders ('+pc.slice(0,4).join('; ')+')');if(o.rays&&o.rays.rays<8)bad.push('only '+o.rays.rays+' rays ran');
+ return'📍 COLLIDE · '+CA_brief(o)+(bad.length?' ❌ '+bad.join(' | '):' ✅')}
+function CA_nn(x,z,r=40){const W=CA_walls(),o=W.S.filter(s=>Math.abs(s[0]-x)<r&&Math.abs(s[1]-z)<r).map(s=>[Math.round(s[0]),Math.round(s[1]),Math.round(s[2]),Math.round(s[3]),W.cats[s[4]]].join(' '));return o.slice(0,40)}
+function CA_lz(){return typeof LAZY==='undefined'?[]:LAZY.map(L=>[L.name||L.id,Object.keys(L).filter(k=>/^(x0|x1|z0|z1|r|cx|cz|x|z)$/.test(k)).map(k=>k+'='+Math.round(L[k])).join(' '),'done',!!L.done,'root',!!L.root,'bld',L.bld&&L.bld.length,'pre',!!L.pre].join(' '))}
+function CA_rows(GO,goSay,CK){window.__ca={lz:CA_lz,nn:CA_nn,cfg:CA,run:CA_run,walls:CA_walls,cols:CA_cols,cover:()=>{const W=CA_walls();return CA_cover(W)},brief:CA_brief};
+ CK.push({ver:'city',id:'collide-audit',area:'city',text:'collide:2026-10-20 · COLLISION vs BUILDINGS audit (no graphics). 📍 GO measures the wall triangles of every building mesh (merged batches, instanced footprints, Athens fill) against the colliders the car really feels. Auto: wall cells with no collider within 1.6 m ≤ '+CA.maxUnc+' %, tall colliders with no visual wall near ≤ '+CA.maxGhost+', colliders over 60 m wide ≤ '+CA.maxBig+', colliders > 1.3x their visual ≤ '+CA.maxOver+', and 8 real car rays into each of ~20 buildings from ~14 m out: the car stops before the first visual wall (≤ '+CA.maxPass+' walls passed; rays into the uncovered cells are listed, not judged: they are the cells counted above). Prints the offending cells.'});
+ for(const c of['fra','ath'])(GO['city/collide-audit']=GO['city/collide-audit']||[]).push({c,n:'collision audit '+(c==='fra'?'Frankfurt':'Athens'),secs:60,fn:()=>CA_go(t=>goSay(t))})}
+({CA_rows,CA_run,CA_go})

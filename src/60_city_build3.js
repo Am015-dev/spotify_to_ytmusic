@@ -75,7 +75,7 @@ function athLandmarksBuild(bt,BM){const MB='#e9dfc6',MW='#f4efe2',GL=[];HUB.lmk=
   const box=(w,h,d,x,y,z,c,ry=0)=>{if(h>=7&&Math.max(w,d)>=8){const g=bxUV(w,h,d,12,13.2);g.rotateY(ry);g.translate(x,y+h/2,z);bt.add(colorize(g,new THREE.Color(c)),BM.plaka)}else bt.add(cbox(w,h,d,x,y+h/2,z,c,ry),BM.plain)},col=(x,y,z,r,h,c=MB)=>bt.add(ccyl(r*.85,r,h,x,y+h/2,z,c,8),BM.plain);
   const gab=(w,d,h,x,y,z,c,ry)=>{const g=roofGeo(w,d,h);g.rotateY(ry);g.translate(x,y,z);bt.add(colorize(g,new THREE.Color(c)),BM.plain)};
   const F=(cx,cz,ry)=>(lx,lz)=>[cx+lx*Math.cos(ry)+lz*Math.sin(ry),cz-lx*Math.sin(ry)+lz*Math.cos(ry)];
-  const coll=(x,z,hw,hd,y0,h,ry)=>hubAddB({x,z,hw,hd,h:y0+h,y0:y0-1.5,ry});
+  const coll=(x,z,hw,hd,y0,h,ry)=>{/* collide-r21i: y0 (the collider's floor, roamHit ignores it for a car below) was the ground at the CENTRE minus 1.5 m, so on a slope the downhill side of a landmark (stoa, parliament...) let the car drive through the wall: floor = lowest ground under the footprint */let lo=y0;const c=Math.cos(ry),sn=Math.sin(ry);for(const a of[-1,0,1])for(const b of[-1,0,1]){const lx=a*hw,lz=b*hd;lo=Math.min(lo,groundY(x+lx*c+lz*sn,z-lx*sn+lz*c))}return hubAddB({x,z,hw,hd,h:y0+h,y0:lo-1.5,ry})};
   // fitted scale for a footprint on flat ground: shrink until it clears every street by 1 m
   const fit=(x,z,w,d,ry)=>{for(let s=1;s>.45;s-=.08)if(athRectClr(x,z,w*s,d*s,ry,1))return s;return .45};
   const nudge=(x,z,w,d,ry)=>{if(athRectClr(x,z,w,d,ry,1))return[x,z];for(let r=4;r<=30;r+=4)for(let k=0;k<12;k++){const a=k/12*Math.PI*2,px=x+Math.cos(a)*r,pz=z+Math.sin(a)*r;if(athRectClr(px,pz,w,d,ry,1))return[px,pz]}return[x,z]};
@@ -110,7 +110,7 @@ function athLandmarksBuild(bt,BM){const MB='#e9dfc6',MW='#f4efe2',GL=[];HUB.lmk=
   // Panathenaic Stadium: marble horseshoe (open end to the NNW, Vas. Konstantinou), drivable track
   if(have('stadium')){const[x,z]=W2(1369,-865),ry=Math.atan2(-.5,-.866),P=F(x,z,ry),L2=160,Rr=17;box(30,.08,L2+30,x,0,z,'#c8754a',ry);
     for(let t=0;t<9;t++){const off=Rr+3+t*3.2,h=1.2+t*1.9;for(const sd of[-1,1]){const[cx,cz]=P(sd*off,0);box(3.2,h,L2,cx,0,cz,t%3===2?'#ddd3bd':'#efe8d8',ry)}for(let k=0;k<12;k++){const a=Math.PI*(k+.5)/12,lx=Math.cos(a)*off,lz=L2/2+Math.sin(a)*off,[cx,cz]=P(lx,lz);box(3.2,h,off*Math.PI/12+.6,cx,0,cz,t%3===2?'#ddd3bd':'#efe8d8',ry+a)}}
-    for(const sd of[-1,1]){const[cx,cz]=P(sd*(Rr+18),0);hubAddB({x:cx,z:cz,hw:15,hd:L2/2,h:18,ry})}for(let k=0;k<6;k++){const a=Math.PI*(k+.5)/6,[cx,cz]=P(Math.cos(a)*(Rr+18),L2/2+Math.sin(a)*(Rr+18));hubAddB({x:cx,z:cz,hw:15,hd:10,h:18,ry:ry+a})}
+    /* collide-r21i: h is an ABSOLUTE top; h:18 on Athens ground (~50 m) made every stand collider 'low' (bLow) and skipped, and 6 boxes left gaps round the curve */for(const sd of[-1,1]){const[cx,cz]=P(sd*(Rr+18),0);hubAddB({x:cx,z:cz,hw:15,hd:L2/2,h:groundY(cx,cz)+18,ry})}for(let k=0;k<12;k++){const a=Math.PI*(k+.5)/12,[cx,cz]=P(Math.cos(a)*(Rr+18),L2/2+Math.sin(a)*(Rr+18));hubAddB({x:cx,z:cz,hw:15,hd:7,h:groundY(cx,cz)+18,ry:ry+a})}
     for(const sd of[-1,1]){const[cx,cz]=P(sd*(Rr+33),-L2/2-2);box(4,8,4,cx,0,cz,'#efe8d8',ry)}}
   // Lycabettus: chapel of Agios Georgios on the summit
   if(have('chapel')){const[x,z]=W2(1552,643),y=groundY(x,z);box(12,5,8,x,y,z,'#ffffff',0);gab(8,12,2.4,x,y+5,z,'#c86a3c',0);box(3,10,3,x+7,y,z,'#ffffff',0);gab(3,3,1.6,x+7,y+10,z,'#c86a3c',0);box(.4,1.6,.4,x+7,y+11.6,z,'#d4af37',0);coll(x+1,z,8,4.5,y,10,0)}

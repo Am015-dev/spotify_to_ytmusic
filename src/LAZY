@@ -1,5 +1,6 @@
 99c3_rv2k3.js:RV3A_go,RV3A_race,RV3A_rows
 99c8_bot.js:BOT_go,BOT_rows,BOT_esc,BOT_escScan,BOT_dbg,RCL_scan,RCL_go
+99c9_collide.js:CA_rows,CA_run,CA_go
 99c_checklist.js
 99c2_slowspots.js:SLOW1_go
 99c3_rv3c.js:RV3C_go,RV3C_start,RV3C_stop
