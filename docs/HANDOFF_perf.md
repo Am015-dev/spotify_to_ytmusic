@@ -677,3 +677,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Identical props: tools/perf1/tPropHash.js, FNV over HUB.props (t,x,y,z,ry,rt,sc, order): ath 111131 rows dfcfd976, fra 37383 rows 2ad2bd10, same with ?bhp=0.
 4. GO perf/pc-boot-lt: new line props-step longest gap < 2150 (Athens) / 600 (Frankfurt) = measured + 30 %. Gate (DESKTOP=1, built): unit 0 FAIL; perf set 6/6; r13+life1+xf1+terrain+phone2 46/47 (xf1/grass SLOW 10.0 s > 10 s, known trunk red).
 5. Left for ≤ 1 s: hubGrid 3.4 s (Athens), OC_props 1.5 s, DR_solid 1.4 s, AS stage 1.6 s need internal cursors; total boot not re-timed (+300 ms budget unverified).
+## perf-r18r (2026-10-20): PC 60 s heap owners measured; growth counted as a device does · no engine change
+1. Owners (tools/perf1/tHeapDiff.js, snapshot diff at ready vs +60 s, test page, fra +86 / ath +86 MB): solidGrp geometry attributes (far-LOD super-cell wbLod arrays, 51 MB at ready and 83-90 MB grown) ~83-90; PC.L src buffer 4.5-7; LF.ms instanceMatrix 4-6; FCG/occ WeakMap geometry 4-10; LF.rp 2; GND_L 2; RD_pred 1.6.
+2. #1 is a test-page artifact: draw=0 stubs renderer.render so STR_up never uploads a far cell and its CPU arrays stay; a device frees them at once. With IOSM_dev (window.__iosmDev) before each GC: tPcHeap fra +55 / ath +32 (raw +72..94 / +79); GO fra +18 / ath +46.
+3. Change: GO perf/pc-heap-60s now counts growth device-like (IOSM_dev before gc), caps fra 60 / ath 56 (measured max +20 %, was 110 / 106). tPcHeap DEV=1, EVAL0=, new tHeapDiff.js (DEPTH=, DEV=1).
+4. Gate (built): unit 0 FAIL; perf pc-heap/heap-30s/pc-roam-30s/pc-boot-lt 7/7; r13 sky + life1 xf1 terrain phone2 47/47. No render path touched, so no new shot.
+5. Left: with real draws the remaining owners are PC.L ~7, LF.ms ~6, FCG/occ ~10 (all small); fra +55 in tPcHeap is near the 60 line. Next: free FCG/occ WeakMap geometry on LF tile unload.

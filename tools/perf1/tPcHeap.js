@@ -8,10 +8,10 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  await p.addInitScript(`(()=>{const q=[];let t=0;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};window.__dbg=1;window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){}}}return t};window.__auto=true;setInterval(()=>{if(window.__auto)window.__tick(1)},16)})()`);
  await p.goto(`http://127.0.0.1:${srv.address().port}/${V}/index.html?test=${CITY}&draw=0${process.env.QS?'&'+process.env.QS:''}`);
  await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:500});L('ready');
- const mb=async()=>{await cdp.send('HeapProfiler.collectGarbage');return +(await p.evaluate(()=>performance.memory.usedJSHeapSize/1048576)).toFixed(0)};
+ const mb=async()=>{if(process.env.DEV)await p.evaluate(()=>window.__iosmDev());await cdp.send('HeapProfiler.collectGarbage');return +(await p.evaluate(()=>performance.memory.usedJSHeapSize/1048576)).toFixed(0)};
  const prof=process.env.PROF;if(prof){await cdp.send('HeapProfiler.enable');await cdp.send('HeapProfiler.startSampling',{samplingInterval:32768})}
  const h0=await mb();L('heap ready '+h0);const snap=async()=>{const {profile}=await cdp.send('HeapProfiler.getSamplingProfile');const self={};const walk=(n,st)=>{const k=(n.callFrame.functionName||'(anon)')+':'+(n.callFrame.lineNumber+1)+(n.callFrame.url.match(/[^/]*$/)||[''])[0].slice(0,10);if(n.selfSize)self[k]=(self[k]||0)+n.selfSize;for(const c of n.children)walk(c,0)};walk(profile.head,0);return self};
- const s0=prof?await snap():null;
+ const s0=prof?await snap():null;if(process.env.EVAL0)console.log('EVAL0',JSON.stringify(await p.evaluate(process.env.EVAL0)));
  await p.evaluate(()=>{window.__auto=false});
  let done=0;const step=+(process.env.STEP||10);const res=[];
  while(done<SECS){await p.evaluate(async n=>{const ev=__oc.ev,RO=ev('RO');if(!window.__drv)window.__drv=ev(`(()=>{const W=a=>Math.atan2(Math.sin(a),Math.cos(a));return()=>{const la=12+RO.v*.9,fx=Math.sin(RO.h),fz=Math.cos(RO.h),q=rfAim(RO.x+fx*la,RO.z+fz*la,fx,fz,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;if(Math.abs(RO.v)<.5&&(window.__stk=(window.__stk|0)+1)>90){window.__stk=0;const s=rfSnap(RO.x+(Math.random()-.5)*400,RO.z+(Math.random()-.5)*400,200);if(s)roamWarp(s[0],s[1],s[2]||0,true)}}})()`);window.__mx=window.__mx||0;window.__nb=window.__nb||0;
