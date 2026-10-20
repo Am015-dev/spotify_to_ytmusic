@@ -1,0 +1,65 @@
+== ath_402x812 real dur 299s states {'roam': 444} vmax 186 km/h taps 15 [('START RACE', 13), ('▶ PLAY\nHot Drop · your first d', 1), ('#storyGo', 1)]
+  #cine                  shows   1 ( 0.2/min) vis   300s (100%) area 100.0% road  18% tc 1 fast  220s | CRASH CAM
+  #roamTut               shows   4 ( 0.8/min) vis   273s ( 91%) area  11.0% road  12% tc 0 fast  214s | TUTORIAL 2/6 / TUTORIAL 2/6 Hold BOOST for TURBO. Smashing t / TUTORIAL 1/6
+  #story                 shows   1 ( 0.2/min) vis    20s (  7%) area  48.0% road  38% tc 1 fast    0s | CHAPTER 1 · WELCOME TO ATHENS Eleni Mavrou Go
+  #roamPop               shows   1 ( 0.2/min) vis   217s ( 73%) area   2.9% road  29% tc 0 fast  207s | DRIFT HERE0.0 / 4 s of drift
+  #roamGauge             shows   1 ( 0.2/min) vis   300s (100%) area   1.6% road   0% tc 0 fast  220s | 41 KM/H / 39 KM/H / 0 KM/H
+  #roamArrow             shows   3 ( 0.6/min) vis   190s ( 64%) area   2.2% road   0% tc 0 fast  180s | ➤ Yiayia Froso · Koulouri Rush → 1469 m / ➤ Yiayia Froso · Koulouri Rush → 1475 m / ➤ Yiayia Froso · Koulouri Rush → 148
+  #rotateHint            shows   1 ( 0.2/min) vis    20s (  7%) area  14.1% road  54% tc 1 fast    0s | 📱↻ Portrait works too Turn sideways for the w
+  #m1Next                shows   3 ( 0.6/min) vis    88s ( 30%) area   3.1% road   0% tc 0 fast   40s | 🥨 Koulouri Rush → 1489 m / 🥨 Koulouri Rush → 1491 m / 🥨 Koulouri Rush → 1498 m
+  #tuG                   shows   1 ( 0.2/min) vis   300s (100%) area   0.6% road   0% tc 0 fast  220s | ⚙
+  #qaBugTop              shows   1 ( 0.2/min) vis   300s (100%) area   0.6% road   0% tc 1 fast  220s | 🐞
+  div.ldl                shows   1 ( 0.2/min) vis    20s (  7%) area   4.8% road  66% tc 1 fast    0s | MAINHATTAN OVERDRIVE
+  #ogArea                shows   2 ( 0.4/min) vis    34s ( 11%) area   2.7% road   0% tc 1 fast   34s | 📍 KOUKAKI16% COMPLETE / 📍 MAKRYGIANNI0% COMPLETE
+  #b2kM                  shows   1 ( 0.2/min) vis   279s ( 93%) area   0.3% road   0% tc 0 fast  220s | BRICKBASH!
+  #crSmHint              shows   2 ( 0.4/min) vis    62s ( 21%) area   1.3% road   0% tc 0 fast   44s | HIT FAST = SMASH
+  #roamTop               shows   1 ( 0.2/min) vis     5s (  2%) area   2.3% road   0% tc 0 fast    5s | WRONG VEHICLE FOR DIRT · ⟳
+  #juPop                 shows   1 ( 0.2/min) vis     4s (  1%) area   1.7% road   0% tc 0 fast    0s | CHAIN 26 ×3 +156 STUDS
+  #hitPop                shows   3 ( 0.6/min) vis     6s (  2%) area   0.7% road   0% tc 0 fast    6s | +COMBO ×3 / +COMBO ×2 / 💥 SMASH!
+== ath_852x393 real dur 300s states {'roam': 597} vmax 190 km/h taps 15 [('START RACE', 13), ('▶ PLAY\nHot Drop · your first d', 1), ('#storyGo', 1)]
+  #cine                  shows   1 ( 0.2/min) vis   300s (100%) area 100.0% road  18% tc 1 fast  256s | CRASH CAM
+  #roamTut               shows   1 ( 0.2/min) vis   276s ( 92%) area   7.8% road  40% tc 1 fast  256s | TUTORIAL 2/6 / TUTORIAL 2/6 Hold BOOST for TURBO. Smashing t / TUTORIAL 1/6
+  #story                 shows   1 ( 0.2/min) vis    24s (  8%) area  35.1% road  51% tc 1 fast    0s | CHAPTER 1 · WELCOME TO ATHENS Eleni Mavrou Go
+  #roamArrow             shows   2 ( 0.4/min) vis   202s ( 68%) area   2.5% road   0% tc 0 fast  202s | ➤ Yiayia Froso · Koulouri Rush → 1464 m / ➤ Yiayia Froso · Koulouri Rush → 1472 m / ➤ Yiayia Froso · Koulouri Rush → 146
+  #roamPop               shows   1 ( 0.2/min) vis   236s ( 79%) area   1.6% road   0% tc 0 fast  236s | DRIFT HERE0.0 / 4 s of drift
+  div.ldl                shows   1 ( 0.2/min) vis    24s (  8%) area   9.9% road  14% tc 0 fast    0s | MAINHATTAN OVERDRIVE
+  #roamGauge             shows   1 ( 0.2/min) vis   300s (100%) area   0.7% road   0% tc 1 fast  256s | 41 KM/H / 1 KM/H / 0 KM/H
+  #m1Next                shows   2 ( 0.4/min) vis    73s ( 24%) area   2.5% road   0% tc 0 fast   54s | 🥨 Yiayia Froso · Koulouri Rush → 1498 m / 🥨 Yiayia Froso · Koulouri Rush → 1491 m / 🥨 Yiayia Froso · Koulouri Rush → 149
+  #tuG                   shows   1 ( 0.2/min) vis   300s (100%) area   0.6% road   0% tc 0 fast  256s | ⚙
+  #qaBugTop              shows   1 ( 0.2/min) vis   300s (100%) area   0.6% road   0% tc 1 fast  256s | 🐞
+  #b2kM                  shows   1 ( 0.2/min) vis   276s ( 92%) area   0.6% road   0% tc 1 fast  256s | BRICKBASH!
+  #crSmHint              shows   2 ( 0.4/min) vis    80s ( 27%) area   1.3% road   0% tc 0 fast   60s | HIT FAST = SMASH
+  #ogArea                shows   1 ( 0.2/min) vis    22s (  7%) area   1.5% road   0% tc 1 fast   22s | 📍 KOUKAKI16% COMPLETE
+  #hitPop                shows   2 ( 0.4/min) vis     5s (  2%) area   0.7% road   0% tc 1 fast    5s | +COMBO ×3 / +COMBO ×2
+== fra_402x812 real dur 299s states {'roam': 648} vmax 115 km/h taps 11 [('START RACE', 9), ('▶ PLAY\nHot Drop · your first d', 1), ('#m1Cs', 1)]
+  #cine                  shows   1 ( 0.2/min) vis   300s (100%) area 100.0% road  18% tc 1 fast  160s | CRASH CAM
+  #roam                  shows   1 ( 0.2/min) vis    24s (  8%) area 100.0% road  18% tc 1 fast    0s | 
+  #roamArrow             shows   1 ( 0.2/min) vis   267s ( 89%) area   2.6% road   0% tc 1 fast  160s | HOT DROP · P1/5 · ➤ Follow · 10 m / HOT DROP · P1/5 · ➤ Follow · 40 m / HOT DROP · P1/5 · ➤ Follow · 20 m
+  #roamGauge             shows   2 ( 0.4/min) vis   276s ( 92%) area   1.6% road   0% tc 0 fast  160s | 17 KM/H / 25 KM/H / 0 KM/H
+  div.tk                 shows   1 ( 0.2/min) vis    24s (  8%) area  18.5% road  16% tc 1 fast    0s | OMA HILDE Pop the chute over the Messe, then 
+  #npcSay                shows   3 ( 0.6/min) vis    20s (  7%) area  10.2% road   0% tc 0 fast    3s | OMA HILDE Corner coming! Keep GAS on, steer a / OMA HILDE Hold BOOST on the straight. Smashin / OMA HILDE Hold GAS and f
+  #tuG                   shows   1 ( 0.2/min) vis   290s ( 97%) area   0.6% road   0% tc 0 fast  160s | ⚙
+  #qaBugTop              shows   1 ( 0.2/min) vis   290s ( 97%) area   0.6% road   0% tc 1 fast  160s | 🐞
+  #rotateHint            shows   1 ( 0.2/min) vis     9s (  3%) area  14.1% road  54% tc 1 fast    0s | 📱↻ Portrait works too Turn sideways for the w
+  #b2kM                  shows   1 ( 0.2/min) vis   290s ( 97%) area   0.3% road   0% tc 0 fast  160s | BRICKBASH!
+  #crSmHint              shows   1 ( 0.2/min) vis    57s ( 19%) area   1.3% road   0% tc 0 fast   25s | HIT FAST = SMASH
+  div.ldl                shows   1 ( 0.2/min) vis     9s (  3%) area   4.8% road  66% tc 1 fast    0s | MAINHATTAN OVERDRIVE
+  #raceW                 shows   1 ( 0.2/min) vis    52s ( 17%) area   0.7% road   0% tc 0 fast    8s | 04:19.7 / 04:20.0 / 04:19.9
+  #m1Skip                shows   1 ( 0.2/min) vis    24s (  8%) area   0.9% road   0% tc 0 fast    0s | SKIP ▸▸
+  #hitPop                shows   2 ( 0.4/min) vis     7s (  2%) area   0.7% road   0% tc 0 fast    7s | 💥 SMASH!
+  #juPop                 shows   1 ( 0.2/min) vis     3s (  1%) area   1.4% road   0% tc 0 fast    3s | CHAIN 13 ×2 +52 STUDS
+== fra_852x393 real dur 298s states {'roam': 645} vmax 119 km/h taps 10 [('START RACE', 8), ('▶ PLAY\nHot Drop · your first d', 1), ('#m1Cs', 1)]
+  #cine                  shows   1 ( 0.2/min) vis   299s (100%) area 100.0% road  18% tc 1 fast  153s | CRASH CAM
+  #roam                  shows   1 ( 0.2/min) vis    32s ( 11%) area 100.0% road  18% tc 1 fast    0s | 
+  div.tk                 shows   1 ( 0.2/min) vis    32s ( 11%) area  22.4% road  34% tc 1 fast    0s | OMA HILDE Late for your own job interview, ro
+  #roamArrow             shows   1 ( 0.2/min) vis   267s ( 89%) area   2.5% road   0% tc 0 fast  153s | HOT DROP · P1/5 · ➤ Follow · 10 m / HOT DROP · P1/5 · ➤ Follow · 40 m / HOT DROP · P1/5 · ➤ Follow · 20 m
+  #roamGauge             shows   1 ( 0.2/min) vis   267s ( 89%) area   0.7% road   0% tc 1 fast  153s | 5 KM/H / 25 KM/H / 22 KM/H
+  #b2kM                  shows   1 ( 0.2/min) vis   299s (100%) area   0.6% road   0% tc 1 fast  153s | BRICKBASH!
+  #tuG                   shows   1 ( 0.2/min) vis   299s (100%) area   0.6% road   0% tc 0 fast  153s | ⚙
+  #qaBugTop              shows   1 ( 0.2/min) vis   299s (100%) area   0.6% road   0% tc 1 fast  153s | 🐞
+  #crSmHint              shows   2 ( 0.4/min) vis    96s ( 32%) area   1.3% road   0% tc 0 fast   23s | HIT FAST = SMASH
+  #raceW                 shows   1 ( 0.2/min) vis    65s ( 22%) area   0.6% road   0% tc 0 fast   10s | 04:19.7 / 04:20.0 / 04:19.9
+  #npcSay                shows   1 ( 0.2/min) vis     4s (  1%) area   9.7% road  45% tc 1 fast    4s | OMA HILDE Hold BOOST on the straight. Smashin
+  #m1Skip                shows   1 ( 0.2/min) vis    32s ( 11%) area   0.9% road   0% tc 0 fast    0s | SKIP ▸▸
+  #juPop                 shows   1 ( 0.2/min) vis     5s (  2%) area   1.1% road   0% tc 0 fast    5s | CHAIN 5 ×1 +10 STUDS
+  #hitPop                shows   1 ( 0.2/min) vis     6s (  2%) area   0.6% road   0% tc 0 fast    6s | 💥 SMASH!
