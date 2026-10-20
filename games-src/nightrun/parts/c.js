@@ -143,7 +143,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   drawPlayer(t);HUDX.drones(t);
   if(running&&!G.dead)FXV.ring(t);
   PW.draw(t);
-  if(window.ABIL)ABIL.draw(t);if(window.CTR)CTR.draw();
+  if(window.ABIL)ABIL.draw(t);if(window.CTR)CTR.draw();if(window.TIM&&TIM.draw)TIM.draw();
   for(const r of G.rings){const k=1-r.l/r.m;ctx.strokeStyle=r.c;ctx.globalAlpha=1-k;ctx.lineWidth=3*(1-k)+1;ctx.beginPath();ctx.arc(r.x,r.y,18+k*52,0,7);ctx.stroke();ctx.globalAlpha=1;}
   ctx.textAlign='center';ctx.font='700 13px "Chakra Petch",sans-serif';for(const f of G.fl){ctx.globalAlpha=Math.min(1,f.l*2);ctx.fillStyle=f.c;wtxt(f.txt,f.x,f.y);}ctx.globalAlpha=1;
   if(PT)SH.ring(ctx,t);

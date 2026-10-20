@@ -28,8 +28,10 @@ const UNIT = () => {
   for (let i = 0; i < 100; i++) m.step(1 / 60); clr(); G.tm.pen = 0; P.dashT = 0; S.r = 0; to(true); S.n = 3; G.en.push({ type: 'drone', x: 760, y: P.y, r: 14, hp: 999, max: 999, flash: 0, t: 0, bf: 99, gr: 0, score: 0, vx: 0, vy: 0 }); m.eb(P.x + 90, P.y, Math.PI, 300, '#f00', 7); G.eb[G.eb.length - 1].cxM = 1; const mk0 = T.stat.mark, ne0 = G.eb.length, cx0 = G.eb.some(b => b.cxM), pr0 = T.stat.parry, pf0 = T.stat.pf; dash();
   ok('beat dash catches a marked seeker shot (40 dmg back)', T.stat.mark === mk0 + 1 && m.G.pb.some(b => b.tm && b.dm === 40), `mark ${T.stat.mark - mk0} pb40 ${m.G.pb.filter(b => b.tm).map(b => b.dm).join(',')} eb ${ne0} marked ${cx0} pf ${T.stat.pf - pf0} parry ${T.stat.parry - pr0} pen ${G.tm.pen.toFixed(2)} n ${S.n} dashT ${P.dashT.toFixed(2)}`);
   // EMP tiers
-  const emp = (n, nb) => { clr(); for (let k = 0; k < nb; k++) m.eb(500 + k * 8, 100 + k * 30, Math.PI, 40, '#fff', 5); P.emp = n; A.st().m = 0; const st = JSON.parse(JSON.stringify(T.stat)); m.press('Emp'); m.step(1 / 60); return { left: P.emp, w: T.stat.waste - st.waste, t: [1, 2, 3].map(i => T.stat['e' + i] - st['e' + i]), bub: !!(A.st().bub) }; };
+  const emp = (n, nb) => { clr(); if (m.G.tm) { m.G.tm.h = 0; m.G.tm.hl = 0; } for (let k = 0; k < nb; k++) m.eb(500 + k * 8, 100 + k * 30, Math.PI, 40, '#fff', 5); P.emp = n; A.st().m = 0; const st = JSON.parse(JSON.stringify(T.stat)); m.press('Emp'); m.step(1 / 60); return { left: P.emp, w: T.stat.waste - st.waste, t: [1, 2, 3].map(i => T.stat['e' + i] - st['e' + i]), bub: !!(A.st().bub) }; };
   const e1 = emp(1, 8), e2 = emp(2, 8), e3 = emp(3, 8), e0 = emp(3, 1);
+  { clr(); G.tm.h = 0; G.tm.hl = 0; G.tm.pen = 0; const S2 = A.st(); let lk = 0; for (let q = 0; q < 6; q++) { S2.n = 3; P.dashT = 0; G.tm.pen = 0; to(false); dash(); if (G.tm.hl > 0) { lk = q + 1; break; } }
+    ok('W49 mashing heats: off-beat presses lock DASH + EMP (heat)', lk >= 3 && lk <= 5 && G.tm.hl > 1.5, 'locked at press ' + lk); const e0 = P.emp = 2; m.press('Emp'); m.step(1 / 60); ok('W49 EMP locked while overheated', P.emp === 2, 'emp ' + P.emp); G.tm.h = 0; G.tm.hl = 0; }
   ok('EMP spends every held charge', e1.left === 0 && e2.left === 0 && e3.left === 0, [e1.left, e2.left, e3.left].join('/'));
   ok('EMP x1 / x2 (+bubble) / x3 tiers', e1.t[0] === 1 && e2.t[1] === 1 && e2.bub && e3.t[2] === 1, JSON.stringify([e1.t, e2.t, e3.t]));
   ok('EMP on a near-empty screen = wasted', e0.w === 1 && e0.left === 0);
@@ -75,7 +77,8 @@ const BOT = ({ n, mode, diff, mid, MAXT, k }) => {
       else if (close(24, .05) && P.hp <= 2) dsh = true;   // emergency, off the beat
       else if (wallNear() && wallNear().x - P.x < 40) dsh = true;
       const hot = C && (C.walls.some(w => w.cur && w.warn <= 0 && w.x < 900) || G.en.some(e => e.ctw && e.wsh && e.x < 900));
-      emp = P.emp > 0 && (hot || (P.emp >= 3 && G.eb.length >= 14) || (P.emp >= 2 && G.eb.length >= 22) || (P.hp <= 2 && G.eb.length >= 8));
+      const ov = G.eb.filter(b => b.ew && Math.hypot(b.x - P.x, b.y - P.y) < 150).length >= 6;   // W49 OVERLOAD ring closing in
+      emp = P.emp > 0 && (hot || ov || (P.emp >= 3 && G.eb.length >= 14) || (P.emp >= 2 && G.eb.length >= 22) || (P.hp <= 2 && G.eb.length >= 8));
     }
     if (mode === 'rand' || mode === 'randd' || mode === 'rande') { dsh = mode !== 'rande' && rnd() < .03; emp = mode !== 'randd' && P.emp > 0 && rnd() < .004; }
     if (dsh && (mode !== 'beat' || ready())) { m.press('Dash'); nd++; }
@@ -83,7 +86,7 @@ const BOT = ({ n, mode, diff, mid, MAXT, k }) => {
     const bn = Math.floor(m.bpos()); if (bn !== lastBeat) { lastBeat = bn; m.press('Fire'); }
     m.step(dt); i++; if (m.G.dead) break; if (m.ST.over) { cleared = true; break; }
   }
-  const T = window.TIM.stat, r = { n, mode, diff, clear: cleared, dead: !!m.G.dead, t: m.G.t, hits: m.ST.hits, hpmax: m.P.max, nd, ne, parry: T.parry, off: T.off, e: T.emp, waste: T.waste, tiers: [T.e1, T.e2, T.e3] };
+  const T = window.TIM.stat, r = { n, mode, diff, clear: cleared, dead: !!m.G.dead, t: m.G.t, hits: m.ST.hits, hpmax: m.P.max, nd, ne, parry: T.parry, off: T.off, e: T.emp, waste: T.waste, lk: T.lock || 0, ew: T.ew || 0, tiers: [T.e1, T.e2, T.e3] };
   m.abort(); return r;
 };
 (async () => {
@@ -99,8 +102,8 @@ const BOT = ({ n, mode, diff, mid, MAXT, k }) => {
   if (process.env.HARD !== '0') for (const mode of ['reflex', 'beat', 'rand', 'nodash']) for (let k = 0; k < RUNS; k++) jobs.push({ n: +(process.env.HARD_ST || 5), mode, diff: 'hard', mid: 1, MAXT, k });
   const res = []; let next = 0;
   await Promise.all(Array.from({ length: PAR }, async () => { const p = await mk(); while (next < jobs.length) { const j = jobs[next++]; try { const r = await p.evaluate(BOT, j); r.key = (j.diff === 'hard' ? 'H-' : '') + j.mode; res.push(r); if (process.env.REPORT) console.log('RUN', j.mode, j.diff, j.n, j.k, r.clear ? 'clear' : 'fail', 'hits', r.hits); } catch (e) { console.log('RUN ERROR', JSON.stringify(j), e.message.slice(0, 120)); } await p.reload(); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); } await p.close(); }));
-  const agg = {}; for (const r of res) { const a = agg[r.key] = agg[r.key] || { n: 0, cl: 0, h: 0, t: 0, nd: 0, ne: 0, pa: 0, off: 0, w: 0, ti: [0, 0, 0] }; a.n++; a.cl += r.clear ? 1 : 0; a.dd = (a.dd || 0) + (r.dead ? 1 : 0); a.hm = (a.hm || 0) + r.hpmax; a.h += r.hits; a.t += r.t; a.nd += r.nd; a.ne += r.e; a.pa += r.parry; a.off += r.off; a.w += r.waste; r.tiers.forEach((x, i) => a.ti[i] += x); }
-  for (const k in agg) { const a = agg[k]; console.log('REPORT ' + k.padEnd(9) + ' runs ' + a.n + ' clear ' + Math.round(100 * a.cl / a.n) + '% dead ' + a.dd + ' hull ' + (a.hm / a.n).toFixed(1) + ' t ' + (a.t / a.n).toFixed(0) + ' hits ' + (a.h / a.n).toFixed(1) + ' dash/min ' + (a.nd / (a.t / 60)).toFixed(1) + ' parry ' + (a.pa / a.n).toFixed(1) + ' offbeat ' + (a.off / a.n).toFixed(1) + ' EMP/min ' + (a.ne / (a.t / 60)).toFixed(2) + ' wasted ' + a.w + ' tiers ' + a.ti.join('/')); }
+  const agg = {}; for (const r of res) { const a = agg[r.key] = agg[r.key] || { n: 0, cl: 0, h: 0, t: 0, nd: 0, ne: 0, pa: 0, off: 0, w: 0, ti: [0, 0, 0] }; a.n++; a.cl += r.clear ? 1 : 0; a.dd = (a.dd || 0) + (r.dead ? 1 : 0); a.hm = (a.hm || 0) + r.hpmax; a.h += r.hits; a.t += r.t; a.nd += r.nd; a.ne += r.e; a.pa += r.parry; a.off += r.off; a.w += r.waste; a.lk = (a.lk || 0) + r.lk; r.tiers.forEach((x, i) => a.ti[i] += x); }
+  for (const k in agg) { const a = agg[k]; console.log('REPORT ' + k.padEnd(9) + ' runs ' + a.n + ' clear ' + Math.round(100 * a.cl / a.n) + '% dead ' + a.dd + ' hull ' + (a.hm / a.n).toFixed(1) + ' t ' + (a.t / a.n).toFixed(0) + ' hits ' + (a.h / a.n).toFixed(1) + ' dash/min ' + (a.nd / (a.t / 60)).toFixed(1) + ' parry ' + (a.pa / a.n).toFixed(1) + ' offbeat ' + (a.off / a.n).toFixed(1) + ' EMP/min ' + (a.ne / (a.t / 60)).toFixed(2) + ' locks ' + (a.lk / a.n).toFixed(1) + ' wasted ' + a.w + ' tiers ' + a.ti.join('/')); }
   const cl = k => agg[k] ? agg[k].cl / agg[k].n : NaN, epm = k => agg[k] ? agg[k].ne / (agg[k].t / 60) : 0;
   const hp = k => agg[k] ? agg[k].h / agg[k].n : NaN;
   chk(`hits per run: beat ${hp('beat').toFixed(1)} < reflex ${hp('reflex').toFixed(1)} < no DASH/EMP ${hp('nodash').toFixed(1)}, random ${hp('rand').toFixed(1)} > beat`, hp('beat') < hp('reflex') && hp('reflex') < hp('nodash') && hp('rand') > hp('beat'));
