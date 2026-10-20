@@ -13,3 +13,19 @@ function PERF1_go(){const ok=b=>b?' ✅':' ❌',W=a=>Math.atan2(Math.sin(a),Math
 (function PERF1_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='frame'))C.items.push({ver:'perf',id:'frame',area:'drive',text:'rv:2026-10-17 · perf/frame (Alex beta.90: “lags a lot even on a very powerful machine”): stepped-frame drive at speed in both cities, the frame JS (sim, traffic, LIFE, lazy builders, streaming, camera) p95 ≤ 16 ms and no frame > 50 ms'});
   C.GO['perf/frame']=['fra','ath'].map(c=>({c,n:'frame time',secs:120,fn:()=>PERF1_go()}));return}
  if(i<600)setTimeout(()=>PERF1_reg(i+1),100)})(0);
+// telemetry-r20g: GO perf/session-doc. Payload shape of the `session` doc and its rate limit (≤ 1 write / 20 s, ≤ 30 docs), stubbed db, no graphics.
+(function TR20G_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='session-doc'))C.items.push({ver:'perf',id:'session-doc',area:'perf',text:'telemetry-r20g · perf/session-doc: one `session` doc per play session (build, device, phases, frame p50/p95/max per state, gap, errors) with ≤ 1 write / 20 s and ≤ 30 docs'});
+  C.GO['perf/session-doc']=[{c:'fra',n:'session doc shape + rate limit',secs:2,fn:async()=>{const S=window.__ps;if(!S)return'📍 SESSION DOC · window.__ps missing ❌ FAIL';const P=S.PS,sv={sent:P.sent,lastW:P.lastW,dirty:P.dirty,seq:P.seq,tPlay:P.tPlay,tm:P.tm,st:P.st},mock=window.__pbDbMock,got=[],R=[];
+   window.__pbDbMock={collection:n=>({add:async d=>{got.push([n,d]);return{}}})};
+   try{P.st={roam:{a:new Float32Array(4096),k:0,n:0},race:{a:new Float32Array(4096),k:0,n:0}};P.tPlay=P.tPlay||performance.now()-4000;for(let k=0;k<40;k++){P.st.roam.a[P.st.roam.k++]=14+k%5;P.st.roam.n++}P.st.race.a[P.st.race.k++]=40;P.st.race.n++;
+    P.sent=0;P.lastW=-1e9;P.dirty=true;const r1=await S.flush(false),d=got[0]&&got[0][1];
+    const need=['kind','build','city','vp','dpr','ua','sid','seq','bootMs','phase','long3','roam','race','gapMs','gapState','errN','err','hint','heap','prog','at'],miss=d?need.filter(x=>!(x in d)):need;
+    R.push(['write '+r1+' into perf, fields '+(miss.length?'missing '+miss.join(','):'all'),r1==='sent'&&got[0][0]==='perf'&&d.kind==='session'&&!miss.length]);
+    R.push(['stats roam p50 '+(d&&d.roam&&d.roam.p50)+' p95 '+(d&&d.roam&&d.roam.p95)+' race max '+(d&&d.race&&d.race.max),!!d&&d.roam.n===40&&d.roam.p95===18&&d.roam.p50===16&&d.race.max===40]);
+    P.dirty=true;const r2=await S.flush(false);clearTimeout(P.tm);P.tm=0;R.push(['2nd write < 20 s later → '+r2+', docs '+got.length,r2==='wait'&&got.length===1]);
+    P.lastW=-1e9;P.sent=P.maxDocs;P.dirty=true;const r3=await S.flush(false);R.push(['31st doc → '+r3,r3==='cap'&&got.length===1]);
+    P.lastW=-1e9;P.sent=0;P.dirty=true;const r4=await S.flush(true);R.push(['pagehide flush → '+r4,r4==='sent'&&got.length===2&&got[1][1].seq===d.seq+1])}
+   catch(e){R.push(['threw '+e,false])}
+   finally{window.__pbDbMock=mock;Object.assign(P,sv);clearTimeout(P.tm);P.tm=sv.tm}
+   const ok=R.every(r=>r[1]);return`📍 SESSION DOC · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}}];return}
+ if(i<600)setTimeout(()=>TR20G_reg(i+1),100)})(0);
