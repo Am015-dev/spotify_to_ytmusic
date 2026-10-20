@@ -10,7 +10,7 @@ const DENS=window.DENS={st:{curtains:0,bul:0,maxGap:0},busy:0,last:-9,px:[],
   get on(){return!!RET.density&&!G.tut&&!G.lab&&!G.boss&&!G.bossDone&&!SH.active&&!(ST.on&&ST.n<=2);},
   idx(){return ST.on?ST.n:20+G.di*3+(G.loop|0);},
   heavy(){const t=(G.t+30)%40;return t<28;},                         // false = a breather
-  budget(){const n=this.idx(),h=clamp(8.5+(24-8.5)*(n-3)/27,5,24.5)*(DF.dn||1),cap=ebCap()-2;
+  budget(){const n=this.idx(),h=clamp(8.5+(24-8.5)*Math.pow(Math.max(0,n-3)/27,1.5),5,24.5)*(DF.dn||1),cap=ebCap()-2;
     return Math.min(this.heavy()?h:h*.6,cap);},
   lead(){return Math.max(2,Math.ceil(.7/(BT.spb||.5)));},            // marker beats: >= .65 s at any tempo
   cols(k){const xs=this.px.slice();for(const b of G.eb)if(b.dn&&!b.dead)xs.push(b.x);const out=[];let tries=0;

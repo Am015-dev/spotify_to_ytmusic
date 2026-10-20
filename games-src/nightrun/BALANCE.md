@@ -276,3 +276,4 @@ parts/density.js: a per-stage budget of bullets on screen (heavy stretch: ~9 at 
 When the screen holds fewer, the director beat hook (dir.js) sends a slow curtain: 2 to 7 columns of 3-4 bullets, speed 105-135, marker >= .7 s, columns >= 115 px apart (also from columns still pending or falling), none above the ship; ebCap/BCAP apply through eb().
 Roster substitution now also covers stages 3-4 (only stages 1-2 keep the plain drones) so no kind passes 35% of spawns. Boss movesets are built at spawn and trimmed to <= 12 distinct attacks (DENS.trimBoss; hulls and caps in armour.js untouched).
 Test: density-test.js (curve, caps, gaps, difficulty order, flag off).
+Result (industry-audit, before -> after): S04 4.99 -> 11.15 (target 12, near), S06 1.08 -> 1.73 pass, S08 78.6 -> 78.4 pass, S09 0.41 -> 0.23 pass, S12 13 -> 8 pass. The budget curve is convex (balance-test Normal late stage 8 clear 67%, same as ?density=0; a linear curve gave 50%).
