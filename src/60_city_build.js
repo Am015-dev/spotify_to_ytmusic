@@ -82,7 +82,7 @@ function* gndGen(grp,x0,x1,z0,z1,o){const B=new Map(),cs=o.cs,nx=Math.round((x1-
       if(v[3])G.n.push(0,1,0);else{const e=2,hx=tH(v[0]+e,v[2])-tH(v[0]-e,v[2]),hz=tH(v[0],v[2]+e)-tH(v[0],v[2]-e),l=Math.hypot(hx,2*e,hz);G.n.push(-hx/l,2*e/l,-hz/l)}}
     if(LL&&n===1&&!sn)LL.push(lx,lz,lw,lh,G.p[ix[0]*3+1],G.p[ix[1]*3+1],G.p[ix[2]*3+1],G.p[ix[3]*3+1],-1);
     for(let a=0;a<n;a++)for(let b=0;b<n;b++){const q=a*(n+1)+b;if(V[q][3]&&V[q+1][3]&&V[q+n+1][3]&&V[q+n+2][3])continue;G.i.push(ix[q],ix[q+1],ix[q+n+1],ix[q+1],ix[q+n+2],ix[q+n+1])}}
-    if(LL&&LOWMEM&&MEMC_ON)GL.c[i*nz+j]=GND_cellF32(LL,ax,az)}
+    if(LL&&MEMC_ON)GL.c[i*nz+j]=GND_cellF32(LL,ax,az)}   // perf-r18g: desktop too (its ground was still boxed JS arrays after 60 s of roam)
     if(o.near&&cc.end){const tk=tkOf(i,j);for(const[key,G]of B)if(key.endsWith(tk)&&key.length>tk.length&&!key.slice(0,-tk.length).includes('|')){mk(G);B.delete(key)}}}
   for(const G of B.values())mk(G);if(GL&&LOWMEM)GND_pack(GL);return out}
 // the Main and the Osthafen basin: water ribbons (~1.2 km pieces so they cull) with the distance to the bank as a vertex attribute (quay foam)

@@ -263,3 +263,9 @@ window.__as={impMesh:AS_impMesh,impAtlas:AS_impAtlas,A:ASSET,R:AS_R,build:AS_bui
   S.sort((a,b)=>a-b);const q=f=>+(S[Math.min(S.length-1,Math.floor(S.length*f))]||0).toFixed(2);// share of the most common variant among the trees in a 30 m disc (≥5 trees)
   return{trees:T.length,variants:Object.keys(by).length,by,p50:q(.5),p95:q(.95),worst:q(1),over:+(S.filter(v=>v>.3).length/Math.max(S.length,1)).toFixed(3),samples:S.length}}};
 try{AS_apply()}catch(e){console.warn('AS apply',e)}
+// perf-r18g: STR_lzFree drops a freed LAZY region's props from HUB.props / pgrid, but ASSET.ag (the 30 m variant grid) kept them and their disposed meshes
+// (~15 MB after 60 s desktop roam). Drop them with the region: only the 30 m cells over its rect (+60 m). ?asg=0 = off
+if(!/[?&]asg=0\b/.test(location.search))STR_lzFree=(f=>function(L){const R=L&&L.root,r=f.apply(this,arguments),G=ASSET.ag,q=L&&L.rect;if(!R||!G||!q)return r;
+ const inR=o=>{for(let t=o;t;t=t.parent)if(t===R)return true;return false};
+ for(let i=Math.floor((q[0]-60)/30);i<=Math.floor((q[1]+60)/30);i++)for(let j=Math.floor((q[2]-60)/30);j<=Math.floor((q[3]+60)/30);j++){const k=i*100000+j,A=G.get(k);if(!A)continue;
+  let n=0;for(const p of A)if(!(p.im&&inR(p.im)))A[n++]=p;if(!n)G.delete(k);else A.length=n}return r})(STR_lzFree);
