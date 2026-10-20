@@ -1,0 +1,6 @@
+# HANDOFF roads-r21g (Athens nav): snap fix shipped, 12/12 NOT reached (Athens 10/12 on seeds 0-11)
+1. Change: navMain(N) (src/60_city_build6.js) = largest strongly connected component of HUB.nodes, cached on N; navPath and the bot's goal picks snap only to it. Bot: goal ring widens to 120-1100 m when <20 nodes in 250-750 m, 40 tries instead of 12 (map-edge 'no reachable waypoint' on seed 5 gone). Nothing the bot asserts was reduced; hairpin costs and lane-start logic untouched.
+2. Measured (built page, 12 seeds, one page per city): Athens 10/12 (was 5-7/12), fails seed 6 (leg 1 1340,-2847 -> 1102,-2197, auto-reset x2) and 7 (leg 3 1595,-2880 -> 2029,-3016, auto-reset x2). Frankfurt 11/12 (seed 6 leg 3 -1975,295 -> -2368,-47; seeds 0-3 pass 4/4). Both races 1ST, 5/5 gates. Unit 0 FAIL; TAG=bot,life1,xf1,terrain 46/46.
+3. What blocks 12/12: no more graph holes; the remaining fails are physical pins ending in the game's double hop (U-turn when the first target is behind, steep verge + building corner at ~1287,-2366; seed 6 repeats at cell 1100,-2300). Connector links would not help.
+4. Next (one target): let the bot reverse-turn (or steer a K-turn) when the first path point is behind the car, or fix that pin geometry; then re-run tools/roads/r21e/multi.js ath 0-11.
+5. docs/BOT_REPORT.md regenerated with 12 seeds per city.
