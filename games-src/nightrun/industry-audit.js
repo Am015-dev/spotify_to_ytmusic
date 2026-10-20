@@ -33,6 +33,7 @@ const RUN = new Function('o', `
   if (!window.__ia) { window.__ia = { on: 1 }; }
   window.__iaH = window.__iaH || [];
   const h1 = NR.on('spawn', e => sp.push([m.G.t, e.type + (e.el ? '*' : '')])), h2 = NR.on('pitStart', () => pits.push(m.G.t)), h3 = NR.on('bossIn', x => bossIn.push([m.G.t, !!x.mini]));
+  m.SH.live = true; // S27: startStory emits no runStart, so SH.live stays false and a stage end skips the pit stop (SH.pit). Set it here so the sim reaches the card screen
   m.startStory(o.n); m.simOn(true); m.NR.watch = { shots: [], spawns: [] };
   ${DEC}
   const seen = new Map(), life = [], ebN = [], enN = [], bossEbN = [], fireBy = new Map(); let hits = 0, dashes = 0, reflex = 0, emps = 0, d = null, i = 0, lastBoss = null, bossWin = [], bossNow = null, bossMax = 0, lanes = 0, lastLane = null, hp0 = null;
@@ -42,6 +43,8 @@ const RUN = new Function('o', `
     const G = m.G, P = m.P; if (m.SH.active) m.SH.close();
     if (i % 3 === 0 && !o.park) { d = dec(); m.touchTo(d.bx, d.by);
       if (d.dash && P.dashCd <= 0) { dashes++; if (G.eb.some(b => Math.hypot(b.x - P.x, b.y - P.y) < 60)) reflex++; m.press('Dash'); }
+      // S20: EMP when 4+ enemy bullets are within 200 px (same rule as humanbot.js, radius 200 here)
+      if (!d.emp && P.emp > 0 && G.eb.filter(b => Math.hypot(b.x - P.x, b.y - P.y) < 200).length >= 4) d.emp = true;
       if (d.emp) { emps++; m.press('Emp'); }
       const lane = Math.round(d.by / 90); if (lastLane != null && lane !== lastLane) lanes++; lastLane = lane; }
     const bp = m.bpos(), bn = Math.floor(bp); if (bn !== lastBeat) { lastBeat = bn; tapAt = bn + (rnd() < .4 ? 0 : (.15 + rnd() * .7)); } if (tapAt >= 0 && bp >= tapAt) { m.press('Fire'); tapAt = -1; }
@@ -120,6 +123,8 @@ const harness = (file, env, ms) => { const r = cp.spawnSync('node', [path.join(_
   if (!cpLong.length) WHY.S26 = 'no story stage of 150 s or longer (CPPROBE: ' + cpRows.map(x => x.n + '=' + x.len + 's').join(' ') + ')';
   // S27: pit stops in the arcade sim (every main run is arcade)
   const pitN = main.reduce((a, r) => a + r.pits, 0); M.pitStopsPerHour = pitN ? r2(pitN / (mins / 60)) : null;
+  // card screens per 10 game-min: each pit stop shows the 3-card screen when the choices flag is on (cardsOn)
+  M.cardScreensPer10Min = pitN && main.every(r => r.cardsOn) ? r2(pitN / (mins / 10)) : null;
   if (!pitN) WHY.S27 = `pit stop never fired in ${r2(mins)} game-min of arcade sim (0 pitStart); not changed here, see choices-test.js`;
   M.assistKeys = [...new Set(main[0].setKeys)].filter(k => /assist|slow|speed|invinc|aim|easy|auto|hit/i.test(k));
   { const jc = (a, b) => { let i = 0; for (const x of a) if (b.has(x)) i++; return i / (a.size + b.size - i || 1); }, sc = r => new Set(r.spawns.map(q => q[1] + '@' + Math.floor(q[0] / 3))); M.predByStage = {};
