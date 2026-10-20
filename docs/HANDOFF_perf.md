@@ -490,3 +490,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Left for 300 ms: OB_fillFix ~370 ms and TR_grade ~540 ms are monolithic (need internal cursors); then ctbK 330, gnd 290, post+ 280, streets 210; Athens post steps + olive trees 800, streets 600.
 4. GO perf/pc-bhs limits: fra < 700, ath < 1500 (guards, not 300). bhs ON: xf1/grass FAIL on fra (OFF: pass), so no flip.
 5. Gate (DESKTOP=1, built): unit 0 FAIL; pc-bhs/pc-boot-lt 4/4 off, pass on; r13+life1+xf1+terrain+phone2 off 47/47; on ath 19/19, fra 27/28 (xf1/grass).
+## ios-r17n (2026-10-20): touch streaming design + slice 1 (?tstream=1, default OFF) · deliverable: design met, ≥ 80 MB Athens NOT met
+1. docs/STREAM_TOUCH.md: owners by unique ArrayBuffer (ath/fra): streamed chunks hidden 68/43 MB, far ground/drive meshes 58/7, rest ~330 MB non-geometry. The GO test page (draw=0) never runs STR_up, so the WB far city keeps 28/44 MB that a device frees: GO heap overstates the device heap (ath 535→508, fra 381→338).
+2. Slice 1 (src/98mf_memfree.js MEMF.ts): chunk radii follow camera.far (touch 1500: off at far+50, show at far-50, deflate at far+200, inflate from far+150), deflate starts 4 s after first roam frame (was 45 s), 2 zips in flight; fixed the zip range check for the new radius.
+3. Measured (touch, lowmem, GC'd, 60 s real roam): Athens ready 531→531, after 60 s 539→532; 813 chunks 57.3→10.7 MB deflated; Frankfurt after 60 s 445. Gain ~45 MB of arrays, masked by roam growth: below 80 MB → OFF.
+4. Gates (built page): unit 0 FAIL; life1/xf1/terrain/phone2/sky-blue 46/47 (xf1/grass known red); perf/ios-mem PASS; mem-quant + touch-first-frames red only in the combined run after ios-mem, same on base r17n0, PASS alone. No shot (default OFF).
+5. Next: zip off chunks under the load curtain (moves the gain to "ready"), slice 2 far trG/gk/dr deflate after a reader audit, slice 3 per-cell block plans; fix the GO heap measure (run STR_up with drawing on).
