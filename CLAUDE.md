@@ -3,7 +3,11 @@ Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-in
 
 ## Production model (2026-10-14, after $700+ and many reverts)
 1. Exactly 2 workers plus 1 reviewer at once (Alex, 2026-10-20, replaces the earlier 5+1: too many bugs from too many parallel changes). The reviewer checks every worker commit (diff read, rebuild, unit + TAG + bot, golden if visuals changed) BEFORE the coordinator deploys; a failed review sends it back to the same worker. Each task is timeboxed to ~30-40 min or ~100k context, with ONE deliverable; then the worker writes 5 lines in docs/HANDOFF_<lane>.md, pushes and STOPS. No idle or self-waking workers, no queues, no open-ended lanes. Pick targets from Alex's own words or the Beta perf db, in his priority order.
-2. Cheapest model that can do it: Haiku for mechanical work, Sonnet for bugs with a repro, UI, integration and tests, Opus only for design or feel or anything Sonnet failed twice. Subagents: always set `model`.
+2. Model by task complexity (Alex, 2026-10-20). The coordinator scores every task before spawning and writes the model in the lane title:
+   - HAIKU = low: mechanical, one file or a table, no judgement (changelog text, ledger rows, renames, config/tune values, docs, branch lists, asset catalogue entries, re-running a gate and reporting).
+   - SONNET = medium: a bug with a repro, a feature in 1-3 modules, UI, tuning with a measurable target, tests/GO asserts, data fixes (ramps, assets from a parts list), integration, telemetry.
+   - OPUS = high: design or feel plans, anything touching 4+ modules or the render/physics core, cross-cutting performance with no known owner, graphics tiers, reviews of feel/visuals, the reviewer's verification of risky commits, and any bug Sonnet missed twice.
+   When unsure between two levels, pick the higher for the first try only if a miss would be expensive to undo (shared code, perf, deploy gate); otherwise the lower. Subagents: always set `model`.
 3. Push only green: before every push, build (tools/build.sh) and run unit (`node tools/unit/run.js`, 0 FAIL) + your TAG + `TAG=life1,xf1,terrain` on the BUILT page, not hot. WIP sits behind a flag that defaults OFF until its tests pass. A reverted push is the most expensive outcome.
 4. Tests are state asserts with no graphics (checklist GO in src/99c_checklist.js with a pass line). No real-time play as a test. One 852×393 shot only for visual changes, and LOOK at it. Each 2K-Drive-quality claim needs a side-by-side shot with a reference.
 5. Token hygiene: print only pass/fail lines (`| tail -5`); never read files > 50 KB whole (grep or a line range); no polling loops or sleeps (run in the background and wait for the notification); hand off at 100k context.
@@ -11,7 +15,7 @@ Live: games/mainhattan-overdrive/ on alex/brave-carson-rbpmlk. Trunk: alex/od-in
 7. The coordinator only routes and deploys. It deploys at most every 30 min (batch builds), never does technical work, and stays under 100k context (/compact).
 8. Bugs come from the in-game 🐞 button → artifact db collection `bugs` (read with ArtifactData). Triage sets status/owner/fixedIn on the doc so Alex sees it in "My reports".
 
-9. Cost discipline (Alex, 2026-10-20, see docs/COST_LEDGER.md): two lanes per target, then a design plan or drop it; Sonnet by default, no Haiku on fixes; the coordinator hands off at 200k context; the ledger gets one row per lane at every deploy.
+9. Cost discipline (Alex, 2026-10-20, see docs/COST_LEDGER.md): two lanes per target, then a design plan or drop it; model by task complexity (rule 2); the coordinator hands off at 200k context; the ledger gets one row per lane at every deploy.
 10. iPhone truth first: no build counts as smooth on phones without the throttled iPhone-like gate (perf/ios-reveal: 6x CPU, 0 shader links and no long frames in the first 3 s after reveal) or real iPhone reports from the Beta page.
 ## Standing orders from Alex
 - Never ask Alex anything; take the recommended option and note it in one line.
