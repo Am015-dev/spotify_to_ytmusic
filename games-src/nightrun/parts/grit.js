@@ -8,6 +8,7 @@
       MEDIC (heals the foes around it while they are not being hit), EVASIVE (steps out of the way of straight shots; homing and area weapons still land). Every kind has a drawn tell from the first frame.
    Nothing here touches hard.js, armour.js, the DMG caps or the W13 floors: shield and plate only shave damage, the floor still lets a foe die no sooner than VIS.ml. */
 if(RET.grit===undefined)RET.grit=!/[?&]grit=0/.test(location.search);
+if(RET.gritBoss===undefined)RET.gritBoss=/[?&]gritboss=1/.test(location.search);   // W54: Hard boss mercy, OFF by default (reaches 17-25% beat-bot clear, target 50%)
 const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.tut||G.lab));},
   rate0:1/50,burst:.25,stK:.03,maxK:4,hk0:.3,hkS:.5,lvTop:.62,from:3,
   /* W47 Normal ease: special kinds thin out before stage 12 (dens), at most maxE alive there, a lower hull slope; stages 1-3 assist: wider beat window, slower enemy shots (humanbot.js: human clear 39% -> 70+% at st3-7) */
@@ -15,6 +16,8 @@ const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.
   st:{charges:0,gain:0,kill:0,fod:0,spec:0},
   fkM:{},fk0:1.15,fkEnd:1.05,fkA:10,fkB:20,   // on-screen floor x1.3 to stage 10, tapering to x1.1 at stage 20 (humanbot.js: median life 2.4 -> 3.0 s; a flat x1.3 cost the stage-20 oracle dodger 20-30 points)
   fk(e){const k=this.fkM[e.type]||this.fk0,s=this.stg();return s<=this.fkA?k:1+(k-1)*Math.max(0,1-(1-(this.fkEnd-1)/Math.max(.001,k-1))*Math.min(1,(s-this.fkA)/(this.fkB-this.fkA)));},
+  mcH:.5,mcHMax:6,   // W54 Hard boss mercy: .5 of a hit per hit taken during a boss fight, at most 3 per run
+  hardBoss(){return this.on&&RET.gritBoss&&SET.diff==='hard'&&!!G.boss&&!G.boss.dead;},
   norm(){return this.on&&SET.diff==='normal';},
   dens(){if(!this.norm())return 1;const s=this.stg();return s>=this.densB?1:s<=this.densA?this.dens0:this.dens0+(1-this.dens0)*(s-this.densA)/(this.densB-this.densA);},
   assist(){return this.norm()&&this.stg()<=this.aTo&&!(typeof G==='object'&&G&&G.boss);},
@@ -54,9 +57,9 @@ const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.
         else if(e.gcd<=0&&e.x<W-60&&e.x>P.x+60){for(const b of G.pb){if(b.vx<=0||b.hm||b.hk||b.au||b.tg||b.ab)continue;const dx=e.x-b.x;if(dx>0&&dx<190&&Math.abs(b.y-e.y)<e.r+8){e.gv=(b.y<e.y?1:-1)*(e.y<90?1:e.y>H-90?-1:1)*300;e.gvt=.2;e.gcd=1.1;break;}}}}}},
   draw(){if(!this.on||!G||G.dead)return;ctx.save();
     for(const e of G.en){if(!e.gk||e.hp<=0||e.x<-20||e.x>W+20)continue;const r=e.r+6,t=G.t;
-      if(e.gk==='plate'){ctx.strokeStyle='#e8f4ff';ctx.lineWidth=5;ctx.beginPath();ctx.arc(e.x,e.y,r,Math.PI*.62,Math.PI*1.38);ctx.stroke();ctx.strokeStyle='#7a8fa6';ctx.lineWidth=2;ctx.stroke();}
+      if((e.gk==='plate'&&ART.pic('gk-plate',r*2.2,e.x,e.y))||(e.gk==='shield'&&e.gs>0&&ART.pic('fx-w34-gk-shield',r*4,e.x,e.y))||(e.gk==='eva'&&ART.pic('gk-evasive',r*3.2,e.x,e.y))){}else if(e.gk==='plate'){ctx.strokeStyle='#e8f4ff';ctx.lineWidth=5;ctx.beginPath();ctx.arc(e.x,e.y,r,Math.PI*.62,Math.PI*1.38);ctx.stroke();ctx.strokeStyle='#7a8fa6';ctx.lineWidth=2;ctx.stroke();}
       else if(e.gk==='shield'&&e.gs>0){ctx.globalAlpha=.4+.5*Math.min(1,e.gs/(e.max*.7))+(e.gsf>0?.3:0);ctx.strokeStyle='#19e3ff';ctx.lineWidth=2.5;ctx.setLineDash([6,4]);ctx.beginPath();ctx.arc(e.x,e.y,r+2,0,7);ctx.stroke();ctx.setLineDash([]);}
-      else if(e.gk==='med'){const p=.6+.4*Math.sin(t*6);ctx.globalAlpha=p;ctx.fillStyle='#3dff7a';ctx.fillRect(e.x-2,e.y-r-12,4,12);ctx.fillRect(e.x-6,e.y-r-8,12,4);ctx.globalAlpha=.15;ctx.strokeStyle='#3dff7a';ctx.beginPath();ctx.arc(e.x,e.y,230,0,7);ctx.stroke();}
+      else if(e.gk==='med'){const p=.6+.4*Math.sin(t*6);ctx.globalAlpha=p;ctx.fillStyle='#3dff7a';if(!ART.pic('gk-medic',24,e.x,e.y-r-8)){ctx.fillRect(e.x-2,e.y-r-12,4,12);ctx.fillRect(e.x-6,e.y-r-8,12,4);}ctx.globalAlpha=.15;ctx.strokeStyle='#3dff7a';ctx.beginPath();ctx.arc(e.x,e.y,230,0,7);ctx.stroke();}
       else if(e.gk==='eva'){ctx.strokeStyle='#d36bff';ctx.lineWidth=2;ctx.globalAlpha=e.gvt>0?.9:.55;for(let i=1;i<=2;i++){ctx.beginPath();ctx.moveTo(e.x+r+i*5,e.y-8);ctx.lineTo(e.x+r+i*5-6,e.y);ctx.lineTo(e.x+r+i*5,e.y+8);ctx.stroke();}}}
     ctx.restore();}};
 /* meter fill time on the EMP button */
@@ -72,6 +75,7 @@ const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.
 {const w0=RET.asWinMs;RET.asWinMs=function(){return w0.call(this)+(GRIT.assist()?Math.round(GRIT.aWin*GRIT.aK()):0);};
   const b0=eb;eb=function(x,y,a,s,c,r){if(GRIT.assist())s*=1-GRIT.aSp*GRIT.aK();if(GRIT.norm())s*=GRIT.bsN;return b0(x,y,a,s,c,r===undefined?5:r);};}
 {const h1=hurt;hurt=function(n){const b=P.hp;h1.apply(this,arguments);   // W47 mercy: on Normal a share of hull hits is absorbed (hull restored, short grace) - a human takes 4-7 hits a stage, not 9
+    if(GRIT.hardBoss()&&!G.dead&&P.hp<b&&b>1){const g=GRIT.g();g.hc=(g.hc||0)+GRIT.mcH;if(g.hc>=1&&(g.hn||0)<GRIT.mcHMax){g.hc-=1;g.hn=(g.hn||0)+1;P.hp=b;P.inv=Math.max(P.inv||0,.6);GRIT.st.mercyH=(GRIT.st.mercyH||0)+1;}}   // W54: Hard (not very hard / Legend) boss fights only - a share of hull hits is absorbed, a few per run; bosses cost a dodger 8 hits in 40 s while stage 1-4 cost 8 in 126 s
     if(GRIT.norm()&&!G.dead&&P.hp<b&&b>1){const g=GRIT.g(),m=GRIT.mc0+(GRIT.mc20-GRIT.mc0)*Math.min(1,Math.max(0,(GRIT.stg()-1)/19));g.mc=(g.mc||0)+m;if(g.mc>=1&&(g.mn||0)<GRIT.mcMax){g.mc-=1;g.mn=(g.mn||0)+1;P.hp=b;P.inv=Math.max(P.inv||0,.6);GRIT.st.mercy=(GRIT.st.mercy||0)+1;}}};}
 NR.on('tick',dt=>GRIT.tick(dt));
 NR.on('runStart',()=>{for(const k in GRIT.st)GRIT.st[k]=0;});
