@@ -1,0 +1,6 @@
+# HANDOFF golden-r20j
+- `node tools/golden.js` builds out/golden and checks 8 views vs docs/golden/*.png (half-size, 1.3 MB); exit 1 on fail, side-by-sides (baseline | now | changed) only for failures in docs/golden/diff/ (git-ignored). `--update` rewrites baselines, `--no-build`, `--page out/<ver>`, `--only a,b`, `--jobs n`. ~3 min.
+- Determinism: seeded Math.random, fixed 60 Hz virtual clock (performance.now/Date.now/rAF), page holds itself at frame N, camera warp via __mho.warp. Masks: sky/cloud band (top 40 %) and the pale story ring (its spot differs per boot). Measured run-to-run noise 0-8 % (Frankfurt traffic highest); tolerances 10-20 %.
+- Rules per frame: <=2 % pure black (race-grid 25 %, ath-street 5 %: by design), sky blue, no HUD over touch controls, text >= 12 px. KNOWN (noted, not failing, list KNOWN in golden.js): speedo "KM/H" is 8 px, race "NO WEAPON" 11 px.
+- Findings for the coordinator: the Acropolis rock is NOT visible from any road within 650 m (ath-acropolis shows hills/mountains only); the roam "EXIT" button still shows over the title menu; "Portrait works too" popup is dismissed by the tool.
+- Left: hold the sim also for a few more views (race countdown), pick a better Acropolis vantage (needs a raised camera), run `golden.js` in CI before deploys.

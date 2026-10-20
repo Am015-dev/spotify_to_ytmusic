@@ -37,3 +37,4 @@ node_modules/
 
 # rev-1 sweep raw shots (grids + referenced tiles are committed)
 qa_rv1/
+docs/golden/diff/
