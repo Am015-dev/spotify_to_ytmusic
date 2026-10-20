@@ -1,3 +1,10 @@
+## r17v (2026-10-20, alex/od-int2): Frankfurt start pose clears the top-left tower
+1. src/98bp_warmall.js R17_off (before R17_seed): Frankfurt spawn turned 180 deg on the same road and moved 40 m back along the new heading (spawn0 updated, camera snapped); ?r17turn=0&r17off=0 = old pose. +40/+60/+80 forward hit the side-challenge ring/card, -80 faces a blue tower, so they were rejected by shot.
+2. GO r17/start-life: top-left open >= 90 % (Athens >= 80 %) and >= 2 cars in the camera frustum 40-120 m ahead (R17_vis). tools/perf1/tR17v.js measures + shoots (CAND=[[d,dh,lat],..] pose search).
+3. Measured (open %, cars in frustum), before -> after: fra 852x393 76,33 -> 95,19; fra 393x852 90,14 -> 97,10; ath 852x393 82,17 and 393x852 97,2 unchanged (Athens not touched; its landscape start still shows a low yellow facade top-left).
+4. Shots docs/shots/r17v/ (fra_land_before, fra_land_after, fra_port_before/after, ath_land, ath_port).
+5. Left: Athens landscape 82 % (try a small pose shift); portrait Athens only 2 cars in view.
+
 ## r17q (2026-10-20, alex/od-int2): lively start road (review 17 N5)
 1. src/98bp_warmall.js R17_seed (called from TWG_run's wrapper, under the curtain): 3 idle far cars go onto the player's road 55/85/112 m ahead (2 same-way, 1 oncoming); seed 1-11 ms, none on frame 1. ?r17=0 turns it off.
 2. GO r17/start-life (src/99c7_rev5fix.js): cars ahead at boot 0 -> 3 in Frankfurt and Athens (PASS both). Gate: unit 0 FAIL, TAG r17/start-life,perf/touch-first-frames 3/3, r13/sky-blue*,life1,xf1,terrain,phone2 47/47 on the built page.
