@@ -4,3 +4,4 @@
 - Drift: slip at 0.4 s 0.41 -> 0.51 rad, at 1.5 s 0.96 -> 0.70 rad (was unbounded). New TUNE: drSnap 14 (yaw build-up), drMax .7 (slip cap), drExitT .4 / drExitG 12 (grip springs back on release; exit < .09 rad in .35 s).
 - Braking and chase cam untouched. GO feel/handling (src/99c7_handling.js) + unit group `handling`.
 - Left: confirm the drift feel by hand on a phone; the review's 1.3 s slip figure did not reproduce in the replay either.
+- Gates: unit 0 FAIL; built page: feel/handling PASS, life1+terrain PASS; xf1/grass fails on trunk too (63ba917: tyre gap + 11 s > 10 s), terrain-tyre-ath flaked once in the combined run, passes solo.
