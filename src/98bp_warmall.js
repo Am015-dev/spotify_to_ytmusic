@@ -9,7 +9,7 @@ const LKG={on:(()=>{const q=new URLSearchParams(location.search).get('lkg');retu
 try{new PerformanceObserver(l=>{for(const e of l.getEntries())if(LKG.lt.length<400)LKG.lt.push([Math.round(e.startTime),Math.round(e.duration)])}).observe({type:'longtask',buffered:true})}catch(e){}
 function LKG_begin(sc,cam,keep){const Q=[],K=keep&&LKG.K||(LKG.K=new Set()),add=o=>{const ms=[].concat(o.material||[]);if(!ms.length||o.isScene)return;const g=o.geometry,a=g&&g.attributes||{};
   // perf-r17x: three r164 InstancedMesh/BatchedMesh keep type 'Mesh', so the flags go in the key (else an instanced set sharing a car paint was deduped against the car: its instanced program linked late)
-  const k=ms.map(m=>m.id+'v'+m.version).join('.')+'|'+o.type+(o.isInstancedMesh?'I':'')+(o.isBatchedMesh?'B':'')+(o.isSkinnedMesh?'s':'')+(o.instanceColor?'c':'')+(a.color?'v':'')+(a.uv1?'u':'')+(a.tangent?'t':'')+(o.castShadow?'S':'')+(g&&g.morphAttributes&&Object.keys(g.morphAttributes).length?'m':'');
+  const k=ms.map(m=>m.id+'v'+m.version).join('.')+'|'+o.type+(o.isInstancedMesh?'I':'')+(o.isBatchedMesh?'B':'')+(o.isSkinnedMesh?'s':'')+(o.instanceColor?'c':'')+(a.color?'v':'')+(a.uv1?'u':'')+(a.tangent?'t':'')+(o.castShadow?'S':'')+(o.receiveShadow?'R':'')/* reveal-r21p: receiveShadow is part of the lit program key (parked-car instanced packs: rs=true, same material/flags as a rs=false mesh -> deduped away, linked on the first drive frame) */+(g&&g.morphAttributes&&Object.keys(g.morphAttributes).length?'m':'');
   if(!K.has(k)){K.add(k);Q.push(o)}};sc.traverse(add);
  // compile(obj, cam, target) walks target's visible lights once per call: a light-only stand-in scene keeps that O(lights), not O(scene)
  const L=[];sc.traverseVisible(o=>{if(o.isLight&&o.layers.test(cam.layers))L.push(o)});const T=new THREE.Scene();T.fog=sc.fog;T.environment=sc.environment;T.environmentIntensity=sc.environmentIntensity;
@@ -50,7 +50,7 @@ function LKG_p2(){const g=LKG.p2g=(LKG.p2g|0)+1;if(g===1){BMK('gate p2 gfx');if(
  if(TUNE.lkLate!==0&&!/[?&]lkp2late=0/.test(location.search))try{if(typeof W12_cars==='function')W12_cars();if(typeof ART8_sweep==='function'){ART8_t=0;ART8_sweep()}}catch(e){}
  LKG.p2=2;BMK('gate p2');LKG_begin(scene,camera,1);LKG_passQ(LKG.q)}
 function LKG_end(){LKG.arm=0;LKG.fe=0;LKG.p30=null;LKG.q=null;LKG.tEnd=performance.now();LKG.idEnd=Math.max(0,...renderer.info.programs.map(p=>p.id));if(LKG.p2){renderer.shadowMap.needsUpdate=true;for(const l of LKG.sl||[])l.shadow.needsUpdate=true}
- /* perf-r17x: ?lkdiag=1 records which object links each program after the gate (GO perf/pc-post-ready-link prints it) */if(/[?&]lkdiag=1/.test(location.search)&&!LKG.dh){LKG.dh=[];const R=renderer,f=R.renderBufferDirect;R.renderBufferDirect=function(c,s,g,m,o,gr){const n=R.info.programs.length;const r=f.apply(this,arguments);if(R.info.programs.length>n&&LKG.dh.length<8){let q=o,ch=[];while(q&&ch.length<5){ch.push((q.name||q.type)+(q.isInstancedMesh?'[I]':''));q=q.parent}LKG.dh.push(R.info.programs[R.info.programs.length-1].id+'@'+ch.join('<')+'/m'+m.id+(m.name?':'+m.name:'')+(s&&s.isScene&&s!==scene?'/otherScene':''))}return r}}}
+ /* perf-r17x: ?lkdiag=1 records which object links each program after the gate (GO perf/pc-post-ready-link prints it) */if(/[?&]lkdiag=1/.test(location.search)&&!LKG.dh){LKG.dh=[];const R=renderer,f=R.renderBufferDirect;R.renderBufferDirect=function(c,s,g,m,o,gr){const n=R.info.programs.length;const r=f.apply(this,arguments);if(R.info.programs.length>n&&LKG.dh.length<8){let q=o,ch=[];while(q&&ch.length<5){ch.push((q.name||q.type)+(q.isInstancedMesh?'[I]':''));q=q.parent}LKG.dh.push(R.info.programs[R.info.programs.length-1].id+'@'+(R.getRenderTarget()?'rt'+R.getRenderTarget().samples+'/'+R.getRenderTarget().texture.colorSpace+'/'+(R.getRenderTarget()===composer.renderTarget1?'rt1':R.getRenderTarget()===composer.renderTarget2?'rt2':'other'):'screen')+'/tm'+R.toneMapping+'@'+ch.join('<')+'/m'+m.id+(m.name?':'+m.name:'')+(s&&s.isScene&&s!==scene?'/otherScene':''))}return r}}}
 LKG.p2On=!/[?&]lkp2=0/.test(location.search);   // perf-r15d: gate pass 2 (objects made/mutated by the warm frames, shadow-depth kinds, post passes); default ON (desktop only, like LKG), ?lkp2=0 = off
 LKG.gfx=!/[?&]lkgfx=0/.test(location.search);LKG.wf=(q=>q==null?8:+q|0)(new URLSearchParams(location.search).get('lkwf'));LKG.wq=0;   // perf-r13f/r13g (default ON on desktop, ?lkgfx=0 = off; LKG itself is desktop only): GFX_pre before the loader warm and again (with the sliced GFX_cast, W12, BW flags) before the roam-gate queue
 const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
@@ -167,6 +167,59 @@ async function TWG_run0(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)ret
   try{PREW.on=await PREW_decide()}catch(e){PREW.on=false}
   if(PREW.on)try{PREW_run()}catch(e){console.warn('TWG prew',e)}
   LD.on=lo;if(wb){const tw=performance.now();await wb;TWG.wbMs=Math.round(performance.now()-tw)}for(let i=0;i<TWG.idle;i++)await new Promise(r=>setTimeout(r,50))}catch(e){console.warn('TWG',e)}finally{TWG.run=0;LD.on=lo;RO.x=x;RO.z=z;RO.h=h;RO.v=0;TWG.fr=0;TWG.mms=Math.round(TWG.mms);TWG.ms=Math.round(performance.now()-t0)}}
+/* reveal-r21p: desktop reveal hold. Real data (Alex's PC, Beta perf db, Athens beta.135-138): the 4.4 / 2.4 / 1.3 / 1.2 s 'roam freezes' and a 2.3 s menu freeze are the first frames after the curtain lifts: the roam-start gate (LKG) and the
+   first real renders still ran AFTER ldHide (36-49 program links, 571 ms GC in the lab). The hold keeps the curtain up (LD.on=false so frame() runs under it) until: the gate has finished, one representative per program was drawn through the real composer
+   (PREW_run, cap DREV.prewCap), the lazy chunks are evaluated, the temporary build memory was released (DREV_gc) and the program count has not grown for DREV.stable frames (or DREV.cap ms). Phones keep the TWG path (LKG.on is false there). ?drev=0 = old. */
+const DREV={on:new URLSearchParams(location.search).get('drev')!=='0',cap:6000,stable:10,prewCap:3000,ran:0,gateMs:-1,prewMs:-1,xcMs:-1,gcMs:-1,settleMs:-1,frames:0,capped:0,p0:-1,p1:-1,p2:-1,h0:-1,h1:-1,h2:-1,ms:-1};
+const DREV_heap=()=>{try{return Math.round(performance.memory.usedJSHeapSize/1048576)}catch(e){return -1}};
+/* V8 starts a mark-compact when external memory grows quickly: allocate and drop a few large buffers under the curtain so the build garbage (arrays, geometry CPU copies) is collected NOW and not in the first drive frames */
+function DREV_gc(){const t=performance.now();try{for(let i=0;i<4;i++){const b=new ArrayBuffer(48<<20);b.byteLength}}catch(e){}DREV.gcMs=Math.round(performance.now()-t)}
+/* second dedupe, separate from LKG.K: the gate's key treated the two parked-car packs (instanced, instance colour, receiveShadow) as already linked, yet compiling them linked 2 programs on the first drive frame.
+   This pass keys on everything the lit program can depend on (material id+version, object kind, instance colour, vertex colour, shadow flags, attribute set) and compiles each new key once, linking before the next. Returns programs added. */
+function DREV_pass(){const R=renderer,P=R.info.programs,n0=P.length,K=DREV.K||(DREV.K=new Set()),Q=[];
+ scene.traverse(o=>{if(o.isScene||o.isLight)return;const ms=[].concat(o.material||[]);if(!ms.length)return;const g=o.geometry,a=g&&g.attributes?Object.keys(g.attributes).sort().join('.'):'';
+  const k=ms.map(m=>m.id+'v'+m.version).join('.')+'|'+o.type+(o.isInstancedMesh?'I':'')+(o.isBatchedMesh?'B':'')+(o.isSkinnedMesh?'s':'')+(o.instanceColor?'c':'')+(o.castShadow?'S':'')+(o.receiveShadow?'R':'')+'|'+a+(g&&g.morphAttributes&&Object.keys(g.morphAttributes).length?'m':'');
+  if(!K.has(k)){K.add(k);Q.push(o)}});
+ if(!Q.length)return 0;if(!LKG.ts)LKG_begin(scene,camera,1);
+ const rt=R.getRenderTarget(),f=R.getActiveCubeFace(),l=R.getActiveMipmapLevel();R.setRenderTarget(composer.readBuffer);
+ try{for(const o of Q){const v=o.visible,m=P.length;o.visible=true;try{R.compile(o,camera,LKG.ts)}catch(e){}finally{o.visible=v}for(let j=m;j<P.length;j++){try{P[j].getUniforms()}catch(e){}}}}
+ finally{R.setRenderTarget(rt,f,l)}return P.length-n0}
+/* every visible object drawn once through the real composer states (1-px scissor, frustum culling off): links the program a draw really needs, whatever compile() guessed (the late parked-car pack linked in rt2 at the first drive frame
+   although a compile of the same mesh into the read buffer had found nothing to do). Vertex work only, one frame. */
+function DREV_full(){const R=renderer,P=R.info.programs,n0=P.length,T=typeof TQ!=='undefined'&&TQ,d0=T?T.draw:0,l0=LD.on,b0=LD.busy,k0=LKG.arm,sv=[];
+ scene.traverse(o=>{if(o.frustumCulled)sv.push(o)});
+ try{for(const o of sv)o.frustumCulled=false;LKG.arm=0;if(T)T.draw=1;LD.on=false;LD.busy=false;PREW_sc(1);const gl=R.getContext(),px=new Uint8Array(4);composer.render();gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px)}
+ finally{PREW_sc(0);for(const o of sv)o.frustumCulled=true;LD.on=l0;LD.busy=b0;LKG.arm=k0;if(T)T.draw=d0}return P.length-n0}
+async function DREV_hold(){
+ if(!DREV.on||!LKG.on||LOWMEM||state!=='roam'||!RO.on)return;
+ const R=renderer,P=R.info.programs,t0=performance.now(),lo=LD.on;DREV.ran=1;DREV.p0=P.length;DREV.h0=DREV_heap();LD.on=false;
+ try{
+  for(let k=0;k<1500&&LKG.arm;k++){await nextFrame()}
+  DREV.gateMs=Math.round(performance.now()-t0);const t1=performance.now();
+  /* what first runs ~0.5-1 s after the curtain on a player page: the parked-car pack (PC_step: new packed meshes = a new program), the shortcut scan set-up; then link what they made and run a few real frames */
+  try{if(TWG.pcw&&typeof PC_step==='function'&&PC.on&&PC_gate()){PC.rel=0;PC_step(1)}}catch(e){console.warn('DREV pc',e)}
+  try{if(TWG.dd&&typeof DEST_find==='function'&&DEST.on){if(DEST.N!==HUB.nodes)DEST_reset();DEST_find(0)}}catch(e){console.warn('DREV dest',e)}
+  try{LKG_begin(scene,camera,1);while(!LKG_step(camera,8))await nextFrame();LKG.q=null}catch(e){console.warn('DREV relink',e)}
+  for(let i=0;i<3;i++)await nextFrame();
+  try{DREV_pass()}catch(e){console.warn('DREV pass',e)}
+  if(typeof PREW_run==='function'){const c=PREW.cap;PREW.cap=DREV.prewCap;try{PREW_run()}catch(e){console.warn('DREV prew',e)}finally{PREW.cap=c}}
+  DREV.prewMs=Math.round(performance.now()-t1);const t2=performance.now();
+  try{if(typeof DREV_extras==='function')await DREV_extras()}catch(e){console.warn('DREV extras',e)}
+  try{if(typeof XC_go==='function')await XC_go()}catch(e){console.warn('DREV xc',e)}
+  DREV.xcMs=Math.round(performance.now()-t2);
+  DREV.h1=DREV_heap();if(new URLSearchParams(location.search).get('drevgc')!=='0')DREV_gc();
+  const t3=performance.now();let last=P.length,still=0;
+  DREV.rl=[];
+  while(still<DREV.stable){if(performance.now()-t3>DREV.cap){DREV.capped=1;break}await nextFrame();DREV.frames++;
+   /* meshes the first real frames create (parked-car packs, LIFE batches ...) are linked here, one by one, still under the curtain */
+   if(DREV.frames%3===1){const n0=P.length;try{DREV_pass()}catch(e){console.warn('DREV relink',e)}if(P.length>n0&&DREV.rl.length<20)DREV.rl.push([DREV.frames,P.length-n0])}
+   const n=P.length;if(n===last)still++;else{still=0;last=n}}
+  {const n0=P.length;try{DREV_pass();DREV.full=DREV_full()}catch(e){console.warn('DREV fin',e)}DREV.fin=P.length-n0}
+  DREV.settleMs=Math.round(performance.now()-t3);
+ }catch(e){console.warn('DREV',e)}
+ finally{LD.on=lo;DREV.p1=P.length;DREV.h2=DREV_heap();DREV.ms=Math.round(performance.now()-t0)}}
+window.DREV=DREV;window.DREV_heap=DREV_heap;window.LKG=LKG;
+TWG_run=(f=>async function(){const r=await f.apply(this,arguments);await DREV_hold();return r})(TWG_run);
 {const q=new URLSearchParams(location.search);TWG.dd=q.get('twgdest')!=='0';TWG.pa=q.get('twgpa')!=='0';TWG.lvc=q.get('twglv')!=='0';TWG.destMs=-1;TWG.fw=120;/* ios-r17o: ?twgdest=0 / ?twgpa=0 / ?twglv=0 = off */}
 DEST_find=(f=>function(b){if(TWG.dd&&b<1e6&&TWG.fr>=0&&TWG.fr<=TWG.fw)return;return f.apply(this,arguments)})(DEST_find);
 TWG.jm=0;TWG.jf=-1;TWG.jn=0;TWG.rm=0;/* ios-r17k: JS ms (frame minus composer.render) of the first 120 drivable frames: max, its frame, frames measured */
