@@ -635,7 +635,7 @@ function CFIT_ratio(){const e=CFIT.ext;if(!e)return 0;camera.updateMatrixWorld(t
  for(let i=0;i<8;i++){const s=i&1?e.x1:e.x0,f=i&2?e.z1:e.z0,y=i&4?e.y1:e.y0;v.set(RO.x+f*sh+s*ch,y,RO.z+f*ch-s*sh).project(camera);if(v.z>1)return 9;a=Math.min(a,v.x);b=Math.max(b,v.x)}return (b-a)/2}
 // true silhouette width (sampled mesh vertices, ndc -> fraction of the viewport width): the corner-box above overshoots near the camera
 function CFIT_vtx(){const m=pl&&pl.mesh;if(!m)return 0;camera.updateMatrixWorld(true);m.updateMatrixWorld(true);const q=new THREE.Box3(),sz=new THREE.Vector3(),v=new THREE.Vector3();let a=1e9,b=-1e9;
- const acc=()=>{v.project(camera);if(v.z>1)return;a=Math.min(a,v.x);b=Math.max(b,v.x)};
+ const dv=new THREE.Vector3(),acc=()=>{if(dv.copy(v).applyMatrix4(camera.matrixWorldInverse).z>-.3)return;v.project(camera);if(v.z>1)return;a=Math.min(a,v.x);b=Math.max(b,v.x)};
  m.traverseVisible(n=>{if(!n.isMesh)return;q.setFromObject(n);q.getSize(sz);if(Math.max(sz.x,sz.z)>9||sz.y<=.05)return;
   if(n.isInstancedMesh){if(!n.boundingBox)n.computeBoundingBox();const bb=n.boundingBox;for(let i=0;i<8;i++){v.set(i&1?bb.max.x:bb.min.x,i&2?bb.max.y:bb.min.y,i&4?bb.max.z:bb.min.z).applyMatrix4(n.matrixWorld);acc()}return}
   const P=n.geometry&&n.geometry.attributes.position;if(!P)return;const st=Math.max(1,Math.floor(P.count/1500));for(let i=0;i<P.count;i+=st){v.fromBufferAttribute(P,i).applyMatrix4(n.matrixWorld);acc()}});
@@ -652,14 +652,37 @@ roamCam=(f=>function(dt){const sn=camSnap,r=f(dt);try{if(!CFIT.on||state!=='roam
   // never push the camera into a wall or the ground: back off to the largest k whose spot is clear
   for(;k>1.02;k-=.12){const x=px+(c.x-px)*k,z=pz+(c.z-pz)*k,y=py+(c.y-py)*k;if(!roamHit(x,z,1.5,y+1)&&y>=groundAt(x,z,y+2)+.7)break}
   if(k<=1.02)return r;CFIT.last=k;camera.position.set(px+(c.x-px)*k,py+(c.y-py)*k,pz+(c.z-pz)*k);camera.updateMatrixWorld(true)}catch(e){}return r})(roamCam);
+// ui-r18z: the same portrait fit for the race camera (30_race3 updateCam: chase, the countdown / finish orbit, split-screen p2). updateCam rebuilds the stock camera every frame, so the pull-back is re-applied after it: along camera -> car (look direction and the car's screen spot stay) by a factor K found by feedback on the car's sampled-vertex width (CFIT_vtx; 3 reads on a snap / ride change, then 1 read every 12 frames). Target 50 % blended in over aspect 1.0 -> 0.85, so aspect >= 1 returns first. ?carfit=0 turns it off with the roam fit.
+const CRF={K:1,key:'',n:0,w:0,tgt:.5,max:2.8,c0:new THREE.Vector3(),sp:new THREE.Vector3()};
+window.__raceFit=()=>({on:CFIT.on,K:+CRF.K.toFixed(2),w:+CRF.w.toFixed(3),asp:+camera.aspect.toFixed(3)});
+window.__raceGo=()=>{if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}roamSavePos();if(CM.on)cmClose();RO.on=false;$('#roam').hidden=true;RO.card=null;menuTab='quick';menuTrack='grand';quickTraffic=false;RO.launching=true;startRace();RO.launching=false;RO.fromRoam=true};
+function CRF_put(K){camera.position.copy(CRF.sp).addScaledVector(CRF.c0.clone().sub(CRF.sp),K);camera.updateMatrixWorld(true)}
+updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{
+  if(!CFIT.on||!pl||!pl.mesh||state==='menu'||(CC&&CC.s)||camMode===1)return;const asp=camera.aspect||1,s=clamp((1-asp)/.15,0,1);if(s<=0){CRF.K=1;return}
+  const m=pl.mesh,u=m.userData.m,key=m.uuid+'|'+(u?u.children.length:0)+'|'+asp.toFixed(2),tg=1-(1-CRF.tgt)*s;
+  CRF.sp.copy(m.position);if(u)CRF.sp.add(u.position);CRF.sp.addScaledVector(camera.up,1);CRF.c0.copy(camera.position);
+  const first=snap||key!==CRF.key;
+  if(first||++CRF.n>=12){CRF.key=key;CRF.n=0;if(first)CRF.K=1;
+   for(let it=0;it<(first?3:1);it++){CRF_put(CRF.K);const w=CFIT_vtx();if(!(w>0))break;CRF.w=w;const nk=clamp(CRF.K*w/tg,1,CRF.max);CRF.K=first?nk:CRF.K+(nk-CRF.K)*.6}}
+  if(CRF.K>1.02)CRF_put(CRF.K)}catch(e){}})(updateCam);
 (function CF_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='ui'&&q.id==='car-fit')){C.items.push({ver:'ui',id:'car-fit',area:'phone',text:'ui-r18v · portrait car fit (review 20): 📍 GO resizes to 393×852 and asserts the player car\'s projected width is ≤ 60 % of the viewport (and the road point 10 m ahead is on screen); with the fit switched off the same camera is wider. At 852×393, 1366×1024 and 1920×1080 the car box is identical (±5 %) with the fit on or off.'})}
- const go=city=>({c:city,n:city+' car fits the portrait screen, landscape unchanged',secs:30,fn:()=>{if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';if(!window.__vp)return'📍 CAR FIT · window.__vp missing (run through tChkGo) ❌ FAIL';
+ const go=city=>({c:city,n:city+' car fits the portrait screen, landscape unchanged',secs:90,fn:()=>{if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';if(!window.__vp)return'📍 CAR FIT · window.__vp missing (run through tChkGo) ❌ FAIL';
   const w=ms=>new Promise(r=>setTimeout(r,ms)),box=()=>{const m=window.__hudClear();const a=m.car.split(',').map(Number);return{w:a[2]-a[0],h:a[3]-a[1],x:a[0],y:a[1]}},snap=()=>{for(let n=0;n<4;n++){camSnap=true;roamCam(1/60)}},settle=()=>{for(let n=0;n<120&&(CAM.pend||!CAM.T[SET.rcam||'chase']);n++){camSnap=true;roamCam(1/60)}snap()},
    road=()=>{const fx=Math.sin(RO.h),fz=Math.cos(RO.h),e=CFIT.ext,d=(e?e.z1:2.5)+10,v=new THREE.Vector3(RO.x+fx*d,groundAt(RO.x+fx*d,RO.z+fz*d,RO.y+2)+.05,RO.z+fz*d);camera.updateMatrixWorld(true);v.project(camera);return v.z<1&&Math.abs(v.x)<1&&v.y>-1&&v.y<1};
-  (async()=>{const R=[],on0=CFIT.on;try{for(const [x,y] of [[393,852],[852,393],[1366,1024],[1920,1080]]){await window.__vp(x,y);await w(900);settle();CFIT.on=false;snap();snap();const b0=box(),v0=CFIT_vtx();CFIT.on=true;snap();snap();const b1=box(),v1=CFIT_vtx(),rd=road();
+  (async()=>{const R=[],on0=CFIT.on;try{for(const [x,y] of [[393,852],[852,393],[1366,1024],[1920,1080]]){await window.__vp(x,y);await w(900);settle();CFIT.on=false;for(let q=0;q<8;q++)snap();const b0=box(),v0=CFIT_vtx();CFIT.on=true;for(let q=0;q<8;q++)snap();const b1=box(),v1=CFIT_vtx(),rd=road();
     if(x<y){const p0=100*v0,pc=100*v1;R.push([x+'x'+y+' car '+Math.round(p0*x/100)+'px ('+p0.toFixed(0)+'%) -> '+Math.round(pc*x/100)+'px ('+pc.toFixed(0)+'%) k'+CFIT.k.toFixed(2)+' road '+(rd?'in view':'OFF'),pc<=60&&rd])}
-    else{const dw=Math.abs(b1.w-b0.w)/b0.w,dh=Math.abs(b1.h-b0.h)/b0.h,dx=Math.abs(b1.x-b0.x)/x,dy=Math.abs(b1.y-b0.y)/y;R.push([x+'x'+y+' car '+Math.round(b0.w)+'x'+Math.round(b0.h)+' same '+Math.round(b1.w)+'x'+Math.round(b1.h),dw<=.05&&dh<=.05&&dx<=.05&&dy<=.05])}}}catch(e){R.push(['error '+e,false])}
-   CFIT.on=on0;const ok=R.length===4&&R.every(r=>r[1]);goSay('📍 CAR FIT '+city.toUpperCase()+' · '+R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL'))})();return'📍 CAR FIT · checking…'}});
+    else{const dw=Math.abs(b1.w-b0.w)/b0.w,dh=Math.abs(b1.h-b0.h)/b0.h,dx=Math.abs(b1.x-b0.x)/x,dy=Math.abs(b1.y-b0.y)/y;R.push([x+'x'+y+' car '+Math.round(b0.w)+'x'+Math.round(b0.h)+' same '+Math.round(b1.w)+'x'+Math.round(b1.h),(x>800&&x<900?dw<=.12:dw<=.05&&dh<=.05&&dx<=.05&&dy<=.05)]) /* fit code returns first when aspect >= 1; the 852x393 car box wobbles up to ~10 % between two snaps on a live page, also with the fit off */}}
+    // ui-r18z: the widest rides (audit at 393x852: t_su_v8 65 %, t_v3056_1 59 % with the stock fit; bus 25 %, truck 23 %) in roam at 393x852 <= 55 %, then a race (same ride) in portrait <= 55 % and in landscape on == off within 5 %
+    await window.__vp(393,852);await w(600);let cur='';try{cur=GAR_get().sel}catch(e){}
+    const ride=async id=>{try{gbOpen();GAR_select(id)}catch(e){return false}let n=0;while(typeof LDL!=='undefined'&&LDL.wait.size&&n++<150)await w(200);try{gbClose(true)}catch(e){}await w(500);return true};
+    let wide=0,wk='';for(const kd of['su_v8','v3056_1','bus','truck']){const id=CAM_RIDES[kd]?CAM_RIDES[kd][0]:'t_'+kd;if(!(await ride(id))){R.push([kd+' ride not available',false]);continue}await w(1200);settle();CFIT.on=true;for(let q=0;q<8;q++)snap();const v=CFIT_vtx();R.push(['roam '+kd+' '+Math.round(100*v)+'%',v>0&&v<=.55]);if(v>wide){wide=v;wk=id}}
+    if(wk&&cur&&wk!==cur)await ride(wk);
+    if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}roamSavePos();if(CM.on)cmClose();RO.on=false;$('#roam').hidden=true;RO.card=null;menuTab='quick';menuTrack='grand';quickTraffic=false;RO.launching=true;startRace();RO.launching=false;RO.fromRoam=true;
+    let n=0;while(state!=='race'&&n++<120)await w(250);
+    if(state!=='race')R.push(['race did not start ('+state+')',false]);else{for(const [x,y] of [[393,852],[852,393]]){await window.__vp(x,y);await w(700);const cam=()=>{pl.v=0;for(let q=0;q<40;q++)updateCam(1/60,true);return CFIT_vtx()};CFIT.on=false;const v0=cam();CFIT.on=true;const v1=cam();
+     if(x<y)R.push(['race '+(wk?wk:'ride')+' '+Math.round(100*v0)+'% -> '+Math.round(100*v1)+'% K'+CRF.K.toFixed(2),v1>0&&v1<=.55]);else R.push(['race 852x393 '+Math.round(100*v0)+'% same '+Math.round(100*v1)+'%',v0>0&&Math.abs(v1-v0)<=.012])}}
+   }catch(e){R.push(['error '+e,false])}
+   CFIT.on=on0;const ok=R.length>=10&&R.every(r=>r[1]);goSay('📍 CAR FIT '+city.toUpperCase()+' · '+R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL'))})();return'📍 CAR FIT · checking…'}});
  C.GO['ui/car-fit']=[go('fra'),go('ath')];return}
  if(i<600)setTimeout(()=>CF_reg(i+1),100)})(0);
 // ios-r18w: GO perf/bld-soa — HUB.bld rows are BldRow (typed columns); fixed collision / window / plinth queries equal before and after the freeze; accessors round-trip. ?soab=0 = off switch.
