@@ -1959,11 +1959,11 @@ function mapLayout(w,h){const land=w>h*1.15,STEP=land?Math.max(92,Math.min(124,w
   // challenge nodes branch off the mini-boss (position 5 of its city), to the roomier side
   for(const s of STAGES.filter(x=>x.from)){const f=nodes[s.from-1],side=f.c<.5?1:-1;nodes.push({n:s.n,m:f.m+STEP*.62,c:Math.max(.12,Math.min(.88,f.c+side*.34)),ci:s.act,br:s.from});}
   const total=m+PAD*.6;
-  const W=land?total:w,H=land?h:total;
+  const SL=land?0:Math.round(h*.55),W=land?total:w,H=land?h:total+SL;   // portrait: spare room under ACT I so the plate (bottom third) can never sit on stage 1
   const at=(mm,c)=>land?{x:mm,y:Math.max(.12,Math.min(.88,c))*h}:{x:Math.max(.1,Math.min(.9,c))*w,y:total-mm};
   for(const nd of nodes)Object.assign(nd,at(nd.m,nd.c));
-  const bs=bands.map(b=>land?{ci:b.ci,x:b.m0-PAD*.4,y:0,w:b.m1-b.m0+PAD*.4,h}:{ci:b.ci,x:0,y:total-b.m1,w,h:b.m1-b.m0});
-  return{land,W,H,nodes,bands:bs,STEP,BAN,PAD,total,at};}
+  const bs=bands.map(b=>land?{ci:b.ci,x:b.m0-PAD*.4,y:0,w:b.m1-b.m0+PAD*.4,h}:{ci:b.ci,x:0,y:total-b.m1,w,h:b.m1-b.m0+(b.ci?0:SL)});
+  return{land,W,H,nodes,bands:bs,STEP,BAN,PAD,total,at,SL};}
 function mapPath(a,b,land){const mx=(a.x+b.x)/2,my=(a.y+b.y)/2;return land?`M${a.x},${a.y}C${mx},${a.y} ${mx},${b.y} ${b.x},${b.y}`:`M${a.x},${a.y}C${a.x},${my} ${b.x},${my} ${b.x},${b.y}`;}
 function stDraw(){const box=$('stRows'),w=box.clientWidth||selEl.clientWidth,h=box.clientHeight||selEl.clientHeight;if(!w||!h)return;
   const keepFrac=box.scrollHeight>box.clientHeight||box.scrollWidth>box.clientWidth?(MAPD.land?box.scrollLeft/Math.max(1,box.scrollWidth):box.scrollTop/Math.max(1,box.scrollHeight)):null;
@@ -1973,7 +1973,7 @@ function stDraw(){const box=$('stRows'),w=box.clientWidth||selEl.clientWidth,h=b
   // painted district bands (the district's own backdrop, dimmed)
   for(const b of L.bands){const D=DISTRICTS[b.ci],e=document.createElement('div');e.className='band';e.style.cssText=`left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px;--c:${D.a};background-image:linear-gradient(${L.land?'90deg':'0deg'},#05030cdd,#05030c88 45%,#05030cdd),url(${bgOf(b.ci)})`;
     const got=STAGES.filter(s=>s.act===b.ci&&!s.ch).reduce((a,s)=>a+(sSave.stars[s.n]|0),0),dn=STAGES.filter(s=>s.act===b.ci&&!s.ch&&(sSave.stars[s.n]|0)>0).length;
-    const t=document.createElement('div');t.className='ban';t.style.cssText=L.land?`left:${b.x+L.PAD*.5}px;top:12px`:`left:50%;top:${b.y+b.h-L.BAN+6}px`;
+    const t=document.createElement('div');t.className='ban';t.style.cssText=L.land?`left:${b.x+L.PAD*.5}px;top:12px`:`left:50%;top:${b.y+b.h-(b.ci?0:L.SL)-L.BAN+6}px`;
     t.innerHTML=`<small>${ACTN[b.ci]} · ${dn}/8</small><b>${D.name}</b><span>${D.sub.split('·')[0].trim()} · ★ ${got}/24</span>`;
     root.append(e,t);}
   // the road: one lit segment per stage you can reach, dark ones beyond
@@ -1995,12 +1995,14 @@ function stDraw(){const box=$('stRows'),w=box.clientWidth||selEl.clientWidth,h=b
   // scroll: keep the place on a relayout, else bring the current stage into view
   const c=by[MAPD.sel>0?MAPD.sel:cur];
   if(L.land){box.scrollLeft=keepFrac!=null&&MAPD.keep?keepFrac*L.W:Math.max(0,c.x-w*.4);}else{box.scrollTop=keepFrac!=null&&MAPD.keep?keepFrac*L.H:Math.max(0,c.y-h*.55);}
-  MAPD.keep=true;mapDetail(MAPD.sel);requestAnimationFrame(mapEdge);}
+  const kept=keepFrac!=null&&MAPD.keep;MAPD.keep=true;mapDetail(MAPD.sel);if(!L.land&&!kept){const pl=$('stDet');if(pl&&!pl.hidden)box.scrollTop=Math.max(0,c.y-(h-pl.offsetHeight)*.5);}requestAnimationFrame(mapEdge);}
 /* a name that would be cut by the edge of the map (or the screen) is hidden until it scrolls fully into view */
-function mapEdge(){const box=$('stRows');if(!box||selEl.hidden)return;const br=box.getBoundingClientRect();for(const n of box.querySelectorAll('.nd')){const r=n.querySelector('.meta').getBoundingClientRect();n.classList.toggle('ed',r.left<br.left+1||r.right>br.right-1||r.top<br.top+1||r.bottom>br.bottom-1);}}
+function mapEdge(){const box=$('stRows');if(!box||selEl.hidden)return;const br=box.getBoundingClientRect(),pl=$('stDet'),pr=pl&&!pl.hidden?pl.getBoundingClientRect():null;
+  for(const t of box.querySelectorAll('.ban')){const r=t.getBoundingClientRect();t.classList.toggle('hb',!!pr&&r.left<pr.right&&r.right>pr.left&&r.top<pr.bottom&&r.bottom>pr.top);}   // a district banner under the stage plate is hidden, not half-seen through it
+  for(const n of box.querySelectorAll('.nd')){const r=n.querySelector('.meta').getBoundingClientRect();n.classList.toggle('ed',r.left<br.left+1||r.right>br.right-1||r.top<br.top+1||r.bottom>br.bottom-1);}}
 function mapPick(n){const ok=unlocked(n);MAPD.sel=n;for(const e of document.querySelectorAll('#stRows .nd'))e.classList.toggle('sel',+e.dataset.n===n);
   if(!ok){const e=document.querySelector(`#stRows .nd[data-n="${n}"]`);if(e){e.classList.remove('shake');void e.offsetWidth;e.classList.add('shake');}}
-  mapDetail(n);mapReveal(n);}
+  mapDetail(n);mapReveal(n);requestAnimationFrame(mapEdge);}
 function mapReveal(n){const box=$('stRows'),e=box.querySelector(`.nd[data-n="${n}"]`),pl=$('stDet');if(!e||!pl||pl.hidden)return;const x=parseFloat(e.style.left),y=parseFloat(e.style.top);
   if(MAPD.land)box.scrollTo({left:Math.max(0,x-box.clientWidth*.42),behavior:'smooth'});else box.scrollTo({top:Math.max(0,y-(box.clientHeight-pl.offsetHeight)*.5),behavior:'smooth'});}
 /* the plate under the map: stage, goal, the three stars, best, PLAY */
@@ -2030,7 +2032,7 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 {const st=document.createElement('style');st.textContent=`
 #stsel .mapbox{display:block!important;flex:1 1 0;min-height:0;position:relative;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;border-radius:10px;background:#05030c;touch-action:pan-x pan-y;scrollbar-width:thin}
 #stsel .mp{position:relative;overflow:hidden}
-#stDet .arc{display:flex;gap:6px;margin:4px 0}#stDet .arc button{flex:1;min-height:40px;border:1px solid #5a4a7a;background:#120a24;color:#cfc3e8;border-radius:8px;font:700 13px/1.1 inherit;letter-spacing:.06em}#stDet .arc button small{display:block;font-size:10px;font-weight:600;opacity:.8}#stDet .arc button.on{background:#ff3fa4;border-color:#ff9bd2;color:#fff}
+#stDet .arc{display:flex;gap:6px;margin:4px 0}#stDet .arc button{flex:1;min-height:40px;border:1px solid #5a4a7a;background:#120a24;color:#cfc3e8;border-radius:8px;font:700 13px/1.1 inherit;letter-spacing:.06em}#stDet .arc button small{display:block;font-size:10px;font-weight:600;opacity:.8}#stDet .arc button.on{background:#b80f66;border-color:#ff9bd2;color:#fff}
 #stsel .band{position:absolute;background-size:cover;background-position:center;opacity:1;border-top:2px solid var(--c);border-image:none}
 #stsel .band::after{content:"";position:absolute;inset:0;box-shadow:inset 0 0 40px #05030c}
 #stsel .ban{position:absolute;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 18px;text-align:center;white-space:nowrap;color:var(--ink);
@@ -2056,6 +2058,8 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
 /* the button is the whole plate: medallion + stars + name. The anchor is the medallion centre. */
 #stsel .nd.sr{transform:translate(calc(var(--m)/-2),-50%)}
 #stsel .nd.sl{flex-direction:row-reverse;transform:translate(calc(var(--m)/2 - 100%),-50%)}
+#stsel .ban.hb{visibility:hidden}
+#stsel .mapbox:not(.land) .nd.sv{flex-direction:column-reverse;transform:translate(-50%,calc(var(--m)/2 - 100%))}
 #stsel .nd.sv{flex-direction:column;gap:0;transform:translate(-50%,calc(var(--m)/-2))}
 #stsel .nd .meta{display:flex;flex-direction:column;gap:0;min-width:0;padding:2px 7px;border-radius:7px;background:#05030cd0;text-align:left;align-items:flex-start}
 #stsel .nd.sl .meta{align-items:flex-end;text-align:right}
@@ -2074,7 +2078,7 @@ function closeStages(){selEl.hidden=true;titleEl.hidden=false;showBest();}
   border:16px solid transparent;border-image:url(media/ui-panel.webp) 70 fill/16px stretch;background:#05030ce8;color:var(--ink);font-family:var(--display)}
 #stDet[hidden]{display:none}
 #stDet .dh{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em}
-#stDet .ac{color:var(--c);font-weight:700;flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stDet .ac{color:#f1ecff;font-weight:700;flex:1 1 auto;min-width:0}
 #stDet .bs{color:#ffe14d;white-space:nowrap}
 #stDet .x{min-width:44px;min-height:44px;margin:-14px -10px -14px 0;border:0;background:none;color:var(--dim);font-size:16px;cursor:pointer}
 #stDet .dm{display:flex;gap:10px;align-items:center}
@@ -5145,7 +5149,7 @@ const LEAK=window.LEAK={
   draw(c,x,y3,k,right){if(!this.on()||!running||G.lab||G.tut||ST.over)return;const f=Math.min(1,this.M/this.cap()),t=c.getTransform(),u=Math.hypot(t.a,t.b)*(c.canvas.getBoundingClientRect().width/c.canvas.width||1),
       fs=Math.max(14*k,14.5/Math.max(.05,u)),q=fs/14;c.save();                       // text is at least 14 css px on a phone
     c.globalAlpha=this.M>0||this.txtT>0?1:.5;c.font=`700 ${fs.toFixed(1)}px "Share Tech Mono",monospace`;c.textAlign='left';
-    const hot=f>=.75,col=hot?'#ff3040':f>=.5?'#ffb020':'#9aa7c4',lab=this.txtT>0?this.txt:'BREACH';c.fillStyle=this.txtT>0?'#ff6a7a':col;
+    const hot=f>=.75,col=hot?'#ff3040':f>=.5?'#ffb020':this.M>0?'#9aa7c4':'#f2f5ff',lab=this.txtT>0?this.txt:'BREACH';c.fillStyle=this.txtT>0?'#ff6a7a':col;
     const w0=c.measureText(lab).width+8*q,bw=this.txtT>0?0:64*q,bh=5*q;
     if(right)x-=w0+bw;c.fillText(lab,x,y3+4*q);
     if(this.txtT<=0){c.fillStyle='#ffffff22';c.fillRect(x+w0,y3-bh/2+1*q,bw,bh);c.fillStyle=col;c.fillRect(x+w0,y3-bh/2+1*q,bw*f,bh);
@@ -6185,7 +6189,7 @@ if(RET.tale){
 #moreBtn,#taleBtn{position:relative}
 .tpv{display:flex;align-items:center;gap:8px;min-height:44px;font:14px/1.25 var(--mono);color:var(--ink);overflow:hidden}
 .tpv .tp{width:36px;height:36px;font-size:17px;border-width:2px}
-.tpv span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpv span{min-width:0}
 .tpv b{color:var(--c)}
 `;document.head.appendChild(TS);
  const reduceMo=()=>{try{return !!(RM||SET.rm||matchMedia('(prefers-reduced-motion: reduce)').matches);}catch(e){return false;}};
@@ -6249,7 +6253,7 @@ if(RET.tale){
  /* ----- one preview line on the stage plate ----- */
  {const o=mapDetail;mapDetail=function(n){o(n);try{const el=$('stDet'),b=beforeFor(n);if(!el||el.hidden||!b||T.b[b.id]||!unlocked(n)||noSim)return;
    const l=b.lines[0],wo=whoOf(l.who,n),pv=document.createElement('div');pv.className='tpv';pv.id='talePv';pv.style.setProperty('--c',wo.c);
-   const sp=document.createElement('span');const bb=document.createElement('b');bb.textContent=wo.n+': ';sp.append(bb,document.createTextNode(l.text));
+   const sp=document.createElement('span');const bb=document.createElement('b');bb.textContent=wo.n+': ';sp.append(bb,document.createTextNode(l.text.split(/(?<=[.!?])\s/)[0]));   // first sentence only; the line wraps instead of being cut
    pv.append(portrait(wo,'sm'),sp);const pl=$('stPlay');if(pl)pl.before(pv);}catch(e){}};}
  /* ----- the STORY LOG ----- */
  const log=document.createElement('div');log.id='taleLog';log.hidden=true;log.setAttribute('role','dialog');log.setAttribute('aria-label','Story log');
@@ -8757,7 +8761,8 @@ if(RET.title)setTimeout(()=>{
 #ttMain{width:100%;max-width:min(94%,440px);display:flex;flex-direction:column;gap:10px}
 #ttMain .row{flex-wrap:nowrap;gap:10px}#ttMain .row .go{flex:1 1 0;min-width:0;padding-left:calc(2.1em + .12em)!important;padding-right:2.1em!important;white-space:nowrap}#ttMain #playBtn{padding-left:1.9em!important;padding-right:1.9em!important}#retTt{text-align:left!important;margin:.8em 0 0!important}
 #playBtn{width:100%;min-height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:clamp(20px,min(5.4vw,3.8vh),28px)}
-#playBtn small,#dailyBtn small{display:block;font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.02em;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#playBtn small,#dailyBtn small{display:block;font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:.02em;line-height:1.15;max-width:100%;white-space:normal}
+#retTt{color:#d6d0f2;background:#05030ccc;border-radius:8px;padding:.2em .6em}
 #dailyBtn small{font-size:14px}
 #mnMore{position:absolute;inset:0;z-index:30;display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 5%;overflow-y:auto;background:#05030c}
 #mnMore[hidden]{display:none}
@@ -9109,7 +9114,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
     if(SH.sh>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iShield,'#19e3ff','×'+SH.sh);
     if(TP.revLeft>0)cx+=HUDX.chip(ctx,cx,cy,k,HUDX.iRev,'#ff2d95','×'+TP.revLeft);
     ctx.restore();PW.chips(t,cx,cy,k);}
-  if(window.LEAK)LEAK.draw(ctx,w-pad,ny+12*k,k,true);   // leak.js: the BREACH meter under the hull pips
+  if(window.LEAK)LEAK.draw(ctx,w-pad-(G.boss&&G.boss.x<W&&window.__bv&&__bv.BV.on?124*k:0),ny+12*k,k,true);   // leak.js: the BREACH meter under the hull pips (left of the boss bar's phase pips + counter while a boss is up)
   HUDX.ship(ctx,P.y,PH_-P.x,k,t,true);
   {const v=HUDX.vals();setRing($('bDash'),Math.min(1,(v.dash+(v.dash<v.dashMax&&P.dashCd>0?1-clamp(P.dashCd,0,1):0))/v.dashMax),'#19e3ff',v.dashMax>1?v.dash:'');setRing($('bEmp'),P.emp/3,'#ffb020',P.emp>0?P.emp:'');}
   if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}

@@ -151,7 +151,8 @@ const SCREENS = [
   ['title', async p => { }],
   ['settings', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#setBtn'); await sleep(300); }],
   ['settings-scrolled', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#setBtn'); await sleep(300); await p.evaluate(() => { const b = document.getElementById('setBody'); if (b) b.scrollTop = b.scrollHeight; }); await sleep(200); }],
-  ['story-map', async p => { await clickText(p, '#title button', 'STORY'); await sleep(500); }],
+  ['story-map', async p => { await p.click('#moreBtn'); await sleep(200); await clickText(p, '#mnMore button', 'STAGE MAP');   // STORY button moved into the MENU sheet and was renamed STAGE MAP
+    await sleep(500); }],
   ['story-stage', async p => { await p.evaluate(() => { __mnr.sSave.all = true; __mnr.startStory(1); }); await sleep(900); }, 'canvas'],
   ['hud-run', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = true; }); await sleep(2500); }, 'canvas'],
   ['hud-boss', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = true; __mnr.G.dt = 1e9; }); await p.waitForFunction(() => __mnr.G.boss && __mnr.G.boss.x <= 800, null, { timeout: 40000 }); await sleep(1800); }, 'canvas'],
@@ -179,7 +180,7 @@ const SCREENS = [
       const ctx = await br.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, hasTouch: !!touch, isMobile: !!touch, userAgent: touch ? UA : undefined });
       const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message));
       await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
-      await p.addInitScript(installCanvasSpy); await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); } catch (e) { } });
+      await p.addInitScript(installCanvasSpy); await p.addInitScript(() => { try { localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); /* the iOS add-to-home card pops up 2.5 s after load and covers the title: it is not part of what this test measures */ } catch (e) { } });
       await p.goto(`http://127.0.0.1:${port}/index.html` + (process.env.QUERY || ''), { waitUntil: 'domcontentloaded' });
       await p.waitForFunction(() => window.__mnr, null, { timeout: 15000 });
       await p.waitForFunction(() => document.documentElement.classList.contains('rdy'), null, { timeout: 15000 }).catch(() => { });

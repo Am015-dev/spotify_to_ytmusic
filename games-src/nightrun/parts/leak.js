@@ -70,7 +70,7 @@ const LEAK=window.LEAK={
   draw(c,x,y3,k,right){if(!this.on()||!running||G.lab||G.tut||ST.over)return;const f=Math.min(1,this.M/this.cap()),t=c.getTransform(),u=Math.hypot(t.a,t.b)*(c.canvas.getBoundingClientRect().width/c.canvas.width||1),
       fs=Math.max(14*k,14.5/Math.max(.05,u)),q=fs/14;c.save();                       // text is at least 14 css px on a phone
     c.globalAlpha=this.M>0||this.txtT>0?1:.5;c.font=`700 ${fs.toFixed(1)}px "Share Tech Mono",monospace`;c.textAlign='left';
-    const hot=f>=.75,col=hot?'#ff3040':f>=.5?'#ffb020':'#9aa7c4',lab=this.txtT>0?this.txt:'BREACH';c.fillStyle=this.txtT>0?'#ff6a7a':col;
+    const hot=f>=.75,col=hot?'#ff3040':f>=.5?'#ffb020':this.M>0?'#9aa7c4':'#f2f5ff',lab=this.txtT>0?this.txt:'BREACH';c.fillStyle=this.txtT>0?'#ff6a7a':col;
     const w0=c.measureText(lab).width+8*q,bw=this.txtT>0?0:64*q,bh=5*q;
     if(right)x-=w0+bw;c.fillText(lab,x,y3+4*q);
     if(this.txtT<=0){c.fillStyle='#ffffff22';c.fillRect(x+w0,y3-bh/2+1*q,bw,bh);c.fillStyle=col;c.fillRect(x+w0,y3-bh/2+1*q,bw*f,bh);
