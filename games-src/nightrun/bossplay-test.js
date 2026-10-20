@@ -2,7 +2,9 @@
 // Boss encounter mechanics (parts/bossplay.js, flag RET.bossplay). Prints PASS/FAIL lines and one table.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/bossplay-test.js      env: GAME_DIR, DIFF (default easy: the shortest fights)
 // 1 every boss: its mechanics trigger and are resolved by the real action (shoot nodes / kill medic or dash the link / EMP / parry / flank), arena rule seen
-// 2 a bot that ignores the mechanic (weaves and shoots the bar) takes >= 1.1x time (stage 8: 1.35x) and >= 1.25x hull (W52: the armour floor of stage 8 is 80 s and the play bot needs 96 s, so <=110 s and 2x cannot both hold) the time of a bot that plays it (same 1e6 HP/frame: the cap sets the pace)
+// 2 a bot that ignores the mechanic (weaves and shoots the bar) takes >= 1.1x time (stage 8: 1.35x; Easy god mode, one seed: sanity only) of a bot that plays it (same 1e6 HP/frame: the cap sets the pace)
+// 6 W53: HULL is the primary payoff (ignoring makes the boss ENRAGE: aimed bursts, denser patterns). Every boss, Normal, real hits (no god mode), HN seeds x play / ignore
+//   (default 12 + 12 = 24 runs per boss): ignore loses >= 1.4x the hull (HP lost, enraged shots hit for 2) and >= 1.15x the time. Thresholds raised from 1.25x / 1.1x (W52 soft cap made ignoring only slow).
 // 3 seeds: two attempts with different seeds differ in picks or attack order; the same seed repeats exactly
 // 4 caps hold (ebCap, BCAP), telegraph >= 0.6 s, free gap >= 96 px, phone portrait + reduced motion draw without errors, hints one short line
 // 5 flag off (?bossplay=0): no mechanics, the bossmoves order untouched, BPL.k = 1
@@ -12,7 +14,7 @@ const BOSSES = [[5, 'tresor'], [13, 'bruecke'], [21, 'schranke'], [29, 'messe'],
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 let fails = 0; const line = (ok, s) => { if (!ok) fails++; console.log((ok ? 'PASS ' : 'FAIL ') + s); };
 const FIGHT = ({ n, diff, play, seed, rm, hull }) => {
-  const m = window.__mnr, L = window.BPL, B2 = window.B2X; m.SET.diff = diff; if (rm) m.SET.reduce = true; try { m.applySet(); } catch (e) { } L.seed = seed; m.startStory(n); m.simOn(true); m.god = !hull; let hits = 0; if (hull) m.NR.on('hurt', () => { if (m.G.boss) hits++; });
+  const m = window.__mnr, L = window.BPL, B2 = window.B2X; m.SET.diff = diff; if (rm) m.SET.reduce = true; try { m.applySet(); } catch (e) { } L.seed = seed; m.startStory(n); m.simOn(true); m.god = !hull; let hits = 0, lost = 0; if (hull) m.NR.on('hurt', () => { if (m.G.boss) hits++; });
   let t0 = null, t1 = null, T = 0, id = null, err = '', drawn = 0, wy = 270, lastK = 0;
   for (let i = 0; i < 900 * 60 && m.running; i++) { if (m.SH.active) m.SH.close(); const e = m.G.boss, P = m.P;
     let tx = 200, ty = 270 + 120 * Math.sin(i / 90);
@@ -29,12 +31,13 @@ const FIGHT = ({ n, diff, play, seed, rm, hull }) => {
       } }
     m.touchTo(tx, ty); if (hull) m.P.hp = Math.max(m.P.hp, 4);   // real hits (no god mode), the hull is topped up so the fight runs to the end
     if (e && e.x < 940) e.hp -= 1e6;
-    try { m.step(1 / 60); } catch (x) { err = x.message; break; }
+    const hp0 = m.P.hp; try { m.step(1 / 60); } catch (x) { err = x.message; break; } if (hull && m.G.boss) lost += Math.max(0, hp0 - m.P.hp);
+
     if (rm && e && e.bp && i % 20 === 0) { try { m.render(m.G.t, 1 / 60); drawn++; } catch (x) { err = x.message; } }
     if (t0 != null && !m.G.boss) { t1 = m.G.t; break; }
     if (t0 != null && m.G.t - t0 > 4 * T) break; }
   const s = L.st || {}; const out = { n, id, play, seed: s.seed, T, ttk: t1 == null ? null : +(t1 - t0).toFixed(1), cut: t1 == null ? +(m.G.t - (t0 || 0)).toFixed(1) : null, res: s.res || {}, how: s.how || {}, seen: Object.keys(s.seen || {}), pick: s.pick, order: s.order,
-    fb: s.fb, open: s.open, tel: s.tel, gap: s.gap, maxEb: s.maxEb, cap: s.cap, maxV: s.maxV, BCAP: m.BCAP, hints: s.hints || [], parry: s.parry | 0, cutN: s.cut | 0, err, drawn, hits, mech: id ? L.T[id].m : [] };
+    fb: s.fb, open: s.open, tel: s.tel, gap: s.gap, maxEb: s.maxEb, cap: s.cap, maxV: s.maxV, BCAP: m.BCAP, hints: s.hints || [], parry: s.parry | 0, cutN: s.cut | 0, err, drawn, hits, lost, mech: id ? L.T[id].m : [] };
   m.abort(); return out; };
 const SEEDS = ({ n }) => { const m = window.__mnr, L = window.BPL, o = []; for (const seed of [11, 12, 11]) { m.SET.diff = 'easy'; try { m.applySet(); } catch (e) { } L.seed = seed; m.startStory(n); m.simOn(true); m.god = true;
     for (let i = 0; i < 400 * 60 && m.running; i++) { if (m.SH.active) m.SH.close(); m.step(1 / 60); if (m.G.boss && m.G.boss.bp) break; }
@@ -59,21 +62,23 @@ const OFF = ({ n }) => { const m = window.__mnr, L = window.BPL; m.SET.diff = 'e
     await Promise.all(pages.map(async (p, k) => { for (let j = k; j < jobs.length; j += 4) { await p.reload(); await p.waitForFunction(() => window.__mnr && window.__mnr.startStory && window.BPL); res.push(await p.evaluate(fn, jobs[j])); } await p.close(); })); return res; };
   // 1 + 2 + 4: play vs ignore, every boss
   const jobs = []; for (const [n] of BOSSES) for (const play of [true, false]) jobs.push({ n, diff: DIFF, play, seed: 1000 + n });
-  const res = await run(jobs, FIGHT, '&bossplay=1'); const get = (n, play) => res.find(r => r.n === n && r.play === play);
+  const res = process.env.HULLONLY ? [] : await run(jobs, FIGHT, '&bossplay=1'); const get = (n, play) => res.find(r => r.n === n && r.play === play);
   console.log('boss       mechanics                     play s  ignore s  ratio  resolved by the action (play)');
-  for (const [n, id] of BOSSES) { const p = get(n, true), ig = get(n, false), tp = p.ttk, ti = ig.ttk != null ? ig.ttk : ig.cut, ratio = tp ? ti / tp : 0;
+  if (!process.env.HULLONLY) for (const [n, id] of BOSSES) { const p = get(n, true), ig = get(n, false), tp = p.ttk, ti = ig.ttk != null ? ig.ttk : ig.cut, ratio = tp ? ti / tp : 0;
     console.log(`${id.padEnd(10)} ${p.mech.join('+').padEnd(29)} ${String(tp).padStart(6)}  ${(ig.ttk != null ? String(ti) : '>' + ti).padStart(8)}  ${ratio.toFixed(2).padStart(5)}  ${JSON.stringify(p.how)} ignore: ${JSON.stringify(ig.how)}`);
     const gates = [...new Set(p.pick.flat())].filter(x => ['nodes', 'medic', 'emp', 'parry', 'back'].includes(x)), arena = p.mech[2], pickedArena = p.pick.flat().includes(arena);
     line(p.id === id && gates.every(gm => p.res[gm] > 0) && (!pickedArena || p.seen.includes(arena)) && p.open > 0, `${id} (stage ${n}): mechanics trigger and resolve by the action (${gates.join(', ')}${pickedArena ? ', arena ' + arena : ''}); overloads ${p.fb}`);
-    line(tp != null && ratio >= (n === 8 ? 1.35 : 1.1), `${id}: ignoring the mechanic takes ${ratio.toFixed(2)}x the time of playing it (>= ${n === 8 ? 1.35 : 1.1})`);
+    line(tp != null && ratio >= (n === 8 ? 1.35 : 1.1), `${id}: ignoring the mechanic takes ${ratio.toFixed(2)}x the time of playing it (>= ${n === 8 ? 1.35 : 1.1}; Easy, god mode: a sanity floor, the payoff gate is section 6)`);
     line(tp != null && tp >= p.T && tp <= 1.6 * p.T, `${id}: playing it, the fight lasts ${tp} s (armour floor ${p.T} s, <= ${(1.6 * p.T).toFixed(0)} s)`);
     line(p.maxEb <= p.cap && p.maxV <= p.BCAP + 1 && p.tel >= .6 && p.gap >= 96 && !p.err, `${id}: bullets ${p.maxEb} <= ebCap ${p.cap}, speed ${Math.round(p.maxV)} <= BCAP, telegraph ${(+p.tel).toFixed(2)} s >= 0.6, free gap ${p.gap >= 1e9 ? 'n/a' : Math.round(p.gap)} >= 96${p.err ? ', error ' + p.err : ''}`);
     line(p.hints.length >= 2 && p.hints.every(h => h.length <= 60), `${id}: intro / phase / outro hints shown (${p.hints.length}), longest ${Math.max(...p.hints.map(h => h.length))} chars (<= 60)`); }
   // 6 W40: hull loss with real hits (no god mode), play vs ignore, Normal
-  { const HB = [[5, 'tresor'], [8, 'adler'], [16, 'krake'], [32, 'kronos']], hj = []; for (const [n] of HB) for (const play of [true, false]) hj.push({ n, diff: 'normal', play, seed: 2000 + n, hull: 1 });
-    const hr = await run(hj, FIGHT, '&bossplay=1'); const hg = (n, play) => hr.find(r => r.n === n && r.play === play);
-    for (const [n, id] of HB) { const p = hg(n, true), ig = hg(n, false), ti = ig.ttk != null ? ig.ttk : ig.cut, rt = p.ttk ? ti / p.ttk : 0, rh = (ig.hits + .5) / (p.hits + .5);
-      line(p.ttk != null && rt >= 1.1 && ig.hits >= 1.25 * Math.max(1, p.hits), `${id} Normal, real hits: play ${p.ttk} s / ${p.hits} hits, ignore ${ig.ttk != null ? ti : '>' + ti} s / ${ig.hits} hits: time ${rt.toFixed(2)}x (>= 1.1), hull ${rh.toFixed(2)}x (>= 1.25)`); } }
+  { const HN = +process.env.HN || 12, ONLY = process.env.ONLY ? process.env.ONLY.split(',').map(Number) : null, HB = BOSSES.filter(([n]) => !ONLY || ONLY.includes(n)), hj = [];
+    for (const [n] of HB) for (let k = 0; k < HN; k++) for (const play of [true, false]) hj.push({ n, diff: 'normal', play, seed: 2000 + n * 31 + k, hull: 1 });
+    const hr = await run(hj, FIGHT, '&bossplay=1'), sum = (a, f) => a.reduce((x, r) => x + f(r), 0);
+    for (const [n, id] of HB) { const P = hr.filter(r => r.n === n && r.play), I = hr.filter(r => r.n === n && !r.play), tm = a => sum(a, r => r.ttk != null ? r.ttk : r.cut) / a.length, hm = a => sum(a, r => r.hits) / a.length, lm = a => sum(a, r => r.lost) / a.length;
+      const rt = tm(I) / tm(P), rh = lm(I) / Math.max(1, lm(P)), done = P.every(r => r.ttk != null);
+      line(done && rt >= 1.15 && rh >= 1.4, `${id} Normal, real hits, ${P.length + I.length} runs: play ${tm(P).toFixed(1)} s / ${lm(P).toFixed(1)} hull (${hm(P).toFixed(1)} hits), ignore ${tm(I).toFixed(1)} s / ${lm(I).toFixed(1)} hull (${hm(I).toFixed(1)} hits): time ${rt.toFixed(2)}x (>= 1.15), hull ${rh.toFixed(2)}x (>= 1.4)`); } }
   { const r = await run([[13], [16]].map(([n]) => ({ n })), CUT); for (const x of r) line(x.how === 'dash', `stage ${x.n}: a DASH through the medic's link beam cuts it (${x.how})`); }
   // 3 seeds
   { const r = await run(BOSSES.map(([n]) => ({ n })), SEEDS); let diffN = 0; for (const o of r) { if (o[0] !== o[1]) diffN++; }

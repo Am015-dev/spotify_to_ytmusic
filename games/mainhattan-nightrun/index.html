@@ -9928,9 +9928,31 @@ const BPN={nodes:'SHIELD NODES',medic:'MEDIC LINK',emp:'ARMOUR PLATE',parry:'PAR
   grid:'LASER GRID',ghost:'MIRROR GHOST',gravity:'GRAVITY LANES',blackout:'BLACKOUT',zone:'SHRINKING RING'};
 const BPH={nodes:'SHOOT THE NODES',medic:'KILL THE MEDIC OR DASH THE LINK',emp:'EMP OR DASH-RAM THE PLATE',parry:'DASH TO PARRY THE ORB',back:'FLANK: GET ABOVE OR BELOW'};
 const BP_GATES=['nodes','medic','emp','parry','back'];
-const BPL=window.BPL={get on(){return!!RET.bossplay&&!!RET.bossmoves;},T:BPT,N:BPN,BREATH:10,OPEN:18,FB:7,FBW:9,LEAK:.25,LEAKH:.45,LEAKT:40,PT:{easy:0,normal:70,hard:95,vhard:95,legend:0},OPENE:14,EASYN:12,FLANK:.8,TEL:.8,GAP:96,auto:/[?&]bpauto=1/.test(location.search)?1.5:0,seed:null,
+const BPL=window.BPL={get on(){return!!RET.bossplay&&!!RET.bossmoves;},T:BPT,N:BPN,BREATH:10,OPEN:18,FB:7,FBW:9,LEAK:.25,LEAKH:.45,LEAKT:40,PT:{easy:0,normal:70,hard:95,vhard:95,legend:0},OPENE:14,EASYN:12,RF:3,RF2:3,GR:3,GRP:4.5,PIN:.75,RB:.35,OPENQ:4,QK:.5,FLANK:.8,TEL:.8,GAP:96,auto:/[?&]bpauto=1/.test(location.search)?1.5:0,seed:null,
   st:null,hz:[]};
-BPL.fb=()=>BPL.FB;   /* W52: an ignored gate overloads by itself after FB=7 s and opens a FBW=9 s window (no silence); LEAK rises to LEAKH after LEAKT s shielded; PT = phase timeout (s, 0 = none) after which the shield stays open. Soft cap: a bot that only dodges still wins in about 1.4x the time (the armour floor is untouchable) */
+BPL.fb=()=>BPL.FB;
+/* W53 ENRAGE: ignoring a gate is DANGEROUS, not slow. While a gate is up and you are not working on it, the meter b.rg fills (RF s to the first tier, RF2 s to the next);
+   each fill fires one bounded BURST (three aimed fans, telegraphed >= 0.6 s, gaps >= GAP px) and raises the tier b.rt (stage <= 12: tier 1 at most). Enraged shots (red) hit for 2 hull and break through the last .75 s of the hit shield.
+   Tier 1: an aimed 3-shot volley every 2 beats (stage <= 12: every bar, and no shield break-through); tier 2 (stage 13+): every beat plus one extra bullet verb from the boss's own moveset layered half a slot later; verb telegraphs
+   one beat tighter where the tempo allows (never below 0.6 s). The tier holds through an overload window (no silence there). A real break resets the meter and the tier;
+   a QUICK break (meter < QK, stage 13+) adds OPENQ s to the open window. Caps: every bullet goes through eb() (ebCap, BCAP). Hull is the payoff, the time ratio follows. */
+BPL.rmax=()=>BPL.tier()?2:1;
+BPL.busy=(e,g)=>{if(g.m==='nodes'||g.m==='medic')return g.tg.some(x=>!x.dead&&x.bpOpen);if(g.m==='back')return g.sy!=null&&Math.abs(P.y-g.sy)>110;if(g.m==='parry')return!!(g.orb&&(g.orb.back||!g.orb.near));return false;};   // working on the gate: in a node / medic row, flanking, or the orb still on its way (not yet passed you); this pauses the meter for at most GR s per gate (GRP for the slow parry orb)
+BPL.vol=(e,n,sp,v,tl)=>{const sb=BT.spb||.5;tl=Math.max(.6,tl||sb*Math.ceil(.6/sb));const s=BPL.stat();s.tel=Math.min(s.tel,tl);BPL.hz.push({aim:1,x:e.x-e.r*.6,y:e.y,on:G.t+tl,off:G.t+tl+.05,t0:G.t,v,n,sp,rage:1});};
+BPL.RE=!/[?&]bprage=0/.test(location.search);   // stage <= 12: ?bprage=0 turns the enrage off there (W53: humanbot stage 8 varies 8-17% human / 25-58% oracle between identical builds at n=12, so it cannot judge this)
+BPL.rage=(e,b,g,dt,sb)=>{const s=BPL.stat();if(!BPL.tier()&&!BPL.RE){b.rg=0;b.rt=0;return;}if(BPL.tier()>0&&P.inv>0&&P.inv<BPL.PIN)for(const x of G.eb)if(x.bpR&&!x.dead&&Math.hypot(x.x-P.x,x.y-P.y)<x.r+10){P.inv=0;break;}   // an enraged shot breaks through the hit shield after its first PIN s
+  if(e.b2&&e.b2.ls>0){b.rg=0;b.rt=0;return;}
+  const bz=g&&g.up&&BPL.busy(e,g);if(bz)g.gr=(g.gr||0)+dt;const ign=g&&g.up&&(!bz||g.gr>(g.m==='parry'?BPL.GRP:BPL.GR)),fbw=g&&!g.up&&g.open&&G.t<g.open&&g.fbw;
+  if(ign)b.rg=(b.rg||0)+dt/(b.rt?BPL.RF2:BPL.RF);else if(!fbw&&!(g&&g.up))b.rg=Math.max(0,(b.rg||0)-dt/BPL.RF);
+  if(b.rg>=1){b.rg=BPL.RB;b.rt=Math.min(BPL.rmax(),(b.rt|0)+1);s.bursts=(s.bursts|0)+1;s.rt=Math.max(s.rt|0,b.rt);const v=250+15*diff();
+    for(let i=0;i<3;i++)BPL.vol(e,5,0,v,Math.max(.6,sb*Math.ceil(.6/sb))+i*.3);floater(e.x,e.y-e.r-48,'ENRAGED '+b.rt,'#ff3d6e');AU.sfx('warn');}
+  if(!(b.rt>0)||!(ign||fbw)||e.bmS>e.bt)return;const k=b.rt>1?1:BPL.tier()?2:4;if((e.bt|0)!==b.rb&&(e.bt|0)%k===0){b.rb=e.bt|0;BPL.vol(e,3,0,220+15*diff());s.vol=(s.vol|0)+1;}};
+/* tier 2 layers one bullet verb from the boss's own moveset (aimed / ring verbs only: no walls, so the free gap rules of each verb hold) */
+BPL.LAY=['tri_burst','split_shot','homing_orb','bounce_orbs','pulse_ring'];   // stateless verbs only (spiral_rev / spokes keep a spin state per slot)
+BPL.lay=e=>{if(e.bp.lay!==undefined)return e.bp.lay;const all=[].concat(...e.lists);return e.bp.lay=BPL.LAY.find(v=>all.includes(v))||null;};
+if(window.BMV){const bt0=BMV.beat;BMV.beat=(e,v,c,d)=>{bt0(e,v,c,d);const b=e.bp;if(!BPL.on||!b||!(b.rt>1)||e.bmS>e.bt||e.bmG||!(b.g&&(b.g.up||b.g.fbw&&G.t<b.g.open)))return;
+    const lv=BPL.lay(e),V=BMV.VB&&BMV.VB[lv];if(!V||lv===v)return;const c2=(c+4)%8;BMV.cur=lv;try{V.f(e,c2,BMX(e),e.bm.P[lv]||{});}catch(x){}BMV.cur=null;eb.src=null;BPL.stat().lay=(BPL.stat().lay|0)+1;};
+  const tl0=BMV.tel;BMV.tel=()=>{const n=tl0(),e=G.boss,sb=BT.spb||.5;return BPL.on&&e&&e.bp&&e.bp.rt>0?Math.min(n,Math.max(Math.ceil(.6/sb-1e-6),n-1)):n;};}   /* W52: an ignored gate overloads by itself after FB=7 s and opens a FBW=9 s window (no silence); LEAK rises to LEAKH after LEAKT s shielded; PT = phase timeout (s, 0 = none) after which the shield stays open. Soft cap: a bot that only dodges still wins in about 1.4x the time (the armour floor is untouchable) */
 /* W40 tier: how many gates must be broken IN A ROW to open the boss, and how long it stays open. First bosses 1 gate / 14 s, district 5 three gates / 10 s */
 BPL.tier=()=>{const n=ST.on?ST.n:20;return n<=12?0:n<40?1:2;};
 BPL.chain=()=>[1,2,3][BPL.tier()];
@@ -9975,9 +9997,10 @@ BPL.teach=e=>{const L=BPTEACH[e.bp.id],c=BPL.codex(),id=e.bp.id,o=c[id]||(c[id]=
 BPL.add=(e,o)=>{const t=en('mine',{x:e.x,y:e.y,wpt:1,bpRole:o.role});t.hp=t.max=t.hq=Math.max(4,Math.round(e.max*o.hk));t.gr=0;t.bpAt=Object.assign({e},o);t.score=0;return t;};
 BPL.resolve=(e,how)=>{const b=e.bp,g=b&&b.g;if(!g||!g.up)return;const s=BPL.stat(),k=g.m+':'+how;s.how[k]=(s.how[k]||0)+1;if(how!=='fb'&&how!=='ls'&&how!=='auto')s.res[g.m]=(s.res[g.m]||0)+1;if(how==='fb')s.fb++;else s.open++;
   for(const t of g.tg)if(!t.dead){t.dead=1;burst(t.x,t.y,'#19e3ff',10,200,.4);}g.up=0;
-  const real=how!=='fb'&&how!=='ls';if(real)b.ch=(b.ch|0)+1;
+  const real=how!=='fb'&&how!=='ls';if(real){b.ch=(b.ch|0)+1;b.rg=0;b.rt=0;}
   if(real&&b.ch<BPL.chain()&&!(e.b2&&e.b2.ls>0)){floater(e.x,e.y-e.r-34,'BREAK '+b.ch+'/'+BPL.chain(),'#19e3ff');AU.sfx('tier');BPL.gate(e,G.t);return;}   // W40: chained gates, the next one rises at once
-  b.ch=0;g.open=G.t+(how==='fb'?BPL.FBW:BPL.opn());   // an overload only flickers FBW s; a real break opens the window, and the boss stays silent for all of it (playing the mechanic is the safe way)
+  const q=real&&BPL.tier()>0&&(b.rg||0)<BPL.QK&&!(b.rt>0);if(real){b.rg=0;b.rt=0;}if(q)BPL.stat().quick=(BPL.stat().quick|0)+1;
+  b.ch=0;g.fbw=how==='fb';g.open=G.t+(how==='fb'?BPL.FBW:BPL.opn()+(q?BPL.OPENQ:0));   // an overload only flickers FBW s; a real break opens the window, and the boss stays silent for all of it (playing the mechanic is the safe way)
   if(real&&e.bm){e.bmS=Math.max(e.bmS|0,e.bt+Math.max(BPL.BREATH,Math.ceil(BPL.opn()/(BT.spb||.5))));BMV.q=BMV.q.filter(q=>q.e!==e);BMV.tq=[];BMV.hz=BMV.hz.filter(z=>z.mk||G.t>=z.on);}   // a gate that is really resolved: the boss is silent for BREATH beats (pending shots and unlit warnings go)
   
   floater(e.x,e.y-e.r-34,how==='fb'?'SHIELD OVERLOAD':'OPEN!','#ffe14d');if(how!=='fb'){shake(6);AU.sfx('tier');G.score+=Math.round(800*(1+G.pos));}
@@ -10009,9 +10032,11 @@ NR.on('tick',dt=>{if(!BPL.on)return;const e=G.boss;if(!e||!e.bp||e.dead){if(BPL.
       if(g.up&&BPL.auto&&t-g.tu>=BPL.auto)BPL.solve(e);
       if(g.up&&t-g.tu>=BPL.fb())BPL.resolve(e,'fb');}
     else if(g.open&&t>=g.open)BPL.gate(e,t);}
+  BPL.rage(e,b,b.g,dt,sb);
   if(BPL.k(e)<1)b.sh=(b.sh||0)+dt;   // W52: shielded seconds in this phase
   BPL.arena(e,b,t,sb,dt);
-  for(const z of BPL.hz)if(z.aim&&t>=z.on&&!z.done){z.done=1;const n=G.eb.length;eb.src=BPSRC;eb(z.x,z.y,Math.atan2(P.y-z.y,P.x-z.x),z.v,'#19e3ff',6);eb.src=null;if(G.eb.length>n){G.eb[n].bpl=1;s.eb++;}}
+  for(const z of BPL.hz)if(z.aim&&t>=z.on&&!z.done){z.done=1;const a0=Math.atan2(P.y-z.y,P.x-z.x),d=Math.max(1,Math.hypot(P.x-z.x,P.y-z.y)),k=z.n||1,sp=Math.max(.3,(BPL.GAP+16)/d);   // fans: neighbours at least GAP px apart where they reach you
+    if(k>1)s.gap=Math.min(s.gap,Math.round(d*sp-12));eb.src=BPSRC;for(let i=0;i<k;i++){const n=G.eb.length;eb(z.x,z.y,a0+(i-(k-1)/2)*sp,z.v,z.rage?'#ff3d6e':'#19e3ff',6);if(G.eb.length>n){G.eb[n].bpl=1;if(z.rage)G.eb[n].bpR=1;s.eb++;}}eb.src=null;}
   BPL.hz=BPL.hz.filter(z=>t<z.off);
   let nl=0;for(const x of G.eb)if(!x.dead)nl++;s.maxEb=Math.max(s.maxEb,nl);s.cap=Math.max(s.cap,ebCap());for(const x of G.eb)if(x.bpl)s.maxV=Math.max(s.maxV,Math.hypot(x.vx,x.vy));});
 const BPSRC={type:'bossmv',arm:true};
@@ -10023,7 +10048,7 @@ BPL.orb=(e,g,dash,sb)=>{const t=G.t,s=BPL.stat();let o=g.orb;
   if(!o&&t>=g.ob){g.orb=o={x:e.x-e.r,y:e.y,t0:t,on:t+BPL.TEL,v:240+15*diff(),back:0};s.tel=Math.min(s.tel,BPL.TEL);return;}
   if(!o||t<o.on)return;const dt=1/60,tx=o.back?e.x:P.x,ty=o.back?e.y:P.y,a=Math.atan2(ty-o.y,tx-o.x),v=o.back?520:o.v;o.x+=Math.cos(a)*v*dt;o.y+=Math.sin(a)*v*dt;
   const d=Math.hypot(P.x-o.x,P.y-o.y);
-  if(!o.back&&dash&&d<110){o.back=1;s.parry=(s.parry|0)+1;floater(P.x,P.y-30,'PARRY!','#19e3ff');AU.sfx('perfect');}
+  if(d<110)o.near=1;if(!o.back&&dash&&d<110){o.back=1;s.parry=(s.parry|0)+1;floater(P.x,P.y-30,'PARRY!','#19e3ff');AU.sfx('perfect');}
   else if(!o.back&&d<20){hurt(1);s.hits++;g.orb=null;g.ob=t+2*sb*4/2;}
   else if(o.back&&Math.hypot(e.x-o.x,e.y-o.y)<e.r){g.orb=null;BPL.resolve(e,'parry');}
   else if(t-o.t0>9){g.orb=null;g.ob=t+sb*2;}};
@@ -10066,6 +10091,8 @@ BPL.draw=()=>{const e=G.boss;if(!BPL.on||!e||!e.bp||e.x>W+40)return;const b=e.bp
   for(const z of BPL.hz)if(z.aim){ctx.globalAlpha=.6;ctx.strokeStyle='#19e3ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(z.x,z.y,10+12*clamp((z.on-t)/.6,0,1),0,7);ctx.stroke();}
   ctx.restore();};
 BPL.tri=(x,y,r,a)=>{ctx.beginPath();for(let i=0;i<3;i++){const q=a+i*2.094;ctx[i?'lineTo':'moveTo'](x+Math.cos(q)*r,y+Math.sin(q)*r);}ctx.closePath();ctx.fill();};
+/* an enraged shot hits for 2 hull (the hurt() wrappers pass no damage, so the second point is taken here; never the killing point) */
+NR.on('hurt',()=>{if(!BPL.on||!G.boss||!G.boss.bp)return;for(const b of G.eb)if(b.bpR&&b.dead&&!b.bpX&&Math.hypot(b.x-P.x,b.y-P.y)<b.r+14){b.bpX=1;if(P.hp>1){P.hp--;BPL.stat().rageHull=(BPL.stat().rageHull|0)+1;}break;}});
 NR.on('bossPhase',({ph})=>{const e=G.boss;if(BPL.on&&e&&e.bp)BPL.phase(e,ph);});
 NR.on('kill',({e,boss})=>{if(!boss||!e||!e.bp)return;BPL.drop(e);BPL.hz=[];const c=BPL.codex()[e.bp.id];BPL.say(e.nm+' DOWN · CODEX '+((c&&c.m)||[]).length+' MECHANICS',4);});
 window.__bpl={BPT,BPL};
@@ -10803,6 +10830,169 @@ setTimeout(()=>{if(!TUT_ON)return;
 window.__tut={get on(){return TUT.on},get i(){return TUT.i},get id(){const s=TUT.cur();return s?s.id:null},get t(){return TUT.t},get n(){return TUT_S.length},ids:TUT_S.map(s=>s.id),
   get endShown(){return TUT.endShown&&!tutC.hidden},get offerShown(){return TUT.offerShown&&!tutC.hidden},get next(){return TUT.next},
   target(){const s=TUT.cur();return s&&s.tgt?s.tgt():null;},start:()=>startTut(),go:i=>{if(TUT.on)tutGo(i);},get log(){return TUT.log},skip:()=>tutSkip(),bpos:()=>bpos(),get wpOpen(){return WP.open}};
+
+/* ---------- LESSONS: short tactics lessons the first time a feature appears (owner, 20 Oct 2026: "better tutorials teaching tactics when they appear first
+   time ... users can practice"). Flag RET.lessons (default ON; ?lessons=0 = the old game: no lesson, no LESSONS button).
+   Six lessons: weapons (first WEAPONS sheet / Garage WEAPONS tab), merge (first Garage FORGE tab), slots (next FORGE / first LOAD tab), ship (first Garage
+   SHIPS tab), counter (first story stage >= 3, where plated and shielded foes start), timing (first story stage >= 2 when FLIGHT SCHOOL was not finished).
+   Each lesson = 2-3 short cards, then a PRACTICE: a tiny sandbox made of shapes (triangles, circles) in its own overlay. Nothing in it touches the run,
+   the hull, Neon, the forge save or the stats: a lesson only opens while no run is live, and the only thing it writes is mnr_lessons {id: 1 seen, 2 practised}.
+   SKIP is on every card. Replay: MENU > LESSONS. Auto-show is off under a test driver unless ?lessons=1. Test: nightrun/lessons-test.js. */
+if(RET.lessons===undefined)RET.lessons=!/[?&]lessons=0/.test(location.search);
+const LS={cur:null,i:0,pr:null,done:null,log:[],raf:0,get on(){return!!RET.lessons;},auto:!!RET.lessons&&(!navigator.webdriver||/[?&]lessons=1/.test(location.search))};
+LS.seen=()=>load('mnr_lessons',{})||{};
+LS.mark=(id,v)=>{const s=LS.seen();if((s[id]|0)<v){s[id]=v;save('mnr_lessons',s);}};
+/* shapes (placeholders until painted art exists): tri = a weapon / ship, dot = a foe, ring = a shield, bar = a front plate, dia = a core */
+const lsS=(k,c,z)=>{z=z||34;const h=z/2,sv=b=>`<svg width="${z}" height="${z}" viewBox="0 0 ${z} ${z}" aria-hidden="true">${b}</svg>`;
+  if(k==='tri')return sv(`<path d="M${z*.12} ${z*.15}L${z*.9} ${h}L${z*.12} ${z*.85}Z" fill="${c}"/>`);
+  if(k==='dot')return sv(`<circle cx="${h}" cy="${h}" r="${z*.3}" fill="${c}"/>`);
+  if(k==='ring')return sv(`<circle cx="${h}" cy="${h}" r="${z*.24}" fill="${c}"/><circle cx="${h}" cy="${h}" r="${z*.44}" fill="none" stroke="#4ad1ff" stroke-width="3"/>`);
+  if(k==='bar')return sv(`<circle cx="${z*.6}" cy="${h}" r="${z*.26}" fill="${c}"/><rect x="${z*.08}" y="${z*.12}" width="${z*.14}" height="${z*.76}" fill="#c9d3e0"/>`);
+  if(k==='dia')return sv(`<path d="M${h} ${z*.08}L${z*.92} ${h}L${h} ${z*.92}L${z*.08} ${h}Z" fill="${c}"/>`);
+  return '';};
+const lsRow=(...a)=>'<div class="ar">'+a.join('')+'</div>',lsN=(k,c,n,z)=>Array.from({length:n},()=>lsS(k,c,z)).join('');
+const lsW=id=>(typeof WPD!=='undefined'&&WPD[id]&&WPD[id].c)||'#ff8ad8',lsWS=id=>(typeof WPD!=='undefined'&&WPD[id]&&WPD[id].s)||id.toUpperCase();
+const lsRecipe=(a,b)=>{if(typeof FGR==='undefined')return null;const r=FGR.find(r=>(r[0]===a&&r[1]===b)||(r[0]===b&&r[1]===a));return r?r[3]:null;};
+const FOE='#ff5a7a';
+const LSN=[
+ {id:'weapons',n:'WEAPONS',cards:[
+   ['EVERY WEAPON HAS A JOB',lsRow(lsS('tri',lsW('pulse')),lsS('tri',lsW('laser')),lsS('tri',lsW('swarm'))),'PULSE spreads wide, LANCE pierces a line, SWARM hunts the nearest foe.'],
+   ['READ THE WAVE',lsRow(lsN('dot',FOE,3,22),'<i>&rarr;</i>',lsS('tri',lsW('laser'))),'Foes in a line: pierce them. A wide crowd: spread. Fast dodgers: homing.'],
+   ['YOU HAVE TWO SLOTS',lsRow(lsS('tri',lsW('pulse')),'<b>+</b>',lsS('tri',lsW('laser'))),'Fill both with different jobs so no wave catches you out.']],
+  pr:{type:'pick',rounds:[
+   {q:'Three foes in a line. Which weapon?',art:lsRow(lsS('tri','#19e3ff'),'<i>&rarr;</i>',lsN('dot',FOE,3,24)),opts:['pulse','laser','swarm'],ok:'laser',why:'LANCE pierces the whole line'},
+   {q:'A wide crowd. Which weapon?',art:lsRow(lsS('tri','#19e3ff'),'<span class="cr">'+lsN('dot',FOE,6,18)+'</span>'),opts:['laser','swarm','pulse'],ok:'pulse',why:'PULSE spread covers the crowd'}]}},
+ {id:'merge',n:'MERGE',cards:[
+   ['TWO WEAPONS, ONE HYBRID',lsRow(lsS('tri',lsW('pulse')),'<b>+</b>',lsS('tri',lsW('swarm')),'<i>&rarr;</i>',lsS('tri','#ffe14d',40)),'Garage FORGE: two weapons you own + 3 scrap + 120 Neon make a hybrid.'],
+   ['ONLY SOME PAIRS MERGE',lsRow(lsS('tri',lsW('pulse')),'<b>+</b>',lsS('tri',lsW('swarm')),'<i>= SEED FAN</i>'),'Each pair has one recipe. The hybrid keeps the first weapon\'s shots and adds a trick.'],
+   ['WHEN TO MERGE',lsRow(lsS('tri','#ffe14d',40)),'Merge when you know your stage: a hybrid frees a slot for a second job.']],
+  pr:{type:'merge',tiles:['pulse','laser','swarm']}},
+ {id:'slots',n:'SLOTS',cards:[
+   ['YOUR LOADOUT',lsRow(lsS('tri',lsW('pulse')),lsS('tri',lsW('laser')),lsS('dia','#3dffb0'),lsS('dot','#ffe14d')),'2 weapon slots, 1 core, 1 passive. Each slot takes one kind only.'],
+   ['CORE AND PASSIVE',lsRow(lsS('dia','#3dffb0'),lsS('dot','#ffe14d')),'A core changes your DASH and EMP. A passive helps all run long.'],
+   ['MODS',lsRow(lsS('tri',lsW('laser')),'<b>+</b>',lsS('dot','#c08aff',20),lsS('dot','#c08aff',20)),'A plain weapon takes 2 mods, a hybrid 1. Mods trade damage for an effect.']],
+  pr:{type:'equip'}},
+ {id:'ship',n:'SHIPS',cards:[
+   ['EACH SHIP FIRES ITS WAY',lsRow(lsS('tri','#19e3ff'),lsS('tri','#ffb020'),lsS('tri','#ff3d6a'),lsS('tri','#b6ff5a')),'Courier: steady. Triplet: bursts of 3. Heavy: a piercing blast every 2 beats. Echo: every shot repeats.'],
+   ['PICK FOR THE STAGE',lsRow(lsS('tri','#ff3d6a'),'<i>&rarr;</i>',lsS('bar',FOE,40)),'Big tough foes and bosses: Heavy. Many small ones: Triplet or Echo.']],
+  pr:{type:'pick',rounds:[
+   {q:'A stage of armoured foes and a boss. Which ship?',art:lsRow(lsS('tri','#19e3ff'),'<i>&rarr;</i>',lsS('bar',FOE,40)),opts:['std','hv','tri'],ok:'hv',why:'Heavy\'s piercing blast breaks tough foes',ship:1}]}},
+ {id:'counter',n:'COUNTERS',cards:[
+   ['PLATED FOES',lsRow(lsS('tri','#19e3ff'),'<i>&rarr;</i>',lsS('bar',FOE,40)),'A front plate takes only a third of your damage. Fly to its side, or EMP.'],
+   ['SHIELDED FOES',lsRow(lsS('ring',FOE,40)),'A shield eats damage first. EMP strips it, then any weapon works.'],
+   ['SWARMS',lsRow('<span class="cr">'+lsN('dot',FOE,6,18)+'</span>'),'Many small foes: a wide weapon (PULSE, FLAME, WAVE) clears them.']],
+  pr:{type:'pick',rounds:[
+   {q:'A plated foe faces you. What do you do?',art:lsRow(lsS('tri','#19e3ff'),'<i>&rarr;</i>',lsS('bar',FOE,40)),opts:['front','side','wait'],ok:'side',why:'From the side the plate does not cover it'},
+   {q:'A shielded foe. What do you do?',art:lsRow(lsS('ring',FOE,40)),opts:['emp','front','dash'],ok:'emp',why:'EMP strips the shield'},
+   {q:'A swarm. Which weapon?',art:lsRow('<span class="cr">'+lsN('dot',FOE,6,18)+'</span>'),opts:['laser','pulse','swarm'],ok:'pulse',why:'A wide spread clears the swarm'}]}},
+ {id:'timing',n:'TIMING',cards:[
+   ['DASH ON THE BEAT',lsRow(lsS('tri','#19e3ff'),'<i>&harr;</i>'),'A ring closes on your ship each beat. DASH as it touches: a perfect dash goes through bullets.'],
+   ['SAVE YOUR EMP',lsRow(lsS('dot','#3dffb0',40)),'EMP clears bullets and strips shields. Keep it for a wall of bullets or a shielded pack.']],
+  pr:{type:'beat',need:2}}];
+const LS_OPT={pulse:['tri','PULSE'],laser:['tri','LANCE'],swarm:['tri','SWARM'],std:['tri','COURIER'],hv:['tri','HEAVY'],tri:['tri','TRIPLET'],
+  front:['tri','SHOOT FRONT'],side:['tri','FLY TO SIDE'],wait:['dot','WAIT'],emp:['dot','EMP'],dash:['tri','DASH']};
+const LS_OC={std:'#19e3ff',hv:'#ff3d6a',tri:'#ffb020',front:'#19e3ff',side:'#3dffb0',wait:'#8890a8',emp:'#3dffb0',dash:'#ffe14d'};
+/* ----- the overlay ----- */
+{const st=document.createElement('style');st.textContent=`#lsC{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;background:rgba(5,3,12,.8);padding:16px;box-sizing:border-box}
+#lsC[hidden]{display:none}#lsC .lc{width:min(420px,100%);max-height:100%;overflow:auto;background:#0d0820;border:2px solid var(--cyan);border-radius:14px;padding:16px;box-sizing:border-box;color:var(--ink);font:600 15px var(--display);text-align:center;display:flex;flex-direction:column;gap:12px}
+#lsC h3{margin:0;font:700 19px var(--display);letter-spacing:.06em;color:var(--cyan)}#lsC .lk{font-size:14px;color:#c9c2e0;letter-spacing:.1em}#lsC p{margin:0;line-height:1.35}
+#lsC .ar{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;flex-wrap:wrap}#lsC .ar i{font-style:normal;font-size:22px;color:#c9c2e0}#lsC .ar b{font-size:22px}
+#lsC small{font-size:13px;color:#c9c2e0}#lsC .cr{display:inline-grid;grid-template-columns:repeat(3,auto);gap:2px}#lsC .rw{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}#lsC .rw button{min-height:48px;min-width:110px}
+#lsC .op{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+#lsC .lo{min-height:56px;background:#1b1236;border:2px solid #4a3c7a;border-radius:10px;color:var(--ink);font:700 14px var(--display);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px;cursor:pointer}
+#lsC .lo.sel{border-color:#ffe14d;box-shadow:0 0 0 2px #ffe14d66}#lsC .lo.ok{border-color:#3dffb0}#lsC .lo.bad{border-color:#ff5a7a}#lsC .lo:disabled{opacity:1;cursor:default}
+#lsC .sl{border-style:dashed;color:#c9c2e0}#lsC .sl.full{border-style:solid;color:var(--ink)}
+#lsC .fb{min-height:22px;font-size:15px}#lsC .fb.ok{color:#3dffb0}#lsC .fb.bad{color:#ff8a9a}
+#lsC .bt{position:relative;height:120px;display:flex;align-items:center;justify-content:center}#lsC .bt .rg{position:absolute;left:50%;top:50%;width:100px;height:100px;margin:-50px 0 0 -50px;border:3px solid #ffe14d;border-radius:50%;box-sizing:border-box}
+#lsC .bt .sh{position:relative;width:34px;height:34px}`;document.head.appendChild(st);}
+const lsC=document.createElement('div');lsC.id='lsC';lsC.hidden=true;lsC.setAttribute('role','dialog');lsC.setAttribute('aria-label','Lesson');document.body.appendChild(lsC);
+for(const ev of['touchstart','touchmove','touchend','pointerdown','mousedown'])lsC.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
+addEventListener('keydown',e=>{if(lsC.hidden)return;
+  if(e.code==='Escape'){const b=$('lsSkip')||$('lsBack');if(b)b.click();}
+  else if(LS.pr&&LS.pr.type==='beat'&&!LS.pr.won&&(e.code==='Space'||e.code==='ShiftLeft'||e.code==='ShiftRight')){const b=$('lsDash');if(b)b.click();}
+  else if(e.code==='Enter'||e.code==='Space'){const b=document.activeElement&&lsC.contains(document.activeElement)?document.activeElement:lsC.querySelector('.rw .go:not(.dim)');if(b)b.click();}
+  else return;e.stopImmediatePropagation();e.preventDefault();},true);
+function lsBtn(row,id,label,cls,fn){const b=document.createElement('button');b.type='button';b.className=cls||'go';b.id=id;b.innerHTML=label;
+  b.addEventListener('click',e=>{e.stopPropagation();fn(b);});row.appendChild(b);return b;}
+function lsFrame(head,body){cancelAnimationFrame(LS.raf);lsC.innerHTML=`<div class="lc"><div class="lk">${head}</div>${body}<div class="rw"></div></div>`;lsC.hidden=false;return lsC.querySelector('.rw');}
+/* ----- flow: cards -> practice -> done ----- */
+function lsShow(id,done){const L=LSN.find(l=>l.id===id);if(!L||!LS.on){if(done)done();return false;}
+  LS.cur=L;LS.i=0;LS.pr=null;LS.done=done||null;LS.mark(id,1);LS.log.push({id,ev:'show'});lsCard();return true;}
+function lsCard(){const L=LS.cur,c=L.cards[LS.i];
+  const rw=lsFrame(`LESSON · ${L.n} · ${LS.i+1}/${L.cards.length+1}`,`<h3>${c[0]}</h3>${c[1]}<p>${c[2]}</p>`);
+  lsBtn(rw,'lsNext',LS.i<L.cards.length-1?'NEXT':'PRACTICE','go',()=>{LS.i++;if(LS.i<L.cards.length)lsCard();else lsPractice();});
+  lsBtn(rw,'lsSkip','SKIP','go dim',()=>lsEnd(false));rw.firstChild.focus();}
+function lsEnd(ok){cancelAnimationFrame(LS.raf);const L=LS.cur;if(L){if(ok)LS.mark(L.id,2);LS.log.push({id:L.id,ev:ok?'done':'skip'});}
+  LS.cur=null;LS.pr=null;lsC.hidden=true;lsC.innerHTML='';const d=LS.done;LS.done=null;if(d)d();}
+function lsWin(why){const P=LS.pr;P.won=true;const fb=lsC.querySelector('.fb');if(fb){fb.className='fb ok';fb.textContent='WELL DONE: '+why;}
+  const rw=lsC.querySelector('.rw');rw.innerHTML='';lsBtn(rw,'lsDone','GOT IT','go',()=>lsEnd(true)).focus();}
+function lsTry(t){const fb=lsC.querySelector('.fb');if(fb){fb.className='fb bad';fb.textContent='TRY AGAIN: '+t;}LS.log.push({id:LS.cur.id,ev:'miss'});}
+function lsPractice(r){const L=LS.cur,P=LS.pr={type:L.pr.type,won:false,r:r|0,hits:0};let rw;
+  const head=`PRACTICE · ${L.n} · ${L.cards.length+1}/${L.cards.length+1}`;
+  if(P.type==='pick'){const RS=L.pr.rounds,R=RS[P.r];rw=lsFrame(head,`<h3>${R.q}</h3>${R.art}<div class="op"></div><div class="fb">Tap your answer${RS.length>1?' ('+(P.r+1)+'/'+RS.length+')':''}</div>`);
+    const op=lsC.querySelector('.op');P.want=R.ok;
+    for(const o of R.opts){const d=LS_OPT[o]||['tri',o.toUpperCase()],c=LS_OC[o]||lsW(o),lb=R.ship&&typeof SHIPS!=='undefined'?((SHIPS.find(s=>s.id===o)||{}).n||d[1]).toUpperCase():d[1];
+      lsBtn(op,'lsO_'+o,lsS(d[0],c,26)+'<span>'+lb+'</span>','lo',b=>{if(P.won||P.step)return;
+        if(o===R.ok){b.classList.add('ok');P.step=1;if(P.r<RS.length-1){const fb=lsC.querySelector('.fb');fb.className='fb ok';fb.textContent='YES: '+R.why;
+            setTimeout(()=>{if(LS.pr===P)lsPractice(P.r+1);},900);}else lsWin(R.why);}
+        else{b.classList.add('bad');setTimeout(()=>b.classList.remove('bad'),600);lsTry('think about what the foes need');}}).dataset.v=o;}
+    lsBtn(rw,'lsSkip','SKIP','go dim',()=>lsEnd(false));}
+  else if(P.type==='merge'){const T=L.pr.tiles;rw=lsFrame(head,`<h3>Merge two weapons into a hybrid</h3><div class="op" id="lsTiles"></div><div class="ar" id="lsForge"></div><div class="fb">Tap two weapons, then FORGE</div>`);
+    P.pick=[];P.want=T.flatMap((a,i)=>T.slice(i+1).filter(b=>lsRecipe(a,b)).map(b=>[a,b]));if(!P.want.length)P.want=[[T[0],T[1]]];
+    const fz=$('lsForge'),draw=()=>{fz.innerHTML=[0,1].map(i=>`<span class="lo sl${P.pick[i]?' full':''}">${P.pick[i]?lsS('tri',lsW(P.pick[i]),26)+lsWS(P.pick[i]):'EMPTY'}</span>`).join('<b>+</b>');
+      for(const b of lsC.querySelectorAll('#lsTiles .lo'))b.classList.toggle('sel',P.pick.includes(b.dataset.v));};
+    for(const w of T)lsBtn($('lsTiles'),'lsT_'+w,lsS('tri',lsW(w),26)+'<span>'+lsWS(w)+'</span>','lo',()=>{if(P.won)return;const k=P.pick.indexOf(w);
+      if(k>=0)P.pick.splice(k,1);else{if(P.pick.length>=2)P.pick.shift();P.pick.push(w);}draw();}).dataset.v=w;
+    lsBtn(rw,'lsForgeGo','FORGE','go',()=>{if(P.won)return;if(P.pick.length<2){lsTry('pick two weapons first');return;}
+      const nm=lsRecipe(P.pick[0],P.pick[1])||(P.want.some(p=>p.includes(P.pick[0])&&p.includes(P.pick[1]))?'HYBRID':null);
+      if(nm){fz.innerHTML=lsS('tri','#ffe14d',40)+'<span>'+nm.toUpperCase()+'</span>';lsWin(lsWS(P.pick[0])+' + '+lsWS(P.pick[1])+' = '+nm.toUpperCase());}
+      else{lsTry('no recipe for '+lsWS(P.pick[0])+' + '+lsWS(P.pick[1]));P.pick=[];draw();}});
+    lsBtn(rw,'lsSkip','SKIP','go dim',()=>lsEnd(false));draw();}
+  else if(P.type==='equip'){const IT=[['w1','tri',lsW('pulse'),'PULSE','weapon'],['w2','tri',lsW('laser'),'LANCE','weapon'],['c','dia','#3dffb0','CORE','core'],['p','dot','#ffe14d','PASSIVE','passive']],
+      SL=[['weapon','WEAPON'],['weapon','WEAPON'],['core','CORE'],['passive','PASSIVE']];
+    rw=lsFrame(head,`<h3>Equip your loadout</h3><div class="op" id="lsItems"></div><div class="op" id="lsSlots"></div><div class="fb">Tap an item, then a slot that fits it</div>`);
+    P.sel=null;P.fill=[null,null,null,null];P.want=IT.map(i=>i[0]);
+    for(const it of IT)lsBtn($('lsItems'),'lsI_'+it[0],lsS(it[1],it[2],24)+'<span>'+it[3]+'</span>','lo',b=>{if(P.won||b.disabled)return;P.sel=it;
+      for(const q of lsC.querySelectorAll('#lsItems .lo'))q.classList.toggle('sel',q===b);}).dataset.v=it[0];
+    SL.forEach(([k,lb],i)=>lsBtn($('lsSlots'),'lsSl_'+i,'<span>'+lb+'</span>','lo sl',b=>{if(P.won)return;const it=P.sel;if(!it){lsTry('tap an item first');return;}
+      if(P.fill[i]){lsTry('that slot is full');return;}
+      if(it[4]!==k){lsTry(lb+' slot takes a '+k+' only');return;}
+      P.fill[i]=it[0];P.sel=null;b.classList.add('full');b.innerHTML=lsS(it[1],it[2],24)+'<span>'+it[3]+'</span>';const ib=$('lsI_'+it[0]);ib.disabled=true;ib.classList.remove('sel');ib.classList.add('ok');
+      if(P.fill.every(Boolean))lsWin('2 weapons, a core and a passive');else{const fb=lsC.querySelector('.fb');fb.className='fb ok';fb.textContent='FITS: '+(P.fill.filter(Boolean).length)+'/4';}}).dataset.v=k);
+    lsBtn(rw,'lsSkip','SKIP','go dim',()=>lsEnd(false));}
+  else if(P.type==='beat'){const need=L.pr.need;rw=lsFrame(head,`<h3>DASH when the ring touches your ship</h3><div class="bt"><div class="rg" id="lsRing"></div><div class="sh">${lsS('tri','#19e3ff',34)}</div></div><div class="fb">On beat: 0/${need}</div>`);
+    P.per=1000;P.t0=performance.now();P.need=need;P.ph=0;const ring=$('lsRing');
+    const tick=()=>{if(LS.pr!==P)return;P.ph=((performance.now()-P.t0)%P.per)/P.per;ring.style.transform=`scale(${(1-.66*P.ph).toFixed(3)})`;ring.style.opacity=(.4+.6*P.ph).toFixed(2);LS.raf=requestAnimationFrame(tick);};tick();
+    lsBtn(rw,'lsDash','DASH','go',()=>{if(P.won)return;const ph=((performance.now()-P.t0)%P.per)/P.per;
+      if(ph>.84||ph<.06){P.hits++;const fb=lsC.querySelector('.fb');fb.className='fb ok';fb.textContent='ON BEAT: '+P.hits+'/'+need;if(P.hits>=need){cancelAnimationFrame(LS.raf);lsWin('dash as the ring touches');}}
+      else lsTry(ph<.5?'too late, wait for the ring':'too early, let the ring close');});
+    lsBtn(rw,'lsSkip','SKIP','go dim',()=>lsEnd(false));}
+  const f=rw&&rw.parentNode.querySelector('.lo, .rw .go');if(f)f.focus();}
+/* ----- the list (MENU > LESSONS, Settings) ----- */
+function lsList(){const rw=lsFrame('HELP','<h3>LESSONS</h3><p>Replay any lesson and its practice.</p><div class="op" id="lsL"></div>');const sv=LS.seen();
+  for(const L of LSN)lsBtn($('lsL'),'lsL_'+L.id,'<span>'+L.n+'</span><small>'+(sv[L.id]===2?'practised':sv[L.id]?'seen':'new')+'</small>','lo',()=>lsShow(L.id,lsList));
+  lsBtn(rw,'lsBack','BACK','go',()=>{lsC.hidden=true;lsC.innerHTML='';});rw.firstChild.focus();}
+/* ----- triggers: first time each feature appears, never while a run is live ----- */
+LS.want=id=>LS.auto&&!running&&lsC.hidden&&!(LS.seen()[id]);
+LS.tryShow=(id,done)=>{if(!LS.want(id))return false;return lsShow(id,done);};
+if(LS.on){
+  {const s0=WP.show;WP.show=function(mode){const r=s0.apply(this,arguments);LS.tryShow('weapons');return r;};}
+  const gaChk=()=>{if(garageEl.hidden)return;const t=GA.tab;
+    if(t==='weapons')LS.tryShow('weapons');else if(t==='ships')LS.tryShow('ship');else if(t==='load')LS.tryShow('slots');
+    else if(t==='forge'){if(!LS.tryShow('merge'))LS.tryShow('slots');}};
+  garageEl.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.tabs button');if(b)setTimeout(gaChk,0);});
+  {const o0=openGarage;openGarage=function(){const r=o0.apply(this,arguments);setTimeout(gaChk,0);return r;};}
+  {const ss=startStory;startStory=function(n){if(running)return ss.apply(this,arguments);const a=arguments,go=()=>{if(!running)ss.apply(this,a);};
+    if(n>=3&&LS.tryShow('counter',go))return;
+    if(n>=2&&load('mnr_tut',0)!==2&&window.TIM&&TIM.on&&LS.tryShow('timing',go))return;
+    return ss.apply(this,a);};}
+  setTimeout(function add(){const g=document.querySelector('#mnMore .mg');if(!g){if((add.n=(add.n|0)+1)<40)setTimeout(add,50);return;}
+    const b=document.createElement('button');b.type='button';b.className='go dim';b.id='lsBtn';b.textContent='LESSONS';b.addEventListener('click',()=>{if(!running)lsList();});
+    const t=$('tutBtn');if(t&&t.parentNode===g)t.after(b);else g.appendChild(b);},0);}
+window.__lessons={ids:LSN.map(l=>l.id),seen:()=>LS.seen(),show:(id,d)=>lsShow(id,d),list:()=>lsList(),get open(){return!lsC.hidden},get id(){return LS.cur?LS.cur.id:null},
+  get step(){return LS.pr?'practice':LS.cur?'card':null},get pr(){return LS.pr},get log(){return LS.log},get auto(){return LS.auto},get on(){return LS.on},
+  start:n=>startStory(n),quit:()=>{if(running)quitToTitle();},get running(){return running},
+  phase:()=>LS.pr&&LS.pr.type==='beat'?((performance.now()-LS.pr.t0)%LS.pr.per)/LS.pr.per:null};
 
 /* ---------- B25 title diet + CONTINUE, B26 type floor (POLISH.md). Flags RET.title and RET.type (ret.js); flags off = the old title.
    Title: one big PLAY / CONTINUE, ENDLESS + DAILY, GARAGE + MENU, and the daily/weekly status chip (#retTt, drawn by ret.js).
