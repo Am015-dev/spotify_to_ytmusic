@@ -534,6 +534,12 @@ function PCH60(cap){if(state!=='roam'||!RO.on)return'📍 PC HEAP 60 s · start 
   const hy=150,ok=und===0&&near===0&&hy>=150;
   return`📍 TSTREAM NEAR ${CID} · shown ${on}, deflated ${oz} (instant re-zips ${MEMF.zst.rz}), undrawn zipped ${und}, zipped inside ${MEMF.nr - 50} m ${near}, raw shown ${(raw/1048576).toFixed(1)} MB, zip/unzip lines ${hy} m apart → ${ok?'✅ PASS':'❌ FAIL'}`}}))}return}
  if(i<600)setTimeout(()=>TSN_reg(i+1),100)})(0);
+// ios-r18m: GO perf/tstream-on: touch streaming is ON by default on the touch / lowmem tier (?tstream=0 off), with one inflate and one deflate in flight after the curtain (3 + 2 held ~20 MB of Blob / stream copies at a time: the fra +37 growth step)
+(function TSO_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='tstream-on')){C.items.push({ver:'perf',id:'tstream-on',area:'perf',text:'ios-r18m · 📍 GO (touch / lowmem): tstream is ON unless ?tstream=0, at most MEMF.ubm=1 inflate and MEMF.zbm=1 deflate in flight, chunks zipped, and a re-zipped chunk drops its raw buffer (zk). Pass line: flag matches the URL, in-flight within the caps, ≥ 1 chunk zipped.',go:'perf/tstream-on'});
+ C.GO['perf/tstream-on']=['fra','ath'].map(c=>({c,n:'tstream default on',secs:15,fn:()=>{if(typeof MEMF==='undefined'||!MEMF.zOn)return'📍 TSTREAM ON · needs the touch / lowmem tier (?lowmem=1) ✅ PASS (not applicable)';
+  const off=/[?&]tstream=0/.test(location.search);let bad=MEMF.ts===off?1:0,rz=0;for(const e of MEMF.S)if(e.cz&&e.zk)rz++;
+  return'📍 TSTREAM ON '+CID+' · flag '+(MEMF.ts?1:0)+' (url off '+off+'), caps inflate '+MEMF.ubm+' deflate '+MEMF.zbm+', in flight '+MEMF.ubusy+'/'+MEMF.zbusy+', zipped '+MEMF.zst.n+', zipped with a kept raw buffer '+rz+' → '+(!bad&&(off||MEMF.ubm===1&&MEMF.zbm===1&&MEMF.zst.n>0&&rz===0)?'✅ PASS':'❌ FAIL')}}))}return}
+ if(i<600)setTimeout(()=>TSO_reg(i+1),100)})(0);
 
 // ios-r18b: hubRecycle spread: touch/lowmem, the first 400 recycle calls (~6 s) do 2 recycles a frame within 1.5 ms (was 6 uncapped, 11 ms at ~f75 in Athens); ?rcbud=1 = on (default OFF: 3 of 4 Athens runs clean, not 4 of 4).
 {const v=new URLSearchParams(location.search).get('rcbud');TUNE.rcBud=v==null?0:+v||0}
