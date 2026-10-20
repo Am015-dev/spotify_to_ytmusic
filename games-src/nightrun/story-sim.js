@@ -3,7 +3,7 @@
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/story-sim.js
 //   env: RUNS=20 (per stage) STAGES=1,6,12 PC=.4 (chance that a fire tap lands on the beat) PAR=4 MAXT=420 (game seconds before a run counts as failed) HARD=1 (Hard Endless instead: STAGES ignored)
 // Prints clear-rate, time, hits and perfects per stage. The bot is the sweep's decide() (dodge grid, dash when a shot is near, EMP when swamped) with a ~50 ms reaction.
-const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
+const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs'), os = require('os');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
 const CLASSIC = !!process.env.CLASSIC, RUNS = +process.env.RUNS || 20, PC = process.env.PC != null ? +process.env.PC : .4, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 420;
 const STAGES = (process.env.STAGES || '1,2,3,4,5,6,7,8,9,10,11,12').split(',').map(Number);
@@ -22,6 +22,7 @@ const BOT = (opts) => {
       for (const b of G.eb) { const px = b.x + b.vx * .14, py = b.y + b.vy * .14, d = Math.hypot(px - cx, py - cy); if (d < 70) c += (70 - d) * (70 - d) * (d < 26 ? 30 : 1); }
       if (G.boss && G.boss.lasers) for (const l of G.boss.lasers) { const vx = Math.cos(l.a), vy = Math.sin(l.a), px = cx - l.x, py = cy - l.y; if (px * vx + py * vy > -20) { const dl = Math.abs(px * vy - py * vx); if (dl < 40) c += (40 - dl) * 120; } }   // read the laser telegraph: stay off its line
       for (const e of G.en) { if (e.type === 'gate') { if (Math.abs(e.x - cx) < 60 && (cy < e.gy - e.gap / 2 + 12 || cy > e.gy + e.gap / 2 - 12)) c += 3000; continue; } const d = Math.hypot(e.x - cx, e.y - cy), r = e.r + 55; if (d < r) c += (r - d) * (r - d) * 3; }
+      if (window.MM && MM.col) c += MM.cost(cx);   // the column strike (fair.js, must move), as a player sees it
       c += Math.abs(cy - ty) * .6 + Math.abs(cx - tx) * .15 + Math.hypot(ix, iy) * 4; if (c < bc) { bc = c; bx = cx; by = cy; }
     }
     const near = G.eb.some(b => Math.hypot(b.x + b.vx * .08 - P.x, b.y + b.vy * .08 - P.y) < 30);
@@ -63,5 +64,7 @@ const BOT = (opts) => {
   console.log('stage  clear%  time(s)  hits  perf  score   (runs ' + RUNS + ', perfect-chance ' + PC + ')');
   for (const n of STAGES) { const a = res[n], c = a.filter(x => x.clear); console.log(String(n).padStart(4), String(Math.round(100 * c.length / a.length)).padStart(6) + '%', avg(c.length ? c : a, 't').toFixed(0).padStart(7), avg(a, 'hits').toFixed(1).padStart(5), avg(a, 'perf').toFixed(0).padStart(5), avg(a, 'score').toFixed(0).padStart(8), ' kills ' + avg(a, 'kills').toFixed(0).padStart(4) + ' ', ' hitsBoss ' + avg(a, 'hb').toFixed(1) + ' hitsWaves ' + avg(a, 'hw').toFixed(1) + ' fight ' + avg(a.filter(x => x.fight), 'fight').toFixed(0).padStart(3) + 's', '  3-star: ' + c.filter(x => x.stars[2]).length + ' perfStar: ' + c.filter(x => x.stars[1]).length); }
   for (const n of STAGES) { const cs = {}; for (const x of res[n]) for (const c in x.causes) cs[c] = (cs[c] || 0) + x.causes[c]; console.log('  hit causes stage ' + n + ': ' + JSON.stringify(cs)); }
-  fs.writeFileSync(path.join(__dirname, 'playtest', 'story-sim.json'), JSON.stringify(res));
+  // Test runs write to the temp dir so the tree stays clean; SAVE=1 refreshes the tracked playtest/story-sim.json.
+  const out = process.env.SAVE ? path.join(__dirname, 'playtest', 'story-sim.json') : path.join(os.tmpdir(), 'story-sim.json');
+  fs.writeFileSync(out, JSON.stringify(res)); console.log('wrote ' + out);
 })().catch(e => { console.error(e); process.exit(2); });

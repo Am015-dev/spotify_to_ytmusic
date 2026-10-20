@@ -47,6 +47,9 @@ ART.put=(o,x,y,rot,al,sx,sy)=>{if(!o)return false;if(al!=null)ctx.globalAlpha=al
   else ctx.drawImage(o.c,x-o.w/2,y-o.h/2,o.w,o.h);
   if(al!=null)ctx.globalAlpha=1;return true;};
 ART.d=(n,w,x,y,rot,al)=>ART.put(ART.sp(n,w),x,y,rot,al);
+/* W34 (ASSETS-NEEDED-2.md): a picture only when the id is REAL art listed in media/ready.json (ART.rd, shapes.js), else false = the caller draws its code shape. fx-w34-* are light on black (keyed in ART.load) and go on additively */
+ART.img=id=>ART.rd&&ART.rd.has(id+'.webp')&&ART.bm[id]||null;
+ART.pic=(id,w,x,y,rot,al)=>{if(!ART.img(id))return false;const o=ART.sp(id,w);if(!o)return false;if(id.startsWith('fx-')){ctx.save();ctx.globalCompositeOperation='lighter';ART.put(o,x,y,rot,al);ctx.restore();return true;}return ART.put(o,x,y,rot,al);};
 /* sprite with a hit flash on top: fl = a flash is on (colour col, strength a) */
 ART.dflash=(n,w,x,y,rot,fl,col,a)=>{const o=ART.sp(n,w);if(!o)return false;ART.put(o,x,y,rot);
   if(fl){const s=ART.sil(n,w,col||'#ffffff');if(s)ART.put(s,x,y,rot,a==null?.8:a);}return true;};

@@ -10,8 +10,9 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', port, '--bind', '127.0.0.1'], { cwd: GAME_DIR, stdio: 'ignore' }); await sleep(800);
   const br = await PW.chromium.launch(), p = await (await br.newContext({ viewport: { width: 1280, height: 720 } })).newPage(), errs = [];
   p.on('pageerror', e => errs.push(e.message)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
+  // obsolete-fixed: the page opens with ?songspread=0 because "flag off = the old song picks" also means the V10 song spread is off
   await p.addInitScript(() => { try { localStorage.setItem('mnr_tut', '1'); } catch (e) { } });
-  await p.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__dp && window.RET && window.__mnr && window.__mnr.TR.list.length >= 11, null, { timeout: 15000 }); await sleep(300);
+  await p.goto(`http://127.0.0.1:${port}/index.html?songspread=0`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__dp && window.RET && window.__mnr && window.__mnr.TR.list.length >= 11, null, { timeout: 15000 }); await sleep(300);
   const get = flag => p.evaluate(f => {
     RET.dpool = f; const d = window.__dp, st = d.STAGES.map(s => ({ n: s.n, di: s.di, song: s.song, goal: s.goal.k })), bosses = {};
     for (const D of d.DISTRICTS) bosses[D.boss] = d.bossSong(D.boss, false);
