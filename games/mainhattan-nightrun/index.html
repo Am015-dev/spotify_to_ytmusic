@@ -916,7 +916,7 @@ const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil
 window.__dmg=DMG;
 NR.on('runStart',()=>{DMG.dps=0;DMG.k=1;});
 /* ---------- spawning ---------- */
-function en(type,o){const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
+function en(type,o){if(window.ROSTER)type=ROSTER.sub(type,o);const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600},flank:{r:13,hp:3,score:180},swarm:{r:9,hp:1,score:60},mine:{r:15,hp:5,score:200}}[type];
   const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2,gr:DMG.on?1:0},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK()*(window.SC?SC.hpK():1))));
   if(!o.mini&&(type==='drone'||type==='charger'||type==='turret'||type==='flank')&&GX()<eliteP()){e.el=1;e.hp=Math.round(e.hp*2);e.r=Math.round(e.r*1.25);e.score*=2;}   // elites: tougher, gold ring, shoot more
@@ -1074,6 +1074,7 @@ function update(dt){
     let mx=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0),my=(K.ArrowDown||K.KeyS?1:0)-(K.ArrowUp||K.KeyW?1:0);
     if(mx||my){const l=Math.hypot(mx,my);P.dx=mx/l;P.dy=my/l;}
     const dashTs=pressed.ShiftLeft||pressed.ShiftRight||pressed.KeyK||pressed.Dash;
+    if(window.ABIL&&ABIL.on)ABIL.dashIn(dashTs,mx,my,pdt);else{   // abilities.js: dash charges + power-up traits (?abil=0 = this old dash)
     const canDash=()=>P.dashCd<=0||SH.spare>0;
     // DASH is snapped to the beat: a press inside the window waits for the beat (at most the window), then counts as on-beat. Outside the window it dashes at once, off-beat, and the tier drops.
     const goDash=(on,j)=>{if(P.dashCd>0)SH.spare--;P.dashT=.2;P.dashCd=1;if(!(mx||my)&&!touch){P.dx=1;P.dy=0;}AU.sfx('dash');
@@ -1084,7 +1085,8 @@ function update(dt){
     if(dashTs&&!P.dq&&canDash()){const j=judge(dashTs);
       if(!j.ok)goDash(false,j);
       else{const rem=(j.beat-bpos())*BT.spb;if(rem>.006&&!SET.all)P.dq={beat:j.beat,j,t:.3};else goDash(true,j);}}
-    else if(P.dq){P.dq.t-=dt;if(bpos()>=P.dq.beat-.002||P.dq.t<=0){const q=P.dq;P.dq=null;if(canDash())goDash(true,q.j);}}
+    else if(P.dq){P.dq.t-=dt;if(bpos()>=P.dq.beat-.002||P.dq.t<=0){const q=P.dq;P.dq=null;if(canDash())goDash(true,q.j);}}}
+    if(P.dashT===.2&&window.CTR)CTR.dash();   // counter.js: parry / vent on the frame a dash starts
     P.dashT=Math.max(0,P.dashT-pdt);P.dashCd=Math.max(0,P.dashCd-pdt);P.inv=Math.max(0,P.inv-pdt);if(P.dashT<=0)P.dashPf=false;
     const py0=P.y;
     if(P.dashT>0){P.x+=P.dx*1050*pdt;P.y+=P.dy*1050*pdt;if(!SET.calm&&Math.random()<.9)G.pt.push({x:P.x,y:P.y,vx:0,vy:0,l:.25,m:.25,c:D.b,sz:10,ghost:1});}
@@ -1095,7 +1097,8 @@ function update(dt){
     if(touch){if(cx!==P.x||P.dashT>0){touch.sx=touch.x;touch.px=cx;}if(cy!==P.y||P.dashT>0){touch.sy=touch.y;touch.py=cy;}}   // finger past the edge: re-anchor, no dead zone
     P.x=cx;P.y=cy;
     P.tilt+=(clamp((P.y-py0)/(pdt*300||1),-1,1)*.25-P.tilt)*Math.min(1,dt*10);
-    if(pressed.KeyX||pressed.KeyL||pressed.Emp){if(P.emp>0){P.emp--;G.empT=.6;G.flash=Math.max(G.flash,.3*FX());shake(9);AU.sfx('emp');
+    if((pressed.KeyX||pressed.KeyL||pressed.Emp)&&P.emp>0&&window.CTR)CTR.emp();   // counter.js: shield strip, good EMP, combo (before the clear)
+    if(pressed.KeyX||pressed.KeyL||pressed.Emp){if(window.ABIL&&ABIL.on)ABIL.emp();else if(P.emp>0){P.emp--;G.empT=.6;G.flash=Math.max(G.flash,.3*FX());shake(9);AU.sfx('emp');
       for(const b of G.eb){burst(b.x,b.y,D.b,2,80,.4);G.score+=5;}G.eb=[];G.en.forEach(e=>{if(e.type!=='boss')e.hp-=10;else e.hp-=25;e.flash=.2;});if(G.boss)G.boss.lasers=[];}}
     // the ship shoots itself on a grid of the beat (a 16th note for the Courier): one shot per grid cell, shots on the beat itself are gold pulse shots
     const firing=SET.auto||K.Space||K.KeyJ||touchFire;
@@ -1171,7 +1174,7 @@ function update(dt){
   for(const p of G.pk){p.bob+=dt*4;const dx=P.x-p.x,dy=P.y-p.y,l=Math.hypot(dx,dy);
     if(l<NR.mod.mag&&!G.dead){p.vx+=dx/l*1400*sdt;p.vy+=dy/l*1400*sdt;}else{p.vx+=(-70-p.vx)*sdt*2;p.vy*=1-sdt*2;}
     p.x+=p.vx*sdt;p.y+=p.vy*sdt;
-    if(l<22&&!G.dead){p.dead=1;AU.sfx('pick');
+    if(l<22&&!G.dead){p.dead=1;AU.sfx('pick');if(window.RWD)RWD.pick(p);
       if(p.t==='shard'){const sk=SH.smk||1;G.mult=Math.min(9.9,+(G.mult+.1*sk).toFixed(2));G.score+=Math.round(50*G.mult*sk);}
       if(p.t==='hp'){P.hp=Math.min(P.max,P.hp+1);floater(P.x,P.y-24,'HULL +1','#3dffb0');}
       if(p.t==='up'){WP.gain();AU.sfx('up');}
@@ -1797,11 +1800,22 @@ const CHALL=[
  {di:2,req:21,name:'RAIL RHYTHM', intro:'Land PERFECTs. Hold the beat.',  ch:'perfect',goal:{k:'survive',v:46}, perf:28,s3:450000, waves:['gate','droneLine','chargers','turret','droneSine']},
  {di:3,req:29,name:'FAIR DASH',   intro:'Beat the clock. Kill fast.',     ch:'speed',  goal:{k:'kill',v:120},    perf:22,s3:600000, waves:['droneV','chargers','turret','gunship','gate'],tb:1.05},
  {di:4,req:37,name:'MARBLE LANE', intro:'One hit ends it. Stay clean.',  ch:'nohit',  goal:{k:'survive',v:46}, perf:26,s3:800000, waves:['phalanx','wedge','turret','droneSine','gunship']}];
+/* V10 music spread (flag RET.songspread, ?songspread=0 = the old n%3 rotation): the stage songs were stage1/2/3 for 36 of 40 stages, so four tracks carried two thirds of a run.
+   Now every non-Athens stage draws from the five stage tracks (stage1-3, endless, endless2) in a seeded shuffle per block of five, and a track never plays in two stages in a row;
+   Athens keeps its two own songs. The song only sets the district length and the energy curve (SONGM), so the stage length changes by at most a minute. */
+const SONGSPREAD=()=>window.RET&&window.RET.songspread!==undefined?window.RET.songspread:!/[?&]songspread=0/.test(location.search);   // (ret.js builds RET later)
+const SONGSEL=(()=>{const POOL=['stage2','endless','stage3','stage1','endless2'],seq=[];let seed=7,prev='';
+  const rnd=()=>(seed=(seed*1103515245+12345)&0x7fffffff)/0x7fffffff;
+  return(n,di,old)=>{if(!SONGSPREAD()||di===4||n<=4)return old;   // the first four stages keep the gentle opening songs
+    while(seq.length<n){const blk=POOL.slice();for(let i=blk.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[blk[i],blk[j]]=[blk[j],blk[i]];}
+      if(blk[0]===prev){const k=1+Math.floor(rnd()*(blk.length-1));[blk[0],blk[k]]=[blk[k],blk[0]];}
+      for(const t of blk){seq.push(t);}prev=blk[blk.length-1];}
+    return seq[n-1];};})();
 const STAGES=[];
 CITYS.forEach((c,ci)=>c.st.forEach((r,k)=>{const n=STAGES.length+1,d={n,di:c.di,name:r[0],intro:r[1],goal:r[2],perf:r[3],waves:r[4],act:ci,pos:k};
-  if(r[2].k==='boss'||r[2].k==='mini')d.lead=r[2].k==='boss'?24:30;if(r[5])d.mini=r[5];d.song=c.di===4?(n%2?'athina':'athina2'):n<=8?['stage1','stage2'][(n-1)%2]:['stage1','stage2','stage3'][(n-1)%3];d.kit=Math.min(24,n-1);STAGES.push(d);}));
+  if(r[2].k==='boss'||r[2].k==='mini')d.lead=r[2].k==='boss'?24:30;if(r[5])d.mini=r[5];d.song=SONGSEL(n,c.di,c.di===4?(n%2?'athina':'athina2'):n<=8?['stage1','stage2'][(n-1)%2]:['stage1','stage2','stage3'][(n-1)%3]);d.kit=Math.min(24,n-1);STAGES.push(d);}));
 const MAIN=STAGES.length;                                  // 40 story stages; the challenge stages come after them
-CHALL.forEach((c,i)=>{const n=STAGES.length+1;STAGES.push({n,di:c.di,name:c.name,intro:c.intro,goal:c.goal,perf:c.perf,waves:c.waves,act:c.di,pos:8+i,ch:c.ch,from:c.req,s3:c.s3,tb:c.tb||0,song:c.di===4?(n%2?'athina':'athina2'):['stage1','stage2','stage3'][(n-1)%3],kit:Math.min(24,c.req-1)});});
+CHALL.forEach((c,i)=>{const n=STAGES.length+1;STAGES.push({n,di:c.di,name:c.name,intro:c.intro,goal:c.goal,perf:c.perf,waves:c.waves,act:c.di,pos:8+i,ch:c.ch,from:c.req,s3:c.s3,tb:c.tb||0,song:SONGSEL(n,c.di,c.di===4?(n%2?'athina':'athina2'):['stage1','stage2','stage3'][(n-1)%3]),kit:Math.min(24,c.req-1)});});
 /* the story grew from 16 to 30 and then to 40 stages: progress saved under the old numbers moves to the same stage by name (once) */
 if(!sSave.v40){const OLD16=['FIRST RUN','PATROL','SEK-ADLER','RIVER ROAD','BRIDGE GUARD','FLUSSKRAKE','GATE RUN','GATE KEEPER','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','HOPLITE','TALOS'],
   OLD30=['FIRST RUN','PATROL','ZEIL','TRESOR-WART','KONVOI','SEK-ADLER','RIVER ROAD','EISERNER STEG','BRIDGE GUARD','ROEMER','FLOTTE','FLUSSKRAKE','GATE RUN','FREIGHT YARD','GATE KEEPER','FIREWALL','CORDON','ZENTRAL-ICE','TRADE FAIR','RUSH HOUR','HAMMERING MAN','MESSE-WÄCHTER','BOARDROOM','KRONOS','PLAKA NIGHTS','HARBOUR WATCH','LYCABETTUS','HOPLITE','AGORA','TALOS'],
@@ -2198,6 +2212,20 @@ const MUTS=[{id:'hail',n:'HAILSTORM',t:'Slow rain from above'},{id:'mine',n:'MIN
 const MINIS=[{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B',sub:'Bridge sentinel, twin cannon'},
   {k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S',sub:'Gate warden, laser rig'},
   {k:7,nm:'HOPLITE',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'H',sub:'Shield wall, spear rig'}];
+/* ---------- V3 rosters and drone cap (flag RET.roster, ?roster=0 = old mix). Drones were 59% of the spawns and 63% of the enemy bullets, every stage alike.
+   Each stage has a ROSTER: a signature kind and a second kind (charger / flanker / swarm / mine), chosen so the two stages next to it share neither. en() (b.js) asks ROSTER.sub()
+   for every drone: about 35% turn into the signature (65%) or the second kind, and a drone that would lift the stage's drone share above 33% always does. Counted per stage (story) or per district (Endless).
+   Bosses, mini-boss summons, zoo units, the Lab and the tutorial are never touched. The shape of the wave (formation, path, count) stays; only the unit type changes. ---------- */
+const ROSTER=window.ROSTER={KINDS:['charger','flank','swarm','mine'],CAP:.33,P:.35,c:{key:'',total:0,drone:0},stat:{sub:0,drone:0,total:0},
+  idx(){return ST.on?ST.n:20+G.di*3+(G.loop|0);},
+  kinds(i){const K=this.KINDS,s=(i*3)%4;return[K[s],K[(s+2)%4]];},   // signature, second: the stages i-1 and i+1 have {s-1,s+1}
+  sub(type,o){if(!RET.roster||G.lab||G.tut||(o&&(o.mini||o.zt))||G.boss||(ST.on&&ST.n<=4))return type;   // stages 1-4 keep the hovering drones (zoo-test, onboarding)
+    const key=ST.on?'s'+ST.n:'e'+G.di+'_'+G.loop,c=this.c;if(c.key!==key){c.key=key;c.total=0;c.drone=0;}
+    let out=type;
+    if(type==='drone'){const over=(c.drone+1)/(c.total+1)>this.CAP&&c.total>=3;
+      if(over||GX()<this.P){const ks=this.kinds(this.idx());out=GX()<.65?ks[0]:ks[1];}}
+    c.total++;this.stat.total++;if(out==='drone'){c.drone++;this.stat.drone++;}else if(type==='drone')this.stat.sub++;
+    return out;}};
 const WARN=[];                                           // spawn markers: shown for one beat before something enters from an edge or falls
 const DIR={
   sb:72,stage:'stage1',bossBar:40,bar:-1,theme:null,thName:'',acc:0,idle:0,emptyB:0,ldt:0,q:[],mut:[],bsK:1,spd:1,nextMini:20,minis:0,lastTheme:'',log:{spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0},
@@ -5605,7 +5633,7 @@ FM.def('sniperlanes',{tags:['elite','hazard'],t:14,cost:4,kinds:['sniper','drone
   FM.later(I,2,()=>{const y=H/2+gr(-60,60);for(let i=0;i<3;i++)FM.u('drone',0,0,t=>[W+30+i*48-150*t,y],{});});}});
 /* 22 kamikaze: a wave of divers, one per beat, each lane further from the last */
 FM.def('kamikaze',{tags:['rush'],t:6,cost:3,kinds:['kamikaze'],role:'kamikaze wave',f(I,k){const s=fmSide(I,k);
-  for(let b=0;b<3;b++)FM.later(I,b,()=>FM.u('kamikaze',W+40,fmCy(H/2+s*(b-1)*150)));}});
+  for(let b=0;b<2;b++)FM.later(I,b*2,()=>FM.u('kamikaze',W+40,fmCy(H/2+s*(b-1)*150)));}});
 /* 23 bomberrun: bombers along the top lane, then the bottom lane */
 FM.def('bomberrun',{tags:['hazard'],t:11,cost:3,kinds:['bomber'],role:'bomber run',f(I,k){const s=fmSide(I,k);FM.u('bomber',W+40,s<0?90:H-120);
   FM.later(I,4,()=>FM.u('drone',0,0,t=>[W+30-160*t,s<0?H-110:110],{}));}});
@@ -5728,7 +5756,7 @@ const fmHover=(a,k)=>{const ks=a.filter(q=>FM.ok(q));return ks.length?ks[k%ks.le
 fmEv('evsway',{t:1,name:'SWAY LINE',f(I,k){const y=gr(160,H-200),a=k%2?-1:1;for(let i=0;i<5;i++)FM.u('drone',0,0,t=>[W+30+i*54-120*t,fmCy(y+a*Math.sin(t*1.5-i*.6)*50)],{});}});
 fmEv('evdoor',{t:1,name:'DOUBLE DOOR',cost:2,f(I,k){let g=gr(160,H-160);for(let b=0;b<2;b++){const y=g;FM.later(I,b*3,()=>{for(const s of[-1,1])for(let q=0;q<2;q++)fmD(W+30+q*46,fmCy(y+s*(95+q*44)));});g=fmCy(g+(g>H/2?-80:80));}}});
 fmEv('evlanterns',{t:1,name:'LANTERNS',f(I,k){const y=gr(150,H-190);for(let i=0;i<4;i++)FM.u('drone',0,0,t=>[W+30+i*70-70*t,fmCy(y+Math.sin(t*1.6+i*1.2)*50)],{});}});
-fmEv('evbracket',{t:2,name:'BRACKET',f(I,k){for(let b=0;b<2;b++)FM.later(I,b*2,()=>{FM.u('flank',W+40,60);FM.u('flank',W+40,H-60);});}});
+fmEv('evbracket',{t:2,name:'BRACKET',f(I,k){for(let b=0;b<2;b++)FM.later(I,b*2,()=>{fmD(W+40,60);fmD(W+40,H-60);});}});
 fmEv('evgrid',{t:2,name:'PATROL GRID',f(I,k){const x=gr(740,820);FM.u('turret',W+60,70,null,{stop:x,bf:fireIn(.3)});FM.u('turret',W+60,H-70,null,{stop:x+30,bf:fireIn(.6)});fmD(W+90,H/2);}});
 fmEv('evtline',{t:3,name:'ROAD GUNS',kinds:['gturret'],f(I,k){for(let i=0;i<2;i++)fmGu('gturret',W+40+i*210,'drone');}});
 fmEv('evwindow',{t:3,name:'WINDOW DISPLAY',f(I,k){const y=gr(110,H-210),x0=gr(700,790);for(let i=0;i<5;i++)FM.u('drone',0,0,t=>{const x=t<1.5?W+30-(W+30-x0)*t/1.5:t<3.5?x0:x0-170*(t-3.5);return [x+i*20,y+i*44];},{});}});
@@ -5737,16 +5765,16 @@ fmEv('evguard',{t:4,name:'GUARD CHANGE',cost:4,kinds:['shielder','turret'],f(I,k
 fmEv('evshieldv',{t:4,name:'SHIELD VEE',cost:4,kinds:['shielder'],f(I,k){const y=gr(170,H-170);for(let i=-1;i<=1;i++)fmH('shielder',W+50+Math.abs(i)*40,fmCy(y+i*110));}});
 fmEv('evfunnel',{t:5,name:'FUNNEL',cost:4,f(I,k){const g=gr(190,H-190);for(let i=0;i<6;i++)for(const s of[-1,1])FM.u('drone',0,0,t=>{const w=Math.max(60,230-i*30-t*38);return [W+30+i*38-130*t,fmCy(g+s*w)];},{});}});
 fmEv('evmines',{t:6,name:'DRIFT MINES',kinds:['mine'],f(I,k){const y0=gr(70,H-250),d=k%2?-1:1;for(let i=0;i<4;i++){const y=fmCy(y0+i*d*58+(d<0?190:0));FM.u('mine',0,0,t=>[W+40+i*90-62*t,y+14*Math.sin(t*.9+i)],{by:y});}}});
-fmEv('evdive',{t:6,name:'DIVE LINE',kinds:['kamikaze'],f(I,k){for(let b=0;b<3;b++)FM.later(I,b,()=>FM.u('kamikaze',W+40,b%2?H-70:70));}});
+fmEv('evdive',{t:6,name:'DIVE LINE',kinds:['charger'],f(I,k){for(let b=0;b<2;b++)FM.later(I,b*2,()=>{for(let q=0;q<2;q++)FM.u('charger',W+40+q*70,b%2?H-70:70);});}});
 fmEv('evtank',{t:6,name:'TANK RUN',kinds:['gtank'],f(I,k){fmGu('gtank',W+40,'charger');fmGu('gtank',W+190,'charger');}});
 fmEv('evram',{t:7,name:'RAM & SHIELD',cost:4,kinds:['charger','shielder'],f(I,k){fmH('shielder',W+50,gr(120,H-120));for(let i=0;i<2;i++)FM.u('charger',W+30+i*110,gr(60,H-110));}});
 fmEv('evwalker',{t:8,name:'WALKER',cost:4,kinds:['gwalker','gturret'],f(I,k){fmGu('gwalker',W+40,'gunship');fmGu('gturret',W+260,'drone');}});
 fmEv('evsplit',{t:9,name:'SPLIT PAIR',kinds:['splitter'],f(I,k){fmH('splitter',W+50,gr(90,H/2-30));fmH('splitter',W+90,gr(H/2+30,H-90));}});
 fmEv('evconvoy',{t:10,name:'CONVOY',cost:5,kinds:['gtank','gturret','gwalker'],f(I,k){fmGu('gtank',W+40,'charger');fmGu('gturret',W+200,'drone');fmGu('gwalker',W+360,'gunship');}});
-fmEv('evbombers',{t:11,name:'BOMB & SNIPE',kinds:['bomber','sniper'],f(I,k){fmH('bomber',W+40,k%2?90:H-100);fmH('sniper',W+90,k%2?H-70:70);}});
+fmEv('evbombers',{t:11,name:'GUNSHIP & SNIPE',kinds:['gunship','sniper'],f(I,k){FM.u('gunship',W+90,k%2?150:H-170);fmH('sniper',W+90,k%2?H-70:70);}});
 fmEv('evsnipe',{t:14,name:'LANE SNIPERS',cost:4,kinds:['sniper','gate'],f(I,k){fmH('sniper',W+40,70);fmH('sniper',W+80,H-70);FM.u('gate',W+30,0,null,{gy:gr(150,H-200),gap:130});}});
-fmEv('evheal',{t:16,name:'MEDIC SQUAD',cost:5,kinds:['healer','shielder'],f(I,k){const y=gr(150,H-150);fmH('healer',W+50,y);fmH('shielder',W+90,fmCy(y>H/2?y-110:y+110));fmD(W+90,fmCy(y>H/2?y+10:y-110));}});
-fmEv('evrelay',{t:17,name:'RELAY',cost:4,kinds:['sniper','shielder','kamikaze'],f(I,k){fmD(W+50,gr(120,H-120));fmH('sniper',W+80,k%2?70:H-70);FM.later(I,3,()=>FM.u('kamikaze',W+40,H/2));}});
+fmEv('evheal',{t:16,name:'MEDIC SQUAD',cost:5,kinds:['healer','shielder','gunship'],f(I,k){const y=gr(150,H-150);fmH('healer',W+50,y);fmH('shielder',W+90,fmCy(y>H/2?y-110:y+110));FM.u('gunship',W+130,fmCy(y>H/2?y+10:y-110));}});
+fmEv('evrelay',{t:17,name:'RELAY',cost:4,kinds:['sniper','charger'],f(I,k){fmD(W+50,gr(120,H-120));fmH('sniper',W+80,k%2?70:H-70);FM.later(I,3,()=>FM.u('charger',W+40,H/2));}});
 fmEv('evcargo',{t:19,name:'CARGO',cost:5,kinds:['carrier','shielder'],f(I,k){FM.u('carrier',W+80,gr(170,H-200));fmD(W+60,k%2?90:H-90);}});
 fmEv('evlayer',{t:22,name:'MINE BELT',cost:5,kinds:['minelayer','mine','gate'],f(I,k){FM.u('minelayer',W+40,gr(140,H-140));FM.u('gate',W+30,0,null,{gy:gr(150,H-200),gap:130});for(let i=0;i<2;i++){const y=gr(60,H-60);FM.u('mine',0,0,t=>[W+40+i*120-62*t,y+14*Math.sin(t*.9+i)],{by:y});}}});
 NR.on('runStart',()=>{FM.reset();});
@@ -6498,6 +6526,7 @@ RET.st=(function(on){
      +'<div class="stGrid">'+cell('Runs',fmtN(s.runs))+cell('Play time',fmtT(s.time))+cell('Enemies',fmtN(s.kills))+cell('Bosses beaten',fmtN(s.bosses))+cell('Grazes',fmtN(s.grazes))+cell('PERFECT dashes',fmtN(s.dashes))+cell('PERFECT hits',fmtN(s.perfects))+cell('FEVERs',fmtN(s.fevers))+cell('Deaths',fmtN(s.deaths))+cell('Best score',fmtN(s.bestScore))+cell('Best stage',bestStage||'-')+cell('Neon earned',fmtN(s.neon))+cell('Daily streak best',fmtN(s.daily))+cell('Stage clears',fmtN(s.clears))+'</div>'
      +(wt.length?'<h3>WEAPONS USED</h3><div class="stParts">'+wt.map(id=>'<div><span>'+esc((window.WPD&&WPD[id]&&WPD[id].n)||id)+'</span><i><u style="width:'+Math.round(100*D.w[id]/wmax)+'%"></u></i><em>'+fmtT(D.w[id])+'</em></div>').join('')+'</div>':'')
      +(window.PW3&&PW3.on&&PW3.sheet?PW3.sheet():'')
+     +(typeof FB!=='undefined'&&FB.on?FB.sheet():'')
      +'<h3>ACHIEVEMENTS <span id="stAchN">'+got+'/'+A.length+'</span></h3><div class="stAch">'
      +A.map(a=>{const g=!!D.a[a.id];return '<div class="ac'+(g?' got':'')+'" data-id="'+a.id+'">'+badge(a,g)+'<span><b>'+esc(a.n)+'</b><small>'+(g?'':'🔒 ')+esc(a.d)+(a.skill?' · no Assist':'')+'</small></span></div>';}).join('')+'</div>'
      +'<h3>CREDITS &amp; PRIVACY</h3><div class="stCred"><p><b>Music</b> original, made for this game</p><p><b>Code and art</b> original, made for this game</p><p><b>Privacy</b> saved only on this device. No data is collected.</p></div>'
@@ -6542,6 +6571,55 @@ RET.st=(function(on){
     setTimeout(()=>{check(true);if(dirty||fresh)save();},400);}
   return{on,A,BY,D:()=>D,S,parts,completion,check,toast,open,shut,save,poll,toastQ:()=>Q.length,reset:()=>{parse(null);dirty=true;lw=rawGet();save();}};
 })(RET.stats);
+
+/* ---------- FEEDBACK: one optional tap at the end of a run (FUN / SAME AGAIN / BORING). Flag RET.feedback (?feedback=0 = nothing shown, nothing stored).
+   Answers go to localStorage 'mnr_fb' (newest last, capped at 500): {stage, mode, diff, wp, sec, ts}. The STATS sheet lists the counts per stage and has a COPY button for the JSON.
+   The strip sits under the buttons of #over / #stres, so it never delays or covers NEXT STAGE / RETRY; it is shown once per run. ---------- */
+if(RET.feedback===undefined)RET.feedback=!/[?&]feedback=0/.test(location.search);
+RET.sioKeys.push('mnr_fb');
+const FB=(function(on){
+  const KEY='mnr_fb',CAP=500,ANS=[['fun','FUN'],['same','SAME AGAIN'],['bore','BORING']];
+  let run=null,id=0;
+  const load=()=>{try{const a=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(a)?a.filter(x=>x&&typeof x==='object'&&typeof x.a==='string'):[];}catch(e){return[];}};
+  const add=(e)=>{const a=load();a.push(e);while(a.length>CAP)a.shift();try{localStorage.setItem(KEY,JSON.stringify(a));}catch(x){}return a;};
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const hosts=()=>[['fbO',document.getElementById('over')],['fbR',document.getElementById('stres')]];
+  function strip(hid,host){let e=document.getElementById(hid);if(!e){const h=host&&host.querySelector('.in');if(!h)return null;
+      e=document.createElement('div');e.id=hid;e.className='fbBar';e.hidden=true;h.appendChild(e);
+      e.addEventListener('click',ev=>{const b=ev.target.closest&&ev.target.closest('button[data-a]');if(b)FB.answer(b.dataset.a);});}return e;}
+  function render(e,done){e.innerHTML=done?'<span class="fbQ">Thanks, noted.</span>':'<span class="fbQ">How did this run feel? (optional)</span><div class="fbR">'+ANS.map(a=>'<button type="button" class="fbB" data-a="'+a[0]+'">'+a[1]+'</button>').join('')+'</div>';}
+  function show(){if(!on||!run||run.shown)return;run.shown=true;for(const [hid,host] of hosts()){const e=strip(hid,host);if(e){render(e,false);e.hidden=false;}}}
+  function hide(){for(const [hid] of hosts()){const e=document.getElementById(hid);if(e)e.hidden=true;}}
+  function answer(a){if(!on||!run||run.done||!ANS.some(x=>x[0]===a))return false;run.done=true;
+    add({a,stage:run.stage,mode:run.mode,diff:run.diff,wp:run.wp,sec:Math.max(0,Math.round((Date.now()-run.t0)/1000)),ts:Date.now()});
+    for(const [hid] of hosts()){const e=document.getElementById(hid);if(e&&!e.hidden)render(e,true);}return true;}
+  function counts(){const m={};for(const x of load()){const k=x.stage;(m[k]||(m[k]={fun:0,same:0,bore:0}))[x.a]++;}return m;}
+  function sheet(){if(!on)return'';const m=counts(),ks=Object.keys(m).sort((a,b)=>(+a||0)-(+b||0)||(a<b?-1:1));
+    return '<h3>FEEDBACK</h3><div class="stParts fbList">'+(ks.length?ks.map(k=>'<div><span>'+(/^\d+$/.test(k)?'Stage '+k:esc(k))+'</span><em>Fun '+m[k].fun+' · Same '+m[k].same+' · Boring '+m[k].bore+'</em></div>').join(''):'<div><span>No answers yet</span></div>')+'</div>'
+      +'<button type="button" class="go dim" id="fbCopy">COPY FEEDBACK</button>';}
+  function copy(b){const t=JSON.stringify(load());const ok=()=>{b.textContent='COPIED';setTimeout(()=>{if(b.isConnected)b.textContent='COPY FEEDBACK';},1800);};
+    const fall=()=>{try{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-999px;top:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();ok();}catch(e){b.textContent='COPY FAILED';}};
+    try{if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,fall);else fall();}catch(e){fall();}}
+  if(on){
+    const st=document.createElement('style');st.textContent=`
+.fbBar{margin-top:10px;text-align:center;font-family:var(--mono,monospace)}.fbBar[hidden]{display:none}
+.fbQ{display:block;font-size:14px;color:#c9c4ec;margin-bottom:6px}
+.fbR{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.fbB{min-height:48px;min-width:96px;flex:1 1 96px;max-width:170px;padding:6px 10px;border-radius:10px;border:2px solid #ffffff55;background:#ffffff14;color:#fff;font:700 15px/1.1 var(--mono,monospace);letter-spacing:.06em;cursor:pointer}
+.fbB:active{background:#19e3ff44;border-color:#19e3ff}
+.fbList em{font-style:normal}
+#stSheet #fbCopy{min-height:48px}`;
+    document.head.appendChild(st);
+    NR.on('runStart',d=>{id++;hide();
+      if(!d||d.tut||d.lab){run=null;return;}
+      run={id,shown:false,done:false,t0:Date.now(),stage:d.story?d.story:'endless',mode:d.story?'story':(d.daily?'daily':(typeof G!=='undefined'&&G.weekly?'weekly':'arcade')),
+        diff:(typeof SET!=='undefined'&&SET.diff)||'normal',wp:(()=>{try{return WP.eqIds().slice();}catch(e){return[];}})()};});
+    NR.on('runEnd',d=>{if(!d||d.quit||!run)return;run.sec=Math.round((Date.now()-run.t0)/1000);setTimeout(show,0);});
+    document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#fbCopy');if(b)copy(b);});
+  }
+  return{on,answer,load,counts,sheet,show,hide};
+})(RET.feedback);
+window.FB=FB;
 
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
    The LAB is a real run with G.lab set: no waves, no district clock, no boss timer, no chest or pit stop, god mode on. What appears is decided by the panel at the bottom:
@@ -7009,7 +7087,7 @@ const HUDX={
   iDash:path2('M2 10h11V5l9 7-9 7v-5H2z'),
   iDrone:path2('M12 3l7 9-7 9-7-9z'),
   iRev:path2('M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7z'),
-  vals(){const dm=1+SH.dmax,rdy=(P.dashCd<=0?1:0)+SH.spare;
+  vals(){const AB=window.ABIL&&ABIL.on&&G&&G.ab,dm=AB?ABIL.max():1+SH.dmax,rdy=AB?G.ab.n:(P.dashCd<=0?1:0)+SH.spare;
     return{hp:P.hp,max:P.max,sh:SH.sh,dash:Math.min(dm,rdy),dashMax:dm,drones:TP.drones?TP.drones.length:0,rev:TP.revLeft,pw:G.pw?G.pw.act.map(a=>a.k):[],perks:TP_DEF.filter(d=>TP.l(d.id)).length,upg:SH.order.length};},
   // a stat chip: icon + number; returns the width it used
   chip(c,x,y,k,p,col,txt,dim){c.save();c.globalAlpha=dim?.4:1;c.translate(x,y-8*k);c.scale(.72*k,.72*k);c.fillStyle=col;c.fill(p,'evenodd');c.restore();
@@ -7128,6 +7206,7 @@ UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,gy=UIK.groundY(
    bold white text >= 14 px on a dark rounded pill (alpha .78, thin accent border), at most 8 words (the caller writes it short; short() only cuts a leftover),
    in the top third under the HUD, never within 120 px of the ship (it slides sideways, or waits), one on screen at a time with at least 1.2 s between two. ---------- */
 if(RET.hint===undefined)RET.hint=!/[?&]hint=0/.test(location.search);
+if(RET.hintdiet===undefined)RET.hintdiet=!/[?&]hintdiet=0/.test(location.search);
 const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE:120,
   on(){return RET.hint!==false;},
   reset(){this.cur=null;this.q.length=0;this.gap=0;this.box=null;},
@@ -7137,10 +7216,18 @@ const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE
     if(!this.on()){G.hint={t:o.t||3,txt};return true;}                      // flag off: the old bubble
     const T=o.t||3,dup=this.cur&&this.cur.txt===txt?this.cur:this.q.find(h=>h.txt===txt);
     if(dup){if(T>dup.t){dup.t=T;if(dup===this.cur&&G.hint)G.hint.t=T;}return false;}   // callers may ask again every frame (a longer first-time ask keeps the longer time)
+    if(!this.diet(txt))return false;
     if(this.cur&&this.cur.el<.2&&T>this.cur.t){this.cur={txt,t:T,col:o.col||null,age:0,el:0,bw:0};if(G.hint){G.hint.t=T;G.hint.txt=txt;}return true;}   // the same moment, a longer first-time text: it replaces the short one
     this.q.push({txt,t:o.t||3,col:o.col||null,age:0,el:0,bw:0});while(this.q.length>3)this.q.shift();this.next();return true;},
+  /* V2 hint diet (flag RET.hintdiet, ?hintdiet=0 = every ask shows): a hint text shows at most twice per profile (counts in localStorage 'mnr_hintseen') and never twice within 3 minutes of play.
+     Not in the tutorial or the Lab (the tutorial teaches by hints). A refused ask returns false like a repeat ask, so callers that retry every frame cost nothing. */
+  clk:0,hs:null,
+  diet(txt){if(RET.hintdiet===false||G.tut||G.lab)return true;
+    if(!this.hs){try{this.hs=JSON.parse(localStorage.getItem('mnr_hintseen')||'{}')||{};}catch(e){this.hs={};}this.hl={};}
+    const n=this.hs[txt]|0;if(n>=2)return false;if(n>0&&this.clk-(this.hl[txt]==null?-1e9:this.hl[txt])<180)return false;
+    this.hs[txt]=n+1;this.hl[txt]=this.clk;try{localStorage.setItem('mnr_hintseen',JSON.stringify(this.hs));}catch(e){}return true;},
   next(){if(this.cur||this.gap>0||!this.q.length||(G.banner&&G.banner.t>0))return;this.cur=this.q.shift();this.seen.push(this.cur.txt);if(this.seen.length>60)this.seen.shift();if(G.hint){G.hint.t=this.cur.t;G.hint.txt=this.cur.txt;}},   // nothing up and no gap to wait out: starts at once
-  tick(dt){if(!this.on()){this.cur=null;this.q.length=0;this.box=null;return;}
+  tick(dt){this.clk+=dt;if(!this.on()){this.cur=null;this.q.length=0;this.box=null;return;}
     if(this.gap>0)this.gap-=dt;for(const h of this.q)h.age+=dt;this.q=this.q.filter(h=>h.age<8);       // a hint nobody saw in 8 s is stale
     const c=this.cur;
     if(c){if(G.banner&&G.banner.t>0){}else if(c.blk){c.bw+=dt;if(c.bw>3)c.t=0;}else{c.t-=dt;c.el+=dt;}   // paused under a banner; dropped after 3 s of no free spot
@@ -7797,7 +7884,8 @@ const CAMP={buf:[],acc:0,ct:0,on:0};
 /* A. auto-aim */
 {const st0=SH.steer;SH.steer=function(b,dt,k){if(!S2.on)return st0.call(this,b,dt,k);k=k||this.hm;b.ag=(b.ag||0)+dt;const hd=S2.hard();
   if(b.ag<(hd?.18:.1))return;                                                  // lock-on delay: a missile flies straight first
-  const cur=Math.atan2(b.vy,b.vx),cone=hd?.7:1.05,R=hd?300:380;let best=null,bd=1e9;
+  const cur=Math.atan2(b.vy,b.vx),nh=hd||MM.on,cone=nh?.7:1.05,R=nh?300:380;   // MM (must move): every tier gets the narrow cone
+  let best=null,bd=1e9;
   for(const e of G.en){if(e.type==='gate'||e.hp<=0||e.dying||e.gr||e.wpt||e.x<b.x-10||e.x>W-20||e.y<0||e.y>H)continue;
     const dx=e.x-b.x,dy=e.y-b.y,d=Math.hypot(dx,dy);if(d>=R||d>=bd)continue;let da=Math.atan2(dy,dx)-cur;da=Math.atan2(Math.sin(da),Math.cos(da));if(Math.abs(da)>cone)continue;bd=d;best=e;}
   if(!best)return;if(!b.au&&(b.hk||SH.hm)){b.au=1;const a=S2.ak();b.dm*=(b.hk?a:(1+a)/2)*S2.park();}   // weapon homing pays the full price, the shop's Homing perk half
@@ -7832,6 +7920,32 @@ NR.on('beat',()=>{if(!S2.on||!G.live||G.dead||G.transT>=0||G.lab||G.tut||SH.acti
 /* stage 30 was a wall: a kill goal with round 1's hull could not be met inside the song; kill-goal stages keep the old hull */
 {const h0=SC.hpK.bind(SC);SC.hpK=()=>{const v=h0();return S2.on&&ST.on&&ST.def&&ST.def.goal&&ST.def.goal.k==='kill'?1:v;};}
 window.__s2={S2,CAMP,B2};
+/* D. must move (flag RET.mustmove, ?mustmove=0 = before; BALANCE.md "Must move"). Owner, 19 Oct 2026: on Normal a ship that only lines up with the next foe
+   and never dodges cleared most stages with any weapon (mustmove-test.js 'track': 60%). A ship that keeps its x inside 70 px for MM.win() seconds gets a COLUMN
+   STRIKE: a vertical lane locks on its x, pulses for MM.tel() s (>= .6), then fires for .25 s. One sidestep of ~45 px (or a dash) clears it, the rest of the
+   screen stays free, so a moving ship is never hit. Strikes repeat while the ship stays in the column zone and hit harder from the second one on.
+   Homing on Normal and Easy also gets the narrower cone and shorter reach of the hard tiers: a missile needs the ship to point at its target. */
+if(RET.mustmove===undefined)RET.mustmove=!/[?&]mustmove=0/.test(location.search);
+const MM=window.MM={get on(){return!!RET.mustmove;},COL:24,buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0,
+  win(){return{easy:5,normal:3.5,hard:3.2,vhard:3,legend:2.8}[SET.diff]||4;},
+  tel(){return{easy:1.1,normal:.95,hard:.8,vhard:.75,legend:.7}[SET.diff]||.95;},
+  live(){return this.on&&G.live&&!G.dead&&G.transT<0&&!G.lab&&!G.tut&&!SH.active&&!ST.over&&!G.over&&!godMode&&(ST.on?ST.n>=3:G.t>20);},
+  cost(x){const c=this.col;return c&&Math.abs(x-c.x)<this.COL+30?(c.fire>0||c.t<.4?6000:1500):0;}};   // for test bots: the lane as a player sees it
+NR.on('runStart',()=>{Object.assign(MM,{buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0});});
+NR.on('tick',dt=>{if(!MM.live()){MM.col=null;MM.buf=[];MM.n=0;return;}
+  MM.acc+=dt;const k=Math.round(MM.win()*10);if(MM.acc>=.1){MM.acc=0;MM.buf.push(P.x);if(MM.buf.length>k)MM.buf.splice(0,MM.buf.length-k);}
+  let lo=1e9,hi=-1e9;for(const x of MM.buf){if(x<lo)lo=x;if(x>hi)hi=x;}if(hi-lo>140)MM.n=0;   // a real move resets the escalation
+  const c=MM.col;if(c){c.t-=dt;if(c.t<=0&&!c.fire&&!c.done){c.fire=.25;AU.sfx('big');shake(4);}
+    if(c.fire>0){c.fire-=dt;if(!c.hit&&Math.abs(P.x-c.x)<MM.COL){c.hit=1;MM.hits++;hurt(c.dmg);}if(c.fire<=0){c.done=1;MM.col=null;MM.cd=SET.diff==='easy'?2.4:1.6;}}return;}
+  MM.cd-=dt;if(MM.cd>0||MM.buf.length<k||hi-lo>=70)return;
+  MM.n++;MM.strikes++;MM.col={x:P.x,t:MM.tel(),fire:0,hit:0,dmg:MM.n>=2&&SET.diff!=="easy"?2:1};AU.sfx('warn');
+  if(MM.strikes===1)floater(P.x,P.y-44,'SIDESTEP!','#ff6a7a');});
+{const dp=drawPickups;drawPickups=function(t){dp(t);const c=MM.col;if(!c||G.dead)return;const w=MM.COL;
+  ctx.save();ctx.globalCompositeOperation='lighter';
+  if(c.fire>0){ctx.globalAlpha=.95;ctx.fillStyle='#ffffff';ctx.fillRect(c.x-w*.5,0,w,H);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}
+  else{const lock=c.t<.4,pulse=SET.reduce?1:Math.floor(t*(lock?18:8))%2?1:.6;ctx.globalAlpha=(lock?.9:.5)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);
+    for(const dx of[-w,w]){ctx.beginPath();ctx.moveTo(c.x+dx,0);ctx.lineTo(c.x+dx,H);ctx.stroke();}ctx.setLineDash([]);ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}
+  ctx.restore();};}
 
 /* ---------- scale, round 3 = parts/hard.js (flag RET.scale3; ?scale3=0 = round 2 exactly). BALANCE.md "Power scale, round 3". ----------
    Owner, 17 Oct 2026 (third report): on Legend a maxed ship parks, homing swarm + guns + fusions + power-ups kill everything and bosses fall in seconds.
@@ -7956,6 +8070,61 @@ NR.on('tick',()=>{if(!B2X.hz.length)return;const t=G.t;B2X.hz=B2X.hz.filter(z=>t
   return dp(t);};}
 B2X.sheen=(x,y,w,h)=>{ctx.save();ctx.globalAlpha=.55+.25*Math.sin(G.t*18);ctx.fillStyle='#e8f4ff';ctx.fillRect(x,y,w,Math.max(1,h*.35));ctx.restore();};   // armour is absorbing: a thin bright line on the boss bar
 window.__b2={B2X};
+
+/* ---------- RISK PAYS (flag RET.reward, ?reward=0 = the old play exactly). Moving and taking risks must beat sitting far away. Built after hard.js / armour.js.
+   GRAZE CHAIN   grazes within 1.5 s of each other chain a multiplier x1..x5 (a graze on the beat counts double: 2 points, x2 at 2 points, x5 at 8). A hit drops it to x1.
+                 It feeds score (+10 pts x combo per tier above 1), the EMP meter (ABIL.gain, hook only) and a damage buff (+10% per tier above 1, cap +40%, 4 s).
+   CLOSE RANGE   manual shots that damage an enemy within 140 px of the ship deal up to +35% (full inside 40 px, linear to 0 at 140). Homing / auto shots, weapon
+                 chains and ability zaps get nothing (keeps the must-move rule). A non-boss enemy killed by such a hit drops one extra shard.
+   NEAR-MISS     the graze already carries pf (judge() on the beat grid): the chain counts it double.
+   RISK PICKUPS  a pickup that drifts through a strip with 3+ enemy bullets within 100 px, or is taken with 3+ bullets around the ship, pays double ("BOLD").
+   Caps: the damage multiplier of buff x close is clamped per tier (CAPK) and sits inside the DMG.hit chain, so the ordinary-enemy ceiling in hard.js (S3.cap)
+   and the boss damage-rate caps in armour.js still bound the total. ebCap / BCAP are not touched. Test: nightrun/reward-test.js. */
+if(RET.reward===undefined)RET.reward=!/[?&]reward=0/.test(location.search);
+const RWD=window.RWD={get on(){return!!RET.reward;},
+  WIN:1.5,BUFF_T:4,CLOSE_R:140,CLOSE_FULL:40,CLOSE_MAX:.35,
+  CAPK:{easy:1.6,normal:1.6,hard:1.4,vhard:1.3,legend:1.25},   // buff x close never above this per tier: the hard tiers keep their DPS ceiling
+  stat:{graze:0,beat:0,maxTier:1,close:0,pb:0,bold:0,drop:0},
+  s(){return G.rw||(G.rw={n:0,t:-9,tier:1,bf:0,bt:0});},
+  tier(){if(!this.on||!G||!G.rw)return 1;const s=G.rw;return G.t-s.t>this.WIN?1:s.tier;},
+  buff(){if(!this.on||!G||!G.rw)return 0;const s=G.rw;return s.bt>0?s.bf:0;},
+  auto(b){return!b||b.hk||b.au||b.tg||b.ab;},   // a homing, locked, or ability shot is not a positioned shot
+  close(b,e){if(this.auto(b)||!e||e.gr)return 0;const d=Math.hypot(P.x-e.x,P.y-e.y);return d>=this.CLOSE_R?0:this.CLOSE_MAX*Math.min(1,(this.CLOSE_R-d)/(this.CLOSE_R-this.CLOSE_FULL));},
+  dmK(b,e){const bf=b&&!b.ab?this.buff():0,cl=this.close(b,e);if(cl>.02&&e){e._rwC=G.t;this.stat.close++;}
+    const k=(1+bf)*(1+cl);return k<=1?1:Math.min(k,this.CAPK[SET.diff]||1.6);},
+  graze(pf){const s=this.s();if(G.t-s.t>this.WIN)s.n=0;s.n+=pf?2:1;s.t=G.t;this.stat.graze++;if(pf)this.stat.beat++;
+    const t=Math.min(5,1+(s.n>>1)),x=t-1;if(t>s.tier&&t>=2){floater(P.x,P.y-52,'CHAIN x'+t,pf?'#ffe14d':'#19e3ff');}
+    s.tier=t;this.stat.maxTier=Math.max(this.stat.maxTier,t);
+    if(x>0){G.score+=Math.round(10*G.mult*x);if(window.ABIL&&ABIL.on)ABIL.gain(.012*x);s.bf=Math.min(.4,.1*x);s.bt=this.BUFF_T;}},
+  hurt(){const s=G.rw;if(s){s.n=0;s.tier=1;s.bf=0;s.bt=0;s.t=-9;}},
+  nearBul(x,y,r){let n=0;const r2=r*r;for(const b of G.eb)if(!b.dead&&(b.x-x)**2+(b.y-y)**2<r2&&++n>=3)break;return n;},
+  tick(dt){const s=G.rw;if(s&&s.bt>0)s.bt-=dt;
+    for(const p of G.pk){if(p.x<0||p.x>W)continue;if(this.nearBul(p.x,p.y,100)>=3){p.rk=1;p.rkT=G.t;}}},
+  pick(p){if(!this.on||!p||G.dead)return;
+    const bold=(p.rk&&G.t-p.rkT<1.2)||this.nearBul(P.x,P.y,120)>=3;if(!bold||p.t==='hp')return;
+    this.stat.bold++;floater(P.x,P.y-40,'BOLD x2','#ffe14d');
+    if(p.t==='shard'){G.mult=Math.min(9.9,+(G.mult+.1*(SH.smk||1)).toFixed(2));G.score+=Math.round(50*G.mult*(SH.smk||1));}
+    else G.score+=Math.round(150*G.mult);
+    if(window.ABIL&&ABIL.on)ABIL.gain(.05);},
+  draw(t){if(!this.on||!G||G.dead)return;
+    for(const p of G.pk){if(!p.rk||G.t-p.rkT>1.2)continue;const y=p.y+Math.sin(p.bob)*3;ctx.save();ctx.strokeStyle='#ffe14d';ctx.globalAlpha=.55+.35*Math.sin(t*10);ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,y,17+Math.sin(t*8)*2,0,7);ctx.stroke();ctx.restore();}
+    const s=G.rw;if(!s||s.n<=0)return;const age=G.t-s.t;if(age>this.WIN)return;const tr=s.tier,fr=1-age/this.WIN,col=['#19e3ff','#19e3ff','#7dff7a','#ffe14d','#ff9a3d','#ff2d78'][tr];
+    ctx.save();ctx.lineWidth=3;ctx.strokeStyle='rgba(0,0,0,.55)';ctx.beginPath();ctx.arc(P.x,P.y,32,0,7);ctx.stroke();
+    ctx.strokeStyle=col;ctx.globalAlpha=.95;ctx.beginPath();ctx.arc(P.x,P.y,32,-Math.PI/2,-Math.PI/2+Math.PI*2*fr);ctx.stroke();
+    if(tr>=2){ctx.globalAlpha=1;ctx.textAlign='center';ctx.font='700 16px "Chakra Petch",sans-serif';ctx.lineWidth=4;ctx.strokeStyle='rgba(0,0,0,.8)';
+      const txt='x'+tr+(s.bt>0?' +'+Math.round(s.bf*100)+'%':'');
+      if(wcv===cv){ctx.strokeText(txt,P.x,P.y-40);ctx.fillStyle=col;ctx.fillText(txt,P.x,P.y-40);}
+      else{ctx.translate(P.x+40,P.y);ctx.rotate(Math.PI/2);ctx.strokeText(txt,0,0);ctx.fillStyle=col;ctx.fillText(txt,0,0);}}
+    ctx.restore();}};
+/* damage: inside the DMG.hit chain (after hard.js's auto/manual split), so every later cap still sees the final number */
+{const h=DMG.hit;DMG.hit=function(d,b,e){const v=h.call(this,d,b,e);if(!RWD.on||!G||!G.live||!b)return v;return v*RWD.dmK(b,e);};}
+NR.on('graze',d=>{if(RWD.on&&G&&G.live&&!G.dead)RWD.graze(!!(d&&d.pf));});
+NR.on('hurt',()=>{if(RWD.on&&G)RWD.hurt();});
+NR.on('tick',dt=>{if(RWD.on&&G&&G.live&&!G.dead)RWD.tick(dt);});
+NR.on('kill',d=>{const e=d&&d.e;if(!RWD.on||!G||!e||d.boss||e.dummy||e.type==='boss'||!e._rwC||G.t-e._rwC>.35)return;
+  let n=0;for(const p of G.pk)if(p.t==='shard')n++;if(n>=30)return;RWD.stat.pb++;RWD.stat.drop++;
+  G.pk.push({t:'shard',x:e.x,y:e.y,vx:rnd(-40,10),vy:rnd(-40,40),bob:0});});
+{const dp=drawPlayer;drawPlayer=function(t){dp(t);if(running)RWD.draw(t);};}
 
 /* ---------- boss movesets = parts/bossmoves.js (flag RET.bossmoves; ?bossmoves=0 = the old ring / fan / spiral / laser lists, exactly).
    Owner, 18 Oct 2026: "Game is extremely repetitive". All ten boss fights were built from the same six attack verbs. Now every fight has its own moveset:
@@ -8531,6 +8700,206 @@ if(PW3.on){
   window.__pw3={PW3,PW3L};
 }
 
+/* ---------- DASH + EMP abilities (flag RET.abil, ?abil=0 = the old dash and EMP exactly). b.js calls ABIL.dashIn() and ABIL.emp() where it read the keys.
+   DASH: charges (3, 4 from LV3) that refill one at a time (1.7 s at LV1 .. 1.2 s at LV5), fires on the press in the move / last stick direction.
+     On the beat it pays the old bonus (score, ON BEAT, tier +3) and refunds a fifth of a charge; off the beat it is a plain dash (no tier drop).
+     LV1-5 = 1 + the shop's extra-dash upgrade (SH.dmax) + 1 for a running power-up at LV3, +2 at LV5.
+     The running timed power-up (G.pw.act) gives the dash a trait:
+       NOVA / DRUM / TEMPO       burn trail: the path burns ordinary enemies that cross it
+       CHORD / CRATE / LEECH     shield ram: hits what it touches, strips zoo shields (e.sh), elites take double
+       SLICE / ECHO / RICOCHET   phase: bullets it passes turn into shards; a kill during the dash refunds a charge
+       WINGMATES                 decoy: an afterimage stays behind 1.2 s and newly aimed shots go for it
+       MAGNET BASS / SLOW        magnet: pickups near the path fly to the ship
+   EMP: P.emp charges (3 max) as before, plus a meter that fills from kills, grazes, on-beat dashes and power-up pickups (x.35 on Legend; the dash refills up to 1.4x slower there).
+     Every EMP clears the bullets and hits like the old one (10 / boss 25, booked by the same caps); the running power-up adds:
+       NOVA          shockwave: the cleared bullets become shards (8 at most)
+       SLICE / SLOW  slow bubble: 2.5 s, bullets inside move at 35%
+       WING / ECHO   chain lightning: 4-7 jumps over the nearest enemies, ground units included (bosses take 2)
+       DRUM / TEMPO / RICOCHET / CRATE   overdrive: 3 s of extra volleys from the equipped weapons, no heat
+       CHORD / BOMB  core breaker: boss shield cores lose 60% of their hull (the boss itself and armour.js caps untouched)
+       MAGNET        every pickup on screen flies in
+   Nothing here writes e.hp upwards or touches DMG / armour caps: EMP damage is dealt where the old EMP dealt it, dash damage goes in as player shots (zap). Test: nightrun/abil-test.js. */
+if(RET.abil===undefined)RET.abil=!/[?&]abil=0/.test(location.search);
+const ABIL=window.ABIL={get on(){return!!RET.abil;},
+  stat:{dash:0,onb:0,burn:0,ram:0,phase:0,refund:0,decoy:0,mag:0,emp:0,conv:0,slow:0,chain:0,od:0,core:0,fill:0},
+  MOD:{nova:'burn',drum:'burn',tempo:'burn',chord:'ram',crate:'ram',leech:'ram',slice:'phase',echo:'phase',ric:'phase',wing:'decoy',magb:'mag',slow:'mag'},
+  EMOD:{nova:'wave',slice:'bubble',slow:'bubble',wing:'chain',echo:'chain',drum:'od',tempo:'od',ric:'od',crate:'od',chord:'core',bomb:'core',magb:'pull',leech:'chain'},
+  FILL:{easy:1.2,normal:1,hard:.7,vhard:.5,legend:.35},RK:{hard:1.15,vhard:1.3,legend:1.4},   // hard tiers: slower EMP meter and dash refill, so Legend does not get easier
+  st(){return G.ab||(G.ab={n:3,r:0,trail:[],dec:null,rings:[],bub:null,arcs:[],od:0,odT:0,hit:null,ref:0,ph:0,m:0,tip:0});},
+  keys(){return G.pw?G.pw.act.map(a=>a.k):[];},
+  pwLv(){let m=0;if(G.pw)for(const a of G.pw.act)m=Math.max(m,a.l3||1);return m;},
+  lv(){const m=this.pwLv();return Math.max(1,Math.min(5,1+(SH.dmax|0)+(m>=5?2:m>=3?1:0)));},
+  max(){return this.lv()>=3?4:3;},
+  refill(){return(1.7-.12*(this.lv()-1))*(this.RK[SET.diff]||1);},
+  mods(map){const o={};for(const k of this.keys())if(map[k])o[map[k]]=1;return o;},
+  dashMod(){const k=this.keys();for(let i=k.length-1;i>=0;i--)if(this.MOD[k[i]])return this.MOD[k[i]];return'';},
+  /* b.js: replaces the beat-snapped dash. ts = the press stamp (or undefined), mx/my = the keys this frame */
+  dashIn(ts,mx,my,dt){const S=this.st(),mx0=this.max();S.n=Math.min(S.n,mx0);
+    if(S.n<mx0){S.r+=dt/this.refill();if(S.r>=1){S.r=0;S.n++;}}else S.r=0;
+    if(ts&&S.n>=1&&P.dashT<=0){S.n--;const j=judge(ts);P.dashT=.2;if(!(mx||my)&&!touch&&!(P.dx||P.dy)){P.dx=1;P.dy=0;}AU.sfx('dash');P.dashPf=j.ok;this.stat.dash++;J.n++;
+      J.last={kind:'dash',ok:j.ok,dt:Math.round(j.dt),beat:j.beat,at:performance.now()};
+      if(j.ok){this.stat.onb++;G.score+=Math.round(200*G.mult*comboK());onPerfect('dash',j,P.x,P.y);S.r+=.2;if(S.r>=1&&S.n<mx0){S.r-=1;S.n++;}this.gain(.04);if(!TIP.done){TIP.done=true;save('mnr_tipdone',true);}}
+      S.hit=new Set();S.ref=0;S.ph=0;const m=this.dashMod();S.mod=m;
+      if(m==='decoy'){S.dec={x:P.x,y:P.y,t:1.2};this.stat.decoy++;}
+      if(m)floater(P.x,P.y-30,{burn:'BURN',ram:'RAM',phase:'PHASE',decoy:'DECOY',mag:'MAGNET'}[m],'#19e3ff');}
+    P.dashCd=S.n>=1?0:(1-S.r)*this.refill();},   // the old field still tells bots and the HUD when the next dash is ready
+  gain(v){if(!this.on||!G||G.dead)return;const S=this.st();if(P.emp>=3){S.m=1;return;}S.m+=v*(this.FILL[SET.diff]||1);this.stat.fill+=v;
+    if(S.m>=1){S.m-=1;P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');AU.sfx('up');S.ping=.6;
+      if(!this.tipE){this.tipE=1;this.tip('EMP charged: tap EMP');}}},
+  tip(t){try{const o=load('mnr_abiltip',{})||{};if(o[t]||G.tut||G.lab)return;o[t]=1;save('mnr_abiltip',o);hintShow(t,4);}catch(e){}},
+  /* b.js: the EMP key or button */
+  emp(){if(P.emp<=0){AU.sfx('heat');return;}const S=this.st();P.emp--;this.stat.emp++;
+    G.empT=.6;if(!SET.reduce)G.flash=Math.max(G.flash,.3*FX());shake(SET.reduce?3:9);AU.sfx('emp');const M=this.mods(this.EMOD),lv=this.lv();
+    S.rings.push({x:P.x,y:P.y,r:0,R:M.wave?520:360,t:0,c:M.wave?'#ff5fd2':'#ffb020'});
+    let sh=0;for(const b of G.eb){if(M.wave&&sh<8&&b.x>0&&b.x<W){G.pk.push({t:'shard',x:b.x,y:b.y,vx:rnd(-60,0),vy:rnd(-40,40),bob:0});sh++;this.stat.conv++;}else burst(b.x,b.y,'#19e3ff',2,80,.4);G.score+=M.wave?10:5;}G.eb=[];
+    G.en.forEach(e=>{if(e.type!=='boss')e.hp-=10;else e.hp-=25;e.flash=.2;});if(G.boss)G.boss.lasers=[];
+    if(M.bubble){S.bub={x:P.x,y:P.y,r:180,t:2.5};this.stat.slow++;}
+    if(M.chain){let x=P.x,y=P.y;const done=new Set(),N=3+lv;S.arcs=[];for(let i=0;i<N;i++){let best=null,bd=1e9;
+        for(const e of G.en){if(done.has(e)||e.dead||e.hp<=0||e.dying)continue;const d=Math.hypot(e.x-x,e.y-y);if(d<bd&&d<520){bd=d;best=e;}}
+        if(!best)break;done.add(best);best.hp-=best.type==='boss'?2:8;best.flash=.2;S.arcs.push({x0:x,y0:y,x1:best.x,y1:best.y,t:.35});x=best.x;y=best.y;this.stat.chain++;}}
+    if(M.od){S.od=3;this.stat.od++;}
+    if(M.core&&G.boss&&G.boss.cores)for(const c of G.boss.cores){if(c.dead||c.hp<=0)continue;c.hp-=Math.ceil((c.max||c.hp)*.6);c.flash=.3;this.stat.core++;}
+    if(M.pull)for(const p of G.pk){p.x=P.x;p.y=P.y;this.stat.mag++;}},
+  tick(dt){if(!this.on||!G||!P||!running)return;const S=this.st(),k=.8+.1*this.lv();if(S.ping>0)S.ping-=dt;if(touchUI&&typeof setRing==='function')this.rings();
+    if(P.dashT>0&&S.mod){
+      if(S.mod==='burn'){S.trail.push({x:P.x,y:P.y,t:.7});}
+      for(const e of G.en){if(e.dead||e.hp<=0||e.dying||e.gr||S.hit.has(e))continue;if(Math.hypot(e.x-P.x,e.y-P.y)>(e.r||14)+20)continue;
+        if(S.mod==='ram'){S.hit.add(e);const d=(e.type==='boss'?2:6*k)*(e.el?2:1);this.zap(e,d);e.flash=.15;if(e.sh)e.sh=0;if(e.shl)e.shl=0;burst(e.x,e.y,'#a98bff',6,180,.3);this.stat.ram++;if(e.hp<=d)this.kref(S);}
+        else if(S.mod==='phase'&&e.hp<=3&&e.type!=='boss'){S.hit.add(e);this.zap(e,3);this.kref(S);}}
+      if(S.mod==='phase')for(const b of G.eb){if(b.dead||Math.hypot(b.x-P.x,b.y-P.y)>40)continue;b.dead=1;if(S.ph<4){G.pk.push({t:'shard',x:b.x,y:b.y,vx:-40,vy:0,bob:0});S.ph++;}G.score+=Math.round(30*G.mult);this.stat.phase++;}
+      if(S.mod==='mag')for(const p of G.pk){if(Math.hypot(p.x-P.x,p.y-P.y)<180&&!p.ab){p.ab=1;p.x=P.x;p.y=P.y;this.stat.mag++;}}}
+    for(const t of S.trail){t.t-=dt;for(const e of G.en){if(e.dead||e.hp<=0||e.gr||e.type==='gate')continue;if(Math.hypot(e.x-t.x,e.y-t.y)<(e.r||14)+14){e._bn=(e._bn||0)+(e.type==='boss'?.5:4)*k*dt;if(e._bn>=1){this.zap(e,e._bn);e._bn=0;}e.flash=.05;this.stat.burn++;}}}
+    S.trail=S.trail.filter(t=>t.t>0);if(S.trail.length>40)S.trail.splice(0,S.trail.length-40);
+    if(S.dec){S.dec.t-=dt;if(S.dec.t<=0)S.dec=null;else for(const b of G.eb){if(b._ab)continue;b._ab=1;const sp=Math.hypot(b.vx,b.vy);if(sp<1)continue;
+        const ax=P.x-b.x,ay=P.y-b.y,al=Math.hypot(ax,ay)||1;if((b.vx*ax+b.vy*ay)/(sp*al)>.97){const dx=S.dec.x-b.x,dy=S.dec.y-b.y,dl=Math.hypot(dx,dy)||1;b.vx=dx/dl*sp;b.vy=dy/dl*sp;this.stat.decoy++;}}}
+    else for(const b of G.eb)b._ab=1;
+    if(S.bub){S.bub.t-=dt;if(S.bub.t<=0)S.bub=null;else for(const b of G.eb)if(Math.hypot(b.x-S.bub.x,b.y-S.bub.y)<S.bub.r){b.x-=b.vx*dt*.65;b.y-=b.vy*dt*.65;}}
+    if(S.od>0){S.od-=dt;S.odT-=dt;P.heat=Math.max(0,P.heat-60*dt);P.over=false;const firing=SET.auto||K.Space||K.KeyJ||touchFire;
+      if(firing&&S.odT<=0&&!G.dead){S.odT=.12;SH.volley(P.x+22,P.y+2,0);}}
+    for(const r of S.rings){r.t+=dt;r.r=r.R*Math.min(1,r.t/.35);}S.rings=S.rings.filter(r=>r.t<.5);
+    for(const a of S.arcs)a.t-=dt;S.arcs=S.arcs.filter(a=>a.t>0);},
+  zap(e,d){if(typeof pbRoom==='function'&&!pbRoom(1))return;G.pb.push({x:e.x,y:e.y,vx:1,vy:0,dm:d,pf:0,ab:1});},   // damage from tick() goes in as a player shot, so DMG.hit, DMG.pass and the armour cap book it like any other
+  kref(S){if(S.ref)return;S.ref=1;S.n=Math.min(this.max(),S.n+1);this.stat.refund++;floater(P.x,P.y-40,'DASH +1','#19e3ff');},
+  /* c.js: the two touch button rings (charge ring + count) */
+  rings(){const S=this.st(),mx=this.max();setRing($('bDash'),Math.min(1,(S.n+(S.n<mx?S.r:0))/mx),S.n?'#19e3ff':'#5a6b7a',S.n);
+    setRing($('bEmp'),P.emp>=3?1:Math.min(1,(P.emp+S.m)/3),P.emp?'#ffb020':'#7a6a4a',P.emp);
+    const e=$('bEmp'),d=$('bDash');if(e)e.classList.toggle('abRdy',P.emp>0);if(d)d.classList.toggle('abRdy',S.n>0);},
+  draw(){if(!this.on||!G||!G.ab)return;const S=G.ab;ctx.save();ctx.lineCap='round';
+    if(S.trail.length>1){ctx.strokeStyle='#ff8a3d';ctx.globalAlpha=.55;ctx.lineWidth=10;ctx.beginPath();S.trail.forEach((t,i)=>i?ctx.lineTo(t.x,t.y):ctx.moveTo(t.x,t.y));ctx.stroke();}
+    if(S.dec){ctx.globalAlpha=.35+.3*Math.sin(G.t*30);ctx.strokeStyle='#ffd23d';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(S.dec.x+18,S.dec.y);ctx.lineTo(S.dec.x-14,S.dec.y-11);ctx.lineTo(S.dec.x-8,S.dec.y);ctx.lineTo(S.dec.x-14,S.dec.y+11);ctx.closePath();ctx.stroke();}
+    for(const r of S.rings){ctx.globalAlpha=Math.max(0,1-r.t/.5);ctx.strokeStyle=r.c;ctx.lineWidth=6;ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,7);ctx.stroke();}
+    if(S.bub){ctx.globalAlpha=.18+.1*Math.min(1,S.bub.t);ctx.fillStyle='#00e5c3';ctx.beginPath();ctx.arc(S.bub.x,S.bub.y,S.bub.r,0,7);ctx.fill();ctx.globalAlpha=.6;ctx.strokeStyle='#00e5c3';ctx.lineWidth=2;ctx.stroke();}
+    for(const a of S.arcs){ctx.globalAlpha=a.t/.35;ctx.strokeStyle='#7df9ff';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(a.x0,a.y0);const mx=(a.x0+a.x1)/2+rnd(-14,14),my=(a.y0+a.y1)/2+rnd(-14,14);ctx.lineTo(mx,my);ctx.lineTo(a.x1,a.y1);ctx.stroke();}
+    if(S.od>0&&P){ctx.globalAlpha=.5;ctx.strokeStyle='#ffe14d';ctx.lineWidth=3;ctx.beginPath();ctx.arc(P.x,P.y,26+3*Math.sin(G.t*20),0,7);ctx.stroke();}
+    ctx.restore();}
+};
+{const st=document.createElement('style');st.textContent=`#touch button#bDash,#touch button#bEmp{min-width:48px;min-height:48px}
+#touch button#bDash::after,#touch button#bEmp::after{font-size:15px}
+#touch button.abRdy#bEmp{filter:drop-shadow(0 0 6px #ffb020)}#touch button.abRdy#bDash{filter:drop-shadow(0 0 5px #19e3ff)}`;document.head.appendChild(st);}
+NR.on('tick',dt=>ABIL.tick(dt));
+NR.on('kill',d=>{if(!ABIL.on||!d||d.boss)return;const e=d.e||{};ABIL.gain(e.el||e.type==='gunship'?.08:.035);});
+NR.on('graze',d=>ABIL.gain(d&&d.pf?.07:.04));
+NR.on('pickup',()=>ABIL.gain(.34));
+NR.on('runStart',()=>{if(ABIL.on)setTimeout(()=>{if(running&&G&&!G.dead)ABIL.tip('DASH has charges, EMP fills from kills');},4000);});
+
+/* ---------- COUNTER threats: DASH and EMP as the answers (flag RET.counter, ?counter=0 = the abilities without these threats). Test: nightrun/counter-test.js.
+   Owner, 19 Oct 2026: "the dash button and emp still useless, the game needs to be more strategic and timing". A button only matters when some threat needs it.
+   One threat every few bars (never with a boss out, in a pit stop, the lab or the tutorial), in turn from the ones the stage has unlocked:
+     SEEKER   (story stage 3+)  a shooter glows a red ring for .7 s, then fires a marked homing shot (red ring; 300 px/s, turns 9 rad/s for 4 s, 2 hull on the hard tiers). Dash in the last .15 s before it hits = PARRY:
+                                it flies back as a big player shot, refunds a charge and adds meter. Too early wastes the charge (it keeps homing), too late is a hit.
+     WALL     (5+, not Easy)    a full-height laser line, 1.3 s warning on the right edge, then it sweeps left: only a dash (i-frames) crosses it.
+                                With no dash charge when it starts, or below Hard, it gets a 110 px gap (Normal: dash or find the gap).
+     CURTAIN  (7+, not Easy)    .9 s tell (gap chevrons), then two dotted walls drawn as bullets (one hazard each, not eb(), so ebCap stays free) .45 s apart, gaps 96 px and >= 270 px apart (too far to slide between even at touch speed; .9 s apart below Hard or with no dash and no EMP): dash a layer or spend the EMP.
+     WARDEN   (9+)              an armoured gunner whose shield takes 70% of every hit; only an EMP strips it, for 8 s, then it comes back.
+   EMP timing: 6+ enemy bullets or a shielded warden on screen = GOOD EMP (score + a quarter of the meter back); on a near-empty screen it pays nothing extra.
+     The EMP button pulses (class abHot) while it would be worth it. DASH then EMP inside 1 s = COMBO blast (12 more to every ordinary foe within 300 px).
+   Dash while overheated vents the gun (VENT). Hooks: b.js dash start (CTR.dash) and EMP press (CTR.emp), c.js draw. Boss HP, armour caps, bossmoves untouched;
+   bullets go through eb() (ebCap, BCAP); tells >= .7 s; reduce motion = no pulse/flash. */
+if(RET.counter===undefined)RET.counter=!/[?&]counter=0/.test(location.search);
+const CTR=window.CTR={get on(){return!!RET.counter;},
+  stat:{seek:0,parry:0,early:0,wall:0,wallHit:0,wallDash:0,curt:0,curtHit:0,curtDash:0,curtEmp:0,ward:0,strip:0,good:0,waste:0,combo:0,vent:0},
+  UN:{seek:3,wall:5,curt:7,ward:9},EV:{easy:10,normal:9,hard:6,vhard:5,legend:4},
+  HK:{easy:4,normal:6,hard:9,vhard:9,legend:9},WK:{easy:.8,normal:1,hard:1.3,vhard:1.5,legend:1.7},
+  reset(){this.tells=[];this.walls=[];this.curts=[];this.bars=0;this.k=0;this.lastDash=-9;this.pend=0;this.fx=[];},
+  live(){return this.on&&G&&G.live&&!G.dead&&!G.lab&&!G.tut&&!(SH&&SH.active);},
+  kinds(){const s=S2.stg(),e=SET.diff==='easy',o=[];if(s>=this.UN.seek)o.push('seek');if(!e&&s>=this.UN.wall)o.push('wall');if(!e&&s>=this.UN.curt)o.push('curt');if(s>=this.UN.ward)o.push('ward');return o;},
+  charges(){return window.ABIL&&ABIL.on?ABIL.st().n:(P.dashCd<=0?1:0);},
+  red(){return window.READ&&READ.D||'#ff2d78';},
+  start(k){if(k==='seek')this.seek();else if(k==='wall')this.wall();else if(k==='curt')this.curt();else if(k==='ward')this.ward();},
+  seek(){const c=G.en.filter(e=>e.type!=='gate'&&e.type!=='boss'&&!e.gr&&!e.wpt&&e.x<W-40&&e.x>P.x+150&&e.hp>0);
+    const e=c.length?c[Math.floor(Math.random()*c.length)]:null,n=HARDS.includes(SET.diff)?2:1;
+    for(let i=0;i<n;i++)this.tells.push({e,x:e?e.x:W-30,y:e?e.y:60+Math.random()*(H-120),t:.7+.45*i,T:.7+.45*i});this.stat.seek++;},
+  fire(t){const x=t.e&&!t.e.dead&&t.e.hp>0?t.e.x-10:t.x,y=t.e&&!t.e.dead&&t.e.hp>0?t.e.y:t.y,k=G.eb.length;
+    eb(x,y,Math.atan2(P.y-y,P.x-x),SET.diff==='easy'?240:300,this.red(),7);if(G.eb.length>k){const b=G.eb[k];b.cxM=1;b.cxH=4;b.dmg=HARDS.includes(SET.diff)?2:1;}},
+  wall(){this.walls.push({x:W-30,warn:1.3,v:420,gap:null,hit:0,dash:0});this.stat.wall++;this.tip('Laser wall: DASH through it');},
+  curt(){const m=60,g1=m+Math.random()*(H-2*m);const g2=g1<H/2?clamp(g1+270+Math.random()*60,m,H-m):clamp(g1-270-Math.random()*60,m,H-m);
+    const d=this.charges()<1&&P.emp<1||!HARDS.includes(SET.diff)?.9:.45;this.curts.push({t:.9+d,g:[g1,g2],T0:.9});[g1,g2].forEach((gy,i)=>this.walls.push({x:W+8,warn:.9+d*i,v:230,gap:{y:gy,h:96},cur:1,hit:0,dash:0}));this.stat.curt++;this.tip('Bullet curtain: EMP clears it');},
+  ward(){const e=en('turret',{x:W+30,y:90+Math.random()*(H-180),stop:W-220});if(!e)return;const hp=Math.round(60*(this.WK[SET.diff]||1));
+    e.hp=e.max=e.hq=hp;e.ctw=1;e.wsh=1;e.wshT=0;e._ph=hp;e.age=0;e.score=Math.max(e.score||0,800);this.stat.ward++;this.tip('Shielded: EMP strips the shield');},
+  tip(t){try{const o=load('mnr_ctrtip',{})||{};if(o[t]||G.tut||G.lab||document.webdriver||navigator.webdriver)return;o[t]=1;save('mnr_ctrtip',o);hintShow(t,4);}catch(e){}},
+  /* b.js, the frame a dash starts (before the bullets move): parry, vent */
+  dash(){if(!this.live())return;this.lastDash=G.t;
+    if(P.over){P.over=false;P.heat=Math.min(P.heat,35);floater(P.x,P.y-36,'VENT','#19e3ff');this.stat.vent++;}
+    let got=0;for(const b of G.eb){if(!b.cxM||b.dead)continue;const sp=Math.hypot(b.vx,b.vy)||1,tt=(Math.hypot(b.x-P.x,b.y-P.y)-(b.r+3))/sp;
+      if(tt<=.17){b.dead=1;got++;let tg=null,bd=1e9;for(const e of G.en){if(e.dead||e.hp<=0||e.gr)continue;const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<bd){bd=d;tg=e;}}
+        const a=tg?Math.atan2(tg.y-P.y,tg.x-P.x):0;G.pb.push({x:P.x+10,y:P.y,vx:Math.cos(a)*700,vy:Math.sin(a)*700,dm:15,pf:1,big:1,ab:1,hk:1.5});
+        burst(b.x,b.y,'#ffffff',10,240,.35);this.stat.parry++;}
+      else if(tt<=.6)this.stat.early++;}
+    if(got){G.eb=G.eb.filter(b=>!b.dead);G.score+=Math.round(300*got*G.mult);floater(P.x,P.y-30,'PARRY!','#ffffff');AU.sfx('up');if(!SET.reduce)shake(4);
+      if(window.ABIL&&ABIL.on){const S=ABIL.st();S.n=Math.min(ABIL.max(),S.n+1);ABIL.gain(.1);}else P.dashCd=0;}},
+  /* b.js, the frame EMP is pressed with a charge (before it clears): strip, good/waste, combo */
+  emp(){if(!this.live())return;const cs=this.walls.filter(w=>w.cur&&w.x<W+10),n=G.eb.length+6*cs.length,ws=G.en.filter(e=>e.ctw&&e.wsh&&!e.dead&&e.x<W);
+    for(const w of cs){let k=0;for(let y=30;y<H&&k<4;y+=120)if(Math.abs(y-w.gap.y)>48){G.pk.push({t:'shard',x:w.x,y,vx:-40,vy:0,bob:0});k++;}this.stat.curtEmp++;}
+    this.walls=this.walls.filter(w=>!cs.includes(w));this.curts=[];
+    for(const e of G.en)if(e.ctw&&!e.dead){if(e.wsh)this.stat.strip++;e.wsh=0;e.wshT=8;e.flash=.3;}
+    if(n>=6||ws.length){this.stat.good++;G.score+=Math.round(400*G.mult);floater(P.x,P.y-44,'GOOD EMP','#ffe14d');this.pend+=.25;}else this.stat.waste++;
+    if(G.t-this.lastDash<=1){this.stat.combo++;floater(P.x,P.y-58,'COMBO BLAST','#ff5fd2');this.fx.push({x:P.x,y:P.y,t:0});
+      for(const e of G.en){if(e.type==='boss'||e.dead||e.hp<=0||e.gr)continue;if(Math.hypot(e.x-P.x,e.y-P.y)<300){e.hp-=12;e.flash=.25;}}}},
+  hot(){return P.emp>0&&(G.eb.length>=6||this.walls.some(w=>w.cur&&w.x<W+10)||G.en.some(e=>e.ctw&&e.wsh&&e.x<W));},
+  tick(dt){if(!this.on||!G||!P)return;const b=$('bEmp');if(b)b.classList.toggle('abHot',!!(running&&!G.dead&&!SET.reduce&&this.hot()));
+    if(this.pend>0&&window.ABIL&&ABIL.on){ABIL.gain(this.pend);this.pend=0;}
+    for(const f of this.fx)f.t+=dt;this.fx=this.fx.filter(f=>f.t<.5);
+    if(!G.live||G.dead){this.tells=[];this.walls=[];this.curts=[];return;}
+    for(const t of this.tells){t.t-=dt;if(t.t<=0){t.dead=1;this.fire(t);}}this.tells=this.tells.filter(t=>!t.dead);
+    const hk=this.HK[SET.diff]||3;
+    for(const b of G.eb){if(!b.cxM||!(b.cxH>0))continue;b.cxH-=dt;const sp=Math.hypot(b.vx,b.vy),cur=Math.atan2(b.vy,b.vx);let w=Math.atan2(P.y-b.y,P.x-b.x)-cur;w=Math.atan2(Math.sin(w),Math.cos(w));
+      const a=cur+clamp(w,-hk*dt,hk*dt);b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;}
+    for(const w of this.walls){if(w.warn>0){w.warn-=dt;if(w.warn<=0&&!w.cur&&(this.charges()<1||!HARDS.includes(SET.diff)))w.gap={y:clamp(P.y+(Math.random()-.5)*160,70,H-70),h:110};continue;}
+      const x0=w.x;w.x-=w.v*dt;if(w.hit||w.done)continue;
+      if(P.x>=w.x-14&&P.x<=x0+14){const inGap=w.gap&&Math.abs(P.y-w.gap.y)<w.gap.h/2-8;
+        if(P.dashT>0||inGap){if(P.dashT>0&&!w.dash){w.dash=1;this.stat[w.cur?'curtDash':'wallDash']++;G.score+=Math.round(200*G.mult);floater(P.x,P.y-30,'THROUGH','#19e3ff');}}
+        else if(P.inv<=0){w.hit=1;this.stat[w.cur?'curtHit':'wallHit']++;hurt(1);}}
+      if(w.x<P.x-20)w.done=1;}
+    this.walls=this.walls.filter(w=>w.x>-30);
+    for(const c of this.curts){c.t-=dt;if(c.t<=0)c.dead=1;}this.curts=this.curts.filter(c=>!c.dead);
+    for(const e of G.en){if(!e.ctw||e.dead)continue;e.age+=dt;if(e.age<20&&e.t>5)e.t=5;   // a warden stays up to 20 s
+      if(e.wsh&&e.hp<e._ph&&e.hp>0)e.hp=e._ph-(e._ph-e.hp)*.3;
+      if(!e.wsh){e.wshT-=dt;if(e.wshT<=0){e.wsh=1;floater(e.x,e.y-e.r-20,'SHIELD UP','#7df9ff');}}e._ph=e.hp;}},
+  bar(){if(!this.live()||this.noAuto||G.boss||G.transT>=0)return;this.bars++;const ev=this.EV[SET.diff]||7;if(this.bars%ev!==ev-2)return;
+    const o=this.kinds();if(!o.length)return;this.start(o[this.k++%o.length]);},
+  draw(){if(!this.on||!G||!G.live)return;const r=this.red(),t=G.t;ctx.save();
+    for(const s of this.tells){const f=1-s.t/s.T,x=s.e&&!s.e.dead?s.e.x:s.x,y=s.e&&!s.e.dead?s.e.y:s.y;ctx.globalAlpha=.4+.6*f;ctx.strokeStyle=r;ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,34-16*f,0,7);ctx.stroke();}
+    for(const b of G.eb)if(b.cxM){ctx.globalAlpha=1;ctx.strokeStyle=r;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(b.x,b.y,13+(SET.reduce?0:2*Math.sin(t*20)),0,7);ctx.stroke();}
+    for(const w of this.walls){if(w.cur){if(w.warn>0)continue;ctx.globalAlpha=1;ctx.fillStyle=r;for(let y=14;y<H;y+=26)if(Math.abs(y-w.gap.y)>48){ctx.beginPath();ctx.arc(w.x,y,7,0,7);ctx.fill();}continue;}
+      if(w.warn>0){ctx.globalAlpha=.35+.35*(SET.reduce?1:Math.abs(Math.sin(t*10)));ctx.strokeStyle=r;ctx.lineWidth=3;ctx.setLineDash([10,10]);ctx.beginPath();ctx.moveTo(w.x,0);ctx.lineTo(w.x,H);ctx.stroke();ctx.setLineDash([]);
+        ctx.globalAlpha=.9;ctx.fillStyle='#ffffff';ctx.font='bold 16px sans-serif';ctx.textAlign='right';ctx.fillText(say('DASH THROUGH'),w.x-10,H/2);continue;}
+      ctx.globalAlpha=.85;ctx.fillStyle=r;const g=w.gap;if(g){ctx.fillRect(w.x-6,0,12,g.y-g.h/2);ctx.fillRect(w.x-6,g.y+g.h/2,12,H-g.y-g.h/2);}else ctx.fillRect(w.x-6,0,12,H);
+      ctx.globalAlpha=.25;ctx.fillRect(w.x-14,0,28,H);}
+    for(const c of this.curts){ctx.globalAlpha=.5+.4*(SET.reduce?1:Math.abs(Math.sin(t*8)));ctx.fillStyle='#4dff9a';c.g.forEach((gy,i)=>{ctx.globalAlpha=i?.45:.95;ctx.beginPath();ctx.moveTo(W-6,gy-48);ctx.lineTo(W-26,gy);ctx.lineTo(W-6,gy+48);ctx.closePath();ctx.fill();});
+      ctx.globalAlpha=.4;ctx.fillStyle=r;ctx.fillRect(W-4,0,4,H);}
+    for(const e of G.en){if(!e.ctw||e.dead)continue;ctx.globalAlpha=1;ctx.lineWidth=4;const R=(e.r||20)+10;
+      if(e.wsh){ctx.strokeStyle='#7df9ff';ctx.beginPath();for(let i=0;i<7;i++){const a=i*Math.PI/3+t*.6;ctx[i?'lineTo':'moveTo'](e.x+Math.cos(a)*R,e.y+Math.sin(a)*R);}ctx.stroke();}
+      else{ctx.strokeStyle='#5a6b7a';ctx.beginPath();ctx.arc(e.x,e.y,R,-Math.PI/2,-Math.PI/2+Math.PI*2*(1-e.wshT/8));ctx.stroke();}}
+    for(const f of this.fx){ctx.globalAlpha=Math.max(0,1-f.t/.5);ctx.strokeStyle='#ff5fd2';ctx.lineWidth=8;ctx.beginPath();ctx.arc(f.x,f.y,300*Math.min(1,f.t/.3),0,7);ctx.stroke();}
+    ctx.restore();}
+};
+CTR.reset();
+{const st=document.createElement('style');st.textContent=`@keyframes abHot{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+#touch button.abHot#bEmp{animation:abHot .5s ease-in-out infinite;filter:drop-shadow(0 0 10px #ffe14d)}`;document.head.appendChild(st);}
+NR.on('runStart',()=>CTR.reset());
+NR.on('bar',()=>CTR.bar());
+NR.on('tick',dt=>CTR.tick(dt));
+
 /* ---------- H: no AFK wins, a dying ship slows the song ----------
    STILL (declared in b.js): a ship that stays within 50 px of one spot for more than 3 s is hunted: enemies fire faster and their bullets are quicker,
    the score of kills and the multiplier decay, and a SNIPER LANE (a beam along the ship's row: it follows the ship for two beats, locks for one, fires on the
@@ -8584,11 +8953,14 @@ NR.on('beat',()=>{if(G.dead||!G.live)return;const B=STILL.beam;
                 miss the dash and you still get a small blast round the ship (never a punishment)
    MINI-BOSS    about every 26 bars (~50 s, see dir.js)
    Never touches the music: only game logic, light and a clean effect sound. */
-const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0,stat:{sets:0,fences:0,drops:0,dropsHit:0,rewards:0},
-  reset(){this.n=0;this.sets=[];this.fence=null;this.dw=null;this.dropAt=-1;this.lastDash=-9;this.pdash=0;this.shower=0;},
+if(RET.deck===undefined)RET.deck=!/[?&]deck=0/.test(location.search);
+if(RET.roster===undefined)RET.roster=!/[?&]roster=0/.test(location.search);   // dir.js ROSTER (V3)
+if(RET.songspread===undefined)RET.songspread=!/[?&]songspread=0/.test(location.search);   // story.js SONGSEL (V10)
+const FUN={n:0,sets:[],fence:null,dw:null,ev:null,deck:[],nextAt:22,lastK:'',dropAt:-1,lastDash:-9,pdash:0,shower:0,stat:{sets:0,fences:0,drops:0,dropsHit:0,rewards:0},
+  reset(){this.ev=null;this.deck=[];this.nextAt=20+gr(0,6);this.lastK='';this.n=0;this.sets=[];this.fence=null;this.dw=null;this.dropAt=-1;this.lastDash=-9;this.pdash=0;this.shower=0;},
   ROWS:[30,90,150,210,270,330,390,450,510],
   /* the bot (sweep.js / d-sim.js) asks: is a ship at height y on a firing beam row? */
-  cost(y){const f=this.fence;if(!f||f.phase<1)return 0;for(const r of f.rows)if(Math.abs(y-r)<26)return 3000;return 0;},
+  cost(y){const l=this.ev;if(l&&l.k==='lane'&&Math.abs(y-l.y)<l.h/2+12)return 3000;const f=this.fence;if(!f||f.phase<1)return 0;for(const r of f.rows)if(Math.abs(y-r)<26)return 3000;return 0;},
   shardShower(n,x0){for(let i=0;i<n;i++)G.pk.push({t:'shard',x:(x0==null?W-40:x0)+gr(-30,30),y:gr(50,H-50),vx:-gr(120,300),vy:gr(-40,40),bob:0});this.shower=.9;},
   track(f){const n0=G.en.length;f();return G.en.slice(n0);},
   setPiece(){const di=G.di,sig=['turretLine','swarm','wedge','turretLine','phalanx'][di%5],k=Math.floor(this.n/6)%3,t=DIR.tierv();
@@ -8601,6 +8973,7 @@ const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0
     this.fence={rows,gy,b0:G.bc,phase:0,fire:0,hit:0};this.stat.fences++;AU.sfx('warn');hintShow(say('LASER FENCE: find the gap'),2.6);},
   bar(){const n=this.n=G.rb;if(PW.on('tempo'))DIR.acc+=.4;if(HARD&&!ST.on&&!G.boss)DIR.acc+=.7;   // Hard: the set pieces and the DROP are extra on top, so the waves keep their bite   // TEMPO UP: faster waves (a bigger wave budget every bar)
     if(G.boss||G.dead||SH.active)return;
+    if(RET.deck!==false){this.deckBar(n);return;}   // V1: the event deck replaces the 6-bar metronome and the 16-bar DROP
     if(n>=3&&n%6===3&&DIR.nonBoss()<8&&(ST.on||G.dbar<DIR.bossBar-6))this.setPiece();
     if(n%16===15&&n>=15&&!this.dw){this.dropAt=n+1;this.dropB=G.bc+4;hintShow(say('DROP COMING: DASH ON THE DOWNBEAT'),3.4);}
     if(n%16===0&&n>=16&&this.dropAt===n)this.dropStart();},
@@ -8623,6 +8996,7 @@ const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0
       const killed=s.es.filter(e=>e.hp<=0).length;if(killed>=s.n*.5){this.stat.rewards++;G.score+=250*s.n;floater(W*.6,H*.4,'SET CLEARED +'+250*s.n,'#ffe14d');this.shardShower(6+s.n);AU.sfx('up');}}
     const f=this.fence;if(f){const ph=G.bc-f.b0;if(f.phase<1&&ph>=3){f.phase=1;AU.sfx('warn');}
       if(f.fire>0){f.fire-=dt;if(!f.hit&&!G.dead)for(const r of f.rows)if(Math.abs(P.y-r)<13){f.hit=1;hurt(1);break;}if(f.fire<=0)this.endFence();}}
+    if(this.ev)this.evTick(dt);
     if(this.shower>0)this.shower-=dt;},
   endFence(){const f=this.fence;if(!f)return;this.fence=null;if(!f.hit){this.stat.rewards++;G.score+=1000;floater(W*.5,H*.45,'FENCE CLEARED +1000','#19e3ff');this.shardShower(10);AU.sfx('up');}},
   beat(){const f=this.fence;if(f&&f.phase>=1&&f.fire<=0&&G.bc-f.b0>=4&&!f.fired){f.fired=1;f.fire=.35;AU.sfx('big');shake(7);}},
@@ -8634,9 +9008,72 @@ const FUN={n:0,sets:[],fence:null,dw:null,dropAt:-1,lastDash:-9,pdash:0,shower:0
           if(lock){ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,r-10,W,20);}}}
       ctx.globalAlpha=lock?.5:.3;ctx.strokeStyle='#19ffb0';ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.strokeRect(10,f.gy-70,W-20,140);ctx.setLineDash([]);   // the safe gap
       ctx.restore();}
+    if(this.ev)this.evDraw(t);
     if(this.dropAt>0&&!this.dw){const cnt=Math.max(1,Math.min(4,this.dropB-G.bc));ctx.save();ctx.textAlign='center';ctx.font='700 46px "Chakra Petch",sans-serif';ctx.globalAlpha=.55+.4*PUL;ctx.fillStyle='#b36bff';wtxt('DROP '+cnt,W/2,92);ctx.restore();
       ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=Math.min(.5,(4-cnt)*.14+.06);ctx.strokeStyle='#b36bff';ctx.lineWidth=10;ctx.strokeRect(5,5,W-10,H-10);ctx.restore();}}
 };
+
+/* ---------- V1 EVENT DECK (flag RET.deck, ?deck=0 = the old 6-bar WEAVE / FENCE / 16-bar DROP metronome) ----------
+   One event at most every 25-31 s (and never with a boss out or about to come): the cards of DECK are shuffled and drawn without repeats until the deck is empty, then it is reshuffled
+   (the last card never opens the next deck). A card whose enemies the stage has not unlocked yet goes to the bottom. Every card is dodgeable or harmless and shows its warning for >= 1 s
+   (the enemy cards use the markers and entry paths of the pattern library): weave, fence, DROP (dash on the downbeat), supply drop (fly to the beacon), lane closes, gate run (fly through rings),
+   mines, rescue capsule (shoot it open), wind gust, blackout strip (shots keep a white rim), crossfire from both edges, swarm, turret line, meteors, wedge. */
+FUN.DECK=['weave','fence','drop','supply','lane','gaterun','mines','rescue','gust','blackout','crossfire','swarm','turrets','hail','wedge'];
+FUN.NEED={mines:'mines',crossfire:'pincer',swarm:'swarm',turrets:'turretLine',wedge:'wedge'};
+Object.assign(FUN,{
+  deckBar(n){if(this.dropAt===n&&!this.dw)this.dropStart();
+    if(this.ev||this.dw||this.fence||this.dropAt>0||G.t<this.nextAt||n<3||DIR.nonBoss()>=8||!(ST.on||G.dbar<DIR.bossBar-6))return;
+    const k=this.draw1();if(k)this.start(k,n);},
+  draw1(){const t=DIR.tierv();for(let i=0;i<2;i++){
+      if(!this.deck.length){const d=this.DECK.slice();for(let j=d.length-1;j>0;j--){const q=Math.floor(gr(0,j+1));[d[j],d[q]]=[d[q],d[j]];}if(d[d.length-1]===this.lastK)d.unshift(d.pop());this.deck=d;}
+      const k=this.deck.pop(),pk=this.NEED[k];if(!pk||(PATS[pk]&&PATS[pk].t<=t+.01))return k;this.deck.unshift(k);}
+    return null;},
+  start(k,n){this.lastK=k;this.nextAt=G.t+gr(25,31);this.stat.sets++;const T=G.t,hs=(s,d)=>hintShow(say(s),d||3);
+    const pat=(id,msg)=>{const es=this.track(()=>PATS[id].f());if(es.length)this.sets.push({es,n:es.length,kind:k});hs(msg);};
+    if(k==='weave'){const es=this.track(()=>{const y=FY(150,H-190);for(let i=0;i<6;i++)en('drone',{x:W+30+i*56,y,amp:120,ph:(i%2)*Math.PI});});if(es.length)this.sets.push({es,n:es.length,kind:k});hs('WEAVE: shoot on the beat',2.4);}
+    else if(k==='fence')this.startFence();
+    else if(k==='drop'){this.dropAt=n+1;this.dropB=G.bc+4;hs('DROP COMING: DASH ON THE DOWNBEAT',3.4);}
+    else if(k==='mines')pat('mines','MINEFIELD: SLIP THROUGH');
+    else if(k==='crossfire')pat('pincer','CROSSFIRE FROM BOTH EDGES');
+    else if(k==='swarm')pat('swarm','SWARM: KEEP MOVING');
+    else if(k==='turrets')pat('turretLine','TURRET LINE: FIND THE GAP');
+    else if(k==='wedge')pat('wedge','WEDGE: SHOOT THE TIP');
+    else if(k==='hail'){DIR.rain(4);this.ev={k,end:T+4};hs('METEORS: LEAVE THE MARKED LANES');}
+    else if(k==='supply'){this.ev={k,t0:T,end:T+9,x:gr(520,800),y:gr(100,H-100),gave:0};hs('SUPPLY DROP: FLY TO THE BEACON',3.4);}
+    else if(k==='lane'){this.ev={k,t0:T,end:T+5.4,y:clamp(P.y+gr(-70,70),70,H-70),h:84,hit:0};hs('LANE CLOSING: LEAVE IT',3);AU.sfx('warn');}
+    else if(k==='gaterun'){const r=[];for(let i=0;i<5;i++)r.push({x:W+80+i*150,y:clamp(H/2+Math.sin(i*1.7+gr(0,1))*150,70,H-70),got:0});this.ev={k,t0:T,end:T+12,rings:r,n:0};hs('GATE RUN: FLY THROUGH THE RINGS',3.4);}
+    else if(k==='rescue'){this.ev={k,t0:T,end:T+13,x:W+30,y:gr(110,H-110),hp:6,done:0};hs('SHOOT THE RESCUE CAPSULE',3.4);}
+    else if(k==='gust'){this.ev={k,t0:T,end:T+4.6,dir:GR()<.5?-1:1};hs('WIND GUST: STEER AGAINST IT');}
+    else if(k==='blackout'){this.ev={k,t0:T,end:T+5.8,x:W+10};hs('BLACKOUT STRIP: WATCH THE RIMS');}
+    NR.emit('setpiece',{kind:k});},
+  evTick(dt){const e=this.ev;if(!e)return;if(G.boss||G.dead||G.t>e.end){this.ev=null;return;}const age=G.t-e.t0;
+    if(e.k==='supply'){if(age>=1&&!e.gave){e.gave=1;AU.sfx('up');for(let i=0;i<9;i++)G.pk.push({t:'shard',x:e.x+gr(-34,34),y:clamp(e.y+gr(-34,34),40,H-40),vx:-45,vy:0,bob:0});}}
+    else if(e.k==='lane'){if(age>=1.3&&age<5.3&&!e.hit&&Math.abs(P.y-e.y)<e.h/2){e.hit=1;hurt(1);}
+      if(age>=5.3&&!e.done){e.done=1;if(!e.hit){this.stat.rewards++;G.score+=800;floater(W*.5,H*.45,'LANE CLEARED +800','#19e3ff');this.shardShower(6);}}}
+    else if(e.k==='gaterun'){let live=0;for(const r of e.rings){r.x-=170*dt;if(r.got)continue;if(r.x>-40)live++;if((r.x-P.x)**2+(r.y-P.y)**2<34*34){r.got=1;e.n++;G.score+=300*e.n;floater(r.x,r.y-20,'+'+300*e.n,'#ffe14d');AU.sfx('up');}}
+      if(e.n>=5&&!e.done){e.done=1;this.stat.rewards++;G.score+=1500;floater(W*.5,H*.4,'GATE RUN +1500','#ffe14d');this.shardShower(10);}
+      if(!live)this.ev=null;}
+    else if(e.k==='rescue'){if(e.x>W*.62)e.x-=48*dt;
+      for(const b of G.pb){if(b.dead||e.done)continue;if((b.x-e.x)**2+(b.y-e.y)**2<26*26){b.dead=1;e.hp--;e.fl=.12;AU.sfx('hit');
+          if(e.hp<=0){e.done=1;this.stat.rewards++;G.score+=1200;floater(e.x,e.y-26,'RESCUED +1200','#3dffb0');this.shardShower(8,e.x);if(P.hp<P.max&&GR()<.6)G.pk.push({t:'hp',x:e.x,y:e.y,vx:-60,vy:0,bob:0});e.end=G.t+.6;}}}
+      if(e.fl>0)e.fl-=dt;}
+    else if(e.k==='gust'){if(age>=1&&age<4.2)P.y=clamp(P.y+e.dir*62*dt,22,H-22);}
+    else if(e.k==='blackout'){if(age>=1)e.x=W+10-(W+260)*(age-1)/4.5;}},
+  evDraw(t){const e=this.ev;if(!e)return;const age=G.t-e.t0,pulse=SET.reduce?1:(Math.floor(t*10)%2?1:.6);ctx.save();
+    if(e.k==='supply'){const k=Math.max(0,1-age);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.globalAlpha=.8*pulse;ctx.beginPath();ctx.arc(e.x,e.y,22+90*k,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(e.x,0);ctx.lineTo(e.x,e.y-22);ctx.stroke();}
+    else if(e.k==='lane'){const live=age>=1.3&&age<5.3;if(live){ctx.globalAlpha=.95;ctx.fillStyle='#fff';ctx.fillRect(0,e.y-3,W,6);ctx.globalAlpha=.4;ctx.fillStyle='#ff3050';ctx.fillRect(0,e.y-e.h/2,W,e.h);}
+      else if(age<1.3){ctx.globalAlpha=.5*pulse;ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.setLineDash([14,10]);ctx.strokeRect(2,e.y-e.h/2,W-4,e.h);ctx.setLineDash([]);}}
+    else if(e.k==='gaterun'){ctx.globalCompositeOperation='lighter';for(const r of e.rings){if(r.got||r.x<-40||r.x>W+40)continue;ctx.globalAlpha=.9;ctx.strokeStyle='#ffe14d';ctx.lineWidth=4;ctx.beginPath();ctx.arc(r.x,r.y,26,0,7);ctx.stroke();ctx.globalAlpha=.25;ctx.fillStyle='#ffe14d';ctx.beginPath();ctx.arc(r.x,r.y,26,0,7);ctx.fill();}}
+    else if(e.k==='rescue'){const f=e.fl>0;ctx.globalAlpha=1;ctx.fillStyle=f?'#fff':'#0e2a22';ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,22,0,7);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#3dffb0';ctx.fillRect(e.x-15,e.y+30,30*Math.max(0,e.hp)/6,4);ctx.strokeRect(e.x-15,e.y+30,30,4);}
+    else if(e.k==='gust'){const live=age>=1&&age<4.2,s=e.dir;ctx.strokeStyle='#9ad8ff';ctx.lineWidth=2;ctx.globalAlpha=live?.6:.3*pulse;const o=(t*(live?90:0))%40;
+      for(let x=60;x<W;x+=160)for(let j=0;j<3;j++){const y=((s>0?o+j*170:H-o-j*170)+H)%H;ctx.beginPath();ctx.moveTo(x-8,y-s*8);ctx.lineTo(x,y);ctx.lineTo(x+8,y-s*8);ctx.stroke();}}
+    else if(e.k==='blackout'){const w=230,x0=e.x;if(age<1){ctx.globalAlpha=.5*pulse;ctx.strokeStyle='#ffffffcc';ctx.setLineDash([10,8]);ctx.strokeRect(W-w,2,w-4,H-4);ctx.setLineDash([]);}
+      else{ctx.fillStyle='#000';ctx.globalAlpha=.62;ctx.fillRect(x0,0,w,H);ctx.globalAlpha=1;ctx.strokeStyle='#ffffffcc';ctx.lineWidth=1.5;
+        for(const b of G.eb)if(b.x>x0&&b.x<x0+w){ctx.beginPath();ctx.arc(b.x,b.y,b.r+2,0,7);ctx.stroke();}
+        for(const q of G.en)if(q.x>x0&&q.x<x0+w&&q.hp>0){ctx.strokeStyle='#ff7080aa';ctx.beginPath();ctx.arc(q.x,q.y,q.r+3,0,7);ctx.stroke();}}}
+    ctx.restore();}
+});
 NR.on('runStart',()=>FUN.reset());NR.on('runEnd',()=>FUN.reset());
 NR.on('tick',dt=>FUN.tick(dt));NR.on('beat',()=>FUN.beat());
 NR.on('tier',({tier,why})=>{if(why==='drop'||!G.live||tier<2)return;FUN.shardShower(2+tier*2,P.x+260);if(tier>=3){shake(4);G.flash=Math.max(G.flash,.12*FX());}});   // every tier up pays out a few shards
@@ -9160,7 +9597,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
     ctx.restore();PW.chips(t,cx,cy,k);}
   if(window.LEAK)LEAK.draw(ctx,w-pad,ny+12*k,k,true);   // leak.js: the BREACH meter under the hull pips
   HUDX.ship(ctx,P.y,PH_-P.x,k,t,true);
-  {const v=HUDX.vals();setRing($('bDash'),Math.min(1,(v.dash+(v.dash<v.dashMax&&P.dashCd>0?1-clamp(P.dashCd,0,1):0))/v.dashMax),'#19e3ff',v.dashMax>1?v.dash:'');setRing($('bEmp'),P.emp/3,'#ffb020',P.emp>0?P.emp:'');}
+  if(window.ABIL&&ABIL.on)ABIL.rings();else{const v=HUDX.vals();setRing($('bDash'),Math.min(1,(v.dash+(v.dash<v.dashMax&&P.dashCd>0?1-clamp(P.dashCd,0,1):0))/v.dashMax),'#19e3ff',v.dashMax>1?v.dash:'');setRing($('bEmp'),P.emp/3,'#ffb020',P.emp>0?P.emp:'');}
   if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
   if(window.HINT&&HINT.on())HINT.draw(ctx,{W:w,H:h,mode:'port',cpu:Math.max(.2,frame.clientWidth/w),top:(G.boss&&G.boss.x<W?112:92)*k,x0:6,x1:w-6,ship:{x:P.y,y:PH_-P.x},acc:D.a});   // F6: the one hint style
   else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(w/2,h-170*k,17*k,k,w,28*k,44*k);ctx.globalAlpha=1;}
@@ -9206,6 +9643,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   drawPlayer(t);HUDX.drones(t);
   if(running&&!G.dead)FXV.ring(t);
   PW.draw(t);
+  if(window.ABIL)ABIL.draw(t);if(window.CTR)CTR.draw();
   for(const r of G.rings){const k=1-r.l/r.m;ctx.strokeStyle=r.c;ctx.globalAlpha=1-k;ctx.lineWidth=3*(1-k)+1;ctx.beginPath();ctx.arc(r.x,r.y,18+k*52,0,7);ctx.stroke();ctx.globalAlpha=1;}
   ctx.textAlign='center';ctx.font='700 13px "Chakra Petch",sans-serif';for(const f of G.fl){ctx.globalAlpha=Math.min(1,f.l*2);ctx.fillStyle=f.c;wtxt(f.txt,f.x,f.y);}ctx.globalAlpha=1;
   if(PT)SH.ring(ctx,t);
