@@ -67,8 +67,40 @@ function BOT_race(say){const R=BOT_rec(),out={kind:'race',city:CID,ok:false};
  return'📍 BOT RACE · racing…'}
 function chkQuick(R){const bad=[RO.x,RO.y,RO.z,RO.v].some(v=>!isFinite(v));if(bad){R.M.nan++;R.mark('nan');return 1}let g=0;try{g=groundY(RO.x,RO.z)||0}catch(e){}if(RO.y<g-3||RO.y<-60){R.M.fall++;R.mark('fall');return 1}
  R.M.steps++;const t=performance.now(),d=chkQuick.t?t-chkQuick.t:0;chkQuick.t=t;if(d>BOT.longMs&&d<5000){R.M.long++;R.mark('long')}R.M.maxMs=Math.max(R.M.maxMs,d<5000?d:0);return 0}
-function BOT_go(kind,say){return kind==='nav'?BOT_nav(say):BOT_race(say)}
+
+// escape-1 (lane escape-r21h, 2026-10-20): "the car MUST be able to get out of ANY hill hole". bot/escape scans groundY on a grid for the deepest terrain pockets
+// (24 headings, 2-10 m out: the pocket score is the slope of the EASIEST way out, so high = enclosed on every side), puts the car at the N worst per city, holds the gas
+// with the game's own roamStep and asserts it is on a road or on open ground within 6 sim-s. Reports each trap cell and the ladder step that freed it (RO.escLog).
+const BESC={n:12,secs:6,step:60,open:1.5};
+/* pit depth: rise the car must climb over the EASIEST of 24 headings within 60 m (a flat or sloping spot reads ~0, a basin reads its spill height); wall: steepest local slope */
+function BOT_pocket(x,z){const g0=groundY(x,z);let mn=1e9,mx=0;for(let k=0;k<24;k++){const a=k*Math.PI/12,sx=Math.sin(a),sz=Math.cos(a);let m=-1e9;for(const r of[4,8,12,18,26,36,48,60]){const q=groundY(x+sx*r,z+sz*r)-g0;if(q>m)m=q}mn=Math.min(mn,m);mx=Math.max(mx,m)}
+ const[gx,gz]=TR_grad(x,z,2);return{depth:mn,rim:mx,wall:Math.hypot(gx,gz)}}
+function BOT_escScan(n=BESC.n){const out=[],B=[WX0+80,WX1-80,WZS+80,WZN-80],st={cells:0,low:0,road:0,hit:0,max:0,pits:0};
+ for(let x=B[0];x<B[1];x+=BESC.step)for(let z=B[2];z<B[3];z+=BESC.step){let g;try{g=groundY(x,z)}catch(e){continue}st.cells++;if(!(g>-1.5)){st.low++;continue}if(TR8_onRoad(x,z)){st.road++;continue}if(roamHit(x,z,2.4,g)){st.hit++;continue}
+  const P=BOT_pocket(x,z);if(P.depth>st.max)st.max=P.depth;if(P.depth>2){st.pits++;out.push({x,z,d:P.depth,rim:P.rim,w:P.wall,g})}}
+ out.sort((a,b)=>b.d-a.d);const pick=[],far=(o,m)=>pick.every(q=>Math.hypot(q.x-o.x,q.z-o.z)>m);
+ for(const o of out){if(pick.length>=n*2/3)break;if(far(o,150))pick.push(o)}   // the deepest basin floors
+ const wl=out.filter(o=>o.w>.9).sort((a,b)=>b.w-a.w);for(const o of wl){if(pick.length>=n)break;if(far(o,60)){o.wall=1;pick.push(o)}}   // + the steepest hill pockets (> 42° at the car)
+ for(const o of out){if(pick.length>=n)break;if(far(o,150))pick.push(o)}
+ return{found:out.length,pick,st}}
+function BOT_esc(say){const R=BOT_rec(),out={kind:'escape',city:CID,ok:false,rows:[]};
+ try{if(RO.sp)try{sprintEnd()}catch(e){}if(RO.ch)try{chAbort()}catch(e){}
+  const S=BOT_escScan(),thr=CTL.thr;out.found=S.found;out.st=S.st;
+  try{for(const o of S.pick){roamWarp(o.x,o.z,0,true);RO.x=o.x;RO.z=o.z;RO.y=groundAt(o.x,o.z,99);RO.v=0;RO.vy=0;RO.t6s=0;RO.t8a=null;ESC.E.log=null;ESC.E.age=0;ESC.E.as=0;ESC.E.ax=null;ESC.E.done=0;RO.stkT=0;
+   let t=0,ok=false,dm=0,why='',mk=0;const x0=RO.x,z0=RO.z;
+   for(let i=0;i<BESC.secs*30;i++){CTL.thr=1;CTL.brk=0;const bad=R.step();t+=1/30;if(bad){why=bad;break}
+    dm=Math.max(dm,Math.hypot(RO.x-x0,RO.z-z0));if(TR8_onRoad(RO.x,RO.z)){ok=true;why='road';break}
+    if(dm>=15&&BOT_pocket(RO.x,RO.z).depth<BESC.open){ok=true;why='open';break}}
+   out.rows.push({x:o.x,z:o.z,depth:+o.d.toFixed(1),wall:+o.w.toFixed(2),ok,t:+t.toFixed(1),why,step:(ESC.E.log&&ESC.E.log.step)||'drove out',dm:Math.round(dm),end:[Math.round(RO.x),Math.round(RO.z)]})}}
+  finally{CTL.thr=thr;CTL.brk=0}
+  out.ok=out.rows.length>=6&&out.rows.every(r=>r.ok)&&!R.errs.length&&!R.M.nan&&!R.M.fall}
+ catch(e){R.errs.push('BOT '+String(e&&e.stack||e).slice(0,160))}
+ R.done();out.err=R.errs.slice(0,4);(window.__chk.bot=window.__chk.bot||{})[CID+'/escape']=out;
+ const bad=out.rows.filter(r=>!r.ok);
+ return'📍 BOT ESCAPE '+(CID==='fra'?'Frankfurt':'Athens')+' · '+out.rows.filter(r=>r.ok).length+'/'+out.rows.length+' deepest pockets (of '+out.found+' scanned deeper than 2 m) back on a road or open ground within '+BESC.secs+' s · '+out.rows.map(r=>r.x+','+r.z+' d'+r.depth+'m '+(r.ok?r.step+' '+r.t+'s':'TRAPPED at '+r.end)).join(' | ')+(R.errs.length?' · '+R.errs[0]:'')+(out.ok?' ✅':' ❌')}
+function BOT_dbg(x,z){const o=[],thr=CTL.thr;roamWarp(x,z,0,true);RO.x=x;RO.z=z;RO.y=groundAt(x,z,99);RO.v=0;RO.vy=0;ESC.E.log=null;ESC.E.age=0;ESC.E.as=0;ESC.E.ax=null;ESC.E.done=0;try{for(let i=0;i<150;i++){CTL.thr=1;roamStep(1/30);if(i%8==0)o.push((i/30).toFixed(2)+' age '+ESC.E.age.toFixed(2)+' as '+ESC.E.as.toFixed(2)+' h '+(ESC.E.h==null?'-':ESC.E.h.toFixed(2))+' v '+RO.v.toFixed(1)+' hd '+RO.h.toFixed(2)+' pos '+Math.round(RO.x)+','+Math.round(RO.z)+' y '+RO.y.toFixed(1)+' trGrip '+(RO.trGrip||0).toFixed(2)+' log '+JSON.stringify(ESC.E.log))}}finally{CTL.thr=thr}return o}
+function BOT_go(kind,say){return kind==='nav'?BOT_nav(say):kind==='escape'?BOT_esc(say):BOT_race(say)}
 /* checklist rows live here (99c_checklist.js is at its 200 KB cap); called from the checklist next to RV3A_rows */
-function BOT_rows(GO,goSay,CK){CK.push({ver:'bot',id:'nav',area:'drive',text:'bot:2026-10-20 · PLAYTEST BOT, DRIVE: no stuck car, no fall-through, no dead end on the road graph. 📍 GO drives the car along 4 seeded road-graph waypoints with the game\'s own steering keys (stepped sim, no teleport). Auto: every waypoint reached, no stuck > 8 s, ≤ 1 auto-reset per leg, no NaN, no fall, speed > 5 m/s on gas, no JS error, ≤ 2 sim steps over 120 ms and none over 300 ms. Prints the worst map cells; tools/tBot.js writes docs/BOT_REPORT.md.'},{ver:'bot',id:'race',area:'race',text:'bot:2026-10-20 · PLAYTEST BOT, RACE: one race per city starts and finishes. 📍 GO races Frankfurt Westend Split / the Athens Akropolis final with the race bot. Auto: all gates passed, result is not a DNF, ≤ 1 stuck, no NaN / fall / JS error.'});
- for(const[k,c,n,s,kd]of [['bot/nav','fra','bot drive Frankfurt',60,'nav'],['bot/nav','ath','bot drive Athens',60,'nav'],['bot/race','fra','bot race Frankfurt',60,'race'],['bot/race','ath','bot race Athens',60,'race']])(GO[k]=GO[k]||[]).push({c,n,secs:s,fn:()=>BOT_go(kd,t=>goSay(t))})}
-({BOT_go,BOT_rows,BOT_nav,BOT_race,BOT_leg,BOT_rec,BOT_rng,BOT_worst,chkQuick,BOT})
+function BOT_rows(GO,goSay,CK){CK.push({ver:'bot',id:'nav',area:'drive',text:'bot:2026-10-20 · PLAYTEST BOT, DRIVE: no stuck car, no fall-through, no dead end on the road graph. 📍 GO drives the car along 4 seeded road-graph waypoints with the game\'s own steering keys (stepped sim, no teleport). Auto: every waypoint reached, no stuck > 8 s, ≤ 1 auto-reset per leg, no NaN, no fall, speed > 5 m/s on gas, no JS error, ≤ 2 sim steps over 120 ms and none over 300 ms. Prints the worst map cells; tools/tBot.js writes docs/BOT_REPORT.md.'},{ver:'bot',id:'race',area:'race',text:'bot:2026-10-20 · PLAYTEST BOT, RACE: one race per city starts and finishes. 📍 GO races Frankfurt Westend Split / the Athens Akropolis final with the race bot. Auto: all gates passed, result is not a DNF, ≤ 1 stuck, no NaN / fall / JS error.'},{ver:'bot',id:'escape',area:'drive',text:'escape-1 (Alex: the car MUST get out of ANY hill hole): 📍 GO scans the ground on a grid for the 12 deepest pockets (spill height over 24 headings within 60 m, plus the steepest wall cells), drops the car in each with the gas held and asserts it is on a road or open ground within 6 s of sim time, 100%. Lists each trap cell and the ladder step that freed it.'});
+ for(const[k,c,n,s,kd]of [['bot/nav','fra','bot drive Frankfurt',60,'nav'],['bot/nav','ath','bot drive Athens',60,'nav'],['bot/race','fra','bot race Frankfurt',60,'race'],['bot/race','ath','bot race Athens',60,'race'],['bot/escape','fra','bot escape Frankfurt',60,'escape'],['bot/escape','ath','bot escape Athens',60,'escape']])(GO[k]=GO[k]||[]).push({c,n,secs:s,fn:()=>BOT_go(kd,t=>goSay(t))})}
+({BOT_dbg,BOT_go,BOT_esc,BOT_escScan,BOT_pocket,BESC,BOT_rows,BOT_nav,BOT_race,BOT_leg,BOT_rec,BOT_rng,BOT_worst,chkQuick,BOT})

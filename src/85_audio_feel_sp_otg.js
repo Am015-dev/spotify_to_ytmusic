@@ -423,7 +423,7 @@ let TR_bf=0;{const _hg=hubGrid;hubGrid=()=>{if(!TR_bf&&HUB.grp){TR_bf=1;TR_bldFi
 function TR_onSlip(x,z){for(const s of SLIPS){const dx=x-s.x,dz=z-s.z;if(dx>50||dx<-50||dz>50||dz<-50)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<12&&inw>-6&&inw<32)return true}return false}
 function TR_pre(dt){RO.trSlope=null;const T=roamTerr(RO.x,RO.z,RO.y+.3);if(RO.y>T.g+.5||T.deck||T.g<-1.5||TR_onSlip(RO.x,RO.z)){RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);if(!T.deck){const[gx,gz]=TR_grad(RO.x,RO.z,2);TR6_stuck(dt,Math.atan(Math.hypot(gx,gz)))}return}
   const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz),th=Math.atan(s),fx=Math.sin(RO.vh??RO.h),fz=Math.cos(RO.vh??RO.h),a=gx*fx+gz*fz;RO.trSlope={gx,gz,th,a};
-  RO.v-=9.8*.75*a/Math.sqrt(1+a*a)*dt;const grip=clamp((.665-th)/(.665-.5),0,1);RO.trGrip=grip;
+  const ea=ESC.E.as>0;/* escape-1: assist = slope grip held, gravity x0.2 */RO.v-=9.8*.75*(ea?.2:1)*a/Math.sqrt(1+a*a)*dt;const grip=ea?1:clamp((.665-th)/(.665-.5),0,1);RO.trGrip=grip;
   if(grip<1){if(a>0&&RO.v>-2&&CTL&&(CTL.thr||CTL.boost))RO.v-=(1-grip)*58*dt;RO.trSl=Math.min(9,(RO.trSl||0)+(1-grip)*16*dt)}else RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);TR6_stuck(dt,th)}
 // terr-6 (Alex b60 deep bowl): gas held, < 2 m/s, on a terrain slope > 20° for 3 s (a little slack for rocking back and forth) → lift to the nearest road
 function TR6_stuck(dt,th){if(TR8_on()||new URLSearchParams(location.search).get('t6r')==='0')return;const on=CTL&&(CTL.thr||CTL.boost)&&Math.abs(RO.v)<2&&th>.349;
@@ -449,7 +449,7 @@ function TR_tilt(s,dt){const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m)return;let
   const N=RO.trN||(RO.trN=V3(0,1,0)),k=Math.min(1,dt*9);N.x+=(nx-N.x)*k;N.y+=(ny-N.y)*k;N.z+=(nz-N.z)*k;N.normalize();if(N.y>.9999)return;TR_q.setFromUnitVectors(TR_up,N);ud.m.quaternion.premultiply(TR_q)}
 const TR_q=new THREE.Quaternion(),TR_up=V3(0,1,0);
 const TR_live=()=>!!pl&&!RO.wk&&(RO.on||state==='roam');
-{const _rs=roamStep;roamStep=dt=>{const on=TR_live();if(on){TR_pre(dt);TR8_unstick(dt)}_rs(dt);if(on&&TR_live())TR_post(dt)}}
+{const _rs=roamStep;roamStep=dt=>{const on=TR_live();if(on){TR_pre(dt);ESC_unstick(dt)}_rs(dt);if(on&&TR_live())TR_post(dt)}}
 {const _rp=roamPose;roamPose=(s,dt)=>{if(TR_live())TR_snap();_rp(s,dt);if(TR_live())TR_tilt(s,dt)}}
 // chase camera: lifted over the hillside between camera and car (fast up, slow down) so it never clips into the slope
 {const _rc=roamCam;roamCam=dt=>{_rc(dt);if(!TR_live())return;const c=camera.position;let need=0;for(const t of[1,.7,.4]){const x=RO.x+(c.x-RO.x)*t,z=RO.z+(c.z-RO.z)*t,yl=RO.y+2+(c.y-RO.y-2)*t,gq=groundY(x,z)+1.7;need=Math.max(need,(gq-yl)/t)}
