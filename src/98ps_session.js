@@ -18,16 +18,19 @@ function PS_doc(){let nav=null,fetch=0;try{nav=performance.getEntriesByType('nav
   b.sid=PS.sid;b.seq=++PS.seq;b.up=Math.round(performance.now()/1000);
   b.bootMs=pl||null;b.phase=pl?{fetch,eval:Math.max(0,ev-fetch),build:Math.max(0,(bd||ev)-ev),reveal:Math.max(0,pl-(bd||ev))}:null;
   b.long3=PS.tPlay?PS.long3:null;b.roam=PS_stat(PS.st.roam);b.race=PS_stat(PS.st.race);b.gapMs=Math.round(PS.gap);b.gapState=PS.gapState;
-  b.errN=PS.errN;b.err=PS.err.slice();b.prog=b.ri&&b.ri.prog;b.hint=Object.assign({},PS.hint);
+  b.lf=PS.lf.slice();b.pRev=PS.pRev;b.pRoam=PS.pRoam;if(typeof PREW!=='undefined')b.prew={n:PREW.n,prog:PREW.prog,p0:PREW.p0,p1:PREW.p1,ms:PREW.ms};b.errN=PS.errN;b.err=PS.err.slice();b.prog=b.ri&&b.ri.prog;b.hint=Object.assign({},PS.hint);
   const r=PS.st.roam,c=PS.st.race,m=(r.n+c.n)?[r,c].map(s=>PS_q(s.a.slice(0,Math.min(s.k,s.a.length)).sort(),.5)):[0,0];b.hint.cap30=Math.max(m[0],m[1])>=30&&Math.max(m[0],m[1])<=36;
   return b}
 // the send, rate-limited: returns 'sent' | 'wait' | 'cap' | 'nodb'
 async function PS_flush(hiding){if(!PS.on||!PS.dirty)return'idle';if(PS.sent>=PS.maxDocs)return'cap';const now=performance.now();
   if(now-PS.lastW<(hiding?PS.hideGapMs:PS.gapMs)){if(!hiding&&!PS.tm)PS.tm=setTimeout(()=>{PS.tm=0;PS_flush(false)},PS.gapMs-(now-PS.lastW)+50);return'wait'}
   PS.lastW=now;PS.dirty=false;PS.sent++;const d=PS_doc();let r='nodb';try{r=await PB_send(d)}catch(e){}if(r!=='sent'){PS.sent--;PS.dirty=true}return r}
-{const _fr=frame;frame=function(now){const ms=PS.last?now-PS.last:0;PS.last=now;_fr(now);
+// ios-r20m: every frame > 50 ms in the first 5 s after reveal -> doc.lf [[ms since reveal, frame ms, programs before, programs after]] (<= 24), doc.pRev = programs at reveal, doc.pRoam = programs 5 s later, doc.prew = prewarm draw {n reps, prog, p0, p1, ms}
+const PS_pc=()=>{try{return renderer.info.programs.length}catch(e){return -1}};PS.lf=[];PS.pRev=-1;PS.pRoam=-1;
+{const _fr=frame;frame=function(now){const ms=PS.last?now-PS.last:0;PS.last=now;const pb=PS_pc();_fr(now);const pa=PS_pc();
   try{if(ms>0&&PB_play()){const hid=PB.hid;
-    if(!PS.tPlay&&!hid){PS.tPlay=now;PS.dirty=true;PS.nextAt=now+60000}
+    if(!PS.tPlay&&!hid){PS.tPlay=now;PS.dirty=true;PS.nextAt=now+60000;PS.pRev=pb}
+    if(PS.tPlay&&!hid){const dt=now-PS.tPlay;if(dt<=5000){if(ms>50&&PS.lf.length<24)PS.lf.push([Math.round(dt),Math.round(ms),pb,pa])}else if(PS.pRoam<0)PS.pRoam=pa}
     if(!hid&&ms<5000){const s=PS.st[state==='race'||state==='countdown'?'race':state==='roam'?'roam':'']; if(s){s.a[s.k++%s.a.length]=ms;s.n++}
       if(ms>PS.gap){PS.gap=ms;PS.gapState=state}
       if(PS.tPlay&&now-PS.tPlay<=3000&&ms>50)PS.long3++}
