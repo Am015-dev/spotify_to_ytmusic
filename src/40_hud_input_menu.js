@@ -144,9 +144,15 @@ const W13_PD={};function W13_carImg(t,cb){const W=240,H=120,K=2;if(W13_TC[t.id])
  cam.position.set(m.x-R*.55,m.y+R*.36,m.z-R*.76);cam.lookAt(m.x,m.y-s.y*.08,m.z);r.renderAsync(sc,cam,o=>{W13_TC[t.id]=o;const L=W13_PD[t.id]||[];delete W13_PD[t.id];for(const f of L)f(o)});sc.remove(g);
  clearTimeout(W13_TT);W13_TT=setTimeout(()=>{if(W13_TR){P1_free('o'+W*K+'x'+H*K);W13_TR=null}},4000)}
 // PERF1: the card shows at once; its 3D car is drawn into it when the GPU readback arrives (a frame or two later), then cached
+// boot-r20h (default ON, ?lazycards=0 off): the 3D car of a team card is drawn only once its card is on screen (hidden panels cost 7 s at 6x CPU at boot), one car per tick
+const W13_LAZY=!/[?&]lazycards=0/.test(location.search),W13_Q=[];let W13_QT=0;
+function W13_enq(t,c,g){W13_Q.push([t,c,g]);if(!W13_QT)W13_QT=setTimeout(W13_pump,400)}
+function W13_pump(){W13_QT=0;for(let i=W13_Q.length-1;i>=0;i--)if(!W13_Q[i][1].isConnected)W13_Q.splice(i,1);
+  const i=state==='menu'&&!LD.busy&&!$('#menu').classList.contains('home')?W13_Q.findIndex(q=>q[1].offsetParent!==null):-1;if(i>=0){const[t,c,g]=W13_Q.splice(i,1)[0];try{W13_carImg(t,o=>g.drawImage(o,0,0))}catch(e){console.warn('W13 lazy card',e)}}
+  if(W13_Q.length)W13_QT=setTimeout(W13_pump,i>=0?150:600)}
 function teamCard(t){try{const[c,g]=cv(480,240);
   g.save();g.translate(240,178);g.scale(1,.24);const gl=g.createRadialGradient(0,0,0,0,0,200);gl.addColorStop(0,'rgba(20,40,70,.38)');gl.addColorStop(1,'rgba(20,40,70,0)');g.fillStyle=gl;g.beginPath();g.arc(0,0,200,0,7);g.fill();g.restore();c.className='w13car';
-  try{W13_carImg(t,o=>g.drawImage(o,0,0))}catch(e){console.warn('W13 team card',e);g.clearRect(0,0,480,240);g.drawImage(W13_teamCard0(t),0,0,480,240)}return c}catch(e){console.warn('W13 team card',e);return W13_teamCard0(t)}}
+  try{if(W13_LAZY&&!W13_TC[t.id])W13_enq(t,c,g);else W13_carImg(t,o=>g.drawImage(o,0,0))}catch(e){console.warn('W13 team card',e);g.clearRect(0,0,480,240);g.drawImage(W13_teamCard0(t),0,0,480,240)}return c}catch(e){console.warn('W13 team card',e);return W13_teamCard0(t)}}
 function W13_teamCard0(t){const[c,g]=cv(240,120);g.fillStyle='#030c18';g.fillRect(0,0,240,120);g.translate(120,64);
   const gl=g.createRadialGradient(0,20,0,0,20,110);gl.addColorStop(0,t.glow+'66');gl.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=gl;g.fillRect(-120,-64,240,120);
   g.fillStyle=t.a;g.beginPath();g.moveTo(-100,26);g.lineTo(-18,-10);g.lineTo(0,-40);g.lineTo(18,-10);g.lineTo(100,26);g.lineTo(96,34);g.lineTo(-96,34);g.closePath();g.fill();
