@@ -90,7 +90,7 @@ WPX.upd=function(dt){const ids=WP.eqIds(),k=WP.fk();
     for(const o of G.eb){if(b.eat<=0)break;if(!o.dead&&Math.hypot(o.x-b.x,o.y-b.y)<b.rad+8){o.dead=1;b.eat--;burst(o.x,o.y,WPD.wave.c,2,100,.2);}}}}
   for(const b of G.pb)if(b.sh&&!b.dead&&b.x>b.bx+300)WPX.shell(b.x,b.y,b.sl||1,b);
   if(ids.includes('well')){const L=WP.lvOf('well');for(let i=WS.orb.length-1;i>=0;i--){const o=WS.orb[i];o.t+=dt;o.x+=o.vx*dt;o.vx=Math.max(60,o.vx-120*dt);o.tk-=dt;
-      for(const e of G.en){if(!WP.tgt(e)||e.type==='boss')continue;const dx=o.x-e.x,dy=o.y-e.y,d=Math.hypot(dx,dy);if(d<o.R&&d>4){const pull=Math.min(d,(1-d/o.R)*240*dt);e.x+=dx/d*pull;e.y+=dy/d*pull;}}
+      for(const e of G.en){if(!WP.tgt(e)||e.type==='boss')continue;const dx=o.x-e.x,dy=o.y-e.y,d=Math.hypot(dx,dy);if(d<o.R&&d>4){const pull=Math.min(d,(1-d/o.R)*(window.CHO?CHO.wellPull:240)*dt);e.x+=dx/d*pull;e.y+=dy/d*pull;}}
       if(o.tk<=0){o.tk=.3;for(const e of G.en)if(WP.tgt(e)&&Math.hypot(e.x-o.x,e.y-o.y)<o.R*.6+e.r)WP.hurtE(e,(.4)*tpDmg()*k,'well');}
       if(o.t>=o.life||o.x>W-20){WS.orb.splice(i,1);const dm=3.4*tpDmg()*k;for(const e of G.en)if(WP.tgt(e)&&Math.hypot(e.x-o.x,e.y-o.y)<o.R*.8+e.r)WP.hurtE(e,dm);
         G.rings.push({x:o.x,y:o.y,l:.4,m:.4,c:WPD.well.c});burst(o.x,o.y,WPD.well.c,10,240,.4);AU.sfx('hit');}}}
@@ -156,7 +156,7 @@ Object.assign(WPX.demo,{
    el.innerHTML=`<canvas width="108" height="52" data-w="${id}"></canvas><div class="tx"><div class="n"><span class="nm">${d.n}</span><small>${own?'LV '+cur+'/'+WP_MAX:'LOCKED'}</small></div><div class="t">${d.tx}</div><div class="pb">${Array.from({length:WP_MAX},(_,i)=>`<i class="${i<cur?'on':''}"></i>`).join('')}</div><div class="t2">${pw}${max?'':abT}</div></div><div class="pr">${max?'MAX':(own?'BUY LV'+(cur+1):'UNLOCK')+'<br>'+neonI+' '+price}</div>`;
    el.addEventListener('click',()=>{const r=WP.buy(id);if(!r.ok){if(r.why==='money'){el.classList.remove('shake');void el.offsetWidth;el.classList.add('shake');gaMsg('Need '+r.need+' more Neon');}else if(r.why==='max')gaMsg(d.n+' is at max level');return;}
      gaMsg(r.lv===1?d.n+' unlocked':d.s+' is now LV '+r.lv);try{AU.sfx('up')}catch(e){}gaDraw();});
-   box.appendChild(el);const c=el.querySelector('canvas').getContext('2d'),n='wp-'+id;if(ART.have(n)){c.drawImage(ART.bm[n],28,0,52,52);}else if(WPX.demoFn)WPX.demoFn(id,c,.7,d.c);}};
+   box.appendChild(el);const c=el.querySelector('canvas').getContext('2d'),n='wp-'+id;if(ART.have(n)&&ART.isReal(n)){c.drawImage(ART.bm[n],28,0,52,52);}else if(WPX.demoFn)WPX.demoFn(id,c,.7,d.c);}};
  gaDraw();}
 // painted weapon icons and fusion pictures: only the files that are real art (media/ready.json) are loaded
 try{fetch(ART.base+'ready.json').then(r=>r.ok?r.json():[]).then(l=>{for(const n of l)if(/^(wp-|fx-fuse)/.test(n))ART.load(n.replace(/\.webp$/,''));}).catch(()=>{});}catch(e){}

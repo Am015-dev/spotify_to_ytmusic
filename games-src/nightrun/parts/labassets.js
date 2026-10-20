@@ -46,7 +46,7 @@ const LA_FD='fo'+'ot';   // built from pieces so this file never contains the fo
 /* ----- which section an asset belongs to ----- */
 function laSecOf(group,base,dir){const g=(group||'').toLowerCase();
   if(dir===LA_FD)return'onfoot';
-  if(/chest|portrait|parallax|medal|difficulty|soon/.test(g))return'ui';
+  if(/chest|portrait|parallax|medal|difficulty|soon|mechanic|forge|boss gates|ability buttons/.test(g))return'ui';
   if(/ship/.test(g))return'ships';if(/weapon/.test(g))return'weapons';if(/mini-boss|boss/.test(g))return'bosses';if(/enem/.test(g))return'enemies';if(/effect/.test(g))return'effects';
   if(/on-foot/.test(g))return'onfoot';if(/kit|flavour|pickup|power/.test(g))return'pickups';if(/cast|character/.test(g))return'chars';if(/achiev/.test(g))return'ach';
   if(/^(spr-)?ship-/.test(base))return'ships';if(/^(wpmount|wp)-|^fx-fuse/.test(base))return'weapons';if(/^(spr-en|en)-/.test(base))return'enemies';if(/^(boss|spr-boss|anim-boss)-/.test(base))return'bosses';

@@ -41,8 +41,8 @@ BMV.idOf=e=>{if(e.mini)return BM_MINI[G.di]||null;return BM_DIST[e.k]||null;};
 BMV.norm=x=>Array.isArray(x)?{v:x[0],p:x[1]||{}}:{v:x,p:{}};
 /* lazily on the boss's first beat (armour.js and fair.js have set the hull and the phase lists by then) */
 BMV.init=e=>{e.bm=null;if(!BMV.on)return;const id=BMV.idOf(e),T=id&&BMT[id];if(!T)return;
-  const L=T.ph.map(l=>l.map(BMV.norm));e.bm={id,T,P:{}};for(const l of L)for(const o of l)e.bm.P[o.v]=o.p;e.lists=L.map(l=>l.map(o=>o.v));
-  const s=BMV.stat();s.boss=id;};
+  const L=T.ph.map(l=>l.map(BMV.norm));e.bm={id,T,P:{}};for(const l of L)for(const o of l)e.bm.P[o.v]=o.p;e.lists=L.map(l=>l.map(o=>o.v));if(window.DENS)DENS.trimBoss(e);
+  const s=BMV.stat();s.boss=id;if(window.BPL)BPL.init(e);};   // bossplay.js: the encounter mechanics, the seeded order
 /* ---- shared helpers ---- */
 BMV.tel=()=>{const sb=BT.spb||.5;return Math.max(Math.ceil(.55/sb-1e-6),HARDS.includes(SET.diff)?1:2);};   // telegraph beats: >= 0.55 s at any tempo, 2 beats on Easy / Normal
 const BMX=e=>{const ph=e.ph||1,d=diff(),dk=BMV.DK[SET.diff]||1,pk=[1,1.08,1.18][ph-1];
@@ -83,7 +83,7 @@ BMV.cost=(x,y)=>{if(!BMV.on||!G.boss)return 0;let c=0;for(const z of BMV.hz){if(
     if(z.vx)for(const k of[.3,.6]){const x0=z.x;z.x+=z.vx*k;let d2=1e9;for(const p of BMV.prims(z))d2=Math.min(d2,BMV.sd(p,x,y));z.x=x0;if(d2<30)c+=(30-d2)*40;}}   // a moving wall or wave: where it will be
   const g=BMV.goal();if(g)c+=Math.hypot(g.x-x,g.y-y)*.8;return c;};
 BMV.goal=()=>{const e=G.boss;if(!e||!e.bmG)return null;return e.bmG.goal?e.bmG.goal():null;};
-BMV.target=()=>{const e=G.boss;if(!e||!e.bmG||!e.bmG.tg)return null;const t=e.bmG.tg.find(x=>!x.dead&&x.hp>0&&G.en.includes(x));return t||null;};
+BMV.target=()=>{const e=G.boss,t=e&&e.bmG&&e.bmG.tg?e.bmG.tg.find(x=>!x.dead&&x.hp>0&&G.en.includes(x)):null;return t||(window.BPL&&BPL.on?BPL.target():null);};   // bossplay.js: a gate's node / medic / flank row
 /* ---- counters: the boss is shielded (no HP loss) until the ship does the thing, or the slot ends ---- */
 BMV.guard=(e,v,hint,o)=>{if(e.bmG)return;e.bmG=Object.assign({v,hp:e.hp,b0:e.bt,end:e.bt+8-(e.pc|0),t0:G.t,tg:[],p:0},o||{});floater(e.x,e.y-e.r-30,hint,'#19e3ff');AU.sfx('warn');BMV.stat().counter++;};
 BMV.unguard=(e,won)=>{const g=e.bmG;if(!g)return;e.bmG=null;BMV.stat().guardT+=G.t-g.t0;for(const t of g.tg)if(!t.dead){t.dead=1;burst(t.x,t.y,'#19e3ff',10,200,.4);}

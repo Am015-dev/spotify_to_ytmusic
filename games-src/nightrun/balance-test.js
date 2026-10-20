@@ -6,6 +6,7 @@
 // Prints pass/fail lines against the targets in BALANCE.md (late build).
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
+// bpauto: this bot never plays a boss gate; ?bpauto=1 resolves each 1.5 s after it rises (bossplay.js)
 const RUNS = +process.env.RUNS || 3, PAR = +process.env.PAR || 4, MAXT = +process.env.MAXT || 600;   // 600: a Legend final boss lasts 170-260 s (boss fights round 4)
 const STAGES = (process.env.STAGES || '1,8,20,30,42').split(',').map(Number);
 const DFS = (process.env.DIFFS || 'easy,normal,hard').split(','), BUILDS = (process.env.BUILDS || 'fresh,mid,late').split(',');
@@ -38,13 +39,13 @@ const BOT = (opts) => {
     if (opts.camp) return camp();
     const G = m.G, P = m.P; let ty = 270 + 140 * Math.sin(G.t * .9), tx = 220 + 70 * Math.sin(G.t * .55), bd = 1e9;
     for (const e of G.en) { if (e.type === 'boss') { if (e.x < 960) ty = e.cores && e.cores.length ? e.cores[0].y : e.y; continue; } /* a shielded boss (fair.js): shoot its cores */ const dx = e.x - P.x; if (dx > 0 && dx < bd && e.x < 940) { bd = dx; ty = e.type === 'gate' ? e.gy : e.y; } }
-    const BM = window.BMV && window.BMV.on && G.boss ? window.BMV : null, bt = BM && BM.target(); if (bt) ty = bt.y;   // boss movesets (bossmoves.js): aim at a counter target
+    const BM = window.BMV && window.BMV.on && G.boss ? window.BMV : null, bt = BM && BM.target(); if (bt) ty = bt.y; const hzOn = BM && BM.hz.some(z => !z.mk && z.on - G.t < .9 && G.t < z.off), pull = bt && hzOn ? .08 : .6;   // a gate target (BPL) is chased only between boss telegraphs, like a player who sees them   // boss movesets (bossmoves.js): aim at a counter target
     let bc = 1e18, bx = P.x, by = P.y;
     for (let ix = -5; ix <= 5; ix++) for (let iy = -5; iy <= 5; iy++) {
       const cx = P.x + ix * 24, cy = P.y + iy * 24; if (cx < 30 || cx > 900 || cy < 40 || cy > 480) continue; let c = 0;
       for (const b of G.eb) { const px = b.x + b.vx * .14, py = b.y + b.vy * .14, d = Math.hypot(px - cx, py - cy); if (d < 70) c += (70 - d) * (70 - d) * (d < 26 ? 30 : 1); }
       for (const e of G.en) { if (e.type === 'gate') { if (Math.abs(e.x - cx) < 60 && (cy < e.gy - e.gap / 2 + 12 || cy > e.gy + e.gap / 2 - 12)) c += 3000; continue; } const d = Math.hypot(e.x - cx, e.y - cy), r = e.r + 55; if (d < r) c += (r - d) * (r - d) * 3; }
-      if (BM) c += BM.cost(cx, cy);   /* the telegraphed boss hazards, as a player sees them */ c += Math.abs(cy - ty) * .6 + Math.abs(cx - tx) * .15 + Math.hypot(ix, iy) * 4; if (c < bc) { bc = c; bx = cx; by = cy; }
+      if (BM) c += BM.cost(cx, cy); if (window.MM && MM.col) c += MM.cost(cx);   /* the column strike (fair.js, must move) */   /* the telegraphed boss hazards, as a player sees them */ c += Math.abs(cy - ty) * pull + Math.abs(cx - tx) * .15 + Math.hypot(ix, iy) * 4; if (c < bc) { bc = c; bx = cx; by = cy; }
     }
     const near = G.eb.some(b => Math.hypot(b.x + b.vx * .08 - P.x, b.y + b.vy * .08 - P.y) < 30);
     return { bx, by, dash: near && P.dashCd <= 0 && rnd() < .5, emp: P.emp > 0 && (G.eb.length > 45 || (P.hp <= 1 && near)) };
@@ -92,7 +93,7 @@ const BOT = (opts) => {
   const res = []; let next = 0, errs = 0;
   await Promise.all(Array.from({ length: PAR }, async () => {
     const p = await browser.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { errs++; if (errs < 4) console.log('PAGE ERROR', e.message); });
-    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ""}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
+    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&bpauto=1${process.env.Q || ""}`); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { });
     if (process.env.PRE) await p.evaluate(process.env.PRE);   // e.g. PRE='window.SC.k=0' to bisect a tuning change
     while (next < jobs.length) { const j = jobs[next++]; try { res.push(await p.evaluate(BOT, j)); } catch (e) { console.log('RUN ERROR', j.n, j.build, e.message.slice(0, 200)); } }
     await p.close();
@@ -110,7 +111,7 @@ const BOT = (opts) => {
       if (e.ty === 'boss' || e.ty === 'miniboss') { if (e.killed) (e.ty === 'boss' ? R.boss : R.mini).push({ n: r.n, s: e.on }); continue; }
       if (!e.killed) continue; R.kills++; if (e.unseen) R.unseen++;
       const t = e.ty + (e.el ? '*' : ''); (R.ty[t] = R.ty[t] || []).push(e.on);
-      if (e.ty !== 'swarm' && e.ty !== 'mine' && e.ty !== 'gate' && e.ty !== 'charger') { R.ns++; if (e.fired) R.nf++; }
+      if (e.ty !== 'swarm' && e.ty !== 'mine' && e.ty !== 'gate' && e.ty !== 'charger') { R.ns++; if (e.fired) R.nf++; if (process.env.DBGF) { const q = (R.dbg = R.dbg || {}); q[e.ty] = q[e.ty] || [0, 0]; q[e.ty][0]++; if (e.fired) q[e.ty][1]++; } }
     }
   }
   const T = { drone: 1.2, turret: 1.2, flank: 1.2, charger: 1.3, gunship: 2.5 };   // chargers are rushers: about 1.3 s glide + aim + dash (BALANCE.md)
@@ -126,6 +127,7 @@ const BOT = (opts) => {
     const minK = diff === 'easy' ? .75 : 1;
     if (build === 'late' && diff !== 'hard') {
       for (const t in T) { const a = R.ty[t]; if (a && a.length >= 3) line(med(a) >= T[t] * minK * (diff === 'easy' ? .9 / 1.2 / .75 * (t === 'gunship' ? 1.2 / 2.5 : 1) : 1), `${k} ${t} median on screen ${med(a).toFixed(2)} s >= ${(T[t] * minK * (diff === 'easy' ? .9 / 1.2 / .75 * (t === 'gunship' ? 1.2 / 2.5 : 1) : 1)).toFixed(2)}`); }
+      if (process.env.DBGF) console.log(k, JSON.stringify(R.dbg));
       line(R.nf / Math.max(1, R.ns) >= .7, `${k} ${(100 * R.nf / Math.max(1, R.ns)).toFixed(0)}% of shooters fired at least once (>= 70%)`);
       for (const b of R.mini) line(b.s >= 25, `${k} mini-boss stage ${b.n} fight ${b.s.toFixed(0)} s >= 25`);
       for (const b of R.boss) line(b.s >= (b.n === 42 || b.n === 40 ? 60 : 45), `${k} boss stage ${b.n} fight ${b.s.toFixed(0)} s >= ${b.n === 42 || b.n === 40 ? 60 : 45}`);

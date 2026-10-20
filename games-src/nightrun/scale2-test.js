@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // Scale round 2 gate (BALANCE.md "Power scale, round 2"; code parts/fair.js, flag RET.scale2, ?scale2=0 = round 1). Prints PASS/FAIL lines.
+// bossplay.js: the pages run with ?bpauto=1 (each boss gate is resolved 1.5 s after it rises, like a player who plays the mechanic); the length bands are for that player.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/scale2-test.js      env: RUNS=3
 // 1 flag off: no boss shield cores, no wall bullets, the old homing (S2 off)
 // 2 pattern gap: every wall gap the hardest tier fires is >= S2.GAP (ship + margin) and no wall bullet sits inside it
@@ -20,13 +21,13 @@ const WALLS = ({ n, diff, secs }) => {   // fly a stage in god mode, collect the
   m.abort(); return { gaps, walls: S2 ? S2.walls.length : 0, on: !!(S2 && S2.on), GAP: S2 ? S2.GAP : 0, cores };
 };
 const bal = (env) => { const js = path.join(os.tmpdir(), 's2-' + process.pid + '-' + Math.random().toString(36).slice(2) + '.json');
-  cp.spawnSync('node', [path.join(__dirname, 'balance-test.js')], { env: Object.assign({}, process.env, { RUNS, PAR: '4', JSON: js, GAME_DIR }, env), stdio: 'ignore' });
+  cp.spawnSync('node', [path.join(__dirname, 'balance-test.js')], { env: Object.assign({}, process.env, { RUNS, PAR: '4', JSON: js, GAME_DIR, Q: '&bpauto=1' + (process.env.Q || '') }, env), stdio: 'ignore' });
   let r = []; try { r = JSON.parse(fs.readFileSync(js, 'utf8')); fs.unlinkSync(js); } catch (e) { } return r; };
 const rate = a => a.length ? a.filter(x => x.clear).length / a.length : NaN;
 (async () => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await new Promise(r => setTimeout(r, 800));
-  const br = await PW.chromium.launch(); const page = async q => { const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { fails++; console.log('FAIL page error ' + e.message); }); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1${q}`); await p.waitForFunction(() => window.__mnr && window.S2 && window.__mnr.TR.list.length > 0, null, { timeout: 10000 }); return p; };
+  const br = await PW.chromium.launch(); const page = async q => { const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { fails++; console.log('FAIL page error ' + e.message); }); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1&nomusic=1&bpauto=1${q}`); await p.waitForFunction(() => window.__mnr && window.S2 && window.__mnr.TR.list.length > 0, null, { timeout: 10000 }); return p; };
   const off = await page('&scale2=0'), o = await off.evaluate(WALLS, { n: 40, diff: 'legend', secs: 150 }); await off.close();
   line(!o.on && o.gaps.length === 0 && o.cores === 0, `flag off (?scale2=0): S2 off, ${o.gaps.length} walls, boss cores seen ${o.cores} frames (round 1: none)`);
   const on = await page(''), w = await on.evaluate(WALLS, { n: 30, diff: 'legend', secs: 100 }); await on.close();
