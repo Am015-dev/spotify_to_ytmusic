@@ -21,11 +21,11 @@ const UNIT = () => {
   const s0 = JSON.parse(JSON.stringify(T.stat)); dash();
   ok('beat dash near bullets = parry, charge back, i-frames .5 s', T.stat.parry === s0.parry + 1 && S.n === 2 && P.inv > .4 && m.G.pb.some(b => b.tm), `parry ${T.stat.parry - s0.parry} n ${S.n} inv ${P.inv.toFixed(2)} refl ${T.stat.refl - s0.refl}`);
   for (let i = 0; i < 40; i++) m.step(1 / 60); clr(); to(true); S.n = 3; S.r = 0; dash(); ok('beat dash into empty air costs one charge', S.n === 2, 'n ' + S.n);
-  for (let i = 0; i < 40; i++) m.step(1 / 60); clr(); to(false); S.n = 3; S.r = 0; dash(); const pen = G.tm.pen; ok('off-beat dash costs 2 and locks the dash', S.n === 1 && pen > .3, `n ${S.n} lock ${pen.toFixed(2)}`);
+  for (let i = 0; i < 40; i++) m.step(1 / 60); clr(); to(false); S.n = 3; S.r = 0; dash(); const pen = G.tm.pen; ok('off-beat panic dash (no bullet near) empties the charges and locks the dash 2 s', S.n === 0 && pen > 1.5, `n ${S.n} lock ${pen.toFixed(2)}`);
   S.n = 3; dash(); ok('no dash during the lock', S.n === 3);
-  for (let i = 0; i < 40; i++) m.step(1 / 60); const b0 = T.stat.brk; S.n = 4; to(false); dash(); for (let i = 0; i < 40; i++) m.step(1 / 60); to(false); S.n = 4; dash(); ok('late twice in a row breaks the chain', T.stat.brk === b0 + 1, 'brk ' + (T.stat.brk - b0));
+  for (let i = 0; i < 40; i++) m.step(1 / 60); const b0 = T.stat.brk; S.n = 4; to(false); dash(); for (let i = 0; i < 100; i++) m.step(1 / 60); to(false); S.n = 4; dash(); ok('late twice in a row breaks the chain', T.stat.brk === b0 + 1, 'brk ' + (T.stat.brk - b0));
   // seeker: a marked shot due within .45 s is caught by a beat dash, flies back for 40
-  for (let i = 0; i < 40; i++) m.step(1 / 60); clr(); to(true); S.n = 3; G.en.push({ type: 'drone', x: 760, y: P.y, r: 14, hp: 999, max: 999, flash: 0, t: 0, bf: 99, gr: 0, score: 0, vx: 0, vy: 0 }); m.eb(P.x + 90, P.y, Math.PI, 300, '#f00', 7); G.eb[G.eb.length - 1].cxM = 1; const mk0 = T.stat.mark, ne0 = G.eb.length, cx0 = G.eb.some(b => b.cxM), pr0 = T.stat.parry, pf0 = T.stat.pf; dash();
+  for (let i = 0; i < 100; i++) m.step(1 / 60); clr(); G.tm.pen = 0; P.dashT = 0; S.r = 0; to(true); S.n = 3; G.en.push({ type: 'drone', x: 760, y: P.y, r: 14, hp: 999, max: 999, flash: 0, t: 0, bf: 99, gr: 0, score: 0, vx: 0, vy: 0 }); m.eb(P.x + 90, P.y, Math.PI, 300, '#f00', 7); G.eb[G.eb.length - 1].cxM = 1; const mk0 = T.stat.mark, ne0 = G.eb.length, cx0 = G.eb.some(b => b.cxM), pr0 = T.stat.parry, pf0 = T.stat.pf; dash();
   ok('beat dash catches a marked seeker shot (40 dmg back)', T.stat.mark === mk0 + 1 && m.G.pb.some(b => b.tm && b.dm === 40), `mark ${T.stat.mark - mk0} pb40 ${m.G.pb.filter(b => b.tm).map(b => b.dm).join(',')} eb ${ne0} marked ${cx0} pf ${T.stat.pf - pf0} parry ${T.stat.parry - pr0} pen ${G.tm.pen.toFixed(2)} n ${S.n} dashT ${P.dashT.toFixed(2)}`);
   // EMP tiers
   const emp = (n, nb) => { clr(); for (let k = 0; k < nb; k++) m.eb(500 + k * 8, 100 + k * 30, Math.PI, 40, '#fff', 5); P.emp = n; A.st().m = 0; const st = JSON.parse(JSON.stringify(T.stat)); m.press('Emp'); m.step(1 / 60); return { left: P.emp, w: T.stat.waste - st.waste, t: [1, 2, 3].map(i => T.stat['e' + i] - st['e' + i]), bub: !!(A.st().bub) }; };
@@ -77,7 +77,7 @@ const BOT = ({ n, mode, diff, mid, MAXT, k }) => {
       const hot = C && (C.walls.some(w => w.cur && w.warn <= 0 && w.x < 900) || G.en.some(e => e.ctw && e.wsh && e.x < 900));
       emp = P.emp > 0 && (hot || (P.emp >= 3 && G.eb.length >= 14) || (P.emp >= 2 && G.eb.length >= 22) || (P.hp <= 2 && G.eb.length >= 8));
     }
-    if (mode === 'rand') { dsh = rnd() < .03; emp = P.emp > 0 && rnd() < .004; }
+    if (mode === 'rand' || mode === 'randd' || mode === 'rande') { dsh = mode !== 'rande' && rnd() < .03; emp = mode !== 'randd' && P.emp > 0 && rnd() < .004; }
     if (dsh && (mode !== 'beat' || ready())) { m.press('Dash'); nd++; }
     if (emp) { m.press('Emp'); ne++; }
     const bn = Math.floor(m.bpos()); if (bn !== lastBeat) { lastBeat = bn; m.press('Fire'); }
@@ -95,7 +95,7 @@ const BOT = ({ n, mode, diff, mid, MAXT, k }) => {
   const u = await mk(); for (const l of await u.evaluate(UNIT)) { console.log(l); if (l.startsWith('FAIL')) fails++; } await u.close();
   const off = await mk('&timing=0'); const o = await off.evaluate(OFF); chk('?timing=0: flag off, EMP spends one charge (' + JSON.stringify(o) + ')', !o.on && o.emp === 2); await off.close();
   const jobs = []; if (process.env.UNIT_ONLY) { await br.close(); srv.kill(); process.exit(fails ? 1 : 0); }
-  for (const mode of ['reflex', 'beat', 'rand', 'nodash', 'park']) for (const n of STAGES) for (let k = 0; k < (mode === 'park' ? 1 : RUNS); k++) jobs.push({ n: n + 0, mode, diff: 'normal', MAXT, k });
+  for (const mode of (process.env.MODES || 'reflex,beat,rand,nodash,park').split(',')) for (const n of STAGES) for (let k = 0; k < (mode === 'park' ? 1 : RUNS); k++) jobs.push({ n: n + 0, mode, diff: 'normal', MAXT, k });
   if (process.env.HARD !== '0') for (const mode of ['reflex', 'beat', 'rand', 'nodash']) for (let k = 0; k < RUNS; k++) jobs.push({ n: +(process.env.HARD_ST || 5), mode, diff: 'hard', mid: 1, MAXT, k });
   const res = []; let next = 0;
   await Promise.all(Array.from({ length: PAR }, async () => { const p = await mk(); while (next < jobs.length) { const j = jobs[next++]; try { const r = await p.evaluate(BOT, j); r.key = (j.diff === 'hard' ? 'H-' : '') + j.mode; res.push(r); if (process.env.REPORT) console.log('RUN', j.mode, j.diff, j.n, j.k, r.clear ? 'clear' : 'fail', 'hits', r.hits); } catch (e) { console.log('RUN ERROR', JSON.stringify(j), e.message.slice(0, 120)); } await p.reload(); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); } await p.close(); }));
