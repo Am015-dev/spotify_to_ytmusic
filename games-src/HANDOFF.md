@@ -1,5 +1,10 @@
 # Handoff: start a new session from this file
 
+## Nightrun HUMAN BOT + visibility floors x1.3 (W32, flag RET.grit, ?grit=0 = old, 20 Oct 2026)
+- `nightrun/humanbot.js`: human-model bot (view 180-200 ms old, bullets only within 260 px ahead, 10% missed dodges per threat episode, steering noise, dash on 40% of threats, EMP at 4+ bullets within 150 px, manual aim with error, 1 s lapse about every 30 s) next to the oracle dodger; builds fresh / mid / late / owner (PULSE 3 + SWARM 10); prints clear %, hits, median on-screen life per kind (REPORT lines always). env: BOTS BUILDS STAGES RUNS PRE='GRIT.fk0=1.2' HP='{"miss":.15}' Q='&grit=0'.
+- Calibration: human clears Normal stage 3 at 96 / 75-88 / 92-100% (fresh / mid / late). Delay below 150 ms or no miss rolls makes it 100%; every ablation moves it 10-20 points (n=12-24 noise +-15).
+- Change: GRIT.fk0 1.0 -> 1.3 to stage 10, tapering to 1.1 at stage 20 (grit.js fk()). Median kill life 2.4 -> 3.0 s (S03 >= 3 met); a flat x1.3 cost the stage-20 oracle dodger 20-30 points, so the taper. Hull slope (GRIT.hk0/hkS) NOT raised.
+- Finding: both bots clear Normal stage 20 only 6-60% already and the human bot 6-31% (target 55-75%): the bots are WORSE than the owner, so bot clear rates cannot show 'too easy'. Stage 8 is the boss stage; the bots do not play boss moves, so 8 is not a usable number. Next: owner-driven feel test before any hull-slope step.
 ## Nightrun anti-camp (W29, flag RET.anticamp, default ON, ?anticamp=0 = old, 20 Oct 2026)
 - `parts/anticamp.js` (after rules.js): camp level from 6 s of x samples (left 25% share x low spread); above .5: 0.8 s flanker tells then streams from behind/above or a left-edge ground-fire wall (120 px gap); pickups wait at 45% of the field; score/EMP gain and long-reach damage scale down; forward repair every 10 close-range kills (max 1 per 25 s, not Very hard/Legend).
 - Strike on Easy/Normal (wraps MM.win, sets MM.col.dmg/t): 6 s still unless camping, tell >= 1.2 s on the beat, first of a stage 0 hull, then 1, none while collecting or (not camping) shooting a lined-up target. Hard tiers unchanged.

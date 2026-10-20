@@ -287,3 +287,10 @@ Result (industry-audit, before -> after): S04 4.99 -> 11.15 (target 12, near), S
 - Strike on Easy/Normal: 6 s still (was 3.5-5) unless camping, tell >= 1.2 s on the beat, first of a stage 0 hull, later 1 (never 2), none while collecting or, when not camping, shooting a lined-up target (fired < .6 s ago). Hard tiers keep strike2.
 - anticamp-test (Normal st 3/10/20 x6, Hard max st 2/4 x6), before (?anticamp=0) -> after: dodge 67 -> 72%, camp 83 -> 22%, bold 33 -> 61%, no-oracle dodger 42 -> 67%; Hard max st 2/4 after: dodge 100 / camp 25 (st 5/12: both 0% before and after). Noise about +-11 at 18 runs (repeat runs: camp 11-22%, dodge 61-83%).
 - repeat-audit arcade-normal stages 1-20 (S23 no-oracle first try): 0.55 (review 4: 0.20 over 45 stages). mustmove 3/10/20: park/hop/track 0% (track was 30% before campers lost the aiming exemption).
+
+## Human bot and floors x1.3 (W32, 20 Oct 2026)
+`humanbot.js`, Normal, n=16 per cell, builds mid / owner (PULSE 3 + SWARM 10), before (floors x1) -> after (x1.3, taper to x1.1 at stage 20):
+- median on-screen life of all kills: 2.43 s -> 3.02 s (S03 >= 3 s). drone 2.0 -> 2.5, charger 2.4 -> 2.6, flank 2.5 -> 3.1, mine 1.9 -> 2.4, swarm 1.7 -> 1.9, turret 3.5-7 -> 6-8, elite drone 4.3 -> 4.7.
+- human bot clear st3: mid 81 -> 88, owner 94 -> 75 (noise +-15); st20: mid 6 -> 13, owner 19 -> 25. Hits per stage 6-9 -> 6-7.
+- oracle dodger clear st3: 100 -> 94-100; st20: mid 25 -> 31, owner 63 -> 31 (earlier n=12 runs of the same build: 33-58 / 42-75; noise +-20).
+- Not reached: human Normal st3-8 70-85% and st20 55-75% (already below it before the change); TTK 3-5 s normal class holds only for drone/charger/flank/turret.
