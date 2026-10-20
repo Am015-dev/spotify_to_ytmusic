@@ -217,7 +217,7 @@ function LV_walk(n){const w=TUNE.life<=0||TUNE.lvPed<=0?70:Math.round(70*LV_d('l
 // ---------- 8 · parked cars: traffic cars (same mesh + collider) parked half on the kerb 30-110 m ahead; smashing one sends it back into traffic
 function LV_parkStep(){const C=HUB.cars;if(!C||!C.length)return;const want=Math.round(5*Math.min(2,LV_d('lvPark'))),N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);let n=0;
   for(const c of C){if(!c.pk)continue;if(c.dead>0){c.pk=0;c.v=c.pv||16;continue}const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);
-    if(n>=want||d>200||dx*fx+dz*fz<-d*.3&&d>40&&!LV_seen(c.x,c.y||0,c.z)){c.pk=0;c.v=c.pv||16;c.lane=.36;c.cv=0;continue}n++}
+    if(n>=want||d>200||dx*fx+dz*fz<-d*.3&&d>40&&!LV_seen(c.x,c.y||0,c.z)){if(HT_POP.on&&!HT_canPop(c.x,c.z,c.y)){n++;continue}/* traffic-law-r21s: a parked car turns back into traffic only out of sight (n >= want unparked it in view: a 3 m snap from the kerb onto the lane, Athens 7451>7450) */c.pk=0;c.v=c.pv||16;c.lane=.36;c.cv=0;continue}n++}
   if(n>=want)return;if(LV.parkJ>0){LV.parkJ--;for(let r=n;r<want;r++)LV_park1(C,true);return}if(LV.fr%15)return;LV_park1(C,LV.fr<30)}
 function LV_park1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);
   // take a car the player cannot see (behind or > 200 m), park it on a street ahead, never on top of a cluster
