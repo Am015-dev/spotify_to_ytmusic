@@ -41,7 +41,7 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
       if(m==='decoy'){S.dec={x:P.x,y:P.y,t:1.2};this.stat.decoy++;}
       if(m)floater(P.x,P.y-30,{burn:'BURN',ram:'RAM',phase:'PHASE',decoy:'DECOY',mag:'MAGNET'}[m],'#19e3ff');}
     P.dashCd=S.n>=1?0:(1-S.r)*this.refill();},   // the old field still tells bots and the HUD when the next dash is ready
-  gain(v){if(!this.on||!G||G.dead)return;if(window.TIM&&TIM.blocked())return;const S=this.st();if(P.emp>=3){S.m=1;return;}S.m+=v*(this.FILL[SET.diff]||1);this.stat.fill+=v;
+  gain(v,src,e){if(!this.on||!G||G.dead)return;if(window.TIM&&TIM.blocked())return;if(window.GRIT&&GRIT.on){v=GRIT.emp(v,src,e);if(!(v>0))return;}const S=this.st();if(P.emp>=3){S.m=1;return;}S.m+=v*(this.FILL[SET.diff]||1);this.stat.fill+=v;
     if(S.m>=1){S.m-=1;P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');AU.sfx('up');S.ping=.6;
       if(!this.tipE){this.tipE=1;this.tip('EMP charged: tap EMP');}}},
   tip(t){try{const o=load('mnr_abiltip',{})||{};if(o[t]||G.tut||G.lab)return;o[t]=1;save('mnr_abiltip',o);hintShow(t,4);}catch(e){}},
@@ -96,7 +96,7 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
 #touch button#bDash::after,#touch button#bEmp::after{font-size:15px}
 #touch button.abRdy#bEmp{filter:drop-shadow(0 0 6px #ffb020)}#touch button.abRdy#bDash{filter:drop-shadow(0 0 5px #19e3ff)}`;document.head.appendChild(st);}
 NR.on('tick',dt=>ABIL.tick(dt));
-NR.on('kill',d=>{if(!ABIL.on||!d||d.boss)return;const e=d.e||{};ABIL.gain(e.el||e.type==='gunship'?.08:.035);});
-NR.on('graze',d=>ABIL.gain(d&&d.pf?.07:.04));
-NR.on('pickup',()=>ABIL.gain(.34));
+NR.on('kill',d=>{if(!ABIL.on||!d||d.boss)return;const e=d.e||{};ABIL.gain(e.el||e.type==='gunship'?.08:.035,'kill',e);});
+NR.on('graze',d=>ABIL.gain(d&&d.pf?.07:.04,'graze'));
+NR.on('pickup',()=>ABIL.gain(.34,'pickup'));
 NR.on('runStart',()=>{if(ABIL.on)setTimeout(()=>{if(running&&G&&!G.dead)ABIL.tip('DASH has charges, EMP fills from kills');},4000);});

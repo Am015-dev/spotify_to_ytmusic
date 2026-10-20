@@ -59,16 +59,16 @@ The range is for a Normal-difficulty, mid-build player unless stated.
 | S21 | Dash uses per minute | 3-10 (est.) | guide | | audit |
 | S22 | Share of dashes that are last-moment reflexes (bullet within 60 px) | <= 70% | guide | Dash with invulnerability frames became the core verb in two references (ref. E, F); a patch that gave them was called the most significant change and was then trimmed, not removed (ref. E) | audit; `abil-test.js` for value |
 | S30 | Answer value: hull lost without the right answer vs with it, per threat | ratio >= 2x on every threat, parry included | hard | One right answer per threat is fine, only if it pays | audit: worst threat of `counter-test.js` (hull lost without / with the timed answer; denominator at least 1). `abil-test.js` clear rates are logged in `harness.abilClear` |
-| S31 | Weapon spread: best weapon's stage time within 15% of the median | <= 15% | guide | | audit: `weapon-test.js` stage-1 clear time per weapon at LV1; (median - fastest) / median |
+| S31 | Weapon spread: worst weapon's median on-screen life at LV10 within 15% of the all-weapon median | <= 15% | guide | | audit: `visible-test.js` with ALL=1, `max |weapon median / all-weapon median - 1|`. Not the stage-1 clear time: that is time-locked (every weapon clears in the same stage time, see section 6) |
 | - | Death penalty on power-ups | lose some, not all; a rank system eases the next life | guide | Ref. A strips every power-up and lowers rank; a recovery wave follows. Players call the cycle a trap if the rank cannot keep up | `strategy-test.js`, `choices-test.js` |
 | - | Scoring: chain or graze reward with a visible cap | chain doubles per link, 9 links (ref. B); graze gauge (ref. C) | guide | | `ret-test.js` (reward) |
-| S29 | Real decisions per minute (a choice with a trade-off) | >= 6 (est.) | guide | | SKIP: the harnesses log presses and hull, not decisions; needs a decision log first (dash and EMP rates are S20, S21) |
+| S29 | Real decisions per minute (a choice with a trade-off) | >= 6 (est.) | guide | | audit, proxy: dash charges spent + EMP uses (`ABIL.stat`) + card picks (`CHO.log`, not `pair`), per game-minute. Bot presses, so an upper bound on a player's choices |
 
 ## 5. Fairness, forgiveness, accessibility, onboarding
 | Id | Standard | Range | Level | Practice behind it | Measured how |
 |---|---|---|---|---|---|
 | S23 | First-try stage clear, a competent bot with no oracle (Normal) | 55-90% | hard | A reflex player should clear most stages first try, not 11% | `repeat-audit.js` (firstTryFails) |
-| S24 | Bullet contacts per stage, competent bot | 3-8 (est.) | guide | | audit: non-god runs on stages 3, 8, 20; contacts counted until clear or death |
+| S24 | Hull hits per stage, competent non-god bot | 3-8 (est.) | guide | | audit: non-god runs on stages 3, 8, 20 (quick: 3); a hull drop (`P.hp` falls) is one contact; dash, invuln and god mode excluded; mean per run |
 | S28 | Assist options (game speed, hit tolerance, auto-aim, extra dashes, ...) | >= 3 | guide | Ref. D ships slow-down, extra dashes and invincibility, achievements stay on; its hidden aids are input buffering, grace windows and corner correction | audit (setting keys); `ret-assist-test.js` |
 | - | Input forgiveness: buffer or grace window on dash and EMP | present | guide | Ref. D | `timing-test.js` |
 | S32 | Time to first kill in a new session | <= 20 s | guide | A one-stick, one-button rhythm game (ref. I) is playable at once; the references teach one idea per fight | audit: `FIRSTKILL` line of `tutorial-test.js` (kill event, from the flight school start; worst of desktop and phone) |

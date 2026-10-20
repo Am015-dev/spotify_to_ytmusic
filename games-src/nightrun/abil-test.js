@@ -39,7 +39,7 @@ const SCN = () => {   // one scenario per trait: start a stage, give the power, 
   const emp = (k, scene) => { set(k); scene && scene(); m.P.emp = 3; const s0 = S0(); m.press('Emp'); run(20); const s1 = A.stat, d = {}; for (const x in s1) d[x] = s1[x] - s0[x]; d.eb = m.G.eb.length; m.abort(); return d; };
   out.wave = emp('nova', bullets).conv; out.bubble = emp('slice').slow; out.chain = emp('wing', () => { foe(400, 200, { hp: 40, max: 40, hq: 40 }); foe(500, 300, { hp: 40, max: 40, hq: 40 }); }).chain;
   out.od = emp('drum').od; out.pull = emp('magb', () => m.G.pk.push({ t: 'shard', x: 800, y: 100, vx: 0, vy: 0, bob: 0 })).mag; out.base = emp('', bullets);
-  { set(''); m.P.emp = 0; A.st().m = 0; for (let i = 0; i < 30; i++) A.gain(.035); out.meter = m.P.emp; m.abort(); }
+  { set(''); m.P.emp = 0; A.st().m = 0; for (let i = 0; i < 30; i++) {if(window.GRIT)GRIT.g().b=1;A.gain(.035);} out.meter = m.P.emp; m.abort(); }
   // core breaker + boss cap: a boss with cores, EMP + ram spam, measure the boss's worst 1 s loss against its armour cap
   { set('chord'); m.startStory(8); m.simOn(true); m.god = true; try { m.PW.give('chord'); } catch (e) { } m.spawnBoss({}); run(300); const B = m.G.boss; let worst = 0, capB = 0, core = 0;
     if (B) { capB = window.B2X ? window.B2X.cap(B) : 0; const hist = [];

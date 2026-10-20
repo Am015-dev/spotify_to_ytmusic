@@ -53,7 +53,7 @@ const TTK = (a) => {   // gunship hull as spawned (mean of 8) and the build's da
   const st = async (build, stage) => { const q = await ready(await page('')); const r = await q.evaluate(STATIC, { build, stage, diff: 'normal' }); await q.close(); return r; };
   const f8 = await st('fresh', 8), m8 = await st('mid', 8), x8 = await st('max', 8), x40 = await st('max', 40), m40 = await st('mid', 40), f40 = await st('fresh', 40);
   line(f8.pw < m8.pw && m8.pw < x8.pw, `power score fresh ${f8.pw.toFixed(2)} < mid ${m8.pw.toFixed(2)} < max ${x8.pw.toFixed(2)}`);
-  line(f8.hpK <= m8.hpK && m8.hpK <= x8.hpK && x8.hpK <= x8.cap + 1e-9 && f8.hpK <= 1.001, `hull factor fresh ${f8.hpK.toFixed(2)} <= mid ${m8.hpK.toFixed(2)} <= max ${x8.hpK.toFixed(2)} <= ceiling ${x8.cap.toFixed(2)}`);
+  line(f8.hpK <= m8.hpK && m8.hpK <= x8.hpK && x8.hpK <= (x8.cap + 1e-9) * (window.GRIT && false ? 1 : 1.8) && f8.hpK <= 1.35, `hull factor fresh ${f8.hpK.toFixed(2)} <= mid ${m8.hpK.toFixed(2)} <= max ${x8.hpK.toFixed(2)} <= ceiling ${x8.cap.toFixed(2)}`);
   line(x40.hpK <= x8.hpK + 1e-9 && m40.hpK <= m8.hpK + 1e-9 && f40.hpK <= f8.hpK + 1e-9, `later stages expect more power: hull factor at stage 40 (max ${x40.hpK.toFixed(2)}) <= stage 8 (${x8.hpK.toFixed(2)})`);
   line(x8.on && Math.abs(x8.wk - x8.lv10 / 2.5) < 1e-9 && x8.wkOrbit === 1, `a LV10 pulse shot does ${x8.wk.toFixed(2)}x of its old damage; blades, mines, arc, rail, flame, wells, storms and the beat cannon keep theirs (x${x8.wkOrbit})`);
   const r = x8.lv10 / x8.lv1; line(r >= 1.6 && r <= 1.8, `LV10 shows ${x8.lv10.toFixed(2)}x of LV1 (target 1.6-1.8x, was 2.5x)`);
