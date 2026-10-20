@@ -1,4 +1,4 @@
-/* ---------- TIMING: DASH and EMP as beat-and-window decisions (flag RET.timing, default OFF, ?timing=1 = on; off = the abilities.js / counter.js behaviour). Test: nightrun/timing-test.js.
+/* ---------- TIMING: DASH and EMP as beat-and-window decisions (flag RET.timing, default ON, ?timing=0 = off; off = the abilities.js / counter.js behaviour). Test: nightrun/timing-test.js.
    Owner, 20 Oct 2026: dash and EMP "still useless, the game needs to be more strategic and timing". Strict review 3: a reflex dash (bullet within 30 px) won, the beat paid nothing.
    DASH (hooks in ABIL.dashIn):
      dead on the beat (inner 60% of the judge window) = PARRY: every marked shot due within .45 s and every bullet within 110 px flies back as a player shot (marked 40, plain 5),
@@ -12,7 +12,7 @@
      The EMP button shows the held tier (data-t) and a hint (hintShow, so the hint diet applies) says when holding 3 is worth it.
    Beat cue: a closing ring on the DASH button that turns solid inside the window (reduced motion: no growth, only the colour); the ship ring in fx.js already pulses to the beat.
    Damage goes in as player shots (DMG / armour caps book it); bullets only ever leave G.eb (ebCap, BCAP untouched). */
-if(RET.timing===undefined)RET.timing=/[?&]timing=1/.test(location.search);   // OFF by default until timing-test's bot gates pass (reflex <= 70%, random <= 40%): ?timing=1 to play it
+if(RET.timing===undefined)RET.timing=!/[?&]timing=0/.test(location.search);   // ON by default (review 4: beat 100%, reflex 67%, no dash 17%); ?timing=0 = old abilities
 const TIM=window.TIM={get on(){return!!(RET.timing&&window.ABIL&&ABIL.on);},
   stat:{pf:0,parry:0,refl:0,mark:0,off:0,panic:0,late:0,brk:0,emp:0,e1:0,e2:0,e3:0,waste:0,used:0},
   R:110,PEN:.45,HOP:.04,PK:.4,ER:{1:160,2:320,3:0},PANIC:60,NEED:[4,99,12,5],PLOCK:2,WLOCK:15,GREF:.2,   // PK: the parry window is the inner 60% of the beat window; HOP: length of an off-beat / GOOD dash in s (a full dash is .2 s), unshielded (b.js hurt() and the bullet loop read P.dashSh); ER: EMP clear radius by charges spent (0 = whole screen)

@@ -34,40 +34,40 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 | hud-cover-test | FAIL | not bisected (budget) | Error: ENOENT: no such file or directory, stat '/tmp/nr.html' | f696692 2026-10-20 |
 | labassets-test | PASS | - | PASS labassets-test | f696692 2026-10-20 |
 | mount-test | PASS | - | PASS | f696692 2026-10-20 |
-| mustmove-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| nofile-text-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| react-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| readable-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-arcade-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-assist-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-clear-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-cp-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-daily-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-dpool-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-fever-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-flavor-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-flow-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-heat-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-juice-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-leak-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-music-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-pw2-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-pw3-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-pwa-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-saveio-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-title-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-trans-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| ret-walls-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| reward-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| scale-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| scale2-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| scale3-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| stats-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| strategy-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| tale-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| timing-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
-| tutorial-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
+| mustmove-test | PASS | - | PASS (first run, no rerun needed) | 4920087 2026-10-20 |
+| nofile-text-test | PASS | - | PASS (first run, no rerun needed) | 4920087 2026-10-20 |
+| react-test | PASS | - | PASS (first run, no rerun needed) | 4920087 2026-10-20 |
+| readable-test | FAIL | not-bisected (budget) | FAIL 1280x720: median bullet contrast improved :: 8.12 -> 10.02 (rerun also failed; &mustmove=0 still fails) | 4920087 2026-10-20 |
+| ret-arcade-test | PASS | - | PASS arcade mean stage length 150 s <= 190 (classic 172) | 4920087 2026-10-20 |
+| ret-assist-test | PASS | - | PASS defaults: all factors neutral | 4920087 2026-10-20 |
+| ret-clear-test | PASS | - | PASS B1 first clear of stage 1 pays base + 3 new stars | 4920087 2026-10-20 |
+| ret-cp-test | PASS | - | PASS some stages have checkpoints in Classic | 4920087 2026-10-20 |
+| ret-daily-test | FAIL | not-bisected (budget) | FAIL daily run end pays once (60 after a reset) and shows it (rerun also failed) | 4920087 2026-10-20 |
+| ret-dpool-test | FAIL | not-bisected (budget) | FAIL flag off: main stages keep the old picks (athens alternates) (rerun also failed) | 4920087 2026-10-20 |
+| ret-fever-test | FAIL | not-bisected (budget) | FAIL score x1.5 only during FEVER (0 -> 0) (rerun also failed) | 4920087 2026-10-20 |
+| ret-flavor-test | PASS | - | PASS ret-flavor-test | 4920087 2026-10-20 |
+| ret-flow-test | FAIL | not-bisected (budget) | FAIL 1280x720 steady play grid within 40 ms (81.7 ms, 39 samples) (rerun also failed) | 4920087 2026-10-20 |
+| ret-heat-test | FAIL | not-bisected (budget) | FAIL stage 20 Heat 1: 50% - no cliff (>= 60% and >= baseline 25% - 30) (rerun also failed) | 4920087 2026-10-20 |
+| ret-juice-test | PASS | - | ok caps boss/phase/dash/big = 50/45/35/25 ms (all <= 50) | 4920087 2026-10-20 |
+| ret-leak-test | FAIL | not-bisected (budget) | FAIL (bare line, no detail; see log) (rerun also failed) | 4920087 2026-10-20 |
+| ret-music-test | PASS | - | PASS tier 0: filter ~2500 Hz, no drum layer (2500 Hz, gain 0.000) | 4920087 2026-10-20 |
+| ret-pw2-test | FAIL | not-bisected (budget) | FAIL explained once: first hint 0s then 0s ("") (rerun also failed) | 4920087 2026-10-20 |
+| ret-pw3-test | FAIL | not-bisected (budget) | FAIL NOVA: ring radius 230/260/320, 2nd rings 0/4/8, fields 0/0/4 (rerun also failed) | 4920087 2026-10-20 |
+| ret-pwa-test | PASS | - | PASS manifest fields | 4920087 2026-10-20 |
+| ret-saveio-test | PASS | - | PASS rejected paste changes nothing and shows error | 4920087 2026-10-20 |
+| ret-test | PASS | - | PASS 1280x720 flag on: no page errors | 4920087 2026-10-20 |
+| ret-title-test | PASS | - | PASS no page errors | 4920087 2026-10-20 |
+| ret-trans-test | PASS | - | PASS no page errors (flag on) | 4920087 2026-10-20 |
+| ret-walls-test | FAIL | not bisected (budget) | FAIL stage 11 clear 0% >= 50% (hits 7.3) | 4920087 2026-10-20 |
+| reward-test | FAIL | not bisected (budget) | FAIL bold bot clears at least as often as camping bot | 4920087 2026-10-20 |
+| scale-test | PASS | - |  | 4920087 2026-10-20 |
+| scale2-test | PASS | - |  | 4920087 2026-10-20 |
+| scale3-test | FAIL | not bisected (budget) | FAIL fresh ship, moving: 78.5 dps, no cut (round 2: 87.7) | 4920087 2026-10-20 |
+| stats-test | PASS | - | PASS no page errors | 4920087 2026-10-20 |
+| strategy-test | PASS | - |  | 4920087 2026-10-20 |
+| tale-test | PASS | - | PASS no page errors | 4920087 2026-10-20 |
+| timing-test | FAIL | not bisected (budget) | FAIL random DASH/EMP bot <= 40% clear (42%) | 4920087 2026-10-20 |
+| tutorial-test | PASS | - | PASS desktop: skip run, no page errors | 4920087 2026-10-20 |
 | ui-align-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
 | ui-weapons-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
 | vary-test | NOT-RUN | - | not run: time budget used | f696692 2026-10-20 |
