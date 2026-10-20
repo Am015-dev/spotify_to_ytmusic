@@ -632,3 +632,10 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Tried and dropped (no effect, 1277 → 1282 MB, not pushed): Math.hypot→sqrt in MEMF_gstep and DEST_open, RD_unstack heading closure/arrays → scratch pairs. JS max f0-f119 in that one run 162 → 121 ms is box noise, not a result; 4-run tables NOT taken.
 4. GO perf/alloc-rate not tightened (nothing improved). No src change, built page identical to trunk.
 5. Next: DEST_find on touch: give it a larger budget only while idle (stationary) so it tiers up and finishes, or precompute per-node ground/onRoad once into a Float32Array; then re-measure (expect −220 MB/15 s).
+
+## ios-r18l: minimap v2 (src/70_roam_world.js MM2, src/41 qvMini; ?mm2=0 = old path; default ON)
+1. Change: touch redraw capped at ~20 Hz (time gate; desktop keeps 30 Hz); shared coord array instead of [x,z] per point; pin / north glyphs cached as sprites; route polyline in one Float32Array; no per-frame closures/arrays. The static base was already one prepainted canvas (MINI.c), so no extra bucket cache was added.
+2. GO perf/minimap2 (src/99c7_rev5fix.js, both cities): same state drawn with old and new path, 99.5-99.7% pixels match, coord array reused, ring avg < 3 ms. Shots 852x393 Fra + Ath before/after look identical.
+3. Measured Ath tBoot lowmem 60 s: miniDraw itself avg 0.21 ms / p95 0.4 / max 2.1 (old) vs avg 0.24 / p95 0.4 / max 1.7-4.3 (new); draws per run 1809 → ~1170 (-35%). jsn50 / JS max: old 1/73, 1/63; new 4/84, 1/91, 7/79 (run noise, no gain).
+4. Gate (built): unit 0 FAIL; r13 sky + life1 xf1 terrain phone2 47/47; perf/touch-first-frames red in both cities, same with ?mm2=0 (gate 5.9 s curtain timing here), others green.
+5. Left: miniDraw is NOT the owner of the long frames (its wrapped 13 ms max was SMM_tick tile paints, max 5-12 ms); the >50 ms JS frames are hubTrafficStep / hubCullStep / roamStep / PC_step. tBoot now prints PF1MM (ring + SMM.st).

@@ -577,3 +577,12 @@ window.__hudClear=function(){const R=e=>{e=typeof e==='string'?document.getEleme
    const ok=M.length>0&&typed&&rays>=60&&hits>0&&bad===0;
    return`📍 FC GRID · ${c==='fra'?'Frankfurt':'Athens'}: ${rays} rays (${hits} hits) over ${M.length} meshes, grid = brute force except ${bad}, typed arrays only ${typed}, ${mb.toFixed(1)} MB (cell table + triangles) → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
  if(i<600)setTimeout(()=>R18I_reg(i+1),100)})(0);
+// ios-r18l: GO perf/minimap2 (both cities). Minimap v2 must look like v1: same state drawn once with the old path and once with the new one (same rotation/zoom), >= 97% of the pixels equal within 40/255 per channel; the shared coordinate array is reused (no [x,z] per call); ms ring avg < 3 ms. Info: avg/p95/max ms, cached glyphs.
+(function R18L_reg(i){const C=window.__chk;if(C&&C.GO&&Array.isArray(C.items)){if(!C.items.some(q=>q.ver==='perf'&&q.id==='minimap2'))C.items.push({ver:'perf',id:'minimap2',area:'perf',text:'r18l · minimap v2: 📍 GO (both cities) draws the minimap with the old path and the new one from the same state; >= 97% of the pixels must match, the coordinate array must be reused, the draw ring avg < 3 ms. Needs free roam with the HUD visible.'});
+  C.GO['perf/minimap2']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt':'Athens',fn:()=>{if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';const el=$('#roamMini canvas');if(!el||el.offsetParent===null)return'📍 Minimap not visible';
+   const on0=MM2.on,tc=MM2.touch,s0=RO.miniS,mf=HUB.mf,shot=on=>{MM2.on=on;MM2.touch=false;RO.miniS=s0;HUB.mf=1;miniDraw();return el.getContext('2d').getImageData(0,0,el.width,el.height).data};
+   let A,B;try{A=shot(false);B=shot(true)}finally{MM2.on=on0;MM2.touch=tc;RO.miniS=s0;HUB.mf=mf}
+   let diff=0;const n=A.length/4;for(let k=0;k<A.length;k+=4)if(Math.abs(A[k]-B[k])>40||Math.abs(A[k+1]-B[k+1])>40||Math.abs(A[k+2]-B[k+2])>40)diff++;
+   const p1=MM2.toF(RO.x,RO.z),p2=MM2.toF(RO.x+9,RO.z),same=p1===p2,sp=MM2.spr.size,st=MM2.stat(),ok=diff/n<.03&&same&&st&&st.avg<3;
+   return`📍 MINIMAP2 · ${c==='fra'?'Frankfurt':'Athens'}: ${(100-100*diff/n).toFixed(1)}% pixels match v1, shared coord array ${same}, ${sp} cached glyphs, draw ms avg ${st&&st.avg.toFixed(2)} p95 ${st&&st.p95.toFixed(1)} max ${st&&st.max.toFixed(1)} (n ${st&&st.n}) → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
+ if(i<600)setTimeout(()=>R18L_reg(i+1),100)})(0);
