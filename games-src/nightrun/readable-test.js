@@ -50,8 +50,9 @@ const MEASURE = () => {
     const k = size + ' ' + q, t0 = Date.now(); let shots = 0;
     while (Date.now() - t0 < 20000) { await sleep(1500); if (Date.now() - t0 < 5000) continue; const n = await p.evaluate(() => __mnr.G.eb.length); if (n < 4) continue;
       const best = await p.evaluate(MEASURE); if (SHOTS && !shots++) { fs.mkdirSync(SHOTS, { recursive: true }); await p.screenshot({ path: path.join(SHOTS, `read-${size}-${q}-d${di}.png`) }); }
-      (R[k] = R[k] || { c: [], d: [], bgL: [], bgS: [], cnt: 0, same: true, dot: [], stat: best.stat, errs: [], read: best.read, worst: [] });
+      (R[k] = R[k] || { c: [], d: [], w: [], bgL: [], bgS: [], cnt: 0, same: true, dot: [], stat: best.stat, errs: [], read: best.read, worst: [] });
       R[k].c.push(...best.blobs.map(b => b.c)); R[k].d.push(...best.blobs.map(b => b.d)); R[k].worst.push(...best.blobs.map(b => ({ c: +b.c.toFixed(2), n: b.n, x: b.x, y: b.y, col: b.col, di })));
+      if (best.blobs.length) R[k].w.push(pct(best.blobs.map(b => b.c), .1));   // worst 10% of this frame
       R[k].bgL.push(best.bgL); R[k].bgS.push(best.bgS); R[k].cnt += best.cnt; R[k].same = R[k].same && best.same; R[k].dot.push(best.dot); R[k].stat = best.stat; }
     if (R[k]) R[k].errs.push(...errs);
     await ctx.close();
@@ -68,6 +69,8 @@ const MEASURE = () => {
     ok(`${size}: flag on dims the backdrop`, n.stat.dim > 0 && med(n.bgL) < med(o.bgL) * .8, f3(med(o.bgL)) + ' -> ' + f3(med(n.bgL)));
     ok(`${size}: hitbox dot visible, >= 4 css px wide`, n.dot.every(d => d.n > 0 && d.wCss >= 4), JSON.stringify(n.dot));
     ok(`${size}: median bullet contrast improved`, med(n.c) > med(o.c) && pct(n.c, .1) >= pct(o.c, .1) * .85, f(med(o.c)) + ' -> ' + f(med(n.c)));
+    const w3 = med(n.w.slice(0, 3));   // gate: worst-10% contrast, median over the first 3 frames (flag on)
+    ok(`${size}: worst-10% bullet contrast >= 1.5:1 (flag on, median of 3 frames)`, w3 >= 1.5, f(w3) + ' :: frames ' + n.w.slice(0, 3).map(f).join(' '));
     ok(`${size}: no page errors`, !o.errs.length && !n.errs.length, (o.errs[0] || n.errs[0] || ''));
   }
   await br.close(); srv.kill(); console.log(bad ? 'FAILURES' : 'ALL PASS'); process.exit(bad ? 1 : 0);
