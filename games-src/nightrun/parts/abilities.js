@@ -34,7 +34,7 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
   /* b.js: replaces the beat-snapped dash. ts = the press stamp (or undefined), mx/my = the keys this frame */
   dashIn(ts,mx,my,dt){const S=this.st(),mx0=this.max();S.n=Math.min(S.n,mx0);
     if(S.n<mx0){S.r+=dt/this.refill();if(S.r>=1){S.r=0;S.n++;}}else S.r=0;
-    const TM=window.TIM&&TIM.on;if(ts&&S.n>=1&&P.dashT<=0&&(!TM||TIM.ready())){S.n=Math.max(0,S.n-1);const j=judge(ts);P.dashT=.2;if(!(mx||my)&&!touch&&!(P.dx||P.dy)){P.dx=1;P.dy=0;}AU.sfx('dash');P.dashPf=j.ok;this.stat.dash++;J.n++;
+    const TM=window.TIM&&TIM.on;if(ts&&S.n>=1&&P.dashT<=0&&(!TM||TIM.ready())){S.n=Math.max(0,S.n-1);const j=judge(ts);P.dashT=.2;if(!(mx||my)&&G.t-P.mvT>.3){const d=dashSafeDir();P.dx=d[0];P.dy=d[1];}AU.sfx('dash');P.dashPf=j.ok;this.stat.dash++;J.n++;
       J.last={kind:'dash',ok:j.ok,dt:Math.round(j.dt),beat:j.beat,at:performance.now()};
       if(j.ok){this.stat.onb++;G.score+=Math.round(200*G.mult*comboK());onPerfect('dash',j,P.x,P.y);if(!TM){S.r+=.2;if(S.r>=1&&S.n<mx0){S.r-=1;S.n++;}}this.gain(.04);if(!TIP.done){TIP.done=true;save('mnr_tipdone',true);}}
       if(TM)TIM.dash(j,S);S.hit=new Set();S.ref=0;S.ph=0;const m=this.dashMod();S.mod=m;

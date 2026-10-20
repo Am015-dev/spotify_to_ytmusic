@@ -1,9 +1,28 @@
 # Handoff: start a new session from this file
 
+## Nightrun enemy variants (W16, flag RET.variants, ?variants=0 = exact old spawns and draws, 20 Oct 2026)
+- `parts/variants.js` (after stagescripts.js): table `VAR.TAB` (stage bands: mini / large / giant / flip / rot / tint / elite chances) + `VAR.CL` (class numbers) + `VAR.KINDS` (which kind may be which class / orientation). Every enemy en() builds is rolled once (own dice, never Math.random): CLASS mini (r x.6, hull x.5, single shots every 2nd, pack of 3-5) | normal | large (r x1.5, hull x2.5, slower, double fire, drops a shard) | giant (r x2.2, plates, gapped ring every 3rd shot, 1 per stage, drops an upgrade); ORIENT N | V (vertical mirror) | T / B (rotated 90, comes down / up) | L (rotated 180: enters from the left, U-turn, flies back left); TINT 0 | 1 / 2 (hue + 1 / 2 pips) | 3 ELITE (dashed ring + diamond, x1.5 hull, shield | split into 2 minis on death | medic link).
+- T / B / L are paths on the formations.js rails (drones only), pictures are turned by canvas transform in drawEnemy (VAR.in / VAR.out), so placeholders and pictures both work. Hull ledger steers the rolls so a stage stays within +-10% of the old total hull.
+- Hooks (one line each): b.js en() (VAR.apply / VAR.after), enemy loop (VAR.pace), eb() (VAR.shot); draw.js drawEnemy; c.js (VAR.mark overlay); formations.js (VAR.st.fm guard: no orientation or packs inside formations).
+- Tests: `variants-test.js` (combos draw in phone + landscape, flag-off seeded identical, looks per stage, hull +-10%, caps, mini life vs DMG floor). repeat-audit.js now also logs 'look' events and `enemyLooks` per stage.
+- Weak: dash-feint elite not done; giant counts as mini-boss only by flag e.mb (no stats event); formation units get class / tint but no orientation or packs; mini packs only for plain waves; hue shift uses ctx.filter (missing on older iOS: pips and rings still tell them apart); lab Enemy preview does not list variants yet; normal enemies still die at ~1.2 s on screen (old DMG floor, W13's area).
+
 Repo `Am015-dev/spotify_to_ytmusic`, branch `alex/brave-carson-rbpmlk` (never merge to main). The site is
 published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Private research lives in
 `Am015-dev/game-night-private` (never copy it into the public repo).
 
+## Nightrun VISIBLE (flag RET.vis, default ON, ?vis=0 = old; W13, 20 Oct 2026)
+- `parts/visible.js` (after timing.js): per-kind on-screen floor (drone 1.6 s, charger/flank 2.1, gunship 5.2, gate/turret/tank 3.1, swarm/mine 1.05, zoo >= 2.1) read by DMG.minLife (b.js); no damage to a foe outside the playfield (DMG grace + VIS.ok); homing locks only on visible foes after .18 s (shop.js SH.steer); DASH, beat-parried shots, COMBO blast and an EMP warden strip skip the floor (e.dk); Normal hull 5 from stage 10 (story.js, VIS.hullD).
+- Gate `nightrun/visible-test.js` (ALL=1 = 16 weapons, VIS=0 = old). Numbers in BALANCE.md "Visible".
+- RET.timing stays OFF: timing-test bots still reflex 75-92% / random 58-67% (gates 70/40); random lives on 5-6 EMP/min. Next: make a wasted EMP cost meter, then flip.
+- Weak: weapon level curve itself unchanged (the floor is the cap); Hard+ floor still shrinks to .8x on late stages.
+
+## Nightrun phone fixes: dash heading + WEAPONS sheet (W12, 20 Oct 2026)
+- Dash bug (portrait touch): `goDash` kept the last heading in `P.dx/dy` when a finger was down, so a still ship dashed along a stale heading (e.g. world left = sideways/back on a portrait screen). Now `P.mvT` stamps the last real move (keys, or touch offset > 3 px); no move in 0.3 s -> `dashSafeDir()` (b.js): 8-way landing spot with most free space, away from bullets (predicted 0.25 s) and foes and walls, ties go forward (world right = screen up in portrait). Test `dash-dir-test.js` (portrait, landscape, desktop).
+- WEAPONS sheet (`#wpm`, g.js): the ghost text was the pit-stop panel showing through `.ov.solid` (90% alpha); `#wpm` is now opaque, z-index 9. Cards are a fixed 96 px, text 14 px, fusion info is the last row INSIDE `#wpL` (`#wpFu`, no longer a separate block), ship picture hidden under 700 px height. Test `ui-weapons-test.js`.
+- Placeholder pictures: `wp-*` and fusion pictures are drawn into the UI only when `ART.isReal` (g.js, wpx.js); otherwise the code icon / demo is used. The Lab ASSETS tab is untouched.
+- For W14 (rebuilding this layout): keep `#wpm` opaque, fusion row inside `#wpL`, and run `ui-weapons-test.js`.
+- Not mine: readable-test fails on the old build too (flag-off check, contrast). `abil-test.js` and `mustmove-test.js` do not exist in the repo.
 ## Nightrun TIMING: beat-timed DASH / EMP (W10, flag RET.timing, default OFF, `?timing=1` = on, 20 Oct 2026)
 - `parts/timing.js` (after counter.js) + hooks in abilities.js (dashIn, emp), counter.js (parry dmg 40, goodAt) and b.js (hurt / bullet absorb read `P.dashSh`).
 - DASH: dead on the beat (inner 60% of the judge window) = PARRY: reflects marked shots due within .45 s and bullets within 110 px (marked 40 dmg, plain 5), .5 s i-frames, charge back if it caught anything. GOOD (outer window) = short unshielded hop for 1 charge. OFF = short unshielded hop for 2 charges + .45 s lock; late twice = CHAIN BROKEN. DASH button: closing ring, white inside the parry window (no growth with reduced motion); fx.js ship ring already pulses.
