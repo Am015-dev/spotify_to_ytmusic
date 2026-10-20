@@ -470,3 +470,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Tried and reverted: rfGrid as a generator (yields inside) broke terr1/terr5 terrain-grade/edge/flush/sky/crown on fra (re-entrancy / order); needs a non-generator slicing (e.g. cache per grid) with the terrain GO as check.
 4. Left for 50 ms: rfGrid, Athens post steps (AS_apply, CE_streets, DR_solid), gndBuild 340 ms, CTB_kind 130-430 ms, bt.flush 160.
 5. Gate (DESKTOP=1, built): unit 0 FAIL; the 8 TAG sets 48/51, reds xf1/grass+slope SLOW and terrain-tyre-ath = known trunk reds.
+## perf-r17l (2026-10-20): post-ready link pre-compile NOT done · no code change
+1. Built r17l OK; tFrame (CITY=fra|ath Q=high SECS=3-5, swiftshader) on the built page: PF1GATE 0, then "page.evaluate: Target page closed" at tFrame.js:57 (Fra, ~1 min) and a 110 s foreground retry timed out, so no PF1LINK was printed. No before/after link counts for either city.
+2. Review #16 numbers stand (Fra afterReady 4, afterGate 7: plain 5, +gs 1, +ao 1; Athens not measured).
+3. No change to src/ or GO perf/pc-post-ready-link (still ≤ 5 in 30 frames after the gate); nothing was pushed to trunk.
+4. Mistake to avoid: a first background retry used pkill, which hit its own shell; use fuser -k PORT/tcp only.
+5. Left: find why the page closes in tFrame on this box (crash/OOM in the drive loop or the probe), get PF1LINK for both cities, then pre-compile the listed kinds in LKG_p2 (src/98bp_warmall.js) and tighten the GO to afterReady 0 / afterGate ≤ 1.
