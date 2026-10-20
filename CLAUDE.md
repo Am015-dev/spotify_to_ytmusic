@@ -13,7 +13,7 @@ Old rules and lessons (read only when needed): `games-src/RULES-ARCHIVE.md`.
 - No screenshots for anyone to look at. Pixel baselines are allowed only as a machine gate (never opened by a model; branch ui-baselines).
 
 ## How we work (owner, 14 Oct 2026: "you waste way too many tokens and deliver shit results")
-- At most 3 workers at once: 1 integrator (Sonnet) + up to 2 fixers. Never 15 in parallel.
+- Workers: owner (20 Oct 2026) wants at least 5 workers + 1 reviewer at once on Nightrun, models chosen by task (see Cheapest model line). Never 15 in parallel.
 - One task = ~30 min and ONE deliverable, fully briefed up front (games-src/BRIEF-TEMPLATE.md). Then 5 report lines and stop.
   No idle workers, no self-wake-ups, no follow-up messages except the owner's new bug reports.
 - Cheapest model that can do it: Haiku for mechanical work, Sonnet for bugs and UI, Opus only for design and feel. Always set it.
