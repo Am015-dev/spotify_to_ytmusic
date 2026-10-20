@@ -96,16 +96,27 @@ function HT_cars(N,dt){const C=HUB.cars,lo=HT_lo(),n=C.length,o=lo&&n?(HUB.htO|0
 function HT_lo(){return!!TUNE.htFar&&(TOUCH.on||!!LOWMEM)}
 function HT_dead(c,im,N,dt){c.dead-=dt;if(CR_tumble(c,im,dt))return;_m.makeScale(0,0,0);im.setMatrixAt(c.j,_m);if(im.userData.w)im.userData.w.setMatrixAt(c.j,_m);if(im.userData.g)im.userData.g.setMatrixAt(c.j,_m);if(c.dead<=0){c.dead=0;/* rv2k2 respawn1: was left at -dt (truthy), so every `!c.dead` alive-check skipped revived cars */c.a=Math.floor(R()*N.length);if(RD_ON)for(let k=0;k<12&&!HT_exit(N[c.a].nb,c.a);k++)c.a=Math.floor(R()*N.ng);/* RD: never respawn on a node without exits */c.b=N[c.a].nb[0];c.t=0;if(c.tr){const T=HUB.trn;c.a=T[Math.floor(R()*T.length)];c.b=N[c.a].nb.find(n=>N[n].tr)}}}
 function HT_exit(nb,a){for(let i=0;i<nb.length;i++)if(nb[i]!==a)return true;return false}
+// traf-r21k2: a car hands over to the next edge only when its first 8 m are clear (merges from two arms put cars 3 m apart: a rear-end overlap); it waits at the node, 3 s at most (no deadlock)
+function HT_blocked(c){if(c.route||c.tr||c.pk)return false;const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B||A.ab||c.a===c.b)return false;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L;
+  for(const o of HUB.cars){if(o===c||o.dead>0||o.pk)continue;const rx=o.x-A.x,rz=o.z-A.z;if(rx*rx+rz*rz>100)continue;const al=rx*hx+rz*hz;if(al<-2||al>8)continue;const oa=N[o.a],ob=N[o.b];if(!oa||!ob)continue;const ol=Math.hypot(ob.x-oa.x,ob.z-oa.z)||1;if(((ob.x-oa.x)*hx+(ob.z-oa.z)*hz)/ol<.5)continue;if(Math.abs(-rx*hz+rz*hx)<2.4)return true}return false}
 function HT_car(c,im,N,dt){if(!N[c.b]||!N[c.a]){c.a=Math.floor(R()*N.ng);c.b=N[c.a].nb[0]??c.a;c.t=0;return}const A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1;
   HT_speed(c,A,B,L,dt);
-  c.t+=c.cv*dt/L;if(c.t>=1){HT_next(c,B,N);return}
+  c.t+=c.cv*dt/L;if(c.t>=1){const pa=c.a,pb=c.b;HT_next(c,B,N);if(HT_LAT.on&&HT_blocked(c)&&(c.hold=(c.hold||0)+dt)<3){c.a=pa;c.b=pb;c.t=1;c.cv=0;HT_pose(c,A,B,(B.x-A.x)/L,(B.z-A.z)/L,A.g||B.g,c.pk&&c.ofW?c.ofW:A.ab||A.g||B.g?0:Math.min(A.w||20,B.w||20),dt,im);return}c.hold=0;/* traf-r21k2: pose on the new edge in the same step (the hand-off step used to skip it: one doubled move, 0.2 m at 12 m/s, at every junction) */const A2=N[c.a],B2=N[c.b];if(!A2||!B2||c.a===c.b||!HT_LAT.on)return;const L2=Math.hypot(B2.x-A2.x,B2.z-A2.z)||1,g2=A2.g||B2.g;HT_pose(c,A2,B2,(B2.x-A2.x)/L2,(B2.z-A2.z)/L2,g2,c.pk&&c.ofW?c.ofW:A2.ab||g2?0:Math.min(A2.w||20,B2.w||20),dt,im);return}
   // v88u perf: cars > 250 m away get their pose (ground probe, suspension, matrix) every 4th frame only; they still move every frame
   if(TUNE.lvLod&&c.dead<=0&&!c.route&&!c.pk&&(HUB.fr+c.j+c.k)%4&&(c.x-RO.x)**2+(c.z-RO.z)**2>62500)return;
   const dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gA=A.g||B.g,W=c.pk&&c.ofW?c.ofW:A.ab||gA?0:Math.min(A.w||20,B.w||20);HT_pose(c,A,B,dx,dz,gA,W,dt,im);HT_hit(c,dx,dz,W,dt)}
 // brake behind the player
 function HT_speed(c,A,B,L,dt){const ahead=Math.hypot(RO.x-(c.x+(B.x-A.x)/L*8),RO.z-(c.z+(B.z-A.z)/L*8))<9;const V=A.ab?(c.hv||(c.hv=rr(28,36))):c.v;if(c.hitT>0){c.hitT-=dt;c.cv=W10_brake(c.cv||0,dt)}else c.cv=(c.cv??V)+Math.min(((ahead?Math.min(2,V):V)-(c.cv??V))*Math.min(1,dt*3),4*dt)}
 function HT_next(c,B,N){if(c.route){c.a=c.b;c.b=c.route.length?c.route.shift():c.a;c.t=0;c.rn=(c.rn||0)+1;return}let nx=B.nb.filter(n=>n!==c.a&&!QS_shut(c.b,n));if(c.tr)nx=nx.filter(n=>N[n].tr);c.a=c.b;c.b=nx.length?nx[Math.floor(R()*nx.length)]:c.a;c.t=0}
-function HT_pose(c,A,B,dx,dz,gA,W,dt,im){const lane=W*(c.l3s!=null&&!c.pk&&W>=14?.27+.09*c.l3s:c.lane)/* life-3: inner/outer lane, smooth lane changes (98l3) */+(RD_ON&&gA&&!c.pk&&!c.tr&&(A.w||0)>=14?(c.l3s??(c.lane<.27?-1:1))*Math.min(A.w,B.w||A.w)*.11:0)/* RD: two lanes per direction on wide streets */+(c.yo||0)/* ayd: give way sideways (98ayd_yield.js) */,x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;
+// traf-r21k2: lane-line handoffs (a turn at a junction moved a car 3-5 m sideways in one step on a 2-lane street, all cars at a green light together) and any other step
+// jump are absorbed into a residual r that closes at <= HT_LAT.v m/s (eased below 1 m): the car slides to its lane line instead of snapping. Teleports (> 25 m: recycle/respawn) reset it. ?lat=0 = off.
+const HT_LAT={on:!/[?&]lat=0/.test(location.search),v:.9,k:1.2,n:0};let _hlx=0,_hlz=0;
+function HT_lat(c,x,z,dx,dz,dt){if(!HT_LAT.on||!(dt>0)||c.pk){_hlx=x;_hlz=z;c.tgx=NaN;c.lrx=c.lrz=0;return}
+  if(c.tgx<1e9){const e=(c.cv||0)*dt,jx=x-c.tgx-c.thx*e,jz=z-c.tgz-c.thz*e,jm=Math.hypot(jx,jz);if(jm>25){c.lrx=c.lrz=0}else if(jm>.06){c.lrx-=jx;c.lrz-=jz;HT_LAT.n++}}
+  c.tgx=x;c.tgz=z;c.thx=dx;c.thz=dz;let rx=c.lrx||0,rz=c.lrz||0;const m=Math.hypot(rx,rz);if(m>0){const st=Math.min(m,Math.min(HT_LAT.v,HT_LAT.k*m)*dt),f=(m-st)/m;rx*=f;rz*=f;if(m-st<.005)rx=rz=0;c.lrx=rx;c.lrz=rz}
+  _hlx=x+rx;_hlz=z+rz}
+function HT_pose(c,A,B,dx,dz,gA,W,dt,im){const lane=W*(c.l3s!=null&&!c.pk&&W>=14?.27+.09*c.l3s:c.lane)/* life-3: inner/outer lane, smooth lane changes (98l3) */+(RD_ON&&gA&&!c.pk&&!c.tr&&(A.w||0)>=14?(c.l3s??(c.lane<.27?-1:1))*Math.min(A.w,B.w||A.w)*.11:0)/* RD: two lanes per direction on wide streets */,yo=c.yo||0/* ayd: give way sideways (98ayd_yield.js), added after the smoother so a dodge stays fast */;let x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;
+  HT_lat(c,x,z,dx,dz,dt);x=_hlx-dz*yo;z=_hlz+dx*yo;
   c.x=x;c.z=z;c.y=TUNE.htGc?HT_gnd(c,x,z,dx,dz,A.ab||gA):A.ab||gA?groundAt(x,z,(c.y||0)+4):groundY(x,z);
   _m.makeBasis(_hrt.set(dz,0,-dx),_hup,_hfw.set(dx,0,dz)).setPosition(x,c.y,z);CR_susp(c,dx,dz,dt,im,_m)}
 // perf-r15a: the per-car ground probe (GND_in / roamTerr deck scan) was the biggest cost inside the car loop; re-probe after 1.5 m or a new edge, extrapolate along the edge in between

@@ -1,0 +1,30 @@
+// traf-r21k2 (2026-10-20): traffic/behaviour, a no-graphics state assert on how NPC cars MOVE (Frankfurt + Athens).
+// Parks the player on the busiest street cluster, steps the real hubTrafficStep at a fixed dt for 60 s and watches every live car within 150 m:
+//   jump  = how far a car moved beyond what its speed explains in one step (a sideways snap is ~3-5 m, a smooth slide <= 0.04 m at dt 1/60); moves > 3 m are recycle/respawn teleports, counted apart
+//   lane changes (c.l3t flips): per car per minute, and how many cars flip on the SAME frame; gap = centre distance to the nearest car ahead in the same lane; overlap = centres < 3.6 m long / 1.8 m wide apart
+const TRF={dt:1/60,sec:60,rad:150,maxJump:.15,maxLatV:2.5,maxSame:.2,minGap:5,maxLc:2};
+function TRF_measure(sec,dt,rad){sec=sec||TRF.sec;dt=dt||TRF.dt;rad=rad||TRF.rad;const L=__l3,H=L.HUB,N=H.nodes;let best=null,bn=-1;for(const c of H.cars){if(c.dead>0)continue;let n=0;for(const o of H.cars)if(Math.abs(o.x-c.x)<160&&Math.abs(o.z-c.z)<160)n++;if(n>bn){bn=n;best=c}}
+  if(!best)return null;const PP=L.park(best.x+6,best.z+6);L.sim(3,1/30);
+  const prev=new Map(),lc=new Map(),R={cars:H.cars.length,near:bn,steps:0,maxJump:0,maxLatV:0,over:0,tele:0,lcFrames:0,multiFrames:0,minGap:1e9,overlapPairs:0,lcMax:0,turnEx:0,ovAll:0,ev:[],ov:[]};const OP=new Set(),PR=new Map(),SEEN=new Set(),n=Math.round(sec/dt);
+  for(let s=0;s<n;s++){L.sim(dt,dt);let nlc=0;const live=[];
+   for(const c of H.cars){if(c.dead>0||c.dz||c.x==null||Math.hypot(c.x-PP[0],c.z-PP[1])>rad)continue;live.push(c);const q=prev.get(c);
+    if(q){const dd=Math.hypot(c.x-q.x,c.z-q.z),A=N[c.a],B=N[c.b],P=N[q.a],Q=N[q.b0];
+     if(dd>3||c.a!==q.a&&(c.a!==q.b0||c.t>=.2)||c.a===q.a&&c.b===q.b0&&c.t<q.t-1e-6||!A||!B||!P||!Q)R.tele++;else{const l1=Math.hypot(B.x-A.x,B.z-A.z)||1,ex=(B.x-A.x)/l1,ez=(B.z-A.z)/l1,l0=Math.hypot(Q.x-P.x,Q.z-P.z)||1,same=c.a===q.a&&c.b===q.b0||ex*(Q.x-P.x)/l0+ez*(Q.z-P.z)/l0>.97;R.steps++;
+      if(same){const lat=Math.abs((c.x-q.x)*-ez+(c.z-q.z)*ex);if(lat>R.maxJump)R.maxJump=lat;if(lat/dt>R.maxLatV)R.maxLatV=lat/dt;if(lat>TRF.maxJump){R.over++;if(R.ev.length<12)R.ev.push([s,c.k,q.a+'>'+q.b0,c.a+'>'+c.b,+c.t.toFixed(2),+lat.toFixed(2),+(c.cv||0).toFixed(1),c.CVin?1:0,+(c.yo||0).toFixed(1)])}}
+      else{const t=Math.max(0,dd-(q.cv+(c.cv||0))*.5*dt-.01);if(t>R.turnEx)R.turnEx=t}}
+     if(c.l3t!=null&&q.l3t!=null&&q.l3t!==c.l3t){nlc++;const k=c.j+'_'+c.k;lc.set(k,(lc.get(k)||0)+1)}}
+    prev.set(c,{x:c.x,z:c.z,a:c.a,b0:c.b,t:c.t,cv:c.cv||0,l3t:c.l3t})}
+   if(nlc){R.lcFrames++;if(nlc>1)R.multiFrames++}
+   if(s%6===0)for(let i=0;i<live.length;i++)for(let j=i+1;j<live.length;j++){const a=live[i],b=live[j],rx=b.x-a.x,rz=b.z-a.z;if(Math.abs(rx)>40||Math.abs(rz)>40)continue;const A=N[a.b],Aa=N[a.a],Bb=N[b.b],Ba=N[b.a];if(!A||!Aa||!Bb||!Ba)continue;
+    let ax=A.x-Aa.x,az=A.z-Aa.z,al=Math.hypot(ax,az)||1;ax/=al;az/=al;let bx=Bb.x-Ba.x,bz=Bb.z-Ba.z,bl=Math.hypot(bx,bz)||1;bx/=bl;bz/=bl;if(ax*bx+az*bz<.7)continue;const d=rx*ax+rz*az,lat=Math.abs(-rx*az+rz*ax);
+    const kk=a.j+'_'+a.k+'/'+b.j+'_'+b.k,ov=Math.abs(d)<3.6&&lat<1.8,H2=PR.get(kk)||(PR.set(kk,{o:0,g:[]}),PR.get(kk));SEEN.add(kk);if(ov){H2.o++;if(H2.o===1)R.ovAll++;if(H2.o===10&&!OP.has(kk)){OP.add(kk);if(R.ov.length<6)R.ov.push([s,kk,+d.toFixed(1),+lat.toFixed(1),+(a.cv||0).toFixed(1),+(b.cv||0).toFixed(1),a.CVin?1:0,b.CVin?1:0,a.a+'>'+a.b,b.a+'>'+b.b,+a.t.toFixed(2),+b.t.toFixed(2)])}}else H2.o=0;
+    if(lat<1.6&&TRF_same(a,b)){H2.g.push(Math.abs(d));if(H2.g.length>5)H2.g.shift();if(H2.g.length===5){const m=Math.max(...H2.g);if(m<R.minGap)R.minGap=m}}else H2.g.length=0}
+   if(s%6===0){for(const k of PR.keys())if(!SEEN.has(k))PR.delete(k);SEEN.clear()}}
+  R.overlapPairs=OP.size;R.lcCars=lc.size;for(const v of lc.values())R.lcMax=Math.max(R.lcMax,v);R.lcPerMin=R.lcMax*60/sec;R.sameFrac=R.lcFrames?R.multiFrames/R.lcFrames:0;if(R.minGap>1e8)R.minGap=99;return R}
+// two cars in the same lane of the same road (not queued at a light: a standing queue may close up to the stop-line spacing)
+function TRF_same(a,b){return Math.abs((a.l3s||0)-(b.l3s||0))<.3&&((a.cv||0)>1||(b.cv||0)>1)}
+function TRF_go(say){const R=TRF_measure();if(!R)return'📍 TRAFFIC · no cars ❌';const ok=R.near>=8&&R.maxJump<TRF.maxJump&&R.maxLatV<TRF.maxLatV&&R.sameFrac<=TRF.maxSame&&R.minGap>=TRF.minGap&&R.overlapPairs===0&&R.lcPerMin<=TRF.maxLc;
+  return`📍 TRAFFIC 60 s at ${R.near} cars: max jump ${R.maxJump.toFixed(3)} m/step (< ${TRF.maxJump}, ${R.over} over, ${R.tele} teleports ignored), lateral speed ${R.maxLatV.toFixed(2)} m/s (< ${TRF.maxLatV}), ${R.lcFrames} lane-change frames, ${R.multiFrames} with 2+ cars (≤ 20 %), per car ≤ ${R.lcPerMin.toFixed(1)}/min (≤ ${TRF.maxLc}), min gap held 0.5 s ${R.minGap.toFixed(1)} m (≥ ${TRF.minGap}), ${R.overlapPairs} overlapping pairs held 1 s (${R.ovAll} touches), turn hand-off step ${R.turnEx.toFixed(2)} m ${ok?'✅':'❌'}`}
+function TRF_rows(GO,goSay,CK){CK.push({ver:'traffic',id:'behaviour',area:'world',text:'traf-r21k2:2026-10-20 · NPC cars move like drivers, not like a switch: each follows its own lane line, junction turns and lane changes slide (no 3-5 m snaps), lane changes only on purpose (pass a slower car, turn side before a junction), never inside a junction box, with a blinker, ≤ 2 a minute and never several cars on the same frame. 📍 GO parks you on the busiest street cluster and steps the real traffic 60 s at dt 1/60 (no graphics). Pass line: max jump < 0.15 m/step, lateral speed < 2.5 m/s, same-frame lane changes ≤ 20 % of lane-change frames, min gap ≥ 5 m, no overlapping cars, ≤ 2 lane changes per car per minute.'});
+ for(const c of['fra','ath'])(GO['traffic/behaviour']=GO['traffic/behaviour']||[]).push({c,n:'traffic behaviour '+(c==='fra'?'Frankfurt':'Athens'),secs:120,fn:()=>TRF_go(t=>goSay(t))})}
+window.__trf={TRF,measure:TRF_measure};
