@@ -661,3 +661,11 @@ roamCam=(f=>function(dt){const sn=camSnap,r=f(dt);try{if(!CFIT.on||state!=='roam
    CFIT.on=on0;const ok=R.length===4&&R.every(r=>r[1]);goSay('📍 CAR FIT '+city.toUpperCase()+' · '+R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL'))})();return'📍 CAR FIT · checking…'}});
  C.GO['ui/car-fit']=[go('fra'),go('ath')];return}
  if(i<600)setTimeout(()=>CF_reg(i+1),100)})(0);
+// ios-r18w: GO perf/bld-soa — HUB.bld rows are BldRow (typed columns); fixed collision / window / plinth queries equal before and after the freeze; accessors round-trip. ?soab=0 = off switch.
+(function SOAB_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='bld-soa')){C.items.push({ver:'perf',id:'bld-soa',area:'perf',text:'ios-r18w · 📍 GO: HUB.bld collider rows are typed-column rows (?soab=0 = off). Pass line: every row converted, fixed queries (roamHit lattice, window counts, plinths, grid sizes) identical before/after, setters round-trip.',go:'perf/bld-soa'});
+ C.GO['perf/bld-soa']=['fra','ath'].map(c=>({c,n:'bld rows in typed columns',secs:8,fn:()=>{if(typeof SOAB==='undefined')return'📍 SOAB · missing ❌ FAIL';if(!SOAB.on)return'📍 SOAB · off (?soab=0) ✅ PASS';
+  const s=SOAB.stat(),B=HUB.bld,r=B.find(b=>b instanceof BldRow);if(!r)return'📍 SOAB · no BldRow ❌ FAIL';let plain=0;for(const b of B)if(!(b instanceof BldRow))plain++;
+  const h=r.h,y0=r.y0,x=r.x;r.h=h+1;r.y0=undefined;const ok0=Math.abs(r.h-h-1)<.01&&r.y0===undefined;r.h=h;r.y0=y0;const ok1=r.x===x&&r.y0===y0&&r.rh===r.rh;
+  const ok=s.same&&ok0&&ok1&&plain<=B.length*.05&&s.rows>1000;
+  return'📍 SOAB · '+s.rows+' rows · '+s.cols+' cols · '+s.own+' own props · '+plain+' plain after · '+s.colMB+' MB cols · freeze '+s.ms+' ms · sig '+(s.same?'equal':'DIFF')+' (hits '+(s.pre&&s.pre.nh)+'/'+(s.post&&s.post.nh)+') '+(ok?'✅ PASS':'❌ FAIL')}}))}return}
+ if(i<600)setTimeout(()=>SOAB_reg(i+1),100)})(0);
