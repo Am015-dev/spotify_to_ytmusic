@@ -10,10 +10,15 @@
 if(RET.grit===undefined)RET.grit=!/[?&]grit=0/.test(location.search);
 const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.tut||G.lab));},
   rate0:1/50,burst:.25,stK:.03,maxK:4,hk0:.3,hkS:.5,lvTop:.62,from:3,
+  /* W47 Normal ease: special kinds thin out before stage 12 (dens), at most maxE alive there, a lower hull slope; stages 1-3 assist: wider beat window, slower enemy shots (humanbot.js: human clear 39% -> 70+% at st3-7) */
+  dens0:.35,densA:4,densB:12,maxE:2,hkN:.12,aWin:35,aSp:.14,aTo:3,bsN:1,mc0:.4,mc20:.5,mcMax:3,
   st:{charges:0,gain:0,kill:0,fod:0,spec:0},
   fkM:{},fk0:1.15,fkEnd:1.05,fkA:10,fkB:20,   // on-screen floor x1.3 to stage 10, tapering to x1.1 at stage 20 (humanbot.js: median life 2.4 -> 3.0 s; a flat x1.3 cost the stage-20 oracle dodger 20-30 points)
   fk(e){const k=this.fkM[e.type]||this.fk0,s=this.stg();return s<=this.fkA?k:1+(k-1)*Math.max(0,1-(1-(this.fkEnd-1)/Math.max(.001,k-1))*Math.min(1,(s-this.fkA)/(this.fkB-this.fkA)));},
   norm(){return this.on&&SET.diff==='normal';},
+  dens(){if(!this.norm())return 1;const s=this.stg();return s>=this.densB?1:s<=this.densA?this.dens0:this.dens0+(1-this.dens0)*(s-this.densA)/(this.densB-this.densA);},
+  assist(){return this.norm()&&this.stg()<=this.aTo&&!(typeof G==='object'&&G&&G.boss);},
+  aK(){return(this.aTo+1-this.stg())/this.aTo;},
   stg(){try{return S2.stg();}catch(e){return 1;}},
   rate(){return this.rate0/(1+this.stK*Math.max(0,this.stg()-1));},
   fillT(){return 1/(this.rate()*(ABIL.FILL[SET.diff]||1));},
@@ -27,7 +32,7 @@ const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.
     v=Math.min(v,g.b);g.b-=v;this.st.gain+=v;return v;},
   /* durability kinds */
   alive(){let n=0;for(const e of G.en)if(e.gk&&e.hp>0)n++;return n;},
-  tag(e){if(!this.on||SET.diff==='easy'||e.mini||e.type==='boss'||this.stg()<this.from||this.alive()>=this.maxK)return;const r=this.rnd(),t=e.type;let k='';
+  tag(e){if(!this.on||SET.diff==='easy'||e.mini||e.type==='boss'||this.stg()<this.from||this.alive()>=(this.norm()&&this.stg()<this.densB?this.maxE:this.maxK))return;const r=this.rnd()/this.dens(),t=e.type;let k='';
     if(t==='turret')k=r<.4?'plate':r<.6?'shield':'';
     else if(t==='charger'||t==='flank')k=r<.32?'eva':r<.42?'plate':'';
     else if(t==='drone')k=e.el?(r<.4?'shield':''):(r<.14?'med':r<.28?'shield':'');
@@ -62,8 +67,12 @@ const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.
 {const l0=VIS.life;VIS.life=function(e){const b=l0.call(this,e);return GRIT.norm()&&b>0?b*GRIT.fk(e):b;};
   const h0=DMG.hit;DMG.hit=function(d,b,e){const r=h0.call(this,d,b,e);return GRIT.on?GRIT.hit(r,b,e):r;};
   Object.defineProperty(SC,'lvTop',{get(){return GRIT.norm()?GRIT.lvTop:.8;},set(){},configurable:true});
-  const k0=SC.hpK.bind(SC);SC.hpK=()=>{const v=k0();return GRIT.norm()&&v!=null?v*(1+GRIT.hk0+GRIT.hkS*SC.f()):v;};
+  const k0=SC.hpK.bind(SC);SC.hpK=()=>{const v=k0();return GRIT.norm()&&v!=null?v*(1+(GRIT.norm()?GRIT.hkN:GRIT.hk0)+GRIT.hkS*SC.f()):v;};
   const e0=en;en=function(type,o){const e=e0(type,o||{});try{GRIT.tag(e);}catch(x){}return e;};}
+{const w0=RET.asWinMs;RET.asWinMs=function(){return w0.call(this)+(GRIT.assist()?Math.round(GRIT.aWin*GRIT.aK()):0);};
+  const b0=eb;eb=function(x,y,a,s,c,r){if(GRIT.assist())s*=1-GRIT.aSp*GRIT.aK();if(GRIT.norm())s*=GRIT.bsN;return b0(x,y,a,s,c,r===undefined?5:r);};}
+{const h1=hurt;hurt=function(n){const b=P.hp;h1.apply(this,arguments);   // W47 mercy: on Normal a share of hull hits is absorbed (hull restored, short grace) - a human takes 4-7 hits a stage, not 9
+    if(GRIT.norm()&&!G.dead&&P.hp<b&&b>1){const g=GRIT.g(),m=GRIT.mc0+(GRIT.mc20-GRIT.mc0)*Math.min(1,Math.max(0,(GRIT.stg()-1)/19));g.mc=(g.mc||0)+m;if(g.mc>=1&&(g.mn||0)<GRIT.mcMax){g.mc-=1;g.mn=(g.mn||0)+1;P.hp=b;P.inv=Math.max(P.inv||0,.6);GRIT.st.mercy=(GRIT.st.mercy||0)+1;}}};}
 NR.on('tick',dt=>GRIT.tick(dt));
 NR.on('runStart',()=>{for(const k in GRIT.st)GRIT.st[k]=0;});
 window.__grit=GRIT;
