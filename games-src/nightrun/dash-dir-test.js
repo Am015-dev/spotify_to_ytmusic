@@ -20,7 +20,7 @@ const D8 = [[0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1]
     return { p, ctx, cdp: await ctx.newCDPSession(p) };
   };
   const dashAndRead = async (p, moving) => {   // press the dash button, wait for the dash to start, read the heading
-    await p.evaluate(() => { const g = __mnr; g.P.dashCd = 0; g.P.dashT = 0; g.P.dq = null; document.getElementById('bDash').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); });
+    await p.evaluate(() => { const g = __mnr; g.P.dashCd = 0; g.P.dashT = 0; g.P.dq = null; if (window.ABIL && ABIL.on) ABIL.st().n = ABIL.max(); if (g.G.tm) g.G.tm.pen = 0;   /* W39: refill is slower now; this test checks direction, not charges */ document.getElementById('bDash').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); });
     for (let i = 0; i < 40; i++) { if (moving) await moving(); await sleep(16); if (await p.evaluate(() => __mnr.P.dashT > 0)) break; }
     return p.evaluate(() => ({ dx: __mnr.P.dx, dy: __mnr.P.dy }));
   };

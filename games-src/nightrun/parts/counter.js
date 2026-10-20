@@ -64,7 +64,7 @@ const CTR=window.CTR={get on(){return!!RET.counter;},
       const x0=w.x;w.x-=w.v*dt;if(w.hit||w.done)continue;
       if(P.x>=w.x-14&&P.x<=x0+14){const inGap=w.gap&&Math.abs(P.y-w.gap.y)<w.gap.h/2-8;
         if(P.dashT>0||inGap){if(P.dashT>0&&!w.dash){w.dash=1;this.stat[w.cur?'curtDash':'wallDash']++;G.score+=Math.round(200*G.mult);floater(P.x,P.y-30,'THROUGH','#19e3ff');}}
-        else if(P.inv<=0){w.hit=1;this.stat[w.cur?'curtHit':'wallHit']++;hurt(1);}}
+        else if(P.inv<=0&&!w.dash){w.hit=1;this.stat[w.cur?'curtHit':'wallHit']++;hurt(1);}}
       if(w.x<P.x-20)w.done=1;}
     this.walls=this.walls.filter(w=>w.x>-30);
     for(const c of this.curts){c.t-=dt;if(c.t<=0)c.dead=1;}this.curts=this.curts.filter(c=>!c.dead);

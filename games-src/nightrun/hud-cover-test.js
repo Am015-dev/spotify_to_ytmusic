@@ -50,7 +50,7 @@ function inPage(mode) {   // runs in the page: freeze, render twice, diff
   const fps = document.getElementById('fpsEl'), fpsVisible = !!fps && !fps.hidden && getComputedStyle(fps).display !== 'none';
   const btns = ['bDash', 'bEmp', 'bPause'].map(id => { const e = document.getElementById(id), b = e && e.getBoundingClientRect(); return b ? { id, w: Math.round(b.width), h: Math.round(b.height), vis: b.width > 0 } : null; }).filter(Boolean);
   const dash = document.getElementById('bDash'), emp = document.getElementById('bEmp');
-  return { cov: covN / (cx * cy), band, bandCells: band, boxes: boxes.length, bad, fpsVisible, btns, hudText: texts.length, scroll: document.documentElement.scrollWidth > innerWidth + 1,
+  return { boxL: boxes.map(b => b.map(Math.round)), cov: covN / (cx * cy), band, bandCells: band, boxes: boxes.length, bad, fpsVisible, btns, hudText: texts.length, scroll: document.documentElement.scrollWidth > innerWidth + 1,
     rings: !!dash && !!emp && getComputedStyle(dash, '::after').content !== 'none' && getComputedStyle(emp, '::after').content !== 'none', frame: [r.width, r.height], mask: Array.from(mask), cx, cy, rp: 540 };
 }
 
@@ -68,6 +68,7 @@ function inPage(mode) {   // runs in the page: freeze, render twice, diff
     const mode = kind === 'phone' ? 'port' : 'land'; const sizeFail = [];
     if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await p.screenshot({ path: path.join(SHOTS, `hud-${W}x${H}.png`) }); }
     const r = await p.evaluate(inPage, await p.evaluate(() => (window.__mnr.rotMode ? 'port' : 'land')));
+    if (process.env.BOXES) console.log(W + 'x' + H, 'frame', r.frame.map(Math.round), 'boxes [x0,y0,x1,y1]', JSON.stringify(r.boxL));
     if (errs.length) sizeFail.push('page errors: ' + errs.slice(0, 2).join(' | '));
     if (kind === 'phone') {
       if (r.cov > .20) sizeFail.push(`HUD covers ${(r.cov * 100).toFixed(1)}% of the playfield (max 20%)`);
