@@ -13,7 +13,7 @@ const HP = process.env.HP ? JSON.parse(process.env.HP) : {};   // human paramete
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const BOT = (o) => {
   const m = window.__mnr, { n, build, bot, seed } = o; m.SET.diff = 'normal'; try { m.applySet(); } catch (e) { }
-  m.startStory(n); m.simOn(true);
+  m.startStory(n); m.simOn(true); const e0 = window.ABIL ? window.ABIL.stat.emp : 0;
   let sd = seed * 7919 + 13; const rnd = () => { sd = (sd * 1103515245 + 12345) & 0x7fffffff; return sd / 0x7fffffff; };   // own dice: a run is repeatable
   const gauss = () => { let s = 0; for (let i = 0; i < 4; i++) s += rnd(); return (s - 2) * 1.73; };
   const WP = window.__wp, SH = m.SH, late = build === 'late';
@@ -83,7 +83,7 @@ const BOT = (o) => {
     if (m.ST.over || m.G.dead) { cleared = !!m.ST.over && !m.G.dead; break; }
   }
   const life = []; for (const [e, r] of rec) { if (r.boss || r.mini || !r.killed || r.in < 0 || r.end - r.in <= 0) continue; life.push([r.ty, +(r.end - r.in).toFixed(2)]); }
-  const res = { n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: m.ST.hits, life, emp: m.ST.emps || 0 };
+  const res = { n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0) };
   m.abort(); return res;
 };
 (async () => {
