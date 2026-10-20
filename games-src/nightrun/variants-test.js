@@ -38,7 +38,7 @@ const RUN = (o) => {   // (c) spawn list, (d) variety, (e) hull / caps / life â€
   while (m.running && !m.ST.over && T < o.secs) { m.P.hp = 99; m.P.inv = 1; m.P.y = 270 + 170 * Math.sin(T * 1.1); m.P.x = 230 + 90 * Math.sin(T * .6); if (m.SH.active) m.SH.close(); m.step(1 / 30); T += 1 / 30;
     maxEb = Math.max(maxEb, m.G.eb.length); for (const b of m.G.eb) if (!b.lob && b.k !== 'n') maxV = Math.max(maxV, Math.hypot(b.vx, b.vy)); }
   const st = window.VAR ? VAR.stat() : {}; try { m.NR.off && m.NR.off('spawn', fn); } catch (_) { }
-  m.abort(); return { n: o.n, sp: sp.slice(0, 400), keys: keys.size, kinds: kinds.size, nv, maxEb, maxV: Math.round(maxV), cap: window.VAR ? VAR.X.cap() : 0, bcap: m.BCAP, hull0: st.hull0, hull1: st.hull1, life };
+  m.abort(); return { n: o.n, sp: sp.slice(0, 400), keys: keys.size, ks: [...keys], kinds: kinds.size, nv, maxEb, maxV: Math.round(maxV), cap: window.VAR ? VAR.X.cap() : 0, bcap: m.BCAP, hull0: st.hull0, hull1: st.hull1, life };
 };
 
 (async () => {
@@ -66,10 +66,13 @@ const RUN = (o) => {   // (c) spawn list, (d) variety, (e) hull / caps / life â€
       await A.ctx.close(); await B.ctx.close(); }
     // (d)+(e) per stage
     const T = {}; let H0 = 0, H1 = 0; const { ctx, p } = await open('', 0, 1);
+    // stage 45 is a no-hit challenge that ends the run at ~25 s, so its looks are counted together with stages 40-44 (W57b)
+    const LK = new Set();
+    for (const n of [40, 41, 42, 43, 44]) { const r = await p.evaluate(RUN, { n, secs: SECS, diff: 'hard' }); r.ks.forEach(k => LK.add(k)); console.log('stage ' + n + ': looks ' + r.keys + ' (counted toward stage 45)'); }
     for (const n of [1, 3, 5, 10, 20, 30, 45]) { const r = await p.evaluate(RUN, { n, secs: SECS, diff: n >= 20 ? 'hard' : 'normal' }); T[n] = r;
-      const need = n >= 30 ? 20 : n >= 10 ? 12 : 0;
-      console.log('stage ' + n + ': kinds ' + r.kinds + ' -> looks ' + r.keys + ' (variant spawns ' + r.nv + '/' + r.sp.length + '), hull x' + (r.hull1 / Math.max(1, r.hull0)).toFixed(2) + ', max eb ' + r.maxEb + ', min life mini ' + r.life.M.toFixed(1) + ' normal ' + r.life.N.toFixed(1));
-      if (need && r.keys < need) fails.push('stage ' + n + ': only ' + r.keys + ' looks (< ' + need + ')');
+      const need = n >= 30 ? 20 : n >= 10 ? 12 : 0, looks = n === 45 ? new Set([...LK, ...r.ks]).size : r.keys;
+      console.log('stage ' + n + ': kinds ' + r.kinds + ' -> looks ' + looks + ' (variant spawns ' + r.nv + '/' + r.sp.length + '), hull x' + (r.hull1 / Math.max(1, r.hull0)).toFixed(2) + ', max eb ' + r.maxEb + ', min life mini ' + r.life.M.toFixed(1) + ' normal ' + r.life.N.toFixed(1));
+      if (need && looks < need) fails.push('stage ' + n + ': only ' + looks + ' looks (< ' + need + ')');
       if (r.maxEb > r.cap + 5) fails.push('stage ' + n + ': enemy bullets ' + r.maxEb + ' > ' + r.cap); if (r.bcap && r.maxV > r.bcap + 1) fails.push('stage ' + n + ': bullet speed ' + r.maxV + ' > BCAP');
       if (r.life.Mbad != null) fails.push('stage ' + n + ': a mini died after ' + r.life.M.toFixed(2) + ' s on screen (below the DMG floor or 1.2) ' + r.life.Mt); 
       H0 += r.hull0; H1 += r.hull1; const ratio = r.hull1 / Math.max(1, r.hull0); if (ratio < .9 || ratio > 1.1) fails.push('stage ' + n + ': hull x' + ratio.toFixed(2) + ' (outside +-10%)'); }

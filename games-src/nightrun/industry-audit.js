@@ -36,7 +36,7 @@ const RUN = new Function('o', `
   m.SH.live = true; // S27: startStory emits no runStart, so SH.live stays false and a stage end skips the pit stop (SH.pit). Set it here so the sim reaches the card screen
   m.startStory(o.n); m.simOn(true); m.NR.watch = { shots: [], spawns: [] };
   ${DEC}
-  const seen = new Map(), life = [], ebN = [], enN = [], bossEbN = [], fireBy = new Map(); let hits = 0, dashes = 0, reflex = 0, emps = 0, d = null, i = 0, lastBoss = null, bossWin = [], bossNow = null, bossMax = 0, lanes = 0, lastLane = null, hp0 = null;
+  let vol = 0; const seen = new Map(), life = [], ebN = [], enN = [], bossEbN = [], fireBy = new Map(); let hits = 0, dashes = 0, reflex = 0, emps = 0, d = null, i = 0, lastBoss = null, bossWin = [], bossNow = null, bossMax = 0, lanes = 0, lastLane = null, hp0 = null;
   const dt = 1 / 60, cap = o.maxt, ST = m.ST; let cleared = false, lastBeat = -1, tapAt = -1;
   const AS = () => (window.ABIL ? window.ABIL.stat : { dash: 0, emp: 0 }), CL = () => (window.CHO ? window.CHO.log : []), A0 = { dash: AS().dash, emp: AS().emp }, c0 = CL().length;   // page counters, read as deltas from the start of this run
   while (m.running && m.G.t < cap) {
@@ -53,13 +53,13 @@ const RUN = new Function('o', `
     for (const e of G2.en) { if (e.type === 'boss') continue; cur.add(e); let s = seen.get(e); if (!s && e.x < 950 && e.x > -20) { s = { t0: now, k: e.type + (e.el ? '*' : ''), x0: e.x }; seen.set(e, s); } }
     for (const [e, s] of seen) if (!cur.has(e) && !s.done) { s.done = 1; life.push({ k: s.k, life: now - s.t0, killed: e.x > -20 && e.x < 940 }); seen.delete(e); }
     if (i % 6 === 0) { enN.push(cur.size); (G2.boss ? bossEbN : ebN).push(G2.eb.length); }
-    const b = G2.boss; if (b && !bossNow) { bossNow = { t0: now, nm: b.nm, ph: 0, verbs: new Set() }; } if (bossNow) { if (b) { bossNow.ph = Math.max(bossNow.ph, b.ph || 0); if (b.lists) for (const l of b.lists) for (const v of l) bossNow.verbs.add(v); bossNow.mini = !!(b.mini || (bossIn.length && bossIn[bossIn.length - 1][1])); } else { bossNow.dur = now - bossNow.t0; bossNow.verbs = [...bossNow.verbs]; bossWin.push(bossNow); bossNow = null; } }
-    const w = m.NR.watch; if (w && i % 6 === 0) { for (const s of w.shots) if (s.by && s.by.type !== 'boss') { let a = fireBy.get(s.by); if (!a) fireBy.set(s.by, a = []); if (!a.length || s.t - a[a.length - 1] > .25) a.push(s.t); } w.shots.length = 0; w.spawns.length = 0; }
+    const b = G2.boss; if (b && !bossNow) { bossNow = { t0: now, nm: b.nm, ph: 0, verbs: new Set() }; } if (bossNow) { if (b) { bossNow.ph = Math.max(bossNow.ph, b.ph || 0); if (b.lists) for (const l of b.lists) for (const v of l) { if (!bossNow.verbs.has(v)) { (bossNow.vf = bossNow.vf || []).push(v + '@' + (now - bossNow.t0).toFixed(1) + (b.bm ? 'B' : '')); } bossNow.verbs.add(v); } bossNow.mini = !!(b.mini || (bossIn.length && bossIn[bossIn.length - 1][1])); } else { bossNow.dur = now - bossNow.t0; bossNow.verbs = [...bossNow.verbs]; bossWin.push(bossNow); bossNow = null; } }
+    const w = m.NR.watch; if (w && i % 6 === 0) { for (const s of w.shots) if (s.by && s.by.type !== 'boss') { let a = fireBy.get(s.by); if (!a) fireBy.set(s.by, a = []); if (!a.length || s.t - a[a.length - 1] > .25) a.push(s.t); vol++; } w.shots.length = 0; w.spawns.length = 0; }
     if (G2.dead) break; if (ST.over) { cleared = true; break; }
   }
   if (bossNow) { bossNow.dur = m.G.t - bossNow.t0; bossNow.verbs = [...bossNow.verbs]; bossNow.open = 1; bossWin.push(bossNow); }
   const cvs = []; for (const [, a] of fireBy) if (a.length >= 3) { const g = []; for (let j = 1; j < a.length; j++) g.push(a[j] - a[j - 1]); const mu = g.reduce((x, y) => x + y, 0) / g.length; if (mu > 0) cvs.push(Math.sqrt(g.reduce((x, y) => x + (y - mu) * (y - mu), 0) / g.length) / mu); }
-  const r = { n: o.n, seed: o.seed, t: +m.G.t.toFixed(1), clear: cleared, hits, life, ebN, enN, bossEbN, bossWin, spawns: sp, dashes, reflex, emps, lanes, pits: pits.length, fireCV: cvs, setKeys: Object.keys(m.SET || {}),
+  const r = { n: o.n, seed: o.seed, t: +m.G.t.toFixed(1), clear: cleared, hits, life, ebN, enN, bossEbN, bossWin, spawns: sp, dashes, reflex, emps, lanes, pits: pits.length, fireCV: cvs, vol, setKeys: Object.keys(m.SET || {}),
     dashUse: AS().dash - A0.dash, empUse: AS().emp - A0.emp, picks: CL().slice(c0).filter(x => x.k !== 'pair').length, cardsOn: !!(window.CHO && window.CHO.on), countersOn: !!(window.ABIL && window.CHO) };   // S29: page counters (ABIL.stat, CHO.log)
   m.NR.watch = null; m.abort(); m.god = false; Math.random = realRnd; return r;`);
 
@@ -103,8 +103,9 @@ const harness = (file, env, ms) => { const r = cp.spawnSync('node', [path.join(_
   M.spawnsPerMin = r2(main.reduce((a, r) => a + r.spawns.length, 0) / mins);
   const drone = main.flatMap(r => r.spawns).filter(s => /^drone/.test(s[1])).length, spN = main.reduce((a, r) => a + r.spawns.length, 0); M.droneShare = r2(drone / Math.max(1, spN));
   M.stageSecs = main.map(r => [r.n, r.t, r.clear]); M.stageSecsMedian = r2(med(main.map(r => r.t)));
+  M.volPerMin = r2(runs.filter(r => !r.err).reduce((a, r) => a + (r.vol || 0), 0) / runs.filter(r => !r.err).reduce((a, r) => a + r.t, 0) * 60);   // enemy volleys per game-minute (fire-timing jitter must not change it)
   const bw = main.flatMap(r => r.bossWin.filter(b => !b.open).map(b => Object.assign({ n: r.n }, b)));
-  M.bosses = bw.map(b => ({ n: b.n, nm: b.nm, secs: r2(b.dur), phases: b.ph, verbs: b.verbs.length, mini: !!b.mini }));
+  M.bosses = bw.map(b => ({ n: b.n, nm: b.nm, secs: r2(b.dur), phases: b.ph, verbs: b.verbs.length, vl: b.verbs.join(" "), vf: (b.vf || []).join(" "), mini: !!b.mini }));
   M.bossSecsMedian = r2(med(bw.filter(b => b.dur > 8).map(b => b.dur))); { const ph = bw.filter(b => b.dur > 8 && !b.mini && b.ph > 0).map(b => b.ph); M.bossPhasesMin = ph.length ? Math.min(...ph) : null; M.bossPhasesMedian = med(ph); M.bossesWithPhaseData = ph.length; }
   M.bossVerbsMedian = r2(med(bw.map(b => b.verbs.length)));
   const secs = main.reduce((a, r) => a + r.t, 0) / 60;
