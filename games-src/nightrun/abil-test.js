@@ -59,7 +59,8 @@ const OFF = () => {   // ?abil=0
   let errs = 0;
   { const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { if (errs++ < 3) console.log('PAGE ERROR', e.message); });
     await p.goto(U('')); await READY(p); const o = await p.evaluate(SCN);
-    line(o.burst >= 3 && o.burst <= 4, `dash: ${o.burst} dashes from 1 s of mashing (3-4), then a recharge`);
+    const tmOn = await p.evaluate(() => !!(window.TIM && TIM.on));   // timing.js: an off-beat press costs 2 charges and locks .45 s, so mashing gets 1-3
+    line(tmOn ? o.burst >= 1 && o.burst <= 3 : o.burst >= 3 && o.burst <= 4, `dash: ${o.burst} dashes from 1 s of mashing (${tmOn ? '1-3 with timing' : '3-4'}), then a recharge`);
     line(o.refills >= 1, `dash: a charge is back within 2 s (${o.refills})`);
     for (const [k, v] of [['burn', o.burn], ['ram', o.ram], ['phase', o.phase], ['decoy', o.decoy], ['mag', o.mag]]) line(v > 0, `dash trait ${k} fires (${Math.round(v)})`);
     line(o.reaim > 0, `dash decoy: aimed shots turn to the afterimage (${o.reaim})`);
