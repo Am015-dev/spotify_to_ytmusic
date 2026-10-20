@@ -52,7 +52,7 @@ const RUN = (o) => {   // (c) spawn list, (d) variety, (e) hull / caps / life â€
   const br = await PW.chromium.launch();
   const open = async (q, pt, seed, vp) => { const ctx = await br.newContext({ viewport: vp || { width: 1280, height: 720 } }), p = await ctx.newPage(); if (seed) await p.addInitScript(SEED);
     p.on('pageerror', e => errs.push((q || '') + ' ' + e.message)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
-    await p.goto(`http://127.0.0.1:${pt || port}/index.html?sim=1&all=1&nomusic=1${q || ''}`); await p.waitForFunction(() => window.__mnr && __mnr.TR.list.length > 0, null, { timeout: 20000 }); return { ctx, p }; };
+    await p.goto(`http://127.0.0.1:${pt || port}/index.html?sim=1&all=1&nomusic=1${q || ''}${process.env.QX || ''}`); await p.waitForFunction(() => window.__mnr && __mnr.TR.list.length > 0, null, { timeout: 20000 }); return { ctx, p }; };
   try {
     for (const [nm, vp] of [['landscape 1280x720', { width: 1280, height: 720 }], ['phone 390x763', { width: 390, height: 763 }]]) {
       const { ctx, p } = await open('', 0, 0, vp); const r = await p.evaluate(COMBOS);

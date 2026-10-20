@@ -7,7 +7,7 @@
               rest stop (+1 hp), rush (one armored gunship, x2 score), rival duel (an elite arrowhead). Later laps carry a twist (ev:ambush^swift).
      UNLOCKS  every 12 session-min a milestone with a NEW card: it adds a twist, an event or a skin to the decks, so hour 3 still brings something new.
    All art is placeholder shapes with stable ids (nv-skin-*, nv-tw-*, nv-ev-*): see ASSETS-NEEDED-2.md. ---------- */
-if(RET.novelty===undefined)RET.novelty=/[?&]novelty=1/.test(location.search);   // default OFF until vary-test (sandwich/wave spawn-near-ship) and variants-test (stage 45 looks) pass with it on
+if(RET.novelty===undefined)RET.novelty=/[?&]novelty=1/.test(location.search);   // default OFF until anticamp-test 'bold >= dodger - 10' passes with it on (see HANDOFF novelty section)
 const NOV=window.NOV={T:(()=>{try{return +sessionStorage.getItem('nr-novelty-T')||0;}catch(e){return 0;}})(),lt:0,ep:0,evN:0,unN:0,last:{},buf:[],pend:[],stat:{tw:0,ev:0,un:0,ep:0,byTw:{},byEv:{}},
   EPM:20*60,EVM:5*60,UNM:12*60,REP:300,
   SK:[{id:'nv-skin-base',sh:'',c:''},{id:'nv-skin-tri',sh:'tri',c:'#7df9ff'},{id:'nv-skin-dia',sh:'dia',c:'#ff7ad9'},{id:'nv-skin-ring',sh:'ring',c:'#ffd166'},{id:'nv-skin-hex',sh:'hex',c:'#9dff7a'},{id:'nv-skin-star',sh:'star',c:'#c9a0ff'},{id:'nv-skin-sq',sh:'sq',c:'#ff9f5a'}],
@@ -52,12 +52,13 @@ const NOV=window.NOV={T:(()=>{try{return +sessionStorage.getItem('nr-novelty-T')
     const tell={ambush:['AMBUSH','a column with one gap'],convoy:['TREASURE CONVOY','gold ships: x3 score'],rest:['REST STOP','+1 hull'],rush:['RUSH','one armored gunship: x2'],duel:['RIVAL','an elite duelist']}[k];
     banner(tell[0],tell[1],k==='ambush'||k==='rush',1.8);NR.emit('rule',{id});
     this.pend.push({at:this.T+1.2,f:()=>this.run(k,tw)});},
+  /* event units are placed here, edge-in from the right: vz:0 keeps variants.js (mirror / rotate / left entry) away from them, so nothing can appear near the ship */
   run(k,tw){if(G.dead||!this.on())return;const out=[];
-    if(k==='ambush'){const gy=110+this.rr()*(H-220),gap=140;for(let y=40;y<=H-40;y+=56)if(Math.abs(y-gy)>gap/2+14)out.push(en('drone',{x:W+40,y}));}
-    else if(k==='convoy'){for(let i=0;i<3;i++){const e=en('drone',{x:W+40+i*60,y:H*.3+i*H*.2});e.hp=Math.ceil(e.hp*3);e.max=e.hp;e.score=Math.round((e.score||100)*3);e.nvx='gilded';out.push(e);}}
+    if(k==='ambush'){const gy=110+this.rr()*(H-220),gap=140;for(let y=40;y<=H-40;y+=56)if(Math.abs(y-gy)>gap/2+14)out.push(en('drone',{x:W+40,y,vz:0}));}
+    else if(k==='convoy'){for(let i=0;i<3;i++){const e=en('drone',{x:W+40+i*60,y:H*.3+i*H*.2,vz:0});e.hp=Math.ceil(e.hp*3);e.max=e.hp;e.score=Math.round((e.score||100)*3);e.nvx='gilded';out.push(e);}}
     else if(k==='rest'){if(P.hp<P.max){P.hp++;floater(P.x,P.y-30,'+1 HULL','#9dff7a');}}
-    else if(k==='rush'){const e=en('gunship',{x:W+60,y:H/2});e.score=Math.round((e.score||1200)*2);e.nvx='armored';out.push(e);}
-    else if(k==='duel'){const e=en('drone',{x:W+40,y:H/2});e.el=1;e.hp=Math.round(e.hp*4);e.max=e.hp;e.r=Math.round(e.r*1.25);e.score=Math.round((e.score||180)*4);e.nvl=1;out.push(e);}
+    else if(k==='rush'){const e=en('gunship',{x:W+60,y:H/2,vz:0});e.score=Math.round((e.score||1200)*2);e.nvx='armored';out.push(e);}
+    else if(k==='duel'){const e=en('drone',{x:W+40,y:H/2,vz:0});e.el=1;e.hp=Math.round(e.hp*4);e.max=e.hp;e.r=Math.round(e.r*1.25);e.score=Math.round((e.score||180)*4);e.nvl=1;out.push(e);}
     if(tw)for(const e of out)this.twist(e,tw);},
   /* ---- wave hook: the units this pattern spawned this frame get the twist ---- */
   wave(x){if(!this.on()||!x||!x.id||/^sig:/.test(x.id))return;const base=String(x.id),es=this.buf.filter(b=>b[0]===G.t).map(b=>b[1]);this.buf.length=0;
