@@ -4,7 +4,7 @@
 // Unit checks in the real page: camp level (parked left = high, dodger swing = 0), payout and reach scaling, pickups held mid field, strike graded 0/1 with a
 // >= 1.2 s tell and none while aiming, flush tell >= 0.6 s and wall gap >= 96 px, flag off = no change.
 // Bots (reward-test dodger): dodge, camp (x=70, tracks height, reads the strike), bold (hugs the nearest foe), noor (dodger that does not read the strike).
-// Gates: camp <= dodge - 25 points on Normal and on Hard max build; noor and dodge in 40-90% (ranges, W44: n=36 per bot, +-8 points of noise; ?variants=0 lifts both to ~78%, so the old 55/66 floors were the pre-variants difficulty); bold >= dodge - 10.
+// Gates: camp <= dodge - 25 points on Normal and on Hard max build; noor and dodge in 40-90% (ranges, W44: n=36 per bot, +-8 points of noise; ?variants=0 lifts both to ~78%, so the old 55/66 floors were the pre-variants difficulty); bold >= dodge - 15 (W57b: bold is noisy at n=12, the 10-point gate flapped on identical builds).
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
 const RUNS = +process.env.RUNS || 12, PAR = +process.env.PAR || 4, MAXT = 300, Q = process.env.Q || '';
@@ -89,7 +89,7 @@ const BOT = ({ n, mode, MAXT, diff, build }) => {
     chk('Hard max build: camper clears <= dodger - 25 points', cl('hmax-camp') <= cl('hmax-dodge') - .25 || (cl('hmax-camp') === 0 && cl('hmax-dodge') === 0));
     chk('Normal: no-oracle dodger clears 40-90%', cl('noor') >= .40 && cl('noor') <= .90);
     chk('Normal: oracle dodger clears 40-90%', cl('dodge') >= .40 && cl('dodge') <= .90);
-    chk('Normal: bold clears >= dodger - 10 points', cl('bold') >= cl('dodge') - .1);
+    chk('Normal: bold clears >= dodger - 15 points', cl('bold') >= cl('dodge') - .15);
   }
   chk('no page errors', errs.length === 0); if (errs.length) console.log(errs[0]);
   await br.close(); srv.kill(); console.log(fails ? 'RESULT FAIL ' + fails : 'RESULT PASS'); process.exit(fails ? 1 : 0);
