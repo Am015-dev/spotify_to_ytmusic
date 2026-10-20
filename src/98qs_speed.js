@@ -89,13 +89,13 @@ function QS_sideFit(x,z,h,len,w,B){const side=(r,i0,rng,away)=>{const P=r.pts,W=
   for(let k=0;k<=rng;k++)for(const sg of k?[1,-1]:[1]){const j=i0+sg*k*2;if(j<3||j>P.length-4)continue;const p=P[j];if(RO.ramps&&RO.ramps.some(q=>Math.hypot(q.x-p.x,q.z-p.z)<120))continue;
    if(away){const a=abAt(p.x,p.z);if(a&&a.road&&a.road.ab)continue}
    const f=Math.sin(h)*p.tx+Math.cos(h)*p.tz>=0?1:-1,hh=Math.atan2(p.tx*f,p.tz*f),s1=(j>>1)&1?1:-1;
-   for(const ins of r.w>=14?[2.4,.8]:[.8])for(const sd of[s1,-s1]){const off=r.w/2-W/2-ins,cx=p.x-p.tz*sd*off,cz=p.z+p.tx*sd*off;if(!QS_rampOk(cx,cz,hh,len,W).filter(m=>m[0]!=='s').length&&QS_cover(cx,cz,hh,len,W)<=.4)return{q:[cx,cz,hh,W],r,j}   /* a slope alone is fine (the lip sits on the ground at the low end) */}}
+   for(const ins of r.w>=14?[2.4,.8]:[Math.max(.2,Math.min(.8,r.w/2-W-.6))])for(const sd of[s1,-s1]){const off=r.w/2-W/2-ins,cx=p.x-p.tz*sd*off,cz=p.z+p.tx*sd*off;if(!QS_rampOk(cx,cz,hh,len,W).filter(m=>m[0]!=='s').length&&QS_cover(cx,cz,hh,len,W)<=.4)return{q:[cx,cz,hh,W],r,j}   /* a slope alone is fine (the lip sits on the ground at the low end) */}}
   return null};
  let res=null;if(B.r.w>=14)res=side(B.r,B.i,20,0);
  if(!res&&B.r.w<14&&QS_PERM){const C=[];for(const r of QS_roads()){if(r.w<14||r.cls==='lz'||r.cls==='mtn')continue;let b=null;for(let i=0;i<r.pts.length;i++){const d=Math.hypot(r.pts[i].x-x,r.pts[i].z-z);if(!b||d<b[1])b=[i,d]}if(b&&b[1]<400)C.push([r,b[0],b[1]])}
   C.sort((a,b)=>a[2]-b[2]);for(const[r,i]of C){res=side(r,i,10,1);if(res)break}}
  if(!res)res=side(B.r,B.i,20,0);
- if(!res){const P=B.r.pts,p=P[Math.min(P.length-4,Math.max(3,B.i))],W=Math.max(3,Math.min(w,B.r.w*.38)),off=B.r.w/2-W/2-.8,f=Math.sin(h)*p.tx+Math.cos(h)*p.tz>=0?1:-1;res={q:[p.x-p.tz*off,p.z+p.tx*off,Math.atan2(p.tx*f,p.tz*f),W],r:B.r,bad:1}}
+ if(!res){const P=B.r.pts,p=P[Math.min(P.length-4,Math.max(3,B.i))],W=Math.max(3,Math.min(w,B.r.w*.38)),off=B.r.w/2-W/2-Math.max(.2,Math.min(.8,B.r.w/2-W-.6)),f=Math.sin(h)*p.tx+Math.cos(h)*p.tz>=0?1:-1;res={q:[p.x-p.tz*off,p.z+p.tx*off,Math.atan2(p.tx*f,p.tz*f),W],r:B.r,bad:1}}
  return res}
 function QS_rampFit(x,z,h,len,w){const o={x0:Math.round(x),z0:Math.round(z),w0:w};
  const ab=typeof abAt==='function'?abAt(x,z):null;if(ab&&ab.road&&ab.road.ab&&Math.abs(ab.lat)<ab.road.w/2+2&&!(CID==='ath'&&TUNE.rampSide&&w>ab.road.w*.4)){o.keep='autobahn';QS_RL.push(o);return null}

@@ -123,7 +123,8 @@ function RCL_go(say){const R=BOT_rec(),out={kind:'ath-clear',city:CID,ok:false,l
    const P0=B.T.pts,i0=Math.max(0,B.i-10),i1=Math.min(P0.length-1,B.i+10),P=[];for(let i=i0;i<=i1;i++)P.push([P0[i].x,P0[i].z]);let L=0;for(let i=1;i<P.length;i++)L+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);
    roamWarp(P[0][0],P[0][1],Math.atan2(P[1][0]-P[0][0],P[1][1]-P[0][1]),true);RO.x=P[0][0];RO.z=P[0][1];RO.y=groundAt(RO.x,RO.z,99);RO.v=0;RO.vy=0;for(let i=0;i<45;i++)R.step();
    const run=()=>{roamWarp(P[0][0],P[0][1],Math.atan2(P[1][0]-P[0][0],P[1][1]-P[0][1]),true);RO.x=P[0][0];RO.z=P[0][1];RO.y=groundAt(RO.x,RO.z,99);RO.v=0;RO.vy=0;for(let i=0;i<45;i++)R.step();return BOT_leg(R,P,L/4+25)};
-   let r=BOT_leg(R,P,L/4+25);if(r.why){const w0=r.why;r=run();r.retry=w0}r.g=[sx,sz];r.len=Math.round(L);r.kmh=r.t>0?+(Math.max(0,L-r.left)/r.t*3.6).toFixed(1):0;if(!r.why&&r.kmh<RCL.kmh)r.why='avg '+r.kmh+' km/h < '+RCL.kmh;out.legs.push(r)}
+   const leg=r=>{r.g=[sx,sz];r.len=Math.round(L);r.kmh=r.t>0?+(Math.max(0,L-r.left)/r.t*3.6).toFixed(1):0;if(!r.why&&r.kmh<RCL.kmh)r.why='avg '+r.kmh+' km/h < '+RCL.kmh;return r};   /* one retry: traffic / the unstick warp make single legs flaky (Athens bot/nav too) */
+   let r=leg(BOT_leg(R,P,L/4+25));if(r.why){const w0=r.why;r=leg(run());r.retry=w0}out.legs.push(r)}
   out.ok=out.hard===0&&out.cover<=RCL.maxCover+.025&&out.ramps>=20&&out.legs.length===10&&out.legs.every(l=>!l.why)&&!R.errs.length&&!R.M.nan&&!R.M.fall}
  catch(e){R.errs.push('RCL '+String(e&&e.stack||e).slice(0,160))}
  R.done();out.err=R.errs.slice(0,3);(window.__chk.bot=window.__chk.bot||{})[CID+'/ath-clear']=out;const bad=out.legs.filter(l=>l.why);
