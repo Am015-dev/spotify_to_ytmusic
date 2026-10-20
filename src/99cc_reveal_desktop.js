@@ -4,7 +4,7 @@
 function RD_rows(R,c){const s=R.sum,F=R.fr,g=F.map(q=>q.dt).sort((a,b)=>a-b),med=g[g.length>>1]||0,big=F.filter(q=>q.dt>2.5*med&&q.dt>100),tx=F.filter(q=>q.texMs>20).length,D=R.D||{},nl=R.p5-R.p0,wm=Math.max(0,...F.map(q=>q.fMs)),att=big.filter(q=>q.link||q.comp||q.texMs>20||q.bufMs>20);
  return[['hold ran '+(D.ran|0)+' (gate '+D.gateMs+' ms, prewarm '+D.prewMs+' ms, chunks '+D.xcMs+' ms, settle '+D.settleMs+' ms'+(D.capped?', CAPPED':'')+')',D.ran===1],
   ['programs at reveal '+R.p0+', at +5 s '+R.p5+' → '+nl+' new (<= 1)',R.p5>=0&&nl<=1],
-  ['links in the first 3 s '+s.link+' ('+s.linkMs+' ms) (<= 1)',s.link<=1],
+  ['links within 3 s of reveal '+s.link+' ('+s.linkMs+' ms) (<= 1)',s.link<=1],
   ['stalls caused by a program link / compile / upload (gap > 2.5x median '+Math.round(med)+' ms with L/C>0 or tex/buf > 20 ms): '+att.length+' (0)',att.length===0],
   ['info: worst frame main-thread cost '+Math.round(wm)+' ms (PC budget 250; software GL blocks the render call on the GPU queue, so absolute ms are lab noise)',true],
   ['info: gaps > 2.5x median '+Math.round(med)+' ms: '+big.length+(big.length?' '+big.map(q=>q.t+':'+Math.round(q.dt)+'(js'+Math.round(q.fMs-q.rMs)+' r'+Math.round(q.rMs)+' L'+q.link+' B'+q.buf+(q.xc?' xc '+q.xc:'')+')').join(','):''),true],
