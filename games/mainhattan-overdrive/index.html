@@ -750,6 +750,7 @@ const TUNE={callCap:0/* perf-r13e single-call cap: minimap tiles paint only what
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.2,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45};
 const OD_CHANGELOG=[
+{v:'v90m-beta.130',date:'20 Oct 2026',items:[{t:'FIXED',s:'Phones: the first seconds of driving are much smoother (parked cars are tidied up while the loading screen is still up).'},{t:'FIXED',s:'Phones use about 20 MB less memory (ground data stored more compactly, far-away city parts compressed).'},{t:'CHANGED',s:'Frankfurt PC loading freezes are about half as long when the new loading mode is on (still off by default).'}]},
 {v:'v90m-beta.129',date:'20 Oct 2026',items:[{t:'FIXED',s:'Frankfurt: the jerk just after you start driving is gone (camera check now works in small steps).'},{t:'FIXED',s:'Phones use about 45 MB less memory in Athens.'},{t:'CHANGED',s:'PC loading work can now be spread into small steps (still off while we finish it).'}]},
 {v:'v90m-beta.128',date:'19 Oct 2026',items:[{t:'FIXED',s:'Turning your phone no longer rebuilds or reloads the city; the screen just resizes.'},{t:'FIXED',s:'Faster start: phones load only the game code they need, and the ground is built in small steps instead of one long freeze.'},{t:'CHANGED',s:'Better memory measurement on phones, so the next update can fix the iPhone reloads.'}]},
 {v:'v90m-beta.127',date:'19 Oct 2026',items:[{t:'NEW',s:'Phone reports: the Beta now tells us when a game starts, when it freezes for over a second, and when iPhone closed the page'},{t:'CHANGED',s:'Athens phone traffic checked: no stutter when you start driving'}]},
@@ -1584,7 +1585,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"29b0e06e","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"db3c3393"}/*end*/,XC={q:{},apply:{},post:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"87e8e38e","99c_checklist":"29b0e06e","99c2_slowspots":"8ec3375b","99c3_rv3c":"ef8ab955","10c_qtc_blob":"0c128cc8","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"de55d8e9","99c6_rv4a":"03b1e523","99c7_rev5fix":"874ee23d"}/*end*/,XC={q:{},apply:{},post:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -3747,7 +3748,10 @@ function OB_fillFix(){const t0=performance.now(),O=OB_RA.ops;O.fExt=0;O.fTrim=0;
   {const nB=BRIDGES.length,ext=OB_ext(FILL_R,nB),M=OB_net(null,ext),cl=new Map(M.comps);FILL_R.forEach((r,k)=>{const R=M.find(M.segs.length+nB+k);cl.set(R,(cl.get(R)||0)+r.L)});let main=-1,mL=-1;for(const[r,l]of cl)if(l>mL){mL=l;main=r}
     const keep=FILL_R.filter((r,k)=>M.find(M.segs.length+nB+k)===main);for(const r of FILL_R)if(!keep.includes(r))OB_log('fdel',(r.x0+r.x1)/2,(r.z0+r.z1)/2,r.L);O.fDel+=FILL_R.length-keep.length;FILL_R.length=0;FILL_R.push(...keep);OB_fillIdx()}
   O.fillMs=Math.round(performance.now()-t0)}
-{const _g=rfGrid;rfGrid=function(){if(FILL_R)return;_g();if(OB_RA.on&&FILL_R.length)OB_fillFix();RD_fillTrim();RD_fillLoop()}}// dev1: repeat until no end changes (a join/trim can leave the next end dead)
+const RFS={base:rfGrid,st:0,S:[()=>{if(OB_RA.on&&FILL_R.length)OB_fillFix()},()=>RD_fillTrim(),()=>RD_fillLoop()]};
+rfGrid=function(){if(FILL_R)return;RFS.base();for(const f of RFS.S)f()};
+function rfGridBegin(){if(FILL_R)return 0;RFS.st=0;RFS.base();return 1}
+function rfGridNext(){if(RFS.st>=RFS.S.length)return 0;RFS.S[RFS.st++]();return RFS.st<RFS.S.length}// dev1: repeat until no end changes (a join/trim can leave the next end dead)
 function OB_audit(){const t0=performance.now(),FR=typeof hubRoads==='function'?hubRoads():[],nF=FR.length,nB=BRIDGES.length;
   const ext=OB_ext(FR,nB),N=OB_net(null,ext),segs=N.segs;
   let fillKm=0,fillDead=0,fillStub=0,fillGap=0;FR.forEach((r,k)=>{fillKm+=r.L;const R=N.find(segs.length+nB+k);N.comps.set(R,(N.comps.get(R)||0)+r.L);const I=ext.info[k];
@@ -3873,10 +3877,10 @@ function TR_hills4(h,nx,nz,r,D){if(!TR_H4.on)return;const s=Math.max(1,Math.roun
     const b=.6*Math.sin(x/TR_HA.w+1.1)*Math.sin(z/(TR_HA.w*1.07)+.3)+.4*Math.sin((x*.8-z*.6)/(TR_HA.w*.82)+2),m0=ss(.1,.85,b);if(m0<=0)continue;
     let fx=Math.min(cx-1.001,Math.max(0,i/s-.5)),fz=Math.min(cz-1.001,Math.max(0,j/s-.5));const a=fx|0,c=fz|0,tx=fx-a,tz=fz-c,q=c*cx+a,f=(F[q]*(1-tx)+F[q+1]*tx)*(1-tz)+(F[q+cx]*(1-tx)+F[q+cx+1]*tx)*tz;
     let m=m0*f;if(m<=0)continue;if(D)m*=ss(250,700,D[j*nx+i]);if(A&&athHill1(A,x,z)>0)m=0;for(const L of LM){if(Math.abs(x-L[0])>L[2]+100||Math.abs(z-L[1])>L[2]+100)continue;const d=Math.hypot(x-L[0],z-L[1]);if(d<L[2]+100)m*=ss(L[2],L[2]+100,d)}
-    if(m>0){const v=TR_HA.h*m;h[j*nx+i]+=v;MK.m[j*nx+i]=m;n++;if(v>top)top=v}}TR_HA.cells=n;TR_HA.top=+top.toFixed(1)}
+    if(m>0){const v=TR_HA.h*m;h[j*nx+i]+=v;MK.m[j*nx+i]=m;n++;if(v>top)top=v}}TR_HA.cells=n;TR_HA.top=+top.toFixed(1);MK.ms=1;if(LOWMEM&&!/[?&]trq=0/.test(location.search)){const F=MK.m,U=new Uint16Array(F.length);let e=0;for(let q=0;q<F.length;q++){U[q]=Math.round(F[q]*65535);const d=Math.abs(U[q]/65535-F[q]);if(d>e)e=d}MK.m=U;MK.ms=1/65535;MK.qe=e*TR_HA.h}}   // perf-r17m: crown mask Uint16 (touch/lowmem, ?trq=0 off), height error <= 0.2 cm
 const TR_GT=(()=>{const q=new URLSearchParams(location.search);return{on:TR_H4.on&&q.get('tgt')!=='0',m:+(q.get('tgtm')||.5)}})();
 function TR_crown(x,z){const K=TR_HA.M;if(!K)return 0;let fx=(x-WX0)/K.r,fz=(z-WZS)/K.r;if(fx<0||fz<0||fx>K.nx-1.001||fz>K.nz-1.001)return 0;const i=fx|0,j=fz|0,tx=fx-i,tz=fz-j,q=j*K.nx+i,m=K.m;
-  return(m[q]*(1-tx)+m[q+1]*tx)*(1-tz)+(m[q+K.nx]*(1-tx)+m[q+K.nx+1]*tx)*tz}
+  return((m[q]*(1-tx)+m[q+1]*tx)*(1-tz)+(m[q+K.nx]*(1-tx)+m[q+K.nx+1]*tx)*tz)*K.ms}
 const TR_onCrown=(x,z)=>TR_GT.on&&TR_crown(x,z)>=TR_GT.m;
 function TR_crownTrees(rnd){const o=[];if(!TR_GT.on||!TR_HA.M)return o;for(let z=HZS-1000;z<HZN+1000;z+=22)for(let x=HX0-1000;x<HX1+1000;x+=22){if(rnd()<.45)continue;const px=x+(rnd()-.5)*16,pz=z+(rnd()-.5)*16;
   if(!TR_onCrown(px,pz))continue;const q=cityAt(px,pz);if(q&&q.d<q.road.w/2+4)continue;let f=null;try{f=fillAt(px,pz)}catch(e){}if(f&&f.d<f.r.w/2+4)continue;if(inRiver(px,pz,-6))continue;o.push([rnd()<.5?'tree3':rnd()<.6?'tree2':'tree',px,pz])}TR_GT.trees=o.length;return o}
@@ -4161,8 +4165,8 @@ function rfGrid(){if(FILL_R)return;FILL_R=[];FILL_G=new Map();BLOCK_C=[];
   {const byG={};for(const r of FILL_R)(byG[r.g]=byG[r.g]||[]).push(r);for(const k in byG){const L=byG[k],V=L.filter(r=>r.v),H=L.filter(r=>!r.v);for(const v of V)for(const h of H)if(v.x0>=h.x0-1&&v.x0<=h.x1+1&&h.z0>=v.z0-1&&h.z0<=v.z1+1){(v.cross=v.cross||[]).push([h.z0-v.z0,h.w]);(h.cross=h.cross||[]).push([v.x0-h.x0,v.w]);FILL_X.push({x:v.x0,z:h.z0,wa:v.w,wb:h.w,v,h})}}}
   for(const r of FILL_R){const a=Math.min(r.x0,r.x1)-r.w,b=Math.max(r.x0,r.x1)+r.w,c=Math.min(r.z0,r.z1)-r.w,d=Math.max(r.z0,r.z1)+r.w;for(let k=Math.floor(a/64);k<=Math.floor(b/64);k++)for(let j=Math.floor(c/64);j<=Math.floor(d/64);j++){const key=k*100000+j;let L=FILL_G.get(key);if(!L)FILL_G.set(key,L=[]);L.push(r)}}}
 function hubRoads(){rfGrid();return FILL_R}
-{const _rg=rfGrid;rfGrid=function(){const was=FILL_R;_rg();if(!was&&FILL_R&&CID==='fra'&&TR_RG)try{const W=TR_W||TR_init(),T0=performance.now();const R=FILL_R.map(f=>({P:[[f.x0,f.z0],[f.x1,f.z1]],hw:f.w/2}));for(const S of CITY_S)if(S.r.cls!=='hill')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
-    W.trf={n:TR_grade(W,R,{skip:TR_rivSkip,pin:TR_rivPin,flat:W.r+4,junc:TR_padList()})};W.trf.ms=Math.round(performance.now()-T0);TR_bridgeEnds()}catch(e){(TR_W||{}).trf={err:String(e)}}}}
+RFS.S.push(()=>{if(CID==='fra'&&TR_RG)try{const W=TR_W||TR_init(),T0=performance.now();const R=FILL_R.map(f=>({P:[[f.x0,f.z0],[f.x1,f.z1]],hw:f.w/2}));for(const S of CITY_S)if(S.r.cls!=='hill')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
+    W.trf={n:TR_grade(W,R,{skip:TR_rivSkip,pin:TR_rivPin,flat:W.r+4,junc:TR_padList()})};W.trf.ms=Math.round(performance.now()-T0);TR_bridgeEnds()}catch(e){(TR_W||{}).trf={err:String(e)}}});// perf-r17i: was an rfGrid wrapper; now the last RFS.S pass (src/51)
 function fpRoad(x,z,r){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+r)return true;const f=fillAt(x,z);return!!(f&&f.d<f.r.w/2+r)}
 const FP_9=[[0,0],[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5],[0,-.5],[0,.5],[-.5,0],[.5,0]];
 function fpPts(w,d){if(w<=12&&d<=12)return FP_9;const P=FP_9.slice(),nx=Math.ceil(w/5),nz=Math.ceil(d/5);for(let i=0;i<=nx;i++)for(let j=0;j<=nz;j++)P.push([i/nx-.5,j/nz-.5]);return P}
@@ -4265,11 +4269,23 @@ function gndVert(x,z,y0,f){const r=riverAt(x,z);if(!r)return[x,y0+tH(x,z),z,0];c
 var GND_L=[],GND_ON=new URLSearchParams(location.search).get('t7g')!=='0',GND_B=1.5;
 function GND_pack(g){let n=0;for(const L of g.c)if(L)n+=L.length;const P=new Float32Array(n),S=new Int32Array(g.c.length*2);let o=0;
   for(let c=0;c<g.c.length;c++){const L=g.c[c];if(!L){S[2*c]=S[2*c+1]=L===undefined?-1:-2;continue}const ox=g.x0+Math.floor(c/g.nz)*g.dx,oz=g.z0+c%g.nz*g.dz;S[2*c]=o;
-    if(L instanceof Float32Array){P.set(L,o);o+=L.length}else for(let k=0;k<L.length;k+=9){P[o]=L[k]-ox;P[o+1]=L[k+1]-oz;for(let q=2;q<9;q++)P[o+q]=L[k+q];o+=9}S[2*c+1]=o}g.P=P;g.s=S;g.c=null}
+    if(L instanceof Float32Array){P.set(L,o);o+=L.length}else for(let k=0;k<L.length;k+=9){P[o]=L[k]-ox;P[o+1]=L[k+1]-oz;for(let q=2;q<9;q++)P[o+q]=L[k+q];o+=9}S[2*c+1]=o}g.P=P;g.s=S;g.c=null;if(GNDQ_ON)GND_quant(g)}
 var MEMC_ON=!/[?&]memc=0/.test(location.search);
 function GND_cellF32(L,ox,oz){const P=new Float32Array(L);for(let k=0;k<P.length;k+=9){P[k]=L[k]-ox;P[k+1]=L[k+1]-oz}return P}
+var GNDQ_ON=LOWMEM&&!/[?&]gq=0/.test(location.search);
+function GND_quant(g){const P=g.P,n=P.length;if(!n||n%9)return;let hl=1e9,hh=-1e9,mx=0;
+  for(let k=0;k<n;k+=9){for(let q=4;q<8;q++){const v=P[k+q];if(v<hl)hl=v;if(v>hh)hh=v}for(let q=0;q<4;q++){const v=Math.abs(P[k+q]);if(v>mx)mx=v}}
+  const sc=Math.min(256,32000/Math.max(mx,1));if(!(hh-hl<=640)||sc<64)return;const hs=65534/Math.max(hh-hl,1e-3),Q=new Int16Array(n);let eh=0,ex=0;
+  for(let k=0;k<n;k+=9){for(let q=0;q<4;q++){const z=Math.round(P[k+q]*sc);Q[k+q]=z;const e=Math.abs(z/sc-P[k+q]);if(e>ex)ex=e}
+    for(let q=4;q<8;q++){const z=Math.round((P[k+q]-hl)*hs)-32767;Q[k+q]=z;const e=Math.abs((z+32767)/hs+hl-P[k+q]);if(e>eh)eh=e}Q[k+8]=P[k+8]}
+  g.P=Q;g.Q=1;g.qis=1/sc;g.qhs=1/hs;g.qhb=hl+32767/hs;g.qt=1.5/sc;g.qe={h:eh,xz:ex,mb:(P.byteLength-Q.byteLength)/1048576}}
+function GND_inQ(g,s,e,i,j,x,z,out){const Q=g.P,ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz,is=g.qis,hs=g.qhs,hb=g.qhb,tl=g.qt;
+  for(let k=s;k<e;k+=9){const w=Q[k+2]*is,h=Q[k+3]*is,x0=Q[k]*is,z0=Q[k+1]*is;if(!(w>0)||!(h>0))continue;let u=(rx-x0)/w,v=(rz-z0)/h;const tu=tl/w,tv=tl/h;if(u<-tu||v<-tv||u>1+tu||v>1+tv)continue;
+    if(Q[k+8]<0)Q[k+8]=ART7_far(ox+x0,oz+z0,w,h)||!ART7_near(ox+x0,oz+z0,w,h)?1:0;
+    const L=out?(out.S||(out.S=new Float32Array(9))):new Float32Array(9);L[0]=x0;L[1]=z0;L[2]=w;L[3]=h;L[4]=Q[k+4]*hs+hb;L[5]=Q[k+5]*hs+hb;L[6]=Q[k+6]*hs+hb;L[7]=Q[k+7]*hs+hb;L[8]=Q[k+8];
+    u=u<0?0:u>1?1:u;v=v<0?0:v>1?1:v;if(out){out.L=L;out.k=0;out.u=u;out.v=v;return out}return{L,k:0,u,v}}return null}
 function GND_in(g,x,z,out){const i=Math.floor((x-g.x0)/g.dx),j=Math.floor((z-g.z0)/g.dz);if(i<0||j<0||i>=g.nx||j>=g.nz)return undefined;
-  if(g.P){const c=i*g.nz+j,s=g.s[2*c],e=g.s[2*c+1];if(s<0)return s===-1?undefined:null;const L=g.P,ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz;
+  if(g.P){const c=i*g.nz+j,s=g.s[2*c],e=g.s[2*c+1];if(s<0)return s===-1?undefined:null;if(g.Q)return GND_inQ(g,s,g.s[2*c+1],i,j,x,z,out);const L=g.P,ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz;
     for(let k=s;k<e;k+=9){const u=(rx-L[k])/L[k+2],v=(rz-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(ox+L[k],oz+L[k+1],L[k+2],L[k+3])||!ART7_near(ox+L[k],oz+L[k+1],L[k+2],L[k+3])?1:0;if(out){out.L=L;out.k=k;out.u=u;out.v=v;return out}return{L,k,u,v}}return null}
   const L=g.c[i*g.nz+j];if(!L)return L;
   if(L instanceof Float32Array){const ox=g.x0+i*g.dx,oz=g.z0+j*g.dz,rx=x-ox,rz=z-oz;for(let k=0;k<L.length;k+=9){const u=(rx-L[k])/L[k+2],v=(rz-L[k+1])/L[k+3];if(u<-1e-6||v<-1e-6||u>1+1e-6||v>1+1e-6)continue;if(L[k+8]<0)L[k+8]=ART7_far(ox+L[k],oz+L[k+1],L[k+2],L[k+3])||!ART7_near(ox+L[k],oz+L[k+1],L[k+2],L[k+3])?1:0;if(out){out.L=L;out.k=k;out.u=u;out.v=v;return out}return{L,k,u,v}}return null}/* perf-r15c */
@@ -4594,7 +4610,7 @@ function* athBuildG(grp,BM,rnd){const T0=performance.now(),RS=2,NX=Math.ceil((WX
   for(const R of[...PLAZAS,...PARKS])rect(R.x0,R.x1,R.z0,R.z1,3);for(const L of LMX)cap(L.x,L.z,L.x,L.z,L.r+4,3);OC_zone(cap);for(const T of TRAILS){const P=T.pts;for(let i=1;i<P.length;i++)cap(P[i-1].x,P[i-1].z,P[i].x,P[i].z,T.w/2+8,3)}
   for(const g of GARAGES)if(g.x!=null)cap(g.x,g.z,g.x,g.z,24,3);for(const k in RF.spots){const[x,z]=WP(RF.spots[k][0],RF.spots[k][1]);cap(x,z,x,z,18,3)}
   const tR2=performance.now();for(const H of HILLS){if(!H.H||H.x1<WX0||H.x0>WX1||H.z1<WZS||H.z0>WZN)continue;for(let z=Math.max(H.z0,WZS);z<Math.min(H.z1,WZN);z+=4)for(let x=Math.max(H.x0,WX0);x<Math.min(H.x1,WX1);x+=4)if(athHill1(H,x+1,z+1)>.2){for(const[a,b]of[[0,0],[2,0],[0,2],[2,2]]){const k=ci(x+a,z+b);if(k>=0)RR[k]=3}}if(Y())yield [.37]}
-  if(TR_GT.on&&TR_HA.M){const K=TR_HA.M;for(let j=0;j<K.nz;j++)for(let i=0;i<K.nx;i++){if(K.m[j*K.nx+i]<TR_GT.m)continue;const x0=WX0+(i-.5)*K.r,z0=WZS+(j-.5)*K.r;for(let a=0;a<K.r;a+=2)for(let b=0;b<K.r;b+=2){const k=ci(x0+a,z0+b);if(k>=0&&!RR[k])RR[k]=3}}if(Y())yield [.37]}
+  if(TR_GT.on&&TR_HA.M){const K=TR_HA.M;for(let j=0;j<K.nz;j++)for(let i=0;i<K.nx;i++){if(K.m[j*K.nx+i]*K.ms<TR_GT.m)continue;const x0=WX0+(i-.5)*K.r,z0=WZS+(j-.5)*K.r;for(let a=0;a<K.r;a+=2)for(let b=0;b<K.r;b+=2){const k=ci(x0+a,z0+b);if(k>=0&&!RR[k])RR[k]=3}}if(Y())yield [.37]}
   const tR=performance.now();
   const fits=(x,z,w,d,c,s)=>{for(const[a,b]of[[0,0],[-.45,-.45],[.45,.45],[.45,-.45],[-.45,.45]]){const lx=a*w,lz=b*d,k=ci(x+lx*c+lz*s,z-lx*s+lz*c);if(k<0||RR[k])return false}const nw=Math.max(1,Math.ceil(w/RS)),nd=Math.max(1,Math.ceil(d/RS));for(let a=0;a<=nw;a++){const lx=(a/nw-.5)*w;for(let b=0;b<=nd;b++){const lz=(b/nd-.5)*d,k=ci(x+lx*c+lz*s,z-lx*s+lz*c);if(k<0||RR[k])return false}}return true};
   const paint=(x,z,w,d,c,s,v)=>{const nw=Math.ceil(w/RS*1.5),nd=Math.ceil(d/RS*1.5);for(let a=0;a<=nw;a++){const lx=(a/nw-.5)*w;for(let b=0;b<=nd;b++){const lz=(b/nd-.5)*d,k=ci(x+lx*c+lz*s,z-lx*s+lz*c);if(k>=0&&(v===4||!RR[k]))RR[k]=v}}};
@@ -4694,7 +4710,7 @@ function athLandmarksBuild(bt,BM){const MB='#e9dfc6',MW='#f4efe2',GL=[];HUB.lmk=
 function buildHub(){for(const _ of buildHubG());}
 var BHQ={ms:+((location.search.match(/[?&]bhms=(\d+)/)||[])[1]||35),on:0,split:0,q:[],en:BHS_EN,t:0,gy:typeof location==='undefined'||!/[?&]gndy=0\b/.test(location.search)};/* perf-r16c (REVIEW_2K_16 N3, 'ld 8' = gnd 3.9 s PC task): the ground step is stepped on every page (gy, ?gndy=0 off), ~250 ms slices without bhs *//* perf-r14e: BH_due() = a long loop inside buildHubG may yield (bhs on, every ~400 ms of work) */function BH_due(){if(!BHQ.en)return false;const n=performance.now();if(!BHQ.t||n-BHQ.t<BHQ.ms){if(!BHQ.t)BHQ.t=n;return false}BHQ.t=0;return true}function BH_post(f){if(BHQ.on){BHQ.q.push(f);return}return f()}
 function* BH_drainG(f){const q=BHQ.q.splice(0);for(const g of q){yield [f,,'post:'+(window.__dbg?String(g).slice(0,40):'')];BHQ.sub=[];g();while(BHQ.sub.length){const h=BHQ.sub.shift();yield [f,,'post+'];h()}BHQ.sub=null}yield [f,,'post.']}
-function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){hubRoads();yield [0,,'hubRoads'];RD_fillLoop(1)}/* dev1: grid ends still dead on the final street net: trim only (a late join could cross built blocks) */const grp=new THREE.Group();scene.add(grp);HUB.grp=grp;HUB.bld=[];try{BV_reset()}catch(e){}const rnd=mul(2024),rr2=(a,b)=>a+rnd()*(b-a),pick=a=>a[Math.floor(rnd()*a.length)];
+function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){if(BHQ.en&&rfGridBegin()){yield [0,,'rfBase'];while(rfGridNext())yield [0,,'rfPass']}else hubRoads();yield [0,,'hubRoads'];RD_fillLoop(1)}/* dev1: grid ends still dead on the final street net: trim only (a late join could cross built blocks) */const grp=new THREE.Group();scene.add(grp);HUB.grp=grp;HUB.bld=[];try{BV_reset()}catch(e){}const rnd=mul(2024),rr2=(a,b)=>a+rnd()*(b-a),pick=a=>a[Math.floor(rnd()*a.length)];
   yield [.02,,'bh5'];const T={glass:hubFacadeTex('glass'),office:hubFacadeTex('office'),gable:hubFacadeTex('gable'),brick:hubFacadeTex('brick')};if(CID!=='fra')Object.assign(T,{poly:hubFacadeTex('poly'),neo:hubFacadeTex('neo'),plaka:hubFacadeTex('plaka')},typeof location!=='undefined'&&/[?&]bv=0\b/.test(location.search)?{}:{poly2:hubFacadeTex('poly2'),poly3:hubFacadeTex('poly3'),poly4:hubFacadeTex('poly4'),neo2:hubFacadeTex('neo2')});
   yield [.02,,'bh6'];const BM={};for(const k in T)BM[k]=new THREE.MeshStandardMaterial({map:T[k],emissiveMap:hubWinEm(k),emissive:0xffffff,emissiveIntensity:k==='glass'?.5:.6,vertexColors:true,roughness:k==='glass'?.12:.7,metalness:k==='glass'?.6:.05,envMapIntensity:k==='glass'?1.6:.6});
   yield [.02,,'bh7'];BM.roof=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.7,metalness:.05});BM.plain=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6,metalness:.1});
@@ -4709,7 +4725,7 @@ function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){hubRoad
   yield [.02,,'bh16'];const M={grass:CID==='fra'?gm('grass',0x7aa860):new THREE.MeshStandardMaterial({map:athGrassTex(),roughness:.9,metalness:0}),road:new THREE.MeshStandardMaterial({map:asph,roughness:.85,metalness:0}),walk:new THREE.MeshStandardMaterial({map:pave,roughness:.9,metalness:0,color:CID==='fra'?0x9a948a:0xc6bba6}),cobble:CID==='fra'?gm('cobble'):new THREE.MeshStandardMaterial({map:athMarbleTex(),roughness:.7,metalness:0,color:0xcdc3b0}),yard:gm('yard'),dirt:new THREE.MeshStandardMaterial({map:dirtTex(),color:0xd8b48a,roughness:.95})};KEEP_TEX.add(M.dirt.map);HUB.M=M;
   yield [.02,,'bh17'];M.rock=new THREE.MeshStandardMaterial({map:(()=>{const Z=256,[c,g]=cv(Z,Z),r=mul(4242);g.fillStyle='#bfb29a';g.fillRect(0,0,Z,Z);for(let i=0;i<2600;i++){const v=r();g.fillStyle=v<.35?'rgba(120,110,95,.35)':v<.7?'rgba(225,215,195,.4)':'rgba(160,140,110,.3)';g.fillRect(r()*Z,r()*Z,2+r()*6,2+r()*4)}const t=tex(c);KEEP_TEX.add(t);return t})(),roughness:.95,metalness:0});
   yield [.02,,'bh18'];M.jn=(()=>{const[c,g]=cv(128,128),r=mul(93);g.fillStyle='#5b5f68';g.fillRect(0,0,128,128);for(let i=0;i<900;i++){const v=70+r()*40|0;g.fillStyle=`rgba(${v},${v+2},${v+8},.5)`;g.fillRect(r()*128,r()*128,2,2)}const t=tex(c);KEEP_TEX.add(t);return t})();
-  yield [.03,,'rfGrid'];rfGrid();yield [.03,,'gnd'];
+  yield [.03,,'rfGrid'];if(BHQ.en&&rfGridBegin()){do yield [.03,,'rfGrid+'];while(rfGridNext())}else rfGrid();yield [.03,,'gnd'];
   if(BHQ.en||BHQ.gy){BHQ.q.length=0;BHQ.on=1;BHQ.gnd=1;try{gndBuild(grp,HX0,HX1,HZS,HZN,{yc:1,...{cs:CID==='fra'?200:100,fine:25,y0:-.01,uv:10,tile:500,cls:CID==='fra'?(x,z)=>hillH(x,z)>0||(zoneAt(x,z)||{}).t==='forest'?'g':'w':(x,z)=>HILL_BY.akro&&athHill1(HILL_BY.akro,x,z)>8?'r':[[0,0],[-30,-30],[30,-30],[-30,30],[30,30]].filter(([a,b])=>athHillH(x+a,z+b)>.4).length>=2?'g':'w',mats:{w:M.walk,g:M.grass,r:M.rock},hilly:CID!=='fra'?athHilly:(a,b,c,d)=>b>HILL.cx-HILL.rx&&a<HILL.cx+HILL.rx&&d>HILL.cz-HILL.rz&&c<HILL.cz+HILL.rz}})}finally{BHQ.on=0}const g=BHQ.gnd,out=BHQ.gout;BHQ.gnd=0;BHQ.gout=null;if(g&&g.next){let r,t=performance.now();while(!(r=g.next()).done)if(performance.now()-t>(BHQ.en?30:250)){yield [.03,,'gndC'];t=performance.now()}out.push(...r.value)}yield* BH_drainG(.03)}else gndBuild(grp,HX0,HX1,HZS,HZN,{cs:CID==='fra'?200:100,fine:25,y0:-.01,uv:10,tile:500,cls:CID==='fra'?(x,z)=>hillH(x,z)>0||(zoneAt(x,z)||{}).t==='forest'?'g':'w':(x,z)=>HILL_BY.akro&&athHill1(HILL_BY.akro,x,z)>8?'r':[[0,0],[-30,-30],[30,-30],[-30,30],[30,30]].filter(([a,b])=>athHillH(x+a,z+b)>.4).length>=2?'g':'w',mats:{w:M.walk,g:M.grass,r:M.rock},hilly:CID!=='fra'?athHilly:(a,b,c,d)=>b>HILL.cx-HILL.rx&&a<HILL.cx+HILL.rx&&d>HILL.cz-HILL.rz&&c<HILL.cz+HILL.rz});yield [.03,'Laying the ground'];
   const jm=new THREE.MeshStandardMaterial({map:M.jn,roughness:.85,metalness:0,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-2}),kerb=[];
   for(const r of hubRoads()){const{x0,z0,w,L,ux,uz}=r,cx=x0+ux*L/2,cz=z0+uz*L/2,yaw=Math.atan2(ux,uz);const g=new THREE.PlaneGeometry(w,L,...ART8_ps(x0,z0,ux,uz,w,L));g.rotateX(-Math.PI/2);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i),uv.getY(i)*L/32);g.rotateY(yaw);g.translate(cx,0,cz);ART_drape(g,.035);bt.add(g,M.road);
@@ -11709,9 +11725,28 @@ function MEMF_pack(m,cd){const g=m.geometry;if(!g.boundingSphere)g.computeBoundi
   const s=g.boundingSphere,v=new THREE.Vector3().copy(s.center).applyMatrix4(m.matrixWorld);MEMF.S.push({m,x:v.x,z:v.z,r:Math.min(s.radius,1200),on:true,ri:cd?Math.min(MEMF.Rin,cd+150):MEMF.Rin,ro:cd?Math.min(MEMF.Rout,cd+400):MEMF.Rout});if(cd)MEMF.st.cd++}
 function MEMF_ipack(m){const g=m.geometry;if(g.userData.mfDone||!g.attributes.position)return;if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingBox)g.computeBoundingBox();MEMF.st.imMB+=MEMF_q(g)/1048576;MEMF.st.im++}
 function MEMF_gstep(){let S=MEMF.S;if(!S.length||!TUNE.gpuStr)return;if((MEMF.fr=(MEMF.fr||0)+1)%300===0){const inS=o=>{while(o.parent)o=o.parent;return o===scene};S=MEMF.S=S.filter(e=>inS(e.m))}   // drop meshes of a freed city
-const cx=camera.position.x,cz=camera.position.z;let up=0;
-  for(const e of S){const d=Math.hypot(e.x-cx,e.z-cz)-e.r;if(e.on){if(d>e.ro){e.on=false;e.m.layers.disableAll();e.m.geometry.dispose();MEMF.st.dn++}}
-    else if(d<e.ri&&up<MEMF.cap){e.on=true;e.m.layers.enable(0);up++;MEMF.st.up++}}}
+const cx=camera.position.x,cz=camera.position.z,T=MEMF.ts,cf=T?camera.far:0,zg=T?150:250,zc=T?2:1;let up=0,zs=0;
+  for(const e of S){const d=Math.hypot(e.x-cx,e.z-cz)-e.r,ro=T?Math.min(e.ro,cf+50):e.ro,ri=T?Math.min(e.ri,cf-50):e.ri;if(e.on){if(d>ro){e.on=false;e.m.layers.disableAll();e.m.geometry.dispose();MEMF.st.dn++}}
+    else if(e.cz){if(e.cz.st===1&&d<ro+(T?100:0)&&MEMF.ubusy<(T?3:2))MEMF_unzip(e)}   // restoring: stays hidden until the arrays are back
+    else if(d<ri&&up<MEMF.cap){e.on=true;e.zb=0;e.m.layers.enable(0);up++;MEMF.st.up++}
+    else if(MEMF.zOn&&MEMF_zready()&&!e.zb&&!e.zfail&&zs<1&&MEMF.zbusy<zc&&d>ro+zg){zs++;e.zr=ro;MEMF_zip(e)}}}
+Object.assign(MEMF,{zOn:LOWMEM&&TUNE.gpuStr&&typeof CompressionStream==='function'&&typeof DecompressionStream==='function'&&!/[?&]zfar=0/.test(location.search),zbusy:0,ubusy:0,zst:{n:0,rawMB:0,zMB:0,back:0,maxMs:0}});
+function MEMF_zready(){if(!(typeof booted!=='undefined'&&booted&&state==='roam')){MEMF.zT=0;return false}const n=performance.now();if(!MEMF.zT)MEMF.zT=n+(MEMF.ts?4000:45000);return n>MEMF.zT}
+MEMF.ts=MEMF.zOn&&/[?&]tstream=1/.test(location.search);
+async function MEMF_zip(e){const g=e.m.geometry,P=[];let tot=0;e.zb=1;MEMF.zbusy++;
+  try{const A=Object.entries(g.attributes);if(g.index)A.push(['@i',g.index]);
+    for(const[k,a]of A){if(!a.array||a.isInterleavedBufferAttribute||a.isInstancedBufferAttribute||a.usage!==THREE.StaticDrawUsage){e.zfail=1;return}const b=a.array.byteLength;P.push({k,a,T:a.array.constructor,n:a.array.length,off:tot,b});tot+=(b+3)&~3}
+    const t0=performance.now(),buf=new Uint8Array(tot);for(const p of P)buf.set(new Uint8Array(p.a.array.buffer,p.a.array.byteOffset,p.b),p.off);
+    const z=new Uint8Array(await new Response(new Blob([buf]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());
+    if(e.on||e.zb!==1||Math.hypot(e.x-camera.position.x,e.z-camera.position.z)-e.r<(e.zr||e.ro))return;   // came back into range meanwhile: keep the raw arrays
+    e.cz={z,P:P.map(p=>({k:p.k,T:p.T,n:p.n,off:p.off})),st:1};for(const p of P){p.a.array=null;p.a.getX=p.a.getY=p.a.getZ=p.a.getW=BA_freed}
+    const st=MEMF.zst;st.n++;st.rawMB+=tot/1048576;st.zMB+=z.length/1048576;st.maxMs=Math.max(st.maxMs,performance.now()-t0)}
+  catch(err){e.zfail=1}finally{MEMF.zbusy--;e.zb=0}}
+async function MEMF_unzip(e){const c=e.cz;c.st=2;MEMF.ubusy++;
+  try{const ab=await new Response(new Blob([c.z]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer(),g=e.m.geometry,t0=performance.now();
+    for(const p of c.P){const a=p.k==='@i'?g.index:g.attributes[p.k];delete a.getX;delete a.getY;delete a.getZ;delete a.getW;a.array=new p.T(ab,p.off,p.n)}
+    g.dispose();e.cz=null;MEMF.zst.back++;MEMF.zst.maxMs=Math.max(MEMF.zst.maxMs,performance.now()-t0)}
+  catch(err){c.st=1;e.zfail=1}finally{MEMF.ubusy--}}
 (function MEMF_raf(){try{MEMF_gstep()}catch(e){}requestAnimationFrame(MEMF_raf)})();
 const BW={U:{uBwOn:{value:1},uBwF:{value:60},uBwC:{value:.48}},mats:new Set(),bm:null,km:{},cells:new Map(),idx:new Map(),tp:new Map(),soup:null,q:[],gen:null,sig:'',mesh:null,st:{studs:0,cells:0,ms:0},grp:null,mt:null};
 const BW_FS='uniform float uBwOn,uBwF,uBwC;\nfloat bwLn(float c,float w){float d=abs(fract(c)-.5);float aa=fwidth(c)*.9;return smoothstep(.5-w-aa,.5-w+aa,d);}\n';
@@ -16224,7 +16259,8 @@ function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!
  if(force||np||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){PC_snap(cx,cz,h);PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
  else if(++PC.t%10===0&&!PC.left){PC_snap(cx,cz,h);for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
  const bud=force?1e9:(TUNE.pc7Bud||60000);/* circular: a new pass mid-way carries on from the same mesh, so no mesh starves under constant turning */
- while(PC.left>0&&tested<bud){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
+ const mb=typeof TWG!=='undefined'&&TWG.pcB&&!force&&TWG.fr>=0&&TWG.fr<=TWG.pcF?TWG.pcB:0;/* ios-r17k: first drivable seconds on touch: also stop a pass at TWG.pcB ms (a mesh is re-packed whole, so the pass just resumes next frame) */
+ while(PC.left>0&&tested<bud&&(!mb||performance.now()-t0<mb)){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
  if(!PC.left)for(const C of PC.L)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
  if(tested){let vis=0;for(const C of PC.L)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();
@@ -16507,10 +16543,13 @@ TWG.wb=new URLSearchParams(location.search).get('twgwb')!=='0';TWG.wbMs=0;
 async function TWG_run(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)return;const t0=performance.now(),x=RO.x,z=RO.z,h=RO.h;TWG.run=1;const lo=LD.on;LD.on=false;   // frame() skips while LD.on; the #ld2 curtain itself stays up until roamLoad's ldHide
  const wb=TWG.wb&&typeof WB_cityBuild==='function'?WB_cityBuild(.99,.99).catch(e=>{WBC.err=String(e);if(e!=='WBabort')console.warn('TWG wb',e)}):null;
  try{for(let i=0;i<TWG.n;i++){RO.v=0;await nextFrame();TWG.nf++;const tm=performance.now();try{TWG_mini(40)}catch(e){console.warn('TWG mini',e)}TWG.mms+=performance.now()-tm}
+  if(TWG.pcw&&typeof PC_step==='function'&&PC.on&&PC_gate()){const tp=performance.now();try{PC.rel=0;PC_step(1)}catch(e){console.warn('TWG pc',e)}TWG.pcMs=Math.round(performance.now()-tp)}
   LD.on=lo;if(wb){const tw=performance.now();await wb;TWG.wbMs=Math.round(performance.now()-tw)}for(let i=0;i<TWG.idle;i++)await new Promise(r=>setTimeout(r,50))}catch(e){console.warn('TWG',e)}finally{TWG.run=0;LD.on=lo;RO.x=x;RO.z=z;RO.h=h;RO.v=0;TWG.fr=0;TWG.mms=Math.round(TWG.mms);TWG.ms=Math.round(performance.now()-t0)}}
-{const r0=composer.render;composer.render=function(){if(TWG.run)return;return r0.apply(this,arguments)}}
-frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;return f(now)})(frame);
+TWG.jm=0;TWG.jf=-1;TWG.jn=0;TWG.rm=0;/* ios-r17k: JS ms (frame minus composer.render) of the first 120 drivable frames: max, its frame, frames measured */
+{const r0=composer.render;composer.render=function(){if(TWG.run)return;if(!(TWG.fr>=1&&TWG.fr<=120))return r0.apply(this,arguments);const t=performance.now();try{return r0.apply(this,arguments)}finally{TWG.rm+=performance.now()-t}}}
+frame=(f=>function(now){if(TWG.fr>=0&&TWG.fr<1e4)TWG.fr++;if(!(TWG.fr>=1&&TWG.fr<=120))return f(now);const t=performance.now();TWG.rm=0;try{return f(now)}finally{const d=performance.now()-t-TWG.rm;TWG.jn++;if(d>TWG.jm){TWG.jm=Math.round(d);TWG.jf=TWG.fr}}})(frame);
 {const _ls=lazyStep;lazyStep=function(){if(TWG.fr>=0&&TWG.fr<=TWG.lz){TWG.held++;return}return _ls.apply(this,arguments)}}
+TWG.pcw=new URLSearchParams(location.search).get('twgpc')!=='0';TWG.pcMs=-1;TWG.pcB=TWG.pcw?10:0;TWG.pcF=300;/* ios-r17k: ?twgpc=0 = old behaviour */
 TWG.ht=0;TWG.htF=-1;TWG.htN=0;TWG.c0=-1;TWG.c60=-1;{const _ht=hubTrafficStep;hubTrafficStep=function(){if(!(TWG.fr>=0&&TWG.fr<=60))return _ht.apply(this,arguments);const t=performance.now();try{return _ht.apply(this,arguments)}finally{const d=performance.now()-t;TWG.htN++;if(d>TWG.ht){TWG.ht=Math.round(d);TWG.htF=TWG.fr}const n=HUB.cars?HUB.cars.length:0;if(TWG.c0<0)TWG.c0=n;TWG.c60=n}}}
 function ENV_on(){if(ENV_on.v!==undefined)return ENV_on.v;let v=true;try{const q=new URLSearchParams(location.search).get('env1');if(q!==null)v=q!=='0';else if(typeof TUNE!=='undefined'&&TUNE.env1===0)v=false}catch(e){}return ENV_on.v=v}
 function ENV_lo(){try{if(typeof LK_lvl==='function'&&LK_lvl()==='low')return true;return typeof SET!=='undefined'&&SET.q==='low'}catch(e){return false}}
