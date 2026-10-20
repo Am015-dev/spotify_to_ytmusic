@@ -548,3 +548,9 @@ window.__hudClear=function(){const R=e=>{e=typeof e==='string'?document.getEleme
    const ok=R.length===S.length&&R.every(r=>r[1]);goSay('📍 HUD CLEAR '+city.toUpperCase()+' · '+R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL'))})();return'📍 HUD CLEAR · checking…'}});
  C.GO['ui/hud-clear']=[go('fra'),go('ath')];return}
  if(i<600)setTimeout(()=>HC_reg(i+1),100)})(0);
+// ios-r18f: GO perf/soa-1 — HUB.props rows are SOA_Row (typed columns), colours are shared (a handful, not one per prop), cvs lives in one Float32Array; accessors round-trip. ?soa=0 = off switch.
+(function SOA_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='soa-1')){C.items.push({ver:'perf',id:'soa-1',area:'perf',text:'ios-r18f · 📍 GO: HUB.props are typed-column rows with a shared colour palette and packed cvs (?soa=0 = off). Pass line: all props are rows, ≤ 300 distinct Color objects over all props, accessors round-trip.',go:'perf/soa-1'});
+ C.GO['perf/soa-1']=['fra','ath'].map(c=>({c,n:'prop rows in typed columns',secs:8,fn:()=>{if(typeof SOA==='undefined')return'📍 SOA · missing ❌ FAIL';if(!SOA.on)return'📍 SOA · ?soa=0 (off switch) ✅ PASS';
+  const s=SOA.stat(),P=HUB.props,p=P.find(q=>q.alive&&q.t)||P[0];if(!p)return'📍 SOA · no props ❌ FAIL';const x=p.x,t=p.t,rt=p.rt,a=p.alive;p.x=x+1;p.alive=false;p.alive=a;p.x=x;const ok0=p.x===x&&p.t===t&&p.rt===rt&&p.alive===a&&typeof t==='string';
+  const ok=ok0&&s.rows===s.props&&s.colors<=300;return`📍 SOA ${CID} · ${s.props} props, ${s.rows} rows, ${s.colors} distinct colours, ${s.cvPairs} packed cvs pairs, columns ${s.colMB} MB, round-trip ${ok0?'ok':'BAD'} → ${ok?'✅ PASS':'❌ FAIL'}`}}))}return}
+ if(i<600)setTimeout(()=>SOA_reg(i+1),100)})(0);
