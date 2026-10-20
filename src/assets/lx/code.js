@@ -246,7 +246,8 @@ function LIFE_landmark(){LIFE.lm=null;const fra=CID==='fra';let at=null;
 // ---------- fill: items within LIFE_R m, nearest first, into the pools (every 12 frames or 20 m)
 function LIFE_fill(){const x0=RO.x,z0=RO.z,cr=Math.ceil(LIFE_R/LIFE_CELL),ca=Math.floor(x0/LIFE_CELL),cb=Math.floor(z0/LIFE_CELL),near=[],t0=performance.now();let todo=false;
  const cl=[];for(let a=ca-cr;a<=ca+cr;a++)for(let b=cb-cr;b<=cb+cr;b++)cl.push([(a-ca)**2+(b-cb)**2,a,b]);cl.sort((p,q)=>p[0]-q[0]);/* r9d: nearest cells first, so the 1.5 ms budget drops the far ring and never the cells around the car (people near the player react on the same frame) */
- for(const [,a,b] of cl){if(!LIFE.C.has(a*100000+b)&&performance.now()-t0>1.5){todo=true;continue}for(const it of LIFE_cell(a,b)){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
+ const cap=typeof TWG!=='undefined'&&TWG.lvc&&TWG.fr>=0&&TWG.fr<=TWG.fw?1:99;let nb=0;/* ios-r17o: first 120 drivable frames: one new cell build per fill */
+ for(const [,a,b] of cl){if(!LIFE.C.has(a*100000+b)){if(performance.now()-t0>1.5||nb>=cap){todo=true;continue}nb++}for(const it of LIFE_cell(a,b)){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
  const pr=Math.ceil(LIFE_R/LIFE_PG);for(let a=Math.floor(x0/LIFE_PG)-pr;a<=Math.floor(x0/LIFE_PG)+pr;a++)for(let b=Math.floor(z0/LIFE_PG)-pr;b<=Math.floor(z0/LIFE_PG)+pr;b++){const it=LIFE_pop(a,b);if(it){const d=(it.x-x0)**2+(it.z-z0)**2;if(d<LIFE_R*LIFE_R)near.push([d,it])}}
  near.sort((p,q)=>p[0]-q[0]);const keep=new Set(),L=[];for(const [,it] of near){keep.add(it.id);if(!LIFE.dead.has(it.id))L.push(it)}
  for(const id of LIFE.dead.keys())if(!keep.has(id))LIFE.dead.delete(id);// smashed things come back once you are out of range

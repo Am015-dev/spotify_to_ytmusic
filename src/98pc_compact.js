@@ -76,7 +76,7 @@ function PC_mesh(C){const im=C.im;C.dirty=false;if(!im.parent)return 0;const cx=
 // Traffic layers (C.dyn, moving) and clouds are re-packed every 10 frames on their own; a mesh dirtied by setMatrixAt is re-packed alone next frame.
 function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!=='roam')return;if(PC.grp&&PC.grp!==HUB.grp){PC.L.length=0;PC.grp=null;PC.f=0}
  {const t=performance.now();if(!PC.f)PC.f=t;if(t-PC.f<3000&&!force)return}if(!PC.grp)PC_scan();/* boot-1: the scan normally ran in the loader (PC_prewarm); the first pass is budgeted like any other */
- if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9))PC_add();const np=PC_drain(force?1e9:3)>0;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
+ if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9&&!(typeof TWG!=='undefined'&&TWG.pa&&TWG.fr>=0&&TWG.fr<=TWG.fw)))PC_add()/* ios-r17o: tiles added in the first 120 drivable frames are packed after them */;const np=PC_drain(force?1e9:3)>0;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
  const t0=performance.now();let tested=0;
  if(force||np||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){PC_snap(cx,cz,h);PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}

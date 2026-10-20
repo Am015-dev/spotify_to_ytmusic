@@ -11,5 +11,5 @@
 // (77 ms at f25: first miniDraw / pedStep / cull / car pose). Run each once inside roamLoad, after roamPost placed the car and before ldHide lifts the curtain.
 // camSnap is kept, so the first real frame still snaps the camera. ?bootpre=0 off.
 function BOOT1_pre(){if(state!=='roam'||/[?&]bootpre=0/.test(location.search))return;const T=(n,f)=>{try{f()}catch(e){console.warn('boot1 '+n,e)}};
-  T('cam',()=>{const sn=camSnap;roamCam(1/60);camSnap=sn});T('traffic',()=>hubTrafficStep(1/60))}
+  T('cam',()=>{const sn=camSnap;roamCam(1/60);camSnap=sn});T('w13',()=>{if(typeof W13L==='undefined'||!W13L.g)return;const a0=W13L.a;W13L.a=.3;W13_lines(1/60);W13L.a=a0;W13_lines(1/60)});/* perf-r17j: first stroked frame of the speed-line canvas under the curtain */T('traffic',()=>hubTrafficStep(1/60))}
 {const _rp=roamPost;roamPost=function(...a){const r=_rp.apply(this,a);if(LD.busy)BOOT1_pre();return r}}

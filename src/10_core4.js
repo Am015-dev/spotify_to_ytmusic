@@ -187,6 +187,8 @@ let lowGfx=matchMedia('(pointer:coarse)').matches;
 // crash-1: low-memory tier, auto on iPhone/iPad/Android (iOS Safari kills the tab when the page gets too big). ?lowmem=0 off, ?lowmem=1 on anywhere
 function LOWMEM_is(u,tp,q){if(q==='0'||q==='1')return q==='1';return /iPhone|iPad|iPod|Android/.test(u||'')||/Macintosh/.test(u||'')&&tp>1}
 const LOWMEM=LOWMEM_is(navigator.userAgent,navigator.maxTouchPoints,new URLSearchParams(location.search).get('lowmem'));window.__lowmem=LOWMEM;
+// ios-r17s/r17z: touch/lowmem far building LOD: range cap 900 m (?lodrt=0 off) and coarser cell (?lodc=N); set here because the cells are built at load
+if(LOWMEM){const _q=new URLSearchParams(location.search),_r=_q.get('lodrt'),_c=_q.get('lodc');TUNE.wbLodRt=_r==null?900:+_r||0;if(_c!=null&&+_c>0)TUNE.wbLodCell=+_c}
 // crash-2: live GPU bytes (buffers + textures), counted at the GL calls; renderer.info counts objects, not bytes, and a first-visit upload of
 // boot-built city geometry raises the count while memFree drops the CPU copy (no growth in bytes). MEM_GPU.mb() = live MB..
 const MEM_GPU={b:new Map,t:new Map,bb:0,tb:0,mb(){return+((this.bb+this.tb)/1048576).toFixed(1)},est(){const c=renderer.domElement,cv=c.width*c.height*12;return+((this.bb+this.tb+(this.rbb||0)+(this.mxb||0)+cv)/1048576).toFixed(1)}};window.MEM_GPU=MEM_GPU;
