@@ -277,3 +277,13 @@ When the screen holds fewer, the director beat hook (dir.js) sends a slow curtai
 Roster substitution now also covers stages 3-4 (only stages 1-2 keep the plain drones) so no kind passes 35% of spawns. Boss movesets are built at spawn and trimmed to <= 12 distinct attacks (DENS.trimBoss; hulls and caps in armour.js untouched).
 Test: density-test.js (curve, caps, gaps, difficulty order, flag off).
 Result (industry-audit, before -> after): S04 4.99 -> 11.15 (target 12, near), S06 1.08 -> 1.73 pass, S08 78.6 -> 78.4 pass, S09 0.41 -> 0.23 pass, S12 13 -> 8 pass. The budget curve is convex (balance-test Normal late stage 8 clear 67%, same as ?density=0; a linear curve gave 50%).
+
+## Anti-camp (W29, parts/anticamp.js, flag RET.anticamp, default ON; ?anticamp=0 = old) - 20 Oct 2026
+- Why: review 4 (g): Normal camper (x=70, tracks height) 92% vs dodger 83%; bot that does not read the strike 20% first try. Camping beat dodging and the strike was a hidden wall.
+- Camp level 0..1: last 6 s of x samples; share in the left 25% (0 at 75%, full at 95%) x spread (full under 32 px, 0 above 64 px). The anticamp-test dodger swing scores 0; the dodge bot is flagged 15% of its time (pushed to the edge by bullets).
+- Above .5: a flanker tell every 2.6 s Normal (Easy 3.4, Hard 2.2, Very hard 2, Legend 1.8; faster at full level): 0.8 s edge marker + dashed line, then a 3-bullet stream from behind or above at the camp spot (3 lines 120 px apart after the 2nd flush), or a ground-fire wall up the left edge with a 120 px gap (dies at 32% of the field). Through eb(): ebCap/BCAP hold.
+- Pickups wait at 45% of the field while camping (fade after 10 s); score and EMP gain x(1 - .5 level); shots from the left 25% at targets beyond 60% hit x(1 - .4 level).
+- Forward repair: every 10 close-range kills (reward.js close mark) drop a repair, max one per 25 s; Easy/Normal/Hard (not Very hard/Legend).
+- Strike on Easy/Normal: 6 s still (was 3.5-5) unless camping, tell >= 1.2 s on the beat, first of a stage 0 hull, later 1 (never 2), none while collecting or, when not camping, shooting a lined-up target (fired < .6 s ago). Hard tiers keep strike2.
+- anticamp-test (Normal st 3/10/20 x6, Hard max st 2/4 x6), before (?anticamp=0) -> after: dodge 67 -> 72%, camp 83 -> 22%, bold 33 -> 61%, no-oracle dodger 42 -> 67%; Hard max st 2/4 after: dodge 100 / camp 25 (st 5/12: both 0% before and after). Noise about +-11 at 18 runs (repeat runs: camp 11-22%, dodge 61-83%).
+- repeat-audit arcade-normal stages 1-20 (S23 no-oracle first try): 0.55 (review 4: 0.20 over 45 stages). mustmove 3/10/20: park/hop/track 0% (track was 30% before campers lost the aiming exemption).
