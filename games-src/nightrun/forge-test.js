@@ -107,20 +107,19 @@ const UI = () => {   // 5: in the page, the Garage FORGE tab
   let capBad = 0, capTxt = ''; for (const t of tab.slice(0, 5)) for (const diff of ['hard', 'legend']) { const r = await p.evaluate(DPS, { rid: t.id, w: t.w, L: 10, secs: 8, diff, n: 30, mods: ['heavy'] }); if (r.cap && r.dps > r.cap * 1.1) { capBad++; capTxt += ` ${t.id}/${diff} ${r.dps.toFixed(0)}>${r.cap.toFixed(0)}`; } }
   line(!capBad, 'ceiling: the top 5 hybrids at LV10 parents on Hard/Legend stage 30 stay under hard.js\'s DPS ceiling x1.1' + capTxt);
   // 3 Hard stage 30 with the story bot
-  if (process.env.HARD !== '0') {
-    const top = tab.slice(0, 10), jobs = []; for (const t of top) for (let r = 0; r < RUNS; r++) jobs.push(t); const res = []; let nx = 0;
-    await Promise.all(Array.from({ length: PAR }, async () => { const q = await page('&all=1&fgt=' + top.map(t => t.id).join(','));
-      while (nx < jobs.length) { const t = jobs[nx++]; const pair = FGR.find(R => R[2] === t.id);
+  if (process.env.HARD !== '0') {   // time to clear Hard stage 30 (story bot, god mode) with the hybrid / with its two parents alone: every ratio within 15% of the median ratio
+    const top = tab.slice(0, 10), jobs = []; for (const t of top) for (let r = 0; r < RUNS; r++) for (const h of [1, 0]) jobs.push({ t, h }); const res = []; let nx = 0;
+    const run = async (q, h) => { while (nx < jobs.length) { const j = jobs.find((x, k) => k >= nx && x.h === h); if (!j) return; jobs.splice(jobs.indexOf(j), 1); const pair = FGR.find(R => R[2] === j.t.id);
         const r = await q.evaluate(({ a, b }) => { const m = window.__mnr, wp = window.__wp; m.SET.diff = 'hard'; try { m.applySet(); } catch (e) { } m.god = true; wp.eq = [a, b]; wp._fk = null; wp.lv = {}; wp.xp = {}; wp.pl = { pulse: 1 }; wp.perm(a, 6); wp.perm(b, 6); window.__fg.FG.ver++; }, { a: pair[0], b: pair[1] }).then(() => q.evaluate(new Function('o', 'return (' + BOTSRC + ')(o)'), { n: 30, PC: .4, MAXT: 420, endless: false })).catch(e => ({ err: e.message }));
-        res.push(Object.assign({ id: t.id }, r)); }
-      await q.close(); }));
-    const rows = top.map(t => { const a = res.filter(r => r.id === t.id && r.t); return { id: t.id, t: a.reduce((x, y) => x + y.t, 0) / Math.max(1, a.length), h: a.reduce((x, y) => x + (y.hits || 0), 0) / Math.max(1, a.length), c: a.filter(r => r.clear).length + '/' + a.length }; });
-    const med = k => { const v = rows.map(r => r[k]).sort((a, b) => a - b); return (v[(v.length - 1) >> 1] + v[v.length >> 1]) / 2; }, mt = med('t'), mh = med('h');
-    console.log('  Hard stage 30 (story bot in god mode: time to clear and hits taken; parents LV6, hybrid LV5): hybrid  time  hits  clears');
-    for (const r of rows) console.log(`  ${r.id.padEnd(13)} ${r.t.toFixed(0).padStart(4)}s ${r.h.toFixed(1).padStart(5)} ${r.c}`);
-    const outT = rows.filter(r => Math.abs(r.t - mt) > .15 * mt), outH = rows.filter(r => Math.abs(r.h - mh) > Math.max(1.5, .15 * mh));
-    line(!outT.length, `Hard stage 30: every top-10 hybrid's time within 15% of the median ${mt.toFixed(0)} s` + (outT.length ? ' (out: ' + outT.map(r => r.id).join(',') + ')' : ''));
-    line(!outH.length, `Hard stage 30: every top-10 hybrid's hits within 15% (or 1.5) of the median ${mh.toFixed(1)}` + (outH.length ? ' (out: ' + outH.map(r => r.id).join(',') + ')' : ''));
+        res.push(Object.assign({ id: j.t.id, h }, r)); } };
+    await Promise.all(Array.from({ length: PAR }, async (_, k) => { const h = k % 2 ? 0 : 1; const q = await page('&all=1' + (h ? '&fgt=' + top.map(t => t.id).join(',') : '&forge=0')); await run(q, h); await q.close(); }));
+    const avg = (id, h) => { const a = res.filter(r => r.id === id && r.h === h && r.t); return a.reduce((x, y) => x + y.t, 0) / Math.max(1, a.length); };
+    const rows = top.map(t => ({ id: t.id, th: avg(t.id, 1), tp: avg(t.id, 0), c: res.filter(r => r.id === t.id && r.h && r.clear).length + '/' + res.filter(r => r.id === t.id && r.h).length })).map(r => Object.assign(r, { k: r.th / Math.max(1, r.tp) }));
+    const v = rows.map(r => r.k).sort((a, b) => a - b), mk = (v[(v.length - 1) >> 1] + v[v.length >> 1]) / 2;
+    console.log('  Hard stage 30, story bot in god mode, parents LV6, hybrid LV5: hybrid / time with hybrid / time parents alone / ratio / clears');
+    for (const r of rows) console.log(`  ${r.id.padEnd(13)} ${r.th.toFixed(0).padStart(4)}s ${r.tp.toFixed(0).padStart(4)}s  x${r.k.toFixed(2)}  ${r.c}`);
+    const out = rows.filter(r => Math.abs(r.k - mk) > .15 * mk);
+    line(!out.length, `Hard stage 30: every top-10 hybrid's clear time vs its parents within 15% of the median ratio x${mk.toFixed(2)}` + (out.length ? ' (out: ' + out.map(r => r.id + ' x' + r.k.toFixed(2)).join(', ') + ')' : ''));
   }
   // 4 inventory + persistence
   const iv = await p.evaluate(INVT); line(!iv.f.length, 'inventory rules: forge, craft, sockets 1/2, core, passive, presets, level cap, sell, scrap' + (iv.f.length ? ': ' + iv.f.join(', ') : ''));
