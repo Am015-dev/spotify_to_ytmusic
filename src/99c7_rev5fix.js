@@ -722,3 +722,25 @@ updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{
   catch(e){R.push(['threw '+e,false])}const ok=R.every(r=>r[1]);return`📍 ALLOC CHAIN ${city.toUpperCase()} · ${R.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}});
  C.GO['perf/alloc-chain']=[go('fra'),go('ath')];return}
  if(i<600)setTimeout(()=>A18Y_reg(i+1),100)})(0);
+// bug-r19a: GO bug/no-raf-error (+ -fra). Review #20: the Frankfurt render threw "null (reading 'byteLength')" ~55 s into the roam (lowmem: SM_upload freed a hub
+// geometry's CPU arrays after upload, MEMF streaming then disposed it at the off line, the re-shown chunk re-uploaded from null). The GO frees up to 40 drawn
+// streamed chunks the SM3 way (the ?test start skips SM_upload), roams 90 s (sim steps, a real render every 15), then sends every chunk past the off line and back.
+// Pass line: 0 render throws, 0 window errors / unhandled rejections, 0 visible meshes that would upload from a null array (MEMF_bad). Freed arrays are put back after.
+(function R19A_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='bug'&&q.id==='no-raf-error')){C.items.push({ver:'bug',id:'no-raf-error',area:'perf',text:'bug-r19a · no render-loop error: 📍 GO (Frankfurt, then -ath) roams 90 s (lowmem: with streamed chunks whose CPU arrays were freed after upload, then all chunks out of range and back) and checks 0 render throws, 0 uncaught errors and 0 visible meshes with a null array that is not on the GPU. Pass line ends ✅ PASS.',go:'bug/no-raf-error'});
+ const run=async()=>{const M=typeof MEMF!=='undefined'?MEMF:null,T=!!(M&&M.S.length),R=renderer,rr=R.render;let rE=0,wE=0,bad=0,bL=[],rmsg='';const oe=()=>wE++,ou=()=>wE++;
+  window.addEventListener('error',oe);window.addEventListener('unhandledrejection',ou);R.render=function(){try{return rr.apply(this,arguments)}catch(err){rE++;rmsg=rmsg||String(err&&err.message).slice(0,60)}};
+  const hold=T?M.gHold:0,frd=[];const chk=()=>{if(!T)return;const b=MEMF_bad();if(b.n>bad){bad=b.n;bL=b.L}};const draw=()=>{try{composer.render()}catch(err){rE++;rmsg=rmsg||String(err&&err.message).slice(0,60)}chk()};
+  try{if(T){M.gHold=0;M.zT=performance.now()-1;for(const e of M.S){if(frd.length>=40)break;const g=e.m.geometry;if(!e.on||!e.dr||e.cz||e.zb||!MEMF_ha(g))continue;const A=Object.values(g.attributes).concat(g.index||[]),k=[];
+      for(const a of A){if(a.isInterleavedBufferAttribute)continue;k.push([a,a.array]);a.array=null;a.getX=a.getY=a.getZ=a.getW=BA_freed}frd.push({e,k})}}
+    const W=a=>Math.atan2(Math.sin(a),Math.cos(a));let n=0;
+    for(let t=0;t<90;t+=1/30){const la=12+RO.v*.9,q=rfSnap(RO.x+Math.sin(RO.h)*la,RO.z+Math.cos(RO.h)*la,60),e=q?W(Math.atan2(q[0]-RO.x,q[1]-RO.z)-RO.h):0;K.KeyW=K.ArrowUp=true;K.ArrowLeft=e>.06;K.ArrowRight=e<-.06;
+      try{roamStep(1/30)}catch(err){wE++}if(T){try{MEMF_gstep();MEMF_Gstep()}catch(err){wE++}}if(++n%15===0){draw();await new Promise(r=>setTimeout(r,0))}}
+    K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;let cyc=0;
+    if(T){const p=camera.position.clone();camera.position.x+=1e5;MEMF_gstep();camera.position.copy(p);draw();for(let j=0;j<240;j++){MEMF_gstep();if(j%8===7){draw();await new Promise(r=>setTimeout(r,0))}}cyc=M.S.filter(e=>e.on).length}
+    await new Promise(r=>setTimeout(r,50));draw();
+    return`📍 NO RAF ERROR · ${rE===0&&wE===0&&bad===0?'✓':'✗'} 90 s roam${T?` + off/on cycle (lowmem: ${frd.length} drawn chunks with freed CPU arrays, ${cyc} chunks shown again, ${M.st.nd||0} kept on the GPU)`:' (desktop: no streaming)'} · ${rE} render throws${rmsg?' ('+rmsg+')':''} (0) · ${wE} uncaught errors (0) · ${bad} visible null-array meshes off the GPU (0)${bL.length?' '+bL.join(','):''} → ${rE===0&&wE===0&&bad===0?'✅ PASS':'❌ FAIL'}`}
+  catch(err){return`📍 NO RAF ERROR · threw ${String(err&&err.message).slice(0,80)} → ❌ FAIL`}
+  finally{R.render=rr;window.removeEventListener('error',oe);window.removeEventListener('unhandledrejection',ou);if(T){M.gHold=hold;for(const{e,k}of frd){for(const[a,v]of k)if(!a.array){a.array=v;delete a.getX;delete a.getY;delete a.getZ;delete a.getW}if(MEMF_ha(e.m.geometry)){e.zfail=0;e.nd=0}}}}};
+ const go=()=>{run().then(r=>goSay(r));return'📍 NO RAF ERROR · roaming 90 s…'};
+ C.GO['bug/no-raf-error']=[{c:'fra',n:'no render-loop error (Frankfurt)',fn:go,secs:150},{c:'ath',n:'no render-loop error (Athens)',fn:go,secs:150}]}return}
+ if(i<600)setTimeout(()=>R19A_reg(i+1),100)})(0);

@@ -12,7 +12,7 @@ function MEMF_free(m,part){const g=m.geometry;if(!g||g.userData.mfDone)return;g.
   MEMF.n++;MEMF.mb+=b/1048576}
 function MEMF_sweep(){if(!TUNE.memFree)return;const hook=m=>{if(m.isInstancedMesh&&TUNE.gpuStr&&m.geometry&&!MEMF.seen.has(m)&&!m.userData.sky){MEMF.seen.add(m);MEMF_ipack(m);return}
   if(m.isMesh&&!m.isInstancedMesh&&!m.isSkinnedMesh&&m.geometry&&!MEMF.seen.has(m)){MEMF.seen.add(m);const u=m.userData;let part=0,cd=0;for(const s of MEMF.skip)if(u[s]){if(LOWMEM&&MEMF.part.includes(s)){part=1;MEMF_gadd(m);break}if(s==='cd'&&TUNE.gpuStr){cd=1;continue}return}
-    if(!part&&TUNE.gpuStr){const g=m.geometry,w=MEMF.gu.get(g);if(w===undefined){MEMF.gu.set(g,m);m.updateMatrixWorld();MEMF_pack(m,cd?u.cd:0);return}if(w){MEMF.gu.set(g,null);const i=MEMF.S.findIndex(e=>e.m===w);if(i>=0){const e=MEMF.S.splice(i,1)[0];e.m.layers.enable(0)}}if(cd)return}   // crash-5: shared geometry -> memFree as before (crash-6: a shared cd geometry is left alone)
+    if(!part&&TUNE.gpuStr){const g=m.geometry,w=MEMF.gu.get(g);if(w===undefined){if(!MEMF_ha(g))return;MEMF.gu.set(g,m);m.updateMatrixWorld();MEMF_pack(m,cd?u.cd:0);return}if(w){MEMF.gu.set(g,null);const i=MEMF.S.findIndex(e=>e.m===w);if(i>=0){const e=MEMF.S[i];if(e.zb)e.zb=2;if(e.cz)MEMF_shh(e,m);else{MEMF.S.splice(i,1);e.m.layers.enable(0)}}}if(cd)return}   // crash-5: shared geometry -> memFree as before (crash-6: a shared cd geometry is left alone)
     const f=m.onAfterRender;m.onAfterRender=function(){MEMF_free(this,part);this.onAfterRender=f}}};
   const walk=o=>{if(o===RO.grp||o.userData.keep&&!o.isMesh||o.userData.gb)return;hook(o);for(const c of o.children)walk(c)};walk(scene)}
 setInterval(MEMF_sweep,2500);
@@ -30,14 +30,14 @@ function MEMF_q(g){if(g.userData.mfDone)return 0;g.dispose();const A=g.attribute
   let b=0;for(const a of [...Object.values(g.attributes),g.index])if(a&&a.array)b+=a.array.byteLength;g.userData.mfDone=3;MEMF.st.pack++;MEMF.st.cpuMB+=b/1048576;return b}
 function MEMF_pack(m,cd){const g=m.geometry;if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingBox)g.computeBoundingBox();MEMF_q(g);
   const s=g.boundingSphere,v=new THREE.Vector3().copy(s.center).applyMatrix4(m.matrixWorld);MEMF.S.push({m,x:v.x,z:v.z,r:Math.min(s.radius,1200),on:true,ri:cd?Math.min(MEMF.Rin,cd+150):MEMF.Rin,ro:cd?Math.min(MEMF.Rout,cd+400):MEMF.Rout});MEMF_dh(MEMF.S[MEMF.S.length-1]);if(cd)MEMF.st.cd++}
-function MEMF_ipack(m){const g=m.geometry;if(g.userData.mfDone||!g.attributes.position)return;if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingBox)g.computeBoundingBox();MEMF.st.imMB+=MEMF_q(g)/1048576;MEMF.st.im++}
+function MEMF_ipack(m){const g=m.geometry;if(g.userData.mfDone||!g.attributes.position||!MEMF_ha(g))return;if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingBox)g.computeBoundingBox();MEMF.st.imMB+=MEMF_q(g)/1048576;MEMF.st.im++}
 // r18m: while the GO runner's inflate-all hold (gHold) is on, every chunk is shown and restored (terrain GOs read hills from any street spot)
 function MEMF_gstep(){let S=MEMF.S;if(!S.length||!TUNE.gpuStr)return;if((MEMF.fr=(MEMF.fr||0)+1)%300===0){const inS=o=>{while(o.parent)o=o.parent;return o===scene};S=MEMF.S=S.filter(e=>inS(e.m))}   // drop meshes of a freed city
 const cx=camera.position.x,cz=camera.position.z,T=MEMF.ts,cf=T?camera.far:0,zg=T?150:250,zc=T?MEMF.zbm:1;let up=0,zs=0;
-  for(const e of S){const d=Math.hypot(e.x-cx,e.z-cz)-e.r,H=T&&MEMF.gHold>performance.now(),ro=H?1e9:T?Math.min(e.ro,cf+50):e.ro,ri=H?1e9:T?Math.min(e.ri,cf-50):e.ri;if(e.on){if(d>ro){e.on=false;e.m.layers.disableAll();e.m.geometry.dispose();MEMF.st.dn++}
+  for(const e of S){const d=Math.hypot(e.x-cx,e.z-cz)-e.r,H=T&&MEMF.gHold>performance.now(),ro=H?1e9:T?Math.min(e.ro,cf+50):e.ro,ri=H?1e9:T?Math.min(e.ri,cf-50):e.ri;if(e.on){if(d>ro){MEMF_off(e)}
       else if(T&&MEMF.nz){if(e.cz){if(e.cz.st===1&&(d<MEMF.nr||MEMF.gHold>performance.now())&&MEMF.ubusy<MEMF.ubm)MEMF_unzip(e)}else if(e.dr&&!e.zb&&!e.zfail&&d>MEMF.nr+150&&MEMF.gHold<performance.now()&&MEMF_zready()&&(MEMF_rz(e)||zs<1&&MEMF.zbusy<zc&&(zs++,e.zr=MEMF.nr,MEMF_zip(e),1)));}}   // ios-r18a: drawn, uploaded chunk past the near radius
     else if(e.cz){if(e.cz.st===1&&d<ro&&MEMF.ubusy<(T?MEMF.ubm:2))MEMF_unzip(e)}   // restoring: stays hidden until the arrays are back (r18a: tstream unzips at the off line, 150 m inside the zip line)
-    else if(d<ri&&up<MEMF.cap){e.on=true;e.zb=0;e.m.layers.enable(0);if(T)MEMF_dh(e);up++;MEMF.st.up++}
+    else if(d<ri&&up<MEMF.cap){if(!e.nd&&!MEMF_ha(e.m.geometry))e.nd=1;e.on=true;e.zb=0;e.m.layers.enable(0);if(T){if(e.nd)e.dr=1;else MEMF_dh(e)}up++;MEMF.st.up++}
     else if(MEMF.zOn&&MEMF_zready()&&!e.zb&&!e.zfail&&(T&&d>ro+zg&&MEMF_rz(e)||zs<1&&MEMF.zbusy<zc&&d>ro+zg&&(zs++,e.zr=ro,MEMF_zip(e),1)));}}
 // perf-r17m: a streamed chunk that stays off for good (farther than Rout + 250 m) gives up its packed CPU arrays for ONE deflated copy (lossless; CompressionStream, one
 // chunk per step, ~half the bytes). It is inflated again once the camera is back inside Rout (before Rin shows it) and applied as zero-copy views; it is never shown
@@ -63,7 +63,7 @@ async function MEMF_zip(e){const g=e.m.geometry,P=[],zon=e.on&&!e.g;let tot=0;e.
 async function MEMF_unzip(e){const c=e.cz;c.st=2;MEMF.ubusy++;
   try{const ab=await new Response(new Blob([c.z]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer(),g=e.m.geometry,t0=performance.now();
     for(const p of c.P){const a=p.k==='@i'?g.index:g.attributes[p.k];delete a.getX;delete a.getY;delete a.getZ;delete a.getW;a.array=new p.T(ab,p.off,p.n)}
-    if(MEMF.ts&&!e.g)e.zk={z:c.z,P:c.P,ab};if(e.g){e.m.layers.mask=e.lm;MEMF.gst.back++}else if(!e.on)g.dispose();e.cz=null;MEMF.zst.back++;MEMF.zst.maxMs=Math.max(MEMF.zst.maxMs,performance.now()-t0)}
+    if(MEMF.ts&&!e.g)e.zk={z:c.z,P:c.P,ab};if(e.g){e.m.layers.mask=e.lm;MEMF.gst.back++}else if(!e.on)g.dispose();e.cz=null;if(e.shm)MEMF_shr(e);MEMF.zst.back++;MEMF.zst.maxMs=Math.max(MEMF.zst.maxMs,performance.now()-t0)}
   catch(err){c.st=1;e.zfail=1}finally{MEMF.ubusy--}}
 (function MEMF_raf(){try{MEMF_gstep()}catch(e){}try{MEMF_Gstep()}catch(e){}requestAnimationFrame(MEMF_raf)})();
 // ios-r17r (?tstream=1): the off chunks are deflated under the load curtain, so the gain shows at ready. roamLoad starts MEMF_cur next to TWG_run and awaits
@@ -72,7 +72,7 @@ async function MEMF_unzip(e){const c=e.cz;c.st=2;MEMF.ubusy++;
 Object.assign(MEMF,{cms:(q=>q==null?250:+q)(new URLSearchParams(location.search).get('tscur')),czN:6});MEMF.zst.cur=0;
 async function MEMF_cur(){if(!MEMF.ts||!TUNE.gpuStr)return;const t0=performance.now();try{MEMF_sweep()}catch(e){}{const inS=o=>{while(o.parent)o=o.parent;return o===scene};MEMF.S=MEMF.S.filter(e=>inS(e.m))}   // not the meshes of a city just left
   const x=RO.x,z=RO.z,cf=camera.far,L=[];for(const e of MEMF.S){const d=Math.hypot(e.x-x,e.z-z)-e.r,ro=Math.min(e.ro,cf+50);
-    if(d>ro&&e.on){e.on=false;e.m.layers.disableAll();e.m.geometry.dispose();MEMF.st.dn++}if(!e.on&&!e.cz&&!e.zb&&!e.zfail&&d>ro+150){e.zr=ro;L.push(e)}else if(MEMF.nz&&e.on&&e.dr&&!e.cz&&!e.zb&&!e.zfail&&d>MEMF.nr+150){e.zr=MEMF.nr;L.push(e)}}
+    if(d>ro&&e.on)MEMF_off(e);if(!e.on&&!e.cz&&!e.zb&&!e.zfail&&d>ro+150){e.zr=ro;L.push(e)}else if(MEMF.nz&&e.on&&e.dr&&!e.cz&&!e.zb&&!e.zfail&&d>MEMF.nr+150){e.zr=MEMF.nr;L.push(e)}}
   {const g=[];for(const e of MEMF.G){if(!e.cz&&!e.zb&&!e.zfail&&Math.hypot(e.x-x,e.z-z)-e.r>cf+200){e.zr=cf+50;g.push(e)}}L.unshift(...g)}   // ground first (r17y)
   const P=[];let t=performance.now();MEMF.cur=1;
   try{for(const e of L){if(MEMF.cend&&performance.now()>MEMF.cend)break;while(MEMF.zbusy>=MEMF.czN||performance.now()-t>8){await nextFrame();t=performance.now()}
@@ -85,7 +85,7 @@ async function MEMF_cur(){if(!MEMF.ts||!TUNE.gpuStr)return;const t0=performance.
 // is inflated from far + 150 m (zero-copy views, layers restored). MEMF_gall() is the inflate-all hook: the GO runner awaits it before a non-perf GO and no
 // ground is zipped for MEMF.gHoldMs after it.
 Object.assign(MEMF,{G:[],gg:new WeakMap(),gHold:0,gHoldMs:180000,gst:{n:0,rawMB:0,zMB:0,back:0}});
-function MEMF_gadd(m){if(!MEMF.ts||m.isInstancedMesh)return;const g=m.geometry,P=g.attributes.position;if(!P||!P.array)return;const w=MEMF.gg.get(g);if(w){w.zfail=1;return}   // shared geometry: left alone
+function MEMF_gadd(m){if(!MEMF.ts||m.isInstancedMesh)return;const g=m.geometry,P=g.attributes.position;if(!P||!P.array)return;const w=MEMF.gg.get(g);if(w){w.zfail=1;if(w.cz)MEMF_shh(w,m);return}   // shared geometry: left alone
   if(!g.boundingSphere)g.computeBoundingSphere();if(!g.boundingBox)g.computeBoundingBox();m.updateMatrixWorld();const s=g.boundingSphere,v=new THREE.Vector3().copy(s.center).applyMatrix4(m.matrixWorld);
   const e={m,g:1,x:v.x,z:v.z,r:s.radius};MEMF.gg.set(g,e);MEMF.G.push(e)}
 function MEMF_Gstep(){const G=MEMF.G;if(!G.length||!MEMF.ts)return;if((MEMF.gfr=(MEMF.gfr||0)+1)%300===0){const inS=o=>{while(o.parent)o=o.parent;return o===scene};MEMF.G=G.filter(e=>inS(e.m))}
@@ -105,3 +105,15 @@ function MEMF_dh(e){if(!MEMF.ts)return;const m=e.m,f=m.onAfterRender;e.dr=0;m.on
 function MEMF_rz(e){const k=e.zk;if(!k||e.cz||e.zb||e.zfail||e.on&&!e.dr)return false;const g=e.m.geometry,A=[];
   for(const p of k.P){const a=p.k==='@i'?g.index:g.attributes[p.k];if(!a||!a.array||a.array.buffer!==k.ab){e.zk=null;return false}A.push(a)}
   e.cz={z:k.z,P:k.P,st:1};e.zk=null;for(const a of A){a.array=null;a.getX=a.getY=a.getZ=a.getW=BA_freed}MEMF.zst.rz++;return true}   // r18m: zk.ab kept the raw buffer alive after the re-zip
+// bug-r19a: review #20's 'null (reading byteLength)' render throw ~55 s into the roam. SM_upload (SM3, lowmem) uploads every hub geometry and then frees its CPU
+// arrays; the streaming off line then disposed that geometry, so the chunk shown again was re-uploaded from a null array. Rules now: a geometry is disposed only
+// while its arrays exist (or are held deflated in e.cz); one whose arrays went elsewhere keeps its GPU copy (e.nd: hidden via layers only). A mesh that shares
+// the geometry of a deflated entry stays hidden until the inflate is done (MEMF_shh / MEMF_shr). GO bug/no-raf-error (src/99c7_rev5fix.js).
+function MEMF_ha(g){for(const k in g.attributes){const a=g.attributes[k];if(!a.isInterleavedBufferAttribute&&!a.array)return false}return !g.index||!!g.index.array}
+function MEMF_off(e){e.on=false;e.m.layers.disableAll();if(e.cz||MEMF_ha(e.m.geometry))e.m.geometry.dispose();else{e.nd=1;MEMF.st.nd=(MEMF.st.nd||0)+1}MEMF.st.dn++}
+function MEMF_shh(e,m){if(m.userData.mfL===undefined){m.userData.mfL=m.layers.mask;m.layers.disableAll()}(e.shm=e.shm||[]).push(m);if(e.cz&&e.cz.st===1)MEMF_unzip(e)}
+function MEMF_shr(e){for(const o of e.shm){o.layers.mask=o.userData.mfL;delete o.userData.mfL}e.shm=null;if(!e.g){const i=MEMF.S.indexOf(e);if(i>=0)MEMF.S.splice(i,1);e.m.layers.enable(0)}}
+// state assert (GO): visible meshes that would be uploaded from a null array (managed, not drawn since shown, or hidden-state ground / shared holds that are drawn)
+function MEMF_bad(cam){let n=0;const L=[];scene.traverse(o=>{if(!o.isMesh||!o.geometry||!o.geometry.attributes.position)return;const g=o.geometry;if(g.attributes.position.array&&MEMF_ha(g))return;
+  for(let q=o;q;q=q.parent)if(!q.visible)return;if(!o.layers.test((cam||camera).layers))return;const e=MEMF.S.find(x=>x.m===o)||MEMF.G.find(x=>x.m===o);
+  if(e?(e.g?!!e.cz:(!e.on||(!e.dr&&!e.nd))):o.userData.mfL!==undefined){n++;if(L.length<3)L.push(Object.keys(o.userData).slice(0,4).join('.')+(e?':'+(e.on?1:0)+(e.cz?'c':'')+(e.dr?'d':''):''))}});return{n,L}}

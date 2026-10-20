@@ -1,3 +1,10 @@
+## bug-r19a (2026-10-20): render-loop throw "null (reading 'byteLength')" (review #20) · fixed
+1. Cause: on lowmem, SM_upload (SM3) uploads every hub geometry and then frees its CPU arrays. MEMF streaming (src/98mf_memfree.js) later disposed that geometry at the off line, so when the chunk came back in range three.js re-uploaded it from a null array (seen: trPl/bwT ground plates, on, not zipped, arrays null). Same trap: a geometry already freed by memFree packed as a stream entry, and a new mesh sharing the geometry of a deflated entry.
+2. Fix (MEMF): dispose only while the arrays exist or are held deflated (MEMF_off; otherwise e.nd, hidden through layers only, GPU copy kept); never pack/stream a geometry whose arrays are gone (MEMF_ha); a mesh sharing a deflated entry's geometry stays hidden until the inflate is done (MEMF_shh/MEMF_shr). MEMF_bad() = state assert.
+3. Measured: tBoot CITY=fra QS=lowmem=1 SECS=90, before 164 / 165 byteLength throws, after 0 / 0. GO bug/no-raf-error (99c7: frees 40 drawn chunks the SM3 way, 90 s roam, all chunks out and back) PASS fra+ath on lowmem and desktop. Heap perf/ios-mem fra 339 -> 355 MB on both builds (no change).
+4. Gates (built): unit 0 FAIL; lowmem bug/no-raf-error,ios-mem,tstream-on,mem-quant pass; perf/tstream-near fails on the OLD build too (3/3 runs: near chunks waiting behind the single inflate in flight, ubusy 1/1), so it predates this fix and is flaky; desktop bug/no-raf-error,r13 sky,life1,xf1,terrain,phone2 49/49.
+5. Left: perf/tstream-near flake (near unzip backlog behind ubm=1, maybe let a near chunk jump the queue); an entry dropped from MEMF.S while deflated (not in scene for 300 frames) and later re-added would still be broken.
+
 ## r18j (2026-10-20, alex/od-int2): Athens start pose + 5 seeded cars
 1. src/98bp_warmall.js: R17_off also moves the Athens start 40 m back on the same road (?r17ao=0 = old); R17_seed seeds 5 cars at 50-120 m (?r17n5=0 = 3 cars; finer slot grid, 14 m spacing).
 2. GO r17/start-life (src/99c7_rev5fix.js): top-left open >= 90 % in both cities, >= 3 cars in the frustum 40-120 m ahead.
