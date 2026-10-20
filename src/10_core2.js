@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.129',date:'20 Oct 2026',items:[{t:'FIXED',s:'Frankfurt: the jerk just after you start driving is gone (camera check now works in small steps).'},{t:'FIXED',s:'Phones use about 45 MB less memory in Athens.'},{t:'CHANGED',s:'PC loading work can now be spread into small steps (still off while we finish it).'}]},
 {v:'v90m-beta.128',date:'19 Oct 2026',items:[{t:'FIXED',s:'Turning your phone no longer rebuilds or reloads the city; the screen just resizes.'},{t:'FIXED',s:'Faster start: phones load only the game code they need, and the ground is built in small steps instead of one long freeze.'},{t:'CHANGED',s:'Better memory measurement on phones, so the next update can fix the iPhone reloads.'}]},
 {v:'v90m-beta.127',date:'19 Oct 2026',items:[{t:'NEW',s:'Phone reports: the Beta now tells us when a game starts, when it freezes for over a second, and when iPhone closed the page'},{t:'CHANGED',s:'Athens phone traffic checked: no stutter when you start driving'}]},
 {v:'v90m-beta.126',date:'19 Oct 2026',items:[{t:'FIXED',s:'PC: almost no graphics are built after loading any more, so the first seconds of driving stay smooth.'}]},
