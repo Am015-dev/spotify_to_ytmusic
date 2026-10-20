@@ -32,12 +32,16 @@ function ESC_trapped(H){const n=H.length;if(!n)return'';const c=H[n-1];
   let rev=0,sg=0;for(let k=i;k<n;k++){const v=H[k][3];if(v>.5){if(sg<0)rev++;sg=1}else if(v<-.5){if(sg>0)rev++;sg=-1}}
   return rev>=ESC.rock.rev?'rocking':''}
 function ESC_end(){const E=ESC.E;E.H.length=0;E.as=0;E.done=0;E.tp=0}
-/* the lift never lands in a building or on a car: the nearest road point, else points 8-48 m along the road (heading q[2]) both ways, else the nearest point as is */
-function ESC_clear(x,z,y){if(roamHit(x,z,2.8,y))return false;for(const q of(HUB.cars||[]))if(!q.dead&&q.x!=null&&Math.hypot(q.x-x,q.z-z)<7)return false;return true}
+/* the lift never lands in a building or on a car (r21h2 review #7): the nearest road point, else points 8-96 m along that road both ways, else the nearest clear point
+   of any other road within 400 m; none clear -> null: the lift HOLDS (the auto test is redone every frame, so it lifts on the first frame a clear spot exists) */
+function ESC_clear(x,z,y,r=7){if(roamHit(x,z,2.8,y))return false;for(const q of(HUB.cars||[]))if(!q.dead&&q.x!=null&&Math.hypot(q.x-x,q.z-z)<r)return false;return true}   // the lift picks with r=10: traffic still moves in the frame of the lift
 function ESC_spot(){const q=TR8_near(RO.x,RO.z);if(!q)return null;const sx=Math.sin(q[2]),sz=Math.cos(q[2]);
-  for(const d of[0,8,-8,16,-16,24,-24,32,-32,40,-40,48,-48]){const x=q[0]+sx*d,z=q[1]+sz*d,y=groundAt(x,z,99);if(d&&!TR8_onRoad(x,z))continue;if(ESC_clear(x,z,y))return[x,z,q[2],d]}return q}
+  for(let d=0;d<=96;d+=8)for(const e of d?[d,-d]:[0]){const x=q[0]+sx*e,z=q[1]+sz*e;if(e&&!TR8_onRoad(x,z))continue;if(ESC_clear(x,z,groundAt(x,z,99),10))return[x,z,q[2],e]}
+  const C=[];for(const S of CITY_S){if(S.r&&S.r.cls==='ped')continue;const P=S.pts;for(let i=0;i<P.length-1;i++){const d=Math.hypot(P[i].x-RO.x,P[i].z-RO.z);if(d<400)C.push([d,P[i],P[i+1]])}}
+  C.sort((u,v)=>u[0]-v[0]);for(let k=0;k<C.length&&k<240;k++){const[,p,n]=C[k];if(!TR8_onRoad(p.x,p.z))continue;if(ESC_clear(p.x,p.z,groundAt(p.x,p.z,99),10))return[p.x,p.z,Math.atan2(n.x-p.x,n.z-p.z),'road2']}
+  return null}
 function ESC_lift(why,how){const q=ESC_spot();if(!q)return false;const H=ESC.E.H,c=H[H.length-1],i=H.length?ESC_at(H,2):-1;
-  const log={step:why,how:how||'',t:H.length?+(c[0]-H[0][0]).toFixed(1):0,v:c?+Math.abs(c[3]).toFixed(1):0,far2:i>=0?+ESC_far(H,i,c[1],c[2]).toFixed(1):null,to:[Math.round(q[0]),Math.round(q[1])],at:q[3]==null?'near':q[3]};TR8_fade();
+  const log={step:why,how:how||'',t:H.length?+(c[0]-H[0][0]).toFixed(1):0,v:c?+Math.abs(c[3]).toFixed(1):0,far2:i>=0?+ESC_far(H,i,c[1],c[2]).toFixed(1):null,to:[Math.round(q[0]),Math.round(q[1])],at:q[3]};TR8_fade();
   if(!roamWarp(q[0],q[1],q[2])){RO.x=q[0];RO.z=q[1];RO.h=RO.vh=q[2];RO.y=groundAt(q[0],q[1],99);RO.vy=0}
   RO.v=0;RO.turbo=0;RO.yr=0;RO.trSl=0;RO.inv=Math.max(RO.inv||0,1.5);RO.t6n=(RO.t6n||0)+1;RO.t6s=0;RO.t8a=null;RO.stkT=0;ESC.cnt[why]=(ESC.cnt[why]||0)+1;ESC_end();ESC.E.log=log;return true}
 function ESC_unstick(dt){const E=ESC.E;
@@ -46,14 +50,14 @@ function ESC_unstick(dt){const E=ESC.E;
   if(!off){ESC_end();return}
   const H=E.H,l=H[H.length-1];if(l&&Math.hypot(RO.x-l[1],RO.z-l[2])>8)ESC_end();   // a warp from anywhere: a new episode
   E.T+=dt;H.push([E.T,RO.x,RO.z,RO.v,RO.h,c.thr||c.boost?1:-1]);while(H[0][0]<E.T-ESC.keep)H.shift();
-  if(ESC_gate(H)){const why=ESC_trapped(H);if(why){ESC_lift('reset',why);return}}
+  if(ESC_gate(H)&&!(E.T<E.nx)){const why=ESC_trapped(H);if(why){if(ESC_lift('reset',why))return;E.nx=E.T+.25}}   // no clear landing yet: hold, retry at 4 Hz
   /* assist: recomputed from E.H each frame too; the probe (192 groundY) is throttled to 4 Hz, except the 1.5 s rung */
   const span=H[H.length-1][0]-H[0][0];
   if(span>=ESC.t1g&&E.as<=0&&!E.done&&Math.abs(RO.v)<5){const i=ESC_at(H,Math.min(span,ESC.t1));E.tp+=dt;
     if(i>=0&&ESC_far(H,i,RO.x,RO.z)<8&&(E.tp>=.25||span>=ESC.t1&&span-dt<ESC.t1)){E.tp=0;const D=ESC_depth(RO.x,RO.z,true);E.h=D.dir;
       if(D.depth>ESC.depth&&(span>=ESC.t1||ESC_boxed(RO.x,RO.z))){E.as=ESC.assist;E.done=1;ESC.cnt.assist++}}}
   if(E.as>0){E.as-=dt;if(E.h!=null){const e=angDiff(E.h,RO.h);RO.h+=clamp(e,-2.5*dt,2.5*dt);RO.vh=(RO.vh??RO.h)+angDiff(RO.h,RO.vh??RO.h)*Math.min(1,dt*8);if(Math.abs(e)<1.2&&RO.v<10)RO.v=Math.min(10,RO.v+30*dt)}}}
-function ESC_manual(){if(state!=='roam'||RO.sp||RO.wk||RO.frozen||RO.card)return false;const ok=ESC_lift('manual');if(ok)say('','BACK ON THE ROAD',1);return ok}
+function ESC_manual(){if(state!=='roam'||RO.sp||RO.wk||RO.frozen||RO.card)return false;const ok=ESC_lift('manual');say('',ok?'BACK ON THE ROAD':'ROAD BUSY, TRY AGAIN',1);return ok}
 // any warp starts a new episode (no history carried across a teleport)
 if(typeof roamWarp==='function')roamWarp=(f=>function(){ESC_end();return f.apply(this,arguments)})(roamWarp);
 // touch + keyboard: #tU (top right). Hidden in races and on foot; keys U / R are handled in 40_hud_input_menu.js

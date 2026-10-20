@@ -106,18 +106,29 @@ function BOT_esc(say){const R=BOT_rec(),out={kind:'escape',city:CID,ok:false,row
   for(const o of S.pick){let dm=0;const r=BOT_escRun(R,o.x,o.z,0,0,1,0,BESC.secs,()=>{dm=Math.max(dm,Math.hypot(RO.x-o.x,RO.z-o.z));if(TR8_onRoad(RO.x,RO.z))return'road';if(dm>=15&&BOT_pocket(RO.x,RO.z).depth<BESC.open)return'open'});
    const L=r.lifts[r.lifts.length-1];out.rows.push({x:o.x,z:o.z,depth:+o.d.toFixed(1),wall:+o.w.toFixed(2),ok:r.why==='road'||r.why==='open',t:r.t,why:r.why,step:L?'lift/'+L.how:r.assist?'assist':'drove out',
     lifts:r.lifts,bad:r.bad,clear:r.lifts.every(l=>l.clear),maxV:r.maxV,end:r.end})}
+  /* review #7: traffic parked on the landing candidates. (a) a car on every point 0-96 m along the nearest road: the lift must land on another road, clear;
+     (b) also on every candidate of every road within 400 m: the lift must HOLD (car not moved); (c) the cars gone: it lifts. Fake cars live in HUB.cars only for the test */
+  {const o=S.pick[0],had=!!HUB.cars,F=[],put=(x,z)=>{const f={x,z,fake:1};F.push(f);HUB.cars.push(f)};if(!had)HUB.cars=[];const lb={ok:false};
+   try{roamWarp(o.x,o.z,0);RO.x=o.x;RO.z=o.z;RO.y=groundAt(o.x,o.z,99);RO.v=0;const q=TR8_near(RO.x,RO.z),sx=Math.sin(q[2]),sz=Math.cos(q[2]);for(let d=-96;d<=96;d+=8)put(q[0]+sx*d,q[1]+sz*d);
+    const n0=RO.t6n||0,a=ESC_lift('reset','test-a'),far=()=>F.every(f=>Math.hypot(f.x-RO.x,f.z-RO.z)>=7);lb.a={lifted:a,to:[Math.round(RO.x),Math.round(RO.z)],at:ESC.E.log&&ESC.E.log.at,clear:a&&ESC_clear(RO.x,RO.z,RO.y)&&far()};
+    roamWarp(o.x,o.z,0);RO.x=o.x;RO.z=o.z;RO.y=groundAt(o.x,o.z,99);for(const S2 of CITY_S){const P=S2.pts;for(let i=0;i<P.length-1;i++)if(Math.hypot(P[i].x-o.x,P[i].z-o.z)<420)put(P[i].x,P[i].z)}
+    const b=ESC_lift('reset','test-b');lb.b={held:!b,moved:Math.round(Math.hypot(RO.x-o.x,RO.z-o.z)),fakes:F.length};
+    for(const f of F){const k=HUB.cars.indexOf(f);if(k>=0)HUB.cars.splice(k,1)}F.length=0;const c=ESC_lift('reset','test-c');lb.c={lifted:c,clear:c&&ESC_clear(RO.x,RO.z,RO.y)};
+    lb.ok=lb.a.lifted&&lb.a.clear&&lb.a.at==='road2'&&lb.b.held&&lb.b.moved<1&&lb.c.lifted&&lb.c.clear}
+   finally{for(const f of F){const k=HUB.cars.indexOf(f);if(k>=0)HUB.cars.splice(k,1)}if(!had)delete HUB.cars;ESC_end()}out.busy=lb}
   /* the reviewer's cases: zero lifts at any frame with |v| > 8 m/s or >= 20 m from a position of the last 2 s; no lift at all without gas */
   for(const[name,x,z,h,v0,gas,st]of BESC.rev[CID]||[]){const r=BOT_escRun(R,x,z,h,v0,gas,st,8);out.rev.push({name,ok:!r.bad.length&&(gas||!r.lifts.length),lifts:r.lifts,maxV:r.maxV,path:r.path,end:r.end})}
   /* must NOT reset (c1286c5): free driving through gentle dips deeper than 2.5 m, from rest, at 20 m/s and circling, plus up to 2 dips per city the car really runs through (>= 27 m in 1.5 s) */
   const free=[];let tried=0;for(const o of S.all){if(free.length>=2||++tried>10)break;if(o.d<2.6||o.d>12||free.some(q=>Math.hypot(q[0]-o.x,q[1]-o.z)<100))continue;if(BOT_freeDir(R,o.x,o.z,1)!=null)free.push([o.x,o.z])}out.free=free;
   for(const[x,z]of[...(BESC.keep[CID]||[]),...free]){const dir=BOT_freeDir(R,x,z);for(const mode of['rest','fast','circle']){const r=BOT_escRun(R,x,z,dir,mode==='rest'?0:mode==='fast'?20:15,1,mode==='circle',6);out.keep.push({x,z,mode,ok:!r.bad.length,lifts:r.lifts,maxV:r.maxV,path:r.path})}}
-  out.ok=out.rows.length>=6&&out.rows.every(r=>r.ok&&r.clear&&!r.bad.length)&&out.rev.length>=4&&out.rev.every(r=>r.ok)&&out.keep.every(k=>k.ok)&&!R.errs.length&&!R.M.nan&&!R.M.fall}
+  out.ok=out.rows.length>=6&&out.rows.every(r=>r.ok&&r.clear&&!r.bad.length)&&out.rev.length>=4&&out.rev.every(r=>r.ok)&&out.busy&&out.busy.ok&&out.keep.every(k=>k.ok)&&!R.errs.length&&!R.M.nan&&!R.M.fall}
  catch(e){R.errs.push('BOT '+String(e&&e.stack||e).slice(0,160))}
  R.done();out.err=R.errs.slice(0,4);(window.__chk.bot=window.__chk.bot||{})[CID+'/escape']=out;
  const fl=a=>a.filter(r=>!r.ok);
  return'📍 BOT ESCAPE '+(CID==='fra'?'Frankfurt':'Athens')+' · '+out.rows.filter(r=>r.ok&&r.clear&&!r.bad.length).length+'/'+out.rows.length+' deepest pockets (of '+out.found+' scanned deeper than 2 m, gas held) on a road or open ground within '+BESC.secs+' s · '
   +out.rows.map(r=>r.x+','+r.z+' d'+r.depth+'m '+(r.ok?r.step+' '+r.t+'s':'TRAPPED at '+r.end)+(r.clear?'':' LANDING NOT CLEAR '+JSON.stringify(r.lifts.filter(l=>!l.clear)))+(r.bad.length?' FALSE '+JSON.stringify(r.bad[0]):'')).join(' | ')
   +' · reviewer cases (no lift at |v| > 8 m/s or >= 20 m in 2 s): '+(out.rev.length-fl(out.rev).length)+'/'+out.rev.length+(fl(out.rev).length?' ('+fl(out.rev).map(r=>r.name+' FALSE '+JSON.stringify(r.lifts)).join(' ')+')':'')
+  +' · busy landing (traffic on every candidate): '+(out.busy&&out.busy.ok?'other road, hold, then lift ✓':'FAIL '+JSON.stringify(out.busy))
   +' · free dips: '+(out.keep.length-fl(out.keep).length)+'/'+out.keep.length+(fl(out.keep).length?' ('+fl(out.keep).map(k=>k.x+','+k.z+' '+k.mode+' FALSE '+JSON.stringify(k.lifts)).join(' ')+')':'')+(R.errs.length?' · '+R.errs[0]:'')+(out.ok?' ✅':' ❌')}
 function BOT_dbg(x,z){const o=[];for(const k in K)K[k]=false;roamWarp(x,z,0);RO.x=x;RO.z=z;RO.y=groundAt(x,z,99);RO.v=0;RO.vy=0;ESC.E.log=null;ESC_end();K.ArrowUp=true;try{for(let i=0;i<300;i++){roamStep(1/30);const H=ESC.E.H;if(i%8==0)o.push((i/30).toFixed(2)+' n '+H.length+' gate '+ESC_gate(H)+' trap '+(ESC_gate(H)?ESC_trapped(H):'-')+' as '+ESC.E.as.toFixed(2)+' v '+RO.v.toFixed(1)+' pos '+Math.round(RO.x)+','+Math.round(RO.z)+' log '+JSON.stringify(ESC.E.log))}}finally{K.ArrowUp=false}return o}
 // ramps-r21q (2026-10-20, Alex: "the roads and streets are unusable"): roads/ath-clear, no graphics. (1) every Athens street centreline + 2 lane offsets (+-w/4) every 2 m outside ramp footprints:
