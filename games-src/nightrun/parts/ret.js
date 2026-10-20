@@ -26,7 +26,7 @@ function retShow(){
 NR.on('runEnd',d=>{if(!d||d.quit)return;retShow();});
 
 /* ===== B1 pay, B2 economy, B3 mercy ===== */
-Object.assign(RET,{clearPay:true,econ:true,mercy:true},{wk:.36,tk:.12,nk:.045});   // wk: weapon price scale, tk: perk price scale, nk: Neon per kill (see RETENTION.md B2)
+Object.assign(RET,{clearPay:true,econ:true,mercy:true},{wk:.36,tk:.12,nk:.052});   // wk: weapon price scale, tk: perk price scale, nk: Neon per kill (see RETENTION.md B2)
 /* B1: a stage clear pays 40+12n Neon the first time, +25 per new star, 10% of the base on later clears */
 RET.payClear=function(n,sum){const old=sSave.stars[n]||0,first=old<1,base=40+12*n,ns=Math.max(0,sum-old);
   const pay=first?base+25*ns:Math.round(base*.1)+25*ns;GA.bank+=pay;gsave();this.last={n,pay,first,ns};return pay;};

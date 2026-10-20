@@ -26,6 +26,7 @@ async function run(br, port, diff, mode) {
       if (!window.__bot) return;
       let fx = 0, fy = 0; for (const b of m.G.eb) { const dx = P.x - b.x, dy = P.y - b.y, d = Math.hypot(dx, dy); if (d < 150 && d > 1) { const w = (150 - d) / d / d * 150; fx += dx * w; fy += dy * w; } }
       for (const e of m.G.en) { const dx = P.x - e.x, dy = P.y - e.y, d = Math.hypot(dx, dy); if (e.type !== 'boss' && d < 130 && d > 1) { const w = (130 - d) / d / d * 150; fx += dx * w; fy += dy * w; } }
+      if (window.MM && MM.col && Math.abs(P.x - MM.col.x) < MM.COL + 40) fx += (P.x >= MM.col.x && P.x < 860 || P.x < 60 ? 3 : -3);   // sidesteps a column strike (fair.js), as a player does
       fx += (200 - P.x) * .01; fy += (400 + 170 * Math.sin(m.G.t * .9) - P.y) * .02;   // sways about like a player does, and dodges
       if (fx > .3) K[B.rt] = true; else if (fx < -.3) K[B.lf] = true; if (fy > .3) K[B.dn] = true; else if (fy < -.3) K[B.up] = true;
     }, 30);

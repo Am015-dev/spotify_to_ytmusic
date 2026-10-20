@@ -74,12 +74,14 @@ const VMUT={
   order:{n:'TARGET ORDER',t:'Shoot the beacons 1, 2, 3'},
   hail:{n:'HAILSTORM',t:'Slow rain from above'},
   minefield:{n:'MINEFIELD',t:'Mines drift in'}};
+const VSIG2={1:['COURIER LIGHTS','evlanterns','evlanterns','mirror'],2:['PATROL GRID','evgrid','evbracket','fast'],3:['WINDOW DISPLAY','evwindow','evtline','echo'],4:['GUARD CHANGE','evguard','evshieldv','mirror']};
+const VSIGS=['evlanterns','evsway','evgrid','evbracket','evwindow','evtline','evguard','evshieldv'];
 const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK?LEAK.pg:.3,X:{},
   on(){return !!RET.vary;},
   active(){return !!(RET.vary&&ST.on&&this.st&&this.st.n===ST.n&&!G.lab&&!G.tut);},
   parse(x){const o={raw:x,br:x[0]==='~',sig:x==='*',g:/\+g$/.test(x)};const b=x.replace(/^~/,'').replace(/\+g$/,'');o.ids=o.sig?[]:b.split('|');return o;},
   plan(){this.st=null;const s=ST.on&&!G.lab&&!G.tut?this.S[ST.n]:null;if(!RET.vary||!s)return;
-    this.st={n:ST.n,s,ms:s.m.map(x=>this.parse(x)),i:-1,inst:{},c:{},mut:s.mut&&VMUT[s.mut]?s.mut:'',card:0,sigOn:0};this.X={};
+    this.st={n:ST.n,s,ms:s.m.map(x=>this.parse(x)),i:-1,inst:{},c:{},mut:s.mut&&VMUT[s.mut]?s.mut:'',card:0,sigOn:0};this.X={};if(RET.vary2)this.evPlan(this.st);
     DIR.mut=this.st.mut==='hail'?['hail']:this.st.mut==='minefield'?['mine']:[];},
   span(){return Math.max(8,ST.lead>0?ST.lead:ST.ch==='speed'?ST.tb*.55:ST.len);},   // a speed challenge usually ends early: its script is packed into the first half
   idx(){const n=this.st.ms.length,sp=this.span(),b=Math.max(0,G.dbar);if(b<sp)return clamp(Math.floor(b*n/sp),0,n-1);
@@ -89,6 +91,17 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
     if(t>st.cur&&(st.c[st.cur]|0)>=1){let nx=st.cur+1;if(t-nx>=2)nx=t-1;const sg=st.ms.findIndex(m=>m.sig);if(sg>st.cur&&sg<nx&&!(st.c[sg]>0))nx=sg;st.cur=nx;}   // at most one moment behind; the set piece is never skipped
     else if(t<st.cur&&G.dbar>=this.span())st.cur=t;return st.cur;},
   mom(){return this.st.ms[this.cur()];},
+  /* ---- VARY2: micro-events swapped into the script (flag RET.vary2) ---- */
+  evVar(i){return this.st.n<6?'':['','mirror','fast','elite'][(this.st.n+i)%4];},
+  evPlan(st){const n=st.n,sg=VSIG2[n];if(sg)st.s=Object.assign({},st.s,{sig:sg});
+    const el=Object.keys(FM.L).filter(id=>FM.L[id].ev&&FM.L[id].t<=n&&!(n<=4&&VSIGS.includes(id))).sort((a,b)=>FM.L[a].t-FM.L[b].t||(a<b?-1:1));if(!el.length)return;
+    const w=el.filter(id=>FM.L[id].t===n).slice(0,2);for(let j=0;w.length<Math.min(4,el.length)&&j<el.length*2;j++){const id=el[(n*3+j)%el.length];if(!w.includes(id))w.push(id);}
+    st.ev=w;let c=0;st.ms=st.ms.map((m,i)=>(i===0||m.sig||m.br||i%3===0)?m:this.parse(w[c++%w.length]));},
+  evTrack(I,n0,fid,d){const es=G.en.slice(n0).filter(e=>e&&e.hp>0);if(!es.length)return;
+    FUN.sets.push({es,n:es.length*3,kind:fid});   // n x3: it counts as a set piece on screen but never pays the SET CLEARED bonus (economy unchanged)
+    const sn=(this.seen=this.seen||{});if(!sn[d.id]){sn[d.id]=1;hintShow(d.name,2);}NR.emit('setpiece',{kind:fid});},
+  pace(bar){const st=this.st;if(!RET.vary2||!st)return 1;const p=clamp(bar/this.span(),0,1.2),n=st.n;
+    switch((n*7)%5){case 0:return .8+.4*p;case 1:return 1.2-.4*p;case 2:return 1+.22*Math.sin(p*15.7+n);case 3:return p>.3&&p<.5?.72:p>.5&&p<.7?1.25:1;default:return 1+.2*Math.cos(p*6.3);}},
   gnd(){return !!this.mom().g;},
   hard(){return HARDS.includes(SET.diff);},                    // Hard, Very hard, Legend: the old random zoo and ground waves still come between the scripted pieces (Legend must not get easier)
   oldK(){return {hard:.25,vhard:.35,legend:.4}[SET.diff]||0;},   // ... and this share of the director's calls still uses the stage's old wave pool (its turrets and gunships)
@@ -99,9 +112,10 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
     const rm=/~r$/.test(id),base=id.replace(/~r$/,'');if(!FM.L[base]){id='line';key=i+':line';}
     let I=st.inst[key];if(!I){I=st.inst[key]=FM.make(FM.L[base]?base:'line',{r:rm?1:0});if(rm)I.s.sd=1;
       if(tw==='elite')I.el=1;if(tw==='fast')I.tk=1.22;}
+    const evd=RET.vary2&&FM.L[base].ev?FM.L[base]:null,vv=evd&&!m.sig?this.evVar(i):'';if(vv==='fast'&&!I.tk1){I.tk1=1;I.tk=1.22;}if(vv==='elite')I.el=1;if(vv==='mirror')tw='mirror';
     if(rm||tw==='mirror'||st.mut==='mirror')I.mir=(I.k%2===1);
-    const fid=m.sig?'sig:'+st.s.sig[0]:id;
-    FM.piece(I);NR.emit('pattern',{id:fid});
+    const fid=m.sig?'sig:'+st.s.sig[0]:evd&&vv?id+'·'+vv:id,n0=G.en.length;
+    FM.piece(I);NR.emit('pattern',{id:fid});if(evd||(m.sig&&FM.L[base].ev))this.evTrack(I,n0,fid,FM.L[base]);
     if(tw==='echo'&&I.k%2===0)FM.later(I,2,()=>{I.mir=!I.mir;FM.piece(I);});
     if(this.log.length<6000)this.log.push({n:st.n,b:+G.dbar.toFixed(1),t:+G.t.toFixed(1),f:fid,p:m.sig?id:'',i,br:m.br?1:0,mut:st.mut});
     if(DIR.log.spawns.length<400)DIR.log.spawns.push([+G.dbar.toFixed(1),fid]);},
@@ -121,7 +135,7 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
       if(b.hv){b.ht-=dt;if(b.ht<=0){b.vx=b.hv[0];b.vy=b.hv[1];b.hv=null;}}
       if(b.ct>0){b.ct-=dt;const a=b.cw*dt,c=Math.cos(a),s=Math.sin(a),vx=b.vx;b.vx=vx*c-b.vy*s;b.vy=vx*s+b.vy*c;}
       if(b.st>0){b.st-=dt;if(b.st<=0&&G.eb.length<ebCap()-1&&!b.dead){const sp=Math.hypot(b.vx,b.vy)*.85,a=Math.atan2(b.vy,b.vx),d=.3*k+.1;b.dead=1;
-        for(const s of[-1,1])G.eb.push(Object.assign({},b,{dead:0,vx:Math.cos(a+s*d)*sp,vy:Math.sin(a+s*d)*sp,st:0,g:false}));}}}
+        for(const s of[-1,1])if(G.eb.length<ebCap())G.eb.push(Object.assign({},b,{dead:0,dn:0,vx:Math.cos(a+s*d)*sp,vy:Math.sin(a+s*d)*sp,st:0,g:false}));}}}
     if(id==='split')G.eb=G.eb.filter(b=>!b.dead);
     if(id==='wind'){const ph=Math.floor((G.dbar||0)/2)%2?1:-1;X.w=ph*42*k;P.y=clamp(P.y+X.w*dt,22,H-22);}
     if(id==='quickdash'&&P.dashCd>.36)P.dashCd=.36;
@@ -155,6 +169,8 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
     ctx.restore();}};
 /* ---- hooks (all inert with the flag off) ---- */
 {const so=DIR.spawnOne;DIR.spawnOne=function(fill){if(VARY.active()&&!(VARY.hard()&&GR()<VARY.oldK()))return VARY.spawn(fill);return so.call(this,fill);};}   // innermost: zoo.js and leak.js wrap it later (caps, READY gaps)
+{const en0=DIR.energy;DIR.energy=function(bar){const e=en0.call(this,bar);return RET.vary2&&VARY.active()?e*VARY.pace(bar):e;};}   // a pace curve per stage (calm / surge / breather), mean 1: Normal is not harder overall
+{const db=drawBG;drawBG=function(bg,t,dt,scroll){db(bg,t,dt,scroll);if(!RET.vary2||!ST.on||G.lab||G.tut)return;ctx.save();ctx.globalAlpha=.13;ctx.fillStyle='hsl('+((ST.n*137)%360)+',70%,45%)';ctx.fillRect(0,0,W,H);ctx.restore();};}   // the five backdrops get a different tint on every stage
 {const pt=DIR.pickTheme;DIR.pickTheme=function(bar){pt.call(this,bar);VARY.theme();};}
 {const bl=DIR.barLine;DIR.barLine=function(i){VARY.theme();return bl.call(this,i);};}
 if(window.ZOO){const wo=ZOO.waveOK;ZOO.waveOK=function(){return wo.call(this)&&(!VARY.active()||VARY.hard());};}   // Easy/Normal: the zoo kinds come from the scripts' roles; the hard tiers keep the old random zoo pressure on top

@@ -6,7 +6,7 @@ const HUDX={
   iDash:path2('M2 10h11V5l9 7-9 7v-5H2z'),
   iDrone:path2('M12 3l7 9-7 9-7-9z'),
   iRev:path2('M12 2a10 10 0 100 20 10 10 0 000-20zm1 5v4h4v2h-4v4h-2v-4H7v-2h4V7z'),
-  vals(){const dm=1+SH.dmax,rdy=(P.dashCd<=0?1:0)+SH.spare;
+  vals(){const AB=window.ABIL&&ABIL.on&&G&&G.ab,dm=AB?ABIL.max():1+SH.dmax,rdy=AB?G.ab.n:(P.dashCd<=0?1:0)+SH.spare;
     return{hp:P.hp,max:P.max,sh:SH.sh,dash:Math.min(dm,rdy),dashMax:dm,drones:TP.drones?TP.drones.length:0,rev:TP.revLeft,pw:G.pw?G.pw.act.map(a=>a.k):[],perks:TP_DEF.filter(d=>TP.l(d.id)).length,upg:SH.order.length};},
   // a stat chip: icon + number; returns the width it used
   chip(c,x,y,k,p,col,txt,dim){c.save();c.globalAlpha=dim?.4:1;c.translate(x,y-8*k);c.scale(.72*k,.72*k);c.fillStyle=col;c.fill(p,'evenodd');c.restore();

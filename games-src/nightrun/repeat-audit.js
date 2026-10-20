@@ -29,15 +29,16 @@ const PLAY = (o) => {
   if (!window.__hooked) {
     window.__hooked = 1; const NR = m.NR;
     NR.on('pattern', p => window.__ev('wave', p.id));
-    NR.on('spawn', e => window.__ev('enemy', e.type + (e.el ? '*' : '')));
+    NR.on('spawn', e => { window.__ev('enemy', e.type + (e.el ? '*' : '')); if (e.vk) window.__ev('look', e.vk); });   // look = variants.js: kind|class+orientation+tint
     NR.on('bossIn', x => { const b = m.G.boss; window.__ev(x.mini ? 'mini' : 'boss', (b && b.nm) + '|k' + (b && b.k)); });
     NR.on('bossPhase', x => window.__ev('phase', ((m.G.boss && m.G.boss.nm) || '?') + '|p' + x.ph));
     NR.on('setpiece', x => window.__ev('set', x.kind));
+    NR.on('rule', x => window.__ev('rule', x.id));   // rules.js: a new mechanic / its twist / a combination
     NR.on('drop', x => window.__ev('drop', x.hit ? 'hit' : 'miss'));
     NR.on('pitStart', () => window.__ev('shop', (m.SH.cards || []).map(c => c.id || c.k || c.n).join('+')));
     if (window.ZOO) { const z = window.ZOO, pk = z.pick; z.pick = function () { const id = pk.apply(this, arguments); if (id) window.__ev('zoo', id); return id; }; }
     { const f = m.FUN, sf = f.startFence; f.startFence = function () { window.__ev('fence', 'fence'); return sf.apply(this, arguments); }; }
-    if (window.HINT) { const h = window.HINT, sh = h.show; h.show = function (txt) { window.__ev('hint', String(txt).slice(0, 60)); return sh.apply(this, arguments); }; }
+    if (window.HINT) { const h = window.HINT, sh = h.show; h.show = function (txt) { const r = sh.apply(this, arguments); if (r) window.__ev('hint', String(txt).slice(0, 60)); return r; }; }
   }
   m.NR.watch = { shots: [], spawns: [] };
   const dec = () => {
@@ -73,12 +74,12 @@ const PLAY = (o) => {
       const b = g.boss; if (b && b.lists) { const v = b.lists[b.ph - 1][b.pi % b.lists[b.ph - 1].length]; const sig = b.nm + '|p' + b.ph + '|' + v; if (sig !== verb) { verb = sig; add('verb', sig); } } else verb = '';
       for (const p of g.pk) if (!pkSeen.has(p)) { pkSeen.add(p); if (p.t !== 'shard') add('pick', p.t + (p.k ? ':' + p.k : '')); }
       const w = m.NR.watch; if (w) { for (const s of w.shots) { const by = s.by; const k = !by ? 'none' : by.type === 'boss' ? 'boss:' + (by.lists ? by.lists[by.ph - 1][by.pi % by.lists[by.ph - 1].length] : '?') : (by.type || (by.arm != null ? 'rain/hazard' : '?')) + (by.el ? '*' : ''); shots[k] = (shots[k] || 0) + 1; } w.shots.length = 0; w.spawns.length = 0; }
-      if (g.boss) bossT += 6 * dt; else if (!m.FUN.fence && !m.FUN.dw && !(m.FUN.sets && m.FUN.sets.length)) plain += 6 * dt;
+      if (g.boss) bossT += 6 * dt; else if (!m.FUN.fence && !m.FUN.dw && !m.FUN.ev && !(m.FUN.sets && m.FUN.sets.length)) plain += 6 * dt;
     }
     if (m.G.dead) break;
     if (!o.endless && m.ST.over) { cleared = true; break; }
   }
-  const G = m.G, r = { n, t: +G.t.toFixed(1), clear: cleared, dead: !!G.dead, hits: m.ST.hits, kills: G.kills, shots, plain: +plain.toFixed(1), bossT: +bossT.toFixed(1), ev };
+  const G = m.G, r = { n, t: +G.t.toFixed(1), clear: cleared, dead: !!G.dead, hits: m.ST.hits, kills: G.kills, mm: window.MM ? [window.MM.strikes, window.MM.hits] : null, shots, plain: +plain.toFixed(1), bossT: +bossT.toFixed(1), ev };
   m.NR.watch = null; m.abort(); m.god = false; return r;
 };
 
@@ -99,7 +100,7 @@ const FRAMESEQ = async (p, o, dir, tag) => {
   await new Promise(r => setTimeout(r, 800));
   const browser = await PW.chromium.launch(), t0 = Date.now(), errors = [];
   const newPage = async (vp) => { const ctx = await browser.newContext(vp || { viewport: { width: 960, height: 540 } }); const p = await ctx.newPage(); p.on('pageerror', e => errors.push(e.message.slice(0, 160)));
-    await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1`);
+    await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${process.env.Q || ""}`);
     await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 15000 }).catch(() => { }); return p; };
   // one session per config; configs run in parallel pages
   const raw = {}, queue = CONFIGS.slice();
@@ -114,7 +115,7 @@ const FRAMESEQ = async (p, o, dir, tag) => {
         if (!r.clear) { retries++; r = await p.evaluate(PLAY, { n, diff, classic: mode === 'classic', god: false, maxt: MAXT, T0: T }); r.retry = 1; runs.push(r); T += r.t;
           if (!r.clear) { r = await p.evaluate(PLAY, { n, diff, classic: mode === 'classic', god: true, maxt: MAXT, T0: T }); r.retry = 2; r.god = 1; runs.push(r); T += r.t; } }
       }
-      raw[c] = { runs, T, retries }; console.log(`${c}: ${(T / 60).toFixed(1)} game-min, ${runs.length} tries, ${retries} stages failed first try  (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
+      raw[c] = { runs, T, retries }; if (process.env.FAILS) console.log(runs.filter(r => !r.retry && !r.clear).map(r => `s${r.n}:${r.dead ? 'd' : 't'}${r.hits}h mm${r.mm}`).join(' ')); console.log(`${c}: ${(T / 60).toFixed(1)} game-min, ${runs.length} tries, ${retries} stages failed first try  (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
     }
   }));
   if (FRAMES) {
@@ -130,8 +131,8 @@ const FRAMESEQ = async (p, o, dir, tag) => {
 
 // ---------- analysis (pure) ----------
 const ENC = new Set(['wave', 'zoo', 'set', 'fence', 'drop', 'mini', 'boss', 'verb']);             // an "encounter": something the player has to answer
-const NOVEL = new Set(['wave', 'zoo', 'enemy', 'set', 'fence', 'drop', 'mini', 'boss', 'verb', 'mut', 'pick', 'shot']);   // a "new thing" if seen for the first time
-const MECH = new Set(['zoo', 'fence', 'drop', 'mini', 'boss', 'mut', 'set']);                       // categories that bring a new rule/decision, not only a new shape
+const NOVEL = new Set(['wave', 'zoo', 'enemy', 'set', 'fence', 'drop', 'mini', 'boss', 'verb', 'mut', 'pick', 'shot', 'rule']);   // a "new thing" if seen for the first time
+const MECH = new Set(['zoo', 'fence', 'drop', 'mini', 'boss', 'mut', 'set', 'rule']);                       // categories that bring a new rule/decision, not only a new shape
 function analyse(raw) {
   const out = {};
   for (const c in raw) {
@@ -157,7 +158,7 @@ function analyse(raw) {
         const jac = prev ? +([...set].filter(x => prev.has(x)).length / new Set([...set, ...prev]).size).toFixed(2) : null; prev = set;
         const tr = runs.filter(r => r.n === n);
         byStage[n] = { mins: +(tr.reduce((a, r) => a + r.t, 0) / 60).toFixed(1), tries: tr.length, cleared: tr.some(r => r.clear && !r.god), enc: new Set(se.filter(e => ENC.has(e[2])).map(sigOf)).size,
-          enemyKinds: new Set(se.filter(e => e[2] === 'enemy').map(e => e[3])).size, waves: new Set(se.filter(e => e[2] === 'wave' || e[2] === 'zoo').map(e => e[3])).size, shotSrc: Object.keys(shotsN).length,
+          enemyKinds: new Set(se.filter(e => e[2] === 'enemy').map(e => e[3])).size, enemyLooks: new Set(se.filter(e => e[2] === 'look').map(e => e[3])).size, waves: new Set(se.filter(e => e[2] === 'wave' || e[2] === 'zoo').map(e => e[3])).size, shotSrc: Object.keys(shotsN).length,
           newThings: nov.length, newList: nov, jaccardPrev: jac, song: [...new Set(se.filter(e => e[2] === 'song').map(e => e[3]))].join('+'), bg: [...new Set(se.filter(e => e[2] === 'bg').map(e => e[3]))].join('+'),
           plainShare: +(tr.reduce((a, r) => a + r.plain, 0) / Math.max(1, tr.reduce((a, r) => a + r.t, 0))).toFixed(2) };
       }

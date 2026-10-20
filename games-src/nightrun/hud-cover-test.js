@@ -10,7 +10,8 @@
 // Landscape phone (844x390) and PC (1366x768) only get "no page error + HUD text >= 11 px / inside the screen" so they cannot regress silently.
 const PW = require(process.env.PW || 'playwright'), path = require('path'), fs = require('fs');
 const gx = require('../scripts/gx-serve.js');
-const FILE = path.resolve(process.argv[2] || '/tmp/nr.html'), SHOTS = process.env.SHOTS;
+// default = the built game (the old /tmp/nr.html scratch file does not exist on a fresh box)
+const FILE = path.resolve(process.argv[2] || path.resolve(__dirname, '../../games/mainhattan-nightrun/index.html')), SHOTS = process.env.SHOTS;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const VPS = [[390, 763, 1, 'phone'], [375, 553, 1, 'phone'], [844, 390, 1, 'land'], [1366, 768, 0, 'pc']].filter(v => !process.env.VP || process.env.VP === v[0] + 'x' + v[1]);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -49,7 +50,7 @@ function inPage(mode) {   // runs in the page: freeze, render twice, diff
   const fps = document.getElementById('fpsEl'), fpsVisible = !!fps && !fps.hidden && getComputedStyle(fps).display !== 'none';
   const btns = ['bDash', 'bEmp', 'bPause'].map(id => { const e = document.getElementById(id), b = e && e.getBoundingClientRect(); return b ? { id, w: Math.round(b.width), h: Math.round(b.height), vis: b.width > 0 } : null; }).filter(Boolean);
   const dash = document.getElementById('bDash'), emp = document.getElementById('bEmp');
-  return { cov: covN / (cx * cy), band, bandCells: band, boxes: boxes.length, bad, fpsVisible, btns, hudText: texts.length, scroll: document.documentElement.scrollWidth > innerWidth + 1,
+  return { boxL: boxes.map(b => b.map(Math.round)), cov: covN / (cx * cy), band, bandCells: band, boxes: boxes.length, bad, fpsVisible, btns, hudText: texts.length, scroll: document.documentElement.scrollWidth > innerWidth + 1,
     rings: !!dash && !!emp && getComputedStyle(dash, '::after').content !== 'none' && getComputedStyle(emp, '::after').content !== 'none', frame: [r.width, r.height], mask: Array.from(mask), cx, cy, rp: 540 };
 }
 
@@ -67,6 +68,7 @@ function inPage(mode) {   // runs in the page: freeze, render twice, diff
     const mode = kind === 'phone' ? 'port' : 'land'; const sizeFail = [];
     if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await p.screenshot({ path: path.join(SHOTS, `hud-${W}x${H}.png`) }); }
     const r = await p.evaluate(inPage, await p.evaluate(() => (window.__mnr.rotMode ? 'port' : 'land')));
+    if (process.env.BOXES) console.log(W + 'x' + H, 'frame', r.frame.map(Math.round), 'boxes [x0,y0,x1,y1]', JSON.stringify(r.boxL));
     if (errs.length) sizeFail.push('page errors: ' + errs.slice(0, 2).join(' | '));
     if (kind === 'phone') {
       if (r.cov > .20) sizeFail.push(`HUD covers ${(r.cov * 100).toFixed(1)}% of the playfield (max 20%)`);

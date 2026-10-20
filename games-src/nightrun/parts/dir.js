@@ -19,6 +19,20 @@ const MUTS=[{id:'hail',n:'HAILSTORM',t:'Slow rain from above'},{id:'mine',n:'MIN
 const MINIS=[{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'B',sub:'Bridge sentinel, twin cannon'},
   {k:5,nm:'SCHRANKEN-WART',r:38,pats:['laser','fan7','ring','laser'],lbl:'S',sub:'Gate warden, laser rig'},
   {k:7,nm:'HOPLITE',r:40,pats:['fan5','ring','fan7','spiral'],lbl:'H',sub:'Shield wall, spear rig'}];
+/* ---------- V3 rosters and drone cap (flag RET.roster, ?roster=0 = old mix). Drones were 59% of the spawns and 63% of the enemy bullets, every stage alike.
+   Each stage has a ROSTER: a signature kind and a second kind (charger / flanker / swarm / mine), chosen so the two stages next to it share neither. en() (b.js) asks ROSTER.sub()
+   for every drone: about 35% turn into the signature (65%) or the second kind, and a drone that would lift the stage's drone share above 33% always does. Counted per stage (story) or per district (Endless).
+   Bosses, mini-boss summons, zoo units, the Lab and the tutorial are never touched. The shape of the wave (formation, path, count) stays; only the unit type changes. ---------- */
+const ROSTER=window.ROSTER={KINDS:['charger','flank','swarm','mine'],CAP:.33,P:.35,c:{key:'',total:0,drone:0},stat:{sub:0,drone:0,total:0},
+  idx(){return ST.on?ST.n:20+G.di*3+(G.loop|0);},
+  kinds(i){const K=this.KINDS,s=(i*3)%4;return[K[s],K[(s+2)%4]];},   // signature, second: the stages i-1 and i+1 have {s-1,s+1}
+  sub(type,o){if(!RET.roster||G.lab||G.tut||(o&&(o.mini||o.zt))||G.boss||(ST.on&&ST.n<=(RET.density?2:4)))return type;   // stages 1-4 keep the hovering drones (zoo-test, onboarding)
+    const key=ST.on?'s'+ST.n:'e'+G.di+'_'+G.loop,c=this.c;if(c.key!==key){c.key=key;c.total=0;c.drone=0;}
+    let out=type;
+    if(type==='drone'){const over=(c.drone+1)/(c.total+1)>this.CAP&&c.total>=3;
+      if(over||GX()<this.P){const ks=this.kinds(this.idx());out=GX()<.65?ks[0]:ks[1];}}
+    c.total++;this.stat.total++;if(out==='drone'){c.drone++;this.stat.drone++;}else if(type==='drone')this.stat.sub++;
+    return out;}};
 const WARN=[];                                           // spawn markers: shown for one beat before something enters from an edge or falls
 const DIR={
   sb:72,stage:'stage1',bossBar:40,bar:-1,theme:null,thName:'',acc:0,idle:0,emptyB:0,ldt:0,q:[],mut:[],bsK:1,spd:1,nextMini:20,minis:0,lastTheme:'',log:{spawns:[],themes:[],mini:0,minD:1e9,maxEmptyBars:0,emptyRun:0},
@@ -47,6 +61,7 @@ const DIR={
     const nb=this.nonBoss();if(nb===0&&!G.boss&&!G.bossDone&&(ST.on||G.dbar<this.bossBar-.5)){this.emptyB++;this.log.emptyRun=this.emptyB/4;this.log.maxEmptyBars=Math.max(this.log.maxEmptyBars,this.log.emptyRun);}else{this.emptyB=0;this.log.emptyRun=0;}
     if(G.boss&&!G.boss.mini)return;
     if(G.bossDone||SH.active)return;
+    if(window.DENS)DENS.beat();                                // density.js: slow curtains when the screen holds fewer bullets than the stage's budget
     const bb=((i%4)+4)%4;
     if(!ST.on&&G.dbar>=this.bossBar)return;                // the boss is about to come: no new waves
     if(ST.on&&ST.spawned)return;
