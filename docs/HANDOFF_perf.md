@@ -620,3 +620,9 @@ Gates: build OK, unit 0 FAIL, TAG set 51/52 on the built page (only xf1/grass re
 3. Measured tPcHeap 60 s, 2-4 runs in parallel (frames >50 meaningless there): before (all off) fra +204 / ath +128; after with ?lfr=500 fra +115 / ath +80 (lfr is the biggest single cut, BK+memc ~-40 fra / -10 ath).
 4. lfr=500 NOT flipped (no 1920x1080 roam pop-in shots taken in the timebox); GND quant on desktop tried and reverted. GO perf/pc-heap-60s stays info + asserts the new caps are on. Gates: unit 0 FAIL; perf/* 6/6; r13/sky-blue*,life1,xf1,terrain,phone2 47/47.
 5. Left: (a) shots at start/30/60 s per city then flip lfr=500; (b) what else grows in fra (~+55 after lfr): heap snapshot by constructor at +60 s (propRespawn / LF_di / FCG_build sampled owners).
+## perf-r18i (2026-10-20): camera-pull grid in typed arrays
+1. Change (src/98fc_foliage_cam.js): FCG_build is a sliced counting sort (count per cell, prefix sum, fill one Int32Array) over a dense x/z cell table (S); no [] / Map per cell, FCG_packStep gone (a box over 2^19 cells doubles that grid's cell size); same hits.
+2. GO perf/fc-grid (src/99c7_rev5fix.js, both cities): 180 fixed rays on 3 meshes = brute-force triangle test, 0 mismatches, typed arrays only; perf/fc-first now also prints grid MB.
+3. Measured fc-first (cold, min of 2 passes), solo Fra 49.1 / 77.0 / 46.2 → 7.9 / 8.2 ms, Ath ≈6 → 5.7 / 6.4; in the full TAG suite (3 runs) Fra 4.1 / 4.1 / 4.2, Ath 6.7 / 8.5 / 20.3. Grid MB: see the fc-first line (typed arrays, last pass).
+4. Gate (built): unit 0 FAIL; perf + r13 sky + life1 xf1 terrain phone2 sets 52/54, 53/54, 51/54; reds only the known xf1/grass, terrain-tyre-ath SLOW, life1/ath-density SLOW.
+5. Left: pass 1 of a cold run can still show one 37-84 ms frame with 0 ms grid work (JIT/GC outside the grid; the GO takes the lower pass).

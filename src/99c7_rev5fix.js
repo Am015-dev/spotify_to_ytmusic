@@ -457,11 +457,11 @@ function IOSM_roam(s){K.ArrowUp=true;for(let i=0;i<s*30;i++){K.ArrowLeft=((i/90|
 (function R17D_reg(i){const C=window.__chk;if(C&&C.GO&&Array.isArray(C.items)){if(!C.items.some(q=>q.ver==='perf'&&q.id==='fc-first'))C.items.push({ver:'perf',id:'fc-first',area:'perf',text:'r17d · first minute of the camera wall-pull (Frankfurt one 117-143 ms frame at about frame 8): 📍 GO (both cities) starts from empty grids and runs 1200 FC_pull frames with the camera circling the car. Pass line: the slowest frame <= 30 ms (info: p99, grids built, FC_occ max). Needs free roam.'});
   C.GO['perf/fc-first']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt':'Athens',fn:()=>{if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';
    const cam=camera.position,c0=cam.clone(),pull=FC.pull,k=FC.k,kt=FC.kt,T=[];let mxd=0,mxi=0,mxw=0;
-   const M2=[];try{FC.pull=true;FC.t=FC.t||0;for(let ps=0;ps<2;ps++){FCG.W=new WeakMap();FCG.pq.length=0;FC.occ=[];FC.occT=-99;FC.rt=0;T.length=0;mxd=0;
+   const M2=[];try{FC.pull=true;FC.t=FC.t||0;for(let ps=0;ps<2;ps++){FCG.W=new WeakMap();FCG.pq.length=0;FC.occ=[];FC.occT=-99;FC.rt=0;T.length=0;mxd=0;FCG.st.mb=0;
     for(let n=0;n<1200;n++){const a=n*.11,r=12+(n%300)*.11;cam.set(RO.x+Math.sin(a)*r,RO.y+4,RO.z+Math.cos(a)*r);FC.off.set(0,0,0);const w0=FCG.st.ms,t0=performance.now();FC_pull(1/60);const d=performance.now()-t0;T.push(d);if(d>mxd){mxd=d;mxi=n;mxw=FCG.st.ms-w0}FC.t+=1/60}M2.push(mxd)}
    }finally{cam.copy(c0);FC.off.set(0,0,0);FC.pull=pull;FC.k=k;FC.kt=kt}
    const S=T.slice().sort((a,b)=>a-b),mx=Math.min(M2[0],M2[1]),ok=mx<=30;window.__chk.fcFirst=window.__chk.fcFirst||{};window.__chk.fcFirst[c]=+mx.toFixed(1);
-   return`📍 FC COLD START · ${c==='fra'?'Frankfurt':'Athens'}: slowest of ${T.length} FC_pull frames ${mx.toFixed(1)} ms (≤ 30; passes ${M2.map(x=>x.toFixed(1)).join(' / ')}), p99 ${S[Math.floor(S.length*.99)].toFixed(1)} ms, grids built ${FCG.st.built}; slowest at frame ${mxi}, of it grid work ${mxw.toFixed(1)} ms → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
+   return`📍 FC COLD START · ${c==='fra'?'Frankfurt':'Athens'}: slowest of ${T.length} FC_pull frames ${mx.toFixed(1)} ms (≤ 30; passes ${M2.map(x=>x.toFixed(1)).join(' / ')}), p99 ${S[Math.floor(S.length*.99)].toFixed(1)} ms, grids built ${FCG.st.built} (${FCG.st.mb.toFixed(1)} MB typed arrays, last pass); slowest at frame ${mxi}, of it grid work ${mxw.toFixed(1)} ms → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
  if(i<600)setTimeout(()=>R17D_reg(i+1),100)})(0);
 
 // perf-r17f: GO perf/pc-bhs (+ -ath). buildHubG gap = time between two yields (window.__bhSt, src/72). bhs (?bhs=1, default OFF): both cities < 1500 ms (r17f measured fra 1217 = rfGrid at 'start', ath 1277; was 1512 / 1277). Info: steps over 50 ms. Off: info only.
@@ -555,3 +555,25 @@ window.__hudClear=function(){const R=e=>{e=typeof e==='string'?document.getEleme
   const s=SOA.stat(),P=HUB.props,p=P.find(q=>q.alive&&q.t)||P[0];if(!p)return'📍 SOA · no props ❌ FAIL';const x=p.x,t=p.t,rt=p.rt,a=p.alive;p.x=x+1;p.alive=false;p.alive=a;p.x=x;const ok0=p.x===x&&p.t===t&&p.rt===rt&&p.alive===a&&typeof t==='string';
   const ok=ok0&&s.rows===s.props&&s.colors<=300;return`📍 SOA ${CID} · ${s.props} props, ${s.rows} rows, ${s.colors} distinct colours, ${s.cvPairs} packed cvs pairs, columns ${s.colMB} MB, round-trip ${ok0?'ok':'BAD'} → ${ok?'✅ PASS':'❌ FAIL'}`}}))}return}
  if(i<600)setTimeout(()=>SOA_reg(i+1),100)})(0);
+
+// perf-r18i: GO perf/fc-grid (both cities). The camera-pull grid is typed arrays only (Int32Array cell table + one Int32Array of triangles, no [] / Map per cell):
+// on 3 occluder meshes x 60 fixed rays FCG_hit must equal a brute-force Moller-Trumbore over every triangle (same hits as the old per-cell arrays); info: grid MB.
+(function R18I_reg(i){const C=window.__chk;if(C&&C.GO&&Array.isArray(C.items)){if(!C.items.some(q=>q.ver==='perf'&&q.id==='fc-grid'))C.items.push({ver:'perf',id:'fc-grid',area:'perf',text:'r18i · camera-pull grid in typed arrays: 📍 GO (both cities) builds the grids of 3 occluder meshes fresh and shoots 60 fixed rays each; FCG_hit must equal a brute-force triangle test (0 mismatches, some hits), the grid must hold no Map / JS array per cell. Info: MB per grid. Needs free roam.'});
+  C.GO['perf/fc-grid']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt':'Athens',fn:()=>{if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';
+   if(FC.t-FC.occT>8||!FC.occ.length)FC_occ();const M=FC.occ.filter(m=>!m.isInstancedMesh&&!m.isBatchedMesh&&FCG_ok(m.geometry)).slice(0,3);let rays=0,hits=0,bad=0,typed=true,mb=0;
+   for(const m of M){const g=m.geometry,old=FCG.W.get(g);if(!g.boundingBox)g.computeBoundingBox();FCG.W.delete(g);const e=FCG_get(g);FCG_build(g,e,performance.now()+1e9);
+    typed=typed&&e.done&&e.S instanceof Int32Array&&e.I instanceof Int32Array&&!e.cells;mb+=(e.S.byteLength+e.I.byteLength)/1048576;
+    const P=g.attributes.position,ix=g.index,nt=ix?ix.count/3|0:P.count/3|0,iM=new THREE.Matrix4().copy(m.matrixWorld).invert();let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;
+    const tv=(t,j)=>{const v=ix?ix.getX(t*3+j):t*3+j;return[P.getX(v),P.getY(v),P.getZ(v)]};
+    for(let q=0;q<60;q++){const t=Math.floor(r()*nt),tg=new THREE.Vector3();for(let j=0;j<3;j++){const v=tv(t,j);tg.x+=v[0]/3;tg.y+=v[1]/3;tg.z+=v[2]/3}tg.applyMatrix4(m.matrixWorld);
+     const o=tg.clone().add(new THREE.Vector3(r()-.5,r()*.3,r()-.5).normalize().multiplyScalar(5+r()*35)),d=tg.clone().sub(o),far=d.length()*1.5;FC.rc.ray.direction.copy(d.normalize());
+     const got=FCG_hit(m,o,far);if(got===null)continue;
+     const lo=o.clone().applyMatrix4(iM),le=o.clone().addScaledVector(d,far).applyMatrix4(iM),dx=le.x-lo.x,dy=le.y-lo.y,dz=le.z-lo.z;let best=-1;
+     for(let k=0;k<nt;k++){const A=tv(k,0),B=tv(k,1),Cc=tv(k,2),e1x=B[0]-A[0],e1y=B[1]-A[1],e1z=B[2]-A[2],e2x=Cc[0]-A[0],e2y=Cc[1]-A[1],e2z=Cc[2]-A[2],px=dy*e2z-dz*e2y,py=dz*e2x-dx*e2z,pz=dx*e2y-dy*e2x,det=e1x*px+e1y*py+e1z*pz;
+      if(det>-1e-12&&det<1e-12)continue;const inv=1/det,tx=lo.x-A[0],ty=lo.y-A[1],tz=lo.z-A[2],u=(tx*px+ty*py+tz*pz)*inv;if(u<0||u>1)continue;
+      const qx=ty*e1z-tz*e1y,qy=tz*e1x-tx*e1z,qz=tx*e1y-ty*e1x,v=(dx*qx+dy*qy+dz*qz)*inv;if(v<0||u+v>1)continue;const tt=(e2x*qx+e2y*qy+e2z*qz)*inv;if(tt<0||tt>1)continue;if(tt*far>best)best=tt*far}
+     rays++;if(best>=0)hits++;if(Math.abs(best-got)>1e-6)bad++}
+    FCG.W.delete(g);if(old)FCG.W.set(g,old)}
+   const ok=M.length>0&&typed&&rays>=60&&hits>0&&bad===0;
+   return`📍 FC GRID · ${c==='fra'?'Frankfurt':'Athens'}: ${rays} rays (${hits} hits) over ${M.length} meshes, grid = brute force except ${bad}, typed arrays only ${typed}, ${mb.toFixed(1)} MB (cell table + triangles) → ${ok?'✅ PASS':'❌ FAIL'}`}}));return}
+ if(i<600)setTimeout(()=>R18I_reg(i+1),100)})(0);
