@@ -13,7 +13,7 @@ function RD_rows(R,c){const s=R.sum,F=R.fr,g=F.map(q=>q.dt).sort((a,b)=>a-b),med
 (function RD_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='reveal-desktop')){
  C.items.push({ver:'perf',id:'reveal-desktop',area:'perf',text:'reveal-r21p · desktop reveal: 📍 GO boots Frankfurt (-ath: Athens) in a PC iframe and reads the 5 s after the curtain lifts. Pass line: the hold ran; programs at reveal == at +5 s (<= 1 new link); no stall (gap > 2.5x median) that coincides with a program link / compile / big upload (absolute gaps and frame ms are info: software GL blocks on the GPU queue); no texture upload > 20 ms. Absolute ms are info (lab = software GL). Before: 36-49 links and a 1.0-1.2 s gap right after the curtain.'},
   {ver:'perf',id:'reveal-desktop-ath',area:'perf',text:'reveal-r21p · same, Athens.'});
- const run=async c=>{const f=document.createElement('iframe');f.style.cssText='position:fixed;left:0;top:0;width:100vw;height:100vh;border:0;z-index:99999';f.src=location.pathname+'?test='+c+'&rvl=1&rvlcpu=1';document.body.appendChild(f);
+ const run=async c=>{const f=document.createElement('iframe');f.style.cssText='position:fixed;left:0;top:0;width:100vw;height:100vh;border:0;z-index:99999';f.src=location.pathname+'?test='+c+'&rvl=1&rvlcpu=1&drevcap=40000'/* lab software GL is ~4x slower than a PC: the 12 s production cap would cut the Athens hold */;document.body.appendChild(f);
   try{const t0=performance.now();let R=null;while(performance.now()-t0<400000){await new Promise(r=>setTimeout(r,1000));try{R=f.contentWindow.RVL}catch(e){}if(R&&R.done)break}
    if(!R||!R.done)return`📍 REVEAL DESKTOP ${c} · no reveal window recorded in ${Math.round((performance.now()-t0)/1000)} s → ❌ FAIL`;
    for(let w=0;w<60&&R.p5<0;w++)await new Promise(r=>setTimeout(r,500));
@@ -23,3 +23,16 @@ function RD_rows(R,c){const s=R.sum,F=R.fr,g=F.map(q=>q.dt).sort((a,b)=>a-b),med
  const go=c=>()=>{run(c).then(r=>goSay(r));return'📍 REVEAL DESKTOP · booting '+c+'…'};
  C.GO['perf/reveal-desktop']=[{c:'fra',n:'desktop reveal (Frankfurt)',fn:go('fra'),secs:420}];C.GO['perf/reveal-desktop-ath']=[{c:'ath',n:'desktop reveal (Athens)',fn:go('ath'),secs:420}]}return}
  if(i<600)setTimeout(()=>RD_reg(i+1),100)})(0);
+
+// review 13: GO perf/reveal-hang. The hold's lazy-chunk wait never resolves (?drevhang=1, test hook) with an 1.5 s chunk cap (?drevxc=1500): the reveal must still happen, the hold must report the chunk timeout (or the 12 s hard cap)
+// and must end within the hard cap plus 2.5 s of slack (the cap fires on a timer, a synchronous step in flight finishes first).
+(function RH_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='reveal-hang')){
+ C.items.push({ver:'perf',id:'reveal-hang',area:'perf',text:'review-13 · reveal hold cannot hang: 📍 GO boots Frankfurt with a lazy-chunk load that never resolves (?drevhang=1, ?drevxc=1500). Pass line: the curtain lifts anyway (reveal window recorded), the hold reports xcTimeout or hard, and its total is <= 12 s hard cap + 2.5 s.'});
+ const run=async()=>{const f=document.createElement('iframe');f.style.cssText='position:fixed;left:0;top:0;width:100vw;height:100vh;border:0;z-index:99999';f.src=location.pathname+'?test=fra&rvl=1&rvlcpu=1&drevhang=1&drevxc=1500';document.body.appendChild(f);
+  try{const t0=performance.now();let R=null;while(performance.now()-t0<400000){await new Promise(r=>setTimeout(r,1000));try{R=f.contentWindow.RVL}catch(e){}if(R&&R.done)break}
+   if(!R||!R.done)return`📍 REVEAL HANG · the curtain never lifted in ${Math.round((performance.now()-t0)/1000)} s → ❌ FAIL`;
+   const D=f.contentWindow.DREV,rows=[['curtain lifted, reveal window recorded ('+R.fr.length+' frames)',true],['hold ran '+D.ran+', chunk timeout '+D.xcTimeout+', hard cap '+D.hard+' (one of them)',D.ran===1&&(D.xcTimeout===1||D.hard===1)],['hold total '+D.ms+' ms <= '+(D.hardMs+2500),D.ms>0&&D.ms<=D.hardMs+2500]],ok=rows.every(r=>r[1]);
+   return`📍 REVEAL HANG · ${rows.map(r=>(r[1]?'✓ ':'✗ ')+r[0]).join(' · ')} → ${ok?'✅ PASS':'❌ FAIL'}`}
+  catch(e){return`📍 REVEAL HANG · threw ${String(e&&e.message).slice(0,80)} → ❌ FAIL`}finally{f.remove()}};
+ C.GO['perf/reveal-hang']=[{c:'fra',n:'reveal hold with a hung chunk load',fn:()=>{run().then(r=>goSay(r));return'📍 REVEAL HANG · booting fra…'},secs:420}]}return}
+ if(i<600)setTimeout(()=>RH_reg(i+1),100)})(0);

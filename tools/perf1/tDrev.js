@@ -10,7 +10,7 @@ const srv=http.createServer((q,r)=>{const f=path.join(OUT,decodeURIComponent(q.u
  const port=srv.address().port,b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--enable-precise-memory-info']});
  for(const c of CITIES){const ctx=await b.newContext({viewport:{width:900,height:581},deviceScaleFactor:1.5}),p=await ctx.newPage();p.setDefaultTimeout(600000);
   const cdp=await ctx.newCDPSession(p);await p.exposeFunction('__rvlThr',(m,a)=>cdp.send(m,a).then(()=>1,e=>String(e)));p.on('pageerror',e=>console.log('ERR',e.message.slice(0,150)));
-  p.on('console',m=>{const t=m.text();if(/^RVL /.test(t))console.log(t)});
+  p.on('console',m=>{const t=m.text();if(/^RVL |DREV/.test(t))console.log(t.slice(0,300))});
   await p.goto(`http://127.0.0.1:${port}/${V}/index.html?test=${c}&rvl=1&lkdiag=1&rvlcpu=${process.env.CPU||6}${process.env.QS?'&'+process.env.QS:''}`);
   if(process.env.PROF){await p.waitForFunction(()=>window.RVL&&RVL.t0>0,null,{polling:20});await cdp.send('Profiler.enable');await cdp.send('Profiler.setSamplingInterval',{interval:200});await cdp.send('Profiler.start')}
   await p.waitForFunction(()=>window.RVL&&RVL.done,null,{polling:500});

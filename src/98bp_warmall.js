@@ -170,7 +170,7 @@ async function TWG_run0(){if(!TWG.on||LKG.on||!TWG.n||state!=='roam'||!RO.on)ret
 /* reveal-r21p: desktop reveal hold. Real data (Alex's PC, Beta perf db, Athens beta.135-138): the 4.4 / 2.4 / 1.3 / 1.2 s 'roam freezes' and a 2.3 s menu freeze are the first frames after the curtain lifts: the roam-start gate (LKG) and the
    first real renders still ran AFTER ldHide (36-49 program links, 571 ms GC in the lab). The hold keeps the curtain up (LD.on=false so frame() runs under it) until: the gate has finished, one representative per program was drawn through the real composer
    (PREW_run, cap DREV.prewCap), the lazy chunks are evaluated, the temporary build memory was released (DREV_gc) and the program count has not grown for DREV.stable frames (or DREV.cap ms). Phones keep the TWG path (LKG.on is false there). ?drev=0 = old. */
-const DREV={on:new URLSearchParams(location.search).get('drev')!=='0',cap:6000,stable:10,prewCap:3000,ran:0,gateMs:-1,prewMs:-1,xcMs:-1,gcMs:-1,settleMs:-1,frames:0,capped:0,p0:-1,p1:-1,p2:-1,h0:-1,h1:-1,h2:-1,ms:-1};
+const DREV={on:new URLSearchParams(location.search).get('drev')!=='0',hardMs:+new URLSearchParams(location.search).get('drevcap')||12000,xcCap:+new URLSearchParams(location.search).get('drevxc')||8000,hang:new URLSearchParams(location.search).get('drevhang')==='1',abort:0,hard:0,xcTimeout:0,cap:6000,stable:10,prewCap:3000,ran:0,gateMs:-1,prewMs:-1,xcMs:-1,gcMs:-1,settleMs:-1,frames:0,capped:0,p0:-1,p1:-1,p2:-1,h0:-1,h1:-1,h2:-1,ms:-1};
 const DREV_heap=()=>{try{return Math.round(performance.memory.usedJSHeapSize/1048576)}catch(e){return -1}};
 /* V8 starts a mark-compact when external memory grows quickly: allocate and drop a few large buffers under the curtain so the build garbage (arrays, geometry CPU copies) is collected NOW and not in the first drive frames */
 function DREV_gc(){const t=performance.now();try{for(let i=0;i<4;i++){const b=new ArrayBuffer(48<<20);b.byteLength}}catch(e){}DREV.gcMs=Math.round(performance.now()-t)}
@@ -190,34 +190,40 @@ function DREV_full(){const R=renderer,P=R.info.programs,n0=P.length,T=typeof TQ!
  scene.traverse(o=>{if(o.frustumCulled)sv.push(o)});
  try{for(const o of sv)o.frustumCulled=false;LKG.arm=0;if(T)T.draw=1;LD.on=false;LD.busy=false;PREW_sc(1);const gl=R.getContext(),px=new Uint8Array(4);composer.render();gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px)}
  finally{PREW_sc(0);for(const o of sv)o.frustumCulled=true;LD.on=l0;LD.busy=b0;LKG.arm=k0;if(T)T.draw=d0}return P.length-n0}
-async function DREV_hold(){
- if(!DREV.on||!LKG.on||LOWMEM||state!=='roam'||!RO.on)return;
- const R=renderer,P=R.info.programs,t0=performance.now(),lo=LD.on;DREV.ran=1;DREV.p0=P.length;DREV.h0=DREV_heap();LD.on=false;
+/* review 13: every await in the body is cut off by DREV_hold's wall-clock cap (DREV.hardMs, default 12 s; ?drevcap=ms): on the cap DREV.abort is set, nf() throws at the next frame and the curtain lifts as it is. The lazy-chunk wait has its own 8 s cap (?drevxc=ms; ?drevhang=1 = test hook, the chunk load never resolves). */
+async function DREV_body(lo,t0){
+ const R=renderer,P=R.info.programs,nf=async()=>{await nextFrame();if(DREV.abort)throw 'DREVabort'};DREV.p0=P.length;DREV.h0=DREV_heap();LD.on=false;
  try{
-  for(let k=0;k<1500&&LKG.arm;k++){await nextFrame()}
+  for(let k=0;k<1500&&LKG.arm;k++){await nf()}
   DREV.gateMs=Math.round(performance.now()-t0);const t1=performance.now();
   /* what first runs ~0.5-1 s after the curtain on a player page: the parked-car pack (PC_step: new packed meshes = a new program), the shortcut scan set-up; then link what they made and run a few real frames */
   try{if(TWG.pcw&&typeof PC_step==='function'&&PC.on&&PC_gate()){PC.rel=0;PC_step(1)}}catch(e){console.warn('DREV pc',e)}
   try{if(TWG.dd&&typeof DEST_find==='function'&&DEST.on){if(DEST.N!==HUB.nodes)DEST_reset();DEST_find(0)}}catch(e){console.warn('DREV dest',e)}
-  try{LKG_begin(scene,camera,1);while(!LKG_step(camera,8))await nextFrame();LKG.q=null}catch(e){console.warn('DREV relink',e)}
-  for(let i=0;i<3;i++)await nextFrame();
+  try{LKG_begin(scene,camera,1);while(!LKG_step(camera,8))await nf();LKG.q=null}catch(e){console.warn('DREV relink',e)}
+  for(let i=0;i<3;i++)await nf();
   try{DREV_pass()}catch(e){console.warn('DREV pass',e)}
   if(typeof PREW_run==='function'){const c=PREW.cap;PREW.cap=DREV.prewCap;try{PREW_run()}catch(e){console.warn('DREV prew',e)}finally{PREW.cap=c}}
   DREV.prewMs=Math.round(performance.now()-t1);const t2=performance.now();
   try{if(typeof DREV_extras==='function')await DREV_extras()}catch(e){console.warn('DREV extras',e)}
-  try{if(typeof XC_go==='function')await XC_go()}catch(e){console.warn('DREV xc',e)}
+  try{if(typeof XC_go==='function'){let tm;const cap=new Promise(r=>{tm=setTimeout(()=>{DREV.xcTimeout=1;console.warn('DREV xc: chunks not loaded in '+DREV.xcCap+' ms, revealing without them');r()},DREV.xcCap)});try{await Promise.race([DREV.hang?new Promise(()=>{}):XC_go(),cap])}finally{clearTimeout(tm)}}}catch(e){if(e==='DREVabort')throw e;console.warn('DREV xc',e)}
   DREV.xcMs=Math.round(performance.now()-t2);
   DREV.h1=DREV_heap();if(new URLSearchParams(location.search).get('drevgc')!=='0')DREV_gc();
   const t3=performance.now();let last=P.length,still=0;
   DREV.rl=[];
-  while(still<DREV.stable){if(performance.now()-t3>DREV.cap){DREV.capped=1;break}await nextFrame();DREV.frames++;
+  while(still<DREV.stable){if(performance.now()-t3>DREV.cap){DREV.capped=1;break}await nf();DREV.frames++;
    /* meshes the first real frames create (parked-car packs, LIFE batches ...) are linked here, one by one, still under the curtain */
    if(DREV.frames%3===1){const n0=P.length;try{DREV_pass()}catch(e){console.warn('DREV relink',e)}if(P.length>n0&&DREV.rl.length<20)DREV.rl.push([DREV.frames,P.length-n0])}
    const n=P.length;if(n===last)still++;else{still=0;last=n}}
   {const n0=P.length;try{DREV_pass();DREV.full=DREV_full()}catch(e){console.warn('DREV fin',e)}DREV.fin=P.length-n0}
   DREV.settleMs=Math.round(performance.now()-t3);
- }catch(e){console.warn('DREV',e)}
- finally{LD.on=lo;DREV.p1=P.length;DREV.h2=DREV_heap();DREV.ms=Math.round(performance.now()-t0)}}
+ }catch(e){if(e!=='DREVabort')console.warn('DREV',e)}
+ finally{if(!DREV.abort)LD.on=lo;DREV.p1=P.length;DREV.h2=DREV_heap()}}
+async function DREV_hold(){
+ if(!DREV.on||!LKG.on||LOWMEM||state!=='roam'||!RO.on)return;
+ const t0=performance.now(),lo=LD.on;DREV.ran=1;DREV.abort=0;let tm;
+ const cap=new Promise(r=>{tm=setTimeout(()=>{DREV.abort=1;DREV.hard=1;console.warn('DREV: hold hit the '+DREV.hardMs+' ms cap, revealing');r()},DREV.hardMs)});
+ try{await Promise.race([DREV_body(lo,t0),cap])}catch(e){console.warn('DREV',e)}
+ finally{clearTimeout(tm);if(DREV.abort)LD.on=lo;DREV.ms=Math.round(performance.now()-t0)}}
 window.DREV=DREV;window.DREV_heap=DREV_heap;window.LKG=LKG;
 TWG_run=(f=>async function(){const r=await f.apply(this,arguments);await DREV_hold();return r})(TWG_run);
 {const q=new URLSearchParams(location.search);TWG.dd=q.get('twgdest')!=='0';TWG.pa=q.get('twgpa')!=='0';TWG.lvc=q.get('twglv')!=='0';TWG.destMs=-1;TWG.fw=120;/* ios-r17o: ?twgdest=0 / ?twgpa=0 / ?twglv=0 = off */}

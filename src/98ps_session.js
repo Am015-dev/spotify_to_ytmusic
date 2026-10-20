@@ -18,7 +18,7 @@ function PS_doc(){let nav=null,fetch=0;try{nav=performance.getEntriesByType('nav
   b.sid=PS.sid;b.seq=++PS.seq;b.up=Math.round(performance.now()/1000);
   b.bootMs=pl||null;b.phase=pl?{fetch,eval:Math.max(0,ev-fetch),build:Math.max(0,(bd||ev)-ev),reveal:Math.max(0,pl-(bd||ev))}:null;
   b.long3=PS.tPlay?PS.long3:null;b.roam=PS_stat(PS.st.roam);b.race=PS_stat(PS.st.race);b.gapMs=Math.round(PS.gap);b.gapState=PS.gapState;
-  b.lf=PS.lf.slice();b.pRev=PS.pRev;b.pRoam=PS.pRoam;if(typeof PREW!=='undefined'){b.prew={ran:PREW.ran,abortedAtMs:PREW.ab,programs:PREW.n,ms:PREW.ms,of:PREW.prog,p0:PREW.p0,p1:PREW.p1};b.prewArm=PREW.arm}b.errN=PS.errN;b.err=PS.err.slice();b.prog=b.ri&&b.ri.prog;b.hint=Object.assign({},PS.hint);
+  b.lf=PS.lf.slice();b.pRev=PS.pRev;b.pRoam=PS.pRoam;if(typeof PREW!=='undefined'){b.prew={ran:PREW.ran,abortedAtMs:PREW.ab,programs:PREW.n,ms:PREW.ms,of:PREW.prog,p0:PREW.p0,p1:PREW.p1};b.prewArm=PREW.arm}if(typeof DREV!=='undefined'){const D=DREV;b.drev={on:D.on,ran:D.ran,ms:D.ms,gateMs:D.gateMs,prewMs:D.prewMs,xcMs:D.xcMs,settleMs:D.settleMs,frames:D.frames,capped:D.capped,hard:D.hard,xcTimeout:D.xcTimeout,p0:D.p0,p1:D.p1,full:D.full,fin:D.fin,h0:D.h0,h1:D.h1,h2:D.h2}}b.errN=PS.errN;b.err=PS.err.slice();b.prog=b.ri&&b.ri.prog;b.hint=Object.assign({},PS.hint);
   const r=PS.st.roam,c=PS.st.race,m=(r.n+c.n)?[r,c].map(s=>PS_q(s.a.slice(0,Math.min(s.k,s.a.length)).sort(),.5)):[0,0];b.hint.cap30=Math.max(m[0],m[1])>=30&&Math.max(m[0],m[1])<=36;
   return b}
 // the send, rate-limited: returns 'sent' | 'wait' | 'cap' | 'nodb'
