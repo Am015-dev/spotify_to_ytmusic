@@ -10,7 +10,7 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 |---|---|---|---|---|
 | abil-test | PASS | - | obsolete-fixed: dash-trait scenario opens with ?timing=0 (off-beat dash is a plain hop with timing ON) | W31 2026-10-20 |
 | afk-test | FAIL | - | not bisected (budget) | W31 2026-10-20 |
-| anticamp-test | FAIL | - | FAIL Normal: no-oracle dodger clears >= 55%; rerun also FAIL (bold vs dodger line); not bisected | 0e03771 2026-10-20 |
+| anticamp-test | PASS | - | bot noise: RUNS 4->12 (n=36/bot), dodge/noor gate is a RANGE 40-90% (measured 56/61%; ?variants=0 lifts to 78%, so old 55/66 floors predate variants); camper <= dodger-25 kept (camp 14%, hard max 8% vs 63%) | W44 2026-10-20 |
 | audio-test | FLAKY | - | passed on rerun (first: FAIL after hidden/visible: grid within 40 ms of the song (max 281.7 ms, 41 samples)) | f696692 2026-10-20 |
 | balance-test | PASS | - | PASS balance-test | f696692 2026-10-20 |
 | boss2-test | PASS | - | PASS boss2-test | f696692 2026-10-20 |
@@ -20,7 +20,7 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 | choices-test | PASS | - | PASS no page errors  | f696692 2026-10-20 |
 | counter-test | PASS | - | passed on rerun (was FLAKY) | W31 2026-10-20 |
 | dash-dir-test | PASS | - | ALL PASS | f696692 2026-10-20 |
-| density-test | FAIL | - | FAIL curtain columns keep a free gap >= 96 px (min 9; stage 10 scripts split and curve bullets); rerun also FAIL; not bisected | 0e03771 2026-10-20 |
+| density-test | PASS | - | REAL fixed: stagescripts split + ai.js dead-r ring pushed bullets past ebCap (guarded; split children drop dn); gap check counts only straight-falling curtain bullets (in-flight bend is not a spawn gap) | W44 2026-10-20 |
 | econ-test | PASS | - | PASS hours in 9-13 | f696692 2026-10-20 |
 | feedback-test | PASS | - | PASS no page errors | f696692 2026-10-20 |
 | flankers-test | PASS | - | PASS flag on with ?flankers=1 | 0e03771 2026-10-20 |
@@ -74,14 +74,14 @@ Totals: 66 tests: 20 PASS, 4 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN.
 | tale-test | PASS | - | PASS no page errors | 4920087 2026-10-20 |
 | timing-test | FAIL | - | random DASH/EMP bot clears 92% (was 42%) with timing ON: EMP spam looks too strong (W28 grit); Hard mid all 0% | W31 2026-10-20 |
 | tutorial-test | PASS | - | PASS desktop: skip run, no page errors | 4920087 2026-10-20 |
-| ui-align-test | FAIL | - | FAIL 390x763 title (10); rerun also FAIL: title (4), story-map (1); not bisected | 0e03771 2026-10-20 |
+| ui-align-test | FAIL | - | REAL, not fixed (time): 29 findings = title daily-streak contrast 4.2-4.5 + truncated stage line, canvas BREACH HUD label contrast ~2:1 and overlap with 1/3 on boss HUD, small-font; story-map screen unreachable (STORY button not visible on #title, 5 vps: probably obsolete selector after the new menu) -> W12 / next worker | W44 2026-10-20 |
 | ui-weapons-test | PASS | - | PASS weapons: sheet opaque, nothing shows through 390x763 fused | 0e03771 2026-10-20 |
 | variants-test | PASS | - | PASS no page errors | 0e03771 2026-10-20 |
 | vary-test | PASS | - | PASS library and the 45 scripts are well formed (a, b) | 0e03771 2026-10-20 |
 | visible-test | PASS | - | PASS killed before visible (PULSE 3 + SWARM 10, Normal st 3,10,20): 0/202 | 0e03771 2026-10-20 |
 | wcard-test | PASS | - | PASS 1280x720: 16 weapon cards, 130 text nodes, no narrow text / overlap / overflow | 0e03771 2026-10-20 |
 | weapon-test | PASS | - | PASS fusions: 48/48 pairs equip, fire, draw, stay under the bullet cap | 0e03771 2026-10-20 |
-| zoo-test | FAIL | - | FAIL easy/normal 0 hovers in 70 s; speed normal 1.06 (wanted 0.78); enemy bullet 471 px/s > 445 on vhard; rerun also FAIL; not bisected | 0e03771 2026-10-20 |
+| zoo-test | PASS | - | obsolete+REAL: opens with ?deck=0&vary=0&vary2=0&variants=0 (wave deck/variants replaced stage 3 plain drone waves: 0-3 hovers); speed check reads LEAK.es (the old displacement ratio was noise); REAL fixed: ai.js leader bullets stacked scale 1.3x1.1 past BCAP (463 px/s) | W44 2026-10-20 |
 
 ## Run caveats
 

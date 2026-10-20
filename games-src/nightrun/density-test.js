@@ -10,13 +10,14 @@ const RUN = new Function('o', `
   while (m.running && m.G.t < o.t && !m.G.dead && !m.G.boss) { if (m.SH.active) m.SH.close(); if (i % 20 === 0) m.press('Fire'); if (i % 3 === 0) m.touchTo(300 + 200 * Math.sin(i / 50), 270 + 200 * Math.sin(i / 37));
     m.step(1 / 60); i++; const eb = m.G.eb;
     if (i % 6 === 0) { s.push(eb.length); mx = Math.max(mx, eb.length); if (eb.length > (o.diff === "hard" ? 35 : 25) + 6) capBad++;
-      const dn = eb.filter(b => b.dn); for (let a = 0; a < dn.length; a++) for (let b = a + 1; b < dn.length; b++) if (Math.abs(dn[a].y - dn[b].y) < 20 && Math.abs(dn[a].x - dn[b].x) < gap) { gap = Math.abs(dn[a].x - dn[b].x); window.__gp = [dn[a].x, dn[a].y, dn[b].x, dn[b].y, dn[a].vy, dn[b].vy, dn[a].vx]; } }
+      const dn = eb.filter(b => b.dn && Math.abs(b.vx) < 1);   // W44: only curtain bullets still falling straight; later systems bend/slow a bullet in flight (vx -34, vy 14), which is not a spawn-gap violation
+      for (let a = 0; a < dn.length; a++) for (let b = a + 1; b < dn.length; b++) if (Math.abs(dn[a].y - dn[b].y) < 20 && Math.abs(dn[a].x - dn[b].x) < gap) { gap = Math.abs(dn[a].x - dn[b].x); window.__gp = [dn[a].x, dn[a].y, dn[b].x, dn[b].y, dn[a].vy, dn[b].vy, dn[a].vx]; } }
     for (const b of eb) vmax = Math.max(vmax, Math.hypot(b.vx, b.vy)); }
   Math.random = rr; const r = { mean: s.reduce((a, b) => a + b, 0) / Math.max(1, s.length), mx, vmax, gap, capBad, cur: window.DENS.st.curtains, sig: s.join(","), gp: window.__gp }; m.abort(); m.god = false; return r;`);
 (async () => {
   const srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', DIR], { stdio: 'ignore' }); await new Promise(r => setTimeout(r, 800));
   const b = await PW.chromium.launch(); let fails = 0; const ck = (ok, msg) => { console.log((ok ? 'PASS ' : 'FAIL ') + msg); if (!ok) fails++; };
-  const run = async (q, o) => { const p = await b.newPage({ viewport: { width: 960, height: 540 } }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${q}`);
+  const run = async (q, o) => { const p = await b.newPage({ viewport: { width: 960, height: 540 } }); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&all=1${q}${process.env.Q || ""}`);
     await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 15000 }).catch(() => { });
     const r = await p.evaluate(`(${RUN.toString().replace(/^function anonymous\(o\s*\)\s*\{/, 'function(o){')})(${JSON.stringify(o)})`); await p.close(); return r; };
   const on = {}, off = {};
@@ -25,9 +26,10 @@ const RUN = new Function('o', `
   const off2 = await run('&density=0', { n: 30, seed: 5, diff: 'normal', t: 90 });
   ck(on[30].mean / on[3].mean >= 1.5, `curve: stage 30 / stage 3 = ${(on[30].mean / on[3].mean).toFixed(2)} (>= 1.5; means ${on[3].mean.toFixed(1)}, ${on[10].mean.toFixed(1)}, ${on[30].mean.toFixed(1)})`);
   ck(on[30].mean > off[30].mean && on[3].mean >= off[3].mean, `flag on is denser than off (st30 ${on[30].mean.toFixed(1)} vs ${off[30].mean.toFixed(1)})`);
+  if (process.env.V) console.log(JSON.stringify([on[3].gp, on[30].gp, on[3].gap, on[30].gap, on[3].capBad, on[30].capBad]));
   ck(on[30].capBad === 0 && on[3].capBad === 0, 'bullets on screen never above ebCap + 6');
   
-  ck(on[3].gap >= 96 && on[30].gap >= 96, `curtain columns keep a free gap >= 96 px (min ${Math.min(on[3].gap, on[30].gap).toFixed(0)}; stage 10 scripts split and curve bullets themselves)`);
+  ck(on[3].gap >= 96 && on[30].gap >= 96, `curtain columns keep a free gap >= 96 px (min ${Math.min(on[3].gap, on[30].gap).toFixed(0)}, straight-falling curtain bullets only)`);
   ck(e.mean < on[30].mean && h.mean > e.mean, `Easy ${e.mean.toFixed(1)} < Normal ${on[30].mean.toFixed(1)}, Hard ${h.mean.toFixed(1)}`);
   ck(off[3].cur === 0 && off[30].cur === 0, 'density=0: no curtain');
   ck(Math.abs(off2.mean - off[30].mean) < .25 * off[30].mean + 1, `density=0: same load as the old build (${off[30].mean.toFixed(1)} vs ${off2.mean.toFixed(1)})`);

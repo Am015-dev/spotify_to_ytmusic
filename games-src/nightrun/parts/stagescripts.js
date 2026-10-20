@@ -135,7 +135,7 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
       if(b.hv){b.ht-=dt;if(b.ht<=0){b.vx=b.hv[0];b.vy=b.hv[1];b.hv=null;}}
       if(b.ct>0){b.ct-=dt;const a=b.cw*dt,c=Math.cos(a),s=Math.sin(a),vx=b.vx;b.vx=vx*c-b.vy*s;b.vy=vx*s+b.vy*c;}
       if(b.st>0){b.st-=dt;if(b.st<=0&&G.eb.length<ebCap()-1&&!b.dead){const sp=Math.hypot(b.vx,b.vy)*.85,a=Math.atan2(b.vy,b.vx),d=.3*k+.1;b.dead=1;
-        for(const s of[-1,1])G.eb.push(Object.assign({},b,{dead:0,vx:Math.cos(a+s*d)*sp,vy:Math.sin(a+s*d)*sp,st:0,g:false}));}}}
+        for(const s of[-1,1])if(G.eb.length<ebCap())G.eb.push(Object.assign({},b,{dead:0,dn:0,vx:Math.cos(a+s*d)*sp,vy:Math.sin(a+s*d)*sp,st:0,g:false}));}}}
     if(id==='split')G.eb=G.eb.filter(b=>!b.dead);
     if(id==='wind'){const ph=Math.floor((G.dbar||0)/2)%2?1:-1;X.w=ph*42*k;P.y=clamp(P.y+X.w*dt,22,H-22);}
     if(id==='quickdash'&&P.dashCd>.36)P.dashCd=.36;
