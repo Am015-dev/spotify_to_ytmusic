@@ -43,9 +43,9 @@ const BPN={nodes:'SHIELD NODES',medic:'MEDIC LINK',emp:'ARMOUR PLATE',parry:'PAR
   grid:'LASER GRID',ghost:'MIRROR GHOST',gravity:'GRAVITY LANES',blackout:'BLACKOUT',zone:'SHRINKING RING'};
 const BPH={nodes:'SHOOT THE NODES',medic:'KILL THE MEDIC OR DASH THE LINK',emp:'EMP OR DASH-RAM THE PLATE',parry:'DASH TO PARRY THE ORB',back:'FLANK: GET ABOVE OR BELOW'};
 const BP_GATES=['nodes','medic','emp','parry','back'];
-const BPL=window.BPL={get on(){return!!RET.bossplay&&!!RET.bossmoves;},T:BPT,N:BPN,BREATH:10,OPEN:18,FB:12,FBW:.5,LEAK:.2,OPENE:14,EASYN:12,FLANK:.8,TEL:.8,GAP:96,auto:/[?&]bpauto=1/.test(location.search)?1.5:0,seed:null,
+const BPL=window.BPL={get on(){return!!RET.bossplay&&!!RET.bossmoves;},T:BPT,N:BPN,BREATH:10,OPEN:18,FB:7,FBW:9,LEAK:.25,LEAKH:.45,LEAKT:40,PT:{easy:0,normal:70,hard:95,vhard:95,legend:0},OPENE:14,EASYN:12,FLANK:.8,TEL:.8,GAP:96,auto:/[?&]bpauto=1/.test(location.search)?1.5:0,seed:null,
   st:null,hz:[]};
-BPL.fb=()=>BPL.FB;   /* W40: an ignored gate flickers after FB s for only FBW s (no silence), so a player who only dodges still wins, at about a third of the pace */
+BPL.fb=()=>BPL.FB;   /* W52: an ignored gate overloads by itself after FB=7 s and opens a FBW=9 s window (no silence); LEAK rises to LEAKH after LEAKT s shielded; PT = phase timeout (s, 0 = none) after which the shield stays open. Soft cap: a bot that only dodges still wins in about 1.4x the time (the armour floor is untouchable) */
 /* W40 tier: how many gates must be broken IN A ROW to open the boss, and how long it stays open. First bosses 1 gate / 14 s, district 5 three gates / 10 s */
 BPL.tier=()=>{const n=ST.on?ST.n:20;return n<=12?0:n<40?1:2;};
 BPL.chain=()=>[1,2,3][BPL.tier()];
@@ -55,7 +55,7 @@ BPL.stat=()=>BPL.st||(BPL.st={boss:null,seed:0,pick:[],order:[],seen:{},res:{},h
 NR.on('runStart',()=>{BPL.st=null;BPL.hz=[];});
 /* a small seeded generator per attempt (the attack order and the picks; the game's own random stays untouched) */
 BPL.rng=s=>{let a=s>>>0||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};};
-BPL.k=e=>{const b=e&&e.bp;if(!BPL.on||!b)return 1;if(e.b2&&e.b2.ls>0||e.bmS>e.bt)return 1;   /* the last stand and a bossmoves STUN are always open */return b.g&&b.g.open&&G.t<b.g.open?1:BPL.LEAK;};   // W40: outside the OPEN window (gate up, rising, between chained gates or phases) only LEAK of the damage gets through
+BPL.k=e=>{const b=e&&e.bp;if(!BPL.on||!b)return 1;if(e.b2&&e.b2.ls>0||e.bmS>e.bt)return 1;   /* the last stand and a bossmoves STUN are always open */if(b.g&&b.g.open&&G.t<b.g.open)return 1;const pt=BPL.PT[SET.diff]||0;if(pt&&G.t-(b.p0||0)>pt)return 1;return(b.sh||0)>BPL.LEAKT?BPL.LEAKH:BPL.LEAK;};   // W40: outside the OPEN window (gate up, rising, between chained gates or phases) only LEAK of the damage gets through
 /* called at the end of BMV.init (the movesets are set): the seed, the picks per phase, the shuffled order */
 BPL.init=e=>{e.bp=null;if(!BPL.on||!e.bm)return;const T=BPT[e.bm.id];if(!T)return;
   const seed=BPL.seed!=null?BPL.seed:(Math.random()*4294967295)>>>0,R=BPL.rng(seed),sig=e.bm.T.sig;
@@ -74,7 +74,7 @@ BPL.sheet=()=>{const c=BPL.codex(),ids=Object.keys(BPT).filter(id=>c[id]);if(!id
   const esc=s=>String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
   return'<h3>BOSS CODEX <span>'+ids.length+'/'+Object.keys(BPT).length+'</span></h3><div class="stParts">'+ids.map(id=>'<div><span>'+esc(c[id].nm)+'</span><em>'+c[id].m.map(m=>esc(BPN[m]||m)).join(' · ')+'</em></div>').join('')+'</div>';};
 /* a phase: its two mechanics (gates take turns; an arena rule runs the whole phase) */
-BPL.phase=(e,ph)=>{const b=e.bp;if(!b)return;const p=b.pick[ph-1]||b.pick[0];b.gs=p.filter(m=>BP_GATES.includes(m));if(!b.gs.length)b.gs=b.T.m.filter(m=>BP_GATES.includes(m)).slice(0,1);b.ch=0;   // chained gates take turns (W40)
+BPL.phase=(e,ph)=>{const b=e.bp;if(!b)return;b.p0=G.t;b.sh=0;const p=b.pick[ph-1]||b.pick[0];b.gs=p.filter(m=>BP_GATES.includes(m));if(!b.gs.length)b.gs=b.T.m.filter(m=>BP_GATES.includes(m)).slice(0,1);b.ch=0;   // chained gates take turns (W40)
   b.ar=p.find(m=>!BP_GATES.includes(m))||null;b.gi=0;b.arS={};
   const keep=b.g&&b.g.open>G.t?b.g.open:0;if(keep&&e.bm&&e.bmS>e.bt)e.bmS=e.bt;   /* a new phase ends the silence (its verbs run) but keeps the OPEN window the player earned */
   BPL.drop(e);BPL.hz=[];if(b.ar)BPL.seen(e,b.ar);BPL.gate(e,G.t+(ph===1?1.5:2*(BT.spb||.5)*4));if(keep)b.g.open=keep;
@@ -124,6 +124,7 @@ NR.on('tick',dt=>{if(!BPL.on)return;const e=G.boss;if(!e||!e.bp||e.dead){if(BPL.
       if(g.up&&BPL.auto&&t-g.tu>=BPL.auto)BPL.solve(e);
       if(g.up&&t-g.tu>=BPL.fb())BPL.resolve(e,'fb');}
     else if(g.open&&t>=g.open)BPL.gate(e,t);}
+  if(BPL.k(e)<1)b.sh=(b.sh||0)+dt;   // W52: shielded seconds in this phase
   BPL.arena(e,b,t,sb,dt);
   for(const z of BPL.hz)if(z.aim&&t>=z.on&&!z.done){z.done=1;const n=G.eb.length;eb.src=BPSRC;eb(z.x,z.y,Math.atan2(P.y-z.y,P.x-z.x),z.v,'#19e3ff',6);eb.src=null;if(G.eb.length>n){G.eb[n].bpl=1;s.eb++;}}
   BPL.hz=BPL.hz.filter(z=>t<z.off);

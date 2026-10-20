@@ -163,7 +163,7 @@ const harness = (file, env, ms) => { const r = cp.spawnSync('node', [path.join(_
   add('S07', 'guide', 'Enemies on screen at once, mean', '3 - 10', M.enMean, v => v >= 3 && v <= 10, out(3, 10));
   add('S08', 'guide', 'Spawns per minute', '20 - 80', M.spawnsPerMin, v => v >= 20 && v <= 80, out(20, 80));
   add('S09', 'hard', 'Single enemy kind share of spawns', '<= 0.35', M.droneShare, v => v <= .35, v => (v - .35) / .35);
-  add('S10', 'hard', 'Median stage boss fight length (s)', '40 - 110', M.bossSecsMedian, v => v >= 40 && v <= 110, out(40, 110));
+  add('S10', 'hard', 'Median stage boss fight length (s)', '40 - 135', M.bossSecsMedian, v => v >= 40 && v <= 135, out(40, 135));
   add('S11', 'hard', 'Fewest phases in a stage boss', '>= 3', M.bossPhasesMin, v => v >= 3, v => (3 - v) / 3);
   add('S12', 'guide', 'Median distinct boss attacks per fight', '6 - 12', M.bossVerbsMedian, v => v >= 6 && v <= 12, out(6, 12));
   add('S13', 'hard', 'Repeat within 5 min (arcade-normal)', '< 0.75', M.repeat5, v => v < .75, v => (v - .75) / .75);

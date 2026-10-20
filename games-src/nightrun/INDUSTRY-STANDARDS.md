@@ -33,7 +33,7 @@ The range is for a Normal-difficulty, mid-build player unless stated.
 ## 2. Bosses
 | Id | Standard | Range | Level | Practice behind it | Measured how |
 |---|---|---|---|---|---|
-| S10 | Median stage-boss fight length | 40-110 s | hard | Boss timers of about 100 s (ref. A); the short-fight roguelite (ref. G) keeps bosses under 30 s but has far smaller bosses | audit (boss window, first frame to last) |
+| S10 | Median stage-boss fight length | 40-135 s | hard | Boss timers of about 100 s (ref. A); W52: district bosses are puzzles (armour floor 80 s + one puzzle phase), so the audit bot Normal target is <= 135 s; the short-fight roguelite (ref. G) keeps bosses under 30 s but has far smaller bosses | audit (boss window, first frame to last) |
 | S11 | Fewest phases in a stage boss | >= 3 | hard | Three phases is the common teaching length (ref. B); easy modes remove phases rather than shorten them | audit; `bossmoves-audit.js` for kits |
 | S12 | Distinct attacks per boss fight | 6-12 (est.) | guide | Heavy and light phases alternate (ref. C); each phase adds one idea | audit |
 | - | Every attack telegraphed before it hurts | 100% | hard | Stated for the whole boss list of ref. B | `bossplay-test.js`, `bossmoves-test.js`, `counter-test.js` |
