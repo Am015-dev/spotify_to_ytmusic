@@ -110,7 +110,7 @@ const BOT = (opts) => {
       if (e.ty === 'boss' || e.ty === 'miniboss') { if (e.killed) (e.ty === 'boss' ? R.boss : R.mini).push({ n: r.n, s: e.on }); continue; }
       if (!e.killed) continue; R.kills++; if (e.unseen) R.unseen++;
       const t = e.ty + (e.el ? '*' : ''); (R.ty[t] = R.ty[t] || []).push(e.on);
-      if (e.ty !== 'swarm' && e.ty !== 'mine' && e.ty !== 'gate' && e.ty !== 'charger') { R.ns++; if (e.fired) R.nf++; }
+      if (e.ty !== 'swarm' && e.ty !== 'mine' && e.ty !== 'gate' && e.ty !== 'charger') { R.ns++; if (e.fired) R.nf++; if (process.env.DBGF) { const q = (R.dbg = R.dbg || {}); q[e.ty] = q[e.ty] || [0, 0]; q[e.ty][0]++; if (e.fired) q[e.ty][1]++; } }
     }
   }
   const T = { drone: 1.2, turret: 1.2, flank: 1.2, charger: 1.3, gunship: 2.5 };   // chargers are rushers: about 1.3 s glide + aim + dash (BALANCE.md)
@@ -126,6 +126,7 @@ const BOT = (opts) => {
     const minK = diff === 'easy' ? .75 : 1;
     if (build === 'late' && diff !== 'hard') {
       for (const t in T) { const a = R.ty[t]; if (a && a.length >= 3) line(med(a) >= T[t] * minK * (diff === 'easy' ? .9 / 1.2 / .75 * (t === 'gunship' ? 1.2 / 2.5 : 1) : 1), `${k} ${t} median on screen ${med(a).toFixed(2)} s >= ${(T[t] * minK * (diff === 'easy' ? .9 / 1.2 / .75 * (t === 'gunship' ? 1.2 / 2.5 : 1) : 1)).toFixed(2)}`); }
+      if (process.env.DBGF) console.log(k, JSON.stringify(R.dbg));
       line(R.nf / Math.max(1, R.ns) >= .7, `${k} ${(100 * R.nf / Math.max(1, R.ns)).toFixed(0)}% of shooters fired at least once (>= 70%)`);
       for (const b of R.mini) line(b.s >= 25, `${k} mini-boss stage ${b.n} fight ${b.s.toFixed(0)} s >= 25`);
       for (const b of R.boss) line(b.s >= (b.n === 42 || b.n === 40 ? 60 : 45), `${k} boss stage ${b.n} fight ${b.s.toFixed(0)} s >= ${b.n === 42 || b.n === 40 ? 60 : 45}`);

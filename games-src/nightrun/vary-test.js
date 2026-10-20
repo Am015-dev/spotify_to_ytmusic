@@ -17,7 +17,7 @@ const fp = () => new Promise(r => { const s = net.createServer(); s.listen(0, '1
 const SEED = `(()=>{let a=12345;Math.random=function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};window.__reseed=v=>{a=v;};})();`;
 
 const STATIC = () => {   // (a) + (b), inside the page
-  const out = [], ok = (c, m) => { if (!c) out.push(m); }, L = FM.L, ids = Object.keys(L), KINDS = ['drone', 'turret', 'charger', 'gunship', 'gate', 'flank', 'swarm', 'mine', ...ZOO.ID];
+  const out = [], ok = (c, m) => { if (!c) out.push(m); }, L = FM.L, ids = Object.keys(L), KINDS = ['drone', 'turret', 'charger', 'gunship', 'gate', 'flank', 'swarm', 'mine', 'gtank', 'gturret', 'gwalker', ...ZOO.ID];
   ok(ids.length >= 40, 'library has ' + ids.length + ' formations (< 40)');
   for (const id of ids) { const d = L[id]; ok(Array.isArray(d.tags) && d.tags.length && d.t >= 1 && d.cost > 0 && typeof d.tele === 'string' && d.gap >= 0 && d.kinds.every(k => KINDS.includes(k)), 'formation ' + id + ' lacks a declaration'); }
   const S = VARY.S, M = VARY.M, base = x => x.replace(/^~/, '').replace(/\+g$/, ''), set = n => new Set(S[n].m.filter(x => x !== '*').flatMap(x => base(x).split('|')));
