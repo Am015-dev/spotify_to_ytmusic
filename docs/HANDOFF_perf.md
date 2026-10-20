@@ -1,3 +1,10 @@
+## r18j (2026-10-20, alex/od-int2): Athens start pose + 5 seeded cars
+1. src/98bp_warmall.js: R17_off also moves the Athens start 40 m back on the same road (?r17ao=0 = old); R17_seed seeds 5 cars at 50-120 m (?r17n5=0 = 3 cars; finer slot grid, 14 m spacing).
+2. GO r17/start-life (src/99c7_rev5fix.js): top-left open >= 90 % in both cities, >= 3 cars in the frustum 40-120 m ahead.
+3. Measured (open %, cars in frustum), before -> after: ath 852x393 83,20 -> 95,23; ath 393x852 94,0 -> 95,5 (5 frames in; 2 after 90 frames as seeded cars drive off); fra 852x393 / 393x852 95,20 / 97,12 unchanged.
+4. Shots docs/shots/r18j/ (fra|ath _land|port _before|after). tools/perf1/tR17v.js CAND=[[d,dh,lat]] chose -40 m (96 % vs 83 % at 0).
+5. Left: portrait cars are tiny dots at 50-120 m; seeded ones leave the 120 m band in ~2 s.
+
 ## r17v (2026-10-20, alex/od-int2): Frankfurt start pose clears the top-left tower
 1. src/98bp_warmall.js R17_off (before R17_seed): Frankfurt spawn turned 180 deg on the same road and moved 40 m back along the new heading (spawn0 updated, camera snapped); ?r17turn=0&r17off=0 = old pose. +40/+60/+80 forward hit the side-challenge ring/card, -80 faces a blue tower, so they were rejected by shot.
 2. GO r17/start-life: top-left open >= 90 % (Athens >= 80 %) and >= 2 cars in the camera frustum 40-120 m ahead (R17_vis). tools/perf1/tR17v.js measures + shoots (CAND=[[d,dh,lat],..] pose search).
