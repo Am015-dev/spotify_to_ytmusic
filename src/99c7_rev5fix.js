@@ -756,3 +756,19 @@ updateCam=(f=>function(dt,snap){f.apply(this,arguments);try{
  const go=()=>{run().then(r=>goSay(r));return'📍 NO RAF ERROR · roaming 90 s…'};
  C.GO['bug/no-raf-error']=[{c:'fra',n:'no render-loop error (Frankfurt)',fn:go,secs:150},{c:'ath',n:'no render-loop error (Athens)',fn:go,secs:150}]}return}
  if(i<600)setTimeout(()=>R19A_reg(i+1),100)})(0);
+// ios-r20f: GO perf/ios-reveal (+ -ath). Boots the city in an iframe like an iPhone (touch, ?lowmem=1, ?rvl=1: 6x CDP CPU throttling from the curtain gate on, 98bp RVL) and reads the
+// first 3 s after the curtain lifts. Pass: 0 program links, no texture upload > 20 ms, and no stall: no frame gap > 2.5x the window's median gap and none > 1.5 s.
+// (SwiftShader at 6x renders every frame in 450-850 ms, so an absolute 100 ms line can't be met in the lab; a link or a chunk eval shows as a 2-10x gap.)
+(function R20F_reg(i){const C=window.__chk;if(C&&C.GO&&C.items){if(!C.items.some(q=>q.ver==='perf'&&q.id==='ios-reveal')){
+ C.items.push({ver:'perf',id:'ios-reveal',area:'perf',text:'ios-r20f · iPhone reveal: 📍 GO boots Frankfurt (then -ath) in a touch lowmem iframe with 6x CPU throttling and counts program links, uploads and stalls in the first 3 s after the curtain. Pass line: 0 links, no upload > 20 ms, no frame gap > 2.5x median or > 1.5 s (before r20f: fra 1 link + a 5.7 s gap at 2.9 s, the lazy chunk eval).'},
+  {ver:'perf',id:'ios-reveal-ath',area:'perf',text:'ios-r20f · iPhone reveal, Athens: same pass line as perf/ios-reveal.'});
+ const run=async c=>{const f=document.createElement('iframe');f.style.cssText='position:fixed;left:0;top:0;width:100vw;height:100vh;border:0;z-index:99999';f.src=location.pathname+'?test='+c+'&lowmem=1&rvl=1';document.body.appendChild(f);
+  try{const t0=performance.now();let R=null;while(performance.now()-t0<280000){await new Promise(r=>setTimeout(r,1000));try{R=f.contentWindow.RVL}catch(e){}if(R&&R.done)break}
+   if(!R||!R.done)return`📍 iOS REVEAL ${c} · no reveal window recorded in ${Math.round((performance.now()-t0)/1000)} s → ❌ FAIL`;
+   const F=R.fr,s=R.sum,g=F.map(q=>q.dt).sort((a,b)=>a-b),med=g[g.length>>1]||0,big=F.filter(q=>q.dt>100&&(q.dt>2.5*med||q.dt>1500)),tx=F.filter(q=>q.texMs>20).length;
+   const ok=s.link===0&&tx===0&&big.length===0;
+   return`📍 iOS REVEAL ${c} · 6x CPU, 3 s after reveal: ${s.frames} frames, ${s.link} program links (0), ${s.tex} tex uploads ${s.texMs} ms (${tx} > 20 ms, 0), ${s.buf} buffer uploads ${s.bufMs} ms · median gap ${Math.round(med)} ms, max ${s.maxDt} ms, stalls ${big.length} (0)${big.length?' '+big.map(q=>q.t+':'+Math.round(q.dt)).join(','):''} · curtain gate ${s.curtainMs} ms (chunks ${s.xcMs} ms) → ${ok?'✅ PASS':'❌ FAIL'}`}
+  catch(e){return`📍 iOS REVEAL · threw ${String(e&&e.message).slice(0,80)} → ❌ FAIL`}finally{f.remove();try{if(window.__cdp)await window.__cdp('Emulation.setCPUThrottlingRate',{rate:1})}catch(e){}}};
+ const go=c=>()=>{run(c).then(r=>goSay(r));return'📍 iOS REVEAL · booting '+c+' throttled…'};
+ C.GO['perf/ios-reveal']=[{c:'fra',n:'iPhone reveal (Frankfurt)',fn:go('fra'),secs:300}];C.GO['perf/ios-reveal-ath']=[{c:'ath',n:'iPhone reveal (Athens)',fn:go('ath'),secs:300}]}return}
+ if(i<600)setTimeout(()=>R20F_reg(i+1),100)})(0);
