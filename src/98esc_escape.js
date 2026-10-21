@@ -57,7 +57,7 @@ function ESC_unstick(dt){const E=ESC.E;
     if(i>=0&&ESC_far(H,i,RO.x,RO.z)<8&&(E.tp>=.25||span>=ESC.t1&&span-dt<ESC.t1)){E.tp=0;const D=ESC_depth(RO.x,RO.z,true);E.h=D.dir;
       if(D.depth>ESC.depth&&(span>=ESC.t1||ESC_boxed(RO.x,RO.z))){E.as=ESC.assist;E.done=1;ESC.cnt.assist++}}}
   if(E.as>0){E.as-=dt;if(E.h!=null){const e=angDiff(E.h,RO.h);RO.h+=clamp(e,-2.5*dt,2.5*dt);RO.vh=(RO.vh??RO.h)+angDiff(RO.h,RO.vh??RO.h)*Math.min(1,dt*8);if(Math.abs(e)<1.2&&RO.v<10)RO.v=Math.min(10,RO.v+30*dt)}}}
-function ESC_manual(){if(state!=='roam'||RO.sp||RO.wk||RO.frozen||RO.card)return false;const ok=ESC_lift('manual');say('',ok?'BACK ON THE ROAD':'ROAD BUSY, TRY AGAIN',1);return ok}
+function ESC_manual(){if(state!=='roam'||RO.sp||RO.wk||RO.frozen||RO.card)return false;const ok=ESC_lift('manual');say('',ok?'BACK ON THE ROAD':'ROAD BUSY, TRY AGAIN',1);if(typeof SKH_note==='function')SKH_note(ok?'BACK ON THE ROAD':'ROAD BUSY, TRY AGAIN');return ok}
 // any warp starts a new episode (no history carried across a teleport)
 if(typeof roamWarp==='function')roamWarp=(f=>function(){ESC_end();return f.apply(this,arguments)})(roamWarp);
 // touch + keyboard: #tU (top right). Hidden in races and on foot; keys U / R are handled in 40_hud_input_menu.js
