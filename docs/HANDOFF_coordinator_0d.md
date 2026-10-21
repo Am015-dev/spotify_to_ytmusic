@@ -9,3 +9,9 @@ Branch cleanup blocked by permission classifier (needs Alex's allow).
 - #22 tr9-chunk f1c4d23 PASS (deployable). #23 L2 smash e2e0557 FAIL flag-on: smash2/tap in core gives 0 bricks + car GAINS 28% speed at 20 km/h; 6x CPU smash chain max step 280 ms vs 146; looks like a red clump, no outward spray/studs. -> send back to L2 worker session_01UAb7bjravewPeYqhETsM1M when a slot frees.
 - Pending reviews: #21b L1 7a39dab, #24 L3 57d31cb (?cl=all life1/smash fail). Running: chk-headroom session_012uFTEC9x2nrU988cCJp5gU, traffic-brain plan session_01Dz6BTPsKAiwmGacMbnChXj.
 - Nit: spent TR9 steps stay in RFS.S.
+
+## 22:20 update (beta.147 live c7c071d8)
+- Alex is angry (16 h, nothing feelable). Promise: next deploys turn ON core+studs, then smash; no docs/cleanup lanes until playable.
+- #24 L3 57d31cb FAIL visual: trail invisible head-on (lost in yellow centre line). Fix: bigger raised gold studs with glint/bob, off centre line, readable at 50 m -> L3 worker session_01QUZuLoxtioWPD6ZyaPq5VX.
+- life1/smash fails with ?cl=core + (smash or studs): L1 owns it (moved spawn/traffic). Send with L1 budget trim (+3.6% calls/+11.6% tris -> <=2%/10%) to L1 worker session_01BvSGWevk9n5atCZWTwXrNL.
+- Running: chk-headroom (almost done), L2 smash fix.
