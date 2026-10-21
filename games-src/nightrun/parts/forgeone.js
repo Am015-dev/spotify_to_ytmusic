@@ -13,7 +13,7 @@ const FG2=window.FG2={tab:'w',sheet:null,sx:0,fl:null,prev:'ships',eqOnly:false}
 {const st=document.createElement('style');st.textContent=`
 #garage.f2{padding:8px 12px!important;gap:0!important}
 #garage.f2>:not(#gaCards){display:none!important}
-#gaCards.f2{display:flex!important;flex-direction:column;gap:8px;flex:1 1 0;min-height:0;overflow:hidden!important;font:14px var(--mono,monospace);color:#efeaff;position:static;width:100%;max-width:760px;margin:0 auto}
+#gaCards.f2{display:flex!important;flex-direction:column;gap:8px;flex:1 1 0;min-height:0;overflow:hidden!important;font:14px var(--mono,monospace);color:#efeaff;position:relative;width:100%;max-width:760px;margin:0 auto}
 #gaCards.f2 *{box-sizing:border-box}
 #gaCards.f2 button{font:700 14px var(--mono,monospace);color:#efeaff;min-height:44px;min-width:44px;border-radius:10px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #gaCards.f2 button[disabled]{cursor:not-allowed}
@@ -81,7 +81,7 @@ const FG2=window.FG2={tab:'w',sheet:null,sx:0,fl:null,prev:'ships',eqOnly:false}
 #gaCards.f2 .f2-pre .r{display:flex;gap:8px;align-items:center}
 #gaCards.f2 .f2-pre input{flex:1 1 auto;min-width:0;height:44px;font:14px var(--mono,monospace);background:#0b0820;color:#efeaff;border:1px solid #8c86b8;border-radius:10px;padding:0 8px}
 #gaCards.f2 .f2-pre small{color:#a9a3cf}
-#gaCards.f2 .f2-scrim{position:absolute;inset:0;z-index:40;background:rgba(5,3,12,.6);display:flex;align-items:flex-end;justify-content:center}
+#gaCards.f2 .f2-scrim{position:absolute;inset:0;z-index:40;overflow:hidden;background:rgba(5,3,12,.6);display:flex;align-items:flex-end;justify-content:center}
 #gaCards.f2 .f2-sheet{width:100%;max-width:760px;max-height:min(78%,560px);display:flex;flex-direction:column;gap:8px;padding:12px 16px 16px;border-radius:16px 16px 0 0;border:1px solid #5cecff;border-bottom:0;background:#120d2e;animation:f2up .2s ease-out}
 #gaCards.f2 .f2-sheet .hd{display:flex;gap:12px;align-items:center}
 #gaCards.f2 .f2-sheet .hd b{display:block;font-size:16px;color:#fff}

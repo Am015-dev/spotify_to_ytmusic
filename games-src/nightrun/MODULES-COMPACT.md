@@ -104,6 +104,6 @@ classes|18|pilot classes picked before a run|classes,classes
 saves|14|explicit, safe saving and save slots|saves,saves
 stamp|5|build stamp and update check|stamp,stamp
 polish|12|a calm, readable playfield: one telegraph style, ship on top|polish,polish
-hub|20|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
+hub|34|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
 c|34|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|6|Mainhattan Nightrun service worker (B30). Built by parts/bui|-
