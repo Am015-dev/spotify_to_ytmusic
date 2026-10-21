@@ -20,6 +20,8 @@ const OTG=[{id:'cp1',kind:'checkpoint',name:'Checkpoint Rush',d:'Fly through 6 h
 const OTG_GOAL={checkpoint:[22,27,34],longjump:[140,100,65],smash:[24,30,38],drift:[900,600,300],speed:[440,380,320],collect:[28,38,50],chase:[20,32,45]},OTG_HI={longjump:1,drift:1,speed:1},OTG_U={longjump:' m',drift:' pts',speed:' km/h',deliver:' crates'};
 // ---------- Side quests: characters around Mainhattan with their own little jobs (2K-style quests)
 const QV_RAMS=4;
+// quests-optin-r22q: ambient "?" side quests (spawner + saved ones) only run with ?quests=auto; by default quests start only when the player picks them
+const QV_AUTO=/[?&]quests=auto/.test(location.search);
 const QUESTS=[
  {id:'q_cider',kind:'deliver',npc:'Frau Schmitt',em:'🍎',col:'#36d17a',ch:1,name:'Ebbelwoi Express',
   hi:'Three crates of Ebbelwoi for the Römer festival! Drive <b>gently</b>: every hard bump smashes a crate.',win:'Wonderful! Not a single drop spilled. Well, almost.',lose:'Oh no… the pigeons will be very happy today.'},
@@ -432,8 +434,8 @@ function qvSpawn(){const G=qvGraph();if(!G||G.list.length<40)return false;const 
   for(let k=0;k<8;k++){if(near<9){const a=rng()*6.28,d=300+rng()*1500;i=qvNear(RO.x+Math.sin(a)*d,RO.z+Math.cos(a)*d,250)}else i=G.list[Math.floor(rng()*G.list.length)];if(i<0)continue;x=G.X[i];z=G.Z[i];if(qvEncOk(x,z))break;i=-1}if(i<0)return false;
   const cnt={};for(const m of live)cnt[m.ev.id]=(cnt[m.ev.id]||0)+1;const pool=QV_ENC.filter(t=>(cnt[t.id]||0)<2&&(t.k!=='photo'||(QV_PH[CID]||[]).some(n=>LM_BY[n]&&LM_BY[n].h)));let W=pool.reduce((a,t)=>a+t.w,0)*rng(),t=pool[0];for(const q of pool){W-=q.w;if(W<=0){t=q;break}}
   const e=G.off[i]<G.off[i+1]?G.nb[G.off[i]]:i;qvEncMark(t,x,z,Math.atan2(G.X[e]-x,G.Z[e]-z),(rng()*4e9)>>>0,0);qvEncSave();return true}
-function qvTick(dt){if(!RO.on)return;const t0=performance.now();if(HUB.nodes&&!(QV.g&&QV.g.N===HUB.nodes)){if(!QV.gi||QV.giN!==HUB.nodes){QV.gi=qvGraphGen(HUB.nodes);QV.giN=HUB.nodes}while(performance.now()-t0<3)if(QV.gi.next().done)break;QV.fr=(QV.fr||0)*.98+(performance.now()-t0)*.02;if(!QV.g||QV.g.N!==HUB.nodes)return}if(!QV.init){QV.init=1;const P=qvPos();for(const m of RO.marks){const q=m.ev&&P[m.ev.id];if(q&&(m.kind==='otg'||m.kind==='quest')&&!m.dyn)qvPlace(m,q[0],q[1],q[2])}qvEncLoad();qvSqInit()}
-  qvNavTick(dt);const now=QV.gt||0;if(!RO.ch&&!RO.sp&&now>QV.sp){const live=RO.marks.filter(m=>m.dyn);QV.sp=now+(live.length<8?.25:1.5);
+function qvTick(dt){if(!RO.on)return;const t0=performance.now();if(HUB.nodes&&!(QV.g&&QV.g.N===HUB.nodes)){if(!QV.gi||QV.giN!==HUB.nodes){QV.gi=qvGraphGen(HUB.nodes);QV.giN=HUB.nodes}while(performance.now()-t0<3)if(QV.gi.next().done)break;QV.fr=(QV.fr||0)*.98+(performance.now()-t0)*.02;if(!QV.g||QV.g.N!==HUB.nodes)return}if(!QV.init){QV.init=1;const P=qvPos();for(const m of RO.marks){const q=m.ev&&P[m.ev.id];if(q&&(m.kind==='otg'||m.kind==='quest')&&!m.dyn)qvPlace(m,q[0],q[1],q[2])}if(QV_AUTO)qvEncLoad();qvSqInit()}
+  qvNavTick(dt);const now=QV.gt||0;if(QV_AUTO&&!RO.ch&&!RO.sp&&now>QV.sp){const live=RO.marks.filter(m=>m.dyn);QV.sp=now+(live.length<8?.25:1.5);
     const nr=live.filter(m=>Math.hypot(m.x-RO.x,m.z-RO.z)<1900).length,keep=m=>RO.wp!==m&&!picks().includes(markKey(m));if(live.length<12)qvSpawn();else if(nr<5){let f=null,fd=2500;for(const m of live){const d=Math.hypot(m.x-RO.x,m.z-RO.z);if(d>fd&&keep(m)){fd=d;f=m}}if(f){qvEncDrop(f);qvSpawn()}}else{const old=live.find(m=>Date.now()-m.born>12*60e3&&Math.hypot(m.x-RO.x,m.z-RO.z)>900&&RO.wp!==m&&!picks().includes(markKey(m)));if(old)qvEncDrop(old)}}QV.fr=(QV.fr||0)*.98+(performance.now()-t0)*.02}
 {const a=$('#qRst'),b=$('#qAbn');if(a)a.onclick=e=>{e.stopPropagation();qvRestart()};if(b)b.onclick=e=>{e.stopPropagation();qvAbandon()}}
 // ---- story questlines: 3 per city, 3 parts each (stage chains with a speaker line per stage, a running joke and a payoff)
