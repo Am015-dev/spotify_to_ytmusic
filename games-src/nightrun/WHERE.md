@@ -10,7 +10,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | flavor | flavor watch 241-242 |  |  | ret-flavor |  |
 | foot | foot build 366-400 | a,footen | c | foot | BRIEF-FOOT |
 | footstage | footstage secOf 163-194 | footen |  | footstage | FOOT-ENEMIES |
-| streetlook | streetlook slHud 145-166 | map,footen |  | streetlook |  |
+| streetlook | streetlook slHud 133-154 | map,footen |  | streetlook | ASSET-POLICY |
 | leak | leak LEAK 14-136 |  | holdline | ret-leak |  |
 | zoo | zoo ZOO 14-253 |  |  | zoo |  |
 | vary,vary2 | formations fmSide 74-256 |  |  | vary |  |

@@ -5,6 +5,8 @@
 // Rules: standing character >= 22% of the field height; props <= 1.3 characters; grounded feet / prop bottoms within 3 px of the road line; every text and visible pickup inside the screen,
 // popups inside the field (an actor's own art may scroll in past the edge with its body); dead band between field and controls < 5% of the height; backdrop layers scroll at 3 distinct speeds; HUD boxes + pause pairwise apart; HUD text >= 12 px;
 // portrait view keeps >= 0.8 s of warning at 260 u/s; no page errors.
+// Behaviour (390x763, real touch events through CDP): stick right/left moves + mirrors Kai, walk back up to 35% of the view, auto-fire turns to a target behind, aim up-left,
+// every foot enemy faces Kai and mirrors, and a 40 s bot run draws no old still frame for any actor that has sheets.
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
@@ -26,7 +28,7 @@ const PROBE = async () => {
       if (/^prop-/.test(key)) R.prop.push({ fr, key, tag, x, h: b.b - b.t, bot: b.b, l: b.l, r: b.r, road: LK().road });
       else if (/^pk-/.test(key)) R.pk.push({ fr, l: b.l, r: b.r, t: b.t, b: b.b, a: c.globalAlpha });
       else if (e && !/^fx-|^wpn-/.test(key)) { const feet = css(c, x, y), S = FOOT.S, grounded = e === S.P ? e.onGround && e.y >= 469.5 : (!e.fly && !e.def.flyer && !e.def.fly && e.y >= 469.5);
-        R.act.push({ fr, key, hum: HUM.test(key) && !/crouch|die/.test(key) && !e.crouch && (e === S.P || e.h >= 58), h: b.b - b.t, feet: feet[1], grounded, road: LK().road, kai: e === S.P }); } } } catch (x_) {}
+        R.act.push({ fr, key, hum: HUM.test(key) && !/crouch|die/.test(key) && !e.crouch && !(sy && sy < .9) && (e === S.P || e.h >= 58), h: b.b - b.t, feet: feet[1], grounded, road: LK().road, kai: e === S.P }); } } } catch (x_) {}
     return r; };
   const ft = P2.fillText; P2.fillText = function (s, x, y, mw) { try { if (this.canvas === cv) { const t = this.getTransform(), k = cv.getBoundingClientRect().width / cv.width, sx = Math.hypot(t.a, t.b) * k, sy = Math.hypot(t.c, t.d) * k,
       fp = parseFloat(/(\d+(?:\.\d+)?)px/.exec(this.font)[1]), w0 = Math.min(this.measureText(String(s)).width, mw || 1e9), al = this.textAlign, bl = this.textBaseline,
@@ -60,7 +62,7 @@ const PROBE = async () => {
     await p.waitForFunction(() => __mnr.ART && __mnr.ART.anim('kai/run') && __mnr.ART.anim('prop-car/loop'), null, { timeout: 15000 }).catch(() => {});
     const m = await p.evaluate(PROBE); await ctx.close(); return m; };
   const measure = m => { const R = m.R, fh = m.box.h, ch = 64 * m.k * m.sc, o = {};
-    const hum = R.act.filter(a => a.hum); o.scale = hum.length ? Math.min(...hum.map(a => a.h / fh)) : 0; o.kai = Math.max(0, ...R.act.filter(a => a.kai && a.hum).map(a => a.h / fh));
+    const hum = R.act.filter(a => a.hum); o.scale = hum.length ? Math.min(...hum.map(a => a.h / fh)) : 0; o.minKey = hum.length ? hum.reduce((a, b) => b.h < a.h ? b : a).key : ''; o.kai = Math.max(0, ...R.act.filter(a => a.kai && a.hum).map(a => a.h / fh));
     o.props = R.prop.length ? Math.max(...R.prop.map(a => a.h / ch)) : 0; o.bprop = R.bp.length ? Math.max(...R.bp.map(a => a.h / ch)) : 0;
     const gr = R.act.filter(a => a.grounded && a.road); o.feet = gr.length ? Math.max(...gr.map(a => Math.abs(a.feet - a.road))) : 99; o.nFeet = gr.length;
     const gp = R.prop.filter(a => a.tag === 'prop'); o.propFeet = gp.length ? Math.max(...gp.map(a => Math.abs(a.bot - a.road))) : 0;
@@ -85,7 +87,7 @@ const PROBE = async () => {
       if (m.err) { ok(tag + ': street run opens', false, m.err); continue; } const o = measure(m), land = m.mode !== 'port';
       if (process.env.BEFORE) { const b0 = await run(w, h, '&streetlook=0'); if (!b0.err && !b0.box) console.log('BEFORE ' + tag + ' no box ' + Object.keys(b0)); if (!b0.err && b0.box) { const b = measure(b0); console.log('BEFORE ' + tag + ' actor/field ' + f2(b.scale) + ' kai ' + f2(b.kai) + ' props/char ' + f2(b.props) + ' feet ' + f2(b.feet) + ' band ' + f2(b.band) + ' txtOut ' + b.txtOut.length + ' pkOut ' + b.pkOut + ' popOut ' + b.popOut.length + ' hudOverlap ' + b.hudOv.length); } }
       console.log('AFTER  ' + tag + ' actor/field ' + f2(o.scale) + ' kai ' + f2(o.kai) + ' props/char ' + f2(o.props) + ' bprop ' + f2(o.bprop) + ' feet ' + f2(o.feet) + '(' + o.nFeet + ') propFeet ' + f2(o.propFeet) + ' band ' + f2(o.band) + ' speeds ' + JSON.stringify(o.speeds, (k, v) => typeof v === 'number' ? +v.toFixed(2) : v) + ' warn ' + f2(o.warn) + 's frames ' + m.frames);
-      ok(tag + ': standing characters >= 22% of the field height (min ' + f2(o.scale) + ')', o.scale >= .22, o.scale);
+      ok(tag + ': standing characters >= 22% of the field height (min ' + f2(o.scale) + ')', o.scale >= .22, [o.scale, o.minKey]);
       ok(tag + ': props <= 1.3 characters (max ' + f2(Math.max(o.props, o.bprop)) + ')', o.props > 0 && o.props <= 1.3 && o.bprop <= 1.3, [o.props, o.bprop]);
       ok(tag + ': grounded feet and prop bottoms within 3 px of the road line', o.nFeet > 20 && o.feet <= 3 && o.propFeet <= 3, [o.feet, o.nFeet, o.propFeet]);
       ok(tag + ': every text inside the screen, popups inside the field', !o.txtOut.length && !o.popOut.length, [o.txtOut.slice(0, 4), o.popOut.slice(0, 4)]);
@@ -94,6 +96,54 @@ const PROBE = async () => {
       ok(tag + ': backdrop scrolls at 3 distinct speeds (far < mid < near)', o.layers3, o.speeds);
       ok(tag + ': HUD boxes and pause pairwise apart, HUD text >= 12 px (' + f2(o.hudPx) + ')', !o.hudOv.length && o.hudPx >= 12, [o.hudOv, o.hudPx]);
       if (!land) ok(tag + ': >= 0.8 s warning at 260 u/s ahead of Kai (' + f2(o.warn) + ' s)', o.warn >= .8, o.warn); }
+    // ---- behaviour at 390x763 with REAL touch events (CDP): stick moves and mirrors Kai, auto-fire turns to a target behind, aim up-left, enemies face and mirror, walk back, no still frames
+    { const ctx = await br.newContext({ viewport: { width: 390, height: 763 }, hasTouch: true, isMobile: true });
+      await ctx.addInitScript(([s]) => { try { localStorage.clear(); localStorage.setItem('mnr_story', s); localStorage.setItem('mnr_tut', '2'); localStorage.setItem('mnr_foot', '{"seen":{"b":1,"a":1},"hint":1}'); } catch (e) {} }, [STORY]);
+      const p = await ctx.newPage(), cdp = await ctx.newCDPSession(p); p.on('pageerror', e => errs.push('behave ' + e.message));
+      await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && document.getElementById('moreBtn'), null, { timeout: 15000 }); await sleep(400);
+      await p.evaluate(() => { document.getElementById('moreBtn').click(); return new Promise(r => setTimeout(() => { document.getElementById('footBtn').click(); setTimeout(r, 400); }, 200)); });
+      // every on-foot sheet decoded before counting
+      await p.waitForFunction(() => { const A = __mnr.ART; return Object.keys(A.ANIM.s).filter(k => A.FM[k.split('/')[0]]).every(k => A.anim(k)); }, null, { timeout: 60000, polling: 300 }).catch(() => {});
+      await p.evaluate(() => { const A = __mnr.ART, fd = A.footDraw, da = A.drawAnim; window.__st = {}; window.__dr = 0;
+        A.footDraw = function (c, who, pose) { const r = fd.apply(this, arguments); if (!r && A.FM[who] && Object.keys(A.ANIM.s).some(k => k.startsWith(who + '/'))) __st[who + ':' + pose] = (__st[who + ':' + pose] || 0) + 1; else if (r) __dr++; return r; };
+        A.drawAnim = function (c, key, t, x, y, sc, flip) { const e = A.fE; if (e) e._tflip = !!flip; return da.apply(this, arguments); };
+        const S = FOOT.S; S.P.hp = S.P.max; FOOT.setAuto(true); FOOT.layout(); });
+      const stick = async (dx, dy, ms) => { const r = await p.evaluate(() => { const b = document.getElementById('fStick').getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2, b.width / 2]; });
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: r[0], y: r[1], id: 1 }] });
+        for (let i = 1; i <= 4; i++) { await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: r[0] + dx * r[2] * i / 4, y: r[1] + dy * r[2] * i / 4, id: 1 }] }); await sleep(30); }
+        await sleep(ms); const o = await p.evaluate(() => { const P = FOOT.S.P; return { x: P.x, f: P.facing, fl: P._tflip, aim: P.aim, cam: FOOT.S.camX, hi: FOOT.S._camHi, floor: FOOT.look.floor, vw: FOOT.hudInfo().vw }; });
+        await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }); await sleep(80); return o; };
+      const clear = () => p.evaluate(() => { const S = FOOT.S; S.E.length = 0; S.eb.length = 0; S.P.hp = S.P.max; S.P.inv = 9; for (const w of S.waves) w.done = true; S.lock = null; });
+      await clear(); const x0 = await p.evaluate(() => FOOT.S.P.x);
+      const R1 = await stick(.9, 0, 900); ok('touch: stick right runs Kai right, faces right, sprite not mirrored', R1.x > x0 + 80 && R1.f === 1 && R1.fl === false, [x0, R1]);
+      const R2 = await stick(-.9, 0, 700); ok('touch: stick left runs Kai left, faces left, sprite mirrored', R2.x < R1.x - 60 && R2.f === -1 && R2.fl === true, [R1.x, R2]);
+      // walk back: run right well into the stage, then hold left
+      await clear(); const R3 = await stick(.9, 0, 2500); await clear(); const R4 = await stick(-.9, 0, 2600);
+      ok('walk back: Kai retreats > 30% of the view and the camera eases back, never behind the floor (35% / checkpoint)', R4.x < R3.x - .3 * R4.vw && R4.cam < R4.hi - .15 * R4.vw && R4.cam >= R4.floor - 1 && R4.floor >= R4.hi - .35 * R4.vw - 1, [R3, R4]);
+      // auto-fire turns to a target behind
+      await clear(); await stick(.9, 0, 300); const AF = await p.evaluate(() => new Promise(r => { const S = FOOT.S, P = S.P; P.facing = 1; const e = FOOT.env.spawn('grunt', P.x - 120, 470); e.seen = 1; e.grace = 0; e.hp = 999; const s0 = S.shots;
+        setTimeout(() => r({ f: P.facing, fl: P._tflip, shots: S.shots - s0, aim: P.aim }), 700); }));
+      ok('auto-fire: a target only behind Kai turns him round (mirrored) and he shoots it', AF.f === -1 && AF.fl === true && AF.shots > 0 && Math.cos(AF.aim) < 0, AF);
+      // aim up-left with auto-fire on a target above-left
+      await clear(); const AU = await p.evaluate(() => { const S = FOOT.S, P = S.P; const e = FOOT.env.spawn('drone', P.x - 90, 300); e.seen = 1; e.grace = 0; e.hp = 999; return 1; });
+      const R5 = await stick(-.6, -.8, 700); ok('aim: stick up-left with auto-fire aims up-left, Kai faces left and stays mirrored', R5.f === -1 && R5.fl === true && R5.aim < -Math.PI / 2 - .2 && R5.aim > -Math.PI + .2, R5);
+      // enemies face Kai and mirror both ways
+      await clear(); const EF = await p.evaluate(async () => { const S = FOOT.S, P = S.P, sl = ms => new Promise(r => setTimeout(r, ms)), out = [];
+        for (const id of ['grunt', 'gunman', 'shield', 'knife', 'sniper', 'drone', 'turret', 'bruiser', 'mech', 'jetpack', 'hound', 'flamer', 'ninja', 'medic']) {
+          S.E.length = 0; S.eb.length = 0; P.inv = 9; P.hp = P.max; const vw = FOOT.hudInfo().vw; P.x = S.camX + vw * .3; let e; try { e = FOOT.env.spawn(id, S.camX + vw * .8, 470); } catch (x) { out.push(id + ':spawn'); continue; }
+          if (!e) { out.push(id + ':nospawn'); continue; } e.seen = 1; e.grace = 0; e.hp = 999; await sl(700); const a = [e.facing, e._tflip];
+          P.x = Math.min(S.camX + vw - 30, e.x + vw * .35); let b, mis = 0; for (let k = 0; k < 30; k++) { await sl(100); if (e._tflip !== (e.facing < 0)) mis++; const want = P.x > e.x ? 1 : -1; b = [e.facing, e._tflip, want]; if (b[0] === want && b[1] === (want < 0)) break; }   // up to 3 s: some turn on purpose slowly (mech turn delay, a knife mid-dash)
+          if (mis) out.push(id + ' drawn flip != facing x' + mis);
+          if (!(a[0] === -1 && a[1] === true && b[0] === b[2] && b[1] === (b[2] < 0))) out.push(id + ' ' + JSON.stringify([a, b, e.state, Math.round(e.x - S.camX), Math.round(P.x - S.camX), e.dead])); }
+        S.E.length = 0; return out; });
+      ok('enemies: every foot enemy faces Kai and mirrors when he moves to its other side (sheets face right; flip = facing left)', !EF.length, EF);
+      // 40 s bot run: no actor with sheets ever draws an old still / shape
+      await clear(); const ST = await p.evaluate(() => new Promise(r => { const S = FOOT.S, ids = ['grunt', 'gunman', 'shield', 'knife', 'sniper', 'drone', 'bruiser', 'mech', 'jetpack', 'hound', 'flamer', 'ninja', 'medic']; let n = 0; __st = {}; __dr = 0;
+        FOOT.ctl = (S_, I) => { for (const k in I) I[k] = 0; const P = S_.P; P.hp = P.max; n++; const ph = Math.floor(n / 90) % 6; I.fire = 1; if (ph === 0 || ph === 3) I.r = 1; else if (ph === 1) I.l = 1; else if (ph === 2) I.d = 1; else if (ph === 4 && n % 40 === 0) I.jumpP = I.jump = 1; else if (n % 50 === 0) I.meleeP = 1;
+          if (n % 120 === 1 && S_.E.filter(e => !e.dead).length < 5) { const e = FOOT.env.spawn(ids[(n / 120 | 0) % ids.length], S_.camX + FOOT.hudInfo().vw * .85, 470); if (e) e.seen = 1; } };
+        setTimeout(() => { FOOT.ctl = null; r({ st: __st, dr: __dr }); }, 40000); }));
+      ok('40 s bot run: no actor that has sheets draws an old still frame (' + ST.dr + ' sheet draws)', ST.dr > 2000 && !Object.keys(ST.st).length, ST.st);
+      await ctx.close(); }
     ok('no page errors', !errs.length, errs.slice(0, 5));
   } catch (e) { ok('test ran', false, e.stack); }
   await br.close(); srv.kill(); console.log(res.filter(x => x).length + '/' + res.length + ' passed'); process.exit(res.every(x => x) ? 0 : 1);

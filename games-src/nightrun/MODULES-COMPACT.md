@@ -21,7 +21,7 @@ up2|13|more to buy: 14 new pit-stop upgrades (8 in the pool from th|-
 perks2|2|fifteen more garage perks: STARTING KITS. An equipped kit gi|-
 strategy|19|STRATEGY: build paths, synergies, a heat budget, slot limits|-
 athens2|11|ATHINA must be Athens in every orientation|-
-art|30|painted art loading, ART.img/anim, sprite strips|sprites,sprites
+art|31|painted art loading, ART.img/anim, sprite strips|sprites,sprites
 ai|11|smarter enemies (the answer to "too easy with all the perks"|-
 meta|11|meta game: LOADOUT (equip / unequip / sell perks, limited sl|-
 ret|53|retention flags: arcade, daily, heat, grade, assist...|sprites,title,type+
@@ -32,7 +32,7 @@ footart|19|ON-FOOT ART: window.FA (the street stage's pictures). Inert |-
 footen|29|on-foot street stage enemies + boss library (W3). Pure data |-
 foot|61|on-foot street stage engine|foot,foot
 footstage|23|the finished on-foot stage (7 sections, Warden gate)|footstage,footstage
-streetlook|20|on-foot street look on phones: one world scale, portrait lay|streetlook,streetlook
+streetlook|19|on-foot street look on phones: one world scale, portrait lay|streetlook,streetlook
 leak|14|ground enemies, calmer pacing, escape penalty|leak,leak
 zoo|26|time to kill + eight new enemy kinds|zoo,zoo
 formations|34|formation library (VARIETY A)|vary,vary,vary2+
@@ -99,5 +99,6 @@ econfit|1|economy fit: hours to finish back to 9-13 h|econfit,econfit
 classes|18|pilot classes picked before a run|classes,classes
 saves|14|explicit, safe saving and save slots|saves,saves
 stamp|5|build stamp and update check|stamp,stamp
+polish|12|a calm, readable playfield: one telegraph style, ship on top|polish,polish
 c|34|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|6|Mainhattan Nightrun service worker (B30). Built by parts/bui|-
