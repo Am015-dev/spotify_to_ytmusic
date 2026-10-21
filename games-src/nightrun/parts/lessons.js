@@ -1,3 +1,6 @@
+// PURPOSE: short tactics lessons the first time a feature appears
+// FLAG: lessons (?lessons=0)
+// TEST: lessons-test.js
 /* ---------- LESSONS: tactics taught as MINI STAGES the first time a feature appears (owner, 20-21 Oct 2026: "better tutorials teaching tactics when they
    appear first time ... users can practice"; W63: "lessons must be mini stages, not plain text cards").
    Flag RET.lessons (default ON; ?lessons=0 = the old game: no lesson, no LESSONS button).

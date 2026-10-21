@@ -34,7 +34,7 @@ const F = [
   ['lab', '#hub_training', '[data-door="#labBtn"]', 'document.getElementById("title").hidden'],
   ['stats', '#hub_profile', '[data-door="#statsBtn"]', 'VIS("#stSheet")'],
   ['checklist', '#hub_profile', '[data-door=".ckB"]', 'VIS("#nrChk")'],
-  ['story log', '#hub_profile', '[data-door="#taleBtn"]', 'VIS("#taleLog")'],
+  ['story log', '#hub_profile', '.hubAct:nth-child(3)', 'VIS("#sgLog")||VIS("#taleLog")'],
   ['settings', '#hub_profile', '.hubAct:nth-child(4)', 'VIS("#setm")'],
   ['saves / export', '#hub_profile', '.hubAct:nth-child(5)', 'VIS("#setm")&&VIS("#svBox")&&VIS("#sioBox")&&Math.abs(document.getElementById("hubSG_da").getBoundingClientRect().top-document.getElementById("setBody").getBoundingClientRect().top)<40'],
   ['full screen', '#hub_profile', '[data-door="#fsBtn"]', 'true'],
@@ -45,7 +45,7 @@ const F = [
 ];
 /* the screen audit: main actions (MORE row, back arrow, cards, settings options aside), header, overlap */
 const AUD = (root) => {
-  const R = document.querySelector(root); if (!R) return { missing: 1 };
+  const R = [...document.querySelectorAll(root)].find(e => !e.hidden) || document.querySelector(root); if (!R) return { missing: 1 };
   const shown = e => { for (let x = e; x && x !== document.body; x = x.parentElement) { if (x.hidden) return false; const c = getComputedStyle(x); if (c.display === 'none' || c.visibility === 'hidden') return false; } const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; };
   const acts = [...R.querySelectorAll('button')].filter(b => shown(b) && b.classList.contains('go') && !b.closest('.tabs,.hubMore,.card,.seg,#setBody,.hubHd,.top,.bot,.sfoot,#svBox,#sioBox,#stampRow') && !b.classList.contains('hubSec') && !b.classList.contains('hubBk'));
   const tabs = [...R.querySelectorAll('.tabs button')].filter(b => shown(b) && !b.classList.contains('hubSec'));
@@ -72,10 +72,10 @@ const AUD = (root) => {
     // ---- HOME ----
     let p = await open(w, h);
     const home = await p.evaluate(() => { const ids = ['playBtn', 'hubStat', 'hub_missions', 'hub_hangar', 'hub_training', 'hub_profile'], r = {}; for (const i of ids) { const e = document.getElementById(i); r[i] = e && VIS('#' + i) ? e.getBoundingClientRect().toJSON() : null; }
-      const btn = [...document.querySelectorAll('#title button')].filter(b => { for (let x = b; x && x !== document.body; x = x.parentElement) { if (x.hidden) return false; const c = getComputedStyle(x); if (c.display === 'none' || c.visibility === 'hidden') return false; } const q = b.getBoundingClientRect(); return q.width > 0 && q.bottom > 0 && q.top < innerHeight; });
+      const btn = [...document.querySelectorAll('#title button')].filter(b => !b.closest('#hubStory')).filter(b => { for (let x = b; x && x !== document.body; x = x.parentElement) { if (x.hidden) return false; const c = getComputedStyle(x); if (c.display === 'none' || c.visibility === 'hidden') return false; } const q = b.getBoundingClientRect(); return q.width > 0 && q.bottom > 0 && q.top < innerHeight; });
       return { r, n: btn.length, names: btn.map(b => b.id), H: innerHeight, W: innerWidth, hub: document.documentElement.classList.contains('hub') }; });
     const R = home.r, all = Object.values(R).every(Boolean);
-    ok('HOME: PLAY + status strip + exactly 4 sections, nothing else to tap' + tag, home.hub && all && home.n === 5, JSON.stringify(home.names));
+    ok('HOME: PLAY + status strip + exactly 4 sections (+ the Story slot), nothing else to tap' + tag, home.hub && all && home.n === 5, JSON.stringify(home.names));
     const big = R.playBtn && R.hub_missions && R.playBtn.height >= R.hub_missions.height && R.playBtn.width > R.hub_missions.width * 1.4;
     ok('HOME: PLAY is the dominant button' + tag, big, JSON.stringify([R.playBtn, R.hub_missions]));
     const rs = Object.entries(R).filter(x => x[1]), ovl = [];
@@ -92,7 +92,7 @@ const AUD = (root) => {
     await p.context().close();
     if (w > 400 && w !== 763) continue;
     // ---- the other screens a section opens share the header ----
-    for (const [name, tile, door, root] of [['settings', '#hub_profile', '.hubAct:nth-child(4)', '#setm'], ['stage map', '#hub_missions', '[data-door="#storyBtn"]', '#stsel'], ['story log', '#hub_profile', '[data-door="#taleBtn"]', '#taleLog'], ['stats', '#hub_profile', '[data-door="#statsBtn"]', '#stSheet'], ['weapon pick', '#hub_hangar', '#hubWpPick', '#wpm']]) {
+    for (const [name, tile, door, root] of [['settings', '#hub_profile', '.hubAct:nth-child(4)', '#setm'], ['stage map', '#hub_missions', '[data-door="#storyBtn"]', '#stsel'], ['story log', '#hub_profile', '.hubAct:nth-child(3)', '#sgLog,#taleLog'], ['stats', '#hub_profile', '[data-door="#statsBtn"]', '#stSheet'], ['weapon pick', '#hub_hangar', '#hubWpPick', '#wpm']]) {
       p = await open(w, h); await tap(p, tile); await tap(p, tile === '#hub_hangar' ? door : tile + 'Scr ' + door); await sleep(300);
       if (root === '#stSheet') await p.evaluate(() => { const s = document.getElementById('stSheet'); s.scrollTop = 0; });
       const a = await p.evaluate(AUD, root);
@@ -143,7 +143,7 @@ const AUD = (root) => {
     const o = await p.evaluate(() => ({ hub: document.documentElement.classList.contains('hub'), grid: !!document.getElementById('hubGrid'), more: VIS('#moreBtn'), start: VIS('#startBtn'), ga: VIS('#gaBtn'), gaB: document.getElementById('gaBack').textContent, sec: !!document.getElementById('hub_missionsScr') }));
     ok('?hub=0: no hub, old title buttons visible, old garage BACK', !o.hub && !o.grid && o.more && o.start && o.ga && o.gaB === 'BACK' && !o.sec, JSON.stringify(o));
     await tap(p, '#moreBtn');
-    const ids = await p.evaluate(() => [...document.querySelectorAll('#mnMore button')].filter(b => b.id !== 'pwaBtn').map(b => b.id || b.className.split(' ').pop()).join(','));
+    const ids = await p.evaluate(() => [...document.querySelectorAll('#mnMore button')].filter(b => b.id !== 'pwaBtn').map(b => b.id === 'sgBtn' ? 'taleBtn' : b.id || b.className.split(' ').pop()).join(','));
     ok('?hub=0: MENU sheet as before', ids === 'storyBtn,wkBtn,wpBtn,labBtn,ckB,tutBtn,lsBtn,setBtn,diffBtn,fsBtn,footBtn,statsBtn,taleBtn,mnBack', ids);
     await p.context().close();
   }

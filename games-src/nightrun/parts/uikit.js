@@ -1,3 +1,6 @@
+// PURPOSE: painted UI kit: HUD plates and the hint bubble
+// FLAG: hint (?hint=0), hintdiet (?hintdiet=0)
+// TEST: hint-test.js
 /* ---------- painted UI kit (media/ui-*.webp): canvas HUD plates + the hint bubble. The DOM side (buttons, panels, rows, touch buttons) is CSS in head.html.
    Every image is decoded once (ART.load -> ImageBitmap) and drawn as a 9-slice with plain drawImage: no per-frame filters. Until it has decoded the old flat look is drawn. */
 const UIK={names:['ui-hud-bars','ui-hud-mult','ui-bubble','ui-bubble-tail'],

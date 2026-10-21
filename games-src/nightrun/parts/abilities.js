@@ -1,3 +1,6 @@
+// PURPOSE: DASH charges and EMP as abilities (beat bonus, refund)
+// FLAG: abil (?abil=0)
+// TEST: abil-test.js
 /* ---------- DASH + EMP abilities (flag RET.abil, ?abil=0 = the old dash and EMP exactly). b.js calls ABIL.dashIn() and ABIL.emp() where it read the keys.
    DASH: charges (3, 4 from LV3) that refill one at a time (1.7 s at LV1 .. 1.2 s at LV5), fires on the press in the move / last stick direction.
      On the beat it pays the old bonus (score, ON BEAT, tier +3) and refunds a fifth of a charge; off the beat it is a plain dash (no tier drop).
@@ -96,7 +99,7 @@ const ABIL=window.ABIL={get on(){return!!RET.abil;},
 {const st=document.createElement('style');st.textContent=`#touch button#bDash,#touch button#bEmp{min-width:48px;min-height:48px}
 #touch button#bDash::after,#touch button#bEmp::after{font-size:15px}
 #touch button.abRdy#bEmp{filter:drop-shadow(0 0 6px #ffb020)}#touch button.abRdy#bDash{filter:drop-shadow(0 0 5px #19e3ff)}`;document.head.appendChild(st);}
-ART.uiIcons=()=>{const q=[['dash','Dash'],['emp','Emp']].filter(k=>ART.rd&&ART.rd.has('ui-'+k[0]+'-icon.webp')),rg=[['R','ready'],['E','empty']].filter(k=>ART.rd&&ART.rd.has('fx-w34-ui-ring-'+k[1]+'.webp'));if(!q.length&&!rg.length||ART.uiDone)return;ART.uiDone=1;const st=document.createElement('style');
+ART.uiIcons=()=>{const q=[['dash','Dash'],['emp','Emp']].filter(k=>ART.rd&&ART.rd.has('ui-'+k[0]+'-icon.webp')),rg=[['R','ready'],['E','empty'],['C','charge']].filter(k=>ART.rd&&ART.rd.has('fx-w34-ui-ring-'+k[1]+'.webp'));if(!q.length&&!rg.length||ART.uiDone)return;ART.uiDone=1;const st=document.createElement('style');
   st.textContent=rg.map(k=>'#touch button.rg'+k[0]+'::after{background:center/100% 100% no-repeat url('+ART.base+'fx-w34-ui-ring-'+k[1]+'.webp);-webkit-mask:none;mask:none;mix-blend-mode:screen}').join('')+q.map(k=>'#touch button#b'+k[1]+'{background:center/62% no-repeat url('+ART.base+'ui-'+k[0]+'-icon.webp)}').join('');document.head.appendChild(st);};   // W34: real DASH / EMP icons, only when listed in ready.json
 if(ART.rd)ART.uiIcons();
 NR.on('tick',dt=>ABIL.tick(dt));

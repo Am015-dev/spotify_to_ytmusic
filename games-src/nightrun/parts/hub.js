@@ -1,3 +1,6 @@
+// PURPOSE: an organised home: PLAY + status + 4 sections (MISSIONS, HANGAR, TRAINING, PROFILE), one header everywhere, grouped settings
+// FLAG: hub (?hub=0)
+// TEST: hub-test.js
 /* ---------- HUB: an organised home (flag RET.hub, default ON; ?hub=0 = the title + MENU sheet exactly as before). Test: nightrun/hub-test.js.
    Gamer feedback (21 Oct 2026): "messy, very unorganized". HOME = one big PLAY (#playBtn, title.js), a status strip, a one-line next-step hint,
    a Story slot (RET.hubStory, story worker) and four sections: MISSIONS, HANGAR, TRAINING, PROFILE.
@@ -18,6 +21,7 @@ if(RET.hub)setTimeout(()=>{
 #hubStat b{color:#fff;font-weight:700}#hubStat .ok{color:#6cf59a}#hubStat .nI{width:1em;height:1em;vertical-align:-.12em}
 #hubHint{width:100%;box-sizing:border-box;text-align:center;font:600 14px/1.3 var(--mono);color:#ffe14d;background:#05030ce6;border-radius:8px;padding:5px 10px}
 #hubHint:empty,#hubStory:empty{display:none}
+#hubStory:has(>button){background:none;border:0;padding:0}
 #hubStory{width:100%;box-sizing:border-box;background:#05030ce6;border:1px solid #3a2b5c;border-radius:8px;padding:6px 10px;font:600 14px/1.3 var(--mono);color:#d6d2f5}
 #hubGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
 #hubGrid .go{position:relative;width:100%;min-height:56px;padding:.4em .4em;font-size:15px;letter-spacing:.08em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
@@ -42,7 +46,7 @@ if(RET.hub)setTimeout(()=>{
 .hub .pg .top .hubN,.hubHd .hubN{color:#ffe14d;font:700 15px var(--mono);white-space:nowrap}
 .hubHd{display:flex;align-items:center;gap:10px;min-height:48px;flex:0 0 auto;box-sizing:border-box;width:100%;background:linear-gradient(#05030c99,#05030c99),url(media/ui-topbar.webp) center/100% 100% no-repeat;padding:0 12px;border-radius:6px;position:sticky;top:0;z-index:2}
 .hubHd .ttl{flex:1 1 auto;font:700 18px var(--display);letter-spacing:.14em;color:var(--cyan)}
-.hub #taleLog>h2{display:none}
+.hub #taleLog>h2,.hub #sgLog>h2{display:none}
 .hub #garage .tabs{flex-wrap:wrap;row-gap:6px}.hub #garage .tabs .hubMoreL{flex:1 0 100%;font:700 13px var(--display);letter-spacing:.16em;color:var(--dim);border-top:1px solid #3a2b5c;padding-top:4px}
 .hub #garage .tabs button.hubSec{min-height:44px;font-size:13px;padding:0 .7em;flex:0 0 auto}
 .hub #wpm .top .ttl{flex:0 1 auto}.hub #wpm .top #wpSl{flex:1 1 auto;min-width:0;overflow:hidden;display:flex;gap:4px}
@@ -56,17 +60,18 @@ if(RET.hub)setTimeout(()=>{
 `;document.head.appendChild(st);
   const neon=()=>neonI+' '+GA.bank;
   const B=(cls,html,fn,id)=>{const b=document.createElement('button');b.type='button';b.className=cls;b.innerHTML=html;if(id)b.id=id;b.addEventListener('click',fn);return b;};
-  const old=sel=>sel.startsWith('.')?document.querySelector('#mnMore '+sel)||document.querySelector(sel):$(sel.replace(/^#/,''));
+  const old=sel=>sel.includes('|')?sel.split('|').map(x=>old(x)).find(Boolean):sel.startsWith('.')?document.querySelector('#mnMore '+sel)||document.querySelector(sel):$(sel.replace(/^#/,''));
   const press=sel=>{const b=old(sel);if(b&&!b.disabled)b.click();};
   /* ---- HOME ---- */
   const stat=document.createElement('div');stat.id='hubStat';stat.setAttribute('role','status');
   const hint=document.createElement('div');hint.id='hubHint';
-  const story=document.createElement('div');story.id='hubStory';   // data slot for the story worker: RET.hubStory('<b>...</b>')
+  const story=document.createElement('div');story.id='hubStory';story.dataset.hook='hub-story-slot';   // data slot for the story worker: RET.hubStory('<b>...</b>')
   RET.hubStory=h=>{story.innerHTML=h||'';};
   const grid=document.createElement('div');grid.id='hubGrid';
   const TILES=[['missions','MISSIONS','go alt'],['hangar','HANGAR','go'],['training','TRAINING','go dim'],['profile','PROFILE','go dim']],tile={};
   for(const [k,l,c] of TILES){const b=B(c,l+'<small></small><i class="hubDot" hidden></i>',()=>k==='hangar'?openHangar():openSec(k),'hub_'+k);tile[k]=b;grid.append(b);}
   $('playBtn').after(stat,hint,story,grid);
+  const sgIn=()=>{const t=$('sgTile');if(t&&t.parentNode!==story)story.append(t);};sgIn();setTimeout(sgIn,120);setTimeout(sgIn,1500);   // saga.js puts its STORY tile after #ttMain when it runs first
   /* ---- section sheets (inside #title, like the old MENU sheet) ---- */
   const SECS={
     missions:{t:'MISSIONS',a:[
@@ -84,7 +89,7 @@ if(RET.hub)setTimeout(()=>{
     profile:{t:'PROFILE',a:[
       ['STATS',()=>'records and achievements','#statsBtn'],
       ['CHECKLIST',()=>{const b=old('.ckB');const m=b&&/\((\d+)\)/.exec(b.textContent);return m?m[1]+' items to check':'owner test list';},'.ckB'],
-      ['STORY LOG',()=>'everything that happened so far','#taleBtn'],
+      ['STORY LOG',()=>'everything that happened so far','#sgBtn|#taleBtn'],
       ['SETTINGS',()=>'gameplay, display, audio, controls','#setBtn'],
       ['SAVES',()=>'save slots, export and import','#setBtn',0,0,'da']],
       more:[['FULL SCREEN: ',()=>{const b=$('fsBtn');return b?b.textContent.replace(/^FULL SCREEN:?\s*/i,''):'';},'#fsBtn',0,1],['UPDATE',()=>'','#setBtn',0,1,'da',1]],stamp:1}};
@@ -131,7 +136,7 @@ if(RET.hub)setTimeout(()=>{
     const bk=B('go alt hubBk','‹',back);bk.setAttribute('aria-label','Back');const t=document.createElement('span');t.className='ttl';t.textContent=title;const n=document.createElement('span');n.className='hubN';
     h.append(bk,t,n);el.prepend(h);new MutationObserver(()=>{n.innerHTML=neon();}).observe(el,{attributes:true,attributeFilter:['hidden']});n.innerHTML=neon();}
   hdr($('setm'),'SETTINGS',()=>closeSettings());
-  {const tl=$('taleLog');if(tl)hdr(tl,'STORY LOG',()=>{const b=$('taleBack');if(b)b.click();});}
+  {const tl=$('taleLog');if(tl)hdr(tl,'STORY LOG',()=>{const b=$('taleBack');if(b)b.click();});const sl=$('sgLog');if(sl)hdr(sl,'STORY LOG',()=>{const b=$('sgBack');if(b)b.click();});}
   {const ob=document.body;new MutationObserver(()=>{const s=$('stSheet');if(s&&!s.querySelector('.hubHd')){hdr(s,'STATS',()=>{const b=$('stsBack');if(b)b.click();else s.hidden=true;});}}).observe(ob,{childList:true});}
   /* ---- settings: five groups by CSS order (no node moves) + a jump row ---- */
   const GRP=[['gp','GAMEPLAY'],['dc','DISPLAY / COMFORT'],['au','AUDIO'],['ct','CONTROLS'],['da','DATA']],H3G={Gameplay:'gp',Controls:'ct',Rhythm:'ct',Audio:'au',Visuals:'dc',Accessibility:'dc',Assist:'dc','Save / Load':'da',Save:'da',BUILD:'da'};

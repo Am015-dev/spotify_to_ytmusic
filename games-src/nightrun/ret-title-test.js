@@ -17,7 +17,7 @@ const AUDIT = ({ root, minPx }) => {
   const shown = e => { for (let x = e; x && x !== document.body; x = x.parentElement) { if (x.hidden || !vis(x)) return false; } return true; };
   const inView = r => r.right > 0 && r.left < vp.w && r.bottom > 0 && r.top < vp.h;
   for (const e of R.querySelectorAll('button,[role=button]')) {
-    if (!shown(e)) continue; const r = e.getBoundingClientRect(); if (!inView(r)) continue; out.n++;
+    if (!shown(e) || e.id === 'sgTile') continue; const r = e.getBoundingClientRect(); if (!inView(r)) continue; out.n++;   // the STORY tile (saga.js) is content, not a title action
     const own = e.closest('.mapbox');   // map nodes may sit under the scroll edge: only count them when fully inside the map
     if (own) { const m = own.getBoundingClientRect(); if (r.left < m.left || r.right > m.right || r.top < m.top || r.bottom > m.bottom) continue; }
     if (r.width < 43.5 || r.height < 43.5) out.btn.push((e.id || e.className || e.tagName) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height));

@@ -1,4 +1,7 @@
-/* ---------- TALE: the adventure on top of the 40 stages (cast, story beats, dialogue card, STORY LOG timeline). Flag RET.tale (?tale=0 = off, exactly as before: no new UI).
+// PURPOSE: story cast, beats, dialogue card, STORY LOG
+// FLAG: tale (?tale=0)
+// TEST: tale-test.js
+/* ---------- TALE: the adventure on top of the 40 stages (cast, story beats, dialogue card, STORY LOG timeline). Flag RET.tale (?tale=0 = off, exactly as before: no new UI). With RET.story on (saga.js) its beats, plate preview and STORY LOG button stand down; TALE.show stays for the street run.
    The owner edits the text in the data table right below. Pictures: media/char-<id>.webp (256x256, see assets-manifest.json); until the file is real art the game draws a coloured badge with the initial.
    Hooks: the stage plate's PLAY (before-card), mapDetail() (one preview line on the stage plate), NR 'runEnd' {story,cleared} (unlock + after-scene), a STORY LOG button in the MENU (title.js builds #mnMore).
    Save: localStorage mnr_tale = {u:{beat:order unlocked},r:{beat:1 read in the log},b:{beat:1 before-card shown},n:counter}; it is in the save export list. ---------- */
@@ -149,13 +152,13 @@ if(RET.tale){
    for(const b of fresh)if(b.when==='after')lines.push(...b.lines);
    if(!lines.length||running||resEl.hidden)return false;
    return show(lines,st);}
- NR.on('runEnd',d=>{if(!d||!d.story||!d.cleared||d.story>MAIN)return;const fresh=unlock(d.story);if(!fresh.length||noSim)return;setTimeout(()=>scene(fresh),700);});
+ NR.on('runEnd',d=>{if(!d||!d.story||!d.cleared||d.story>MAIN)return;const fresh=unlock(d.story);if(!fresh.length||noSim||RET.story)return;setTimeout(()=>scene(fresh),700);});
  /* ----- before-card: PLAY on the stage plate, the first time (the title's PLAY / CONTINUE, NEXT STAGE and RETRY start at once, as before) ----- */
- stage.addEventListener('click',e=>{const bt=e.target.closest&&e.target.closest('#stPlay');if(!bt||bt.disabled||noSim||running||C.on)return;
+ stage.addEventListener('click',e=>{const bt=e.target.closest&&e.target.closest('#stPlay');if(!bt||bt.disabled||noSim||RET.story||running||C.on)return;
    const n=+$('stDet').dataset.n,b=beforeFor(n);if(!b||T.b[b.id]||!unlocked(n))return;
    e.stopPropagation();T.b[b.id]=1;sv();if(!show(b.lines.slice(),n,()=>startStory(n)))startStory(n);},true);
  /* ----- one preview line on the stage plate ----- */
- {const o=mapDetail;mapDetail=function(n){o(n);try{const el=$('stDet'),b=beforeFor(n);if(!el||el.hidden||!b||T.b[b.id]||!unlocked(n)||noSim)return;
+ {const o=mapDetail;mapDetail=function(n){o(n);try{const el=$('stDet'),b=beforeFor(n);if(!el||el.hidden||!b||T.b[b.id]||!unlocked(n)||noSim||RET.story)return;
    const l=b.lines[0],wo=whoOf(l.who,n),pv=document.createElement('div');pv.className='tpv';pv.id='talePv';pv.style.setProperty('--c',wo.c);
    const sp=document.createElement('span');const bb=document.createElement('b');bb.textContent=wo.n+': ';sp.append(bb,document.createTextNode(l.text.split(/(?<=[.!?])\s/)[0]));   // first sentence only; the line wraps instead of being cut
    pv.append(portrait(wo,'sm'),sp);const pl=$('stPlay');if(pl)pl.before(pv);}catch(e){}};}
@@ -190,7 +193,7 @@ if(RET.tale){
  function dots(){const n=unread();for(const id of['taleDot','taleDot0']){const e=$(id);if(e)e.hidden=!n;}const m=$('moreBtn');if(m){if(n)m.setAttribute('aria-label','MENU, new story');else m.removeAttribute('aria-label');}}
  function install(k){const mn=$('mnMore');
    if(!mn){if(k<40)setTimeout(()=>install(k+1),50);return;}
-   if($('taleBtn'))return;const grid=mn.querySelector('.mg');if(!grid)return;
+   if($('taleBtn')||RET.story)return;const grid=mn.querySelector('.mg');if(!grid)return;
    const b=document.createElement('button');b.type='button';b.className='go alt';b.id='taleBtn';b.innerHTML='STORY LOG<span class="tdot" id="taleDot" hidden></span>';
    b.addEventListener('click',()=>{if(!running)openLog();});grid.append(b);
    const m=$('moreBtn');if(m){const d=document.createElement('span');d.className='tdot';d.id='taleDot0';d.hidden=true;m.append(d);}
