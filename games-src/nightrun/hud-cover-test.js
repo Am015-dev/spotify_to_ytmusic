@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Nightrun HUD coverage test (scenario nr-hud-busy = the worst-case phone moment). Fast: ~1 min.
 //   NR_OUT=/tmp/nr.html python3 games-src/nightrun/parts/build.py && NODE_PATH=/opt/node-tools/node_modules node games-src/nightrun/hud-cover-test.js /tmp/nr.html
-//   env: SHOTS=dir (screenshots: hud on, and hud-diff mask)   VP=390x763 (one size)
+//   env: SHOTS=dir (screenshots: hud on, and hud-diff mask)   VP=390x763 (one size)   QUERY='&strip=1' (extra URL flags)
 // For each phone size (390x763, 375x553 portrait) it opens ?scn=nr-hud-busy, freezes the frame, renders it with and without the HUD and diffs the pixels:
 //   coverage   boxes round the HUD pixels (12 px apart = one box) cover <= 20% of the playfield
 //   band       no HUD pixel in the middle 60% of the height, except a 50 px disc round the ship
@@ -50,12 +50,12 @@ function inPage(mode) {   // runs in the page: freeze, render twice, diff
   const fps = document.getElementById('fpsEl'), fpsVisible = !!fps && !fps.hidden && getComputedStyle(fps).display !== 'none';
   const btns = ['bDash', 'bEmp', 'bPause'].map(id => { const e = document.getElementById(id), b = e && e.getBoundingClientRect(); return b ? { id, w: Math.round(b.width), h: Math.round(b.height), vis: b.width > 0 } : null; }).filter(Boolean);
   const dash = document.getElementById('bDash'), emp = document.getElementById('bEmp');
-  return { boxL: boxes.map(b => b.map(Math.round)), cov: covN / (cx * cy), band, bandCells: band, boxes: boxes.length, bad, fpsVisible, btns, hudText: texts.length, scroll: document.documentElement.scrollWidth > innerWidth + 1,
+  return { boxL: boxes.map(b => b.map(Math.round)), cov: covN / (cx * cy), band, bandCells: band, boxes: boxes.length, bad, fpsVisible, btns, hudText: texts.length, texts: texts.map(t => t.t + '@' + Math.round(t.x0) + ',' + Math.round(t.y)), scroll: document.documentElement.scrollWidth > innerWidth + 1,
     rings: !!dash && !!emp && getComputedStyle(dash, '::after').content !== 'none' && getComputedStyle(emp, '::after').content !== 'none', frame: [r.width, r.height], mask: Array.from(mask), cx, cy, rp: 540 };
 }
 
 (async () => {
-  const url = await gx.url('mainhattan-nightrun', { file: FILE, query: '?scn=nr-hud-busy' });
+  const url = await gx.url('mainhattan-nightrun', { file: FILE, query: '?scn=nr-hud-busy' + (process.env.QUERY || '') });
   const br = await PW.chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] }); let fails = 0; const rows = [];
   for (const [W, H, touch, kind] of VPS) {
     const ctx = await br.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1, hasTouch: !!touch, isMobile: !!touch, userAgent: touch ? UA : undefined });
@@ -68,6 +68,7 @@ function inPage(mode) {   // runs in the page: freeze, render twice, diff
     const mode = kind === 'phone' ? 'port' : 'land'; const sizeFail = [];
     if (SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); await p.screenshot({ path: path.join(SHOTS, `hud-${W}x${H}.png`) }); }
     const r = await p.evaluate(inPage, await p.evaluate(() => (window.__mnr.rotMode ? 'port' : 'land')));
+    if (process.env.TEXTS) console.log(W + 'x' + H, 'texts', JSON.stringify(r.texts || []));
     if (process.env.BOXES) console.log(W + 'x' + H, 'frame', r.frame.map(Math.round), 'boxes [x0,y0,x1,y1]', JSON.stringify(r.boxL));
     if (errs.length) sizeFail.push('page errors: ' + errs.slice(0, 2).join(' | '));
     if (kind === 'phone') {

@@ -25,7 +25,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
     await p.addInitScript(() => { try { localStorage.setItem('mnr_tut', '1'); } catch (e) { } });
     await p.goto(`http://127.0.0.1:${port}/index.html${q}`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr);
     await sleep(1200);
-    await p.click('#startBtn'); await p.waitForFunction(() => window.__mnr.running, null, { timeout: 5000 });
+    await p.click('#hub_missions'); await sleep(300); await p.click('#hub_missionsScr [data-door="#startBtn"]'); await p.waitForFunction(() => window.__mnr.running, null, { timeout: 5000 });
     if (wait) await p.waitForFunction(() => __mnr.BT.mode === 'file' && !__mnr.BT.pend && __mnr.AU.a.state === 'running', null, { timeout: 20000 });
     if (stub) await p.evaluate(() => { window.__sw = []; window.__st = []; const A = __mnr.AU; A.__sw = A.switchTo; A.switchTo = function (s) { window.__sw.push(s); }; A.__ss = A.startStage; A.startStage = function (s) { window.__st.push(s); }; });
     return { p, errs, ctx };
