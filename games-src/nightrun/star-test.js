@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// STAR chip gate (parts/abup.js, #bPwr): a tap on the star power-up chip trades the held power-up on touch and mouse, the hit box is >= 44 px, no page errors.
+// STAR chip gate (parts/abup.js, #bPwr): (old behaviour, ?pwrclear=0; the new one is pwrstar-test.js) a tap on the star power-up chip trades the held power-up on touch and mouse, the hit box is >= 44 px, no page errors.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/star-test.js
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
@@ -18,7 +18,7 @@ const READ = () => ({ n: window.ABIL.st().n, trades: window.__abup.stat.trade, h
   for (const [vw, vh, touch] of [[390, 763, 'touch'], [375, 553, 'touch'], [390, 763, 'mouse']]) {
     const ctx = await br.newContext({ viewport: { width: vw, height: vh }, hasTouch: true, isMobile: true }), p = await ctx.newPage(), tag = `${vw}x${vh} ${touch}`;
     p.on('pageerror', e => { if (errs++ < 3) console.log('PAGE ERROR', e.message); });
-    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&lessons=0`); await p.waitForFunction(() => window.__mnr && window.ABIL, null, { timeout: 10000 }).catch(() => { });
+    await p.goto(`http://127.0.0.1:${port}/index.html?sim=1&lessons=0&pwrclear=0`); await p.waitForFunction(() => window.__mnr && window.ABIL, null, { timeout: 10000 }).catch(() => { });
     const s = await p.evaluate(SETUP);
     line(!s.hidden && s.w >= 44 && s.h >= 44, `${tag}: star chip visible, ${Math.round(s.w)}x${Math.round(s.h)} px`);
     line(s.top, `${tag}: nothing covers the chip centre`);
