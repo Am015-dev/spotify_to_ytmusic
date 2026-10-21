@@ -676,10 +676,10 @@ function RP_scan(){const bld=[],tall=[],lane=[];(RO.ramps||[]).forEach((r,i)=>{c
 GO['art/props-road']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt brick pile':'Athens brick pile',fn:()=>window.__art?__art.propsRoad(goSay):'📍 art GO not loaded ❌'}));
  GO['art/fest-form']=[{c:'ath',n:'Festival Delivery',fn:()=>window.__art?__art.festForm(goSay):'📍 art GO not loaded ❌'}];
  GO['art/footsurf']=['fra','ath'].map(c=>({c,n:c==='fra'?'Frankfurt grass patch':'Athens grass patch',fn:()=>window.__art?__art.footSurf(goSay):'📍 art GO not loaded ❌'}));
- // chk-1: items without a GO get one from area/text (garage / Athens / Frankfurt roam)
+ // chk-1: items without a GO get one from area/text
  for(const it of OD_CHECKLIST){if(GO[k(it)])continue;const t=(it.text||'').toLowerCase();
   GO[k(it)]=[(it.area==='garage'||/^garage|garage →|rides →/.test(t))?{gar:1,n:'garage'}:/athens|syntagma|acropolis/.test(t)?{here:1,c:'ath',n:'Athens free roam'}:{here:1,c:'fra',n:'Frankfurt free roam'}]}
- const goI={},goSay=t=>{goI._t=t;window.__goLast=t;try{say('',t,2.2)}catch(e){}}; RV3A_rows(GO,goSay,OD_CHECKLIST);
+ const goI={},goSay=t=>{goI._t=t;window.__goLast=t;try{say('',t,2.2)}catch(e){}}; window.RV3A_rows&&RV3A_rows(GO,goSay,OD_CHECKLIST);
  const goCity=T=>T.gar?CID:T.c||(T.w&&((LDW_P.find(q=>q.model===T.w)||{}).city))||'fra';
  const goAt=T=>{if(T.w){const E=LDW.on.find(e=>e.id===T.w);return E&&{x:E.x,z:E.z}}
   if(T.p){let b=null,bd=1e18;for(const q of HUB.props||[]){if(q.t!==T.p||q.alive===false)continue;const d=(q.x-RO.x)**2+(q.z-RO.z)**2;if(d>900&&d<bd){bd=d;b=q}}return b&&{x:b.x,z:b.z}}

@@ -1,0 +1,5 @@
+- Cause: 99c_checklist.js:682 called RV3A_rows (lives in lazy chunk 99c3_rv2k3, not loaded on player pages until the panel opens) -> ReferenceError at boot.
+- Fix: guard `window.RV3A_rows&&RV3A_rows(...)`; panel open loads the GO chunks and re-renders, so rows still appear.
+- Added GO why/no-pageerr (fra+ath) in 99c3_rv2k3.js: fails if PS.err (98ps_session error listener) has any uncaught error since boot.
+- Measured: built page, player (non-test) boot + checklist open: 0 pageerrors; unit 0 FAIL; why/no-pageerr, life1, xf1, terrain pass in fra+ath except known xf1/grass; terr1/terrain-tyre-ath flaky (also fails on baseline build).
+- Left: no pre-fix repro captured on the old build; 99c_checklist.js is at 204.77 KB of 204.8 KB cap.
