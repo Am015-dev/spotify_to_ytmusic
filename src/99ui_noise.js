@@ -33,6 +33,7 @@ UIG.go=goSay=>{const U=UIG;
     say('','TOO SLOW · 100 km/h',1);const t5=S()==='TOO SLOW · 100 km/h';RO.ch=null;
     chk('quest coach + Ambush + objective say at 100 km/h show at once',t1&&t2&&t3&&t4&&t5&&U.q.length===q0&&U.shown===sh0)}
    {const q0=U.q.length,p0=U.pass;say('','PIN SET · TEST',1.2,{must:1});chk('PIN SET tagged at 100 km/h shows at once',document.querySelector('#sub').textContent==='PIN SET · TEST'&&U.q.length===q0&&U.pass===p0+1)}
+   {const q0=U.q.length,p0=U.pass;say('','NO ROAD HERE · TEST',1.2,{must:1});chk('PIN NO ROAD tagged at 100 km/h shows at once',document.querySelector('#sub').textContent==='NO ROAD HERE · TEST'&&U.q.length===q0&&U.pass===p0+1)}
    say('RESCUE','road busy');chk('essential shows at once',U.shown===sh0);
    RO.v=0;let n=0;for(let i=0;i<12;i++)U.step(.25);chk('queued shows after 1.5 s stopped',U.shown===sh0+1);
    for(let i=0;i<40;i++){U.T+=.5;say('NEXT '+i,'');}chk('second within 60 s blocked',U.shown===sh0+1);

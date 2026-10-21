@@ -316,15 +316,15 @@ function PIN_away(){if(SM_ON)return false;const p=PIN_S.cur;return !!(p&&CID==='
 // navigation point: the pin itself, or the DRIVE TO gate towards its district (chosen once per pin and load)
 function PIN_navPt(){const p=PIN_S.cur;if(!p)return null;if(!PIN_away())return p;if(!PIN_S.gate){let b=null,bd=1e18;for(const G of HUB.gates||[]){const d=Math.hypot(G.x-RO.x,G.z-RO.z)+Math.hypot(G.x-p.x,G.z-p.z)+(G.to===p.d?0:6000);if(d<bd){bd=d;b=G}}PIN_S.gate=b?{x:b.x,z:b.z,to:b.to,name:b.name,gate:1}:p}return PIN_S.gate}
 function PIN_dist(){const p=PIN_S.cur;if(!p)return 0;const t=PIN_navPt(),N=QV.nav,ex=t!==p?Math.hypot(t.x-p.x,t.z-p.z):0;if(N&&N.rem!=null&&Math.abs(N.tx-t.x)<1&&Math.abs(N.tz-t.z)<1)return N.rem+ex;return Math.hypot(t.x-RO.x,t.z-RO.z)+ex}
-function PIN_set(x,z,quiet){let d=null;if(CID==='ath'){const[e,n]=RW(x,z);d=athDistAt(e,n);if(!d){say('','OUTSIDE ATHENS · PIN A SPOT INSIDE A DISTRICT',1.6);return false}}
+function PIN_set(x,z,quiet){let d=null;if(CID==='ath'){const[e,n]=RW(x,z);d=athDistAt(e,n);if(!d){say('','OUTSIDE ATHENS · PIN A SPOT INSIDE A DISTRICT',1.6,{must:1});return false}}
   PIN_S.cur=PIN_mk(x,z,d);PIN_S.gate=null;PIN_S.log.set++;PIN_save();const busy=RO.ch||RO.sp;if(!busy){RO.wp=PIN_S.cur;QV.nav=null;try{qvNavTick(0)}catch(e){}}
   if(!quiet){AU.sfx('pick');say('',busy?'📍 PIN SET · GPS AFTER THE EVENT':('📍 PIN SET · '+qvKm(PIN_dist())+(PIN_away()?' · VIA DRIVE TO '+ATH_DIST[d].name:'')).toUpperCase(),1.6,{must:1})}
   PIN_ui();if(RO.mapOpen)drawRoamMap();return true}
-function PIN_clear(quiet){if(!PIN_S.cur)return false;if(RO.wp===PIN_S.cur){RO.wp=null;QV.nav=null}PIN_S.cur=null;PIN_S.gate=null;PIN_S.log.clr++;PIN_save();PIN_ui();if(PIN_S.mesh)PIN_S.mesh.visible=false;if(!quiet){say('','PIN CLEARED',1);AU.sfx('pick')}if(RO.mapOpen)drawRoamMap();return true}
+function PIN_clear(quiet){if(!PIN_S.cur)return false;if(RO.wp===PIN_S.cur){RO.wp=null;QV.nav=null}PIN_S.cur=null;PIN_S.gate=null;PIN_S.log.clr++;PIN_save();PIN_ui();if(PIN_S.mesh)PIN_S.mesh.visible=false;if(!quiet){say('','PIN CLEARED',1,{must:1});AU.sfx('pick')}if(RO.mapOpen)drawRoamMap();return true}
 function PIN_arrive(){PIN_S.log.arr++;hitPop('📍 ARRIVED','#ff3b5c');feed('📍 PIN REACHED',0,'#ff3b5c');AU.sfx('pick');PIN_clear(1)}
 // canvas px (map) -> snapped road point -> pin
 function PIN_tap(px,py){if(!RO.mapI)return false;const[wx,wz]=RO.mapI(px,py),R=clamp(36*DPR2()/(RO.mapSc||1),60,600),G=qvGraph(),i=G?qvNear(wx,wz,R):-1;let x,z;
-  if(i>=0){x=G.X[i];z=G.Z[i]}else{const q=rfSnap(wx,wz,R);if(q[0]===wx&&q[1]===wz){say('','NO ROAD HERE · TAP CLOSER TO A STREET',1.4);return false}x=q[0];z=q[1]}return PIN_set(x,z)}
+  if(i>=0){x=G.X[i];z=G.Z[i]}else{const q=rfSnap(wx,wz,R);if(q[0]===wx&&q[1]===wz){say('','NO ROAD HERE · TAP CLOSER TO A STREET',1.4,{must:1});return false}x=q[0];z=q[1]}return PIN_set(x,z)}
 function PIN_hit(px,py){const p=PIN_S.cur;if(!p||!RO.mapP)return false;const[x,y]=RO.mapP(p.x,p.z),k=DPR2();return Math.hypot(x-px,y-py)<20*k||Math.hypot(x-px,y-18*k-py)<20*k}
 function PIN_mapDraw(g,P,dpr,R0){const p=PIN_S.cur;if(!p)return;const[x,y]=P(p.x,p.z),r=Math.max(R0*.9,10*dpr);g.save();
   const t=PIN_navPt();if(t&&t!==p){const[gx,gy]=P(t.x,t.z);g.setLineDash([6*dpr,6*dpr]);g.strokeStyle='#ff3b5c';g.lineWidth=3*dpr;g.beginPath();g.moveTo(gx,gy);g.lineTo(x,y);g.stroke();g.setLineDash([])}
