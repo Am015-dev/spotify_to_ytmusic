@@ -134,7 +134,7 @@ function affordCount(){let n=0;for(const d of TP_DEF){const pr=tuneNext(d);if(pr
 {const tabs=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='tune';b.type='button';b.textContent='TUNE';tabs.prepend(b);b.addEventListener('click',()=>{GA.tab='tune';gaDraw();});}
 const gaItems0=gaItems;
 function perkIcon(d){let real=false;try{real=ART.isReal('kit-'+(d.uid||d.id));}catch(e){}return real?`<img class="ki" src="media/kit-${d.uid||d.id}.webp" alt="" decoding="async">`:svgI(d.ic);}      // kit perks have their own painted icon (a placeholder until the art is in, see ASSETS-NEEDED.md)
-function tuneDraw(){const box=$('gaCards');box.innerHTML='';box.classList.add('tune');const rec=recTune();
+function tuneDraw(tb){const box=tb||$('gaCards');if(!tb)box.innerHTML='';box.classList.add('tune');const rec=recTune();
   for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button'),p=pathOf(d.id);b.type='button';
     b.className='card'+(!pr?' max':GA.bank<pr?' no':'');b.style.setProperty('--c',!pr?'#8c86b8':d.c);b.dataset.id='tp_'+d.id;b.dataset.kind='tune';b.dataset.lvl=l;
     const bad=d.bad?`<div class="chips"><b class="bad">TRADE-OFF: ${d.bad(Math.min(d.max,l+1))}</b></div>`:'';

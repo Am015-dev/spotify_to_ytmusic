@@ -6,7 +6,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 
 | flag | key (file name L1-L2) | > wraps | < wrapped by | test | doc |
 |---|---|---|---|---|---|
-| sprites,title,type,oneMore*,arcade*,walls*,heat*,daily*,dpool*,layers*,sting*,trans*,grade*,saveio*,juice,assist,pwa,fever | ret (one `RET.x` line per flag, top of the file) |  | stamp,saves | ret | RETENTION |
+| sprites,title,type,oneMore*,arcade*,walls*,heat*,daily*,dpool*,layers*,sting*,trans*,grade*,saveio*,juice,assist,pwa,fever | ret (one `RET.x` line per flag, top of the file) |  | stamp,saves,hub | ret | RETENTION |
 | flavor | flavor watch 241-242 |  |  | ret-flavor |  |
 | foot | foot build 366-400 | a,footen | c | foot | BRIEF-FOOT |
 | footstage | footstage secOf 163-194 | footen |  | footstage | FOOT-ENEMIES |
@@ -41,12 +41,13 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | forge | forge FG 65-183 |  |  | forge |  |
 | forge | inventory INV.draw 54-112 |  |  | forge |  |
 | forgeui | forgeui FGU 20-117 |  |  | forgeui | ASSETS-NEEDED-3 |
+| forge2 | forgeone FG2 12-118 |  |  | forge2 |  |
 | counter | counter CTR 18-100 |  |  | counter |  |
 | timing | timing TIM 19-101 | draw |  | timing |  |
 | vis | visible VIS 12-21 |  |  | visible | BALANCE |
 | grit,gritBoss | grit GRIT 15-71 |  |  | grit | BALANCE |
 | density | density DENS 12-31 |  |  | density | BALANCE |
-| bossplay | bossplay BPL.target 131-161 | a |  | bossplay |  |
+| bossplay,bossfit | bossplay BPL.target 144-176 | a |  | bossplay |  |
 | rules | rules BT0 54-177 |  |  | rules |  |
 | novelty | novelty NOV 14-90 |  |  | novelty | ASSETS-NEEDED-2 |
 | anticamp | anticamp AC 15-80 |  |  | anticamp |  |
@@ -54,9 +55,10 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | pacing | pacing PAC 15-65 |  |  | pacing |  |
 | bite | bite BITE 13-19 |  |  |  |  |
 | flankers | flankers ebRoom 67-73 |  |  | flankers |  |
-| foeart | foeart FOEART 42-82 |  |  | foeart | ASSETS-NEEDED-ENEMIES |
+| foeart | foeart FOEART 45-85 |  |  | foeart | ASSETS-NEEDED-ENEMIES |
 | fleet,fleetArr! | fleet FLEET 21-222 |  |  | fleet |  |
 | endramp | endramp ENDR 15-55 |  |  | endramp |  |
+| legend,easy2 | legend LEG 18-59 |  |  | legend |  |
 | deck,roster,songspread | fun FUN 14-77 | footen |  | fun |  |
 | lessons | lessons lsTick 156-178 |  |  | lessons |  |
 | story | saga |  |  | story |  |
@@ -66,10 +68,13 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | powers | arsenal PWX.tip 90-157 | footen |  | powers | ASSETS-NEEDED-3 |
 | abup | abup ABUP 23-77 |  |  | abup | ASSETS-NEEDED-3 |
 | econfit | econfit ECF.apply 11-12 |  |  |  |  |
+| comfort* | comfort COM 14-78 |  |  | comfort |  |
 | classes | classes clsSvg 106-108 |  |  | classes | ASSETS-NEEDED-3 |
 | saves | saves saveSlot 55-60 | ret |  | saves |  |
 | stamp | stamp RET.stampX 10-44 | ret |  | stamp |  |
 | polish | polish POL.flush 78-105 |  |  | polish |  |
+| hub,garagefix | hub gfPatchAll 288-301 | ret |  | hub |  |
+| school | school footEnd 107-121 |  |  | school |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.
 

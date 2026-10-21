@@ -166,8 +166,8 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
 /* ---------- menus, settings, flow ---------- */
 const titleEl=$('title'),overEl=$('over'),pauseEl=$('pausem'),setEl=$('setm');
 const HUDLOG={frame:0};
-function showBest(){$('bestT').innerHTML=(best.score?`Best run <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`:'No runs logged yet')
-  +` &nbsp;·&nbsp; Daily <strong>${dailyBest.score?dailyBest.score.toLocaleString('de-DE'):'—'}</strong>`;if(window.RET&&RET.dailyShow)RET.dailyShow();}
+function showBest(){$('bestT').innerHTML=(best.score?`Best run <strong>${window.fmtN(best.score)}</strong> · ${best.dist}`:'No runs logged yet')
+  +` &nbsp;·&nbsp; Daily <strong>${dailyBest.score?window.fmtN(dailyBest.score):'—'}</strong>`;if(window.RET&&RET.dailyShow)RET.dailyShow();}
 showBest();
 function syncUI(){$('touch').hidden=!(running&&touchUI&&!paused&&!SH.active);}
 /* ---------- settings (one card, Overdrive's look): the schema drives the rows; every change is saved and applied live ---------- */
@@ -242,8 +242,8 @@ function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false
   else if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;
-  $('oScore').textContent=G.score.toLocaleString('de-DE');$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
-  $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${dailyBest.score.toLocaleString('de-DE')}</strong>`:`Best <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`;
+  $('oScore').textContent=window.fmtN(G.score);$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
+  $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${window.fmtN(dailyBest.score)}</strong>`:`Best <strong>${window.fmtN(best.score)}</strong> · ${best.dist}`;
   overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);showBest();
   G.over=true;lastDaily=G.daily;lastWeekly=!!G.weekly;}
 let lastDaily=false,lastWeekly=false;

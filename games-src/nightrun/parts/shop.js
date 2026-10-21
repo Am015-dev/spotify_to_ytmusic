@@ -62,9 +62,9 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
   draw(){const box=$('shCards');box.innerHTML='';
     this.cards.forEach((c,i)=>{const u=c.u,pr=this.price(u),b=document.createElement('button');b.type='button';
       b.className='card'+(c.sold?' sold':this.neon<pr?' no':'');b.style.setProperty('--c',u.c);b.dataset.id=u.id;
-      b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}</div><div class="t">${u.t}</div></div><div class="pr">${c.sold?'FITTED':neonI+' '+pr}</div>`;
+      b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}</div><div class="t">${u.t}</div></div><div class="pr">${c.sold?'FITTED':neonI+' '+window.fmtN(pr)}</div>`;
       b.addEventListener('click',()=>this.buy(i));box.appendChild(b);});
-    $('shN').textContent=this.neon;$('shRe').innerHTML='REROLL '+neonI+' '+this.rerollPrice();$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
+    $('shN').textContent=window.fmtN(this.neon);$('shRe').innerHTML='REROLL '+neonI+' '+window.fmtN(this.rerollPrice());$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
     $('shGo').textContent=this.picks?'GO':'SKIP';
     $('shOwn').innerHTML=this.order.length?this.order.map(id=>{const u=UBY[id];return `<span style="--c:${u.c}">${svgI(u.ic)}${this.n(id)>1?'×'+this.n(id):''}</span>`;}).join(''):'<span style="color:var(--dim)">No upgrades yet</span>';},
   // ----- during the run -----
