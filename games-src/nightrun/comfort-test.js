@@ -191,8 +191,8 @@ if (require.main === module) (async () => {
   // 5. settings: defaults, persistence, live apply, calm mode, reduced motion
   {
     const url = await U('&sim=1'), { ctx, p, errs } = await page(br, url, 390, 763, true);
-    const d = await p.evaluate(() => { const m = __mnr; return { flash: m.SET.flash, shake: m.SET.shake, glow: m.SET.glow, scan: m.SET.scan, txt: m.SET.txt, cbp: m.SET.cbp, hc: m.SET.hc, on: m.RET.comfort, h3: [...document.querySelectorAll('#setBody h3')].map(e => e.textContent), grp: [...document.querySelectorAll('#setBody [data-k]')].map(e => e.dataset.k) }; });
-    ok('default: comfort on, flash Reduced, shake Low, glow Low, scan on, text normal, palette off', d.on && d.flash === 1 && d.shake === 1 && d.glow === 1 && d.scan === true && d.txt === 'normal' && d.cbp === 'off', JSON.stringify(d));
+    const d = await p.evaluate(() => { const m = __mnr; return { flash: m.SET.flash, reduce: m.SET.reduce, shake: m.SET.shake, glow: m.SET.glow, scan: m.SET.scan, txt: m.SET.txt, cbp: m.SET.cbp, hc: m.SET.hc, on: m.RET.comfort, h3: [...document.querySelectorAll('#setBody h3')].map(e => e.textContent), grp: [...document.querySelectorAll('#setBody [data-k]')].map(e => e.dataset.k) }; });
+    ok('default: comfort on, flash Full (capped), shake Low, glow Low, scan on, text normal, palette off, SET.reduce off (gameplay juice unchanged)', d.on && d.flash === 2 && d.reduce === false && d.shake === 1 && d.glow === 1 && d.scan === true && d.txt === 'normal' && d.cbp === 'off', JSON.stringify(d));
     ok('Settings has the Comfort group with all 8 rows + Calm mode', d.h3.includes('Comfort') && ['flash', 'shake', 'glow', 'scan', 'txt', 'hc', 'cbp', 'rm', 'calmm'].every(k => d.grp.includes(k)), d.h3.join(','));
     const live = await p.evaluate(() => {
       const m = __mnr, o = {}; m.startStory(2); m.simOn(true); for (let i = 0; i < 40; i++) m.step(1 / 60); const C = window.COM;

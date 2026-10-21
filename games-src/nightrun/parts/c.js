@@ -79,7 +79,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   ctx.textAlign='left';ctx.font=`700 ${19*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(sc,pad,19*k);
   const sw=ctx.measureText(sc).width;ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle=D.b;ctx.fillText(mu,pad+sw+8*k,18*k);
   {const col=TIERC[T-1],bx=pad+30*k,bw=Math.min(180*k,w*.36),sg=(bw-3*3*k)/TIERS,by=25*k,bh=6*k;
-    ctx.font=`700 ${13*k}px "Chakra Petch",sans-serif`;ctx.fillStyle=col;ctx.fillText('×'+T,pad,32*k);
+    ctx.font=`700 ${13*k}px "Chakra Petch",sans-serif`;ctx.fillStyle=col;ctx.fillText('×'+T,pad,32*k+(window.COM?COM.hy():0));
     for(let i=0;i<TIERS;i++){const f=i<T-1?1:i===T-1?(T===TIERS?1:(C.n-(T-1)*TS)/TS):0,x=bx+i*(sg+3*k);ctx.fillStyle='#ffffff1c';ctx.fillRect(x,by,sg,bh);ctx.fillStyle=TIERC[i];ctx.fillRect(x,by,sg*f,bh);
       if(i===T-1&&T===TIERS){ctx.globalAlpha=.3+.4*PUL;ctx.fillStyle='#fff';ctx.fillRect(x,by,sg,bh);ctx.globalAlpha=1;}}
     if(C.n>0){const left=clamp(1-(G.bc-C.lb+PHF)/(8+SH.ck),0,1);ctx.fillStyle='#ffffff22';ctx.fillRect(bx,by+bh+2*k,bw,2*k);ctx.fillStyle=col;ctx.fillRect(bx,by+bh+2*k,bw*left,2*k);}}

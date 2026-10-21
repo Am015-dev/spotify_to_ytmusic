@@ -1,3 +1,6 @@
+// PURPOSE: eye strain pass: flash/glitch rate and alpha caps, shake caps, glow/scan lines, text floors, Comfort settings, colour-blind remap
+// FLAG: RET.comfort (?comfort=0)
+// TEST: comfort-test.js
 /* ---------- comfort.js: eye strain (owner, 21 Oct 2026, real gamer feedback "EYE STRAIN"). Flag RET.comfort, default ON; ?comfort=0 = the old look and feel.
    Test: nightrun/comfort-test.js (flashes, contrast, caps, text size, settings). Only global effect parameters live here; hitboxes, timing, armour.js and hard.js are untouched.
    FLASH   the full-screen flash (G.flash) and glitch (G.glitch) may start at most 3 times a second and their overlay alpha is capped (Full .10, Reduced .05, Off 0): under the
@@ -36,6 +39,7 @@ const COM=window.COM={
     if(hu>=95&&hu<=175)hu=210;else if(hu>=335||hu<=22){hu=32;if(SET.cbp==='prot')l=Math.min(.78,l+.12);}else return c;   // greens -> blue, reds -> orange (protanopia: reds are dark, lift them)
     const q=(1-Math.abs(2*l-1))*s,x=q*(1-Math.abs((hu/60)%2-1)),m=l-q/2,[r,g,b]=hu<60?[q,x,0]:hu<120?[x,q,0]:hu<180?[0,q,x]:hu<240?[0,x,q]:hu<300?[x,0,q]:[q,0,x];
     const hx=v=>Math.round((v+m)*255).toString(16).padStart(2,'0');return '#'+hx(r)+hx(g)+hx(b)+al;},
+  hy(){return this.on()&&this.phone?3:0;},                                                        // the x-tier label drops 3 px when its font is raised to 14
   cbOn:false,
   cbApply(){const on=SET.cbp==='deut'||SET.cbp==='prot';if(on===this.cbOn){this.cbc&&this.cbc.clear();return;}this.cbOn=on;const P=CanvasRenderingContext2D.prototype,me=this;
     for(const p of ['fillStyle','strokeStyle','shadowColor']){if(on){const d=Object.getOwnPropertyDescriptor(P,p);(me.cbd||(me.cbd={}))[p]=d;
@@ -71,10 +75,10 @@ const COM=window.COM={
     else if(k in this.CALM||k==='txt'||k==='cbp'||k==='hc'){if(SET.calmm){SET.calmm=false;delete SET.calmBk;}}},
   apply(){if(!this.on())return;this.cbApply();this.css();document.documentElement.classList.toggle('cmf',true);document.documentElement.classList.toggle('cmf-tl',SET.txt==='large');}
 };
-/* defaults (Defaults button: Object.assign(SET,DEFS)); existing saves are moved to the gentle levels once (SET.cv) */
-Object.assign(DEFS,{flash:RET.comfort?1:DEFS.flash,shake:RET.comfort?1:DEFS.shake,glow:RET.comfort?1:2,scan:true,txt:'normal',cbp:'off',calmm:false});
+/* defaults (Defaults button: Object.assign(SET,DEFS)); existing saves get Low shake once (SET.cv). Flash stays Full by default (a lower level turns SET.reduce on, which switches gameplay juice and rules off): Full is capped by itself */
+Object.assign(DEFS,{shake:RET.comfort?1:DEFS.shake,glow:RET.comfort?1:2,scan:true,txt:'normal',cbp:'off',calmm:false});
 if(RET.comfort){for(const k of['glow','scan','txt','cbp','calmm'])if(SET[k]===undefined)SET[k]=DEFS[k];
-  if(!SET.cv){SET.cv=1;SET.flash=Math.min(SET.flash,1);SET.shake=Math.min(SET.shake,1);}
+  if(!SET.cv){SET.cv=1;SET.shake=Math.min(SET.shake,1);}
   if(SET.rm===undefined)SET.rm=RM;deriveSet();}
 COM.fontHook();
 {const de=drawEnemy;drawEnemy=function(e,t){   // every ordinary enemy sits on a soft light halo (the existing glow sprite, pale, 30% before the glow setting): a dark hull stays readable on the dark city
@@ -87,6 +91,6 @@ const BK=window.BK=(t,n)=>Math.floor(t*(RET.comfort?Math.min(n,6):n))%2;
 /* the stylesheet pass needs every module's CSS to exist: after load, then again once the fonts are in */
 if(RET.comfort){document.documentElement.classList.add('cmf');
   const st=document.createElement('style');st.id='cmfCss';st.textContent='html.cmf{--dim:#b9b4e4}html.cmf .stat,html.cmf .keys{color:#c4bfea}'   // dim text 4.5:1 on the panels
-    +'html.cmf #taleList .tx,html.cmf #lsC .ln{line-height:1.5;max-width:62ch}html.cmf #taleList .tx div+div{margin-top:5px}';   // story / lesson cards: at most ~62 characters a line, airier lines
+    +'html.cmf #taleList .tx,html.cmf #lsC .ln{line-height:1.5;max-width:62ch}html.cmf #taleList .tx div+div{margin-top:5px}html.cmf .pg .card .bt button{letter-spacing:.05em;padding-left:.55em;padding-right:.55em}html.cmf .pg .presets .pst{letter-spacing:.03em}';   // story / lesson cards: at most ~62 characters a line, airier lines
 document.head.appendChild(st);
   addEventListener('load',()=>{COM.apply();setTimeout(()=>COM.apply(),1500);});}
