@@ -97,9 +97,9 @@ RET.st=(function(on){
   NR.on('kill',d=>{if(!on||!live())return;if(d&&d.boss)S().bosses++;else S().kills++;mark();});
   /* on-foot STREET RUN (foot.js events, read defensively): runs, kills, boss kills, time. Neon arrives through the bank poll. */
   let ft0=0;
-  NR.on('footStart',d=>{if(!on||!d)return;ft0=+d.t0||0;if(!d.cp){S().runs++;mark();}});
-  NR.on('footKill',d=>{if(!on||!d)return;if(d.boss)S().bosses++;else S().kills++;mark();});
-  NR.on('footEnd',d=>{if(!on||!d)return;const t=Math.max(0,Math.min(3600,(+d.time||0)-ft0));S().time+=t;if(!d.cleared&&!d.quit)S().deaths++;ft0=0;mark();poll();save();});
+  NR.on('footStart',d=>{if(!on||!d||window.__schFoot)return;ft0=+d.t0||0;if(!d.cp){S().runs++;mark();}});
+  NR.on('footKill',d=>{if(!on||!d||window.__schFoot)return;if(d.boss)S().bosses++;else S().kills++;mark();});
+  NR.on('footEnd',d=>{if(!on||!d||window.__schFoot)return;const t=Math.max(0,Math.min(3600,(+d.time||0)-ft0));S().time+=t;if(!d.cleared&&!d.quit)S().deaths++;ft0=0;mark();poll();save();});
   NR.on('graze',()=>{if(!on||!live())return;S().grazes++;mark();});
   NR.on('choice',()=>{if(!on||!live())return;S().choices++;mark();});   // choices.js (RET.build2): cards and pickup pairs taken
   NR.on('perfect',d=>{if(!on||!live())return;S().perfects++;if(d&&d.kind==='dash')S().dashes++;mark();});
@@ -142,7 +142,7 @@ RET.st=(function(on){
   if(on&&dsh)try{RET.dailyShow();}catch(e){}
   /* ---- the sheet ---- */
   const fmtT=s=>{s=Math.round(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+'h '+m+'m':m+'m '+(s%60)+'s';};
-  const fmtN=n=>Math.round(n).toLocaleString('de-DE');
+  const fmtN=window.fmtN;
   const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
   function badge(a,got){
     const real=window.ART&&ART.rd&&ART.rd.has('ach-'+a.id+'.webp');
