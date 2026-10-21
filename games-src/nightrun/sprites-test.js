@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Strip-sprite loader + boss / player-ship wiring through the real page (prints pass/fail only):  NODE_PATH=$(npm root -g) node games-src/nightrun/sprites-test.js
 //   env: GAME_DIR=<dir with index.html>, ONLY=sek-adler,hoplite (bosses for the anchor check)
+//        SMOKE=1: fast gate (decode every 5th sheet, 3 on-foot actors, shorter frame-time runs): same checks, fewer samples; the nightly run leaves it unset
 //  (a) every bundled sheet decodes and its frame count matches the strip; frame math: smoothing.json holds, loop wraps, one-shot stops on its last frame and reports done
 //  (b) drawAnim puts the anchor where asked (pixel-identical to a hand-placed drawImage, mirrored with flip); no per-frame allocation (one record per sheet)
 //  (c) a missing / unlisted sheet gives null / false and the game still draws the still, no page errors
@@ -12,22 +13,22 @@ const PW = require('playwright'), path = require('path'), net = require('net'), 
 const GAME = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun'), ONLY = (process.env.ONLY || 'sek-adler,hoplite,kronos').split(',').filter(Boolean);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const fp = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
-const fails = []; let n = 0;
+const SMOKE = !!process.env.SMOKE, fails = []; let n = 0;
 const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? ' :: ' + info : '')); console.log('FAIL ' + name + (info ? ' :: ' + info : '')); } else console.log('PASS ' + name); };
 (async () => {
   const port = await fp(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME], { stdio: 'ignore' }); await sleep(700);
   const br = await PW.chromium.launch(), url = q => `http://127.0.0.1:${port}/index.html?nomusic=1${q || ''}`;
   const open = async (q, reqs, init) => { const c = await br.newContext({ viewport: { width: 1280, height: 720 } }), p = await c.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); if (reqs) p.on('request', r => reqs.push(r.url()));
-    await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); if (init) await p.addInitScript(init); await p.addInitScript(() => { const t = setInterval(() => { if (window.__mnr) { window.ART = __mnr.ART; window.SPR = __mnr.SPR; window.UIK = __mnr.UIK; clearInterval(t); } }, 5); }); await p.goto(url(q)); return { c, p, errs }; };
+    await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.addInitScript(sm => { window.__SMOKE = sm; }, SMOKE); if (init) await p.addInitScript(init); await p.addInitScript(() => { const t = setInterval(() => { if (window.__mnr) { window.ART = __mnr.ART; window.SPR = __mnr.SPR; window.UIK = __mnr.UIK; clearInterval(t); } }, 5); }); await p.goto(url(q)); return { c, p, errs }; };
   try {
     /* (a)(b)(c) loader */
     { const { c, p, errs } = await open('');
       await p.waitForFunction(() => window.__mnr && __mnr.ART.rd && __mnr.ART.rd.size > 0, null, { timeout: 20000 });
       const keys = await p.evaluate(() => Object.keys(ART.ANIM.s)); ok('a1 ANIM bundles the boss, ship, weapon fx, explosion, small fx and pickup sheets', keys.length >= 115 && keys.filter(k => /^boss-/.test(k)).length === 40 && keys.filter(k => /^ship-(std|tri|hv|ec|swg|syn|drift|lancer|nova)\//.test(k)).length === 18 && keys.filter(k => /^wpn-/.test(k)).length === 38 && keys.filter(k => /^fx-boom-/.test(k)).length === 13 && keys.includes('fx-shield/glow') && keys.includes('pk-health/spin'), keys.length);
       const nrd = await p.evaluate(() => [...ART.rd].filter(f => /^anim\/.+-strip\.webp$/.test(f)).length); ok('a1 ANIM bundles every listed sheet (bosses, ships, enemy ships, on-foot actors, props)', keys.length === nrd && keys.length > 170 && ['kai/run', 'warden/die', 'medic/heal', 'ship-ecruiser/volley', 'prop-steam/glow', 'prop-car/loop'].every(k => keys.includes(k)), keys.length + '/' + nrd);
-      let all = false; try { await p.waitForFunction(() => Object.keys(ART.ANIM.s).every(k => ART.anim(k)), null, { timeout: 90000, polling: 250 }); all = true; } catch (e) { }
+      let all = false; try { await p.waitForFunction(() => Object.keys(ART.ANIM.s).filter((k, i) => !window.__SMOKE || i % 5 === 0).every(k => ART.anim(k)), null, { timeout: 90000, polling: 250 }); all = true; } catch (e) { }
       ok('a2 every sheet decodes', all);
-      const bad = await p.evaluate(() => Object.entries(ART.ANIM.s).filter(([k, m]) => { const b = ART.anim(k); return !b || b.width !== m[0] * m[2] || b.height !== m[3]; }).map(e => e[0]));
+      const bad = await p.evaluate(() => Object.entries(ART.ANIM.s).filter(([k, m], i) => { if (window.__SMOKE && i % 5) return false; const b = ART.anim(k); return !b || b.width !== m[0] * m[2] || b.height !== m[3]; }).map(e => e[0]));
       ok('a3 strip size = frames x w, h', !bad.length, bad.slice(0, 3).join(','));
       const fm = await p.evaluate(() => { const H = ART.ANIM.sm.holds, out = [];
         const exp = (key, t) => { const m = ART.ANIM.s[key], act = key.split('/')[1], hd = H[act], loop = ['idle', 'run', 'flame', 'glow', 'loop', 'spin', 'hover'].includes(act); let u = t, tot = 0; const w = []; for (let i = 0; i < m[0]; i++) { w.push((hd && hd.length === m[0] ? hd[i] : 1) / m[1]); tot += w[i]; }
@@ -86,7 +87,7 @@ const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? '
       await p.waitForFunction(() => window.__mnr && __mnr.ART.rd && __mnr.ART.rd.size > 0, null, { timeout: 20000 });
       await p.waitForFunction(() => Object.keys(ART.ANIM.s).every(k => k.startsWith('ship-') ? ART.anim(k) : true), null, { timeout: 60000, polling: 250 });
       const r = await p.evaluate(() => { const m = __mnr; if (m.running) m.abort(); m.SET.diff = 'normal'; m.SET.auto = false; m.applySet && m.applySet(); m.startStory(3); m.simOn(true); const on = [], off = []; let T = 0;
-        for (let i = 0; i < 1500; i++) { m.P.hp = 99; m.P.inv = 1; m.P.y = 360 + 150 * Math.sin(T * 1.3); m.P.x = 260 + 100 * Math.sin(T * .7); if (m.SH.active) m.SH.close(); m.step(1 / 30); T += 1 / 30;
+        for (let i = 0; i < (window.__SMOKE ? 1000 : 1500); i++) { m.P.hp = 99; m.P.inv = 1; m.P.y = 360 + 150 * Math.sin(T * 1.3); m.P.x = 260 + 100 * Math.sin(T * .7); if (m.SH.active) m.SH.close(); m.step(1 / 30); T += 1 / 30;
           if (i > 300 && i % 2) for (const f of i % 4 === 1 ? [true, false] : [false, true]) { RET.sprites = f; const t = performance.now(); m.render(m.G.t, 1 / 30); (f ? on : off).push(performance.now() - t); } }
         RET.sprites = true; const st = a => { a.sort((x, y) => x - y); return { mean: +a[Math.floor(a.length / 2)].toFixed(2), p95: +a[Math.floor(a.length * .95)].toFixed(2), max: +a[a.length - 1].toFixed(2) }; };
         const dl = SPR.shipDeath(), g = ART.gh.length; m.render(m.G.t, 1 / 30); const q = ART.fx.length; ART.gh.length = 0; return { on: st(on), off: st(off), death: [dl > 0, g], enemies: m.G.en.length, q }; });
@@ -138,12 +139,12 @@ const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? '
     /* (f) enemy ships, on-foot actors, props */
     { const { c, p, errs } = await open('&sim=1&all=1&mustmove=0&deck=0&vary=0&vary2=0&variants=0');
       await p.waitForFunction(() => window.__mnr && __mnr.ART.rd && __mnr.ART.rd.size > 0, null, { timeout: 20000 });
-      await p.waitForFunction(() => Object.keys(ART.ANIM.s).every(k => ART.anim(k)), null, { timeout: 120000, polling: 250 });
+      await p.waitForFunction(() => Object.keys(ART.ANIM.s).filter(k => !window.__SMOKE || /^(kai|grunt|gunman)\/|^ship-e|^prop-/.test(k)).every(k => ART.anim(k)), null, { timeout: 120000, polling: 250 });
       const r = await p.evaluate(() => { const out = { sl: !!RET.streetlook }, mk = () => { const c = document.createElement('canvas'); c.width = 600; c.height = 500; return c; };
         const bb = cv => { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let X0 = 1e9, X1 = -1, Y0 = 1e9, Y1 = -1, n = 0; for (let y = 0; y < cv.height; y++)for (let x = 0; x < cv.width; x++) if (d[(y * cv.width + x) * 4 + 3] > 40) { n++; if (x < X0) X0 = x; if (x > X1) X1 = x; if (y < Y0) Y0 = y; if (y > Y1) Y1 = y; } return { X0, X1, Y0, Y1, n }; };
         /* on-foot: feet (bottom of the opaque pixels) on the old spot, 80 px tall figure, for every actor and pose that has a sheet */
         const FM = ART.FM, foot = [], H = 80; out.who = Object.keys(FM).length;
-        for (const who in FM) { const acts = new Set(Object.values(FM[who])); for (const pose in FM[who]) { if (pose === '_all' || pose === '_w') continue; const cv = mk(), g = cv.getContext('2d'); ART.fE = null; const ok = ART.footDraw(g, who, pose, 300, 400, H, false, 0.01); const b = bb(cv);
+        for (const who in FM) { if (window.__SMOKE && !/^(kai|grunt|gunman)$/.test(who)) continue; const acts = new Set(Object.values(FM[who])); for (const pose in FM[who]) { if (pose === '_all' || pose === '_w') continue; const cv = mk(), g = cv.getContext('2d'); ART.fE = null; const ok = ART.footDraw(g, who, pose, 300, 400, H, false, 0.01); const b = bb(cv);
             if (!ok || b.n < 50 || Math.abs(b.Y1 - 400) > 14 || b.Y1 < b.Y0 + H * .3) foot.push(who + '/' + pose + ' ' + JSON.stringify(b) + ok); } }
         out.footBad = foot.slice(0, 5);
         const f1 = mk(); ART.fE = null; const a1 = bb((() => { ART.footDraw(f1.getContext('2d'), 'grunt', 'idle', 300, 400, H, false, 0); return f1; })()), f2 = mk(); ART.footDraw(f2.getContext('2d'), 'grunt', 'idle', 300, 400, H, true, 0); const a2 = bb(f2);

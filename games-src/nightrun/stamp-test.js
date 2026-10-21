@@ -11,7 +11,7 @@ const res = [], ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' : 'FAI
 const STAMP = /^build [0-9a-f]{10} · \d{4}-\d\d-\d\d \d\d:\d\d UTC$/;
 (async () => {
   const tmp = fs.mkdtempSync('/tmp/nrstamp-'), root = path.join(tmp, 'mainhattan-nightrun');
-  fs.mkdirSync(tmp, { recursive: true }); cp.execSync(`cp -r ${GAME_DIR} ${root} && rm -rf ${root}/music/*.mp3 && cp ${GAME_DIR}/music/tracks.json ${root}/music/`);
+  fs.mkdirSync(tmp, { recursive: true }); cp.execSync(`cp -rL ${GAME_DIR} ${root} && rm -rf ${root}/music/*.mp3 && cp ${GAME_DIR}/music/tracks.json ${root}/music/`);
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', tmp], { stdio: 'ignore' }); await sleep(800);
   const U = `http://127.0.0.1:${port}/mainhattan-nightrun/`, idx = path.join(root, 'index.html');
   const br = await PW.chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] });
@@ -28,7 +28,7 @@ const STAMP = /^build [0-9a-f]{10} · \d{4}-\d\d-\d\d \d\d:\d\d UTC$/;
     await p.evaluate(async () => { const r = await navigator.serviceWorker.ready; for (let i = 0; i < 50 && !(await caches.keys()).some(n => n.startsWith('nr-shell-')); i++) await new Promise(r => setTimeout(r, 100)); });
     const names = await p.evaluate(async () => (await caches.keys()).filter(n => n.startsWith('nr-')));
     ok('stamp hash matches the service worker cache name', names.includes('nr-shell-' + hash), JSON.stringify(names));
-    await p.click('#moreBtn'); await sleep(300); await p.click('#setBtn'); await sleep(300);
+    await p.click('#hub_profile'); await sleep(300); await p.click('#hub_profileScr .hubAct:nth-child(4)'); await sleep(300); await p.evaluate(() => { if (window.__tidy) __tidy.go('more'); }); await sleep(200);   // the BUILD row sits on Settings > More   // PROFILE > Settings (the hub hides #moreBtn / #setBtn)
     const s = await p.evaluate(() => ({ s: (document.getElementById('stampS') || {}).textContent, f: (document.getElementById('stampF') || {}).textContent, b: !!document.getElementById('stampBtn') }));
     ok('stamp + flags line + update button in Settings', s.s === t && /sprites on/.test(s.f) && /music pack on/.test(s.f) && /lessons on/.test(s.f) && /classes on/.test(s.f) && s.b, JSON.stringify(s));
 

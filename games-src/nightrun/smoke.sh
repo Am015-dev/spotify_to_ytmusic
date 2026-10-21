@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Nightrun SMOKE suite (<= 5 min): the gate for every consolidation step (CONSOLIDATION-PLAN.md). One fresh build in a temp dir,
+# Nightrun SMOKE suite (target <= 5 min): the gate for every consolidation step (CONSOLIDATION-PLAN.md). One fresh build in a temp dir,
 # then each test ALONE (never two at once: parallel runs gave false hud-cover FAILs), one PASS/FAIL line per test with its time.
 #   bash games-src/nightrun/smoke.sh            exit 1 if any test fails      env: KEEP=1 keeps the temp dir, LOG=dir keeps each test's output
 # The other ~95 *-test.js files are the FULL (nightly) set: see CONSOLIDATION-PLAN.md "Tests".
@@ -20,12 +20,10 @@ UI="${UI:-title,settings,story-stage,hud-run,pause,game-over}"   # core screens;
 run ui-align-390x763 env VP=390x763 ONLY="$UI" node "$HERE/ui-align-test.js"
 run ui-align-375x553 env VP=375x553 ONLY="$UI" node "$HERE/ui-align-test.js"
 run ui-align-844x390 env VP=844x390 ONLY="$UI" node "$HERE/ui-align-test.js"
-# hub-test at one phone size (the nightly run keeps all 4): a copy with SIZES cut to 390x763, the test file itself is not changed
-sed 's/^const SIZES = \[.*\];/const SIZES = [[390, 763]];/' "$HERE/hub-test.js" > "$T/hub-smoke-test.js"
-grep -q '^const SIZES = \[\[390, 763\]\];' "$T/hub-smoke-test.js" || echo "FAIL hub: could not cut SIZES"
-run hub              node "$T/hub-smoke-test.js"
+# hub-test and sprites-test run in SMOKE=1 mode (fewer samples, same screens: see their headers); the nightly run leaves SMOKE unset
+run hub              env SMOKE=1 node "$HERE/hub-test.js"
 run story            node "$HERE/story-test.js"
-run sprites          env ONLY="${SPR:-hoplite}" node "$HERE/sprites-test.js"   # one boss for the anchor check; all bosses nightly
+run sprites          env SMOKE=1 ONLY="${SPR:-hoplite}" node "$HERE/sprites-test.js"   # one boss for the anchor check; all bosses nightly
 run labfull          node "$HERE/labfull-test.js"
 echo "$([ $bad -eq 0 ] && echo PASS || echo FAIL) smoke: $bad failed, $(( $(date +%s)-t0 )) s"
 [ -n "${KEEP:-}" ] || rm -rf "$T"
