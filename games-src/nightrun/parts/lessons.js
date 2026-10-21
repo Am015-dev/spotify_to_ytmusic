@@ -84,6 +84,13 @@ const LS_CH={pulse:['tri','#ff8ad8','PULSE'],laser:['tri','#7dffd8','LANCE'],swa
   std:['tri','#19e3ff','COURIER'],tri:['tri','#ffb020','TRIPLET'],hv:['tri','#ff3d6a','HEAVY'],emp:['ring','#3dffb0','EMP'],dash:['tri','#ffe14d','DASH'],
   'i:w1':['tri','#ff8ad8','PULSE'],'i:w2':['tri','#7dffd8','LANCE'],'i:c':['dia','#3dffb0','CORE'],'i:p':['dot','#ffe14d','PASSIVE'],
   's:0':['tri','#8890a8','WEAPON'],'s:1':['tri','#8890a8','WEAPON'],'s:2':['dia','#8890a8','CORE'],'s:3':['dot','#8890a8','PASSIVE']};
+/* older lesson format (cards + pr:{type:'pick',rounds}), still pushed by other parts (classes.js: 'pilot'): each round becomes a one-tap pick phase over a
+   small drifting scene; the cards are dropped (one line of text at a time). lsRow / lsN / LS_OPT / LS_OC stay so those parts keep loading. */
+const lsRow=()=>'',lsN=()=>'',LS_OPT={},LS_OC={};
+function lsLegacy(L){const rs=(L.pr&&L.pr.rounds)||[];return rs.map((R,i)=>{for(const o of R.opts)if(!LS_CH[o])LS_CH[o]=[(LS_OPT[o]||[])[0]||'dot',LS_OC[o]||'#19e3ff',String((LS_OPT[o]||[])[1]||o).toUpperCase()];
+  return{id:L.id+'-'+(i+1),say:String(R.q).slice(0,60),chips:R.opts.slice(),want:R.ok,fly:0,
+    init:m=>{m.wp=[];for(let k=0;k<4;k++)lsFoe(m,{x:m.w*(.55+.1*k),y:m.h*(.25+.17*k),hp:1,r:10,vy:26*(k%2?1:-1)});},
+    chip:(m,v)=>{if(v===R.ok)m.win(String(R.why||'').replace(/\.$/,''));else m.fail('think about what you face');},sel:()=>false};});}
 /* ----- the overlay ----- */
 {const st=document.createElement('style');st.textContent=`#lsC{position:fixed;inset:0;z-index:9300;display:flex;align-items:center;justify-content:center;background:rgba(5,3,12,.86);padding:16px;box-sizing:border-box}
 #lsC[hidden]{display:none}#lsC .lc{width:min(440px,100%);height:min(640px,100%);background:#0d0820;border:2px solid var(--cyan);border-radius:14px;padding:12px;box-sizing:border-box;color:var(--ink);font:600 15px var(--display);text-align:center;display:flex;flex-direction:column;gap:8px}
@@ -110,7 +117,7 @@ function lsBtn(row,id,label,cls,fn){const b=document.createElement('button');b.t
   b.addEventListener('click',e=>{e.stopPropagation();fn(b);});row.appendChild(b);return b;}
 const lsLine=(t,c)=>{const l=$('lsLine');if(l){l.textContent=t;l.className='ln'+(c?' '+c:'');}};
 /* ----- the mini stage ----- */
-function lsShow(id,done){const L=LSN.find(l=>l.id===id);if(!L||!LS.on){if(done)done();return false;}
+function lsShow(id,done){const L=LSN.find(l=>l.id===id);if(L&&!L.ph)L.ph=lsLegacy(L);if(!L||!LS.on||!L.ph.length){if(done)done();return false;}
   cancelAnimationFrame(LS.raf);LS.cur=L;LS.done=done||null;LS.mark(id,1);LS.log.push({id,ev:'show'});
   lsC.innerHTML=`<div class="lc"><div class="lk" id="lsHead"></div><div class="ln" id="lsLine"></div><div class="cw" id="lsCw"><canvas id="lsCv"></canvas></div><div class="op" id="lsChips"></div><div class="rw"></div></div>`;
   lsC.hidden=false;lsBtn(lsC.querySelector('.rw'),'lsSkip','SKIP','go dim',()=>lsEnd(false));
@@ -213,7 +220,7 @@ if(LS.on){
   setTimeout(function add(){const g=document.querySelector('#mnMore .mg');if(!g){if((add.n=(add.n|0)+1)<40)setTimeout(add,50);return;}
     const b=document.createElement('button');b.type='button';b.className='go dim';b.id='lsBtn';b.textContent='LESSONS';b.addEventListener('click',()=>{if(!running)lsList();});
     const t=$('tutBtn');if(t&&t.parentNode===g)t.after(b);else g.appendChild(b);},0);}
-window.__lessons={ids:LSN.map(l=>l.id),phases:Object.fromEntries(LSN.map(l=>[l.id,l.ph.map(p=>p.id)])),seen:()=>LS.seen(),show:(id,d)=>lsShow(id,d),list:()=>lsList(),
+window.__lessons={get ids(){return LSN.map(l=>l.id);},get phases(){return Object.fromEntries(LSN.map(l=>[l.id,(l.ph||(l.ph=lsLegacy(l))).map(p=>p.id)]));},seen:()=>LS.seen(),show:(id,d)=>lsShow(id,d),list:()=>lsList(),
   get open(){return!lsC.hidden},get id(){return LS.cur?LS.cur.id:null},get log(){return LS.log},get auto(){return LS.auto},get on(){return LS.on},
   get ms(){const m=LS.m;if(!m)return null;return{ph:m.P.id,want:m.P.want||null,state:m.state,fails:m.pf,wp:m.wp.slice(),w:m.w,h:m.h,s:{x:m.s.x,y:m.s.y},emp:m.emp,
     foes:m.fo.filter(f=>!f.dead).map(f=>({x:f.x,y:f.y,k:f.k,sh:f.sh})),wall:lsWallX(m),beat:lsBeat(m),pick:(m.pick||[]).slice(),fill:(m.fill||[]).slice()};},

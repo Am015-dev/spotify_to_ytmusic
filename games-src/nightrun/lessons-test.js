@@ -38,6 +38,7 @@ const BOT = () => { if (window.__lsBotI) return; const st = {}, L = window.__les
       case 'm-fly': case 's-fly': L.steer(m.w * .16, near()); break;
       case 'c-shield': L.steer(m.w * .16, near()); if (failed && m.emp && m.foes.some(f => f.sh)) click('emp'); break;
       case 'c-wall': if (m.wall != null) { const d = m.wall - m.s.x; if (!failed) { if (d > 200 && m.emp && !r.a) { click('emp'); r.a = 1; } } else if (d < 120 && m.emp) click('emp'); } break;
+      default: if (/-\d+$/.test(m.ph)) { if (!r.a) { const w = [...document.querySelectorAll('#lsChips .lo')].find(b => b.dataset.v !== m.want); if (w) w.click(); r.a = 1; } else if (failed) click(m.want); } break;
       case 't-dash': if (m.wall != null) { const d = m.wall - m.s.x; if (!failed && !r.a && d > 150 && m.beat > .3 && m.beat < .5) { click('dash'); r.a = 1; } else if (failed && d > 20 && d < 130 && (m.beat > .86 || m.beat < .05)) click('dash'); } break; } }, 20); };
 async function page(br, port, vp, q) {
   const ctx = await br.newContext({ viewport: { width: vp[0], height: vp[1] }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 }), p = await ctx.newPage(), errs = [];
@@ -79,6 +80,8 @@ async function run(br, port, vp) {
   await tab('tune'); await tab('ships'); st = await L(p); ok(`${lab}: ship lesson on the first SHIPS tab`, st.open && st.id === 'ship', JSON.stringify(st));
   if (st.open) check('ship', await play(p, 'ship'));
   await tab('tune'); await tab('ships'); ok(`${lab}: ship lesson shows once`, !(await L(p)).open);
+  if ((await p.evaluate(() => window.__lessons.ids)).includes('pilot') && await p.$('#garage .tabs button[data-t="pilot"]:not([hidden])')) {   // classes.js pushes an older-format lesson: it must play as a mini stage too
+    await tab('pilot'); st = await L(p); ok(`${lab}: pilot lesson on the first PILOT tab`, st.open && st.id === 'pilot', JSON.stringify(st)); if (st.open) check('pilot', await play(p, 'pilot')); await tab('tune'); }
   await p.evaluate(() => window.__inv.close()); await sleep(200);
   // STORY: stage 3 = counter, stage 2 = timing (before the run starts; the run starts after GOT IT)
   await p.evaluate(() => window.__lessons.start(3)); await sleep(250); st = await L(p);
