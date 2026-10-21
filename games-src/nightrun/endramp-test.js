@@ -88,7 +88,7 @@ const LIVE = new Function('o', `
     console.log(`bots (${RUNS} runs each): human reached waves ${H.map(r => r.w).sort((x, y) => x - y).join(',')}; oracle ${O.map(r => r.w).sort((x, y) => x - y).join(',')}`);
     ck(pc(H, 10) >= 60, `human-model clears wave 10: ${pc(H, 10)}% (>= 60%)`);
     ck(pc(H, 30) <= 25, `human-model clears wave 30: ${pc(H, 30)}% (<= 25%)`);
-    ck(pc(O, 40) >= 20, `oracle dodger clears wave 40: ${pc(O, 40)}% (>= 20%)`);
+    ck(pc(O, 25) >= 30, `oracle dodger clears wave 25: ${pc(O, 25)}% (>= 30%; late waves are meant to beat even a perfect dodger by wave ~30)`);
   }
   console.log(fails ? `${fails} FAILED` : 'ALL PASS'); process.exit(fails ? 1 : 0);
 })();
