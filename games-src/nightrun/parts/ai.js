@@ -28,7 +28,7 @@ NR.on('beat',()=>{if(!G.live||G.dead||ST.over)return;
 NR.on('kill',({e})=>{if(!e||!e.ldr)return;if(!G.over&&!ST.over)G.score+=e.score;floater(e.x,e.y-30,'LEADER DOWN','#ffd23d');
   for(const f of G.en){if(f.lk===e&&f.hp>0){f.rg=1;f.shl=false;f.bf=Math.min(f.bf,2);}}});
 {const de=drawEnemy;drawEnemy=function(e,t){de(e,t);if(e.type==='boss'||e.hp<=0)return;
-  if(e.ldr){ctx.save();ctx.translate(e.x,e.y);if(!ART.have('spr-en-leader')){const g=ART.sil('spr-en-drone',e.r*2.9,'#ffd23d');if(g)ART.put(g,0,0,0,.3);}   // a gold sheen on the drone body until the leader sprite exists
+  if(e.ldr){ctx.save();ctx.translate(e.x,e.y);if(!ART.have('spr-en-leader')&&e._fa!==FOEART.fr){const g=ART.sil('spr-en-drone',e.r*2.9,'#ffd23d');if(g)ART.put(g,0,0,0,.3);}   // a gold sheen on the drone body until the leader sprite exists
     ctx.strokeStyle='#ffd23d';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(0,0,e.r+7,0,7);ctx.stroke();ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,e.r+12,0,7);ctx.stroke();
     const cy=-e.r-14;if(ART.have('fx-crown')){const o=ART.sp('fx-crown',22);ctx.globalCompositeOperation='lighter';ART.put(o,0,cy+4);ctx.globalCompositeOperation='source-over';}
     else{ctx.fillStyle='#ffd23d';ctx.beginPath();ctx.moveTo(-8,cy+8);ctx.lineTo(-8,cy);ctx.lineTo(-4,cy+4);ctx.lineTo(0,cy-3);ctx.lineTo(4,cy+4);ctx.lineTo(8,cy);ctx.lineTo(8,cy+8);ctx.closePath();ctx.fill();}   // crown (painted when fx-crown is ready)

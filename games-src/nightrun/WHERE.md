@@ -10,6 +10,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | flavor | flavor watch 241-242 |  |  | ret-flavor |  |
 | foot | foot build 366-400 | a,footen | c | foot | BRIEF-FOOT |
 | footstage | footstage secOf 163-194 | footen |  | footstage | FOOT-ENEMIES |
+| streetlook | streetlook slHud 145-166 | map,footen |  | streetlook |  |
 | leak | leak LEAK 14-136 |  | holdline | ret-leak |  |
 | zoo | zoo ZOO 14-253 |  |  | zoo |  |
 | vary,vary2 | formations fmSide 74-256 |  |  | vary |  |
@@ -67,6 +68,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | classes | classes clsSvg 106-108 |  |  | classes | ASSETS-NEEDED-3 |
 | saves | saves saveSlot 55-60 | ret |  | saves |  |
 | stamp | stamp RET.stampX 10-44 | ret |  | stamp |  |
+| polish | polish POL.flush 78-105 |  |  | polish |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.
 
