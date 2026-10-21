@@ -5105,7 +5105,7 @@ function ftUpdate(rdt){if(!S||S.paused||S.end)return;
   let dt=Math.min(rdt,.05);if(S.hs>0){S.hs-=rdt;dt*=.05;}
   if(F.ctl)try{F.ctl(S,I);}catch(e){}
   S.time+=dt;if(S.note.t>0)S.note.t-=rdt;if(S.shake>0)S.shake=Math.max(0,S.shake-rdt*30);if(S.feverT>0)S.feverT-=dt;S.hintT+=rdt;
-  stepPlayer(dt);stepStage(dt);if(S.st.hook&&S.st.hook.step)S.st.hook.step(S,dt,env);stepEnemies(dt);stepShots(dt);stepPickups(dt);
+  stepPlayer(dt);stepStage(dt);if(S.st.hook&&S.st.hook.step)S.st.hook.step(S,dt,env);stepEnemies(dt);stepShots(dt);stepPickups(dt);if(F.post)F.post(S,dt);   // tidy.js: arena player cap + flyers kept under the HUD
   I.jumpP=I.meleeP=I.dashP=I.bombP=0;
   if(S.dead){S.dead-=rdt;if(S.dead<=0)finish(false);}
   else if(S.win){S.win-=rdt;if(S.win<=0)finish(true);}}
@@ -5696,12 +5696,13 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
 
 /* ----- HUD: one panel top-left; score + time left of the pause button; hint below both; boss bar above the progress bar ----- */
 function slRR(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
-function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push({x,y:y-t0,w,h}),m=10*u,pd=8*u,W=F.WEAPONS[P.w],PK=F.PICKUPS;SL.tag='hud';
+function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push({x,y:y-t0,w,h}),m=10*u,pl=!!(RET.tidy&&typeof UIK!=='undefined'&&ART.bm&&ART.bm['ui-hud-mult']),pd=(pl?13:8)*u,W=F.WEAPONS[P.w],PK=F.PICKUPS;SL.tag='hud';
   c.textBaseline='top';c.textAlign='left';c.font='bold '+fs(14)+'px monospace';
   const wt=W.n+(P.w==='pistol'?'':' LV'+P.lv+' · '+P.ammo),pw=[];for(const k of IN.PW_KEYS){const p=P.pw[k];if(p)pw.push([PK[k].c,PK[k].ic+(PK[k].max>1?p.lv:'')]);}
   const bt='●×'+P.bombs,r3=c.measureText(bt).width+pw.length*36*u;
   const iw=Math.max(P.max*20*u,c.measureText(wt).width,r3,110*u),pw_=iw+2*pd,ph=pd+16*u+6*u+16*u+6*u+16*u+8*u+5*u+pd,x=m,y=t0+m;
-  c.fillStyle='rgba(5,3,12,.62)';slRR(c,x,y,pw_,ph,8*u);c.fill();c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=u;c.stroke();
+  if(pl)UIK.plate(c,'ui-hud-mult',x,y,pw_,ph,20,12*u,33,125);   // tidy: the fly HUD's own plate (same dark fill + painted frame)
+  else{c.fillStyle='rgba(5,3,12,.62)';slRR(c,x,y,pw_,ph,8*u);c.fill();c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=u;c.stroke();}
   for(let i=0;i<P.max;i++){c.fillStyle=i<P.hp?'#ff4060':'#ffffff26';c.beginPath();c.arc(x+pd+8*u+i*20*u,y+pd+8*u,7.5*u,0,6.283);c.fill();}
   let ry=y+pd+22*u;c.fillStyle=W.c;c.fillText(wt,x+pd,ry);ry+=22*u;
   c.fillStyle='#ffb020';c.fillText(bt,x+pd,ry);let px=x+pd+c.measureText(bt).width+14*u;for(const [col,t] of pw){c.fillStyle=col;c.fillText(t,px,ry);px+=36*u;}ry+=24*u;
@@ -5710,7 +5711,7 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
   c.textAlign='right';c.font='bold '+fs(16)+'px monospace';const st=String(S.score),tt=IN.fmtT(S.time),sw=Math.max(c.measureText(st).width,c.measureText(tt).width);
   let sr=vw-60*u,sy=t0+m+2*u;if(x+pw_+10*u>sr-sw){sr=vw-10*u;sy=t0+60*u;}   // narrow screen: under the pause button
   c.fillStyle='#fff';c.fillText(st,sr,sy);c.font='bold '+fs(14)+'px monospace';c.fillStyle='#c9c3e6';c.fillText(tt,sr,sy+20*u);box(sr-sw,sy,sw,38*u);
-  const hudB=Math.max(y+ph,sy+38*u)-t0;SL.hudB=hudB+8*u;
+  const hudB=Math.max(y+ph,sy+38*u)-t0;SL.hudB=hudB+8*u;SL.hudFull=hudB+42*u;   // hudFull: the band with the hint line (tidy keeps flyers under it)
   if(S.boss&&!S.boss.dead){const bw=vw*.7,bx=vw*.15,by=VH-48*u;c.fillStyle='#ffffff22';c.fillRect(bx,by,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText('WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';
@@ -14302,7 +14303,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='55d0ccefae 2026-10-21 20:32 UTC';
+const NR_STAMP='003b7afaf9 2026-10-21 21:46 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -14546,7 +14547,7 @@ if(RET.hub)setTimeout(()=>{
     const ttl=document.createElement('span');ttl.className='ttl';ttl.textContent=D.t;const n=document.createElement('span');n.className='hubN';top.append(bk,ttl,n);
     const body=document.createElement('div');body.className='hubBody';el.append(top,body);
     const acts=[];
-    const mk=(row,cls,a)=>{const [l,sub,sel,run,inl,grp]=a;const b=B(cls,'',()=>{if(run)shutSec();press(sel);if(grp)setTimeout(()=>{jump(grp);if(a[6]){const u=$('stampBtn');if(u)u.click();}},250);if(!run)setTimeout(drawSec,80);});
+    const mk=(row,cls,a)=>{const [l,sub,sel,run,inl,grp]=a;const b=B(cls,'',()=>{if(run)shutSec();press(sel);if(grp)setTimeout(()=>{jump(grp,1);if(a[6]){const u=$('stampBtn');if(u)u.click();}},250);if(!run)setTimeout(drawSec,80);});
       b.dataset.door=sel;acts.push([b,l,sub,inl,sel]);row.append(b);};
     D.a.forEach((a,i)=>mk(body,i?'go dim hubAct':'go hubAct',a));
     if(D.more){const m=document.createElement('div');m.className='hubMore';m.innerHTML='<span>MORE</span>';const r=document.createElement('div');m.append(r);for(const a of D.more)mk(r,'go dim',a);body.append(m);}
@@ -14600,7 +14601,7 @@ if(RET.hub)setTimeout(()=>{
       e.style.order=gi[x]*1000+2+(++i);}}
   const jumpRow=document.createElement('div');jumpRow.id='hubJump';
   for(const [g,l] of GRP)jumpRow.append(B('',l.split(' ')[0].replace('GAMEPLAY','GAME'),()=>jump(g)));
-  function jump(g){regroup();const h=gh[g];if(h)h.scrollIntoView({block:'start'});}
+  function jump(g,door){if(door&&RET.tidyJump&&RET.tidyJump(g))return;regroup();const h=gh[g];if(h)h.scrollIntoView({block:'start'});}
   if(sb){sb.before(jumpRow);regroup();new MutationObserver(()=>{if(!sb._hubR){sb._hubR=1;requestAnimationFrame(()=>{sb._hubR=0;regroup();});}}).observe(sb,{childList:true});}
   /* ---- HOME strip, hint and red dots (only for things you can act on) ---- */
   function draw(){if(!RET.hub)return;const n=mapCurrent(),s=STAGES[n-1],d=window.DY&&RET.daily?DY.status():null,w=RET.week?RET.week():null,aff=typeof affordCount==='function'?affordCount():0;
@@ -14619,6 +14620,95 @@ if(RET.hub)setTimeout(()=>{
   {const a=affUpd;affUpd=function(){const r=a.apply(this,arguments);if(!T.hidden)draw();return r;};}
   draw();
   window.__hub={open:openSec,shut:shutSec,hangar:openHangar,jump,draw,SECS,cur:()=>cur};   // test hook
+},0);
+
+// PURPOSE: tidy Settings (<= 20 controls on the main page, one Assist page, the rest under More) + a street run that keeps Kai in the left third and drones off the HUD
+// FLAG: tidy (?tidy=0)
+// TEST: tidy-test.js
+/* ---------- TIDY (flag RET.tidy, default ON; ?tidy=0 = Settings and the street run exactly as before). Owner, 21 Oct 2026: "messy, unorganized, the game is shit on foot".
+   Review 8: Settings had 41 controls (hc and rm twice, Music twice, DATA tab clipped). Now the main page has 19: Gameplay (HUD, Difficulty, Auto-fire, Aim assist, ASSIST >),
+   Display / Comfort (Quality, Particles, Colour theme, Flashing, Screen shake, Text size), Audio (Master, Music, Effects, Music mix), Controls (Touch layout, Sensitivity, Button size),
+   Data (MORE >). ASSIST = one page (world speed, bullets, hull, beat window, timing, hitbox, big bullets, high contrast, colour-blind, reduced motion, Calm mode, Everything counts).
+   MORE = everything else that was there (glow, scan lines, FPS, ducking, latency test, beat cue, save / load / backup, update, lab, tutorial). No node is removed or moved: rows are shown /
+   hidden by a data-pg attribute (main | assist | more | dup), so every id, hook and test that looks a row up keeps working. The Comfort copies of hc / rm are 'dup' (the Assist rows stay).
+   Street run (phones, portrait): during an arena lock or the boss arena the camera is parked, so Kai used to run to the right edge and fight clipped (median 82% of the view);
+   now he may not pass 37% of the view while the camera is parked (F.post, after every step), the camera still keeps him at 25% otherwise (streetlook camK) and the walk-back rule
+   (<= 35% back, W90) is untouched. Flyers (drones) are kept below the HUD band: their drawn top is never above the HUD band (SL.hudFull = panel + score + the hint line). The HUD panel uses the fly HUD's own plate (streetlook.js slHud). ---------- */
+if(RET.tidy===undefined)RET.tidy=!/[?&]tidy=0/.test(location.search);
+
+/* ===== street run: player cap + flyers under the HUD ===== */
+(function(){
+if(!RET.tidy||!window.FOOT||!FOOT._in)return;
+const F=FOOT,IN=F._in,FL=470,CAP=.37;
+F.post=(S,dt)=>{const SL=F.look;if(!SL||!S||S.end)return;const L=IN.L&&IN.L();if(!L||!L.vw)return;const P=S.P,vw=L.vw;
+  if(SL.port&&(S.lock||S.bossOn)){const hi=S.camX+vw*CAP;if(P.x>hi){P.x=hi;if(P.vx>0)P.vx=0;}}
+  if(SL.hudFull!=null&&SL.k>0&&L.sc){const K=SL.k,d0=SL.d0,s=SL.s,top=SL.t0+SL.hudFull+6/L.sc;
+    for(const e of S.E){if(e.dead||!(e.fly||(e.def&&(e.def.fly||e.def.flyer))))continue;
+      const off=e.ext&&e.fly?e.h/2:0,dd=FL-(top+e.h*K);if(dd<=0)continue;   // dd: how far above the road the drone's feet may be drawn
+      const d=dd<=d0*K?dd/K:d0+(dd-d0*K)/s,ymin=FL-d-off;if(e.y<ymin)e.y=ymin;}}};
+})();
+
+/* ===== Settings ===== */
+if(RET.tidy&&RET.hub)setTimeout(()=>{
+  const sb=document.getElementById('setBody'),setm=document.getElementById('setm');if(!sb||!setm)return;
+  document.documentElement.classList.add('td');
+  const MAIN='hud diff auto aim part q pal flash shake txt master music sfx mus layout sens dsize'.split(' ');
+  const ASSIST='asNote asSpd asBul asHull asWin win all asBig hc hbox rm cbp calmm'.split(' ');
+  const MORE='tdH_d fps fpsc glow scan tdH_a duck keepmus react mute tdH_r cue sync calBox tdH_s ck stampRow labBtnS tut setLastSave svH svBox sioH sioBox'.split(' ');
+  const css=document.createElement('style');let r='';
+  for(const pg of ['main','assist','more'])r+=`.td #setBody[data-pg="${pg}"]>:not([data-pg="${pg}"]){display:none!important}`;
+  for(let i=0;i<60;i++)r+=`.td #setBody[data-pg="assist"]>[data-oa="${i}"]{order:${i}!important}.td #setBody[data-pg="more"]>[data-om="${i}"]{order:${i}!important}`;
+  css.textContent=r+`
+.td #setBody>.tdBar,.td #setBody>.tdNav{display:flex}
+.td #setBody>.tdNav{order:100!important}.td #setBody>#tdMoreW{order:4001!important}
+.td #setBody>.tdBar{order:-1!important;align-items:center;gap:10px;padding:8px 0 4px;color:var(--yel);font:italic 900 14px var(--display);letter-spacing:.12em;text-transform:uppercase}
+.td #setBody .tdBar button,.td #setBody .tdNav button{all:unset;box-sizing:border-box;cursor:pointer;min-height:48px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-radius:8px;background:#0a2437;border:1px solid #2f9cbc;color:#e6f6ff;font:italic 800 13px var(--display);letter-spacing:.1em;text-transform:uppercase}
+.td #setBody .tdNav button{width:100%}.td #setBody .tdNav small{font:600 11px var(--mono);letter-spacing:.02em;text-transform:none;color:#9cc3d6;white-space:normal;text-align:right}
+.td #setBody .tdBar button:focus-visible,.td #setBody .tdNav button:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
+.td #setBody>.tdH{margin:12px 0 4px;font:italic 900 14px var(--display);letter-spacing:.12em;color:var(--yel);border-bottom:1px solid rgba(47,156,188,.35);padding-bottom:5px;text-transform:uppercase}
+.td #setBody[data-pg="assist"]>h3,.td #setBody[data-pg="more"]>h3:not(#svH):not(#sioH){display:none!important}
+.td #hubJump{overflow:hidden;gap:4px}.td #hubJump button{flex:1 1 auto;min-width:0;font-size:11px;padding:0 6px;letter-spacing:0}
+.td #setm[data-pg="assist"] #hubJump,.td #setm[data-pg="more"] #hubJump{display:none}
+.td #setm .seg>span{overflow-wrap:anywhere}.td #setm .sl>span{width:auto;min-width:84px;max-width:42%;overflow-wrap:anywhere}
+@media (max-width:400px){.td #hubJump button{font-size:10px;letter-spacing:-.02em}}`;
+  document.head.appendChild(css);
+  const key=e=>{if(e.dataset&&e.dataset.k)return e.dataset.k;const i=e.querySelector&&e.querySelector('input[type=range]');if(i)return i.id.slice(1).toLowerCase();return e.id||'';};
+  const B=(id,label,sub,fn)=>{const w=document.createElement('div');w.className='tdNav';w.id=id+'W';w.innerHTML='<button type="button" id="'+id+'"><span>'+label+'</span><small>'+sub+'</small></button>';w.firstChild.addEventListener('click',fn);return w;};
+  const bar=document.createElement('div');bar.className='tdBar';bar.innerHTML='<button type="button" id="tdBack" aria-label="Back to settings">‹ Settings</button><span id="tdTitle"></span>';
+  const nA=B('tdAssist','Assist','speed · bullets · hull · timing ›',()=>go('assist')),nM=B('tdMore','More','save · backup · lab · tutorial · extras ›',()=>go('more'));
+  const lab=[['tdH_d','Display'],['tdH_a','Audio'],['tdH_r','Rhythm'],['tdH_s','Data']].map(([id,t])=>{const h=document.createElement('div');h.className='tdH';h.id=id;h.textContent=t;h.dataset.pg='more';h.dataset.om=MORE.indexOf(id)*2;return h;});
+  let cur='main';
+  function classify(){const kids=[...sb.children],lastOf={};
+    for(const e of kids){const k=key(e);if(k&&!/^td/.test(e.id))lastOf[k]=e;}
+    let prevPg='main',prevIdx=0;
+    for(const e of kids){
+      if(e.classList.contains('hubSG')){e.dataset.pg='main';continue;}
+      if(e.classList.contains('tdNav')||e.classList.contains('tdBar')||e.classList.contains('tdH'))continue;
+      const k=key(e),isP=e.tagName==='P'&&!e.id;let pg,idx=0;
+      if(e.tagName==='H3'){pg=e.id==='svH'||e.id==='sioH'?'more':'dup';idx=MORE.indexOf(e.id);}
+      else if(isP){pg=prevPg;idx=prevIdx+.5;}   // an explanation under a row: same page, right after it
+      else if(e.id==='hubComfort')pg='dup';
+      else if(k&&lastOf[k]!==e)pg='dup';   // the Comfort copies of hc / rm: the Assist rows stay
+      else if(MAIN.includes(k))pg='main';
+      else if(ASSIST.includes(k)){pg='assist';idx=ASSIST.indexOf(k);}
+      else{pg='more';const mk=MORE.includes(k)?k:MORE.includes(e.id)?e.id:e.querySelector('.ckB')?'ck':e.querySelector('#tutBtnS')?'tut':'';idx=mk?MORE.indexOf(mk):MORE.length;}
+      e.dataset.pg=pg;if(!isP&&pg!=='dup'&&e.tagName!=='H3'){prevPg=pg;prevIdx=idx;}
+      if(pg==='assist')e.dataset.oa=Math.min(59,Math.round(idx*2));
+      if(pg==='more')e.dataset.om=Math.min(59,Math.round(idx*2));}}
+  function place(){if(!bar.isConnected){sb.append(bar,nA,nM,...lab);nA.dataset.pg='main';nM.dataset.pg='main';}}
+  function go(pg){cur=pg;sb.dataset.pg=pg;bar.dataset.pg=pg==='main'?'none':pg;setm.dataset.pg=pg;sb.scrollTop=0;const t=document.getElementById('tdTitle');if(t)t.textContent=pg==='assist'?'Assist':pg==='more'?'More':'';
+    const h=setm.querySelector('.hubHd .ttl');if(h)h.textContent=pg==='main'?'SETTINGS':pg==='assist'?'ASSIST':'MORE';}
+  /* the music choice shares its name with the volume slider */
+  const fix=()=>{const m=sb.querySelector('.seg[data-k="mus"]>span');if(m&&m.textContent!=='Music mix')m.textContent='Music mix';};
+  // nav buttons live inside their page: Assist under Gameplay, More under Data
+  let busy=0;const run=()=>{if(busy)return;busy=1;try{place();classify();fix();}finally{busy=0;}};
+  run();go('main');
+  new MutationObserver(()=>{if(!sb._tdR){sb._tdR=1;requestAnimationFrame(()=>{sb._tdR=0;run();});}}).observe(sb,{childList:true});
+  document.getElementById('tdBack').addEventListener('click',()=>go('main'));
+  setm.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.hubHd .hubBk');if(b&&cur!=='main'){e.stopImmediatePropagation();e.preventDefault();go('main');}},true);
+  new MutationObserver(()=>{if(setm.hidden)go('main');else run();}).observe(setm,{attributes:true,attributeFilter:['hidden']});
+  RET.tidyJump=g=>{if(g!=='da')return false;go('more');return true;};   // the hub doors for saves / export / update check land on the MORE page, where those controls live
+  window.__tidy={go,run,page:()=>cur,MAIN,ASSIST,MORE};   // test hook
 },0);
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */

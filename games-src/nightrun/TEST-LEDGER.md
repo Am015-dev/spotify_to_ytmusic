@@ -103,3 +103,5 @@ ret-daily (failed-run floor), ret-dpool (?songspread=0), ret-fever (vis floor), 
 Environment: hud-cover-test used /tmp/nr.html; it now defaults to the built game. Flaky: counter-test, fun-test set-piece timing, forge Hard stage 30 ratios (noise about +-20%).
 Real regression left open: hud-cover (phone HUD coverage), readable (worst-10% contrast), timing (random bot too strong), ret-walls and scale3 (bot clear rates).
 Not run: ui-align, ui-weapons, vary, wcard, weapon, zoo and the rest of the first half.
+
+21 Oct 2026 W109 tidy (flag tidy): tidy-test 40/40 (settings main page 19 controls, street median 0.33, 0 drone/HUD overlaps), hub 147/147, comfort, footstage 27/27, streetlook 43/43, hud-cover and ui-align 0 findings at 390x763 and 375x553, saves 42/42, tutorial. musicpack-test and stamp-test cannot click the hub-hidden #startBtn / #moreBtn (not caused by tidy).

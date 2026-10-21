@@ -99,7 +99,7 @@ if(RET.hub)setTimeout(()=>{
     const ttl=document.createElement('span');ttl.className='ttl';ttl.textContent=D.t;const n=document.createElement('span');n.className='hubN';top.append(bk,ttl,n);
     const body=document.createElement('div');body.className='hubBody';el.append(top,body);
     const acts=[];
-    const mk=(row,cls,a)=>{const [l,sub,sel,run,inl,grp]=a;const b=B(cls,'',()=>{if(run)shutSec();press(sel);if(grp)setTimeout(()=>{jump(grp);if(a[6]){const u=$('stampBtn');if(u)u.click();}},250);if(!run)setTimeout(drawSec,80);});
+    const mk=(row,cls,a)=>{const [l,sub,sel,run,inl,grp]=a;const b=B(cls,'',()=>{if(run)shutSec();press(sel);if(grp)setTimeout(()=>{jump(grp,1);if(a[6]){const u=$('stampBtn');if(u)u.click();}},250);if(!run)setTimeout(drawSec,80);});
       b.dataset.door=sel;acts.push([b,l,sub,inl,sel]);row.append(b);};
     D.a.forEach((a,i)=>mk(body,i?'go dim hubAct':'go hubAct',a));
     if(D.more){const m=document.createElement('div');m.className='hubMore';m.innerHTML='<span>MORE</span>';const r=document.createElement('div');m.append(r);for(const a of D.more)mk(r,'go dim',a);body.append(m);}
@@ -153,7 +153,7 @@ if(RET.hub)setTimeout(()=>{
       e.style.order=gi[x]*1000+2+(++i);}}
   const jumpRow=document.createElement('div');jumpRow.id='hubJump';
   for(const [g,l] of GRP)jumpRow.append(B('',l.split(' ')[0].replace('GAMEPLAY','GAME'),()=>jump(g)));
-  function jump(g){regroup();const h=gh[g];if(h)h.scrollIntoView({block:'start'});}
+  function jump(g,door){if(door&&RET.tidyJump&&RET.tidyJump(g))return;regroup();const h=gh[g];if(h)h.scrollIntoView({block:'start'});}
   if(sb){sb.before(jumpRow);regroup();new MutationObserver(()=>{if(!sb._hubR){sb._hubR=1;requestAnimationFrame(()=>{sb._hubR=0;regroup();});}}).observe(sb,{childList:true});}
   /* ---- HOME strip, hint and red dots (only for things you can act on) ---- */
   function draw(){if(!RET.hub)return;const n=mapCurrent(),s=STAGES[n-1],d=window.DY&&RET.daily?DY.status():null,w=RET.week?RET.week():null,aff=typeof affordCount==='function'?affordCount():0;

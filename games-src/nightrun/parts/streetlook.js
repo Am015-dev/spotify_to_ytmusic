@@ -130,12 +130,13 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
 
 /* ----- HUD: one panel top-left; score + time left of the pause button; hint below both; boss bar above the progress bar ----- */
 function slRR(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
-function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push({x,y:y-t0,w,h}),m=10*u,pd=8*u,W=F.WEAPONS[P.w],PK=F.PICKUPS;SL.tag='hud';
+function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push({x,y:y-t0,w,h}),m=10*u,pl=!!(RET.tidy&&typeof UIK!=='undefined'&&ART.bm&&ART.bm['ui-hud-mult']),pd=(pl?13:8)*u,W=F.WEAPONS[P.w],PK=F.PICKUPS;SL.tag='hud';
   c.textBaseline='top';c.textAlign='left';c.font='bold '+fs(14)+'px monospace';
   const wt=W.n+(P.w==='pistol'?'':' LV'+P.lv+' · '+P.ammo),pw=[];for(const k of IN.PW_KEYS){const p=P.pw[k];if(p)pw.push([PK[k].c,PK[k].ic+(PK[k].max>1?p.lv:'')]);}
   const bt='●×'+P.bombs,r3=c.measureText(bt).width+pw.length*36*u;
   const iw=Math.max(P.max*20*u,c.measureText(wt).width,r3,110*u),pw_=iw+2*pd,ph=pd+16*u+6*u+16*u+6*u+16*u+8*u+5*u+pd,x=m,y=t0+m;
-  c.fillStyle='rgba(5,3,12,.62)';slRR(c,x,y,pw_,ph,8*u);c.fill();c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=u;c.stroke();
+  if(pl)UIK.plate(c,'ui-hud-mult',x,y,pw_,ph,20,12*u,33,125);   // tidy: the fly HUD's own plate (same dark fill + painted frame)
+  else{c.fillStyle='rgba(5,3,12,.62)';slRR(c,x,y,pw_,ph,8*u);c.fill();c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=u;c.stroke();}
   for(let i=0;i<P.max;i++){c.fillStyle=i<P.hp?'#ff4060':'#ffffff26';c.beginPath();c.arc(x+pd+8*u+i*20*u,y+pd+8*u,7.5*u,0,6.283);c.fill();}
   let ry=y+pd+22*u;c.fillStyle=W.c;c.fillText(wt,x+pd,ry);ry+=22*u;
   c.fillStyle='#ffb020';c.fillText(bt,x+pd,ry);let px=x+pd+c.measureText(bt).width+14*u;for(const [col,t] of pw){c.fillStyle=col;c.fillText(t,px,ry);px+=36*u;}ry+=24*u;
@@ -144,7 +145,7 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
   c.textAlign='right';c.font='bold '+fs(16)+'px monospace';const st=String(S.score),tt=IN.fmtT(S.time),sw=Math.max(c.measureText(st).width,c.measureText(tt).width);
   let sr=vw-60*u,sy=t0+m+2*u;if(x+pw_+10*u>sr-sw){sr=vw-10*u;sy=t0+60*u;}   // narrow screen: under the pause button
   c.fillStyle='#fff';c.fillText(st,sr,sy);c.font='bold '+fs(14)+'px monospace';c.fillStyle='#c9c3e6';c.fillText(tt,sr,sy+20*u);box(sr-sw,sy,sw,38*u);
-  const hudB=Math.max(y+ph,sy+38*u)-t0;SL.hudB=hudB+8*u;
+  const hudB=Math.max(y+ph,sy+38*u)-t0;SL.hudB=hudB+8*u;SL.hudFull=hudB+42*u;   // hudFull: the band with the hint line (tidy keeps flyers under it)
   if(S.boss&&!S.boss.dead){const bw=vw*.7,bx=vw*.15,by=VH-48*u;c.fillStyle='#ffffff22';c.fillRect(bx,by,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText('WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';

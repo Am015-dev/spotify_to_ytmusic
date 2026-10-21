@@ -36,7 +36,7 @@ const F = [
   ['checklist', '#hub_profile', '[data-door=".ckB"]', 'VIS("#nrChk")'],
   ['story log', '#hub_profile', '.hubAct:nth-child(3)', 'VIS("#sgLog")||VIS("#taleLog")'],
   ['settings', '#hub_profile', '.hubAct:nth-child(4)', 'VIS("#setm")'],
-  ['saves / export', '#hub_profile', '.hubAct:nth-child(5)', 'VIS("#setm")&&VIS("#svBox")&&VIS("#sioBox")&&Math.abs(document.getElementById("hubSG_da").getBoundingClientRect().top-document.getElementById("setBody").getBoundingClientRect().top)<40'],
+  ['saves / export', '#hub_profile', '.hubAct:nth-child(5)', 'VIS("#setm")&&VIS("#svBox")&&VIS("#sioBox")&&(window.__tidy?__tidy.page()==="more":Math.abs(document.getElementById("hubSG_da").getBoundingClientRect().top-document.getElementById("setBody").getBoundingClientRect().top)<40)'],
   ['full screen', '#hub_profile', '[data-door="#fsBtn"]', 'true'],
   ['update check', '#hub_profile', '.hubMore button:nth-child(2)', 'VIS("#setm")&&VIS("#stampBtn")'],
   ['build stamp', '#hub_profile', null, '/build /.test(document.getElementById("hubStamp").textContent)'],
