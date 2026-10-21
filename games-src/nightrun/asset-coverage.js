@@ -75,7 +75,7 @@ function install() {
     await fresh('', 700); await ev(() => TALE.show([{ who: 'boss', text: 'Check.' }], 3, () => { })); await sleep(900); });
   step('pit', async () => { await fresh('', 900); await click('#startBtn', 1500); await ev(() => { __mnr.god = true; __mnr.SH.neon = 999; __mnr.SH.pit(() => { }); }); await sleep(1200); await crawl('#shopP,#shop,#pit,#pitm', 12, 'back|close|reset|leave|go|launch|^$'); await sleep(500);
     await fresh('&chest=1', 900); await ev(() => localStorage.setItem('mnr_chest', '1')); await click('#startBtn', 1500); await ev(() => { __mnr.G.bossDone = true; __mnr.SH.pit(() => { }); }); await sleep(1200); await click('#chest button.chk', 700); await sleep(700); });
-  step('results', async () => { await fresh('', 900); for (const [n, k] of [[1, 1], [5, 2], [9, 3], [17, 1], [33, 2], [40, 3], [41, 3]]) { await ev(n => { __mnr.abort(); __mnr.sSave.all = true; __mnr.god = true; __mnr.startStory(n); }, n); await sleep(1200); await ev(() => { const S = __mnr.ST; S.stars = [1, k > 1 ? 1 : 0, k > 2 ? 1 : 0]; S.finish(); }); await sleep(900); } });
+  step('results', async () => { await fresh('', 900); for (const [n, k] of [[1, 1], [5, 2], [9, 3], [17, 1], [33, 2], [40, 3], [41, 3]]) { await ev(n => { __mnr.abort(); __mnr.sSave.all = true; __mnr.god = true; __mnr.startStory(n); }, n); await sleep(1200); await ev(k => { const S = __mnr.ST; S.stars = [1, k > 1 ? 1 : 0, k > 2 ? 1 : 0]; S.finish(); }, k); await sleep(900); } });
 
   /* ---- story stages: intro card, a few seconds of flight in god mode, then the failure screen ---- */
   step('stages', async () => { await fresh('', 900); const N = await ev(() => __mnr.STAGES.length); for (let n = 1; n <= (N || 0); n++) {
