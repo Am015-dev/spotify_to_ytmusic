@@ -65,8 +65,9 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | story | saga |  |  | story |  |
 | cp | cp chkBox 72-91 | shop,g |  | ret-cp |  |
 | fs | fs save 16-19 |  |  | fs |  |
-| read | readable READ 16-67 | fxwave |  | readable |  |
+| read | readable READ 16-69 | fxwave |  | readable |  |
 | bulletart | bulletart BA 9-11 |  |  | bulletart |  |
+| legible | legible LGB 14-35 |  |  | legible | INDUSTRY-PLAYBOOK |
 | powers | arsenal PWX.tip 90-157 | footen |  | powers | ASSETS-NEEDED-3 |
 | abup,pwrclear | abup ABUP 25-97 |  |  | abup | ASSETS-NEEDED-3 |
 | zonehint | zonehint ZH 9-26 |  |  | pwrstar |  |

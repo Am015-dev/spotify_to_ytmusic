@@ -85,4 +85,23 @@ Practice: tiered tests (smoke per change, regression per merge, full device farm
 | 11 | Roles do not need different answers (S30 0.67x); Legend only faster | Each role has one weak point (shield = beat shot, flanker = dash); Legend adds pattern kinds | PB15 >= 1.5 bits, PB16 | L | zoo.js, counter.js, hard.js |
 | 12 | No risk/reward beyond survival | Graze meter: skimming bullets fills the EMP; capped per bullet; EMP held is score-multiplier risk | PB14 | M | power.js / powerups.js, counter.js |
 
+## Colour grammar (one colour per role; parts/legible.js, flag `legible`, ?legible=0 = old; gate legible-test.js)
+| Role | Hue family (deg) | Colours in code | Never used for |
+|---|---|---|---|
+| Enemy bullets and enemy fire | warm: pink / red / orange (270-60) | READ.D #ff2d78 with white core and dark halo (LGB.HALO); painted orb, shell, rocket keep their warm pictures; homing orb turned warm; needle gets a white core line | pickups, player shots |
+| Player shots | cool: cyan / blue / white (160-285) | READ.SHOT #7fe6ff, READ.SHOT2 #e6f8ff at ~70% alpha | enemy fire, pickups |
+| Pickups (shards, hull, upgrade, EMP) | green (~137) | LGB.PK #5dff8a (glow and ring) | enemy fire (shells and orbs are orange, so no gold pickups) |
+| Music power coins | leaf green (~105) | LGB.COIN #7dff5d (glow, dashed ring, label; the coin picture stays) | enemy fire |
+| Hazards (mines, wells, zones) | purple (260-300) | target only: not recoloured by W126 (overlays belong to W120); telegraph strokes already sit on a dark halo (readable.js) | pickups |
+| Enemies | own sprite colours on a pale under-glow (LGB.GLOW #e9e2ff, alpha LGB.st per district) | - | - |
+| Elite marker | gold ring #ffd23d (draw.js) | - | pickups |
+
+Measured by legible-test.js (390x763 DPR 2, 7 scenes, 3 frozen frames each, ?legible=0 -> default):
+enemy contrast median 2.70/-/10.39/9.35/3.00/2.47/2.57 -> 3.49/-/7.44/6.93/3.94/3.34/3.32 (stages 2/6/10/14/20/boss/endless 10; stage 6 frames had no enemy in the measured area; gate >= 3);
+enemy-bullet worst 10% 4.07/15.9/1.54/1.54/2.92/17.5/1.60 -> 6.60/16.0/18.0/19.1/12.9/19.6/17.0 (gate >= 3);
+backdrop busyness p90 0.016/0.014/0.009/0.009/0.017/0.016/0.016 -> 0.007/0.008/0.004/0.004/0.008/0.008/0.008 (gate <= 0.010);
+enemy-bullet pixels warm 100%, pickup hues >= 45 deg from every bullet hue bucket, player shots 192/197 deg.
+Method notes: contrast = WCAG ratio of linear luminance; an enemy = median of its changed pixels vs the median backdrop within 1.6 r; a bullet = the better of its bright p95 or dark p10
+(its outline) vs the ring 6 css px outside; busyness = gamma-luma gradient over 1 css px, p90 of 24 css px cells in the middle 76% of the short side. Banners and hints are switched off while measuring.
+
 Sources (site names): Game Developer (Bright, Slow, and Deadly), shmups.wiki, shmups.system11.org, itch.io jam posts and reviews, tvtropes (danmaku), w3.org / WCAG 2.3.1, Game Accessibility Guidelines, caniplaythat, publisher support pages (photosensitivity / camera shake options), eastondev, wayline.io, dev.to (hit-stop / shake), World of Level Design, bugnet, uxplanet, kompassify, oceanviewgames, drizz, GameBench (fitgap).

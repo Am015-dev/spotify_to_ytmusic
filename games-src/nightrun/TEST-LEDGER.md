@@ -38,6 +38,7 @@ Totals: 66 tests: 19 PASS, 5 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN (W57b: anticam
 | hint-test | PASS | - | PASS (d) HINT missing: safe fallback to the old draw | f696692 2026-10-20 |
 | hud-cover-test | FAIL | - | REAL: harness fixed (defaults to the built game); phone HUD covers 27.0% at 375x553 (max 20%), 108/327 HUD cells in the middle band -> W12 | W31 2026-10-20 |
 | labassets-test | PASS | - | PASS labassets-test | f696692 2026-10-20 |
+| legible-test | PASS | - | new (W126): enemies >= 3:1, enemy bullets worst 10% >= 3:1, backdrop busyness <= 0.010, colour roles; 7 scenes | W126 2026-10-21 |
 | mount-test | PASS | - | PASS | f696692 2026-10-20 |
 | mustmove-test | PASS | - | PASS (first run, no rerun needed) | 4920087 2026-10-20 |
 | nofile-text-test | PASS | - | PASS (first run, no rerun needed) | 4920087 2026-10-20 |
