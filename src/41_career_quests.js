@@ -318,7 +318,7 @@ function PIN_navPt(){const p=PIN_S.cur;if(!p)return null;if(!PIN_away())return p
 function PIN_dist(){const p=PIN_S.cur;if(!p)return 0;const t=PIN_navPt(),N=QV.nav,ex=t!==p?Math.hypot(t.x-p.x,t.z-p.z):0;if(N&&N.rem!=null&&Math.abs(N.tx-t.x)<1&&Math.abs(N.tz-t.z)<1)return N.rem+ex;return Math.hypot(t.x-RO.x,t.z-RO.z)+ex}
 function PIN_set(x,z,quiet){let d=null;if(CID==='ath'){const[e,n]=RW(x,z);d=athDistAt(e,n);if(!d){say('','OUTSIDE ATHENS · PIN A SPOT INSIDE A DISTRICT',1.6);return false}}
   PIN_S.cur=PIN_mk(x,z,d);PIN_S.gate=null;PIN_S.log.set++;PIN_save();const busy=RO.ch||RO.sp;if(!busy){RO.wp=PIN_S.cur;QV.nav=null;try{qvNavTick(0)}catch(e){}}
-  if(!quiet){AU.sfx('pick');say('',busy?'📍 PIN SET · GPS AFTER THE EVENT':('📍 PIN SET · '+qvKm(PIN_dist())+(PIN_away()?' · VIA DRIVE TO '+ATH_DIST[d].name:'')).toUpperCase(),1.6)}
+  if(!quiet){AU.sfx('pick');say('',busy?'📍 PIN SET · GPS AFTER THE EVENT':('📍 PIN SET · '+qvKm(PIN_dist())+(PIN_away()?' · VIA DRIVE TO '+ATH_DIST[d].name:'')).toUpperCase(),1.6,{must:1})}
   PIN_ui();if(RO.mapOpen)drawRoamMap();return true}
 function PIN_clear(quiet){if(!PIN_S.cur)return false;if(RO.wp===PIN_S.cur){RO.wp=null;QV.nav=null}PIN_S.cur=null;PIN_S.gate=null;PIN_S.log.clr++;PIN_save();PIN_ui();if(PIN_S.mesh)PIN_S.mesh.visible=false;if(!quiet){say('','PIN CLEARED',1);AU.sfx('pick')}if(RO.mapOpen)drawRoamMap();return true}
 function PIN_arrive(){PIN_S.log.arr++;hitPop('📍 ARRIVED','#ff3b5c');feed('📍 PIN REACHED',0,'#ff3b5c');AU.sfx('pick');PIN_clear(1)}
