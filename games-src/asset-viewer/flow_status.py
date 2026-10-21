@@ -183,7 +183,25 @@ def made_elsewhere(root, folder, name):
     return _made[(root, game)].get(name)
 
 
+def pushed_anims():
+    import subprocess
+    def run():
+        try: out = subprocess.run(["git", "-C", str(REPO), "ls-tree", "-r", "--name-only", BRANCH, "games-src/anims"], capture_output=True, text=True, timeout=30).stdout
+        except Exception: return set()
+        return set(out.splitlines())
+    return _cached("pushedanims", 120, run)
+
+
+def sprite_reviews():
+    f = Path(__file__).parent / "sprite_reviews.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+
+
 def stage(game, name, done, vote):
+    if name.startswith("strip-"):  # animated strip sheet: games-src/anims/<game>/sheets/<who>/<act>-strip.webp (owner 2026-10-21)
+        who, act = name[6:].rsplit("-", 1)
+        if game_text(game) and f"{who}/{act}-strip" in game_text(game): return "wired"
+        if f"games-src/anims/{game}/sheets/{who}/{act}-strip.webp" in pushed_anims(): return "pushed"
     media = f"games/{game}/media/{name}.webp"
     if game_text(game) and f"media/{name}.webp" in game_text(game): return "wired"
     if media in pushed_files(): return "pushed"
@@ -212,6 +230,7 @@ def build():
             try: cards = json.load(open(p, encoding="utf-8"))["cards"]
             except Exception: continue
             folder = p.parent
+            game = "covers" if root == "flow-covers" else folder.parent.name if root == "flow-video" else                 folder.parent.parent.name if folder.parent.name.startswith("runs-") else folder.name  # day runs: flow-2d/<game>/runs-<date>/<out>/
             items = []
             qf = GA / "logs" / "flow_qa" / f"{root}__{folder.name}__{p.stem}.json"  # first-pass auto check (flow_qa.py, outside this project)
             try: qa = json.loads(qf.read_text(encoding="utf-8")) if qf.exists() else {}
@@ -222,12 +241,15 @@ def build():
                 if not f.exists(): f = made_elsewhere(root, folder, name) or f  # regenerated into a later run folder
                 old = folder / "_redo" / f"{name}.jpg"
                 vt = votes.get(f"{folder.name}/{name}", {}) if root == "flow-2d" else {}
+                if name.startswith("strip-") and not vt:  # strip sheets are reviewed in the Sprites tab (sprite_reviews.json)
+                    sr = sprite_reviews().get(f"{game}/" + "/".join(name[6:].rsplit("-", 1)), {})
+                    vt = {"v": {"ok": "ok", "fix": "redo"}.get(sr.get("v")), "note": sr.get("note", "")}
                 items.append({"name": name, "done": f.exists(), "thumb": thumb(f) if f.exists() else None,
                               "t": int(f.stat().st_mtime) if f.exists() else None, "prompt": prompt,
                               "full": f"full/{f.relative_to(GA).as_posix()}",
                               "twin": TWIN.get((folder.name, name)), "vote": vt.get("v"), "note": vt.get("note", ""),
                               "old": thumb(old) if old.exists() else None,
-                              "stage": stage(folder.name, name, f.exists(), vt.get("v")) if root == "flow-2d" else None,
+                              "stage": stage(game, name, f.exists(), vt.get("v")) if root == "flow-2d" else None,
                               "flags": ["blank"] if root == "flow-2d" and f.exists() and facts(f)[1] else [],
                               "qa": {k: qa[name][k] for k in ("ok", "issues") if k in qa[name]} if f.exists() and name in qa else None})
             game = "covers" if root == "flow-covers" else folder.parent.name if root == "flow-video" else \
