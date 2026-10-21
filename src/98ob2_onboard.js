@@ -24,7 +24,7 @@ body #odNew{top:auto;bottom:8px;right:max(10px,env(safe-area-inset-right));paddi
   $$('#ob2Row').onclick=e=>{const b=e.target.closest('button'),k=b&&b.dataset.k;if(!b)return;if(!k)return more(true);try{AU.sfx('pick')}catch(e){}$$(k).click()};
   let was=0,shown=0;
   const sync=()=>{const on=M.classList.contains('home')&&!M.hidden;
-    if(on&&!was){M.classList.remove('ob2more');let sv=0;for(let n=1;n<=3;n++)try{if(slotInfo(n))sv=1}catch(e){}$$('#ob2Play span').firstChild.nodeValue=sv?'▶ CONTINUE':'▶ PLAY';$$('#ob2Play small').textContent=sv?'Back to Mainhattan':'Hot Drop · your first drive';
+    if(on&&!was){M.classList.remove('ob2more');let sv=0;for(let n=1;n<=3;n++)try{if(slotInfo(n))sv=1}catch(e){}$$('#ob2Play span').firstChild.nodeValue=sv?'▶ CONTINUE':'▶ PLAY';$$('#ob2Play small').textContent=sv?'Back to Mainhattan':(OD_INTRO?'Hot Drop · your first drive':'Free roam · drive anywhere');
       $$('#ob2Row').style.display=sv?'':'none';$$('#home .hbar h2').textContent=sv?'WELCOME BACK':'WELCOME';
       if(!shown++)setTimeout(()=>{try{localStorage.setItem('mho_seenVer',OD_VER)}catch(e){}},7000)}
     was=on;document.body.classList.toggle('ob2home',on&&!M.classList.contains('ob2more'))};

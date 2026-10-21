@@ -4,3 +4,9 @@
 - HUD moved (free roam, phone): ↺ ⚙ 🐞 into the pause menu (new buttons RESET CAR / SETTINGS / REPORT BUG); hidden until needed: ✓ N/4 chip (odPin), HIT FAST pill (crSmHint), NEXT bar (m1Next), 🚪 EXIT (only on foot), objective arrow (only with a quest/route). Left: ◀ ▶ GAS BRAKE BOOST ❚❚, speed gauge, minimap, boost bar = 9.
 - GOs `why/drive-start`, `why/quiet` (fra + ath, 852×393 and 393×852): PASS. Speed >5 km/h in 0.4-5 s lab, 0 cards/cutscene/auto quest, max 1 visible text element, HUD ≤9. Shots: docs/shots/drivefirst/.
 - Left: the Hot Drop story is no longer offered in free roam (reachable via `?intro=1`, the map/career menu, `__m1`); give it a map marker lane. Terrain slope trap (gap 1) still makes portrait starts slow (4.7 s to 5 km/h).
+
+## Review fix (same lane)
+- RESET CAR in the pause menu now calls ESC_manual() directly (the HUD #tU only listens to touch/pointer events). Only that one button is added; ⚙ and 🐞 already live in the pause menu (duplicates removed). GO why/reset: pointer tap on ❚❚, click RESET CAR, asserts ESC_manual ran once and the BACK ON THE ROAD pill (#skhNote) is visible.
+- Menu PLAY subtitle now "Free roam · drive anywhere" (Hot Drop text only with ?intro=1).
+- Arbiter treats {must:1} say/npcSay lines as essential (GO: a must line survives a newer hitPop); slot visibility now uses the target (inline) opacity so fading cards count at once; roamPlate joined the text slots.
+- Gate: unit 0 FAIL; TAG=life1,xf1,terrain,quests,ui1,travel,stuck,why 59/59 (852x393); TAG=why 5/5 at 393x852. Golden baselines hud-landscape-852x393 / hud-portrait still need a refresh by the reviewer after looking at docs/shots/drivefirst/.
