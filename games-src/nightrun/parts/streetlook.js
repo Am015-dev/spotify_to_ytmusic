@@ -5,10 +5,11 @@
    Flag RET.streetlook (default ON; ?streetlook=0 = the old look exactly: foot.js draws and lays out as before). Test: nightrun/streetlook-test.js (machine gate on the draw calls).
    One world scale K = 0.225 x visible field height / 64 (Kai standing): a standing character is >= 22% of the field on every screen. Gameplay boxes do not change: every actor, pickup, shot and effect
    is drawn K times bigger about its own spot, and heights above the road are drawn K times taller (compressed above D0 so flyers stay on screen), so a shot still leaves the gun and hits the chest.
-   Props: <= 1.25 characters tall, bottom-centre on the road line; neon / banner signs hang on a pole drawn with them; no flying props. Breakable signs stand on a pole too.
+   Props: the approved prop sheets only, <= 1.25 characters tall, bottom-centre on the road line; no flying or hanging props. The breakable sign placeholder stands on a plain pole.
    Portrait phones: the field fills everything above the controls (no dead band), road strip + progress bar sit right on the controls; the camera keeps Kai at 25% of a >= 330 unit wide view
    (0.75 x 330 - half bodies = 215 units = 0.83 s at 260 u/s, the fastest walker). Landscape and desktop keep their layout. Popups clamp inside the field, pickups fade out 24 units before the edge.
-   Backdrop: sky with a small offset crescent moon, far skyline (x0.12), mid buildings (x0.4), near props + lamps on the road (x1); darker to lighter; a few windows twinkle.
+   Backdrop (no new art, ASSET-POLICY.md): placeholder flat layers labelled bg-street-sky / far (x0.12) / mid (x0.4) / road, prop sheets on the road (x1); real files replace them (ASSETS-NEEDED-STREET.md).
+   Kai may walk back (camera eases back <= 35% of the view, not behind the section checkpoint); auto-fire turns Kai to a target behind. Poses without a sheet borrow the nearest act (art.js ART.FB).
    HUD: hearts / weapon / ammo / bombs / power-ups / fever in one panel top-left (14 px+ text), score + time left of the pause button, the hint under both. ---------- */
 if(RET.streetlook===undefined)RET.streetlook=!/[?&]streetlook=0/.test(location.search);
 (function(){
@@ -32,6 +33,16 @@ SL.layout=(L,W,H,dpr,T)=>{SL.port=false;F.camK=undefined;if(!(T&&H>W*1.05))retur
   const sk=clamp(Math.min(Z-2*mg,W*.38,minX-16-12),96,160);set(L.stick,16,hf+(Z-sk)/2,sk);
   const pb=L.root.querySelector('#fPause');pb.style.left=(W-52)+'px';pb.style.top='8px';return true;};
 
+/* ----- walking back: the left wall is no longer the camera's furthest point; Kai may retreat while the camera eases back up to 35% of the view, never behind the
+   current section's checkpoint (or the stage's mid checkpoint once passed) and never inside an arena lock or the boss arena ----- */
+SL.back=(S,P,vw,want)=>{S._camHi=Math.max(S._camHi||0,S.camX);if(S.lock||S.bossOn)return want;
+  let cp=0;if(F.SEC&&S.st===F.STAGES[F.main]){for(const q of F.SEC)if(q.x<=P.maxX)cp=q.x;}else if(S.st.cp&&P.maxX>S.st.cp)cp=S.st.cp;
+  const floor=Math.max(0,S._camHi-.35*vw,cp-40);SL.floor=floor;
+  return P.x-S.camX<vw*.15?Math.max(floor,Math.min(want,P.x-vw*.15)):want;};
+/* ----- auto-fire facing: no stick input, nothing to shoot ahead, a target behind on screen = turn round (auto-fire then shoots it) ----- */
+SL.face=(P,hit)=>{const S=F.S,vw=IN.L().vw;let ah=0,bh=0;for(const e of S.E){if(e.dead||!e.seen||!hit(e)||e.x<S.camX||e.x>S.camX+vw)continue;if((e.x-P.x)*P.facing>-20)ah=1;else bh=1;}
+  if(!ah&&bh)P.facing=-P.facing;};
+
 /* ----- the scale for this frame and the height map (world y -> drawn y; the road line and everything under it stay put) ----- */
 function slFrame(L){const VV=SL.port?SL.VV:L.box.h/L.sc,K=Math.max(1,.225*VV/CH),t0=VH-VV,room=FL-t0-14-62*K;   // room: drawn height above the road a 58-unit flyer's feet may use
   SL.VV=VV;SL.k=K;SL.t0=t0;SL.d0=Math.min(150,room*.8/K);SL.s=clamp((room-K*SL.d0)/(DTOP-SL.d0),.25,K);}
@@ -40,56 +51,33 @@ SL.my=my;
 const at=(c,x,y,k)=>{c.save();c.translate(x,my(y));c.scale(k,k);c.translate(-x,-y);};   // run the old drawing code for a body at (x,y): mapped and K times bigger about that spot
 
 /* ----- backdrop tiles (built once per size): far skyline and mid buildings, drawn in world units, blitted with parallax ----- */
+/* ----- backdrop: NO new art (ASSET-POLICY.md). Until the owner delivers the street layers (ASSETS-NEEDED-STREET.md) each layer is a PLACEHOLDER: plain flat rectangles in one tint
+   with its asset id as the label. A real file foot/bg-street-<layer>.webp listed in ready.json replaces its placeholder (tiled, parallax kept). The old media/foot/bg-*.webp are mock placeholders: not used. ----- */
+const BGL={far:['#140d2a','bg-street-far',960,.34,.44],mid:['#22163f','bg-street-mid',1280,.24,.36]};   // tint, asset id, tile width (units), min / extra height as a share of the sky
 let tiles={};
 function slTile(kind,Hh,res){const key=kind+'|'+Math.round(Hh)+'|'+res.toFixed(2);let o=tiles[key];if(o)return o;if(Object.keys(tiles).length>5)tiles={};
-  const far=kind==='far',TW=far?960:1280,cv=document.createElement('canvas');cv.width=Math.ceil(TW*res);cv.height=Math.ceil(Hh*res);const g=cv.getContext('2d');g.scale(res,res);const win=[];
-  let x=0,i=0;while(x<TW-30){const r=hs(i*7+(far?3:11)),r2=hs(i*13+(far?5:17)),bw=Math.min(TW-x,far?44+64*r:118+92*r),bh=Hh*(far?.34+.44*r2:.24+.36*r2),top=Hh-bh;
-    if(far){g.fillStyle='#120b27';g.fillRect(x,top,bw-3,bh);g.fillStyle='#1b1238';g.fillRect(x,top,bw-3,2);
-      if(r>.6){g.fillStyle='#120b27';g.fillRect(x+bw*.45,top-22,2,22);g.fillStyle='#ff2a4a';g.fillRect(x+bw*.45-1,top-24,4,3);}
-      for(let wy=top+10;wy<Hh-14;wy+=14)for(let wx=x+6;wx<x+bw-10;wx+=10)if(hs(wx*3+wy*7)>.93){g.fillStyle='rgba(255,190,120,.32)';g.fillRect(wx,wy,3,4);}}
-    else{g.fillStyle='#21153f';g.fillRect(x,top,bw,bh);g.fillStyle='#34245e';g.fillRect(x,top,3,bh);g.fillStyle='#2c1e52';g.fillRect(x-2,top-4,bw+4,5);
-      for(let wy=top+14,rr=0;wy<Hh-22;wy+=17,rr++)for(let wx=x+10,cc=0;wx<x+bw-14;wx+=15,cc++){const q=hs(i*131+rr*17+cc*5);
-        if(q>.74){const warm=hs(i*7+rr)>.45;g.fillStyle=warm?'rgba(255,205,125,.78)':'rgba(125,225,255,.72)';g.fillRect(wx,wy,7,8);win.push([wx,wy,warm]);}else{g.fillStyle='rgba(8,5,20,.55)';g.fillRect(wx,wy,7,8);}}
-      if(r2>.5){const c=['#ff2d95','#19e3ff','#ffb020','#3dff8a'][Math.floor(hs(i*9)*4)],sw=bw*.42,sy=top+bh*.18,sx=x+bw*.3;   // a neon sign bolted to the facade (two brackets)
-        g.fillStyle='#14102a';g.fillRect(sx+6,sy-6,3,6);g.fillRect(sx+sw-9,sy-6,3,6);g.globalAlpha=.25;g.fillStyle=c;g.fillRect(sx-5,sy-5,sw+10,28);g.globalAlpha=1;g.fillStyle=c;g.fillRect(sx,sy,sw,18);g.fillStyle='rgba(10,5,25,.8)';g.fillRect(sx+3,sy+3,sw-6,12);}}
-    x+=bw+(far?2:8+20*hs(i*29));i++;}
-  return tiles[key]={cv,TW,Hh,win};}
-function slBlit(c,kind,k,cam,x0,w,t0,res,t){const o=slTile(kind,FL+2-t0,res),off=cam*k,TW=o.TW;let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+kind;
-  for(;x<x0+w;x+=TW){c.drawImage(o.cv,x,t0,TW,o.Hh);
-    if(kind==='mid'&&o.win.length){const n=o.win.length,q=Math.floor(t*.9);for(let j=0;j<4;j++){const wv=o.win[Math.floor(hs(q*17+j*131)*n)],a=.5+.5*Math.sin(t*5+j*2);   // a few windows flick off and on
-        c.fillStyle=a>.5?(wv[2]?'#ffe2a8':'#bff3ff'):'rgba(8,5,20,.9)';c.fillRect(x+wv[0],t0+wv[1],7,8);}}}
-  SL.tag='';}
+  const L_=BGL[kind],TW=L_[2],cv=document.createElement('canvas');cv.width=Math.ceil(TW*res);cv.height=Math.ceil(Hh*res);const g=cv.getContext('2d');g.scale(res,res);g.fillStyle=L_[0];
+  let x=0,i=0;while(x<TW-30){const bw=Math.min(TW-x,(kind==='far'?60:150)+60*hs(i*7+3)),bh=Hh*(L_[3]+L_[4]*hs(i*13+5));g.fillRect(x,Hh-bh,bw-4,bh);x+=bw;i++;}
+  g.fillStyle='rgba(255,255,255,.35)';g.font='bold 12px monospace';g.textAlign='left';g.textBaseline='bottom';g.fillText(L_[1]+' (placeholder)',8,Hh-6);
+  return tiles[key]={cv,TW,Hh};}
+function slPic(id){const fa=window.FA;return fa&&fa._pic?fa._pic('foot/'+id+'.webp'):null;}
+function slBlit(c,kind,k,cam,x0,w,t0,res){const pic=slPic(BGL[kind][1]),Hh=FL+2-t0;let src,TW;
+  if(pic){TW=Hh*pic.width/pic.height;src=pic;}else{const o=slTile(kind,Hh,res);src=o.cv;TW=o.TW;}
+  const off=cam*k;let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+kind;for(;x<x0+w;x+=TW)c.drawImage(src,x,t0,TW,Hh);SL.tag='';}
 
-/* ----- near layer (x1, on the road): lamps and the prop sheets, every one <= 1.25 characters tall ----- */
-const PROPS=[['car',.62,0],['police',.72,0],['holo',1.15,0],['beacon',.95,0],['steam',.9,0],['neon',.5,1],['banner',.55,1]];   // [sheet, height in characters, 1 = a sign on a pole]
-function slNear(c,cam,x0,w,t){const C=CH*SL.k,cell=520,i0=Math.floor((cam+x0)/cell)-1,i1=Math.ceil((cam+x0+w)/cell)+1;
-  for(let i=i0;i<=i1;i++){const r=hs(i*41+7),px=i*cell-cam+cell*(.2+.6*hs(i*5+1));
-    if(hs(i*3+2)<.45){const lx=i*cell-cam+cell*.05,ph=1.25*C;c.fillStyle='#1a1530';c.fillRect(lx-2.5*SL.k,FL-ph,5*SL.k,ph);c.fillRect(lx-2.5*SL.k,FL-ph,18*SL.k,4*SL.k);   // street lamp
-      c.fillStyle='rgba(255,226,150,.16)';c.beginPath();c.ellipse(lx+16*SL.k,FL-ph+18*SL.k,20*SL.k,26*SL.k,0,0,6.283);c.fill();c.fillStyle='#fff1b8';c.fillRect(lx+12*SL.k,FL-ph+3*SL.k,8*SL.k,4*SL.k);}
-  }
-  if(typeof ART!=='undefined'&&ART.footProps)ART.footProps(c,cam,w,FL,t);}
-/* the prop sheets, through ART.footProps (same hook as the old street; this part owns it while the flag is on). x from SL.x0 (the screen's left edge in view units) */
+/* ----- near layer (x1, on the road): the approved prop sheets only, each <= 1.25 characters tall, bottom on the road ----- */
+const PROPS=[['car',.62],['police',.72],['holo',1.15],['beacon',.95],['steam',.9]];   // [sheet, height in characters]
 if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART.drawAnim)return;const C=CH*SL.k,x0=SL.x0||0,cell=400,i0=Math.floor((cam+x0)/cell)-1,i1=Math.ceil((cam+x0+w)/cell)+1;
-  for(let i=i0;i<=i1;i++){const r=hs(i*41+7),px=i*cell-cam+cell*(.2+.6*hs(i*5+1));
-    if(r>.58)continue;
+  for(let i=i0;i<=i1;i++){const r=hs(i*41+7),px=i*cell-cam+cell*(.2+.6*hs(i*5+1));if(r>.58)continue;
     const q=PROPS[Math.floor(hs(i*97+3)*PROPS.length)],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),m=ART.ANIM.s[k];if(!m||!ART.anim(k))continue;
-    const h=q[1]*C,sc=h/m[3];
-    if(q[2]){const top=fl-1.25*C;c.fillStyle='#1d1834';c.fillRect(px-3*SL.k,top+h*.6,6*SL.k,fl-top-h*.6);c.fillRect(px-12*SL.k,fl-4*SL.k,24*SL.k,4*SL.k);   // the pole the sign hangs on
-      SL.tag='prop-m';ART.drawAnim(c,k,t+i*.37,px,top+h/2,sc,false,.95);}
-    else{SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,sc,false,.95);}   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
-    SL.tag='';}};
+    const h=q[1]*C;SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,.95);SL.tag='';}};   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
 
-function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,t=S.time,fh=FL-t0;
-  const g=c.createLinearGradient(0,t0,0,FL);g.addColorStop(0,'#06041a');g.addColorStop(.55,'#1c0b37');g.addColorStop(1,'#3b1553');c.fillStyle=g;c.fillRect(x0,t0-4,w,fh+8);
-  c.fillStyle='rgba(255,255,255,.55)';for(let i=0;i<34;i++){const sx=x0+((hs(i*3)*w*1.4-cam*.02)%w+w)%w;c.fillRect(sx,t0+hs(i*7+1)*fh*.5,1.4,1.4);}
-  const mr=Math.max(7,fh*.03),mx=x0+w*.84,mY=t0+fh*.13;c.fillStyle='rgba(240,220,255,.12)';c.beginPath();c.arc(mx,mY,mr*2.6,0,6.283);c.fill();   // small crescent, high right, off the action
-  c.fillStyle='#efe2ff';c.beginPath();c.arc(mx,mY,mr,0,6.283);c.fill();c.fillStyle='#0b061f';c.beginPath();c.arc(mx+mr*.45,mY-mr*.2,mr*.9,0,6.283);c.fill();
-  slBlit(c,'far',SL.speeds.far,cam,x0,w,t0,res,t);
-  c.fillStyle='rgba(30,12,60,.35)';c.fillRect(x0,FL-fh*.45,w,fh*.45+2);   // haze between the layers
-  slBlit(c,'mid',SL.speeds.mid,cam,x0,w,t0,res,t);
-  const rg=c.createLinearGradient(0,FL,0,VH);rg.addColorStop(0,'#251c40');rg.addColorStop(1,'#09070f');c.fillStyle=rg;c.fillRect(x0,FL,w,VH-FL+2);   // the road
-  c.fillStyle='#5a4590';c.fillRect(x0,FL,w,3);c.fillStyle='rgba(255,210,120,.32)';const so=((cam%120)+120)%120;for(let x=x0-so;x<x0+w;x+=120)c.fillRect(x,FL+36,48,3);
-  SL.x0=x0;slNear(c,cam,x0,w,t);}
+function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,fh=FL-t0;
+  const sky=slPic('bg-street-sky');if(sky)c.drawImage(sky,x0,t0-4,w,fh+8);else{c.fillStyle='#0c0820';c.fillRect(x0,t0-4,w,fh+8);c.fillStyle='rgba(255,255,255,.35)';c.font='bold 12px monospace';c.textAlign='right';c.textBaseline='top';c.fillText('bg-street-sky (placeholder)',x0+w-8,t0+fh*.35);}
+  slBlit(c,'far',SL.speeds.far,cam,x0,w,t0,res);slBlit(c,'mid',SL.speeds.mid,cam,x0,w,t0,res);
+  const rd=slPic('bg-street-road');if(rd){const TW=(VH-FL)*rd.width/rd.height;let x=x0-((cam%TW)+TW)%TW;for(;x<x0+w;x+=TW)c.drawImage(rd,x,FL,TW,VH-FL+2);}
+  else{c.fillStyle='#1b1530';c.fillRect(x0,FL,w,VH-FL+2);c.fillStyle='#3a2a60';c.fillRect(x0,FL,w,3);}
+  SL.x0=x0;if(typeof ART!=='undefined'&&ART.footProps)ART.footProps(c,cam,w,FL,S.time);}
 
 /* ----- the frame ----- */
 SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);

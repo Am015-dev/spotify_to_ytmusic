@@ -81,11 +81,11 @@ const BGC={};function bgFor(i){if(BGC[i])return BGC[i];
 
 // Scanlines + vignette: rebuilt at the canvas's own pixel size (1 canvas pixel per output pixel, no scaling pass) and drawn as one image a frame.
 const SCN={l:null,p:null};
-function scanFor(port){const w=cv.width,h=cv.height,o=SCN[port?'p':'l'];if(o&&o.width===w&&o.height===h)return o;
+function scanFor(port){const w=cv.width,h=cv.height,o=SCN[port?'p':'l'],cp=window.COM&&COM.scanP(),ck=cp?cp.a+'|'+cp.v:'';if(o&&o.width===w&&o.height===h&&(o.ck||'')===ck)return o;   // comfort.js: softer lines, lighter vignette
   const c=o||document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d'),u=port?VS:S,SW=port?PW_:W,SH_=port?PH_:H;g.setTransform(u,0,0,u,0,0);
-  g.fillStyle=port?'rgba(0,0,0,.16)':'rgba(0,0,0,.18)';for(let y=0;y<SH_;y+=3)g.fillRect(0,y,SW,1);
+  if(cp){if(cp.a){g.fillStyle='rgba(0,0,0,'+cp.a+')';for(let y=0;y<SH_;y+=cp.pitch)g.fillRect(0,y,SW,1);}}else{g.fillStyle=port?'rgba(0,0,0,.16)':'rgba(0,0,0,.18)';for(let y=0;y<SH_;y+=3)g.fillRect(0,y,SW,1);}
   const v=port?g.createRadialGradient(SW/2,SH_/2,SH_*.3,SW/2,SH_/2,SH_*.75):g.createRadialGradient(SW/2,SH_/2,SH_*.35,SW/2,SH_/2,SH_*.95);
-  v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,port?'rgba(0,0,0,.55)':'rgba(0,0,0,.6)');g.fillStyle=v;g.fillRect(0,0,SW,SH_);SCN[port?'p':'l']=c;return c;}
+  v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,cp?'rgba(0,0,0,'+cp.v+')':port?'rgba(0,0,0,.55)':'rgba(0,0,0,.6)');g.fillStyle=v;g.fillRect(0,0,SW,SH_);c.ck=ck;SCN[port?'p':'l']=c;return c;}
 // A big scrolling layer is built once at 1.5 px per unit; on a screen that needs less (1 px per unit at 1080p) a copy at exactly the needed size is drawn instead,
 // so the GPU does not shrink a 2880 px wide texture every frame.
 function dispOf(L,r){r=Math.min(PR,r);if(r>=PR*.98)return L.c;if(L.d&&Math.abs(L.dr-r)<.004)return L.d;

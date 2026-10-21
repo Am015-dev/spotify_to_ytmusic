@@ -198,14 +198,17 @@ ART.FM={kai:H({hit:'hurt','crouch-shoot':'crouchshoot'}),grunt:H(),gunman:H(),sh
   ninja:{block:'block',dash:'dash',slash:'slash',hit:'block',die:'die'},medic:{walk:'walk',heal:'heal',die:'die'}};
 for(const w in ART.FM){const o=ART.FM[w];o._all=[...new Set(Object.values(o))];if(w==='kai')o._all.push('dash','runshoot','land','combo2','combo3','aimup','aimdiag','grenade','victory');}
 ART.fE=null;ART.fS={};
+ART.FB={hit:['hurt','idle'],crouch:['idle'],'crouch-shoot':['crouchshoot','shoot','idle'],melee:['melee','shoot','idle'],attack2:['melee','shoot'],enrage:['idle'],fall:['jump'],jump:['jump'],run:['run','walk'],'run-a':['run','walk'],'run-b':['run','walk'],_any:['idle','run','walk','hover','fly']};   // streetlook: pose -> nearest acts when the mapped sheet is missing
 ART.footDraw=(c,who,pose,x,y,h,flip,t)=>{if(!RET.sprites)return false;const mp=ART.FM[who];if(!mp)return false;if(!mp._w){mp._w=1;for(const a of mp._all)ART.anim(who+'/'+a);}
-  const e=ART.fE||ART.fS,xa=e._xa,act=xa||mp[pose];if(!act)return false;const key=who+'/'+act,b=ART.anim(key);if(!b)return false;const o=ART.aS(key),m=o.m,fall=pose==='fall'&&act==='jump',kp=key+(fall?'F':'');
+  const e=ART.fE||ART.fS,xa=e._xa;let act=xa||mp[pose],key=act&&who+'/'+act,b=key&&ART.anim(key),sub=false;
+  if(!b&&RET.streetlook){for(const a of (ART.FB[pose]||[]).concat(ART.FB._any,mp._all)){const k2=who+'/'+a;if(ART.ANIM.s[k2]&&ART.anim(k2)){sub=a!==act;act=a;key=k2;b=ART.anim(k2);break;}}}   // streetlook: a pose without its own sheet borrows the nearest act, never the old still
+  if(!b)return false;const o=ART.aS(key),m=o.m,fall=pose==='fall'&&act==='jump',kp=key+(fall?'F':'');
   if(e._fa!==kp){e._fa=kp;e._f0=t;}let tt=ART.fE?t-e._f0:t;if(act==='jump'){tt=fall?o.cum[1]+tt:Math.min(tt,o.cum[1]-.001);}
-  const sc=h/m[3],sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=1;const f=sq.frames[act];if(f&&f.indexOf(i)>=0&&ART.aT<sq.ms/1000)sy=1-sq.amount*(1-ART.aT/(sq.ms/1000));
+  const cr=sub&&/^crouch/.test(pose),sc=(cr&&who==='kai'?h/.7:h)/m[3],sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=cr?.7:1;const f=sq.frames[act];if(f&&f.indexOf(i)>=0&&ART.aT<sq.ms/1000)sy=1-sq.amount*(1-ART.aT/(sq.ms/1000));
   const dead=act==='die'&&who!=='kai',fade=dead?1-.85*Math.min(1,Math.max(0,tt-.4)/.8):1,ga=c.globalAlpha;
   c.save();c.translate(x,y);if(window.FA&&FA.shadow)FA.shadow(c,m[2]*sc*.75,who==='drone'||who==='jetpack'?.6*fade:fade);
   if(act==='run'||act==='runshoot'||act==='walk')c.rotate(sm.lean.run_deg*Math.PI/180*(flip?-1:1));
-  c.globalAlpha=ga*fade;ART.drawAnim(c,key,tt,0,0,sc,flip,null,sy);c.restore();return true;};
+  c.globalAlpha=ga*fade;ART.drawAnim(c,key,tt,0,0,sc,flip,null,sy);if(sub&&pose==='hit'){c.globalCompositeOperation='lighter';ART.drawAnim(c,key,tt,0,0,sc,flip,.5,sy);c.globalCompositeOperation='source-over';}c.restore();return true;};   // a borrowed hit act flashes white
 }
 /* ----- street props behind the actors: a few per parallax cell, standing on the road line (pf = FL), looping at the sheet fps ----- */
 ART.PROPS=[['car',80,0],['police',84,0],['steam',120,0],['beacon',160,0],['neon',150,0],['banner',170,0],['holo',150,0],['windows',190,0],['drone',58,1]];

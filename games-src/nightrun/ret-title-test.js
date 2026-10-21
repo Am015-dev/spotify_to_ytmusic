@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// ?hub=0: this test checks the old title + MENU sheet (still served with ?hub=0); the hub itself is hub-test.js.
 // POLISH B25 (title diet + CONTINUE) and B26 (text >= 14 px, touch targets >= 44 px) on title, menu and map. Headless, no screenshots.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/ret-title-test.js     env: GAME_DIR=...
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
@@ -16,7 +17,7 @@ const AUDIT = ({ root, minPx }) => {
   const shown = e => { for (let x = e; x && x !== document.body; x = x.parentElement) { if (x.hidden || !vis(x)) return false; } return true; };
   const inView = r => r.right > 0 && r.left < vp.w && r.bottom > 0 && r.top < vp.h;
   for (const e of R.querySelectorAll('button,[role=button]')) {
-    if (!shown(e)) continue; const r = e.getBoundingClientRect(); if (!inView(r)) continue; out.n++;
+    if (!shown(e) || e.id === 'sgTile') continue; const r = e.getBoundingClientRect(); if (!inView(r)) continue; out.n++;   // the STORY tile (saga.js) is content, not a title action
     const own = e.closest('.mapbox');   // map nodes may sit under the scroll edge: only count them when fully inside the map
     if (own) { const m = own.getBoundingClientRect(); if (r.left < m.left || r.right > m.right || r.top < m.top || r.bottom > m.bottom) continue; }
     if (r.width < 43.5 || r.height < 43.5) out.btn.push((e.id || e.className || e.tagName) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height));
@@ -41,7 +42,7 @@ const AUDIT = ({ root, minPx }) => {
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(() => { try { if (!sessionStorage.getItem('__ini')) { sessionStorage.setItem('__ini', '1'); localStorage.setItem('mnr_tut', '1'); } } catch (e) { } });
     if (init) await p.addInitScript(init);
-    await p.goto(`http://127.0.0.1:${port}/index.html${q}`); await p.waitForFunction(() => window.__mnr && window.RET && (window.RET.titleDraw !== undefined || window.RET.title === false), null, { timeout: 9000 }); await p.waitForFunction(() => document.documentElement.classList.contains('rdy'), null, { timeout: 9000 }); await sleep(250); return p; };
+    await p.goto(`http://127.0.0.1:${port}/index.html${q ? q + '&hub=0' : '?hub=0'}`); await p.waitForFunction(() => window.__mnr && window.RET && (window.RET.titleDraw !== undefined || window.RET.title === false), null, { timeout: 9000 }); await p.waitForFunction(() => document.documentElement.classList.contains('rdy'), null, { timeout: 9000 }); await sleep(250); return p; };
   const vis = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); if (!e) return false; for (let x = e; x && x !== document.body; x = x.parentElement) { if (x.hidden) return false; const cs = getComputedStyle(x); if (cs.display === 'none' || cs.visibility === 'hidden') return false; } const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; }, sel);
   const tap = async (p, sel) => { await p.locator(sel).scrollIntoViewIfNeeded().catch(() => { }); const b = await p.locator(sel).boundingBox(); await p.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2); };
   const menuOpen = async p => { if (!await vis(p, '#mnMore')) { await tap(p, '#moreBtn'); await sleep(150); } };

@@ -153,14 +153,14 @@ const SCREENS = [
   ['settings-scrolled', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#setBtn'); await sleep(300); await p.evaluate(() => { const b = document.getElementById('setBody'); if (b) b.scrollTop = b.scrollHeight; }); await sleep(200); }],
   ['story-map', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#storyBtn'); await sleep(500); }],   // STORY moved into the MENU sheet (B25)
   ['story-stage', async p => { await p.evaluate(() => { __mnr.sSave.all = true; __mnr.startStory(1); }); await sleep(900); }, 'canvas'],
-  ['hud-run', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = true; }); await sleep(2500); }, 'canvas'],
-  ['hud-boss', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = true; __mnr.G.dt = 1e9; }); await p.waitForFunction(() => __mnr.G.boss && __mnr.G.boss.x <= 800, null, { timeout: 40000 }); await sleep(1800); }, 'canvas'],
-  ['pause', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await sleep(800); await p.keyboard.press('Escape'); await sleep(400); }],
-  ['pit-shop', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.SH.neon = 200; __mnr.SH.pit(() => { }); }); await sleep(900); }],
-  ['boss-chest', async p => { await p.evaluate(() => localStorage.setItem('mnr_chest', '1')); await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.G.bossDone = true; __mnr.SH.pit(() => { }); }); await sleep(900); }],
+  ['hud-run', async p => { await p.evaluate(() => document.getElementById('startBtn').click()); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = true; }); await sleep(2500); }, 'canvas'],
+  ['hud-boss', async p => { await p.evaluate(() => document.getElementById('startBtn').click()); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = true; __mnr.G.dt = 1e9; }); await p.waitForFunction(() => __mnr.G.boss && __mnr.G.boss.x <= 800, null, { timeout: 40000 }); await sleep(1800); }, 'canvas'],
+  ['pause', async p => { await p.evaluate(() => document.getElementById('startBtn').click()); await p.waitForFunction(() => __mnr.running); await sleep(800); await p.keyboard.press('Escape'); await sleep(400); }],
+  ['pit-shop', async p => { await p.evaluate(() => document.getElementById('startBtn').click()); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.SH.neon = 200; __mnr.SH.pit(() => { }); }); await sleep(900); }],
+  ['boss-chest', async p => { await p.evaluate(() => localStorage.setItem('mnr_chest', '1')); await p.evaluate(() => document.getElementById('startBtn').click()); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.G.bossDone = true; __mnr.SH.pit(() => { }); }); await sleep(900); }],
   ['story-results', async p => { await p.evaluate(() => { __mnr.sSave.all = true; __mnr.startStory(1); }); await sleep(700); await p.evaluate(() => { __mnr.ST.fail(); }); await sleep(900); }],
-  ['game-over', async p => { await p.click('#startBtn'); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = false; __mnr.hurt(99); __mnr.G.deadT = 9; }); await sleep(1800); }],
-  ['garage', async p => { await p.click('#gaBtn'); await sleep(500); }],
+  ['game-over', async p => { await p.evaluate(() => document.getElementById('startBtn').click()); await p.waitForFunction(() => __mnr.running); await p.evaluate(() => { __mnr.god = false; __mnr.hurt(99); __mnr.G.deadT = 9; }); await sleep(1800); }],
+  ['garage', async p => { await p.evaluate(() => (document.getElementById('hub_hangar') || document.getElementById('gaBtn')).click()); await sleep(500); }],
   ['garage-tabs', null],
   ['lab-boss', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#labBtn'); await sleep(2500); }, 'canvas'],
   ['lab-foes', async p => { await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); await p.click('#labBtn'); await sleep(900); await p.click('#labTab_foes'); await sleep(300); }],
@@ -201,7 +201,7 @@ const SCREENS = [
     for (const [name, setup, mode] of SCREENS) {
       if (ONLY && !ONLY.some(o => name.startsWith(o))) continue;
       if (name === 'garage-tabs') { for (const tab of ['ships', 'crew', 'looks', 'load', 'mkt', 'forge', 'pilot']) { if (ONLY && !ONLY.some(o => 'garage-tabs'.startsWith(o) || ('garage-' + tab).startsWith(o))) continue;
-          await run('garage-' + tab, async p => { await p.click('#gaBtn'); await sleep(400); const b = await p.$(`#garage .tabs button[data-t="${tab}"]`); if (!b) throw new Error('no garage tab ' + tab); await b.click(); await sleep(500); }); } continue; }
+          await run('garage-' + tab, async p => { await p.evaluate(() => (document.getElementById('hub_hangar') || document.getElementById('gaBtn')).click()); await sleep(400); const b = await p.$(`#garage .tabs button[data-t="${tab}"]`); if (!b) throw new Error('no garage tab ' + tab); await b.click(); await sleep(500); }); } continue; }
       await run(name, setup, mode);
     }
   }
