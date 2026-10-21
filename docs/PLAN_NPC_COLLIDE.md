@@ -25,3 +25,12 @@ Gate failures that are already on trunk (base build, same TAG): ctb/collide, tra
 ## Left
 - The NPC box uses the edge direction, not the pose heading on corner curves (c.hdx/hdz). This is a small error on curves.
 - Smash-2 still keeps 85 % of the player's speed in a bump. The separation now stops the pass-through, but bumping still feels light. That is a feel call for Alex's review.
+
+## Invisible cars (Alex, same lane): hitting something where no car is drawn
+Checked (headless, both cities):
+- Traffic cars solid while not drawn (mesh missing, hidden parent, j >= count, scale 0, matrix off): 0 of 88 nearby cars, and 0 of 102 contacts during a 120 s ghost drive.
+- Static NPC cars (CR_NPCS): none exist in roam.
+- Phone-tier perf-5 compaction (98pc_compact, quality low/min): it re-packs which traffic instances are drawn every 10 frames. Within 40 m of the player, 0 undrawn cars in 3,600 frames per city, because its 60 m keep radius covers that range.
+**Root cause: the boxes are bigger than the drawn car.** Scooter 1.0 x 2.2 m vs drawn 0.61 x 1.46; su:* cars 2.3 x 4.8 vs 2.0 x 4.0; bus 12 vs 10.3 m long; truck 2.6 vs 2.1 m wide. Now that a bump really blocks, the player stopped 0.4-0.9 m short of the visible car, which looks like hitting air.
+Fix: CT_dim (read by OB_cdim) clamps each kind's box to its drawn geometry (+5 cm). It never grows a box, and it re-reads the geometry when a lazy model swaps in. On phones, a traffic car with no draw slot is not solid (visible = solid).
+GO collide/npc-box: kinds with a box > 0.1 m outside the drawn car went from 4 to 0 in Frankfurt and from 4 to 0 in Athens.
