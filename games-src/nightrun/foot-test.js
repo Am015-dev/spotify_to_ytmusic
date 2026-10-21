@@ -131,7 +131,7 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
         ok('stats: on-foot run counted (runs, kills, time)', (b.runs | 0) > (r.a.runs | 0) && (b.kills | 0) > (r.a.kills | 0) && (b.time | 0) >= (r.a.time | 0), [r.a, b]); }
       else ok('stats: stage opens', false, st); await p.ctx.close(); }
     // ---- unit checks on the engine (desktop page)
-    { const p = await open(1280, 720); await enter(p, false);
+    { const p = await open(1280, 720); await enter(p, false); await p.evaluate(() => { FOOT.stop(); FOOT.start('street1'); });   // engine unit checks on the street1 mock (footstage.js has its own test)
       const u = await p.evaluate(() => { const S = FOOT.S, P = S.P, o = {}; P.inv = 0; P.dashIF = 0;
         const give = k => { S.pk.push({ k, x: P.x, y: P.y - 36, vy: 0, t: 0, on: true }); FOOT.step(1 / 60); };
         give('w_hmg'); o.hmg1 = P.w + P.lv; for (let i = 0; i < 6; i++) give('w_hmg'); o.hmg5 = P.w + P.lv;
