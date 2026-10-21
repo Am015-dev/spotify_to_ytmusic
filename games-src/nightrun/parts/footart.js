@@ -102,6 +102,7 @@ function mac(ctx,id,pose,t,S,u){
 /* ---- public draw ---- */
 FA.draw=(ctx,who,pose,x,y,h,flip,t)=>{
   if(WHO.indexOf(who)<0)who='grunt';t=t||0;
+  if(RET.footq&&RET.sprites&&window.FOOT&&FOOT.q){FOOT.q.draw(ctx,who,pose,x,y,h,flip,t);return;}   // footq.js: one height per entity, the sheet or a flat box, never the old shapes below
   if(typeof ART!=='undefined'&&ART.footDraw&&ART.footDraw(ctx,who,pose,x,y,h,flip,t))return;   // the strip sheets (art.js); stills and shapes below when a sheet is missing or ?sprites=0
   const mach=!!MAC[who];if(pose==='run')pose=BK(t,8)?'run-b':'run-a';
   if(mach&&pose!=='shoot'&&pose!=='hit'&&pose!=='die')pose='idle';
@@ -137,6 +138,7 @@ const PAR={sky:.02,far:.12,mid:.35,near:.7,floor:1},NEON=['#ff2d95','#19e3ff','#
 FA.floorY=h=>Math.round(h*(1-70/540));   // = FOOT's road line (view 540 tall, floor at h-70), so feet stand on the road
 FA.bg=(ctx,layer,camX,w,h)=>{
   const fy=FA.floorY(h),k=h/720,off=(camX||0)*(PAR[layer]||0),pic=FA._pic('foot/bg-'+layer+'.webp');
+  if(RET.footq&&!pic)return;   // footq: no old vector skyline (a painted layer only)
   ctx.save();
   if(pic){const kk=fy/(h*.8),tw=h*2*kk;let x0=-(((off%tw)+tw)%tw);for(let x=x0;x<w;x+=tw)ctx.drawImage(pic,x,0,tw,h*kk);ctx.restore();return;}   // the picture's 80% street line is scaled onto the road line
   if(layer==='sky'){const g=ctx.createLinearGradient(0,0,0,fy);g.addColorStop(0,'#07051a');g.addColorStop(.6,'#2a0f4a');g.addColorStop(1,'#6a1f6a');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);

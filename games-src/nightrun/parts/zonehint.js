@@ -16,9 +16,11 @@ const ZH=window.ZH={get on(){return!!RET.zonehint;},ZT:4.5,done:{rule:0,boss:0},
     if(!this.done.boss&&window.BMV&&BMV.hz&&G.boss){for(const z of BMV.hz)if(z.s==='well'){this.start('boss',z.x,z.y,Math.min(z.R||300,300),'#c08aff');break;}}},
   draw(){const c=this.cap;if(!this.on||!c)return;const txt=this.TXT[c.k],a=Math.min(1,c.t/.5,(this.ZT-c.t)/.3+.01);
     ctx.save();ctx.globalAlpha=Math.max(0,a);ctx.font='700 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    const w=Math.min(W-16,ctx.measureText(txt).width+22),x=clamp(c.x,w/2+8,W-w/2-8),y=clamp(c.y-Math.min(c.r,150)-18,60,H-60);
-    ctx.fillStyle='#05030ccc';ctx.strokeStyle=c.col;ctx.lineWidth=1.5;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x-w/2,y-13,w,26,13);else ctx.rect(x-w/2,y-13,w,26);ctx.fill();ctx.stroke();
-    ctx.fillStyle='#fff';ctx.fillText(txt,x,y+1,w-12);ctx.restore();}};
+    const up=typeof wcv!=='undefined'&&wcv!==cv,off=Math.min(c.r,150)+18;   // portrait: the world is turned, so the box is turned back upright like wtxt()
+    const w=Math.min((up?H:W)-16,ctx.measureText(txt).width+22),x=up?clamp(c.x-off,60,W-60):clamp(c.x,w/2+8,W-w/2-8),y=up?clamp(c.y,w/2+8,H-w/2-8):clamp(c.y-off,60,H-60);
+    ctx.translate(x,y);if(up)ctx.rotate(Math.PI/2);
+    ctx.fillStyle='#05030ccc';ctx.strokeStyle=c.col;ctx.lineWidth=1.5;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(-w/2,-13,w,26,13);else ctx.rect(-w/2,-13,w,26);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#fff';ctx.fillText(txt,0,1,w-12);ctx.restore();}};
 NR.on('runStart',()=>ZH.reset());
 NR.on('tick',dt=>ZH.tick(dt));
 {const dp=drawPlayer;drawPlayer=function(t){dp(t);try{ZH.draw();}catch(e){}};}

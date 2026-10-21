@@ -37,7 +37,7 @@ const BOT = () => { window.__fl = { up: 0, down: 0, pick: 0, kill: 0, cp: 0, lv5
     await p.waitForFunction(() => window.__mnr && document.getElementById('moreBtn'), null, { timeout: 15000 }); await sleep(400); p.ctx = ctx; return p; };
   const enter = async (p, touch) => { await p.evaluate(() => document.getElementById('moreBtn').click()); await sleep(200);
     const b = await p.$('#footBtn'); if (!b) return 'no button'; if (await b.isDisabled()) return 'locked';
-    if (touch) await b.tap(); else await b.click(); await sleep(300);
+    if (touch) await b.tap(); else await b.click(); await sleep(300); await p.waitForFunction(() => FOOT.on, null, { timeout: 12000 }).catch(() => {});
     for (let i = 0; i < 6 && !(await p.evaluate(() => FOOT.on)); i++) { await p.evaluate(() => { const c = document.getElementById('taleCard'); if (c && !c.hidden) (document.getElementById('taleTc') || c).click(); }); await sleep(250); }
     return (await p.evaluate(() => FOOT.on)) ? 'on' : 'not started'; };
   // layout audit: controls 44px+ inside the screen, never over the play box, no button on another or on the stick circle (8 px gaps), hint strip clear of the HUD, field size

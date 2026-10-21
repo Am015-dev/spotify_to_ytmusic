@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Nightrun LESSONS test (parts/lessons.js: mini stages; real page, ?nomusic=1&lessons=1). Prints only PASS / FAIL lines; exit code 1 on any FAIL.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/lessons-test.js     env: GAME_DIR=...  VP=390x763 (one size)
+// Runs with ?schoolfull=0 (one pass of the phases); the full demo + 3 rounds version is tested by school-full-test.js.
 // At 390x763 and 375x553 (touch): (a) each lesson's mini stage opens the first time its feature appears (WEAPONS sheet, Garage FORGE twice, SHIPS,
 // story stage 3, story stage 2) and never again; (b) an in-page bot plays it: in every phase that teaches a choice it first does the wrong thing and gets
 // TRY AGAIN, then does the right thing and the phase turns green; every lesson reaches LESSON CLEAR in < 60 s; (c) SKIP closes it and it stays seen;
@@ -45,7 +46,7 @@ const BOT = () => { if (window.__lsBotI) return; const st = {}, L = window.__les
 async function page(br, port, vp, q) {
   const ctx = await br.newContext({ viewport: { width: vp[0], height: vp[1] }, hasTouch: true, isMobile: true, deviceScaleFactor: 2 }), p = await ctx.newPage(), errs = [];
   p.on('pageerror', e => errs.push(e.message)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.addInitScript(INIT);
-  await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1${q}`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__lessons && document.getElementById('mnMore')); await sleep(600);
+  await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&schoolfull=0${q}`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__lessons && document.getElementById('mnMore')); await sleep(600);
   return { ctx, p, errs };
 }
 const L = p => p.evaluate(() => ({ open: window.__lessons.open, id: window.__lessons.id, seen: window.__lessons.seen() }));

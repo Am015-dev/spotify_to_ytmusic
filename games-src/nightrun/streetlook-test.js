@@ -57,7 +57,7 @@ const PROBE = async () => {
     await ctx.addInitScript(([s]) => { try { localStorage.clear(); localStorage.setItem('mnr_story', s); localStorage.setItem('mnr_tut', '2'); localStorage.setItem('mnr_foot', '{"seen":{"b":1,"a":1},"hint":1}'); } catch (e) {} }, [STORY]);
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(w + 'x' + h + q + ' ' + e.message)); await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1${q}`, { waitUntil: 'domcontentloaded' });
     await p.waitForFunction(() => window.__mnr && document.getElementById('moreBtn'), null, { timeout: 15000 }); await sleep(400);
-    const st = await p.evaluate(() => { document.getElementById('moreBtn').click(); return new Promise(r => setTimeout(() => { const b = document.getElementById('footBtn'); if (!b || b.disabled) return r('no button'); b.click(); setTimeout(() => r(FOOT.on ? 'on' : 'off'), 300); }, 200)); });
+    const st = await p.evaluate(() => { document.getElementById('moreBtn').click(); return new Promise(r => setTimeout(() => { const b = document.getElementById('footBtn'); if (!b || b.disabled) return r('no button'); b.click(); const t0 = performance.now(), iv = setInterval(() => { if (FOOT.on || performance.now() - t0 > 12000) { clearInterval(iv); r(FOOT.on ? 'on' : 'off'); } }, 50); }, 200)); });
     if (st !== 'on') { await ctx.close(); return { err: st }; }
     await p.waitForFunction(() => __mnr.ART && __mnr.ART.anim('kai/run') && __mnr.ART.anim('prop-car/loop'), null, { timeout: 15000 }).catch(() => {});
     const m = await p.evaluate(PROBE); await ctx.close(); return m; };
