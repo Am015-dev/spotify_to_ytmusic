@@ -95,7 +95,8 @@ async function offer(br, port, opt, label) {
   await p.reload({ waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__tut); await sleep(1700);
   ok(`${label}: offer never shows again`, !(await p.evaluate(() => window.__tut.offerShown)));
   await p.evaluate(() => { if (window.RET && RET.menuOpen) RET.menuOpen(); }); await sleep(120); if (opt.hasTouch) await p.tap('#setBtn'); else await p.click('#setBtn'); await sleep(300);
-  await p.evaluate(() => document.getElementById('tutBtnS').scrollIntoView()); if (opt.hasTouch) await p.tap('#tutBtnS'); else await p.click('#tutBtnS'); await sleep(500);
+  await p.evaluate(() => { if (window.__tidy) __tidy.go('more'); document.getElementById('tutBtnS').scrollIntoView(); });  // tidy Settings: the tutorial button lives on the MORE page
+  if (opt.hasTouch) await p.tap('#tutBtnS'); else await p.click('#tutBtnS'); await sleep(500);
   ok(`${label}: Settings > REPLAY TUTORIAL starts it`, await p.evaluate(() => window.__tut.on && window.__mnr.running));
   await p.evaluate(() => window.__tut.skip());
   // a returning player (has a best run) is never asked

@@ -180,7 +180,7 @@ if(RET.story){
    if(FS&&FS.tale&&window.TALE_CAST){const map={oda:'dispatch',lumen:'mechanic',wren:'ally',vex:'rival',courier:'courier'};
      for(const id in map)if(STORY_CAST[id]&&TALE_CAST[map[id]]){TALE_CAST[map[id]].n=STORY_CAST[id].n;TALE_CAST[map[id]].role=STORY_CAST[id].role;}
      FS.tale.before=rowsOf('foot:before').map(r=>[map[r.who]||r.who,r.l.join(' ')]);FS.tale.after=rowsOf('foot:after').map(r=>[map[r.who]||r.who,r.l.join(' ')]);}}catch(e){}
- NR.on('footStart',()=>mark('foot:before'));NR.on('footEnd',d=>{if(d&&d.cleared)mark('foot:after');});
+ NR.on('footStart',()=>{if(!window.__schFoot)mark('foot:before');});NR.on('footEnd',d=>{if(d&&d.cleared)mark('foot:after');});
  /* ----- the chapter list (STORY LOG) ----- */
  const log=document.createElement('div');log.id='sgLog';log.hidden=true;log.setAttribute('role','dialog');log.setAttribute('aria-label','Story');
  log.innerHTML='<h2>STORY</h2><div class="sgsum" id="sgSum"></div><ul id="sgList"></ul><button type="button" class="go back" id="sgBack">BACK</button>';stage.appendChild(log);

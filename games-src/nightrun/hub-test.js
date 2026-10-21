@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 // HUB (parts/hub.js, flag RET.hub): every feature within 2 taps of HOME, <= 6 main actions per screen (the labelled MORE row aside),
+// (runs with ?school=0 = the old TRAINING sheet; the school list has its own school-test.js)
 // one header everywhere (back arrow, title, Neon), nothing overlapping, no page errors, ?hub=0 = the old title + MENU sheet. Headless, no screenshots.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/hub-test.js     env: GAME_DIR=...
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
@@ -36,7 +37,7 @@ const F = [
   ['checklist', '#hub_profile', '[data-door=".ckB"]', 'VIS("#nrChk")'],
   ['story log', '#hub_profile', '.hubAct:nth-child(3)', 'VIS("#sgLog")||VIS("#taleLog")'],
   ['settings', '#hub_profile', '.hubAct:nth-child(4)', 'VIS("#setm")'],
-  ['saves / export', '#hub_profile', '.hubAct:nth-child(5)', 'VIS("#setm")&&VIS("#svBox")&&VIS("#sioBox")&&Math.abs(document.getElementById("hubSG_da").getBoundingClientRect().top-document.getElementById("setBody").getBoundingClientRect().top)<40'],
+  ['saves / export', '#hub_profile', '.hubAct:nth-child(5)', 'VIS("#setm")&&VIS("#svBox")&&VIS("#sioBox")&&(window.__tidy?__tidy.page()==="more":Math.abs(document.getElementById("hubSG_da").getBoundingClientRect().top-document.getElementById("setBody").getBoundingClientRect().top)<40)'],
   ['full screen', '#hub_profile', '[data-door="#fsBtn"]', 'true'],
   ['update check', '#hub_profile', '.hubMore button:nth-child(2)', 'VIS("#setm")&&VIS("#stampBtn")'],
   ['build stamp', '#hub_profile', null, '/build /.test(document.getElementById("hubStamp").textContent)'],
@@ -63,7 +64,7 @@ const AUD = (root) => {
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(w + 'x' + h + ' ' + e.message));
     await p.addInitScript(() => { try { if (!sessionStorage.getItem('__ini')) { sessionStorage.setItem('__ini', '1'); localStorage.setItem('mnr_tut', '1'); } } catch (e) { } });
     if (init) await p.addInitScript(init);
-    await p.goto(`http://127.0.0.1:${port}/index.html${q}`); await p.waitForFunction(() => window.__mnr && window.RET && document.documentElement.classList.contains('rdy'), null, { timeout: 9000 }); await sleep(300);
+    await p.goto(`http://127.0.0.1:${port}/index.html${q ? q + '&school=0' : '?school=0'}`); await p.waitForFunction(() => window.__mnr && window.RET && document.documentElement.classList.contains('rdy'), null, { timeout: 9000 }); await sleep(300);
     await p.evaluate(`window.VIS=${VIS.toString()};window.__hubTab=()=>{const b=document.querySelector('#garage .tabs button.on');return b&&b.dataset.t;}`); return p; };
   let taps = 0;
   const tap = async (p, sel) => { const l = p.locator(sel).first(); await l.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => { }); const b = await l.boundingBox(); if (!b) throw new Error('not on screen: ' + sel); await p.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2); taps++; await sleep(350); };

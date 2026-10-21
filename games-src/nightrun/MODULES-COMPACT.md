@@ -69,6 +69,7 @@ abilities|13|DASH charges and EMP as abilities (beat bonus, refund)|abil,abil
 forge|21|weapon forge: combine, sockets, presets (data, actions)|forge,forge
 inventory|14|inventory + loadout screen (Garage FORGE tab)|forge,forge
 forgeui|25|forge screen, step by step|forgeui,forgeui
+forgeone|28|one-screen phone forge: bench + ship slot bar + swipe strip,|forge2,forge2
 counter|12|threats that make DASH and EMP the answer|counter,counter
 timing|12|DASH/EMP as beat-and-window decisions|timing,timing
 visible|3|enemies live long enough to be seen and fought|vis,vis
@@ -85,7 +86,7 @@ flankers|8|flanker enemies that punish a parked ship (default OFF)|flankers,flan
 foeart|9|every fly-stage enemy draws from an approved ship sheet|foeart,foeart
 fleet|23|enemy warships in the fly stages|fleet,fleet
 endramp|8|endless mode climbs in difficulty|endramp,endramp
-legend|6|Legend plays differently, not just faster|legend,legend
+legend|8|Legend plays differently, not just faster|legend,legend
 h|5|H: no AFK wins, a dying ship slows the song|-
 fun|15|set pieces, deck replaces the fixed metronome, rosters|deck,deck,roster+
 tut|16|TUT: FLIGHT SCHOOL, a playable tutorial stage (about 3 minut|-
@@ -103,6 +104,10 @@ classes|18|pilot classes picked before a run|classes,classes
 saves|14|explicit, safe saving and save slots|saves,saves
 stamp|5|build stamp and update check|stamp,stamp
 polish|12|a calm, readable playfield: one telegraph style, ship on top|polish,polish
-hub|20|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
+diet|14|visual diet: fewer own effects, readable enemies, a lean 6-i|diet,diet
+mix|9|the music stays on top of the effects: separate buses, an ef|mix,mix
+hub|34|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
+layout|5|phone layout pass: centred one-colour section pills, centred|layout,layout
+school|14|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,school
 c|34|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|6|Mainhattan Nightrun service worker (B30). Built by parts/bui|-

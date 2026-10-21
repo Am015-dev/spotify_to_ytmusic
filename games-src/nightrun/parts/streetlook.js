@@ -55,10 +55,10 @@ const at=(c,x,y,k)=>{c.save();c.translate(x,my(y));c.scale(k,k);c.translate(-x,-
    with its asset id as the label. A real file foot/bg-street-<layer>.webp listed in ready.json replaces its placeholder (tiled, parallax kept). The old media/foot/bg-*.webp are mock placeholders: not used. ----- */
 const BGL={far:['#140d2a','bg-street-far',960,.34,.44],mid:['#22163f','bg-street-mid',1280,.24,.36]};   // tint, asset id, tile width (units), min / extra height as a share of the sky
 let tiles={};
-function slTile(kind,Hh,res){const key=kind+'|'+Math.round(Hh)+'|'+res.toFixed(2);let o=tiles[key];if(o)return o;if(Object.keys(tiles).length>5)tiles={};
+function slTile(kind,Hh,res){const key=kind+'|'+Math.round(Hh)+'|'+res.toFixed(2)+'|'+(window.phText()?1:0);let o=tiles[key];if(o)return o;if(Object.keys(tiles).length>5)tiles={};
   const L_=BGL[kind],TW=L_[2],cv=document.createElement('canvas');cv.width=Math.ceil(TW*res);cv.height=Math.ceil(Hh*res);const g=cv.getContext('2d');g.scale(res,res);g.fillStyle=L_[0];
   let x=0,i=0;while(x<TW-30){const bw=Math.min(TW-x,(kind==='far'?60:150)+60*hs(i*7+3)),bh=Hh*(L_[3]+L_[4]*hs(i*13+5));g.fillRect(x,Hh-bh,bw-4,bh);x+=bw;i++;}
-  g.fillStyle='rgba(255,255,255,.35)';g.font='bold 12px monospace';g.textAlign='left';g.textBaseline='bottom';g.fillText(L_[1]+' (placeholder)',8,Hh-6);
+  g.fillStyle='rgba(255,255,255,.35)';g.font='bold 12px monospace';g.textAlign='left';g.textBaseline='bottom';if(window.phText())g.fillText(L_[1]+' (placeholder)',8,Hh-6);
   return tiles[key]={cv,TW,Hh};}
 function slPic(id){const fa=window.FA;return fa&&fa._pic?fa._pic('foot/'+id+'.webp'):null;}
 function slBlit(c,kind,k,cam,x0,w,t0,res){const pic=slPic(BGL[kind][1]),Hh=FL+2-t0;let src,TW;
@@ -73,7 +73,7 @@ if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART
     const h=q[1]*C;SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,.95);SL.tag='';}};   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
 
 function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,fh=FL-t0;
-  const sky=slPic('bg-street-sky');if(sky)c.drawImage(sky,x0,t0-4,w,fh+8);else{c.fillStyle='#0c0820';c.fillRect(x0,t0-4,w,fh+8);c.fillStyle='rgba(255,255,255,.35)';c.font='bold 12px monospace';c.textAlign='right';c.textBaseline='top';c.fillText('bg-street-sky (placeholder)',x0+w-8,t0+fh*.35);}
+  const sky=slPic('bg-street-sky');if(sky)c.drawImage(sky,x0,t0-4,w,fh+8);else{c.fillStyle='#0c0820';c.fillRect(x0,t0-4,w,fh+8);if(window.phText()){c.fillStyle='rgba(255,255,255,.35)';c.font='bold 12px monospace';c.textAlign='right';c.textBaseline='top';c.fillText('bg-street-sky (placeholder)',x0+w-8,t0+fh*.35);}}
   slBlit(c,'far',SL.speeds.far,cam,x0,w,t0,res);slBlit(c,'mid',SL.speeds.mid,cam,x0,w,t0,res);
   const rd=slPic('bg-street-road');if(rd){const TW=(VH-FL)*rd.width/rd.height;let x=x0-((cam%TW)+TW)%TW;for(;x<x0+w;x+=TW)c.drawImage(rd,x,FL,TW,VH-FL+2);}
   else{c.fillStyle='#1b1530';c.fillRect(x0,FL,w,VH-FL+2);c.fillStyle='#3a2a60';c.fillRect(x0,FL,w,3);}
@@ -130,12 +130,13 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
 
 /* ----- HUD: one panel top-left; score + time left of the pause button; hint below both; boss bar above the progress bar ----- */
 function slRR(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
-function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push({x,y:y-t0,w,h}),m=10*u,pd=8*u,W=F.WEAPONS[P.w],PK=F.PICKUPS;SL.tag='hud';
+function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push({x,y:y-t0,w,h}),m=10*u,pl=!!(RET.tidy&&typeof UIK!=='undefined'&&ART.bm&&ART.bm['ui-hud-mult']),pd=(pl?13:8)*u,W=F.WEAPONS[P.w],PK=F.PICKUPS;SL.tag='hud';
   c.textBaseline='top';c.textAlign='left';c.font='bold '+fs(14)+'px monospace';
   const wt=W.n+(P.w==='pistol'?'':' LV'+P.lv+' · '+P.ammo),pw=[];for(const k of IN.PW_KEYS){const p=P.pw[k];if(p)pw.push([PK[k].c,PK[k].ic+(PK[k].max>1?p.lv:'')]);}
   const bt='●×'+P.bombs,r3=c.measureText(bt).width+pw.length*36*u;
   const iw=Math.max(P.max*20*u,c.measureText(wt).width,r3,110*u),pw_=iw+2*pd,ph=pd+16*u+6*u+16*u+6*u+16*u+8*u+5*u+pd,x=m,y=t0+m;
-  c.fillStyle='rgba(5,3,12,.62)';slRR(c,x,y,pw_,ph,8*u);c.fill();c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=u;c.stroke();
+  if(pl)UIK.plate(c,'ui-hud-mult',x,y,pw_,ph,20,12*u,33,125);   // tidy: the fly HUD's own plate (same dark fill + painted frame)
+  else{c.fillStyle='rgba(5,3,12,.62)';slRR(c,x,y,pw_,ph,8*u);c.fill();c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=u;c.stroke();}
   for(let i=0;i<P.max;i++){c.fillStyle=i<P.hp?'#ff4060':'#ffffff26';c.beginPath();c.arc(x+pd+8*u+i*20*u,y+pd+8*u,7.5*u,0,6.283);c.fill();}
   let ry=y+pd+22*u;c.fillStyle=W.c;c.fillText(wt,x+pd,ry);ry+=22*u;
   c.fillStyle='#ffb020';c.fillText(bt,x+pd,ry);let px=x+pd+c.measureText(bt).width+14*u;for(const [col,t] of pw){c.fillStyle=col;c.fillText(t,px,ry);px+=36*u;}ry+=24*u;
@@ -144,7 +145,7 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
   c.textAlign='right';c.font='bold '+fs(16)+'px monospace';const st=String(S.score),tt=IN.fmtT(S.time),sw=Math.max(c.measureText(st).width,c.measureText(tt).width);
   let sr=vw-60*u,sy=t0+m+2*u;if(x+pw_+10*u>sr-sw){sr=vw-10*u;sy=t0+60*u;}   // narrow screen: under the pause button
   c.fillStyle='#fff';c.fillText(st,sr,sy);c.font='bold '+fs(14)+'px monospace';c.fillStyle='#c9c3e6';c.fillText(tt,sr,sy+20*u);box(sr-sw,sy,sw,38*u);
-  const hudB=Math.max(y+ph,sy+38*u)-t0;SL.hudB=hudB+8*u;
+  const hudB=Math.max(y+ph,sy+38*u)-t0;SL.hudB=hudB+8*u;SL.hudFull=hudB+42*u;   // hudFull: the band with the hint line (tidy keeps flyers under it)
   if(S.boss&&!S.boss.dead){const bw=vw*.7,bx=vw*.15,by=VH-48*u;c.fillStyle='#ffffff22';c.fillRect(bx,by,bw,10*u);c.fillStyle='#ff2050';c.fillRect(bx,by,bw*Math.max(0,S.boss.hp/S.boss.max),10*u);
     c.textAlign='center';c.fillStyle='#fff';c.textBaseline='bottom';c.font='bold '+fs(14)+'px monospace';c.fillText('WARDEN',vw/2,by-2*u);box(bx,by-18*u,bw,28*u);}
   c.textAlign='center';c.textBaseline='top';let hint=null;const line=S.note.t>0?S.note.txt:IN.hintOn()?IN.hintText():'';

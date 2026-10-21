@@ -166,8 +166,8 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
 /* ---------- menus, settings, flow ---------- */
 const titleEl=$('title'),overEl=$('over'),pauseEl=$('pausem'),setEl=$('setm');
 const HUDLOG={frame:0};
-function showBest(){$('bestT').innerHTML=(best.score?`Best run <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`:'No runs logged yet')
-  +` &nbsp;·&nbsp; Daily <strong>${dailyBest.score?dailyBest.score.toLocaleString('de-DE'):'—'}</strong>`;if(window.RET&&RET.dailyShow)RET.dailyShow();}
+function showBest(){$('bestT').innerHTML=(best.score?`Best run <strong>${window.fmtN(best.score)}</strong> · ${best.dist}`:'No runs logged yet')
+  +` &nbsp;·&nbsp; Daily <strong>${dailyBest.score?window.fmtN(dailyBest.score):'—'}</strong>`;if(window.RET&&RET.dailyShow)RET.dailyShow();}
 showBest();
 function syncUI(){$('touch').hidden=!(running&&touchUI&&!paused&&!SH.active);}
 /* ---------- settings (one card, Overdrive's look): the schema drives the rows; every change is saved and applied live ---------- */
@@ -177,7 +177,7 @@ const SCHEMA=[
   {g:'Controls',rows:[{k:'layout',l:'Touch layout',o:[['left','Left'],['right','Right']]},{k:'sens',l:'Sensitivity',s:[1,5,1],f:v=>String(v)},{k:'dsize',l:'Button size',o:[['S','Small'],['M','Medium'],['L','Large']]}]},
   {g:'Rhythm',rows:[{k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']]},{k:'all',l:'Everything counts',o:OFFON},{k:'cue',l:'Beat cue',o:[['off','Off'],['S','Small'],['M','Medium'],['L','Large']]},
     {k:'sync',l:'Latency',s:[-150,150,5],f:v=>(v>0?'+':'')+v+' ms',tap:1}]},
-  {g:'Audio',rows:[{k:'master',l:'Master',s:[0,100,5],p:1},{k:'music',l:'Music',s:[0,100,5],p:1},{k:'sfx',l:'Effects',s:[0,100,5],p:1},{k:'duck',l:'Ducking',o:[[true,'On'],[false,'Off']]},{k:'keepmus',l:'Keep music playing when paused',o:[[true,'On'],[false,'Off']]},{k:'react',l:'Music reacts',o:OFFON},{k:'mus',l:'Music',o:[['mix','Mix'],['classic','Classic only'],['new','New only']]},{k:'mute',l:'Mute all',o:OFFON}]},
+  {g:'Audio',rows:[{k:'master',l:'Master',s:[0,100,5],p:1},{k:'music',l:'Music volume',s:[0,100,5],p:1},{k:'sfx',l:'Effects volume',s:[0,100,5],p:1},{k:'mixr',l:'Reduce repetitive sounds',o:[[true,'On'],[false,'Off']]},{k:'duck',l:'Ducking',o:[[true,'On'],[false,'Off']]},{k:'keepmus',l:'Keep music playing when paused',o:[[true,'On'],[false,'Off']]},{k:'react',l:'Music reacts',o:OFFON},{k:'mus',l:'Music mix',o:[['mix','Mix'],['classic','Classic only'],['new','New only']]},{k:'mute',l:'Mute all',o:OFFON}]},
   {g:'Visuals',rows:[{k:'part',l:'Particles',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'shake',l:'Screen shake',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'flash',l:'Flashing',o:[[0,'Off'],[1,'Reduced'],[2,'Full']]},
     {k:'q',l:'Quality',o:[['L','Low'],['M','Medium'],['H','High']]},{k:'fps',l:'FPS cap',o:[[30,'30'],[60,'60']]},{k:"pal",l:"Colour theme",o:[['neon','Neon'],['cb','Blue-orange'],['term','Terminal']]},{k:'fpsc',l:'FPS counter',o:OFFON}]},
   {g:'Accessibility',rows:[{k:'rm',l:'Reduced motion',o:OFFON},{k:'hc',l:'High-contrast bullets',o:OFFON}]}];
@@ -242,8 +242,8 @@ function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false
   else if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;
-  $('oScore').textContent=G.score.toLocaleString('de-DE');$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
-  $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${dailyBest.score.toLocaleString('de-DE')}</strong>`:`Best <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`;
+  $('oScore').textContent=window.fmtN(G.score);$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
+  $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${window.fmtN(dailyBest.score)}</strong>`:`Best <strong>${window.fmtN(best.score)}</strong> · ${best.dist}`;
   overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);showBest();
   G.over=true;lastDaily=G.daily;lastWeekly=!!G.weekly;}
 let lastDaily=false,lastWeekly=false;

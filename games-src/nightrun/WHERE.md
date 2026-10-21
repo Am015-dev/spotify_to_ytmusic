@@ -6,11 +6,11 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 
 | flag | key (file name L1-L2) | > wraps | < wrapped by | test | doc |
 |---|---|---|---|---|---|
-| sprites,title,type,oneMore*,arcade*,walls*,heat*,daily*,dpool*,layers*,sting*,trans*,grade*,saveio*,juice,assist,pwa,fever | ret (one `RET.x` line per flag, top of the file) |  | stamp,saves,hub | ret | RETENTION |
-| flavor | flavor watch 241-242 |  |  | ret-flavor |  |
+| sprites,title,type,oneMore*,arcade*,walls*,heat*,daily*,dpool*,layers*,sting*,trans*,grade*,saveio*,juice,assist,pwa,fever | ret (one `RET.x` line per flag, top of the file) |  | stamp,saves,hub+1 | ret | RETENTION |
+| flavor | flavor watch 241-242 |  | tidy | ret-flavor |  |
 | foot | foot build 366-400 | a,footen | c | foot | BRIEF-FOOT |
 | footstage | footstage secOf 163-194 | footen |  | footstage | FOOT-ENEMIES |
-| streetlook | streetlook slHud 133-154 | map,footen |  | streetlook | ASSET-POLICY |
+| streetlook | streetlook slHud 133-155 | map,footen |  | streetlook | ASSET-POLICY |
 | leak | leak LEAK 14-136 |  | holdline | ret-leak |  |
 | zoo | zoo ZOO 14-254 |  |  | zoo |  |
 | vary,vary2 | formations fmSide 74-256 |  |  | vary |  |
@@ -41,6 +41,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | forge | forge FG 65-183 |  |  | forge |  |
 | forge | inventory INV.draw 54-112 |  |  | forge |  |
 | forgeui | forgeui FGU 20-117 |  |  | forgeui | ASSETS-NEEDED-3 |
+| forge2 | forgeone FG2 12-118 |  |  | forge2 |  |
 | counter | counter CTR 18-100 |  |  | counter |  |
 | timing | timing TIM 19-101 | draw |  | timing |  |
 | vis | visible VIS 12-21 |  |  | visible | BALANCE |
@@ -57,7 +58,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | foeart | foeart FOEART 45-85 |  |  | foeart | ASSETS-NEEDED-ENEMIES |
 | fleet,fleetArr! | fleet FLEET 21-222 |  |  | fleet |  |
 | endramp | endramp ENDR 15-55 |  |  | endramp |  |
-| legend! | legend LEG 18-22 |  |  | legend |  |
+| legend,easy2 | legend LEG 18-59 |  |  | legend |  |
 | deck,roster,songspread | fun FUN 14-77 | footen |  | fun |  |
 | lessons | lessons lsTick 156-178 |  |  | lessons |  |
 | story | saga |  |  | story |  |
@@ -72,7 +73,12 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | saves | saves saveSlot 55-60 | ret |  | saves |  |
 | stamp | stamp RET.stampX 10-44 | ret |  | stamp |  |
 | polish | polish POL.flush 78-105 |  |  | polish |  |
-| hub | hub draw 159-167 | ret |  | hub |  |
+| diet | diet DIET.thin 36-63 |  |  | diet |  |
+| mix | mix MIX 17-24 | a |  | mix |  |
+| hub,garagefix | hub gfPatchAll 288-301 | ret |  | hub |  |
+| layout,layoutStrip* | layout lyMap 41-55 |  |  | layout |  |
+| school | school footEnd 107-121 |  |  | school |  |
+| tidy | tidy F.post 19-88 | flavor,ret |  | tidy |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.
 
