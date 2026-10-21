@@ -74,6 +74,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const u = new URL(req.url);
+  if (req.cache === 'no-store') return;   // the page's own "check for update" must see the network, never a cached copy
   if (u.origin !== location.origin || !u.href.startsWith(BASE)) return;
   const rel = u.href.slice(BASE.length).split(/[?#]/)[0], k = key(u.href);
   if (rel === '' || rel === 'index.html') e.respondWith(networkFirst(req, k, 3000));
