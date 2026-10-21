@@ -10,6 +10,7 @@ const FXW=window.FXW={stat:{bullet:0,muzzle:0,hit:0,boom:0,sniper:0,bomb:0,mine:
   SOLID:{disc:1,orbit:1,mine:1,shell:1},                                  // weapon shots painted on white (solid objects): drawn normally, not additively
   SPIN:{disc:1,orbit:1,mine:1,well:1,storm:1},
   LOOK:{arc:'electric',storm:'electric',laser:'plasma',rail:'plasma',frost:'plasma',wave:'plasma',well:'plasma'}};   // how a kill by this weapon explodes (default fire)
+FXW.has=k=>{if(FXW.pic(k))return true;if(!RET.sprites)return false;const s=ART.fxSheet(k);return !!(s&&ART.anim(s));};   // a real still OR a decoded strip sheet (parts/art.js)
 FXW.name=k=>FXW._n[k]||(FXW._n[k]='fx-'+k);
 FXW.pic=k=>{try{const n=FXW.name(k);return ART.rd&&ART.rd.has(n+'.webp')&&ART.bm[n]?ART.bm[n]:null;}catch(e){return null;}};
 /* additive picture of key k, centred, w world units wide (aspect kept), rotated; false when the picture is not real */
@@ -22,14 +23,14 @@ FXW.bullet=b=>{if(!b.wid)return false;const k='w-'+b.wid+'-bullet';if(!FXW.pic(k
   if(solid)ctx.globalCompositeOperation='source-over';ART.put(o,b.x+(FXW.SPIN[b.wid]?0:Math.cos(ang)*w*.25),b.y+(FXW.SPIN[b.wid]?0:Math.sin(ang)*w*.25),ang,.85);if(solid)ctx.globalCompositeOperation='lighter';
   FXW.stat.bullet++;return true;};
 /* muzzle flash key: the first equipped weapon (alternating) with a real muzzle picture, else the shared 'muzzle' */
-FXW.mz=base=>{try{const eq=WP.eq;if(!eq)return base;let n=0,pick=null;for(const id of eq)if(id&&FXW.pic('w-'+id+'-muzzle')){if(n++===FXW.mv%2||!pick)pick=id;}
+FXW.mz=base=>{try{const eq=WP.eq;if(!eq)return base;let n=0,pick=null;for(const id of eq)if(id&&FXW.has('w-'+id+'-muzzle')){if(n++===FXW.mv%2||!pick)pick=id;}
     if(n>1)FXW.mv++;if(pick){FXW.stat.muzzle++;return'w-'+pick+'-muzzle';}}catch(e){}return base;};
 /* hit spark key: the picture of the weapon that fired the bullet, else the shared 'hit-spark' */
-FXW.hk=(b,base)=>{if(b&&b.wid&&FXW.pic('w-'+b.wid+'-hit')){FXW.stat.hit++;return'w-'+b.wid+'-hit';}return base;};
+FXW.hk=(b,base)=>{if(b&&b.wid&&FXW.has('w-'+b.wid+'-hit')){FXW.stat.hit++;return'w-'+b.wid+'-hit';}return base;};
 /* explosion key by size and look; base = the shared explosion the game asked for, sz = its size in world units, e = the enemy (e._wk = the weapon that last hurt it) */
-FXW.bk=(base,e,sz)=>{try{let sk;if(base==='explosion-boss'){const k=FXW.bs%2?'boom-boss-b':'boom-boss-a';if(FXW.pic(k)){FXW.bs++;FXW.stat.boom++;return k;}return base;}
+FXW.bk=(base,e,sz)=>{try{let sk;if(base==='explosion-boss'){const k=FXW.bs%2?'boom-boss-b':'boom-boss-a';if(FXW.has(k)){FXW.bs++;FXW.stat.boom++;return k;}return base;}
     sk=base==='explosion-small'?'small':(sz>=140?'large':'medium');const lk=(e&&e._wk&&FXW.LOOK[e._wk])||'fire';
-    for(const l of lk==='fire'?['fire']:[lk,'fire']){const k='boom-'+sk+'-'+l;if(FXW.pic(k)){FXW.stat.boom++;return k;}}}catch(err){}return base;};
+    for(const l of lk==='fire'?['fire']:[lk,'fire']){const k='boom-'+sk+'-'+l;if(FXW.has(k)){FXW.stat.boom++;return k;}}}catch(err){}return base;};
 /* --- enemy fire (zoo.js) --- */
 const fxBeam=(k,x,y,ang,len,th,al)=>{const b=FXW.pic(k);if(!b)return false;ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=al;ctx.translate(x,y);ctx.rotate(ang);ctx.drawImage(b,0,-th/2,len,th);ctx.restore();return true;};
 FXW.sniper=(e,k,lk)=>{if(!fxBeam('eb-sniper-beam',e.x,e.y,e.ang,1500,lk?16:9,lk?.95:.3+.5*k))return false;FXW.stat.sniper++;return true;};

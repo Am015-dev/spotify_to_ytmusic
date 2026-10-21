@@ -23,7 +23,8 @@ const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? '
     /* (a)(b)(c) loader */
     { const { c, p, errs } = await open('');
       await p.waitForFunction(() => window.__mnr && __mnr.ART.rd && __mnr.ART.rd.size > 0, null, { timeout: 20000 });
-      const keys = await p.evaluate(() => Object.keys(ART.ANIM.s)); const nrd = await p.evaluate(() => [...ART.rd].filter(f => /^anim\/.+-strip\.webp$/.test(f)).length); ok('a1 ANIM bundles every listed sheet (bosses, ships, enemy ships, on-foot actors, props)', keys.length === nrd && keys.length > 150 && ['kai/run', 'warden/die', 'medic/heal', 'ship-ecruiser/volley', 'prop-steam/glow', 'prop-car/loop'].every(k => keys.includes(k)), keys.length + '/' + nrd);
+      const keys = await p.evaluate(() => Object.keys(ART.ANIM.s)); ok('a1 ANIM bundles the boss, ship, weapon fx, explosion, small fx and pickup sheets', keys.length >= 115 && keys.filter(k => /^boss-/.test(k)).length === 40 && keys.filter(k => /^ship-(std|tri|hv|ec|swg|syn|drift|lancer|nova)\//.test(k)).length === 18 && keys.filter(k => /^wpn-/.test(k)).length === 38 && keys.filter(k => /^fx-boom-/.test(k)).length === 13 && keys.includes('fx-shield/glow') && keys.includes('pk-health/spin'), keys.length);
+      const nrd = await p.evaluate(() => [...ART.rd].filter(f => /^anim\/.+-strip\.webp$/.test(f)).length); ok('a1 ANIM bundles every listed sheet (bosses, ships, enemy ships, on-foot actors, props)', keys.length === nrd && keys.length > 170 && ['kai/run', 'warden/die', 'medic/heal', 'ship-ecruiser/volley', 'prop-steam/glow', 'prop-car/loop'].every(k => keys.includes(k)), keys.length + '/' + nrd);
       let all = false; try { await p.waitForFunction(() => Object.keys(ART.ANIM.s).every(k => ART.anim(k)), null, { timeout: 90000, polling: 250 }); all = true; } catch (e) { }
       ok('a2 every sheet decodes', all);
       const bad = await p.evaluate(() => Object.entries(ART.ANIM.s).filter(([k, m]) => { const b = ART.anim(k); return !b || b.width !== m[0] * m[2] || b.height !== m[3]; }).map(e => e[0]));
@@ -92,6 +93,35 @@ const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? '
       ok('d8 zoo scene frame time: sprites on not > 1 ms over off (median and p95)', r.on.mean <= r.off.mean + 1 && r.on.p95 <= r.off.p95 + 1, JSON.stringify(r));
       ok('d9 ship death clip queued once, explosion delayed behind it', r.death[0] && r.death[1] === 1, JSON.stringify(r.death));
       ok('d10 no page errors (sim)', !errs.length, errs[0]); await c.close(); }
+    /* (f) weapon fx, explosions, small fx, pickups */
+    { const { c, p, errs } = await open('');
+      await p.waitForFunction(() => window.__mnr && __mnr.ART.rd && __mnr.ART.rd.size > 0, null, { timeout: 20000 });
+      const want = ['fx-boom-small-fire/burst', 'fx-boom-medium-fire/burst', 'fx-boom-large-fire/burst', 'fx-boom-boss-a/burst', 'fx-spark/burst', 'fx-hitconfirm/burst', 'fx-shield/glow', 'pk-coin/spin', 'pk-health/spin', 'wpn-pulse/muzzle', 'wpn-pulse/impact'];
+      try { await p.waitForFunction(w => w.every(k => ART.anim(k)), want, { timeout: 60000, polling: 250 }); } catch (e) { ok('f0 fx sheets decode', false); }
+      const m = await p.evaluate(() => ['hit-spark', 'hitconfirm', 'boom-medium-fire', 'boom-boss-b', 'w-pulse-hit', 'w-pulse-muzzle', 'explosion-small', 'muzzle', 'boom-nope', 'w-nope-hit'].map(k => ART.fxSheet(k)));
+      ok('f1 old keys map to sheets (impact = hit), keys without a sheet map to 0', JSON.stringify(m) === JSON.stringify(['fx-spark/burst', 'fx-hitconfirm/burst', 'fx-boom-medium-fire/burst', 'fx-boom-boss-b/burst', 'wpn-pulse/impact', 'wpn-pulse/muzzle', 0, 0, 0, 0]), JSON.stringify(m));
+      const r = await p.evaluate(() => { const m = __mnr, d = ART.drawAnim; let calls = 0; ART.drawAnim = (...a) => { calls++; return d(...a); };
+        const run = key => { ART.fx.length = 0; calls = 0; ART.boom(key, 300, 300, 80, .3); let n = 0; const fr = []; while (ART.fx.length && n < 400) { m.render(m.G.t, 1 / 60); n++; } return { n, calls, left: ART.fx.length }; };
+        const on = run('boom-medium-fire'), tot = ART.aS('fx-boom-medium-fire/burst').tot;
+        RET.sprites = false; const off = run('explosion-small'); const offSheet = run('boom-medium-fire'); RET.sprites = true;
+        const hs = run('w-pulse-hit'), mz = run('w-pulse-muzzle'), sp = run('hit-spark'), hc = run('hitconfirm');
+        ART.fx.length = 0; ART.boom('boom-medium-fire', 300, 300, 80, .3); m.render(m.G.t, 1 / 60); const q = ART.fx[0], life0 = q.t;
+        ART.drawAnim = d; return { on, tot, off, offSheet, hs, mz, sp, hc, life0 }; });
+      const secs = r.on.n / 60;
+      ok('f2 explosion plays its 5 frames then ends within the sheet time + the small fade (not the old grow+fade life)', r.on.calls > 5 && r.on.left === 0 && secs >= r.tot && secs <= r.tot + .08 + .1, JSON.stringify(r.on) + ' tot ' + r.tot);
+      ok('f3 ?sprites=0 style: stills only (no drawAnim), same life as before (.3 s)', r.off.calls === 0 && r.offSheet.calls === 0 && r.off.n >= 17 && r.off.n <= 20, JSON.stringify([r.off, r.offSheet]));
+      ok('f4 weapon impact, muzzle, spark and hit-confirm each play from their sheet and end', [r.hs, r.mz, r.sp, r.hc].every(x => x.calls > 1 && x.left === 0), JSON.stringify([r.hs, r.mz, r.sp, r.hc]));
+      const pk = await p.evaluate(() => { const cv = document.createElement('canvas'); cv.width = cv.height = 100; const out = {}; const z = ART.drawAnim; let calls = 0; ART.drawAnim = (...a) => { calls++; return z(...a); };
+        out.shard = SPR.pk('shard', 30); out.hp = SPR.pk('hp', 30); out.other = SPR.pk('drum', 30); out.calls = calls; out.sh = SPR.shield(); RET.sprites = false; out.off = [SPR.pk('shard', 30), SPR.shield()]; RET.sprites = true;
+        ART.rd.delete('anim/pk-coin/spin-strip.webp'); out.miss = SPR.pk('shard', 30); ART.rd.add('anim/pk-coin/spin-strip.webp'); ART.drawAnim = z; return out; });
+      ok('f5 pickups: coin -> pk-shard, health -> pk-hp sheets; other pickups, flag off and a missing sheet use the still', pk.shard === true && pk.hp === true && pk.other === false && pk.calls === 2 && pk.off[0] === false && pk.miss === false, JSON.stringify(pk));
+      ok('f6 shield glow loops from its sheet, off with the flag', pk.sh === true && pk.off[1] === false, JSON.stringify(pk));
+      const lp = await p.evaluate(() => { const o = ART.aS('fx-shield/glow'), a = ART.aS('pk-coin/spin'); return [o.loop, a.loop, ART.aS('fx-boom-small-fire/burst').loop, ART.aS('wpn-pulse/impact').loop]; });
+      ok('f7 glow and spin loop, burst and impact are one-shots', JSON.stringify(lp) === '[true,true,false,false]', JSON.stringify(lp));
+      const gm = await p.evaluate(() => { const m = __mnr; m.P.hp = 99; let hit = 0, calls = 0; const d = ART.drawAnim; ART.drawAnim = (cc, k, ...a) => { if (/^(wpn-|fx-|pk-)/.test(k)) calls++; return d(cc, k, ...a); };
+        for (let i = 0; i < 600; i++) { m.P.hp = 99; m.step && m.step(1 / 60); m.render(m.G.t, 1 / 60); } ART.drawAnim = d; return { calls, fx: ART.fx.length, FXW: FXW.stat.boom }; });
+      ok('f8 in a real run the fx sheets are drawn (muzzle / impact / explosion)', gm.calls > 20, JSON.stringify(gm));
+      ok('f9 no page errors (fx)', !errs.length, errs[0]); await c.close(); }
     /* (e) ?sprites=0 */
     { const reqs = [], { c, p, errs } = await open('&sprites=0&bpauto=1&boss=sek-adler', reqs);
       try { await p.waitForFunction(() => window.__mnr && __mnr.G.boss && __mnr.G.boss.x <= 791, null, { timeout: 30000 }); } catch (e) { ok('e0 boss arrives', false); }

@@ -34,6 +34,7 @@ function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%
   if(so){const bob=Math.sin(t*5)*1.2,sf=RET.sprites&&SPR.shipOn(shipDef().id),en=sf?null:ART.sp('fx-engine',46);ctx.globalCompositeOperation='lighter';
     if(en)ART.put(en,-24-en.w*.5*(.8+.2*PUL),bob,0,.7+.3*PUL);                  // painted jet, flickers with the beat
     G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';if(!(sf&&SPR.ship(ctx,shipDef().id,t,bob)))ART.put(so,0,bob);RIG.draw(ctx,shipDef().id,60,t,bob);ctx.restore();
+    if(SH.sh>0)SPR.shield();
     const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}
     ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();return;}
   ctx.globalCompositeOperation='lighter';G_(-20,2,16+Math.random()*5,D.a,.9);G_(0,0,34,D.a,.18);ctx.globalCompositeOperation='source-over';
