@@ -26,11 +26,13 @@ ai|11|smarter enemies (the answer to "too easy with all the perks"|-
 meta|11|meta game: LOADOUT (equip / unequip / sell perks, limited sl|-
 ret|53|retention flags: arcade, daily, heat, grade, assist...|sprites,title,type+
 fxwave|6|EFFECTS ASSET WAVE 8 (owner, 18 Oct 2026). Pictures for shot|-
+arthooks|9|literal id table for fx/fg/wpmount/wp/rule/rx/ui pictures pl|-
 flavor|25|run-and-gun flavour for the shooter|flavor,flavor
 footart|19|ON-FOOT ART: window.FA (the street stage's pictures). Inert |-
 footen|29|on-foot street stage enemies + boss library (W3). Pure data |-
-foot|60|on-foot street stage engine|foot,foot
+foot|61|on-foot street stage engine|foot,foot
 footstage|23|the finished on-foot stage (7 sections, Warden gate)|footstage,footstage
+streetlook|20|on-foot street look on phones: one world scale, portrait lay|streetlook,streetlook
 leak|14|ground enemies, calmer pacing, escape penalty|leak,leak
 zoo|26|time to kill + eight new enemy kinds|zoo,zoo
 formations|34|formation library (VARIETY A)|vary,vary,vary2+
