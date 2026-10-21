@@ -3414,10 +3414,12 @@ NR.on('runEnd',d=>{if(!RET.mercy||!d||!d.story)return;const n=d.story;
 NR.on('runStart',d=>{if(!RET.mercy||!d||!d.story||!RET.mercyHull(d.story))return;
   G.note={t:3,txt:'MERCY: +1 hull'+(RET.mercyLvl(d.story)?', a little easier':'')+' this try'};});
 /* B2: what a full garage costs, summed from the live prices (econ-test.js prints it) */
-RET.totalCost=function(){let t=0;
+RET.totalCost=function(){if(window.ECF)ECF.apply();let t=0;
   for(const d of TP_DEF)for(let l=0;l<d.max;l++)t+=tpPrice(d,l);
   for(const id of WP_IDS){t+=WPD[id].p?(RET.econ?Math.max(5,Math.round(WPD[id].p*RET.wk)):WPD[id].p):0;for(let L=1;L<WP_MAX;L++)t+=WPX_PRICE(L);}
   for(const a of [SHIPS,CREW,THEMES])for(const x of a)t+=x.p||0;
+  // econfit.js scales RET.wk / RET.tk (applied above); the abup upgrades and the 24 forge merges are buyable too
+  if(window.ABUP)for(const u of ABUP.U)t+=u.p;if(window.FG)t+=24*FG_COST.neon;
   return t;};
 RET.probe=()=>({w:WPX_PRICE(1),k:tpPrice(TP_BY.dmg,0)});
 
@@ -12871,6 +12873,16 @@ if(ABUP.on){
 ABUP.T={get GA(){return GA;},gsave:()=>gsave(),open:f=>openGarage(f),close:()=>closeGarage(),emit:(n,d)=>NR.emit(n,d)};   // test handle
 window.__abup=ABUP;
 
+/* ---------- econfit.js: economy back to 9-13 h (Strict review 7, task 5). After pacing (stages ~90 s) the Neon per hour went up and the full
+   garage got new buyable layers (abup upgrades, forge merges) that RET.totalCost did not count. Only prices change: the weapon / perk scales (RET.wk, RET.tk),
+   are x ECF.k (abup 90-140 and forge 120 Neon stay), and RET.totalCost now counts abup + the 24 forge merges. Neon per kill (RET.nk), armour.js and hard.js are untouched.
+   Flag RET.econfit, default ON; ?econfit=0 = the prices as they were. Daily / weekly modes pay the same as before (no price or reward change there).
+   Early game: the first weapon upgrade costs ~13 Neon, the first 3 stages pay 52+64+76 (econ-test). ---------- */
+if(RET.econfit===undefined)RET.econfit=!/[?&]econfit=0/.test(location.search);
+const ECF=window.ECF={k:1.05,wk:RET.wk,tk:RET.tk};
+ECF.apply=function(){const on=!!RET.econfit,k=on?this.k:1;RET.wk=this.wk*k;RET.tk=this.tk*k;};
+ECF.apply();
+
 /* ---------- PILOT CLASSES (flag RET.classes, default ON; ?classes=0 = the game exactly as before). Test: nightrun/classes-test.js.
    Owner, 21 Oct 2026: "pilot can have a class so we can have more variety on the game unlocking more skills but with balance."
    Five classes, picked in the Garage tab PILOT. No class picked = ROOKIE = the old game. Each class = a passive + a downside + a SIGNATURE that rides on a button
@@ -13143,7 +13155,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='f63d7b9272 2026-10-21 16:31 UTC';
+const NR_STAMP='a7d7f17c3b 2026-10-21 17:18 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
