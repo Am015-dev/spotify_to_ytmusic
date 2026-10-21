@@ -26,7 +26,7 @@ const gc={};
 function glow(col0){if(gc[col0])return gc[col0];const col=/^#[0-9a-f]{3}$/i.test(col0)?'#'+col0[1]+col0[1]+col0[2]+col0[2]+col0[3]+col0[3]:col0;const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');
   const r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,col+'ff');r.addColorStop(.18,col+'bb');r.addColorStop(.5,col+'30');r.addColorStop(1,col+'00');
   g.fillStyle=r;g.fillRect(0,0,64,64);return gc[col0]=c;}
-function G_(x,y,r,col,a=1){ctx.globalAlpha=a;ctx.drawImage(glow(col),x-r,y-r,r*2,r*2);ctx.globalAlpha=1;}
+function G_(x,y,r,col,a=1){ctx.globalAlpha=window.COM?a*COM.g():a;ctx.drawImage(glow(col),x-r,y-r,r*2,r*2);ctx.globalAlpha=1;}
 
 /* ---------- storage + settings ---------- */
 function load(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
@@ -34,6 +34,7 @@ function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
 let best=load('mnr_best',{score:0,dist:''});
 const todayN=()=>{const d=(window.RET&&RET.daily&&RET.clock)?new Date(RET.clock()):new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
+window.CMF_ON=!/[?&]comfort=0/.test(location.search);   // comfort.js: the eye-strain pass (?comfort=0 = the old look)
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 // every setting, its default and (in c.js) its row in the settings panel. Saved under mnr_set, applied live by applySet().
 const DEFS={music:.45,sfx:.8,master:1,duck:true,keepmus:true,react:true,mute:false,diff:'normal',hud:'min',auto:true,aim:false,layout:'right',sens:3,dsize:'M',win:'normal',all:false,sync:0,cue:'M',

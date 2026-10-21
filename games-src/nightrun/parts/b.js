@@ -183,7 +183,7 @@ function spawnBoss(o){o=o||{};const D=DISTRICTS[G.di],k=o.k!=null?o.k:D.boss,min
 /* ---------- effects + scoring ---------- */
 function burst(x,y,col,n=18,sp=260,life=.6){if(!SET.part)return;if(SET.calm){if(FXV.near(x,y))return;n=Math.ceil(n*.25);life*=.45;}for(let i=0;i<n;i++){const a=rnd(0,7),s=rnd(40,sp);G.pt.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,l:rnd(life*.5,life),m:life,c:col,sz:rnd(1.5,3.5)});}}
 function floater(x,y,txt,c='#ffffff'){G.fl.push({x,y,txt:say(txt),c,l:1});}
-const shake=v=>{G.shake=Math.max(G.shake,v*[0,.45,1][SET.shake]*(SET.rm?.3:1));};
+const shake=v=>{v=v*[0,.45,1][SET.shake]*(SET.rm?.3:1);G.shake=Math.max(G.shake,window.COM?COM.sk(v):v);};   // comfort.js caps the amplitude (and 0 in reduced motion)
 const TS=6,TIERS=4;                                      // power points per tier, number of tiers
 const tierOf=n=>Math.min(TIERS,1+Math.floor(n/TS));
 const comboK=()=>tierOf(C.n)*(window.RET&&RET.fever&&RET.fv.on?RET.fv.k:1);                            // score multiplier = tier (x1..x4)

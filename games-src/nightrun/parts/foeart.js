@@ -1,3 +1,6 @@
+// PURPOSE: every fly-stage enemy draws from an approved ship sheet
+// FLAG: foeart (?foeart=0)
+// TEST: none
 /* ---------- foeart.js: every fly-stage enemy draws from an approved ship sheet (owner, 21 Oct 2026: "the ships are not wired, I still see old shapes").
    Flag RET.foeart, default ON; ?foeart=0 = the drawing as it was. Needs RET.sprites (the sheets are anim/ship-e<kind>/flame|volley).
    ENEMY_ART maps EVERY enemy id the game can spawn to the nearest approved enemy-ship sheet, a tint (hue turn / saturation / brightness, built ONCE per sheet+tint into an

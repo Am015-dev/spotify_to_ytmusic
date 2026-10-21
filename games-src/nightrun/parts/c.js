@@ -10,7 +10,7 @@ function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.
   UIK.bubble(ctx,x-tw/2-pad,y-up-ex,tw+2*pad,bh+ex);ctx.fillStyle='#fff';lines.forEach((l,i)=>ctx.fillText(l,x,y-ex+i*lh));}
 
 // the tier meter: big x1..x4, four segments (the current one fills), a thin line that runs down before the tier slips. k = size, (cx, by) = bottom-centre
-function tierMeter(cx,by,k){const T=tierOf(C.n),col=TIERC[T-1],w=262*k,h=40*k,x0=cx-w/2,y0=by-h,pop=G.tpop>0?1+G.tpop*.4*(G.tdir>0?1:-.5):1;
+function tierMeter(cx,by,k){const T=tierOf(C.n),col=TIERC[T-1],w=262*k,h=40*k,x0=cx-w/2,y0=by-h,pop=G.tpop>0&&!(RET.comfort&&SET.rm)?1+G.tpop*.4*(G.tdir>0?1:-.5):1;
   ctx.save();ctx.fillStyle='#05030ccc';ctx.fillRect(x0,y0,w,h);ctx.strokeStyle=col;ctx.globalAlpha=.5+.45*(T>1?PUL:0);ctx.lineWidth=1.5;ctx.strokeRect(x0+.5,y0+.5,w-1,h-1);ctx.globalAlpha=1;
   ctx.save();ctx.translate(x0+34*k,y0+h/2+10*k);ctx.scale(pop,pop);ctx.font=`700 ${Math.round(30*k)}px "Chakra Petch",sans-serif`;ctx.textAlign='center';ctx.fillStyle=col;ctx.fillText('×'+T,0,0);ctx.restore();
   const sx=x0+68*k,sw=(w-80*k)/TIERS;
@@ -44,7 +44,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
   cn(0,H,()=>{const y0=H-78;UIK.plate(ctx,'ui-hud-bars',8,y0,322,mn?50:74,24,12,157,197);const by=y0+36;ctx.textAlign='left';ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#dcd8f6';ctx.fillText('HULL',20,y0+26);
     const hw=Math.min(16,88/P.max);for(let i=0;i<P.max;i++){ctx.fillStyle=i<P.hp?(P.hp<=1?'#ff3040':'#3dffb0'):'#ffffff1a';ctx.fillRect(20+i*hw,by-8,hw-4,8);}
     ctx.fillStyle='#dcd8f6';ctx.fillText('HEAT',114,y0+26);ctx.fillStyle='#ffffff1a';ctx.fillRect(114,by-8,90,8);
-    ctx.fillStyle=P.over?(SET.reduce||Math.floor(t*10)%2?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(114,by-8,90*P.heat/100,8);
+    ctx.fillStyle=P.over?(SET.reduce||BK(t,10)?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(114,by-8,90*P.heat/100,8);
     ctx.fillStyle='#dcd8f6';ctx.fillText('DASH',216,y0+26);ctx.fillStyle=P.dashCd<=0?D.a:'#ffffff1a';ctx.fillRect(216,by-8,36*(1-P.dashCd),8);
     ctx.fillStyle='#dcd8f6';ctx.fillText('EMP',264,y0+26);for(let i=0;i<3;i++){ctx.fillStyle=i<P.emp?'#ffb020':'#ffffff1a';ctx.beginPath();ctx.arc(270+i*14,by-4,4.5,0,7);ctx.fill();}
     ctx.fillStyle='#dcd8f6';WP.hud(ctx,20,y0+62,1);
@@ -63,7 +63,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     if(G.banner.ev)ART.pic(G.banner.ev,Math.min(256,W*.5),W/2,H/2-58-48,0,Math.max(0,a));ctx.globalAlpha=Math.max(0,a);   // mini-event banner art (nv-ev-*)
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,H/2-58,W,96);const col=G.banner.warn?'#ff3040':D.a;
     ctx.fillStyle=col;ctx.fillRect(0,H/2-58,W,2);ctx.fillRect(0,H/2+36,W,2);
-    ctx.font='700 54px "Chakra Petch",sans-serif';ctx.fillStyle=G.banner.warn&&!SET.reduce&&Math.floor(t*6)%2?'#ffffff':col;ctx.fillText(G.banner.a,W/2+(1-a)*40,H/2-2);
+    ctx.font='700 54px "Chakra Petch",sans-serif';ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,W/2+(1-a)*40,H/2-2);
     ctx.font=`${15*Math.min(ku,1.3)}px "Share Tech Mono",monospace`;ctx.fillStyle='#e9e6ff';ctx.fillText(G.banner.b,W/2,H/2+32);ctx.globalAlpha=1;}
   ctx.restore();}
 
@@ -79,14 +79,14 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
   ctx.textAlign='left';ctx.font=`700 ${19*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#fff';ctx.fillText(sc,pad,19*k);
   const sw=ctx.measureText(sc).width;ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle=D.b;ctx.fillText(mu,pad+sw+8*k,18*k);
   {const col=TIERC[T-1],bx=pad+30*k,bw=Math.min(180*k,w*.36),sg=(bw-3*3*k)/TIERS,by=25*k,bh=6*k;
-    ctx.font=`700 ${13*k}px "Chakra Petch",sans-serif`;ctx.fillStyle=col;ctx.fillText('×'+T,pad,32*k);
+    ctx.font=`700 ${13*k}px "Chakra Petch",sans-serif`;ctx.fillStyle=col;ctx.fillText('×'+T,pad,32*k+(window.COM?COM.hy():0));
     for(let i=0;i<TIERS;i++){const f=i<T-1?1:i===T-1?(T===TIERS?1:(C.n-(T-1)*TS)/TS):0,x=bx+i*(sg+3*k);ctx.fillStyle='#ffffff1c';ctx.fillRect(x,by,sg,bh);ctx.fillStyle=TIERC[i];ctx.fillRect(x,by,sg*f,bh);
       if(i===T-1&&T===TIERS){ctx.globalAlpha=.3+.4*PUL;ctx.fillStyle='#fff';ctx.fillRect(x,by,sg,bh);ctx.globalAlpha=1;}}
     if(C.n>0){const left=clamp(1-(G.bc-C.lb+PHF)/(8+SH.ck),0,1);ctx.fillStyle='#ffffff22';ctx.fillRect(bx,by+bh+2*k,bw,2*k);ctx.fillStyle=col;ctx.fillRect(bx,by+bh+2*k,bw*left,2*k);}}
   {const hw=Math.min(11*k,70*k/P.max),hwid=P.max*(hw+3*k)-3*k,rx=w-pad;ctx.save();ctx.translate(rx-hwid-18*k,3*k);ctx.scale(.62*k,.62*k);ctx.fillStyle=P.hp<=1?'#ff3040':'#3dffb0';ctx.fill(HUDX.iHeart,'evenodd');ctx.restore();
     for(let i=0;i<P.max;i++){ctx.fillStyle=i<P.hp?(P.hp<=1?'#ff3040':'#3dffb0'):'#ffffff1a';ctx.fillRect(rx-hwid+i*(hw+3*k),6*k,hw,8*k);}
     const lb=P.over?'OVERHEAT':'HEAT',bwd=64*k;ctx.textAlign='right';ctx.font=`${11*k}px "Share Tech Mono",monospace`;ctx.fillStyle=P.over?'#ff3040':'#dcd8f6';ctx.fillText(lb,rx-bwd-5*k,32*k);
-    ctx.fillStyle='#ffffff1a';ctx.fillRect(rx-bwd,25*k,bwd,7*k);ctx.fillStyle=P.over?(SET.reduce||Math.floor(t*10)%2?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(rx-bwd,25*k,bwd*P.heat/100,7*k);}
+    ctx.fillStyle='#ffffff1a';ctx.fillRect(rx-bwd,25*k,bwd,7*k);ctx.fillStyle=P.over?(SET.reduce||BK(t,10)?'#ff3040':'#ff304066'):P.heat>70?'#ffa02d':D.b;ctx.fillRect(rx-bwd,25*k,bwd*P.heat/100,7*k);}
   Object.assign(HUDLOG,{x:HUDX.vals()});
   let ny=sH+6*k;
   const short=h*Math.max(.2,frame.clientWidth/w)<800;   // short phone (390x763 and below): the secondary HUD collapses to hull / score / meters + one thin boss bar, and the hint moves to the bottom band
@@ -107,12 +107,12 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
     if(G.banner.ev)ART.pic(G.banner.ev,Math.min(256*k,w*.7),w/2,h/2-58*k-40*k,0,Math.max(0,a));ctx.globalAlpha=Math.max(0,a);
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,h/2-58*k,w,96*k);const col=G.banner.warn?'#ff3040':D.a;
     ctx.fillStyle=col;ctx.fillRect(0,h/2-58*k,w,2);ctx.fillRect(0,h/2+36*k,w,2);
-    ctx.font=`700 ${Math.min(54*k,w/Math.max(7,G.banner.a.length*.62))}px "Chakra Petch",sans-serif`;ctx.fillStyle=G.banner.warn&&!SET.reduce&&Math.floor(t*6)%2?'#ffffff':col;ctx.fillText(G.banner.a,w/2+(1-a)*40,h/2+4*k);
+    ctx.font=`700 ${Math.min(54*k,w/Math.max(7,G.banner.a.length*.62))}px "Chakra Petch",sans-serif`;ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,w/2+(1-a)*40,h/2+4*k);
     ctx.font=`${Math.min(15*k,w/Math.max(20,G.banner.b.length*.62))}px "Share Tech Mono",monospace`;ctx.fillStyle='#e9e6ff';ctx.fillText(G.banner.b,w/2,h/2+26*k);ctx.globalAlpha=1;}
   ctx.restore();}
 
 let PUL=0,PHF=0,FD=0,HUDOFF=false;
-function tierGlow(c){const T=tierOf(C.n);c.save();c.globalCompositeOperation='lighter';c.globalAlpha=.012*(T-1)+.02*(T-1)*PUL*FX();c.fillStyle=TIERC[T-1];c.fillRect(0,0,W,H);c.restore();}   // each tier lifts the whole picture a little
+function tierGlow(c){const T=tierOf(C.n);c.save();c.globalCompositeOperation='lighter';c.globalAlpha=(.012*(T-1)+.02*(T-1)*PUL*FX())*(window.COM?COM.pg_():1);c.fillStyle=TIERC[T-1];c.fillRect(0,0,W,H);c.restore();}   // each tier lifts the whole picture a little
 function shotDraw(b,D){const ang=(b.vx||b.vy)?Math.atan2(b.vy,b.vx):0;let o,al=.55,sy;      // the ship's own shots stay thinner and dimmer than the lime enemy bullets
   if(b.hv){o=ART.sp('fx-shot-hv',46);al=.8;}
   else if(b.ec){o=ART.sp('fx-shot-ec',30);al=.65;}
@@ -152,8 +152,9 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   ctx.restore();
   if(G.empT>0&&(AH.pic('fx-pw-bomb-pulse',(0.6-G.empT)*2800,P.x,P.y,0,Math.min(1,G.empT*2.2))||ART.wave(P.x,P.y,(0.6-G.empT)*1400,G.empT*2.2))){}
   else if(G.empT>0){ctx.strokeStyle='#ffb020';ctx.lineWidth=6*G.empT;ctx.beginPath();ctx.arc(P.x,P.y,(0.6-G.empT)*1400,0,7);ctx.stroke();}
-  if(G.flash>0){ctx.fillStyle=`rgba(255,255,255,${G.flash*.5})`;ctx.fillRect(0,0,W,H);}
-  if(G.glitch>0){for(let i=0;i<6;i++){const y=rnd(0,H),h=rnd(4,26);ctx.drawImage(wcv,0,y*S,wcv.width,h*S,rnd(-20,20),y,W,h);}ctx.fillStyle=`rgba(255,40,80,${G.glitch*.25})`;ctx.fillRect(0,0,W,H);}
+  if(window.COM)COM.gate(dt);   // comfort.js: at most 3 full-screen flashes a second, capped alpha
+  if(G.flash>0){ctx.fillStyle=`rgba(255,255,255,${window.COM?COM.fa():G.flash*.5})`;ctx.fillRect(0,0,W,H);}
+  if(G.glitch>0){const gk=window.COM?COM.gk():1;for(let i=0;i<6;i++){const y=rnd(0,H),h=rnd(4,26);ctx.drawImage(wcv,0,y*S,wcv.width,h*S,rnd(-20,20)*gk,y,W,h);}ctx.fillStyle=`rgba(255,40,80,${window.COM?COM.ga():G.glitch*.25})`;ctx.fillRect(0,0,W,H);}
   if(running&&T_>1)tierGlow(ctx);
   if(PT){if(running)FXV.edges(t);
     ctx=vctx;ctx.setTransform(0,-1,1,0,0,cv.height);ctx.drawImage(wcv,0,0);                // world, turned so that its right is the screen's up
@@ -181,16 +182,17 @@ const SCHEMA=[
     {k:'q',l:'Quality',o:[['L','Low'],['M','Medium'],['H','High']]},{k:'fps',l:'FPS cap',o:[[30,'30'],[60,'60']]},{k:"pal",l:"Colour theme",o:[['neon','Neon'],['cb','Blue-orange'],['term','Terminal']]},{k:'fpsc',l:'FPS counter',o:OFFON}]},
   {g:'Accessibility',rows:[{k:'rm',l:'Reduced motion',o:OFFON},{k:'hc',l:'High-contrast bullets',o:OFFON}]}];
 if(window.RET&&RET.assistSchema)RET.assistSchema(SCHEMA);
+if(window.COM)COM.schema(SCHEMA);   // comfort.js: the Comfort group
 const PALS={neon:null,cb:{a:'#ffb020',b:'#4aa3ff'},term:{a:'#3dff7a',b:'#d6ffe0'}};
 let palOn='neon';
 function applyPal(){if(palOn===SET.pal)return;palOn=SET.pal;const th=PALS[SET.pal];
   for(const D of DISTRICTS){if(!D.a0){D.a0=D.a;D.b0=D.b;}D.a=th?th.a:D.a0;D.b=th?th.b:D.b0;}
   for(const k in BGC)delete BGC[k];for(const k in BGPC)delete BGPC[k];}
-function applySet(){if(window.RET&&RET.assistApply)RET.assistApply();deriveSet();AU.vol();DF=DIFFS[SET.diff]||DIFFS.normal;HARD=HARDS.includes(SET.diff);applyPal();
+function applySet(){if(window.COM)COM.apply();if(window.RET&&RET.assistApply)RET.assistApply();deriveSet();AU.vol();DF=DIFFS[SET.diff]||DIFFS.normal;HARD=HARDS.includes(SET.diff);applyPal();
   stage.classList.toggle('ds-S',SET.dsize==='S');stage.classList.toggle('ds-L',SET.dsize==='L');document.documentElement.classList.toggle('hc',!!SET.hc);
   $('fpsEl').hidden=!FPSOK();fit();
   if(typeof diffDraw==='function')diffDraw();}
-function setVal(k,v){SET[k]=v;saveSet();applySet();syncSet();}
+function setVal(k,v){SET[k]=v;if(window.COM)COM.onSet(k,v);saveSet();applySet();syncSet();}
 const setRows={};
 function buildSettings(){const body=$('setBody');
   for(const grp of SCHEMA){const h=document.createElement('h3');h.textContent=grp.g;body.appendChild(h);

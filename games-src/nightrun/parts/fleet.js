@@ -156,7 +156,7 @@ const FLEET=window.FLEET={
     ctx.save();ctx.translate(e.x,e.y);
     if(e.arm){ctx.globalAlpha=.35+.5*(typeof PHF==='number'?PHF:0);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+8,0,7);ctx.stroke();ctx.globalAlpha=1;}
     ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
-    if(k==='int'){ctx.rotate(e.fs===3&&e.ang!=null?e.ang+Math.PI:0);if(e.fs===2)ctx.fillStyle=Math.floor(t*12)%2?'#ff3050':fill;
+    if(k==='int'){ctx.rotate(e.fs===3&&e.ang!=null?e.ang+Math.PI:0);if(e.fs===2)ctx.fillStyle=BK(t,12)?'#ff3050':fill;
       ctx.beginPath();ctx.moveTo(-r*1.5,0);ctx.lineTo(r,-r*.9);ctx.lineTo(r*.5,0);ctx.lineTo(r,r*.9);ctx.closePath();ctx.fill();ctx.stroke();}
     else if(k==='bom'){ctx.beginPath();ctx.moveTo(-r*1.2,0);ctx.lineTo(-r*.3,-r*.7);ctx.lineTo(r*1.2,-r*.9);ctx.lineTo(r,0);ctx.lineTo(r*1.2,r*.9);ctx.lineTo(-r*.3,r*.7);ctx.closePath();ctx.fill();ctx.stroke();
       ctx.fillStyle=fl?'#fff':e.arm?'#ff3050':T.col;for(const s of[-1,1]){ctx.beginPath();ctx.arc(r*.2,s*r*.38,r*.2,0,7);ctx.fill();}}
