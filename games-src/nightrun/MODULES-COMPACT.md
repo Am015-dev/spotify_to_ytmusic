@@ -33,6 +33,7 @@ footen|29|on-foot street stage enemies + boss library (W3). Pure data |-
 foot|62|on-foot street stage engine|foot,foot
 footstage|23|the finished on-foot stage (7 sections, Warden gate)|footstage,footstage
 streetlook|19|on-foot street look on phones: one world scale, portrait lay|streetlook,streetlook
+footq|6|on-foot quality: sprites preloaded before the run starts, no|footq,footq
 leak|14|ground enemies, calmer pacing, escape penalty|leak,leak
 zoo|26|time to kill + eight new enemy kinds|zoo,zoo
 formations|34|formation library (VARIETY A)|vary,vary,vary2+
@@ -97,9 +98,10 @@ cp|10|checkpoints with grace on long stages|cp,cp
 fs|5|phone full screen on first tap|fs,fs
 readable|11|bullets and threats readable at a glance|read,read
 bulletart|1|real bullet pictures (converted approved previews) for enemy|bulletart,bulletart
+legible|4|enemies, enemy bullets and pickups readable on every stage b|legible,legible
 arsenal|17|12 extra power-ups and the context-aware drop picker|powers,powers
-abup|15|DASH/EMP upgrades and power-up interaction|abup,abup
-zonehint|2|one-line caption on the first purple ring (gravity well) of |zonehint,zonehint
+abup|20|DASH/EMP upgrades and power-up interaction|abup,abup
+zonehint|3|one-line caption on the first purple ring (gravity well) of |zonehint,zonehint
 econfit|1|economy fit: hours to finish back to 9-13 h|econfit,econfit
 comfort|11|eye strain pass: flash/glitch rate and alpha caps, shake cap|comfort,comfort
 classes|18|pilot classes picked before a run|classes,classes
