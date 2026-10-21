@@ -19,5 +19,12 @@ for n in SHIP:
     st=Image.open(M+'spr-ship-%s.webp'%n);hull=60*st.height/st.width
     bw,bh=b[2]-b[0],b[3]-b[1];k=min(92/bw,1.5*hull/bh)
     c['ship-'+n]={'k':round(k,4),'ox':round(30-(b[2]-j['w']/2)*k,2),'oy':round(-((b[1]+b[3])/2-j['h']/2)*k,2)}
+#  weapon fx, explosions, small fx, pickups (media/anim/wpn-*, fx-*, pk-*): bw = mean content width in sheet px (alpha > 48), so the content is drawn as wide as the still it replaces
+for who in sorted(os.listdir(M+'anim')):
+    if not who.startswith(('wpn-','fx-','pk-')):continue
+    for f in sorted(os.listdir(M+'anim/'+who)):
+        if not f.endswith('-strip.webp'):continue
+        act=f[:-11];j,fr=frames(who,act);bb=[b for b in (x.point(lambda v:255 if v>48 else 0).getbbox() for x in fr) if b]
+        c[who+'/'+act]={'bw':round(sum(b[2]-b[0] for b in bb)/max(1,len(bb)),1) or j['w']}
 json.dump(c,open(R+'games-src/nightrun/sprite-calib.json','w'),separators=(',',':'),sort_keys=True)
 print(len(c),'calibrated')

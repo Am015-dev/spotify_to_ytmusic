@@ -56,7 +56,8 @@ ART.dflash=(n,w,x,y,rot,fl,col,a)=>{const o=ART.sp(n,w);if(!o)return false;ART.p
 /* ----- effects: light on black, drawn additively, scaled up while they fade ----- */
 ART.boom=(k,x,y,sz,life,delay)=>{const f=ART.fx;if(f.length>=24)f.shift();f.push({k,x,y,sz,t:-(delay||0),m:life});};   // delay: seconds before it shows (a sprite clip plays first)
 ART.fxDraw=()=>{const f=ART.fx;if(!f.length)return;ctx.globalCompositeOperation='lighter';
-  for(let i=f.length-1;i>=0;i--){const q=f[i];q.t+=FD;if(q.t<0)continue;const k=q.t/q.m;if(k>=1){f.splice(i,1);continue;}
+  for(let i=f.length-1;i>=0;i--){const q=f[i];q.t+=FD;if(q.t<0)continue;const sk=RET.sprites&&ART.fxSheet(q.k),so=sk&&ART.aS(sk),ml=so?so.tot+SPR.fxTail:q.m,k=q.t/ml;if(k>=1){f.splice(i,1);continue;}
+    if(sk&&ART.anim(sk)){ART.drawAnim(ctx,sk,q.t,q.x,q.y,q.sz/ART.ANIM.c[sk].bw,false,Math.min(1,(ml-q.t)/SPR.fxTail)*(q.k==='hit-spark'?.9:1));continue;}   // the sheet plays its frames, with a short fade after the last one
     const b=ART.bm['fx-'+q.k];if(!b)continue;const grow=q.k==='muzzle'||q.k==='hit-spark'||/-(muzzle|hit)$/.test(q.k)?.8+.4*k:.55+.65*k,w=q.sz*grow,h=w*b.height/b.width;
     ctx.globalAlpha=Math.min(1,(1-k)*1.6)*(q.k==='hit-spark'?.9:1);ctx.drawImage(b,q.x-w/2,q.y-h/2,w,h);}
   ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';};
@@ -176,8 +177,25 @@ SPR.ship=(c,id,t,bob)=>{const cb=ART.ANIM.c['ship-'+id],bk=ART.ANIM.sm.ship_bank
   SPR._sq+=((1-f*(1-bk.squash_y))-SPR._sq)*Math.min(1,FD*1000/bk.ease_ms);                 // banking: the existing tilt, plus a squash while the ship moves up / down
   return ART.drawAnim(c,'ship-'+id+'/flame',t,cb.ox,bob+cb.oy,cb.k,false,null,SPR._sq);};
 SPR.shipDeath=()=>{const id=shipDef().id,cb=ART.ANIM.c['ship-'+id],key='ship-'+id+'/death';if(!cb||!ART.anim(key))return 0;ART.gh.push({key,x:P.x+cb.ox,y:P.y+cb.oy,k:cb.k,t:0});return ART.aS(key).tot;};
+/* ----- weapon fx (muzzle / impact), explosions (burst), small fx (spark, hit-confirm, shield glow) and pickups (spin). Each effect keeps its old key; ART.fxSheet maps it to the sheet, 0 when there is none.
+   Sizes: calibration bw (content width in sheet px) so a sheet is drawn as wide as the still it replaces. Per-weapon 'beam' sheets stay unwired: the player's shots are small sprites (FXW.bullet), a 392 px beam would not fit them.
+   debris / ground-dust have no hook yet (nothing draws them as stills either). ----- */
+SPR.fxTail=.08;
+ART.fxs={};
+ART.fxSheet=k=>{let s=ART.fxs[k];if(s!==undefined)return s;let m;s=0;
+  if(k==='hit-spark')s='fx-spark/burst';else if(k==='hitconfirm')s='fx-hitconfirm/burst';
+  else if((m=/^boom-(.+)$/.exec(k)))s='fx-boom-'+m[1]+'/burst';
+  else if((m=/^w-(\w+)-(muzzle|hit)$/.exec(k)))s='wpn-'+m[1]+'/'+(m[2]==='hit'?'impact':'muzzle');
+  if(s&&!(ART.ANIM.s[s]&&ART.ANIM.c[s]))s=0;return ART.fxs[k]=s;};
+SPR.PK={shard:'pk-coin/spin',hp:'pk-health/spin'};
+/* a pickup coin: sheet drawn about the origin, w world units wide (the still's size); false = draw the still */
+SPR.pk=(k,w)=>{const key=RET.sprites&&SPR.PK[k];if(!key||!ART.ANIM.c[key]||!ART.anim(key))return false;return ART.drawAnim(ctx,key,G.t,0,0,w/ART.ANIM.c[key].bw,false);};
+/* a shield is up: the glow loops around the ship */
+SPR.shield=()=>{const key='fx-shield/glow';if(!RET.sprites||!ART.ANIM.c[key]||!ART.anim(key))return false;ctx.save();ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,G.t,P.x,P.y,96/ART.ANIM.c[key].bw,false,.6);ctx.restore();return true;};
+SPR.warmFx=()=>{for(const k of['fx-boom-small-fire/burst','fx-boom-medium-fire/burst','fx-boom-large-fire/burst','fx-spark/burst','fx-hitconfirm/burst','fx-shield/glow','pk-coin/spin','pk-health/spin'])ART.anim(k);
+  try{for(const id of WP.eq)if(id){ART.anim('wpn-'+id+'/muzzle');ART.anim('wpn-'+id+'/impact');}}catch(e){}};
 /* load on demand: the chosen ship's sheets and the three newer hulls' stills shortly after start, each district's boss a few seconds after the district begins */
-setTimeout(()=>{if(!RET.sprites)return;for(const n of['drift','lancer','nova'])ART.load('spr-ship-'+n);try{SPR.shipOn(shipDef().id);}catch(e){}},2500);
-SPR.warmBoss=nm=>{for(const a of['idle','attack','hit','defeat'])ART.anim('boss-'+nm+'/'+a);};
+setTimeout(()=>{if(!RET.sprites)return;for(const n of['drift','lancer','nova'])ART.load('spr-ship-'+n);try{SPR.shipOn(shipDef().id);}catch(e){}SPR.warmFx();},2500);
+SPR.warmBoss=nm=>{for(const a of['idle','attack','hit','defeat'])ART.anim('boss-'+nm+'/'+a);ART.anim('fx-boom-boss-a/burst');ART.anim('fx-boom-boss-b/burst');SPR.warmFx();};
 NR.on('tick',()=>{if(!RET.sprites||!G.live)return;const b=G.boss;if(b&&!b._sl){b._sl=1;const nm=ART.bossN[ART.artK(b)];if(nm)SPR.warmBoss(nm);}      // a boss on screen: its sheets start loading the moment it spawns, two seconds before it stops
   if(G.di===SPR._di)return;SPR._di=G.di;const nm=ART.bossN[DISTRICTS[G.di].boss];if(nm)setTimeout(()=>SPR.warmBoss(nm),3500);});
