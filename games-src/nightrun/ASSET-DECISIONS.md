@@ -17,3 +17,13 @@
 - fx-pw-pickup-glow (power-up picked up), fx-pw-level-up (weapon level rises), fx-pw-fever-aura (while fever is on), fx-pw-shield-bubble (while a shield charge is up), fx-pw-bomb-pulse (EMP ring): additions over the existing code shapes.
 - fx-w34-ui-ring-charge: the DASH / EMP button ring while it is recharging (class rgC); ready and empty already existed.
 - fx-eb-shockwave-ring: a ring where a boss fires pulse_ring. The ground shockwave verb keeps its column.
+
+## From the runtime coverage run (W93, 21 Oct 2026)
+
+1. **soon-* (7 real files):** the garage SOON tab (`soonDraw`, meta.js:73) is unreachable since the tab was removed. Put the tab back, show the cards somewhere else (e.g. the end of the MENU sheet), or retire the 7 files?
+2. **90 % target:** 564 of 887 images are generated placeholders (not in `ready.json`), so at most 36 % of all files can draw. Real files covered: 234 of 323 (72.4 %). The 89 left have hooks but need moments the headless driver cannot reach (list and reasons in the report). Accept 72 % as measured, or ask for a longer human-played coverage session?
+3. **fx-explosion-big / -boss / hit-spark / shockwave / orb-homing:** superseded by the `anim/fx-boom-*` clips; only drawn when sprites are off. Keep as the sprites-off fallback or retire?
+4. **spr-* stills (spr-boss-*, spr-en-*, spr-ship-*):** fallbacks next to the strips; 4 of 6 real ones drew only as the strip loads. Keep or drop?
+5. **fx-fuse-tag-* (14):** only on the WEAPONS fusion banner; confirm that banner is the intended home (it also needs a fused pair equipped).
+6. **ach-* (30), fg-* (44), fl-* (12), rule-*, rx-*, bp-*, ui-* and the remaining placeholder groups:** placeholders by policy; they draw as flat shapes with their hooks already in place and become art when ingested. Nothing to wire.
+7. **anim/prop-drone, prop-windows, pk-coin, pk-health:** hooks exist (seeded prop placement, pickup draw); confirm they appear in play, the headless run did not sample them.
