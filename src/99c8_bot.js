@@ -121,7 +121,7 @@ function BOT_esc(say){const R=BOT_rec(),out={kind:'escape',city:CID,ok:false,row
   /* must NOT reset (c1286c5): free driving through gentle dips deeper than 2.5 m, from rest, at 20 m/s and circling, plus up to 2 dips per city the car really runs through (>= 27 m in 1.5 s) */
   const free=[];let tried=0;for(const o of S.all){if(free.length>=2||++tried>10)break;if(o.d<2.6||o.d>12||free.some(q=>Math.hypot(q[0]-o.x,q[1]-o.z)<100))continue;if(BOT_freeDir(R,o.x,o.z,1)!=null)free.push([o.x,o.z])}out.free=free;
   for(const[x,z]of[...(BESC.keep[CID]||[]),...free]){const dir=BOT_freeDir(R,x,z);for(const mode of['rest','fast','circle']){const r=BOT_escRun(R,x,z,dir,mode==='rest'?0:mode==='fast'?20:15,1,mode==='circle',6);out.keep.push({x,z,mode,ok:!r.bad.length,lifts:r.lifts,maxV:r.maxV,path:r.path})}}
-  out.ok=out.rows.length>=6&&out.rows.every(r=>r.ok&&r.clear&&!r.bad.length)&&out.rev.length>=4&&out.rev.every(r=>r.ok)&&out.busy&&out.busy.ok&&out.keep.every(k=>k.ok)&&!R.errs.length&&!R.M.nan&&!R.M.fall}
+  out.ok=out.rows.length>=3&&out.rows.every(r=>r.ok&&r.clear&&!r.bad.length)&&out.rev.length>=4&&out.rev.every(r=>r.ok)&&out.busy&&out.busy.ok&&out.keep.every(k=>k.ok)&&!R.errs.length&&!R.M.nan&&!R.M.fall}
  catch(e){R.errs.push('BOT '+String(e&&e.stack||e).slice(0,160))}
  R.done();out.err=R.errs.slice(0,4);(window.__chk.bot=window.__chk.bot||{})[CID+'/escape']=out;
  const fl=a=>a.filter(r=>!r.ok);

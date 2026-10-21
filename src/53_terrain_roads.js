@@ -151,7 +151,7 @@ const TR_RG=TERR.on&&new URLSearchParams(location.search).get('trg')!=='0';
 function TR_roadsInit(W,force){if(!TR_RG)return;if(CID!=='fra'&&!force)return;  // Athens: graded after AB_auto has extended the dead-end streets (TR_afterExt)
   const T0=performance.now(),R=[];try{for(let _k1=0,_c1=CITY_S,S;_k1<_c1.length&&(S=_c1[_k1],true);_k1++)if(S.r.cls!=='hill'||CID!=='fra')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2,g:S.r.cls==='hill'?.3:0})
     if(CID==='fra')for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
-    const skip=CID==='fra'?TR_rivSkip:null,pinY=(x,z)=>{for(let _j1=0,_b1=BRIDGES;_j1<_b1.length;_j1++){const b=_b1[_j1];if(Math.abs(x-b.cx)>b.r+30||Math.abs(z-b.cz)>b.r+30)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(c)<b.w&&Math.abs(a)>b.half-5&&Math.abs(a)<b.half+45){const v=deckY(b,Math.sign(a)*b.half);if(v!=null)return v}}return null};if(/trdbg/.test(location.search))W.trSnap={S:CITY_S.slice(),n:CITY_S.map(S=>S.pts.length),p0:CITY_S.map(S=>S.pts[0]),pts:CITY_S.map(S=>S.pts)};W.trg={n:TR_grade(W,R,{skip,pin:CID==='fra'?TR_rivPin:null,flat:W.r+4,g:CID==='fra'?.085:.07,junc:TR_padList()}),ms:0};TR8_fadeRoads(W,R,TR_padList())}catch(e){W.trg={err:String(e)}}W.trg.ms=Math.round(performance.now()-T0);try{TR_bridgeEnds()}catch(e){}}
+    const skip=CID==='fra'?TR_rivSkip:null,pinY=(x,z)=>{for(let _j1=0,_b1=BRIDGES;_j1<_b1.length;_j1++){const b=_b1[_j1];if(Math.abs(x-b.cx)>b.r+30||Math.abs(z-b.cz)>b.r+30)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(c)<b.w&&Math.abs(a)>b.half-5&&Math.abs(a)<b.half+45){const v=deckY(b,Math.sign(a)*b.half);if(v!=null)return v}}return null};if(/trdbg/.test(location.search))W.trSnap={S:CITY_S.slice(),n:CITY_S.map(S=>S.pts.length),p0:CITY_S.map(S=>S.pts[0]),pts:CITY_S.map(S=>S.pts)};W.trg={n:TR_grade(W,R,{skip,pin:CID==='fra'?TR_rivPin:null,flat:W.r+4,g:CID==='fra'?.085:.07,junc:TR_padList()}),ms:0};TR8_fadeRoads(W,R,TR_padList());if(CID!=='fra')TR9_cap(W,R,TR_padList())}catch(e){W.trg={err:String(e)}}W.trg.ms=Math.round(performance.now()-T0);try{TR_bridgeEnds()}catch(e){}}
 // terr-8 (Alex b60 deep bowl, simple route): after grading, the terrain beside every road / filler road / junction or plaza pad is held inside a
 // 26° cone around the nearest road cell's height (|h − H| ≤ d·tan 26°), fully up to 60 m from the road edge, fading out by 120 m (a plain
 // 40 m blend toward road height squeezed tall hills into steeper walls): no basins or walls beside the roads. Acropolis plateau kept.
@@ -172,6 +172,34 @@ function TR8_fadeRoads(W,R,pads){if(!TR8_FON)return;const T0=performance.now(),{
     if(CID!=='fra'&&typeof HILL_BY!=='undefined'&&HILL_BY.akro&&athHill1(HILL_BY.akro,x,z)>0)continue;
     const lim=TR8_K*d,c=clamp(h[k],H[k]-lim,H[k]+lim);if(c===h[k])continue;const t=clamp((d-TR8_F)/TR8_F,0,1),w=1-t*t*(3-2*t);h[k]+=(c-h[k])*w;m++}
   W.tr8={fill:FR.length,cells:m,ms:Math.round(performance.now()-T0)}}
+// terr-9 (why-2k gap 1, "hills I cannot get out of"): after grading, the ground beside every road, filler road and pad is a slope-limited field: a cell may differ from each neighbour
+// that is closer to the road by at most tan(th(d))*step, th = 18 deg up to 30 m from the road edge, opening to 50 deg by 65 m (the hills stay far away: only the foot of a hill near a road is eased).
+// Cells within TR9_PIN m of a road (the flat shoulder the road surface, kerbs and plots sit on), river cells and the Acropolis footprint are never moved. One pass in ascending distance. ?t9c=0 = the old ground. Athens' ground quadtree cache (QTC, tools/qtdump.js) is re-dumped with this ground.
+const TR9_ON=new URLSearchParams(location.search).get('t9c')!=='0',TR9_PIN=6,TR9_N=72;
+function TR_roadDist(W,R,pads){const{r,nx,nz}=W,n=nx*nz,D=new Float32Array(n).fill(1e9);
+  const seed=(x0,z0,x1,z1,hw)=>{const i0=Math.max(0,Math.floor((Math.min(x0,x1)-hw-WX0)/r)),i1=Math.min(nx-1,Math.ceil((Math.max(x0,x1)+hw-WX0)/r)),j0=Math.max(0,Math.floor((Math.min(z0,z1)-hw-WZS)/r)),j1=Math.min(nz-1,Math.ceil((Math.max(z0,z1)+hw-WZS)/r));
+    const dx=x1-x0,dz=z1-z0,L2=dx*dx+dz*dz||1;for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const x=WX0+i*r,z=WZS+j*r,t=clamp(((x-x0)*dx+(z-z0)*dz)/L2,0,1),d=Math.hypot(x-x0-dx*t,z-z0-dz*t);if(d<=hw)D[j*nx+i]=0}};
+  for(const q of R){const P=q.P;for(let a=0;a<P.length-1;a++)seed(P[a][0],P[a][1],P[a+1][0],P[a+1][1],(q.hw||4))}
+  let FR=[];try{FR=FILL_R||[]}catch(e){}if(CID==='fra')for(const f of FR)seed(f.x0,f.z0,f.x0+f.ux*f.L,f.z0+f.uz*f.L,f.w/2);
+  for(const p of pads||[])seed(p[0],p[1],p[0],p[1],p[2]);
+  const s2=r*Math.SQRT2,rel=(k,k2,c)=>{const d=D[k2]+c;if(d<D[k])D[k]=d};
+  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i;if(i)rel(k,k-1,r);if(j){rel(k,k-nx,r);if(i)rel(k,k-nx-1,s2);if(i<nx-1)rel(k,k-nx+1,s2)}}
+  for(let j=nz-1;j>=0;j--)for(let i=nx-1;i>=0;i--){const k=j*nx+i;if(i<nx-1)rel(k,k+1,r);if(j<nz-1){rel(k,k+nx,r);if(i<nx-1)rel(k,k+nx+1,s2);if(i)rel(k,k+nx-1,s2)}}
+  return D}
+function TR9_cap(W,R,pads){if(!TR9_ON)return;const T0=performance.now(),{r,nx,nz,h}=W,D=TR_roadDist(W,R,pads),K0=Math.tan(18*Math.PI/180),K1=Math.tan(50*Math.PI/180);
+  const skip=new Uint8Array(nx*nz),NBK=TR9_N*2,cnt=new Int32Array(NBK+2);let nb=0;
+  for(let j=1;j<nz-1;j++)for(let i=1;i<nx-1;i++){const k=j*nx+i,d=D[k];if(d>=TR9_N)continue;
+    if(d>TR9_PIN){cnt[(d*2|0)+1]++;nb++}}
+  for(let b=0;b<NBK;b++)cnt[b+1]+=cnt[b];const band=new Int32Array(nb);
+  for(let j=1;j<nz-1;j++)for(let i=1;i<nx-1;i++){const k=j*nx+i,d=D[k];if(d>TR9_PIN&&d<TR9_N)band[cnt[d*2|0]++]=k}
+  if(WATERS.length||(CID!=='fra'&&typeof HILL_BY!=='undefined'&&HILL_BY.akro)){const A=CID!=='fra'&&typeof HILL_BY!=='undefined'?HILL_BY.akro:null;for(let q=0;q<nb;q++){const k=band[q],x=WX0+(k%nx)*r,z=WZS+((k/nx)|0)*r;if((WATERS.length&&inRiver(x,z,-25))||(A&&athHill1(A,x,z)>0))skip[k]=1}}
+  const KK=new Float32Array(TR9_N+1);for(let d=0;d<=TR9_N;d++){const t=clamp((d-25)/40,0,1);KK[d]=K0+(K1-K0)*t*t*(3-2*t)}
+  const NB=[-1,1,-nx,nx,-1-nx,1-nx,nx-1,nx+1],NF=[1,1,1,1,Math.SQRT2,Math.SQRT2,Math.SQRT2,Math.SQRT2];let ch=0;
+  // ascending distance: every neighbour that is closer to the road is final when a cell is visited
+  for(let q=0;q<nb;q++){const k=band[q];if(skip[k])continue;const dk=D[k],w=KK[dk|0]*r;let lo=-1e9,hi=1e9;
+    for(let e=0;e<8;e++){const u=k+NB[e];if(skip[u]||!(D[u]<dk-.01))continue;const hu=h[u],m=w*NF[e];if(hu-m>lo)lo=hu-m;if(hu+m<hi)hi=hu+m}
+    if(lo===-1e9)continue;const v=h[k],t=lo>hi?(lo+hi)/2:v<lo?lo:v>hi?hi:v;if(t!==v){h[k]=t;ch++}}
+  W.tr9={band:nb,changed:ch,ms:Math.round(performance.now()-T0)}}
 // every deck (city bridges had none: decks from y 0) starts and ends at the graded ground, re-read after each grading pass: no step at the joints
 function TR_bridgeEnds(){if(CID!=='fra'||!TR_RG)return;for(const b of[...BRIDGES,...(AB_BRIDGES||[])]){const g=s=>{const[x,z]=deckPt(b,s*(b.half+.6));return TR_G(x,z)};b.yA=g(-1);b.yB=g(1);b.trE=1}}
 
@@ -465,7 +493,7 @@ function rfGrid(){if(FILL_R)return;FILL_R=[];FILL_G=new Map();BLOCK_C=[];
 function hubRoads(){rfGrid();return FILL_R}
 // terr-1: Frankfurt filler roads are graded into the raster as soon as the grid exists
 RFS.S.push(()=>{if(CID==='fra'&&TR_RG)try{const W=TR_W||TR_init(),T0=performance.now();const R=FILL_R.map(f=>({P:[[f.x0,f.z0],[f.x1,f.z1]],hw:f.w/2}));for(let _k4=0,_c4=CITY_S,S;_k4<_c4.length&&(S=_c4[_k4],true);_k4++)if(S.r.cls!=='hill')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
-    W.trf={n:TR_grade(W,R,{skip:TR_rivSkip,pin:TR_rivPin,flat:W.r+4,junc:TR_padList()})};W.trf.ms=Math.round(performance.now()-T0);TR_bridgeEnds()}catch(e){(TR_W||{}).trf={err:String(e)}}});// perf-r17i: was an rfGrid wrapper; now the last RFS.S pass (src/51)
+    W.trf={n:TR_grade(W,R,{skip:TR_rivSkip,pin:TR_rivPin,flat:W.r+4,junc:TR_padList()})};W.trf.ms=Math.round(performance.now()-T0);TR9_cap(W,R,TR_padList());TR_bridgeEnds()}catch(e){(TR_W||{}).trf={err:String(e)}}});// perf-r17i: was an rfGrid wrapper; now the last RFS.S pass (src/51)
 // footprint test for buildings (9 points of the rotated rectangle): off streets, filler roads, water, plazas/parks/landmarks
 // athroads: true when a street or filler road reaches within r m of (x,z) (kerb included)
 function fpRoad(x,z,r){const q=cityAt(x,z);if(q&&q.d<q.road.w/2+r)return true;const f=fillAt(x,z);return!!(f&&f.d<f.r.w/2+r)}
