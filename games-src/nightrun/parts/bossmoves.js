@@ -1,3 +1,6 @@
+// PURPOSE: boss movesets: verbs (vd), telegraphs, per-boss lists
+// FLAG: bossmoves (?bossmoves=0)
+// TEST: bossmoves-test.js
 /* ---------- boss movesets = parts/bossmoves.js (flag RET.bossmoves; ?bossmoves=0 = the old ring / fan / spiral / laser lists, exactly).
    Owner, 18 Oct 2026: "Game is extremely repetitive". All ten boss fights were built from the same six attack verbs. Now every fight has its own moveset:
    8+ verbs in three phases (armour.js still owns HP, the damage cap, the 66/33% phase lines and the EXPOSED last stand: nothing here touches them),

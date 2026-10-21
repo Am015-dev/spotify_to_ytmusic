@@ -1,3 +1,6 @@
+// PURPOSE: explicit, safe saving and save slots
+// FLAG: saves (?saves=0)
+// TEST: saves-test.js
 /* ---------- explicit, safe saving (owner request: "User must be able to save progress."). Flag RET.saves, ?saves=0 = the old behaviour (no wrappers, no listeners, no UI).
    What existed before: every game key is written to localStorage the moment it changes (save() in a.js), a Settings > Save group exports / imports a versioned base64+checksum code or a file (ret.js, B24: RET.sio) with one undo backup, and a storage-blocked toast.
    Added here:
