@@ -64,6 +64,7 @@ Test column = test file and its status in `TEST-LEDGER.md`: P PASS, F FAIL, Fl F
 | powers | arsenal.js | 12 more power-ups (defensive, offensive, utility, risky), context picker, max 2 timed + 1 stored charge | powers-test - |
 | read | readable.js | bullets and threats readable at a glance | readable-test F |
 | zoo | zoo.js | time to kill + 8 enemy kinds | zoo-test NR |
+| fleet | fleet.js | enemy ships in the fly stages: interceptor 6+, bomber 10+, carrier 16+, cruiser 22+ (single -> pair -> mixed) | fleet-test P |
 | leak | leak.js | ground enemies, calmer pacing, escape penalty | ret-leak-test F |
 | fever | ret.js | FEVER meter: score x1.5 while on | ret-fever-test F |
 | title / type | title.js (`?title=0`, `?type=0`) | title diet; 14 px text, 44 px touch targets | ret-title-test P |

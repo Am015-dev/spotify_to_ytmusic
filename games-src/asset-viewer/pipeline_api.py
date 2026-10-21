@@ -61,4 +61,13 @@ def music(games_dir, base, cover):
         c = GA / "flow-covers" / f"{COVER_ALIAS.get(d.name, d.name)}.jpg"
         out[d.name] = {"cover": cover(c) if c.is_file() else None,
                        "tracks": [{"name": f.stem, "url": f"{base}{d.name}/music/{f.name}", "kb": f.stat().st_size // 1024} for f in files]}
+    # pushed music SOURCES not wired into a game yet (owner 2026-10-21: pushed music must show in the viewer): played from
+    # GitHub raw, so local and Pages views both work without copying ~200 MB
+    raw = "https://raw.githubusercontent.com/am015-dev/spotify_to_ytmusic/alex/brave-carson-rbpmlk/"
+    src = Path(games_dir).parent / "games-src" / "nightrun" / "music-treblo"
+    files = sorted(src.glob("*.mp3"))
+    if files:
+        c = GA / "flow-covers" / "mainhattan-nightrun.jpg"
+        out["mainhattan-nightrun (new cues, not wired)"] = {"cover": cover(c) if c.is_file() else None, "tracks": [
+            {"name": f.stem, "url": raw + f.relative_to(Path(games_dir).parent).as_posix(), "kb": f.stat().st_size // 1024} for f in files]}
     return out
