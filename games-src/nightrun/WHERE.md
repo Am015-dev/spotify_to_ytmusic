@@ -41,6 +41,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | forge | forge FG 65-183 |  |  | forge |  |
 | forge | inventory INV.draw 54-112 |  |  | forge |  |
 | forgeui | forgeui FGU 20-117 |  |  | forgeui | ASSETS-NEEDED-3 |
+| forge2 | forgeone FG2 12-118 |  |  | forge2 |  |
 | counter | counter CTR 18-100 |  |  | counter |  |
 | timing | timing TIM 19-101 | draw |  | timing |  |
 | vis | visible VIS 12-21 |  |  | visible | BALANCE |
@@ -72,7 +73,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | saves | saves saveSlot 55-60 | ret |  | saves |  |
 | stamp | stamp RET.stampX 10-44 | ret |  | stamp |  |
 | polish | polish POL.flush 78-105 |  |  | polish |  |
-| hub | hub draw 159-167 | ret |  | hub |  |
+| hub,garagefix | hub gfPatchAll 288-301 | ret |  | hub |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.
 
