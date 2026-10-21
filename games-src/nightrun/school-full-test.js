@@ -79,6 +79,29 @@ const drive = (p, id, opt) => p.evaluate(([id, HUMAN, LS_HUMAN, opt]) => {
       ok(`drill ${id}: a hit in round 2 repeats round 2, then it still clears`, r.hitDone && r.afterHit && r.afterHit.r === 2 && r.afterHit.fails === r.failsBefore + 1 && r.rounds === 3 && r.ph === 'done', JSON.stringify(r.afterHit) + ' ' + r.rounds + ' ' + r.ph);
       await p.evaluate(() => { for (const b of ['lsDone', 'schCardList']) { const e = document.getElementById(b); if (e) e.click(); } try { __school.shut(); } catch (e) { } }); await sleep(200);
     }
+    // 1) no empty stretch, escalation  2) leaving a drill stops it  3) SKIP DEMO + a cleared drill skips its demo
+    {
+      const r = await p.evaluate(() => { __school.shut(); const sv = localStorage.getItem('mnr_school'); localStorage.removeItem('mnr_school'); __school.run('dodge'); const m = __mnr, SF = __schoolfull; m.simOn(true); m.god = true; const o = SF.SF.last.o, dt = 1 / 60;
+        for (let i = 0; i < 60 * 3; i++) m.step(dt);
+        const demo0 = document.getElementById('sfDemo') && SF.SF.inDemo(); SF.SF.skipDemo(); for (let i = 0; i < 3; i++) m.step(dt);
+        const afterSkip = SF.state.ph; if (sv) localStorage.setItem('mnr_school', sv); m.simOn(false); m.god = false;
+        __school.shut(); const stopped = !__tut.on && !__school.foot;
+        __school.run('shield'); const ok2 = __tut.on && __tut.id === 'shield'; __school.shut();
+        return { demo0, afterSkip, stopped, ok2, none: !__tut.on }; });
+      ok('SKIP DEMO starts round 1', r.demo0 && r.afterSkip === 'play', JSON.stringify(r));
+      ok('shut() fully stops the drill, the next drill starts', r.stopped && r.ok2 && r.none, JSON.stringify(r));
+      for (const id of ['dodge', 'fan', 'shoot', 'gate']) {
+        const e = await p.evaluate(id => { const m = __mnr, SF = __schoolfull; __school.run(id); m.simOn(true); m.god = true; const dt = 1 / 60, o = SF.SF.last.o; SF.SF.skipDemo();
+          for (let i = 0; i < 60 * 90 && SF.state && SF.state.r < 4 && __tut.on; i++) { const g = m.G; const tg = o.base.tgt && o.base.tgt(); if (tg && i % 3 === 0) m.touchTo(Math.min(tg.x, 600), tg.y); m.step(dt); if (i % 5 === 0 && SF.state && SF.state.ph === 'play' && o.gap <= 0 && o.r < 4) SF.rep && 0; }
+          const em = SF.state ? SF.state.em : null; m.simOn(false); m.god = false; __school.shut(); return { em, rate: SF.SF.VOL[id] || null }; }, id);
+        const mx = e.em ? Math.max(...Object.values(e.em).map(v => v.max)) : 99;
+        ok(`drill ${id}: no gap > 3 s without a threat or target (max ${mx.toFixed(1)} s)`, mx <= 3, JSON.stringify(e.em));
+      }
+      const v = await p.evaluate(() => { const V = __schoolfull.SF.VOL; return ['dodge', 'fan'].every(k => V[k].n[1] >= V[k].n[0] && V[k].n[2] >= V[k].n[1] && V[k].sp[1] >= V[k].sp[0] * .9 && V[k].iv[2] <= V[k].iv[0]); });
+      ok('dodge / fan: later rounds have more volleys, shorter intervals (never emptier)', v);
+      const rd = await p.evaluate(() => { __school.shut(); __school.run('dodge'); const sk = __schoolfull.SF.last.o.T >= __schoolfull.SF.DEMO; __school.shut(); return sk; });
+      ok('a cleared drill replays without the demo', rd);
+    }
     ok('progress (mnr_school / mnr_lessons) still counts every drill', (await p.evaluate(() => __school.done().length)) >= ids.length, await p.evaluate(() => __school.done().join(',')));
     ok('no page errors', !errs.length, errs.slice(0, 3).join('|')); await ctx.close();
     // ?schoolfull=0 reproduces the old behaviour: one success (tut, foot) / one pass of the phases (lesson) clears, no demo
