@@ -58,7 +58,11 @@ function install() {
 
   const driveFoot = async () => { await sleep(700); await p.keyboard.down('KeyD'); await p.keyboard.down('KeyJ');
     for (let i = 0; i < 9; i++) { await p.keyboard.press('Space'); await sleep(260); await p.keyboard.press('KeyL'); await sleep(260); if (i % 3 === 2) { await p.keyboard.press('ShiftLeft'); await p.keyboard.press('KeyG'); } await sleep(420); }
-    await p.keyboard.up('KeyD'); await p.keyboard.up('KeyJ'); await p.keyboard.down('KeyA'); await sleep(600); await p.keyboard.up('KeyA'); };
+    await p.keyboard.up('KeyD'); await p.keyboard.down('KeyW'); await sleep(900); await p.keyboard.down('KeyD'); await sleep(900); await p.keyboard.up('KeyD'); await p.keyboard.up('KeyW');
+    await p.keyboard.down('KeyS'); await sleep(900); await p.keyboard.up('KeyS'); await p.keyboard.up('KeyJ'); for (let i = 0; i < 6; i++) { await p.keyboard.press('KeyL'); await sleep(180); }
+    await p.keyboard.down('KeyA'); await sleep(500); await p.keyboard.up('KeyA'); await ev(() => { const P = FOOT.S && FOOT.S.P; if (P) { P.inv = 0; P.dashIF = 0; P.hp = 0.001; } }); await sleep(2500); };
+  // page side: for `ms`, hold fire and keep every non-boss foe next to the ship so shots land (impact, death and kill clips play)
+  const pump = async ms => { await ev(() => { clearInterval(window.__pump); __mnr.touchTo(__mnr.P.x, __mnr.P.y); window.__pump = setInterval(() => { const P = __mnr.P; __mnr.touchTo(P.x, P.y); for (const e of __mnr.G.en) if (e.type !== 'boss' && !e.dead) { e.x = P.x + 110 + Math.random() * 40; e.y = P.y - 30 + Math.random() * 60; e.hp = Math.min(e.hp, 2); } }, 200); }); await sleep(ms); await ev(() => { clearInterval(window.__pump); }); };
   const STEPS = [];
   const step = (name, fn) => STEPS.push([name, fn]);
 
@@ -89,13 +93,15 @@ function install() {
     const groups = await ev(() => [...LABFULL.R].map(([g, o]) => [g, [...o.items.keys()]])) || [];
     if (V) console.log('  lab groups', groups.map(([g, ids]) => g + ':' + ids.length).join(' '));
     for (const [g, ids] of groups) { if (/^(foot|tut|tutorial|sprite|screen|lesson)$/.test(g)) continue; for (const id of ids) {
-      await ev(([g, id]) => { try { __mnr.G.en = __mnr.G.en.filter(e => e.type === 'boss'); LABFULL.do(LABFULL.R.get(g).items.get(id)); } catch (e) { } }, [g, id]); await sleep(g === 'boss' ? 2600 : g === 'phase' ? 1500 : 160);
-      if (g === 'boss') { await ev(() => { const e = __mnr.G.boss; if (e) e.flash = .3; }); await sleep(300); await ev(() => __mnr.killBoss()); await sleep(2400); }
-      else if (g === 'enemy' || g === 'fleet' || g === 'flank') { await ev(() => { for (const e of __mnr.G.en) if (e.type !== 'boss') { e.flash = .3; } }); await sleep(250); await ev(() => { for (const e of __mnr.G.en) if (e.type !== 'boss') e.hp = -1; }); await sleep(900); } } } });
-  step('weapons', async () => { await fresh('&lab=1', 2500); await ev(() => { __mnr.god = true; LABFULL.scan(); }); const ids = await ev(() => [...LABFULL.R.get('weapon').items.keys()]) || [];
-    for (const id of ids) { await ev(id => { LABFULL.do(LABFULL.R.get('weapon').items.get(id)); __mnr.G.en = []; for (const k of ['drone', 'gunship', 'charger']) LABFULL.do(LABFULL.R.get('enemy').items.get(k)); __mnr.touchTo(__mnr.P.x, __mnr.P.y); }, id); await sleep(2600); await ev(() => { __mnr.G.en = []; }); } });
-  step('ships', async () => { const ids = await (async () => { await fresh('&lab=1', 2500); await ev(() => LABFULL.scan()); return ev(() => [...LABFULL.R.get('ship').items.keys()]); })() || [];
-    for (const id of ids) { await fresh('&lab=1', 2000); await ev(id => { LABFULL.scan(); LABFULL.do(LABFULL.R.get('ship').items.get(id)); }, id); await sleep(1500); await ev(() => { __mnr.god = false; __mnr.hurt(99); }); await sleep(2500); } });
+      await ev(([g, id]) => { try { __mnr.G.en = __mnr.G.en.filter(e => e.type === 'boss'); LABFULL.do(LABFULL.R.get(g).items.get(id)); } catch (e) { } }, [g, id]); if (g === 'boss') { await p.waitForFunction(() => __mnr.G.boss && __mnr.G.boss.x <= 820, null, { timeout: 15000 }).catch(() => { }); await sleep(4500); await ev(() => { const e = __mnr.G.boss; if (e) e.flash = .3; }); await sleep(400); await ev(() => __mnr.killBoss()); await sleep(3000); }
+      else await sleep(g === 'phase' ? 1500 : 160);
+      if (false) { }
+      else if (g === 'enemy' || g === 'fleet' || g === 'flank' || g === 'variant') { await ev(() => { for (const e of __mnr.G.en) if (e.type !== 'boss') e.flash = .3; }); await pump(1500); } } } });
+  step('weapons', async () => { await fresh('&lab=1', 2500); await ev(() => { __mnr.god = true; LABFULL.scan(); });
+    for (const g of ['weapon', 'hybrid', 'mod']) { const ids = await ev(g => [...LABFULL.R.get(g).items.keys()], g) || [];
+      for (const id of ids) { await ev(([g, id]) => { LABFULL.do(LABFULL.R.get(g).items.get(id)); __mnr.G.en = []; for (const k of ['drone', 'gunship', 'charger']) LABFULL.do(LABFULL.R.get('enemy').items.get(k)); }, [g, id]); await pump(g === 'weapon' ? 2800 : 1800); } } });
+  step('ships', async () => { await fresh('', 900); const ids = await ev(() => __mnr.SHIPS.map(x => x.id)) || [];
+    for (const id of ids) { await fresh('', 900); await ev(id => { __mnr.GA.ship = id; __mnr.SH.ship = id; }, id); await click('#startBtn', 1800); await ev(() => { __mnr.god = true; __mnr.touchTo(__mnr.P.x, __mnr.P.y); }); await sleep(3500); await ev(() => { __mnr.god = false; __mnr.hurt(99); __mnr.G.deadT = 9; }); await sleep(2600); } });
   step('lab-tabs', async () => { await fresh('&lab=1', 2200); for (const t of ['dex', 'ctrl', 'foes', 'items', 'cheats', 'boss']) { await click('#labTab_' + t, 500); await crawl('#labP .lbody', 14, 'back|close|reset|wipe|erase|clear|exit'); } });
   step('lab-screens', async () => { await fresh('&lab=1', 2200); const ids = await ev(() => [...(LABFULL.R.get('screen') ? LABFULL.R.get('screen').items.keys() : [])]) || [];
     for (const id of ids) { await ev(id => { try { LABFULL.do(LABFULL.R.get('screen').items.get(id)); } catch (e) { } }, id); await sleep(900); } });
