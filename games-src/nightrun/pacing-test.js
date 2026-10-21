@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Pacing (parts/pacing.js, flag RET.pacing). NODE_PATH=$(npm root -g) node games-src/nightrun/pacing-test.js   env: RUNS=12 (human-model bot runs per stage and build) STAGES=5,6,11,12,20
 // Measures with humanbot.js (Normal, fresh build) + pacing-rec.js, ?pacing=0 (old) against the default (new):
-//  (a) stage duration 75-110 s (kill / survive stages, bot clears), boss and mini-boss stages keep their length
+//  (a) stage duration 75-110 s (kill / survive stages, measured on clears: the fresh human bot must clear >= 30%, bite.js made Normal bite), boss and mini-boss stages keep their length
 //  (b) kill goal reachable by the bot in >= 85% of runs (stages 6, 11, 12), goal below the old one
 //  (c) on-screen crowd readable (max <= 14), unkilled-leave share <= 10% and below the old one, a leaver spent >= 4 s in the upper two thirds
 //  (d) hull of a normal foe <= 4 hits (elite 6-10, big <= 12); median on-screen life (S03) not below the old value
@@ -34,7 +34,7 @@ const stats = (res, n) => { const a = res.filter(r => r.n === n && r.px), P = a.
   const pool = { el: [], a: [], b: [], da: [], db: [] };
   for (const [a, b] of rows) {
     const boss = a.kv == null || isNaN(a.kv);
-    if (!boss) ok(b.clear >= Math.ceil(b.runs * .5) ? b.dur >= 75 && b.dur <= 110 : false, `(a) stage ${b.n} lasts ${b.dur.toFixed(0)} s (75-110), clear ${b.clear}/${b.runs}`);
+    if (!boss) ok(b.clear >= Math.ceil(b.runs * .3) ? b.dur >= 75 && b.dur <= 110 : false, `(a) stage ${b.n} lasts ${b.dur.toFixed(0)} s (75-110), clear ${b.clear}/${b.runs}`);
     else ok(b.len === a.len, `(a) boss/mini stage ${b.n} keeps its length (${a.len} -> ${b.len} bars)`);
     if (!boss && a.kv > 100) { ok(b.reachN > 0 && b.reach >= .85 * b.reachN, `(b) stage ${b.n} kill goal ${b.kv} reachable ${b.reach}/${b.reachN} (>= 85%), was ${a.kv}`); ok(b.kv < a.kv, `(b) stage ${b.n} kill goal lower (${a.kv} -> ${b.kv})`); }
     ok(boss ? b.maxOn <= a.maxOn + .5 : b.maxOn <= 16 && b.maxOn <= a.maxOn + 1.5, `(c) stage ${b.n} per-run peak of ${b.maxOn} foe-weights on screen (swarm .34, mine .5; <= 16, was ${a.maxOn})`);
