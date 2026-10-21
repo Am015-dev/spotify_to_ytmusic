@@ -131,7 +131,7 @@ const UI = () => {   // 5: in the page, the Garage FORGE tab
   line(!p.perr.length, 'no page errors (main page)' + (p.perr[0] ? ': ' + p.perr[0] : ''));
   // 5 UI sizes
   for (const vp of [{ width: 390, height: 763 }, { width: 360, height: 640 }, { width: 844, height: 390 }]) {
-    const q = await br.newPage({ viewport: vp, isMobile: true, hasTouch: true }); const pe = []; q.on('pageerror', e => pe.push(e.message)); await q.goto(U()); await q.waitForFunction(() => window.__fg, null, { timeout: 10000 });
+    const q = await br.newPage({ viewport: vp, isMobile: true, hasTouch: true }); const pe = []; q.on('pageerror', e => pe.push(e.message)); await q.goto(U('&forge2=0'));   // the grid check is for the forgeui screen; forge2-test.js covers the one-screen forge await q.waitForFunction(() => window.__fg, null, { timeout: 10000 });
     const r = await q.evaluate(UI).catch(e => ['eval ' + e.message]);
     const pit = await q.evaluate(() => { const { FG } = window.__fg; FG.savePre(1, 'FAST'); window.INV.pit(); const el = document.getElementById('fgQuick'); el.parentNode.hidden = false; const b = el.querySelector('button'); const r = b && b.getBoundingClientRect(); const ok = !el.hidden && b && r.height >= 43.5 && parseFloat(getComputedStyle(b).fontSize) >= 14; el.parentNode.hidden = true; return ok; });
     line(!r.length && pit && !pe.length, `UI ${vp.width}x${vp.height}: FORGE tab tiles >= 44 px, text >= 14 px, no overlap or overflow, tap-to-swap, pit-stop preset row` + (r.length ? ': ' + r.slice(0, 3).join(' | ') : '') + (pit ? '' : ' (pit row)') + (pe[0] ? ' ' + pe[0] : ''));

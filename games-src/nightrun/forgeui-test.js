@@ -5,7 +5,7 @@
 // 2 select: tap a card then slot A / B, and tap a slot then a card; the preview shows the hybrid, recipe, deltas (red damage, green effects), good-against line
 // 3 disabled reasons: one weapon, no recipe, not enough Neon, not enough scrap; MERGE disabled with the reason shown
 // 4 merge pays the cost, UNDO gives it back, merge again, equip the hybrid in loadout slot 1 (WP.eq follows), EQUIPPED chip filter, stage badge
-// 5 saves intact over a reload; ?forgeui=0 shows the old screen; no page errors
+// 5 saves intact over a reload; ?forgeui=0 shows the old screen; no page errors (pinned to &forge2=0: the one-screen forge has its own forge2-test.js)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
@@ -54,7 +54,7 @@ const FLOW = () => {   // 2-4, by real clicks
 };
 (async () => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
-  await sleep(800); const br = await PW.chromium.launch(), errs = [], U = q => `http://127.0.0.1:${port}/index.html?nomusic=1${q || ''}`;
+  await sleep(800); const br = await PW.chromium.launch(), errs = [], U = q => `http://127.0.0.1:${port}/index.html?nomusic=1&forge2=0${q || ''}`;
   const page = async (q, vp, touch) => { const ctx = await br.newContext({ viewport: vp, hasTouch: !!touch, isMobile: !!touch }); const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
     await p.addInitScript(() => { try { localStorage.setItem('mnr_tut', '1'); localStorage.setItem('mnr_tipdone', 'true'); localStorage.setItem('mnr_fscard', '99'); } catch (e) { } });
     await p.goto(U(q)); await p.waitForFunction(() => window.__mnr && window.__fg && window.__inv && window.__fgu, null, { timeout: 15000 }); await sleep(600); p.ctx = ctx; return p; };
