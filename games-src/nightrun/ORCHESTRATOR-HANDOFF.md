@@ -54,6 +54,7 @@ Test column = test file and its status in `TEST-LEDGER.md`: P PASS, F FAIL, Fl F
 | feedback | feedback.js | FUN / SAME AGAIN / BORING tap at run end | feedback-test P |
 | flavor | flavor.js | run-and-gun flavour for the shooter | ret-flavor-test P |
 | foot | foot.js | on-foot street stage | foot-test P |
+| footstage | footstage.js (+ hooks in foot.js) | the finished on-foot stage `zeil`: 7 sections + Warden relay gate, 5 new foot enemies (jetpack, hound, flamer, ninja, medic), checkpoints per section, progress bar, mercy; `?footstage=0` = the street1 mock exactly | footstage-test P |
 | boss2 | armour.js | boss damage cap, HP phases, last stand | boss2-test P |
 | bossmoves | bossmoves.js | boss movesets (VARIETY B) | bossmoves-test P |
 | bossvis | bossvis.js | bosses look different per phase | bossvis-test P |

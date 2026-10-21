@@ -82,9 +82,9 @@ function newRun(id,fromCp){const st=STAGES[id],D=diffK(),old=S;
     fever:0,feverT:0,hs:0,shake:0,lhb:null,note:{t:0,txt:''},cp:null,cpUsed:!!fromCp,assist:!!(RET.assistActive&&RET.assistActive()),lockedIds:{},idleSpawn:0,hintT:0,moved:0,shots:0};
   S.pk=(st.pk||[]).map(([x,k])=>({k,x,y:FL-16,vy:0,t:0,on:true,fix:1}));
   S.pr=st.props.map(([x,k],i)=>{const d=PROPD[k];return{x,y:d.y||FL,k,hp:d.hp,w:d.w,h:d.h,c:d.c,i,fl:0};});
-  if(fromCp&&old&&old.cp){const c=old.cp;S.P.x=st.cp+40;S.P.maxX=S.P.x;S.camX=st.cp-120;S.score=c.score;S.time=c.time;S.kills=c.kills;S.hurts=c.hurts;S.cp=c;
-    for(const w of S.waves)if(w.lock?(st.locks.find(l=>l.id===w.lock)||{x:0}).x<st.cp:w.x<st.cp+200)w.done=true;
-    for(const l of st.locks)if(l.x<st.cp)S.lockDone[l.id]=1;S.pr=S.pr.filter(p=>p.x>st.cp);S.pk=S.pk.filter(p=>p.x>st.cp);S.P.w=c.w;S.P.lv=c.lv;S.P.ammo=c.ammo;S.P.bombs=Math.max(2,c.bombs);}
+  if(fromCp&&old&&old.cp){const c=old.cp,cpx=c.x!=null?c.x:st.cp;S.cpN=c.n|0;S.P.x=cpx+40;S.P.maxX=S.P.x;S.camX=Math.max(0,cpx-120);S.score=c.score;S.time=c.time;S.kills=c.kills;S.hurts=c.hurts;S.cp=c;
+    for(const w of S.waves)if(w.lock?(st.locks.find(l=>l.id===w.lock)||{x:0}).x<cpx:w.x<cpx+200)w.done=true;
+    for(const l of st.locks)if(l.x<cpx)S.lockDone[l.id]=1;S.pr=S.pr.filter(p=>p.x>cpx);S.pk=S.pk.filter(p=>p.x>cpx);S.P.w=c.w;S.P.lv=c.lv;S.P.ammo=c.ammo;S.P.bombs=Math.max(2,c.bombs);}
   F.S=S;return S;}
 const viewW=()=>L?L.vw:960;
 function note(t,s){S.note={t:s||2.2,txt:t};}
@@ -133,7 +133,7 @@ const env={get P(){return S.P;},get G(){return S.G||envG();},get D(){return S.D;
   melee(e,r,dmg,o){if(e.grace>0||e.dead)return false;const P=S.P,b=pbox(P);let hit=false;if(r.x<b.x+b.w&&r.x+r.w>b.x&&r.y<b.y+b.h&&r.y+r.h>b.y)hit=ftHurt(dmg||1,e.x,'mel:'+e.id);
     if(!e._mfx||S.time-e._mfx>.12){e._mfx=S.time;S.fx.push({slash:1,x:r.x+r.w/2,y:r.y+r.h/2,w:Math.min(r.w,200),l:.15,c:o&&o.beam?'#ff2050':'#ff4a6a'});}return hit;}};
 F.env=env;
-function pbox(P){const h=P.crouch?40:P.h;return{x:P.x-P.w/2,y:P.y-h,w:P.w,h};}
+function pbox(P){const h=P.crouch?40:P.h,bw=S.st.fs?28:P.w;return{x:P.x-bw/2,y:P.y-h,w:bw,h};}   // P.w is the weapon id (the street1 mock keeps its NaN box; footstage stages use the 28 px body)
 function ebox(e){return e.ext&&e.fly?{x:e.x-e.w/2,y:e.y-e.h/2,w:e.w,h:e.h}:{x:e.x-e.w/2,y:e.y-e.h,w:e.w,h:e.h};}   // W3 flyers: y = centre
 const hittable=e=>!e.dead&&!(e.def.canHit&&e.def.canHit(e)===false);
 function circHit(x,y,r,b){const cx=clamp(x,b.x,b.x+b.w),cy=clamp(y,b.y,b.y+b.h);return (x-cx)*(x-cx)+(y-cy)*(y-cy)<=r*r;}
@@ -187,6 +187,7 @@ function pickW(P,id){const w=WEAPONS[id];if(P.w===id){const nl=Math.min(WMAX,P.l
 function collect(p){const P=S.P,d=PICKUPS[p.k];sfx('pick');let lv=1;
   if(d.w)pickW(P,d.w);
   else if(p.k==='heal'){if(P.hp<P.max){P.hp++;pop(P.x,P.y-90,'+1 HEART','#ff6070',true);}else{S.score+=300;pop(P.x,P.y-90,'+300','#ff6070',true);}}
+  else if(p.k==='ammo'){const w=WEAPONS[P.w];if(P.ammo!==Infinity){P.ammo+=Math.ceil(w.ammo*.6);pop(P.x,P.y-90,w.n+' AMMO','#ffe08a',true);}else{P.bombs=Math.min(9,P.bombs+1);pop(P.x,P.y-90,'+1 BOMB','#ffb020',true);}}
   else if(p.k==='bomb'){P.bombs=Math.min(9,P.bombs+1);pop(P.x,P.y-90,'+1 BOMB','#ffb020',true);}
   else{const c=P.pw[p.k];lv=c?Math.min(d.max,c.lv+1):1;P.pw[p.k]={lv,t:d.t+(p.k==='slow'?1.5*(lv-1):0)};pop(P.x,P.y-90,d.n+(d.max>1?' LV'+lv:''),d.c,true);}
   NR.emit('footPick',{id:p.k,lv});}
@@ -242,7 +243,8 @@ function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
   if(S.lock&&S.lock.id!=='boss'){const left=S.E.some(e=>!e.dead&&e.lock===S.lock.id)||S.waves.some(w=>w.lock===S.lock.id&&!w.done);
     if(!left){S.lockDone[S.lock.id]=1;S.lock=null;note('GO  ▶',1.5);sfx('up');}}
   if(S.bossOn&&!S.boss&&S.time>=S.bossAt){const b=spawn(st.boss.id,S.camX+vw-70,FL,{boss:true});b.grace=1.2;}
-  if(!S.cp&&P.x>=st.cp){S.cp={score:S.score,time:S.time,kills:S.kills,hurts:S.hurts,w:P.w,lv:P.lv,ammo:P.ammo,bombs:P.bombs};note('CHECKPOINT',1.6);sfx('up');NR.emit('footCp',{stage:S.id});
+  if(st.cps){const k=S.cpN|0;if(k<st.cps.length&&P.x>=st.cps[k]&&!S.lock){S.cpN=k+1;S.cp={x:st.cps[k],n:k+1,score:S.score,time:S.time,kills:S.kills,hurts:S.hurts,w:P.w,lv:P.lv,ammo:P.ammo,bombs:P.bombs};note('CHECKPOINT',1.6);sfx('up');NR.emit('footCp',{stage:S.id,n:k+1});if(P.hp<P.max)P.hp++;}}
+  else if(!S.cp&&P.x>=st.cp){S.cp={score:S.score,time:S.time,kills:S.kills,hurts:S.hurts,w:P.w,lv:P.lv,ammo:P.ammo,bombs:P.bombs};note('CHECKPOINT',1.6);sfx('up');NR.emit('footCp',{stage:S.id});
     if(P.hp<P.max)P.hp++;}
   const edge=S.camX+vw;
   for(const w of S.waves){if(w.done)continue;
@@ -256,7 +258,7 @@ function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
   // idle pressure: standing still never wins. After 7 s without progress, gangs walk in from both sides and keep coming faster.
   if(!S.lock&&!S.bossOn&&P.idle>7&&S.time>=S.idleSpawn&&S.E.filter(e=>!e.dead).length<(P.idle>20?10:3)){S.idleSpawn=S.time+Math.max(1.4,4-P.idle*.06);
     spawn('grunt',Math.random()<.5?S.camX-40:edge+40,null,{fb:1});if(P.idle>16)spawn('gunman',edge+40,null,{fb:1});}}   // built-in walkers: they always come to you
-function stepEnemies(dt){const P=S.P,slow=P.pw.slow?.45:1,edt=dt*slow*((RET.asW&&RET.asW())||1);
+function stepEnemies(dt){const P=S.P,slow=P.pw.slow?.45:1,edt=dt*slow*((RET.asW&&RET.asW())||1)*(S.st.hook&&S.st.hook.agg?S.st.hook.agg(S):1);
   envG();
   for(const e of S.E){if(e.dead){if(e.ext&&!e.remove){e.dt_=(e.dt_||0)+edt;try{e.def.ai(e,edt,env);}catch(x){e.remove=true;}if(e.dt_>1.2)e.remove=true;}continue;}e.t+=edt;if(e.flash>0)e.flash-=dt;if(e.grace>0)e.grace-=edt;if(e.tele>0)e.tele-=edt;
     try{e.def.ai(e,edt,env);}catch(x){if(!e._err){e._err=1;console.warn('foot ai',e.id,x);}e.def=fbDef(e.id);}
@@ -316,7 +318,7 @@ function ftUpdate(rdt){if(!S||S.paused||S.end)return;
   let dt=Math.min(rdt,.05);if(S.hs>0){S.hs-=rdt;dt*=.05;}
   if(F.ctl)try{F.ctl(S,I);}catch(e){}
   S.time+=dt;if(S.note.t>0)S.note.t-=rdt;if(S.shake>0)S.shake=Math.max(0,S.shake-rdt*30);if(S.feverT>0)S.feverT-=dt;S.hintT+=rdt;
-  stepPlayer(dt);stepStage(dt);stepEnemies(dt);stepShots(dt);stepPickups(dt);
+  stepPlayer(dt);stepStage(dt);if(S.st.hook&&S.st.hook.step)S.st.hook.step(S,dt,env);stepEnemies(dt);stepShots(dt);stepPickups(dt);
   I.jumpP=I.meleeP=I.dashP=I.bombP=0;
   if(S.dead){S.dead-=rdt;if(S.dead<=0)finish(false);}
   else if(S.win){S.win-=rdt;if(S.win<=0)finish(true);}}
@@ -438,6 +440,7 @@ function human(c,x,y,h,col,pose,flip,t,crouch){   // fallback humanoid: head, bo
   c.fillStyle='#ffffffaa';if(/shoot/.test(pose))c.fillRect(6,-46,22,5);else if(pose==='melee'){c.fillRect(6,-44,26,3);}else c.fillRect(4,-44,12,5);
   c.fillStyle='#000a';c.fillRect(1,-61,6,4);c.restore();}
 function drawWho(c,who,pose,x,y,h,flip,t,col,crouch){const fa=window.FA;
+  if(F.drawX&&F.drawX[who]){try{F.drawX[who](c,pose,x,y,h,flip,t,col);return;}catch(e){}}
   if(fa&&typeof fa.draw==='function'){try{fa.draw(c,who,pose,x,y,h,flip,t);return;}catch(e){}}
   if(who==='drone'||who==='turret'){c.fillStyle=col;c.fillRect(x-h*.8,y-h,h*1.6,h);c.fillStyle='#ffffffaa';c.fillRect(x+(flip?-h:h*.4),y-h*.6,h*.6,4);return;}
   if(who==='mech'||who==='warden'){c.fillStyle=col;c.fillRect(x-h*.35,y-h,h*.7,h*.75);c.fillRect(x-h*.3,y-h*.25,h*.2,h*.25);c.fillRect(x+h*.1,y-h*.25,h*.2,h*.25);c.fillStyle='#ffd23a';c.fillRect(x+(flip?-h*.3:h*.1),y-h*.9,h*.2,h*.1);return;}
@@ -457,6 +460,7 @@ function draw(){if(!L||!S)return;const c=L.ctx,sc=L.sc*L.dpr,vw=L.vw,P=S.P;
     if(e.wind>0){c.strokeStyle='#ff304a';c.lineWidth=3;c.strokeRect(e.x-e.w/2-4,e.y-e.h-4,e.w+8,e.h+8);}
     c.globalAlpha=e.grace>0?.65:1;drawWho(c,e.id,pose,e.x,e.ext&&e.fly?e.y+e.h/2:e.y,e.h,e.facing<0,e.dead?e.dt_||0:e.t,e.flash>0?'#ffffff':(e.def.c||'#d04'));c.globalAlpha=1;
     if(e.def.front&&e.def.fb){c.fillStyle='#a0c0ff';c.fillRect(e.x+e.facing*e.w*.5-3,e.y-e.h*.9,6,e.h*.8);}}
+  if(S.st.hook&&S.st.hook.draw)try{S.st.hook.draw(c,S);}catch(x){}
   const blink=P.inv>0&&Math.floor(S.time*16)%2;if(!blink||P.hp<=0){
     if(P.pw.shield){c.strokeStyle='#5ad1ff';c.lineWidth=2+P.pw.shield.lv;c.beginPath();c.arc(P.x,P.y-34,44,0,6.283);c.stroke();}
     if(P.dashIF>0){c.fillStyle='#19e3ff33';c.fillRect(P.x-24-P.facing*20,P.y-60,48,58);}
@@ -490,6 +494,7 @@ function drawHud(c,vw,fs){const P=S.P,u=1/L.sc,m=10*u,hb=[],box=(x,y,w,h)=>hb.pu
   // hints and notes get their own strip under the HUD (hearts, weapon, bombs end at about 62 px), never on the timer
   let line='',hint=null;if(S.note.t>0)line=S.note.txt;else if(hintOn())line=hintText();
   if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-24*u),hy=m+66*u;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-24*u);hint={x:vw/2-tw/2-8*u,y:hy,w:tw+16*u,h:26*u};}
+  if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
   L.hud={hud:hb,hint,vw};
   ghost();}
 function hintOn(){return S&&!SV.hint&&S.hintT<20&&(S.moved<250||S.shots<1);}
@@ -510,7 +515,7 @@ function pause(on){if(!S||S.end)return;S.paused=on;for(const k in I)I[k]=0;if(on
   else{hideMenu();lastT=performance.now();}}
 function showRes(){const E=S.end,id=S.id,b=SV.best[id];
   const rows=[['SCORE',E.score],['TIME',fmtT(E.time)],['KILLS',S.kills],['NEON','+'+E.neon+(E.first?' · first clear':'')]];
-  if(b)rows.push(['BEST',b.score+' · '+b.rank]);
+  if(b)rows.push(['BEST',b.score+' · '+b.rank]);if(S.st.hook&&S.st.hook.rows)S.st.hook.rows(S,rows);
   const html='<h2>'+(E.cleared?'STREET CLEAR':'YOU WENT DOWN')+'</h2>'+(E.cleared?'<div class="rk" id="fRank">'+E.rank+'</div>':'')+rows.map(r=>'<div class="fr"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join('')+(S.assist?'<div class="sm">ⓐ Assist run · no records</div>':'');
   const bt=[];if(!E.cleared&&S.cp)bt.push(['FROM CHECKPOINT',()=>{hideMenu();begin(id,true);},'fCp']);
   bt.push([E.cleared?'RUN AGAIN':'RETRY',()=>{hideMenu();begin(id);},'fAgain']);
@@ -535,8 +540,8 @@ function sim(sec,dt){dt=dt||1/60;let n=Math.round(sec/dt);while(n-->0&&S&&!S.end
 /* ===== MENU button: STREET RUN (unlocked after story stage 3) ===== */
 if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)return false;if(document.getElementById('footBtn'))return true;
     const b=document.createElement('button');b.type='button';b.className='go wide';b.id='footBtn';g.appendChild(b);
-    const paint=()=>{const u=ftUnlocked();b.disabled=!u;b.innerHTML=u?'STREET RUN<small style="font-size:14px;display:block">on foot · '+(SV.best.street1?'best '+SV.best.street1.score:'new')+'</small>':'STREET RUN<small style="font-size:14px;display:block">clear stage 3 to unlock</small>';};
-    paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');start('street1');});
+    const paint=()=>{const u=ftUnlocked();b.disabled=!u;b.innerHTML=u?'STREET RUN<small style="font-size:14px;display:block">on foot · '+(SV.best[F.main||'street1']?'best '+SV.best[F.main||'street1'].score:'new')+'</small>':'STREET RUN<small style="font-size:14px;display:block">clear stage 3 to unlock</small>';};
+    paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');start(F.main||'street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
 return F;})();
