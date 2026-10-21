@@ -1,3 +1,6 @@
+// PURPOSE: one enemy, many looks (size, reversed)
+// FLAG: variants (?variants=0)
+// TEST: variants-test.js
 /* ---------- variants.js: one enemy, many looks (owner, 20 Oct 2026: "the game is boring and predictable... make variations of enemies by sizing them or reversing them").
    Flag RET.variants (default on); ?variants=0 = the exact old spawns and draws (nothing below runs, no dice are drawn).
    Every enemy that en() (b.js) builds is rolled once against the table VARTAB (data, edit freely) and gets:

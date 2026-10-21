@@ -1,3 +1,6 @@
+// PURPOSE: flanker enemies that punish a parked ship (default OFF)
+// FLAG: flankers (?flankers=0)
+// TEST: flankers-test.js
 /* ---------- FLANKERS (flag RET.flankers, default OFF, ?flankers=1 = on; off = W29 anti-camp bullet streams). 20 Oct 2026
    The anti-camp "flush" used to be bullet streams with edge markers. With this flag it spawns real enemies you can see, shoot and be hurt by:
    DIVER   shielded triangle: enters from above the camp column after a 0.8 s tell (dashed line + chevron), dives down that column and leaves.

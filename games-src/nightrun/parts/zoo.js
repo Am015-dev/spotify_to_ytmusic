@@ -1,3 +1,6 @@
+// PURPOSE: time to kill + eight new enemy kinds
+// FLAG: zoo (?zoo=0)
+// TEST: zoo-test.js
 /* ---------- zoo.js: time to kill them all + eight new enemy kinds (owner, 17 Oct 2026). Flag RET.zoo; ?zoo=0 = the game as it was.
    1. STATION AND HOVER: drones and flankers no longer fly straight through. Each enters, slows to a strafe in the right 60% of the screen on its own slot (slots keep
       them spread over y, never stacked), hovers for N beats on the beat clock (Easy 6, Normal 5, Hard 4, Very hard / Legend 3), fires from there, then departs to the left.

@@ -1,3 +1,6 @@
+// PURPOSE: boss HP phases, damage cap, last stand
+// FLAG: boss2 (?boss2=0)
+// TEST: boss2-test.js
 /* ---------- boss fights that last = parts/armour.js (flag RET.boss2; ?boss2=0 = the fights before it). BALANCE.md "Boss fights, round 4". ----------
    Owner, 17 Oct 2026: "Legend is still easy ... boss fights are still short", "even boss I can beat in seconds".
    A. a hard damage-rate cap: a boss loses at most max/(T x M) HP in any 1 s window, whatever hits it (bullets, homing, bomblets, mines, chains, blades,

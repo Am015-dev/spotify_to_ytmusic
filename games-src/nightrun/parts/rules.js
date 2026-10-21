@@ -1,3 +1,6 @@
+// PURPOSE: new-mechanic cadence, returns with a twist
+// FLAG: rules (?rules=0)
+// TEST: rules-test.js
 /* ---------- RULES: a new-mechanic cadence (flag RET.rules, default ON; ?rules=0 = the old game). Test: nightrun/rules-test.js.
    Every 3 stages a NEW mechanic comes in (stages 2, 5, 8 ... 44), the next stage brings it back with a TWIST, the third stage combines it with the twist of the one before.
    Endless: one plan step every 5 min of play. Each mechanic is a table entry in RU.T (name, one-line card, colour, interactions) with code-drawn shape art (circles, triangles, bars),

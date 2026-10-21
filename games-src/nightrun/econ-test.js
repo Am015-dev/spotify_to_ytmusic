@@ -14,7 +14,7 @@ const freePort = () => new Promise(r => { const s = net.createServer(); s.listen
   const cost = await p.evaluate(() => ({ on: (RET.econ = true, RET.totalCost()), off: (RET.econ = false, RET.totalCost()) })); await br.close(); srv.kill();
   const sim = path.join(__dirname, 'story-sim.js'), env = Object.assign({}, process.env, { STAGES: '1,8,20,30', RUNS: process.env.RUNS || '2', PC: '.4', PAR: '4' });
   cp.spawnSync('node', [sim], { env, stdio: 'ignore' });
-  const js = JSON.parse(fs.readFileSync(path.join(__dirname, 'playtest', 'story-sim.json'), 'utf8')), all = [].concat(...Object.values(js)).filter(r => r.clear);
+  const js = JSON.parse(fs.readFileSync(process.env.SAVE ? path.join(__dirname, 'playtest', 'story-sim.json') : path.join(require('os').tmpdir(), 'story-sim.json'), 'utf8')), all = [].concat(...Object.values(js)).filter(r => r.clear);
   const sec = all.reduce((a, r) => a + r.t, 0), neon = all.reduce((a, r) => a + r.neon, 0), perH = neon / (sec / 3600);
   const base = all.reduce((a, r) => a + (40 + 12 * r.n) * .1, 0), perHr = perH + base / (sec / 3600);          // replay: + 10% clear pay
   // first clears of all 45 stages: 40+12n each, +25 for ~2.5 stars on average, plus the Neon the stages themselves bank; the story takes ~146 min

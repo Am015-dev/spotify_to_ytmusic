@@ -1,3 +1,6 @@
+// PURPOSE: counters, achievements, completion %
+// FLAG: stats (?stats=0)
+// TEST: stats-test.js
 /* ---------- STATS + ACHIEVEMENTS + COMPLETION (POLISH.md B29). Flag RET.stats (?stats=0 = exactly the old game: nothing counted, no UI).
    Lifetime counters live in localStorage 'mnr_stats' (also in the save export list). They are fed by NR events only; nothing here changes gameplay, rewards or balance.
    30 achievements (ach-<id>.webp, 128x128, listed in assets-manifest.json; a coloured badge with a glyph is drawn until real art is listed in media/ready.json).

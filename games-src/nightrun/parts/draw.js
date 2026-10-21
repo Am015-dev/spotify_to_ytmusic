@@ -34,7 +34,7 @@ function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%
   if(so){const bob=Math.sin(t*5)*1.2,sf=RET.sprites&&SPR.shipOn(shipDef().id),en=sf?null:ART.sp('fx-engine',46);ctx.globalCompositeOperation='lighter';
     if(en)ART.put(en,-24-en.w*.5*(.8+.2*PUL),bob,0,.7+.3*PUL);                  // painted jet, flickers with the beat
     G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';if(!(sf&&SPR.ship(ctx,shipDef().id,t,bob)))ART.put(so,0,bob);RIG.draw(ctx,shipDef().id,60,t,bob);ctx.restore();
-    if(SH.sh>0)SPR.shield();
+    if(SH.sh>0)SPR.shield();AH.player();
     const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}
     ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();return;}
   ctx.globalCompositeOperation='lighter';G_(-20,2,16+Math.random()*5,D.a,.9);G_(0,0,34,D.a,.18);ctx.globalCompositeOperation='source-over';
@@ -101,7 +101,7 @@ function bossPaint(e,t,fl,c){const ak=ART.artK(e),nm=ART.bossN[ak],b=nm&&ART.bm[
 function drawBoss(e,t,fl){const c=e.col;
   for(const l of e.lasers){ctx.save();ctx.translate(-e.x,-e.y);const tele=l.t<2*BT.spb;ctx.translate(l.x,l.y);ctx.rotate(l.a);
     if(tele){if(RET.read)READ.under(1400,5);ctx.strokeStyle=(SET.reduce||Math.floor(l.t*14)%2)?'#ff3040cc':'#ff304044';ctx.lineWidth=1;ctx.setLineDash([10,6]);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(1400,0);ctx.stroke();ctx.setLineDash([]);}
-    else{ctx.globalCompositeOperation='lighter';ctx.fillStyle='#ff304066';ctx.fillRect(0,-12,1400,24);ctx.fillStyle='#ffe0e6';ctx.fillRect(0,-3,1400,6);ctx.globalCompositeOperation='source-over';}
+    else if(!AH.span('fx-eb-laser-sweep',700,0,1400,40,0,.95)){ctx.globalCompositeOperation='lighter';ctx.fillStyle='#ff304066';ctx.fillRect(0,-12,1400,24);ctx.fillStyle='#ffe0e6';ctx.fillRect(0,-3,1400,6);ctx.globalCompositeOperation='source-over';}
     ctx.restore();}
   ctx.globalCompositeOperation='lighter';G_(0,0,e.r*2.2,c,.35);ctx.globalCompositeOperation='source-over';
   if(bossPaint(e,t,fl,c))return;

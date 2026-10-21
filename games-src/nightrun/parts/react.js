@@ -1,3 +1,6 @@
+// PURPOSE: enemies react to the ship, not fixed paths
+// FLAG: react (?react=0)
+// TEST: react-test.js
 /* ---------- enemies that react = parts/react.js (flag RET.react; ?react=0 = the old fixed paths and fire timers). BALANCE.md "Enemies that react".
    Owner, 19 Oct 2026: "Very predictive moves of enemies ... the game needs to be more strategic and timing."
    Drones, flankers, turrets and gunships get a small brain. They read the ship (position, smoothed velocity PV, the half it favours) and react,
