@@ -10,6 +10,7 @@ Checks (each failure prints a one-line fix):
   (b) a source file that was already over 120 KB grows (baseline: games-src/guard-baseline.json)
   (c) a game gains a NEW override layer file (ui14.js style numbered file, or a new file that re-defines functions of an earlier one)
   (d) a built artefact (game html, x.js, joined ui.js, kit demo.html) is tracked in git again
+  (f) placeholders draw no text outside the Lab or ?placeholders=1 (window.phText)
   (e) Nightrun parts header standard: every nightrun/parts/*.js starts with a comment holding `FLAG:` (or `FLAG: none`) and `TEST:` lines
       and a `PURPOSE:` line. A NEW part file without it fails; files listed in the baseline as legacy only warn.
 """
@@ -154,6 +155,14 @@ def main(argv):
             fails.append("(e) nightrun/parts/%s has no standard header. Fix: first lines `// PURPOSE: <one line>`, `// FLAG: <name (?name=0)|none>`, `// TEST: <x-test.js|none>` (see nightrun/WHERE.md)." % p.name)
         else: bad.append(p.name)
     if bad: notes.append("warning: %d old nightrun parts lack the FLAG:/TEST: header (add it when you touch them): %s" % (len(bad), " ".join(b[:-3] for b in bad[:12]) + (" ..." if len(bad) > 12 else "")))
+
+    # (f) placeholders draw no text outside the LAB / ?placeholders=1 (owner review 8, D06: "bg-street-sky (placeholder)" on the live street run)
+    for p in sorted((SRC / "nightrun" / "parts").glob("*.js")):
+        for i, line in enumerate(p.read_text(encoding="utf-8", errors="replace").split("\n"), 1):
+            if "fillText" in line and re.search(r"placeholder|bg-street-|\bPH_?LABEL\b", line, re.I) and "phText" not in line:
+                fails.append("(f) nightrun/parts/%s:%d draws placeholder text outside the Lab. Fix: wrap it in if(window.phText()) (games-src/nightrun/parts/a.js)." % (p.name, i))
+            if re.match(r"const label=", line) and "phText" not in line:
+                fails.append("(f) nightrun/parts/%s:%d: the placeholder label helper must check window.phText() first." % (p.name, i))
 
     for n in notes: print(n)
     if fails:

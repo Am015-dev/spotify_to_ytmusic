@@ -55,10 +55,10 @@ const at=(c,x,y,k)=>{c.save();c.translate(x,my(y));c.scale(k,k);c.translate(-x,-
    with its asset id as the label. A real file foot/bg-street-<layer>.webp listed in ready.json replaces its placeholder (tiled, parallax kept). The old media/foot/bg-*.webp are mock placeholders: not used. ----- */
 const BGL={far:['#140d2a','bg-street-far',960,.34,.44],mid:['#22163f','bg-street-mid',1280,.24,.36]};   // tint, asset id, tile width (units), min / extra height as a share of the sky
 let tiles={};
-function slTile(kind,Hh,res){const key=kind+'|'+Math.round(Hh)+'|'+res.toFixed(2);let o=tiles[key];if(o)return o;if(Object.keys(tiles).length>5)tiles={};
+function slTile(kind,Hh,res){const key=kind+'|'+Math.round(Hh)+'|'+res.toFixed(2)+'|'+(window.phText()?1:0);let o=tiles[key];if(o)return o;if(Object.keys(tiles).length>5)tiles={};
   const L_=BGL[kind],TW=L_[2],cv=document.createElement('canvas');cv.width=Math.ceil(TW*res);cv.height=Math.ceil(Hh*res);const g=cv.getContext('2d');g.scale(res,res);g.fillStyle=L_[0];
   let x=0,i=0;while(x<TW-30){const bw=Math.min(TW-x,(kind==='far'?60:150)+60*hs(i*7+3)),bh=Hh*(L_[3]+L_[4]*hs(i*13+5));g.fillRect(x,Hh-bh,bw-4,bh);x+=bw;i++;}
-  g.fillStyle='rgba(255,255,255,.35)';g.font='bold 12px monospace';g.textAlign='left';g.textBaseline='bottom';g.fillText(L_[1]+' (placeholder)',8,Hh-6);
+  g.fillStyle='rgba(255,255,255,.35)';g.font='bold 12px monospace';g.textAlign='left';g.textBaseline='bottom';if(window.phText())g.fillText(L_[1]+' (placeholder)',8,Hh-6);
   return tiles[key]={cv,TW,Hh};}
 function slPic(id){const fa=window.FA;return fa&&fa._pic?fa._pic('foot/'+id+'.webp'):null;}
 function slBlit(c,kind,k,cam,x0,w,t0,res){const pic=slPic(BGL[kind][1]),Hh=FL+2-t0;let src,TW;
@@ -73,7 +73,7 @@ if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART
     const h=q[1]*C;SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,.95);SL.tag='';}};   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
 
 function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,fh=FL-t0;
-  const sky=slPic('bg-street-sky');if(sky)c.drawImage(sky,x0,t0-4,w,fh+8);else{c.fillStyle='#0c0820';c.fillRect(x0,t0-4,w,fh+8);c.fillStyle='rgba(255,255,255,.35)';c.font='bold 12px monospace';c.textAlign='right';c.textBaseline='top';c.fillText('bg-street-sky (placeholder)',x0+w-8,t0+fh*.35);}
+  const sky=slPic('bg-street-sky');if(sky)c.drawImage(sky,x0,t0-4,w,fh+8);else{c.fillStyle='#0c0820';c.fillRect(x0,t0-4,w,fh+8);if(window.phText()){c.fillStyle='rgba(255,255,255,.35)';c.font='bold 12px monospace';c.textAlign='right';c.textBaseline='top';c.fillText('bg-street-sky (placeholder)',x0+w-8,t0+fh*.35);}}
   slBlit(c,'far',SL.speeds.far,cam,x0,w,t0,res);slBlit(c,'mid',SL.speeds.mid,cam,x0,w,t0,res);
   const rd=slPic('bg-street-road');if(rd){const TW=(VH-FL)*rd.width/rd.height;let x=x0-((cam%TW)+TW)%TW;for(;x<x0+w;x+=TW)c.drawImage(rd,x,FL,TW,VH-FL+2);}
   else{c.fillStyle='#1b1530';c.fillRect(x0,FL,w,VH-FL+2);c.fillStyle='#3a2a60';c.fillRect(x0,FL,w,3);}
