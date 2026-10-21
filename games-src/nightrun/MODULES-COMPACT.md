@@ -30,7 +30,7 @@ arthooks|9|literal id table for fx/fg/wpmount/wp/rule/rx/ui pictures pl|-
 flavor|25|run-and-gun flavour for the shooter|flavor,flavor
 footart|19|ON-FOOT ART: window.FA (the street stage's pictures). Inert |-
 footen|29|on-foot street stage enemies + boss library (W3). Pure data |-
-foot|61|on-foot street stage engine|foot,foot
+foot|62|on-foot street stage engine|foot,foot
 footstage|23|the finished on-foot stage (7 sections, Warden gate)|footstage,footstage
 streetlook|19|on-foot street look on phones: one world scale, portrait lay|streetlook,streetlook
 leak|14|ground enemies, calmer pacing, escape penalty|leak,leak
@@ -63,7 +63,7 @@ armour|8|boss HP phases, damage cap, last stand|boss2,boss2
 reward|6|risk pays: graze chain multiplier|reward,reward
 choices|9|build pressure and real choices (default OFF)|build2,build2
 bossmoves|42|boss movesets: verbs (vd), telegraphs, per-boss lists|bossmoves,bossmoves
-bossvis|8|bosses look different in each phase|bossvis,bossvis
+bossvis|13|bosses look different in each phase|bossvis,bossvis,first30+
 powlevels|20|power-up levels + five new shooter power-ups|pw3,pw3
 abilities|13|DASH charges and EMP as abilities (beat bonus, refund)|abil,abil
 forge|21|weapon forge: combine, sockets, presets (data, actions)|forge,forge
@@ -91,7 +91,7 @@ h|5|H: no AFK wins, a dying ship slows the song|-
 fun|15|set pieces, deck replaces the fixed metronome, rosters|deck,deck,roster+
 tut|16|TUT: FLIGHT SCHOOL, a playable tutorial stage (about 3 minut|-
 lessons|27|short tactics lessons the first time a feature appears|lessons,lessons
-saga|23|campaign story: opening, briefings, comms, chapter ends, STO|story,story
+saga|25|campaign story: opening, briefings, comms, chapter ends, STO|story,story
 title|6|title diet + CONTINUE, 14 px type floor|title,title,type+
 cp|10|checkpoints with grace on long stages|cp,cp
 fs|5|phone full screen on first tap|fs,fs
@@ -109,5 +109,7 @@ mix|9|the music stays on top of the effects: separate buses, an ef|mix,mix
 hub|34|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
 layout|5|phone layout pass: centred one-colour section pills, centred|layout,layout
 school|14|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,school
+schoolfull|10|every Flight School drill and lesson mini stage is a real le|schoolfull,schoolfull
+tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
 c|34|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|6|Mainhattan Nightrun service worker (B30). Built by parts/bui|-

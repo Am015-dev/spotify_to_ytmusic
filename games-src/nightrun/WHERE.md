@@ -77,7 +77,8 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | mix | mix MIX 17-24 | a |  | mix |  |
 | hub,garagefix | hub gfPatchAll 288-301 | ret |  | hub |  |
 | layout,layoutStrip* | layout lyMap 41-55 |  |  | layout |  |
-| school | school footEnd 107-121 |  |  | school |  |
+| school | school footEnd 107-122 |  |  | school |  |
+| schoolfull | schoolfull sfGapWall 49-67 |  |  | school-full |  |
 | tidy | tidy F.post 19-88 | flavor,ret |  | tidy |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.

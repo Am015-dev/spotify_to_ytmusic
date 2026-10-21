@@ -2,6 +2,7 @@
 // Nightrun SCHOOL test (flag RET.school): TRAINING on HOME opens the drill list in 1 tap, every drill starts and finishes headless (pass via the test hook, fail via
 // the 25 s timeout hook), progress persists, no save / Neon / stats change, lesson triggers still fire once, ?school=0 = the old TRAINING sheet, no page errors.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/school-test.js     env: GAME_DIR=...   Prints only PASS / FAIL lines.
+// Runs with ?schoolfull=0 (old one-success drills); the full 3-round drills are tested by school-full-test.js.
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -13,7 +14,7 @@ async function page(br, port, opt, q, init) {
   const ctx = await br.newContext(opt), p = await ctx.newPage(), errs = [];
   p.on('pageerror', e => errs.push(e.message)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   if (init) await p.addInitScript(init);
-  await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1${q || ''}`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__tut && window.__hub);
+  await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&schoolfull=0${q || ''}`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.__tut && window.__hub);
   await sleep(700); return { ctx, p, errs };
 }
 const keep = p => p.evaluate(k => { const re = new RegExp(k, 'i'), o = []; for (let i = 0; i < localStorage.length; i++) { const n = localStorage.key(i); if (re.test(n) && n !== 'mnr_school' && !/^mnr_(forge|wpseen|lessons|sv)/.test(n)) o.push([n, localStorage.getItem(n)]); } return JSON.stringify(o.sort()); }, KEEP.source);
