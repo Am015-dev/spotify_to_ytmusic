@@ -166,7 +166,7 @@ body.v85 #roamGauge{background:rgba(10,14,28,.55);border-radius:16px;padding:2px
 body.v85 #roamArrow{display:flex;align-items:center;gap:6px;font-size:15px!important;font-weight:800;color:#fff;background:rgba(10,14,28,.62);border-radius:14px;padding:4px 14px;max-width:60vw!important;text-shadow:0 1px 2px #000}
 body.v85 #roamArrow i{font-size:15px}
 #touch,#btnZone,.tbtn{touch-action:none}
-#roamFT{z-index:40;pointer-events:auto;bottom:auto;top:calc(10px + env(safe-area-inset-top,0px))}
+#roamMap #roamFT,#roamFT{z-index:40;pointer-events:auto;bottom:auto;height:auto;min-height:44px;top:calc(10px + env(safe-area-inset-top,0px))}
 body:not([data-mode=roam]) #ogHud,body:not([data-mode=roam]) #ogArea{display:none!important}
 #itemBox{right:auto!important;left:calc(50% - clamp(24px,5.5vh,32px))!important;top:calc(60px + env(safe-area-inset-top,0px))!important}
 
