@@ -64,7 +64,7 @@ const BOT = (o) => {
   const inWin = () => { const p = m.bpos(); return Math.abs(p - Math.round(p)) * m.BT.spb * 1000 <= m.winMs() * (window.TIM && TIM.PK || 1) - 15; };
   const ready = () => { const S = window.ABIL.st(); return S.n >= 1 && m.P.dashT <= 0 && (!window.TIM || TIM.ready()); };
   const wallNear = () => C && C.walls.find(w => !w.cur && w.warn <= 0 && !w.hit && !w.dash && w.x > m.P.x && w.x - m.P.x < 150);
-  const cz = {}; let i = 0, lastBeat = -1, tapAt = -1, cleared = false, nd = 0, ne = 0; const dt = 1 / 60, human = mode === 'human';
+  const cz = {}; let ebS = 0, ebN = 0, moMax = 0, i = 0, lastBeat = -1, tapAt = -1, cleared = false, nd = 0, ne = 0; const dt = 1 / 60, human = mode === 'human';
   while (m.running && m.G.t < o.MAXT) {
     if (SH.active) { SH.close(); ups(); }
     if (i % 60 === 0) keepPw();
@@ -91,11 +91,11 @@ const BOT = (o) => {
     if (human) { if (bn !== lastBeat) { lastBeat = bn; tapAt = bn + (rnd() < .4 ? 0 : (.15 + rnd() * .7)); } if (tapAt >= 0 && bp >= tapAt) { m.press('Fire'); tapAt = -1; } }
     else if (bn !== lastBeat) { lastBeat = bn; m.press('Fire'); }
     const h0 = m.ST.hits, px = m.P.x, py = m.P.y, nb = G.eb.some(b => Math.hypot(b.x - px, b.y - py) < 40), ne0 = G.en.find(e => e.type !== 'boss' && Math.hypot(e.x - px, e.y - py) < (e.r || 14) + 40);
-    m.step(dt); i++;
+    m.step(dt); i++; if (i % 30 === 0) { ebS += m.G.eb.length; ebN++; const mo = m.G.eb.length + m.G.en.length; if (mo > moMax) moMax = mo; }
     if (m.ST.hits > h0) { const c = C && C.walls.some(w => w.warn <= 0 && Math.abs(w.x - px) < 40) ? 'wall' : window.MM && MM.col && Math.abs(MM.col.x - px) < 40 ? 'strike' : nb ? (m.G.boss ? 'bossbullet' : 'bullet') : ne0 ? 'touch:' + ne0.type : m.G.boss ? 'boss' : 'other'; cz[c] = (cz[c] || 0) + 1; }
     if (m.ST.over || m.G.dead) { cleared = !!m.ST.over && !m.G.dead; break; }
   }
-  const r = { n, mode, diff: o.diff, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: m.ST.hits, w: o.endless ? window.ENDR.w : 0, cz, boss: !!m.G.boss, nd, ne, leg: JSON.stringify([window.CTR && CTR.stat, window.LEG && LEG.stat]) };
+  const r = { n, mode, diff: o.diff, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: m.ST.hits, w: o.endless ? window.ENDR.w : 0, cz, boss: !!m.G.boss, nd, ne, eb: ebN ? ebS / ebN : 0, mo: moMax, leg: JSON.stringify([window.CTR && CTR.stat, window.LEG && LEG.stat]) };
   m.abort(); return r;
 };
 (async () => {
@@ -123,7 +123,7 @@ const BOT = (o) => {
   const cell = (d, mo, n) => res.filter(r => r.diff === d && r.mode === mo && (n == null || r.n === n));
   for (const d of DIFFS) for (const mo of MODES) { const a = cell(d, mo); if (!a.length) continue;
     console.log(ENDLESS ? `${d} ${mo} endless: wave med ${med(a.map(r => r.w))} [${a.map(r => r.w).sort((x, y) => x - y).join(' ')}] reach10 ${pct(a.map(r => ({ clear: r.w >= 10 })))}% reach25 ${pct(a.map(r => ({ clear: r.w >= 25 })))}%`
-      : `${d} ${mo} clear% ` + STAGES.map(n => n + ':' + pct(cell(d, mo, n))).join(' ') + ` | pooled ${pct(a)}% | hits med ${med(a.map(r => r.hits))} | boss reached ${a.filter(r => r.boss || r.clear).length} | causes ${JSON.stringify(a.reduce((z, r) => { for (const k in r.cz) z[k] = (z[k] || 0) + r.cz[k]; return z; }, {}))} | dash/run ${Math.round(a.reduce((x, r) => x + r.nd, 0) / a.length)} (n=${a.length})`); }
+      : `${d} ${mo} clear% ` + STAGES.map(n => n + ':' + pct(cell(d, mo, n))).join(' ') + ` | pooled ${pct(a)}% | hits med ${med(a.map(r => r.hits))} | boss reached ${a.filter(r => r.boss || r.clear).length} | causes ${JSON.stringify(a.reduce((z, r) => { for (const k in r.cz) z[k] = (z[k] || 0) + r.cz[k]; return z; }, {}))} | dash/run ${Math.round(a.reduce((x, r) => x + r.nd, 0) / a.length)} | bullets avg ${(a.reduce((x, r) => x + r.eb, 0) / a.length).toFixed(1)} objs max ${Math.max(...a.map(r => r.mo))} (n=${a.length})`); }
   line(errs === 0, `no page errors (${errs})`);
   if (process.env.GATE !== '0' && Q === '&legend=1' && DIFFS.includes('legend')) {
     const L = mo => { const a = cell('legend', mo).filter(r => r.n === 10 || r.n === 20); return a.length ? pct(a) : null; };
