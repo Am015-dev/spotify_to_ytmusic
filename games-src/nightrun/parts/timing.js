@@ -79,7 +79,7 @@ const TIM=window.TIM={get on(){return!!(RET.timing&&window.ABIL&&ABIL.on);},
   tip2(t){if(window.ABIL)ABIL.tip(t);},
   draw(){if(!this.on||!G||!G.tm||!P)return;const T=G.tm;ctx.save();
     if(T.ew){const k=Math.max(0,T.ew.t/this.EWT);ctx.strokeStyle='#ffb020';ctx.globalAlpha=.85;ctx.lineWidth=3;ctx.setLineDash([10,8]);ctx.beginPath();ctx.arc(P.x,P.y,40+(this.EWR-40)*k,0,7);ctx.stroke();ctx.setLineDash([]);
-      ctx.fillStyle='#ffb020';ctx.font='bold 14px sans-serif';ctx.textAlign='center';ctx.fillText(say('OVERLOAD: EMP'),P.x,P.y-52);}
+      ctx.fillStyle='#ffb020';ctx.font='bold 14px sans-serif';ctx.textAlign='center';wtxt(say('OVERLOAD: EMP'),P.x,P.y-52);}
     if(T.hl>0){ctx.strokeStyle='#ff5050';ctx.globalAlpha=SET.reduce?.6:.4+.4*Math.abs(Math.sin(G.t*12));ctx.lineWidth=2;ctx.beginPath();ctx.arc(P.x,P.y,30,0,7);ctx.stroke();}
     ctx.restore();},
   tick(dt){if(!this.on||!G||!P||!running)return;const T=this.st();if(T.pen>0)T.pen-=dt;if(T.em>0)T.em-=dt;
