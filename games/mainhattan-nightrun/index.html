@@ -802,8 +802,8 @@ function fit(){
   const was=rotMode;rotMode=touchUI&&st.height>st.width*1.05;   // portrait: a vertical play area, ship at the bottom
   document.documentElement.classList.toggle('touch',touchUI);
   const aw=st.width,ah=st.height;let w,h,strip=0,side=0;
-  if(rotMode){const sA=Math.min(aw/H,(ah-84)/W),sB=Math.min((aw-80)/H,ah/W);   // buttons in a strip below, or in a column beside the play area, whichever leaves the bigger screen
-    if(sB>sA*1.04){side=80;w=H*sB;h=W*sB;}else{strip=84;w=H*sA;h=W*sA;}}
+  if(rotMode){const LY=typeof RET!=='undefined'&&RET.layout&&RET.layoutStrip,SB=LY?68:84,sA=Math.min(aw/H,(ah-SB)/W),sB=Math.min((aw-80)/H,ah/W);   // buttons in a strip below, or in a column beside the play area, whichever leaves the bigger screen
+    if(sB>sA*1.04&&!LY){side=80;w=H*sB;h=W*sB;}else{strip=SB;w=H*sA;h=W*sA;}}
   else{w=aw;h=w*9/16;if(h>ah){h=ah;w=h*16/9;}}
   {const cpu=rotMode?w/PW_:w/W;HK=rotMode?Math.min(2,Math.max(1,11.6/(11*cpu))):1;HKL=rotMode?1:Math.min(2,Math.max(1,11.6/(11*cpu)));}   // CSS px per world unit: below 11 px of type the HUD is scaled up
   const left=SET.layout==='left';
@@ -14576,7 +14576,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='4bf25e1de5 2026-10-21 21:52 UTC';
+const NR_STAMP='45b0a60b8f 2026-10-21 21:49 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -14717,85 +14717,6 @@ if(POL.on){
     ctx.save();ctx.globalAlpha=.4;ctx.fillStyle='#05030c';ctx.fillRect(x,y0,3,h);ctx.globalAlpha=f<.65?1:.55;ctx.fillStyle=col;ctx.fillRect(x+.5,y0+h*(1-f),2,h*f);
       if(LEAK.flashT>0||(hot&&!SET.reduce&&Math.floor(G.t*6)%2)){ctx.globalAlpha=Math.min(1,.4+LEAK.flashT);ctx.fillStyle='#ff3040';ctx.fillRect(x,y0,3,h);}
       ctx.restore();};}
-}
-
-// PURPOSE: the music stays on top of the effects: separate buses, an effect compressor, a voice cap, no repeated ticks, a little variation
-// FLAG: mix (?mix=0)
-// TEST: mix-test.js
-/* ---------- MIX: owner 21 Oct 2026: "the music is distorted by annoying repetitive sound effects" (flag RET.mix, default ON; ?mix=0 = the old graph and the old sound calls, nothing is wrapped).
-   MEASURED before (mix-test.js, 90 s bot runs, stages 2/10/20, boss, endless wave 15): up to 16 effect voices (53 in endless), 25 explosions in one second, 'hit' 13/s, 'pick' 2 in the same frame, the master
-   limiter 9.9 dB into overload (2 blocks at full scale) and the effects bus 2 to 6 dB LOUDER than the music. NO new sound assets: only gain, filter, pitch, scheduling on the sounds that exist.
-   GRAPH   music bus (musv > duck > cutg) and effects bus (sfxv) stay separate; sfxv now runs through a DynamicsCompressor (AU.sfxc) before the master, so a pile of effects cannot push the master limiter.
-           Both buses get a fixed trim (K.mus, K.sfx) on top of the two sliders, so the defaults sit music over effects. The perfect stinger has its own half-level bus (AU.stbq, made on first use).
-   SOUNDS  Every AU.sfx call goes through allow(): a minimum gap per sound id, at most N per rolling second, explosions at most 3 per 200 ms, and a voice cap (CAP): the quietest / oldest voice of an equal or
-           lower priority is faded out and stopped, or the new sound is dropped when everything alive matters more. A crowd makes the sound softer and shorter. Round-robin variants per id (5 steps, pitch +-4 %,
-           level +-1.5 dB, never the same twice in a row). Settings > Audio > "Reduce repetitive sounds" (SET.mixr, default On) switches the gaps / caps / variants off; the buses stay.
-   DUCK    music dips 4 dB for 150 ms under a big effect (explosion, hit on the hull, phase, EMP), at most once per 400 ms, so it never pumps.
-   BEAT    the PERFECT / ON BEAT sound is one soft sine instead of three layers and its stinger has half the level; when they happen is unchanged (timing windows, BT, stinger grid are not touched).
-   NOT     timing windows, hitboxes, armour.js, hard.js, the beat clock and the stinger scheduling. ---------- */
-if(RET.mix===undefined)RET.mix=!/[?&]mix=0/.test(location.search);
-DEFS.mixr=true;if(SET.mixr===undefined)SET.mixr=true;
-const MIX=window.MIX={K:{mus:1.4,sfx:.5},CAP:6,
-  // id: [minimum gap s, most per rolling second, priority, voices it makes, level, length]
-  T:{shot:[.14,5,1,1,.85,.9],graze:[.2,3,1,1,.8,.9],hit:[.17,5,2,1,.8,.9],pick:[.12,4,3,2,.7,.85],dash:[.2,3,3,2,.8,1],heat:[.4,2,3,1,.8,1],up:[.12,4,4,4,.8,1],tier:[.14,3,4,5,.75,1],
-     perfect:[.14,4,4,1,.7,1],warn:[.5,2,5,6,.8,1],boom:[.07,5,5,2,.6,.75],hurt:[.3,3,6,2,.85,1],emp:[.5,2,6,2,.85,1],big:[.5,2,7,2,.8,1],phase:[.5,2,7,5,.85,1]},
-  PP:[1,1.04,.97,1.02,.985],DB:[0,1.2,-1.1,.6,-.7],SEQ:[0,3,1,4,2],
-  log:{},rr:{},vox:[],cur:null,lastDuck:-9,stat:{drop:0,steal:0,play:0},
-  on(){return!!RET.mix;},red(){return!!RET.mix&&SET.mixr!==false;}};
-if(RET.mix){
-  const M=MIX,isFx=d=>d===AU.fx||d===AU.stb||d===AU.stbq,dbv=x=>Math.pow(10,x/20);
-  const oInit=AU.init,oOsc=AU.osc,oNoise=AU.noise,oSfx=AU.sfx,oSting=AU.sting,oDuck=AU.duckMusic,oVol=AU.vol;
-  AU.init=function(){const had=this.a;oInit.apply(this,arguments);if(!had&&this.a&&!this.sfxc)M.graph();};
-  M.graph=()=>{const a=AU.a;if(!a||!AU.sfxv||!AU.m)return;
-    try{const c=a.createDynamicsCompressor();c.threshold.value=-24;c.knee.value=10;c.ratio.value=5;c.attack.value=.003;c.release.value=.14;
-      AU.sfxv.disconnect(AU.m);AU.sfxv.connect(c);c.connect(AU.m);AU.sfxc=c;                       // effects: their own compressor before the master
-      }catch(e){}
-    AU.vol(true);};
-  AU.vol=function(now){if(!this.a)return;const t=this.a.currentTime,k=now?0:.02;
-    this.m.gain.setTargetAtTime(SET.mute?0:.55*SET.master,t,k||.001);this.musv.gain.setTargetAtTime(SET.music*M.K.mus,t,k||.001);this.sfxv.gain.setTargetAtTime(SET.sfx*M.K.sfx,t,k||.001);};
-  AU.duckMusic=function(at){const a=this.a;if(!a||!this.duck||!SET.duck)return;const t=at||a.currentTime;
-    if(t-M.lastDuck<.4&&t>=M.lastDuck)return;M.lastDuck=t;
-    const g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.63,t,.01);g.setTargetAtTime(1,t+.15,.07);};   // -4 dB, 150 ms, then back
-  /* the two synth helpers are copied here only so that a voice can be faded out and stopped; the sound is the same as a.js makes */
-  const osc2=(t,type,freq,dur,vol,dest,slide,cut)=>{const a=AU.a,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);
-    if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t+dur);
-    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.005);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-    let n=o;if(cut){const f=a.createBiquadFilter();f.type='lowpass';f.frequency.setValueAtTime(cut,t);f.frequency.exponentialRampToValueAtTime(Math.max(80,cut/6),t+dur);o.connect(f);n=f;}
-    n.connect(g);g.connect(dest);o.start(t);o.stop(t+dur+.02);M.vox.push({o,g,t0:t,end:t+dur+.02,vol,id:M.cur.id,pr:M.cur.pr});return g;};
-  const noise2=(t,dur,vol,freq,dest,type='highpass')=>{const a=AU.a,s=a.createBufferSource(),f=a.createBiquadFilter(),g=a.createGain();s.buffer=AU.nb;
-    f.type=type;f.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(dest);s.start(t);s.stop(t+dur+.02);
-    M.vox.push({o:s,g,t0:t,end:t+dur+.02,vol,id:M.cur.id,pr:M.cur.pr});};
-  AU.osc=function(t,type,freq,dur,vol,dest,slide,cut){const C=M.cur;if(!C||!AU.a||!isFx(dest))return oOsc.apply(this,arguments);
-    return osc2(t,type,freq*C.p,dur*C.d,vol*C.v,dest,slide?slide*C.p:slide,cut);};
-  AU.noise=function(t,dur,vol,freq,dest,type){const C=M.cur;if(!C||!AU.a||!isFx(dest))return oNoise.apply(this,arguments);
-    return noise2(t,dur*C.d,vol*C.v,freq*C.p,dest,type);};
-  /* make room for `need` voices of priority `pr`: fade out and stop the quietest / oldest voice that matters no more than it; false when that is not possible */
-  M.room=(t,need,pr)=>{M.vox=M.vox.filter(v=>v.end>t);let over=M.vox.length+need-M.CAP;if(over<=0)return true;
-    const c=M.vox.filter(v=>v.pr<=pr).sort((a,b)=>a.pr-b.pr||a.vol*(a.end-t)-b.vol*(b.end-t)||a.t0-b.t0);if(c.length<over)return false;
-    for(const v of c.slice(0,over)){try{v.g.gain.cancelScheduledValues(t);v.g.gain.setTargetAtTime(0,t,.004);v.o.stop(t+.015);}catch(e){}v.end=t+.015;M.stat.steal++;}
-    M.vox=M.vox.filter(v=>v.end>t+.015);return true;};
-  /* may this sound play now? (fills the variant when it may) */
-  const allow=(n,t)=>{const T=M.T[n];if(!T)return{p:1,v:1,d:1,pr:5};
-    const L=M.log[n]||(M.log[n]=[]);while(L.length&&L[0]<t-1)L.shift();
-    if(L.length&&t-L[L.length-1]<T[0]*(.9+Math.random()*.25))return null;     // minimum gap, a little uneven so a steady stream does not tick like a clock
-    if(L.length>=T[1])return null;                                               // most per rolling second
-    if(n==='boom'||n==='big'){let c=0;for(const x of(M.log.boom||[]).concat(M.log.big||[]))if(t-x<.2)c++;if(c>=3)return null;}   // explosions: three per 200 ms
-    if(!M.room(t,T[3],T[2]))return null;
-    L.push(t);const crowd=Math.max(0,L.length-1),k=n==='boom'||n==='pick'||n==='hit'?1/Math.sqrt(1+.45*crowd):1;   // a crowd of the same sound is softer and shorter
-    const i=M.rr[n]=((M.rr[n]|0)+1)%5,s=M.SEQ[i];
-    return{p:M.PP[s],v:T[4]*k*dbv(M.DB[s]),d:T[5]*(k<1?.8+.2*k:1),pr:T[2]};};
-  AU.sfx=function(n){const a=this.a;if(!a||a.state!=='running'||SET.mute)return oSfx.apply(this,arguments);
-    if(SET.mixr===false){M.cur={id:n,p:1,v:1,d:1,pr:(M.T[n]||[0,0,5])[2]};try{return oSfx.apply(this,arguments);}finally{M.cur=null;}}
-    const t=a.currentTime,V=allow(n,t);if(!V){M.stat.drop++;return;}M.stat.play++;V.id=n;
-    if(n==='perfect'){M.cur=V;try{osc2(t,'sine',this.f(100),.16,.09*V.v,this.fx,0);}finally{M.cur=null;}return;}   // one soft tone (was three layers)
-    M.cur=V;try{return oSfx.apply(this,arguments);}finally{M.cur=null;}};
-  AU.sting=function(n){const a=this.a;if(!a||!AU.sfxv)return oSting.apply(this,arguments);
-    if(n==='perfect'&&!this.stbq){try{const q=a.createGain();q.gain.value=.354;q.connect(this.sfxv);this.stbq=q;}catch(e){}}      // .5 x the stinger bus (.708), made when the first one plays
-    M.room(a.currentTime,5,8);                                                                          // a stinger always plays: it takes the room of up to five quieter effect voices
-    const real=this.stb;if(n==='perfect'&&this.stbq)this.stb=this.stbq;M.cur={id:'sting:'+n,p:1,v:1,d:1,pr:9};   // stinger voices count against the cap but are never stolen
-    const n0=M.vox.length;let r;try{r=oSting.apply(this,arguments);}finally{this.stb=real;M.cur=null;}
-    if(r&&M.vox.length===n0)M.vox.push({o:null,g:null,t0:a.currentTime,end:a.currentTime+.8,vol:.3,pr:9});   // a stinger from a file is one voice we cannot stop, but it counts
-    return r;};                      // the perfect one at half the level
 }
 
 // PURPOSE: an organised home: PLAY + status + 4 sections (MISSIONS, HANGAR, TRAINING, PROFILE), one header everywhere, grouped settings
@@ -15100,6 +15021,62 @@ box0().addEventListener('click',e=>{const box=box0(),ch=e.target.closest&&e.targ
 }
 },0);
 
+// PURPOSE: phone layout pass: centred one-colour section pills, centred result / pause buttons, controls below the field, stage card beside its node
+// FLAG: layout (?layout=0)
+// TEST: layout-test.js
+/* ---------- LAYOUT (flag RET.layout, default ON; ?layout=0 = the screens exactly as before). Strict review 8, fixes 20-23. CSS and wrappers only, no new art.
+   20 MISSIONS / TRAINING / PROFILE: every pill the same colour and width, centred, the block centred in the screen.
+   21 result (#over, #stres) and pause (#pausem): one title, centred equal buttons.
+   22 (flag RET.layoutStrip, ?strip=1, default OFF) b.js fit(): on a phone the buttons always sit in a strip BELOW the field (never a column over its edge); the x~NNs label sits above its button.
+   23 stage map: a stage card beside the selected node (name, goal, real length), the district plate never covers that node, the bottom sheet is at most half the screen,
+      ARCADE / CLASSIC show the real length in minutes:seconds instead of "~3 MIN". ---------- */
+if(RET.layout===undefined)RET.layout=!/[?&]layout=0/.test(location.search);
+if(RET.layoutStrip===undefined)RET.layoutStrip=/[?&]strip=1/.test(location.search);   // fix 22 (controls strip below the field): default OFF until the HUD diet lands, 375x553 HUD cover is 21.0% with it (max 20%)
+if(RET.layout){
+  document.documentElement.classList.add('lay');
+  {const st=document.createElement('style');st.textContent=`
+.lay .hubScr .hubBody{gap:14px;padding-top:8px}
+.lay .hubScr .hubBody>:first-child{margin-top:auto}.lay .hubScr .hubBody>:last-child{margin-bottom:auto}   /* centred, but a tall list still scrolls from its top */
+.lay .hubScr .hubAct,.lay .hubScr .hubMore{width:min(100%,440px);box-sizing:border-box;margin-left:auto;margin-right:auto}
+.lay .hubScr .hubAct{min-height:64px}
+.lay .hubScr .hubMore{align-self:center}
+.lay #over .in,.lay #stres .in,.lay #pausem .in{align-items:center;text-align:center}
+.lay #over .row,.lay #stres .row,.lay #pausem .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(100%,360px);margin:0 auto;justify-items:stretch}
+.lay #over .row>button,.lay #stres .row>button,.lay #pausem .row>button{width:100%;min-width:0;margin:0;box-sizing:border-box}
+.lay #over .row>button:first-child,.lay #stres .row>button:first-child,.lay #pausem .row>button:first-child{grid-column:1/-1}
+.lay #over .row>button:last-child:nth-child(even),.lay #stres .row>button:last-child:nth-child(even),.lay #pausem .row>button:last-child:nth-child(even){grid-column:1/-1}
+.lay #over .row>button,.lay #stres .row>button,.lay #pausem .row>button{background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important}
+.lay #pausem .eyebrow{display:none}
+.lay #pStats{max-width:340px}
+.lay #touch button#bEmp[data-t]::before{top:-15px;bottom:auto}
+.lay #stsel #stDet{max-height:50%;overflow-y:auto}
+.lay #stDet .stl{flex-direction:row;flex-wrap:wrap;gap:2px 12px;font-size:14px}
+.lay #stsel .ban.lyhb{visibility:hidden}
+.lay #stsel .nd.sel .meta{visibility:hidden}
+.lyCard{position:absolute;z-index:3;box-sizing:border-box;width:176px;padding:5px 8px;border:1px solid var(--c,#8c86b8);border-radius:8px;background:#05030cee;color:var(--ink);font:600 14px/1.25 var(--mono)}
+.lyCard b{display:block;font:700 15px/1.15 var(--display);letter-spacing:.05em}
+.lyCard i{display:block;color:var(--cyan);font-style:normal}
+.lyCard u{text-decoration:none;color:#ffe14d}
+`;document.head.appendChild(st);}
+  const lyBpm=s=>{const t=TR.by[s.song],m=SONGM[s.song];return(t&&t.bpm)||(m&&m.bpm)||120;};
+  const lyLen=(s,full)=>{const t=Math.round((full?stLenC(s):stLen(s))*240/lyBpm(s)),m=Math.floor(t/60);return '~'+m+':'+String(t%60).padStart(2,'0');};
+  window.LAY={len:lyLen};
+  function lyMap(n){const box=$('stRows'),old=box&&box.querySelector('.lyCard');if(old)old.remove();if(!box)return;
+    for(const b of box.querySelectorAll('.ban'))b.classList.remove('lyhb');
+    if(!(n>0))return;const s=STAGES[n-1];
+    const a=$('arcA'),c=$('arcC');if(a&&a.querySelector('small'))a.querySelector('small').textContent=lyLen(s,false);if(c&&c.querySelector('small'))c.querySelector('small').textContent=lyLen(s,true);
+    const nd=box.querySelector('.nd[data-n="'+n+'"]'),mp=box.querySelector('.mp');if(!nd||!mp)return;
+    const x=parseFloat(nd.style.left),y=parseFloat(nd.style.top),right=x<mp.offsetWidth/2,k=sSave.stars[n]|0,ok=unlocked(n);
+    const e=document.createElement('div');e.className='lyCard';e.style.setProperty('--c',DISTRICTS[s.di].a);
+    e.innerHTML='<b>'+(s.n<=MAIN?s.n+' · ':'')+s.name+'</b><i>'+goalTxt(s)+'</i><u>'+(ok?'★'.repeat(k)+'☆'.repeat(3-k)+' ':'')+(s.ch?'':(ARC.active()?lyLen(s,false):lyLen(s,true)))+'</u>';
+    mp.append(e);const ew=e.offsetWidth,eh=e.offsetHeight;e.style.top=Math.max(2,y-eh/2)+'px';e.style.left=(right?x+34:Math.max(2,x-34-ew))+'px';
+    const er=nd.getBoundingClientRect();for(const b of box.querySelectorAll('.ban')){const r=b.getBoundingClientRect();if(r.left<er.right&&r.right>er.left&&r.top<er.bottom&&r.bottom>er.top)b.classList.add('lyhb');}}
+  {const md=mapDetail;mapDetail=function(n){const r=md.apply(this,arguments);try{lyMap(n);}catch(e){}return r;};}
+  /* section sheets: one colour (the hub gives the first pill the bright style) */
+  setTimeout(()=>{for(const b of document.querySelectorAll('.hubScr .hubAct'))b.classList.add('dim');},0);
+  setTimeout(()=>{if(typeof fit==='function')fit();},0);
+}
+
 // PURPOSE: TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics, loadout lessons, counters, gate, on foot), progress, next drill
 // FLAG: school (?school=0)
 // TEST: school-test.js
@@ -15401,7 +15378,7 @@ const SCHEMA=[
   {g:'Controls',rows:[{k:'layout',l:'Touch layout',o:[['left','Left'],['right','Right']]},{k:'sens',l:'Sensitivity',s:[1,5,1],f:v=>String(v)},{k:'dsize',l:'Button size',o:[['S','Small'],['M','Medium'],['L','Large']]}]},
   {g:'Rhythm',rows:[{k:'win',l:'Timing window',o:[['tight','Tight'],['normal','Normal'],['loose','Loose']]},{k:'all',l:'Everything counts',o:OFFON},{k:'cue',l:'Beat cue',o:[['off','Off'],['S','Small'],['M','Medium'],['L','Large']]},
     {k:'sync',l:'Latency',s:[-150,150,5],f:v=>(v>0?'+':'')+v+' ms',tap:1}]},
-  {g:'Audio',rows:[{k:'master',l:'Master',s:[0,100,5],p:1},{k:'music',l:'Music volume',s:[0,100,5],p:1},{k:'sfx',l:'Effects volume',s:[0,100,5],p:1},{k:'mixr',l:'Reduce repetitive sounds',o:[[true,'On'],[false,'Off']]},{k:'duck',l:'Ducking',o:[[true,'On'],[false,'Off']]},{k:'keepmus',l:'Keep music playing when paused',o:[[true,'On'],[false,'Off']]},{k:'react',l:'Music reacts',o:OFFON},{k:'mus',l:'Music mix',o:[['mix','Mix'],['classic','Classic only'],['new','New only']]},{k:'mute',l:'Mute all',o:OFFON}]},
+  {g:'Audio',rows:[{k:'master',l:'Master',s:[0,100,5],p:1},{k:'music',l:'Music',s:[0,100,5],p:1},{k:'sfx',l:'Effects',s:[0,100,5],p:1},{k:'duck',l:'Ducking',o:[[true,'On'],[false,'Off']]},{k:'keepmus',l:'Keep music playing when paused',o:[[true,'On'],[false,'Off']]},{k:'react',l:'Music reacts',o:OFFON},{k:'mus',l:'Music',o:[['mix','Mix'],['classic','Classic only'],['new','New only']]},{k:'mute',l:'Mute all',o:OFFON}]},
   {g:'Visuals',rows:[{k:'part',l:'Particles',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'shake',l:'Screen shake',o:[[0,'Off'],[1,'Low'],[2,'Full']]},{k:'flash',l:'Flashing',o:[[0,'Off'],[1,'Reduced'],[2,'Full']]},
     {k:'q',l:'Quality',o:[['L','Low'],['M','Medium'],['H','High']]},{k:'fps',l:'FPS cap',o:[[30,'30'],[60,'60']]},{k:"pal",l:"Colour theme",o:[['neon','Neon'],['cb','Blue-orange'],['term','Terminal']]},{k:'fpsc',l:'FPS counter',o:OFFON}]},
   {g:'Accessibility',rows:[{k:'rm',l:'Reduced motion',o:OFFON},{k:'hc',l:'High-contrast bullets',o:OFFON}]}];
