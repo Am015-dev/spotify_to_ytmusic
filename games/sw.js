@@ -1,10 +1,10 @@
 /* Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. */
 // Game Night Shelf service worker (scope = the games/ folder).
 //  - shelf pages, manifest, icons, covers: network first (3 s), the cached copy when offline or slow
-//  - games the player chose to keep (cached by sync.html): cache first, quietly refreshed in the background
+//  - games the player chose to keep (cached by sync.html, every file listed in <game>/offline.json): cache first; Range requests (audio, video) are answered from the cached file as 206; only html/json are quietly refreshed
 //  - a game that was not downloaded and there is no network: a friendly page instead of the browser error
 //  - cross-origin requests are never touched or stored
-const VER = 'v1';
+const VER = 'v2';
 const SHELF = 'gns-shelf-' + VER;
 const GAMES = 'gns-games-' + VER;
 const SLUGS = ['crown-city-smash', 'nebula-aces', 'doorkick-dungeon', 'shipwreck-isle', 'sands-of-qamar', 'sunglaze', 'rampart-and-vine', 'short-fuse', 'tidewake', 'hollowbough', 'thornbound', 'kaiten-kitchen', 'lantern-dive', 'cauldron-fair', 'final-approach', 'mainhattan-nightrun', 'mainhattan-overdrive'];
@@ -52,6 +52,7 @@ async function cacheFirst(req, k) {
   const cache = await caches.open(GAMES);
   const hit = await cache.match(k);
   if (!hit) return null;
+  if (!/(\.(html|json)|\/)$/.test(k)) return hit;   // media, models, scripts: kept as downloaded (reading and comparing megabytes on every request would be slow)
   const old = hit.clone().text().catch(() => null);
   // refresh behind the scenes; the next open gets the new version, and open pages hear "a new version is ready"
   fetch(k, { cache: 'no-cache' }).then(async r => {
@@ -67,6 +68,16 @@ async function cacheFirst(req, k) {
 // tell open pages that a newer copy of this file is stored (the shared kit shows "A new version is ready — tap to reload")
 function notify(url) { self.clients.matchAll({ type: 'window' }).then(cs => cs.forEach(c => c.postMessage({ type: 'gns-update', url }))).catch(() => { }); }
 
+async function ranged(req, hit) {
+  const m = /^bytes=(\d*)-(\d*)$/.exec(req.headers.get('range') || '');
+  const b = await hit.blob(), n = b.size;
+  let s = m && m[1] !== '' ? +m[1] : 0, e = m && m[2] !== '' ? +m[2] : n - 1;
+  if (m && m[1] === '' && m[2] !== '') { s = Math.max(0, n - +m[2]); e = n - 1; }
+  if (!m || s >= n) return new Response(null, { status: 416, headers: { 'content-range': 'bytes */' + n } });
+  e = Math.min(e, n - 1);
+  return new Response(b.slice(s, e + 1), { status: 206, headers: { 'content-type': hit.headers.get('content-type') || b.type || 'application/octet-stream', 'content-range': 'bytes ' + s + '-' + e + '/' + n, 'content-length': String(e - s + 1), 'accept-ranges': 'bytes' } });
+}
+
 function offlinePage(isDoc) {
   if (!isDoc) return new Response('', { status: 504, statusText: 'Offline' });
   const html = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Offline</title>' +
@@ -79,14 +90,21 @@ function offlinePage(isDoc) {
 
 self.addEventListener('fetch', e => {
   const req = e.request;
-  if (req.method !== 'GET' || req.headers.has('range')) return;
+  if (req.method !== 'GET') return;
   const u = new URL(req.url);
   if (u.origin !== self.location.origin || !u.pathname.startsWith(BASE)) return;
+  if (req.headers.has('range') && !isGame(u)) return;
+  if (req.cache === 'no-store') return;   // the shelf's own "check the list" must see the network
   const doc = req.mode === 'navigate' || req.destination === 'document' || req.destination === 'iframe';
   const k = key(u);
   e.respondWith((async () => {
     try {
       if (isGame(u)) {
+        if (req.headers.has('range')) {   // <audio>/<video>: slice the stored file; not stored = the browser's own range request
+          const h = await (await caches.open(GAMES)).match(k);
+          if (h) return ranged(req, h);
+          try { return await fetch(req); } catch (_) { return new Response('', { status: 504 }); }
+        }
         const hit = await cacheFirst(req, k);
         if (hit) return hit;
         try { return await fetch(req); } catch (_) { return offlinePage(doc); }
