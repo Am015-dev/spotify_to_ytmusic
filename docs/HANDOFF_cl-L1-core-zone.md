@@ -4,3 +4,8 @@
 3. Density: outside the box 60 % of the prop instances are hidden for good (sliced, 1500/tick, draw calls unchanged); 70 % of the traffic fleet and the peds are moved onto core roads, 20 cars within 140 m of the spawn.
 4. Measured (fra, built page, ?cl=core): props per 100 m of street 6.1 inside vs 2.5 outside (2.4x), 10 cars within 150 m of the spawn, 60/75 cars in the core. Shot: docs/shots/cl-L1/spawn_berliner.jpg.
 5. Left: the x1.5 prop ADD inside the core (needs new instances per tile mesh; today the 2.4x comes from thinning outside only), and `hubCullStep` is not touched. Flag stays OFF by default.
+
+## Fix round (review 21)
+- Heading: R17_off is skipped while CL.sp (98bp 180 deg start-life turn); GO now checks __tq.home after the real roamLoad (east, in box).
+- Cost: only traffic moves (35 % of fleet, 10 cars near the spawn); peds stay (moving them was +4 % calls, opt-in ?clped=1). GO A/Bs moved vs home traffic at Paulsplatz: calls +1.1 %, tris +1.6 %.
+- Shot: docs/shots/cl-L1/spawn_berliner_realplay.jpg (real PLAY path, faces east into traffic).
