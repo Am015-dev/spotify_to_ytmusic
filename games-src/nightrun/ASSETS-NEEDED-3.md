@@ -45,3 +45,16 @@ Garage ABILITY tab cards draw a shape icon until `abup-<id>.webp` is listed in m
 | `abup-erad` | 96x96 | white | 3 | A | Garage ABILITY card, WIDE EMP | An amber shock ring with a wider second ring. |
 | `abup-econv` | 96x96 | white | 3 | A | Garage ABILITY card, EMP SALVAGE | Green shards flying out of an amber ring. |
 | `ui-pwr-slot` | 96x96 | transparent | 3 | B | touch power-up slot (#bPwr, hold to trade) | A round dark chip with a gold star and a hold ring. |
+## Pilot classes (parts/classes.js, Garage tab PILOT)
+
+5 class portraits-as-icons and 30 skill-node icons. Until a picture exists the PILOT tab draws a code shape (`clsSvg`: triangle, ring, bar, diamond, dot).
+**Wiring:** `N` = not wired yet: `CLSUI.draw` would swap `clsSvg(...)` for `ART.sp('<id>')` once the picture is in `media/ready.json`. Same hand-in steps and background as above.
+
+| id | size | bg | prio | wired | where | picture |
+|---|---|---|---|---|---|---|
+| `cls-gunner` | 64x64 | white | 2 | N | PILOT card GUNNER | An orange heavy cannon ship nose, three muzzle flashes. |
+| `cls-ghost` | 64x64 | white | 2 | N | PILOT card GHOST | A pale cyan ship outline fading into a motion trail. |
+| `cls-warden` | 64x64 | white | 2 | N | PILOT card WARDEN | A teal ship behind a tall curved shield plate. |
+| `cls-tinker` | 64x64 | white | 2 | N | PILOT card TINKER | A yellow ship with a wrench arm and floating gears. |
+| `cls-gambler` | 64x64 | white | 2 | N | PILOT card GAMBLER | A magenta ship over two neon dice. |
+| `node-<node id>` | 48x48 | white | 3 | N | PILOT skill tree, 30 nodes: g1-g6, h1-h6, w1-w6, t1-t6, b1-b6 | One simple glyph in the class colour per node (name in `classes.js` `T`). |
