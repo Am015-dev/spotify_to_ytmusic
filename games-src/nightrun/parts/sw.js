@@ -6,7 +6,7 @@
    - other origins (fonts) are never touched; on activate the old shell cache goes and the asset cache is carried over to the new name */
 const BUILD = '__BUILD__';
 const SHELF = 'nr-shell-' + BUILD, ASSETS = 'nr-assets-' + BUILD;
-const CAP = { music: 24, media: 420 };
+const CAP = { music: 24, media: 470 };
 const BASE = new URL('./', self.registration.scope).href;
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png', 'media/title.webp', 'media/title-phone.webp', 'media/ready.json', 'music/tracks.json'];
 const wait = ms => new Promise(r => setTimeout(r, ms));

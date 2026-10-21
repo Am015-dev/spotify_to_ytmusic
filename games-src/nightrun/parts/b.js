@@ -409,7 +409,7 @@ function update(dt){
     if(l<22&&!G.dead){p.dead=1;AU.sfx('pick');if(window.RWD)RWD.pick(p);
       if(p.t==='shard'){const sk=SH.smk||1;G.mult=Math.min(9.9,+(G.mult+.1*sk).toFixed(2));G.score+=Math.round(50*G.mult*sk);}
       if(p.t==='hp'){P.hp=Math.min(P.max,P.hp+1);floater(P.x,P.y-24,'HULL +1','#3dffb0');}
-      if(p.t==='up'){WP.gain();AU.sfx('up');}
+      if(p.t==='up'){WP.gain();AU.sfx('up');NR.emit('weaponUp');}
       if(p.t==='emp'){P.emp=Math.min(3,P.emp+1);floater(P.x,P.y-24,'EMP +1','#ffb020');}
       if(p.t==='pw')NR.emit('pickup',p);}
     if(p.x<-30)p.dead=1;}

@@ -1,7 +1,7 @@
 /* ---------- vector SHAPES for every item that still waits for painted art (see ASSETS-NEEDED.md). Each draws a simple shape now and switches to the painted file as soon as it is
    listed in media/ready.json (make-placeholders.py writes that list when it finds real art). Nothing here ever shows the placeholder pictures. ---------- */
 ART.rd=new Set();ART.isReal=n=>ART.rd.has(n+'.webp');
-fetch(ART.base+'ready.json').then(r=>r.json()).then(a=>{if(!Array.isArray(a))return;ART.rd=new Set(a);for(const f of a)if(!f.startsWith('anim/'))ART.load(f.replace(/\.webp$/,''));   // (anim/ strips load on demand: ART.anim)
+fetch(ART.base+'ready.json').then(r=>r.json()).then(a=>{if(!Array.isArray(a))return;ART.rd=new Set(a);for(const f of a)if(!f.startsWith('anim/')&&!/\.mp3$/.test(f))ART.load(f.replace(/\.webp$/,''));   // (anim/ strips load on demand: ART.anim)
   if(ART.uiIcons)ART.uiIcons();if(typeof garageEl!=='undefined'&&!garageEl.hidden)gaDraw();}).catch(()=>{});
 const SVGW=(inner,vb)=>`<svg viewBox="0 0 ${vb||24} ${vb||24}" aria-hidden="true">${inner}</svg>`;
 /* ----- difficulty badges ----- */

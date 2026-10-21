@@ -71,3 +71,9 @@ Same rules as above before use: pick a/b, `audio-test.js` for `bpm`/`offsetMs`/`
 | `st-boss-in`, `st-clear`, `st-fail`, `st-newbest`, `st-perfect`, `st-phase`, `st-tierup1..3`, `st-unlock` (a/b) | short stingers (not loops) | the matching UI moments: boss intro, stage clear, game over, new best, PERFECT, boss phase change, tier-ups, unlock |
 Owner's picks so far (used in the published YouTube mix): d1b-a, d1a-b, boss-d1-a, d2a-a, d2b-a, boss-d2-a, d3a-b, d3b-a,
 boss-d3-b, d4a-b, d4b-b, boss-d4-b, pit-b, school-a, fever-128-a, endless3-a. Everything else: pick by ear.
+
+## Wired: music pack (flag `RET.musicpack`, `?musicpack=0` = the old music; `parts/musicpack.js`, test `musicpack-test.js`)
+28 cues + 9 trimmed stingers, 96 kbps mp3, in `games/mainhattan-nightrun/media/mp-<id>.mp3` and listed in `media/ready.json` (that list decides what exists; a missing or 404 file = the old songs).
+Tempo and first-beat offset are MEASURED on the encoded files (the prompted BPM is far off for many cues), table in `musicpack.js` (`MP.T`).
+Contexts: stage = d1a-d4b pools + athA/athB (pack cues first), boss = boss-dN (a) and its `~b` take on each boss phase, endless3 = last district (Ostend from loop 2), fever = fever-120/128/132 by the stage's tempo band (combo tier 4 = one band up), pit = pit, on foot = street1 / -lock / -boss(~b) / -clear, stingers = clear, fail, unlock (new weapon), boss defeat (clear), tierup1-3, perfect, boss-in, phase.
+Not wired: school, st-newbest, the `-v2` takes, talos. Low-confidence tempo (listen / re-measure first): d2b, boss-d3~b, d1a, athB (a swing feel; the beat phase flips by a third of a beat).
