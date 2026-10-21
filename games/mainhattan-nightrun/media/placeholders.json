@@ -507,5 +507,11 @@
 "ui-emp-icon.webp": "63bbcf90737cd16ec8a69aa981e13c97",
 "fx-w34-ui-ring-ready.webp": "7c6db503d4fe4165ca79b27741ebf449",
 "fx-w34-ui-ring-charge.webp": "6bd48e90774b7b130afd7ddcedf81773",
-"fx-w34-ui-ring-empty.webp": "d3fec2ef9094bfae018ddf2b60f0c8a4"
+"fx-w34-ui-ring-empty.webp": "d3fec2ef9094bfae018ddf2b60f0c8a4",
+"char-ally.webp": "bc5dfb37919b80faeed1e3e56d759bb0",
+"char-courier.webp": "a7867f63ab36d082a6de7ff75f8d27ac",
+"char-dispatch.webp": "077fe946ae5a150d961f465224204162",
+"char-lumen.webp": "c15929550414f2dd305415d959ef7146",
+"char-mechanic.webp": "fc3dccbbf34f1403783bed56458cd870",
+"char-rival.webp": "e3cb2cc101394ac1c50fc45985cee0bf"
 }
