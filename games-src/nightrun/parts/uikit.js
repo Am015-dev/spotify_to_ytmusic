@@ -70,8 +70,8 @@ const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE
     const T=o.t||3,dup=this.cur&&this.cur.txt===txt?this.cur:this.q.find(h=>h.txt===txt);
     if(dup){if(T>dup.t){dup.t=T;if(dup===this.cur&&G.hint)G.hint.t=T;}return false;}   // callers may ask again every frame (a longer first-time ask keeps the longer time)
     if(!this.diet(txt))return false;
-    if(this.cur&&this.cur.el<.2&&T>this.cur.t){this.cur={txt,t:T,col:o.col||null,age:0,el:0,bw:0};if(G.hint){G.hint.t=T;G.hint.txt=txt;}return true;}   // the same moment, a longer first-time text: it replaces the short one
-    this.q.push({txt,t:o.t||3,col:o.col||null,age:0,el:0,bw:0});while(this.q.length>3)this.q.shift();this.next();return true;},
+    if(this.cur&&this.cur.el<.2&&T>this.cur.t){this.cur={txt,t:T,col:o.col||null,ic:o.ic||null,age:0,el:0,bw:0};if(G.hint){G.hint.t=T;G.hint.txt=txt;}return true;}   // the same moment, a longer first-time text: it replaces the short one
+    this.q.push({txt,t:o.t||3,col:o.col||null,ic:o.ic||null,age:0,el:0,bw:0});while(this.q.length>3)this.q.shift();this.next();return true;},
   /* V2 hint diet (flag RET.hintdiet, ?hintdiet=0 = every ask shows): a hint text shows at most twice per profile (counts in localStorage 'mnr_hintseen') and never twice within 3 minutes of play.
      Not in the tutorial or the Lab (the tutorial teaches by hints). A refused ask returns false like a repeat ask, so callers that retry every frame cost nothing. */
   clk:0,hs:null,
@@ -90,11 +90,12 @@ const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE
   // g = {W,H: drawing area (units), cpu: CSS px per unit, top: y of the first free row, x0,x1: free x range, ship:{x,y}, acc: border colour}
   draw(c,g){const h=this.cur;if(!h||!this.on()||(G.banner&&G.banner.t>0)){this.box=null;return;}
     const fs=Math.max(15.5,16/g.cpu),pad=fs*.75,lh=fs*1.22,font=`700 ${fs}px "Chakra Petch",sans-serif`;c.save();c.font=font;
-    const maxW=Math.max(120,g.x1-g.x0-2*pad-8),ws=h.txt.split(' ');let lines=[],cur='';
+    const ic=h.ic&&ART.img(h.ic)?h.ic:null,icW=ic?fs*1.9:0;   // a rule card carries its badge on the left (art only)
+    const maxW=Math.max(120,g.x1-g.x0-2*pad-8-icW),ws=h.txt.split(' ');let lines=[],cur='';
     for(const w of ws){const t=cur?cur+' '+w:w;if(cur&&c.measureText(t).width>maxW){lines.push(cur);cur=w;}else cur=t;}if(cur)lines.push(cur);
     if(lines.length===2&&ws.length>3){let best=null;for(let i=1;i<ws.length;i++){const a=ws.slice(0,i).join(' '),b=ws.slice(i).join(' '),m=Math.max(c.measureText(a).width,c.measureText(b).width);if(m<=maxW&&(!best||m<best.m))best={a,b,m};}if(best)lines=[best.a,best.b];}
     let tw=0;for(const l of lines)tw=Math.max(tw,c.measureText(l).width);tw=Math.min(tw,maxW);
-    const bw=tw+2*pad,bh=lines.length*lh+fs*.7,safe=this.SAFE/g.cpu,sh=g.ship;
+    const bw=tw+2*pad+icW,bh=lines.length*lh+fs*.7,safe=this.SAFE/g.cpu,sh=g.ship;
     const dist=(x)=>{if(!sh)return 1e9;const dx=Math.max(x-sh.x,0,sh.x-(x+bw)),dy=Math.max(g.top-sh.y,0,sh.y-(g.top+bh));return Math.hypot(dx,dy);};
     const mid=(g.x0+g.x1)/2-bw/2,cand=[mid,g.x0+4,g.x1-4-bw,(g.x0+mid)/2,(g.x1-bw+mid)/2];let x=null;
     for(const cx of cand){if(cx>=g.x0-1&&cx+bw<=g.x1+1&&dist(cx)>=safe){x=cx;break;}}
@@ -102,6 +103,6 @@ const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE
     const y=g.top,a=Math.min(1,h.t*3,h.el*6+.001),r=Math.min(bh/2,fs*.7);
     c.globalAlpha=Math.max(0,a);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+bw,y,x+bw,y+bh,r);c.arcTo(x+bw,y+bh,x,y+bh,r);c.arcTo(x,y+bh,x,y,r);c.arcTo(x,y,x+bw,y,r);c.closePath();
     c.fillStyle='rgba(5,3,12,.78)';c.fill();c.lineWidth=1.5/g.cpu;c.strokeStyle=h.col||g.acc||'#19e3ff';c.stroke();
-    c.fillStyle='#fff';c.textAlign='center';c.textBaseline='alphabetic';c.font=font;lines.forEach((l,i)=>c.fillText(l,x+bw/2,y+fs*.35+(i+.82)*lh));
+    c.fillStyle='#fff';c.textAlign='center';c.textBaseline='alphabetic';c.font=font;lines.forEach((l,i)=>c.fillText(l,x+icW+(bw-icW)/2,y+fs*.35+(i+.82)*lh));if(ic)ART.pic(ic,Math.min(bh-4,icW),x+pad*.4+icW/2,y+bh/2);
     c.restore();this.box={x,y,w:bw,h:bh,fs,cpu:g.cpu,ship:sh?{x:sh.x,y:sh.y}:null,areaH:g.H,areaW:g.W,txt:h.txt,lines:lines.length,mode:g.mode,hudBottom:g.top};}};
 NR.on('runStart',()=>HINT.reset());

@@ -50,7 +50,7 @@ const NOV=window.NOV={T:(()=>{try{return +sessionStorage.getItem('nr-novelty-T')
     if(!ks.length&&lap){const t=this.tw.filter(t=>t.indexOf('+')<0&&!c['ev:'+k+'^'+t]);if(t.length)tw=t[Math.floor(this.rr()*t.length)];}
     const id='ev:'+k+(tw?'^'+tw:'');this.see('ev:'+k);if(tw)this.see(id);this.stat.ev++;this.stat.byEv[k]=(this.stat.byEv[k]|0)+1;
     const tell={ambush:['AMBUSH','a column with one gap'],convoy:['TREASURE CONVOY','gold ships: x3 score'],rest:['REST STOP','+1 hull'],rush:['RUSH','one armored gunship: x2'],duel:['RIVAL','an elite duelist']}[k];
-    banner(tell[0],tell[1],k==='ambush'||k==='rush',1.8);NR.emit('rule',{id});
+    banner(tell[0],tell[1],k==='ambush'||k==='rush',1.8);G.banner.ev='nv-ev-'+k;NR.emit('rule',{id});
     this.pend.push({at:this.T+1.2,f:()=>this.run(k,tw)});},
   /* event units are placed here, edge-in from the right: vz:0 keeps variants.js (mirror / rotate / left entry) away from them, so nothing can appear near the ship */
   run(k,tw){if(G.dead||!this.on())return;const out=[];

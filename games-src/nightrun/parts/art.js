@@ -5,14 +5,14 @@ const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
   dn:['bankenviertel','mainufer','ostend','messe','athina'],
   bossN:['sek-adler','flusskrake','zentral-ice','kronos','bruecken-waechter','schranken-wart','talos','hoplite','tresor-wart','messe-waechter'],
   artK:e=>e.ak!=null?e.ak:e.nm==='TRESOR-WART'?8:e.nm==='MESSE-WÄCHTER'?9:e.k,   // the two mini-bosses with their own paintings
-  shipN:['std','tri','hv','ec','swg','syn'],
+  shipN:['std','tri','hv','ec','swg','syn','drift','lancer','nova'],
   enN:['drone','charger','gunship','gate','flank','swarm','mine','turret-base','turret-barrel'],
   fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine','shield-link','bullet-shell','bullet-needle','bullet-rocket'],
   pkN:['shard','hp','up','emp','drum','tempo','slow','drop']};
 ART.load=n=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();
   im.onload=()=>{const done=b=>{ART.bm[n]=b;};
     /* effects made as light on a solid black square (no alpha): turn the black into transparency once, colours un-premultiplied, so they look right with normal blending and identical when drawn additively */
-    if(n.startsWith('fx-')&&!n.startsWith('fx-fuse')){try{const w=im.naturalWidth,h=im.naturalHeight,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);const id=g.getImageData(0,0,w,h),d=id.data;let solid=true,dark=0;for(let i=3;i<d.length;i+=4)if(d[i]<250){solid=false;break;}
+    if((n.startsWith('fx-')&&!n.startsWith('fx-fuse'))||n.startsWith('nv-ev-')){try{const w=im.naturalWidth,h=im.naturalHeight,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);const id=g.getImageData(0,0,w,h),d=id.data;let solid=true,dark=0;for(let i=3;i<d.length;i+=4)if(d[i]<250){solid=false;break;}
       for(const q of [0,w-1,(h-1)*w,h*w-1]){const o=q*4;if(d[o]+d[o+1]+d[o+2]<90)dark++;}
       if(solid&&dark>=3){for(let i=0;i<d.length;i+=4){const m=Math.max(d[i],d[i+1],d[i+2]);if(m<3){d[i+3]=0;continue;}d[i+3]=m;const k=255/m;d[i]=Math.min(255,d[i]*k);d[i+1]=Math.min(255,d[i+1]*k);d[i+2]=Math.min(255,d[i+2]*k);}g.putImageData(id,0,0);done(c);return;}}catch(e){}}
     if(self.createImageBitmap)createImageBitmap(im).then(done,()=>done(im));else done(im);};
@@ -49,7 +49,9 @@ ART.put=(o,x,y,rot,al,sx,sy)=>{if(!o)return false;if(al!=null)ctx.globalAlpha=al
 ART.d=(n,w,x,y,rot,al)=>ART.put(ART.sp(n,w),x,y,rot,al);
 /* W34 (ASSETS-NEEDED-2.md): a picture only when the id is REAL art listed in media/ready.json (ART.rd, shapes.js), else false = the caller draws its code shape. fx-w34-* are light on black (keyed in ART.load) and go on additively */
 ART.img=id=>ART.rd&&ART.rd.has(id+'.webp')&&ART.bm[id]||null;
-ART.pic=(id,w,x,y,rot,al)=>{if(!ART.img(id))return false;const o=ART.sp(id,w);if(!o)return false;if(id.startsWith('fx-')){ctx.save();ctx.globalCompositeOperation='lighter';ART.put(o,x,y,rot,al);ctx.restore();return true;}return ART.put(o,x,y,rot,al);};
+ART.pic=(id,w,x,y,rot,al)=>{if(!ART.img(id))return false;const o=ART.sp(id,w);if(!o)return false;if(id.startsWith('fx-')||id.startsWith('nv-ev-')){ctx.save();ctx.globalCompositeOperation='lighter';ART.put(o,x,y,rot,al);ctx.restore();return true;}return ART.put(o,x,y,rot,al);};
+/* a listed picture stretched to w x h (centred on x,y, rotated by rot): telegraph lines, columns and beams; false = the caller draws its code shape. fx- ids go on additively */
+ART.span=(id,x,y,w,h,rot,al)=>{const b=ART.img(id);if(!b)return false;ctx.save();if(id.startsWith('fx-')||id.startsWith('nv-ev-'))ctx.globalCompositeOperation='lighter';if(al!=null)ctx.globalAlpha=al;ctx.translate(x,y);if(rot)ctx.rotate(rot);ctx.drawImage(b,-w/2,-h/2,w,h);ctx.restore();return true;};
 /* sprite with a hit flash on top: fl = a flash is on (colour col, strength a) */
 ART.dflash=(n,w,x,y,rot,fl,col,a)=>{const o=ART.sp(n,w);if(!o)return false;ART.put(o,x,y,rot);
   if(fl){const s=ART.sil(n,w,col||'#ffffff');if(s)ART.put(s,x,y,rot,a==null?.8:a);}return true;};

@@ -245,9 +245,9 @@ Read-only audit of what ships in `games/mainhattan-nightrun/` and whether the ga
 
 | id | in ready.json | ASSETS-NEEDED-2 priority / wiring | status | where |
 |---|---|---|---|---|
-| `ac-fire-gap` | no | pri 3, wiring H | UNREFERENCED |  |
+| `ac-fire-gap` | no | pri 3, wiring H | REFERENCED | anticamp.js:65 (sweep gap) |
 | `ac-flank-tell` | no | pri 1, wiring hooked W58b | REFERENCED | anticamp.js:62 |
-| `ac-flanker` | no | pri 1, wiring H | UNREFERENCED |  |
+| `ac-flanker` | no | pri 1, wiring H | REFERENCED | flankers.js:49 (diver) |
 | `boss-messe-waechter` | yes | - | REFERENCED | art.js:6 bossN -> art.js:111 |
 | `boss-tresor-wart` | yes | - | REFERENCED | art.js:6 bossN -> art.js:111 |
 | `bp-back` | no | pri 1, wiring hooked W58b | REFERENCED | bossplay.js:203 |
@@ -348,14 +348,14 @@ Read-only audit of what ships in `games/mainhattan-nightrun/` and whether the ga
 | `fx-shot-hv` | yes | - | REFERENCED | c.js:115 |
 | `fx-shot-perfect` | yes | - | REFERENCED | c.js:117 |
 | `fx-shot-std` | yes | - | REFERENCED | c.js:118 |
-| `fx-w34-ac-fire` | no | pri 1, wiring H | UNREFERENCED |  |
-| `fx-w34-ac-line` | no | pri 3, wiring H | UNREFERENCED |  |
+| `fx-w34-ac-fire` | no | pri 1, wiring H | REFERENCED | anticamp.js:65 (ART.span) |
+| `fx-w34-ac-line` | no | pri 3, wiring H | REFERENCED | anticamp.js:61,63 (ART.span) |
 | `fx-w34-bp-gravity` | no | pri 2, wiring hooked W58b | REFERENCED | bossplay.js:197 |
 | `fx-w34-bp-grid` | no | pri 1, wiring hooked W58b | REFERENCED | bossplay.js:198 |
 | `fx-w34-bp-medlink` | no | pri 1, wiring hooked W58b | REFERENCED | bossplay.js:205 |
 | `fx-w34-bp-zone` | no | pri 2, wiring hooked W58b | REFERENCED | bossplay.js:200 |
 | `fx-w34-elite-aura` | no | pri 1, wiring hooked W58b | REFERENCED | variants.js:109 |
-| `fx-w34-gk-medlink` | no | pri 2, wiring H | UNREFERENCED |  |
+| `fx-w34-gk-medlink` | no | pri 2, wiring H | REFERENCED | grit.js:59 (GRIT.link) |
 | `fx-w34-gk-shield` | no | pri 1, wiring hooked W58b | REFERENCED | grit.js:60 |
 | `fx-w34-rule-cash` | no | pri 2, wiring hooked W58b | REFERENCED | rules.js:128 |
 | `fx-w34-rule-gate` | no | pri 2, wiring hooked W58b | REFERENCED | rules.js:143 |
@@ -364,10 +364,10 @@ Read-only audit of what ships in `games/mainhattan-nightrun/` and whether the ga
 | `fx-w34-rule-portal` | no | pri 2, wiring hooked W58b | REFERENCED | rules.js:106 |
 | `fx-w34-rule-tide` | no | pri 2, wiring hooked W58b | REFERENCED | rules.js:113 |
 | `fx-w34-rule-well` | no | pri 2, wiring hooked W58b | REFERENCED | rules.js:60 |
-| `fx-w34-strike-col` | no | pri 1, wiring H | UNREFERENCED |  |
+| `fx-w34-strike-col` | no | pri 1, wiring H | REFERENCED | fair.js:96,98 (ART.span) |
 | `fx-w34-ui-ring-charge` | no | pri 2, wiring H | UNREFERENCED |  |
-| `fx-w34-ui-ring-empty` | no | pri 3, wiring H | UNREFERENCED |  |
-| `fx-w34-ui-ring-ready` | no | pri 2, wiring H | UNREFERENCED |  |
+| `fx-w34-ui-ring-empty` | no | pri 3, wiring H | TEMPLATE | abilities.js:99 (CSS .rgR / .rgE on the touch ring, set in c.js setRing) |
+| `fx-w34-ui-ring-ready` | no | pri 2, wiring H | TEMPLATE | abilities.js:99 (CSS .rgR / .rgE on the touch ring, set in c.js setRing) |
 | `gk-evasive` | no | pri 1, wiring hooked W58b | REFERENCED | grit.js:60 |
 | `gk-medic` | no | pri 1, wiring hooked W58b | REFERENCED | grit.js:62 |
 | `gk-plate` | no | pri 1, wiring hooked W58b | REFERENCED | grit.js:60 |
@@ -400,40 +400,40 @@ Read-only audit of what ships in `games/mainhattan-nightrun/` and whether the ga
 | `nv-tw-swift` | no | pri 3, wiring hooked W58b | REFERENCED | novelty.js:76 |
 | `nv-tw-tiny` | no | pri 3, wiring hooked W58b | REFERENCED | novelty.js:77 |
 | `rule-bounce` | no | pri 2, wiring hooked W58b | REFERENCED | rules.js:75 |
-| `rule-bounce-icon` | no | pri 3, wiring H | UNREFERENCED |  |
+| `rule-bounce-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
 | `rule-bumper` | no | pri 2, wiring A | REFERENCED | rules.js:160 |
-| `rule-bumper-icon` | no | pri 3, wiring H | UNREFERENCED |  |
-| `rule-cash-icon` | no | pri 3, wiring H | UNREFERENCED |  |
+| `rule-bumper-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
+| `rule-cash-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
 | `rule-cover` | no | pri 2, wiring A | REFERENCED | rules.js:152 |
-| `rule-cover-icon` | no | pri 3, wiring H | UNREFERENCED |  |
+| `rule-cover-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
 | `rule-echo` | no | pri 2, wiring hooked W58b | REFERENCED | rules.js:84 |
-| `rule-echo-icon` | no | pri 3, wiring H | UNREFERENCED |  |
-| `rule-gate-icon` | no | pri 3, wiring H | UNREFERENCED |  |
+| `rule-echo-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
+| `rule-gate-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
 | `rule-gold` | no | pri 2, wiring hooked W58b | REFERENCED | rules.js:101 |
-| `rule-gold-icon` | no | pri 3, wiring H | UNREFERENCED |  |
+| `rule-gold-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
 | `rule-hulls` | no | pri 2, wiring hooked W58b | REFERENCED | rules.js:91 |
-| `rule-hulls-icon` | no | pri 3, wiring H | UNREFERENCED |  |
+| `rule-hulls-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
 | `rule-hunter` | no | pri 2, wiring A | REFERENCED | rules.js:137 |
-| `rule-hunter-icon` | no | pri 3, wiring H | UNREFERENCED |  |
-| `rule-lane-icon` | no | pri 3, wiring H | UNREFERENCED |  |
+| `rule-hunter-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
+| `rule-lane-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
 | `rule-pads` | no | pri 2, wiring A | REFERENCED | rules.js:168 |
-| `rule-pads-icon` | no | pri 3, wiring H | UNREFERENCED |  |
-| `rule-pocket-icon` | no | pri 3, wiring H | UNREFERENCED |  |
-| `rule-portal-icon` | no | pri 3, wiring H | UNREFERENCED |  |
-| `rule-tide-icon` | no | pri 3, wiring H | UNREFERENCED |  |
-| `rule-well-icon` | no | pri 3, wiring H | UNREFERENCED |  |
-| `rx-bait` | no | pri 2, wiring H | UNREFERENCED |  |
+| `rule-pads-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
+| `rule-pocket-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
+| `rule-portal-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
+| `rule-tide-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
+| `rule-well-icon` | no | pri 3, wiring H | TEMPLATE | rules.js:33 -> uikit.js HINT.draw (rule card badge) |
+| `rx-bait` | no | pri 2, wiring H | TEMPLATE | react.js:129 (state tell, `rx-`+state) |
 | `rx-crown` | no | pri 3, wiring hooked W58b | REFERENCED | react.js:128 |
-| `rx-feint` | no | pri 2, wiring H | UNREFERENCED |  |
-| `rx-hunt` | no | pri 2, wiring H | UNREFERENCED |  |
-| `rx-press` | no | pri 2, wiring H | UNREFERENCED |  |
-| `rx-retreat` | no | pri 2, wiring H | UNREFERENCED |  |
+| `rx-feint` | no | pri 2, wiring H | TEMPLATE | react.js:129 (state tell, `rx-`+state) |
+| `rx-hunt` | no | pri 2, wiring H | TEMPLATE | react.js:129 (state tell, `rx-`+state) |
+| `rx-press` | no | pri 2, wiring H | TEMPLATE | react.js:129 (state tell, `rx-`+state) |
+| `rx-retreat` | no | pri 2, wiring H | TEMPLATE | react.js:129 (state tell, `rx-`+state) |
 | `rx-ring-gold` | no | pri 2, wiring hooked W58b | REFERENCED | react.js:127 |
 | `rx-ring-steel` | no | pri 2, wiring hooked W58b | REFERENCED | react.js:127 |
-| `rx-window` | no | pri 2, wiring H | UNREFERENCED |  |
-| `ship-drift` | yes | - | UNREFERENCED |  |
-| `ship-lancer` | yes | - | UNREFERENCED |  |
-| `ship-nova` | yes | - | UNREFERENCED |  |
+| `rx-window` | no | pri 2, wiring H | TEMPLATE | react.js:129 (state tell, `rx-`+state) |
+| `ship-drift` | yes | - | REFERENCED | art.js:8 shipN -> shapes.js:25 shipPortrait |
+| `ship-lancer` | yes | - | REFERENCED | art.js:8 shipN -> shapes.js:25 shipPortrait |
+| `ship-nova` | yes | - | REFERENCED | art.js:8 shipN -> shapes.js:25 shipPortrait |
 | `soon-boss-trophies` | yes | - | TEMPLATE | shapes.js:20 |
 | `soon-contracts` | yes | - | TEMPLATE | shapes.js:20 |
 | `soon-leaderboards` | yes | - | TEMPLATE | shapes.js:20 |
@@ -444,21 +444,21 @@ Read-only audit of what ships in `games/mainhattan-nightrun/` and whether the ga
 | `spr-boss-messe-waechter` | yes | - | REFERENCED | art.js:6 bossN -> art.js:111 |
 | `spr-boss-tresor-wart` | yes | - | REFERENCED | art.js:6 bossN -> art.js:111 |
 | `spr-en-leader` | yes | - | REFERENCED | ai.js:31 |
-| `spr-ship-drift` | yes | - | UNREFERENCED |  |
-| `spr-ship-lancer` | yes | - | UNREFERENCED |  |
-| `spr-ship-nova` | yes | - | UNREFERENCED |  |
+| `spr-ship-drift` | yes | - | REFERENCED | art.js:8 shipN -> art.js:111 |
+| `spr-ship-lancer` | yes | - | REFERENCED | art.js:8 shipN -> art.js:111 |
+| `spr-ship-nova` | yes | - | REFERENCED | art.js:8 shipN -> art.js:111 |
 | `ui-dash-icon` | no | pri 1, wiring A | TEMPLATE | abilities.js:99 |
 | `ui-emp-icon` | no | pri 1, wiring A | TEMPLATE | abilities.js:99 |
 | `var-elite-diamond` | no | pri 2, wiring hooked W58b | REFERENCED | variants.js:110 |
 | `var-pip` | no | pri 3, wiring hooked W58b | REFERENCED | variants.js:108 |
-| `wp-drone` | yes | - | UNREFERENCED | wp-*: labassets.js:145 parses the name only, no draw path |
-| `wp-flame` | yes | - | UNREFERENCED | wp-*: labassets.js:145 parses the name only, no draw path |
-| `wp-frost` | yes | - | UNREFERENCED | wp-*: labassets.js:145 parses the name only, no draw path |
-| `wp-rail` | yes | - | UNREFERENCED | wp-*: labassets.js:145 parses the name only, no draw path |
-| `wp-shell` | yes | - | UNREFERENCED | wp-*: labassets.js:145 parses the name only, no draw path |
-| `wp-storm` | yes | - | UNREFERENCED | wp-*: labassets.js:145 parses the name only, no draw path |
-| `wp-wave` | yes | - | UNREFERENCED | wp-*: labassets.js:145 parses the name only, no draw path |
-| `wp-well` | yes | - | UNREFERENCED | wp-*: labassets.js:145 parses the name only, no draw path |
+| `wp-drone` | yes | - | TEMPLATE | g.js:370 and wpx.js:159 (`wp-`+id, weapon cards) |
+| `wp-flame` | yes | - | TEMPLATE | g.js:370 and wpx.js:159 (`wp-`+id, weapon cards) |
+| `wp-frost` | yes | - | TEMPLATE | g.js:370 and wpx.js:159 (`wp-`+id, weapon cards) |
+| `wp-rail` | yes | - | TEMPLATE | g.js:370 and wpx.js:159 (`wp-`+id, weapon cards) |
+| `wp-shell` | yes | - | TEMPLATE | g.js:370 and wpx.js:159 (`wp-`+id, weapon cards) |
+| `wp-storm` | yes | - | TEMPLATE | g.js:370 and wpx.js:159 (`wp-`+id, weapon cards) |
+| `wp-wave` | yes | - | TEMPLATE | g.js:370 and wpx.js:159 (`wp-`+id, weapon cards) |
+| `wp-well` | yes | - | TEMPLATE | g.js:370 and wpx.js:159 (`wp-`+id, weapon cards) |
 
 ## 3. Music cues (games-src/nightrun/music-treblo, 82 mp3)
 
@@ -550,7 +550,7 @@ Read-only audit of what ships in `games/mainhattan-nightrun/` and whether the ga
 ## Counts
 
 - **Strip sheets:** 222 wired / 7 unwired of 229 (all 229 are in ready.json).
-- **Other media ids:** 69 referenced referenced by literal or preload list, 101 by family template (per id not verified), 44 unreferenced, of 214 ids.
+- **Other media ids:** 81 referenced by literal or preload list, 132 by family template (per id not verified), 1 unreferenced (`fx-w34-ui-ring-charge`), of 214 ids. Re-counted by hand after W84 (was 69 / 101 / 44). The 5 `nv-ev-*` banners (not in this table) are now drawn by `c.js` banner via `G.banner.ev`; `pk-ammo/spin` sheet is drawn on the on-foot ammo pickup (`foot.js:464`).
 - **Music cues:** 26 referenced by audio code / 56 not, of 82. Shipped to games/music: 0 of 82 (only the 11 original tracks are there). Listed in tracks.json: 0 of 82.
 
 ## Top 20 unwired items (by importance)
@@ -566,14 +566,16 @@ Read-only audit of what ships in `games/mainhattan-nightrun/` and whether the ga
 9. **Tutorial music:** `school-a/b`. Unreferenced.
 10. **Stingers:** `st-boss-in`, `st-clear`, `st-fail`, `st-perfect`, `st-phase`, `st-tierup1-3`, `st-newbest`, `st-unlock` (20 files). `a.js:119` reads a `stingers` list from tracks.json, which does not exist, so none load. `st-newbest` and `st-unlock` have no caller.
 11. **Shipped, unused: wpn beam sheets** (`wpn-arc/laser/orbit/storm/wave/well` `beam`, 6 sheets). Deliberately unwired per `art.js:210`.
-12. **Shipped, unused: `pk-ammo/spin`.** `SPR.PK` (art.js:219) and `ART.pkN` (art.js:11) have no ammo pickup.
-13. **Shipped, unused: ship stills `ship-drift/lancer/nova` and `spr-ship-drift/lancer/nova` (6 files).** Their sheets are wired, but the stills are not in `ART.shipN` (art.js:8) and nothing else draws them.
-14. **Shipped, unused: `wp-*` weapon panel stills** (8 files: drone, flame, frost, rail, shell, storm, wave, well). Only `labassets.js:145` parses the name.
-15. **Priority 1, not painted and not hooked: `ac-flanker`.** Needs an `ART.pic` call; `anticamp.js` uses `ac-flank-tell` instead.
-16. **Priority 1, not painted: forge icons `fg-h-*` / `fg-k-*` (17 files).** Reached by the template at `forge.js:124`, so they appear once painted and ingested.
-17. **Priority 1, not painted: `ui-dash-icon`, `ui-emp-icon`.** Template at `abilities.js:99`; skipped while absent from ready.json.
-18. **Priority 1, not hooked: `fx-w34-ac-fire`, `fx-w34-strike-col`.** No `ART.pic` call anywhere.
-19. **Priority 2, not hooked: `rx-bait`, `rx-feint`, `rx-hunt`, `rx-press`, `rx-retreat`, `rx-window`** (6 files). No references.
-20. **Priority 3, not hooked: 15 `rule-*-icon` banner icons.** The game draws the `rule-bounce`, `rule-echo` and `rule-hulls` stills; the icon ids are not used.
+12. **`pk-ammo/spin`: wired (W84).** The space game has no ammo, but the on-foot ammo pickup exists (`foot.js:190`, `footstage.js:21`); `foot.js:464` now plays the sheet there when `RET.sprites` is on, else the glyph circle.
+13. **Ship stills `ship-drift/lancer/nova`, `spr-ship-*`: wired (W84).** Added to `ART.shipN` (`art.js:8`), so the garage portrait (`shapes.js:25`) and the preload (`art.js:111`) use them.
+14. **`wp-*` weapon stills: already wired** (`g.js:370` pit-stop sheet, `wpx.js:159` garage WEAPONS tab, `draw.js:19`); the first audit missed the `'wp-'+id` builders.
+15. **`ac-flanker`: wired (W84).** Drawn on the `diver` flanker (`flankers.js:49`), code wedge when absent.
+16. **Forge icons `fg-h-*` / `fg-k-*` (17 files)**: already reached by the template at `forge.js:124`; they appear once painted and ingested (not in ready.json yet).
+17. **`ui-dash-icon`, `ui-emp-icon`**: already wired by the template at `abilities.js:99`; they appear once painted and ingested. Ring states `ready` / `empty` now wired as CSS rings; `fx-w34-ui-ring-charge` left on purpose (the charging ring is the live progress arc; an art ring would hide the charge level).
+18. **`fx-w34-ac-fire`, `fx-w34-strike-col`, `fx-w34-ac-line`, `ac-fire-gap`, `fx-w34-gk-medlink`: wired (W84)** (anticamp.js, fair.js, grit.js). The medic beam gets a thin green line as its shape.
+19. **`rx-bait/feint/hunt/press/retreat/window`: wired (W84)**, a 1.4 s tell above the enemy when its state changes (art only, no shape: the existing rings are the code tell).
+20. **15 `rule-*-icon` badges: wired (W84)** on the rule card (the HINT box, left side); `rule-bounce/echo/hulls` stills are the fallback for those three.
+
+Test: `nightrun/arthook-test.js` (each hooked id draws when listed in ready.json and the shape otherwise).
 
 Generated from the parts files at commit time; re-run after changes.

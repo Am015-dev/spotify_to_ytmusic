@@ -94,7 +94,7 @@ NR.on('tick',dt=>{if(!MM.live()){MM.col=null;MM.buf=[];MM.n=0;MM.still=0;MM.anc=
     if(MM.pre!==null){ctx.globalAlpha=SET.reduce?.4:.25+.2*Math.sin(t*9);ctx.strokeStyle='#ff7080';ctx.lineWidth=1.5;ctx.setLineDash([3,12]);ctx.beginPath();ctx.moveTo(MM.pre,0);ctx.lineTo(MM.pre,H);ctx.stroke();ctx.setLineDash([]);}ctx.restore();}
   const c=MM.col;if(!c)return;const w=c.w||MM.COL;
   ctx.save();ctx.globalCompositeOperation='lighter';
-  if(c.fire>0){ctx.globalAlpha=.95;ctx.fillStyle='#ffffff';ctx.fillRect(c.x-w*.5,0,w,H);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}
+  if(c.fire>0){if(!ART.span('fx-w34-strike-col',c.x,H/2,w*2,H,0,.95)){ctx.globalAlpha=.95;ctx.fillStyle='#ffffff';ctx.fillRect(c.x-w*.5,0,w,H);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}}
   else{const lock=c.t<(c.tl&&MM.s2()?BT.spb:.4),pulse=SET.reduce?1:MM.s2()&&c.tl?(bpos()%1<.5?1:.55):Math.floor(t*(lock?18:8))%2?1:.6;ctx.globalAlpha=(lock?.9:.5)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);
-    for(const dx of[-w,w]){ctx.beginPath();ctx.moveTo(c.x+dx,0);ctx.lineTo(c.x+dx,H);ctx.stroke();}ctx.setLineDash([]);ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}
+    for(const dx of[-w,w]){ctx.beginPath();ctx.moveTo(c.x+dx,0);ctx.lineTo(c.x+dx,H);ctx.stroke();}ctx.setLineDash([]);if(!ART.span('fx-w34-strike-col',c.x,H/2,w*2,H,0,(lock?.5:.28)*pulse)){ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}}
   ctx.restore();};}

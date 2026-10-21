@@ -30,7 +30,7 @@ const RU=window.RU={st:null,stat:{seen:{},use:{},card:0,obj:0},TEL:.8,
       if(!m.on){m.on=1;m.age=0;D.init(m);this.stat.obj++;
         const nw=this.seen(m.id,m.tw);this.stat.seen[m.id+(m.tw?'~tw':'')]=1;NR.emit('rule',{id:m.id+(m.tw?'~tw':''),n:D.n});
         if(S.list.length>1&&m===S.list[S.list.length-1])NR.emit('rule',{id:S.list.map(x=>x.id+(x.tw?'~tw':'')).join('+')});
-        if(nw||m.tw){const t=(m.tw?'TWIST: ':'NEW: ')+D.n+' · '+(m.tw?D.tt:D.t);if(window.HINT){if(HINT.show(t,{t:3.2,col:D.c}))this.stat.card++;}else hintShow(t,3);}}
+        if(nw||m.tw){const t=(m.tw?'TWIST: ':'NEW: ')+D.n+' · '+(m.tw?D.tt:D.t);if(window.HINT){if(HINT.show(t,{t:3.2,col:D.c,ic:ART.img('rule-'+m.id+'-icon')?'rule-'+m.id+'-icon':['bounce','echo','hulls'].includes(m.id)?'rule-'+m.id:null}))this.stat.card++;}else hintShow(t,3);}}
       if(m.age>=this.TEL)D.tick(m,dt);}},
   draw(){const S=this.st;if(!RET.rules||!S||!this.on())return;
     for(const m of S.list){if(!m.on)continue;const D=this.T[m.id],a=Math.min(1,m.age/this.TEL);ctx.save();
