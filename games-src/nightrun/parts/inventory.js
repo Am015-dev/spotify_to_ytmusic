@@ -1,3 +1,6 @@
+// PURPOSE: inventory + loadout screen (Garage FORGE tab)
+// FLAG: forge (?forge=0)
+// TEST: forge-test.js
 /* ---------- INVENTORY + LOADOUT (Garage tab FORGE, flag RET.forge; forge.js holds the data and the actions). Phone first: tiles >= 44 px, text >= 14 px.
    Tap an item, then tap a slot (or use the item's buttons); tap a slot first to filter the grid to what fits it. 4 slots: 2 weapons (weapon or hybrid,
    with 2 / 1 mod sockets), 1 ability core, 1 passive. 3 named presets; the pit stop shows a quick preset row. */

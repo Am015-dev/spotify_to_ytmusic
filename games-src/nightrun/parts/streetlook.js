@@ -1,3 +1,6 @@
+// PURPOSE: on-foot street look on phones: one world scale, portrait layout, 3-layer parallax, clip-safe popups, grouped HUD
+// FLAG: streetlook (?streetlook=0)
+// TEST: streetlook-test.js
 /* ---------- STREETLOOK: the on-foot street, art-directed by numbers (owner, 21 Oct 2026, on an iPhone: the field used 65% of the screen, tiny actors, giant floating props, clipped popups).
    Flag RET.streetlook (default ON; ?streetlook=0 = the old look exactly: foot.js draws and lays out as before). Test: nightrun/streetlook-test.js (machine gate on the draw calls).
    One world scale K = 0.225 x visible field height / 64 (Kai standing): a standing character is >= 22% of the field on every screen. Gameplay boxes do not change: every actor, pickup, shot and effect
@@ -122,12 +125,13 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
     if(P.pw.shield){c.strokeStyle='#5ad1ff';c.lineWidth=2+P.pw.shield.lv;c.beginPath();c.arc(P.x,P.y-34,44,0,6.283);c.stroke();}
     if(P.dashIF>0){c.fillStyle='#19e3ff33';c.fillRect(P.x-24-P.facing*20,P.y-60,48,58);}
     P._xa=IN.kaiX(P);ART.fE=P;IN.drawWho(c,'kai',IN.ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,S.feverT>0?'#ffd23a':'#19e3ff',P.crouch);ART.fE=null;
-    if(P.shotT>0&&F.WEAPONS[P.w].kind!=='arc'){const a=P.aim;c.fillStyle='#fff';c.beginPath();c.arc(P.x+Math.cos(a)*28,P.y-(P.crouch?26:44)+Math.sin(a)*20,5,0,6.283);c.fill();}c.restore();}
-  for(const b of S.pb){at(c,b.x,b.y,K);c.fillStyle=b.c;if(b.kind==='fire'){c.globalAlpha=Math.max(0,b.life*2);c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.globalAlpha=1;}else if(b.kind==='rkt'){c.fillRect(b.x-8,b.y-3,16,6);}else{c.fillRect(b.x-6,b.y-2,12,4);}c.restore();}
-  for(const g of S.bombsL){at(c,g.x,g.y,K);c.fillStyle='#ffb020';c.beginPath();c.arc(g.x,g.y,7,0,6.283);c.fill();c.restore();}
+    if(P.shotT>0){const a=P.aim,mx=P.x+Math.cos(a)*28,mY=P.y-(P.crouch?26:44)+Math.sin(a)*20;if(!(window.AH&&AH.ftMuz(c,P.w,mx,mY,a))&&F.WEAPONS[P.w].kind!=='arc'){c.fillStyle='#fff';c.beginPath();c.arc(mx,mY,5,0,6.283);c.fill();}}c.restore();}
+  for(const b of S.pb){at(c,b.x,b.y,K);if(window.AH&&AH.ftBul(c,b)){c.restore();continue;}c.fillStyle=b.c;if(b.kind==='fire'){c.globalAlpha=Math.max(0,b.life*2);c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.globalAlpha=1;}else if(b.kind==='rkt'){c.fillRect(b.x-8,b.y-3,16,6);}else{c.fillRect(b.x-6,b.y-2,12,4);}c.restore();}
+  for(const g of S.bombsL){at(c,g.x,g.y,K);if(window.AH&&AH.ftDraw(c,'fx-ft-grenade',g.x,g.y,22,S.time*7)){c.restore();continue;}c.fillStyle='#ffb020';c.beginPath();c.arc(g.x,g.y,7,0,6.283);c.fill();c.restore();}
   for(const b of S.eb){at(c,b.x,b.y,K);if(RET.read&&window.READ)READ.footEb(c,b);else{c.fillStyle=b.c;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.fillStyle='#fff';c.beginPath();c.arc(b.x,b.y,b.r*.45,0,6.283);c.fill();}c.restore();}
   for(const f of S.fx){c.globalAlpha=Math.min(1,f.l*3);
-    if(f.arc){c.strokeStyle=f.c;c.lineWidth=3*K;c.beginPath();f.arc.forEach(([x,y],i)=>{const j=i?IN.ftRnd(-6,6):0;i?c.lineTo(x+j,my(y)+j):c.moveTo(x,my(y));});c.stroke();}
+    if(f.pic&&window.AH){at(c,f.x,f.y,K);AH.ftFx(c,f);c.restore();continue;}
+    if(f.arc&&window.AH&&AH.ftArc(c,Object.assign({},f,{arc:f.arc.map(([x,y])=>[x,my(y)])}))){}else if(f.arc){c.strokeStyle=f.c;c.lineWidth=3*K;c.beginPath();f.arc.forEach(([x,y],i)=>{const j=i?IN.ftRnd(-6,6):0;i?c.lineTo(x+j,my(y)+j):c.moveTo(x,my(y));});c.stroke();}
     else{at(c,f.x,f.y,K);if(f.slash){c.strokeStyle=f.c;c.lineWidth=4;c.beginPath();c.arc(f.x,f.y,f.w*.5,-1.2,1.2);c.stroke();}
       else if(f.ring){c.strokeStyle=f.c;c.lineWidth=4;c.beginPath();c.arc(f.x,f.y,f.r*(1-f.l/f.m*.6),0,6.283);c.stroke();}
       else{c.fillStyle=f.c;c.fillRect(f.x-f.r/2,f.y-f.r/2,f.r,f.r);}c.restore();}}c.globalAlpha=1;

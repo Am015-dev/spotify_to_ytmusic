@@ -1,3 +1,6 @@
+// PURPOSE: weapon forge: combine, sockets, presets (data, actions)
+// FLAG: forge (?forge=0)
+// TEST: forge-test.js
 /* ---------- WEAPON FORGE (flag RET.forge, default ON; ?forge=0 = the old weapons exactly). Owner, 20 Oct 2026: "weapons maybe can be combined and users can
    organize their inventories ... the game needs to be more creative".
    - HYBRIDS: two owned weapons + 3 scrap + 120 Neon forge a named hybrid from the recipe table FGR (one row per pair; add rows to extend). A hybrid sits in a

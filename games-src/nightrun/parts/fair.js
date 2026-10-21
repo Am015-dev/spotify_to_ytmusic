@@ -1,3 +1,6 @@
+// PURPOSE: scale round 2, must-move column strike, strike follow-up
+// FLAG: scale2 (?scale2=0), mustmove (?mustmove=0), strike2 (?strike2=0)
+// TEST: scale2-test.js
 /* ---------- scale, round 2 = parts/fair.js (flag RET.scale2; ?scale2=0 = the state after round 1). BALANCE.md "Power scale, round 2". ----------
    Owner, 17 Oct 2026: on Legend a maxed ship parks, its missiles kill everything, it hops between two spots when bullets come, and bosses are trivial.
    A. auto-aim: homing shots only lock on a foe that is on screen, past its entry grace and inside a forward cone, after a short lock-on delay, and a locked shot

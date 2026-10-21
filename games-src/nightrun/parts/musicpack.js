@@ -1,3 +1,6 @@
+// PURPOSE: polish music cues played by context
+// FLAG: musicpack (?musicpack=0)
+// TEST: musicpack-test.js
 /* ---------- MUSICPACK: the 2026-10 polish cues played by context (flag RET.musicpack, default on; ?musicpack=0 = the old music, byte for byte) ----------
    The cues ADD to the old songs, they never replace them. Setting "Music" (SET.mus): mix (default) = old and new together / classic = the old music only (= ?musicpack=0) / new = the pack cues only.
    Mix: stage pool = old and new songs interleaved, a seeded shuffle per run (alternating families, never one of the last 2 songs); boss = old track or boss-dN (~b) by turns; endless = endless / endless2 / endless3 rotate;

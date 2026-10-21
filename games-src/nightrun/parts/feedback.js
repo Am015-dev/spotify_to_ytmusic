@@ -1,3 +1,6 @@
+// PURPOSE: FUN / SAME AGAIN / BORING tap at run end
+// FLAG: feedback (?feedback=0)
+// TEST: feedback-test.js
 /* ---------- FEEDBACK: one optional tap at the end of a run (FUN / SAME AGAIN / BORING). Flag RET.feedback (?feedback=0 = nothing shown, nothing stored).
    Answers go to localStorage 'mnr_fb' (newest last, capped at 500): {stage, mode, diff, wp, sec, ts}. The STATS sheet lists the counts per stage and has a COPY button for the JSON.
    The strip sits under the buttons of #over / #stres, so it never delays or covers NEXT STAGE / RETRY; it is shown once per run. ---------- */

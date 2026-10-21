@@ -1,3 +1,6 @@
+// PURPOSE: title diet + CONTINUE, 14 px type floor
+// FLAG: title (?title=0), type (?type=0)
+// TEST: ret-title-test.js
 /* ---------- B25 title diet + CONTINUE, B26 type floor (POLISH.md). Flags RET.title and RET.type (ret.js); flags off = the old title.
    Title: one big PLAY / CONTINUE, ENDLESS + DAILY, GARAGE + MENU, and the daily/weekly status chip (#retTt, drawn by ret.js).
    MENU (#mnMore) holds the old buttons, same ids: storyBtn (stage map), wkBtn (weekly run), labBtn, wpBtn, ckB (checklist), tutBtn (Flight School),
