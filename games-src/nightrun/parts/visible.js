@@ -1,3 +1,6 @@
+// PURPOSE: enemies live long enough to be seen and fought
+// FLAG: vis (?vis=0)
+// TEST: visible-test.js
 /* ---------- VISIBLE: enemies live on screen long enough to be seen, read and fought (flag RET.vis, default ON; ?vis=0 = the old rules). Test: nightrun/visible-test.js. BALANCE.md "Visible".
    1. on-screen floor per kind (DMG.minLife asks VIS.ml): a foe cannot lose its hull faster than this, whatever hits it (spread, chain, arc, homing, blades),
       so a maxed area weapon caps out at hull/second per target instead of deleting the screen. The old floor shrank to .65x on late stages; this one does not.

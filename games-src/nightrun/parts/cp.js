@@ -1,3 +1,6 @@
+// PURPOSE: checkpoints with grace on long stages
+// FLAG: cp (?cp=0)
+// TEST: ret-cp-test.js
 /* ---------- CHECKPOINTS WITH GRACE (flag RET.cp, off with ?cp=0 = exactly the old game). Test: ret-cp-test.js ----------
    A long stage (>= 150 s: Classic length, a boss with a long approach) gets a checkpoint at about 1/3 and 2/3, bar-aligned, never inside a boss fight and never in the last 15 s.
    Passing one snapshots the run (score, kills, perks, weapons, Neon). Dying after one offers RESUME FROM CHECKPOINT on the run-end screen (one resume per checkpoint, 2 per stage).

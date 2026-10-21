@@ -1,3 +1,6 @@
+// PURPOSE: LAB, complete: every test menu entry
+// FLAG: labfull (?labfull=0)
+// TEST: labfull-test.js
 /* ---------- LAB, COMPLETE (flag RET.labfull, default ON; ?labfull=0 = the Lab exactly as before). Test: nightrun/labfull-test.js.
    Owner, 21 Oct 2026: "make sure everything can be shown in the lab so I can evaluate any bug."
    ONE REGISTRY: LAB.register(group, id, {name, spawn(ctx), reset, info:{role,hp,tele,flags,tip}}). Every content layer goes through it, and labfullScan() walks the

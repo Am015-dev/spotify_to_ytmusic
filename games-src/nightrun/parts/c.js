@@ -23,7 +23,7 @@ function tierMeter(cx,by,k){const T=tierOf(C.n),col=TIERC[T-1],w=262*k,h=40*k,x0
    The numbers are still logged for the tests. */
 const HUDMIN=()=>SET.hud!=='full';
 const FPSOK=()=>!!SET.fpsc&&(/[?&]test=1/.test(location.search)||!touchUI);   // the FPS counter: PC any time; on a phone only in test mode (?test=1)
-function setRing(b,f,c,n){const key=f.toFixed(2)+'|'+n;if(!b||b._k===key)return;b._k=key;b.classList.toggle('rgR',f>=.999&&!!n);b.classList.toggle('rgE',!n);b.style.setProperty('--f',f);b.style.setProperty('--rc',c);b.dataset.n=n;}   // charge ring + count on a touch button
+function setRing(b,f,c,n){const key=f.toFixed(2)+'|'+n;if(!b||b._k===key)return;b._k=key;b.classList.toggle('rgR',f>=.999&&!!n);b.classList.toggle('rgE',!n);b.classList.toggle('rgC',f<.999&&!!n);b.style.setProperty('--f',f);b.style.setProperty('--rc',c);b.dataset.n=n;}   // charge ring + count on a touch button
 function hudMin(c,k,x,y,t){try{Object.assign(HUDLOG,{x:HUDX.vals()});}catch(e){}
   const parts=[];if(SH.sh>0)parts.push(['#19e3ff','◆'+SH.sh]);if(TP.revLeft>0)parts.push(['#ff2d95','+'+TP.revLeft]);if(!parts.length)return;
   c.save();c.font=`700 ${13*k}px "Share Tech Mono",monospace`;c.textAlign='left';let xx=x;for(const [col,txt] of parts){c.fillStyle=col;c.fillText(txt,xx,y);xx+=c.measureText(txt).width+10*k;}c.restore();}
@@ -150,7 +150,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   ctx.textAlign='center';{const tf=ctx.getTransform(),u=Math.hypot(tf.a,tf.b)*(ctx.canvas.getBoundingClientRect().width/ctx.canvas.width||1);ctx.font=`700 ${Math.max(13,11.5/Math.max(.05,u)).toFixed(1)}px "Chakra Petch",sans-serif`;}for(const f of G.fl){ctx.globalAlpha=Math.min(1,f.l*2);ctx.fillStyle=f.c;wtxt(f.txt,f.x,f.y);}ctx.globalAlpha=1;
   if(PT)SH.ring(ctx,t);
   ctx.restore();
-  if(G.empT>0&&ART.wave(P.x,P.y,(0.6-G.empT)*1400,G.empT*2.2)){}
+  if(G.empT>0&&(AH.pic('fx-pw-bomb-pulse',(0.6-G.empT)*2800,P.x,P.y,0,Math.min(1,G.empT*2.2))||ART.wave(P.x,P.y,(0.6-G.empT)*1400,G.empT*2.2))){}
   else if(G.empT>0){ctx.strokeStyle='#ffb020';ctx.lineWidth=6*G.empT;ctx.beginPath();ctx.arc(P.x,P.y,(0.6-G.empT)*1400,0,7);ctx.stroke();}
   if(G.flash>0){ctx.fillStyle=`rgba(255,255,255,${G.flash*.5})`;ctx.fillRect(0,0,W,H);}
   if(G.glitch>0){for(let i=0;i<6;i++){const y=rnd(0,H),h=rnd(4,26);ctx.drawImage(wcv,0,y*S,wcv.width,h*S,rnd(-20,20),y,W,h);}ctx.fillStyle=`rgba(255,40,80,${G.glitch*.25})`;ctx.fillRect(0,0,W,H);}

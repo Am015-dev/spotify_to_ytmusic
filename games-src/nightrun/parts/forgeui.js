@@ -1,3 +1,6 @@
+// PURPOSE: forge screen, step by step
+// FLAG: forgeui (?forgeui=0)
+// TEST: forgeui-test.js
 /* ---------- FORGE SCREEN, step by step (flag RET.forgeui, default ON; ?forgeui=0 = the old inventory.js screen). Owner, 21 Oct 2026: "Forge of weapons is very
    confusing, needs better user interface." Same rules, costs and data as forge.js (24 hybrids, 12 mods, cores, passives, presets); this file only draws.
    Three zones: FORGE (slot A + slot B = output, live preview, MERGE, UNDO), INVENTORY (big cards, chips: type / equipped / sort by tier), LOADOUT (2 weapon

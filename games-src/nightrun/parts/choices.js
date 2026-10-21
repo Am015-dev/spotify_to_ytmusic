@@ -1,3 +1,6 @@
+// PURPOSE: build pressure and real choices (default OFF)
+// FLAG: build2 (OFF; ?build2=1)
+// TEST: choices-test.js
 /* ---------- BUILD PRESSURE + REAL CHOICES (flag RET.build2, default off for now; ?build2=1 = on). BALANCE.md "Build pressure + choices". ----------
    1. Hard tiers: a ship that hugs the back line (mean x under 125 px over ~3 s) is flanked: telegraphed lane shots from behind and drops from the top or
       bottom edge at its column. The rate grows with the power score above what the stage expects (SC.f), so a maxed ship that camps is punished and a fresh

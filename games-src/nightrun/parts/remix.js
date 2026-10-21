@@ -1,3 +1,6 @@
+// PURPOSE: each run plays a different seeded cut of the script
+// FLAG: remix (?remix=0)
+// TEST: remix-test.js
 /* ---------- remix.js: every run plays a different cut of the stage script (owner 20 Oct 2026: enemies "very predictable and repeatable"). Flag RET.remix (default on); ?remix=0 = the old fixed scripts (no dice drawn).
    Per run one private seeded stream (one GR draw at the stage start, so daily / ?seed= runs stay reproducible) remixes the stage's VARY plan:
      ORDER    the free moments are shuffled among their slots; the intro, the order and timing of everything in the first 30 s (those moments only swap for an equal or cheaper equivalent), the set piece and the breathers stay where they are

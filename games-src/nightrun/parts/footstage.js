@@ -1,3 +1,6 @@
+// PURPOSE: the finished on-foot stage (7 sections, Warden gate)
+// FLAG: footstage (?footstage=0)
+// TEST: footstage-test.js
 /* ---------- FOOTSTAGE: the finished on-foot stage (flag RET.footstage, default ON; ?footstage=0 = the street1 mock exactly: nothing here runs). Test: nightrun/footstage-test.js.
    Owner, 21 Oct 2026: "include ... on-foot enemies for on-foot stages (same as the fly stages difficulty will increase gradually); one on foot stage for start, there is already a mock."
    Stage 'zeil' (FOOT.main, the MENU button opens it): 7 sections + the boss arena, a checkpoint at the start of every section, a progress bar on the road strip.

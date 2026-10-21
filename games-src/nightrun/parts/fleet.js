@@ -1,3 +1,6 @@
+// PURPOSE: enemy warships in the fly stages
+// FLAG: fleet (?fleet=0)
+// TEST: fleet-test.js
 /* ---------- fleet.js: four enemy warships in the fly stages (owner, 21 Oct 2026: "include enemy ships ... same as the fly stages difficulty will increase gradually").
    Flag RET.fleet, default ON; ?fleet=0 = the game as it was (no fleet waves, no extra dice).
    INTERCEPTOR (story stage 6+): fast and fragile. Strafes on a station >= 4 s firing aimed pairs, then shows its dive line for .7 s (kinked where it will swerve),
