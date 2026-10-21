@@ -427,7 +427,7 @@ function bossUpdate(e,dt,d){
   if(rotMode&&!e.sub)UIK.portraitSwap(e);                // turned to portrait during the fight: a boss without a road changes to its flyer
   const mv=rotMode?'air':UIK.moveOf(e);if(mv!=='air')UIK.bossMove(e,dt,mv);
   else if(e.x>bossX()){e.x-=110*dt;e.y=H/2-20;return;}
-  else e.y=H/2-20+Math.sin(e.t*.7)*150;
+  else e.y=H/2-20+Math.sin(e.t*.7)*(window.RET&&RET.first30?55:150);   // first30: the boss stays in the centre lane
   for(const l of e.lasers){l.t+=dt;if(l.t>2*BT.spb&&l.t<3.1*BT.spb&&!G.dead){const vx=Math.cos(l.a),vy=Math.sin(l.a),px=P.x-l.x,py=P.y-l.y,pr=px*vx+py*vy;
       if(pr>0&&Math.abs(px*vy-py*vx)<9)hurt();}}
   e.lasers=e.lasers.filter(l=>l.t<3.1*BT.spb);}

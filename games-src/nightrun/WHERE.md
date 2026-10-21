@@ -35,7 +35,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | reward | reward RWD 14-54 |  |  | reward |  |
 | build2! | choices CHO.tick 28-61 |  |  | choices | BALANCE |
 | bossmoves | bossmoves vd 98-178 |  |  | bossmoves |  |
-| bossvis | bossvis BV.over 38-82 |  |  | bossvis |  |
+| bossvis,first30 | bossvis BV.over 38-89 |  |  | bossvis |  |
 | pw3 | powlevels PW3 36-188 | power,a |  | ret-pw3 |  |
 | abil | abilities ABIL 24-101 | a,art |  | abil |  |
 | forge | forge FG 65-183 |  |  | forge |  |

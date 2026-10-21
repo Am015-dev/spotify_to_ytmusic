@@ -1213,7 +1213,7 @@ function bossUpdate(e,dt,d){
   if(rotMode&&!e.sub)UIK.portraitSwap(e);                // turned to portrait during the fight: a boss without a road changes to its flyer
   const mv=rotMode?'air':UIK.moveOf(e);if(mv!=='air')UIK.bossMove(e,dt,mv);
   else if(e.x>bossX()){e.x-=110*dt;e.y=H/2-20;return;}
-  else e.y=H/2-20+Math.sin(e.t*.7)*150;
+  else e.y=H/2-20+Math.sin(e.t*.7)*(window.RET&&RET.first30?55:150);   // first30: the boss stays in the centre lane
   for(const l of e.lasers){l.t+=dt;if(l.t>2*BT.spb&&l.t<3.1*BT.spb&&!G.dead){const vx=Math.cos(l.a),vy=Math.sin(l.a),px=P.x-l.x,py=P.y-l.y,pr=px*vx+py*vy;
       if(pr>0&&Math.abs(px*vy-py*vx)<9)hurt();}}
   e.lasers=e.lasers.filter(l=>l.t<3.1*BT.spb);}
@@ -1332,8 +1332,13 @@ function bossPaint(e,t,fl,c){const ak=ART.artK(e),nm=ART.bossN[ak],b=nm&&ART.bm[
 function drawBoss(e,t,fl){const c=e.col;
   for(const l of e.lasers){ctx.save();ctx.translate(-e.x,-e.y);const tele=l.t<2*BT.spb;ctx.translate(l.x,l.y);ctx.rotate(l.a);
     if(tele){if(RET.read)READ.under(1400,5);ctx.strokeStyle=(SET.reduce||BK(l.t,14))?'#ff3040cc':'#ff304044';ctx.lineWidth=1;ctx.setLineDash([10,6]);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(1400,0);ctx.stroke();ctx.setLineDash([]);}
+    else if(RET.first30&&window.F30){if(!F30.sheet('fx-eb-laser-sweep',700,0,1400,40,'#ff5a3c'))F30.beam(1400,28,'#ff5a3c');}
     else if(!AH.span('fx-eb-laser-sweep',700,0,1400,40,0,.95)){ctx.globalCompositeOperation='lighter';ctx.fillStyle='#ff304066';ctx.fillRect(0,-12,1400,24);ctx.fillStyle='#ffe0e6';ctx.fillRect(0,-3,1400,6);ctx.globalCompositeOperation='source-over';}
     ctx.restore();}
+  const k30=RET.first30&&window.F30?F30.k(e):1;   // first30: the body is drawn at least 140 css px (the lasers above stay in world units)
+  if(k30!==1){ctx.save();ctx.scale(k30,k30);}
+  try{drawBossBody(e,t,fl,c);}finally{if(k30!==1)ctx.restore();}}
+function drawBossBody(e,t,fl,c){
   ctx.globalCompositeOperation='lighter';G_(0,0,e.r*2.2,c,.35);ctx.globalCompositeOperation='source-over';
   if(bossPaint(e,t,fl,c))return;
   ctx.fillStyle='#100a1c';ctx.strokeStyle=c;ctx.lineWidth=2.5;
@@ -10079,13 +10084,13 @@ BMV.rayBlock=(x,y,a,bl)=>{const ca=Math.cos(a),sa=Math.sin(a);let best=1500;for(
   for(const[p,d,lo,hi]of[[x,ca,x0,x1],[y,sa,y0,y1]]){if(Math.abs(d)<1e-9){if(p<lo||p>hi){t0=1e9;break;}continue;}let u=(lo-p)/d,v=(hi-p)/d;if(u>v)[u,v]=[v,u];t0=Math.max(t0,u);t1=Math.min(t1,v);}if(t0<=t1&&t0<best)best=t0;}return best;};
 /* ---- drawing (c.js calls BMV.draw before the ship): telegraphs pulse thin, live hazards are solid ---- */
 BMV.draw=tm=>{const e=G.boss;if(!e||!e.bm)return;const t=G.t;ctx.save();
-  for(const z of BMV.hz){const live=!z.mk&&t>=z.on,k=z.on>z.t0?clamp((t-z.t0)/(z.on-z.t0),0,1):1,pul=.35+.25*Math.sin(t*22);ctx.globalAlpha=live?.82:z.mk?.5*(1-.4*k)+.1:.18+.3*k*pul*2;
-    const col=z.c||'#ff3d6e';ctx.save();ctx.fillStyle=ctx.strokeStyle=col;
+  for(const z of BMV.hz){const live=!z.mk&&t>=z.on,k=z.on>z.t0?clamp((t-z.t0)/(z.on-z.t0),0,1):1,pul=.35+.25*Math.sin(t*22);ctx.globalAlpha=live?(RET.first30?F30.A:.82):z.mk?.5*(1-.4*k)+.1:.18+.3*k*pul*2;
+    const col=RET.first30&&z.c?F30.col(z.c):z.c||'#ff3d6e';ctx.save();ctx.fillStyle=ctx.strokeStyle=col;
     switch(z.s){
       case'band':case'col':case'wall':for(const p of BMV.prims(z)){const[a,b,c2,d]=p.r;if(live)ctx.fillRect(a,b,c2-a,d-b);else{ctx.lineWidth=2;ctx.setLineDash([8,6]);ctx.strokeRect(a,b,c2-a,d-b);ctx.setLineDash([]);ctx.globalAlpha*=.35;ctx.fillRect(a,b,c2-a,d-b);ctx.globalAlpha/=.35;}}
         if(z.arc&&!live){ctx.beginPath();const ax=z.arc.x+(z.x-z.arc.x)*k,ay=z.arc.y+(z.y0+60-z.arc.y)*k-Math.sin(k*3.1416)*160;ctx.arc(ax,ay,7,0,7);ctx.fill();}break;
       case'circ':ctx.lineWidth=live?0:2;ctx.beginPath();ctx.arc(z.x,z.y,live?z.r:z.r*(z.cd?1.6-.6*k:1),0,7);if(live)ctx.fill();else ctx.stroke();if(!live){ctx.globalAlpha*=.3;ctx.beginPath();ctx.arc(z.x,z.y,z.r*k,0,7);ctx.fill();}break;
-      case'beam':{const L=z.L==null?1400:z.L;ctx.translate(z.x,z.y);ctx.rotate(z.a);if(live)ctx.fillRect(0,-z.w/2,Math.max(L,2),z.w);else{ctx.lineWidth=2;ctx.setLineDash([10,8]);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(z.grow?1500:z.blk?L:1400,0);ctx.stroke();ctx.setLineDash([]);}
+      case'beam':{const L=z.L==null?1400:z.L;ctx.translate(z.x,z.y);ctx.rotate(z.a);if(live){if(RET.first30)F30.beam(Math.max(L,2),Math.max(z.w,20),col);else ctx.fillRect(0,-z.w/2,Math.max(L,2),z.w);}else{ctx.lineWidth=2;ctx.setLineDash([10,8]);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(z.grow?1500:z.blk?L:1400,0);ctx.stroke();ctx.setLineDash([]);}
         ctx.rotate(-z.a);ctx.translate(-z.x,-z.y);if(z.sw&&!live){ctx.globalAlpha=.16;ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(z.x,z.y);ctx.arc(z.x,z.y,1400,Math.min(z.a0,z.a1),Math.max(z.a0,z.a1));ctx.closePath();ctx.fill();}break;}
       case'well':ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(z.x,z.y,(z.core||24)+((t*60+i*40)%120),0,7);ctx.globalAlpha=live?.5:.2;ctx.stroke();}ctx.globalAlpha=live?.85:.3;ctx.beginPath();ctx.arc(z.x,z.y,z.core||24,0,7);ctx.fill();break;
       case'aim':{const s=z.e;ctx.lineWidth=2;ctx.setLineDash([6,8]);ctx.beginPath();ctx.moveTo(s.x-20,s.y);ctx.lineTo(P.x,P.y);ctx.stroke();ctx.setLineDash([]);break;}
@@ -10110,8 +10115,8 @@ window.__bmv={BMV,BMT,VB};
 NR.on('runStart',()=>{const V=window.BV;if(!V||!V.NAMES)return;for(const k in VB)if(!V.NAMES[k])V.NAMES[k]=k.replace(/_/g,' ').toUpperCase();});
 
 // PURPOSE: bosses look different in each phase
-// FLAG: bossvis (?bossvis=0)
-// TEST: bossvis-test.js
+// FLAG: bossvis (?bossvis=0), first30 (?first30=0)
+// TEST: bossvis-test.js, first30-test.js
 /* ---------- bosses that look different in each phase = parts/bossvis.js (flag RET.bossvis; ?bossvis=0 = the bosses before it). Review F10, 18 Oct 2026.
    Visuals only: no hitbox, HP, armour cap or timing is touched. The phases come from armour.js / b.js bossBeat (e.ph 1..3, NR 'bossPhase').
    Per phase: a red tint on the boss sprite (stronger in 3), one armour plate gone per change (placeholder shapes drawn over the body from e._dw / e._dh,
@@ -10146,9 +10151,9 @@ const BV=window.BV={get on(){return!!RET.bossvis;},pips:0,flash:'',tinted:0,
   if(!n&&!e._dw){ctx.save();ctx.globalAlpha=a0*.8;ctx.fillStyle=col;ctx.beginPath();ctx.arc(0,0,e.r,0,7);ctx.fill();ctx.restore();}   // no picture (placeholder boss): the disc itself goes red
   };}
 /* plates, cracks, aura: drawn over the boss in its own coordinates (the context is at the boss centre) */
-BV.over=function(e,t){const ph=e.ph||1,mv=UIK.moveOf?UIK.moveOf(e):'air',ground=mv!=='air',dw=e._dw||e.r*3,dh=e._dh||e.r*3,hw=dw/2,hh=dh/2,red=BV.reduced(),by=0;
-  BV.rect={cx:(()=>{const T=ctx.getTransform();return T.e;})(),cy:ctx.getTransform().f,s:Math.hypot(ctx.getTransform().a,ctx.getTransform().b),hw,hh,rot:!!rotMode};
-  ctx.save();
+BV.over=function(e,t){const ph=e.ph||1,mv=UIK.moveOf?UIK.moveOf(e):'air',ground=mv!=='air',dw=e._dw||e.r*3,dh=e._dh||e.r*3,k30=RET.first30&&window.F30?F30.k(e):1,hw=dw/2,hh=dh/2,red=BV.reduced(),by=0;
+  BV.rect={cx:(()=>{const T=ctx.getTransform();return T.e;})(),cy:ctx.getTransform().f,s:Math.hypot(ctx.getTransform().a,ctx.getTransform().b),hw:hw*k30,hh:hh*k30,rot:!!rotMode};
+  ctx.save();if(k30!==1)ctx.scale(k30,k30);
   // aura ring: phase 1 thin cyan, 2 amber double, 3 red thick and pulsing; a ground boss gets the upper arc only
   const R=BV.RING[ph-1],rr=Math.max(hw,hh)*.5*R[1]+e.r*.35,pu=red?0:Math.sin(t*(3+ph*2))*(ph-1)*2;
   ctx.globalCompositeOperation='lighter';ctx.strokeStyle=R[0];ctx.lineWidth=R[2];ctx.globalAlpha=.3+.1*ph;
@@ -10163,12 +10168,12 @@ BV.over=function(e,t){const ph=e.ph||1,mv=UIK.moveOf?UIK.moveOf(e):'air',ground=
       if(!red&&((Math.floor(t*9)+id)%5===0)){ctx.globalCompositeOperation='lighter';G_(x+rnd(-w*.4,w*.4),y+rnd(-h*.3,h*.3),9+ph*3,'#ffd23d',.9);ctx.globalCompositeOperation='source-over';}
       else if(red){ctx.globalCompositeOperation='lighter';G_(x,y,10,'#ffd23d',.5);ctx.globalCompositeOperation='source-over';}
     }else{
-      ctx.fillStyle='#7a84a8aa';ctx.strokeStyle='#dfe6ff';ctx.lineWidth=1.5;ctx.beginPath();
-      ctx.moveTo(x-w*.5,y+h*.5);ctx.lineTo(x-w*.35,y-h*.5);ctx.lineTo(x+w*.5,y-h*.4);ctx.lineTo(x+w*.4,y+h*.5);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.fillStyle=RET.first30?R[0]+'73':'#7a84a8aa';ctx.strokeStyle=RET.first30?'#0a0612':'#dfe6ff';ctx.lineWidth=1.5;ctx.beginPath();   // first30: a tinted marker in the phase colour, not a white plate
+      ctx.moveTo(x-w*.5,y+h*.5);ctx.lineTo(x-w*.35,y-h*.5);ctx.lineTo(x+w*.5,y-h*.4);ctx.lineTo(x+w*.4,y+h*.5);ctx.closePath();ctx.fill();ctx.stroke();if(BV.pl)BV.pl.push(ctx.fillStyle);
     }}
   // the plate that just broke falls off the boss (ground bosses: it drops to the road line and stops there)
   if(v&&v.t>0&&v.id!=null){const s=BV.SLOTS[v.id],p=1-v.t,w=s[2]*hw,h=s[3]*hh,x=s[0]*hw+(v.id===2?1:-1)*p*50,fall=Math.min(p*p*260,ground?Math.max(0,hh-(s[1]*hh)-4):260);
-    ctx.save();ctx.globalAlpha=Math.min(1,v.t*2);ctx.translate(x,(ground&&v.id===0?-.46:s[1])*hh+fall);ctx.rotate(red?0:p*4);ctx.fillStyle='#7a84a8';ctx.strokeStyle='#dfe6ff';ctx.lineWidth=1.5;
+    ctx.save();ctx.globalAlpha=Math.min(1,v.t*2);ctx.translate(x,(ground&&v.id===0?-.46:s[1])*hh+fall);ctx.rotate(red?0:p*4);ctx.fillStyle=RET.first30?R[0]:'#7a84a8';ctx.strokeStyle=RET.first30?'#0a0612':'#dfe6ff';ctx.lineWidth=1.5;
     ctx.beginPath();ctx.moveTo(-w*.5,h*.5);ctx.lineTo(-w*.35,-h*.5);ctx.lineTo(w*.5,-h*.4);ctx.lineTo(w*.4,h*.5);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
   ctx.restore();};
 {const db2=drawBoss;drawBoss=function(e,t,fl){db2(e,t,fl);if(BV.on&&e&&e.ph)BV.over(e,t);};}
@@ -10190,6 +10195,41 @@ NR.on('tick',dt=>{const e=G&&G.boss;if(e&&e.bv&&e.bv.t>0)e.bv.t-=dt*1.1;});
     ctx.restore();BV.pips=p;};
   const hud=drawHUD;drawHUD=function(t){hud(t);const b=G&&G.boss;if(b&&b.x<W)pips(W/2-200*HKL,30*HKL,400*HKL,8*HKL,HKL,b.ph);};
   const hudp=drawHUDP;drawHUDP=function(t){hudp(t);const b=G&&G.boss;if(!b||b.x>=W)return;const k=HK,w=PW_,bw=Math.min(330,w-120),ny=40*k+6*k;pips((w-bw)/2,ny+12*k,bw,6*k,k,b.ph);};}
+/* ===== first30 (flag RET.first30 below; lives here because it is mostly the boss's looks) ===== */
+/* ---------- FIRST30 (flag RET.first30, default ON; ?first30=0 = the game exactly as before). Owner, 21 Oct 2026: "boring, eye strain, no story, extremely annoying".
+   9  opening: saga.js (no cards before play; 2 small live cards after the first wave; the briefing is one line on the start banner)
+   11 bosses: drawn at least F30.MIN css px (draw.js drawBoss scales the body, bossvis.js scales the plates with it; hit radius unchanged), kept in the centre lane,
+      and on Normal and below the ship's shots bend toward the boss (F30.TURN rad/s, only shots already heading roughly at it)
+   12 eye strain: boss lasers are a tinted soft-edged beam at alpha <= F30.A (existing fx sheet multiplied with a colour; a gradient when the sheet is missing),
+      the title logo loses its red / cyan offset. No new art (ASSET-POLICY.md). Test: nightrun/first30-test.js ---------- */
+if(RET.first30===undefined)RET.first30=!/[?&]first30=0/.test(location.search);
+const F30=window.F30={get on(){return!!RET.first30;},MIN:140,A:.6,TURN:1.5,COL:'#ff5a3c',tc:new Map(),
+  s(){const cv=document.getElementById('game');const w=cv?cv.clientWidth:0;return w>0?w/(rotMode?H:W):1;},                         // css px per world unit
+  k(e){if(!RET.first30||!e)return 1;const a=Math.max(e._dw||e.r*3,e._dh||e.r*3);return Math.max(1,Math.min(1.7,F30.MIN/(a*F30.s())));},
+  css(e){return Math.max(e._dw||e.r*3,e._dh||e.r*3)*F30.k(e)*F30.s();},
+  /* a near-white colour becomes amber, anything else is kept: a beam is never white */
+  col(c){const m=/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i.exec(c||'');if(!m)return F30.COL;return(+('0x'+m[1])+ +('0x'+m[2])+ +('0x'+m[3]))/3>190&&+('0x'+m[3])>120?'#ffb347':c.slice(0,7);},
+  /* the existing sheet multiplied with a colour (pink / white core -> that colour; black stays black, so it is drawn additively), cached */
+  tint(img,col){let m=F30.tc.get(img);if(!m)F30.tc.set(img,m=new Map());let c=m.get(col);if(c)return c;if(m.size>6)m.clear();
+    c=document.createElement('canvas');c.width=img.width;c.height=img.height;const g=c.getContext('2d');g.drawImage(img,0,0);g.globalCompositeOperation='multiply';g.fillStyle=col;g.fillRect(0,0,c.width,c.height);
+    g.globalCompositeOperation='destination-in';g.drawImage(img,0,0);m.set(col,c);return c;},
+  /* a beam from the origin along +x, soft on both edges, one fill at alpha <= A (the caller has translated / rotated) */
+  beam(L,w,col){col=F30.col(col);const g=ctx.createLinearGradient(0,-w/2,0,w/2);g.addColorStop(0,col+'00');g.addColorStop(.28,col+'aa');g.addColorStop(.5,col+'ff');g.addColorStop(.72,col+'aa');g.addColorStop(1,col+'00');
+    ctx.save();ctx.globalAlpha=Math.min(F30.A,ctx.globalAlpha);ctx.fillStyle=g;F30.maxA=Math.max(F30.maxA,ctx.globalAlpha);ctx.fillRect(0,-w/2,L,w);ctx.restore();F30.beams++;},
+  /* the boss laser sheet, tinted, centred at (x,y) w x h (tiled over the length by stretching, like AH.span) */
+  sheet(id,x,y,w,h,col){const b=window.ART&&ART.img&&ART.img(id);if(!b)return false;ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=F30.A;F30.maxA=Math.max(F30.maxA,ctx.globalAlpha);ctx.translate(x,y);ctx.drawImage(F30.tint(b,F30.col(col)),-w/2,-h/2,w,h);ctx.restore();F30.beams++;return true;},
+  beams:0,maxA:0};
+/* the logo: no red / cyan split (eye strain on every visit) */
+if(RET.first30){const st=document.createElement('style');st.textContent='h1{text-shadow:none!important}h1 span{text-shadow:none!important}';document.head.appendChild(st);}
+/* bosses: centre lane (portrait and flyers: the boss stays within 70 world px of the middle once it has arrived) and the auto-aim on Normal and below */
+NR.on('tick',dt=>{if(!RET.first30||!G||!G.boss||G.boss.dead||G.dead)return;const e=G.boss;if(e.x>bossX()+4)return;
+  const flyer=rotMode||(window.UIK&&UIK.moveOf?UIK.moveOf(e)==='air':true);
+  if(flyer){const lo=H/2-80,hi=H/2+80,cl=y=>Math.max(lo,Math.min(hi,y));if(e.bmC&&e.bmC.air){e.bmC.y=cl(e.bmC.y);e.bmC.y0=cl(e.bmC.y0);}
+    e.y+=(cl(e.y)-e.y)*Math.min(1,dt*(e.bmC?12:4));}
+  if(SET.diff!=='easy'&&SET.diff!=='normal')return;
+  for(const b of G.pb){if(b.dead||b.big&&b.pf)continue;const dx=e.x-b.x,dy=e.y-b.y,sp=Math.hypot(b.vx,b.vy);if(sp<50||dx*b.vx+dy*b.vy<=0)continue;
+    const a0=Math.atan2(b.vy,b.vx),a1=Math.atan2(dy,dx);let d=Math.atan2(Math.sin(a1-a0),Math.cos(a1-a0));if(Math.abs(d)>1.1)continue;
+    const t=Math.max(-F30.TURN*dt,Math.min(F30.TURN*dt,d)),a=a0+t;b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;}});
 window.__bv={BV};
 
 // PURPOSE: power-up levels + five new shooter power-ups
@@ -11572,7 +11612,7 @@ BPL.draw=()=>{const e=G.boss;if(!BPL.on||!e||!e.bp||e.x>W+40)return;const b=e.bp
     if(!live){ctx.globalAlpha=.9;ctx.fillStyle='#ffe14d';for(let x=40;x<x1;x+=90)BPL.tri(x,S.top?S.h+12:H-S.h-12,9,S.top?Math.PI/2:-Math.PI/2);}}
   if(m==='conveyor'){ctx.globalAlpha=.22;ctx.fillStyle='#ffb020';const o=(t*110)%60;if(!ART.pic('bp-conveyor',x1,x1/2,H*.25)){for(let x=-60+o;x<x1;x+=60){BPL.tri(x,H*.25,10,0);}}ctx.fillStyle='#19e3ff';for(let x=x1-(t*70)%60;x>0;x-=60)BPL.tri(x,H*.75,10,Math.PI);}
   if(m==='gravity'){ctx.globalAlpha=.2;for(let k=0;k<3;k++){const dir=(k+Math.floor(t/((BT.spb||.5)*8)))%2?1:-1;ctx.fillStyle=dir>0?'#ff7ad9':'#7ad9ff';if(!ART.pic('fx-w34-bp-gravity',x1,x1/2,(k+.5)*H/3,dir>0?0:Math.PI)){for(let x=50;x<x1;x+=110)BPL.tri(x,(k+.5)*H/3,11,dir*Math.PI/2);}}}
-  if(m==='grid'&&S.c&&t<S.off){const live=t>=S.on;for(const x of S.c){ctx.globalAlpha=live?.85:.2+.2*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';if(!ART.pic('fx-w34-bp-grid',live?18:4,x,H/2))ctx.fillRect(x-(live?9:2),0,live?18:4,H);}}
+  if(m==='grid'&&S.c&&t<S.off){const live=t>=S.on;for(const x of S.c){ctx.globalAlpha=live?(RET.first30?F30.A:.85):.2+.2*pul;ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';if(!ART.pic('fx-w34-bp-grid',live?18:4,x,H/2))ctx.fillRect(x-(live?9:2),0,live?18:4,H);}}
   if(m==='ghost'&&S.gx!=null){ctx.globalAlpha=.55;ctx.strokeStyle='#c78cff';ctx.lineWidth=3;if(!ART.pic('bp-ghost',36,S.gx,S.gy)){ctx.beginPath();ctx.moveTo(S.gx+16,S.gy);ctx.lineTo(S.gx-12,S.gy-12);ctx.lineTo(S.gx-12,S.gy+12);ctx.closePath();ctx.stroke();}}
   if(m==='zone'&&S.r){ctx.globalAlpha=.6;ctx.strokeStyle='#ffe14d';ctx.lineWidth=4;ctx.setLineDash([14,10]);if(!ART.pic('fx-w34-bp-zone',S.r*2,S.cx,S.cy)){ctx.beginPath();ctx.arc(S.cx,S.cy,S.r,0,7);ctx.stroke();}ctx.setLineDash([]);}
   if(g){const rise=g.up?1:clamp((t-g.t0)/BPL.TEL,0,1);ctx.globalAlpha=g.up?.9:.4*rise;
@@ -13186,6 +13226,14 @@ if(RET.story){
 .sgP{width:64px;height:64px;border-radius:50%;border:3px solid var(--c,#19e3ff);box-sizing:border-box;object-fit:cover;background:#05030c;flex:0 0 auto}
 .sgP.ph{display:flex;align-items:center;justify-content:center;border-radius:6px;border:2px dashed var(--c);background:#120a24;color:var(--c);font:700 14px var(--mono);letter-spacing:0;text-align:center;overflow:hidden;word-break:break-all}
 .sgP.sm{width:40px;height:40px;border-width:2px}
+#sgCard.live{background:none!important;justify-content:flex-start;padding:64px 10px 0;pointer-events:none;cursor:default}
+#sgCard.live::before{display:none}
+#sgCard.live .sgc{pointer-events:auto;cursor:pointer;padding:8px 10px;gap:4px 10px;background:#0d0720e6}
+#sgCard.live .sgt{min-height:0;font-size:14px;line-height:1.3}
+#sgCard.live .sgch,#sgCard.live .sgbar{display:none}
+#sgCard.live .sgf{margin-top:-2px}
+#sgCard.live .sgf button{min-height:36px}
+#sgCard.live .sgP{width:40px;height:40px}
 #sgComms{position:absolute;z-index:26;left:0;top:0;max-width:min(92%,520px);box-sizing:border-box;padding:6px 10px;border-left:3px solid var(--c,#19e3ff);border-radius:0 8px 8px 0;background:#05030ca8;color:#fff;font:14px/1.3 var(--display);pointer-events:none;text-shadow:0 1px 2px #000;transition:opacity .25s}
 #sgComms[hidden]{display:none}
 #sgComms b{color:var(--c);font:700 14px var(--mono);letter-spacing:.08em;margin-right:6px}
@@ -13212,9 +13260,9 @@ if(RET.story){
  /* ----- the scene card: a list of cards, tap / Space = next, SKIP / Escape = end ----- */
  const card=document.createElement('div');card.id='sgCard';card.hidden=true;card.tabIndex=0;card.setAttribute('role','dialog');card.setAttribute('aria-modal','true');card.setAttribute('aria-label','Story');
  card.innerHTML='<div class="sgc" id="sgC" aria-live="polite"></div>';stage.appendChild(card);
- const K={on:false,cards:[],i:0,done:null,auto:0,tm:0,back:null,kind:''};
+ const K={on:false,cards:[],i:0,done:null,auto:0,tm:0,back:null,kind:'',live:false};
  function paint(){const c=K.cards[K.i],box=$('sgC');clearTimeout(K.tm);box.textContent='';
-   card.classList.toggle('brief',!!c.brief);card.style.backgroundImage=c.bg?'url('+c.bg+')':'none';
+   card.classList.toggle('brief',!!c.brief);card.classList.toggle('live',K.live);card.style.backgroundImage=c.bg?'url('+c.bg+')':'none';
    const wo=c.brief?{c:'#ffb020'}:whoOf(c.who);box.style.setProperty('--c',wo.c);
    const add=(cls,html,txt)=>{const d=document.createElement('div');d.className=cls;if(html!=null)d.innerHTML=html;if(txt!=null)d.textContent=txt;box.appendChild(d);return d;};
    if(c.head)add('sgch',null,c.head);
@@ -13229,14 +13277,14 @@ if(RET.story){
    f.append(sk,dots,nx);sk.addEventListener('click',e=>{e.stopPropagation();close();});
    if(K.auto)K.tm=setTimeout(adv,K.auto);}
  function adv(){if(!K.on)return;if(K.i<K.cards.length-1){K.i++;paint();return;}close();}
- function close(){if(!K.on)return;clearTimeout(K.tm);K.on=false;card.hidden=true;const d=K.done;K.done=null;
+ function close(){if(!K.on)return;clearTimeout(K.tm);K.on=false;card.hidden=true;const d=K.done;K.done=null;K.live=false;card.classList.remove('live');
    if(K.back&&K.back.focus&&document.contains(K.back)){try{K.back.focus();}catch(e){}}NR.emit('sagaClose',{kind:K.kind});if(d)d();}
  /* play(cards, done, {auto:ms, kind}): false when it cannot open (a run is on or a card is open) */
- function play(cards,done,o){o=o||{};if(running||K.on||!cards||!cards.length)return false;
-   K.on=true;K.cards=cards;K.i=0;K.done=done||null;K.auto=o.auto||0;K.kind=o.kind||'';K.back=document.activeElement;card.hidden=false;paint();
-   setTimeout(()=>{if(K.on)card.focus();},0);NR.emit('sagaOpen',{kind:K.kind,n:cards.length});return true;}
+ function play(cards,done,o){o=o||{};if((running&&!o.live)||K.on||!cards||!cards.length)return false;
+   K.on=true;K.live=!!o.live;K.cards=cards;K.i=0;K.done=done||null;K.auto=o.auto||0;K.kind=o.kind||'';K.back=document.activeElement;card.hidden=false;paint();
+   if(!K.live)setTimeout(()=>{if(K.on)card.focus();},0);NR.emit('sagaOpen',{kind:K.kind,n:cards.length});return true;}
  card.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#sgSkip'))return;adv();});
- addEventListener('keydown',e=>{if(!K.on)return;
+ addEventListener('keydown',e=>{if(!K.on||K.live)return;
    if(e.code==='Space'||e.code==='Enter'||e.code==='NumpadEnter'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)adv();}
    else if(e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();close();}},true);
  /* ----- scenes from the data ----- */
@@ -13249,6 +13297,7 @@ if(RET.story){
  const endCards=c=>{const out=cardsOf('end:'+c,bgFor(diOfCh(c)),chHead(c)+' · END');if(c===CHN)out.push(...cardsOf('epi',bgFor(DISTRICTS.length-1),'EPILOGUE'),...cardsOf('credits',bgFor(0),'CREDITS'));return out;};
  /* ----- before a story stage: the opening (once) and the stage briefing (first time) ----- */
  {const ss=startStory;startStory=function(n){if(running||!SG_AUTO||K.on)return ss.apply(this,arguments);const a=arguments,go=()=>{if(!running)ss.apply(this,a);};
+   if(RET.first30){F3.arm(n);return ss.apply(this,a);}   // first30: the stage starts at once; briefing = one banner line, opening = 2 live cards after the first wave
    const q=[];let auto=0,kind='';
    if(!seen('open')&&n<=STORY_CH[0][2]){q.push(...openingCards());mark('open');auto=4200;kind='open';}
    if(n<=MAIN&&!seen('brief:'+n)){const b=briefCard(n);if(b){if(auto){/* the opening auto-advances; the briefing waits for a tap */}q.push(b);mark('brief:'+n);kind=kind||'brief';}}
@@ -13256,6 +13305,19 @@ if(RET.story){
    if(auto){const op=q.filter(c=>!c.brief),br=q.filter(c=>c.brief);if(play(op,()=>{if(!br.length||!play(br,go,{kind:'brief'}))go();},{auto,kind:'open'}))return;}
    else if(play(q,go,{kind}))return;
    return ss.apply(this,a);};}
+ /* ----- first30 (review 8 fix 9): no wall of cards before play. The stage starts at once; the stage-1 briefing is the one line under the start banner;
+   the opening is 2 small cards (3.8 s each, 7.6 s at most, tap = next, SKIP = off) that appear after the first enemies are on the field and never block input ----- */
+ const F3={n:0,line:'',open:false,t:0};
+ F3.short=t=>{let x=String(t).split(/ before | and | while | until |, |[.;] /)[0];if(x.length>30){x=x.slice(0,30);x=x.slice(0,x.lastIndexOf(' '));}return x;};   // the banner line is one short phrase (it must fit a 375 px phone)
+ F3.arm=n=>{F3.n=n;F3.line='';F3.open=false;clearTimeout(F3.t);
+   if(n<=MAIN&&!seen('brief:'+n)){const r=rowsOf('brief:'+n)[0];if(r){F3.line=F3.short(r.l[0]);mark('brief:'+n);}}
+   if(!seen('open')&&n<=STORY_CH[0][2]){F3.open=true;mark('open');}};
+ F3.cards=()=>ROWS.filter(r=>r.id==='op1'||r.id==='op4').map(r=>({who:r.who,l:r.l,bg:'',head:'FRANKFURT · 2099'}));
+ F3.wait=k=>{if(!running||K.on||!F3.open)return;const live=G.en&&G.en.some(e=>e.type!=='boss');if(!live&&k<16){F3.t=setTimeout(()=>F3.wait(k+1),250);return;}F3.open=false;play(F3.cards(),null,{auto:3800,kind:'open',live:true});};
+ NR.on('runStart',d=>{if(!RET.first30||!d||d.story!==F3.n)return;const n=F3.n;
+   setTimeout(()=>{if(F3.line&&running&&G.banner&&G.banner.t>0){G.banner.b=say(F3.line);F3.line='';}},0);
+   if(F3.open)F3.t=setTimeout(()=>F3.wait(0),1500);});
+ NR.on('runEnd',()=>{clearTimeout(F3.t);F3.open=false;if(K.on&&K.live)close();});
  /* ----- in-stage comms: one line, 3 s, at the bottom of the playfield unless the ship is there (then near the top, below the HUD) ----- */
  const cm=document.createElement('div');cm.id='sgComms';cm.hidden=true;cm.setAttribute('role','status');cm.setAttribute('aria-live','polite');stage.appendChild(cm);
  const CM={q:[],t:0,raf:0,n:0,bars:0,mid:false};
@@ -13333,7 +13395,7 @@ if(RET.story){
    if(RET.titleDraw&&!RET.titleDraw.sg){const o=RET.titleDraw;RET.titleDraw=function(){const r=o.apply(this,arguments);tileDraw();return r;};RET.titleDraw.sg=1;}}
  setTimeout(()=>install(0),0);
  NR.on('runEnd',()=>setTimeout(tileDraw,0));
- window.SAGA={rows:ROWS,ch:STORY_CH,cast:STORY_CAST,save:SV,play,close,openLog,closeLog,seen,comm,chOf,curCh,briefCard,endCards,openingCards,get open(){return K.on;},get kind(){return K.kind;},auto:SG_AUTO,
+ window.SAGA={F3,rows:ROWS,ch:STORY_CH,cast:STORY_CAST,save:SV,play,close,openLog,closeLog,seen,comm,chOf,curCh,briefCard,endCards,openingCards,get open(){return K.on;},get kind(){return K.kind;},auto:SG_AUTO,
    t:{run:()=>running,ship:shipRect,finish:()=>ST.finish(),start:n=>startStory(n),fail:()=>ST.fail(),boss:()=>NR.emit('bossIn',{}),bar:k=>{for(let i=0;i<k;i++)NR.emit('bar',{});},stageLen:()=>ST.len}};
 }
 
@@ -14302,7 +14364,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='55d0ccefae 2026-10-21 20:32 UTC';
+const NR_STAMP='772400432f 2026-10-21 22:03 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;

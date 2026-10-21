@@ -101,8 +101,13 @@ function bossPaint(e,t,fl,c){const ak=ART.artK(e),nm=ART.bossN[ak],b=nm&&ART.bm[
 function drawBoss(e,t,fl){const c=e.col;
   for(const l of e.lasers){ctx.save();ctx.translate(-e.x,-e.y);const tele=l.t<2*BT.spb;ctx.translate(l.x,l.y);ctx.rotate(l.a);
     if(tele){if(RET.read)READ.under(1400,5);ctx.strokeStyle=(SET.reduce||BK(l.t,14))?'#ff3040cc':'#ff304044';ctx.lineWidth=1;ctx.setLineDash([10,6]);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(1400,0);ctx.stroke();ctx.setLineDash([]);}
+    else if(RET.first30&&window.F30){if(!F30.sheet('fx-eb-laser-sweep',700,0,1400,40,'#ff5a3c'))F30.beam(1400,28,'#ff5a3c');}
     else if(!AH.span('fx-eb-laser-sweep',700,0,1400,40,0,.95)){ctx.globalCompositeOperation='lighter';ctx.fillStyle='#ff304066';ctx.fillRect(0,-12,1400,24);ctx.fillStyle='#ffe0e6';ctx.fillRect(0,-3,1400,6);ctx.globalCompositeOperation='source-over';}
     ctx.restore();}
+  const k30=RET.first30&&window.F30?F30.k(e):1;   // first30: the body is drawn at least 140 css px (the lasers above stay in world units)
+  if(k30!==1){ctx.save();ctx.scale(k30,k30);}
+  try{drawBossBody(e,t,fl,c);}finally{if(k30!==1)ctx.restore();}}
+function drawBossBody(e,t,fl,c){
   ctx.globalCompositeOperation='lighter';G_(0,0,e.r*2.2,c,.35);ctx.globalCompositeOperation='source-over';
   if(bossPaint(e,t,fl,c))return;
   ctx.fillStyle='#100a1c';ctx.strokeStyle=c;ctx.lineWidth=2.5;

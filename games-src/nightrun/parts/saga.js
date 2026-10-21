@@ -52,6 +52,14 @@ if(RET.story){
 .sgP{width:64px;height:64px;border-radius:50%;border:3px solid var(--c,#19e3ff);box-sizing:border-box;object-fit:cover;background:#05030c;flex:0 0 auto}
 .sgP.ph{display:flex;align-items:center;justify-content:center;border-radius:6px;border:2px dashed var(--c);background:#120a24;color:var(--c);font:700 14px var(--mono);letter-spacing:0;text-align:center;overflow:hidden;word-break:break-all}
 .sgP.sm{width:40px;height:40px;border-width:2px}
+#sgCard.live{background:none!important;justify-content:flex-start;padding:64px 10px 0;pointer-events:none;cursor:default}
+#sgCard.live::before{display:none}
+#sgCard.live .sgc{pointer-events:auto;cursor:pointer;padding:8px 10px;gap:4px 10px;background:#0d0720e6}
+#sgCard.live .sgt{min-height:0;font-size:14px;line-height:1.3}
+#sgCard.live .sgch,#sgCard.live .sgbar{display:none}
+#sgCard.live .sgf{margin-top:-2px}
+#sgCard.live .sgf button{min-height:36px}
+#sgCard.live .sgP{width:40px;height:40px}
 #sgComms{position:absolute;z-index:26;left:0;top:0;max-width:min(92%,520px);box-sizing:border-box;padding:6px 10px;border-left:3px solid var(--c,#19e3ff);border-radius:0 8px 8px 0;background:#05030ca8;color:#fff;font:14px/1.3 var(--display);pointer-events:none;text-shadow:0 1px 2px #000;transition:opacity .25s}
 #sgComms[hidden]{display:none}
 #sgComms b{color:var(--c);font:700 14px var(--mono);letter-spacing:.08em;margin-right:6px}
@@ -78,9 +86,9 @@ if(RET.story){
  /* ----- the scene card: a list of cards, tap / Space = next, SKIP / Escape = end ----- */
  const card=document.createElement('div');card.id='sgCard';card.hidden=true;card.tabIndex=0;card.setAttribute('role','dialog');card.setAttribute('aria-modal','true');card.setAttribute('aria-label','Story');
  card.innerHTML='<div class="sgc" id="sgC" aria-live="polite"></div>';stage.appendChild(card);
- const K={on:false,cards:[],i:0,done:null,auto:0,tm:0,back:null,kind:''};
+ const K={on:false,cards:[],i:0,done:null,auto:0,tm:0,back:null,kind:'',live:false};
  function paint(){const c=K.cards[K.i],box=$('sgC');clearTimeout(K.tm);box.textContent='';
-   card.classList.toggle('brief',!!c.brief);card.style.backgroundImage=c.bg?'url('+c.bg+')':'none';
+   card.classList.toggle('brief',!!c.brief);card.classList.toggle('live',K.live);card.style.backgroundImage=c.bg?'url('+c.bg+')':'none';
    const wo=c.brief?{c:'#ffb020'}:whoOf(c.who);box.style.setProperty('--c',wo.c);
    const add=(cls,html,txt)=>{const d=document.createElement('div');d.className=cls;if(html!=null)d.innerHTML=html;if(txt!=null)d.textContent=txt;box.appendChild(d);return d;};
    if(c.head)add('sgch',null,c.head);
@@ -95,14 +103,14 @@ if(RET.story){
    f.append(sk,dots,nx);sk.addEventListener('click',e=>{e.stopPropagation();close();});
    if(K.auto)K.tm=setTimeout(adv,K.auto);}
  function adv(){if(!K.on)return;if(K.i<K.cards.length-1){K.i++;paint();return;}close();}
- function close(){if(!K.on)return;clearTimeout(K.tm);K.on=false;card.hidden=true;const d=K.done;K.done=null;
+ function close(){if(!K.on)return;clearTimeout(K.tm);K.on=false;card.hidden=true;const d=K.done;K.done=null;K.live=false;card.classList.remove('live');
    if(K.back&&K.back.focus&&document.contains(K.back)){try{K.back.focus();}catch(e){}}NR.emit('sagaClose',{kind:K.kind});if(d)d();}
  /* play(cards, done, {auto:ms, kind}): false when it cannot open (a run is on or a card is open) */
- function play(cards,done,o){o=o||{};if(running||K.on||!cards||!cards.length)return false;
-   K.on=true;K.cards=cards;K.i=0;K.done=done||null;K.auto=o.auto||0;K.kind=o.kind||'';K.back=document.activeElement;card.hidden=false;paint();
-   setTimeout(()=>{if(K.on)card.focus();},0);NR.emit('sagaOpen',{kind:K.kind,n:cards.length});return true;}
+ function play(cards,done,o){o=o||{};if((running&&!o.live)||K.on||!cards||!cards.length)return false;
+   K.on=true;K.live=!!o.live;K.cards=cards;K.i=0;K.done=done||null;K.auto=o.auto||0;K.kind=o.kind||'';K.back=document.activeElement;card.hidden=false;paint();
+   if(!K.live)setTimeout(()=>{if(K.on)card.focus();},0);NR.emit('sagaOpen',{kind:K.kind,n:cards.length});return true;}
  card.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#sgSkip'))return;adv();});
- addEventListener('keydown',e=>{if(!K.on)return;
+ addEventListener('keydown',e=>{if(!K.on||K.live)return;
    if(e.code==='Space'||e.code==='Enter'||e.code==='NumpadEnter'){e.preventDefault();e.stopImmediatePropagation();if(!e.repeat)adv();}
    else if(e.code==='Escape'){e.preventDefault();e.stopImmediatePropagation();close();}},true);
  /* ----- scenes from the data ----- */
@@ -115,6 +123,7 @@ if(RET.story){
  const endCards=c=>{const out=cardsOf('end:'+c,bgFor(diOfCh(c)),chHead(c)+' · END');if(c===CHN)out.push(...cardsOf('epi',bgFor(DISTRICTS.length-1),'EPILOGUE'),...cardsOf('credits',bgFor(0),'CREDITS'));return out;};
  /* ----- before a story stage: the opening (once) and the stage briefing (first time) ----- */
  {const ss=startStory;startStory=function(n){if(running||!SG_AUTO||K.on)return ss.apply(this,arguments);const a=arguments,go=()=>{if(!running)ss.apply(this,a);};
+   if(RET.first30){F3.arm(n);return ss.apply(this,a);}   // first30: the stage starts at once; briefing = one banner line, opening = 2 live cards after the first wave
    const q=[];let auto=0,kind='';
    if(!seen('open')&&n<=STORY_CH[0][2]){q.push(...openingCards());mark('open');auto=4200;kind='open';}
    if(n<=MAIN&&!seen('brief:'+n)){const b=briefCard(n);if(b){if(auto){/* the opening auto-advances; the briefing waits for a tap */}q.push(b);mark('brief:'+n);kind=kind||'brief';}}
@@ -122,6 +131,19 @@ if(RET.story){
    if(auto){const op=q.filter(c=>!c.brief),br=q.filter(c=>c.brief);if(play(op,()=>{if(!br.length||!play(br,go,{kind:'brief'}))go();},{auto,kind:'open'}))return;}
    else if(play(q,go,{kind}))return;
    return ss.apply(this,a);};}
+ /* ----- first30 (review 8 fix 9): no wall of cards before play. The stage starts at once; the stage-1 briefing is the one line under the start banner;
+   the opening is 2 small cards (3.8 s each, 7.6 s at most, tap = next, SKIP = off) that appear after the first enemies are on the field and never block input ----- */
+ const F3={n:0,line:'',open:false,t:0};
+ F3.short=t=>{let x=String(t).split(/ before | and | while | until |, |[.;] /)[0];if(x.length>30){x=x.slice(0,30);x=x.slice(0,x.lastIndexOf(' '));}return x;};   // the banner line is one short phrase (it must fit a 375 px phone)
+ F3.arm=n=>{F3.n=n;F3.line='';F3.open=false;clearTimeout(F3.t);
+   if(n<=MAIN&&!seen('brief:'+n)){const r=rowsOf('brief:'+n)[0];if(r){F3.line=F3.short(r.l[0]);mark('brief:'+n);}}
+   if(!seen('open')&&n<=STORY_CH[0][2]){F3.open=true;mark('open');}};
+ F3.cards=()=>ROWS.filter(r=>r.id==='op1'||r.id==='op4').map(r=>({who:r.who,l:r.l,bg:'',head:'FRANKFURT · 2099'}));
+ F3.wait=k=>{if(!running||K.on||!F3.open)return;const live=G.en&&G.en.some(e=>e.type!=='boss');if(!live&&k<16){F3.t=setTimeout(()=>F3.wait(k+1),250);return;}F3.open=false;play(F3.cards(),null,{auto:3800,kind:'open',live:true});};
+ NR.on('runStart',d=>{if(!RET.first30||!d||d.story!==F3.n)return;const n=F3.n;
+   setTimeout(()=>{if(F3.line&&running&&G.banner&&G.banner.t>0){G.banner.b=say(F3.line);F3.line='';}},0);
+   if(F3.open)F3.t=setTimeout(()=>F3.wait(0),1500);});
+ NR.on('runEnd',()=>{clearTimeout(F3.t);F3.open=false;if(K.on&&K.live)close();});
  /* ----- in-stage comms: one line, 3 s, at the bottom of the playfield unless the ship is there (then near the top, below the HUD) ----- */
  const cm=document.createElement('div');cm.id='sgComms';cm.hidden=true;cm.setAttribute('role','status');cm.setAttribute('aria-live','polite');stage.appendChild(cm);
  const CM={q:[],t:0,raf:0,n:0,bars:0,mid:false};
@@ -199,6 +221,6 @@ if(RET.story){
    if(RET.titleDraw&&!RET.titleDraw.sg){const o=RET.titleDraw;RET.titleDraw=function(){const r=o.apply(this,arguments);tileDraw();return r;};RET.titleDraw.sg=1;}}
  setTimeout(()=>install(0),0);
  NR.on('runEnd',()=>setTimeout(tileDraw,0));
- window.SAGA={rows:ROWS,ch:STORY_CH,cast:STORY_CAST,save:SV,play,close,openLog,closeLog,seen,comm,chOf,curCh,briefCard,endCards,openingCards,get open(){return K.on;},get kind(){return K.kind;},auto:SG_AUTO,
+ window.SAGA={F3,rows:ROWS,ch:STORY_CH,cast:STORY_CAST,save:SV,play,close,openLog,closeLog,seen,comm,chOf,curCh,briefCard,endCards,openingCards,get open(){return K.on;},get kind(){return K.kind;},auto:SG_AUTO,
    t:{run:()=>running,ship:shipRect,finish:()=>ST.finish(),start:n=>startStory(n),fail:()=>ST.fail(),boss:()=>NR.emit('bossIn',{}),bar:k=>{for(let i=0;i<k;i++)NR.emit('bar',{});},stageLen:()=>ST.len}};
 }

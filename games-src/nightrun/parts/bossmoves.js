@@ -279,13 +279,13 @@ BMV.rayBlock=(x,y,a,bl)=>{const ca=Math.cos(a),sa=Math.sin(a);let best=1500;for(
   for(const[p,d,lo,hi]of[[x,ca,x0,x1],[y,sa,y0,y1]]){if(Math.abs(d)<1e-9){if(p<lo||p>hi){t0=1e9;break;}continue;}let u=(lo-p)/d,v=(hi-p)/d;if(u>v)[u,v]=[v,u];t0=Math.max(t0,u);t1=Math.min(t1,v);}if(t0<=t1&&t0<best)best=t0;}return best;};
 /* ---- drawing (c.js calls BMV.draw before the ship): telegraphs pulse thin, live hazards are solid ---- */
 BMV.draw=tm=>{const e=G.boss;if(!e||!e.bm)return;const t=G.t;ctx.save();
-  for(const z of BMV.hz){const live=!z.mk&&t>=z.on,k=z.on>z.t0?clamp((t-z.t0)/(z.on-z.t0),0,1):1,pul=.35+.25*Math.sin(t*22);ctx.globalAlpha=live?.82:z.mk?.5*(1-.4*k)+.1:.18+.3*k*pul*2;
-    const col=z.c||'#ff3d6e';ctx.save();ctx.fillStyle=ctx.strokeStyle=col;
+  for(const z of BMV.hz){const live=!z.mk&&t>=z.on,k=z.on>z.t0?clamp((t-z.t0)/(z.on-z.t0),0,1):1,pul=.35+.25*Math.sin(t*22);ctx.globalAlpha=live?(RET.first30?F30.A:.82):z.mk?.5*(1-.4*k)+.1:.18+.3*k*pul*2;
+    const col=RET.first30&&z.c?F30.col(z.c):z.c||'#ff3d6e';ctx.save();ctx.fillStyle=ctx.strokeStyle=col;
     switch(z.s){
       case'band':case'col':case'wall':for(const p of BMV.prims(z)){const[a,b,c2,d]=p.r;if(live)ctx.fillRect(a,b,c2-a,d-b);else{ctx.lineWidth=2;ctx.setLineDash([8,6]);ctx.strokeRect(a,b,c2-a,d-b);ctx.setLineDash([]);ctx.globalAlpha*=.35;ctx.fillRect(a,b,c2-a,d-b);ctx.globalAlpha/=.35;}}
         if(z.arc&&!live){ctx.beginPath();const ax=z.arc.x+(z.x-z.arc.x)*k,ay=z.arc.y+(z.y0+60-z.arc.y)*k-Math.sin(k*3.1416)*160;ctx.arc(ax,ay,7,0,7);ctx.fill();}break;
       case'circ':ctx.lineWidth=live?0:2;ctx.beginPath();ctx.arc(z.x,z.y,live?z.r:z.r*(z.cd?1.6-.6*k:1),0,7);if(live)ctx.fill();else ctx.stroke();if(!live){ctx.globalAlpha*=.3;ctx.beginPath();ctx.arc(z.x,z.y,z.r*k,0,7);ctx.fill();}break;
-      case'beam':{const L=z.L==null?1400:z.L;ctx.translate(z.x,z.y);ctx.rotate(z.a);if(live)ctx.fillRect(0,-z.w/2,Math.max(L,2),z.w);else{ctx.lineWidth=2;ctx.setLineDash([10,8]);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(z.grow?1500:z.blk?L:1400,0);ctx.stroke();ctx.setLineDash([]);}
+      case'beam':{const L=z.L==null?1400:z.L;ctx.translate(z.x,z.y);ctx.rotate(z.a);if(live){if(RET.first30)F30.beam(Math.max(L,2),Math.max(z.w,20),col);else ctx.fillRect(0,-z.w/2,Math.max(L,2),z.w);}else{ctx.lineWidth=2;ctx.setLineDash([10,8]);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(z.grow?1500:z.blk?L:1400,0);ctx.stroke();ctx.setLineDash([]);}
         ctx.rotate(-z.a);ctx.translate(-z.x,-z.y);if(z.sw&&!live){ctx.globalAlpha=.16;ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(z.x,z.y);ctx.arc(z.x,z.y,1400,Math.min(z.a0,z.a1),Math.max(z.a0,z.a1));ctx.closePath();ctx.fill();}break;}
       case'well':ctx.lineWidth=2;for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(z.x,z.y,(z.core||24)+((t*60+i*40)%120),0,7);ctx.globalAlpha=live?.5:.2;ctx.stroke();}ctx.globalAlpha=live?.85:.3;ctx.beginPath();ctx.arc(z.x,z.y,z.core||24,0,7);ctx.fill();break;
       case'aim':{const s=z.e;ctx.lineWidth=2;ctx.setLineDash([6,8]);ctx.beginPath();ctx.moveTo(s.x-20,s.y);ctx.lineTo(P.x,P.y);ctx.stroke();ctx.setLineDash([]);break;}
