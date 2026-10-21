@@ -706,6 +706,7 @@ Object.assign(BX_TESTS,{
 function BX_test(id){const T=BX_TESTS[id];if(!T)return;const ck=$('#odChk');if(ck)ck.hidden=true;if(!BX.on)BX_open();if(BX.mode==='drive')BX_driveStop();
  BX_load({log:T.log()},T.n);BX.testId=id;BX.camGo=1;BX.seenAll=new Set();BX.auto=null;if(T.drive)BX_driveStart();if(T.race)BX_raceSetup();
  if(T.auto)BX.auto={W:BX_lap([0,0,0]).map(o=>o.s.p),st:{i:0}};return T.n} // trk-4: auto = the AI drives the lap you watch (the check runs the same autopilot in fast time)
+window.BX=BX;   // lazy-split: the builder is a lazy chunk (src/LAZY), so eager code (98v_r3_levels typeof BX) and the checklist chunk see it on window
 window.__bx={BX,open:BX_open,close:BX_close,test:BX_test,check:id=>BX_TESTS[id||BX.testId].chk(),tests:()=>Object.keys(BX_TESTS),off:id=>BX_TESTS[id||BX.testId].off||null,
  proj:(x,y,z)=>{const v=bxV(x,y,z).project(BX.cam);return[(v.x+1)/2*innerWidth,(1-v.y)/2*innerHeight,v.z<1?1:0]},
  cell:(i,j,l)=>{const p=bxV(BXO+(i+.5)*BXC,l==null?BX_h(BXO+(i+.5)*BXC,BXO+(j+.5)*BXC):l*BXH,BXO+(j+.5)*BXC).project(BX.cam);return[(p.x+1)/2*innerWidth,(1-p.y)/2*innerHeight]},

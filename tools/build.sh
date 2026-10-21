@@ -12,7 +12,7 @@ VER="${1:?usage: tools/build.sh <ver> [--local]}"; OUT="out/$VER"; mkdir -p "$OU
 for f in src/*.js src/*.html; do grep -qx "$(basename "$f")" src/ORDER src/MODELS || { echo "BUILD FAIL: $f not in src/ORDER or src/MODELS"; exit 1; }; done
 python3 tools/modmap.py || echo "WARN: modmap failed (docs/MODULES.md not refreshed)"   # keep docs/MODULES.md in step with src/
 # lazy code chunks (src/LAZY, split-1): modules that are still in ORDER (dev tools keep working) but are NOT in the page; packed to out/<ver>/xc/<name>.js, evaluated after drivable (src/10z_lazy.js)
-XC_ORDER=$(grep -vxF -f <(sed 's/:.*//;/^#/d;/^$/d' src/LAZY 2>/dev/null; echo __none__) src/ORDER)
+XC_ORDER=$(grep -vxF -f <(sed 's/:.*//;/^#/d;/^$/d;s/+/\n/g' src/LAZY 2>/dev/null; echo __none__) src/ORDER)
 rm -rf "$OUT/xc"; XCV=$(node tools/lazy/pack.js "$OUT") || { echo "BUILD FAIL: lazy chunks"; exit 1; }
 for f in "$OUT"/xc/*.js; do [ -e "$f" ] && { node --check "$f" || { echo "BUILD FAIL: $f syntax"; exit 1; }; }; done
 ( cd src && node ../tools/strip.js $XC_ORDER ) | XCV="$XCV" python3 tools/lazy/inject.py > "$OUT/overdrive.html"   # deploy page: own-line comments stripped (tools/strip.js, AST-identical); --local dev page below stays unstripped

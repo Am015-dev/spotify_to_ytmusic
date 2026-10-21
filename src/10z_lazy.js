@@ -20,6 +20,7 @@ function XC_run(all){XC.t0=XC.t0||performance.now();return(async()=>{/* perf-r14
 if(!XC.done&&!TQ){const iv=setInterval(()=>{try{if(state==='loading'||LD.on||LD.busy)return}catch(e){return}clearInterval(iv);setTimeout(XC_go,1500)},300)}
 // perf-r16c: 99c_checklist is at its 200 KB cap, so its panel hook lives here: opening the 📋 panel on a player page loads the GO chunks, then re-renders (their items + 📍 GO buttons)
 XC.post['99c_checklist']=()=>{const o=window.odChkOpen;if(typeof o!=='function'||XC_ALL0)return;window.odChkOpen=function(){const r=o.apply(this,arguments);if(!XC.all)XC_go(true).then(()=>{const v=document.querySelector('.ckOn');if(v)o()});return r}};
+XC.post['98b2_builder2']=()=>{try{if(!document.querySelector('.bxTrk'))window.BX_raceMenu()}catch(e){}};   // lazy-split: the race menu may have been built before the builder chunk loaded
 window.__xc={XC,need:XC_need,go:XC_go,ev:XC_eval};   // ev = test hook: eval in module scope
 // per-city boot data (52_terrain_data.js awaits these): start the downloads NOW, ~40 modules before the await, so they run parallel to the rest of the page's start-up
 for(const n of CID==='ath'?['10c_qtc_blob','52a_terr_ath']:['52f_terr_fra'])XC_need(n);

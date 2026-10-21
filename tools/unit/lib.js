@@ -8,7 +8,7 @@ const memo=(k,f)=>k in cache?cache[k]:(cache[k]=f());
 const rd=f=>fs.readFileSync(path.join(SRCD,f),'utf8');
 const ORDER=()=>memo('order',()=>rd('ORDER').split('\n').map(s=>s.trim()).filter(Boolean));
 const MODS=()=>memo('mods',()=>{const o={};for(const f of ORDER())o[f]=rd(f);return o});
-const LAZYL=()=>memo('lazy',()=>{try{return rd('LAZY').split('\n').map(s=>s.trim().replace(/:.*/,'')).filter(s=>s&&s[0]!=='#')}catch(e){return[]}});   // split-1: modules built as xc/ chunks, not in the page
+const LAZYL=()=>memo('lazy',()=>{try{return rd('LAZY').split('\n').map(s=>s.trim().replace(/:.*/,'')).filter(s=>s&&s[0]!=='#').flatMap(s=>s.split('+'))}catch(e){return[]}});   // split-1: modules built as xc/ chunks, not in the page
 const STRIP=require('../strip.js').strip;   // the built page ships comment-stripped (tools/build.sh), so size checks measure the same text
 const PAGE=()=>memo('page',()=>{let s=ORDER().filter(f=>!LAZYL().includes(f)).map(f=>f.endsWith('.js')?STRIP(MODS()[f]):MODS()[f]).join('');if(SEED==='credits')s=s.replace(/by Alex/g,'by Bob');if(SEED==='allopen')s=s.replace('ALL_OPEN=true','ALL_OPEN=false');return s});
 const JSCODE=()=>memo('js',()=>{let s=ORDER().filter(f=>f.endsWith('.js')).map(f=>MODS()[f]).join('\n');
