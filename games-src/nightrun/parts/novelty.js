@@ -1,3 +1,6 @@
+// PURPOSE: late-run escalation layer
+// FLAG: novelty (?novelty=0)
+// TEST: novelty-test.js
 /* ---------- novelty.js: a late-run escalation layer (owner 20 Oct 2026: "the game is boring, repetitive, needs to be more creative"). Flag RET.novelty (default OFF for now, ?novelty=1 = on); off = the old game (no hooks act, no GR draws).
    It keeps a session clock (game seconds summed over stages) and a codex of what the player has seen (localStorage 'nr-novelty'), and always prefers the unseen:
      TWISTS   from session minute 8 (all of them by minute 28) a wave that already came in the last 5 min comes back with a twist from the deck: swift (+12% speed), armored (x1.5 hp, ring), gilded (x2 score, gold), tiny (r x0.85),

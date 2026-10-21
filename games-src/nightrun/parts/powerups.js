@@ -1,3 +1,6 @@
+// PURPOSE: six music-tied timed power-ups + drum burst
+// FLAG: pw2 (?pw2=0)
+// TEST: ret-pw2-test.js
 /* ---------- powerups: six music-tied timed power-ups + a reliable DRUM BURST (flag RET.pw2, off with ?pw2=0 = the old game) ----------
    ECHO         every on-beat shot comes back once, a beat later, from where the ship was (a ghost shot with a trail)
    DOWNBEAT NOVA  on the first beat of each bar a ring leaves the ship: wipes the bullets it touches, light damage to enemies

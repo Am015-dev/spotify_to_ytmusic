@@ -1,3 +1,6 @@
+// PURPOSE: every story stage plays its own script
+// FLAG: vary (?vary=0)
+// TEST: vary-test.js
 /* ---------- stagescripts.js: every story stage plays its own script (VARIETY A, owner 18 Oct 2026). Flag RET.vary (formations.js); ?vary=0 = the old shuffled pools.
    THE SCRIPT TABLE (edit freely; vary-test.js checks it): stage number -> {sig, mut, m}
      m    the moments in order, spread evenly over the stage (a boss / mini-boss stage: over the build-up before it). One moment is a few bars of one formation:
