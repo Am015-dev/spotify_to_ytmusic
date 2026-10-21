@@ -221,7 +221,7 @@ function OB_fillFix(){const t0=performance.now(),O=OB_RA.ops;O.fExt=0;O.fTrim=0;
   O.fillMs=Math.round(performance.now()-t0)}
 // perf-r17i: rfGrid post-passes are RFS.S (run in order); rfGrid runs them all, buildHubG with bhs runs rfGridBegin() then one RFS.S entry per step (rfGridNext) so no step is the whole 0.6-1.2 s. Same calls in the same order.
 const RFS={base:rfGrid,st:0,S:[()=>{if(OB_RA.on&&FILL_R.length)OB_fillFix()},()=>RD_fillTrim(),()=>RD_fillLoop()]};
-rfGrid=function(){if(FILL_R)return;RFS.base();for(const f of RFS.S)f()};
+rfGrid=function(){if(FILL_R)return;RFS.base();RFS.st=0;while(RFS.st<RFS.S.length)RFS.S[RFS.st++]()};
 function rfGridBegin(){if(FILL_R)return 0;RFS.st=0;RFS.base();return 1}
 function rfGridNext(){if(RFS.st>=RFS.S.length)return 0;RFS.S[RFS.st++]();return RFS.st<RFS.S.length}// dev1: repeat until no end changes (a join/trim can leave the next end dead)
 // runtime audit of the CURRENT drawn network: CITY_S drivable streets + filler grid + bridges + Autobahn links, junction plates, GPS coverage
