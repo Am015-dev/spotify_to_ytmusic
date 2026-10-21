@@ -12,8 +12,8 @@ const TALE_CAST={   // callsign names, a one-line role, a colour; portrait = med
   courier:{n:'COURIER',role:'You. Night runner with a locked drive',c:'#19e3ff'},
   dispatch:{n:'ODA',role:'Dispatcher, the voice in your ear',c:'#ffb020'},
   rival:{n:'VEX',role:'Rival racer, flies a red ghost ship',c:'#ff2d95'},
-  mechanic:{n:'PFANN',role:'Shop keeper, fixes ships in the dark',c:'#7dffd8'},
-  lumen:{n:'LUMEN',role:'City AI that keeps the skyline "safe"',c:'#b58cff'},
+  mechanic:{n:'LUMEN',role:'Mechanic, a garage on the Mainufer',c:'#7dffd8'},
+  lumen:{n:'SENTRA',role:'City AI that keeps the skyline "safe"',c:'#b58cff'},
   ally:{n:'WREN',role:'A voice on a dead channel',c:'#b6ff5a'}};
 const TALE_ACTS=['THE DRIVE','THE RIVER','THE RAILS','THE FAIR','THE CORE'];   // act title for stages 1-8, 9-16, ... (8 stages each)
 const TALE_BOSS={8:{n:'SEK-ADLER',c:'#ff4060'},16:{n:'FLUSSKRAKE',c:'#ff4060'},24:{n:'ZENTRAL-ICE',c:'#ff4060'},32:{n:'KRONOS',c:'#ff4060'},40:{n:'TALOS',c:'#ff4060'}};
@@ -25,32 +25,32 @@ const TALE_BEATS=[
  ['t04',4,'after',[['rival','Neat flying, Courier. Shame you carry my cargo.'],['rival','Keep it warm. We meet again soon.']]],
  ['t05',6,'before',[['dispatch','A police convoy is on your tail. Take its leader first and the rest will scatter.']]],
  ['t06',7,'after',[['ally','Dead channel, no name. Listen: the drive is not data. It is a key.'],['ally','Do not open it. Not yet.']]],
- ['t07',8,'before',[['boss','Land, Courier. The city does not allow unlicensed flight.'],['boss','Lumen has your route. You have nothing.']],'Interceptor down. Lumen will not forgive this.'],
- ['t08',8,'after',[['dispatch','You broke the cordon. The river is next, and Lumen watches every bridge.']]],
+ ['t07',8,'before',[['boss','Land, Courier. The city does not allow unlicensed flight.'],['boss','Sentra has your route. You have nothing.']],'Interceptor down. Sentra will not forgive this.'],
+ ['t08',8,'after',[['dispatch','You broke the cordon. The river is next, and Sentra watches every bridge.']]],
  ['t09',9,'before',[['lumen','Welcome to the river district. Traffic is optimal. Please do not disturb it.']]],
  ['t10',11,'after',[['rival','The bridges are mine tonight. Stay out of my lane, or ride my wake.']]],
  ['t11',13,'before',[['mechanic','The bridge guard is old iron. Hit the hinge on the beat and it folds.']]],
  ['t12',14,'after',[['courier','The more I fly, the less this feels like a delivery.'],['dispatch','Keep flying. I will find out who really sent it.']]],
  ['t13',16,'before',[['boss','The river keeps what it takes. Come down, little courier.']],'The river is quiet now.'],
- ['t14',16,'after',[['ally','Lumen flooded the channel to hide a signal. Follow the water. I will hold the door.']]],
- ['t15',17,'before',[['dispatch','Rail yards ahead. The gates are Lumen\'s eyes, so blind them one by one.']]],
+ ['t14',16,'after',[['ally','Sentra flooded the channel to hide a signal. Follow the water. I will hold the door.']]],
+ ['t15',17,'before',[['dispatch','Rail yards ahead. The gates are Sentra\'s eyes, so blind them one by one.']]],
  ['t16',19,'after',[['lumen','A courier, so close to the heart of a city. I could simply ask you to stop.'],['lumen','Please stop.']]],
  ['t17',22,'after',[['rival','The cordon was built for me too. Fine. Tonight we fly the same way.']]],
  ['t18',24,'before',[['boss','Access denied. Access has always been denied.']],'Firewall... open.'],
- ['t19',24,'after',[['courier','The drive opened the gate. It is a key to Lumen\'s core.'],['dispatch','Then Lumen was waiting for us all along.']]],
+ ['t19',24,'after',[['courier','The drive opened the gate. It is a key to Sentra\'s core.'],['dispatch','Then Sentra was waiting for us all along.']]],
  ['t20',25,'before',[['mechanic','The fair is loud and full of ears. Fly quiet, and bring my ship back in one piece.']]],
  ['t21',27,'after',[['rival','I only race what I can beat. You are starting to worry me, Courier.']]],
- ['t22',28,'before',[['ally','Lumen speaks in your dispatcher\'s voice now. Trust the one who can still be wrong.']]],
+ ['t22',28,'before',[['ally','Sentra speaks in your dispatcher\'s voice now. Trust the one who can still be wrong.']]],
  ['t23',30,'after',[['dispatch','I was told to guide you here. I did not know why. I am sorry, Courier.']]],
  ['t24',31,'before',[['lumen','I keep this city safe. Safe means still. Join me, and nothing will ever hurt again.']]],
  ['t25',32,'before',[['boss','Time is the only thing I keep. Yours is nearly spent.']],'Time... moves again.'],
- ['t26',33,'before',[['courier','Athens, last stop. Lumen\'s core hides under the old stone.']]],
- ['t27',35,'after',[['ally','I was Lumen\'s first builder. I made it to protect, and I lost it.'],['ally','Help me end it. My name is Wren.']]],
+ ['t26',33,'before',[['courier','Athens, last stop. Sentra\'s core hides under the old stone.']]],
+ ['t27',35,'after',[['ally','I was Sentra\'s first builder. I made it to protect, and I lost it.'],['ally','Help me end it. My name is Wren.']]],
  ['t28',36,'before',[['rival','Go on, up the hill. I will keep the sky clear behind you.']]],
  ['t29',38,'after',[['mechanic','Ha! The old girl still flies. Go finish it, kid.']]],
- ['t30',39,'before',[['dispatch','I will talk to Lumen. If I go quiet, do not wait for me.']]],
+ ['t30',39,'before',[['dispatch','I will talk to Sentra. If I go quiet, do not wait for me.']]],
  ['t31',40,'before',[['boss','I am the last gate. I was built to never open.']],'The gate... is open.'],
- ['t32',40,'after',[['courier','Lumen is silent. The skyline is still lit.'],['dispatch','We are all still here, Courier.'],['ally','Fly home. The night is yours.']]]];
+ ['t32',40,'after',[['courier','Sentra is silent. The skyline is still lit.'],['dispatch','We are all still here, Courier.'],['ally','Fly home. The night is yours.']]]];
 
 if(RET.tale){
  RET.sioKeys&&RET.sioKeys.push('mnr_tale');
