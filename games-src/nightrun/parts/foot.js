@@ -400,7 +400,7 @@ function build(){if(L)return L;const st=document.createElement('style');st.textC
   return L;}
 function isTouch(){return ('ontouchstart' in window)||navigator.maxTouchPoints>0||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);}
 const autoOn=()=>!!(L&&L.touch&&(SV.auto===undefined||SV.auto));   // touch: auto-fire is on unless the player turned it off in the pause menu
-function layout(){if(!L)return;const vv=window.visualViewport,W=Math.round(vv?vv.width:innerWidth),H=Math.round(vv?vv.height:innerHeight),dpr=Math.min(2,window.devicePixelRatio||1);
+function layout(){if(!L)return;const vv=window.visualViewport,W=Math.round(vv?vv.width:innerWidth),H=Math.round(vv?vv.height:innerHeight),dpr=Math.min(F.dprMax||2,window.devicePixelRatio||1);
   const T=L.touch=isTouch()||F.forceTouch;if(F.look&&F.look.layout&&F.look.layout(L,W,H,dpr,T))return;let cx=0,cy=0,cw=W,ch=H,mode='full',minVw=480,sw=0;
   if(T&&H>W*1.05){mode='port';minVw=420;ch=H-clamp(Math.round(H*.37),190,290);}   // portrait: the field takes about 63% of the height, the pad lives below it
   else if(T){mode='land';minVw=420;sw=clamp(Math.round(W*.22),160,220);cx=sw;cw=W-2*sw;}   // landscape: the field is the whole screen, the pad sits over the side bands
@@ -537,8 +537,8 @@ function leave(then){const id=S&&S.id,cl=S&&S.end&&S.end.cleared;stop();
   if(then)then();}
 
 /* ===== start / stop ===== */
-function loop(t){if(!F.on){raf=0;return;}const dt=Math.min(.05,(t-lastT)/1000||0);lastT=t;ftUpdate(dt);draw();raf=requestAnimationFrame(loop);}
-function begin(id,fromCp){build();newRun(id,fromCp);for(const k in I)I[k]=0;L.root.hidden=false;F.on=true;layout();hideMenu();
+function loop(t){if(!F.on){raf=0;return;}const dt=Math.min(.05,(t-lastT)/1000||0);lastT=t;ftUpdate(dt);if(F.pre)F.pre(L.ctx);draw();raf=requestAnimationFrame(loop);}
+function begin(id,fromCp){if(F.ui){F.ui=0;if(F.hold&&F.hold(()=>begin(id,fromCp)))return;}build();newRun(id,fromCp);for(const k in I)I[k]=0;L.root.hidden=false;F.on=true;layout();hideMenu();
   try{if(window.AU&&AU.startStage)AU.startStage(STAGES[id].song);}catch(e){}
   NR.emit('footStart',{stage:id,cp:!!fromCp,t0:S.time});lastT=performance.now();if(!raf)raf=requestAnimationFrame(loop);}
 function start(id){id=id||'street1';if(!RET.foot||!STAGES[id])return false;if(typeof running!=='undefined'&&running)return false;
@@ -552,7 +552,7 @@ function sim(sec,dt){dt=dt||1/60;let n=Math.round(sec/dt);while(n-->0&&S&&!S.end
 if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)return false;if(document.getElementById('footBtn'))return true;
     const b=document.createElement('button');b.type='button';b.className='go wide';b.id='footBtn';g.appendChild(b);
     const paint=()=>{const u=ftUnlocked();b.disabled=!u;b.innerHTML=u?'STREET RUN<small style="font-size:14px;display:block">on foot · '+(SV.best[F.main||'street1']?'best '+SV.best[F.main||'street1'].score:'new')+'</small>':'STREET RUN<small style="font-size:14px;display:block">clear stage 3 to unlock</small>';};
-    paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');start(F.main||'street1');});
+    paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');F.ui=1;start(F.main||'street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
 F._in={L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
