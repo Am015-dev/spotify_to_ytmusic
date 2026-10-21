@@ -221,7 +221,7 @@ function calFrame(){const pad=$('calPad');if(!pad||setEl.hidden||!CAL.on)return;
 $('setBack').addEventListener('click',closeSettings);
 $('setBtn').addEventListener('click',()=>openSettings('title'));
 $('pSetBtn').addEventListener('click',()=>openSettings('pause'));
-buildSettings();if(window.RET&&RET.assistBuild)RET.assistBuild();
+buildSettings();if(window.RET&&RET.assistBuild)RET.assistBuild();if(window.RET&&RET.stampX)RET.stampX.build();
 function setPause(on){if(!running||on===paused)return;if(!on&&window.NRF&&NRF.holdResume())return;paused=on;pauseEl.hidden=!on;
   if(on){const v=HUDX.vals();$('pStats').textContent=`Hull ${v.hp}/${v.max} · Shield ×${v.sh} · Dash ${v.dash}/${v.dashMax}`+(v.rev?` · Revive ×${v.rev}`:'')+(v.drones?` · Drones ×${v.drones}`:'')+` · Perks ${v.perks} · Upgrades ${v.upg}`;}   // the counters the phone HUD hides while you play
   if(on){if(!(window.NRF&&NRF.keepOn()))AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}

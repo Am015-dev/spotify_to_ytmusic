@@ -1,10 +1,10 @@
-/* Mainhattan Nightrun service worker (B30). Built by parts/build.py: 49fe4c3337 is replaced by a hash of the page, so every deploy makes a new worker and new cache names.
+/* Mainhattan Nightrun service worker (B30). Built by parts/build.py: 86887bb463 is replaced by a hash of the page, so every deploy makes a new worker and new cache names.
    - shell (index.html, manifest, icons, title art): precached; index.html is NETWORK FIRST (3 s) with the cache as fallback, so a stale page is never served while online
    - tracks.json: network first, cache fallback
    - music/*.mp3 and media/*: cached when first used (size capped), served from the cache, then quietly re-checked with a conditional request (304 = nothing downloaded)
    - Range requests (a plain <audio src>) are answered from the cached file as 206; the game itself fetches songs whole into a blob, which needs no special case
    - other origins (fonts) are never touched; on activate the old shell cache goes and the asset cache is carried over to the new name */
-const BUILD = '49fe4c3337';
+const BUILD = '86887bb463';
 const SHELF = 'nr-shell-' + BUILD, ASSETS = 'nr-assets-' + BUILD;
 const CAP = { music: 24, media: 470 };
 const BASE = new URL('./', self.registration.scope).href;
@@ -74,6 +74,7 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const u = new URL(req.url);
+  if (req.cache === 'no-store') return;   // the page's own "check for update" must see the network, never a cached copy
   if (u.origin !== location.origin || !u.href.startsWith(BASE)) return;
   const rel = u.href.slice(BASE.length).split(/[?#]/)[0], k = key(u.href);
   if (rel === '' || rel === 'index.html') e.respondWith(networkFirst(req, k, 3000));
