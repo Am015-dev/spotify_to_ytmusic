@@ -15,7 +15,7 @@
    Final gate RUNS=12 (n=24): human 8%, oracle 29% (target 35-65, inside the noise band), no-oracle 8%, beat 100%, no-dash 29%, camper / random 0%, endless median wave 4. The bots carry no meta progress, the owner does: hull plating (+5), revives, shield regen.
    Not touched: armour.js hull / caps, hard.js DPS ceiling, stage length (pacing), boss length cap (bossfit). ---------- */
 if(RET.legend===undefined)RET.legend=!/[?&]legend=0/.test(location.search);
-const LEG=window.LEG={WIN:.85,PK:.5,PKK:.55,HULL:0,EV:6,GAP:120,GOFF:110,CR:46,CT:2.2,TELL:.6,FAN:3,CD:2.2,PT:50,FBW:6,FILL:.5,HOV:5,POOL:8,RGN:.5,
+const LEG=window.LEG={WIN:.85,PK:.5,PKK:.55,HULL:0,PL:4,EV:6,GAP:120,GOFF:110,CR:46,CT:2.2,TELL:.6,FAN:3,CD:2.2,PT:50,FBW:6,FILL:.5,HOV:5,POOL:8,RGN:.5,
   DF:{d:3.6,fr:5.6,bs:1.7,dn:1.45,sd:1.15,sbs:.85,sfr:.85,fan:3,el:1.1,aq:3,heal:.35},HPK:1,DM:{lv:.3,hp:1.1},SC:{lv:.5,hp:1.2},HK:9,WK:1.3,DK:1.15,RK:1.15,FS:2,
   stat:{pun:0,pk:0,hp:0,verb:0,gap:0,rev:0},cz:null,
   act(){return!!RET.legend&&typeof SET==='object'&&SET.diff==='legend'&&!(typeof G==='object'&&G&&(G.lab||G.tut));}};
@@ -28,7 +28,8 @@ if(RET.legend){
   if(window.BPL){BPL.AM=BPL.AM||{};BPL.AM.legend=0;BPL.PT.legend=LEG.PT;BPL.FIT.PT.legend=LEG.PT;BPL.FIT.FBWD.legend=LEG.FBW;}
   /* 1. timing: a narrower window, no assist; a narrower PERFECT share */
   {const aw=RET.asWinMs;RET.asWinMs=function(){const v=aw.call(this);return LEG.act()?-Math.round((WINS[SET.win]||110)*(1-LEG.WIN)):v;};}
-  if(window.TIM){const pk=TIM.PK;Object.defineProperty(TIM,'PK',{get(){return LEG.act()?LEG.PK:pk;},set(){},configurable:true});}
+  if(window.TIM){const pk=TIM.PK;Object.defineProperty(TIM,'PK',{get(){return LEG.act()?LEG.PK:pk;},set(){},configurable:true});
+    const pl=TIM.PLOCK;Object.defineProperty(TIM,'PLOCK',{get(){return LEG.act()?LEG.PL:pl;},set(v){},configurable:true});}   // W121: a button press with nothing near locks DASH LEG.PL s (random mashing was clearing 13%)
   /* 3. walls: the one gap is narrow */
   if(window.CTR){const t0=CTR.tick;CTR.tick=function(dt){const pend=LEG.act()&&this.walls?this.walls.filter(w=>!w.cur&&w.warn>0):null;t0.apply(this,arguments);
     if(pend)for(const w of pend){if(w.warn>0||w.lg)continue;w.lg=1;if(!w.gap&&!w.cur){const s=GR()<.5?-1:1;w.gap={y:clamp(P.y+s*LEG.GOFF,70,H-70),h:110};if(Math.abs(w.gap.y-P.y)<LEG.GOFF*.8)w.gap.y=clamp(P.y-s*LEG.GOFF,70,H-70);}if(w.gap){w.gap.h=Math.min(w.gap.h,LEG.GAP);LEG.stat.gap++;}}};}
