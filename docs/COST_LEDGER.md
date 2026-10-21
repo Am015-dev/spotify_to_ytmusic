@@ -67,7 +67,11 @@ Model and status come from the session list. Cost is blank: the session list doe
 | drive-first-r22d1 | beta.145 | Sonnet | First PLAY drives, one text slot, phone HUD <=9 (gaps 4-5) | shipped beta.145 |
 | terrain-flat-r22d2 | beta.145 | Sonnet | Slope cap beside roads, unstick 1.2/2.5 s (gap 1) | shipped beta.145 |
 | review-17-18 | beta.145 | Opus | Reviews of drive-first and terrain | PASS |
-| hud-cam-r22d3 | beta.146 | Sonnet | Camera clear + phone roam HUD-6 (gaps 6-7) | in review #19 |
+| hud-cam-r22d3 | beta.146 | Sonnet | Camera clear + phone roam HUD-6 (gaps 6-7) | shipped beta.146 |
 | core-loop-plan-r22d4 | — | Opus | Frankfurt core + one loop design plan, 8 lanes (gap 9) | done (docs) |
-| rv3a-fix-r22d5 | — | Sonnet | RV3A_rows ReferenceError on player pages + no-pageerror GO | working at log time |
-| cl-L1-core-zone | — | Sonnet | Core loop L1: core zone behind ?cl=core | working at log time |
+| rv3a-fix-r22d5 | beta.146 | Sonnet | RV3A_rows ReferenceError on player pages + no-pageerror GO | shipped beta.146 (GO weak, see review #20) |
+| cl-L1-core-zone | — | Sonnet | Core loop L1: core zone behind ?cl=core | in review #21 |
+| review-19-20 | beta.146 | Opus | Reviews of hud-cam and rv3a fix | PASS |
+| tr9-chunk-r22d6 | — | Sonnet | Chunk TR9 slope cap at boot (fra 244 -> 14 ms steps) | in review #22 |
+| cl-L2-smash | — | Sonnet | Core loop L2: smash props at any speed | working at log time |
+| cl-L3-studs | — | Sonnet | Core loop L3: stud flow | working at log time |
