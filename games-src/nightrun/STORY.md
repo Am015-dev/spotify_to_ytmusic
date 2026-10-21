@@ -13,3 +13,13 @@ Build: `python3 games-src/nightrun/parts/build.py`.
 
 ## Adventure layer (parts/tale.js, flag `RET.tale`, `?tale=0` = off)
 Six cast members, 32 story beats (`TALE_BEATS`) and 5 boss taunt/defeat lines, all in one data table at the top of `tale.js` (edit the text there). `before` beats play as a card the first time PLAY is tapped on the stage plate (one tap or SKIP; the plate shows a one-line preview; the title's PLAY / CONTINUE, NEXT STAGE and RETRY start at once); `after` beats play on the clear screen after the first clear. Every beat unlocks in the STORY LOG (MENU) when its stage is first cleared; locked ones read "???" with the stage that unlocks them. Save: `mnr_tale` (in the export list). Portraits: `media/char-<id>.webp` 256x256 (manifest group "Story cast"); a coloured hex with the initial until the file is real art. `?sim=1` pages never show cards (`&tale=2` forces them). Test: `NODE_PATH=$(npm root -g) node games-src/nightrun/tale-test.js`.
+
+## Campaign through-line (parts/storydata.js + parts/saga.js, flag `RET.story`, default ON, `?story=0` = off)
+One data file holds every line (`storydata.js`: id, chapter, trigger, speaker, line 1, line 2; max 2 lines of 140 characters a card). Ten chapters over the 40 stages
+(`STORY_CH`): a courier carries the stolen Kronos ledger from Frankfurt to an open server in Athens; Wren (the clerk who sent it), ODA (dispatcher, betrays you in
+chapter 6, redeems herself in 9), Lumen (mechanic, takes over comms), Vex (bounty racer, turns ally), Direktorin Halde (Kronos chair), ten bosses with an intro and a defeat line.
+Where it shows: the opening (first story start, ~25 s, auto-advance, tap / SKIP), a one-card briefing before each stage (first time), comms lines in the stage (start,
+mid-point, boss in, boss down; 3 s, no input, they move away from the ship and the touch buttons), the chapter's end scene and a 'story so far' line on the result screen,
+the epilogue + credits after stage 40, the street run's before/after (through foot.js / TALE.show). HOME: STORY tile (`hub-story-slot` when present); MENU: STORY LOG
+(chapter list, last line per chapter, replays). With RET.story on, tale.js's beats, plate preview and STORY LOG button stand down. Pages under test automation never
+meet a scene unless `?story=2`. Save: `mnr_saga` (exported). Missing portrait: ASSETS-NEEDED-STORY.md. Test: `NODE_PATH=$(npm root -g) node games-src/nightrun/story-test.js`.

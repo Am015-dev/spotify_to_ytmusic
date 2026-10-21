@@ -1,0 +1,237 @@
+/* ---------- STORYDATA: every line of the campaign through-line (flag RET.story, ?story=0 = off). The owner edits the text HERE; saga.js only plays it.
+   Rules: a card is one speaker and at most 2 lines (l1, l2), each line <= 140 characters (story-test.js checks it). German place names, English text.
+   Row: [id, chapter, trigger, speaker, line1, line2]. Triggers:
+     open          the opening sequence (first start, cards auto-advance, tap / SKIP)
+     brief:N       the one-card BRIEFING before story stage N (speaker 'brief': l1 = the story goal, l2 = what is new)
+     go:N / mid:N  one comms line in stage N: at the start / at the mid-point (3 s, never blocks)
+     boss:N / down:N   the boss's line when it appears / when it goes down (stage N)
+     end:C         the chapter's closing scene, after its last stage is first cleared (result screen)
+     sofar:C       the 'story so far' line of chapter C (result screen, chapter list)
+     foot:before / foot:after / sofar:foot   the on-foot STREET RUN mini-arc
+     epi           the epilogue after the last stage; credits = the closing card
+   Speakers: a STORY_CAST id, 'nar' (no portrait), 'brief', or 'b:<n>' = the boss of stage n (its boss portrait). ---------- */
+if(RET.story===undefined)RET.story=!/[?&]story=0/.test(location.search);
+const STORY_CAST={
+  nar:{n:'',role:'',c:'#9fe8ff'},   // narrator: no name, no picture
+  courier:{n:'COURIER',role:'You. A courier with a stolen drive',c:'#19e3ff',pic:'char-courier'},
+  oda:{n:'ODA',role:'Dispatcher, the voice in your ear',c:'#ffb020',pic:'char-dispatch'},
+  lumen:{n:'LUMEN',role:'Mechanic, a garage on the Mainufer',c:'#7dffd8',pic:'char-mechanic'},
+  vex:{n:'VEX',role:'Bounty racer in a red ship',c:'#ff2d95',pic:'char-rival'},
+  wren:{n:'WREN',role:'Kronos clerk who sent the drive',c:'#b6ff5a',pic:'char-ally'},
+  halde:{n:'DIREKTORIN HALDE',role:'Chair of Kronos Bank',c:'#ff4060',pic:'char-halde'}};
+/* ten chapters over the five districts: [title, first stage, last stage] */
+const STORY_CH=[
+  ['THE DROP',1,5],['THE CORDON',6,8],['THE RIVER',9,13],['THE KRAKEN',14,16],['THE RAILS',17,21],
+  ['THE BETRAYAL',22,24],['THE FAIR',25,29],['THE FLAGSHIP',30,32],['ATHINA',33,37],['THE LAST GATE',38,40]];
+const STORY_LINES=[
+ /* ===== OPENING (first start, ~25 s) ===== */
+ ['op1',1,'open','nar','Kronos Bank owns the skyline, the police and every debt in this city.','Tonight one of its secrets fell out of a window.'],
+ ['op2',1,'open','wren','If you hear this, they caught me. The drive holds what Kronos hides.','Get it to the open server in Athens. Do not let them take it back.'],
+ ['op3',1,'open','courier','Dead drop, sixtieth floor, no name, triple pay.','I never ask what I carry. Tonight I wonder.'],
+ ['op4',1,'open','oda','Courier, ODA here. I have your route out of the Bankenviertel.','Fly low, keep to the beat, and do not open the drive.'],
+ ['op5',1,'open','lumen','Lumen, Mainufer garage. Your ship is tape and hope.','Bring it to me in one piece and I will make it fly.'],
+ ['op6',1,'open','nar','Ten chapters, five districts, one drive.','Deliver it. Stay alive.'],
+
+ /* ===== CHAPTER 1 · THE DROP (stages 1-5, Bankenviertel) ===== */
+ ['b01',1,'brief:1','brief','Get the drive out of the bank towers before Kronos locks them.','NEW: move to dodge. Shots on the beat glow gold and hit harder.'],
+ ['g01',1,'go:1','oda','You are live. Towers ahead, drones waking up.'],
+ ['m01',1,'mid:1','oda','Halfway out. Kronos has noticed the empty vault.'],
+ ['b02',1,'brief:2','brief','Kronos drones sweep the towers. Thin them out.','NEW: drones on patrol. Cut their lines before they spread.'],
+ ['g02',1,'go:2','oda','Patrol pattern. They fly in lines, so cut the lines.'],
+ ['m02',1,'mid:2','courier','Who leaves a drive like this in a dead drop?'],
+ ['b03',1,'brief:3','brief','Cut across the Zeil, the shopping mile, under the ads.','NEW: shop windows and swarms. Turrets hold still, kill them first.'],
+ ['g03',1,'go:3','oda','Every ad on the Zeil is a Kronos camera. Smile.'],
+ ['m03',1,'mid:3','oda','Bounty on you just went up. Somebody wants that drive badly.'],
+ ['b04',1,'brief:4','brief','The old guard post. Police lanes everywhere.','NEW: pick your lane. Chargers flash before they ram.'],
+ ['g04',1,'go:4','oda','Hauptwache police are on the bank payroll. No mercy from them.'],
+ ['m04',1,'mid:4','courier','The drive is warm. It is still writing something.'],
+ ['b05',1,'brief:5','brief','The vault keeper wants its drive back.','NEW: a mini-boss. Learn its pattern, then hit the gaps.'],
+ ['g05',1,'go:5','oda','Big signal under the tower. That is the vault itself.'],
+ ['m05',1,'mid:5','oda','Stay on the beat. Keepers read panic.'],
+ ['x05',1,'boss:5','b:5','Item missing from vault sixty. Return it. Return it. Return it.'],
+ ['d05',1,'down:5','b:5','Vault... unguarded.'],
+ ['e1a',1,'end:1','oda','The vault keeper is scrap. Kronos knows exactly what you carry now.'],
+ ['e1b',1,'end:1','courier','Then they know I am not giving it back.','What is on this thing, ODA?'],
+ ['s1',1,'sofar:1','nar','You stole a Kronos drive from vault sixty. The bank wants it back.'],
+
+ /* ===== CHAPTER 2 · THE CORDON (stages 6-8) ===== */
+ ['b06',2,'brief:6','brief','A police convoy closes in from the Taunusanlage.','NEW: squad leaders. Kill the leader first and the squad breaks.'],
+ ['g06',2,'go:6','oda','Convoy on your tail. Leaders glow. Take them out.'],
+ ['m06',2,'mid:6','wren','Recording two. If this plays, the drive is moving. Good.'],
+ ['b07',2,'brief:7','brief','Climb the Taunus Tower and get above the cordon.','NEW: climb the glass and chain PERFECT hits for score.'],
+ ['g07',2,'go:7','oda','Up the glass. The cordon cannot follow you that high.'],
+ ['m07',2,'mid:7','wren','My name is Wren. I keep the books at Kronos. I kept a copy.'],
+ ['b08',2,'brief:8','brief','The SEK-ADLER, the bank\'s own interceptor. No way round it.','NEW: a district boss. It changes its pattern as it loses armour.'],
+ ['g08',2,'go:8','oda','Interceptor inbound. It is fast. Be faster.'],
+ ['m08',2,'mid:8','courier','A police ship with a bank logo. Of course.'],
+ ['x08',2,'boss:8','b:8','Unlicensed flight. Land now. The bank has already paid for your arrest.'],
+ ['d08',2,'down:8','b:8','Eagle down. Requesting... a refund.'],
+ ['e2a',2,'end:2','wren','The drive holds the Kronos ledger. Every loan in Frankfurt, every name.','Read it with care. Some of the numbers are lies.'],
+ ['e2b',2,'end:2','oda','The cordon is broken. Head for the river. Lumen is waiting.'],
+ ['s2',2,'sofar:2','nar','Wren, a Kronos clerk, sent you the bank\'s ledger. The police serve the bank.'],
+
+ /* ===== CHAPTER 3 · THE RIVER (stages 9-13, Mainufer) ===== */
+ ['b09',3,'brief:9','brief','Follow the Main to Lumen\'s garage.','NEW: a score goal. Chain PERFECT hits to multiply your points.'],
+ ['g09',3,'go:9','lumen','I see you on the river cam. You are leaking. Keep coming.'],
+ ['m09',3,'mid:9','lumen','Patched your shield over the radio. Do not thank me, dodge.'],
+ ['b10',3,'brief:10','brief','The Eiserner Steg. A narrow bridge, tight lanes.','NEW: laser gates. Fly the open gap or DASH through.'],
+ ['g10',3,'go:10','lumen','Gates on the bridge. Read the gap, then commit.'],
+ ['m10',3,'mid:10','vex','Red ship, your six. That drive is worth a year of my debt.'],
+ ['b11',3,'brief:11','brief','The Römer squares. Old town, new Kronos guns.','NEW: old town, new guns. Gunships turn slowly, fly their flank.'],
+ ['g11',3,'go:11','oda','Vex is a bounty racer. Fast, greedy, never misses twice.'],
+ ['m11',3,'mid:11','vex','Hand it over, courier. Nobody wins against Kronos.'],
+ ['b12',3,'brief:12','brief','Catch the ferry line before Vex does.','NEW: ferry crossing. Hunt the patrol to the kill count.'],
+ ['g12',3,'go:12','lumen','Ferry crossing. Stay over the water, the drones hate it.'],
+ ['m12',3,'mid:12','courier','Lumen, I looked at the ledger. My name is in it.'],
+ ['b13',3,'brief:13','brief','Something guards the old bridge. Cross it anyway.','NEW: a bridge sentinel with a twin cannon. Hit it when it turns.'],
+ ['g13',3,'go:13','lumen','That bridge guard is old iron. Hit the hinges on the beat.'],
+ ['m13',3,'mid:13','lumen','Keep its cannons apart and it cannot finish a sweep.'],
+ ['x13',3,'boss:13','b:13','Toll due. Toll is everything you own. Toll is forever.'],
+ ['d13',3,'down:13','b:13','Bridge... open. Toll... waived.'],
+ ['e3a',3,'end:3','lumen','I ran your ledger. Look at the dates. Debts older than the people.'],
+ ['e3b',3,'end:3','courier','So the debts are invented.','Half the city pays Kronos for nothing.'],
+ ['s3',3,'sofar:3','nar','The ledger is forged: Kronos invented the city\'s debt. Vex hunts the bounty.'],
+
+ /* ===== CHAPTER 4 · THE KRAKEN (stages 14-16) ===== */
+ ['b14',4,'brief:14','brief','Helix Finanz patrol boats sweep the river.','NEW: patrol boats with a leader. Survive the flotilla.'],
+ ['g14',4,'go:14','oda','Helix Finanz is a Kronos shell. Same bank, new paint.'],
+ ['m14',4,'mid:14','wren','They moved me tonight. I can still reach a channel. Barely.'],
+ ['b15',4,'brief:15','brief','The harbour cranes swing over the water.','NEW: cranes swing. Score big while the lanes move.'],
+ ['g15',4,'go:15','lumen','Cranes are slow. Use them as cover.'],
+ ['m15',4,'mid:15','vex','You fly like you have something to lose. Interesting.'],
+ ['b16',4,'brief:16','brief','The Flusskrake, Helix\'s river rig, rises from the Main.','NEW: a district boss. The river fights back.'],
+ ['g16',4,'go:16','oda','Something huge under the water. Get ready.'],
+ ['m16',4,'mid:16','lumen','That rig pumps the river dry for coolant. Kronos servers drink a lot.'],
+ ['x16',4,'boss:16','b:16','The river keeps what it takes. Sink, little courier, like the rest.'],
+ ['d16',4,'down:16','b:16','The river... is quiet now.'],
+ ['e4a',4,'end:4','wren','I found the forgery. Halde, the chair, signed every page herself.'],
+ ['e4b',4,'end:4','oda','Next is Ostend and the Zentralbank gates. I will route you through.'],
+ ['s4',4,'sofar:4','nar','Direktorin Halde, chair of Kronos, signed the forged ledger. Wren is held.'],
+
+ /* ===== CHAPTER 5 · THE RAILS (stages 17-21, Ostend) ===== */
+ ['b17',5,'brief:17','brief','Laser gates guard the Ostend rail yards.','NEW: laser gates ahead. DASH through.'],
+ ['g17',5,'go:17','oda','Gate run. Trust the beat, not your eyes.'],
+ ['m17',5,'mid:17','courier','ODA, you have been quiet. Everything fine?'],
+ ['b18',5,'brief:18','brief','Cross the freight yard to the Zentralbank fence.','NEW: rails, gates and chargers together.'],
+ ['g18',5,'go:18','oda','Freight yard. Stay off the rails when the gates close.'],
+ ['m18',5,'mid:18','lumen','Something in your route data is wrong. Checking.'],
+ ['b19',5,'brief:19','brief','Burn through the Zentralbank firewall.','NEW: gates and gunships at the same time.'],
+ ['g19',5,'go:19','oda','The firewall is the last wall before the vault district.'],
+ ['m19',5,'mid:19','vex','Courier. My debt is in that ledger too. Is it real?'],
+ ['b20',5,'brief:20','brief','The signal box. Rail lights fail around you.','NEW: signals fail. Read the gates yourself.'],
+ ['g20',5,'go:20','lumen','Signals are dark. Gates by instinct now.'],
+ ['m20',5,'mid:20','courier','Vex, it is fake. Every euro of it.'],
+ ['b21',5,'brief:21','brief','The gate keeper holds the way to the cordon.','NEW: a mini-boss with a laser rig.'],
+ ['g21',5,'go:21','oda','Keeper ahead. After this, I will send you a short cut.'],
+ ['m21',5,'mid:21','lumen','Courier, do not take ODA\'s short cut. Not yet.'],
+ ['x21',5,'boss:21','b:21','Gate closed. Gate closed. Gate has always been closed.'],
+ ['d21',5,'down:21','b:21','Gate... open.'],
+ ['e5a',5,'end:5','lumen','Your route runs straight into a Kronos cordon. Somebody drew it that way.'],
+ ['e5b',5,'end:5','courier','Only ODA draws my routes.'],
+ ['s5',5,'sofar:5','nar','Vex learns her debt is fake. Lumen finds your route leads into a trap.'],
+
+ /* ===== CHAPTER 6 · THE BETRAYAL (stages 22-24) ===== */
+ ['b22',6,'brief:22','brief','ODA\'s short cut ends in the last cordon.','NEW: leaders hold the line. Survive the trap.'],
+ ['g22',6,'go:22','oda','Courier... I am sorry. Kronos owns my debt. They offered to clear it.'],
+ ['m22',6,'mid:22','lumen','I have your comms now. Forget ODA. Fly.'],
+ ['b23',6,'brief:23','brief','Break out through the loading docks.','NEW: crates, cranes and gunships.'],
+ ['g23',6,'go:23','lumen','Docks to the east. Kill your way to the open sky.'],
+ ['m23',6,'mid:23','vex','I saw the cordon close. Need a red ship on your wing?'],
+ ['b24',6,'brief:24','brief','The Zentral-ICE guards the bank\'s core. Break it.','NEW: a district boss. Break the bank firewall.'],
+ ['g24',6,'go:24','lumen','The ICE is a program with guns. Hit it on the beat.'],
+ ['m24',6,'mid:24','courier','ODA sold me. Fine. I am still flying.'],
+ ['x24',6,'boss:24','b:24','Access denied. Access has always been denied. You are a rounding error.'],
+ ['d24',6,'down:24','b:24','Firewall... open.'],
+ ['e6a',6,'end:6','oda','Halde has my sister\'s debt. I gave her your route. I will not ask you to forgive.'],
+ ['e6b',6,'end:6','lumen','Then earn it later, ODA. Courier, Messe next. Vex flies with us now.'],
+ ['s6',6,'sofar:6','nar','ODA sold your route to Kronos to save her sister. Lumen takes over comms.'],
+
+ /* ===== CHAPTER 7 · THE FAIR (stages 25-29, Messe) ===== */
+ ['b25',7,'brief:25','brief','The Messe trade fair. Halde shows off her new fleet.','NEW: elite guards everywhere. Stay sharp.'],
+ ['g25',7,'go:25','vex','Fair is loud. Good. Nobody hears two ships at once.'],
+ ['m25',7,'mid:25','lumen','Vex, stay on their left. Courier, the right is yours.'],
+ ['b26',7,'brief:26','brief','Rush hour over the fair grounds.','NEW: rack up score, and do not get hit.'],
+ ['g26',7,'go:26','vex','Rush hour. Ten thousand commuters, all in debt.'],
+ ['m26',7,'mid:26','courier','After tonight, none of them owe a cent.'],
+ ['b27',7,'brief:27','brief','Pass the Hammering Man. It keeps the beat.','NEW: the hammer keeps the beat. Survive its rhythm.'],
+ ['g27',7,'go:27','lumen','The hammer swings on the downbeat. So should you.'],
+ ['m27',7,'mid:27','halde','A courier and a bounty racer. How very small.'],
+ ['b28',7,'brief:28','brief','The expo hall. Stalls, lights and snipers.','NEW: snipers in the stalls. Keep moving.'],
+ ['g28',7,'go:28','vex','Snipers love a straight line. Do not give them one.'],
+ ['m28',7,'mid:28','halde','Give me the drive and I will forgive your debt. Personally.'],
+ ['b29',7,'brief:29','brief','The fair has a guardian. It stands in your way.','NEW: a mini-boss with fans and spirals.'],
+ ['g29',7,'go:29','lumen','Guardian ahead. Halde\'s flagship is right behind it.'],
+ ['m29',7,'mid:29','vex','I have the left. Go!'],
+ ['x29',7,'boss:29','b:29','Welcome to the fair. Everything is for sale. You are the last item.'],
+ ['d29',7,'down:29','b:29','Exhibit... closed.'],
+ ['e7a',7,'end:7','halde','You want to free them? Debt keeps people still. Still people do not riot.'],
+ ['e7b',7,'end:7','courier','Then I will make some noise.'],
+ ['s7',7,'sofar:7','nar','Vex flies with you. Halde offers a deal; you refuse it.'],
+
+ /* ===== CHAPTER 8 · THE FLAGSHIP (stages 30-32) ===== */
+ ['b30',8,'brief:30','brief','The Kronos boardroom. Everything shoots.','NEW: leaders everywhere. Kill them first.'],
+ ['g30',8,'go:30','lumen','Boardroom floor. Every gun in the bank is here.'],
+ ['m30',8,'mid:30','oda','Courier. I hacked the boardroom doors. Not forgiveness. Just doors.'],
+ ['b31',8,'brief:31','brief','The skyline, top floor. Halde boards her flagship.','NEW: top floor. Do not get hit.'],
+ ['g31',8,'go:31','vex','There she goes, up to the flagship. Chase her.'],
+ ['m31',8,'mid:31','lumen','Shields at max. That is all I can give you.'],
+ ['b32',8,'brief:32','brief','KRONOS, the corporate flagship. End it.','NEW: the corporation\'s warship. A district boss.'],
+ ['g32',8,'go:32','halde','I own the sky you fly in, courier.'],
+ ['m32',8,'mid:32','courier','You own nothing tonight.'],
+ ['x32',8,'boss:32','b:32','Every debt has a due date. Yours is now.'],
+ ['d32',8,'down:32','b:32','Flagship lost. The master copy... is already gone.'],
+ ['e8a',8,'end:8','lumen','The flagship beamed the master ledger to a vault under Piraeus. Athens.'],
+ ['e8b',8,'end:8','courier','Athens is where the open server is. Good.','We finish this there.'],
+ ['s8',8,'sofar:8','nar','The Kronos flagship falls. The master ledger fled to a vault in Athens.'],
+
+ /* ===== CHAPTER 9 · ATHINA (stages 33-37) ===== */
+ ['b33',9,'brief:33','brief','Athens at night. Hold the Plaka rooftops.','NEW: shield walls (phalanx). Shoot round them.'],
+ ['g33',9,'go:33','lumen','Athens. Rooftops and kiosks. The phalanx guards are new.'],
+ ['m33',9,'mid:33','oda','Wren is free. I traded my own route data for her cell. She is safe.'],
+ ['b34',9,'brief:34','brief','Piraeus is closed. Find a way to the harbour.','NEW: pillars. DASH between them.'],
+ ['g34',9,'go:34','wren','Courier. It is Wren. I am out. Thank ODA, not me.'],
+ ['m34',9,'mid:34','wren','The vault sits under the harbour. Its guardian never sleeps.'],
+ ['b35',9,'brief:35','brief','Climb the Lycabettus under fire.','NEW: wedge squads climb with you.'],
+ ['g35',9,'go:35','vex','Uphill, under fire. My favourite.'],
+ ['m35',9,'mid:35','wren','From the top you can see the harbour vault. That is the target.'],
+ ['b36',9,'brief:36','brief','March up the Acropolis, the sacred rock.','NEW: shield walls and wedges together.'],
+ ['g36',9,'go:36','oda','I have the vault code. It is yours, Courier. All of it.'],
+ ['m36',9,'mid:36','courier','Welcome back, ODA.'],
+ ['b37',9,'brief:37','brief','The Hoplite. The shield wall walks.','NEW: a mini-boss behind a shield. Flank it.'],
+ ['g37',9,'go:37','lumen','A walking shield wall. Flank it, never face it.'],
+ ['m37',9,'mid:37','vex','Its shield turns slowly. Go wide!'],
+ ['x37',9,'boss:37','b:37','Halt. No debtor passes the sacred rock.'],
+ ['d37',9,'down:37','b:37','The wall... breaks.'],
+ ['e9a',9,'end:9','wren','The guardian is Talos. Kronos built it to protect the ledger at any cost.'],
+ ['e9b',9,'end:9','oda','Three stages to the harbour. We are all with you this time.'],
+ ['s9',9,'sofar:9','nar','ODA freed Wren and gave you the vault code. Talos guards the harbour vault.'],
+
+ /* ===== CHAPTER 10 · THE LAST GATE (stages 38-40) ===== */
+ ['b38',10,'brief:38','brief','The Agora. Phalanx and leaders, no gaps.','NEW: every Athens enemy at once.'],
+ ['g38',10,'go:38','lumen','Agora. Everything they have left.'],
+ ['m38',10,'mid:38','halde','I still hold the backup, courier. Talos will keep it.'],
+ ['b39',10,'brief:39','brief','The olive road, the last road to the sea.','NEW: the last test before the boss. Kill fast.'],
+ ['g39',10,'go:39','vex','Last road. I will keep the sky clear behind you.'],
+ ['m39',10,'mid:39','wren','The open server is ready. Get the drive close to the vault.'],
+ ['b40',10,'brief:40','brief','TALOS, the bronze guardian of the harbour vault.','NEW: the final boss. Everything you learned, at once.'],
+ ['g40',10,'go:40','oda','This is it. Upload starts when Talos falls.'],
+ ['m40',10,'mid:40','courier','For everyone in that ledger.'],
+ ['x40',10,'boss:40','b:40','I keep what is owed. A city without debt is a city without order.'],
+ ['d40',10,'down:40','b:40','Order... released. The gate is open.'],
+ ['e10a',10,'end:10','wren','Upload complete. The ledger is public. Every forged debt is void.'],
+ ['s10',10,'sofar:10','nar','Talos falls. The ledger is public and the forged debts are void.'],
+
+ /* ===== EPILOGUE + CREDITS (after stage 40) ===== */
+ ['ep1',10,'epi','nar','Kronos Bank is under investigation. Halde was arrested at the Frankfurt airport.'],
+ ['ep2',10,'epi','oda','My sister owes nothing. Neither do you, Courier.','If you ever want a dispatcher again, I am on channel nine.'],
+ ['ep3',10,'epi','lumen','The ship is a wreck. I love it. Come back and I will rebuild her.'],
+ ['ep4',10,'epi','vex','Debt-free and bored. Race you home.'],
+ ['ep5',10,'epi','courier','One drive, ten chapters, one city that can breathe.','The night is ours.'],
+ ['cr1',10,'credits','nar','NIGHTRUN · THE LEDGER · THE END','Thank you for flying. Endless, Daily and the challenge stages wait.'],
+
+ /* ===== THE STREET RUN (on foot, Zeil Underpass): the key ===== */
+ ['f1',3,'foot:before','wren','The ledger is locked. I hid the key in the Zeil underpass. No ship fits down there.'],
+ ['f2',3,'foot:before','courier','Then I walk. ODA, keep the beat in my ear.'],
+ ['f3',3,'foot:after','lumen','Key recovered. The ledger opens now. Every page of it.'],
+ ['f4',3,'foot:after','courier','Back to the ship. I want to read this in the air.'],
+ ['sf',3,'sofar:foot','nar','On foot under the Zeil you recovered Wren\'s key to the ledger.']];
