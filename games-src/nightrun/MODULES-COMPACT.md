@@ -33,6 +33,7 @@ footen|29|on-foot street stage enemies + boss library (W3). Pure data |-
 foot|62|on-foot street stage engine|foot,foot
 footstage|23|the finished on-foot stage (7 sections, Warden gate)|footstage,footstage
 streetlook|19|on-foot street look on phones: one world scale, portrait lay|streetlook,streetlook
+footq|6|on-foot quality: sprites preloaded before the run starts, no|footq,footq
 leak|14|ground enemies, calmer pacing, escape penalty|leak,leak
 zoo|26|time to kill + eight new enemy kinds|zoo,zoo
 formations|34|formation library (VARIETY A)|vary,vary,vary2+
@@ -45,7 +46,7 @@ flow|6|the song never stops or stutters|flow,flow
 musicpack|15|polish music cues played by context|musicpack,musicpack
 storydata|20|every line of the campaign story (data only; saga.js plays i|story,story
 tale|21|story cast, beats, dialogue card, STORY LOG|tale,tale
-stats|20|counters, achievements, completion %|stats,stats
+stats|21|counters, achievements, completion %|stats,stats
 feedback|5|FUN / SAME AGAIN / BORING tap at run end|feedback,feedback
 lab|17|LAB: its own stage (title > LAB, settings > OPEN LAB, or ?la|-
 labassets|27|LAB ASSETS tab: look at every picture|labassets,labassets
@@ -98,7 +99,8 @@ fs|5|phone full screen on first tap|fs,fs
 readable|11|bullets and threats readable at a glance|read,read
 bulletart|1|real bullet pictures (converted approved previews) for enemy|bulletart,bulletart
 arsenal|17|12 extra power-ups and the context-aware drop picker|powers,powers
-abup|15|DASH/EMP upgrades and power-up interaction|abup,abup
+abup|20|DASH/EMP upgrades and power-up interaction|abup,abup
+zonehint|3|one-line caption on the first purple ring (gravity well) of |zonehint,zonehint
 econfit|1|economy fit: hours to finish back to 9-13 h|econfit,econfit
 comfort|11|eye strain pass: flash/glitch rate and alpha caps, shake cap|comfort,comfort
 classes|18|pilot classes picked before a run|classes,classes
@@ -109,7 +111,9 @@ diet|14|visual diet: fewer own effects, readable enemies, a lean 6-i|diet,diet
 mix|9|the music stays on top of the effects: separate buses, an ef|mix,mix
 hub|34|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
 layout|5|phone layout pass: centred one-colour section pills, centred|layout,layout
-school|14|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,school
+school|15|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,school
+schoolfull|13|every Flight School drill and lesson mini stage is a real le|schoolfull,schoolfull
 tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
+menufix|4|HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 p|menufix,menufix
 c|34|the hint bubble: wraps to two lines and stays inside the scr|-
-sw|6|Mainhattan Nightrun service worker (B30). Built by parts/bui|-
+sw|7|Mainhattan Nightrun service worker (B30). Built by parts/bui|-
