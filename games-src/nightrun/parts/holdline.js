@@ -21,7 +21,7 @@ const HOLD=window.HOLD={
   draw(){if(!this.live())return;const f=this.frac(),x=2,y0=34,h=H-68,hot=f<.35,col=f<.35?'#ff5060':f<.65?'#ffb020':'#19e3ff';
     ctx.save();ctx.globalAlpha=.55;ctx.fillStyle='#05030c';ctx.fillRect(x,y0,5,h);
     ctx.globalAlpha=1;ctx.fillStyle=col;ctx.fillRect(x+1,y0+h*(1-f),3,h*f);
-    if(LEAK.flashT>0||(hot&&!SET.reduce&&Math.floor(G.t*6)%2)){ctx.globalAlpha=Math.min(1,.4+LEAK.flashT);ctx.strokeStyle='#ff3040';ctx.lineWidth=1.5;ctx.strokeRect(x-.5,y0-.5,6,h+1);}
+    if(LEAK.flashT>0||(hot&&!SET.reduce&&BK(G.t,6))){ctx.globalAlpha=Math.min(1,.4+LEAK.flashT);ctx.strokeStyle='#ff3040';ctx.lineWidth=1.5;ctx.strokeRect(x-.5,y0-.5,6,h+1);}
     ctx.restore();},
   init(){if(this.inited)return;this.inited=true;
     { const lk=LEAK.leak;LEAK.leak=function(w,e){if(!HOLD.on())return lk.call(this,w,e);lk.call(this,w,e);HOLD.leaked(w+HOLD.extra(e),e);}; }

@@ -160,7 +160,7 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
       for(const e of G.en)if(e.x>x0&&e.x<x0+w&&e.hp>0){ctx.strokeStyle='#ff7080aa';ctx.beginPath();ctx.arc(e.x,e.y,e.r+3,0,7);ctx.stroke();}}
     if(id==='shrink'&&X.m>1){ctx.fillStyle='#ff304030';ctx.fillRect(0,0,W,X.m);ctx.fillRect(0,H-X.m,W,X.m);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,X.m);ctx.lineTo(W,X.m);ctx.moveTo(0,H-X.m);ctx.lineTo(W,H-X.m);ctx.stroke();}
     if(id==='wind'&&X.w){ctx.strokeStyle='#9ad8ff';ctx.globalAlpha=.55;ctx.lineWidth=2;const s=Math.sign(X.w),o=(t*60)%40;for(let x=60;x<W;x+=160)for(let j=0;j<3;j++){const y=(s>0?o+j*170:H-o-j*170);ctx.beginPath();ctx.moveTo(x-8,y-s*8);ctx.lineTo(x,y);ctx.lineTo(x+8,y-s*8);ctx.stroke();}ctx.globalAlpha=1;}
-    if(id==='laser')for(const L of X.lz||[]){const live=G.bc>=L.on;ctx.strokeStyle=live?'#ff3050':'#ff7080';ctx.globalAlpha=live?1:.45+.35*(Math.floor(t*10)%2);ctx.lineWidth=live?6:2;ctx.setLineDash(live?[]:[12,10]);
+    if(id==='laser')for(const L of X.lz||[]){const live=G.bc>=L.on;ctx.strokeStyle=live?'#ff3050':'#ff7080';ctx.globalAlpha=live?1:.45+.35*(BK(t,10));ctx.lineWidth=live?6:2;ctx.setLineDash(live?[]:[12,10]);
       ctx.beginPath();ctx.moveTo(0,L.y);ctx.lineTo(W,L.y);ctx.stroke();ctx.setLineDash([]);if(live){ctx.globalAlpha=.25;ctx.fillStyle='#ff3050';ctx.fillRect(0,L.y-12,W,24);}ctx.globalAlpha=1;}
     if(id==='beatgap'&&X.bw){const w=X.bw;ctx.fillStyle='#ff3dbb';ctx.globalAlpha=.85;ctx.fillRect(w.x-5,0,10,w.gc-w.g/2);ctx.fillRect(w.x-5,w.gc+w.g/2,10,H-w.gc-w.g/2);
       if(w.nx!=null){ctx.globalAlpha=.4;ctx.strokeStyle='#3dffb0';ctx.setLineDash([6,6]);ctx.strokeRect(w.x-14,w.nx-w.g/2,28,w.g);ctx.setLineDash([]);}ctx.globalAlpha=1;}

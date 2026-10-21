@@ -128,7 +128,7 @@ const DIR={
     else{e.x-=(150+10*d)*dt;e.y=(e.by||e.y)+Math.sin(e.t*2.2)*22;}},
   moveSwarm(e,dt,d){e.x-=(200+10*d)*dt;e.y=e.by+Math.sin(e.t*3.2+(e.ph||0))*(e.amp||50);},
   moveMine(e,dt,d){e.x-=(62+4*d)*dt;e.y=e.by+Math.sin(e.t*.9+(e.ph||0))*14;},
-  drawWarn(t){if(!WARN.length)return;ctx.save();for(const w of WARN){const k=clamp((G.bp-w.b),0,1),a=.35+.65*(SET.reduce?1:Math.floor(t*14)%2?.7:1);
+  drawWarn(t){if(!WARN.length)return;ctx.save();for(const w of WARN){const k=clamp((G.bp-w.b),0,1),a=.35+.65*(SET.reduce?1:BK(t,14)?.7:1);
     ctx.globalAlpha=a;ctx.strokeStyle='#ff7080';ctx.fillStyle='#ff304055';ctx.lineWidth=2.5;
     if(w.kind==='rain'){ctx.beginPath();ctx.moveTo(w.x-12,6);ctx.lineTo(w.x,26+8*k);ctx.lineTo(w.x+12,6);ctx.stroke();ctx.fillRect(w.x-1.5,28,3,H*.1*(1-k));}
     else{const dy=w.side<0?1:-1,y=w.side<0?8:H-8;ctx.beginPath();ctx.moveTo(w.x-14,y);ctx.lineTo(w.x,y+dy*(18+8*k));ctx.lineTo(w.x+14,y);ctx.closePath();ctx.fill();ctx.stroke();}}

@@ -36,7 +36,7 @@ const fxBeam=(k,x,y,ang,len,th,al)=>{const b=FXW.pic(k);if(!b)return false;ctx.s
 FXW.sniper=(e,k,lk)=>{if(!fxBeam('eb-sniper-beam',e.x,e.y,e.ang,1500,lk?16:9,lk?.95:.3+.5*k))return false;FXW.stat.sniper++;return true;};
 FXW.aim=(e,left)=>{if(!fxBeam('eb-aim-line',e.x,e.y,e.ang,1500,left<=.3?12:7,left<=.3?.95:.45))return false;FXW.stat.aim++;return true;};
 FXW.bomb=b=>{if(!FXW.add('eb-bomb',b.x,b.y,24,G.t*2,1,true))return false;FXW.stat.bomb++;return true;};
-FXW.mine=(m,t,left)=>{const al=m.armed?(left<=2&&Math.floor(t*8)%2?.4:1):.45;if(!FXW.add('eb-mine',m.x,m.y,m.r*2.8,t*.5,al,true))return false;ctx.globalAlpha=al;FXW.stat.mine++;return true;};
+FXW.mine=(m,t,left)=>{const al=m.armed?(left<=2&&BK(t,8)?.4:1):.45;if(!FXW.add('eb-mine',m.x,m.y,m.r*2.8,t*.5,al,true))return false;ctx.globalAlpha=al;FXW.stat.mine++;return true;};
 /* the shielder's bubble: the picture clipped to the front arc the vector shield covered; ctx is at the enemy's centre */
 FXW.bubble=(e,r,f,al)=>{const b=FXW.pic('eb-shield-bubble');if(!b)return false;const rs=r+12;ctx.save();ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,rs*1.3,f-1.15,f+1.15);ctx.closePath();ctx.clip();
   ctx.globalCompositeOperation='lighter';ctx.globalAlpha=al;ctx.drawImage(b,-rs*1.15,-rs*1.15,rs*2.3,rs*2.3);ctx.restore();FXW.stat.bubble++;return true;};

@@ -91,7 +91,7 @@ function note(t,s){S.note={t:s||2.2,txt:t};}
 function pop(x,y,t,c,big){S.pop.push({x,y,t,c:c||'#fff',l:big?1.4:.9,m:big?1.4:.9,big:!!big});if(S.pop.length>40)S.pop.shift();}
 function ftBurst(x,y,c,n,sp){if(S.fx.length>260)return;for(let i=0;i<n;i++){const a=ftRnd(0,6.283),v=ftRnd(.3,1)*(sp||260);S.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-80,l:ftRnd(.25,.6),c,r:ftRnd(2,4)});}}
 function hitstop(ms){if(!RET.juice||reduce())return;S.hs=Math.max(S.hs,ms/1000);}
-function ftShake(v){if(reduce())return;S.shake=Math.max(S.shake,v);}
+function ftShake(v){if(reduce())return;S.shake=Math.max(S.shake,window.COM?COM.sk(v):v);}
 function sfx(n){try{if(window.AU&&AU.sfx)AU.sfx(n);}catch(e){}}
 /* the song's beat: bpos() from a.js when the beat clock runs, else our own 120 bpm clock */
 function beatPos(){try{if(typeof bpos==='function'&&typeof BT!=='undefined'&&BT.mode!=='none'){const p=bpos(performance.now());if(isFinite(p))return p;}}catch(e){}return S?S.time*2:0;}
@@ -101,7 +101,7 @@ function ftOnBeat(){const p=beatPos(),f=Math.abs(p-Math.round(p)),spb=(typeof BT
 function edef(id,boss){const R=boss?window.FOOT_BOSS:window.FOOT_ENEMIES;const d=R&&R[id];if(d&&typeof d.ai==='function')return d;return fbDef(id);}
 const fbCache={};
 function fbDef(id){if(fbCache[id])return fbCache[id];const b=FB[id]||FB.grunt;
-  const d=Object.assign({},b,{fb:1,drops:DROPS,pose:e=>e.dead?'die':e.flash>0?'hit':e.wind>0?'melee':Math.abs(e.vx)>5?(Math.floor(e.t*6)%2?'run-a':'run-b'):e.tele>0?'shoot':'idle',
+  const d=Object.assign({},b,{fb:1,drops:DROPS,pose:e=>e.dead?'die':e.flash>0?'hit':e.wind>0?'melee':Math.abs(e.vx)>5?(BK(e.t,6)?'run-a':'run-b'):e.tele>0?'shoot':'idle',
     ai(e,dt,env){const P=env.P,dx=P.x-e.x,ad=Math.abs(dx);e.facing=dx<0?-1:1;const D=env.D;
       if(b.fly){if(e.ph==null)e.ph=ftRnd(0,6.28);const G=env.G,tx=clamp(P.x+Math.sin(e.t*.9+e.ph)*230,G.camX+50,G.camX+G.viewW-50)-e.x;e.facing=dx<0?-1:1;e.vx=Math.sign(tx)*Math.min(b.sp,Math.abs(tx)*1.5);e.vy=((e.hy||140)+Math.sin(e.t*2.2)*28-e.y)*2.2;}
       else if(!b.still){if(e.wj==null)e.wj=ftRnd(-70,70);const want=b.melee?0:(b.want||220)+e.wj;e.vx=ad>want+30?Math.sign(dx)*b.sp:(!b.melee&&ad<want-80?-Math.sign(dx)*b.sp*.5:0);
@@ -446,7 +446,7 @@ function drawWho(c,who,pose,x,y,h,flip,t,col,crouch){const fa=window.FA;
   if(who==='mech'||who==='warden'){c.fillStyle=col;c.fillRect(x-h*.35,y-h,h*.7,h*.75);c.fillRect(x-h*.3,y-h*.25,h*.2,h*.25);c.fillRect(x+h*.1,y-h*.25,h*.2,h*.25);c.fillStyle='#ffd23a';c.fillRect(x+(flip?-h*.3:h*.1),y-h*.9,h*.2,h*.1);return;}
   human(c,x,y,h,col,pose,flip,t,crouch);}
 function ppose(P){if(P.hp<=0)return'die';if(P.hurtT>0)return'hit';if(P.mel>0)return'melee';if(P.crouch)return P.shotT>0?'crouch-shoot':'crouch';
-  if(!P.onGround)return P.vy<0?'jump':'fall';if(P.shotT>0)return'shoot';if(Math.abs(P.vx)>5)return Math.floor(P.anim*7)%2?'run-a':'run-b';return'idle';}
+  if(!P.onGround)return P.vy<0?'jump':'fall';if(P.shotT>0)return'shoot';if(Math.abs(P.vx)>5)return BK(P.anim,7)?'run-a':'run-b';return'idle';}
 /* Kai's extra acts for the strip sheets (art only): the pose name still drives the shapes and stills; '' = let the pose pick the act */
 function kaiX(P){const t=S.time,dt=Math.min(.1,Math.max(0,t-(P._xt==null?t:P._xt)));P._xt=t;if(P.hp<=0)return'die';if(S.end&&S.end.cleared)return'victory';
   const mel=P.mel>0;if(mel&&!P._pm){P._cb=t-(P._me||-9)<.7?(P._cb%3)+1:1;P._mk=.34;}if(P._pm&&!mel)P._me=t;P._pm=mel;if(P._mk>0)P._mk-=dt;
@@ -469,7 +469,7 @@ function draw(){if(!L||!S)return;const c=L.ctx,sc=L.sc*L.dpr,vw=L.vw,P=S.P;
     c.globalAlpha=e.grace>0?.65:1;ART.fE=e;drawWho(c,e.id,pose,e.x,e.ext&&e.fly?e.y+e.h/2:e.y,e.h,e.facing<0,e.dead?e.dt_||0:e.t,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;c.globalAlpha=1;
     if(e.def.front&&e.def.fb){c.fillStyle='#a0c0ff';c.fillRect(e.x+e.facing*e.w*.5-3,e.y-e.h*.9,6,e.h*.8);}}
   if(S.st.hook&&S.st.hook.draw)try{S.st.hook.draw(c,S);}catch(x){}
-  const blink=P.inv>0&&Math.floor(S.time*16)%2;if(!blink||P.hp<=0){
+  const blink=P.inv>0&&BK(S.time,16);if(!blink||P.hp<=0){
     if(P.pw.shield){c.strokeStyle='#5ad1ff';c.lineWidth=2+P.pw.shield.lv;c.beginPath();c.arc(P.x,P.y-34,44,0,6.283);c.stroke();}
     if(P.dashIF>0){c.fillStyle='#19e3ff33';c.fillRect(P.x-24-P.facing*20,P.y-60,48,58);}
     P._xa=kaiX(P);ART.fE=P;drawWho(c,'kai',ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,S.feverT>0?'#ffd23a':'#19e3ff',P.crouch);ART.fE=null;

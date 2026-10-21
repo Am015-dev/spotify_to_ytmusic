@@ -77,7 +77,7 @@ NR.on('pitStart',()=>{AX.asLeft=SH.n('as');if(SH.n('ec'))P.emp=Math.max(P.emp,3)
 NR.on('tick',dt=>{if(!G.live||G.dead)return;const r=SH.smg;if(r)for(const p of G.pk){if(p.t!=='shard')continue;const dx=P.x-p.x,dy=P.y-p.y,l=Math.hypot(dx,dy);if(l<NR.mod.mag+r&&l>1){p.vx+=dx/l*900*dt;p.vy+=dy/l*900*dt;}}
   for(let i=AX.arcs.length-1;i>=0;i--){AX.arcs[i].l-=dt;if(AX.arcs[i].l<=0)AX.arcs.splice(i,1);}});
 /* ----- looks: wing cannons, rear gun, beat drones, overdrive ring, bullet-time tint, lightning ----- */
-{const dp=drawPlayer;drawPlayer=function(t){dp(t);if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:Math.floor(t*20)%2))return;
+{const dp=drawPlayer;drawPlayer=function(t){dp(t);if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:BK(t,20)))return;
   ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);const D=DISTRICTS[G.di];
   const sd=lvSide(),rg=lvRear();
   ctx.fillStyle='#16102a';ctx.strokeStyle='#ff8a3d';ctx.lineWidth=1.2;
