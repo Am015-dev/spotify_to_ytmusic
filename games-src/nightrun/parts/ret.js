@@ -1,3 +1,6 @@
+// PURPOSE: retention flags: arcade, daily, heat, grade, assist...
+// FLAG: sprites, title, type, oneMore, arcade, walls, heat, daily, dpool, layers, sting, trans, grade, saveio, juice, assist, pwa, fever (see RET lines at top)
+// TEST: ret-test.js
 /* ---------- retention parts (RETENTION.md). Each item has a flag in RET; a flag set to false leaves the game exactly as it was. ---------- */
 const RET=window.RET=window.RET||{};
 if(RET.sprites===undefined)RET.sprites=!/[?&]sprites=0/.test(location.search);   // animated strip sheets for bosses and player ships (parts/art.js SPR); ?sprites=0 = the stills as before

@@ -1,3 +1,6 @@
+// PURPOSE: LAB ASSETS tab: look at every picture
+// FLAG: labassets (?labassets=0)
+// TEST: labassets-test.js
 /* ---------- LAB 'ASSETS' TAB (flag RET.labassets, ?labassets=0 = the old Lab) ----------
    Lets the owner look at EVERY picture the game knows, real or placeholder, and try it in the Lab sandbox before the real art exists.
    Data: media/assets-index.json (written by build.py: assets-manifest.json + every other media file), media/ready.json (painted files),

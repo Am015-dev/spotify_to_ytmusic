@@ -1,3 +1,6 @@
+// PURPOSE: formation library (VARIETY A)
+// FLAG: vary (?vary=0), vary2 (?vary2=0)
+// TEST: vary-test.js
 /* ---------- formations.js: the formation library (VARIETY A, owner 18 Oct 2026: "Game is extremely repetitive"). Flag RET.vary; ?vary=0 = the old waves exactly.
    A formation is a SPATIAL idea, not a recolour of one row: pincers from top and bottom, an X that converges, a snake on a path, a spiral, a wall whose gap moves...
    Every entry declares

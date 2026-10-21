@@ -1,3 +1,6 @@
+// PURPOSE: DASH/EMP as beat-and-window decisions
+// FLAG: timing (?timing=0)
+// TEST: timing-test.js
 /* ---------- TIMING: DASH and EMP as beat-and-window decisions (flag RET.timing, default ON, ?timing=0 = off; off = the abilities.js / counter.js behaviour). Test: nightrun/timing-test.js.
    Owner, 20 Oct 2026: dash and EMP "still useless, the game needs to be more strategic and timing". Strict review 3: a reflex dash (bullet within 30 px) won, the beat paid nothing.
    DASH (hooks in ABIL.dashIn):

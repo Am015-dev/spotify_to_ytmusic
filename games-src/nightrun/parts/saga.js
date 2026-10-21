@@ -1,3 +1,6 @@
+// PURPOSE: campaign story: opening, briefings, comms, chapter ends, STORY tile and log
+// FLAG: story (?story=0)
+// TEST: story-test.js
 /* ---------- SAGA: plays the campaign through-line written in parts/storydata.js (flag RET.story, default ON; ?story=0 = the game exactly as before).
    Where it shows: the OPENING (first story start, ~25 s, auto-advancing, tap / SKIP), a one-card BRIEFING before each story stage (first time only),
    in-stage COMMS lines (one line, 3 s, never blocks, moves away from the ship: start, mid-point, boss in, boss down), the chapter's closing scene and a

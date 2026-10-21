@@ -1,3 +1,6 @@
+// PURPOSE: 12 extra power-ups and the context-aware drop picker
+// FLAG: powers (?powers=0)
+// TEST: powers-test.js
 /*@@ARSENAL-START@@ ---------- arsenal: twelve more tactical power-ups + a context-aware drop picker (flag RET.powers, ?powers=0 = the game exactly as before) ----------
    Owner, 20 Oct 2026: "Better use of power ups, include a wider selection so it is not boring."
    DEFENSIVE  BUBBLE SHIELD  (charge) absorbs the next hit          STASIS FIELD   enemy bullets near the ship crawl

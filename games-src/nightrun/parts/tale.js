@@ -1,3 +1,6 @@
+// PURPOSE: story cast, beats, dialogue card, STORY LOG
+// FLAG: tale (?tale=0)
+// TEST: tale-test.js
 /* ---------- TALE: the adventure on top of the 40 stages (cast, story beats, dialogue card, STORY LOG timeline). Flag RET.tale (?tale=0 = off, exactly as before: no new UI). With RET.story on (saga.js) its beats, plate preview and STORY LOG button stand down; TALE.show stays for the street run.
    The owner edits the text in the data table right below. Pictures: media/char-<id>.webp (256x256, see assets-manifest.json); until the file is real art the game draws a coloured badge with the initial.
    Hooks: the stage plate's PLAY (before-card), mapDetail() (one preview line on the stage plate), NR 'runEnd' {story,cleared} (unlock + after-scene), a STORY LOG button in the MENU (title.js builds #mnMore).

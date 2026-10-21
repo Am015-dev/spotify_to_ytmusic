@@ -1,3 +1,6 @@
+// PURPOSE: every line of the campaign story (data only; saga.js plays it)
+// FLAG: story (?story=0)
+// TEST: story-test.js
 /* ---------- STORYDATA: every line of the campaign through-line (flag RET.story, ?story=0 = off). The owner edits the text HERE; saga.js only plays it.
    Rules: a card is one speaker and at most 2 lines (l1, l2), each line <= 140 characters (story-test.js checks it). German place names, English text.
    Row: [id, chapter, trigger, speaker, line1, line2]. Triggers:

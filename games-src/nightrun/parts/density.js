@@ -1,3 +1,6 @@
+// PURPOSE: per-stage budget of enemy bullets on screen
+// FLAG: density (?density=0)
+// TEST: density-test.js
 /* ---------- DENSITY: a per-stage budget of enemy bullets on screen (flag RET.density, default ON; ?density=0 = the old rules). Test: nightrun/density-test.js. BALANCE.md "Density".
    Industry practice: a shooter ramps the amount of readable fire, not its speed, and alternates heavy and light stretches. The budget (Normal): planned bullets on screen in a HEAVY
    stretch rise from about 9 at stage 3 to 22 at stage 30; a LIGHT stretch (a breather, every 40 s: 28 s heavy, 12 s light, the first 10 s of a stage light) is half of it.
