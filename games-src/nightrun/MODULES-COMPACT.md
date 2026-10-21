@@ -46,7 +46,7 @@ flow|6|the song never stops or stutters|flow,flow
 musicpack|15|polish music cues played by context|musicpack,musicpack
 storydata|20|every line of the campaign story (data only; saga.js plays i|story,story
 tale|21|story cast, beats, dialogue card, STORY LOG|tale,tale
-stats|20|counters, achievements, completion %|stats,stats
+stats|21|counters, achievements, completion %|stats,stats
 feedback|5|FUN / SAME AGAIN / BORING tap at run end|feedback,feedback
 lab|17|LAB: its own stage (title > LAB, settings > OPEN LAB, or ?la|-
 labassets|27|LAB ASSETS tab: look at every picture|labassets,labassets
@@ -112,9 +112,10 @@ diet|14|visual diet: fewer own effects, readable enemies, a lean 6-i|diet,diet
 mix|9|the music stays on top of the effects: separate buses, an ef|mix,mix
 hub|34|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
 layout|5|phone layout pass: centred one-colour section pills, centred|layout,layout
-school|14|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,school
-schoolfull|10|every Flight School drill and lesson mini stage is a real le|schoolfull,schoolfull
+school|15|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,school
+schoolfull|13|every Flight School drill and lesson mini stage is a real le|schoolfull,schoolfull
 tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
-explain|7|every fly-stage visual is explained: first-appearance captio|explain,explain
+menufix|4|HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 p|menufix,menufix
+explain|8|every fly-stage visual is explained: first-appearance captio|explain,explain
 c|34|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|7|Mainhattan Nightrun service worker (B30). Built by parts/bui|-

@@ -5,6 +5,7 @@
 const RET=window.RET=window.RET||{};
 if(RET.sprites===undefined)RET.sprites=!/[?&]sprites=0/.test(location.search);   // animated strip sheets for bosses and player ships (parts/art.js SPR); ?sprites=0 = the stills as before
 if(RET.title===undefined)RET.title=!/[?&]title=0/.test(location.search);   // B25: title diet (PLAY / CONTINUE, 5 buttons, the rest in MENU); parts/title.js
+if(RET.menufix===undefined)RET.menufix=!/[?&]menufix=0/.test(location.search);   // menu defects of review 8: HANGAR 5 tabs + MORE sheet, achievement toast never over a control, no decoration glyphs; parts/menufix.js, stats.js, map.js
 if(RET.type===undefined)RET.type=!/[?&]type=0/.test(location.search);     // B26: text >= 14 px and touch targets >= 44 px on title, menu and map; parts/title.js
 if(RET.oneMore===undefined)RET.oneMore=true;   // B5: run-end screens show Neon banked, the next unlock bar and a ONE MORE RUN button
 RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct, can}; null when everything is owned
@@ -249,7 +250,7 @@ RET.skip=function(){for(const c of retCnt)c.set(c.to);retCnt.length=0;try{for(co
 RET.chipV=GA.bank;RET.chips=[];
 function retChipSet(n){const t=window.fmtN(n);for(const c of RET.chips)c.firstElementChild.textContent=t;}
 RET.chipSync=function(){if(!RET.trans)return;for(const el of [$('over'),$('stres'),$('stsel')]){if(!el||el.querySelector('.retChip'))continue;
-    const c=document.createElement('div');c.className='retChip';c.innerHTML='◆ <b></b> Neon';el.appendChild(c);RET.chips.push(c);}
+    const c=document.createElement('div');c.className='retChip';c.innerHTML=(RET.menufix?'':'◆ ')+'<b></b> Neon';el.appendChild(c);RET.chips.push(c);}
   if(RET.chipV!==GA.bank||!RET.chips[0].firstElementChild.textContent){RET.countUp(retChipSet,RET.chipV,GA.bank,800);RET.chipV=GA.bank;}};
 for(const id of ['over','stres','stsel']){const el=$(id);if(el)new MutationObserver(()=>{if(!el.hidden&&RET.trans&&!retCnt.length)RET.chipSync();}).observe(el,{attributes:true,attributeFilter:['hidden']});}
 /* grades: every 16 bars a letter from the PERFECTs and hull lost in those bars */
