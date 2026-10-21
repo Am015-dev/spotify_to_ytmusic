@@ -211,7 +211,7 @@ function hitProp(p,d){p.hp-=d;p.fl=.08;if(p.hp<=0&&!p.gone){p.gone=1;ftBurst(p.x
 function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.min(FL,P.y+P.vy*dt);return;}
   const mx=I.r?1:I.l?-1:(Math.abs(I.x)>.25?clamp(I.x*1.4,-1,1):0),spdLv=P.pw.speed?P.pw.speed.lv:0,spd=230*(1+.15*spdLv);
   P.crouch=P.onGround&&(I.d||I.y>.6)&&P.dash<=0;
-  if(mx)P.facing=mx>0?1:-1;
+  if(mx)P.facing=mx>0?1:-1;else if(F.look&&F.look.face&&autoOn())F.look.face(P,hittable);   // streetlook: auto-fire turns to a target behind
   for(const k of ['inv','dashCd','dashIF','melCd','cd','shotT','hurtT'])if(P[k]>0)P[k]-=dt;
   if(I.dashP&&P.dashCd<=0){const beat=ftOnBeat();AH.ftPush(S.fx,'fx-ft-dust',P.x,P.y-6,64,.35);P.dash=.24;P.dashCd=.75/(1+.25*spdLv);P.dashIF=beat?.45:.26;P.vy=Math.min(P.vy,0);
     if(beat){pop(P.x,P.y-80,'ON BEAT','#ffd23a');S.fever=Math.min(100,S.fever+12);NR.emit('footBeat',{kind:'dash'});}sfx('dash');}
@@ -238,7 +238,7 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
 
 /* ===== the stage: camera, locks, waves, idle pressure, boss ===== */
 function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
-  let want=Math.max(S.camX,P.x-vw*.38);want=Math.min(want,st.len-vw);
+  let want=Math.max(S.camX,P.x-vw*(F.camK||.38));if(F.look&&F.look.back)want=F.look.back(S,P,vw,want);   // streetlook: walk back up to 35% of the viewwant=Math.min(want,st.len-vw);
   if(!S.lock)for(const l of st.locks)if(!S.lockDone[l.id]&&want>=l.x-vw/2){S.lock={id:l.id,cam:l.x-vw/2};note('ARENA LOCK',1.6);sfx('warn');for(const w of S.waves)if(w.lock===l.id)w.started=true,w.next=S.time+(w.delay||0);break;}
   const bc=Math.min(st.boss.x-vw/2,st.len-vw);if(!S.lock&&!S.bossOn&&want>=bc-1){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.6;note('WARNING: WARDEN',1.8);sfx('warn');S.eb.length=0;}
   if(S.lock)want=Math.min(want,S.lock.cam);
@@ -401,7 +401,7 @@ function build(){if(L)return L;const st=document.createElement('style');st.textC
 function isTouch(){return ('ontouchstart' in window)||navigator.maxTouchPoints>0||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);}
 const autoOn=()=>!!(L&&L.touch&&(SV.auto===undefined||SV.auto));   // touch: auto-fire is on unless the player turned it off in the pause menu
 function layout(){if(!L)return;const vv=window.visualViewport,W=Math.round(vv?vv.width:innerWidth),H=Math.round(vv?vv.height:innerHeight),dpr=Math.min(2,window.devicePixelRatio||1);
-  const T=L.touch=isTouch()||F.forceTouch;let cx=0,cy=0,cw=W,ch=H,mode='full',minVw=480,sw=0;
+  const T=L.touch=isTouch()||F.forceTouch;if(F.look&&F.look.layout&&F.look.layout(L,W,H,dpr,T))return;let cx=0,cy=0,cw=W,ch=H,mode='full',minVw=480,sw=0;
   if(T&&H>W*1.05){mode='port';minVw=420;ch=H-clamp(Math.round(H*.37),190,290);}   // portrait: the field takes about 63% of the height, the pad lives below it
   else if(T){mode='land';minVw=420;sw=clamp(Math.round(W*.22),160,220);cx=sw;cw=W-2*sw;}   // landscape: the field is the whole screen, the pad sits over the side bands
   let sc=ch/VH;if(cw/sc<minVw)sc=cw/minVw;
@@ -458,7 +458,7 @@ function kaiX(P){const t=S.time,dt=Math.min(.1,Math.max(0,t-(P._xt==null?t:P._xt
   if(P.hurtT>0)return'hurt';if(P.dash>0)return'dash';if(P._gt>0)return'grenade';if(P._mk>0)return P._cb===3?'combo3':P._cb===2?'combo2':'melee';
   if(P._ln>0&&P.onGround)return'land';if(P.crouch)return P._sk>0?'crouchshoot':'';if(!P.onGround||P._sk<=0)return'';
   const el=Math.abs(Math.sin(P.aim||0));return el>.8?'aimup':el>.3?'aimdiag':Math.abs(P.vx)>5?'runshoot':'';}
-function draw(){if(!L||!S)return;const c=L.ctx,sc=L.sc*L.dpr,vw=L.vw,P=S.P;
+function draw(){if(!L||!S)return;if(F.look&&F.look.draw&&F.look.draw(L.ctx))return;const c=L.ctx,sc=L.sc*L.dpr,vw=L.vw,P=S.P;
   c.setTransform(1,0,0,1,0,0);c.fillStyle='#05030c';c.fillRect(0,0,L.cv.width,L.cv.height);c.setTransform(sc,0,0,sc,(L.box.x-L.ox)*L.dpr,(L.box.y-L.oy)*L.dpr);const sh=S.shake?ftRnd(-S.shake,S.shake)*.5:0;
   drawBg(c,vw,L.exl||0,L.exr||0);c.save();c.translate(-S.camX+sh,sh*.5);
   for(const [px,py,pw] of S.st.plats){c.fillStyle='#3a2a52';c.fillRect(px,py,pw,12);c.fillStyle='#19e3ff';c.fillRect(px,py,pw,2);}
@@ -555,4 +555,5 @@ if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)
     paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');start(F.main||'street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
+F._in={L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
 return F;})();

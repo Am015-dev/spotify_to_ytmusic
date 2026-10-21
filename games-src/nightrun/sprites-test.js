@@ -139,7 +139,7 @@ const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? '
     { const { c, p, errs } = await open('&sim=1&all=1&mustmove=0&deck=0&vary=0&vary2=0&variants=0');
       await p.waitForFunction(() => window.__mnr && __mnr.ART.rd && __mnr.ART.rd.size > 0, null, { timeout: 20000 });
       await p.waitForFunction(() => Object.keys(ART.ANIM.s).every(k => ART.anim(k)), null, { timeout: 120000, polling: 250 });
-      const r = await p.evaluate(() => { const out = {}, mk = () => { const c = document.createElement('canvas'); c.width = 600; c.height = 500; return c; };
+      const r = await p.evaluate(() => { const out = { sl: !!RET.streetlook }, mk = () => { const c = document.createElement('canvas'); c.width = 600; c.height = 500; return c; };
         const bb = cv => { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let X0 = 1e9, X1 = -1, Y0 = 1e9, Y1 = -1, n = 0; for (let y = 0; y < cv.height; y++)for (let x = 0; x < cv.width; x++) if (d[(y * cv.width + x) * 4 + 3] > 40) { n++; if (x < X0) X0 = x; if (x > X1) X1 = x; if (y < Y0) Y0 = y; if (y > Y1) Y1 = y; } return { X0, X1, Y0, Y1, n }; };
         /* on-foot: feet (bottom of the opaque pixels) on the old spot, 80 px tall figure, for every actor and pose that has a sheet */
         const FM = ART.FM, foot = [], H = 80; out.who = Object.keys(FM).length;
@@ -165,7 +165,7 @@ const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? '
         /* props: draw only with the flag; one drawImage per prop */
         const pcv = mk(), pg = pcv.getContext('2d'); RET.sprites = true; ART.footProps(pg, 0, 560 * 2, 400, 2); const pn = bb(pcv).n; RET.sprites = false; const pcv2 = mk(); ART.footProps(pcv2.getContext('2d'), 0, 1120, 400, 2); const pn2 = bb(pcv2).n; RET.sprites = true; out.props = [pn, pn2];
         const ds = RET.sprites; RET.sprites = false; out.off = [ART.footDraw(mk().getContext('2d'), 'kai', 'idle', 300, 400, H, false, 0), SPR.foe({}, 'einterceptor', 0, 0, 0, 50, 0, false)]; RET.sprites = ds;
-        const k = 'grunt/idle-strip.webp'; ART.rd.delete('anim/' + k); out.miss = ART.footDraw(mk().getContext('2d'), 'grunt', 'idle', 300, 400, H, false, 0); ART.rd.add('anim/' + k);
+        const k = 'grunt/idle-strip.webp'; ART.rd.delete('anim/' + k); const sl0 = RET.streetlook; out.borrow = ART.footDraw(mk().getContext('2d'), 'grunt', 'idle', 300, 400, H, false, 0); RET.streetlook = false; out.miss = ART.footDraw(mk().getContext('2d'), 'grunt', 'idle', 300, 400, H, false, 0); RET.streetlook = sl0;   // streetlook: a missing act borrows a sibling sheet; flag off = old art ART.rd.add('anim/' + k);
         return out; });
       ok('f1 every on-foot actor and pose with a sheet draws, feet on the spot (+-14 px of 80)', r.who === 16 && !r.footBad.length, JSON.stringify(r.footBad));
       ok('f2 flip mirrors around the anchor (feet centre stays)', Math.abs(r.flip[0] - r.flip[1]) <= 16, JSON.stringify(r.flip));
@@ -174,7 +174,7 @@ const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? '
       ok('f5 die draws (enemy fades, Kai stays opaque)', r.die[0] && r.die[1] === 'grunt/die' && r.die[2], JSON.stringify(r.die));
       ok('f6 enemy ships: all six kinds draw from flame, arm switches to volley, width as asked', r.ships.every(s => s[1] && s[2] === 'flame' && s[3] && s[4] === 'volley'), JSON.stringify(r.ships));
       ok('f7 props draw only with the flag on', r.props[0] > 200 && r.props[1] === 0, JSON.stringify(r.props));
-      ok('f8 flag off / missing sheet: footDraw and SPR.foe return false (old art draws)', r.off[0] === false && r.off[1] === false && r.miss === false, JSON.stringify([r.off, r.miss]));
+      ok('f8 flag off / missing sheet: footDraw and SPR.foe return false (old art draws); with streetlook a missing act borrows a sibling sheet', r.off[0] === false && r.off[1] === false && r.miss === false && r.borrow === !!r.sl, JSON.stringify([r.off, r.miss, r.borrow, r.sl]));
       ok('f9 no page errors (new categories)', !errs.length, errs[0]); await c.close(); }
     /* (g) the finished foot stage: Kai and the street draw from sheets, and a fleet enemy leaves a death clip */
     { const { c, p, errs } = await open('', null, () => { try { if (!sessionStorage.getItem('_ft')) { sessionStorage.setItem('_ft', 1); localStorage.clear(); localStorage.setItem('mnr_story', JSON.stringify({ stars: { 1: 3, 2: 3, 3: 2 }, snap: {}, all: false, v30: 1, v40: 1 })); localStorage.setItem('mnr_tut', '2'); localStorage.setItem('mnr_foot', '{"seen":{"b":1,"a":1},"hint":1}'); } } catch (e) { } });

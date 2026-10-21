@@ -165,6 +165,7 @@ pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<7;
   if(e.arm){const k=PHF;ctx.save();ctx.globalCompositeOperation='lighter';G_(0,0,e.r*(1.7+1.3*k),'#ff3050',.22+.55*k);ctx.restore();
     ctx.strokeStyle='#ff7080';ctx.globalAlpha=.35+.65*k;ctx.lineWidth=2+2*k;ctx.beginPath();ctx.arc(0,0,e.r+4+16*(1-k),0,7);ctx.stroke();ctx.globalAlpha=1;}
   if(e.el){ctx.strokeStyle='#ffd23d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,e.r+4,0,7);ctx.stroke();}
+  if(FOEART.body(e,t,fl,1)){ctx.restore();return;}
   if(e.type==='flank'){const fa=(e.side&&!e.settled)?Math.atan2(-e.side*190,-80):Math.PI;if(ART.dflash('spr-en-flank',e.r*3.4,0,Math.sin(t*5+eb_(e))*1,fa-Math.PI,fl)){ctx.restore();return;}}
   else if(e.type==='swarm'){if(ART.dflash('spr-en-swarm',e.r*2.8,0,Math.sin(t*7+eb_(e))*.8,0,fl)){ctx.restore();return;}}
   else if(ART.dflash('spr-en-mine',e.r*2.5,0,0,t*.6+e.ph,fl)){ctx.globalCompositeOperation='lighter';const p=.5+.5*Math.sin(t*5+e.ph);G_(0,0,e.r*(.9+.4*p),'#ffa02d',.25+.2*p);ctx.globalCompositeOperation='source-over';hpBar(-14,-e.r-9,28,e.hp/e.max);ctx.restore();return;}

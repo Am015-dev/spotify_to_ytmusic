@@ -152,6 +152,7 @@ const FLEET=window.FLEET={
     if(k==='car'&&e.fsh){ctx.save();ctx.globalAlpha=.35+.2*Math.sin(t*6);ctx.strokeStyle='#4ad1ff';ctx.fillStyle='#4ad1ff1c';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,r+14,0,7);ctx.fill();ctx.stroke();ctx.restore();}
     if(this.spr(e,t)){if(e.arm){ctx.save();ctx.translate(e.x,e.y);ctx.globalAlpha=.35+.5*(typeof PHF==='number'?PHF:0);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+8,0,7);ctx.stroke();ctx.restore();}   // the shot tell stays
       if(e.max>1)hpBar(e.x-14,e.y-r-9,28,e.hp/e.max);return;}
+    if(k==='drn'){ctx.save();ctx.translate(e.x,e.y);const o=FOEART.body(e,t,fl);ctx.restore();if(o)return;}
     ctx.save();ctx.translate(e.x,e.y);
     if(e.arm){ctx.globalAlpha=.35+.5*(typeof PHF==='number'?PHF:0);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+8,0,7);ctx.stroke();ctx.globalAlpha=1;}
     ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
