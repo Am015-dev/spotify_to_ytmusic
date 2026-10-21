@@ -65,7 +65,7 @@ const AUD = (root) => {
     await p.addInitScript(() => { try { if (!sessionStorage.getItem('__ini')) { sessionStorage.setItem('__ini', '1'); localStorage.setItem('mnr_tut', '1'); } } catch (e) { } });
     if (init) await p.addInitScript(init);
     await p.goto(`http://127.0.0.1:${port}/index.html${q ? q + '&school=0' : '?school=0'}`); await p.waitForFunction(() => window.__mnr && window.RET && document.documentElement.classList.contains('rdy'), null, { timeout: 9000 }); await sleep(300);
-    await p.evaluate(`window.VIS=${VIS.toString()};window.__hubTab=()=>{const b=document.querySelector('#garage .tabs button.on');return b&&b.dataset.t;}`); return p; };
+    await p.evaluate(`window.VIS=${VIS.toString()};window.__hubTab=()=>{const b=document.querySelector('#garage .tabs button.on[data-t]');return b&&b.dataset.t;}`); return p; };
   let taps = 0;
   const tap = async (p, sel) => { const l = p.locator(sel).first(); await l.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => { }); const b = await l.boundingBox(); if (!b) throw new Error('not on screen: ' + sel); await p.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2); taps++; await sleep(350); };
   for (const [w, h] of SIZES) {
