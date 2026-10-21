@@ -73,7 +73,7 @@ function chkBox(){let e=$('cpBox');if(!e){const host=$('over').querySelector('.i
   e.innerHTML='<button type="button" id="cpResume">↺ RESUME FROM CHECKPOINT</button><p id="cpNote"></p>';host.insertBefore(e,host.querySelector('.row'));
   $('cpResume').addEventListener('click',()=>{if(!overlayReady)return;CHK.go();});}return e;}
 NR.on('runEnd',d=>{if(!RET.cp)return;const e=chkBox();
-  if(CHK.marked&&d&&d.story&&!d.quit){const el=$('oNeon');if(el){const a=SH.lastBank|0;el.innerHTML=a?'Banked '+neonI+' <strong>+'+a+'</strong> · garage '+GA.bank:'Banked nothing';}retShow();}
+  if(CHK.marked&&d&&d.story&&!d.quit){const el=$('oNeon');if(el){const a=SH.lastBank|0;el.innerHTML=a?'Banked '+neonI+' <strong>+'+a+'</strong> · garage '+window.fmtN(GA.bank):'Banked nothing';}retShow();}
   const on=!!d&&!!d.story&&!d.cleared&&!d.quit&&CHK.eligible();e.hidden=!on;
   if(on){$('cpNote').textContent='Half hull, '+CHK.grace+' s safe. Marked ↺: Neon ×'+CHK.k+', no records.';setTimeout(()=>{if(!overEl.hidden&&!e.hidden)$('cpResume').focus();},700);}});
 

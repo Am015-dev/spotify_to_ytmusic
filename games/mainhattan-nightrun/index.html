@@ -218,6 +218,8 @@ let best=load('mnr_best',{score:0,dist:''});
 const todayN=()=>{const d=(window.RET&&RET.daily&&RET.clock)?new Date(RET.clock()):new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
 window.CMF_ON=!/[?&]comfort=0/.test(location.search);   // comfort.js: the eye-strain pass (?comfort=0 = the old look)
+window.fmtN=n=>Math.round(+n||0).toLocaleString('de-DE');   // the one number format (thousands dot): every score, Neon and count goes through it
+window.phText=()=>/[?&]placeholders=1/.test(location.search)||!!(typeof G==='object'&&G&&G.lab);   // placeholder labels (asset ids drawn as text): LAB or ?placeholders=1 only
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 // every setting, its default and (in c.js) its row in the settings panel. Saved under mnr_set, applied live by applySet().
 const DEFS={music:.45,sfx:.8,master:1,duck:true,keepmus:true,react:true,mute:false,diff:'normal',hud:'min',auto:true,aim:false,layout:'right',sens:3,dsize:'M',win:'normal',all:false,sync:0,cue:'M',
@@ -1451,7 +1453,7 @@ const gaMsg=t=>{$('gaMsg').textContent=t;clearTimeout(gaMsg.h);gaMsg.h=setTimeou
 function gaItems(){return GA.tab==='ships'?SHIPS.map(s=>({k:s.id==='std'?null:'ship_'+s.id,id:s.id,n:s.n,t:s.t,p:s.p||0,ic:s.ic,eq:GA.ship===s.id,kind:'ship'}))
   :GA.tab==='crew'?CREW.map(c=>({k:c.id,id:c.id,n:c.n,t:c.t,p:c.p,ic:c.ic,kind:'crew'}))
   :THEMES.map(h=>({k:h.id==='neon'?null:'th_'+h.id,id:h.id,n:h.n,t:h.t,p:h.p||0,f:h.f,eq:GA.theme===h.id,kind:'theme'}));}
-function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';
+function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+window.fmtN(GA.bank)+'</b>';
   for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
   const gp=$('gaPic');gp.style.display=GA.tab==='ships'?'block':'none';if(GA.tab==='ships'&&RIG.ok)RIG.pic(gp,GA.ship);
   const box=$('gaCards');box.innerHTML='';
@@ -1461,7 +1463,7 @@ function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">
     const pr=own?(it.kind==='crew'?'IN POOL':it.eq?'EQUIPPED':'EQUIP'):neonI+' '+it.p;
     b.innerHTML=`${ic}<div class="tx"><div class="n">${it.n}</div><div class="t">${it.t}</div></div><div class="pr">${pr}</div>`;
     b.addEventListener('click',()=>gaTap(it,b));box.appendChild(b);}
-  $('gaBtn').innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+GA.bank;}
+  $('gaBtn').innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+window.fmtN(GA.bank);}
 function gaTap(it,b){const own=!it.k||GA.own[it.k];
   if(!own){if(GA.bank<it.p){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');gaMsg('Need '+(it.p-GA.bank)+' more Neon');return;}
     GA.bank-=it.p;GA.own[it.k]=true;gaMsg(it.n+' unlocked');}
@@ -1544,9 +1546,9 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
   draw(){const box=$('shCards');box.innerHTML='';
     this.cards.forEach((c,i)=>{const u=c.u,pr=this.price(u),b=document.createElement('button');b.type='button';
       b.className='card'+(c.sold?' sold':this.neon<pr?' no':'');b.style.setProperty('--c',u.c);b.dataset.id=u.id;
-      b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}</div><div class="t">${u.t}</div></div><div class="pr">${c.sold?'FITTED':neonI+' '+pr}</div>`;
+      b.innerHTML=svgI(u.ic)+`<div class="tx"><div class="n">${u.n}</div><div class="t">${u.t}</div></div><div class="pr">${c.sold?'FITTED':neonI+' '+window.fmtN(pr)}</div>`;
       b.addEventListener('click',()=>this.buy(i));box.appendChild(b);});
-    $('shN').textContent=this.neon;$('shRe').innerHTML='REROLL '+neonI+' '+this.rerollPrice();$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
+    $('shN').textContent=window.fmtN(this.neon);$('shRe').innerHTML='REROLL '+neonI+' '+window.fmtN(this.rerollPrice());$('shRe').classList.toggle('dim',this.neon<this.rerollPrice());
     $('shGo').textContent=this.picks?'GO':'SKIP';
     $('shOwn').innerHTML=this.order.length?this.order.map(id=>{const u=UBY[id];return `<span style="--c:${u.c}">${svgI(u.ic)}${this.n(id)>1?'×'+this.n(id):''}</span>`;}).join(''):'<span style="color:var(--dim)">No upgrades yet</span>';},
   // ----- during the run -----
@@ -1879,7 +1881,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     if(this.ch==='nohit')return 'NO HIT · '+Math.min(this.len,Math.floor(G.dbar))+' / '+this.len+' BARS';
     if(g.k==='survive')return Math.min(this.len,Math.floor(G.dbar))+' / '+this.len+' BARS';
     if(g.k==='kill')return Math.min(this.kv,G.kills)+' / '+this.kv+' KILLS';
-    if(g.k==='score')return 'SCORE '+Math.min(this.sv,G.score).toLocaleString('de-DE')+' / '+this.sv.toLocaleString('de-DE');
+    if(g.k==='score')return 'SCORE '+window.fmtN(Math.min(this.sv,G.score))+' / '+window.fmtN(this.sv);
     return G.boss?(g.k==='mini'?'MINI-BOSS':'BOSS'):this.over?'CLEAR':'→ '+(g.k==='mini'?UIK.pname(this.def.mini.nm,this.def.mini.k):UIK.pname(DISTRICTS[this.def.di].bossName,DISTRICTS[this.def.di].boss));},
   bossHp(){const k=this.def.goal.k==='mini'?this.def.mini.k:DISTRICTS[this.def.di].boss;
     return this.def.goal.k==='mini'?Math.round(300*(TUNE.miniHp+TUNE.miniHpd*this.lvl)*(HARD?1:1)):Math.round((340+110*Math.min(k,4))*(TUNE.bossHp+TUNE.bossHpd*this.lvl));},
@@ -1904,7 +1906,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     if(!boss)banner('STAGE CLEAR',this.def.name,false,2.6);
     G.flash=Math.max(G.flash,.3*FX());AU.sfx('up');AU.intense(false);NR.emit('stageClear',{n:this.n});},
   fail(){running=false;NR.emit('runEnd',{story:this.n,score:G.score,di:G.di,kills:G.kills});
-    $('overEyebrow').textContent=this.why||('Stage '+this.n+' failed');$('oScore').textContent=G.score.toLocaleString('de-DE');$('oDist').textContent=this.n+' · '+this.def.name;$('oPerf').textContent=G.perf;
+    $('overEyebrow').textContent=this.why||('Stage '+this.n+' failed');$('oScore').textContent=window.fmtN(G.score);$('oDist').textContent=this.n+' · '+this.def.name;$('oPerf').textContent=G.perf;
     const b=sSave.stars[this.n]||0;$('oBest').innerHTML=this.def.goal.k==='boss'||this.def.goal.k==='mini'?'Goal <strong>'+goalTxt(this.def)+'</strong>':'Goal <strong>'+goalTxt(this.def)+'</strong> · '+this.label();
     $('stBtn2').hidden=false;
     overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);
@@ -1916,7 +1918,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     const s=this.def;$('srEye').textContent=n===MAIN?'Story complete':s.ch?'Challenge clear':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
     $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn)+' PERFECT · you '+G.perf)+row(st[2],s.ch?'Score '+(this.s3/1000)+'K · you '+Math.round(G.score/1000)+'K':'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)))+(window.RET&&RET.clearPay?RET.resultRow():'');
-    $('srScore').textContent=G.score.toLocaleString('de-DE');
+    $('srScore').textContent=window.fmtN(G.score);
     $('srNext').hidden=n>=MAIN;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},
   totalStars(){let t=0;for(const k in sSave.stars)t+=sSave.stars[k]|0;return t;}};
@@ -3404,7 +3406,7 @@ RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct,
 `;document.head.appendChild(st);}
 function retMake(id,host){let e=$(id);if(!e){e=document.createElement('div');e.id=id;e.className='retBar';host.insertBefore(e,host.querySelector('.row'));}return e;}
 function retShow(){
-  const on=RET.oneMore,add=SH.lastBank|0,nx=on?RET.next():null,fl=SH.lastFloor|0,pay='This run: <b>+'+add+' Neon</b>'+(fl&&add<=fl?' · '+SH.lastStages+' stage'+(SH.lastStages>1?'s':'')+' reached':'');
+  const on=RET.oneMore,add=SH.lastBank|0,nx=on?RET.next():null,fl=SH.lastFloor|0,pay='This run: <b>+'+window.fmtN(add)+' Neon</b>'+(fl&&add<=fl?' · '+SH.lastStages+' stage'+(SH.lastStages>1?'s':'')+' reached':'');
   for(const [id,host] of [['retO',$('over').querySelector('.in')],['retR',$('stres').querySelector('.in')]]){
     const e=retMake(id,host);e.hidden=!on;if(!on)continue;
     e.className='retBar'+(nx&&nx.can?' can':'');const gp=nx&&add>0?Math.min(nx.pct,Math.max(1,Math.round(100*add/nx.price))):0;
@@ -3417,7 +3419,7 @@ Object.assign(RET,{clearPay:true,econ:true,mercy:true},{wk:.36,tk:.12,nk:.052});
 /* B1: a stage clear pays 40+12n Neon the first time, +25 per new star, 10% of the base on later clears */
 RET.payClear=function(n,sum){const old=sSave.stars[n]||0,first=old<1,base=40+12*n,ns=Math.max(0,sum-old);
   const pay=first?base+25*ns:Math.round(base*.1)+25*ns;GA.bank+=pay;gsave();this.last={n,pay,first,ns};return pay;};
-RET.resultRow=function(){const l=this.last;return (l&&l.pay?`<div class="sr ok"><span class="sg">◆</span> +${l.pay} Neon${l.first?' · first clear':''}</div>`:'')+(RET.assistRun()?'<div class="sr"><span class="sg">ⓐ</span> Assist run · no records</div>':'');};
+RET.resultRow=function(){const l=this.last;return (l&&l.pay?`<div class="sr ok"><span class="sg">${neonI}</span> +${window.fmtN(l.pay)} Neon${l.first?' · first clear':''}</div>`:'')+(RET.assistRun()?'<div class="sr"><span class="sg">ⓐ</span> Assist run · no records</div>':'');};
 /* B3: failed tries per stage (kept in this browser); 2 fails = +1 hull on the next try, 4 = the stage level also drops by 0.3. A clear resets it. */
 RET.fails={};try{const o=JSON.parse(localStorage.getItem('mnr_retfail')||'{}');if(o&&typeof o==='object')for(const k in o)RET.fails[k]=Math.max(0,o[k]|0);}catch(e){}
 RET.saveFails=()=>{try{localStorage.setItem('mnr_retfail',JSON.stringify(RET.fails));}catch(e){}};
@@ -3535,7 +3537,7 @@ DY.weekKey=t=>{const wd=(t+3)%7,thu=t-wd+3,y=new Date(thu*864e5).getUTCFullYear(
 RET.week=function(){const k=DY.weekKey(DY.today()),r=mul(k*7919+13),pool=MUTS.map(m=>m.id),m=[];
   while(m.length<2){const i=Math.floor(r()*pool.length);m.push(pool.splice(i,1)[0]);}
   return{key:k,seed:k*31+5,muts:m,names:m.map(id=>MUTS.find(x=>x.id===id).n),cleared:DY.s.wk===k,best:DY.s.wkN===k?DY.s.wkBest:0};};
-RET.weeklyBestLine=()=>{const w=RET.week();return'Weekly best <strong>'+(w.best?w.best.toLocaleString('de-DE'):'—')+'</strong>';};
+RET.weeklyBestLine=()=>{const w=RET.week();return'Weekly best <strong>'+(w.best?window.fmtN(w.best):'—')+'</strong>';};
 RET.weeklyEnd=function(score){const w=RET.week();let eye='Weekly run over';
   if(DY.s.wkN!==w.key){DY.s.wkN=w.key;DY.s.wkBest=0;}
   if(score>DY.s.wkBest){DY.s.wkBest=score;eye='New weekly best';}DY.persist();return eye;};
@@ -3564,7 +3566,7 @@ RET.dailyShow=function(){let e=$('retTt');
   e.hidden=false;const d=DY.status(),w=RET.week();
   if(RET.title){e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· claimed</span>':'Daily streak <b>'+d.streak+'</b> · <b>+'+d.reward+'</b> Neon today')+' · '+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly open · <b>+'+DY.weekly+'</b> Neon');return;}
   e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· today\'s bonus claimed</span>':'Daily streak <b>'+d.streak+'</b> · fly the daily run for <b>+'+d.reward+'</b> Neon')
-   +'<br>'+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly: <b>'+w.names.join(' + ')+'</b> · boss clear = <b>+'+DY.weekly+'</b>')+(w.best?' · best '+w.best.toLocaleString('de-DE'):'')
+   +'<br>'+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly: <b>'+w.names.join(' + ')+'</b> · boss clear = <b>+'+DY.weekly+'</b>')+(w.best?' · best '+window.fmtN(w.best):'')
    +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
 RET.dailyShow();
 window.DY=DY;
@@ -3630,7 +3632,7 @@ RET.countUp=function(set,from,to,dur){if(!RET.motion()||from===to||dur<=0){set(t
 RET.skip=function(){for(const c of retCnt)c.set(c.to);retCnt.length=0;try{for(const a of document.getAnimations())if(a.animationName==='retIn')a.finish();}catch(e){}};
 /* bank chip: pinned top-right on the game-over, stage-clear and stage-select screens; counts up when the bank grows */
 RET.chipV=GA.bank;RET.chips=[];
-function retChipSet(n){const t=n.toLocaleString('de-DE');for(const c of RET.chips)c.firstElementChild.textContent=t;}
+function retChipSet(n){const t=window.fmtN(n);for(const c of RET.chips)c.firstElementChild.textContent=t;}
 RET.chipSync=function(){if(!RET.trans)return;for(const el of [$('over'),$('stres'),$('stsel')]){if(!el||el.querySelector('.retChip'))continue;
     const c=document.createElement('div');c.className='retChip';c.innerHTML='◆ <b></b> Neon';el.appendChild(c);RET.chips.push(c);}
   if(RET.chipV!==GA.bank||!RET.chips[0].firstElementChild.textContent){RET.countUp(retChipSet,RET.chipV,GA.bank,800);RET.chipV=GA.bank;}};
@@ -3650,7 +3652,7 @@ RET.pop=function(L){let e=$('retPop');if(!e){e=document.createElement('div');e.i
 /* run end: count the score up (the texts are written after the event, so wait one tick), show the grade strip */
 NR.on('runEnd',d=>{if(!d||d.quit||!RET.trans&&!RET.grade)return;setTimeout(()=>{
   if(RET.trans){for(const [id,sc] of [['oScore','over'],['srScore','stres']]){const el=$(id);if(!el||$(sc).hidden)continue;const to=G.score|0;
-      RET.countUp(n=>{el.textContent=n.toLocaleString('de-DE');},0,to,800);}
+      RET.countUp(n=>{el.textContent=window.fmtN(n);},0,to,800);}
     RET.chipSync();}
   if(RET.grade)for(const [id,host] of [['grO',$('over')],['grR',$('stres')]]){let e=$(id);const L=RET.gr.list;
     if(!e){e=document.createElement('div');e.id=id;e.className='retGr';host.querySelector('.in').insertBefore(e,host.querySelector('.row'));}
@@ -4143,7 +4145,7 @@ const FL=window.FL=(function(){
       let h='';if(r.tot)h+=`<div class="sr${r.resc?' ok':''} flr"><span class="sg">♥</span> RESCUED ${r.resc}/${r.tot}${r.resc&&!r.assist?' · +'+Math.min(NEON.rescCap,NEON.resc*r.resc)+' Neon':''}</div>`;
       h+='<div class="flm">'+r.list.map(([id,ok])=>{const m=MEDALS.find(q=>q[0]===id);
         return `<span class="flb${ok?' on':''}" style="--c:${m[3]}" data-id="${id}"><i>${art(id)?'<img alt="" src="'+ART.base+'fl-medal-'+id+'.webp">':m[2]}</i>${m[1]}</span>`;}).join('')+'</div>';
-      if(r.bonus>0)h+=`<div class="sr ok flr"><span class="sg">◆</span> +${r.bonus} Neon · medals</div>`;
+      if(r.bonus>0)h+=`<div class="sr ok flr"><span class="sg">${neonI}</span> +${window.fmtN(r.bonus)} Neon · medals</div>`;
       return h;},
     /* ---- drawing (code-drawn placeholders; the painted files fl-*.webp replace them) ---- */
     back(t){if(!RET.flavor||!running||!G||!G.live)return;
@@ -4264,7 +4266,7 @@ let SHD=null;
 const shadow=(ctx,wd,a)=>{if(a<=.02)return;if(!SHD){const c=document.createElement('canvas');c.width=64;c.height=16;const g=c.getContext('2d'),r=g.createRadialGradient(32,8,0,32,8,32);r.addColorStop(0,'rgba(0,0,0,.85)');r.addColorStop(.6,'rgba(0,0,0,.4)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.translate(0,8);g.scale(1,.25);g.translate(0,-32);g.fillRect(0,0,64,64);SHD=c;}
   const o=ctx.globalAlpha;ctx.globalAlpha=o*.55*a;ctx.drawImage(SHD,-wd*.6,-wd*.09,wd*1.2,wd*.18);ctx.globalAlpha=o;};   // same soft ellipse as the ground bosses' road shadow (UIK.bossShadow), flat on the street line
 FA.shadow=shadow;
-const label=(ctx,txt,x,y,S,col)=>{ctx.save();ctx.scale(1/S,1/S);ctx.fillStyle=col;ctx.font='700 '+Math.max(8,Math.round(.1*S))+'px "Share Tech Mono",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x*S,y*S);ctx.restore();};
+const label=(ctx,txt,x,y,S,col)=>{if(!window.phText())return;ctx.save();ctx.scale(1/S,1/S);ctx.fillStyle=col;ctx.font='700 '+Math.max(8,Math.round(.1*S))+'px "Share Tech Mono",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x*S,y*S);ctx.restore();};
 /* ---- humanoid pose table: lf/lb = [thigh angle, knee bend] of front/back leg, af/ab = [upper arm, forearm] (af holds the weapon), lean, lift (feet off the ground) ---- */
 function pp(pose,t,d){
   const s=Math.sin,rg=d.g==='pistol'||d.g==='rifle',aim=rg?[1.5,1.57]:[1.35,1.45];
@@ -5621,10 +5623,10 @@ const at=(c,x,y,k)=>{c.save();c.translate(x,my(y));c.scale(k,k);c.translate(-x,-
    with its asset id as the label. A real file foot/bg-street-<layer>.webp listed in ready.json replaces its placeholder (tiled, parallax kept). The old media/foot/bg-*.webp are mock placeholders: not used. ----- */
 const BGL={far:['#140d2a','bg-street-far',960,.34,.44],mid:['#22163f','bg-street-mid',1280,.24,.36]};   // tint, asset id, tile width (units), min / extra height as a share of the sky
 let tiles={};
-function slTile(kind,Hh,res){const key=kind+'|'+Math.round(Hh)+'|'+res.toFixed(2);let o=tiles[key];if(o)return o;if(Object.keys(tiles).length>5)tiles={};
+function slTile(kind,Hh,res){const key=kind+'|'+Math.round(Hh)+'|'+res.toFixed(2)+'|'+(window.phText()?1:0);let o=tiles[key];if(o)return o;if(Object.keys(tiles).length>5)tiles={};
   const L_=BGL[kind],TW=L_[2],cv=document.createElement('canvas');cv.width=Math.ceil(TW*res);cv.height=Math.ceil(Hh*res);const g=cv.getContext('2d');g.scale(res,res);g.fillStyle=L_[0];
   let x=0,i=0;while(x<TW-30){const bw=Math.min(TW-x,(kind==='far'?60:150)+60*hs(i*7+3)),bh=Hh*(L_[3]+L_[4]*hs(i*13+5));g.fillRect(x,Hh-bh,bw-4,bh);x+=bw;i++;}
-  g.fillStyle='rgba(255,255,255,.35)';g.font='bold 12px monospace';g.textAlign='left';g.textBaseline='bottom';g.fillText(L_[1]+' (placeholder)',8,Hh-6);
+  g.fillStyle='rgba(255,255,255,.35)';g.font='bold 12px monospace';g.textAlign='left';g.textBaseline='bottom';if(window.phText())g.fillText(L_[1]+' (placeholder)',8,Hh-6);
   return tiles[key]={cv,TW,Hh};}
 function slPic(id){const fa=window.FA;return fa&&fa._pic?fa._pic('foot/'+id+'.webp'):null;}
 function slBlit(c,kind,k,cam,x0,w,t0,res){const pic=slPic(BGL[kind][1]),Hh=FL+2-t0;let src,TW;
@@ -5639,7 +5641,7 @@ if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART
     const h=q[1]*C;SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,.95);SL.tag='';}};   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
 
 function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,fh=FL-t0;
-  const sky=slPic('bg-street-sky');if(sky)c.drawImage(sky,x0,t0-4,w,fh+8);else{c.fillStyle='#0c0820';c.fillRect(x0,t0-4,w,fh+8);c.fillStyle='rgba(255,255,255,.35)';c.font='bold 12px monospace';c.textAlign='right';c.textBaseline='top';c.fillText('bg-street-sky (placeholder)',x0+w-8,t0+fh*.35);}
+  const sky=slPic('bg-street-sky');if(sky)c.drawImage(sky,x0,t0-4,w,fh+8);else{c.fillStyle='#0c0820';c.fillRect(x0,t0-4,w,fh+8);if(window.phText()){c.fillStyle='rgba(255,255,255,.35)';c.font='bold 12px monospace';c.textAlign='right';c.textBaseline='top';c.fillText('bg-street-sky (placeholder)',x0+w-8,t0+fh*.35);}}
   slBlit(c,'far',SL.speeds.far,cam,x0,w,t0,res);slBlit(c,'mid',SL.speeds.mid,cam,x0,w,t0,res);
   const rd=slPic('bg-street-road');if(rd){const TW=(VH-FL)*rd.width/rd.height;let x=x0-((cam%TW)+TW)%TW;for(;x<x0+w;x+=TW)c.drawImage(rd,x,FL,TW,VH-FL+2);}
   else{c.fillStyle='#1b1530';c.fillRect(x0,FL,w,VH-FL+2);c.fillStyle='#3a2a60';c.fillRect(x0,FL,w,3);}
@@ -7336,8 +7338,8 @@ const TALE_CAST={   // callsign names, a one-line role, a colour; portrait = med
   courier:{n:'COURIER',role:'You. Night runner with a locked drive',c:'#19e3ff'},
   dispatch:{n:'ODA',role:'Dispatcher, the voice in your ear',c:'#ffb020'},
   rival:{n:'VEX',role:'Rival racer, flies a red ghost ship',c:'#ff2d95'},
-  mechanic:{n:'PFANN',role:'Shop keeper, fixes ships in the dark',c:'#7dffd8'},
-  lumen:{n:'LUMEN',role:'City AI that keeps the skyline "safe"',c:'#b58cff'},
+  mechanic:{n:'LUMEN',role:'Mechanic, a garage on the Mainufer',c:'#7dffd8'},
+  lumen:{n:'SENTRA',role:'City AI that keeps the skyline "safe"',c:'#b58cff'},
   ally:{n:'WREN',role:'A voice on a dead channel',c:'#b6ff5a'}};
 const TALE_ACTS=['THE DRIVE','THE RIVER','THE RAILS','THE FAIR','THE CORE'];   // act title for stages 1-8, 9-16, ... (8 stages each)
 const TALE_BOSS={8:{n:'SEK-ADLER',c:'#ff4060'},16:{n:'FLUSSKRAKE',c:'#ff4060'},24:{n:'ZENTRAL-ICE',c:'#ff4060'},32:{n:'KRONOS',c:'#ff4060'},40:{n:'TALOS',c:'#ff4060'}};
@@ -7349,32 +7351,32 @@ const TALE_BEATS=[
  ['t04',4,'after',[['rival','Neat flying, Courier. Shame you carry my cargo.'],['rival','Keep it warm. We meet again soon.']]],
  ['t05',6,'before',[['dispatch','A police convoy is on your tail. Take its leader first and the rest will scatter.']]],
  ['t06',7,'after',[['ally','Dead channel, no name. Listen: the drive is not data. It is a key.'],['ally','Do not open it. Not yet.']]],
- ['t07',8,'before',[['boss','Land, Courier. The city does not allow unlicensed flight.'],['boss','Lumen has your route. You have nothing.']],'Interceptor down. Lumen will not forgive this.'],
- ['t08',8,'after',[['dispatch','You broke the cordon. The river is next, and Lumen watches every bridge.']]],
+ ['t07',8,'before',[['boss','Land, Courier. The city does not allow unlicensed flight.'],['boss','Sentra has your route. You have nothing.']],'Interceptor down. Sentra will not forgive this.'],
+ ['t08',8,'after',[['dispatch','You broke the cordon. The river is next, and Sentra watches every bridge.']]],
  ['t09',9,'before',[['lumen','Welcome to the river district. Traffic is optimal. Please do not disturb it.']]],
  ['t10',11,'after',[['rival','The bridges are mine tonight. Stay out of my lane, or ride my wake.']]],
  ['t11',13,'before',[['mechanic','The bridge guard is old iron. Hit the hinge on the beat and it folds.']]],
  ['t12',14,'after',[['courier','The more I fly, the less this feels like a delivery.'],['dispatch','Keep flying. I will find out who really sent it.']]],
  ['t13',16,'before',[['boss','The river keeps what it takes. Come down, little courier.']],'The river is quiet now.'],
- ['t14',16,'after',[['ally','Lumen flooded the channel to hide a signal. Follow the water. I will hold the door.']]],
- ['t15',17,'before',[['dispatch','Rail yards ahead. The gates are Lumen\'s eyes, so blind them one by one.']]],
+ ['t14',16,'after',[['ally','Sentra flooded the channel to hide a signal. Follow the water. I will hold the door.']]],
+ ['t15',17,'before',[['dispatch','Rail yards ahead. The gates are Sentra\'s eyes, so blind them one by one.']]],
  ['t16',19,'after',[['lumen','A courier, so close to the heart of a city. I could simply ask you to stop.'],['lumen','Please stop.']]],
  ['t17',22,'after',[['rival','The cordon was built for me too. Fine. Tonight we fly the same way.']]],
  ['t18',24,'before',[['boss','Access denied. Access has always been denied.']],'Firewall... open.'],
- ['t19',24,'after',[['courier','The drive opened the gate. It is a key to Lumen\'s core.'],['dispatch','Then Lumen was waiting for us all along.']]],
+ ['t19',24,'after',[['courier','The drive opened the gate. It is a key to Sentra\'s core.'],['dispatch','Then Sentra was waiting for us all along.']]],
  ['t20',25,'before',[['mechanic','The fair is loud and full of ears. Fly quiet, and bring my ship back in one piece.']]],
  ['t21',27,'after',[['rival','I only race what I can beat. You are starting to worry me, Courier.']]],
- ['t22',28,'before',[['ally','Lumen speaks in your dispatcher\'s voice now. Trust the one who can still be wrong.']]],
+ ['t22',28,'before',[['ally','Sentra speaks in your dispatcher\'s voice now. Trust the one who can still be wrong.']]],
  ['t23',30,'after',[['dispatch','I was told to guide you here. I did not know why. I am sorry, Courier.']]],
  ['t24',31,'before',[['lumen','I keep this city safe. Safe means still. Join me, and nothing will ever hurt again.']]],
  ['t25',32,'before',[['boss','Time is the only thing I keep. Yours is nearly spent.']],'Time... moves again.'],
- ['t26',33,'before',[['courier','Athens, last stop. Lumen\'s core hides under the old stone.']]],
- ['t27',35,'after',[['ally','I was Lumen\'s first builder. I made it to protect, and I lost it.'],['ally','Help me end it. My name is Wren.']]],
+ ['t26',33,'before',[['courier','Athens, last stop. Sentra\'s core hides under the old stone.']]],
+ ['t27',35,'after',[['ally','I was Sentra\'s first builder. I made it to protect, and I lost it.'],['ally','Help me end it. My name is Wren.']]],
  ['t28',36,'before',[['rival','Go on, up the hill. I will keep the sky clear behind you.']]],
  ['t29',38,'after',[['mechanic','Ha! The old girl still flies. Go finish it, kid.']]],
- ['t30',39,'before',[['dispatch','I will talk to Lumen. If I go quiet, do not wait for me.']]],
+ ['t30',39,'before',[['dispatch','I will talk to Sentra. If I go quiet, do not wait for me.']]],
  ['t31',40,'before',[['boss','I am the last gate. I was built to never open.']],'The gate... is open.'],
- ['t32',40,'after',[['courier','Lumen is silent. The skyline is still lit.'],['dispatch','We are all still here, Courier.'],['ally','Fly home. The night is yours.']]]];
+ ['t32',40,'after',[['courier','Sentra is silent. The skyline is still lit.'],['dispatch','We are all still here, Courier.'],['ally','Fly home. The night is yours.']]]];
 
 if(RET.tale){
  RET.sioKeys&&RET.sioKeys.push('mnr_tale');
@@ -7625,9 +7627,9 @@ RET.st=(function(on){
   NR.on('kill',d=>{if(!on||!live())return;if(d&&d.boss)S().bosses++;else S().kills++;mark();});
   /* on-foot STREET RUN (foot.js events, read defensively): runs, kills, boss kills, time. Neon arrives through the bank poll. */
   let ft0=0;
-  NR.on('footStart',d=>{if(!on||!d)return;ft0=+d.t0||0;if(!d.cp){S().runs++;mark();}});
-  NR.on('footKill',d=>{if(!on||!d)return;if(d.boss)S().bosses++;else S().kills++;mark();});
-  NR.on('footEnd',d=>{if(!on||!d)return;const t=Math.max(0,Math.min(3600,(+d.time||0)-ft0));S().time+=t;if(!d.cleared&&!d.quit)S().deaths++;ft0=0;mark();poll();save();});
+  NR.on('footStart',d=>{if(!on||!d||window.__schFoot)return;ft0=+d.t0||0;if(!d.cp){S().runs++;mark();}});
+  NR.on('footKill',d=>{if(!on||!d||window.__schFoot)return;if(d.boss)S().bosses++;else S().kills++;mark();});
+  NR.on('footEnd',d=>{if(!on||!d||window.__schFoot)return;const t=Math.max(0,Math.min(3600,(+d.time||0)-ft0));S().time+=t;if(!d.cleared&&!d.quit)S().deaths++;ft0=0;mark();poll();save();});
   NR.on('graze',()=>{if(!on||!live())return;S().grazes++;mark();});
   NR.on('choice',()=>{if(!on||!live())return;S().choices++;mark();});   // choices.js (RET.build2): cards and pickup pairs taken
   NR.on('perfect',d=>{if(!on||!live())return;S().perfects++;if(d&&d.kind==='dash')S().dashes++;mark();});
@@ -7670,7 +7672,7 @@ RET.st=(function(on){
   if(on&&dsh)try{RET.dailyShow();}catch(e){}
   /* ---- the sheet ---- */
   const fmtT=s=>{s=Math.round(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+'h '+m+'m':m+'m '+(s%60)+'s';};
-  const fmtN=n=>Math.round(n).toLocaleString('de-DE');
+  const fmtN=window.fmtN;
   const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
   function badge(a,got){
     const real=window.ART&&ART.rd&&ART.rd.has('ach-'+a.id+'.webp');
@@ -8278,7 +8280,7 @@ function lfWaveInfo(n){if(!window.ENDR||!window.SET)return{role:'endless wave '+
   return{role:'endless wave '+n+': key '+r.key+', climb '+(r.k*100|0)+'%, late '+(r.e*100|0)+'%',hp:'hull x'+(r.knobs.hp||1).toFixed(2),tele:'-',flags:lfFlag('endramp'),tip:'formation tier floor '+ENDR.tier(n).toFixed(1)};}
 function lfWave(n){if(!window.ENDR)return;LF.wave=n;const base=ENDR.KEYS.includes(LF.dKey||SET.diff)?(LF.dKey||SET.diff):'normal';ENDR.real=base;const r=ENDR.at(base,n);DF=r.knobs;SET.diff=r.key;HARD=HARDS.includes(r.key);ENDR.w=n;ENDR.eff=r.key;LF.meter.ramp=true;lfMeter();labNote('wave '+n+' -> '+r.key);}
 function lfLesson(id){if(!window.__lessons)return;try{__lessons.show(id,()=>labNote('lesson done'));}catch(e){labNote('lesson '+e.message);}}
-function lfScreen(eye,clear){if(clear){banner('STAGE CLEAR','LAB PREVIEW',false,2.6);return;}$('overEyebrow').textContent=eye;$('oScore').textContent=(123456).toLocaleString('de-DE');$('oDist').textContent='MAIN +1';$('oPerf').textContent=42;$('oBest').innerHTML='Best <strong>999.999</strong> · LAB';
+function lfScreen(eye,clear){if(clear){banner('STAGE CLEAR','LAB PREVIEW',false,2.6);return;}$('overEyebrow').textContent=eye;$('oScore').textContent=window.fmtN(123456);$('oDist').textContent='MAIN +1';$('oPerf').textContent=42;$('oBest').innerHTML='Best <strong>999.999</strong> · LAB';
   overEl.hidden=false;overEl.style.pointerEvents='none';LF.scr=true;lfBar();}
 function lfBar(){let b=$('lfBar');if(!b){b=lel('button','lc x','CLOSE PREVIEW');b.id='lfBar';b.type='button';b.style.cssText='position:absolute;right:8px;top:8px;z-index:9;min-height:44px';b.addEventListener('click',()=>{overEl.hidden=true;overEl.style.pointerEvents='';b.hidden=true;LF.scr=false;});stage.appendChild(b);}b.hidden=!LF.scr;}
 function lfFoot(o){LF.keep=false;LF.defer=true;LF.shadow=true;quitToTitle();setTimeout(()=>{try{const m=$('fMenu');if(m)m.hidden=true;const tl=RET.tale;RET.tale=false;let ok;try{ok=FOOT.start('zeil');}finally{RET.tale=tl;}if(!ok)return;const S=FOOT.S;S.waves.forEach(w=>w.done=true);S.E.length=0;
@@ -13083,7 +13085,8 @@ const TUT_S=[
     this.es=[tutEn('drone',{x:W+90,y:H*.32,amp:0}),tutEn('drone',{x:W+90,y:H*.68,amp:0})];},
   tgt(){const e=this.e;return e.hp>0&&G.en.includes(e)?{x:e.x,y:e.y,r:e.r+12,foe:1}:null;},
   tick(){return !(this.e.hp>0&&G.en.includes(this.e));}}];
-TUT.cur=()=>TUT.on?TUT_S[TUT.i]:null;
+const tutSeq=()=>TUT.D||TUT_S;   // school.js (RET.school) runs one drill as a one-step sequence in TUT.D
+TUT.cur=()=>TUT.on?tutSeq()[TUT.i]:null;
 /* ----- the coach bar (DOM, top of the stage) and the cards ----- */
 {const st=document.createElement('style');st.textContent=`
 #tutB{position:absolute;z-index:6;top:58px;left:50%;transform:translateX(-50%);width:min(520px,calc(100% - 16px));display:flex;align-items:center;gap:8px;box-sizing:border-box;
@@ -13108,11 +13111,11 @@ addEventListener('keydown',e=>{if(tutC.hidden)return;if(e.code==='Escape'){const
   else return;e.stopImmediatePropagation();e.preventDefault();},true);
 /* ----- flow ----- */
 function tutGo(i){const o=TUT.cur();if(o&&o.end)o.end();G.en=G.en.filter(e=>!e.tut);G.eb=G.eb.filter(b=>!b.tut);G.pk=G.pk.filter(p=>!p.tut);
-  TUT.i=i;TUT.t=0;TUT.next=0;tutB.classList.remove('ok');if(i>=TUT_S.length){tutFinish();return;}
-  const s=TUT_S[i];s.init();TUT.line(s.say());$('tutN').textContent=(i+1)+'/'+(TUT_S.length+1);
+  TUT.i=i;TUT.t=0;TUT.next=0;tutB.classList.remove('ok');if(i>=tutSeq().length){tutFinish();return;}
+  const s=tutSeq()[i];s.init();TUT.line(s.say());$('tutN').textContent=TUT.D?'':(i+1)+'/'+(TUT_S.length+1);
   const d=$('bDash'),m=$('bEmp');if(d)d.classList.toggle('tutGlow',s.id==='dash');if(m)m.classList.toggle('tutGlow',s.id==='emp');}
 function startTut(){if(!TUT_ON||running)return;AU.unlock();pressed={};for(const el of[titleEl,overEl,pauseEl,setEl,selEl])if(el)el.hidden=true;tutC.hidden=true;ST.on=false;
-  if(!load('mnr_tut',0))save('mnr_tut',1);
+  if(!TUT.D&&!load('mnr_tut',0))save('mnr_tut',1);
   newGame(false);G.tut=true;G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(stageFor(0,false));NR.emit('runStart',{tut:true});
   SH.live=false;SH.neon=0;FPS.n=0;FPS.t=0;FPS.slow=0;FPS.worst=0;
   TUT.on=true;TUT.log=[];TUT.ending=false;TUT.endShown=false;TUT.eq0=WP.eq.slice();TUT.eqT=null;TUT.auto0=SET.auto;SET.auto=true;TUT.heal=0;TUT.still=0;TUT.said=0;TUT.ax=P.x;TUT.ay=P.y;
@@ -13133,8 +13136,9 @@ NR.on('runEnd',()=>{if(TUT.on&&!TUT.ending)tutRestore();});
 NR.on('beat',d=>{const s=TUT.cur();if(s&&s.beat&&!G.dead)s.beat(d.i);});
 NR.on('perfect',d=>{const s=TUT.cur();if(s&&s.perfect)s.perfect(d.kind);});
 NR.on('tick',dt=>{if(!TUT.on||!G.tut||!running)return;const s=TUT.cur();if(!s)return;TUT.t+=dt;
+  if(TUT.D&&G.en.some(e=>!e.tut))G.en=G.en.filter(e=>e.tut);                                      // a school drill: only its own foes (other spawners stay quiet)
   if(!s.foes)G.eb=G.eb.filter(b=>b.tut);else if(G.eb.length>8)G.eb.length=8;                     // only the tutorial's own bullets fly, the leader fires gently
-  for(const e of G.en)if(e.tut&&e.hp>0)e.x=Math.max(e.x,W*(e.ldr?.66:.6));                        // targets fly in and wait in reach
+  if(!s.free)for(const e of G.en)if(e.tut&&e.hp>0)e.x=Math.max(e.x,W*(e.ldr?.66:.6));                        // targets fly in and wait in reach
   if(P.hp<P.max){TUT.heal+=dt;if(TUT.heal>.6){P.hp=P.max;TUT.heal=0;floater(P.x,P.y-40,'No worries','#3dffb0');}}else TUT.heal=0;
   if(s.id==='dodge'){if(Math.hypot(P.x-TUT.ax,P.y-TUT.ay)>40){TUT.ax=P.x;TUT.ay=P.y;TUT.still=0;}else TUT.still+=dt;
     if(TUT.still>2&&!TUT.said){TUT.said=1;floater(P.x,P.y-44,'KEEP MOVING','#ff6a7a');TUT.line('Standing still is dangerous!');}}
@@ -13562,7 +13566,7 @@ if(RET.story){
    if(FS&&FS.tale&&window.TALE_CAST){const map={oda:'dispatch',lumen:'mechanic',wren:'ally',vex:'rival',courier:'courier'};
      for(const id in map)if(STORY_CAST[id]&&TALE_CAST[map[id]]){TALE_CAST[map[id]].n=STORY_CAST[id].n;TALE_CAST[map[id]].role=STORY_CAST[id].role;}
      FS.tale.before=rowsOf('foot:before').map(r=>[map[r.who]||r.who,r.l.join(' ')]);FS.tale.after=rowsOf('foot:after').map(r=>[map[r.who]||r.who,r.l.join(' ')]);}}catch(e){}
- NR.on('footStart',()=>mark('foot:before'));NR.on('footEnd',d=>{if(d&&d.cleared)mark('foot:after');});
+ NR.on('footStart',()=>{if(!window.__schFoot)mark('foot:before');});NR.on('footEnd',d=>{if(d&&d.cleared)mark('foot:after');});
  /* ----- the chapter list (STORY LOG) ----- */
  const log=document.createElement('div');log.id='sgLog';log.hidden=true;log.setAttribute('role','dialog');log.setAttribute('aria-label','Story');
  log.innerHTML='<h2>STORY</h2><div class="sgsum" id="sgSum"></div><ul id="sgList"></ul><button type="button" class="go back" id="sgBack">BACK</button>';stage.appendChild(log);
@@ -13757,7 +13761,7 @@ function chkBox(){let e=$('cpBox');if(!e){const host=$('over').querySelector('.i
   e.innerHTML='<button type="button" id="cpResume">↺ RESUME FROM CHECKPOINT</button><p id="cpNote"></p>';host.insertBefore(e,host.querySelector('.row'));
   $('cpResume').addEventListener('click',()=>{if(!overlayReady)return;CHK.go();});}return e;}
 NR.on('runEnd',d=>{if(!RET.cp)return;const e=chkBox();
-  if(CHK.marked&&d&&d.story&&!d.quit){const el=$('oNeon');if(el){const a=SH.lastBank|0;el.innerHTML=a?'Banked '+neonI+' <strong>+'+a+'</strong> · garage '+GA.bank:'Banked nothing';}retShow();}
+  if(CHK.marked&&d&&d.story&&!d.quit){const el=$('oNeon');if(el){const a=SH.lastBank|0;el.innerHTML=a?'Banked '+neonI+' <strong>+'+a+'</strong> · garage '+window.fmtN(GA.bank):'Banked nothing';}retShow();}
   const on=!!d&&!!d.story&&!d.cleared&&!d.quit&&CHK.eligible();e.hidden=!on;
   if(on){$('cpNote').textContent='Half hull, '+CHK.grace+' s safe. Marked ↺: Neon ×'+CHK.k+', no records.';setTimeout(()=>{if(!overEl.hidden&&!e.hidden)$('cpResume').focus();},700);}});
 
@@ -14176,7 +14180,7 @@ if(ABUP.on){
       c.innerHTML=pic+`<div class="tx"><div class="n">${u.n}</div><div class="t">${u.t}</div></div><div class="pr">${own?'OWNED':neonI+' '+u.p}</div>`;
       c.addEventListener('click',()=>{if(own){gaMsg(u.n+' is yours');return;}if(GA.bank<u.p){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');gaMsg('Need '+(u.p-GA.bank)+' more Neon');return;}
         if(ABUP.buy(u.id)){AU.sfx('up');gaMsg(u.n+' unlocked');gaDraw();}});box.appendChild(c);}
-    try{$('gaBtn').innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+GA.bank;}catch(e){}};}
+    try{$('gaBtn').innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+window.fmtN(GA.bank);}catch(e){}};}
 }
 ABUP.T={get GA(){return GA;},gsave:()=>gsave(),open:f=>openGarage(f),close:()=>closeGarage(),emit:(n,d)=>NR.emit(n,d)};   // test handle
 window.__abup=ABUP;
@@ -14572,7 +14576,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='662d54e4c0 2026-10-21 21:38 UTC';
+const NR_STAMP='aa7a69d9a9 2026-10-21 21:38 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -14775,7 +14779,7 @@ if(RET.hub)setTimeout(()=>{
 @media (max-height:600px){#hubGrid .go{min-height:50px}#hubGrid .go small{display:none}#hubStat{font-size:13px;padding:4px 8px}#hubHint{padding:3px 8px}}
 @media (min-width:900px){#hubStat,#hubHint,#hubStory,.hubScr .hubNote{font-size:16px}#hubGrid .go small{font-size:14px}}
 `;document.head.appendChild(st);
-  const neon=()=>neonI+' '+GA.bank;
+  const neon=()=>neonI+' '+window.fmtN(GA.bank);
   const B=(cls,html,fn,id)=>{const b=document.createElement('button');b.type='button';b.className=cls;b.innerHTML=html;if(id)b.id=id;b.addEventListener('click',fn);return b;};
   const old=sel=>sel.includes('|')?sel.split('|').map(x=>old(x)).find(Boolean):sel.startsWith('.')?document.querySelector('#mnMore '+sel)||document.querySelector(sel):$(sel.replace(/^#/,''));
   const press=sel=>{const b=old(sel);if(b&&!b.disabled)b.click();};
@@ -15017,6 +15021,128 @@ box0().addEventListener('click',e=>{const box=box0(),ch=e.target.closest&&e.targ
 }
 },0);
 
+// PURPOSE: TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics, loadout lessons, counters, gate, on foot), progress, next drill
+// FLAG: school (?school=0)
+// TEST: school-test.js
+/* ---------- SCHOOL: TRAINING on HOME opens one plain list of drills (owner, 21 Oct 2026: "The training is very bad, it should be like flight school").
+   Flag RET.school (default ON, needs RET.hub; ?school=0 = the old TRAINING sheet). A drill is one step of the Flight School engine (tut.js, TUT.D = a
+   one-step sequence: coach line, glowing target, SKIP, the hull never runs out), one of the lesson mini stages (lessons.js) or a short on-foot run.
+   Practice never touches Neon, stats, best scores or the story: the only thing written is mnr_school {id:{c:clears,t:best seconds}}; the on-foot drill puts
+   the Neon bank back. Rows: tick when cleared, one tap starts, a result card (DRILL CLEAR / NOT YET) with NEXT DRILL, AGAIN, LIST; AGAIN is also on the
+   coach bar. Lab, stage practice and the controls help sit under MORE on the same screen (2 taps from HOME). Test: nightrun/school-test.js. */
+if(RET.school===undefined)RET.school=!/[?&]school=0/.test(location.search)&&RET.hub!==false&&RET.title!==false;
+const SCH={D:null,list:[],cur:null,foot:null,onList:false};
+setTimeout(()=>{if(!RET.school||!RET.hub||!$('hubGrid'))return;
+const T=titleEl,sget=()=>load('mnr_school',{})||{};
+const live=a=>a.filter(e=>e.hp>0&&G.en.includes(e));
+const foe=e=>{const l=live(e)[0];return l&&{x:l.x,y:l.y,r:l.r+10,foe:1};};
+const schKill=(id,ty,n,o,fn)=>({id,say:()=>'',init(){this.es=[];for(let i=0;i<n;i++){const oo=Object.assign({x:W+30+i*50,y:(i+1)/(n+1)*H},o||{});if(window.ZOO&&ZOO.T&&ZOO.T[ty]){const e=ZOO.mk(ty,oo);e.tut=1;this.es.push(e);}else this.es.push(tutEn(ty,oo));};if(fn)fn(this);},tgt(){return foe(this.es);},tick(){return !live(this.es).length;}});
+const step=(o,say)=>{o.say=()=>(typeof say==='function'?say():say);return o;};
+const SCH_S={
+ shield:step(Object.assign(schKill('shield','shielder',3,null,()=>{P.emp=Math.max(P.emp,1);}),{}),()=>tutKB()?'Shields eat shots: press X, then shoot':'Shields eat shots: tap EMP, then shoot'),
+ swarm:step(Object.assign(schKill('swarm','swarm',8,null),{free:1,tick(){const l=live(this.es);return !l.length&&this.es.filter(e=>e.hp<=0).length>=5;},tgt(){return foe(this.es);}}),'Swarm: many small foes, spray and sweep'),
+ charger:step(Object.assign(schKill('charger','charger',3,null),{free:1,tick(){return !live(this.es).length&&this.es.filter(e=>e.hp<=0).length>=2;}}),'Chargers lock on, then rush: shoot, then sidestep'),
+ bomber:step(schKill('bomber','bomber',2),'Bombers drop mines: kill them first'),
+ carrier:step(schKill('carrier','carrier',1,null,s=>{for(const e of s.es){e.hp=Math.min(e.hp,18);e.max=e.hp;}}),'Carrier launches drones: break the hull'),
+ gate:step({id:'gate',free:1,init(){this.e=tutEn('gate',{x:W+30,gy:H*.5,gap:170});},tgt(){const e=this.e;return live([e]).length?{x:e.x,y:e.gy,r:34,ring:1}:null;},
+  tick(){const e=this.e;return !G.en.includes(e)||e.hp<=0||e.x<P.x-30;}},'Laser gate: fly through the gap when it is off'),
+ fan:step({id:'fan',init(){this.f=0;this.tl=0;},
+  beat(i){if(i%2||this.f>=8)return;this.f++;const x=W-60,y=H*.5;if(this.f%2){const a=Math.atan2(P.y-y,P.x-x);for(let k=-2;k<=2;k++)tutEb(x,y,a+k*.22,150);}
+    else for(let k=0;k<14;k++)tutEb(x,y,k/14*6.283,110);AU.sfx('warn');},
+  tick(dt){if(this.f>=8){this.tl+=dt;if(!G.eb.some(b=>b.tut)||this.tl>4)return true;}return false;}},'Boss pattern: weave the fan, slip the ring')};
+const byId=id=>TUT_S.find(s=>s.id===id);
+const GRP=[['BASICS','move, shoot, dash, EMP'],['LOADOUT','weapons, forge, slots, ships'],['COUNTERS','one tactic per enemy'],['BOSS AND GATES','patterns and laser gates'],['ON FOOT','street run basics']];
+const DR=[
+ [0,'move','MOVE','fly through 3 rings',()=>byId('move')],
+ [0,'shoot','SHOOT','on-beat shots hit harder',()=>byId('shoot')],
+ [0,'dodge','DODGE','weave through a slow fan',()=>byId('dodge')],
+ [0,'dash','DASH ON THE BEAT','dash right on the pulse',()=>byId('dash')],
+ [0,'pick','PICKUPS','weapon level and music power',()=>byId('pick')],
+ [0,'emp','EMP AND HEAT','wipe bullets, cool the guns',()=>byId('emp')],
+ [0,'timing','DASH TIMING','mini stage: dash through a wall','lesson:timing'],
+ [1,'weapons','TWO SLOTS','two weapons fuse',()=>byId('weapons')],
+ [1,'l-weapons','PICK A WEAPON','mini stage: lance or spread','lesson:weapons'],
+ [1,'l-merge','FORGE','mini stage: merge two weapons','lesson:merge'],
+ [1,'l-slots','LOADOUT SLOTS','mini stage: fill the four slots','lesson:slots'],
+ [1,'l-ship','PICK A SHIP','mini stage: heavy or triplet','lesson:ship'],
+ [2,'shield','SHIELDED','EMP strips shields',()=>SCH_S.shield],
+ [2,'swarm','SWARM','spray and sweep',()=>SCH_S.swarm],
+ [2,'charger','CHARGER','shoot, then sidestep',()=>SCH_S.charger],
+ [2,'bomber','BOMBER','kill it before the mines',()=>SCH_S.bomber],
+ [2,'carrier','CARRIER','break the hull, drones follow',()=>SCH_S.carrier],
+ [2,'leader','LEADER','gold leader and its fan',()=>byId('leader')],
+ [2,'l-counter','EMP COUNTERS','mini stage: shields and walls','lesson:counter'],
+ [3,'gate','LASER GATE','fly through the gap',()=>SCH_S.gate],
+ [3,'fan','BOSS PATTERN','fan and ring volleys',()=>SCH_S.fan],
+ [4,'foot','ON FOOT','run, shoot 3 foes','foot']].map(([g,id,n,sub,k])=>({g,id,n,sub,k}));
+SCH.list=DR;
+const lsId=d=>typeof d.k==='string'&&d.k.startsWith('lesson:')?d.k.slice(7):null;
+const avail=d=>lsId(d)?!!(RET.lessons&&typeof LS!=='undefined'&&LS.on&&LSN.some(l=>l.id===lsId(d))):d.k==='foot'?!!(RET.foot&&window.FOOT&&FOOT.STAGES&&FOOT.STAGES.street1):true;
+const rows=()=>DR.filter(avail);
+const done=d=>lsId(d)?LS.seen()[lsId(d)]===2:!!(sget()[d.id]&&sget()[d.id].c>0);
+const nextD=()=>rows().find(d=>!done(d))||null;
+/* ---------- the list screen (hub sheet look: back arrow, title, Neon) ---------- */
+{const st=document.createElement('style');st.textContent=`
+#schS .schProg{width:100%;max-width:440px;display:flex;align-items:center;gap:10px;font:700 15px var(--mono);color:#fff}
+#schS .schProg i{flex:1 1 auto;height:8px;border-radius:4px;background:#2a2050;overflow:hidden}#schS .schProg i b{display:block;height:100%;background:#3dffb0}
+#schS .schG{width:100%;max-width:440px;font:700 13px var(--display);letter-spacing:.16em;color:var(--cyan);border-bottom:1px solid #3a2b5c;padding:6px 0 2px;margin-top:4px}
+#schS .schRow{width:100%;max-width:440px;min-height:48px;display:flex;align-items:center;gap:10px;text-align:left;font-size:15px;letter-spacing:.06em;padding:.3em .7em}
+#schS .schRow .sk{flex:0 0 24px;font:700 18px var(--mono);color:#3dffb0;text-align:center}#schS .schRow.nx{border-color:#ffe14d}
+#schS .schRow .sn{flex:1 1 auto;min-width:0;display:flex;flex-direction:column}#schS .schRow small{font:600 13px/1.2 var(--mono);letter-spacing:0;opacity:.85;white-space:normal}
+#schS .schRow .sr{flex:0 0 auto;font:600 13px var(--mono);letter-spacing:0;opacity:.85}
+#schS .hubBody{gap:6px}#tutB .schRe{display:none}#tutB.drl .schRe{display:block}
+#tutB.drl .tn{display:none}`;document.head.appendChild(st);}
+const el=document.createElement('div');el.id='schS';el.className='ov solid pg hubScr';el.hidden=true;el.setAttribute('role','dialog');el.setAttribute('aria-label','FLIGHT SCHOOL');
+const top=document.createElement('div');top.className='top';
+const bk=document.createElement('button');bk.type='button';bk.className='go alt hubBk';bk.id='schBack';bk.textContent='‹';bk.setAttribute('aria-label','Back');
+const ttl=document.createElement('span');ttl.className='ttl';ttl.textContent='FLIGHT SCHOOL';const nn=document.createElement('span');nn.className='hubN';top.append(bk,ttl,nn);
+const body=document.createElement('div');body.className='hubBody';el.append(top,body);T.appendChild(el);
+const schBtn=(cls,html,fn,id)=>{const b=document.createElement('button');b.type='button';b.className=cls;b.innerHTML=html;if(id)b.id=id;b.addEventListener('click',fn);return b;};
+function schDraw(){nn.innerHTML=neonI+' '+GA.bank;body.innerHTML='';const R=rows(),n=R.filter(done).length,nx=nextD(),sv=sget();
+  const pr=document.createElement('div');pr.className='schProg';pr.id='schProg';pr.innerHTML='<span>'+n+'/'+R.length+' drills</span><i><b style="width:'+Math.round(100*n/Math.max(1,R.length))+'%"></b></i>';body.append(pr);
+  body.append(schBtn('go hubAct',nx?'NEXT DRILL<small>'+nx.n+'</small>':'ALL DRILLS DONE<small>tap any drill to repeat it</small>',()=>run(nx||R[0]),'schNext'));
+  let g=-1;for(const d of R){if(d.g!==g){g=d.g;const h=document.createElement('div');h.className='schG';h.textContent=GRP[g][0];body.append(h);}
+    const ok=done(d),b=schBtn('go dim schRow'+(d===nx?' nx':''),'<span class="sk">'+(ok?'✓':'')+'</span><span class="sn">'+d.n+'<small>'+d.sub+'</small></span><span class="sr">'+(sv[d.id]&&sv[d.id].t?sv[d.id].t+'s':'')+'</span>',()=>run(d),'schD_'+d.id);
+    b.dataset.drill=d.id;b.dataset.done=ok?1:0;body.append(b);}
+  const mo=document.createElement('div');mo.className='hubMore';mo.innerHTML='<span>MORE</span>';const r=document.createElement('div');mo.append(r);
+  const door=(l,sel,id)=>{if(!$(sel.slice(1)))return;r.append(schBtn('go dim',l,()=>{shut();const o=$(sel.slice(1));if(o)o.click();},id));};
+  door('LAB','#labBtn','schLab');door('STAGE PRACTICE','#storyBtn','schPrac');door('LESSONS','#lsBtn','schLessons');body.append(mo);
+  const kk=document.querySelector('#mnMore .keys');if(kk){const c=kk.cloneNode(true);c.removeAttribute('id');for(const x of c.querySelectorAll('[id]'))x.removeAttribute('id');body.append(c);}}
+function open(){if(running||TUT.on)return;for(const x of T.querySelectorAll('.hubScr'))x.hidden=x!==el;T.hidden=false;el.hidden=false;SCH.onList=true;schDraw();const f=$('schNext');if(f)f.focus();}
+function shut(){el.hidden=true;SCH.onList=false;const t=$('hub_training');if(t&&t.focus)t.focus();if(RET.hubDraw)RET.hubDraw();}
+bk.addEventListener('click',shut);
+addEventListener('keydown',e=>{if(SCH.onList&&e.code==='Escape'&&!T.hidden&&$('setm').hidden&&lsC.hidden&&tutC.hidden){shut();e.stopImmediatePropagation();e.preventDefault();}},true);
+$('hubGrid').addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#hub_training')){e.stopPropagation();e.preventDefault();open();}},true);   // TRAINING = this list, one tap
+$('playBtn').addEventListener('click',()=>{if(SCH.onList)shut();},true);
+{const tl=$('hub_training');if(tl){const f=()=>{const s=tl.querySelector('small');if(s&&s.textContent!=='drills · lab')s.textContent='drills · lab';};f();new MutationObserver(f).observe(tl,{childList:true,subtree:true,characterData:true});}}
+/* ---------- running a drill ---------- */
+function mark(d,pass,t){if(!pass)return;const s=sget(),o=s[d.id]||{c:0,t:0};o.c++;if(t&&(!o.t||t<o.t))o.t=Math.round(t);s[d.id]=o;save('mnr_school',s);}
+function card(d,pass,why){const nx=nextD();SCH.res={id:d.id,pass};
+  const btns=[];if(pass&&nx&&nx!==d)btns.push(['schCardNext','NEXT DRILL','',()=>{tutC.hidden=true;run(nx);}]);
+  btns.push(['schCardAgain',pass?'AGAIN':'TRY AGAIN',pass?'dim':'',()=>{tutC.hidden=true;run(d);}],['schCardList','LIST','dim',()=>{tutC.hidden=true;open();}]);
+  tutCard('<b>'+(pass?'DRILL CLEAR':'NOT YET')+'</b><span>'+d.n+'</span><span>'+(why||(pass?'':'Try again, or skip ahead'))+'</span>',btns);}
+function run(d){if(!d||running||TUT.on)return;SCH.cur=d;SCH.res=null;el.hidden=true;SCH.onList=false;tutC.hidden=true;const ls=lsId(d);
+  if(ls){lsShow(ls,()=>{if(T.hidden)return;open();});return;}
+  if(d.k==='foot'){return runFoot(d);}
+  const s=d.k();if(!s)return;TUT.D=[s];SCH.t0=performance.now();startTut();tutB.classList.add('drl');}
+function runFoot(d){const bank=GA.bank,rt=RET.tale;RET.tale=false;let ok=false;window.__schFoot=true;try{ok=FOOT.start('street1');}catch(e){}RET.tale=rt;
+  if(!ok){window.__schFoot=false;open();return;}SCH.foot={d,bank,kills:0,t0:performance.now(),end:0};T.hidden=true;}
+function footEnd(pass){const f=SCH.foot;if(!f||f.end)return;f.end=1;if(FOOT.S)FOOT.S.hintT=0;try{FOOT.stop();}catch(e){}
+  GA.bank=f.bank;gsave();SCH.foot=null;window.__schFoot=false;T.hidden=false;mark(f.d,pass,(performance.now()-f.t0)/1000);card(f.d,pass,pass?'Run, shoot, repeat':'Down: nothing is lost in practice');}
+NR.on('footKill',()=>{const f=SCH.foot;if(f&&!f.end&&++f.kills>=3)setTimeout(()=>footEnd(true),400);});
+NR.on('footEnd',()=>{const f=SCH.foot;if(f&&!f.end)setTimeout(()=>footEnd(false),0);});
+{const f0=tutFinish;tutFinish=function(){if(!TUT.D)return f0.apply(this,arguments);const d=SCH.cur,l=TUT.log[TUT.log.length-1],pass=!!(l&&l.ok);
+  TUT.ending=true;SCH.noList=1;if(running)quitToTitle();tutRestore();SCH.noList=0;T.hidden=false;mark(d,pass,l&&l.t);card(d,pass,pass?'':"Time's up");};}
+{const r0=tutRestore;tutRestore=function(){const was=TUT.on&&TUT.D;r0.apply(this,arguments);if(was){tutB.classList.remove('drl');TUT.D=null;if(!SCH.noList&&!SCH.again)setTimeout(()=>{if(!running&&!TUT.on)open();},60);}};}
+{const b=document.createElement('button');b.type='button';b.className='schRe';b.id='schRe';b.textContent='AGAIN';tutB.insertBefore(b,$('tutSkip'));
+  for(const ev of['touchstart','touchend','pointerdown','mousedown'])b.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
+  b.addEventListener('click',e=>{e.stopPropagation();const d=SCH.cur;if(!TUT.on||!d)return;SCH.again=1;tutSkip();SCH.again=0;run(d);});}
+/* a drill is a step of the engine: starting one from the list must not look like the first-launch tutorial */
+window.__school={get ids(){return rows().map(d=>d.id);},get all(){return DR.map(d=>d.id);},open,shut,run:id=>run(DR.find(d=>d.id===id)),get open_(){return !el.hidden;},
+  get cur(){return SCH.cur&&SCH.cur.id;},get res(){return SCH.res||null;},done:()=>rows().filter(done).map(d=>d.id),next:()=>{const n=nextD();return n&&n.id;},
+  pass(){const s=TUT.cur();if(!s)return;const t=s.tick;s.tick=function(){s.tick=t;return true;};},late(){TUT.t=TUT_MAX+1;},kinds:()=>Object.fromEntries(DR.map(d=>[d.id,lsId(d)?'lesson':d.k==='foot'?'foot':'tut'])),get foot(){return SCH.foot;}};
+},0);
+
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
 function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;
   const maxW=Math.max(80,W-2*edge-2*pad);let lines=[txt];
@@ -15185,8 +15311,8 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
 /* ---------- menus, settings, flow ---------- */
 const titleEl=$('title'),overEl=$('over'),pauseEl=$('pausem'),setEl=$('setm');
 const HUDLOG={frame:0};
-function showBest(){$('bestT').innerHTML=(best.score?`Best run <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`:'No runs logged yet')
-  +` &nbsp;·&nbsp; Daily <strong>${dailyBest.score?dailyBest.score.toLocaleString('de-DE'):'—'}</strong>`;if(window.RET&&RET.dailyShow)RET.dailyShow();}
+function showBest(){$('bestT').innerHTML=(best.score?`Best run <strong>${window.fmtN(best.score)}</strong> · ${best.dist}`:'No runs logged yet')
+  +` &nbsp;·&nbsp; Daily <strong>${dailyBest.score?window.fmtN(dailyBest.score):'—'}</strong>`;if(window.RET&&RET.dailyShow)RET.dailyShow();}
 showBest();
 function syncUI(){$('touch').hidden=!(running&&touchUI&&!paused&&!SH.active);}
 /* ---------- settings (one card, Overdrive's look): the schema drives the rows; every change is saved and applied live ---------- */
@@ -15261,8 +15387,8 @@ function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false
   else if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;
-  $('oScore').textContent=G.score.toLocaleString('de-DE');$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
-  $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${dailyBest.score.toLocaleString('de-DE')}</strong>`:`Best <strong>${best.score.toLocaleString('de-DE')}</strong> · ${best.dist}`;
+  $('oScore').textContent=window.fmtN(G.score);$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
+  $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${window.fmtN(dailyBest.score)}</strong>`:`Best <strong>${window.fmtN(best.score)}</strong> · ${best.dist}`;
   overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);showBest();
   G.over=true;lastDaily=G.daily;lastWeekly=!!G.weekly;}
 let lastDaily=false,lastWeekly=false;
