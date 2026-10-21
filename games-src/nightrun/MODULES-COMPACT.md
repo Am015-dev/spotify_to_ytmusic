@@ -33,6 +33,7 @@ footen|29|on-foot street stage enemies + boss library (W3). Pure data |-
 foot|62|on-foot street stage engine|foot,foot
 footstage|23|the finished on-foot stage (7 sections, Warden gate)|footstage,footstage
 streetlook|19|on-foot street look on phones: one world scale, portrait lay|streetlook,streetlook
+footq|6|on-foot quality: sprites preloaded before the run starts, no|footq,footq
 leak|14|ground enemies, calmer pacing, escape penalty|leak,leak
 zoo|26|time to kill + eight new enemy kinds|zoo,zoo
 formations|34|formation library (VARIETY A)|vary,vary,vary2+
@@ -98,8 +99,8 @@ fs|5|phone full screen on first tap|fs,fs
 readable|11|bullets and threats readable at a glance|read,read
 bulletart|1|real bullet pictures (converted approved previews) for enemy|bulletart,bulletart
 arsenal|17|12 extra power-ups and the context-aware drop picker|powers,powers
-abup|15|DASH/EMP upgrades and power-up interaction|abup,abup
-zonehint|2|one-line caption on the first purple ring (gravity well) of |zonehint,zonehint
+abup|20|DASH/EMP upgrades and power-up interaction|abup,abup
+zonehint|3|one-line caption on the first purple ring (gravity well) of |zonehint,zonehint
 econfit|1|economy fit: hours to finish back to 9-13 h|econfit,econfit
 comfort|11|eye strain pass: flash/glitch rate and alpha caps, shake cap|comfort,comfort
 classes|18|pilot classes picked before a run|classes,classes
@@ -113,5 +114,6 @@ layout|5|phone layout pass: centred one-colour section pills, centred|layout,lay
 school|14|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,school
 schoolfull|10|every Flight School drill and lesson mini stage is a real le|schoolfull,schoolfull
 tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
+explain|7|every fly-stage visual is explained: first-appearance captio|explain,explain
 c|34|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|7|Mainhattan Nightrun service worker (B30). Built by parts/bui|-

@@ -8,7 +8,7 @@ Fix layer: `parts/explain.js`, flag `RET.explain` (default ON, `?explain=0` = be
 Scenes: story stages 1, 4, 8 (ends in a boss), 12, a forced boss (stage 8 + bossNow), endless to wave 11. Every 30th frame (20th boss,
 60th endless) one full render is traced: each canvas fill/stroke/fillRect/strokeRect/fillText/strokeText/drawImage is keyed by the
 first stack frame above the ctx wrappers and shared paint helpers (`part.js:function`). "every frame" = >3000 traced calls,
-"often" >400, "some stages" >40, else rare. Numbers come from the explain ON run plus the ?explain=0 run.
+"often" >400, "some stages" >40, else rare. Rows: explain ON run + ?explain=0 run.
 
 **Approved list.** The backticked keys below ARE the approved list: explain-test.js fails on any traced site not listed here.
 A new visual must get a row (and a verdict) here before it ships.
@@ -92,6 +92,7 @@ A new visual must get a row (and a verdict) here before it ships.
 | `power.js:draw` | power-up glyph | collect | rare 1/6 | S |
 | `power.js:marker` | glowing enemy that drops a power-up | kill it | some stages 3/6 | S |
 | `power.js:pickup` | power-up pickup + name | collect | some stages 3/6 | W |
+| `powlevels.js:PW.draw` | held power-up level glyph (star) | use it | some stages | S |
 | `powerups.js:PW.draw` | timed power-up effect | nothing | some stages 1/6 | S |
 | `react.js:RX.over` | pink tell ring on an enemy | move | often 5/6 | C tell |
 | `readable.js:bullets` | enemy bullet core | dodge | every frame 6/6 | S |
