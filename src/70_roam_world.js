@@ -390,13 +390,15 @@ function sprintFinish(){const sp=RO.sp,e=sp.e;sp.done=true;const place=1+sp.ai.f
   const el=$('#spRes');el.hidden=false;el.innerHTML=`<h3>${place===1?'1ST · YOU WIN!':ord(place)+' PLACE'}</h3><div class="st">${'★'.repeat(stars)}<i>${'★'.repeat(3-stars)}</i></div><p>${e.name} · ${fmt2(sp.t)}${nb?' · NEW BEST':''}</p><p>+<b>${cr.toLocaleString('de-DE')}</b> studs · +<b>${xp}</b> XP${fresh?` · ${fresh} new ★`:stars?' · replay (30%)':''}${gift?`<br>🎁 <b>NEW GARAGE PART: ${gift}</b>`:''}</p><table>${rows.map((r,i)=>`<tr class="${r.me?'me':''}"><td>${i+1}</td><td>${r.n}</td><td>${r.t!=null?(r.est?'~':'')+fmt2(r.t):'—'}</td></tr>`).join('')}</table><div class="rcb"><button class="go" id="spAgain">RACE AGAIN</button><button class="go alt" id="spOk">CONTINUE</button></div>`;
   AU.sfx(stars?'finish':'crash');RO.fin=true;$('#spOk').onclick=()=>{el.hidden=true;RO.fin=false};$('#spAgain').onclick=()=>{el.hidden=true;RO.fin=false;const m=sp.m;sprintStart(m)};sprintEnd()}
 // ---------- first-time tutorial with Hilde
+// drive-first-r22d1: the Hilde tutorial card sequence and the Hot Drop cutscene/escort only run with ?intro=1 (src/99fd_drivefirst.js shows one small hint pill instead)
+const OD_INTRO=/[?&]intro=1\b/.test(location.search);
 const TUT=[{t:'Drive! Hold ↑ (on touch it accelerates by itself).',tt:'Drive! Your car accelerates by itself — steer with ◀ ▶.',ok:()=>Math.abs(RO.v)*3.6>150},
  {t:'Hold SHIFT for TURBO. Smashing things refills the bar.',tt:'Hold BOOST for TURBO. Smashing things refills the bar.',ok:()=>(RO.boostT||0)>.8},
  {t:'Hold X and steer to DRIFT. Release for a mini-turbo!',tt:'Keep GAS on, steer and hold BRAKE to slide. Let go for a mini-turbo!',ok:()=>RO.tutTurbo},
  {t:'Press SPACE to HOP over traffic.',tt:'Tap HOP to jump over traffic.',ok:()=>RO.tutHop},
  {t:'Smash 10 things in a row to build a CHAIN — studs multiply!',tt:'Smash 10 things in a row to build a CHAIN — studs multiply!',ok:()=>CB.n>=10},
  {t:'Glowing beacons start races and events. 🏁 EVENTS shows them all on the map. Have fun!',tt:'Glowing beacons start races and events. 🏁 EVENTS shows them all on the map. Have fun!',ok:()=>RO.tutT>6}];
-function tutStep(dt){const o=store.peek('mho_roam',{});if(o.tut||RO.sp||RO.ch||RO.story)return $('#roamTut').hidden=true;RO.tutI=RO.tutI||0;const s=TUT[RO.tutI];const el=$('#roamTut');if(Math.abs(RO.v)>11&&!/[?&]dbg=1\b/.test(location.search))return el.hidden=true;el.hidden=false;
+function tutStep(dt){const o=store.peek('mho_roam',{});if(o.tut||!OD_INTRO||RO.sp||RO.ch||RO.story)return $('#roamTut').hidden=true;RO.tutI=RO.tutI||0;const s=TUT[RO.tutI];const el=$('#roamTut');if(Math.abs(RO.v)>11&&!/[?&]dbg=1\b/.test(location.search))return el.hidden=true;el.hidden=false;
   el.querySelector('img').src=avatar('HILDE');el.querySelector('p').textContent=TOUCH.on?s.tt:s.t;el.querySelector('small').textContent=`TUTORIAL ${RO.tutI+1}/${TUT.length}`;RO.tutT=(RO.tutT||0)+dt;RO.tutShow=(RO.tutShow||0)+dt;el.classList.toggle('min',RO.tutShow>6);
   if(RO.tutT>1.2&&s.ok()||RO.tutT>6){RO.tutI++;RO.tutT=0;RO.tutShow=0;AU.sfx('pick');if(RO.tutI>=TUT.length)tutDone(true)}}
 function tutDone(fin){const o=roamSave();o.tut=1;roamStore(o);$('#roamTut').hidden=true;if(fin){const S=season();S.cr+=500;saveSeason(S);addXP(50,'tutorial');say('TUTORIAL DONE','+500 studs',1.6)}}
