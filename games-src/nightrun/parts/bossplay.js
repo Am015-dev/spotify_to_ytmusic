@@ -1,3 +1,6 @@
+// PURPOSE: boss encounter mechanics (gates, ignoring a boss costs)
+// FLAG: bossplay (?bossplay=0)
+// TEST: bossplay-test.js
 /* ---------- boss ENCOUNTER MECHANICS = parts/bossplay.js (flag RET.bossplay, default ON; ?bossplay=0 = off, ?bossplay=0 / off = the fights before it, exactly). Test: nightrun/bossplay-test.js.
    Owner, 20 Oct 2026: "the enemies, bosses are also very predictable and repeatable; I beat the game very easy on normal ... the game needs to be more creative".
    Every boss had its own moveset (bossmoves.js) but every fight was still "dodge while shooting the bar". Now each boss brings three MECHANICS that change how

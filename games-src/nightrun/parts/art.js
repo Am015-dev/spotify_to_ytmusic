@@ -1,3 +1,6 @@
+// PURPOSE: painted art loading, ART.img/anim, sprite strips
+// FLAG: sprites (?sprites=0)
+// TEST: sprites-test.js
 /* ---------- painted art (media/*.webp): loaded once, decoded once (createImageBitmap), pre-scaled to the size they are drawn at ----------
    Everything here has a procedural fallback: until an image is ready (or if it is missing) ART.* returns null/false and the old drawing runs.
    Nothing is filtered or blurred per frame; scaled copies are cached and rebuilt only when the canvas scale S changes. */

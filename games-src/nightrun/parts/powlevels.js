@@ -1,3 +1,6 @@
+// PURPOSE: power-up levels + five new shooter power-ups
+// FLAG: pw3 (?pw3=0)
+// TEST: ret-pw3-test.js
 /* ---------- power-up LEVELS + five new shooter power-ups (flag RET.pw3; ?pw3=0 = parts/powerups.js exactly as before) ----------
    LEVELS (LV1..LV5): the same power picked up again while it runs, or within 4 bars of it ending, goes up one level and its 8-bar timer restarts.
    A hit (the hull really takes it; an absorbed hit does not count) lowers every running leveled power by one level, never below LV1.

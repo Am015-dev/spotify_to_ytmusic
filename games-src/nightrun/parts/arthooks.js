@@ -1,3 +1,6 @@
+// PURPOSE: literal id table for fx/fg/wpmount/wp/rule/rx/ui pictures plus the hooks that draw them when real art is listed in ready.json
+// FLAG: none (a picture draws only when listed in media/ready.json)
+// TEST: arthooks-test.js
 /* ---------- arthooks.js: every picture id of the groups fx-* / fg-* / wpmount-* / wp-* / rule-*-icon / rx-* / ui-* / foot/bg-* as a LITERAL (owner, 21 Oct 2026).
    AH.IDS is the table the asset viewer's scan reads (the other draw sites build their names at run time: 'fg-'+id, 'wpmount-'+wid, 'rx-'+state ...).
    A picture is drawn only when it is REAL art listed in media/ready.json (ART.img): the hatched PLACEHOLDER files are never shown, the code shape stays. When real art is

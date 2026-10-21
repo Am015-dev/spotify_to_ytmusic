@@ -2979,6 +2979,9 @@ NR.on('pitStart',()=>{try{bgFor(ATH);if(!ATHP)ATHP=buildAthensP();}catch(e){}});
 // the colour theme switch clears the caches
 {const pc=applyPal;applyPal=function(){const was=palOn;pc();if(palOn!==was)ATHP=null;};}
 
+// PURPOSE: painted art loading, ART.img/anim, sprite strips
+// FLAG: sprites (?sprites=0)
+// TEST: sprites-test.js
 /* ---------- painted art (media/*.webp): loaded once, decoded once (createImageBitmap), pre-scaled to the size they are drawn at ----------
    Everything here has a procedural fallback: until an image is ready (or if it is missing) ART.* returns null/false and the old drawing runs.
    Nothing is filtered or blurred per frame; scaled copies are cached and rebuilt only when the canvas scale S changes. */
@@ -3371,6 +3374,9 @@ NR.on('runStart',()=>setTimeout(()=>{if(!GA.queue.length)return;for(const id of 
 /* the LAB is its own stage now: see lab.js */
 let labEl=null,garageDirty=false;
 
+// PURPOSE: retention flags: arcade, daily, heat, grade, assist...
+// FLAG: sprites, title, type, oneMore, arcade, walls, heat, daily, dpool, layers, sting, trans, grade, saveio, juice, assist, pwa, fever (see RET lines at top)
+// TEST: ret-test.js
 /* ---------- retention parts (RETENTION.md). Each item has a flag in RET; a flag set to false leaves the game exactly as it was. ---------- */
 const RET=window.RET=window.RET||{};
 if(RET.sprites===undefined)RET.sprites=!/[?&]sprites=0/.test(location.search);   // animated strip sheets for bosses and player ships (parts/art.js SPR); ?sprites=0 = the stills as before
@@ -3911,6 +3917,9 @@ FXW.magnet=(f,k)=>{if(typeof PWK==='undefined'||!PWK.magb||f.c!==PWK.magb.c||!FX
 FXW.wing=w=>{if(FXW.add('pw-wingmate-trail',w.x-24,w.y,52,0,.8))FXW.stat.wing++;};     // an addition behind the drone (the vector drone stays)
 FXW.cresc=cr=>{if(!FXW.add('pw-crescendo-glow',P.x,P.y,88+8*Math.min(5,cr.bars|0),0,.3+.1*Math.min(5,cr.bars|0)))return false;FXW.stat.cresc++;return true;};
 
+// PURPOSE: literal id table for fx/fg/wpmount/wp/rule/rx/ui pictures plus the hooks that draw them when real art is listed in ready.json
+// FLAG: none (a picture draws only when listed in media/ready.json)
+// TEST: arthooks-test.js
 /* ---------- arthooks.js: every picture id of the groups fx-* / fg-* / wpmount-* / wp-* / rule-*-icon / rx-* / ui-* / foot/bg-* as a LITERAL (owner, 21 Oct 2026).
    AH.IDS is the table the asset viewer's scan reads (the other draw sites build their names at run time: 'fg-'+id, 'wpmount-'+wid, 'rx-'+state ...).
    A picture is drawn only when it is REAL art listed in media/ready.json (ART.img): the hatched PLACEHOLDER files are never shown, the code shape stays. When real art is
@@ -3971,6 +3980,9 @@ NR.on('pickup',p=>{if(p)AH.boom('pw-pickup-glow',p.x,p.y,90,.35);});
 AH.lvChk=lv=>{if(AH.lv!=null&&lv>AH.lv&&P)AH.boom('pw-level-up',P.x,P.y,120,.5);AH.lv=lv;};
 NR.on('tick',()=>{try{if(running&&P&&!G.dead&&typeof WP!=='undefined')AH.lvChk(WP.lv|0);}catch(e){}});
 
+// PURPOSE: run-and-gun flavour for the shooter
+// FLAG: flavor (?flavor=0)
+// TEST: ret-flavor-test.js
 /* ---------- flavor.js: run-and-gun flavour for the shooter (W5, 18 Oct 2026). Flag RET.flavor; ?flavor=0 = the game as it was (nothing spawns, nothing is drawn, no dice are rolled).
    Story stages only (never the LAB, the tutorial, endless or the daily run), nothing new starts during a boss.
    1. CAPTIVES: a hacked courier drone (DATA SPRITE) in a glowing cage drifts in from the right, 1 (stages 1-4) or 2 per stage, none in the first minute of stages 1-2.
@@ -4763,6 +4775,9 @@ window.FOOT_BOSS={warden:WA};
 window.FOOT_EN_UTIL={beatLen:beatLen,beatNow:beatNow,tokClean:tokClean,rollDrops:rollDrops,safeSpawn:safeSpawn};
 })();
 
+// PURPOSE: on-foot street stage engine
+// FLAG: foot (?foot=0)
+// TEST: foot-test.js
 /* ---------- FOOT: the on-foot street stage (run-and-gun), BRIEF-FOOT.md W1. Flag RET.foot (?foot=0 = off: no button, no layer, FOOT.start does nothing).
    Own full-screen layer #footL (canvas + touch pad + pause/results) with its own loop; it opens only from the MENU while the shooter is idle (!running).
    Coordinates: world px, y down. Every body (player, enemy, prop) has x = CENTRE, y = FEET (bottom), w, h. Floor y = FOOT_FLOOR (view 540 tall, -70 = the ground bosses' road line).
@@ -5319,6 +5334,9 @@ if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
 return F;})();
 
+// PURPOSE: the finished on-foot stage (7 sections, Warden gate)
+// FLAG: footstage (?footstage=0)
+// TEST: footstage-test.js
 /* ---------- FOOTSTAGE: the finished on-foot stage (flag RET.footstage, default ON; ?footstage=0 = the street1 mock exactly: nothing here runs). Test: nightrun/footstage-test.js.
    Owner, 21 Oct 2026: "include ... on-foot enemies for on-foot stages (same as the fly stages difficulty will increase gradually); one on foot stage for start, there is already a mock."
    Stage 'zeil' (FOOT.main, the MENU button opens it): 7 sections + the boss arena, a checkpoint at the start of every section, a progress bar on the road strip.
@@ -5538,6 +5556,9 @@ const D={
 F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{if(who!=='warden2'&&sheet(c,who,pose,x,y,h,flip,t))return;D[who](c,pose,x,y,h,flip,t,col);};
 })();
 
+// PURPOSE: ground enemies, calmer pacing, escape penalty
+// FLAG: leak (?leak=0)
+// TEST: ret-leak-test.js
 /* ---------- leak.js: ground enemies, calmer pacing, escape penalty (owner, 17 Oct 2026). Flag RET.leak; ?leak=0 = the game as it was.
    1. GROUND ENEMIES: gtank (rolls on the road line, lobs a slow shell), gturret (rises out of the road, aimed shots), gwalker (slow, tanky, steps).
       They stand on UIK.groundY() (the ground-boss road line, same soft shadow), never fly or jump, scroll left with the ground. About 30% of the waves of a stage
@@ -5672,6 +5693,9 @@ NR.on('bar',()=>{if(!RET.leak||!running)return;LEAK.noFev=false;
   if(LEAK.gap===2){LEAK.gap=0;LEAK.rdy(false);}else if(LEAK.gap===1){LEAK.gap=2;LEAK.gaps++;LEAK.rdy(true);}
   if(LEAK.M>0&&++LEAK.quiet>=2){LEAK.M=Math.max(0,LEAK.M-1);LEAK.quiet=0;}});
 
+// PURPOSE: time to kill + eight new enemy kinds
+// FLAG: zoo (?zoo=0)
+// TEST: zoo-test.js
 /* ---------- zoo.js: time to kill them all + eight new enemy kinds (owner, 17 Oct 2026). Flag RET.zoo; ?zoo=0 = the game as it was.
    1. STATION AND HOVER: drones and flankers no longer fly straight through. Each enters, slows to a strafe in the right 60% of the screen on its own slot (slots keep
       them spread over y, never stacked), hovers for N beats on the beat clock (Easy 6, Normal 5, Hard 4, Very hard / Legend 3), fires from there, then departs to the left.
@@ -5933,6 +5957,9 @@ NR.on('spawn',e=>{if(!RET.zoo||!e)return;
 NR.on('kill',o=>{if(!RET.zoo||!o||o.boss||!o.e||!o.e.zt)return;ZOO.died(o.e);});
 NR.on('beat',()=>{if(!RET.zoo||!running||G.dead)return;const d=diff();for(const e of G.en.slice())if(e.zt&&ZOO.T[e.type]&&e.type!=='zdrn')ZOO.beat(e,d);});
 
+// PURPOSE: formation library (VARIETY A)
+// FLAG: vary (?vary=0), vary2 (?vary2=0)
+// TEST: vary-test.js
 /* ---------- formations.js: the formation library (VARIETY A, owner 18 Oct 2026: "Game is extremely repetitive"). Flag RET.vary; ?vary=0 = the old waves exactly.
    A formation is a SPATIAL idea, not a recolour of one row: pincers from top and bottom, an X that converges, a snake on a path, a spiral, a wall whose gap moves...
    Every entry declares
@@ -6223,6 +6250,9 @@ FM.swN=.3;
 NR.on('beat',()=>{if(RET.vary)FM.tickTel();});
 {const dp=drawPickups;drawPickups=function(t){dp(t);try{FM.draw(t);}catch(err){}};}
 
+// PURPOSE: every story stage plays its own script
+// FLAG: vary (?vary=0)
+// TEST: vary-test.js
 /* ---------- stagescripts.js: every story stage plays its own script (VARIETY A, owner 18 Oct 2026). Flag RET.vary (formations.js); ?vary=0 = the old shuffled pools.
    THE SCRIPT TABLE (edit freely; vary-test.js checks it): stage number -> {sig, mut, m}
      m    the moments in order, spread evenly over the stage (a boss / mini-boss stage: over the build-up before it). One moment is a few bars of one formation:
@@ -6412,6 +6442,9 @@ NR.on('tick',dt=>{try{VARY.tick(dt);}catch(err){}});
 NR.on('beat',()=>{try{VARY.beat();}catch(err){}});
 NR.on('runEnd',()=>{if(window.LEAK)LEAK.pg=VARY.pg0;});
 
+// PURPOSE: each run plays a different seeded cut of the script
+// FLAG: remix (?remix=0)
+// TEST: remix-test.js
 /* ---------- remix.js: every run plays a different cut of the stage script (owner 20 Oct 2026: enemies "very predictable and repeatable"). Flag RET.remix (default on); ?remix=0 = the old fixed scripts (no dice drawn).
    Per run one private seeded stream (one GR draw at the stage start, so daily / ?seed= runs stay reproducible) remixes the stage's VARY plan:
      ORDER    the free moments are shuffled among their slots; the intro, the order and timing of everything in the first 30 s (those moments only swap for an equal or cheaper equivalent), the set piece and the breathers stay where they are
@@ -6458,6 +6491,9 @@ if(window.VARY&&window.FM){
 {const u0=FM.u;FM.u=function(kind,x,y,pf,o){const I=this.cur;if(RET.remix&&I&&I.rdy){const d=I.rdy;if(pf){const p0=pf;pf=(t,q)=>{const p=p0(t,q);return[p[0],p[1]+d];};}else y=clamp(y+d,26,H-26);}return u0.call(this,kind,x,y,pf,o);};}
 }
 
+// PURPOSE: one enemy, many looks (size, reversed)
+// FLAG: variants (?variants=0)
+// TEST: variants-test.js
 /* ---------- variants.js: one enemy, many looks (owner, 20 Oct 2026: "the game is boring and predictable... make variations of enemies by sizing them or reversing them").
    Flag RET.variants (default on); ?variants=0 = the exact old spawns and draws (nothing below runs, no dice are drawn).
    Every enemy that en() (b.js) builds is rolled once against the table VARTAB (data, edit freely) and gets:
@@ -6576,6 +6612,9 @@ VAR.mark=function(e,t){if(!e.vz||e.hp<=0)return;ctx.save();ctx.translate(e.x,e.y
 VAR.X={en:(t,o)=>en(t,o),draw:(e,t)=>{ctx.save();drawEnemy(e,t);ctx.restore();VAR.mark(e,t);},cap:()=>ebCap()};   // for variants-test.js
 VAR.stat=()=>({n:VAR.st.n,hull0:VAR.st.hull0,hull1:VAR.st.hull1});
 
+// PURPOSE: power-aware enemy scale, round 1
+// FLAG: scale (?scale=0)
+// TEST: scale-test.js
 /* ---------- power-aware scale (flag RET.scale; ?scale=0 = the old numbers exactly). BALANCE.md "Power scale". ----------
    The player's power score counts what the Garage sells that upsCalc (dir.js) did not: permanent weapon levels, the fusion, plus shop and garage perks (UPS.u).
    Enemy hull points grow with the power ABOVE what the stage expects, up to a ceiling; a weapon level adds less damage per shot than it used to (LV10 = 1.8x LV1, not 2.5x+). Bosses are not scaled (their armour sets the fight). */
@@ -6601,6 +6640,9 @@ SC.firstShot=()=>SC.on&&HARDS.includes(SET.diff)&&SET.diff!=='hard'?1:2;
 if(RET.scale){Object.assign(TUNE.dm,SC.hard);
   const mh=RET.mercyHull,ml=RET.mercyLvl;RET.mercyHull=n=>HARDS.includes(SET.diff)&&SET.diff!=='hard'?0:mh.call(RET,n);RET.mercyLvl=n=>HARDS.includes(SET.diff)&&SET.diff!=='hard'?0:ml.call(RET,n);}
 
+// PURPOSE: six music-tied timed power-ups + drum burst
+// FLAG: pw2 (?pw2=0)
+// TEST: ret-pw2-test.js
 /* ---------- powerups: six music-tied timed power-ups + a reliable DRUM BURST (flag RET.pw2, off with ?pw2=0 = the old game) ----------
    ECHO         every on-beat shot comes back once, a beat later, from where the ship was (a ghost shot with a trail)
    DOWNBEAT NOVA  on the first beat of each bar a ring leaves the ship: wipes the bullets it touches, light damage to enemies
@@ -6706,6 +6748,9 @@ if(RET.pw2){
   NR.on('runStart',()=>{G.p2=null;});NR.on('runEnd',()=>{if(G)G.p2=null;});
 }
 
+// PURPOSE: the song never stops or stutters
+// FLAG: flow (?flow=0)
+// TEST: ret-flow-test.js
 /* ---------- FLOW: the song never stops or stutters. Flag RET.flow (?flow=0 = the old behaviour). ----------
    Screens where the game waits for the player (pit stop, chest, weapon sheet, stage result, story cards, tutorial cards) keep the song on its own beat clock:
    the song is ducked (~40% down), low-passed and loses its drum layer so choices stay readable, and returns to full on the next bar line when play resumes.
@@ -6770,6 +6815,9 @@ document.addEventListener('visibilitychange',()=>{if(!RET.flow)return;
   if(document.hidden){if(NRF.cnt){NRF.cnt=null;cntEl.hidden=true;}if(paused&&!AU.hold){AU.suspend();}}
   else if(paused&&AU.hold){AU.resume();if(NRF.why.pause)NRF.apply(true);}});
 
+// PURPOSE: polish music cues played by context
+// FLAG: musicpack (?musicpack=0)
+// TEST: musicpack-test.js
 /* ---------- MUSICPACK: the 2026-10 polish cues played by context (flag RET.musicpack, default on; ?musicpack=0 = the old music, byte for byte) ----------
    The cues ADD to the old songs, they never replace them. Setting "Music" (SET.mus): mix (default) = old and new together / classic = the old music only (= ?musicpack=0) / new = the pack cues only.
    Mix: stage pool = old and new songs interleaved, a seeded shuffle per run (alternating families, never one of the last 2 songs); boss = old track or boss-dN (~b) by turns; endless = endless / endless2 / endless3 rotate;
@@ -6869,6 +6917,9 @@ NR.on('footPhase',()=>{MP.fb=MP.fb?0:1;MP.fk=null;});
 setInterval(MP.foot,500);
 window.__mp=MP;
 
+// PURPOSE: story cast, beats, dialogue card, STORY LOG
+// FLAG: tale (?tale=0)
+// TEST: tale-test.js
 /* ---------- TALE: the adventure on top of the 40 stages (cast, story beats, dialogue card, STORY LOG timeline). Flag RET.tale (?tale=0 = off, exactly as before: no new UI).
    The owner edits the text in the data table right below. Pictures: media/char-<id>.webp (256x256, see assets-manifest.json); until the file is real art the game draws a coloured badge with the initial.
    Hooks: the stage plate's PLAY (before-card), mapDetail() (one preview line on the stage plate), NR 'runEnd' {story,cleared} (unlock + after-scene), a STORY LOG button in the MENU (title.js builds #mnMore).
@@ -7070,6 +7121,9 @@ if(RET.tale){
  window.TALE={beats:BEATS,cast:TALE_CAST,save:T,show,openLog,closeLog,unlock,scene,unread,unlocked:isU,shown};
 }
 
+// PURPOSE: counters, achievements, completion %
+// FLAG: stats (?stats=0)
+// TEST: stats-test.js
 /* ---------- STATS + ACHIEVEMENTS + COMPLETION (POLISH.md B29). Flag RET.stats (?stats=0 = exactly the old game: nothing counted, no UI).
    Lifetime counters live in localStorage 'mnr_stats' (also in the save export list). They are fed by NR events only; nothing here changes gameplay, rewards or balance.
    30 achievements (ach-<id>.webp, 128x128, listed in assets-manifest.json; a coloured badge with a glyph is drawn until real art is listed in media/ready.json).
@@ -7276,6 +7330,9 @@ RET.st=(function(on){
   return{on,A,BY,D:()=>D,S,parts,completion,check,toast,open,shut,save,poll,toastQ:()=>Q.length,reset:()=>{parse(null);dirty=true;lw=rawGet();save();}};
 })(RET.stats);
 
+// PURPOSE: FUN / SAME AGAIN / BORING tap at run end
+// FLAG: feedback (?feedback=0)
+// TEST: feedback-test.js
 /* ---------- FEEDBACK: one optional tap at the end of a run (FUN / SAME AGAIN / BORING). Flag RET.feedback (?feedback=0 = nothing shown, nothing stored).
    Answers go to localStorage 'mnr_fb' (newest last, capped at 500): {stage, mode, diff, wp, sec, ts}. The STATS sheet lists the counts per stage and has a COPY button for the JSON.
    The strip sits under the buttons of #over / #stres, so it never delays or covers NEXT STAGE / RETRY; it is shown once per run. ---------- */
@@ -7482,6 +7539,9 @@ setTimeout(()=>{
   {const bq=(location.search.match(/[?&]boss=([a-z-]+)/)||[])[1],bi=bq?LAB_B.findIndex(B=>B.art===bq):-1;   // ?boss=<id> (e.g. ?boss=talos): the LAB opens on that boss
     if(bi>=0)setTimeout(()=>startLab(bi),300);else if(/[?&]lab=1/.test(location.search))setTimeout(()=>startLab(),300);}},0);
 
+// PURPOSE: LAB ASSETS tab: look at every picture
+// FLAG: labassets (?labassets=0)
+// TEST: labassets-test.js
 /* ---------- LAB 'ASSETS' TAB (flag RET.labassets, ?labassets=0 = the old Lab) ----------
    Lets the owner look at EVERY picture the game knows, real or placeholder, and try it in the Lab sandbox before the real art exists.
    Data: media/assets-index.json (written by build.py: assets-manifest.json + every other media file), media/ready.json (painted files),
@@ -7710,6 +7770,9 @@ setInterval(()=>{const F=window.FXW;if(F&&typeof F==='object'&&F.preview&&!(runn
 NR.on('runEnd',()=>{LA.stop(true);LA.closeCard();LA.S.ph=true;LA.fxOn=false;if(window.FXW&&typeof FXW==='object'&&FXW._labWrap)FXW.preview=false;LA.host=null;});   // (apply() would still see running+G.lab here)
 NR.on('tick',()=>{if(!G||!G.lab||!RET.labassets)return;if((G.frameLab||0)%60===0)LA.apply();});
 
+// PURPOSE: LAB, complete: every test menu entry
+// FLAG: labfull (?labfull=0)
+// TEST: labfull-test.js
 /* ---------- LAB, COMPLETE (flag RET.labfull, default ON; ?labfull=0 = the Lab exactly as before). Test: nightrun/labfull-test.js.
    Owner, 21 Oct 2026: "make sure everything can be shown in the lab so I can evaluate any bug."
    ONE REGISTRY: LAB.register(group, id, {name, spawn(ctx), reset, info:{role,hp,tele,flags,tip}}). Every content layer goes through it, and labfullScan() walks the
@@ -8069,6 +8132,9 @@ function hudBusy(){
   top();setInterval(top,150);}
 if(/[?&]scn=nr-hud-busy/.test(location.search))addEventListener('load',()=>setTimeout(hudBusy,600));
 
+// PURPOSE: painted UI kit: HUD plates and the hint bubble
+// FLAG: hint (?hint=0), hintdiet (?hintdiet=0)
+// TEST: hint-test.js
 /* ---------- painted UI kit (media/ui-*.webp): canvas HUD plates + the hint bubble. The DOM side (buttons, panels, rows, touch buttons) is CSS in head.html.
    Every image is decoded once (ART.load -> ImageBitmap) and drawn as a 9-slice with plain drawImage: no per-frame filters. Until it has decoded the old flat look is drawn. */
 const UIK={names:['ui-hud-bars','ui-hud-mult','ui-bubble','ui-bubble-tail'],
@@ -8796,6 +8862,9 @@ Object.assign(WPX.demo,{
 try{fetch(ART.base+'ready.json').then(r=>r.ok?r.json():[]).then(l=>{for(const n of l)if(/^(wp-|fx-fuse)/.test(n))ART.load(n.replace(/\.webp$/,''));}).catch(()=>{});}catch(e){}
 window.__ga={GA,gsave,openGarage:f=>openGarage(f),WPD};          // test hook
 
+// PURPOSE: scale round 2, must-move column strike, strike follow-up
+// FLAG: scale2 (?scale2=0), mustmove (?mustmove=0), strike2 (?strike2=0)
+// TEST: scale2-test.js
 /* ---------- scale, round 2 = parts/fair.js (flag RET.scale2; ?scale2=0 = the state after round 1). BALANCE.md "Power scale, round 2". ----------
    Owner, 17 Oct 2026: on Legend a maxed ship parks, its missiles kill everything, it hops between two spots when bullets come, and bosses are trivial.
    A. auto-aim: homing shots only lock on a foe that is on screen, past its entry grace and inside a forward cone, after a short lock-on delay, and a locked shot
@@ -8897,6 +8966,9 @@ NR.on('tick',dt=>{if(!MM.live()){MM.col=null;MM.buf=[];MM.n=0;MM.still=0;MM.anc=
     for(const dx of[-w,w]){ctx.beginPath();ctx.moveTo(c.x+dx,0);ctx.lineTo(c.x+dx,H);ctx.stroke();}ctx.setLineDash([]);if(!ART.span('fx-w34-strike-col',c.x,H/2,w*2,H,0,(lock?.5:.28)*pulse)){ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(c.x-w,0,w*2,H);}}
   ctx.restore();};}
 
+// PURPOSE: scale round 3: power-aware enemy hull
+// FLAG: scale3 (?scale3=0)
+// TEST: scale3-test.js
 /* ---------- scale, round 3 = parts/hard.js (flag RET.scale3; ?scale3=0 = round 2 exactly). BALANCE.md "Power scale, round 3". ----------
    Owner, 17 Oct 2026 (third report): on Legend a maxed ship parks, homing swarm + guns + fusions + power-ups kill everything and bosses fall in seconds.
    Hard tiers only (hard, very hard, legend); Easy and Normal keep round 2.
@@ -8952,6 +9024,9 @@ NR.on('tick',dt=>{const a=Math.min(1,dt/3),au=S3.au,man=S3.man;S3.st.au+=au;S3.s
 {const t0=B2.tmin;B2.tmin=function(e){const t=t0.call(this,e);return S3.on&&S2.hard()&&!e.mini?Math.round(t*S3.bT):t;};}   // ... and its damage budget is shorter: the shield cores and the repair add their time
 window.__s3={S3};
 
+// PURPOSE: enemies react to the ship, not fixed paths
+// FLAG: react (?react=0)
+// TEST: react-test.js
 /* ---------- enemies that react = parts/react.js (flag RET.react; ?react=0 = the old fixed paths and fire timers). BALANCE.md "Enemies that react".
    Owner, 19 Oct 2026: "Very predictive moves of enemies ... the game needs to be more strategic and timing."
    Drones, flankers, turrets and gunships get a small brain. They read the ship (position, smoothed velocity PV, the half it favours) and react,
@@ -9088,6 +9163,9 @@ RX.over=function(t){if(!RX.on||!running)return;const mo=RET.motion?RET.motion():
 {const dp=drawPickups;drawPickups=function(t){dp(t);try{RX.over(t);}catch(err){}};}
 RX.spawn=(t,o)=>en(t,o);   // test hook (react-test)
 
+// PURPOSE: boss HP phases, damage cap, last stand
+// FLAG: boss2 (?boss2=0)
+// TEST: boss2-test.js
 /* ---------- boss fights that last = parts/armour.js (flag RET.boss2; ?boss2=0 = the fights before it). BALANCE.md "Boss fights, round 4". ----------
    Owner, 17 Oct 2026: "Legend is still easy ... boss fights are still short", "even boss I can beat in seconds".
    A. a hard damage-rate cap: a boss loses at most max/(T x M) HP in any 1 s window, whatever hits it (bullets, homing, bomblets, mines, chains, blades,
@@ -9157,6 +9235,9 @@ NR.on('tick',()=>{if(!B2X.hz.length)return;const t=G.t;B2X.hz=B2X.hz.filter(z=>t
 B2X.sheen=(x,y,w,h)=>{ctx.save();ctx.globalAlpha=.55+.25*Math.sin(G.t*18);ctx.fillStyle='#e8f4ff';ctx.fillRect(x,y,w,Math.max(1,h*.35));ctx.restore();};   // armour is absorbing: a thin bright line on the boss bar
 window.__b2={B2X};
 
+// PURPOSE: risk pays: graze chain multiplier
+// FLAG: reward (?reward=0)
+// TEST: reward-test.js
 /* ---------- RISK PAYS (flag RET.reward, ?reward=0 = the old play exactly). Moving and taking risks must beat sitting far away. Built after hard.js / armour.js.
    GRAZE CHAIN   grazes within 1.5 s of each other chain a multiplier x1..x5 (a graze on the beat counts double: 2 points, x2 at 2 points, x5 at 8). A hit drops it to x1.
                  It feeds score (+10 pts x combo per tier above 1), the EMP meter (ABIL.gain, hook only) and a damage buff (+10% per tier above 1, cap +40%, 4 s).
@@ -9212,6 +9293,9 @@ NR.on('kill',d=>{const e=d&&d.e;if(!RWD.on||!G||!e||d.boss||e.dummy||e.type==='b
   G.pk.push({t:'shard',x:e.x,y:e.y,vx:rnd(-40,10),vy:rnd(-40,40),bob:0});});
 {const dp=drawPlayer;drawPlayer=function(t){dp(t);if(running)RWD.draw(t);};}
 
+// PURPOSE: build pressure and real choices (default OFF)
+// FLAG: build2 (OFF; ?build2=1)
+// TEST: choices-test.js
 /* ---------- BUILD PRESSURE + REAL CHOICES (flag RET.build2, default off for now; ?build2=1 = on). BALANCE.md "Build pressure + choices". ----------
    1. Hard tiers: a ship that hugs the back line (mean x under 125 px over ~3 s) is flanked: telegraphed lane shots from behind and drops from the top or
       bottom edge at its column. The rate grows with the power score above what the stage expects (SC.f), so a maxed ship that camps is punished and a fresh
@@ -9309,6 +9393,9 @@ CHO.ui=function(){let el=document.getElementById('choL');
     if(c.bad){const x=document.createElement('div');x.textContent=c.bad;x.style.cssText='font-size:14px;color:#ff7aa8';b.append(x);}
     b.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();CHO.pick(i);});el.appendChild(b);});};
 
+// PURPOSE: boss movesets: verbs (vd), telegraphs, per-boss lists
+// FLAG: bossmoves (?bossmoves=0)
+// TEST: bossmoves-test.js
 /* ---------- boss movesets = parts/bossmoves.js (flag RET.bossmoves; ?bossmoves=0 = the old ring / fan / spiral / laser lists, exactly).
    Owner, 18 Oct 2026: "Game is extremely repetitive". All ten boss fights were built from the same six attack verbs. Now every fight has its own moveset:
    8+ verbs in three phases (armour.js still owns HP, the damage cap, the 66/33% phase lines and the EXPOSED last stand: nothing here touches them),
@@ -9617,6 +9704,9 @@ window.__bmv={BMV,BMT,VB};
 /* bossvis.js (loads later) names the phase by its first verb: give the new verbs readable names there */
 NR.on('runStart',()=>{const V=window.BV;if(!V||!V.NAMES)return;for(const k in VB)if(!V.NAMES[k])V.NAMES[k]=k.replace(/_/g,' ').toUpperCase();});
 
+// PURPOSE: bosses look different in each phase
+// FLAG: bossvis (?bossvis=0)
+// TEST: bossvis-test.js
 /* ---------- bosses that look different in each phase = parts/bossvis.js (flag RET.bossvis; ?bossvis=0 = the bosses before it). Review F10, 18 Oct 2026.
    Visuals only: no hitbox, HP, armour cap or timing is touched. The phases come from armour.js / b.js bossBeat (e.ph 1..3, NR 'bossPhase').
    Per phase: a red tint on the boss sprite (stronger in 3), one armour plate gone per change (placeholder shapes drawn over the body from e._dw / e._dh,
@@ -9697,6 +9787,9 @@ NR.on('tick',dt=>{const e=G&&G.boss;if(e&&e.bv&&e.bv.t>0)e.bv.t-=dt*1.1;});
   const hudp=drawHUDP;drawHUDP=function(t){hudp(t);const b=G&&G.boss;if(!b||b.x>=W)return;const k=HK,w=PW_,bw=Math.min(330,w-120),ny=40*k+6*k;pips((w-bw)/2,ny+12*k,bw,6*k,k,b.ph);};}
 window.__bv={BV};
 
+// PURPOSE: power-up levels + five new shooter power-ups
+// FLAG: pw3 (?pw3=0)
+// TEST: ret-pw3-test.js
 /* ---------- power-up LEVELS + five new shooter power-ups (flag RET.pw3; ?pw3=0 = parts/powerups.js exactly as before) ----------
    LEVELS (LV1..LV5): the same power picked up again while it runs, or within 4 bars of it ending, goes up one level and its 8-bar timer restarts.
    A hit (the hull really takes it; an absorbed hit does not count) lowers every running leveled power by one level, never below LV1.
@@ -9883,6 +9976,9 @@ if(PW3.on){
   window.__pw3={PW3,PW3L};
 }
 
+// PURPOSE: DASH charges and EMP as abilities (beat bonus, refund)
+// FLAG: abil (?abil=0)
+// TEST: abil-test.js
 /* ---------- DASH + EMP abilities (flag RET.abil, ?abil=0 = the old dash and EMP exactly). b.js calls ABIL.dashIn() and ABIL.emp() where it read the keys.
    DASH: charges (3, 4 from LV3) that refill one at a time (1.7 s at LV1 .. 1.2 s at LV5), fires on the press in the move / last stick direction.
      On the beat it pays the old bonus (score, ON BEAT, tier +3) and refunds a fifth of a charge; off the beat it is a plain dash (no tier drop).
@@ -9990,6 +10086,9 @@ NR.on('graze',d=>ABIL.gain(d&&d.pf?.07:.04,'graze'));
 NR.on('pickup',()=>ABIL.gain(.34,'pickup'));
 NR.on('runStart',()=>{if(ABIL.on)setTimeout(()=>{if(running&&G&&!G.dead)ABIL.tip('DASH has charges, EMP fills from kills');},4000);});
 
+// PURPOSE: weapon forge: combine, sockets, presets (data, actions)
+// FLAG: forge (?forge=0)
+// TEST: forge-test.js
 /* ---------- WEAPON FORGE (flag RET.forge, default ON; ?forge=0 = the old weapons exactly). Owner, 20 Oct 2026: "weapons maybe can be combined and users can
    organize their inventories ... the game needs to be more creative".
    - HYBRIDS: two owned weapons + 3 scrap + 120 Neon forge a named hybrid from the recipe table FGR (one row per pair; add rows to extend). A hybrid sits in a
@@ -10171,6 +10270,9 @@ if(window.CHO){CHO.DECK.push({id:'scrap',n:'FORGE SCRAP',d:'+2 forge scrap for t
   const o0=CHO.offer;CHO.offer=function(k){const d=this.DECK,keep=d.slice();if(!FG.on)this.DECK=d.filter(c=>!c.fg);try{return o0.call(this,k);}finally{this.DECK=keep;}};}
 window.__fg={FG,FGR,FGM,FGK,FGP};
 
+// PURPOSE: inventory + loadout screen (Garage FORGE tab)
+// FLAG: forge (?forge=0)
+// TEST: forge-test.js
 /* ---------- INVENTORY + LOADOUT (Garage tab FORGE, flag RET.forge; forge.js holds the data and the actions). Phone first: tiles >= 44 px, text >= 14 px.
    Tap an item, then tap a slot (or use the item's buttons); tap a slot first to filter the grid to what fits it. 4 slots: 2 weapons (weapon or hybrid,
    with 2 / 1 mod sockets), 1 ability core, 1 passive. 3 named presets; the pit stop shows a quick preset row. */
@@ -10281,6 +10383,9 @@ INV.draw=function(box){const s=FG.st(),lo=s.lo;FG.sync();box.innerHTML='';const 
  NR.on('pitStart',()=>INV.pit());}
 window.__inv={INV,draw:()=>gaDraw(),open:f=>openGarage(f),close:()=>closeGarage()};          // test hook
 
+// PURPOSE: forge screen, step by step
+// FLAG: forgeui (?forgeui=0)
+// TEST: forgeui-test.js
 /* ---------- FORGE SCREEN, step by step (flag RET.forgeui, default ON; ?forgeui=0 = the old inventory.js screen). Owner, 21 Oct 2026: "Forge of weapons is very
    confusing, needs better user interface." Same rules, costs and data as forge.js (24 hybrids, 12 mods, cores, passives, presets); this file only draws.
    Three zones: FORGE (slot A + slot B = output, live preview, MERGE, UNDO), INVENTORY (big cards, chips: type / equipped / sort by tier), LOADOUT (2 weapon
@@ -10491,6 +10596,9 @@ FGU.draw=function(box){const s=FG.st(),lo=s.lo,U=this,own=WP_IDS.filter(id=>WP.h
 NR.on('runStart',()=>{FGU.undo=null;FGU.arm=null;});
 window.__fgu=FGU;
 
+// PURPOSE: threats that make DASH and EMP the answer
+// FLAG: counter (?counter=0)
+// TEST: counter-test.js
 /* ---------- COUNTER threats: DASH and EMP as the answers (flag RET.counter, ?counter=0 = the abilities without these threats). Test: nightrun/counter-test.js.
    Owner, 19 Oct 2026: "the dash button and emp still useless, the game needs to be more strategic and timing". A button only matters when some threat needs it.
    One threat every few bars (never with a boss out, in a pit stop, the lab or the tutorial), in turn from the ones the stage has unlocked:
@@ -10589,6 +10697,9 @@ NR.on('runStart',()=>CTR.reset());
 NR.on('bar',()=>CTR.bar());
 NR.on('tick',dt=>CTR.tick(dt));
 
+// PURPOSE: DASH/EMP as beat-and-window decisions
+// FLAG: timing (?timing=0)
+// TEST: timing-test.js
 /* ---------- TIMING: DASH and EMP as beat-and-window decisions (flag RET.timing, default ON, ?timing=0 = off; off = the abilities.js / counter.js behaviour). Test: nightrun/timing-test.js.
    Owner, 20 Oct 2026: dash and EMP "still useless, the game needs to be more strategic and timing". Strict review 3: a reflex dash (bullet within 30 px) won, the beat paid nothing.
    DASH (hooks in ABIL.dashIn):
@@ -10688,6 +10799,9 @@ const TIM=window.TIM={get on(){return!!(RET.timing&&window.ABIL&&ABIL.on);},
 NR.on('tick',dt=>TIM.tick(dt));
 NR.on('runStart',()=>{if(G)G.tm=null;});
 
+// PURPOSE: enemies live long enough to be seen and fought
+// FLAG: vis (?vis=0)
+// TEST: visible-test.js
 /* ---------- VISIBLE: enemies live on screen long enough to be seen, read and fought (flag RET.vis, default ON; ?vis=0 = the old rules). Test: nightrun/visible-test.js. BALANCE.md "Visible".
    1. on-screen floor per kind (DMG.minLife asks VIS.ml): a foe cannot lose its hull faster than this, whatever hits it (spread, chain, arc, homing, blades),
       so a maxed area weapon caps out at hull/second per target instead of deleting the screen. The old floor shrank to .65x on late stages; this one does not.
@@ -10707,6 +10821,9 @@ const VIS=window.VIS={get on(){return!!RET.vis&&!(typeof G==='object'&&G&&G.tut)
     const b=this.ml[e.type]!=null?this.ml[e.type]:e.zt?Math.max(this.zoo,DMG.ml[e.type]||0):(DMG.ml[e.type]||0);
     return(e.el?(e.type==='charger'?Math.max(this.elC,b):Math.max(this.el,b)):b)*(SET.diff==='easy'?DMG.easyK:HARDS.includes(SET.diff)?Math.max(this.hk,DMG.lm()):1);}};
 
+// PURPOSE: slower EMP meter, tougher varied enemies
+// FLAG: grit (?grit=0), gritBoss (?gritboss=0)
+// TEST: grit-test.js
 /* ---------- GRIT: a slower EMP meter and tougher, more varied enemies (flag RET.grit, default ON; ?grit=0 = the old numbers exactly). BALANCE.md "Grit". Test: nightrun/grit-test.js.
    Owner, 20 Oct 2026: "the game is very easy, the EMP charges very fast, the enemies are predictable, my weapons are superior to the enemies".
    1. EMP meter: ABIL.gain asks GRIT.emp for every source. Kills of fodder (mini, swarm, mine, plain drones) give nothing, the rest diminish as kills pile up, graze gain is capped per second,
@@ -10792,6 +10909,9 @@ NR.on('tick',dt=>GRIT.tick(dt));
 NR.on('runStart',()=>{for(const k in GRIT.st)GRIT.st[k]=0;});
 window.__grit=GRIT;
 
+// PURPOSE: per-stage budget of enemy bullets on screen
+// FLAG: density (?density=0)
+// TEST: density-test.js
 /* ---------- DENSITY: a per-stage budget of enemy bullets on screen (flag RET.density, default ON; ?density=0 = the old rules). Test: nightrun/density-test.js. BALANCE.md "Density".
    Industry practice: a shooter ramps the amount of readable fire, not its speed, and alternates heavy and light stretches. The budget (Normal): planned bullets on screen in a HEAVY
    stretch rise from about 9 at stage 3 to 22 at stage 30; a LIGHT stretch (a breather, every 40 s: 28 s heavy, 12 s light, the first 10 s of a stage light) is half of it.
@@ -10832,6 +10952,9 @@ NR.on('runStart',()=>{DENS.busy=0;DENS.last=-9;DENS.px.length=0;});
   else if(RET.density&&b&&b.bm===undefined&&window.BMV&&BMV.on)try{const id=BMV.idOf(b),T=id&&BMV.T[id];if(T)b.lists=T.ph.map(l=>l.map(x=>BMV.norm(x).v));}catch(e){}   // bossplay inits on the first beat: until then show the boss's own table, not the old fan5 / ring lists (S12 counted both = 13)
   return b;};}
 
+// PURPOSE: boss encounter mechanics (gates, ignoring a boss costs)
+// FLAG: bossplay (?bossplay=0)
+// TEST: bossplay-test.js
 /* ---------- boss ENCOUNTER MECHANICS = parts/bossplay.js (flag RET.bossplay, default ON; ?bossplay=0 = off, ?bossplay=0 / off = the fights before it, exactly). Test: nightrun/bossplay-test.js.
    Owner, 20 Oct 2026: "the enemies, bosses are also very predictable and repeatable; I beat the game very easy on normal ... the game needs to be more creative".
    Every boss had its own moveset (bossmoves.js) but every fight was still "dodge while shooting the bar". Now each boss brings three MECHANICS that change how
@@ -11049,6 +11172,9 @@ NR.on('bossPhase',({ph})=>{const e=G.boss;if(BPL.on&&e&&e.bp)BPL.phase(e,ph);});
 NR.on('kill',({e,boss})=>{if(!boss||!e||!e.bp)return;BPL.drop(e);BPL.hz=[];const c=BPL.codex()[e.bp.id];BPL.say(e.nm+' DOWN · CODEX '+((c&&c.m)||[]).length+' MECHANICS',4);});
 window.__bpl={BPT,BPL};
 
+// PURPOSE: new-mechanic cadence, returns with a twist
+// FLAG: rules (?rules=0)
+// TEST: rules-test.js
 /* ---------- RULES: a new-mechanic cadence (flag RET.rules, default ON; ?rules=0 = the old game). Test: nightrun/rules-test.js.
    Every 3 stages a NEW mechanic comes in (stages 2, 5, 8 ... 44), the next stage brings it back with a TWIST, the third stage combines it with the twist of the one before.
    Endless: one plan step every 5 min of play. Each mechanic is a table entry in RU.T (name, one-line card, colour, interactions) with code-drawn shape art (circles, triangles, bars),
@@ -11224,6 +11350,9 @@ NR.on('tick',dt=>{try{RU.tick(dt);}catch(err){}});
 {const dp=drawPlayer;drawPlayer=function(t){if(RET.rules)try{RU.draw();}catch(err){}dp(t);};}
 if(window.CTR){const cd=CTR.dash,ce=CTR.emp;CTR.dash=function(){const r=cd.apply(this,arguments);try{RU.dash();}catch(e){}return r;};CTR.emp=function(){try{RU.emp();}catch(e){}return ce.apply(this,arguments);};}
 
+// PURPOSE: late-run escalation layer
+// FLAG: novelty (?novelty=0)
+// TEST: novelty-test.js
 /* ---------- novelty.js: a late-run escalation layer (owner 20 Oct 2026: "the game is boring, repetitive, needs to be more creative"). Flag RET.novelty (default OFF for now, ?novelty=1 = on); off = the old game (no hooks act, no GR draws).
    It keeps a session clock (game seconds summed over stages) and a codex of what the player has seen (localStorage 'nr-novelty'), and always prefers the unseen:
      TWISTS   from session minute 8 (all of them by minute 28) a wave that already came in the last 5 min comes back with a twist from the deck: swift (+12% speed), armored (x1.5 hp, ring), gilded (x2 score, gold), tiny (r x0.85),
@@ -11312,6 +11441,9 @@ NR.on('beat',()=>{if(RET.novelty)try{NOV.tick();}catch(err){}});
 NR.on('runStart',()=>{NOV.lt=0;NOV.buf.length=0;NOV.pend.length=0;});
 {const de=drawEnemy;drawEnemy=function(e,t){de(e,t);try{NOV.mark(e);}catch(err){}};NOV.drawE=(e,t)=>drawEnemy(e,t);}   // (drawE: the test draws through the real hook)
 
+// PURPOSE: graded, readable pressure on a parked ship
+// FLAG: anticamp (?anticamp=0)
+// TEST: anticamp-test.js
 /* ---------- ANTI-CAMP (flag RET.anticamp, ?anticamp=0 = old play). Review 4, 20 Oct 2026: a ship parked at the left edge that only tracks height cleared more
    than a dodger, and the column strike was a hidden wall for anyone who did not read it. Now camping draws soft, readable, graded pressure instead:
    CAMP LEVEL  0..1 from the last 6 s of x samples: share of time in the left 25% of the field and low x spread (a dodger swings 150-290 px: level 0).
@@ -11390,6 +11522,9 @@ if(window.MM){const w0=MM.win;MM.win=function(){const w=w0.call(this);return AC.
 if(window.ABIL){const g0=ABIL.gain;ABIL.gain=function(v){return g0.call(this,AC.on?v*AC.payK():v);};}
 {const dp=drawPickups;drawPickups=function(t){dp(t);try{AC.draw(t);}catch(err){}};}
 
+// PURPOSE: hold the line: letting enemies pass costs
+// FLAG: holdline (?holdline=0)
+// TEST: holdline-test.js
 /* ---------- holdline.js: hold the line (owner, 20 Oct 2026: "gamer should not be leaving so many enemies passing through defense"). Flag RET.holdline; ?holdline=0 = leak.js as it was.
    The BREACH meter of leak.js becomes a visible defence line on the left edge of the playfield: it empties with every leak, an empty line costs one hull (leak.js pay(), same caps).
    1. VISIBLE LINE: a thin bar on the left edge, full = safe, amber / red as it drains, flashes on a leak. The stat strip label reads LINE with the leak count of the stage.
@@ -11423,6 +11558,9 @@ NR.on('runStart',()=>{HOLD.init();HOLD.reset();LEAK.lab='LINE';});
 NR.on('kill',o=>{if(o&&o.e)HOLD.killed(o.e);});
 NR.on('bar',()=>{HOLD.barRef=0;});
 
+// PURPOSE: shorter stages, fewer enemies, enemies that stay
+// FLAG: pacing (?pacing=0)
+// TEST: pacing-test.js
 /* ---------- pacing.js: shorter stages, fewer enemies at once, enemies that stay and fight (owner, 21 Oct 2026, stage 11 Normal:
    "very long as a stage, enemies are way too many, I cannot kill them all because they fly very fast away, and they should not need an extreme number of shots").
    Flag RET.pacing, default ON; ?pacing=0 = the game as it was. Easy / Normal only for 3-5 (Hard and above keep their own pressure); 1-2 apply to every difficulty.
@@ -11486,6 +11624,42 @@ if(RET.pacing){
   NR.on('spawn',e=>PAC.trim(e));
 }
 
+// PURPOSE: Normal bites again on top of the short stages
+// FLAG: bite (?bite=0)
+// TEST: none
+/* ---------- BITE: Normal bites again on top of the short stages (flag RET.bite, default ON; ?bite=0 = the game as it was). Test: humanbot / anticamp-test / timing-test.
+   Strict review 7: since pacing.js (stages ~90 s) the human-model bot clears Normal 97% and a bot that never presses DASH or EMP clears as often as the beat bot.
+   Normal story stages only (not Easy, not the hard tiers, not the Lab or the tutorial); stage length, armour.js and hard.js are not touched. Denser threats per second, not longer stages:
+   1. PRESSURE WINDOWS (counter.js threats): one every BITE.ev bars instead of 9 (BITE.evMid on stages BITE.full-BITE.midTo: from 16 the base pressure already climbs); the laser wall (a lane strike: only a dash crosses it, a dead-on-beat dash is
+      shielded for .2 s, an off-beat hop only .04 s) unlocks on stage 3 instead of 5. From stage BITE.full a wall keeps its gap only when no dash charge is held
+      (as on Hard); before that the gap is BITE.gapH px. A bullet curtain's second layer follows .45 s after the first while DASH or EMP is ready (EMP clears both).
+   2. MERCY: grit.js absorbs at most BITE.mc() hull hits a run from stage 3 (was 3): 1 on stages 3-5 (hull 7 there), 2 from stage BITE.full (hull 5-6).
+   3. FREE HEALTH: hull drops (ST.heal) x BITE.heal from stage BITE.full. ---------- */
+if(RET.bite===undefined)RET.bite=!/[?&]bite=0/.test(location.search);
+const BITE=window.BITE={ev:5,evMid:4,midTo:15,wallAt:3,full:6,gapH:84,mcEarly:1,mcLate:2,heal:.7,
+  stat:{walls:0,shut:0,curt:0},
+  act(){return!!RET.bite&&typeof SET==='object'&&SET.diff==='normal'&&!!ST.on&&!(typeof G==='object'&&G&&(G.lab||G.tut));},
+  stg(){return ST.on?ST.n:1;},
+  late(){return this.act()&&this.stg()>=this.full;},
+    mc(){return this.stg()>=this.full?this.mcLate:this.mcEarly;}};
+if(window.CTR){
+  const ev=CTR.EV.normal,wa=CTR.UN.wall;
+  Object.defineProperty(CTR.EV,'normal',{get(){return BITE.act()?(BITE.late()&&BITE.stg()<=BITE.midTo?BITE.evMid:BITE.ev):ev;},set(){},configurable:true,enumerable:true});
+  Object.defineProperty(CTR.UN,'wall',{get(){return BITE.act()?BITE.wallAt:wa;},set(){},configurable:true,enumerable:true});
+  const c0=CTR.curt;CTR.curt=function(){const n=this.walls.length;c0.apply(this,arguments);
+    if(!BITE.act()||!BITE.late()||!(this.charges()>=1||P.emp>=1))return;const w=this.walls.slice(n);BITE.stat.curt++;
+    if(w.length===2){w[1].warn=w[0].warn+.45;const c=this.curts[this.curts.length-1];if(c)c.t=c.T0+.45;}};
+  const t0=CTR.tick;CTR.tick=function(dt){const pend=this.walls?this.walls.filter(w=>!w.cur&&w.warn>0):[];t0.apply(this,arguments);
+    if(!BITE.act())return;for(const w of pend){if(w.warn>0||!w.gap||w.bt)continue;w.bt=1;BITE.stat.walls++;
+      if(BITE.late()&&this.charges()>=1){w.gap=null;BITE.stat.shut++;}else w.gap.h=Math.min(w.gap.h,BITE.gapH);}};
+}
+if(window.GRIT){const m=GRIT.mcMax;Object.defineProperty(GRIT,'mcMax',{get(){return BITE.act()&&BITE.stg()>=BITE.wallAt?Math.min(m,BITE.mc()):m;},set(){},configurable:true});}
+{const sl=ST.setLevel;ST.setLevel=function(n){const r=sl.apply(this,arguments);if(RET.bite&&SET.diff==='normal'&&n>=BITE.full)this.heal*=BITE.heal;return r;};}
+NR.on('runStart',()=>{for(const k in BITE.stat)BITE.stat[k]=0;});
+
+// PURPOSE: flanker enemies that punish a parked ship (default OFF)
+// FLAG: flankers (?flankers=0)
+// TEST: flankers-test.js
 /* ---------- FLANKERS (flag RET.flankers, default OFF, ?flankers=1 = on; off = W29 anti-camp bullet streams). 20 Oct 2026
    The anti-camp "flush" used to be bullet streams with edge markers. With this flag it spawns real enemies you can see, shoot and be hurt by:
    DIVER   shielded triangle: enters from above the camp column after a 0.8 s tell (dashed line + chevron), dives down that column and leaves.
@@ -11557,6 +11731,9 @@ NR.on('kill',d=>{const e=d&&d.e;if(!e||!e.fk)return;FLK.stat.kill++;if(GX()<.7)G
 {const de=drawEnemy;drawEnemy=function(e,t){if(e.fk&&FLK.K[e.fk]){FLK.draw(e,t);return;}de(e,t);};}
 {const dp=drawPickups;drawPickups=function(t){dp(t);try{if(FLK.on)FLK.drawTells(t);}catch(err){}};}
 
+// PURPOSE: enemy warships in the fly stages
+// FLAG: fleet (?fleet=0)
+// TEST: fleet-test.js
 /* ---------- fleet.js: four enemy warships in the fly stages (owner, 21 Oct 2026: "include enemy ships ... same as the fly stages difficulty will increase gradually").
    Flag RET.fleet, default ON; ?fleet=0 = the game as it was (no fleet waves, no extra dice).
    INTERCEPTOR (story stage 6+): fast and fragile. Strafes on a station >= 4 s firing aimed pairs, then shows its dive line for .7 s (kinked where it will swerve),
@@ -11770,6 +11947,9 @@ NR.on('spawn',e=>{if(RET.fleet&&e&&e.fl&&e.fl!=='drn')FLEET.hint(e);});
 NR.on('kill',o=>{if(!RET.fleet||!o||o.boss||!o.e||!o.e.fl)return;FLEET.died(o.e);});
 NR.on('beat',()=>{if(!RET.fleet||!running||G.dead)return;const d=diff();for(const e of G.en.slice())if(e.fl&&FLEET.K[e.type])FLEET.beat(e,d);});
 
+// PURPOSE: endless mode climbs in difficulty
+// FLAG: endramp (?endramp=0)
+// TEST: endramp-test.js
 /* ---------- ENDRAMP: endless mode climbs in difficulty (flag RET.endramp, default ON; ?endramp=0 = the old fixed difficulty). Test: nightrun/endramp-test.js.
    Owner 20 Oct 2026: "endless should gradually increase difficulty, even if normal it should go to legend, else the game is very easy for an experienced player; more tactics and patterns so enemies are never predictable."
    A WAVE is one director phase (8 bars, DIR.pickTheme). Plain endless only: never story, daily, weekly, the tutorial or the Lab.
@@ -11874,6 +12054,9 @@ NR.on('beat',()=>{if(G.dead||!G.live)return;const B=STILL.beam;
     ctx.beginPath();ctx.moveTo(0,B.y);ctx.lineTo(W,B.y);ctx.stroke();ctx.setLineDash([]);if(lock){ctx.globalAlpha=.18*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,B.y-BEAM_Y,W,BEAM_Y*2);}}
   ctx.restore();};}
 
+// PURPOSE: set pieces, deck replaces the fixed metronome, rosters
+// FLAG: deck (?deck=0), roster (?roster=0), songspread (?songspread=0)
+// TEST: fun-test.js
 /* ---------- FUN pass: something new every ~8-10 s ----------
    SET PIECES   every 6 bars (~12 s) a signature formation per district that moves on the beat (WEAVE) or a LASER FENCE across the screen on the bar line;
                 clear one and a shard shower sweeps across the screen
@@ -12150,6 +12333,9 @@ window.__tut={get on(){return TUT.on},get i(){return TUT.i},get id(){const s=TUT
   get endShown(){return TUT.endShown&&!tutC.hidden},get offerShown(){return TUT.offerShown&&!tutC.hidden},get next(){return TUT.next},
   target(){const s=TUT.cur();return s&&s.tgt?s.tgt():null;},start:()=>startTut(),go:i=>{if(TUT.on)tutGo(i);},get log(){return TUT.log},skip:()=>tutSkip(),bpos:()=>bpos(),get wpOpen(){return WP.open}};
 
+// PURPOSE: short tactics lessons the first time a feature appears
+// FLAG: lessons (?lessons=0)
+// TEST: lessons-test.js
 /* ---------- LESSONS: tactics taught as MINI STAGES the first time a feature appears (owner, 20-21 Oct 2026: "better tutorials teaching tactics when they
    appear first time ... users can practice"; W63: "lessons must be mini stages, not plain text cards").
    Flag RET.lessons (default ON; ?lessons=0 = the old game: no lesson, no LESSONS button).
@@ -12379,6 +12565,9 @@ window.__lessons={get ids(){return LSN.map(l=>l.id);},get phases(){return Object
   steer:(x,y)=>{const m=LS.m;if(m){m.s.tx=x;m.s.ty=y;}},
   start:n=>startStory(n),quit:()=>{if(running)quitToTitle();},get running(){return running}};
 
+// PURPOSE: title diet + CONTINUE, 14 px type floor
+// FLAG: title (?title=0), type (?type=0)
+// TEST: ret-title-test.js
 /* ---------- B25 title diet + CONTINUE, B26 type floor (POLISH.md). Flags RET.title and RET.type (ret.js); flags off = the old title.
    Title: one big PLAY / CONTINUE, ENDLESS + DAILY, GARAGE + MENU, and the daily/weekly status chip (#retTt, drawn by ret.js).
    MENU (#mnMore) holds the old buttons, same ids: storyBtn (stage map), wkBtn (weekly run), labBtn, wpBtn, ckB (checklist), tutBtn (Flight School),
@@ -12451,6 +12640,9 @@ if(RET.title)setTimeout(()=>{
   if(window.RET&&RET.dailyShow)RET.dailyShow();
 },0);
 
+// PURPOSE: checkpoints with grace on long stages
+// FLAG: cp (?cp=0)
+// TEST: ret-cp-test.js
 /* ---------- CHECKPOINTS WITH GRACE (flag RET.cp, off with ?cp=0 = exactly the old game). Test: ret-cp-test.js ----------
    A long stage (>= 150 s: Classic length, a boss with a long approach) gets a checkpoint at about 1/3 and 2/3, bar-aligned, never inside a boss fight and never in the last 15 s.
    Passing one snapshots the run (score, kills, perks, weapons, Neon). Dying after one offers RESUME FROM CHECKPOINT on the run-end screen (one resume per checkpoint, 2 per stage).
@@ -12540,6 +12732,9 @@ NR.on('runEnd',d=>{if(!RET.cp)return;const e=chkBox();
    ctx.globalAlpha=.16*f;ctx.beginPath();ctx.arc(P.x,P.y,34,0,7);ctx.fill();
    ctx.globalAlpha=.85*pulse*Math.min(1,f*2.5);ctx.lineWidth=3;ctx.setLineDash([10,7]);ctx.lineDashOffset=-t*60;ctx.beginPath();ctx.arc(P.x,P.y,34,0,7);ctx.stroke();ctx.restore();};}
 
+// PURPOSE: phone full screen on first tap
+// FLAG: fs (?fs=0)
+// TEST: fs-test.js
 /* ---------- Phone full screen, portrait and landscape (owner, 18 Oct 2026). Flag RET.fs (?fs=0 = off).
    Touch devices: the first tap goes full screen (browsers need a user gesture), a tap after a rotation or a system exit goes back in (unless the player turned it off
    with the MENU > FULL SCREEN button, which is remembered in mnr_fs). iPhone Safari has no page full screen: there the button explains Add to Home Screen. ---------- */
@@ -12584,6 +12779,9 @@ if(RET.fs){(()=>{
     mg.appendChild(fsEl);paint();},0);
 })();}
 
+// PURPOSE: bullets and threats readable at a glance
+// FLAG: read (?read=0)
+// TEST: readable-test.js
 /* ---------- readable.js (F5, REVIEW-2026-10-18): bullets and threats readable at a glance. Flag RET.read; ?read=0 = the old look exactly.
    1. In play only (running), the city backdrop (bg.js drawBG / drawBGP) is desaturated and dimmed to about 55% by one overlay (hook in c.js render); menus are unchanged.
       The beat pulse on the screen edges stays, a little lower (READ.PULSE, hook in fx.js FXV.edges).
@@ -12658,6 +12856,9 @@ if(RET.read&&PW.p2&&PW.p2.K&&PW.p2.K.nova)PW.p2.K.nova.c=READ.NOVA;
 {const f=RET.assistSchema;RET.assistSchema=function(SC){if(f)f.call(this,SC);if(!RET.read)return;const g=SC.find(x=>x.g==='Assist')||SC.find(x=>x.g==='Accessibility');if(!g||g.rows.some(r=>r.k==='hbox'))return;
   const i=g.rows.findIndex(r=>r.k==='hc');g.rows.splice(i<0?g.rows.length:i+1,0,{k:'hbox',l:'Show hitbox',o:[[false,'Off'],[true,'On']],d:'A small white dot on the ship marks the only spot that can be hit. Never marks a run.'});};}
 
+// PURPOSE: 12 extra power-ups and the context-aware drop picker
+// FLAG: powers (?powers=0)
+// TEST: powers-test.js
 /*@@ARSENAL-START@@ ---------- arsenal: twelve more tactical power-ups + a context-aware drop picker (flag RET.powers, ?powers=0 = the game exactly as before) ----------
    Owner, 20 Oct 2026: "Better use of power ups, include a wider selection so it is not boring."
    DEFENSIVE  BUBBLE SHIELD  (charge) absorbs the next hit          STASIS FIELD   enemy bullets near the ship crawl
@@ -12813,6 +13014,9 @@ if(PWX.on){
 window.__pwx={PWX,PWK};
 /*@@ARSENAL-END@@*/
 
+// PURPOSE: DASH/EMP upgrades and power-up interaction
+// FLAG: abup (?abup=0)
+// TEST: abup-test.js
 /* ---------- ABUP: DASH and EMP upgrades + power-up interaction (flag RET.abup, default ON; ?abup=0 = the abilities exactly as before). Test: nightrun/abup-test.js.
    Owner, 21 Oct 2026: "The power ups should be used by EMP, dash and EMP are useless as they stand; either allow upgrades eg double dash, power ups recharge,
    more power ups on demand or from the screen; game must be more strategic and timing."
@@ -12935,6 +13139,9 @@ if(ABUP.on){
 ABUP.T={get GA(){return GA;},gsave:()=>gsave(),open:f=>openGarage(f),close:()=>closeGarage(),emit:(n,d)=>NR.emit(n,d)};   // test handle
 window.__abup=ABUP;
 
+// PURPOSE: economy fit: hours to finish back to 9-13 h
+// FLAG: econfit (?econfit=0)
+// TEST: none
 /* ---------- econfit.js: economy back to 9-13 h (Strict review 7, task 5). After pacing (stages ~90 s) the Neon per hour went up and the full
    garage got new buyable layers (abup upgrades, forge merges) that RET.totalCost did not count. Only prices change: the weapon / perk scales (RET.wk, RET.tk),
    are x ECF.k (abup 90-140 and forge 120 Neon stay), and RET.totalCost now counts abup + the 24 forge merges. Neon per kill (RET.nk), armour.js and hard.js are untouched.
@@ -12945,6 +13152,9 @@ const ECF=window.ECF={k:1.05,wk:RET.wk,tk:RET.tk};
 ECF.apply=function(){const on=!!RET.econfit,k=on?this.k:1;RET.wk=this.wk*k;RET.tk=this.tk*k;};
 ECF.apply();
 
+// PURPOSE: pilot classes picked before a run
+// FLAG: classes (?classes=0)
+// TEST: classes-test.js
 /* ---------- PILOT CLASSES (flag RET.classes, default ON; ?classes=0 = the game exactly as before). Test: nightrun/classes-test.js.
    Owner, 21 Oct 2026: "pilot can have a class so we can have more variety on the game unlocking more skills but with balance."
    Five classes, picked in the Garage tab PILOT. No class picked = ROOKIE = the old game. Each class = a passive + a downside + a SIGNATURE that rides on a button
@@ -13095,6 +13305,9 @@ if(typeof LSN!=='undefined'&&CLS.on&&!LSN.some(l=>l.id==='pilot')){
     pr:{type:'pick',rounds:[{q:'Bullets everywhere, you want to slip through. Which pilot?',art:lsRow(lsN('dot',FOE,4,18)),opts:['gunner','ghost','tinker'],ok:'ghost',why:'GHOST dashes more often.'}]}});}
 window.__cls={CLS,UI:CLSUI,open:()=>{openGarage();GA.tab='pilot';gaDraw();}};   // test hook
 
+// PURPOSE: explicit, safe saving and save slots
+// FLAG: saves (?saves=0)
+// TEST: saves-test.js
 /* ---------- explicit, safe saving (owner request: "User must be able to save progress."). Flag RET.saves, ?saves=0 = the old behaviour (no wrappers, no listeners, no UI).
    What existed before: every game key is written to localStorage the moment it changes (save() in a.js), a Settings > Save group exports / imports a versioned base64+checksum code or a file (ret.js, B24: RET.sio) with one undo backup, and a storage-blocked toast.
    Added here:
@@ -13212,12 +13425,15 @@ if(RET.saves){
   try{if(!localStorage.getItem('mnr_svinfo'))SV.flush(true);}catch(e){}
 }
 
+// PURPOSE: build stamp and update check
+// FLAG: stamp (?stamp=0)
+// TEST: stamp-test.js
 /* ---------- build stamp + update check (owner, 21 Oct 2026: "the game has not changed" = an old shell on the phone). Flag RET.stamp (off with ?stamp=0): off = no stamp, no button, no toast, no auto reload.
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='46c90d6ace 2026-10-21 17:42 UTC';
+const NR_STAMP='ece74068d1 2026-10-21 17:43 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;

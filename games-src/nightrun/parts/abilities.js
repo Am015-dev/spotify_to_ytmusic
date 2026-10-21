@@ -1,3 +1,6 @@
+// PURPOSE: DASH charges and EMP as abilities (beat bonus, refund)
+// FLAG: abil (?abil=0)
+// TEST: abil-test.js
 /* ---------- DASH + EMP abilities (flag RET.abil, ?abil=0 = the old dash and EMP exactly). b.js calls ABIL.dashIn() and ABIL.emp() where it read the keys.
    DASH: charges (3, 4 from LV3) that refill one at a time (1.7 s at LV1 .. 1.2 s at LV5), fires on the press in the move / last stick direction.
      On the beat it pays the old bonus (score, ON BEAT, tier +3) and refunds a fifth of a charge; off the beat it is a plain dash (no tier drop).

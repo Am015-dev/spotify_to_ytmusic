@@ -7,18 +7,18 @@ Wired: 996 paintings, 73 3D models. Still to wire: 298 paintings, 75 models.
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
 | mainhattan-nightrun | 295 | 10 |
+| lantern-dive | 1 | 0 |
 | final-approach | 1 | 0 |
 | sands-of-qamar | 1 | 0 |
-| lantern-dive | 1 | 0 |
 | shipwreck-isle | 0 | 1 |
-| doorkick-dungeon | 0 | 9 |
+| thornbound | 0 | 6 |
 | hollowbough | 0 | 7 |
-| crown-city-smash | 0 | 1 |
-| sunglaze | 0 | 10 |
-| short-fuse | 0 | 3 |
 | rampart-and-vine | 0 | 13 |
 | nebula-aces | 0 | 15 |
-| thornbound | 0 | 6 |
+| doorkick-dungeon | 0 | 9 |
+| short-fuse | 0 | 3 |
+| crown-city-smash | 0 | 1 |
+| sunglaze | 0 | 10 |
 
 ## mainhattan-nightrun
 
@@ -322,6 +322,14 @@ Wired: 996 paintings, 73 3D models. Still to wire: 298 paintings, 75 models.
 | Wave 0 prompts-strip.json | `strip-wpn-well-impact` | (card restored 2026-10-21 from the made strip; original prompt: build_fx_strips.py) |
 | Wave 0 prompts-strip.json | `strip-wpn-well-muzzle` | (card restored 2026-10-21 from the made strip; original prompt: build_fx_strips.py) |
 
+## lantern-dive
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 3 Wave 3 (9:16) | `table-tunnel-glow-phone` | a vertical deep-sea cave view in dark blue with faint light shafts from above, calm empty centre, no text |
+
 ## final-approach
 
 3D: none
@@ -338,14 +346,6 @@ Wired: 996 paintings, 73 3D models. Still to wire: 298 paintings, 75 models.
 |---|---|---|
 | Wave 1 Wave 1 | `ui-seat-chip` | a blank cream scoreboard plaque with a thin brown wooden border and a small rope loop on each side, centre emp |
 
-## lantern-dive
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 3 Wave 3 (9:16) | `table-tunnel-glow-phone` | a vertical deep-sea cave view in dark blue with faint light shafts from above, calm empty centre, no text |
-
 ## shipwreck-isle
 
 3D: sw-ada
@@ -353,9 +353,9 @@ Wired: 996 paintings, 73 3D models. Still to wire: 298 paintings, 75 models.
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
 
-## doorkick-dungeon
+## thornbound
 
-3D: bone-pile, boss-dread, boss-inferno, boss-pharaoh, boss-skygrif, boss-tentacles, boss-wyrm, coin-pile, torch
+3D: banner-clans, banner-nobility, pawn-agent, pawn-knight, pawn-priest, stag-statue
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
@@ -363,27 +363,6 @@ Wired: 996 paintings, 73 3D models. Still to wire: 298 paintings, 75 models.
 ## hollowbough
 
 3D: acorn, worker-badger, worker-hare, worker-hedgehog, worker-porcupine, worker-rabbit, worker-squirrel
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## crown-city-smash
-
-3D: brainjack-token
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## sunglaze
-
-3D: tile-black-a, tile-black-b, tile-blue-a, tile-blue-b, tile-red-a, tile-red-b, tile-teal-a, tile-teal-b, tile-yellow-a, tile-yellow-b
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## short-fuse
-
-3D: bomb-clockwork, bomb-dynamite, bomb-tower-clock
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
@@ -402,9 +381,30 @@ Wired: 996 paintings, 73 3D models. Still to wire: 298 paintings, 75 models.
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
 
-## thornbound
+## doorkick-dungeon
 
-3D: banner-clans, banner-nobility, pawn-agent, pawn-knight, pawn-priest, stag-statue
+3D: bone-pile, boss-dread, boss-inferno, boss-pharaoh, boss-skygrif, boss-tentacles, boss-wyrm, coin-pile, torch
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## short-fuse
+
+3D: bomb-clockwork, bomb-dynamite, bomb-tower-clock
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## crown-city-smash
+
+3D: brainjack-token
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## sunglaze
+
+3D: tile-black-a, tile-black-b, tile-blue-a, tile-blue-b, tile-red-a, tile-red-b, tile-teal-a, tile-teal-b, tile-yellow-a, tile-yellow-b
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|

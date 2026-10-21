@@ -1,3 +1,6 @@
+// PURPOSE: the song never stops or stutters
+// FLAG: flow (?flow=0)
+// TEST: ret-flow-test.js
 /* ---------- FLOW: the song never stops or stutters. Flag RET.flow (?flow=0 = the old behaviour). ----------
    Screens where the game waits for the player (pit stop, chest, weapon sheet, stage result, story cards, tutorial cards) keep the song on its own beat clock:
    the song is ducked (~40% down), low-passed and loses its drum layer so choices stay readable, and returns to full on the next bar line when play resumes.

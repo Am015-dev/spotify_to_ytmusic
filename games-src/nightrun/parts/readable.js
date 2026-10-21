@@ -1,3 +1,6 @@
+// PURPOSE: bullets and threats readable at a glance
+// FLAG: read (?read=0)
+// TEST: readable-test.js
 /* ---------- readable.js (F5, REVIEW-2026-10-18): bullets and threats readable at a glance. Flag RET.read; ?read=0 = the old look exactly.
    1. In play only (running), the city backdrop (bg.js drawBG / drawBGP) is desaturated and dimmed to about 55% by one overlay (hook in c.js render); menus are unchanged.
       The beat pulse on the screen edges stays, a little lower (READ.PULSE, hook in fx.js FXV.edges).

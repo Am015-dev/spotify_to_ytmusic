@@ -1,3 +1,6 @@
+// PURPOSE: endless mode climbs in difficulty
+// FLAG: endramp (?endramp=0)
+// TEST: endramp-test.js
 /* ---------- ENDRAMP: endless mode climbs in difficulty (flag RET.endramp, default ON; ?endramp=0 = the old fixed difficulty). Test: nightrun/endramp-test.js.
    Owner 20 Oct 2026: "endless should gradually increase difficulty, even if normal it should go to legend, else the game is very easy for an experienced player; more tactics and patterns so enemies are never predictable."
    A WAVE is one director phase (8 bars, DIR.pickTheme). Plain endless only: never story, daily, weekly, the tutorial or the Lab.

@@ -1,3 +1,6 @@
+// PURPOSE: DASH/EMP upgrades and power-up interaction
+// FLAG: abup (?abup=0)
+// TEST: abup-test.js
 /* ---------- ABUP: DASH and EMP upgrades + power-up interaction (flag RET.abup, default ON; ?abup=0 = the abilities exactly as before). Test: nightrun/abup-test.js.
    Owner, 21 Oct 2026: "The power ups should be used by EMP, dash and EMP are useless as they stand; either allow upgrades eg double dash, power ups recharge,
    more power ups on demand or from the screen; game must be more strategic and timing."

@@ -1,3 +1,6 @@
+// PURPOSE: phone full screen on first tap
+// FLAG: fs (?fs=0)
+// TEST: fs-test.js
 /* ---------- Phone full screen, portrait and landscape (owner, 18 Oct 2026). Flag RET.fs (?fs=0 = off).
    Touch devices: the first tap goes full screen (browsers need a user gesture), a tap after a rotation or a system exit goes back in (unless the player turned it off
    with the MENU > FULL SCREEN button, which is remembered in mnr_fs). iPhone Safari has no page full screen: there the button explains Add to Home Screen. ---------- */
