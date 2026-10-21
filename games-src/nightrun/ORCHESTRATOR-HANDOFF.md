@@ -54,6 +54,7 @@ Test column = test file and its status in `TEST-LEDGER.md`: P PASS, F FAIL, Fl F
 | feedback | feedback.js | FUN / SAME AGAIN / BORING tap at run end | feedback-test P |
 | flavor | flavor.js | run-and-gun flavour for the shooter | ret-flavor-test P |
 | foot | foot.js | on-foot street stage | foot-test P |
+| footstage | footstage.js (+ hooks in foot.js) | the finished on-foot stage `zeil`: 7 sections + Warden relay gate, 5 new foot enemies (jetpack, hound, flamer, ninja, medic), checkpoints per section, progress bar, mercy; `?footstage=0` = the street1 mock exactly | footstage-test P |
 | boss2 | armour.js | boss damage cap, HP phases, last stand | boss2-test P |
 | bossmoves | bossmoves.js | boss movesets (VARIETY B) | bossmoves-test P |
 | bossvis | bossvis.js | bosses look different per phase | bossvis-test P |
@@ -63,6 +64,7 @@ Test column = test file and its status in `TEST-LEDGER.md`: P PASS, F FAIL, Fl F
 | powers | arsenal.js | 12 more power-ups (defensive, offensive, utility, risky), context picker, max 2 timed + 1 stored charge | powers-test - |
 | read | readable.js | bullets and threats readable at a glance | readable-test F |
 | zoo | zoo.js | time to kill + 8 enemy kinds | zoo-test NR |
+| fleet | fleet.js | enemy ships in the fly stages: interceptor 6+, bomber 10+, carrier 16+, cruiser 22+ (single -> pair -> mixed) | fleet-test P |
 | leak | leak.js | ground enemies, calmer pacing, escape penalty | ret-leak-test F |
 | fever | ret.js | FEVER meter: score x1.5 while on | ret-fever-test F |
 | title / type | title.js (`?title=0`, `?type=0`) | title diet; 14 px text, 44 px touch targets | ret-title-test P |

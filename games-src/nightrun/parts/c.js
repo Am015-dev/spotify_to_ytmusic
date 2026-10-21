@@ -126,7 +126,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   if(!PT){drawBG(bgFor(G.di),t,dt,G.scroll);if(RET.read)READ.dim(W,H);
   }   // (no rain, no traffic specks: the background stays calm)
   drawPickups(t);
-  for(const e of G.en)drawEnemy(e,t);if(RET.variants)for(const e of G.en)if(e.vz)VAR.mark(e,t);
+  for(const e of G.en)drawEnemy(e,t);if(ART.gh.length)ART.ghosts();if(RET.variants)for(const e of G.en)if(e.vz)VAR.mark(e,t);
   // player bullets
   ctx.globalCompositeOperation='lighter';const D=DISTRICTS[G.di];
   // the ship's own fire is dim and thin: the enemy bullets (bright lime, dark rim) are what must read
@@ -270,7 +270,7 @@ function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){req
 applySet();syncSet();requestAnimationFrame(loop);
 document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];});
         // build the other districts' skylines while the title is up
-window.__mnr={RET,ARC,render,hudBusy,get hudOff(){return HUDOFF},set hudOff(v){HUDOFF=!!v},ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get rotMode(){return rotMode},dashSafeDir,get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
+window.__mnr={SPR,RET,ARC,render,hudBusy,get hudOff(){return HUDOFF},set hudOff(v){HUDOFF=!!v},ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get rotMode(){return rotMode},dashSafeDir,get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},get TP(){return TP},TP_DEF,HUDX,UBY,PWK,hurt,NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
   get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},MAIN,get K(){return K},startStory,unlockedN:unlocked,sSave,
