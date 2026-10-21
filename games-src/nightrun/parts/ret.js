@@ -42,10 +42,12 @@ NR.on('runEnd',d=>{if(!RET.mercy||!d||!d.story)return;const n=d.story;
 NR.on('runStart',d=>{if(!RET.mercy||!d||!d.story||!RET.mercyHull(d.story))return;
   G.note={t:3,txt:'MERCY: +1 hull'+(RET.mercyLvl(d.story)?', a little easier':'')+' this try'};});
 /* B2: what a full garage costs, summed from the live prices (econ-test.js prints it) */
-RET.totalCost=function(){let t=0;
+RET.totalCost=function(){if(window.ECF)ECF.apply();let t=0;
   for(const d of TP_DEF)for(let l=0;l<d.max;l++)t+=tpPrice(d,l);
   for(const id of WP_IDS){t+=WPD[id].p?(RET.econ?Math.max(5,Math.round(WPD[id].p*RET.wk)):WPD[id].p):0;for(let L=1;L<WP_MAX;L++)t+=WPX_PRICE(L);}
   for(const a of [SHIPS,CREW,THEMES])for(const x of a)t+=x.p||0;
+  // econfit.js scales RET.wk / RET.tk (applied above); the abup upgrades and the 24 forge merges are buyable too
+  if(window.ABUP)for(const u of ABUP.U)t+=u.p;if(window.FG)t+=24*FG_COST.neon;
   return t;};
 RET.probe=()=>({w:WPX_PRICE(1),k:tpPrice(TP_BY.dmg,0)});
 

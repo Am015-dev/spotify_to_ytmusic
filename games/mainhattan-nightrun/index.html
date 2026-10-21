@@ -3414,10 +3414,12 @@ NR.on('runEnd',d=>{if(!RET.mercy||!d||!d.story)return;const n=d.story;
 NR.on('runStart',d=>{if(!RET.mercy||!d||!d.story||!RET.mercyHull(d.story))return;
   G.note={t:3,txt:'MERCY: +1 hull'+(RET.mercyLvl(d.story)?', a little easier':'')+' this try'};});
 /* B2: what a full garage costs, summed from the live prices (econ-test.js prints it) */
-RET.totalCost=function(){let t=0;
+RET.totalCost=function(){if(window.ECF)ECF.apply();let t=0;
   for(const d of TP_DEF)for(let l=0;l<d.max;l++)t+=tpPrice(d,l);
   for(const id of WP_IDS){t+=WPD[id].p?(RET.econ?Math.max(5,Math.round(WPD[id].p*RET.wk)):WPD[id].p):0;for(let L=1;L<WP_MAX;L++)t+=WPX_PRICE(L);}
   for(const a of [SHIPS,CREW,THEMES])for(const x of a)t+=x.p||0;
+  // econfit.js scales RET.wk / RET.tk (applied above); the abup upgrades and the 24 forge merges are buyable too
+  if(window.ABUP)for(const u of ABUP.U)t+=u.p;if(window.FG)t+=24*FG_COST.neon;
   return t;};
 RET.probe=()=>({w:WPX_PRICE(1),k:tpPrice(TP_BY.dmg,0)});
 
@@ -11423,6 +11425,36 @@ if(RET.pacing){
   NR.on('spawn',e=>PAC.trim(e));
 }
 
+/* ---------- BITE: Normal bites again on top of the short stages (flag RET.bite, default ON; ?bite=0 = the game as it was). Test: humanbot / anticamp-test / timing-test.
+   Strict review 7: since pacing.js (stages ~90 s) the human-model bot clears Normal 97% and a bot that never presses DASH or EMP clears as often as the beat bot.
+   Normal story stages only (not Easy, not the hard tiers, not the Lab or the tutorial); stage length, armour.js and hard.js are not touched. Denser threats per second, not longer stages:
+   1. PRESSURE WINDOWS (counter.js threats): one every BITE.ev bars instead of 9 (BITE.evMid on stages BITE.full-BITE.midTo: from 16 the base pressure already climbs); the laser wall (a lane strike: only a dash crosses it, a dead-on-beat dash is
+      shielded for .2 s, an off-beat hop only .04 s) unlocks on stage 3 instead of 5. From stage BITE.full a wall keeps its gap only when no dash charge is held
+      (as on Hard); before that the gap is BITE.gapH px. A bullet curtain's second layer follows .45 s after the first while DASH or EMP is ready (EMP clears both).
+   2. MERCY: grit.js absorbs at most BITE.mc() hull hits a run from stage 3 (was 3): 1 on stages 3-5 (hull 7 there), 2 from stage BITE.full (hull 5-6).
+   3. FREE HEALTH: hull drops (ST.heal) x BITE.heal from stage BITE.full. ---------- */
+if(RET.bite===undefined)RET.bite=!/[?&]bite=0/.test(location.search);
+const BITE=window.BITE={ev:5,evMid:4,midTo:15,wallAt:3,full:6,gapH:84,mcEarly:1,mcLate:2,heal:.7,
+  stat:{walls:0,shut:0,curt:0},
+  act(){return!!RET.bite&&typeof SET==='object'&&SET.diff==='normal'&&!!ST.on&&!(typeof G==='object'&&G&&(G.lab||G.tut));},
+  stg(){return ST.on?ST.n:1;},
+  late(){return this.act()&&this.stg()>=this.full;},
+    mc(){return this.stg()>=this.full?this.mcLate:this.mcEarly;}};
+if(window.CTR){
+  const ev=CTR.EV.normal,wa=CTR.UN.wall;
+  Object.defineProperty(CTR.EV,'normal',{get(){return BITE.act()?(BITE.late()&&BITE.stg()<=BITE.midTo?BITE.evMid:BITE.ev):ev;},set(){},configurable:true,enumerable:true});
+  Object.defineProperty(CTR.UN,'wall',{get(){return BITE.act()?BITE.wallAt:wa;},set(){},configurable:true,enumerable:true});
+  const c0=CTR.curt;CTR.curt=function(){const n=this.walls.length;c0.apply(this,arguments);
+    if(!BITE.act()||!BITE.late()||!(this.charges()>=1||P.emp>=1))return;const w=this.walls.slice(n);BITE.stat.curt++;
+    if(w.length===2){w[1].warn=w[0].warn+.45;const c=this.curts[this.curts.length-1];if(c)c.t=c.T0+.45;}};
+  const t0=CTR.tick;CTR.tick=function(dt){const pend=this.walls?this.walls.filter(w=>!w.cur&&w.warn>0):[];t0.apply(this,arguments);
+    if(!BITE.act())return;for(const w of pend){if(w.warn>0||!w.gap||w.bt)continue;w.bt=1;BITE.stat.walls++;
+      if(BITE.late()&&this.charges()>=1){w.gap=null;BITE.stat.shut++;}else w.gap.h=Math.min(w.gap.h,BITE.gapH);}};
+}
+if(window.GRIT){const m=GRIT.mcMax;Object.defineProperty(GRIT,'mcMax',{get(){return BITE.act()&&BITE.stg()>=BITE.wallAt?Math.min(m,BITE.mc()):m;},set(){},configurable:true});}
+{const sl=ST.setLevel;ST.setLevel=function(n){const r=sl.apply(this,arguments);if(RET.bite&&SET.diff==='normal'&&n>=BITE.full)this.heal*=BITE.heal;return r;};}
+NR.on('runStart',()=>{for(const k in BITE.stat)BITE.stat[k]=0;});
+
 /* ---------- FLANKERS (flag RET.flankers, default OFF, ?flankers=1 = on; off = W29 anti-camp bullet streams). 20 Oct 2026
    The anti-camp "flush" used to be bullet streams with edge markers. With this flag it spawns real enemies you can see, shoot and be hurt by:
    DIVER   shielded triangle: enters from above the camp column after a 0.8 s tell (dashed line + chevron), dives down that column and leaves.
@@ -12876,6 +12908,16 @@ if(ABUP.on){
 ABUP.T={get GA(){return GA;},gsave:()=>gsave(),open:f=>openGarage(f),close:()=>closeGarage(),emit:(n,d)=>NR.emit(n,d)};   // test handle
 window.__abup=ABUP;
 
+/* ---------- econfit.js: economy back to 9-13 h (Strict review 7, task 5). After pacing (stages ~90 s) the Neon per hour went up and the full
+   garage got new buyable layers (abup upgrades, forge merges) that RET.totalCost did not count. Only prices change: the weapon / perk scales (RET.wk, RET.tk),
+   are x ECF.k (abup 90-140 and forge 120 Neon stay), and RET.totalCost now counts abup + the 24 forge merges. Neon per kill (RET.nk), armour.js and hard.js are untouched.
+   Flag RET.econfit, default ON; ?econfit=0 = the prices as they were. Daily / weekly modes pay the same as before (no price or reward change there).
+   Early game: the first weapon upgrade costs ~13 Neon, the first 3 stages pay 52+64+76 (econ-test). ---------- */
+if(RET.econfit===undefined)RET.econfit=!/[?&]econfit=0/.test(location.search);
+const ECF=window.ECF={k:1.05,wk:RET.wk,tk:RET.tk};
+ECF.apply=function(){const on=!!RET.econfit,k=on?this.k:1;RET.wk=this.wk*k;RET.tk=this.tk*k;};
+ECF.apply();
+
 /* ---------- PILOT CLASSES (flag RET.classes, default ON; ?classes=0 = the game exactly as before). Test: nightrun/classes-test.js.
    Owner, 21 Oct 2026: "pilot can have a class so we can have more variety on the game unlocking more skills but with balance."
    Five classes, picked in the Garage tab PILOT. No class picked = ROOKIE = the old game. Each class = a passive + a downside + a SIGNATURE that rides on a button
@@ -13148,7 +13190,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='08c19e881a 2026-10-21 17:31 UTC';
+const NR_STAMP='9db0be0817 2026-10-21 17:37 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
