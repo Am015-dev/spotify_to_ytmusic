@@ -16,6 +16,7 @@
    the phase lines and the last stand (EXPOSED = always open). Hooks: armour.js room x BPL.k(e); bossmoves.js BMV.init -> BPL.init; c.js draw; stats.js sheet. */
 if(RET.bossplay===undefined)RET.bossplay=!/[?&]bossplay=(0|off)/.test(location.search);   // ON by default; ?bossplay=0 = the fights before it, exactly
 if(RET.bossplay)RET.sioKeys.push('mnr_bpcodex');
+if(RET.bossfit===undefined)RET.bossfit=!/[?&]bossfit=(0|off)/.test(location.search);   // W87 boss fit: ON by default; ?bossfit=0 = the fights before it, exactly
 const BPT={
   tresor:  {m:['nodes','emp','slab'],     line:'BREAK THE BOLTS, EMP THE PLATE'},
   bruecke: {m:['medic','back','conveyor'],line:'CUT THE LINK, FLANK THE SHIELD'},
@@ -45,7 +46,19 @@ const BPH={nodes:'SHOOT THE NODES',medic:'KILL THE MEDIC OR DASH THE LINK',emp:'
 const BP_GATES=['nodes','medic','emp','parry','back'];
 const BPL=window.BPL={get on(){return!!RET.bossplay&&!!RET.bossmoves;},T:BPT,N:BPN,BREATH:10,OPEN:18,FB:7,FBW:9,LEAK:.25,LEAKH:.45,LEAKT:40,PT:{easy:0,normal:70,hard:95,vhard:95,legend:0},OPENE:14,EASYN:12,RF:3,RF2:3,GR:3,GRP:4.5,PIN:.75,RB:.35,OPENQ:4,QK:.5,FLANK:.8,TEL:.8,GAP:96,auto:/[?&]bpauto=1/.test(location.search)?1.5:0,seed:null,
   st:null,hz:[]};
-BPL.fb=()=>BPL.FB;
+/* W87 BOSS FIT (flag RET.bossfit; review 7 task 2): bosses ran 60-200 s and ignoring the gate only cost 1.4-1.9x hull. Playing the mechanic now pays in TIME (a real break
+   opens a SURGE window: the armour cap x SG for its length; armour.js caps untouched, only the bossplay multiplier on them) and ignoring pays in HULL (a shorter overload FB,
+   a phase timeout PT so no shielded phase drags, denser enraged volleys VK and wider bursts BN). Per-boss rows: SGB (surge) override the tier default. ?bossfit=0 = W53 numbers. */
+BPL.FIT={SG:[1.8,1.9,1.9],SGD:{easy:[1.2,1.2,1.2],hard:[1.6,1.8,1.9],vhard:[1.6,1.8,1.9]},SGB:{},FB:7,FBD:{normal:4,hard:5,vhard:5},FBW:9,FBWD:{normal:12},LK:{},PT:{normal:30,hard:60},VK:[2,2,1],BN:5,RM:2,LD:1,RH:1,RHD:{hard:9,vhard:9},SL:5};   // RH: the enrage tier from which every hit takes +1 hull (Hard: off, its enrage already costs 2x+ and the beat bot must still clear Hard stage 5)
+Object.defineProperty(BPL,'fit',{get(){return!!RET.bossfit;}});
+BPL.sg=e=>{const v=BPL.FIT.SGB[e.bp.id];return v!=null?v:(BPL.FIT.SGD[SET.diff]||BPL.FIT.SG)[BPL.tier()];};
+/* W87 moveset density: a phase with 4+ verbs runs SL-beat slots (b.js runs 8; the verbs act on beats 0 / 2 / 4), and a verb a phase never reached opens the next phase, so the shorter fights still show every verb; queued telegraphed hits still fire */
+if(typeof bossBeat==='function'){const bb=bossBeat;bossBeat=function(e,d){const ph0=e.ph;bb(e,d);const b=e.bp;if(!BPL.on||!BPL.fit||!b||!e.lists)return;
+  if(ph0&&e.ph!==ph0&&e.lists[e.ph-1]){const vs=(BMV.st&&BMV.st.verbs)||{},l=e.lists[e.ph-1],all=(e.lists[ph0-1]||[]).filter(v=>!vs[v]&&!l.includes(v)).concat(l);
+    e.lists[e.ph-1]=all.filter(v=>!vs[v]).concat(all.filter(v=>vs[v]));}   // verbs this fight has not run yet open the new phase (a verb the last phase never reached included)
+  const l=e.lists[e.ph-1];
+  if(BPL.FIT.SL&&e.pc===BPL.FIT.SL-1&&l&&l.length>=4)e.pc=7;};}
+BPL.fb=()=>BPL.fit?BPL.FIT.FBD[SET.diff]||BPL.FIT.FB:BPL.FB;
 BPL.RFD={hard:[3,3]};   // enrage fill seconds [to tier 1, to tier 2] per difficulty (Hard has its own row)
 BPL.LKN=[BPL.LEAK,BPL.LEAKH,BPL.LEAKT];BPL.LK={hard:[.25,.45,40]};   // shield leak [base, after LEAKT s shielded, LEAKT] per difficulty; Hard has its own row (a beat-timed bot died 30-60 s into the t=126 boss)
 /* W53 ENRAGE: ignoring a gate is DANGEROUS, not slow. While a gate is up and you are not working on it, the meter b.rg fills (RF s to the first tier, RF2 s to the next);
@@ -53,7 +66,7 @@ BPL.LKN=[BPL.LEAK,BPL.LEAKH,BPL.LEAKT];BPL.LK={hard:[.25,.45,40]};   // shield l
    Tier 1: an aimed 3-shot volley every 2 beats (stage <= 12: every bar, and no shield break-through); tier 2 (stage 13+): every beat plus one extra bullet verb from the boss's own moveset layered half a slot later; verb telegraphs
    one beat tighter where the tempo allows (never below 0.6 s). The tier holds through an overload window (no silence there). A real break resets the meter and the tier;
    a QUICK break (meter < QK, stage 13+) adds OPENQ s to the open window. Caps: every bullet goes through eb() (ebCap, BCAP). Hull is the payoff, the time ratio follows. */
-BPL.rmax=()=>BPL.tier()?2:1;
+BPL.rmax=()=>BPL.tier()||BPL.fit&&BPL.FIT.RM>1?2:1;   // W87: with bossfit the early bosses reach tier 2 too (FIT.RM)
 BPL.busy=(e,g)=>{if(g.m==='nodes'||g.m==='medic')return g.tg.some(x=>!x.dead&&x.bpOpen);if(g.m==='back')return g.sy!=null&&Math.abs(P.y-g.sy)>110;if(g.m==='parry')return!!(g.orb&&(g.orb.back||!g.orb.near));return false;};   // working on the gate: in a node / medic row, flanking, or the orb still on its way (not yet passed you); this pauses the meter for at most GR s per gate (GRP for the slow parry orb)
 BPL.vol=(e,n,sp,v,tl)=>{const sb=BT.spb||.5;tl=Math.max(.6,tl||sb*Math.ceil(.6/sb));const s=BPL.stat();s.tel=Math.min(s.tel,tl);BPL.hz.push({aim:1,x:e.x-e.r*.6,y:e.y,on:G.t+tl,off:G.t+tl+.05,t0:G.t,v,n,sp,rage:1});};
 BPL.RE=!/[?&]bprage=0/.test(location.search);   // stage <= 12: ?bprage=0 turns the enrage off there (W53: humanbot stage 8 varies 8-17% human / 25-58% oracle between identical builds at n=12, so it cannot judge this)
@@ -62,8 +75,8 @@ BPL.rage=(e,b,g,dt,sb)=>{const s=BPL.stat();if(!BPL.tier()&&!BPL.RE){b.rg=0;b.rt
   const bz=g&&g.up&&BPL.busy(e,g);if(bz)g.gr=(g.gr||0)+dt;const ign=g&&g.up&&(!bz||g.gr>(g.m==='parry'?BPL.GRP:BPL.GR)),fbw=g&&!g.up&&g.open&&G.t<g.open&&g.fbw;
   const rf=BPL.RFD[SET.diff]||[BPL.RF,BPL.RF2];if(ign)b.rg=(b.rg||0)+dt/(b.rt?rf[1]:rf[0]);else if(!fbw&&!(g&&g.up))b.rg=Math.max(0,(b.rg||0)-dt/rf[0]);
   if(b.rg>=1){b.rg=BPL.RB;b.rt=Math.min(BPL.rmax(),(b.rt|0)+1);s.bursts=(s.bursts|0)+1;s.rt=Math.max(s.rt|0,b.rt);const v=250+15*diff();
-    for(let i=0;i<3;i++)BPL.vol(e,5,0,v,Math.max(.6,sb*Math.ceil(.6/sb))+i*.3);floater(e.x,e.y-e.r-48,'ENRAGED '+b.rt,'#ff3d6e');AU.sfx('warn');}
-  if(!(b.rt>0)||!(ign||fbw)||e.bmS>e.bt)return;const k=b.rt>1?1:BPL.tier()?2:4;if((e.bt|0)!==b.rb&&(e.bt|0)%k===0){b.rb=e.bt|0;BPL.vol(e,3,0,220+15*diff());s.vol=(s.vol|0)+1;}};
+    for(let i=0;i<3;i++)BPL.vol(e,BPL.fit?BPL.FIT.BN:5,0,v,Math.max(.6,sb*Math.ceil(.6/sb))+i*.3);floater(e.x,e.y-e.r-48,'ENRAGED '+b.rt,'#ff3d6e');AU.sfx('warn');}
+  if(!(b.rt>0)||!(ign||fbw)||e.bmS>e.bt)return;const k=b.rt>1?1:BPL.fit?BPL.FIT.VK[BPL.tier()]:BPL.tier()?2:4;if((e.bt|0)!==b.rb&&(e.bt|0)%k===0){b.rb=e.bt|0;BPL.vol(e,3,0,220+15*diff());s.vol=(s.vol|0)+1;}};
 /* tier 2 layers one bullet verb from the boss's own moveset (aimed / ring verbs only: no walls, so the free gap rules of each verb hold) */
 BPL.LAY=['tri_burst','split_shot','homing_orb','bounce_orbs','pulse_ring'];   // stateless verbs only (spiral_rev / spokes keep a spin state per slot)
 BPL.lay=e=>{if(e.bp.lay!==undefined)return e.bp.lay;const all=[].concat(...e.lists);return e.bp.lay=BPL.LAY.find(v=>all.includes(v))||null;};
@@ -79,14 +92,14 @@ BPL.stat=()=>BPL.st||(BPL.st={boss:null,seed:0,pick:[],order:[],seen:{},res:{},h
 NR.on('runStart',()=>{BPL.st=null;BPL.hz=[];});
 /* a small seeded generator per attempt (the attack order and the picks; the game's own random stays untouched) */
 BPL.rng=s=>{let a=s>>>0||1;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};};
-BPL.k=e=>{const b=e&&e.bp;if(!BPL.on||!b)return 1;if(e.b2&&e.b2.ls>0||e.bmS>e.bt)return 1;   /* the last stand and a bossmoves STUN are always open */if(b.g&&b.g.open&&G.t<b.g.open)return 1;const pt=BPL.PT[SET.diff]||0;if(pt&&G.t-(b.p0||0)>pt)return 1;const L=BPL.LK[SET.diff]||BPL.LKN;return(b.sh||0)>L[2]?L[1]:L[0];};   // W40: outside the OPEN window (gate up, rising, between chained gates or phases) only LEAK of the damage gets through
+BPL.k=e=>{const b=e&&e.bp;if(!BPL.on||!b)return 1;if(e.b2&&e.b2.ls>0)return 1;if(BPL.fit&&b.g&&b.g.open&&G.t<b.g.open&&!b.g.fbw)return BPL.sg(e);   /* W87: a real break surges */if(e.bmS>e.bt)return 1;   /* the last stand and a bossmoves STUN are always open */if(b.g&&b.g.open&&G.t<b.g.open)return 1;const pt=(BPL.fit?BPL.FIT.PT:BPL.PT)[SET.diff]||0;if(pt&&G.t-(b.p0||0)>pt)return 1;const L=BPL.fit&&BPL.FIT.LK[SET.diff]||BPL.LK[SET.diff]||BPL.LKN;return(b.sh||0)>L[2]?L[1]:L[0];};   // W40: outside the OPEN window (gate up, rising, between chained gates or phases) only LEAK of the damage gets through
 /* called at the end of BMV.init (the movesets are set): the seed, the picks per phase, the shuffled order */
 BPL.init=e=>{e.bp=null;if(!BPL.on||!e.bm)return;const T=BPT[e.bm.id];if(!T)return;
   const seed=BPL.seed!=null?BPL.seed:(Math.random()*4294967295)>>>0,R=BPL.rng(seed),sig=e.bm.T.sig;
   const L0=e.lists.map(l=>l.slice());
   e.lists=L0.map((l,i)=>{const a=l.slice(),lo=i===2?1:0;for(let j=a.length-1;j>lo;j--){const k=lo+Math.floor(R()*(j-lo+1));[a[j],a[k]]=[a[k],a[j]];}
     if(i===2){const own=l.filter(v=>!L0[0].includes(v)&&!L0[1].includes(v));a.sort((x,y)=>(own.includes(y)?1:0)-(own.includes(x)?1:0));}   // phase 3 is short: the verbs only it has come first (shuffled among themselves), the rest follow in shuffled order
-    if(i>0&&a.includes(sig)){a.splice(a.indexOf(sig),1);a.unshift(sig);}return a;});           // phases 2-3 still open with the signature verb
+    if(i>0&&a.includes(sig)&&!(BPL.fit&&i===2&&a[0]!==sig&&!L0[0].concat(L0[1]).includes(a[0]))){a.splice(a.indexOf(sig),1);a.splice(BPL.fit&&i===2?1:0,0,sig);}return a;});           // phases 2-3 still open with the signature verb (W87 bossfit: phase 3 opens with its own new verb, the signature second)
   const pick=[0,1,2].map(()=>{const drop=Math.floor(R()*3);return T.m.filter((_,j)=>j!==drop);});
   e.bp={id:e.bm.id,T,seed,R,pick,g:null,gi:0,ar:null,cy:0};
   const s=BPL.stat();s.boss=e.bm.id;s.seed=seed;s.pick=pick.map(p=>p.slice());s.order=e.lists.map(l=>l.slice());
@@ -99,14 +112,14 @@ BPL.sheet=()=>{const c=BPL.codex(),ids=Object.keys(BPT).filter(id=>c[id]);if(!id
   return'<h3>BOSS CODEX <span>'+ids.length+'/'+Object.keys(BPT).length+'</span></h3><div class="stParts">'+ids.map(id=>'<div><span>'+esc(c[id].nm)+'</span><em>'+c[id].m.map(m=>esc(BPN[m]||m)).join(' · ')+'</em></div>').join('')+'</div>';};
 /* a phase: its two mechanics (gates take turns; an arena rule runs the whole phase) */
 BPL.phase=(e,ph)=>{const b=e.bp;if(!b)return;b.p0=G.t;b.sh=0;const p=b.pick[ph-1]||b.pick[0];b.gs=p.filter(m=>BP_GATES.includes(m));if(!b.gs.length)b.gs=b.T.m.filter(m=>BP_GATES.includes(m)).slice(0,1);b.ch=0;   // chained gates take turns (W40)
-  b.ar=p.find(m=>!BP_GATES.includes(m))||null;b.gi=0;b.arS={};
+  b.ar=p.find(m=>!BP_GATES.includes(m))||null;b.gi=0;if(BPL.fit){const c=b.gn||{};b.gs.forEach((m,i)=>{if((c[m]|0)<(c[b.gs[b.gi]]|0))b.gi=i;});}b.arS={};   // W87: each phase starts on its least-seen gate (shorter fights still show both)
   const keep=b.g&&b.g.open>G.t?b.g.open:0;if(keep&&e.bm&&e.bmS>e.bt)e.bmS=e.bt;   /* a new phase ends the silence (its verbs run) but keeps the OPEN window the player earned */
-  BPL.drop(e);BPL.hz=[];if(b.ar)BPL.seen(e,b.ar);BPL.gate(e,G.t+(ph===1?1.5:2*(BT.spb||.5)*4));if(keep)b.g.open=keep;
+  BPL.drop(e);BPL.hz=[];if(b.ar)BPL.seen(e,b.ar);BPL.gate(e,G.t+(ph===1?1.5:2*(BT.spb||.5)*4));if(keep){b.g.open=keep;if(BPL.fit)b.gi--;}   /* W87: the carried window does not skip this phase's first gate */
   if(ph>1)BPL.say('PHASE '+ph+': '+p.map(m=>BPN[m]).join(' + '),3.5);};
 BPL.drop=e=>{const g=e.bp&&e.bp.g;if(!g)return;for(const t of g.tg||[])if(!t.dead&&G.en.includes(t)){t.dead=1;G.en.splice(G.en.indexOf(t),1);}e.bp.g=null;};
 /* a gate rises at time t0 (telegraphed TEL s: shapes fade in, damage still counts), then holds until it is resolved or overloads after FB s */
 BPL.gate=(e,t0)=>{const b=e.bp,m=b.gs[b.gi%b.gs.length];b.gi++;BPL.drop(e);b.g={m,t0,up:0,tg:[],ct:0,fl:0,orb:null,ob:0,sa:Math.PI,shot:0,open:0};};
-BPL.raise=(e,g)=>{g.up=1;g.tu=G.t;BPL.seen(e,g.m);const ph=e.ph||1,s=BPL.stat();s.closed++;
+BPL.raise=(e,g)=>{g.up=1;g.tu=G.t;const gn=e.bp.gn||(e.bp.gn={});gn[g.m]=(gn[g.m]|0)+1;BPL.seen(e,g.m);const ph=e.ph||1,s=BPL.stat();s.closed++;
   if(g.m==='nodes'){const n=BPL.easy()?2:ph===3?4:3;for(let i=0;i<n;i++)g.tg.push(BPL.add(e,{fx:clamp(e.x-60-i*90,120,W-40),fy:i%2?H-80:80,hk:.010,role:'node'}));}   // out of the centre line: fly up / down to reach them
   if(g.m==='medic')g.tg.push(BPL.add(e,{fx:clamp(e.x+30,0,W-30),fy:e.y>H/2?80:H-80,hk:.022,role:'medic'}));
   BPL.say(BPH[g.m],3);AU.sfx('warn');};
@@ -117,7 +130,7 @@ BPL.resolve=(e,how)=>{const b=e.bp,g=b&&b.g;if(!g||!g.up)return;const s=BPL.stat
   const real=how!=='fb'&&how!=='ls';if(real){b.ch=(b.ch|0)+1;b.rg=0;b.rt=0;}
   if(real&&b.ch<BPL.chain()&&!(e.b2&&e.b2.ls>0)){floater(e.x,e.y-e.r-34,'BREAK '+b.ch+'/'+BPL.chain(),'#19e3ff');AU.sfx('tier');BPL.gate(e,G.t);return;}   // W40: chained gates, the next one rises at once
   const q=real&&BPL.tier()>0&&(b.rg||0)<BPL.QK&&!(b.rt>0);if(real){b.rg=0;b.rt=0;}if(q)BPL.stat().quick=(BPL.stat().quick|0)+1;
-  b.ch=0;g.fbw=how==='fb';g.open=G.t+(how==='fb'?BPL.FBW:BPL.opn()+(q?BPL.OPENQ:0));   // an overload only flickers FBW s; a real break opens the window, and the boss stays silent for all of it (playing the mechanic is the safe way)
+  b.ch=0;g.fbw=how==='fb';g.open=G.t+(how==='fb'?(BPL.fit?BPL.FIT.FBWD[SET.diff]||BPL.FIT.FBW:BPL.FBW):BPL.opn()+(q?BPL.OPENQ:0));   // an overload only flickers FBW s; a real break opens the window, and the boss stays silent for all of it (playing the mechanic is the safe way)
   if(real&&e.bm){e.bmS=Math.max(e.bmS|0,e.bt+Math.max(BPL.BREATH,Math.ceil(BPL.opn()/(BT.spb||.5))));BMV.q=BMV.q.filter(q=>q.e!==e);BMV.tq=[];BMV.hz=BMV.hz.filter(z=>z.mk||G.t>=z.on);}   // a gate that is really resolved: the boss is silent for BREATH beats (pending shots and unlit warnings go)
   
   floater(e.x,e.y-e.r-34,how==='fb'?'SHIELD OVERLOAD':'OPEN!','#ffe14d');if(how!=='fb'){shake(6);AU.sfx('tier');G.score+=Math.round(800*(1+G.pos));}
@@ -149,10 +162,12 @@ NR.on('tick',dt=>{if(!BPL.on)return;const e=G.boss;if(!e||!e.bp||e.dead){if(BPL.
       if(g.up&&BPL.auto&&t-g.tu>=BPL.auto)BPL.solve(e);
       if(g.up&&t-g.tu>=BPL.fb())BPL.resolve(e,'fb');}
     else if(g.open&&t>=g.open)BPL.gate(e,t);}
+  if(dt>0){const k=Math.min(1,dt*6);b.vx=(b.vx||0)+(((P.x-(b.px??P.x))/dt)-(b.vx||0))*k;b.vy=(b.vy||0)+(((P.y-(b.py??P.y))/dt)-(b.vy||0))*k;b.px=P.x;b.py=P.y;}   // W87: the ship's smoothed velocity (enraged volleys lead it)
   BPL.rage(e,b,b.g,dt,sb);
   if(BPL.k(e)<1)b.sh=(b.sh||0)+dt;   // W52: shielded seconds in this phase
   BPL.arena(e,b,t,sb,dt);
-  for(const z of BPL.hz)if(z.aim&&t>=z.on&&!z.done){z.done=1;const a0=Math.atan2(P.y-z.y,P.x-z.x),d=Math.max(1,Math.hypot(P.x-z.x,P.y-z.y)),k=z.n||1,sp=Math.max(.3,(BPL.GAP+16)/d);   // fans: neighbours at least GAP px apart where they reach you
+  for(const z of BPL.hz)if(z.aim&&t>=z.on&&!z.done){z.done=1;let ax=P.x,ay=P.y;if(z.rage&&BPL.fit&&BPL.FIT.LD){const f=Math.hypot(P.x-z.x,P.y-z.y)/(z.v||250)*BPL.FIT.LD;ax=clamp(P.x+(b.vx||0)*f,20,W-20);ay=clamp(P.y+(b.vy||0)*f,20,H-20);}   // W87: an enraged volley aims where the ship is going (a steady line gets hit; a turn dodges it)
+    const a0=Math.atan2(ay-z.y,ax-z.x),d=Math.max(1,Math.hypot(P.x-z.x,P.y-z.y)),k=z.n||1,sp=Math.max(.3,(BPL.GAP+16)/d);   // fans: neighbours at least GAP px apart where they reach you
     if(k>1)s.gap=Math.min(s.gap,Math.round(d*sp-12));eb.src=BPSRC;for(let i=0;i<k;i++){const n=G.eb.length;eb(z.x,z.y,a0+(i-(k-1)/2)*sp,z.v,z.rage?'#ff3d6e':'#19e3ff',6);if(G.eb.length>n){G.eb[n].bpl=1;if(z.rage)G.eb[n].bpR=1;s.eb++;}}eb.src=null;}
   BPL.hz=BPL.hz.filter(z=>t<z.off);
   let nl=0;for(const x of G.eb)if(!x.dead)nl++;s.maxEb=Math.max(s.maxEb,nl);s.cap=Math.max(s.cap,ebCap());for(const x of G.eb)if(x.bpl)s.maxV=Math.max(s.maxV,Math.hypot(x.vx,x.vy));});
@@ -210,7 +225,8 @@ BPL.draw=()=>{const e=G.boss;if(!BPL.on||!e||!e.bp||e.x>W+40)return;const b=e.bp
   ctx.restore();};
 BPL.tri=(x,y,r,a)=>{ctx.beginPath();for(let i=0;i<3;i++){const q=a+i*2.094;ctx[i?'lineTo':'moveTo'](x+Math.cos(q)*r,y+Math.sin(q)*r);}ctx.closePath();ctx.fill();};
 /* an enraged shot hits for 2 hull (the hurt() wrappers pass no damage, so the second point is taken here; never the killing point) */
-NR.on('hurt',()=>{if(!BPL.on||!G.boss||!G.boss.bp)return;for(const b of G.eb)if(b.bpR&&b.dead&&!b.bpX&&Math.hypot(b.x-P.x,b.y-P.y)<b.r+14){b.bpX=1;if(P.hp>1){P.hp--;BPL.stat().rageHull=(BPL.stat().rageHull|0)+1;}break;}});
+NR.on('hurt',()=>{if(!BPL.on||!G.boss||!G.boss.bp)return;let x2=0;for(const b of G.eb)if(b.bpR&&b.dead&&!b.bpX&&Math.hypot(b.x-P.x,b.y-P.y)<b.r+14){b.bpX=1;x2=1;if(P.hp>1){P.hp--;BPL.stat().rageHull=(BPL.stat().rageHull|0)+1;}break;}
+  if(!x2&&BPL.fit&&BPL.FIT.RH&&G.boss.bp.rt>=(BPL.FIT.RHD[SET.diff]||BPL.FIT.RH)&&P.hp>1){P.hp--;BPL.stat().rageHull=(BPL.stat().rageHull|0)+1;}});   // W87: while it is ENRAGED (a gate ignored) every hit takes one more hull (never the last point)
 NR.on('bossPhase',({ph})=>{const e=G.boss;if(BPL.on&&e&&e.bp)BPL.phase(e,ph);});
 NR.on('kill',({e,boss})=>{if(!boss||!e||!e.bp)return;BPL.drop(e);BPL.hz=[];const c=BPL.codex()[e.bp.id];BPL.say(e.nm+' DOWN · CODEX '+((c&&c.m)||[]).length+' MECHANICS',4);});
 window.__bpl={BPT,BPL};
