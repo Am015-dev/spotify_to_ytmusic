@@ -1,10 +1,11 @@
-/* Mainhattan Nightrun service worker (B30). Built by parts/build.py: 44540a24bb is replaced by a hash of the page, so every deploy makes a new worker and new cache names.
+/* Mainhattan Nightrun service worker (B30). Built by parts/build.py: f00a0e788d is replaced by a hash of the page, so every deploy makes a new worker and new cache names.
    - shell (index.html, manifest, icons, title art): precached; index.html is NETWORK FIRST (3 s) with the cache as fallback, so a stale page is never served while online
    - tracks.json: network first, cache fallback
    - music/*.mp3 and media/*: cached when first used (size capped), served from the cache, then quietly re-checked with a conditional request (304 = nothing downloaded)
    - Range requests (a plain <audio src>) are answered from the cached file as 206; the game itself fetches songs whole into a blob, which needs no special case
+   - offline packs: files listed in offline.json (written by games-src/scripts/offline-manifest.py, downloaded by the shelf's Download into cache gns-games-*) are never capped or evicted and are served from that cache when the network is down
    - other origins (fonts) are never touched; on activate the old shell cache goes and the asset cache is carried over to the new name */
-const BUILD = '44540a24bb';
+const BUILD = 'f00a0e788d';
 const SHELF = 'nr-shell-' + BUILD, ASSETS = 'nr-assets-' + BUILD;
 const CAP = { music: 24, media: 470 };
 const BASE = new URL('./', self.registration.scope).href;
@@ -33,8 +34,19 @@ self.addEventListener('activate', e => {
   })());
 });
 
+let LISTED = null;   // files of the offline pack (relative paths): exempt from CAP and never evicted
+async function listed() {
+  if (LISTED) return LISTED;
+  try {
+    let r = await caches.match(key('offline.json'));
+    if (!r) r = await fetch(new Request(new URL('offline.json', BASE), { cache: 'no-cache' }));
+    const j = await r.json(); LISTED = new Set((j.files || []).concat(j.optional || []).map(f => f.p));
+  } catch (_) { return new Set(); }
+  return LISTED;
+}
 async function trim(cache, prefix, cap) {   // oldest first (keys() is in insertion order)
-  const ks = (await cache.keys()).filter(r => new URL(r.url).pathname.includes(prefix));
+  const L = await listed();
+  const ks = (await cache.keys()).filter(r => { const p = new URL(r.url).href.slice(BASE.length); return new URL(r.url).pathname.includes(prefix) && !L.has(p); });
   for (let i = 0; i < ks.length - cap; i++) await cache.delete(ks[i]);
 }
 async function networkFirst(req, k, ms) {
@@ -64,6 +76,8 @@ async function asset(req, k, kind) {
     }).catch(() => { });
     return isRange ? ranged(req, hit) : hit;
   }
+  const pack = await caches.match(k);   // the shelf's offline pack (gns-games-*): same URL, any cache
+  if (pack) return isRange ? ranged(req, pack) : pack;
   if (isRange) return fetch(req);   // not cached yet: the browser's own range handling; the whole file is cached when the game fetches it
   const r = await fetch(req);
   if (r && r.status === 200 && r.type === 'basic') { try { await cache.put(k, r.clone()); await trim(cache, kind === 'music' ? '/music/' : '/media/', CAP[kind]); } catch (_) { } }

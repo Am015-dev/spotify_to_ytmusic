@@ -95,9 +95,11 @@ saga|25|campaign story: opening, briefings, comms, chapter ends, STO|story,story
 title|6|title diet + CONTINUE, 14 px type floor|title,title,type+
 cp|10|checkpoints with grace on long stages|cp,cp
 fs|5|phone full screen on first tap|fs,fs
-readable|10|bullets and threats readable at a glance|read,read
+readable|11|bullets and threats readable at a glance|read,read
+bulletart|1|real bullet pictures (converted approved previews) for enemy|bulletart,bulletart
 arsenal|17|12 extra power-ups and the context-aware drop picker|powers,powers
 abup|15|DASH/EMP upgrades and power-up interaction|abup,abup
+zonehint|2|one-line caption on the first purple ring (gravity well) of |zonehint,zonehint
 econfit|1|economy fit: hours to finish back to 9-13 h|econfit,econfit
 comfort|11|eye strain pass: flash/glitch rate and alpha caps, shake cap|comfort,comfort
 classes|18|pilot classes picked before a run|classes,classes
@@ -112,4 +114,4 @@ school|14|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,sc
 schoolfull|10|every Flight School drill and lesson mini stage is a real le|schoolfull,schoolfull
 tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
 c|34|the hint bubble: wraps to two lines and stays inside the scr|-
-sw|6|Mainhattan Nightrun service worker (B30). Built by parts/bui|-
+sw|7|Mainhattan Nightrun service worker (B30). Built by parts/bui|-

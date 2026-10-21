@@ -369,6 +369,9 @@ def main():
     if TIMES:
         tj = out / ".check" / "timings.json"; tj.parent.mkdir(parents=True, exist_ok=True)
         tj.write_text(json.dumps([{"slug": a_, "check": b_, "seconds": c_} for a_, b_, c_ in TIMES], indent=1))
+    if deployed and not a.suffix:  # offline packs: games/<slug>/offline.json lists every file a game loads (the shelf's Download uses it)
+        try: subprocess.run([sys.executable, str(SCRIPTS / "offline-manifest.py")], check=False, timeout=120)
+        except Exception as e: print("offline-manifest skipped:", e)
     if deployed and not a.suffix:  # refresh games/status.json (versions, wiring); never blocks the deploy
         try: subprocess.run([sys.executable, str(SCRIPTS / "game-status.py")], check=False, timeout=120)
         except Exception as e: print("game-status skipped:", e)

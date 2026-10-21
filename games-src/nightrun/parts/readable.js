@@ -30,8 +30,9 @@ const READ=window.READ={D:'#ff2d78',CORE:'#ffffff',RING:'#07030f',SHOT:'#7fe6ff'
     ctx.save();ctx.globalCompositeOperation='lighter';for(const b of L)G_(b.x,b.y,b.r*2.6*bg,D,b.k?.3:.38);ctx.globalCompositeOperation='source-over';
     const pb=ART.have('fx-bullet-enemy')&&ART.hue('fx-bullet-enemy',15,-92);          // the painted orb, turned from lime to pink (kept as a picture)
     for(const [col,k] of hc?[['#ffffff',1.95],[this.RING,1.62],[D,1.25],[this.CORE,.68]]:[[this.RING,1.5],[D,1.18],[this.CORE,.64]]){
-      ctx.fillStyle=col;ctx.beginPath();for(const b of L){if(b.k)continue;const r=b.r*k*bg;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();
-      if(pb&&col===D){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.45;for(const b of L){if(b.k)continue;const w=b.r*2.6*bg;ctx.drawImage(pb.c,b.x-w/2,b.y-w/2,w,w*pb.h/pb.w);}ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}}
+      const ba=RET.bulletart&&pb;   // bulletart: the painted orb is THE orb (full strength, bigger), not a 45 % wash over a flat disc (bulletart.js)
+      if(!(ba&&col===D)){ctx.fillStyle=col;ctx.beginPath();for(const b of L){if(b.k)continue;const r=b.r*k*bg;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();}
+      if(pb&&col===D){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=ba?1:.45;for(const b of L){if(b.k)continue;const w=b.r*(ba?3.4:2.6)*bg;ctx.drawImage(pb.c,b.x-w/2,b.y-w/2,w,w*pb.h/pb.w);}ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}}
     for(const b of L){if(b.k||!(b.hm>0))continue;if(ART.have('fx-orb-homing')){const o=ART.bm['fx-orb-homing'],w=b.r*3.6;this.ring(b.x,b.y,w*.42,2);ctx.globalCompositeOperation='lighter';ctx.drawImage(o,b.x-w/2,b.y-w/2,w,w);ctx.globalCompositeOperation='source-over';continue;}
       this.ring(b.x,b.y,b.r+5.2,2.4);ctx.strokeStyle='#ffffff';ctx.lineWidth=1.6;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(b.x,b.y,b.r+3.5,0,7);ctx.stroke();ctx.globalAlpha=1;}
     for(const b of L){if(!b.k)continue;const a=Math.atan2(b.vy,b.vx),ca=Math.cos(a),sa=Math.sin(a),r=b.r*bg;if(b.k==='r')AH.pic('fx-eb-rocket-trail',b.r*9,b.x-ca*b.r*4.5,b.y-sa*b.r*4.5,a,.8);
