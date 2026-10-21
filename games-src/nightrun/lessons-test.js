@@ -15,7 +15,9 @@ const out = [], ok = (name, pass, info) => { out.push(!!pass); console.log((pass
 const VPS = [[390, 763], [375, 553]].filter(v => !process.env.VP || process.env.VP === v[0] + 'x' + v[1]);
 const NOFAIL = ['m-fly', 's-fly'];   // fly-only phases: nothing to get wrong
 const INIT = () => { try { if (!sessionStorage.getItem('ls0')) { localStorage.clear(); localStorage.setItem('mnr_tut', '1'); localStorage.setItem('mnr_best', JSON.stringify({ score: 4321, dist: 'TEST' })); sessionStorage.setItem('ls0', 1); } } catch (e) { } };
-const snap = p => p.evaluate(() => { const o = []; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k !== 'mnr_lessons') o.push([k, localStorage.getItem(k)]); } o.sort(); return JSON.stringify({ o, bank: window.__mnr.GA.bank }); });
+// saves.js's own autosave / backup keys copy every mnr_ key (mnr_lessons too), so they change when a lesson is marked; they are not game saves or stats
+const SAVES_OWN = /^mnr_(bak|bakinfo|probe|svinfo|svauto0?|svbk[1-3]|svpre)$/;
+const snap = p => p.evaluate(src => { const own = new RegExp(src), o = []; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k !== 'mnr_lessons' && !own.test(k)) o.push([k, localStorage.getItem(k)]); } o.sort(); return JSON.stringify({ o, bank: window.__mnr.GA.bank }); }, SAVES_OWN.source);
 const look = p => p.evaluate(() => { const bad = [], vw = innerWidth, vh = innerHeight, C = document.getElementById('lsC'); if (!C || C.hidden) return bad;
   const ln = document.getElementById('lsLine'); if (ln && ln.textContent.length > 60) bad.push('long line ' + ln.textContent.length);
   for (const el of C.querySelectorAll('*')) { if (!el.getClientRects().length) continue; const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
