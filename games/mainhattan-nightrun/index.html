@@ -11335,7 +11335,7 @@ NR.on('beat',()=>{if(!RET.fleet||!running||G.dead)return;const d=diff();for(cons
                novelty clock (twists, epochs) never trails the wave count. No three consecutive waves share a pattern set. ---------- */
 if(RET.endramp===undefined)RET.endramp=!/[?&]endramp=0/.test(location.search);
 const ENDR=window.ENDR={KEYS:['easy','normal','hard','vhard','legend'],L:{easy:42,normal:30,hard:14,vhard:7,legend:0},X:30,P:2,KL:.55,HK:0,CE:{d:.22,fr:.15,dn:.15,bs:.06,el:.15},
-  o:{cap:4,diff:1,tier:1,sig:1,pool:1,rules:1,nov:1},w:0,real:'normal',eff:'',bi:0,act:false,firing:0,sig:null,sets:[],sigs:[],stat:{waves:0,sig:0,keys:[]},
+  o:{cap:4,diff:1,tier:1,sig:1,pool:1,rules:1,nov:1,pac:1},w:0,real:'normal',eff:'',bi:0,act:false,firing:0,sig:null,sets:[],sigs:[],stat:{waves:0,sig:0,keys:[]},
   on(){return!!RET.endramp&&this.act&&running&&!ST.on&&!G.tut&&!G.lab&&!G.daily&&!G.weekly;},
   /* pure: the knobs and key for a base key at wave w */
   at(key,w){const B=DIFFS[key]||DIFFS.normal,Lg=DIFFS.legend,L=this.L[key]==null?28:this.L[key],k=L<=0?1:Math.pow(clamp((w-1)/L,0,1),this.P),e=clamp((w-L-1)/this.X,0,1),o={};
@@ -11346,8 +11346,9 @@ const ENDR=window.ENDR={KEYS:['easy','normal','hard','vhard','legend'],L:{easy:4
     const i0=this.KEYS.indexOf(key),ti=i0+clamp((k-this.KL)/(1-this.KL),0,1)*(4-i0);   // the key (hard-only systems: walls, strikes, boss tier) lags the knobs: it steps up over the last 45% of the climb
     return{k,e,key:this.KEYS[Math.min(this.o.cap,i0>this.o.cap?i0:4,Math.floor(ti+1e-9))],knobs:o};},
   tier(w){return Math.min(2.2,.1+.08*w);},                   // the formation tier floor: rarer patterns unlock by wave (DIR.tierv never goes below it)
-  apply(){const r=this.at(this.real,this.w);if(this.o.diff){DF=r.knobs;SET.diff=r.key;HARD=HARDS.includes(r.key);}else r.key=this.real;this.eff=r.key;return r;},
-  restore(){if(!this.eff)return;SET.diff=this.real;DF=DIFFS[this.real]||DIFFS.normal;HARD=HARDS.includes(this.real);this.eff='';},
+  apply(){if(this.o.pac&&window.PAC){if(this.hold0==null)this.hold0=PAC.hold;PAC.hold=0;}   // pacing's stay-and-fight is a story-stage relief; in endless the held flyers stalled boss fights for 3000+ s (the oracle never got past wave 7-24)
+    const r=this.at(this.real,this.w);if(this.o.diff){DF=r.knobs;SET.diff=r.key;HARD=HARDS.includes(r.key);}else r.key=this.real;this.eff=r.key;return r;},
+  restore(){if(this.hold0!=null&&window.PAC){PAC.hold=this.hold0;this.hold0=null;}if(!this.eff)return;SET.diff=this.real;DF=DIFFS[this.real]||DIFFS.normal;HARD=HARDS.includes(this.real);this.eff='';},
   nextWave(){if(this.eff&&SET.diff!==this.eff&&DIFFS[SET.diff])this.real=SET.diff;                      // the player changed it in the pause menu: that is the new start
     this.w++;this.bi=0;this.stat.waves=this.w;this.sets[this.w]=new Set();const r=this.apply();if(this.stat.keys[this.stat.keys.length-1]!==r.key)this.stat.keys.push(r.key);
     if(this.o.nov&&window.NOV&&NOV.T<this.w*50)NOV.T=this.w*50;
