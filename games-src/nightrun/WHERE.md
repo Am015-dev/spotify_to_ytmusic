@@ -20,6 +20,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | pw2 | powerups PW2 15-107 |  |  | ret-pw2 |  |
 | flow | flow NRF.sync 27-44 |  |  | ret-flow |  |
 | musicpack | musicpack mpBand 62-62 |  |  | musicpack |  |
+| story | storydata STORY_LINES 29-240 |  |  | story |  |
 | tale | tale TALE_BEATS 21-203 |  |  | tale |  |
 | stats | stats open 171-208 |  |  | stats | POLISH |
 | feedback | feedback copy 29-51 |  |  | feedback |  |
@@ -52,13 +53,14 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | pacing | pacing PAC 15-65 |  |  | pacing |  |
 | bite | bite BITE 13-19 |  |  |  |  |
 | flankers | flankers ebRoom 67-73 |  |  | flankers |  |
-| fleet | fleet FLEET 21-215 |  |  | fleet |  |
+| fleet,fleetArr! | fleet FLEET 21-221 |  |  | fleet |  |
 | endramp | endramp ENDR 15-55 |  |  | endramp |  |
 | deck,roster,songspread | fun FUN 14-77 | footen |  | fun |  |
 | lessons | lessons lsTick 156-178 |  |  | lessons |  |
+| story | saga |  |  | story |  |
 | cp | cp chkBox 72-91 | shop,g |  | ret-cp |  |
 | fs | fs save 16-19 |  |  | fs |  |
-| read | readable READ 16-65 | fxwave |  | readable |  |
+| read | readable READ 16-66 | fxwave |  | readable |  |
 | powers | arsenal PWX.tip 90-157 | footen |  | powers | ASSETS-NEEDED-3 |
 | abup | abup ABUP 23-77 |  |  | abup | ASSETS-NEEDED-3 |
 | econfit | econfit ECF.apply 11-12 |  |  |  |  |

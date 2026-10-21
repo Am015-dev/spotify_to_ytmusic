@@ -26,10 +26,11 @@ ai|11|smarter enemies (the answer to "too easy with all the perks"|-
 meta|11|meta game: LOADOUT (equip / unequip / sell perks, limited sl|-
 ret|53|retention flags: arcade, daily, heat, grade, assist...|sprites,title,type+
 fxwave|6|EFFECTS ASSET WAVE 8 (owner, 18 Oct 2026). Pictures for shot|-
+arthooks|9|literal id table for fx/fg/wpmount/wp/rule/rx/ui pictures pl|-
 flavor|25|run-and-gun flavour for the shooter|flavor,flavor
 footart|19|ON-FOOT ART: window.FA (the street stage's pictures). Inert |-
 footen|29|on-foot street stage enemies + boss library (W3). Pure data |-
-foot|60|on-foot street stage engine|foot,foot
+foot|61|on-foot street stage engine|foot,foot
 footstage|23|the finished on-foot stage (7 sections, Warden gate)|footstage,footstage
 leak|14|ground enemies, calmer pacing, escape penalty|leak,leak
 zoo|26|time to kill + eight new enemy kinds|zoo,zoo
@@ -41,6 +42,7 @@ scale|3|power-aware enemy scale, round 1|scale,scale
 powerups|12|six music-tied timed power-ups + drum burst|pw2,pw2
 flow|6|the song never stops or stutters|flow,flow
 musicpack|15|polish music cues played by context|musicpack,musicpack
+storydata|20|every line of the campaign story (data only; saga.js plays i|story,story
 tale|21|story cast, beats, dialogue card, STORY LOG|tale,tale
 stats|20|counters, achievements, completion %|stats,stats
 feedback|5|FUN / SAME AGAIN / BORING tap at run end|feedback,feedback
@@ -79,12 +81,13 @@ holdline|3|hold the line: letting enemies pass costs|holdline,holdline
 pacing|6|shorter stages, fewer enemies, enemies that stay|pacing,pacing
 bite|3|Normal bites again on top of the short stages|bite,bite
 flankers|8|flanker enemies that punish a parked ship (default OFF)|flankers,flankers
-fleet|22|enemy warships in the fly stages|fleet,fleet
+fleet|23|enemy warships in the fly stages|fleet,fleet
 endramp|8|endless mode climbs in difficulty|endramp,endramp
 h|5|H: no AFK wins, a dying ship slows the song|-
 fun|15|set pieces, deck replaces the fixed metronome, rosters|deck,deck,roster+
 tut|16|TUT: FLIGHT SCHOOL, a playable tutorial stage (about 3 minut|-
 lessons|27|short tactics lessons the first time a feature appears|lessons,lessons
+saga|23|campaign story: opening, briefings, comms, chapter ends, STO|story,story
 title|6|title diet + CONTINUE, 14 px type floor|title,title,type+
 cp|10|checkpoints with grace on long stages|cp,cp
 fs|5|phone full screen on first tap|fs,fs

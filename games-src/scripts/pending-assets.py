@@ -405,5 +405,21 @@ w('\n## Hooks that draw a flat shape for a missing id\n')
 w('Picture ids named by `ART.pic / ART.sp / ART.img / FXW.pic` literals in `parts/*.js` and absent from `media/ready.json` (%d). Every one is a row in the table above; `pending-test.js` fails if a hook id is missing from it.\n' % len(hook_missing))
 for i in hook_missing: w('- `%s` (%s) in %s' % (i, E[i]['status'], ', '.join(hooks[i])))
 w('\nDynamic names (cannot be checked one by one, the ids they build are in the table through the manifest): ' + ', '.join("`%s`+" % p for p in sorted(dyn)))
-open(OUT, 'w').write('\n'.join(o) + '\n')
+# guard.py rejects non-media files over 400 KB: keep the main report under ~380 KB, the P2 and P3 rows go to sibling files (same columns)
+body = '\n'.join(o) + '\n'
+if len(body.encode()) > 380000:
+    hdr = [i for i, l in enumerate(o) if l.startswith('| id | kind')][0]
+    rows_i = [i for i, l in enumerate(o) if i > hdr + 1 and l.startswith('| `')]
+    rowpri = lambda l: l.split(' | ')[5].strip() if l.count(' | ') >= 6 else ''
+    keep = set(rows_i); parts_ = {'P2': [], 'P3': []}
+    for i in rows_i:
+        pr = rowpri(o[i])
+        if pr in parts_: parts_[pr].append(o[i]); keep.discard(i)
+    main = [l for i, l in enumerate(o) if i not in (set(rows_i) - keep)]
+    for pr, prow in parts_.items():
+        fn2 = OUT.replace('.md', '-' + pr + '.md')
+        open(fn2, 'w').write('# Nightrun pending assets, priority %s rows (continues %s)\n\n' % (pr, os.path.basename(OUT)) + o[hdr] + '\n' + o[hdr + 1] + '\n' + '\n'.join(prow) + '\n')
+    main.insert(hdr + 2, '_P2 rows: %s, P3 rows: %s (same columns, split so each file stays under the repo size limit)._\n' % (os.path.basename(OUT).replace('.md', '-P2.md'), os.path.basename(OUT).replace('.md', '-P3.md')))
+    body = '\n'.join(main) + '\n'
+open(OUT, 'w').write(body)
 print('wrote %s: %d pending (%d to paint, %d ingest/wire, %d superseded?), %d delivered/covered' % (os.path.relpath(OUT, ROOT), tot, cnt(lambda e: e['status'] == 'not delivered'), cnt(lambda e: e['status'] == 'delivered-unwired'), len(sup), len(delivered)))

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// TALE (parts/tale.js): cast, story beats, dialogue card, STORY LOG timeline. Headless, no screenshots. Prints PASS/FAIL lines only.
+// TALE (parts/tale.js): cast, story beats, dialogue card, STORY LOG timeline. Runs with ?story=0 (saga.js replaces the tale when RET.story is on). Headless, no screenshots. Prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/tale-test.js     env: GAME_DIR=...
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
@@ -20,7 +20,7 @@ const AUDIT = root => { const R = document.querySelector(root); if (!R) return {
   await sleep(700);
   const br = await PW.chromium.launch(), errs = [];
   const open = async (w, h, q = '', opt = {}) => { const ctx = opt.ctx || await br.newContext({ viewport: { width: w, height: h }, hasTouch: true, isMobile: w < 800, reducedMotion: opt.rm ? 'reduce' : 'no-preference' });
-    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1${q}`, { waitUntil: 'domcontentloaded' });
+    const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message)); await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&story=0${q}`, { waitUntil: 'domcontentloaded' });
     await p.waitForFunction(() => window.__mnr && document.getElementById('moreBtn') || /tale=0/.test(location.search), null, { timeout: 10000 }); await sleep(250); p.ctx = ctx; return p; };
   const vis = (p, sel) => p.evaluate(s => { const e = document.querySelector(s); if (!e) return false; for (let x = e; x && x !== document.body; x = x.parentElement) if (x.hidden || getComputedStyle(x).display === 'none') return false; return true; }, sel);
   try {
