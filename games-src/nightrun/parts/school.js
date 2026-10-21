@@ -86,7 +86,10 @@ function schDraw(){nn.innerHTML=neonI+' '+GA.bank;body.innerHTML='';const R=rows
   door('LAB','#labBtn','schLab');door('STAGE PRACTICE','#storyBtn','schPrac');door('LESSONS','#lsBtn','schLessons');body.append(mo);
   const kk=document.querySelector('#mnMore .keys');if(kk){const c=kk.cloneNode(true);c.removeAttribute('id');for(const x of c.querySelectorAll('[id]'))x.removeAttribute('id');body.append(c);}}
 function open(){if(running||TUT.on)return;for(const x of T.querySelectorAll('.hubScr'))x.hidden=x!==el;T.hidden=false;el.hidden=false;SCH.onList=true;schDraw();const f=$('schNext');if(f)f.focus();}
-function shut(){el.hidden=true;SCH.onList=false;const t=$('hub_training');if(t&&t.focus)t.focus();if(RET.hubDraw)RET.hubDraw();}
+function live_(){return !!(SCH.foot||(TUT.on&&TUT.D)||(typeof LS!=='undefined'&&LS.m));}
+function stopDrill(){if(SCH.foot)footEnd(false,1);if(TUT.on&&TUT.D){SCH.noList=1;try{tutSkip();}catch(e){}SCH.noList=0;}   // leaving a drill (LIST, back, another drill, shut) fully stops it: no card, no list
+  if(typeof LS!=='undefined'&&LS.m){LS.done=null;try{lsEnd(false);}catch(e){}}tutC.hidden=true;}
+function shut(){stopDrill();el.hidden=true;SCH.onList=false;const t=$('hub_training');if(t&&t.focus)t.focus();if(RET.hubDraw)RET.hubDraw();}
 bk.addEventListener('click',shut);
 addEventListener('keydown',e=>{if(SCH.onList&&e.code==='Escape'&&!T.hidden&&$('setm').hidden&&lsC.hidden&&tutC.hidden){shut();e.stopImmediatePropagation();e.preventDefault();}},true);
 $('hubGrid').addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#hub_training')){e.stopPropagation();e.preventDefault();open();}},true);   // TRAINING = this list, one tap
@@ -98,18 +101,19 @@ function card(d,pass,why){const nx=nextD();SCH.res={id:d.id,pass};
   const btns=[];if(pass&&nx&&nx!==d)btns.push(['schCardNext','NEXT DRILL','',()=>{tutC.hidden=true;run(nx);}]);
   btns.push(['schCardAgain',pass?'AGAIN':'TRY AGAIN',pass?'dim':'',()=>{tutC.hidden=true;run(d);}],['schCardList','LIST','dim',()=>{tutC.hidden=true;open();}]);
   tutCard('<b>'+(pass?'DRILL CLEAR':'NOT YET')+'</b><span>'+d.n+'</span><span>'+(why||(pass?'':'Try again, or skip ahead'))+'</span>',btns);}
-function run(d){if(!d||running||TUT.on)return;SCH.cur=d;SCH.res=null;el.hidden=true;SCH.onList=false;tutC.hidden=true;const ls=lsId(d);
+function run(d){if(!d)return;if(live_())stopDrill();if(running||TUT.on)return;SCH.cur=d;SCH.res=null;el.hidden=true;SCH.onList=false;tutC.hidden=true;const ls=lsId(d);
   if(ls){lsShow(ls,()=>{if(T.hidden)return;open();});return;}
   if(d.k==='foot'){return runFoot(d);}
-  const s=d.k();if(!s)return;TUT.D=[s];SCH.t0=performance.now();startTut();tutB.classList.add('drl');}
+  let s=d.k();if(!s)return;if(SCH.wrap)s=SCH.wrap(s,d);TUT.D=[s];SCH.t0=performance.now();startTut();tutB.classList.add('drl');}
 function runFoot(d){const bank=GA.bank,rt=RET.tale;RET.tale=false;let ok=false;window.__schFoot=true;try{ok=FOOT.start('street1');}catch(e){}RET.tale=rt;
-  if(!ok){window.__schFoot=false;open();return;}SCH.foot={d,bank,kills:0,t0:performance.now(),end:0};T.hidden=true;}
-function footEnd(pass){const f=SCH.foot;if(!f||f.end)return;f.end=1;if(FOOT.S)FOOT.S.hintT=0;try{FOOT.stop();}catch(e){}
-  GA.bank=f.bank;gsave();SCH.foot=null;window.__schFoot=false;T.hidden=false;mark(f.d,pass,(performance.now()-f.t0)/1000);card(f.d,pass,pass?'Run, shoot, repeat':'Down: nothing is lost in practice');}
-NR.on('footKill',()=>{const f=SCH.foot;if(f&&!f.end&&++f.kills>=3)setTimeout(()=>footEnd(true),400);});
-NR.on('footEnd',()=>{const f=SCH.foot;if(f&&!f.end)setTimeout(()=>footEnd(false),0);});
+  if(!ok){window.__schFoot=false;open();return;}SCH.foot={d,bank,kills:0,t0:performance.now(),end:0};if(SCH.sf)SCH.sf.footStart(SCH.foot);T.hidden=true;}
+function footEnd(pass,quiet){const f=SCH.foot;if(!f||f.end)return;f.end=1;if(FOOT.S)FOOT.S.hintT=0;try{FOOT.stop();}catch(e){}
+  GA.bank=f.bank;gsave();SCH.foot=null;window.__schFoot=false;if(quiet){T.hidden=false;return;}T.hidden=false;mark(f.d,pass,f.F&&f.F.t?f.F.t:(performance.now()-f.t0)/1000);card(f.d,pass,pass?(f.F&&f.F.t?Math.round(f.F.t)+' s · 3/3 rounds':'Run, shoot, repeat'):'Down: nothing is lost in practice');}
+SCH.footEndNow=footEnd;SCH.was=id=>{const d=DR.find(x=>x.id===id||lsId(x)===id);return !!d&&done(d);};
+NR.on('footKill',()=>{const f=SCH.foot;if(f&&!f.end&&f.F&&SCH.sf){SCH.sf.footKill(f,footEnd);return;}if(f&&!f.end&&++f.kills>=3)setTimeout(()=>footEnd(true),400);});
+NR.on('footEnd',e=>{const f=SCH.foot;if(f&&!f.end&&!(e&&e.quit)&&SCH.sf&&SCH.sf.footDown(f))return;if(f&&!f.end&&!(f.F&&f.F.restart))setTimeout(()=>footEnd(false),0);});
 {const f0=tutFinish;tutFinish=function(){if(!TUT.D)return f0.apply(this,arguments);const d=SCH.cur,l=TUT.log[TUT.log.length-1],pass=!!(l&&l.ok);
-  TUT.ending=true;SCH.noList=1;if(running)quitToTitle();tutRestore();SCH.noList=0;T.hidden=false;mark(d,pass,l&&l.t);card(d,pass,pass?'':"Time's up");};}
+  TUT.ending=true;SCH.noList=1;if(running)quitToTitle();tutRestore();SCH.noList=0;T.hidden=false;mark(d,pass,l&&l.t);card(d,pass,pass?(SCH.wrap&&l&&l.t>0?Math.round(l.t)+' s · 3/3 rounds':''):"Time's up");};}
 {const r0=tutRestore;tutRestore=function(){const was=TUT.on&&TUT.D;r0.apply(this,arguments);if(was){tutB.classList.remove('drl');TUT.D=null;if(!SCH.noList&&!SCH.again)setTimeout(()=>{if(!running&&!TUT.on)open();},60);}};}
 {const b=document.createElement('button');b.type='button';b.className='schRe';b.id='schRe';b.textContent='AGAIN';tutB.insertBefore(b,$('tutSkip'));
   for(const ev of['touchstart','touchend','pointerdown','mousedown'])b.addEventListener(ev,e=>e.stopPropagation(),{passive:true});

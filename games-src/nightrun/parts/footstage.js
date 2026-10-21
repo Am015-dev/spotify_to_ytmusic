@@ -217,5 +217,5 @@ const D={
   relay(c,pose,x,y,h,flip,t,col){c.save();dead(c,pose,t);c.fillStyle=col==='#ffffff'?col:'#3a4a6a';c.fillRect(x-12,y-h+20,24,h-20);c.fillStyle='#7df9ff';c.fillRect(x-17,y-8,34,8);
     c.globalAlpha*=.6+.4*Math.sin(t*8);c.beginPath();c.arc(x,y-h+12,12,0,6.283);c.fill();c.restore();},
   warden2(c,pose,x,y,h,flip,t,col){const fa=window.FA;if(fa&&typeof fa.draw==='function'){fa.draw(c,'warden',pose,x,y,h,flip,t);return;}c.fillStyle=col;c.fillRect(x-h*.35,y-h,h*.7,h);}};
-F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{if(who!=='warden2'&&sheet(c,who,pose,x,y,h,flip,t))return;D[who](c,pose,x,y,h,flip,t,col);};
+F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{if(RET.footq&&RET.sprites&&F.q&&who!=='warden2'&&(ART.FM[who]||who==='relay')){F.q.draw(c,who,pose,x,y,h,flip,t);return;}if(who!=='warden2'&&sheet(c,who,pose,x,y,h,flip,t))return;D[who](c,pose,x,y,h,flip,t,col);};
 })();
