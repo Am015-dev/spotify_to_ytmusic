@@ -21,3 +21,17 @@ Hand-in steps are the same as in `ASSETS-NEEDED-2.md`: save under the exact id i
 | `pk-zone` | 64x64 | white | 3 | A | PW.coin, NEON ZONE (utility) | A magenta target ring, double circle. |
 | `pk-decoy` | 64x64 | white | 3 | A | PW.coin, DECOY DRONE (utility) | A lime-green dart drone silhouette. |
 | `pk-glass` | 64x64 | white | 3 | A | PW.coin, GLASS CANNON (risky) | A pink cracked crystal diamond. |
+
+## Pilot classes (parts/classes.js, Garage tab PILOT)
+
+5 class portraits-as-icons and 30 skill-node icons. Until a picture exists the PILOT tab draws a code shape (`clsSvg`: triangle, ring, bar, diamond, dot).
+**Wiring:** `N` = not wired yet: `CLSUI.draw` would swap `clsSvg(...)` for `ART.sp('<id>')` once the picture is in `media/ready.json`. Same hand-in steps and background as above.
+
+| id | size | bg | prio | wired | where | picture |
+|---|---|---|---|---|---|---|
+| `cls-gunner` | 64x64 | white | 2 | N | PILOT card GUNNER | An orange heavy cannon ship nose, three muzzle flashes. |
+| `cls-ghost` | 64x64 | white | 2 | N | PILOT card GHOST | A pale cyan ship outline fading into a motion trail. |
+| `cls-warden` | 64x64 | white | 2 | N | PILOT card WARDEN | A teal ship behind a tall curved shield plate. |
+| `cls-tinker` | 64x64 | white | 2 | N | PILOT card TINKER | A yellow ship with a wrench arm and floating gears. |
+| `cls-gambler` | 64x64 | white | 2 | N | PILOT card GAMBLER | A magenta ship over two neon dice. |
+| `node-<node id>` | 48x48 | white | 3 | N | PILOT skill tree, 30 nodes: g1-g6, h1-h6, w1-w6, t1-t6, b1-b6 | One simple glyph in the class colour per node (name in `classes.js` `T`). |
