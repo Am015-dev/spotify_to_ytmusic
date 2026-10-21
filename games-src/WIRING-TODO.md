@@ -7,18 +7,18 @@ Wired: 1226 paintings, 73 3D models. Still to wire: 68 paintings, 75 models.
 | Game | Paintings to wire | 3D to wire |
 |---|---:|---:|
 | mainhattan-nightrun | 65 | 10 |
-| sands-of-qamar | 1 | 0 |
 | lantern-dive | 1 | 0 |
+| sands-of-qamar | 1 | 0 |
 | final-approach | 1 | 0 |
-| nebula-aces | 0 | 15 |
-| thornbound | 0 | 6 |
-| rampart-and-vine | 0 | 13 |
 | hollowbough | 0 | 7 |
-| shipwreck-isle | 0 | 1 |
-| doorkick-dungeon | 0 | 9 |
-| sunglaze | 0 | 10 |
 | crown-city-smash | 0 | 1 |
+| nebula-aces | 0 | 15 |
+| rampart-and-vine | 0 | 13 |
+| thornbound | 0 | 6 |
+| doorkick-dungeon | 0 | 9 |
 | short-fuse | 0 | 3 |
+| shipwreck-isle | 0 | 1 |
+| sunglaze | 0 | 10 |
 
 ## mainhattan-nightrun
 
@@ -92,14 +92,6 @@ Wired: 1226 paintings, 73 3D models. Still to wire: 68 paintings, 75 models.
 | Wave 0 prompts-strip.json | `strip-wpn-wave-beam` | (card restored 2026-10-21 from the made strip; original prompt: build_fx_strips.py) |
 | Wave 0 prompts-strip.json | `strip-wpn-well-beam` | (card restored 2026-10-21 from the made strip; original prompt: build_fx_strips.py) |
 
-## sands-of-qamar
-
-3D: none
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-| Wave 1 Wave 1 | `ui-seat-chip` | a blank cream scoreboard plaque with a thin brown wooden border and a small rope loop on each side, centre emp |
-
 ## lantern-dive
 
 3D: none
@@ -107,6 +99,14 @@ Wired: 1226 paintings, 73 3D models. Still to wire: 68 paintings, 75 models.
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
 | Wave 3 Wave 3 (9:16) | `table-tunnel-glow-phone` | a vertical deep-sea cave view in dark blue with faint light shafts from above, calm empty centre, no text |
+
+## sands-of-qamar
+
+3D: none
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+| Wave 1 Wave 1 | `ui-seat-chip` | a blank cream scoreboard plaque with a thin brown wooden border and a small rope loop on each side, centre emp |
 
 ## final-approach
 
@@ -116,51 +116,9 @@ Wired: 1226 paintings, 73 3D models. Still to wire: 68 paintings, 75 models.
 |---|---|---|
 | Wave 3 Wave 3 (16:9) | `ui-altbar` | a long narrow teal cockpit panel strip with rivets, empty, single object, centred, plain flat white background |
 
-## nebula-aces
-
-3D: na-anvil, na-beacon, na-hauler, na-herald, na-keel, na-kestrel, na-maul, na-needle, na-razor, na-rift-gate, na-rock-d, na-rock-e, na-station, na-warden, na-wreck
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## thornbound
-
-3D: banner-clans, banner-nobility, pawn-agent, pawn-knight, pawn-priest, stag-statue
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## rampart-and-vine
-
-3D: church-tower, piece-champ-axe, piece-champ-banner, piece-champ-knight, piece-hog-black, piece-hog-piglet, piece-hog-spotted, piece-mason-hammer, piece-mason-ladder, piece-mason-trowel, piece-meeple-farmer, piece-meeple-knight, piece-meeple-monk
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
 ## hollowbough
 
 3D: acorn, worker-badger, worker-hare, worker-hedgehog, worker-porcupine, worker-rabbit, worker-squirrel
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## shipwreck-isle
-
-3D: sw-ada
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## doorkick-dungeon
-
-3D: bone-pile, boss-dread, boss-inferno, boss-pharaoh, boss-skygrif, boss-tentacles, boss-wyrm, coin-pile, torch
-
-| Wave / kind | File (media/…webp) | What it is |
-|---|---|---|
-
-## sunglaze
-
-3D: tile-black-a, tile-black-b, tile-blue-a, tile-blue-b, tile-red-a, tile-red-b, tile-teal-a, tile-teal-b, tile-yellow-a, tile-yellow-b
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
@@ -172,9 +130,51 @@ Wired: 1226 paintings, 73 3D models. Still to wire: 68 paintings, 75 models.
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
 
+## nebula-aces
+
+3D: na-anvil, na-beacon, na-hauler, na-herald, na-keel, na-kestrel, na-maul, na-needle, na-razor, na-rift-gate, na-rock-d, na-rock-e, na-station, na-warden, na-wreck
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## rampart-and-vine
+
+3D: church-tower, piece-champ-axe, piece-champ-banner, piece-champ-knight, piece-hog-black, piece-hog-piglet, piece-hog-spotted, piece-mason-hammer, piece-mason-ladder, piece-mason-trowel, piece-meeple-farmer, piece-meeple-knight, piece-meeple-monk
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## thornbound
+
+3D: banner-clans, banner-nobility, pawn-agent, pawn-knight, pawn-priest, stag-statue
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## doorkick-dungeon
+
+3D: bone-pile, boss-dread, boss-inferno, boss-pharaoh, boss-skygrif, boss-tentacles, boss-wyrm, coin-pile, torch
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
 ## short-fuse
 
 3D: bomb-clockwork, bomb-dynamite, bomb-tower-clock
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## shipwreck-isle
+
+3D: sw-ada
+
+| Wave / kind | File (media/…webp) | What it is |
+|---|---|---|
+
+## sunglaze
+
+3D: tile-black-a, tile-black-b, tile-blue-a, tile-blue-b, tile-red-a, tile-red-b, tile-teal-a, tile-teal-b, tile-yellow-a, tile-yellow-b
 
 | Wave / kind | File (media/…webp) | What it is |
 |---|---|---|
