@@ -154,7 +154,7 @@ const FL=window.FL=(function(){
       let h='';if(r.tot)h+=`<div class="sr${r.resc?' ok':''} flr"><span class="sg">♥</span> RESCUED ${r.resc}/${r.tot}${r.resc&&!r.assist?' · +'+Math.min(NEON.rescCap,NEON.resc*r.resc)+' Neon':''}</div>`;
       h+='<div class="flm">'+r.list.map(([id,ok])=>{const m=MEDALS.find(q=>q[0]===id);
         return `<span class="flb${ok?' on':''}" style="--c:${m[3]}" data-id="${id}"><i>${art(id)?'<img alt="" src="'+ART.base+'fl-medal-'+id+'.webp">':m[2]}</i>${m[1]}</span>`;}).join('')+'</div>';
-      if(r.bonus>0)h+=`<div class="sr ok flr"><span class="sg">◆</span> +${r.bonus} Neon · medals</div>`;
+      if(r.bonus>0)h+=`<div class="sr ok flr"><span class="sg">${neonI}</span> +${window.fmtN(r.bonus)} Neon · medals</div>`;
       return h;},
     /* ---- drawing (code-drawn placeholders; the painted files fl-*.webp replace them) ---- */
     back(t){if(!RET.flavor||!running||!G||!G.live)return;

@@ -118,7 +118,7 @@ if(ABUP.on){
       c.innerHTML=pic+`<div class="tx"><div class="n">${u.n}</div><div class="t">${u.t}</div></div><div class="pr">${own?'OWNED':neonI+' '+u.p}</div>`;
       c.addEventListener('click',()=>{if(own){gaMsg(u.n+' is yours');return;}if(GA.bank<u.p){c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake');gaMsg('Need '+(u.p-GA.bank)+' more Neon');return;}
         if(ABUP.buy(u.id)){AU.sfx('up');gaMsg(u.n+' unlocked');gaDraw();}});box.appendChild(c);}
-    try{$('gaBtn').innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+GA.bank;}catch(e){}};}
+    try{$('gaBtn').innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+window.fmtN(GA.bank);}catch(e){}};}
 }
 ABUP.T={get GA(){return GA;},gsave:()=>gsave(),open:f=>openGarage(f),close:()=>closeGarage(),emit:(n,d)=>NR.emit(n,d)};   // test handle
 window.__abup=ABUP;

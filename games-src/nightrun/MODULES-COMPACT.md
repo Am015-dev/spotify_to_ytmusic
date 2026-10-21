@@ -69,6 +69,7 @@ abilities|13|DASH charges and EMP as abilities (beat bonus, refund)|abil,abil
 forge|21|weapon forge: combine, sockets, presets (data, actions)|forge,forge
 inventory|14|inventory + loadout screen (Garage FORGE tab)|forge,forge
 forgeui|25|forge screen, step by step|forgeui,forgeui
+forgeone|28|one-screen phone forge: bench + ship slot bar + swipe strip,|forge2,forge2
 counter|12|threats that make DASH and EMP the answer|counter,counter
 timing|12|DASH/EMP as beat-and-window decisions|timing,timing
 visible|3|enemies live long enough to be seen and fought|vis,vis
@@ -103,6 +104,6 @@ classes|18|pilot classes picked before a run|classes,classes
 saves|14|explicit, safe saving and save slots|saves,saves
 stamp|5|build stamp and update check|stamp,stamp
 polish|12|a calm, readable playfield: one telegraph style, ship on top|polish,polish
-hub|20|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
+hub|34|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
 c|34|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|6|Mainhattan Nightrun service worker (B30). Built by parts/bui|-
