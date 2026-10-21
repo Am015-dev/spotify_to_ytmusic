@@ -1,3 +1,6 @@
+// PURPOSE: formation library (VARIETY A)
+// FLAG: vary (?vary=0), vary2 (?vary2=0)
+// TEST: vary-test.js
 /* ---------- formations.js: the formation library (VARIETY A, owner 18 Oct 2026: "Game is extremely repetitive"). Flag RET.vary; ?vary=0 = the old waves exactly.
    A formation is a SPATIAL idea, not a recolour of one row: pincers from top and bottom, an X that converges, a snake on a path, a spiral, a wall whose gap moves...
    Every entry declares
@@ -53,7 +56,7 @@ const FM=window.FM={GAP:130,L:{},TEL:[],cur:null,
   unwarn(w){const i=WARN.indexOf(w);if(i>=0)WARN.splice(i,1);},
   edge(e,side){const r=G.rings[G.rings.length-1];if(r&&r.x===W-14){r.x=clamp(e.x,30,W-30);r.y=side<0?14:H-14;}},   // move en()'s entry ring to the edge it really comes in from
   draw(t){if(!RET.vary||!this.TEL.length)return;ctx.save();
-    for(const o of this.TEL){const k=clamp((G.t-o.t0)/Math.max(.2,o.T||.5),0,1),bl=SET.reduce?1:(Math.floor(t*12)%2?.65:1);ctx.globalAlpha=(.35+.5*k)*bl;ctx.strokeStyle=o.c||'#ff7080';ctx.lineWidth=2;ctx.setLineDash([10,8]);
+    for(const o of this.TEL){const k=clamp((G.t-o.t0)/Math.max(.2,o.T||.5),0,1),bl=SET.reduce?1:(BK(t,12)?.65:1);ctx.globalAlpha=(.35+.5*k)*bl;ctx.strokeStyle=o.c||'#ff7080';ctx.lineWidth=2;ctx.setLineDash([10,8]);
       if(o.k==='lane'){ctx.beginPath();ctx.moveTo(W*.35,o.y);ctx.lineTo(W-6,o.y);ctx.stroke();}
       else if(o.k==='col'){ctx.beginPath();ctx.moveTo(o.x,8);ctx.lineTo(o.x,o.gc-o.g/2);ctx.moveTo(o.x,o.gc+o.g/2);ctx.lineTo(o.x,H-8);ctx.stroke();
         ctx.setLineDash([]);ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(o.x-8,o.gc-o.g/2);ctx.lineTo(o.x+8,o.gc-o.g/2);ctx.moveTo(o.x-8,o.gc+o.g/2);ctx.lineTo(o.x+8,o.gc+o.g/2);ctx.stroke();}

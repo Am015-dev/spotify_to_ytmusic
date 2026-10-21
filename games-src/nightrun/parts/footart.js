@@ -27,7 +27,7 @@ const shade=(hex,f)=>{const n=parseInt(hex.slice(1),16);return 'rgb('+Math.min(2
 const lp=(x,y,th,l)=>[x+l*Math.sin(th),y+l*Math.cos(th)];   // angles are measured from straight down, positive = forward (+x)
 const limb=(ctx,pts,w,col)=>{ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.stroke();};
 const dot=(ctx,x,y,r,col)=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,r,0,6.2832);ctx.fill();};
-const flash=(ctx,x,y,t,r)=>{const big=Math.floor(t*18)%2===0,R=r*(big?1:.6);ctx.fillStyle='#ff9a2d';ctx.beginPath();for(let i=0;i<16;i++){const a=i*.3927,q=i%2?R*.4:R;ctx.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q);}ctx.closePath();ctx.fill();dot(ctx,x,y,R*.4,'#fff6a0');};
+const flash=(ctx,x,y,t,r)=>{const big=BK(t,18)===0,R=r*(big?1:.6);ctx.fillStyle='#ff9a2d';ctx.beginPath();for(let i=0;i<16;i++){const a=i*.3927,q=i%2?R*.4:R;ctx.lineTo(x+Math.cos(a)*q,y+Math.sin(a)*q);}ctx.closePath();ctx.fill();dot(ctx,x,y,R*.4,'#fff6a0');};
 let SHD=null;
 const shadow=(ctx,wd,a)=>{if(a<=.02)return;if(!SHD){const c=document.createElement('canvas');c.width=64;c.height=16;const g=c.getContext('2d'),r=g.createRadialGradient(32,8,0,32,8,32);r.addColorStop(0,'rgba(0,0,0,.85)');r.addColorStop(.6,'rgba(0,0,0,.4)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.translate(0,8);g.scale(1,.25);g.translate(0,-32);g.fillRect(0,0,64,64);SHD=c;}
   const o=ctx.globalAlpha;ctx.globalAlpha=o*.55*a;ctx.drawImage(SHD,-wd*.6,-wd*.09,wd*1.2,wd*.18);ctx.globalAlpha=o;};   // same soft ellipse as the ground bosses' road shadow (UIK.bossShadow), flat on the street line
@@ -90,7 +90,7 @@ function mac(ctx,id,pose,t,S,u){
     ctx.fillStyle=K(m.c);ctx.beginPath();ctx.ellipse(0,cy,.3,.12,0,0,6.3);ctx.fill();ctx.fillStyle=K(shade(m.c,1.25));ctx.beginPath();ctx.ellipse(0,cy-.07,.17,.1,0,3.14,6.3);ctx.fill();
     dot(ctx,.1,cy,.045,K(sho?'#fff':'#ff2040'));for(const x of[-.18,.18]){ctx.fillStyle='rgba(220,255,255,'+(.4+.3*Math.sin(t*60+x*9))+')';ctx.beginPath();ctx.ellipse(x,cy-.17,.17,.02,0,0,6.3);ctx.fill();limb(ctx,[[x,cy-.1],[x,cy-.17]],.02,K(m.d));}
     limb(ctx,[[.1,cy+.1],[.28,cy+.1]],.04,K('#222'));if(sho)flash(ctx,.32,cy+.1,t,.09);if(S>40)label(ctx,m.k,-.03,cy,S,'#06060e');}
-  else if(id==='turret'){const rec=sho?-.03*(Math.floor(t*18)%2):0;
+  else if(id==='turret'){const rec=sho?-.03*(BK(t,18)):0;
     ctx.fillStyle=K(m.d);ctx.beginPath();ctx.moveTo(-.28,0);ctx.lineTo(.28,0);ctx.lineTo(.2,-.17);ctx.lineTo(-.2,-.17);ctx.fill();dot(ctx,0,-.2,.17,K(m.c));ctx.fillStyle=K(m.c);ctx.fillRect(-.17,-.2,.34,.03);
     const bx=Math.cos(-.2),by=Math.sin(-.2);limb(ctx,[[.05,-.23],[.05+(.42+rec)*bx,-.23+(.42+rec)*by]],.07,K('#222'));if(sho)flash(ctx,.05+.47*bx,-.23+.47*by,t,.1);if(S>40)label(ctx,m.k,-.05,-.08,S,fl?'#999':'#f2e6ff');}
   else{const sw=Math.sin(t*3)*.01;
@@ -103,7 +103,7 @@ function mac(ctx,id,pose,t,S,u){
 FA.draw=(ctx,who,pose,x,y,h,flip,t)=>{
   if(WHO.indexOf(who)<0)who='grunt';t=t||0;
   if(typeof ART!=='undefined'&&ART.footDraw&&ART.footDraw(ctx,who,pose,x,y,h,flip,t))return;   // the strip sheets (art.js); stills and shapes below when a sheet is missing or ?sprites=0
-  const mach=!!MAC[who];if(pose==='run')pose=Math.floor(t*8)%2?'run-b':'run-a';
+  const mach=!!MAC[who];if(pose==='run')pose=BK(t,8)?'run-b':'run-a';
   if(mach&&pose!=='shoot'&&pose!=='hit'&&pose!=='die')pose='idle';
   if(!mach&&POSES.indexOf(pose)<0&&!(who==='warden'&&(pose==='attack2'||pose==='enrage')))pose='idle';
   const u=pose==='die'?Math.max(0,t):0,fade=pose==='die'?1-.85*Math.min(1,u/1.2):1,pic=FA._pic('foot/'+who+'-'+pose+'.webp');

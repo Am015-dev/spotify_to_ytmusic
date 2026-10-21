@@ -1,3 +1,6 @@
+// PURPOSE: boss movesets: verbs (vd), telegraphs, per-boss lists
+// FLAG: bossmoves (?bossmoves=0)
+// TEST: bossmoves-test.js
 /* ---------- boss movesets = parts/bossmoves.js (flag RET.bossmoves; ?bossmoves=0 = the old ring / fan / spiral / laser lists, exactly).
    Owner, 18 Oct 2026: "Game is extremely repetitive". All ten boss fights were built from the same six attack verbs. Now every fight has its own moveset:
    8+ verbs in three phases (armour.js still owns HP, the damage cap, the 66/33% phase lines and the EXPOSED last stand: nothing here touches them),
@@ -111,7 +114,7 @@ vd('bar_curtain','any','laser curtain on the bar line',(e,c,X,p)=>{if(c!==2&&c!=
 // pulsing rings with a gap that shifts each pulse (find the gap)
 vd('pulse_ring','any','pulsing rings with shifting gaps',(e,c,X,p)=>{const every=X.ph===3?2:4;if(c%every)return;const a0=bmAim(e.x,e.y),off=e.bmG2==null?0:e.bmG2+(gx(0,1)<.5?-.4:.4);e.bmG2=clamp(off,-.8,.8);
   const ga=a0+e.bmG2,dist=Math.max(160,Math.hypot(P.x-e.x,P.y-e.y)),gw=Math.max(.6,(BMV.GAP+40)/dist);bmMark({s:'wedge',x:e.x,y:e.y,a:ga,w:gw},X.tl);bmTelBul('pulse_ring',X.tl);
-  bmLater(e,X.tl,()=>{const n=X.n(p.n||16);if(bmRoom()<6)return;for(let i=0;i<n;i++){const a=ga+gw/2+(6.2832-gw)*(i+.5)/n;bmShot('pulse_ring',e.x,e.y,a,X.v(140),6);}});});
+  bmLater(e,X.tl,()=>{AH.ring(e.x,e.y);const n=X.n(p.n||16);if(bmRoom()<6)return;for(let i=0;i<n;i++){const a=ga+gw/2+(6.2832-gw)*(i+.5)/n;bmShot('pulse_ring',e.x,e.y,a,X.v(140),6);}});});
 // homing orb you must shoot: it curves after the ship and pops into a ring if it lives
 vd('homing_orb','any','homing orb (shoot it)',(e,c,X,p)=>{if(c!==0&&!(c===4&&X.ph>1))return;bmMark({s:'charge',x:e.x-30,y:e.y,r:22},X.tl);bmTelBul('homing_orb',X.tl);
   bmLater(e,X.tl,()=>{bmShot('homing_orb',e.x-30,e.y,bmAim(e.x-30,e.y),X.v(115),8,{k:'r',hp:HARD?3:2,dmg:1,gc:'#9fb0ff',bmH:1.25,bmL:G.t+4});});});

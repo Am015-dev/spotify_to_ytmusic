@@ -1,3 +1,6 @@
+// PURPOSE: the finished on-foot stage (7 sections, Warden gate)
+// FLAG: footstage (?footstage=0)
+// TEST: footstage-test.js
 /* ---------- FOOTSTAGE: the finished on-foot stage (flag RET.footstage, default ON; ?footstage=0 = the street1 mock exactly: nothing here runs). Test: nightrun/footstage-test.js.
    Owner, 21 Oct 2026: "include ... on-foot enemies for on-foot stages (same as the fly stages difficulty will increase gradually); one on foot stage for start, there is already a mock."
    Stage 'zeil' (FOOT.main, the MENU button opens it): 7 sections + the boss arena, a checkpoint at the start of every section, a progress bar on the road strip.
@@ -146,13 +149,13 @@ const ST={n:'ZEIL UNDERPASS',len:14600,song:'stage2',cp:2000,cps:SEC.slice(1).ma
     w(6600,'grunt',3,1),w(6700,'mech',1,1),w(7100,'gunman',2,1.3),w(7150,'knife',2,1.1,{side:'l'}),w(6900,'drone',2,1.3,{side:'top'}),
     k('D','mech',1,1,0),k('D','shield',2,2,2),k('D','gunman',2,1.5,4),k('D','knife',2,1.2,7,{side:'l'}),k('D','grunt',3,1,9),
     // 5 SKY AND TEETH: + jetpack, hound
-    w(8400,'jetpack',1,1,{side:'top'}),w(8600,'hound',2,1.4),w(9000,'jetpack',1,1,{side:'top'}),w(9050,'gunman',2,1.4),w(9200,'grunt',2,1,{side:'l'}),w(8800,'knife',2,1,{side:'l'}),
+    w(8400,'jetpack',1,1,{side:'top'}),w(8600,'hound',2,1.4),w(9000,'jetpack',1,1,{side:'top'}),w(9050,'gunman',3,1.3),w(9200,'grunt',2,1,{side:'l'}),w(8800,'knife',2,1,{side:'l'}),
     k('E','hound',3,1.4,0),k('E','jetpack',2,2,2,{side:'top'}),k('E','shield',1,1,4),k('E','grunt',2,1,6,{side:'l'}),k('E','gunman',2,1.4,8),k('E','hound',1,1,10,{side:'l'}),
     // 6 HEAT AND BLADES: + flamer, ninja
-    w(10400,'flamer',1,1),w(10600,'ninja',1,1),w(11000,'flamer',1,1),w(11050,'drone',2,1.4,{side:'top'}),w(11100,'hound',1,1,{side:'l'}),w(10800,'gunman',2,1.3),
+    w(10400,'flamer',1,1),w(10600,'ninja',1,1),w(11000,'flamer',1,1),w(11050,'drone',2,1.4,{side:'top'}),w(11100,'hound',1,1,{side:'l'}),w(10800,'gunman',3,1.2),
     k('F','ninja',2,2.4,0),k('F','flamer',2,2,1),k('F','gunman',2,1.4,4),k('F','jetpack',1,1,6,{side:'top'}),k('F','knife',2,1,8,{side:'l'}),k('F','hound',2,1.4,10),k('F','shield',1,1,11),
     // 7 FIELD HOSPITAL: + medic, everything mixed
-    w(12400,'medic',1,1),w(12450,'bruiser',1,1),w(12600,'grunt',3,1),w(12650,'medic',1,1),w(12900,'hound',2,1.2,{side:'l'}),w(12950,'sniper',1,1),w(13100,'jetpack',1,1,{side:'top'}),
+    w(12400,'medic',1,1),w(12450,'bruiser',1,1),w(12600,'grunt',4,1),w(12650,'medic',1,1),w(12900,'hound',2,1.2,{side:'l'}),w(12950,'sniper',1,1),w(13100,'jetpack',1,1,{side:'top'}),
     k('G','medic',2,3,0),k('G','mech',1,1,1),k('G','ninja',1,1,3),k('G','hound',2,1.4,4,{side:'l'}),k('G','jetpack',2,2,6,{side:'top'}),k('G','flamer',1,1,8),k('G','gunman',2,1.4,10),k('G','grunt',3,1,12,{side:'l'}),k('G','medic',1,1,13)],
   locks:[{id:'A',x:1700},{id:'B',x:3700},{id:'C',x:5700},{id:'D',x:7500},{id:'E',x:9500},{id:'F',x:11500},{id:'G',x:13300}],
   boss:{x:14100,id:'warden2'},

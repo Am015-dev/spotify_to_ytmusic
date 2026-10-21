@@ -1,3 +1,6 @@
+// PURPOSE: ground enemies, calmer pacing, escape penalty
+// FLAG: leak (?leak=0)
+// TEST: ret-leak-test.js
 /* ---------- leak.js: ground enemies, calmer pacing, escape penalty (owner, 17 Oct 2026). Flag RET.leak; ?leak=0 = the game as it was.
    1. GROUND ENEMIES: gtank (rolls on the road line, lobs a slow shell), gturret (rises out of the road, aimed shots), gwalker (slow, tanky, steps).
       They stand on UIK.groundY() (the ground-boss road line, same soft shadow), never fly or jump, scroll left with the ground. About 30% of the waves of a stage
@@ -76,7 +79,7 @@ const LEAK=window.LEAK={
     c.fillStyle=this.txtT>0?'#ff6a7a':col;c.fillText(lab,x,y3+4*q);
     if(this.txtT<=0){c.fillStyle='#ffffff22';c.fillRect(x+w0,y3-bh/2+1*q,bw,bh);c.fillStyle=col;c.fillRect(x+w0,y3-bh/2+1*q,bw*f,bh);
       c.fillStyle='#ffffff66';c.fillRect(x+w0+bw*this.free/this.cap(),y3-bh/2-1*q,1.5*q,bh+2*q);                         // the tick marks where the free warning ends
-      if(hot&&!SET.reduce&&Math.floor(G.t*6)%2){c.strokeStyle='#ff3040';c.lineWidth=1.5*q;c.strokeRect(x+w0-1,y3-bh/2,bw+2,bh+2*q);}}
+      if(hot&&!SET.reduce&&BK(G.t,6)){c.strokeStyle='#ff3040';c.lineWidth=1.5*q;c.strokeRect(x+w0-1,y3-bh/2,bw+2,bh+2*q);}}
     c.restore();},
   /* ---- drawing of the ground enemies (coloured shapes; painted art spr-en-<type> is used once it is real art) ---- */
   art(e,t){const D=DISTRICTS[G.di],fl=e.flash>0,r=e.r,line=fl?'#fff':D.a,fill=fl?'#fff':'#14091f';

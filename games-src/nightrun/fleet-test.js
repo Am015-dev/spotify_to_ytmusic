@@ -12,7 +12,7 @@ const GAME = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainha
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const fp = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148';
-const SEED = `(()=>{let a=777;Math.random=function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};})();`;
+const SEED = `(()=>{const seed=()=>{let a=777;Math.random=function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};};seed();window.__reseed=seed;})();`;
 const FIRST = { einterceptor: 6, ebomber: 10, ecarrier: 16, ecruiser: 22 };
 
 const SETUP = (n, df) => { const m = window.__mnr; if (m.running) m.abort(); m.SET.diff = df || 'normal'; m.SET.auto = false; m.applySet && m.applySet(); m.startStory(n); m.simOn(true);
@@ -95,8 +95,9 @@ const RUN = () => {   // (e) stage 30 with fleet waves forced, invulnerable dodg
   const hits = {}; for (const id in F.K) { const e = F.mk(id, { x: 2000, y: 200 }); hits[id] = +(e.max / dph / u).toFixed(1); e.dead = 1; }
   m.abort(); return { s, T: Math.round(T), maxEb, hits };
 };
+// the title screen's idle render frames draw from Math.random until sim mode starts, so how many they took (wall clock) moved the seeded stream: reseed right before the stage is built (its spawn list is rolled in startStory)
 const PLAY = () => {   // (f) seeded play, flag off vs no fleet.js
-  const m = window.__mnr; SETUP(12, 'normal'); let T = 0; const log = [];
+  const m = window.__mnr; window.__reseed(); SETUP(12, 'normal'); let T = 0; const log = [];
   while (m.running && T < 45) { m.P.hp = 99; m.P.y = 300 + 150 * Math.sin(T * 1.3); m.P.x = 220 + 80 * Math.sin(T * .7); S(1); T += 1 / 30; }
   const r = { spawns: m.G.spawns.length, sp: JSON.stringify(m.G.spawns).length, kills: m.G.kills, score: m.G.score, en: m.G.en.map(e => e.type).join(',') }; m.abort(); return r;
 };

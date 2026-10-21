@@ -1,3 +1,6 @@
+// PURPOSE: time to kill + eight new enemy kinds
+// FLAG: zoo (?zoo=0)
+// TEST: zoo-test.js
 /* ---------- zoo.js: time to kill them all + eight new enemy kinds (owner, 17 Oct 2026). Flag RET.zoo; ?zoo=0 = the game as it was.
    1. STATION AND HOVER: drones and flankers no longer fly straight through. Each enters, slows to a strafe in the right 60% of the screen on its own slot (slots keep
       them spread over y, never stacked), hovers for N beats on the beat clock (Easy 6, Normal 5, Hard 4, Very hard / Legend 3), fires from there, then departs to the left.
@@ -181,7 +184,7 @@ const ZOO=window.ZOO={
     for(const b of this.bombs){const k=clamp((G.t-b.t0)/.5,0,1),R=this.BR,near=G.bc>=b.b0+1;ctx.globalAlpha=.9;ctx.strokeStyle='#ff4d4d';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(b.x,b.y,R,0,7);ctx.stroke();
       ctx.globalAlpha=.18+.3*k;ctx.fillStyle='#ff304088';ctx.beginPath();ctx.arc(b.x,b.y,R*(near?1:.35+.65*k),0,7);ctx.fill();
       ctx.globalAlpha=1;if(!FXW.bomb(b)){ctx.fillStyle='#1a0e0a';ctx.strokeStyle='#ffa02d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(b.x,b.y,7,0,7);ctx.fill();ctx.stroke();}}
-    for(const m of this.mines){const left=16-(G.bc-m.b0);if(!FXW.mine(m,t,left)){ctx.globalAlpha=m.armed?(left<=2&&Math.floor(t*8)%2?.4:1):.45;ctx.fillStyle='#1a1d08';ctx.strokeStyle=m.armed?(RET.read?READ.D:'#d8ff3d'):(RET.read?'#8a4058':'#7a8a30');ctx.lineWidth=2;
+    for(const m of this.mines){const left=16-(G.bc-m.b0);if(!FXW.mine(m,t,left)){ctx.globalAlpha=m.armed?(left<=2&&BK(t,8)?.4:1):.45;ctx.fillStyle='#1a1d08';ctx.strokeStyle=m.armed?(RET.read?READ.D:'#d8ff3d'):(RET.read?'#8a4058':'#7a8a30');ctx.lineWidth=2;
       ctx.beginPath();for(let i=0;i<8;i++){const q=i*Math.PI/4+t*.5,rr=i%2?m.r*.6:m.r;ctx.lineTo(m.x+Math.cos(q)*rr,m.y+Math.sin(q)*rr);}ctx.closePath();ctx.fill();ctx.stroke();}
       if(!m.armed){ctx.strokeStyle='#ff4d4d';ctx.setLineDash([3,4]);ctx.beginPath();ctx.arc(m.x,m.y,m.r+9,0,7);ctx.stroke();ctx.setLineDash([]);}}
     for(const f of this.fx){const k=1-f.l/f.m;ctx.globalAlpha=Math.max(0,f.l/f.m);ctx.strokeStyle=f.c;ctx.fillStyle=f.c;ctx.lineWidth=3;
@@ -193,6 +196,7 @@ const ZOO=window.ZOO={
     if(e.arm){const k=PHF;ctx.save();ctx.globalCompositeOperation='lighter';G_(0,0,r*(1.7+1.2*k),'#ff3050',.22+.5*k);ctx.restore();
       ctx.strokeStyle='#ff7080';ctx.globalAlpha=.35+.65*k;ctx.lineWidth=2+2*k;ctx.beginPath();ctx.arc(0,0,r+4+16*(1-k),0,7);ctx.stroke();ctx.globalAlpha=1;}
     if(e.type==='kamikaze'&&SPR.foe(e,'ekamikaze',t,0,0,r*3.6,e.zst===3||e.tel?e.ang-Math.PI:0,fl)){ctx.restore();return;}   // art sheet; the dive line is drawn by over()
+    if(FOEART.body(e,t,fl,1)){ctx.restore();return;}
     ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
     const glow=(c,a)=>{ctx.globalCompositeOperation='lighter';G_(0,0,r*1.1,c,a);ctx.globalCompositeOperation='source-over';};
     switch(e.type){

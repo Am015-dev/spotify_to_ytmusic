@@ -1,3 +1,6 @@
+// PURPOSE: enemy warships in the fly stages
+// FLAG: fleet (?fleet=0)
+// TEST: fleet-test.js
 /* ---------- fleet.js: four enemy warships in the fly stages (owner, 21 Oct 2026: "include enemy ships ... same as the fly stages difficulty will increase gradually").
    Flag RET.fleet, default ON; ?fleet=0 = the game as it was (no fleet waves, no extra dice).
    INTERCEPTOR (story stage 6+): fast and fragile. Strafes on a station >= 4 s firing aimed pairs, then shows its dive line for .7 s (kinked where it will swerve),
@@ -22,6 +25,7 @@ const FLEET=window.FLEET={
      ecruiser:{k:'cru',st:22,r:44,hp:60,score:3000,col:'#ff3d8a',lo:14,hi:18,ml:6,w:3,max:1,hint:'CRUISER: slip through the beam gap'},
      efdrone:{k:'drn',r:9,hp:1,score:60,col:'#c9a8ff',lo:1,hi:1,ml:.6,w:0,max:9}},
   ORDER:['einterceptor','ebomber','ecarrier','ecruiser'],
+  ARR:1.7,   // arrival floor (s after it is fully on screen): the hull cannot reach 0 any sooner (like DMG.minLife but for every source, EMP and dash included), so a unit is seen for >= 1.5 s before it can die (industry S01); HP and shots-to-kill unchanged (damage above the floor counts)
   TELE:{dive:.7,bomb:.75,beam:.9},BR:46,BEAM:{L:360,w:9,spd:.55,live:3,off:2.5},
   SPR:{einterceptor:.1,ebomber:.13,ecarrier:.17,ecruiser:.22},
   bombs:[],fx:[],seen:{},run:{},cruKey:null,inited:false,stat:null,
@@ -144,13 +148,15 @@ const FLEET=window.FLEET={
   /* ---- looks: code shapes until the sprite loader lands ---- */
   spr(e,t){if(!this.SPR[e.type]||typeof SPR==='undefined')return false;return SPR.foe(e,e.type,t,e.x,e.y,520*this.SPR[e.type],e.fl==='int'&&e.fs===3&&e.ang!=null?e.ang+Math.PI:0,e.flash>0);},   // flame / volley / death sheets (art.js SPR.foe); width = sheet px x SPR
   draw(e,t){const T=this.K[e.type],fl=e.flash>0,r=e.r,line=fl?'#fff':T.col,fill=fl?'#fff':'#12081f',k=e.fl;
+    if(e.shT>0){ctx.save();ctx.globalAlpha=.3+.25*Math.sin(t*14);ctx.strokeStyle='#ffe27a';ctx.fillStyle='#ffe27a22';ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y,r+8,0,7);ctx.fill();ctx.stroke();ctx.restore();}   // arrival shield
     if(k==='car'&&e.fsh){ctx.save();ctx.globalAlpha=.35+.2*Math.sin(t*6);ctx.strokeStyle='#4ad1ff';ctx.fillStyle='#4ad1ff1c';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,r+14,0,7);ctx.fill();ctx.stroke();ctx.restore();}
     if(this.spr(e,t)){if(e.arm){ctx.save();ctx.translate(e.x,e.y);ctx.globalAlpha=.35+.5*(typeof PHF==='number'?PHF:0);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+8,0,7);ctx.stroke();ctx.restore();}   // the shot tell stays
       if(e.max>1)hpBar(e.x-14,e.y-r-9,28,e.hp/e.max);return;}
+    if(k==='drn'){ctx.save();ctx.translate(e.x,e.y);const o=FOEART.body(e,t,fl);ctx.restore();if(o)return;}
     ctx.save();ctx.translate(e.x,e.y);
     if(e.arm){ctx.globalAlpha=.35+.5*(typeof PHF==='number'?PHF:0);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+8,0,7);ctx.stroke();ctx.globalAlpha=1;}
     ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
-    if(k==='int'){ctx.rotate(e.fs===3&&e.ang!=null?e.ang+Math.PI:0);if(e.fs===2)ctx.fillStyle=Math.floor(t*12)%2?'#ff3050':fill;
+    if(k==='int'){ctx.rotate(e.fs===3&&e.ang!=null?e.ang+Math.PI:0);if(e.fs===2)ctx.fillStyle=BK(t,12)?'#ff3050':fill;
       ctx.beginPath();ctx.moveTo(-r*1.5,0);ctx.lineTo(r,-r*.9);ctx.lineTo(r*.5,0);ctx.lineTo(r,r*.9);ctx.closePath();ctx.fill();ctx.stroke();}
     else if(k==='bom'){ctx.beginPath();ctx.moveTo(-r*1.2,0);ctx.lineTo(-r*.3,-r*.7);ctx.lineTo(r*1.2,-r*.9);ctx.lineTo(r,0);ctx.lineTo(r*1.2,r*.9);ctx.lineTo(-r*.3,r*.7);ctx.closePath();ctx.fill();ctx.stroke();
       ctx.fillStyle=fl?'#fff':e.arm?'#ff3050':T.col;for(const s of[-1,1]){ctx.beginPath();ctx.arc(r*.2,s*r*.38,r*.2,0,7);ctx.fill();}}
@@ -195,6 +201,10 @@ const FLEET=window.FLEET={
     if(typeof labBuildFoes==='function'){const lb=labBuildFoes;labBuildFoes=function(body){lb(body);if(!RET.fleet)return;const r=lsec(body,'ENEMY SHIPS (fleet)');
       for(const id of FLEET.ORDER)lchip(r,FLEET.K[id].hint.split(':')[0],labFoe(y=>{FLEET.bombs=[];FLEET.mk(id,{x:W+40,y,nd:3});}));};}}};
 FLEET.reset();
+if(RET.fleetArr===undefined)RET.fleetArr=/[?&]fleetarr=1/.test(location.search);   // DEFAULT OFF: with it on, industry S01 passes but pacing stage 11 clear drops (needs a joint pass with the Normal tuning)
+{ const p0=DMG.pass;DMG.pass=function(dt){const r=p0.call(this,dt);   // after the frame's hull loss is booked, before the kill check: an arriving unit keeps its hull
+    if(RET.fleet&&RET.fleetArr)for(const e of G.en)if(e.fl&&FLEET.K[e.type]&&!e.dead&&e.tin!=null&&G.t-e.tin<FLEET.ARR){{const fl=e.max*(1-(G.t-e.tin)/FLEET.ARR);if(e.hp<fl)e.hp=e.hq=Math.min(e.max,fl);}e.shT=FLEET.ARR-(G.t-e.tin);}else if(e.shT)e.shT=0;
+    return r;}; }
 { const de=drawEnemy;drawEnemy=function(e,t){if(RET.fleet&&e.fl&&FLEET.K[e.type]){FLEET.draw(e,t);return;}de(e,t);}; }
 { const dp=drawPickups;drawPickups=function(t){dp(t);try{FLEET.over(t);}catch(err){}}; }
 { const so=DIR.spawnOne;DIR.spawnOne=function(fill,k){   // outermost: a fleet wave replaces the wave; a busy screen goes to the zoo / pacing deferral inside
