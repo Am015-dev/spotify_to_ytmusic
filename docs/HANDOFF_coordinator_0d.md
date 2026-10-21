@@ -15,3 +15,8 @@ Branch cleanup blocked by permission classifier (needs Alex's allow).
 - #24 L3 57d31cb FAIL visual: trail invisible head-on (lost in yellow centre line). Fix: bigger raised gold studs with glint/bob, off centre line, readable at 50 m -> L3 worker session_01QUZuLoxtioWPD6ZyaPq5VX.
 - life1/smash fails with ?cl=core + (smash or studs): L1 owns it (moved spawn/traffic). Send with L1 budget trim (+3.6% calls/+11.6% tris -> <=2%/10%) to L1 worker session_01BvSGWevk9n5atCZWTwXrNL.
 - Running: chk-headroom (almost done), L2 smash fix.
+
+## 23:50 update (Alex 4.5/100: invisible cars, pass-through buildings, popups, cars change on camera turn)
+- Running (OPUS): solid-cars-r22e1 session_0158LpbxvfQUnNUMvKzX6iu9 (incl. camera-turn identity, phone compaction PC.L slot reuse, fra -553,591), solid-buildings-r22e2 session_01Ke7GnTrGY5pjbfQyY6g4MB (fra sheds list, white 11.5 m mesh at -530,630). Paused: L2 smash, chk-headroom (uncommitted, see their handoffs).
+- NEXT lane when a slot frees (SONNET, Alex priority): quiet-start r22e3: Athens CHAPTER 1 modal story card blocks 120 s (drive-first only covered fra) -> behind ?intro=1 like fra; garage 'TAP TO OPEN' at speed -> hide >20 km/h; no forced vehicle swap ('WRONG VEHICLE FOR DIRT' auto buggy) ; no auto-routing to Garage; STUD RUSH banner only when asked. GO: first 120 s fresh PLAY both cities = 0 modal/cards, <=1 hint.
+- Then: BENCH_2K gaps (docs/BENCH_2K.md): boost VFX, speed feel, empty first frame, matte cars, street life.
