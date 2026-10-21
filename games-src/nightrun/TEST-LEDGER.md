@@ -28,6 +28,7 @@ Totals: 66 tests: 19 PASS, 5 FAIL, 2 FLAKY, 0 TIMEOUT, 40 NOT-RUN (W57b: anticam
 | footart-test | PASS | - | footart-test: all passed (924 draws, bg layers, picture swap) | f696692 2026-10-20 |
 | footen-test | PASS | - | footen-test: all 207 checks passed | f696692 2026-10-20 |
 | forge-test | FLAKY | - | recipe trims (zp .12->.2, zp2 leap .3->.2, ring .15->.12, voltrail px 2->1); power check passes; Hard-30 ratio band is noisy (railric .72-1.19 on identical builds), RUNS default 2->4 | W31 2026-10-20 |
+| forge2-test | PASS | - | new: one-screen forge (?forge2=0 = forgeui); forge-test grid UI check and forgeui-test pinned to &forge2=0 | forge2 2026-10-21 |
 | fs-test | PASS | - | PASS portrait: no page errors | f696692 2026-10-20 |
 | fun-test | PASS | - | obsolete-fixed: opens with ?deck=0 (old WEAVE/FENCE/DROP) + STILL reset so the parked ship survives; 40 s set-piece window | W31 2026-10-20 |
 | fxkey-test | PASS | - | PASS no page errors | f696692 2026-10-20 |

@@ -69,6 +69,7 @@ abilities|13|DASH charges and EMP as abilities (beat bonus, refund)|abil,abil
 forge|21|weapon forge: combine, sockets, presets (data, actions)|forge,forge
 inventory|14|inventory + loadout screen (Garage FORGE tab)|forge,forge
 forgeui|25|forge screen, step by step|forgeui,forgeui
+forgeone|28|one-screen phone forge: bench + ship slot bar + swipe strip,|forge2,forge2
 counter|12|threats that make DASH and EMP the answer|counter,counter
 timing|12|DASH/EMP as beat-and-window decisions|timing,timing
 visible|3|enemies live long enough to be seen and fought|vis,vis
