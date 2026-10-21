@@ -131,7 +131,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     if(this.ch==='nohit')return 'NO HIT · '+Math.min(this.len,Math.floor(G.dbar))+' / '+this.len+' BARS';
     if(g.k==='survive')return Math.min(this.len,Math.floor(G.dbar))+' / '+this.len+' BARS';
     if(g.k==='kill')return Math.min(this.kv,G.kills)+' / '+this.kv+' KILLS';
-    if(g.k==='score')return 'SCORE '+Math.min(this.sv,G.score).toLocaleString('de-DE')+' / '+this.sv.toLocaleString('de-DE');
+    if(g.k==='score')return 'SCORE '+window.fmtN(Math.min(this.sv,G.score))+' / '+window.fmtN(this.sv);
     return G.boss?(g.k==='mini'?'MINI-BOSS':'BOSS'):this.over?'CLEAR':'→ '+(g.k==='mini'?UIK.pname(this.def.mini.nm,this.def.mini.k):UIK.pname(DISTRICTS[this.def.di].bossName,DISTRICTS[this.def.di].boss));},
   bossHp(){const k=this.def.goal.k==='mini'?this.def.mini.k:DISTRICTS[this.def.di].boss;
     return this.def.goal.k==='mini'?Math.round(300*(TUNE.miniHp+TUNE.miniHpd*this.lvl)*(HARD?1:1)):Math.round((340+110*Math.min(k,4))*(TUNE.bossHp+TUNE.bossHpd*this.lvl));},
@@ -156,7 +156,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     if(!boss)banner('STAGE CLEAR',this.def.name,false,2.6);
     G.flash=Math.max(G.flash,.3*FX());AU.sfx('up');AU.intense(false);NR.emit('stageClear',{n:this.n});},
   fail(){running=false;NR.emit('runEnd',{story:this.n,score:G.score,di:G.di,kills:G.kills});
-    $('overEyebrow').textContent=this.why||('Stage '+this.n+' failed');$('oScore').textContent=G.score.toLocaleString('de-DE');$('oDist').textContent=this.n+' · '+this.def.name;$('oPerf').textContent=G.perf;
+    $('overEyebrow').textContent=this.why||('Stage '+this.n+' failed');$('oScore').textContent=window.fmtN(G.score);$('oDist').textContent=this.n+' · '+this.def.name;$('oPerf').textContent=G.perf;
     const b=sSave.stars[this.n]||0;$('oBest').innerHTML=this.def.goal.k==='boss'||this.def.goal.k==='mini'?'Goal <strong>'+goalTxt(this.def)+'</strong>':'Goal <strong>'+goalTxt(this.def)+'</strong> · '+this.label();
     $('stBtn2').hidden=false;
     overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);
@@ -168,7 +168,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     const s=this.def;$('srEye').textContent=n===MAIN?'Story complete':s.ch?'Challenge clear':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
     $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn)+' PERFECT · you '+G.perf)+row(st[2],s.ch?'Score '+(this.s3/1000)+'K · you '+Math.round(G.score/1000)+'K':'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)))+(window.RET&&RET.clearPay?RET.resultRow():'');
-    $('srScore').textContent=G.score.toLocaleString('de-DE');
+    $('srScore').textContent=window.fmtN(G.score);
     $('srNext').hidden=n>=MAIN;$('srNext').textContent='NEXT STAGE';
     resEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!resEl.hidden)($('srNext').hidden?$('srRetry'):$('srNext')).focus();},500);G.over=true;},
   totalStars(){let t=0;for(const k in sSave.stars)t+=sSave.stars[k]|0;return t;}};

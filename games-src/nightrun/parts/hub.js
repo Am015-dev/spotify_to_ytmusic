@@ -58,7 +58,7 @@ if(RET.hub)setTimeout(()=>{
 @media (max-height:600px){#hubGrid .go{min-height:50px}#hubGrid .go small{display:none}#hubStat{font-size:13px;padding:4px 8px}#hubHint{padding:3px 8px}}
 @media (min-width:900px){#hubStat,#hubHint,#hubStory,.hubScr .hubNote{font-size:16px}#hubGrid .go small{font-size:14px}}
 `;document.head.appendChild(st);
-  const neon=()=>neonI+' '+GA.bank;
+  const neon=()=>neonI+' '+window.fmtN(GA.bank);
   const B=(cls,html,fn,id)=>{const b=document.createElement('button');b.type='button';b.className=cls;b.innerHTML=html;if(id)b.id=id;b.addEventListener('click',fn);return b;};
   const old=sel=>sel.includes('|')?sel.split('|').map(x=>old(x)).find(Boolean):sel.startsWith('.')?document.querySelector('#mnMore '+sel)||document.querySelector(sel):$(sel.replace(/^#/,''));
   const press=sel=>{const b=old(sel);if(b&&!b.disabled)b.click();};

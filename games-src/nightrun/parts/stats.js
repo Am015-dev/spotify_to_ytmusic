@@ -142,7 +142,7 @@ RET.st=(function(on){
   if(on&&dsh)try{RET.dailyShow();}catch(e){}
   /* ---- the sheet ---- */
   const fmtT=s=>{s=Math.round(s);const h=Math.floor(s/3600),m=Math.floor(s%3600/60);return h?h+'h '+m+'m':m+'m '+(s%60)+'s';};
-  const fmtN=n=>Math.round(n).toLocaleString('de-DE');
+  const fmtN=window.fmtN;
   const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
   function badge(a,got){
     const real=window.ART&&ART.rd&&ART.rd.has('ach-'+a.id+'.webp');
