@@ -1284,14 +1284,14 @@ function drawEnemy(e,t){const D=DISTRICTS[G.di];ctx.save();ctx.translate(e.x,e.y
     ctx.strokeStyle='#ff7080';ctx.globalAlpha=.35+.65*k;ctx.lineWidth=2+2*k;ctx.beginPath();ctx.arc(0,0,e.r+4+16*(1-k),0,7);ctx.stroke();ctx.globalAlpha=1;}
   if(e.el){ctx.strokeStyle='#ffd23d';ctx.lineWidth=2;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(0,0,e.r+4,0,7);ctx.stroke();ctx.globalAlpha=1;}
   switch(e.type){
-    case'drone':{if(ART.dflash(e.ldr&&ART.have('spr-en-leader')?'spr-en-leader':'spr-en-drone',e.r*2.9,0,Math.sin(t*4+eb_(e))*1.5,0,fl)){ctx.strokeStyle='#8890c0';ctx.lineWidth=1.2;
+    case'drone':{if(FOEART.body(e,t,fl))break;if(ART.dflash(e.ldr&&ART.have('spr-en-leader')?'spr-en-leader':'spr-en-drone',e.r*2.9,0,Math.sin(t*4+eb_(e))*1.5,0,fl)){ctx.strokeStyle='#8890c0';ctx.lineWidth=1.2;
         for(const s of[-1,1]){ctx.beginPath();ctx.ellipse(s*9,-e.r*.85,8*Math.abs(Math.sin(t*40+s)),1.6,0,0,7);ctx.stroke();}   // spinning rotors
         const red=(Math.floor(G.bp)+Math.floor(e.by))%2;ctx.globalCompositeOperation='lighter';G_(0,-e.r*.55,7,red?'#ff2030':'#2050ff',.9);ctx.globalCompositeOperation='source-over';break;}
       ctx.fillStyle=fl?'#fff':'#141024';ctx.strokeStyle='#5a6aff';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(0,0,14,8,0,0,7);ctx.fill();ctx.stroke();
       ctx.strokeStyle='#8890c0';ctx.lineWidth=1;for(const s of[-1,1]){ctx.beginPath();ctx.moveTo(s*10,-4);ctx.lineTo(s*16,-10);ctx.stroke();ctx.beginPath();ctx.ellipse(s*16,-11,8*Math.abs(Math.sin(t*40+s)),1.5,0,0,7);ctx.stroke();}
       const red=(Math.floor(G.bp)+Math.floor(e.by))%2;ctx.globalCompositeOperation='lighter';G_(0,-6,10,red?'#ff2030':'#2050ff',.95);ctx.globalCompositeOperation='source-over';
       ctx.fillStyle='#ff3dbb';ctx.fillRect(-12,-1,5,2);break;}
-    case'turret':{const a=aim(e);{const bs=ART.sp('spr-en-turret-base',e.r*2.5),br=ART.sp('spr-en-turret-barrel',e.r*1.7);
+    case'turret':{const a=aim(e);if(FOEART.body(e,t,fl))break;{const bs=ART.sp('spr-en-turret-base',e.r*2.5),br=ART.sp('spr-en-turret-barrel',e.r*1.7);
         if(bs&&br){ART.put(bs,0,e.r*.12);if(fl)ART.put(ART.sil('spr-en-turret-base',e.r*2.5,'#ffffff'),0,e.r*.12,0,.8);
           ctx.save();ctx.translate(0,-e.r*.1);ctx.rotate(a);ctx.drawImage(br.c,-br.h*.5,-br.h/2,br.w,br.h);   // the barrel turns on its hub and keeps aiming
           if(fl){const q=ART.sil('spr-en-turret-barrel',e.r*1.7,'#ffffff');ctx.globalAlpha=.8;ctx.drawImage(q.c,-br.h*.5,-br.h/2,q.w,q.h);ctx.globalAlpha=1;}ctx.restore();
@@ -1299,7 +1299,7 @@ function drawEnemy(e,t){const D=DISTRICTS[G.di];ctx.save();ctx.translate(e.x,e.y
       ctx.fillStyle=fl?'#fff':'#1a1020';ctx.strokeStyle='#ffa02d';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<6;i++){const q=i*Math.PI/3;ctx.lineTo(Math.cos(q)*20,Math.sin(q)*20);}ctx.closePath();ctx.fill();ctx.stroke();
       ctx.rotate(a);ctx.fillStyle='#ffa02d';ctx.fillRect(6,-3,20,6);ctx.rotate(-a);ctx.globalCompositeOperation='lighter';G_(0,0,14,'#ffa02d',.6);ctx.globalCompositeOperation='source-over';break;}
     case'charger':{if(e.aimL){ctx.strokeStyle='#ff304088';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(-10,0);ctx.lineTo(-W,0);ctx.stroke();ctx.setLineDash([]);}
-      if(ART.dflash('spr-en-charger',e.r*3.4,0,Math.sin(t*6+eb_(e))*1,0,fl))break;
+      if(FOEART.body(e,t,fl))break;if(ART.dflash('spr-en-charger',e.r*3.4,0,Math.sin(t*6+eb_(e))*1,0,fl))break;
       ctx.fillStyle=fl?'#fff':'#220a12';ctx.strokeStyle='#ff3040';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-16,0);ctx.lineTo(12,-11);ctx.lineTo(6,0);ctx.lineTo(12,11);ctx.closePath();ctx.fill();ctx.stroke();
       ctx.globalCompositeOperation='lighter';G_(12,0,12,'#ff3040',.8);ctx.globalCompositeOperation='source-over';break;}
     case'gunship':{if(SPR.foe(e,'egunship',t,0,0,e.r*3,0,fl)||ART.dflash('spr-en-gunship',e.r*3,0,Math.sin(t*2+eb_(e))*1.5,0,fl)){ctx.globalCompositeOperation='lighter';G_(-e.r*1.3,0,12,D.a,.5);ctx.globalCompositeOperation='source-over';hpBar(-30,-e.r*.8-14,60,e.hp/e.max);break;}
@@ -1310,10 +1310,11 @@ function drawEnemy(e,t){const D=DISTRICTS[G.di];ctx.save();ctx.translate(e.x,e.y
     case'gate':{ctx.translate(0,-e.y);const top=e.gy-e.gap/2,bot=e.gy+e.gap/2;
       if(e.on){ctx.globalCompositeOperation='lighter';ctx.fillStyle='#ff304055';ctx.fillRect(-7,0,14,top);ctx.fillRect(-7,bot,14,H-bot);ctx.fillStyle='#ffd0d8';ctx.fillRect(-1.5,0,3,top);ctx.fillRect(-1.5,bot,3,H-bot);ctx.globalCompositeOperation='source-over';}
       else if(e.tele&&(SET.reduce||Math.floor(t*16)%2)){ctx.fillStyle='#ff304066';ctx.fillRect(-1,0,2,top);ctx.fillRect(-1,bot,2,H-bot);}
-      for(const y of[top,bot]){if(!gatePost(y,y===top,fl)){ctx.fillStyle=fl?'#fff':'#1a0a10';ctx.strokeStyle='#ff3040';ctx.lineWidth=2;ctx.fillRect(-12,y-12,24,24);ctx.strokeRect(-12,y-12,24,24);}
+      for(const y of[top,bot]){if(!FOEART.post(e,y,y===top,fl)&&!gatePost(y,y===top,fl)){ctx.fillStyle=fl?'#fff':'#1a0a10';ctx.strokeStyle='#ff3040';ctx.lineWidth=2;ctx.fillRect(-12,y-12,24,24);ctx.strokeRect(-12,y-12,24,24);}
         ctx.globalCompositeOperation='lighter';G_(0,y,14,'#ff3040',.7);ctx.globalCompositeOperation='source-over';}
       hpBar(-20,top-24,40,e.hp/e.max);break;}
-    case'boss':drawBoss(e,t,fl);break;}
+    case'boss':drawBoss(e,t,fl);break;
+    default:FOEART.body(e,t,fl);}                      // a kind with no case here (a zoo kind that lost its zt flag) still gets its sheet look
   if(e.vz)VAR.out(e,t);ctx.restore();}
 const eb_=e=>e._b==null?(e._b=Math.random()*6.28):e._b;      // per-enemy phase for the bob
 function gatePost(y,up,fl){const o=ART.sp('spr-en-gate',26);if(!o)return false;const cy=y+(up?-1:1)*(o.h/2-12);ART.put(o,0,cy,0,null,1,up?1:-1);
@@ -2381,6 +2382,7 @@ pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<7;
   if(e.arm){const k=PHF;ctx.save();ctx.globalCompositeOperation='lighter';G_(0,0,e.r*(1.7+1.3*k),'#ff3050',.22+.55*k);ctx.restore();
     ctx.strokeStyle='#ff7080';ctx.globalAlpha=.35+.65*k;ctx.lineWidth=2+2*k;ctx.beginPath();ctx.arc(0,0,e.r+4+16*(1-k),0,7);ctx.stroke();ctx.globalAlpha=1;}
   if(e.el){ctx.strokeStyle='#ffd23d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,e.r+4,0,7);ctx.stroke();}
+  if(FOEART.body(e,t,fl,1)){ctx.restore();return;}
   if(e.type==='flank'){const fa=(e.side&&!e.settled)?Math.atan2(-e.side*190,-80):Math.PI;if(ART.dflash('spr-en-flank',e.r*3.4,0,Math.sin(t*5+eb_(e))*1,fa-Math.PI,fl)){ctx.restore();return;}}
   else if(e.type==='swarm'){if(ART.dflash('spr-en-swarm',e.r*2.8,0,Math.sin(t*7+eb_(e))*.8,0,fl)){ctx.restore();return;}}
   else if(ART.dflash('spr-en-mine',e.r*2.5,0,0,t*.6+e.ph,fl)){ctx.globalCompositeOperation='lighter';const p=.5+.5*Math.sin(t*5+e.ph);G_(0,0,e.r*(.9+.4*p),'#ffa02d',.25+.2*p);ctx.globalCompositeOperation='source-over';hpBar(-14,-e.r-9,28,e.hp/e.max);ctx.restore();return;}
@@ -3109,11 +3111,12 @@ setInterval(()=>{if(document.hidden||!G||(running&&!calmNow()))return;ART.frame(
 ART.ANIM={"s":{"boss-bruecken-waechter/attack":[3,8,392,234,196,234],"boss-bruecken-waechter/defeat":[3,6,392,311,196,311],"boss-bruecken-waechter/hit":[3,10,392,317,196,317],"boss-bruecken-waechter/idle":[3,4,392,268,196,268],"boss-flusskrake/attack":[3,8,392,315,196,315],"boss-flusskrake/defeat":[3,6,351,384,175,384],"boss-flusskrake/hit":[3,10,373,384,186,384],"boss-flusskrake/idle":[3,4,392,368,196,368],"boss-hoplite/attack":[4,8,392,301,196,301],"boss-hoplite/defeat":[4,6,343,384,171,384],"boss-hoplite/hit":[3,10,384,384,192,384],"boss-hoplite/idle":[4,4,259,384,129,384],"boss-kronos/attack":[4,8,392,248,196,248],"boss-kronos/defeat":[4,6,392,371,196,371],"boss-kronos/hit":[3,10,392,282,196,282],"boss-kronos/idle":[4,4,392,276,196,276],"boss-messe-waechter/attack":[3,8,290,384,145,384],"boss-messe-waechter/defeat":[3,6,314,384,157,384],"boss-messe-waechter/hit":[3,10,288,384,144,384],"boss-messe-waechter/idle":[3,4,276,384,138,384],"boss-schranken-wart/attack":[4,8,392,299,196,299],"boss-schranken-wart/defeat":[4,6,392,356,196,356],"boss-schranken-wart/hit":[3,10,392,237,196,237],"boss-schranken-wart/idle":[4,4,392,190,196,190],"boss-sek-adler/attack":[4,8,392,245,196,245],"boss-sek-adler/defeat":[4,6,356,384,178,384],"boss-sek-adler/hit":[3,10,392,343,196,343],"boss-sek-adler/idle":[4,4,392,266,196,266],"boss-talos/attack":[4,8,291,384,145,384],"boss-talos/defeat":[4,6,258,384,129,384],"boss-talos/hit":[3,10,298,384,149,384],"boss-talos/idle":[4,4,227,384,113,384],"boss-tresor-wart/attack":[3,8,392,256,196,256],"boss-tresor-wart/defeat":[3,6,379,384,189,384],"boss-tresor-wart/hit":[3,10,392,313,196,313],"boss-tresor-wart/idle":[3,4,392,266,196,266],"boss-zentral-ice/attack":[4,8,392,249,196,249],"boss-zentral-ice/defeat":[4,6,392,212,196,212],"boss-zentral-ice/hit":[3,10,392,244,196,244],"boss-zentral-ice/idle":[4,4,392,305,196,305],"bruiser/die":[4,8,258,256,129,256],"bruiser/idle":[4,4,127,256,63,256],"bruiser/jump":[4,8,229,256,114,256],"bruiser/melee":[4,10,253,256,126,256],"bruiser/run":[6,12,205,256,102,256],"bruiser/shoot":[3,10,248,256,124,256],"drone/die":[4,8,223,256,111,256],"drone/idle":[4,4,273,256,136,256],"drone/shoot":[3,10,314,256,157,256],"flamer/die":[4,8,216,256,108,256],"flamer/hit":[3,10,213,256,106,256],"flamer/spray":[4,12,294,256,147,256],"flamer/walk":[4,8,207,256,103,256],"fx-boom-boss-a/burst":[5,12,242,256,121.0,128.0],"fx-boom-boss-b/burst":[5,12,255,256,127.5,128.0],"fx-boom-debris/burst":[5,12,259,256,129.5,128.0],"fx-boom-ground-dust/burst":[5,12,264,204,132.0,102.0],"fx-boom-large-electric/burst":[5,12,262,256,131.0,128.0],"fx-boom-large-fire/burst":[5,12,264,244,132.0,122.0],"fx-boom-large-plasma/burst":[5,12,257,256,128.5,128.0],"fx-boom-medium-electric/burst":[5,12,264,255,132.0,127.5],"fx-boom-medium-fire/burst":[5,12,264,249,132.0,124.5],"fx-boom-medium-plasma/burst":[5,12,264,242,132.0,121.0],"fx-boom-small-electric/burst":[5,12,264,236,132.0,118.0],"fx-boom-small-fire/burst":[5,12,264,253,132.0,126.5],"fx-boom-small-plasma/burst":[5,12,255,256,127.5,128.0],"fx-hitconfirm/burst":[4,12,259,256,129.5,128.0],"fx-shield/glow":[4,8,389,384,194.5,192.0],"fx-spark/burst":[4,12,253,256,126.5,128.0],"grunt/die":[4,8,242,256,121,256],"grunt/idle":[4,4,127,256,63,256],"grunt/jump":[4,8,187,256,93,256],"grunt/melee":[4,10,220,256,110,256],"grunt/run":[6,12,192,256,96,256],"grunt/shoot":[3,10,205,256,102,256],"gunman/die":[4,8,255,256,127,256],"gunman/idle":[4,4,95,256,47,256],"gunman/jump":[4,8,186,256,93,256],"gunman/melee":[4,10,263,256,131,256],"gunman/run":[6,12,175,256,87,256],"gunman/shoot":[3,10,193,256,96,256],"hound/bite":[3,12,338,256,169,256],"hound/die":[4,8,281,256,140,256],"hound/pounce":[4,10,336,256,168,256],"hound/run":[6,12,376,256,188,256],"jetpack/die":[4,8,235,256,117,256],"jetpack/fly":[4,10,161,256,80,256],"jetpack/hover":[4,8,149,256,74,256],"jetpack/shoot":[3,10,196,256,98,256],"kai/aimdiag":[3,10,137,256,68,256],"kai/aimup":[3,10,109,256,54,256],"kai/combo2":[4,10,190,256,95,256],"kai/combo3":[4,10,209,256,104,256],"kai/crouchshoot":[3,10,289,256,144,256],"kai/dash":[4,14,242,256,121,256],"kai/die":[4,8,236,256,118,256],"kai/grenade":[4,10,180,256,90,256],"kai/hurt":[4,10,145,256,72,256],"kai/idle":[4,4,106,256,53,256],"kai/jump":[4,8,167,256,83,256],"kai/land":[3,10,151,256,75,256],"kai/melee":[4,10,194,256,97,256],"kai/run":[6,12,159,256,79,256],"kai/runshoot":[6,12,266,256,133,256],"kai/shoot":[3,10,196,256,98,256],"kai/victory":[4,6,116,256,58,256],"knife/die":[4,8,246,256,123,256],"knife/idle":[4,4,89,256,44,256],"knife/jump":[4,8,194,256,97,256],"knife/melee":[4,10,227,256,113,256],"knife/run":[6,12,176,256,88,256],"knife/shoot":[3,10,172,256,86,256],"mech/die":[4,8,160,256,80,256],"mech/idle":[4,4,167,256,83,256],"mech/shoot":[3,10,214,256,107,256],"medic/die":[4,8,207,256,103,256],"medic/heal":[4,8,172,256,86,256],"medic/walk":[4,8,134,256,67,256],"ninja/block":[3,8,147,256,73,256],"ninja/dash":[4,14,393,256,196,256],"ninja/die":[4,8,235,256,117,256],"ninja/slash":[4,12,252,256,126,256],"pk-ammo/spin":[4,10,247,256,123.5,128.0],"pk-coin/spin":[4,10,253,256,126.5,128.0],"pk-health/spin":[4,10,225,256,112.5,128.0],"prop-banner/loop":[4,8,187,384,93.5,192.0],"prop-beacon/loop":[4,8,184,384,92.0,192.0],"prop-car/loop":[4,8,392,254,196.0,127.0],"prop-drone/loop":[4,8,392,269,196.0,134.5],"prop-holo/loop":[4,8,186,384,93.0,192.0],"prop-neon/loop":[4,8,163,384,81.5,192.0],"prop-police/loop":[4,8,381,384,190.5,192.0],"prop-steam/glow":[5,8,204,384,102.0,192.0],"prop-windows/loop":[4,8,257,384,128.5,192.0],"shield/die":[4,8,238,256,119,256],"shield/idle":[4,4,144,256,72,256],"shield/jump":[4,8,204,256,102,256],"shield/melee":[4,10,250,256,125,256],"shield/run":[6,12,207,256,103,256],"shield/shoot":[3,10,217,256,108,256],"ship-drift/death":[4,8,520,261,260.0,130.5],"ship-drift/flame":[4,12,520,165,260.0,82.5],"ship-ebomber/death":[4,8,520,249,260.0,124.5],"ship-ebomber/flame":[4,12,520,179,260.0,89.5],"ship-ebomber/volley":[3,12,520,182,260.0,91.0],"ship-ec/death":[4,8,520,247,260.0,123.5],"ship-ec/flame":[4,12,520,144,260.0,72.0],"ship-ecarrier/death":[4,8,520,289,260.0,144.5],"ship-ecarrier/flame":[4,12,520,215,260.0,107.5],"ship-ecarrier/volley":[3,12,520,233,260.0,116.5],"ship-ecruiser/death":[4,8,520,270,260.0,135.0],"ship-ecruiser/flame":[4,12,520,172,260.0,86.0],"ship-ecruiser/volley":[3,12,520,190,260.0,95.0],"ship-egunship/death":[4,8,520,237,260.0,118.5],"ship-egunship/flame":[4,12,520,179,260.0,89.5],"ship-egunship/volley":[3,12,520,164,260.0,82.0],"ship-einterceptor/death":[4,8,520,241,260.0,120.5],"ship-einterceptor/flame":[4,12,520,221,260.0,110.5],"ship-einterceptor/volley":[3,12,520,240,260.0,120.0],"ship-ekamikaze/death":[4,8,520,251,260.0,125.5],"ship-ekamikaze/flame":[4,12,520,225,260.0,112.5],"ship-ekamikaze/volley":[3,12,520,240,260.0,120.0],"ship-hv/death":[4,8,520,256,260.0,128.0],"ship-hv/flame":[4,12,520,164,260.0,82.0],"ship-lancer/death":[4,8,520,256,260.0,128.0],"ship-lancer/flame":[4,12,520,121,260.0,60.5],"ship-nova/death":[4,8,520,278,260.0,139.0],"ship-nova/flame":[4,12,520,149,260.0,74.5],"ship-std/death":[4,8,520,234,260.0,117.0],"ship-std/flame":[4,12,520,107,260.0,53.5],"ship-swg/death":[4,8,520,242,260.0,121.0],"ship-swg/flame":[4,12,520,214,260.0,107.0],"ship-syn/death":[4,8,520,261,260.0,130.5],"ship-syn/flame":[4,12,520,167,260.0,83.5],"ship-tri/death":[4,8,520,237,260.0,118.5],"ship-tri/flame":[4,12,520,205,260.0,102.5],"sniper/die":[4,8,202,256,101,256],"sniper/idle":[4,4,160,256,80,256],"sniper/jump":[4,8,254,256,127,256],"sniper/melee":[4,10,224,256,112,256],"sniper/run":[6,12,270,256,135,256],"sniper/shoot":[3,10,205,256,102,256],"turret/die":[4,8,240,256,120,256],"turret/idle":[4,4,306,256,153,256],"turret/shoot":[3,10,325,256,162,256],"warden/die":[4,8,259,256,129,256],"warden/idle":[4,4,139,256,69,256],"warden/jump":[4,8,196,256,98,256],"warden/melee":[4,10,288,256,144,256],"warden/run":[6,12,253,256,126,256],"warden/shoot":[3,10,287,256,143,256],"wpn-arc/beam":[4,12,392,190,196.0,95.0],"wpn-arc/impact":[4,14,264,254,132.0,127.0],"wpn-arc/muzzle":[3,18,392,223,196.0,111.5],"wpn-beat/impact":[4,14,264,255,132.0,127.5],"wpn-beat/muzzle":[3,18,392,308,196.0,154.0],"wpn-disc/impact":[4,14,264,235,132.0,117.5],"wpn-disc/muzzle":[3,18,392,252,196.0,126.0],"wpn-drone/impact":[4,14,257,256,128.5,128.0],"wpn-drone/muzzle":[3,18,392,346,196.0,173.0],"wpn-flame/impact":[4,14,264,216,132.0,108.0],"wpn-flame/muzzle":[3,18,392,242,196.0,121.0],"wpn-frost/impact":[4,14,259,256,129.5,128.0],"wpn-frost/muzzle":[3,18,392,227,196.0,113.5],"wpn-laser/beam":[4,12,392,109,196.0,54.5],"wpn-laser/impact":[4,14,256,256,128.0,128.0],"wpn-laser/muzzle":[3,18,392,170,196.0,85.0],"wpn-mine/impact":[4,14,259,256,129.5,128.0],"wpn-mine/muzzle":[3,18,392,295,196.0,147.5],"wpn-orbit/beam":[4,12,392,281,196.0,140.5],"wpn-orbit/impact":[4,14,264,208,132.0,104.0],"wpn-orbit/muzzle":[3,18,392,173,196.0,86.5],"wpn-pulse/impact":[4,14,264,204,132.0,102.0],"wpn-pulse/muzzle":[3,18,392,237,196.0,118.5],"wpn-rail/impact":[4,14,260,256,130.0,128.0],"wpn-rail/muzzle":[3,18,392,292,196.0,146.0],"wpn-shell/impact":[4,14,264,207,132.0,103.5],"wpn-shell/muzzle":[3,18,392,282,196.0,141.0],"wpn-storm/beam":[4,12,392,296,196.0,148.0],"wpn-storm/impact":[4,14,252,256,126.0,128.0],"wpn-storm/muzzle":[3,18,392,304,196.0,152.0],"wpn-swarm/impact":[4,14,264,213,132.0,106.5],"wpn-swarm/muzzle":[3,18,392,206,196.0,103.0],"wpn-wave/beam":[4,12,392,360,196.0,180.0],"wpn-wave/impact":[4,14,264,228,132.0,114.0],"wpn-wave/muzzle":[3,18,392,284,196.0,142.0],"wpn-well/beam":[4,12,392,296,196.0,148.0],"wpn-well/impact":[4,14,254,256,127.0,128.0],"wpn-well/muzzle":[3,18,392,214,196.0,107.0]},"sm":{"holds":{"run":[1.5,0.75,0.75,1.5,0.75,0.75],"shoot":[1.4,0.6,1],"melee":[1.6,0.5,1.3,1],"attack":[1.6,0.5,1.3,1],"jump":[1.3,1,1,1.6],"die":[1,1,1,3],"defeat":[1,1,1,3],"hit":[1,1,1.4],"impact":[0.6,1.3,1,1],"burst":[0.6,1,1.3,1,1],"muzzle":[0.6,1.2,1],"death":[1,1,1,2]},"hitstop":{"ms":90,"flash_ms":70,"flash_white":0.85,"frame":{"die":0,"hit":0,"death":0,"melee":2,"attack":2,"shoot":1}},"squash":{"amount":0.07,"ms":125,"frames":{"run":[0,3],"jump":[3],"melee":[2],"attack":[2]}},"bob":{"idle_px":1.5,"idle_breath_scale":0.012,"boss_idle_px":4,"boss_hover_px":3,"hz":0.6},"lean":{"run_deg":4},"crossfade":{"actions":["idle","flame","beam","burst","impact","muzzle","bank"],"from":0.5,"max_alpha":0.85},"trails":{"enabled":false,"use_only_for":"dashes / big swings while the sprite actually moves","alpha":[0.16,0.06]},"ship_bank":{"note":"no bank sprites: tilt and squash the ship sprite while it moves up/down","tilt_deg":6,"squash_y":0.92,"ease_ms":120}},"c":{"boss-bruecken-waechter":{"bw":381.3,"gap":5.0},"boss-flusskrake":{"bw":378.7,"gap":2.3},"boss-hoplite":{"bw":248.0,"gap":3.2},"boss-kronos":{"bw":374.2,"gap":5.5},"boss-messe-waechter":{"bw":259.7,"gap":15.7},"boss-schranken-wart":{"bw":379.5,"gap":3.2},"boss-sek-adler":{"bw":375.5,"gap":8.8},"boss-talos":{"bw":215.0,"gap":9.2},"boss-tresor-wart":{"bw":374.0,"gap":3.0},"boss-zentral-ice":{"bw":359.5,"gap":21.2},"fx-boom-boss-a/burst":{"bw":150.6},"fx-boom-boss-b/burst":{"bw":127.0},"fx-boom-debris/burst":{"bw":189.5},"fx-boom-ground-dust/burst":{"bw":74.8},"fx-boom-large-electric/burst":{"bw":124.2},"fx-boom-large-fire/burst":{"bw":128.0},"fx-boom-large-plasma/burst":{"bw":116.8},"fx-boom-medium-electric/burst":{"bw":140.8},"fx-boom-medium-fire/burst":{"bw":122.8},"fx-boom-medium-plasma/burst":{"bw":148.2},"fx-boom-small-electric/burst":{"bw":111.6},"fx-boom-small-fire/burst":{"bw":136.0},"fx-boom-small-plasma/burst":{"bw":175.5},"fx-hitconfirm/burst":{"bw":167.0},"fx-shield/glow":{"bw":359.8},"fx-spark/burst":{"bw":159.8},"pk-ammo/spin":{"bw":216.5},"pk-coin/spin":{"bw":154.5},"pk-health/spin":{"bw":189.2},"ship-drift":{"k":0.1965,"ox":-14.02,"oy":-0.0},"ship-ec":{"k":0.1499,"ox":-4.63,"oy":0.15},"ship-hv":{"k":0.1881,"ox":-15.91,"oy":0.09},"ship-lancer":{"k":0.1881,"ox":-15.91,"oy":-0.09},"ship-nova":{"k":0.1921,"ox":-16.29,"oy":-0.19},"ship-std":{"k":0.219,"ox":-16.22,"oy":-0.0},"ship-swg":{"k":0.1583,"ox":-7.36,"oy":0.08},"ship-syn":{"k":0.1905,"ox":-15.9,"oy":0.1},"ship-tri":{"k":0.1684,"ox":-8.9,"oy":0.08},"wpn-arc/beam":{"bw":361.2},"wpn-arc/impact":{"bw":113.5},"wpn-arc/muzzle":{"bw":227.3},"wpn-beat/impact":{"bw":145.8},"wpn-beat/muzzle":{"bw":204.3},"wpn-disc/impact":{"bw":156.3},"wpn-disc/muzzle":{"bw":224.0},"wpn-drone/impact":{"bw":166.0},"wpn-drone/muzzle":{"bw":191.7},"wpn-flame/impact":{"bw":141.8},"wpn-flame/muzzle":{"bw":200.3},"wpn-frost/impact":{"bw":165.2},"wpn-frost/muzzle":{"bw":159.0},"wpn-laser/beam":{"bw":359.8},"wpn-laser/impact":{"bw":152.2},"wpn-laser/muzzle":{"bw":205.3},"wpn-mine/impact":{"bw":163.2},"wpn-mine/muzzle":{"bw":226.3},"wpn-orbit/beam":{"bw":319.0},"wpn-orbit/impact":{"bw":145.8},"wpn-orbit/muzzle":{"bw":157.3},"wpn-pulse/impact":{"bw":113.8},"wpn-pulse/muzzle":{"bw":163.0},"wpn-rail/impact":{"bw":150.0},"wpn-rail/muzzle":{"bw":208.7},"wpn-shell/impact":{"bw":124.2},"wpn-shell/muzzle":{"bw":221.3},"wpn-storm/beam":{"bw":352.2},"wpn-storm/impact":{"bw":136.8},"wpn-storm/muzzle":{"bw":254.3},"wpn-swarm/impact":{"bw":157.8},"wpn-swarm/muzzle":{"bw":201.0},"wpn-wave/beam":{"bw":317.8},"wpn-wave/impact":{"bw":134.2},"wpn-wave/muzzle":{"bw":154.3},"wpn-well/beam":{"bw":330.8},"wpn-well/impact":{"bw":144.3},"wpn-well/muzzle":{"bw":124.0}}};
 ART.as={};ART.aDone=false;ART.aP=0;ART.aT=0;                // aDone / aP / aT: set by ART.aframe (a one-shot reached its end; progress 0..1 and seconds inside the frame)
 ART.LOOPA=new Set(['idle','run','flame','glow','loop','spin','hover']);   // every other act is a one-shot: it stops on its last frame
-ART.aS=key=>{let o=ART.as[key];if(o!==undefined)return o;const m=ART.ANIM.s[key];if(!m)return ART.as[key]=null;   // per-sheet record, built once: cumulative frame end times (smoothing.json holds at the sheet fps)
+ART.VS={};ART.VB={};     // tinted copies of enemy-ship sheets (foeart.js): meta and strip, kept out of ART.ANIM.s / ART.rd so the listed-sheet counts stay the real files
+ART.aS=key=>{let o=ART.as[key];if(o!==undefined)return o;const m=ART.ANIM.s[key]||ART.VS[key];if(!m)return ART.as[key]=null;   // per-sheet record, built once: cumulative frame end times (smoothing.json holds at the sheet fps)
   const act=key.slice(key.lastIndexOf('/')+1),hd=ART.ANIM.sm.holds[act],n=m[0],cum=new Float32Array(n);let s=0;for(let i=0;i<n;i++){s+=(hd&&hd.length===n?hd[i]:1)/m[1];cum[i]=s;}
   return ART.as[key]={m,act,cum,tot:s,loop:ART.LOOPA.has(act),xf:ART.ANIM.sm.crossfade.actions.indexOf(act)>=0};};
 /* the decoded strip for key ('boss-kronos/idle'), or null while it loads / when it is not listed in ready.json / with the flag off */
-ART.anim=key=>{if(!RET.sprites)return null;const n='anim/'+key+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return null;const b=ART.bm[n];if(b)return b;if(!(n in ART.bm))ART.load(n);return null;};
+ART.anim=key=>{if(!RET.sprites)return null;if(ART.VB[key])return ART.VB[key];const n='anim/'+key+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return null;const b=ART.bm[n];if(b)return b;if(!(n in ART.bm))ART.load(n);return null;};
 /* frame index at t seconds since the act began */
 ART.aframe=(key,t)=>{const o=ART.aS(key);ART.aDone=false;ART.aP=0;ART.aT=0;if(!o)return 0;const n=o.m[0];let u=t>0?t:0;
   if(o.loop)u%=o.tot;else if(u>=o.tot){ART.aDone=true;ART.aP=1;return n-1;}
@@ -3162,7 +3165,7 @@ SPR.ship=(c,id,t,bob)=>{const cb=ART.ANIM.c['ship-'+id],bk=ART.ANIM.sm.ship_bank
 SPR.shipDeath=()=>{const id=shipDef().id,cb=ART.ANIM.c['ship-'+id],key='ship-'+id+'/death';if(!cb||!ART.anim(key))return 0;ART.gh.push({key,x:P.x+cb.ox,y:P.y+cb.oy,k:cb.k,t:0});return ART.aS(key).tot;};
 /* ----- enemy ships: flame (loops) / volley (while the shot is armed: the beat before it fires) / death (a ghost clip where it died). Sheets face left like the old shapes; w = drawn width in world px; rot turns the nose (dives); art only, e.r stays the hitbox ----- */
 SPR.foe=(e,id,t,x,y,w,rot,fl)=>{if(!RET.sprites)return false;const b='ship-'+id+'/',fk=b+'flame';if(!ART.ANIM.s[fk]||!ART.anim(fk))return false;ART.anim(b+'death');const hv=ART.ANIM.s[b+'volley']&&ART.anim(b+'volley')&&e.arm?'volley':'flame';
-  if(hv!==e._ea){e._ea=hv;e._es=t;}const key=b+hv,sc=w/ART.ANIM.s[key][2],tt=t-e._es;e._fs=sc;e._fw=w;
+  if(hv!==e._ea){e._ea=hv;e._es=t;}const key=b+hv,sc=w/ART.ANIM.s[key][2],tt=t-e._es;e._fs=sc;e._fw=w;e._fa=FOEART.fr;
   if(rot){ctx.save();ctx.translate(x,y);ctx.rotate(rot);x=0;y=0;}
   ART.drawAnim(ctx,key,tt,x,y,sc,false);if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,x,y,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);ctx.globalCompositeOperation='source-over';}
   if(rot)ctx.restore();return true;};
@@ -3242,7 +3245,7 @@ NR.on('beat',()=>{if(!G.live||G.dead||ST.over)return;
 NR.on('kill',({e})=>{if(!e||!e.ldr)return;if(!G.over&&!ST.over)G.score+=e.score;floater(e.x,e.y-30,'LEADER DOWN','#ffd23d');
   for(const f of G.en){if(f.lk===e&&f.hp>0){f.rg=1;f.shl=false;f.bf=Math.min(f.bf,2);}}});
 {const de=drawEnemy;drawEnemy=function(e,t){de(e,t);if(e.type==='boss'||e.hp<=0)return;
-  if(e.ldr){ctx.save();ctx.translate(e.x,e.y);if(!ART.have('spr-en-leader')){const g=ART.sil('spr-en-drone',e.r*2.9,'#ffd23d');if(g)ART.put(g,0,0,0,.3);}   // a gold sheen on the drone body until the leader sprite exists
+  if(e.ldr){ctx.save();ctx.translate(e.x,e.y);if(!ART.have('spr-en-leader')&&e._fa!==FOEART.fr){const g=ART.sil('spr-en-drone',e.r*2.9,'#ffd23d');if(g)ART.put(g,0,0,0,.3);}   // a gold sheen on the drone body until the leader sprite exists
     ctx.strokeStyle='#ffd23d';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(0,0,e.r+7,0,7);ctx.stroke();ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(0,0,e.r+12,0,7);ctx.stroke();
     const cy=-e.r-14;if(ART.have('fx-crown')){const o=ART.sp('fx-crown',22);ctx.globalCompositeOperation='lighter';ART.put(o,0,cy+4);ctx.globalCompositeOperation='source-over';}
     else{ctx.fillStyle='#ffd23d';ctx.beginPath();ctx.moveTo(-8,cy+8);ctx.lineTo(-8,cy);ctx.lineTo(-4,cy+4);ctx.lineTo(0,cy-3);ctx.lineTo(4,cy+4);ctx.lineTo(8,cy);ctx.lineTo(8,cy+8);ctx.closePath();ctx.fill();}   // crown (painted when fx-crown is ready)
@@ -5804,6 +5807,7 @@ const ZOO=window.ZOO={
     if(e.arm){const k=PHF;ctx.save();ctx.globalCompositeOperation='lighter';G_(0,0,r*(1.7+1.2*k),'#ff3050',.22+.5*k);ctx.restore();
       ctx.strokeStyle='#ff7080';ctx.globalAlpha=.35+.65*k;ctx.lineWidth=2+2*k;ctx.beginPath();ctx.arc(0,0,r+4+16*(1-k),0,7);ctx.stroke();ctx.globalAlpha=1;}
     if(e.type==='kamikaze'&&SPR.foe(e,'ekamikaze',t,0,0,r*3.6,e.zst===3||e.tel?e.ang-Math.PI:0,fl)){ctx.restore();return;}   // art sheet; the dive line is drawn by over()
+    if(FOEART.body(e,t,fl,1)){ctx.restore();return;}
     ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
     const glow=(c,a)=>{ctx.globalCompositeOperation='lighter';G_(0,0,r*1.1,c,a);ctx.globalCompositeOperation='source-over';};
     switch(e.type){
@@ -11471,7 +11475,7 @@ const FLK=window.FLK={get on(){return!!RET.flankers&&!!RET.anticamp;},HOLD:2,SHA
     for(const t of this.tells){t.t-=dt;if(t.t<=0){t.done=1;try{this.mk(t);}catch(err){}}}this.tells=this.tells.filter(t=>!t.done);
     for(const e of G.en)if(e.fk&&!e.dead&&e.hp>0)this.move(e,dt);},
   draw(e,t){const K=this.K[e.fk],fl=e.flash>0,line=fl?'#fff':K.col,fill=fl?'#fff':'#12081f',s=e.sd||1;
-    ctx.save();ctx.translate(e.x,e.y);ctx.scale(s,1);ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
+    ctx.save();ctx.translate(e.x,e.y);ctx.scale(s,1);if(FOEART.body(e,t,fl,1)){ctx.restore();return;}ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
     if(e.fk==='diver'){if(ART.pic('ac-flanker',e.r*3.2,0,0,-Math.PI/2)){if(fl){ctx.globalAlpha=.6;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,0,e.r,0,7);ctx.fill();ctx.globalAlpha=1;}}else{ctx.rotate(Math.PI/2);ctx.beginPath();ctx.moveTo(e.r+4,0);ctx.lineTo(-e.r,-e.r*.9);ctx.lineTo(-e.r*.4,0);ctx.lineTo(-e.r,e.r*.9);ctx.closePath();ctx.fill();ctx.stroke();ctx.rotate(-Math.PI/2);}
       if(e.hp>e.hull){ctx.globalAlpha=.55+.3*Math.sin(t*10);ctx.strokeStyle='#4ad1ff';ctx.beginPath();ctx.arc(0,0,e.r+7,0,7);ctx.stroke();}}
     else if(e.fk==='crawler'){ctx.beginPath();ctx.arc(0,e.r*.5,e.r,Math.PI,0);ctx.closePath();ctx.fill();ctx.stroke();
@@ -11493,6 +11497,89 @@ NR.on('tick',dt=>{try{if(G)FLK.tick(dt);}catch(err){}});
 NR.on('kill',d=>{const e=d&&d.e;if(!e||!e.fk)return;FLK.stat.kill++;if(GX()<.7)G.pk.push({t:'shard',x:e.x,y:e.y,vx:rnd(-40,20),vy:rnd(-60,60),bob:rnd(0,7)});});
 {const de=drawEnemy;drawEnemy=function(e,t){if(e.fk&&FLK.K[e.fk]){FLK.draw(e,t);return;}de(e,t);};}
 {const dp=drawPickups;drawPickups=function(t){dp(t);try{if(FLK.on)FLK.drawTells(t);}catch(err){}};}
+
+/* ---------- foeart.js: every fly-stage enemy draws from an approved ship sheet (owner, 21 Oct 2026: "the ships are not wired, I still see old shapes").
+   Flag RET.foeart, default ON; ?foeart=0 = the drawing as it was. Needs RET.sprites (the sheets are anim/ship-e<kind>/flame|volley).
+   ENEMY_ART maps EVERY enemy id the game can spawn to the nearest approved enemy-ship sheet, a tint (hue turn / saturation / brightness, built ONCE per sheet+tint into an
+   offscreen strip that ART.drawAnim then draws like any other sheet), a width (k x the old radius, or w px), an optional heading and two small overlays (pre / ov, code shapes
+   or existing fx art). Art only: radius, hull, hit boxes, spawn rules are not touched. Variants (VAR.in / out: size, mirror, rotation, hue pips, elite) wrap the body as before.
+   native: the sheet is drawn by SPR.foe (gunship, kamikaze, the four fleet ships). NEEDS: ids that still draw their old picture (ASSETS-NEEDED-ENEMIES.md).
+   Test: nightrun/foeart-test.js (every spawnable id must be mapped or listed in NEEDS). ---------- */
+if(RET.foeart===undefined)RET.foeart=!/[?&]foeart=0/.test(location.search);
+/* hue turn is relative to the sheets' own colour (measured: interceptor / bomber / gunship / carrier / cruiser sit at hue 228, kamikaze at 351) */
+const ENEMY_ART=window.ENEMY_ART={
+  /* core director kinds (dir.js, draw.js) */
+  drone:{s:'einterceptor',k:3.4,t:[-28,1,1],L:{k:4.2,t:[180,1.15,1.1]}},                       // L: the leader (e.ldr) is gold and a quarter larger
+  charger:{s:'ekamikaze',k:3.6,t:[29,1.1,1]},
+  turret:{s:'egunship',k:3.1,t:[171,1.1,1],rot:e=>aim(e)+Math.PI,mk:'turret'},
+  gate:{s:'ebomber',w:46,t:[127,1.2,1],mk:'gate'},                                                // two pylons (FOEART.post), nose turned to the gap
+  flank:{s:'einterceptor',k:3.2,t:[-43,1.05,1],rot:e=>((e.side&&!e.settled)?Math.atan2(-e.side*190,-80):Math.PI)-Math.PI},
+  swarm:{s:'einterceptor',k:3.0,t:[87,1.1,1.05]},
+  mine:{s:'ebomber',k:2.3,t:[167,1.2,1.05],hp:1,mk:'mine'},
+  gunship:{native:1},
+  /* zoo.js kinds */
+  shielder:{s:'egunship',k:3.4,t:[-38,1.1,1],hp:1,mk:'shielder',ov:(e,t,r)=>{if(e.shN>0)FXW.bubble(e,r,e.fa==null?Math.PI:e.fa,(.35+.5*(e.shN/e.shMax))*(e.shF>0?1:.8));}},   // the existing shield picture (gameplay tell)
+  splitter:{s:'einterceptor',k:3.2,t:[72,1.15,1],hp:1,mk:'splitter'},
+  bomber:{s:'ebomber',k:3.4,t:[165,1.15,1],hp:1,mk:'zbomber'},
+  sniper:{s:'einterceptor',k:3.7,t:[-138,1.2,1],hp:1,mk:'sniper'},
+  healer:{s:'einterceptor',k:3.2,t:[-73,1.1,1.05],hp:1,mk:'healer'},
+  carrier:{s:'ecarrier',k:2.7,t:[37,1.1,1],hp:1},
+  minelayer:{s:'ebomber',k:3.2,t:[-158,1.2,1],hp:1,mk:'minelayer'},
+  kamikaze:{native:1},
+  zdrn:{s:'einterceptor',k:3.2,t:[47,1,1.05],mk:'zdrone'},
+  /* fleet.js (the four ships draw through FLEET.spr / SPR.foe; the drone that orbits the carrier is the interceptor in lilac) */
+  einterceptor:{native:1},ebomber:{native:1},ecarrier:{native:1},ecruiser:{native:1},
+  efdrone:{s:'einterceptor',k:3.2,t:[42,1,1.05],mk:'cdrone'},
+  /* flankers.js (ids fk-<kind>) */
+  'fk-diver':{s:'ekamikaze',k:3.2,t:[34,1.15,1],rot:()=>-Math.PI/2,mk:'diver',ov:(e,t,r)=>{if(e.hp>e.hull){ctx.globalAlpha=.55+.3*Math.sin(t*10);ctx.strokeStyle='#4ad1ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+7,0,7);ctx.stroke();ctx.globalAlpha=1;}}},   // the old shield-up ring stays (gameplay tell)
+  'fk-crawler':{s:'ebomber',k:3.3,t:[-148,1.2,1],mk:'crawler'},
+  'fk-bait':{s:'einterceptor',k:3.1,t:[102,1.1,1.05],mk:'bait'}};
+/* ASSET-POLICY.md: no new art in code. A stand-in is a recoloured / scaled / flipped approved sheet plus, where the type needs its own look, a plain flat marker (mk = the asset id it waits for,
+   see ASSETS-NEEDED-ENEMIES.md). The marker is a small triangle / circle / box at the stern with the id in 6 px text; it goes away when a real sheet replaces the entry. */
+const MKSHAPE=['tri','circ','box'];
+/* ids that still draw their old picture: the sheet to ask for is in ASSETS-NEEDED-ENEMIES.md. The ground units walk, a ship cannot stand in for them. */
+const NEEDS=window.FOEART_NEEDS=['gtank','gturret','gwalker'];
+const FOEART=window.FOEART={fr:0,built:0,cnt:0,n:{all:0,sheet:0,stand:0,by:{}},flt:(()=>{try{return 'filter' in CanvasRenderingContext2D.prototype;}catch(_){return false;}})(),
+  id:e=>e.fk&&window.FLK&&FLK.K[e.fk]?'fk-'+e.fk:e.type,
+  map:e=>{const m=ENEMY_ART[FOEART.id(e)];if(!m||m.native)return null;if(e.ldr&&m.L){if(!m._L)m._L=Object.assign({},m,m.L);return m._L;}return m;},
+  /* the (tinted) strip key for an act; the tinted copy is built once, at most one per frame */
+  sheet(m,act){const src='ship-'+m.s+'/'+act;if(!ART.ANIM.s[src])return null;const sb=ART.anim(src);if(!sb)return null;const tn=m.t;if(!tn||(!tn[0]&&tn[1]===1&&tn[2]===1))return src;
+    const tg=m._tg||(m._tg=Math.round(tn[0])+'_'+Math.round(tn[1]*100)+'_'+Math.round(tn[2]*100)),vk='ship-'+m.s+'~'+tg+'/'+act;
+    if(ART.VB[vk])return vk;if(FOEART.built>=1)return src;FOEART.built++;
+    const cv=document.createElement('canvas');cv.width=sb.width;cv.height=sb.height;const g=cv.getContext('2d');
+    if(FOEART.flt){g.filter='hue-rotate('+tn[0]+'deg) saturate('+tn[1]+') brightness('+tn[2]+')';g.drawImage(sb,0,0);}
+    else{g.drawImage(sb,0,0);g.globalCompositeOperation='source-atop';g.fillStyle='hsla('+(((228+tn[0])%360+360)%360)+',80%,55%,.45)';g.fillRect(0,0,cv.width,cv.height);}   // no canvas filter (old Safari): a colour wash instead
+    ART.VS[vk]=ART.ANIM.s[src];ART.VB[vk]=cv;return vk;},
+  /* draw the sheet body of e at the origin of the current transform (every call site has translated to the enemy). own: this site did not run VAR.in (dir.js, zoo.js, flankers.js do not go through draw.js) */
+  body(e,t,fl,own){if(!RET.foeart||!RET.sprites)return false;const m=FOEART.map(e);if(!m)return false;
+    const act=e.arm&&ART.ANIM.s['ship-'+m.s+'/volley']?'volley':'flame',key=FOEART.sheet(m,act)||(act==='volley'?FOEART.sheet(m,'flame'):null);if(!key)return false;
+    if(own&&e.vz)VAR.in(e,t);
+    const r=e.r,w=m.w||r*m.k,sc=w/(ART.VS[key]||ART.ANIM.s[key])[2],tt=(e.t||0)+eb_(e),rot=m.rot?m.rot(e,t):0;
+    ctx.save();if(rot)ctx.rotate(rot);ART.drawAnim(ctx,key,tt,0,0,sc,false);
+    if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,0,0,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);ctx.globalCompositeOperation='source-over';}ctx.restore();
+    if(m.ov)m.ov(e,t,r,fl);if(m.mk)FOEART.marker(m,r,fl);
+    if(m.hp&&e.max>1&&e.hp>0)hpBar(-14,-r-(e.type==='shielder'?22:9),28,e.hp/e.max);
+    if(own&&e.vz)VAR.out(e,t);
+    e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
+  marker(m,r,fl){let q=m._mc;if(!q){q=m._mc=document.createElement('canvas');q.width=40;q.height=22;const g=q.getContext('2d'),sh=MKSHAPE[(m.mk.length+m.mk.charCodeAt(0))%3];g.fillStyle='#e8ecff';g.beginPath();
+      if(sh==='tri'){g.moveTo(20,1);g.lineTo(24,8);g.lineTo(16,8);g.closePath();}else if(sh==='circ')g.arc(20,5,3.5,0,7);else g.rect(16.5,1.5,7,7);g.fill();g.font='700 7px sans-serif';g.textAlign='center';g.fillText(m.mk,20,19);}
+    ctx.globalAlpha=fl?1:.9;ctx.drawImage(q,r*.9-20,r*.7-5);ctx.globalAlpha=1;},
+  /* gate pylon at (0,y) of the gate's frame: the nose points into the gap */
+  post(e,y,up,fl){if(!RET.foeart||!RET.sprites)return false;const m=ENEMY_ART.gate,key=FOEART.sheet(m,'flame');if(!key)return false;const sc=m.w/(ART.VS[key]||ART.ANIM.s[key])[2];
+    ctx.save();ctx.translate(0,y);ctx.rotate(up?-Math.PI/2:Math.PI/2);ART.drawAnim(ctx,key,e.t||0,0,0,sc,false);
+    if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,e.t||0,0,0,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);}
+    ctx.restore();e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
+  /* the four sheets every stage can need are fetched shortly after the page loads (carrier / cruiser come with their first sighting); one missing tint is built per idle frame, so a unit never shows the plain colour */
+  warm(){if(!RET.sprites||!RET.foeart)return;for(const s of['einterceptor','ebomber','egunship','ekamikaze'])ART.anim('ship-'+s+'/flame');},
+  idle(){if(!RET.foeart||!RET.sprites||FOEART.built)return;const L=FOEART._l||(FOEART._l=Object.values(ENEMY_ART).filter(m=>!m.native).flatMap(m=>m.L?[m,Object.assign({},m,m.L)]:[m]));
+    for(const m of L){if(m.t&&!ART.VB['ship-'+m.s+'~'+(m._tg||'')+'/flame']&&ART.ANIM.s['ship-'+m.s+'/flame']&&ART.anim('ship-'+m.s+'/flame')){FOEART.sheet(m,'flame');return;}}},
+  /* ids the game can spawn, from the tables it spawns from (ZOO.T, FLEET.K, FLK.K, DMG.ml and LEAK.GT; the director's own kinds) */
+  ids(){const s=new Set(['drone','charger','gunship','gate','flank','swarm','mine','turret']);
+    for(const T of[window.ZOO&&ZOO.T,window.FLEET&&FLEET.K,window.DMG&&DMG.ml,window.LEAK&&LEAK.GT])if(T)for(const k in T)s.add(k);
+    if(window.FLK)for(const k in FLK.K)s.add('fk-'+k);s.delete('boss');return[...s];},
+  /* share of on-screen enemy draws that came from a sheet (the test turns FOEART.cnt on) */
+  tally(){const n=FOEART.n;for(const e of G.en){if(e.type==='boss'||e.dead||e.hp<=0||e.x<0||e.x>W||e.y<-10||e.y>H+10)continue;const id=FOEART.id(e),b=n.by[id]||(n.by[id]=[0,0,0]);n.all++;b[1]++;if(e._fa===FOEART.fr){n.sheet++;b[0]++;if(e._fk===FOEART.fr){n.stand++;b[2]++;}}}}};
+setTimeout(()=>FOEART.warm(),2600);
 
 /* ---------- fleet.js: four enemy warships in the fly stages (owner, 21 Oct 2026: "include enemy ships ... same as the fly stages difficulty will increase gradually").
    Flag RET.fleet, default ON; ?fleet=0 = the game as it was (no fleet waves, no extra dice).
@@ -11643,6 +11730,7 @@ const FLEET=window.FLEET={
     if(k==='car'&&e.fsh){ctx.save();ctx.globalAlpha=.35+.2*Math.sin(t*6);ctx.strokeStyle='#4ad1ff';ctx.fillStyle='#4ad1ff1c';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,r+14,0,7);ctx.fill();ctx.stroke();ctx.restore();}
     if(this.spr(e,t)){if(e.arm){ctx.save();ctx.translate(e.x,e.y);ctx.globalAlpha=.35+.5*(typeof PHF==='number'?PHF:0);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+8,0,7);ctx.stroke();ctx.restore();}   // the shot tell stays
       if(e.max>1)hpBar(e.x-14,e.y-r-9,28,e.hp/e.max);return;}
+    if(k==='drn'){ctx.save();ctx.translate(e.x,e.y);const o=FOEART.body(e,t,fl);ctx.restore();if(o)return;}
     ctx.save();ctx.translate(e.x,e.y);
     if(e.arm){ctx.globalAlpha=.35+.5*(typeof PHF==='number'?PHF:0);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+8,0,7);ctx.stroke();ctx.globalAlpha=1;}
     ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
@@ -13143,7 +13231,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='f63d7b9272 2026-10-21 16:31 UTC';
+const NR_STAMP='efd8b1bd16 2026-10-21 18:16 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -13310,7 +13398,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   if(!PT){drawBG(bgFor(G.di),t,dt,G.scroll);if(RET.read)READ.dim(W,H);
   }   // (no rain, no traffic specks: the background stays calm)
   drawPickups(t);
-  for(const e of G.en)drawEnemy(e,t);if(ART.gh.length)ART.ghosts();if(RET.variants)for(const e of G.en)if(e.vz)VAR.mark(e,t);
+  FOEART.fr++;FOEART.built=0;for(const e of G.en)drawEnemy(e,t);FOEART.idle();if(FOEART.cnt)FOEART.tally();if(ART.gh.length)ART.ghosts();if(RET.variants)for(const e of G.en)if(e.vz)VAR.mark(e,t);
   // player bullets
   ctx.globalCompositeOperation='lighter';const D=DISTRICTS[G.di];
   // the ship's own fire is dim and thin: the enemy bullets (bright lime, dark rim) are what must read

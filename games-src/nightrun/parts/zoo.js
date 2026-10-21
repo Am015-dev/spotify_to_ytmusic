@@ -193,6 +193,7 @@ const ZOO=window.ZOO={
     if(e.arm){const k=PHF;ctx.save();ctx.globalCompositeOperation='lighter';G_(0,0,r*(1.7+1.2*k),'#ff3050',.22+.5*k);ctx.restore();
       ctx.strokeStyle='#ff7080';ctx.globalAlpha=.35+.65*k;ctx.lineWidth=2+2*k;ctx.beginPath();ctx.arc(0,0,r+4+16*(1-k),0,7);ctx.stroke();ctx.globalAlpha=1;}
     if(e.type==='kamikaze'&&SPR.foe(e,'ekamikaze',t,0,0,r*3.6,e.zst===3||e.tel?e.ang-Math.PI:0,fl)){ctx.restore();return;}   // art sheet; the dive line is drawn by over()
+    if(FOEART.body(e,t,fl,1)){ctx.restore();return;}
     ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
     const glow=(c,a)=>{ctx.globalCompositeOperation='lighter';G_(0,0,r*1.1,c,a);ctx.globalCompositeOperation='source-over';};
     switch(e.type){

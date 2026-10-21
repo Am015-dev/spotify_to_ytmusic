@@ -54,14 +54,14 @@ function drawEnemy(e,t){const D=DISTRICTS[G.di];ctx.save();ctx.translate(e.x,e.y
     ctx.strokeStyle='#ff7080';ctx.globalAlpha=.35+.65*k;ctx.lineWidth=2+2*k;ctx.beginPath();ctx.arc(0,0,e.r+4+16*(1-k),0,7);ctx.stroke();ctx.globalAlpha=1;}
   if(e.el){ctx.strokeStyle='#ffd23d';ctx.lineWidth=2;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(0,0,e.r+4,0,7);ctx.stroke();ctx.globalAlpha=1;}
   switch(e.type){
-    case'drone':{if(ART.dflash(e.ldr&&ART.have('spr-en-leader')?'spr-en-leader':'spr-en-drone',e.r*2.9,0,Math.sin(t*4+eb_(e))*1.5,0,fl)){ctx.strokeStyle='#8890c0';ctx.lineWidth=1.2;
+    case'drone':{if(FOEART.body(e,t,fl))break;if(ART.dflash(e.ldr&&ART.have('spr-en-leader')?'spr-en-leader':'spr-en-drone',e.r*2.9,0,Math.sin(t*4+eb_(e))*1.5,0,fl)){ctx.strokeStyle='#8890c0';ctx.lineWidth=1.2;
         for(const s of[-1,1]){ctx.beginPath();ctx.ellipse(s*9,-e.r*.85,8*Math.abs(Math.sin(t*40+s)),1.6,0,0,7);ctx.stroke();}   // spinning rotors
         const red=(Math.floor(G.bp)+Math.floor(e.by))%2;ctx.globalCompositeOperation='lighter';G_(0,-e.r*.55,7,red?'#ff2030':'#2050ff',.9);ctx.globalCompositeOperation='source-over';break;}
       ctx.fillStyle=fl?'#fff':'#141024';ctx.strokeStyle='#5a6aff';ctx.lineWidth=1.5;ctx.beginPath();ctx.ellipse(0,0,14,8,0,0,7);ctx.fill();ctx.stroke();
       ctx.strokeStyle='#8890c0';ctx.lineWidth=1;for(const s of[-1,1]){ctx.beginPath();ctx.moveTo(s*10,-4);ctx.lineTo(s*16,-10);ctx.stroke();ctx.beginPath();ctx.ellipse(s*16,-11,8*Math.abs(Math.sin(t*40+s)),1.5,0,0,7);ctx.stroke();}
       const red=(Math.floor(G.bp)+Math.floor(e.by))%2;ctx.globalCompositeOperation='lighter';G_(0,-6,10,red?'#ff2030':'#2050ff',.95);ctx.globalCompositeOperation='source-over';
       ctx.fillStyle='#ff3dbb';ctx.fillRect(-12,-1,5,2);break;}
-    case'turret':{const a=aim(e);{const bs=ART.sp('spr-en-turret-base',e.r*2.5),br=ART.sp('spr-en-turret-barrel',e.r*1.7);
+    case'turret':{const a=aim(e);if(FOEART.body(e,t,fl))break;{const bs=ART.sp('spr-en-turret-base',e.r*2.5),br=ART.sp('spr-en-turret-barrel',e.r*1.7);
         if(bs&&br){ART.put(bs,0,e.r*.12);if(fl)ART.put(ART.sil('spr-en-turret-base',e.r*2.5,'#ffffff'),0,e.r*.12,0,.8);
           ctx.save();ctx.translate(0,-e.r*.1);ctx.rotate(a);ctx.drawImage(br.c,-br.h*.5,-br.h/2,br.w,br.h);   // the barrel turns on its hub and keeps aiming
           if(fl){const q=ART.sil('spr-en-turret-barrel',e.r*1.7,'#ffffff');ctx.globalAlpha=.8;ctx.drawImage(q.c,-br.h*.5,-br.h/2,q.w,q.h);ctx.globalAlpha=1;}ctx.restore();
@@ -69,7 +69,7 @@ function drawEnemy(e,t){const D=DISTRICTS[G.di];ctx.save();ctx.translate(e.x,e.y
       ctx.fillStyle=fl?'#fff':'#1a1020';ctx.strokeStyle='#ffa02d';ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<6;i++){const q=i*Math.PI/3;ctx.lineTo(Math.cos(q)*20,Math.sin(q)*20);}ctx.closePath();ctx.fill();ctx.stroke();
       ctx.rotate(a);ctx.fillStyle='#ffa02d';ctx.fillRect(6,-3,20,6);ctx.rotate(-a);ctx.globalCompositeOperation='lighter';G_(0,0,14,'#ffa02d',.6);ctx.globalCompositeOperation='source-over';break;}
     case'charger':{if(e.aimL){ctx.strokeStyle='#ff304088';ctx.setLineDash([6,6]);ctx.beginPath();ctx.moveTo(-10,0);ctx.lineTo(-W,0);ctx.stroke();ctx.setLineDash([]);}
-      if(ART.dflash('spr-en-charger',e.r*3.4,0,Math.sin(t*6+eb_(e))*1,0,fl))break;
+      if(FOEART.body(e,t,fl))break;if(ART.dflash('spr-en-charger',e.r*3.4,0,Math.sin(t*6+eb_(e))*1,0,fl))break;
       ctx.fillStyle=fl?'#fff':'#220a12';ctx.strokeStyle='#ff3040';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-16,0);ctx.lineTo(12,-11);ctx.lineTo(6,0);ctx.lineTo(12,11);ctx.closePath();ctx.fill();ctx.stroke();
       ctx.globalCompositeOperation='lighter';G_(12,0,12,'#ff3040',.8);ctx.globalCompositeOperation='source-over';break;}
     case'gunship':{if(SPR.foe(e,'egunship',t,0,0,e.r*3,0,fl)||ART.dflash('spr-en-gunship',e.r*3,0,Math.sin(t*2+eb_(e))*1.5,0,fl)){ctx.globalCompositeOperation='lighter';G_(-e.r*1.3,0,12,D.a,.5);ctx.globalCompositeOperation='source-over';hpBar(-30,-e.r*.8-14,60,e.hp/e.max);break;}
@@ -80,10 +80,11 @@ function drawEnemy(e,t){const D=DISTRICTS[G.di];ctx.save();ctx.translate(e.x,e.y
     case'gate':{ctx.translate(0,-e.y);const top=e.gy-e.gap/2,bot=e.gy+e.gap/2;
       if(e.on){ctx.globalCompositeOperation='lighter';ctx.fillStyle='#ff304055';ctx.fillRect(-7,0,14,top);ctx.fillRect(-7,bot,14,H-bot);ctx.fillStyle='#ffd0d8';ctx.fillRect(-1.5,0,3,top);ctx.fillRect(-1.5,bot,3,H-bot);ctx.globalCompositeOperation='source-over';}
       else if(e.tele&&(SET.reduce||Math.floor(t*16)%2)){ctx.fillStyle='#ff304066';ctx.fillRect(-1,0,2,top);ctx.fillRect(-1,bot,2,H-bot);}
-      for(const y of[top,bot]){if(!gatePost(y,y===top,fl)){ctx.fillStyle=fl?'#fff':'#1a0a10';ctx.strokeStyle='#ff3040';ctx.lineWidth=2;ctx.fillRect(-12,y-12,24,24);ctx.strokeRect(-12,y-12,24,24);}
+      for(const y of[top,bot]){if(!FOEART.post(e,y,y===top,fl)&&!gatePost(y,y===top,fl)){ctx.fillStyle=fl?'#fff':'#1a0a10';ctx.strokeStyle='#ff3040';ctx.lineWidth=2;ctx.fillRect(-12,y-12,24,24);ctx.strokeRect(-12,y-12,24,24);}
         ctx.globalCompositeOperation='lighter';G_(0,y,14,'#ff3040',.7);ctx.globalCompositeOperation='source-over';}
       hpBar(-20,top-24,40,e.hp/e.max);break;}
-    case'boss':drawBoss(e,t,fl);break;}
+    case'boss':drawBoss(e,t,fl);break;
+    default:FOEART.body(e,t,fl);}                      // a kind with no case here (a zoo kind that lost its zt flag) still gets its sheet look
   if(e.vz)VAR.out(e,t);ctx.restore();}
 const eb_=e=>e._b==null?(e._b=Math.random()*6.28):e._b;      // per-enemy phase for the bob
 function gatePost(y,up,fl){const o=ART.sp('spr-en-gate',26);if(!o)return false;const cy=y+(up?-1:1)*(o.h/2-12);ART.put(o,0,cy,0,null,1,up?1:-1);

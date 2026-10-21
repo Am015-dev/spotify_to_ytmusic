@@ -46,7 +46,7 @@ const FLK=window.FLK={get on(){return!!RET.flankers&&!!RET.anticamp;},HOLD:2,SHA
     for(const t of this.tells){t.t-=dt;if(t.t<=0){t.done=1;try{this.mk(t);}catch(err){}}}this.tells=this.tells.filter(t=>!t.done);
     for(const e of G.en)if(e.fk&&!e.dead&&e.hp>0)this.move(e,dt);},
   draw(e,t){const K=this.K[e.fk],fl=e.flash>0,line=fl?'#fff':K.col,fill=fl?'#fff':'#12081f',s=e.sd||1;
-    ctx.save();ctx.translate(e.x,e.y);ctx.scale(s,1);ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
+    ctx.save();ctx.translate(e.x,e.y);ctx.scale(s,1);if(FOEART.body(e,t,fl,1)){ctx.restore();return;}ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
     if(e.fk==='diver'){if(ART.pic('ac-flanker',e.r*3.2,0,0,-Math.PI/2)){if(fl){ctx.globalAlpha=.6;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(0,0,e.r,0,7);ctx.fill();ctx.globalAlpha=1;}}else{ctx.rotate(Math.PI/2);ctx.beginPath();ctx.moveTo(e.r+4,0);ctx.lineTo(-e.r,-e.r*.9);ctx.lineTo(-e.r*.4,0);ctx.lineTo(-e.r,e.r*.9);ctx.closePath();ctx.fill();ctx.stroke();ctx.rotate(-Math.PI/2);}
       if(e.hp>e.hull){ctx.globalAlpha=.55+.3*Math.sin(t*10);ctx.strokeStyle='#4ad1ff';ctx.beginPath();ctx.arc(0,0,e.r+7,0,7);ctx.stroke();}}
     else if(e.fk==='crawler'){ctx.beginPath();ctx.arc(0,e.r*.5,e.r,Math.PI,0);ctx.closePath();ctx.fill();ctx.stroke();
