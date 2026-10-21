@@ -11806,7 +11806,7 @@ window.__pwx={PWX,PWK};
    2. Power-ups and abilities: a power-up pickup puts PKD of a charge into the dash refill (the EMP meter already fills from it through grit.js);
       an EMP that fires (not WASTED) CONSUMES the held power-up: the stored charge (arsenal.js), else a timed power with less than half its time left,
       and adds a blast flavoured by its role: defensive = SHIELD EMP (i-frames), offensive = HOMING EMP (homing shots), the rest = SLOW-FIELD EMP;
-      the power-up slot (a touch chip next to EMP, Q on a keyboard): HOLD it to trade the held power-up for a full dash refill, or (dash full) a fresh drop from
+      the power-up slot (a touch chip next to EMP, Q on a keyboard): TAP it to trade the held power-up for a full dash refill, or (dash full) a fresh drop from
       the right edge; CD s cooldown.
    3. Mashing stays unrewarded: the double hop, the trail and the refund only follow a dash the beat judge passed; heat (timing.js) still counts every press.
    Nothing here writes e.hp, the DMG / armour caps, hard.js or the grit token bucket: EMP charges still only come through ABIL.gain (the reserve takes the
@@ -11889,14 +11889,16 @@ if(ABUP.on){
   NR.on('pickup',()=>{if(!ABUP.on||!G||G.dead)return;const S=ABIL.st(),m=ABIL.max();if(S.n>=m)return;S.r+=ABUP.PKD;ABUP.stat.pkDash++;if(S.r>=1){S.r-=1;S.n++;}});
   NR.on('runStart',()=>{if(G)G.abx=null;if(window.TIM&&ER0)TIM.ER=ABUP.has('erad')?{1:Math.round(ER0[1]*ABUP.ER_K),2:Math.round(ER0[2]*ABUP.ER_K),3:ER0[3]}:Object.assign({},ER0);});
   /* the power-up slot: a touch chip before EMP (hold = trade), Q on a keyboard */
-  {const t=$('touch'),e=$('bEmp');if(t&&e){const b=document.createElement('button');b.id='bPwr';b.type='button';b.hidden=true;b.setAttribute('aria-label','Power-up slot: hold to trade');
+  {const t=$('touch'),e=$('bEmp');if(t&&e){const b=document.createElement('button');b.id='bPwr';b.type='button';b.hidden=true;b.setAttribute('aria-label','Power-up slot: tap to trade');
       b.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 16.5 5.5 21l2-7.5L2 9h7z" fill="currentColor"/></svg>';t.insertBefore(b,e);
-      let h=0;const up=()=>{if(h){clearTimeout(h);h=0;ABIL.tip('Hold the power-up chip to trade it');}};
-      b.addEventListener('pointerdown',ev=>{ev.preventDefault();ev.stopPropagation();clearTimeout(h);h=setTimeout(()=>{h=0;ABUP.trade();},ABUP.HOLD*1000);});
-      for(const k of['pointerup','pointercancel','pointerleave'])b.addEventListener(k,up);}}
+      let dn=0;const pop=()=>{b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');};
+      b.addEventListener('pointerdown',ev=>{ev.preventDefault();ev.stopPropagation();dn=1;pop();});   // tap = trade (the 20 s slot cooldown guards a slip); feedback on press
+      b.addEventListener('pointerup',ev=>{ev.preventDefault();ev.stopPropagation();if(dn){dn=0;ABUP.trade();}});
+      b.addEventListener('click',ev=>{ev.stopPropagation();if(ev.detail===0)ABUP.trade();});   // keyboard / assistive click
+      for(const k of['pointercancel','pointerleave'])b.addEventListener(k,()=>{dn=0;});}}
   addEventListener('keydown',e=>{if(e.code==='KeyQ'&&!e.repeat&&running&&!(e.target&&e.target.tagName==='INPUT'))ABUP.trade();});
   {const st=document.createElement('style');st.textContent=`#touch button#bPwr{min-width:44px;min-height:44px;width:min(var(--bs),48px);height:min(var(--bs),48px);border-radius:50%;border:2px solid var(--pc,#ffe14d);background:#05030cb0;color:var(--pc,#ffe14d);font-size:0;padding:9px;display:flex;align-items:center;justify-content:center}
-#touch button#bPwr[hidden]{display:none}#touch button#bPwr svg{width:100%;height:100%}#touch button#bPwr.cd{opacity:.45}
+#touch button#bPwr[hidden]{display:none}#touch button#bPwr svg{width:100%;height:100%}#touch button#bPwr.cd{opacity:.45}#touch button#bPwr.pop{animation:pwPop .22s ease-out}@keyframes pwPop{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
 #gaCards .card .abI{width:34px;height:34px;flex:0 0 34px}`;document.head.appendChild(st);}
   /* Garage tab ABILITY */
   {const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='abil';b.type='button';b.textContent='ABILITY';tb.appendChild(b);b.addEventListener('click',()=>{GA.tab='abil';gaDraw();});}
