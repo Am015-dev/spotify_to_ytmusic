@@ -69,7 +69,8 @@ const ABUP=window.ABUP={get on(){return!!RET.abup&&!!(window.ABIL&&ABIL.on);},
     if(R.shT>0)R.shT-=dt;this.chip();},
   /* the touch chip: shown while a power-up is held */
   chip(){const b=$('bPwr');if(!b)return;const h=G&&!G.dead&&touchUI?this.held(true):null,R=G?this.r():null,show=!!h;
-    if(b.hidden===show)b.hidden=!show;if(!h)return;const c=this.col(h.k),k=h.k+'|'+(G.t<R.cd?1:0);if(b._k!==k){b._k=k;b.style.setProperty('--pc',c);b.classList.toggle('cd',G.t<R.cd);}},
+    if(b.hidden===show)b.hidden=!show;if(!h)return;const c=this.col(h.k),cd=G.t<R.cd,lb=cd?Math.ceil(R.cd-G.t)+'s':'TRADE',k=h.k+'|'+lb;
+    if(b._k!==k){b._k=k;b.style.setProperty('--pc',c);b.classList.toggle('cd',cd);b.classList.toggle('rdy',!cd);b.setAttribute('data-lbl',lb);b.setAttribute('aria-label',cd?'Power-up slot: ready in '+lb:'Power-up slot: tap to trade this power-up for a dash refill or a new drop');b.title='Trade the held power-up for a dash refill (or a new drop when dash is full)';}},
   draw(){if(!this.on||!G||!G.abx||!P)return;const R=G.abx;if(R.shT>0){ctx.save();ctx.globalAlpha=.3+.4*Math.min(1,R.shT);ctx.strokeStyle=R.shC||'#7fd8ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(P.x,P.y,34,0,7);ctx.stroke();ctx.restore();}
     if(R.res){ctx.save();ctx.globalAlpha=.8;ctx.fillStyle='#ffb020';ctx.beginPath();ctx.arc(P.x-18,P.y+22,3.5,0,7);ctx.fill();ctx.restore();}}
 };
@@ -106,7 +107,7 @@ if(ABUP.on){
       for(const k of['pointercancel','pointerleave'])b.addEventListener(k,()=>{dn=0;});}}
   addEventListener('keydown',e=>{if(e.code==='KeyQ'&&!e.repeat&&running&&!(e.target&&e.target.tagName==='INPUT'))ABUP.trade();});
   {const st=document.createElement('style');st.textContent=`#touch button#bPwr{min-width:44px;min-height:44px;width:min(var(--bs),48px);height:min(var(--bs),48px);border-radius:50%;border:2px solid var(--pc,#ffe14d);background:#05030cb0;color:var(--pc,#ffe14d);font-size:0;padding:9px;display:flex;align-items:center;justify-content:center}
-#touch button#bPwr[hidden]{display:none}#touch button#bPwr svg{width:100%;height:100%}#touch button#bPwr.cd{opacity:.45}#touch button#bPwr.pop{animation:pwPop .22s ease-out}@keyframes pwPop{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
+#touch button#bPwr[hidden]{display:none}#touch button#bPwr svg{width:100%;height:100%}#touch button#bPwr{position:relative;overflow:visible}#touch button#bPwr::before{content:attr(data-lbl);position:absolute;left:50%;top:-15px;transform:translateX(-50%);font:700 10px/1 var(--mono,monospace);color:var(--pc,#ffe14d);letter-spacing:.04em;white-space:nowrap;pointer-events:none}#touch button#bPwr.rdy{box-shadow:0 0 8px var(--pc,#ffe14d)}#touch button#bPwr.cd{opacity:.45}#touch button#bPwr.cd::before{color:#8c86b8}#touch button#bPwr.pop{animation:pwPop .22s ease-out}@keyframes pwPop{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
 #gaCards .card .abI{width:34px;height:34px;flex:0 0 34px}`;document.head.appendChild(st);}
   /* Garage tab ABILITY */
   {const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='abil';b.type='button';b.textContent='ABILITY';tb.appendChild(b);b.addEventListener('click',()=>{GA.tab='abil';gaDraw();});}

@@ -65,9 +65,11 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | story | saga |  |  | story |  |
 | cp | cp chkBox 72-91 | shop,g |  | ret-cp |  |
 | fs | fs save 16-19 |  |  | fs |  |
-| read | readable READ 16-66 | fxwave |  | readable |  |
+| read | readable READ 16-67 | fxwave |  | readable |  |
+| bulletart | bulletart BA 9-11 |  |  | bulletart |  |
 | powers | arsenal PWX.tip 90-157 | footen |  | powers | ASSETS-NEEDED-3 |
-| abup | abup ABUP 23-77 |  |  | abup | ASSETS-NEEDED-3 |
+| abup | abup ABUP 23-78 |  |  | abup | ASSETS-NEEDED-3 |
+| zonehint | zonehint ZH 9-24 |  |  | pwrstar |  |
 | econfit | econfit ECF.apply 11-12 |  |  |  |  |
 | comfort* | comfort COM 14-78 |  |  | comfort |  |
 | classes | classes clsSvg 106-108 |  |  | classes | ASSETS-NEEDED-3 |
@@ -78,7 +80,8 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | mix | mix MIX 17-24 | a |  | mix |  |
 | hub,garagefix | hub gfPatchAll 288-301 | ret |  | hub |  |
 | layout,layoutStrip* | layout lyMap 41-55 |  |  | layout |  |
-| school | school footEnd 107-121 |  |  | school |  |
+| school | school footEnd 107-122 |  |  | school |  |
+| schoolfull | schoolfull sfGapWall 49-67 |  |  | school-full |  |
 | tidy | tidy F.post 19-88 | flavor,ret |  | tidy |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.

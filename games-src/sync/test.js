@@ -26,7 +26,7 @@ async function mk(b, opt = {}) {
   return c;
 }
 async function pg(c, label, url, errs) {
-  const p = await c.newPage(); p.setDefaultTimeout(30000);
+  const p = await c.newPage(); p.setDefaultTimeout(30000); p.on('dialog', d => d.accept());   // the 100 MB warning is a confirm()
   p.on('pageerror', e => { errs.push(label + ' pageerror: ' + e.message); });
   p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|net::ERR|fonts\.g/.test(m.text())) errs.push(label + ' console: ' + m.text()); });
   if (url) await p.goto(URLB + url); return p;
@@ -46,7 +46,7 @@ const SAVES = { ccs_save2: JSON.stringify({ round: 4, hp: [10, 7], log: 'x'.repe
     const cA = await mk(b); const pA = await pg(cA, 'A', 'sync.html', errs);
     await pA.evaluate(() => navigator.serviceWorker.ready); await pA.waitForFunction(() => navigator.serviceWorker.controller || true);
     const ver = await pA.evaluate(async () => (await caches.keys()).sort());
-    ok(ver.includes('gns-shelf-v1'), 'SW installed, shelf cache exists: ' + ver);
+    ok(ver.includes('gns-shelf-v2'), 'SW installed, shelf cache exists: ' + ver);
     await pA.reload(); await pA.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 15000 });
     ok(await pA.locator('#games li').count() === 17, '17 games listed');
     const row = id => pA.locator('[data-id="' + id + '"]');
@@ -79,7 +79,7 @@ const SAVES = { ccs_save2: JSON.stringify({ round: 4, hp: [10, 7], log: 'x'.repe
     await p2.locator('#dlall').click(); await p2.waitForFunction(() => /All games are stored|could not/.test(document.getElementById('offmsg').textContent), null, { timeout: 120000 });
     ok(/All games are stored/.test(await p2.locator('#offmsg').textContent()), 'Download all: ' + await p2.locator('#offmsg').textContent());
     await p2.locator('#rmall').click(); await p2.waitForFunction(() => document.querySelectorAll('.g .st.ok').length === 0);
-    ok(await p2.evaluate(async () => (await (await caches.open('gns-games-v1')).keys()).length) === 0, 'Remove all empties the game cache');
+    ok(await p2.evaluate(async () => (await (await caches.open('gns-games-v2')).keys()).length) === 0, 'Remove all empties the game cache');
     await cA.close();
 
     // ================= B. save file export / import =================
