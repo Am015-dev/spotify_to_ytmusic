@@ -56,3 +56,18 @@ The 12 slots from `games-src/next-wave/music/mainhattan-nightrun/cues-polish.jso
 | `d4b-b.mp3` | 3:18 | `d4b` | Messe district pool (prompted 132 BPM) |
 
 **Licence:** generated with Treblo by the project owner's account; Treblo Terms of Service section 8: the user owns the outputs. No samples, no artist names in the prompts.
+
+## Polish set + street + stingers (pushed 2026-10-21, 54 files, 160 kbps MP3 from the laptop WAVs)
+Same rules as above before use: pick a/b, `audio-test.js` for `bpm`/`offsetMs`/`gapMs`, trim to whole bars, -18 LUFS,
+`tracks.json` entry, then the pool/row. Specs (prompt, bpm, loop, save_as) are in
+`games-src/next-wave/music/mainhattan-nightrun/cues-polish.json` and `cues-street.json`.
+| files | what | wire to |
+|---|---|---|
+| `boss-d1-v2`, `boss-d2-v2`, `boss-d4-v2`, `d1b-v2`, `d2b-v2`, `d3a-v2`, `d4a-v2` (a/b) | second takes of B18 cues | extra entries in the district pools (`RET.DP.rows`, same key + `-v2`) or replace a weak first take |
+| `fever-120`, `fever-128`, `fever-132` (a/b) | fever / overdrive mode at three tempos | the fever state, matched to the stage's tempo band |
+| `endless3` (a/b) | third Endless theme | the Endless loop pool |
+| `pit` (a/b), `school` (a/b) | pit-stop garage (100 BPM, calm) and Night School / tutorial (110 BPM, very clear beat) | pit stop screen; tutorial / lessons |
+| `street1`, `street1-lock`, `street1-boss`, `street1-clear` (a/b) | on-foot street stage: run, arena lock, boss, clear | `parts/foot.js` (flag `RET.foot`); until wired the stage plays `stage2` |
+| `st-boss-in`, `st-clear`, `st-fail`, `st-newbest`, `st-perfect`, `st-phase`, `st-tierup1..3`, `st-unlock` (a/b) | short stingers (not loops) | the matching UI moments: boss intro, stage clear, game over, new best, PERFECT, boss phase change, tier-ups, unlock |
+Owner's picks so far (used in the published YouTube mix): d1b-a, d1a-b, boss-d1-a, d2a-a, d2b-a, boss-d2-a, d3a-b, d3b-a,
+boss-d3-b, d4a-b, d4b-b, boss-d4-b, pit-b, school-a, fever-128-a, endless3-a. Everything else: pick by ear.
