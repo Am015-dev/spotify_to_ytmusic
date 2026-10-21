@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 392,
+ "h": 245,
+ "anchor": [
+  196,
+  245
+ ],
+ "order": [
+  "strip-boss-sek-adler-attack#1",
+  "strip-boss-sek-adler-attack#2",
+  "strip-boss-sek-adler-attack#3",
+  "strip-boss-sek-adler-attack#4"
+ ]
+}

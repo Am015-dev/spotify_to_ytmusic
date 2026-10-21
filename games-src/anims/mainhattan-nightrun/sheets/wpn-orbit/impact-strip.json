@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 264,
+ "h": 208,
+ "anchor": [
+  132,
+  208
+ ],
+ "order": [
+  "strip-wpn-orbit-impact#1",
+  "strip-wpn-orbit-impact#2",
+  "strip-wpn-orbit-impact#3",
+  "strip-wpn-orbit-impact#4"
+ ]
+}

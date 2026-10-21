@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 8,
+ "w": 147,
+ "h": 256,
+ "anchor": [
+  73,
+  256
+ ],
+ "order": [
+  "strip-ninja-block#1",
+  "strip-ninja-block#2",
+  "strip-ninja-block#3"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 127,
+ "h": 256,
+ "anchor": [
+  63,
+  256
+ ],
+ "order": [
+  "strip-grunt-idle#1",
+  "strip-grunt-idle#2",
+  "strip-grunt-idle#3",
+  "strip-grunt-idle#4"
+ ]
+}

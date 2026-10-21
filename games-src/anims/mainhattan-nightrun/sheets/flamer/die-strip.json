@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 216,
+ "h": 256,
+ "anchor": [
+  108,
+  256
+ ],
+ "order": [
+  "strip-flamer-die#1",
+  "strip-flamer-die#2",
+  "strip-flamer-die#3",
+  "strip-flamer-die#4"
+ ]
+}

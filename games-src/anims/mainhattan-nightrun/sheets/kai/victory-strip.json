@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 6,
+ "w": 116,
+ "h": 256,
+ "anchor": [
+  58,
+  256
+ ],
+ "order": [
+  "strip-kai-victory#1",
+  "strip-kai-victory#2",
+  "strip-kai-victory#3",
+  "strip-kai-victory#4"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 520,
+ "h": 107,
+ "anchor": [
+  260,
+  107
+ ],
+ "order": [
+  "strip-ship-std-flame#1",
+  "strip-ship-std-flame#2",
+  "strip-ship-std-flame#3",
+  "strip-ship-std-flame#4"
+ ]
+}

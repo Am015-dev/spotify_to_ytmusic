@@ -1,0 +1,18 @@
+{
+ "frames": 6,
+ "fps": 12,
+ "w": 270,
+ "h": 256,
+ "anchor": [
+  135,
+  256
+ ],
+ "order": [
+  "strip-sniper-run#1",
+  "strip-sniper-run#2",
+  "strip-sniper-run#3",
+  "strip-sniper-run#4",
+  "strip-sniper-run#5",
+  "strip-sniper-run#6"
+ ]
+}

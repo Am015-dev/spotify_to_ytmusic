@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 392,
+ "h": 109,
+ "anchor": [
+  196,
+  109
+ ],
+ "order": [
+  "strip-wpn-laser-beam#1",
+  "strip-wpn-laser-beam#2",
+  "strip-wpn-laser-beam#3",
+  "strip-wpn-laser-beam#4"
+ ]
+}

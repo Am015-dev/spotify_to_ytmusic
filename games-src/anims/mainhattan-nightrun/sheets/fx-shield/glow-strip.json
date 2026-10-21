@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 389,
+ "h": 384,
+ "anchor": [
+  194,
+  384
+ ],
+ "order": [
+  "strip-fx-shield-glow#1",
+  "strip-fx-shield-glow#2",
+  "strip-fx-shield-glow#3",
+  "strip-fx-shield-glow#4"
+ ]
+}

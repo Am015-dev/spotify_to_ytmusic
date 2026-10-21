@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 259,
+ "h": 256,
+ "anchor": [
+  129,
+  256
+ ],
+ "order": [
+  "strip-wpn-frost-impact#1",
+  "strip-wpn-frost-impact#2",
+  "strip-wpn-frost-impact#3",
+  "strip-wpn-frost-impact#4"
+ ]
+}

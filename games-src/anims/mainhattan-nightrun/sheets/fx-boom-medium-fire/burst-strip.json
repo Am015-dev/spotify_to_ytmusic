@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 12,
+ "w": 264,
+ "h": 249,
+ "anchor": [
+  132,
+  249
+ ],
+ "order": [
+  "strip-fx-boom-medium-fire-burst#1",
+  "strip-fx-boom-medium-fire-burst#2",
+  "strip-fx-boom-medium-fire-burst#3",
+  "strip-fx-boom-medium-fire-burst#4",
+  "strip-fx-boom-medium-fire-burst#5"
+ ]
+}

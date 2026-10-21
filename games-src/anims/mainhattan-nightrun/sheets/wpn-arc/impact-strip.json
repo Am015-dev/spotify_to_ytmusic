@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 264,
+ "h": 254,
+ "anchor": [
+  132,
+  254
+ ],
+ "order": [
+  "strip-wpn-arc-impact#1",
+  "strip-wpn-arc-impact#2",
+  "strip-wpn-arc-impact#3",
+  "strip-wpn-arc-impact#4"
+ ]
+}

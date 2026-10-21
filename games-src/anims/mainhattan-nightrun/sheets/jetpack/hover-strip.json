@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 149,
+ "h": 256,
+ "anchor": [
+  74,
+  256
+ ],
+ "order": [
+  "strip-jetpack-hover#1",
+  "strip-jetpack-hover#2",
+  "strip-jetpack-hover#3",
+  "strip-jetpack-hover#4"
+ ]
+}

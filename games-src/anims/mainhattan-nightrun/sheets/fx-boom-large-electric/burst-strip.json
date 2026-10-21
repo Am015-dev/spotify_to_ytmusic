@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 12,
+ "w": 262,
+ "h": 256,
+ "anchor": [
+  131,
+  256
+ ],
+ "order": [
+  "strip-fx-boom-large-electric-burst#1",
+  "strip-fx-boom-large-electric-burst#2",
+  "strip-fx-boom-large-electric-burst#3",
+  "strip-fx-boom-large-electric-burst#4",
+  "strip-fx-boom-large-electric-burst#5"
+ ]
+}

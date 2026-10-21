@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 235,
+ "h": 256,
+ "anchor": [
+  117,
+  256
+ ],
+ "order": [
+  "strip-ninja-die#1",
+  "strip-ninja-die#2",
+  "strip-ninja-die#3",
+  "strip-ninja-die#4"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 225,
+ "h": 256,
+ "anchor": [
+  112,
+  256
+ ],
+ "order": [
+  "strip-pk-health-spin#1",
+  "strip-pk-health-spin#2",
+  "strip-pk-health-spin#3",
+  "strip-pk-health-spin#4"
+ ]
+}

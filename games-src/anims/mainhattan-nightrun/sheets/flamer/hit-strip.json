@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 213,
+ "h": 256,
+ "anchor": [
+  106,
+  256
+ ],
+ "order": [
+  "strip-flamer-hit#1",
+  "strip-flamer-hit#2",
+  "strip-flamer-hit#3"
+ ]
+}

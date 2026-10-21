@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 257,
+ "h": 256,
+ "anchor": [
+  128,
+  256
+ ],
+ "order": [
+  "strip-wpn-drone-impact#1",
+  "strip-wpn-drone-impact#2",
+  "strip-wpn-drone-impact#3",
+  "strip-wpn-drone-impact#4"
+ ]
+}

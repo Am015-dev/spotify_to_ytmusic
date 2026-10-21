@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 263,
+ "h": 256,
+ "anchor": [
+  131,
+  256
+ ],
+ "order": [
+  "strip-gunman-melee#1",
+  "strip-gunman-melee#2",
+  "strip-gunman-melee#3",
+  "strip-gunman-melee#4"
+ ]
+}

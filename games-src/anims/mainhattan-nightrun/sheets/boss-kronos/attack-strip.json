@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 392,
+ "h": 248,
+ "anchor": [
+  196,
+  248
+ ],
+ "order": [
+  "strip-boss-kronos-attack#1",
+  "strip-boss-kronos-attack#2",
+  "strip-boss-kronos-attack#3",
+  "strip-boss-kronos-attack#4"
+ ]
+}

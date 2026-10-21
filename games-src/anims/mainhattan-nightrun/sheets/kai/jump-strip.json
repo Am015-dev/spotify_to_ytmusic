@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 167,
+ "h": 256,
+ "anchor": [
+  83,
+  256
+ ],
+ "order": [
+  "strip-kai-jump#1",
+  "strip-kai-jump#2",
+  "strip-kai-jump#3",
+  "strip-kai-jump#4"
+ ]
+}

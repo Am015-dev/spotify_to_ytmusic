@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 6,
+ "w": 392,
+ "h": 371,
+ "anchor": [
+  196,
+  371
+ ],
+ "order": [
+  "strip-boss-kronos-defeat#1",
+  "strip-boss-kronos-defeat#2",
+  "strip-boss-kronos-defeat#3",
+  "strip-boss-kronos-defeat#4"
+ ]
+}

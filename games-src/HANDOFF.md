@@ -1,5 +1,10 @@
 # Handoff: start a new session from this file
 
+## Nightrun ANIMATED SPRITE SHEETS: wire them (assets 21 Oct 2026, owner approved all 229; suggest flag RET.sprites)
+- Full task list with file:line hooks and name map: `games-src/anims/mainhattan-nightrun/HANDOFF-SPRITES.md`. Sheets in `games-src/anims/mainhattan-nightrun/sheets/<who>/<act>-strip.webp|json` (one row; json frames/fps/w/h/anchor) + `smoothing.json` (approved holds / hit-stop / squash / cross-fade rules) + `review.json`.
+- First build `ART.anim/frame/drawAnim` (no one-row strip loader exists; only the 2-row boss grid UIK.bossDraw uikit.js:23-32), bundle the jsons in build.py, list files in media/ready.json.
+- Then: bosses idle/attack/hit/defeat (keys `anim/boss-<id>/...`; `boss-<id>` is the portrait), on-foot kai + 10 enemies (run replaces run-a/run-b), player ships flame/death (flame replaces fx-engine), weapon muzzle/impact (impact = code `hit`), fx-boom bursts (5 frames instead of grow+fade).
+- NOT in game, art only (owner designs first): foot enemies jetpack/hound/flamer/ninja/medic, enemy ships interceptor/bomber/carrier/cruiser, props.
 ## Nightrun HARD wall (W54, 20 Oct 2026): cause = the stage-5 boss fight, not grit/heat/timing
 - Bisect (timing-test Hard st5 mid, beat bot, n=8-12): baseline 0-13%. `&grit=0 &anticamp=0 &flankers=0 &react=0 &strike2=0 &density=0 &novelty=0 &vis=0` all stay 0%; `&bossplay=0` and `&bossmoves=0` give 58% (n=12). The bot reaches the boss at t=126 with 4-11 hits and dies 30-60 s later with the boss at 50-95% (a bot that ignores the gates fights ~2x longer; pre-boss hit rate ~1 per 15 s, in the boss ~1 per 6 s).
 - Tried (Hard only, via PRE): BMV.DK.hard 1.0, BPL.PT.hard 45, BPL.FB 3/FBW 14, LEAK .4/.55: no effect (0-13%). Hard boss mercy (grit.js GRIT.mcH/mcHMax, flag `?gritboss=1`, OFF): .5 x 3 hits 0%, .5 x 6 17%, .6 x 8 25%; plus PT 30 / FB 3 / LEAK .55 33%. Target 50% NOT reached; the lever that works is bossplay's shield slog (W53's file), so no default change was made.

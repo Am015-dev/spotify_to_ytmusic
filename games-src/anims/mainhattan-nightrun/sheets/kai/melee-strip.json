@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 194,
+ "h": 256,
+ "anchor": [
+  97,
+  256
+ ],
+ "order": [
+  "strip-kai-melee#1",
+  "strip-kai-melee#2",
+  "strip-kai-melee#3",
+  "strip-kai-melee#4"
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 12,
+ "w": 257,
+ "h": 256,
+ "anchor": [
+  128,
+  256
+ ],
+ "order": [
+  "strip-fx-boom-large-plasma-burst#1",
+  "strip-fx-boom-large-plasma-burst#2",
+  "strip-fx-boom-large-plasma-burst#3",
+  "strip-fx-boom-large-plasma-burst#4",
+  "strip-fx-boom-large-plasma-burst#5"
+ ]
+}

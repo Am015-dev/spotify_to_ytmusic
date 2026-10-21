@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 8,
+ "w": 290,
+ "h": 384,
+ "anchor": [
+  145,
+  384
+ ],
+ "order": [
+  "strip-boss-messe-waechter-attack#1",
+  "strip-boss-messe-waechter-attack#2",
+  "strip-boss-messe-waechter-attack#3"
+ ]
+}

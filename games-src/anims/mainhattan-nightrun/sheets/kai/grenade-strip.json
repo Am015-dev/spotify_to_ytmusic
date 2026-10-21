@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 180,
+ "h": 256,
+ "anchor": [
+  90,
+  256
+ ],
+ "order": [
+  "strip-kai-grenade#1",
+  "strip-kai-grenade#2",
+  "strip-kai-grenade#3",
+  "strip-kai-grenade#4"
+ ]
+}

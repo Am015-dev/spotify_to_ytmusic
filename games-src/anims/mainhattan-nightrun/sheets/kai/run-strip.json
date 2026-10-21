@@ -1,0 +1,18 @@
+{
+ "frames": 6,
+ "fps": 12,
+ "w": 159,
+ "h": 256,
+ "anchor": [
+  79,
+  256
+ ],
+ "order": [
+  "strip-kai-run#1",
+  "strip-kai-run#2",
+  "strip-kai-run#3",
+  "strip-kai-run#4",
+  "strip-kai-run#5",
+  "strip-kai-run#6"
+ ]
+}

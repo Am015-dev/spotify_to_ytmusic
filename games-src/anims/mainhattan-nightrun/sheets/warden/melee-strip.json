@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 288,
+ "h": 256,
+ "anchor": [
+  144,
+  256
+ ],
+ "order": [
+  "strip-warden-melee#1",
+  "strip-warden-melee#2",
+  "strip-warden-melee#3",
+  "strip-warden-melee#4"
+ ]
+}

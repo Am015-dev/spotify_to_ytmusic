@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 392,
+ "h": 305,
+ "anchor": [
+  196,
+  305
+ ],
+ "order": [
+  "strip-boss-zentral-ice-idle#1",
+  "strip-boss-zentral-ice-idle#2",
+  "strip-boss-zentral-ice-idle#3",
+  "strip-boss-zentral-ice-idle#4"
+ ]
+}

@@ -1,0 +1,918 @@
+{
+ "boss-bruecken-waechter/attack": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-bruecken-waechter/defeat": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-bruecken-waechter/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-bruecken-waechter/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-flusskrake/attack": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-flusskrake/defeat": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-flusskrake/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-flusskrake/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-hoplite/attack": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-hoplite/defeat": {
+  "note": "the hoplite frames are mixed on direction [new strip 2026-10-21: faces left in all 4 frames] no many directions on frames [new strip 2 2026-10-21: locked to the reference facing left, collapses forward, head on the left]",
+  "v": "ok"
+ },
+ "boss-hoplite/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-hoplite/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-kronos/attack": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-kronos/defeat": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-kronos/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-kronos/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-messe-waechter/attack": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-messe-waechter/defeat": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-messe-waechter/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-messe-waechter/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-schranken-wart/attack": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-schranken-wart/defeat": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-schranken-wart/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-schranken-wart/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-sek-adler/attack": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-sek-adler/defeat": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-sek-adler/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-sek-adler/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-talos/attack": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-talos/defeat": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-talos/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-talos/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-tresor-wart/attack": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-tresor-wart/defeat": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-tresor-wart/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-tresor-wart/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-zentral-ice/attack": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-zentral-ice/defeat": {
+  "note": "the frames are mixed and confusing [new strip 2026-10-21: one boss per frame]",
+  "v": "ok"
+ },
+ "boss-zentral-ice/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "boss-zentral-ice/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "bruiser/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "bruiser/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "bruiser/jump": {
+  "note": "",
+  "v": "ok"
+ },
+ "bruiser/melee": {
+  "note": "",
+  "v": "ok"
+ },
+ "bruiser/run": {
+  "note": "",
+  "v": "ok"
+ },
+ "bruiser/shoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "drone/die": {
+  "note": "there are whites and the AI cut down some amount of the drone heli [new strip 2026-10-21: solid rotor blades, no blur, no whites]",
+  "v": "ok"
+ },
+ "drone/idle": {
+  "note": "there are whites and the AI cut down some amount of the drone heli [new strip 2026-10-21: solid rotor blades, no blur, no whites]",
+  "v": "ok"
+ },
+ "drone/shoot": {
+  "note": "there are whites and the AI cut down some amount of the drone heli [new strip 2026-10-21: solid rotor blades, no blur, no whites]",
+  "v": "ok"
+ },
+ "flamer/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "flamer/hit": {
+  "note": "",
+  "v": "ok"
+ },
+ "flamer/spray": {
+  "note": "",
+  "v": "ok"
+ },
+ "flamer/walk": {
+  "note": "",
+  "v": "ok"
+ },
+ "fx-boom-boss-a/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-boss-b/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-debris/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-ground-dust/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-large-electric/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-large-fire/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-large-plasma/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-medium-electric/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-medium-fire/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-medium-plasma/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-small-electric/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-small-fire/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-boom-small-plasma/burst": {
+  "note": "frames are not arranged as sprite , they are moving [rebuilt 2026-10-21: cut with the 5 frames Flow drew, each centred]",
+  "v": "ok"
+ },
+ "fx-hitconfirm/burst": {
+  "note": "",
+  "v": "ok"
+ },
+ "fx-shield/glow": {
+  "note": "",
+  "v": "ok"
+ },
+ "fx-spark/burst": {
+  "note": "",
+  "v": "ok"
+ },
+ "grunt/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "grunt/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "grunt/jump": {
+  "note": "",
+  "v": "ok"
+ },
+ "grunt/melee": {
+  "note": "",
+  "v": "ok"
+ },
+ "grunt/run": {
+  "note": "",
+  "v": "ok"
+ },
+ "grunt/shoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "gunman/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "gunman/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "gunman/jump": {
+  "note": "",
+  "v": "ok"
+ },
+ "gunman/melee": {
+  "note": "",
+  "v": "ok"
+ },
+ "gunman/run": {
+  "note": "",
+  "v": "ok"
+ },
+ "gunman/shoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "hound/bite": {
+  "note": "there are slight whites [re-cut 2026-10-21: white gaps between the legs removed]",
+  "v": "ok"
+ },
+ "hound/die": {
+  "note": "there are slight whites from background [re-cut 2026-10-21: white gaps between the legs removed]",
+  "v": "ok"
+ },
+ "hound/pounce": {
+  "note": "there are slight whites from background [re-cut 2026-10-21: white gaps between the legs removed]",
+  "v": "ok"
+ },
+ "hound/run": {
+  "note": "there are slight whites from background [re-cut 2026-10-21: white gaps between the legs removed]",
+  "v": "ok"
+ },
+ "jetpack/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "jetpack/fly": {
+  "note": "",
+  "v": "ok"
+ },
+ "jetpack/hover": {
+  "note": "",
+  "v": "ok"
+ },
+ "jetpack/shoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/aimdiag": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/aimup": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/combo2": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/combo3": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/crouchshoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/dash": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/grenade": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/hurt": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/jump": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/land": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/melee": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/run": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/runshoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/shoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "kai/victory": {
+  "note": "",
+  "v": "ok"
+ },
+ "knife/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "knife/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "knife/jump": {
+  "note": "",
+  "v": "ok"
+ },
+ "knife/melee": {
+  "note": "",
+  "v": "ok"
+ },
+ "knife/run": {
+  "note": "",
+  "v": "ok"
+ },
+ "knife/shoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "mech/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "mech/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "mech/shoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "medic/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "medic/heal": {
+  "note": "",
+  "v": "ok"
+ },
+ "medic/walk": {
+  "note": "",
+  "v": "ok"
+ },
+ "ninja/block": {
+  "note": "",
+  "v": "ok"
+ },
+ "ninja/dash": {
+  "note": "",
+  "v": "ok"
+ },
+ "ninja/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "ninja/slash": {
+  "note": "",
+  "v": "ok"
+ },
+ "pk-ammo/spin": {
+  "note": "",
+  "v": "ok"
+ },
+ "pk-coin/spin": {
+  "note": "",
+  "v": "ok"
+ },
+ "pk-health/spin": {
+  "note": "",
+  "v": "ok"
+ },
+ "prop-banner/loop": {
+  "note": "",
+  "v": "ok"
+ },
+ "prop-beacon/loop": {
+  "note": "",
+  "v": "ok"
+ },
+ "prop-car/loop": {
+  "note": "",
+  "v": "ok"
+ },
+ "prop-drone/loop": {
+  "note": "",
+  "v": "ok"
+ },
+ "prop-holo/loop": {
+  "note": "",
+  "v": "ok"
+ },
+ "prop-neon/loop": {
+  "note": "",
+  "v": "ok"
+ },
+ "prop-police/loop": {
+  "note": "",
+  "v": "ok"
+ },
+ "prop-steam/glow": {
+  "note": "",
+  "v": "ok"
+ },
+ "prop-windows/loop": {
+  "note": "",
+  "v": "ok"
+ },
+ "shield/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "shield/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "shield/jump": {
+  "note": "",
+  "v": "ok"
+ },
+ "shield/melee": {
+  "note": "",
+  "v": "ok"
+ },
+ "shield/run": {
+  "note": "",
+  "v": "ok"
+ },
+ "shield/shoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-drift/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-drift/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ebomber/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ebomber/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ebomber/volley": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ec/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ec/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ecarrier/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ecarrier/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ecarrier/volley": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ecruiser/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ecruiser/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ecruiser/volley": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-egunship/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-egunship/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-egunship/volley": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-einterceptor/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-einterceptor/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-einterceptor/volley": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ekamikaze/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ekamikaze/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-ekamikaze/volley": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-hv/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-hv/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-lancer/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-lancer/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-nova/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-nova/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-std/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-std/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-swg/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-swg/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-syn/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-syn/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-tri/death": {
+  "note": "",
+  "v": "ok"
+ },
+ "ship-tri/flame": {
+  "note": "",
+  "v": "ok"
+ },
+ "sniper/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "sniper/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "sniper/jump": {
+  "note": "",
+  "v": "ok"
+ },
+ "sniper/melee": {
+  "note": "",
+  "v": "ok"
+ },
+ "sniper/run": {
+  "note": "",
+  "v": "ok"
+ },
+ "sniper/shoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "turret/die": {
+  "note": "",
+  "v": "ok"
+ },
+ "turret/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "turret/shoot": {
+  "note": "",
+  "v": "ok"
+ },
+ "warden/die": {
+  "note": "dies from the opposite direction [mirrored 2026-10-21: now faces right like his other moves] no the last frame is wrong direction [frame 4 flipped back 2026-10-21]",
+  "v": "ok"
+ },
+ "warden/idle": {
+  "note": "",
+  "v": "ok"
+ },
+ "warden/jump": {
+  "note": "",
+  "v": "ok"
+ },
+ "warden/melee": {
+  "note": "",
+  "v": "ok"
+ },
+ "warden/run": {
+  "note": "",
+  "v": "ok"
+ },
+ "warden/shoot": {
+  "note": "the sword disappears a bit [new strip 2026-10-21: sword stays in hand, shot is a separate wave]",
+  "v": "ok"
+ },
+ "wpn-arc/beam": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-arc/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-arc/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-beat/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-beat/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-disc/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-disc/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-drone/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-drone/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-flame/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-flame/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-frost/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-frost/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-laser/beam": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-laser/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-laser/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-mine/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-mine/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-orbit/beam": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-orbit/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-orbit/muzzle": {
+  "note": "the frames are cut [rebuilt 2026-10-21: cut as the 3 frames Flow drew, none split]",
+  "v": "ok"
+ },
+ "wpn-pulse/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-pulse/muzzle": {
+  "note": "the frames are cut [rebuilt 2026-10-21: cut as the 3 frames Flow drew, none split]",
+  "v": "ok"
+ },
+ "wpn-rail/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-rail/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-shell/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-shell/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-storm/beam": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-storm/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-storm/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-swarm/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-swarm/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-wave/beam": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-wave/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-wave/muzzle": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-well/beam": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-well/impact": {
+  "note": "",
+  "v": "ok"
+ },
+ "wpn-well/muzzle": {
+  "note": "",
+  "v": "ok"
+ }
+}

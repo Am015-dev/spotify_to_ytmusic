@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 236,
+ "h": 256,
+ "anchor": [
+  118,
+  256
+ ],
+ "order": [
+  "strip-kai-die#1",
+  "strip-kai-die#2",
+  "strip-kai-die#3",
+  "strip-kai-die#4"
+ ]
+}

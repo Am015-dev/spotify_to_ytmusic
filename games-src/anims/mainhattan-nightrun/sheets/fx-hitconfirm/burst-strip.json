@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 259,
+ "h": 256,
+ "anchor": [
+  129,
+  256
+ ],
+ "order": [
+  "strip-fx-hitconfirm-burst#1",
+  "strip-fx-hitconfirm-burst#2",
+  "strip-fx-hitconfirm-burst#3",
+  "strip-fx-hitconfirm-burst#4"
+ ]
+}

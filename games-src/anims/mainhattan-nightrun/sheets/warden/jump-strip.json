@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 196,
+ "h": 256,
+ "anchor": [
+  98,
+  256
+ ],
+ "order": [
+  "strip-warden-jump#1",
+  "strip-warden-jump#2",
+  "strip-warden-jump#3",
+  "strip-warden-jump#4"
+ ]
+}

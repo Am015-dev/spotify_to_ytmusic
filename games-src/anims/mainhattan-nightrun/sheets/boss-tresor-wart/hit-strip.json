@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 392,
+ "h": 313,
+ "anchor": [
+  196,
+  313
+ ],
+ "order": [
+  "strip-boss-tresor-wart-hit#1",
+  "strip-boss-tresor-wart-hit#2",
+  "strip-boss-tresor-wart-hit#3"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 259,
+ "h": 256,
+ "anchor": [
+  129,
+  256
+ ],
+ "order": [
+  "strip-warden-die#1",
+  "strip-warden-die#2",
+  "strip-warden-die#3",
+  "strip-warden-die#4"
+ ]
+}

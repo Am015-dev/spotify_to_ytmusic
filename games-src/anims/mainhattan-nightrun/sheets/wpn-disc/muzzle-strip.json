@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 18,
+ "w": 392,
+ "h": 252,
+ "anchor": [
+  196,
+  252
+ ],
+ "order": [
+  "strip-wpn-disc-muzzle#1",
+  "strip-wpn-disc-muzzle#2",
+  "strip-wpn-disc-muzzle#3"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 6,
+ "w": 258,
+ "h": 384,
+ "anchor": [
+  129,
+  384
+ ],
+ "order": [
+  "strip-boss-talos-defeat#1",
+  "strip-boss-talos-defeat#2",
+  "strip-boss-talos-defeat#3",
+  "strip-boss-talos-defeat#4"
+ ]
+}

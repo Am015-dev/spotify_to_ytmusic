@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 254,
+ "h": 256,
+ "anchor": [
+  127,
+  256
+ ],
+ "order": [
+  "strip-wpn-well-impact#1",
+  "strip-wpn-well-impact#2",
+  "strip-wpn-well-impact#3",
+  "strip-wpn-well-impact#4"
+ ]
+}

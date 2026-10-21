@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 281,
+ "h": 256,
+ "anchor": [
+  140,
+  256
+ ],
+ "order": [
+  "strip-hound-die#1",
+  "strip-hound-die#2",
+  "strip-hound-die#3",
+  "strip-hound-die#4"
+ ]
+}

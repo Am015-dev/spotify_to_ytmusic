@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 89,
+ "h": 256,
+ "anchor": [
+  44,
+  256
+ ],
+ "order": [
+  "strip-knife-idle#1",
+  "strip-knife-idle#2",
+  "strip-knife-idle#3",
+  "strip-knife-idle#4"
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 12,
+ "w": 242,
+ "h": 256,
+ "anchor": [
+  121,
+  256
+ ],
+ "order": [
+  "strip-fx-boom-boss-a-burst#1",
+  "strip-fx-boom-boss-a-burst#2",
+  "strip-fx-boom-boss-a-burst#3",
+  "strip-fx-boom-boss-a-burst#4",
+  "strip-fx-boom-boss-a-burst#5"
+ ]
+}

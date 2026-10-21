@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 139,
+ "h": 256,
+ "anchor": [
+  69,
+  256
+ ],
+ "order": [
+  "strip-warden-idle#1",
+  "strip-warden-idle#2",
+  "strip-warden-idle#3",
+  "strip-warden-idle#4"
+ ]
+}

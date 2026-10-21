@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 145,
+ "h": 256,
+ "anchor": [
+  72,
+  256
+ ],
+ "order": [
+  "strip-kai-hurt#1",
+  "strip-kai-hurt#2",
+  "strip-kai-hurt#3",
+  "strip-kai-hurt#4"
+ ]
+}

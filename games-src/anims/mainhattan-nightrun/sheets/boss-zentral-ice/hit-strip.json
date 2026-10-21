@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 392,
+ "h": 244,
+ "anchor": [
+  196,
+  244
+ ],
+ "order": [
+  "strip-boss-zentral-ice-hit#1",
+  "strip-boss-zentral-ice-hit#2",
+  "strip-boss-zentral-ice-hit#3"
+ ]
+}

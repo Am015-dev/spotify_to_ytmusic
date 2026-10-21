@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 167,
+ "h": 256,
+ "anchor": [
+  83,
+  256
+ ],
+ "order": [
+  "strip-mech-idle#1",
+  "strip-mech-idle#2",
+  "strip-mech-idle#3",
+  "strip-mech-idle#4"
+ ]
+}

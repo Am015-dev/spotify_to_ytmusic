@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 252,
+ "h": 256,
+ "anchor": [
+  126,
+  256
+ ],
+ "order": [
+  "strip-wpn-storm-impact#1",
+  "strip-wpn-storm-impact#2",
+  "strip-wpn-storm-impact#3",
+  "strip-wpn-storm-impact#4"
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 12,
+ "w": 264,
+ "h": 204,
+ "anchor": [
+  132,
+  204
+ ],
+ "order": [
+  "strip-fx-boom-ground-dust-burst#1",
+  "strip-fx-boom-ground-dust-burst#2",
+  "strip-fx-boom-ground-dust-burst#3",
+  "strip-fx-boom-ground-dust-burst#4",
+  "strip-fx-boom-ground-dust-burst#5"
+ ]
+}

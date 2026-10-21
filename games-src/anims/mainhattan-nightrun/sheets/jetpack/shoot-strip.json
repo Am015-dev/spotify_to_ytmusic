@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 196,
+ "h": 256,
+ "anchor": [
+  98,
+  256
+ ],
+ "order": [
+  "strip-jetpack-shoot#1",
+  "strip-jetpack-shoot#2",
+  "strip-jetpack-shoot#3"
+ ]
+}

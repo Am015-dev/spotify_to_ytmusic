@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 520,
+ "h": 278,
+ "anchor": [
+  260,
+  278
+ ],
+ "order": [
+  "_old_strip-ship-nova-death#1",
+  "_old_strip-ship-nova-death#2",
+  "_old_strip-ship-nova-death#3",
+  "_old_strip-ship-nova-death#4"
+ ]
+}

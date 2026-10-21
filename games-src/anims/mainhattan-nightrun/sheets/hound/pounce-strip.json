@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 336,
+ "h": 256,
+ "anchor": [
+  168,
+  256
+ ],
+ "order": [
+  "strip-hound-pounce#1",
+  "strip-hound-pounce#2",
+  "strip-hound-pounce#3",
+  "strip-hound-pounce#4"
+ ]
+}

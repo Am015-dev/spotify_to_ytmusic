@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 253,
+ "h": 256,
+ "anchor": [
+  126,
+  256
+ ],
+ "order": [
+  "strip-fx-spark-burst#1",
+  "strip-fx-spark-burst#2",
+  "strip-fx-spark-burst#3",
+  "strip-fx-spark-burst#4"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 392,
+ "h": 254,
+ "anchor": [
+  196,
+  254
+ ],
+ "order": [
+  "strip-prop-car-loop#1",
+  "strip-prop-car-loop#2",
+  "strip-prop-car-loop#3",
+  "strip-prop-car-loop#4"
+ ]
+}

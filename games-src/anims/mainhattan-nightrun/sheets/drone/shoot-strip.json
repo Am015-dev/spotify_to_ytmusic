@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 314,
+ "h": 256,
+ "anchor": [
+  157,
+  256
+ ],
+ "order": [
+  "strip-drone-shoot#1",
+  "strip-drone-shoot#2",
+  "strip-drone-shoot#3"
+ ]
+}

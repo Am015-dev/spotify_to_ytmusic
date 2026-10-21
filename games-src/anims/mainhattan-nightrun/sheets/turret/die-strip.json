@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 240,
+ "h": 256,
+ "anchor": [
+  120,
+  256
+ ],
+ "order": [
+  "strip-turret-die#1",
+  "strip-turret-die#2",
+  "strip-turret-die#3",
+  "strip-turret-die#4"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 187,
+ "h": 256,
+ "anchor": [
+  93,
+  256
+ ],
+ "order": [
+  "strip-grunt-jump#1",
+  "strip-grunt-jump#2",
+  "strip-grunt-jump#3",
+  "strip-grunt-jump#4"
+ ]
+}

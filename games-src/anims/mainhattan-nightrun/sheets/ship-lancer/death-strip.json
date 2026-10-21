@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 520,
+ "h": 256,
+ "anchor": [
+  260,
+  256
+ ],
+ "order": [
+  "strip-ship-lancer-death#1",
+  "strip-ship-lancer-death#2",
+  "strip-ship-lancer-death#3",
+  "strip-ship-lancer-death#4"
+ ]
+}

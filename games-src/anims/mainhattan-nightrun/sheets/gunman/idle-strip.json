@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 95,
+ "h": 256,
+ "anchor": [
+  47,
+  256
+ ],
+ "order": [
+  "strip-gunman-idle#1",
+  "strip-gunman-idle#2",
+  "strip-gunman-idle#3",
+  "strip-gunman-idle#4"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 194,
+ "h": 256,
+ "anchor": [
+  97,
+  256
+ ],
+ "order": [
+  "strip-knife-jump#1",
+  "strip-knife-jump#2",
+  "strip-knife-jump#3",
+  "strip-knife-jump#4"
+ ]
+}

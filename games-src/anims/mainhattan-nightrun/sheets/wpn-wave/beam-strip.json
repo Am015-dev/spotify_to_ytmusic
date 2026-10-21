@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 392,
+ "h": 360,
+ "anchor": [
+  196,
+  360
+ ],
+ "order": [
+  "strip-wpn-wave-beam#1",
+  "strip-wpn-wave-beam#2",
+  "strip-wpn-wave-beam#3",
+  "strip-wpn-wave-beam#4"
+ ]
+}

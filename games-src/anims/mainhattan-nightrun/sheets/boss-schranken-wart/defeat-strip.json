@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 6,
+ "w": 392,
+ "h": 356,
+ "anchor": [
+  196,
+  356
+ ],
+ "order": [
+  "strip-boss-schranken-wart-defeat#1",
+  "strip-boss-schranken-wart-defeat#2",
+  "strip-boss-schranken-wart-defeat#3",
+  "strip-boss-schranken-wart-defeat#4"
+ ]
+}

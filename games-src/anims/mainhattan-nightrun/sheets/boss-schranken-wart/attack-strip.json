@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 392,
+ "h": 299,
+ "anchor": [
+  196,
+  299
+ ],
+ "order": [
+  "strip-boss-schranken-wart-attack#1",
+  "strip-boss-schranken-wart-attack#2",
+  "strip-boss-schranken-wart-attack#3",
+  "strip-boss-schranken-wart-attack#4"
+ ]
+}

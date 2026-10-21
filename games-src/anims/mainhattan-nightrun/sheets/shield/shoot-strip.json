@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 217,
+ "h": 256,
+ "anchor": [
+  108,
+  256
+ ],
+ "order": [
+  "strip-shield-shoot#1",
+  "strip-shield-shoot#2",
+  "strip-shield-shoot#3"
+ ]
+}

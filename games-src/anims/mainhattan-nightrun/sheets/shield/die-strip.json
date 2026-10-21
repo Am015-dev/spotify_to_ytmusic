@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 238,
+ "h": 256,
+ "anchor": [
+  119,
+  256
+ ],
+ "order": [
+  "strip-shield-die#1",
+  "strip-shield-die#2",
+  "strip-shield-die#3",
+  "strip-shield-die#4"
+ ]
+}

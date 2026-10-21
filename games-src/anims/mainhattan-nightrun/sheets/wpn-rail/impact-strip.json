@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 260,
+ "h": 256,
+ "anchor": [
+  130,
+  256
+ ],
+ "order": [
+  "strip-wpn-rail-impact#1",
+  "strip-wpn-rail-impact#2",
+  "strip-wpn-rail-impact#3",
+  "strip-wpn-rail-impact#4"
+ ]
+}

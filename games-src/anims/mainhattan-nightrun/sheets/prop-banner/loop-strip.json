@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 187,
+ "h": 384,
+ "anchor": [
+  93,
+  384
+ ],
+ "order": [
+  "strip-prop-banner-loop#1",
+  "strip-prop-banner-loop#2",
+  "strip-prop-banner-loop#3",
+  "strip-prop-banner-loop#4"
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 12,
+ "w": 520,
+ "h": 182,
+ "anchor": [
+  260,
+  182
+ ],
+ "order": [
+  "strip-ship-ebomber-volley#1",
+  "strip-ship-ebomber-volley#2",
+  "strip-ship-ebomber-volley#3"
+ ]
+}

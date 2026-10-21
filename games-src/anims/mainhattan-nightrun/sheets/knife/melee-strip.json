@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 227,
+ "h": 256,
+ "anchor": [
+  113,
+  256
+ ],
+ "order": [
+  "strip-knife-melee#1",
+  "strip-knife-melee#2",
+  "strip-knife-melee#3",
+  "strip-knife-melee#4"
+ ]
+}

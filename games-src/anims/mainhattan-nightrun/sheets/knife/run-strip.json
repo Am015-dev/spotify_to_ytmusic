@@ -1,0 +1,18 @@
+{
+ "frames": 6,
+ "fps": 12,
+ "w": 176,
+ "h": 256,
+ "anchor": [
+  88,
+  256
+ ],
+ "order": [
+  "strip-knife-run#1",
+  "strip-knife-run#2",
+  "strip-knife-run#3",
+  "strip-knife-run#4",
+  "strip-knife-run#5",
+  "strip-knife-run#6"
+ ]
+}

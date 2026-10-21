@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 287,
+ "h": 256,
+ "anchor": [
+  143,
+  256
+ ],
+ "order": [
+  "strip-warden-shoot#1",
+  "strip-warden-shoot#2",
+  "strip-warden-shoot#3"
+ ]
+}

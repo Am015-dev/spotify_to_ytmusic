@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 264,
+ "h": 255,
+ "anchor": [
+  132,
+  255
+ ],
+ "order": [
+  "strip-wpn-beat-impact#1",
+  "strip-wpn-beat-impact#2",
+  "strip-wpn-beat-impact#3",
+  "strip-wpn-beat-impact#4"
+ ]
+}

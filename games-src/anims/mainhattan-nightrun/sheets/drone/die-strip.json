@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 223,
+ "h": 256,
+ "anchor": [
+  111,
+  256
+ ],
+ "order": [
+  "strip-drone-die#1",
+  "strip-drone-die#2",
+  "strip-drone-die#3",
+  "strip-drone-die#4"
+ ]
+}

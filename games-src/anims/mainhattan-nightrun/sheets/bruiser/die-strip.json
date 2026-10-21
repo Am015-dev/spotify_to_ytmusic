@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 258,
+ "h": 256,
+ "anchor": [
+  129,
+  256
+ ],
+ "order": [
+  "strip-bruiser-die#1",
+  "strip-bruiser-die#2",
+  "strip-bruiser-die#3",
+  "strip-bruiser-die#4"
+ ]
+}

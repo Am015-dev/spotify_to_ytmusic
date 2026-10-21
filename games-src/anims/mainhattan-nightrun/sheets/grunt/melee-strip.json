@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 220,
+ "h": 256,
+ "anchor": [
+  110,
+  256
+ ],
+ "order": [
+  "strip-grunt-melee#1",
+  "strip-grunt-melee#2",
+  "strip-grunt-melee#3",
+  "strip-grunt-melee#4"
+ ]
+}

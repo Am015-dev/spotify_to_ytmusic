@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 381,
+ "h": 384,
+ "anchor": [
+  190,
+  384
+ ],
+ "order": [
+  "strip-prop-police-loop#1",
+  "strip-prop-police-loop#2",
+  "strip-prop-police-loop#3",
+  "strip-prop-police-loop#4"
+ ]
+}

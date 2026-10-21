@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 12,
+ "w": 259,
+ "h": 256,
+ "anchor": [
+  129,
+  256
+ ],
+ "order": [
+  "strip-fx-boom-debris-burst#1",
+  "strip-fx-boom-debris-burst#2",
+  "strip-fx-boom-debris-burst#3",
+  "strip-fx-boom-debris-burst#4",
+  "strip-fx-boom-debris-burst#5"
+ ]
+}

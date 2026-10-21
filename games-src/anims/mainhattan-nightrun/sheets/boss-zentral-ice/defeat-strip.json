@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 6,
+ "w": 392,
+ "h": 212,
+ "anchor": [
+  196,
+  212
+ ],
+ "order": [
+  "strip-boss-zentral-ice-defeat#1",
+  "strip-boss-zentral-ice-defeat#2",
+  "strip-boss-zentral-ice-defeat#3",
+  "strip-boss-zentral-ice-defeat#4"
+ ]
+}

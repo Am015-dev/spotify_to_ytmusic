@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 392,
+ "h": 296,
+ "anchor": [
+  196,
+  296
+ ],
+ "order": [
+  "strip-wpn-well-beam#1",
+  "strip-wpn-well-beam#2",
+  "strip-wpn-well-beam#3",
+  "strip-wpn-well-beam#4"
+ ]
+}

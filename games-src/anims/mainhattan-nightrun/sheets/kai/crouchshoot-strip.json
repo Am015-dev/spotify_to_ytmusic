@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 289,
+ "h": 256,
+ "anchor": [
+  144,
+  256
+ ],
+ "order": [
+  "strip-kai-crouchshoot#1",
+  "strip-kai-crouchshoot#2",
+  "strip-kai-crouchshoot#3"
+ ]
+}

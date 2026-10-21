@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 250,
+ "h": 256,
+ "anchor": [
+  125,
+  256
+ ],
+ "order": [
+  "strip-shield-melee#1",
+  "strip-shield-melee#2",
+  "strip-shield-melee#3",
+  "strip-shield-melee#4"
+ ]
+}

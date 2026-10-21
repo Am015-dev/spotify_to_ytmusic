@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 252,
+ "h": 256,
+ "anchor": [
+  126,
+  256
+ ],
+ "order": [
+  "strip-ninja-slash#1",
+  "strip-ninja-slash#2",
+  "strip-ninja-slash#3",
+  "strip-ninja-slash#4"
+ ]
+}

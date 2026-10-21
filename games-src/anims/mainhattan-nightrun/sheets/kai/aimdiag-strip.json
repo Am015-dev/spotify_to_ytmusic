@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 137,
+ "h": 256,
+ "anchor": [
+  68,
+  256
+ ],
+ "order": [
+  "strip-kai-aimdiag#1",
+  "strip-kai-aimdiag#2",
+  "strip-kai-aimdiag#3"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 520,
+ "h": 251,
+ "anchor": [
+  260,
+  251
+ ],
+ "order": [
+  "strip-ship-ekamikaze-death#1",
+  "strip-ship-ekamikaze-death#2",
+  "strip-ship-ekamikaze-death#3",
+  "strip-ship-ekamikaze-death#4"
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 12,
+ "w": 338,
+ "h": 256,
+ "anchor": [
+  169,
+  256
+ ],
+ "order": [
+  "strip-hound-bite#1",
+  "strip-hound-bite#2",
+  "strip-hound-bite#3"
+ ]
+}

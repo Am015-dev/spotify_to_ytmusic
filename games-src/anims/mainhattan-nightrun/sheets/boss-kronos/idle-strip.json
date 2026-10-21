@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 392,
+ "h": 276,
+ "anchor": [
+  196,
+  276
+ ],
+ "order": [
+  "strip-boss-kronos-idle#1",
+  "strip-boss-kronos-idle#2",
+  "strip-boss-kronos-idle#3",
+  "strip-boss-kronos-idle#4"
+ ]
+}

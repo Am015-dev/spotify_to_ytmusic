@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 205,
+ "h": 256,
+ "anchor": [
+  102,
+  256
+ ],
+ "order": [
+  "strip-sniper-shoot#1",
+  "strip-sniper-shoot#2",
+  "strip-sniper-shoot#3"
+ ]
+}

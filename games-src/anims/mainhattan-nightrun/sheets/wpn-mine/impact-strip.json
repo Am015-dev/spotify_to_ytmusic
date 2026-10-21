@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 259,
+ "h": 256,
+ "anchor": [
+  129,
+  256
+ ],
+ "order": [
+  "strip-wpn-mine-impact#1",
+  "strip-wpn-mine-impact#2",
+  "strip-wpn-mine-impact#3",
+  "strip-wpn-mine-impact#4"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 207,
+ "h": 256,
+ "anchor": [
+  103,
+  256
+ ],
+ "order": [
+  "strip-medic-die#1",
+  "strip-medic-die#2",
+  "strip-medic-die#3",
+  "strip-medic-die#4"
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "frames": 6,
+ "fps": 12,
+ "w": 192,
+ "h": 256,
+ "anchor": [
+  96,
+  256
+ ],
+ "order": [
+  "strip-grunt-run#1",
+  "strip-grunt-run#2",
+  "strip-grunt-run#3",
+  "strip-grunt-run#4",
+  "strip-grunt-run#5",
+  "strip-grunt-run#6"
+ ]
+}

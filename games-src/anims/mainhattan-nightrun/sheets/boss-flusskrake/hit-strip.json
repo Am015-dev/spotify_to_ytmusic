@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 373,
+ "h": 384,
+ "anchor": [
+  186,
+  384
+ ],
+ "order": [
+  "strip-boss-flusskrake-hit#1",
+  "strip-boss-flusskrake-hit#2",
+  "strip-boss-flusskrake-hit#3"
+ ]
+}

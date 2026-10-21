@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 247,
+ "h": 256,
+ "anchor": [
+  123,
+  256
+ ],
+ "order": [
+  "strip-pk-ammo-spin#1",
+  "strip-pk-ammo-spin#2",
+  "strip-pk-ammo-spin#3",
+  "strip-pk-ammo-spin#4"
+ ]
+}

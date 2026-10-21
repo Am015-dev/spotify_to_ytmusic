@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 10,
+ "w": 190,
+ "h": 256,
+ "anchor": [
+  95,
+  256
+ ],
+ "order": [
+  "strip-kai-combo2#1",
+  "strip-kai-combo2#2",
+  "strip-kai-combo2#3",
+  "strip-kai-combo2#4"
+ ]
+}

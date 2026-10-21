@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 392,
+ "h": 269,
+ "anchor": [
+  196,
+  269
+ ],
+ "order": [
+  "strip-prop-drone-loop#1",
+  "strip-prop-drone-loop#2",
+  "strip-prop-drone-loop#3",
+  "strip-prop-drone-loop#4"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 264,
+ "h": 213,
+ "anchor": [
+  132,
+  213
+ ],
+ "order": [
+  "strip-wpn-swarm-impact#1",
+  "strip-wpn-swarm-impact#2",
+  "strip-wpn-swarm-impact#3",
+  "strip-wpn-swarm-impact#4"
+ ]
+}

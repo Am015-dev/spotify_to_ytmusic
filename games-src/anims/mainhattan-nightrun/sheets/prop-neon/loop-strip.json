@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 163,
+ "h": 384,
+ "anchor": [
+  81,
+  384
+ ],
+ "order": [
+  "strip-prop-neon-loop#1",
+  "strip-prop-neon-loop#2",
+  "strip-prop-neon-loop#3",
+  "strip-prop-neon-loop#4"
+ ]
+}

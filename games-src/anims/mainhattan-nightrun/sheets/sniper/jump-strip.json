@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 254,
+ "h": 256,
+ "anchor": [
+  127,
+  256
+ ],
+ "order": [
+  "strip-sniper-jump#1",
+  "strip-sniper-jump#2",
+  "strip-sniper-jump#3",
+  "strip-sniper-jump#4"
+ ]
+}

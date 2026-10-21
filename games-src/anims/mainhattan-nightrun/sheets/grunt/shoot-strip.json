@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 205,
+ "h": 256,
+ "anchor": [
+  102,
+  256
+ ],
+ "order": [
+  "strip-grunt-shoot#1",
+  "strip-grunt-shoot#2",
+  "strip-grunt-shoot#3"
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 384,
+ "h": 384,
+ "anchor": [
+  192,
+  384
+ ],
+ "order": [
+  "strip-boss-hoplite-hit#1",
+  "strip-boss-hoplite-hit#2",
+  "strip-boss-hoplite-hit#3"
+ ]
+}

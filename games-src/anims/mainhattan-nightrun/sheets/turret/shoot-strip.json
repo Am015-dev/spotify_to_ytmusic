@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 325,
+ "h": 256,
+ "anchor": [
+  162,
+  256
+ ],
+ "order": [
+  "strip-turret-shoot#1",
+  "strip-turret-shoot#2",
+  "strip-turret-shoot#3"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 273,
+ "h": 256,
+ "anchor": [
+  136,
+  256
+ ],
+ "order": [
+  "strip-drone-idle#1",
+  "strip-drone-idle#2",
+  "strip-drone-idle#3",
+  "strip-drone-idle#4"
+ ]
+}

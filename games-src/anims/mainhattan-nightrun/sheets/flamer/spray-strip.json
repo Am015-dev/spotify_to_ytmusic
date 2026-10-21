@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 294,
+ "h": 256,
+ "anchor": [
+  147,
+  256
+ ],
+ "order": [
+  "strip-flamer-spray#1",
+  "strip-flamer-spray#2",
+  "strip-flamer-spray#3",
+  "strip-flamer-spray#4"
+ ]
+}

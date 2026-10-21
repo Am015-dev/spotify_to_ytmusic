@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 106,
+ "h": 256,
+ "anchor": [
+  53,
+  256
+ ],
+ "order": [
+  "strip-kai-idle#1",
+  "strip-kai-idle#2",
+  "strip-kai-idle#3",
+  "strip-kai-idle#4"
+ ]
+}

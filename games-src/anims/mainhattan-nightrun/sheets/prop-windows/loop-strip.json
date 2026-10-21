@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 257,
+ "h": 384,
+ "anchor": [
+  128,
+  384
+ ],
+ "order": [
+  "strip-prop-windows-loop#1",
+  "strip-prop-windows-loop#2",
+  "strip-prop-windows-loop#3",
+  "strip-prop-windows-loop#4"
+ ]
+}

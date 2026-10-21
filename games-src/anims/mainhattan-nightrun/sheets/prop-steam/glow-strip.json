@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 204,
+ "h": 384,
+ "anchor": [
+  102,
+  384
+ ],
+ "order": [
+  "strip-prop-steam-glow#1",
+  "strip-prop-steam-glow#2",
+  "strip-prop-steam-glow#3",
+  "strip-prop-steam-glow#4",
+  "strip-prop-steam-glow#5"
+ ]
+}

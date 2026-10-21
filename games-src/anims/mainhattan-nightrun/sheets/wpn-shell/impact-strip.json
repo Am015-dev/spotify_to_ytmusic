@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 264,
+ "h": 207,
+ "anchor": [
+  132,
+  207
+ ],
+ "order": [
+  "strip-wpn-shell-impact#1",
+  "strip-wpn-shell-impact#2",
+  "strip-wpn-shell-impact#3",
+  "strip-wpn-shell-impact#4"
+ ]
+}

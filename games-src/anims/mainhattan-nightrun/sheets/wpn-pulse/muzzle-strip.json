@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 18,
+ "w": 392,
+ "h": 237,
+ "anchor": [
+  196,
+  237
+ ],
+ "order": [
+  "strip-wpn-pulse-muzzle#1",
+  "strip-wpn-pulse-muzzle#2",
+  "strip-wpn-pulse-muzzle#3"
+ ]
+}

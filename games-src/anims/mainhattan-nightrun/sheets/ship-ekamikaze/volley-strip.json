@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 12,
+ "w": 520,
+ "h": 240,
+ "anchor": [
+  260,
+  240
+ ],
+ "order": [
+  "strip-ship-ekamikaze-volley#1",
+  "strip-ship-ekamikaze-volley#2",
+  "strip-ship-ekamikaze-volley#3"
+ ]
+}

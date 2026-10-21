@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 14,
+ "w": 256,
+ "h": 256,
+ "anchor": [
+  128,
+  256
+ ],
+ "order": [
+  "strip-wpn-laser-impact#1",
+  "strip-wpn-laser-impact#2",
+  "strip-wpn-laser-impact#3",
+  "strip-wpn-laser-impact#4"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 291,
+ "h": 384,
+ "anchor": [
+  145,
+  384
+ ],
+ "order": [
+  "strip-boss-talos-attack#1",
+  "strip-boss-talos-attack#2",
+  "strip-boss-talos-attack#3",
+  "strip-boss-talos-attack#4"
+ ]
+}

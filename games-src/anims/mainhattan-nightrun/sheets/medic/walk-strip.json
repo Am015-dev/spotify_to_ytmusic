@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 134,
+ "h": 256,
+ "anchor": [
+  67,
+  256
+ ],
+ "order": [
+  "strip-medic-walk#1",
+  "strip-medic-walk#2",
+  "strip-medic-walk#3",
+  "strip-medic-walk#4"
+ ]
+}

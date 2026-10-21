@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 306,
+ "h": 256,
+ "anchor": [
+  153,
+  256
+ ],
+ "order": [
+  "strip-turret-idle#1",
+  "strip-turret-idle#2",
+  "strip-turret-idle#3",
+  "strip-turret-idle#4"
+ ]
+}

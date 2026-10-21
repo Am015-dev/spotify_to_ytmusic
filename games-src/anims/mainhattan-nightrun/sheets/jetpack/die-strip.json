@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 235,
+ "h": 256,
+ "anchor": [
+  117,
+  256
+ ],
+ "order": [
+  "strip-jetpack-die#1",
+  "strip-jetpack-die#2",
+  "strip-jetpack-die#3",
+  "strip-jetpack-die#4"
+ ]
+}

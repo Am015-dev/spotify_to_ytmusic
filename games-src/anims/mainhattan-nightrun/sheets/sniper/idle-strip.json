@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 160,
+ "h": 256,
+ "anchor": [
+  80,
+  256
+ ],
+ "order": [
+  "strip-sniper-idle#1",
+  "strip-sniper-idle#2",
+  "strip-sniper-idle#3",
+  "strip-sniper-idle#4"
+ ]
+}

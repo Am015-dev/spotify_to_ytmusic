@@ -1,0 +1,18 @@
+{
+ "frames": 6,
+ "fps": 12,
+ "w": 205,
+ "h": 256,
+ "anchor": [
+  102,
+  256
+ ],
+ "order": [
+  "strip-bruiser-run#1",
+  "strip-bruiser-run#2",
+  "strip-bruiser-run#3",
+  "strip-bruiser-run#4",
+  "strip-bruiser-run#5",
+  "strip-bruiser-run#6"
+ ]
+}

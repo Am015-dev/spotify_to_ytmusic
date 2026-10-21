@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 6,
+ "w": 343,
+ "h": 384,
+ "anchor": [
+  171,
+  384
+ ],
+ "order": [
+  "strip-boss-hoplite-defeat#1",
+  "strip-boss-hoplite-defeat#2",
+  "strip-boss-hoplite-defeat#3",
+  "strip-boss-hoplite-defeat#4"
+ ]
+}

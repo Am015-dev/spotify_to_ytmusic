@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 4,
+ "w": 276,
+ "h": 384,
+ "anchor": [
+  138,
+  384
+ ],
+ "order": [
+  "strip-boss-messe-waechter-idle#1",
+  "strip-boss-messe-waechter-idle#2",
+  "strip-boss-messe-waechter-idle#3"
+ ]
+}

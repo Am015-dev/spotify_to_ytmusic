@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 392,
+ "h": 190,
+ "anchor": [
+  196,
+  190
+ ],
+ "order": [
+  "strip-boss-schranken-wart-idle#1",
+  "strip-boss-schranken-wart-idle#2",
+  "strip-boss-schranken-wart-idle#3",
+  "strip-boss-schranken-wart-idle#4"
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "frames": 6,
+ "fps": 12,
+ "w": 175,
+ "h": 256,
+ "anchor": [
+  87,
+  256
+ ],
+ "order": [
+  "strip-gunman-run#1",
+  "strip-gunman-run#2",
+  "strip-gunman-run#3",
+  "strip-gunman-run#4",
+  "strip-gunman-run#5",
+  "strip-gunman-run#6"
+ ]
+}

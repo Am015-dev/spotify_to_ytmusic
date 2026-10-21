@@ -1,0 +1,15 @@
+{
+ "frames": 3,
+ "fps": 10,
+ "w": 172,
+ "h": 256,
+ "anchor": [
+  86,
+  256
+ ],
+ "order": [
+  "strip-knife-shoot#1",
+  "strip-knife-shoot#2",
+  "strip-knife-shoot#3"
+ ]
+}

@@ -1,0 +1,18 @@
+{
+ "frames": 6,
+ "fps": 12,
+ "w": 207,
+ "h": 256,
+ "anchor": [
+  103,
+  256
+ ],
+ "order": [
+  "strip-shield-run#1",
+  "strip-shield-run#2",
+  "strip-shield-run#3",
+  "strip-shield-run#4",
+  "strip-shield-run#5",
+  "strip-shield-run#6"
+ ]
+}

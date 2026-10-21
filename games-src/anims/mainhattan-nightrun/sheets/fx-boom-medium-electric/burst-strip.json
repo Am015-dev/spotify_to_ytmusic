@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 12,
+ "w": 264,
+ "h": 255,
+ "anchor": [
+  132,
+  255
+ ],
+ "order": [
+  "strip-fx-boom-medium-electric-burst#1",
+  "strip-fx-boom-medium-electric-burst#2",
+  "strip-fx-boom-medium-electric-burst#3",
+  "strip-fx-boom-medium-electric-burst#4",
+  "strip-fx-boom-medium-electric-burst#5"
+ ]
+}

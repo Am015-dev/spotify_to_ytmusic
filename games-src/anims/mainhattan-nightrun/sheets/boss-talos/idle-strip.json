@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 227,
+ "h": 384,
+ "anchor": [
+  113,
+  384
+ ],
+ "order": [
+  "strip-boss-talos-idle#1",
+  "strip-boss-talos-idle#2",
+  "strip-boss-talos-idle#3",
+  "strip-boss-talos-idle#4"
+ ]
+}

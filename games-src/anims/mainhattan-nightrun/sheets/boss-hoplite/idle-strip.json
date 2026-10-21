@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 4,
+ "w": 259,
+ "h": 384,
+ "anchor": [
+  129,
+  384
+ ],
+ "order": [
+  "strip-boss-hoplite-idle#1",
+  "strip-boss-hoplite-idle#2",
+  "strip-boss-hoplite-idle#3",
+  "strip-boss-hoplite-idle#4"
+ ]
+}

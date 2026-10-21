@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 520,
+ "h": 237,
+ "anchor": [
+  260,
+  237
+ ],
+ "order": [
+  "strip-ship-egunship-death#1",
+  "strip-ship-egunship-death#2",
+  "strip-ship-egunship-death#3",
+  "strip-ship-egunship-death#4"
+ ]
+}

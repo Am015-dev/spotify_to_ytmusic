@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 8,
+ "w": 184,
+ "h": 384,
+ "anchor": [
+  92,
+  384
+ ],
+ "order": [
+  "strip-prop-beacon-loop#1",
+  "strip-prop-beacon-loop#2",
+  "strip-prop-beacon-loop#3",
+  "strip-prop-beacon-loop#4"
+ ]
+}
