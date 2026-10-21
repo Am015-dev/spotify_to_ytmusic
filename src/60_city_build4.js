@@ -32,7 +32,7 @@ function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){if((BHQ
   yield [.1,CID==='fra'?'Growing the Taunus':'Planting the olive trees'];worldGroundBuild(grp,bt,BM);yield [.16,CID==='fra'?'Laying the Autobahn':'Opening the periptera'];abBuild(grp,bt,BM,M);yield [.24,CID==='fra'?'Filling the Main':'Polishing the marble'];
   // the Main: water ribbons along the bend, quay walls, slipways, the nine real bridges at their real angles
   waterBuild(grp,waterMat());quayBuild(bt,BM);slipBuild(bt,BM);
-  for(const b of BRIDGES){const road=b.kind!=='foot',stone=b.look==='stone';deckBuild(b,bt,BM,road?M.road:M.walk,road?32:10,road?(stone?'#a8553f':'#6a6f7a'):'#8a6a4a',road?(stone?'#c9a27a':'#dfe3ea'):'#c0392b');if(b.look==='truss')stegBuild(b,bt,BM)}
+  for(let _j1=0,_b1=BRIDGES;_j1<_b1.length;_j1++){const b=_b1[_j1];const road=b.kind!=='foot',stone=b.look==='stone';deckBuild(b,bt,BM,road?M.road:M.walk,road?32:10,road?(stone?'#a8553f':'#6a6f7a'):'#8a6a4a',road?(stone?'#c9a27a':'#dfe3ea'):'#c0392b');if(b.look==='truss')stegBuild(b,bt,BM)}
   yield [.3,'Raising the skyline'];
   // custom landmark towers (glass), used for the skyline icons
   const addBld=(x,z,w,d,h,kind,col,roof)=>{bt.add(colorize(bxUV(w,h,d,14,12).translate(x,h/2,z),new THREE.Color(col)),BM[kind]);let H=h;
@@ -78,7 +78,7 @@ function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){if((BHQ
           putK(nm,sc,x,z,ry,pick(tl));p+=mw+rr2(3,10)}};
       for(const sd of['n','s','e','w'])row(sd);continue}}
   // frontage along the real streets: buildings turned to the street (oriented colliders), wherever the footprint is clear
-  if(CID==='fra'){const FL=['building-a','building-b','building-c','building-d','building-e','building-f','building-g','building-h'];let nS=0;for(const S of CITY_S){if(++nS%8===0||BH_due())yield [.38+.02*nS/CITY_S.length];if(S.r.cls==='quay')continue;const P=S.pts,w=S.r.w;for(const sd of[-1,1]){let s=24;while(s<S.L-24){const i=Math.min(P.length-1,Math.round(s/8)),p=P[i],nm=BV.on?BV_pick(FL,p.x+p.tz*sd*(w/2+16),p.z-p.tx*sd*(w/2+16),9,'fac'):pick(FL),sc=26*rr2(.92,1.08),[mw,,md]=kmSize(nm,sc),off=w/2+7+md/2,x=p.x+p.tz*sd*off,z=p.z-p.tx*sd*off,ry=Math.atan2(-p.tz*sd,p.tx*sd);
+  if(CID==='fra'){const FL=['building-a','building-b','building-c','building-d','building-e','building-f','building-g','building-h'];let nS=0;for(let _j2=0,_b2=CITY_S;_j2<_b2.length;_j2++){const S=_b2[_j2];if(++nS%8===0||BH_due())yield [.38+.02*nS/CITY_S.length];if(S.r.cls==='quay')continue;const P=S.pts,w=S.r.w;for(const sd of[-1,1]){let s=24;while(s<S.L-24){const i=Math.min(P.length-1,Math.round(s/8)),p=P[i],nm=BV.on?BV_pick(FL,p.x+p.tz*sd*(w/2+16),p.z-p.tx*sd*(w/2+16),9,'fac'):pick(FL),sc=26*rr2(.92,1.08),[mw,,md]=kmSize(nm,sc),off=w/2+7+md/2,x=p.x+p.tz*sd*off,z=p.z-p.tx*sd*off,ry=Math.atan2(-p.tz*sd,p.tx*sd);
       if(rnd()<.8&&!occHit(x,z,Math.max(mw,md)*.5))putK(nm,sc,x,z,ry,pick(TINT.city));s+=mw+rr2(5,14)}}}}
   if(CID!=='fra')yield* athBuildG(grp,BM,rnd);
   HUB.blocks=blocks;yield [.4,'Building the landmarks'];
@@ -86,7 +86,7 @@ function* buildHubG(){if(HUB.built)return;HUB.built=true;if(CID==='fra'){if((BHQ
   if(CID==='fra')lmBuildAll(bt,BM);skylineBuild(grp);
   {const ath=CID==='ath',L=LM_BY[ath?'Garaz Psyrri':'Werkstatt Konstablerwache'],gx=L.x,gz=L.z,GW=ath?36:70,GD=ath?22:34;addBld(gx,gz,GW,GD,16,'brick',ath?'#f4f2ec':'#7ac05a','flat');const door=new THREE.BoxGeometry(24,10,.5);door.translate(gx,5,gz-GD/2-.3);bt.add(colorize(door,new THREE.Color('#2f3640')),BM.plain);const sign=new THREE.BoxGeometry(30,4,.5);sign.translate(gx,13,gz-GD/2-.6);bt.add(colorize(sign,new THREE.Color(ath?'#0d5eaf':'#ffcc00')),BM.plain);if(ath)for(const k of[-1,1])bt.add(cbox(5,16.6,1.2,gx+k*(GW/2-3),8.3,gz-GD/2-.4,'#0d5eaf'),BM.plain);HUB.garage={x:gx,z:gz-(ath?GD/2+10:45)}}
   if(CID!=='fra'){athTerrainBuild(bt,BM,M,grp,G);athLandmarksBuild(bt,BM)}
-  if(CID==='ath'){HUB.gates=[];const TX={};for(const S of CITY_S){if(!['arterial','main','sec'].includes(S.r.cls))continue;const P=S.pts;for(let i=1;i<P.length;i++){const[a,b]=RW(P[i-1].x,P[i-1].z),[c,d]=RW(P[i].x,P[i].z),ia=athIn(ATHD,a,b),ib=athIn(ATHD,c,d);if(ia===ib)continue;const q=ia?P[i-1]:P[i],o=ia?P[i]:P[i-1],[oe,on]=RW(o.x,o.z),to=athDistAt(oe,on);if(!to||to===ATHD||SM_ON)continue;
+  if(CID==='ath'){HUB.gates=[];const TX={};for(let _j3=0,_b3=CITY_S;_j3<_b3.length;_j3++){const S=_b3[_j3];if(!['arterial','main','sec'].includes(S.r.cls))continue;const P=S.pts;for(let i=1;i<P.length;i++){const[a,b]=RW(P[i-1].x,P[i-1].z),[c,d]=RW(P[i].x,P[i].z),ia=athIn(ATHD,a,b),ib=athIn(ATHD,c,d);if(ia===ib)continue;const q=ia?P[i-1]:P[i],o=ia?P[i]:P[i-1],[oe,on]=RW(o.x,o.z),to=athDistAt(oe,on);if(!to||to===ATHD||SM_ON)continue;
       if(HUB.gates.some(g=>Math.hypot(g.x-q.x,g.z-q.z)<70))continue;const w=S.r.w,ry=Math.atan2(q.tx,q.tz),gx=q.x,gz=q.z,gy=groundY(gx,gz),D=ATH_DIST[to];HUB.gates.push({x:gx,z:gz,to,name:D.name});
       for(const sd of[-1,1]){const px=gx+q.tz*sd*(w/2+1.5),pz=gz-q.tx*sd*(w/2+1.5),rq=athRoadD(px,pz,40);if(rq&&rq.e<1.2)continue;bt.add(cbox(1.6,9,1.6,px,gy+4.5,pz,'#f4f2ec',ry),BM.plain);hubAddB({x:px,z:pz,hw:.8,hd:.8,h:gy+9})}
       if(!TX[to]){const[c2,g2]=cv(512,96);g2.fillStyle=D.col;g2.fillRect(0,0,512,96);g2.fillStyle='#141413';g2.fillRect(6,6,500,84);g2.fillStyle='#fff';g2.font='900 34px system-ui';g2.textAlign='center';g2.textBaseline='middle';g2.fillText('DRIVE TO '+D.name.toUpperCase()+' ▶',256,50);const t=tex(c2);KEEP_TEX.add(t);TX[to]=new THREE.MeshBasicMaterial({map:t,side:THREE.DoubleSide,toneMapped:false})}
@@ -109,7 +109,7 @@ function hubGridAdd(list){if(HUB.grid)gridAddTo(HUB.grid,list)}
 function gridHit(G,x,z,rad){const L=G.get(Math.floor(x/40)*10000+Math.floor(z/40));if(L)for(const b of L)if(bHit(b,x,z,rad))return b;return null}
 const lzHit=(x,z,r)=>gridHit(LZ.g,x,z,r);
 function lzRoadD(x,z){const kx=Math.floor(x/64),kz=Math.floor(z/64);let b=1e9;for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){const L=LZ.rg.get((kx+a)*100000+kz+c);if(L)for(const p of L){const d=Math.hypot(p.x-x,p.z-z)-p.w/2;if(d<b)b=d}}return b}
-function lzPlanAll(){for(const L of LAZY){if(L.planned)continue;L.planned=1;if(L.plan)L.plan(L);gridAddTo(LZ.g,L.bld)}HUB.towns=LAZY.reduce((a,L)=>a+(L.towns||0),0)}
+function lzPlanAll(){for(let _i1=0,_a1=LAZY;_i1<_a1.length;_i1++){const L=_a1[_i1];if(L.planned)continue;L.planned=1;if(L.plan)L.plan(L);gridAddTo(LZ.g,L.bld)}HUB.towns=LAZY.reduce((a,L)=>a+(L.towns||0),0)}
 // placement test for planned parts: inside the world, off the water, Autobahn, Taunus roads, trails, garages, biome roads, other planned parts and (in the city) the streets and buildings
 function lzFree(x,z,r){if(x<WX0+40||x>WX1-40||z<WZS+40||z>WZN-40)return false;if(inRiver(x,z,-(r+8)))return false;const a=abAt(x,z);if(a&&a.d<a.road.w/2+r+8)return false;if(mtnDist(x,z)<r+16||trailDist(x,z)<r+8)return false;
   if(GARAGES.some(g=>g.x!=null&&Math.hypot(x-g.x,z-g.z)<r+58))return false;if(lzRoadD(x,z)<r+3||lzHit(x,z,r+2))return false;
@@ -162,7 +162,7 @@ function lzFinish(L){if(L.pg&&!L.pre&&L.it)while(!L.it.next().done);const R=L.ro
   R.visible=true;if(L.cullL){if(HUB.cull)for(const c of L.cullL)HUB.cull.push(c);HUB.cj=4;L.cullL=null}else hubCullAdd(R);L.done=true;L.it=null;L.bt=null;L.tDone=performance.now();L.qd=true}
 function lzRun(L){if(L.done)return;const i=LZ.q.indexOf(L);if(i>=0)LZ.q.splice(i,1);lzStart(L);const t=performance.now();while(!L.it.next().done);L.ms+=performance.now()-t;lzFinish(L);if(LZ.cur===L)LZ.cur=null}
 // the per-frame step (called from hubTrafficStep): queue biomes within 2200 m, nearest first, and spend at most LZ.ms on generator steps
-function lazyStep(){if(!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;let add=false;for(const L of LAZY)if(!L.done&&!L.qd&&lzD(L,x,z)<(L.inR||LZ.inR||2200)){L.qd=true;LZ.q.push(L);add=true}
+function lazyStep(){if(!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;let add=false;for(let _k1=0,_c1=LAZY,L;_k1<_c1.length&&(L=_c1[_k1],true);_k1++)if(!L.done&&!L.qd&&lzD(L,x,z)<(L.inR||LZ.inR||2200)){L.qd=true;LZ.q.push(L);add=true}
   if(!LZ.cur&&!LZ.q.length)return;if(add)LZ.q.sort((a,b)=>lzD(a,x,z)-lzD(b,x,z));const t0=performance.now();let n=0;
   while(performance.now()-t0<LZ.ms){if(!LZ.cur){LZ.cur=LZ.q.shift();if(!LZ.cur)break;if(LZ.cur.done){LZ.cur=null;continue}lzStart(LZ.cur)}const L=LZ.cur,t1=performance.now(),r=L.it.next();let d1=performance.now()-t1;L.ms+=d1;n++;let d2=0;if(r.done&&!L.pg){L.pg=1;L.it=lzPreG(L);continue}if(r.done){const t2=performance.now();lzFinish(L);d2=performance.now()-t2;d1+=d2;LZ.cur=null}if(d1>20)(LZ.slow||(LZ.slow=[])).length<40&&LZ.slow.push([L.id,r.done?'fin':r.value||'?',Math.round(d1),Math.round(d2),LZ.lastV||'']);LZ.lastV=r.value}
   if(!n)return;const dt=performance.now()-t0;LZ.steps++;LZ.tot+=dt;if(dt>LZ.max)LZ.max=dt;if(dt>8)LZ.over++;LZ.hist.push(+dt.toFixed(2));if(LZ.hist.length>900)LZ.hist.shift()}

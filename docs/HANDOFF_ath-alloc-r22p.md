@@ -1,0 +1,6 @@
+# HANDOFF ath-alloc-r22p
+- Measured (tools/athdrive.js out <ver> ath, HEAP=40, 1800 ticks = 30 s): sampled allocation 1589 MB (~53 MB/s) before -> 1421 MB (~47 MB/s) after; iterator `next` 192 -> 109 MB, Math.hypot 78 -> 43 MB.
+- Changed: roamTerr call sites pass per-site scratch results (_rtA.._rtH); for..of over the hot arrays (HUB.cars, RO.studs, SLIPS, ALL_DECKS, CITY_S, HUB.bld, PC.L, ...) is now an indexed loop (head-variable form, also for brace-less bodies); Math.hypot -> sqrt in 71/90/98ct/98pc.
+- GO perf/ath-alloc (src/99cd_athalloc.js, before 99_api): static check of the hot functions + roamTerr scratch identity; the MB/s limit (40) only bites where performance.memory is precise (the lab runner is not: 0 deltas).
+- Left: roamTerr still shows ~97 MB self (callers DEST_open, FX19_seat, HT_pose; cause not found, not the result object), LIFE_draw/LIFE_free ~90, cityAt ~55 (Map keys), RD_cityNear ~43, roamHit ~35, remaining hypot in pedStep/DEST_dij, for..of over Maps/Sets and unlisted arrays (STR_step, addR, LV_edges0 `A.nb`). Target < 600 MB / 30 s is NOT met.
+- Gate: unit 0 FAIL, TAG=perf/ath-alloc,life1,xf1,terrain on the built page 42/43 (xf1/grass only "SLOW 10.2 s > 10 s" under the parallel fra+ath load; solo rerun 6.9 s PASS).

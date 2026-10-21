@@ -19,7 +19,7 @@ qvMiniQ=(f=>function(){if(MF.off.has('side'))return;return f.apply(this,argument
 OG_map=(f=>function(){const S=OG.S;if(!MF.off.has('event')&&!MF.off.has('collect'))return f.apply(this,arguments);OG.S=S.filter(s=>!MF.off.has(MF_ogCat(s)));try{return f.apply(this,arguments)}finally{OG.S=S}})(OG_map);
 {const C=$('#roamMapC');if(C){C.addEventListener('pointerup',()=>{MF.g=1},true);for(const t of['pointerup','pointercancel'])addEventListener(t,()=>{MF.g=0})}}
 // ---------- chips
-function MF_count(){const n={};for(const m of RO.marks||[]){const c=MF_cat(m);if(c)n[c]=(n[c]||0)+1}for(const s of(typeof OG!=='undefined'&&OG.S)||[]){const c=MF_ogCat(s);n[c]=(n[c]||0)+1}return n}
+function MF_count(){const n={};for(let _k1=0,_c1=RO.marks||[],m;_k1<_c1.length&&(m=_c1[_k1],true);_k1++){const c=MF_cat(m);if(c)n[c]=(n[c]||0)+1}for(const s of(typeof OG!=='undefined'&&OG.S)||[]){const c=MF_ogCat(s);n[c]=(n[c]||0)+1}return n}
 function MF_ui(){const host=$('#roamMap');if(!host)return;let el=document.getElementById('mfBar');if(!el){el=document.createElement('div');el.id='mfBar';host.appendChild(el);
   el.addEventListener('pointerdown',e=>e.stopPropagation());el.addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('button');if(!b)return;MF_tap(b.dataset.mf)})}
  const n=MF_count(),C=MF_C.filter(c=>n[c[0]]),allOn=C.every(c=>!MF.off.has(c[0]));

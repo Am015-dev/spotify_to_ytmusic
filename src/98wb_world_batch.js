@@ -132,7 +132,7 @@ async function WB_cityBuild2(a,b){const t0=performance.now(),SL=a==null?6:14,grp
     WBC.sup.push(S);WB_big(ti,'super '+nt);i+=S.cells.length;if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(.5+.5*i/WBC.cells.size)}
   // v89b STR: before the far LOD switches on, build the super cells within load range of the camera inside this (sliced) build, as live does for all
   // of them; otherwise the first ~3 s after the switch show missing far blocks while STR_step catches up
-  if(STR_on()&&typeof camera!=='undefined')for(;;){const cx=camera.position.x,cz=camera.position.z,LD=STR_R()+TUNE.strLoad;let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;
+  if(STR_on()&&typeof camera!=='undefined')for(;;){const cx=camera.position.x,cz=camera.position.z,LD=STR_R()+TUNE.strLoad;let b=null,bd=LD;for(let _k1=0,_c1=WBC.sup,S;_k1<_c1.length&&(S=_c1[_k1],true);_k1++){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;
     for(const _ of WB_supMk(b,true))if(!WBC.fast&&performance.now()-tt>SL)tt=await yl(1);STR.st.b++;if(typeof STR_up==='function')STR_up(b)}   // perf-r11c: upload now, frees the CPU copy
   {const sl=performance.now()-tt,S=WBC.st;if(sl>(S.slMax||0))S.slMax=Math.round(sl);if(sl>50)S.sl50=(S.sl50||0)+1;if(sl>100)S.sl100=(S.sl100||0)+1}
   WBC.on=true;WBC.sig='';WBC.st.ms=Math.round(performance.now()-t0);WBC.st.objs=WBC.objs.length;WBC.st.mobjs=WBC.mobjs.length;WBC.st.cells=WBC.cells.size}
@@ -156,7 +156,7 @@ function* WB_supMk(S,keep){const nt=S.nt,grp=S.grp;if(!nt){if(!keep)for(const c 
     const m=new THREE.Mesh(g,WBC.mat);m.matrixAutoUpdate=false;m.visible=false;m.userData.keep=1;m.userData.wbLod=1;m.raycast=()=>{};m.receiveShadow=false;m.castShadow=false;grp.add(m);return m};
   for(const [c,st,n,B] of rng)if(n)c.lod=mk(st,n,B);if(rng.filter(q=>q[2]).length>1)S.lod=mk(0,nt*3,bx);S.built=1;S.mb=nt*54/1048576;WBC.st.lodT=(WBC.st.lodT||0)+nt}
 function WB_supFree(S){const gs=new Set();for(const c of S.cells)if(c.lod){c.lod.removeFromParent();gs.add(c.lod.geometry);c.lod=null}if(S.lod){S.lod.removeFromParent();gs.add(S.lod.geometry);S.lod=null}for(const g of gs)g.dispose();S.built=0;WBC.st.lodT=Math.max(0,(WBC.st.lodT||0)-S.nt)}
-function WB_cityClear(keep){if(WBC.prep&&WBC.prep!==keep){for(const {P} of WBC.prep.L)for(const q of P)q.m.removeFromParent();WBC.prep=null}for(const c of WBC.cells.values())if(c.lod){c.lod.removeFromParent();c.lod.geometry.dispose()}for(const S of WBC.sup||[])if(S.lod){S.lod.removeFromParent();S.lod.geometry.dispose()}WBC.sup=[];for(const G of WBC.grps||[])if(G.P){G.P.removeFromParent();G.P.dispose()}WBC.grps=null;for(const e of WBC.mobjs){for(const [,m] of e.pcs)m.removeFromParent();for(const r of e.rm||[])r.removeFromParent()}WBC.cells.clear();WBC.objs=[];WBC.mobjs=[];WBC.tpl.clear();WBC.tl=[];WBC.on=false;WBC.grp=null;WBC.built=null}
+function WB_cityClear(keep){if(WBC.prep&&WBC.prep!==keep){for(const {P} of WBC.prep.L)for(const q of P)q.m.removeFromParent();WBC.prep=null}for(const c of WBC.cells.values())if(c.lod){c.lod.removeFromParent();c.lod.geometry.dispose()}for(let _k2=0,_c2=WBC.sup||[],S;_k2<_c2.length&&(S=_c2[_k2],true);_k2++)if(S.lod){S.lod.removeFromParent();S.lod.geometry.dispose()}WBC.sup=[];for(const G of WBC.grps||[])if(G.P){G.P.removeFromParent();G.P.dispose()}WBC.grps=null;for(const e of WBC.mobjs){for(const [,m] of e.pcs)m.removeFromParent();for(const r of e.rm||[])r.removeFromParent()}WBC.cells.clear();WBC.objs=[];WBC.mobjs=[];WBC.tpl.clear();WBC.tl=[];WBC.on=false;WBC.grp=null;WBC.built=null}
 // near proxy of one original: only its instances in near cells (rebuilt when the near set changes or the game rewrote the original)
 const WB_M=new THREE.Matrix4(),WB_Cl=new THREE.Color();
 // v88w: near proxies are per (model, material, parent) across all 1 km tiles: two tiles' copies of the same house were 2 draws, now 1
@@ -175,7 +175,7 @@ function WB_mruns(e){for(const r of e.rm||[])r.visible=false;e.show=[];const P=e
       if(!r){const pg=new THREE.BufferGeometry();for(const nm in g0.attributes)pg.setAttribute(nm,g0.attributes[nm]);if(g0.index)pg.setIndex(g0.index);r=new THREE.Mesh(pg,m0.material);r.position.copy(m0.position);r.quaternion.copy(m0.quaternion);r.scale.copy(m0.scale);r.castShadow=m0.castShadow;r.receiveShadow=m0.receiveShadow;r.renderOrder=m0.renderOrder;r.visible=false;r.userData.keep=1;r.userData.wbM=1;r.raycast=()=>{};m0.parent.add(r);e.rm.push(r)}
       u++;r.geometry.setDrawRange(st,end-st);const b=new THREE.Box3();for(let q=i;q<=j;q++)b.union(P[q][1].geometry.boundingBox);r.geometry.boundingBox=b;r.geometry.boundingSphere=b.getBoundingSphere(new THREE.Sphere());e.show.push(r)}i=j+1}}
 const WBC_v=[];
-function WB_cityHide(){if(WBC.hid)return;WBC.hid=1;for(const G of WBC.grps||[])if(G.P)G.P.visible=false;for(const e of WBC.mobjs){for(const [,m] of e.pcs)m.visible=false;for(const r of e.rm||[])r.visible=false}for(const c of WBC.cells.values())if(c.lod)c.lod.visible=false;for(const S of WBC.sup||[])if(S.lod)S.lod.visible=false}
+function WB_cityHide(){if(WBC.hid)return;WBC.hid=1;for(const G of WBC.grps||[])if(G.P)G.P.visible=false;for(const e of WBC.mobjs){for(const [,m] of e.pcs)m.visible=false;for(const r of e.rm||[])r.visible=false}for(const c of WBC.cells.values())if(c.lod)c.lod.visible=false;for(let _k3=0,_c3=WBC.sup||[],S;_k3<_c3.length&&(S=_c3[_k3],true);_k3++)if(S.lod)S.lod.visible=false}
 function WB_cityPre(cam){WBC_v.length=0;if(!WBC.on)return;if(WBC.grp!==HUB.grp||!HUB.grp.visible||!TUNE.wbCity||state!=='roam'&&state!=='loading'){WB_cityHide();return}WBC.hid=0;const cx=cam.matrixWorld.elements[12],cz=cam.matrixWorld.elements[14],D=TUNE.wbLodD,R=TUNE.wbLodRt>0?TUNE.wbLodRt:(SET.q==='high'?2100:1600);   // r17s: wbLodRt = far-LOD cell range cap (touch/lowmem)
   
   // near set: cells whose rectangle is within D of the camera (updated when the camera crosses a 25 m step)
@@ -185,7 +185,7 @@ function WB_cityPre(cam){WBC_v.length=0;if(!WBC.on)return;if(WBC.grp!==HUB.grp||
   for(const G of WBC.grps){let h=0;for(let q=0;q<G.L.length;q++)if(G.L[q].v)h=(h*31+q+1)|0;if(h!==G.sig){G.sig=h;G.dirty=1}if(G.dirty)WB_gprox(G);if(G.P){G.P.visible=G.n>0;if(G.P.visible)px++}}
   for(const e of WBC.mobjs){const v=e.o.visible;e.v=v;WBC_v.push(v);e.o.visible=false;if(!e.show)WB_mruns(e);for(const [,m] of e.pcs)m.visible=false;for(const m of e.show){m.visible=v;if(v)px++}}
   for(const c of WBC.cells.values())if(c.lod){let any=false;for(const e of c.objs)if(e.v&&e.o.parent){any=true;break}c.lod.visible=!WBC.near.has(c.k)&&c.d<R&&any;c.ok=any;if(c.lod.visible)lod++}
-  const SD=TUNE.wbSuperD;if(SD>0)for(const S of WBC.sup){if(!S.lod)continue;let ok=true,vis=false;for(const c of S.cells){if(!c.lod)continue;if(WBC.near.has(c.k)||c.d<SD||!c.ok){ok=false;break}if(c.lod.visible)vis=true}
+  const SD=TUNE.wbSuperD;if(SD>0)for(let _k4=0,_c4=WBC.sup,S;_k4<_c4.length&&(S=_c4[_k4],true);_k4++){if(!S.lod)continue;let ok=true,vis=false;for(const c of S.cells){if(!c.lod)continue;if(WBC.near.has(c.k)||c.d<SD||!c.ok){ok=false;break}if(c.lod.visible)vis=true}
     S.lod.visible=false;if(ok&&vis){for(const c of S.cells)if(c.lod&&c.lod.visible){c.lod.visible=false;lod--}S.lod.visible=true;lod++}}
   WBC.st.lod=lod;WBC.st.prox=px}
 // far small things: mission-giver minifigs, the 1.5 m beacon stubs, ramp parts (each 1-35 draws, a few px tall beyond ~260 m)
@@ -219,7 +219,7 @@ function WB_icoSlot(t){let k=WBI.slot.get(t);if(k!=null)return k;const img=t&&t.
 const _wbiQ=new THREE.Quaternion(),_wbiP=new THREE.Vector3(),_wbiS=new THREE.Vector3(),_wbiM=new THREE.Matrix4();
 function WB_icoPre(cam){WBI.h.length=0;if(WBI.m)WBI.m.visible=false;if(!TUNE.wbIcon||typeof state==='undefined'||state!=='roam'||typeof RO==='undefined'||!RO||!RO.marks)return;if(!WBI.m)WB_icoInit();
   const m=WBI.m,a=WBI.ia.array;let n=0;cam.getWorldQuaternion(_wbiQ);
-  for(const mk of RO.marks){const sp=mk&&mk.sp;if(!sp||!sp.visible||n>=160)continue;let o=sp.parent,vis=!!o;while(o){if(!o.visible){vis=false;break}if(o===scene)break;o=o.parent;if(!o)vis=false}if(!vis)continue;
+  for(let _j1=0,_b1=RO.marks;_j1<_b1.length;_j1++){const mk=_b1[_j1];const sp=mk&&mk.sp;if(!sp||!sp.visible||n>=160)continue;let o=sp.parent,vis=!!o;while(o){if(!o.visible){vis=false;break}if(o===scene)break;o=o.parent;if(!o)vis=false}if(!vis)continue;
     const mt=sp.material;if(!mt||mt.depthTest===false||sp.renderOrder)continue;const k=WB_icoSlot(mt.map);if(k<0)continue;const e=sp.matrixWorld.elements;
     _wbiP.set(e[12],e[13],e[14]);_wbiS.set(Math.hypot(e[0],e[1],e[2]),Math.hypot(e[4],e[5],e[6]),1);_wbiM.compose(_wbiP,_wbiQ,_wbiS);m.setMatrixAt(n,_wbiM);
     a[n*3]=(k%16)*.0625;a[n*3+1]=1-(Math.floor(k/16)+1)*.125;a[n*3+2]=mt.opacity;n++;sp.visible=false;WBI.h.push(sp)}

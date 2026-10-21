@@ -136,7 +136,7 @@ qvTgt=(f=>function(ch){if(ATC_isA(ch)&&ch.v2){const S=ch.v2.L.st[ch.v2.si],tg=ch
   if(S&&S.koth){const t=f(ch);if(!t||Math.hypot(t.x-S.koth.x,t.z-S.koth.z)>S.koth.r*.7||Math.hypot(RO.x-S.koth.x,RO.z-S.koth.z)>S.koth.r*.6){tg.x=S.koth.x;tg.z=S.koth.z;return tg}return t}}return f(ch)})(qvTgt);
 qvEnter=(f=>function(ch,i){f(ch,i);if(ATC_isA(ch)&&ch.v2){const S=ch.v2.L.st[ch.v2.si];if(S&&S.t==='atcGate'&&!S.gs){S.gs=1;ATC_gateSetup(ch,S)}}})(qvEnter);
 // ---------- the DRIVE TO gate inside a mission
-function SM_gates(){if(SM_GT)return SM_GT;SM_GT=[];for(const S of CITY_S){if(!['arterial','main','sec','res','link'].includes(S.r.cls))continue;const P=S.pts;
+function SM_gates(){if(SM_GT)return SM_GT;SM_GT=[];for(let _j1=0,_b1=CITY_S;_j1<_b1.length;_j1++){const S=_b1[_j1];if(!['arterial','main','sec','res','link'].includes(S.r.cls))continue;const P=S.pts;
   for(let i=1;i<P.length;i++){const a=athDistAt(...RW(P[i-1].x,P[i-1].z)),b=athDistAt(...RW(P[i].x,P[i].z));if(!a||!b||a===b)continue;
     for(const[q,to]of[[P[i],b],[P[i-1],a]])if(!SM_GT.some(g=>g.to===to&&Math.hypot(g.x-q.x,g.z-q.z)<70))SM_GT.push({x:q.x,z:q.z,to})}}return SM_GT}
 function ATC_gateSetup(ch,S){const G=(SM_ON?SM_gates():HUB.gates||[]).filter(g=>g.to===S.to);const ref=S.aim||{x:RO.x,z:RO.z};let b=null,bd=1e18;for(const g of G){const d=Math.hypot(g.x-RO.x,g.z-RO.z)+Math.hypot(g.x-ref.x,g.z-ref.z)*.6;if(d<bd){bd=d;b=g}}

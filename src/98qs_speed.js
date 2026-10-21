@@ -47,13 +47,13 @@ function QS_shutSet(){const N=HUB.nodes,R=RO.ramps;if(!N||!R)return null;if(QS_S
  for(const r of R){if(r.dk)continue;for(const k of QS_rampEdges(r,N))S.add(k)}
  QS_SH=S;QS_SHr=R;QS_SHn=R.length;QS_SHg=N.ng;return S}
 function QS_shut(a,b){if(!TUNE.rampClear||a==null||b==null)return false;const S=QS_shutSet();return!!S&&S.has(Math.min(a,b)*100000+Math.max(a,b))}
-function QS_rampNear(x,z){if(!TUNE.rampClear)return false;for(const r of RO.ramps||[])if(!r.dk&&QS_pts(r).some(([px,pz])=>Math.hypot(px-x,pz-z)<r.w/2+12))return true;return false}
+function QS_rampNear(x,z){if(!TUNE.rampClear)return false;for(let _k1=0,_c1=RO.ramps||[],r;_k1<_c1.length&&(r=_c1[_k1],true);_k1++)if(!r.dk&&QS_pts(r).some(([px,pz])=>Math.hypot(px-x,pz-z)<r.w/2+12))return true;return false}
 // traffic count follows the hour (FL day cycle): live cars × QS_hourK/1.2; extra cars out of sight (> 200 m) are parked off-map for 20-40 s
 function QS_hourK(){let h=12;try{h=FL_time()*24}catch(e){}const ath=CID!=='fra';if(h<5)return ath?.5:.35;if(h<7)return .7;if(h<9.5)return 1.2;if(h<14.5)return 1;if(h<15.5)return ath?1.2:1;if(h<16)return 1;if(h<19.5)return 1.2;return ath?(h<23?1:.5):.7}
 let QS_ct=0;function QS_clear(dt){if(!HUB.cars||!HUB.nodes||(QS_ct+=dt)<.5)return;QS_ct=0;const N=HUB.nodes;
  if(TUNE.trHour){const C=HUB.cars,live=C.filter(c=>!(c.dead>0)).length,want=Math.round(C.length*QS_hourK()/1.2);let over=live-want;
   for(const c of C){if(over<=0)break;if(c.dead>0||c.pk||c.tr||c.route||c.crW||(HT_POP.on?!HT_canPop(c.x,c.z,c.y):Math.hypot(c.x-RO.x,c.z-RO.z)<200))continue;c.dead=20+R()*20;over--}}
- for(const c of HUB.cars){if(TUNE.trOn&&!c.pk&&!c.tr&&N[c.a]&&N[c.b]){const ab=!!(N[c.a].ab&&N[c.b].ab);if(c.qsAb!==ab){c.qsAb=ab;c.v=QS_v0(c.k,ab)}}/* Autobahn 100-130 (trucks 80-90), city 50-60 km/h */
+ for(let _i1=0,_a1=HUB.cars;_i1<_a1.length;_i1++){const c=_a1[_i1];if(TUNE.trOn&&!c.pk&&!c.tr&&N[c.a]&&N[c.b]){const ab=!!(N[c.a].ab&&N[c.b].ab);if(c.qsAb!==ab){c.qsAb=ab;c.v=QS_v0(c.k,ab)}}/* Autobahn 100-130 (trucks 80-90), city 50-60 km/h */
   if(c.pk||c.tr||c.dead>0||c.route||!QS_shut(c.a,c.b)||Math.hypot(c.x-RO.x,c.z-RO.z)<110&&LV_seen(c.x,c.y||0,c.z))continue;/* close but out of view (behind you, round a corner) moves too */const A=N[c.a];if(!A)continue;
   const nx=A.nb.filter(n=>n<N.ng&&n!==c.b&&!QS_shut(c.a,n));if(nx.length){c.b=nx[Math.floor(R()*nx.length)];c.t=0}}}
 hubTrafficStep=(f=>function(dt){try{QS_clear(dt)}catch(e){}return f.apply(this,arguments)})(hubTrafficStep);
@@ -68,12 +68,12 @@ function QS_rampOk(x,z,h,len,w){const s=Math.sin(h),c=Math.cos(h),why=[];const P
  const ge=groundY(...P(-len/2,0)),gl=groundY(...P(len/2,0));if(Math.abs(ge-gl)>.5)why.push('slope '+(gl-ge).toFixed(1));
  for(let a=-len/2-30;a<=len/2+40;a+=3)for(const b of[-w/2+.6,0,w/2-.6]){const[px,pz]=P(a,b),g=groundY(px,pz);
   if(roamHit(px,pz,.9,g+.6)){why.push('collider@'+Math.round(a));a=1e9;break}if(typeof inRiver==='function'&&inRiver(px,pz,-1)){why.push('water@'+Math.round(a));a=1e9;break}}
- for(const J of JUNC||[])for(const a of[-len/2-30,-len/2-15,-len/2,0,len/2,len/2+20])if(Math.hypot(P(a,0)[0]-J.x,P(a,0)[1]-J.z)<J.r+2){why.push('junction@'+a);break}
+ for(let _k2=0,_c2=JUNC||[],J;_k2<_c2.length&&(J=_c2[_k2],true);_k2++)for(const a of[-len/2-30,-len/2-15,-len/2,0,len/2,len/2+20])if(Math.hypot(P(a,0)[0]-J.x,P(a,0)[1]-J.z)<J.r+2){why.push('junction@'+a);break}
  return why}
 // every drivable road as 8 m samples {x,z,tx,tz}: city streets, lazy biome roads (outer towns), Taunus mountain roads
 let QS_RD=null;function QS_roads(){if(QS_RD)return QS_RD;const R=[],add=(P,w,cls)=>{if(!P||P.length<2)return;const Q=[];for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],L=Math.hypot(b.x-a.x,b.z-a.z);if(L<.01)continue;
   const n=Math.max(1,Math.ceil(L/8));for(let k=0;k<n;k++)Q.push({x:a.x+(b.x-a.x)*k/n,z:a.z+(b.z-a.z)*k/n,tx:(b.x-a.x)/L,tz:(b.z-a.z)/L})}if(Q.length>8)R.push({pts:Q,w,cls})};
- for(const S of CITY_S)if(S.r.cls!=='ped')add(S.pts,S.r.w,S.r.cls);try{for(const S of LZ.roads||[])add(S.pts,S.w||(S.r&&S.r.w)||8,'lz')}catch(e){}try{for(const S of mtnSamples())add(S.pts,(S.r&&S.r.w)||9,'mtn')}catch(e){}
+ for(let _k3=0,_c3=CITY_S,S;_k3<_c3.length&&(S=_c3[_k3],true);_k3++)if(S.r.cls!=='ped')add(S.pts,S.r.w,S.r.cls);try{for(const S of LZ.roads||[])add(S.pts,S.w||(S.r&&S.r.w)||8,'lz')}catch(e){}try{for(const S of mtnSamples())add(S.pts,(S.r&&S.r.w)||9,'mtn')}catch(e){}
  return QS_RD=R}
 // ramps-r21q (2026-10-20): "the roads and streets are unusable": 18 of 33 Athens ramps spanned the whole carriageway (7 m walls on 7.5 m streets). Athens street ramps now
 // sit on ONE side, at most 40 % of the road width (clear lane beside); a ramp on a street narrower than 14 m moves to the nearest wide street within 400 m (permanent
@@ -110,4 +110,4 @@ function QS_rampFit(x,z,h,len,w){const o={x0:Math.round(x),z0:Math.round(z),w0:w
  Object.assign(o,{x:Math.round(best[0]),z:Math.round(best[1]),w:W,road:B.r.cls,moved:Math.round(Math.hypot(best[0]-x,best[1]-z))});QS_RL.push(o);return[best[0],best[1],best[2],W]}
 addRamp=(f=>function(x,z,h,len,hgt,w,col,Y0){if(TUNE.rampFit&&Y0==null&&!QS_rampSkip(col)){try{const r=QS_rampFit(x,z,h,len,w);if(r)[x,z,h,w]=r}catch(e){console.warn('QS ramp',e)}}return f.call(this,x,z,h,len,hgt,w,col,Y0)})(addRamp);
 function QS_rampSkip(col){return col===0xffd12c/* OTG roof ramp: leads onto its roof deck */}
-window.__qs={shutQ:(a,b)=>QS_shut(a,b),ramps:()=>QS_RL,shut:()=>{const S=QS_shutSet();return S?S.size:0},fill:()=>{if(pl)pl.bm=100},veh:()=>CR_MODE,line:ab=>{const S=ab?abSamples().filter(S=>S.r.ab&&!S.r.c):CITY_S.filter(S=>S.r.cls!=='hill'&&S.r.cls!=='ped'&&!S.prof);S.sort((a,b)=>b.L-a.L);return S[0].pts.map(p=>[p.x,p.z])},kmh:()=>QS_kmh(carStat()),cls:QS_cls,mix:()=>{const n={};for(const c of HUB.cars){const k=HCAR[c.k];n[k]=(n[k]||0)+1}return n}};
+window.__qs={shutQ:(a,b)=>QS_shut(a,b),ramps:()=>QS_RL,shut:()=>{const S=QS_shutSet();return S?S.size:0},fill:()=>{if(pl)pl.bm=100},veh:()=>CR_MODE,line:ab=>{const S=ab?abSamples().filter(S=>S.r.ab&&!S.r.c):CITY_S.filter(S=>S.r.cls!=='hill'&&S.r.cls!=='ped'&&!S.prof);S.sort((a,b)=>b.L-a.L);return S[0].pts.map(p=>[p.x,p.z])},kmh:()=>QS_kmh(carStat()),cls:QS_cls,mix:()=>{const n={};for(let _i2=0,_a2=HUB.cars;_i2<_a2.length;_i2++){const c=_a2[_i2];const k=HCAR[c.k];n[k]=(n[k]||0)+1}return n}};

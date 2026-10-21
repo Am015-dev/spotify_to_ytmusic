@@ -40,7 +40,7 @@ function OF_figPose(dt){const F=OF.fig;if(!F)return;
 const OF_cH=c=>{const N=HUB.nodes,A=N[c.a],B=N[c.b];if(!A||!B)return 0;return Math.atan2(B.x-A.x,B.z-A.z)};
 const OF_box=(x,z,h,hw=1.02,hd=2.35)=>({x,z,hw,hd,c:Math.cos(h),s:Math.sin(h),h:999});
 function OF_cars(withTraffic){const L=[];if(OF.car)L.push({k:'cur',x:OF.car.x,z:OF.car.z,y:OF.car.y,h:OF.car.h,hw:OF.car.hw,hd:OF.car.hd,ref:OF.car});for(const v of OF.vs)L.push({k:'grp',x:v.x,z:v.z,y:v.y,h:v.h,hw:v.hw,hd:v.hd,ref:v});
-  if(withTraffic&&HUB.cars)for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-OF.x,dz=c.z-OF.z;if(dx*dx+dz*dz>30*30)continue;// v89f: scooters / trolleybuses get their own size (was a 2 × 4.7 m car box: a stopped Athens scooter walled off the lane and the walker never reached the car behind it)
+  if(withTraffic&&HUB.cars)for(let _j1=0,_b1=HUB.cars;_j1<_b1.length;_j1++){const c=_b1[_j1];if(c.dead>0||c.x==null)continue;const dx=c.x-OF.x,dz=c.z-OF.z;if(dx*dx+dz*dz>30*30)continue;// v89f: scooters / trolleybuses get their own size (was a 2 × 4.7 m car box: a stopped Athens scooter walled off the lane and the walker never reached the car behind it)
     const dm=OF_cdim(c.k);L.push({k:c.pk&&!(c.cv>.3)?'park':'traf',x:c.x,z:c.z,y:c.y||0,h:OF_cH(c),hw:dm?dm[0]:undefined,hd:dm?dm[1]:undefined,ref:c})}return L}
 // foot-2: the walker's box of a traffic / parked ride = the bounding box of its REAL model (HUB.cim[k]): a delivery truck is 6.2 m long, a bus 12 m, not the 4.7 m car box
 function OF_cdim(k){const m=HUB.cim&&HUB.cim[k];if(m&&m.geometry){const g=m.geometry;if(!g.boundingBox)g.computeBoundingBox();const b=g.boundingBox,w=(b.max.x-b.min.x)/2,l=(b.max.z-b.min.z)/2;if(w>.3&&l>.5)return[w,l]}return typeof OB_cdim==='function'?OB_cdim(k):null}
@@ -397,8 +397,8 @@ function OF_spawn(P,fx,fz,fh){if(!roamWarp(P.cx,P.cz,P.h,true))return false;OF_p
 function OF_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}if(RO.card){RO.card=null;$('#roamCard').hidden=true}
   OF_reset();OF_actEnd&&OF_actEnd();
   if(kind==='bench'||kind==='mission'){const T=[];
-    if(kind==='bench'){for(const q of HUB.props||[])if(q.t==='bench'&&q.alive!==false)T.push({x:q.x,z:q.z,y:q.y??groundAt(q.x,q.z,99),q})}
-    else for(const m of RO.marks||[]){if(!m.fig||markLocked(m))continue;const v=m.fig.getWorldPosition(new THREE.Vector3());T.push({x:v.x,z:v.z,y:v.y,m})}
+    if(kind==='bench'){for(let _k1=0,_c1=HUB.props||[],q;_k1<_c1.length&&(q=_c1[_k1],true);_k1++)if(q.t==='bench'&&q.alive!==false)T.push({x:q.x,z:q.z,y:q.y??groundAt(q.x,q.z,99),q})}
+    else for(let _k2=0,_c2=RO.marks||[],m;_k2<_c2.length&&(m=_c2[_k2],true);_k2++){if(!m.fig||markLocked(m))continue;const v=m.fig.getWorldPosition(new THREE.Vector3());T.push({x:v.x,z:v.z,y:v.y,m})}
     if(!T.length)return'📍 No '+kind+' nearby · try again';T.sort((a,b)=>((a.x-RO.x)**2+(a.z-RO.z)**2)-((b.x-RO.x)**2+(b.z-RO.z)**2));
     for(const t of T.slice(0,25)){const q=rfSnap(t.x,t.z,200);if(!q)continue;  // the nearest one with a free spot 2-3 m away (the bench itself does not block it)
       for(const r of[2,2.5,3])for(let a=0;a<16;a++){const an=a/16*6.283,x=t.x+Math.sin(an)*r,z=t.z+Math.cos(an)*r,y=groundAt(x,z,t.y+2);if(Math.abs(y-t.y)>.6||roamHit(x,z,OF_R+.25,y+1)||CID==='fra'&&inRiver(x,z))continue;
@@ -411,7 +411,7 @@ function OF_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first
   if(kind==='npc'){const p=OF_npcPick();if(!p)return'📍 No pedestrian free · try again';const x=P.x+Math.sin(P.h)*2-P.rx*.9,z=P.z+Math.cos(P.h)*2-P.rz*.9;/* ahead, a step towards the shops: in view beside the minifig */p.ofS={x,z,h:P.h+Math.PI/2,go:1};p._x=x;p._z=z;p.y=groundAt(x,z,P.y+2);p.yc=1;OF.npc=p;return'📍 PEDESTRIAN AHEAD · walk up, tap 👋 HI (PC: E)'}
   return kind==='phone'?'📍 ON FOOT · half stick = walk, full stick = run':kind==='jump'?'📍 ON FOOT · JUMP (PC: Space)':'📍 ON FOOT · walk ahead, then turn (PC: WASD, Shift runs)'}
 function OF_npcPick(){const P=HUB.peds;if(!P)return null;const n=typeof LV_pn==='function'?LV_pn(P.length):P.length;let b=null,bd=-1;for(let i=0;i<n;i++){const p=P[i];if(p.cw||p.jy>0||p.ofS)continue;const d=p._x!==p._x?1e9:Math.hypot(p._x-RO.x,p._z-RO.z);if(d>bd){bd=d;b=p}}return b}
-function OF_actEnd(){for(const p of HUB.peds||[])if(p.ofS)delete p.ofS}
+function OF_actEnd(){for(let _k3=0,_c3=HUB.peds||[],p;_k3<_c3.length&&(p=_c3[_k3],true);_k3++)if(p.ofS)delete p.ofS}
 OF_api=(f=>function(){const o=f(),P=OF.npc,v=P&&P.ofS;let face=null;if(v){face=+Math.abs(angDiff(v.h,Math.atan2(OF.x-v.x,OF.z-v.z))).toFixed(2)}
   return Object.assign(o,{cy:+OF.cy.toFixed(3),cyIn:+OF.cyIn.toFixed(3),vx:+OF.vx.toFixed(2),vz:+OF.vz.toFixed(2),ph:+OF.ph.toFixed(3),footV:+(OF.footV||0).toFixed(2),gnd:+(OF.y-groundAt(OF.x,OF.z,OF.y+1)).toFixed(3),
     act:OF.act?OF.act.k:null,sit:!!OF.sit,npc:P?{d:+Math.hypot((P._x||0)-OF.x,(P._z||0)-OF.z).toFixed(2),w:v?+(v.w||0).toFixed(2):0,face,jy:+(P.jy||0).toFixed(2),bub:!!(OF.bub&&OF.bub.s.visible)}:null,
@@ -429,7 +429,7 @@ function OF_acts(){const L=[],fx=Math.sin(OF.h),fz=Math.cos(OF.h),add=(k,o,d,x,z
   if(OF.near)add(OF.near.k==='traf'?'traf':'car',OF.near,OF_edge(OF.near)-(OF.near.k==='traf'?OF_JREACH-OF_NEAR:0),OF.near.x,OF.near.z,OF.near.k==='traf'?-.6:.4);
   const P=HUB.peds||[],n=typeof LV_pn==='function'?LV_pn(P.length):P.length;for(let i=0;i<n;i++){const p=P[i];if(p._x!==p._x||p.jy>0||Math.abs((p.y||0)-OF.y)>1.5)continue;const d=Math.hypot(p._x-OF.x,p._z-OF.z);if(d<2.8)add('npc',p,d,p._x,p._z,1.2)}
   const PG=HUB.pgrid;if(PG){const kx=Math.floor(OF.x/16),kz=Math.floor(OF.z/16);for(let a=-1;a<=1;a++)for(let c=-1;c<=1;c++){for(const q of PG.get((kx+a)*10000+kz+c)||[]){if(q.t!=='bench'||!q.alive||Math.abs((q.y||0)-OF.y)>1.2)continue;const d=Math.hypot(q.x-OF.x,q.z-OF.z);if(d<2.2)add('bench',q,d,q.x,q.z,.3)}}}
-  for(const m of RO.marks||[]){if(!m.fig||markLocked(m))continue;const v=m.fig.getWorldPosition(_ofBv),d=Math.hypot(v.x-OF.x,v.z-OF.z);if(d<3.5&&Math.abs(v.y-OF.y)<2)add('mission',m,d,v.x,v.z,1.2)}
+  for(let _k4=0,_c4=RO.marks||[],m;_k4<_c4.length&&(m=_c4[_k4],true);_k4++){if(!m.fig||markLocked(m))continue;const v=m.fig.getWorldPosition(_ofBv),d=Math.hypot(v.x-OF.x,v.z-OF.z);if(d<3.5&&Math.abs(v.y-OF.y)<2)add('mission',m,d,v.x,v.z,1.2)}
   let b=null;for(const q of L)if(!b||q.s<b.s)b=q;return b}
 function OF_use(a){if(!a||RO.foot!=='walk')return;OF.n.use=(OF.n.use||0)+1;
   if(a.k==='car'||a.k==='traf')return OF_enter(a.o);
@@ -438,7 +438,7 @@ function OF_use(a){if(!a||RO.foot!=='walk')return;OF.n.use=(OF.n.use||0)+1;
   if(a.k==='bench'){const q=a.o;OF.sit={x:q.x,z:q.z,y:q.y??groundAt(q.x,q.z,OF.y+1),h:(q.ry||0)+Math.PI,x0:OF.x,z0:OF.z,t:0,q};OF_sitFit(OF.sit);OF.vx=OF.vz=0;OF.spd=0;AU.sfx&&AU.sfx('brick');OF.log.push('sit');return}
   if(a.k==='mission'){OF.vx=OF.vz=0;roamOpen(a.o);RO.cardPin=1;OF.log.push('talk');if(!$('#roamCard').hidden)OF.n.card=(OF.n.card||0)+1;return}}
 // per frame (walk): pick the target, run the greeting / bubble timers, sit
-function OF_actStep(dt){for(const p of HUB.peds||[]){const S=p.ofS;if(!S)continue;if(S.w>0)S.w-=dt;if(S.rel){S.t-=dt;if(S.t<=0)delete p.ofS}else if(Math.hypot(S.x-OF.x,S.z-OF.z)>30)delete p.ofS}
+function OF_actStep(dt){for(let _k5=0,_c5=HUB.peds||[],p;_k5<_c5.length&&(p=_c5[_k5],true);_k5++){const S=p.ofS;if(!S)continue;if(S.w>0)S.w-=dt;if(S.rel){S.t-=dt;if(S.t<=0)delete p.ofS}else if(Math.hypot(S.x-OF.x,S.z-OF.z)>30)delete p.ofS}
   if(OF.wave>0)OF.wave-=dt;const B=OF.bub;if(B){B.t-=dt;const p=B.p;B.s.position.set((p._x===p._x?p._x:0),(p.y||0)+3.95*OF_pedS()+.45,(p._z===p._z?p._z:0));if(B.t<=0)OF_bubOff()}
   OF.act=RO.foot==='walk'&&!OF.sit?OF_acts():null}
 // sit pose fit (cam-2, 2026-10-14; Alex beta.25: the figure stood INSIDE the bench, hips below the seat top). The bench model (53 terrain_roads) in its own frame: seat box top y .625,
@@ -521,4 +521,4 @@ async function OF_hudRun(){const W=ms=>new Promise(r=>setTimeout(r,ms)),bad=[],i
   window.dispatchEvent(new TouchEvent('touchstart',{touches:[],changedTouches:[]}));await W(400);miss('hybrid after touch');
   return(bad.length?'❌ FAIL ':'✅ PASS ')+'TOUCH BUTTONS AFTER RIDE SWITCHES · 3 phone switches + hybrid touch · '+(bad.length?'missing '+bad.join(', '):'all 5 visible every time')}
 // cam-3: every RO.mark within 15 m of a road (rfSnap) and clear of colliders, both cities
-function OF_markChk(){const bad=[];for(const m of RO.marks||[]){const g=groundAt(m.x,m.z,99),q=rfSnap(m.x,m.z,400),d=q?Math.hypot(q[0]-m.x,q[1]-m.z):1e9;if(d>15||SC_hit(m.x,m.z,g))bad.push((m.kind+':'+(m.id||'?'))+'@'+(m.x|0)+','+(m.z|0)+(d>15?' '+Math.round(d)+'m':' wall'))}return{n:(RO.marks||[]).length,bad}}
+function OF_markChk(){const bad=[];for(let _k6=0,_c6=RO.marks||[],m;_k6<_c6.length&&(m=_c6[_k6],true);_k6++){const g=groundAt(m.x,m.z,99),q=rfSnap(m.x,m.z,400),d=q?Math.hypot(q[0]-m.x,q[1]-m.z):1e9;if(d>15||SC_hit(m.x,m.z,g))bad.push((m.kind+':'+(m.id||'?'))+'@'+(m.x|0)+','+(m.z|0)+(d>15?' '+Math.round(d)+'m':' wall'))}return{n:(RO.marks||[]).length,bad}}

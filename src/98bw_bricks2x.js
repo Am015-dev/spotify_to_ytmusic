@@ -91,7 +91,7 @@ function BW_terrMerge(){if(!TUNE.wbTerr||!HUB||!HUB.grp)return;const G=new Map()
 // lazy zones (story/biome extras): their small things (stud lines, crates, signs: geometry radius < 3 m) are not drawn beyond TUNE.wbLzD
 const BWZ={h:[],L:new Map()};
 function BW_lzPre(cam){BWZ.h.length=0;const D=TUNE.wbLzD;if(!D||typeof LAZY==='undefined'||state!=='roam')return;const e=cam.matrixWorld.elements,cx=e[12],cz=e[14];
-  for(const L of LAZY){const R=L.root;if(!R||!R.parent||!R.visible||!L.rect)continue;const r=L.rect,d=Math.hypot(Math.max(r[0]-cx,0,cx-r[1]),Math.max(r[2]-cz,0,cz-r[3]));if(d<=D)continue;
+  for(let _j1=0,_b1=LAZY;_j1<_b1.length;_j1++){const L=_b1[_j1];const R=L.root;if(!R||!R.parent||!R.visible||!L.rect)continue;const r=L.rect,d=Math.hypot(Math.max(r[0]-cx,0,cx-r[1]),Math.max(r[2]-cz,0,cz-r[3]));if(d<=D)continue;
     let c=BWZ.L.get(L);if(!c||c.n!==R.children.length){c={n:R.children.length,m:[]};R.traverse(o=>{if(o.isMesh&&o.geometry&&!o.userData.keep){const g=o.geometry;if(!g.boundingSphere)g.computeBoundingSphere();if(g.boundingSphere&&g.boundingSphere.radius<3)c.m.push(o)}});BWZ.L.set(L,c)}
     for(const o of c.m)if(o.visible){o.visible=false;BWZ.h.push(o)}}
   // HUB-level instanced small things (stud lines, crates, markers) whose whole instance spread is farther than D

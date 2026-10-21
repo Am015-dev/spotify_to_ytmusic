@@ -8,7 +8,7 @@ function ATHR_audit(){const out=[],seen=new Set(),M=.5;let km=0;
   for(let o=-h;o<=h+.01;o+=Math.min(1.5,h)){const px=x-tz*o,pz=z+tx*o,b=roamHit(px,pz,.3,y+.5);if(b)add(kind(b),b,px,pz,rd,w,h-Math.abs(o),'h='+(b.h?+(b.h-y).toFixed(1):'?'))}};
  const walk=(x0,z0,x1,z1,w,rd)=>{const L=Math.hypot(x1-x0,z1-z0);if(L<.5)return;const tx=(x1-x0)/L,tz=(z1-z0)/L;km+=L/1000;let py=null;
   for(let s=0;s<=L;s+=3){const x=x0+tx*s,z=z0+tz*s;probe(x,z,tx,tz,w,rd);const g=groundY(x,z);if(py!=null&&Math.abs(g-py)>.8&&!(typeof onAnyDeck==='function'&&onAnyDeck(x,z)))add('step',null,x,z,rd,w,Math.abs(g-py),'Δy '+(g-py).toFixed(1));py=g}};
- for(const S of CITY_S){if(S.r.cls==='ped'||S.r.cls==='hill')continue;const P=S.pts,rd=S.r.name||S.r.cls||'street';for(let i=0;i+1<P.length;i++)walk(P[i].x,P[i].z,P[i+1].x,P[i+1].z,S.r.w,rd)}
+ for(let _j1=0,_b1=CITY_S;_j1<_b1.length;_j1++){const S=_b1[_j1];if(S.r.cls==='ped'||S.r.cls==='hill')continue;const P=S.pts,rd=S.r.name||S.r.cls||'street';for(let i=0;i+1<P.length;i++)walk(P[i].x,P[i].z,P[i+1].x,P[i+1].z,S.r.w,rd)}
  for(const r of hubRoads())walk(r.x0,r.z0,r.x1,r.z1,r.w,'fill');
  if(typeof abSamples==='function')for(const S of abSamples()){if(!S.r.ab||S.r.c)continue;const P=S.pts;for(let i=0;i+1<P.length;i++)walk(P[i].x,P[i].z,P[i+1].x,P[i+1].z,S.r.w,S.r.name||'ab')}
  out.sort((a,b)=>b.dep-a.dep);return{n:out.length,km,nb:HUB.bld.length,ng:HUB.grid?HUB.grid.size:0,list:out}}
@@ -19,7 +19,7 @@ function ATHR_go(){const r=ATHR_audit(),by={};for(const o of r.list)by[o.type]=(
 // athroads2: VISIBLE-mesh pass. Every visible mesh/instance (merged city tiles included) contributes its wall triangles (near-vertical, base within 2 m of the ground, top >= 3.5 m above it, >= 1.5 m long) as XZ base segments;
 // a wall segment that comes closer than (w/2 - 0.5 m) to a road centre line, off bridge decks, is a visual overlap (a building standing in the road whether or not it has a collider).
 function ATHR_roads(){const R=[];
- for(const S of CITY_S){if(S.r.cls==='ped'||S.r.cls==='hill')continue;const P=S.pts,rd=S.r.name||S.r.cls||'street';for(let i=0;i+1<P.length;i++)R.push({x0:P[i].x,z0:P[i].z,x1:P[i+1].x,z1:P[i+1].z,w:S.r.w,rd,s:S,i})}
+ for(let _j2=0,_b2=CITY_S;_j2<_b2.length;_j2++){const S=_b2[_j2];if(S.r.cls==='ped'||S.r.cls==='hill')continue;const P=S.pts,rd=S.r.name||S.r.cls||'street';for(let i=0;i+1<P.length;i++)R.push({x0:P[i].x,z0:P[i].z,x1:P[i+1].x,z1:P[i+1].z,w:S.r.w,rd,s:S,i})}
  for(const r of hubRoads())R.push({x0:r.x0,z0:r.z0,x1:r.x1,z1:r.z1,w:r.w,rd:'fill',s:null,i:0});
  if(typeof abSamples==='function')for(const S of abSamples()){if(!S.r.ab||S.r.c)continue;const P=S.pts;for(let i=0;i+1<P.length;i++)R.push({x0:P[i].x,z0:P[i].z,x1:P[i+1].x,z1:P[i+1].z,w:S.r.w,rd:S.r.name||'ab',s:null,i:0})}
  return R}
@@ -51,7 +51,7 @@ function ATHR_vis(){const R=ATHR_roads(),G=new Map(),K=(i,j)=>i*10000+j,out=[],s
 window.__athVis=ATHR_vis;
 // dead ends: a street end (CITY_S polyline end, not ped/hill) that touches no other road within w/2+3 m, with a wall (mesh) or collider within 15 m straight ahead
 function ATHR_dead(){const R=ATHR_roads(),out=[];const ends=[];
- for(const S of CITY_S){if(S.r.cls==='ped'||S.r.cls==='hill')continue;const P=S.pts;if(P.length<2)continue;ends.push({p:P[0],q:P[1],S,w:S.r.w,rd:S.r.name||S.r.cls||'street'},{p:P[P.length-1],q:P[P.length-2],S,w:S.r.w,rd:S.r.name||S.r.cls||'street'})}
+ for(let _j3=0,_b3=CITY_S;_j3<_b3.length;_j3++){const S=_b3[_j3];if(S.r.cls==='ped'||S.r.cls==='hill')continue;const P=S.pts;if(P.length<2)continue;ends.push({p:P[0],q:P[1],S,w:S.r.w,rd:S.r.name||S.r.cls||'street'},{p:P[P.length-1],q:P[P.length-2],S,w:S.r.w,rd:S.r.name||S.r.cls||'street'})}
  for(const r of hubRoads())ends.push({p:{x:r.x0,z:r.z0},q:{x:r.x1,z:r.z1},S:null,w:r.w,rd:'fill'},{p:{x:r.x1,z:r.z1},q:{x:r.x0,z:r.z0},S:null,w:r.w,rd:'fill'});
  const G=new Map(),K=(i,j)=>i*10000+j;for(const r of R){for(let i=Math.floor((Math.min(r.x0,r.x1)-r.w)/40);i<=Math.floor((Math.max(r.x0,r.x1)+r.w)/40);i++)for(let j=Math.floor((Math.min(r.z0,r.z1)-r.w)/40);j<=Math.floor((Math.max(r.z0,r.z1)+r.w)/40);j++){const k=K(i,j);let L=G.get(k);if(!L)G.set(k,L=[]);L.push(r)}}
  const conn=e=>{const R2=G.get(K(Math.floor(e.p.x/40),Math.floor(e.p.z/40)))||[];for(const r of R2){if(e.S&&r.s===e.S&&Math.hypot(e.p.x-e.q.x,e.p.z-e.q.z)>0&&(r.i===0||r.i===e.S.pts.length-2)&&(r.x0===e.p.x&&r.z0===e.p.z||r.x1===e.p.x&&r.z1===e.p.z)&&(r.x0===e.q.x&&r.z0===e.q.z||r.x1===e.q.x&&r.z1===e.q.z))continue;
@@ -68,6 +68,6 @@ window.__athDead=ATHR_dead;
 function ATHR_go2(){const v=ATHR_vis(),d=ATHR_dead();return'📍 ROADS VISUAL ('+CID+') · '+v.n+' visible overlaps, '+d.n+' blocked dead ends ('+d.all+' dead ends in all)'+(v.n?' · worst '+v.list.slice(0,3).map(o=>o.x+','+o.z+' '+o.road).join('; '):'')+(d.n?' · dead '+d.list.slice(0,3).map(o=>o.x+','+o.z+' '+o.road).join('; '):'')+(v.n>ATHR_VMAX||d.n?' ❌':' ✅')}
 // athroads4: up to ATHR_VMAX visible overlaps allowed (the target); the leftovers are small 4 m kerb props (one 552-vertex mesh) on Stournari, Kifisias, Vasilissis Sofias, Pl. Filikis Etaireias; dead ends must stay 0
 const ATHR_VMAX=10;
-window.__athDump=(x,z,r)=>{const R=[],B=[];for(const S of CITY_S)if(S.pts.some(p=>Math.abs(p.x-x)<r&&Math.abs(p.z-z)<r))R.push({c:S.r.cls,w:S.r.w,p:S.pts.map(p=>[Math.round(p.x),Math.round(p.z)])});const seen=new Set();for(let a=x-r;a<=x+r;a+=40)for(let c=z-r;c<=z+r;c+=40)for(const b of(HUB.grid.get(Math.floor(a/40)*10000+Math.floor(c/40))||[]))if(!seen.has(b)){seen.add(b);B.push([+b.x.toFixed(1),+b.z.toFixed(1),+b.hw.toFixed(1),+b.hd.toFixed(1),b.c==null?0:+Math.atan2(b.s,b.c).toFixed(2),+(b.h||0).toFixed(0)])}return{R,B}};
+window.__athDump=(x,z,r)=>{const R=[],B=[];for(let _k1=0,_c1=CITY_S,S;_k1<_c1.length&&(S=_c1[_k1],true);_k1++)if(S.pts.some(p=>Math.abs(p.x-x)<r&&Math.abs(p.z-z)<r))R.push({c:S.r.cls,w:S.r.w,p:S.pts.map(p=>[Math.round(p.x),Math.round(p.z)])});const seen=new Set();for(let a=x-r;a<=x+r;a+=40)for(let c=z-r;c<=z+r;c+=40)for(const b of(HUB.grid.get(Math.floor(a/40)*10000+Math.floor(c/40))||[]))if(!seen.has(b)){seen.add(b);B.push([+b.x.toFixed(1),+b.z.toFixed(1),+b.hw.toFixed(1),+b.hd.toFixed(1),b.c==null?0:+Math.atan2(b.s,b.c).toFixed(2),+(b.h||0).toFixed(0)])}return{R,B}};
 window.__athHub=()=>HUB;
 window.__athScene=()=>scene;

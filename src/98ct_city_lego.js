@@ -53,8 +53,8 @@ hubTrafficStep=(f=>function(dt){const r=f.apply(this,arguments);try{const N=HUB.
     if(nx.length)c.b=nx[(c.j+c.a)%nx.length];else{c.b=c._wa;CT_WD.st.ut++}}c._wa=c.a}
   const w=CT_segW(N,c.a,c.b);if(w>=99)continue;if(!CT_wideOk(N,c.a,c.b,hw))CT_WD.st.bad++;c.lane=Math.max((hw+.15)/w,Math.min(.36,.5-(hw+.3)/w))}}catch(e){}return r})(hubTrafficStep);
 window.__ct={CT,swap:CT_SWAP,hcar:()=>HCAR.slice(),geo:nm=>CR_cityGeo(nm),r:()=>renderer,
- cars:()=>(HUB.cars||[]).filter(c=>!(c.dead>0)&&c.x!=null).map(c=>{const N=HUB.nodes,A=N[c.a],B=N[c.b];return{nm:HCAR[c.k],x:c.x,z:c.z,y:c.y||0,h:A&&B?Math.atan2(B.x-A.x,B.z-A.z):0,d:Math.hypot(c.x-RO.x,c.z-RO.z)}}).sort((a,b)=>a.d-b.d),
- wide:()=>{const N=HUB.nodes,o=[];for(const c of HUB.cars||[]){const hw=CT_wideHw(c);if(!hw)continue;const w=CT_segW(N,c.a,c.b);o.push({hw:+hw.toFixed(2),W:w,lane:+c.lane.toFixed(3),off:+(c.lane*w).toFixed(2),kerb:+(w/2-c.lane*w-hw).toFixed(2),mid:+(c.lane*w-hw).toFixed(2),x:c.x,z:c.z})}return{st:CT_WD.st,cars:o}},
+ cars:()=>(HUB.cars||[]).filter(c=>!(c.dead>0)&&c.x!=null).map(c=>{const N=HUB.nodes,A=N[c.a],B=N[c.b];return{nm:HCAR[c.k],x:c.x,z:c.z,y:c.y||0,h:A&&B?Math.atan2(B.x-A.x,B.z-A.z):0,d:Math.sqrt((c.x-RO.x)*(c.x-RO.x)+(c.z-RO.z)*(c.z-RO.z))}}).sort((a,b)=>a.d-b.d),
+ wide:()=>{const N=HUB.nodes,o=[];for(let _k1=0,_c1=HUB.cars||[],c;_k1<_c1.length&&(c=_c1[_k1],true);_k1++){const hw=CT_wideHw(c);if(!hw)continue;const w=CT_segW(N,c.a,c.b);o.push({hw:+hw.toFixed(2),W:w,lane:+c.lane.toFixed(3),off:+(c.lane*w).toFixed(2),kerb:+(w/2-c.lane*w-hw).toFixed(2),mid:+(c.lane*w-hw).toFixed(2),x:c.x,z:c.z})}return{st:CT_WD.st,cars:o}},
  freeze:on=>{if(on){if(!CT.hts){CT.hts=hubTrafficStep;hubTrafficStep=()=>{}}}else if(CT.hts){hubTrafficStep=CT.hts;CT.hts=null}}};
 // ---- CTB (city-1): BUILDINGS. The generic filler buildings (Frankfurt: the Kenney street rows/frontage via putK; Athens: the small 'plaka'
 // houses and villas via put) become real LEGO sets at minifig scale (LD_SW × LD_FIG: a figure fits the door). A filler slot is filled along its
@@ -95,9 +95,9 @@ function CTB_kind(v){if(CTB.K[v.k])return CTB.K[v.k];if(!v.ids.every(id=>LD_MODE
 const CTB_h=(x,z,s)=>{const v=Math.sin(x*12.9898+z*78.233+s*37.719)*43758.5453;return v-Math.floor(v)};
 function CTB_pick(x,z,i,maxW,maxD,row){const V=CTB_V[CTB_city()],tot=V.reduce((a,v)=>a+v.w,0);let r=CTB_h(x,z,i)*tot;
  if(CID==='fra'&&typeof BV_near==='function'&&BV.on){/* art-5: the LEGO family least used nearby (bv1: ≥ 3 facade types per block, no street of one look) */const n=BV_near(x,z,100,'fac'),N=BV_near(x,z,45,'fac'),rn=v=>(row||[]).filter(q=>q[0].v.ids[0]===v.ids[0]).length,sc=v=>{const f='lego:'+v.ids[0];return((n[f]||0)+3*(N[f]||0)+6*rn(v))/v.w+CTB_h(x,z,i+V.indexOf(v))*.9};/* + this slot's row so far */
-  for(const v of V.slice().sort((p,q)=>sc(p)-sc(q))){const K=CTB_kind(v);if(!K||K.W>maxW||K.D>maxD+1)continue;if(v.gap&&(rn(v)||CTB.cg.some(p=>Math.hypot(p[0]-x,p[1]-z)<v.gap)))continue;return K}return null}
+  for(const v of V.slice().sort((p,q)=>sc(p)-sc(q))){const K=CTB_kind(v);if(!K||K.W>maxW||K.D>maxD+1)continue;if(v.gap&&(rn(v)||CTB.cg.some(p=>Math.sqrt((p[0]-x)*(p[0]-x)+(p[1]-z)*(p[1]-z))<v.gap)))continue;return K}return null}
  for(let t=0;t<V.length;t++){const v=V[(t+V.findIndex(q=>(r-=q.w)<0)+V.length)%V.length];const K=CTB_kind(v);if(!K||K.W>maxW||K.D>maxD+1)continue;
-  if(v.gap&&CTB.cg.some(p=>Math.hypot(p[0]-x,p[1]-z)<v.gap))continue;return K}return null}
+  if(v.gap&&CTB.cg.some(p=>Math.sqrt((p[0]-x)*(p[0]-x)+(p[1]-z)*(p[1]-z))<v.gap))continue;return K}return null}
 // fill a slot (centre x,z; yaw ry; width w along the street, depth d; local +z = the street front). Returns false = keep the old building.
 function CTB_fill(x,z,ry,w,d,h0,extra){if(!CTB.on)return false;CTB.st.slots++;const c=Math.cos(ry),s=Math.sin(ry),row=[];let p=-w/2,i=0;
  while(p<w/2-3&&i<8&&!(row.length&&w/2-p<7)){const K=CTB_pick(x+p,z,i++,w/2-p,d,row);if(!K)break;row.push([K,p+K.W/2]);p+=K.W+.4}
@@ -120,10 +120,10 @@ function CTB_mesh(){if(!HUB.grp)return;for(const k in CTB.K){const K=CTB.K[k];if
   for(const[g,mat]of K.near){const im=new THREE.InstancedMesh(g,mat,n);im.count=0;im.frustumCulled=false;im.receiveShadow=true;im.name='ctb_'+k;if(mat===CR_GM)im.renderOrder=2;im.userData.keep=1;HUB.grp.add(im);K.ims.push(im)}
   const f=new THREE.InstancedMesh(K.far,K.near[0][1],n);f.count=0;f.frustumCulled=false;f.name='ctbf_'+k;f.userData.keep=1;HUB.grp.add(f);K.fim=f}CTB_plinth();CTB_step(1)}
 const _ctbM=new THREE.Matrix4(),_ctbQ=new THREE.Quaternion(),_ctbP=new THREE.Vector3(),_ctbS=new THREE.Vector3(1,1,1),_ctbU=new THREE.Vector3(0,1,0),_ctbD=new THREE.Vector3();
-function CTB_step(force){if(!force&&++CTB.t%6)return;if(typeof camera==='undefined')return;const cx=camera.position.x,cz=camera.position.z;camera.getWorldDirection(_ctbD);const dl=Math.hypot(_ctbD.x,_ctbD.z)||1,fx=_ctbD.x/dl,fz=_ctbD.z/dl;
+function CTB_step(force){if(!force&&++CTB.t%6)return;if(typeof camera==='undefined')return;const cx=camera.position.x,cz=camera.position.z;camera.getWorldDirection(_ctbD);const dl=Math.sqrt(_ctbD.x*_ctbD.x+_ctbD.z*_ctbD.z)||1,fx=_ctbD.x/dl,fz=_ctbD.z/dl;
  /* perf-4: far sets drawn to 520 m on high/med, 380 m on low, 300 m on min (the low/min hub culling hides the rest of the street by 1000 m) */const lv=typeof LK_lvl==='function'?LK_lvl():SET.q,far=lv==='min'?Math.min(CTB.far,300):lv==='low'?Math.min(CTB.far,380):CTB.far;
  for(const k in CTB.K){const K=CTB.K[k];if(!K.fim)continue;let nn=0,nf=0;const r=Math.max(K.W,K.D);
-  for(const o of K.L){const dx=o.x-cx,dz=o.z-cz,dd=Math.hypot(dx,dz);if(dd>far||(dd>r+12&&(dx*fx+dz*fz)<-r-6&&(dx*fx+dz*fz)<-dd*.35))continue;// behind the camera
+  for(const o of K.L){const dx=o.x-cx,dz=o.z-cz,dd=Math.sqrt(dx*dx+dz*dz);if(dd>far||(dd>r+12&&(dx*fx+dz*fz)<-r-6&&(dx*fx+dz*fz)<-dd*.35))continue;// behind the camera
    _ctbM.compose(_ctbP.set(o.x,o.y,o.z),_ctbQ.setFromAxisAngle(_ctbU,o.a),_ctbS);if(dd<CTB.near){for(const im of K.ims)im.setMatrixAt(nn,_ctbM);nn++}else K.fim.setMatrixAt(nf++,_ctbM)}
   for(const im of K.ims){im.count=nn;im.instanceMatrix.needsUpdate=true}K.fim.count=nf;K.fim.instanceMatrix.needsUpdate=true}}
 buildRoam=(f=>function(){const r=f.apply(this,arguments);try{CTB_mesh()}catch(e){console.warn('CTB mesh',e)}return r})(buildRoam);
@@ -133,8 +133,8 @@ hubCullStep=(f=>function(){f.apply(this,arguments);try{CTB_step()}catch(e){}})(h
 function CTB_all(){const A=[];for(const k in CTB.K)for(const o of CTB.K[k].L)A.push([o,CTB.K[k]]);return A}
 // street normal of a set (front → road) and the road spot d m in front of its facade
 function CTB_front(o,K,d){const nx=-Math.sin(o.a),nz=-Math.cos(o.a);return{nx,nz,x:o.x+nx*(K.D/2+d),z:o.z+nz*(K.D/2+d)}}
-function CTB_spot(d){const A=CTB_all();if(!A.length)return null;const O=CID==='fra'?{x:0,z:0}:{x:0,z:-600};A.sort((p,q)=>Math.hypot(p[0].x-O.x,p[0].z-O.z)-Math.hypot(q[0].x-O.x,q[0].z-O.z));
- for(const[o,K]of A.slice(0,4000)){if(K.v.gap)continue;const n=A.filter(([q])=>Math.hypot(q.x-o.x,q.z-o.z)<40).length;if(n<3)continue;let dd=d;if(!dd){/* row view: 2.5 m onto the asphalt */for(let t=1;t<=14&&!dd;t+=.5){const P=CTB_front(o,K,t);if(CTB_onRoad(P.x,P.z))dd=t+2.5}if(!dd)continue}const F=CTB_front(o,K,dd);
+function CTB_spot(d){const A=CTB_all();if(!A.length)return null;const O=CID==='fra'?{x:0,z:0}:{x:0,z:-600};A.sort((p,q)=>Math.sqrt((p[0].x-O.x)*(p[0].x-O.x)+(p[0].z-O.z)*(p[0].z-O.z))-Math.sqrt((q[0].x-O.x)*(q[0].x-O.x)+(q[0].z-O.z)*(q[0].z-O.z)));
+ for(const[o,K]of A.slice(0,4000)){if(K.v.gap)continue;const n=A.filter(([q])=>Math.sqrt((q.x-o.x)*(q.x-o.x)+(q.z-o.z)*(q.z-o.z))<40).length;if(n<3)continue;let dd=d;if(!dd){/* row view: 2.5 m onto the asphalt */for(let t=1;t<=14&&!dd;t+=.5){const P=CTB_front(o,K,t);if(CTB_onRoad(P.x,P.z))dd=t+2.5}if(!dd)continue}const F=CTB_front(o,K,dd);
   if(!LF_onRoad(F.x,F.z)||roamHit(F.x,F.z,1.4,groundY(F.x,F.z)+.5))continue;let ok=true;/* clear run to the facade */for(let t=dd;t>1.5&&ok;t-=.5){const b=roamHit(o.x+F.nx*(K.D/2+t),o.z+F.nz*(K.D/2+t),1,groundY(F.x,F.z)+.5);if(b&&b!==o.b)ok=false}
   if(ok)return{o,K,F}}return null}
 function CTB_park(S,h){try{OF_reset()}catch(e){}if(RO.wk){RO.wk=null;try{RBRK.visible=false;pl.mesh.visible=true}catch(e){}}roamWarp(S.F.x,S.F.z,h,true);RO.x=S.F.x;RO.z=S.F.z;RO.h=RO.vh=h;RO.v=0;CTB_step(1)}
@@ -144,7 +144,7 @@ const CTB_off=()=>CTB.on?'':'📍 PENDING · LEGO-set buildings are OFF (?ctb=0)
 const CTB_box=(o,K,sh)=>{const c=Math.cos(o.a),s=Math.sin(o.a),C=K.col,cx=o.x+C.ox*c+C.oz*s,cz=o.z-C.ox*s+C.oz*c,P=[];for(const[u,v]of[[-1,-1],[1,-1],[1,1],[-1,1],[0,-1]]){const lx=u*(C.hw-sh),lz=v*(C.hd-sh);P.push([cx+lx*c+lz*s,cz-lx*s+lz*c])}return P};
 // ctb/fra-row: a street of sets, near LOD drawn, every footprint off the road, sitting on the ground
 function CTB_goRow(say){const off=CTB_off();if(off)return off;if(state!=='roam'||!RO.on)return'📍 Start free roam first';const S=CTB_spot(0);if(!S)return'📍 no row of LEGO sets with a free street spot ❌';
- CTB_park(S,S.o.a+1.1);setTimeout(()=>{CTB_step(1);/* camera has followed the car */const N=CTB_all().filter(([q])=>Math.hypot(q.x-RO.x,q.z-RO.z)<50);let road=0,gmax=0,near=0;
+ CTB_park(S,S.o.a+1.1);setTimeout(()=>{CTB_step(1);/* camera has followed the car */const N=CTB_all().filter(([q])=>Math.sqrt((q.x-RO.x)*(q.x-RO.x)+(q.z-RO.z)*(q.z-RO.z))<50);let road=0,gmax=0,near=0;
  for(const[q,K]of N){for(const[x,z]of CTB_box(q,K,.3))if(CTB_onRoad(x,z))road++;const c=Math.cos(q.a),s=Math.sin(q.a);for(const[u,v]of[[-1,-1],[1,-1],[1,1],[-1,1]]){const lx=u*K.W/2,lz=v*K.D/2,g=groundY(q.x+lx*c+lz*s,q.z-lx*s+lz*c);gmax=Math.max(gmax,g-q.y,q.ph>.12?0:q.y-g)}}/* sunk anywhere, or floating without a plinth */
  for(const k in CTB.K)near+=CTB.K[k].ims[0]?CTB.K[k].ims[0].count:0;const kinds=new Set(N.map(([,K])=>K.v.k)).size,ok=N.length>=3&&near>=3&&road===0&&gmax<=.15&&kinds>=2;
  window.__chk=window.__chk||{};window.__chk.ctbRow={n:N.length,near,kinds,road,gmax:+gmax.toFixed(2),ok};
@@ -171,4 +171,4 @@ function CTB_goPerf(say){const off=CTB_off();if(off)return off;if(state!=='roam'
  // moving frames) then failed, also on beta.53. Say the verdict only once 5 frames in a row come < 150 ms apart (cap 15 s).
  let n=0,tp=performance.now();const t0=tp,wf=()=>{const t=performance.now();n=t-tp<150?n+1:0;tp=t;if(n>=5||t-t0>15000){try{say(res)}catch(e){}return}requestAnimationFrame(wf)};requestAnimationFrame(wf);return'📍 LEGO STREET PERF · measuring…'}
 window.__ctb={go:{row:s=>CTB_goRow(s),hit:s=>CTB_goHit(s),perf:s=>CTB_goPerf(s)},spot:CTB_spot,CTB,pos:()=>({x:RO.x,z:RO.z}),V:CTB_V,stat:()=>({...CTB.st,kinds:Object.values(CTB.K).map(K=>({k:K.v.k,n:K.L.length,W:+K.W.toFixed(1),D:+K.D.toFixed(1),H:+K.H.toFixed(1),tris:K.tris,ftris:K.ftris,near:K.ims[0]?K.ims[0].count:0,far:K.fim?K.fim.count:0}))}),
- near:()=>{let best=null;for(const k in CTB.K)for(const o of CTB.K[k].L){const d=Math.hypot(o.x-RO.x,o.z-RO.z);if(!best||d<best.d)best={k,d,...o,W:CTB.K[k].W,D:CTB.K[k].D,H:CTB.K[k].H}}return best},list:k=>CTB.K[k]?CTB.K[k].L:[]};
+ near:()=>{let best=null;for(const k in CTB.K)for(const o of CTB.K[k].L){const d=Math.sqrt((o.x-RO.x)*(o.x-RO.x)+(o.z-RO.z)*(o.z-RO.z));if(!best||d<best.d)best={k,d,...o,W:CTB.K[k].W,D:CTB.K[k].D,H:CTB.K[k].H}}return best},list:k=>CTB.K[k]?CTB.K[k].L:[]};

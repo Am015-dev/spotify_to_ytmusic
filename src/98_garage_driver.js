@@ -288,7 +288,7 @@ function ART8_step(){ART8_sweep();
       if(n)ART8_W.multiplyScalar(1/n);else s.mesh.getWorldPosition(ART8_W);m.uniforms.uP0.value.copy(ART8_W)}
     m.visible=!!ok}
   for(const t of ART8.ims)t.count=0;camera.getWorldPosition(ART8_C);const f2=(ART8.far+10)**2;
-  if(state==='roam'&&HUB.cars&&HUB.cim)for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-ART8_C.x,dz=c.z-ART8_C.z;if(dx*dx+dz*dz>f2)continue;const im=HUB.cim[c.k];if(!im)continue;ART8_put(im,c.j);ART8_put(im.userData.w,c.j);ART8_put(im.userData.g,c.j)}
+  if(state==='roam'&&HUB.cars&&HUB.cim)for(let _j1=0,_b1=HUB.cars;_j1<_b1.length;_j1++){const c=_b1[_j1];if(c.dead>0||c.x==null)continue;const dx=c.x-ART8_C.x,dz=c.z-ART8_C.z;if(dx*dx+dz*dz>f2)continue;const im=HUB.cim[c.k];if(!im)continue;ART8_put(im,c.j);ART8_put(im.userData.w,c.j);ART8_put(im.userData.g,c.j)}
   if(state!=='roam')for(const c of traffic||[]){const o=TRM[c.k];if(c.i==null||!o||!o.body)continue;o.body.getMatrixAt(c.i,ART8_M);const e=ART8_M.elements,dx=e[12]-ART8_C.x,dz=e[14]-ART8_C.z;if(dx*dx+dz*dz>f2||e[0]*e[0]+e[1]*e[1]+e[2]*e[2]<1e-6)continue;for(const k in o)ART8_put(o[k],c.i)}
   for(const t of ART8.ims)t.instanceMatrix.needsUpdate=true}
 renderer.render=(f=>function(sc,cam){if(sc===scene)try{ART8_step()}catch(e){}return f.call(this,sc,cam)})(renderer.render);

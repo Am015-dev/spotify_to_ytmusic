@@ -23,7 +23,7 @@ function PC_reg(im,sky){const n=im.count,src=new Float32Array(im.instanceMatrix.
  for(const k of['raycast','computeBoundingSphere','computeBoundingBox'])im[k]=function(){const c=this.count;this.count=C.n;try{return _pcIM[k].apply(this,arguments)}finally{this.count=c}};
  im.frustumCulled=false;im.userData.pc=C;PC.L.push(C);PC.st.meshes++;PC.st.src+=n;return C}
 // instance i: world-ish centre (mesh local, the step applies matrixWorld) + radius = geometry radius × max scale (0 scale = hidden)
-function PC_sph(C,i){const a=C.src,o=i*16,W=C.sky?null:C.im.matrixWorld.elements,bs=C.im.geometry.boundingSphere,c=bs.center,sx=Math.hypot(a[o],a[o+1],a[o+2]),sy=Math.hypot(a[o+4],a[o+5],a[o+6]),sz=Math.hypot(a[o+8],a[o+9],a[o+10]);
+function PC_sph(C,i){const a=C.src,o=i*16,W=C.sky?null:C.im.matrixWorld.elements,bs=C.im.geometry.boundingSphere,c=bs.center,sx=Math.sqrt(a[o]*a[o]+(a[o+1])*(a[o+1])+(a[o+2])*(a[o+2])),sy=Math.sqrt((a[o+4])*(a[o+4])+(a[o+5])*(a[o+5])+(a[o+6])*(a[o+6])),sz=Math.sqrt((a[o+8])*(a[o+8])+(a[o+9])*(a[o+9])+(a[o+10])*(a[o+10]));
  C.c[i*4]=a[o]*c.x+a[o+4]*c.y+a[o+8]*c.z+a[o+12];C.c[i*4+1]=a[o+1]*c.x+a[o+5]*c.y+a[o+9]*c.z+a[o+13];C.c[i*4+2]=a[o+2]*c.x+a[o+6]*c.y+a[o+10]*c.z+a[o+14];C.c[i*4+3]=bs.radius*Math.max(sx,sy,sz);
  if(W){const x=C.c[i*4],y=C.c[i*4+1],z=C.c[i*4+2];C.c[i*4]=W[0]*x+W[4]*y+W[8]*z+W[12];C.c[i*4+1]=W[1]*x+W[5]*y+W[9]*z+W[13];C.c[i*4+2]=W[2]*x+W[6]*y+W[10]*z+W[14]}}
 function PC_scan(){PC.L.length=0;PC.st.meshes=PC.st.src=0;PC.grp=HUB.grp;if(!HUB.grp)return;HUB.grp.traverse(o=>{if(PC_cand(o))PC_reg(o,false)});PC.wg=null;PC_addCk(HUB.grp);
@@ -79,13 +79,13 @@ function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!
  if(PC.nch!==HUB.grp.children.length&&(force||PC.t%10===9&&!(typeof TWG!=='undefined'&&TWG.pa&&TWG.fr>=0&&TWG.fr<=TWG.fw)))PC_add()/* ios-r17o: tiles added in the first 120 drivable frames are packed after them */;const np=PC_drain(force?1e9:3)>0;/* 3 s after roam starts: after the first-roam-frame passes (98sp_simplify reads every instance by .count) */
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
  const t0=performance.now();let tested=0;
- if(force||np||dh>.26||Math.hypot(cx-PC.x,cz-PC.z)>=20){PC_snap(cx,cz,h);PC.left=PC.L.length;PC.t=0;for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
- else if(++PC.t%10===0&&!PC.left){PC_snap(cx,cz,h);for(const C of PC.L)if(C.sky||C.dyn)tested+=PC_mesh(C)}
+ if(force||np||dh>.26||Math.sqrt((cx-PC.x)*(cx-PC.x)+(cz-PC.z)*(cz-PC.z))>=20){PC_snap(cx,cz,h);PC.left=PC.L.length;PC.t=0;for(let _k1=0,_c1=PC.L,C;_k1<_c1.length&&(C=_c1[_k1],true);_k1++)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
+ else if(++PC.t%10===0&&!PC.left){PC_snap(cx,cz,h);for(let _k2=0,_c2=PC.L,C;_k2<_c2.length&&(C=_c2[_k2],true);_k2++)if(C.sky||C.dyn)tested+=PC_mesh(C)}
  const bud=force?1e9:(TUNE.pc7Bud||60000);/* circular: a new pass mid-way carries on from the same mesh, so no mesh starves under constant turning */
  const mb=typeof TWG!=='undefined'&&TWG.pcB&&!force&&TWG.fr>=0&&TWG.fr<=TWG.pcF?TWG.pcB:0;/* ios-r17k: first drivable seconds on touch: also stop a pass at TWG.pcB ms (a mesh is re-packed whole, so the pass just resumes next frame) */
  while(PC.left>0&&tested<bud&&(!mb||performance.now()-t0<mb)){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
- if(!PC.left)for(const C of PC.L)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
- if(tested){let vis=0;for(const C of PC.L)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
+ if(!PC.left)for(let _k3=0,_c3=PC.L,C;_k3<_c3.length&&(C=_c3[_k3],true);_k3++)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
+ if(tested){let vis=0;for(let _k4=0,_c4=PC.L,C;_k4<_c4.length&&(C=_c4[_k4],true);_k4++)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();
 // boot-4: the pass's camera snapshot + per-cell visibility (was a closure made every frame, Math.hypot per cell)
 function PC_snap(cx,cz,h){camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);PC.x=cx;PC.y=camera.position.y;PC.z=cz;PC.h=h;
@@ -96,7 +96,7 @@ function PC_prewarm(){try{if(PC.on&&HUB.grp&&!PC.grp&&PC_gate())PC_scan()}catch(
 // perf-7 gate: compaction costs ~1.8 ms CPU/frame (A/B), only worth it where the GPU is the limit: quality low/min (phones). med/high skip PC_step entirely
 // (nothing is scanned or wrapped); if quality rises after a pass ran (auto ladder / settings), PC_release puts every mesh back to its full source copy.
 function PC_gate(){const lv=typeof LK_lvl==='function'?LK_lvl():SET.q;return TUNE.pc7All||lv==='low'||lv==='min'}
-function PC_release(){for(const C of PC.L){const im=C.im;if(!im.parent)continue;if(C.shr){C.shr=0;PC_cap(C,C.n)}im.instanceMatrix.array.set(C.src);if(C.col&&im.instanceColor)im.instanceColor.array.set(C.col);
+function PC_release(){for(let _k5=0,_c5=PC.L,C;_k5<_c5.length&&(C=_c5[_k5],true);_k5++){const im=C.im;if(!im.parent)continue;if(C.shr){C.shr=0;PC_cap(C,C.n)}im.instanceMatrix.array.set(C.src);if(C.col&&im.instanceColor)im.instanceColor.array.set(C.col);
   for(let i=0;i<C.n;i++)C.slot[i]=i;C.s=C.n;C.dirty=false;im.count=C.n;im.instanceMatrix.clearUpdateRanges();im.instanceMatrix.needsUpdate=true;if(im.instanceColor){im.instanceColor.clearUpdateRanges();im.instanceColor.needsUpdate=true}}
  PC.left=0;PC.x=1e9;PC.h=1e9;PC.rel=1}
 hubCullStep=(f=>function(){f.apply(this,arguments);try{if(PC_gate()){PC.rel=0;PC_step()}else if(PC.L.length&&!PC.rel)PC_release()}catch(e){if(!PC.err){PC.err=String(e);console.warn('PC',e)}}})(hubCullStep);
@@ -106,7 +106,7 @@ function PC_go(){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if
  const C=P.im.userData.pc;/* no roamWarp: a warp clears the props it lands on */camera.position.set(P.x+8,P.y+4,P.z+8);camera.lookAt(P.x,P.y,P.z);camera.updateMatrixWorld();PC_step(1);
  const shown0=C.slot[P.i]>=0;_pcM.makeScale(0,0,0);P.alive=false;P.im.setMatrixAt(P.i,_pcM);PC_step(1);
  // hidden: no slot, and no drawn slot carries a non-zero matrix at the prop's spot
- const arr=P.im.instanceMatrix.array;let ghost=0;for(let s=0;s<P.im.count;s++){const o=s*16;if(Math.hypot(arr[o+12]-P.x,arr[o+14]-P.z)<.05&&Math.hypot(arr[o],arr[o+1],arr[o+2])>1e-4)ghost++}
+ const arr=P.im.instanceMatrix.array;let ghost=0;for(let s=0;s<P.im.count;s++){const o=s*16;if(Math.sqrt((arr[o+12]-P.x)*(arr[o+12]-P.x)+(arr[o+14]-P.z)*(arr[o+14]-P.z))<.05&&Math.sqrt(arr[o]*arr[o]+(arr[o+1])*(arr[o+1])+(arr[o+2])*(arr[o+2]))>1e-4)ghost++}
  const gone=C.slot[P.i]<0&&ghost===0;propRevive(P);PC_step(1);const back=C.slot[P.i]>=0&&P.im.getMatrixAt(P.i,_pcM)&&Math.abs(_pcM.elements[12]-P.x)<.01;
  const ratio=PC.st.vis/Math.max(1,PC.st.src);window.__chk=window.__chk||{};window.__chk.perf5={shown0,gone,ghost,back,meshes:PC.st.meshes,src:PC.st.src,vis:PC.st.vis,ms:PC.st.ms};
  return`📍 compaction: ${PC.st.meshes} meshes, ${PC.st.vis}/${PC.st.src} instances drawn (${PC.st.ms} ms); prop visible ${shown0}, smashed hidden ${gone} (ghosts ${ghost}), revived ${back}`+ok(shown0&&gone&&back&&ratio<.8)}

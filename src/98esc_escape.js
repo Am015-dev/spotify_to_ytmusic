@@ -37,7 +37,7 @@ function ESC_end(){const E=ESC.E;E.H.length=0;E.as=0;E.done=0;E.tp=0}
 function ESC_clear(x,z,y,r=7){if(roamHit(x,z,2.8,y))return false;for(const q of(HUB.cars||[]))if(!q.dead&&q.x!=null&&Math.hypot(q.x-x,q.z-z)<r)return false;return true}   // the lift picks with r=10: traffic still moves in the frame of the lift
 function ESC_spot(){const q=TR8_near(RO.x,RO.z);if(!q)return null;const sx=Math.sin(q[2]),sz=Math.cos(q[2]);
   for(let d=0;d<=96;d+=8)for(const e of d?[d,-d]:[0]){const x=q[0]+sx*e,z=q[1]+sz*e;if(e&&!TR8_onRoad(x,z))continue;if(ESC_clear(x,z,groundAt(x,z,99),10))return[x,z,q[2],e]}
-  const C=[];for(const S of CITY_S){if(S.r&&S.r.cls==='ped')continue;const P=S.pts;for(let i=0;i<P.length-1;i++){const d=Math.hypot(P[i].x-RO.x,P[i].z-RO.z);if(d<400)C.push([d,P[i],P[i+1]])}}
+  const C=[];for(let _j1=0,_b1=CITY_S;_j1<_b1.length;_j1++){const S=_b1[_j1];if(S.r&&S.r.cls==='ped')continue;const P=S.pts;for(let i=0;i<P.length-1;i++){const d=Math.hypot(P[i].x-RO.x,P[i].z-RO.z);if(d<400)C.push([d,P[i],P[i+1]])}}
   C.sort((u,v)=>u[0]-v[0]);for(let k=0;k<C.length&&k<240;k++){const[,p,n]=C[k];if(!TR8_onRoad(p.x,p.z))continue;if(ESC_clear(p.x,p.z,groundAt(p.x,p.z,99),10))return[p.x,p.z,Math.atan2(n.x-p.x,n.z-p.z),'road2']}
   return null}
 function ESC_lift(why,how){const q=ESC_spot();if(!q)return false;const H=ESC.E.H,c=H[H.length-1],i=H.length?ESC_at(H,2):-1;

@@ -2,7 +2,7 @@
 function DR_edge(x,z){let e=1e9;const q=cityAt(x,z);if(q){e=q.d-q.road.w/2;if(e<6&&e>-.5)e=Math.min(e,CE_roadE(x,z))}const f=fillAt(x,z);if(f)e=Math.min(e,f.d-f.r.w/2);
   if(CID!=='fra'){try{const a=abAt(x,z);if(a)e=Math.min(e,a.d-a.road.w/2)}catch(_){}}try{e=Math.min(e,lzRoadD(x,z))}catch(_){}return e}
 window.__dr={edge:DR_edge,
- props(x,z,R=1e9){const o={total:0,road:0,path:0,side:0,lamp:0,types:{}};for(const p of HUB.props||[]){if(!p.alive&&!(p.rt<1e8))continue;if(R<1e9&&Math.hypot(p.x-x,p.z-z)>R)continue;o.total++;const e=DR_edge(p.x,p.z);if(e<0){o.road++;o.roadT=o.roadT||{};o.roadT[p.t]=(o.roadT[p.t]||0)+1}if(e<2.5){o.path++;o.types[p.t]=(o.types[p.t]||0)+1}else if(e<6)o.side++}return o},
+ props(x,z,R=1e9){const o={total:0,road:0,path:0,side:0,lamp:0,types:{}};for(let _k1=0,_c1=HUB.props||[],p;_k1<_c1.length&&(p=_c1[_k1],true);_k1++){if(!p.alive&&!(p.rt<1e8))continue;if(R<1e9&&Math.hypot(p.x-x,p.z-z)>R)continue;o.total++;const e=DR_edge(p.x,p.z);if(e<0){o.road++;o.roadT=o.roadT||{};o.roadT[p.t]=(o.roadT[p.t]||0)+1}if(e<2.5){o.path++;o.types[p.t]=(o.types[p.t]||0)+1}else if(e<6)o.side++}return o},
  traffic(R=150){const C=HUB.cars||[];let alive=0,near=0,stop=0;for(const c of C){if(c.dead>0)continue;alive++;if(Math.hypot(c.x-RO.x,c.z-RO.z)<R){near++;if((c.cv??c.v)<.5)stop++}}return{total:C.length,alive,near,stop}},
  objs(){let n=0,m=0,im=0,inst=0;scene.traverse(o=>{n++;if(o.isMesh&&o.visible){m++;if(o.isInstancedMesh){im++;inst+=o.count}}});return{objs:n,meshes:m,instMeshes:im,instances:inst}},
  draws(){renderer.info.autoReset=false;renderer.info.reset();(window.__fastR||composer.render).call(composer);const r={calls:renderer.info.render.calls,tris:renderer.info.render.triangles};renderer.info.autoReset=true;return r},
@@ -124,7 +124,7 @@ function DR_traffic(){const C=HUB.cars;if(!C||!C.length)return;const n0=C.length
   const per={};for(const c of keep.slice().sort((a,b)=>a.k-b.k||a.j-b.j)){c.j=per[c.k]=(per[c.k]??-1)+1;c.lane=.36}
   HUB.cim.forEach((im,k)=>{im.count=(per[k]??-1)+1;im.instanceMatrix.needsUpdate=true});C.length=0;C.push(...keep);DR.st.cars=[n0,C.length]}
 // a car stopped for 8 s that the player cannot see (behind or > 60 m) is recycled: queues never grow into walls
-function DR_unjam(dt){const hx=Math.sin(RO.h),hz=Math.cos(RO.h);for(const c of HUB.cars){if(c.dead>0||c.route||c.pk){c.DRs=0;continue}if((c.cv??c.v)<.5)c.DRs=(c.DRs||0)+dt;else c.DRs=0;if(c.DRs<8)continue;
+function DR_unjam(dt){const hx=Math.sin(RO.h),hz=Math.cos(RO.h);for(let _j1=0,_b1=HUB.cars;_j1<_b1.length;_j1++){const c=_b1[_j1];if(c.dead>0||c.route||c.pk){c.DRs=0;continue}if((c.cv??c.v)<.5)c.DRs=(c.DRs||0)+dt;else c.DRs=0;if(c.DRs<8)continue;
   const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);if(HT_POP.on?HT_canPop(c.x,c.z,c.y):d>60||dx*hx+dz*hz<0||RD_ON&&typeof LV_seen==='function'&&!LV_seen(c.x,c.y||0,c.z)){c.dead=.05;c.DRs=0;DR.st.unjam=(DR.st.unjam||0)+1}}}
 // touch HUD: one-line mission card (title + count + bar), tap the title to show the text; plate and card right of the minimap
 if(DR.on){const st=document.createElement('style');st.textContent=`body.touch #qTrk{width:min(300px,38vw);padding:4px 8px 5px;border-width:2px;border-radius:10px}

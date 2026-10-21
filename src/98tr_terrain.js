@@ -2,12 +2,12 @@
 // Roads = CITY_S streets (+ Frankfurt filler grid FILL_R and Autobahn AB) sampled every 8 m; heights = groundY (the physics/road surface).
 const TRN={};
 function TRN_rng(s){let a=s>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
-function TRN_roads(){const R=[];for(const S of CITY_S)R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2,id:S.r.id||S.r.name,cls:S.r.cls,ref:S});
+function TRN_roads(){const R=[];for(let _k1=0,_c1=CITY_S,S;_k1<_c1.length&&(S=_c1[_k1],true);_k1++)R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2,id:S.r.id||S.r.name,cls:S.r.cls,ref:S});
   if(CID==='fra'){try{hubRoads()}catch(e){}for(const r of FILL_R||[]){const P=[],n=Math.max(1,Math.round(r.L/8));for(let i=0;i<=n;i++)P.push([r.x0+r.ux*r.L*i/n,r.z0+r.uz*r.L*i/n]);R.push({P,hw:r.w/2,id:'fill'+r.g,cls:'fill',ref:r})}
     for(const S of abSamples()){const P=S.pts.filter(p=>p.x>WX0+50&&p.x<WX1-50&&p.z>WZS+50&&p.z<WZN-50).map(p=>[p.x,p.z]);if(P.length>1)R.push({P,hw:S.r.w/4,id:S.r.k||S.r.id,cls:'ab'})}}
   return R}
 // points to skip: water (bridges carry their own decks), decks, and the world rim
-function TRN_skip(x,z){if(x<WX0+60||x>WX1-60||z<WZS+60||z>WZN-60)return true;if(CID==='fra'&&inRiver(x,z,-25))return true;for(const b of ALL_DECKS)if(deckAt(b,x,z)!=null)return true;return false}
+function TRN_skip(x,z){if(x<WX0+60||x>WX1-60||z<WZS+60||z>WZN-60)return true;if(CID==='fra'&&inRiver(x,z,-25))return true;for(let _k2=0,_c2=ALL_DECKS,b;_k2<_c2.length&&(b=_c2[_k2],true);_k2++)if(deckAt(b,x,z)!=null)return true;return false}
 // steepest 8 m step along every road
 function TRN_grade(){const G=[];let worst=null;for(const r of TRN_roads()){if(r.cls==='hill')continue;  // hill trails (Lycabettus, Filopappou) climb by design
    const P=r.P;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],d=Math.hypot(b[0]-a[0],b[1]-a[1]);if(d<4||TRN_skip(a[0],a[1])||TRN_skip(b[0],b[1]))continue;
@@ -24,10 +24,10 @@ function TRN_edge(n=50){const R=TRN_roads().filter(r=>r.P.length>2),rnd=TRN_rng(
     const d=Math.max(Math.abs(groundY(c[0]+nx*hw,c[1]+nz*hw)-y),Math.abs(groundY(c[0]-nx*hw,c[1]-nz*hw)-y));out.push({d,x:Math.round(c[0]),z:Math.round(c[1]),id:r.id})}
   out.sort((a,b)=>b.d-a.d);const o={n:out.length,max:+out[0].d.toFixed(2),worst:out[0],over:out.filter(q=>q.d>.3).length};TRN.edge=o;return o}
 // deck (bridge / ramp) ends: deck surface vs the ground just past the joint
-function TRN_ramp(){let mx=0,w=null,n=0;for(const b of ALL_DECKS){for(const s of[-1,1]){const a=s*b.half,y=deckY(b,a);if(y==null)continue;const[x,z]=deckPt(b,s*(b.half+.6));if(CID==='fra'&&inRiver(x,z))continue;n++;
+function TRN_ramp(){let mx=0,w=null,n=0;for(let _j1=0,_b1=ALL_DECKS;_j1<_b1.length;_j1++){const b=_b1[_j1];for(const s of[-1,1]){const a=s*b.half,y=deckY(b,a);if(y==null)continue;const[x,z]=deckPt(b,s*(b.half+.6));if(CID==='fra'&&inRiver(x,z))continue;n++;
     const d=Math.abs(y-groundY(x,z));if(d>mx){mx=d;w={id:b.id,x:Math.round(x),z:Math.round(z)}}}}const o={n,max:+mx.toFixed(2),worst:w};TRN.ramp=o;return o}
 // buildings: the lowest point of the body/plinth vs the lowest ground under its footprint (9 points)
-function TRN_base(){let n=0,bad=0,mx=0,w=null;for(const b of HUB.bld||[]){if(b.hw==null||b.trMin==null)continue;n++;const g=b.trMin,bot=b.trBot??g,gap=bot-g;if(gap>.05){bad++;if(gap>mx){mx=gap;w={x:Math.round(b.x),z:Math.round(b.z)}}}}
+function TRN_base(){let n=0,bad=0,mx=0,w=null;for(let _k3=0,_c3=HUB.bld||[],b;_k3<_c3.length&&(b=_c3[_k3],true);_k3++){if(b.hw==null||b.trMin==null)continue;n++;const g=b.trMin,bot=b.trBot??g,gap=bot-g;if(gap>.05){bad++;if(gap>mx){mx=gap;w={x:Math.round(b.x),z:Math.round(b.z)}}}}
   const o={n,bad,max:+mx.toFixed(2),worst:w};TRN.base=o;return o}
 // relief: summit (highest ground within 150 m of the hill) above the lowest ground 400-1000 m around it
 function TRN_relief(cx,cz){let top=-1e9,tx=cx,tz=cz;for(let x=-400;x<=400;x+=10)for(let z=-400;z<=400;z+=10){const y=groundY(cx+x,cz+z);if(y>top){top=y;tx=cx+x;tz=cz+z}}
@@ -86,7 +86,7 @@ function TRNinner(c,x,z){TRN_slopeCol(c,x,z);return c}
 const TRN_FL={n:0,float:[],buried:[],tilt:[]};
 if(typeof TBatch!=='undefined'){const _add=TBatch.prototype.add;TBatch.prototype.add=function(g,mat,matrix){try{if((TERR.on||/trflush/.test(location.search))&&g&&g.attributes&&g.attributes.position){if(matrix){g.applyMatrix4(matrix);matrix=null}g.computeBoundingBox();const b=g.boundingBox;
     if(b.max.y-b.min.y<.6&&b.max.x-b.min.x<400&&b.max.z-b.min.z<400&&b.max.x-b.min.x+b.max.z-b.min.z>1.5){const cx=(b.min.x+b.max.x)/2,cz=(b.min.z+b.max.z)/2;if(BRIDGES.some(B=>B.kind==='foot'&&Math.hypot(cx-B.cx,cz-B.cz)<B.half+20)){}else{const p=g.attributes.position,st=Math.max(1,Math.floor(p.count/64));let lo=1e9,hi=-1e9,wx=0,wz=0;
-      for(let i=0;i<p.count;i+=st){const x=p.getX(i),z=p.getZ(i);if(CID==='fra'&&inRiver(x,z,-2))continue;let gd=groundY(x,z);for(const D of ALL_DECKS){const h=deckAt(D,x,z);if(h!=null)gd=Math.max(gd,h)}const d=p.getY(i)-gd;if(d<lo){lo=d;wx=x;wz=z}if(d>hi)hi=d}
+      for(let i=0;i<p.count;i+=st){const x=p.getX(i),z=p.getZ(i);if(CID==='fra'&&inRiver(x,z,-2))continue;let gd=groundY(x,z);for(let _j2=0,_b2=ALL_DECKS;_j2<_b2.length;_j2++){const D=_b2[_j2];const h=deckAt(D,x,z);if(h!=null)gd=Math.max(gd,h)}const d=p.getY(i)-gd;if(d<lo){lo=d;wx=x;wz=z}if(d>hi)hi=d}
       if(lo<1e8){TRN_FL.n++;const e=[Math.round(wx),Math.round(wz),+lo.toFixed(2),+hi.toFixed(2),(mat&&mat.color?mat.color.getHexString():'')+(mat&&mat.map?'T':'')];if(lo>.12&&lo<1.5){TRN_FL.float.push(e);if(/trdbg/.test(location.search))e.push(new Error().stack.split('\n').slice(2,9).join(' | '),[b.min.x,b.min.y,b.min.z,b.max.x,b.max.y,b.max.z].map(v=>+v.toFixed(2)))}else if(hi<-.02&&hi>-1.5)TRN_FL.buried.push(e)}}}}}catch(e){}return _add.call(this,g,mat,matrix)}}
 function TRN_flush(){const F=TRN_FL;TRN.flush={n:F.n,float:F.float.length,buried:F.buried.length,ex:F.float.slice(0,3).concat(F.buried.slice(0,3))};return TRN.flush}
 // junction planarity: ground under every street junction (JUNC, radius r) and filler crossing (FILL_X) vs its best-fit plane, ≤ 0.1 m
@@ -166,7 +166,7 @@ function TRN_skyGo(){if(!TERR.on)return'📍 PENDING · terrain is OFF in this b
 window.__trn.sky=()=>TRN_view(100,undefined,TRN_SKY);
 // terr-5 GO terrain-crown-fra: buildings (HUB.bld colliders) whose centre or corners lie on a crown = 0; ground class under 200 crown samples
 // = grass; park blocks exist. Parks you on a street crossing the biggest crown.
-function TRN_crownGo(){if(!TR_GT.on)return'📍 PENDING · green crowns are OFF (?tgt=0)';let onC=0;for(const b of HUB.bld||[]){if(b.y0||!b.h)continue;const hw=b.hw||0,hd=b.hd||0;if([[0,0],[hw,hd],[-hw,hd],[hw,-hd],[-hw,-hd]].some(([a,c])=>TR_onCrown(b.x+a*.8,b.z+c*.8)))onC++}
+function TRN_crownGo(){if(!TR_GT.on)return'📍 PENDING · green crowns are OFF (?tgt=0)';let onC=0;for(let _k4=0,_c4=HUB.bld||[],b;_k4<_c4.length&&(b=_c4[_k4],true);_k4++){if(b.y0||!b.h)continue;const hw=b.hw||0,hd=b.hd||0;if([[0,0],[hw,hd],[-hw,hd],[hw,-hd],[-hw,-hd]].some(([a,c])=>TR_onCrown(b.x+a*.8,b.z+c*.8)))onC++}
   const rnd=TRN_rng(31),P=[];for(let t=0;P.length<200&&t<20000;t++){const x=HX0+rnd()*(HX1-HX0),z=HZS+rnd()*(HZN-HZS);if(TR_onCrown(x,z))P.push([x,z])}
   let grass=0,road=0;for(const[x,z]of P){const q=cityAt(x,z);let f=null;try{f=fillAt(x,z)}catch(e){}if((q&&q.d<q.road.w/2+3)||(f&&f.d<f.r.w/2+3)){road++;continue}if(TRN_gmat(x,z)==='g')grass++}
   const parks=ZONES.filter(Z=>Z.t==='grass'&&TR_onCrown((Z.x0+Z.x1)/2,(Z.z0+Z.z1)/2)).length,n=P.length-road,ok=onC===0&&n>0&&grass>=n*.95&&parks>0;

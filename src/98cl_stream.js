@@ -14,10 +14,10 @@ const STR_R=()=>SET.q==='high'?2100:1600;
 const STR_d=(S,x,z)=>Math.hypot(Math.max(S.x0-x,0,x-S.x1),Math.max(S.z0-z,0,z-S.z1));
 function STR_step(){if(!STR_on()||!WBC.on||state!=='roam'||!WBC.sup||typeof camera==='undefined')return;const t0=performance.now(),cx=camera.position.x,cz=camera.position.z,R=STR_R(),LD=R+TUNE.strLoad,UL=R+TUNE.strUnload;
   if(STR.S&&(STR.S.grp!==WBC.grp||!WBC.sup.includes(STR.S))){STR.S=null;STR.it=null}
-  let nf=0;for(const S of WBC.sup)if(S.built&&S!==STR.S&&STR_d(S,cx,cz)>UL){WB_supFree(S);STR.st.f++;if(++nf>=2)break}
+  let nf=0;for(let _k1=0,_c1=WBC.sup,S;_k1<_c1.length&&(S=_c1[_k1],true);_k1++)if(S.built&&S!==STR.S&&STR_d(S,cx,cz)>UL){WB_supFree(S);STR.st.f++;if(++nf>=2)break}
   // catch-up: a missing cell INSIDE draw range (after a warp, flight, garage or roam start) gets up to STR.msC minus this frame's LAZY time (instead of STR.ms), so the frame's stream work stays under 16 ms
   // a frame whose LAZY step was already big builds nothing (frees still run): the frame's stream work stays under 16 ms
-  let n=0,bud=STR.lzT>16-STR.ms-STR.sl-2?0:STR.ms;while(performance.now()-t0<bud){if(!STR.it){let b=null,bd=LD;for(const S of WBC.sup){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;if(bd<R)bud=Math.max(bud,STR.msC-STR.lzT);STR.S=b;STR.it=WB_supMk(b,true)}else if(STR_d(STR.S,cx,cz)<R)bud=Math.max(bud,STR.msC-STR.lzT);
+  let n=0,bud=STR.lzT>16-STR.ms-STR.sl-2?0:STR.ms;while(performance.now()-t0<bud){if(!STR.it){let b=null,bd=LD;for(let _k2=0,_c2=WBC.sup,S;_k2<_c2.length&&(S=_c2[_k2],true);_k2++){if(S.built||!S.nt)continue;const d=STR_d(S,cx,cz);if(d<bd){bd=d;b=S}}if(!b)break;if(bd<R)bud=Math.max(bud,STR.msC-STR.lzT);STR.S=b;STR.it=WB_supMk(b,true)}else if(STR_d(STR.S,cx,cz)<R)bud=Math.max(bud,STR.msC-STR.lzT);
     n++;if(STR.it.next().done){STR_up(STR.S);STR.it=null;STR.S=null;STR.st.b++;WBC.sig=''}}
   if(!n)return;const dt=performance.now()-t0;if(dt>STR.st.max)STR.st.max=dt;if(dt>8)STR.st.over++;STR.st.hist.push(+dt.toFixed(2));if(STR.st.hist.length>600)STR.st.hist.shift()}
 // perf-r11c: a streamed super cell's CPU copy (54 B per far triangle) was only dropped at its first DRAW, and the cells behind the camera or inside wbLodD
@@ -26,13 +26,13 @@ function STR_up(S){const m=S&&(S.lod||S.cells.find(c=>c.lod)&&S.cells.find(c=>c.
   const U=STR.up||(STR.up={sc:new THREE.Scene(),mt:new THREE.MeshBasicMaterial(),rt:new THREE.WebGLRenderTarget(1,1)});const q=new THREE.Mesh(g,U.mt),dr=g.drawRange.count,prev=renderer.getRenderTarget();q.frustumCulled=false;g.drawRange.count=0;U.sc.add(q);
   try{renderer.setRenderTarget(U.rt);renderer.render(U.sc,camera)}catch(e){}finally{renderer.setRenderTarget(prev);g.drawRange.count=dr;U.sc.clear();STR.st.up=(STR.st.up||0)+1}}
 {const _ls=lazyStep;lazyStep=function(){const t=performance.now(),r=_ls.apply(this,arguments);STR.lzT=(STR.lzT0||0)+performance.now()-t;try{STR_step()}catch(e){console.warn('STR',e);TUNE.strOn=0}return r}}
-window.__str={st:STR.st,sup:()=>{let b=0,mb=0;for(const S of WBC.sup||[])if(S.built){b++;mb+=S.mb}return{sup:(WBC.sup||[]).length,built:b,mb:+mb.toFixed(1),lodT:WBC.st.lodT}}};
+window.__str={st:STR.st,sup:()=>{let b=0,mb=0;for(let _k3=0,_c3=WBC.sup||[],S;_k3<_c3.length&&(S=_c3[_k3],true);_k3++)if(S.built){b++;mb+=S.mb}return{sup:(WBC.sup||[]).length,built:b,mb:+mb.toFixed(1),lodT:WBC.st.lodT}}};
 // LAZY unload: only regions built by the plain lzBuildG (their build has no side effects beyond L.root + props); Taunus/Wald/Attiki corridors stay
 // (their builders add terrain, colliders or lanes while building). Colliders were added once at the first finish and are kept.
 // crash-4: LF fill tiles (build LF_tileG, own free hook LF_unreg) unload too: they were never freed and grew GPU buffers ~+25 MB per 5 min in Frankfurt
 const STR_lzOk=L=>(L.build===lzBuildG||L.lf)&&!L.pre&&L.done&&!L.it&&L.root&&LZ.cur!==L;
 function STR_lzFree(L){const R=L.root,inR=o=>{for(let q=o;q;q=q.parent)if(q===R)return true;return false};
-  if(HUB.props){const keep=[],gone=[];for(const p of HUB.props)(p.im&&inR(p.im)?gone:keep).push(p);if(gone.length){HUB.props.length=0;for(const p of keep)HUB.props.push(p);/* art-2: no spread, 130k+ props overflow the call stack */const PG=HUB.pgrid;if(PG)for(const p of gone){const k=Math.floor(p.x/16)*10000+Math.floor(p.z/16),A=PG.get(k);if(A){const i=A.indexOf(p);if(i>=0)A.splice(i,1)}}}}
+  if(HUB.props){const keep=[],gone=[];for(let _k4=0,_c4=HUB.props,p;_k4<_c4.length&&(p=_c4[_k4],true);_k4++)(p.im&&inR(p.im)?gone:keep).push(p);if(gone.length){HUB.props.length=0;for(const p of keep)HUB.props.push(p);/* art-2: no spread, 130k+ props overflow the call stack */const PG=HUB.pgrid;if(PG)for(const p of gone){const k=Math.floor(p.x/16)*10000+Math.floor(p.z/16),A=PG.get(k);if(A){const i=A.indexOf(p);if(i>=0)A.splice(i,1)}}}}
   if(HUB.cull){const C=HUB.cull.filter(c=>!inR(c.o));HUB.cull.length=0;for(const c of C)HUB.cull.push(c)}
   R.removeFromParent();R.traverse(o=>{if(o.isInstancedMesh)o.dispose();else if(o.isMesh&&o.geometry)o.geometry.dispose()});
   L.root=null;L.done=false;L.qd=false;L.it=null;L.bt=null;L.strRe=1;if(L.pN!=null)L.props.length=L.pN;HUB.cj=4;STR.st.lzF++}
@@ -40,7 +40,7 @@ function STR_lzFree(L){const R=L.root,inR=o=>{for(let q=o;q;q=q.parent)if(q===R)
 STR.st.lzBig=[];
 {const _st=lzStart;lzStart=function(L){if(!L.it&&L.pN==null)L.pN=L.props.length;const fresh=!L.it,r=_st.apply(this,arguments);if(fresh&&L.it){const it=L.it;let k=0;L.it={next(){const t=performance.now(),q=it.next(),d=performance.now()-t;k++;if(d>6){const B=STR.st.lzBig;B.push([+d.toFixed(1),L.id,k,q.done?'end':'']);B.sort((a,b)=>b[0]-a[0]);B.length=Math.min(B.length,3)}return q},[Symbol.iterator](){return this}}}return r}}
 {const _fi=lzFinish;lzFinish=function(L){if(!L.strRe)return _fi.apply(this,arguments);const b=L.bld;L.bld=[];try{return _fi.apply(this,arguments)}finally{L.bld=b;STR.st.lzB++}}}
-function STR_lzStep(){if(!STR_on()||!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;for(const L of LAZY)if(STR_lzOk(L)&&lzD(L,x,z)>(L.outR||STR_R()+TUNE.strLzOut))STR_lzFree(L)}
+function STR_lzStep(){if(!STR_on()||!HUB.built||!LAZY.length||!RO.on)return;const x=RO.x,z=RO.z;for(let _k5=0,_c5=LAZY,L;_k5<_c5.length&&(L=_c5[_k5],true);_k5++)if(STR_lzOk(L)&&lzD(L,x,z)>(L.outR||STR_R()+TUNE.strLzOut))STR_lzFree(L)}
 // per-frame cost of all streaming work (LAZY build + LAZY unload + far-cell build/free): STR.st.fr = frames, max ms, over 8/16/50 ms
 STR.st.fr={n:0,max:0,o8:0,o16:0,o50:0};
 {const _ls=lazyStep;lazyStep=function(){const t0=performance.now();try{STR_lzStep();STR.lzT0=performance.now()-t0;LZ.inR=STR_on()?STR_R()+TUNE.strLzIn:2200;return _ls.apply(this,arguments)}finally{const dt=performance.now()-t0,F=STR.st.fr;if(dt>.05){F.n++;if(dt>F.max)F.max=+dt.toFixed(1);if(dt>8)F.o8++;if(dt>16)F.o16++;if(dt>50)F.o50++}}}}

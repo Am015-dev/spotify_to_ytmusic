@@ -7,7 +7,7 @@ const TJ={EB:22/256,mg:.028,off:/[?&]tj=0/.test(location.search)};
 // true distance from (x,z) to the street polyline near cityAt's nearest sample (cityAt.d is to the sample point: coarse on curves)
 function TJ_st(x,z){const q=cityAt(x,z);if(!q)return null;const P=q.S.pts;let d=1e9;for(let i=Math.max(0,q.i-2);i<Math.min(P.length-1,q.i+2);i++){const a=P[i],b=P[i+1],dx=b.x-a.x,dz=b.z-a.z,l2=dx*dx+dz*dz||1,t=clamp(((x-a.x)*dx+(z-a.z)*dz)/l2,0,1);d=Math.min(d,Math.hypot(a.x+dx*t-x,a.z+dz*t-z))}
   if(P.length===1)d=q.d;return{q,d,road:q.road}}
-function TJ_list(){const L=[];for(const J of JUNC||[])L.push({k:'disc',x:J.x,z:J.z,r:J.r,inA:(x,z)=>Math.hypot(x-J.x,z-J.z)<J.r-.5});
+function TJ_list(){const L=[];for(let _k1=0,_c1=JUNC||[],J;_k1<_c1.length&&(J=_c1[_k1],true);_k1++)L.push({k:'disc',x:J.x,z:J.z,r:J.r,inA:(x,z)=>Math.hypot(x-J.x,z-J.z)<J.r-.5});
   if(CID==='fra'){try{hubRoads()}catch(e){}for(const X of FILL_X||[])L.push({k:'sq',x:X.x,z:X.z,r:Math.hypot(X.wa,X.wb)/2,inA:(x,z)=>Math.abs(x-X.x)<X.wa/2-.3&&Math.abs(z-X.z)<X.wb/2-.3});
     for(const f of FILL_R||[]){let a=null;const end=t=>{const tm=(a+t)/2,cx=f.x0+f.ux*tm,cz=f.z0+f.uz*tm,q=cityAt(cx,cz);if(!q)return;const S=q.S||q.road;
         L.push({k:'fxs',x:cx,z:cz,r:Math.max(f.w,q.road.w)*1.2,f,inA:(x,z)=>{const dx=x-f.x0,dz=z-f.z0,t2=dx*f.ux+dz*f.uz,lat=Math.abs(dx*f.uz-dz*f.ux);if(t2<0||t2>f.L||lat>f.w/2-.3)return false;const p=TJ_st(x,z);return p&&p.road===q.road&&p.d<p.road.w/2-.3}})};
@@ -31,7 +31,7 @@ function TJ_tris(MS,L){const C=new Map(),key=(i,j)=>i*100000+j;for(const J of L)
 function TJ_hits(C,x,z){const A=C.get(Math.floor(x/8)*100000+Math.floor(z/8)),H=[];if(A)for(const T of A){const w1=((T.bx-x)*(T.cz-z)-(T.cx-x)*(T.bz-z))/T.ar,w2=((T.cx-x)*(T.az-z)-(T.ax-x)*(T.cz-z))/T.ar,w3=1-w1-w2;if(w1<-1e-6||w2<-1e-6||w3<-1e-6)continue;
     H.push({y:w1*T.ay+w2*T.by+w3*T.cy,u:w1*T.ua+w2*T.ub+w3*T.uc,kind:T.kind,pf:T.pf})}return H.sort((a,b)=>b.y-a.y)}
 // bridge decks carry their own surface (their approach may start inside a quay junction): skipped, like the terrain tests
-function TJ_deck(x,z){for(const b of ALL_DECKS||[])if(deckAt(b,x,z)!=null)return true;return false}
+function TJ_deck(x,z){for(let _k2=0,_c2=ALL_DECKS||[],b;_k2<_c2.length&&(b=_c2[_k2],true);_k2++)if(deckAt(b,x,z)!=null)return true;return false}
 function TJ_one(J,C){const P=[];let strip=0,n=0,flush=0,wf=null;
   for(let x=Math.ceil(J.x-J.r);x<=J.x+J.r;x++)for(let z=Math.ceil(J.z-J.r);z<=J.z+J.r;z++){if(!J.inA(x,z)||TJ_deck(x,z))continue;const g=groundY(x,z),H=TJ_hits(C,x+.01,z+.01).filter(h=>h.y>g-.4&&h.y<g+.6);if(!H.length)continue;n++;
     // flush = how far the visible top stands above the road surface (asphalt / pad) under it; band = a painted kerb/edge line on top
@@ -66,7 +66,7 @@ function TJ_fx(){if(HUB.tjFx)return HUB.tjFx;const F=[];if(CID==='fra'&&!TJ.off)
 // inside a street (true distance) or any junction area, + m: filler kerbs stop there (cityAt's sample distance let them run into junctions on curves)
 function TJ_inJunc(x,z,m){const p=TJ_st(x,z);if(p&&p.road.cls!=='hill'&&p.d<p.road.w/2+m)return true;return TJ_inJA(x,z,m)}
 // junction areas only (discs, filler squares, filler pads), not plain street
-function TJ_inJA(x,z,m){for(const J of JUNC||[])if(Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m)return true;
+function TJ_inJA(x,z,m){for(let _k3=0,_c3=JUNC||[],J;_k3<_c3.length&&(J=_c3[_k3],true);_k3++)if(Math.abs(J.x-x)<J.r+m&&Math.abs(J.z-z)<J.r+m&&Math.hypot(J.x-x,J.z-z)<J.r+m)return true;
   for(const X of FILL_X||[])if(Math.abs(X.x-x)<X.wa/2+m&&Math.abs(X.z-z)<X.wb/2+m)return true;
   for(const c of TJ_fx()){const dx=x-c.x,dz=z-c.z;if(Math.abs(dx*c.tx+dz*c.tz)<c.A+m&&Math.abs(dx*c.ux+dz*c.uz)<c.B+m)return true}return false}
 // near a filler crossing (for the CV boulevard medians, which only stopped at street discs)
@@ -77,7 +77,7 @@ function TJ_nearFx(x,z,m){for(const c of TJ_fx())if(Math.hypot(c.x-x,c.z-z)<Math
 // sits 2.8 cm above the highest of them (TJ_y; 1.2 cm left 1-2 cm dips between 3 m pad vertices on convex ground). TJ.conf=0 (?tjconf=0) = off.
 TJ.conf=!TJ.off&&!/[?&]tjconf=0/.test(location.search);
 function TJ_cells(){const C=new Map(),put=(x,z,r)=>{for(let i=Math.floor((x-r)/8);i<=Math.floor((x+r)/8);i++)for(let j=Math.floor((z-r)/8);j<=Math.floor((z+r)/8);j++)C.set(i*100000+j,[])};
-  for(const J of JUNC||[])put(J.x,J.z,J.r+1);for(const X of FILL_X||[])put(X.x,X.z,Math.hypot(X.wa,X.wb)/2+1);for(const c of TJ_fx())put(c.x,c.z,Math.hypot(c.A,c.B)+1);return C}
+  for(let _k4=0,_c4=JUNC||[],J;_k4<_c4.length&&(J=_c4[_k4],true);_k4++)put(J.x,J.z,J.r+1);for(const X of FILL_X||[])put(X.x,X.z,Math.hypot(X.wa,X.wb)/2+1);for(const c of TJ_fx())put(c.x,c.z,Math.hypot(c.A,c.B)+1);return C}
 // pedestrian streets: the walk texture with a polygon offset (M.walk itself, and the terrain ground trG, are ground, not road)
 function TJ_ped(mat){const M=HUB.M;return!!(M&&M.walk&&mat!==M.walk&&mat.map&&mat.map===M.walk.map&&mat.polygonOffset)}
 function TJ_isRoad(mat){const M=HUB.M;return!!M&&(mat===M.road||mat===M.street||mat===M.resSt||TJ_ped(mat)||(M.jn&&mat.map===M.jn))}

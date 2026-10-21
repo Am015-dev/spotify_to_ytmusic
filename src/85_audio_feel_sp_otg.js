@@ -192,7 +192,7 @@ function FL_headlights(n){if(!HUB.grp||!HUB.cars)return;let H=FL.hl;const N=HUB.
     H=FL.hl=new THREE.InstancedMesh(mergeG(L),mat,N+48);/* perf-17: headroom, so traffic growing does not rebuild it mid-drive */H.frustumCulled=false;H.renderOrder=2;HUB.grp.add(H);H.userData.keep=1}
   H.material.color.setScalar(2.4*n);let j=0;
   if(pl&&RO.on){FL_hq.setFromAxisAngle(FL_hy,RO.h);FL_hm.compose(FL_hv.set(RO.x,RO.y,RO.z),FL_hq,FL_hs.set(1.2,1.2,1.25));H.setMatrixAt(j++,FL_hm)}
-  for(const c of HUB.cars){if(c.dead>0)continue;const im=HUB.cim[c.k];if(!im)continue;im.getMatrixAt(c.j,FL_hm);H.setMatrixAt(j++,FL_hm)}
+  for(let _j1=0,_b1=HUB.cars;_j1<_b1.length;_j1++){const c=_b1[_j1];if(c.dead>0)continue;const im=HUB.cim[c.k];if(!im)continue;im.getMatrixAt(c.j,FL_hm);H.setMatrixAt(j++,FL_hm)}
   H.count=j;H.instanceMatrix.needsUpdate=true}
 function FL_step(dt){if(!RO.on||state!=='roam')return;FL.clk+=dt;const mode=FL_mode();FL_time();
   if(mode==='cycle'&&!RO.frozen){FL.t=(FL.t+dt/FL_DAY)%1;FL.saveT+=dt;if(FL.saveT>3){FL.saveT=0;store.set('mho_fl_tod',+FL.t.toFixed(5))}}
@@ -278,11 +278,11 @@ function SP_battleInit(){const old=SP_S.bt;if(old&&old.s2){scene.remove(old.s2.m
   const r2={x:px,z:pz,y:groundAt(px,pz,RO.y+2),h:RO.h,vh:RO.h,v:0,vy:0,yr:0,dDir:0,dT:0,landK:0,camH:null,camL:null,camR:0,hp:100,inv:0,turbo:0};
   const hid=old?old.hid:HUB.cars.filter((c,i)=>i%2&&!(c.dead>0));for(const c of hid)c.dead=1e9;
   SP_S.bt={t:SP_BATTLE_T,s2,r2,sc:[{pr:0,tr:0,td:0},{pr:0,tr:0,td:0}],hid,tdCd:0,sh2:0,end:false};SP_S.st1=SP_S.st2=0;RO.v=0;RO.frozen=false;RO.hp=100;
-  if(old)for(const c of HUB.cars)if(c.dead>0&&c.dead<1e8)c.dead=.01;
+  if(old)for(let _k1=0,_c1=HUB.cars,c;_k1<_c1.length&&(c=_c1[_k1],true);_k1++)if(c.dead>0&&c.dead<1e8)c.dead=.01;
   if(!p1.mesh.getObjectByName('SP_tag'))SP_tag(p1.mesh,1);SP_tag(s2.mesh,2);SP_enterView();say('SMASH BATTLE','MOST SMASHES & TAKEDOWNS IN 3:00',2.2)}
 const SP_pts=s=>s.pr+s.tr*3+s.td*10;
 function SP_p2Step(dt){const B=SP_S.bt,P=B.r2,s=B.s2;SP_padsPoll();const c=SP_ctl(2),busy=B.end;SP_S.st2=Math.max(0,SP_S.st2-dt);
-  const T0=roamTerr(P.x,P.z,P.y+.3),air=P.y>T0.g+.5,top=(RO.top||60),boost=c.boost&&s.bm>1&&!busy;s.nitro=boost||P.turbo>0;P.turbo=Math.max(0,P.turbo-dt);
+  const T0=roamTerr(P.x,P.z,P.y+.3,_rtE),air=P.y>T0.g+.5,top=(RO.top||60),boost=c.boost&&s.bm>1&&!busy;s.nitro=boost||P.turbo>0;P.turbo=Math.max(0,P.turbo-dt);
   if(boost)s.bm=Math.max(0,s.bm-22*dt);else s.bm=Math.min(100,s.bm+7*dt);
   if(SP_S.pr2.fire){SP_S.pr2.fire=false;if(!air&&P.vy<=0&&!busy){P.vy=12;P.y+=.05;AU.sfx('launch')}}SP_S.pr2.roll=0;
   if(busy)P.v*=Math.max(0,1-dt*4);else if(!air){const tt=top*.66*(boost?1.45:1)*(P.turbo>0?1.2:1);if(c.thr||boost)P.v+=(s.stats.acc*1.15*Math.max(0,1-P.v/tt)+(boost?20:0))*dt;else P.v-=P.v*.4*dt;
@@ -291,7 +291,7 @@ function SP_p2Step(dt){const B=SP_S.bt,P=B.r2,s=B.s2;SP_padsPoll();const c=SP_ct
   if(hbOk&&!P.dDir&&Math.abs(c.steer)>.2){P.dDir=Math.sign(c.steer);P.dT=0}if(P.dDir&&!hbOk){if(P.dT>.5){P.turbo=Math.max(P.turbo,P.dT>1.1?1.3:.8);s.bm=Math.min(100,s.bm+8)}P.dDir=0;P.dT=0}
   let ytg=-c.steer*maxR*Math.sign(P.v||1);if(P.dDir){ytg=-P.dDir*maxR*(1.5+.6*clamp(c.steer*P.dDir,-1,1));P.dT+=dt}
   P.yr+=(ytg-P.yr)*Math.min(1,dt*(c.steer||P.dDir?14:18));P.h+=P.yr*dt;P.vh+=angDiff(P.h,P.vh)*Math.min(1,dt*(air?.6:P.dDir?2:13));
-  let nx=P.x+Math.sin(P.vh)*P.v*dt,nz=P.z+Math.cos(P.vh)*P.v*dt;const N=roamTerr(nx,nz,P.y+.3);
+  let nx=P.x+Math.sin(P.vh)*P.v*dt,nz=P.z+Math.cos(P.vh)*P.v*dt;const N=roamTerr(nx,nz,P.y+.3,_rtF);
   if(N.low||(N.g>P.y+1.4&&!air&&!RO.ramps.some(r=>Math.hypot(nx-r.x,nz-r.z)<r.len))){nx=P.x;nz=P.z;P.v*=-.25}else if(N.g>P.y+1.4){P.y=N.g}
   const hb=roamHit(nx,nz,2.2,P.y);if(hb){const pp=bldPush(hb,nx,nz,2.2);nx=pp[0];nz=pp[1];if(sp>20){P.v*=.7;burst(SPARK,V3(nx,P.y+1.5,nz),6,14,.3,new THREE.Color(2,1.4,.6))}}
   P.x=clamp(nx,WX0+10,WX1-10);P.z=clamp(nz,WZS+10,WZN-10);const g2=groundAt(P.x,P.z,P.y+.3);
@@ -301,7 +301,7 @@ function SP_p2Step(dt){const B=SP_S.bt,P=B.r2,s=B.s2;SP_padsPoll();const c=SP_ct
   const ro={},p1=pl,ctl=CTL,h0=HUB.smashed,cb=CB.n;for(const f of SP_RF)ro[f]=RO[f];for(const f of SP_RF)RO[f]=P[f];pl=s;CTL=c;SP_S.who=2;
   try{if(!busy)smashCheck(dt);roamPose(s,dt)}finally{for(const f of SP_RF)P[f]=RO[f];for(const f of SP_RF)RO[f]=ro[f];pl=p1;CTL=ctl;SP_S.who=1;CB.n=cb}
   B.sc[1].pr+=HUB.smashed-h0;
-  if(!busy&&sp>10)for(const k of HUB.cars){if(k.dead>0||k.x==null)continue;if(Math.abs(k.x-P.x)>5||Math.abs(k.z-P.z)>5||Math.abs((k.y||0)-P.y)>3||Math.hypot(k.x-P.x,k.z-P.z)>=5||!OB_carP(k,P))continue;
+  if(!busy&&sp>10)for(let _j2=0,_b2=HUB.cars;_j2<_b2.length;_j2++){const k=_b2[_j2];if(k.dead>0||k.x==null)continue;if(Math.abs(k.x-P.x)>5||Math.abs(k.z-P.z)>5||Math.abs((k.y||0)-P.y)>3||Math.hypot(k.x-P.x,k.z-P.z)>=5||!OB_carP(k,P))continue;
     k.dead=25;const at=V3(k.x,(k.y||0)+1.5,k.z),f2=V3(Math.sin(P.vh),0,Math.cos(P.vh));debris(at,V3(0,9,0).addScaledVector(f2,sp*.5),18,[new THREE.Color('#d8302a'),new THREE.Color('#22252f'),new THREE.Color('#d0e8ff')],1.1,k.y||0);
     P.v*=s.nitro?.95:.85;s.bm=Math.min(100,s.bm+12);B.sc[1].tr++;B.sh2=.4;AU.sfx('crash')}
   B.sh2=Math.max(0,(B.sh2||0)-dt*3)}
@@ -420,8 +420,8 @@ let TR_bf=0;{const _hg=hubGrid;hubGrid=()=>{if(!TR_bf&&HUB.grp){TR_bf=1;TR_bldFi
 // ---------- drivable slopes (2K-Drive style): gravity along the slope, full grip up to ~29°, fading to none at ~38° (the car then slides back
 // down the fall line, never stuck); the car stays glued to the terrain (no airborne frames on terrain), never sinks below it
 /* races-3: the slipway is built on top of the raw terrain grade (groundY), whose 0.8 slope at the quay edge dragged the River boat from 14 m/s to a standstill at the slip top (-245,-157). Drag rests on and 6 m past a slip. */
-function TR_onSlip(x,z){for(const s of SLIPS){const dx=x-s.x,dz=z-s.z;if(dx>50||dx<-50||dz>50||dz<-50)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<12&&inw>-6&&inw<32)return true}return false}
-function TR_pre(dt){RO.trSlope=null;const T=roamTerr(RO.x,RO.z,RO.y+.3);if(RO.y>T.g+.5||T.deck||T.g<-1.5||TR_onSlip(RO.x,RO.z)){RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);if(!T.deck){const[gx,gz]=TR_grad(RO.x,RO.z,2);TR6_stuck(dt,Math.atan(Math.hypot(gx,gz)))}return}
+function TR_onSlip(x,z){for(let _j3=0,_b3=SLIPS;_j3<_b3.length;_j3++){const s=_b3[_j3];const dx=x-s.x,dz=z-s.z;if(dx>50||dx<-50||dz>50||dz<-50)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<12&&inw>-6&&inw<32)return true}return false}
+function TR_pre(dt){RO.trSlope=null;const T=roamTerr(RO.x,RO.z,RO.y+.3,_rtG);if(RO.y>T.g+.5||T.deck||T.g<-1.5||TR_onSlip(RO.x,RO.z)){RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);if(!T.deck){const[gx,gz]=TR_grad(RO.x,RO.z,2);TR6_stuck(dt,Math.atan(Math.hypot(gx,gz)))}return}
   const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz),th=Math.atan(s),fx=Math.sin(RO.vh??RO.h),fz=Math.cos(RO.vh??RO.h),a=gx*fx+gz*fz;RO.trSlope={gx,gz,th,a};
   const ea=ESC.E.as>0;/* escape-1: assist = slope grip held, gravity x0.2 */RO.v-=9.8*.75*(ea?.2:1)*a/Math.sqrt(1+a*a)*dt;const grip=ea?1:clamp((.665-th)/(.665-.5),0,1);RO.trGrip=grip;
   if(grip<1){if(a>0&&RO.v>-2&&CTL&&(CTL.thr||CTL.boost))RO.v-=(1-grip)*58*dt;RO.trSl=Math.min(9,(RO.trSl||0)+(1-grip)*16*dt)}else RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);TR6_stuck(dt,th)}
@@ -434,7 +434,7 @@ function TR6_stuck(dt,th){if(TR8_on()||new URLSearchParams(location.search).get(
 const TR8_q=new URLSearchParams(location.search).get('t8u')!=='0',TR8_on=()=>TR8_q;
 function TR8_onRoad(x,z){const q=cityAt(x,z);if(q&&q.road&&q.d<q.road.w/2+3)return true;const f=fillAt(x,z);return!!(f&&f.r&&f.d<f.r.w/2+3)}
 function TR8_near(x,z){for(const r of[80,200,450,900]){const q=rfSnap(x,z,r);if(q[0]!==x||q[1]!==z)return q}
-  let b=null,bd=1e18;for(const S of CITY_S){const P=S.pts;for(let i=0;i<P.length-1;i++){const p=P[i],d=(p.x-x)**2+(p.z-z)**2;if(d<bd){bd=d;const n=P[i+1];b=[p.x,p.z,Math.atan2(n.x-p.x,n.z-p.z)]}}}return b}
+  let b=null,bd=1e18;for(let _j4=0,_b4=CITY_S;_j4<_b4.length;_j4++){const S=_b4[_j4];const P=S.pts;for(let i=0;i<P.length-1;i++){const p=P[i],d=(p.x-x)**2+(p.z-z)**2;if(d<bd){bd=d;const n=P[i+1];b=[p.x,p.z,Math.atan2(n.x-p.x,n.z-p.z)]}}}return b}
 function TR8_fade(){try{let d=document.getElementById('tr8f');if(!d){d=document.createElement('div');d.id='tr8f';d.style.cssText='position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:50';document.body.appendChild(d)}
   d.style.transition='none';d.style.opacity='.85';void d.offsetWidth;d.style.transition='opacity .5s';d.style.opacity='0'}catch(e){}}
 function TR8_unstick(dt){if(!TR8_on())return;const c=CTL,held=c&&(c.thr||c.boost||c.brk),off=held&&!RO.trDeck&&!TR8_onRoad(RO.x,RO.z)&&RO.veh!=='boat';  // tracks-3: a boat on the Main is not stuck (the lift to the nearest road threw the river-run boat onto the quay every ~6 s)
@@ -443,7 +443,7 @@ function TR8_unstick(dt){if(!TR8_on())return;const c=CTL,held=c&&(c.thr||c.boost
   if(!roamWarp(q[0],q[1],q[2])){RO.x=q[0];RO.z=q[1];RO.h=RO.vh=q[2];RO.y=groundAt(q[0],q[1],99);RO.vy=0}RO.v=0;RO.t6n=(RO.t6n||0)+1}
 function TR_post(dt){const S=RO.trSlope;if(RO.trSl>.05&&S){const s=Math.hypot(S.gx,S.gz)||1,dx=-S.gx/s*RO.trSl*dt,dz=-S.gz/s*RO.trSl*dt;if(!roamHit(RO.x+dx,RO.z+dz,2.2,RO.y)){RO.x+=dx;RO.z+=dz}}
   TR_snap();TR_summitStep()}
-function TR_snap(){const dt=1/60,T=roamTerr(RO.x,RO.z,RO.y+.3),g=T.g;RO.trDeck=!!T.deck;
+function TR_snap(){const dt=1/60,T=roamTerr(RO.x,RO.z,RO.y+.3,_rtH),g=T.g;RO.trDeck=!!T.deck;
   if(RO.y<g){RO.y=g;if(RO.vy<0)RO.vy=0}else if(RO.y>g&&RO.vy<=.01&&RO.vy>-8&&!RO.lastRamp&&RO.y-g<Math.abs(RO.v)*dt*1.2+.6){RO.y=g;RO.vy=0;if(pl)pl.air=null}}
 function TR_tilt(s,dt){const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m)return;let nx=0,ny=1,nz=0;if(!s.air&&!RO.trDeck&&RO.y<groundY(RO.x,RO.z)+.6){const[gx,gz]=TR_grad(RO.x,RO.z,2.2),l=Math.hypot(gx,1,gz);nx=-gx/l;ny=1/l;nz=-gz/l}
   const N=RO.trN||(RO.trN=V3(0,1,0)),k=Math.min(1,dt*9);N.x+=(nx-N.x)*k;N.y+=(ny-N.y)*k;N.z+=(nz-N.z)*k;N.normalize();if(N.y>.9999)return;TR_q.setFromUnitVectors(TR_up,N);ud.m.quaternion.premultiply(TR_q)}
@@ -519,7 +519,7 @@ function OG_walk(i,dx,dz,L){const G=qvGraph(),P=[[G.X[i],G.Z[i]]],C=[0];const d0
 // flat ground along a walk: every 8 m within ±2.5 m of its start height (v81 terrain: no jump ramps onto hillsides)
 function OG_flat(W){const y0=groundY(W.P[0][0],W.P[0][1]);for(let d=8;d<=W.len;d+=8){const q=OG_at(W,d);if(Math.abs(groundY(q.x,q.z)-y0)>2.5)return false}return true}
 function OG_at(W,s){const P=W.P,C=W.C;let k=1;while(k<P.length-1&&C[k]<s)k++;const a=P[k-1],b=P[k]||a,l=(C[k]-C[k-1])||1,u=clamp((s-C[k-1])/l,0,1),hx=(b[0]-a[0])/l,hz=(b[1]-a[1])/l;return{x:a[0]+(b[0]-a[0])*u,z:a[1]+(b[1]-a[1])*u,hx,hz,h:Math.atan2(hx,hz)}}
-function OG_excl(){const ex=[];for(const g of HUB.gates||[])ex.push([g.x,g.z,55]);for(const m of RO.marks||[])if(Number.isFinite(m.x))ex.push([m.x,m.z,45]);for(const g of GARAGES)if(g.x!=null)ex.push([g.x,g.z,45]);return ex}
+function OG_excl(){const ex=[];for(const g of HUB.gates||[])ex.push([g.x,g.z,55]);for(let _k2=0,_c2=RO.marks||[],m;_k2<_c2.length&&(m=_c2[_k2],true);_k2++)if(Number.isFinite(m.x))ex.push([m.x,m.z,45]);for(const g of GARAGES)if(g.x!=null)ex.push([g.x,g.z,45]);return ex}
 const OG_near=(ex,x,z,f=1)=>ex.some(([a,b,r])=>(a-x)**2+(b-z)**2<r*r*f);
 // ---------- procedural placement
 function OG_build(){const G=qvGraph();if(!G||!RO.grp)return false;const t0=performance.now();OG_clear();OG_sv();
@@ -531,7 +531,7 @@ function OG_build(){const G=qvGraph();if(!G||!RO.grp)return false;const t0=perfo
   const smp=[];for(const i of G.list)for(let k=G.off[i];k<G.off[i+1];k++){const j=G.nb[k];if(j<=i)continue;const L=Math.hypot(G.X[j]-G.X[i],G.Z[j]-G.Z[i]),n=Math.max(1,Math.ceil(L/20));for(let q=0;q<n;q++){const u=q/n,x=G.X[i]+(G.X[j]-G.X[i])*u,z=G.Z[i]+(G.Z[j]-G.Z[i])*u;if(OG_inD(x,z)&&!inRiver(x,z))smp.push([x,z,u<.5?i:j])}}
   OG.smp=smp;const deg=i=>G.off[i+1]-G.off[i];
   // golden bricks 1: in the air behind the city's jump ramps
-  for(const r of RO.ramps||[]){if(r.dk||r.og)continue;const fx=Math.sin(r.h),fz=Math.cos(r.h),x=r.x+fx*(r.len/2+11),z=r.z+fz*(r.len/2+11);if(!ok(x,z)||nearest(x,z,120))continue;put({k:'gold',t:'ramp',x,z,y:r.y0+r.hgt+2.6})}
+  for(let _k3=0,_c3=RO.ramps||[],r;_k3<_c3.length&&(r=_c3[_k3],true);_k3++){if(r.dk||r.og)continue;const fx=Math.sin(r.h),fz=Math.cos(r.h),x=r.x+fx*(r.len/2+11),z=r.z+fz*(r.len/2+11);if(!ok(x,z)||nearest(x,z,120))continue;put({k:'gold',t:'ramp',x,z,y:r.y0+r.hgt+2.6})}
   // golden bricks 2: hill tops (highest road node of its 300 m cell, ≥ 12 m above the cell's lowest)
   {const C=new Map();for(const s of smp){const k=Math.floor(s[0]/300)*100000+Math.floor(s[1]/300),y=groundY(s[0],s[1]);let c=C.get(k);if(!c)C.set(k,c={hi:-1e9,lo:1e9,p:null,kx:Math.floor(s[0]/300),kz:Math.floor(s[1]/300)});if(y>c.hi){c.hi=y;c.p=s}c.lo=Math.min(c.lo,y)}
     for(const[k,c]of C){if(c.hi-c.lo<8)continue;const kx=c.kx,kz=c.kz;let top=true;for(let a=-1;a<=1&&top;a++)for(let b=-1;b<=1;b++){const o=C.get((kx+a)*100000+kz+b);if(o&&o!==c&&o.hi>c.hi){top=false;break}}
@@ -577,7 +577,7 @@ function OG_navCells(){const N=QV.nav,P=N&&N.P,wp=RO.wp;const key=P||wp?(P?P.len
   if(wp&&Number.isFinite(wp.x))add(wp.x,wp.z);return OG.navC=C}
 const OG_onPath=sp=>OG.navC.has(Math.floor(sp.x/30)*100000+Math.floor(sp.z/30));
 function OG_done(sp){const s=OG_sv();return sp.k==='ev'?(s.e[sp.id]||0):sp.k==='gold'?(s.g[sp.id]?3:0):(s.c[sp.id]?3:0)}
-function OG_blocked(sp){if(OG_onPath(sp))return true;for(const m of RO.marks||[])if(Number.isFinite(m.x)&&(m.x-sp.x)**2+(m.z-sp.z)**2<40*40)return true;for(const g of HUB.gates||[])if((g.x-sp.x)**2+(g.z-sp.z)**2<50*50)return true;return false}
+function OG_blocked(sp){if(OG_onPath(sp))return true;for(let _k4=0,_c4=RO.marks||[],m;_k4<_c4.length&&(m=_c4[_k4],true);_k4++)if(Number.isFinite(m.x)&&(m.x-sp.x)**2+(m.z-sp.z)**2<40*40)return true;for(const g of HUB.gates||[])if((g.x-sp.x)**2+(g.z-sp.z)**2<50*50)return true;return false}
 function OG_pickVis(){const x=RO.x,z=RO.z,kx=Math.floor(x/100),kz=Math.floor(z/100),L=[];OG_navCells();
   for(let a=-3;a<=3;a++)for(let c=-3;c<=3;c++){const Q=OG.grid.get((kx+a)*100000+kz+c);if(!Q)continue;for(const sp of Q){const t=OG_done(sp);if(t>=3)continue;const d=Math.hypot(sp.x-x,sp.z-z);if(d>OG_FADE[1])continue;if(OG_blocked(sp))continue;L.push([d+(t?60:0),sp,d])}}
   L.sort((p,q)=>p[0]-q[0]);OG.vis=L.slice(0,OG_N).map(q=>q[1]);for(const sp of OG.vis)if(sp.roof&&!sp.roofOn)OG_roofOn(sp);
@@ -592,7 +592,7 @@ function OG_draw(){if(!OG.imE)return;const on=!OG.ev&&state==='roam';const n={E:
 // ---------- area completion
 function OG_stats(a){const s=OG_sv(),o={ev:[0,0],g:[0,0],c:[0,0],st:[0,0]};for(const sp of OG.S){if(sp.a!==a)continue;const q=sp.k==='ev'?o.ev:sp.k==='gold'?o.g:o.c;q[1]++;if(OG_done(sp))q[0]++}
   for(const g of RO.gbs||[]){if(OG_areaAt(g.x,g.z)!==a)continue;o.g[1]++;if(g.m&&!g.m.visible)o.g[0]++}
-  for(const m of RO.marks||[]){if(!m.ev||m.dyn||!['rival','boss','quest','otg','challenge','sprint','mode'].includes(m.kind)||!Number.isFinite(m.x)||OG_areaAt(m.x,m.z)!==a)continue;o.st[1]++;try{if(markDone(m))o.st[0]++}catch(e){}}
+  for(let _k5=0,_c5=RO.marks||[],m;_k5<_c5.length&&(m=_c5[_k5],true);_k5++){if(!m.ev||m.dyn||!['rival','boss','quest','otg','challenge','sprint','mode'].includes(m.kind)||!Number.isFinite(m.x)||OG_areaAt(m.x,m.z)!==a)continue;o.st[1]++;try{if(markDone(m))o.st[0]++}catch(e){}}
   const D=o.ev[0]+o.g[0]+o.c[0]+o.st[0],T=o.ev[1]+o.g[1]+o.c[1]+o.st[1];o.pct=T?Math.floor(100*D/T):100;o.D=D;o.T=T;return o}
 function OG_areas(){const L=[...new Set(OG.S.map(s=>s.a))];return L.sort()}
 function OG_sum(){const s=OG_sv();for(const a of OG_areas())s.sum[a]=OG_stats(a).pct;if(CID!=='fra'){let D=0,T=0;for(const a of OG_areas()){const o=OG_stats(a);D+=o.D;T+=o.T}s.sum['§'+ATHD]=T?Math.floor(100*D/T):0}OG_save()}

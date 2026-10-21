@@ -111,7 +111,7 @@ function BOT_esc(say){const R=BOT_rec(),out={kind:'escape',city:CID,ok:false,row
   {const o=S.pick[0],had=!!HUB.cars,F=[],put=(x,z)=>{const f={x,z,fake:1};F.push(f);HUB.cars.push(f)};if(!had)HUB.cars=[];const lb={ok:false};
    try{roamWarp(o.x,o.z,0);RO.x=o.x;RO.z=o.z;RO.y=groundAt(o.x,o.z,99);RO.v=0;const q=TR8_near(RO.x,RO.z),sx=Math.sin(q[2]),sz=Math.cos(q[2]);for(let d=-96;d<=96;d+=8)put(q[0]+sx*d,q[1]+sz*d);
     const n0=RO.t6n||0,a=ESC_lift('reset','test-a'),far=()=>F.every(f=>Math.hypot(f.x-RO.x,f.z-RO.z)>=7);lb.a={lifted:a,to:[Math.round(RO.x),Math.round(RO.z)],at:ESC.E.log&&ESC.E.log.at,clear:a&&ESC_clear(RO.x,RO.z,RO.y)&&far()};
-    roamWarp(o.x,o.z,0);RO.x=o.x;RO.z=o.z;RO.y=groundAt(o.x,o.z,99);for(const S2 of CITY_S){const P=S2.pts;for(let i=0;i<P.length-1;i++)if(Math.hypot(P[i].x-o.x,P[i].z-o.z)<420)put(P[i].x,P[i].z)}
+    roamWarp(o.x,o.z,0);RO.x=o.x;RO.z=o.z;RO.y=groundAt(o.x,o.z,99);for(let _j1=0,_b1=CITY_S;_j1<_b1.length;_j1++){const S2=_b1[_j1];const P=S2.pts;for(let i=0;i<P.length-1;i++)if(Math.hypot(P[i].x-o.x,P[i].z-o.z)<420)put(P[i].x,P[i].z)}
     const b=ESC_lift('reset','test-b');lb.b={held:!b,moved:Math.round(Math.hypot(RO.x-o.x,RO.z-o.z)),fakes:F.length};
     for(const f of F){const k=HUB.cars.indexOf(f);if(k>=0)HUB.cars.splice(k,1)}F.length=0;const c=ESC_lift('reset','test-c');lb.c={lifted:c,clear:c&&ESC_clear(RO.x,RO.z,RO.y)};
     lb.ok=lb.a.lifted&&lb.a.clear&&lb.a.at==='road2'&&lb.b.held&&lb.b.moved<1&&lb.c.lifted&&lb.c.clear}
@@ -135,9 +135,9 @@ function BOT_dbg(x,z){const o=[];for(const k in K)K[k]=false;roamWarp(x,z,0);RO.
 // second difference of groundAt <= 8 cm (counts and worst reported); (2) no ramp covers more than 40 % of any carriageway cross-section within 12 m of a road (all ramps unioned);
 // (3) the bot drives the 10 worst FORMER full-width ramp streets (160 m each) at >= 20 km/h average, no stuck / reset / fall.
 const RCL=window.__rcl={maxStep:.08,hardStep:.5,maxCover:.4,kmh:20,sites:[[2894,-2196],[3084,-2628],[676,-1559],[-2354,-2020],[-2213,-1966],[-1625,-1715],[-3850,2588],[3122,-1987],[-2545,2026],[-5299,4083]]};
-function RCL_inRamp(x,z,m){for(const r of RO.ramps){if(r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(a)<r.len/2+m&&Math.abs(b)<r.w/2+m)return true}return false}
+function RCL_inRamp(x,z,m){for(let _j2=0,_b2=RO.ramps;_j2<_b2.length;_j2++){const r=_b2[_j2];if(r.dk)continue;const dx=x-r.x,dz=z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);if(Math.abs(a)<r.len/2+m&&Math.abs(b)<r.w/2+m)return true}return false}
 function RCL_scan(){const st={n:0,steps:0,max:0,worst:null,bad:{}},cv={max:0,at:null,over:0,n:0};
- for(const S of CITY_S){if(S.r.cls==='ped')continue;const w=S.r.w,P=S.pts;
+ for(let _j3=0,_b3=CITY_S;_j3<_b3.length;_j3++){const S=_b3[_j3];if(S.r.cls==='ped')continue;const w=S.r.w,P=S.pts;
   for(const off of[0,-w/4,w/4]){let prev=null,pp=null;for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],dx=b.x-a.x,dz=b.z-a.z,L=Math.hypot(dx,dz);if(L<.1)continue;const ux=dx/L,uz=dz/L;
    for(let s=0;s<L;s+=2){const x=a.x+ux*s-uz*off,z=a.z+uz*s+ux*off,g=groundAt(x,z,prev!=null?prev+1.5:99);st.n++;
     if(prev!=null&&pp!=null){const d=Math.abs(prev-(pp+g)/2);if(d>RCL.maxStep&&!RCL_inRamp(x,z,10)){st.steps++;if(d>RCL.hardStep)st.hard=(st.hard||0)+1;st.bad[S.r.name]=(st.bad[S.r.name]||0)+1;if(d>st.max){st.max=d;st.worst=[Math.round(x-ux*2),Math.round(z-uz*2),S.r.name]}}}pp=prev;prev=g}}}
@@ -150,7 +150,7 @@ function RCL_scan(){const st={n:0,steps:0,max:0,worst:null,bad:{}},cv={max:0,at:
 function RCL_go(say){const R=BOT_rec(),out={kind:'ath-clear',city:CID,ok:false,legs:[]};
  try{if(RO.sp)try{sprintEnd()}catch(e){}if(RO.ch)try{chAbort()}catch(e){}
   const S=RCL_scan();out.steps=S.st.steps;out.hard=S.st.hard||0;out.stepMax=+S.st.max.toFixed(2);out.stepWorst=S.st.worst;out.samples=S.st.n;out.cover=+S.cv.max.toFixed(2);out.coverAt=S.cv.at;out.coverOver=S.cv.over;out.ramps=RO.ramps.filter(r=>!r.dk).length;
-  for(const[sx,sz]of RCL.sites){let B=null;for(const T of CITY_S){if(T.r.cls==='ped'||T.r.cls==='hill')continue;for(let i=0;i<T.pts.length;i++){const d=Math.hypot(T.pts[i].x-sx,T.pts[i].z-sz);if(!B||d<B.d)B={T,i,d}}}
+  for(const[sx,sz]of RCL.sites){let B=null;for(let _j4=0,_b4=CITY_S;_j4<_b4.length;_j4++){const T=_b4[_j4];if(T.r.cls==='ped'||T.r.cls==='hill')continue;for(let i=0;i<T.pts.length;i++){const d=Math.hypot(T.pts[i].x-sx,T.pts[i].z-sz);if(!B||d<B.d)B={T,i,d}}}
    if(!B||B.d>40){out.legs.push({g:[sx,sz],why:'no street'});continue}
    const P0=B.T.pts,i0=Math.max(0,B.i-10),i1=Math.min(P0.length-1,B.i+10),P=[];for(let i=i0;i<=i1;i++)P.push([P0[i].x,P0[i].z]);let L=0;for(let i=1;i<P.length;i++)L+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);
    roamWarp(P[0][0],P[0][1],Math.atan2(P[1][0]-P[0][0],P[1][1]-P[0][1]),true);RO.x=P[0][0];RO.z=P[0][1];RO.y=groundAt(RO.x,RO.z,99);RO.v=0;RO.vy=0;for(let i=0;i<45;i++)R.step();

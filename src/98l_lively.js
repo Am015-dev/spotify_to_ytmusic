@@ -71,7 +71,7 @@ function LV_birdStep(dt){const B=LV.birds;if(!B)return;const d=LV_d('lvBird'),ac
 // ---------- 3 · rooftop flags: pole + cloth, the cloth swings about the pole and ripples (scale) in the wind. Roofs 9-60 m up, one per 60 m cell.
 // A pool of 36 flags (× knob) sits on the nearest such roofs within 380 m of the player; re-picked every second as you drive.
 function LV_flagInit(){const P=Math.round(36*Math.min(2,LV_d('lvFlag')));if(P<=0)return;const C=[],grid=new Set();
-  for(const b of HUB.bld){if(!b||b.hw==null||b.hw<3||b.hd<3)continue;const hh=b.h-(b.trY||0);if(!(hh>9&&hh<60))continue;const gk=Math.floor(b.x/60)+'|'+Math.floor(b.z/60);if(grid.has(gk))continue;grid.add(gk);C.push([b.x,b.h,b.z])}
+  for(let _j1=0,_b1=HUB.bld;_j1<_b1.length;_j1++){const b=_b1[_j1];if(!b||b.hw==null||b.hw<3||b.hd<3)continue;const hh=b.h-(b.trY||0);if(!(hh>9&&hh<60))continue;const gk=Math.floor(b.x/60)+'|'+Math.floor(b.z/60);if(grid.has(gk))continue;grid.add(gk);C.push([b.x,b.h,b.z])}
   if(!C.length)return;const pole=mergeG([ccyl(.07,.09,5,0,2.5,0,'#e8e8e8',6),cbox(.22,.22,.22,0,5.05,0,'#ffd12c')]);
   const D=CID==='fra'?[['#d01818','#ffffff','#d01818'],['#1a1a1a','#d01818','#ffcc00'],['#1f4fbf','#1f4fbf','#1f4fbf'],['#ffffff','#d01818','#ffffff']]:[['#1f5fbf','#ffffff','#1f5fbf'],['#ffffff','#1f5fbf','#ffffff'],['#1f5fbf','#1f5fbf','#ffffff']];
   // cloth 2.4 × 1.5 m in three horizontal stripes, x from the pole outwards (pivot at the pole); one mesh per design keeps the stripes in vertex colours
@@ -93,7 +93,7 @@ function LV_blimpInit(){if(LV_d('lvBlimp')<=0)return;const env=new THREE.SphereG
   // stud row on the top seam (LEGO cue)
   for(let z=-16;z<=16;z+=4)parts.push(ccyl(.9,.9,.6,0,8.6-Math.abs(z)*.06,z,'#ffd12c',10));
   const g=mergeG(parts),m=new THREE.Mesh(g,LV_mat());m.frustumCulled=false;HUB.grp.add(m);
-  let cx=0,cz=0,n=0;for(const b of HUB.bld){if(!b)continue;cx+=b.x;cz+=b.z;n++}cx/=Math.max(1,n);cz/=Math.max(1,n);LV.blimp={m,cx,cz,r:CID==='fra'?520:420}}
+  let cx=0,cz=0,n=0;for(let _j2=0,_b2=HUB.bld;_j2<_b2.length;_j2++){const b=_b2[_j2];if(!b)continue;cx+=b.x;cz+=b.z;n++}cx/=Math.max(1,n);cz/=Math.max(1,n);LV.blimp={m,cx,cz,r:CID==='fra'?520:420}}
 function LV_blimpStep(){const B=LV.blimp;if(!B)return;B.m.visible=LV_d('lvBlimp')>0;const a=LV.t*.016,x=B.cx+Math.sin(a)*B.r,z=B.cz+Math.cos(a)*B.r;
   B.m.position.set(x,150+Math.sin(LV.t*.3)*3,z);B.m.rotation.set(0,a+Math.PI/2,Math.sin(LV.t*.25)*.03)}
 // ---------- 5 · boats on the Main (Frankfurt): small LEGO cruisers along the river centreline, both directions, soft collision with the player
@@ -299,5 +299,5 @@ function LVP_hud(){const C=LVP.c;if(!C||RO.ch||RO.sp)return;const a=huQ('#roamAr
 window.__lv={LV,n:()=>({peds:HUB.peds?LV_pn(HUB.peds.length):0,flags:LV.flags?LV.flags.L.length:0,roofs:LV.n.flags||0,boats:LV.n.boats||0,birds:LV.birds?LV.birds.fl.filter(f=>f.on).length:0,blimp:!!LV.blimp,ms:LV.ms}),
   view:()=>{// people / cars / birds / boats inside the camera view within 120 m (the "is anything happening" count of the research doc)
     const fr=new THREE.Frustum().setFromProjectionMatrix(new THREE.Matrix4().multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse)),v=new THREE.Vector3(),c={peds:0,cars:0,birds:0,boats:0},inV=(x,y,z)=>fr.containsPoint(v.set(x,y+1,z))&&v.distanceTo(camera.position)<120;
-    for(const p of HUB.peds||[])if(p._x===p._x&&inV(p._x,p.y,p._z))c.peds++;for(const k of HUB.cars||[])if(k.dead<=0&&inV(k.x,k.y||0,k.z))c.cars++;
+    for(let _k1=0,_c1=HUB.peds||[],p;_k1<_c1.length&&(p=_c1[_k1],true);_k1++)if(p._x===p._x&&inV(p._x,p.y,p._z))c.peds++;for(let _k2=0,_c2=HUB.cars||[],k;_k2<_c2.length&&(k=_c2[_k2],true);_k2++)if(k.dead<=0&&inV(k.x,k.y||0,k.z))c.cars++;
     if(LV.birds)for(const F of LV.birds.fl)if(F.on)for(const b of F.b)if(inV(b.x,b.y,b.z))c.birds++;if(LV.boats)for(const b of LV.boats.bt)if(inV(b.x,0,b.z))c.boats++;return c}};

@@ -13,7 +13,7 @@
 function RV3_cover(){const N=40,g=new Uint8Array(N*N),W=innerWidth,H=innerHeight,tf=Math.tan(camera.fov*Math.PI/360),v=new THREE.Vector3(),cv=new THREE.Vector3();camera.updateMatrixWorld();
  const add=(p,r)=>{cv.copy(p).applyMatrix4(camera.matrixWorldInverse);if(cv.z>-.3)return;const d=-cv.z,px=r*(H/2)/(tf*d);v.copy(p).project(camera);const x=(v.x+1)/2*W,y=(1-v.y)/2*H;for(let i=Math.max(0,Math.floor((x-px)/W*N));i<=Math.min(N-1,Math.floor((x+px)/W*N));i++)for(let j=Math.max(0,Math.floor((y-px)/H*N));j<=Math.min(N-1,Math.floor((y+px)/H*N));j++)g[j*N+i]=1};
  if(DEB)for(const d of DEB.list)add(d.p,.5*Math.hypot(1.6*d.s.x,d.s.y,1.6*d.s.z)*(d.life<.5?d.life/.5:1));
- for(const c of HUB.cars||[])if(c.crW)add(v3tmp.set(c.crW.x,c.crW.y+.8,c.crW.z),2.4*CR_tk(c.crW.t));
+ for(let _k1=0,_c1=HUB.cars||[],c;_k1<_c1.length&&(c=_c1[_k1],true);_k1++)if(c.crW)add(v3tmp.set(c.crW.x,c.crW.y+.8,c.crW.z),2.4*CR_tk(c.crW.t));
  let n=0;for(const q of g)n+=q;return n/(N*N)}
 const v3tmp=new THREE.Vector3();
 function RV3_go(kind,say){const ok=b=>b?' ✅':' ❌',P=innerHeight>innerWidth?'portrait':'landscape';

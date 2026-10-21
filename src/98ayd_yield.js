@@ -5,7 +5,7 @@
 // ?ayd=0 turns it off. Cars never leave the road: the shift is cut to 35 % when cityAt() says the kerb is near.
 const AYD={on:!/[?&]ayd=0/.test(location.search),lane:HT_lawQ('lane'),n:0};
 function AYD_pre(dt){if(!AYD.on||typeof RO==='undefined'||!RO.on||RO.foot&&RO.foot!=='car'||!HUB.cars||!HUB.nodes)return;const N=HUB.nodes,h=RO.vh??RO.h,fx=Math.sin(h),fz=Math.cos(h),act=RO.v>3;
- for(const c of HUB.cars){if(c.pk||c.tr||c.route&&!c.CVr||c.dead>0){if(c.yo)c.yo=0;continue}const rx=c.x-RO.x,rz=c.z-RO.z;if(!c.yo&&!c.yoH&&(!act||rx*rx+rz*rz>10000))continue;
+ for(let _j1=0,_b1=HUB.cars;_j1<_b1.length;_j1++){const c=_b1[_j1];if(c.pk||c.tr||c.route&&!c.CVr||c.dead>0){if(c.yo)c.yo=0;continue}const rx=c.x-RO.x,rz=c.z-RO.z;if(!c.yo&&!c.yoH&&(!act||rx*rx+rz*rz>10000))continue;
   let tg=0;const A=N[c.a],B=N[c.b];
   if(act&&A&&B&&!A.ab){const al=rx*fx+rz*fz,lat=rx*fz-rz*fx;
    if(al>1&&al<14+RO.v*1.6&&Math.abs(lat)<3.9){const L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,s=lat>=0?1:-1,nd=fz*-dz-fx*dx/* right normal · car lane direction (-dz,dx) */;
@@ -22,6 +22,6 @@ function AYD_pre(dt){if(!AYD.on||typeof RO==='undefined'||!RO.on||RO.foot&&RO.fo
 // rv4C: a dead/despawned car leaves every collision structure (OB grid, spatial grids, caches that copy c.x/c.z) the moment it dies: its position is parked 10 000 km away until it respawns
 // (pin.js: a smashed car, dead=24.98, still pinned the player at 50-85 km/h). Tumble debris uses c.crW, not c.x/z, so the visuals are unchanged.
 /* rv4E (behind window.OD_AYDCLR, default OFF: it widened the fra race gap, rv2k2/close 74 m > 60 m): at 80+ km/h a car inside the player's corridor (4 m behind to 12 m + 1 s ahead, 5.6 m either side) is taken off the road (silently, respawns later): in a 10 m Athens street the yield cannot clear it in time (pace#1 counted 2-3 rams per 60 s). Free-roam density elsewhere is unchanged; ?ayd=0 off. */
-function AYD_clear(){if(!window.OD_AYDCLR||!AYD.on||typeof RO==='undefined'||!RO.on||RO.foot&&RO.foot!=='car'||!HUB.cars||RO.v<22)return;const h=RO.vh??RO.h,fx=Math.sin(h),fz=Math.cos(h),L=12+RO.v;for(const c of HUB.cars){if(c.dead>0||c.pk||c.tr)continue;const rx=c.x-RO.x,rz=c.z-RO.z;if(rx*rx+rz*rz>L*L+100)continue;const al=rx*fx+rz*fz,lat=rx*fz-rz*fx;if(al>-4&&al<L&&Math.abs(lat)<5.6){c.dead=6;AYD.cl=(AYD.cl||0)+1}}}
-function AYD_park(){for(const c of HUB.cars){if(c.dead>0){if(!c.dz){c.dz=1;c.x=c.z=-1e7;AYD.parked=(AYD.parked||0)+1}}else if(c.dz)c.dz=0}}
+function AYD_clear(){if(!window.OD_AYDCLR||!AYD.on||typeof RO==='undefined'||!RO.on||RO.foot&&RO.foot!=='car'||!HUB.cars||RO.v<22)return;const h=RO.vh??RO.h,fx=Math.sin(h),fz=Math.cos(h),L=12+RO.v;for(let _j2=0,_b2=HUB.cars;_j2<_b2.length;_j2++){const c=_b2[_j2];if(c.dead>0||c.pk||c.tr)continue;const rx=c.x-RO.x,rz=c.z-RO.z;if(rx*rx+rz*rz>L*L+100)continue;const al=rx*fx+rz*fz,lat=rx*fz-rz*fx;if(al>-4&&al<L&&Math.abs(lat)<5.6){c.dead=6;AYD.cl=(AYD.cl||0)+1}}}
+function AYD_park(){for(let _j3=0,_b3=HUB.cars;_j3<_b3.length;_j3++){const c=_b3[_j3];if(c.dead>0){if(!c.dz){c.dz=1;c.x=c.z=-1e7;AYD.parked=(AYD.parked||0)+1}}else if(c.dz)c.dz=0}}
 hubTrafficStep=(f=>function(dt){try{AYD_pre(dt);AYD_clear();AYD_park()}catch(e){console.warn('AYD',e)}const r=f.apply(this,arguments);try{AYD_park()}catch(e){console.warn('AYD',e)}return r})(hubTrafficStep);

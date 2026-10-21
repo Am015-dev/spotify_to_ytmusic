@@ -71,7 +71,7 @@ LF.keep=.6;LF.lite=!/[?&]lfl=0\b/.test(location.search);// share of open cells t
 // my grass mounds: OFF once art-1's terrain relief (TR raster) is merged, so ground height has one owner; ?lfm=0 turns them off now
 LF.mounds=!/[?&]lfm=0\b/.test(location.search)&&!(typeof TERR!=='undefined'&&TERR.on);  // terr-1: off whenever the terrain raster (TERR.on) owns the relief
 function LF_ctx(){if(LF.cx)return LF.cx;const fra=CID==='fra';const VS=new Map();let k=0;const put=(x,z,ux,uz,w)=>{if(x<HX0||x>HX1||z<HZS||z>HZN)return;const key=Math.floor(x/1000)+'|'+Math.floor(z/1000);let A=VS.get(key);if(!A)VS.set(key,A=[]);A.push([x,z,ux,uz,w,k++])};
- for(const S of CITY_S){const Pp=S.pts;if(!Pp||S.r.cls==='hill')continue;let acc=0;for(let i=1;i<Pp.length-1;i++){const p=Pp[i],q=Pp[i-1];acc+=Math.hypot(p.x-q.x,p.z-q.z);if(acc<LF.vs)continue;acc=0;put(p.x,p.z,p.tx,p.tz,S.r.w)}}
+ for(let _j1=0,_b1=CITY_S;_j1<_b1.length;_j1++){const S=_b1[_j1];const Pp=S.pts;if(!Pp||S.r.cls==='hill')continue;let acc=0;for(let i=1;i<Pp.length-1;i++){const p=Pp[i],q=Pp[i-1];acc+=Math.hypot(p.x-q.x,p.z-q.z);if(acc<LF.vs)continue;acc=0;put(p.x,p.z,p.tx,p.tz,S.r.w)}}
  for(const r of hubRoads())for(let d=8;d<r.L-8;d+=LF.vs)put(r.x0+r.ux*d,r.z0+r.uz*d,r.ux,r.uz,r.w);
  return LF.cx={VS,TREES:fra?['tree','tree2','tree3','tree']:['CE_olive','CE_pine','CE_cypress','CE_olive','tree2'],ROCK:fra?'rock':'CE_rock',
   GRN:fra?['#4fa83a','#3f8f30','#62b848','#2f7a2a']:['#7a9a48','#8aa858','#6b8a3e','#9aae6a'],DIRT:fra?['#a8865a','#d8c08a','#8a6a44']:['#c8a46a','#d8bc84','#b08a5a']}}
@@ -246,7 +246,7 @@ function* LF_tileG(L){LF_unreg(L);L.props=[];const C=LF_ctx(),fra=CID==='fra',[X
   m.computeBoundingSphere();m.castShadow=t==='mound';m.receiveShadow=true;m.userData.lf=t;m.userData.lfR=L.id;m.userData.nsh=t!=='mound';L.root.add(m);LF.ms.push(m);yield 'lf11'}
  st.regs=(st.regs||0)+1;LF.rp=K.rp;yield* lzPropsG(L)}
 // GO / tests: build the fill tiles around (x,z) now (a GO lands you there before lazyStep would reach them)
-function LF_ensure(x,z,r){if(typeof LAZY==='undefined')return 0;let n=0;for(const L of LAZY)if(L.lf&&!L.done&&lzD(L,x,z)<r){lzRun(L);n++}return n}
+function LF_ensure(x,z,r){if(typeof LAZY==='undefined')return 0;let n=0;for(let _k1=0,_c1=LAZY,L;_k1<_c1.length&&(L=_c1[_k1],true);_k1++)if(L.lf&&!L.done&&lzD(L,x,z)<r){lzRun(L);n++}return n}
 buildHubProps=(f=>function(){const r=f.apply(this,arguments);return BH_post(()=>{try{LF_reg()}catch(e){console.warn('LF reg',e)}if(LF.on)P2_after(LF_warm);return r})})(buildHubProps);
 // distance cull: each decor type hides past LF.R[type] m (checked every 15 frames)
 hubCullStep=(f=>function(){f.apply(this,arguments);if(!LF.ms||(LF.fr=(LF.fr|0)+1)%15)return;const cp=camera.position;for(const m of LF.ms){const s=m.boundingSphere;if(!s)continue;m.visible=Math.hypot(s.center.x-cp.x,s.center.z-cp.z)-s.radius<LF.R[m.userData.lf]}})(hubCullStep);

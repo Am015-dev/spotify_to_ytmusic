@@ -17,10 +17,10 @@ function SHB_step(){const T=SHB_pool();SHB.n=0;SHB.pl=null;let on=false;try{on=s
   const p=pl.mesh.position,air=Math.max(0,p.y+SHB.pb[2]-SHB_gy(p.x,p.z)),k=Math.max(.35,1-air*.15),w=Math.min(SHB.pb[0],SHB.pb[1])*1.15*k,L=Math.max(SHB.pb[0],SHB.pb[1])*1.1*k;
   SHB.pl=[p.x,p.z];SHB_put(p.x,SHB_gy(p.x,p.z,p.y+SHB.pb[2]),p.z,w,L,RO.h)}
  // city traffic (within 140 m): the car's instance matrix gives position + heading
- for(const c of HUB.cars||[]){if(c.dead>0||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z;if(dx*dx+dz*dz>140*140)continue;const im=HUB.cim&&HUB.cim[c.k];let h=c.h||0,y=c.y;
+ for(let _k1=0,_c1=HUB.cars||[],c;_k1<_c1.length&&(c=_c1[_k1],true);_k1++){if(c.dead>0||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z;if(dx*dx+dz*dz>140*140)continue;const im=HUB.cim&&HUB.cim[c.k];let h=c.h||0,y=c.y;
   if(im&&c.j!=null){im.getMatrixAt(c.j,SHB_M);SHB_M.decompose(SHB_V,SHB_Q,SHB_S);if(SHB_S.x<1e-3)continue;SHB_E.setFromQuaternion(SHB_Q,'YXZ');h=SHB_E.y;y=SHB_V.y}SHB_put(c.x,SHB_gy(c.x,c.z,y),c.z,2.3,4.8,h)}
  // people (within 90 m)
- for(const p of HUB.peds||[]){if(p._x!==p._x)continue;const dx=p._x-RO.x,dz=p._z-RO.z;if(dx*dx+dz*dz>90*90)continue;SHB_put(p._x,SHB_gy(p._x,p._z,p.y),p._z,.9,.9,0)}
+ for(let _k2=0,_c2=HUB.peds||[],p;_k2<_c2.length&&(p=_c2[_k2],true);_k2++){if(p._x!==p._x)continue;const dx=p._x-RO.x,dz=p._z-RO.z;if(dx*dx+dz*dz>90*90)continue;SHB_put(p._x,SHB_gy(p._x,p._z,p.y),p._z,.9,.9,0)}
  // trees (within 160 m)
  for(const t of SHB.trees){const dx=t[0]-RO.x,dz=t[1]-RO.z;if(dx*dx+dz*dz>160*160)continue;SHB_put(t[0],SHB_gy(t[0],t[1]),t[1],t[2],t[2],0)}
  T.count=SHB.n;T.instanceMatrix.needsUpdate=true}

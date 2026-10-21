@@ -183,7 +183,7 @@ function ART6_step(){const T=ART6_pool();let n=0;const put=m=>{if(n<640)T.setMat
       w.getWorldScale(ART6_S);lb.getCenter(ART6_V).applyMatrix4(w.matrixWorld);const r=Math.max(lb.max.y-lb.min.y,lb.max.z-lb.min.z)/2*ART6_S.y,t=(lb.max.x-lb.min.x)*ART6_S.x;
       ART6_V.y-=r-.015;ART6_M.compose(ART6_V,ART6_Q,ART6_S.set(t*1.25,1,r*1.1));put(ART6_M)}}
   // city traffic: wheel clusters of each model's wheel mesh × the car's instance matrix
-  if(state==='roam'&&RO.on&&HUB.cars&&HUB.cim)for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z;if(dx*dx+dz*dz>120*120)continue;const im=HUB.cim[c.k],wm=im&&im.userData.w;if(!wm)continue;
+  if(state==='roam'&&RO.on&&HUB.cars&&HUB.cim)for(let _j1=0,_b1=HUB.cars;_j1<_b1.length;_j1++){const c=_b1[_j1];if(c.dead>0||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z;if(dx*dx+dz*dz>120*120)continue;const im=HUB.cim[c.k],wm=im&&im.userData.w;if(!wm)continue;
     const W=ART6_wl[c.k]||(ART6_wl[c.k]=ART6_wheels(wm.geometry));wm.getMatrixAt(c.j,ART6_M);
     for(const q of W){ART6_L.makeScale(q[3]*1.25,1,q[4]*.55).setPosition(q[0],q[1]+.015,q[2]);put(ART6_L.premultiply(ART6_M))}}
   // race traffic: four corner patches inside the car footprint (its old shadow matrix: width×1.1, length×1.05 on the road)

@@ -12,7 +12,7 @@ function CVF_mat(p){const[w,h]=CVF_s(p);_m.compose(V3(p.x,p.y,p.z),new THREE.Qua
 function CVF_bedGeo(fl){const L=[];if(!fl){L.push([2.4,.32,0,0,0,'#9a948a'],[2.0,.06,.32,0,0,'#5a3a24']);for(const[a,b]of[[-.62,-.62],[.62,.62]])L.push([.72,.34,.36,a,b,'#4f9a36'])}
   else for(const[a,b]of[[-.7,.1],[-.1,.72],[.7,.2],[.2,-.72],[-.5,.62]])L.push([.4,.22,.36,a,b,'#ffffff']);return ART_brickGeo(L,null,0)/* ~130 tris a pit, no studs */}
 function CVF_apply(){if(!CVF.on||CVF.done||!HUB.props)return;CVF.done=1;const c=new THREE.Color(),beds=[],tou=new Set();
-  for(const p of HUB.props){if(!p.im||p.i==null||!CVF_RX.test(p.t))continue;CVF_mat(p);
+  for(let _k1=0,_c1=HUB.props,p;_k1<_c1.length&&(p=_c1[_k1],true);_k1++){if(!p.im||p.i==null||!CVF_RX.test(p.t))continue;CVF_mat(p);
     if(p.im.instanceColor){p.im.getColorAt(p.i,c);c.offsetHSL((CVF_h(p.x,p.z,3)-.5)*.06,(CVF_h(p.x,p.z,4)-.5)*.12,(CVF_h(p.x,p.z,5)-.5)*.14);p.im.setColorAt(p.i,c);tou.add(p.im)}CVF.n++;
     if(CVF_TREE.test(p.t)){const hh=CVF_h(p.x,p.z,6);if(hh<.5){let e=0;try{e=OC_roadE(p.x,p.z);if(inRiver(p.x,p.z,0)||onAnyDeck(p.x,p.z))e=0}catch(x){e=0}/* street trees (1.6-14 m off the road) get a pit half the time, park trees 1 in 8 */if(e>=1.6&&(e<14||hh<.12))beds.push(p)}}}
   for(const im of tou)if(im.instanceColor)im.instanceColor.needsUpdate=true;

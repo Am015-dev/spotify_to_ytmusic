@@ -70,7 +70,7 @@ const A2_POOL={ath:[['olive',.16,.6],['cypress',.1,.6],['aleppo',.06,.6],['plane
  fra:[['plane',.1,.8],['timber',.018,1.5],['tram',.025,.5],['ebbelwoi',.05,.9]]};
 function A2_city(){return CID==='fra'?'fra':'ath'}
 // park / plaza edges and slipways: a car leaving the road there must not meet a prop (xf1/grass, xf1/water): keep m metres clear of every PARKS rectangle and slipway
-function A2_verge(x,z,m){if(typeof PARKS!=='undefined')for(const R of PARKS)if(x>R.x0-m&&x<R.x1+m&&z>R.z0-m&&z<R.z1+m)return true;if(typeof SLIPS!=='undefined')for(const S of SLIPS)if((x-S.x)**2+(z-S.z)**2<m*m)return true;return false}
+function A2_verge(x,z,m){if(typeof PARKS!=='undefined')for(const R of PARKS)if(x>R.x0-m&&x<R.x1+m&&z>R.z0-m&&z<R.z1+m)return true;if(typeof SLIPS!=='undefined')for(let _k1=0,_c1=SLIPS,S;_k1<_c1.length&&(S=_c1[_k1],true);_k1++)if((x-S.x)**2+(z-S.z)**2<m*m)return true;return false}
 // open verge: nothing solid within 30 m behind the kerb (n = direction away from the road): a car leaving the road there drives onto open ground (xf1/grass picks exactly these edges), so keep the kerb clear
 function A2_open(x,z,nx,nz){for(let d=6;d<=30;d+=6){const px=x+nx*d,pz=z+nz*d;if(roamHit(px,pz,3,groundY(px,pz)+.5))return false}return true}
 function A2_free(x,z,r){const k=Math.round(x/3)+'|'+Math.round(z/3);if(A2.occ.has(k))return false;if(LV_onRoad(x,z,.9+Math.min(r,3)*.4))return false;if(typeof OC_roadE==='function'&&OC_roadE(x,z)<Math.min(r,3)+.8)return false;if(A2_verge(x,z,14))return false;if(roamHit(x,z,r+.3,groundY(x,z)+.5))return false;A2.occ.add(k);return true}

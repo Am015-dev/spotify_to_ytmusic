@@ -111,9 +111,9 @@ const OB_kunion=(a,b)=>{a=OB_kf(a);b=OB_kf(b);if(a!==b)OB_KA.set(b,a);return a};
 let OB_kn=0;const OB_log=(t,x,z,d)=>{if(OB_RA.log.length<400)OB_RA.log.push([t,Math.round(x),Math.round(z),Math.round(d)])};OB_RA.log=[];
 // is (x,z) a deliberate cut (world edge, river bank, bridge deck)? such ends are not dead ends
 function OB_cut(x,z,w){if(x<WX0+44||x>WX1-44||z<WZS+44||z>WZN-44)return 1;if(WATERS.length&&inRiver(x,z,-24))return 2;
-  for(const b of BRIDGES){if(b.kind==='foot'||Math.abs(x-b.cx)>b.r+40||Math.abs(z-b.cz)>b.r+40)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(a)<b.half+26&&Math.abs(c)<b.w/2+w/2+14)return 3}return 0}
+  for(let _j1=0,_b1=BRIDGES;_j1<_b1.length;_j1++){const b=_b1[_j1];if(b.kind==='foot'||Math.abs(x-b.cx)>b.r+40||Math.abs(z-b.cz)>b.r+40)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(a)<b.half+26&&Math.abs(c)<b.w/2+w/2+14)return 3}return 0}
 function OB_okLine(x0,z0,x1,z1){const d=Math.hypot(x1-x0,z1-z0),n=Math.max(1,Math.ceil(d/3));for(let m=0;m<=n;m++){const x=x0+(x1-x0)*m/n,z=z0+(z1-z0)*m/n;if(x<WX0+30||x>WX1-30||z<WZS+30||z>WZN-30)return false;if(WATERS.length&&inRiver(x,z,-6))return false;
-  for(const b of BRIDGES){if(Math.abs(x-b.cx)>b.r+8||Math.abs(z-b.cz)>b.r+8)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(a)<b.half+3&&Math.abs(c)<b.w/2+4)return false}}return true}
+  for(let _j2=0,_b2=BRIDGES;_j2<_b2.length;_j2++){const b=_b2[_j2];if(Math.abs(x-b.cx)>b.r+8||Math.abs(z-b.cz)>b.r+8)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(a)<b.half+3&&Math.abs(c)<b.w/2+4)return false}}return true}
 // snapshot of the drivable network: samples grid, junction flags (the game's own rules), union-find components, dead ends
 function OB_net(segs,ext){segs=segs||CITY_S.filter(OB_DRV);const n=segs.length,G=new Map(),ck=(x,z)=>(Math.floor(x/32)+4096)*8192+Math.floor(z/32)+4096;
   segs.forEach((S,a)=>S.pts.forEach((p,i)=>{const k=ck(p.x,p.z);let L=G.get(k);if(!L)G.set(k,L=[]);L.push(a,i)}));
@@ -157,11 +157,11 @@ function OB_fix(){const t0=performance.now();OB_RA.before=OB_sum(OB_net());if(!O
   //    Frankfurt: its streets are tied together by the filler grid / bridges / Autobahn at runtime, so only the grid pass (OB_fillFix) runs there.
   if(CID!=='fra')OB_orphPass(O);
   OB_crossPass(O);OB_deadPass(O);for(let k=0;k<3&&OB_crossPass(O);k++);OB_RA.crossLeft=OB_crossPass({cross:0});
-  if(CID!=='fra')for(const S of CITY_S)for(const p of S.pts)if(p.k!=null)p.k=OB_kf(p.k);
+  if(CID!=='fra')for(let _k1=0,_c1=CITY_S,S;_k1<_c1.length&&(S=_c1[_k1],true);_k1++)for(const p of S.pts)if(p.k!=null)p.k=OB_kf(p.k);
   OB_RA.fixed=OB_sum(OB_net());OB_RA.ms=Math.round(performance.now()-t0)}
 // 0. hairpin spikes (an OSM vertex that doubles back < 8 m, e.g. a street folding over its own junction): sample dropped
-function OB_despike(){const KC=new Map();for(const S of CITY_S)for(const p of S.pts)if(p.k!=null)KC.set(p.k,(KC.get(p.k)||0)+1);let n=0;
-  for(const S of CITY_S){if(!OB_DRV(S))continue;const P=S.pts;for(let i=1;i+1<P.length;i++){const a=P[i-1],p=P[i],b=P[i+1],ax=p.x-a.x,az=p.z-a.z,bx=b.x-p.x,bz=b.z-p.z,la=Math.hypot(ax,az),lb=Math.hypot(bx,bz);
+function OB_despike(){const KC=new Map();for(let _k2=0,_c2=CITY_S,S;_k2<_c2.length&&(S=_c2[_k2],true);_k2++)for(const p of S.pts)if(p.k!=null)KC.set(p.k,(KC.get(p.k)||0)+1);let n=0;
+  for(let _j3=0,_b3=CITY_S;_j3<_b3.length;_j3++){const S=_b3[_j3];if(!OB_DRV(S))continue;const P=S.pts;for(let i=1;i+1<P.length;i++){const a=P[i-1],p=P[i],b=P[i+1],ax=p.x-a.x,az=p.z-a.z,bx=b.x-p.x,bz=b.z-p.z,la=Math.hypot(ax,az),lb=Math.hypot(bx,bz);
     if(!la||!lb||Math.min(la,lb)>8||(ax*bx+az*bz)/(la*lb)>-.7||(p.k!=null&&KC.get(p.k)>1))continue;P.splice(i,1);i--;n++;let s0=0;for(let k=0;k<P.length;k++){if(k)s0+=Math.hypot(P[k].x-P[k-1].x,P[k].z-P[k-1].z);P[k].s=s0}S.L=s0}}return n}
 // 1. crossings of two drivable streets without a junction: one shared sample on both
 function OB_crossPass(O){{const N=OB_net(),S=N.segs,J=new Map(),jk=(x,z)=>Math.floor(x/16)*100000+Math.floor(z/16);for(let j=0;j<N.joins.length;j+=4){const k=jk(N.joins[j+2],N.joins[j+3]);let L=J.get(k);if(!L)J.set(k,L=[]);L.push(N.joins[j],N.joins[j+1],N.joins[j+2],N.joins[j+3])}
@@ -272,7 +272,7 @@ function RD_prune(){if(CID==='fra')return;const O=RD.ops;for(let round=0;round<2
   // pieces cut off from the main network (< 3 km): dropped
   {const N=OB_net(),kill=new Set();N.segs.forEach((S,a)=>{const r=N.find(a);if(r!==N.main&&(N.comps.get(r)||0)<3000)kill.add(S)});if(kill.size){O.orph=kill.size;for(let i=CITY_S.length-1;i>=0;i--)if(kill.has(CITY_S[i]))CITY_S.splice(i,1)}}}
 function RD_net(){if(!RD_ON)return;RD.before=OB_sum(OB_net());RD_prune();
-  if(CID!=='fra'){const O=RD.ops,WM={arterial:[13,1.25,22],main:[11,1.2,18],sec:[8,1,12],res:[7,1,10],link:[7,1,10]};const seen=new Set();for(const S of CITY_S){const r=S.r;if(seen.has(r))continue;seen.add(r);if(r.one){r.one0=1;r.one=0;O.two++}const m=WM[r.cls];if(m){const w=Math.min(Math.max(r.w,m[2]),Math.max(m[0],r.w*m[1]));if(w>r.w+.05){r.w0=r.w;r.w=+w.toFixed(1);O.wide++}}}}
+  if(CID!=='fra'){const O=RD.ops,WM={arterial:[13,1.25,22],main:[11,1.2,18],sec:[8,1,12],res:[7,1,10],link:[7,1,10]};const seen=new Set();for(let _j4=0,_b4=CITY_S;_j4<_b4.length;_j4++){const S=_b4[_j4];const r=S.r;if(seen.has(r))continue;seen.add(r);if(r.one){r.one0=1;r.one=0;O.two++}const m=WM[r.cls];if(m){const w=Math.min(Math.max(r.w,m[2]),Math.max(m[0],r.w*m[1]));if(w>r.w+.05){r.w0=r.w;r.w=+w.toFixed(1);O.wide++}}}}
   RD.after=OB_sum(OB_net())}
 // dev1 (v90k/fra-net, Frankfurt): a filler-grid road whose end is still not a junction runs on along its own line to the next road within 150 m
 // (street, other grid road), stopping at that road's centre line; if none (or the Main is in the way) it is trimmed back to its last crossing
@@ -308,7 +308,7 @@ function cityAt(x,z,skip=-1,np=false,out=null){const kx=Math.floor(x/64),kz=Math
 const AJ=[];if(CID!=='fra'){const JK=new Map();CITY_S.forEach((S,si)=>S.pts.forEach((p,i)=>{if(p.k==null)return;let L=JK.get(p.k);if(!L)JK.set(p.k,L=[]);L.push(si,i)}));
   for(const L of JK.values()){if(L.length<4)continue;const ids=[],ix=[];let wm=0,ends=0,road=0;for(let j=0;j<L.length;j+=2){const S=CITY_S[L[j]],i=L[j+1];ix.push([L[j],i]);S.pts[i].j=1;if(!ids.includes(L[j]))ids.push(L[j]);wm=Math.max(wm,S.r.w);if(i===0||i===S.pts.length-1)ends++;if(S.r.cls!=='ped')road++}
     const p=CITY_S[L[0]].pts[L[1]],pass=ix.length===2&&ends===2&&Math.abs(CITY_S[ix[0][0]].r.w-CITY_S[ix[1][0]].r.w)<3;AJ.push({x:p.x,z:p.z,r:pass||!road?0:wm/2+1.5,ids,ix})}}
-const JUNC=[];if(CID!=='fra'){for(const J of AJ)if(J.r>0)JUNC.push(J)}else{const add=(x,z,r,a,b)=>{for(const J of JUNC)if(Math.hypot(J.x-x,J.z-z)<26){J.r=Math.max(J.r,r);if(!J.ids.includes(a))J.ids.push(a);if(!J.ids.includes(b))J.ids.push(b);return}JUNC.push({x,z,r,ids:[a,b]})};
+const JUNC=[];if(CID!=='fra'){for(const J of AJ)if(J.r>0)JUNC.push(J)}else{const add=(x,z,r,a,b)=>{for(let _k3=0,_c3=JUNC,J;_k3<_c3.length&&(J=_c3[_k3],true);_k3++)if(Math.hypot(J.x-x,J.z-z)<26){J.r=Math.max(J.r,r);if(!J.ids.includes(a))J.ids.push(a);if(!J.ids.includes(b))J.ids.push(b);return}JUNC.push({x,z,r,ids:[a,b]})};
   CITY_S.forEach((S,si)=>{const P=S.pts;for(let i=0;i<P.length;i++){const end=i===0||i===P.length-1,q=cityAt(P[i].x,P[i].z,si);if(!q)continue;const wB=q.road.w;if(q.d<6||(end&&q.d<wB/2+10))add(q.p.x,q.p.z,Math.max(S.r.w,wB)/2+3,si,q.si)}})}
 // ---------- landmarks, plazas and parks (exclusions for the filler grid and buildings)
 const PLAZAS=RF.plazas.map(([name,r])=>({name,...rfRect(r)})),PARKS=RF.parks.map(([name,r])=>({name,...rfRect(r)}));

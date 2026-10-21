@@ -1,7 +1,7 @@
 // slow1: 📍 GO slow1/spots (called from RV2K2_go kind 'slowspots', src/99c_checklist.js; own module to keep that file under 200 KB)
 function SLOW1_go(){const ok=b=>b?' ✅':' ❌';/* slow1: the spots where a road-following car used to slow or stick with nothing to see. Traffic is parked away for the run (it is a visible reason, and random); the check is geometry: no solid set piece stands on the drawn street (LIFE_free), and a car driven through each spot keeps ≥ 40 km/h within 40 m of it (the bridge is a hard corner: a bot that overshoots it is a steering matter, so each run ends once the car is past the spot) and is never unstuck-warped */
   const SP=CID==='fra'?[['Frankfurt -482,-161 →',-482,-161,0],['Frankfurt -482,-161 ←',-482,-161,Math.PI],['bridge 576,-306',576,-306,Math.PI]]:[['Athens -2466,-1512 →',-2466,-1512,0],['Athens -2466,-1512 ←',-2466,-1512,Math.PI]],W=a=>Math.atan2(Math.sin(a),Math.cos(a)),sv=(HUB.cars||[]).map(c=>[c,c.dead,c.x,c.z]),out=[];let bad=0;
-  try{for(const c of HUB.cars){c.dead=1e9;c.x=1e6}
+  try{for(let _j1=0,_b1=HUB.cars;_j1<_b1.length;_j1++){const c=_b1[_j1];c.dead=1e9;c.x=1e6}
    for(const[nm,X,Z,fl]of SP){const q=rfSnap(X,Z,60);if(!q){out.push(nm+' no road');bad++;continue}
     const seen=new Map();for(let a=-240;a<=240;a+=60)for(let b=-240;b<=240;b+=60){const r=rfSnap(X+a,Z+b,30);if(!r||Math.hypot(r[0]-X-a,r[1]-Z-b)>30)continue;roamWarp(r[0],r[1],r[2],true);RO.v=0;roamStep(1/30);roamStep(1/30);for(const it of(window.__life&&__life.LIFE.H)||[])seen.set(it.id,it)}
     let on=0;for(const it of seen.values()){if(it.c==='grp'||it.c==='pop')continue;const r=it.r||.5;for(let k=0;k<8;k++){const x=it.x+Math.cos(k*.785)*r*.9,z=it.z+Math.sin(k*.785)*r*.9,c=cityAt(x,z);if(c&&c.road&&c.d<c.road.w/2-.3){on++;break}}}

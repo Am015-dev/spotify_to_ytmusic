@@ -38,7 +38,7 @@ function SKS_tyres(W,H){const b=SKS.b||(SKS.b=new THREE.Box3()),o=[];for(const w
 // (traffic is seated on the mean of its 4 corner grounds, FX19_seat: on a kerb or camber one corner reads up to ~9 cm)
 // a jump ramp's side rails (addRamp neon strips, LIFE kicker red rails) run along its edges a few cm above the slope: a tyre on that band is against an
 // obstacle, not sunk in the road: not judged while you drive (|lateral| within w/2 ± 0.45 m, along the ramp). Parked there (a spawn) still fails.
-function SKS_rail(x,z){for(const r of RO.ramps||[]){const dx=x-r.x,dz=z-r.z,sh=Math.sin(r.h),ch=Math.cos(r.h),a=dx*sh+dz*ch,c=dx*ch-dz*sh;if(Math.abs(a)<r.len/2+.5&&Math.abs(Math.abs(c)-r.w/2)<.45)return true}return false}
+function SKS_rail(x,z){for(let _k1=0,_c1=RO.ramps||[],r;_k1<_c1.length&&(r=_c1[_k1],true);_k1++){const dx=x-r.x,dz=z-r.z,sh=Math.sin(r.h),ch=Math.cos(r.h),a=dx*sh+dz*ch,c=dx*ch-dz*sh;if(Math.abs(a)<r.len/2+.5&&Math.abs(Math.abs(c)-r.w/2)<.45)return true}return false}
 // kerb-parked traffic (c.pk) may put a tyre on the 0.5 m kerb-stone strip drawn 25 cm up (v90k/kerb-parked placement, not a start sink): judged against the
 // ground only, its drawn-surface hits are listed as a warning
 const SKS_rok=(q,k)=>k==='pl'&&Math.abs(RO.v)>1&&SKS_rail(q.x,q.z),SKS_kerb=(q,k)=>k==='tr'&&q.pk&&q.v!=null&&q.v<-.08;
@@ -58,7 +58,7 @@ function SKS_sample(mode){const r={pl:[],tr:[],ot:[]};if(!pl||!pl.mesh)return r;
   {const ys=W.map(w=>(b.setFromObject(w,true),b.min.y));r.pl=SKS_tyres(W,W.length&&mode>=1?win(RO.x,RO.z,8,128,ys):null)}
   if(!(mode>=2))return r;
   // traffic within 60 m: the 4 tyre contact points of its wheel instance (SKS_trTyres), one 6 m picture per car; other wheeled meshes within 60 m: one per mesh
-  for(const c of HUB.cars||[]){if(c.dead>0||c.x==null||(c.x===0&&c.z===0)||Math.hypot(c.x-RO.x,c.z-RO.z)>60)continue;const T=SKS_trTyres(c),H=win(c.x,c.z,6,48,T.map(p=>p.y));
+  for(let _k2=0,_c2=HUB.cars||[],c;_k2<_c2.length&&(c=_c2[_k2],true);_k2++){if(c.dead>0||c.x==null||(c.x===0&&c.z===0)||Math.hypot(c.x-RO.x,c.z-RO.z)>60)continue;const T=SKS_trTyres(c),H=win(c.x,c.z,6,48,T.map(p=>p.y));
     for(const p of T){const s=H(p.x,p.z);r.tr.push({x:p.x,z:p.z,pk:!!c.pk,g:p.y-groundAt(p.x,p.z,p.y+1),v:s==null?null:p.y-s})}}
   const ex=new Set();pl.mesh.traverse(o=>ex.add(o));const O=[];scene.traverseVisible(o=>{if(o.isMesh&&o.userData.r&&!ex.has(o)){o.getWorldPosition(_skO);if(Math.hypot(_skO.x-RO.x,_skO.z-RO.z)<=60)O.push(o)}});
   for(const w of O){b.setFromObject(w,true);r.ot.push(...SKS_tyres([w],win((b.min.x+b.max.x)/2,(b.min.z+b.max.z)/2,4,32,[b.min.y])))}return r}

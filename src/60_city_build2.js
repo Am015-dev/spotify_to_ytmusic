@@ -141,7 +141,7 @@ function athTerrainBuild(bt,BM,M,grp,G){const A=HILL_BY.akro;
   if(A&&OC.ring0){const N=64,pt=t=>{const u=Math.sin(t),v=Math.cos(t),de=(u*A.rx*.985)*A.ca+(v*A.rz*.985)*A.sa,dn=-(u*A.rx*.985)*A.sa+(v*A.rz*.985)*A.ca;return[A.cx-de*A.sx,A.cz+dn*A.sz,u]};
     for(let k=0;k<N;k++){const t0=k/N*Math.PI*2,t1=(k+1)/N*Math.PI*2,[x0,z0,u0]=pt(t0),[x1,z1,u1]=pt(t1);if((u0+u1)/2<-.42)continue;const cx=(x0+x1)/2,cz=(z0+z1)/2,L=Math.hypot(x1-x0,z1-z0)+2.2,ry=Math.atan2(-(z1-z0),x1-x0);
       bt.add(cbox(L,4.2,1.8,cx,A.H+.4,cz,'#d8c9a8',ry),BM.plain);bt.add(cbox(L,.5,2.2,cx,A.H+2.55,cz,'#c8b894',ry),BM.plain);hubAddB({x:cx,z:cz,hw:L/2,hd:1.1,h:A.H+2.5,ry})}}
-  for(const S of CITY_S){if(S.r.id!=='lyka')continue;const H=HILL_BY.lyka,P=S.pts;for(let i=6;i<P.length-3;i+=2){const p=P[i];if(p.y<6)continue;const ox=p.x-H.cx,oz=p.z-H.cz,sd=(ox*p.tz-oz*p.tx)>0?1:-1,o=S.r.w/2+1.2,x=p.x+p.tz*sd*o,z=p.z-p.tx*sd*o,ry=Math.atan2(-p.tz,p.tx);
+  for(let _j1=0,_b1=CITY_S;_j1<_b1.length;_j1++){const S=_b1[_j1];if(S.r.id!=='lyka')continue;const H=HILL_BY.lyka,P=S.pts;for(let i=6;i<P.length-3;i+=2){const p=P[i];if(p.y<6)continue;const ox=p.x-H.cx,oz=p.z-H.cz,sd=(ox*p.tz-oz*p.tx)>0?1:-1,o=S.r.w/2+1.2,x=p.x+p.tz*sd*o,z=p.z-p.tx*sd*o,ry=Math.atan2(-p.tz,p.tx);
       bt.add(cbox(17,1.1,.7,x,p.y+.55,z,i%8<2?'#e8e2d4':'#f4f0e6',ry),BM.plain);hubAddB({x,z,hw:8.5,hd:.35,h:p.y+1.3,y0:p.y-2.5,ry})}}
   for(const L of LMX){if(/^(g_|garaz)/.test(L.id))continue;const ru=/hephaestus|stoa|hadrianlib|olympieion|arch|museum|stadium/.test(L.id),s2=Math.min(L.r*1.5,150);if(hillH(L.x,L.z)>.5)continue;G(s2,s2,L.x,L.z,.011,ru?M.grass:M.cobble,s2/14,s2/14);ZONES.push({t:ru?'grass':'plaza',x0:L.x-s2/2,x1:L.x+s2/2,z0:L.z-s2/2,z1:L.z+s2/2,name:L.name})}
   HUB.ridge=athRidge();grp.add(HUB.ridge)}

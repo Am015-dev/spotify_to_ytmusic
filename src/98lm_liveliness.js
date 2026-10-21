@@ -24,8 +24,8 @@ function LVM_pix(){try{composer.render()}catch(e){try{renderer.render(scene,came
    if(!(gg>r*1.08&&gg>b*1.12&&gg-Math.min(r,b)>28)){ok=0;break}const L=.3*r+.59*gg+.11*b;s+=L;s2+=L*L}
   if(ok&&s2/16-(s/16)**2<30)flat+=16}
  const n=W*H;let cols=0;for(const v of bins.values())if(v>=n*.002)cols++;return{green:+(flat/n*100).toFixed(1),cols}}
-function LVM_measure(){const x=RO.x,z=RO.z,R2=2500;let props=0,life=0;for(const q of HUB.props||[])if(q.alive!==false&&(q.x-x)**2+(q.z-z)**2<R2)props++;
- for(const p of HUB.peds||[])if(p&&p.on!==false&&p.x!=null&&(p.x-x)**2+(p.z-z)**2<R2)life++;
+function LVM_measure(){const x=RO.x,z=RO.z,R2=2500;let props=0,life=0;for(let _k1=0,_c1=HUB.props||[],q;_k1<_c1.length&&(q=_c1[_k1],true);_k1++)if(q.alive!==false&&(q.x-x)**2+(q.z-z)**2<R2)props++;
+ for(let _k2=0,_c2=HUB.peds||[],p;_k2<_c2.length&&(p=_c2[_k2],true);_k2++)if(p&&p.on!==false&&p.x!=null&&(p.x-x)**2+(p.z-z)**2<R2)life++;
  const v=new THREE.Vector3();camera.getWorldDirection(v);const a0=Math.atan2(v.x,v.z);let lo=1e9,hi=-1e9;
  for(let r=30;r<=200;r+=17)for(let k=-4;k<=4;k++){const a=a0+k*.13,sx=camera.position.x+Math.sin(a)*r,sz=camera.position.z+Math.cos(a)*r;let y=0;try{y=groundAt(sx,sz,999)}catch(e){}if(!isFinite(y))continue;lo=Math.min(lo,y);hi=Math.max(hi,y)}
  return Object.assign(LVM_pix(),{props,life,hr:+(hi-lo).toFixed(1)})}

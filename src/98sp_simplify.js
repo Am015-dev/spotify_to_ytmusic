@@ -16,11 +16,11 @@ function SIMP_rectP(R,x0,x1,z0,z1){const RS=SIMP_RS,M=SIMP_PE+10,i0=Math.max(0,M
   for(let j=j0;j<=j1;j++){const pz=R.z0+(j+.5)*RS;for(let i=i0;i<=i1;i++){const px=R.x0+(i+.5)*RS,e=Math.hypot(Math.max(x0-px,0,px-x1),Math.max(z0-pz,0,pz-z1));if(e>M)continue;const v=Math.ceil(e),k=j*R.nx+i;if(v<R.D[k])R.D[k]=v}}}
 function SIMP_poly(R,P,hw){for(let i=1;i<P.length;i++)SIMP_paint(R,P[i-1].x,P[i-1].z,P[i].x,P[i].z,hw)}
 function SIMP_R(){const S=SIMP_S();if(S.R)return S.R;const t=performance.now(),x0=WX0,z0=WZS,nx=Math.ceil((WX1-WX0)/SIMP_RS),nz=Math.ceil((WZN-WZS)/SIMP_RS),R={x0,z0,nx,nz,D:new Uint8Array(nx*nz).fill(255),lz:0};
-  for(const s of CITY_S)if(s.r.cls!=='hill')SIMP_poly(R,s.pts,s.r.w/2);
+  for(let _k1=0,_c1=CITY_S,s;_k1<_c1.length&&(s=_c1[_k1],true);_k1++)if(s.r.cls!=='hill')SIMP_poly(R,s.pts,s.r.w/2);
   for(const f of FILL_R||[])SIMP_paint(R,f.x0,f.z0,f.x1,f.z1,f.w/2);
   try{for(const a of abSamples())SIMP_poly(R,a.pts,a.r.w/2)}catch(e){}
   try{for(const P of PLAZAS)SIMP_rectP(R,P.x0,P.x1,P.z0,P.z1)}catch(e){}
-  try{for(const b of ALL_DECKS){const[ax,az]=deckPt(b,-b.hw,0),[bx,bz]=deckPt(b,b.hw,0);SIMP_paint(R,ax,az,bx,bz,b.w/2)}}catch(e){}/* bridges */
+  try{for(let _j1=0,_b1=ALL_DECKS;_j1<_b1.length;_j1++){const b=_b1[_j1];const[ax,az]=deckPt(b,-b.hw,0),[bx,bz]=deckPt(b,b.hw,0);SIMP_paint(R,ax,az,bx,bz,b.w/2)}}catch(e){}/* bridges */
   S.R=R;S.st.rasterMs=Math.round(performance.now()-t);return R}
 // biome roads are planned after the city (lzPlanAll): painted once they exist
 function SIMP_lzRoads(){const R=SIMP_R();if(R.lz>=LZ.roads.length)return;for(let i=R.lz;i<LZ.roads.length;i++){const S=LZ.roads[i];SIMP_poly(R,S.pts,(S.w||8)/2)}R.lz=LZ.roads.length}
@@ -46,7 +46,7 @@ function SIMP_pockets(){const S=SIMP_S();if(!S.on||!HUB.grp||(S.P&&S.P.grp===HUB
   const BIO=LAZY.filter(L=>!/^(lf_|woods)/.test(L.id)).map(L=>({x0:L.rect[0],x1:L.rect[1],z0:L.rect[2],z1:L.rect[3]})),PZ=[...PARKS,...PLAZAS],ZP=(typeof ZONES!=='undefined'?ZONES:[]).filter(Z=>Z.t==='plaza'||Z.t==='cobble');
   const ok=(x,z)=>{if(SIMP_D(x,z)<SIMP_PE)return false;for(const[a,b]of[[-.5,-.5],[.5,-.5],[-.5,.5],[.5,.5]])if(SIMP_D(x+a*C,z+b*C)<SIMP_PE)return false;
     if(SIMP_isEx(x,z,8)||inRiver(x,z,-(C+6))||onAnyDeck(x,z)||hillH(x,z)>.5)return false;if(PZ.some(R=>SIMP_inRect(R,x,z,6))||ZP.some(R=>SIMP_inRect(R,x,z,4))||BIO.some(R=>SIMP_inRect(R,x,z,20)))return false;
-    try{if(trailDist(x,z)<C+8||mtnDist(x,z)<C+14)return false}catch(e){}for(const q of RO.ramps||[])if(q.x!=null&&Math.hypot(q.x-x,q.z-z)<50)return false;return true};
+    try{if(trailDist(x,z)<C+8||mtnDist(x,z)<C+14)return false}catch(e){}for(let _k2=0,_c2=RO.ramps||[],q;_k2<_c2.length&&(q=_c2[_k2],true);_k2++)if(q.x!=null&&Math.hypot(q.x-x,q.z-z)<50)return false;return true};
   for(let j=0;j<nz;j++)for(let i=0;i<nx;i++)if(ok(x0+(i+.5)*C,z0+(j+.5)*C))M[j*nx+i]=1;
   // drop small pockets (< 4 cells): a hedge box round one back yard reads as clutter
   {const seen=new Uint8Array(nx*nz),st=[];for(let k=0;k<nx*nz;k++){if(!M[k]||seen[k])continue;const comp=[];st.push(k);seen[k]=1;while(st.length){const q=st.pop();comp.push(q);const i=q%nx,j=(q-i)/nx;for(const[a,b]of[[1,0],[-1,0],[0,1],[0,-1]]){const ii=i+a,jj=j+b;if(ii<0||jj<0||ii>=nx||jj>=nz)continue;const kk=jj*nx+ii;if(M[kk]&&!seen[kk]){seen[kk]=1;st.push(kk)}}}if(comp.length<4)for(const q of comp)M[q]=0}}
@@ -116,7 +116,7 @@ function SIMP_farClean(only){const S=SIMP_S();if(!S.on)return;const t0=performan
     HUB.grp.traverse(o=>{if(!o.isInstancedMesh||!(SIMP_solidTag(o)||o.userData.athB))return;let dirty=false;for(let i=0;i<o.count;i++){o.getMatrixAt(i,Mx);P.setFromMatrixPosition(Mx);const L=FG.get(Math.floor(P.x/40)*10000+Math.floor(P.z/40));if(!L)continue;for(const b of L)if(bHit(b,P.x,P.z,.6)){o.setMatrixAt(i,Z);dirty=true;if(!del.has(b)){del.add(b);S.st.farHid=(S.st.farHid||0)+1}break}}if(dirty){o.instanceMatrix.needsUpdate=true;o.computeBoundingSphere()}});for(const b of del)F.delete(b)}
   const rc=new THREE.Raycaster(),objs=[];HUB.grp.traverse(q=>{if((q.isMesh||q.isInstancedMesh)&&!q.userData.trG&&!q.userData.gk&&!q.userData.simp&&!q.userData.lf)objs.push(q)});HUB.grp.updateMatrixWorld(true);
   for(const b of F){const g=groundY(b.x,b.z);let any=false;for(const[a,c]of[[0,0],[.3,.3],[-.3,-.3]]){rc.set(V3(b.x+a*b.hw,g+400,b.z+c*b.hd),V3(0,-1,0));rc.far=400-.5;try{if(rc.intersectObjects(objs,false).some(h=>h.point.y>g+1.5)){any=true;break}}catch(e){any=true}}if(!any){del.add(b);ghost++}}
-  if(del.size){let j=0;for(const b of HUB.bld)if(!del.has(b))HUB.bld[j++]=b;HUB.bld.length=j;for(const[k,A]of HUB.grid){if(A.some(b=>del.has(b)))HUB.grid.set(k,A.filter(b=>!del.has(b)))}}
+  if(del.size){let j=0;for(let _k3=0,_c3=HUB.bld,b;_k3<_c3.length&&(b=_c3[_k3],true);_k3++)if(!del.has(b))HUB.bld[j++]=b;HUB.bld.length=j;for(const[k,A]of HUB.grid){if(A.some(b=>del.has(b)))HUB.grid.set(k,A.filter(b=>!del.has(b)))}}
   const fc=S.st.farClean||{ctb:0,ghost:0,left:0,ms:0};S.st.farClean={ctb:fc.ctb+ctb,ghost:fc.ghost+ghost,left:only?fc.left:F.size-ghost,ms:fc.ms+Math.round(performance.now()-t0)}}
 // hooks: pockets after the biome plan (city grid + biome roads known), pocket trees after the props, SOLID once the roam world is up and after each biome
 if(typeof lzPlanAll==='function'){const _f=lzPlanAll;lzPlanAll=function(){const r=_f.apply(this,arguments);try{SIMP_pockets()}catch(e){console.warn('SIMP pockets',e)}return r}}
@@ -129,7 +129,7 @@ const SIMP_BASE={fra:{calls:1878,tris:17661206},ath:{calls:654,tris:5090560}};/*
 function SIMP_inHX(x,z){return x>HX0&&x<HX1&&z>HZS&&z<HZN}
 function SIMP_isBld(b){return !b.simp&&b.hw>=2.5&&b.hd>=2.5&&(b.h-(b.trMin??0))>3}
 // buildings in the city box whose whole footprint is > 25 m from a road edge (landmarks / story spots / garages exempt)
-function SIMP_farList(){SIMP_lzRoads();const F=[],BIO=LAZY.filter(L=>!/^(lf_|woods)/.test(L.id)).map(L=>L.rect);let n=0;for(const b of HUB.bld){if(!SIMP_isBld(b)||!SIMP_inHX(b.x,b.z))continue;if(BIO.some(r=>b.x>r[0]&&b.x<r[1]&&b.z>r[2]&&b.z<r[3]))continue;/* district set pieces (Osthafen port, Fraport…) are curated like landmarks */n++;const c=b.c??1,s=b.s??0;if(SIMP_fpD(b.x,b.z,b.hw*2+2,b.hd*2+2,c,s)>SIMP_CUT&&!SIMP_isEx(b.x,b.z))F.push(b)/* colliders sit up to 1 m inside the visual */}return{n,far:F}}
+function SIMP_farList(){SIMP_lzRoads();const F=[],BIO=LAZY.filter(L=>!/^(lf_|woods)/.test(L.id)).map(L=>L.rect);let n=0;for(let _j2=0,_b2=HUB.bld;_j2<_b2.length;_j2++){const b=_b2[_j2];if(!SIMP_isBld(b)||!SIMP_inHX(b.x,b.z))continue;if(BIO.some(r=>b.x>r[0]&&b.x<r[1]&&b.z>r[2]&&b.z<r[3]))continue;/* district set pieces (Osthafen port, Fraport…) are curated like landmarks */n++;const c=b.c??1,s=b.s??0;if(SIMP_fpD(b.x,b.z,b.hw*2+2,b.hd*2+2,c,s)>SIMP_CUT&&!SIMP_isEx(b.x,b.z))F.push(b)/* colliders sit up to 1 m inside the visual */}return{n,far:F}}
 // 20 fixed street spots (seeded) in the city box
 function SIMP_spots(k=20,seed=77){const rnd=mul(seed),S=CITY_S.filter(S=>S.r.cls!=='quay'&&S.r.cls!=='hill'&&S.r.cls!=='ped'),o=[];let t=0;while(o.length<k&&t++<50000){const s=S[Math.floor(rnd()*S.length)],p=s.pts[Math.floor(rnd()*s.pts.length)];if(SIMP_inHX(p.x,p.z)&&Math.abs(p.x-HX0)>200&&Math.abs(p.x-HX1)>200)o.push([p.x,p.z])}return o}
 // building-like visuals (tagged instanced meshes, ≥ 1.8 m deep, ≥ 2.5 m tall, standing on the ground) within 300 m of the spots, and how many have no collider
@@ -145,8 +145,8 @@ function SIMP_park(x,z,h){try{OF_reset()}catch(e){}if(RO.wk){RO.wk=null;try{RBRK
 const SIMP_wait=ms=>new Promise(r=>setTimeout(r,ms));
 // test-only: traffic cars near the test path are sent to a far node (a traffic car ramming the test car turned it 90° and failed a facade run)
 function SIMP_clearTraffic(x,z,r){const N=HUB.nodes||[];let far=-1;for(let i=0;i<N.length;i+=7)if(N[i].nb&&N[i].nb.length&&Math.hypot(N[i].x-x,N[i].z-z)>400){far=i;break}if(far<0)return 0;let n=0;
-  for(const c of HUB.cars||[]){if(c.route||c.pk||Math.hypot(c.x-x,c.z-z)>r)continue;c.a=far;c.b=N[far].nb[0];c.t=0;c.x=N[far].x;c.z=N[far].z;n++}
-  try{for(const p of HUB.peds||[])if(p&&p.x!=null&&Math.hypot(p.x-x,p.z-z)<r/2)pedPlace(p,150,380)}catch(e){}/* pedestrians too: a push deflected the car */return n}
+  for(let _k4=0,_c4=HUB.cars||[],c;_k4<_c4.length&&(c=_c4[_k4],true);_k4++){if(c.route||c.pk||Math.hypot(c.x-x,c.z-z)>r)continue;c.a=far;c.b=N[far].nb[0];c.t=0;c.x=N[far].x;c.z=N[far].z;n++}
+  try{for(let _k5=0,_c5=HUB.peds||[],p;_k5<_c5.length&&(p=_c5[_k5],true);_k5++)if(p&&p.x!=null&&Math.hypot(p.x-x,p.z-z)<r/2)pedPlace(p,150,380)}catch(e){}/* pedestrians too: a push deflected the car */return n}
 async function SIMP_perfRun(){const sp=SIMP_perfSpots(),R=[];for(const[x,z,h]of sp){SIMP_park(x,z,h);await SIMP_wait(700);try{hubCullStep()}catch(e){}R.push(SIMP_drawStat())}const s=k=>R.reduce((a,r)=>a+r[k],0);return{spots:sp.length,calls:s('calls'),tris:s('tris'),per:R}}
 // facade candidates: a building's face with ≥ d m of clear open ground in front (seeded, spread over the city box)
 function SIMP_faces(k,d,seed){const rnd=mul(seed),B=HUB.bld.filter(b=>SIMP_isBld(b)&&SIMP_inHX(b.x,b.z)&&b.hw>=3&&b.hd>=3&&b.hw<40&&b.hd<40),o=[];let t=0;
