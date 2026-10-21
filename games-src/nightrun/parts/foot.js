@@ -211,7 +211,7 @@ function hitProp(p,d){p.hp-=d;p.fl=.08;if(p.hp<=0&&!p.gone){p.gone=1;ftBurst(p.x
 function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.min(FL,P.y+P.vy*dt);return;}
   const mx=I.r?1:I.l?-1:(Math.abs(I.x)>.25?clamp(I.x*1.4,-1,1):0),spdLv=P.pw.speed?P.pw.speed.lv:0,spd=230*(1+.15*spdLv);
   P.crouch=P.onGround&&(I.d||I.y>.6)&&P.dash<=0;
-  if(mx)P.facing=mx>0?1:-1;
+  if(mx)P.facing=mx>0?1:-1;else if(F.look&&F.look.face&&autoOn())F.look.face(P,hittable);   // streetlook: auto-fire turns to a target behind
   for(const k of ['inv','dashCd','dashIF','melCd','cd','shotT','hurtT'])if(P[k]>0)P[k]-=dt;
   if(I.dashP&&P.dashCd<=0){const beat=ftOnBeat();AH.ftPush(S.fx,'fx-ft-dust',P.x,P.y-6,64,.35);P.dash=.24;P.dashCd=.75/(1+.25*spdLv);P.dashIF=beat?.45:.26;P.vy=Math.min(P.vy,0);
     if(beat){pop(P.x,P.y-80,'ON BEAT','#ffd23a');S.fever=Math.min(100,S.fever+12);NR.emit('footBeat',{kind:'dash'});}sfx('dash');}
@@ -238,7 +238,7 @@ function stepPlayer(dt){const P=S.P;if(P.hp<=0){P.vx*=.9;P.vy+=GRAV*dt;P.y=Math.
 
 /* ===== the stage: camera, locks, waves, idle pressure, boss ===== */
 function stepStage(dt){const st=S.st,P=S.P,vw=viewW();
-  let want=Math.max(S.camX,P.x-vw*(F.camK||.38));want=Math.min(want,st.len-vw);
+  let want=Math.max(S.camX,P.x-vw*(F.camK||.38));if(F.look&&F.look.back)want=F.look.back(S,P,vw,want);   // streetlook: walk back up to 35% of the viewwant=Math.min(want,st.len-vw);
   if(!S.lock)for(const l of st.locks)if(!S.lockDone[l.id]&&want>=l.x-vw/2){S.lock={id:l.id,cam:l.x-vw/2};note('ARENA LOCK',1.6);sfx('warn');for(const w of S.waves)if(w.lock===l.id)w.started=true,w.next=S.time+(w.delay||0);break;}
   const bc=Math.min(st.boss.x-vw/2,st.len-vw);if(!S.lock&&!S.bossOn&&want>=bc-1){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.6;note('WARNING: WARDEN',1.8);sfx('warn');S.eb.length=0;}
   if(S.lock)want=Math.min(want,S.lock.cam);

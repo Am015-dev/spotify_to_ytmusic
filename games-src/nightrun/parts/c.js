@@ -128,7 +128,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   if(!PT){drawBG(bgFor(G.di),t,dt,G.scroll);if(RET.read)READ.dim(W,H);
   }   // (no rain, no traffic specks: the background stays calm)
   drawPickups(t);
-  for(const e of G.en)drawEnemy(e,t);if(ART.gh.length)ART.ghosts();if(RET.variants)for(const e of G.en)if(e.vz)VAR.mark(e,t);
+  FOEART.fr++;FOEART.built=0;for(const e of G.en)drawEnemy(e,t);FOEART.idle();if(FOEART.cnt)FOEART.tally();if(ART.gh.length)ART.ghosts();if(RET.variants)for(const e of G.en)if(e.vz)VAR.mark(e,t);
   // player bullets
   ctx.globalCompositeOperation='lighter';const D=DISTRICTS[G.di];
   // the ship's own fire is dim and thin: the enemy bullets (bright lime, dark rim) are what must read
