@@ -81,6 +81,9 @@ A new visual must get a row (and a verdict) here before it ships.
 | `foeart.js:idle` | enemy ship sprite, idle pose | shoot | rare (seed-dependent) | S |
 | `fun.js:draw` | set piece picture | as above | some stages 4/6 | S |
 | `fun.js:evDraw` | set piece: laser lane, supply ring, gate rings, gust arrows | leave / fly in / fly through | some stages 2/6 | C lane,supply,gaterun |
+| `legible.js:band` | darker play band behind the action (city kept at the edges) | nothing | every frame | S |
+| `legible.js:enemy` | pale under-glow behind each enemy (readability) | shoot | every frame | S |
+| `legible.js:halo` | dark halo under enemy bullets (readability) | dodge | every frame | S |
 | `fx.js:bar` | beat pulse bars on 4 screen edges | nothing (decor) | every frame 6/6 | R: kept only red at 1 hull, caption edge |
 | `fx.js:ring` | beat cue: 2 rings close on the ship | DASH when they meet | often 6/6 | C beat |
 | `fxwave.js:FXW.bullet` | enemy bullet picture | dodge | every frame 6/6 | S |
