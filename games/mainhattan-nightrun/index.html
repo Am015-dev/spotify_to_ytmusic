@@ -1260,9 +1260,9 @@ RIG.pic=function(cv,sid){if(!cv)return;const c=cv.getContext('2d'),W=cv.width,H=
 function drawPlayer(t){if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:Math.floor(t*20)%2))return;const D=DISTRICTS[G.di];
   ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);
   const so=ART.sp('spr-ship-'+shipDef().id,60);
-  if(so){const bob=Math.sin(t*5)*1.2,en=ART.sp('fx-engine',46);ctx.globalCompositeOperation='lighter';
+  if(so){const bob=Math.sin(t*5)*1.2,sf=RET.sprites&&SPR.shipOn(shipDef().id),en=sf?null:ART.sp('fx-engine',46);ctx.globalCompositeOperation='lighter';
     if(en)ART.put(en,-24-en.w*.5*(.8+.2*PUL),bob,0,.7+.3*PUL);                  // painted jet, flickers with the beat
-    G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';ART.put(so,0,bob);RIG.draw(ctx,shipDef().id,60,t,bob);ctx.restore();
+    G_(-18,bob,8+Math.random()*3,D.a,.55);G_(0,0,34,D.a,.14);ctx.globalCompositeOperation='source-over';if(!(sf&&SPR.ship(ctx,shipDef().id,t,bob)))ART.put(so,0,bob);RIG.draw(ctx,shipDef().id,60,t,bob);ctx.restore();
     const T=tierOf(C.n);if(T>1){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,26+13*T,TIERC[T-1],.1+.07*T);ctx.restore();}
     ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(P.x,P.y,2.5,0,7);ctx.fill();return;}
   ctx.globalCompositeOperation='lighter';G_(-20,2,16+Math.random()*5,D.a,.9);G_(0,0,34,D.a,.18);ctx.globalCompositeOperation='source-over';
@@ -1322,6 +1322,7 @@ function bossPaint(e,t,fl,c){const ak=ART.artK(e),nm=ART.bossN[ak],b=nm&&ART.bm[
   if(!rotMode)UIK.bossShadow(e,mv,wd);
   if(e._ph===undefined){e._ph=e.ph;e.pp=0;}if(e._ph!==e.ph){e._ph=e.ph;e.pp=1;}e.pp=Math.max(0,e.pp-FD*1.4);       // a phase change pulses a glow in the district colour
   if(e.pp>0||e.ph===3){ctx.globalCompositeOperation='lighter';if(e.pp>0)G_(0,0,e.r*(2.4+1.6*e.pp),c,.6*e.pp);if(e.ph===3)G_(0,0,e.r*2.3,'#ff3040',.16+.12*PUL);ctx.globalCompositeOperation='source-over';}
+  if(RET.sprites&&SPR.boss(e,nm,wd,by,tl,fl))return true;
   if(UIK.bossDraw(e,nm,wd,by,tl,fl))return true;
   return ART.dflash('spr-boss-'+nm,wd,0,by,tl,fl,'#ff4058',.32);}   // damage: a red tint
 function drawBoss(e,t,fl){const c=e.col;
@@ -2998,7 +2999,7 @@ ART.load=n=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();
 ART.have=n=>!!ART.bm[n];
 ART.err={};
 ART.frame=()=>{if(Math.abs(S-ART.S)>.01){ART.S=S;ART.sc={};}
-  if(running&&P){if(G.dead&&!ART.dead)ART.boom(FXW.bk('explosion-big',null,170),P.x,P.y,170,.6);else if(!G.dead&&P.hp<ART.hp)ART.boom(FXW.bk('explosion-small',null,76),P.x,P.y,76,.4);ART.hp=P.hp;ART.dead=G.dead;}else ART.dead=false;};        // the canvas scale changed (resize / rotation): scaled copies are rebuilt on demand
+  if(running&&P){if(G.dead&&!ART.dead)ART.boom(FXW.bk('explosion-big',null,170),P.x,P.y,170,.6,RET.sprites?SPR.shipDeath():0);else if(!G.dead&&P.hp<ART.hp)ART.boom(FXW.bk('explosion-small',null,76),P.x,P.y,76,.4);ART.hp=P.hp;ART.dead=G.dead;}else ART.dead=false;};        // the canvas scale changed (resize / rotation): scaled copies are rebuilt on demand
 /* a copy of image n that is w world units wide, at the pixel size it will be drawn at ({c,w,h}); null while loading */
 ART.sp=(n,w,sc)=>{const b=ART.bm[n];if(!b)return null;sc=sc||S;w=Math.max(1,Math.round(w*2)/2);const k=n+'@'+w+'@'+sc;let o=ART.sc[k];if(o)return o;
   const h=w*b.height/b.width,pw=Math.max(1,Math.round(w*sc)),ph=Math.max(1,Math.round(h*sc));
@@ -3032,9 +3033,9 @@ ART.pic=(id,w,x,y,rot,al)=>{if(!ART.img(id))return false;const o=ART.sp(id,w);if
 ART.dflash=(n,w,x,y,rot,fl,col,a)=>{const o=ART.sp(n,w);if(!o)return false;ART.put(o,x,y,rot);
   if(fl){const s=ART.sil(n,w,col||'#ffffff');if(s)ART.put(s,x,y,rot,a==null?.8:a);}return true;};
 /* ----- effects: light on black, drawn additively, scaled up while they fade ----- */
-ART.boom=(k,x,y,sz,life)=>{const f=ART.fx;if(f.length>=24)f.shift();f.push({k,x,y,sz,t:0,m:life});};
+ART.boom=(k,x,y,sz,life,delay)=>{const f=ART.fx;if(f.length>=24)f.shift();f.push({k,x,y,sz,t:-(delay||0),m:life});};   // delay: seconds before it shows (a sprite clip plays first)
 ART.fxDraw=()=>{const f=ART.fx;if(!f.length)return;ctx.globalCompositeOperation='lighter';
-  for(let i=f.length-1;i>=0;i--){const q=f[i];q.t+=FD;const k=q.t/q.m;if(k>=1){f.splice(i,1);continue;}
+  for(let i=f.length-1;i>=0;i--){const q=f[i];q.t+=FD;if(q.t<0)continue;const k=q.t/q.m;if(k>=1){f.splice(i,1);continue;}
     const b=ART.bm['fx-'+q.k];if(!b)continue;const grow=q.k==='muzzle'||q.k==='hit-spark'||/-(muzzle|hit)$/.test(q.k)?.8+.4*k:.55+.65*k,w=q.sz*grow,h=w*b.height/b.width;
     ctx.globalAlpha=Math.min(1,(1-k)*1.6)*(q.k==='hit-spark'?.9:1);ctx.drawImage(b,q.x-w/2,q.y-h/2,w,h);}
   ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';};
@@ -3088,7 +3089,7 @@ ART.portrait=(k,cx,y,sz,al)=>{const b=ART.bm['boss-'+ART.bossN[k]];if(!b)return;
   const rest=[];for(const n of ART.bossN){rest.push('spr-boss-'+n);rest.push('boss-'+n);}
   let i=0;const step=()=>{if(i<rest.length)ART.load(rest[i++]);else if(i<rest.length+DISTRICTS.length){ART.warm(i++-rest.length);}else return;setTimeout(step,350);};setTimeout(step,1500);}
 NR.on('kill',({e,boss})=>{
-  if(boss){const bx=e.x,by=e.y;for(let i=0;i<5;i++)G.delayed.push({t:i*.16,f:()=>ART.boom(FXW.bk(i===4?'explosion-boss':'explosion-big',e,i===4?320:170),bx+rnd(-40,40),by+rnd(-40,40),i===4?320:170,.6)});return;}
+  if(boss){const bx=e.x,by=e.y,dl=RET.sprites?SPR.bossDefeat(e):0;for(let i=0;i<5;i++)G.delayed.push({t:dl+i*.16,f:()=>ART.boom(FXW.bk(i===4?'explosion-boss':'explosion-big',e,i===4?320:170),bx+rnd(-40,40),by+rnd(-40,40),i===4?320:170,.6)});return;}
   {const sz=e.type==='gunship'?150:e.type==='mine'?90:Math.max(54,e.r*3.6);ART.boom(FXW.bk(e.type==='gunship'||e.type==='mine'?'explosion-big':'explosion-small',e,sz),e.x,e.y,sz,.42);}});
 NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom(FXW.mz('muzzle'),f.x+10,f.y,34,.09);});
 {const _b=banner;banner=function(a,b,warn,t){_b(a,b,warn,t);if(warn&&G.boss&&!G.boss.dead&&G.boss.k!=null)G.banner.pic=ART.artK(G.boss);};}   // boss intro / phase banners carry the boss portrait
@@ -3097,6 +3098,68 @@ NR.on('fire',f=>{if(f.x!=null&&ART.fx.length<16)ART.boom(FXW.mz('muzzle'),f.x+10
 setInterval(()=>{if(document.hidden||!G||(running&&!calmNow()))return;ART.frame();const port=wcv!==cv;
   for(const di of[G.di,nextDi(G.di).di]){if(!ART.paintReady(di))continue;const n=ART.dn[di];
     if(port)ART.bgOf(di,true,VS,PW_,PH_,.5);else{ART.bgOf(di,false,S,W,H,.52);ART.midHaze(di,n,310);ART.strip('ly-near-'+DISTRICTS[di].near,130);}}},700);
+/* ---------- animated strip sheets (media/anim/<who>/<act>-strip.webp, one row of frames; sizes, fps, anchors, hold times and calibration are bundled by build.py as ART.ANIM, so there is no fetch at run time).
+   RET.sprites (default on; ?sprites=0 = the stills exactly as before). ART.anim / ART.aframe / ART.drawAnim are the loader (HANDOFF-SPRITES.md section 1; "aframe" because ART.frame is the per-frame tick);
+   SPR.* wires the bosses and the player ships. Every path returns false/null until its sheet is decoded or when it is missing, so the old drawing runs. Step 2 (weapon fx, explosions, pickups, enemy ships, on-foot, props) hooks in here with ART.drawAnim. ---------- */
+ART.ANIM={"s":{"boss-bruecken-waechter/attack":[3,8,392,234,196,234],"boss-bruecken-waechter/defeat":[3,6,392,311,196,311],"boss-bruecken-waechter/hit":[3,10,392,317,196,317],"boss-bruecken-waechter/idle":[3,4,392,268,196,268],"boss-flusskrake/attack":[3,8,392,315,196,315],"boss-flusskrake/defeat":[3,6,351,384,175,384],"boss-flusskrake/hit":[3,10,373,384,186,384],"boss-flusskrake/idle":[3,4,392,368,196,368],"boss-hoplite/attack":[4,8,392,301,196,301],"boss-hoplite/defeat":[4,6,343,384,171,384],"boss-hoplite/hit":[3,10,384,384,192,384],"boss-hoplite/idle":[4,4,259,384,129,384],"boss-kronos/attack":[4,8,392,248,196,248],"boss-kronos/defeat":[4,6,392,371,196,371],"boss-kronos/hit":[3,10,392,282,196,282],"boss-kronos/idle":[4,4,392,276,196,276],"boss-messe-waechter/attack":[3,8,290,384,145,384],"boss-messe-waechter/defeat":[3,6,314,384,157,384],"boss-messe-waechter/hit":[3,10,288,384,144,384],"boss-messe-waechter/idle":[3,4,276,384,138,384],"boss-schranken-wart/attack":[4,8,392,299,196,299],"boss-schranken-wart/defeat":[4,6,392,356,196,356],"boss-schranken-wart/hit":[3,10,392,237,196,237],"boss-schranken-wart/idle":[4,4,392,190,196,190],"boss-sek-adler/attack":[4,8,392,245,196,245],"boss-sek-adler/defeat":[4,6,356,384,178,384],"boss-sek-adler/hit":[3,10,392,343,196,343],"boss-sek-adler/idle":[4,4,392,266,196,266],"boss-talos/attack":[4,8,291,384,145,384],"boss-talos/defeat":[4,6,258,384,129,384],"boss-talos/hit":[3,10,298,384,149,384],"boss-talos/idle":[4,4,227,384,113,384],"boss-tresor-wart/attack":[3,8,392,256,196,256],"boss-tresor-wart/defeat":[3,6,379,384,189,384],"boss-tresor-wart/hit":[3,10,392,313,196,313],"boss-tresor-wart/idle":[3,4,392,266,196,266],"boss-zentral-ice/attack":[4,8,392,249,196,249],"boss-zentral-ice/defeat":[4,6,392,212,196,212],"boss-zentral-ice/hit":[3,10,392,244,196,244],"boss-zentral-ice/idle":[4,4,392,305,196,305],"ship-drift/death":[4,8,520,261,260.0,130.5],"ship-drift/flame":[4,12,520,165,260.0,82.5],"ship-ec/death":[4,8,520,247,260.0,123.5],"ship-ec/flame":[4,12,520,144,260.0,72.0],"ship-hv/death":[4,8,520,256,260.0,128.0],"ship-hv/flame":[4,12,520,164,260.0,82.0],"ship-lancer/death":[4,8,520,256,260.0,128.0],"ship-lancer/flame":[4,12,520,121,260.0,60.5],"ship-nova/death":[4,8,520,278,260.0,139.0],"ship-nova/flame":[4,12,520,149,260.0,74.5],"ship-std/death":[4,8,520,234,260.0,117.0],"ship-std/flame":[4,12,520,107,260.0,53.5],"ship-swg/death":[4,8,520,242,260.0,121.0],"ship-swg/flame":[4,12,520,214,260.0,107.0],"ship-syn/death":[4,8,520,261,260.0,130.5],"ship-syn/flame":[4,12,520,167,260.0,83.5],"ship-tri/death":[4,8,520,237,260.0,118.5],"ship-tri/flame":[4,12,520,205,260.0,102.5]},"sm":{"holds":{"run":[1.5,0.75,0.75,1.5,0.75,0.75],"shoot":[1.4,0.6,1],"melee":[1.6,0.5,1.3,1],"attack":[1.6,0.5,1.3,1],"jump":[1.3,1,1,1.6],"die":[1,1,1,3],"defeat":[1,1,1,3],"hit":[1,1,1.4],"impact":[0.6,1.3,1,1],"burst":[0.6,1,1.3,1,1],"muzzle":[0.6,1.2,1],"death":[1,1,1,2]},"hitstop":{"ms":90,"flash_ms":70,"flash_white":0.85,"frame":{"die":0,"hit":0,"death":0,"melee":2,"attack":2,"shoot":1}},"squash":{"amount":0.07,"ms":125,"frames":{"run":[0,3],"jump":[3],"melee":[2],"attack":[2]}},"bob":{"idle_px":1.5,"idle_breath_scale":0.012,"boss_idle_px":4,"boss_hover_px":3,"hz":0.6},"lean":{"run_deg":4},"crossfade":{"actions":["idle","flame","beam","burst","impact","muzzle","bank"],"from":0.5,"max_alpha":0.85},"trails":{"enabled":false,"use_only_for":"dashes / big swings while the sprite actually moves","alpha":[0.16,0.06]},"ship_bank":{"note":"no bank sprites: tilt and squash the ship sprite while it moves up/down","tilt_deg":6,"squash_y":0.92,"ease_ms":120}},"c":{"boss-bruecken-waechter":{"bw":381.3,"gap":5.0},"boss-flusskrake":{"bw":378.7,"gap":2.3},"boss-hoplite":{"bw":248.0,"gap":3.2},"boss-kronos":{"bw":374.2,"gap":5.5},"boss-messe-waechter":{"bw":259.7,"gap":15.7},"boss-schranken-wart":{"bw":379.5,"gap":3.2},"boss-sek-adler":{"bw":375.5,"gap":8.8},"boss-talos":{"bw":215.0,"gap":9.2},"boss-tresor-wart":{"bw":374.0,"gap":3.0},"boss-zentral-ice":{"bw":359.5,"gap":21.2},"ship-drift":{"k":0.1965,"ox":-14.02,"oy":-0.0},"ship-ec":{"k":0.1499,"ox":-4.63,"oy":0.15},"ship-hv":{"k":0.1881,"ox":-15.91,"oy":0.09},"ship-lancer":{"k":0.1881,"ox":-15.91,"oy":-0.09},"ship-nova":{"k":0.1921,"ox":-16.29,"oy":-0.19},"ship-std":{"k":0.219,"ox":-16.22,"oy":-0.0},"ship-swg":{"k":0.1583,"ox":-7.36,"oy":0.08},"ship-syn":{"k":0.1905,"ox":-15.9,"oy":0.1},"ship-tri":{"k":0.1684,"ox":-8.9,"oy":0.08}}};
+ART.as={};ART.aDone=false;ART.aP=0;ART.aT=0;                // aDone / aP / aT: set by ART.aframe (a one-shot reached its end; progress 0..1 and seconds inside the frame)
+ART.LOOPA=new Set(['idle','run','flame','glow','loop','spin','hover']);   // every other act is a one-shot: it stops on its last frame
+ART.aS=key=>{let o=ART.as[key];if(o!==undefined)return o;const m=ART.ANIM.s[key];if(!m)return ART.as[key]=null;   // per-sheet record, built once: cumulative frame end times (smoothing.json holds at the sheet fps)
+  const act=key.slice(key.lastIndexOf('/')+1),hd=ART.ANIM.sm.holds[act],n=m[0],cum=new Float32Array(n);let s=0;for(let i=0;i<n;i++){s+=(hd&&hd.length===n?hd[i]:1)/m[1];cum[i]=s;}
+  return ART.as[key]={m,act,cum,tot:s,loop:ART.LOOPA.has(act),xf:ART.ANIM.sm.crossfade.actions.indexOf(act)>=0};};
+/* the decoded strip for key ('boss-kronos/idle'), or null while it loads / when it is not listed in ready.json / with the flag off */
+ART.anim=key=>{if(!RET.sprites)return null;const n='anim/'+key+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return null;const b=ART.bm[n];if(b)return b;if(!(n in ART.bm))ART.load(n);return null;};
+/* frame index at t seconds since the act began */
+ART.aframe=(key,t)=>{const o=ART.aS(key);ART.aDone=false;ART.aP=0;ART.aT=0;if(!o)return 0;const n=o.m[0];let u=t>0?t:0;
+  if(o.loop)u%=o.tot;else if(u>=o.tot){ART.aDone=true;ART.aP=1;return n-1;}
+  for(let i=0;i<n;i++)if(u<o.cum[i]){const a=i?o.cum[i-1]:0;ART.aT=u-a;ART.aP=ART.aT/(o.cum[i]-a);return i;}
+  return n-1;};
+/* one cell, its anchor on x,y; sc = world units per sheet px; flip mirrors around the anchor; sy = extra vertical squash about the anchor; idle / flame cross-fade into the next frame (smoothing.json) */
+ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(key);if(!b0)return false;const i=ART.aframe(key,t),p=ART.aP,m=o.m,w=m[2],h=m[3],sv=sc*(sy||1),X=ART.ANIM.sm.crossfade,
+    cf=o.xf&&p>X.from&&(o.loop||i+1<m[0])?(p-X.from)/(1-X.from)*X.max_alpha:0,ga=c.globalAlpha;
+  let b=b0,cw=w,ch=h;const ts=sc*S;       // sheets are drawn ~3-5x smaller than they are: a copy at the drawn pixel size is built once per sheet and canvas scale (like ART.sp), so the blit is 1:1 and the downscale is smooth
+  if(ts<.75){cw=Math.max(1,Math.round(w*ts));const k='a|'+key+'@'+cw;let q=ART.sc[k];
+    if(!q){ch=Math.max(1,Math.round(h*cw/w));const cv_=document.createElement('canvas');cv_.width=cw*m[0];cv_.height=ch;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*cw,0,cw,ch);q=ART.sc[k]={c:cv_,h:ch};}
+    b=q.c;ch=q.h;}
+  if(flip){c.save();c.translate(x,y);c.scale(-1,1);x=0;y=0;}
+  const dx=x-m[4]*sc,dy=y-m[5]*sv;if(al!=null)c.globalAlpha=al*ga;
+  c.drawImage(b,i*cw,0,cw,ch,dx,dy,w*sc,h*sv);
+  if(cf>0){c.globalAlpha=(al==null?1:al)*ga*cf;c.drawImage(b,((i+1)%m[0])*cw,0,cw,ch,dx,dy,w*sc,h*sv);}
+  if(flip)c.restore();c.globalAlpha=ga;return true;};
+ART.gh=[];      // clips that outlive their object (boss defeat, ship death): {key,x,y,k,t}
+ART.ghosts=()=>{const g=ART.gh;for(let i=g.length-1;i>=0;i--){const q=g[i],o=ART.aS(q.key);q.t+=FD;if(!o||q.t>o.tot+.2){g.splice(i,1);continue;}ART.drawAnim(ctx,q.key,q.t,q.x,q.y,q.k,false);}};
+const SPR={_sq:1,_di:-1};
+/* ----- bosses: idle / attack / hit / defeat. Sheets face left like the stills; the body is drawn as wide as the still was (calibration bw), the frame bottom sits where the still's bottom did (+ the idle gap), so the feet do not move ----- */
+SPR.boss=(e,nm,wd,by,tl,fl)=>{const cb=ART.ANIM.c['boss-'+nm],st=ART.bm['spr-boss-'+nm];if(!cb||!st||e.labPose)return false;const base='boss-'+nm+'/',ik=base+'idle';
+  if(!ART.anim(ik)){return false;}ART.anim(base+'attack');ART.anim(base+'hit');ART.anim(base+'defeat');
+  if(e.fireT>0)e.fireT=Math.max(0,e.fireT-FD);e._st=(e._st||0)+FD;const T=e._st,A=UIK.boss[nm];   // (the grid path ticked these; the sheets do now)
+  let want='idle';
+  if(e.ph!==undefined&&(e.arm||e.fireT>0)&&ART.anim(base+'attack'))want='attack';
+  else if(e._sa==='hit'&&T-e._s0<ART.aS(base+'hit').tot)want='hit';
+  else if(fl&&T>=(e._hc||0)&&ART.anim(base+'hit'))want='hit';
+  if(want!==e._sa){e._sa=want;e._s0=T;if(want==='hit')e._hc=T+ART.aS(base+'hit').tot+.6;}
+  const key=base+want,k=wd/cb.bw,y=by+wd*st.height/st.width/2+cb.gap*k,tt=T-e._s0,sm=ART.ANIM.sm;
+  if(A){let dw=wd*A.kw,dh=dw*A.ch/A.cw;if(ART.artK(e)===6){dh=e.r*3.6*A.kh;dw=dh*A.cw/A.ch;}e._dh=dh;e._dw=dw;}
+  if(!rotMode&&A&&A.move==='ground')e.y=UIK.groundY()-(e._dh||130)/2;   // a walker stands on the road line this very frame (bossMove sets the same value on the next step): the road moves when the LAB panel opens or the window changes
+  const i=ART.aframe(key,tt);let sy=1;const sq=sm.squash.frames[want];if(sq&&sq.indexOf(i)>=0&&ART.aT<sm.squash.ms/1000)sy=1-sm.squash.amount*(1-ART.aT/(sm.squash.ms/1000));
+  if(!e._sp)e._sp={base:'',y:0,k:1};e._sp.base=base;e._sp.y=y;e._sp.k=k;
+  ctx.save();if(tl){ctx.translate(0,by);ctx.rotate(tl);ctx.translate(0,-by);}
+  ART.drawAnim(ctx,key,tt,0,y,k,false,null,sy);
+  if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,0,y,k,false,sm.hitstop.flash_white*.5,sy);}   // the hit flash stays on top
+  ctx.restore();return true;};
+/* a boss that just died: its defeat clip plays once where it stood; returns the seconds the explosion waits */
+SPR.bossDefeat=e=>{const p=e._sp;if(!p||!ART.anim(p.base+'defeat'))return 0;const key=p.base+'defeat';ART.gh.push({key,x:e.x,y:e.y+p.y,k:p.k,t:0});return Math.min(1.2,ART.aS(key).tot);};
+/* ----- player ships: flame (ship + jet, replaces fx-engine) and death. The frame centre goes where calibration puts the nose where the still's nose was ----- */
+SPR.shipOn=id=>{ART.anim('ship-'+id+'/death');return !!(ART.ANIM.c['ship-'+id]&&ART.anim('ship-'+id+'/flame'));};
+SPR.ship=(c,id,t,bob)=>{const cb=ART.ANIM.c['ship-'+id],bk=ART.ANIM.sm.ship_bank,f=Math.min(1,Math.abs(P.tilt)/(bk.tilt_deg*Math.PI/180));
+  SPR._sq+=((1-f*(1-bk.squash_y))-SPR._sq)*Math.min(1,FD*1000/bk.ease_ms);                 // banking: the existing tilt, plus a squash while the ship moves up / down
+  return ART.drawAnim(c,'ship-'+id+'/flame',t,cb.ox,bob+cb.oy,cb.k,false,null,SPR._sq);};
+SPR.shipDeath=()=>{const id=shipDef().id,cb=ART.ANIM.c['ship-'+id],key='ship-'+id+'/death';if(!cb||!ART.anim(key))return 0;ART.gh.push({key,x:P.x+cb.ox,y:P.y+cb.oy,k:cb.k,t:0});return ART.aS(key).tot;};
+/* load on demand: the chosen ship's sheets and the three newer hulls' stills shortly after start, each district's boss a few seconds after the district begins */
+setTimeout(()=>{if(!RET.sprites)return;for(const n of['drift','lancer','nova'])ART.load('spr-ship-'+n);try{SPR.shipOn(shipDef().id);}catch(e){}},2500);
+SPR.warmBoss=nm=>{for(const a of['idle','attack','hit','defeat'])ART.anim('boss-'+nm+'/'+a);};
+NR.on('tick',()=>{if(!RET.sprites||!G.live)return;const b=G.boss;if(b&&!b._sl){b._sl=1;const nm=ART.bossN[ART.artK(b)];if(nm)SPR.warmBoss(nm);}      // a boss on screen: its sheets start loading the moment it spawns, two seconds before it stops
+  if(G.di===SPR._di)return;SPR._di=G.di;const nm=ART.bossN[DISTRICTS[G.di].boss];if(nm)setTimeout(()=>SPR.warmBoss(nm),3500);});
 
 /* ---------- smarter enemies (the answer to "too easy with all the perks"), all gated by the level q ----------
    q = story level (2.4 .. 11.5), in endless 2 + district*1.6 + loop*3.
@@ -3258,6 +3321,7 @@ let labEl=null,garageDirty=false;
 
 /* ---------- retention parts (RETENTION.md). Each item has a flag in RET; a flag set to false leaves the game exactly as it was. ---------- */
 const RET=window.RET=window.RET||{};
+if(RET.sprites===undefined)RET.sprites=!/[?&]sprites=0/.test(location.search);   // animated strip sheets for bosses and player ships (parts/art.js SPR); ?sprites=0 = the stills as before
 if(RET.title===undefined)RET.title=!/[?&]title=0/.test(location.search);   // B25: title diet (PLAY / CONTINUE, 5 buttons, the rest in MENU); parts/title.js
 if(RET.type===undefined)RET.type=!/[?&]type=0/.test(location.search);     // B26: text >= 14 px and touch targets >= 44 px on title, menu and map; parts/title.js
 if(RET.oneMore===undefined)RET.oneMore=true;   // B5: run-end screens show Neon banked, the next unlock bar and a ONE MORE RUN button
@@ -7200,7 +7264,8 @@ NR.on('tick',()=>{if(!G||!G.lab||!RET.labassets)return;if((G.frameLab||0)%60===0
 /* ---------- vector SHAPES for every item that still waits for painted art (see ASSETS-NEEDED.md). Each draws a simple shape now and switches to the painted file as soon as it is
    listed in media/ready.json (make-placeholders.py writes that list when it finds real art). Nothing here ever shows the placeholder pictures. ---------- */
 ART.rd=new Set();ART.isReal=n=>ART.rd.has(n+'.webp');
-fetch(ART.base+'ready.json').then(r=>r.json()).then(a=>{if(!Array.isArray(a))return;ART.rd=new Set(a);for(const f of a)ART.load(f.replace(/\.webp$/,''));if(ART.uiIcons)ART.uiIcons();if(typeof garageEl!=='undefined'&&!garageEl.hidden)gaDraw();}).catch(()=>{});
+fetch(ART.base+'ready.json').then(r=>r.json()).then(a=>{if(!Array.isArray(a))return;ART.rd=new Set(a);for(const f of a)if(!f.startsWith('anim/'))ART.load(f.replace(/\.webp$/,''));   // (anim/ strips load on demand: ART.anim)
+  if(ART.uiIcons)ART.uiIcons();if(typeof garageEl!=='undefined'&&!garageEl.hidden)gaDraw();}).catch(()=>{});
 const SVGW=(inner,vb)=>`<svg viewBox="0 0 ${vb||24} ${vb||24}" aria-hidden="true">${inner}</svg>`;
 /* ----- difficulty badges ----- */
 const DIFFC={easy:'#8c86b8',normal:'#19e3ff',hard:'#ffb020',vhard:'#ff5a3d',legend:'#ff2d95'};
@@ -12376,7 +12441,7 @@ function render(t,dt){FD=dt;ART.frame();G.tpop=Math.max(0,(G.tpop||0)-dt*1.6);co
   if(!PT){drawBG(bgFor(G.di),t,dt,G.scroll);if(RET.read)READ.dim(W,H);
   }   // (no rain, no traffic specks: the background stays calm)
   drawPickups(t);
-  for(const e of G.en)drawEnemy(e,t);if(RET.variants)for(const e of G.en)if(e.vz)VAR.mark(e,t);
+  for(const e of G.en)drawEnemy(e,t);if(ART.gh.length)ART.ghosts();if(RET.variants)for(const e of G.en)if(e.vz)VAR.mark(e,t);
   // player bullets
   ctx.globalCompositeOperation='lighter';const D=DISTRICTS[G.di];
   // the ship's own fire is dim and thin: the enemy bullets (bright lime, dark rim) are what must read
@@ -12520,7 +12585,7 @@ function loop(now){const raw=now-last;if(!simOn&&raw<(SET.fps===30?30:12.5)){req
 applySet();syncSet();requestAnimationFrame(loop);
 document.fonts&&document.fonts.ready.then(()=>{for(const k in BGC)delete BGC[k];});
         // build the other districts' skylines while the title is up
-window.__mnr={RET,ARC,render,hudBusy,get hudOff(){return HUDOFF},set hudOff(v){HUDOFF=!!v},ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get rotMode(){return rotMode},dashSafeDir,get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
+window.__mnr={SPR,RET,ARC,render,hudBusy,get hudOff(){return HUDOFF},set hudOff(v){HUDOFF=!!v},ART,FUN,DIR,RSC,UIK,get S_(){return S},STILL,DYE,get CAL(){return CAL},winMs,calNow,get DIST(){return DISTRICTS},DEFS,TIERC,calTap:doCalTap,calStart,applySet,setVal,tierOf,TS,DIFFS,get DF(){return DF},get TIP(){return TIP},get G(){return G},get P(){return P},get rotMode(){return rotMode},dashSafeDir,get C(){return C},get BT(){return BT},get TR(){return TR},get SET(){return SET},get J(){return J},get HUD(){return HUDLOG},
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get SH(){return SH},get GA(){return GA},get TP(){return TP},TP_DEF,HUDX,UBY,PWK,hurt,NR,PW,FXV,eb,get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
   get ST(){return ST},get TUNE(){return TUNE},get HARD(){return HARD},loadTrack,get STAGES(){return STAGES},MAIN,get K(){return K},startStory,unlockedN:unlocked,sSave,
