@@ -42,6 +42,7 @@
   <a href="music.html">Music</a>
   <a href="games.html">Games</a>
   <a href="index.html">3D models</a>
+<a href="workers.html">Workers</a>
   <select id="game"><option value="">All games</option></select>
   <select id="wave"><option value="">All waves</option></select>
   <select id="state" autocomplete="off"><option value="" selected>All batches</option><option value="open">With pending images</option><option value="done">Complete</option><option value="planned">Planned waves (not made yet)</option></select>
@@ -91,9 +92,9 @@ async function load() {
 }
 function draw() {
   const g = $('game').value, st = $('state').value, w = $('wave').value;
-  const bs = data.batches.filter(b => (!g || b.game === g) && (!w || b.wave === w) && (!st || (st === 'planned' ? b.source === 'next-wave' : st === 'open' ? b.done < b.total : b.done === b.total)))
+  const bs = data.batches.filter(b => (!g || b.game === g) && (!w || b.wave === w) && (!st || (st === 'planned' ? b.source === 'next-wave' : st === 'open' ? b.done < b.total && !b.closed : b.done === b.total || b.closed)))
     .sort((a, b) => (b.total - b.done) - (a.total - a.done) || a.game.localeCompare(b.game));
-  $('rows').innerHTML = bs.map(b => `<tr><td>${b.game}</td><td>${b.kind} <span class="mute">${b.root}${b.source === 'next-wave' ? ' &middot; planned' : ''}</span></td><td class="num">${b.done}</td>
+  $('rows').innerHTML = bs.map(b => `<tr><td>${b.game}</td><td>${b.kind} <span class="mute">${b.root}${b.source === 'next-wave' ? ' &middot; planned' : ''}${b.closed ? ' &middot; <b>CLOSED</b> ' + b.closed : ''}</span></td><td class="num">${b.done}</td>
     <td class="num">${b.total - b.done}</td><td><div class="bar"><div style="width:${b.done / b.total * 100}%"></div></div></td></tr>`).join('');
   $('galleries').innerHTML = bs.map(b => `<div class="panel" style="margin-bottom:12px"><b>${b.game}</b> <span class="mute">· ${b.kind} · ${b.done}/${b.total}</span>
     <div class="grid">${b.items.map(i => `<div class="cell">${i.done ? `<img src="${i.thumb}" loading="lazy" alt="${i.name}" data-full="${i.thumb}">`

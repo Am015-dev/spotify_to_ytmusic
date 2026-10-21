@@ -12,6 +12,9 @@ GA = Path(os.environ.get("GAME_ASSETS", Path(__file__).parent.parent))
 LOGS = Path(os.environ.get("FLOW_LOGS", r"C:\Users\kourisa\Google-Flow_MCP\logs"))
 THUMBS = Path(__file__).parent / "flowthumbs"
 LIMIT = int(os.environ.get("FLOW_DAY_LIMIT", 380))
+# games whose Flow work is finished (owner closes them): left out of pending/ETA, tagged CLOSED in the planner and board.
+# Nightrun 2026-10-21: 844 cards made; the 15 parked UI plates in its _stale folder are closed with it.
+CLOSED = {"mainhattan-nightrun": "2026-10-21"}
 KIND = {"prompts-kit.json": "Wave 4 kit", "prompts.json": "main set", "prompts-redo.json": "redo", "prompts-redo2.json": "redo",
         "prompts-v2.json": "3D v2", "prompts-v3.json": "3D v3", "prompts-gapfix.json": "3D gap fix", "prompts-tokens.json": "3D tokens",
         "prompts-missing.json": "3D missing", "prompts-tall.json": "story map",
@@ -167,6 +170,19 @@ def facts(f):
     return _facts[key]
 
 
+_made = {}
+def made_elsewhere(root, folder, name):
+    """Same card made in another folder of the same game (strip redo rounds land in runs-<date>/<new group>; the board
+    showed the originals as missing, owner 2026-10-21). _old_/_rejected_ copies have other names, so they never match."""
+    game = next((p for p in folder.relative_to(GA / root).parts[:1]), "")
+    if (root, game) not in _made:
+        idx = {}
+        for p in (GA / root / game).rglob("*.jpg"):
+            if "_stale" not in p.parts and "_redo" not in p.parts: idx.setdefault(p.stem, p)
+        _made[(root, game)] = idx
+    return _made[(root, game)].get(name)
+
+
 def stage(game, name, done, vote):
     media = f"games/{game}/media/{name}.webp"
     if game_text(game) and f"media/{name}.webp" in game_text(game): return "wired"
@@ -178,6 +194,7 @@ def stage(game, name, done, vote):
 
 
 def build():
+    _made.clear()
     now = dt.datetime.now(dt.timezone.utc)
     win = sorted(j for j in jobs() if j > now - dt.timedelta(hours=24))
     forecast = []
@@ -202,6 +219,7 @@ def build():
             for name, prompt in cards.items():
                 if isinstance(prompt, dict): prompt = prompt.get("prompt", "")  # pose cards: {"prompt": ..., reference fields}
                 f = folder / f"{name}.jpg"
+                if not f.exists(): f = made_elsewhere(root, folder, name) or f  # regenerated into a later run folder
                 old = folder / "_redo" / f"{name}.jpg"
                 vt = votes.get(f"{folder.name}/{name}", {}) if root == "flow-2d" else {}
                 items.append({"name": name, "done": f.exists(), "thumb": thumb(f) if f.exists() else None,
@@ -212,11 +230,13 @@ def build():
                               "stage": stage(folder.name, name, f.exists(), vt.get("v")) if root == "flow-2d" else None,
                               "flags": ["blank"] if root == "flow-2d" and f.exists() and facts(f)[1] else [],
                               "qa": {k: qa[name][k] for k in ("ok", "issues") if k in qa[name]} if f.exists() and name in qa else None})
-            game = "covers" if root == "flow-covers" else folder.parent.name if root == "flow-video" else folder.name
+            game = "covers" if root == "flow-covers" else folder.parent.name if root == "flow-video" else \
+                folder.parent.parent.name if folder.parent.name.startswith("runs-") else folder.name  # day runs: flow-2d/<game>/runs-<date>/<out>/
             batches.append({"root": root, "game": game, "kind": kind_of(p.name), "file": p.relative_to(GA).as_posix(),
                             "wave": wave_of(root, p.name), "ratio": ratio_of(p.name),
-                            "done": sum(i["done"] for i in items), "total": len(items), "items": items})
-    pending = sum(b["total"] - b["done"] for b in batches)
+                            "done": sum(i["done"] for i in items), "total": len(items), "items": items,
+                            "closed": next((d for g, d in CLOSED.items() if g in p.relative_to(GA).parts), None)})
+    pending = sum(b["total"] - b["done"] for b in batches if not b["closed"])
     # when does the pending work fit? fill the free room hour by hour, then at LIMIT per day after the forecast
     left, eta = pending, None
     for f in forecast:
@@ -238,7 +258,7 @@ def build():
     for b in batches:
         if b["root"] != "flow-2d": continue
         for i in b["items"]:
-            if i["done"]: seen.setdefault((b["game"], facts(GA / "flow-2d" / b["game"] / f"{i['name']}.jpg")[0]), []).append(i)
+            if i["done"]: seen.setdefault((b["game"], facts(GA / i["full"][len("full/"):])[0]), []).append(i)  # real path: day runs live in subfolders
     for same in seen.values():
         names = {x["name"] for x in same}
         if len(names) > 1:

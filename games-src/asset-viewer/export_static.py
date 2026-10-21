@@ -11,7 +11,7 @@ import pipeline_api
 V = Path(__file__).parent
 REPO = Path(os.environ.get("CROWN_REPO", r"C:\Users\kourisa\crown-media\repo"))
 OUT = REPO / "games" / "asset-viewer"
-PAGES = ["flow.html", "board.html", "assets.html", "screens.html", "anims.html", "music.html", "games.html"]
+PAGES = ["flow.html", "board.html", "assets.html", "screens.html", "anims.html", "sprites.html", "music.html", "games.html"]
 # local server routes -> GitHub Pages paths (asset-viewer/ sits next to the game folders)
 ROUTES = [("src=\"game/${G}/", "src=\"../${G}/"), ("`/repo/${g}/media/", "`../${g}/media/")]
 
@@ -43,6 +43,18 @@ for w in sorted((flow_status.GA / "flow-video").glob("*/*.webm")):
     anims.append({"game": w.parent.name, "name": w.stem, "webm": url(w), "mp4": None, "sheet": url(sheet) if sheet.exists() else None,
                   "kb": w.stat().st_size // 1024, "t": int(w.stat().st_mtime)})
 (OUT / "anims.json").write_text(json.dumps(anims), encoding="utf-8")
+# sprite sheets (Sprites tab): the strip sheets are copied in (Pages serves games/ only), with flags + the owner's reviews
+sprites, rev = [], json.loads((V / "sprite_reviews.json").read_text(encoding="utf-8")) if (V / "sprite_reviews.json").exists() else {}
+ev = flow_status.GA / "logs" / "sprite_eval.json"; flags = json.loads(ev.read_text(encoding="utf-8")) if ev.exists() else {}
+cat = lambda w: ("Bosses" if w.startswith("boss-") else "Ships" if w.startswith("ship-") else "Weapons" if w.startswith("wpn-")
+                 else "Explosions" if w.startswith("fx-") else "Props" if w.startswith(("prop-", "pk-")) else "Characters")
+for j in sorted((flow_status.GA / "flow-2d").glob("*/anim/*/*-strip.json")):
+    d, who, g, act = json.loads(j.read_text(encoding="utf-8")), j.parent.name, j.parents[2].name, j.stem.replace("-strip", "")
+    dst = OUT / "sprites" / g / who; dst.mkdir(parents=True, exist_ok=True); shutil.copy2(j.with_suffix(".webp"), dst / j.with_suffix(".webp").name)
+    sprites.append({"game": g, "cat": cat(who), "who": who, "act": act, "src": f"sprites/{g}/{who}/{j.with_suffix('.webp').name}",
+                    "t": int(j.stat().st_mtime), "flags": flags.get(f"{who}/{act}", []) if g == "mainhattan-nightrun" else [],
+                    "review": rev.get(f"{g}/{who}/{act}"), **{k: d[k] for k in ("frames", "fps", "w", "h")}})
+(OUT / "sprites.json").write_text(json.dumps(sprites), encoding="utf-8")
 music = pipeline_api.music(games, "../", flow_status.thumb)
 for m in music.values():
     if m["cover"]: shutil.copy2(V / m["cover"], OUT / m["cover"])
@@ -56,7 +68,8 @@ for p in PAGES:
     html = html.replace("cache: 'no-store'", "cache: 'no-cache'")
     for a, b in ROUTES: html = html.replace(a, b)
     i = html.index(">", html.index("<body")) + 1
-    (OUT / p).write_text(html[:i] + banner + html[i:], encoding="utf-8")
+    ro = '<style>.rv,.card textarea,#bulk{display:none!important}</style>' if p == "sprites.html" else ""  # reviews need serve.py
+    (OUT / p).write_text(html[:i] + banner + ro + html[i:], encoding="utf-8")
 (OUT / "index.html").write_text('<!doctype html><meta charset="utf-8"><title>Asset viewer</title>'
                                 '<meta http-equiv="refresh" content="0; url=board.html"><a href="board.html">Production board</a>',
                                 encoding="utf-8")

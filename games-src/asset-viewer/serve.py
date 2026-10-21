@@ -1,6 +1,6 @@
 """Serve the model viewer and save Keep/Redo votes to viewer/votes.json (POST /votes).
 Run: C:\\Miniforge3\\python.exe viewer\\serve.py   ->  http://127.0.0.1:8765/"""
-import json, os
+import json, os, re, threading
 import mimetypes
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -12,6 +12,10 @@ GA = Path(os.environ.get("GAME_ASSETS", V.parent)).resolve()
 FULL = ("flow-2d", "flow-3d", "flow-covers", "flow-video")  # only these folders are readable through /full/
 REPO = (Path(os.environ.get("CROWN_REPO", r"C:\Users\kourisa\crown-media\repo")) / "games").resolve()  # /repo/<game>/media/<file>: painted game art, read-only
 IMG = {".jpg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
+# sprite sheet review (sprites.html): {"game/who/act": {"v": "ok"|"fix"|None, "note": str}}
+REVF, REVLOCK, REVKEY = V / "sprite_reviews.json", threading.Lock(), re.compile(r"^[\w.-]+/[\w.-]+/[\w.-]+$")
+def load_reviews():
+    return json.loads(REVF.read_text(encoding="utf-8")) if REVF.exists() else {}
 # frames share one origin, so one frame's saved game would open every other frame on the same screen: give each its own memory storage
 FRESH = (b"<script>(()=>{const M=()=>{const d=new Map;return{getItem:k=>d.has(k)?d.get(k):null,setItem:(k,v)=>d.set(k,String(v)),"
          b"removeItem:k=>d.delete(k),clear:()=>d.clear(),key:i=>[...d.keys()][i]??null,get length(){return d.size}}};"
@@ -44,6 +48,22 @@ class H(SimpleHTTPRequestHandler):
             body = json.dumps(pipeline_api.music(REPO, "game/", lambda c: f"full/{c.relative_to(GA).as_posix()}")).encode()
             self.send_response(200); self.send_header("Content-Type", "application/json"); self.end_headers()
             return self.wfile.write(body)
+        if self.path.split("?")[0] == "/sprites.json":  # strip sprite sheets: flow-2d/<game>/anim/<who>/<action>-strip.webp/.json
+            cat = lambda w: ("Bosses" if w.startswith("boss-") else "Ships" if w.startswith("ship-") else "Weapons" if w.startswith("wpn-")
+                             else "Explosions" if w.startswith("fx-")
+                             else "Props" if w.startswith(("prop-", "pk-")) else "Characters")
+            out, rev = [], load_reviews()
+            ev = GA / "logs" / "sprite_eval.json"  # eval_sprites.py flags (Nightrun only)
+            flags = json.loads(ev.read_text(encoding="utf-8")) if ev.exists() else {}
+            for j in sorted((GA / "flow-2d").glob("*/anim/*/*-strip.json")):
+                d = json.loads(j.read_text(encoding="utf-8")); who, g, act = j.parent.name, j.parents[2].name, j.stem.replace("-strip", "")
+                out.append({"game": g, "cat": cat(who), "who": who, "act": act,
+                            "src": f"full/{j.with_suffix('.webp').relative_to(GA).as_posix()}", "t": int(j.stat().st_mtime),
+                            "flags": flags.get(f"{who}/{act}", []) if g == "mainhattan-nightrun" else [],
+                            "review": rev.get(f"{g}/{who}/{act}"), **{k: d[k] for k in ("frames", "fps", "w", "h")}})
+            body = json.dumps(out).encode()
+            self.send_response(200); self.send_header("Content-Type", "application/json"); self.end_headers()
+            return self.wfile.write(body)
         if self.path.split("?")[0] == "/anims.json":  # Flow animation clips: flow-video/<game>/<name>.webm (alpha) + .mp4 source
             out = []
             for w in sorted((GA / "flow-video").glob("*/*.webm")):
@@ -57,9 +77,9 @@ class H(SimpleHTTPRequestHandler):
             return self.wfile.write(body)
         if self.path.startswith("/full/"):  # full-size Flow images for the Asset Board lightbox
             f = (GA / unquote(self.path[6:].split("?")[0])).resolve()
-            if f.suffix.lower() not in (".jpg", ".png", ".webm", ".mp4") or not any(f.is_relative_to(GA / r) for r in FULL) or not f.is_file():
+            if f.suffix.lower() not in (".jpg", ".png", ".webp", ".webm", ".mp4") or not any(f.is_relative_to(GA / r) for r in FULL) or not f.is_file():
                 return self.send_error(404)
-            ctype = {".jpg": "image/jpeg", ".png": "image/png", ".webm": "video/webm", ".mp4": "video/mp4"}[f.suffix.lower()]
+            ctype = {".jpg": "image/jpeg", ".png": "image/png", ".webp": "image/webp", ".webm": "video/webm", ".mp4": "video/mp4"}[f.suffix.lower()]
             self.send_response(200); self.send_header("Content-Type", ctype)
             self.end_headers()
             return self.wfile.write(f.read_bytes())
@@ -87,6 +107,21 @@ class H(SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
+        if self.path == "/sprite_reviews":  # [{"key": "game/who/act", "v": "ok"|"fix"|null, "note": "..."}, ...] -> all reviews
+            try:
+                d = json.loads(self.rfile.read(min(int(self.headers.get("Content-Length", 0)), 400_000)))
+                if not isinstance(d, list) or not all(isinstance(c, dict) and REVKEY.match(c.get("key", "")) and c.get("v") in ("ok", "fix", None)
+                                                      and len(c.get("note") or "") <= 2000 for c in d): raise ValueError("bad review")
+                with REVLOCK:
+                    rev = load_reviews()
+                    for c in d:
+                        if c.get("v") or c.get("note"): rev[c["key"]] = {"v": c.get("v"), "note": c.get("note") or ""}
+                        else: rev.pop(c["key"], None)
+                    REVF.write_text(json.dumps(rev, indent=1, sort_keys=True, ensure_ascii=False), encoding="utf-8")
+            except (ValueError, TypeError): return self.send_error(400)
+            body = json.dumps(rev).encode()
+            self.send_response(200); self.send_header("Content-Type", "application/json"); self.end_headers()
+            return self.wfile.write(body)
         if self.path in ("/votes2d/bulk", "/run"):  # [{key, v, note}, ...] | {"jobs": ["game|prompts-x.json|1:1", ...]}
             import pipeline_api
             try:

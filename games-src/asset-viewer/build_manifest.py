@@ -22,7 +22,10 @@ for g in sorted((V.parent / "vm" / "pixal" / "out").glob("*.glb")):
     stem, suffix = (g.stem[:-5], "-pixal-game") if g.stem.endswith("_game") else (g.stem, "-pixal")
     game, _, name = stem.partition("__")
     up = V.parent / "vm" / "pixal" / "upright" / g.name  # lean-corrected copy (vm/pixal/upright.py) when it exists
-    dst = f"{stem}{suffix}.glb"; shutil.copy(up if up.exists() else g, V / "glb" / dst)
+    # stray pieces removed + doubleSided (vm/pixal/fix_glb.py, 2026-10-17): prefer the cleaned copy of whichever is used
+    P = V.parent / "vm" / "pixal"
+    use = next(x for x in (P / "upright_fixed" / g.name, up, P / "fixed" / g.name, g) if x.exists() and (x != P / "fixed" / g.name or not up.exists()))
+    dst = f"{stem}{suffix}.glb"; shutil.copy(use, V / "glb" / dst)
     src = CUT / f"{stem}.png"
     if src.exists(): shutil.copy(src, V / "src" / src.name)
     items.append({"game": game, "name": f"{name}{suffix}", "glb": f"glb/{dst}", "src": f"src/{stem}.png", "kb": g.stat().st_size // 1024,

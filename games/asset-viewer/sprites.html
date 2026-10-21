@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sprites</title>
+<!-- strip sprite sheets of every game (sprites.json from serve.py), by category, playing at game speed (owner 2026-10-21).
+     Same playback as flow-2d/<game>/anim/preview.html: speed, pause/step, Smoothing ON/OFF (values in anim/smoothing.json). -->
+<style>
+  :root { --bg: #111215; --card: #1d2025; --card2: #24272d; --line: #2d3138; --ink: #ecebe7; --mute: #9599a1; --dim: #6c7078; --accent: #f2b33d; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button, select { font: inherit; color: inherit; }
+  header { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 14px; padding: 10px 18px; flex-wrap: wrap;
+           background: rgba(17,18,21,.94); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+  header h1 { font-size: 17px; margin: 0; } header h1 span { color: var(--accent); }
+  nav.tabs { display: flex; gap: 4px; flex-wrap: wrap; } nav.tabs a { text-decoration: none; padding: 6px 10px; border-radius: 7px; color: var(--mute); }
+  nav.tabs a.on { background: var(--card2); color: var(--ink); } nav.tabs a:hover { color: var(--ink); }
+  .bar { display: flex; gap: 10px 14px; align-items: center; flex-wrap: wrap; padding: 10px 22px 0; color: var(--mute); font-size: 13px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; flex-wrap: wrap; }
+  .seg button { background: var(--card); border: 0; padding: 5px 10px; cursor: pointer; }
+  .seg button.on { background: var(--ink); color: #15171a; }
+  .seg button small { color: inherit; opacity: .6; }
+  select { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; }
+  .btn { background: var(--card2); border: 1px solid var(--line); border-radius: 8px; padding: 4px 9px; cursor: pointer; }
+  h2 { font-size: 15px; margin: 22px 22px 8px; color: var(--accent); }
+  .grid { padding: 0 22px; display: flex; flex-wrap: wrap; gap: 12px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px; text-align: center; }
+  .card canvas { display: block; margin: auto; max-width: 100%; height: auto; }
+  .card b { font-size: 13px; } .card span { color: var(--dim); font-size: 12px; }
+  .empty { color: var(--mute); padding: 40px 22px; }
+  /* review: red = automatic eval flags, green = approved, orange = needs work */
+  .card { min-width: 230px; display: flex; flex-direction: column; gap: 5px; }
+  .card.flag { border-color: #e5534b; box-shadow: 0 0 0 1px #e5534b inset; }
+  .card.ok { border-color: #3fb950; box-shadow: 0 0 0 1px #3fb950 inset; } .card.fix { border-color: #f0883e; box-shadow: 0 0 0 1px #f0883e inset; }
+  .flags { margin: 0; padding: 4px 8px 4px 22px; text-align: left; color: #ff9b94; font-size: 12px; background: rgba(229,83,75,.1); border-radius: 6px; }
+  .rv { display: flex; gap: 6px; justify-content: center; }
+  .rv button { flex: 1; background: var(--card2); border: 1px solid var(--line); border-radius: 7px; padding: 4px 6px; cursor: pointer; }
+  .rv button.ok.on { background: #3fb950; color: #0d1117; border-color: #3fb950; } .rv button.fix.on { background: #f0883e; color: #0d1117; border-color: #f0883e; }
+  .card textarea { width: 100%; min-height: 34px; resize: vertical; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 7px; padding: 5px 7px; font: 12px/1.4 inherit; }
+  #msg { color: var(--accent); }
+  @media (max-width: 700px) { .bar, .grid { padding-left: 12px; padding-right: 12px; } h2 { margin-left: 12px; } }
+</style>
+</head>
+<body><div style="position:sticky;top:0;z-index:99;background:#3a2f12;color:#ffe9a8;font:13px system-ui;padding:6px 12px">Read-only snapshot of 21 Oct 2026 13:40. Voting and Flow runs work only in the local viewer.</div><style>.rv,.card textarea,#bulk{display:none!important}</style>
+<header>
+  <h1>Flow <span>Sprites</span></h1>
+  <nav class="tabs"><a href="board.html">Production</a><a href="assets.html">Assets</a><a href="screens.html">Screens</a><a href="anims.html">Animations</a><a class="on" href="sprites.html">Sprites</a><a href="music.html">Music</a><a href="games.html">Games</a><a href="flow.html">Flow planner</a><a href="workers.html">Workers</a></nav>
+</header>
+<div class="bar">
+  <span class="seg" id="cats"></span>
+  <select id="game"></select>
+  <label>Speed <input id="sp" type="range" min="0.1" max="3" step="0.05" value="1" style="width:150px;vertical-align:middle"></label><b id="spv">1.00×</b>
+  <button class="btn" id="pp">Pause</button><button class="btn" id="st">Step ›</button>
+  <label><input type="checkbox" id="smooth" checked> <b>Smoothing</b></label>
+  <label>Size <select id="size"><option value="0.5">small</option><option value="0.75" selected>medium</option><option value="1">full</option></select></label>
+</div>
+<div class="bar">
+  <b>Review</b> <span class="seg" id="rf"></span>
+  <button class="btn" id="bulk" title="Approve every shown sheet that has no automatic flag and no review yet">Approve shown unflagged</button>
+  <button class="btn" id="exp">Export JSON</button> <span id="msg"></span>
+</div>
+<div id="out"><div class="empty">Loading…</div></div>
+<script>
+const $ = id => document.getElementById(id);
+const CATS = ['All', 'Characters', 'Bosses', 'Ships', 'Weapons', 'Explosions', 'Props'];
+let S = [], cat = 'All', game = '', speed = 1, paused = false, stepN = 0, smooth = true, scale = 0.75, gen = 0, rf = 'all';
+try { const s = JSON.parse(localStorage.getItem('spritesView') || '{}'); cat = s.cat || cat; scale = s.scale || scale; rf = s.rf || rf; } catch (e) {}
+const save = () => { try { localStorage.setItem('spritesView', JSON.stringify({ cat, scale, rf })); } catch (e) {} };
+// review: saved by serve.py in viewer/sprite_reviews.json; flags come from logs/sprite_eval.json (eval_sprites.py)
+const key = s => `${s.game}/${s.who}/${s.act}`, st = s => (s.review && s.review.v) || 'todo';
+const RF = { all: ['All', () => true], flagged: ['Auto-flagged', s => s.flags.length], todo: ['To review', s => st(s) === 'todo'],
+  ok: ['Approved', s => st(s) === 'ok'], fix: ['Needs work', s => st(s) === 'fix'] };
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const msg = t => { $('msg').textContent = t; };
+async function post(changes) {
+  try { const r = await fetch('sprite_reviews', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(changes) });
+    if (!r.ok) throw new Error(r.status); const rev = await r.json(); S.forEach(s => { s.review = rev[key(s)] || null; });
+    msg(`saved · ${Object.values(rev).filter(v => v.v === 'ok').length} approved, ${Object.values(rev).filter(v => v.v === 'fix').length} need work`); return true;
+  } catch (e) { msg('NOT saved (is serve.py running?) ' + e.message); return false; }
+}
+const inCat = s => (cat === 'All' || s.cat === cat) && (!game || s.game === game);
+const rfBar = () => { $('rf').innerHTML = Object.entries(RF).map(([k, [lab, f]]) => `<button data-r="${k}" class="${k === rf ? 'on' : ''}">${lab} <small>${S.filter(s => inCat(s) && f(s)).length}</small></button>`).join(''); };
+function paint(c, s) { rfBar(); c.className = 'card' + (s.flags.length ? ' flag' : '') + (st(s) !== 'todo' ? ' ' + st(s) : '');
+  c.querySelectorAll('.rv button').forEach(b => b.classList.toggle('on', st(s) === b.dataset.v)); }
+// recommended smoothing (anim/smoothing.json): key-frame holds, hit-stop + flash, squash, bob/breath, lean, cross-fade
+const W = { run: [1.5,.75,.75,1.5,.75,.75], shoot: [1.4,.6,1], melee: [1.6,.5,1.3,1], attack: [1.6,.5,1.3,1], jump: [1.3,1,1,1.6],
+  die: [1,1,1,3], defeat: [1,1,1,3], hit: [1,1,1.4], impact: [.6,1.3,1,1], burst: [.6,1,1.3,1,1], muzzle: [.6,1.2,1], death: [1,1,1,2] };
+const STOP = { die: 0, hit: 0, death: 0, melee: 2, attack: 2, shoot: 1 }, SQUASH = { run: [0,3], jump: [3], melee: [2], attack: [2] };
+const FADE = new Set(['idle','flame','beam','burst','impact','muzzle','hover','glow','loop']);
+function frameAt(tau, s) {
+  const w = (smooth && W[s.act]) ? W[s.act].slice(0, s.frames) : Array(s.frames).fill(1); while (w.length < s.frames) w.push(1);
+  const L = w.reduce((a, b) => a + b, 0); let p = ((tau % L) + L) % L;
+  for (let i = 0; i < s.frames; i++) { if (p < w[i]) return [i, p / w[i]]; p -= w[i]; } return [s.frames - 1, 0];
+}
+const white = document.createElement('canvas'), wx = white.getContext('2d');
+function sprite(ctx, im, s, i, alpha, flash) {
+  ctx.globalAlpha = alpha;
+  if (flash > 0) { white.width = s.w; white.height = s.h; wx.clearRect(0, 0, s.w, s.h); wx.drawImage(im, i * s.w, 0, s.w, s.h, 0, 0, s.w, s.h);
+    wx.globalCompositeOperation = 'source-atop'; wx.fillStyle = `rgba(255,255,255,${.85 * flash})`; wx.fillRect(0, 0, s.w, s.h);
+    wx.globalCompositeOperation = 'source-over'; ctx.drawImage(white, 0, 0); }
+  else ctx.drawImage(im, i * s.w, 0, s.w, s.h, 0, 0, s.w, s.h);
+  ctx.globalAlpha = 1;
+}
+function card(s, myGen) {
+  const PAD = 18, c = document.createElement('div'); c.className = 'card';
+  const cv = document.createElement('canvas'); cv.width = s.w + PAD * 2; cv.height = s.h + PAD + 6; cv.style.width = (cv.width * scale) + 'px';
+  c.append(cv); c.insertAdjacentHTML('beforeend', `<div><b>${s.who} · ${s.act}</b><br><span>${s.frames} frames · ${s.fps} fps</span></div>`
+    + (s.flags.length ? `<ul class="flags">${s.flags.map(f => `<li>${esc(f)}</li>`).join('')}</ul>` : '')
+    + `<div class="rv"><button class="ok" data-v="ok">✓ Approve</button><button class="fix" data-v="fix">✎ Needs work</button></div>`
+    + `<textarea placeholder="Comment (what to improve)…" maxlength="2000">${esc((s.review && s.review.note) || '')}</textarea>`);
+  paint(c, s); const ta = c.querySelector('textarea');
+  c.querySelector('.rv').onclick = async e => { const b = e.target.closest('button'); if (!b) return;
+    const v = st(s) === b.dataset.v ? null : b.dataset.v;  // click again = undo
+    if (await post([{ key: key(s), v, note: ta.value }])) paint(c, s); };
+  ta.onchange = async () => { const v = st(s) === 'todo' && ta.value.trim() ? 'fix' : (s.review && s.review.v) || null;  // a comment alone = needs work
+    if (await post([{ key: key(s), v, note: ta.value }])) paint(c, s); };
+  const im = new Image(); im.src = s.src; const x = cv.getContext('2d');
+  im.onload = () => { let tau = 0, last = performance.now(), seen = stepN, prev = -1, stopT = 0, flashT = 0, sqT = 0, clock = 0;
+    (function f(t) { if (myGen !== gen) return;
+      const dt = Math.min(.1, (t - last) / 1000); last = t; clock += dt;
+      if (!paused) { if (stopT > 0) stopT -= dt; else tau += dt * s.fps * speed; }
+      if (stepN !== seen) { tau = Math.floor(tau) + 1; seen = stepN; }
+      const [j, frac] = frameAt(tau, s);
+      if (j !== prev) { if (smooth && STOP[s.act] === j && !paused) { stopT = .09 / speed; flashT = 1; }
+        if (smooth && (SQUASH[s.act] || []).includes(j)) sqT = 1; prev = j; }
+      flashT = Math.max(0, flashT - dt * 14); sqT = Math.max(0, sqT - dt * 8);
+      const fy = s.h + PAD; x.clearRect(0, 0, cv.width, cv.height); x.fillStyle = '#3a3d44'; x.fillRect(0, fy + 2, cv.width, 2);
+      x.save(); let bob = 0, sy = 1, sx = 1, rot = 0;
+      if (smooth) { if (s.act === 'idle') { bob = Math.sin(clock * Math.PI * 1.2) * (s.cat === 'Bosses' ? 4 : 1.5); sy = 1 + .012 * Math.sin(clock * Math.PI * 1.2); }
+        else if (s.cat === 'Bosses' && s.act !== 'defeat') bob = Math.sin(clock * Math.PI) * 3;
+        if (s.act === 'run') rot = 4 * Math.PI / 180;
+        if (sqT > 0) { const k = Math.sin(sqT * Math.PI / 2); sy *= 1 - .07 * k; sx *= 1 + .07 * k; } }
+      x.translate(PAD + s.w / 2, fy + bob); x.rotate(rot); x.scale(sx, sy); x.translate(-s.w / 2, -s.h);
+      sprite(x, im, s, j, 1, smooth ? flashT : 0);
+      if (smooth && FADE.has(s.act) && frac > .5) sprite(x, im, s, (j + 1) % s.frames, Math.min(1, (frac - .5) / .5) * .85, 0);
+      x.restore(); cv.dataset.frame = j; requestAnimationFrame(f); })(performance.now()); };
+  return c;
+}
+function draw() {
+  gen++; const myGen = gen, out = $('out'); out.innerHTML = '';
+  const list = S.filter(s => inCat(s) && RF[rf][1](s)); rfBar();
+  $('cats').innerHTML = CATS.map(c => `<button data-c="${c}" class="${c === cat ? 'on' : ''}">${c} <small>${c === 'All' ? S.filter(s => !game || s.game === game).length : S.filter(s => s.cat === c && (!game || s.game === game)).length}</small></button>`).join('');
+  if (!list.length) { out.innerHTML = '<div class="empty">No sprite sheets here yet.</div>'; return; }
+  for (const c of CATS.slice(1)) {
+    const part = list.filter(s => s.cat === c); if (!part.length) continue;
+    const h = document.createElement('h2'); h.textContent = `${c} (${part.length})`; out.append(h);
+    const g = document.createElement('div'); g.className = 'grid'; out.append(g);
+    part.sort((a, b) => (a.who + a.act).localeCompare(b.who + b.act)).forEach(s => g.append(card(s, myGen)));
+  }
+}
+$('cats').onclick = e => { const b = e.target.closest('button'); if (!b) return; cat = b.dataset.c; save(); draw(); };
+$('game').onchange = e => { game = e.target.value; draw(); };
+$('rf').onclick = e => { const b = e.target.closest('button'); if (!b) return; rf = b.dataset.r; save(); draw(); };
+$('bulk').onclick = async () => {
+  const todo = S.filter(s => (cat === 'All' || s.cat === cat) && (!game || s.game === game) && RF[rf][1](s) && !s.flags.length && st(s) === 'todo');
+  if (!todo.length) return msg('nothing to approve here');
+  if (!confirm(`Approve ${todo.length} shown sheets without automatic flags?`)) return;
+  if (await post(todo.map(s => ({ key: key(s), v: 'ok', note: '' })))) draw();
+};
+$('exp').onclick = () => {  // every sheet with its status, comment and automatic flags
+  if (!S.length) return msg('sprites not loaded yet');
+  const items = S.map(s => ({ key: key(s), game: s.game, category: s.cat, who: s.who, action: s.act, status: { ok: 'approved', fix: 'needs_work', todo: 'unreviewed' }[st(s)],
+    comment: (s.review && s.review.note) || '', auto_flags: s.flags, frames: s.frames, fps: s.fps, sheet: s.src.replace(/^full\//, '') }));
+  const count = v => items.filter(i => i.status === v).length;
+  const out = { exported: new Date().toISOString(), total: items.length, approved: count('approved'), needs_work: count('needs_work'), unreviewed: count('unreviewed'),
+    items: items.sort((a, b) => ({ needs_work: 0, unreviewed: 1, approved: 2 }[a.status] - { needs_work: 0, unreviewed: 1, approved: 2 }[b.status]) || a.key.localeCompare(b.key)) };
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(out, null, 1)], { type: 'application/json' }));
+  a.download = `sprite-review-${out.exported.slice(0, 10)}.json`; a.click(); URL.revokeObjectURL(a.href);
+};
+$('sp').oninput = e => { speed = +e.target.value; $('spv').textContent = speed.toFixed(2) + '×'; };
+$('pp').onclick = e => { paused = !paused; e.target.textContent = paused ? 'Play' : 'Pause'; };
+$('st').onclick = () => { paused = true; $('pp').textContent = 'Play'; stepN++; };
+$('smooth').onchange = e => { smooth = e.target.checked; };
+$('size').value = String(scale); $('size').onchange = e => { scale = +e.target.value; save(); draw(); };
+fetch('sprites.json', { cache: 'no-cache' }).then(r => r.json()).then(d => {
+  S = d; const games = [...new Set(S.map(s => s.game))].sort();
+  $('game').innerHTML = `<option value="">All games</option>` + games.map(g => `<option>${g}</option>`).join('');
+  draw();
+}).catch(() => { $('out').innerHTML = '<div class="empty">Could not load sprites.json (is serve.py running?)</div>'; });
+</script>
+</body>
+</html>

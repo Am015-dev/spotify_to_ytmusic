@@ -3,7 +3,7 @@
 Local review tool for the facelift art: 3D model Keep/Redo votes, 2D Flow image votes, Flow budget planner,
 game screens with painted art in place, animation clips.
 
-Source of truth is the Windows laptop copy (`Desktop\game-assets\viewer`); this folder is a code-only copy.
+Source of truth is the Windows laptop copy (`Desktop\TALON_assets\viewer`); this folder is a code-only copy.
 Sync direction: laptop -> repo. Large data (`glb/`, `src/`, `media/`, `flowthumbs/`, Flow images) is not in git.
 
 Online (read-only snapshot): https://am015-dev.github.io/spotify_to_ytmusic/asset-viewer/ (Production board, Flow Planner,
@@ -12,7 +12,7 @@ Asset Board). Refresh it with `python viewer/export_static.py`, then push `games
 ## Run
 
 ```sh
-CROWN_REPO=/path/to/repo GAME_ASSETS=/path/to/game-assets python3 serve.py   # -> http://127.0.0.1:8765/
+CROWN_REPO=/path/to/repo GAME_ASSETS=/path/to/TALON_assets python3 serve.py   # -> http://127.0.0.1:8765/
 ```
 
 | Env | Default (laptop) | Used for |
