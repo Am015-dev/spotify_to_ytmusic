@@ -69,7 +69,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | bulletart | bulletart BA 9-11 |  |  | bulletart |  |
 | powers | arsenal PWX.tip 90-157 | footen |  | powers | ASSETS-NEEDED-3 |
 | abup,pwrclear | abup ABUP 25-97 |  |  | abup | ASSETS-NEEDED-3 |
-| zonehint | zonehint ZH 9-24 |  |  | pwrstar |  |
+| zonehint | zonehint ZH 9-26 |  |  | pwrstar |  |
 | econfit | econfit ECF.apply 11-12 |  |  |  |  |
 | comfort* | comfort COM 14-78 |  |  | comfort |  |
 | classes | classes clsSvg 106-108 |  |  | classes | ASSETS-NEEDED-3 |
@@ -83,6 +83,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | school | school footEnd 107-122 |  |  | school |  |
 | schoolfull | schoolfull sfGapWall 49-67 |  |  | school-full |  |
 | tidy | tidy F.post 19-88 | flavor,ret |  | tidy |  |
+| explain | explain EXP 11-39 |  |  | explain | WORKER-RULES |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.
 
