@@ -1,3 +1,6 @@
+// PURPOSE: hold the line: letting enemies pass costs
+// FLAG: holdline (?holdline=0)
+// TEST: holdline-test.js
 /* ---------- holdline.js: hold the line (owner, 20 Oct 2026: "gamer should not be leaving so many enemies passing through defense"). Flag RET.holdline; ?holdline=0 = leak.js as it was.
    The BREACH meter of leak.js becomes a visible defence line on the left edge of the playfield: it empties with every leak, an empty line costs one hull (leak.js pay(), same caps).
    1. VISIBLE LINE: a thin bar on the left edge, full = safe, amber / red as it drains, flashes on a leak. The stat strip label reads LINE with the leak count of the stage.

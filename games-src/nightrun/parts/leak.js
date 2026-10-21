@@ -1,3 +1,6 @@
+// PURPOSE: ground enemies, calmer pacing, escape penalty
+// FLAG: leak (?leak=0)
+// TEST: ret-leak-test.js
 /* ---------- leak.js: ground enemies, calmer pacing, escape penalty (owner, 17 Oct 2026). Flag RET.leak; ?leak=0 = the game as it was.
    1. GROUND ENEMIES: gtank (rolls on the road line, lobs a slow shell), gturret (rises out of the road, aimed shots), gwalker (slow, tanky, steps).
       They stand on UIK.groundY() (the ground-boss road line, same soft shadow), never fly or jump, scroll left with the ground. About 30% of the waves of a stage

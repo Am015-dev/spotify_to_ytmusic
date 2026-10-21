@@ -1,3 +1,6 @@
+// PURPOSE: set pieces, deck replaces the fixed metronome, rosters
+// FLAG: deck (?deck=0), roster (?roster=0), songspread (?songspread=0)
+// TEST: fun-test.js
 /* ---------- FUN pass: something new every ~8-10 s ----------
    SET PIECES   every 6 bars (~12 s) a signature formation per district that moves on the beat (WEAVE) or a LASER FENCE across the screen on the bar line;
                 clear one and a shard shower sweeps across the screen

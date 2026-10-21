@@ -1,3 +1,6 @@
+// PURPOSE: slower EMP meter, tougher varied enemies
+// FLAG: grit (?grit=0), gritBoss (?gritboss=0)
+// TEST: grit-test.js
 /* ---------- GRIT: a slower EMP meter and tougher, more varied enemies (flag RET.grit, default ON; ?grit=0 = the old numbers exactly). BALANCE.md "Grit". Test: nightrun/grit-test.js.
    Owner, 20 Oct 2026: "the game is very easy, the EMP charges very fast, the enemies are predictable, my weapons are superior to the enemies".
    1. EMP meter: ABIL.gain asks GRIT.emp for every source. Kills of fodder (mini, swarm, mine, plain drones) give nothing, the rest diminish as kills pile up, graze gain is capped per second,
