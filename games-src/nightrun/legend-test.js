@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// LEGEND gate (parts/legend.js, flag RET.legend, default OFF: the bots run with ?legend=1, Q='&legend=0' measures the old Legend). Prints PASS/FAIL lines; REPORT=1 prints the bot table.
+// LEGEND gate (parts/legend.js, flag RET.legend, default ON: the bots run with ?legend=1, Q='&legend=0' measures the old Legend). Prints PASS/FAIL lines; REPORT=1 prints the bot table.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/legend-test.js
 //   env: DIFFS=legend STAGES=10,20 MODES=human,dodger,noor,beat,nodash,camp,rand RUNS=8 PAR=4 Q='&legend=0' ENDLESS=1 (endless: median wave reached) GATE=0 (table only)
 // BUILD=mid|late|owner (default mid). Bots ( story stages, headless ?sim=1): human = humanbot.js human model (late view, misses, lapses, aim error); dodger = the oracle (balance-test cost grid,
@@ -107,9 +107,9 @@ const BOT = (o) => {
   const mk = async q => { const p = await br.newPage({ viewport: { width: 960, height: 540 } }); p.on('pageerror', e => { errs++; if (errs < 4) console.log('FAIL page error ' + e.message); }); await p.goto(url(q)); await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 8000 }).catch(() => { }); return p; };
   if (process.env.GATE !== '0') {   // flag: default (off) = the old rows exactly
     const rows = () => ({ on: !!(window.RET && RET.legend), d: JSON.stringify(window.__mnr.DIFFS.legend), fill: window.ABIL && ABIL.FILL.legend, ev: window.CTR && CTR.EV.legend });
-    const p0 = await mk(''), p1 = await mk('&legend=1'); const a = await p0.evaluate(rows), b = await p1.evaluate(rows); await p0.close(); await p1.close();
-    line(!a.on && b.on, `flag: default off (${a.on}), ?legend=1 on (${b.on})`);
-    line(a.d === '{"d":4.7,"bs":2.4,"fr":6.6,"dn":1.8,"sd":2,"sbs":1.5,"sfr":1.7,"fan":5,"heal":0.15,"el":1.9,"aq":6}' && a.fill === .35 && a.ev === 4, `flag off keeps the old Legend rows (fill ${a.fill}, pressure every ${a.ev} bars)`);
+    const p0 = await mk('&legend=0'), p1 = await mk(''); const a = await p0.evaluate(rows), b = await p1.evaluate(rows); await p0.close(); await p1.close();
+    line(!a.on && b.on, `flag: default on (${b.on}), ?legend=0 off (${a.on})`);
+    line(a.d === '{"d":4.7,"bs":2.4,"fr":6.6,"dn":1.8,"sd":2,"sbs":1.5,"sfr":1.7,"fan":5,"heal":0.15,"el":1.9,"aq":6}' && a.fill === .35 && a.ev === 4, `?legend=0 keeps the old Legend rows (fill ${a.fill}, pressure every ${a.ev} bars)`);
   }
   for (const diff of DIFFS) for (const mode of MODES) for (const n of STAGES) for (let k = 0; k < RUNS; k++) jobs.push({ n, mode, diff, seed: k + 1, MAXT, endless: ENDLESS, build: BUILD });
   await Promise.all(Array.from({ length: PAR }, async () => {

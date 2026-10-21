@@ -58,7 +58,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | foeart | foeart FOEART 45-85 |  |  | foeart | ASSETS-NEEDED-ENEMIES |
 | fleet,fleetArr! | fleet FLEET 21-222 |  |  | fleet |  |
 | endramp | endramp ENDR 15-55 |  |  | endramp |  |
-| legend!,easy2 | legend LEG 18-56 |  |  | legend |  |
+| legend,easy2 | legend LEG 18-59 |  |  | legend |  |
 | deck,roster,songspread | fun FUN 14-77 | footen |  | fun |  |
 | lessons | lessons lsTick 156-178 |  |  | lessons |  |
 | story | saga |  |  | story |  |

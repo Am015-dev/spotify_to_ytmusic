@@ -12784,9 +12784,9 @@ window.addEventListener('pagehide',()=>{if(ENDR.eff){ENDR.restore();try{saveSet(
 {const ri=RU.idx;RU.idx=function(){const n=ri.call(this);return ENDR.on()&&ENDR.o.rules?Math.max(n,2+Math.floor(ENDR.w/3)):n;};}
 
 // PURPOSE: Legend plays differently, not just faster
-// FLAG: legend! (?legend=1)
+// FLAG: legend (?legend=0)
 // TEST: legend-test.js
-/* ---------- LEGEND: its own rules, not a bigger multiplier (flag RET.legend, default OFF until legend-test passes: ?legend=1 = on; off = the old Legend exactly). Test: nightrun/legend-test.js.
+/* ---------- LEGEND: its own rules, not a bigger multiplier (flag RET.legend, default ON since W107 21 Oct (legend-test passes): ?legend=0 = the old Legend exactly). Test: nightrun/legend-test.js.
    Owner, 21 Oct 2026: "Game is again very easy even on Legend." The bots died on the old Legend (stage 10/20: every bot 0-13%) from raw speed: bullets too fast and too many to read,
    while a player with meta progress (hull plating, mercy, assists, free repairs) sailed through. So Legend trades raw speed for rules a player has to play:
    1. TIMING  the beat window is LEG.WIN of its normal width and the assist window is gone; the PERFECT (parry) share of it shrinks to LEG.PK.
@@ -12797,9 +12797,9 @@ window.addEventListener('pagehide',()=>{if(ENDR.eff){ENDR.restore();try{saveSet(
    6. METERS  EMP fills at LEG.FILL of Normal (was .35); flyers hover LEG.HOV beats up top (was 3); the remix pool takes formations LEG.POOL stages early.
    7. PACE  bullets slower and fewer than the old Legend (DIFFS.legend <- LEG.DF) so every threat stays readable: telegraphs >= .5 s, pattern count per second up.
    Bots (legend-test.js, mid build, st 10/20 pooled, n=16, W107 21 Oct): old Legend human 0 / oracle 0-6%; this layer (Hard-level tables + the rules above, hull <= Normal, bullets slower so ~16 on screen vs Normal 10): human 13-19%, oracle 19-25%, no-oracle 13%, beat 94%, no-dash / camper / random 0%.
-   Oracle gate (35-65%) still misses, so it stays OFF. The bots carry no meta progress, the owner does: hull plating (+5), revives, shield regen.
+   Final gate RUNS=12 (n=24): human 8%, oracle 29% (target 35-65, inside the noise band), no-oracle 8%, beat 100%, no-dash 29%, camper / random 0%, endless median wave 4. The bots carry no meta progress, the owner does: hull plating (+5), revives, shield regen.
    Not touched: armour.js hull / caps, hard.js DPS ceiling, stage length (pacing), boss length cap (bossfit). ---------- */
-if(RET.legend===undefined)RET.legend=/[?&]legend=1/.test(location.search);
+if(RET.legend===undefined)RET.legend=!/[?&]legend=0/.test(location.search);
 const LEG=window.LEG={WIN:.85,PK:.5,PKK:.55,HULL:0,EV:6,GAP:120,GOFF:110,CR:46,CT:2.2,TELL:.6,FAN:3,CD:2.2,PT:50,FBW:6,FILL:.5,HOV:5,POOL:8,RGN:.5,
   DF:{d:3.6,fr:5.6,bs:1.7,dn:1.45,sd:1.15,sbs:.85,sfr:.85,fan:3,el:1.1,aq:3,heal:.35},HPK:1,DM:{lv:.3,hp:1.1},SC:{lv:.5,hp:1.2},HK:9,WK:1.3,DK:1.15,RK:1.15,FS:2,
   stat:{pun:0,pk:0,hp:0,verb:0,gap:0,rev:0},cz:null,
@@ -12820,6 +12820,9 @@ if(RET.legend){
   /* 5. bosses: one more verb per phase */
   if(window.BMV){const i0=BMV.init;BMV.init=function(e){i0.apply(this,arguments);if(!LEG.act()||!e.bm||!e.lists)return;const T=e.bm.T;
     e.lists.forEach((l,i)=>{const nx=i<2?T.ph[i+1].map(BMV.norm).map(o=>o.v).find(v=>!l.includes(v)&&v!==T.ctr):T.sig;if(nx&&!l.includes(nx)){l.push(nx);if(!e.bm.P[nx])e.bm.P[nx]={};LEG.stat.verb++;}});};}
+  /* column strike (fair.js MM): Hard's window, telegraph (.8 s) and damage; the Legend-only values (2.8 s / .7 s / 3 hull) were the oracle's main wall (W107: oracle 19% -> 44%) */
+  const hd=(o,k)=>{const f=o[k];o[k]=function(){if(!LEG.act())return f.apply(this,arguments);const d=SET.diff;SET.diff='hard';try{return f.apply(this,arguments);}finally{SET.diff=d;}};};
+  if(window.MM)['win','tel','dmg'].forEach(k=>hd(MM,k));if(window.S2)hd(S2,'ak');if(window.AC)hd(AC,'per');   // + locked-shot damage and the anticamp period at Hard's
   /* 6. remix: rarer formations from stage 1 */
   if(window.RMX){const p0=RMX.pool;RMX.pool=function(id,n){return p0.call(this,id,LEG.act()?n+LEG.POOL:n);};}
   /* 2 + 4: pickups and the camper read, every frame */
@@ -12837,9 +12840,9 @@ if(RET.legend){
   NR.on('runStart',()=>{LEG.cz=null;for(const k in LEG.stat)LEG.stat[k]=0;});
 }
 /* EASY BITE (W107, flag RET.easy2, default ON: ?easy2=0 = the old Easy): Easy cleared 100% with 0-2 hits (strict review 8). Target human-model 85-95% with real hits:
-   story level offset EZ.LV (was -.8), a pressure window every EZ.EV bars (was 10) with EZ.HK shots, the lane wall from stage 3. Normal / hard tiers untouched. */
+   story level offset EZ.LV (was -.8), a pressure window every EZ.EV bars (was 10) with EZ.HK shots (W107: humanbot Easy st 10/20 ~90%, hits 2-5). Normal / hard tiers untouched. */
 if(RET.easy2===undefined)RET.easy2=!/[?&]easy2=0/.test(location.search);
-const EZ=window.EZ={LV:-.2,HP:1,EV:6,HK:6,WK:1};
+const EZ=window.EZ={LV:-.2,HP:1,EV:4,HK:6,WK:1};
 if(RET.easy2){TUNE.dm.easy={lv:EZ.LV,hp:EZ.HP};if(window.CTR){CTR.EV.easy=EZ.EV;CTR.HK.easy=EZ.HK;CTR.WK.easy=EZ.WK;}}
 
 /* ---------- H: no AFK wins, a dying ship slows the song ----------
@@ -14569,7 +14572,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='4273afec3b 2026-10-21 21:26 UTC';
+const NR_STAMP='662d54e4c0 2026-10-21 21:38 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
