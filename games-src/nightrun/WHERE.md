@@ -7,10 +7,11 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | flag | key (file name L1-L2) | > wraps | < wrapped by | test | doc |
 |---|---|---|---|---|---|
 | sprites,title,type,oneMore*,arcade*,walls*,heat*,daily*,dpool*,layers*,sting*,trans*,grade*,saveio*,juice,assist,pwa,fever | ret (one `RET.x` line per flag, top of the file) |  | stamp,saves,hub+1 | ret | RETENTION |
-| flavor | flavor watch 241-242 |  | tidy | ret-flavor |  |
+| flavor | flavor watch 241-242 |  | footq,tidy | ret-flavor |  |
 | foot | foot build 366-400 | a,footen | c | foot | BRIEF-FOOT |
 | footstage | footstage secOf 163-194 | footen |  | footstage | FOOT-ENEMIES |
 | streetlook | streetlook slHud 133-155 | map,footen |  | streetlook | ASSET-POLICY |
+| footq | footq fix 34-40 | flavor |  | footq | ASSET-POLICY |
 | leak | leak LEAK 14-136 |  | holdline | ret-leak |  |
 | zoo | zoo ZOO 14-254 |  |  | zoo |  |
 | vary,vary2 | formations fmSide 74-256 |  |  | vary |  |

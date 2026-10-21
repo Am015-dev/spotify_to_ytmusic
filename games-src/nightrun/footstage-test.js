@@ -53,7 +53,7 @@ const BOT = () => { const tel = e => e.tele > 0 || e.wind > 0 || !!e.lane || !!e
     await p.waitForFunction(() => window.__mnr && document.getElementById('moreBtn'), null, { timeout: 15000 }); await sleep(400); p.ctx = ctx; return p; };
   const enter = async (p, touch) => { await p.evaluate(() => document.getElementById('moreBtn').click()); await sleep(200);
     const b = await p.$('#footBtn'); if (!b) return 'no button'; if (await b.isDisabled()) return 'locked';
-    if (touch) await b.tap(); else await b.click(); await sleep(300);
+    if (touch) await b.tap(); else await b.click(); await sleep(300); await p.waitForFunction(() => FOOT.on, null, { timeout: 12000 }).catch(() => {});
     return await p.evaluate(() => FOOT.on ? 'on:' + FOOT.S.id : 'not started'); };
   // the street1 mock, seeded: a state fingerprint after 40 s of the old bot-free walk (run right, hold fire)
   const fp = p => p.evaluate(() => { let s = 7; Math.random = () => (s = (s * 16807) % 2147483647) / 2147483647; document.getElementById('fMenu').hidden = true; FOOT.ctl = (S, I) => { I.r = 1; I.fire = 1; };

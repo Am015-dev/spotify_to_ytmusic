@@ -84,7 +84,7 @@ const KEYS = () => { const sb = document.getElementById('setBody'); const o = []
   if (!ONLY || ONLY === 'street') {
     for (const [w, h] of SIZES) {
       const tag = ` ${w}x${h}`, p = await open(w, h, '', true);
-      const st = await p.evaluate(() => new Promise(r => { document.getElementById('moreBtn').click(); setTimeout(() => { const b = document.getElementById('footBtn'); if (!b || b.disabled) return r('no button'); b.click(); setTimeout(() => r(FOOT.on ? 'on' : 'off'), 300); }, 200); }));
+      const st = await p.evaluate(() => new Promise(r => { document.getElementById('moreBtn').click(); setTimeout(() => { const b = document.getElementById('footBtn'); if (!b || b.disabled) return r('no button'); b.click(); const t0 = performance.now(), iv = setInterval(() => { if (FOOT.on || performance.now() - t0 > 12000) { clearInterval(iv); r(FOOT.on ? 'on' : 'off'); } }, 50); }, 200); }));
       if (st !== 'on') { ok('street run starts' + tag, false, st); await p.context().close(); continue; }
       await p.waitForFunction(() => __mnr.ART && __mnr.ART.anim('kai/run'), null, { timeout: 15000 }).catch(() => { }); await sleep(800);
       const R = await p.evaluate(secs => new Promise(res => {
