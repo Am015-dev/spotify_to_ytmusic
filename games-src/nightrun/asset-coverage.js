@@ -56,21 +56,31 @@ function install() {
   // press every visible button inside a container once (tabs, cards, chips); stops when the container disappears; skips leave-buttons
   const crawl = async (root, max, skip) => { for (let i = 0; i < (max || 40); i++) { const ok = await ev(([r, k, sk]) => { const R = document.querySelector(r); if (!R) return 0; const bs = [...R.querySelectorAll('button,.card,.tile,[role=button]')].filter(b => b.offsetParent && b.getBoundingClientRect().height > 8 && !(sk && new RegExp(sk, 'i').test(b.textContent + ' ' + b.id))); const b = bs[k]; if (!b) return 0; b.click(); return 1; }, [root, i, skip || 'back|close|quit|title|reset|delete|erase|wipe|exit']); if (!ok) break; await sleep(160); } };
 
+  const driveFoot = async () => { await sleep(700); await p.keyboard.down('KeyD'); await p.keyboard.down('KeyJ');
+    for (let i = 0; i < 9; i++) { await p.keyboard.press('Space'); await sleep(260); await p.keyboard.press('KeyL'); await sleep(260); if (i % 3 === 2) { await p.keyboard.press('ShiftLeft'); await p.keyboard.press('KeyG'); } await sleep(420); }
+    await p.keyboard.up('KeyD'); await p.keyboard.up('KeyJ'); await p.keyboard.down('KeyA'); await sleep(600); await p.keyboard.up('KeyA'); };
   const STEPS = [];
   const step = (name, fn) => STEPS.push([name, fn]);
 
   step('title', async () => { await fresh('', 3500); });
   step('title-late', async () => { await fresh('', 500); await ev(() => { RET.menuOpen(); }); await sleep(500); await ev(() => { RET.menuShut && RET.menuShut(); }); await sleep(8000); });
   for (const id of ['storyBtn', 'wkBtn', 'wpBtn', 'tutBtn', 'lsBtn', 'setBtn', 'diffBtn', 'statsBtn', 'taleBtn', 'footBtn']) step('menu-' + id, async () => {
-    await fresh('', 900); await ev(() => { __mnr.sSave.all = true; }); await menu(); await click('#' + id, 900); await crawl('#story,#storyP,#sel,#wp,#wpP,#setm,#statsP,#taleP,#lsP,#tutP,#fMenu', 30); await sleep(500); });
+    await fresh('', 900); await ev(() => { __mnr.sSave.all = true; }); await menu(); await click('#' + id, 900); if (id === 'diffBtn') for (let i = 0; i < 6; i++) { await menu(); await click('#diffBtn', 350); } await crawl('#story,#storyP,#sel,#wp,#wpP,#setm,#statsP,#taleP,#lsP,#tutP,#fMenu', 30); await sleep(500); });
   step('menu-checklist', async () => { await fresh('', 900); await menu(); await click('.ckB', 900); await crawl('#nrChk', 30); await sleep(400); });
   step('garage', async () => { await fresh('', 900); await ev(() => { try { __mnr.GA.bank = 99999; __mnr.GA.shards = 9999; } catch (e) { } }); await click('#gaBtn', 700);
-    for (const tab of ['ships', 'crew', 'looks', 'load', 'mkt', 'forge', 'pilot']) { await click(`#garage .tabs button[data-t="${tab}"]`, 500); await crawl('#garage .body,#garage', 36, 'back|close|reset|sell|scrap|wipe|erase|launch|^$'); await sleep(300); } });
+    const tabs = await ev(() => [...document.querySelectorAll('#garage .tabs button')].map(b => b.dataset.t)) || [];
+    for (const tab of tabs) { await click(`#garage .tabs button[data-t="${tab}"]`, 500); await crawl('#garage .body,#garage', 36, 'back|close|reset|sell|scrap|wipe|erase|launch|^$'); await sleep(300); } });
+  step('tale', async () => { await fresh('', 900); await ev(() => { for (let n = 1; n <= 40; n++) TALE.unlock(n); }); await ev(() => TALE.openLog()); await sleep(900); await crawl('#taleLog,#taleP,.talelog', 20); await sleep(300);
+    const cast = await ev(() => Object.keys(TALE.cast)) || []; for (const who of cast) { await fresh('', 700); await ev(w => TALE.show([{ who: w, text: 'Check.' }], 1, () => { }), who); await sleep(900); }
+    await fresh('', 700); await ev(() => TALE.show([{ who: 'boss', text: 'Check.' }], 3, () => { })); await sleep(900); });
+  step('pit', async () => { await fresh('', 900); await click('#startBtn', 1500); await ev(() => { __mnr.god = true; __mnr.SH.neon = 999; __mnr.SH.pit(() => { }); }); await sleep(1200); await crawl('#shopP,#shop,#pit,#pitm', 12, 'back|close|reset|leave|go|launch|^$'); await sleep(500);
+    await fresh('&chest=1', 900); await ev(() => localStorage.setItem('mnr_chest', '1')); await click('#startBtn', 1500); await ev(() => { __mnr.G.bossDone = true; __mnr.SH.pit(() => { }); }); await sleep(1200); await click('#chest button.chk', 700); await sleep(700); });
+  step('results', async () => { await fresh('', 900); for (const [n, k] of [[1, 1], [5, 2], [9, 3], [17, 1], [33, 2], [40, 3], [41, 3]]) { await ev(n => { __mnr.abort(); __mnr.sSave.all = true; __mnr.god = true; __mnr.startStory(n); }, n); await sleep(1200); await ev(k => { const S = __mnr.ST; S.stars = [1, k > 1 ? 1 : 0, k > 2 ? 1 : 0]; S.finish(); }, k); await sleep(900); } });
 
   /* ---- story stages: intro card, a few seconds of flight in god mode, then the failure screen ---- */
   step('stages', async () => { await fresh('', 900); const N = await ev(() => __mnr.STAGES.length); for (let n = 1; n <= (N || 0); n++) {
-    await ev(n => { __mnr.abort(); __mnr.sSave.all = true; __mnr.god = true; __mnr.startStory(n); }, n); await sleep(2600); if (n % 8 === 0) { await ev(() => { __mnr.ST.fail && __mnr.ST.fail(); }); await sleep(900); } } await ev(() => __mnr.abort()); });
-  step('endless', async () => { await fresh('', 900); await click('#startBtn', 1500); await ev(() => { __mnr.god = true; });
+    await ev(n => { __mnr.abort(); __mnr.sSave.all = true; __mnr.god = true; __mnr.startStory(n); }, n); await sleep(900); await ev(() => __mnr.touchTo(__mnr.P.x, __mnr.P.y)); await sleep(1700); if (n % 8 === 0) { await ev(() => { __mnr.ST.fail && __mnr.ST.fail(); }); await sleep(900); } } await ev(() => __mnr.abort()); });
+  step('endless', async () => { await fresh('', 900); await click('#startBtn', 1500); await ev(() => { __mnr.god = true; __mnr.touchTo(__mnr.P.x, __mnr.P.y); });
     const nd = await ev(() => __mnr.DIST.length) || 5; for (let i = 0; i < nd; i++) { await ev(i => __mnr.skipTo(i), i); await sleep(2200); await ev(() => __mnr.bossNow()); await sleep(5000); await ev(() => __mnr.killBoss()); await sleep(2500); }
     await ev(() => { __mnr.god = false; __mnr.hurt(99); __mnr.G.deadT = 9; }); await sleep(2500); });
 
@@ -79,14 +89,20 @@ function install() {
     const groups = await ev(() => [...LABFULL.R].map(([g, o]) => [g, [...o.items.keys()]])) || [];
     if (V) console.log('  lab groups', groups.map(([g, ids]) => g + ':' + ids.length).join(' '));
     for (const [g, ids] of groups) { if (/^(foot|tut|tutorial|sprite|screen|lesson)$/.test(g)) continue; for (const id of ids) {
-      await ev(([g, id]) => { try { __mnr.G.en = __mnr.G.en.filter(e => e.type === 'boss'); LABFULL.do(LABFULL.R.get(g).items.get(id)); } catch (e) { } }, [g, id]); await sleep(g === 'boss' ? 1800 : g === 'phase' ? 1500 : 160); } } });
+      await ev(([g, id]) => { try { __mnr.G.en = __mnr.G.en.filter(e => e.type === 'boss'); LABFULL.do(LABFULL.R.get(g).items.get(id)); } catch (e) { } }, [g, id]); await sleep(g === 'boss' ? 2600 : g === 'phase' ? 1500 : 160);
+      if (g === 'boss') { await ev(() => { const e = __mnr.G.boss; if (e) e.flash = .3; }); await sleep(300); await ev(() => __mnr.killBoss()); await sleep(2400); }
+      else if (g === 'enemy' || g === 'fleet' || g === 'flank') { await ev(() => { for (const e of __mnr.G.en) if (e.type !== 'boss') { e.flash = .3; } }); await sleep(250); await ev(() => { for (const e of __mnr.G.en) if (e.type !== 'boss') e.hp = -1; }); await sleep(900); } } } });
+  step('weapons', async () => { await fresh('&lab=1', 2500); await ev(() => { __mnr.god = true; LABFULL.scan(); }); const ids = await ev(() => [...LABFULL.R.get('weapon').items.keys()]) || [];
+    for (const id of ids) { await ev(id => { LABFULL.do(LABFULL.R.get('weapon').items.get(id)); __mnr.G.en = []; for (const k of ['drone', 'gunship', 'charger']) LABFULL.do(LABFULL.R.get('enemy').items.get(k)); __mnr.touchTo(__mnr.P.x, __mnr.P.y); }, id); await sleep(2600); await ev(() => { __mnr.G.en = []; }); } });
+  step('ships', async () => { const ids = await (async () => { await fresh('&lab=1', 2500); await ev(() => LABFULL.scan()); return ev(() => [...LABFULL.R.get('ship').items.keys()]); })() || [];
+    for (const id of ids) { await fresh('&lab=1', 2000); await ev(id => { LABFULL.scan(); LABFULL.do(LABFULL.R.get('ship').items.get(id)); }, id); await sleep(1500); await ev(() => { __mnr.god = false; __mnr.hurt(99); }); await sleep(2500); } });
   step('lab-tabs', async () => { await fresh('&lab=1', 2200); for (const t of ['dex', 'ctrl', 'foes', 'items', 'cheats', 'boss']) { await click('#labTab_' + t, 500); await crawl('#labP .lbody', 14, 'back|close|reset|wipe|erase|clear|exit'); } });
   step('lab-screens', async () => { await fresh('&lab=1', 2200); const ids = await ev(() => [...(LABFULL.R.get('screen') ? LABFULL.R.get('screen').items.keys() : [])]) || [];
     for (const id of ids) { await ev(id => { try { LABFULL.do(LABFULL.R.get('screen').items.get(id)); } catch (e) { } }, id); await sleep(900); } });
   step('lessons', async () => { await fresh('&lab=1', 2200); const ids = await ev(() => [...(LABFULL.R.get('lesson') ? LABFULL.R.get('lesson').items.keys() : [])]) || [];
     for (const id of ids) { await ev(id => { try { LABFULL.do(LABFULL.R.get('lesson').items.get(id)); } catch (e) { } }, id); await sleep(700); } });
   step('foot', async () => { const ids = await (async () => { await fresh('&lab=1', 2200); return ev(() => [...(LABFULL.R.get('foot') ? LABFULL.R.get('foot').items.keys() : [])]); })() || [];
-    for (const id of ids) { await fresh('&lab=1', 1800); await ev(id => { try { LABFULL.scan(); LABFULL.do(LABFULL.R.get('foot').items.get(id)); } catch (e) { } }, id); await sleep(3200); } });
+    for (const id of ids) { await fresh('&lab=1', 1800); await ev(id => { try { LABFULL.scan(); LABFULL.do(LABFULL.R.get('foot').items.get(id)); } catch (e) { } }, id); await driveFoot(); } });
 
   for (const [name, fn] of STEPS) { if (ONLY && !ONLY.some(o => name.startsWith(o))) continue; cur = name; const t0 = Date.now(); try { await fn(); } catch (e) { fails.push(name + ': ' + String(e.message).split('\n')[0]); } await harvest(); if (V) console.log(`step ${name} ${(Date.now() - t0) / 1000 | 0}s fetched=${fetched.size} drawn=${Object.keys(drawn).length} shown=${Object.keys(shown).length}`); }
   await harvest(); await br.close(); srv.kill();
@@ -99,11 +115,11 @@ function install() {
   const ready = new Set(JSON.parse(fs.readFileSync(path.join(MEDIA, 'ready.json'), 'utf8')));   // the files the game is allowed to draw (placeholders are never listed: ASSET-POLICY.md)
   const real = f => ready.has(f), cov = f => !!(drawn[f] || shown[f]);
   const G = {}; for (const f of files) { const g = group(f), o = G[g] || (G[g] = { n: 0, real: 0, realCov: 0, fetched: 0, drawn: 0, shown: 0, any: 0 }); o.n++; if (fetched.has(f)) o.fetched++; if (drawn[f]) o.drawn++; if (shown[f]) o.shown++; if (cov(f)) o.any++; if (real(f)) { o.real++; if (cov(f)) o.realCov++; } }
-  const tot = { n: files.length, real: 0, realCov: 0, fetched: 0, drawn: 0, shown: 0, any: 0 }; for (const o of Object.values(G)) for (const k in tot) tot[k] += o[k];
+  const tot = { n: 0, real: 0, realCov: 0, fetched: 0, drawn: 0, shown: 0, any: 0 }; for (const o of Object.values(G)) for (const k in tot) tot[k] += o[k];
   const pc = (a, b) => b ? (100 * a / b).toFixed(1) + '%' : '-';
   const gl = Object.entries(G).sort((a, b) => b[1].n - a[1].n);
   const unrefReal = files.filter(f => real(f) && !cov(f)), unrefPh = files.filter(f => !real(f) && !cov(f)), phDrawn = files.filter(f => !real(f) && cov(f));
-  const result = { total: tot, groups: Object.fromEntries(gl.map(([g, o]) => [g, o])), unrefReal, unrefPlaceholder: unrefPh, placeholderDrawn: phDrawn, fails, errs: [...new Set(errs)].slice(0, 10) };
+  const result = { total: tot, groups: Object.fromEntries(gl.map(([g, o]) => [g, o])), unrefReal, unrefPlaceholder: unrefPh, drawnFiles: Object.keys(drawn).sort(), shownFiles: Object.keys(shown).sort(), fetchedFiles: [...fetched].sort(), placeholderDrawn: phDrawn, fails, errs: [...new Set(errs)].slice(0, 10) };
   if (RAW) fs.writeFileSync(RAW, JSON.stringify(result, null, 1));
   let md = `# Mainhattan Nightrun: runtime asset coverage\n\nGenerated by \`games-src/nightrun/asset-coverage.js\` (Playwright, ${VW}x${VH} phone, ONE browser session with a persistent log). Counts are images of \`games/mainhattan-nightrun/media/\` (${files.length} files: webp/png/jpg/svg; music and json are not images).\n\n`
     + `- **fetched**: the browser requested the URL. **drawn**: it reached a visible canvas through \`drawImage\` (also via off-screen copies and ImageBitmaps). **shown**: it was visible in the DOM (<img> or CSS background). **covered** = drawn or shown.\n`

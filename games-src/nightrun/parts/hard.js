@@ -1,3 +1,6 @@
+// PURPOSE: scale round 3: power-aware enemy hull
+// FLAG: scale3 (?scale3=0)
+// TEST: scale3-test.js
 /* ---------- scale, round 3 = parts/hard.js (flag RET.scale3; ?scale3=0 = round 2 exactly). BALANCE.md "Power scale, round 3". ----------
    Owner, 17 Oct 2026 (third report): on Legend a maxed ship parks, homing swarm + guns + fusions + power-ups kill everything and bosses fall in seconds.
    Hard tiers only (hard, very hard, legend); Easy and Normal keep round 2.

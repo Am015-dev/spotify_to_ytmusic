@@ -1,3 +1,6 @@
+// PURPOSE: a calm, readable playfield: one telegraph style, ship on top, bullets tinted by threat
+// FLAG: polish (?polish=0)
+// TEST: polish-test.js
 /* ---------- polish.js: a calm, readable playfield (owner, 21 Oct 2026: "the game looks very unprofessional"). Flag RET.polish, default ON; ?polish=0 = the game as it was
    (nothing below is installed). Presentation only: no hitbox, damage, timing or spawn rule is touched; armour.js and hard.js are not read.
    1. ONE TELEGRAPH LANGUAGE (the world layer, between drawPickups and the screen-edge pulse): every big circle (radius >= 40 world units) is a "marker".

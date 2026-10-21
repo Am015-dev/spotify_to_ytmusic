@@ -1,3 +1,6 @@
+// PURPOSE: Normal bites again on top of the short stages
+// FLAG: bite (?bite=0)
+// TEST: none
 /* ---------- BITE: Normal bites again on top of the short stages (flag RET.bite, default ON; ?bite=0 = the game as it was). Test: humanbot / anticamp-test / timing-test.
    Strict review 7: since pacing.js (stages ~90 s) the human-model bot clears Normal 97% and a bot that never presses DASH or EMP clears as often as the beat bot.
    Normal story stages only (not Easy, not the hard tiers, not the Lab or the tutorial); stage length, armour.js and hard.js are not touched. Denser threats per second, not longer stages:

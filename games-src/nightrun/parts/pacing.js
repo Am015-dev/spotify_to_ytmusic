@@ -1,3 +1,6 @@
+// PURPOSE: shorter stages, fewer enemies, enemies that stay
+// FLAG: pacing (?pacing=0)
+// TEST: pacing-test.js
 /* ---------- pacing.js: shorter stages, fewer enemies at once, enemies that stay and fight (owner, 21 Oct 2026, stage 11 Normal:
    "very long as a stage, enemies are way too many, I cannot kill them all because they fly very fast away, and they should not need an extreme number of shots").
    Flag RET.pacing, default ON; ?pacing=0 = the game as it was. Easy / Normal only for 3-5 (Hard and above keep their own pressure); 1-2 apply to every difficulty.

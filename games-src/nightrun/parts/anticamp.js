@@ -1,3 +1,6 @@
+// PURPOSE: graded, readable pressure on a parked ship
+// FLAG: anticamp (?anticamp=0)
+// TEST: anticamp-test.js
 /* ---------- ANTI-CAMP (flag RET.anticamp, ?anticamp=0 = old play). Review 4, 20 Oct 2026: a ship parked at the left edge that only tracks height cleared more
    than a dodger, and the column strike was a hidden wall for anyone who did not read it. Now camping draws soft, readable, graded pressure instead:
    CAMP LEVEL  0..1 from the last 6 s of x samples: share of time in the left 25% of the field and low x spread (a dodger swings 150-290 px: level 0).
