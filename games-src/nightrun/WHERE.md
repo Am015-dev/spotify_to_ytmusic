@@ -68,7 +68,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | read | readable READ 16-67 | fxwave |  | readable |  |
 | bulletart | bulletart BA 9-11 |  |  | bulletart |  |
 | powers | arsenal PWX.tip 90-157 | footen |  | powers | ASSETS-NEEDED-3 |
-| abup | abup ABUP 23-78 |  |  | abup | ASSETS-NEEDED-3 |
+| abup,pwrclear | abup ABUP 25-97 |  |  | abup | ASSETS-NEEDED-3 |
 | zonehint | zonehint ZH 9-24 |  |  | pwrstar |  |
 | econfit | econfit ECF.apply 11-12 |  |  |  |  |
 | comfort* | comfort COM 14-78 |  |  | comfort |  |
