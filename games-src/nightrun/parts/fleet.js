@@ -197,8 +197,9 @@ const FLEET=window.FLEET={
     if(typeof labBuildFoes==='function'){const lb=labBuildFoes;labBuildFoes=function(body){lb(body);if(!RET.fleet)return;const r=lsec(body,'ENEMY SHIPS (fleet)');
       for(const id of FLEET.ORDER)lchip(r,FLEET.K[id].hint.split(':')[0],labFoe(y=>{FLEET.bombs=[];FLEET.mk(id,{x:W+40,y,nd:3});}));};}}};
 FLEET.reset();
+if(RET.fleetArr===undefined)RET.fleetArr=/[?&]fleetarr=1/.test(location.search);   // DEFAULT OFF: with it on, industry S01 passes but pacing stage 11 clear drops (needs a joint pass with the Normal tuning)
 { const p0=DMG.pass;DMG.pass=function(dt){const r=p0.call(this,dt);   // after the frame's hull loss is booked, before the kill check: an arriving unit keeps its hull
-    if(RET.fleet)for(const e of G.en)if(e.fl&&FLEET.K[e.type]&&!e.dead&&e.tin!=null&&G.t-e.tin<FLEET.ARR){{const fl=e.max*(1-(G.t-e.tin)/FLEET.ARR);if(e.hp<fl)e.hp=e.hq=Math.min(e.max,fl);}e.shT=FLEET.ARR-(G.t-e.tin);}else if(e.shT)e.shT=0;
+    if(RET.fleet&&RET.fleetArr)for(const e of G.en)if(e.fl&&FLEET.K[e.type]&&!e.dead&&e.tin!=null&&G.t-e.tin<FLEET.ARR){{const fl=e.max*(1-(G.t-e.tin)/FLEET.ARR);if(e.hp<fl)e.hp=e.hq=Math.min(e.max,fl);}e.shT=FLEET.ARR-(G.t-e.tin);}else if(e.shT)e.shT=0;
     return r;}; }
 { const de=drawEnemy;drawEnemy=function(e,t){if(RET.fleet&&e.fl&&FLEET.K[e.type]){FLEET.draw(e,t);return;}de(e,t);}; }
 { const dp=drawPickups;drawPickups=function(t){dp(t);try{FLEET.over(t);}catch(err){}}; }
