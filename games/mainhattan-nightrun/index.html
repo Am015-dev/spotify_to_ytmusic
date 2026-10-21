@@ -2575,7 +2575,7 @@ function affordCount(){let n=0;for(const d of TP_DEF){const pr=tuneNext(d);if(pr
 {const tabs=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='tune';b.type='button';b.textContent='TUNE';tabs.prepend(b);b.addEventListener('click',()=>{GA.tab='tune';gaDraw();});}
 const gaItems0=gaItems;
 function perkIcon(d){let real=false;try{real=ART.isReal('kit-'+(d.uid||d.id));}catch(e){}return real?`<img class="ki" src="media/kit-${d.uid||d.id}.webp" alt="" decoding="async">`:svgI(d.ic);}      // kit perks have their own painted icon (a placeholder until the art is in, see ASSETS-NEEDED.md)
-function tuneDraw(){const box=$('gaCards');box.innerHTML='';box.classList.add('tune');const rec=recTune();
+function tuneDraw(tb){const box=tb||$('gaCards');if(!tb)box.innerHTML='';box.classList.add('tune');const rec=recTune();
   for(const d of TP_DEF){const l=TP.raw(d.id),pr=tuneNext(d),b=document.createElement('button'),p=pathOf(d.id);b.type='button';
     b.className='card'+(!pr?' max':GA.bank<pr?' no':'');b.style.setProperty('--c',!pr?'#8c86b8':d.c);b.dataset.id='tp_'+d.id;b.dataset.kind='tune';b.dataset.lvl=l;
     const bad=d.bad?`<div class="chips"><b class="bad">TRADE-OFF: ${d.bad(Math.min(d.max,l+1))}</b></div>`:'';
@@ -14302,7 +14302,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='55d0ccefae 2026-10-21 20:32 UTC';
+const NR_STAMP='f3de36c361 2026-10-21 21:10 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -14619,6 +14619,132 @@ if(RET.hub)setTimeout(()=>{
   {const a=affUpd;affUpd=function(){const r=a.apply(this,arguments);if(!T.hidden)draw();return r;};}
   draw();
   window.__hub={open:openSec,shut:shutSec,hangar:openHangar,jump,draw,SECS,cur:()=>cur};   // test hook
+/* ---- garagefix (flag RET.garagefix, default ON, ?garagefix=0 = old Garage; needs the hub; test garagefix-test.js) ---- */
+/* ---------- garagefix.js: the Garage on a phone (flag RET.garagefix, default ON; ?garagefix=0 = the Garage exactly as before). Test: nightrun/garagefix-test.js.
+   Owner (21 Oct 2026): "on garage when I buy something I need to scroll up and down if the item is below the 5th item."
+   1. Buying never moves the list: a TUNE purchase re-renders only the cards that changed (tuneDraw(detached box) + replaceWith); every other redraw puts the scroll back.
+   2. Each tab keeps its own scroll (also when you leave the Garage and come back).
+   3. Phone layout: 2-column compact cards (level, price, buy pill inside), one-row tab bar, sticky bar with the AFFORDABLE chip and section jump chips,
+      a RECOMMENDED NEXT row at the top, a "Need N more" reason on every card you cannot buy. Header stays put (the cards are the only scroller). No new art. */
+if(RET.garagefix===undefined)RET.garagefix=!/[?&]garagefix=0/.test(location.search);
+const GF=window.GF={on:!!RET.garagefix,mem:{},aff:false,keep:null,busy:0,tabs:['tune','ships','crew','looks','abil','mkt']};
+if(GF.on){
+{const st=document.createElement('style');st.textContent=`
+#garage.gfx{gap:6px!important;padding-bottom:8px!important}
+#garage.gfx .top{min-height:44px}
+#garage.gfx #hubLoad{font-size:12px!important;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:0!important;padding:2px 8px!important;margin:0!important;flex:0 0 auto}
+@media (max-height:640px){#garage.gfx #hubLoad{display:none}}
+#garage.gfx .tabs{flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden;gap:6px!important;padding:0 0 2px;align-items:center}
+#garage.gfx .tabs button{flex:0 0 auto!important;min-width:44px;min-height:44px;padding:0 14px!important;font-size:13px!important;letter-spacing:.04em;width:auto!important;margin:0!important}
+#garage.gfx .tabs .hubMoreL{flex:0 0 auto;font-size:12px;color:var(--dim);padding:0 2px}
+#garage.gfx #gaPic{display:none!important}
+#garage .msg{font-size:12px}
+#garage.gfx .msg{font-size:12px;min-height:16px}
+#garage.gfx #gaCards{flex:1 1 0;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;position:relative;scroll-behavior:auto}
+#gaCards.gfg{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:min-content;align-content:start;gap:8px!important;padding:0 2px 12px!important}
+#gaCards.gfg .gfBar{position:sticky;top:0;z-index:4;grid-column:1/-1;display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:3px 0;margin:0 -2px;background:linear-gradient(#0b0820 82%,#0b082000);touch-action:pan-x}
+#gaCards.gfg .gfBar::-webkit-scrollbar{display:none}
+#gaCards .gfChip{flex:0 0 auto;min-height:44px;min-width:44px;padding:0 12px;border-radius:22px;border:1.5px solid #5a4d8a;background:#1a1240;color:#efeaff;font:700 12.5px var(--mono,monospace);letter-spacing:.04em;white-space:nowrap;cursor:pointer;touch-action:manipulation}
+#gaCards .gfChip.on{background:var(--cyan,#19e3ff);color:#0b0820;border-color:var(--cyan,#19e3ff)}
+#gaCards .gfChip.sec{border-color:var(--c,#5a4d8a);color:var(--c,#efeaff)}
+#gaCards .gfSec{grid-column:1/-1;margin:4px 0 0;font:700 13px var(--mono,monospace);letter-spacing:.1em;color:var(--c,#19e3ff);display:flex;align-items:center;gap:6px}
+#gaCards .gfSec::after{content:'';flex:1;height:1px;background:var(--c,#5a4d8a);opacity:.6}
+#gaCards .gfRec{grid-column:1/-1;display:flex;align-items:center;gap:8px;min-height:56px;padding:6px 10px;border-radius:12px;border:2px solid var(--amber,#ffb020);background:#241a0a;color:#fff;text-align:left;font-family:var(--display);cursor:pointer;touch-action:manipulation}
+#gaCards .gfRec .rt{font:700 12px var(--mono,monospace);letter-spacing:.08em;color:var(--amber,#ffb020);flex:0 0 auto}
+#gaCards .gfRec .rn{flex:1 1 0;min-width:0;font-weight:700;font-size:14px;line-height:1.1;overflow-wrap:anywhere}
+#gaCards .gfRec .gfBuy{flex:0 0 auto}
+#garage #gaCards.gfg .card{flex-direction:column!important;align-items:stretch;justify-content:flex-start;text-align:left;gap:4px;padding:8px!important;min-height:44px;opacity:1}
+#garage #gaCards.gfg .card>svg,#garage #gaCards.gfg .card>img,#garage #gaCards.gfg .card>.sw{align-self:flex-start;height:32px!important;width:32px!important;flex:0 0 auto}
+#garage #gaCards.gfg .card>img.shp{width:auto!important;height:46px!important;max-width:100%}
+#garage #gaCards.gfg .card .tx{flex:1 1 auto;gap:2px}
+#garage #gaCards.gfg .card .n{font-size:14px;line-height:1.1}
+#garage #gaCards.gfg .card .t,#garage #gaCards.gfg .card .pv{font-size:12px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#garage #gaCards.gfg .card .lv{font-size:12px;margin-left:4px}
+#garage #gaCards.gfg .card .lv::before{content:'Lv '}
+#garage #gaCards.gfg .card .chips,#garage #gaCards.gfg .card .chips b{font-size:12px}
+#garage #gaCards.gfg .card .rec{font-size:12px;top:-9px;right:6px}
+#garage #gaCards.gfg .card .pr{margin:0!important;align-self:stretch;min-height:44px;display:flex;align-items:center;justify-content:center;gap:5px;border-radius:10px;border:1.5px solid var(--amber,#ffb020);background:#2a1d08;font-size:14px;box-sizing:border-box;text-align:center;white-space:normal;line-height:1.1}
+#garage #gaCards.gfg .card.no .pr{border-style:dashed;border-color:#8c86b8;background:#150f2c;color:#ffd0da;font-size:12.5px}
+#garage #gaCards.gfg .card.no .n,#garage #gaCards.gfg .card.no .t{opacity:.85}
+#garage #gaCards.gfg .card.max .pr,#garage #gaCards.gfg .card.sold .pr{border-color:#8c86b8;color:#c9c3e6;background:none}
+#garage #gaCards.gfg .card.sel .pr{border-color:var(--cyan);color:var(--cyan);background:#0c2330}
+#gaCards .gfBuy{display:inline-flex;align-items:center;gap:5px;min-height:44px;padding:0 12px;border-radius:10px;border:1.5px solid var(--amber,#ffb020);background:#2a1d08;color:var(--amber,#ffb020);font:700 14px var(--mono,monospace);white-space:nowrap}
+#gaCards .gfhide{display:none!important}
+#gaCards #mkRe,#gaCards .mkbar button,#gaCards .presets button{min-height:44px}
+#gaCards.gfg .card.d{grid-column:1/-1}
+#gaCards.gfg .fullrow,#gaCards.gfg .slots{grid-column:1/-1}
+`;document.head.appendChild(st);}
+garageEl.classList.add('gfx');
+const box0=()=>$('gaCards');
+const nnum=s=>{const m=/(\d+)\s*$/.exec((s||'').trim());return m?+m[1]:0;};
+const gfSecOf=c=>{const id=c.dataset.id||'';return c.dataset.kind==='tune'?pathOf(id.replace(/^tp_/,'')):c.dataset.kind==='crew'?pathOf(id.replace(/^up_|^pu_/,'')):null;};
+const SECORD=()=>Object.keys(PATHS).concat(['_']);
+/* one card: a BUY pill with the price (or the reason you cannot buy), once per node */
+function gfCard(c){if(c.dataset.gf)return;c.dataset.gf=1;const pr=c.querySelector('.pr');if(!pr||!/^(tune|ship|crew|theme|abil|market)/.test(c.dataset.kind||''))return;
+  const t=pr.textContent.trim(),price=pr.querySelector('.nI')?nnum(t):0;c._raw=c.outerHTML;
+  if(c.classList.contains('sold')||c.classList.contains('max')||!price)return;
+  if(GA.bank<price){pr.innerHTML='Need '+(price-GA.bank)+' more '+neonI;c.setAttribute('aria-disabled','true');c.title='Not enough Neon: need '+(price-GA.bank)+' more';}
+  else pr.innerHTML='BUY '+pr.innerHTML;}
+function gfRecWho(box){if(GA.tab==='tune'){let r=null;try{r=recTune();}catch(e){}const d=r&&TP_DEF.find(x=>x.id===r);if(d){const pr=tuneNext(d);return pr?{id:'tp_'+d.id,n:d.n,lv:TP.raw(d.id)+1,p:pr}:null;}return null;}
+  let best=null;for(const c of box.querySelectorAll('.card'))if(!c.classList.contains('no')&&!c.classList.contains('sold')&&!c.classList.contains('max')&&c.querySelector('.pr .nI')){const p=nnum(c.querySelector('.pr').textContent);if(p&&(!best||p<best.p))best={id:c.dataset.id,n:(c.querySelector('.n')||c).textContent.replace(/\d+\/\d+$/,'').trim(),lv:0,p};}
+  return best;}
+function gfBar(box){let bar=box.querySelector('.gfBar');const cards=[...box.querySelectorAll('.card')];
+  const aff=cards.filter(c=>!c.classList.contains('no')&&!c.classList.contains('sold')&&!c.classList.contains('max')&&c.querySelector('.pr .nI')).length;
+  const secs=GA.tab==='tune'||GA.tab==='crew'?SECORD().filter(k=>box.querySelector('.gfSec[data-k="'+k+'"]')):[];
+  const sig=aff+'|'+GF.aff+'|'+secs.join();if(bar&&bar._sig===sig)return;
+  if(!bar){bar=document.createElement('div');bar.className='gfBar';box.prepend(bar);}
+  bar._sig=sig;bar.innerHTML='<button type="button" class="gfChip aff'+(GF.aff?' on':'')+'" aria-pressed="'+GF.aff+'">AFFORDABLE '+aff+'</button>'
+    +secs.map(k=>`<button type="button" class="gfChip sec" data-k="${k}" style="--c:${k==='_'?'#8c86b8':PATHS[k].c}">${k==='_'?'OTHER':PATHS[k].n.toUpperCase()}</button>`).join('');}
+function gfRec(box){let r=box.querySelector('.gfRec');const w=gfRecWho(box);if(!w){if(r)r.remove();return;}
+  if(!r){r=document.createElement('button');r.type='button';r.className='gfRec';box.querySelector('.gfBar').after(r);}
+  r.dataset.for=w.id;r.innerHTML='<span class="rt">RECOMMENDED NEXT</span><span class="rn">'+w.n+(w.lv?' · Lv '+w.lv:'')+'</span><span class="gfBuy">BUY '+neonI+' '+w.p+'</span>';}
+function gfFilter(box){const cards=[...box.querySelectorAll('.card')];
+  for(const c of cards){const off=GF.aff&&(c.classList.contains('no')||c.classList.contains('sold')||c.classList.contains('max'))&&c.dataset.id!==GF.keep;c.classList.toggle('gfhide',off);}
+  for(const h of box.querySelectorAll('.gfSec')){let n=h.nextElementSibling,any=false;while(n&&!n.classList.contains('gfSec')){if(n.classList.contains('card')&&!n.classList.contains('gfhide'))any=true;n=n.nextElementSibling;}h.classList.toggle('gfhide',!any);}}
+/* sections: cards grouped by build path with a heading each (tune and crew) */
+function gfSections(box){if(GA.tab!=='tune'&&GA.tab!=='crew')return;const cards=[...box.querySelectorAll('.card')];if(!cards.length)return;
+  const ord=SECORD(),key=c=>gfSecOf(c)||'_',rank=c=>ord.indexOf(key(c));
+  cards.sort((a,b)=>rank(a)-rank(b));let last=null;for(const h of box.querySelectorAll('.gfSec'))h.remove();
+  for(const c of cards){const k=key(c);if(k!==last){const h=document.createElement('div');h.className='gfSec';h.dataset.k=k;h.style.setProperty('--c',k==='_'?'#8c86b8':PATHS[k].c);h.textContent=k==='_'?'OTHER':PATHS[k].n.toUpperCase();box.append(h);last=k;}box.append(c);}}
+function gfDecorate(box){box.classList.toggle('gfg',GF.tabs.includes(GA.tab));if(!box.classList.contains('gfg')){for(const x of box.querySelectorAll('.gfBar,.gfRec,.gfSec'))x.remove();return;}
+  const had=box.querySelector('.gfBar');if(had)had.remove();const rec0=box.querySelector('.gfRec');if(rec0)rec0.remove();
+  for(const c of box.querySelectorAll('.card'))gfCard(c);gfSections(box);gfBar(box);gfRec(box);gfFilter(box);}
+/* ---- scroll memory: per tab, kept while the Garage is closed ---- */
+const SKEY=()=>GA.tab;
+box0().addEventListener('scroll',()=>{if(!GF.busy&&!garageEl.hidden)GF.mem[SKEY()]=box0().scrollTop;},{passive:true});
+function gfRestore(box,top){GF.busy++;box.scrollTop=top;const again=()=>{if(box.scrollTop!==top&&box.scrollHeight-box.clientHeight>=top-1)box.scrollTop=top;};
+  requestAnimationFrame(()=>{again();requestAnimationFrame(()=>{again();GF.busy=Math.max(0,GF.busy-1);});});}
+let g0=gaDraw,inp=null;
+{gaDraw=function(){const box=box0(),hidden=garageEl.hidden;if(!hidden&&GF.last===GA.tab)GF.mem[GA.tab]=box.scrollTop;
+  const patch=inp&&GA.tab==='tune'&&!hidden&&box.querySelector('.card[data-kind=tune]')&&box.classList.contains('gfg');
+  if(patch){const top=box.scrollTop;GF.busy++;GF.keep=inp;
+    $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';
+    const tmp=document.createElement('div');tuneDraw(tmp);
+    for(const c of box.querySelectorAll('.card'))if(c._raw===undefined&&c.dataset.gf)c._raw=c.outerHTML;
+    // a purchase can change the price text of every card (the "Need N more" reason): compare the raw markup of the fresh card with the live card before decoration
+    const ok=gfPatchAll(box,tmp);
+    if(ok){affUpd();gfBar(box);gfRec(box);gfFilter(box);box.scrollTop=top;requestAnimationFrame(()=>{box.scrollTop=top;GF.busy=Math.max(0,GF.busy-1);});GF.mem[GA.tab]=top;GF.last=GA.tab;return;}
+    GF.busy=Math.max(0,GF.busy-1);}
+  const want=GF.mem[GA.tab]||0,foc=document.activeElement&&box.contains(document.activeElement)?document.activeElement.dataset.id:null;
+  GF.busy++;const r=g0.apply(this,arguments);
+  if(garageEl.hidden||(window.labEl&&!labEl.hidden)){GF.busy=Math.max(0,GF.busy-1);return r;}
+  gfDecorate(box);gfRestore(box,want);GF.busy=Math.max(0,GF.busy-1);GF.last=GA.tab;GF.keep=null;
+  if(foc){const f=box.querySelector('[data-id="'+foc+'"]');if(f)try{f.focus({preventScroll:true});}catch(e){}}
+  return r;};}
+/* patch helper: decorate each fresh card, compare the decorated markup with the live one, replace only the differences */
+function gfPatchAll(box,fresh){const live=new Map([...box.querySelectorAll('.card[data-id]')].map(c=>[c.dataset.id,c])),foc=document.activeElement&&document.activeElement.dataset?document.activeElement.dataset.id:null;
+  const nf=[...fresh.querySelectorAll('.card[data-id]')];if(nf.length!==live.size)return false;
+  for(const nc of nf)if(!live.has(nc.dataset.id))return false;
+  for(const nc of nf){const oc=live.get(nc.dataset.id);gfCard(nc);const same=oc.outerHTML.replace(/ class="[^"]*"/,'')===nc.outerHTML.replace(/ class="[^"]*"/,'')&&oc.className.replace(/\bgfhide\b|\s+/g,' ').trim()===nc.className.replace(/\bgfhide\b|\s+/g,' ').trim();
+    if(same)continue;oc.replaceWith(nc);if(foc&&foc===nc.dataset.id)try{nc.focus({preventScroll:true});}catch(e){}}
+  return true;}
+{const tb0=tuneBuy;tuneBuy=function(d,b){inp='tp_'+d.id;try{return tb0.apply(this,arguments);}finally{inp=null;}};}
+/* chip taps */
+box0().addEventListener('click',e=>{const box=box0(),ch=e.target.closest&&e.target.closest('.gfChip'),rc=e.target.closest&&e.target.closest('.gfRec');
+  if(ch){e.stopPropagation();if(ch.classList.contains('aff')){GF.aff=!GF.aff;GF.keep=null;const bar=box.querySelector('.gfBar');if(bar)bar._sig='';gfBar(box);gfFilter(box);return;}
+    const h=box.querySelector('.gfSec[data-k="'+ch.dataset.k+'"]');if(h){const bar=box.querySelector('.gfBar'),top=h.getBoundingClientRect().top-box.getBoundingClientRect().top+box.scrollTop-(bar?bar.offsetHeight:0);box.scrollTo({top:Math.max(0,top)});}return;}
+  if(rc){e.stopPropagation();const c=box.querySelector('.card[data-id="'+rc.dataset.for+'"]');if(c)c.click();}},true);
+}
 },0);
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
