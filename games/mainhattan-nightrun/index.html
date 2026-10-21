@@ -3136,8 +3136,8 @@ ART.aframe=(key,t)=>{const o=ART.aS(key);ART.aDone=false;ART.aP=0;ART.aT=0;if(!o
 /* one cell, its anchor on x,y; sc = world units per sheet px; flip mirrors around the anchor; sy = extra vertical squash about the anchor; idle / flame cross-fade into the next frame (smoothing.json) */
 ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(key);if(!b0)return false;const i=ART.aframe(key,t),p=ART.aP,m=o.m,w=m[2],h=m[3],sv=sc*(sy||1),X=ART.ANIM.sm.crossfade,
     cf=o.xf&&p>X.from&&(o.loop||i+1<m[0])?(p-X.from)/(1-X.from)*X.max_alpha:0,ga=c.globalAlpha;
-  let b=b0,cw=w,ch=h;const ts=sc*(RET.footq&&c.canvas&&c.canvas.id==='footC'?Math.hypot(c.getTransform().a,c.getTransform().b):S);   // footq: the on-foot canvas has its own scale (not the fly S): the copy is made at the real device-pixel size, never a small copy blown up       // sheets are drawn ~3-5x smaller than they are: a copy at the drawn pixel size is built once per sheet and canvas scale (like ART.sp), so the blit is 1:1 and the downscale is smooth
-  if(ts<(RET.footq?.9:.75)){cw=Math.max(1,Math.round(w*ts));const k='a|'+key+'@'+cw;let q=ART.sc[k];
+  let b=b0,cw=w,ch=h;const fo=RET.footq&&c.canvas&&c.canvas.id==='footC',ts=sc*(fo?Math.hypot(c.getTransform().a,c.getTransform().b):S);   // footq: the on-foot canvas has its own scale (not the fly S): the copy is made at the real device-pixel size, never a small copy blown up       // sheets are drawn ~3-5x smaller than they are: a copy at the drawn pixel size is built once per sheet and canvas scale (like ART.sp), so the blit is 1:1 and the downscale is smooth
+  if(ts<(fo?.9:.75)){cw=Math.max(1,Math.round(w*ts));const k='a|'+key+'@'+cw;let q=ART.sc[k];
     if(!q){ch=Math.max(1,Math.round(h*cw/w));const cv_=document.createElement('canvas');cv_.width=cw*m[0];cv_.height=ch;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*cw,0,cw,ch);q=ART.sc[k]={c:cv_,h:ch};}
     b=q.c;ch=q.h;}
   if(flip){c.save();c.translate(x,y);c.scale(-1,1);x=0;y=0;}
@@ -12893,7 +12893,7 @@ window.addEventListener('pagehide',()=>{if(ENDR.eff){ENDR.restore();try{saveSet(
    Final gate RUNS=12 (n=24): human 8%, oracle 29% (target 35-65, inside the noise band), no-oracle 8%, beat 100%, no-dash 29%, camper / random 0%, endless median wave 4. The bots carry no meta progress, the owner does: hull plating (+5), revives, shield regen.
    Not touched: armour.js hull / caps, hard.js DPS ceiling, stage length (pacing), boss length cap (bossfit). ---------- */
 if(RET.legend===undefined)RET.legend=!/[?&]legend=0/.test(location.search);
-const LEG=window.LEG={WIN:.85,PK:.5,PKK:.55,HULL:0,PL:4,EV:6,GAP:120,GOFF:110,CR:46,CT:2.2,TELL:.6,FAN:3,CD:2.2,PT:50,FBW:6,FILL:.5,HOV:5,POOL:8,RGN:.5,
+const LEG=window.LEG={WIN:.85,PK:.5,PKK:.55,HULL:0,EV:6,GAP:120,GOFF:110,CR:46,CT:2.2,TELL:.6,FAN:3,CD:2.2,PT:50,FBW:6,FILL:.5,HOV:5,POOL:8,RGN:.5,
   DF:{d:3.6,fr:5.6,bs:1.7,dn:1.45,sd:1.15,sbs:.85,sfr:.85,fan:3,el:1.1,aq:3,heal:.35},HPK:1,DM:{lv:.3,hp:1.1},SC:{lv:.5,hp:1.2},HK:9,WK:1.3,DK:1.15,RK:1.15,FS:2,
   stat:{pun:0,pk:0,hp:0,verb:0,gap:0,rev:0},cz:null,
   act(){return!!RET.legend&&typeof SET==='object'&&SET.diff==='legend'&&!(typeof G==='object'&&G&&(G.lab||G.tut));}};
@@ -12906,8 +12906,7 @@ if(RET.legend){
   if(window.BPL){BPL.AM=BPL.AM||{};BPL.AM.legend=0;BPL.PT.legend=LEG.PT;BPL.FIT.PT.legend=LEG.PT;BPL.FIT.FBWD.legend=LEG.FBW;}
   /* 1. timing: a narrower window, no assist; a narrower PERFECT share */
   {const aw=RET.asWinMs;RET.asWinMs=function(){const v=aw.call(this);return LEG.act()?-Math.round((WINS[SET.win]||110)*(1-LEG.WIN)):v;};}
-  if(window.TIM){const pk=TIM.PK;Object.defineProperty(TIM,'PK',{get(){return LEG.act()?LEG.PK:pk;},set(){},configurable:true});
-    const pl=TIM.PLOCK;Object.defineProperty(TIM,'PLOCK',{get(){return LEG.act()?LEG.PL:pl;},set(v){},configurable:true});}   // W121: a button press with nothing near locks DASH LEG.PL s (random mashing was clearing 13%)
+  if(window.TIM){const pk=TIM.PK;Object.defineProperty(TIM,'PK',{get(){return LEG.act()?LEG.PK:pk;},set(){},configurable:true});}
   /* 3. walls: the one gap is narrow */
   if(window.CTR){const t0=CTR.tick;CTR.tick=function(dt){const pend=LEG.act()&&this.walls?this.walls.filter(w=>!w.cur&&w.warn>0):null;t0.apply(this,arguments);
     if(pend)for(const w of pend){if(w.warn>0||w.lg)continue;w.lg=1;if(!w.gap&&!w.cur){const s=GR()<.5?-1:1;w.gap={y:clamp(P.y+s*LEG.GOFF,70,H-70),h:110};if(Math.abs(w.gap.y-P.y)<LEG.GOFF*.8)w.gap.y=clamp(P.y-s*LEG.GOFF,70,H-70);}if(w.gap){w.gap.h=Math.min(w.gap.h,LEG.GAP);LEG.stat.gap++;}}};}
@@ -14360,9 +14359,11 @@ const ZH=window.ZH={get on(){return!!RET.zonehint;},ZT:4.5,done:{rule:0,boss:0},
     if(!this.done.boss&&window.BMV&&BMV.hz&&G.boss){for(const z of BMV.hz)if(z.s==='well'){this.start('boss',z.x,z.y,Math.min(z.R||300,300),'#c08aff');break;}}},
   draw(){const c=this.cap;if(!this.on||!c)return;const txt=this.TXT[c.k],a=Math.min(1,c.t/.5,(this.ZT-c.t)/.3+.01);
     ctx.save();ctx.globalAlpha=Math.max(0,a);ctx.font='700 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
-    const w=Math.min(W-16,ctx.measureText(txt).width+22),x=clamp(c.x,w/2+8,W-w/2-8),y=clamp(c.y-Math.min(c.r,150)-18,60,H-60);
-    ctx.fillStyle='#05030ccc';ctx.strokeStyle=c.col;ctx.lineWidth=1.5;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x-w/2,y-13,w,26,13);else ctx.rect(x-w/2,y-13,w,26);ctx.fill();ctx.stroke();
-    ctx.fillStyle='#fff';ctx.fillText(txt,x,y+1,w-12);ctx.restore();}};
+    const up=typeof wcv!=='undefined'&&wcv!==cv,off=Math.min(c.r,150)+18;   // portrait: the world is turned, so the box is turned back upright like wtxt()
+    const w=Math.min((up?H:W)-16,ctx.measureText(txt).width+22),x=up?clamp(c.x-off,60,W-60):clamp(c.x,w/2+8,W-w/2-8),y=up?clamp(c.y,w/2+8,H-w/2-8):clamp(c.y-off,60,H-60);
+    ctx.translate(x,y);if(up)ctx.rotate(Math.PI/2);
+    ctx.fillStyle='#05030ccc';ctx.strokeStyle=c.col;ctx.lineWidth=1.5;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(-w/2,-13,w,26,13);else ctx.rect(-w/2,-13,w,26);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#fff';ctx.fillText(txt,0,1,w-12);ctx.restore();}};
 NR.on('runStart',()=>ZH.reset());
 NR.on('tick',dt=>ZH.tick(dt));
 {const dp=drawPlayer;drawPlayer=function(t){dp(t);try{ZH.draw();}catch(e){}};}
@@ -14758,7 +14759,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='e3d6934d2a 2026-10-21 22:51 UTC';
+const NR_STAMP='3d13a94abc 2026-10-21 22:59 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
