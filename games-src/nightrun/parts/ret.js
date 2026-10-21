@@ -21,7 +21,7 @@ RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct,
 `;document.head.appendChild(st);}
 function retMake(id,host){let e=$(id);if(!e){e=document.createElement('div');e.id=id;e.className='retBar';host.insertBefore(e,host.querySelector('.row'));}return e;}
 function retShow(){
-  const on=RET.oneMore,add=SH.lastBank|0,nx=on?RET.next():null,fl=SH.lastFloor|0,pay='This run: <b>+'+add+' Neon</b>'+(fl&&add<=fl?' · '+SH.lastStages+' stage'+(SH.lastStages>1?'s':'')+' reached':'');
+  const on=RET.oneMore,add=SH.lastBank|0,nx=on?RET.next():null,fl=SH.lastFloor|0,pay='This run: <b>+'+window.fmtN(add)+' Neon</b>'+(fl&&add<=fl?' · '+SH.lastStages+' stage'+(SH.lastStages>1?'s':'')+' reached':'');
   for(const [id,host] of [['retO',$('over').querySelector('.in')],['retR',$('stres').querySelector('.in')]]){
     const e=retMake(id,host);e.hidden=!on;if(!on)continue;
     e.className='retBar'+(nx&&nx.can?' can':'');const gp=nx&&add>0?Math.min(nx.pct,Math.max(1,Math.round(100*add/nx.price))):0;
@@ -34,7 +34,7 @@ Object.assign(RET,{clearPay:true,econ:true,mercy:true},{wk:.36,tk:.12,nk:.052});
 /* B1: a stage clear pays 40+12n Neon the first time, +25 per new star, 10% of the base on later clears */
 RET.payClear=function(n,sum){const old=sSave.stars[n]||0,first=old<1,base=40+12*n,ns=Math.max(0,sum-old);
   const pay=first?base+25*ns:Math.round(base*.1)+25*ns;GA.bank+=pay;gsave();this.last={n,pay,first,ns};return pay;};
-RET.resultRow=function(){const l=this.last;return (l&&l.pay?`<div class="sr ok"><span class="sg">◆</span> +${l.pay} Neon${l.first?' · first clear':''}</div>`:'')+(RET.assistRun()?'<div class="sr"><span class="sg">ⓐ</span> Assist run · no records</div>':'');};
+RET.resultRow=function(){const l=this.last;return (l&&l.pay?`<div class="sr ok"><span class="sg">${neonI}</span> +${window.fmtN(l.pay)} Neon${l.first?' · first clear':''}</div>`:'')+(RET.assistRun()?'<div class="sr"><span class="sg">ⓐ</span> Assist run · no records</div>':'');};
 /* B3: failed tries per stage (kept in this browser); 2 fails = +1 hull on the next try, 4 = the stage level also drops by 0.3. A clear resets it. */
 RET.fails={};try{const o=JSON.parse(localStorage.getItem('mnr_retfail')||'{}');if(o&&typeof o==='object')for(const k in o)RET.fails[k]=Math.max(0,o[k]|0);}catch(e){}
 RET.saveFails=()=>{try{localStorage.setItem('mnr_retfail',JSON.stringify(RET.fails));}catch(e){}};
@@ -152,7 +152,7 @@ DY.weekKey=t=>{const wd=(t+3)%7,thu=t-wd+3,y=new Date(thu*864e5).getUTCFullYear(
 RET.week=function(){const k=DY.weekKey(DY.today()),r=mul(k*7919+13),pool=MUTS.map(m=>m.id),m=[];
   while(m.length<2){const i=Math.floor(r()*pool.length);m.push(pool.splice(i,1)[0]);}
   return{key:k,seed:k*31+5,muts:m,names:m.map(id=>MUTS.find(x=>x.id===id).n),cleared:DY.s.wk===k,best:DY.s.wkN===k?DY.s.wkBest:0};};
-RET.weeklyBestLine=()=>{const w=RET.week();return'Weekly best <strong>'+(w.best?w.best.toLocaleString('de-DE'):'—')+'</strong>';};
+RET.weeklyBestLine=()=>{const w=RET.week();return'Weekly best <strong>'+(w.best?window.fmtN(w.best):'—')+'</strong>';};
 RET.weeklyEnd=function(score){const w=RET.week();let eye='Weekly run over';
   if(DY.s.wkN!==w.key){DY.s.wkN=w.key;DY.s.wkBest=0;}
   if(score>DY.s.wkBest){DY.s.wkBest=score;eye='New weekly best';}DY.persist();return eye;};
@@ -181,7 +181,7 @@ RET.dailyShow=function(){let e=$('retTt');
   e.hidden=false;const d=DY.status(),w=RET.week();
   if(RET.title){e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· claimed</span>':'Daily streak <b>'+d.streak+'</b> · <b>+'+d.reward+'</b> Neon today')+' · '+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly open · <b>+'+DY.weekly+'</b> Neon');return;}
   e.innerHTML=(d.claimed?'Daily streak <b>'+d.streak+'</b> <span class="ok">· today\'s bonus claimed</span>':'Daily streak <b>'+d.streak+'</b> · fly the daily run for <b>+'+d.reward+'</b> Neon')
-   +'<br>'+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly: <b>'+w.names.join(' + ')+'</b> · boss clear = <b>+'+DY.weekly+'</b>')+(w.best?' · best '+w.best.toLocaleString('de-DE'):'')
+   +'<br>'+(w.cleared?'Weekly <span class="ok">cleared</span>':'Weekly: <b>'+w.names.join(' + ')+'</b> · boss clear = <b>+'+DY.weekly+'</b>')+(w.best?' · best '+window.fmtN(w.best):'')
    +'<br><button type="button" id="wkBtn">WEEKLY RUN</button>';};
 RET.dailyShow();
 window.DY=DY;
@@ -247,7 +247,7 @@ RET.countUp=function(set,from,to,dur){if(!RET.motion()||from===to||dur<=0){set(t
 RET.skip=function(){for(const c of retCnt)c.set(c.to);retCnt.length=0;try{for(const a of document.getAnimations())if(a.animationName==='retIn')a.finish();}catch(e){}};
 /* bank chip: pinned top-right on the game-over, stage-clear and stage-select screens; counts up when the bank grows */
 RET.chipV=GA.bank;RET.chips=[];
-function retChipSet(n){const t=n.toLocaleString('de-DE');for(const c of RET.chips)c.firstElementChild.textContent=t;}
+function retChipSet(n){const t=window.fmtN(n);for(const c of RET.chips)c.firstElementChild.textContent=t;}
 RET.chipSync=function(){if(!RET.trans)return;for(const el of [$('over'),$('stres'),$('stsel')]){if(!el||el.querySelector('.retChip'))continue;
     const c=document.createElement('div');c.className='retChip';c.innerHTML='◆ <b></b> Neon';el.appendChild(c);RET.chips.push(c);}
   if(RET.chipV!==GA.bank||!RET.chips[0].firstElementChild.textContent){RET.countUp(retChipSet,RET.chipV,GA.bank,800);RET.chipV=GA.bank;}};
@@ -267,7 +267,7 @@ RET.pop=function(L){let e=$('retPop');if(!e){e=document.createElement('div');e.i
 /* run end: count the score up (the texts are written after the event, so wait one tick), show the grade strip */
 NR.on('runEnd',d=>{if(!d||d.quit||!RET.trans&&!RET.grade)return;setTimeout(()=>{
   if(RET.trans){for(const [id,sc] of [['oScore','over'],['srScore','stres']]){const el=$(id);if(!el||$(sc).hidden)continue;const to=G.score|0;
-      RET.countUp(n=>{el.textContent=n.toLocaleString('de-DE');},0,to,800);}
+      RET.countUp(n=>{el.textContent=window.fmtN(n);},0,to,800);}
     RET.chipSync();}
   if(RET.grade)for(const [id,host] of [['grO',$('over')],['grR',$('stres')]]){let e=$(id);const L=RET.gr.list;
     if(!e){e=document.createElement('div');e.id=id;e.className='retGr';host.querySelector('.in').insertBefore(e,host.querySelector('.row'));}

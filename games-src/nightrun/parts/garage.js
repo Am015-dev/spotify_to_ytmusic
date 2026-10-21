@@ -86,7 +86,7 @@ const gaMsg=t=>{$('gaMsg').textContent=t;clearTimeout(gaMsg.h);gaMsg.h=setTimeou
 function gaItems(){return GA.tab==='ships'?SHIPS.map(s=>({k:s.id==='std'?null:'ship_'+s.id,id:s.id,n:s.n,t:s.t,p:s.p||0,ic:s.ic,eq:GA.ship===s.id,kind:'ship'}))
   :GA.tab==='crew'?CREW.map(c=>({k:c.id,id:c.id,n:c.n,t:c.t,p:c.p,ic:c.ic,kind:'crew'}))
   :THEMES.map(h=>({k:h.id==='neon'?null:'th_'+h.id,id:h.id,n:h.n,t:h.t,p:h.p||0,f:h.f,eq:GA.theme===h.id,kind:'theme'}));}
-function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';
+function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+window.fmtN(GA.bank)+'</b>';
   for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
   const gp=$('gaPic');gp.style.display=GA.tab==='ships'?'block':'none';if(GA.tab==='ships'&&RIG.ok)RIG.pic(gp,GA.ship);
   const box=$('gaCards');box.innerHTML='';
@@ -96,7 +96,7 @@ function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">
     const pr=own?(it.kind==='crew'?'IN POOL':it.eq?'EQUIPPED':'EQUIP'):neonI+' '+it.p;
     b.innerHTML=`${ic}<div class="tx"><div class="n">${it.n}</div><div class="t">${it.t}</div></div><div class="pr">${pr}</div>`;
     b.addEventListener('click',()=>gaTap(it,b));box.appendChild(b);}
-  $('gaBtn').innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+GA.bank;}
+  $('gaBtn').innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+window.fmtN(GA.bank);}
 function gaTap(it,b){const own=!it.k||GA.own[it.k];
   if(!own){if(GA.bank<it.p){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');gaMsg('Need '+(it.p-GA.bank)+' more Neon');return;}
     GA.bank-=it.p;GA.own[it.k]=true;gaMsg(it.n+' unlocked');}
