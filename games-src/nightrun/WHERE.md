@@ -73,7 +73,10 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | saves | saves saveSlot 55-60 | ret |  | saves |  |
 | stamp | stamp RET.stampX 10-44 | ret |  | stamp |  |
 | polish | polish POL.flush 78-105 |  |  | polish |  |
+| diet | diet DIET.thin 36-63 |  |  | diet |  |
+| mix | mix MIX 17-24 | a |  | mix |  |
 | hub,garagefix | hub gfPatchAll 288-301 | ret |  | hub |  |
+| layout,layoutStrip* | layout lyMap 41-55 |  |  | layout |  |
 | school | school footEnd 107-121 |  |  | school |  |
 | tidy | tidy F.post 19-88 | flavor,ret |  | tidy |  |
 

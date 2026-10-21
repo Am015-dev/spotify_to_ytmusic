@@ -14,8 +14,8 @@ function fit(){
   const was=rotMode;rotMode=touchUI&&st.height>st.width*1.05;   // portrait: a vertical play area, ship at the bottom
   document.documentElement.classList.toggle('touch',touchUI);
   const aw=st.width,ah=st.height;let w,h,strip=0,side=0;
-  if(rotMode){const sA=Math.min(aw/H,(ah-84)/W),sB=Math.min((aw-80)/H,ah/W);   // buttons in a strip below, or in a column beside the play area, whichever leaves the bigger screen
-    if(sB>sA*1.04){side=80;w=H*sB;h=W*sB;}else{strip=84;w=H*sA;h=W*sA;}}
+  if(rotMode){const LY=typeof RET!=='undefined'&&RET.layout&&RET.layoutStrip,SB=LY?68:84,sA=Math.min(aw/H,(ah-SB)/W),sB=Math.min((aw-80)/H,ah/W);   // buttons in a strip below, or in a column beside the play area, whichever leaves the bigger screen
+    if(sB>sA*1.04&&!LY){side=80;w=H*sB;h=W*sB;}else{strip=SB;w=H*sA;h=W*sA;}}
   else{w=aw;h=w*9/16;if(h>ah){h=ah;w=h*16/9;}}
   {const cpu=rotMode?w/PW_:w/W;HK=rotMode?Math.min(2,Math.max(1,11.6/(11*cpu))):1;HKL=rotMode?1:Math.min(2,Math.max(1,11.6/(11*cpu)));}   // CSS px per world unit: below 11 px of type the HUD is scaled up
   const left=SET.layout==='left';
