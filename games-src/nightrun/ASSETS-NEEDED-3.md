@@ -21,3 +21,16 @@ Hand-in steps are the same as in `ASSETS-NEEDED-2.md`: save under the exact id i
 | `pk-zone` | 64x64 | white | 3 | A | PW.coin, NEON ZONE (utility) | A magenta target ring, double circle. |
 | `pk-decoy` | 64x64 | white | 3 | A | PW.coin, DECOY DRONE (utility) | A lime-green dart drone silhouette. |
 | `pk-glass` | 64x64 | white | 3 | A | PW.coin, GLASS CANNON (risky) | A pink cracked crystal diamond. |
+
+## ABILITY upgrades + power-up slot (parts/abup.js, flag RET.abup)
+Garage ABILITY tab cards draw a shape icon until `abup-<id>.webp` is listed in media ready.json (then an `<img>` replaces it). The touch slot chip draws a star until painted.
+
+| id | size | bg | prio | wired | where | picture |
+|---|---|---|---|---|---|---|
+| `abup-dd` | 96x96 | white | 2 | A | Garage ABILITY card, DOUBLE DASH | Two cyan dash arrows, the second offset and fainter. |
+| `abup-trail` | 96x96 | white | 2 | A | Garage ABILITY card, BURN TRAIL | A cyan arrow leaving an orange flame streak. |
+| `abup-pref` | 96x96 | white | 2 | A | Garage ABILITY card, BEAT REFUND | A white beat ring with a circular return arrow. |
+| `abup-ecap` | 96x96 | white | 2 | A | Garage ABILITY card, EMP RESERVE | Four amber cells, the fourth outlined. |
+| `abup-erad` | 96x96 | white | 3 | A | Garage ABILITY card, WIDE EMP | An amber shock ring with a wider second ring. |
+| `abup-econv` | 96x96 | white | 3 | A | Garage ABILITY card, EMP SALVAGE | Green shards flying out of an amber ring. |
+| `ui-pwr-slot` | 96x96 | transparent | 3 | B | touch power-up slot (#bPwr, hold to trade) | A round dark chip with a gold star and a hold ring. |
