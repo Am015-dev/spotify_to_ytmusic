@@ -97,9 +97,21 @@ function A2_fill(){const R0=A2.R,cx=Math.floor(RO.x/40),cz=Math.floor(RO.z/40),c
  for(const[,it]of near){if(!use.has(it.d))continue;const m=A2.M[it.d],n=cnt[it.d]||0;if(n>=m.instanceMatrix.count)continue;cnt[it.d]=n+1;A2.drawn.push(it);LV_set(m,n,it.x,it.y,it.z,0,it.h,0,it.s)}
  for(const id in A2.M){const m=A2.M[id];m.count=cnt[id]||0;m.visible=m.count>0;m.instanceMatrix.needsUpdate=true}
  A2.n.drawn=Object.keys(cnt).length;A2.n.inst=near.length;if(todo)A2.px=1e9}
+// solid-buildings-r22e2: drawn roadside BUILDINGS (Athens apartment blocks, church, temple, kiosk; Frankfurt half-timbered house) were only in A2_hit's
+// soft centre push-out (car nose 1+ m inside, run from the traffic step, skipped on deferred phone frames): Alex "buildings that I pass through".
+// Now each drawn one is a real HUB.grid box (roamHit: the car stops at the wall like any city block), added/removed with the drawn set so nothing invisible blocks.
+if(/[?&]a2solid=0\b/.test(location.search))A2.solid=false;   // the old soft push-out only (A/B)
+const A2_SOLID=new Set(['apt1','apt2','church','temple','kiosk','timber']);
+function A2_col(it){if(it.cb)return it.cb;const g=A2.G&&A2.G[it.d],bb=g&&g.userData.a2.bb;if(!bb)return null;const c=Math.cos(it.h),s=Math.sin(it.h),H=(bb.max.y-bb.min.y)*it.s;
+ return it.cb={x:it.x+it.ox*c+it.oz*s,z:it.z-it.ox*s+it.oz*c,hw:it.hw,hd:it.hd,c,s,h:it.y+bb.min.y*it.s+H,rh:H,a2:it.d}}
+function A2_solid(){const G=HUB.grid;if(!G)return;if(A2.cg!==G){A2.cg=G;A2.sol=new Set()}const want=new Set();for(const it of A2.drawn)if(A2_SOLID.has(it.d)){const b=A2_col(it);if(b)want.add(b)}
+ for(const b of A2.sol)if(!want.has(b)){for(const k of b.keys){const L=G.get(k),i=L?L.indexOf(b):-1;if(i>=0)L.splice(i,1)}A2.sol.delete(b)}
+ for(const b of want)if(!A2.sol.has(b)){const[ex,ez]=bExt(b);b.keys=[];for(let k=Math.floor((b.x-ex-5)/40);k<=Math.floor((b.x+ex+5)/40);k++)for(let j=Math.floor((b.z-ez-5)/40);j<=Math.floor((b.z+ez+5)/40);j++){const key=k*10000+j;let L=G.get(key);if(!L)G.set(key,L=[]);L.push(b);b.keys.push(key)}A2.sol.add(b)}
+ A2.n.solid=A2.sol.size}
+{const _f=A2_fill;A2_fill=function(){_f.apply(this,arguments);if(A2.solid!==false)try{A2_solid()}catch(e){console.warn('A2 solid',e)}}}
 // plain push-out for solids (trunk circle, footprint box in the prop frame); no speed loss beyond a small scrub, no smash (collision lane owns colliders)
 function A2_hit(){if(!A2.drawn||!A2.drawn.length)return;const now=performance.now(),dt=Math.min(.05,(now-(A2.t||now))/1000||.016);A2.t=now;
- for(const it of A2.drawn){const d=A2_BY[it.d];if(!d.col)continue;if(Math.abs((RO.y||0)-it.y)>3)continue;// only props that are drawn this fill can block (no invisible walls)
+ for(const it of A2.drawn){const d=A2_BY[it.d];if(!d.col||it.cb&&A2.sol&&A2.sol.has(it.cb))continue;/* solid-buildings-r22e2: real colliders own these */if(Math.abs((RO.y||0)-it.y)>3)continue;// only props that are drawn this fill can block (no invisible walls)
    const ex=RO.x-it.x,ez=RO.z-it.z;let nx,nz,pen;
    if(d.col==='c'){const rr=it.r+1.1,e2=ex*ex+ez*ez;if(e2>=rr*rr)continue;const e=Math.sqrt(e2)||1;nx=ex/e;nz=ez/e;pen=rr-e}
    else{const c=Math.cos(it.h),s=Math.sin(it.h),lx=ex*c-ez*s-it.ox,lz=ex*s+ez*c-it.oz,hx=it.hw+1.1,hz=it.hd+1.1;if(Math.abs(lx)>=hx||Math.abs(lz)>=hz)continue;

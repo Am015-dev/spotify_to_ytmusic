@@ -1,0 +1,70 @@
+// solid-buildings-r22e2 (2026-10-21): why/solid-bld. Alex: "buildings that I pass through" (Frankfurt + Athens, within 30 s of play).
+// No graphics. Drawn side = wall triangles (>= 3.5 m columns, 2 m cells, the 99c9 raster) of every visible building-like mesh near the PLAY spawn (600 m) and
+// along the bot/nav route (120 m corridor), lazy regions INCLUDED once drawn; one building = one instance of an instanced mesh, or one connected wall
+// cluster of a merged batch. Collider side = roamHit (what the car feels). A building passes at >= 90 % of its wall cells inside a collider (+1.6 m).
+const SB={rad:1.6,minH:3.5,minCells:6,cov:.9,R:600,corr:120,nRay:40};
+// area of interest: [x,z,r] circles (spawn + bot route samples every 60 m)
+function SB_area(){const A=[];const sp=RO.spawn0||[RO.x,RO.z];A.push([sp[0],sp[1],SB.R]);try{const P=SB_route();for(let i=0;i<P.length;i++)A.push([P[i][0],P[i][1],SB.corr])}catch(e){}return A}
+// bot/nav route without driving: the same seeded waypoint picks as BOT_nav (99c8), legs chained end to end
+function SB_route(){const N=HUB.nodes;if(!N||!N.length||typeof navPath!=='function')return[];const rng=(s=>()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296})(20261020+(CID==='fra'?1:2));
+ let x=RO.x,z=RO.z;if(CID==='fra'){const q=rfSnap(-375,475,120);x=q?q[0]:-375;z=q?q[1]:475}const M=navMain(N),out=[];
+ for(let w=0;w<4;w++){const C=[];for(let i=0;i<N.ng;i++){if(!M[i])continue;const d=Math.hypot(N[i].x-x,N[i].z-z);if(d>250&&d<750)C.push(i)}if(!C.length)break;let P=null;
+  for(let t=0;!P&&t<40;t++){const i=C[Math.floor(rng()*C.length)],p=navPath(x,z,N[i].x,N[i].z);if(p.length>2)P=p}if(!P)break;let la=null;for(const q of P){if(!la||Math.hypot(q[0]-la[0],q[1]-la[1])>60){out.push(q);la=q}}const e=P[P.length-1];x=e[0];z=e[1]}return out}
+const SB_in=(A,x,z,m=0)=>{for(const a of A)if((x-a[0])**2+(z-a[1])**2<(a[2]+m)**2)return true;return false};
+function SB_vis(o){for(let q=o;q;q=q.parent)if(q.visible===false)return false;return true}
+// buildings: Map key -> {cat,cells:[[x,z]],x,z}
+function SB_blds(A,only){const Mx=new THREE.Matrix4(),IM=new THREE.Matrix4(),a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),sph=new THREE.Sphere();scene.updateMatrixWorld(true);const B=new Map();let tris=0;
+ const geoW=new WeakMap(),walls=g=>{let w=geoW.get(g);if(w)return w;w=[];const P=g.attributes.position,I=g.index,n=I?I.count:P.count;if(!g.boundingBox)g.computeBoundingBox();if(g.boundingBox.max.y-g.boundingBox.min.y>=.3)for(let i=0;i<n;i+=3){const i0=I?I.getX(i):i,i1=I?I.getX(i+1):i+1,i2=I?I.getX(i+2):i+2;w.push(P.getX(i0),P.getY(i0),P.getZ(i0),P.getX(i1),P.getY(i1),P.getZ(i1),P.getX(i2),P.getY(i2),P.getZ(i2))}geoW.set(g,w);return w};
+ const run=(o,w,M,key,cat)=>{const cell=new Map();for(let k=0;k<w.length;k+=9){a.set(w[k],w[k+1],w[k+2]).applyMatrix4(M);b.set(w[k+3],w[k+4],w[k+5]).applyMatrix4(M);c.set(w[k+6],w[k+7],w[k+8]).applyMatrix4(M);
+   const ymin=Math.min(a.y,b.y,c.y),ymax=Math.max(a.y,b.y,c.y);if(ymax-ymin<.3)continue;const ux=b.x-a.x,uy=b.y-a.y,uz=b.z-a.z,vx=c.x-a.x,vy=c.y-a.y,vz=c.z-a.z,nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx;if(Math.abs(ny)/(Math.hypot(nx,ny,nz)||1)>.2)continue;
+   const xs=[a.x,b.x,c.x],zs=[a.z,b.z,c.z];let bi=0,bj=1,bd=-1;for(let i=0;i<3;i++)for(let j=i+1;j<3;j++){const d=Math.hypot(xs[i]-xs[j],zs[i]-zs[j]);if(d>bd){bd=d;bi=i;bj=j}}if(bd<.3)continue;tris++;
+   const n=Math.max(1,Math.ceil(bd/1.5));for(let q=0;q<=n;q++){const x=xs[bi]+(xs[bj]-xs[bi])*q/n,z=zs[bi]+(zs[bj]-zs[bi])*q/n,kk=Math.floor(x/2)*100000+Math.floor(z/2);let e=cell.get(kk);if(!e)cell.set(kk,e=[x,z,ymin,ymax]);else{if(ymin<e[2])e[2]=ymin;if(ymax>e[3])e[3]=ymax}}}
+  const S=[];for(const[k,e]of cell){if(!SB_in(A,e[0],e[1]))continue;const gy=groundY(e[0],e[1]);if(e[3]-e[2]>=SB.minH&&e[3]-gy>=SB.minH&&e[2]<gy+8)S.push([k,e[0],e[1]])}if(!S.length)return;
+  // merged batches: one building per 8-connected cluster of wall cells
+  const left=new Map(S.map(s=>[s[0],s]));let ci=0;for(const s of S){if(!left.has(s[0]))continue;const Q=[s],cl=[];left.delete(s[0]);while(Q.length){const t=Q.pop();cl.push([t[1],t[2]]);const kx=Math.floor(t[1]/2),kz=Math.floor(t[2]/2);for(let dx=-1;dx<=1;dx++)for(let dz=-1;dz<=1;dz++){const kk=(kx+dx)*100000+kz+dz,u=left.get(kk);if(u){left.delete(kk);Q.push(u)}}}
+   if(cl.length<SB.minCells)continue;let sx=0,sz=0;for(const p of cl){sx+=p[0];sz+=p[1]}B.set(key+'#'+ci++,{cat,cells:cl,x:sx/cl.length,z:sz/cl.length,o})}};
+ scene.traverse(o=>{if(!(o.isMesh||o.isInstancedMesh)||!o.geometry||!o.geometry.attributes.position)return;const u=o.userData||{};if(u.gk||u.trG||u.sky||o.material&&o.material.type==='ShaderMaterial'&&!u.a8s)return;if(only&&!only.has(o))return;if(!SB_vis(o))return;
+  const g=o.geometry;if(!g.boundingSphere)g.computeBoundingSphere();const w=walls(g);if(!w.length)return;const cat=SB_cat(o);
+  if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,IM);Mx.multiplyMatrices(o.matrixWorld,IM);sph.copy(g.boundingSphere).applyMatrix4(Mx);if(!SB_in(A,sph.center.x,sph.center.z,sph.radius))continue;run(o,w,Mx,o.uuid+':'+i,cat)}}
+  else{sph.copy(g.boundingSphere).applyMatrix4(o.matrixWorld);if(SB_in(A,sph.center.x,sph.center.z,sph.radius))run(o,w,o.matrixWorld,o.uuid,cat)}});
+ return{B,tris}}
+// category label (the 99c9 CA_cat rules, that chunk does not export it)
+function SB_cat(o){const u=o.userData||{};if(HUB.BM)for(const k in HUB.BM)if(HUB.BM[k]===o.material)return'BM:'+k+(o.isInstancedMesh?'+i':'');for(const k of['athB','dr','cv','bvL','c1h','c3','trPl','gk','trG','keep','asLod','as','lf','simp','ocPool','bmk','lz'])if(u[k]!==undefined)return k+(k==='athB'?':'+u[k]:'');let p=o.parent,pk='';while(p&&!pk){pk=Object.keys(p.userData||{}).join('.');p=p.parent}const m=o.material;return'-'+(m&&m.type.replace('Mesh','').replace('Material','')||'')+(m&&m.map?'+map':'')+(m&&m.vertexColors?'+vc':'')+(o.isInstancedMesh?'+inst':'')+(pk?'^'+pk:'')+'/'+(m&&m.name||'')+'/'+(o.name||'')}
+function SB_cover(B){const bad=[],by={};for(const e of B){let h=0;for(const[x,z]of e.cells)if(roamHit(x,z,SB.rad,groundY(x,z)))h++;e.f=h/e.cells.length;const r=by[e.cat]||(by[e.cat]={n:0,bad:0});r.n++;if(e.f<SB.cov){r.bad++;bad.push(e)}}bad.sort((a,b)=>b.cells.length-a.cells.length);return{bad,by}}
+// what counts as a building: the 99c9 building categories (city blocks, Athens fill, brick/glass/office/gable/roof/plaka batches, lazy regions use the same
+// materials) plus the roadside asset buildings (98a2 A2_SOLID meshes a2_<id>). Trees, props (smashable, own grid), bridges, signs and track platforms are not.
+const SB_bldRe=/^(athB:|dr$|BM:(office|brick|glass|gable|roof|plaka))/;
+const SB_isBld=e=>SB_bldRe.test(e.cat)||e.o&&/^ctbf?_/.test(e.o.name||'')||e.o&&/^a2_/.test(e.o.name||'')&&typeof A2_SOLID!=='undefined'&&A2_SOLID.has(e.o.name.slice(3));
+// roadside asset buildings are drawn only within A2.R of the car: walk the car (position only, no physics) over the spawn + route samples and audit what each fill draws
+function SB_a2Walk(A,fn){if(typeof A2==='undefined'||!A2.on||!A2.M)return 0;const sv=[RO.x,RO.z];let n=0;try{for(const a of A){RO.x=a[0];RO.z=a[1];A2.px=1e9;A2_fill();n++;fn(a)}}finally{RO.x=sv[0];RO.z=sv[1];A2.px=1e9;A2_fill()}return n}
+function SB_audit(){const A=SB_area(),{B}=SB_blds(A),blds=[];for(const e of B.values())if(SB_isBld(e))blds.push(e);const a2=new Map();
+ SB_a2Walk(A,a=>{const sc=[[a[0],a[1],A2.R+20]];const ms=new Set(Object.values(A2.M).filter(m=>m.visible&&A2_SOLID.has(m.name.slice(3))));if(!ms.size)return;const R=SB_blds(sc,ms);
+  for(const e of R.B.values()){const k=Math.round(e.x/3)+','+Math.round(e.z/3);if(a2.has(k))continue;let h=0;for(const[x,z]of e.cells)if(roamHit(x,z,SB.rad,groundY(x,z)))h++;e.f=h/e.cells.length;e.at=[a[0],a[1]];a2.set(k,e)}});
+ const C=SB_cover(blds),bad=C.bad.slice();for(const e of a2.values())if(e.f<SB.cov)bad.push(e);return{A,blds,a2:[...a2.values()],bad,by:C.by}}
+// car runs: straight at a building wall from 12-30 m out, gas held, real roamStep at 1/30 s; FAIL when the car ends up past a wall cell of any audited building on its line
+function SB_ray(G,e,ang,kmh){const R=Math.sqrt(e.cells.length)*1.2+14;let sx=0,sz=0,ok=false;for(let t=0;t<8&&!ok;t++){const a=ang+t*Math.PI/4;sx=e.x+Math.sin(a)*R;sz=e.z+Math.cos(a)*R;ok=!roamHit(sx,sz,4,groundY(sx,sz))&&!inRiver(sx,sz,2)&&!onAnyDeck(sx,sz)&&SB_nearW(G,sx,sz,4)<0}if(!ok)return null;
+ if(e.at&&typeof A2!=='undefined'){RO.x=sx;RO.z=sz;A2.px=1e9;A2_fill()}
+ const h=Math.atan2(e.x-sx,e.z-sz);roamWarp(sx,sz,h,true);RO.x=sx;RO.z=sz;RO.h=h;RO.v=kmh/3.6;RO.vy=0;RO.y=groundY(sx,sz);K.ArrowUp=true;let still=0;try{for(let st=0,n=kmh<50?90:60;st<n;st++){RO.v=Math.max(RO.v,st<3?kmh/3.6:-99);roamStep(1/30);if(!isFinite(RO.x))break;if(st>6&&Math.abs(RO.v)<.4){if(++still>4)break}else still=0}}finally{K.ArrowUp=false}
+ const ex=RO.x,ez=RO.z;
+ // drove through: the path crossed one of the target's wall cells (0.8 m) that has no collider within 1 m, >= 2.5 m before the end (a car stopped at, or sliding along, a facade keeps its centre >= 1 m off the wall;
+ // a <= 1 m corner overhang of an oriented Athens block is a body clip, listed in docs/HANDOFF_solid-buildings-r22e2.md, not a drive-through)
+ const L=Math.hypot(ex-sx,ez-sz),cr=()=>{for(let d=1;d<L-2.5;d+=.5){const px=sx+(ex-sx)*d/L,pz=sz+(ez-sz)*d/L;for(const c of e.cells)if((c[0]-px)**2+(c[1]-pz)**2<.64&&!roamHit(c[0],c[1],1,groundY(c[0],c[1])+.5))return true}return false};
+ if(cr())return{pass:1,id:Math.round(e.x)+','+Math.round(e.z)+' '+(e.o&&e.o.name||e.cat)+' '+kmh+'kmh through, end '+Math.round(ex)+','+Math.round(ez)};
+ return SB_inside(G,ex,ez)?{pass:1,id:Math.round(e.x)+','+Math.round(e.z)+' '+(e.o&&e.o.name||e.cat)+' '+kmh+'kmh end '+Math.round(ex)+','+Math.round(ez)}:{pass:0}}
+// inside a footprint: the FIRST wall met in each of the 4 directions (<= 40 m) belongs to the same building (a car stopped at a facade, or in an alley, has another building or open road on some side)
+function SB_inside(G,x,z){let id=-1;for(const[dx,dz]of[[1,0],[-1,0],[0,1],[0,-1]]){let i=-1;for(let d=1.5;d<=40&&i<0;d+=1)i=SB_nearW(G,x+dx*d,z+dz*d,1);if(i<0)return false;const b=G.W[i][2];if(id<0)id=b;else if(b!==id)return false}return true}
+const SB_hash=W=>{const G=new Map();G.W=W;W.forEach((p,i)=>{const k=Math.floor(p[0]/8)*100000+Math.floor(p[1]/8);let a=G.get(k);if(!a)G.set(k,a=[]);a.push(i)});return G};
+function SB_nearW(G,x,z,r){for(let a=Math.floor((x-r)/8);a<=Math.floor((x+r)/8);a++)for(let b=Math.floor((z-r)/8);b<=Math.floor((z+r)/8);b++){const L=G.get(a*100000+b);if(L)for(const i of L){const p=G.W[i];if((p[0]-x)**2+(p[1]-z)**2<=r*r)return i}}return -1}
+function SB_go(){const t0=performance.now(),sv={x:RO.x,z:RO.z,h:RO.h,v:RO.v},o=SB_audit(),t1=performance.now();const all=o.blds.concat(o.a2),W=[];all.forEach((e,bi)=>{for(const c of e.cells)W.push([c[0],c[1],bi])});const G=SB_hash(W);
+ const pick=[];const a2s=o.a2.slice(0,12);for(const e of a2s)pick.push(e);const rest=SB.nRay-pick.length;for(let i=0;i<rest&&o.blds.length;i++)pick.push(o.blds[Math.floor(i*o.blds.length/rest)]);
+ const rays={n:0,skip:0,pass:[]};try{pick.forEach((e,i)=>{for(const kmh of[30,80]){const r=SB_ray(G,e,i*2.39996,kmh);if(!r){rays.skip++;continue}rays.n++;if(r.pass)rays.pass.push(r.id)}})}
+ finally{roamWarp(sv.x,sv.z,sv.h,true);RO.x=sv.x;RO.z=sv.z;RO.h=sv.h;RO.v=0;if(typeof A2!=='undefined'&&A2.M){A2.px=1e9;A2_fill()}}
+ const nb=o.bad.length,ok=nb===0&&rays.pass.length===0&&rays.n>=SB.nRay;window.__sb.last={o,rays};
+ const ls=o.bad.slice(0,5).map(e=>(e.o&&e.o.name||e.cat)+'@'+Math.round(e.x)+','+Math.round(e.z)+' '+Math.round(100*e.f)+'%');
+ return'📍 why/solid-bld '+CID+' · '+(o.blds.length+o.a2.length)+' drawn buildings within '+SB.R+' m of the spawn + '+SB.corr+' m of the bot route ('+o.a2.length+' roadside asset buildings) · '+nb+' with < '+Math.round(SB.cov*100)+' % collider overlap'+(ls.length?' ('+ls.join('; ')+')':'')+
+  ' · car runs '+rays.n+' (30+80 km/h, skipped '+rays.skip+'), '+rays.pass.length+' drove through or ended inside a building'+(rays.pass.length?' ('+rays.pass.slice(0,4).join('; ')+')':'')+' · '+Math.round(t1-t0)+'+'+Math.round(performance.now()-t1)+' ms → '+(ok?'✅ PASS':'❌ FAIL')}
+{const R=()=>{if(!window.__chk||!__chk.GO)return false;if(__chk.GO['why/solid-bld'])return true;
+ __chk.items.unshift({ver:'why',id:'solid-bld',area:'city',text:'solid-buildings-r22e2 (Alex: "buildings that I pass through"): every DRAWN building within 600 m of the PLAY spawn and 120 m of the bot route (city blocks, Athens fill, lazy regions once drawn, roadside asset buildings: Athens apartment blocks / church / temple / kiosk, Frankfurt half-timbered houses) has a collider over >= 90 % of its walls, and 40 buildings x (30, 80 km/h) straight car runs never end past a wall. 📍 GO (no graphics).'});
+ __chk.GO['why/solid-bld']=['fra','ath'].map(c=>({c,n:'solid buildings '+(c==='fra'?'Frankfurt':'Athens'),secs:60,fn:()=>SB_go()}));return true};if(!R()){const t=setInterval(()=>{if(R())clearInterval(t)},250)}}
+window.__sb={go:SB_go,audit:SB_audit,cfg:SB,route:SB_route,area:SB_area,blds:SB_blds,cover:SB_cover};
+({})
