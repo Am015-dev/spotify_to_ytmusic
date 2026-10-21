@@ -64,3 +64,10 @@ Model and status come from the session list. Cost is blank: the session list doe
 | golden-r20j | 323 | Sonnet | Golden-screenshot regression (portrait and landscape, both cities) | working at log time |
 | review-r20k | 324 | Opus | Industry-benchmark feel review against LEGO 2K Drive and Forza Horizon | working at log time |
 | chores-r20l | 325 | Haiku | Branch cleanup, ledger rows, fix-lane brief template (mechanical) | in progress (this lane) |
+| drive-first-r22d1 | beta.145 | Sonnet | First PLAY drives, one text slot, phone HUD <=9 (gaps 4-5) | shipped beta.145 |
+| terrain-flat-r22d2 | beta.145 | Sonnet | Slope cap beside roads, unstick 1.2/2.5 s (gap 1) | shipped beta.145 |
+| review-17-18 | beta.145 | Opus | Reviews of drive-first and terrain | PASS |
+| hud-cam-r22d3 | beta.146 | Sonnet | Camera clear + phone roam HUD-6 (gaps 6-7) | in review #19 |
+| core-loop-plan-r22d4 | — | Opus | Frankfurt core + one loop design plan, 8 lanes (gap 9) | done (docs) |
+| rv3a-fix-r22d5 | — | Sonnet | RV3A_rows ReferenceError on player pages + no-pageerror GO | working at log time |
+| cl-L1-core-zone | — | Sonnet | Core loop L1: core zone behind ?cl=core | working at log time |
