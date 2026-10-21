@@ -13920,8 +13920,9 @@ const READ=window.READ={D:'#ff2d78',CORE:'#ffffff',RING:'#07030f',SHOT:'#7fe6ff'
     ctx.save();ctx.globalCompositeOperation='lighter';for(const b of L)G_(b.x,b.y,b.r*2.6*bg,D,b.k?.3:.38);ctx.globalCompositeOperation='source-over';
     const pb=ART.have('fx-bullet-enemy')&&ART.hue('fx-bullet-enemy',15,-92);          // the painted orb, turned from lime to pink (kept as a picture)
     for(const [col,k] of hc?[['#ffffff',1.95],[this.RING,1.62],[D,1.25],[this.CORE,.68]]:[[this.RING,1.5],[D,1.18],[this.CORE,.64]]){
-      ctx.fillStyle=col;ctx.beginPath();for(const b of L){if(b.k)continue;const r=b.r*k*bg;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();
-      if(pb&&col===D){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.45;for(const b of L){if(b.k)continue;const w=b.r*2.6*bg;ctx.drawImage(pb.c,b.x-w/2,b.y-w/2,w,w*pb.h/pb.w);}ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}}
+      const ba=RET.bulletart&&pb;   // bulletart: the painted orb is THE orb (full strength, bigger), not a 45 % wash over a flat disc (bulletart.js)
+      if(!(ba&&col===D)){ctx.fillStyle=col;ctx.beginPath();for(const b of L){if(b.k)continue;const r=b.r*k*bg;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();}
+      if(pb&&col===D){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=ba?1:.45;for(const b of L){if(b.k)continue;const w=b.r*(ba?3.4:2.6)*bg;ctx.drawImage(pb.c,b.x-w/2,b.y-w/2,w,w*pb.h/pb.w);}ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}}
     for(const b of L){if(b.k||!(b.hm>0))continue;if(ART.have('fx-orb-homing')){const o=ART.bm['fx-orb-homing'],w=b.r*3.6;this.ring(b.x,b.y,w*.42,2);ctx.globalCompositeOperation='lighter';ctx.drawImage(o,b.x-w/2,b.y-w/2,w,w);ctx.globalCompositeOperation='source-over';continue;}
       this.ring(b.x,b.y,b.r+5.2,2.4);ctx.strokeStyle='#ffffff';ctx.lineWidth=1.6;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(b.x,b.y,b.r+3.5,0,7);ctx.stroke();ctx.globalAlpha=1;}
     for(const b of L){if(!b.k)continue;const a=Math.atan2(b.vy,b.vx),ca=Math.cos(a),sa=Math.sin(a),r=b.r*bg;if(b.k==='r')AH.pic('fx-eb-rocket-trail',b.r*9,b.x-ca*b.r*4.5,b.y-sa*b.r*4.5,a,.8);
@@ -13964,6 +13965,18 @@ if(RET.read&&PW.p2&&PW.p2.K&&PW.p2.K.nova)PW.p2.K.nova.c=READ.NOVA;
 /* Settings > Assist (or Accessibility when Assist is off): 'Show hitbox' */
 {const f=RET.assistSchema;RET.assistSchema=function(SC){if(f)f.call(this,SC);if(!RET.read)return;const g=SC.find(x=>x.g==='Assist')||SC.find(x=>x.g==='Accessibility');if(!g||g.rows.some(r=>r.k==='hbox'))return;
   const i=g.rows.findIndex(r=>r.k==='hc');g.rows.splice(i<0?g.rows.length:i+1,0,{k:'hbox',l:'Show hitbox',o:[[false,'Off'],[true,'On']],d:'A small white dot on the ship marks the only spot that can be hit. Never marks a run.'});};}
+
+// PURPOSE: real bullet pictures (converted approved previews) for enemy orb/needle/shell/rocket and every player weapon; ?bulletart=0 = the old dots
+// FLAG: bulletart (?bulletart=0)
+// TEST: bulletart-test.js
+/* ---------- bulletart.js (owner, 21 Oct 2026: "plain dots as bullets"). The pictures are media/fx-bullet-{needle,rocket,shell}.webp and fx-w-<weapon>-{bullet,hit,muzzle}.webp
+   (96 px, alpha, converted from the approved 256 px previews; listed in media/ready.json). The draw sites already exist: ai.js / readable.js (needle, shell, rocket, rotated to travel direction),
+   fxwave.js FXW.bullet (player shots by weapon id), readable.js orb (painted orb at full strength). This file only holds the switch: with RET.bulletart off the ids below read as "not there",
+   so the old code shapes draw. Hitboxes are not touched (b.r / b.js stay). */
+if(RET.bulletart===undefined)RET.bulletart=!/[?&]bulletart=0/.test(location.search);
+const BA=window.BA={own:n=>/^fx-bullet-(needle|rocket|shell)$/.test(n)||/^fx-w-[a-z]+-(bullet|hit|muzzle)$/.test(n)};
+{const h=ART.have;ART.have=function(n){return(!RET.bulletart&&BA.own(n))?false:h.call(this,n);};}
+{const p=FXW.pic;FXW.pic=function(k){return(!RET.bulletart&&/^w-[a-z]+-(bullet|hit|muzzle)$/.test(k))?null:p.call(this,k);};}
 
 // PURPOSE: 12 extra power-ups and the context-aware drop picker
 // FLAG: powers (?powers=0)
@@ -14639,7 +14652,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='1463afce40 2026-10-21 22:06 UTC';
+const NR_STAMP='8cc20bcea8 2026-10-21 22:15 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
