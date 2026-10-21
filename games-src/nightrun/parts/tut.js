@@ -53,7 +53,8 @@ const TUT_S=[
     this.es=[tutEn('drone',{x:W+90,y:H*.32,amp:0}),tutEn('drone',{x:W+90,y:H*.68,amp:0})];},
   tgt(){const e=this.e;return e.hp>0&&G.en.includes(e)?{x:e.x,y:e.y,r:e.r+12,foe:1}:null;},
   tick(){return !(this.e.hp>0&&G.en.includes(this.e));}}];
-TUT.cur=()=>TUT.on?TUT_S[TUT.i]:null;
+const tutSeq=()=>TUT.D||TUT_S;   // school.js (RET.school) runs one drill as a one-step sequence in TUT.D
+TUT.cur=()=>TUT.on?tutSeq()[TUT.i]:null;
 /* ----- the coach bar (DOM, top of the stage) and the cards ----- */
 {const st=document.createElement('style');st.textContent=`
 #tutB{position:absolute;z-index:6;top:58px;left:50%;transform:translateX(-50%);width:min(520px,calc(100% - 16px));display:flex;align-items:center;gap:8px;box-sizing:border-box;
@@ -78,11 +79,11 @@ addEventListener('keydown',e=>{if(tutC.hidden)return;if(e.code==='Escape'){const
   else return;e.stopImmediatePropagation();e.preventDefault();},true);
 /* ----- flow ----- */
 function tutGo(i){const o=TUT.cur();if(o&&o.end)o.end();G.en=G.en.filter(e=>!e.tut);G.eb=G.eb.filter(b=>!b.tut);G.pk=G.pk.filter(p=>!p.tut);
-  TUT.i=i;TUT.t=0;TUT.next=0;tutB.classList.remove('ok');if(i>=TUT_S.length){tutFinish();return;}
-  const s=TUT_S[i];s.init();TUT.line(s.say());$('tutN').textContent=(i+1)+'/'+(TUT_S.length+1);
+  TUT.i=i;TUT.t=0;TUT.next=0;tutB.classList.remove('ok');if(i>=tutSeq().length){tutFinish();return;}
+  const s=tutSeq()[i];s.init();TUT.line(s.say());$('tutN').textContent=TUT.D?'':(i+1)+'/'+(TUT_S.length+1);
   const d=$('bDash'),m=$('bEmp');if(d)d.classList.toggle('tutGlow',s.id==='dash');if(m)m.classList.toggle('tutGlow',s.id==='emp');}
 function startTut(){if(!TUT_ON||running)return;AU.unlock();pressed={};for(const el of[titleEl,overEl,pauseEl,setEl,selEl])if(el)el.hidden=true;tutC.hidden=true;ST.on=false;
-  if(!load('mnr_tut',0))save('mnr_tut',1);
+  if(!TUT.D&&!load('mnr_tut',0))save('mnr_tut',1);
   newGame(false);G.tut=true;G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(stageFor(0,false));NR.emit('runStart',{tut:true});
   SH.live=false;SH.neon=0;FPS.n=0;FPS.t=0;FPS.slow=0;FPS.worst=0;
   TUT.on=true;TUT.log=[];TUT.ending=false;TUT.endShown=false;TUT.eq0=WP.eq.slice();TUT.eqT=null;TUT.auto0=SET.auto;SET.auto=true;TUT.heal=0;TUT.still=0;TUT.said=0;TUT.ax=P.x;TUT.ay=P.y;
@@ -103,8 +104,9 @@ NR.on('runEnd',()=>{if(TUT.on&&!TUT.ending)tutRestore();});
 NR.on('beat',d=>{const s=TUT.cur();if(s&&s.beat&&!G.dead)s.beat(d.i);});
 NR.on('perfect',d=>{const s=TUT.cur();if(s&&s.perfect)s.perfect(d.kind);});
 NR.on('tick',dt=>{if(!TUT.on||!G.tut||!running)return;const s=TUT.cur();if(!s)return;TUT.t+=dt;
+  if(TUT.D&&G.en.some(e=>!e.tut))G.en=G.en.filter(e=>e.tut);                                      // a school drill: only its own foes (other spawners stay quiet)
   if(!s.foes)G.eb=G.eb.filter(b=>b.tut);else if(G.eb.length>8)G.eb.length=8;                     // only the tutorial's own bullets fly, the leader fires gently
-  for(const e of G.en)if(e.tut&&e.hp>0)e.x=Math.max(e.x,W*(e.ldr?.66:.6));                        // targets fly in and wait in reach
+  if(!s.free)for(const e of G.en)if(e.tut&&e.hp>0)e.x=Math.max(e.x,W*(e.ldr?.66:.6));                        // targets fly in and wait in reach
   if(P.hp<P.max){TUT.heal+=dt;if(TUT.heal>.6){P.hp=P.max;TUT.heal=0;floater(P.x,P.y-40,'No worries','#3dffb0');}}else TUT.heal=0;
   if(s.id==='dodge'){if(Math.hypot(P.x-TUT.ax,P.y-TUT.ay)>40){TUT.ax=P.x;TUT.ay=P.y;TUT.still=0;}else TUT.still+=dt;
     if(TUT.still>2&&!TUT.said){TUT.said=1;floater(P.x,P.y-44,'KEEP MOVING','#ff6a7a');TUT.line('Standing still is dangerous!');}}
