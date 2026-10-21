@@ -43,6 +43,7 @@ scale|3|power-aware enemy scale, round 1|scale,scale
 powerups|12|six music-tied timed power-ups + drum burst|pw2,pw2
 flow|6|the song never stops or stutters|flow,flow
 musicpack|15|polish music cues played by context|musicpack,musicpack
+storydata|20|every line of the campaign story (data only; saga.js plays i|story,story
 tale|21|story cast, beats, dialogue card, STORY LOG|tale,tale
 stats|20|counters, achievements, completion %|stats,stats
 feedback|5|FUN / SAME AGAIN / BORING tap at run end|feedback,feedback
@@ -81,12 +82,13 @@ holdline|3|hold the line: letting enemies pass costs|holdline,holdline
 pacing|6|shorter stages, fewer enemies, enemies that stay|pacing,pacing
 bite|3|Normal bites again on top of the short stages|bite,bite
 flankers|8|flanker enemies that punish a parked ship (default OFF)|flankers,flankers
-fleet|22|enemy warships in the fly stages|fleet,fleet
+fleet|23|enemy warships in the fly stages|fleet,fleet
 endramp|8|endless mode climbs in difficulty|endramp,endramp
 h|5|H: no AFK wins, a dying ship slows the song|-
 fun|15|set pieces, deck replaces the fixed metronome, rosters|deck,deck,roster+
 tut|16|TUT: FLIGHT SCHOOL, a playable tutorial stage (about 3 minut|-
 lessons|27|short tactics lessons the first time a feature appears|lessons,lessons
+saga|23|campaign story: opening, briefings, comms, chapter ends, STO|story,story
 title|6|title diet + CONTINUE, 14 px type floor|title,title,type+
 cp|10|checkpoints with grace on long stages|cp,cp
 fs|5|phone full screen on first tap|fs,fs
