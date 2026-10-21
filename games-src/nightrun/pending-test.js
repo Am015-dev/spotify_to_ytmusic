@@ -8,7 +8,8 @@ let fails = 0; const line = (ok, s) => { if (!ok) fails++; console.log((ok ? 'PA
 const reports = fs.readdirSync(NR).filter(f => /^ASSETS-PENDING-\d{4}-\d\d-\d\d\.md$/.test(f)).sort();
 line(reports.length > 0, 'a report ASSETS-PENDING-<date>.md exists' + (reports.length ? ' (' + reports[reports.length - 1] + ')' : ''));
 if (!reports.length) process.exit(1);
-const md = fs.readFileSync(path.join(NR, reports[reports.length - 1]), 'utf8');
+const main_ = reports[reports.length - 1]; let md = fs.readFileSync(path.join(NR, main_), 'utf8');
+for (const pr of ['P2', 'P3']) { const f2 = path.join(NR, main_.replace('.md', '-' + pr + '.md')); if (fs.existsSync(f2)) md += '\n' + fs.readFileSync(f2, 'utf8'); }   // rows are split by priority (repo size limit)
 const rows = new Map();   // id -> cells
 for (const l of md.split('\n')) {
   const m = /^\| `([^`]+)` \|/.exec(l); if (!m) continue;
