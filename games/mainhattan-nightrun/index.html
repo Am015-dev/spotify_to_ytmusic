@@ -14194,7 +14194,8 @@ const ABUP=window.ABUP={get on(){return!!RET.abup&&!!(window.ABIL&&ABIL.on);},
     if(R.shT>0)R.shT-=dt;this.chip();},
   /* the touch chip: shown while a power-up is held */
   chip(){const b=$('bPwr');if(!b)return;const h=G&&!G.dead&&touchUI?this.held(true):null,R=G?this.r():null,show=!!h;
-    if(b.hidden===show)b.hidden=!show;if(!h)return;const c=this.col(h.k),k=h.k+'|'+(G.t<R.cd?1:0);if(b._k!==k){b._k=k;b.style.setProperty('--pc',c);b.classList.toggle('cd',G.t<R.cd);}},
+    if(b.hidden===show)b.hidden=!show;if(!h)return;const c=this.col(h.k),cd=G.t<R.cd,lb=cd?Math.ceil(R.cd-G.t)+'s':'TRADE',k=h.k+'|'+lb;
+    if(b._k!==k){b._k=k;b.style.setProperty('--pc',c);b.classList.toggle('cd',cd);b.classList.toggle('rdy',!cd);b.setAttribute('data-lbl',lb);b.setAttribute('aria-label',cd?'Power-up slot: ready in '+lb:'Power-up slot: tap to trade this power-up for a dash refill or a new drop');b.title='Trade the held power-up for a dash refill (or a new drop when dash is full)';}},
   draw(){if(!this.on||!G||!G.abx||!P)return;const R=G.abx;if(R.shT>0){ctx.save();ctx.globalAlpha=.3+.4*Math.min(1,R.shT);ctx.strokeStyle=R.shC||'#7fd8ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(P.x,P.y,34,0,7);ctx.stroke();ctx.restore();}
     if(R.res){ctx.save();ctx.globalAlpha=.8;ctx.fillStyle='#ffb020';ctx.beginPath();ctx.arc(P.x-18,P.y+22,3.5,0,7);ctx.fill();ctx.restore();}}
 };
@@ -14231,7 +14232,7 @@ if(ABUP.on){
       for(const k of['pointercancel','pointerleave'])b.addEventListener(k,()=>{dn=0;});}}
   addEventListener('keydown',e=>{if(e.code==='KeyQ'&&!e.repeat&&running&&!(e.target&&e.target.tagName==='INPUT'))ABUP.trade();});
   {const st=document.createElement('style');st.textContent=`#touch button#bPwr{min-width:44px;min-height:44px;width:min(var(--bs),48px);height:min(var(--bs),48px);border-radius:50%;border:2px solid var(--pc,#ffe14d);background:#05030cb0;color:var(--pc,#ffe14d);font-size:0;padding:9px;display:flex;align-items:center;justify-content:center}
-#touch button#bPwr[hidden]{display:none}#touch button#bPwr svg{width:100%;height:100%}#touch button#bPwr.cd{opacity:.45}#touch button#bPwr.pop{animation:pwPop .22s ease-out}@keyframes pwPop{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
+#touch button#bPwr[hidden]{display:none}#touch button#bPwr svg{width:100%;height:100%}#touch button#bPwr{position:relative;overflow:visible}#touch button#bPwr::before{content:attr(data-lbl);position:absolute;left:50%;top:-15px;transform:translateX(-50%);font:700 10px/1 var(--mono,monospace);color:var(--pc,#ffe14d);letter-spacing:.04em;white-space:nowrap;pointer-events:none}#touch button#bPwr.rdy{box-shadow:0 0 8px var(--pc,#ffe14d)}#touch button#bPwr.cd{opacity:.45}#touch button#bPwr.cd::before{color:#8c86b8}#touch button#bPwr.pop{animation:pwPop .22s ease-out}@keyframes pwPop{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
 #gaCards .card .abI{width:34px;height:34px;flex:0 0 34px}`;document.head.appendChild(st);}
   /* Garage tab ABILITY */
   {const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='abil';b.type='button';b.textContent='ABILITY';tb.appendChild(b);b.addEventListener('click',()=>{GA.tab='abil';gaDraw();});}
@@ -14247,6 +14248,31 @@ if(ABUP.on){
 }
 ABUP.T={get GA(){return GA;},gsave:()=>gsave(),open:f=>openGarage(f),close:()=>closeGarage(),emit:(n,d)=>NR.emit(n,d)};   // test handle
 window.__abup=ABUP;
+
+// PURPOSE: one-line caption on the first purple ring (gravity well) of each stage: what the ring is
+// FLAG: zonehint (?zonehint=0)
+// TEST: pwrstar-test.js
+/* ---------- ZH: zone legend (flag RET.zonehint, default ON; ?zonehint=0 = no caption). Owner, 21 Oct 2026: "what are the large purple dashed circles?"
+   They are the GRAVITY WELL: rules.js (stage mechanic, #b06bff, dashed while it telegraphs; it bends shots, never takes hull) and the boss verbs
+   gravity_well / vacuum in bossmoves.js (#c08aff, pulls the SHIP). The first time either shows in a stage a short caption is drawn on the ring for ZT s
+   (own canvas text, so the hint diet of two shows per profile does not hide it). Nothing here changes play. ---------- */
+if(RET.zonehint===undefined)RET.zonehint=!/[?&]zonehint=0/.test(location.search);
+const ZH=window.ZH={get on(){return!!RET.zonehint;},ZT:4.5,done:{rule:0,boss:0},cap:null,
+  TXT:{rule:'PURPLE RING = gravity well: bends shots, no damage',boss:'PURPLE RING = gravity well: it pulls your ship, thrust away'},
+  reset(){this.done={rule:0,boss:0};this.cap=null;},
+  start(k,x,y,r,col){if(this.done[k])return;this.done[k]=1;this.cap={k,x,y,r,col,t:this.ZT};},
+  tick(dt){if(!this.on||!G||G.dead||G.tut||G.lab)return;
+    if(this.cap){this.cap.t-=dt;if(this.cap.t<=0)this.cap=null;}
+    if(!this.done.rule&&window.RU&&RU.st&&RU.on&&RU.on()){for(const m of RU.st.list)if(m.id==='well'&&m.on&&m.o&&m.o.w&&m.o.w.length){const w=RU.T.well.pos(m,m.o.w[0],0);this.start('rule',w.x,w.y,150,'#b06bff');break;}}
+    if(!this.done.boss&&window.BMV&&BMV.hz&&G.boss){for(const z of BMV.hz)if(z.s==='well'){this.start('boss',z.x,z.y,Math.min(z.R||300,300),'#c08aff');break;}}},
+  draw(){const c=this.cap;if(!this.on||!c)return;const txt=this.TXT[c.k],a=Math.min(1,c.t/.5,(this.ZT-c.t)/.3+.01);
+    ctx.save();ctx.globalAlpha=Math.max(0,a);ctx.font='700 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    const w=Math.min(W-16,ctx.measureText(txt).width+22),x=clamp(c.x,w/2+8,W-w/2-8),y=clamp(c.y-Math.min(c.r,150)-18,60,H-60);
+    ctx.fillStyle='#05030ccc';ctx.strokeStyle=c.col;ctx.lineWidth=1.5;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x-w/2,y-13,w,26,13);else ctx.rect(x-w/2,y-13,w,26);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#fff';ctx.fillText(txt,x,y+1,w-12);ctx.restore();}};
+NR.on('runStart',()=>ZH.reset());
+NR.on('tick',dt=>ZH.tick(dt));
+{const dp=drawPlayer;drawPlayer=function(t){dp(t);try{ZH.draw();}catch(e){}};}
 
 // PURPOSE: economy fit: hours to finish back to 9-13 h
 // FLAG: econfit (?econfit=0)
@@ -14639,7 +14665,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='1463afce40 2026-10-21 22:06 UTC';
+const NR_STAMP='d5520f4564 2026-10-21 22:13 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
