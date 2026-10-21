@@ -132,7 +132,9 @@ const BOT = (opts) => {
       for (const b of R.mini) line(b.s >= 25, `${k} mini-boss stage ${b.n} fight ${b.s.toFixed(0)} s >= 25`);
       for (const b of R.boss) line(b.s >= (b.n === 42 || b.n === 40 ? 60 : 45), `${k} boss stage ${b.n} fight ${b.s.toFixed(0)} s >= ${b.n === 42 || b.n === 40 ? 60 : 45}`);
     }
-    if (diff === 'normal' && build !== 'fresh') for (const n in R.clrS) { const c = R.clrS[n][0] / R.clrS[n][1]; if (+n <= 20) line(c >= .66, `${k} stage ${n} clear ${Math.round(100 * c)}% (target >= 90%, gate 66% at small RUNS)`); }
+    // W127 22 Oct: at RUNS=3 one stage can only read 0/33/67/100%, and a bot that clears ~75% fails a 66% gate on one cell about 1 time in 6 (stage 20: 1/3, then 6/8 on the next run, same build, also with ?legend=0&easy2=0). So the per-stage gate needs >= 8 runs; with fewer the clears of stages <= 20 are pooled.
+    if (diff === 'normal' && build !== 'fresh') { let pc = 0, pn = 0; for (const n in R.clrS) { if (+n > 20) continue; const [cc, rn] = R.clrS[n]; pc += cc; pn += rn; if (rn >= 8) line(cc / rn >= .66, `${k} stage ${n} clear ${Math.round(100 * cc / rn)}% (target >= 90%, gate 66%, ${rn} runs)`); }
+      if (pn) line(pc / pn >= .66, `${k} stages <= 20 clear ${pc}/${pn} = ${Math.round(100 * pc / pn)}% pooled (target >= 90%, gate 66%)`); }
   }
   console.log(fails ? `FAIL balance-test: ${fails} check(s)` : 'PASS balance-test');
   process.exit(fails ? 1 : 0);
