@@ -176,6 +176,35 @@ SPR.ship=(c,id,t,bob)=>{const cb=ART.ANIM.c['ship-'+id],bk=ART.ANIM.sm.ship_bank
   SPR._sq+=((1-f*(1-bk.squash_y))-SPR._sq)*Math.min(1,FD*1000/bk.ease_ms);                 // banking: the existing tilt, plus a squash while the ship moves up / down
   return ART.drawAnim(c,'ship-'+id+'/flame',t,cb.ox,bob+cb.oy,cb.k,false,null,SPR._sq);};
 SPR.shipDeath=()=>{const id=shipDef().id,cb=ART.ANIM.c['ship-'+id],key='ship-'+id+'/death';if(!cb||!ART.anim(key))return 0;ART.gh.push({key,x:P.x+cb.ox,y:P.y+cb.oy,k:cb.k,t:0});return ART.aS(key).tot;};
+/* ----- enemy ships: flame (loops) / volley (while the shot is armed: the beat before it fires) / death (a ghost clip where it died). Sheets face left like the old shapes; w = drawn width in world px; rot turns the nose (dives); art only, e.r stays the hitbox ----- */
+SPR.foe=(e,id,t,x,y,w,rot,fl)=>{if(!RET.sprites)return false;const b='ship-'+id+'/',fk=b+'flame';if(!ART.ANIM.s[fk]||!ART.anim(fk))return false;ART.anim(b+'death');const hv=ART.ANIM.s[b+'volley']&&ART.anim(b+'volley')&&e.arm?'volley':'flame';
+  if(hv!==e._ea){e._ea=hv;e._es=t;}const key=b+hv,sc=w/ART.ANIM.s[key][2],tt=t-e._es;e._fs=sc;e._fw=w;
+  if(rot){ctx.save();ctx.translate(x,y);ctx.rotate(rot);x=0;y=0;}
+  ART.drawAnim(ctx,key,tt,x,y,sc,false);if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,x,y,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);ctx.globalCompositeOperation='source-over';}
+  if(rot)ctx.restore();return true;};
+NR.on('kill',({e,boss})=>{if(!RET.sprites||boss||!e||!e._fs)return;const t=e.type==='einterceptor'||e.type==='ebomber'||e.type==='ecarrier'||e.type==='ecruiser'||e.type==='gunship'||e.type==='kamikaze'?e.type:'';const k='ship-'+(t==='gunship'||t==='kamikaze'?'e'+t:t)+'/death';
+  if(t&&ART.anim(k)&&ART.gh.length<12)ART.gh.push({key:k,x:e.x,y:e.y,k:e._fs,t:0});});
+/* ----- on-foot actors: pose -> act (HANDOFF-SPRITES.md). The draw loop in foot.js sets ART.fE to the entity before it draws (it carries the act start); Kai's extra acts arrive in e._xa. Feet are the anchor (bottom-centre); the cell is drawn h tall, so the old hit box is unchanged. A missing sheet / ?sprites=0 = the stills and shapes ----- */
+{const H=(o)=>Object.assign({idle:'idle','run-a':'run','run-b':'run',run:'run',shoot:'shoot',melee:'melee',die:'die',jump:'jump',fall:'jump'},o||{}),M={idle:'idle',shoot:'shoot',die:'die','run-a':'idle','run-b':'idle',jump:'idle',fall:'idle',crouch:'idle','crouch-shoot':'shoot',melee:'idle'};
+ART.FM={kai:H({hit:'hurt','crouch-shoot':'crouchshoot'}),grunt:H(),gunman:H(),shield:H(),bruiser:H(),knife:H(),sniper:H(),warden:H({attack2:'melee',enrage:'idle'}),drone:M,turret:M,mech:M,
+  jetpack:{hover:'hover',fly:'fly',shoot:'shoot',die:'die'},hound:{run:'run',pounce:'pounce',bite:'bite',hit:'run',die:'die'},flamer:{walk:'walk',spray:'spray',hit:'hit',die:'die'},
+  ninja:{block:'block',dash:'dash',slash:'slash',hit:'block',die:'die'},medic:{walk:'walk',heal:'heal',die:'die'}};
+for(const w in ART.FM){const o=ART.FM[w];o._all=[...new Set(Object.values(o))];if(w==='kai')o._all.push('dash','runshoot','land','combo2','combo3','aimup','aimdiag','grenade','victory');}
+ART.fE=null;ART.fS={};
+ART.footDraw=(c,who,pose,x,y,h,flip,t)=>{if(!RET.sprites)return false;const mp=ART.FM[who];if(!mp)return false;if(!mp._w){mp._w=1;for(const a of mp._all)ART.anim(who+'/'+a);}
+  const e=ART.fE||ART.fS,xa=e._xa,act=xa||mp[pose];if(!act)return false;const key=who+'/'+act,b=ART.anim(key);if(!b)return false;const o=ART.aS(key),m=o.m,fall=pose==='fall'&&act==='jump',kp=key+(fall?'F':'');
+  if(e._fa!==kp){e._fa=kp;e._f0=t;}let tt=ART.fE?t-e._f0:t;if(act==='jump'){tt=fall?o.cum[1]+tt:Math.min(tt,o.cum[1]-.001);}
+  const sc=h/m[3],sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=1;const f=sq.frames[act];if(f&&f.indexOf(i)>=0&&ART.aT<sq.ms/1000)sy=1-sq.amount*(1-ART.aT/(sq.ms/1000));
+  const dead=act==='die'&&who!=='kai',fade=dead?1-.85*Math.min(1,Math.max(0,tt-.4)/.8):1,ga=c.globalAlpha;
+  c.save();c.translate(x,y);if(window.FA&&FA.shadow)FA.shadow(c,m[2]*sc*.75,who==='drone'||who==='jetpack'?.6*fade:fade);
+  if(act==='run'||act==='runshoot'||act==='walk')c.rotate(sm.lean.run_deg*Math.PI/180*(flip?-1:1));
+  c.globalAlpha=ga*fade;ART.drawAnim(c,key,tt,0,0,sc,flip,null,sy);c.restore();return true;};
+}
+/* ----- street props behind the actors: a few per parallax cell, standing on the road line (pf = FL), looping at the sheet fps ----- */
+ART.PROPS=[['car',80,0],['police',84,0],['steam',120,0],['beacon',160,0],['neon',150,0],['banner',170,0],['holo',150,0],['windows',190,0],['drone',58,1]];
+ART.footProps=(c,camX,vw,fl,t)=>{if(!RET.sprites)return;const cell=560,off=camX*.7,i0=Math.floor(off/cell)-1,n=Math.ceil(vw/cell)+3;
+  for(let i=i0;i<i0+n;i++){const r=((Math.imul((i|0)^61,0x45d9f3b)>>>7)&1023)/1024;if(r>.62)continue;const q=ART.PROPS[(Math.imul(i*7+3,0x9e3779b1)>>>9)%ART.PROPS.length],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),a=ART.anim(k);if(!a)continue;
+    const m=ART.ANIM.s[k],sc=q[1]/m[3],px=i*cell-off+cell*(.25+r*.6),py=q[2]?fl-190+Math.sin(t*.7+i)*8:fl-q[1]/2+3;ART.drawAnim(c,k,t+i*.37,px,py,sc,false,.92);}};
 /* load on demand: the chosen ship's sheets and the three newer hulls' stills shortly after start, each district's boss a few seconds after the district begins */
 setTimeout(()=>{if(!RET.sprites)return;for(const n of['drift','lancer','nova'])ART.load('spr-ship-'+n);try{SPR.shipOn(shipDef().id);}catch(e){}},2500);
 SPR.warmBoss=nm=>{for(const a of['idle','attack','hit','defeat'])ART.anim('boss-'+nm+'/'+a);};

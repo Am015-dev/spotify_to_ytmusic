@@ -71,7 +71,7 @@ function drawEnemy(e,t){const D=DISTRICTS[G.di];ctx.save();ctx.translate(e.x,e.y
       if(ART.dflash('spr-en-charger',e.r*3.4,0,Math.sin(t*6+eb_(e))*1,0,fl))break;
       ctx.fillStyle=fl?'#fff':'#220a12';ctx.strokeStyle='#ff3040';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-16,0);ctx.lineTo(12,-11);ctx.lineTo(6,0);ctx.lineTo(12,11);ctx.closePath();ctx.fill();ctx.stroke();
       ctx.globalCompositeOperation='lighter';G_(12,0,12,'#ff3040',.8);ctx.globalCompositeOperation='source-over';break;}
-    case'gunship':{if(ART.dflash('spr-en-gunship',e.r*3,0,Math.sin(t*2+eb_(e))*1.5,0,fl)){ctx.globalCompositeOperation='lighter';G_(-e.r*1.3,0,12,D.a,.5);ctx.globalCompositeOperation='source-over';hpBar(-30,-e.r*.8-14,60,e.hp/e.max);break;}
+    case'gunship':{if(SPR.foe(e,'egunship',t,0,0,e.r*3,0,fl)||ART.dflash('spr-en-gunship',e.r*3,0,Math.sin(t*2+eb_(e))*1.5,0,fl)){ctx.globalCompositeOperation='lighter';G_(-e.r*1.3,0,12,D.a,.5);ctx.globalCompositeOperation='source-over';hpBar(-30,-e.r*.8-14,60,e.hp/e.max);break;}
       ctx.fillStyle=fl?'#fff':'#120c1e';ctx.strokeStyle=D.a;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-46,0);ctx.lineTo(-20,-24);ctx.lineTo(40,-20);ctx.lineTo(50,0);ctx.lineTo(40,20);ctx.lineTo(-20,24);ctx.closePath();ctx.fill();ctx.stroke();
       ctx.font='700 10px "Chakra Petch",sans-serif';ctx.fillStyle=D.b;wtxt('KRONOS',-14,4);
       ctx.globalCompositeOperation='lighter';G_(48,0,18,'#ff3dbb',.8);for(let i=0;i<4;i++)G_(-24+i*18,-18,4,'#ffffff',Math.sin(t*5+i)>0?.8:.2);ctx.globalCompositeOperation='source-over';

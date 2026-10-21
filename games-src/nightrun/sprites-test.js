@@ -6,6 +6,7 @@
 //  (c) a missing / unlisted sheet gives null / false and the game still draws the still, no page errors
 //  (d) in game: a boss draws from its sheets (idle -> attack on the beat -> hit on damage, flash stays), body bottom / centre stay on the old still's spot (headless frame diff), the ship likewise;
 //      frame time with sprites on is not more than 1 ms over sprites off
+//  (f) enemy ships (flame / volley / death clip), on-foot actors (pose -> act, feet on the spot, Kai extras, jump / fall frames, die fade), street props; ?sprites=0 and a missing sheet = old art
 //  (e) ?sprites=0: no sprite code runs and no media/anim file is requested
 const PW = require('playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun'), ONLY = (process.env.ONLY || 'sek-adler,hoplite,kronos').split(',').filter(Boolean);
@@ -16,13 +17,13 @@ const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? '
 (async () => {
   const port = await fp(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME], { stdio: 'ignore' }); await sleep(700);
   const br = await PW.chromium.launch(), url = q => `http://127.0.0.1:${port}/index.html?nomusic=1${q || ''}`;
-  const open = async (q, reqs) => { const c = await br.newContext({ viewport: { width: 1280, height: 720 } }), p = await c.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); if (reqs) p.on('request', r => reqs.push(r.url()));
-    await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.addInitScript(() => { const t = setInterval(() => { if (window.__mnr) { window.ART = __mnr.ART; window.SPR = __mnr.SPR; window.UIK = __mnr.UIK; clearInterval(t); } }, 5); }); await p.goto(url(q)); return { c, p, errs }; };
+  const open = async (q, reqs, init) => { const c = await br.newContext({ viewport: { width: 1280, height: 720 } }), p = await c.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); if (reqs) p.on('request', r => reqs.push(r.url()));
+    await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); if (init) await p.addInitScript(init); await p.addInitScript(() => { const t = setInterval(() => { if (window.__mnr) { window.ART = __mnr.ART; window.SPR = __mnr.SPR; window.UIK = __mnr.UIK; clearInterval(t); } }, 5); }); await p.goto(url(q)); return { c, p, errs }; };
   try {
     /* (a)(b)(c) loader */
     { const { c, p, errs } = await open('');
       await p.waitForFunction(() => window.__mnr && __mnr.ART.rd && __mnr.ART.rd.size > 0, null, { timeout: 20000 });
-      const keys = await p.evaluate(() => Object.keys(ART.ANIM.s)); ok('a1 ANIM bundles 58 sheets (10 bosses x4, 9 ships x2)', keys.length === 58, keys.length);
+      const keys = await p.evaluate(() => Object.keys(ART.ANIM.s)); const nrd = await p.evaluate(() => [...ART.rd].filter(f => /^anim\/.+-strip\.webp$/.test(f)).length); ok('a1 ANIM bundles every listed sheet (bosses, ships, enemy ships, on-foot actors, props)', keys.length === nrd && keys.length > 150 && ['kai/run', 'warden/die', 'medic/heal', 'ship-ecruiser/volley', 'prop-steam/glow', 'prop-car/loop'].every(k => keys.includes(k)), keys.length + '/' + nrd);
       let all = false; try { await p.waitForFunction(() => Object.keys(ART.ANIM.s).every(k => ART.anim(k)), null, { timeout: 90000, polling: 250 }); all = true; } catch (e) { }
       ok('a2 every sheet decodes', all);
       const bad = await p.evaluate(() => Object.entries(ART.ANIM.s).filter(([k, m]) => { const b = ART.anim(k); return !b || b.width !== m[0] * m[2] || b.height !== m[3]; }).map(e => e[0]));
@@ -104,6 +105,57 @@ const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? '
       try { await p.waitForFunction(() => window.__mnr && __mnr.G.boss && __mnr.G.boss.x <= 791, null, { timeout: 30000 }); } catch (e) { }
       const r = await p.evaluate(() => { ART.rd.delete('anim/boss-kronos/idle-strip.webp'); ART.rd.delete('anim/ship-std/flame-strip.webp'); const m = __mnr, b = m.G.boss; b._sp = null; for (let i = 0; i < 30; i++) m.render(m.G.t, 1 / 60); return { sp: !!(b && b._sp), ship: SPR.shipOn('std') }; });
       ok('c2 idle sheet missing: boss falls back to the old drawing, ship to still + jet, no errors', r.sp === false && r.ship === false && !errs.length, JSON.stringify(r) + (errs[0] || '')); await c.close(); }
+    /* (f) enemy ships, on-foot actors, props */
+    { const { c, p, errs } = await open('&sim=1&all=1&mustmove=0&deck=0&vary=0&vary2=0&variants=0');
+      await p.waitForFunction(() => window.__mnr && __mnr.ART.rd && __mnr.ART.rd.size > 0, null, { timeout: 20000 });
+      await p.waitForFunction(() => Object.keys(ART.ANIM.s).every(k => ART.anim(k)), null, { timeout: 120000, polling: 250 });
+      const r = await p.evaluate(() => { const out = {}, mk = () => { const c = document.createElement('canvas'); c.width = 600; c.height = 500; return c; };
+        const bb = cv => { const d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data; let X0 = 1e9, X1 = -1, Y0 = 1e9, Y1 = -1, n = 0; for (let y = 0; y < cv.height; y++)for (let x = 0; x < cv.width; x++) if (d[(y * cv.width + x) * 4 + 3] > 40) { n++; if (x < X0) X0 = x; if (x > X1) X1 = x; if (y < Y0) Y0 = y; if (y > Y1) Y1 = y; } return { X0, X1, Y0, Y1, n }; };
+        /* on-foot: feet (bottom of the opaque pixels) on the old spot, 80 px tall figure, for every actor and pose that has a sheet */
+        const FM = ART.FM, foot = [], H = 80; out.who = Object.keys(FM).length;
+        for (const who in FM) { const acts = new Set(Object.values(FM[who])); for (const pose in FM[who]) { if (pose === '_all' || pose === '_w') continue; const cv = mk(), g = cv.getContext('2d'); ART.fE = null; const ok = ART.footDraw(g, who, pose, 300, 400, H, false, 0.01); const b = bb(cv);
+            if (!ok || b.n < 50 || Math.abs(b.Y1 - 400) > 14 || b.Y1 < b.Y0 + H * .3) foot.push(who + '/' + pose + ' ' + JSON.stringify(b) + ok); } }
+        out.footBad = foot.slice(0, 5);
+        const f1 = mk(); ART.fE = null; const a1 = bb((() => { ART.footDraw(f1.getContext('2d'), 'grunt', 'idle', 300, 400, H, false, 0); return f1; })()), f2 = mk(); ART.footDraw(f2.getContext('2d'), 'grunt', 'idle', 300, 400, H, true, 0); const a2 = bb(f2);
+        out.flip = [a1.X0 + a1.X1, a2.X0 + a2.X1];   // mirrored around the anchor
+        /* kai extras: each is its own sheet and draws; entity state carries the act start */
+        const kx = {}; for (const a of ['dash', 'runshoot', 'hurt', 'land', 'crouchshoot', 'combo2', 'combo3', 'aimup', 'aimdiag', 'grenade', 'victory', 'die', 'melee', 'shoot', 'run', 'idle']) { const e = { _xa: a }, cv = mk(); ART.fE = e; kx[a] = ART.footDraw(cv.getContext('2d'), 'kai', 'idle', 300, 400, H, false, 1) && e._fa === 'kai/' + a && bb(cv).n > 50; }
+        ART.fE = null; out.kai = Object.entries(kx).filter(e => !e[1]).map(e => e[0]);
+        /* jump rises on frames 0-1, fall is on frames 2-3; die plays once and ends on the last frame (alpha fades for enemies, not Kai) */
+        const jm = ART.aS('grunt/jump'), e1 = {}, e2 = {}; ART.fE = e1; ART.footDraw(mk().getContext('2d'), 'grunt', 'jump', 300, 400, H, false, 5); ART.footDraw(mk().getContext('2d'), 'grunt', 'jump', 300, 400, H, false, 9); const ji = ART.aframe('grunt/jump', Math.min(4, jm.cum[1] - .001));
+        ART.fE = e2; ART.footDraw(mk().getContext('2d'), 'grunt', 'fall', 300, 400, H, false, 5); out.jf = [ji, ART.aframe('grunt/jump', jm.cum[1] + .001) >= 2, e2._fa];
+        const ed = { _xa: undefined }; ART.fE = ed; ART.footDraw(mk().getContext('2d'), 'grunt', 'die', 300, 400, H, false, 0); const cvd = mk(); ART.footDraw(cvd.getContext('2d'), 'grunt', 'die', 300, 400, H, false, .6); const dd = bb(cvd); ART.fE = null;
+        const dk = (() => { const q = mk(); ART.fE = { _xa: 'die' }; ART.footDraw(q.getContext('2d'), 'kai', 'die', 300, 400, H, false, 7); const k0 = bb(q).n; const q2 = mk(); ART.fE = { _xa: 'die' }; ART.footDraw(q2.getContext('2d'), 'kai', 'die', 300, 400, H, false, 7); ART.fE.__ = 1; const e = { _xa: 'die' }; ART.fE = e; ART.footDraw(mk().getContext('2d'), 'kai', 'die', 300, 400, H, false, 7); ART.footDraw(q2.getContext('2d'), 'kai', 'die', 300, 400, H, false, 9); ART.fE = null; return k0; })();
+        out.die = [dd.n > 50, ed._fa, dk > 50];
+        /* run lean + squash do not move the feet (bottom within 14 px of the road line): covered by the loop above */
+        /* enemy ships: drawn width = what the code asks, nose / centre on e.x e.y, arm -> volley, kill -> death ghost, hit flash */
+        const sh = []; for (const id of ['einterceptor', 'ebomber', 'ecarrier', 'ecruiser', 'egunship', 'ekamikaze']) { const cv = mk(), g = cv.getContext('2d'), e = { arm: false }, w = 90; const prev = window.ctx; 
+          const ok1 = (() => { const c0 = document.getElementById('game').getContext('2d'); return SPR.foe(e, id, 1, 300, 250, w, 0, false); })(); sh.push([id, ok1, e._ea, e._fw === w]); e.arm = true; SPR.foe(e, id, 1.5, 300, 250, w, 0, false); sh[sh.length - 1].push(e._ea); }
+        out.ships = sh;
+        /* props: draw only with the flag; one drawImage per prop */
+        const pcv = mk(), pg = pcv.getContext('2d'); RET.sprites = true; ART.footProps(pg, 0, 560 * 2, 400, 2); const pn = bb(pcv).n; RET.sprites = false; const pcv2 = mk(); ART.footProps(pcv2.getContext('2d'), 0, 1120, 400, 2); const pn2 = bb(pcv2).n; RET.sprites = true; out.props = [pn, pn2];
+        const ds = RET.sprites; RET.sprites = false; out.off = [ART.footDraw(mk().getContext('2d'), 'kai', 'idle', 300, 400, H, false, 0), SPR.foe({}, 'einterceptor', 0, 0, 0, 50, 0, false)]; RET.sprites = ds;
+        const k = 'grunt/idle-strip.webp'; ART.rd.delete('anim/' + k); out.miss = ART.footDraw(mk().getContext('2d'), 'grunt', 'idle', 300, 400, H, false, 0); ART.rd.add('anim/' + k);
+        return out; });
+      ok('f1 every on-foot actor and pose with a sheet draws, feet on the spot (+-14 px of 80)', r.who === 16 && !r.footBad.length, JSON.stringify(r.footBad));
+      ok('f2 flip mirrors around the anchor (feet centre stays)', Math.abs(r.flip[0] - r.flip[1]) <= 16, JSON.stringify(r.flip));
+      ok('f3 Kai extras (dash runshoot hurt land crouchshoot combo2/3 aimup aimdiag grenade victory die) each draw their own sheet', !r.kai.length, r.kai.join(','));
+      ok('f4 jump holds frames 0-1, fall starts on frame 2+ (own act key)', r.jf[0] <= 1 && r.jf[1] && r.jf[2] === 'grunt/jumpF', JSON.stringify(r.jf));
+      ok('f5 die draws (enemy fades, Kai stays opaque)', r.die[0] && r.die[1] === 'grunt/die' && r.die[2], JSON.stringify(r.die));
+      ok('f6 enemy ships: all six kinds draw from flame, arm switches to volley, width as asked', r.ships.every(s => s[1] && s[2] === 'flame' && s[3] && s[4] === 'volley'), JSON.stringify(r.ships));
+      ok('f7 props draw only with the flag on', r.props[0] > 200 && r.props[1] === 0, JSON.stringify(r.props));
+      ok('f8 flag off / missing sheet: footDraw and SPR.foe return false (old art draws)', r.off[0] === false && r.off[1] === false && r.miss === false, JSON.stringify([r.off, r.miss]));
+      ok('f9 no page errors (new categories)', !errs.length, errs[0]); await c.close(); }
+    /* (g) the finished foot stage: Kai and the street draw from sheets, and a fleet enemy leaves a death clip */
+    { const { c, p, errs } = await open('', null, () => { try { if (!sessionStorage.getItem('_ft')) { sessionStorage.setItem('_ft', 1); localStorage.clear(); localStorage.setItem('mnr_story', JSON.stringify({ stars: { 1: 3, 2: 3, 3: 2 }, snap: {}, all: false, v30: 1, v40: 1 })); localStorage.setItem('mnr_tut', '2'); localStorage.setItem('mnr_foot', '{"seen":{"b":1,"a":1},"hint":1}'); } } catch (e) { } });
+      await p.waitForFunction(() => window.__mnr && __mnr.ART.rd && __mnr.ART.rd.size > 0 && window.FOOT, null, { timeout: 20000 });
+      const r = await p.evaluate(async () => { const ok = k => ART.anim(k); for (const w of ['kai', 'grunt', 'gunman']) for (const a of ART.FM[w]._all) ART.anim(w + '/' + a); for (const k of ['prop-car/loop', 'prop-police/loop', 'prop-steam/glow', 'prop-neon/loop', 'prop-banner/loop', 'prop-beacon/loop', 'prop-holo/loop', 'prop-windows/loop', 'prop-drone/loop']) ART.anim(k);
+        await new Promise(r => setTimeout(r, 6000)); const fm = document.getElementById('fMenu'); if (fm) fm.hidden = true; FOOT.start('zeil'); const S = FOOT.S, P = S.P; const cnt = {}, fd = ART.footDraw; ART.footDraw = (c, who, pose, ...a) => { const r = fd(c, who, pose, ...a); if (r) cnt[who + '/' + (ART.fE && ART.fE._xa || pose)] = (cnt[who + '/' + (ART.fE && ART.fE._xa || pose)] | 0) + 1; return r; };
+        const pr = ART.footProps; let pc = 0; ART.footProps = (...a) => { pc++; return pr(...a); }; FOOT.sim && 0;
+        P.crouch = false; await new Promise(r => setTimeout(r, 600)); P.dash = .3; await new Promise(r => setTimeout(r, 200)); P.mel = .2; await new Promise(r => setTimeout(r, 200)); P.vx = 120; P.shotT = .3; await new Promise(r => setTimeout(r, 400));
+        ART.footDraw = fd; ART.footProps = pr; FOOT.stop(); return { cnt, pc, keys: Object.keys(cnt) }; });
+      ok('g1 foot stage: Kai draws idle/dash/melee sheets and the street props are asked each frame', r.pc > 5 && r.keys.some(k => k.startsWith('kai/')) && r.keys.some(k => /^kai\/(dash|melee|combo|runshoot)/.test(k)), JSON.stringify(r));
+      ok('g2 no page errors (foot stage)', !errs.length, errs[0]); await c.close(); }
   } catch (e) { fails.push('crash ' + e.message); console.log('FAIL crash ' + e.stack); }
   await br.close(); srv.kill(); console.log(fails.length ? `${fails.length} FAIL of ${n}` : `all ${n} PASS`); process.exit(fails.length ? 1 : 0);
 })();

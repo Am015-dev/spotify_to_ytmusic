@@ -31,6 +31,7 @@ const flash=(ctx,x,y,t,r)=>{const big=Math.floor(t*18)%2===0,R=r*(big?1:.6);ctx.
 let SHD=null;
 const shadow=(ctx,wd,a)=>{if(a<=.02)return;if(!SHD){const c=document.createElement('canvas');c.width=64;c.height=16;const g=c.getContext('2d'),r=g.createRadialGradient(32,8,0,32,8,32);r.addColorStop(0,'rgba(0,0,0,.85)');r.addColorStop(.6,'rgba(0,0,0,.4)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.translate(0,8);g.scale(1,.25);g.translate(0,-32);g.fillRect(0,0,64,64);SHD=c;}
   const o=ctx.globalAlpha;ctx.globalAlpha=o*.55*a;ctx.drawImage(SHD,-wd*.6,-wd*.09,wd*1.2,wd*.18);ctx.globalAlpha=o;};   // same soft ellipse as the ground bosses' road shadow (UIK.bossShadow), flat on the street line
+FA.shadow=shadow;
 const label=(ctx,txt,x,y,S,col)=>{ctx.save();ctx.scale(1/S,1/S);ctx.fillStyle=col;ctx.font='700 '+Math.max(8,Math.round(.1*S))+'px "Share Tech Mono",monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x*S,y*S);ctx.restore();};
 /* ---- humanoid pose table: lf/lb = [thigh angle, knee bend] of front/back leg, af/ab = [upper arm, forearm] (af holds the weapon), lean, lift (feet off the ground) ---- */
 function pp(pose,t,d){
@@ -101,6 +102,7 @@ function mac(ctx,id,pose,t,S,u){
 /* ---- public draw ---- */
 FA.draw=(ctx,who,pose,x,y,h,flip,t)=>{
   if(WHO.indexOf(who)<0)who='grunt';t=t||0;
+  if(typeof ART!=='undefined'&&ART.footDraw&&ART.footDraw(ctx,who,pose,x,y,h,flip,t))return;   // the strip sheets (art.js); stills and shapes below when a sheet is missing or ?sprites=0
   const mach=!!MAC[who];if(pose==='run')pose=Math.floor(t*8)%2?'run-b':'run-a';
   if(mach&&pose!=='shoot'&&pose!=='hit'&&pose!=='die')pose='idle';
   if(!mach&&POSES.indexOf(pose)<0&&!(who==='warden'&&(pose==='attack2'||pose==='enrage')))pose='idle';

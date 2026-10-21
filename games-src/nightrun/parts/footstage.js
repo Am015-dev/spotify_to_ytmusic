@@ -189,10 +189,7 @@ ST.hook={
 F.STAGES.zeil=ST;F.main='zeil';F.SEC=SEC;F.AGG=AGG;
 
 /* ---------- placeholder art (shapes) + the sprite-sheet hook ---------- */
-const SPR={jetpack:{hover:'hover',fly:'fly',shoot:'shoot',die:'die'},hound:{run:'run',pounce:'pounce',bite:'bite',hit:'run',die:'die'},flamer:{walk:'walk',spray:'spray',hit:'hit',die:'die'},
-  ninja:{block:'block',dash:'dash',slash:'slash',hit:'block',die:'die'},medic:{walk:'walk',heal:'heal',die:'die'}};
-function sheet(c,who,pose,x,y,h,flip,t){const A=window.ART;if(!RET.sprites||!A||typeof A.drawAnim!=='function'||typeof A.anim!=='function')return false;const act=SPR[who]&&SPR[who][pose];if(!act)return false;
-  const key=who+'/'+act,a=A.anim(key);if(!a||!a.h)return false;A.drawAnim(c,key,t,x,y,h/a.h,flip);return true;}
+function sheet(c,who,pose,x,y,h,flip,t){return typeof ART!=='undefined'&&typeof ART.footDraw==='function'&&ART.footDraw(c,who,pose,x,y,h,flip,t);}   // the shared loader (art.js ART.FM maps pose -> act for these five too)
 const dead=(c,pose,t)=>{if(pose==='die')c.globalAlpha*=Math.max(.1,1-t*1.6);};
 const D={
   jetpack(c,pose,x,y,h,flip,t,col){c.save();dead(c,pose,t);c.translate(x,y);c.scale(flip?-1:1,1);const s=h/58;c.scale(s,s);

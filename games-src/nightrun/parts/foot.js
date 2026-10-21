@@ -431,7 +431,7 @@ function drawBg(c,vw0,exl,exr){const vw=vw0+exl+exr;c.save();c.translate(-exl,0)
     const off=S.camX*k,i0=Math.floor(off/wd)-1;for(let i=i0;i<i0+vw/wd+3;i++){const h=hmin+hsh(i+k*99)*(hmax-hmin),x=i*wd-off;c.fillStyle=col;c.fillRect(x,y0-h,wd-6,h);
       if(k>.3){c.fillStyle=hsh(i*3.1)>.5?'#ff2d9555':'#19e3ff44';for(let wy=y0-h+12;wy<y0-14;wy+=22)c.fillRect(x+8+hsh(i+wy)*(wd-30),wy,10,6);}}}
   c.fillStyle='#1c1426';c.fillRect(0,FL,vw,VH-FL);c.fillStyle='#ff2d95';c.fillRect(0,FL,vw,2);
-  c.fillStyle='#ffffff14';const so=S.camX%80;for(let x=-so;x<vw;x+=80)c.fillRect(x,FL+30,40,4);c.restore();}
+  c.fillStyle='#ffffff14';const so=S.camX%80;for(let x=-so;x<vw;x+=80)c.fillRect(x,FL+30,40,4);if(typeof ART!=='undefined'&&ART.footProps)ART.footProps(c,S.camX,vw,FL,S.time);c.restore();}
 function human(c,x,y,h,col,pose,flip,t,crouch){   // fallback humanoid: head, body, legs, gun arm
   const s=h/64;c.save();c.translate(x,y);c.scale(flip?-s:s,s);const run=/run/.test(pose),ph=Math.sin(t*14);
   if(crouch||/crouch/.test(pose)){c.translate(0,0);c.scale(1,.66);}
@@ -447,6 +447,14 @@ function drawWho(c,who,pose,x,y,h,flip,t,col,crouch){const fa=window.FA;
   human(c,x,y,h,col,pose,flip,t,crouch);}
 function ppose(P){if(P.hp<=0)return'die';if(P.hurtT>0)return'hit';if(P.mel>0)return'melee';if(P.crouch)return P.shotT>0?'crouch-shoot':'crouch';
   if(!P.onGround)return P.vy<0?'jump':'fall';if(P.shotT>0)return'shoot';if(Math.abs(P.vx)>5)return Math.floor(P.anim*7)%2?'run-a':'run-b';return'idle';}
+/* Kai's extra acts for the strip sheets (art only): the pose name still drives the shapes and stills; '' = let the pose pick the act */
+function kaiX(P){const t=S.time,dt=Math.min(.1,Math.max(0,t-(P._xt==null?t:P._xt)));P._xt=t;if(P.hp<=0)return'die';if(S.end&&S.end.cleared)return'victory';
+  const mel=P.mel>0;if(mel&&!P._pm){P._cb=t-(P._me||-9)<.7?(P._cb%3)+1:1;P._mk=.34;}if(P._pm&&!mel)P._me=t;P._pm=mel;if(P._mk>0)P._mk-=dt;
+  if(P._gb!=null&&P.bombs<P._gb)P._gt=.4;P._gb=P.bombs;if(P._gt>0)P._gt-=dt;if(P._sk>0)P._sk-=dt;if(P.shotT>0)P._sk=.18;
+  if(!P.onGround)P._air=(P._air||0)+dt;else{if(P._air>.25)P._ln=.2;P._air=0;}if(P._ln>0)P._ln-=dt;
+  if(P.hurtT>0)return'hurt';if(P.dash>0)return'dash';if(P._gt>0)return'grenade';if(P._mk>0)return P._cb===3?'combo3':P._cb===2?'combo2':'melee';
+  if(P._ln>0&&P.onGround)return'land';if(P.crouch)return P._sk>0?'crouchshoot':'';if(!P.onGround||P._sk<=0)return'';
+  const el=Math.abs(Math.sin(P.aim||0));return el>.8?'aimup':el>.3?'aimdiag':Math.abs(P.vx)>5?'runshoot':'';}
 function draw(){if(!L||!S)return;const c=L.ctx,sc=L.sc*L.dpr,vw=L.vw,P=S.P;
   c.setTransform(1,0,0,1,0,0);c.fillStyle='#05030c';c.fillRect(0,0,L.cv.width,L.cv.height);c.setTransform(sc,0,0,sc,(L.box.x-L.ox)*L.dpr,(L.box.y-L.oy)*L.dpr);const sh=S.shake?ftRnd(-S.shake,S.shake)*.5:0;
   drawBg(c,vw,L.exl||0,L.exr||0);c.save();c.translate(-S.camX+sh,sh*.5);
@@ -458,13 +466,13 @@ function draw(){if(!L||!S)return;const c=L.ctx,sc=L.sc*L.dpr,vw=L.vw,P=S.P;
   for(const e of S.E){if(e.dead&&!(e.ext&&!e.remove))continue;const pose=e.dead?'die':(()=>{try{return e.def.pose?e.def.pose(e):'idle';}catch(x){return'idle';}})();
     if(e.tele>0){c.fillStyle='#ff304a';c.globalAlpha=.35+.35*Math.sin(S.time*30);c.beginPath();c.arc(e.x+e.facing*e.w*.4,e.y-e.h*.62,10+e.w*.1,0,6.283);c.fill();c.globalAlpha=1;}
     if(e.wind>0){c.strokeStyle='#ff304a';c.lineWidth=3;c.strokeRect(e.x-e.w/2-4,e.y-e.h-4,e.w+8,e.h+8);}
-    c.globalAlpha=e.grace>0?.65:1;drawWho(c,e.id,pose,e.x,e.ext&&e.fly?e.y+e.h/2:e.y,e.h,e.facing<0,e.dead?e.dt_||0:e.t,e.flash>0?'#ffffff':(e.def.c||'#d04'));c.globalAlpha=1;
+    c.globalAlpha=e.grace>0?.65:1;ART.fE=e;drawWho(c,e.id,pose,e.x,e.ext&&e.fly?e.y+e.h/2:e.y,e.h,e.facing<0,e.dead?e.dt_||0:e.t,e.flash>0?'#ffffff':(e.def.c||'#d04'));ART.fE=null;c.globalAlpha=1;
     if(e.def.front&&e.def.fb){c.fillStyle='#a0c0ff';c.fillRect(e.x+e.facing*e.w*.5-3,e.y-e.h*.9,6,e.h*.8);}}
   if(S.st.hook&&S.st.hook.draw)try{S.st.hook.draw(c,S);}catch(x){}
   const blink=P.inv>0&&Math.floor(S.time*16)%2;if(!blink||P.hp<=0){
     if(P.pw.shield){c.strokeStyle='#5ad1ff';c.lineWidth=2+P.pw.shield.lv;c.beginPath();c.arc(P.x,P.y-34,44,0,6.283);c.stroke();}
     if(P.dashIF>0){c.fillStyle='#19e3ff33';c.fillRect(P.x-24-P.facing*20,P.y-60,48,58);}
-    drawWho(c,'kai',ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,S.feverT>0?'#ffd23a':'#19e3ff',P.crouch);
+    P._xa=kaiX(P);ART.fE=P;drawWho(c,'kai',ppose(P),P.x,P.y,P.crouch?44:P.h,P.facing<0,S.time,S.feverT>0?'#ffd23a':'#19e3ff',P.crouch);ART.fE=null;
     if(P.shotT>0&&WEAPONS[P.w].kind!=='arc'){const a=P.aim;c.fillStyle='#fff';c.beginPath();c.arc(P.x+Math.cos(a)*28,P.y-(P.crouch?26:44)+Math.sin(a)*20,5,0,6.283);c.fill();}}
   for(const b of S.pb){c.fillStyle=b.c;if(b.kind==='fire'){c.globalAlpha=Math.max(0,b.life*2);c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();c.globalAlpha=1;}else if(b.kind==='rkt'){c.fillRect(b.x-8,b.y-3,16,6);}else{c.fillRect(b.x-6,b.y-2,12,4);}}
   for(const g of S.bombsL){c.fillStyle='#ffb020';c.beginPath();c.arc(g.x,g.y,7,0,6.283);c.fill();}

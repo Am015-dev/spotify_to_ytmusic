@@ -142,11 +142,11 @@ const FLEET=window.FLEET={
     this.bombs=this.bombs.filter(b=>!b.f);
     for(const f of this.fx)f.l-=dt;this.fx=this.fx.filter(f=>f.l>0);},
   /* ---- looks: code shapes until the sprite loader lands ---- */
-  spr(e,t,act){if(!RET.sprites||!window.ART||typeof ART.drawAnim!=='function'||!this.SPR[e.type])return false;
-    try{ART.drawAnim(ctx,'anim/ship-'+e.type+'/'+act,t-(e.t0||0),e.x,e.y,this.SPR[e.type],false);return true;}catch(err){return false;}},
+  spr(e,t){if(!this.SPR[e.type]||typeof SPR==='undefined')return false;return SPR.foe(e,e.type,t,e.x,e.y,520*this.SPR[e.type],e.fl==='int'&&e.fs===3&&e.ang!=null?e.ang+Math.PI:0,e.flash>0);},   // flame / volley / death sheets (art.js SPR.foe); width = sheet px x SPR
   draw(e,t){const T=this.K[e.type],fl=e.flash>0,r=e.r,line=fl?'#fff':T.col,fill=fl?'#fff':'#12081f',k=e.fl;
     if(k==='car'&&e.fsh){ctx.save();ctx.globalAlpha=.35+.2*Math.sin(t*6);ctx.strokeStyle='#4ad1ff';ctx.fillStyle='#4ad1ff1c';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,r+14,0,7);ctx.fill();ctx.stroke();ctx.restore();}
-    if(this.spr(e,t,e.arm?'volley':'flame')){if(e.max>1)hpBar(e.x-14,e.y-r-9,28,e.hp/e.max);return;}
+    if(this.spr(e,t)){if(e.arm){ctx.save();ctx.translate(e.x,e.y);ctx.globalAlpha=.35+.5*(typeof PHF==='number'?PHF:0);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+8,0,7);ctx.stroke();ctx.restore();}   // the shot tell stays
+      if(e.max>1)hpBar(e.x-14,e.y-r-9,28,e.hp/e.max);return;}
     ctx.save();ctx.translate(e.x,e.y);
     if(e.arm){ctx.globalAlpha=.35+.5*(typeof PHF==='number'?PHF:0);ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+8,0,7);ctx.stroke();ctx.globalAlpha=1;}
     ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
