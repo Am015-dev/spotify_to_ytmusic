@@ -3136,8 +3136,8 @@ ART.aframe=(key,t)=>{const o=ART.aS(key);ART.aDone=false;ART.aP=0;ART.aT=0;if(!o
 /* one cell, its anchor on x,y; sc = world units per sheet px; flip mirrors around the anchor; sy = extra vertical squash about the anchor; idle / flame cross-fade into the next frame (smoothing.json) */
 ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(key);if(!b0)return false;const i=ART.aframe(key,t),p=ART.aP,m=o.m,w=m[2],h=m[3],sv=sc*(sy||1),X=ART.ANIM.sm.crossfade,
     cf=o.xf&&p>X.from&&(o.loop||i+1<m[0])?(p-X.from)/(1-X.from)*X.max_alpha:0,ga=c.globalAlpha;
-  let b=b0,cw=w,ch=h;const ts=sc*S;       // sheets are drawn ~3-5x smaller than they are: a copy at the drawn pixel size is built once per sheet and canvas scale (like ART.sp), so the blit is 1:1 and the downscale is smooth
-  if(ts<.75){cw=Math.max(1,Math.round(w*ts));const k='a|'+key+'@'+cw;let q=ART.sc[k];
+  let b=b0,cw=w,ch=h;const ts=sc*(RET.footq&&c.canvas&&c.canvas.id==='footC'?Math.hypot(c.getTransform().a,c.getTransform().b):S);   // footq: the on-foot canvas has its own scale (not the fly S): the copy is made at the real device-pixel size, never a small copy blown up       // sheets are drawn ~3-5x smaller than they are: a copy at the drawn pixel size is built once per sheet and canvas scale (like ART.sp), so the blit is 1:1 and the downscale is smooth
+  if(ts<(RET.footq?.9:.75)){cw=Math.max(1,Math.round(w*ts));const k='a|'+key+'@'+cw;let q=ART.sc[k];
     if(!q){ch=Math.max(1,Math.round(h*cw/w));const cv_=document.createElement('canvas');cv_.width=cw*m[0];cv_.height=ch;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*cw,0,cw,ch);q=ART.sc[k]={c:cv_,h:ch};}
     b=q.c;ch=q.h;}
   if(flip){c.save();c.translate(x,y);c.scale(-1,1);x=0;y=0;}
@@ -3195,7 +3195,7 @@ ART.footDraw=(c,who,pose,x,y,h,flip,t)=>{if(!RET.sprites)return false;const mp=A
   if(!b&&RET.streetlook){for(const a of (ART.FB[pose]||[]).concat(ART.FB._any,mp._all)){const k2=who+'/'+a;if(ART.ANIM.s[k2]&&ART.anim(k2)){sub=a!==act;act=a;key=k2;b=ART.anim(k2);break;}}}   // streetlook: a pose without its own sheet borrows the nearest act, never the old still
   if(!b)return false;const o=ART.aS(key),m=o.m,fall=pose==='fall'&&act==='jump',kp=key+(fall?'F':'');
   if(e._fa!==kp){e._fa=kp;e._f0=t;}let tt=ART.fE?t-e._f0:t;if(act==='jump'){tt=fall?o.cum[1]+tt:Math.min(tt,o.cum[1]-.001);}
-  const cr=sub&&/^crouch/.test(pose),sc=(cr&&who==='kai'?h/.7:h)/m[3],sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=cr?.7:1;const f=sq.frames[act];if(f&&f.indexOf(i)>=0&&ART.aT<sq.ms/1000)sy=1-sq.amount*(1-ART.aT/(sq.ms/1000));
+  const cr=sub&&/^crouch/.test(pose)&&!RET.footq,sc=(cr&&who==='kai'?h/.7:h)/m[3],sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=cr?.7:1;const f=sq.frames[act];if(!RET.footq&&f&&f.indexOf(i)>=0&&ART.aT<sq.ms/1000)sy=1-sq.amount*(1-ART.aT/(sq.ms/1000));
   const dead=act==='die'&&who!=='kai',fade=dead?1-.85*Math.min(1,Math.max(0,tt-.4)/.8):1,ga=c.globalAlpha;
   c.save();c.translate(x,y);if(window.FA&&FA.shadow)FA.shadow(c,m[2]*sc*.75,who==='drone'||who==='jetpack'?.6*fade:fade);
   if(act==='run'||act==='runshoot'||act==='walk')c.rotate(sm.lean.run_deg*Math.PI/180*(flip?-1:1));
@@ -4341,6 +4341,7 @@ function mac(ctx,id,pose,t,S,u){
 /* ---- public draw ---- */
 FA.draw=(ctx,who,pose,x,y,h,flip,t)=>{
   if(WHO.indexOf(who)<0)who='grunt';t=t||0;
+  if(RET.footq&&RET.sprites&&window.FOOT&&FOOT.q){FOOT.q.draw(ctx,who,pose,x,y,h,flip,t);return;}   // footq.js: one height per entity, the sheet or a flat box, never the old shapes below
   if(typeof ART!=='undefined'&&ART.footDraw&&ART.footDraw(ctx,who,pose,x,y,h,flip,t))return;   // the strip sheets (art.js); stills and shapes below when a sheet is missing or ?sprites=0
   const mach=!!MAC[who];if(pose==='run')pose=BK(t,8)?'run-b':'run-a';
   if(mach&&pose!=='shoot'&&pose!=='hit'&&pose!=='die')pose='idle';
@@ -4376,6 +4377,7 @@ const PAR={sky:.02,far:.12,mid:.35,near:.7,floor:1},NEON=['#ff2d95','#19e3ff','#
 FA.floorY=h=>Math.round(h*(1-70/540));   // = FOOT's road line (view 540 tall, floor at h-70), so feet stand on the road
 FA.bg=(ctx,layer,camX,w,h)=>{
   const fy=FA.floorY(h),k=h/720,off=(camX||0)*(PAR[layer]||0),pic=FA._pic('foot/bg-'+layer+'.webp');
+  if(RET.footq&&!pic)return;   // footq: no old vector skyline (a painted layer only)
   ctx.save();
   if(pic){const kk=fy/(h*.8),tw=h*2*kk;let x0=-(((off%tw)+tw)%tw);for(let x=x0;x<w;x+=tw)ctx.drawImage(pic,x,0,tw,h*kk);ctx.restore();return;}   // the picture's 80% street line is scaled onto the road line
   if(layer==='sky'){const g=ctx.createLinearGradient(0,0,0,fy);g.addColorStop(0,'#07051a');g.addColorStop(.6,'#2a0f4a');g.addColorStop(1,'#6a1f6a');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
@@ -5191,7 +5193,7 @@ function build(){if(L)return L;const st=document.createElement('style');st.textC
   return L;}
 function isTouch(){return ('ontouchstart' in window)||navigator.maxTouchPoints>0||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);}
 const autoOn=()=>!!(L&&L.touch&&(SV.auto===undefined||SV.auto));   // touch: auto-fire is on unless the player turned it off in the pause menu
-function layout(){if(!L)return;const vv=window.visualViewport,W=Math.round(vv?vv.width:innerWidth),H=Math.round(vv?vv.height:innerHeight),dpr=Math.min(2,window.devicePixelRatio||1);
+function layout(){if(!L)return;const vv=window.visualViewport,W=Math.round(vv?vv.width:innerWidth),H=Math.round(vv?vv.height:innerHeight),dpr=Math.min(F.dprMax||2,window.devicePixelRatio||1);
   const T=L.touch=isTouch()||F.forceTouch;if(F.look&&F.look.layout&&F.look.layout(L,W,H,dpr,T))return;let cx=0,cy=0,cw=W,ch=H,mode='full',minVw=480,sw=0;
   if(T&&H>W*1.05){mode='port';minVw=420;ch=H-clamp(Math.round(H*.37),190,290);}   // portrait: the field takes about 63% of the height, the pad lives below it
   else if(T){mode='land';minVw=420;sw=clamp(Math.round(W*.22),160,220);cx=sw;cw=W-2*sw;}   // landscape: the field is the whole screen, the pad sits over the side bands
@@ -5328,8 +5330,8 @@ function leave(then){const id=S&&S.id,cl=S&&S.end&&S.end.cleared;stop();
   if(then)then();}
 
 /* ===== start / stop ===== */
-function loop(t){if(!F.on){raf=0;return;}const dt=Math.min(.05,(t-lastT)/1000||0);lastT=t;ftUpdate(dt);draw();raf=requestAnimationFrame(loop);}
-function begin(id,fromCp){build();newRun(id,fromCp);for(const k in I)I[k]=0;L.root.hidden=false;F.on=true;layout();hideMenu();
+function loop(t){if(!F.on){raf=0;return;}const dt=Math.min(.05,(t-lastT)/1000||0);lastT=t;ftUpdate(dt);if(F.pre)F.pre(L.ctx);draw();raf=requestAnimationFrame(loop);}
+function begin(id,fromCp){if(F.ui){F.ui=0;if(F.hold&&F.hold(()=>begin(id,fromCp)))return;}build();newRun(id,fromCp);for(const k in I)I[k]=0;L.root.hidden=false;F.on=true;layout();hideMenu();
   try{if(window.AU&&AU.startStage)AU.startStage(STAGES[id].song);}catch(e){}
   NR.emit('footStart',{stage:id,cp:!!fromCp,t0:S.time});lastT=performance.now();if(!raf)raf=requestAnimationFrame(loop);}
 function start(id){id=id||'street1';if(!RET.foot||!STAGES[id])return false;if(typeof running!=='undefined'&&running)return false;
@@ -5343,7 +5345,7 @@ function sim(sec,dt){dt=dt||1/60;let n=Math.round(sec/dt);while(n-->0&&S&&!S.end
 if(RET.foot){const add=()=>{const g=document.querySelector('#mnMore .mg');if(!g)return false;if(document.getElementById('footBtn'))return true;
     const b=document.createElement('button');b.type='button';b.className='go wide';b.id='footBtn';g.appendChild(b);
     const paint=()=>{const u=ftUnlocked();b.disabled=!u;b.innerHTML=u?'STREET RUN<small style="font-size:14px;display:block">on foot · '+(SV.best[F.main||'street1']?'best '+SV.best[F.main||'street1'].score:'new')+'</small>':'STREET RUN<small style="font-size:14px;display:block">clear stage 3 to unlock</small>';};
-    paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');start(F.main||'street1');});
+    paint();b.addEventListener('click',()=>{if(!ftUnlocked())return;const mn=$('mnMore');F.ui=1;start(F.main||'street1');});
     NR.on('runEnd',()=>setTimeout(paint,50));NR.on('footEnd',()=>setTimeout(paint,50));F.paint=paint;return true;};
   let n=0;const t=setInterval(()=>{if(add()||++n>80)clearInterval(t);},60);}
 F._in={L:()=>L,drawWho,ppose,kaiX,ghost,hintOn,hintText,fmtT,PW_KEYS,ftRnd};   // for streetlook.js (draws the street on its own when RET.streetlook is on)
@@ -5568,7 +5570,7 @@ const D={
   relay(c,pose,x,y,h,flip,t,col){c.save();dead(c,pose,t);c.fillStyle=col==='#ffffff'?col:'#3a4a6a';c.fillRect(x-12,y-h+20,24,h-20);c.fillStyle='#7df9ff';c.fillRect(x-17,y-8,34,8);
     c.globalAlpha*=.6+.4*Math.sin(t*8);c.beginPath();c.arc(x,y-h+12,12,0,6.283);c.fill();c.restore();},
   warden2(c,pose,x,y,h,flip,t,col){const fa=window.FA;if(fa&&typeof fa.draw==='function'){fa.draw(c,'warden',pose,x,y,h,flip,t);return;}c.fillStyle=col;c.fillRect(x-h*.35,y-h,h*.7,h);}};
-F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{if(who!=='warden2'&&sheet(c,who,pose,x,y,h,flip,t))return;D[who](c,pose,x,y,h,flip,t,col);};
+F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{if(RET.footq&&RET.sprites&&F.q&&who!=='warden2'&&(ART.FM[who]||who==='relay')){F.q.draw(c,who,pose,x,y,h,flip,t);return;}if(who!=='warden2'&&sheet(c,who,pose,x,y,h,flip,t))return;D[who](c,pose,x,y,h,flip,t,col);};
 })();
 
 // PURPOSE: on-foot street look on phones: one world scale, portrait layout, 3-layer parallax, clip-safe popups, grouped HUD
@@ -5725,6 +5727,54 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
   if(line){c.font='bold '+fs(16)+'px monospace';const tw=Math.min(c.measureText(line).width,vw-40*u),hy=t0+hudB+8*u;c.fillStyle='#000b';c.fillRect(vw/2-tw/2-8*u,hy,tw+16*u,26*u);c.fillStyle='#fff';c.fillText(line,vw/2,hy+4*u,vw-40*u);hint={x:vw/2-tw/2-8*u,y:hy-t0,w:tw+16*u,h:26*u};SL.hudB=hudB+42*u;}
   SL.tag='';if(S.st.hook&&S.st.hook.hud)try{S.st.hook.hud(c,vw,u,box,fs,S);}catch(x){}
   L.hud={hud:hb,hint,vw};IN.ghost();}
+})();
+
+// PURPOSE: on-foot quality: sprites preloaded before the run starts, no old mock graphics, one fixed size per character, sharp at device pixel ratio
+// FLAG: footq (?footq=0)
+// TEST: footq-test.js
+/* ---------- FOOTQ (owner, 21 Oct 2026: "on foot I can see the old graphics before the sprites, they change size, the quality resolution is very bad").
+   Flag RET.footq (default ON; ?footq=0 = the old behaviour exactly). Causes found and fixed:
+   1. Sheets load lazily, so the first seconds of a run drew the old code shapes (FA.hum / FA.mac) and the flat backdrop of footart.js. Now FOOT.hold() (called by foot.js begin) preloads every on-foot sheet
+      (ART.FM acts, the five street props, the ammo pickup) behind a short LOADING cover (<= 8 s, then it starts anyway) and FA.draw / F.drawX / FA.bg never draw the old shapes: a sheet that is still decoding
+      draws nothing, a character with no sheet at all draws a flat labelled box (asset id), ASSET-POLICY.md.
+   2. Size: one height per entity (the first non-crouch h it is drawn with, e._qh), the same for every act and frame; Kai's crouch is that height x CR (the kneeling art is cut to fill its cell, so the
+      cell is drawn 0.6875 x to keep the head the same size); the landing squash is off on foot; a crouch without its own sheet borrows crouchshoot (not a squashed idle).
+   3. Sharpness: art.js drawAnim measured the pre-scaled copy with the FLY canvas scale (S), so on foot a 64 px copy was blown up 3-4x; it now reads the real canvas transform of #footC. The canvas takes the
+      full device pixel ratio (up to 3, was 2) and imageSmoothingQuality is high each frame. The sheets are 256 px tall: a character is never drawn from a smaller copy than its device size. ---------- */
+if(RET.footq===undefined)RET.footq=!/[?&]footq=0/.test(location.search);
+(function(){
+if(!RET.footq||!window.FOOT||!window.FA||typeof ART==='undefined')return;   // FA.draw, FA.bg and footstage's F.drawX call FOOT.q.draw when it exists
+const F=FOOT,FQ=F.q={on:true,CR:.6875,hold:null,miss:{},held:0,calls:0,keys:[]};
+F.dprMax=3;
+/* ----- the sheets this stage can draw ----- */
+FQ.list=()=>{const k=[];for(const w in ART.FM)for(const a of ART.FM[w]._all)k.push(w+'/'+a);
+  for(const p of ['car/loop','police/loop','holo/loop','beacon/loop','steam/glow'])k.push('prop-'+p);k.push('pk-ammo/spin');return k.filter(x=>ART.ANIM.s[x]);};
+FQ.state=k=>{const n='anim/'+k+'-strip';if(!ART.rd||!ART.rd.has(n+'.webp'))return 'none';if(ART.err&&ART.err[n])return 'bad';return ART.anim(k)?'ok':'wait';};   // ART.anim also starts the load
+FQ.ready=()=>{if(!RET.sprites)return true;if(!ART.rd||!ART.rd.size)return false;let ok=true;for(const k of FQ.list()){const s=FQ.state(k);if(s==='wait')ok=false;}return ok;};
+FQ.pending=()=>FQ.list().filter(k=>FQ.state(k)==='wait');
+FQ.pct=()=>{const l=FQ.list();return l.length?Math.round(100*l.filter(k=>FQ.state(k)!=='wait').length/l.length):100;};
+/* ----- loading hold: returns true when it took over the start (cb runs when the sheets are ready or after 8 s) ----- */
+/* only the STREET RUN button asks for it (F.ui, foot.js): FOOT.start() from code (tests, tools) still starts at once and just draws nothing for a sheet that is not decoded yet */
+F.hold=cb=>{if(FQ.ready())return false;if(FQ.hold)return true;FA.init&&FA.init();
+  const d=document.createElement('div');d.id='footQ';d.setAttribute('role','status');d.style.cssText='position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:#05030c;color:#c9c3e6;font:700 16px "Share Tech Mono",monospace;letter-spacing:.12em';
+  d.textContent='LOADING STREET RUN 0%';document.body.appendChild(d);FQ.hold=d;FQ.held++;const t0=performance.now();
+  const tick=()=>{d.textContent='LOADING STREET RUN '+FQ.pct()+'%';if(FQ.ready()||performance.now()-t0>8000){d.remove();FQ.hold=null;FQ.waited=performance.now()-t0;cb();}else setTimeout(tick,50);};setTimeout(tick,0);return true;};
+/* ----- every frame: smooth, high quality ----- */
+F.pre=c=>{c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';};
+/* ----- one height per entity ----- */
+const fix=(who,pose,h)=>{const e=ART.fE;if(!e)return h;
+  if(e._qh==null)e._qh=who==='kai'&&e===F.S.P?(e.h||h):(who==='kai'&&/^crouch/.test(pose)?h/FQ.CR:h);   // Kai: his standing height (P.h); the rest: the height they are first drawn with
+  return who==='kai'&&(/^crouch/.test(pose)||h<e._qh*.9)?e._qh*FQ.CR:e._qh;};
+FQ.fix=fix;
+/* a crouch without its own sheet borrows crouchshoot (a squashed idle changed the shape) */
+ART.FB.crouch=['crouchshoot','idle'];
+/* ----- placeholder: a flat labelled box, only for an id that has no sheet at all (never the old mock shapes) ----- */
+const box=(ctx,who,x,y,h,flip)=>{FQ.miss[who]=(FQ.miss[who]||0)+1;if(ART.ANIM.s[who+'/idle']||(ART.FM[who]&&ART.FM[who]._all.some(a=>ART.ANIM.s[who+'/'+a])))return;   // it has sheets: still decoding, draw nothing
+  const w=h*.5;ctx.save();ctx.globalAlpha*=.8;ctx.fillStyle='#3a2a52';ctx.fillRect(x-w/2,y-h,w,h);ctx.strokeStyle='#19e3ff';ctx.lineWidth=2;ctx.strokeRect(x-w/2+1,y-h+1,w-2,h-2);
+  if(window.phText&&window.phText()){ctx.fillStyle='#fff';ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(who,x,y-h/2);}ctx.restore();};
+const drawSheet=(ctx,who,pose,x,y,h,flip,t)=>{FQ.calls++;h=fix(who,pose,h);if(ART.footDraw(ctx,who,pose,x,y,h,flip,t))return true;box(ctx,who,x,y,h,flip);return false;};
+FQ.draw=drawSheet;
+/* the callers are the owners: footart.js FA.draw / FA.bg and footstage.js F.drawX send every on-foot character through FQ.draw (sheet, a flat box when it has no sheet, never the old shapes) */
 })();
 
 // PURPOSE: ground enemies, calmer pacing, escape penalty
@@ -14707,7 +14757,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='6b3d699639 2026-10-21 22:43 UTC';
+const NR_STAMP='9cb06bf149 2026-10-21 22:50 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -15496,15 +15546,16 @@ function card(d,pass,why){const nx=nextD();SCH.res={id:d.id,pass};
 function run(d){if(!d||running||TUT.on)return;SCH.cur=d;SCH.res=null;el.hidden=true;SCH.onList=false;tutC.hidden=true;const ls=lsId(d);
   if(ls){lsShow(ls,()=>{if(T.hidden)return;open();});return;}
   if(d.k==='foot'){return runFoot(d);}
-  const s=d.k();if(!s)return;TUT.D=[s];SCH.t0=performance.now();startTut();tutB.classList.add('drl');}
+  let s=d.k();if(!s)return;if(SCH.wrap)s=SCH.wrap(s,d);TUT.D=[s];SCH.t0=performance.now();startTut();tutB.classList.add('drl');}
 function runFoot(d){const bank=GA.bank,rt=RET.tale;RET.tale=false;let ok=false;window.__schFoot=true;try{ok=FOOT.start('street1');}catch(e){}RET.tale=rt;
-  if(!ok){window.__schFoot=false;open();return;}SCH.foot={d,bank,kills:0,t0:performance.now(),end:0};T.hidden=true;}
+  if(!ok){window.__schFoot=false;open();return;}SCH.foot={d,bank,kills:0,t0:performance.now(),end:0};if(SCH.sf)SCH.sf.footStart(SCH.foot);T.hidden=true;}
 function footEnd(pass){const f=SCH.foot;if(!f||f.end)return;f.end=1;if(FOOT.S)FOOT.S.hintT=0;try{FOOT.stop();}catch(e){}
-  GA.bank=f.bank;gsave();SCH.foot=null;window.__schFoot=false;T.hidden=false;mark(f.d,pass,(performance.now()-f.t0)/1000);card(f.d,pass,pass?'Run, shoot, repeat':'Down: nothing is lost in practice');}
-NR.on('footKill',()=>{const f=SCH.foot;if(f&&!f.end&&++f.kills>=3)setTimeout(()=>footEnd(true),400);});
-NR.on('footEnd',()=>{const f=SCH.foot;if(f&&!f.end)setTimeout(()=>footEnd(false),0);});
+  GA.bank=f.bank;gsave();SCH.foot=null;window.__schFoot=false;T.hidden=false;mark(f.d,pass,f.F&&f.F.t?f.F.t:(performance.now()-f.t0)/1000);card(f.d,pass,pass?(f.F&&f.F.t?Math.round(f.F.t)+' s · 3/3 rounds':'Run, shoot, repeat'):'Down: nothing is lost in practice');}
+SCH.footEndNow=footEnd;
+NR.on('footKill',()=>{const f=SCH.foot;if(f&&!f.end&&f.F&&SCH.sf){SCH.sf.footKill(f,footEnd);return;}if(f&&!f.end&&++f.kills>=3)setTimeout(()=>footEnd(true),400);});
+NR.on('footEnd',e=>{const f=SCH.foot;if(f&&!f.end&&!(e&&e.quit)&&SCH.sf&&SCH.sf.footDown(f))return;if(f&&!f.end&&!(f.F&&f.F.restart))setTimeout(()=>footEnd(false),0);});
 {const f0=tutFinish;tutFinish=function(){if(!TUT.D)return f0.apply(this,arguments);const d=SCH.cur,l=TUT.log[TUT.log.length-1],pass=!!(l&&l.ok);
-  TUT.ending=true;SCH.noList=1;if(running)quitToTitle();tutRestore();SCH.noList=0;T.hidden=false;mark(d,pass,l&&l.t);card(d,pass,pass?'':"Time's up");};}
+  TUT.ending=true;SCH.noList=1;if(running)quitToTitle();tutRestore();SCH.noList=0;T.hidden=false;mark(d,pass,l&&l.t);card(d,pass,pass?(SCH.wrap&&l&&l.t>0?Math.round(l.t)+' s · 3/3 rounds':''):"Time's up");};}
 {const r0=tutRestore;tutRestore=function(){const was=TUT.on&&TUT.D;r0.apply(this,arguments);if(was){tutB.classList.remove('drl');TUT.D=null;if(!SCH.noList&&!SCH.again)setTimeout(()=>{if(!running&&!TUT.on)open();},60);}};}
 {const b=document.createElement('button');b.type='button';b.className='schRe';b.id='schRe';b.textContent='AGAIN';tutB.insertBefore(b,$('tutSkip'));
   for(const ev of['touchstart','touchend','pointerdown','mousedown'])b.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
@@ -15514,6 +15565,99 @@ window.__school={get ids(){return rows().map(d=>d.id);},get all(){return DR.map(
   get cur(){return SCH.cur&&SCH.cur.id;},get res(){return SCH.res||null;},done:()=>rows().filter(done).map(d=>d.id),next:()=>{const n=nextD();return n&&n.id;},
   pass(){const s=TUT.cur();if(!s)return;const t=s.tick;s.tick=function(){s.tick=t;return true;};},late(){TUT.t=TUT_MAX+1;},kinds:()=>Object.fromEntries(DR.map(d=>[d.id,lsId(d)?'lesson':d.k==='foot'?'foot':'tut'])),get foot(){return SCH.foot;}};
 },0);
+
+// PURPOSE: every Flight School drill and lesson mini stage is a real lesson: demo, three escalating rounds, 3 in a row, round counter, time on the clear card
+// FLAG: schoolfull (?schoolfull=0)
+// TEST: school-full-test.js
+/* ---------- SCHOOL FULL (owner, 21 Oct 2026: "the flight school extra lessons last 5 seconds wtf is this"). Flag RET.schoolfull (default ON; ?schoolfull=0 =
+   the old one-success drills and one-pass lessons). Every drill (school.js DR: tut steps, counter foes, gate, fan, on foot) and every lesson mini stage
+   (lessons.js LSN) now runs as: DEMO (8 s: the drill's own targets and foes play out with a "WATCH" line, nothing counts), then ROUND 1/3 (slow: the world at
+   60 % speed, hits forgiven), ROUND 2/3 (normal, a hit breaks the streak), ROUND 3/3 (faster plus the previous skill: an aimed fan to dodge in the fly
+   drills, gap walls in the lesson sandbox, no hit allowed on foot). A drill round needs 3 successes in a row and lasts at least SF.RMIN seconds (after 3 in a
+   row it says KEEP GOING until then); a lesson round is one clean run of all its phases (repeated until SF.RMIN). A fail (hit in rounds 2-3, or SF.REPMAX
+   s without a success) repeats that round, never back to the list. Counter: coach bar "R2/3 · 1/3", lesson head "ROUND 2/3", a badge on foot. The clear
+   card / line shows time and rounds. Saves only what school.js / lessons.js already save (mnr_school, mnr_lessons). Test: nightrun/school-full-test.js. */
+if(RET.schoolfull===undefined)RET.schoolfull=!/[?&]schoolfull=0/.test(location.search);
+const SF={DEMO:8,RMIN:12,NEED:3,REPMAX:25,LSMAX:60,log:[],last:null,get on(){return !!RET.schoolfull;}};
+{const st=document.createElement('style');st.textContent=`#tutB.drl.sf .tn{display:block;flex:0 0 auto;font:700 13px var(--mono);color:#ffe14d;white-space:nowrap}
+#sfBadge{position:fixed;z-index:9200;left:50%;top:calc(158px + env(safe-area-inset-top,0px));transform:translateX(-50%);max-width:calc(100% - 32px);box-sizing:border-box;padding:6px 12px;border-radius:10px;
+background:rgba(13,8,32,.86);border:2px solid #ffe14d;color:#fff;font:700 14px var(--mono);text-align:center;pointer-events:none}#sfBadge[hidden]{display:none}`;document.head.appendChild(st);}
+const sfBadge=document.createElement('div');sfBadge.id='sfBadge';sfBadge.hidden=true;sfBadge.setAttribute('aria-live','polite');document.body.appendChild(sfBadge);
+const sfGoal=(r,say)=>r===1?'SLOW: '+say:r===3?say+' + dodge':say;
+/* ===== 1. tut-engine drills (one step in TUT.D): wrap the step ===== */
+SF.wrap=(b,d)=>{const o={id:b.id,base:b,ph:'demo',r:0,k:0,T:0,rt:0,pt:0,gap:0,hp:0,fails:0,rounds:0,
+  get free(){return b.free;},get foes(){return b.foes;},
+  say(){return o.ph==='demo'?'WATCH: '+b.say():sfGoal(o.r,b.say());},
+  init(){o.ph='demo';o.r=0;o.k=0;o.T=0;o.rt=0;o.pt=0;o.gap=0;o.fails=0;o.rounds=0;o.hp=P.hp;tutB.classList.add('sf');b.init();o.cnt();SF.last={id:d.id,kind:'tut',o};},
+  tgt(){return o.gap>0?null:b.tgt?b.tgt():null;},
+  beat(i){if(o.gap>0)return;if(b.beat)b.beat(i);if(o.r===3&&o.ph==='play'&&i%4===0&&!/^(dodge|fan)$/.test(b.id))o.over();},
+  perfect(k){if(o.gap<=0&&b.perfect)b.perfect(k);},
+  end(){if(b.end)b.end();tutB.classList.remove('sf');},
+  cnt(){const n=$('tutN');if(!n)return;const t=o.ph==='demo'?'DEMO '+Math.max(0,Math.ceil(SF.DEMO-o.T)):'R'+o.r+'/3 · '+Math.min(o.k,SF.NEED)+'/'+SF.NEED;if(n.textContent!==t)n.textContent=t;},
+  clear(){G.en=G.en.filter(e=>!e.tut);G.eb=G.eb.filter(x=>!x.tut);G.pk=G.pk.filter(p=>!p.tut);},
+  rep(){o.clear();o.pt=0;b.init();if(b.id==='weapons'&&o.wDone){b.p=1;b.es=[.25,.4,.55,.7].map((f,i)=>tutEn('drone',{x:W+30+i*40,y:f*H,amp:0}));}   // the slot sheet once, then the fusion fights
+   TUT.line(o.k>=SF.NEED?'KEEP GOING: '+b.say():sfGoal(o.r,b.say()));},
+  round(r){o.r=r;o.k=0;o.rt=0;o.ph='play';o.gap=1.6;o.clear();TUT.line('ROUND '+r+'/3: '+sfGoal(r,b.say()));floater(P.x,P.y-56,'ROUND '+r+'/3','#ffe14d');AU.sfx('tier');},
+  fail(why){o.fails++;o.k=0;o.rt=0;o.gap=1.4;o.clear();TUT.line(why);floater(P.x,P.y-50,'ROUND '+o.r+' AGAIN','#ff6a7a');SF.log.push({id:d.id,ev:'fail',r:o.r,why});},
+  over(){const x=W-30,y=clamp(P.y+rnd(-50,50),50,H-60),a=Math.atan2(P.y-y,P.x-x);for(let k=-1;k<=1;k++)tutEb(x,y,a+k*.24,135);},
+  tick(dt){o.T+=dt;if(TUT.t>5)return false;TUT.t=0;o.cnt();          // TUT.t > 5 = forced by the __school.late() hook: let the engine time out
+    if(o.ph==='demo'){if(o.T>=SF.DEMO)o.round(1);return false;}
+    if(o.gap>0){o.gap-=dt;if(o.gap<=0)o.rep();o.hp=P.hp;return false;}
+    o.rt+=dt;o.pt+=dt;if(o.r===1)G.slow=Math.min(G.slow,.6);
+    if(o.r>=2&&P.hp<o.hp){o.hp=P.hp;o.fail('HIT: round '+o.r+' again, 3 in a row');return false;}o.hp=P.hp;
+    if(o.pt>SF.REPMAX){o.fail('Too slow: round '+o.r+' again');return false;}
+    if(b.tick(dt)){o.k++;o.wDone=1;floater(P.x,P.y-50,o.k+' IN A ROW','#3dffb0');AU.sfx('perfect');SF.log.push({id:d.id,ev:'ok',r:o.r,k:o.k});
+      if(o.k>=SF.NEED&&o.rt>=SF.RMIN){o.rounds++;if(o.r>=3){o.ph='done';TUT.t=+o.T.toFixed(1);SF.log.push({id:d.id,ev:'clear',t:o.T,rounds:o.rounds});return true;}o.round(o.r+1);}
+      else o.gap=.9;}
+    return false;}};
+  return o;};
+/* ===== 2. lesson mini stages (lessons.js sandbox) ===== */
+const sfHead=m=>{const F=m.F,h=$('lsHead');if(!F||!h)return;h.textContent=m.L.n+' · '+(m.state==='demo'?'DEMO '+Math.max(0,Math.ceil(F.demo)):'ROUND '+F.r+'/3 · part '+(m.pi+1)+'/'+m.L.ph.length);};
+function sfLsFail(m,why){const F=m.F;F.fails++;F.rt=0;SF.log.push({id:m.L.id,ev:'fail',r:F.r,why});lsPhase(0);lsLine(why,'bad');m.sayT=2.2;}
+function sfGapWall(m){const n=12,g=1+Math.floor(Math.random()*(n-4));for(let i=0;i<n;i++)if(i<g||i>g+2)m.eb.push({x:m.w+10,y:m.h*(i+.5)/n,vx:-95,r:6,hz:1});}
+{const s0=lsShow;lsShow=function(id){const r=s0.apply(this,arguments),m=LS.m;if(!r||!m||!SF.on)return r;
+  m.F={r:0,T:0,rt:0,demo:SF.DEMO,fails:0,rounds:0,hz:0};m.state='demo';lsLine('WATCH: '+m.P.say);sfHead(m);SF.last={id,kind:'lesson',m};
+  const f0=m.fail;m.fail=why=>{if(m.state)return;f0(why);if(m.F.r>=2&&/^hit/i.test(String(why)))sfLsFail(m,'HIT: round '+m.F.r+' again');};
+  return r;};}
+{const p0=lsPhase;lsPhase=function(i){const r=p0.apply(this,arguments),m=LS.m;if(m&&m.F&&m.F.r){lsLine(sfGoal(m.F.r,m.P.say));sfHead(m);}return r;};}
+{const t0=lsTick;lsTick=function(m,dt){const F=m.F;if(!F||!SF.on||F.done)return t0(m,dt);F.T+=dt;
+  if(m.state==='demo'){F.demo-=dt;const f=m.fo.find(x=>!x.dead);if(f)m.s.ty=f.y;t0(m,dt);sfHead(m);
+    if(F.demo<=0){m.state='';F.r=1;F.rt=0;lsPhase(0);lsLine('ROUND 1/3: '+sfGoal(1,m.P.say),'ok');m.sayT=1.6;}return;}
+  if(!m.state){F.rt+=dt;if(F.rt>SF.LSMAX){sfLsFail(m,'Too slow: round '+F.r+' again');return;}}
+  t0(m,dt*(F.r===1?.6:F.r===3?1.2:1));
+  if(F.r===3&&!m.state&&m.P.fly!==0&&!/^(c-wall|t-dash)$/.test(m.P.id)){F.hz-=dt;if(F.hz<=0){F.hz=3.2;sfGapWall(m);}}};}
+{const c0=lsClear;lsClear=function(){const m=LS.m,F=m&&m.F;if(!F||!SF.on||F.done)return c0();
+  if(F.rt<SF.RMIN){lsPhase(0);lsLine('KEEP GOING: '+m.P.say,'ok');m.sayT=1.6;return;}
+  F.rounds++;SF.log.push({id:m.L.id,ev:'round',r:F.r});
+  if(F.r<3){F.r++;F.rt=0;lsPhase(0);lsLine('ROUND '+F.r+'/3: '+sfGoal(F.r,m.P.say),'ok');m.sayT=1.6;return;}
+  F.done=1;c0();const t=Math.round(F.T);SF.log.push({id:m.L.id,ev:'clear',t:F.T,rounds:F.rounds});
+  lsLine('LESSON CLEAR · '+t+' s · 3/3 rounds','ok');const h=$('lsHead');if(h)h.textContent=m.L.n+' · CLEAR · '+t+' s';};}
+/* ===== 3. the on-foot drill (school.js SCH.foot): kills in a row per round, a fall repeats the round ===== */
+const ftT=()=>window.FOOT&&FOOT.S?FOOT.S.time||0:0,ftC=f=>f.F.acc+ftT();   // drill clock: on-foot game time, summed over restarts
+SF.footStart=f=>{f.F={r:0,k:0,acc:-ftT(),rt0:0,hurts:0,fails:0,rounds:0};SF.last={id:f.d.id,kind:'foot',f};sfBadge.hidden=false;SF.footCnt(f);};
+SF.footCnt=f=>{const F=f.F;if(!F)return;const t=ftC(f);
+  if(!F.r&&t>=SF.DEMO){F.r=1;F.k=0;F.rt0=t;F.hurts=FOOT.S?FOOT.S.hurts|0:0;}
+  sfBadge.textContent=!F.r?'WATCH: run right, tap to shoot · '+Math.max(0,Math.ceil(SF.DEMO-t)):'ROUND '+F.r+'/3 · '+Math.min(F.k,SF.NEED)+'/'+SF.NEED+' · '+(F.r===1?'shoot 3 foes':F.r===2?'3 foes in a row':'3 foes, no hit');};
+SF.footKill=(f,end)=>{const F=f.F;if(!F||F.t)return;SF.footCnt(f);if(!F.r)return;const S=FOOT.S||{},h=S.hurts|0;
+  if(F.r>=2&&h>F.hurts){F.hurts=h;F.k=0;F.rt0=ftC(f);F.fails++;SF.log.push({id:f.d.id,ev:'fail',r:F.r,why:'hit'});}
+  F.k++;SF.log.push({id:f.d.id,ev:'ok',r:F.r,k:F.k});
+  if(F.k>=SF.NEED&&ftC(f)-F.rt0>=SF.RMIN){F.rounds++;if(F.r>=3){F.t=ftC(f);SF.log.push({id:f.d.id,ev:'clear',t:F.t,rounds:F.rounds});sfBadge.hidden=true;setTimeout(()=>end(true),400);return;}
+    F.r++;F.k=0;F.rt0=ftC(f);F.hurts=S.hurts|0;}
+  SF.footCnt(f);};
+setInterval(()=>{const f=SCH.foot;if(f&&f.F&&!f.end&&!f.F.t)SF.footCnt(f);else if(!sfBadge.hidden)sfBadge.hidden=true;},250);
+SF.footDown=f=>{const F=f.F;if(!F||F.t)return false;F.k=0;F.fails++;F.acc+=ftT();SF.log.push({id:f.d.id,ev:'fail',r:F.r,why:'down'});
+  setTimeout(()=>{if(SCH.foot!==f||f.end)return;let ok=false;try{FOOT.stop();ok=FOOT.start('street1');}catch(e){}
+    if(!ok){SCH.footEndNow&&SCH.footEndNow(false);return;}F.acc-=ftT();F.rt0=ftC(f);F.hurts=0;SF.footCnt(f);},0);return true;};
+if(RET.schoolfull){SCH.wrap=SF.wrap;SCH.sf=SF;}
+window.__schoolfull={get on(){return SF.on;},get log(){return SF.log;},SF,
+  get state(){const L=SF.last;if(!L)return null;if(L.kind==='tut'){const o=L.o;return{id:L.id,kind:'tut',ph:o.ph,r:o.r,k:o.k,T:o.T,rounds:o.rounds,fails:o.fails,gap:o.gap};}
+    if(L.kind==='lesson'){const F=L.m.F;return{id:L.id,kind:'lesson',ph:L.m.state==='demo'?'demo':F.done?'done':'play',r:F.r,T:F.T,rounds:F.rounds,fails:F.fails,state:L.m.state,pid:L.m.P.id};}
+    const F=L.f.F;return{id:L.id,kind:'foot',r:F.r,k:F.k,rounds:F.rounds,fails:F.fails,T:F.t||ftC(L.f),ph:F.t?'done':F.r?'play':'demo'};},
+  // oracle hooks for the test bot: one real success of the current rep / lesson phase
+  rep(){const L=SF.last;if(!L)return false;if(L.kind==='tut'){const b=L.o.base,t=b.tick;b.tick=function(){b.tick=t;return true;};return true;}
+    if(L.kind==='lesson'){const m=L.m;if(m.state)return false;m.win('oracle');return true;}return false;},
+  lsWin(){const m=LS.m;if(!m||m.state)return false;m.win('oracle');return true;},lsSim(){cancelAnimationFrame(LS.raf);LS.raf=0;},lsStep(dt){if(LS.m)lsTick(LS.m,dt);},lsFail(){const m=LS.m;if(m&&!m.state)m.fail('hit');},
+  hit(){P.hp=Math.max(1,P.hp-1);}};
 
 // PURPOSE: tidy Settings (<= 20 controls on the main page, one Assist page, the rest under More) + a street run that keeps Kai in the left third and drones off the HUD
 // FLAG: tidy (?tidy=0)
