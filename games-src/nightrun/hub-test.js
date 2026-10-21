@@ -23,12 +23,12 @@ const F = [
   ['hangar: forge', '#hub_hangar', '#garage .tabs [data-t=forge]', '__hubTab()==="forge"'],
   ['hangar: pilot class', '#hub_hangar', '#garage .tabs [data-t=pilot]', '__hubTab()==="pilot"'],
   ['hangar: upgrades', '#hub_hangar', '#garage .tabs [data-t=tune]', '__hubTab()==="tune"'],
-  ['hangar: ability', '#hub_hangar', '#garage .tabs [data-t=abil]', '__hubTab()==="abil"'],
-  ['hangar: crew', '#hub_hangar', '#garage .tabs [data-t=crew]', '__hubTab()==="crew"'],
-  ['hangar: looks', '#hub_hangar', '#garage .tabs [data-t=looks]', '__hubTab()==="looks"'],
-  ['hangar: load', '#hub_hangar', '#garage .tabs [data-t=load]', '__hubTab()==="load"'],
-  ['hangar: shop', '#hub_hangar', '#garage .tabs [data-t=mkt]', '__hubTab()==="mkt"'],
-  ['weapon pick', '#hub_hangar', '#hubWpPick', 'VIS("#wpm")'],
+  ['hangar: ability', '#hub_hangar', '#mfMore|#mfI_abil', '__hubTab()==="abil"'],
+  ['hangar: crew', '#hub_hangar', '#mfMore|#mfI_crew', '__hubTab()==="crew"'],
+  ['hangar: looks', '#hub_hangar', '#mfMore|#mfI_looks', '__hubTab()==="looks"'],
+  ['hangar: load', '#hub_hangar', '#mfMore|#mfI_load', '__hubTab()==="load"'],
+  ['hangar: shop', '#hub_hangar', '#mfMore|#mfI_mkt', '__hubTab()==="mkt"'],
+  ['weapon pick', '#hub_hangar', '#mfMore|#mfI_pick', 'VIS("#wpm")'],
   ['flight school', '#hub_training', '[data-door="#tutBtn"]', 'document.getElementById("title").hidden'],
   ['lessons', '#hub_training', '[data-door="#lsBtn"]', 'VIS("#lsC")'],
   ['practice', '#hub_training', '.hubAct:nth-child(3)', 'VIS("#stsel")'],
@@ -93,8 +93,8 @@ const AUD = (root) => {
     await p.context().close();
     if (w > 400 && w !== 763) continue;
     // ---- the other screens a section opens share the header ----
-    for (const [name, tile, door, root] of [['settings', '#hub_profile', '.hubAct:nth-child(4)', '#setm'], ['stage map', '#hub_missions', '[data-door="#storyBtn"]', '#stsel'], ['story log', '#hub_profile', '.hubAct:nth-child(3)', '#sgLog,#taleLog'], ['stats', '#hub_profile', '[data-door="#statsBtn"]', '#stSheet'], ['weapon pick', '#hub_hangar', '#hubWpPick', '#wpm']]) {
-      p = await open(w, h); await tap(p, tile); await tap(p, tile === '#hub_hangar' ? door : tile + 'Scr ' + door); await sleep(300);
+    for (const [name, tile, door, root] of [['settings', '#hub_profile', '.hubAct:nth-child(4)', '#setm'], ['stage map', '#hub_missions', '[data-door="#storyBtn"]', '#stsel'], ['story log', '#hub_profile', '.hubAct:nth-child(3)', '#sgLog,#taleLog'], ['stats', '#hub_profile', '[data-door="#statsBtn"]', '#stSheet'], ['weapon pick', '#hub_hangar', '#mfMore|#mfI_pick', '#wpm']]) {
+      p = await open(w, h); await tap(p, tile); for (const d of door.split('|')) await tap(p, tile === '#hub_hangar' ? d : tile + 'Scr ' + d); await sleep(300);
       if (root === '#stSheet') await p.evaluate(() => { const s = document.getElementById('stSheet'); s.scrollTop = 0; });
       const a = await p.evaluate(AUD, root);
       ok(`${name}: same header (back arrow, title, Neon)` + tag, a.hd, JSON.stringify(a));
@@ -105,8 +105,8 @@ const AUD = (root) => {
   for (const [w, h] of [[390, 763], [375, 553]]) {
     for (const [name, tile, door, check] of F) {
       const p = await open(w, h); taps = 0; let r = false, why = '';
-      try { await tap(p, tile); if (door) await tap(p, tile === '#hub_hangar' ? door : tile + 'Scr ' + door); await sleep(400); r = await p.evaluate(check); } catch (e) { why = e.message.slice(0, 120); }
-      ok(`${taps} taps: ${name} ${w}x${h}`, r && taps <= 2, why || String(r));
+      try { await tap(p, tile); if (door) for (const d of door.split('|')) await tap(p, tile === '#hub_hangar' ? d : tile + 'Scr ' + d); await sleep(400); r = await p.evaluate(check); } catch (e) { why = e.message.slice(0, 120); }
+      ok(`${taps} taps: ${name} ${w}x${h}`, r && taps <= (/\|/.test(door || '') ? 3 : 2), why || String(r));
       await p.context().close();
     }
   }

@@ -63,6 +63,7 @@ RET.st=(function(on){
     {id:'neon5000',n:'Neon Saver',d:'Earn 5000 Neon',g:'◆',t:'s',f:()=>S().neon>=5000},
     {id:'kills1000',n:'Demolition',d:'Destroy 1000 enemies',g:'✸',t:'s',f:()=>S().kills>=1000},
     {id:'arcade',n:'Short and Sweet',d:'Clear a stage in Arcade',g:'⚡',t:'b',f:()=>S().arcClears>=1}];
+  if(RET.menufix)for(const a of A)if(/[◆◇♦✦✸⌛∞]/.test(a.g))a.g='';   // menufix: no text diamonds or odd glyphs; the tier-coloured badge and its words carry the meaning
   const BY=Object.fromEntries(A.map(a=>[a.id,a]));
   const TC={b:'#d08a4a',s:'#c9d2e0',g:'#ffd23d'},TN={b:'BRONZE',s:'SILVER',g:'GOLD'};
   /* ---- toast queue: one at a time, each shown 2 s, non-blocking ---- */
@@ -70,12 +71,18 @@ RET.st=(function(on){
   function toast(a){Q.push(a);if(!showing)next();}
   /* the toast waits (queued) while the pit stop, the clear screen or the chest reveal is open: it used to cover their titles */
   const blocked=()=>['shop','stres','chest'].some(i=>{const o=document.getElementById(i);return !!o&&!o.hidden&&getComputedStyle(o).display!=='none';});
+  /* menufix: the toast sits in the first slot (top, then bottom) where no button, tab, card or input lies under it; if none is clear it waits (queued) */
+  const HIT='button,a[href],input,select,textarea,label,[role=button],[onclick],.go,.card,.tabs,.seg';
+  function mfFree(e){const r=e.getBoundingClientRect();if(!r.width)return false;for(let i=0;i<=6;i++)for(let j=0;j<=2;j++){const x=r.left+r.width*i/6,y=r.top+r.height*j/2,t=document.elementFromPoint(Math.min(innerWidth-1,Math.max(0,x)),Math.min(innerHeight-1,Math.max(0,y)));if(t&&t!==e&&t.closest(HIT))return false;}return true;}
+  function mfSlot(e){e.style.transition='none';let ok=false;for(const s of['mfTop','mfBot']){e.classList.remove('mfTop','mfBot');e.classList.add(s,'show');if(mfFree(e)){ok=true;break;}}
+    e.classList.remove('show');if(!ok)e.classList.remove('mfTop','mfBot');void e.offsetWidth;e.style.transition='';return ok;}
   function next(){if(!Q.length){showing=false;return;}showing=true;if(blocked()){setTimeout(next,400);return;}const a=Q.shift();
     let e=document.getElementById('achToast');
     if(!e){e=document.createElement('div');e.id='achToast';e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e);}
-    e.innerHTML='<span class="ab" style="--c:'+TC[a.t]+'">'+a.g+'</span><span><small>'+TN[a.t]+' ACHIEVEMENT</small><b>'+a.n+'</b></span>';
-    e.className='show';try{if(window.AU&&AU.sting)AU.sting('clear');}catch(x){}
-    setTimeout(()=>{e.className='';setTimeout(next,0);},2000);}
+    e.className='';e.innerHTML='<span class="ab" style="--c:'+TC[a.t]+'">'+a.g+'</span><span><small>'+TN[a.t]+' ACHIEVEMENT</small><b>'+a.n+'</b></span>';
+    if(RET.menufix&&!mfSlot(e)){Q.unshift(a);setTimeout(next,500);return;}
+    e.classList.add('show');try{if(window.AU&&AU.sting)AU.sting('clear');}catch(x){}
+    setTimeout(()=>{e.classList.remove('show');setTimeout(next,0);},2000);}
   /* ---- unlocks ---- */
   function check(silent){if(!on)return[];const got=[];
     for(const a of A){if(D.a[a.id])continue;let ok=false;try{ok=!!a.f();}catch(e){}
@@ -180,6 +187,8 @@ RET.st=(function(on){
   if(on){const st=document.createElement('style');st.textContent=`
 #achToast{position:fixed;left:50%;top:max(10px,env(safe-area-inset-top));transform:translate(-50%,-14px);z-index:99998;display:flex;gap:10px;align-items:center;max-width:min(92vw,360px);padding:8px 14px 8px 8px;border-radius:12px;background:#0b0618ee;border:1px solid #ffd23d;color:#fff;font:600 14px/1.25 var(--mono);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
 #achToast.show{opacity:1;transform:translate(-50%,0)}
+#achToast.mfBot{top:auto;bottom:max(14px,env(safe-area-inset-bottom));transform:translate(-50%,14px)}#achToast.mfBot.show{transform:translate(-50%,0)}
+.ab:empty::after{content:'';width:14px;height:14px;border-radius:50%;background:var(--c)}.ab:empty{font-size:0}
 @media (prefers-reduced-motion:reduce){#achToast{transition:none;transform:translate(-50%,0)}}
 #achToast small{display:block;color:#ffd23d;font-size:14px}#achToast b{font-size:16px}
 .ab{flex:none;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid var(--c);background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--c) 55%,#000),#120a22);color:#fff;font:700 20px/1 var(--mono);overflow:hidden}

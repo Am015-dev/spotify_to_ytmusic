@@ -2030,7 +2030,7 @@ function stDraw(){const box=$('stRows'),w=box.clientWidth||selEl.clientWidth,h=b
     b.dataset.n=s.n;b.dataset.id='s'+s.n;b.dataset.nd=!ok?'locked':k>0?'done':boss||mini?'boss':'open';b.style.cssText=`left:${nd.x}px;top:${nd.y}px;--c:${D.a}`;
     b.setAttribute('aria-label',`Stage ${s.n} ${s.name}${ok?'':' locked'}`);
     const side=L.land||s.ch||STAGES.some(x=>x.from===s.n)?'v':(nd.x<L.W/2?'r':'l');b.classList.add('s'+side);   // r / l: the label sits beside the medallion, v: under it
-    b.innerHTML=`<span class="md"><i class="ring"></i><span class="no">${s.ch?'◆':s.n}</span></span><span class="meta">${ok&&k?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:ok?'':lockI}<span class="nm">${s.name}</span></span>`;
+    b.innerHTML=`<span class="md"><i class="ring"></i><span class="no">${s.ch&&!(window.RET&&RET.menufix)?'◆':s.n}</span></span><span class="meta">${ok&&k?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:ok?'':lockI}<span class="nm">${s.name}</span></span>`;
     b.addEventListener('click',()=>mapPick(s.n));root.append(b);}
   box.append(root);
   if(!box._edge){box._edge=1;let q=0;box.addEventListener('scroll',()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;mapEdge();});},{passive:true});}
@@ -3395,6 +3395,7 @@ let labEl=null,garageDirty=false;
 const RET=window.RET=window.RET||{};
 if(RET.sprites===undefined)RET.sprites=!/[?&]sprites=0/.test(location.search);   // animated strip sheets for bosses and player ships (parts/art.js SPR); ?sprites=0 = the stills as before
 if(RET.title===undefined)RET.title=!/[?&]title=0/.test(location.search);   // B25: title diet (PLAY / CONTINUE, 5 buttons, the rest in MENU); parts/title.js
+if(RET.menufix===undefined)RET.menufix=!/[?&]menufix=0/.test(location.search);   // menu defects of review 8: HANGAR 5 tabs + MORE sheet, achievement toast never over a control, no decoration glyphs; parts/menufix.js, stats.js, map.js
 if(RET.type===undefined)RET.type=!/[?&]type=0/.test(location.search);     // B26: text >= 14 px and touch targets >= 44 px on title, menu and map; parts/title.js
 if(RET.oneMore===undefined)RET.oneMore=true;   // B5: run-end screens show Neon banked, the next unlock bar and a ONE MORE RUN button
 RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct, can}; null when everything is owned
@@ -3639,7 +3640,7 @@ RET.skip=function(){for(const c of retCnt)c.set(c.to);retCnt.length=0;try{for(co
 RET.chipV=GA.bank;RET.chips=[];
 function retChipSet(n){const t=window.fmtN(n);for(const c of RET.chips)c.firstElementChild.textContent=t;}
 RET.chipSync=function(){if(!RET.trans)return;for(const el of [$('over'),$('stres'),$('stsel')]){if(!el||el.querySelector('.retChip'))continue;
-    const c=document.createElement('div');c.className='retChip';c.innerHTML='◆ <b></b> Neon';el.appendChild(c);RET.chips.push(c);}
+    const c=document.createElement('div');c.className='retChip';c.innerHTML=(RET.menufix?'':'◆ ')+'<b></b> Neon';el.appendChild(c);RET.chips.push(c);}
   if(RET.chipV!==GA.bank||!RET.chips[0].firstElementChild.textContent){RET.countUp(retChipSet,RET.chipV,GA.bank,800);RET.chipV=GA.bank;}};
 for(const id of ['over','stres','stsel']){const el=$(id);if(el)new MutationObserver(()=>{if(!el.hidden&&RET.trans&&!retCnt.length)RET.chipSync();}).observe(el,{attributes:true,attributeFilter:['hidden']});}
 /* grades: every 16 bars a letter from the PERFECTs and hull lost in those bars */
@@ -7599,6 +7600,7 @@ RET.st=(function(on){
     {id:'neon5000',n:'Neon Saver',d:'Earn 5000 Neon',g:'◆',t:'s',f:()=>S().neon>=5000},
     {id:'kills1000',n:'Demolition',d:'Destroy 1000 enemies',g:'✸',t:'s',f:()=>S().kills>=1000},
     {id:'arcade',n:'Short and Sweet',d:'Clear a stage in Arcade',g:'⚡',t:'b',f:()=>S().arcClears>=1}];
+  if(RET.menufix)for(const a of A)if(/[◆◇♦✦✸⌛∞]/.test(a.g))a.g='';   // menufix: no text diamonds or odd glyphs; the tier-coloured badge and its words carry the meaning
   const BY=Object.fromEntries(A.map(a=>[a.id,a]));
   const TC={b:'#d08a4a',s:'#c9d2e0',g:'#ffd23d'},TN={b:'BRONZE',s:'SILVER',g:'GOLD'};
   /* ---- toast queue: one at a time, each shown 2 s, non-blocking ---- */
@@ -7606,12 +7608,18 @@ RET.st=(function(on){
   function toast(a){Q.push(a);if(!showing)next();}
   /* the toast waits (queued) while the pit stop, the clear screen or the chest reveal is open: it used to cover their titles */
   const blocked=()=>['shop','stres','chest'].some(i=>{const o=document.getElementById(i);return !!o&&!o.hidden&&getComputedStyle(o).display!=='none';});
+  /* menufix: the toast sits in the first slot (top, then bottom) where no button, tab, card or input lies under it; if none is clear it waits (queued) */
+  const HIT='button,a[href],input,select,textarea,label,[role=button],[onclick],.go,.card,.tabs,.seg';
+  function mfFree(e){const r=e.getBoundingClientRect();if(!r.width)return false;for(let i=0;i<=6;i++)for(let j=0;j<=2;j++){const x=r.left+r.width*i/6,y=r.top+r.height*j/2,t=document.elementFromPoint(Math.min(innerWidth-1,Math.max(0,x)),Math.min(innerHeight-1,Math.max(0,y)));if(t&&t!==e&&t.closest(HIT))return false;}return true;}
+  function mfSlot(e){e.style.transition='none';let ok=false;for(const s of['mfTop','mfBot']){e.classList.remove('mfTop','mfBot');e.classList.add(s,'show');if(mfFree(e)){ok=true;break;}}
+    e.classList.remove('show');if(!ok)e.classList.remove('mfTop','mfBot');void e.offsetWidth;e.style.transition='';return ok;}
   function next(){if(!Q.length){showing=false;return;}showing=true;if(blocked()){setTimeout(next,400);return;}const a=Q.shift();
     let e=document.getElementById('achToast');
     if(!e){e=document.createElement('div');e.id='achToast';e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e);}
-    e.innerHTML='<span class="ab" style="--c:'+TC[a.t]+'">'+a.g+'</span><span><small>'+TN[a.t]+' ACHIEVEMENT</small><b>'+a.n+'</b></span>';
-    e.className='show';try{if(window.AU&&AU.sting)AU.sting('clear');}catch(x){}
-    setTimeout(()=>{e.className='';setTimeout(next,0);},2000);}
+    e.className='';e.innerHTML='<span class="ab" style="--c:'+TC[a.t]+'">'+a.g+'</span><span><small>'+TN[a.t]+' ACHIEVEMENT</small><b>'+a.n+'</b></span>';
+    if(RET.menufix&&!mfSlot(e)){Q.unshift(a);setTimeout(next,500);return;}
+    e.classList.add('show');try{if(window.AU&&AU.sting)AU.sting('clear');}catch(x){}
+    setTimeout(()=>{e.classList.remove('show');setTimeout(next,0);},2000);}
   /* ---- unlocks ---- */
   function check(silent){if(!on)return[];const got=[];
     for(const a of A){if(D.a[a.id])continue;let ok=false;try{ok=!!a.f();}catch(e){}
@@ -7716,6 +7724,8 @@ RET.st=(function(on){
   if(on){const st=document.createElement('style');st.textContent=`
 #achToast{position:fixed;left:50%;top:max(10px,env(safe-area-inset-top));transform:translate(-50%,-14px);z-index:99998;display:flex;gap:10px;align-items:center;max-width:min(92vw,360px);padding:8px 14px 8px 8px;border-radius:12px;background:#0b0618ee;border:1px solid #ffd23d;color:#fff;font:600 14px/1.25 var(--mono);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
 #achToast.show{opacity:1;transform:translate(-50%,0)}
+#achToast.mfBot{top:auto;bottom:max(14px,env(safe-area-inset-bottom));transform:translate(-50%,14px)}#achToast.mfBot.show{transform:translate(-50%,0)}
+.ab:empty::after{content:'';width:14px;height:14px;border-radius:50%;background:var(--c)}.ab:empty{font-size:0}
 @media (prefers-reduced-motion:reduce){#achToast{transition:none;transform:translate(-50%,0)}}
 #achToast small{display:block;color:#ffd23d;font-size:14px}#achToast b{font-size:16px}
 .ab{flex:none;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid var(--c);background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--c) 55%,#000),#120a22);color:#fff;font:700 20px/1 var(--mono);overflow:hidden}
@@ -14678,7 +14688,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='00e1345f67 2026-10-21 22:33 UTC';
+const NR_STAMP='a04c20f267 2026-10-21 22:47 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -15574,6 +15584,48 @@ if(RET.tidy&&RET.hub)setTimeout(()=>{
   RET.tidyJump=g=>{if(g!=='da')return false;go('more');return true;};   // the hub doors for saves / export / update check land on the MORE page, where those controls live
   window.__tidy={go,run,page:()=>cur,MAIN,ASSIST,MORE};   // test hook
 },0);
+
+// PURPOSE: HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 px phone); the other menu defects of review 8 live in stats.js (toast slot, achievement glyphs), map.js and ret.js (glyphs)
+// FLAG: menufix (?menufix=0)
+// TEST: menufix-test.js
+/* ---------- MENUFIX (flag RET.menufix, default ON; ?menufix=0 = the old HANGAR with ten tabs). Review 8, fix list 13: the HANGAR tab row had ten tabs and a PICK button in a scroller,
+   labels were cut at 375 px. Now the row holds SHIP, WEAPONS, FORGE, PILOT, UPGRADES and one MORE button; MORE opens a sheet titled "MORE IN HANGAR" with ABILITY, CREW, LOOKS, LOAD, SHOP
+   and PICK WEAPONS (each button clicks the original tab, so every id and hook keeps working). The original buttons stay in the row, hidden. ---------- */
+(function(){
+if(!RET.menufix||!RET.hub||typeof garageEl==='undefined')return;
+document.documentElement.classList.add('mfx');
+const st=document.createElement('style');st.textContent=`
+html.mfx #garage.gfx .tabs{overflow:visible!important;gap:4px!important;flex-wrap:nowrap!important;-webkit-mask-image:none!important;mask-image:none!important}
+html.mfx #garage .tabs button.hubSec,html.mfx #garage .tabs .hubMoreL{display:none!important}
+html.mfx #garage .tabs button:not(.hubSec){flex:1 1 auto!important;min-width:0!important;padding:0 4px!important;font-size:13px!important;letter-spacing:0!important;white-space:nowrap;overflow:hidden}
+#mfSheet{position:fixed;inset:0;z-index:60;background:#05020fd9;display:flex;align-items:flex-end;justify-content:center}
+#mfSheet[hidden]{display:none}
+#mfSheet .mfBox{width:min(100%,420px);box-sizing:border-box;padding:14px 12px calc(14px + env(safe-area-inset-bottom));background:#120a26;border:1px solid #3a2b5c;border-radius:16px 16px 0 0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#mfSheet h2{grid-column:1/-1;margin:0 0 2px;font:700 14px var(--display);letter-spacing:.14em;color:var(--dim)}
+#mfSheet button{min-height:48px;font-size:14px;letter-spacing:.04em}
+#mfSheet .mfX{grid-column:1/-1}
+`;document.head.appendChild(st);
+const tabs=garageEl.querySelector('.tabs'),NAMES={abil:'ABILITY',crew:'CREW',looks:'LOOKS',load:'LOAD',mkt:'SHOP'},ML=['abil','crew','looks','load','mkt'];
+const more=document.createElement('button');more.type='button';more.id='mfMore';more.className='go dim';more.textContent='MORE';more.setAttribute('aria-haspopup','dialog');
+const sheet=document.createElement('div');sheet.id='mfSheet';sheet.hidden=true;sheet.setAttribute('role','dialog');sheet.setAttribute('aria-label','More in the hangar');
+const box=document.createElement('div');box.className='mfBox';const h=document.createElement('h2');h.textContent='MORE IN HANGAR';box.append(h);
+const shut=()=>{sheet.hidden=true;more.setAttribute('aria-expanded','false');};
+function item(label,id,go){const b=document.createElement('button');b.type='button';b.className='go dim';b.id=id;b.textContent=label;b.addEventListener('click',()=>{shut();go();});box.append(b);}
+const orig=t=>tabs.querySelector('button[data-t="'+t+'"]');
+for(const t of ML)item(NAMES[t],'mfI_'+t,()=>{const o=orig(t);if(o)o.click();});
+item('PICK WEAPONS','mfI_pick',()=>{const w=$('hubWpPick');if(w)w.click();});
+const x=document.createElement('button');x.type='button';x.className='go alt mfX';x.id='mfClose';x.textContent='CLOSE';x.addEventListener('click',shut);box.append(x);
+sheet.append(box);let t0=0;   // the game turns a touch into a click at once and the browser sends its own a moment later: that second click must not hit what just appeared
+sheet.addEventListener('click',e=>{if(e.target!==sheet)return;if(performance.now()-t0>=450)shut();},true);garageEl.append(sheet);
+more.addEventListener('click',()=>{if(!sheet.hidden)return;t0=performance.now();sheet.hidden=false;more.setAttribute('aria-expanded','true');$('mfI_'+(ML.includes(GA.tab)?GA.tab:'abil')).focus();});
+addEventListener('keydown',e=>{if(!sheet.hidden&&e.code==='Escape'){shut();e.stopImmediatePropagation();e.preventDefault();}},true);
+function draw(){const ml=tabs.querySelector('.hubMoreL');if(more.parentNode!==tabs||(ml&&more.nextSibling!==ml))tabs.insertBefore(more,ml||null);
+  more.classList.toggle('on',ML.includes(GA.tab));}
+{let busy=0;new MutationObserver(()=>{if(busy)return;busy=1;draw();busy=0;}).observe(tabs,{childList:true});}
+{const g1=gaDraw;gaDraw=function(){const r=g1.apply(this,arguments);draw();return r;};}
+{const old=window.__hub;if(old)old.mfShut=shut;}
+window.__menufix={sheet:()=>sheet,shut};
+})();
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
 function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;
