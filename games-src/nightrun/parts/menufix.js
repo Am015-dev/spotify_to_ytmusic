@@ -22,20 +22,20 @@ const tabs=garageEl.querySelector('.tabs'),NAMES={abil:'ABILITY',crew:'CREW',loo
 const more=document.createElement('button');more.type='button';more.id='mfMore';more.className='go dim';more.textContent='MORE';more.setAttribute('aria-haspopup','dialog');
 const sheet=document.createElement('div');sheet.id='mfSheet';sheet.hidden=true;sheet.setAttribute('role','dialog');sheet.setAttribute('aria-label','More in the hangar');
 const box=document.createElement('div');box.className='mfBox';const h=document.createElement('h2');h.textContent='MORE IN HANGAR';box.append(h);
-const shut=()=>{sheet.hidden=true;more.setAttribute('aria-expanded','false');};
-function item(label,id,go){const b=document.createElement('button');b.type='button';b.className='go dim';b.id=id;b.textContent=label;b.addEventListener('click',()=>{shut();go();});box.append(b);}
+const mfShut=()=>{sheet.hidden=true;more.setAttribute('aria-expanded','false');};
+function item(label,id,go){const b=document.createElement('button');b.type='button';b.className='go dim';b.id=id;b.textContent=label;b.addEventListener('click',()=>{mfShut();go();});box.append(b);}
 const orig=t=>tabs.querySelector('button[data-t="'+t+'"]');
 for(const t of ML)item(NAMES[t],'mfI_'+t,()=>{const o=orig(t);if(o)o.click();});
 item('PICK WEAPONS','mfI_pick',()=>{const w=$('hubWpPick');if(w)w.click();});
-const x=document.createElement('button');x.type='button';x.className='go alt mfX';x.id='mfClose';x.textContent='CLOSE';x.addEventListener('click',shut);box.append(x);
+const x=document.createElement('button');x.type='button';x.className='go alt mfX';x.id='mfClose';x.textContent='CLOSE';x.addEventListener('click',mfShut);box.append(x);
 sheet.append(box);let t0=0;   // the game turns a touch into a click at once and the browser sends its own a moment later: that second click must not hit what just appeared
-sheet.addEventListener('click',e=>{if(e.target!==sheet)return;if(performance.now()-t0>=450)shut();},true);garageEl.append(sheet);
+sheet.addEventListener('click',e=>{if(e.target!==sheet)return;if(performance.now()-t0>=450)mfShut();},true);garageEl.append(sheet);
 more.addEventListener('click',()=>{if(!sheet.hidden)return;t0=performance.now();sheet.hidden=false;more.setAttribute('aria-expanded','true');$('mfI_'+(ML.includes(GA.tab)?GA.tab:'abil')).focus();});
-addEventListener('keydown',e=>{if(!sheet.hidden&&e.code==='Escape'){shut();e.stopImmediatePropagation();e.preventDefault();}},true);
-function draw(){const ml=tabs.querySelector('.hubMoreL');if(more.parentNode!==tabs||(ml&&more.nextSibling!==ml))tabs.insertBefore(more,ml||null);
+addEventListener('keydown',e=>{if(!sheet.hidden&&e.code==='Escape'){mfShut();e.stopImmediatePropagation();e.preventDefault();}},true);
+function mfDraw(){const ml=tabs.querySelector('.hubMoreL');if(more.parentNode!==tabs||(ml&&more.nextSibling!==ml))tabs.insertBefore(more,ml||null);
   more.classList.toggle('on',ML.includes(GA.tab));}
-{let busy=0;new MutationObserver(()=>{if(busy)return;busy=1;draw();busy=0;}).observe(tabs,{childList:true});}
-{const g1=gaDraw;gaDraw=function(){const r=g1.apply(this,arguments);draw();return r;};}
-{const old=window.__hub;if(old)old.mfShut=shut;}
-window.__menufix={sheet:()=>sheet,shut};
+{let busy=0;new MutationObserver(()=>{if(busy)return;busy=1;mfDraw();busy=0;}).observe(tabs,{childList:true});}
+{const g1=gaDraw;gaDraw=function(){const r=g1.apply(this,arguments);mfDraw();return r;};}
+{const old=window.__hub;if(old)old.mfShut=mfShut;}
+window.__menufix={sheet:()=>sheet,mfShut};
 })();
