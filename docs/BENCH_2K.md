@@ -22,3 +22,9 @@ Overall visual parity: about 3.8/10 (mean of the six views).
 5. **Street life is too small and too far.** Minifigs and props sit back from the kerb and are small at chase-cam distance. Pull bigger props and minifig groups to the kerb on core streets (ties to the cl-L1/L2 lanes).
 
 Separate from looks, and higher priority (Alex's 4.5/100): invisible cars and driving through buildings. That acceptance list is being sent to the solid-cars / solid-buildings lanes.
+
+## First 120 s of a fresh PLAY (phone 852x393, gas held, 2 s polls)
+- Frankfurt (`shots/bench/first120_fra.jpg`): loading card (credits), "Hold GAS · steer" pill, BOOST + BRICKBASH meter once moving, objective line cycling Stud Rush → **Garage → 52 m** → Takedown → ramp ring, **"Garage · TAP TO OPEN" prompt that stays up while driving at 88-134 km/h**, "+COMBO ×2", **"WRONG VEHICLE FOR DIRT ⟳" with an automatic switch to the buggy**, a 3D beacon ring, then (~185 s) the STUD RUSH timer panel and the "OSTEND 0% COMPLETE" area banner.
+- Athens (`shots/bench/first120_ath_storycard.jpg`): a **modal text-wall story card ("CHAPTER 1 · WELCOME TO ATHENS", Eleni Mavrou, CONTINUE ▶) blocks play for the whole 120 s**; drive-first only covers Frankfurt.
+- A 2K Drive player would not see: the Athens text wall, the garage prompt at speed, the forced vehicle swap toast, auto-routing to the Garage, and the always-on objective/area text.
+- Note: a player page ignores ?city=ath; the city comes from localStorage mho_city@<slot>.
