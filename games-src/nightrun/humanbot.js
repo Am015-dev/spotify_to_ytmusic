@@ -84,14 +84,14 @@ const BOT = (o) => {
     if (tapAt >= 0 && bp >= tapAt) { m.press('Fire'); tapAt = -1; }
     const G = m.G;
     for (const e of G.en) { let r = rec.get(e); if (!r) { r = { ty: e.type + (e.el ? '*' : ''), in: -1, end: -1, boss: e.type === 'boss', mini: !!e.mini }; rec.set(e, r); } if (r.in < 0 && e.x < 960 - (e.r || 14)) r.in = G.t; }
-    m.step(dt); i++;
+    m.step(dt); i++; if (window.__rec) window.__rec(m, i);   // optional recorder (pacing-test.js)
     for (const [e, r] of rec) if (r.end < 0 && (e.dead || !m.G.en.includes(e))) { r.end = m.G.t; r.killed = e.hp <= 0; }
     if (m.ST.over || m.G.dead) { cleared = !!m.ST.over && !m.G.dead; break; }
   }
   const life = []; for (const [e, r] of rec) { if (r.boss || r.mini || !r.killed || r.in < 0 || r.end - r.in <= 0) continue; life.push([r.ty, +(r.end - r.in).toFixed(2)]); }
   let sp = 0, lk = 0, lw = 0; for (const [e, r] of rec) { if (r.boss || r.mini || !LK || !(LK.weight(e) > 0)) continue; sp++; if (e.lkd) { lk++; lw += LK.weight(e); } }
   if (o.endless) cleared = window.ENDR.w >= n && !m.G.dead;
-  const res = { w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0) };
+  const res = { px: window.__recOut ? window.__recOut(m) : null, w: o.endless ? window.ENDR.w : 0, wt: window.__wt, sp, lk, lw, hl: window.HOLD ? window.HOLD.stat() : null, n, build, bot, clear: cleared, dead: !!m.G.dead, t: +m.G.t.toFixed(1), hits: o.endless ? 0 : m.ST.hits, life, emp: m.ST.emps || (window.ABIL ? window.ABIL.stat.emp - e0 : 0) };
   m.abort(); return res;
 };
 (async () => {

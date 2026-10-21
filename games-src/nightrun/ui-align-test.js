@@ -200,7 +200,7 @@ const SCREENS = [
     };
     for (const [name, setup, mode] of SCREENS) {
       if (ONLY && !ONLY.some(o => name.startsWith(o))) continue;
-      if (name === 'garage-tabs') { for (const tab of ['ships', 'crew', 'looks', 'load', 'mkt', 'pilot']) { if (ONLY && !ONLY.some(o => 'garage-tabs'.startsWith(o) || ('garage-' + tab).startsWith(o))) continue;
+      if (name === 'garage-tabs') { for (const tab of ['ships', 'crew', 'looks', 'load', 'mkt', 'forge', 'pilot']) { if (ONLY && !ONLY.some(o => 'garage-tabs'.startsWith(o) || ('garage-' + tab).startsWith(o))) continue;
           await run('garage-' + tab, async p => { await p.click('#gaBtn'); await sleep(400); const b = await p.$(`#garage .tabs button[data-t="${tab}"]`); if (!b) throw new Error('no garage tab ' + tab); await b.click(); await sleep(500); }); } continue; }
       await run(name, setup, mode);
     }
