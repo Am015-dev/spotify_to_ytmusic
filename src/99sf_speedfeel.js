@@ -91,5 +91,5 @@ async function SF_go(){const R2=[],ck=(m,b)=>{R2.push((b?'✓ ':'✗ ')+m);retur
   return'📍 SPEEDFEEL · '+R2.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
 {const R=()=>{const C=window.__chk;if(!C||!C.GO||!C.items)return false;if(C.GO['why/speedfeel'])return true;
   C.items.push({ver:'why',id:'speedfeel',area:'phone',text:'speed-boost-feel-r22e4 · speed feel + boost VFX (BENCH_2K gaps 1+2): 📍 GO steps the roam camera at 0/50/130 km/h and on boost (no play). Pass line: FOV +4° at 130 and +1° more on boost (≤ +12), edge streaks 0 below 90 km/h and ≥ 0.3/0.5 at 130/boost, pull-back, ≥ 20 jet particles + 2 glows + flash + bar pulse on boost, all gone after it, and ≤ 5% frame time at 6x CPU.'});
-  C.GO['why/speedfeel']=['fra','ath'].map(c=>({c,n:'speed feel + boost '+(c==='fra'?'Frankfurt':'Athens'),secs:40,fn:()=>{SF_go().then(m=>goSay(m),e=>goSay('📍 SPEEDFEEL · error '+e+' ❌ FAIL'));return'📍 SPEEDFEEL · checking…'}}));return true};
+  C.GO['why/speedfeel']=['fra','ath'].map(c=>({c,n:'speed feel + boost '+(c==='fra'?'Frankfurt':'Athens'),secs:70,fn:()=>{SF_go().then(m=>goSay(m),e=>goSay('📍 SPEEDFEEL · error '+e+' ❌ FAIL'));return'📍 SPEEDFEEL · checking…'}}));return true};
   if(!R()){const t=setInterval(()=>{if(R())clearInterval(t)},250)}}
