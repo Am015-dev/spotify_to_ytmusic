@@ -237,3 +237,6 @@ setTimeout(()=>{if(!RET.sprites)return;for(const n of['drift','lancer','nova'])A
 SPR.warmBoss=nm=>{for(const a of['idle','attack','hit','defeat'])ART.anim('boss-'+nm+'/'+a);ART.anim('fx-boom-boss-a/burst');ART.anim('fx-boom-boss-b/burst');SPR.warmFx();};
 NR.on('tick',()=>{if(!RET.sprites||!G.live)return;const b=G.boss;if(b&&!b._sl){b._sl=1;const nm=ART.bossN[ART.artK(b)];if(nm)SPR.warmBoss(nm);}      // a boss on screen: its sheets start loading the moment it spawns, two seconds before it stops
   if(G.di===SPR._di)return;SPR._di=G.di;const nm=ART.bossN[DISTRICTS[G.di].boss];if(nm)setTimeout(()=>SPR.warmBoss(nm),3500);});
+/* review 9 fix 6 (E02): the 2 s spawn grace made drawPlayer blink the whole ship (6 Hz, half the frames hidden), so a new run showed only the ring, dot and flame. The grace stays; only a real hit blinks. */
+NR.on('hurt',()=>{ART.hitG=G;});
+{const dp=drawPlayer;drawPlayer=function(t){if(!(P&&P.inv>0)||ART.hitG===G||RET.shipBlink)return dp.apply(this,arguments);const v=P.inv;P.inv=0;try{return dp.apply(this,arguments);}finally{P.inv=v;}};}
