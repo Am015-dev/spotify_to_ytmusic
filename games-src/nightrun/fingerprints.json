@@ -1,20 +1,20 @@
 {
  "fly2": {
   "state": "e77f6b3d892d05da",
-  "draw": "c2e76be5b254f769",
+  "draw": "ff7d30b60b9c5691",
   "frames": 1800,
   "samples": 30,
   "rng": 2310,
-  "dcalls": 329,
+  "dcalls": 337,
   "end": null
  },
  "endless10": {
   "state": "0c70d49960293c11",
-  "draw": "10e2fad539bb06a8",
+  "draw": "91bf5ee95534683a",
   "frames": 1800,
   "samples": 30,
   "rng": 2845,
-  "dcalls": 392,
+  "dcalls": 415,
   "end": null
  },
  "street": {
@@ -28,47 +28,47 @@
  },
  "fly6": {
   "state": "8b0847e5d289328a",
-  "draw": "fce04df0ecf40969",
+  "draw": "c628e6bcd71abf8d",
   "frames": 1800,
   "samples": 30,
   "rng": 1539,
-  "dcalls": 308,
+  "dcalls": 320,
   "end": null
  },
  "fly10": {
   "state": "5ead12e78637bc52",
-  "draw": "847e9835a24cba73",
+  "draw": "6729fd4fff0e5ad8",
   "frames": 1800,
   "samples": 30,
   "rng": 2872,
-  "dcalls": 305,
+  "dcalls": 315,
   "end": null
  },
  "fly14": {
   "state": "00746b080c1e14ee",
-  "draw": "92a0a4e491fd8921",
+  "draw": "08f4f550dd9877ba",
   "frames": 1800,
   "samples": 30,
   "rng": 3708,
-  "dcalls": 372,
+  "dcalls": 388,
   "end": null
  },
  "boss": {
   "state": "2d33618c1babdfdf",
-  "draw": "e94d91815ec9e9b6",
+  "draw": "1afde4f4058f9422",
   "frames": 1800,
   "samples": 30,
   "rng": 3309,
-  "dcalls": 226,
+  "dcalls": 227,
   "end": "boss on screen 1680 frames"
  },
  "legend10": {
-  "state": "fea86abe831c7fab",
-  "draw": "d67752da0b3599e2",
+  "state": "b60f3c336b70d11e",
+  "draw": "0abe6bdaf9eb566d",
   "frames": 1752,
   "samples": 29,
-  "rng": 3128,
-  "dcalls": 250,
+  "rng": 3171,
+  "dcalls": 260,
   "end": "dead"
  }
 }
