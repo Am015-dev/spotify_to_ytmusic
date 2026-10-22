@@ -26,11 +26,13 @@ const SCN = () => {
   const parryNow = () => m.G.eb.some(b => b.cxM && (Math.hypot(b.x - m.P.x, b.y - m.P.y) - (b.r + 3)) / (Math.hypot(b.vx, b.vy) || 1) < .13);
   const wallNear = () => C.walls.find(w => w.warn <= 0 && !w.hit && !w.dash && w.x > m.P.x);
   const curtOn = () => C.walls.some(w => w.cur && w.warn <= 0 && w.x < 900);
+  const inWin = () => { const p = m.bpos(); return window.TIM && TIM.on ? Math.abs(p - Math.round(p)) * m.BT.spb * 1000 <= m.winMs() * TIM.PK - 15 : true; };   // W131: the good player dashes IN the beat window (as timing-test's beat bot); an off-beat dash costs the charges
+  const mkSoon = () => m.G.eb.some(b => b.cxM && (Math.hypot(b.x - m.P.x, b.y - m.P.y) - (b.r + 3)) / (Math.hypot(b.vx, b.vy) || 1) < .4);
   const run = (secs, mode, pump) => { const h0 = m.P.hp; let presses = { d: 0, e: 0 }, i = 0;
     while (i < secs * 60 && m.running) { pump && pump(i);
       const w = wallNear();
       if (mode === 'with' && w && w.x - m.P.x < 340) { m.touchTo(m.P.x + 120, m.P.y); m.P.dx = 1; m.P.dy = 0; } else dodge();
-      if (mode === 'with') { if ((parryNow() || (w && w.x - m.P.x < 45 && w.x - m.P.x > 0)) && window.ABIL.st().n >= 1 && m.P.dashT <= 0 && (!window.TIM || window.TIM.ready())) {   // W39: one press when a dash is ready (spam now runs the slower refill dry)
+      if (mode === 'with') { if (((inWin() && (mkSoon() || (w && w.x - m.P.x < 150))) || parryNow() || (w && w.x - m.P.x < 45 && w.x - m.P.x > 0)) && window.ABIL.st().n >= 1 && m.P.dashT <= 0 && (!window.TIM || window.TIM.ready())) {   // W39: one press when a dash is ready (spam now runs the slower refill dry)
         m.press('Dash'); presses.d++; } if (m.P.emp > 0 && (curtOn() || m.G.en.some(e => e.ctw && e.wsh && e.x < 900))) { m.press('Emp'); presses.e++; } }
       if (mode === 'rand') { if (rnd() < pump.rd) { m.press('Dash'); presses.d++; } if (m.P.emp > 0 && rnd() < pump.re) { m.press('Emp'); presses.e++; } }
       if (i % 15 === 0) m.press('Fire');
@@ -81,7 +83,8 @@ const OFF = () => { const m = window.__mnr, C = window.CTR; m.SET.diff = 'normal
     const cmp = (k, label) => { const a = o[k].without, b = o[k].with; line(a.lost >= b.lost + 2 && a.lost >= 2 * Math.max(1, b.lost), `${label}: hull lost without ${a.lost}, with the timed answer ${b.lost} (${JSON.stringify(b.d)} / ${JSON.stringify(a.d)})`); };
     cmp('seek', 'SEEKER (parry dash)'); cmp('wall', 'LASER WALL (dash through)'); { const a = o.curt.without, b = o.curt.with; line(a.d.curtHit >= b.d.curtHit + 3, `CURTAIN (EMP): curtain hits without ${a.d.curtHit}, with the timed EMP ${b.d.curtHit} (hull lost ${a.lost} vs ${b.lost}; the rest is Hard's anti-camping)`); }
     line(o.ward.without.t >= 2 * o.ward.with.t && o.ward.with.strip > 0, `WARDEN (EMP strip): time to kill ${o.ward.without.t} s without EMP, ${o.ward.with.t} s with (${o.ward.with.strip} strips)`);
-    line(o.combo.pair.combo === 1 && o.combo.pair.dmg >= o.combo.emp.dmg + 30, `COMBO dash->EMP: damage ${o.combo.pair.dmg} vs EMP alone ${o.combo.emp.dmg}`);
+    line(o.combo.pair.combo === 1 && o.combo.pair.dmg >= o.combo.emp.dmg + 10,   // W131: 5 foes x 30 hull cap the pair at 150 and EMP alone does 125-135, so +30 was unreachable
+       `COMBO dash->EMP: damage ${o.combo.pair.dmg} vs EMP alone ${o.combo.emp.dmg}`);
     line(o.timing.waste === 1 && o.timing.good === 1 && o.timing.hot, `EMP timing: empty screen = wasted (${o.timing.waste}), curtain = good (${o.timing.good}), button pulse ${o.timing.hot}`);
     line(o.vent, `DASH vents an overheat (${o.vent})`);
     line(o.mix.rand >= o.mix.timed + 2 && o.mix.rand >= 1.5 * o.mix.timed, `random presses lose ${o.mix.rand} hull (${o.mix.rpress} dashes), timed lose ${o.mix.timed} (${o.mix.tpress.d} dashes, ${o.mix.tpress.e} EMP)`);
