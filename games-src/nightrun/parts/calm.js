@@ -11,7 +11,7 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:6,TMAX:2.
   /* css px per world unit under the current transform */
   css(){const t=ctx.getTransform(),c=ctx.canvas;return Math.hypot(t.a,t.b)*(c.clientWidth/c.width||1)||1;},
   isRule(a){return/^(RULE|NEW$|REMIX|TWIST)/.test(a||'');},
-  small(bn){return!!bn&&this.on&&!bn.warn&&(bn.sm||!!bn.ev);},
+  small(bn){return!!bn&&this.on&&(!!bn.sm||(!bn.warn&&!!bn.ev));},
   /* top-band strip: one line, under the score bar, off the middle of the field */
   draw(bn,w,h,k){const kk=bn.t,a=Math.max(0,Math.min(1,kk*3,(bn.m-kk)*6)),D=DISTRICTS[G.di],y=(G.boss&&G.boss.x<W?52:38)*k,hh=24*k;
     ctx.save();ctx.globalAlpha=a*.9;ctx.fillStyle='#05030cd0';ctx.fillRect(0,y,w,hh);ctx.fillStyle=D.a;ctx.fillRect(0,y,3*k,hh);ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='alphabetic';
@@ -31,7 +31,8 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:6,TMAX:2.
 /* ---- 1. banners: the rule card is small and short ---- */
 {const bn0=banner;banner=function(a,b,warn,t){const r=bn0.apply(this,arguments);
   if(RET.calm&&running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}
-  else if(RET.calm&&G&&G.banner&&!warn&&!G.banner.ev){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TTITLE);G.banner.t=G.banner.m=m;}   // review 9 #1: the stage title is a one-line chip for 2 s, not a 96 px band over live fire
+  else if(RET.calm&&G&&G.banner&&(!warn||a==='WARNUNG')&&!G.banner.ev){   // review 10 #4: the boss intro is the same chip (name + sub on one line)
+    G.banner.sm=1;const m=Math.min(t||3.2,CALM.TTITLE);G.banner.t=G.banner.m=m;}   // review 9 #1: the stage title is a one-line chip for 2 s, not a 96 px band over live fire
   return r;};}
 /* ---- 2. beams: thin and soft ---- */
 {const bb=FXW.bullet;FXW.bullet=function(b){if(!CALM.on||!b.wid)return bb.apply(this,arguments);const k='w-'+b.wid+'-bullet';if(!FXW.pic(k))return false;
