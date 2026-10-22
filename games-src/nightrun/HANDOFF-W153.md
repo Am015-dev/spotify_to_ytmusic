@@ -1,0 +1,7 @@
+# W153: stay (parts/stay.js, flag RET.stay, ?stay=0 = old). 22 Oct 2026
+
+Stages 7-20 and endless, Easy/Normal. Formation units: entry speed capped (crosses the screen in >= 6 s), wait off screen while 8 foes are on screen, one second pass if they would leave alive (pacing.js did this only for units that move themselves; a path unit was reset every frame, so it never looped). Non-path foes also wait off screen when 8 are present. Endless gets pacing's hold (ENDR zeroes PAC.hold). Director groups wait for a breather (<= 3 foes or 7 s) and for < 5 foes alive. Normal foe hull: +2 hits over pacing.js.
+
+Measured (stay-test.js, Normal, mid build, 3 runs, before -> after): leave alive 2.2/0/0/1.5% -> 0/0/0.5/0.4% (st 8/12/16/endless 6, gate <= 15% met); most on screen 12/14/11/23 -> 8/8/12/9 (gate 8: st 8 and 12 met); median on screen 2.9/2.8/2.4/2.6 s -> 2.8/2.8/2.5/2.8 s (gate >= 4 NOT met); bot clear 1/9 -> 2/9 (the 55-80% band is not reachable with this bot on stages 8-16 even before the change; fresh build 0/33/0%).
+
+Open: (1) median time on screen is the time to KILL (the human-model bot kills in ~2.8 s, foes have 5-9 hits), not a flyer leaving; 0% leave. Reaching 4 s would need sturdier or shielded foes (a visible rule), so left to the owner. (2) stage 16 peak 12 and endless 9: ground foes / zoo hover slots appear on screen without passing the entry gate; fix = defer zoo slots in zoo.js. (3) No phone screenshot looked at: no new visual (the second-pass ring is pacing.js's red ring).
