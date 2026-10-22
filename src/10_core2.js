@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.150',date:'22 Oct 2026',items:[{t:'FIXED',s:'No more invisible traffic cars on phones, and cars no longer change when you turn the camera away and back.'},{t:'FIXED',s:'You can no longer drive through a traffic car while it waits or turns at a junction.'},{t:'CHANGED',s:'PLAY now starts quiet in both cities: no story card in Athens, no prompts while you drive fast, and your car is never swapped for a buggy on dirt.'}]},
 {v:'v90m-beta.149',date:'22 Oct 2026',items:[{t:'FIXED',s:'More buildings are solid: a Frankfurt block and a tower you could drive into now stop you.'},{t:'FIXED',s:'Long LEGO fences now smash when you hit them, instead of letting you pass through.'}]},
 {v:'v90m-beta.148',date:'22 Oct 2026',items:[{t:'FIXED',s:'Roadside houses, apartments, churches and kiosks are solid now: you can no longer drive into them.'}]},
 {v:'v90m-beta.147',date:'21 Oct 2026',items:[{t:'FIXED',s:'Frankfurt loads more smoothly on phones: the ground-flattening step no longer freezes the loading screen.'}]},
