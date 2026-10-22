@@ -18,6 +18,8 @@ DEFS.mixr=true;if(SET.mixr===undefined)SET.mixr=true;
 if(RET.mix&&SET.music===.45&&SET.sfx===.8){SET.music=.7;SET.sfx=.5;}   // review 8 fix 3: the old defaults (music 45 / effects 80) become music 70 / effects 50; a changed slider stays
 DEFS.music=.7;DEFS.sfx=.5;
 const MIX=window.MIX={K:{mus:1.4,sfx:.5},CAP:6,TOT:4,
+  // per-sound trim in dB on top of the level in T (review 10 F02): a shot / hit alone sits at about -29 dBFS RMS at the output (target -30..-26), the longer sounds are trimmed so effects as a whole sit 6-10 dB under the music
+  TR:{shot:30,hit:35.5,graze:12,boom:9,pick:9,dash:9,heat:8,perfect:8,up:8,tier:8,hurt:5,emp:4,big:4,warn:4,phase:4},
   // id: [minimum gap s, most per rolling second, priority, voices it makes, level, length]
   T:{shot:[.5,2,1,1,.7,.9],graze:[.3,2,1,1,.7,.9],hit:[.4,2,2,1,.7,.9],pick:[.25,3,3,2,.7,.85],dash:[.2,3,3,2,.8,1],heat:[.4,2,3,1,.8,1],up:[.12,4,4,4,.8,1],tier:[.14,3,4,5,.75,1],
      perfect:[.14,4,4,1,.7,1],warn:[.5,2,5,6,.8,1],boom:[.07,5,5,2,.6,.75],hurt:[.3,3,6,2,.85,1],emp:[.5,2,6,2,.85,1],big:[.5,2,7,2,.8,1],phase:[.5,2,7,5,.85,1]},
@@ -74,7 +76,7 @@ if(RET.mix){
     if(!M.room(t,T[3],T[2]))return null;
     L.push(t);const crowd=Math.max(0,L.length-1),k=n==='boom'||n==='pick'||n==='hit'?1/Math.sqrt(1+.45*crowd):1;   // a crowd of the same sound is softer and shorter
     const i=M.rr[n]=((M.rr[n]|0)+1)%5,s=M.SEQ[i];
-    return{p:M.PP[s],v:T[4]*k*dbv(M.DB[s]),d:T[5]*(k<1?.8+.2*k:1),pr:T[2]};};
+    return{p:M.PP[s],v:T[4]*k*dbv(M.DB[s]+(M.TR[n]||0)),d:T[5]*(k<1?.8+.2*k:1),pr:T[2]};};
   AU.sfx=function(n){const a=this.a;if(!a||a.state!=='running'||SET.mute)return oSfx.apply(this,arguments);
     if(SET.mixr===false){M.cur={id:n,p:1,v:1,d:1,pr:(M.T[n]||[0,0,5])[2]};try{return oSfx.apply(this,arguments);}finally{M.cur=null;}}
     const t=a.currentTime,V=allow(n,t);if(!V){M.stat.drop++;return;}M.stat.play++;V.id=n;
