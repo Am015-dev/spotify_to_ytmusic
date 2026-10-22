@@ -1,7 +1,7 @@
 // ===== fair2 (lane H, 2026-10-17): fair race combat in the city duel (98tk_city_duel.js). Refs: docs/refs/fair_combat.md.
 // Before: every frame of contact cut the rival's speed 8 % (frame-rate dependent), so a player parked or crawling in front held a rival
 // to the blocker's pace, and a 2 s side hug took it from 76 to 46 km/h. There was no real takedown.
-// Now (?fair2=0 = old contact; a mode opts out with C.fair2=false or sp.fair2=false; the raceG takedown race (sp.td) keeps its own rules):
+// Now (?fair2=0 = old contact; a mode opts out with C.fair2=false or sp.fair2=false):
 //  - rivals are heavy: side or rear contact is a shove EVENT (cooldown FC2.cd s), at most FC2.shove of speed for either car, never per frame.
 //  - blocking does not hold: a rival with you ahead on its line steers around (dodge offset), and after FC2.blk s it ghosts through.
 //  - takedown = player ≥ 80 km/h AND (boost/turbo with closing speed ≥ 3 m/s, or closing speed ≥ FC2.hard): brick burst, +boost, KO feed.
@@ -10,7 +10,7 @@
 //  - rivals hitting you follow the same rules: a shove event, capped, never a wreck.
 const FC2={on:(()=>{try{return new URLSearchParams(location.search).get('fair2')!=='0'}catch(e){return true}})(),
  cd:.45,shove:.04,blk:1,down:1.2,ghost:1.5,cu:3,cuK:1.2,fcCd:8,hard:12,kmh:80,log:[]};
-function FC2_live(sp){return FC2.on&&!!sp&&!sp.td&&sp.fair2!==false&&!(sp.C&&sp.C.fair2===false)}   // sp.td = raceG takedown mode (98td_takedown.js) keeps its own rules
+function FC2_live(sp){return FC2.on&&!!sp&&sp.fair2!==false&&!(sp.C&&sp.C.fair2===false)}
 // timers + speed multiplier for this frame (0 while down)
 function FC2_pre(a,dt){for(const k of['down','ghost','cu','fcCd','bumpCd'])if(a[k]>0)a[k]=Math.max(0,a[k]-dt);
  if(a.fc2Down&&!(a.down>0)){a.fc2Down=0;a.v=Math.max(a.v,(a.vDown||0)*.85);a.ghost=FC2.ghost;a.cu=FC2.cu;a.g.visible=true;FC2.log.push({e:'back',n:a.name,t:+(RO.sp?RO.sp.t:0).toFixed(2)})}

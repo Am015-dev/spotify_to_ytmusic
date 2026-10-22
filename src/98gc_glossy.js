@@ -4,8 +4,8 @@
 // a hot sun disc and one thin bright band all round the sky at 28 deg (mirrored as a crisp line on spoiler/roof/bonnet edges from the chase or orbit
 // camera, whatever the heading). Paint keeps its own env intensity x .5 (ek), which cancels the clearcoat's extra sky sheen: measured on the body
 // (tools/tGloss2.js + glossStats.py, 852x393, fra day/dusk, phone and desktop) hue +-2 deg, saturation -2..-4 %, value +2 %.
-// Same PMREM size as buildEnv, no new shaders, materials or passes. Default OFF (?gloss=1 on): the gain is a thin line, not a clear win yet.
-const GL={P:{sun:24,sr:1.6,re:28,rw:2.5,rk:16,ek:.5},on:OD_FLAG('gloss'),tex:null,id:'',C:new Map(),n:0,ms:0,mats:new Set()};
+// Same PMREM size as buildEnv, no new shaders, materials or passes. Default ON since r22e33 (review #59 ruling); ?gloss=0 is the kill switch.
+const GL={P:{sun:24,sr:1.6,re:28,rw:2.5,rk:16,ek:.5},on:(()=>{const m=/[?&]gloss=([^&#]*)/.exec(location.search);return!m||m[1]!=='0'})(),tex:null,id:'',C:new Map(),n:0,ms:0,mats:new Set()};
 // r22e10: keyed on the mood id AND the key light (colour, intensity, direction, quantised), so a Frankfurt mood/time switch that keeps the id still rebuilds;
 // the last 4 envs stay cached (cycling day/dusk/night re-uses them, no PMREM churn)
 function GL_key(){const d=moonL.position.clone().normalize();return MOOD.id+'|'+moonL.color.getHexString()+'|'+Math.round(moonL.intensity)+'|'+[d.x,d.y,d.z].map(v=>Math.round(v*3)).join(',')+'|'+(lowGfx?1:0)}

@@ -13,11 +13,10 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,
   window.__drv=n=>{K.ArrowUp=true;for(let i=0;i<n;i++){K.ArrowLeft=((i/90|0)%3===0);roamStep(1/30)}K.ArrowUp=K.ArrowLeft=false}}`);
  const out=async n=>{const r=await ev(`__ph(${JSON.stringify(n)})`);console.log(JSON.stringify(r))};
  await ev(`__drv(1800)`);await out('roam60');
- const race=td=>`{if(window.TDR){TDR.on=${td};TDR.sel=${td};TDR.force=${td}}const mk=tkMarkOf(RIVAL_EV.find(e=>e.p===TK_C.p));tkStart(mk,TK_C);const sp=RO.sp;sp.cd=0;const bot=tkBot(tkGeoOf(TK_C).pA,{lag:.15});for(let k=0;k<8;k++){for(let i=0;i<150;i++){bot(sp);roamStep(1/30)}__tq.draw()}try{$('#spRes').hidden=true}catch(e){}RO.fin=false;if(RO.sp===sp)try{sprintEnd()}catch(e){}if(window.TDR){TDR.on=TDR.sel=TDR.force=false}__drv(300)}`;
+ const race=td=>`{const mk=tkMarkOf(RIVAL_EV.find(e=>e.p===TK_C.p));tkStart(mk,TK_C);const sp=RO.sp;sp.cd=0;const bot=tkBot(tkGeoOf(TK_C).pA,{lag:.15});for(let k=0;k<8;k++){for(let i=0;i<150;i++){bot(sp);roamStep(1/30)}__tq.draw()}try{$('#spRes').hidden=true}catch(e){}RO.fin=false;if(RO.sp===sp)try{sprintEnd()}catch(e){}__drv(300)}`;
  for(const ph of (PH||'roam,race,race,td,warp,warp,smash,garage,roam').split(',')){
   if(ph==='roam')await ev(`__drv(1800)`);
   if(ph==='race')await ev(race(false));
-  if(ph==='td')await ev(race(true));
   if(ph==='warp')await ev(`{const q=rfSnap(RO.x+(Math.random()-.5)*2400,RO.z+(Math.random()-.5)*2400,300);if(q)roamWarp(q[0],q[1],q[2]||0,true);RO.v=0;__drv(600)}`);
   if(ph==='smash')await ev(`{for(let k=0;k<6;k++){try{debris(V3(RO.x,RO.y+1,RO.z),V3(0,4,0),20,[new THREE.Color(0xff0000)],.8)}catch(e){}__drv(60)}__drv(300)}`);
   if(ph==='garage')await ev(`{try{gbOpen();gbClose(true)}catch(e){console.log('gb',e)}__drv(300)}`);

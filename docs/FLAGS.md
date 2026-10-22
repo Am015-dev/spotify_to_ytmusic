@@ -3,7 +3,7 @@
 Rule 11: a default-OFF flag lives at most 1 day, then it ships ON or is deleted. Shipped-ON features keep their `?x=0` kill switch.
 
 ## Preview build
-`tools/build.sh <ver> --preview` writes `out/<ver>-preview/` with `const OD_PREVIEW=true` (src/10_core.js). Every flag resolved through `OD_FLAG('name')` is ON there; an explicit `?name=0` (or `?cl=off`) still wins. It prints the list of flags it turned on (now: `cl.core cl.studs gloss td`). A new default-OFF flag MUST be read through `OD_FLAG('name')` (or `OD_FLAG('cl.key')` for `?cl=key`) so the preview picks it up.
+`tools/build.sh <ver> --preview` writes `out/<ver>-preview/` with `const OD_PREVIEW=true` (src/10_core.js). Every flag resolved through `OD_FLAG('name')` is ON there; an explicit `?name=0` (or `?cl=off`) still wins. It prints the list of flags it turned on (now: `cl.core cl.studs`). A new default-OFF flag MUST be read through `OD_FLAG('name')` (or `OD_FLAG('cl.key')` for `?cl=key`) so the preview picks it up.
 Publishing the preview is the coordinator's job (same chunks as the normal Beta artifact, from `out/<ver>-preview/`).
 
 ## Table
@@ -15,10 +15,10 @@ Publishing the preview is the coordinator's job (same chunks as the normal Beta 
 | `?bx` bowl rocking exit | 2026-10-22 r22e14 | OFF | same A/B as t9e | **DELETED** (ESC.rock.bx) |
 | `?t8f` hill fade near roads | terr-8 (2026-10) | OFF | HANDOFF_terr8: pits 96 -> 95, ath steep worse with a blend; nobody owns it | **DELETED** (TR8_fadeRoads + call) |
 | `?sfj` speed-streak shimmer | speed-boost-feel r22e4 | OFF | never measured; re-composites the layer every other frame (phone cost) | **DELETED** (SF.jit) |
-| `?gloss` glossy car paint | glossy-cars r22e5 / r22e10 | OFF | r22e10: phone hue +1.0 deg, sat -2.5 %, val +2.3 %; same programs, no extra draw calls; no review pass recorded yet | **ON-candidate, needs review** (in the preview) |
+| `?gloss` glossy car paint | glossy-cars r22e5 / r22e10 | **ON** | r22e10: phone hue +1.0 deg, sat -2.5 %, val +2.3 %; same programs, no extra draw calls; no review pass recorded yet | **SHIPPED ON** (r22e33, review #59); kill switch `?gloss=0` |
 | `?cl=core` Frankfurt core zone | cl-L1 (2026-10-22) | OFF | HANDOFF_cl-L1: props 2.4x denser inside, 10 cars within 150 m of spawn; x1.5 prop add not done | **ON-candidate, needs review** (in the preview) |
 | `?cl=studs` stud trail | cl-L3 (2026-10-22) | OFF | HANDOFF_cl-L3: 638 studs collected, gap 8 m, counter 14 px; trails thin head-on | **ON-candidate, needs review** (in the preview) |
-| `?td=1` Takedown race | raceG (2026-10) | OFF | HANDOFF_raceG: built + GO; waits for a release reviewer to play it | **ON-candidate, needs review** (in the preview) |
+| `?td=1` Takedown race | raceG (2026-10) | deleted | HANDOFF_raceG: built + GO; waits for a release reviewer to play it | **DELETED** (r22e33, review #59: red on phone, `starts Fraport Quick Race`): 98td_takedown.js, TD_go, GO raceG/takedown, checklist row |
 | `?cl=smash` | cl-L2 / smash-look r22e22 | **ON** in Frankfurt | shipped beta.154 | shipped ON, kill switch `?cl=nosmash` / `?cl=off` |
 | `?soab=1` typed-column HUB.bld | ios-r18w (2026-10-20) | OFF | HANDOFF_perf: no heap gain (171.9 vs 175.7 MB; old rows still alive) | **DELETE, pending**: module 98so_bld + GO perf/bld-soa in 99c7_rev5fix; own lane, no owner |
 | `?t6m=1` terr-6 grass fit | terr-6 / terr-7 | OFF | HANDOFF_terr7: boot regression, gap/pit GOs failed | **DELETE, pending**: tied to the QTC v5/v6 dumps (needs a QTC re-dump), own lane |
