@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.154',date:'22 Oct 2026',items:[{t:'NEW',s:'Frankfurt: smashing props now throws a wide fan of bricks and gold studs that arc over your car.'},{t:'CHANGED',s:'No more pop-up cards while you drive: level-ups and results are small notes, and events start only when you tap TAP TO START.'}]},
 {v:'v90m-beta.153',date:'22 Oct 2026',items:[{t:'FIXED',s:'No more invisible walls next to some Athens buildings: you can drive right up to them, and they now end at the roof.'}]},
 {v:'v90m-beta.152',date:'22 Oct 2026',items:[{t:'FIXED',s:'Traffic cars no longer jump, slide sideways or pop up while you can see them; cars that must respawn now do it behind you.'},{t:'FIXED',s:'Ground loads before the city appears on phones.'}]},
 {v:'v90m-beta.151',date:'22 Oct 2026',items:[{t:'NEW',s:'Speed feel: speed lines at the screen edges above 90 km/h, a wider view at speed, and a whoosh, flash and blue jets when you boost.'},{t:'FIXED',s:'Traffic cars stay the same when you turn the camera, and stuck or overlapping cars now clear away out of your sight.'},{t:'FIXED',s:'Less stutter on phones right after the city appears.'}]},
