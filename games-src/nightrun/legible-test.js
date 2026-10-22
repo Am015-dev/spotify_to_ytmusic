@@ -7,11 +7,12 @@
 //   1 enemies   per enemy: median luminance of its changed pixels vs median backdrop within 1.6 r; gate: median per scene >= 4.5:1, p25 >= 3:1 (review 9 E21)
 //   2 bullets   per bullet (changed pixels within 2 radii): the better of (bright p95 vs ring backdrop) and (dark outline p10 vs ring backdrop), 6 css px ring; gate: worst 10% per scene >= 3:1
 //   3 backdrop  backdrop-only canvas (captured right after the backdrop dim): gamma luma gradient over 1 css px, per 24 css px cell over the play band
-//               (middle 76% of the short side); busyness = p90 of the cells (the busy parts under the action); gate <= 0.010
+//               (middle 76% of the short side); busyness = p90 of the cells (the busy parts under the action); gate <= 0.015 (BUSY)
 //   4 colour    saturated pixels within 2 radii of each enemy bullet: >= 90% warm (270-60 deg); pickup / coin palette hues >= 30 deg from every bullet hue bucket; player shots 160-285 deg
 const PW = require(process.env.PW || 'playwright'), path = require('path'), fs = require('fs');
 const gx = require('../scripts/gx-serve.js');
 const FILE = path.resolve(process.argv[2] || path.resolve(__dirname, '../../games/mainhattan-nightrun/index.html')), ONLY = process.env.ONLY || '', SHOTS = process.env.SHOTS;
+const BUSY = .015;   // was .010 (22 Oct owner on a real phone: the city was invisible under a 75 % veil; the lighter veil, DIM .35 + BAND .3, needs the busy cells up to ~.014)
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let bad = 0; const ok = (n, p, i) => { if (!p) bad++; console.log((p ? 'PASS ' : 'FAIL ') + n + (i ? ' :: ' + i : '')); };
 const SCN = [['stage2', 'story', 2], ['stage6', 'story', 6], ['stage10', 'story', 10], ['stage14', 'story', 14], ['stage20', 'story', 20], ['boss', 'boss', 4], ['endless10', 'endless', 10]].filter(s => !ONLY || s[0].includes(ONLY));
@@ -66,7 +67,7 @@ const RUN = new Function('o', `
       for (let y = Math.max(0, y0 - pad); y <= Math.min(h - 1, y1 + pad); y++) for (let x = Math.max(0, x0 - pad); x <= Math.min(w - 1, x1 + pad); x++) { bl += L(Bb, (y * w + x) * 4); bn++; }
       if (sn >= 4) out.hue.push(Math.round(hue(sr / sn, sg / sn, sb / sn)[0])); }
     // per bullet: changed pixels inside 2 radii vs the ring just outside (6 css px)
-    for (const bu of eb) { const [cx, cy] = scr(bu.x, bu.y); if (cx < 8 || cy < 75 * dpr || cx > w - 8 || cy > h - 8) continue; /* not under the top HUD bar */ const rr = Math.max(4, bu.r * kk * 2), ro = rr + 6 * dpr, Ls = []; let bl = 0, bn = 0;
+    for (const bu of eb) { const [cx, cy] = scr(bu.x, bu.y); if (cx < 8 || cy < 75 * dpr || cx > w - 8 || cy > h - 8) continue; /* not under the top HUD bar */ const rr = Math.max(4, Math.max(bu.r * kk, m.RET.legible ? LGB.MINR * dpr : 0) * 2)   /* the drawn radius (legible.js size floor), not the hit radius */, ro = rr + 6 * dpr, Ls = []; let bl = 0, bn = 0;
       for (let y = Math.max(0, Math.round(cy - ro)); y <= Math.min(h - 1, Math.round(cy + ro)); y++) for (let x = Math.max(0, Math.round(cx - ro)); x <= Math.min(w - 1, Math.round(cx + ro)); x++) { const i = (y * w + x) * 4, dd = Math.hypot(x - cx, y - cy);
         if (dd <= rr) { if (Math.abs(A[i] - Bb[i]) + Math.abs(A[i + 1] - Bb[i + 1]) + Math.abs(A[i + 2] - Bb[i + 2]) > 60) { Ls.push(L(A, i)); const [hh, ss] = hue(A[i], A[i + 1], A[i + 2]); if (ss > .45 && Math.max(A[i], A[i + 1], A[i + 2]) > 90) { const kk2 = (bu.k || (bu.hm > 0 ? 'h' : 'o')) + Math.floor(hh / 30) * 30; out.kh = out.kh || {}; out.kh[kk2] = (out.kh[kk2] || 0) + 1; } } } else if (dd <= ro) { bl += L(Bb, i); bn++; } }
       if (Ls.length < 4 || !bn) continue; Ls.sort((a, b) => a - b); const bgL = bl / bn, bc = Math.max(cr(Ls[Math.floor(Ls.length * .95)], bgL), cr(Ls[Math.floor(Ls.length * .1)], bgL)); out.eb.push(bc); out.bN++;
@@ -114,7 +115,7 @@ const hd = (a, b) => { const d = Math.abs(a - b) % 360; return Math.min(d, 360 -
     ok(`${name}: enemies median >= 4.5:1`, !b.en.length || med(b.en) >= 4.5, f(med(b.en)) + ' (n ' + b.en.length + ')');
     ok(`${name}: enemies p25 >= 3:1`, !b.en.length || pct(b.en, .25) >= 3, f(pct(b.en, .25)) + ' (n ' + b.en.length + ')');
     ok(`${name}: enemy bullets worst 10% >= 3:1`, b.eb.length < 5 || pct(b.eb, .1) >= 3, f(pct(b.eb, .1)) + ' (n ' + b.eb.length + ')');
-    ok(`${name}: backdrop busyness under the play band <= 0.010`, b.busy.length && Math.max(...b.busy) <= .010, f3(Math.max(...b.busy, 0)));
+    ok(`${name}: backdrop busyness under the play band <= ${BUSY}`, b.busy.length && Math.max(...b.busy) <= BUSY, f3(Math.max(...b.busy, 0)));
     ok(`${name}: ?legible=0 draws nothing new`, !a.leg && !a.stat.en && !a.stat.halo && !a.stat.band, JSON.stringify(a.stat));
     ok(`${name}: no page errors`, !o.errs.length && !nw.errs.length, o.errs[0] || nw.errs[0] || '');
   }

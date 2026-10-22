@@ -213,7 +213,7 @@ function openSettings(from){setFrom=from;setEl.hidden=false;titleEl.hidden=true;
 function closeSettings(){stopCal();setEl.hidden=true;if(setFrom==='pause'){pauseEl.hidden=false;$('resumeBtn').focus();}else titleEl.hidden=false;}
 let defArmed=0;
 $('setDef').addEventListener('click',()=>{const b=$('setDef');if(!defArmed){defArmed=setTimeout(()=>{defArmed=0;b.textContent='DEFAULTS';},3000);b.textContent='TAP AGAIN TO RESET';return;}
-  clearTimeout(defArmed);defArmed=0;b.textContent='DEFAULTS';Object.assign(SET,DEFS,{v3:1});saveSet();applySet();syncSet();});
+  clearTimeout(defArmed);defArmed=0;b.textContent='DEFAULTS';Object.assign(SET,DEFS,{v3:1,afv:1});saveSet();applySet();syncSet();});
 // latency test: clicks on the audio clock, 8 taps, the median lateness becomes the Audio sync
 function stopCal(){calStop();$('calBox').classList.remove('on');$('calBtn').textContent='TAP TEST';}
 function toggleCal(){if($('calBox').classList.contains('on')){stopCal();return;}AU.unlock();calStart();$('calBox').classList.add('on');$('calBtn').textContent='CLOSE';calUI();}

@@ -96,7 +96,7 @@ ART.paintBG=(bg,t,scroll)=>{const D=bg.D,di=DISTRICTS.indexOf(D);bg._p=false;if(
   ART.tiles(mid,H-30-mid.h,scroll,.3,.88);
   ART.tiles(nr,H-nr.h,scroll,1.1,.92);bg._p=true;return true;};
 ART.paintP=(bg,scroll)=>{const di=DISTRICTS.indexOf(bg.D);if(!ART.bm['bg-'+ART.dn[di]+'-phone'])ART.warm(di);const o=ART.bgOf(di,true,VS,PW_,PH_,.5);if(!o)return false;
-  const off=(scroll*.1)%(2*PH_),j0=Math.floor(off/PH_);
+  const off=(scroll*(RET.legible&&window.LGB?LGB.PX.base:.1))%(2*PH_),j0=Math.floor(off/PH_);
   for(let j=j0;j*PH_-off<PH_;j++){const y=PH_-(j*PH_-off)-PH_;      // moves down the screen like the roofs
     if(j&1){ctx.save();ctx.translate(0,y+PH_);ctx.scale(1,-1);ctx.drawImage(o.c,0,0,PW_,PH_);ctx.restore();}else ctx.drawImage(o.c,0,y,PW_,PH_);}
   return true;};
