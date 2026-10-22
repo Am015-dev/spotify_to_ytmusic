@@ -4,7 +4,7 @@
 //   env: ONLY=<scene substring>  SHOTS=<dir> saves one phone frame per scene (keep them out of git)
 // Phone 390x763 DPR 2, Normal, god mode, hand-stepped sim; stages 2 6 10 14 20, a boss, endless wave 10; each scene measured on 3 frozen frames, both ?legible=0 and default.
 // The same frozen frame is rendered three times (all / no enemy bullets / no enemies); pixels that change are that layer, the other render is its local backdrop.
-//   1 enemies   per enemy: median luminance of its changed pixels vs median backdrop within 1.6 r; gate: median per scene >= 3:1
+//   1 enemies   per enemy: median luminance of its changed pixels vs median backdrop within 1.6 r; gate: median per scene >= 4.5:1, p25 >= 3:1 (review 9 E21)
 //   2 bullets   per bullet (changed pixels within 2 radii): the better of (bright p95 vs ring backdrop) and (dark outline p10 vs ring backdrop), 6 css px ring; gate: worst 10% per scene >= 3:1
 //   3 backdrop  backdrop-only canvas (captured right after the backdrop dim): gamma luma gradient over 1 css px, per 24 css px cell over the play band
 //               (middle 76% of the short side); busyness = p90 of the cells (the busy parts under the action); gate <= 0.010
@@ -53,7 +53,7 @@ const RUN = new Function('o', `
     for (const e of en) { const [cx, cy] = scr(e.x, e.y); if (cx < 8 || cy < 8 || cx > w - 8 || cy > h - 8) continue; const r = Math.max(6, (e.r || 14) * kk * 1.4), ls = [], bs = [];
       for (let y = Math.max(0, Math.round(cy - r * 1.6)); y <= Math.min(h - 1, Math.round(cy + r * 1.6)); y++) for (let x = Math.max(0, Math.round(cx - r * 1.6)); x <= Math.min(w - 1, Math.round(cx + r * 1.6)); x++) { const i = (y * w + x) * 4, dd = (x - cx) ** 2 + (y - cy) ** 2;
         if (dd <= r * r && Math.abs(A[i] - Be[i]) + Math.abs(A[i + 1] - Be[i + 1]) + Math.abs(A[i + 2] - Be[i + 2]) > 40) ls.push(L(A, i)); bs.push(L(Be, i)); }
-      if (ls.length < 12) continue; ls.sort((a, b) => a - b); bs.sort((a, b) => a - b); out.en.push(cr(ls[Math.floor(ls.length * .5)], bs[Math.floor(bs.length * .5)])); out.eN++; }
+      if (ls.length < 12) continue; ls.sort((a, b) => a - b); bs.sort((a, b) => a - b); const ec = cr(ls[Math.floor(ls.length * .5)], bs[Math.floor(bs.length * .5)]); out.en.push(ec); out.eN++; if (ec < 3) (out.elo = out.elo || []).push([+ec.toFixed(2), e.type + (e.fk ? ':' + e.fk : ''), Math.round(e.x), Math.round(e.y), ls.length, +ls[Math.floor(ls.length * .5)].toFixed(3), +bs[Math.floor(bs.length * .5)].toFixed(3), e.vz ? 1 : 0, e._lg || 0, Math.round(cx), Math.round(cy), Math.round(r), [0, .5, .9, 1.2].map(q => { const i = (Math.round(cy) * w + Math.round(cx + q * r)) * 4; return [A[i], A[i + 1], A[i + 2], Be[i], Be[i + 1], Be[i + 2]].join('/'); }).join(' '), e.r, e.hp, e.st || e.mode || '']); }
     // 2 bullets: connected blobs of changed pixels (A vs Bb)
     const mask = new Uint8Array(w * h); for (let i = 0; i < w * h; i++) { const k = i * 4; if (Math.abs(A[k] - Bb[k]) + Math.abs(A[k + 1] - Bb[k + 1]) + Math.abs(A[k + 2] - Bb[k + 2]) > 60) mask[i] = 1; }
     const st = [];
@@ -70,6 +70,7 @@ const RUN = new Function('o', `
       for (let y = Math.max(0, Math.round(cy - ro)); y <= Math.min(h - 1, Math.round(cy + ro)); y++) for (let x = Math.max(0, Math.round(cx - ro)); x <= Math.min(w - 1, Math.round(cx + ro)); x++) { const i = (y * w + x) * 4, dd = Math.hypot(x - cx, y - cy);
         if (dd <= rr) { if (Math.abs(A[i] - Bb[i]) + Math.abs(A[i + 1] - Bb[i + 1]) + Math.abs(A[i + 2] - Bb[i + 2]) > 60) { Ls.push(L(A, i)); const [hh, ss] = hue(A[i], A[i + 1], A[i + 2]); if (ss > .45 && Math.max(A[i], A[i + 1], A[i + 2]) > 90) { const kk2 = (bu.k || (bu.hm > 0 ? 'h' : 'o')) + Math.floor(hh / 30) * 30; out.kh = out.kh || {}; out.kh[kk2] = (out.kh[kk2] || 0) + 1; } } } else if (dd <= ro) { bl += L(Bb, i); bn++; } }
       if (Ls.length < 4 || !bn) continue; Ls.sort((a, b) => a - b); const bgL = bl / bn, bc = Math.max(cr(Ls[Math.floor(Ls.length * .95)], bgL), cr(Ls[Math.floor(Ls.length * .1)], bgL)); out.eb.push(bc); out.bN++;
+      if (bc < 3 && o.dbg && !out.crop) { const cw = 120, c2 = document.createElement('canvas'); c2.width = cw * 3; c2.height = cw; const g2 = c2.getContext('2d'); [A, Bb, Be].forEach((D, j) => { const id = g2.createImageData(cw, cw); for (let y = 0; y < cw; y++) for (let x = 0; x < cw; x++) { const sx = Math.round(cx) - cw / 2 + x, sy = Math.round(cy) - cw / 2 + y; if (sx < 0 || sy < 0 || sx >= w || sy >= h) continue; for (let q = 0; q < 4; q++) id.data[(y * cw + x) * 4 + q] = D[(sy * w + sx) * 4 + q]; } g2.putImageData(id, j * cw, 0); }); out.crop = c2.toDataURL(); }
       if (bc < 3) (out.lo = out.lo || []).push([+bc.toFixed(2), Ls.length, Math.round(cx), Math.round(cy), +bgL.toFixed(3), +Ls[Math.floor(Ls.length * .9)].toFixed(3), +Ls[Math.floor(Ls.length * .1)].toFixed(3), bu.k || 'o']); }
     // 3 backdrop busyness over the play band
     if (B) { const bw = B.w, bh = B.h, P = bw < bh, s = P ? bw : bh, a0 = Math.round(s * .12), a1 = Math.round(s * .88); let sum = 0, n = 0;
@@ -94,8 +95,9 @@ const hd = (a, b) => { const d = Math.abs(a - b) % 360; return Math.min(d, 360 -
     const ctx = await br.newContext({ viewport: { width: 390, height: 763 }, deviceScaleFactor: 2, hasTouch: true, isMobile: true }), p = await ctx.newPage(), errs = [];
     p.on('pageerror', e => errs.push(e.message)); await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
     await p.goto(await U(q ? '&' + q : ''), { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && __mnr.ART, null, { timeout: 30000 }); await sleep(1500);
-    let r = null; try { for (let k = 0; k < 16 && !r; k++) { r = await p.evaluate(RUN, { kind, n }); await sleep(k ? 250 : 3000); } } catch (e) { errs.push(e.message); }
+    let r = null; try { for (let k = 0; k < 16 && !r; k++) { r = await p.evaluate(RUN, { kind, n, dbg: !!process.env.DBG }); await sleep(k ? 250 : 3000); } } catch (e) { errs.push(e.message); }
     if (SHOTS && q === '' || SHOTS && process.env.BOTH) { fs.mkdirSync(SHOTS, { recursive: true }); await p.screenshot({ path: path.join(SHOTS, `leg-${name}${q ? '-old' : ''}.png`) }); }
+    if (r && r.crop && SHOTS) { fs.mkdirSync(SHOTS, { recursive: true }); fs.writeFileSync(path.join(SHOTS, `crop-${name}${q ? '-old' : ''}.png`), Buffer.from(r.crop.split(',')[1], 'base64')); }
     res[name + (q ? ' old' : '')] = { r, errs }; await ctx.close();
   }
   const f = x => x.toFixed(2), f3 = x => x.toFixed(4), med = a => pct(a, .5);
@@ -106,10 +108,11 @@ const hd = (a, b) => { const d = Math.abs(a - b) % 360; return Math.min(d, 360 -
     console.log(`${name}: ${process.env.DBG ? a.dbg + ' | ' + b.dbg : ''} frames ${a.fr}/${b.fr} enemies ${a.eN}/${b.eN} bullets ${a.bN}/${b.bN}`);
     console.log(`  enemy contrast median ${f(med(a.en))} -> ${f(med(b.en))}  p25 ${f(pct(a.en, .25))} -> ${f(pct(b.en, .25))}`);
     console.log(`  bullet contrast worst10% ${f(pct(a.eb, .1))} -> ${f(pct(b.eb, .1))}  median ${f(med(a.eb))} -> ${f(med(b.eb))}`);
-    if (process.env.DBG) console.log('  low', JSON.stringify((b.lo || []).slice(0, 8)), JSON.stringify(b.stat), JSON.stringify(b.kh));
+    if (process.env.DBG) console.log('  low', JSON.stringify((b.elo || []).slice(0, 10)), JSON.stringify((b.lo || []).slice(0, 8)), JSON.stringify(b.stat), JSON.stringify(b.kh));
     console.log(`  backdrop busyness (p90 of 24 px cells) ${f3(Math.max(...a.busy, 0))} -> ${f3(Math.max(...b.busy, 0))}  mean ${f3(Math.max(...a.busyM, 0))} -> ${f3(Math.max(...b.busyM, 0))}`);
     ok(`${name}: measured (>= 2 frames with enemies or bullets, both looks)`, a.fr >= 2 && b.fr >= 2, a.fr + '/' + b.fr);
-    ok(`${name}: enemies median >= 3:1`, !b.en.length || med(b.en) >= 3, f(med(b.en)) + ' (n ' + b.en.length + ')');
+    ok(`${name}: enemies median >= 4.5:1`, !b.en.length || med(b.en) >= 4.5, f(med(b.en)) + ' (n ' + b.en.length + ')');
+    ok(`${name}: enemies p25 >= 3:1`, !b.en.length || pct(b.en, .25) >= 3, f(pct(b.en, .25)) + ' (n ' + b.en.length + ')');
     ok(`${name}: enemy bullets worst 10% >= 3:1`, b.eb.length < 5 || pct(b.eb, .1) >= 3, f(pct(b.eb, .1)) + ' (n ' + b.eb.length + ')');
     ok(`${name}: backdrop busyness under the play band <= 0.010`, b.busy.length && Math.max(...b.busy) <= .010, f3(Math.max(...b.busy, 0)));
     ok(`${name}: ?legible=0 draws nothing new`, !a.leg && !a.stat.en && !a.stat.halo && !a.stat.band, JSON.stringify(a.stat));

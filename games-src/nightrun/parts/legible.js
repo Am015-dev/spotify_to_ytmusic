@@ -17,8 +17,15 @@ const LGB=window.LGB={GLOW:'#e9e2ff',GR:2.4,GC:1.9,HALO:'rgba(4,1,10,1)',BAND:.5
   st:[1,1,1,1,1,1,1,1,1,1,1,1],ga(){const a=this.st[G.di];return a==null?1:a;},
   stat:{en:0,halo:0,band:0},
   /* 1. one enemy */
-  enemy(de,e,t){if(e.type==='boss'||!running)return de(e,t);const r=e.r||12;ctx.save();ctx.globalCompositeOperation='source-over';G_(e.x,e.y,r*this.GR,this.GLOW,this.ga());G_(e.x,e.y,r*this.GC,this.GLOW,this.ga());ctx.restore();
-    de(e,t);this.stat.en++;},
+  enemy(de,e,t){if(e.type==='boss'||!running)return de(e,t);const r=e.r||12;ctx.save();ctx.globalCompositeOperation='source-over';G_(e.x,e.y,r*this.GR,this.GLOW,this.ga());G_(e.x,e.y,r*this.GC,this.GLOW,this.ga());this.rim(e.x,e.y,r);ctx.restore();
+    de(e,t);this.stat.en++;e._lg=(e._lg|0)+1;},
+  /* 1b. a flat pale disc + thin pale edge right behind the hull (review 9 E21): the soft glow fades to nothing at the hull's own edge, so a dark ship entering at the black top of the
+     field read ~2.5:1; the disc gives every hull a light plate (alpha RA, radius RR x r). Enemy bullets keep their contrast: their dark halo is drawn later, over the disc. */
+  RA:.3,RR:1.15,RL:.6,
+  /* hull brightness factor for the recoloured sheets (foeart.js FOEART.sheet; built once per tint, no per-frame cost): the dark red / navy hulls read ~2.5:1 on the black top of the field */
+  BR:1.4,
+  rim(x,y,r){const R=r*this.RR;ctx.globalAlpha=this.RA*(window.COM?COM.g():1);ctx.fillStyle=this.GLOW;ctx.beginPath();ctx.arc(x,y,R,0,7);ctx.fill();
+    ctx.globalAlpha=this.RL*(window.COM?COM.g():1);ctx.strokeStyle=this.GLOW;ctx.lineWidth=1.6;ctx.stroke();ctx.globalAlpha=1;},
   /* 2. the dark halo under the enemy bullets */
   halo(){const L=G.eb;if(!L.length)return;const bg=(RET.asBigOn()?1.35:1)*1.2;ctx.save();ctx.globalCompositeOperation='source-over';ctx.fillStyle=this.HALO;ctx.beginPath();
     for(const b of L){const r=b.r*(b.k==='n'?2.6:b.k==='r'?2.4:2.1)*bg+1.5;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();ctx.restore();this.stat.halo++;},
@@ -29,6 +36,9 @@ const LGB=window.LGB={GLOW:'#e9e2ff',GR:2.4,GC:1.9,HALO:'rgba(4,1,10,1)',BAND:.5
     ctx.save();ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;ctx.fillStyle=g;ctx.fillRect(-40,-40,w+80,h+80);ctx.restore();this.stat.band++;}};
 {const de=drawEnemy;drawEnemy=function(e,t){if(!RET.legible)return de(e,t);LGB.enemy(de,e,t);};}
 {const d0=READ.dim;READ.dim=function(w,h){d0.call(this,w,h);if(RET.legible&&RET.read&&running)LGB.band(w,h);if(LGB.grab)LGB.grab(ctx);};}   // grab: legible-test.js reads the backdrop alone here
+/* 1c. ships drawn from their own sheet (gunship, kamikaze, the four fleet ships: SPR.foe, no recoloured strip to brighten) get the same lift as one added copy at alpha BR-1 (one drawImage per ship, no filter) */
+{const f0=SPR.foe;SPR.foe=function(e,id,t,x,y,w,rot,fl){const ok=f0.call(this,e,id,t,x,y,w,rot,fl);if(!ok||fl||!RET.legible||!running||LGB.BR<=1||!e||e.type==='boss')return ok;
+  ctx.save();if(rot){ctx.translate(x,y);ctx.rotate(rot);x=0;y=0;}ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,'ship-'+id+'/'+e._ea,t-e._es,x,y,e._fs,false,LGB.BR-1);ctx.restore();return ok;};}
 {const b0=READ.bullets;READ.bullets=function(){if(RET.legible)LGB.halo();return b0.call(this);};}
 /* 4. pickups: shards / hull / upgrade / EMP glow green, music coins leaf green (gold is the elite ring and sits next to orange shells) (power.js PW.pickup) */
 if(RET.legible&&RET.read)READ.UP=LGB.PK.up;

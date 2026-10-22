@@ -46,7 +46,7 @@ const FOEART=window.FOEART={fr:0,built:0,cnt:0,n:{all:0,sheet:0,stand:0,by:{}},f
   id:e=>e.fk&&window.FLK&&FLK.K[e.fk]?'fk-'+e.fk:e.type,
   map:e=>{const m=ENEMY_ART[FOEART.id(e)];if(!m||m.native)return null;if(e.ldr&&m.L){if(!m._L)m._L=Object.assign({},m,m.L);return m._L;}return m;},
   /* the (tinted) strip key for an act; the tinted copy is built once, at most one per frame */
-  sheet(m,act){const src='ship-'+m.s+'/'+act;if(!ART.ANIM.s[src])return null;const sb=ART.anim(src);if(!sb)return null;const tn=m.t;if(!tn||(!tn[0]&&tn[1]===1&&tn[2]===1))return src;
+  sheet(m,act){const src='ship-'+m.s+'/'+act;if(!ART.ANIM.s[src])return null;const sb=ART.anim(src);if(!sb)return null;const t0=m.t,lb=RET.legible&&window.LGB?LGB.BR:1,tn=t0&&lb!==1?[t0[0],t0[1],t0[2]*lb]:t0;if(!tn||(!tn[0]&&tn[1]===1&&tn[2]===1))return src;   // lb: legible.js lifts dark hulls (LGB.BR)
     const tg=m._tg||(m._tg=Math.round(tn[0])+'_'+Math.round(tn[1]*100)+'_'+Math.round(tn[2]*100)),vk='ship-'+m.s+'~'+tg+'/'+act;
     if(ART.VB[vk])return vk;if(FOEART.built>=1)return src;FOEART.built++;
     const cv=document.createElement('canvas');cv.width=sb.width;cv.height=sb.height;const g=cv.getContext('2d');
