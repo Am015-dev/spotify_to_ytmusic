@@ -1,11 +1,11 @@
 {
  "frames": 4,
  "fps": 4,
- "w": 392,
- "h": 266,
+ "w": 387,
+ "h": 257,
  "anchor": [
-  196,
-  266
+  193,
+  257
  ],
  "order": [
   "strip-boss-sek-adler-idle#1",
