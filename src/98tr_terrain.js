@@ -104,7 +104,7 @@ function TRN_junc(){const L=[];for(const J of (typeof JUNC!=='undefined'?JUNC:[]
 const TRN_VD=1500,TRN_VA=1.5,TRN_VH=20;
 function TRN_ray(x0,z0,ey,a,tA,vh=TRN_VH,mg=0){const ux=Math.sin(a),uz=Math.cos(a);let occ=-1e9;const B=new Set();
   for(let d=5;d<=TRN_VD;d+=d<300?5:10){const x=x0+ux*d,z=z0+uz*d,L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));
-    if(L)for(const b of L){if(B.has(b)||!b.h)continue;if(bHit(b,x,z,0)){B.add(b);occ=Math.max(occ,(b.h-ey)/d)}}
+    if(L)for(const b of L){if(B.has(b)||!b.h||b.fill)continue;/* ath-trap-r2: solid-fill blocks (DR_solidBuildG) sit behind the street buildings: not skyline occluders */if(bHit(b,x,z,0)){B.add(b);occ=Math.max(occ,(b.h-ey)/d)}}
     const gy=groundY(x,z),g=(gy-ey)/d;if(d>=150&&g>tA&&gy-ey>=vh&&g>occ+mg)return d;occ=Math.max(occ,g)}
   // nothing on the ground: the backdrop ridge (Athens, terr-4 placement: stands on the ground under the eye, apparent height y/2300) if it clears everything
   const T=TR_H4.on?TRN_ridgeTop():null;if(T){const deg=((Math.round(a*57.296)%360)+360)%360,y=T[deg];if(y>-1e8){const g=(y-1.5)/TRN_RD;if(g>tA&&g>occ+mg)return TRN_RD}}return 0}
