@@ -1,0 +1,4 @@
+# HANDOFF chip-fix-r22e30 (review #55 follow-ups)
+- (a) One chip at a time: OG_ask now calls RQ_hide(true) (newest ask wins; RQ_offer already yields to a live OG.ask), simpler than stacking rows. (b) Flight chip: leading icon stripped from markTitle in RQ_offer, so "✈ FLIGHTS" shows one ✈. GO why/no-popup extended (single ✈; event ask over a marker chip = exactly 1 chip, both orders); __rqStage(1) stages it for shots.
+- Gates on the rebuilt page: unit 0 FAIL; tools/gate.sh 76/76 fra+ath (phone profile); why/no-popup + why/hud6 4/4 landscape and 4/4 portrait. 852x393 + 393x852 iPhone-UA shots looked at: only the yellow event chip, no overlap (the small #roamPrompt "Garage TAP TO OPEN" zone pill is separate and unchanged).
+- Left: add an OD_CHANGELOG line at deploy; 6x-CPU phone gate not run.
