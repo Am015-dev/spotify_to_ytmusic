@@ -27,3 +27,19 @@ Input: every tap reaches a button as a synthetic click from the pointerup handle
 a tile just before its click = 'select'; the panel button or a 2nd press buys. `.click()` from code (tests) and phones keep the old instant action.
 Left: the PILOT, FORGE and ABILITY screens are their own overlays and keep their old look; the bay's stat bars come from upgrade levels
 (Hull = hull plating + shields, Damage = power core + critical, Fire rate = rapid coil, Dash = dash capacitor), not from ship type.
+
+## H2 (22 Oct 2026): fixes after the orchestrator's 1440x860 review
+Screenshots (out of git) at 1440x860, 2000x1240 and 390x763 dpr 2, every tab plus MORE (ability, crew, looks, loadout, market, pick, forge), before and after, each looked at.
+
+| tab | was | now | verdict vs HANGAR-AUDIT |
+|---|---|---|---|
+| SHIP | starter stat bars ~8 % | bars start at 34 % (starter, no upgrades) and fill with upgrade levels (ships differ in their shot, not in these 4 stats) | pass |
+| WEAPONS | 8 debug placeholders ('wp-frost 256x256'...), ~40 px art in 160 px tiles, LOCKED twice, faded locked tiles | the 8 placeholder files leave media/ready.json (md5 added to placeholders.json), so no screen shows them; without painted art a tile shows an emblem: weapon colour ring + its projectile art (fx-w-<id>-bullet, else the vector demo); icon canvas 128x128 drawn at 72 px; locked = full contrast + one amber padlock badge + 'UNLOCK ◆ N'; 'power 1.00x' lines hidden | pass |
+| PILOT | old inner layout, 12 px text, grey skill rows, panel 'Nothing here yet' | class tiles (64 px emblem in its colour, name, one-line perk); panel: big emblem, name, perk, Power/Speed/Guard bars with words (low/medium/high), the class perk lines, ONE pick button (= #clsPick); skills as tiles (name + XP price); phone keeps the details + pick button under the tiles | pass (class emblems are still the game's vector shapes, no portrait art exists) |
+| UPGRADES | pass | text >= 15 px on PC | pass |
+| MORE: ability / crew / looks | same frame and tiles | unchanged | pass |
+| MORE: loadout / market | empty 'Nothing here yet' panel | a tab without tiles drops the panel and uses its width | partial: the perk loadout's own 13 px rows are not restyled |
+| MORE: FORGE | own overlay | placeholders gone there too (same ready.json fix); layout unchanged | FAIL: still its own screen, not the 3-column frame (left for the next worker) |
+
+Gates: qa/hangar2-test.js extended (no visible text /\d+x\d+/, min font 15 px PC / 14 px phone on SHIP/WEAPONS/PILOT/UPGRADES, tile opacity >= .85, no placeholder wp- file in ready.json, PILOT panel with 3 bars + pick button, starter stat bar 30-40 %): 0 failed.
+Asset registry: asset-registry.py stops on its own gate (master list and live tree disagree on 247/1088 rows, before this change), so the registry was not rebuilt; the 8 rows (nr.hangar.wp-drone/flame/frost/rail/shell/storm/wave/well) become not-delivered (needs-art) on the next run that passes that gate, because their files are now in placeholders.json.
