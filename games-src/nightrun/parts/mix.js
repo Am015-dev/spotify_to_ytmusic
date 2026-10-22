@@ -88,3 +88,13 @@ if(RET.mix){
     if(r&&M.vox.length===n0)M.vox.push({o:null,g:null,t0:a.currentTime,end:a.currentTime+.8,vol:.3,pr:9});   // a stinger from a file is one voice we cannot stop, but it counts
     return r;};                      // the perfect one at half the level
 }
+/* owner 22 Oct 06:25: "very annoying sound effects eg on perfect: disable it, it distorts music; alert is also very repetitive:
+   it should alert in real danger, not every 5 seconds". Flag RET.calmsfx (default ON, ?calmsfx=0 = old): no PERFECT sound or
+   stinger at all; the 'warn' alert plays only for real danger (hull 2 or less, or a boss arriving) and at most once per 20 s. */
+if(RET.calmsfx===undefined)RET.calmsfx=!/[?&]calmsfx=0/.test(location.search);
+{const s0=AU.sfx,g0=AU.sting;let lastWarn=-99;
+  AU.sfx=function(n){if(RET.calmsfx){if(n==='perfect')return;
+    if(n==='warn'){const t=(typeof G==='object'&&G&&G.t)||0,real=(typeof P==='object'&&P&&P.hp<=2)||(typeof G==='object'&&G&&G.boss&&!G.boss.dead&&G.boss.bt!=null&&G.boss.bt<4);
+      if(!real||t-lastWarn<20)return;lastWarn=t;}}
+    return s0.apply(this,arguments);};
+  AU.sting=function(n){if(RET.calmsfx&&n==='perfect')return false;return g0.apply(this,arguments);};}
