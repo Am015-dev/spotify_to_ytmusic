@@ -17,3 +17,4 @@
 - 150 s sim (tools/sim_traffic150.js), gate on vs ?popmem=0: ath overlaps 23 vs 49, head-ons 15 vs 19; fra (2 runs summed) 5 vs 7, 3 vs 6. Review #34 was ath 311 vs 47, fra 35 vs 1.
 - GO why/solid-cars PASS fra+ath; unit 0 FAIL; TAG=why,life1,xf1,terrain 69/72: speedfeel (6x CPU timing noise, solo PASS), quiet-start fra (river-dip vehicle swaps, solo 2/3 on, 3/3 popmem=0), quiet-dirt ath.
 - Left: why/quiet-dirt ath is 1/3 solo with the gate on AND 1/3 with ?popmem=0 on this build: the stall frames have no NPC within 6 m (player car on terrain at ath ~1100,-320 / 1460,-220), so it is not traffic; needs a drive/terrain lane.
+- Reviewer bar (sums, gate on vs ?popmem=0, same build): ath idle x2 near 73/105 head 37/42; ath gas x2 70/99, 42/55; fra idle x2 5/7, 3/6; fra gas x4 25/28, 11/21. NaN 0, frozen30s 0 in all; trafficMs within 7%.
