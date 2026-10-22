@@ -7,7 +7,7 @@
    DIFFICULTY  The selected difficulty is the start. Every wave the per-difficulty knobs (DF: d, bs, fr, dn, fan, heal, el, aq) move a step toward Legend (hull drops, heal, stay as chosen: sustain is not part of the ramp) along a curve that starts gently (progress^2); Normal reaches Legend at wave 31 (Easy 43, Hard 15,
                Very hard 8). The difficulty key the other systems read (SET.diff: boss movesets, telegraph times, zoo counts, hazards) steps up the same ladder over the last 45% of the climb (the oracle dodger cannot live through those systems earlier, bot numbers in endramp-test), so bosses follow. After Legend the knobs keep rising
                slowly for 30 more waves up to a ceiling (d +22%, fire +15%, density +15%, bullet speed +6%, elites +15%, one more bullet in fans). armour.js hull / caps and hard.js DPS ceiling are untouched.
-               BOSS DEADLINE (E05, review 9): armour.js caps the damage rate, and a ship that barely hits never finished the first endless boss (48/364 hp in 519 s). From SOFT.t0 s after the boss takes position its HP may not stay above a schedule that reaches 0 at SOFT.t0 + SOFT.len (90 s):
+               BOSS DEADLINE (E05 review 9, F07 review 10): armour.js caps the damage rate, and a ship that barely hits never finished the first endless boss (48/364 hp in 519 s). From SOFT.t0 s after the boss takes position its HP may not stay above a schedule that reaches 0 at SOFT.t0 + SOFT.len (28 s; it was 90 s, which with the 32-bar floor made a boss wave 74-95 s and wave 10 come at 350-390 s):
                the armour cracks (a one-time caption names it), a ship that is ahead of the schedule is untouched, armour.js caps / hull / phases (floors, bar lines, last stand) are not changed. o.soft=0 = off.
                The player's chosen difficulty is restored at the end of the run (and on page hide, so a mid-run settings save never keeps the stepped key).
    VERBS       From wave 2 each wave has a signature verb (flankers, rain, pincer, mines, swarm ring, convoy ...) chosen from a seeded bag (GR), fired on bar 5 of the wave (and bar 2 from wave 12); patterns the last two waves used are
@@ -15,7 +15,7 @@
                novelty clock (twists, epochs) never trails the wave count. No three consecutive waves share a pattern set. ---------- */
 if(RET.endramp===undefined)RET.endramp=!/[?&]endramp=0/.test(location.search);
 const ENDR=window.ENDR={KEYS:['easy','normal','hard','vhard','legend'],L:{easy:42,normal:30,hard:14,vhard:7,legend:0},X:30,P:2,KL:.55,HK:0,CE:{d:.22,fr:.15,dn:.15,bs:.06,el:.15},
-  o:{cap:4,diff:1,tier:1,sig:1,pool:1,rules:1,nov:1,pac:1,soft:1},SOFT:{t0:30,len:60},w:0,real:'normal',eff:'',bi:0,act:false,firing:0,sig:null,sets:[],sigs:[],stat:{waves:0,sig:0,keys:[]},
+  o:{cap:4,diff:1,tier:1,sig:1,pool:1,rules:1,nov:1,pac:1,soft:1},SOFT:{t0:6,len:22,mb:10},w:0,real:'normal',eff:'',bi:0,act:false,firing:0,sig:null,sets:[],sigs:[],stat:{waves:0,sig:0,keys:[]},
   on(){return!!RET.endramp&&this.act&&running&&!ST.on&&!G.tut&&!G.lab&&!G.daily&&!G.weekly;},
   /* pure: the knobs and key for a base key at wave w */
   at(key,w){const B=DIFFS[key]||DIFFS.normal,Lg=DIFFS.legend,L=this.L[key]==null?28:this.L[key],k=L<=0?1:Math.pow(clamp((w-1)/L,0,1),this.P),e=clamp((w-L-1)/this.X,0,1),o={};
@@ -60,10 +60,14 @@ window.addEventListener('pagehide',()=>{if(ENDR.eff){ENDR.restore();try{saveSet(
   const t=this.tierv()+.01;c=Object.keys(PATS).map(k=>PATS[k]).filter(p=>p.t<=t&&!a.has(p.id)&&!b.has(p.id));if(c.length>=2)return c;
   c=base.filter(p=>!a.has(p.id));return c.length?c:base;};}
 {const ri=RU.idx;RU.idx=function(){const n=ri.call(this);return ENDR.on()&&ENDR.o.rules?Math.max(n,2+Math.floor(ENDR.w/3)):n;};}
+/* BOSS LENGTH (review 10 F07): in endless every boss lives <= SOFT.t0 + SOFT.len s after it takes position (28 s, ~33 s from its spawn) and may fall from bar SOFT.mb instead of bar 32 (the 32-bar floor alone held a district boss for 61 s), so wave 10 comes by ~250 s with the 3 bosses on the way; armour.js caps / hull / phase lines are untouched */
+{const sb=spawnBoss;spawnBoss=function(o){const b=sb(o);if(b&&b.b2&&ENDR.on()&&ENDR.o.soft)b.minBar=Math.min(b.minBar,ENDR.SOFT.mb);return b;};}
 /* BOSS DEADLINE: runs after armour.js's pass (this part loads later), so the schedule only pulls HP down to the next phase floor; the phases still start on their bar lines */
 {const dp=DMG.pass;DMG.pass=function(dt){const r=dp.call(this,dt);const e=G.boss;if(!ENDR.on()||!ENDR.o.soft||!e||e.dead||!e.b2||e.x>bossX())return r;
   const s=e.b2,S=ENDR.SOFT;s.soft=(s.soft||0)+dt;if(s.soft<S.t0)return r;
+  if(e.bmG&&window.BMV)BMV.unguard(e,0);                      // a boss move that holds the HP (flank shield, overload ...) cannot outlast the deadline: bossmoves.js restored the HP every frame (Legend boss stayed 61 s)
   const want=e.max*Math.max(0,1-(s.soft-S.t0)/S.len),pf=e.ph===1?e.max*.64:e.ph===2?e.max*.31:0,hp=Math.max(pf,Math.min(e.hp,want));
+  if(e.floor>hp)e.floor=hp;                                  // b.js lifts the HP back to e.floor every frame (a guard / min-bar floor left over from a verb held a Legend boss at 66% for 8 s)
   if(hp<e.hp-1e-6){e.hp=e.hq=s.ref=hp;s.sh=0;e.b2s=0;
     if(!s.softMsg){s.softMsg=1;floater(e.x,BOSSFY(e.y-e.r-34),'ARMOUR CRACKS','#ffe14d');if(!ENDR.softSeen){ENDR.softSeen=1;G.note={t:3.6,txt:'The boss armour is cracking: keep shooting'};}}}
   return r;};}

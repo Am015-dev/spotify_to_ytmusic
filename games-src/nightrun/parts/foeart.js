@@ -12,7 +12,7 @@ if(RET.foeart===undefined)RET.foeart=!/[?&]foeart=0/.test(location.search);
 /* hue turn is relative to the sheets' own colour (measured: interceptor / bomber / gunship / carrier / cruiser sit at hue 228, kamikaze at 351) */
 const ENEMY_ART=window.ENEMY_ART={
   /* core director kinds (dir.js, draw.js) */
-  drone:{s:'einterceptor',k:3.4,t:[-28,1,1],L:{k:4.2,t:[180,1.15,1.1]}},                       // L: the leader (e.ldr) is gold and a quarter larger
+  drone:{s:'einterceptor',k:5.1,ol:1,t:[-28,1.1,1.3],L:{k:6.3,t:[180,1.15,1.1]}},                       // L: the leader (e.ldr) is gold and a quarter larger
   charger:{s:'ekamikaze',k:3.6,t:[29,1.1,1]},
   turret:{s:'egunship',k:3.1,t:[171,1.1,1],rot:e=>aim(e)+Math.PI,mk:'turret'},
   gate:{s:'ebomber',w:46,t:[127,1.2,1],mk:'gate'},                                                // two pylons (FOEART.post), nose turned to the gap
@@ -58,9 +58,9 @@ const FOEART=window.FOEART={fr:0,built:0,cnt:0,n:{all:0,sheet:0,stand:0,by:{}},f
     const act=e.arm&&ART.ANIM.s['ship-'+m.s+'/volley']?'volley':'flame',key=FOEART.sheet(m,act)||(act==='volley'?FOEART.sheet(m,'flame'):null);if(!key)return false;
     if(own&&e.vz)VAR.in(e,t);
     const r=e.r,w=m.w||r*m.k,sc=w/(ART.VS[key]||ART.ANIM.s[key])[2],tt=(e.t||0)+eb_(e),rot=m.rot?m.rot(e,t):0;
-    ctx.save();if(rot)ctx.rotate(rot);ART.drawAnim(ctx,key,tt,0,0,sc,false);
+    ctx.save();if(rot)ctx.rotate(rot);if(m.ol){ctx.shadowColor='rgba(4,1,10,1)';ctx.shadowBlur=5;}ART.drawAnim(ctx,key,tt,0,0,sc,false);
     if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,0,0,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);ctx.globalCompositeOperation='source-over';}ctx.restore();
-    if(m.ov)m.ov(e,t,r,fl);if(m.mk)FOEART.marker(m,r,fl);
+    if(m.ov)m.ov(e,t,r,fl);
     if(m.hp&&e.max>1&&e.hp>0)hpBar(-14,-r-(e.type==='shielder'?22:9),28,e.hp/e.max);
     if(own&&e.vz)VAR.out(e,t);
     e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},

@@ -3,11 +3,11 @@
 // TEST: calm-test.js, review9-test.js
 /* ---------- CALM (flag RET.calm, default ON; ?calm=0 = as before). Owner look, Legend stage 10 on a phone (22 Oct 2026):
    - a rule announcement ("RULE · CURVED SHOTS") covered the middle of the field while enemies attacked: now a small strip in the top band (under the score bar), at most 2.5 s;
-   - bright beams ~25 css px wide: pictured player shots are at most 12 css px thick (alpha <= .75), enemy aim / sniper beams <= 12 css px (alpha <= .8);
+   - bright beams ~25 css px wide: pictured player shots are at most 6 css px thick (alpha <= .5), enemy aim / sniper beams <= 6 css px (alpha <= .5); lane edges dashed and dim;
    - enemies wore 3-4 rings at once: at most 2 per enemy, priority attack tell (pink / red) > elite (gold) > the rest (1 frame of memory decides).
    Nothing here changes damage or timing. ---------- */
 if(RET.calm===undefined)RET.calm=!/[?&]calm=0/.test(location.search);
-const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2.5,TTITLE:2,RMAX:2,fr:0,cur:null,pk:new Map(),pp:new Map(),a:null,stat:{rings:0,cut:0,beams:0},
+const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:6,TMAX:2.5,TTITLE:2,RMAX:2,fr:0,cur:null,pk:new Map(),pp:new Map(),a:null,stat:{rings:0,cut:0,beams:0},
   /* css px per world unit under the current transform */
   css(){const t=ctx.getTransform(),c=ctx.canvas;return Math.hypot(t.a,t.b)*(c.clientWidth/c.width||1)||1;},
   isRule(a){return/^(RULE|NEW$|REMIX|TWIST)/.test(a||'');},
@@ -39,10 +39,10 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2
   const L=b.len||(b.big?22:b.pn!=null?28:20);let w=Math.max(22,Math.min(130,L*1.4+(b.th||3)*2));const ang=((b.vx||b.vy)?Math.atan2(b.vy,b.vx):0)+(FXW.SPIN[b.wid]?G.t*9:0);
   let o=ART.sp(FXW.name(k),w);if(!o)return false;const cap=CALM.BEAM/CALM.css();if(o.h>cap&&!FXW.SPIN[b.wid]){w=w*cap/o.h;o=ART.sp(FXW.name(k),w);if(!o)return false;CALM.stat.beams++;}
   const solid=FXW.SOLID[b.wid];if(solid)ctx.globalCompositeOperation='source-over';
-  ART.put(o,b.x+(FXW.SPIN[b.wid]?0:Math.cos(ang)*w*.25),b.y+(FXW.SPIN[b.wid]?0:Math.sin(ang)*w*.25),ang,.75);if(solid)ctx.globalCompositeOperation='lighter';FXW.stat.bullet++;return true;};}
+  ART.put(o,b.x+(FXW.SPIN[b.wid]?0:Math.cos(ang)*w*.25),b.y+(FXW.SPIN[b.wid]?0:Math.sin(ang)*w*.25),ang,.5);if(solid)ctx.globalCompositeOperation='lighter';FXW.stat.bullet++;return true;};}
 {const sn=FXW.sniper,ai=FXW.aim;
-  FXW.sniper=function(e,k,lk){if(!CALM.on)return sn.apply(this,arguments);if(!fxBeam('eb-sniper-beam',e.x,e.y,e.ang,1500,lk?CALM.BEAM/CALM.css():9,lk?.8:.3+.5*k))return false;FXW.stat.sniper++;return true;};
-  FXW.aim=function(e,left){if(!CALM.on)return ai.apply(this,arguments);if(!fxBeam('eb-aim-line',e.x,e.y,e.ang,1500,left<=.3?Math.min(10,CALM.BEAM/CALM.css()):7,left<=.3?.8:.45))return false;FXW.stat.aim++;return true;};}
+  FXW.sniper=function(e,k,lk){if(!CALM.on)return sn.apply(this,arguments);if(!fxBeam('eb-sniper-beam',e.x,e.y,e.ang,1500,lk?CALM.BEAM/CALM.css():6,lk?.5:.3+.2*k))return false;FXW.stat.sniper++;return true;};
+  FXW.aim=function(e,left){if(!CALM.on)return ai.apply(this,arguments);if(!fxBeam('eb-aim-line',e.x,e.y,e.ang,1500,left<=.3?Math.min(6,CALM.BEAM/CALM.css()):5,left<=.3?.5:.4))return false;FXW.stat.aim++;return true;};}
 /* ---- 3. rings: at most 2 per enemy ---- */
 {const bump=f=>function(){CALM.fr++;CALM.pp=CALM.pk;CALM.pk=new Map();return f.apply(this,arguments);};drawBGP=bump(drawBGP);drawBG=bump(drawBG);
   const de=drawEnemy;drawEnemy=function(e){if(!CALM.on||e===G.boss||e.type==='boss')return de.apply(this,arguments);const p=CALM.cur;CALM.cur=e;try{return de.apply(this,arguments);}finally{CALM.cur=p;}};

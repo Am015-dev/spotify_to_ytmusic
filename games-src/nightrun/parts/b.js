@@ -96,7 +96,7 @@ const DYE={cur:1,q:1};                                     // dying slows the so
 const FIRE_K=.62;                                          // enemy fire cadence: about 40% fewer bullets than before, each one aimed and telegraphed
 const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk*AI.fk()*(DMG.on?DMG.fk*DMG.lf()*(SET.diff==='easy'?.8:1)*(ST.on?1:DMG.fkE):1);   // DMG.fk: enemies live longer now (BALANCE.md), so each fires a little less often
 function diff(){if(ST.on)return ST.d*DF.sd*UPS.d;const ease=G.loop||G.pos?1:clamp(.8+.2*G.t/150,.8,1);return(1+.17*(G.pos+G.dprog)+TUNE2.loopD*G.loop)*ease*DF.d*UPS.d;}   // endless: a smooth ramp over the districts and loops, a gentle first minutes; UPS.d = soft scaling with the player's upgrades
-const bossX=()=>rotMode?690:790;                          // where a boss stops: portrait keeps it clear of the HUD at the top
+const bossX=()=>rotMode?Math.min(690,W-92*HK-1.8*(G&&G.boss?G.boss.r:46)-4):790;                          // where a boss stops: portrait keeps it clear of the HUD at the top
 const bossStage=k=>(window.RET&&RET.dpool&&RET.DP.boss(k))||(k===3?'boss2':k===6?'boss3':'boss');   // final boss gets its own song
 // Mini-bosses and the first boss (SEK-ADLER) keep the stage song and get a drum layer; the district bosses switch to the boss song, the final boss to boss2.
 const bossSong=(k,mini)=>mini||(k===0&&!(window.RET&&RET.dpool))?null:bossStage(k);

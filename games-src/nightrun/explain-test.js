@@ -68,6 +68,35 @@ const keyOf = (s, lm, lines) => { const fr = s.split('<').map(f => { const [fn, 
       ok('no "x~" text drawn on the field', txt.length === 0, txt);
       const lbl = Object.entries(dom).filter(([k, v]) => /x~|~\d/.test(v.txt)).map(([k, v]) => k + ' ' + v.txt); ok('no "x~" text in the HUD', lbl.length === 0, lbl);
     }
+    if (!/explain=0|exp10=0/.test(q)) {   // review 10 (W145): caption budget, visible-only + leader line, side words, zonehint in the queue, hint strip whole, merged pops
+      const R10 = new Function('o', `
+        const m = window.__mnr, E = window.EXP, X = window.EX10; let sd = 11; Math.random = () => { sd = (sd + 0x6D2B79F5) >>> 0; let t = sd; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+        try { localStorage.removeItem('mnr_exptaught'); } catch (e) {} X.tt = null; m.god = true; m.startStory(o.story); m.simOn(true); const st = [], vis = []; let last = null, lead = 0, frames = 0;
+        for (let i = 0; m.running && i < o.secs * 60; i++) { if (m.SH && m.SH.active) m.SH.close(); if (o.park) { if (i % 20 === 0) m.press('Fire'); } else { if (i % 20 === 0) m.press('Fire'); if (i % 3 === 0) m.touchTo(195 + 150 * Math.sin(i / 50), 520 + 120 * Math.sin(i / 37)); }
+          m.step(1 / 60); const c = E.cap; if (c && c !== last) { last = c; st.push({ k: c.k, t: +m.G.t.toFixed(1) }); }
+          if (c && i % 10 === 0) { frames++; vis.push(!!X.tgt(c)); try { m.render(m.G.t, 1 / 60); } catch (e) {} if (E.cbox) lead++; } }
+        const r = { st, vis: vis.every(Boolean), frames, list: X.list.slice(), dur: m.G.t }; m.abort(); return r;`);
+      const s1 = await p.evaluate(R10, { story: 1, secs: 60, park: 1 });
+      const n60 = s1.st.length, gaps = s1.st.slice(1).map((c, i) => c.t - s1.st[i].t);
+      ok('stage 1, parked new player: <= 3 captions in the first 60 s', n60 <= 3 && n60 >= 1, s1.st);
+      ok('stage 1: captions >= 20 s apart', gaps.every(g => g >= 19.9), s1.st);
+      const s3 = await p.evaluate(R10, { story: 3, secs: 60 });
+      ok('stage 3: <= 1 caption per 20 s (budget 1 per stage)', s3.st.length <= 1, s3.st);
+      ok('a caption is drawn only while its thing is in the field', s1.vis && s3.vis, { s1: s1.vis, s3: s3.vis });
+      ok('captions not shown go to the pause list', s3.list.length >= s3.st.length, s3.list);
+      const u = await p.evaluate(() => { const E = window.EXP, X = window.EX10, m = window.__mnr; const r = {};
+        const D = X.probe.dims(), W = D.W, H = D.H, rot = D.rot; r.rot = rot; r.sTop = X.side(W / 2, 4); r.sBot = X.side(W / 2, H - 4); r.sR = X.side(W - 4, H / 2);
+        r.sideOk = rot ? (r.sTop === 'LEFT' && r.sBot === 'RIGHT' && r.sR === 'TOP') : (r.sTop === 'TOP' && r.sBot === 'BOTTOM' && r.sR === 'RIGHT');
+        r.warnTxt = /%SIDE%/.test(E.TXT.warn) && !/TOP EDGE/.test(E.TXT.warn);
+        r.zh = typeof ZH !== 'undefined' && !!E.TXT.zh_rule && !!E.TXT.zh_boss;
+        HINT.MAXW = 8; r.hint = HINT.short('EMP spends all charges: hold 3 for the big burst') === 'EMP spends all charges: hold 3 for the big burst';
+        m.startStory(1); m.simOn(true); for (let i = 0; i < 30; i++) m.step(1 / 60); const n0 = X.probe.fl().length; X.probe.pop(200, 200, '+130'); X.probe.pop(205, 202, '+260'); X.probe.pop(210, 204, '+100');
+        const sp = X.probe.fl().slice(n0).filter(f => /^\+/.test(f.txt)); r.pops = sp.length; r.popTxt = sp.map(f => f.txt); m.abort(); return r; });
+      ok('edge-mark caption names the side the mark is on (no fixed "TOP EDGE")', u.sideOk && u.warnTxt, u);
+      ok('zonehint captions have queue ids', u.zh, u);
+      ok('hint strip keeps the whole sentence (no cut after 8 words)', u.hint, u);
+      ok('score pop-ups near one point merge into one', u.pops === 1 && u.popTxt[0] === '+490', u);
+    }
     const off = await browser.newContext({ viewport: { width: 390, height: 763 } }), q2 = await off.newPage();
     await q2.goto(base + '/index.html?explain=0'); await q2.waitForFunction(() => window.__mnr); ok('?explain=0 turns it off', await q2.evaluate(() => !window.EXP || !EXP.on));
     ok('no page errors', errs.length === 0, errs.slice(0, 3));

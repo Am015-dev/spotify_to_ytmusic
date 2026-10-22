@@ -107,3 +107,91 @@ const LBQ=window.LBQ={q:[],cur:null,last:-9,box:null,GAP:.8,
   reset(){this.q=[];this.cur=null;this.last=-9;this.box=null;}};
 NR.on('runStart',()=>LBQ.reset());
 {const fl=floater;floater=function(x,y,txt,c){if(RET.explain&&running&&G&&!G.tut&&!G.lab&&typeof txt==='string'&&/[A-Z]{3}/.test(txt)&&!/^\+/.test(txt)){LBQ.push(x,y,txt,c||'#ffffff');return;}return fl.apply(this,arguments);};LBQ.fl=fl;}
+/* ---------- review 10 (W145), fixes #3, #9, #10, #11. Flag RET.exp10 (?exp10=0 = review-9 behaviour). Nothing here changes play.
+   #3  caption budget: at most 3 captions in story stage 1, then 1 per stage, >= 20 s apart; a caption already taught to this profile (localStorage
+       'mnr_exptaught') is not shown again; a caption that waits > 5 s or whose thing left the field goes to the pause screen list "WHAT'S ON SCREEN".
+   #9  zonehint.js captions go through this queue (ids zh_rule / zh_boss); "+N" score pop-ups that would overlap a live one merge into it.
+   #10 a caption shows only while its thing is in the field and a leader line points at it; the edge-mark caption names the side the mark is on.
+   #11 hint strip: whole sentences (up to 14 words, wrapped) instead of a cut after 8 words; the power-up "TAP" chip never sits over a button. ---------- */
+if(RET.exp10===undefined)RET.exp10=!/[?&]exp10=0/.test(location.search);
+const EX10=window.EX10={get on(){return!!(RET.explain&&RET.exp10);},GAP:20,STALE:5,n:0,gap:0,list:[],shownAt:[],tt:null,
+  ENEMY:{tell:1,counter:1,hpbar:1,tough:1,shield:1},SHIP:{beat:1,hull:1,chain:1,still:1},
+  budget(){return typeof ST!=='undefined'&&ST.on&&ST.n===1?3:1;},
+  taught(){if(!this.tt){try{this.tt=JSON.parse(localStorage.getItem('mnr_exptaught')||'{}')||{};}catch(e){this.tt={};}}return this.tt;},
+  teach(k){this.taught()[k]=1;try{localStorage.setItem('mnr_exptaught',JSON.stringify(this.tt));}catch(e){}},
+  later(k){if(!this.list.includes(k))this.list.push(k);},
+  reset(){this.n=0;this.gap=0;this.list=[];this.shownAt=[];},
+  inF(x,y){return x!=null&&y!=null&&x>=-4&&x<=W+4&&y>=-4&&y<=H+4;},
+  live(e){return!!e&&!e.dead&&!(e.hp<=0)&&G.en.includes(e)&&this.inF(e.x,e.y);},
+  /* where the thing a caption names is now (world coords), or null when it is not in the field */
+  tgt(c){const k=c.k;if(this.ENEMY[k]){if(c.e)return this.live(c.e)?[c.e.x,c.e.y]:null;return this.inF(c.x,c.y)?[c.x,c.y]:null;}
+    if(this.SHIP[k])return[P.x,P.y];
+    if(k==='edge')return P.hp<=1?[c.x,c.y]:null;
+    if(k==='grade'){const e=document.getElementById('retPop');return e&&e.classList.contains('on')?[c.x,c.y]:null;}
+    if(k==='warn'){const w=typeof WARN!=='undefined'&&WARN[0];return w?[w.x,w.kind==='rain'?16:w.side<0?8:H-8]:null;}
+    if(k==='fence'){const F=typeof FUN!=='undefined'&&FUN.fence;return F&&F.rows&&F.rows.length?[c.x,c.y]:null;}
+    if(k==='flank')return window.AC&&AC.tells&&AC.tells.length||window.FLK&&FLK.tells&&FLK.tells.length?[c.x,c.y]:null;
+    if(k==='bill')return window.FL&&FL.set&&FL.set.k==='bill'?[c.x,c.y]:null;
+    if(k==='secret')return window.FL&&FL.sec&&this.inF(FL.sec.x,FL.sec.y)?[FL.sec.x,FL.sec.y]:null;
+    if(/^rule:/.test(k)){const id=k.slice(5);return window.RU&&RU.st&&RU.st.list.some(m=>m.id===id&&m.on)?[c.x,c.y]:null;}
+    if(k==='zh_rule'){if(!(window.RU&&RU.st))return null;for(const m of RU.st.list)if(m.id==='well'&&m.on&&m.o&&m.o.w&&m.o.w.length){const w=RU.T.well.pos(m,m.o.w[0],0);return[w.x,w.y];}return null;}
+    if(k==='zh_boss'){if(!(window.BMV&&BMV.hz&&G.boss))return null;for(const z of BMV.hz)if(z.s==='well')return[z.x,z.y];return null;}
+    const F=typeof FUN!=='undefined'?FUN:null;if(F&&/^(lane|supply|gaterun|hail|rescue|gust|blackout)$/.test(k)){const e=F.ev;return e&&e.k===k?[e.x!=null?e.x:c.x,e.y!=null?e.y:c.y]:null;}
+    return[c.x,c.y];},
+  /* the screen side a world point is nearest to (portrait: the world is turned, world +x = screen up) */
+  side(x,y){const rot=typeof wcv!=='undefined'&&wcv!==cv,d=rot?{TOP:W-x,BOTTOM:x,LEFT:y,RIGHT:H-y}:{TOP:y,BOTTOM:H-y,LEFT:x,RIGHT:W-x};let b='TOP';for(const s in d)if(d[s]<d[b])b=s;return b;}};
+Object.assign(EXP.TXT,{zh_rule:'PURPLE RING = gravity well: bends shots, no damage',zh_boss:'PURPLE RING = gravity well: it pulls your ship, thrust away',
+  warn:'MARK AT THE %SIDE% EDGE = danger comes in there',hull:'GREEN SQUARES OVER YOUR SHIP = your hull. Lose them all and the run ends'});
+NR.on('runStart',()=>EX10.reset());
+/* capture the enemy a caption names, so the caption follows it and ends with it */
+{const sh=EXP.show;EXP.show=function(k,x,y,col){const was=this.shown[k],r=sh.apply(this,arguments);
+  if(r&&!was&&EX10.on&&EX10.ENEMY[k]&&G){const c=this.q[this.q.length-1];if(c&&c.k===k){let b=null,bd=1e9;for(const e of G.en){const d=Math.abs(e.x-x)+Math.abs(e.y-y);if(!e.dead&&d<bd){bd=d;b=e;}}if(b&&bd<4)c.e=b;}}
+  return r;};}
+{const tk=EXP.tick;EXP.tick=function(dt){if(!EX10.on)return tk.apply(this,arguments);if(!this.on||!G||G.dead||G.tut||G.lab||!running)return;
+  EX10.gap=Math.max(0,EX10.gap-dt);const T=EX10.taught();
+  this.q=this.q.filter(c=>{c.age=(c.age||0)+dt;if(T[c.k]||c.age>EX10.STALE||!EX10.tgt(c)){EX10.later(c.k);return false;}return true;});
+  this.q.sort((a,b)=>(T[a.k]?1:0)-(T[b.k]?1:0));
+  const shut=EX10.gap>0||EX10.n>=EX10.budget(),had=this.cap,z=window.ZH&&ZH.cap;if(z)ZH.cap=null;   // zonehint captions are in this queue now: its own box never blocks it
+  try{if(shut){const q=this.q;this.q=[];tk.call(this,dt);this.q=q.concat(this.q);}else tk.call(this,dt);}finally{if(z&&window.ZH&&!ZH.cap)ZH.cap=z;}
+  const c=this.cap;if(c&&c!==had&&!c._x){c._x=1;EX10.n++;EX10.gap=EX10.GAP;EX10.teach(c.k);EX10.later(c.k);EX10.shownAt.push({k:c.k,t:G.t});}
+  if(c&&!EX10.tgt(c)){this.cap=null;this.cbox=null;}};}   // its thing left the field: the caption goes with it (it is in the pause list)
+/* draw: the side word, then a leader line from the box to the thing */
+{const dr=EXP.draw;EXP.draw=function(){const c=this.cap;if(!EX10.on||!c)return dr.apply(this,arguments);const p=EX10.tgt(c);if(!p)return;
+  const t0=this.TXT[c.k];if(/%SIDE%/.test(t0))this.TXT[c.k]=t0.replace('%SIDE%',EX10.side(p[0],p[1]));
+  try{dr.apply(this,arguments);}finally{this.TXT[c.k]=t0;}
+  const b=this.cbox;if(!b)return;const qx=clamp(p[0],b[0],b[0]+b[2]),qy=clamp(p[1],b[1],b[1]+b[3]),d=Math.hypot(p[0]-qx,p[1]-qy);if(d<14)return;
+  const a=Math.max(0,Math.min(1,c.t/.5,(this.ZT-c.t)/.3+.01)),ux=(p[0]-qx)/d,uy=(p[1]-qy)/d,ex=p[0]-ux*10,ey=p[1]-uy*10;
+  ctx.save();ctx.globalAlpha=a*.9;ctx.strokeStyle=c.col;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(qx,qy);ctx.lineTo(ex,ey);ctx.stroke();ctx.fillStyle=c.col;ctx.fillRect(ex-2.5,ey-2.5,5,5);ctx.restore();};}
+EXP.leader=1;
+/* #9 zonehint: the first well of a stage asks this queue; ZH keeps its state (done / cap) for its own test, its own box is not drawn */
+if(window.ZH){const zs=ZH.start;ZH.start=function(k,x,y,r,col){const d=this.done[k];zs.apply(this,arguments);if(EX10.on&&!d)EXP.show('zh_'+k,x,y,col);};
+  const zd=ZH.draw;ZH.draw=function(){if(EX10.on)return;return zd.apply(this,arguments);};}
+/* #9 score pop-ups: a "+N" that would sit on a live "+M" (same 0.3 s or still overlapping) adds into it */
+{const fl=floater;floater=function(x,y,txt,c){if(!EX10.on||!running||!G||typeof txt!=='string'||!/^\+\d+$/.test(txt))return fl.apply(this,arguments);
+  for(const f of G.fl)if(f._sp&&f.l>.25&&(G.t-f._sp<.3&&Math.hypot(f.x-x,f.y-y)<90||Math.abs(f.x-x)<(f.txt.length+txt.length)*5+8&&Math.abs(f.y-y)<22)){f.txt='+'+((+f.txt.slice(1)||0)+(+txt.slice(1)||0));f.l=Math.max(f.l,.8);return;}
+  const n=G.fl.length;fl.apply(this,arguments);if(G.fl.length>n)G.fl[G.fl.length-1]._sp=G.t;};}
+/* pause screen: WHAT'S ON SCREEN, every caption of this run (shown or waiting) in plain words */
+{const pm=document.getElementById('pausem');if(pm){const put=()=>{if(pm.hidden)return;let d=document.getElementById('expList');const L=EX10.on?EX10.list.filter(k=>EXP.TXT[k]):[];
+    if(!L.length){if(d)d.hidden=true;return;}const inn=pm.querySelector('.in')||pm;
+    if(!d){d=document.createElement('div');d.id='expList';d.style.cssText='max-width:min(92vw,420px);margin:8px auto;text-align:left;font:600 13px/1.35 sans-serif;color:#e9e6ff;background:#05030cf2;border:1px solid #19e3ff66;border-radius:10px;padding:8px 12px;max-height:38vh;overflow:auto;overflow-wrap:anywhere';inn.appendChild(d);}
+    d.hidden=false;d.innerHTML='';const h=document.createElement('div');h.textContent="WHAT'S ON SCREEN";h.style.cssText='font-weight:800;letter-spacing:.06em;color:#19e3ff;margin-bottom:4px';d.appendChild(h);
+    for(const k of L){const r=document.createElement('div');r.textContent=EXP.TXT[k].replace('%SIDE%','SIDE');r.style.margin='3px 0';d.appendChild(r);}};
+  new MutationObserver(put).observe(pm,{attributes:true,attributeFilter:['hidden']});EX10.pauseList=put;}}
+/* #11 hint strip: keep the whole sentence (HINT.draw wraps it); only a text over 14 words is cut, at its last ':' or '.' */
+if(window.HINT){const so=HINT.short;HINT.short=function(s){if(!EX10.on)return so.apply(this,arguments);const w=String(s==null?'':s).trim().split(/\s+/).filter(Boolean);if(w.length<=14)return w.join(' ');
+  const t=w.slice(0,14).join(' '),i=Math.max(t.lastIndexOf(': '),t.lastIndexOf('. '));return i>8?t.slice(0,i):so.apply(this,arguments);};}
+if(window.ABIL&&ABIL.tip){const tp=ABIL.tip,SH={'EMP spends all charges: hold 3 for the big burst':'EMP uses every charge: wait for 3 = big burst','Crowded screen: EMP x3 now':'Crowded screen: use EMP now (3 charges)'};
+  ABIL.tip=function(t){return tp.call(this,EX10.on&&SH[t]||t);};}
+/* #11 the power-up chip ("TAP: use SLOW now") moves to the first spot that covers no button and stays on screen */
+EX10.chip=function(){const b=document.getElementById('bPwr'),cp=b&&b.querySelector('.cp');if(!cp||!b.classList.contains('cap'))return;
+  const bs=[...document.querySelectorAll('#touch button')].filter(x=>x!==b&&x.offsetParent).map(x=>x.getBoundingClientRect()).filter(r=>r.width&&r.height);
+  const S=[['calc(100% + 20px)','0','auto','auto'],['calc(100% + 20px)','auto','auto','0'],['auto','calc(100% + 8px)','0','auto'],['auto','auto','0','calc(100% + 8px)'],['auto','0','calc(100% + 8px)','auto'],['calc(100% + 64px)','0','auto','auto']];
+  const fit=()=>{const r=cp.getBoundingClientRect();if(r.left<2||r.top<2||r.right>innerWidth-2||r.bottom>innerHeight-2)return false;return!bs.some(q=>q.left<r.right&&q.right>r.left&&q.top<r.bottom&&q.bottom>r.top);};
+  if(cp._s!=null){const s=S[cp._s];cp.style.bottom=s[0];cp.style.right=s[1];cp.style.top=s[2];cp.style.left=s[3];if(fit())return;}
+  for(let i=0;i<S.length;i++){const s=S[i];cp.style.bottom=s[0];cp.style.right=s[1];cp.style.top=s[2];cp.style.left=s[3];if(fit()){cp._s=i;return;}}cp._s=null;};
+NR.on('tick',()=>{try{if(EX10.on)EX10.chip();}catch(e){}});
+EX10.probe={dims:()=>({W,H,rot:typeof wcv!=='undefined'&&wcv!==cv}),pop:(x,y,t)=>floater(x,y,t),fl:()=>G.fl};   // for explain-test.js
+/* review 10: a word label that an enemy flies into moves to the next free spot (it was placed once and stayed under a flanker) */
+{const lt=LBQ.tick;LBQ.tick=function(dt){lt.apply(this,arguments);if(!EX10.on||!this.cur||!this.box)return;const b=this.box;if(EXP.obst(b[0],b[1],b[2],b[3],'lbl')<100)return;
+  const rot=typeof wcv!=='undefined'&&wcv!==cv,bw=b[2],bh=b[3],s=EXP.spot(this.cur.x,this.cur.ly,bw,bh,bw/2+60,rot?Math.max(bw/2+60,290/(EXP._u||.57)):W-bw/2-8,bh/2+40,H-bh/2-40,'lbl');
+  if(s[2]>=1e6){G.fl=G.fl.filter(f=>f!==this.cur);this.cur=null;this.box=null;return;}this.cur.x=s[0];this.cur.ly=this.cur.y=s[1];this.box=[s[0]-bw/2,s[1]-bh/2,bw,bh];};}

@@ -22,7 +22,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
     p.on('pageerror', e => errs.push('page: ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push('console: ' + m.text()); });
     await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
     if (route) await route(p);
-    await p.addInitScript(() => { try { localStorage.setItem('mnr_tut', '1'); } catch (e) { } });
+    await p.addInitScript(() => { try { localStorage.setItem('mnr_tut', '1'); } catch (e) { } window.PK = () => { const S = __dp.STAGES, q = __mnr.RET.DP.pick(S.map(s => s.di)); return S.map((s, i) => ({ ch: s.ch, di: s.di, song: q[i] })); }; });
     await p.goto(`http://127.0.0.1:${port}/index.html${q}`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr);
     await sleep(1200);
     await p.click('#hub_missions'); await sleep(300); await p.click('#hub_missionsScr [data-door="#startBtn"]'); await p.waitForFunction(() => window.__mnr.running, null, { timeout: 5000 });
@@ -43,16 +43,16 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
   const mixed = await p.evaluate(() => ({ mode: __mp.mode(), def: __mnr.DEFS.mus, set: __mnr.SET.mus, pools: [0, 1, 2, 3, 4].map(d => __mnr.RET.DP.pool(d)), first: __mnr.BT.stage }));
   ok('0 Music setting defaults to Mix and is a saved setting', mixed.mode === 'mix' && mixed.def === 'mix' && mixed.set === 'mix', mixed);
   ok('0 Mix: every district pool holds old and new songs, interleaved', mixed.pools.every(po => po.some(k => PK.test(k)) && po.some(k => !PK.test(k)) && fam(po[0]) !== fam(po[1])), mixed.pools);
-  const share = await p.evaluate(() => { const o = []; for (let seed = 1; seed <= 30; seed++) { __mp.seed = seed * 7919; __mnr.RET.DP.sc = null; o.push(__dp.STAGES.filter(s => !s.ch).slice(0, 12).map(s => s.song)); } return o; });
+  const share = await p.evaluate(() => { const o = []; for (let seed = 1; seed <= 30; seed++) { __mp.seed = seed * 7919; __mnr.RET.DP.sc = null; o.push(PK().filter(s => !s.ch).slice(0, 12).map(s => s.song)); } return o; });
   const bad = [], sh = { N: 0, O: 0 }; let rep1 = 0, rep2 = 0;
   for (const run of share) { const n = run.filter(k => PK.test(k)).length; sh.N += n; sh.O += 12 - n; if (n < 5 || 12 - n < 5) bad.push(run.join()); for (let i = 1; i < run.length; i++) { if (run[i] === run[i - 1]) rep1++; if (i > 1 && run[i] === run[i - 2]) rep2++; } }
   ok(`0 Mix over 12 stages x 30 runs: new ${(100 * sh.N / 360).toFixed(1)}% / old ${(100 * sh.O / 360).toFixed(1)}%, each family >= 40% in every run, no immediate repeat, none of the last 2 again`, !bad.length && rep1 === 0 && rep2 === 0, { bad: bad.slice(0, 2), rep1, rep2 });
   ok('0 the shuffle differs between runs (seeded, not a fixed rotation)', new Set(share.map(r => r.join())).size > 5);
-  const st = await p.evaluate(() => { __mp.seed = 12345; __mnr.RET.DP.sc = null; const D = __dp, di = k => D.STAGES.filter(s => !s.ch && s.di === k).map(s => s.song); return { bank: di(0), main: di(1), ost: di(2), messe: di(3), ath: di(4) }; });
+  const st = await p.evaluate(() => { __mp.seed = 12345; __mnr.RET.DP.sc = null; const di = k => PK().filter(s => !s.ch && s.di === k).map(s => s.song); return { bank: di(0), main: di(1), ost: di(2), messe: di(3), ath: di(4) }; });
   ok('2 stages: new cues appear in every district sequence (Bank d1a/d1b, Athens athA/athB)', [st.bank, st.main, st.ost, st.messe, st.ath].every(a => a.some(k => PK.test(k)) && a.some(k => !PK.test(k))), st);
   ok(`2 the run itself starts on a real song (${mixed.first})`, /^(d[1-4][ab]|ath[AB]|stage\d|endless\d?|athina\d?)$/.test(mixed.first));
   const setMus = (p, v) => p.evaluate(v => { __mnr.setVal('mus', v); __mp.seed = 4242; __mnr.RET.DP.sc = null; }, v);
-  const songsOf = p => p.evaluate(() => __dp.STAGES.filter(s => !s.ch).slice(0, 40).map(s => s.song));
+  const songsOf = p => p.evaluate(() => PK().filter(s => !s.ch).slice(0, 40).map(s => s.song));
   await setMus(p, 'classic'); const cl = await songsOf(p); const clB = await p.evaluate(() => [0, 1, 2, 3].map(k => __dp.bossStage(k)).join());
   await setMus(p, 'new'); const nw = await songsOf(p); const nwB = await p.evaluate(() => [0, 1, 2, 3].map(k => __dp.bossStage(k)).join());
   await setMus(p, 'mix');
@@ -139,6 +139,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
   await p.evaluate(() => { __mnr.SET.mute = false; __mnr.AU.vol(true); });
   ok('5 no page errors with the pack', errs.length === 0, errs); allErrs.push(...errs);
   const pickOn = await p.evaluate(() => __dp.STAGES.map(s => s.song).join());
+  const pickMix = await p.evaluate(() => { const S = __mnr.SET, st = __dp.STAGES; S.mus = 'mix'; const a = st.map(s => s.song).join(); S.mus = 'classic'; const c = st.map(s => s.song).join(); const o = st.map(s => s.song0 || s.song).join(); S.mus = 'new'; const n = st.map(s => s.song).join(); S.mus = 'mix'; return { a, c, o, n, same: a === st.map(s => s.song).join() }; });
   await p.context().close();
 
   // ---------- fallback 1: nothing of the pack listed in ready.json
@@ -163,7 +164,9 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
   const ref = await open(noList);
   const rf = await ref.p.evaluate(() => ({ songs: __dp.STAGES.map(s => s.song).join(), bosses: [0, 1, 2, 3].map(k => __dp.bossStage(k)).join(), en: [__dp.songFor(3, 0), __dp.songFor(2, 1)].join() }));
   ok('5 ?musicpack=0: flag off, nothing registered, stage / boss / endless picks identical to a build without the files', off.on === false && off.reg === 0 && off.songs === rf.songs && off.bosses === rf.bosses && off.en === rf.en && !/^(d[1-4]|ath[AB])/.test(off.st), { off, rf });
-  ok('5 the pack really changes the picks when on', pickOn !== rf.songs);
+  ok('5 Classic = every stage plays its original song; Mix keeps a stage\'s own song until it is cleared (then a replay may take a new one)', pickMix.c === pickMix.o && pickMix.a === pickMix.o && pickMix.same, pickMix);
+  const pickNew = pickMix.n;
+  ok('5 the pack really changes the picks when on (New only)', pickNew !== rf.songs);
   allErrs.push(...o0.errs, ...ref.errs);
   ok('5 no page errors anywhere', allErrs.length === 0, allErrs);
   await br.close(); srv.kill();

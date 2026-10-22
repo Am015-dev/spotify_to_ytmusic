@@ -3,7 +3,8 @@
 //   overlay inventory  every overlay kind drawn (beams, lanes, rings, chevrons, bars, ticks, marks: known families + any draw spanning > 45% of the field)
 //                      has a caption id in EXP.OVL with a caption text, and that caption showed in the run where the overlay was drawn
 //   white beam         max run of near-white columns (>= half the field height) <= 4 css px in every probed frame
-//   labels (#5)        in stages 1, 3, 10: 0 text boxes (caption box, queued label, word floaters) overlapping each other or an enemy rect
+//   labels (#5)        in stages 1, 3, 10: 0 text boxes (caption box, queued label, word floaters) overlapping each other or an enemy rect;
+//                      review 10 #9: "+N" score pop-ups overlap no other text box by > 4 px
 //   off                ?explain=0 restores the old floaters. PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/overlay-test.js        env GAME_DIR=<built dir>  SECS=60
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process'), fs = require('fs');
@@ -37,7 +38,9 @@ const RUN = new Function('o', `
       if (o.lab && window.EXP) { const bx = []; if (EXP.cbox) bx.push(['caption', EXP.cbox]); if (window.LBQ && LBQ.box && LBQ.cur) bx.push(['label ' + LBQ.cur.txt, LBQ.box]);
         for (const f of m.G.fl) if (!f.lbq && f !== (window.LBQ && LBQ.cur) && /[A-Z]{3}/.test(f.txt) && !/^\\+/.test(f.txt)) { const L = f.txt.length * 9 + 16; bx.push(['floater ' + f.txt, rot ? [f.x - 11, f.y - L / 2, 22, L] : [f.x - L / 2, f.y - 11, L, 22]]); }
         lab.n += bx.length; for (let a = 0; a < bx.length; a++) { for (let b = a + 1; b < bx.length; b++) if (ov(bx[a][1], bx[b][1])) { lab.tt++; if (lab.ex.length < 4) lab.ex.push(bx[a][0] + ' x ' + bx[b][0]); }
-          for (const e of m.G.en) { if (e.dead) continue; const r = e.r || 14; if (ov(bx[a][1], [e.x - r, e.y - r, 2 * r, 2 * r])) { lab.te++; if (lab.ex.length < 4) lab.ex.push(bx[a][0] + ' x enemy ' + e.type); break; } } } }
+          for (const e of m.G.en) { if (e.dead) continue; const r = e.r || 14; if (ov(bx[a][1], [e.x - r, e.y - r, 2 * r, 2 * r])) { lab.te++; if (lab.ex.length < 4) lab.ex.push(bx[a][0] + ' x enemy ' + e.type); break; } } }
+        if (window.EX10 && EX10.on) { const ps = []; for (const f of m.G.fl) if (/^\\+\\d+$/.test(f.txt) && f.l > .25) { const L = f.txt.length * 9 + 8; ps.push(['pop ' + f.txt, rot ? [f.x - 9, f.y - L / 2, 18, L] : [f.x - L / 2, f.y - 9, L, 18]]); }   // review 10 #9: score pop-ups merge, never stack
+          lab.n += ps.length; for (let a = 0; a < ps.length; a++) for (const b of ps.slice(a + 1).concat(bx)) { const A = ps[a][1], B = b[1]; if (A[0] + 4 < B[0] + B[2] && A[0] + A[2] > B[0] + 4 && A[1] + 4 < B[1] + B[3] && A[1] + A[3] > B[1] + 4) { lab.tt++; if (lab.ex.length < 4) lab.ex.push(ps[a][0] + ' x ' + b[0]); } } } }
       if (i % 12 === 0) { const W = cv.width, H = cv.height, d = c2.getImageData(0, 0, W, H).data, col = new Uint16Array(W); for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) { const j = (y * W + x) * 4; if (d[j] >= 200 && d[j + 1] >= 200 && d[j + 2] >= 200) col[x]++; }
         let run = 0; for (let x = 0; x < W; x++) { if (col[x] >= H * .5) { run++; wmax = Math.max(wmax, run * css); } else run = 0; } } } }
   const r = { scn: o.scn, t: m.G.t, frames, wmax, lab, shown: window.EXP ? Object.keys(EXP.shown) : [] }; m.abort(); return r;`);

@@ -67,8 +67,8 @@ RU.T={
     init(m){m.o.y=H*.5;m.o.h=m.tw?140:190;m.o.in=0;},
     tick(m,dt){m.o.y=H*.5+Math.sin(G.t*(m.tw?.45:.28))*(H*.5-m.o.h/2-40);const inn=Math.abs(P.y-m.o.y)<m.o.h/2;m.o.in=inn;
       if(inn){G.score+=Math.round(40*dt*G.mult);if(G.ab&&P.emp<3)G.ab.m=Math.min(1,(G.ab.m||0)+.012*dt*RU.gk());RU.use('lane');}},
-    draw(m){if(ART.pic('fx-w34-rule-lane',W,W/2,m.o.y))return;ctx.fillStyle=this.c;ctx.globalAlpha*=m.o.in?.16:.08;ctx.fillRect(0,m.o.y-m.o.h/2,W,m.o.h);ctx.globalAlpha/=m.o.in?.16:.08;
-      ctx.strokeStyle=this.c;ctx.lineWidth=2;for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(0,m.o.y+s*m.o.h/2);ctx.lineTo(W,m.o.y+s*m.o.h/2);ctx.stroke();}
+    draw(m){if(ART.pic('fx-w34-rule-lane',W,W/2,m.o.y,0,.4))return;ctx.fillStyle=this.c;ctx.globalAlpha*=m.o.in?.16:.08;ctx.fillRect(0,m.o.y-m.o.h/2,W,m.o.h);ctx.globalAlpha/=m.o.in?.16:.08;
+      ctx.strokeStyle=this.c;ctx.lineWidth=2;ctx.globalAlpha*=.5;ctx.setLineDash([12,10]);for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(0,m.o.y+s*m.o.h/2);ctx.lineTo(W,m.o.y+s*m.o.h/2);ctx.stroke();}ctx.setLineDash([]);ctx.globalAlpha/=.5;
       for(let x=60;x<W;x+=160)RU.tri(x,m.o.y-m.o.h/2+10,8,1.57);},
     dash(m){if(m.o.in&&G.ab){G.ab.n=Math.min(4,(G.ab.n||0)+.5*RU.gk());}}},
   bounce:{n:'BOUNCE PANELS',t:'enemy shots ricochet off them',tt:'dash near one: it bounces shots back',c:'#19e3ff',

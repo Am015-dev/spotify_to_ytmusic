@@ -208,7 +208,7 @@ DP.boss=k=>{const a=DP.bossT[k];if(!a)return null;for(const s of a)if(DP.have(s)
 DP.pick=(dis)=>{const out=[],cnt={};for(let s=0;s<dis.length;s++){const di=dis[s],p=DP.pool(di),c=cnt[di]=(cnt[di]||0)+1,prev=out[s-1];let r=p[(c-1)%p.length];for(let j=0;j<p.length&&r===prev;j++)r=p[(c-1+j+1)%p.length];out.push(r);}return out;};
 DP.endless=(di,loop)=>{const n=ORDER.length,pos=posOf(di),dis=[];for(let l=0;l<=loop;l++)for(const d of ORDER)dis.push(d);return DP.pick(dis)[loop*n+pos];};
 DP.stage=n=>{const key=TR.list.length;if(DP.sc!==key){const dis=STAGES.map(s=>s.di);DP.sq=DP.pick(dis);DP.sc=key;}return DP.sq[n-1];};
-for(const s of STAGES){if(s.ch)continue;const old=s.song;   // challenge stages (fixed rules, tuned to their song) keep their old pick
+for(const s of STAGES){if(s.ch)continue;const old=s.song;s.song0=old;   // challenge stages (fixed rules, tuned to their song) keep their old pick
   Object.defineProperty(s,'song',{configurable:true,enumerable:true,get(){return RET.dpool?DP.stage(this.n):old;},set(v){Object.defineProperty(this,'song',{value:v,writable:true,configurable:true,enumerable:true});}});}
 window.__dp={STAGES,songFor,bossSong,bossStage,ORDER,DISTRICTS,songBars};   // test hook (ret-dpool-test.js)
 /* ===== B19 combo-driven music, B20 stingers (POLISH.md). The engine is in a.js (AU.lyTick / AU.lyHit / AU.sting); this only wires the events. ===== */

@@ -43,7 +43,7 @@ variants|12|one enemy, many looks (size, reversed)|variants,variants
 scale|3|power-aware enemy scale, round 1|scale,scale
 powerups|12|six music-tied timed power-ups + drum burst|pw2,pw2
 flow|6|the song never stops or stutters|flow,flow
-musicpack|15|polish music cues played by context|musicpack,musicpack
+musicpack|16|polish music cues played by context|musicpack,musicpack
 storydata|20|every line of the campaign story (data only; saga.js plays i|story,story
 tale|21|story cast, beats, dialogue card, STORY LOG|tale,tale
 stats|21|counters, achievements, completion %|stats,stats
@@ -59,7 +59,7 @@ g|62|G: owner test checklist, first-tap buttons, power-up levels,|-
 wpx|21|4b. WEAPON LEVELS BOUGHT IN THE GARAGE + EIGHT MORE WEAPONS |-
 fair|13|scale round 2, must-move column strike, strike follow-up|scale2,scale2,mustmove+
 hard|6|scale round 3: power-aware enemy hull|scale3,scale3
-react|15|enemies react to the ship, not fixed paths|react,react
+react|14|enemies react to the ship, not fixed paths|react,react
 armour|8|boss HP phases, damage cap, last stand|boss2,boss2
 reward|6|risk pays: graze chain multiplier|reward,reward
 choices|9|build pressure and real choices (default OFF)|build2,build2
@@ -86,7 +86,8 @@ bite|3|Normal bites again on top of the short stages|bite,bite
 flankers|8|flanker enemies that punish a parked ship (default OFF)|flankers,flankers
 foeart|9|every fly-stage enemy draws from an approved ship sheet|foeart,foeart
 fleet|23|enemy warships in the fly stages|fleet,fleet
-endramp|9|endless mode climbs in difficulty|endramp,endramp
+endramp|10|endless mode climbs in difficulty|endramp,endramp
+bandclear|2|no enemy rests under the HUD band on a phone: flyers cross i|bandclear,bandclear
 legend|11|Legend plays differently, not just faster|legend,legend
 h|5|H: no AFK wins, a dying ship slows the song|-
 fun|16|set pieces, deck replaces the fixed metronome, rosters|deck,deck,roster+
@@ -116,7 +117,7 @@ school|15|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,sc
 schoolfull|13|every Flight School drill and lesson mini stage is a real le|schoolfull,schoolfull
 tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
 menufix|4|HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 p|menufix,menufix
-explain|15|every fly-stage visual is explained: first-appearance captio|explain,explain
+explain|26|every fly-stage visual is explained: first-appearance captio|explain,explain
 calm|6|a calm playfield: rule banners small in the top band, thin s|calm,calm
 waves|15|stages 1-6 play named waves with one idea each, a breather b|waves,waves
 c|35|the hint bubble: wraps to two lines and stays inside the scr|-

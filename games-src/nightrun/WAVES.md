@@ -67,6 +67,8 @@ height for 0.7 s, dash, come back. Squads: 2 (3 when the song has time to spare)
 | 6 | 3/8 (6/8 in an earlier run of the same build) | 6 | 7 | 5 | 3.5 / 5.4 s |
 | pooled | **35/48 = 73%** (gate 60-80%) | | | | |
 
+After merging the latest base (same test, 8 runs): 1:8/8 2:8/8 3:8/8 4:8/8 5:0/8 6:5/8, pooled 37/48 = 77%, max on screen 6-8.
+
 Old (`?waves=0`, 8 runs): 1:100 2:100 3:88 4:88 5:0 6:88. Leaks per run: median 0 on every stage.
 
 Open points for the reviewer:
