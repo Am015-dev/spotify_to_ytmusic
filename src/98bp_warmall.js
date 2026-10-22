@@ -59,10 +59,7 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
  P2_compile=function(sc,cam){if(!on)return _pc.call(this,sc,cam);on=false;
   try{const L=window.__life;if(L&&L.init&&L.LIFE&&L.LIFE.on)WARMALL.life=!!L.init()}catch(e){console.warn('warmall life',e)}
   // the outer land's ground material is only made by worldGroundGen after the first roam frame (98bt_boot2 slices): link a twin of it now (same params → same program)
-  let gm=null;try{if(typeof worldGroundGen==='function'){const tx=CID==='fra'?groundTex('grass'):athGrassTex(),m=new THREE.MeshStandardMaterial({map:tx,vertexColors:true,roughness:.92});
-   if(typeof ENV_ground==='function')ENV_ground(m,{kind:'land',tint:true,base:WGC,s:[900,260,70]});m.polygonOffset=true;m.polygonOffsetFactor=1;m.polygonOffsetUnits=2;
-   const g=new THREE.BufferGeometry();for(const[k,n]of[['position',3],['normal',3],['uv',2],['color',3]])g.setAttribute(k,new THREE.Float32BufferAttribute(new Array(n*3).fill(0),n));
-   gm=new THREE.Mesh(g,m);gm.receiveShadow=true;gm.frustumCulled=false;sc.add(gm)}}catch(e){console.warn('warmall ground',e)}
+  let gm=null;try{if(typeof worldGroundGen==='function'){gm=WARM_gtwin();sc.add(gm)}}catch(e){console.warn('warmall ground',e)}
   // boot-4: the transform burst (pooled material, 30_race xfWarm) linked its program on the first swap
   let bm=null;try{if(typeof xfWarm==='function'){bm=xfWarm();sc.add(bm)}}catch(e){console.warn('warmall burst',e)}
   // perf-r11c: LF_warm links the fill materials right after the hub props, but Athens still linked the instanced fill program (instance colour + vertex colours + env map)
@@ -141,7 +138,13 @@ async function PREW_decide(){const q=PREW.q;if(q==='1'){PREW.arm='forced-on';ret
 function PREW_sc(on){const R=renderer,rt=[composer.renderTarget1,composer.renderTarget2].filter(Boolean);PREW.sv=PREW.sv||[];
  if(on){PREW.sv=rt.map(t=>[t,t.scissorTest,t.scissor.clone()]);for(const t of rt){t.scissorTest=true;t.scissor.set(0,0,1,1)}PREW.ss=[R.getScissorTest(),new THREE.Vector4()];R.getScissor(PREW.ss[1]);R.setScissorTest(true);R.setScissor(0,0,1,1)}
  else{for(const[t,f,v]of PREW.sv){t.scissorTest=f;t.scissor.copy(v)}PREW.sv=[];if(PREW.ss){R.setScissor(PREW.ss[1]);R.setScissorTest(PREW.ss[0]);PREW.ss=null}}}
+/* gk-tile-reveal-r22e9: twin of the outer-land ground tile (worldGroundGen: map + vertex colours + env-1 land patch). Shared by the loader compile and PREW_run (the loader twin is gone by then, so its program was released) */
+function WARM_gtwin(){const tx=CID==='fra'?groundTex('grass'):athGrassTex(),m=new THREE.MeshStandardMaterial({map:tx,vertexColors:true,roughness:.92});
+ if(typeof ENV_ground==='function')ENV_ground(m,{kind:'land',tint:true,base:WGC,s:[900,260,70]});m.polygonOffset=true;m.polygonOffsetFactor=1;m.polygonOffsetUnits=2;
+ const g=new THREE.BufferGeometry();for(const[k,n]of[['position',3],['normal',3],['uv',2],['color',3]])g.setAttribute(k,new THREE.Float32BufferAttribute(new Array(n*3).fill(0),n));
+ const gm=new THREE.Mesh(g,m);gm.receiveShadow=true;gm.frustumCulled=false;return gm}
 function PREW_run(){const t0=performance.now(),R=renderer,P=R.info.programs;PREW.p0=P.length;PREW.ran=1;const seen=new Set(),all=[],keep=[];
+ let GT=null;try{if(typeof worldGroundGen==='function'){GT=WARM_gtwin();scene.add(GT)}}catch(e){console.warn('PREW gtwin',e)}
  /* coin-prewarm-r22e6: ?cl=core,studs builds its stud InstancedMeshes (own gold/blue materials) after the first compile, so they have no program yet and were never drawn here (a link after reveal).
     Compile them now and draw them FIRST, so the cap can never abort before the coin. */
  const CLI=[];try{if(window.__cls&&__cls.keep){for(const s of __cls.keep)if(s.im&&!CLI.includes(s.im))CLI.push(s.im);for(const o of CLI){let q=o,hid=[];while(q&&q!==scene){if(q.visible===false){q.visible=true;hid.push(q)}q=q.parent}try{R.compile(o,camera,scene)}catch(e){}for(const x of hid)x.visible=false;const pr=R.properties.get(o.material).currentProgram;if(pr)try{pr.getUniforms()}catch(e){}}}}catch(e){console.warn('PREW cl',e)}
@@ -151,9 +154,11 @@ function PREW_run(){const t0=performance.now(),R=renderer,P=R.info.programs;PREW
  try{for(const o of all)o.visible=false;
   LKG.arm=0;if(T)T.draw=1;LD.on=false;LD.busy=false;TWG.run=0;PREW_sc(1);const gl=R.getContext(),px=new Uint8Array(4);
   /* batches of 4 representatives: each ends in a 1-px read, which blocks until the GPU has finished, so the wall clock between batches is real and the cap can bite */
-  if(CLI.length)keep.sort((x,y)=>CLI.includes(y)-CLI.includes(x));for(let i=0;i<keep.length;i+=4){const b=keep.slice(i,i+4);for(const o of b){o.visible=true;o.frustumCulled=false}composer.render();gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);for(const o of b)o.visible=false;drawn+=b.length;
+  /* gk-tile-reveal-r22e9: the ground tiles (userData.gk, one MeshStandard per class) sort right after the coin; at 6x the cap aborts after ~4 programs and the tile linked ~2 s after reveal */
+  if(GT)keep.push(GT)
+  {const rk=o=>o===GT?3:CLI.includes(o)?2:o.userData&&o.userData.gk?1:0;keep.sort((x,y)=>rk(y)-rk(x))}for(let i=0;i<keep.length;i+=4){const b=keep.slice(i,i+4);for(const o of b){o.visible=true;o.frustumCulled=false}composer.render();gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);for(const o of b)o.visible=false;drawn+=b.length;
    const dt=performance.now()-t0;if(dt>PREW.cap&&i+4<keep.length){PREW.ab=Math.round(dt);break}}}
- finally{PREW_sc(0);for(const[o,v,f]of sv){o.visible=v;o.frustumCulled=f}LD.on=l0;LD.busy=b0;LKG.arm=k0;if(T)T.draw=d0;TWG.run=r0;PREW.n=drawn;PREW.prog=seen.size;PREW.p1=P.length;PREW.ms=Math.round(performance.now()-t0)}}
+ finally{if(GT){scene.remove(GT);GT.geometry.dispose()}PREW_sc(0);for(const[o,v,f]of sv){o.visible=v;o.frustumCulled=f}LD.on=l0;LD.busy=b0;LKG.arm=k0;if(T)T.draw=d0;TWG.run=r0;PREW.n=drawn;PREW.prog=seen.size;PREW.p1=P.length;PREW.ms=Math.round(performance.now()-t0)}}
 /* ios-r20f: a player page evaluated the lazy code chunks (99c_checklist 212 KB, the city chunks; direct eval, 0.3-1.6 s on a slow CPU) 1.5 s AFTER the curtain lifted (10z_lazy.js),
    the iPhone freeze ~2 s after the city appears. They now load and eval here, under the curtain, before the gate frames. Touch/lowmem path only (desktop has LKG). ?twgxc=0 = old timing */
 TWG.xc=new URLSearchParams(location.search).get('twgxc')!=='0';TWG.xcMs=-1;

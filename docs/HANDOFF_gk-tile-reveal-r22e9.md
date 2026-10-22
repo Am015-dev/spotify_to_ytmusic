@@ -1,0 +1,6 @@
+# HANDOFF gk-tile-reveal-r22e9
+1. Cause: the late "gk" link was the OUTER-LAND ground tile (worldGroundGen: map + vertexColors + env-1 'land' patch, built after reveal). Its loader twin (P2_compile) is removed from the scene, so its program was released before PREW_run; nothing in the scene had that program.
+2. Fix (src/98bp_warmall.js): WARM_gtwin() (shared by P2_compile and PREW_run); PREW_run adds a twin, draws it FIRST (before coin, gk tiles), removes it. No new system.
+3. ios-reveal fra CPU=6 prewarm=1 on the built page: links 0/0/0 default (was 1/1/1) and 0/0/0 with ?cl=core,studs (was 1/1/1). But the GO stall rule (gap > 2.5x median) still fails: default 3/8 green, core,studs 0/6; the stall is the last frame (~2.7 s, 0.7-1 s, js only ~200 ms, render ~110 ms, no link/upload), not a shader. Athens default unchanged (1 stall in 2 runs, same as before).
+4. Gates: unit 0 FAIL; TAG=life1,xf1,terrain,core,studs fra+ath 44/44; fra spawn shot with studs looked fine. Studs/core NOT flipped to default (stall criterion not met).
+5. Left: find the ~0.8 s non-JS frame at ~2.5-3 s after reveal (likely GC or a GPU-side first draw; try PerformanceObserver longtask + a trace), then flip fra studs+core.
