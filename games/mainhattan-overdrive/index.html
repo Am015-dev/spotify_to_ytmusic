@@ -751,6 +751,7 @@ const TUNE={wbLodRt:0/* r17s far-LOD cell range cap in m (0 = by quality tier); 
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.12,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45,drSnap:14,drMax:.7,drExitT:.4,drExitG:12};
 const OD_CHANGELOG=[
+{v:'v90m-beta.153',date:'22 Oct 2026',items:[{t:'FIXED',s:'No more invisible walls next to some Athens buildings: you can drive right up to them, and they now end at the roof.'}]},
 {v:'v90m-beta.152',date:'22 Oct 2026',items:[{t:'FIXED',s:'Traffic cars no longer jump, slide sideways or pop up while you can see them; cars that must respawn now do it behind you.'},{t:'FIXED',s:'Ground loads before the city appears on phones.'}]},
 {v:'v90m-beta.151',date:'22 Oct 2026',items:[{t:'NEW',s:'Speed feel: speed lines at the screen edges above 90 km/h, a wider view at speed, and a whoosh, flash and blue jets when you boost.'},{t:'FIXED',s:'Traffic cars stay the same when you turn the camera, and stuck or overlapping cars now clear away out of your sight.'},{t:'FIXED',s:'Less stutter on phones right after the city appears.'}]},
 {v:'v90m-beta.150',date:'22 Oct 2026',items:[{t:'FIXED',s:'No more invisible traffic cars on phones, and cars no longer change when you turn the camera away and back.'},{t:'FIXED',s:'You can no longer drive through a traffic car while it waits or turns at a junction.'},{t:'CHANGED',s:'PLAY now starts quiet in both cities: no story card in Athens, no prompts while you drive fast, and your car is never swapped for a buggy on dirt.'}]},
@@ -3991,6 +3992,7 @@ function TR8_fadeRoads(W,R,pads){if(!TR8_FON)return;const T0=performance.now(),{
     const lim=TR8_K*d,c=clamp(h[k],H[k]-lim,H[k]+lim);if(c===h[k])continue;const t=clamp((d-TR8_F)/TR8_F,0,1),w=1-t*t*(3-2*t);h[k]+=(c-h[k])*w;m++}
   W.tr8={fill:FR.length,cells:m,ms:Math.round(performance.now()-T0)}}
 const TR9_ON=new URLSearchParams(location.search).get('t9c')!=='0',TR9_PIN=6,TR9_N=72;
+const TR9_EASE={ath:[[1290,-300,140]]},TR9_EK=Math.tan(16*Math.PI/180),TR9_EON=new URLSearchParams(location.search).get('t9e')==='1';
 const TR9_CH=new URLSearchParams(location.search).get('t9ch')!=='0',TR9_B=14,TR9_Y=3000;
 function* TR9_dist(W,R,pads,Z){const{r,nx,nz}=W,n=nx*nz,D=new Float32Array(n).fill(1e9);let w=0;const tick=c=>(w+=c)>=TR9_Y?(w=0,true):false;
   const seed=(x0,z0,x1,z1,hw)=>{const i0=Math.max(0,Math.floor((Math.min(x0,x1)-hw-WX0)/r)),i1=Math.min(nx-1,Math.ceil((Math.max(x0,x1)+hw-WX0)/r)),j0=Math.max(0,Math.floor((Math.min(z0,z1)-hw-WZS)/r)),j1=Math.min(nz-1,Math.ceil((Math.max(z0,z1)+hw-WZS)/r));
@@ -4011,7 +4013,8 @@ function* TR9_gen(W,R,pads){if(!TR9_ON)return;const T0=performance.now(),{r,nx,n
   if(WATERS.length||(CID!=='fra'&&typeof HILL_BY!=='undefined'&&HILL_BY.akro)){const A=CID!=='fra'&&typeof HILL_BY!=='undefined'?HILL_BY.akro:null;for(let q=0;q<nb;q++){const k=band[q],x=WX0+(k%nx)*r,z=WZS+((k/nx)|0)*r;if((WATERS.length&&inRiver(x,z,-25))||(A&&athHill1(A,x,z)>0))skip[k]=1;if(tick(40))yield}}
   const KK=new Float32Array(TR9_N+1);for(let d=0;d<=TR9_N;d++){const t=clamp((d-25)/40,0,1);KK[d]=K0+(K1-K0)*t*t*(3-2*t)}
   const NB=[-1,1,-nx,nx,-1-nx,1-nx,nx-1,nx+1],NF=[1,1,1,1,Math.SQRT2,Math.SQRT2,Math.SQRT2,Math.SQRT2];let ch=0;
-  for(let q=0;q<nb;q++){const k=band[q];if(skip[k])continue;const dk=D[k],w=KK[dk|0]*r;let lo=-1e9,hi=1e9;
+  const EZ=TR9_EON&&TR9_EASE[CID]||[];
+  for(let q=0;q<nb;q++){const k=band[q];if(skip[k])continue;const dk=D[k];let w=KK[dk|0]*r;if(EZ.length){const x=WX0+(k%nx)*r,z=WZS+((k/nx)|0)*r;for(const e of EZ)if((x-e[0])**2+(z-e[1])**2<e[2]*e[2]){w=Math.min(w,TR9_EK*r);break}}let lo=-1e9,hi=1e9;
     for(let e=0;e<8;e++){const u=k+NB[e];if(skip[u]||!(D[u]<dk-.01))continue;const hu=h[u],m=w*NF[e];if(hu-m>lo)lo=hu-m;if(hu+m<hi)hi=hu+m}
     if(lo!==-1e9){const v=h[k],t=lo>hi?(lo+hi)/2:v<lo?lo:v>hi?hi:v;if(t!==v){h[k]=t;ch++}}if(tick(8))yield}
   W.tr9={band:nb,changed:ch,ms:Math.round(performance.now()-T0)}}
@@ -7531,9 +7534,11 @@ function* TR_bldFixG(){let yt=performance.now();const B=HUB.bld,C=new Map(),CS=8
   HUB.trB={n:B.length,lifted:B.filter(b=>b.trOff).length,plinths:TR_PL.length}}
 let TR_bf=0;{const _hg=hubGrid;hubGrid=()=>{if(!TR_bf&&HUB.grp){TR_bf=1;TR_bldFix()}return _hg()}}
 function TR_onSlip(x,z){for(let _j3=0,_b3=SLIPS;_j3<_b3.length;_j3++){const s=_b3[_j3];const dx=x-s.x,dz=z-s.z;if(dx>50||dx<-50||dz>50||dz<-50)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<12&&inw>-6&&inw<32)return true}return false}
+let TR_CLB=new URLSearchParams(location.search).get('clb')==='1';   // default OFF until the bughunt bar holds (hill/offroad slides -60 %, no yJump rise)
+function TR_climbWin(){if(!TR_CLB||!CTL||!(CTL.thr||CTL.boost))return[.5,.665];const lo=.64+.06*clamp((RO.v||0)/10,0,1);return[lo,lo+.1]}
 function TR_pre(dt){RO.trSlope=null;const T=roamTerr(RO.x,RO.z,RO.y+.3,_rtG);if(RO.y>T.g+.5||T.deck||T.g<-1.5||TR_onSlip(RO.x,RO.z)){RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);if(!T.deck){const[gx,gz]=TR_grad(RO.x,RO.z,2);TR6_stuck(dt,Math.atan(Math.hypot(gx,gz)))}return}
   const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz),th=Math.atan(s),fx=Math.sin(RO.vh??RO.h),fz=Math.cos(RO.vh??RO.h),a=gx*fx+gz*fz;RO.trSlope={gx,gz,th,a};
-  const ea=ESC.E.as>0;/* escape-1: assist = slope grip held, gravity x0.2 */RO.v-=9.8*.75*(ea?.2:1)*a/Math.sqrt(1+a*a)*dt;const grip=ea?1:clamp((.665-th)/(.665-.5),0,1);RO.trGrip=grip;
+  const ea=ESC.E.as>0;/* escape-1: assist = slope grip held, gravity x0.2 */RO.v-=9.8*.75*(ea?.2:1)*a/Math.sqrt(1+a*a)*dt;const cw=TR_climbWin(),grip=ea?1:clamp((cw[1]-th)/(cw[1]-cw[0]),0,1);RO.trGrip=grip;
   if(grip<1){if(a>0&&RO.v>-2&&CTL&&(CTL.thr||CTL.boost))RO.v-=(1-grip)*58*dt;RO.trSl=Math.min(9,(RO.trSl||0)+(1-grip)*16*dt)}else RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);TR6_stuck(dt,th)}
 function TR6_stuck(dt,th){if(TR8_on()||new URLSearchParams(location.search).get('t6r')==='0')return;const on=CTL&&(CTL.thr||CTL.boost)&&Math.abs(RO.v)<2&&th>.349;
   RO.t6s=on?(RO.t6s||0)+dt:Math.max(0,(RO.t6s||0)-.5*dt);if(RO.t6s<3)return;RO.t6s=0;
@@ -8866,8 +8871,8 @@ function DR_athFill(R){let mat=null;HUB.grp.traverse(o=>{if(!mat&&o.isInstancedM
   const quad=(ax,az,bx,bz,ya,yb,y0,nx,nz,col)=>{const k=P.length/3,L=Math.hypot(bx-ax,bz-az),u1=L/FW,va=(ya-y0)/FH,vb=(yb-y0)/FH;
     P.push(ax,ya,az,bx,ya,bz,bx,yb,bz,ax,yb,az);for(let q=0;q<4;q++){N.push(nx,0,nz);C.push(col.r,col.g,col.b)}U.push(u1,va,0,va,0,vb,u1,vb);I.push(k,k+2,k+1,k,k+3,k+2)};
   const roof=(x0,z0,x1,z1,y)=>{const k=rP.length/3;rP.push(x0,y,z0,x0,y,z1,x1,y,z1,x1,y,z0);for(let q=0;q<4;q++)rC.push(rc.r,rc.g,rc.b);rI.push(k,k+1,k+2,k,k+2,k+3)};
-  for(const r of R){const cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2;/* collide-r21i: the fill drew 7963 blocks (75 km2) and registered NO collider since v89f (the early return in DR_solidBuildG skipped the HUB.bld push): the car drove through them */{const cb={x:cx,z:cz,hw:(r.x1-r.x0)/2,hd:(r.z1-r.z0)/2};HUB.bld.push(cb);if(HUB.grid)gridAddTo(HUB.grid,[cb])}let lo=1e9,hi=-1e9;for(const[a,b]of[[r.x0,r.z0],[r.x1,r.z0],[r.x0,r.z1],[r.x1,r.z1],[cx,cz]]){const y=groundY(a,b);lo=Math.min(lo,y);hi=Math.max(hi,y)}
-    const y0=lo-.5,y1=hi+.6+(2+Math.floor(DR_h(cx*.37,cz*.37)*2))*3.1;c.set(PC[Math.floor(DR_h(cz,cx)*PC.length)]);roof(r.x0,r.z0,r.x1,r.z1,y1);
+  for(const r of R){const cx=(r.x0+r.x1)/2,cz=(r.z0+r.z1)/2;/* collide-r21i: the fill drew 7963 blocks (75 km2) and registered NO collider since v89f (the early return in DR_solidBuildG skipped the HUB.bld push): the car drove through them */let lo=1e9,hi=-1e9;for(const[a,b]of[[r.x0,r.z0],[r.x1,r.z0],[r.x0,r.z1],[r.x1,r.z1],[cx,cz]]){const y=groundY(a,b);lo=Math.min(lo,y);hi=Math.max(hi,y)}
+    const y0=lo-.5,y1=hi+.6+(2+Math.floor(DR_h(cx*.37,cz*.37)*2))*3.1;/* ath-trap-r2: the collider has the drawn block's real top (y1, absolute), not an endless wall */{const cb={x:cx,z:cz,hw:(r.x1-r.x0)/2,hd:(r.z1-r.z0)/2,h:y1,fill:1};HUB.bld.push(cb);if(HUB.grid)gridAddTo(HUB.grid,[cb])}c.set(PC[Math.floor(DR_h(cz,cx)*PC.length)]);roof(r.x0,r.z0,r.x1,r.z1,y1);
     for(const[sx,sz,dx,dz,nx,nz,len]of[[r.x0,r.z0,1,0,0,-1,r.x1-r.x0],[r.x1,r.z0,0,1,1,0,r.z1-r.z0],[r.x1,r.z1,-1,0,0,1,r.x1-r.x0],[r.x0,r.z1,0,-1,-1,0,r.z1-r.z0]]){
       const ns=Math.max(1,Math.round(len/32)),sl=len/ns,dep=Math.min(12,(nx?r.x1-r.x0:r.z1-r.z0)/2-.5);
       for(let k=0;k<ns;k++){const ax=sx+dx*k*sl,az=sz+dz*k*sl,bx=ax+dx*sl,bz=az+dz*sl,mx=(ax+bx)/2,mz=(az+bz)/2;st.seg++;
@@ -15317,7 +15322,7 @@ function TRN_junc(){const L=[];for(const J of (typeof JUNC!=='undefined'?JUNC:[]
 const TRN_VD=1500,TRN_VA=1.5,TRN_VH=20;
 function TRN_ray(x0,z0,ey,a,tA,vh=TRN_VH,mg=0){const ux=Math.sin(a),uz=Math.cos(a);let occ=-1e9;const B=new Set();
   for(let d=5;d<=TRN_VD;d+=d<300?5:10){const x=x0+ux*d,z=z0+uz*d,L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));
-    if(L)for(const b of L){if(B.has(b)||!b.h)continue;if(bHit(b,x,z,0)){B.add(b);occ=Math.max(occ,(b.h-ey)/d)}}
+    if(L)for(const b of L){if(B.has(b)||!b.h||b.fill)continue;/* ath-trap-r2: solid-fill blocks (DR_solidBuildG) sit behind the street buildings: not skyline occluders */if(bHit(b,x,z,0)){B.add(b);occ=Math.max(occ,(b.h-ey)/d)}}
     const gy=groundY(x,z),g=(gy-ey)/d;if(d>=150&&g>tA&&gy-ey>=vh&&g>occ+mg)return d;occ=Math.max(occ,g)}
   const T=TR_H4.on?TRN_ridgeTop():null;if(T){const deg=((Math.round(a*57.296)%360)+360)%360,y=T[deg];if(y>-1e8){const g=(y-1.5)/TRN_RD;if(g>tA&&g>occ+mg)return TRN_RD}}return 0}
 function TRN_view(n=100,seed,opt={}){const va=opt.va??TRN_VA,vh=opt.vh??TRN_VH,mg=Math.tan((opt.mg??0)*Math.PI/180);const R=TRN_roads().filter(r=>r.cls!=='ab'&&r.cls!=='hill'&&r.P.length>2),rnd=TRN_rng(seed??(CID==='fra'?21:23)),S=[];
@@ -15391,7 +15396,7 @@ function TR6_go(kind){try{
   if(kind==='slope'){const o=TR6_slope();return'📍 SLOPES BESIDE ROADS · steepest terrain 6-25 m beside a road: '+o.th+'° at ('+o.x+','+o.z+') of '+o.n+' points (info; the car climbs ≤29°, TR6_stuck lifts it out of anything steeper) ✅'}
   if(kind==='pit'){const o=TR6_pit();return'📍 PIT ESCAPE · start on '+(o.s.th||0)+'° at ('+o.s.x+','+o.s.z+'), gas 10 s: '+(o.onR?'on a road':'moved '+o.mv+' m')+', lifted '+o.lifts+'×'+(o.ok?' ✅':' ❌')}
  }catch(e){return'📍 terr6 '+kind+' ERROR '+e.message+' ❌'}}
-const ESC={q:new URLSearchParams(location.search).get('esc')!=='0',t1:1.5,t1g:.5,assist:2,depth:2.5,keep:6,vMax:8,net2:20,pin:{t:3,t2:5,net:4,v:3},rock:{t:5,r:6,rev:2},
+const ESC={q:new URLSearchParams(location.search).get('esc')!=='0',t1:1.5,t1g:.5,assist:2,depth:2.5,keep:6,vMax:8,net2:20,pin:{t:3,t2:5,net:4,v:3},rock:{t:5,tb:2.5,r:6,rev:2,bx:new URLSearchParams(location.search).get('bx')==='1'},
   cnt:{assist:0,reset:0,manual:0},E:{H:[],T:0,as:0,h:null,tp:0,done:0,log:null}};
 function ESC_depth(x,z,wantDir){const g0=groundY(x,z);let mn=1e9,bk=0;for(let k=0;k<24;k++){const a=k*Math.PI/12,sx=Math.sin(a),sz=Math.cos(a);let m=-1e9;for(const r of[4,8,12,18,26,36,48,60]){const q=groundY(x+sx*r,z+sz*r)-g0;if(q>m)m=q}if(m<mn){mn=m;bk=a}}
   return wantDir?{depth:mn,dir:bk}:mn}
@@ -15404,9 +15409,9 @@ function ESC_pin(H,w){const n=H.length,c=H[n-1],i=ESC_at(H,w);if(i<0)return fals
   return c[5]*((c[1]-H[i][1])*Math.sin(c[4])+(c[2]-H[i][2])*Math.cos(c[4]))<ESC.pin.net&&s/(c[0]-H[i][0])<ESC.pin.v}
 function ESC_trapped(H){const n=H.length;if(!n)return'';const c=H[n-1];
   if(ESC_pin(H,ESC.pin.t)){if(ESC_hole(c[1],c[2]))return'pinned';if(ESC_pin(H,ESC.pin.t2))return'stuck'}
-  let i=ESC_at(H,ESC.rock.t);if(i<0)return'';let cx=0,cz=0;for(let k=i;k<n;k++){cx+=H[k][1];cz+=H[k][2]}cx/=n-i;cz/=n-i;if(ESC_far(H,i,cx,cz)>=ESC.rock.r)return'';
-  let rev=0,sg=0;for(let k=i;k<n;k++){const v=H[k][3];if(v>.5){if(sg<0)rev++;sg=1}else if(v<-.5){if(sg>0)rev++;sg=-1}}
-  return rev>=ESC.rock.rev?'rocking':''}
+  const rk=w=>{const i=ESC_at(H,w);if(i<0)return false;let cx=0,cz=0;for(let k=i;k<n;k++){cx+=H[k][1];cz+=H[k][2]}cx/=n-i;cz/=n-i;if(ESC_far(H,i,cx,cz)>=ESC.rock.r)return false;
+    let rev=0,sg=0;for(let k=i;k<n;k++){const v=H[k][3];if(v>.5){if(sg<0)rev++;sg=1}else if(v<-.5){if(sg>0)rev++;sg=-1}}return rev>=ESC.rock.rev};
+  return rk(ESC.rock.t)||(ESC.rock.bx&&rk(ESC.rock.tb)&&ESC_hole(c[1],c[2]))?'rocking':''}
 function ESC_end(){const E=ESC.E;E.H.length=0;E.as=0;E.done=0;E.tp=0}
 function ESC_clear(x,z,y,r=7){if(roamHit(x,z,2.8,y))return false;for(const q of(HUB.cars||[]))if(!q.dead&&q.x!=null&&Math.hypot(q.x-x,q.z-z)<r)return false;return true}   // the lift picks with r=10: traffic still moves in the frame of the lift
 function ESC_spot(){const q=TR8_near(RO.x,RO.z);if(!q)return null;const sx=Math.sin(q[2]),sz=Math.cos(q[2]);
@@ -17865,7 +17870,7 @@ function SKH_pre(dt){
 }
 function SKH_post(dt){
   if(!SKH.q||!SKH_ok()||SKH.t<=0||RO.trDeck)return;
-  const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz);if(Math.atan(s)<SKH.slope||s<1e-6)return;
+  const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz);if(Math.atan(s)<(SKH.slope<9&&typeof TR_CLB!=='undefined'&&TR_CLB?Math.max(SKH.slope,TR_climbWin()[1]):SKH.slope)||s<1e-6)return;   /* let-cars-climb-r22e17: no slide while the slope grip still holds (the TR_pre climb window) */
   const fx=-gx/s,fz=-gz/s;let ok=false;
   for(const d of[0,1.05,-1.05]){const c=Math.cos(d),n=Math.sin(d),dx=(fx*c-fz*n)*4*dt,dz=(fx*n+fz*c)*4*dt;if(!roamHit(RO.x+dx,RO.z+dz,2.2,RO.y)){RO.x+=dx;RO.z+=dz;ok=true;break}}
   if(ok)SKH.cnt.slide++}
@@ -17886,6 +17891,31 @@ function SKH_go(){const out=[];let bad=0;const cand=[];const B=[WX0+80,WX1-80,WZ
 function SKH_rows(GO,goSay,CK){CK.push({ver:'stuck',id:'hills',area:'drive',text:'stuck-hills-r22h:2026-10-21 · a car wedged on a steep hill (> 35 deg, next to a road, building or wall) with the gas held always gets out: after 2.5 s without moving it backs off, after 5 s it is put back on the road with a BACK ON THE ROAD note (works on and beside the road, free roam). 📍 GO pins the car on 3 steep slopes of this city with full gas. Pass line: recovered within 6 s each, when the stuck ladder does the lift: reverse-assist within 3.1 s and a must-show note shown in a visible pill (>= 12 px, in view) (off the road the older escape ladder may get there first).'});
  for(const c of['fra','ath'])(GO['stuck/hills']=GO['stuck/hills']||[]).push({c,n:'stuck hills '+(c==='fra'?'Frankfurt':'Athens'),secs:60,fn:()=>SKH_go()})}
 
+function CLB_line(){const B=[WX0+120,WX1-120,WZS+120,WZN-120],r=[];const gr=(x,z)=>{const[gx,gz]=TR_grad(x,z,2);return[gx,gz,Math.atan(Math.hypot(gx,gz))]};
+  for(let x=B[0];x<B[1];x+=17)for(let z=B[2];z<B[3];z+=17){let g;try{g=roamTerr(x,z,999).g}catch(e){continue}if(!(g>2))continue;const[gx,gz,th]=gr(x,z);if(th<.58||th>.66)continue;
+    const s=Math.hypot(gx,gz),ux=gx/s,uz=gz/s;let top=null,steep=0,ok=true;for(let d=2;d<=60;d+=2){const px=x+ux*d,pz=z+uz*d,q=gr(px,pz);if(roamHit(px,pz,2.4,roamTerr(px,pz,999).g)||TR8_onRoad(px,pz)){ok=false;break}if(q[2]>.58)steep+=2;if(q[2]>.72){ok=false;break}if(q[2]<.2){top=[px,pz];break}}
+    if(!ok||!top||steep<6)continue;let base=null;for(let d=2;d<=50;d+=2){const px=x-ux*d,pz=z-uz*d,q=gr(px,pz);if(roamHit(px,pz,2.4,roamTerr(px,pz,999).g)){ok=false;break}if(q[2]>.72){ok=false;break}if(q[2]<.2&&d>=16){base=[px,pz];break}}
+    if(!ok||!base)continue;steep+=0;r.push({x,z,base,top,steep,th,ux,uz,len:Math.hypot(top[0]-base[0],top[1]-base[1])})}
+  r.sort((a,b)=>b.steep-a.steep||b.th-a.th);return r}
+function CLB_run(L,win){const T0=TR_CLB;TR_CLB=win;for(const k in K)K[k]=false;const h=Math.atan2(L.ux,L.uz),[bx,bz]=L.base,[tx,tz]=L.top,tY=(()=>{let m=-1e9;for(let k=0;k<=40;k++){const f=k/40;m=Math.max(m,roamTerr(bx+(tx-bx)*f,bz+(tz-bz)*f,999).g)}return m})();   /* the crest of the line (the top point can sit past it, lower) */
+  roamWarp(bx,bz,h);RO.x=bx;RO.z=bz;RO.h=RO.vh=h;RO.y=groundAt(bx,bz,99);RO.vy=0;RO.v=12;ESC_end();SKH_reset();K.ArrowUp=true;let tr=[],t=0,top=false,maxTh=0,y0=RO.y,warp=RO.t6n||0;
+  try{for(;t<9;t+=1/30){const e=Math.atan2(Math.sin(Math.atan2(tx-RO.x,tz-RO.z)-RO.h),Math.cos(Math.atan2(tx-RO.x,tz-RO.z)-RO.h));RO.h=RO.vh=h;roamStep(1/30);   /* heading held on the fall line: the climb grip is under test, not the steering */if(Math.round(t*30)%15===0)tr.push(Math.round(RO.v)+'/'+(RO.trSlope?Math.round(RO.trSlope.th*57.3):'-')+'/'+(RO.trGrip??1).toFixed(1)+'/'+RO.y.toFixed(0)+(TR_live()?'':'!L')+(RO.trDeck?'D':'')+'/e'+Math.round(e*57.3)+'/s'+Math.round((RO.x-bx)*L.ux+(RO.z-bz)*L.uz)+'/q'+Math.round(-(RO.x-bx)*L.uz+(RO.z-bz)*L.ux)+'/h'+Math.round(Math.atan2(Math.sin(RO.h-h),Math.cos(RO.h-h))*57.3));if((RO.t6n||0)!==warp){tr.push('warp');break}
+    if(RO.trSlope)maxTh=Math.max(maxTh,RO.trSlope.th);if(RO.y>=tY-1.5){top=true;break}}}
+  finally{for(const k in K)K[k]=false;TR_CLB=T0}return{top,t:+t.toFixed(1),maxDeg:Math.round(maxTh*57.3),dy:+(RO.y-y0).toFixed(1),need:+(tY-y0).toFixed(1),tr:tr.join(' ')}}
+function CLB_wall(){const cx=RO.x,cz=RO.z;for(let r=20;r<400;r+=15)for(let a=0;a<6.28;a+=.4){const x=cx+Math.sin(a)*r,z=cz+Math.cos(a)*r,g=roamTerr(x,z,999).g;if(!roamHit(x,z,.5,g))continue;
+    for(const b of[0,1.57,-1.57,3.14]){const ux=Math.sin(a+b),uz=Math.cos(a+b);let f=0;for(let d=1;d<6;d++)if(!roamHit(x-ux*d,z-uz*d,.5,g)){f=d;break}if(!f)continue;const sx=x-ux*(f+8),sz=z-uz*(f+8);
+      if(roamHit(sx,sz,2.8,roamTerr(sx,sz,999).g)||Math.abs(roamTerr(sx,sz,999).g-g)>1.5)continue;return{sx,sz,h:Math.atan2(ux,uz)}}}return null}
+function CLB_go(){const out=[];let bad=0;const p0=[RO.x,RO.z,RO.h],ws=say;say=()=>{};
+  try{const L=CLB_line();if(!L.length){out.push('no 35 deg line found FAIL');bad++}
+    for(const l of L.slice(0,2)){const n=CLB_run(l,true),o=CLB_run(l,false);if(!n.top)bad++;out.push(`slope ${Math.round(l.th*57.3)}deg ${l.steep} m steep, climb ${n.need} m: new top ${n.top} in ${n.t}s (max ${n.maxDeg}deg) · old top ${o.top} (dy ${o.dy})`+(n.top?'':' FAIL ['+n.tr+']'))}
+    roamWarp(p0[0],p0[1],p0[2]);RO.x=p0[0];RO.z=p0[1];const W=CLB_wall();if(!W){out.push('no wall found FAIL');bad++}else{for(const k in K)K[k]=false;roamWarp(W.sx,W.sz,W.h);RO.x=W.sx;RO.z=W.sz;RO.h=RO.vh=W.h;RO.y=groundAt(W.sx,W.sz,99);RO.v=6;RO.vy=0;ESC_end();SKH_reset();K.ArrowUp=true;let up=0,ins=0;
+      for(let i=0;i<120;i++){roamStep(1/30);up=Math.max(up,RO.y-roamTerr(RO.x,RO.z,RO.y+.3).g);if(roamHit(RO.x,RO.z,.3,RO.y))ins++}K.ArrowUp=false;const ok=up<=1&&ins===0;if(!ok)bad++;out.push(`wall: max ${up.toFixed(2)} m over the ground, ${ins} frames inside`+(ok?'':' FAIL'))}}
+  catch(e){bad++;out.push('threw '+String(e).slice(0,80)+' FAIL')}
+  finally{say=ws;for(const k in K)K[k]=false;SKH_reset();ESC_end();RO.v=0;RO.vy=0;roamWarp(p0[0],p0[1],p0[2]);RO.x=p0[0];RO.z=p0[1];RO.h=RO.vh=p0[2];RO.y=groundAt(p0[0],p0[1],99)}
+  return'📍 clb/climb · '+out.join(' · ')+' → '+(bad?'❌ FAIL':'✅ PASS')}
+{const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
+ __chk.items.unshift({ver:'clb',id:'climb',area:'drive',text:'let-cars-climb-r22e17 (Alex: "no stuck on hills"): with the gas held the car climbs terrain to ~40 deg (46 deg max at speed) and does not slide back; buildings stay walls. 📍 GO drives up the 2 steepest clear ~35 deg Taunus fall lines at gas from their foot (pass: reaches the top within 9 s; old window shown as INFO) and into a building wall for 4 s (pass: never > 1 m over the ground, never inside). Flag ?clb=1, default OFF (the GO switches it on for its own runs).'});
+ __chk.GO['clb/climb']=[{c:'fra',n:'climb Frankfurt',secs:60,fn:()=>CLB_go()}]},500)}
 function TF_slope(x,z){const[gx,gz]=TR_grad(x,z,2);return Math.atan(Math.hypot(gx,gz))}
 function TF_wet(x,z){try{return WATERS.length&&[[0,0],[7,0],[-7,0],[0,7],[0,-7]].some(([a,b])=>inRiver(x+a,z+b))}catch(e){return false}}
 function TF_gradeStat(N=5000){const pts=[];for(const S of CITY_S){if(S.r.cls==='ped')continue;const P=S.pts;for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],m=Math.max(1,Math.ceil(Math.hypot(b.x-a.x,b.z-a.z)/10));for(let q=0;q<m;q++)pts.push([a.x+(b.x-a.x)*q/m,a.z+(b.z-a.z)*q/m])}}
