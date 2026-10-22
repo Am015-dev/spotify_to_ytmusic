@@ -9649,6 +9649,7 @@ RX.spawn=(t,o)=>en(t,o);   // test hook (react-test)
       (EXPOSED: the boss stops firing for 8 beats) at 12%.
    C. power scale: the hull is set high (x HK), and a ship whose honest damage cannot finish inside ~1.2 T gets its boss damage raised (at most x AMP); hard.js's repair is held to REP x the cap,
       so a fresh ship is not stuck: its fight ends near 1.2 T; the cap still holds the floor. */
+const BOSSFY=window.BOSSFY=y=>typeof wcv!=='undefined'&&wcv===cv?Math.max(y,150):y;   // boss floaters stay below the hint line at the top of a landscape screen
 if(RET.boss2===undefined)RET.boss2=!/[?&]boss2=0/.test(location.search);
 const B2X=window.B2X={get on(){return!!RET.boss2;},HK:1.8,M:1.06,AMP:12,LATE:1.2,LS:8,REP:.2,BK:5,SHT:14,
   T:{mini:{easy:42,normal:50,hard:60,vhard:65,legend:70},dist:{easy:66,normal:80,hard:95,vhard:102,legend:110},fin:{easy:100,normal:120,hard:145,vhard:158,legend:170}},   // the shortest fight in seconds
@@ -9688,7 +9689,7 @@ NR.on('runStart',()=>{B2X.hz=[];B2X.st={abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,l
   if(left>.01){s.sh=.35;
     if(now-s.sp>.12){s.sp=now;burst(e.x-e.r*.7,e.y+rnd(-e.r*.5,e.r*.5),'#cfe8ff',5,190,.25);}
     if(now-s.cl>.3){s.cl=now;AU.sfx('hit');}
-    if(now-s.fl>5){s.fl=now;floater(e.x,e.y-e.r-34,'ARMOUR HOLDS','#cfe8ff');}}
+    if(now-s.fl>5){s.fl=now;floater(e.x,BOSSFY(e.y-e.r-34)+22,'ARMOUR HOLDS','#cfe8ff');}}
   if(take>0)s.w.push([now,take]);
   let hp=s.ref-take;const pf=e.ph===1?e.max*.64:e.ph===2?e.max*.31:0;   // hold the HP at the next phase line until that phase starts on the bar
   if(hp<pf)hp=Math.min(s.ref,pf);
@@ -11272,7 +11273,7 @@ FG2.draw=function(box){const s=FG.st(),lo=s.lo,U=FGU,F=this,own=WP_IDS.filter(id
   const sel=INV.sel,sty=sel&&U.ty(sel);
   for(const sl of[0,1,'core','pas']){const q=INV.slotHtml(sl),fits=sel&&((sl===0||sl===1)?/[whm]/.test(sty):sl==='core'?sty==='k':sty==='p');
     const d=el('div','fgslot f2-ls'+(q.it?'':' no')+(fits?' hot':'')+(U.arm===sl?' arm':''),null,{'data-slot':String(sl),'data-lesson':'loadout-slot'});
-    const short=sl===0?'SLOT 1':sl===1?'SLOT 2':sl==='core'?'CORE':'PASSIVE',nm=q.it?(U.ty(q.it)==='w'?WPD[U.id(q.it)].s:q.n):short;
+    const short=sl===0?'SLOT 1':sl===1?'SLOT 2':sl==='core'?'CORE':'PASSIVE',nm=q.it?(U.ty(q.it)==='w'?WPD[U.id(q.it)].s:q.n):(sl==='core'||sl==='pas')?'NO '+short:short;   // an empty core / passive says so; tap opens its pick list
     const mods=(sl===0||sl===1)?(lo.m[sl]||[]).filter(Boolean).length:0;
     const b=btn(F.fl==='s'+sl?'pop':'',cv(32)+'<span title="'+fgEsc(q.n)+'">'+fgEsc(nm)+(mods?' +'+mods:'')+'</span>',()=>{const x=INV.sel;
       if(x)return act(()=>{const m=U.put(sl,x);if(!/^Only|^Craft/.test(m||''))INV.sel=null;return m;},'s'+sl);
@@ -11448,7 +11449,8 @@ const CTR=window.CTR={get on(){return!!RET.counter;},
     for(const b of G.eb)if(b.cxM){ctx.globalAlpha=1;ctx.strokeStyle=r;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(b.x,b.y,13+(SET.reduce?0:2*Math.sin(t*20)),0,7);ctx.stroke();}
     for(const w of this.walls){if(w.cur){if(w.warn>0)continue;ctx.globalAlpha=1;ctx.fillStyle=r;for(let y=14;y<H;y+=26)if(Math.abs(y-w.gap.y)>48){ctx.beginPath();ctx.arc(w.x,y,7,0,7);ctx.fill();}continue;}
       if(w.warn>0){ctx.globalAlpha=.35+.35*(SET.reduce?1:Math.abs(Math.sin(t*10)));ctx.strokeStyle=r;ctx.lineWidth=3;ctx.setLineDash([10,10]);ctx.beginPath();ctx.moveTo(w.x,0);ctx.lineTo(w.x,H);ctx.stroke();ctx.setLineDash([]);
-        ctx.globalAlpha=.9;ctx.fillStyle='#ffffff';ctx.font='bold 16px sans-serif';ctx.textAlign='right';wtxt(say('DASH THROUGH'),w.x-10,H/2);continue;}
+        ctx.globalAlpha=.9;ctx.fillStyle='#ffffff';ctx.font='bold 16px sans-serif';ctx.textAlign='right';{const rot=typeof wcv!=='undefined'&&wcv!==cv,tx=say('DASH THROUGH');ctx.textBaseline='middle';
+          wtxt(tx,rot?Math.min(w.x-10,W-130*W/Math.max(300,cv.getBoundingClientRect().height)):w.x-10,H/2);}continue;}   // portrait: keep the words below the top score bar
       ctx.globalAlpha=.85;ctx.fillStyle=r;const g=w.gap;if(g){ctx.fillRect(w.x-6,0,12,g.y-g.h/2);ctx.fillRect(w.x-6,g.y+g.h/2,12,H-g.y-g.h/2);}else ctx.fillRect(w.x-6,0,12,H);
       ctx.globalAlpha=.25;ctx.fillRect(w.x-14,0,28,H);}
     for(const c of this.curts){ctx.globalAlpha=.5+.4*(SET.reduce?1:Math.abs(Math.sin(t*8)));ctx.fillStyle='#4dff9a';c.g.forEach((gy,i)=>{ctx.globalAlpha=i?.45:.95;ctx.beginPath();ctx.moveTo(W-6,gy-48);ctx.lineTo(W-26,gy);ctx.lineTo(W-6,gy+48);ctx.closePath();ctx.fill();});
@@ -11854,7 +11856,7 @@ BPL.add=(e,o)=>{const t=en('mine',{x:e.x,y:e.y,wpt:1,bpRole:o.role});t.hp=t.max=
 BPL.resolve=(e,how)=>{const b=e.bp,g=b&&b.g;if(!g||!g.up)return;const s=BPL.stat(),k=g.m+':'+how;s.how[k]=(s.how[k]||0)+1;if(how!=='fb'&&how!=='ls'&&how!=='auto')s.res[g.m]=(s.res[g.m]||0)+1;if(how==='fb')s.fb++;else s.open++;
   for(const t of g.tg)if(!t.dead){t.dead=1;burst(t.x,t.y,'#19e3ff',10,200,.4);}g.up=0;
   const real=how!=='fb'&&how!=='ls';if(real){b.ch=(b.ch|0)+1;b.rg=0;b.rt=0;}
-  if(real&&b.ch<BPL.chain()&&!(e.b2&&e.b2.ls>0)){floater(e.x,e.y-e.r-34,'BREAK '+b.ch+'/'+BPL.chain(),'#19e3ff');AU.sfx('tier');BPL.gate(e,G.t);return;}   // W40: chained gates, the next one rises at once
+  if(real&&b.ch<BPL.chain()&&!(e.b2&&e.b2.ls>0)){floater(e.x,BOSSFY(e.y-e.r-34),'BREAK '+b.ch+'/'+BPL.chain(),'#19e3ff');AU.sfx('tier');BPL.gate(e,G.t);return;}   // W40: chained gates, the next one rises at once
   const q=real&&BPL.tier()>0&&(b.rg||0)<BPL.QK&&!(b.rt>0);if(real){b.rg=0;b.rt=0;}if(q)BPL.stat().quick=(BPL.stat().quick|0)+1;
   b.ch=0;g.fbw=how==='fb';g.open=G.t+(how==='fb'?(BPL.fit?BPL.FIT.FBWD[SET.diff]||BPL.FIT.FBW:BPL.FBW):BPL.opn()+(q?BPL.OPENQ:0));   // an overload only flickers FBW s; a real break opens the window, and the boss stays silent for all of it (playing the mechanic is the safe way)
   if(real&&e.bm){e.bmS=Math.max(e.bmS|0,e.bt+Math.max(BPL.BREATH,Math.ceil(BPL.opn()/(BT.spb||.5))));BMV.q=BMV.q.filter(q=>q.e!==e);BMV.tq=[];BMV.hz=BMV.hz.filter(z=>z.mk||G.t>=z.on);}   // a gate that is really resolved: the boss is silent for BREATH beats (pending shots and unlit warnings go)
@@ -13131,9 +13133,14 @@ Object.assign(FUN,{
     else if(e.k==='gust'){if(age>=1&&age<4.2)P.y=clamp(P.y+e.dir*62*dt,22,H-22);}
     else if(e.k==='blackout'){if(age>=1)e.x=W+10-(W+260)*(age-1)/4.5;}},
   evDraw(t){const e=this.ev;if(!e)return;const age=G.t-e.t0,pulse=SET.reduce?1:(BK(t,10)?1:.6);ctx.save();
-    if(e.k==='supply'){const k=Math.max(0,1-age);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.globalAlpha=.8*pulse;ctx.beginPath();ctx.arc(e.x,e.y,22+90*k,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(e.x,0);ctx.lineTo(e.x,e.y-22);ctx.stroke();}
-    else if(e.k==='lane'){const live=age>=1.3&&age<5.3;if(live){ctx.globalAlpha=.95;ctx.fillStyle='#fff';ctx.fillRect(0,e.y-3,W,6);ctx.globalAlpha=.4;ctx.fillStyle='#ff3050';ctx.fillRect(0,e.y-e.h/2,W,e.h);}
-      else if(age<1.3){ctx.globalAlpha=.5*pulse;ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.setLineDash([14,10]);ctx.strokeRect(2,e.y-e.h/2,W-4,e.h);ctx.setLineDash([]);}}
+    if(e.k==='supply'){const k=Math.max(0,1-age);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.globalAlpha=.8*pulse;ctx.beginPath();ctx.arc(e.x,e.y,window.DIET&&DIET.on?Math.min(22+90*k,DIET.ringMax()):22+90*k,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(e.x,0);ctx.lineTo(e.x,e.y-22);ctx.stroke();}
+    else if(e.k==='lane'){const live=age>=1.3&&age<5.3,y0=e.y-e.h/2;   // thin telegraph: two edge lines + a light fill (<= 15%) + words; the whole band is the danger
+      ctx.globalAlpha=live?.14:.08*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,y0,W,e.h);
+      ctx.globalAlpha=live?.95:.6*pulse;ctx.strokeStyle=live?'#ff6a7a':'#ff7080';ctx.lineWidth=live?3:2;if(!live)ctx.setLineDash([14,10]);
+      ctx.beginPath();ctx.moveTo(0,y0);ctx.lineTo(W,y0);ctx.moveTo(0,y0+e.h);ctx.lineTo(W,y0+e.h);ctx.stroke();ctx.setLineDash([]);
+      ctx.globalAlpha=.95;ctx.font='700 14px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=3;ctx.strokeStyle='#05030c';
+      const tx=live?'LASER ON: LEAVE THIS BAND':'LASER SOON: LEAVE THIS BAND';ctx.fillStyle='#fff';
+      if(wcv===cv){ctx.strokeText(tx,W*.5,e.y);ctx.fillText(tx,W*.5,e.y);}else{ctx.translate(W*.5,e.y);ctx.rotate(Math.PI/2);ctx.strokeText(tx,0,0);ctx.fillText(tx,0,0);}}
     else if(e.k==='gaterun'){ctx.globalCompositeOperation='lighter';for(const r of e.rings){if(r.got||r.x<-40||r.x>W+40)continue;ctx.globalAlpha=.9;ctx.strokeStyle='#ffe14d';ctx.lineWidth=4;ctx.beginPath();ctx.arc(r.x,r.y,26,0,7);ctx.stroke();ctx.globalAlpha=.25;ctx.fillStyle='#ffe14d';ctx.beginPath();ctx.arc(r.x,r.y,26,0,7);ctx.fill();}}
     else if(e.k==='rescue'){const f=e.fl>0;ctx.globalAlpha=1;ctx.fillStyle=f?'#fff':'#0e2a22';ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,22,0,7);ctx.fill();ctx.stroke();
       ctx.fillStyle='#3dffb0';ctx.fillRect(e.x-15,e.y+30,30*Math.max(0,e.hp)/6,4);ctx.strokeRect(e.x-15,e.y+30,30,4);}
@@ -14073,16 +14080,16 @@ const BA=window.BA={own:n=>/^fx-bullet-(needle|rocket|shell)$/.test(n)||/^fx-w-[
       the city as it was, so the district stays recognisable.
    4. Colour grammar (INDUSTRY-PLAYBOOK.md 'Colour grammar'): enemy fire warm (pink / red / orange), player shots cool (readable.js), pickups green, music coins leaf green (gold is the elite ring and sits next to orange shells). ---------- */
 if(RET.legible===undefined)RET.legible=!/[?&]legible=0/.test(location.search);
-const LGB=window.LGB={GLOW:'#e9e2ff',HALO:'rgba(6,2,14,.88)',BAND:.55,EDGE:.12,
+const LGB=window.LGB={GLOW:'#e9e2ff',GR:2.4,GC:1.9,HALO:'rgba(4,1,10,1)',BAND:.55,EDGE:.12,
   PK:{shard:'#5dff8a',hp:'#5dff8a',up:'#5dff8a',emp:'#5dff8a'},COIN:'#7dff5d',
   /* under-glow alpha per district (G.di); tuned with legible-test.js */
-  st:[.8,.8,.8,.8,.8,.8,.8,.8,.8,.8,.8,.8],ga(){const a=this.st[G.di];return a==null?.8:a;},
+  st:[1,1,1,1,1,1,1,1,1,1,1,1],ga(){const a=this.st[G.di];return a==null?1:a;},
   stat:{en:0,halo:0,band:0},
   /* 1. one enemy */
-  enemy(de,e,t){if(e.type==='boss'||!running)return de(e,t);const r=e.r||12;ctx.save();ctx.globalCompositeOperation='source-over';G_(e.x,e.y,r*2.3,this.GLOW,this.ga());ctx.restore();
+  enemy(de,e,t){if(e.type==='boss'||!running)return de(e,t);const r=e.r||12;ctx.save();ctx.globalCompositeOperation='source-over';G_(e.x,e.y,r*this.GR,this.GLOW,this.ga());G_(e.x,e.y,r*this.GC,this.GLOW,this.ga());ctx.restore();
     de(e,t);this.stat.en++;},
   /* 2. the dark halo under the enemy bullets */
-  halo(){const L=G.eb;if(!L.length)return;const bg=RET.asBigOn()?1.35:1;ctx.save();ctx.globalCompositeOperation='source-over';ctx.fillStyle=this.HALO;ctx.beginPath();
+  halo(){const L=G.eb;if(!L.length)return;const bg=(RET.asBigOn()?1.35:1)*1.2;ctx.save();ctx.globalCompositeOperation='source-over';ctx.fillStyle=this.HALO;ctx.beginPath();
     for(const b of L){const r=b.r*(b.k==='n'?2.6:b.k==='r'?2.4:2.1)*bg+1.5;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();ctx.restore();this.stat.halo++;},
   /* 3. the play band: w,h = the backdrop's own units (landscape W,H; portrait PW_,PH_); the band runs across the short side */
   band(w,h){const P=w<h,E=this.EDGE,key=w+'x'+h+'@'+this.BAND;let g=this._g;
@@ -14827,7 +14834,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='e290783d0a 2026-10-22 00:35 UTC';
+const NR_STAMP='2deb73db92 2026-10-22 00:40 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -15040,7 +15047,7 @@ if(DIET.on){
     if(G.banner.pic!=null)ART.portrait(G.banner.pic,w/2,h/2-58*k-100*k,92*k,Math.max(0,a));
     if(G.banner.ev)ART.pic(G.banner.ev,Math.min(256*k,w*.7),w/2,h/2-58*k-40*k,0,Math.max(0,a));ctx.globalAlpha=Math.max(0,a);
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,h/2-58*k,w,96*k);const col=G.banner.warn?'#ff3040':D.a;ctx.fillStyle=col;ctx.fillRect(0,h/2-58*k,w,2);ctx.fillRect(0,h/2+36*k,w,2);
-    ctx.font=`700 ${Math.min(54*k,w/Math.max(7,G.banner.a.length*.62))}px "Chakra Petch",sans-serif`;ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,w/2+(1-a)*40,h/2+4*k);
+    ctx.font=`700 ${Math.min(54*k,w/Math.max(7,G.banner.a.length*.62))}px "Chakra Petch",sans-serif`;ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,w/2+(1-a)*40,h/2-4*k);
     ctx.font=`${Math.min(15*k,w/Math.max(20,G.banner.b.length*.62))}px "Share Tech Mono",monospace`;ctx.fillStyle='#e9e6ff';ctx.fillText(G.banner.b,w/2,h/2+26*k);ctx.globalAlpha=1;};
   const buttons=()=>{if(window.ABIL&&ABIL.on)ABIL.rings();else{const v=HUDX.vals();setRing($('bDash'),Math.min(1,(v.dash+(v.dash<v.dashMax&&P.dashCd>0?1-clamp(P.dashCd,0,1):0))/v.dashMax),'#19e3ff',v.dashMax>1?v.dash:'');setRing($('bEmp'),P.emp/3,'#ffb020',P.emp>0?P.emp:'');}};
   DIET.hudP=function(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_;ctx.save();LOG();
@@ -15921,7 +15928,7 @@ const EXP=window.EXP={get on(){return!!RET.explain;},ZT:4,shown:{},q:[],cap:null
     ctx.font='700 '+fs.toFixed(1)+'px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
     const maxW=Math.min((rot?H:W)-16,190/Math.max(.05,u))-fs*1.6,lines=[];let ln='';for(const wd of String(txt).split(' ')){const t=ln?ln+' '+wd:wd;if(ln&&ctx.measureText(t).width>maxW){lines.push(ln);ln=wd;}else ln=t;}if(ln)lines.push(ln);   // wrap, never squeeze
     const lh=fs*1.25,bh=lines.length*lh+fs*.7,w=Math.min((rot?H:W)-16,Math.max(...lines.map(l=>ctx.measureText(l).width))+fs*1.6);
-    const m=80/Math.max(.05,u),x=rot?clamp(ax+40,bh/2+m,W-bh/2-m):clamp(ax,w/2+8,W-w/2-8),y=rot?clamp(ay,w/2+m,H-w/2-m):clamp(ay-40,bh/2+m,H-bh/2-m);   // keep clear of the HUD bands on every side
+    const m=(rot?80:104)/Math.max(.05,u),x=rot?clamp(ax+40,bh/2+m,W-bh/2-m):clamp(ax,w/2+8,W-w/2-8),y=rot?clamp(ay,w/2+m,H-w/2-m):clamp(ay-40,bh/2+m,H-bh/2-m);   // keep clear of the HUD bands on every side
     ctx.translate(x,y);if(rot)ctx.rotate(Math.PI/2);
     ctx.fillStyle='#05030ccc';ctx.strokeStyle=col;ctx.lineWidth=1.5;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(-w/2,-bh/2,w,bh,Math.min(13,bh/2));else ctx.rect(-w/2,-bh/2,w,bh);ctx.fill();ctx.stroke();
     ctx.fillStyle='#fff';lines.forEach((l,i)=>ctx.fillText(l,0,(i-(lines.length-1)/2)*lh+1));ctx.restore();},
@@ -16004,7 +16011,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     if(mn)hudMin(ctx,1,18,y0-8,t);});
   if(ku>1.25)tierMeter(W-131*ku-14,H-8,ku);else tierMeter(W/2,H-8,ku);       // big HUD on a small screen: the meter moves to the right corner, clear of the bars frame
   if(G.note.t>0&&G.note.txt)cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12-(ku>1.25?50:0));ctx.globalAlpha=1;});
-  if(window.HINT&&HINT.on())HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});   // F6: the one hint style (top third, under the HUD)
+  if(window.HINT&&HINT.on()){if(!(G.banner.t>0))HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});}   // F6: the one hint style (top third, under the HUD); not while the stage banner is up (they overlapped at 844x390)
   else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(W/2,H-62,15,1,W,26,40);ctx.globalAlpha=1;});
   if(!mn){SH.hud(ctx,t,{nx:24,ny:90,dx:216,dy:H-52,sx:18,sy:H-60,ring:true});HUDX.ship(ctx,P.x,P.y,1,t);}else HUDX.ship(ctx,P.x,P.y,1,t);
   // boss bar
@@ -16016,7 +16023,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     if(G.banner.ev)ART.pic(G.banner.ev,Math.min(256,W*.5),W/2,H/2-58-48,0,Math.max(0,a));ctx.globalAlpha=Math.max(0,a);   // mini-event banner art (nv-ev-*)
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,H/2-58,W,96);const col=G.banner.warn?'#ff3040':D.a;
     ctx.fillStyle=col;ctx.fillRect(0,H/2-58,W,2);ctx.fillRect(0,H/2+36,W,2);
-    ctx.font='700 54px "Chakra Petch",sans-serif';ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,W/2+(1-a)*40,H/2-2);
+    ctx.font='700 54px "Chakra Petch",sans-serif';ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,W/2+(1-a)*40,H/2-8);
     ctx.font=`${15*Math.min(ku,1.3)}px "Share Tech Mono",monospace`;ctx.fillStyle='#e9e6ff';ctx.fillText(G.banner.b,W/2,H/2+32);ctx.globalAlpha=1;}
   ctx.restore();}
 
@@ -16060,7 +16067,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
     if(G.banner.ev)ART.pic(G.banner.ev,Math.min(256*k,w*.7),w/2,h/2-58*k-40*k,0,Math.max(0,a));ctx.globalAlpha=Math.max(0,a);
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,h/2-58*k,w,96*k);const col=G.banner.warn?'#ff3040':D.a;
     ctx.fillStyle=col;ctx.fillRect(0,h/2-58*k,w,2);ctx.fillRect(0,h/2+36*k,w,2);
-    ctx.font=`700 ${Math.min(54*k,w/Math.max(7,G.banner.a.length*.62))}px "Chakra Petch",sans-serif`;ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,w/2+(1-a)*40,h/2+4*k);
+    ctx.font=`700 ${Math.min(54*k,w/Math.max(7,G.banner.a.length*.62))}px "Chakra Petch",sans-serif`;ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,w/2+(1-a)*40,h/2-4*k);
     ctx.font=`${Math.min(15*k,w/Math.max(20,G.banner.b.length*.62))}px "Share Tech Mono",monospace`;ctx.fillStyle='#e9e6ff';ctx.fillText(G.banner.b,w/2,h/2+26*k);ctx.globalAlpha=1;}
   ctx.restore();}
 

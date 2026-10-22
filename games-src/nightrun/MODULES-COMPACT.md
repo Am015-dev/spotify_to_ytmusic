@@ -87,9 +87,9 @@ flankers|8|flanker enemies that punish a parked ship (default OFF)|flankers,flan
 foeart|9|every fly-stage enemy draws from an approved ship sheet|foeart,foeart
 fleet|23|enemy warships in the fly stages|fleet,fleet
 endramp|8|endless mode climbs in difficulty|endramp,endramp
-legend|8|Legend plays differently, not just faster|legend,legend
+legend|11|Legend plays differently, not just faster|legend,legend
 h|5|H: no AFK wins, a dying ship slows the song|-
-fun|15|set pieces, deck replaces the fixed metronome, rosters|deck,deck,roster+
+fun|16|set pieces, deck replaces the fixed metronome, rosters|deck,deck,roster+
 tut|16|TUT: FLIGHT SCHOOL, a playable tutorial stage (about 3 minut|-
 lessons|27|short tactics lessons the first time a feature appears|lessons,lessons
 saga|25|campaign story: opening, briefings, comms, chapter ends, STO|story,story
