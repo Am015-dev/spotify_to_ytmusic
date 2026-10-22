@@ -28,3 +28,8 @@ Branch cleanup blocked by permission classifier (needs Alex's allow).
 - quiet-start 18073e7 #27 PASS but HELD: ath street car bogs on dirt (34 vs 43 km/h) since auto-form removed; xf1 bypass hides it. Follow-up sent to quiet-start worker session_01MbTWDL8oqG6UZWcXuPfjBj (silent off-road grip, drop xf1 bypass, LEVEL UP toast <=2 s). Ship as beta.150 after its review.
 - Running: solid-cars (Opus), L1 fix round, quiet-start follow-up (3 lanes; L1 is small fix round).
 - Small follow-ups: fra shed boxes 0.7 m inset (shrink-wrap); ath bot/nav extra resets near 1800,-2900 after bFloor change.
+
+## 02:45 beta.150 live (cc77a4e): solid-cars 212d252 (#29 PASS) + quiet-start 18073e7/236b2b9 (#27/#30 PASS)
+- Shipped with fra xf1/water red (hull 0.11 vs 0.12-0.32 band, cosmetic): follow-up sent to quiet-start worker.
+- Running: cl-L2 smash fix (session_01UAb7bjravewPeYqhETsM1M), speed-boost-feel (OPUS session_011Af3Qyk5PucscAdG2Z5HY4), xf1/water mini-fix. Review #31 L1 0575445 pending (+ ship core,studs ON question).
+- Follow-ups: fra shed boxes; collide-audit wall fra -698,2187; ath bot/nav resets near 1800,-2900; stud look polish (rim, every-2nd past 40 m); chk-headroom (uncommitted, resume).
