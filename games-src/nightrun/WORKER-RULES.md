@@ -19,3 +19,6 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
 8. EVERY THING ON SCREEN MUST BE EXPLAINED (owner, 21 Oct: "so many unexplainable visuals, gamer is angry and confused"):
    any ring, icon, bar, label, effect or button you add or touch must be (a) readable by its shape/colour alone, (b) captioned
    in plain words the first time it appears, or (c) removed. No abbreviations or symbols without words (no "x~97s").
+9. TEST TIME BUDGET (owner, 22 Oct 05:05: "who told you to spend so much time running the game, is it efficient?"): run ONLY the
+   test that proves your fix plus `guard.py` and one 2-minute smoke; no stage 1-20 sweeps or "3 consecutive runs" unless the task is
+   balance/difficulty. New or edited tests step game time faster than real time (`__mnr.step(dt)` loops), never wait on wall-clock play.

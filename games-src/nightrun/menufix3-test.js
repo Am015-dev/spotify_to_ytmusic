@@ -5,7 +5,7 @@
 // Headless Chromium, 390x763 and 375x553, touch. Prints PASS/FAIL lines only.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/menufix3-test.js     env: GAME_DIR=...
 // Gate 1 (E12): a new player who dies on the first run sees RETRY as the first visible button of the death screen; the GARAGE shortcut is hidden while nothing is affordable.
-// Gate 2 (E14): the hangar and HOME show one Neon glyph in one colour and one number format (thousands dot, no raw "2400" / "2.400" mix).
+// Gate 2 (E14): the hangar and HOME show one Neon glyph in one colour and one number format (plain digits "2400", never "2.400"; review 10 #14 changed it from the thousands dot).
 // Gate 3 (E17/E19): HOME has one info strip, no build stamp; the PLAY subtitle is one line; every DATA-page jump button fits the screen.
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
@@ -46,7 +46,7 @@ const shown = `(e=>{if(!e)return false;for(let x=e;x&&x!==document.body;x=x.pare
       await tap(p, '#hub_hangar');
       const t = await p.evaluate(`(()=>{const S=${shown};const g=document.getElementById('garage');const txt=g.innerText;const hub=document.getElementById('title').innerText;const cols=new Set([...document.querySelectorAll('.nI')].filter(S).map(e=>getComputedStyle(e).color));return{glyphs:(txt.match(/[◆◇♦⬢⬡✦]/g)||[]).length,raw:(txt.match(/\\b\\d{4,}\\b/g)||[]),hubRaw:(hub.match(/\\b\\d{4,}\\b/g)||[]),cols:[...cols],bank:document.getElementById('gaBankN')?document.getElementById('gaBankN').textContent:''};})()`);
       ok('E14 hangar: no text diamond or hex glyph (Neon is the one icon)' + tag, t.glyphs === 0, JSON.stringify(t));
-      ok('E14 hangar: no raw 4+ digit number (one format, thousands dot)' + tag, t.raw.length === 0 && t.bank === '2.400', JSON.stringify(t));
+      ok('E14 hangar: one number format, plain digits (2400, no thousands dot, review 10 #14)' + tag, t.raw.every(x => !/\d\.\d{3}/.test(x)) && t.bank === '2400', JSON.stringify(t));
       ok('E14 Neon icon: one colour everywhere on hangar' + tag, t.cols.length <= 1, JSON.stringify(t.cols));
       await tap(p, '#gaBack');
       await p.context().close();
