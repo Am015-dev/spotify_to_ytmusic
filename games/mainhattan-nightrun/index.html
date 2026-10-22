@@ -10241,6 +10241,20 @@ BV.over=function(e,t){const ph=e.ph||1,mv=UIK.moveOf?UIK.moveOf(e):'air',ground=
     ctx.beginPath();ctx.moveTo(-w*.5,h*.5);ctx.lineTo(-w*.35,-h*.5);ctx.lineTo(w*.5,-h*.4);ctx.lineTo(w*.4,h*.5);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
   ctx.restore();};
 {const db2=drawBoss;drawBoss=function(e,t,fl){db2(e,t,fl);if(BV.on&&e&&e.ph)BV.over(e,t);};}
+/* review 9 #9: no wave text while a boss is up (READY / NEXT WAVE is hidden), and the teal shapes say what they are */
+BV.tag=function(txt,x,y,col){const tf=ctx.getTransform(),u=Math.max(.05,Math.hypot(tf.a,tf.b)*(ctx.canvas.getBoundingClientRect().width/ctx.canvas.width||1)),fs=12/u;   // 12 css px on screen, upright on a rotated field
+  ctx.save();ctx.translate(x,y);if(rotMode)ctx.rotate(Math.PI/2);ctx.font='700 '+fs.toFixed(1)+'px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=.95;
+  const w=ctx.measureText(txt).width+fs;ctx.fillStyle='#05030cc0';ctx.fillRect(-w/2,-fs*.8,w,fs*1.6);ctx.fillStyle=col;ctx.fillText(txt,0,0);ctx.restore();};
+{const rd=window.LEAK&&LEAK.rdy;if(rd)LEAK.rdy=function(on){return rd.call(this,on&&!(RET.calm&&G&&G.boss&&G.boss.x<W));};
+  NR.on('tick',()=>{const el=document.getElementById('retReady');if(el&&RET.calm&&G&&G.boss&&G.boss.x<W&&el.style.display!=='none')el.style.display='none';});
+  const lateWrap=()=>{   // bossplay.js / bossmoves.js define their draw after this file: wrap on the first tick
+  if(window.BPL&&BPL.draw&&!BPL.draw.bv){const pd=BPL.draw;BPL.draw=function(){const r=pd.apply(this,arguments);   // the teal outlined lane = the open lane of the blackout
+    try{const e=G.boss,b=e&&e.bp;if(RET.calm&&b&&b.ar==='blackout'&&b.arS&&b.arS.lane!=null&&e.x<W+40){const lh=H/3,x1=e.x-e.r-10;BV.tag('SAFE LANE',Math.max(60,x1/2),b.arS.lane*lh+lh/2,'#19e3ff');}}catch(x){}
+    return r;};BPL.draw.bv=1;}
+  if(window.BMV&&BMV.draw&&!BMV.draw.bv){const bd=BMV.draw;BMV.draw=function(tm){const r=bd.apply(this,arguments);
+    try{const e=G.boss,z=RET.calm&&e&&e.bm&&BMV.hz.find(q=>q.fw&&q.s==='wall'&&q.x>40&&q.x<W-40);if(z)BV.tag('FIREWALL: FLY THROUGH THE GAP',Math.max(120,Math.min(W-120,z.x)),H*.62,'#19e3ff');}catch(x){}
+    return r;};BMV.draw.bv=1;}};
+  NR.on('tick',lateWrap);}
 /* the phase change: the broken plate, sparks, and the new attack's name for one bar */
 NR.on('bossPhase',d=>{const e=G&&G.boss;if(!BV.on||!e||!d)return;const ph=d.ph||e.ph,id=Math.max(0,Math.min(2,ph-2));e.bv={t:1,id};
   const s=BV.SLOTS[id],hw=(e._dw||e.r*3)/2,hh=(e._dh||e.r*3)/2;
@@ -14843,7 +14857,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='f454ad4519 2026-10-22 02:06 UTC';
+const NR_STAMP='b2f93b2c57 2026-10-22 02:18 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -15984,14 +15998,14 @@ if(RET.pop){const rp=RET.pop;RET.pop=function(L){rp.apply(this,arguments);try{EX
 
 // PURPOSE: a calm playfield: rule banners small in the top band, thin soft player/enemy beams, at most 2 rings per enemy
 // FLAG: calm (?calm=0)
-// TEST: calm-test.js
+// TEST: calm-test.js, review9-test.js
 /* ---------- CALM (flag RET.calm, default ON; ?calm=0 = as before). Owner look, Legend stage 10 on a phone (22 Oct 2026):
    - a rule announcement ("RULE · CURVED SHOTS") covered the middle of the field while enemies attacked: now a small strip in the top band (under the score bar), at most 2.5 s;
    - bright beams ~25 css px wide: pictured player shots are at most 12 css px thick (alpha <= .75), enemy aim / sniper beams <= 12 css px (alpha <= .8);
    - enemies wore 3-4 rings at once: at most 2 per enemy, priority attack tell (pink / red) > elite (gold) > the rest (1 frame of memory decides).
    Nothing here changes damage or timing. ---------- */
 if(RET.calm===undefined)RET.calm=!/[?&]calm=0/.test(location.search);
-const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2.5,RMAX:2,fr:0,cur:null,pk:new Map(),pp:new Map(),a:null,stat:{rings:0,cut:0,beams:0},
+const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2.5,TTITLE:2,RMAX:2,fr:0,cur:null,pk:new Map(),pp:new Map(),a:null,stat:{rings:0,cut:0,beams:0},
   /* css px per world unit under the current transform */
   css(){const t=ctx.getTransform(),c=ctx.canvas;return Math.hypot(t.a,t.b)*(c.clientWidth/c.width||1)||1;},
   isRule(a){return/^(RULE|NEW$|REMIX|TWIST)/.test(a||'');},
@@ -15999,8 +16013,9 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2
   /* top-band strip: one line, under the score bar, off the middle of the field */
   draw(bn,w,h,k){const kk=bn.t,a=Math.max(0,Math.min(1,kk*3,(bn.m-kk)*6)),D=DISTRICTS[G.di],y=(G.boss&&G.boss.x<W?52:38)*k,hh=24*k;
     ctx.save();ctx.globalAlpha=a*.9;ctx.fillStyle='#05030cd0';ctx.fillRect(0,y,w,hh);ctx.fillStyle=D.a;ctx.fillRect(0,y,3*k,hh);ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    const txt=bn.a+(bn.b?' · '+bn.b:'');ctx.font=`700 ${12*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#e9e6ff';
+    let txt=bn.a+(bn.b?' · '+bn.b:'');ctx.font=`700 ${12*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#e9e6ff';
     let f=12*k;while(f>8*k&&ctx.measureText(txt).width>w-16*k){f-=.5*k;ctx.font=`700 ${f}px "Chakra Petch",sans-serif`;}
+    if(ctx.measureText(txt).width>w-16*k)txt=bn.a;   // the sub line does not fit one chip: the title alone
     ctx.fillText(txt,w/2,y+hh*.68);ctx.restore();},
   cls(s){let r=0,g=0,b=0;if(typeof s!=='string')return 2;let m=s.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i);
     if(m){r=parseInt(m[1],16);g=parseInt(m[2],16);b=parseInt(m[3],16);}else if((m=s.match(/rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)/))){r=+m[1];g=+m[2];b=+m[3];}else return 2;
@@ -16013,7 +16028,9 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2
     m.cm|=1<<c;if(n>=this.RMAX||m.n>=this.RMAX){this.stat.cut++;return false;}m.n++;this.stat.rings++;return true;}};
 /* ---- 1. banners: the rule card is small and short ---- */
 {const bn0=banner;banner=function(a,b,warn,t){const r=bn0.apply(this,arguments);
-  if(RET.calm&&running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}return r;};}
+  if(RET.calm&&running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}
+  else if(RET.calm&&G&&G.banner&&!warn&&!G.banner.ev){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TTITLE);G.banner.t=G.banner.m=m;}   // review 9 #1: the stage title is a one-line chip for 2 s, not a 96 px band over live fire
+  return r;};}
 /* ---- 2. beams: thin and soft ---- */
 {const bb=FXW.bullet;FXW.bullet=function(b){if(!CALM.on||!b.wid)return bb.apply(this,arguments);const k='w-'+b.wid+'-bullet';if(!FXW.pic(k))return false;
   const L=b.len||(b.big?22:b.pn!=null?28:20);let w=Math.max(22,Math.min(130,L*1.4+(b.th||3)*2));const ang=((b.vx||b.vy)?Math.atan2(b.vy,b.vx):0)+(FXW.SPIN[b.wid]?G.t*9:0);
