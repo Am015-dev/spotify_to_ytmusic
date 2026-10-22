@@ -71,8 +71,15 @@ HT_car=(f=>function(c,im,N,dt){NC_hc=0;const r=f.apply(this,arguments);if(NC.on&
 const NC_PM={on:!/[?&]popmem=0/.test(location.search),F:[],t:-1e9,k:0,n:16,r2:250*250,S:new THREE.Sphere(new THREE.Vector3(),4),cur:new THREE.Frustum(),m:new THREE.Matrix4(),fr:-1};
 HT_popF=(f=>function(){const r=f.apply(this,arguments);if(NC_PM.on&&typeof camera!=='undefined'){const P=HT_POP;if(P.on&&P.f)NC_PM.cur.copy(P.f);else{camera.updateMatrixWorld();NC_PM.cur.setFromProjectionMatrix(NC_PM.m.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse))}NC_PM.fr=1;
  if(T-NC_PM.t>=.5){NC_PM.t=T;const F=NC_PM.F,i=NC_PM.k++%NC_PM.n;(F[i]||(F[i]={f:new THREE.Frustum(),x:0,z:0,t:0})).f.copy(NC_PM.cur);F[i].x=RO.x;F[i].z=RO.z;F[i].t=T}}return r})(HT_popF);
-HT_canPop=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r||!NC_PM.on||NC_PM.fr<0||state!=='roam')return r;const d2=(x-RO.x)**2+(z-RO.z)**2;if(d2>NC_PM.r2)return r;if(d2<1600)return false;const S=NC_PM.S;S.center.set(x,(y??RO.y??0)+1,z);
+HT_canPop=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r||!NC_PM.on||NC_PM.sick||RD_US.ov||NC_PM.fr<0||state!=='roam')return r;const d2=(x-RO.x)**2+(z-RO.z)**2;if(d2>NC_PM.r2)return r;if(d2<1600)return false;const S=NC_PM.S;S.center.set(x,(y??RO.y??0)+1,z);
  if(NC_PM.cur.intersectsSphere(S))return false;for(const e of NC_PM.F)if(e&&T-e.t<8&&(x-e.x)**2+(z-e.z)**2<NC_PM.r2&&e.f.intersectsSphere(S))return false;return true})(HT_canPop);
+// solid-cars-r22e8: the 8 s view memory blocked the clean-up of UNHEALTHY cars too (RD_unstack: stacked pairs < 3.7 m and stranded cars; the dead-end queue (deS);
+// DR_unjam: stopped 8 s): stacked/stuck cars piled up (150 s sim ath NPC overlaps 311 vs 47, head-ons 96 vs 24; why/quiet-dirt street car stalled). Those paths now
+// (only the overlap pairs; a stranded single car keeps the memory: GO (d)) get the plain law again (never in the current view, never < 40 m); the memory stays for healthy moving cars (recycle, parking, speed thinning). ?popmem=0 = all old.
+NC_PM.sick=0;
+{const sk=f=>function(){NC_PM.sick=1;try{return f.apply(this,arguments)}finally{NC_PM.sick=0}};
+ if(typeof DR_unjam==='function')DR_unjam=sk(DR_unjam);
+ HT_car=(f=>function(c){if(!c.deS)return f.apply(this,arguments);NC_PM.sick=1;try{return f.apply(this,arguments)}finally{NC_PM.sick=0}})(HT_car)}
 // solid-cars-r22e1: at a one-way dead end HT_next leaves the car on a degenerate edge (a === b): HT_pose then got heading (0,0), the basis matrix collapsed to
 // scale 0 and the car was invisible but alive and solid (GO why/solid-cars (d), Athens node 777), or RD_unstack popped it in plain view. HT_pose never builds a
 // zero heading now (the car keeps its last one, drawn and solid where it stopped; RD_unstack removes it once the gate above says out of sight). The law's
