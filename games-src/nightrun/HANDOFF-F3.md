@@ -23,3 +23,5 @@ Left to do / known
 2. streetfeel-test "body heights" fails on gunner with or without street3 (also with ?street3=0, i.e. the base): comes with the merged sheet refresh 43afc826, not street3.
 3. simhunt FAIL is the flight game's "ship dies with no bullet within 60 px" (unexplained-death); the street is not in simhunt.
 4. The lamp pools are at fixed world x; the painted lamp posts sit in parallax layers, so pools and posts do not line up (cones were removed for that reason).
+5. fingerprint-test: street changes (expected). fly6 / fly10 / endless10 flip between two hashes on the SAME page from run to run (checked twice on one build:
+   fly6 e2f0e31c.. or 70b52b23.., fly10 c9f1cc94.. or 3f92ffd0..), and legend10 differs also with street3 forced off: those are not street3 (flaky or from the merged E1/H1 work).
