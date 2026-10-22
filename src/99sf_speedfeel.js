@@ -18,7 +18,7 @@ function SF_dom(){if(SF.el)return;const st=document.createElement('style');st.te
   const v=document.createElement('div');v.id='sfV';document.body.appendChild(c);document.body.appendChild(v);SF.el=c;SF.vgEl=v}
 function SF_init(){if(!SF.on||SF.P||typeof THREE==='undefined'||typeof scene==='undefined')return;SF_dom();const tex=SF_glowTex(),g=new THREE.BufferGeometry();
   g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(SF_N*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(SF_N*3),3));g.setDrawRange(0,0);
-  const m=new THREE.Points(g,new THREE.PointsMaterial({size:.5,map:tex,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true,toneMapped:false}));
+  const m=new THREE.Points(g,new THREE.PointsMaterial({size:.4,map:tex,vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true,toneMapped:false}));
   m.frustumCulled=false;m.name='sfJet';m.userData.gbG=1;m.renderOrder=5;SF.P={m,g,p:[]};for(let i=0;i<SF_N;i++)SF.P.p.push({l:0,L:1,x:0,y:0,z:0,vx:0,vy:0,vz:0});
   const sm=new THREE.SpriteMaterial({map:tex,color:new THREE.Color(.55,.9,1.3),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,toneMapped:false});
   for(let i=0;i<2;i++){const sp=new THREE.Sprite(sm);sp.scale.setScalar(.001);sp.frustumCulled=false;sp.userData.gbG=1;sp.renderOrder=5;SF.glow.push(sp)}scene.add(m,...SF.glow)}
@@ -66,7 +66,7 @@ function SF_jets(s,on,dt){const t0=performance.now();if(!SF.P){SF_init();if(!SF.
     const a2=a*a;col[i]=(.25+.75*a2)*a2*1.4;col[i+1]=(.55+.45*a)*a2*1.4;col[i+2]=a2*1.6;n++}
   P.g.setDrawRange(0,n);if(n){P.g.attributes.position.needsUpdate=true;P.g.attributes.color.needsUpdate=true}SF.nAlive=n;SF.ms+=performance.now()-t0}
 // TURBO pickups and race turbo/nitro set RO.turbo / s.nitro but B2K only popped the thrusters for the BOOST button: the "TURBO shows no visible effect" of BENCH_2K
-B2K_turbines=(f=>function(s,on,dt){if(SF.on&&!on&&s===pl)try{on=SF_state().b}catch(e){}f.call(this,s,on,dt);if(!SF.on)return;try{SF_rearFix()}catch(e){}try{if(B2K.turbG&&B2K.turbS>.02){B2K.turbG.mF.color.setRGB(.55,.88,1).multiplyScalar(1.6*Math.max(.2,TUNE.fxFlI))}SF_jets(s,on,dt)}catch(e){SF.err=String(e)}})(B2K_turbines);
+B2K_turbines=(f=>function(s,on,dt){if(SF.force&&SF.force.b&&s===pl)on=true;else if(SF.on&&!on&&s===pl)try{on=SF_state().b}catch(e){}f.call(this,s,on,dt);if(!SF.on)return;try{SF_rearFix()}catch(e){}try{if(B2K.turbG&&B2K.turbS>.02){B2K.turbG.mF.color.setRGB(.55,.88,1).multiplyScalar(1.6*Math.max(.2,TUNE.fxFlI))}SF_jets(s,on,dt)}catch(e){SF.err=String(e)}})(B2K_turbines);
 window.__sf={st:()=>({on:SF.on,op:+SF.op.toFixed(3),vg:+SF.vg.toFixed(3),kmh:Math.round(SF.kmh),b:SF.b,jets:SF.nAlive,glow:SF.glow.filter(g=>g.visible).length,fov:+camera.fov.toFixed(1),pull:+SF.pull.toFixed(2),starts:SF.starts,err:SF.err||null}),
   hold:(kmh,b)=>{SF.force=kmh==null?null:{kmh,b:!!b}}};/* shot helper: __sf.hold(130,true) holds the speed/boost look; __sf.hold() releases */
 // ---- GO why/speedfeel: the roam camera and the boost path stepped by hand at fixed speeds (no real-time play), then a 6x CPU frame budget A/B
@@ -75,7 +75,7 @@ async function SF_go(){const R2=[],ck=(m,b)=>{R2.push((b?'✓ ':'✗ ')+m);retur
     run=(kmh,b,n)=>{SF.force={kmh,b};RO.v=kmh/3.6;RO.boosting=b;pl.nitro=b;RO.turbo=b?.5:0;for(let k=0;k<n;k++){roamCam(1/60);B2K_turbines(pl,b,1/60)}};let ok=true;
   try{camSnap=true;run(0,false,90);const f0=camera.fov,op0=SF.op;run(50,false,120);const f50=camera.fov,op50=SF.op;run(130,false,180);const f130=camera.fov,op130=SF.op,pu=SF.pull;
     run(130,true,4);const j4=SF.nAlive,fl=SF.vg;run(130,true,90);const fB=camera.fov,opB=SF.op,jB=SF.nAlive,gB=SF.glow.filter(g=>g.visible).length,pulse=B2K.el&&B2K.el.classList.contains('sfB');
-    ok&=ck(`FOV rest ${f0.toFixed(1)}° → 130 km/h +${(f130-f0).toFixed(1)}° (≥ 4) → boost +${(fB-f0).toFixed(1)}° (≥ f130 + 1, ≤ 12.05)`,f130-f0>=4&&fB-f130>=1&&fB-f0<=12.05);
+    ok&=ck(`FOV rest ${f0.toFixed(1)}° → 130 km/h +${(f130-f0).toFixed(1)}° (≥ 4) → boost +${(fB-f0).toFixed(1)}° (≥ f130 + 1 or at the +12 cap, ≤ 12.05)`,f130-f0>=4&&(fB-f130>=1||fB-f0>=11.9)&&fB-f0<=12.05);
     ok&=ck(`streaks 0/50/130/boost = ${op0.toFixed(2)}/${op50.toFixed(2)}/${op130.toFixed(2)}/${opB.toFixed(2)} (0, 0, ≥ 0.3, ≥ 0.5)`,op0===0&&op50===0&&op130>=.3&&opB>=.5);
     ok&=ck(`pull-back at 130 km/h ${pu.toFixed(2)} m (≥ 0.25)`,pu>=.25);
     ok&=ck(`boost jets ${j4} after 4 frames, ${jB} held (≥ 20), glow sprites ${gB} (2), start flash ${fl.toFixed(2)} (≥ 0.4), bar pulse ${pulse?'on':'off'}`,jB>=20&&gB===2&&fl>=.4&&pulse);
@@ -83,7 +83,7 @@ async function SF_go(){const R2=[],ck=(m,b)=>{R2.push((b?'✓ ':'✗ ')+m);retur
   }catch(e){rs();return'📍 SPEEDFEEL · error '+e+' ❌ FAIL'}rs();
   // frame budget at 6x CPU: whole-frame A/B (boost look held vs module off), alternating, plus the module's own CPU time per frame
   if(window.__cdp){const fr=async n=>{const d=[];let t=performance.now();for(let i=0;i<n;i++){await new Promise(r=>requestAnimationFrame(r));const q=performance.now();d.push(q-t);t=q}d.sort((a,b)=>a-b);return d[d.length>>1]},
-    set=on=>{SF.on=on;SF.force=on?{kmh:130,b:true}:null;if(!on){SF.el.style.opacity='0';SF.vgEl.style.opacity='0';SF.P.g.setDrawRange(0,0);for(const g of SF.glow)g.visible=false}};
+    set=on=>{SF.on=on;SF.force={kmh:130,b:true};/* both sides boost the B2K thrusters: the A/B isolates this module */if(!on){SF.el.style.opacity='0';SF.vgEl.style.opacity='0';SF.P.g.setDrawRange(0,0);for(const g of SF.glow)g.visible=false}};
     await window.__cdp('Emulation.setCPUThrottlingRate',{rate:6});try{const A=[],B=[];let m0=0,n0=0;await fr(20);for(let r=0;r<2;r++){set(false);await fr(10);A.push(await fr(40));set(true);await fr(10);m0-=SF.ms;n0-=SF.msN;B.push(await fr(40));m0+=SF.ms;n0+=SF.msN}
       set(true);SF.force=null;const a=(A[0]+A[1])/2,b=(B[0]+B[1])/2,self=n0?m0/n0:0,noise=Math.abs(A[0]-A[1])/a,dP=(b-a)/a;
       ok&=ck(`6x CPU frame median off ${a.toFixed(1)} ms / on ${b.toFixed(1)} ms (${(dP*100).toFixed(1)}%, A/A noise ${(noise*100).toFixed(1)}%), module self ${self.toFixed(2)} ms/frame = ${(self/a*100).toFixed(1)}% (≤ 5)`,self/a<=.05&&dP<=.05+noise)}
