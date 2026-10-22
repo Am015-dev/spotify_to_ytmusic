@@ -14657,7 +14657,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='bf039257e2 2026-10-22 16:09 UTC';
+const NR_STAMP='ce8dfaaae8 2026-10-22 16:21 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16302,6 +16302,24 @@ if(RET.clean){ART.paintP=function(bg,scroll){const di=DISTRICTS.indexOf(bg.D);if
 if(RET.clean)LGB.HK={n:1.35,r:1.35,'':1.35,s:1.35};
 /* no word pop-ups in play: PERFECT, ON BEAT, CHAIN n, GRAZE, OVERHEAT are dropped (score numbers stay) */
 if(RET.clean){const fl=floater;floater=function(x,y,txt){if(running&&typeof txt==='string'&&/PERFECT|ON BEAT|CHAIN|GRAZE|OVERHEAT|COMBO|NICE|GREAT/i.test(txt))return;return fl.apply(this,arguments);};}
+
+// PURPOSE: the song changes only when the district changes, and keeps playing (no restart) between stages and through the menus
+// FLAG: steady (?steady=0 = a new song every stage, menu song between stages)
+// TEST: qa/loadgate.js (no page errors); fingerprint-test (sim: no audio)
+/* ---------- STEADY: owner, 22 Oct 2026: "the song changes too often between stages".
+   Before: each story stage had its own song (stage1/stage2/stage3 in turn, a shuffled pool from stage 5), the menu between two stages switched to the
+   menu song, and starting a stage restarted its song from the top. Now:
+   1. every stage of a district plays that district's song (the song of the district's first story stage), boss fights keep their boss song;
+   2. a stage that wants the song already playing keeps it running (no restart, the beat clock just continues);
+   3. after a run, the menus keep the stage song instead of switching to the menu song (the title on first load still plays the menu song). ---------- */
+if(RET.steady===undefined)RET.steady=!/[?&]steady=0/.test(location.search);
+if(RET.steady){
+  {const per={},used=new Set(),POOL=['stage1','stage3','endless','stage2','endless2'];for(const d of STAGES){if(d.ch)continue;   // each district its own song (no two districts share one)
+    if(per[d.di]===undefined){let s=d.song;if(used.has(s))s=POOL.find(x=>!used.has(x))||s;per[d.di]=s;used.add(s);}d.song=per[d.di];}}
+  {const s0=AU.startStage;AU.startStage=function(stage,at){const c=this.cur;
+    if(stage!=='menu'&&c&&c.stage===stage&&BT.stage===stage&&BT.mode==='file'){this.want=null;this.wantT=0;return;}   // same song: keep it running
+    return s0.apply(this,arguments);};}
+  {const m0=AU.menuMusic;AU.menuMusic=function(){if(BT.stage&&BT.stage!=='menu'&&this.cur)return;return m0.apply(this,arguments);};}}
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
 function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;

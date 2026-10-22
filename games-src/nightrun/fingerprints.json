@@ -1,11 +1,11 @@
 {
  "fly2": {
-  "state": "72bb31546e77a628",
-  "draw": "5e3620d7bcff9d0d",
+  "state": "30772a23b0511c3a",
+  "draw": "3b4f5062815c6b41",
   "frames": 1800,
   "samples": 30,
-  "rng": 1033,
-  "dcalls": 272,
+  "rng": 598,
+  "dcalls": 257,
   "end": null
  },
  "endless10": {
@@ -27,30 +27,30 @@
   "end": "section 3 x 7864 lock D foes 1"
  },
  "fly6": {
-  "state": "3d02f2b03a305b09",
-  "draw": "ed3505672705337b",
+  "state": "58bbb354414ca9a0",
+  "draw": "dcf3bf76427c0217",
   "frames": 1800,
   "samples": 30,
-  "rng": 1274,
-  "dcalls": 331,
+  "rng": 1553,
+  "dcalls": 389,
   "end": null
  },
  "fly10": {
-  "state": "41fcd4353cd7ab8e",
-  "draw": "bae02e0d2574dd19",
+  "state": "b6cb66b64079fd1d",
+  "draw": "90864b7a111eb230",
   "frames": 1800,
   "samples": 30,
-  "rng": 2054,
-  "dcalls": 350,
+  "rng": 2664,
+  "dcalls": 390,
   "end": null
  },
  "fly14": {
-  "state": "9775a9a58b267523",
-  "draw": "442a965bc0dc16da",
+  "state": "479eb82421c01f6c",
+  "draw": "f73ad266ec8a7617",
   "frames": 1800,
   "samples": 30,
-  "rng": 2278,
-  "dcalls": 335,
+  "rng": 4412,
+  "dcalls": 448,
   "end": null
  },
  "boss": {
@@ -63,12 +63,12 @@
   "end": "boss on screen 1680 frames"
  },
  "legend10": {
-  "state": "9ddfd698b0e58133",
-  "draw": "796539c779f641cb",
+  "state": "e4fbad21d8e62ee8",
+  "draw": "b76f2fc63d2a6d07",
   "frames": 1800,
   "samples": 30,
-  "rng": 1934,
-  "dcalls": 394,
+  "rng": 2525,
+  "dcalls": 379,
   "end": null
  }
 }

@@ -10,20 +10,20 @@ Code: parts/street/street2.js (replaces FOOT.STAGES.zeil when on). Test: qa/stre
 | 3 | THE HEAVY | heavy with an armoured front: red glow, then a straight charge | bait the charge into the red barrel (stun + big damage) or chip his back |
 | 4 | KIOSK ROW | gunner behind a kiosk + rushers, a gold crate in the open | open the gold crate under fire (heart / power gun) or move on |
 | 5 | TWO WAYS | 2 gunners behind cover, a platform above them | high path again, now under two guns, or break the cover from below |
-| 6 | CLIMAX | the big heavy + rushers, 2 red barrels, cover that breaks | bait both barrels, then finish him |
+| 6 | CLIMAX | the big heavy (its charge costs 2 hearts) + rushers, 2 red barrels, cover that breaks | bait both barrels, then finish him |
 
 ## Rules
 - Cover: crates, a car, kiosks, a sign, doors. Every cover stops bullets from BOTH sides and breaks under fire (crate 4 hits, car 9, kiosk 7):
   debris flies, some hold a reward (gold crates always do; plain ones a third of the time). A heavy's charge smashes cover in one go.
 - Red barrels are hazards: a bullet or a heavy's charge sets them off (blast hurts foes, and Kai within 70 units).
-- Gunner: hides behind the nearest cover on Kai's far side, pops up every ~2 s (0.5 s red glow) to fire. While hidden he only takes hits
+- Gunner: hides behind the nearest cover on Kai's far side, pops up every ~2 s (0.5 s red glow) to fire a 2-round burst. While hidden he only takes hits
   from above (Kai on a platform) or from his own side (flanked). Cover gone or 14 s up: he leaves cover and charges (no enemy lives > 25 s).
-- Rusher: sprints at Kai, 0.45 s red crouch at 120 units, lunges 260 units. Jump it, dash through it, or shoot it on the way in.
-- Heavy: armoured front (x0.3 damage), walks in, 0.8 s red glow, charges straight; a barrel in the path stuns him 2.2 s (OPEN, x2).
+- Rusher: sprints at Kai, 0.4 s red crouch at 120 units, lunges 260 units. Jump it, dash through it, or shoot it on the way in.
+- Heavy: armoured front (x0.3 damage), walks in, 0.8 s red glow, charges straight; a barrel in the path stuns him 2.4 s (x2 damage); a wall stuns him 1 s; after 15 s every charge ends winded (2 s).
 - Scale: one body height per kind (Kai 64, rusher 62, gunner 64, heavy 84, boss heavy 96 units) drawn through the street's single
   world scale; feet on the road line (FL 470). Props use the existing sc-* pictures and the car strip, bottom on the road.
 - No captions or chips during play (the engine's ARENA/CHECKPOINT/WARNING notes are muted on this stage); telegraphs are red glows.
-- Rooms: each beat is a soft room (the camera holds until its foes are down), a short walk between rooms, checkpoints at rooms 3 and 5.
+- Rooms: each beat is a soft room (the camera holds until its foes are down), a short walk between rooms, one checkpoint at room 4 (it gives a heart back).
 
 ## Gates (qa/street2-test.js)
 human-style bot clears 60-90%; >= 8 destructibles broken per run; no enemy alive > 25 s after it is seen;
