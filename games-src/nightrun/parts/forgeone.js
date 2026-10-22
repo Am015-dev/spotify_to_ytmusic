@@ -166,7 +166,7 @@ FG2.draw=function(box){const s=FG.st(),lo=s.lo,U=FGU,F=this,own=WP_IDS.filter(id
   const sel=INV.sel,sty=sel&&U.ty(sel);
   for(const sl of[0,1,'core','pas']){const q=INV.slotHtml(sl),fits=sel&&((sl===0||sl===1)?/[whm]/.test(sty):sl==='core'?sty==='k':sty==='p');
     const d=el('div','fgslot f2-ls'+(q.it?'':' no')+(fits?' hot':'')+(U.arm===sl?' arm':''),null,{'data-slot':String(sl),'data-lesson':'loadout-slot'});
-    const short=sl===0?'SLOT 1':sl===1?'SLOT 2':sl==='core'?'CORE':'PASSIVE',nm=q.it?(U.ty(q.it)==='w'?WPD[U.id(q.it)].s:q.n):short;
+    const short=sl===0?'SLOT 1':sl===1?'SLOT 2':sl==='core'?'CORE':'PASSIVE',nm=q.it?(U.ty(q.it)==='w'?WPD[U.id(q.it)].s:q.n):(sl==='core'||sl==='pas')?'NO '+short:short;   // an empty core / passive says so; tap opens its pick list
     const mods=(sl===0||sl===1)?(lo.m[sl]||[]).filter(Boolean).length:0;
     const b=btn(F.fl==='s'+sl?'pop':'',cv(32)+'<span title="'+fgEsc(q.n)+'">'+fgEsc(nm)+(mods?' +'+mods:'')+'</span>',()=>{const x=INV.sel;
       if(x)return act(()=>{const m=U.put(sl,x);if(!/^Only|^Craft/.test(m||''))INV.sel=null;return m;},'s'+sl);

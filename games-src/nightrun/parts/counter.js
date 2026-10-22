@@ -81,7 +81,8 @@ const CTR=window.CTR={get on(){return!!RET.counter;},
     for(const b of G.eb)if(b.cxM){ctx.globalAlpha=1;ctx.strokeStyle=r;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(b.x,b.y,13+(SET.reduce?0:2*Math.sin(t*20)),0,7);ctx.stroke();}
     for(const w of this.walls){if(w.cur){if(w.warn>0)continue;ctx.globalAlpha=1;ctx.fillStyle=r;for(let y=14;y<H;y+=26)if(Math.abs(y-w.gap.y)>48){ctx.beginPath();ctx.arc(w.x,y,7,0,7);ctx.fill();}continue;}
       if(w.warn>0){ctx.globalAlpha=.35+.35*(SET.reduce?1:Math.abs(Math.sin(t*10)));ctx.strokeStyle=r;ctx.lineWidth=3;ctx.setLineDash([10,10]);ctx.beginPath();ctx.moveTo(w.x,0);ctx.lineTo(w.x,H);ctx.stroke();ctx.setLineDash([]);
-        ctx.globalAlpha=.9;ctx.fillStyle='#ffffff';ctx.font='bold 16px sans-serif';ctx.textAlign='right';wtxt(say('DASH THROUGH'),w.x-10,H/2);continue;}
+        ctx.globalAlpha=.9;ctx.fillStyle='#ffffff';ctx.font='bold 16px sans-serif';ctx.textAlign='right';{const rot=typeof wcv!=='undefined'&&wcv!==cv,tx=say('DASH THROUGH');ctx.textBaseline='middle';
+          wtxt(tx,rot?Math.min(w.x-10,W-130*W/Math.max(300,cv.getBoundingClientRect().height)):w.x-10,H/2);}continue;}   // portrait: keep the words below the top score bar
       ctx.globalAlpha=.85;ctx.fillStyle=r;const g=w.gap;if(g){ctx.fillRect(w.x-6,0,12,g.y-g.h/2);ctx.fillRect(w.x-6,g.y+g.h/2,12,H-g.y-g.h/2);}else ctx.fillRect(w.x-6,0,12,H);
       ctx.globalAlpha=.25;ctx.fillRect(w.x-14,0,28,H);}
     for(const c of this.curts){ctx.globalAlpha=.5+.4*(SET.reduce?1:Math.abs(Math.sin(t*8)));ctx.fillStyle='#4dff9a';c.g.forEach((gy,i)=>{ctx.globalAlpha=i?.45:.95;ctx.beginPath();ctx.moveTo(W-6,gy-48);ctx.lineTo(W-26,gy);ctx.lineTo(W-6,gy+48);ctx.closePath();ctx.fill();});
