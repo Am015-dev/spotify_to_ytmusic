@@ -4,7 +4,7 @@
 // boost: blue-white exhaust jets (one additive Points draw, world-space trail behind the nozzles), a cyan glow sprite per nozzle, a cyan edge vignette
 //   with a flash on boost start, the existing whoosh cue, and the HUD boost bar pulsing while boosting.
 // The Points/Sprite programs are created before the loader's warm-up (ldPrewarm) so nothing links on the first boost. GO why/speedfeel (state asserts).
-const SF_Q=new URLSearchParams(location.search),SF={on:SF_Q.get('sf')!=='0',jit:SF_Q.get('sfj')!=='0',vgOn:SF_Q.get('sfv')!=='0',op:0,vg:0,fl:0,bE:0,kmh:0,b:false,wasB:false,t:0,ms:0,msN:0,force:null,el:null,vgEl:null,P:null,glow:[],nAlive:0,pull:0,lastPos:[null,null],starts:0};
+const SF_Q=new URLSearchParams(location.search),SF={on:SF_Q.get('sf')!=='0',jit:SF_Q.get('sfj')==='1',/* per-frame shimmer transform: off (re-composites the layer every other frame; ?sfj=1 on) */vgOn:SF_Q.get('sfv')!=='0',op:0,vg:0,fl:0,bE:0,kmh:0,b:false,wasB:false,t:0,ms:0,msN:0,force:null,el:null,vgEl:null,P:null,glow:[],nAlive:0,pull:0,lastPos:[null,null],starts:0};
 const SF_N=72;
 function SF_glowTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);
   r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.25,'rgba(200,245,255,.9)');r.addColorStop(.6,'rgba(60,170,255,.35)');r.addColorStop(1,'rgba(0,60,255,0)');g.fillStyle=r;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)}
@@ -84,8 +84,8 @@ async function SF_go(){const R2=[],ck=(m,b)=>{R2.push((b?'✓ ':'✗ ')+m);retur
   // frame budget at 6x CPU: whole-frame A/B (boost look held vs module off), alternating, plus the module's own CPU time per frame
   if(window.__cdp){const fr=async n=>{const d=[];let t=performance.now();for(let i=0;i<n;i++){await new Promise(r=>requestAnimationFrame(r));const q=performance.now();d.push(q-t);t=q}d.sort((a,b)=>a-b);return d[d.length>>1]},
     set=on=>{SF.on=on;SF.force={kmh:130,b:true};/* both sides boost the B2K thrusters: the A/B isolates this module */if(!on){SF.el.style.opacity='0';SF.vgEl.style.opacity='0';SF.P.g.setDrawRange(0,0);for(const g of SF.glow)g.visible=false}};
-    await window.__cdp('Emulation.setCPUThrottlingRate',{rate:6});try{const A=[],B=[];let m0=0,n0=0;await fr(20);for(let r=0;r<2;r++){set(false);await fr(10);A.push(await fr(40));set(true);await fr(10);m0-=SF.ms;n0-=SF.msN;B.push(await fr(40));m0+=SF.ms;n0+=SF.msN}
-      set(true);SF.force=null;const a=(A[0]+A[1])/2,b=(B[0]+B[1])/2,self=n0?m0/n0:0,noise=Math.abs(A[0]-A[1])/a,dP=(b-a)/a;
+    await window.__cdp('Emulation.setCPUThrottlingRate',{rate:6});try{const A=[],B=[];let m0=0,n0=0;await fr(20);for(let r=0;r<3;r++){set(false);await fr(10);A.push(await fr(40));set(true);await fr(10);m0-=SF.ms;n0-=SF.msN;B.push(await fr(40));m0+=SF.ms;n0+=SF.msN}
+      set(true);SF.force=null;const md=x=>x.slice().sort((p,q)=>p-q)[1],a=md(A),b=md(B),self=n0?m0/n0:0,noise=(Math.max(...A)-Math.min(...A))/a,dP=(b-a)/a;
       ok&=ck(`6x CPU frame median off ${a.toFixed(1)} ms / on ${b.toFixed(1)} ms (${(dP*100).toFixed(1)}%, A/A noise ${(noise*100).toFixed(1)}%), module self ${self.toFixed(2)} ms/frame = ${(self/a*100).toFixed(1)}% (≤ 5)`,self/a<=.05&&dP<=.05+noise)}
     finally{await window.__cdp('Emulation.setCPUThrottlingRate',{rate:1});SF.on=true;SF.force=null}}else R2.push('· 6x CPU A/B skipped (no __cdp: run through tChkGo)');
   return'📍 SPEEDFEEL · '+R2.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
