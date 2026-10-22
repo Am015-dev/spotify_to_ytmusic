@@ -32,7 +32,7 @@ F.pre=c=>{c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';};
 /* ----- one height per entity ----- */
 const fix=(who,pose,h)=>{const e=ART.fE;if(!e)return h;
   if(e._qh==null)e._qh=who==='kai'&&e===F.S.P?(e.h||h):(who==='kai'&&/^crouch/.test(pose)?h/FQ.CR:h);   // Kai: his standing height (P.h); the rest: the height they are first drawn with
-  return who==='kai'&&(/^crouch/.test(pose)||h<e._qh*.9)?e._qh*FQ.CR:e._qh;};
+  return who==='kai'&&!RET.bodyscale&&(/^crouch/.test(pose)||h<e._qh*.9)?e._qh*FQ.CR:e._qh;};   // bodyscale (art.js): the crouch cell is drawn at Kai's one scale, never shrunk
 FQ.fix=fix;
 /* a crouch without its own sheet borrows crouchshoot (a squashed idle changed the shape) */
 ART.FB.crouch=['crouchshoot','idle'];
