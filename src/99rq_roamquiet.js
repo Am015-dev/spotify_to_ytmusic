@@ -24,7 +24,7 @@ async function RQ_go_test(){const R=[],ck=(m,b)=>R.push((b?'✓ ':'✗ ')+m),vis
  try{for(const kind of['garage','mission']){const m=(RO.marks||[]).find(q=>(kind==='garage'?q.kind==='garage':q.kind!=='garage'&&q.kind!=='flight'&&q.ev)&&!markLocked(q)&&!markDone(q));if(!m){ck(kind+': no marker in this city (skipped)',true);continue}
   RO.ch=null;RO.sp=null;RO.card=null;$('#roamCard').hidden=true;RQ_hide(false);RQ.no.clear();RO.x=m.x;RO.z=m.z+6;RO.y=m.g.position.y;RO.v=0;RO.cool=0;K.ArrowUp=K.KeyW=false;camSnap=true;
   let cardAt=-1,chipAt=-1;for(let i=0;i<150;i++){roamStep(1/30);RO.v=0;if(cardAt<0&&(RO.card||vis($('#roamCard'))))cardAt=i;if(chipAt<0&&vis(RQ_el()))chipAt=i}
-  ck(kind+' marker, stopped 5 s: no card (first at '+cardAt+'), chip "'+RQ_el().textContent.trim().slice(0,32)+'" shown at '+chipAt,cardAt<0&&chipAt>=0&&vis(RQ_el())||cardAt<0&&chipAt>=0);
+  ck(kind+' marker, stopped 5 s: no card (seen at '+cardAt+'), chip "'+RQ_el().textContent.trim().slice(0,32)+'" shown at '+chipAt,cardAt<0&&chipAt>=0&&vis(RQ_el())||cardAt<0&&chipAt>=0);
   const tap=RQ_go();ck(kind+': tap on the chip opens the card ('+tap+', card '+!!RO.card+', chip hidden '+!vis(RQ_el())+')',tap&&!!RO.card&&vis($('#roamCard'))&&!vis(RQ_el()));
   RO.card=null;$('#roamCard').hidden=true}}
  catch(e){R.push('✗ rq threw '+e)}
