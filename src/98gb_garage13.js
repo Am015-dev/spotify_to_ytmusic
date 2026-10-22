@@ -191,7 +191,7 @@ addEventListener('pointerdown',e=>{if(!G13_pop.k)return;if(e.target.closest&&e.t
 #g13Ch .g13Ca{flex:0 1 auto;max-width:150px;height:44px;padding:0 12px;border-radius:12px;border:2px solid #141413;background:#ffd400;color:#141413;font:italic 900 12px system-ui;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 2px 0 #141413}
 #gbx.r2.gbBk .r2BkT{gap:12px}
 #gbx.r2.gbBk .r2BkT [data-r2b="mir"],#gbx.r2.gbBk .r2BkT [data-gx="grp"]{display:none!important}
-#gbBkPc .paEm{width:max-content;justify-self:start}#gbBkPc:has(.gbPc:not(.paC):not([style*="none"])) .paEm{display:none!important}
+#gbBkPc .paEm{width:max-content;justify-self:start}#gbBkPc.paHas .paEm{display:none!important}
 #gbx.r2.gbBk .r2BkT [data-g13="parts"]{order:-3}#gbx.r2.gbBk .r2BkT [data-g13="tray"]{order:-2;position:relative}#gbx.r2.gbBk .r2BkT [data-r2b="sel"]{order:-1}
 #gbx .r2BkT [data-g13].on{background:#ffd400}.g13N{position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;border-radius:9px;background:#e3000b;color:#fff;font:900 12px/18px system-ui;font-style:normal}
 #gbx.r2.gbBk:not(.gxBig) #g13Ch{display:none}
@@ -212,6 +212,8 @@ addEventListener('pointerdown',e=>{if(!G13_pop.k)return;if(e.target.closest&&e.t
 #gbx.r2 #slBar.g13X [data-s="grp"],#gbx.r2 #slBar.g13X [data-s="move"],#gbx.r2 #slBar.g13X [data-g13s="join"],#gbx.r2 #slBar.g13X [data-g13s="turn"]{display:none}
 #gbx.r2 #slBar [data-g13s="more"]{order:9}#gbx.r2 #slBar.g13X [data-g13s="more"]{background:#ffd400}
 `;document.head.appendChild(st)}
+// frame-js-r22e21: the tray empty-hint rule was #gbBkPc:has(.gbPc:not(.paC):not([style*="none"])) .paEm. A [style] attribute inside :has() makes every inline-style write in the page (speed fx, boost meter: every frame) re-match the body :has() rules over the whole HUD (~3 ms/frame). Same rule, kept in step by an observer (runs before paint).
+{const S=$('#gbBkPc');if(S){const f=()=>S.classList.toggle('paHas',!!S.querySelector('.gbPc:not(.paC):not([style*="none"])'));new MutationObserver(f).observe(S,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});f()}}
 // ---------- 6) new parts (docs/GARAGE13_PARTS.md): true LEGO proportions, stud 8 mm = GB_U, plate 3.2 mm = GB_PH, brick = 3 plates.
 // front of a part = -z (like the headlight 'hl'); SNOT studs face -z. Element lists: 40468 Yellow Taxi, 76916, 76920, 31127, 60371.
 if(!CR_CATS.includes('SNOT'))CR_CATS.splice(CR_CATS.indexOf('Slopes')+1,0,'SNOT');
