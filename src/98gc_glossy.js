@@ -29,17 +29,17 @@ function GL_off(){for(const m of GL.mats){const o=m.userData.gl0;m.envMap=scene.
 // ART10_cars (every 500 ms in roam) re-points car paint at scene.environment and caps it: run after it, same cadence
 ART10_cars=(f=>function(){const r=f.apply(this,arguments);try{GL_apply()}catch(e){}return r})(ART10_cars);
 // GO why/glossy: paint on player + traffic carries the studio env with clearcoat; material + program counts unchanged (±2) after switching it on;
-// render cost at 6x CPU (tChkGo CDP bridge) within +5% (interleaved off/on blocks of renderer.render + 1-px readback, median).
+// render cost at 6x CPU (tChkGo CDP bridge) within +5% (8 interleaved off/on rounds, each the mean of 8 renderer.render + 1-px readback after 1 warm frame; median of the round means).
 function GL_go(say){if(state!=='roam'||!RO.on)return'📍 Start free roam to run this';
   const cnt=()=>{const S=new Set();if(pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.isMesh)[].concat(o.material).forEach(m=>S.add(m))});for(const k in HUB.cim){const im=HUB.cim[k];if(im)for(const x of[im,im.userData.w,im.userData.g])if(x)[].concat(x.material).forEach(m=>S.add(m))}return S.size};
   const chk=()=>{let p=0,pg=0,t=0,tg=0;pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material))if(GL_paint(m)&&m.roughness>=.1){p++;if(m.envMap===GL.tex&&m.envMapIntensity>=1&&(!m.isMeshPhysicalMaterial||m.clearcoat>=.8))pg++}});
    for(const k in HUB.cim){const im=HUB.cim[k];if(im)for(const m of[].concat(im.material))if(m.isMeshStandardMaterial){t++;if(m.envMap===GL.tex&&m.envMapIntensity>=1)tg++}}return{p,pg,t,tg}};
-  const gl=renderer.getContext(),px=new Uint8Array(4),blk=n=>{const a=[];for(let i=0;i<n;i++){const t0=performance.now();renderer.render(scene,camera);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);a.push(performance.now()-t0)}return a};
+  const gl=renderer.getContext(),px=new Uint8Array(4),blk=n=>{const t0=performance.now();for(let i=0;i<n;i++){renderer.render(scene,camera);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px)}return(performance.now()-t0)/n};
   const med=a=>{a=a.slice().sort((x,y)=>x-y);return a[a.length>>1]};
   (async()=>{const wasOn=GL.on;GL.on=false;GL_off();renderer.render(scene,camera);const m0=cnt(),p0=renderer.info.programs.length;
    GL.on=true;GL_apply();renderer.render(scene,camera);const m1=cnt(),p1=renderer.info.programs.length,c=chk();
    const thr=typeof window.__cdp==='function';if(thr)await window.__cdp('Emulation.setCPUThrottlingRate',{rate:6});
-   const A=[],B=[];try{for(let r=0;r<6;r++){GL.on=false;GL_off();A.push(...blk(4));GL.on=true;GL_apply();B.push(...blk(4))}}finally{if(thr)await window.__cdp('Emulation.setCPUThrottlingRate',{rate:1})}
+   const A=[],B=[];try{for(let r=0;r<8;r++){GL.on=false;GL_off();blk(1);A.push(blk(8));GL.on=true;GL_apply();blk(1);B.push(blk(8))}}finally{if(thr)await window.__cdp('Emulation.setCPUThrottlingRate',{rate:1})}
    GL.on=wasOn;if(!wasOn)GL_off();const a=med(A),b=med(B),d=(b/a-1)*100;
    const ok=c.p>0&&c.pg===c.p&&c.t>0&&c.tg===c.t&&Math.abs(m1-m0)<=2&&p1-p0<=2&&d<=5;
    say(`📍 why/glossy · player paint with studio env + clearcoat ${c.pg}/${c.p} · traffic paint ${c.tg}/${c.t} · materials ${m0}→${m1} (±2) · programs ${p0}→${p1} (+≤2) · render ${thr?'6x CPU':'1x (no CDP)'} median off ${a.toFixed(2)} ms → on ${b.toFixed(2)} ms (${d>=0?'+':''}${d.toFixed(1)}%, ≤ +5%) · env build ${GL.ms.toFixed(1)} ms, ${GL.n} built → ${ok?'✅ PASS':'❌ FAIL'}`)})();
