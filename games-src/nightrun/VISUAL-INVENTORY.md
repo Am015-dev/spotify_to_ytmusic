@@ -78,6 +78,7 @@ A new visual must get a row (and a verdict) here before it ships.
 | `draw.js:pkPaint` | pickup sprite | collect | every frame 6/6 | S |
 | `explain.js:RWD.draw` | pickup highlight ring (graze reward) | collect it | often 6/6 | S |
 | `explain.js:box` | first-appearance caption box | read | often 5/6 | S |
+| `explain.js:EXP.draw` | caption leader line + end dot: points from the caption box at the thing it names (review 10, W145) | read | with each caption | S |
 | `flavor.js:drawBrk` | breakable lamp/crate | shoot for Neon | often 4/6 | S |
 | `flavor.js:drawCap` | capsule pickup | collect | often 3/6 | S |
 | `flavor.js:drawMedal` | medal pickup | collect | some stages 2/6 | S |
