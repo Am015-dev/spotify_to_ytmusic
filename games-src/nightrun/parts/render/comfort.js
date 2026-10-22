@@ -85,7 +85,7 @@ HOOK.drawEnemy(de=>function(e,t){   // every ordinary enemy sits on a soft light
     if(RET.comfort&&e!==G.boss&&!e.dead&&e.hp>0&&e.r<40){ctx.save();ctx.globalCompositeOperation='lighter';G_(e.x,e.y,e.r*1.45,'#cfd8ff',.3);ctx.restore();}
     return de.call(this,e,t);});
 {const h1=drawHUDP,h2=drawHUD,w=(f)=>function(t){COM.hud=1;try{return f.call(this,t);}finally{COM.hud=0;}};drawHUDP=w(h1);drawHUD=w(h2);   // HUD text has the higher floor
-  if(window.PW&&PW.hud){const h3=PW.hud;PW.hud=function(t){COM.hud=1;try{return h3.call(this,t);}finally{COM.hud=0;}};}}
+  }
 /* blinks: a warning blink never runs faster than 6 Hz (3 flashes a second) */
 const BK=window.BK=(t,n)=>Math.floor(t*(RET.comfort?Math.min(n,6):n))%2;
 /* the stylesheet pass needs every module's CSS to exist: after load, then again once the fonts are in */

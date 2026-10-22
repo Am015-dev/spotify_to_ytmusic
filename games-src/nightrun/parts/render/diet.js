@@ -43,7 +43,6 @@ if(DIET.on){
   {const bo=ART.boom;ART.boom=function(){while(ART.fx.length>=DIET.FX)ART.fx.shift();return bo.apply(this,arguments);};}   // at most 8 explosion pictures alive (was 24)
   if(window.AH&&AH.boom){const bm=AH.boom;AH.boom=function(id,x,y,w){if(/ring|wave/.test(id)&&w>2*DIET.ringMax())arguments[3]=2*DIET.ringMax();return bm.apply(this,arguments);};}
   {const pic=ART.pic;ART.pic=function(id,w,x,y,rot,al){if(running&&w>2*DIET.ringMax()&&/^fx-w34-rule-/.test(id))al=Math.min(al==null?1:al,.14);return pic.call(this,id,w,x,y,rot,al);};}   // stage-rule zones keep their true size (gameplay), drawn faint
-  if(window.PW&&PW.draw)HOOK['PW.draw'](pd=>function(){const s=G&&G.pw,wv=s&&s.wv;if(wv>0)s.wv=0;try{return pd.apply(this,arguments);}finally{if(wv>0)s.wv=wv;}});   // the screen-wide DROP! wave: gone (the flash and the pop-up stay)
   /* own power-up auras and rings round the ship: arcs drawn inside PW.draw / drawPlayer are capped at the cosmetic ring size */
   {const cap=DIET.capC=c=>{if(!c||c.__diet)return;c.__diet=1;const a=c.arc;c.arc=function(x,y,r){if(DIET.cap&&r>0){const t=this.getTransform(),k=Math.hypot(t.a,t.b)/S,mx=DIET.ringMax();if(r*k>mx)arguments[2]=mx/k;}return a.apply(this,arguments);};};cap(vctx);cap(wctx);
    const sc=f=>function(){DIET.cap++;try{return f.apply(this,arguments);}finally{DIET.cap--;}};HOOK['PW.draw'](sc);HOOK.drawPlayer(sc);}
@@ -99,7 +98,6 @@ if(DIET.on){
     banner(t,W,H,Math.min(ku,1.3));ctx.restore();};
   const hud=(f,lean)=>function(t){if(!DIET.lean()||!running||!G)return f.apply(this,arguments);if(window.COM)COM.hud=1;try{return lean(t);}finally{if(window.COM)COM.hud=0;}};
   drawHUDP=hud(drawHUDP,t=>DIET.hudP(t));drawHUD=hud(drawHUD,t=>DIET.hudL(t));
-  if(window.PW&&PW.hud){const ph=PW.hud;PW.hud=function(){if(DIET.lean())return;return ph.apply(this,arguments);};}
   if(typeof HOLD!=='undefined'&&HOLD.draw){const hd=HOLD.draw;HOLD.draw=function(){if(DIET.lean())return;return hd.apply(this,arguments);};}   // LINE: Full HUD only
   if(window.ABIL&&ABIL.rings){const ar=ABIL.rings;ABIL.rings=function(){const r=ar.apply(this,arguments);if(DIET.lean()){const e=$('bEmp');if(e&&/^~/.test(e.getAttribute('data-t')||''))e.removeAttribute('data-t');}return r;};}
 }
