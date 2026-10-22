@@ -17,14 +17,14 @@ if(RET.street3===undefined)RET.street3=!/[?&]street3=0/.test(location.search);
 if(!RET.street3||!RET.street2||!window.FOOT||!FOOT.STAGES||!FOOT.STAGES.zeil||!FOOT.STAGES.zeil.s2||!FOOT._in)return;
 const F=FOOT,IN=F._in,ST=F.STAGES.zeil,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;
 const S3=F.S3={GCD:1.4,ART:typeof ART!=='undefined'?ART:null,log:null,up:0,upKey:'',phDraw:0,full:0,SPD:.7,
-  T:{beats:8,boss:150,waves:12,peakT:140,t0:2,thr0:2,thrPeak:8,cap:5},
+  T:{beats:8,boss:145,waves:12,peakT:136,t0:2,thr0:2,thrPeak:8,cap:5},
   TH:{rusher:1,gunner:2,heavy:4,bigheavy:8}};
 const on=()=>RET.street3&&F.S&&F.S.st===ST;
 /* ----- the stage: street2's rooms stretched over a longer road (the gate decides the pace, not the length) ----- */
 const SX=7300/6200;ST.len=8200;ST.boss={x:7700,id:'bigheavy'};ST.cp=0;ST.cps=[];ST.locks=[];ST.waves=[];ST.s3=1;ST.song='stage2';
 ST.props=ST.props.map(p=>[Math.round(p[0]*SX),p[1],p[2]]);ST.plats=ST.plats.map(p=>[Math.round(p[0]*SX),p[1],p[2]]);
 if(F.SEC)for(const r of F.SEC)r.x=Math.round(r.x*SX);
-const xAt=t=>Math.round(7220*t/150+520);ST.pk=[[xAt(38),'ammo'],[xAt(92),'ammo'],[xAt(141),'ammo']];   // ammo where the clock puts Kai; heals drop next to Kai (below)
+const xAt=t=>Math.round(7220*t/145+520);ST.pk=[[xAt(38),'ammo'],[xAt(92),'ammo'],[xAt(141),'ammo']];   // ammo where the clock puts Kai; heals drop next to Kai (below)
 /* the wave plan: 12 waves, threat 2 -> 8 in equal steps (monotonic), a heavy in every third wave from threat 7 up, one gunner a wave, two from wave 7 */
 function plan(intro){const T=S3.T,N=T.waves,out=[];for(let i=0;i<N;i++){const t=intro+i*(T.peakT-intro)/(N-1),thr=Math.round(T.thr0+(T.thrPeak-T.thr0)*i/(N-1));
     let b=thr;const u=[];if(b>=7&&(N-1-i)%3===0){u.push('heavy');b-=4;}let g=Math.min(i<6?1:2,Math.floor(b*.3/2));if(i>=1&&g<1&&b>=3)g=1;for(let j=0;j<g;j++){u.push('gunner');b-=2;}while(b>0){u.push('rusher');b--;}
@@ -42,7 +42,8 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
   const f=S.s3;f.gate=gate(S,vw);S.idleSpawn=S.time+60;   // the clock sets the pace: standing at the gate is not camping (no idle spawns of other foes)
   const bc=Math.min(ST.boss.x-vw/2,ST.len-vw);
   const alive0=S.E.some(e=>!e.dead&&!e.boss);
-  if(!S.bossOn&&f.gate>=bc-40&&(!alive0||S.time>S3.T.boss+12)){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.2;f.boss=+S.time.toFixed(1);}   // the boss comes in quietly (no warning sting), once the street is clear (12 s at most)
+  if(!S.bossOn&&f.gate>=bc-40&&(!alive0||S.time>S3.T.boss+12)){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.2;f.boss=+S.time.toFixed(1);
+    for(let i=0;i<Math.min(2,P.max-P.hp);i++){f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*(60+50*i),S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}}   // up to two heals as the big heavy walks in (its charge hits for 2)   // the boss comes in quietly (no warning sting), once the street is clear (12 s at most)
   const alive=S.E.filter(e=>!e.dead).length;
   if(!f.bh&&S.time>=S3.T.peakT+6&&P.hp>0&&P.hp<P.max){f.bh=1;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // the breather: one heal before the big heavy
   if(S.time>20&&S.time-(f.lastHeal||0)>12&&P.hp>0&&P.hp<=P.max-2&&!S.pk.some(q=>q.k==='heal')){f.lastHeal=S.time;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // two hearts down: a heal drops beside Kai (at most one every 12 s)
