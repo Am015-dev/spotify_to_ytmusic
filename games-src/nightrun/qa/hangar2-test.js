@@ -56,6 +56,28 @@ const scan = (p, minPx) => p.evaluate(async (minPx) => {
       ok('phone: bay on top, tab / slot / tile text >= 14 px', r.bay && r.min >= 14, JSON.stringify(r));
       const g = await scan(p, 14); ok('phone: every tab: no debug size text, text >= 14 px, tiles opacity >= .85', !g.length, g.join(' | '));
       ok('phone: no page errors', !p.errs.length, p.errs.join(' | ')); await p.context().close(); }
+    // H3 (parts/menus/hangar3.js): MORE is a page in the frame (no dialog), FORGE keeps the hangar header, BACK hides the hangar from every tab and MORE section
+    for (const [W, H, tch] of [[1440, 860, false], [390, 763, true]]) { const p = await open(b.br, b.base, W, H, '?nomusic=1', SEED, tch), tag = W > 1000 ? 'PC' : 'phone';
+      const r = await p.evaluate(async () => { const z = ms => new Promise(r => setTimeout(r, ms)), vis = e => !!e && e.offsetParent !== null && getComputedStyle(e).visibility !== 'hidden';
+        const o = { dlg: [], tiles: 0, ic: 99, gaBackForge: false, shut: [], txt: 99 };
+        const hub = () => { document.getElementById('hub_hangar').click(); };
+        hub(); await z(250); document.getElementById('mfMore').click(); await z(250);
+        o.dlg = [...document.querySelectorAll('[role=dialog],[aria-modal=true]')].filter(vis).map(e => e.id || e.className);
+        const t = [...document.querySelectorAll('#h3More .mt')].filter(vis); o.tiles = t.length; for (const x of t) o.ic = Math.min(o.ic, x.querySelector('svg').getBoundingClientRect().width);
+        for (const e of document.querySelectorAll('#h3More .mt b, #h3More .mt span, #h3More .mt em')) if (vis(e)) o.txt = Math.min(o.txt, parseFloat(getComputedStyle(e).fontSize));
+        document.getElementById('h3M_forge').click(); await z(300); o.gaBackForge = innerWidth >= 1024 ? vis(document.getElementById('gaBack')) && vis(document.querySelector('#garage .tabs')) : vis(document.getElementById('fuBack'));   // phone: the one-screen forge (forge2-test) keeps its own back button
+        o.merge = !!document.getElementById('fuMerge') && vis(document.getElementById('fuMerge'));
+        const back = async (name) => { document.getElementById('gaBack').click(); await z(150); if (getComputedStyle(document.getElementById('garage')).display !== 'none') o.shut.push(name); hub(); await z(200); };
+        await back('forge');
+        for (const k of ['ships', 'weapons', 'pilot', 'tune']) { document.querySelector('#garage .tabs button[data-t="' + k + '"]').click(); await z(150); await back(k); }
+        for (const k of ['abil', 'crew', 'looks', 'load', 'mkt', 'pick', 'forge']) { document.getElementById('mfMore').click(); await z(150); if (k !== 'pick') { document.getElementById('h3M_' + k).click(); await z(200); } await back('more:' + k); }
+        document.getElementById('mfMore').click(); await z(150); await back('more page');
+        return o; });
+      ok(tag + ' H3: MORE is a page, no role=dialog / pop-up', !r.dlg.length && r.tiles >= 7, JSON.stringify(r.dlg) + ' tiles ' + r.tiles);
+      ok(tag + ' H3: MORE tile icons >= 72 px, text >= 14 px', r.ic >= 72 && r.txt >= 14, 'icon ' + r.ic + ' text ' + r.txt);
+      ok(tag + ' H3: FORGE keeps a back button (PC: #gaBack + hangar tabs), MERGE shown', r.gaBackForge && r.merge, JSON.stringify(r));
+      ok(tag + ' H3: BACK hides the hangar from every tab and MORE section', !r.shut.length, r.shut.join(','));
+      ok(tag + ' H3: no page errors', !p.errs.length, p.errs.join(' | ')); await p.context().close(); }
     { const p = await open(b.br, b.base, 1440, 860, '?nomusic=1&hangar2=0', SEED, false);
       await p.evaluate(() => __hub.hangar()); await sleep(300);
       ok('?hangar2=0: no bay, the old hangar', await p.evaluate(() => !document.getElementById('h2Bay')));
