@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 522,
+ "h": 122,
+ "anchor": [
+  261,
+  122
+ ],
+ "order": [
+  "strip-ship-eswarm-volley#1",
+  "strip-ship-eswarm-volley#2",
+  "strip-ship-eswarm-volley#3",
+  "strip-ship-eswarm-volley#4"
+ ]
+}

@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 523,
+ "h": 170,
+ "anchor": [
+  261,
+  170
+ ],
+ "order": [
+  "strip-ship-eminelayer-flame#1",
+  "strip-ship-eminelayer-flame#2",
+  "strip-ship-eminelayer-flame#3",
+  "strip-ship-eminelayer-flame#4"
+ ]
+}

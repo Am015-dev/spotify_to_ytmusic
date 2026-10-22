@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 523,
+ "h": 193,
+ "anchor": [
+  261,
+  193
+ ],
+ "order": [
+  "strip-ship-eminelayer-volley#1",
+  "strip-ship-eminelayer-volley#2",
+  "strip-ship-eminelayer-volley#3",
+  "strip-ship-eminelayer-volley#4"
+ ]
+}

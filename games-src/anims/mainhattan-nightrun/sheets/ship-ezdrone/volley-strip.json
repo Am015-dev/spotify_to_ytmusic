@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 520,
+ "h": 226,
+ "anchor": [
+  260,
+  226
+ ],
+ "order": [
+  "strip-ship-ezdrone-volley#1",
+  "strip-ship-ezdrone-volley#2",
+  "strip-ship-ezdrone-volley#3",
+  "strip-ship-ezdrone-volley#4"
+ ]
+}

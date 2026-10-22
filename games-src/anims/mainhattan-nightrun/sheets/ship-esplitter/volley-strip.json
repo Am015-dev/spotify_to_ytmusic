@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 523,
+ "h": 175,
+ "anchor": [
+  261,
+  175
+ ],
+ "order": [
+  "strip-ship-esplitter-volley#1",
+  "strip-ship-esplitter-volley#2",
+  "strip-ship-esplitter-volley#3",
+  "strip-ship-esplitter-volley#4"
+ ]
+}

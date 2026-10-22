@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 231,
+ "anchor": [
+  260,
+  231
+ ],
+ "order": [
+  "strip-ship-eswarm-death#1",
+  "strip-ship-eswarm-death#2",
+  "strip-ship-eswarm-death#3",
+  "strip-ship-eswarm-death#4",
+  "strip-ship-eswarm-death#5"
+ ]
+}
