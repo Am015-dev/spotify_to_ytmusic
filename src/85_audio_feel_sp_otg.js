@@ -421,10 +421,14 @@ let TR_bf=0;{const _hg=hubGrid;hubGrid=()=>{if(!TR_bf&&HUB.grp){TR_bf=1;TR_bldFi
 // down the fall line, never stuck); the car stays glued to the terrain (no airborne frames on terrain), never sinks below it
 /* races-3: the slipway is built on top of the raw terrain grade (groundY), whose 0.8 slope at the quay edge dragged the River boat from 14 m/s to a standstill at the slip top (-245,-157). Drag rests on and 6 m past a slip. */
 function TR_onSlip(x,z){for(let _j3=0,_b3=SLIPS;_j3<_b3.length;_j3++){const s=_b3[_j3];const dx=x-s.x,dz=z-s.z;if(dx>50||dx<-50||dz>50||dz<-50)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<12&&inw>-6&&inw<32)return true}return false}
+// let-cars-climb-r22e17 (Alex: "no stuck on hills", 2K lets you drive up almost anything): the grip window grows with the gas and speed. Gas held: full grip to 37 deg standing,
+// 40 deg at >= 10 m/s, fading to none at +6 deg (~46 deg max); no gas: the old 29 -> 38 deg. Buildings are colliders, not terrain, so walls stay walls. ?clb=0 = the old window.
+let TR_CLB=new URLSearchParams(location.search).get('clb')!=='0';
+function TR_climbWin(){if(!TR_CLB||!CTL||!(CTL.thr||CTL.boost))return[.5,.665];const lo=.64+.06*clamp((RO.v||0)/10,0,1);return[lo,lo+.1]}
 function TR_pre(dt){RO.trSlope=null;const T=roamTerr(RO.x,RO.z,RO.y+.3,_rtG);if(RO.y>T.g+.5||T.deck||T.g<-1.5||TR_onSlip(RO.x,RO.z)){RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);if(!T.deck){const[gx,gz]=TR_grad(RO.x,RO.z,2);TR6_stuck(dt,Math.atan(Math.hypot(gx,gz)))}return}
   const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz),th=Math.atan(s),fx=Math.sin(RO.vh??RO.h),fz=Math.cos(RO.vh??RO.h),a=gx*fx+gz*fz;RO.trSlope={gx,gz,th,a};
-  const ea=ESC.E.as>0;/* escape-1: assist = slope grip held, gravity x0.2 */RO.v-=9.8*.75*(ea?.2:1)*a/Math.sqrt(1+a*a)*dt;const grip=ea?1:clamp((.665-th)/(.665-.5),0,1);RO.trGrip=grip;
-  if(grip<1){if(a>0&&RO.v>-2&&CTL&&(CTL.thr||CTL.boost))RO.v-=(1-grip)*58*dt;RO.trSl=Math.min(9,(RO.trSl||0)+(1-grip)*16*dt)}else RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);TR6_stuck(dt,th)}
+  const ea=ESC.E.as>0;/* escape-1: assist = slope grip held, gravity x0.2 */RO.v-=9.8*.75*(ea?.2:1)*a/Math.sqrt(1+a*a)*dt;const cw=TR_climbWin(),grip=ea?1:clamp((cw[1]-th)/(cw[1]-cw[0]),0,1);RO.trGrip=grip;
+  if(grip<1){if(a>0&&RO.v>-2&&CTL&&(CTL.thr||CTL.boost))RO.v-=(1-grip)*58*dt;if(TR_CLB&&CTL&&(CTL.thr||CTL.boost)&&RO.v>2)RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);/* let-cars-climb: no fall-line slide while the car still drives up under gas (the gas fade above slows it first) */else RO.trSl=Math.min(9,(RO.trSl||0)+(1-grip)*16*dt)}else RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);TR6_stuck(dt,th)}
 // terr-6 (Alex b60 deep bowl): gas held, < 2 m/s, on a terrain slope > 20° for 3 s (a little slack for rocking back and forth) → lift to the nearest road
 function TR6_stuck(dt,th){if(TR8_on()||new URLSearchParams(location.search).get('t6r')==='0')return;const on=CTL&&(CTL.thr||CTL.boost)&&Math.abs(RO.v)<2&&th>.349;
   RO.t6s=on?(RO.t6s||0)+dt:Math.max(0,(RO.t6s||0)-.5*dt);if(RO.t6s<3)return;RO.t6s=0;

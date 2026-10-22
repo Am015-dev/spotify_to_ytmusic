@@ -27,7 +27,7 @@ function SKH_pre(dt){
 }
 function SKH_post(dt){
   if(!SKH.q||!SKH_ok()||SKH.t<=0||RO.trDeck)return;
-  const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz);if(Math.atan(s)<SKH.slope||s<1e-6)return;
+  const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz);if(Math.atan(s)<(SKH.slope<9&&typeof TR_CLB!=='undefined'&&TR_CLB?Math.max(SKH.slope,TR_climbWin()[1]):SKH.slope)||s<1e-6)return;   /* let-cars-climb-r22e17: no slide while the slope grip still holds (the TR_pre climb window) */
   const fx=-gx/s,fz=-gz/s;let ok=false;
   for(const d of[0,1.05,-1.05]){const c=Math.cos(d),n=Math.sin(d),dx=(fx*c-fz*n)*4*dt,dz=(fx*n+fz*c)*4*dt;if(!roamHit(RO.x+dx,RO.z+dz,2.2,RO.y)){RO.x+=dx;RO.z+=dz;ok=true;break}}
   if(ok)SKH.cnt.slide++}

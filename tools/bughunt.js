@@ -97,6 +97,11 @@ const detect=dt=>{const x=RO.x,y=RO.y,z=RO.z,foot=RO.foot&&RO.foot!=='car',busy=
   if(alive&&dd<9&&!foot&&Math.abs((c.y||y)-y)<2){let M=null;try{const[w,l]=OB_cdim(c.k);M=NC_mtv(x,z,RO.h,OB_HW,OB_HL,c.x,c.z,typeof c.hh==='number'?c.hh:Math.atan2(c.hdx||0,c.hdz||1),w,l)}catch(e){}
    const o=ovl.get(c)||0;if(M&&M[2]>.25){ovl.set(c,o+1);if(o+1===3)add('npcOverlap','player box inside an NPC car '+M[2].toFixed(2)+' m for 3 frames at '+Math.round(Math.abs(RO.v)*3.6)+' km/h (mode '+BH.mode+')')}else ovl.delete(c)}
   CP.set(c,{x:c.x,z:c.z,alive,lat:p&&p.lat,l0:p&&p.l0,mx:p&&p.alive?c.x-p.x:0,mz:p&&p.alive?c.z-p.z:0,a:c.a,b:c.b,t:c.t,cv:c.cv,hh:c.hh,yo:c.yo,lrx:c.lrx,lrz:c.lrz,dead:c.dead,pk:c.pk})}
+  // let-cars-climb-r22e17: slope slide-backs per bot mode (gas held on a terrain slope facing up it, the car moving back down) with the clamp that did it, and wall climbs
+  {const md=BH.mode||'',S=RO.trSlope,sk=(()=>{try{return SKH.cnt.slide|0}catch(e){return 0}})(),skd=sk>(BH.skS??sk);BH.skS=sk;BH.mT2=BH.mT2||{};BH.mT2[md]=(BH.mT2[md]||0)+dt;
+   const up=S&&S.a>.15,back=!warp&&up&&BH.gas&&(skd||(RO.trSl||0)>.5||RO.v<-.3);
+   if(back&&!BH.slOn){BH.slOn=1;const why=skd?'skh':(RO.trSl||0)>.5?'trSl':(RO.trGrip??1)<1?'grip':'grav',k=md+'|'+why;BH.sl=BH.sl||{};BH.sl[k]=(BH.sl[k]||0)+1;BH.cnt.slopeSlide=(BH.cnt.slopeSlide||0)+1}else if(!back&&(!up||RO.v>1))BH.slOn=0;
+   let wc=false;try{wc=!warp&&y-P.y>.05&&y-roamTerr(x,z,y+.3).g>.8&&roamHit(x,z,2.2,y-.5)}catch(e){}if(wc&&!BH.wcOn){BH.wcOn=1;add('wallClimb','car climbs a wall: '+(y-groundY(x,z)).toFixed(1)+' m over the ground line inside a collider')}else if(!wc)BH.wcOn=0}
  P.x=x;P.y=y;P.z=z;P.v=RO.v};
 // ---------- stepping ----------
 BH.episode=(seed,dt)=>{BH.seed=seed;BH.s=seed*7919+13;BH.dt=dt;Math.random=rnd;try{__tq.reset()}catch(e){}
@@ -110,7 +115,7 @@ BH.run=(ms,max)=>{const t0=performance.now();let n=0;BH.on=true;
  BH.on=false;keys();return n};
 BH.release=()=>{window.requestAnimationFrame=BH.raf0;for(const cb of BH.q)BH.raf0(cb);BH.q=[];BH.raf0(BH.F());keys()};
 BH.capture=()=>{window.requestAnimationFrame=cb=>{if(cb!==BH.F())BH.q.push(cb);return 1}};
-BH.report=()=>({ldWait:BH.ldWait||0,t:BH.t,km:BH.km,cnt:BH.cnt,gasT:BH.gasT,slowT:BH.slowT,hits:BH.hits,acts:BH.acts,cells:Object.values(BH.cells),msgs:Object.entries(BH.msgs).sort((a,b)=>b[1]-a[1]).slice(0,25),xcErr:(()=>{try{return XC.err.slice(0,10)}catch(e){return[]}})(),skh:(()=>{try{return SKH.cnt}catch(e){return null}})()});
+BH.report=()=>({ldWait:BH.ldWait||0,t:BH.t,km:BH.km,cnt:BH.cnt,gasT:BH.gasT,slowT:BH.slowT,hits:BH.hits,acts:BH.acts,cells:Object.values(BH.cells),msgs:Object.entries(BH.msgs).sort((a,b)=>b[1]-a[1]).slice(0,25),xcErr:(()=>{try{return XC.err.slice(0,10)}catch(e){return[]}})(),skh:(()=>{try{return SKH.cnt}catch(e){return null}})(),sl:BH.sl||{},mT:BH.mT2||{}});
 return 'ok'})()`;
 
 // ---------- touch taps (real Playwright touch on the real buttons, rAF released) ----------
@@ -151,15 +156,16 @@ async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const 
  const cities=CITY==='both'?['fra','ath']:[CITY],wallEnd=T0+Math.max(30,BUDGET-(SHOTS?60*Math.ceil(SHOTS/4):0)-15)*1000;
  const jobs=[];for(const c of cities)for(let i=0;i<PAGES;i++)jobs.push(cityRun(b,base,c,HOURS*3600/PAGES,wallEnd,i).catch(e=>({city:c,fail:String(e).slice(0,200)})));
  const runs=await Promise.all(jobs);const res={};let fails=0;
- for(const r of runs){if(r.fail){console.log('FAIL boot '+r.city+' '+r.fail);fails++;continue}const C=res[r.city]=res[r.city]||{t:0,km:0,cnt:{},gasT:0,slowT:0,hits:{npc:0,world:0,invisible:0},cells:[],msgs:{},taps:[],errs:[],nErr:0,steps:0,episodes:0,boot:[],xcErr:[],acts:{},skh:[]};
+ for(const r of runs){if(r.fail){console.log('FAIL boot '+r.city+' '+r.fail);fails++;continue}const C=res[r.city]=res[r.city]||{t:0,km:0,cnt:{},gasT:0,slowT:0,hits:{npc:0,world:0,invisible:0},cells:[],msgs:{},taps:[],errs:[],nErr:0,steps:0,episodes:0,boot:[],xcErr:[],acts:{},skh:[],sl:{},mT:{}};
   C.t+=r.t;C.km+=r.km;C.gasT+=r.gasT;C.slowT+=r.slowT;C.steps+=r.steps;C.episodes+=r.episodes;C.boot.push(r.boot);C.cells.push(...r.cells);C.taps.push(...r.taps);C.errs.push(...r.pageErrs);C.nErr+=r.nPageErr;C.xcErr.push(...r.xcErr);C.skh.push(r.skh);
-  for(const k in r.cnt)C.cnt[k]=(C.cnt[k]||0)+r.cnt[k];for(const k in r.hits)C.hits[k]+=r.hits[k];for(const[m,n]of r.msgs)C.msgs[m]=(C.msgs[m]||0)+n;for(const k in r.acts)C.acts[k]=(C.acts[k]||0)+r.acts[k]}
+  for(const k in r.cnt)C.cnt[k]=(C.cnt[k]||0)+r.cnt[k];for(const k in r.hits)C.hits[k]+=r.hits[k];for(const[m,n]of r.msgs)C.msgs[m]=(C.msgs[m]||0)+n;for(const k in r.acts)C.acts[k]=(C.acts[k]||0)+r.acts[k];for(const k in r.sl||{})C.sl[k]=(C.sl[k]||0)+r.sl[k];for(const k in r.mT||{})C.mT[k]=(C.mT[k]||0)+r.mT[k]}
  const lines=[];
  for(const city in res){const C=res[city],h=Math.max(C.t,1)/3600;C.cnt.jsErr=(C.cnt.jsErr||0)+C.nErr+C.xcErr.length;C.cnt.deadButton=C.taps.filter(t=>!t[1]).length;C.frustration=C.gasT?100*C.slowT/C.gasT:0;C.perH={};
   for(const d in LIMIT){const n=d==='frustration'?C.frustration:(C.cnt[d]||0),ph=d==='frustration'?n:n/h,abs=['nan','bounds','jsErr','belowGround','yJump','launch','deadButton'].includes(d);C.perH[d]=+ph.toFixed(2);
    const ok=abs?n<=LIMIT[d]:ph<=LIMIT[d];if(!ok)fails++;lines.push(`${ok?'PASS':'FAIL'} ${d} ${city} ${d==='frustration'?n.toFixed(1)+' % of gas time under 10 km/h':n+' hits = '+ph.toFixed(1)+'/h'} (limit ${LIMIT[d]}${d==='frustration'?' %':abs?' total':'/h'})`)}
   lines.push(`INFO ${city} npc sideways by the old c.hh reading ${C.cnt.npcLatHH||0} vs step-velocity ${C.cnt.npcLateral||0}`);lines.push(`INFO ${city} sim ${(C.t/60).toFixed(1)} min (${(C.t/3600).toFixed(2)} of ${HOURS} h target) · ${C.km.toFixed(1)} km · ${C.steps} steps @ dt ${DT} · ${C.episodes} seeds · contacts/km npc ${(C.hits.npc/Math.max(C.km,.1)).toFixed(2)} world ${(C.hits.world/Math.max(C.km,.1)).toFixed(2)} invisible ${(C.hits.invisible/Math.max(C.km,.1)).toFixed(2)} · boot ${C.boot.map(x=>x.toFixed(0)).join('/')} s`);
   {const sk=C.skh.reduce((a,q)=>a+((q&&q.rev)|0)+((q&&q.lift)|0),0),un=C.msgs.UNSTUCK|0,bo=C.cnt.backOnRoad|0;lines.push(`INFO trap ${city} ladder ${(sk/h).toFixed(1)}/h · UNSTUCK ${(un/h).toFixed(1)}/h · BACK ON THE ROAD ${(bo/h).toFixed(1)}/h · sum ${((sk+un+bo)/h).toFixed(1)}/h`)}
+  {const by={},wy={};for(const k in C.sl){const[m,w]=k.split('|');by[m]=(by[m]||0)+C.sl[k];wy[w]=(wy[w]||0)+C.sl[k]}lines.push(`INFO slope ${city} slides ${C.cnt.slopeSlide|0} = ${((C.cnt.slopeSlide|0)/h).toFixed(1)}/h · per mode `+Object.keys(by).sort().map(m=>`${m||'-'} ${by[m]} (${(by[m]/Math.max(C.mT[m]||1,1)*3600).toFixed(0)}/mode-h)`).join(', ')+` · by clamp `+Object.entries(wy).map(([w,n])=>w+' '+n).join(', ')+` · wallClimb ${C.cnt.wallClimb|0} · yJump ${C.cnt.yJump|0} · belowGround ${C.cnt.belowGround|0}`)}
   for(const t of C.taps)if(!t[1])lines.push(`  dead button ${city}: ${t[0]} · ${t[2]}`)}
  let shotList=[];
  if(SHOTS){const all=Object.values(res).flatMap(C=>C.cells).filter(c=>!['jsErr','nan'].includes(c.det)).sort((a,b)=>b.n-a.n),pick=[],seen=new Set();for(const c of all){const k=c.city+Math.floor(c.x/60)+','+Math.floor(c.z/60);if(seen.has(k))continue;seen.add(k);pick.push(c);if(pick.length>=SHOTS)break}
