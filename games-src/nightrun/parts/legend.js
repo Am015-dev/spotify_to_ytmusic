@@ -41,7 +41,7 @@ if(RET.legend){
       if(w.mv&&w.gap&&w.warn<=0&&!w.hit){w.gap.y+=w.gv*dt;if(w.gap.y<70||w.gap.y>H-70){w.gv=-w.gv;w.gap.y=clamp(w.gap.y,70,H-70);}}}
     LEG.wt=LEG.act();try{t0.apply(this,arguments);}finally{LEG.wt=0;}if(LEG.act())for(const w of this.walls){if(w.lgap&&w.gap!==w.lgap)w.gap=w.lgap;
       if(!w.cur&&w.gap&&!w.lgap){const s=P.y>H/2?-1:1;w.gap.y=clamp(P.y+s*LEG.GOFF*(1+.5*GR()),70,H-70);w.lgap=w.gap;}   /* the no-charge gap opens away from the ship too: an empty dash means read and move */if(w.gap&&!w.cur)w.gap.h=Math.min(w.gap.h,LEG.GAP);}};   // counter.js re-rolls a gap at the warning's end
-    {const h0=hurt;hurt=function(n){return h0.call(this,LEG.wt?Math.max(n||1,LEG.WD):n);};}   // c. a laser wall hit costs LEG.WD hull on Legend (2: the shell's heavy hit)
+    HOOK.hurt(h0=>function(n){return h0.call(this,LEG.wt?Math.max(n||1,LEG.WD):n);});   // c. a laser wall hit costs LEG.WD hull on Legend (2: the shell's heavy hit)
     const s0=CTR.start;CTR.start=function(k){if(LEG.act()&&k==='curt'){this.wall();const w=this.walls[this.walls.length-1];if(w)w.mv=1;return;}return s0.apply(this,arguments);};}
   /* 5. bosses: one more verb per phase */
   if(window.BMV){const i0=BMV.init;BMV.init=function(e){i0.apply(this,arguments);if(!LEG.act()||!e.bm||!e.lists)return;const T=e.bm.T;

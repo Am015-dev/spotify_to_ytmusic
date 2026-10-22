@@ -446,3 +446,4 @@ function bossLoot(e){if(!ST.on||GX()<ST.heal)G.pk.push({t:'hp',x:e.x,y:e.y,vx:-8
   G.pk.push({t:WP.canGain()?'up':'emp',x:e.x,y:e.y,vx:-80,vy:40,bob:0});
   for(let i=0;i<8;i++)G.pk.push({t:'shard',x:e.x+rnd(-30,30),y:e.y+rnd(-30,30),vx:rnd(-160,-40),vy:rnd(-90,90),bob:0});}
 hookable('spawnBoss',()=>spawnBoss,f=>spawnBoss=f);   // layers (build order): athens, fair, hard, armour, density, endramp; endramp runs outermost
+hookable('hurt',()=>hurt,f=>hurt=f);   // layers (build order): upgrades, up2, g, grit, legend, classes (outermost)

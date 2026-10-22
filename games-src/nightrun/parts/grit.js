@@ -79,9 +79,9 @@ const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.
   const e0=en;en=function(type,o){const e=e0(type,o||{});try{GRIT.tag(e);}catch(x){}return e;};}
 {const w0=RET.asWinMs;RET.asWinMs=function(){return w0.call(this)+(GRIT.assist()?Math.round(GRIT.aWin*GRIT.aK()):0);};
   const b0=eb;eb=function(x,y,a,s,c,r){if(GRIT.assist())s*=1-GRIT.aSp*GRIT.aK();if(GRIT.norm())s*=GRIT.bsN;return b0(x,y,a,s,c,r===undefined?5:r);};}
-{const h1=hurt;hurt=function(n){const b=P.hp;h1.apply(this,arguments);   // W47 mercy: on Normal a share of hull hits is absorbed (hull restored, short grace) - a human takes 4-7 hits a stage, not 9
+HOOK.hurt(h1=>function(n){const b=P.hp;h1.apply(this,arguments);   // W47 mercy: on Normal a share of hull hits is absorbed (hull restored, short grace) - a human takes 4-7 hits a stage, not 9
     if(GRIT.hardBoss()&&!G.dead&&P.hp<b&&b>1){const g=GRIT.g();g.hc=(g.hc||0)+GRIT.mcH;if(g.hc>=1&&(g.hn||0)<GRIT.mcHMax){g.hc-=1;g.hn=(g.hn||0)+1;P.hp=b;P.inv=Math.max(P.inv||0,.6);GRIT.st.mercyH=(GRIT.st.mercyH||0)+1;}}   // W54: Hard (not very hard / Legend) boss fights only - a share of hull hits is absorbed, a few per run; bosses cost a dodger 8 hits in 40 s while stage 1-4 cost 8 in 126 s
-    if(GRIT.norm()&&!G.dead&&P.hp<b&&b>1){const g=GRIT.g(),m=GRIT.mc0+(GRIT.mc20-GRIT.mc0)*Math.min(1,Math.max(0,(GRIT.stg()-1)/19));g.mc=(g.mc||0)+m;if(g.mc>=1&&(g.mn||0)<GRIT.mcMax){g.mc-=1;g.mn=(g.mn||0)+1;P.hp=b;P.inv=Math.max(P.inv||0,.6);GRIT.st.mercy=(GRIT.st.mercy||0)+1;}}};}
+    if(GRIT.norm()&&!G.dead&&P.hp<b&&b>1){const g=GRIT.g(),m=GRIT.mc0+(GRIT.mc20-GRIT.mc0)*Math.min(1,Math.max(0,(GRIT.stg()-1)/19));g.mc=(g.mc||0)+m;if(g.mc>=1&&(g.mn||0)<GRIT.mcMax){g.mc-=1;g.mn=(g.mn||0)+1;P.hp=b;P.inv=Math.max(P.inv||0,.6);GRIT.st.mercy=(GRIT.st.mercy||0)+1;}}});
 NR.on('tick',dt=>GRIT.tick(dt));
 NR.on('runStart',()=>{for(const k in GRIT.st)GRIT.st[k]=0;});
 window.__grit=GRIT;

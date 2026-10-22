@@ -65,7 +65,7 @@ NR.on('beat',()=>{if(AX.odOn>0&&--AX.odBeats<=0){AX.odOn=0;}
   const n=SH.n('bd');if(n&&!G.dead&&G.live){for(let k=0;k<n;k++){const a=G.bp*Math.PI/2+k*6.2832/n,x=P.x+Math.cos(a)*46,y=P.y+Math.sin(a)*46;
     G.pb.push({x:x+10,y,vx:900,vy:0,dm:2.2*tpDmg(),pf:1,big:1,px:new Set(),pn:1,bd:1});}}});
 /* ----- auto-shield, second wind, EMP cell, interest, drones that follow the ship ----- */
-{const hu=hurt;hurt=function(){const hp0=P.hp,sh0=SH.sh;hu();if(P.hp<hp0&&P.hp<=1&&P.hp>0&&SH.sh===0&&AX.asLeft>0){AX.asLeft--;SH.sh++;floater(P.x,P.y-30,'AUTO-SHIELD','#19e3ff');AU.sfx('up');}};}
+HOOK.hurt(hu=>function(){const hp0=P.hp,sh0=SH.sh;hu();if(P.hp<hp0&&P.hp<=1&&P.hp>0&&SH.sh===0&&AX.asLeft>0){AX.asLeft--;SH.sh++;floater(P.x,P.y-30,'AUTO-SHIELD','#19e3ff');AU.sfx('up');}});
 {const d0=die;die=function(){if(AX.sw>0&&!G.dead&&TP.revLeft<=0){AX.sw--;P.hp=P.max;P.inv=3;G.eb=[];G.flash=Math.max(G.flash,.6*FX());shake(16);
       for(const e of G.en){if(e.type==='boss')e.hp-=25;else e.hp-=30;e.flash=.2;}burst(P.x,P.y,'#ff2d95',40,420,.7);G.rings.push({x:P.x,y:P.y,l:.8,m:.8,c:'#ff2d95'});floater(P.x,P.y-30,'SECOND WIND','#ff2d95');AU.sfx('up');return;}
     d0();};}

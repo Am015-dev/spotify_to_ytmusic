@@ -99,7 +99,7 @@ NR.on('spawn',e=>{if(!CLS.R.live||CLS.R.k.pwc===1||!e||!e.pw||!G.pw)return;G.pw.
 NR.on('kill',d=>{if(CLS.is('gambler')&&d&&!d.boss)CLS.R.streak++;});
 NR.on('hurt',()=>{if(CLS.is('gambler')){CLS.R.streak=0;if(G.ab)G.ab.m=0;}});
 NR.on('tick',dt=>{if(CLS.R.shield>0)CLS.R.shield=Math.max(0,CLS.R.shield-dt);});
-{const h0=hurt;hurt=function(n){if(CLS.R.live&&CLS.R.shield>0&&!(P.inv>0)&&!G.dead){CLS.R.shield=0;P.inv=1;CLS.stat.shield++;burst(P.x,P.y,'#00e5c3',18,240);floater(P.x,P.y-30,'BLOCKED','#00e5c3');return;}return h0.apply(this,arguments);};}
+HOOK.hurt(h0=>function(n){if(CLS.R.live&&CLS.R.shield>0&&!(P.inv>0)&&!G.dead){CLS.R.shield=0;P.inv=1;CLS.stat.shield++;burst(P.x,P.y,'#00e5c3',18,240);floater(P.x,P.y-30,'BLOCKED','#00e5c3');return;}return h0.apply(this,arguments);});
 /* the shield ring round the ship while BULWARK is up */
 {const dr=ABIL.draw;ABIL.draw=function(){const r=dr.apply(this,arguments);if(CLS.R.shield>0&&P&&ctx){ctx.save();ctx.globalAlpha=.35+.25*Math.min(1,CLS.R.shield);ctx.strokeStyle='#00e5c3';ctx.lineWidth=3;ctx.beginPath();ctx.arc(P.x,P.y,30,0,7);ctx.stroke();ctx.restore();}return r;};}
 /* ---------- UI: Garage tab PILOT (class picker + skill tree) ---------- */
