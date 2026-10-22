@@ -20,3 +20,9 @@ save/resume (13), asset-load (417 files, 229 anim strips, all decode, no placeho
 - Monkey saw `blob:` "failed requests" (audio object URLs aborted on reload); lib.js now ignores blob: URLs. Not re-run after that change.
 - Frame-time gates are loose (p50 33 ms, p95 100 ms) because this box draws on a software canvas; draw-call gate 250 (measured 100-135).
 - Not run in the final pass because of the 45 min stop: a second monkey run after the blob filter; FULL=1 soak.
+
+## W129 (22 Oct 2026)
+- Open 1, 2 fixed (banner title raised 8 px on short landscape; boss floaters BOSSFY stay under the hint line; no hint under the stage banner; explain caption top margin 104 css px in landscape). ui-align 844x390 clean in 5 of 5 runs after the fix.
+- Open 4 is not a stage-6 hitch: every stage shows one 130-150 ms frame in each 30 frames (30 frames at 1/60 and at 1/30 alike, no single drawImage over 15 ms) = headless software-canvas flush, so p95 lands on it whenever more than 5% of frames are hit. Not fixed in game code; gate this on p90 or ignore.
+- Open 5 is not a dead button: tapping CORE opens the pick sheet (verified). An empty slot now reads "NO CORE" / "NO PASSIVE".
+- Still failing: legible-test stage10 enemy bullets worst 10% (1.90-2.79 in the combined run, passes alone and with ?explain=0; also failed before this work). explain-test "approved list" reports 4 unmapped draw sites (built:enemy, banner, draw, evDraw) from the edited lines: VISUAL-INVENTORY needs a re-map.

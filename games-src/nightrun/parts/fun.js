@@ -115,9 +115,14 @@ Object.assign(FUN,{
     else if(e.k==='gust'){if(age>=1&&age<4.2)P.y=clamp(P.y+e.dir*62*dt,22,H-22);}
     else if(e.k==='blackout'){if(age>=1)e.x=W+10-(W+260)*(age-1)/4.5;}},
   evDraw(t){const e=this.ev;if(!e)return;const age=G.t-e.t0,pulse=SET.reduce?1:(BK(t,10)?1:.6);ctx.save();
-    if(e.k==='supply'){const k=Math.max(0,1-age);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.globalAlpha=.8*pulse;ctx.beginPath();ctx.arc(e.x,e.y,22+90*k,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(e.x,0);ctx.lineTo(e.x,e.y-22);ctx.stroke();}
-    else if(e.k==='lane'){const live=age>=1.3&&age<5.3;if(live){ctx.globalAlpha=.95;ctx.fillStyle='#fff';ctx.fillRect(0,e.y-3,W,6);ctx.globalAlpha=.4;ctx.fillStyle='#ff3050';ctx.fillRect(0,e.y-e.h/2,W,e.h);}
-      else if(age<1.3){ctx.globalAlpha=.5*pulse;ctx.strokeStyle='#ff7080';ctx.lineWidth=2;ctx.setLineDash([14,10]);ctx.strokeRect(2,e.y-e.h/2,W-4,e.h);ctx.setLineDash([]);}}
+    if(e.k==='supply'){const k=Math.max(0,1-age);ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.globalAlpha=.8*pulse;ctx.beginPath();ctx.arc(e.x,e.y,window.DIET&&DIET.on?Math.min(22+90*k,DIET.ringMax()):22+90*k,0,7);ctx.stroke();ctx.beginPath();ctx.moveTo(e.x,0);ctx.lineTo(e.x,e.y-22);ctx.stroke();}
+    else if(e.k==='lane'){const live=age>=1.3&&age<5.3,y0=e.y-e.h/2;   // thin telegraph: two edge lines + a light fill (<= 15%) + words; the whole band is the danger
+      ctx.globalAlpha=live?.14:.08*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,y0,W,e.h);
+      ctx.globalAlpha=live?.95:.6*pulse;ctx.strokeStyle=live?'#ff6a7a':'#ff7080';ctx.lineWidth=live?3:2;if(!live)ctx.setLineDash([14,10]);
+      ctx.beginPath();ctx.moveTo(0,y0);ctx.lineTo(W,y0);ctx.moveTo(0,y0+e.h);ctx.lineTo(W,y0+e.h);ctx.stroke();ctx.setLineDash([]);
+      ctx.globalAlpha=.95;ctx.font='700 14px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=3;ctx.strokeStyle='#05030c';
+      const tx=live?'LASER ON: LEAVE THIS BAND':'LASER SOON: LEAVE THIS BAND';ctx.fillStyle='#fff';
+      if(wcv===cv){ctx.strokeText(tx,W*.5,e.y);ctx.fillText(tx,W*.5,e.y);}else{ctx.translate(W*.5,e.y);ctx.rotate(Math.PI/2);ctx.strokeText(tx,0,0);ctx.fillText(tx,0,0);}}
     else if(e.k==='gaterun'){ctx.globalCompositeOperation='lighter';for(const r of e.rings){if(r.got||r.x<-40||r.x>W+40)continue;ctx.globalAlpha=.9;ctx.strokeStyle='#ffe14d';ctx.lineWidth=4;ctx.beginPath();ctx.arc(r.x,r.y,26,0,7);ctx.stroke();ctx.globalAlpha=.25;ctx.fillStyle='#ffe14d';ctx.beginPath();ctx.arc(r.x,r.y,26,0,7);ctx.fill();}}
     else if(e.k==='rescue'){const f=e.fl>0;ctx.globalAlpha=1;ctx.fillStyle=f?'#fff':'#0e2a22';ctx.strokeStyle='#3dffb0';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,22,0,7);ctx.fill();ctx.stroke();
       ctx.fillStyle='#3dffb0';ctx.fillRect(e.x-15,e.y+30,30*Math.max(0,e.hp)/6,4);ctx.strokeRect(e.x-15,e.y+30,30,4);}

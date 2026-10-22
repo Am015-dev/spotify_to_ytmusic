@@ -51,7 +51,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     if(mn)hudMin(ctx,1,18,y0-8,t);});
   if(ku>1.25)tierMeter(W-131*ku-14,H-8,ku);else tierMeter(W/2,H-8,ku);       // big HUD on a small screen: the meter moves to the right corner, clear of the bars frame
   if(G.note.t>0&&G.note.txt)cn(W,H,()=>{ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font='12px "Share Tech Mono",monospace';ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,W-18,H-12-(ku>1.25?50:0));ctx.globalAlpha=1;});
-  if(window.HINT&&HINT.on())HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});   // F6: the one hint style (top third, under the HUD)
+  if(window.HINT&&HINT.on()){if(!(G.banner.t>0))HINT.draw(ctx,{W,H,mode:'land',cpu:Math.max(.2,frame.clientWidth/W),top:(G.boss&&G.boss.x<W?84:76)*ku,x0:Math.min(W*.4,244*ku),x1:W-8,ship:{x:P.x,y:P.y},acc:D.a});}   // F6: the one hint style (top third, under the HUD); not while the stage banner is up (they overlapped at 844x390)
   else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0)cn(W/2,H-62,()=>{ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(W/2,H-62,15,1,W,26,40);ctx.globalAlpha=1;});
   if(!mn){SH.hud(ctx,t,{nx:24,ny:90,dx:216,dy:H-52,sx:18,sy:H-60,ring:true});HUDX.ship(ctx,P.x,P.y,1,t);}else HUDX.ship(ctx,P.x,P.y,1,t);
   // boss bar
@@ -63,7 +63,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
     if(G.banner.ev)ART.pic(G.banner.ev,Math.min(256,W*.5),W/2,H/2-58-48,0,Math.max(0,a));ctx.globalAlpha=Math.max(0,a);   // mini-event banner art (nv-ev-*)
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,H/2-58,W,96);const col=G.banner.warn?'#ff3040':D.a;
     ctx.fillStyle=col;ctx.fillRect(0,H/2-58,W,2);ctx.fillRect(0,H/2+36,W,2);
-    ctx.font='700 54px "Chakra Petch",sans-serif';ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,W/2+(1-a)*40,H/2-2);
+    ctx.font='700 54px "Chakra Petch",sans-serif';ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,W/2+(1-a)*40,H/2-8);
     ctx.font=`${15*Math.min(ku,1.3)}px "Share Tech Mono",monospace`;ctx.fillStyle='#e9e6ff';ctx.fillText(G.banner.b,W/2,H/2+32);ctx.globalAlpha=1;}
   ctx.restore();}
 
@@ -107,7 +107,7 @@ function drawHUDP(t){const D=DISTRICTS[G.di],k=HK,w=PW_,h=PH_,T=tierOf(C.n);ctx.
     if(G.banner.ev)ART.pic(G.banner.ev,Math.min(256*k,w*.7),w/2,h/2-58*k-40*k,0,Math.max(0,a));ctx.globalAlpha=Math.max(0,a);
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,h/2-58*k,w,96*k);const col=G.banner.warn?'#ff3040':D.a;
     ctx.fillStyle=col;ctx.fillRect(0,h/2-58*k,w,2);ctx.fillRect(0,h/2+36*k,w,2);
-    ctx.font=`700 ${Math.min(54*k,w/Math.max(7,G.banner.a.length*.62))}px "Chakra Petch",sans-serif`;ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,w/2+(1-a)*40,h/2+4*k);
+    ctx.font=`700 ${Math.min(54*k,w/Math.max(7,G.banner.a.length*.62))}px "Chakra Petch",sans-serif`;ctx.fillStyle=G.banner.warn&&!SET.reduce&&BK(t,6)?'#ffffff':col;ctx.fillText(G.banner.a,w/2+(1-a)*40,h/2-4*k);
     ctx.font=`${Math.min(15*k,w/Math.max(20,G.banner.b.length*.62))}px "Share Tech Mono",monospace`;ctx.fillStyle='#e9e6ff';ctx.fillText(G.banner.b,w/2,h/2+26*k);ctx.globalAlpha=1;}
   ctx.restore();}
 
