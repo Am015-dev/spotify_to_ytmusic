@@ -119,6 +119,7 @@ tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
 menufix|4|HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 p|menufix,menufix
 explain|26|every fly-stage visual is explained: first-appearance captio|explain,explain
 calm|6|a calm playfield: rule banners small in the top band, thin s|calm,calm
+waves|15|stages 1-6 play named waves with one idea each, a breather b|waves,waves
 nocaps|9|no caption, hint bubble or info box while a stage is played;|nocaps,nocaps
 c|35|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|7|Mainhattan Nightrun service worker (B30). Built by parts/bui|-

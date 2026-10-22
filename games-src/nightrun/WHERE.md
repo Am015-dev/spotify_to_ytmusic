@@ -88,6 +88,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | menufix | menufix mfDraw 35-41 |  |  | menufix |  |
 | explain,exp10 | explain EXP 11-65 | abilities |  | explain | WORKER-RULES |
 | calm | calm CALM 10-38 | footen,fxwave |  | calm |  |
+| waves | waves WV 15-125 | a |  | waves | WAVES |
 | nocaps | nocaps NC 16-45 |  |  | nocaps |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.
