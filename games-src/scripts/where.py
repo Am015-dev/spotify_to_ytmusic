@@ -145,6 +145,28 @@ RECIPES = [
 ]
 
 
+HOOKDEF = re.compile(r"hookable\('([\w.]+)'")
+HOOKUSE = re.compile(r"HOOK(?:\.(\w+)|\['([\w.]+)'\])\(|(DRAW\.(?:pre|extra))\.push\(")
+
+
+def hook_lines(a):
+    """Hooked functions (consolidation step 3): the one home (hookable / DRAW owner) and its layers in registration (build) order."""
+    home, lay = {"drawPickups": None}, {}
+    for f in a["files"]:
+        n = f["name"]; t = mm.rd(PARTS / n)
+        for m in HOOKDEF.finditer(t): home[m.group(1)] = "%s:%d" % (short(n), t[:m.start()].count("\n") + 1)
+        if "const DRAW={" in t: home["drawPickups"] = "%s:%d" % (short(n), t[:t.index("const DRAW={")].count("\n") + 1)
+        for m in HOOKUSE.finditer(t):
+            if "//" in t[t.rfind("\n", 0, m.start()) + 1:m.start()]: continue   # a comment that names the hook
+            k = m.group(1) or m.group(2) or ("drawPickups" if m.group(3) == "DRAW.extra" else "drawPickups(pre)")
+            lay.setdefault(k, []).append(short(n))
+    L = ["", "Hooked functions: ONE definition in its home part; layers register with one line (`HOOK.name(prev=>function(..){..})`, drawPickups: `DRAW.extra.push`), listed here in build order, last = outermost (zoo/leak register at their first runStart). Runtime list: `HOOKS[name]`.", ""]
+    for k in sorted(home, key=lambda k: -len(lay.get(k, []))):
+        ls = lay.get(k, []) + (["pre: " + ",".join(lay["drawPickups(pre)"])] if k == "drawPickups" and "drawPickups(pre)" in lay else [])
+        L.append("- %s @ %s: %s" % (k, home[k], ", ".join(ls) or "-"))
+    return L
+
+
 def render():
     a, texts, ft, wraps, wrapped_by = analyse()
     L = ["# WHERE: Mainhattan Nightrun, which file owns what", "",
@@ -156,6 +178,7 @@ def render():
         if len(flags) > 4: key = "ret (one `RET.x` line per flag, top of the file)"
         L.append("| %s | %s | %s | %s | %s | %s |" % (fmt_flags(flags, ft), key.strip(), cell_list(wraps.get(n, {}), 3), cell_list(wrapped_by.get(n, {}), 3),
                                                       test_for(n, t, flags), doc_for(t)))
+    L += hook_lines(a)
     L += ["", "Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.", "",
           "## How to find X (named file, then the function)", ""]
     for i, (q, ans) in enumerate(RECIPES, 1): L.append("%d. **%s**: %s" % (i, q, ans))
