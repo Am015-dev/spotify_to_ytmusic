@@ -883,7 +883,7 @@ const DYE={cur:1,q:1};                                     // dying slows the so
 const FIRE_K=.62;                                          // enemy fire cadence: about 40% fewer bullets than before, each one aimed and telegraphed
 const frK=()=>(ST.on?DF.sfr:DF.fr)*FIRE_K*STILL.fk*AI.fk()*(DMG.on?DMG.fk*DMG.lf()*(SET.diff==='easy'?.8:1)*(ST.on?1:DMG.fkE):1);   // DMG.fk: enemies live longer now (BALANCE.md), so each fires a little less often
 function diff(){if(ST.on)return ST.d*DF.sd*UPS.d;const ease=G.loop||G.pos?1:clamp(.8+.2*G.t/150,.8,1);return(1+.17*(G.pos+G.dprog)+TUNE2.loopD*G.loop)*ease*DF.d*UPS.d;}   // endless: a smooth ramp over the districts and loops, a gentle first minutes; UPS.d = soft scaling with the player's upgrades
-const bossX=()=>rotMode?690:790;                          // where a boss stops: portrait keeps it clear of the HUD at the top
+const bossX=()=>rotMode?Math.min(690,W-92*HK-1.8*(G&&G.boss?G.boss.r:46)-4):790;                          // where a boss stops: portrait keeps it clear of the HUD at the top
 const bossStage=k=>(window.RET&&RET.dpool&&RET.DP.boss(k))||(k===3?'boss2':k===6?'boss3':'boss');   // final boss gets its own song
 // Mini-bosses and the first boss (SEK-ADLER) keep the stage song and get a drum layer; the district bosses switch to the boss song, the final boss to boss2.
 const bossSong=(k,mini)=>mini||(k===0&&!(window.RET&&RET.dpool))?null:bossStage(k);
@@ -12872,7 +12872,7 @@ NR.on('beat',()=>{if(!RET.fleet||!running||G.dead)return;const d=diff();for(cons
    DIFFICULTY  The selected difficulty is the start. Every wave the per-difficulty knobs (DF: d, bs, fr, dn, fan, heal, el, aq) move a step toward Legend (hull drops, heal, stay as chosen: sustain is not part of the ramp) along a curve that starts gently (progress^2); Normal reaches Legend at wave 31 (Easy 43, Hard 15,
                Very hard 8). The difficulty key the other systems read (SET.diff: boss movesets, telegraph times, zoo counts, hazards) steps up the same ladder over the last 45% of the climb (the oracle dodger cannot live through those systems earlier, bot numbers in endramp-test), so bosses follow. After Legend the knobs keep rising
                slowly for 30 more waves up to a ceiling (d +22%, fire +15%, density +15%, bullet speed +6%, elites +15%, one more bullet in fans). armour.js hull / caps and hard.js DPS ceiling are untouched.
-               BOSS DEADLINE (E05, review 9): armour.js caps the damage rate, and a ship that barely hits never finished the first endless boss (48/364 hp in 519 s). From SOFT.t0 s after the boss takes position its HP may not stay above a schedule that reaches 0 at SOFT.t0 + SOFT.len (90 s):
+               BOSS DEADLINE (E05 review 9, F07 review 10): armour.js caps the damage rate, and a ship that barely hits never finished the first endless boss (48/364 hp in 519 s). From SOFT.t0 s after the boss takes position its HP may not stay above a schedule that reaches 0 at SOFT.t0 + SOFT.len (28 s; it was 90 s, which with the 32-bar floor made a boss wave 74-95 s and wave 10 come at 350-390 s):
                the armour cracks (a one-time caption names it), a ship that is ahead of the schedule is untouched, armour.js caps / hull / phases (floors, bar lines, last stand) are not changed. o.soft=0 = off.
                The player's chosen difficulty is restored at the end of the run (and on page hide, so a mid-run settings save never keeps the stepped key).
    VERBS       From wave 2 each wave has a signature verb (flankers, rain, pincer, mines, swarm ring, convoy ...) chosen from a seeded bag (GR), fired on bar 5 of the wave (and bar 2 from wave 12); patterns the last two waves used are
@@ -12880,7 +12880,7 @@ NR.on('beat',()=>{if(!RET.fleet||!running||G.dead)return;const d=diff();for(cons
                novelty clock (twists, epochs) never trails the wave count. No three consecutive waves share a pattern set. ---------- */
 if(RET.endramp===undefined)RET.endramp=!/[?&]endramp=0/.test(location.search);
 const ENDR=window.ENDR={KEYS:['easy','normal','hard','vhard','legend'],L:{easy:42,normal:30,hard:14,vhard:7,legend:0},X:30,P:2,KL:.55,HK:0,CE:{d:.22,fr:.15,dn:.15,bs:.06,el:.15},
-  o:{cap:4,diff:1,tier:1,sig:1,pool:1,rules:1,nov:1,pac:1,soft:1},SOFT:{t0:30,len:60},w:0,real:'normal',eff:'',bi:0,act:false,firing:0,sig:null,sets:[],sigs:[],stat:{waves:0,sig:0,keys:[]},
+  o:{cap:4,diff:1,tier:1,sig:1,pool:1,rules:1,nov:1,pac:1,soft:1},SOFT:{t0:6,len:22,mb:10},w:0,real:'normal',eff:'',bi:0,act:false,firing:0,sig:null,sets:[],sigs:[],stat:{waves:0,sig:0,keys:[]},
   on(){return!!RET.endramp&&this.act&&running&&!ST.on&&!G.tut&&!G.lab&&!G.daily&&!G.weekly;},
   /* pure: the knobs and key for a base key at wave w */
   at(key,w){const B=DIFFS[key]||DIFFS.normal,Lg=DIFFS.legend,L=this.L[key]==null?28:this.L[key],k=L<=0?1:Math.pow(clamp((w-1)/L,0,1),this.P),e=clamp((w-L-1)/this.X,0,1),o={};
@@ -12925,13 +12925,36 @@ window.addEventListener('pagehide',()=>{if(ENDR.eff){ENDR.restore();try{saveSet(
   const t=this.tierv()+.01;c=Object.keys(PATS).map(k=>PATS[k]).filter(p=>p.t<=t&&!a.has(p.id)&&!b.has(p.id));if(c.length>=2)return c;
   c=base.filter(p=>!a.has(p.id));return c.length?c:base;};}
 {const ri=RU.idx;RU.idx=function(){const n=ri.call(this);return ENDR.on()&&ENDR.o.rules?Math.max(n,2+Math.floor(ENDR.w/3)):n;};}
+/* BOSS LENGTH (review 10 F07): in endless every boss lives <= SOFT.t0 + SOFT.len s after it takes position (28 s, ~33 s from its spawn) and may fall from bar SOFT.mb instead of bar 32 (the 32-bar floor alone held a district boss for 61 s), so wave 10 comes by ~250 s with the 3 bosses on the way; armour.js caps / hull / phase lines are untouched */
+{const sb=spawnBoss;spawnBoss=function(o){const b=sb(o);if(b&&b.b2&&ENDR.on()&&ENDR.o.soft)b.minBar=Math.min(b.minBar,ENDR.SOFT.mb);return b;};}
 /* BOSS DEADLINE: runs after armour.js's pass (this part loads later), so the schedule only pulls HP down to the next phase floor; the phases still start on their bar lines */
 {const dp=DMG.pass;DMG.pass=function(dt){const r=dp.call(this,dt);const e=G.boss;if(!ENDR.on()||!ENDR.o.soft||!e||e.dead||!e.b2||e.x>bossX())return r;
   const s=e.b2,S=ENDR.SOFT;s.soft=(s.soft||0)+dt;if(s.soft<S.t0)return r;
+  if(e.bmG&&window.BMV)BMV.unguard(e,0);                      // a boss move that holds the HP (flank shield, overload ...) cannot outlast the deadline: bossmoves.js restored the HP every frame (Legend boss stayed 61 s)
   const want=e.max*Math.max(0,1-(s.soft-S.t0)/S.len),pf=e.ph===1?e.max*.64:e.ph===2?e.max*.31:0,hp=Math.max(pf,Math.min(e.hp,want));
+  if(e.floor>hp)e.floor=hp;                                  // b.js lifts the HP back to e.floor every frame (a guard / min-bar floor left over from a verb held a Legend boss at 66% for 8 s)
   if(hp<e.hp-1e-6){e.hp=e.hq=s.ref=hp;s.sh=0;e.b2s=0;
     if(!s.softMsg){s.softMsg=1;floater(e.x,BOSSFY(e.y-e.r-34),'ARMOUR CRACKS','#ffe14d');if(!ENDR.softSeen){ENDR.softSeen=1;G.note={t:3.6,txt:'The boss armour is cracking: keep shooting'};}}}
   return r;};}
+
+// PURPOSE: no enemy rests under the HUD band on a phone: flyers cross it fast, strays are moved out
+// FLAG: bandclear (?bandclear=0)
+// TEST: hudband-test.js
+/* ---------- bandclear.js: nothing shows under the score strip (strict review 10 F01: enemies entered through the band and stayed 1-3.5 s under the score on 40-50% of frames). Flag RET.bandclear; ?bandclear=0 = as before.
+   Portrait phones only (rotMode): the band is the top 92 x HK units of the field (score strip, chips, boss bar).
+   WARP-IN: in the frame a flyer would show with its top edge inside the band (it comes in from the top, is created there, or its AI would rest there) it is put on the band's lower edge instead, before the frame is drawn: a unit on a formation path skips along its own path to the first point below the band (the path and the spacing of the line are kept, a follower arrives later and does the same), any other flyer is placed. Nothing is ever seen in the band.
+   A boss's body (1.8 x r) is kept out of the band once it has taken its place (its entrance from above is left alone). Ground enemies are untouched. Test: hudband-test.js. ---------- */
+if(RET.bandclear===undefined)RET.bandclear=!/[?&]bandclear=0/.test(location.search);
+const BCL=window.BCL={st:{warp:0,shift:0},band(){return rotMode?92*HK:0;}};
+const bclPlace=e=>{const B=BCL.band(),edge=W-B-e.r-1;
+  if(e.fp&&e.pth){let t=Math.max(0,e.pt||0),p=e.pth(t,e),i=0;while(p[0]+(e.ox||0)>edge&&i++<400){t+=.02;p=e.pth(t,e);}
+    if(i<400){e.pt=t;e.x=p[0]+(e.ox||0);e.y=p[1];}else{e.ox=(e.ox||0)+edge-(p[0]+(e.ox||0));e.x=edge;BCL.st.shift++;}}   // a path that never leaves the band: the whole path is moved down
+  else e.x=edge;
+  if(e.stop!=null&&e.stop>edge)e.stop=edge;BCL.st.warp++;};                                      // a turret's rest line too
+NR.on('tick',dt=>{if(!RET.bandclear||!rotMode||!G||!G.live||G.dead)return;const B=BCL.band();
+  for(const e of G.en){if(e.hp<=0||e.dead)continue;
+    if(e.type==='boss'){if(e.t>2){const mx=W-B-1.8*e.r-2;if(e.x>mx&&e.x<=bossX()+120)e.x=mx;}continue;}   // a boss's move may carry its body up into the band: clamp it (it arrives from above and is left alone until it has taken its place)
+    if(!e.gnd&&e.x<W&&W-e.x-e.r<B)bclPlace(e);}});
 
 // PURPOSE: Legend plays differently, not just faster
 // FLAG: legend (?legend=0)
@@ -14889,7 +14912,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='c1dc9ba8ec 2026-10-22 05:25 UTC';
+const NR_STAMP='8ed2c3af17 2026-10-22 05:28 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
