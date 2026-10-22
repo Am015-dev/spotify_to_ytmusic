@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.158',date:'22 Oct 2026',items:[{t:'CHANGED',s:'Cars now have a glossy paint finish by default (add ?gloss=0 to the address to turn it off).'},{t:'CHANGED',s:'The Takedown race is removed; all other races are unchanged.'}]},
 {v:'v90m-beta.157',date:'22 Oct 2026',items:[{t:'FIXED',s:'On foot you can no longer walk out of the world: you slow down and TURN BACK shows, like in the car.'},{t:'FIXED',s:'Only one TAP chip shows at a time, and the flight chip shows its plane icon once.'}]},
 {v:'v90m-beta.156',date:'22 Oct 2026',items:[{t:'FIXED',s:'On phones, traffic cars are no longer re-placed where you can see them.'},{t:'CHANGED',s:'Removed unfinished test options (hill climb, Athens bowl).'}]},
 {v:'v90m-beta.155',date:'22 Oct 2026',items:[{t:'CHANGED',s:'Stopping at a garage, flight or event marker no longer opens its card: tap the chip to open it.'},{t:'CHANGED',s:'Smoother on phones: the game does about 30% less work every frame (the HUD no longer forces a full restyle).'}]},
