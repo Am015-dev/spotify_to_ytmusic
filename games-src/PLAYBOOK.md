@@ -1,5 +1,8 @@
 # Playbook: change one place, land in every game
 
+> **Nightrun (22 Oct 2026): games-src/nightrun/WORKER-RULES.md overrides this file where they differ** (review branches nr/Wxx instead of pushing live, phone screenshots looked at but never committed, simhunt fast-sim gate, no generated files in worker commits, every design task names a player decision, reviews score fun anchored to players' 10-12/100). Lessons and sources: games-src/nightrun/PROCESS-AUDIT-2026-10-22.md.
+
+
 Roles: **Orchestrator** = main model (plans, decides, deploys). **Worker** = Sonnet (builds, fixes). **Script** = no AI.
 Read root `CLAUDE.md` first (hard rules, cost rules). A finished game goes straight to `games/<slug>/index.html` once its checks pass (owner, 5 Oct; `-next` previews are retired). Never touch Mainhattan / Overdrive; Ticket to Ride is on hold.
 

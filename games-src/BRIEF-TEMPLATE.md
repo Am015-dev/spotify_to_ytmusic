@@ -1,5 +1,8 @@
 # Worker brief: paste this at the top of every new worker or cloud session
 
+> **Nightrun (22 Oct 2026): games-src/nightrun/WORKER-RULES.md overrides this file where they differ** (review branches nr/Wxx instead of pushing live, phone screenshots looked at but never committed, simhunt fast-sim gate, no generated files in worker commits, every design task names a player decision, reviews score fun anchored to players' 10-12/100). Lessons and sources: games-src/nightrun/PROCESS-AUDIT-2026-10-22.md.
+
+
 Fill the three <...> parts, delete nothing else. Keep the whole brief under ~60 lines.
 
 ```
