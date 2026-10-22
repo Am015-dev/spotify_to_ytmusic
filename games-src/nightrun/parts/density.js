@@ -43,8 +43,8 @@ NR.on('runStart',()=>{DENS.busy=0;DENS.last=-9;DENS.px.length=0;});
 /* ---------- NEWPLAYER (flag RET.first30, F11 of review 10): the very first run of stage 1 (banked runs = 0, not Hard) is gentle for a player who has not found the controls yet: no aimed
    enemy fire for the first 15 s, then only every 3rd aimed shot until 45 s, and enemies that fly past cost no hull and a parked ship is not hunted (h.js) until 45 s. A parked ship is still alive at 45 s. Shots that are not aimed
    at the ship (spreads, curtains, drops) and everything after 45 s are untouched; the next run is the normal stage 1. ---------- */
-const NP=window.NP={T:15,T2:45,cone:.6,cut:0,n:0,
-  get run(){return!!RET.first30&&ST.on&&ST.n===1&&GA.runs===0&&!HARDS.includes(SET.diff)&&!G.tut&&!G.lab&&G.t<NP.T2;}};
+const NP=window.NP={skip:false,T:15,T2:45,cone:.6,cut:0,n:0,
+  get run(){return!NP.skip&&!!RET.first30&&ST.on&&ST.n===1&&GA.runs===0&&!HARDS.includes(SET.diff)&&!G.tut&&!G.lab&&G.t<NP.T2;}};
 {const e0=eb;eb=function(x,y,a,s,c,r){const o=eb.src;
   if(o&&o.type&&o.type!=='boss'&&NP.run){const d=Math.abs(((a-Math.atan2(P.y-y,P.x-x))%(2*Math.PI)+3*Math.PI)%(2*Math.PI)-Math.PI);if(d<NP.cone&&(G.t<NP.T||NP.n++%3)){NP.cut++;return;}}
   return e0.apply(this,arguments);};}
