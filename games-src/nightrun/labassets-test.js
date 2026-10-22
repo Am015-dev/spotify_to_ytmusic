@@ -27,7 +27,8 @@ const idx = JSON.parse(fs.readFileSync(path.join(GAME, 'media/assets-index.json'
     await p.addInitScript(() => { window.__earlyFXW = window.FXW; });
     await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&lab=1${q || ''}`);
     await p.waitForFunction(() => window.__mnr && __mnr.G && __mnr.G.lab, null, { timeout: 20000 }).catch(() => fails.push(`lab did not open @${w}x${h}`)); await sleep(500); return { ctx, p }; };
-  const tab = async p => { await p.click('#labTab_assets'); await p.waitForSelector('#laSecs button', { timeout: 8000 }).catch(() => fails.push('ASSETS tab did not load')); await sleep(200); };
+  const tab = async p => { await p.evaluate(() => document.getElementById('labTab_assets').click());   // lab2: the tab strip is hidden on the Lab home; a code click opens the ASSETS page
+    await p.waitForSelector('#laSecs button', { timeout: 8000 }).catch(() => fails.push('ASSETS tab did not load')); await sleep(200); };
   const sec = async (p, id) => { await p.click(`#laSecs button[data-sec="${id}"]`); await sleep(150); };
   // expected counts from the files themselves
   const exp = {};
