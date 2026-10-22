@@ -1,7 +1,7 @@
 # Coordinator handoff (OD 0d -> 0e), 2026-10-22 ~03:15 UTC
 Read CLAUDE.md first. Live = beta.150 (cc77a4e on alex/brave-carson-rbpmlk). Beta page https://claude.ai/artifact/P6zT2b2SwfHYguRTtb67Ug (v316 = beta.150).
 ## Alex's state (angry, scores 4.5/100)
-Complaints tonight: invisible cars (FIXED beta.150), pass-through buildings (FIXED beta.148/149), cars change on camera turn (FIXED beta.150), popups/annoying quests (FIXED beta.150 quiet-start), empty/boring world, power-ups/races/speed below bad. Wants: benchmark vs LEGO 2K Drive (docs/BENCH_2K.md, docs/shots/bench, mean ~3.8/10). Promise made: no docs/cleanup lanes until playable; every update names one thing to try and where. Never ask Alex.
+Complaints tonight: invisible cars (FIXED beta.150), pass-through buildings (FIXED beta.148/149), cars change on camera turn (FIXED beta.150), popups/annoying quests (FIXED beta.150 quiet-start), empty/boring world, power-ups/races/speed below bad. Wants: benchmark vs LEGO 2K Drive (docs/BENCH_2K.md, docs/shots/library (INDEX.md; ref2k_* ids), mean ~3.8/10). Promise made: no docs/cleanup lanes until playable; every update names one thing to try and where. Never ask Alex.
 ## Shipped this session
 beta.145 drive-first+terrain; 146 hud-cam+rv3a; 147 tr9-chunk; 148 A2 roadside buildings solid; 149 solid-bld r2 (sets, sloped floors, fence capsules); 150 solid-cars (phone draw-slot reuse = invisible/changing cars; HT_hit skips at nodes) + quiet-start (no Athens chapter card, no prompts >20 km/h, no buggy swap, street car grips dirt).
 ## Reviewed PASS, on trunk, not yet live
