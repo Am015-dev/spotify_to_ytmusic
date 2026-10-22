@@ -13099,7 +13099,7 @@ const FUN={n:0,sets:[],fence:null,dw:null,ev:null,deck:[],nextAt:22,lastK:'',dro
   draw(t){if(!G||G.dead)return;
     const T=tierOf(C.n);if(T>=3){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,34+10*T+4*PUL,TIERC[T-1],.14+.06*T);ctx.restore();}   // tier 3+: the ship glows in the tier colour
     const f=this.fence;if(f){ctx.save();const lock=f.phase>=1,fire=f.fire>0,pulse=SET.reduce?1:(Math.floor(t*(lock?18:8))%2?1:.6);ctx.globalCompositeOperation='lighter';
-      for(const r of f.rows){if(fire){ctx.globalAlpha=.95;ctx.fillStyle='#fff';ctx.fillRect(0,r-4,W,8);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(0,r-12,W,24);}
+      for(const r of f.rows){if(fire){const tn=window.EXP&&EXP.on;ctx.globalAlpha=tn?.55:.95;ctx.fillStyle=tn?'#ffb0c0':'#fff';ctx.fillRect(0,r-(tn?2:4),W,tn?4:8);ctx.globalAlpha=tn?.4:.5;ctx.fillStyle='#ff3050';ctx.fillRect(0,r-12,W,24);}
         else{ctx.globalAlpha=(lock?.9:.45)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);ctx.beginPath();ctx.moveTo(0,r);ctx.lineTo(W,r);ctx.stroke();ctx.setLineDash([]);
           if(lock){ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,r-10,W,20);}}}
       ctx.globalAlpha=lock?.5:.3;ctx.strokeStyle='#19ffb0';ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.strokeRect(10,f.gy-70,W-20,140);ctx.setLineDash([]);   // the safe gap
@@ -14857,7 +14857,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='b2f93b2c57 2026-10-22 02:18 UTC';
+const NR_STAMP='d2193cc3c6 2026-10-22 02:18 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -15995,6 +15995,53 @@ if(RET.pop){const rp=RET.pop;RET.pop=function(L){rp.apply(this,arguments);try{EX
 {const st=document.createElement('style');st.textContent='html.exp #touch button#bEmp[data-t]::before{content:attr(data-t)!important;font:700 10px sans-serif!important;white-space:nowrap}';document.head.appendChild(st);
   if(RET.explain)document.documentElement.classList.add('exp');
   if(window.ABIL&&ABIL.rings){const ar=ABIL.rings;ABIL.rings=function(){const r=ar.apply(this,arguments);if(RET.explain){const e=$('bEmp'),v=e&&e.getAttribute('data-t');if(v&&/~/.test(v))e.setAttribute('data-t',v.replace(/^x?~?(\d+)s$/,'full in $1s'));}return r;};}}
+/* ---------- review 9, fixes #2 and #5 (W134). #2: every overlay drawn in a stage has a caption id (EXP.OVL, gate overlay-test.js); the laser-fence
+   beam is tinted and <= 60% alpha (fun.js). #5: one label queue near the ship (word floaters: CHAIN, PERFECT, KEEP MOVING..., one at a time, >= 0.8 s
+   apart, newest of a kind wins) and captions placed in free space away from enemies, bullets and the label (EXP.spot). ---------- */
+Object.assign(EXP.TXT,{fence:'RED LINES = laser fence: wait in the GREEN BOX until it has fired',hpbar:'PINK BAR BESIDE AN ENEMY = its health left',
+  tough:'WHITE TICKS BESIDE AN ENEMY = a tougher one: hit it more',flank:'RED ARROW AT THE SIDE = an enemy comes in there: move away',
+  still:'RED DASHED RING ON YOUR SHIP = you sat still too long: move',secret:'GOLD MARK = secret: shoot it for Neon',
+  shield:'BLUE DASHED LINE = this enemy shields its leader: kill it first',bill:'RED STRIPES = falling signs: leave the red lanes',
+  hail:'RED LANE MARKS = meteors fall there: leave them',rescue:'CAPSULE = rescue: shoot it open',gust:'ARROWS = wind gust: steer against it',blackout:'DARK STRIP = blackout: watch the lit rims'});
+/* overlay kind (traced draw site) -> caption id; 'rule' = the stage mechanic's own caption (rule:<id>). overlay-test.js fails on an overlay kind not listed here */
+EXP.OVL={'fun.js:evDraw':'ev','flavor.js:drawBill':'bill','fun.js:draw':'fence','rules.js:draw':'rule','rules.js:ring':'rule','draw.js:hpBar':'hpbar','variants.js:VAR.mark':'tough',
+  'counter.js:draw':'counter','react.js:RX.over':'tell','dir.js:drawWarn':'warn','anticamp.js:draw':'flank','flankers.js:draw':'flank','ai.js:anon':'still',
+  'ai.js:drawEnemy':'shield','flavor.js:drawSec':'secret','fx.js:ring':'beat','fx.js:bar':'edge','zonehint.js:draw':'rule'};
+EXP.gap=0;
+{const sh=EXP.show;EXP.show=function(k,x,y,col){if(/^rule:/.test(k)&&!this.TXT[k]&&window.RU){const D=RU.T[k.slice(5)];if(D)this.TXT[k]=(D.n||'').toUpperCase()+': '+(D.t||'');}return sh.call(this,k,x,y,col);};
+  const tk=EXP.tick;EXP.tick=function(dt){if(!this.on||!G||G.dead||G.tut||G.lab||!running)return;
+    const had=!!this.cap;this.gap=Math.max(0,this.gap-dt);if(!this.cap&&this.gap>0){const q=this.q;this.q=[];tk.call(this,dt);this.q=q.concat(this.q);}else tk.call(this,dt);   // 0.8 s between two captions
+    if(had&&!this.cap)this.gap=.8;if(this.cap&&this.cap!==this._lc){this._lc=this.cap;this.cap.p=null;}
+    const F=typeof FUN!=='undefined'?FUN:null;if(F&&F.fence&&F.fence.rows&&F.fence.rows.length)this.show('fence',W*.5,F.fence.gy!=null?F.fence.gy:H/2,'#ff3050');
+    if(window.RU&&RU.st&&RET.rules)for(const m of RU.st.list)if(m.on){this.show('rule:'+m.id,W*.5,H*.5,(RU.T[m.id]||{}).c||'#ffe14d');break;}
+    for(const e of G.en){if(e.dead)continue;if(e.max>1&&e.hp<e.max&&e.hp>0&&e.x<W-20)this.show('hpbar',e.x,e.y,'#ff3dbb');if(e.vz)this.show('tough',e.x,e.y,'#ffffff');if(e.shl&&e.lk)this.show('shield',e.x,e.y,'#19e3ff');}
+    if(window.AC&&AC.tells&&AC.tells.length||window.FLK&&FLK.tells&&FLK.tells.length)this.show('flank',W*.5,H*.5,'#ff3050');
+    if(typeof STILL!=='undefined'&&STILL.dg)this.show('still',P.x,P.y,'#ff3050');
+    if(window.FL&&FL.set&&FL.set.k==='bill')this.show('bill',W*.5,H*.5,'#ff3050');
+    if(window.FL&&FL.sec)this.show('secret',FL.sec.x,FL.sec.y,'#ffd23d');
+    LBQ.tick(dt);};}
+/* free space: enemies, enemy bullets and the label box are obstacles; the caption takes the candidate spot with the least overlap, nearest its anchor */
+EXP.obst=function(x,y,w,h,skip){let n=0;const hit=(a,b,r)=>a+r>x&&a-r<x+w&&b+r>y&&b-r<y+h;if(G){for(const e of G.en)if(!e.dead&&hit(e.x,e.y,(e.r||14)+8))n+=100;for(const b of G.eb)if(hit(b.x,b.y,(b.r||4)+4))n++;}
+  if(skip!=='lbl'&&LBQ.box){const L=LBQ.box;if(L[0]<x+w&&L[0]+L[2]>x&&L[1]<y+h&&L[1]+L[3]>y)n+=100;}if(skip!=='cap'&&EXP.cbox){const L=EXP.cbox;if(L[0]<x+w&&L[0]+L[2]>x&&L[1]<y+h&&L[1]+L[3]>y)n+=100;}return n;};
+EXP.spot=function(ax,ay,bw,bh,xmin,xmax,ymin,ymax,skip){let best=null;for(const dy of[0,-90,90,-180,180,-270,270])for(const dx of[0,-110,110,-220,220]){const x=clamp(ax+dx,xmin,xmax),y=clamp(ay+dy,ymin,ymax);
+    const s=EXP.obst(x-bw/2,y-bh/2,bw,bh,skip)*1e4+Math.hypot(x-ax,y-ay);if(!best||s<best[2])best=[x,y,s];}return best;};
+{const bx=EXP.box;EXP.box=function(txt,ax,ay,col,a){if(!RET.explain)return bx.apply(this,arguments);const c=this.cap||{};const rot=typeof wcv!=='undefined'&&wcv!==cv;
+    const tf=ctx.getTransform(),u=Math.hypot(tf.a,tf.b)*(ctx.canvas.getBoundingClientRect().width/ctx.canvas.width||1),fs=Math.max(13,13/Math.max(.05,u));ctx.save();ctx.font='700 '+fs.toFixed(1)+'px sans-serif';
+    const tw=Math.min(Math.min((rot?H:W)-16,190/Math.max(.05,u)),ctx.measureText(String(txt)).width+fs*1.6),nl=Math.ceil(ctx.measureText(String(txt)).width/Math.max(1,tw-fs*1.6)+.15),bh=nl*fs*1.25+fs*.7;ctx.restore();
+    const bw=rot?bh:tw,bH=rot?tw:bh,m=(rot?80:104)/Math.max(.05,u);
+    if(!c.p||this.obst(c.p[0]-bw/2,c.p[1]-bH/2,bw,bH,'cap')>=100){this._u=u;const s=this.spot(rot?ax+40:ax,rot?ay:ay-40,bw,bH,rot?bw/2+m:bw/2+8,rot?Math.max(bw/2+m,Math.min(W-bw/2-m,290/Math.max(.05,u))):W-bw/2-8,rot?bH/2+m:bH/2+m,rot?H-bH/2-m:H-bH/2-m,'cap');c.p=[s[0],s[1]];if(s[2]>=1e6){this.cbox=null;if(this.cap)this.cap.t=Math.min(this.ZT,this.cap.t+1/60);return;}}
+    this.cbox=[c.p[0]-bw/2,c.p[1]-bH/2,bw,bH];return bx.call(this,txt,rot?c.p[0]-40:c.p[0],rot?c.p[1]:c.p[1]+40,col,a);};
+  const dr=EXP.draw;EXP.draw=function(){if(!this.cap)this.cbox=null;return dr.apply(this,arguments);};}
+/* label queue: word floaters (letters, not "+100" score pops) wait their turn; the live one sits near the ship in free space */
+const LBQ=window.LBQ={q:[],cur:null,last:-9,box:null,GAP:.8,
+  push(x,y,txt,c){if(this.q.some(o=>o.txt===txt)||this.cur&&this.cur.txt===txt&&this.cur.l>.5)return;this.q.push({txt,c,at:G.t});if(this.q.length>3)this.q.shift();},
+  tick(dt){if(this.cur&&!G.fl.includes(this.cur))this.cur=null;if(this.cur)this.cur.y=this.cur.ly;else this.box=null;this.q=this.q.filter(o=>G.t-o.at<2.5);if(!this.q.length||G.t-this.last<this.GAP)return;
+    if(this.cur){G.fl=G.fl.filter(f=>f!==this.cur);this.cur=null;}const o=this.q.shift();this.last=G.t;
+    const rot=typeof wcv!=='undefined'&&wcv!==cv,len=o.txt.length*9+16,bw=rot?22:len,bh=rot?len:22,s=EXP.spot(rot?P.x+70:P.x,rot?P.y:P.y-70,bw,bh,bw/2+60,rot?Math.max(bw/2+60,290/(EXP._u||.57)):W-bw/2-8,bh/2+40,H-bh/2-40,'lbl');
+    const n0=G.fl.length;this.fl(s[0],s[1],o.txt,o.c);this.cur=G.fl.length>n0?G.fl[G.fl.length-1]:null;if(this.cur)this.cur.ly=s[1];this.box=[s[0]-bw/2,s[1]-bh/2,bw,bh];},
+  reset(){this.q=[];this.cur=null;this.last=-9;this.box=null;}};
+NR.on('runStart',()=>LBQ.reset());
+{const fl=floater;floater=function(x,y,txt,c){if(RET.explain&&running&&G&&!G.tut&&!G.lab&&typeof txt==='string'&&/[A-Z]{3}/.test(txt)&&!/^\+/.test(txt)){LBQ.push(x,y,txt,c||'#ffffff');return;}return fl.apply(this,arguments);};LBQ.fl=fl;}
 
 // PURPOSE: a calm playfield: rule banners small in the top band, thin soft player/enemy beams, at most 2 rings per enemy
 // FLAG: calm (?calm=0)
