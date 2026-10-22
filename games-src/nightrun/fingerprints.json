@@ -1,74 +1,74 @@
 {
  "fly2": {
   "state": "7b42e867bce26814",
-  "draw": "fa3c8ef880426305",
+  "draw": "cb3568fa41ec8fe8",
   "frames": 1800,
   "samples": 30,
   "rng": 1034,
-  "dcalls": 329,
+  "dcalls": 296,
   "end": null
  },
  "endless10": {
   "state": "f3f2b0d1dd98b4fd",
-  "draw": "6024db006bd5a9d4",
+  "draw": "7cf0e9952f05a6bd",
   "frames": 1800,
   "samples": 30,
   "rng": 2706,
-  "dcalls": 559,
+  "dcalls": 562,
   "end": null
  },
  "street": {
   "state": "e757943a26b4f221",
-  "draw": "0715dc92189a7dfd",
+  "draw": "c8c417b287a0b1b9",
   "frames": 7200,
   "samples": 120,
   "rng": 5808,
-  "dcalls": 230,
+  "dcalls": 172,
   "end": "section 0 x 6723 foes 6"
  },
  "fly6": {
   "state": "e2f0e31c38f9d627",
-  "draw": "2c986fd81bca6b5a",
+  "draw": "9f4cb58dd3490900",
   "frames": 1800,
   "samples": 30,
   "rng": 2012,
-  "dcalls": 481,
+  "dcalls": 450,
   "end": null
  },
  "fly10": {
   "state": "c9f1cc94c16e06d0",
-  "draw": "542d8ec3975742a2",
+  "draw": "bc9388badf3e17de",
   "frames": 1800,
   "samples": 30,
   "rng": 2277,
-  "dcalls": 527,
+  "dcalls": 485,
   "end": null
  },
  "fly14": {
   "state": "bbf9d285546fe78f",
-  "draw": "20f2ebd2fd44d914",
+  "draw": "4508d6a9f8e6393f",
   "frames": 1800,
   "samples": 30,
   "rng": 3804,
-  "dcalls": 530,
+  "dcalls": 533,
   "end": null
  },
  "boss": {
   "state": "40cca42010da3149",
-  "draw": "271bd3cb0c8ae15a",
+  "draw": "5783c528fd98d42a",
   "frames": 1800,
   "samples": 30,
   "rng": 3072,
-  "dcalls": 411,
+  "dcalls": 308,
   "end": "boss on screen 1680 frames"
  },
  "legend10": {
   "state": "788d6f15572821c9",
-  "draw": "75281a4416e0d48e",
+  "draw": "1c9dd9ad238a4008",
   "frames": 1800,
   "samples": 30,
   "rng": 1953,
-  "dcalls": 626,
+  "dcalls": 559,
   "end": null
  }
 }
