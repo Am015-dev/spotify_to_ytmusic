@@ -14657,7 +14657,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='8ba96d99fa 2026-10-22 16:58 UTC';
+const NR_STAMP='a5ece07fca 2026-10-22 17:07 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16541,6 +16541,16 @@ if(RET.steady){
     if(stage!=='menu'&&c&&c.stage===stage&&BT.stage===stage&&BT.mode==='file'){this.want=null;this.wantT=0;return;}   // same song: keep it running
     return s0.apply(this,arguments);};}
   {const m0=AU.menuMusic;AU.menuMusic=function(){if(BT.stage&&BT.stage!=='menu'&&this.cur)return;return m0.apply(this,arguments);};}}
+
+// PURPOSE: your shots fly fast: every player bullet leaves at 1.8x speed with a longer streak
+// FLAG: snappy (?snappy=0 = the old 900 px/s shots)
+// TEST: fingerprint-test (state changes: shots hit sooner), qa/loadgate.js
+/* ---------- SNAPPY: owner, 22 Oct 2026: "the bullets are so slow fired". Player shots left at 520-1150 units/s (most at 900: 1.4 s to cross the field).
+   Each new player bullet is sped up once by K (homing ones by KH so they still turn), and its drawn streak is 1.5x longer. ---------- */
+if(RET.snappy===undefined)RET.snappy=!/[?&]snappy=0/.test(location.search);
+const SNAP=window.SNAP={K:1.8,KH:1.35,n:0,
+  tick(){if(!RET.snappy||!G||!G.pb)return;for(const b of G.pb){if(b._sn)continue;b._sn=1;const k=b.hk?this.KH:this.K;b.vx*=k;b.vy*=k;if(b.len)b.len*=1.5;this.n++;}}};
+NR.on('tick',()=>SNAP.tick());
 
 // PURPOSE: one menu style: one plate shape (rounded rectangle), one font family, one solid selected/focus ring, no dashed lines,
 //          a desktop title that uses the screen, and one size ladder for ships, pickups and bullets in play
