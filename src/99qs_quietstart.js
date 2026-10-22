@@ -17,11 +17,11 @@ huTop=(f=>function(v){if(QS.act()&&typeof v==='string'&&v.indexOf('WRONG VEHICLE
 // 4) no automatic area banner (BORNHEIM 0% COMPLETE), and no 'DRIFT HERE / AIR TIME / SMASH' side challenge starts on its own (popStep timer here, street pop-up pads in models/lx.js)
 OG_pop=(f=>function(){if(QS.act()&&arguments.length>1)return;return f.apply(this,arguments)})(OG_pop);   // the automatic call on entering an area passes (area,first); the dev API passes the area only
 popStep=(f=>function(){if(QS.act()&&!RO.pop)return;return f.apply(this,arguments)})(popStep);
-QS.clean=()=>{for(const id of FD.SLOTS){const e=document.getElementById(id);if(!e)continue;if(id==='msg'||id==='sub')e.style.opacity=0;else e.hidden=true}FD.rec.clear();/* leave no transient text for the next GO */};
+QS.clean=()=>{FD.hint.hidden=true;FD.mT=0;FD.p0=[RO.x,RO.z];for(const id of FD.SLOTS){const e=document.getElementById(id);if(!e)continue;if(id==='msg'||id==='sub')e.style.opacity=0;else e.hidden=true}FD.rec.clear();/* leave no transient text for the next GO */};
 function QS_clean(){QS.clean()}
 window.__qs=QS;
 // ---- GO why/quiet-start: fresh save, 180 s of stepped driving (road, dirt, past a garage at speed), state asserts only
-async function QS_go(){const R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),W=ms=>new Promise(r=>setTimeout(r,ms)),A=a=>Math.atan2(Math.sin(a),Math.cos(a));
+async function QS_go(){const home=[RO.x,RO.z,RO.h],R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),W=ms=>new Promise(r=>setTimeout(r,ms)),A=a=>Math.atan2(Math.sin(a),Math.cos(a));
  const sv={ro:Object.assign({},roamSave()),story:store.get('mho_story',{seen:0,end:0}),flags:store.get('mho_flags',{}),m1:store.get('mho_m1',null),ch:RO.ch,card:RO.card,wp:RO.wp,v:RO.v,vsel:RO.vsel,auto:M1.auto,init:M1.init,isInit:M1.isInit,s:M1.s};
  let water=0,swaps=0,modal=0,modes=0,route=0,maxHint=0,fast=0;const bad=[];
  try{
@@ -70,7 +70,7 @@ async function QS_go(){const R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),W=ms=>ne
   ck('<=1 hint visible at any time (max '+maxHint+')',maxHint<=1);
   ck('no prompt/hint above 20 km/h ('+fast+' samples)',fast===0);
  }catch(e){R.push('✗ threw '+e)}
- finally{K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;QS_clean();store.set('mho_story',sv.story);store.set('mho_flags',sv.flags);store.set('mho_m1',sv.m1);roamStore(sv.ro);RO.ch=sv.ch;RO.card=sv.card;RO.wp=sv.wp;RO.v=sv.v;RO.vsel=sv.vsel;M1.auto=sv.auto;M1.init=sv.init;M1.isInit=sv.isInit;M1.s=sv.s}
+ finally{K.KeyW=K.ArrowUp=K.ArrowLeft=K.ArrowRight=false;try{roamWarp(home[0],home[1],home[2])}catch(e){}RO.v=0;QS_clean();store.set('mho_story',sv.story);store.set('mho_flags',sv.flags);store.set('mho_m1',sv.m1);roamStore(sv.ro);RO.ch=sv.ch;RO.card=sv.card;RO.wp=sv.wp;RO.v=sv.v;RO.vsel=sv.vsel;M1.auto=sv.auto;M1.init=sv.init;M1.isInit=sv.isInit;M1.s=sv.s}
  const ok=R.every(r=>r[0]==='✓'||r[0]==='·');return'📍 why/quiet-start · '+R.join(' · ')+(bad.length?' · EVENTS '+bad.slice(0,14).join(' ; '):'')+' → '+(ok?'✅ PASS':'❌ FAIL')}
 // GO why/quiet-dirt: the street car on dirt must not be slower than the old auto off-road form (same seeded drive, legacy vs quiet) and must not bog down
 async function QS_goDirt(){const home=[RO.x,RO.z,RO.h],ro0=Object.assign({},roamSave()),R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),rnd0=Math.random,off0=QS.off,sv={v:RO.v,wp:RO.wp};
