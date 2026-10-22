@@ -11748,6 +11748,16 @@ NR.on('runStart',()=>{DENS.busy=0;DENS.last=-9;DENS.px.length=0;});
 {const sb=spawnBoss;spawnBoss=function(o){const b=sb(o);if(RET.density&&b&&b.bm===undefined&&window.BMV&&!(window.BPL&&BPL.on))try{BMV.init(b);}catch(e){}
   else if(RET.density&&b&&b.bm===undefined&&window.BMV&&BMV.on)try{const id=BMV.idOf(b),T=id&&BMV.T[id];if(T)b.lists=T.ph.map(l=>l.map(x=>BMV.norm(x).v));}catch(e){}   // bossplay inits on the first beat: until then show the boss's own table, not the old fan5 / ring lists (S12 counted both = 13)
   return b;};}
+/* ---------- NEWPLAYER (flag RET.first30, F11 of review 10): the very first run of stage 1 (banked runs = 0, not Hard) is gentle for a player who has not found the controls yet: no aimed
+   enemy fire for the first 15 s, then only every 3rd aimed shot until 45 s, and enemies that fly past cost no hull and a parked ship is not hunted (h.js) until 45 s. A parked ship is still alive at 45 s. Shots that are not aimed
+   at the ship (spreads, curtains, drops) and everything after 45 s are untouched; the next run is the normal stage 1. ---------- */
+const NP=window.NP={skip:false,T:15,T2:45,cone:.6,cut:0,n:0,
+  get run(){return!NP.skip&&!!RET.first30&&ST.on&&ST.n===1&&GA.runs===0&&!HARDS.includes(SET.diff)&&!G.tut&&!G.lab&&G.t<NP.T2;}};
+{const e0=eb;eb=function(x,y,a,s,c,r){const o=eb.src;
+  if(o&&o.type&&o.type!=='boss'&&NP.run){const d=Math.abs(((a-Math.atan2(P.y-y,P.x-x))%(2*Math.PI)+3*Math.PI)%(2*Math.PI)-Math.PI);if(d<NP.cone&&(G.t<NP.T||NP.n++%3)){NP.cut++;return;}}
+  return e0.apply(this,arguments);};}
+if(window.LEAK){const lk=LEAK.leak;LEAK.leak=function(w,e){if(NP.run)return;return lk.apply(this,arguments);};}
+NR.on('tick',()=>{if(NP.run&&STILL.t>0){STILL.t=0;STILL.beam=null;}});   // the "parked ship is hunted" rule (h.js) starts counting after the first 45 s of this run
 
 // PURPOSE: boss encounter mechanics (gates, ignoring a boss costs)
 // FLAG: bossplay (?bossplay=0)
@@ -14879,7 +14889,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='d007b4b0fd 2026-10-22 05:12 UTC';
+const NR_STAMP='69a70dabec 2026-10-22 05:16 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
