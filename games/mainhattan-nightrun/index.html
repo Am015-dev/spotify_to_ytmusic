@@ -578,7 +578,7 @@ const AU={lat:.03,a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,ste
     if(s===4||s===12){if(this.boss)this.noise(t,.16,.5,1200,this.mus,'bandpass');else if(BT.stage!=='stage1')this.noise(t,.1,.22,2500,this.mus,'bandpass');}
     if(s%2===1)this.noise(t,.04,.18,7000,this.mus);
     const bl=[0,0,12,0,0,12,0,7,0,0,12,0,10,0,7,12][s];this.osc(t,'sawtooth',this.f(r+bl),spb*.9,.22,this.mus,0,this.boss?1800:900);
-    if(s%2===0){const ar=[0,3,7,10,12,10,7,3][(s/2)%8];const g=this.osc(t,'square',this.f(r+24+ar),spb*1.6,.05,this.mus,0,3000);g.connect(this.dly);}},
+    if(s%2===0){const ar=[0,3,7,10,12,10,7,3][(s/2)%8];const g=this.osc(t,'square',this.f(r+24+ar),spb*1.6,.05,this.mus,0,3000);if(sndOn('m_echo'))g.connect(this.dly);}},
   sfx(n){const a=this.a;if(!a||a.state!=='running')return;const t=a.currentTime,F=this.fx;
     // continuous sounds (own shots, hits, grazes) are rate-limited and soft so they sit under the music instead of buzzing over it
     const GAP=SFXGAP[n];if(GAP){const L=this.lastSfx||(this.lastSfx={});if(t-(L[n]||-9)<GAP)return;L[n]=t;}if(n==='boom'||n==='big'||n==='phase'||n==='emp'||n==='hurt')this.duckMusic();
@@ -1570,7 +1570,7 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
     const tp=s.act.find(a=>a.k==='tempo');if(tp){if(G.score>s.ls)G.score+=G.score-s.ls;if(G.waveT>0&&!G.waveWait)G.waveT-=dt*.5;}   // score x2, waves come 1.5x as fast
     s.ls=G.score;
     if(s.act.some(a=>a.k==='tempo')&&!G.dead){const h=Math.floor(bpos()*2);if(s.h8===undefined)s.h8=h;if(h!==s.h8){s.h8=h;if(h%2){const x=P.x+22,y=P.y;G.pb.push({x,y:y-5,vx:900,vy:-40,dm:1,pf:0},{x,y:y+5,vx:900,vy:40,dm:1,pf:0});   // the off-beat 8th note: double-time fire
-        try{const a=AU.a;if(a&&a.state==='running')AU.noise(a.currentTime,.04,.16,8500,AU.musv);}catch(e){}}}}else s.h8=undefined;   // a quiet hi-hat on the off-beats
+        try{const a=AU.a;if(a&&a.state==='running'&&sndOn('hat'))AU.noise(a.currentTime,.04,.16,8500,AU.musv);}catch(e){}}}}else s.h8=undefined;   // a quiet hi-hat on the off-beats
     this.wk+=((s.act.some(a=>a.k==='slow')?.6:1)-this.wk)*Math.min(1,dt*6);if(Math.abs(this.wk-1)<.004)this.wk=1;AU.slowColour(this.wk<.97);   // bullet time eases in and out; only a gentle low-pass touches the song
     if(s.drop)this.dropTick(s);
     if(s.wv>0)s.wv-=dt;},
@@ -1578,9 +1578,9 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
     if(d.rev!==BT.rev){this.reset2();this.blast(d.ob);s.drop=null;return;}   // the song was swapped under the Drop: fire now
     if(a&&a.state==='running'&&BT.src){
       if(!d.cs&&(d.cutB-p)*BT.spb<.15){d.cs=1;const g=AU.cutg.gain,T=Math.max(a.currentTime,R(d.cutB)-.01);g.setTargetAtTime(0,T,.012);
-        AU.osc(T,'sawtooth',110,4*BT.spb,.1,AU.fx,1400,2500);AU.noise(T,4*BT.spb,.12,3000,AU.fx);}   // a riser fills the silent bar
+        if(sndOn('riser')){AU.osc(T,'sawtooth',110,4*BT.spb,.1,AU.fx,1400,2500);AU.noise(T,4*BT.spb,.12,3000,AU.fx);}}   // a riser fills the silent bar
       if(!d.rs&&(d.blastB-p)*BT.spb<.15){d.rs=1;const T=Math.max(a.currentTime,R(d.blastB)-.004);AU.cutg.gain.setTargetAtTime(1,T,.008);
-        AU.noise(T,.9,.9,300,AU.fx,'lowpass');AU.osc(T,'sine',150,.7,1,AU.fx,28);AU.noise(T,.25,.5,5000,AU.fx);}}
+        if(sndOn('dropboom')){AU.noise(T,.9,.9,300,AU.fx,'lowpass');AU.osc(T,'sine',150,.7,1,AU.fx,28);AU.noise(T,.25,.5,5000,AU.fx);}}}
     if(p>=d.blastB){this.blast(d.ob);s.drop=null;}},
   reset2(){try{const a=AU.a;if(a&&AU.cutg){const g=AU.cutg.gain;g.cancelScheduledValues(a.currentTime);g.setTargetAtTime(1,a.currentTime,.01);}}catch(e){}},
   blast(ob){const s=this.st();this.stat.blast++;
@@ -1591,7 +1591,7 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
     const s16=BT.spb/4,now=a.currentTime;
     if(this.dstep<0||BT.rev!==this.drev||NR.music.rate!==this.drate){this.drev=BT.rev;this.drate=NR.music.rate;this.dstep=Math.ceil((now-BT.t0)/s16);}   // song or speed changed: restart the pattern on the new grid
     while(BT.t0+this.dstep*s16<now+.12){const t=BT.t0+this.dstep*s16;if(t>=now-.01)this.hit(this.dstep,t);this.dstep++;}},
-  hit(n,t){const s=((n%16)+16)%16,bar=Math.floor(n/16),D=AU.musv;
+  hit(n,t){if(!sndOn('drums'))return;const s=((n%16)+16)%16,bar=Math.floor(n/16),D=AU.musv;
     if(s%4===0)AU.osc(t,'sine',165,.3,1.1,D,42);
     if(s===10)AU.osc(t,'sine',150,.2,.5,D,45);
     if(s===4||s===12){AU.noise(t,.2,.7,1800,D,'bandpass');AU.osc(t,'triangle',210,.12,.35,D,120);}
@@ -3012,7 +3012,7 @@ HOOK.drawEnemy(de=>function(e,t){de(e,t);if(e.type==='boss'||e.hp<=0)return;
   else if(e.rg){ctx.save();ctx.globalCompositeOperation='lighter';G_(e.x,e.y,e.r*2,'#ff3050',.4);ctx.restore();}});
 {const fb=FXV.bullets;FXV.bullets=function(){fb.call(this);let any=false;for(const b of G.eb)if(b.hm>0){if(ART.have('fx-orb-homing')){const o=ART.bm['fx-orb-homing'],w=b.r*3.6;ctx.save();ctx.globalCompositeOperation='lighter';ctx.drawImage(o,b.x-w/2,b.y-w/2,w,w);ctx.restore();continue;}if(!any){ctx.save();ctx.strokeStyle='#ffffff';ctx.lineWidth=1.6;ctx.globalAlpha=.85;ctx.beginPath();any=true;}ctx.moveTo(b.x+b.r+3.5,b.y);ctx.arc(b.x,b.y,b.r+3.5,0,7);}if(any){ctx.stroke();ctx.restore();}};}
 /* low hull: the song keeps its tempo; the screen edges pulse red on the beat and a soft heartbeat thumps under the music */
-NR.on('beat',()=>{if(!G.live||G.dead||ST.over||!P||P.hp>1||!AU.a||AU.a.state!=='running')return;try{AU.osc(AU.a.currentTime+.02,'sine',58,.2,.5,AU.musv,38);}catch(e){}});
+NR.on('beat',()=>{if(!G.live||G.dead||ST.over||!P||P.hp>1||!AU.a||AU.a.state!=='running')return;if(sndOn('heart'))try{AU.osc(AU.a.currentTime+.02,'sine',58,.2,.5,AU.musv,38);}catch(e){}});
 
 /* ---------- bullet kinds: size, speed, look and impact differ now ----------
    orb    r5  lime, 1 hull (the default: turret fans, gunship rings)
@@ -6647,7 +6647,7 @@ const PW2=PW.p2={stat:{echo:0,echoHit:0,nova:0,novaClr:0,novaHit:0,pull:0,wing:0
   NOTES:[0,3,5,7,10,12,15,17],
   seen:(()=>{try{return load('mnr_pw2seen',{})||{};}catch(e){return {};}})(),
   at(B){return BT.t0+BT.off+B*BT.spb;},
-  note(i,dur,vol,type,when,oct){const a=AU.a;if(!a||a.state!=='running')return false;try{AU.osc(Math.max(a.currentTime+.003,when||0),type||'triangle',AU.f(AU.root+(oct==null?24:oct)+PW2.NOTES[((i%8)+8)%8]),dur,vol,AU.musv,0,3200);return true;}catch(e){return false;}},
+  note(i,dur,vol,type,when,oct){const a=AU.a;if(!a||a.state!=='running'||!sndOn('pwnote'))return false;try{AU.osc(Math.max(a.currentTime+.003,when||0),type||'triangle',AU.f(AU.root+(oct==null?24:oct)+PW2.NOTES[((i%8)+8)%8]),dur,vol,AU.musv,0,3200);return true;}catch(e){return false;}},
   act(k){const s=G&&G.pw;return s?s.act.find(a=>a.k===k)||null:null;},
   any(){const s=G&&G.pw;return !!(s&&s.act.some(a=>PW2.K[a.k]));},
   st(){return G.p2||(G.p2={ech:[],trl:[],nv:null,mp:[],wm:[{x:0,y:0},{x:0,y:0}],h:null,rel:null,fl:[]});},
@@ -6678,7 +6678,7 @@ if(RET.pw2){
       s.trl.push({x:g.x,y:g.y,l:.32,m:.32});PW2.stat.echo++;PW2.note(5+(G.bc%3),.14,.07,'square',0,24);}});
   /* ----- DOWNBEAT NOVA, CHORD SHIELD release ----- */
   NR.on('bar',()=>{if(!G.live||G.dead||!PW.on('nova'))return;const s=PW2.st();s.nv={x:P.x,y:P.y,r:0,R:230,hit:new Set(),dm:5};if(window.PW3&&PW3.on)PW3.novaTag(s.nv);PW2.stat.nova++;
-    PW2.note(0,.5,.1,'sawtooth',0,12);PW2.note(7,.35,.07,'triangle',0,24);try{if(AU.a&&AU.a.state==='running')AU.osc(AU.a.currentTime+.003,'sine',110,.3,.5,AU.musv,40);}catch(e){}});
+    PW2.note(0,.5,.1,'sawtooth',0,12);PW2.note(7,.35,.07,'triangle',0,24);try{if(AU.a&&AU.a.state==='running'&&sndOn('pwthump'))AU.osc(AU.a.currentTime+.003,'sine',110,.3,.5,AU.musv,40);}catch(e){}});
   NR.on('beat',()=>{if(!G.live||G.dead)return;const s=G.p2,a=PW2.act('chord');if(!s||!a||!a.used||a.rel)return;a.rel=true;   // the next beat after the hit
     s.nv={x:P.x,y:P.y,r:0,R:170,hit:new Set(),dm:4,ch:1};PW2.stat.chordRel++;
     for(const [i,dl] of [[0,0],[2,.03],[4,.06],[7,.09]])PW2.note(i,.7,.08,'triangle',AU.a?AU.a.currentTime+dl:0,24);
@@ -6702,7 +6702,7 @@ if(RET.pw2){
     for(const t of s.trl)t.l-=dt;s.trl=s.trl.filter(t=>t.l>0);for(const f of s.fl)f.l-=dt;s.fl=s.fl.filter(f=>f.l>0);});
   /* ----- MAGNET pulse sound + visual, CRESCENDO ----- */
   NR.on('beat',()=>{if(!G.live||G.dead)return;
-    if(PW.on('magb')){const s=PW2.st();s.fl.push({x:P.x,y:P.y,r:34,c:PWK.magb.c,l:.35,m:.35,grow:560});PW2.note(0,.22,.14,'sine',0,12);try{if(AU.a&&AU.a.state==='running')AU.osc(AU.a.currentTime+.003,'sine',90,.2,.4,AU.musv,45);}catch(e){}}
+    if(PW.on('magb')){const s=PW2.st();s.fl.push({x:P.x,y:P.y,r:34,c:PWK.magb.c,l:.35,m:.35,grow:560});PW2.note(0,.22,.14,'sine',0,12);try{if(AU.a&&AU.a.state==='running'&&sndOn('pwthump'))AU.osc(AU.a.currentTime+.003,'sine',90,.2,.4,AU.musv,45);}catch(e){}}
     const a=PW2.act('cres');if(a){PW2.note(Math.min(7,(a.bars|0)+(G.bc%4>>1)),.16,.05+.012*Math.min(5,a.bars|0),'triangle',0,24+12*((a.bars|0)>=3?1:0));}});
   NR.on('bar',()=>{const a=PW2.act('cres');if(!a||G.dead||!G.live)return;a.bars=(a.bars|0)+1;if(a.bars<=5)floater(P.x,P.y-40,'×'+PW2.cresK().toFixed(2),PWK.cres.c);PW2.stat.cres=Math.max(PW2.stat.cres,a.bars);});
   NR.on('hurt',()=>{const a=PW2.act('cres');if(a)a.bars=0;});
@@ -12870,7 +12870,7 @@ const FUN={n:0,sets:[],fence:null,dw:null,ev:null,deck:[],nextAt:22,lastK:'',dro
       for(const e of G.en)if(e.type!=='boss'&&e.x<W-10){e.hp-=22;e.flash=.2;}
       const pts=800*T*(1+Math.min(3,Math.floor(G.rb/16)));G.score+=pts;tierSet(C.n+3,'drop');
       G.flash=Math.max(G.flash,.55*FX());shake(14);PW.st().wv=.7;banner('DROP!','+'+pts,false,1.5);floater(P.x,P.y-36,'DROP! ×'+T,'#b36bff');
-      this.shardShower(14+4*T);AU.sfx('big');try{const a=AU.a;if(a&&a.state==='running'){AU.noise(a.currentTime,.7,.35,300,AU.fx,'lowpass');AU.osc(a.currentTime,'sine',140,.5,.6,AU.fx,30);}}catch(e){}this.stat.rewards++;}
+      this.shardShower(14+4*T);AU.sfx('big');try{const a=AU.a;if(a&&a.state==='running'&&sndOn('reward')){AU.noise(a.currentTime,.7,.35,300,AU.fx,'lowpass');AU.osc(a.currentTime,'sine',140,.5,.6,AU.fx,30);}}catch(e){}this.stat.rewards++;}
     else{let k=0;if(!HARD)G.eb=G.eb.filter(b=>{if(Math.hypot(b.x-P.x,b.y-P.y)<170){G.score+=5;return false;}return true;});   // a miss: only the bullets close to the ship vanish
       G.flash=Math.max(G.flash,.2*FX());PW.st().wv=.5;floater(P.x,P.y-36,'DROP','#8c86b8');}
     NR.emit('drop',{hit});},
@@ -14657,7 +14657,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='bf039257e2 2026-10-22 16:09 UTC';
+const NR_STAMP='16e4ba7368 2026-10-22 16:34 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16263,24 +16263,123 @@ const SL=window.SL={
 
 // PURPOSE: the song plays clean, nothing filters, ducks, cuts or covers it; only a few quiet game sounds are left
 // FLAG: pure (?pure=0 = the old mix)
-// TEST: qa/puremusic-test.js
+// TEST: qa/soundlab-test.js
 /* ---------- PURE: owner, 22 Oct 2026: "keep the music not distorted by any power up, no perfect sound effects or anything that makes the game experience bad".
    The song goes straight from its volume to the master (no combo low-pass, no duck, no Drop cut, no SLOW low-pass, no pause-screen filter).
    Game sounds: only 'hurt' (you were hit), 'pick' (you took something) and 'boom' (an enemy died) are left, quieter; every other effect, every
    music sting and every power-up sound is silent. Menu sounds (outside a run) stay. ---------- */
 if(RET.pure===undefined)RET.pure=!/[?&]pure=0/.test(location.search);
-const PURE=window.PURE={KEEP:{hurt:1,pick:1,boom:1},GAIN:.22,blocked:0,played:0,
+/* ---------- SND: owner, 22 Oct 2026: "the effects are distorting the music, I need to spot which ones; include them in the Lab so I can select".
+   One row per sound / music effect: [id, group, plain name, default on]. Group fx = AU.sfx sounds, st = jingles on the beat (AU.sting), mu = music effects,
+   pw = sounds a power-up / wave makes by itself (they never went through AU.sfx). The choice is saved in localStorage 'nr_snd' and read here, by the Lab SOUND page (soundlab.js).
+   Default = the clean mix: only hurt, pick, boom on; every jingle, music effect and power-up sound off. ---------- */
+const SNDT=[
+  ['hurt','fx','You are hit (crunch)',1],['pick','fx','Pick-up chime',1],['boom','fx','Enemy explodes (boom)',1],
+  ['shot','fx','Your gun tick',0],['hit','fx','Your shot hits an enemy (tick)',0],['graze','fx','Near-miss tick',0],['dash','fx','Dash whoosh',0],['emp','fx','EMP blast',0],
+  ['big','fx','Big explosion (boss, reward)',0],['warn','fx','Danger warning beeps',0],['heat','fx','Overheat buzz',0],['up','fx','Power-up collected (4 notes)',0],
+  ['tier','fx','Combo tier-up (5 notes)',0],['perfect','fx','PERFECT chime',0],['phase','fx','Boss phase change',0],
+  ['s_perfect','st','PERFECT jingle on the beat',0],['s_tierup','st','Combo tier-up jingle',0],['s_fever','st','FEVER jingle',0],['s_phase','st','Boss phase jingle',0],
+  ['s_boss-in','st','Boss arrives jingle',0],['s_clear','st','Stage clear jingle',0],['s_fail','st','Game over jingle',0],['s_unlock','st','Unlock jingle',0],['s_newbest','st','New best jingle',0],
+  ['m_duck','mu','Music dips under explosions and hits',0],['m_duckst','mu','Music dips under big jingles',0],['m_dull','mu','Music dull until the combo builds (low-pass)',0],
+  ['m_hit','mu','Music muffled for a beat when you are hit',0],['m_slow','mu','SLOW power-up muffles the song',0],['m_drop','mu','DROP power-up cuts the music for a bar',0],
+  ['m_pause','mu','Music muffled on pause and menu screens',0],['m_drum','mu','Combo drum layer added to the song',0],['m_tier','mu','Combo hats, kick and bass added to the song',0],
+  ['m_echo','mu','Echo on the synth soundtrack',0],
+  ['heart','pw','Heartbeat when you have 1 hull left',0],['hat','pw','TEMPO power-up hi-hat',0],['drums','pw','DRUM power-up drum kit',0],['pwnote','pw','Power-up notes (echo, nova, magnet, chord, level chime)',0],
+  ['pwthump','pw','Power-up thump (nova, magnet)',0],['riser','pw','DROP power-up riser',0],['dropboom','pw','DROP power-up blast',0],['reward','pw','Reward shower boom',0]];
+const SNDGRP={fx:'GAME SOUNDS',st:'JINGLES ON THE BEAT',mu:'MUSIC EFFECTS',pw:'POWER-UP AND WAVE SOUNDS'};
+const SNDLS={get:Storage.prototype.getItem,set:Storage.prototype.setItem};   // the Lab keeps game saves in a shadow copy while it runs: the sound choice is written to the real storage
+const SND=window.SND={T:SNDT,G:SNDGRP,cfg:{on:{},vol:1,off:false},pv:{},force:null,
+  load(){try{const j=JSON.parse(SNDLS.get.call(localStorage,'nr_snd')||'null');if(j&&typeof j==='object'){this.cfg.on=j.on&&typeof j.on==='object'?j.on:{};this.cfg.vol=typeof j.vol==='number'?Math.max(0,Math.min(2,j.vol)):1;this.cfg.off=!!j.off;}}catch(e){}},
+  save(){try{SNDLS.set.call(localStorage,'nr_snd',JSON.stringify(this.cfg));}catch(e){}},
+  def(id){const r=SNDT.find(x=>x[0]===id);return r?!!r[3]:false;},
+  on(id){if(!RET.pure)return true;if(this.force===id)return true;const t=performance.now();if(this.pv[id]&&this.pv[id]>t)return true;
+    if(this.cfg.off)return false;const v=this.cfg.on[id];return v===undefined?this.def(id):!!v;},
+  set(id,v){this.cfg.on[id]=!!v;this.save();this.apply();},
+  setOff(v){this.cfg.off=!!v;this.save();this.apply();},
+  setVol(v){this.cfg.vol=Math.max(0,Math.min(2,+v||0));this.save();this.apply();},
+  musicFx(){return SNDT.some(r=>r[1]==='mu'&&this.on(r[0]));},
+  apply(){PURE.route();if(PURE.ok)try{PURE.ok.gain.value=PURE.GAIN*this.cfg.vol;AU.fx.gain.value=PURE.ok.gain.value;}catch(e){}}};
+window.sndOn=id=>!window.SND||SND.on(id);                        // call sites outside the audio parts: if(sndOn('heart'))AU.osc(...)
+SND.load();
+const PURE=window.PURE={GAIN:.22,blocked:0,played:0,
+  get KEEP(){const o={};for(const r of SNDT)if(r[1]==='fx'&&SND.on(r[0]))o[r[0]]=1;return o;},
   wire(){const a=AU.a;if(!a||this.done||!AU.musv||!AU.m)return;this.done=1;
-    try{AU.musv.disconnect();}catch(e){}AU.musv.connect(AU.m);                 // song: volume -> master, nothing in between
-    this.ok=a.createGain();this.ok.gain.value=this.GAIN;this.ok.connect(AU.sfxv);   // the few sounds that stay
-    try{AU.fx.gain.value=0;}catch(e){}}};                                    // power-up and effect sounds wired straight to AU.fx: silent
+    this.ok=a.createGain();this.ok.gain.value=this.GAIN*SND.cfg.vol;this.ok.connect(AU.sfxv);try{AU.fx.gain.value=this.ok.gain.value;}catch(e){}   // the game sounds that stay; AU.fx (power-up and wave sounds, now gated one by one) sits at the same level
+    const cg=AU.cutg&&AU.cutg.gain;if(cg){const o=cg.setTargetAtTime.bind(cg);cg.setTargetAtTime=(v,t,k)=>o(SND.on('m_drop')?v:1,t,k);}   // the DROP cut only reaches the song when its switch is on
+    this.route();},
+  route(){if(!this.done||!AU.musv||!AU.m)return;const full=SND.musicFx();if(this.full===full)return;this.full=full;
+    try{AU.musv.disconnect();}catch(e){}AU.musv.connect(full?(AU.lp||AU.duck):AU.m);}};   // all music effects off: song volume -> master, nothing in between (the clean mix)
 if(RET.pure){
   {const i0=AU.init;AU.init=function(){const r=i0.apply(this,arguments);PURE.wire();return r;};}
-  AU.duckMusic=function(){};AU.slowColour=function(){};
+  {const d0=AU.duckMusic;AU.duckMusic=function(at){return SND.on(at===undefined?'m_duck':'m_duckst')?d0.apply(this,arguments):undefined;};}
+  {const s0=AU.slowColour;AU.slowColour=function(on){return s0.call(this,SND.on('m_slow')?on:false);};}
+  {const OPEN=[20000,20000,20000,20000],OLD=[2500,6000,20000,20000];
+   Object.defineProperty(AU,'lpHz',{get(){return SND.on('m_dull')?OLD:OPEN;},set(v){},configurable:true});}
+  {const h0=AU.lyHit;AU.lyHit=function(){const r=h0.apply(this,arguments);const a=this.a;                                   // the old "a hit muffles the song for a beat"
+    if(a&&this.lp&&running&&!paused&&SND.on('m_hit')){const L=this.lp.frequency,now=a.currentTime,spb=BT.spb||.5;L.cancelScheduledValues(now);L.setTargetAtTime(900,now,.01);L.setTargetAtTime(this.lpHz[this.lyStep()],now+spb,spb/4);}
+    return r;};}
+  {const y0=AU.lyDrum;AU.lyDrum=function(){return SND.on('m_drum')?y0.apply(this,arguments):0;};}
+  {const t0=AU.tlsched;AU.tlsched=function(){return SND.on('m_tier')?t0.apply(this,arguments):undefined;};}
+  {const g0=AU.sting;AU.sting=function(n){if(running){const id='s_'+(/^tierup/.test(n)?'tierup':n);if(!SND.on(id)){PURE.blocked++;return false;}}return g0.apply(this,arguments);};}
   {const s0=AU.sfx;AU.sfx=function(n){PURE.wire();
-    if(running&&!PURE.KEEP[n]){PURE.blocked++;return;}
+    if(running&&!SND.on(n)){PURE.blocked++;return;}
     const F0=this.fx;if(PURE.ok)this.fx=PURE.ok;PURE.played++;try{return s0.apply(this,arguments);}finally{this.fx=F0;}};}
-  {const g0=AU.sting;AU.sting=function(){if(running){PURE.blocked++;return false;}return g0.apply(this,arguments);};}}
+  {const a0=window.NRF&&NRF.apply;if(a0)NRF.apply=function(duck,at){const w=duck;a0.call(this,duck&&SND.on('m_pause'),at);this.ducked=w;};}}
+
+// PURPOSE: the Lab SOUND page: one row per sound and music effect, PLAY over the song, ON/OFF saved (gate = puremusic.js SND)
+// FLAG: none (needs the Lab and RET.pure; ?pure=0 shows the page but every row plays and nothing is gated)
+// TEST: qa/soundlab-test.js
+/* ---------- SOUNDLAB: owner, 22 Oct 2026: "the effects are distorting the music, extremely annoying; I need to spot which ones; include them in the Lab so I can select".
+   Page rows come from SND.T (puremusic.js), so a new sound id added there shows up here. PLAY forces that one sound for the call (SND.force) or switches that music effect on for 2.5 s (SND.pv)
+   so the owner hears it over the song with its ON/OFF unchanged. ON/OFF and the Effects volume are saved in localStorage 'nr_snd'. ---------- */
+if(window.SND&&window.LABX){
+  const PV_MS=2500,now=()=>AU.a?AU.a.currentTime:0,later=(f,ms)=>setTimeout(()=>{try{f();}catch(e){}},ms);
+  const lpBack=()=>{const L=AU.lp&&AU.lp.frequency;if(!L||!AU.a)return;const t=now();L.cancelScheduledValues(t);L.setTargetAtTime(AU.lpHz[AU.lyStep?AU.lyStep():2]||20000,t,.12);};
+  // a music effect is made to happen once, and held on for PV_MS so the filters and buses are in the path
+  const MU={
+    m_duck:()=>{for(let i=0;i<4;i++)later(()=>AU.duckMusic(),i*600);},
+    m_duckst:()=>{for(let i=0;i<3;i++)later(()=>AU.duckMusic(now()),i*800);},
+    m_dull:()=>{const L=AU.lp&&AU.lp.frequency;if(!L)return;const t=now();L.cancelScheduledValues(t);L.setTargetAtTime(2500,t,.05);later(lpBack,PV_MS);},
+    m_hit:()=>{AU.lyHit();later(()=>AU.lyHit(),1200);},
+    m_slow:()=>{AU.slowColour(true);later(()=>{if(!(window.PW&&PW.wk<.97))AU.slowColour(false);},PV_MS);},
+    m_drop:()=>{const g=AU.cutg&&AU.cutg.gain;if(!g)return;const t=now();g.setTargetAtTime(0,t,.012);g.setTargetAtTime(1,t+.9,.012);},
+    m_pause:()=>{if(!window.NRF)return;NRF.apply(true);later(()=>NRF.apply(NRF.want()),PV_MS);},
+    m_drum:()=>{SND.pv.tierForce=performance.now()+PV_MS+1500;try{AU.lyHit();}catch(e){}},
+    m_tier:()=>{SND.pv.tierForce=performance.now()+PV_MS+1500;},
+    m_echo:()=>{const t=now()+.02;for(let i=0;i<3;i++){const g=AU.osc(t+i*.5,'square',AU.f(AU.root+24+[0,3,7][i]),.4,.1,AU.mus,0,3000);if(g&&AU.dly)g.connect(AU.dly);}}};
+  const PW_={
+    heart:()=>{const t=now()+.02;for(let i=0;i<4;i++)AU.osc(t+i*.5,'sine',58,.2,.5,AU.musv,38);},
+    hat:()=>{const t=now()+.02;for(let i=0;i<8;i++)AU.noise(t+i*.25,.04,.16,8500,AU.musv);},
+    drums:()=>{const t=now()+.05,s=(BT.spb||.5)/4;SND.force='drums';try{for(let n=0;n<16;n++)PW.hit(n,t+n*s);}finally{SND.force=null;}},
+    pwnote:()=>{for(let i=0;i<5;i++)PW2.note([0,2,4,5,7][i],.14,.07,'triangle',now()+.02+i*.08,24);},
+    pwthump:()=>{AU.osc(now()+.02,'sine',110,.3,.5,AU.musv,40);AU.osc(now()+.52,'sine',90,.2,.4,AU.musv,45);},
+    riser:()=>{const T=now()+.02;AU.osc(T,'sawtooth',110,2,.1,AU.fx,1400,2500);AU.noise(T,2,.12,3000,AU.fx);},
+    dropboom:()=>{const T=now()+.02;AU.noise(T,.9,.9,300,AU.fx,'lowpass');AU.osc(T,'sine',150,.7,1,AU.fx,28);AU.noise(T,.25,.5,5000,AU.fx);},
+    reward:()=>{const T=now()+.02;AU.noise(T,.7,.35,300,AU.fx,'lowpass');AU.osc(T,'sine',140,.5,.6,AU.fx,30);}};
+  SND.play=function(id){AU.unlock();if(!AU.a||AU.a.state!=='running')return false;const r=SND.T.find(x=>x[0]===id);if(!r)return false;
+    if(r[1]==='mu'){this.pv[id]=performance.now()+PV_MS;this.apply();later(()=>this.apply(),PV_MS+80);MU[id]();return true;}
+    this.force=id;try{if(r[1]==='fx')AU.sfx(id);else if(r[1]==='st')AU.sting(id.slice(2)==='tierup'?'tierup1':id.slice(2));else{PW_[id]();}}finally{this.force=null;}
+    return true;};
+  // 'tier' is forced to 3 for a moment so the drum layer and the hats / kick / bass can be heard; the game writes AU.tier as before
+  {let tv=AU.tier;Object.defineProperty(AU,'tier',{get(){return SND.pv.tierForce>performance.now()?Math.max(3,tv|0):tv;},set(v){tv=v;},configurable:true});
+}
+  const st=document.createElement('style');st.textContent=`#labP .snr{display:flex;align-items:center;gap:6px;width:100%;margin:2px 0}#labP .snr .sn{flex:1 1 auto;font-size:13px;line-height:1.25;min-width:0}
+#labP .snr .lc{flex:0 0 auto;min-width:64px;min-height:36px}#labP .snv{display:flex;align-items:center;gap:8px;width:100%;font-size:13px}#labP .snv input{flex:1 1 auto;min-height:36px}`;document.head.appendChild(st);
+  const build=body=>{
+    const top=lsec(body,'SOUND LAB: PLAY hears one over the song, ON/OFF is saved');
+    const v=lel('div','snv'),lab=lel('span','',''),sl=lel('input');sl.type='range';sl.min=0;sl.max=200;sl.step=5;sl.id='sndVol';sl.setAttribute('aria-label','Effects volume');
+    const show=()=>{lab.textContent='Effects volume '+Math.round(SND.cfg.vol*100)+'%';};sl.value=Math.round(SND.cfg.vol*100);show();
+    sl.addEventListener('input',()=>{SND.setVol(sl.value/100);show();});v.append(lab,sl);top.append(v);
+    lchip(top,'ALL EFFECTS OFF',()=>SND.setOff(!SND.cfg.off),{on:()=>SND.cfg.off,text:on=>on?'ALL EFFECTS OFF: ON':'ALL EFFECTS OFF'});
+    lchip(top,'CLEAN MIX',()=>{SND.cfg.on={};SND.cfg.off=false;SND.save();SND.apply();},{aria:'Back to the clean mix: only hurt, pick-up and explosion sounds'});
+    for(const g of Object.keys(SND.G)){const host=lsec(body,SND.G[g]);
+      for(const r of SND.T.filter(x=>x[1]===g)){const id=r[0],row=lel('div','snr'),nm=lel('span','sn',r[2]);row.dataset.id=id;row.append(nm);host.append(row);
+        lchip(row,'PLAY',()=>{SND.play(id);},{aria:'Play: '+r[2]});
+        lchip(row,'OFF',()=>SND.set(id,!SND.on(id)),{on:()=>SND.cfg.on[id]===undefined?SND.def(id):!!SND.cfg.on[id],text:on=>on?'ON':'OFF',aria:'Switch: '+r[2]});}}};
+  if(typeof LF!=='undefined'&&LF.restore){const r0=LF.restore;LF.restore=function(s){if(s&&s.ls){const v=SNDLS.get.call(localStorage,'nr_snd');if(v===null)delete s.ls.nr_snd;else s.ls.nr_snd=v;}return r0.apply(this,arguments);};}   // leaving the Lab must not undo the choice
+  const t0=LABX.tabs;LABX.tabs=()=>(t0?t0():[]).concat([['sound','SOUND']]);LABX.build=Object.assign(LABX.build||{},{sound:build});
+  {const ls=labSync;labSync=function(){ls();const b=$('labTab_sound');if(b)b.classList.toggle('on',LAB.tab==='sound');};}
+}
 
 // PURPOSE: the picture looks painted, not pasted: no light discs behind enemies, a much lighter black veil over the city
 // FLAG: clean (?clean=0 = the old look)
@@ -16302,6 +16401,24 @@ if(RET.clean){ART.paintP=function(bg,scroll){const di=DISTRICTS.indexOf(bg.D);if
 if(RET.clean)LGB.HK={n:1.35,r:1.35,'':1.35,s:1.35};
 /* no word pop-ups in play: PERFECT, ON BEAT, CHAIN n, GRAZE, OVERHEAT are dropped (score numbers stay) */
 if(RET.clean){const fl=floater;floater=function(x,y,txt){if(running&&typeof txt==='string'&&/PERFECT|ON BEAT|CHAIN|GRAZE|OVERHEAT|COMBO|NICE|GREAT/i.test(txt))return;return fl.apply(this,arguments);};}
+
+// PURPOSE: the song changes only when the district changes, and keeps playing (no restart) between stages and through the menus
+// FLAG: steady (?steady=0 = a new song every stage, menu song between stages)
+// TEST: qa/loadgate.js (no page errors); fingerprint-test (sim: no audio)
+/* ---------- STEADY: owner, 22 Oct 2026: "the song changes too often between stages".
+   Before: each story stage had its own song (stage1/stage2/stage3 in turn, a shuffled pool from stage 5), the menu between two stages switched to the
+   menu song, and starting a stage restarted its song from the top. Now:
+   1. every stage of a district plays that district's song (the song of the district's first story stage), boss fights keep their boss song;
+   2. a stage that wants the song already playing keeps it running (no restart, the beat clock just continues);
+   3. after a run, the menus keep the stage song instead of switching to the menu song (the title on first load still plays the menu song). ---------- */
+if(RET.steady===undefined)RET.steady=!/[?&]steady=0/.test(location.search);
+if(RET.steady){
+  {const per={},used=new Set(),POOL=['stage1','stage3','endless','stage2','endless2'];for(const d of STAGES){if(d.ch)continue;   // each district its own song (no two districts share one)
+    if(per[d.di]===undefined){let s=d.song;if(used.has(s))s=POOL.find(x=>!used.has(x))||s;per[d.di]=s;used.add(s);}d.song=per[d.di];}}
+  {const s0=AU.startStage;AU.startStage=function(stage,at){const c=this.cur;
+    if(stage!=='menu'&&c&&c.stage===stage&&BT.stage===stage&&BT.mode==='file'){this.want=null;this.wantT=0;return;}   // same song: keep it running
+    return s0.apply(this,arguments);};}
+  {const m0=AU.menuMusic;AU.menuMusic=function(){if(BT.stage&&BT.stage!=='menu'&&this.cur)return;return m0.apply(this,arguments);};}}
 
 /* the hint bubble: wraps to two lines and stays inside the screen (a long power-level text used to run off both edges at 390 px). cx,y = centre / last baseline, fs = font px, W = width of the drawing area, up/bh = bubble top above y and height for one line */
 function hintDraw(cx,y,fs,k,W,up,bh){const txt=G.hint.txt,pad=26*k,edge=8*k;ctx.textAlign='center';ctx.font=`700 ${fs}px "Chakra Petch",sans-serif`;

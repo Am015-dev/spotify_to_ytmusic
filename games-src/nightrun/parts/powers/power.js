@@ -30,7 +30,7 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
     const tp=s.act.find(a=>a.k==='tempo');if(tp){if(G.score>s.ls)G.score+=G.score-s.ls;if(G.waveT>0&&!G.waveWait)G.waveT-=dt*.5;}   // score x2, waves come 1.5x as fast
     s.ls=G.score;
     if(s.act.some(a=>a.k==='tempo')&&!G.dead){const h=Math.floor(bpos()*2);if(s.h8===undefined)s.h8=h;if(h!==s.h8){s.h8=h;if(h%2){const x=P.x+22,y=P.y;G.pb.push({x,y:y-5,vx:900,vy:-40,dm:1,pf:0},{x,y:y+5,vx:900,vy:40,dm:1,pf:0});   // the off-beat 8th note: double-time fire
-        try{const a=AU.a;if(a&&a.state==='running')AU.noise(a.currentTime,.04,.16,8500,AU.musv);}catch(e){}}}}else s.h8=undefined;   // a quiet hi-hat on the off-beats
+        try{const a=AU.a;if(a&&a.state==='running'&&sndOn('hat'))AU.noise(a.currentTime,.04,.16,8500,AU.musv);}catch(e){}}}}else s.h8=undefined;   // a quiet hi-hat on the off-beats
     this.wk+=((s.act.some(a=>a.k==='slow')?.6:1)-this.wk)*Math.min(1,dt*6);if(Math.abs(this.wk-1)<.004)this.wk=1;AU.slowColour(this.wk<.97);   // bullet time eases in and out; only a gentle low-pass touches the song
     if(s.drop)this.dropTick(s);
     if(s.wv>0)s.wv-=dt;},
@@ -38,9 +38,9 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
     if(d.rev!==BT.rev){this.reset2();this.blast(d.ob);s.drop=null;return;}   // the song was swapped under the Drop: fire now
     if(a&&a.state==='running'&&BT.src){
       if(!d.cs&&(d.cutB-p)*BT.spb<.15){d.cs=1;const g=AU.cutg.gain,T=Math.max(a.currentTime,R(d.cutB)-.01);g.setTargetAtTime(0,T,.012);
-        AU.osc(T,'sawtooth',110,4*BT.spb,.1,AU.fx,1400,2500);AU.noise(T,4*BT.spb,.12,3000,AU.fx);}   // a riser fills the silent bar
+        if(sndOn('riser')){AU.osc(T,'sawtooth',110,4*BT.spb,.1,AU.fx,1400,2500);AU.noise(T,4*BT.spb,.12,3000,AU.fx);}}   // a riser fills the silent bar
       if(!d.rs&&(d.blastB-p)*BT.spb<.15){d.rs=1;const T=Math.max(a.currentTime,R(d.blastB)-.004);AU.cutg.gain.setTargetAtTime(1,T,.008);
-        AU.noise(T,.9,.9,300,AU.fx,'lowpass');AU.osc(T,'sine',150,.7,1,AU.fx,28);AU.noise(T,.25,.5,5000,AU.fx);}}
+        if(sndOn('dropboom')){AU.noise(T,.9,.9,300,AU.fx,'lowpass');AU.osc(T,'sine',150,.7,1,AU.fx,28);AU.noise(T,.25,.5,5000,AU.fx);}}}
     if(p>=d.blastB){this.blast(d.ob);s.drop=null;}},
   reset2(){try{const a=AU.a;if(a&&AU.cutg){const g=AU.cutg.gain;g.cancelScheduledValues(a.currentTime);g.setTargetAtTime(1,a.currentTime,.01);}}catch(e){}},
   blast(ob){const s=this.st();this.stat.blast++;
@@ -51,7 +51,7 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
     const s16=BT.spb/4,now=a.currentTime;
     if(this.dstep<0||BT.rev!==this.drev||NR.music.rate!==this.drate){this.drev=BT.rev;this.drate=NR.music.rate;this.dstep=Math.ceil((now-BT.t0)/s16);}   // song or speed changed: restart the pattern on the new grid
     while(BT.t0+this.dstep*s16<now+.12){const t=BT.t0+this.dstep*s16;if(t>=now-.01)this.hit(this.dstep,t);this.dstep++;}},
-  hit(n,t){const s=((n%16)+16)%16,bar=Math.floor(n/16),D=AU.musv;
+  hit(n,t){if(!sndOn('drums'))return;const s=((n%16)+16)%16,bar=Math.floor(n/16),D=AU.musv;
     if(s%4===0)AU.osc(t,'sine',165,.3,1.1,D,42);
     if(s===10)AU.osc(t,'sine',150,.2,.5,D,45);
     if(s===4||s===12){AU.noise(t,.2,.7,1800,D,'bandpass');AU.osc(t,'triangle',210,.12,.35,D,120);}

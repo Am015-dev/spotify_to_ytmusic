@@ -22,7 +22,7 @@ const PW2=PW.p2={stat:{echo:0,echoHit:0,nova:0,novaClr:0,novaHit:0,pull:0,wing:0
   NOTES:[0,3,5,7,10,12,15,17],
   seen:(()=>{try{return load('mnr_pw2seen',{})||{};}catch(e){return {};}})(),
   at(B){return BT.t0+BT.off+B*BT.spb;},
-  note(i,dur,vol,type,when,oct){const a=AU.a;if(!a||a.state!=='running')return false;try{AU.osc(Math.max(a.currentTime+.003,when||0),type||'triangle',AU.f(AU.root+(oct==null?24:oct)+PW2.NOTES[((i%8)+8)%8]),dur,vol,AU.musv,0,3200);return true;}catch(e){return false;}},
+  note(i,dur,vol,type,when,oct){const a=AU.a;if(!a||a.state!=='running'||!sndOn('pwnote'))return false;try{AU.osc(Math.max(a.currentTime+.003,when||0),type||'triangle',AU.f(AU.root+(oct==null?24:oct)+PW2.NOTES[((i%8)+8)%8]),dur,vol,AU.musv,0,3200);return true;}catch(e){return false;}},
   act(k){const s=G&&G.pw;return s?s.act.find(a=>a.k===k)||null:null;},
   any(){const s=G&&G.pw;return !!(s&&s.act.some(a=>PW2.K[a.k]));},
   st(){return G.p2||(G.p2={ech:[],trl:[],nv:null,mp:[],wm:[{x:0,y:0},{x:0,y:0}],h:null,rel:null,fl:[]});},
@@ -53,7 +53,7 @@ if(RET.pw2){
       s.trl.push({x:g.x,y:g.y,l:.32,m:.32});PW2.stat.echo++;PW2.note(5+(G.bc%3),.14,.07,'square',0,24);}});
   /* ----- DOWNBEAT NOVA, CHORD SHIELD release ----- */
   NR.on('bar',()=>{if(!G.live||G.dead||!PW.on('nova'))return;const s=PW2.st();s.nv={x:P.x,y:P.y,r:0,R:230,hit:new Set(),dm:5};if(window.PW3&&PW3.on)PW3.novaTag(s.nv);PW2.stat.nova++;
-    PW2.note(0,.5,.1,'sawtooth',0,12);PW2.note(7,.35,.07,'triangle',0,24);try{if(AU.a&&AU.a.state==='running')AU.osc(AU.a.currentTime+.003,'sine',110,.3,.5,AU.musv,40);}catch(e){}});
+    PW2.note(0,.5,.1,'sawtooth',0,12);PW2.note(7,.35,.07,'triangle',0,24);try{if(AU.a&&AU.a.state==='running'&&sndOn('pwthump'))AU.osc(AU.a.currentTime+.003,'sine',110,.3,.5,AU.musv,40);}catch(e){}});
   NR.on('beat',()=>{if(!G.live||G.dead)return;const s=G.p2,a=PW2.act('chord');if(!s||!a||!a.used||a.rel)return;a.rel=true;   // the next beat after the hit
     s.nv={x:P.x,y:P.y,r:0,R:170,hit:new Set(),dm:4,ch:1};PW2.stat.chordRel++;
     for(const [i,dl] of [[0,0],[2,.03],[4,.06],[7,.09]])PW2.note(i,.7,.08,'triangle',AU.a?AU.a.currentTime+dl:0,24);
@@ -77,7 +77,7 @@ if(RET.pw2){
     for(const t of s.trl)t.l-=dt;s.trl=s.trl.filter(t=>t.l>0);for(const f of s.fl)f.l-=dt;s.fl=s.fl.filter(f=>f.l>0);});
   /* ----- MAGNET pulse sound + visual, CRESCENDO ----- */
   NR.on('beat',()=>{if(!G.live||G.dead)return;
-    if(PW.on('magb')){const s=PW2.st();s.fl.push({x:P.x,y:P.y,r:34,c:PWK.magb.c,l:.35,m:.35,grow:560});PW2.note(0,.22,.14,'sine',0,12);try{if(AU.a&&AU.a.state==='running')AU.osc(AU.a.currentTime+.003,'sine',90,.2,.4,AU.musv,45);}catch(e){}}
+    if(PW.on('magb')){const s=PW2.st();s.fl.push({x:P.x,y:P.y,r:34,c:PWK.magb.c,l:.35,m:.35,grow:560});PW2.note(0,.22,.14,'sine',0,12);try{if(AU.a&&AU.a.state==='running'&&sndOn('pwthump'))AU.osc(AU.a.currentTime+.003,'sine',90,.2,.4,AU.musv,45);}catch(e){}}
     const a=PW2.act('cres');if(a){PW2.note(Math.min(7,(a.bars|0)+(G.bc%4>>1)),.16,.05+.012*Math.min(5,a.bars|0),'triangle',0,24+12*((a.bars|0)>=3?1:0));}});
   NR.on('bar',()=>{const a=PW2.act('cres');if(!a||G.dead||!G.live)return;a.bars=(a.bars|0)+1;if(a.bars<=5)floater(P.x,P.y-40,'×'+PW2.cresK().toFixed(2),PWK.cres.c);PW2.stat.cres=Math.max(PW2.stat.cres,a.bars);});
   NR.on('hurt',()=>{const a=PW2.act('cres');if(a)a.bars=0;});
