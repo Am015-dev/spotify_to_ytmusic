@@ -1,11 +1,11 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 392,
- "h": 244,
+ "w": 453,
+ "h": 282,
  "anchor": [
-  196,
-  244
+  226,
+  282
  ],
  "order": [
   "strip-boss-zentral-ice-hit#1",

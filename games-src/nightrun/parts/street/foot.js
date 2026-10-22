@@ -509,7 +509,7 @@ function drawHud(c,vw,fs){const P=S.P,u=1/L.sc,m=10*u,hb=[],box=(x,y,w,h)=>hb.pu
   L.hud={hud:hb,hint,vw};
   ghost();}
 function hintOn(){return S&&!SV.hint&&S.hintT<20&&(S.moved<250||S.shots<1);}
-function hintText(){if(S.moved<250)return L&&L.touch?'Push the stick right':'D or → to run';return L&&L.touch?(autoOn()?'Face an enemy: you shoot':'Hold FIRE to shoot'):'Hold J to shoot';}
+function hintText(){if(S.moved<250)return L&&L.touch?'Push the stick right':'D or → to run';return L&&L.touch?(autoOn()?'Face an enemy: you shoot':(RET.bossfix!==false?'Tap or hold FIRE to shoot':'Hold FIRE to shoot')):'Hold J to shoot';}
 function ghost(){const g=L.ghost;if(!L.touch||!hintOn()||S.note.t>0||(L.menu&&!L.menu.hidden)||(autoOn()&&S.moved>=250)){g.hidden=true;return;}g.hidden=false;
   const tgt=S.moved<250?L.stick:L.btn.fire,r=tgt.getBoundingClientRect(),ph=(S.time%1.2)/1.2;
   g.style.left=(r.left+r.width/2+(S.moved<250?r.width*.3*ph:0))+'px';g.style.top=(r.top+r.height/2)+'px';}

@@ -53,7 +53,7 @@ BV.over=function(e,t){const ph=e.ph||1,mv=UIK.moveOf?UIK.moveOf(e):'air',ground=
       else if(red){ctx.globalCompositeOperation='lighter';G_(x,y,10,'#ffd23d',.5);ctx.globalCompositeOperation='source-over';}
     }else{
       ctx.fillStyle=RET.first30?R[0]+'73':'#7a84a8aa';ctx.strokeStyle=RET.first30?'#0a0612':'#dfe6ff';ctx.lineWidth=1.5;ctx.beginPath();   // first30: a tinted marker in the phase colour, not a white plate
-      ctx.moveTo(x-w*.5,y+h*.5);ctx.lineTo(x-w*.35,y-h*.5);ctx.lineTo(x+w*.5,y-h*.4);ctx.lineTo(x+w*.4,y+h*.5);ctx.closePath();ctx.fill();ctx.stroke();if(BV.pl)BV.pl.push(ctx.fillStyle);
+      if(RET.bossfix!==false){if(BV.pl)BV.pl.push(ctx.fillStyle);}else{ctx.moveTo(x-w*.5,y+h*.5);ctx.lineTo(x-w*.35,y-h*.5);ctx.lineTo(x+w*.5,y-h*.4);ctx.lineTo(x+w*.4,y+h*.5);ctx.closePath();ctx.fill();ctx.stroke();if(BV.pl)BV.pl.push(ctx.fillStyle);}   // bossfix: the boss's own painted armour is the plate; no flat quad on top of it (a lost plate still shows its scar)
     }}
   // the plate that just broke falls off the boss (ground bosses: it drops to the road line and stops there)
   if(v&&v.t>0&&v.id!=null){const s=BV.SLOTS[v.id],p=1-v.t,w=s[2]*hw,h=s[3]*hh,x=s[0]*hw+(v.id===2?1:-1)*p*50,fall=Math.min(p*p*260,ground?Math.max(0,hh-(s[1]*hh)-4):260);

@@ -2,10 +2,10 @@
  "frames": 4,
  "fps": 4,
  "w": 227,
- "h": 384,
+ "h": 372,
  "anchor": [
   113,
-  384
+  372
  ],
  "order": [
   "strip-boss-talos-idle#1",
