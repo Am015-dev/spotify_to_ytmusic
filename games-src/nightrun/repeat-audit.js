@@ -61,7 +61,13 @@ const PLAY = (o) => {
     const G = m.G;
     if (m.SH.active) m.SH.close();
     if (G.t > .5 && i % 30 === 0) { const mk = (m.DIR.mut || []).join('+'); if (mk !== mutDone) { mutDone = mk; for (const id of (m.DIR.mut || [])) add('mut', id); } }   // mutators change per district (Endless loops)
-    if (i % 3 === 0) { d = dec(); m.touchTo(d.bx, d.by); if (d.dash) m.press('Dash'); if (d.emp) m.press('Emp'); }
+    if (i % 3 === 0) { d = dec(); m.touchTo(d.bx, d.by);
+      // W131: with the timing rules ON (default) the old 50% random off-beat dash empties the charges and locks the dash 2 s, so the bot hurt itself. Under timing it now dashes the way timing-test's beat bot does: inside the beat window when a bullet / marked shot / laser wall is close, off the beat only as the last-hull emergency. ?timing=0 keeps the old rule.
+      if (window.TIM && TIM.on) { const P = m.P, G = m.G, p = m.bpos(), inWin = Math.abs(p - Math.round(p)) * m.BT.spb * 1000 <= m.winMs() * TIM.PK - 15, cl = (R, t) => G.eb.some(b => Math.hypot(b.x + b.vx * t - P.x, b.y + b.vy * t - P.y) < R);
+        const ready = window.ABIL.st().n >= 1 && P.dashT <= 0 && TIM.ready(), wl = window.CTR && CTR.walls.find(w => !w.cur && w.warn <= 0 && !w.hit && !w.dash && w.x > P.x && w.x - P.x < 150);
+        const mk = G.eb.some(b => b.cxM && (Math.hypot(b.x - P.x, b.y - P.y) - b.r - 3) / (Math.hypot(b.vx, b.vy) || 1) < .4);
+        d.dash = ready && ((inWin && (mk || cl(75, .25) || !!wl)) || (cl(24, .05) && P.hp <= 2) || (wl && wl.x - P.x < 40) || !!(m.FUN.dw && !m.FUN.dw.done)); }
+      if (d.dash) m.press('Dash'); if (d.emp) m.press('Emp'); }
     const bp = m.bpos(), bn = Math.floor(bp);
     if (bn !== lastBeat) { lastBeat = bn; tapAt = bn + (rnd() < .4 ? 0 : (.15 + rnd() * .7)); }
     if (tapAt >= 0 && bp >= tapAt) { m.press('Fire'); tapAt = -1; }

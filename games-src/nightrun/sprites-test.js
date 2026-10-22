@@ -126,7 +126,7 @@ const ok = (name, cond, info) => { n++; if (!cond) { fails.push(name + (info ? '
     /* (e) ?sprites=0 */
     { const reqs = [], { c, p, errs } = await open('&sprites=0&bpauto=1&boss=sek-adler', reqs);
       try { await p.waitForFunction(() => window.__mnr && __mnr.G.boss && __mnr.G.boss.x <= 791, null, { timeout: 30000 }); } catch (e) { ok('e0 boss arrives', false); }
-      await sleep(3000);
+      await sleep(SMOKE ? 1200 : 3000);   // W131: smoke waits less for a loader that must stay silent
       const r = await p.evaluate(() => { const m = __mnr, b = m.G.boss; let calls = 0; const d = ART.drawAnim; ART.drawAnim = (...a) => { calls++; return d(...a); }; for (let i = 0; i < 60; i++) m.render(m.G.t, 1 / 60); ART.drawAnim = d; return { f: RET.sprites, a: ART.anim('boss-sek-adler/idle'), sp: b && !!b._sp, sa: b && b._sa, calls, gh: ART.gh.length }; });
       ok('e1 ?sprites=0: flag off, nothing from the loader, no sprite state on the boss', r.f === false && r.a === null && !r.sp && r.sa === undefined && r.calls === 0 && r.gh === 0, JSON.stringify(r));
       const rq = reqs.filter(u => /\/media\/anim\//.test(u)); ok('e2 ?sprites=0: no media/anim file requested', !rq.length, rq[0]);

@@ -1,0 +1,9366 @@
+{
+ "arcade-normal": {
+  "gameMinutes": 155,
+  "tries": 71,
+  "firstTryFails": 13,
+  "events": 20903,
+  "repeatRatio5min": 0.488,
+  "encounters": 3380,
+  "encountersPerMin": 21.8,
+  "topEncounters": [
+   [
+    "verb:bar_curtain",
+    73,
+    2.2
+   ],
+   [
+    "verb:spokes",
+    59,
+    1.7
+   ],
+   [
+    "verb:homing_orb",
+    54,
+    1.6
+   ],
+   [
+    "wave:evdoor",
+    46,
+    1.4
+   ],
+   [
+    "verb:cross_beams",
+    46,
+    1.4
+   ],
+   [
+    "verb:bounce_orbs",
+    42,
+    1.2
+   ],
+   [
+    "verb:lane_wall",
+    40,
+    1.2
+   ],
+   [
+    "verb:split_shot",
+    38,
+    1.1
+   ]
+  ],
+  "distinctEncounterSigs": 1121,
+  "per5min": [
+   [
+    0,
+    23,
+    11
+   ],
+   [
+    5,
+    39,
+    13
+   ],
+   [
+    10,
+    44,
+    14
+   ],
+   [
+    15,
+    74,
+    16
+   ],
+   [
+    20,
+    58,
+    18
+   ],
+   [
+    25,
+    88,
+    22
+   ],
+   [
+    30,
+    59,
+    15
+   ],
+   [
+    35,
+    38,
+    15
+   ],
+   [
+    40,
+    7,
+    1
+   ],
+   [
+    45,
+    81,
+    23
+   ],
+   [
+    50,
+    36,
+    15
+   ],
+   [
+    55,
+    84,
+    24
+   ],
+   [
+    60,
+    79,
+    27
+   ],
+   [
+    65,
+    68,
+    23
+   ],
+   [
+    70,
+    67,
+    25
+   ],
+   [
+    75,
+    60,
+    18
+   ],
+   [
+    80,
+    78,
+    26
+   ],
+   [
+    85,
+    80,
+    22
+   ],
+   [
+    90,
+    38,
+    21
+   ],
+   [
+    95,
+    3,
+    1
+   ],
+   [
+    100,
+    55,
+    25
+   ],
+   [
+    105,
+    39,
+    14
+   ],
+   [
+    110,
+    80,
+    19
+   ],
+   [
+    115,
+    75,
+    27
+   ],
+   [
+    120,
+    64,
+    24
+   ],
+   [
+    125,
+    75,
+    25
+   ],
+   [
+    130,
+    29,
+    14
+   ],
+   [
+    135,
+    103,
+    12
+   ],
+   [
+    140,
+    82,
+    11
+   ],
+   [
+    145,
+    115,
+    18
+   ],
+   [
+    150,
+    103,
+    15
+   ]
+  ],
+  "stages": {
+   "1": {
+    "mins": 1.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 2,
+    "enemyLooks": 9,
+    "waves": 5,
+    "shotSrc": 2,
+    "newThings": 18,
+    "newList": [
+     "enemy:drone",
+     "enemy:drone*",
+     "wave:vee",
+     "pick:up",
+     "wave:evdoor",
+     "pick:pw:drop",
+     "set:supply",
+     "wave:stutter",
+     "pick:emp",
+     "pick:pw:bubble",
+     "set:gust",
+     "pick:pw:chord",
+     "wave:sig:COURIER LIGHTS",
+     "set:sig:COURIER LIGHTS",
+     "pick:pw:echo",
+     "wave:wave",
+     "shot:drone",
+     "shot:drone*"
+    ],
+    "jaccardPrev": null,
+    "song": "stage1+fever-128",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.71
+   },
+   "2": {
+    "mins": 1.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 9,
+    "enemyKinds": 3,
+    "enemyLooks": 11,
+    "waves": 5,
+    "shotSrc": 3,
+    "newThings": 15,
+    "newList": [
+     "rule:well",
+     "enemy:fk_diver",
+     "pick:pw:empr",
+     "wave:echo",
+     "set:blackout",
+     "pick:pw:slow",
+     "pick:pw:drum",
+     "pick:pw:lance",
+     "wave:hold",
+     "wave:sig:PATROL GRID",
+     "enemy:turret",
+     "set:sig:PATROL GRID",
+     "set:lane",
+     "shot:none",
+     "shot:turret"
+    ],
+    "jaccardPrev": 0.25,
+    "song": "d1b",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.81
+   },
+   "3": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 8,
+    "enemyKinds": 5,
+    "enemyLooks": 20,
+    "waves": 4,
+    "shotSrc": 5,
+    "newThings": 15,
+    "newList": [
+     "enemy:flank",
+     "wave:bounce",
+     "enemy:mine",
+     "rule:well~tw",
+     "pick:pw:stasis",
+     "wave:stairs",
+     "pick:pw:splint",
+     "pick:pw:ric",
+     "wave:sig:WINDOW DISPLAY",
+     "set:sig:WINDOW DISPLAY",
+     "enemy:gturret",
+     "set:weave",
+     "shot:rain/hazard",
+     "shot:flank",
+     "shot:gturret"
+    ],
+    "jaccardPrev": 0.25,
+    "song": "stage3+fever-132",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.71
+   },
+   "4": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 15,
+    "enemyKinds": 6,
+    "enemyLooks": 24,
+    "waves": 10,
+    "shotSrc": 6,
+    "newThings": 19,
+    "newList": [
+     "wave:stampede",
+     "enemy:charger",
+     "enemy:charger*",
+     "enemy:shielder",
+     "wave:evstation",
+     "set:evstation",
+     "enemy:swarm",
+     "wave:bloom",
+     "rule:ev:rest",
+     "wave:fan",
+     "pick:pw:nova",
+     "wave:shieldwall",
+     "wave:swoop",
+     "wave:sig:GUARD CHANGE",
+     "set:sig:GUARD CHANGE",
+     "wave:turrets",
+     "shot:charger",
+     "shot:swarm",
+     "shot:shielder"
+    ],
+    "jaccardPrev": 0.16,
+    "song": "d1a",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.63
+   },
+   "5": {
+    "mins": 8.2,
+    "tries": 3,
+    "cleared": false,
+    "enc": 39,
+    "enemyKinds": 10,
+    "enemyLooks": 42,
+    "waves": 17,
+    "shotSrc": 11,
+    "newThings": 50,
+    "newList": [
+     "enemy:flank*",
+     "rule:lane",
+     "pick:pw:zone",
+     "wave:evfunnel",
+     "set:evfunnel",
+     "pick:pw:magb",
+     "wave:evgrid",
+     "set:evgrid",
+     "enemy:turret*",
+     "pick:pw:bomb",
+     "wave:evwindow",
+     "set:evwindow",
+     "set:hail",
+     "wave:cross",
+     "wave:evtline",
+     "set:evtline",
+     "pick:pw:dashr",
+     "wave:sweep",
+     "wave:sig:VAULT ALARM",
+     "pick:pw:crate",
+     "mini:TRESOR-WART|k5",
+     "verb:bar_curtain",
+     "verb:rain_lane",
+     "verb:lob",
+     "verb:vault_doors",
+     "pick:hp",
+     "wave:bait",
+     "pick:pw:gwell",
+     "wave:box",
+     "wave:box^swift",
+     "set:drop",
+     "drop:hit",
+     "rule:ev:ambush",
+     "fence:fence",
+     "set:fence",
+     "wave:evfunnel^swift",
+     "wave:evgrid^armored",
+     "rule:unlock:tw-gilded",
+     "pick:pw:slice",
+     "wave:evfunnel^armored",
+     "set:gaterun",
+     "wave:stutter^armored",
+     "verb:minefield",
+     "verb:vault_lock",
+     "verb:split_shot",
+     "verb:shockwave",
+     "shot:flank*",
+     "shot:turret*",
+     "shot:bossmv",
+     "shot:mine"
+    ],
+    "jaccardPrev": 0.11,
+    "song": "stage2+fever-132+fever-128",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.31
+   },
+   "6": {
+    "mins": 1.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 25,
+    "enemyKinds": 13,
+    "enemyLooks": 32,
+    "waves": 17,
+    "shotSrc": 7,
+    "newThings": 28,
+    "newList": [
+     "enemy:gate",
+     "wave:gates",
+     "enemy:einterceptor",
+     "rule:lane~tw",
+     "wave:evdive·elite",
+     "wave:evmines",
+     "set:evmines",
+     "wave:evmines^armored",
+     "pick:pw:leech",
+     "set:rescue",
+     "wave:bounce^armored",
+     "wave:evgrid·fast",
+     "set:evgrid·fast",
+     "wave:evgrid·elite",
+     "set:evgrid·elite",
+     "rule:ev:convoy",
+     "enemy:fk_crawler",
+     "wave:tide",
+     "wave:tide^swift",
+     "wave:evmines·mirror",
+     "set:evmines·mirror",
+     "wave:evtline·fast",
+     "set:evtline·fast",
+     "wave:hold^armored",
+     "wave:sig:CONVOY AMBUSH",
+     "wave:evdive·mirror",
+     "wave:evdive·mirror^gilded",
+     "shot:einterceptor"
+    ],
+    "jaccardPrev": 0.2,
+    "song": "d1b",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.46
+   },
+   "7": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 27,
+    "enemyKinds": 10,
+    "enemyLooks": 35,
+    "waves": 17,
+    "shotSrc": 8,
+    "newThings": 26,
+    "newList": [
+     "wave:crossX",
+     "wave:crossX^armored",
+     "rule:lane+well~tw",
+     "wave:evram",
+     "set:evram",
+     "wave:evwindow·mirror",
+     "set:evwindow·mirror",
+     "wave:evwindow·mirror^armored",
+     "pick:pw:ovd",
+     "wave:evwindow·mirror^swift",
+     "wave:meteors",
+     "wave:meteors^armored",
+     "wave:evshieldv·elite",
+     "set:evshieldv·elite",
+     "wave:evshieldv·elite^swift",
+     "wave:evguard·mirror",
+     "set:evguard·mirror",
+     "wave:burst",
+     "pick:pw:cres",
+     "wave:evwindow·elite",
+     "set:evwindow·elite",
+     "wave:line",
+     "wave:sig:GLASS ELEVATOR",
+     "wave:evguard·fast",
+     "set:evguard·fast",
+     "wave:evguard·fast^armored"
+    ],
+    "jaccardPrev": 0.2,
+    "song": "stage3+fever-132",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.29
+   },
+   "8": {
+    "mins": 6.2,
+    "tries": 3,
+    "cleared": false,
+    "enc": 45,
+    "enemyKinds": 14,
+    "enemyLooks": 44,
+    "waves": 25,
+    "shotSrc": 12,
+    "newThings": 40,
+    "newList": [
+     "enemy:gwalker",
+     "wave:evwalker·mirror",
+     "set:evwalker·mirror",
+     "rule:echo",
+     "wave:evwalker·mirror^swift",
+     "wave:evshieldv·fast",
+     "set:evshieldv·fast",
+     "wave:arrow",
+     "wave:evfunnel·mirror",
+     "set:evfunnel·mirror",
+     "wave:evwalker·elite",
+     "set:evwalker·elite",
+     "wave:evshieldv",
+     "set:evshieldv",
+     "wave:sig:SIREN CHASE",
+     "wave:evwalker·mirror^gilded",
+     "boss:SEK-ADLER|k0",
+     "verb:tri_burst",
+     "verb:homing_orb",
+     "verb:laser_sweep",
+     "verb:siren_ram",
+     "verb:echo",
+     "verb:backup_cores",
+     "verb:track_beam",
+     "enemy:fk_bait",
+     "verb:bullet_time",
+     "wave:evwalker·mirror^armored",
+     "wave:evshieldv·fast^swift",
+     "wave:helix",
+     "wave:evshieldv^gilded",
+     "pick:pw:hornet",
+     "rule:epoch:1:nv-skin-tri",
+     "rule:ev:convoy^swift",
+     "wave:evwalker·mirror^swift+tiny",
+     "wave:evshieldv·fast^swift+tiny",
+     "wave:fan^swift",
+     "set:turrets",
+     "wave:evfunnel·mirror^armored",
+     "wave:evwalker·elite^gilded",
+     "shot:gwalker"
+    ],
+    "jaccardPrev": 0.17,
+    "song": "d1a+boss-d1+boss-d1~b+boss",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.13
+   },
+   "9": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 31,
+    "enemyKinds": 14,
+    "enemyLooks": 39,
+    "waves": 23,
+    "shotSrc": 10,
+    "newThings": 26,
+    "newList": [
+     "wave:box^swift+tiny",
+     "rule:echo~tw",
+     "enemy:splitter",
+     "wave:evsplit·fast",
+     "set:evsplit·fast",
+     "enemy:zdrn",
+     "wave:evsplit·fast^swift+tiny",
+     "wave:evfunnel·elite",
+     "set:evfunnel·elite",
+     "wave:cross^swift",
+     "wave:cross^swift+tiny",
+     "rule:unlock:ev-rush",
+     "wave:evdive·mirror^swift",
+     "wave:swoop^swift",
+     "wave:evfunnel·elite^armored",
+     "wave:evmines^swift",
+     "wave:evsplit·mirror",
+     "set:evsplit·mirror",
+     "wave:evsplit·mirror^armored",
+     "wave:evsplit·mirror^swift",
+     "wave:hold^swift",
+     "wave:sig:RIVER LANTERNS",
+     "wave:evdive",
+     "wave:evdive^armored",
+     "wave:evdive^swift+tiny",
+     "shot:splitter"
+    ],
+    "jaccardPrev": 0.16,
+    "song": "endless",
+    "bg": "MAINUFER",
+    "plainShare": 0.49
+   },
+   "10": {
+    "mins": 1.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 25,
+    "enemyKinds": 12,
+    "enemyLooks": 24,
+    "waves": 17,
+    "shotSrc": 7,
+    "newThings": 25,
+    "newList": [
+     "rule:ev:rush",
+     "enemy:gunship",
+     "wave:braid",
+     "rule:echo+lane~tw",
+     "wave:evconvoy·elite",
+     "set:evconvoy·elite",
+     "wave:evconvoy·elite^swift+tiny",
+     "wave:orbit",
+     "wave:orbit^gilded",
+     "wave:evtank·fast",
+     "set:evtank·fast",
+     "wave:evram·elite",
+     "set:evram·elite",
+     "wave:evram·elite^swift+tiny",
+     "wave:evmines^gilded",
+     "wave:evmines^swift+tiny",
+     "wave:evtank·mirror",
+     "set:evtank·mirror",
+     "wave:evconvoy·fast",
+     "set:evconvoy·fast",
+     "wave:bounce^swift+tiny",
+     "wave:sig:BRIDGE STRAIN",
+     "wave:gunship",
+     "pick:pw:tempo",
+     "shot:gunship"
+    ],
+    "jaccardPrev": 0.26,
+    "song": "d2a+fever-132",
+    "bg": "MAINUFER",
+    "plainShare": 0.38
+   },
+   "11": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 31,
+    "enemyKinds": 19,
+    "enemyLooks": 36,
+    "waves": 22,
+    "shotSrc": 13,
+    "newThings": 22,
+    "newList": [
+     "wave:crossX^gilded",
+     "rule:gold",
+     "wave:evbombers",
+     "set:evbombers",
+     "wave:evbombers^armored",
+     "wave:evram·mirror",
+     "set:evram·mirror",
+     "wave:evram·mirror^swift+tiny",
+     "wave:fan^armored",
+     "enemy:bomber",
+     "wave:bomberrun",
+     "enemy:ebomber",
+     "wave:evram^armored",
+     "pick:pw:decoy",
+     "wave:evsplit·fast^armored",
+     "wave:evsplit·fast^gilded",
+     "wave:box^armored",
+     "wave:line^swift+tiny",
+     "wave:line^gilded",
+     "wave:sig:MARKET BELLS",
+     "wave:evbombers·elite",
+     "set:evbombers·elite"
+    ],
+    "jaccardPrev": 0.23,
+    "song": "stage3",
+    "bg": "MAINUFER",
+    "plainShare": 0.38
+   },
+   "12": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 27,
+    "enemyKinds": 14,
+    "enemyLooks": 31,
+    "waves": 20,
+    "shotSrc": 10,
+    "newThings": 24,
+    "newList": [
+     "wave:vee^swift+tiny",
+     "rule:gold~tw",
+     "wave:vee^armored",
+     "enemy:gtank",
+     "wave:evconvoy·mirror",
+     "set:evconvoy·mirror",
+     "wave:evconvoy·mirror^gilded",
+     "wave:evbombers·fast",
+     "set:evbombers·fast",
+     "wave:pincer",
+     "wave:pincer^gilded",
+     "wave:evdoor^swift",
+     "wave:evconvoy·mirror^armored",
+     "wave:evlanterns·fast",
+     "set:evlanterns·fast",
+     "wave:evlanterns·fast^gilded",
+     "wave:evbombers·elite^armored",
+     "wave:evbombers·elite^gilded",
+     "wave:spiral",
+     "wave:spiral^armored",
+     "wave:bounce^gilded",
+     "wave:bounce^swift",
+     "wave:sig:BOW WAVE",
+     "shot:gtank"
+    ],
+    "jaccardPrev": 0.27,
+    "song": "d2b+fever-132",
+    "bg": "MAINUFER",
+    "plainShare": 0.41
+   },
+   "13": {
+    "mins": 16,
+    "tries": 3,
+    "cleared": false,
+    "enc": 92,
+    "enemyKinds": 17,
+    "enemyLooks": 74,
+    "waves": 66,
+    "shotSrc": 14,
+    "newThings": 69,
+    "newList": [
+     "rule:gold+echo~tw",
+     "wave:evlanterns·fast^swift+tiny",
+     "wave:evlanterns·fast^armored",
+     "wave:evlanterns·fast^swift",
+     "wave:evsway·elite",
+     "set:evsway·elite",
+     "wave:evsway·elite^swift",
+     "wave:evsway·elite^gilded",
+     "rule:ev:ambush^gilded",
+     "wave:evsway·elite^swift+tiny",
+     "wave:evgrid^swift",
+     "wave:evgrid^swift+tiny",
+     "wave:evgrid^gilded",
+     "wave:evbracket·mirror",
+     "wave:geyser",
+     "wave:geyser^armored",
+     "wave:evlanterns·elite",
+     "set:evlanterns·elite",
+     "wave:evlanterns·elite^armored",
+     "wave:evlanterns·elite^swift+tiny",
+     "wave:cross^gilded",
+     "wave:cross^armored",
+     "pick:pw:glass",
+     "wave:sig:OLD STONES",
+     "mini:BRÜCKEN-WÄCHTER|k4",
+     "verb:bounce_orbs",
+     "verb:g_charge",
+     "verb:lane_wall",
+     "wave:chargers",
+     "wave:chargers^swift+tiny",
+     "wave:chargers^armored",
+     "wave:evsway·elite^armored",
+     "wave:evlanterns",
+     "set:evlanterns",
+     "wave:evlanterns^armored",
+     "wave:evlanterns^swift",
+     "wave:evlanterns^swift+tiny",
+     "wave:swoop^gilded",
+     "wave:swoop^swift+tiny",
+     "wave:evgrid·fast^armored",
+     "wave:evgrid·fast^gilded",
+     "wave:crossX^swift+tiny",
+     "wave:evbracket",
+     "wave:evbracket^gilded",
+     "wave:evbracket^swift+tiny",
+     "wave:wave^swift",
+     "set:wedge",
+     "rule:ev:rush^swift",
+     "wave:echo^gilded",
+     "wave:echo^swift+tiny",
+     "wave:evbracket^swift",
+     "rule:unlock:tw-tiny",
+     "wave:evbracket^tiny",
+     "wave:evbracket^armored",
+     "wave:box^tiny",
+     "wave:evlanterns·fast^tiny",
+     "wave:evgrid·elite^tiny",
+     "wave:evgrid·elite^swift",
+     "wave:evgrid·elite^gilded",
+     "wave:evgrid·elite^swift+tiny",
+     "wave:swoop^tiny",
+     "wave:swoop^armored",
+     "drop:miss",
+     "wave:wave^tiny",
+     "rule:epoch:2:nv-skin-dia",
+     "verb:bridge_drop",
+     "verb:hold_span",
+     "verb:cross_beams",
+     "shot:zdrn"
+    ],
+    "jaccardPrev": 0.15,
+    "song": "stage2",
+    "bg": "MAINUFER",
+    "plainShare": 0.18
+   },
+   "14": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 23,
+    "enemyKinds": 11,
+    "enemyLooks": 23,
+    "waves": 14,
+    "shotSrc": 8,
+    "newThings": 18,
+    "newList": [
+     "rule:ev:rush^armored",
+     "rule:portal",
+     "enemy:sniper",
+     "wave:evsnipe·elite",
+     "set:evsnipe·elite",
+     "wave:evsway",
+     "set:evsway",
+     "wave:evsway^armored",
+     "wave:evbracket·fast",
+     "wave:evsnipe·mirror",
+     "set:evsnipe·mirror",
+     "wave:evsnipe·mirror^tiny",
+     "wave:evbracket·fast^swift",
+     "wave:sig:FLEET SIGNAL",
+     "wave:evsway·mirror",
+     "set:evsway·mirror",
+     "shot:sniper",
+     "shot:ebomber"
+    ],
+    "jaccardPrev": 0.12,
+    "song": "d2a",
+    "bg": "MAINUFER",
+    "plainShare": 0.51
+   },
+   "15": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 39,
+    "enemyKinds": 14,
+    "enemyLooks": 31,
+    "waves": 28,
+    "shotSrc": 11,
+    "newThings": 28,
+    "newList": [
+     "wave:box^armored+swift",
+     "wave:box^gilded",
+     "rule:portal~tw",
+     "wave:evtline^armored",
+     "wave:evwindow·mirror^tiny",
+     "wave:mirror",
+     "wave:mirror^tiny",
+     "wave:mirror^gilded",
+     "wave:evguard",
+     "set:evguard",
+     "wave:evguard^armored+swift",
+     "wave:evguard^gilded",
+     "wave:evshieldv·mirror",
+     "set:evshieldv·mirror",
+     "wave:evshieldv·mirror^swift+tiny",
+     "wave:evshieldv·mirror^armored",
+     "wave:evwindow·fast",
+     "set:evwindow·fast",
+     "wave:evwindow·fast^tiny",
+     "wave:evtline·elite",
+     "set:evtline·elite",
+     "wave:evtline·elite^swift+tiny",
+     "rule:unlock:ev-duel",
+     "wave:bounce^armored+swift",
+     "wave:sig:CRANE SWING",
+     "wave:evguard·fast^tiny",
+     "wave:evguard·fast^swift",
+     "wave:evguard·fast^swift+tiny"
+    ],
+    "jaccardPrev": 0.15,
+    "song": "endless+fever-132",
+    "bg": "MAINUFER",
+    "plainShare": 0.31
+   },
+   "16": {
+    "mins": 7.3,
+    "tries": 3,
+    "cleared": false,
+    "enc": 44,
+    "enemyKinds": 17,
+    "enemyLooks": 45,
+    "waves": 26,
+    "shotSrc": 10,
+    "newThings": 36,
+    "newList": [
+     "rule:portal+gold~tw",
+     "enemy:healer",
+     "wave:evheal·mirror",
+     "set:evheal·mirror",
+     "enemy:ecarrier",
+     "enemy:efdrone",
+     "set:mines",
+     "wave:evguard^swift+tiny",
+     "wave:evshieldv·mirror^swift",
+     "wave:evheal·elite",
+     "set:evheal·elite",
+     "wave:sig:UNDERTOW",
+     "boss:FLUSSKRAKE|k1",
+     "verb:spokes",
+     "verb:pulse_ring",
+     "verb:tide_lanes",
+     "verb:tentacle_tips",
+     "verb:vacuum",
+     "verb:orbit_drones",
+     "rule:ev:duel",
+     "wave:evheal·mirror^gilded",
+     "wave:evheal·mirror^armored",
+     "pick:pw:wing",
+     "wave:evwindow·fast^swift",
+     "wave:evguard^tiny",
+     "wave:evshieldv·mirror^tiny",
+     "wave:bloom^gilded",
+     "wave:evheal·elite^armored+swift",
+     "wave:evheal·mirror^swift",
+     "wave:fan^gilded",
+     "wave:evheal·mirror^swift+tiny",
+     "wave:evwindow·fast^armored+swift",
+     "wave:evguard^swift",
+     "wave:evheal·elite^swift+tiny",
+     "wave:evheal·mirror^armored+swift",
+     "shot:healer"
+    ],
+    "jaccardPrev": 0.17,
+    "song": "d2b+boss3+boss-d2+boss-d2~b",
+    "bg": "MAINUFER",
+    "plainShare": 0.11
+   },
+   "17": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 33,
+    "enemyKinds": 17,
+    "enemyLooks": 35,
+    "waves": 23,
+    "shotSrc": 12,
+    "newThings": 23,
+    "newList": [
+     "rule:ev:rush^tiny",
+     "wave:helix^gilded",
+     "rule:bounce",
+     "wave:helix^swift",
+     "wave:evrelay·fast",
+     "set:evrelay·fast",
+     "wave:evrelay·fast^gilded",
+     "wave:evguard·elite",
+     "set:evguard·elite",
+     "wave:evguard·elite^swift+tiny",
+     "set:swarm",
+     "wave:fan^armored+swift",
+     "wave:slalom",
+     "wave:slalom^swift",
+     "wave:evshieldv·fast^armored+swift",
+     "wave:evshieldv·fast^tiny",
+     "wave:evshieldv·fast^gilded",
+     "wave:evrelay·elite",
+     "set:evrelay·elite",
+     "wave:evshieldv^swift",
+     "wave:evguard·mirror^swift+tiny",
+     "wave:bounce^tiny",
+     "wave:sig:RED LIGHTS"
+    ],
+    "jaccardPrev": 0.21,
+    "song": "stage3",
+    "bg": "OSTEND",
+    "plainShare": 0.38
+   },
+   "18": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 27,
+    "enemyKinds": 13,
+    "enemyLooks": 28,
+    "waves": 19,
+    "shotSrc": 7,
+    "newThings": 15,
+    "newList": [
+     "wave:snake",
+     "rule:bounce~tw",
+     "wave:snake^gilded",
+     "wave:pincer^swift+tiny",
+     "wave:pincer^armored",
+     "wave:evmines·fast",
+     "set:evmines·fast",
+     "wave:evtank·elite",
+     "set:evtank·elite",
+     "wave:evtank·elite^armored+swift",
+     "wave:evfunnel·mirror^armored+swift",
+     "wave:evdive·fast",
+     "wave:evdive·fast^gilded",
+     "wave:sig:SHUNTING YARD",
+     "wave:evmines·mirror^swift+tiny"
+    ],
+    "jaccardPrev": 0.23,
+    "song": "d3b+fever-132",
+    "bg": "OSTEND",
+    "plainShare": 0.56
+   },
+   "19": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 25,
+    "enemyKinds": 20,
+    "enemyLooks": 38,
+    "waves": 17,
+    "shotSrc": 14,
+    "newThings": 24,
+    "newList": [
+     "rule:bounce+portal~tw",
+     "enemy:carrier",
+     "wave:evcargo",
+     "set:evcargo",
+     "wave:evcargo^armored+swift",
+     "wave:stairs^swift+tiny",
+     "wave:evmines·elite",
+     "set:evmines·elite",
+     "wave:evtank",
+     "set:evtank",
+     "wave:evtank^armored+swift",
+     "wave:evdive·mirror^armored",
+     "wave:evmines·fast^armored",
+     "wave:evcargo·elite",
+     "set:evcargo·elite",
+     "wave:evcargo·elite^swift+tiny",
+     "rule:epoch:3:nv-skin-ring",
+     "rule:unlock:tw-lead",
+     "rule:ev:convoy^tiny",
+     "wave:hold^armored+swift",
+     "set:crossfire",
+     "wave:sig:FIREWALL BREACH",
+     "shot:efdrone",
+     "shot:carrier"
+    ],
+    "jaccardPrev": 0.27,
+    "song": "endless2",
+    "bg": "OSTEND",
+    "plainShare": 0.4
+   },
+   "20": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 32,
+    "enemyKinds": 22,
+    "enemyLooks": 41,
+    "waves": 24,
+    "shotSrc": 15,
+    "newThings": 20,
+    "newList": [
+     "wave:stutter^armored+swift",
+     "wave:stutter^gilded",
+     "rule:pocket",
+     "wave:evram·mirror^gilded",
+     "wave:evwalker·fast",
+     "set:evwalker·fast",
+     "wave:evwalker·fast^armored",
+     "wave:meteors^gilded+lead",
+     "wave:evram^gilded+lead",
+     "wave:carrier",
+     "wave:curtain",
+     "wave:shieldwall^swift+tiny",
+     "wave:evwalker",
+     "set:evwalker",
+     "wave:evwalker^gilded+lead",
+     "wave:evwalker^lead",
+     "wave:evwalker^swift+tiny",
+     "wave:wave^armored",
+     "wave:sig:SIGNAL FAILURE",
+     "wave:splitterv"
+    ],
+    "jaccardPrev": 0.32,
+    "song": "d3a+fever-132",
+    "bg": "OSTEND",
+    "plainShare": 0.49
+   },
+   "21": {
+    "mins": 8.5,
+    "tries": 3,
+    "cleared": false,
+    "enc": 102,
+    "enemyKinds": 24,
+    "enemyLooks": 70,
+    "waves": 71,
+    "shotSrc": 17,
+    "newThings": 71,
+    "newList": [
+     "wave:chargers^gilded",
+     "rule:pocket~tw",
+     "wave:evconvoy·fast^gilded+lead",
+     "wave:evconvoy·fast^lead",
+     "wave:evconvoy·fast^gilded",
+     "wave:evbombers·elite^swift",
+     "wave:evheal",
+     "set:evheal",
+     "wave:evheal^gilded",
+     "wave:evheal^lead",
+     "wave:pincer^tiny",
+     "wave:pincer^swift",
+     "wave:pincer^armored+swift",
+     "wave:evsnipe·fast",
+     "set:evsnipe·fast",
+     "wave:evsnipe·fast^gilded+lead",
+     "wave:evconvoy·elite^gilded+lead",
+     "wave:evconvoy·elite^armored",
+     "wave:sig:BARRIER DROP",
+     "wave:evconvoy·fast^armored",
+     "mini:SCHRANKEN-WART|k5",
+     "wave:stampede^lead",
+     "wave:stampede^gilded",
+     "wave:stampede^tiny",
+     "wave:evconvoy·fast^swift",
+     "wave:evbombers·elite^tiny",
+     "wave:evbombers·elite^lead",
+     "wave:evbombers·elite^armored+swift",
+     "wave:evbombers·elite^swift+tiny",
+     "wave:geyser^lead",
+     "wave:geyser^swift+tiny",
+     "rule:ev:duel^lead",
+     "wave:geyser^armored+swift",
+     "wave:evheal·fast",
+     "set:evheal·fast",
+     "wave:scissors",
+     "wave:scissors^gilded+lead",
+     "wave:evsnipe",
+     "set:evsnipe",
+     "wave:evsnipe^tiny",
+     "wave:evsnipe^armored+swift",
+     "wave:evsnipe^swift+tiny",
+     "wave:bounce^gilded+lead",
+     "pick:pw:nr",
+     "wave:bounce^lead",
+     "wave:evconvoy·fast^armored+swift",
+     "verb:barrier_gates",
+     "verb:signal_override",
+     "verb:delay_bombs",
+     "verb:gravity_well",
+     "wave:echo^gilded+lead",
+     "wave:echo^armored+swift",
+     "wave:echo^lead",
+     "wave:evconvoy·fast^tiny",
+     "wave:evconvoy·fast^swift+tiny",
+     "wave:evbombers·elite^gilded+lead",
+     "wave:evconvoy",
+     "set:evconvoy",
+     "wave:evconvoy^swift+tiny",
+     "wave:evconvoy^gilded+lead",
+     "wave:evconvoy^tiny",
+     "wave:evsnipe·mirror^gilded",
+     "wave:evsnipe·mirror^gilded+lead",
+     "wave:scissors^gilded",
+     "wave:scissors^swift+tiny",
+     "wave:scissors^armored",
+     "wave:scissors^tiny",
+     "wave:evheal·elite^lead",
+     "wave:geyser^tiny",
+     "wave:geyser^gilded+lead",
+     "verb:beat_floor"
+    ],
+    "jaccardPrev": 0.22,
+    "song": "endless",
+    "bg": "OSTEND",
+    "plainShare": 0.26
+   },
+   "22": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 24,
+    "enemyKinds": 17,
+    "enemyLooks": 38,
+    "waves": 16,
+    "shotSrc": 11,
+    "newThings": 19,
+    "newList": [
+     "rule:ev:rest^armored",
+     "rule:pocket+bounce~tw",
+     "wave:bait^gilded",
+     "enemy:minelayer",
+     "wave:evlayer·elite",
+     "set:evlayer·elite",
+     "wave:evlayer·elite^armored+swift",
+     "wave:evheal·elite^armored",
+     "wave:evbombers^swift",
+     "wave:kamikaze",
+     "wave:kamikaze^gilded+lead",
+     "wave:kamikaze^armored+swift",
+     "enemy:kamikaze",
+     "wave:evsnipe·fast^tiny",
+     "wave:sig:LAST CORDON",
+     "wave:evlayer·mirror",
+     "set:evlayer·mirror",
+     "wave:evlayer·mirror^gilded+lead",
+     "shot:kamikaze"
+    ],
+    "jaccardPrev": 0.19,
+    "song": "d3b+fever-132",
+    "bg": "OSTEND",
+    "plainShare": 0.13
+   },
+   "23": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 25,
+    "enemyKinds": 16,
+    "enemyLooks": 44,
+    "waves": 18,
+    "shotSrc": 10,
+    "newThings": 20,
+    "newList": [
+     "wave:box^gilded+lead",
+     "wave:box^lead",
+     "rule:hunter",
+     "rule:unlock:combo-swift-armored",
+     "wave:evrelay",
+     "set:evrelay",
+     "wave:evrelay^tiny",
+     "wave:evcargo·mirror",
+     "set:evcargo·mirror",
+     "wave:evcargo·mirror^tiny",
+     "wave:sandwich",
+     "wave:sandwich^armored+swift",
+     "wave:evlayer·elite^gilded+lead",
+     "wave:evlayer·elite^tiny",
+     "wave:evdoor^swift+armored",
+     "wave:evlayer·mirror^tiny",
+     "wave:evlayer·mirror^swift",
+     "wave:evcargo·fast",
+     "set:evcargo·fast",
+     "shot:minelayer"
+    ],
+    "jaccardPrev": 0.21,
+    "song": "endless2",
+    "bg": "OSTEND",
+    "plainShare": 0.17
+   },
+   "24": {
+    "mins": 5.4,
+    "tries": 3,
+    "cleared": false,
+    "enc": 46,
+    "enemyKinds": 14,
+    "enemyLooks": 32,
+    "waves": 29,
+    "shotSrc": 11,
+    "newThings": 28,
+    "newList": [
+     "wave:zigzag",
+     "wave:zigzag^gilded",
+     "rule:hunter~tw",
+     "wave:river",
+     "wave:evdoor·elite",
+     "wave:evdoor·mirror",
+     "boss:ZENTRAL-ICE|k2",
+     "verb:spiral_rev",
+     "wave:bounce^swift+armored",
+     "wave:evdoor·mirror^swift+tiny",
+     "rule:ev:ambush^armored",
+     "wave:evsway^lead",
+     "wave:evbracket·mirror^armored",
+     "wave:evdoor·elite^gilded",
+     "wave:sig:ICE CORE",
+     "verb:firewall",
+     "verb:overload",
+     "wave:evdoor·mirror^armored+swift",
+     "wave:evlanterns·fast^swift+armored",
+     "wave:pincer^swift+armored",
+     "wave:pincer^lead",
+     "wave:evsway^armored+swift",
+     "wave:evbracket·mirror^gilded",
+     "wave:river^swift+tiny",
+     "wave:evdoor·elite^armored+swift",
+     "wave:evdoor·elite^swift+armored",
+     "wave:evdoor·mirror^lead",
+     "shot:charger*"
+    ],
+    "jaccardPrev": 0.15,
+    "song": "d3a+fever-132+boss-d3+boss+boss-d3~b",
+    "bg": "OSTEND",
+    "plainShare": 0.29
+   },
+   "25": {
+    "mins": 1.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 27,
+    "enemyKinds": 16,
+    "enemyLooks": 33,
+    "waves": 20,
+    "shotSrc": 11,
+    "newThings": 19,
+    "newList": [
+     "wave:helix^lead",
+     "rule:hunter+pocket~tw",
+     "wave:evbracket·fast^swift+tiny",
+     "wave:pulse",
+     "wave:evtline·mirror",
+     "set:evtline·mirror",
+     "wave:evtline·mirror^lead",
+     "wave:evtline·mirror^armored+swift",
+     "wave:gates^gilded",
+     "wave:evtline·elite^gilded+lead",
+     "wave:evgrid·mirror",
+     "set:evgrid·mirror",
+     "wave:evgrid·mirror^tiny",
+     "wave:evgrid·mirror^swift+armored",
+     "enemy:ecruiser",
+     "rule:epoch:4:nv-skin-hex",
+     "rule:ev:rush^lead",
+     "wave:sig:PRESS PASS",
+     "shot:ecruiser"
+    ],
+    "jaccardPrev": 0.18,
+    "song": "stage1+fever-128",
+    "bg": "MESSE",
+    "plainShare": 0.47
+   },
+   "26": {
+    "mins": 1.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 28,
+    "enemyKinds": 16,
+    "enemyLooks": 30,
+    "waves": 18,
+    "shotSrc": 11,
+    "newThings": 12,
+    "newList": [
+     "wave:snake^armored+swift",
+     "rule:gate",
+     "wave:evguard^lead",
+     "wave:wall~r",
+     "wave:wall~r^gilded",
+     "wave:evstation·fast",
+     "set:evstation·fast",
+     "wave:evstation·fast^swift+armored",
+     "wave:evshieldv^lead",
+     "wave:evshieldv·fast^gilded+lead",
+     "wave:hold^lead",
+     "wave:sig:GRIDLOCK"
+    ],
+    "jaccardPrev": 0.24,
+    "song": "d4b",
+    "bg": "MESSE",
+    "plainShare": 0.43
+   },
+   "27": {
+    "mins": 1.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 25,
+    "enemyKinds": 19,
+    "enemyLooks": 41,
+    "waves": 18,
+    "shotSrc": 11,
+    "newThings": 13,
+    "newList": [
+     "wave:bounce^tiny+armored",
+     "rule:gate~tw",
+     "wave:evstation^swift+armored",
+     "wave:bomberrun^tiny",
+     "wave:bomberrun^lead",
+     "wave:evmines^tiny",
+     "wave:evfunnel·fast",
+     "set:evfunnel·fast",
+     "wave:evstation·elite",
+     "set:evstation·elite",
+     "wave:sig:HAMMER BEAT",
+     "wave:cross^gilded+lead",
+     "wave:cross^tiny"
+    ],
+    "jaccardPrev": 0.33,
+    "song": "endless2+fever-128",
+    "bg": "MESSE",
+    "plainShare": 0.49
+   },
+   "28": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 25,
+    "enemyKinds": 19,
+    "enemyLooks": 27,
+    "waves": 16,
+    "shotSrc": 15,
+    "newThings": 9,
+    "newList": [
+     "mut:hail",
+     "rule:gate+hunter~tw",
+     "wave:evmines·mirror^tiny+armored",
+     "wave:meteors^tiny",
+     "wave:evmines^swift+armored",
+     "wave:evmines^lead",
+     "wave:evram·mirror^gilded+lead",
+     "rule:unlock:combo-tiny-swift",
+     "wave:shieldwall^swift+armored"
+    ],
+    "jaccardPrev": 0.29,
+    "song": "d4a",
+    "bg": "MESSE",
+    "plainShare": 0.32
+   },
+   "29": {
+    "mins": 15.4,
+    "tries": 3,
+    "cleared": false,
+    "enc": 109,
+    "enemyKinds": 23,
+    "enemyLooks": 77,
+    "waves": 81,
+    "shotSrc": 21,
+    "newThings": 75,
+    "newList": [
+     "wave:stairs^swift",
+     "rule:tide",
+     "wave:stairs^tiny+swift",
+     "wave:stairs^armored+swift",
+     "rule:ev:rush^gilded",
+     "wave:evwalker·fast^armored+swift",
+     "wave:evsplit·elite",
+     "set:evsplit·elite",
+     "wave:evsplit·elite^lead",
+     "wave:evsplit·elite^swift+armored",
+     "wave:cross^swift+armored",
+     "wave:cross^lead",
+     "wave:cross^armored+swift",
+     "wave:evwalker·mirror^tiny",
+     "wave:evwalker·mirror^tiny+armored",
+     "wave:evbombers·fast^armored",
+     "wave:evbombers·fast^swift+armored",
+     "wave:evconvoy·elite^tiny+swift",
+     "wave:evconvoy·elite^gilded",
+     "wave:curtain^lead",
+     "wave:curtain^swift+tiny",
+     "wave:sig:GUARD OF HONOUR",
+     "wave:bounce^tiny+swift",
+     "mini:MESSE-WÄCHTER|k4",
+     "verb:mirror_hall",
+     "verb:spotlight",
+     "wave:crossX^swift",
+     "wave:crossX^armored+swift",
+     "wave:crossX^gilded+lead",
+     "wave:evwalker·fast^lead",
+     "wave:evwalker·fast^gilded",
+     "wave:evwalker·fast^tiny+armored",
+     "wave:evwalker·fast^tiny+swift",
+     "wave:evsplit·elite^armored",
+     "wave:evsplit·elite^tiny+swift",
+     "wave:evsplit·elite^tiny+armored",
+     "wave:sniperlanes",
+     "wave:sniperlanes^swift+armored",
+     "wave:sniperlanes^tiny",
+     "wave:sniperlanes^gilded+lead",
+     "wave:evwalker·mirror^tiny+swift",
+     "wave:evconvoy·fast^tiny+swift",
+     "wave:evconvoy·fast^swift+armored",
+     "wave:loop",
+     "wave:loop^tiny+swift",
+     "wave:loop^gilded",
+     "wave:evbombers^swift+armored",
+     "wave:evbombers^swift+tiny",
+     "wave:evbombers^armored+swift",
+     "wave:evwalker·fast^swift+armored",
+     "rule:ev:convoy^gilded",
+     "wave:box^tiny+swift",
+     "wave:box^tiny+armored",
+     "wave:evwalker·fast^gilded+lead",
+     "wave:evwalker·fast^swift+tiny",
+     "wave:evsplit·elite^tiny",
+     "wave:evsplit·elite^gilded+lead",
+     "wave:evsplit·elite^swift",
+     "wave:evsplit·elite^gilded",
+     "wave:evsplit·elite^armored+swift",
+     "wave:evconvoy^gilded",
+     "wave:evconvoy^tiny+swift",
+     "wave:evbombers·mirror",
+     "set:evbombers·mirror",
+     "wave:evbombers·mirror^armored",
+     "wave:evbombers·mirror^swift",
+     "wave:minefield",
+     "wave:minefield^gilded",
+     "wave:minefield^swift+tiny",
+     "wave:minefield^tiny+armored",
+     "wave:minefield^tiny",
+     "wave:evwalker·elite^armored+swift",
+     "rule:unlock:combo-lead-gilded",
+     "rule:epoch:5:nv-skin-star",
+     "shot:ecarrier"
+    ],
+    "jaccardPrev": 0.18,
+    "song": "stage2+fever-132+fever-128",
+    "bg": "MESSE",
+    "plainShare": 0.17
+   },
+   "30": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 17,
+    "enemyKinds": 19,
+    "enemyLooks": 33,
+    "waves": 10,
+    "shotSrc": 12,
+    "newThings": 8,
+    "newList": [
+     "rule:ev:rest^tiny",
+     "mut:mine",
+     "rule:tide~tw",
+     "wave:bait^armored",
+     "wave:evsnipe^gilded+lead",
+     "wave:stairs^gilded",
+     "wave:evsnipe^lead",
+     "wave:evheal·fast^tiny+armored"
+    ],
+    "jaccardPrev": 0.18,
+    "song": "d4b+fever-132",
+    "bg": "MESSE",
+    "plainShare": 0.16
+   },
+   "31": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 20,
+    "enemyKinds": 19,
+    "enemyLooks": 39,
+    "waves": 13,
+    "shotSrc": 12,
+    "newThings": 8,
+    "newList": [
+     "wave:bait^lead+gilded",
+     "rule:tide+gate~tw",
+     "wave:evrelay^swift+armored",
+     "wave:evrelay^armored+swift",
+     "wave:evcargo·mirror^armored",
+     "wave:evcargo·mirror^lead+tiny",
+     "wave:evcargo·mirror^swift+tiny",
+     "wave:evcargo·mirror^gilded+lead"
+    ],
+    "jaccardPrev": 0.31,
+    "song": "endless2",
+    "bg": "MESSE",
+    "plainShare": 0.26
+   },
+   "32": {
+    "mins": 7.9,
+    "tries": 3,
+    "cleared": false,
+    "enc": 51,
+    "enemyKinds": 16,
+    "enemyLooks": 53,
+    "waves": 36,
+    "shotSrc": 10,
+    "newThings": 30,
+    "newList": [
+     "rule:cash",
+     "wave:evbracket·mirror^tiny+swift",
+     "wave:sig:MARKET CRASH",
+     "boss:KRONOS|k3",
+     "verb:cashflow",
+     "verb:cash_core",
+     "wave:crossX^tiny+swift",
+     "wave:evdoor·mirror^tiny+armored",
+     "wave:evlanterns·fast^gilded+lead",
+     "wave:geyser^tiny+swift",
+     "wave:geyser^lead+tiny",
+     "wave:evsway^swift",
+     "wave:evbracket·mirror^lead+gilded",
+     "wave:burst^swift+armored",
+     "wave:evdoor·elite^lead+gilded",
+     "wave:evdoor·mirror^tiny",
+     "wave:crossX^tiny",
+     "wave:crossX^lead+gilded",
+     "wave:evdoor·mirror^swift+armored",
+     "wave:evlanterns·fast^tiny+swift",
+     "wave:evlanterns·fast^lead+gilded",
+     "rule:unlock:combo-armored-tiny",
+     "wave:geyser^gilded",
+     "wave:evsway^lead+gilded",
+     "wave:evbracket·mirror^swift+tiny",
+     "wave:bloom^swift+armored",
+     "wave:evdoor·elite^gilded+lead",
+     "wave:stutter^tiny+armored",
+     "wave:stutter^gilded+lead",
+     "wave:evdoor·mirror^armored+tiny"
+    ],
+    "jaccardPrev": 0.16,
+    "song": "d4a+boss2+fever-132+boss-d4+boss-d4~b",
+    "bg": "MESSE",
+    "plainShare": 0.2
+   },
+   "33": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 33,
+    "enemyKinds": 14,
+    "enemyLooks": 31,
+    "waves": 25,
+    "shotSrc": 10,
+    "newThings": 17,
+    "newList": [
+     "rule:ev:rest^gilded",
+     "wave:cross^tiny+swift",
+     "wave:cross^armored+tiny",
+     "rule:cash~tw",
+     "wave:evbracket·fast^swift+armored",
+     "wave:evbracket·fast^tiny+swift",
+     "wave:phalanx",
+     "wave:evgrid·mirror^tiny+swift",
+     "wave:evgrid·mirror^gilded+lead",
+     "wave:evwindow·fast^swift+tiny",
+     "wave:evwindow·fast^tiny+swift",
+     "wave:evtline·elite^lead+tiny",
+     "wave:evbracket^tiny+swift",
+     "wave:evbracket^lead+tiny",
+     "wave:bait^swift",
+     "wave:sig:ROOFTOP KIOSKS",
+     "wave:evtline^lead+tiny"
+    ],
+    "jaccardPrev": 0.18,
+    "song": "athina+fever-128",
+    "bg": "ATHINA",
+    "plainShare": 0.52
+   },
+   "34": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 31,
+    "enemyKinds": 16,
+    "enemyLooks": 35,
+    "waves": 23,
+    "shotSrc": 11,
+    "newThings": 17,
+    "newList": [
+     "wave:vee^lead+tiny",
+     "wave:vee^lead+gilded",
+     "rule:cash+tide~tw",
+     "wave:evwindow·elite^lead+gilded",
+     "wave:evguard^gilded+lead",
+     "wave:bloom~r",
+     "wave:bloom~r^armored+tiny",
+     "wave:evwindow·elite^lead",
+     "wave:evstation^lead+gilded",
+     "wave:evstation^gilded+lead",
+     "wave:evguard·mirror^gilded+lead",
+     "wave:evshieldv·fast^lead+gilded",
+     "wave:evshieldv·fast^tiny+swift",
+     "wave:evshieldv·fast^tiny+armored",
+     "wave:bounce^lead+tiny",
+     "wave:bounce^lead+gilded",
+     "wave:sig:HARBOUR CHAIN"
+    ],
+    "jaccardPrev": 0.24,
+    "song": "athA",
+    "bg": "ATHINA",
+    "plainShare": 0.38
+   },
+   "35": {
+    "mins": 1.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 25,
+    "enemyKinds": 18,
+    "enemyLooks": 42,
+    "waves": 17,
+    "shotSrc": 11,
+    "newThings": 15,
+    "newList": [
+     "wave:crossX^armored+tiny",
+     "rule:cover",
+     "wave:evstation^swift+tiny",
+     "wave:crossX^tiny+armored",
+     "wave:evmines^tiny+armored",
+     "wave:evstation·mirror",
+     "set:evstation·mirror",
+     "rule:ev:rest^swift",
+     "wave:evstation·mirror^tiny",
+     "wave:bait^armored+swift",
+     "wave:evdive·elite^lead",
+     "wave:evdive·elite^armored+swift",
+     "wave:wave^gilded+lead",
+     "wave:wave^lead",
+     "wave:sig:HILL BEACONS"
+    ],
+    "jaccardPrev": 0.28,
+    "song": "athina2+fever-128",
+    "bg": "ATHINA",
+    "plainShare": 0.54
+   },
+   "36": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 30,
+    "enemyKinds": 20,
+    "enemyLooks": 31,
+    "waves": 19,
+    "shotSrc": 12,
+    "newThings": 10,
+    "newList": [
+     "wave:zigzag^armored",
+     "rule:cover~tw",
+     "wave:zigzag^gilded+lead",
+     "wave:evtank·fast^tiny",
+     "wave:vee^gilded+lead",
+     "wave:evwalker·mirror^lead+tiny",
+     "wave:evmines·elite^lead",
+     "wave:evtank^lead",
+     "wave:stutter^swift+tiny",
+     "wave:sig:SACRED STEPS"
+    ],
+    "jaccardPrev": 0.29,
+    "song": "athB",
+    "bg": "ATHINA",
+    "plainShare": 0.46
+   },
+   "37": {
+    "mins": 7.6,
+    "tries": 3,
+    "cleared": false,
+    "enc": 88,
+    "enemyKinds": 25,
+    "enemyLooks": 78,
+    "waves": 64,
+    "shotSrc": 20,
+    "newThings": 57,
+    "newList": [
+     "rule:cover+cash~tw",
+     "wave:evwalker·fast^swift",
+     "wave:evwalker·fast^lead+gilded",
+     "wave:evsplit·elite^lead+gilded",
+     "wave:evsplit·elite^lead+tiny",
+     "wave:sig:BRONZE SHIELDS",
+     "wave:cross^tiny+armored",
+     "wave:cross^lead+tiny",
+     "wave:evwalker·fast^tiny",
+     "wave:evwalker·fast^lead+tiny",
+     "wave:evwalker·fast^armored+tiny",
+     "wave:evsplit·elite^armored+tiny",
+     "wave:evsplit·elite^swift+tiny",
+     "wave:bait^tiny+armored",
+     "wave:bait^gilded+lead",
+     "wave:bait^swift+tiny",
+     "wave:sandwich^gilded",
+     "wave:sandwich^tiny",
+     "wave:sandwich^lead",
+     "wave:evconvoy·fast^lead+tiny",
+     "wave:evconvoy·fast^tiny+armored",
+     "rule:epoch:6:nv-skin-sq",
+     "rule:unlock:combo-lead-swift",
+     "rule:ev:duel^tiny",
+     "wave:evconvoy·fast^gilded+swift",
+     "wave:evbombers·elite^swift+armored",
+     "wave:evbombers·elite^armored+tiny",
+     "wave:evwalker^tiny",
+     "wave:evwalker^armored",
+     "wave:evwalker^armored+tiny",
+     "wave:evwalker^tiny+armored",
+     "wave:wave^lead+swift",
+     "wave:wave^lead+tiny",
+     "wave:wave^swift+armored",
+     "wave:evwalker·fast^gilded+swift",
+     "mini:HOPLITE|k7",
+     "wave:helix^swift+armored",
+     "wave:helix^swift+tiny",
+     "wave:evwalker·fast^lead+swift",
+     "wave:evsplit·elite^lead+swift",
+     "wave:evsplit·elite^gilded+swift",
+     "wave:evbombers^gilded",
+     "wave:evbombers^lead+swift",
+     "wave:evbombers^tiny",
+     "wave:evbombers^tiny+armored",
+     "wave:evconvoy·mirror^swift+armored",
+     "pick:pw:mag",
+     "wave:line^gilded+lead",
+     "wave:evwalker^gilded+swift",
+     "wave:evwalker^gilded",
+     "wave:evwalker^lead+swift",
+     "wave:evwalker^lead+gilded",
+     "pick:pw:bub",
+     "wave:wave^tiny+swift",
+     "wave:wave^tiny+armored",
+     "verb:phalanx_wall",
+     "verb:flank_shield"
+    ],
+    "jaccardPrev": 0.21,
+    "song": "athina+fever-128",
+    "bg": "ATHINA",
+    "plainShare": 0.36
+   },
+   "38": {
+    "mins": 1.5,
+    "tries": 1,
+    "cleared": true,
+    "enc": 33,
+    "enemyKinds": 16,
+    "enemyLooks": 34,
+    "waves": 23,
+    "shotSrc": 10,
+    "newThings": 18,
+    "newList": [
+     "rule:bumper",
+     "wave:evbombers·elite^lead+gilded",
+     "wave:evbombers·elite^tiny+armored",
+     "rule:ev:convoy^lead",
+     "wave:evsnipe^swift+armored",
+     "wave:cross^lead+gilded",
+     "wave:evheal·elite^swift+armored",
+     "wave:evheal·elite^gilded",
+     "wave:lattice",
+     "wave:lattice^lead+tiny",
+     "wave:evheal·mirror^lead",
+     "wave:hold^gilded",
+     "wave:hold^swift+tiny",
+     "wave:sig:STALL ROWS",
+     "wave:evrelay·mirror",
+     "set:evrelay·mirror",
+     "wave:evrelay·mirror^swift",
+     "wave:evrelay·mirror^tiny+swift"
+    ],
+    "jaccardPrev": 0.16,
+    "song": "athA",
+    "bg": "ATHINA",
+    "plainShare": 0.19
+   },
+   "39": {
+    "mins": 1.4,
+    "tries": 1,
+    "cleared": true,
+    "enc": 21,
+    "enemyKinds": 22,
+    "enemyLooks": 45,
+    "waves": 15,
+    "shotSrc": 13,
+    "newThings": 8,
+    "newList": [
+     "wave:stampede^swift",
+     "rule:bumper~tw",
+     "wave:evcargo·mirror^armored+tiny",
+     "wave:escort",
+     "wave:evcargo·mirror^gilded",
+     "wave:evlayer·elite^armored+tiny",
+     "wave:evlayer·elite^lead",
+     "wave:sig:OLIVE GROVE"
+    ],
+    "jaccardPrev": 0.3,
+    "song": "athina2+fever-128",
+    "bg": "ATHINA",
+    "plainShare": 0.3
+   },
+   "40": {
+    "mins": 7.6,
+    "tries": 3,
+    "cleared": false,
+    "enc": 43,
+    "enemyKinds": 15,
+    "enemyLooks": 48,
+    "waves": 28,
+    "shotSrc": 12,
+    "newThings": 27,
+    "newList": [
+     "rule:bumper+cover~tw",
+     "wave:noose",
+     "wave:sig:BRONZE DAWN",
+     "boss:TALOS|k6",
+     "verb:stomp",
+     "wave:evlanterns·fast^lead+swift",
+     "wave:zigzag^swift+tiny",
+     "wave:zigzag^tiny+armored",
+     "wave:evdoor·mirror^gilded+swift",
+     "wave:evlanterns·fast^gilded+swift",
+     "wave:tide^tiny+swift",
+     "wave:evsway^tiny+armored",
+     "wave:evbracket·mirror^lead",
+     "rule:ev:duel^armored",
+     "wave:evlanterns^lead+tiny",
+     "verb:spear_throw",
+     "wave:zigzag^tiny+swift",
+     "wave:evdoor·mirror^tiny+swift",
+     "wave:evlanterns·fast^armored+swift",
+     "wave:tide^armored",
+     "rule:unlock:combo-gilded-tiny",
+     "wave:evsway^gilded+swift",
+     "wave:swoop^lead+swift",
+     "wave:evdoor·elite^lead",
+     "wave:evlanterns^lead+gilded",
+     "verb:heat_vent",
+     "shot:fk_bait"
+    ],
+    "jaccardPrev": 0.2,
+    "song": "athB+boss3",
+    "bg": "ATHINA",
+    "plainShare": 0.19
+   },
+   "41": {
+    "mins": 4.4,
+    "tries": 3,
+    "cleared": false,
+    "enc": 98,
+    "enemyKinds": 11,
+    "enemyLooks": 51,
+    "waves": 84,
+    "shotSrc": 10,
+    "newThings": 70,
+    "newList": [
+     "wave:turrets^lead+swift",
+     "wave:turrets^lead+gilded",
+     "rule:hulls",
+     "wave:turrets^tiny",
+     "wave:evbracket·fast^armored",
+     "wave:evbracket·fast^gilded",
+     "wave:evgrid·elite^lead",
+     "wave:evgrid·elite^lead+swift",
+     "wave:evgrid·elite^lead+gilded",
+     "wave:evwindow^armored",
+     "wave:evwindow^swift",
+     "wave:evwindow^gilded",
+     "wave:cross^gilded+tiny",
+     "wave:cross^lead+swift",
+     "wave:cross^gilded+swift",
+     "wave:evtline·fast^swift",
+     "wave:gunship^gilded+swift",
+     "wave:gunship^lead+gilded",
+     "wave:gunship^tiny",
+     "wave:gunship^swift+armored",
+     "wave:orbit^tiny",
+     "wave:orbit^armored+tiny",
+     "wave:orbit^tiny+armored",
+     "wave:sig:GLASS CORRIDOR",
+     "wave:turrets^lead+tiny",
+     "wave:turrets^gilded+swift",
+     "wave:turrets^swift+armored",
+     "wave:turrets^armored",
+     "wave:evbracket·fast^tiny+armored",
+     "wave:evbracket·fast^lead+tiny",
+     "wave:evbracket·fast^gilded+lead",
+     "wave:evbracket·fast^gilded+swift",
+     "wave:evgrid·elite^lead+tiny",
+     "wave:evgrid·elite^gilded+swift",
+     "wave:evgrid·elite^armored+tiny",
+     "wave:evgrid·elite^tiny+armored",
+     "wave:gunship^gilded+lead",
+     "wave:gunship^lead+swift",
+     "wave:gunship^gilded+tiny",
+     "wave:evtline·mirror^gilded+tiny",
+     "wave:evtline·mirror^lead+tiny",
+     "wave:evtline·mirror^armored",
+     "wave:turrets^gilded+lead",
+     "wave:turrets^lead",
+     "wave:turrets^swift+tiny",
+     "wave:turrets^armored+swift",
+     "wave:evbracket·fast^armored+tiny",
+     "wave:evbracket·fast^lead+swift",
+     "wave:evbracket·fast^armored+swift",
+     "wave:evbracket·fast^tiny",
+     "wave:evgrid·elite^swift+armored",
+     "wave:evgrid·elite^armored",
+     "wave:evgrid·elite^gilded+lead",
+     "wave:evgrid·elite^gilded+tiny",
+     "wave:box^armored+tiny",
+     "wave:box^lead+tiny",
+     "wave:evtline·mirror^gilded",
+     "wave:evtline·mirror^gilded+lead",
+     "wave:evtline·mirror^gilded+swift",
+     "wave:evtline·mirror^swift+tiny",
+     "wave:evwindow·elite^swift+tiny",
+     "wave:evwindow·elite^swift+armored",
+     "wave:evwindow·elite^gilded+tiny",
+     "wave:orbit^lead+swift",
+     "wave:orbit^armored+swift",
+     "wave:orbit^swift",
+     "wave:orbit^gilded+tiny",
+     "wave:gunship^armored",
+     "wave:gunship^armored+tiny",
+     "wave:gunship^lead"
+    ],
+    "jaccardPrev": 0.08,
+    "song": "endless",
+    "bg": "BANKENVIERTEL",
+    "plainShare": 0.45
+   },
+   "42": {
+    "mins": 5.2,
+    "tries": 3,
+    "cleared": false,
+    "enc": 86,
+    "enemyKinds": 11,
+    "enemyLooks": 50,
+    "waves": 73,
+    "shotSrc": 9,
+    "newThings": 68,
+    "newList": [
+     "wave:zigzag^armored+swift",
+     "rule:hulls~tw",
+     "wave:evwindow·elite^gilded+swift",
+     "wave:evguard^armored",
+     "rule:epoch:7:nv-skin-base",
+     "rule:ev:convoy^armored",
+     "wave:orbit^gilded+lead",
+     "wave:evstation·elite^swift+lead",
+     "wave:sig:FERRY WAKE",
+     "wave:pillars",
+     "wave:pillars^armored+tiny",
+     "wave:evwindow·elite^armored+swift",
+     "wave:evguard^armored+tiny",
+     "wave:orbit^lead",
+     "wave:orbit^lead+tiny",
+     "wave:evshieldv·fast^lead+swift",
+     "wave:evshieldv·fast^lead",
+     "wave:evstation·elite^gilded",
+     "wave:geyser^lead+gilded",
+     "wave:hold^tiny+armored",
+     "wave:hold^lead+gilded",
+     "wave:braid^swift+armored",
+     "wave:evwindow·elite^lead+swift",
+     "wave:evguard^lead+tiny",
+     "wave:orbit^armored",
+     "wave:orbit^tiny+swift",
+     "wave:evshieldv·fast^gilded+swift",
+     "wave:evstation·elite^tiny+armored",
+     "wave:geyser^swift+lead",
+     "wave:hold^tiny+swift",
+     "wave:hold^gilded+tiny",
+     "wave:slalom^tiny+armored",
+     "wave:slalom^lead",
+     "wave:evwindow·elite^gilded+lead",
+     "wave:evguard^gilded+tiny",
+     "wave:orbit^swift+armored",
+     "wave:orbit^gilded+swift",
+     "wave:evshieldv·fast^lead+tiny",
+     "wave:evshieldv·fast^gilded+tiny",
+     "wave:evstation·elite^swift",
+     "wave:geyser^swift+armored",
+     "wave:geyser^lead+swift",
+     "wave:hold^swift+armored",
+     "wave:bounce^gilded+swift",
+     "wave:evwindow·elite^tiny",
+     "wave:evguard^tiny+armored",
+     "wave:evguard^swift+armored",
+     "wave:orbit^swift+lead",
+     "wave:evshieldv·fast^swift+lead",
+     "wave:evstation·elite^gilded+lead",
+     "wave:evstation·elite^tiny",
+     "wave:hold^tiny",
+     "rule:unlock:combo-armored-lead",
+     "wave:slalom^armored+tiny",
+     "wave:slalom^gilded+tiny",
+     "wave:evwindow·elite^swift",
+     "wave:evguard^swift+lead",
+     "wave:evguard^tiny+swift",
+     "wave:orbit^armored+lead",
+     "wave:orbit^lead+gilded",
+     "wave:evshieldv·fast^armored+tiny",
+     "wave:evshieldv·fast^swift+armored",
+     "wave:evstation·elite^swift+tiny",
+     "wave:noose^swift+lead",
+     "wave:hold^armored+tiny",
+     "wave:hold^armored+lead",
+     "wave:slalom^gilded+swift",
+     "shot:swarm*"
+    ],
+    "jaccardPrev": 0.07,
+    "song": "stage1+fever-128",
+    "bg": "MAINUFER",
+    "plainShare": 0.23
+   },
+   "43": {
+    "mins": 1.6,
+    "tries": 1,
+    "cleared": true,
+    "enc": 37,
+    "enemyKinds": 10,
+    "enemyLooks": 41,
+    "waves": 32,
+    "shotSrc": 8,
+    "newThings": 25,
+    "newList": [
+     "wave:bait^swift+lead",
+     "wave:bait^armored+tiny",
+     "rule:hulls+bumper~tw",
+     "wave:bait^tiny",
+     "wave:evstation^gilded+swift",
+     "wave:evstation^lead+swift",
+     "wave:evfunnel·mirror^gilded+lead",
+     "wave:evdive·fast^gilded+tiny",
+     "wave:evdive·fast^armored+swift",
+     "wave:arrow^gilded+tiny",
+     "wave:arrow^swift+lead",
+     "wave:arrow^armored",
+     "wave:arrow^tiny+swift",
+     "wave:cross^armored+lead",
+     "wave:cross^swift+lead",
+     "wave:crossX^armored+lead",
+     "wave:crossX^swift+armored",
+     "wave:hold^lead+tiny",
+     "wave:hold^gilded+lead",
+     "wave:hold^gilded+swift",
+     "wave:hold^swift+lead",
+     "wave:sig:RAIL RHYTHM",
+     "wave:evmines^gilded+tiny",
+     "wave:evmines^lead+tiny",
+     "wave:evmines^lead+gilded"
+    ],
+    "jaccardPrev": 0.11,
+    "song": "stage2+fever-132",
+    "bg": "OSTEND",
+    "plainShare": 0.57
+   },
+   "44": {
+    "mins": 2.3,
+    "tries": 1,
+    "cleared": true,
+    "enc": 56,
+    "enemyKinds": 17,
+    "enemyLooks": 48,
+    "waves": 47,
+    "shotSrc": 11,
+    "newThings": 38,
+    "newList": [
+     "wave:echo^swift",
+     "wave:echo^swift+lead",
+     "rule:pads",
+     "wave:evmines·mirror^tiny",
+     "wave:evmines·mirror^lead+tiny",
+     "wave:evtank·fast^lead+tiny",
+     "wave:evtank·fast^armored",
+     "wave:scissors^armored+swift",
+     "wave:scissors^gilded+swift",
+     "wave:evwalker^lead+tiny",
+     "wave:evwalker^swift",
+     "wave:evram·mirror^lead+tiny",
+     "wave:evram·mirror^tiny",
+     "wave:evram·mirror^gilded+tiny",
+     "wave:helix^swift+lead",
+     "wave:helix^lead+swift",
+     "wave:hold^lead+swift",
+     "wave:sig:TRADE RUSH",
+     "wave:echo^armored+tiny",
+     "wave:echo^lead+tiny",
+     "wave:evmines·mirror^gilded+swift",
+     "wave:evmines·mirror^armored+tiny",
+     "wave:evmines·mirror^gilded+lead",
+     "wave:evtank·fast^armored+lead",
+     "wave:evtank·fast^tiny+armored",
+     "wave:scissors^swift",
+     "wave:scissors^tiny+swift",
+     "wave:scissors^gilded+tiny",
+     "wave:scissors^lead+tiny",
+     "wave:evwalker^armored+swift",
+     "wave:evwalker^gilded+tiny",
+     "wave:evwalker^armored+lead",
+     "wave:evram·mirror^lead",
+     "wave:evram·mirror^lead+swift",
+     "wave:evram·mirror^lead+gilded",
+     "wave:helix^lead+tiny",
+     "wave:helix^armored+swift",
+     "wave:helix^armored+lead"
+    ],
+    "jaccardPrev": 0.16,
+    "song": "stage3",
+    "bg": "MESSE",
+    "plainShare": 0.35
+   },
+   "45": {
+    "mins": 5.8,
+    "tries": 3,
+    "cleared": false,
+    "enc": 121,
+    "enemyKinds": 15,
+    "enemyLooks": 73,
+    "waves": 104,
+    "shotSrc": 12,
+    "newThings": 84,
+    "newList": [
+     "wave:kamikaze^gilded+tiny",
+     "wave:kamikaze^swift+armored",
+     "rule:pads~tw",
+     "wave:kamikaze^lead+gilded",
+     "wave:kamikaze^tiny+swift",
+     "wave:evwalker·fast^swift+lead",
+     "wave:evwalker·fast^armored+lead",
+     "wave:evwalker·fast^gilded+tiny",
+     "wave:evconvoy·elite^gilded+tiny",
+     "wave:evconvoy·elite^armored+swift",
+     "wave:evconvoy·elite^lead+tiny",
+     "wave:evconvoy·elite^lead+swift",
+     "wave:lattice^swift+lead",
+     "wave:lattice^gilded+lead",
+     "wave:lattice^lead+swift",
+     "wave:lattice^tiny",
+     "wave:stairs^lead+swift",
+     "wave:stairs^gilded+lead",
+     "wave:stairs^gilded+tiny",
+     "wave:stairs^armored+tiny",
+     "rule:ev:duel^gilded",
+     "wave:evbombers·fast^swift",
+     "wave:evbombers·fast^gilded+tiny",
+     "wave:evbombers·fast^tiny+armored",
+     "wave:evbombers·fast^lead",
+     "wave:evbombers·fast^lead+tiny",
+     "wave:pulse^lead+swift",
+     "wave:pulse^gilded",
+     "wave:pulse^lead+tiny",
+     "wave:stampede^swift+armored",
+     "wave:stampede^armored+tiny",
+     "wave:stampede^armored+lead",
+     "wave:stampede^swift+tiny",
+     "wave:phalanx^swift",
+     "wave:phalanx^swift+lead",
+     "wave:phalanx^tiny",
+     "wave:stairs^tiny",
+     "wave:stairs^swift+lead",
+     "wave:stairs^swift+armored",
+     "wave:stairs^gilded+swift",
+     "wave:stairs^lead",
+     "wave:stairs^lead+tiny",
+     "wave:comet",
+     "wave:comet^lead",
+     "wave:comet^swift",
+     "wave:comet^armored",
+     "wave:comet^gilded",
+     "wave:evbombers·fast^swift+lead",
+     "wave:evbombers·fast^gilded",
+     "wave:evbombers·fast^lead+gilded",
+     "wave:evbombers·fast^gilded+lead",
+     "wave:evbombers·fast^gilded+swift",
+     "wave:evconvoy·elite^swift+armored",
+     "wave:evconvoy·elite^tiny",
+     "wave:stampede^tiny+armored",
+     "wave:stampede^swift+lead",
+     "wave:stampede^lead+tiny",
+     "wave:stampede^lead+gilded",
+     "wave:stampede^gilded+lead",
+     "wave:pulse^swift+armored",
+     "wave:pulse^armored",
+     "wave:pulse^armored+tiny",
+     "wave:pulse^gilded+tiny",
+     "wave:evbombers^gilded+lead",
+     "wave:evbombers^lead+tiny",
+     "wave:evbombers^armored+tiny",
+     "wave:evbombers^tiny+swift",
+     "wave:crossX^gilded+swift",
+     "wave:crossX^lead+tiny",
+     "wave:crossX^swift+lead",
+     "wave:crossX^lead",
+     "wave:crossX^gilded+tiny",
+     "wave:evconvoy·fast^lead+swift",
+     "wave:evconvoy·fast^armored+tiny",
+     "wave:evconvoy·fast^swift+lead",
+     "wave:evconvoy·fast^armored+lead",
+     "wave:testudo",
+     "wave:testudo^gilded+lead",
+     "wave:testudo^swift+lead",
+     "wave:bounce^armored+tiny",
+     "wave:bounce^lead+swift",
+     "wave:sig:MARBLE ECHO",
+     "wave:evsplit·fast^swift+armored",
+     "wave:evsplit·fast^lead+gilded"
+    ],
+    "jaccardPrev": 0.14,
+    "song": "athina+fever-128+menu",
+    "bg": "ATHINA",
+    "plainShare": 0.49
+   }
+  },
+  "jaccardMedian": 0.2,
+  "jaccardMean": 0.2,
+  "stagesWithZeroNew": 0,
+  "firstSeen": [
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "enemy:drone*",
+    0
+   ],
+   [
+    "wave:vee",
+    0
+   ],
+   [
+    "pick:up",
+    0.07
+   ],
+   [
+    "wave:evdoor",
+    0.22
+   ],
+   [
+    "pick:pw:drop",
+    0.28
+   ],
+   [
+    "set:supply",
+    0.35
+   ],
+   [
+    "wave:stutter",
+    0.44
+   ],
+   [
+    "pick:emp",
+    0.64
+   ],
+   [
+    "pick:pw:bubble",
+    0.8
+   ],
+   [
+    "set:gust",
+    0.91
+   ],
+   [
+    "pick:pw:chord",
+    1.03
+   ],
+   [
+    "wave:sig:COURIER LIGHTS",
+    1.23
+   ],
+   [
+    "set:sig:COURIER LIGHTS",
+    1.23
+   ],
+   [
+    "pick:pw:echo",
+    1.34
+   ],
+   [
+    "wave:wave",
+    1.37
+   ],
+   [
+    "rule:well",
+    1.55
+   ],
+   [
+    "enemy:fk_diver",
+    1.7
+   ],
+   [
+    "pick:pw:empr",
+    1.74
+   ],
+   [
+    "wave:echo",
+    1.91
+   ],
+   [
+    "set:blackout",
+    1.91
+   ],
+   [
+    "pick:pw:slow",
+    2.22
+   ],
+   [
+    "pick:pw:drum",
+    2.35
+   ],
+   [
+    "pick:pw:lance",
+    2.65
+   ],
+   [
+    "wave:hold",
+    2.68
+   ],
+   [
+    "wave:sig:PATROL GRID",
+    2.77
+   ],
+   [
+    "enemy:turret",
+    2.83
+   ],
+   [
+    "set:sig:PATROL GRID",
+    2.83
+   ],
+   [
+    "set:lane",
+    2.87
+   ],
+   [
+    "enemy:flank",
+    3
+   ],
+   [
+    "wave:bounce",
+    3
+   ],
+   [
+    "enemy:mine",
+    3.06
+   ],
+   [
+    "rule:well~tw",
+    3.1
+   ],
+   [
+    "pick:pw:stasis",
+    3.26
+   ],
+   [
+    "wave:stairs",
+    3.44
+   ],
+   [
+    "pick:pw:splint",
+    3.51
+   ],
+   [
+    "pick:pw:ric",
+    4.08
+   ],
+   [
+    "wave:sig:WINDOW DISPLAY",
+    4.31
+   ],
+   [
+    "set:sig:WINDOW DISPLAY",
+    4.31
+   ],
+   [
+    "enemy:gturret",
+    4.34
+   ],
+   [
+    "set:weave",
+    4.47
+   ],
+   [
+    "wave:stampede",
+    4.52
+   ],
+   [
+    "enemy:charger",
+    4.53
+   ],
+   [
+    "enemy:charger*",
+    4.54
+   ],
+   [
+    "enemy:shielder",
+    4.64
+   ],
+   [
+    "wave:evstation",
+    4.64
+   ],
+   [
+    "set:evstation",
+    4.64
+   ],
+   [
+    "enemy:swarm",
+    4.88
+   ],
+   [
+    "wave:bloom",
+    4.97
+   ],
+   [
+    "rule:ev:rest",
+    5.01
+   ],
+   [
+    "wave:fan",
+    5.38
+   ],
+   [
+    "pick:pw:nova",
+    5.41
+   ],
+   [
+    "wave:shieldwall",
+    5.63
+   ],
+   [
+    "wave:swoop",
+    5.67
+   ],
+   [
+    "wave:sig:GUARD CHANGE",
+    5.91
+   ],
+   [
+    "set:sig:GUARD CHANGE",
+    5.91
+   ],
+   [
+    "wave:turrets",
+    6.03
+   ],
+   [
+    "enemy:flank*",
+    6.05
+   ],
+   [
+    "rule:lane",
+    6.15
+   ],
+   [
+    "pick:pw:zone",
+    6.27
+   ],
+   [
+    "wave:evfunnel",
+    6.28
+   ],
+   [
+    "set:evfunnel",
+    6.28
+   ],
+   [
+    "pick:pw:magb",
+    6.44
+   ],
+   [
+    "wave:evgrid",
+    6.5
+   ],
+   [
+    "set:evgrid",
+    6.5
+   ],
+   [
+    "enemy:turret*",
+    6.55
+   ],
+   [
+    "pick:pw:bomb",
+    6.67
+   ],
+   [
+    "wave:evwindow",
+    6.82
+   ],
+   [
+    "set:evwindow",
+    6.82
+   ],
+   [
+    "set:hail",
+    7
+   ],
+   [
+    "wave:cross",
+    7.06
+   ],
+   [
+    "wave:evtline",
+    7.28
+   ],
+   [
+    "set:evtline",
+    7.28
+   ],
+   [
+    "pick:pw:dashr",
+    7.29
+   ],
+   [
+    "wave:sweep",
+    7.41
+   ],
+   [
+    "wave:sig:VAULT ALARM",
+    7.64
+   ],
+   [
+    "pick:pw:crate",
+    7.95
+   ],
+   [
+    "mini:TRESOR-WART|k5",
+    8.09
+   ],
+   [
+    "verb:bar_curtain",
+    8.09
+   ],
+   [
+    "verb:rain_lane",
+    8.1
+   ],
+   [
+    "verb:lob",
+    8.28
+   ],
+   [
+    "verb:vault_doors",
+    8.54
+   ],
+   [
+    "pick:hp",
+    8.54
+   ],
+   [
+    "wave:bait",
+    8.55
+   ],
+   [
+    "pick:pw:gwell",
+    8.9
+   ],
+   [
+    "wave:box",
+    9.16
+   ],
+   [
+    "wave:box^swift",
+    9.21
+   ],
+   [
+    "set:drop",
+    9.75
+   ],
+   [
+    "drop:hit",
+    9.79
+   ],
+   [
+    "rule:ev:ambush",
+    10.02
+   ],
+   [
+    "fence:fence",
+    10.28
+   ],
+   [
+    "set:fence",
+    10.28
+   ],
+   [
+    "wave:evfunnel^swift",
+    11.16
+   ],
+   [
+    "wave:evgrid^armored",
+    11.52
+   ],
+   [
+    "rule:unlock:tw-gilded",
+    12.02
+   ],
+   [
+    "pick:pw:slice",
+    12.32
+   ],
+   [
+    "wave:evfunnel^armored",
+    12.39
+   ],
+   [
+    "set:gaterun",
+    12.67
+   ],
+   [
+    "wave:stutter^armored",
+    12.79
+   ],
+   [
+    "verb:minefield",
+    13.5
+   ],
+   [
+    "verb:vault_lock",
+    13.54
+   ],
+   [
+    "verb:split_shot",
+    13.58
+   ],
+   [
+    "verb:shockwave",
+    13.99
+   ],
+   [
+    "enemy:gate",
+    14.25
+   ],
+   [
+    "wave:gates",
+    14.25
+   ],
+   [
+    "enemy:einterceptor",
+    14.31
+   ],
+   [
+    "rule:lane~tw",
+    14.35
+   ],
+   [
+    "wave:evdive·elite",
+    14.4
+   ],
+   [
+    "wave:evmines",
+    14.56
+   ],
+   [
+    "set:evmines",
+    14.56
+   ],
+   [
+    "wave:evmines^armored",
+    14.62
+   ],
+   [
+    "pick:pw:leech",
+    14.64
+   ],
+   [
+    "set:rescue",
+    14.65
+   ],
+   [
+    "wave:bounce^armored",
+    14.74
+   ],
+   [
+    "wave:evgrid·fast",
+    14.8
+   ],
+   [
+    "set:evgrid·fast",
+    14.8
+   ],
+   [
+    "wave:evgrid·elite",
+    14.93
+   ],
+   [
+    "set:evgrid·elite",
+    14.93
+   ],
+   [
+    "rule:ev:convoy",
+    15.03
+   ],
+   [
+    "enemy:fk_crawler",
+    15.05
+   ],
+   [
+    "wave:tide",
+    15.1
+   ],
+   [
+    "wave:tide^swift",
+    15.14
+   ],
+   [
+    "wave:evmines·mirror",
+    15.2
+   ],
+   [
+    "set:evmines·mirror",
+    15.2
+   ],
+   [
+    "wave:evtline·fast",
+    15.31
+   ],
+   [
+    "set:evtline·fast",
+    15.31
+   ],
+   [
+    "wave:hold^armored",
+    15.48
+   ],
+   [
+    "wave:sig:CONVOY AMBUSH",
+    15.54
+   ],
+   [
+    "wave:evdive·mirror",
+    15.66
+   ],
+   [
+    "wave:evdive·mirror^gilded",
+    15.79
+   ],
+   [
+    "wave:crossX",
+    15.8
+   ],
+   [
+    "wave:crossX^armored",
+    15.87
+   ],
+   [
+    "rule:lane+well~tw",
+    15.9
+   ],
+   [
+    "wave:evram",
+    15.93
+   ],
+   [
+    "set:evram",
+    15.93
+   ],
+   [
+    "wave:evwindow·mirror",
+    16.05
+   ],
+   [
+    "set:evwindow·mirror",
+    16.05
+   ],
+   [
+    "wave:evwindow·mirror^armored",
+    16.09
+   ],
+   [
+    "pick:pw:ovd",
+    16.11
+   ],
+   [
+    "wave:evwindow·mirror^swift",
+    16.15
+   ],
+   [
+    "wave:meteors",
+    16.18
+   ],
+   [
+    "wave:meteors^armored",
+    16.24
+   ],
+   [
+    "wave:evshieldv·elite",
+    16.3
+   ],
+   [
+    "set:evshieldv·elite",
+    16.3
+   ],
+   [
+    "wave:evshieldv·elite^swift",
+    16.4
+   ],
+   [
+    "wave:evguard·mirror",
+    16.56
+   ],
+   [
+    "set:evguard·mirror",
+    16.56
+   ],
+   [
+    "wave:burst",
+    16.74
+   ],
+   [
+    "pick:pw:cres",
+    16.8
+   ],
+   [
+    "wave:evwindow·elite",
+    16.83
+   ],
+   [
+    "set:evwindow·elite",
+    16.83
+   ],
+   [
+    "wave:line",
+    16.95
+   ],
+   [
+    "wave:sig:GLASS ELEVATOR",
+    17.08
+   ],
+   [
+    "wave:evguard·fast",
+    17.2
+   ],
+   [
+    "set:evguard·fast",
+    17.2
+   ],
+   [
+    "wave:evguard·fast^armored",
+    17.27
+   ],
+   [
+    "enemy:gwalker",
+    17.41
+   ],
+   [
+    "wave:evwalker·mirror",
+    17.41
+   ],
+   [
+    "set:evwalker·mirror",
+    17.41
+   ],
+   [
+    "rule:echo",
+    17.43
+   ],
+   [
+    "wave:evwalker·mirror^swift",
+    17.45
+   ],
+   [
+    "wave:evshieldv·fast",
+    17.53
+   ],
+   [
+    "set:evshieldv·fast",
+    17.53
+   ],
+   [
+    "wave:arrow",
+    17.61
+   ],
+   [
+    "wave:evfunnel·mirror",
+    17.77
+   ],
+   [
+    "set:evfunnel·mirror",
+    17.77
+   ],
+   [
+    "wave:evwalker·elite",
+    17.9
+   ],
+   [
+    "set:evwalker·elite",
+    17.9
+   ],
+   [
+    "wave:evshieldv",
+    17.98
+   ],
+   [
+    "set:evshieldv",
+    17.98
+   ],
+   [
+    "wave:sig:SIREN CHASE",
+    18.06
+   ],
+   [
+    "wave:evwalker·mirror^gilded",
+    18.14
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    18.22
+   ],
+   [
+    "verb:tri_burst",
+    18.22
+   ],
+   [
+    "verb:homing_orb",
+    18.22
+   ],
+   [
+    "verb:laser_sweep",
+    18.4
+   ],
+   [
+    "verb:siren_ram",
+    18.65
+   ],
+   [
+    "verb:echo",
+    18.73
+   ],
+   [
+    "verb:backup_cores",
+    18.78
+   ],
+   [
+    "verb:track_beam",
+    18.82
+   ],
+   [
+    "enemy:fk_bait",
+    18.89
+   ],
+   [
+    "verb:bullet_time",
+    19.2
+   ],
+   [
+    "wave:evwalker·mirror^armored",
+    19.34
+   ],
+   [
+    "wave:evshieldv·fast^swift",
+    19.46
+   ],
+   [
+    "wave:helix",
+    19.79
+   ],
+   [
+    "wave:evshieldv^gilded",
+    19.91
+   ],
+   [
+    "pick:pw:hornet",
+    19.99
+   ],
+   [
+    "rule:epoch:1:nv-skin-tri",
+    20.03
+   ],
+   [
+    "rule:ev:convoy^swift",
+    20.03
+   ],
+   [
+    "wave:evwalker·mirror^swift+tiny",
+    20.09
+   ],
+   [
+    "wave:evshieldv·fast^swift+tiny",
+    21.15
+   ],
+   [
+    "wave:fan^swift",
+    21.23
+   ],
+   [
+    "set:turrets",
+    21.31
+   ],
+   [
+    "wave:evfunnel·mirror^armored",
+    21.39
+   ],
+   [
+    "wave:evwalker·elite^gilded",
+    21.52
+   ],
+   [
+    "wave:box^swift+tiny",
+    23.57
+   ],
+   [
+    "rule:echo~tw",
+    23.58
+   ],
+   [
+    "enemy:splitter",
+    23.63
+   ],
+   [
+    "wave:evsplit·fast",
+    23.63
+   ],
+   [
+    "set:evsplit·fast",
+    23.63
+   ],
+   [
+    "enemy:zdrn",
+    23.68
+   ],
+   [
+    "wave:evsplit·fast^swift+tiny",
+    23.75
+   ],
+   [
+    "wave:evfunnel·elite",
+    23.8
+   ],
+   [
+    "set:evfunnel·elite",
+    23.8
+   ],
+   [
+    "wave:cross^swift",
+    23.94
+   ],
+   [
+    "wave:cross^swift+tiny",
+    23.98
+   ],
+   [
+    "rule:unlock:ev-rush",
+    24.04
+   ],
+   [
+    "wave:evdive·mirror^swift",
+    24.1
+   ],
+   [
+    "wave:swoop^swift",
+    24.22
+   ],
+   [
+    "wave:evfunnel·elite^armored",
+    24.27
+   ],
+   [
+    "wave:evmines^swift",
+    24.45
+   ],
+   [
+    "wave:evsplit·mirror",
+    24.51
+   ],
+   [
+    "set:evsplit·mirror",
+    24.51
+   ],
+   [
+    "wave:evsplit·mirror^armored",
+    24.57
+   ],
+   [
+    "wave:evsplit·mirror^swift",
+    24.6
+   ],
+   [
+    "wave:hold^swift",
+    24.72
+   ],
+   [
+    "wave:sig:RIVER LANTERNS",
+    24.77
+   ],
+   [
+    "wave:evdive",
+    24.89
+   ],
+   [
+    "wave:evdive^armored",
+    24.95
+   ],
+   [
+    "wave:evdive^swift+tiny",
+    25.01
+   ],
+   [
+    "rule:ev:rush",
+    25.05
+   ],
+   [
+    "enemy:gunship",
+    25.07
+   ],
+   [
+    "wave:braid",
+    25.11
+   ],
+   [
+    "rule:echo+lane~tw",
+    25.12
+   ],
+   [
+    "wave:evconvoy·elite",
+    25.16
+   ],
+   [
+    "set:evconvoy·elite",
+    25.16
+   ],
+   [
+    "wave:evconvoy·elite^swift+tiny",
+    25.25
+   ],
+   [
+    "wave:orbit",
+    25.43
+   ],
+   [
+    "wave:orbit^gilded",
+    25.51
+   ],
+   [
+    "wave:evtank·fast",
+    25.6
+   ],
+   [
+    "set:evtank·fast",
+    25.6
+   ],
+   [
+    "wave:evram·elite",
+    25.69
+   ],
+   [
+    "set:evram·elite",
+    25.69
+   ],
+   [
+    "wave:evram·elite^swift+tiny",
+    25.78
+   ],
+   [
+    "wave:evmines^gilded",
+    25.87
+   ],
+   [
+    "wave:evmines^swift+tiny",
+    25.91
+   ],
+   [
+    "wave:evtank·mirror",
+    26
+   ],
+   [
+    "set:evtank·mirror",
+    26
+   ],
+   [
+    "wave:evconvoy·fast",
+    26.08
+   ],
+   [
+    "set:evconvoy·fast",
+    26.08
+   ],
+   [
+    "wave:bounce^swift+tiny",
+    26.2
+   ],
+   [
+    "wave:sig:BRIDGE STRAIN",
+    26.22
+   ],
+   [
+    "wave:gunship",
+    26.35
+   ],
+   [
+    "pick:pw:tempo",
+    26.41
+   ],
+   [
+    "wave:crossX^gilded",
+    26.52
+   ],
+   [
+    "rule:gold",
+    26.53
+   ],
+   [
+    "wave:evbombers",
+    26.59
+   ],
+   [
+    "set:evbombers",
+    26.59
+   ],
+   [
+    "wave:evbombers^armored",
+    26.65
+   ],
+   [
+    "wave:evram·mirror",
+    26.71
+   ],
+   [
+    "set:evram·mirror",
+    26.71
+   ],
+   [
+    "wave:evram·mirror^swift+tiny",
+    26.77
+   ],
+   [
+    "wave:fan^armored",
+    26.9
+   ],
+   [
+    "enemy:bomber",
+    26.96
+   ],
+   [
+    "wave:bomberrun",
+    26.96
+   ],
+   [
+    "enemy:ebomber",
+    27.02
+   ],
+   [
+    "wave:evram^armored",
+    27.15
+   ],
+   [
+    "pick:pw:decoy",
+    27.21
+   ],
+   [
+    "wave:evsplit·fast^armored",
+    27.34
+   ],
+   [
+    "wave:evsplit·fast^gilded",
+    27.4
+   ],
+   [
+    "wave:box^armored",
+    27.52
+   ],
+   [
+    "wave:line^swift+tiny",
+    27.68
+   ],
+   [
+    "wave:line^gilded",
+    27.74
+   ],
+   [
+    "wave:sig:MARKET BELLS",
+    27.81
+   ],
+   [
+    "wave:evbombers·elite",
+    27.93
+   ],
+   [
+    "set:evbombers·elite",
+    27.93
+   ],
+   [
+    "wave:vee^swift+tiny",
+    28.05
+   ],
+   [
+    "rule:gold~tw",
+    28.08
+   ],
+   [
+    "wave:vee^armored",
+    28.09
+   ],
+   [
+    "enemy:gtank",
+    28.16
+   ],
+   [
+    "wave:evconvoy·mirror",
+    28.16
+   ],
+   [
+    "set:evconvoy·mirror",
+    28.16
+   ],
+   [
+    "wave:evconvoy·mirror^gilded",
+    28.23
+   ],
+   [
+    "wave:evbombers·fast",
+    28.31
+   ],
+   [
+    "set:evbombers·fast",
+    28.31
+   ],
+   [
+    "wave:pincer",
+    28.38
+   ],
+   [
+    "wave:pincer^gilded",
+    28.45
+   ],
+   [
+    "wave:evdoor^swift",
+    28.58
+   ],
+   [
+    "wave:evconvoy·mirror^armored",
+    28.71
+   ],
+   [
+    "wave:evlanterns·fast",
+    28.78
+   ],
+   [
+    "set:evlanterns·fast",
+    28.78
+   ],
+   [
+    "wave:evlanterns·fast^gilded",
+    28.81
+   ],
+   [
+    "wave:evbombers·elite^armored",
+    28.87
+   ],
+   [
+    "wave:evbombers·elite^gilded",
+    28.93
+   ],
+   [
+    "wave:spiral",
+    28.98
+   ],
+   [
+    "wave:spiral^armored",
+    29.03
+   ],
+   [
+    "wave:bounce^gilded",
+    29.11
+   ],
+   [
+    "wave:bounce^swift",
+    29.18
+   ],
+   [
+    "wave:sig:BOW WAVE",
+    29.25
+   ],
+   [
+    "rule:gold+echo~tw",
+    29.57
+   ],
+   [
+    "wave:evlanterns·fast^swift+tiny",
+    29.72
+   ],
+   [
+    "wave:evlanterns·fast^armored",
+    29.79
+   ],
+   [
+    "wave:evlanterns·fast^swift",
+    29.85
+   ],
+   [
+    "wave:evsway·elite",
+    29.91
+   ],
+   [
+    "set:evsway·elite",
+    29.91
+   ],
+   [
+    "wave:evsway·elite^swift",
+    29.95
+   ],
+   [
+    "wave:evsway·elite^gilded",
+    30.05
+   ],
+   [
+    "rule:ev:ambush^gilded",
+    30.06
+   ],
+   [
+    "wave:evsway·elite^swift+tiny",
+    30.07
+   ],
+   [
+    "wave:evgrid^swift",
+    30.23
+   ],
+   [
+    "wave:evgrid^swift+tiny",
+    30.25
+   ],
+   [
+    "wave:evgrid^gilded",
+    30.29
+   ],
+   [
+    "wave:evbracket·mirror",
+    30.42
+   ],
+   [
+    "wave:geyser",
+    30.55
+   ],
+   [
+    "wave:geyser^armored",
+    30.61
+   ],
+   [
+    "wave:evlanterns·elite",
+    30.68
+   ],
+   [
+    "set:evlanterns·elite",
+    30.68
+   ],
+   [
+    "wave:evlanterns·elite^armored",
+    30.74
+   ],
+   [
+    "wave:evlanterns·elite^swift+tiny",
+    30.8
+   ],
+   [
+    "wave:cross^gilded",
+    30.93
+   ],
+   [
+    "wave:cross^armored",
+    30.96
+   ],
+   [
+    "pick:pw:glass",
+    30.98
+   ],
+   [
+    "wave:sig:OLD STONES",
+    31.15
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    31.56
+   ],
+   [
+    "verb:bounce_orbs",
+    31.56
+   ],
+   [
+    "verb:g_charge",
+    31.68
+   ],
+   [
+    "verb:lane_wall",
+    31.75
+   ],
+   [
+    "wave:chargers",
+    33.1
+   ],
+   [
+    "wave:chargers^swift+tiny",
+    33.17
+   ],
+   [
+    "wave:chargers^armored",
+    33.23
+   ],
+   [
+    "wave:evsway·elite^armored",
+    33.48
+   ],
+   [
+    "wave:evlanterns",
+    33.69
+   ],
+   [
+    "set:evlanterns",
+    33.69
+   ],
+   [
+    "wave:evlanterns^armored",
+    33.74
+   ],
+   [
+    "wave:evlanterns^swift",
+    33.8
+   ],
+   [
+    "wave:evlanterns^swift+tiny",
+    33.83
+   ],
+   [
+    "wave:swoop^gilded",
+    33.96
+   ],
+   [
+    "wave:swoop^swift+tiny",
+    34.02
+   ],
+   [
+    "wave:evgrid·fast^armored",
+    34.15
+   ],
+   [
+    "wave:evgrid·fast^gilded",
+    34.22
+   ],
+   [
+    "wave:crossX^swift+tiny",
+    34.41
+   ],
+   [
+    "wave:evbracket",
+    34.47
+   ],
+   [
+    "wave:evbracket^gilded",
+    34.55
+   ],
+   [
+    "wave:evbracket^swift+tiny",
+    34.59
+   ],
+   [
+    "wave:wave^swift",
+    34.91
+   ],
+   [
+    "set:wedge",
+    35.04
+   ],
+   [
+    "rule:ev:rush^swift",
+    35.07
+   ],
+   [
+    "wave:echo^gilded",
+    35.56
+   ],
+   [
+    "wave:echo^swift+tiny",
+    35.62
+   ],
+   [
+    "wave:evbracket^swift",
+    36.05
+   ],
+   [
+    "rule:unlock:tw-tiny",
+    36.07
+   ],
+   [
+    "wave:evbracket^tiny",
+    36.12
+   ],
+   [
+    "wave:evbracket^armored",
+    36.16
+   ],
+   [
+    "wave:box^tiny",
+    36.38
+   ],
+   [
+    "wave:evlanterns·fast^tiny",
+    36.48
+   ],
+   [
+    "wave:evgrid·elite^tiny",
+    36.64
+   ],
+   [
+    "wave:evgrid·elite^swift",
+    36.7
+   ],
+   [
+    "wave:evgrid·elite^gilded",
+    36.73
+   ],
+   [
+    "wave:evgrid·elite^swift+tiny",
+    36.8
+   ],
+   [
+    "wave:swoop^tiny",
+    36.86
+   ],
+   [
+    "wave:swoop^armored",
+    36.92
+   ],
+   [
+    "drop:miss",
+    37.28
+   ],
+   [
+    "wave:wave^tiny",
+    37.43
+   ],
+   [
+    "rule:epoch:2:nv-skin-dia",
+    40.07
+   ],
+   [
+    "verb:bridge_drop",
+    40.22
+   ],
+   [
+    "verb:hold_span",
+    40.3
+   ],
+   [
+    "verb:cross_beams",
+    40.34
+   ],
+   [
+    "rule:ev:rush^armored",
+    45.43
+   ],
+   [
+    "rule:portal",
+    45.53
+   ],
+   [
+    "enemy:sniper",
+    45.61
+   ],
+   [
+    "wave:evsnipe·elite",
+    45.61
+   ],
+   [
+    "set:evsnipe·elite",
+    45.61
+   ],
+   [
+    "wave:evsway",
+    45.7
+   ],
+   [
+    "set:evsway",
+    45.7
+   ],
+   [
+    "wave:evsway^armored",
+    45.79
+   ],
+   [
+    "wave:evbracket·fast",
+    45.97
+   ],
+   [
+    "wave:evsnipe·mirror",
+    46.32
+   ],
+   [
+    "set:evsnipe·mirror",
+    46.32
+   ],
+   [
+    "wave:evsnipe·mirror^tiny",
+    46.41
+   ],
+   [
+    "wave:evbracket·fast^swift",
+    46.59
+   ],
+   [
+    "wave:sig:FLEET SIGNAL",
+    46.72
+   ],
+   [
+    "wave:evsway·mirror",
+    46.9
+   ],
+   [
+    "set:evsway·mirror",
+    46.9
+   ],
+   [
+    "wave:box^armored+swift",
+    47
+   ],
+   [
+    "wave:box^gilded",
+    47.05
+   ],
+   [
+    "rule:portal~tw",
+    47.07
+   ],
+   [
+    "wave:evtline^armored",
+    47.17
+   ],
+   [
+    "wave:evwindow·mirror^tiny",
+    47.29
+   ],
+   [
+    "wave:mirror",
+    47.35
+   ],
+   [
+    "wave:mirror^tiny",
+    47.41
+   ],
+   [
+    "wave:mirror^gilded",
+    47.47
+   ],
+   [
+    "wave:evguard",
+    47.58
+   ],
+   [
+    "set:evguard",
+    47.58
+   ],
+   [
+    "wave:evguard^armored+swift",
+    47.63
+   ],
+   [
+    "wave:evguard^gilded",
+    47.69
+   ],
+   [
+    "wave:evshieldv·mirror",
+    47.74
+   ],
+   [
+    "set:evshieldv·mirror",
+    47.74
+   ],
+   [
+    "wave:evshieldv·mirror^swift+tiny",
+    47.8
+   ],
+   [
+    "wave:evshieldv·mirror^armored",
+    47.83
+   ],
+   [
+    "wave:evwindow·fast",
+    47.89
+   ],
+   [
+    "set:evwindow·fast",
+    47.89
+   ],
+   [
+    "wave:evwindow·fast^tiny",
+    47.95
+   ],
+   [
+    "wave:evtline·elite",
+    48.01
+   ],
+   [
+    "set:evtline·elite",
+    48.01
+   ],
+   [
+    "wave:evtline·elite^swift+tiny",
+    48.06
+   ],
+   [
+    "rule:unlock:ev-duel",
+    48.09
+   ],
+   [
+    "wave:bounce^armored+swift",
+    48.21
+   ],
+   [
+    "wave:sig:CRANE SWING",
+    48.27
+   ],
+   [
+    "wave:evguard·fast^tiny",
+    48.45
+   ],
+   [
+    "wave:evguard·fast^swift",
+    48.47
+   ],
+   [
+    "wave:evguard·fast^swift+tiny",
+    48.5
+   ],
+   [
+    "rule:portal+gold~tw",
+    48.6
+   ],
+   [
+    "enemy:healer",
+    48.65
+   ],
+   [
+    "wave:evheal·mirror",
+    48.65
+   ],
+   [
+    "set:evheal·mirror",
+    48.65
+   ],
+   [
+    "enemy:ecarrier",
+    48.79
+   ],
+   [
+    "enemy:efdrone",
+    48.83
+   ],
+   [
+    "set:mines",
+    48.87
+   ],
+   [
+    "wave:evguard^swift+tiny",
+    48.9
+   ],
+   [
+    "wave:evshieldv·mirror^swift",
+    48.98
+   ],
+   [
+    "wave:evheal·elite",
+    49.12
+   ],
+   [
+    "set:evheal·elite",
+    49.12
+   ],
+   [
+    "wave:sig:UNDERTOW",
+    49.16
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    49.23
+   ],
+   [
+    "verb:spokes",
+    49.23
+   ],
+   [
+    "verb:pulse_ring",
+    49.36
+   ],
+   [
+    "verb:tide_lanes",
+    49.87
+   ],
+   [
+    "verb:tentacle_tips",
+    50
+   ],
+   [
+    "verb:vacuum",
+    50.08
+   ],
+   [
+    "verb:orbit_drones",
+    50.55
+   ],
+   [
+    "rule:ev:duel",
+    50.82
+   ],
+   [
+    "wave:evheal·mirror^gilded",
+    50.89
+   ],
+   [
+    "wave:evheal·mirror^armored",
+    50.97
+   ],
+   [
+    "pick:pw:wing",
+    51.1
+   ],
+   [
+    "wave:evwindow·fast^swift",
+    51.11
+   ],
+   [
+    "wave:evguard^tiny",
+    51.22
+   ],
+   [
+    "wave:evshieldv·mirror^tiny",
+    51.29
+   ],
+   [
+    "wave:bloom^gilded",
+    51.37
+   ],
+   [
+    "wave:evheal·elite^armored+swift",
+    51.44
+   ],
+   [
+    "wave:evheal·mirror^swift",
+    51.57
+   ],
+   [
+    "wave:fan^gilded",
+    53.08
+   ],
+   [
+    "wave:evheal·mirror^swift+tiny",
+    53.23
+   ],
+   [
+    "wave:evwindow·fast^armored+swift",
+    53.3
+   ],
+   [
+    "wave:evguard^swift",
+    53.48
+   ],
+   [
+    "wave:evheal·elite^swift+tiny",
+    53.74
+   ],
+   [
+    "wave:evheal·mirror^armored+swift",
+    53.81
+   ],
+   [
+    "rule:ev:rush^tiny",
+    55.81
+   ],
+   [
+    "wave:helix^gilded",
+    55.87
+   ],
+   [
+    "rule:bounce",
+    55.91
+   ],
+   [
+    "wave:helix^swift",
+    55.93
+   ],
+   [
+    "wave:evrelay·fast",
+    55.99
+   ],
+   [
+    "set:evrelay·fast",
+    55.99
+   ],
+   [
+    "wave:evrelay·fast^gilded",
+    56.06
+   ],
+   [
+    "wave:evguard·elite",
+    56.12
+   ],
+   [
+    "set:evguard·elite",
+    56.12
+   ],
+   [
+    "wave:evguard·elite^swift+tiny",
+    56.18
+   ],
+   [
+    "set:swarm",
+    56.24
+   ],
+   [
+    "wave:fan^armored+swift",
+    56.31
+   ],
+   [
+    "wave:slalom",
+    56.37
+   ],
+   [
+    "wave:slalom^swift",
+    56.43
+   ],
+   [
+    "wave:evshieldv·fast^armored+swift",
+    56.56
+   ],
+   [
+    "wave:evshieldv·fast^tiny",
+    56.59
+   ],
+   [
+    "wave:evshieldv·fast^gilded",
+    56.65
+   ],
+   [
+    "wave:evrelay·elite",
+    56.77
+   ],
+   [
+    "set:evrelay·elite",
+    56.77
+   ],
+   [
+    "wave:evshieldv^swift",
+    56.87
+   ],
+   [
+    "wave:evguard·mirror^swift+tiny",
+    56.99
+   ],
+   [
+    "wave:bounce^tiny",
+    57.12
+   ],
+   [
+    "wave:sig:RED LIGHTS",
+    57.18
+   ],
+   [
+    "wave:snake",
+    57.35
+   ],
+   [
+    "rule:bounce~tw",
+    57.45
+   ],
+   [
+    "wave:snake^gilded",
+    57.48
+   ],
+   [
+    "wave:pincer^swift+tiny",
+    57.81
+   ],
+   [
+    "wave:pincer^armored",
+    57.84
+   ],
+   [
+    "wave:evmines·fast",
+    57.99
+   ],
+   [
+    "set:evmines·fast",
+    57.99
+   ],
+   [
+    "wave:evtank·elite",
+    58.01
+   ],
+   [
+    "set:evtank·elite",
+    58.01
+   ],
+   [
+    "wave:evtank·elite^armored+swift",
+    58.07
+   ],
+   [
+    "wave:evfunnel·mirror^armored+swift",
+    58.31
+   ],
+   [
+    "wave:evdive·fast",
+    58.37
+   ],
+   [
+    "wave:evdive·fast^gilded",
+    58.42
+   ],
+   [
+    "wave:sig:SHUNTING YARD",
+    58.63
+   ],
+   [
+    "wave:evmines·mirror^swift+tiny",
+    58.87
+   ],
+   [
+    "rule:bounce+portal~tw",
+    59
+   ],
+   [
+    "enemy:carrier",
+    59.04
+   ],
+   [
+    "wave:evcargo",
+    59.04
+   ],
+   [
+    "set:evcargo",
+    59.04
+   ],
+   [
+    "wave:evcargo^armored+swift",
+    59.14
+   ],
+   [
+    "wave:stairs^swift+tiny",
+    59.42
+   ],
+   [
+    "wave:evmines·elite",
+    59.52
+   ],
+   [
+    "set:evmines·elite",
+    59.52
+   ],
+   [
+    "wave:evtank",
+    59.57
+   ],
+   [
+    "set:evtank",
+    59.57
+   ],
+   [
+    "wave:evtank^armored+swift",
+    59.66
+   ],
+   [
+    "wave:evdive·mirror^armored",
+    59.76
+   ],
+   [
+    "wave:evmines·fast^armored",
+    59.92
+   ],
+   [
+    "wave:evcargo·elite",
+    59.99
+   ],
+   [
+    "set:evcargo·elite",
+    59.99
+   ],
+   [
+    "wave:evcargo·elite^swift+tiny",
+    60.09
+   ],
+   [
+    "rule:epoch:3:nv-skin-ring",
+    60.1
+   ],
+   [
+    "rule:unlock:tw-lead",
+    60.1
+   ],
+   [
+    "rule:ev:convoy^tiny",
+    60.1
+   ],
+   [
+    "wave:hold^armored+swift",
+    60.23
+   ],
+   [
+    "set:crossfire",
+    60.28
+   ],
+   [
+    "wave:sig:FIREWALL BREACH",
+    60.33
+   ],
+   [
+    "wave:stutter^armored+swift",
+    60.48
+   ],
+   [
+    "wave:stutter^gilded",
+    60.54
+   ],
+   [
+    "rule:pocket",
+    60.54
+   ],
+   [
+    "wave:evram·mirror^gilded",
+    60.64
+   ],
+   [
+    "wave:evwalker·fast",
+    60.71
+   ],
+   [
+    "set:evwalker·fast",
+    60.71
+   ],
+   [
+    "wave:evwalker·fast^armored",
+    60.77
+   ],
+   [
+    "wave:meteors^gilded+lead",
+    60.89
+   ],
+   [
+    "wave:evram^gilded+lead",
+    60.96
+   ],
+   [
+    "wave:carrier",
+    61.03
+   ],
+   [
+    "wave:curtain",
+    61.09
+   ],
+   [
+    "wave:shieldwall^swift+tiny",
+    61.31
+   ],
+   [
+    "wave:evwalker",
+    61.37
+   ],
+   [
+    "set:evwalker",
+    61.37
+   ],
+   [
+    "wave:evwalker^gilded+lead",
+    61.42
+   ],
+   [
+    "wave:evwalker^lead",
+    61.44
+   ],
+   [
+    "wave:evwalker^swift+tiny",
+    61.48
+   ],
+   [
+    "wave:wave^armored",
+    61.73
+   ],
+   [
+    "wave:sig:SIGNAL FAILURE",
+    61.76
+   ],
+   [
+    "wave:splitterv",
+    61.97
+   ],
+   [
+    "wave:chargers^gilded",
+    62.04
+   ],
+   [
+    "rule:pocket~tw",
+    62.08
+   ],
+   [
+    "wave:evconvoy·fast^gilded+lead",
+    62.18
+   ],
+   [
+    "wave:evconvoy·fast^lead",
+    62.24
+   ],
+   [
+    "wave:evconvoy·fast^gilded",
+    62.33
+   ],
+   [
+    "wave:evbombers·elite^swift",
+    62.54
+   ],
+   [
+    "wave:evheal",
+    62.57
+   ],
+   [
+    "set:evheal",
+    62.57
+   ],
+   [
+    "wave:evheal^gilded",
+    62.68
+   ],
+   [
+    "wave:evheal^lead",
+    62.7
+   ],
+   [
+    "wave:pincer^tiny",
+    62.8
+   ],
+   [
+    "wave:pincer^swift",
+    62.83
+   ],
+   [
+    "wave:pincer^armored+swift",
+    62.89
+   ],
+   [
+    "wave:evsnipe·fast",
+    62.95
+   ],
+   [
+    "set:evsnipe·fast",
+    62.95
+   ],
+   [
+    "wave:evsnipe·fast^gilded+lead",
+    63.13
+   ],
+   [
+    "wave:evconvoy·elite^gilded+lead",
+    63.22
+   ],
+   [
+    "wave:evconvoy·elite^armored",
+    63.36
+   ],
+   [
+    "wave:sig:BARRIER DROP",
+    63.77
+   ],
+   [
+    "wave:evconvoy·fast^armored",
+    63.95
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    63.98
+   ],
+   [
+    "wave:stampede^lead",
+    64.39
+   ],
+   [
+    "wave:stampede^gilded",
+    64.45
+   ],
+   [
+    "wave:stampede^tiny",
+    64.51
+   ],
+   [
+    "wave:evconvoy·fast^swift",
+    64.69
+   ],
+   [
+    "wave:evbombers·elite^tiny",
+    64.74
+   ],
+   [
+    "wave:evbombers·elite^lead",
+    64.8
+   ],
+   [
+    "wave:evbombers·elite^armored+swift",
+    64.86
+   ],
+   [
+    "wave:evbombers·elite^swift+tiny",
+    64.89
+   ],
+   [
+    "wave:geyser^lead",
+    65.04
+   ],
+   [
+    "wave:geyser^swift+tiny",
+    65.1
+   ],
+   [
+    "rule:ev:duel^lead",
+    65.12
+   ],
+   [
+    "wave:geyser^armored+swift",
+    65.13
+   ],
+   [
+    "wave:evheal·fast",
+    65.39
+   ],
+   [
+    "set:evheal·fast",
+    65.39
+   ],
+   [
+    "wave:scissors",
+    65.54
+   ],
+   [
+    "wave:scissors^gilded+lead",
+    65.6
+   ],
+   [
+    "wave:evsnipe",
+    65.72
+   ],
+   [
+    "set:evsnipe",
+    65.72
+   ],
+   [
+    "wave:evsnipe^tiny",
+    65.74
+   ],
+   [
+    "wave:evsnipe^armored+swift",
+    65.8
+   ],
+   [
+    "wave:evsnipe^swift+tiny",
+    65.86
+   ],
+   [
+    "wave:bounce^gilded+lead",
+    66.16
+   ],
+   [
+    "pick:pw:nr",
+    66.2
+   ],
+   [
+    "wave:bounce^lead",
+    66.22
+   ],
+   [
+    "wave:evconvoy·fast^armored+swift",
+    66.3
+   ],
+   [
+    "verb:barrier_gates",
+    66.83
+   ],
+   [
+    "verb:signal_override",
+    66.9
+   ],
+   [
+    "verb:delay_bombs",
+    66.94
+   ],
+   [
+    "verb:gravity_well",
+    66.97
+   ],
+   [
+    "wave:echo^gilded+lead",
+    67.24
+   ],
+   [
+    "wave:echo^armored+swift",
+    67.3
+   ],
+   [
+    "wave:echo^lead",
+    67.36
+   ],
+   [
+    "wave:evconvoy·fast^tiny",
+    67.4
+   ],
+   [
+    "wave:evconvoy·fast^swift+tiny",
+    67.44
+   ],
+   [
+    "wave:evbombers·elite^gilded+lead",
+    67.65
+   ],
+   [
+    "wave:evconvoy",
+    67.8
+   ],
+   [
+    "set:evconvoy",
+    67.8
+   ],
+   [
+    "wave:evconvoy^swift+tiny",
+    67.83
+   ],
+   [
+    "wave:evconvoy^gilded+lead",
+    67.88
+   ],
+   [
+    "wave:evconvoy^tiny",
+    67.91
+   ],
+   [
+    "wave:evsnipe·mirror^gilded",
+    68.03
+   ],
+   [
+    "wave:evsnipe·mirror^gilded+lead",
+    68.06
+   ],
+   [
+    "wave:scissors^gilded",
+    68.18
+   ],
+   [
+    "wave:scissors^swift+tiny",
+    68.24
+   ],
+   [
+    "wave:scissors^armored",
+    68.3
+   ],
+   [
+    "wave:scissors^tiny",
+    68.36
+   ],
+   [
+    "wave:evheal·elite^lead",
+    68.44
+   ],
+   [
+    "wave:geyser^tiny",
+    68.56
+   ],
+   [
+    "wave:geyser^gilded+lead",
+    68.59
+   ],
+   [
+    "verb:beat_floor",
+    70.23
+   ],
+   [
+    "rule:ev:rest^armored",
+    70.46
+   ],
+   [
+    "rule:pocket+bounce~tw",
+    70.56
+   ],
+   [
+    "wave:bait^gilded",
+    70.58
+   ],
+   [
+    "enemy:minelayer",
+    70.64
+   ],
+   [
+    "wave:evlayer·elite",
+    70.64
+   ],
+   [
+    "set:evlayer·elite",
+    70.64
+   ],
+   [
+    "wave:evlayer·elite^armored+swift",
+    70.67
+   ],
+   [
+    "wave:evheal·elite^armored",
+    71.27
+   ],
+   [
+    "wave:evbombers^swift",
+    71.44
+   ],
+   [
+    "wave:kamikaze",
+    71.44
+   ],
+   [
+    "wave:kamikaze^gilded+lead",
+    71.44
+   ],
+   [
+    "wave:kamikaze^armored+swift",
+    71.44
+   ],
+   [
+    "enemy:kamikaze",
+    71.45
+   ],
+   [
+    "wave:evsnipe·fast^tiny",
+    71.64
+   ],
+   [
+    "wave:sig:LAST CORDON",
+    71.87
+   ],
+   [
+    "wave:evlayer·mirror",
+    71.94
+   ],
+   [
+    "set:evlayer·mirror",
+    71.94
+   ],
+   [
+    "wave:evlayer·mirror^gilded+lead",
+    71.94
+   ],
+   [
+    "wave:box^gilded+lead",
+    72
+   ],
+   [
+    "wave:box^lead",
+    72.05
+   ],
+   [
+    "rule:hunter",
+    72.1
+   ],
+   [
+    "rule:unlock:combo-swift-armored",
+    72.13
+   ],
+   [
+    "wave:evrelay",
+    72.19
+   ],
+   [
+    "set:evrelay",
+    72.19
+   ],
+   [
+    "wave:evrelay^tiny",
+    72.24
+   ],
+   [
+    "wave:evcargo·mirror",
+    72.34
+   ],
+   [
+    "set:evcargo·mirror",
+    72.34
+   ],
+   [
+    "wave:evcargo·mirror^tiny",
+    72.36
+   ],
+   [
+    "wave:sandwich",
+    72.43
+   ],
+   [
+    "wave:sandwich^armored+swift",
+    72.53
+   ],
+   [
+    "wave:evlayer·elite^gilded+lead",
+    72.57
+   ],
+   [
+    "wave:evlayer·elite^tiny",
+    72.62
+   ],
+   [
+    "wave:evdoor^swift+armored",
+    72.74
+   ],
+   [
+    "wave:evlayer·mirror^tiny",
+    72.86
+   ],
+   [
+    "wave:evlayer·mirror^swift",
+    72.88
+   ],
+   [
+    "wave:evcargo·fast",
+    73.14
+   ],
+   [
+    "set:evcargo·fast",
+    73.14
+   ],
+   [
+    "wave:zigzag",
+    73.55
+   ],
+   [
+    "wave:zigzag^gilded",
+    73.58
+   ],
+   [
+    "rule:hunter~tw",
+    73.65
+   ],
+   [
+    "wave:river",
+    74.1
+   ],
+   [
+    "wave:evdoor·elite",
+    74.13
+   ],
+   [
+    "wave:evdoor·mirror",
+    74.29
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    74.32
+   ],
+   [
+    "verb:spiral_rev",
+    74.52
+   ],
+   [
+    "wave:bounce^swift+armored",
+    74.98
+   ],
+   [
+    "wave:evdoor·mirror^swift+tiny",
+    75.05
+   ],
+   [
+    "rule:ev:ambush^armored",
+    75.15
+   ],
+   [
+    "wave:evsway^lead",
+    75.22
+   ],
+   [
+    "wave:evbracket·mirror^armored",
+    75.3
+   ],
+   [
+    "wave:evdoor·elite^gilded",
+    75.48
+   ],
+   [
+    "wave:sig:ICE CORE",
+    75.58
+   ],
+   [
+    "verb:firewall",
+    76.32
+   ],
+   [
+    "verb:overload",
+    76.42
+   ],
+   [
+    "wave:evdoor·mirror^armored+swift",
+    76.56
+   ],
+   [
+    "wave:evlanterns·fast^swift+armored",
+    76.66
+   ],
+   [
+    "wave:pincer^swift+armored",
+    76.69
+   ],
+   [
+    "wave:pincer^lead",
+    76.72
+   ],
+   [
+    "wave:evsway^armored+swift",
+    76.79
+   ],
+   [
+    "wave:evbracket·mirror^gilded",
+    76.82
+   ],
+   [
+    "wave:river^swift+tiny",
+    76.88
+   ],
+   [
+    "wave:evdoor·elite^armored+swift",
+    76.95
+   ],
+   [
+    "wave:evdoor·elite^swift+armored",
+    77.01
+   ],
+   [
+    "wave:evdoor·mirror^lead",
+    77.18
+   ],
+   [
+    "wave:helix^lead",
+    79
+   ],
+   [
+    "rule:hunter+pocket~tw",
+    79.05
+   ],
+   [
+    "wave:evbracket·fast^swift+tiny",
+    79.17
+   ],
+   [
+    "wave:pulse",
+    79.43
+   ],
+   [
+    "wave:evtline·mirror",
+    79.48
+   ],
+   [
+    "set:evtline·mirror",
+    79.48
+   ],
+   [
+    "wave:evtline·mirror^lead",
+    79.52
+   ],
+   [
+    "wave:evtline·mirror^armored+swift",
+    79.59
+   ],
+   [
+    "wave:gates^gilded",
+    79.68
+   ],
+   [
+    "wave:evtline·elite^gilded+lead",
+    79.76
+   ],
+   [
+    "wave:evgrid·mirror",
+    79.89
+   ],
+   [
+    "set:evgrid·mirror",
+    79.89
+   ],
+   [
+    "wave:evgrid·mirror^tiny",
+    79.97
+   ],
+   [
+    "wave:evgrid·mirror^swift+armored",
+    79.99
+   ],
+   [
+    "enemy:ecruiser",
+    80.12
+   ],
+   [
+    "rule:epoch:4:nv-skin-hex",
+    80.17
+   ],
+   [
+    "rule:ev:rush^lead",
+    80.17
+   ],
+   [
+    "wave:sig:PRESS PASS",
+    80.19
+   ],
+   [
+    "wave:snake^armored+swift",
+    80.44
+   ],
+   [
+    "rule:gate",
+    80.5
+   ],
+   [
+    "wave:evguard^lead",
+    80.77
+   ],
+   [
+    "wave:wall~r",
+    80.8
+   ],
+   [
+    "wave:wall~r^gilded",
+    80.87
+   ],
+   [
+    "wave:evstation·fast",
+    80.94
+   ],
+   [
+    "set:evstation·fast",
+    80.94
+   ],
+   [
+    "wave:evstation·fast^swift+armored",
+    81.04
+   ],
+   [
+    "wave:evshieldv^lead",
+    81.27
+   ],
+   [
+    "wave:evshieldv·fast^gilded+lead",
+    81.54
+   ],
+   [
+    "wave:hold^lead",
+    81.67
+   ],
+   [
+    "wave:sig:GRIDLOCK",
+    81.74
+   ],
+   [
+    "wave:bounce^tiny+armored",
+    81.95
+   ],
+   [
+    "rule:gate~tw",
+    82.05
+   ],
+   [
+    "wave:evstation^swift+armored",
+    82.19
+   ],
+   [
+    "wave:bomberrun^tiny",
+    82.38
+   ],
+   [
+    "wave:bomberrun^lead",
+    82.47
+   ],
+   [
+    "wave:evmines^tiny",
+    82.61
+   ],
+   [
+    "wave:evfunnel·fast",
+    82.95
+   ],
+   [
+    "set:evfunnel·fast",
+    82.95
+   ],
+   [
+    "wave:evstation·elite",
+    83.07
+   ],
+   [
+    "set:evstation·elite",
+    83.07
+   ],
+   [
+    "wave:sig:HAMMER BEAT",
+    83.19
+   ],
+   [
+    "wave:cross^gilded+lead",
+    83.33
+   ],
+   [
+    "wave:cross^tiny",
+    83.35
+   ],
+   [
+    "mut:hail",
+    83.39
+   ],
+   [
+    "rule:gate+hunter~tw",
+    83.47
+   ],
+   [
+    "wave:evmines·mirror^tiny+armored",
+    83.59
+   ],
+   [
+    "wave:meteors^tiny",
+    83.91
+   ],
+   [
+    "wave:evmines^swift+armored",
+    83.98
+   ],
+   [
+    "wave:evmines^lead",
+    84.04
+   ],
+   [
+    "wave:evram·mirror^gilded+lead",
+    84.14
+   ],
+   [
+    "rule:unlock:combo-tiny-swift",
+    84.18
+   ],
+   [
+    "wave:shieldwall^swift+armored",
+    84.28
+   ],
+   [
+    "wave:stairs^swift",
+    85.01
+   ],
+   [
+    "rule:tide",
+    85.01
+   ],
+   [
+    "wave:stairs^tiny+swift",
+    85.07
+   ],
+   [
+    "wave:stairs^armored+swift",
+    85.1
+   ],
+   [
+    "rule:ev:rush^gilded",
+    85.19
+   ],
+   [
+    "wave:evwalker·fast^armored+swift",
+    85.29
+   ],
+   [
+    "wave:evsplit·elite",
+    85.37
+   ],
+   [
+    "set:evsplit·elite",
+    85.37
+   ],
+   [
+    "wave:evsplit·elite^lead",
+    85.48
+   ],
+   [
+    "wave:evsplit·elite^swift+armored",
+    85.5
+   ],
+   [
+    "wave:cross^swift+armored",
+    85.57
+   ],
+   [
+    "wave:cross^lead",
+    85.6
+   ],
+   [
+    "wave:cross^armored+swift",
+    85.63
+   ],
+   [
+    "wave:evwalker·mirror^tiny",
+    85.83
+   ],
+   [
+    "wave:evwalker·mirror^tiny+armored",
+    85.86
+   ],
+   [
+    "wave:evbombers·fast^armored",
+    86.05
+   ],
+   [
+    "wave:evbombers·fast^swift+armored",
+    86.14
+   ],
+   [
+    "wave:evconvoy·elite^tiny+swift",
+    86.26
+   ],
+   [
+    "wave:evconvoy·elite^gilded",
+    86.32
+   ],
+   [
+    "wave:curtain^lead",
+    86.43
+   ],
+   [
+    "wave:curtain^swift+tiny",
+    86.49
+   ],
+   [
+    "wave:sig:GUARD OF HONOUR",
+    86.57
+   ],
+   [
+    "wave:bounce^tiny+swift",
+    86.77
+   ],
+   [
+    "mini:MESSE-WÄCHTER|k4",
+    86.95
+   ],
+   [
+    "verb:mirror_hall",
+    87.39
+   ],
+   [
+    "verb:spotlight",
+    87.47
+   ],
+   [
+    "wave:crossX^swift",
+    88.02
+   ],
+   [
+    "wave:crossX^armored+swift",
+    88.09
+   ],
+   [
+    "wave:crossX^gilded+lead",
+    88.12
+   ],
+   [
+    "wave:evwalker·fast^lead",
+    88.15
+   ],
+   [
+    "wave:evwalker·fast^gilded",
+    88.21
+   ],
+   [
+    "wave:evwalker·fast^tiny+armored",
+    88.28
+   ],
+   [
+    "wave:evwalker·fast^tiny+swift",
+    88.31
+   ],
+   [
+    "wave:evsplit·elite^armored",
+    88.37
+   ],
+   [
+    "wave:evsplit·elite^tiny+swift",
+    88.49
+   ],
+   [
+    "wave:evsplit·elite^tiny+armored",
+    88.49
+   ],
+   [
+    "wave:sniperlanes",
+    88.54
+   ],
+   [
+    "wave:sniperlanes^swift+armored",
+    88.56
+   ],
+   [
+    "wave:sniperlanes^tiny",
+    88.6
+   ],
+   [
+    "wave:sniperlanes^gilded+lead",
+    88.7
+   ],
+   [
+    "wave:evwalker·mirror^tiny+swift",
+    88.81
+   ],
+   [
+    "wave:evconvoy·fast^tiny+swift",
+    89.03
+   ],
+   [
+    "wave:evconvoy·fast^swift+armored",
+    89.06
+   ],
+   [
+    "wave:loop",
+    89.17
+   ],
+   [
+    "wave:loop^tiny+swift",
+    89.24
+   ],
+   [
+    "wave:loop^gilded",
+    89.25
+   ],
+   [
+    "wave:evbombers^swift+armored",
+    89.35
+   ],
+   [
+    "wave:evbombers^swift+tiny",
+    89.42
+   ],
+   [
+    "wave:evbombers^armored+swift",
+    89.46
+   ],
+   [
+    "wave:evwalker·fast^swift+armored",
+    89.91
+   ],
+   [
+    "rule:ev:convoy^gilded",
+    90.36
+   ],
+   [
+    "wave:box^tiny+swift",
+    90.52
+   ],
+   [
+    "wave:box^tiny+armored",
+    90.55
+   ],
+   [
+    "wave:evwalker·fast^gilded+lead",
+    90.58
+   ],
+   [
+    "wave:evwalker·fast^swift+tiny",
+    90.71
+   ],
+   [
+    "wave:evsplit·elite^tiny",
+    90.8
+   ],
+   [
+    "wave:evsplit·elite^gilded+lead",
+    90.82
+   ],
+   [
+    "wave:evsplit·elite^swift",
+    90.87
+   ],
+   [
+    "wave:evsplit·elite^gilded",
+    90.92
+   ],
+   [
+    "wave:evsplit·elite^armored+swift",
+    90.94
+   ],
+   [
+    "wave:evconvoy^gilded",
+    91.05
+   ],
+   [
+    "wave:evconvoy^tiny+swift",
+    91.11
+   ],
+   [
+    "wave:evbombers·mirror",
+    91.14
+   ],
+   [
+    "set:evbombers·mirror",
+    91.14
+   ],
+   [
+    "wave:evbombers·mirror^armored",
+    91.24
+   ],
+   [
+    "wave:evbombers·mirror^swift",
+    91.27
+   ],
+   [
+    "wave:minefield",
+    91.34
+   ],
+   [
+    "wave:minefield^gilded",
+    91.37
+   ],
+   [
+    "wave:minefield^swift+tiny",
+    91.43
+   ],
+   [
+    "wave:minefield^tiny+armored",
+    91.49
+   ],
+   [
+    "wave:minefield^tiny",
+    91.53
+   ],
+   [
+    "wave:evwalker·elite^armored+swift",
+    91.64
+   ],
+   [
+    "rule:unlock:combo-lead-gilded",
+    96.19
+   ],
+   [
+    "rule:epoch:5:nv-skin-star",
+    100.19
+   ],
+   [
+    "rule:ev:rest^tiny",
+    100.36
+   ],
+   [
+    "mut:mine",
+    100.37
+   ],
+   [
+    "rule:tide~tw",
+    100.46
+   ],
+   [
+    "wave:bait^armored",
+    100.46
+   ],
+   [
+    "wave:evsnipe^gilded+lead",
+    100.72
+   ],
+   [
+    "wave:stairs^gilded",
+    100.86
+   ],
+   [
+    "wave:evsnipe^lead",
+    101.34
+   ],
+   [
+    "wave:evheal·fast^tiny+armored",
+    101.57
+   ],
+   [
+    "wave:bait^lead+gilded",
+    101.96
+   ],
+   [
+    "rule:tide+gate~tw",
+    101.97
+   ],
+   [
+    "wave:evrelay^swift+armored",
+    102.08
+   ],
+   [
+    "wave:evrelay^armored+swift",
+    102.13
+   ],
+   [
+    "wave:evcargo·mirror^armored",
+    102.22
+   ],
+   [
+    "wave:evcargo·mirror^lead+tiny",
+    102.7
+   ],
+   [
+    "wave:evcargo·mirror^swift+tiny",
+    102.7
+   ],
+   [
+    "wave:evcargo·mirror^gilded+lead",
+    102.77
+   ],
+   [
+    "rule:cash",
+    103.52
+   ],
+   [
+    "wave:evbracket·mirror^tiny+swift",
+    103.86
+   ],
+   [
+    "wave:sig:MARKET CRASH",
+    104.1
+   ],
+   [
+    "boss:KRONOS|k3",
+    104.16
+   ],
+   [
+    "verb:cashflow",
+    105.06
+   ],
+   [
+    "verb:cash_core",
+    105.15
+   ],
+   [
+    "wave:crossX^tiny+swift",
+    105.51
+   ],
+   [
+    "wave:evdoor·mirror^tiny+armored",
+    105.58
+   ],
+   [
+    "wave:evlanterns·fast^gilded+lead",
+    105.64
+   ],
+   [
+    "wave:geyser^tiny+swift",
+    105.7
+   ],
+   [
+    "wave:geyser^lead+tiny",
+    105.73
+   ],
+   [
+    "wave:evsway^swift",
+    105.8
+   ],
+   [
+    "wave:evbracket·mirror^lead+gilded",
+    105.86
+   ],
+   [
+    "wave:burst^swift+armored",
+    105.99
+   ],
+   [
+    "wave:evdoor·elite^lead+gilded",
+    106.02
+   ],
+   [
+    "wave:evdoor·mirror^tiny",
+    106.2
+   ],
+   [
+    "wave:crossX^tiny",
+    108
+   ],
+   [
+    "wave:crossX^lead+gilded",
+    108.04
+   ],
+   [
+    "wave:evdoor·mirror^swift+armored",
+    108.1
+   ],
+   [
+    "wave:evlanterns·fast^tiny+swift",
+    108.16
+   ],
+   [
+    "wave:evlanterns·fast^lead+gilded",
+    108.19
+   ],
+   [
+    "rule:unlock:combo-armored-tiny",
+    108.22
+   ],
+   [
+    "wave:geyser^gilded",
+    108.26
+   ],
+   [
+    "wave:evsway^lead+gilded",
+    108.32
+   ],
+   [
+    "wave:evbracket·mirror^swift+tiny",
+    108.38
+   ],
+   [
+    "wave:bloom^swift+armored",
+    108.45
+   ],
+   [
+    "wave:evdoor·elite^gilded+lead",
+    108.54
+   ],
+   [
+    "wave:stutter^tiny+armored",
+    108.67
+   ],
+   [
+    "wave:stutter^gilded+lead",
+    108.69
+   ],
+   [
+    "wave:evdoor·mirror^armored+tiny",
+    108.73
+   ],
+   [
+    "rule:ev:rest^gilded",
+    111.35
+   ],
+   [
+    "wave:cross^tiny+swift",
+    111.38
+   ],
+   [
+    "wave:cross^armored+tiny",
+    111.44
+   ],
+   [
+    "rule:cash~tw",
+    111.45
+   ],
+   [
+    "wave:evbracket·fast^swift+armored",
+    111.58
+   ],
+   [
+    "wave:evbracket·fast^tiny+swift",
+    111.61
+   ],
+   [
+    "wave:phalanx",
+    111.84
+   ],
+   [
+    "wave:evgrid·mirror^tiny+swift",
+    111.95
+   ],
+   [
+    "wave:evgrid·mirror^gilded+lead",
+    112
+   ],
+   [
+    "wave:evwindow·fast^swift+tiny",
+    112.09
+   ],
+   [
+    "wave:evwindow·fast^tiny+swift",
+    112.1
+   ],
+   [
+    "wave:evtline·elite^lead+tiny",
+    112.2
+   ],
+   [
+    "wave:evbracket^tiny+swift",
+    112.39
+   ],
+   [
+    "wave:evbracket^lead+tiny",
+    112.39
+   ],
+   [
+    "wave:bait^swift",
+    112.53
+   ],
+   [
+    "wave:sig:ROOFTOP KIOSKS",
+    112.67
+   ],
+   [
+    "wave:evtline^lead+tiny",
+    112.85
+   ],
+   [
+    "wave:vee^lead+tiny",
+    112.91
+   ],
+   [
+    "wave:vee^lead+gilded",
+    112.98
+   ],
+   [
+    "rule:cash+tide~tw",
+    112.98
+   ],
+   [
+    "wave:evwindow·elite^lead+gilded",
+    113.14
+   ],
+   [
+    "wave:evguard^gilded+lead",
+    113.3
+   ],
+   [
+    "wave:bloom~r",
+    113.37
+   ],
+   [
+    "wave:bloom~r^armored+tiny",
+    113.4
+   ],
+   [
+    "wave:evwindow·elite^lead",
+    113.66
+   ],
+   [
+    "wave:evstation^lead+gilded",
+    113.79
+   ],
+   [
+    "wave:evstation^gilded+lead",
+    113.79
+   ],
+   [
+    "wave:evguard·mirror^gilded+lead",
+    113.89
+   ],
+   [
+    "wave:evshieldv·fast^lead+gilded",
+    113.95
+   ],
+   [
+    "wave:evshieldv·fast^tiny+swift",
+    113.98
+   ],
+   [
+    "wave:evshieldv·fast^tiny+armored",
+    114.02
+   ],
+   [
+    "wave:bounce^lead+tiny",
+    114.14
+   ],
+   [
+    "wave:bounce^lead+gilded",
+    114.21
+   ],
+   [
+    "wave:sig:HARBOUR CHAIN",
+    114.37
+   ],
+   [
+    "wave:crossX^armored+tiny",
+    114.51
+   ],
+   [
+    "rule:cover",
+    114.52
+   ],
+   [
+    "wave:evstation^swift+tiny",
+    114.73
+   ],
+   [
+    "wave:crossX^tiny+armored",
+    114.95
+   ],
+   [
+    "wave:evmines^tiny+armored",
+    115.13
+   ],
+   [
+    "wave:evstation·mirror",
+    115.22
+   ],
+   [
+    "set:evstation·mirror",
+    115.22
+   ],
+   [
+    "rule:ev:rest^swift",
+    115.24
+   ],
+   [
+    "wave:evstation·mirror^tiny",
+    115.33
+   ],
+   [
+    "wave:bait^armored+swift",
+    115.36
+   ],
+   [
+    "wave:evdive·elite^lead",
+    115.44
+   ],
+   [
+    "wave:evdive·elite^armored+swift",
+    115.44
+   ],
+   [
+    "wave:wave^gilded+lead",
+    115.53
+   ],
+   [
+    "wave:wave^lead",
+    115.59
+   ],
+   [
+    "wave:sig:HILL BEACONS",
+    115.65
+   ],
+   [
+    "wave:zigzag^armored",
+    115.89
+   ],
+   [
+    "rule:cover~tw",
+    115.95
+   ],
+   [
+    "wave:zigzag^gilded+lead",
+    115.98
+   ],
+   [
+    "wave:evtank·fast^tiny",
+    116.25
+   ],
+   [
+    "wave:vee^gilded+lead",
+    116.34
+   ],
+   [
+    "wave:evwalker·mirror^lead+tiny",
+    116.61
+   ],
+   [
+    "wave:evmines·elite^lead",
+    116.83
+   ],
+   [
+    "wave:evtank^lead",
+    116.96
+   ],
+   [
+    "wave:stutter^swift+tiny",
+    117.07
+   ],
+   [
+    "wave:sig:SACRED STEPS",
+    117.16
+   ],
+   [
+    "rule:cover+cash~tw",
+    117.48
+   ],
+   [
+    "wave:evwalker·fast^swift",
+    117.67
+   ],
+   [
+    "wave:evwalker·fast^lead+gilded",
+    117.74
+   ],
+   [
+    "wave:evsplit·elite^lead+gilded",
+    117.9
+   ],
+   [
+    "wave:evsplit·elite^lead+tiny",
+    117.94
+   ],
+   [
+    "wave:sig:BRONZE SHIELDS",
+    119.06
+   ],
+   [
+    "wave:cross^tiny+armored",
+    119.16
+   ],
+   [
+    "wave:cross^lead+tiny",
+    119.29
+   ],
+   [
+    "wave:evwalker·fast^tiny",
+    119.35
+   ],
+   [
+    "wave:evwalker·fast^lead+tiny",
+    119.41
+   ],
+   [
+    "wave:evwalker·fast^armored+tiny",
+    119.48
+   ],
+   [
+    "wave:evsplit·elite^armored+tiny",
+    119.63
+   ],
+   [
+    "wave:evsplit·elite^swift+tiny",
+    119.74
+   ],
+   [
+    "wave:bait^tiny+armored",
+    119.79
+   ],
+   [
+    "wave:bait^gilded+lead",
+    119.86
+   ],
+   [
+    "wave:bait^swift+tiny",
+    119.91
+   ],
+   [
+    "wave:sandwich^gilded",
+    120.01
+   ],
+   [
+    "wave:sandwich^tiny",
+    120.03
+   ],
+   [
+    "wave:sandwich^lead",
+    120.07
+   ],
+   [
+    "wave:evconvoy·fast^lead+tiny",
+    120.17
+   ],
+   [
+    "wave:evconvoy·fast^tiny+armored",
+    120.23
+   ],
+   [
+    "rule:epoch:6:nv-skin-sq",
+    120.25
+   ],
+   [
+    "rule:unlock:combo-lead-swift",
+    120.25
+   ],
+   [
+    "rule:ev:duel^tiny",
+    120.25
+   ],
+   [
+    "wave:evconvoy·fast^gilded+swift",
+    120.27
+   ],
+   [
+    "wave:evbombers·elite^swift+armored",
+    120.4
+   ],
+   [
+    "wave:evbombers·elite^armored+tiny",
+    120.46
+   ],
+   [
+    "wave:evwalker^tiny",
+    120.49
+   ],
+   [
+    "wave:evwalker^armored",
+    120.56
+   ],
+   [
+    "wave:evwalker^armored+tiny",
+    120.62
+   ],
+   [
+    "wave:evwalker^tiny+armored",
+    120.65
+   ],
+   [
+    "wave:wave^lead+swift",
+    120.99
+   ],
+   [
+    "wave:wave^lead+tiny",
+    121.09
+   ],
+   [
+    "wave:wave^swift+armored",
+    121.11
+   ],
+   [
+    "wave:evwalker·fast^gilded+swift",
+    121.17
+   ],
+   [
+    "mini:HOPLITE|k7",
+    121.21
+   ],
+   [
+    "wave:helix^swift+armored",
+    121.72
+   ],
+   [
+    "wave:helix^swift+tiny",
+    121.78
+   ],
+   [
+    "wave:evwalker·fast^lead+swift",
+    121.98
+   ],
+   [
+    "wave:evsplit·elite^lead+swift",
+    122.16
+   ],
+   [
+    "wave:evsplit·elite^gilded+swift",
+    122.22
+   ],
+   [
+    "wave:evbombers^gilded",
+    122.33
+   ],
+   [
+    "wave:evbombers^lead+swift",
+    122.38
+   ],
+   [
+    "wave:evbombers^tiny",
+    122.44
+   ],
+   [
+    "wave:evbombers^tiny+armored",
+    122.47
+   ],
+   [
+    "wave:evconvoy·mirror^swift+armored",
+    122.65
+   ],
+   [
+    "pick:pw:mag",
+    122.73
+   ],
+   [
+    "wave:line^gilded+lead",
+    122.99
+   ],
+   [
+    "wave:evwalker^gilded+swift",
+    123.06
+   ],
+   [
+    "wave:evwalker^gilded",
+    123.11
+   ],
+   [
+    "wave:evwalker^lead+swift",
+    123.15
+   ],
+   [
+    "wave:evwalker^lead+gilded",
+    123.21
+   ],
+   [
+    "pick:pw:bub",
+    123.46
+   ],
+   [
+    "wave:wave^tiny+swift",
+    123.52
+   ],
+   [
+    "wave:wave^tiny+armored",
+    123.59
+   ],
+   [
+    "verb:phalanx_wall",
+    124.16
+   ],
+   [
+    "verb:flank_shield",
+    124.28
+   ],
+   [
+    "rule:bumper",
+    125.09
+   ],
+   [
+    "wave:evbombers·elite^lead+gilded",
+    125.16
+   ],
+   [
+    "wave:evbombers·elite^tiny+armored",
+    125.22
+   ],
+   [
+    "rule:ev:convoy^lead",
+    125.26
+   ],
+   [
+    "wave:evsnipe^swift+armored",
+    125.35
+   ],
+   [
+    "wave:cross^lead+gilded",
+    125.47
+   ],
+   [
+    "wave:evheal·elite^swift+armored",
+    125.69
+   ],
+   [
+    "wave:evheal·elite^gilded",
+    125.76
+   ],
+   [
+    "wave:lattice",
+    125.84
+   ],
+   [
+    "wave:lattice^lead+tiny",
+    125.89
+   ],
+   [
+    "wave:evheal·mirror^lead",
+    126.03
+   ],
+   [
+    "wave:hold^gilded",
+    126.21
+   ],
+   [
+    "wave:hold^swift+tiny",
+    126.26
+   ],
+   [
+    "wave:sig:STALL ROWS",
+    126.33
+   ],
+   [
+    "wave:evrelay·mirror",
+    126.42
+   ],
+   [
+    "set:evrelay·mirror",
+    126.42
+   ],
+   [
+    "wave:evrelay·mirror^swift",
+    126.49
+   ],
+   [
+    "wave:evrelay·mirror^tiny+swift",
+    126.52
+   ],
+   [
+    "wave:stampede^swift",
+    126.63
+   ],
+   [
+    "rule:bumper~tw",
+    126.64
+   ],
+   [
+    "wave:evcargo·mirror^armored+tiny",
+    126.89
+   ],
+   [
+    "wave:escort",
+    127.03
+   ],
+   [
+    "wave:evcargo·mirror^gilded",
+    127.36
+   ],
+   [
+    "wave:evlayer·elite^armored+tiny",
+    127.51
+   ],
+   [
+    "wave:evlayer·elite^lead",
+    127.61
+   ],
+   [
+    "wave:sig:OLIVE GROVE",
+    127.79
+   ],
+   [
+    "rule:bumper+cover~tw",
+    128.06
+   ],
+   [
+    "wave:noose",
+    128.54
+   ],
+   [
+    "wave:sig:BRONZE DAWN",
+    128.77
+   ],
+   [
+    "boss:TALOS|k6",
+    128.94
+   ],
+   [
+    "verb:stomp",
+    128.94
+   ],
+   [
+    "wave:evlanterns·fast^lead+swift",
+    128.94
+   ],
+   [
+    "wave:zigzag^swift+tiny",
+    129.76
+   ],
+   [
+    "wave:zigzag^tiny+armored",
+    129.8
+   ],
+   [
+    "wave:evdoor·mirror^gilded+swift",
+    129.89
+   ],
+   [
+    "wave:evlanterns·fast^gilded+swift",
+    129.98
+   ],
+   [
+    "wave:tide^tiny+swift",
+    130.03
+   ],
+   [
+    "wave:evsway^tiny+armored",
+    130.11
+   ],
+   [
+    "wave:evbracket·mirror^lead",
+    130.2
+   ],
+   [
+    "rule:ev:duel^armored",
+    130.28
+   ],
+   [
+    "wave:evlanterns^lead+tiny",
+    130.51
+   ],
+   [
+    "verb:spear_throw",
+    131.86
+   ],
+   [
+    "wave:zigzag^tiny+swift",
+    132.03
+   ],
+   [
+    "wave:evdoor·mirror^tiny+swift",
+    132.12
+   ],
+   [
+    "wave:evlanterns·fast^armored+swift",
+    132.21
+   ],
+   [
+    "wave:tide^armored",
+    132.25
+   ],
+   [
+    "rule:unlock:combo-gilded-tiny",
+    132.28
+   ],
+   [
+    "wave:evsway^gilded+swift",
+    132.43
+   ],
+   [
+    "wave:swoop^lead+swift",
+    132.56
+   ],
+   [
+    "wave:evdoor·elite^lead",
+    132.65
+   ],
+   [
+    "wave:evlanterns^lead+gilded",
+    132.74
+   ],
+   [
+    "verb:heat_vent",
+    133.96
+   ],
+   [
+    "wave:turrets^lead+swift",
+    135.62
+   ],
+   [
+    "wave:turrets^lead+gilded",
+    135.68
+   ],
+   [
+    "rule:hulls",
+    135.69
+   ],
+   [
+    "wave:turrets^tiny",
+    135.74
+   ],
+   [
+    "wave:evbracket·fast^armored",
+    135.83
+   ],
+   [
+    "wave:evbracket·fast^gilded",
+    135.89
+   ],
+   [
+    "wave:evgrid·elite^lead",
+    135.97
+   ],
+   [
+    "wave:evgrid·elite^lead+swift",
+    136.03
+   ],
+   [
+    "wave:evgrid·elite^lead+gilded",
+    136.09
+   ],
+   [
+    "wave:evwindow^armored",
+    136.24
+   ],
+   [
+    "wave:evwindow^swift",
+    136.27
+   ],
+   [
+    "wave:evwindow^gilded",
+    136.33
+   ],
+   [
+    "wave:cross^gilded+tiny",
+    136.41
+   ],
+   [
+    "wave:cross^lead+swift",
+    136.47
+   ],
+   [
+    "wave:cross^gilded+swift",
+    136.53
+   ],
+   [
+    "wave:evtline·fast^swift",
+    136.65
+   ],
+   [
+    "wave:gunship^gilded+swift",
+    136.74
+   ],
+   [
+    "wave:gunship^lead+gilded",
+    136.8
+   ],
+   [
+    "wave:gunship^tiny",
+    136.86
+   ],
+   [
+    "wave:gunship^swift+armored",
+    136.89
+   ],
+   [
+    "wave:orbit^tiny",
+    137
+   ],
+   [
+    "wave:orbit^armored+tiny",
+    137.06
+   ],
+   [
+    "wave:orbit^tiny+armored",
+    137.09
+   ],
+   [
+    "wave:sig:GLASS CORRIDOR",
+    137.15
+   ],
+   [
+    "wave:turrets^lead+tiny",
+    137.19
+   ],
+   [
+    "wave:turrets^gilded+swift",
+    137.21
+   ],
+   [
+    "wave:turrets^swift+armored",
+    137.27
+   ],
+   [
+    "wave:turrets^armored",
+    137.33
+   ],
+   [
+    "wave:evbracket·fast^tiny+armored",
+    137.39
+   ],
+   [
+    "wave:evbracket·fast^lead+tiny",
+    137.42
+   ],
+   [
+    "wave:evbracket·fast^gilded+lead",
+    137.48
+   ],
+   [
+    "wave:evbracket·fast^gilded+swift",
+    137.54
+   ],
+   [
+    "wave:evgrid·elite^lead+tiny",
+    137.57
+   ],
+   [
+    "wave:evgrid·elite^gilded+swift",
+    137.63
+   ],
+   [
+    "wave:evgrid·elite^armored+tiny",
+    137.69
+   ],
+   [
+    "wave:evgrid·elite^tiny+armored",
+    137.74
+   ],
+   [
+    "wave:gunship^gilded+lead",
+    137.82
+   ],
+   [
+    "wave:gunship^lead+swift",
+    137.86
+   ],
+   [
+    "wave:gunship^gilded+tiny",
+    137.92
+   ],
+   [
+    "wave:evtline·mirror^gilded+tiny",
+    138.01
+   ],
+   [
+    "wave:evtline·mirror^lead+tiny",
+    138.07
+   ],
+   [
+    "wave:evtline·mirror^armored",
+    138.13
+   ],
+   [
+    "wave:turrets^gilded+lead",
+    138.2
+   ],
+   [
+    "wave:turrets^lead",
+    138.23
+   ],
+   [
+    "wave:turrets^swift+tiny",
+    138.29
+   ],
+   [
+    "wave:turrets^armored+swift",
+    138.35
+   ],
+   [
+    "wave:evbracket·fast^armored+tiny",
+    138.41
+   ],
+   [
+    "wave:evbracket·fast^lead+swift",
+    138.44
+   ],
+   [
+    "wave:evbracket·fast^armored+swift",
+    138.49
+   ],
+   [
+    "wave:evbracket·fast^tiny",
+    138.55
+   ],
+   [
+    "wave:evgrid·elite^swift+armored",
+    138.6
+   ],
+   [
+    "wave:evgrid·elite^armored",
+    138.64
+   ],
+   [
+    "wave:evgrid·elite^gilded+lead",
+    138.7
+   ],
+   [
+    "wave:evgrid·elite^gilded+tiny",
+    138.76
+   ],
+   [
+    "wave:box^armored+tiny",
+    138.88
+   ],
+   [
+    "wave:box^lead+tiny",
+    138.94
+   ],
+   [
+    "wave:evtline·mirror^gilded",
+    138.99
+   ],
+   [
+    "wave:evtline·mirror^gilded+lead",
+    139.02
+   ],
+   [
+    "wave:evtline·mirror^gilded+swift",
+    139.08
+   ],
+   [
+    "wave:evtline·mirror^swift+tiny",
+    139.11
+   ],
+   [
+    "wave:evwindow·elite^swift+tiny",
+    139.41
+   ],
+   [
+    "wave:evwindow·elite^swift+armored",
+    139.47
+   ],
+   [
+    "wave:evwindow·elite^gilded+tiny",
+    139.49
+   ],
+   [
+    "wave:orbit^lead+swift",
+    139.58
+   ],
+   [
+    "wave:orbit^armored+swift",
+    139.6
+   ],
+   [
+    "wave:orbit^swift",
+    139.64
+   ],
+   [
+    "wave:orbit^gilded+tiny",
+    139.7
+   ],
+   [
+    "wave:gunship^armored",
+    139.85
+   ],
+   [
+    "wave:gunship^armored+tiny",
+    139.91
+   ],
+   [
+    "wave:gunship^lead",
+    139.97
+   ],
+   [
+    "wave:zigzag^armored+swift",
+    140.02
+   ],
+   [
+    "rule:hulls~tw",
+    140.08
+   ],
+   [
+    "wave:evwindow·elite^gilded+swift",
+    140.11
+   ],
+   [
+    "wave:evguard^armored",
+    140.28
+   ],
+   [
+    "rule:epoch:7:nv-skin-base",
+    140.3
+   ],
+   [
+    "rule:ev:convoy^armored",
+    140.3
+   ],
+   [
+    "wave:orbit^gilded+lead",
+    140.33
+   ],
+   [
+    "wave:evstation·elite^swift+lead",
+    140.59
+   ],
+   [
+    "wave:sig:FERRY WAKE",
+    140.83
+   ],
+   [
+    "wave:pillars",
+    140.89
+   ],
+   [
+    "wave:pillars^armored+tiny",
+    140.92
+   ],
+   [
+    "wave:evwindow·elite^armored+swift",
+    140.95
+   ],
+   [
+    "wave:evguard^armored+tiny",
+    141.08
+   ],
+   [
+    "wave:orbit^lead",
+    141.1
+   ],
+   [
+    "wave:orbit^lead+tiny",
+    141.13
+   ],
+   [
+    "wave:evshieldv·fast^lead+swift",
+    141.21
+   ],
+   [
+    "wave:evshieldv·fast^lead",
+    141.26
+   ],
+   [
+    "wave:evstation·elite^gilded",
+    141.3
+   ],
+   [
+    "wave:geyser^lead+gilded",
+    141.52
+   ],
+   [
+    "wave:hold^tiny+armored",
+    141.52
+   ],
+   [
+    "wave:hold^lead+gilded",
+    141.52
+   ],
+   [
+    "wave:braid^swift+armored",
+    141.75
+   ],
+   [
+    "wave:evwindow·elite^lead+swift",
+    141.84
+   ],
+   [
+    "wave:evguard^lead+tiny",
+    141.93
+   ],
+   [
+    "wave:orbit^armored",
+    142.01
+   ],
+   [
+    "wave:orbit^tiny+swift",
+    142.06
+   ],
+   [
+    "wave:evshieldv·fast^gilded+swift",
+    142.15
+   ],
+   [
+    "wave:evstation·elite^tiny+armored",
+    142.23
+   ],
+   [
+    "wave:geyser^swift+lead",
+    142.32
+   ],
+   [
+    "wave:hold^tiny+swift",
+    142.41
+   ],
+   [
+    "wave:hold^gilded+tiny",
+    142.48
+   ],
+   [
+    "wave:slalom^tiny+armored",
+    142.61
+   ],
+   [
+    "wave:slalom^lead",
+    142.64
+   ],
+   [
+    "wave:evwindow·elite^gilded+lead",
+    142.7
+   ],
+   [
+    "wave:evguard^gilded+tiny",
+    142.81
+   ],
+   [
+    "wave:orbit^swift+armored",
+    142.84
+   ],
+   [
+    "wave:orbit^gilded+swift",
+    142.86
+   ],
+   [
+    "wave:evshieldv·fast^lead+tiny",
+    142.94
+   ],
+   [
+    "wave:evshieldv·fast^gilded+tiny",
+    142.99
+   ],
+   [
+    "wave:evstation·elite^swift",
+    143.03
+   ],
+   [
+    "wave:geyser^swift+armored",
+    143.16
+   ],
+   [
+    "wave:geyser^lead+swift",
+    143.16
+   ],
+   [
+    "wave:hold^swift+armored",
+    143.27
+   ],
+   [
+    "wave:bounce^gilded+swift",
+    143.48
+   ],
+   [
+    "wave:evwindow·elite^tiny",
+    143.57
+   ],
+   [
+    "wave:evguard^tiny+armored",
+    143.66
+   ],
+   [
+    "wave:evguard^swift+armored",
+    143.74
+   ],
+   [
+    "wave:orbit^swift+lead",
+    143.79
+   ],
+   [
+    "wave:evshieldv·fast^swift+lead",
+    143.88
+   ],
+   [
+    "wave:evstation·elite^gilded+lead",
+    143.96
+   ],
+   [
+    "wave:evstation·elite^tiny",
+    144.05
+   ],
+   [
+    "wave:hold^tiny",
+    144.19
+   ],
+   [
+    "rule:unlock:combo-armored-lead",
+    144.31
+   ],
+   [
+    "wave:slalom^armored+tiny",
+    144.31
+   ],
+   [
+    "wave:slalom^gilded+tiny",
+    144.34
+   ],
+   [
+    "wave:evwindow·elite^swift",
+    144.37
+   ],
+   [
+    "wave:evguard^swift+lead",
+    144.48
+   ],
+   [
+    "wave:evguard^tiny+swift",
+    144.54
+   ],
+   [
+    "wave:orbit^armored+lead",
+    144.56
+   ],
+   [
+    "wave:orbit^lead+gilded",
+    144.59
+   ],
+   [
+    "wave:evshieldv·fast^armored+tiny",
+    144.67
+   ],
+   [
+    "wave:evshieldv·fast^swift+armored",
+    144.72
+   ],
+   [
+    "wave:evstation·elite^swift+tiny",
+    144.76
+   ],
+   [
+    "wave:noose^swift+lead",
+    144.91
+   ],
+   [
+    "wave:hold^armored+tiny",
+    144.96
+   ],
+   [
+    "wave:hold^armored+lead",
+    145.02
+   ],
+   [
+    "wave:slalom^gilded+swift",
+    145.15
+   ],
+   [
+    "wave:bait^swift+lead",
+    145.2
+   ],
+   [
+    "wave:bait^armored+tiny",
+    145.26
+   ],
+   [
+    "rule:hulls+bumper~tw",
+    145.27
+   ],
+   [
+    "wave:bait^tiny",
+    145.33
+   ],
+   [
+    "wave:evstation^gilded+swift",
+    145.42
+   ],
+   [
+    "wave:evstation^lead+swift",
+    145.47
+   ],
+   [
+    "wave:evfunnel·mirror^gilded+lead",
+    145.6
+   ],
+   [
+    "wave:evdive·fast^gilded+tiny",
+    145.69
+   ],
+   [
+    "wave:evdive·fast^armored+swift",
+    145.69
+   ],
+   [
+    "wave:arrow^gilded+tiny",
+    145.8
+   ],
+   [
+    "wave:arrow^swift+lead",
+    145.8
+   ],
+   [
+    "wave:arrow^armored",
+    145.89
+   ],
+   [
+    "wave:arrow^tiny+swift",
+    145.89
+   ],
+   [
+    "wave:cross^armored+lead",
+    146.02
+   ],
+   [
+    "wave:cross^swift+lead",
+    146.03
+   ],
+   [
+    "wave:crossX^armored+lead",
+    146.15
+   ],
+   [
+    "wave:crossX^swift+armored",
+    146.18
+   ],
+   [
+    "wave:hold^lead+tiny",
+    146.24
+   ],
+   [
+    "wave:hold^gilded+lead",
+    146.3
+   ],
+   [
+    "wave:hold^gilded+swift",
+    146.37
+   ],
+   [
+    "wave:hold^swift+lead",
+    146.4
+   ],
+   [
+    "wave:sig:RAIL RHYTHM",
+    146.45
+   ],
+   [
+    "wave:evmines^gilded+tiny",
+    146.66
+   ],
+   [
+    "wave:evmines^lead+tiny",
+    146.71
+   ],
+   [
+    "wave:evmines^lead+gilded",
+    146.74
+   ],
+   [
+    "wave:echo^swift",
+    146.81
+   ],
+   [
+    "wave:echo^swift+lead",
+    146.88
+   ],
+   [
+    "rule:pads",
+    146.88
+   ],
+   [
+    "wave:evmines·mirror^tiny",
+    146.97
+   ],
+   [
+    "wave:evmines·mirror^lead+tiny",
+    147.03
+   ],
+   [
+    "wave:evtank·fast^lead+tiny",
+    147.13
+   ],
+   [
+    "wave:evtank·fast^armored",
+    147.16
+   ],
+   [
+    "wave:scissors^armored+swift",
+    147.25
+   ],
+   [
+    "wave:scissors^gilded+swift",
+    147.31
+   ],
+   [
+    "wave:evwalker^lead+tiny",
+    147.41
+   ],
+   [
+    "wave:evwalker^swift",
+    147.44
+   ],
+   [
+    "wave:evram·mirror^lead+tiny",
+    147.52
+   ],
+   [
+    "wave:evram·mirror^tiny",
+    147.56
+   ],
+   [
+    "wave:evram·mirror^gilded+tiny",
+    147.63
+   ],
+   [
+    "wave:helix^swift+lead",
+    147.75
+   ],
+   [
+    "wave:helix^lead+swift",
+    147.75
+   ],
+   [
+    "wave:hold^lead+swift",
+    147.83
+   ],
+   [
+    "wave:sig:TRADE RUSH",
+    147.91
+   ],
+   [
+    "wave:echo^armored+tiny",
+    148.06
+   ],
+   [
+    "wave:echo^lead+tiny",
+    148.08
+   ],
+   [
+    "wave:evmines·mirror^gilded+swift",
+    148.16
+   ],
+   [
+    "wave:evmines·mirror^armored+tiny",
+    148.22
+   ],
+   [
+    "wave:evmines·mirror^gilded+lead",
+    148.24
+   ],
+   [
+    "wave:evtank·fast^armored+lead",
+    148.28
+   ],
+   [
+    "wave:evtank·fast^tiny+armored",
+    148.31
+   ],
+   [
+    "wave:scissors^swift",
+    148.44
+   ],
+   [
+    "wave:scissors^tiny+swift",
+    148.45
+   ],
+   [
+    "wave:scissors^gilded+tiny",
+    148.49
+   ],
+   [
+    "wave:scissors^lead+tiny",
+    148.53
+   ],
+   [
+    "wave:evwalker^armored+swift",
+    148.56
+   ],
+   [
+    "wave:evwalker^gilded+tiny",
+    148.59
+   ],
+   [
+    "wave:evwalker^armored+lead",
+    148.66
+   ],
+   [
+    "wave:evram·mirror^lead",
+    148.69
+   ],
+   [
+    "wave:evram·mirror^lead+swift",
+    148.75
+   ],
+   [
+    "wave:evram·mirror^lead+gilded",
+    148.81
+   ],
+   [
+    "wave:helix^lead+tiny",
+    148.83
+   ],
+   [
+    "wave:helix^armored+swift",
+    148.88
+   ],
+   [
+    "wave:helix^armored+lead",
+    148.94
+   ],
+   [
+    "wave:kamikaze^gilded+tiny",
+    149.16
+   ],
+   [
+    "wave:kamikaze^swift+armored",
+    149.22
+   ],
+   [
+    "rule:pads~tw",
+    149.23
+   ],
+   [
+    "wave:kamikaze^lead+gilded",
+    149.29
+   ],
+   [
+    "wave:kamikaze^tiny+swift",
+    149.35
+   ],
+   [
+    "wave:evwalker·fast^swift+lead",
+    149.49
+   ],
+   [
+    "wave:evwalker·fast^armored+lead",
+    149.55
+   ],
+   [
+    "wave:evwalker·fast^gilded+tiny",
+    149.58
+   ],
+   [
+    "wave:evconvoy·elite^gilded+tiny",
+    149.68
+   ],
+   [
+    "wave:evconvoy·elite^armored+swift",
+    149.74
+   ],
+   [
+    "wave:evconvoy·elite^lead+tiny",
+    149.81
+   ],
+   [
+    "wave:evconvoy·elite^lead+swift",
+    149.82
+   ],
+   [
+    "wave:lattice^swift+lead",
+    149.93
+   ],
+   [
+    "wave:lattice^gilded+lead",
+    149.97
+   ],
+   [
+    "wave:lattice^lead+swift",
+    150.04
+   ],
+   [
+    "wave:lattice^tiny",
+    150.07
+   ],
+   [
+    "wave:stairs^lead+swift",
+    150.14
+   ],
+   [
+    "wave:stairs^gilded+lead",
+    150.21
+   ],
+   [
+    "wave:stairs^gilded+tiny",
+    150.22
+   ],
+   [
+    "wave:stairs^armored+tiny",
+    150.27
+   ],
+   [
+    "rule:ev:duel^gilded",
+    150.33
+   ],
+   [
+    "wave:evbombers·fast^swift",
+    150.37
+   ],
+   [
+    "wave:evbombers·fast^gilded+tiny",
+    150.44
+   ],
+   [
+    "wave:evbombers·fast^tiny+armored",
+    150.5
+   ],
+   [
+    "wave:evbombers·fast^lead",
+    150.53
+   ],
+   [
+    "wave:evbombers·fast^lead+tiny",
+    150.6
+   ],
+   [
+    "wave:pulse^lead+swift",
+    150.73
+   ],
+   [
+    "wave:pulse^gilded",
+    150.79
+   ],
+   [
+    "wave:pulse^lead+tiny",
+    150.86
+   ],
+   [
+    "wave:stampede^swift+armored",
+    150.91
+   ],
+   [
+    "wave:stampede^armored+tiny",
+    150.97
+   ],
+   [
+    "wave:stampede^armored+lead",
+    151.03
+   ],
+   [
+    "wave:stampede^swift+tiny",
+    151.1
+   ],
+   [
+    "wave:phalanx^swift",
+    151.44
+   ],
+   [
+    "wave:phalanx^swift+lead",
+    151.49
+   ],
+   [
+    "wave:phalanx^tiny",
+    151.54
+   ],
+   [
+    "wave:stairs^tiny",
+    151.61
+   ],
+   [
+    "wave:stairs^swift+lead",
+    151.63
+   ],
+   [
+    "wave:stairs^swift+armored",
+    151.64
+   ],
+   [
+    "wave:stairs^gilded+swift",
+    151.74
+   ],
+   [
+    "wave:stairs^lead",
+    151.79
+   ],
+   [
+    "wave:stairs^lead+tiny",
+    151.81
+   ],
+   [
+    "wave:comet",
+    151.86
+   ],
+   [
+    "wave:comet^lead",
+    151.92
+   ],
+   [
+    "wave:comet^swift",
+    151.94
+   ],
+   [
+    "wave:comet^armored",
+    151.99
+   ],
+   [
+    "wave:comet^gilded",
+    152.05
+   ],
+   [
+    "wave:evbombers·fast^swift+lead",
+    152.08
+   ],
+   [
+    "wave:evbombers·fast^gilded",
+    152.15
+   ],
+   [
+    "wave:evbombers·fast^lead+gilded",
+    152.21
+   ],
+   [
+    "wave:evbombers·fast^gilded+lead",
+    152.25
+   ],
+   [
+    "wave:evbombers·fast^gilded+swift",
+    152.28
+   ],
+   [
+    "wave:evconvoy·elite^swift+armored",
+    152.39
+   ],
+   [
+    "wave:evconvoy·elite^tiny",
+    152.5
+   ],
+   [
+    "wave:stampede^tiny+armored",
+    152.54
+   ],
+   [
+    "wave:stampede^swift+lead",
+    152.57
+   ],
+   [
+    "wave:stampede^lead+tiny",
+    152.64
+   ],
+   [
+    "wave:stampede^lead+gilded",
+    152.7
+   ],
+   [
+    "wave:stampede^gilded+lead",
+    152.76
+   ],
+   [
+    "wave:pulse^swift+armored",
+    153.06
+   ],
+   [
+    "wave:pulse^armored",
+    153.1
+   ],
+   [
+    "wave:pulse^armored+tiny",
+    153.18
+   ],
+   [
+    "wave:pulse^gilded+tiny",
+    153.2
+   ],
+   [
+    "wave:evbombers^gilded+lead",
+    153.29
+   ],
+   [
+    "wave:evbombers^lead+tiny",
+    153.3
+   ],
+   [
+    "wave:evbombers^armored+tiny",
+    153.37
+   ],
+   [
+    "wave:evbombers^tiny+swift",
+    153.46
+   ],
+   [
+    "wave:crossX^gilded+swift",
+    153.55
+   ],
+   [
+    "wave:crossX^lead+tiny",
+    153.59
+   ],
+   [
+    "wave:crossX^swift+lead",
+    153.62
+   ],
+   [
+    "wave:crossX^lead",
+    153.68
+   ],
+   [
+    "wave:crossX^gilded+tiny",
+    153.72
+   ],
+   [
+    "wave:evconvoy·fast^lead+swift",
+    153.84
+   ],
+   [
+    "wave:evconvoy·fast^armored+tiny",
+    153.94
+   ],
+   [
+    "wave:evconvoy·fast^swift+lead",
+    153.97
+   ],
+   [
+    "wave:evconvoy·fast^armored+lead",
+    154.04
+   ],
+   [
+    "wave:testudo",
+    154.1
+   ],
+   [
+    "wave:testudo^gilded+lead",
+    154.17
+   ],
+   [
+    "wave:testudo^swift+lead",
+    154.3
+   ],
+   [
+    "wave:bounce^armored+tiny",
+    154.43
+   ],
+   [
+    "wave:bounce^lead+swift",
+    154.5
+   ],
+   [
+    "wave:sig:MARBLE ECHO",
+    154.54
+   ],
+   [
+    "wave:evsplit·fast^swift+armored",
+    154.89
+   ],
+   [
+    "wave:evsplit·fast^lead+gilded",
+    154.93
+   ]
+  ],
+  "mechTimeline": [
+   [
+    "enemy:drone",
+    0
+   ],
+   [
+    "enemy:drone*",
+    0
+   ],
+   [
+    "set:supply",
+    0.35
+   ],
+   [
+    "set:gust",
+    0.91
+   ],
+   [
+    "set:sig:COURIER LIGHTS",
+    1.23
+   ],
+   [
+    "rule:well",
+    1.55
+   ],
+   [
+    "enemy:fk_diver",
+    1.7
+   ],
+   [
+    "set:blackout",
+    1.91
+   ],
+   [
+    "enemy:turret",
+    2.83
+   ],
+   [
+    "set:sig:PATROL GRID",
+    2.83
+   ],
+   [
+    "set:lane",
+    2.87
+   ],
+   [
+    "enemy:flank",
+    3
+   ],
+   [
+    "enemy:mine",
+    3.06
+   ],
+   [
+    "rule:well~tw",
+    3.1
+   ],
+   [
+    "set:sig:WINDOW DISPLAY",
+    4.31
+   ],
+   [
+    "enemy:gturret",
+    4.34
+   ],
+   [
+    "set:weave",
+    4.47
+   ],
+   [
+    "enemy:charger",
+    4.53
+   ],
+   [
+    "enemy:charger*",
+    4.54
+   ],
+   [
+    "enemy:shielder",
+    4.64
+   ],
+   [
+    "set:evstation",
+    4.64
+   ],
+   [
+    "enemy:swarm",
+    4.88
+   ],
+   [
+    "rule:ev:rest",
+    5.01
+   ],
+   [
+    "set:sig:GUARD CHANGE",
+    5.91
+   ],
+   [
+    "enemy:flank*",
+    6.05
+   ],
+   [
+    "rule:lane",
+    6.15
+   ],
+   [
+    "set:evfunnel",
+    6.28
+   ],
+   [
+    "set:evgrid",
+    6.5
+   ],
+   [
+    "enemy:turret*",
+    6.55
+   ],
+   [
+    "set:evwindow",
+    6.82
+   ],
+   [
+    "set:hail",
+    7
+   ],
+   [
+    "set:evtline",
+    7.28
+   ],
+   [
+    "mini:TRESOR-WART|k5",
+    8.09
+   ],
+   [
+    "verb:bar_curtain",
+    8.09
+   ],
+   [
+    "verb:rain_lane",
+    8.1
+   ],
+   [
+    "verb:lob",
+    8.28
+   ],
+   [
+    "verb:vault_doors",
+    8.54
+   ],
+   [
+    "set:drop",
+    9.75
+   ],
+   [
+    "drop:hit",
+    9.79
+   ],
+   [
+    "rule:ev:ambush",
+    10.02
+   ],
+   [
+    "fence:fence",
+    10.28
+   ],
+   [
+    "set:fence",
+    10.28
+   ],
+   [
+    "rule:unlock:tw-gilded",
+    12.02
+   ],
+   [
+    "set:gaterun",
+    12.67
+   ],
+   [
+    "verb:minefield",
+    13.5
+   ],
+   [
+    "verb:vault_lock",
+    13.54
+   ],
+   [
+    "verb:split_shot",
+    13.58
+   ],
+   [
+    "verb:shockwave",
+    13.99
+   ],
+   [
+    "enemy:gate",
+    14.25
+   ],
+   [
+    "enemy:einterceptor",
+    14.31
+   ],
+   [
+    "rule:lane~tw",
+    14.35
+   ],
+   [
+    "set:evmines",
+    14.56
+   ],
+   [
+    "set:rescue",
+    14.65
+   ],
+   [
+    "set:evgrid·fast",
+    14.8
+   ],
+   [
+    "set:evgrid·elite",
+    14.93
+   ],
+   [
+    "rule:ev:convoy",
+    15.03
+   ],
+   [
+    "enemy:fk_crawler",
+    15.05
+   ],
+   [
+    "set:evmines·mirror",
+    15.2
+   ],
+   [
+    "set:evtline·fast",
+    15.31
+   ],
+   [
+    "rule:lane+well~tw",
+    15.9
+   ],
+   [
+    "set:evram",
+    15.93
+   ],
+   [
+    "set:evwindow·mirror",
+    16.05
+   ],
+   [
+    "set:evshieldv·elite",
+    16.3
+   ],
+   [
+    "set:evguard·mirror",
+    16.56
+   ],
+   [
+    "set:evwindow·elite",
+    16.83
+   ],
+   [
+    "set:evguard·fast",
+    17.2
+   ],
+   [
+    "enemy:gwalker",
+    17.41
+   ],
+   [
+    "set:evwalker·mirror",
+    17.41
+   ],
+   [
+    "rule:echo",
+    17.43
+   ],
+   [
+    "set:evshieldv·fast",
+    17.53
+   ],
+   [
+    "set:evfunnel·mirror",
+    17.77
+   ],
+   [
+    "set:evwalker·elite",
+    17.9
+   ],
+   [
+    "set:evshieldv",
+    17.98
+   ],
+   [
+    "boss:SEK-ADLER|k0",
+    18.22
+   ],
+   [
+    "verb:tri_burst",
+    18.22
+   ],
+   [
+    "verb:homing_orb",
+    18.22
+   ],
+   [
+    "verb:laser_sweep",
+    18.4
+   ],
+   [
+    "verb:siren_ram",
+    18.65
+   ],
+   [
+    "verb:echo",
+    18.73
+   ],
+   [
+    "verb:backup_cores",
+    18.78
+   ],
+   [
+    "verb:track_beam",
+    18.82
+   ],
+   [
+    "enemy:fk_bait",
+    18.89
+   ],
+   [
+    "verb:bullet_time",
+    19.2
+   ],
+   [
+    "rule:epoch:1:nv-skin-tri",
+    20.03
+   ],
+   [
+    "rule:ev:convoy^swift",
+    20.03
+   ],
+   [
+    "set:turrets",
+    21.31
+   ],
+   [
+    "rule:echo~tw",
+    23.58
+   ],
+   [
+    "enemy:splitter",
+    23.63
+   ],
+   [
+    "set:evsplit·fast",
+    23.63
+   ],
+   [
+    "enemy:zdrn",
+    23.68
+   ],
+   [
+    "set:evfunnel·elite",
+    23.8
+   ],
+   [
+    "rule:unlock:ev-rush",
+    24.04
+   ],
+   [
+    "set:evsplit·mirror",
+    24.51
+   ],
+   [
+    "rule:ev:rush",
+    25.05
+   ],
+   [
+    "enemy:gunship",
+    25.07
+   ],
+   [
+    "rule:echo+lane~tw",
+    25.12
+   ],
+   [
+    "set:evconvoy·elite",
+    25.16
+   ],
+   [
+    "set:evtank·fast",
+    25.6
+   ],
+   [
+    "set:evram·elite",
+    25.69
+   ],
+   [
+    "set:evtank·mirror",
+    26
+   ],
+   [
+    "set:evconvoy·fast",
+    26.08
+   ],
+   [
+    "rule:gold",
+    26.53
+   ],
+   [
+    "set:evbombers",
+    26.59
+   ],
+   [
+    "set:evram·mirror",
+    26.71
+   ],
+   [
+    "enemy:bomber",
+    26.96
+   ],
+   [
+    "enemy:ebomber",
+    27.02
+   ],
+   [
+    "set:evbombers·elite",
+    27.93
+   ],
+   [
+    "rule:gold~tw",
+    28.08
+   ],
+   [
+    "enemy:gtank",
+    28.16
+   ],
+   [
+    "set:evconvoy·mirror",
+    28.16
+   ],
+   [
+    "set:evbombers·fast",
+    28.31
+   ],
+   [
+    "set:evlanterns·fast",
+    28.78
+   ],
+   [
+    "rule:gold+echo~tw",
+    29.57
+   ],
+   [
+    "set:evsway·elite",
+    29.91
+   ],
+   [
+    "rule:ev:ambush^gilded",
+    30.06
+   ],
+   [
+    "set:evlanterns·elite",
+    30.68
+   ],
+   [
+    "mini:BRÜCKEN-WÄCHTER|k4",
+    31.56
+   ],
+   [
+    "verb:bounce_orbs",
+    31.56
+   ],
+   [
+    "verb:g_charge",
+    31.68
+   ],
+   [
+    "verb:lane_wall",
+    31.75
+   ],
+   [
+    "set:evlanterns",
+    33.69
+   ],
+   [
+    "set:wedge",
+    35.04
+   ],
+   [
+    "rule:ev:rush^swift",
+    35.07
+   ],
+   [
+    "rule:unlock:tw-tiny",
+    36.07
+   ],
+   [
+    "drop:miss",
+    37.28
+   ],
+   [
+    "rule:epoch:2:nv-skin-dia",
+    40.07
+   ],
+   [
+    "verb:bridge_drop",
+    40.22
+   ],
+   [
+    "verb:hold_span",
+    40.3
+   ],
+   [
+    "verb:cross_beams",
+    40.34
+   ],
+   [
+    "rule:ev:rush^armored",
+    45.43
+   ],
+   [
+    "rule:portal",
+    45.53
+   ],
+   [
+    "enemy:sniper",
+    45.61
+   ],
+   [
+    "set:evsnipe·elite",
+    45.61
+   ],
+   [
+    "set:evsway",
+    45.7
+   ],
+   [
+    "set:evsnipe·mirror",
+    46.32
+   ],
+   [
+    "set:evsway·mirror",
+    46.9
+   ],
+   [
+    "rule:portal~tw",
+    47.07
+   ],
+   [
+    "set:evguard",
+    47.58
+   ],
+   [
+    "set:evshieldv·mirror",
+    47.74
+   ],
+   [
+    "set:evwindow·fast",
+    47.89
+   ],
+   [
+    "set:evtline·elite",
+    48.01
+   ],
+   [
+    "rule:unlock:ev-duel",
+    48.09
+   ],
+   [
+    "rule:portal+gold~tw",
+    48.6
+   ],
+   [
+    "enemy:healer",
+    48.65
+   ],
+   [
+    "set:evheal·mirror",
+    48.65
+   ],
+   [
+    "enemy:ecarrier",
+    48.79
+   ],
+   [
+    "enemy:efdrone",
+    48.83
+   ],
+   [
+    "set:mines",
+    48.87
+   ],
+   [
+    "set:evheal·elite",
+    49.12
+   ],
+   [
+    "boss:FLUSSKRAKE|k1",
+    49.23
+   ],
+   [
+    "verb:spokes",
+    49.23
+   ],
+   [
+    "verb:pulse_ring",
+    49.36
+   ],
+   [
+    "verb:tide_lanes",
+    49.87
+   ],
+   [
+    "verb:tentacle_tips",
+    50
+   ],
+   [
+    "verb:vacuum",
+    50.08
+   ],
+   [
+    "verb:orbit_drones",
+    50.55
+   ],
+   [
+    "rule:ev:duel",
+    50.82
+   ],
+   [
+    "rule:ev:rush^tiny",
+    55.81
+   ],
+   [
+    "rule:bounce",
+    55.91
+   ],
+   [
+    "set:evrelay·fast",
+    55.99
+   ],
+   [
+    "set:evguard·elite",
+    56.12
+   ],
+   [
+    "set:swarm",
+    56.24
+   ],
+   [
+    "set:evrelay·elite",
+    56.77
+   ],
+   [
+    "rule:bounce~tw",
+    57.45
+   ],
+   [
+    "set:evmines·fast",
+    57.99
+   ],
+   [
+    "set:evtank·elite",
+    58.01
+   ],
+   [
+    "rule:bounce+portal~tw",
+    59
+   ],
+   [
+    "enemy:carrier",
+    59.04
+   ],
+   [
+    "set:evcargo",
+    59.04
+   ],
+   [
+    "set:evmines·elite",
+    59.52
+   ],
+   [
+    "set:evtank",
+    59.57
+   ],
+   [
+    "set:evcargo·elite",
+    59.99
+   ],
+   [
+    "rule:epoch:3:nv-skin-ring",
+    60.1
+   ],
+   [
+    "rule:unlock:tw-lead",
+    60.1
+   ],
+   [
+    "rule:ev:convoy^tiny",
+    60.1
+   ],
+   [
+    "set:crossfire",
+    60.28
+   ],
+   [
+    "rule:pocket",
+    60.54
+   ],
+   [
+    "set:evwalker·fast",
+    60.71
+   ],
+   [
+    "set:evwalker",
+    61.37
+   ],
+   [
+    "rule:pocket~tw",
+    62.08
+   ],
+   [
+    "set:evheal",
+    62.57
+   ],
+   [
+    "set:evsnipe·fast",
+    62.95
+   ],
+   [
+    "mini:SCHRANKEN-WART|k5",
+    63.98
+   ],
+   [
+    "rule:ev:duel^lead",
+    65.12
+   ],
+   [
+    "set:evheal·fast",
+    65.39
+   ],
+   [
+    "set:evsnipe",
+    65.72
+   ],
+   [
+    "verb:barrier_gates",
+    66.83
+   ],
+   [
+    "verb:signal_override",
+    66.9
+   ],
+   [
+    "verb:delay_bombs",
+    66.94
+   ],
+   [
+    "verb:gravity_well",
+    66.97
+   ],
+   [
+    "set:evconvoy",
+    67.8
+   ],
+   [
+    "verb:beat_floor",
+    70.23
+   ],
+   [
+    "rule:ev:rest^armored",
+    70.46
+   ],
+   [
+    "rule:pocket+bounce~tw",
+    70.56
+   ],
+   [
+    "enemy:minelayer",
+    70.64
+   ],
+   [
+    "set:evlayer·elite",
+    70.64
+   ],
+   [
+    "enemy:kamikaze",
+    71.45
+   ],
+   [
+    "set:evlayer·mirror",
+    71.94
+   ],
+   [
+    "rule:hunter",
+    72.1
+   ],
+   [
+    "rule:unlock:combo-swift-armored",
+    72.13
+   ],
+   [
+    "set:evrelay",
+    72.19
+   ],
+   [
+    "set:evcargo·mirror",
+    72.34
+   ],
+   [
+    "set:evcargo·fast",
+    73.14
+   ],
+   [
+    "rule:hunter~tw",
+    73.65
+   ],
+   [
+    "boss:ZENTRAL-ICE|k2",
+    74.32
+   ],
+   [
+    "verb:spiral_rev",
+    74.52
+   ],
+   [
+    "rule:ev:ambush^armored",
+    75.15
+   ],
+   [
+    "verb:firewall",
+    76.32
+   ],
+   [
+    "verb:overload",
+    76.42
+   ],
+   [
+    "rule:hunter+pocket~tw",
+    79.05
+   ],
+   [
+    "set:evtline·mirror",
+    79.48
+   ],
+   [
+    "set:evgrid·mirror",
+    79.89
+   ],
+   [
+    "enemy:ecruiser",
+    80.12
+   ],
+   [
+    "rule:epoch:4:nv-skin-hex",
+    80.17
+   ],
+   [
+    "rule:ev:rush^lead",
+    80.17
+   ],
+   [
+    "rule:gate",
+    80.5
+   ],
+   [
+    "set:evstation·fast",
+    80.94
+   ],
+   [
+    "rule:gate~tw",
+    82.05
+   ],
+   [
+    "set:evfunnel·fast",
+    82.95
+   ],
+   [
+    "set:evstation·elite",
+    83.07
+   ],
+   [
+    "mut:hail",
+    83.39
+   ],
+   [
+    "rule:gate+hunter~tw",
+    83.47
+   ],
+   [
+    "rule:unlock:combo-tiny-swift",
+    84.18
+   ],
+   [
+    "rule:tide",
+    85.01
+   ],
+   [
+    "rule:ev:rush^gilded",
+    85.19
+   ],
+   [
+    "set:evsplit·elite",
+    85.37
+   ],
+   [
+    "mini:MESSE-WÄCHTER|k4",
+    86.95
+   ],
+   [
+    "verb:mirror_hall",
+    87.39
+   ],
+   [
+    "verb:spotlight",
+    87.47
+   ],
+   [
+    "rule:ev:convoy^gilded",
+    90.36
+   ],
+   [
+    "set:evbombers·mirror",
+    91.14
+   ],
+   [
+    "rule:unlock:combo-lead-gilded",
+    96.19
+   ],
+   [
+    "rule:epoch:5:nv-skin-star",
+    100.19
+   ],
+   [
+    "rule:ev:rest^tiny",
+    100.36
+   ],
+   [
+    "mut:mine",
+    100.37
+   ],
+   [
+    "rule:tide~tw",
+    100.46
+   ],
+   [
+    "rule:tide+gate~tw",
+    101.97
+   ],
+   [
+    "rule:cash",
+    103.52
+   ],
+   [
+    "boss:KRONOS|k3",
+    104.16
+   ],
+   [
+    "verb:cashflow",
+    105.06
+   ],
+   [
+    "verb:cash_core",
+    105.15
+   ],
+   [
+    "rule:unlock:combo-armored-tiny",
+    108.22
+   ],
+   [
+    "rule:ev:rest^gilded",
+    111.35
+   ],
+   [
+    "rule:cash~tw",
+    111.45
+   ],
+   [
+    "rule:cash+tide~tw",
+    112.98
+   ],
+   [
+    "rule:cover",
+    114.52
+   ],
+   [
+    "set:evstation·mirror",
+    115.22
+   ],
+   [
+    "rule:ev:rest^swift",
+    115.24
+   ],
+   [
+    "rule:cover~tw",
+    115.95
+   ],
+   [
+    "rule:cover+cash~tw",
+    117.48
+   ],
+   [
+    "rule:epoch:6:nv-skin-sq",
+    120.25
+   ],
+   [
+    "rule:unlock:combo-lead-swift",
+    120.25
+   ],
+   [
+    "rule:ev:duel^tiny",
+    120.25
+   ],
+   [
+    "mini:HOPLITE|k7",
+    121.21
+   ],
+   [
+    "verb:phalanx_wall",
+    124.16
+   ],
+   [
+    "verb:flank_shield",
+    124.28
+   ],
+   [
+    "rule:bumper",
+    125.09
+   ],
+   [
+    "rule:ev:convoy^lead",
+    125.26
+   ],
+   [
+    "set:evrelay·mirror",
+    126.42
+   ],
+   [
+    "rule:bumper~tw",
+    126.64
+   ],
+   [
+    "rule:bumper+cover~tw",
+    128.06
+   ],
+   [
+    "boss:TALOS|k6",
+    128.94
+   ],
+   [
+    "verb:stomp",
+    128.94
+   ],
+   [
+    "rule:ev:duel^armored",
+    130.28
+   ],
+   [
+    "verb:spear_throw",
+    131.86
+   ],
+   [
+    "rule:unlock:combo-gilded-tiny",
+    132.28
+   ],
+   [
+    "verb:heat_vent",
+    133.96
+   ],
+   [
+    "rule:hulls",
+    135.69
+   ],
+   [
+    "rule:hulls~tw",
+    140.08
+   ],
+   [
+    "rule:epoch:7:nv-skin-base",
+    140.3
+   ],
+   [
+    "rule:ev:convoy^armored",
+    140.3
+   ],
+   [
+    "rule:unlock:combo-armored-lead",
+    144.31
+   ],
+   [
+    "rule:hulls+bumper~tw",
+    145.27
+   ],
+   [
+    "rule:pads",
+    146.88
+   ],
+   [
+    "rule:pads~tw",
+    149.23
+   ],
+   [
+    "rule:ev:duel^gilded",
+    150.33
+   ]
+  ],
+  "longestNoveltyGapMin": 5.1,
+  "lastNewThingMin": 154.93,
+  "newThingsFirst30": 296,
+  "newThingsAfter30": 979,
+  "longestMechGapMin": 5.4,
+  "plainLoopShare": 0.3,
+  "bossShare": 0.31,
+  "specialEventGapMaxS": 492,
+  "specialEventGapMedianS": 4,
+  "bossFights": 29,
+  "bossFightsBig": 15,
+  "distinctBossBehaviours": 25,
+  "distinctBossVerbKits": 23,
+  "bossVerbsTotal": [
+   "backup_cores",
+   "bar_curtain",
+   "barrier_gates",
+   "beat_floor",
+   "bounce_orbs",
+   "bridge_drop",
+   "bullet_time",
+   "cash_core",
+   "cashflow",
+   "cross_beams",
+   "delay_bombs",
+   "echo",
+   "firewall",
+   "flank_shield",
+   "g_charge",
+   "gravity_well",
+   "heat_vent",
+   "hold_span",
+   "homing_orb",
+   "lane_wall",
+   "laser_sweep",
+   "lob",
+   "minefield",
+   "mirror_hall",
+   "orbit_drones",
+   "overload",
+   "phalanx_wall",
+   "pulse_ring",
+   "rain_lane",
+   "shockwave",
+   "signal_override",
+   "siren_ram",
+   "spear_throw",
+   "spiral_rev",
+   "split_shot",
+   "spokes",
+   "spotlight",
+   "stomp",
+   "tentacle_tips",
+   "tide_lanes",
+   "track_beam",
+   "tri_burst",
+   "vacuum",
+   "vault_doors",
+   "vault_lock"
+  ],
+  "bossList": [
+   [
+    "mini",
+    "TRESOR-WART",
+    "bar_curtain,lob,rain_lane,vault_doors"
+   ],
+   [
+    "mini",
+    "TRESOR-WART",
+    "bar_curtain,lob,rain_lane"
+   ],
+   [
+    "mini",
+    "TRESOR-WART",
+    "bar_curtain,lob,minefield,rain_lane,shockwave,split_shot,vault_doors,vault_lock"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "backup_cores,bullet_time,echo,homing_orb,laser_sweep,siren_ram,track_beam,tri_burst"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "backup_cores,echo,homing_orb,laser_sweep,siren_ram,tri_burst"
+   ],
+   [
+    "boss",
+    "SEK-ADLER",
+    "backup_cores,bullet_time,echo,homing_orb,laser_sweep,siren_ram,track_beam,tri_burst"
+   ],
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "bounce_orbs,g_charge,lane_wall"
+   ],
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "bounce_orbs,g_charge,lane_wall"
+   ],
+   [
+    "mini",
+    "BRÜCKEN-WÄCHTER",
+    "bounce_orbs,bridge_drop,cross_beams,g_charge,hold_span,lane_wall,split_shot"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "bounce_orbs,echo,orbit_drones,pulse_ring,rain_lane,spokes,tentacle_tips,tide_lanes,vacuum"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "bounce_orbs,echo,orbit_drones,pulse_ring,rain_lane,spokes,tentacle_tips,tide_lanes,vacuum"
+   ],
+   [
+    "boss",
+    "FLUSSKRAKE",
+    "bounce_orbs,echo,orbit_drones,pulse_ring,rain_lane,spokes,tentacle_tips,tide_lanes,vacuum"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "laser_sweep,pulse_ring,tri_burst"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "barrier_gates,delay_bombs,gravity_well,laser_sweep,pulse_ring,signal_override,tri_burst"
+   ],
+   [
+    "mini",
+    "SCHRANKEN-WART",
+    "barrier_gates,beat_floor,delay_bombs,gravity_well,laser_sweep,pulse_ring,signal_override,tri_burst"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "lane_wall,laser_sweep,spiral_rev"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "firewall,lane_wall,laser_sweep,overload,spiral_rev"
+   ],
+   [
+    "boss",
+    "ZENTRAL-ICE",
+    "bullet_time,cross_beams,firewall,gravity_well,lane_wall,laser_sweep,orbit_drones,overload,spiral_rev,vacuum"
+   ],
+   [
+    "mini",
+    "MESSE-WÄCHTER",
+    "bar_curtain,homing_orb,mirror_hall,spiral_rev,split_shot,spokes,spotlight,vacuum"
+   ],
+   [
+    "mini",
+    "MESSE-WÄCHTER",
+    "bar_curtain,homing_orb,spokes"
+   ],
+   [
+    "mini",
+    "MESSE-WÄCHTER",
+    "bar_curtain,homing_orb,spokes"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "bar_curtain,bounce_orbs,cash_core,cashflow,cross_beams,minefield,track_beam,tri_burst"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "bar_curtain,bounce_orbs,cash_core,cashflow,cross_beams,minefield,track_beam,tri_burst"
+   ],
+   [
+    "boss",
+    "KRONOS",
+    "bar_curtain,beat_floor,bounce_orbs,cash_core,cashflow,cross_beams,minefield,track_beam,tri_burst"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "g_charge,lane_wall,rain_lane"
+   ],
+   [
+    "mini",
+    "HOPLITE",
+    "beat_floor,delay_bombs,flank_shield,g_charge,lane_wall,minefield,phalanx_wall,rain_lane"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "lob,pulse_ring,stomp"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "g_charge,lob,pulse_ring,spear_throw,stomp"
+   ],
+   [
+    "boss",
+    "TALOS",
+    "echo,g_charge,heat_vent,lob,pulse_ring,shockwave,spear_throw,spiral_rev,stomp"
+   ]
+  ],
+  "songMinutes": {
+   "stage2": 38.1,
+   "endless": 15.7,
+   "athina": 12.5,
+   "boss3": 8.4,
+   "stage3": 8,
+   "stage1": 6.9,
+   "endless2": 5.8,
+   "fever-132": 5.2,
+   "fever-128": 4.9,
+   "athB": 4.3,
+   "d1a": 4.1,
+   "boss2": 3.9,
+   "d2b": 3.6,
+   "d4a": 3.6,
+   "d1b": 3.1,
+   "d3a": 3.1,
+   "athA": 3.1,
+   "d4b": 2.8,
+   "d2a": 2.7,
+   "d3b": 2.6,
+   "athina2": 2.4,
+   "boss-d3": 1.7,
+   "boss": 1.6,
+   "boss-d1": 1.5,
+   "boss-d1~b": 1.3,
+   "boss-d4": 0.9,
+   "boss-d4~b": 0.9,
+   "boss-d2": 0.8,
+   "boss-d2~b": 0.7,
+   "boss-d3~b": 0.7,
+   "menu": 0
+  },
+  "distinctSongs": 31,
+  "songStartsPerHour": 71.6,
+  "distinctTracksPerHour": 12,
+  "backgrounds": [
+   "BANKENVIERTEL",
+   "MAINUFER",
+   "OSTEND",
+   "MESSE",
+   "ATHINA"
+  ],
+  "spawns": 8340,
+  "spawnShare": [
+   [
+    "drone",
+    2249,
+    27
+   ],
+   [
+    "mine",
+    1296,
+    15.5
+   ],
+   [
+    "charger",
+    884,
+    10.6
+   ],
+   [
+    "flank",
+    792,
+    9.5
+   ],
+   [
+    "swarm",
+    785,
+    9.4
+   ],
+   [
+    "turret",
+    447,
+    5.4
+   ],
+   [
+    "einterceptor",
+    426,
+    5.1
+   ],
+   [
+    "ebomber",
+    166,
+    2
+   ],
+   [
+    "zdrn",
+    158,
+    1.9
+   ],
+   [
+    "efdrone",
+    158,
+    1.9
+   ],
+   [
+    "gunship",
+    144,
+    1.7
+   ],
+   [
+    "shielder",
+    126,
+    1.5
+   ],
+   [
+    "gturret",
+    116,
+    1.4
+   ],
+   [
+    "gwalker",
+    91,
+    1.1
+   ],
+   [
+    "sniper",
+    85,
+    1
+   ],
+   [
+    "gate",
+    60,
+    0.7
+   ],
+   [
+    "ecarrier",
+    60,
+    0.7
+   ],
+   [
+    "gtank",
+    58,
+    0.7
+   ],
+   [
+    "fk_diver",
+    51,
+    0.6
+   ],
+   [
+    "splitter",
+    42,
+    0.5
+   ],
+   [
+    "fk_crawler",
+    29,
+    0.3
+   ],
+   [
+    "minelayer",
+    25,
+    0.3
+   ],
+   [
+    "kamikaze",
+    22,
+    0.3
+   ],
+   [
+    "healer",
+    21,
+    0.3
+   ],
+   [
+    "carrier",
+    17,
+    0.2
+   ],
+   [
+    "fk_bait",
+    15,
+    0.2
+   ],
+   [
+    "ecruiser",
+    11,
+    0.1
+   ],
+   [
+    "bomber",
+    6,
+    0.1
+   ]
+  ],
+  "pickups": [
+   [
+    "up",
+    379
+   ],
+   [
+    "emp",
+    205
+   ],
+   [
+    "hp",
+    41
+   ],
+   [
+    "pw:lance",
+    29
+   ],
+   [
+    "pw:splint",
+    20
+   ],
+   [
+    "pw:empr",
+    19
+   ],
+   [
+    "pw:bubble",
+    18
+   ],
+   [
+    "pw:ric",
+    17
+   ],
+   [
+    "pw:dashr",
+    17
+   ],
+   [
+    "pw:hornet",
+    15
+   ],
+   [
+    "pw:gwell",
+    14
+   ],
+   [
+    "pw:slice",
+    14
+   ],
+   [
+    "pw:leech",
+    14
+   ],
+   [
+    "pw:ovd",
+    14
+   ],
+   [
+    "pw:zone",
+    12
+   ],
+   [
+    "pw:crate",
+    12
+   ],
+   [
+    "pw:decoy",
+    11
+   ],
+   [
+    "pw:drum",
+    9
+   ],
+   [
+    "pw:magb",
+    9
+   ],
+   [
+    "pw:bomb",
+    9
+   ],
+   [
+    "pw:stasis",
+    8
+   ],
+   [
+    "pw:drop",
+    7
+   ],
+   [
+    "pw:chord",
+    7
+   ],
+   [
+    "pw:echo",
+    6
+   ],
+   [
+    "pw:nova",
+    6
+   ],
+   [
+    "pw:glass",
+    6
+   ],
+   [
+    "pw:slow",
+    5
+   ],
+   [
+    "pw:tempo",
+    4
+   ],
+   [
+    "pw:wing",
+    3
+   ],
+   [
+    "pw:cres",
+    2
+   ],
+   [
+    "pw:nr",
+    1
+   ],
+   [
+    "pw:mag",
+    1
+   ],
+   [
+    "pw:bub",
+    1
+   ]
+  ],
+  "bulletSources": [
+   [
+    "bossmv",
+    22412,
+    41.6
+   ],
+   [
+    "rain/hazard",
+    20610,
+    38.2
+   ],
+   [
+    "drone*",
+    3301,
+    6.1
+   ],
+   [
+    "drone",
+    1659,
+    3.1
+   ],
+   [
+    "turret",
+    1229,
+    2.3
+   ],
+   [
+    "none",
+    933,
+    1.7
+   ],
+   [
+    "flank*",
+    758,
+    1.4
+   ],
+   [
+    "gunship",
+    586,
+    1.1
+   ],
+   [
+    "turret*",
+    576,
+    1.1
+   ],
+   [
+    "einterceptor",
+    442,
+    0.8
+   ],
+   [
+    "flank",
+    423,
+    0.8
+   ],
+   [
+    "gwalker",
+    383,
+    0.7
+   ],
+   [
+    "gturret",
+    138,
+    0.3
+   ],
+   [
+    "sniper",
+    123,
+    0.2
+   ],
+   [
+    "efdrone",
+    57,
+    0.1
+   ],
+   [
+    "fk_bait",
+    57,
+    0.1
+   ],
+   [
+    "gtank",
+    55,
+    0.1
+   ],
+   [
+    "shielder",
+    45,
+    0.1
+   ],
+   [
+    "splitter",
+    22,
+    0
+   ],
+   [
+    "mine",
+    19,
+    0
+   ],
+   [
+    "ecruiser",
+    16,
+    0
+   ],
+   [
+    "zdrn",
+    14,
+    0
+   ],
+   [
+    "charger",
+    10,
+    0
+   ],
+   [
+    "minelayer",
+    8,
+    0
+   ],
+   [
+    "carrier",
+    5,
+    0
+   ],
+   [
+    "swarm",
+    4,
+    0
+   ],
+   [
+    "ecarrier",
+    4,
+    0
+   ],
+   [
+    "ebomber",
+    3,
+    0
+   ],
+   [
+    "charger*",
+    3,
+    0
+   ],
+   [
+    "kamikaze",
+    2,
+    0
+   ],
+   [
+    "swarm*",
+    2,
+    0
+   ],
+   [
+    "healer",
+    1,
+    0
+   ]
+  ],
+  "hints": [
+   [
+    "★ VAULT ALARM",
+    3
+   ],
+   [
+    "★ SIREN CHASE",
+    3
+   ],
+   [
+    "★ OLD STONES",
+    3
+   ],
+   [
+    "★ BARRIER DROP",
+    3
+   ],
+   [
+    "★ GUARD OF HONOUR",
+    3
+   ],
+   [
+    "★ MARKET CRASH",
+    3
+   ],
+   [
+    "★ BRONZE SHIELDS",
+    3
+   ],
+   [
+    "MERCY: +1 hull this try",
+    3
+   ],
+   [
+    "★ FERRY WAKE",
+    3
+   ],
+   [
+    "SUPPLY DROP: FLY TO THE BEACON",
+    2
+   ],
+   [
+    "Blast on the downbeat",
+    2
+   ],
+   [
+    "WIND GUST: STEER AGAINST IT",
+    2
+   ],
+   [
+    "SHOOT THE CAGE: FREE THE DATA SPRITE",
+    2
+   ],
+   [
+    "WINGS: two drones shoot the off-beats",
+    2
+   ],
+   [
+    "CHORD: blocks one hit, rings on the beat",
+    2
+   ]
+  ],
+  "mutators": {
+   "hail": 1,
+   "mine": 1
+  },
+  "setPieces": {
+   "set:supply": 16,
+   "set:gust": 14,
+   "set:sig:COURIER LIGHTS": 2,
+   "set:blackout": 17,
+   "set:sig:PATROL GRID": 1,
+   "set:lane": 10,
+   "set:sig:WINDOW DISPLAY": 3,
+   "set:weave": 7,
+   "set:evstation": 19,
+   "set:sig:GUARD CHANGE": 2,
+   "set:evfunnel": 18,
+   "set:evgrid": 15,
+   "set:evwindow": 19,
+   "set:hail": 12,
+   "set:evtline": 12,
+   "set:drop": 14,
+   "drop:hit": 13,
+   "fence:fence": 11,
+   "set:fence": 11,
+   "set:gaterun": 16,
+   "set:evmines": 17,
+   "set:rescue": 14,
+   "set:evgrid·fast": 5,
+   "set:evgrid·elite": 23,
+   "set:evmines·mirror": 12,
+   "set:evtline·fast": 4,
+   "set:evram": 9,
+   "set:evwindow·mirror": 5,
+   "set:evshieldv·elite": 3,
+   "set:evguard·mirror": 7,
+   "set:evwindow·elite": 16,
+   "set:evguard·fast": 7,
+   "set:evwalker·mirror": 16,
+   "set:evshieldv·fast": 22,
+   "set:evfunnel·mirror": 9,
+   "set:evwalker·elite": 5,
+   "set:evshieldv": 7,
+   "set:turrets": 13,
+   "set:evsplit·fast": 7,
+   "set:evfunnel·elite": 3,
+   "set:evsplit·mirror": 4,
+   "set:evconvoy·elite": 15,
+   "set:evtank·fast": 9,
+   "set:evram·elite": 4,
+   "set:evtank·mirror": 1,
+   "set:evconvoy·fast": 24,
+   "set:evbombers": 18,
+   "set:evram·mirror": 13,
+   "set:evbombers·elite": 17,
+   "set:evconvoy·mirror": 6,
+   "set:evbombers·fast": 16,
+   "set:evlanterns·fast": 25,
+   "set:evsway·elite": 9,
+   "set:evlanterns·elite": 3,
+   "set:evlanterns": 7,
+   "set:wedge": 14,
+   "drop:miss": 1,
+   "set:evsnipe·elite": 1,
+   "set:evsway": 11,
+   "set:evsnipe·mirror": 5,
+   "set:evsway·mirror": 1,
+   "set:evguard": 19,
+   "set:evshieldv·mirror": 5,
+   "set:evwindow·fast": 8,
+   "set:evtline·elite": 6,
+   "set:evheal·mirror": 8,
+   "set:mines": 11,
+   "set:evheal·elite": 9,
+   "set:evrelay·fast": 3,
+   "set:evguard·elite": 2,
+   "set:swarm": 7,
+   "set:evrelay·elite": 1,
+   "set:evmines·fast": 2,
+   "set:evtank·elite": 2,
+   "set:evcargo": 2,
+   "set:evmines·elite": 3,
+   "set:evtank": 4,
+   "set:evcargo·elite": 2,
+   "set:crossfire": 7,
+   "set:evwalker·fast": 34,
+   "set:evwalker": 20,
+   "set:evheal": 3,
+   "set:evsnipe·fast": 5,
+   "set:evheal·fast": 3,
+   "set:evsnipe": 9,
+   "set:evconvoy": 7,
+   "set:evlayer·elite": 8,
+   "set:evlayer·mirror": 4,
+   "set:evrelay": 6,
+   "set:evcargo·mirror": 10,
+   "set:evcargo·fast": 1,
+   "set:evtline·mirror": 11,
+   "set:evgrid·mirror": 6,
+   "set:evstation·fast": 2,
+   "set:evfunnel·fast": 2,
+   "set:evstation·elite": 9,
+   "set:evsplit·elite": 18,
+   "set:evbombers·mirror": 3,
+   "set:evstation·mirror": 2,
+   "set:evrelay·mirror": 3
+  },
+  "pitStops": 0
+ },
+ "meta": {
+  "date": "2026-10-22T00:21:59.934Z",
+  "configs": [
+   "arcade-normal"
+  ],
+  "stages": [
+   1,
+   45
+  ],
+  "pageErrors": [],
+  "realSecs": 69
+ }
+}
