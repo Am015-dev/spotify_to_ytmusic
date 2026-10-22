@@ -127,7 +127,7 @@ const FG=window.FG={get on(){return!!RET.forge;},s:null,ver:0,mn:[],kills:[0,0],
   icon(c,it,S){c.clearRect(0,0,S,S);{const pi=typeof ART==='object'&&ART.img('fg-'+it.replace(':','-'));if(pi){c.drawImage(pi,0,0,S,S);return;}}   // real picture fg-<h|m|k|p>-<id> when listed in ready.json
     const m=S/2;c.save();c.lineWidth=Math.max(2,S/16);
     const ty=it.split(':')[0],id=it.split(':')[1];
-    if(ty==='w'){const col=WPD[id]?WPD[id].c:'#fff';c.fillStyle=col;this.shape(c,'o',m,m,S*.3);c.fill();c.fillStyle='#0b0820';c.font='700 '+Math.round(S*.24)+'px "Share Tech Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.fillText((WPD[id]?WPD[id].s:'?').slice(0,2),m,m+1);}
+    if(ty==='w'){const col=WPD[id]?WPD[id].c:'#fff',wp=typeof ART==='object'&&ART.img('wpmount-'+id);if(wp)c.drawImage(wp,0,0,S,S);else{c.fillStyle=col;this.shape(c,'o',m,m,S*.3);c.fill();}}   // review 9 #13: the weapon's own picture (wpmount-<id>), a plain colour disc otherwise; no letters on the cell
     else if(ty==='h'){const R=this.rid(id);if(R){const c1=WPD[R[0]].c,c2=WPD[R[1]].c,sh=FG_SH[FGR.indexOf(R)%FG_SH.length];c.fillStyle=c1;this.shape(c,'o',m-S*.08,m,S*.28);c.fill();
       c.globalCompositeOperation='lighter';c.fillStyle=c2;this.shape(c,'tri',m+S*.12,m,S*.24);c.fill();c.strokeStyle=c2;this.shape(c,sh,m+S*.3,m-S*.3,S*.1);sh==='ring'?c.stroke():c.fill();c.fillStyle=c1;this.shape(c,'dot',m-S*.32,m+S*.3,S*.12);c.fill();}}
     else if(ty==='m'){const M=FGM.find(x=>x[0]===id);c.strokeStyle=c.fillStyle='#e6e1ff';this.shape(c,M?M[5]:'dot',m,m,S*.3);(M&&M[5]==='ring')?c.stroke():c.fill();c.strokeStyle='#19e3ff';this.shape(c,'o',m,m,S*.44);c.stroke();}

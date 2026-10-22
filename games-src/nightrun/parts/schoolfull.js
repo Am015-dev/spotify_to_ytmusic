@@ -10,7 +10,7 @@
    s without a success) repeats that round, never back to the list. Counter: coach bar "R2/3 · 1/3", lesson head "ROUND 2/3", a badge on foot. The clear
    card / line shows time and rounds. Saves only what school.js / lessons.js already save (mnr_school, mnr_lessons). Test: nightrun/school-full-test.js. */
 if(RET.schoolfull===undefined)RET.schoolfull=!/[?&]schoolfull=0/.test(location.search);
-const SF={DEMO:8,RMIN:12,NEED:3,REPMAX:25,LSMAX:60,log:[],last:null,get on(){return !!RET.schoolfull;}};
+const SF={DEMO:8,RMIN:12,NEED:3,REPMAX:25,LSMAX:60,log:[],last:null,demoSeen:{},get on(){return !!RET.schoolfull;}};
 {const st=document.createElement('style');st.textContent=`#tutB.drl.sf .tn{display:block;flex:0 0 auto;font:700 13px var(--mono);color:#ffe14d;white-space:nowrap}
 #sfBadge{position:fixed;z-index:9200;left:50%;top:calc(158px + env(safe-area-inset-top,0px));transform:translateX(-50%);max-width:calc(100% - 32px);box-sizing:border-box;padding:6px 12px;border-radius:10px;
 background:rgba(13,8,32,.86);border:2px solid #ffe14d;color:#fff;font:700 14px var(--mono);text-align:center;pointer-events:none}#sfBadge[hidden]{display:none}`;document.head.appendChild(st);}
@@ -27,7 +27,7 @@ SF.wrap=(b,d)=>{const vol=SF.VOL[b.id]?b.id:null;const o={id:b.id,base:b,ph:'dem
   get free(){return b.free;},get foes(){return b.foes;},
   say(){return o.ph==='demo'?'WATCH: '+b.say():sfGoal(o.r,b.say());},
   init(){o.ph='demo';o.em={};o.run=0;o.vn=0;o.vt=0;o.tl=0;o.r=0;o.k=0;o.T=0;o.rt=0;o.pt=0;o.gap=0;o.fails=0;o.rounds=0;o.hp=P.hp;tutB.classList.add('sf');b.init();o.cnt();SF.last={id:d.id,kind:'tut',o};
-    if(SCH.was&&SCH.was(d.id))o.T=SF.DEMO;},   // a cleared drill replays without the demo
+    if(SCH.was&&SCH.was(d.id)||SF.demoSeen[d.id])o.T=SF.DEMO;SF.demoSeen[d.id]=1;},   // a cleared drill, or one whose demo already played, starts at round 1
   tgt(){return o.gap>0?null:b.tgt?b.tgt():null;},
   skipDemo(){if(o.ph==='demo')o.T=SF.DEMO;},
   beat(i){if(o.gap>0||vol)return;if(b.beat)b.beat(i);if(o.r===3&&o.ph==='play'&&i%4===0&&!/^(dodge|fan)$/.test(b.id))o.over();},
@@ -93,17 +93,13 @@ SF.footDown=f=>{const F=f.F;if(!F||F.t)return false;F.k=0;F.fails++;F.acc+=ftT()
   setTimeout(()=>{if(SCH.foot!==f||f.end)return;let ok=false;try{FOOT.stop();ok=FOOT.start('street1');}catch(e){}
     if(!ok){SCH.footEndNow&&SCH.footEndNow(false);return;}F.acc-=ftT();F.rt0=ftC(f);F.hurts=0;SF.footCnt(f);},0);return true;};
 /* ===== 4. SKIP DEMO: one button for all three kinds while a demo plays (a cleared drill skips its demo by itself) ===== */
-{const st=document.createElement('style');st.textContent=`#sfDemo{position:fixed;z-index:9210;left:50%;top:calc(116px + env(safe-area-inset-top,0px));transform:translateX(-50%);min-width:150px;min-height:44px;padding:0 16px;border-radius:10px;border:2px solid #ffe14d;background:#1a1033;color:#fff;font:700 15px var(--display);letter-spacing:.08em;cursor:pointer}#sfDemo[hidden]{display:none}`;document.head.appendChild(st);}
-const sfDemo=document.createElement('button');sfDemo.type='button';sfDemo.id='sfDemo';sfDemo.hidden=true;sfDemo.textContent='SKIP DEMO';sfDemo.setAttribute('aria-label','Skip the demo and start round 1');document.body.appendChild(sfDemo);
-for(const ev of['touchstart','touchend','pointerdown','mousedown'])sfDemo.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
+/* review 9 #12: the drill bar shows AGAIN and SKIP only, so there is no floating SKIP DEMO pad; the demo plays once per drill (SF.demoSeen) */
 SF.inDemo=()=>{const L=SF.last;if(!L)return false;
   if(L.kind==='tut')return L.o.ph==='demo'&&TUT.on&&TUT.cur()===L.o;
   if(L.kind==='lesson')return LS.m===L.m&&L.m.state==='demo';
   return SCH.foot===L.f&&!!L.f.F&&!L.f.F.r&&!L.f.end;};
 SF.skipDemo=()=>{const L=SF.last;if(!L||!SF.inDemo())return false;
   if(L.kind==='tut')L.o.skipDemo();else if(L.kind==='lesson')L.m.F.demo=0;else{const F=L.f.F;F.acc+=SF.DEMO-ftC(L.f);SF.footCnt(L.f);}return true;};
-sfDemo.addEventListener('click',e=>{e.stopPropagation();SF.skipDemo();});
-setInterval(()=>{const on=SF.on&&SF.inDemo();if(sfDemo.hidden===on)sfDemo.hidden=!on;},150);
 if(RET.schoolfull){SCH.wrap=SF.wrap;SCH.sf=SF;}
 window.__schoolfull={get on(){return SF.on;},get log(){return SF.log;},SF,
   get state(){const L=SF.last;if(!L)return null;if(L.kind==='tut'){const o=L.o;return{id:L.id,kind:'tut',ph:o.ph,r:o.r,k:o.k,T:o.T,rounds:o.rounds,fails:o.fails,gap:o.gap,em:o.em};}
