@@ -2743,7 +2743,7 @@ const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
 ART.pend=0;ART.lowN=0;ART.q=[];
 ART.pump=()=>{while(ART.q.length&&ART.lowN<2&&ART.pend===0){const n=ART.q.shift();if(n in ART.bm)continue;ART.lowN++;ART.load(n,1);}};
 ART.load=(n,q)=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();if(!q)ART.pend++;let fin=false;const end=()=>{if(fin)return;fin=true;if(q)ART.lowN--;else ART.pend--;ART.pump();};
-  im.onload=()=>{const done=b=>{ART.bm[n]=b;end();};
+  im.onload=()=>{const done=b=>{ART.bm[n]=ART.fix?ART.fix(n,b):b;end();};
     /* effects made as light on a solid black square (no alpha): turn the black into transparency once, colours un-premultiplied, so they look right with normal blending and identical when drawn additively */
     if((n.startsWith('fx-')&&!n.startsWith('fx-fuse'))||n.startsWith('nv-ev-')){try{const w=im.naturalWidth,h=im.naturalHeight,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);const id=g.getImageData(0,0,w,h),d=id.data;let solid=true,dark=0;for(let i=3;i<d.length;i+=4)if(d[i]<250){solid=false;break;}
       for(const q of [0,w-1,(h-1)*w,h*w-1]){const o=q*4;if(d[o]+d[o+1]+d[o+2]<90)dark++;}
@@ -4001,7 +4001,7 @@ const FA={POSES,WHO,POSES_BOSS:POSES.concat(['attack2','enrage']),MACHINES:['dro
 window.FA=FA;
 /* ---- real pictures: ready.json lists the painted files; each is loaded once (a failed load is remembered and silently ignored) ---- */
 FA._base=()=>FA.base||(typeof ART!=='undefined'&&ART.base)||'media/';
-FA._load=f=>{if(FA._im[f]||typeof Image==='undefined')return;const r={ok:false,bad:false,im:new Image()};r.im.onload=()=>{r.ok=true;};r.im.onerror=()=>{r.bad=true;};r.im.src=FA._base()+f;FA._im[f]=r;};
+FA._load=f=>{if(FA._im[f]||typeof Image==='undefined')return;const r={ok:false,bad:false,im:new Image()};r.im.onload=()=>{if(typeof AFX!=='undefined')AFX.fixFoot(f,r);r.ok=true;};r.im.onerror=()=>{r.bad=true;};r.im.src=FA._base()+f;FA._im[f]=r;};
 FA.ready=a=>{if(!Array.isArray(a))return;for(const f of a)if(typeof f==='string'&&f.indexOf('foot/')===0){FA._rd.add(f);FA._load(f);}};
 FA.init=()=>{if(FA._init)return;FA._init=true;if(typeof fetch==='function')fetch(FA._base()+'ready.json').then(r=>r.json()).then(FA.ready).catch(()=>{});};
 FA._pic=f=>{FA.init();const r=FA._im[f];return r&&r.ok?r.im:null;};
@@ -5399,7 +5399,7 @@ const PLY=['sky','far','mid','near','floor'],PSP={sky:.02,far:.12,mid:.4,near:.7
 SL.paint=0;
 function slPainted(c,x0,w,cam,t0){const P={};for(const l of PLY){const q=slPic('bg-'+l);if(!q||!q.width)return false;P[l]=q;}
   const DH=(FL-t0)/.8,TW=2*DH,tile=(l,y,h,sy,sh)=>{const off=cam*PSP[l];let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+l;for(;x<x0+w;x+=TW)c.drawImage(P[l],0,sy,P[l].width,sh,x,y,TW+1,h);SL.tag='';};
-  const H=P.sky.height;tile('sky',t0-4,FL-t0+8,0,H);for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
+  const H=P.sky.height;tile('sky',t0-4,FL-t0+8,0,RET.artfix?Math.min(H,Math.round(H*(FL-t0+8)/DH)):H);/* artfix: the sky keeps its own aspect (only the rows above the street line, not the whole picture squeezed into them) */for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
   const DF=Math.max(DH,(VH+2-FL)/.2),fy=FL-.8*DF,r0=.69;tile('floor',fy+r0*DF,(1-r0)*DF,Math.round(r0*P.floor.height),P.floor.height-Math.round(r0*P.floor.height));   // only the floor rows (the top of the picture is transparent)
   SL.paint=1;return true;}
 function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,fh=FL-t0;
@@ -14657,7 +14657,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='a5ece07fca 2026-10-22 17:07 UTC';
+const NR_STAMP='e3ff102d31 2026-10-22 17:21 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16551,6 +16551,42 @@ if(RET.snappy===undefined)RET.snappy=!/[?&]snappy=0/.test(location.search);
 const SNAP=window.SNAP={K:1.8,KH:1.35,n:0,
   tick(){if(!RET.snappy||!G||!G.pb)return;for(const b of G.pb){if(b._sn)continue;b._sn=1;const k=b.hk?this.KH:this.K;b.vx*=k;b.vy*=k;if(b.len)b.len*=1.5;this.n++;}}};
 NR.on('tick',()=>SNAP.tick());
+
+// PURPOSE: wiring fixes for painted art: flat backgrounds keyed out at load (sprites), white gaps keyed out of the street layers, the street sky drawn at its own aspect
+// FLAG: artfix (?artfix=0 = the old wiring)
+// TEST: qa/assetaudit.js (BLUR / DIST / OPAQUE / WHITE flags before and after); qa/loadgate.js
+/* ---------- ARTFIX (owner, 22 Oct 2026: "lots of assets not wired correctly: blurred, distorted, without the background removal").
+   ART.fix(n,b)   called by ART.load for every picture: a SPRITE (en-, spr-, pk-, fl-, char-) whose four corners are one flat opaque colour gets that colour flooded away from the
+                  edges with a soft 1-pixel edge. Scenes (corners differ), pictures that already have transparent corners, and a flood that would eat < 8% or > 92% are left alone.
+   AFX.fixFoot    called by footart.js when a media/foot/ picture has loaded: the street layers far/mid/near lose their enclosed WHITE gaps (the white key of the generator only
+                  reached the edges); an on-foot pose with a flat background is keyed like a sprite. The keyed copy is made once, at load, and cached by the loader. ---------- */
+if(RET.artfix===undefined)RET.artfix=!/[?&]artfix=0/.test(location.search);
+const AFX={log:{},KEY:/^(en|spr|pk|fl|char)-/,LAYER:/^foot\/bg-(far|mid|near)$/,POSE:/^foot\/(?!bg-)/};
+AFX.px=b=>{const w=b.naturalWidth||b.width,h=b.naturalHeight||b.height;if(!w||!h)return null;const c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(b,0,0);
+  try{const id=g.getImageData(0,0,w,h);return{c,g,id,d:id.data,w,h};}catch(e){return null;}};
+/* flat colour at the four corners -> flood from the whole border, soft edge; returns the removed fraction (0 = untouched) */
+AFX.flat=o=>{const{d,w,h}=o,N=w*h,cs=[0,w-1,(h-1)*w,N-1].map(p=>[d[p*4],d[p*4+1],d[p*4+2],d[p*4+3]]);if(cs.some(c=>c[3]<250))return 0;
+  const m=[0,1,2].map(k=>(cs[0][k]+cs[1][k]+cs[2][k]+cs[3][k])/4);if(cs.some(c=>Math.abs(c[0]-m[0])+Math.abs(c[1]-m[1])+Math.abs(c[2]-m[2])>60))return 0;
+  const T=30,S=80,dist=p=>Math.abs(d[p*4]-m[0])+Math.abs(d[p*4+1]-m[1])+Math.abs(d[p*4+2]-m[2]),seen=new Uint8Array(N),st=new Int32Array(N);let sp=0,n=0;
+  const push=p=>{if(!seen[p]&&dist(p)<=T){seen[p]=1;st[sp++]=p;}};
+  for(let x=0;x<w;x++){push(x);push((h-1)*w+x);}for(let y=0;y<h;y++){push(y*w);push(y*w+w-1);}
+  while(sp){const p=st[--sp],x=p%w;n++;if(x>0)push(p-1);if(x<w-1)push(p+1);if(p>=w)push(p-w);if(p<N-w)push(p+w);}
+  if(n<N*.08||n>N*.92)return 0;
+  for(let p=0;p<N;p++)if(seen[p])d[p*4+3]=0;
+  for(let p=0;p<N;p++){if(seen[p])continue;const x=p%w;if(!((x>0&&seen[p-1])||(x<w-1&&seen[p+1])||(p>=w&&seen[p-w])||(p<N-w&&seen[p+w])))continue;const q=dist(p);if(q<S)d[p*4+3]=Math.round(d[p*4+3]*Math.max(0,q-T)/(S-T));}
+  return n/N;};
+/* enclosed near-white gaps (a lit sky seen through the buildings) -> transparent; small white specks (highlights) stay; returns the removed fraction */
+AFX.white=o=>{const{d,w,h}=o,N=w*h,lo=p=>Math.min(d[p*4],d[p*4+1],d[p*4+2]),isW=p=>lo(p)>228&&d[p*4+3]>200,seen=new Uint8Array(N),rem=new Uint8Array(N),st=new Int32Array(N),cm=Math.max(120,N*.00006);let tot=0;
+  for(let s=0;s<N;s++){if(seen[s]||!isW(s))continue;let sp=0,n=0;const from=[];seen[s]=1;st[sp++]=s;while(sp){const p=st[--sp],x=p%w;n++;from.push(p);const nb=[x>0?p-1:-1,x<w-1?p+1:-1,p>=w?p-w:-1,p<N-w?p+w:-1];for(const q of nb)if(q>=0&&!seen[q]&&isW(q)){seen[q]=1;st[sp++]=q;}}
+    if(n>=cm){for(const p of from)rem[p]=1;tot+=n;}}
+  if(!tot)return 0;for(let p=0;p<N;p++)if(rem[p])d[p*4+3]=0;
+  for(let p=0;p<N;p++){if(rem[p]||d[p*4+3]===0)continue;const x=p%w;if(!((x>0&&rem[p-1])||(x<w-1&&rem[p+1])||(p>=w&&rem[p-w])||(p<N-w&&rem[p+w])))continue;const l=lo(p);if(l>170)d[p*4+3]=Math.round(d[p*4+3]*Math.max(0,Math.min(1,(250-l)/80)));}
+  return tot/N;};
+AFX.run=(id,b,fn)=>{try{const o=AFX.px(b);if(!o)return null;const k=fn(o);if(!k)return null;o.g.putImageData(o.id,0,0);AFX.log[id]=+k.toFixed(3);return o.c;}catch(e){return null;}};
+ART.fix=(n,b)=>{if(!RET.artfix||!b||!AFX.KEY.test(n)||n.indexOf('anim/')===0)return b;return AFX.run(n,b,AFX.flat)||b;};
+AFX.fixFoot=(f,r)=>{if(!RET.artfix||!r||!r.im)return;const id=f.replace(/\.webp$/,'');let c=null;
+  if(AFX.LAYER.test(id))c=AFX.run(id,r.im,AFX.white);else if(AFX.POSE.test(id))c=AFX.run(id,r.im,AFX.flat);
+  if(c)r.im=c;};
 
 // PURPOSE: one menu style: one plate shape (rounded rectangle), one font family, one solid selected/focus ring, no dashed lines,
 //          a desktop title that uses the screen, and one size ladder for ships, pickups and bullets in play

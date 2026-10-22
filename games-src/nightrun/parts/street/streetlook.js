@@ -79,7 +79,7 @@ const PLY=['sky','far','mid','near','floor'],PSP={sky:.02,far:.12,mid:.4,near:.7
 SL.paint=0;
 function slPainted(c,x0,w,cam,t0){const P={};for(const l of PLY){const q=slPic('bg-'+l);if(!q||!q.width)return false;P[l]=q;}
   const DH=(FL-t0)/.8,TW=2*DH,tile=(l,y,h,sy,sh)=>{const off=cam*PSP[l];let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+l;for(;x<x0+w;x+=TW)c.drawImage(P[l],0,sy,P[l].width,sh,x,y,TW+1,h);SL.tag='';};
-  const H=P.sky.height;tile('sky',t0-4,FL-t0+8,0,H);for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
+  const H=P.sky.height;tile('sky',t0-4,FL-t0+8,0,RET.artfix?Math.min(H,Math.round(H*(FL-t0+8)/DH)):H);/* artfix: the sky keeps its own aspect (only the rows above the street line, not the whole picture squeezed into them) */for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
   const DF=Math.max(DH,(VH+2-FL)/.2),fy=FL-.8*DF,r0=.69;tile('floor',fy+r0*DF,(1-r0)*DF,Math.round(r0*P.floor.height),P.floor.height-Math.round(r0*P.floor.height));   // only the floor rows (the top of the picture is transparent)
   SL.paint=1;return true;}
 function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,fh=FL-t0;
