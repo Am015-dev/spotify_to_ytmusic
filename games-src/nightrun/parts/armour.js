@@ -20,11 +20,11 @@ const B2X=window.B2X={get on(){return true;},HK:1.8,M:1.06,AMP:12,LATE:1.2,LS:8,
   hz:[],st:{bank:0,abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,ls:0,calm:0}};
 NR.on('runStart',()=>{B2X.hz=[];B2X.st={abs:0,dealt:0,amp:0,ph:[],hz:0,hzHit:0,ls:0,calm:0};});
 /* spawn: high hull, HP-driven phases (p2/p3 are set on the bar line, b.js bossBeat), the phase pattern lists */
-{const sb=spawnBoss;spawnBoss=function(o){const b=sb(o);if(!B2X.on||!b||!b.minBar)return b;
+HOOK.spawnBoss(sb=>function(o){const b=sb(o);if(!B2X.on||!b||!b.minBar)return b;
   b.hp=b.max=Math.round(b.max*B2X.HK);b.floor=b.pf0=Math.ceil(b.max*.62);b.p2=b.p3=1e9;
   const p=b.lists[1].slice(),h=Math.ceil(p.length/2),up={fan5:'fan7',fan7:'fan9'};
   b.lists=[b.lists[0],p.slice(h).concat(p.slice(0,h)),p.map(x=>up[x]||x)];   // phase 2 opens with the patterns phase 1 never used; phase 3 fans are one size up
-  b.b2={w:[],bk:0,ref:b.hp,act:0,rate:0,amp:1,sp:0,sh:0,cl:0,fl:0,ls:0,lsd:0};return b;};}
+  b.b2={w:[],bk:0,ref:b.hp,act:0,rate:0,amp:1,sp:0,sh:0,cl:0,fl:0,ls:0,lsd:0};return b;});
 /* the bar line: a phase starts only on a bar, with one bar of calm; the last stand silences the boss */
 {const bb=bossBeat;bossBeat=function(e,d){const s=e.b2;if(!B2X.on||!s)return bb(e,d);
   const nb=e.bt+1;if(nb%4===0&&e.x<=bossX()){const bar=nb/4;

@@ -37,9 +37,9 @@ DENS.trimBoss=function(e){if(!RET.density||!e.lists)return;const cnt={};for(cons
   this.st.trim=(this.st.trim||0)+1;};
 NR.on('runStart',()=>{DENS.busy=0;DENS.last=-9;DENS.px.length=0;});
 /* a boss gets its moveset (and so its trimmed list) at spawn, not on its first beat: the old phase lists never show next to the new ones */
-{const sb=spawnBoss;spawnBoss=function(o){const b=sb(o);if(RET.density&&b&&b.bm===undefined&&window.BMV&&!(window.BPL&&BPL.on))try{BMV.init(b);}catch(e){}
+HOOK.spawnBoss(sb=>function(o){const b=sb(o);if(RET.density&&b&&b.bm===undefined&&window.BMV&&!(window.BPL&&BPL.on))try{BMV.init(b);}catch(e){}
   else if(RET.density&&b&&b.bm===undefined&&window.BMV&&BMV.on)try{const id=BMV.idOf(b),T=id&&BMV.T[id];if(T)b.lists=T.ph.map(l=>l.map(x=>BMV.norm(x).v));}catch(e){}   // bossplay inits on the first beat: until then show the boss's own table, not the old fan5 / ring lists (S12 counted both = 13)
-  return b;};}
+  return b;});
 /* ---------- NEWPLAYER (flag RET.first30, F11 of review 10): the very first run of stage 1 (banked runs = 0, not Hard) is gentle for a player who has not found the controls yet: no aimed
    enemy fire for the first 15 s, then only every 3rd aimed shot until 45 s, and enemies that fly past cost no hull and a parked ship is not hunted (h.js) until 45 s. A parked ship is still alive at 45 s. Shots that are not aimed
    at the ship (spreads, curtains, drops) and everything after 45 s are untouched; the next run is the normal stage 1. ---------- */

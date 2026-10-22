@@ -52,6 +52,6 @@ NR.on('tick',dt=>{const a=Math.min(1,dt/3),au=S3.au,man=S3.man;S3.st.au+=au;S3.s
   if(!S3.act()||!G.live)return;const e=G.boss;if(!e||e.dead||!e.minBar||e.x>bossX())return;
   if(e.s3a==null)e.s3a=G.t;if(G.t-e.s3a>2.5&&!(e.cores&&e.cores.length)&&!(window.B2X&&B2X.on&&!CAMP.on)){const top=e.max*[1,.66,.33][Math.min(2,e.gi|0)],r=Math.min(top-e.hp,e.max*.012*dt);if(r>0){e.hp+=r;e.hq=e.hp;if(e.hp0!=null)e.hp0+=r;S3.st.reg+=r;}}});
 /* the district and final bosses on the hard tiers: auto-aim hits them at bA and they repair themselves, so their hull is cut to keep the fight at ~55-80 s for a maxed ship */
-{const sb1=spawnBoss;spawnBoss=function(o){const b=sb1(o);if(b&&S3.on&&S2.hard()&&!b.mini){b.hp=b.max=Math.round(b.max*S3.bK);b.floor=b.pf0=Math.ceil(b.max*.62);}return b;};}
+HOOK.spawnBoss(sb1=>function(o){const b=sb1(o);if(b&&S3.on&&S2.hard()&&!b.mini){b.hp=b.max=Math.round(b.max*S3.bK);b.floor=b.pf0=Math.ceil(b.max*.62);}return b;});
 {const t0=B2.tmin;B2.tmin=function(e){const t=t0.call(this,e);return S3.on&&S2.hard()&&!e.mini?Math.round(t*S3.bT):t;};}   // ... and its damage budget is shorter: the shield cores and the repair add their time
 window.__s3={S3};

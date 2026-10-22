@@ -11,7 +11,7 @@ WAVES.phalanx=function(){const y=gr(150,H-210);for(let c=0;c<2;c++)for(let r=-1;
 WAVES.wedge=function(){const y=gr(150,H-190);for(let i=-2;i<=2;i++)en('charger',{x:W+30+Math.abs(i)*72,y:y+i*52});return 3;};                  // five chargers in a V
 WAVES.pillars=function(){en('gate',{x:W+30,gy:gr(150,H-200),gap:124});en('gate',{x:W+420,gy:gr(150,H-200),gap:124});return 4.8;};             // two narrow gates in a row
 const ATAB={6:['fan7','spiral','laser','summon','ring','laser','fan9'],7:['fan5','ring','fan7','spiral']};
-const _spawnBoss=spawnBoss;spawnBoss=function(o){const b=_spawnBoss(o);if(b.k===6&&!b.lbl)b.lbl='T';return b;};
+HOOK.spawnBoss(_spawnBoss=>function(o){const b=_spawnBoss(o);if(b.k===6&&!b.lbl)b.lbl='T';return b;});
 
 /* ----- landmark sprites (called from lmSprite's default branch) ----- */
 function athSprite(kind,D){let c,g,w,h;const body='#0b0816',lit=D.win[1],rim=D.a;

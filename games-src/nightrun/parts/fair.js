@@ -37,7 +37,7 @@ NR.on('tick',dt=>{if(!S2.on||!G.live||G.dead||!S2.hard()){CAMP.on=0;return;}
   if(on&&G.t>6&&G.transT<0&&!G.lab&&!G.tut)STILL.t=Math.max(STILL.t,STILLF()+1+CAMP.ct);});   // h.js does the rest: hunter shots, the sniper lane, then the static discharge
 /* B. bosses */
 const B2={tmin(e){return(e.mini?{normal:30,hard:40,vhard:44,legend:46}:{normal:34,hard:48,vhard:52,legend:56})[SET.diff]||0;}};   // seconds the HP bar takes at the most (DPS ceiling)
-{const sb0=spawnBoss;spawnBoss=function(o){const b=sb0(o);if(S2.on&&b){const k=(1+.3*SC.f())*(b.mini?1:.7);b.hp=b.max=Math.round(b.max*k);b.floor=b.pf0=Math.ceil(b.max*.62);b.gi=0;b.cores=[];b.gw=0;b.cf=0;}return b;};   // district and final bosses x.7: the shield gates add their time
+{HOOK.spawnBoss(sb0=>function(o){const b=sb0(o);if(S2.on&&b){const k=(1+.3*SC.f())*(b.mini?1:.7);b.hp=b.max=Math.round(b.max*k);b.floor=b.pf0=Math.ceil(b.max*.62);b.gi=0;b.cores=[];b.gw=0;b.cf=0;}return b;});   // district and final bosses x.7: the shield gates add their time
  const bb0=bossBeat;bossBeat=function(e,d){bb0(e,d);e.pf0=e.floor;if(S2.on&&e.cf>0&&e.minBar)e.floor=Math.max(e.floor,e.cf);};}   // pf0: the phase floor (b.js) under the DPS ceiling
 NR.on('tick',dt=>{if(!S2.on||!G.live)return;const e=G.boss;if(!e||e.dead||!e.minBar||e.x>bossX()||!e.cores)return;   // minBar 0 = a test or lab kill
   const n=S2.hard()?2:SET.diff==='normal'?1:0;
