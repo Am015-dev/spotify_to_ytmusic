@@ -161,5 +161,5 @@ NR.on('footEnd',d=>{if(F.lab&&FLAB.on&&d&&d.quit&&!FLAB.leaving){FLAB.leaving=tr
     const n=lsec(body,'WHAT IT DOES');const p=lel('div','',null);p.style.cssText='font-size:13px;line-height:1.4;color:var(--ink);max-width:560px';
     p.textContent='Starts the street run with a control panel: jump to any room or the climax, add foes, crates and barrels in front of Kai, god mode, infinite ammo, every weapon, pause and slow motion, hit boxes, the road line, the sprite frame of every character and an animation viewer. Nothing is saved: no Neon, no best score, no story card. The song and each on foot sound have their own switches on the SOUND page, group ON FOOT.';
     n.append(p);}});}
-if(/[?&]footlab=1/.test(location.search))setTimeout(()=>FLAB.start(),600);
+if(/[?&]footlab=1/.test(location.search))setTimeout(()=>window.FOOTVIEW&&FOOTVIEW.auto?FOOTVIEW.open():FLAB.start(),600);   // footview.js: the viewer unless &footplay=1
 })();
