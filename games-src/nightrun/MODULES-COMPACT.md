@@ -64,7 +64,7 @@ armour|8|boss HP phases, damage cap, last stand|boss2,boss2
 reward|6|risk pays: graze chain multiplier|reward,reward
 choices|9|build pressure and real choices (default OFF)|build2,build2
 bossmoves|42|boss movesets: verbs (vd), telegraphs, per-boss lists|bossmoves,bossmoves
-bossvis|13|bosses look different in each phase|bossvis,bossvis,first30+
+bossvis|15|bosses look different in each phase|bossvis,bossvis,first30+
 powlevels|20|power-up levels + five new shooter power-ups|pw3,pw3
 abilities|13|DASH charges and EMP as abilities (beat bonus, refund)|abil,abil
 forge|21|weapon forge: combine, sockets, presets (data, actions)|forge,forge
@@ -75,7 +75,7 @@ counter|12|threats that make DASH and EMP the answer|counter,counter
 timing|12|DASH/EMP as beat-and-window decisions|timing,timing
 visible|3|enemies live long enough to be seen and fought|vis,vis
 grit|10|slower EMP meter, tougher varied enemies|grit,grit,gritBoss
-density|5|per-stage budget of enemy bullets on screen|density,density
+density|6|per-stage budget of enemy bullets on screen|density,density
 bossplay|32|boss encounter mechanics (gates, ignoring a boss costs)|bossplay,bossplay
 rules|21|new-mechanic cadence, returns with a twist|rules,rules
 novelty|12|late-run escalation layer|novelty,novelty
@@ -86,7 +86,7 @@ bite|3|Normal bites again on top of the short stages|bite,bite
 flankers|8|flanker enemies that punish a parked ship (default OFF)|flankers,flankers
 foeart|9|every fly-stage enemy draws from an approved ship sheet|foeart,foeart
 fleet|23|enemy warships in the fly stages|fleet,fleet
-endramp|8|endless mode climbs in difficulty|endramp,endramp
+endramp|9|endless mode climbs in difficulty|endramp,endramp
 legend|11|Legend plays differently, not just faster|legend,legend
 h|5|H: no AFK wins, a dying ship slows the song|-
 fun|16|set pieces, deck replaces the fixed metronome, rosters|deck,deck,roster+
@@ -98,7 +98,7 @@ cp|10|checkpoints with grace on long stages|cp,cp
 fs|5|phone full screen on first tap|fs,fs
 readable|11|bullets and threats readable at a glance|read,read
 bulletart|1|real bullet pictures (converted approved previews) for enemy|bulletart,bulletart
-legible|4|enemies, enemy bullets and pickups readable on every stage b|legible,legible
+legible|5|enemies, enemy bullets and pickups readable on every stage b|legible,legible
 arsenal|17|12 extra power-ups and the context-aware drop picker|powers,powers
 abup|20|DASH/EMP upgrades and power-up interaction|abup,abup
 zonehint|3|one-line caption on the first purple ring (gravity well) of |zonehint,zonehint
@@ -109,14 +109,15 @@ saves|14|explicit, safe saving and save slots|saves,saves
 stamp|5|build stamp and update check|stamp,stamp
 polish|12|a calm, readable playfield: one telegraph style, ship on top|polish,polish
 diet|14|visual diet: fewer own effects, readable enemies, a lean 6-i|diet,diet
-mix|9|the music stays on top of the effects: separate buses, an ef|mix,mix
+mix|11|the music stays on top of the effects: separate buses, an ef|mix,mix
 hub|34|an organised home: PLAY + status + 4 sections (MISSIONS, HAN|hub,hub
-layout|5|phone layout pass: centred one-colour section pills, centred|layout,layout
+layout|7|phone layout pass: centred one-colour section pills, centred|layout,layout
 school|15|TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics|school,school
 schoolfull|13|every Flight School drill and lesson mini stage is a real le|schoolfull,schoolfull
 tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
 menufix|4|HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 p|menufix,menufix
-explain|8|every fly-stage visual is explained: first-appearance captio|explain,explain
+explain|15|every fly-stage visual is explained: first-appearance captio|explain,explain
 calm|6|a calm playfield: rule banners small in the top band, thin s|calm,calm
+waves|15|stages 1-6 play named waves with one idea each, a breather b|waves,waves
 c|35|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|7|Mainhattan Nightrun service worker (B30). Built by parts/bui|-
