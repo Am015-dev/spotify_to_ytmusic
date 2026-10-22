@@ -1,3 +1,4 @@
+// NOT BUILT since 22 Oct 2026 (C5: procedural Athens fallback removed, painted art only). Safe to delete this file.
 /* ---------- ATHINA must be Athens in every orientation ----------
    Landscape: moon and glint on the water, olive groves on the shore, on top of the lit Acropolis, Plaka and Lycabettus that were already there.
    Portrait: its own backdrop. A big floodlit Acropolis with the Parthenon on its hill passes by all the time (once per layer, always on screen somewhere), Lycabettus with its chapel,

@@ -618,68 +618,7 @@ const DISTRICTS=[
 ];
 const DIST_LEN=58;
 
-/* ---------- background generation ---------- */
-function skyline(w,h,o){const[c,g]=mk(w,h);const r=mul(o.seed);let x=0;const lights=[];
-  while(x<w){let bw=Math.floor(o.minW+r()*(o.maxW-o.minW));if(w-x-bw<o.minW)bw=w-x;const bh=Math.floor(o.minH+r()*(o.maxH-o.minH));const y=h-bh;
-    g.fillStyle=o.body;g.fillRect(x,y,bw,bh);
-    if(r()<.3){g.fillRect(x+bw*.3,y-14,bw*.4,14);}
-    g.fillStyle=o.edge;g.fillRect(x,y,bw,1);
-    const cw=o.cell,ch=o.cell+2;for(let yy=y+6;yy<h-4;yy+=ch)for(let xx=x+4;xx<x+bw-4;xx+=cw){if(r()<o.winP){g.globalAlpha=.25+r()*.6;g.fillStyle=o.win[Math.floor(r()*o.win.length)];g.fillRect(xx,yy,cw-3,ch-4);}}
-    g.globalAlpha=1;
-    if(r()<.45){g.fillStyle=o.body;g.fillRect(x+bw/2-1,y-30,2,30);lights.push([x+bw/2,y-30]);}
-    if(o.signs&&bw>44&&bh>120&&r()<.5){const SL=o.sl||SIGNS,txt=SL[Math.floor(r()*SL.length)],col=r()<.5?o.na:o.nb;g.save();g.shadowColor=col;g.shadowBlur=10;g.fillStyle=col;
-      if(r()<.5&&txt.length<=10){g.font='700 13px "Chakra Petch",sans-serif';g.textAlign='center';const sx=x+bw/2,sy=y+24+r()*40;
-        g.fillStyle='#0a0612';g.fillRect(sx-9,sy-12,18,txt.length*14+6);g.fillStyle=col;[...txt].forEach((ch2,i)=>g.fillText(ch2,sx,sy+i*14));}
-      else{g.font='700 12px "Chakra Petch",sans-serif';const tw=g.measureText(txt).width;const sx=x+(bw-tw)/2,sy=y+30+r()*50;
-        g.strokeStyle=col;g.lineWidth=1.5;g.strokeRect(sx-5,sy-12,tw+10,17);g.fillText(txt,sx,sy);}
-      g.restore();}
-    x+=bw+(o.gap?Math.floor(r()*o.gap):0);}
-  return{c,w,lights};}
-
-function lmSprite(kind,D){const body='#0b0816',rim=D.b;let c,g,w,h;
-  const winGrid=(x0,y0,w0,h0,col,p,cw=6,ch=7)=>{for(let y=y0;y<y0+h0;y+=ch)for(let x=x0;x<x0+w0;x+=cw)if(Math.random()<p){g.globalAlpha=.3+Math.random()*.6;g.fillStyle=col;g.fillRect(x,y,cw-2,ch-3);}g.globalAlpha=1;};
-  switch(kind){
-    case'main':[c,g]=mk(w=100,h=470);g.fillStyle=body;g.fillRect(10,90,55,380);g.beginPath();g.moveTo(40,70);g.arc(62,110,36,-Math.PI/2,Math.PI/2);g.lineTo(40,470);g.lineTo(98,470);g.lineTo(98,110);g.fill();
-      g.fillRect(40,70,58,400);winGrid(44,80,50,380,'#9fe8ff',.55,5,6);winGrid(14,100,46,360,D.win[0],.35);
-      g.fillStyle='#ccc';g.fillRect(66,0,3,72);g.fillStyle=rim;g.fillRect(40,68,58,2);break;
-    case'commerz':[c,g]=mk(w=120,h=500);g.fillStyle=body;g.beginPath();g.moveTo(10,500);g.lineTo(18,90);g.lineTo(102,90);g.lineTo(110,500);g.fill();
-      for(let i=0;i<3;i++){g.fillStyle='#ffd23d';g.globalAlpha=.8-i*.2;g.fillRect(22+i*6,60+i*10,76-i*12,10);}g.globalAlpha=1;g.fillStyle=body;g.fillRect(20,70,80,20);
-      g.fillStyle='#ffd23d';g.globalAlpha=.9;g.fillRect(24,74,72,4);g.globalAlpha=1;g.fillStyle='#ddd';g.fillRect(58,0,3,62);
-      winGrid(24,96,72,400,D.win[0],.4);for(let y=130;y<480;y+=90){g.fillStyle='#1b3b2a';g.fillRect(22,y,76,22);g.fillStyle='#3dffb044';g.fillRect(24,y+2,72,18);}break;
-    case'opera':[c,g]=mk(w=200,h=150);g.fillStyle=body;g.fillRect(10,60,180,90);g.beginPath();g.moveTo(10,60);g.lineTo(100,20);g.lineTo(190,60);g.fill();
-      for(let i=0;i<8;i++){g.fillStyle='#ffcf6a';g.globalAlpha=.55;g.fillRect(22+i*21,80,10,34);}g.globalAlpha=1;g.fillStyle=rim;g.fillRect(10,60,180,2);
-      g.font='700 10px "Chakra Petch",sans-serif';g.fillStyle='#ffcf6a';g.textAlign='center';g.fillText('ALTE OPER',100,54);break;
-    case'dom':[c,g]=mk(w=110,h=330);g.fillStyle=body;g.fillRect(25,110,60,220);g.fillRect(5,220,100,110);
-      g.beginPath();g.moveTo(25,110);g.lineTo(35,70);g.lineTo(75,70);g.lineTo(85,110);g.fill();g.beginPath();g.moveTo(38,70);g.quadraticCurveTo(55,10,72,70);g.fill();
-      g.fillRect(53,0,4,30);g.fillStyle='#ffcf6a';g.globalAlpha=.6;for(let y=130;y<320;y+=40){g.fillRect(40,y,6,22);g.fillRect(64,y,6,22);}g.globalAlpha=1;break;
-    case'roemer':[c,g]=mk(w=200,h=130);for(let i=0;i<3;i++){const x=i*66+2;g.fillStyle=body;g.beginPath();g.moveTo(x,130);g.lineTo(x,60);
-      for(let s=0;s<4;s++){g.lineTo(x+s*8,60-s*12);g.lineTo(x+s*8+8,60-s*12);}g.lineTo(x+32,10);for(let s=3;s>=0;s--){g.lineTo(x+64-s*8-8,60-s*12);g.lineTo(x+64-s*8,60-s*12);}g.lineTo(x+64,130);g.fill();
-      g.fillStyle='#ffcf6a';g.globalAlpha=.7;for(let r=0;r<3;r++)for(let k=0;k<3;k++)g.fillRect(x+12+k*16,62+r*20,7,11);g.globalAlpha=1;}
-      g.fillStyle=rim;g.fillRect(0,128,200,2);break;
-    case'ezb':[c,g]=mk(w=190,h=430);g.fillStyle=body;g.beginPath();g.moveTo(10,430);g.lineTo(18,20);g.lineTo(78,34);g.lineTo(88,430);g.fill();
-      g.beginPath();g.moveTo(100,430);g.lineTo(110,40);g.lineTo(172,26);g.lineTo(182,430);g.fill();
-      g.strokeStyle='#0e2a26';g.lineWidth=3;for(let y=80;y<420;y+=70){g.beginPath();g.moveTo(84,y);g.lineTo(106,y+35);g.moveTo(106,y);g.lineTo(84,y+35);g.stroke();}
-      winGrid(22,44,58,380,D.win[0],.5,5,6);winGrid(112,50,62,370,D.win[1],.45,5,6);g.fillStyle=rim;g.fillRect(0,428,190,2);
-      g.font='700 11px "Chakra Petch",sans-serif';g.fillStyle=D.b;g.textAlign='center';g.fillText('€ SPERRZONE €',95,14);break;
-    case'grossmarkt':[c,g]=mk(w=260,h=110);g.fillStyle=body;g.fillRect(0,40,260,70);for(let i=0;i<10;i++){g.beginPath();g.moveTo(i*26,40);g.quadraticCurveTo(i*26+13,20,i*26+26,40);g.fill();}
-      winGrid(6,50,248,50,D.win[0],.25,8,10);break;
-    case'messe':[c,g]=mk(w=90,h=470);g.fillStyle=body;g.fillRect(15,90,60,380);g.beginPath();g.moveTo(15,90);g.lineTo(45,20);g.lineTo(75,90);g.fill();
-      g.fillStyle=D.a;g.globalAlpha=.8;g.beginPath();g.moveTo(22,86);g.lineTo(45,32);g.lineTo(68,86);g.closePath();g.stroke();g.strokeStyle=D.a;g.lineWidth=1.5;g.stroke();g.globalAlpha=1;
-      for(let x=22;x<75;x+=10){g.fillStyle='#1a0c10';g.fillRect(x,96,3,370);}winGrid(18,96,56,370,D.win[0],.35,5,7);break;
-    case'europa':[c,g]=mk(w=80,h=510);g.fillStyle='#120a14';g.fillRect(34,120,12,390);g.beginPath();g.ellipse(40,150,36,14,0,0,7);g.fill();g.fillRect(28,130,24,20);
-      g.fillStyle=D.b;g.globalAlpha=.8;g.fillRect(8,148,64,2);g.globalAlpha=1;g.fillStyle='#ccc';g.fillRect(39,0,2,125);break;
-    default:return athSprite(kind,D);}
-  return{c,w,h};}
-
-function buildBG(i){const D=DISTRICTS[i];
-  const far=skyline(1920,300,{seed:11+i*7,minW:30,maxW:80,minH:60,maxH:220,body:'#0d0a1e',edge:'#1f1a3a',win:D.win,winP:.12,cell:5});
-  const mid=skyline(1920,380,{seed:99+i*13,minW:44,maxW:120,minH:D.low?70:110,maxH:D.low?170:330,body:'#07050f',edge:D.a,win:D.win,winP:.22,cell:7,signs:true,sl:D.signs,na:D.a,nb:D.b,gap:26});
-  {const g=mid.c.getContext('2d');g.save();g.globalCompositeOperation='lighter';g.globalAlpha=.5;mid.lights.forEach(([lx,ly],k)=>{if(k%2)return;g.drawImage(glow('#ff3030'),lx-6,ly-6,12,12);});g.restore();}   // red tower lights are part of the layer (they were ~12 glow draws a frame)
-  const lms=D.lm.filter(k=>k!=='hammer').map(k=>lmSprite(k,D));
-  return{D,far,mid,lms,hammer:D.lm.includes('hammer')};}
-const BGC={};function bgFor(i){if(BGC[i])return BGC[i];
-  if(ART.stubOk(i,false))return BGC[i]={D:DISTRICTS[i],stub:1,lms:[]};     // painted district: no procedural skyline to build (building one was a 20-80 ms hitch)
-  return BGC[i]=buildBG(i);}
+const BGC={};function bgFor(i){return BGC[i]||(BGC[i]={D:DISTRICTS[i],stub:1,lms:[]});}   // painted backdrops only (owner, 22 Oct 2026): no procedural skyline fallback
 
 // Scanlines + vignette: rebuilt at the canvas's own pixel size (1 canvas pixel per output pixel, no scaling pass) and drawn as one image a frame.
 const SCN={l:null,p:null};
@@ -688,14 +627,6 @@ function scanFor(port){const w=cv.width,h=cv.height,o=SCN[port?'p':'l'],cp=windo
   if(cp){if(cp.a){g.fillStyle='rgba(0,0,0,'+cp.a+')';for(let y=0;y<SH_;y+=cp.pitch)g.fillRect(0,y,SW,1);}}else{g.fillStyle=port?'rgba(0,0,0,.16)':'rgba(0,0,0,.18)';for(let y=0;y<SH_;y+=3)g.fillRect(0,y,SW,1);}
   const v=port?g.createRadialGradient(SW/2,SH_/2,SH_*.3,SW/2,SH_/2,SH_*.75):g.createRadialGradient(SW/2,SH_/2,SH_*.35,SW/2,SH_/2,SH_*.95);
   v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,cp?'rgba(0,0,0,'+cp.v+')':port?'rgba(0,0,0,.55)':'rgba(0,0,0,.6)');g.fillStyle=v;g.fillRect(0,0,SW,SH_);c.ck=ck;SCN[port?'p':'l']=c;return c;}
-// A big scrolling layer is built once at 1.5 px per unit; on a screen that needs less (1 px per unit at 1080p) a copy at exactly the needed size is drawn instead,
-// so the GPU does not shrink a 2880 px wide texture every frame.
-function dispOf(L,r){r=Math.min(PR,r);if(r>=PR*.98)return L.c;if(L.d&&Math.abs(L.dr-r)<.004)return L.d;
-  const c=L.d||document.createElement('canvas');c.width=Math.max(1,Math.round(L.c.width/PR*r));c.height=Math.max(1,Math.round(L.c.height/PR*r));const g=c.getContext('2d');g.imageSmoothingQuality='high';g.clearRect(0,0,c.width,c.height);g.drawImage(L.c,0,0,c.width,c.height);L.d=c;L.dr=r;return c;}
-function blitL(L,x,y){if(x>=W||x+L.c.width/PR<=0)return;ctx.drawImage(dispOf(L,S),x,y,L.c.width/PR,L.c.height/PR);}
-
-
-const cars=[];
 // Sky gradient + glow pre-rendered at the canvas's own pixel size: one drawImage a frame instead of a full-screen gradient fill, a gradient object and a glow sprite.
 // One slot per orientation (the current district only), rebuilt when the district or the canvas size changes.
 const SKYS={l:null,p:null};
@@ -706,81 +637,16 @@ function skyFor(bg,port){const w=cv.width,h=cv.height,s=SKYS[port?'p':'l'];if(s&
   const gx=port?SW*.3:SW*.72,gy=port?SH_*.25:SH_*.28,r=260;g.globalCompositeOperation='lighter';g.globalAlpha=port?.12:.18;g.drawImage(glow(D.a),gx-r,gy-r,r*2,r*2);
   SKYS[port?'p':'l']={bg,c};return c;}
 
-function drawBG(bg,t,dt,scroll){const D=bg.D;
-  if(ART.paintBG(bg,t,scroll))return;                    // painted backdrop + painted parallax strips (art.js); the procedural sky and skylines below are the fallback
-  if(bg.stub){const i=DISTRICTS.indexOf(D);if(!ART.failed(i,false)){ctx.drawImage(skyFor(bg,false),0,0,W,H);return;}D.nostub=1;delete BGC[i];bg=bgFor(i);}     // still loading: the plain sky; a file failed: build the real skyline
-  ctx.drawImage(skyFor(bg,false),0,0,W,H);                // sky gradient + moon haze, drawn once per district and size (see skyFor)
-  ctx.save();ctx.globalAlpha=.1;ctx.font='700 46px "Chakra Petch",sans-serif';ctx.fillStyle=D.b;
-  const adw=(bg.adw||(bg.adw=ctx.measureText(D.ad).width))+400;const ax=W-((scroll*.06)%(adw+W));ctx.fillText(D.ad,ax,84);ctx.restore();
-  const tile=(L,par,y)=>{const o=(scroll*par)%L.w;blitL(L,-o,y);blitL(L,-o+L.w,y);return o;};
-  const fo=tile(bg.far,.1,H-300-40);
-  // landmarks
-  const span=1500;bg.lms.forEach((lm,k)=>{let x=((k*span/bg.lms.length+300)-scroll*.22)%span;if(x<-lm.w)x+=span;const y=H-lm.h-50;blitL(lm,x,y);
-    ctx.globalCompositeOperation='lighter';G_(x+lm.w/2,y+2,8,'#ff3030',.45);ctx.globalCompositeOperation='source-over';});
-  if(bg.hammer){let x=(900-scroll*.22)%span;if(x<-120)x+=span;drawHammer(x,H-50,t);}
-  const mo=tile(bg.mid,.45,H-380);
-  // traffic
-  ctx.globalCompositeOperation='source-over';
-  // haze
-  const hz=bg.hzG||(bg.hzG=(()=>{const q=ctx.createLinearGradient(0,H-220,0,H);q.addColorStop(0,D.a+'00');q.addColorStop(1,D.a+'38');return q;})());ctx.fillStyle=hz;ctx.fillRect(0,H-220,W,220);
-  drawNear(bg,t,scroll);}
-
-function drawHammer(x,base,t){ctx.fillStyle='#0a0508';const hgt=190;const bx=x+40,by=base-hgt;
-  ctx.fillRect(bx-10,by+40,22,hgt-40);ctx.beginPath();ctx.arc(bx+1,by+30,12,0,7);ctx.fill();
-  const a=-0.2+Math.max(0,Math.sin(t*1.3))*0.9;ctx.save();ctx.translate(bx+8,by+50);ctx.rotate(a);ctx.fillRect(0,-5,70,10);ctx.fillRect(62,-12,18,24);ctx.restore();
-  ctx.fillRect(bx-24,by+50,16,6);}
-
-let trainX=2000;
-function drawNear(bg,t,scroll){const D=bg.D,ty=H-58;
-  if(D.near==='sea'){drawSea(bg,t,scroll);return;}
-  if(D.near==='river'){const wy=H-86;const g=ctx.createLinearGradient(0,wy,0,H);g.addColorStop(0,'#08203a');g.addColorStop(1,'#020610');ctx.fillStyle=g;ctx.fillRect(0,wy,W,H-wy);
-    ctx.save();ctx.globalAlpha=.22;const mo=(scroll*.45)%bg.mid.w,top=H-380;
-    for(let s=0;s<86;s+=4){const off=Math.sin(t*2+s*.3)*4,sy=(wy-s-4)-top;if(sy<0)break;
-      const seg=(sx,dx,w)=>{if(w>0)ctx.drawImage(bg.mid.c,sx*PR,sy*PR,w*PR,4*PR,dx+off,wy+s,w,4);};
-      const w1=Math.min(W,bg.mid.w-mo);seg(mo,0,w1);seg(0,w1,W-w1);}
-    ctx.restore();
-    ctx.globalCompositeOperation='lighter';for(let i=0;i<12;i++){const x=(i*97-scroll*1.1)%W;const xx=x<0?x+W:x;ctx.fillStyle=D.a+'22';ctx.fillRect(xx,wy+10+(i*37)%70,20+(i*13)%30,1);}ctx.globalCompositeOperation='source-over';
-    // Eiserner Steg
-    const span=1300;let bx=(200-scroll*1.3)%span;if(bx<-600)bx+=span;const dy=wy-12;
-    ctx.strokeStyle='#1a1428';ctx.lineWidth=3;ctx.fillStyle='#0c0916';ctx.fillRect(bx,dy,560,6);
-    for(let k=0;k<2;k++){const ax=bx+40+k*250;ctx.beginPath();ctx.moveTo(ax,dy);ctx.quadraticCurveTo(ax+115,dy-90,ax+230,dy);ctx.stroke();
-      for(let j=1;j<10;j++){const u=j/10,xx=ax+230*u,yy=dy-(1-(2*u-1)**2)*45;ctx.beginPath();ctx.moveTo(xx,dy);ctx.lineTo(xx+(j%2?12:-12),yy);ctx.stroke();}}
-    ctx.fillRect(bx+20,dy,14,H-dy);ctx.fillRect(bx+270,dy,14,H-dy);ctx.fillRect(bx+520,dy,14,H-dy);
-    ctx.globalCompositeOperation='lighter';for(let k=0;k<8;k++)G_(bx+30+k*70,dy-2,8,D.b,.6);ctx.globalCompositeOperation='source-over';
-  }else{
-    ctx.fillStyle='#050309';ctx.fillRect(0,H-30,W,30);
-    const pil=180,po=(scroll*1.3)%pil;ctx.fillStyle='#0b0814';for(let x=-po;x<W+pil;x+=pil){ctx.fillRect(x,ty,16,H-ty);}
-    ctx.fillStyle='#0e0a1a';ctx.fillRect(0,ty,W,12);ctx.fillStyle=D.a;ctx.fillRect(0,ty,W,1.5);
-    if(D.near==='street'){const lo=(scroll*1.3)%120;ctx.globalCompositeOperation='lighter';for(let x=-lo;x<W+120;x+=120){G_(x+8,ty-4,18,D.b,.5);}ctx.globalCompositeOperation='source-over';}
-    trainX-=scroll>0?420*FD:0;if(trainX<-900)trainX=W+rnd(800,2600);
-    if(trainX<W){ctx.fillStyle='#120c20';ctx.fillRect(trainX,ty-26,820,24);ctx.fillStyle=D.b;for(let k=0;k<40;k++)ctx.fillRect(trainX+8+k*20,ty-20,12,8);
-      ctx.globalCompositeOperation='lighter';G_(trainX,ty-14,20,'#ffffff',.8);ctx.globalCompositeOperation='source-over';
-      ctx.font='700 11px "Chakra Petch",sans-serif';ctx.fillStyle=D.a;ctx.fillText('S8 → FLUGHAFEN',trainX+40,ty-30);}
-  }
-}
+function drawBG(bg,t,dt,scroll){
+  if(ART.paintBG(bg,t,scroll))return;                    // painted backdrop + painted parallax strips (art.js)
+  ctx.drawImage(skyFor(bg,false),0,0,W,H);}               // art still loading or missing: the plain sky gradient
 
 /* ---------- portrait backdrop: the city seen from above, scrolling toward the ship (drawn upright on the visible canvas, 540 x 960 units) ---------- */
 const PW_=H,PH_=W;                                       // portrait screen in world units
-function roofLayer(h,o){const[c,g]=mk(PW_,h);const r=mul(o.seed);let y=0;
-  while(y<h){let rh=Math.floor(o.minH+r()*(o.maxH-o.minH));if(h-y-rh<o.minH)rh=h-y;
-    let x=0;while(x<PW_){let bw=Math.floor(o.minW+r()*(o.maxW-o.minW));if(PW_-x-bw<o.minW)bw=PW_-x;
-      if(r()<o.fill){const bx=x+o.gap/2,by=y+o.gap/2,w=bw-o.gap,hh=rh-o.gap;
-        g.fillStyle=o.body;g.fillRect(bx,by,w,hh);g.strokeStyle=o.edge;g.globalAlpha=o.ea;g.lineWidth=1.5;g.strokeRect(bx+.5,by+.5,w-1,hh-1);g.globalAlpha=1;
-        const n=Math.floor(r()*5);for(let k=0;k<n;k++){g.fillStyle=o.detail;g.fillRect(bx+6+r()*Math.max(1,w-22),by+6+r()*Math.max(1,hh-22),5+r()*12,5+r()*12);}
-        for(let yy=by+8;yy<by+hh-6;yy+=o.cell+3)for(let xx=bx+8;xx<bx+w-6;xx+=o.cell+3){if(r()<o.winP){g.globalAlpha=.2+r()*.5;g.fillStyle=o.win[Math.floor(r()*o.win.length)];g.fillRect(xx,yy,o.cell,o.cell);}}
-        g.globalAlpha=1;if(o.beacon&&r()<.4){g.fillStyle='#ff3030';g.fillRect(bx+w/2-1.5,by+hh/2-1.5,3,3);}}
-      x+=bw;}
-    y+=rh;}
-  return{c,h};}
-function buildBGP(i){const D=DISTRICTS[i];
-  return{far:roofLayer(1100,{seed:31+i*7,minW:50,maxW:130,minH:70,maxH:170,body:'#0d0a1e',edge:D.b,ea:.18,detail:'#1a1536',win:D.win,winP:.1,cell:3,fill:.8,gap:16}),
-         near:roofLayer(1500,{seed:77+i*13,minW:70,maxW:170,minH:120,maxH:260,body:'#07050f',edge:D.a,ea:.55,detail:'#140e24',win:D.win,winP:.16,cell:4,fill:.7,gap:30,beacon:1})};}
-const BGPC={};function bgpFor(i){if(BGPC[i])return BGPC[i];if(ART.stubOk(i,true))return BGPC[i]={stub:1};return BGPC[i]=buildBGP(i);}
+const BGPC={};function bgpFor(i){return BGPC[i]||(BGPC[i]={stub:1});}
 
 function drawBGP(bg,t,dt,scroll){const D=bg.D;let L=bgpFor(DISTRICTS.indexOf(D));
   const PA=ART.paintP(bg,scroll);if(!PA)ctx.drawImage(skyFor(bg,true),0,0,PW_,PH_);   // painted phone backdrop, the roofs on top fainter
-  if(!PA&&L.stub&&ART.failed(DISTRICTS.indexOf(D),true)){const i=DISTRICTS.indexOf(D);D.nostubP=1;delete BGPC[i];L=bgpFor(i);}
-  if(!PA&&!L.stub)for(const [lay,par,al] of [[L.far,.22,.9],[L.near,.6,1]]){const o=(scroll*par)%lay.h;ctx.globalAlpha=al;const dc=dispOf(lay,VS);ctx.drawImage(dc,0,o-lay.h,PW_,lay.h);ctx.drawImage(dc,0,o,PW_,lay.h);}
   if(PA){const lb=ART.bm['ly-phone-'+ART.dn[DISTRICTS.indexOf(D)]];if(lb){const lh=PW_*lb.height/lb.width,off=(scroll*(RET.legible&&window.LGB?LGB.PX.roof:.5))%(2*lh);ctx.globalAlpha=.5;   // the painted rooftops seen from above, mirrored tiles so there is no seam
       for(let j=-2;j*lh+off<PH_;j++){const y=j*lh+off;if(y+lh<=0)continue;if(j&1){ctx.save();ctx.translate(0,y+lh);ctx.scale(1,-1);ctx.drawImage(lb,0,0,PW_,lh);ctx.restore();}else ctx.drawImage(lb,0,y,PW_,lh);}}}
   ctx.globalAlpha=1;
@@ -788,7 +654,6 @@ function drawBGP(bg,t,dt,scroll){const D=bg.D;let L=bgpFor(DISTRICTS.indexOf(D))
   ctx.globalCompositeOperation='lighter';
   ctx.globalCompositeOperation='source-over';
   const hz=bg.hzP||(bg.hzP=(()=>{const q=ctx.createLinearGradient(0,PH_-260,0,PH_);q.addColorStop(0,D.a+'00');q.addColorStop(1,D.a+'30');return q;})());ctx.fillStyle=hz;ctx.fillRect(0,PH_-260,PW_,260);
-  if(D.near==='sea'&&!PA)athensP(bg,t,scroll);
 }
 
 
@@ -2173,65 +2038,6 @@ WAVES.pillars=function(){en('gate',{x:W+30,gy:gr(150,H-200),gap:124});en('gate',
 const ATAB={6:['fan7','spiral','laser','summon','ring','laser','fan9'],7:['fan5','ring','fan7','spiral']};
 HOOK.spawnBoss(_spawnBoss=>function(o){const b=_spawnBoss(o);if(b.k===6&&!b.lbl)b.lbl='T';return b;});
 
-/* ----- landmark sprites (called from lmSprite's default branch) ----- */
-function athSprite(kind,D){let c,g,w,h;const body='#0b0816',lit=D.win[1],rim=D.a;
-  const glowAt=(x,y,r,col,a)=>{const gg=g.createRadialGradient(x,y,0,x,y,r);gg.addColorStop(0,col+Math.round(a*255).toString(16).padStart(2,'0'));gg.addColorStop(1,col+'00');g.fillStyle=gg;g.fillRect(x-r,y-r,r*2,r*2);};
-  switch(kind){
-    case'acropolis':{[c,g]=mk(w=300,h=250);glowAt(150,118,120,D.a,.3);
-      g.fillStyle=body;g.beginPath();g.moveTo(0,250);g.lineTo(30,205);g.lineTo(70,168);g.lineTo(95,152);g.lineTo(215,152);g.lineTo(245,170);g.lineTo(272,208);g.lineTo(300,250);g.closePath();g.fill();
-      g.strokeStyle=rim;g.globalAlpha=.55;g.lineWidth=1.5;g.beginPath();g.moveTo(30,205);g.lineTo(70,168);g.lineTo(95,152);g.lineTo(215,152);g.lineTo(245,170);g.lineTo(272,208);g.stroke();g.globalAlpha=1;
-      g.fillStyle='#d9c58a';g.globalAlpha=.9;g.fillRect(92,144,126,8);                                   // temple floor
-      for(let i=0;i<8;i++)g.fillRect(98+i*15.5,104,7,40);                                              // eight columns
-      g.fillRect(94,96,122,8);g.beginPath();g.moveTo(90,96);g.lineTo(155,66);g.lineTo(220,96);g.closePath();g.fill();   // beam and gable
-      g.globalAlpha=1;g.fillStyle=body;g.beginPath();g.moveTo(104,92);g.lineTo(155,72);g.lineTo(206,92);g.closePath();g.fill();
-      g.fillStyle='#ffe9a8';g.globalAlpha=.5;for(let i=0;i<7;i++)g.fillRect(105+i*15.5,108,6,34);g.globalAlpha=1;
-      g.fillStyle='#fff6d0';g.fillRect(150,52,2,12);break;}
-    case'lycabettus':{[c,g]=mk(w=240,h=230);g.fillStyle=body;g.beginPath();g.moveTo(0,230);g.quadraticCurveTo(70,200,105,120);g.quadraticCurveTo(125,70,145,62);g.quadraticCurveTo(170,70,190,130);g.quadraticCurveTo(215,200,240,230);g.closePath();g.fill();
-      g.strokeStyle=D.b;g.globalAlpha=.4;g.lineWidth=1.5;g.beginPath();g.moveTo(105,120);g.quadraticCurveTo(125,70,145,62);g.quadraticCurveTo(170,70,190,130);g.stroke();g.globalAlpha=1;
-      glowAt(143,50,34,'#ffffff',.35);g.fillStyle='#f4f1e6';g.fillRect(133,46,20,16);g.fillStyle=body;g.fillRect(140,52,6,10);g.fillStyle='#f4f1e6';g.fillRect(142,34,2.5,12);g.fillRect(138.5,38,10,2.5);   // white chapel and cross
-      g.fillStyle='#050309';for(const x of[40,72,168,205]){g.beginPath();g.ellipse(x,214-Math.abs(x-120)*.2,5,17,0,0,7);g.fill();}   // cypress trees
-      g.fillStyle='#ffd27a';g.globalAlpha=.7;for(let i=0;i<9;i++)g.fillRect(90+Math.sin(i*1.7)*40+i*6,150+i*7,2,2);g.globalAlpha=1;break;}
-    case'plaka':{[c,g]=mk(w=240,h=130);const hs=[[0,62,58],[52,48,48],[96,78,62],[154,54,50],[196,66,44]];
-      for(const[x,hh,ww]of hs){g.fillStyle=body;g.fillRect(x,130-hh,ww,hh);g.fillStyle='#14102a';g.fillRect(x-2,130-hh-4,ww+4,5);g.fillStyle=rim;g.globalAlpha=.5;g.fillRect(x-2,130-hh-4,ww+4,1);g.globalAlpha=1;
-        for(let yy=130-hh+10;yy<118;yy+=16)for(let xx=x+7;xx<x+ww-9;xx+=15){g.fillStyle=Math.random()<.65?D.win[0]:'#1a1430';g.globalAlpha=.8;g.fillRect(xx,yy,7,9);g.globalAlpha=1;}}
-      g.strokeStyle='#ffd27a';g.globalAlpha=.55;g.lineWidth=1;g.beginPath();g.moveTo(8,40);g.quadraticCurveTo(60,60,110,40);g.quadraticCurveTo(160,60,225,38);g.stroke();g.globalAlpha=1;   // string lights
-      g.fillStyle='#ffd27a';for(const[x,y]of[[8,40],[34,50],[60,53],[86,50],[110,40],[134,51],[160,54],[190,50],[225,38]]){g.beginPath();g.arc(x,y,2,0,7);g.fill();}break;}
-    case'kiosk':{[c,g]=mk(w=84,h=110);g.fillStyle=body;g.fillRect(14,56,56,54);g.fillStyle='#14102a';g.fillRect(8,50,68,8);
-      for(let i=0;i<6;i++){g.fillStyle=i%2?D.a:'#14102a';g.globalAlpha=.8;g.fillRect(8+i*11.3,58,11.3,8);}g.globalAlpha=1;
-      g.fillStyle='#ffe9a8';g.globalAlpha=.8;g.fillRect(20,72,44,22);g.globalAlpha=1;g.fillStyle=body;g.fillRect(24,76,8,14);g.fillRect(36,76,8,14);g.fillRect(48,76,8,14);
-      glowAt(42,26,40,D.b,.4);g.font='700 13px "Chakra Petch",sans-serif';g.textAlign='center';g.fillStyle=D.b;g.shadowColor=D.b;g.shadowBlur=8;g.fillText('KIOSKI',42,30);g.shadowBlur=0;
-      g.strokeStyle=D.b;g.lineWidth=1.5;g.strokeRect(10,16,64,20);break;}
-    default:return null;}
-  return{c,w,h};}
-
-/* ----- the sea at Piraeus, in place of the street (landscape) ----- */
-function drawSea(bg,t,scroll){const D=bg.D,wy=H-70;
-  const g=ctx.createLinearGradient(0,wy-12,0,H);g.addColorStop(0,'#0a2a4a');g.addColorStop(.35,'#071a36');g.addColorStop(1,'#020812');ctx.fillStyle=g;ctx.fillRect(0,wy,W,H-wy);
-  ctx.fillStyle='#16345c';ctx.fillRect(0,wy-2,W,3);                                              // horizon line of the water
-  ctx.globalCompositeOperation='lighter';ctx.fillStyle=D.a+'26';                               // a few still gold reflections of the lit hill
-  for(let i=0;i<6;i++){const x=((i*173-scroll*.6)%W+W)%W;ctx.fillRect(x,wy+8+i*9,34-i*3,1.5);}
-  ctx.globalCompositeOperation='source-over';
-  // a ferry at anchor, drifting slowly past
-  const span=2200;let fx=((900-scroll*.35)%span+span)%span-420;
-  if(fx<W+40){ctx.fillStyle='#0a0612';ctx.fillRect(fx,wy-34,300,30);ctx.beginPath();ctx.moveTo(fx-24,wy-4);ctx.lineTo(fx,wy-34);ctx.lineTo(fx+300,wy-34);ctx.lineTo(fx+330,wy-4);ctx.closePath();ctx.fill();ctx.fillRect(fx+90,wy-60,120,26);
-    ctx.fillStyle=D.win[0];for(let k=0;k<22;k++)ctx.fillRect(fx+10+k*13,wy-26,7,5);for(let k=0;k<8;k++)ctx.fillRect(fx+98+k*14,wy-52,7,6);
-    ctx.fillStyle=D.b;ctx.fillRect(fx+140,wy-72,40,12);}
-  // quay with lamp posts and cranes of the harbour
-  ctx.fillStyle='#050309';ctx.fillRect(0,H-26,W,26);ctx.fillStyle='#0e0a1a';ctx.fillRect(0,H-32,W,8);ctx.fillStyle=D.b;ctx.fillRect(0,H-32,W,1.5);
-  const lo=(scroll*1.3)%160;ctx.globalCompositeOperation='lighter';for(let x=-lo;x<W+160;x+=160){ctx.fillStyle='#0b0814';ctx.fillRect(x+6,H-62,3,30);G_(x+7.5,H-64,16,D.a,.45);}ctx.globalCompositeOperation='source-over';
-  const cr=((1300-scroll*1.3)%1900+1900)%1900-300;ctx.fillStyle='#0b0814';ctx.fillRect(cr,H-130,6,100);ctx.fillRect(cr-60,H-130,150,5);ctx.fillRect(cr+80,H-130,3,36);
-  ctx.globalCompositeOperation='lighter';G_(cr+3,H-132,7,'#ff3030',.5);ctx.globalCompositeOperation='source-over';}
-
-/* ----- portrait: the sea along the left edge and the lit Acropolis plateau sliding by ----- */
-function athensP(bg,t,scroll){const D=bg.D;
-  const g=ctx.createLinearGradient(0,0,PW_*.24,0);g.addColorStop(0,'#0a2a4af0');g.addColorStop(1,'#0a2a4a00');ctx.fillStyle=g;ctx.fillRect(0,0,PW_*.24,PH_);
-  ctx.globalCompositeOperation='lighter';ctx.fillStyle='#2ee6d61c';for(let i=0;i<10;i++){const y=((i*131+scroll*.2)%PH_+PH_)%PH_;ctx.fillRect(6+(i*37)%50,y,26,1.5);}ctx.globalCompositeOperation='source-over';
-  const span=2600,y=((scroll*.55)%span)-300;                                                          // the hill with the temple, once per ~2600 units of scroll
-  if(y>-260&&y<PH_+40){const x=PW_*.66;ctx.globalAlpha=clamp((y-30)/260,0,1)*.9;ctx.globalCompositeOperation='lighter';G_(x,y+90,170,D.a,.16);ctx.globalCompositeOperation='source-over';
-    ctx.fillStyle='#0b0816';ctx.fillRect(x-100,y,200,180);ctx.strokeStyle=D.a;ctx.globalAlpha=.3;ctx.lineWidth=2;ctx.strokeRect(x-100,y,200,180);ctx.globalAlpha=1;
-    ctx.fillStyle='#e8d9a8';ctx.globalAlpha=.85;ctx.fillRect(x-62,y+40,124,10);ctx.fillRect(x-62,y+130,124,10);
-    for(let i=0;i<9;i++){ctx.beginPath();ctx.arc(x-56+i*14,y+45,3.5,0,7);ctx.arc(x-56+i*14,y+135,3.5,0,7);ctx.fill();}ctx.globalAlpha=1;}}
-
 /* ----- bosses: TALOS (bronze guardian) and HOPLITE (mini-boss with a shield) ----- */
 function drawBossX(e,t){ctx.fillStyle='#100a1c';ctx.strokeStyle=e.col;ctx.lineWidth=2.5;
   if(e.k===6){for(let i=0;i<6;i++){ctx.save();ctx.rotate(-t*.5+i*Math.PI/3);ctx.beginPath();ctx.moveTo(e.r+2,-5);ctx.lineTo(e.r+26,0);ctx.lineTo(e.r+2,5);ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}
@@ -2241,7 +2047,6 @@ function drawBossX(e,t){ctx.fillStyle='#100a1c';ctx.strokeStyle=e.col;ctx.lineWi
 /* story act V: the stages are in story.js (CITYS) */
 BOSS_SUB[7]='Shield wall, spear rig';
 DISTRICTS[ATH].song='athina';
-                                                       // build the skyline while the title is up
 
 /* ---------- the director: every district lasts as long as its song; the waves follow the song ----------
    * A district is the length of its song in bars (SONGM). The boss comes in the last 32 bars and cannot fall before its armour is spent (31 bars),
@@ -2914,101 +2719,6 @@ window.__nrs={get SYN(){return SYN},SYNS,PATHS,foeOf,foeTip,pathOf,lvText,tpDmg:
 #gaCards.tune .card.d .bt{flex:1 1 100%;justify-content:space-between}
 #gaCards.tune .card.d .bt button{flex:1 1 0;min-height:44px}
 `;document.head.appendChild(st);}
-
-/* ---------- ATHINA must be Athens in every orientation ----------
-   Landscape: moon and glint on the water, olive groves on the shore, on top of the lit Acropolis, Plaka and Lycabettus that were already there.
-   Portrait: its own backdrop. A big floodlit Acropolis with the Parthenon on its hill passes by all the time (once per layer, always on screen somewhere), Lycabettus with its chapel,
-   olive groves, whitewashed Plaka roofs with a blue church dome and string lights, and the sea with moon glints along the left edge. Original art only, no bullet-coloured pixels. */
-{const as0=athSprite;athSprite=function(kind,D){
-  if(kind==='acropolis'){const r=as0(kind,D),k=1.45,[c,g]=mk(r.w*k,r.h*k);g.drawImage(r.c,0,0,r.w*k,r.h*k);return{c,w:r.w*k,h:r.h*k};}      // the Acropolis is the hero of the skyline: bigger
-  if(kind!=='olive')return as0(kind,D);
-  const[c,g]=mk(260,120),r=mul(77);g.fillStyle='#050309';g.fillRect(0,108,260,12);
-  for(let i=0;i<9;i++){const x=14+i*28+r()*10,h=30+r()*16;g.fillStyle='#0a0710';g.fillRect(x-1.5,120-h*.8,3,h*.6);
-    for(let k=0;k<4;k++){g.fillStyle=['#14211c','#1c2e26','#2a4034','#3c5a48'][k];g.beginPath();g.ellipse(x+(k-1.5)*5,120-h-4+k*2,15-k*2,10-k,0,0,7);g.fill();}
-    g.fillStyle='#b8d8b0';g.globalAlpha=.35;g.beginPath();g.ellipse(x-4,120-h-9,8,3,0,0,7);g.fill();g.globalAlpha=1;}
-  return{c,w:260,h:120};};
- DISTRICTS[ATH].lm.push('olive','olive');}
-{const ds=drawSea;drawSea=function(bg,t,scroll){ds(bg,t,scroll);
-  const D=bg.D,wy=H-70,mx=W*.64;ctx.save();ctx.globalCompositeOperation='lighter';
-  const gl=ctx.createLinearGradient(0,wy,0,H);gl.addColorStop(0,'#cfe6ff44');gl.addColorStop(1,'#cfe6ff00');                       // the moon's glint column on the water
-  ctx.fillStyle=gl;ctx.beginPath();ctx.moveTo(mx-14,wy);ctx.lineTo(mx+14,wy);ctx.lineTo(mx+46,H-26);ctx.lineTo(mx-46,H-26);ctx.closePath();ctx.fill();
-  ctx.fillStyle='#e8f2ff';for(let i=0;i<16;i++){const y=wy+4+i*(H-30-wy)/16,hw=3+i*2.2,j=Math.sin(t*1.7+i*1.9);ctx.globalAlpha=.55-.025*i;ctx.fillRect(mx+j*(2+i*.9)-hw,y,hw*2,1.4);}
-  ctx.globalAlpha=1;ctx.restore();};}
-{const db=drawBG;drawBG=function(bg,t,dt,scroll){db(bg,t,dt,scroll);
-  if(bg.D.name!=='ATHINA'||bg._p)return;ctx.save();ctx.globalCompositeOperation='lighter';const mx=W*.64,my=H*.2;G_(mx,my,120,'#bcd6ff',.2);ctx.globalCompositeOperation='source-over';
-  ctx.fillStyle='#f4f1e6';ctx.beginPath();ctx.arc(mx,my,17,0,7);ctx.fill();ctx.fillStyle='#d6d9e8';ctx.beginPath();ctx.arc(mx+5,my-3,5,0,7);ctx.arc(mx-6,my+6,3.5,0,7);ctx.fill();ctx.restore();};}
-
-/* ----- portrait ----- */
-const AW=PW_,AH_FAR=1000,AH_LYC=1900,AH_NEAR=1500;
-let ATHP=null;
-function buildAthensP(){const D=DISTRICTS[ATH],r=mul(2026),gd=(g,x,y,rad,col,a)=>{const q=g.createRadialGradient(x,y,0,x,y,rad);q.addColorStop(0,col+Math.round(a*255).toString(16).padStart(2,'0'));q.addColorStop(1,col+'00');g.fillStyle=q;g.fillRect(x-rad,y-rad,rad*2,rad*2);};
-  const olive=(g,x,y,s)=>{g.fillStyle='#0a0710';g.fillRect(x-1.5*s,y-6*s,3*s,9*s);for(let k=0;k<4;k++){g.fillStyle=['#12201a','#1b2f26','#294036','#3b5a49'][k];g.beginPath();g.ellipse(x+(k-1.5)*4*s,y-12*s+k*1.5*s,13*s-k*2*s,9*s-k*s,0,0,7);g.fill();}
-    g.fillStyle='#bcd9b4';g.globalAlpha=.3;g.beginPath();g.ellipse(x-4*s,y-17*s,7*s,2.6*s,0,0,7);g.fill();g.globalAlpha=1;};
-  /* two far layers: Lycabettus and the sea (540 x 1900, slow) and the Acropolis (540 x 1000, so one is always on screen) */
-  const[fc,fg]=mk(AW,AH_FAR),[lc,lg]=mk(AW,AH_LYC);
-  // the sea along the left edge with moon glints
-  {const sg=lg.createLinearGradient(0,0,150,0);sg.addColorStop(0,'#0b2e52');sg.addColorStop(.7,'#0a2a4acc');sg.addColorStop(1,'#0a2a4a00');lg.fillStyle=sg;lg.fillRect(0,0,150,AH_LYC);
-    lg.globalCompositeOperation='lighter';lg.fillStyle='#cfe6ff';for(let i=0;i<70;i++){const y=r()*AH_LYC,x=10+r()*80,w=8+r()*26;lg.globalAlpha=.1+r()*.3;lg.fillRect(x,y,w,1.5);}
-    lg.globalAlpha=1;lg.globalCompositeOperation='source-over';}
-  // the Acropolis rock with the lit Parthenon (front view), floodlit
-  {const cx=330,by=560;gd(fg,cx,by-170,230,D.a,.34);
-    fg.fillStyle='#0b0816';fg.beginPath();fg.moveTo(80,by+60);fg.lineTo(120,by+10);fg.lineTo(170,by-70);fg.lineTo(205,by-96);fg.lineTo(460,by-96);fg.lineTo(500,by-60);fg.lineTo(540,by+20);fg.lineTo(540,by+60);fg.closePath();fg.fill();
-    fg.strokeStyle=D.a;fg.globalAlpha=.55;fg.lineWidth=2;fg.beginPath();fg.moveTo(120,by+10);fg.lineTo(170,by-70);fg.lineTo(205,by-96);fg.lineTo(460,by-96);fg.lineTo(500,by-60);fg.lineTo(540,by+20);fg.stroke();fg.globalAlpha=1;
-    // rock face lit from below
-    for(let i=0;i<14;i++){const x=150+r()*340,y=by-90+r()*140;fg.fillStyle='#ffcf4a';fg.globalAlpha=.05+r()*.06;fg.fillRect(x,y,6+r()*30,2);}fg.globalAlpha=1;
-    // fortress wall
-    fg.fillStyle='#1a1424';fg.fillRect(205,by-112,255,16);fg.fillStyle='#e8d9a8';fg.globalAlpha=.5;fg.fillRect(205,by-112,255,2);fg.globalAlpha=1;
-    // temple: floor, 8 columns, beam, pediment
-    const tx=232,tw=200,ty=by-112;fg.fillStyle='#e8d9a8';fg.fillRect(tx-6,ty-6,tw+12,6);
-    for(let i=0;i<8;i++){const x=tx+i*(tw-9)/7;fg.fillStyle='#f2e6bd';fg.fillRect(x,ty-78,9,72);fg.fillStyle='#ffffff';fg.globalAlpha=.25;fg.fillRect(x+1.5,ty-78,2,72);fg.globalAlpha=1;fg.fillStyle='#b8a672';fg.fillRect(x+7,ty-78,2,72);}
-    fg.fillStyle='#e8d9a8';fg.fillRect(tx-6,ty-90,tw+12,12);
-    fg.fillStyle='#f6ecc8';fg.beginPath();fg.moveTo(tx-12,ty-90);fg.lineTo(tx+tw/2,ty-124);fg.lineTo(tx+tw+12,ty-90);fg.closePath();fg.fill();
-    fg.fillStyle='#0b0816';fg.beginPath();fg.moveTo(tx+8,ty-93);fg.lineTo(tx+tw/2,ty-117);fg.lineTo(tx+tw-8,ty-93);fg.closePath();fg.fill();
-    fg.fillStyle='#ffe9a8';fg.globalAlpha=.4;for(let i=0;i<7;i++)fg.fillRect(tx+9+i*(tw-9)/7+2,ty-72,(tw-9)/7-6,62);fg.globalAlpha=1;
-    gd(fg,cx-6,ty-40,150,'#fff0c0',.22);
-    // floodlight beams up the hill
-    fg.save();fg.globalCompositeOperation='lighter';for(const x of[190,330,470]){const q=fg.createLinearGradient(x,by+40,x,by-170);q.addColorStop(0,D.a+'30');q.addColorStop(1,D.a+'00');fg.fillStyle=q;fg.beginPath();fg.moveTo(x-8,by+40);fg.lineTo(x+8,by+40);fg.lineTo(x+46,by-170);fg.lineTo(x-46,by-170);fg.closePath();fg.fill();}fg.restore();
-    // olive groves at the foot, a small Odeon arch and a few pines
-    for(let i=0;i<9;i++)olive(fg,150+i*42+r()*12,by+58+r()*14,1+r()*.5);
-    fg.fillStyle='#050309';for(const x of[168,498]){fg.beginPath();fg.ellipse(x,by-20,5,20,0,0,7);fg.fill();}}
-  // Lycabettus with its white chapel on the far side of the layer
-  {const cx=380,by=900;gd(lg,cx,by-120,150,'#bcd6ff',.14);lg.fillStyle='#0b0816';lg.beginPath();lg.moveTo(180,by+90);lg.quadraticCurveTo(300,by+40,340,by-60);lg.quadraticCurveTo(375,by-120,410,by-60);lg.quadraticCurveTo(450,by+40,540,by+90);lg.closePath();lg.fill();
-    lg.strokeStyle=D.b;lg.globalAlpha=.4;lg.lineWidth=1.5;lg.beginPath();lg.moveTo(340,by-60);lg.quadraticCurveTo(375,by-120,410,by-60);lg.stroke();lg.globalAlpha=1;
-    gd(lg,cx,by-132,38,'#ffffff',.4);lg.fillStyle='#f4f1e6';lg.fillRect(cx-11,by-136,22,16);lg.fillStyle='#0b0816';lg.fillRect(cx-3,by-130,6,10);lg.fillStyle='#f4f1e6';lg.fillRect(cx-1.5,by-152,3,16);lg.fillRect(cx-6,by-147,12,3);
-    lg.fillStyle='#ffd27a';lg.globalAlpha=.7;for(let i=0;i<14;i++)lg.fillRect(cx-50+Math.sin(i*1.9)*44+i*6,by-30+i*7,2,2);lg.globalAlpha=1;
-    for(let i=0;i<6;i++)olive(lg,230+i*50+r()*10,by+84+r()*6,.9+r()*.4);}
-  /* near layer: whitewashed Plaka roofs along both edges (540 x 1500) */
-  const[nc,ng]=mk(AW,AH_NEAR);
-  {const roofs=(x0,x1)=>{let y=10;while(y<AH_NEAR-60){const rh=70+Math.floor(r()*70);let x=x0;while(x<x1-40){const bw=Math.min(x1-x,52+Math.floor(r()*56));
-        if(r()<.88){const bx=x+5,by=y+5,w=bw-10,h=rh-10,terra=r()<.22;
-          ng.fillStyle=terra?'#4a2a2c':'#2d3558';ng.fillRect(bx,by,w,h);ng.fillStyle=terra?'#6c3a34':'#3b4670';ng.fillRect(bx,by,w,h*.55);               // roof top and its shaded half
-          ng.strokeStyle=terra?'#b8765e':'#cfd6f0';ng.globalAlpha=.55;ng.lineWidth=1.4;ng.strokeRect(bx+.5,by+.5,w-1,h-1);ng.globalAlpha=1;
-          if(!terra&&r()<.5){ng.fillStyle='#8aa2e0';ng.globalAlpha=.5;ng.fillRect(bx+4,by+4,w-8,3);ng.globalAlpha=1;}
-          for(let k=0,n=1+Math.floor(r()*3);k<n;k++){const px=bx+6+r()*Math.max(1,w-18),py=by+h*.62+r()*Math.max(1,h*.3-6);ng.fillStyle=['#2f4a36','#a85a3a','#caa05a'][Math.floor(r()*3)];ng.beginPath();ng.arc(px,py,3+r()*2,0,7);ng.fill();}   // pots and rooftop plants
-          for(let yy=by+h*.62;yy<by+h-6;yy+=11)for(let xx=bx+7;xx<bx+w-9;xx+=12)if(r()<.4){ng.fillStyle='#ffe0a0';ng.globalAlpha=.35+r()*.5;ng.fillRect(xx,yy,5,6);}
-          ng.globalAlpha=1;
-          if(r()<.07){ng.fillStyle='#e8ecf8';ng.beginPath();ng.arc(bx+w/2,by+h*.4,Math.min(w,h)*.27,0,7);ng.fill();ng.fillStyle='#3a6ad8';ng.beginPath();ng.arc(bx+w/2,by+h*.4,Math.min(w,h)*.2,Math.PI,0);ng.fill();ng.fillStyle='#f4f1e6';ng.fillRect(bx+w/2-1,by+h*.4-Math.min(w,h)*.27-8,2,8);}     // a whitewashed church with its blue dome
-        }
-        x+=bw;}
-      // string lights across the lane
-      ng.strokeStyle='#ffd27a';ng.globalAlpha=.4;ng.lineWidth=1;ng.beginPath();ng.moveTo(x0,y+rh);ng.quadraticCurveTo((x0+x1)/2,y+rh+10,x1,y+rh);ng.stroke();ng.globalAlpha=.9;ng.fillStyle='#ffe0a0';for(let k=0;k<7;k++)ng.fillRect(x0+(x1-x0)*k/6-1,y+rh+(k%2?4:2),2,2);ng.globalAlpha=1;
-      y+=rh;}};
-    roofs(0,150);roofs(400,540);
-    for(let i=0;i<22;i++)olive(ng,r()<.5?158+r()*18:376+r()*20,40+r()*(AH_NEAR-80),.8+r()*.4);}
-  return{far:{c:fc,h:AH_FAR},lyc:{c:lc,h:AH_LYC},near:{c:nc,h:AH_NEAR}};}
-const drawAthensP=(bg,t,dt,scroll)=>{const D=bg.D,L=ATHP||(ATHP=buildAthensP());
-  const sk=ctx.createLinearGradient(0,0,0,PH_);sk.addColorStop(0,D.sky[2]);sk.addColorStop(.5,D.sky[1]);sk.addColorStop(1,D.sky[0]);ctx.fillStyle=sk;ctx.fillRect(0,0,PW_,PH_);
-  ctx.globalCompositeOperation='lighter';G_(PW_*.72,PH_*.16,200,'#bcd6ff',.16);ctx.globalCompositeOperation='source-over';
-  ctx.fillStyle='#f4f1e6';ctx.beginPath();ctx.arc(PW_*.74,PH_*.1,15,0,7);ctx.fill();ctx.fillStyle='#d6d9e8';ctx.beginPath();ctx.arc(PW_*.74+5,PH_*.1-3,4.5,0,7);ctx.fill();   // the moon
-  {const o=(scroll*.12)%L.lyc.h;ctx.drawImage(L.lyc.c,0,o-L.lyc.h,PW_,L.lyc.h);ctx.drawImage(L.lyc.c,0,o,PW_,L.lyc.h);}
-  {const o=(scroll*.2)%L.far.h;ctx.drawImage(L.far.c,0,o-L.far.h,PW_,L.far.h);ctx.drawImage(L.far.c,0,o,PW_,L.far.h);}
-  {const o=(scroll*.5)%L.near.h;ctx.globalAlpha=.86;ctx.drawImage(L.near.c,0,o-L.near.h,PW_,L.near.h);ctx.drawImage(L.near.c,0,o,PW_,L.near.h);ctx.globalAlpha=1;}
-  ctx.save();ctx.globalCompositeOperation='lighter';ctx.fillStyle='#e8f2ff';for(let i=0;i<12;i++){const y=((i*83+scroll*.35)%PH_+PH_)%PH_,x=24+((i*47)%70);ctx.globalAlpha=.16+.1*Math.sin(t*2+i);ctx.fillRect(x,y,12+(i%4)*5,1.5);}ctx.restore();   // glints on the sea
-  const hz=ctx.createLinearGradient(0,PH_-260,0,PH_);hz.addColorStop(0,D.a+'00');hz.addColorStop(1,D.a+'30');ctx.fillStyle=hz;ctx.fillRect(0,PH_-260,PW_,260);};
-{const dbp=drawBGP;drawBGP=function(bg,t,dt,scroll){if(bg.D.name==='ATHINA'&&!ART.bm['bg-athina-phone'])drawAthensP(bg,t,dt,scroll);else dbp(bg,t,dt,scroll);};}
-NR.on('pitStart',()=>{try{bgFor(ATH);if(!ATHP)ATHP=buildAthensP();}catch(e){}});            // the pit stop freezes the world: build the Athens backdrops there, not when the district starts
-// the colour theme switch clears the caches
-{const pc=applyPal;applyPal=function(){const was=palOn;pc();if(palOn!==was)ATHP=null;};}
 
 // PURPOSE: painted art loading, ART.img/anim, sprite strips
 // FLAG: sprites (?sprites=0)
@@ -14928,7 +14638,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='69f9fbbffa 2026-10-22 11:40 UTC';
+const NR_STAMP='238bb81621 2026-10-22 14:32 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
