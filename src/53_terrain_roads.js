@@ -176,6 +176,10 @@ function TR8_fadeRoads(W,R,pads){if(!TR8_FON)return;const T0=performance.now(),{
 // that is closer to the road by at most tan(th(d))*step, th = 18 deg up to 30 m from the road edge, opening to 50 deg by 65 m (the hills stay far away: only the foot of a hill near a road is eased).
 // Cells within TR9_PIN m of a road (the flat shoulder the road surface, kerbs and plots sit on), river cells and the Acropolis footprint are never moved. One pass in ascending distance. ?t9c=0 = the old ground. Athens' ground quadtree cache (QTC, tools/qtdump.js) is re-dumped with this ground.
 const TR9_ON=new URLSearchParams(location.search).get('t9c')!=='0',TR9_PIN=6,TR9_N=72;
+// ath-trap-r22e14 (bughunt: Athens stuck ladder 32/h): trap cells where a car off the road end slides into a bowl (Pedion tou Areos south edge: 33 m drop, 77 -> 44 m).
+// the TR9 cap is TR9_EK = 16 deg out to TR9_N (not 18 -> 50 deg), so the bowl wall next to the road becomes a drivable ramp (bowl floor 44 -> 63-68 m). WIP: default OFF until measured, ?t9e=1 = on
+// (needs a QTC re-dump with it on: node tools/qtdump.js).
+const TR9_EASE={ath:[[1290,-300,140]]},TR9_EK=Math.tan(16*Math.PI/180),TR9_EON=new URLSearchParams(location.search).get('t9e')==='1';
 // r22d6: TR_roadDist + TR9_cap are one generator (TR9_gen) that yields every ~TR9_Y cells of work; a boot step (TR9_step) runs it for ~TR9_B ms and re-queues itself in RFS.S
 // until it is done (fra), Athens (no yield point inside AB_auto) drains it at once. Same operations in the same order, so W.h is bit-identical to the old one-task version. ?t9ch=0 = one task.
 const TR9_CH=new URLSearchParams(location.search).get('t9ch')!=='0',TR9_B=14,TR9_Y=3000;
@@ -199,7 +203,8 @@ function* TR9_gen(W,R,pads){if(!TR9_ON)return;const T0=performance.now(),{r,nx,n
   const KK=new Float32Array(TR9_N+1);for(let d=0;d<=TR9_N;d++){const t=clamp((d-25)/40,0,1);KK[d]=K0+(K1-K0)*t*t*(3-2*t)}
   const NB=[-1,1,-nx,nx,-1-nx,1-nx,nx-1,nx+1],NF=[1,1,1,1,Math.SQRT2,Math.SQRT2,Math.SQRT2,Math.SQRT2];let ch=0;
   // ascending distance: every neighbour that is closer to the road is final when a cell is visited
-  for(let q=0;q<nb;q++){const k=band[q];if(skip[k])continue;const dk=D[k],w=KK[dk|0]*r;let lo=-1e9,hi=1e9;
+  const EZ=TR9_EON&&TR9_EASE[CID]||[];
+  for(let q=0;q<nb;q++){const k=band[q];if(skip[k])continue;const dk=D[k];let w=KK[dk|0]*r;if(EZ.length){const x=WX0+(k%nx)*r,z=WZS+((k/nx)|0)*r;for(const e of EZ)if((x-e[0])**2+(z-e[1])**2<e[2]*e[2]){w=Math.min(w,TR9_EK*r);break}}let lo=-1e9,hi=1e9;
     for(let e=0;e<8;e++){const u=k+NB[e];if(skip[u]||!(D[u]<dk-.01))continue;const hu=h[u],m=w*NF[e];if(hu-m>lo)lo=hu-m;if(hu+m<hi)hi=hu+m}
     if(lo!==-1e9){const v=h[k],t=lo>hi?(lo+hi)/2:v<lo?lo:v>hi?hi:v;if(t!==v){h[k]=t;ch++}}if(tick(8))yield}
   W.tr9={band:nb,changed:ch,ms:Math.round(performance.now()-T0)}}

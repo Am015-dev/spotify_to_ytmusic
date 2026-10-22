@@ -27,10 +27,10 @@ let vt=performance.now()+1e6;
 const rnd=()=>{BH.s=(BH.s*16807)%2147483647;return BH.s/2147483647};
 const cell=(x,z)=>Math.floor(x/25)+','+Math.floor(z/25);
 const add=(det,desc,x,z,y,extra)=>{x=x??RO.x;z=z??RO.z;y=y??RO.y;BH.cnt[det]=(BH.cnt[det]||0)+1;const k=det+'|'+cell(x,z);const c=BH.cells[k];if(c){c.n++;return}
- BH.cells[k]={det,n:1,t:+BH.t.toFixed(1),seed:BH.seed,city:CID,x:+x.toFixed(1),y:+(+y).toFixed(1),z:+z.toFixed(1),h:+RO.h.toFixed(2),kmh:Math.round(Math.abs(RO.v)*3.6),act:BH.act,desc,repro:'?test='+CID+'&at='+Math.round(x)+','+Math.round(z)+' seed '+BH.seed+' t '+BH.t.toFixed(0)+' s',...(extra||{})}};
+ BH.cells[k]={det,n:1,t:+BH.t.toFixed(1),seed:BH.seed,city:CID,x:+x.toFixed(1),y:+(+y).toFixed(1),z:+z.toFixed(1),h:+RO.h.toFixed(2),kmh:Math.round(Math.abs(RO.v)*3.6),act:BH.act,mode:BH.mode||'',desc,repro:'?test='+CID+'&at='+Math.round(x)+','+Math.round(z)+' seed '+BH.seed+' t '+BH.t.toFixed(0)+' s',...(extra||{})}};
 BH.add=add;
 // messages: BACK ON THE ROAD and every toast the player sees
-const wrapMsg=(name,ti)=>{try{const f=eval(name);if(typeof f!=='function')return;const __w=function(){try{const s=[...arguments].slice(0,ti+1).filter(a=>typeof a==='string').join(' ').trim();if(s&&BH.on){BH.msgs[s]=(BH.msgs[s]||0)+1;if(/BACK ON THE ROAD/.test(s)&&BH.t-(BH.borT||-9)>1.5){BH.borT=BH.t;add('backOnRoad','re-placed: '+s.slice(0,60))}}}catch(e){}return f.apply(this,arguments)};eval(name+'=__w')}catch(e){}};
+const wrapMsg=(name,ti)=>{try{const f=eval(name);if(typeof f!=='function')return;const __w=function(){try{const s=[...arguments].slice(0,ti+1).filter(a=>typeof a==='string').join(' ').trim();if(s&&BH.on){BH.msgs[s]=(BH.msgs[s]||0)+1;if(/^UNSTUCK/.test(s))add('unstuck','UNSTUCK auto-reverse');if(/BACK ON THE ROAD/.test(s)&&BH.t-(BH.borT||-9)>1.5){BH.borT=BH.t;BH.borP=1;add('backOnRoad','re-placed: '+s.slice(0,60))}}}catch(e){}return f.apply(this,arguments)};eval(name+'=__w')}catch(e){}};
 wrapMsg('say',1);wrapMsg('feed',0);
 // popups: top-level overlays that become visible with no player action in the last 2 s
 const POP='#roamCard,#roamPop,#roamPrompt,#storyGo,#rcGo,#m1Cs,#tutSkip,#settings,#gbx,#spRes,#roamPause,#profile,#roamMap,.m1go,[id$=Card],[id$=card],[class*=modal]';
@@ -81,6 +81,9 @@ const detect=dt=>{const x=RO.x,y=RO.y,z=RO.z,foot=RO.foot&&RO.foot!=='car',busy=
    if(c){BH.hits.npc++}else{let b=null;for(const r of[1.5,2.5,3.5]){try{b=roamHit(x+fx*r,z+fz*r,1.4,y)}catch(e){}if(b)break}
     if(b){BH.hits.world++}else{const g2=groundY(x+fx*3,z+fz*3);if(g2-y<.6){BH.hits.invisible++;add('invisible','stopped by nothing: -'+(dv*3.6).toFixed(0)+' km/h in one step, no NPC, no collider, no slope ahead')}}}}}
  const NDG=(c,p)=>{const f=v=>typeof v==='number'?+v.toFixed(2):v;return{dg:{a:c.a,b:c.b,t:f(c.t),cv:f(c.cv),hh:f(c.hh),yo:f(c.yo),lr:[f(c.lrx),f(c.lrz)],route:!!c.route,tr:!!c.tr,hitT:f(c.hitT),deS:c.deS,hold:f(c.hold),fdt:f(c.fdt),dx:p?f(c.x-p.x):null,dz:p?f(c.z-p.z):null,p:p?{a:p.a,b:p.b,t:f(p.t),cv:f(p.cv),hh:f(p.hh),yo:f(p.yo),lr:[f(p.lrx),f(p.lrz)],mx:f(p.mx),mz:f(p.mz),dead:f(p.dead)}:null,act:BH.act}}};
+ // stuck ladder / UNSTUCK cells (ath-trap-r22e14): where the ladder fires, so the trap geometry can be found
+ try{const S=SKH.cnt;for(const k of['rev','lift']){const n=S[k]|0,o=BH['skh_'+k]??n;if(n>o)k==='lift'?add('skh_lift','stuck ladder lift (from here)',P.x,P.z,P.y):add('skh_rev','stuck ladder reverse-assist');BH['skh_'+k]=n}}catch(e){}
+ if(BH.borP){BH.borP=0;if(mv>12)add('liftFrom','BACK ON THE ROAD lifted from here',P.x,P.z,P.y)}
  // NPC cars
  const cf=(()=>{try{const d=new THREE.Vector3();camera.getWorldDirection(d);return[camera.position.x,camera.position.z,d.x,d.z]}catch(e){return[x,z,Math.sin(RO.h),Math.cos(RO.h)]}})();
  for(const c of HUB.cars){if(!isFinite(c.x+c.z)){add('nan','NPC car NaN',x,z,y);continue}const dd=Math.hypot(c.x-x,c.z-z);const p=CP.get(c),alive=!(c.dead>0)&&!c.pk;
@@ -156,6 +159,7 @@ async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const 
   for(const d in LIMIT){const n=d==='frustration'?C.frustration:(C.cnt[d]||0),ph=d==='frustration'?n:n/h,abs=['nan','bounds','jsErr','belowGround','yJump','launch','deadButton'].includes(d);C.perH[d]=+ph.toFixed(2);
    const ok=abs?n<=LIMIT[d]:ph<=LIMIT[d];if(!ok)fails++;lines.push(`${ok?'PASS':'FAIL'} ${d} ${city} ${d==='frustration'?n.toFixed(1)+' % of gas time under 10 km/h':n+' hits = '+ph.toFixed(1)+'/h'} (limit ${LIMIT[d]}${d==='frustration'?' %':abs?' total':'/h'})`)}
   lines.push(`INFO ${city} npc sideways by the old c.hh reading ${C.cnt.npcLatHH||0} vs step-velocity ${C.cnt.npcLateral||0}`);lines.push(`INFO ${city} sim ${(C.t/60).toFixed(1)} min (${(C.t/3600).toFixed(2)} of ${HOURS} h target) · ${C.km.toFixed(1)} km · ${C.steps} steps @ dt ${DT} · ${C.episodes} seeds · contacts/km npc ${(C.hits.npc/Math.max(C.km,.1)).toFixed(2)} world ${(C.hits.world/Math.max(C.km,.1)).toFixed(2)} invisible ${(C.hits.invisible/Math.max(C.km,.1)).toFixed(2)} · boot ${C.boot.map(x=>x.toFixed(0)).join('/')} s`);
+  {const sk=C.skh.reduce((a,q)=>a+((q&&q.rev)|0)+((q&&q.lift)|0),0),un=C.msgs.UNSTUCK|0,bo=C.cnt.backOnRoad|0;lines.push(`INFO trap ${city} ladder ${(sk/h).toFixed(1)}/h · UNSTUCK ${(un/h).toFixed(1)}/h · BACK ON THE ROAD ${(bo/h).toFixed(1)}/h · sum ${((sk+un+bo)/h).toFixed(1)}/h`)}
   for(const t of C.taps)if(!t[1])lines.push(`  dead button ${city}: ${t[0]} · ${t[2]}`)}
  let shotList=[];
  if(SHOTS){const all=Object.values(res).flatMap(C=>C.cells).filter(c=>!['jsErr','nan'].includes(c.det)).sort((a,b)=>b.n-a.n),pick=[],seen=new Set();for(const c of all){const k=c.city+Math.floor(c.x/60)+','+Math.floor(c.z/60);if(seen.has(k))continue;seen.add(k);pick.push(c);if(pick.length>=SHOTS)break}

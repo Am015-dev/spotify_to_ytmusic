@@ -12,7 +12,7 @@
 //   b) LIFT when GATE and TRAPPED hold on the same frame: short fade, lift to the nearest clear road point facing along it (speed and boost zeroed, no penalty in free roam).
 //   c) the manual rescue is always there: touch button #tU (top right), keys U and R (R only outside challenges). Same lift as b).
 // The episode (E.H) is cleared when the gas is released, on a road, on any warp (roamWarp, a lift, or a jump > 8 m between frames) and outside free roam.
-const ESC={q:new URLSearchParams(location.search).get('esc')!=='0',t1:1.5,t1g:.5,assist:2,depth:2.5,keep:6,vMax:8,net2:20,pin:{t:3,t2:5,net:4,v:3},rock:{t:5,r:6,rev:2},
+const ESC={q:new URLSearchParams(location.search).get('esc')!=='0',t1:1.5,t1g:.5,assist:2,depth:2.5,keep:6,vMax:8,net2:20,pin:{t:3,t2:5,net:4,v:3},rock:{t:5,tb:2.5,r:6,rev:2,bx:new URLSearchParams(location.search).get('bx')==='1'},
   cnt:{assist:0,reset:0,manual:0},E:{H:[],T:0,as:0,h:null,tp:0,done:0,log:null}};
 function ESC_depth(x,z,wantDir){const g0=groundY(x,z);let mn=1e9,bk=0;for(let k=0;k<24;k++){const a=k*Math.PI/12,sx=Math.sin(a),sz=Math.cos(a);let m=-1e9;for(const r of[4,8,12,18,26,36,48,60]){const q=groundY(x+sx*r,z+sz*r)-g0;if(q>m)m=q}if(m<mn){mn=m;bk=a}}
   return wantDir?{depth:mn,dir:bk}:mn}
@@ -28,9 +28,10 @@ function ESC_pin(H,w){const n=H.length,c=H[n-1],i=ESC_at(H,w);if(i<0)return fals
   return c[5]*((c[1]-H[i][1])*Math.sin(c[4])+(c[2]-H[i][2])*Math.cos(c[4]))<ESC.pin.net&&s/(c[0]-H[i][0])<ESC.pin.v}
 function ESC_trapped(H){const n=H.length;if(!n)return'';const c=H[n-1];
   if(ESC_pin(H,ESC.pin.t)){if(ESC_hole(c[1],c[2]))return'pinned';if(ESC_pin(H,ESC.pin.t2))return'stuck'}
-  let i=ESC_at(H,ESC.rock.t);if(i<0)return'';let cx=0,cz=0;for(let k=i;k<n;k++){cx+=H[k][1];cz+=H[k][2]}cx/=n-i;cz/=n-i;if(ESC_far(H,i,cx,cz)>=ESC.rock.r)return'';
-  let rev=0,sg=0;for(let k=i;k<n;k++){const v=H[k][3];if(v>.5){if(sg<0)rev++;sg=1}else if(v<-.5){if(sg>0)rev++;sg=-1}}
-  return rev>=ESC.rock.rev?'rocking':''}
+  const rk=w=>{const i=ESC_at(H,w);if(i<0)return false;let cx=0,cz=0;for(let k=i;k<n;k++){cx+=H[k][1];cz+=H[k][2]}cx/=n-i;cz/=n-i;if(ESC_far(H,i,cx,cz)>=ESC.rock.r)return false;
+    let rev=0,sg=0;for(let k=i;k<n;k++){const v=H[k][3];if(v>.5){if(sg<0)rev++;sg=1}else if(v<-.5){if(sg>0)rev++;sg=-1}}return rev>=ESC.rock.rev};
+  // bowl exit (ath-trap-r22e14): rocking in a hole (ESC_hole) is trapped after rock.tb = 2.5 s, not 5 s. WIP: default OFF until measured, ?bx=1 = on
+  return rk(ESC.rock.t)||(ESC.rock.bx&&rk(ESC.rock.tb)&&ESC_hole(c[1],c[2]))?'rocking':''}
 function ESC_end(){const E=ESC.E;E.H.length=0;E.as=0;E.done=0;E.tp=0}
 /* the lift never lands in a building or on a car (r21h2 review #7): the nearest road point, else points 8-96 m along that road both ways, else the nearest clear point
    of any other road within 400 m; none clear -> null: the lift HOLDS (the auto test is redone every frame, so it lifts on the first frame a clear spot exists) */
