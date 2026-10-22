@@ -40,6 +40,13 @@ MP.register=function(list){const rows=[];
    const l2=out.slice(-2),prev=out[s-1];let i=bag.findIndex(k=>!l2.includes(k));if(i<0)i=bag.findIndex(k=>k!==prev);if(i<0)i=0;out.push(bag.splice(i,1)[0]);
    if(bags[bk]&&!bags[bk].length)delete bags[bk];}
   return out;};
+ // story stages (owner 22 Oct: "you mixed up the selections very badly"): the song of a stage no longer changes between loads or while the pack registers.
+ // Classic = the stage's original song (s.song0). Mix = the stage keeps its own song until it is cleared; a replay of a cleared stage plays a new pack song of its district (fixed per stage, never the stage's own). New = pack pool with a fixed seed.
+ {const ds=DP.stage;DP.stage=function(n){const s=STAGES[n-1];if(!s||!s.song0)return ds.apply(this,arguments);const m=MP.mode(),own=s.song0;
+   if(m==='classic'||!MP.any())return own;
+   if(m==='new'){const sv=MP.seed;MP.seed=0x2f6e2b1;try{return ds.apply(this,arguments);}finally{MP.seed=sv;}}
+   if(!(typeof sSave!=="undefined"&&sSave.stars[n]>0))return own;
+   const nw=DP.pool(s.di).filter(k=>MP.pool[k]&&k!==own);return nw.length?nw[n%nw.length]:own;};}
  // endless (loop 2+): the last three districts take endless / endless2 / endless3 in turn (a shuffle per loop), the others their pool
  const eo=DP.endless;DP.endless=function(di,loop){if(MP.on()&&MP.has('endless3')&&loop>=1){const p=posOf(di);if(p>=2){
    if(MP.mode()==='new')return 'endless3';

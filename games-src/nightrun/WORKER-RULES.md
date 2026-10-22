@@ -22,3 +22,7 @@ about them 2+ hours later: the briefs had dropped the DONE trigger and the HARD 
 9. TEST TIME BUDGET (owner, 22 Oct 05:05: "who told you to spend so much time running the game, is it efficient?"): run ONLY the
    test that proves your fix plus `guard.py` and one 2-minute smoke; no stage 1-20 sweeps or "3 consecutive runs" unless the task is
    balance/difficulty. New or edited tests step game time faster than real time (`__mnr.step(dt)` loops), never wait on wall-clock play.
+10. REVIEWS SCORE FUN, NOT FIXES (owner, 22 Oct 05:55: "the review must be strict, the score is not even 12/100"): every reviewer
+   is anchored to the real players' score (10-12/100). Score what a player experiences (fun, clarity, fairness, tension, looks, sound),
+   never whether a fix landed. Each category starts at the players' level and moves only with concrete before/after evidence
+   from play; a 'fixed' defect that still feels bad scores as not fixed. State the headline as 'player-equivalent score'.
