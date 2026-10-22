@@ -96,11 +96,11 @@ MP.loadSt=function(n){const a=AU.a;if(!a||!MP.ready||!MP.ready.has('mp-st-'+n+'.
   let r;try{r=so.apply(this,arguments);}finally{if(old)AU.stg[n]=had;}
   if(r&&m==='mix'&&pack)MP.stOld[n]=!MP.stOld[n];return r;};}
 // on foot: the run plays stage2 or street1 by turns (new only: street1); lock / boss (a/b per boss phase) / clear are extras, read from the stage state twice a second
-MP.foot=function(){const F=window.FOOT;if(!MP.on()||!F||!F.on||!F.S)return;const S=F.S;
+MP.foot=function(){const F=window.FOOT;if(!MP.on()||!F||!F.on||!F.S||!sndOn('f_mcue'))return;   // Lab SOUND > ON FOOT: the song switches are off unless switched onconst S=F.S;
   let k=S.end&&S.end.cleared?'street1-clear':S.bossOn||S.boss?'street1-boss':S.lock?'street1-lock':MP.fbase||'street1';
   if(k==='street1-boss'&&MP.fb)k='street1-boss~b';
   if(!(k==='stage2'?TR.by.stage2:MP.has(k))||MP.fk===k)return;MP.fk=k;loadTrack(k);AU.startStage(k);};
-NR.on('footStart',d=>{MP.fk=null;MP.fb=0;if(!MP.on()||!MP.has('street1'))return;
+NR.on('footStart',d=>{MP.fk=null;MP.fb=0;if(!MP.on()||!MP.has('street1')||!sndOn('f_mcue'))return;
   if(!(d&&d.cp)||!MP.fbase){const nw=MP.mode()==='new'||(MP.lastFoot===null?MP.R()<.5:!MP.lastFoot);MP.lastFoot=nw;MP.fbase=nw?'street1':'stage2';}
   MP.fk=MP.fbase;if(MP.fbase==='street1')AU.startStage('street1');});   // stage2 is what the stage already started
 NR.on('footPhase',()=>{MP.fb=MP.fb?0:1;MP.fk=null;});
