@@ -1,92 +1,41 @@
-# Sprite cuts: on-foot sheets and stills (qa/spritecut.js, 22 Oct 2026)
+# Sprite cuts: what was really wrong (qa/spritecut.js, 22 Oct 2026, rewritten by S5)
 
-How it is checked: `NODE_PATH=$(npm root -g) node games-src/nightrun/qa/spritecut.js` (add `--all` for bosses, ships and fx). Each strip is cut exactly as art.js
-cuts it (frame i = x i*w, size w x h from its json). A frame is CUT when its opaque pixels (alpha > 32) touch the top, left or right edge of its cell in a run
-longer than 2 px (the bottom too, except for on-foot actors whose feet stand on it). BODY = a loop whose body height jumps more than 15% from its median.
-The Lab > ON FOOT viewer draws a red line on the cut edge of the frame.
+Owner (22 Oct): "I can see the sprites fine, it's your fault." Right: the game never cropped a sprite.
 
-## Before / after (on-foot scope: 218 sheets and stills)
+## How the game draws a frame (checked line by line)
+`ART.drawAnim` (parts/art/art.js) draws the whole cell: source rect (i*w, 0, w, h) from the json size, destination (w*sc, h*sc) about the anchor. `ART.footDraw` calls it with
+`sc = h / cell height`. No clip rect, no body-box crop, no top offset, no cell-height clamp. The small-size copy (a canvas of `w*ts` per frame) cuts at the same frame
+width, so it is whole as well. `build.py` takes frames / w / h from `games-src/anims/mainhattan-nightrun/sheets/*.json`. So a frame is only wrong when the webp in
+`games/mainhattan-nightrun/media/anim` is not the export its json was written for.
 
-| | edge cuts | body jumps | wrong frame count / size |
+## True cause 1: stale media copies (fixed)
+15 more strips in `media/anim` were older exports than their json/sheet (the 28 foe strips were fixed by L3 the same way). Each is now a byte copy of `sheets/`:
+- Wrong width (the game cut every frame at the json width, so a frame showed a slice of its neighbour and lost its right side; boss sheets were also 12 px taller):
+  boss-bruecken-waechter/attack, boss-flusskrake/attack, boss-flusskrake/hit, boss-hoplite/hit, boss-messe-waechter/idle, boss-schranken-wart/attack,
+  boss-sek-adler/attack, boss-sek-adler/idle, boss-talos/idle, boss-tresor-wart/attack, boss-zentral-ice/hit
+- Same size, older art (before the "one body size across acts" pass of 22 Oct): grunt/run, gunman/run, knife/run, kai/aimdiag
+
+Edge cuts caused by slicing: 0 (before: 29 frames with left/right or short-sheet cuts on the 10 boss strips above that touch an edge; talos/idle was only 12 px too tall).
+
+## True cause 2: the checker (fixed)
+The 13 "cut in the art" on-foot frames and the pickup stills were never clipped. The art is scaled to fill its cell, so a round head or disc **touches** the edge:
+kai/idle frame 3 has 4, 14, 18, 22 opaque px on rows 0..3 (a dome), the same for kai/run 3 (6, 15, 20, 24), grunt/die 1 (3, 8, 13, 16), mech/shoot 2 (3, 15, 32, 37) and so on;
+the pk-* pickups are discs (20, 30, 38 px going inward). A clipped picture keeps its width instead. `spritecut.js` now calls an edge a cut only if the width at the edge is
+still >= 2/3 of the width 3 px inward; round contacts are counted apart ("tangent, not a cut"). No art change is needed for them.
+
+## Result (`NODE_PATH=$(npm root -g) node games-src/nightrun/qa/spritecut.js`)
+| | edge cuts | tangent only | count errors |
 |---|---|---|---|
-| before | 56 sheets (125 frames) | 2 loops | 28 sheets |
-| after | 29 sheets (29 frames) | 1 loop | 0 |
+| on-foot scope, before (L3 state) | 29 frames | not counted | 0 |
+| on-foot scope, now | 4 stills | 25 frames | 0 |
+| `--all`, now | 14 sheets / 15 frames | 31 frames | 0 |
 
-## Fixed here (wiring, not art)
-
-28 on-foot strips in `games/mainhattan-nightrun/media/anim` were an older export than their json in `games-src/anims/mainhattan-nightrun/sheets` (the json the build bundles).
-The game cut them at the wrong frame width, so each frame showed a slice of its neighbour and lost its own right side (hound run: json 434 px a frame, sheet 376).
-Each was replaced by its matching export from `sheets/` (same file the json was written for; no new art). With the boss copies below applied, `--all` reports 0 count errors for bosses and ships too.
-
-bruiser/shoot, drone/shoot, flamer/hit, flamer/spray, grunt/shoot, gunman/melee, gunman/shoot, hound/bite, hound/run, jetpack/fly, kai/aimup, kai/crouchshoot, kai/dash, kai/shoot, knife/jump, knife/melee, knife/shoot, mech/idle, medic/heal, shield/melee, shield/shoot, sniper/jump, sniper/melee, sniper/run, sniper/shoot, turret/shoot, warden/run, warden/shoot
-
-NOT applied yet (outside the on-foot scope; the same fix, ready): boss-bruecken-waechter/attack, boss-flusskrake/attack, boss-flusskrake/hit, boss-hoplite/hit, boss-messe-waechter/idle, boss-schranken-wart/attack, boss-sek-adler/attack, boss-sek-adler/idle, boss-talos/idle, boss-tresor-wart/attack, boss-zentral-ice/hit. Copying them from sheets/ fixes their frame cut but changes the endless10 draw fingerprint (state unchanged), so it needs the orchestrator's OK (then UPDATE=1 fingerprints).
-
-## Cut in the art itself: please re-export (id, frames, edge)
-
-| id | frames (1-based) | edge |
-|---|---|---|
-| bruiser/die | 1 | top |
-| flamer/walk | 3 | top |
-| foot/pk-bomb | 1 | top |
-| foot/pk-bomb | 1 | bottom |
-| foot/pk-damage | 1 | top |
-| foot/pk-damage | 1 | left |
-| foot/pk-damage | 1 | right |
-| foot/pk-damage | 1 | bottom |
-| foot/pk-magnet | 1 | top |
-| foot/pk-magnet | 1 | left |
-| foot/pk-magnet | 1 | right |
-| foot/pk-magnet | 1 | bottom |
-| foot/pk-shield | 1 | top |
-| foot/pk-shield | 1 | bottom |
-| foot/pk-slow | 1 | top |
-| foot/pk-slow | 1 | right |
-| foot/pk-speed | 1 | top |
-| foot/pk-speed | 1 | left |
-| foot/pk-speed | 1 | right |
-| foot/pk-speed | 1 | bottom |
-| foot/pk-weapon-arc | 1 | top |
-| foot/pk-weapon-arc | 1 | left |
-| foot/pk-weapon-arc | 1 | right |
-| foot/pk-weapon-arc | 1 | bottom |
-| foot/pk-weapon-flame | 1 | top |
-| foot/pk-weapon-flame | 1 | left |
-| foot/pk-weapon-flame | 1 | bottom |
-| foot/pk-weapon-hmg | 1 | left |
-| foot/pk-weapon-hmg | 1 | right |
-| foot/pk-weapon-rocket | 1 | top |
-| foot/pk-weapon-rocket | 1 | left |
-| foot/pk-weapon-rocket | 1 | right |
-| foot/pk-weapon-rocket | 1 | bottom |
-| foot/pk-weapon-shotgun | 1 | top |
-| foot/pk-weapon-shotgun | 1 | left |
-| foot/pk-weapon-shotgun | 1 | right |
-| foot/pk-weapon-shotgun | 1 | bottom |
-| foot/sc-barrel | 1 | top |
-| foot/sc-barrel | 1 | bottom |
-| foot/sc-crate | 1 | left |
-| foot/sc-crate | 1 | right |
-| foot/sc-door | 1 | bottom |
-| foot/sc-neon-sign | 1 | top |
-| foot/sc-neon-sign | 1 | bottom |
-| foot/sc-vending | 1 | top |
-| foot/sc-vending | 1 | bottom |
-| grunt/die | 1 | top |
-| grunt/jump | 3 | top |
-| jetpack/die | 1 | top |
-| jetpack/fly | 1 | top |
-| kai/combo3 | 3 | top |
-| kai/hurt | 1 | top |
-| kai/idle | 3 | top |
-| kai/land | 3 | top |
-| kai/run | 3 | top |
-| mech/shoot | 2 | top |
-| shield/idle | 3 | top |
-
-Note: the media/foot rows are single pictures (pickups, scene props) cropped tight to the art; they are drawn as stills, so a tight crop is only a cut if the
-picture itself is clipped. The kai / foe rows are the head or a raised arm touching the top of a 256 px cell: give those frames headroom (the art is scaled to fill the cell).
+## What still touches its edge: the SOURCE does, proof = opaque px per line from the edge inward (media/foot is the source still)
+- foot/sc-neon-sign top 56, 58, 58, 58 and bottom 61, 62, 62, 62: a flat rectangle sign cropped tight (its own border).
+- foot/sc-door bottom 235, 235, 235, 235: the door's flat base on the road line.
+- foot/sc-vending bottom 26, 77, 102, 108 and top 3, 4, 4, 4: rounded base / thin antenna; foot/pk-slow top 19, 23, 23, 25 and right 19, 22, 26, 25: a near-disc; all fully drawn, 1-2 px contact.
+- ship-* death / volley frames (explosion flashes and weapon volleys fill the cell): effects, not bodies; not on foot.
+These are drawn whole (stills are drawn h x h without crop). Re-exporting them with a margin is optional polish, not a bug.
 
 ## Body jumps (loops)
-
-- prop-steam/glow: frames 1,3,5 (a loop whose glow changes size; expected for steam, no fix needed)
+- prop-steam/glow: frames 1,3,5 (a glow that changes size; expected for steam, no fix needed)

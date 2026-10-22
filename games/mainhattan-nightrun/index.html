@@ -14665,7 +14665,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='0510f351c4 2026-10-22 20:24 UTC';
+const NR_STAMP='0510f351c4 2026-10-22 20:40 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
