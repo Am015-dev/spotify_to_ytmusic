@@ -7,9 +7,10 @@ Gate: `tools/gate.sh <built page url>` = `PHONE=1 TAG=why,life1,xf1,terrain` fra
 - Not reproduced (pass in 12+ runs): cam-clear, why/quiet-start swap, terr1/terrain-tyre-ath, life1/ath-density, speedfeel-timing beyond the A/B. If they flake again run with REPEAT.
 - Possible game issue (not hidden, seen once): solid-cars (d) "su:t_su_pink (pk, parked) jumped 9.3 m at 111 m, in view after turn-back".
 
-## Round 2 (review #58; NOT done, context over 150k: next worker starts here)
-1. traffic-inview sideways (src/99iv_inview.js): put the check back to <= 3.05 m/s. Make the control ~0 by choosing a car on a straight edge (|heading change| over the 3 steps ~ 0, edge length > 30 m, t in .1-.6) in placeCar and for the live car, instead of "control + 4". The 4 m/s Athens reading was a bend, not the guard.
-2. solid-cars (d) (src/99sc_solidcars.js): `e.us` is set once and exempts the car for the whole test. Make it per-jump: exempt only the step that happens at s<120 (camera away) with c.dz, and keep tracking later steps (s>=120) as a jump. Rebase on the parked-jump lane's push (session_013RWqLMcZtuea3iSREUQtyd: 2 m in frustum / 3.5 m out) and keep its thresholds.
-3. life1/people (src/assets/lx/code.js LIFE_goDodge): revert to ONE group. Fix the cause: a group an earlier GO scattered keeps its people flown/gone; reset it (revive the group's people, LIFE state) before the run-up, and re-check LIFE.n.dodge+fly.
-4. xf1/grass (src/assets/xf/code.js): tolerance for the poll gap is a mask. Find why the swap takes 0.57 s on grass at 36 km/h in a batch (speed low = blocked/slow start; check XF_keep, the car's state left by the previous GO: RO.turbo, FL.hold/FL.s/FL.cand, pl.vmode, QS.off, surface timer FL.cT). Measure tIn/tSw on the sim clock inside the game step, not by setInterval.
-Gate: tools/gate.sh <built page> x3 on fra+ath, plus REPEAT=20 on each touched GO.
+## Round 2 result (flake-kill-r22e32)
+1. traffic-inview sideways: back to <= 3.05 m/s. A car is re-placed on a straight edge (edge >= 30 m, 12-50 m from the camera) until its no-offset control reads <= 0.6 m/s; no such spot = FAIL with its own message.
+2. solid-cars (d): the dz exemption is per step (only a jump at s<120); a later on-screen jump of the same car counts. The parked-jump lane's 2 m / 3.5 m split had not landed on trunk, so the 3.5 m threshold is unchanged.
+3. LIFE dodge: ONE group again. Cause fixed by resetting the group's fly entries (and dead flag) before the run-up; a failure now prints stale-fly count, top speed, closest distance, sim time. Not reproduced here, so the cause is a hypothesis: watch for the diagnostic line if it fails again.
+4. xf1/grass: tIn/tSw measured on the sim clock (FL_step wrapper), bar = 0.5 s + one sim step. No poll-gap tolerance left.
+5. terr6/terrain-pit-ath (coordinator ask): TR6_pit now starts like TR8_go (t6s, t8a, y, keys reset). Hypothesis, not reproduced.
+Gate (phone profile, fra+ath): see commit message result. Unit 0 FAIL. Harness note: REPEAT>=7 on a GO reloads the page mid-run (any GO, seen on why/no-popup too) and the following items die with 'reading said'; not a game bug.
