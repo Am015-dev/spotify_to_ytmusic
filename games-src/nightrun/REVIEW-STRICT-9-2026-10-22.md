@@ -1,29 +1,26 @@
 # Nightrun strict ninth review (22 Oct 2026, 01:22-02:05 UTC)
 
 Measured on `590a30c8` (page stamp `d9dfe8c608 · 2026-10-22 01:15 UTC`), a frozen copy of `games/mainhattan-nightrun` served by `python3 -m http.server`.
-Headless Chromium, phones 390x763 and 375x553 (DPR 2, touch). 110 screenshots looked at by me (scratchpad only, not committed). No game code changed.
-Caveat: headless software rendering runs the real loop at about 1/3 speed (60 s wall = 19-50 s game time); most stage shots use the test hooks (god mode, hand-stepped engine).
-Audio was not re-measured this round: section 2 of review 8 stands until someone re-runs it. Same 4 personas, 13 lines, weights and scale as reviews 3-8.
+Headless Chromium, 390x763 and 375x553 (DPR 2, touch), 110 shots looked at (not committed). No game code changed. Headless runs the loop at ~1/3 speed;
+stage shots use the test hooks (god mode, hand-stepped). Audio not re-measured: review 8 section 2 stands. Same personas, lines, weights, scale as reviews 3-8.
 
 ## Headline
 **HEADLINE 46.9 / 100** (46.3 before, **+0.6**). Mean of the two harshest: V 46.4 and R 47.4. Panel mean 48.2.
-About 30 changes landed and the score barely moved, because most of them added **more things on top of the field** (captions, rule cards, marks, rings) instead of
-taking things away. Real wins: the "placeholder" label is gone from the street run, the backdrop under play is darker and calmer (busyness p90 0.0043-0.0082, gate 0.010),
-enemy bullets now carry a dark outline and pass the contrast gate everywhere, the hangar ship cards have real art, Flight School is one clear list of 22 drills,
-and Legend no longer starts with more hull than Normal (5 = 5, checked in code). What a player sees in the first minute is still: a giant title banner over live fire,
-a row of enemies parked under the score bar, white and green full-height beams nobody explained, captions that sit on enemies and on each other, and a ship that is just a ring and a flame for its first seconds.
+~30 changes, +0.6: most **added things on top of the field** (captions, rule cards, marks, rings) instead of removing them. Wins: street "placeholder" label gone,
+calmer darker backdrop (busyness p90 0.0043-0.0082), outlined bullets pass contrast everywhere, real ship-card art, Flight School one clear list, Legend hull = Normal (5 = 5).
+Still in the first minute: a giant title banner over live fire, enemies parked under the score bar, unexplained white / green full-height beams, captions on enemies and on each other, a ship that is only a ring and a flame.
 
 ## 1. What a player sees (shots quoted)
 | Screen | Seen |
 |---|---|
 | HOME (np-00-a) | Clean, real backdrop art, 4 tiles. Still 3 info strips above the tiles (status, "Next:", STORY), build stamp shown, red dot on TRAINING. PLAY subtitle wraps "Stage 1 · FIRST RUN · / ARCADE". |
-| First 60 s, new player (np-03..60-a/b) | PLAY goes straight into stage 1: good (no 25 s of story cards any more). At game 1.7 s the title banner "1 · FIRST RUN / Deliver the data. Stay alive." covers the middle 25% of the field while 5 enemies already fire (np-03-a). Ship sprite missing at start: only a grey ring, a dot and a pink flame (np-03-a, school-shoot-0-b). Captions come one per few seconds: "PINK RING ON AN ENEMY = it attacks soon", "RINGS ON YOUR SHIP: dash when they meet = PERFECT", "NUMBER ON A BUTTON = charges left" (no number is visible on any button), "CHAIN: pass close to bullets..." printed **on top of** "KEEP MOVING" and a second caption = unreadable garble (np-20-a); "CHAIN" on top of "PERFECT" (np-25-b). A player who does not move dies at ~30 s game time on 375x553 (np-40-b); the next tap landed in HANGAR > UPGRADES with "Need 7 more" on every card: the first thing after the first death is a shop you cannot afford. |
+| First 60 s, new player (np-*) | PLAY goes straight into stage 1 (no story wall: good). At 1.7 s the title banner covers the middle 25% of the field while 5 enemies fire (np-03-a). Ship sprite missing at start: ring, dot, flame only. Captions every few s: "PINK RING ON AN ENEMY...", "RINGS ON YOUR SHIP...", "NUMBER ON A BUTTON = charges left" (no number visible), "CHAIN..." printed on top of "KEEP MOVING" and another caption = garble (np-20-a); CHAIN on PERFECT (np-25-b). A parked player dies at ~30 s (375x553); the next tap opened HANGAR > UPGRADES, "Need 7 more" on every card (np-40-b). |
 | Stage 1 at 10-20 s (np-20-a) | 7 enemies in a row at the very top, half under the score / hull band; 3 full-height translucent white columns plus a red full-height line through the ship; "+206" score pop-ups; 18 enemy bullets. This is the stage meant to teach. |
-| Stages 3 / 6 / 10 / 14 / 20 (st*-a/b) | Title banner over the field on every stage start (st10-early-a "10 · EISERNER STEG", st14-early-b "14 · FLOTTE", st20-early-a "20 · SIGNAL BOX"), each with live bullets crossing it. "MARK AT THE TOP EDGE = danger comes in there" caption drawn on top of enemies (st20-early-a, leg10-early-a). St 3 mid: two unexplained circles (green ring with a line, purple double ring ~120 css px), 3 red ">" flank chevrons, score 00000000 at 28 s (st3-mid-a). St 6 late (375x553): a ~10 css px **solid white full-height beam**, a green full-height lane with a teal wash, two columns of grey ">" chevrons, no enemy visible (st6-late-b). St 10 late (375x553): enemy formation sits inside the HUD band (y < 100 css px), red full-height line, two pink dashed lanes with ">" triangles, a green column: 5 overlays, 0 words (st10-late-b). Small pink vertical bars beside enemies (st14-early-b). |
-| Legend st 10 (leg10-*) | Same banner, same caption, plus 4 cyan laser spokes from a turret. Looks busier than Normal at the start, the same after 25 s (8 vs 2 enemy bullets on screen at t 26-28 s). |
-| Boss / endless (end-w10-a, boss8-*) | Endless wave-1 boss: "ARMOUR HOLDS" label, "NEXT WAVE" text drawn across the boss, a large teal outlined rectangle on the right with no label, "TAP: use SLOW now" chip, a 4th button SLOW appears. **The endless run never left wave 0**: a centred auto-firing ship (god mode) met the boss at 81 s and after 519 s the boss had lost 48 of 364 hp. A player who does not know the armour rule is stuck forever; there is no fail-safe. The scripted stage-8 boss did not spawn in my run (bossNow hook), so stage-boss feel is not re-scored. |
-| Flight School (school-*) | List is good (22 drills, NEXT DRILL on top). In a drill: "Standing still is dangerous!", "DEMO 2", AGAIN, SKIP and SKIP DEMO = 3 skip-like buttons at once (school-dodge-6-a). The shoot drill on 375x553 plays the district banner "BANKENVIERTEL" clipped at the left edge across the drill (school-shoot-0-b). The demo counter climbs (DEMO 7 after 6 s). |
-| Street Run (street-*-a) | Label gone, hero sprite and drone sprite are real art. Backdrop is still flat purple rectangles; an enemy sits cut off at the left edge; no visible shots although the bot fires; bottom 30% is the control pad. |
+| Stages 3/6/10/14/20 (st*) | Title banner over live fire at every start (st10-early-a, st14-early-b, st20-early-a). "MARK AT THE TOP EDGE" caption drawn on enemies (st20-early-a). St 3: unexplained green ring + line, purple double ring ~120 css px, red ">" chevrons, score 0 at 28 s (st3-mid-a). St 6 (375): **solid white full-height beam**, green lane with teal wash, grey ">" columns, no enemy visible (st6-late-b). St 10 (375): formation inside the HUD band, red line, 2 pink dashed lanes, green column: 5 overlays, 0 words (st10-late-b). Pink bars beside enemies (st14-early-b). |
+| Legend st 10 (leg10-*) | Same banner and caption, plus 4 cyan laser spokes; busier than Normal at the start, similar after 25 s (8 vs 2 bullets). |
+| Boss / endless (end-w10-a) | "ARMOUR HOLDS", "NEXT WAVE" drawn across the boss, unlabeled teal rectangle, "TAP: use SLOW now", a 4th button. **Endless never left wave 0**: a centred auto-firing ship (god) met the boss at 81 s; 519 s later it had lost 48 of 364 hp. No fail-safe for a player who does not know the armour rule. Stage-8 boss hook did not spawn it: stage-boss feel not re-scored. |
+| Flight School (school-*) | Good list (22 drills). In a drill: AGAIN, SKIP and SKIP DEMO at once (school-dodge-6-a); district banner "BANKENVIERTEL" clipped across the drill on 375 (school-shoot-0-b); DEMO counter climbs. |
+| Street Run (street-*-a) | Label gone; hero and drone are real art. Backdrop still flat purple blocks; enemy cut off at the left edge; no visible shots. |
 | Hangar (hangar-*, missions-a) | 6 tabs now (was 10): better. Cards have real ship art. Currency: header cyan ♦, RECOMMENDED yellow ♦, every BUY a purple hex gem: 3 glyphs for one currency; settings header "2.400", hangar "2400". Forge: weapon icon still a pink "PU" disc; inventory cells "SLOT 2", "NO CORE", "NO" (clipped word). |
 | Settings (settings-a) | DATA tab clipped at the right edge again; 127 buttons/inputs in the panel; HUD defaults MINIMAL (good). |
 | 375x553 | DASH / EMP / pause sit in a column right of a narrowed field; captions and banners keep the 390 px layout and clip (school-shoot-0-b). |
@@ -31,10 +28,10 @@ a row of enemies parked under the score bar, white and green full-height beams n
 ## 2. Orchestrator's claims, verified
 | Claim | Verdict |
 |---|---|
-| Title banner covers the middle of the field during action | **TRUE**, every stage start, both phones (st10-early-a, st14-early-b). `c.js` L60-66 draws it at H/2-58, 96 px tall, 54 px font; `CALM.small` does not apply to stage titles. |
-| "BUBBLE SHIELD" / "READY" overlap at the ship | Not seen in my frames; **the same bug is real** with other words: CHAIN + KEEP MOVING + a caption garbled (np-20-a), CHAIN + PERFECT (np-25-b). One label queue at the ship is missing. |
-| Enemies spawn hidden under the top score bar | **TRUE** (np-20-a, st10-late-b, st14-early-b): rows park at y 30-100 css px under the 70 px HUD band. |
-| Enemy bullet contrast stage 10 worst-10% ~1.9:1 | **Not reproduced by the gate**: legible-test (hand-stepped, 3 frames) gives st 10 worst-10% 5.50, st 14 16.1, st 20 12.1, boss 7.4, endless 10 16.2; all PASS. Bullets read well in my shots (orange core, dark outline). The 1.9 likely came from live frames with beams / washes behind the bullet (st6-late-b, st10-late-b): the gate does not render those layers. Enemies are the weak part: boss-scene enemy median 3.50, endless 10 p25 2.89, st 20 p25 1.34. |
+| Title banner over the field | **TRUE**, every start, both phones. `c.js` L60-66: H/2-58, 96 px, 54 px font; `CALM.small` skips stage titles. |
+| BUBBLE SHIELD / READY overlap | Those words not seen; **same bug** with CHAIN + KEEP MOVING + caption (np-20-a), CHAIN + PERFECT (np-25-b). |
+| Enemies under the score bar | **TRUE** (np-20-a, st10-late-b): rows park at y 30-100 css px under the HUD band. |
+| Bullet contrast st 10 worst-10% ~1.9:1 | **Not reproduced**: legible-test worst-10% st 10 5.50, st 14 16.1, st 20 12.1, boss 7.4, endless 16.2 (PASS); bullets read well in shots. The 1.9 likely comes from bullets over beams / washes (st6-late-b), which the gate does not render. Enemies are weaker: boss median 3.50, endless p25 2.89, st 20 p25 1.34. |
 | Pink bars and sideways labels beside enemies | Pink bars **TRUE** (st14-early-b); small white "<" ticks beside most enemies (np-10-a) unexplained. |
 | Street Run backdrop flat placeholder blocks | **TRUE** (street-0-a, street-20-a). Asset item, see the end. |
 
@@ -57,10 +54,8 @@ a row of enemies parked under the score bar, white and green full-height beams n
 | | **Weighted 30 / h3** | | 48.9/43.9 | 50.0/44.8 | 52.4/47.6 | 51.4/46.1 |
 | | **Reviewer** | | **46.4** | **47.4** | 50.0 | 48.8 |
 - Up: onboarding (+0.6: no story wall, captions exist), readability (+0.3-0.6: calmer backdrop, outlined bullets), polish (placeholder label gone). Down: bosses (-0.4: endless boss that plain fire cannot break, NEXT WAVE drawn over it).
-- V: "It tells me what the pink ring means while three white beams I was never told about cross my ship, and the stage name is in my face while I'm being shot."
-- R: "Legend is fair now on hull, but the first boss in endless just stands there forever if I don't know the trick."
-- M: "Hangar is finally 6 tabs. Three different gems for one currency."
-- P: "Every fix added a layer. Count the overlays on st10-late-b: five, and not one word."
+- V: "It explains the pink ring while three white beams nobody explained cross my ship." R: "Endless boss stands there forever if I don't know the trick."
+- M: "Hangar is 6 tabs at last; three gems for one currency." P: "Every fix added a layer: five overlays on st10-late-b, not one word."
 
 ## 4. Defects (repro = shot / stage / time / phone)
 | id | sev | defect | repro |
@@ -110,9 +105,7 @@ a row of enemies parked under the score bar, white and green full-height beams n
 ## Assets for the owner (separate, not code)
 - Street Run: sky + street backgrounds (3 layers per section) to replace the flat purple blocks; HUD panel frame; Warden arena.
 - Forge / hybrid weapon icons (24 hybrids) to replace the "PU" disc.
-- Optional: per-district clean play backdrops (already dimmed; art would let us drop the dim).
 - Sound pack items from review 8 (soft beat shot, 3-4 hit variants, quiet pickup, 1-2 booms).
 
 ## Reproduce
-Scratchpad scripts (not committed): `shots.js` (scenes newplayer, stages, legend, boss, endless, street, school, menus; `ONLY=` / `VP=a|b`), `q.js` (hull per difficulty, endless boss timer).
-Contrast: `NODE_PATH=$(npm root -g) node games-src/nightrun/legible-test.js <frozen index.html>` (ALL PASS, numbers above). Tests run one at a time.
+Scratchpad `shots.js` (scenes; `ONLY=`, `VP=a|b`), `q.js` (hull per difficulty, endless boss timer); `legible-test.js <frozen index.html>` (ALL PASS).
