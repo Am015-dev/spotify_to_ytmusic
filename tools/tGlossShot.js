@@ -1,0 +1,10 @@
+// tGlossShot (glossy-cars-r22e5): node tools/tGlossShot.js <base url> <out prefix> [city]  852x393 phone: (1) player car close in sun (orbit cam, 3/4 front), (2) a street with traffic (camera above the nearest 3 cars)
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,OUT,CITY='fra']=process.argv.slice(2);
+const Q=(p,f)=>p.evaluate(src=>__tk.q(src),'('+f.toString()+')()');
+const close=()=>{window.__gsCam=1;const f=()=>{if(!window.__gsCam)return;const h=RO.h,d=4.2;camera.position.set(RO.x+Math.sin(h+.75)*d,RO.y+1.55,RO.z+Math.cos(h+.75)*d);camera.lookAt(RO.x,RO.y+.55,RO.z);camera.fov=50;camera.updateProjectionMatrix();requestAnimationFrame(f)};window.__gsF=f;roamCam=(g=>function(){g.apply(this,arguments);if(window.__gsCam){const h=RO.h,d=4.2;camera.position.set(RO.x+Math.sin(h+.75)*d,RO.y+1.55,RO.z+Math.cos(h+.75)*d);camera.lookAt(RO.x,RO.y+.55,RO.z)}})(roamCam);return 'ok'};
+const street=()=>{window.__gsCam=0;const cs=HUB.cars.filter(c=>!(c.dead>0)&&!c.pk).sort((a,b)=>Math.hypot(a.x-RO.x,a.z-RO.z)-Math.hypot(b.x-RO.x,b.z-RO.z));const c=cs[0];if(!c)return'no car';window.__gsC=c;
+ roamCam=(g=>function(){g.apply(this,arguments);const c=__gsC,h=Math.atan2(c.hdx,c.hdz);camera.position.set(c.x+Math.sin(h+.9)*7,c.y+2.6,c.z+Math.cos(h+.9)*7);camera.lookAt(c.x,c.y+.6,c.z)})(roamCam);return HUB.cars.length+' cars, nearest '+Math.hypot(c.x-RO.x,c.z-RO.z).toFixed(0)+' m'};
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const c=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await c.newPage();p.setDefaultTimeout(400000);
+ await p.goto(BASE+'?test='+CITY);await p.waitForFunction(()=>window.__chk&&window.__tq&&__tq.ready,null,{timeout:400000});await p.waitForTimeout(3000);
+ console.log('close',await Q(p,close));await p.waitForTimeout(1500);await p.screenshot({path:OUT+'_car.png'});
+ console.log('street',await Q(p,street));await p.waitForTimeout(1500);await p.screenshot({path:OUT+'_street.png'});await b.close()})();
