@@ -58,7 +58,7 @@ const FUN={n:0,sets:[],fence:null,dw:null,ev:null,deck:[],nextAt:22,lastK:'',dro
   draw(t){if(!G||G.dead)return;
     const T=tierOf(C.n);if(T>=3){ctx.save();ctx.globalCompositeOperation='lighter';G_(P.x,P.y,34+10*T+4*PUL,TIERC[T-1],.14+.06*T);ctx.restore();}   // tier 3+: the ship glows in the tier colour
     const f=this.fence;if(f){ctx.save();const lock=f.phase>=1,fire=f.fire>0,pulse=SET.reduce?1:(Math.floor(t*(lock?18:8))%2?1:.6);ctx.globalCompositeOperation='lighter';
-      for(const r of f.rows){if(fire){ctx.globalAlpha=.95;ctx.fillStyle='#fff';ctx.fillRect(0,r-4,W,8);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(0,r-12,W,24);}
+      for(const r of f.rows){if(fire){const tn=window.EXP&&EXP.on;ctx.globalAlpha=tn?.55:.95;ctx.fillStyle=tn?'#ffb0c0':'#fff';ctx.fillRect(0,r-(tn?2:4),W,tn?4:8);ctx.globalAlpha=tn?.4:.5;ctx.fillStyle='#ff3050';ctx.fillRect(0,r-12,W,24);}
         else{ctx.globalAlpha=(lock?.9:.45)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);ctx.beginPath();ctx.moveTo(0,r);ctx.lineTo(W,r);ctx.stroke();ctx.setLineDash([]);
           if(lock){ctx.globalAlpha=.16*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,r-10,W,20);}}}
       ctx.globalAlpha=lock?.5:.3;ctx.strokeStyle='#19ffb0';ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.strokeRect(10,f.gy-70,W-20,140);ctx.setLineDash([]);   // the safe gap

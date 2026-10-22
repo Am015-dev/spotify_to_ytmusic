@@ -107,3 +107,5 @@ Real regression left open: hud-cover (phone HUD coverage), readable (worst-10% c
 Not run: ui-align, ui-weapons, vary, wcard, weapon, zoo and the rest of the first half.
 
 21 Oct 2026 W109 tidy (flag tidy): tidy-test 40/40 (settings main page 19 controls, street median 0.33, 0 drone/HUD overlaps), hub 147/147, comfort, footstage 27/27, streetlook 43/43, hud-cover and ui-align 0 findings at 390x763 and 375x553, saves 42/42, tutorial. musicpack-test and stamp-test cannot click the hub-hidden #startBtn / #moreBtn (not caused by tidy).
+
+22 Oct 2026 W134 review-9 fixes #2 + #5 (flag explain): overlay-test (new) 8/8: 0 overlay kinds without a caption id in 60 s of stages 1/3/6/10, max white column 0 css px (stage 14 laser fence was 5 px before, 0 after), 0 text boxes overlapping each other or an enemy in stages 1/3/10. explain 9/9, calm 12/12, hud-cover PASS (4 sizes), guard ok. diet 25/26: boss stage 8 BV.over ring > 120 px fails on the base build too (bossvis, not this change).
