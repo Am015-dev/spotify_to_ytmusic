@@ -6,15 +6,14 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 
 | flag | key (file name L1-L2) | > wraps | < wrapped by | test | doc |
 |---|---|---|---|---|---|
-| sprites,title,type,oneMore*,arcade*,walls*,heat*,daily*,dpool*,layers*,sting*,trans*,grade*,saveio*,juice,assist,pwa,fever,menufix | ret (one `RET.x` line per flag, top of the file) |  | stamp,saves,hub+1 | ret | RETENTION |
+| sprites,title,type,oneMore*,arcade*,walls*,heat*,daily*,dpool*,layers*,sting*,trans*,grade*,saveio*,juice,assist,pwa,fever | ret (one `RET.x` line per flag, top of the file) |  | stamp,saves,hub+1 | ret | RETENTION |
 | flavor | flavor watch 241-242 |  | footq,tidy | ret-flavor |  |
 | foot | foot build 366-400 | a,footen | c | foot | BRIEF-FOOT |
 | footstage | footstage secOf 163-194 | footen |  | footstage | FOOT-ENEMIES |
 | streetlook | streetlook slHud 133-155 | map,footen |  | streetlook | ASSET-POLICY |
-| footq | footq fix 34-40 | flavor |  | footq | ASSET-POLICY |
 | leak | leak LEAK 14-136 |  | holdline | ret-leak |  |
 | zoo | zoo ZOO 14-254 |  |  | zoo |  |
-| vary,vary2,hudband | formations fmSide 74-256 |  |  | vary |  |
+| vary,vary2 | formations fmSide 74-256 |  |  | vary |  |
 | vary | stagescripts VARY 82-191 |  |  | vary |  |
 | remix | remix RMX 14-48 |  |  | remix |  |
 | variants | variants VAR.apply 49-66 |  |  | variants |  |
@@ -25,14 +24,12 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | story | storydata STORY_LINES 29-240 |  |  | story |  |
 | tale | tale TALE_BEATS 21-203 |  |  | tale |  |
 | stats | stats open 178-217 |  |  | stats | POLISH |
-| feedback | feedback copy 29-51 |  |  | feedback |  |
 | labassets | labassets laSecOf 50-56 |  |  | labassets |  |
 | labfull | labfull lfScan 33-93 | lab |  | labfull |  |
-| hint,hintdiet | uikit HINT 66-111 |  |  | hint |  |
-| scale2,mustmove,strike2 | fair MM 71-103 |  |  | scale2 | BALANCE |
+| hint | uikit HINT 65-110 |  |  | hint |  |
+| mustmove | fair MM 69-101 |  |  | scale2 | BALANCE |
 | scale3 | hard S3auto 21-57 |  |  | scale3 | BALANCE |
 | react | react fan0 75-118 |  |  | react | BALANCE |
-| boss2 | armour B2X 16-70 |  |  | boss2 | BALANCE |
 | reward | reward RWD 14-54 |  |  | reward |  |
 | build2! | choices CHO.tick 28-61 |  |  | choices | BALANCE |
 | bossmoves | bossmoves vd 98-178 |  |  | bossmoves |  |
@@ -43,7 +40,6 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | forge | inventory INV.draw 54-112 |  |  | forge |  |
 | forgeui | forgeui FGU 20-117 |  |  | forgeui | ASSETS-NEEDED-3 |
 | forge2 | forgeone FG2 12-118 |  |  | forge2 |  |
-| counter | counter CTR 18-101 |  |  | counter |  |
 | timing | timing TIM 19-101 | draw |  | timing |  |
 | vis | visible VIS 12-21 |  |  | visible | BALANCE |
 | grit,gritBoss | grit GRIT 15-71 |  |  | grit | BALANCE |
@@ -54,41 +50,29 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | anticamp | anticamp AC 15-80 |  |  | anticamp |  |
 | holdline | holdline HOLD 11-35 | leak |  | holdline |  |
 | pacing | pacing PAC 15-65 |  |  | pacing |  |
-| bite | bite BITE 13-19 |  |  |  |  |
 | flankers | flankers ebRoom 67-73 |  |  | flankers |  |
 | foeart | foeart FOEART 45-85 |  |  | foeart | ASSETS-NEEDED-ENEMIES |
 | fleet,fleetArr! | fleet FLEET 21-222 |  |  | fleet |  |
 | endramp | endramp ENDR 17-57 |  |  | endramp |  |
-| bandclear | bandclear bclPlace 10-18 |  |  | hudband |  |
 | legend,easy2 | legend LEG 19-79 |  |  | legend |  |
-| deck,roster,songspread | fun FUN 14-77 | footen |  | fun |  |
+| deck,songspread | fun FUN 13-76 | footen |  | fun |  |
 | lessons | lessons lsTick 156-178 |  |  | lessons |  |
 | story | saga |  |  | story |  |
 | cp | cp chkBox 72-91 | shop,g |  | ret-cp |  |
 | fs | fs save 16-19 |  |  | fs |  |
 | read | readable READ 16-69 | fxwave |  | readable |  |
-| bulletart | bulletart BA 9-11 |  |  | bulletart |  |
 | legible | legible LGB 14-51 |  |  | legible | INDUSTRY-PLAYBOOK |
 | powers | arsenal PWX.tip 90-157 | footen |  | powers | ASSETS-NEEDED-3 |
 | abup,pwrclear | abup ABUP 25-97 |  |  | abup | ASSETS-NEEDED-3 |
-| zonehint | zonehint ZH 9-26 |  |  | pwrstar |  |
-| econfit | econfit ECF.apply 11-12 |  |  |  |  |
 | comfort* | comfort COM 14-78 |  |  | comfort |  |
 | classes | classes clsSvg 106-108 |  |  | classes | ASSETS-NEEDED-3 |
 | saves | saves saveSlot 55-60 | ret |  | saves |  |
-| stamp | stamp RET.stampX 10-44 | ret |  | stamp |  |
 | polish | polish POL.flush 78-105 |  |  | polish |  |
-| diet | diet DIET.thin 36-63 |  |  | diet |  |
-| mix | mix MIX 20-27 | a |  | mix |  |
 | hub,garagefix | hub gfPatchAll 290-303 | ret |  | hub |  |
 | layout,layoutStrip* | layout lyMap 41-60 |  |  | layout |  |
 | school | school footEnd 115-132 |  |  | school |  |
 | schoolfull | schoolfull sfGapWall 61-79 |  |  | school-full |  |
-| tidy | tidy F.post 19-88 | flavor,ret |  | tidy |  |
-| menufix | menufix mfDraw 35-41 |  |  | menufix |  |
-| explain,exp10 | explain EXP 11-65 | abilities |  | explain | WORKER-RULES |
-| calm | calm CALM 10-38 | footen,fxwave |  | calm |  |
-| waves | waves WV 15-125 | a |  | waves | WAVES |
+| explain,exp10,nolist | explain EXP 11-65 | abilities |  | explain | WORKER-RULES |
 | nocaps | nocaps NC 16-45 |  |  | nocaps |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.

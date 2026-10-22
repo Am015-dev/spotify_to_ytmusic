@@ -2032,7 +2032,7 @@ function stDraw(){const box=$('stRows'),w=box.clientWidth||selEl.clientWidth,h=b
     b.dataset.n=s.n;b.dataset.id='s'+s.n;b.dataset.nd=!ok?'locked':k>0?'done':boss||mini?'boss':'open';b.style.cssText=`left:${nd.x}px;top:${nd.y}px;--c:${D.a}`;
     b.setAttribute('aria-label',`Stage ${s.n} ${s.name}${ok?'':' locked'}`);
     const side=L.land||s.ch||STAGES.some(x=>x.from===s.n)?'v':(nd.x<L.W/2?'r':'l');b.classList.add('s'+side);   // r / l: the label sits beside the medallion, v: under it
-    b.innerHTML=`<span class="md"><i class="ring"></i><span class="no">${s.ch&&!(window.RET&&RET.menufix)?'◆':s.n}</span></span><span class="meta">${ok&&k?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:ok?'':lockI}<span class="nm">${s.name}</span></span>`;
+    b.innerHTML=`<span class="md"><i class="ring"></i><span class="no">${s.n}</span></span><span class="meta">${ok&&k?`<span class="stars">${'★'.repeat(k)}${'☆'.repeat(3-k)}</span>`:ok?'':lockI}<span class="nm">${s.name}</span></span>`;
     b.addEventListener('click',()=>mapPick(s.n));root.append(b);}
   box.append(root);
   if(!box._edge){box._edge=1;let q=0;box.addEventListener('scroll',()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;mapEdge();});},{passive:true});}
@@ -2253,7 +2253,7 @@ const MINIS=[{k:4,nm:'BRÜCKEN-WÄCHTER',r:40,pats:['fan5','ring','fan7','spiral
 const ROSTER=window.ROSTER={KINDS:['charger','flank','swarm','mine'],CAP:.33,P:.35,c:{key:'',total:0,drone:0},stat:{sub:0,drone:0,total:0},
   idx(){return ST.on?ST.n:20+G.di*3+(G.loop|0);},
   kinds(i){const K=this.KINDS,s=(i*3)%4;return[K[s],K[(s+2)%4]];},   // signature, second: the stages i-1 and i+1 have {s-1,s+1}
-  sub(type,o){if(!RET.roster||G.lab||G.tut||(o&&(o.mini||o.zt))||G.boss||(ST.on&&ST.n<=(RET.density?2:4)))return type;   // stages 1-4 keep the hovering drones (zoo-test, onboarding)
+  sub(type,o){if(G.lab||G.tut||(o&&(o.mini||o.zt))||G.boss||(ST.on&&ST.n<=(RET.density?2:4)))return type;   // stages 1-4 keep the hovering drones (zoo-test, onboarding)
     const key=ST.on?'s'+ST.n:'e'+G.di+'_'+G.loop,c=this.c;if(c.key!==key){c.key=key;c.total=0;c.drone=0;}
     let out=type;
     if(type==='drone'){const over=(c.drone+1)/(c.total+1)>this.CAP&&c.total>=3;
@@ -3138,7 +3138,7 @@ ART.aframe=(key,t)=>{const o=ART.aS(key);ART.aDone=false;ART.aP=0;ART.aT=0;if(!o
 /* one cell, its anchor on x,y; sc = world units per sheet px; flip mirrors around the anchor; sy = extra vertical squash about the anchor; idle / flame cross-fade into the next frame (smoothing.json) */
 ART.drawAnim=(c,key,t,x,y,sc,flip,al,sy)=>{const o=ART.aS(key),b0=o&&ART.anim(key);if(!b0)return false;const i=ART.aframe(key,t),p=ART.aP,m=o.m,w=m[2],h=m[3],sv=sc*(sy||1),X=ART.ANIM.sm.crossfade,
     cf=o.xf&&p>X.from&&(o.loop||i+1<m[0])?(p-X.from)/(1-X.from)*X.max_alpha:0,ga=c.globalAlpha;
-  let b=b0,cw=w,ch=h;const fo=RET.footq&&c.canvas&&c.canvas.id==='footC',ts=sc*(fo?Math.hypot(c.getTransform().a,c.getTransform().b):S);   // footq: the on-foot canvas has its own scale (not the fly S): the copy is made at the real device-pixel size, never a small copy blown up       // sheets are drawn ~3-5x smaller than they are: a copy at the drawn pixel size is built once per sheet and canvas scale (like ART.sp), so the blit is 1:1 and the downscale is smooth
+  let b=b0,cw=w,ch=h;const fo=c.canvas&&c.canvas.id==='footC',ts=sc*(fo?Math.hypot(c.getTransform().a,c.getTransform().b):S);   // footq: the on-foot canvas has its own scale (not the fly S): the copy is made at the real device-pixel size, never a small copy blown up       // sheets are drawn ~3-5x smaller than they are: a copy at the drawn pixel size is built once per sheet and canvas scale (like ART.sp), so the blit is 1:1 and the downscale is smooth
   if(ts<(fo?.9:.75)){cw=Math.max(1,Math.round(w*ts));const k='a|'+key+'@'+cw;let q=ART.sc[k];
     if(!q){ch=Math.max(1,Math.round(h*cw/w));const cv_=document.createElement('canvas');cv_.width=cw*m[0];cv_.height=ch;const g=cv_.getContext('2d');g.imageSmoothingQuality='high';for(let j=0;j<m[0];j++)g.drawImage(b0,j*w,0,w,h,j*cw,0,cw,ch);q=ART.sc[k]={c:cv_,h:ch};}
     b=q.c;ch=q.h;}
@@ -3197,7 +3197,7 @@ ART.footDraw=(c,who,pose,x,y,h,flip,t)=>{if(!RET.sprites)return false;const mp=A
   if(!b&&RET.streetlook){for(const a of (ART.FB[pose]||[]).concat(ART.FB._any,mp._all)){const k2=who+'/'+a;if(ART.ANIM.s[k2]&&ART.anim(k2)){sub=a!==act;act=a;key=k2;b=ART.anim(k2);break;}}}   // streetlook: a pose without its own sheet borrows the nearest act, never the old still
   if(!b)return false;const o=ART.aS(key),m=o.m,fall=pose==='fall'&&act==='jump',kp=key+(fall?'F':'');
   if(e._fa!==kp){e._fa=kp;e._f0=t;}let tt=ART.fE?t-e._f0:t;if(act==='jump'){tt=fall?o.cum[1]+tt:Math.min(tt,o.cum[1]-.001);}
-  const cr=sub&&/^crouch/.test(pose)&&!RET.footq,sc=(cr&&who==='kai'?h/.7:h)/m[3],sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=cr?.7:1;const f=sq.frames[act];if(!RET.footq&&f&&f.indexOf(i)>=0&&ART.aT<sq.ms/1000)sy=1-sq.amount*(1-ART.aT/(sq.ms/1000));
+  const cr=false,sc=h/m[3],sm=ART.ANIM.sm,sq=sm.squash;const i=ART.aframe(key,tt);let sy=cr?.7:1;
   const dead=act==='die'&&who!=='kai',fade=dead?1-.85*Math.min(1,Math.max(0,tt-.4)/.8):1,ga=c.globalAlpha;
   c.save();c.translate(x,y);if(window.FA&&FA.shadow)FA.shadow(c,m[2]*sc*.75,who==='drone'||who==='jetpack'?.6*fade:fade);
   if(act==='run'||act==='runshoot'||act==='walk')c.rotate(sm.lean.run_deg*Math.PI/180*(flip?-1:1));
@@ -3400,7 +3400,6 @@ let labEl=null,garageDirty=false;
 const RET=window.RET=window.RET||{};
 if(RET.sprites===undefined)RET.sprites=!/[?&]sprites=0/.test(location.search);   // animated strip sheets for bosses and player ships (parts/art.js SPR); ?sprites=0 = the stills as before
 if(RET.title===undefined)RET.title=!/[?&]title=0/.test(location.search);   // B25: title diet (PLAY / CONTINUE, 5 buttons, the rest in MENU); parts/title.js
-if(RET.menufix===undefined)RET.menufix=!/[?&]menufix=0/.test(location.search);   // menu defects of review 8: HANGAR 5 tabs + MORE sheet, achievement toast never over a control, no decoration glyphs; parts/menufix.js, stats.js, map.js
 if(RET.type===undefined)RET.type=!/[?&]type=0/.test(location.search);     // B26: text >= 14 px and touch targets >= 44 px on title, menu and map; parts/title.js
 if(RET.oneMore===undefined)RET.oneMore=true;   // B5: run-end screens show Neon banked, the next unlock bar and a ONE MORE RUN button
 RET.next=function(){   // the cheapest thing still to buy: {n, price, bank, pct, can}; null when everything is owned
@@ -3648,7 +3647,7 @@ RET.skip=function(){for(const c of retCnt)c.set(c.to);retCnt.length=0;try{for(co
 RET.chipV=GA.bank;RET.chips=[];
 function retChipSet(n){const t=window.fmtN(n);for(const c of RET.chips)c.firstElementChild.textContent=t;}
 RET.chipSync=function(){if(!RET.trans)return;for(const el of [$('over'),$('stres'),$('stsel')]){if(!el||el.querySelector('.retChip'))continue;
-    const c=document.createElement('div');c.className='retChip';c.innerHTML=(RET.menufix?'':'◆ ')+'<b></b> Neon';el.appendChild(c);RET.chips.push(c);}
+    const c=document.createElement('div');c.className='retChip';c.innerHTML='<b></b> Neon';el.appendChild(c);RET.chips.push(c);}
   if(RET.chipV!==GA.bank||!RET.chips[0].firstElementChild.textContent){RET.countUp(retChipSet,RET.chipV,GA.bank,800);RET.chipV=GA.bank;}};
 for(const id of ['over','stres','stsel']){const el=$(id);if(el)new MutationObserver(()=>{if(!el.hidden&&RET.trans&&!retCnt.length)RET.chipSync();}).observe(el,{attributes:true,attributeFilter:['hidden']});}
 /* grades: every 16 bars a letter from the PERFECTs and hull lost in those bars */
@@ -4350,7 +4349,7 @@ function mac(ctx,id,pose,t,S,u){
 /* ---- public draw ---- */
 FA.draw=(ctx,who,pose,x,y,h,flip,t)=>{
   if(WHO.indexOf(who)<0)who='grunt';t=t||0;
-  if(RET.footq&&RET.sprites&&window.FOOT&&FOOT.q){FOOT.q.draw(ctx,who,pose,x,y,h,flip,t);return;}   // footq.js: one height per entity, the sheet or a flat box, never the old shapes below
+  if(RET.sprites&&window.FOOT&&FOOT.q){FOOT.q.draw(ctx,who,pose,x,y,h,flip,t);return;}   // footq.js: one height per entity, the sheet or a flat box, never the old shapes below
   if(typeof ART!=='undefined'&&ART.footDraw&&ART.footDraw(ctx,who,pose,x,y,h,flip,t))return;   // the strip sheets (art.js); stills and shapes below when a sheet is missing or ?sprites=0
   const mach=!!MAC[who];if(pose==='run')pose=BK(t,8)?'run-b':'run-a';
   if(mach&&pose!=='shoot'&&pose!=='hit'&&pose!=='die')pose='idle';
@@ -4386,7 +4385,7 @@ const PAR={sky:.02,far:.12,mid:.35,near:.7,floor:1},NEON=['#ff2d95','#19e3ff','#
 FA.floorY=h=>Math.round(h*(1-70/540));   // = FOOT's road line (view 540 tall, floor at h-70), so feet stand on the road
 FA.bg=(ctx,layer,camX,w,h)=>{
   const fy=FA.floorY(h),k=h/720,off=(camX||0)*(PAR[layer]||0),pic=FA._pic('foot/bg-'+layer+'.webp');
-  if(RET.footq&&!pic)return;   // footq: no old vector skyline (a painted layer only)
+  if(!pic)return;   // footq: no old vector skyline (a painted layer only)
   ctx.save();
   if(pic){const kk=fy/(h*.8),tw=h*2*kk;let x0=-(((off%tw)+tw)%tw);for(let x=x0;x<w;x+=tw)ctx.drawImage(pic,x,0,tw,h*kk);ctx.restore();return;}   // the picture's 80% street line is scaled onto the road line
   if(layer==='sky'){const g=ctx.createLinearGradient(0,0,0,fy);g.addColorStop(0,'#07051a');g.addColorStop(.6,'#2a0f4a');g.addColorStop(1,'#6a1f6a');ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
@@ -5579,7 +5578,7 @@ const D={
   relay(c,pose,x,y,h,flip,t,col){c.save();dead(c,pose,t);c.fillStyle=col==='#ffffff'?col:'#3a4a6a';c.fillRect(x-12,y-h+20,24,h-20);c.fillStyle='#7df9ff';c.fillRect(x-17,y-8,34,8);
     c.globalAlpha*=.6+.4*Math.sin(t*8);c.beginPath();c.arc(x,y-h+12,12,0,6.283);c.fill();c.restore();},
   warden2(c,pose,x,y,h,flip,t,col){const fa=window.FA;if(fa&&typeof fa.draw==='function'){fa.draw(c,'warden',pose,x,y,h,flip,t);return;}c.fillStyle=col;c.fillRect(x-h*.35,y-h,h*.7,h);}};
-F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{if(RET.footq&&RET.sprites&&F.q&&who!=='warden2'&&(ART.FM[who]||who==='relay')){F.q.draw(c,who,pose,x,y,h,flip,t);return;}if(who!=='warden2'&&sheet(c,who,pose,x,y,h,flip,t))return;D[who](c,pose,x,y,h,flip,t,col);};
+F.drawX=F.drawX||{};for(const who in D)F.drawX[who]=(c,pose,x,y,h,flip,t,col)=>{if(RET.sprites&&F.q&&who!=='warden2'&&(ART.FM[who]||who==='relay')){F.q.draw(c,who,pose,x,y,h,flip,t);return;}if(who!=='warden2'&&sheet(c,who,pose,x,y,h,flip,t))return;D[who](c,pose,x,y,h,flip,t,col);};
 })();
 
 // PURPOSE: on-foot street look on phones: one world scale, portrait layout, 3-layer parallax, clip-safe popups, grouped HUD
@@ -5714,7 +5713,7 @@ SL.draw=c=>{const L=IN.L(),S=F.S;if(!L||!S)return false;slFrame(L);
 
 /* ----- HUD: one panel top-left; score + time left of the pause button; hint below both; boss bar above the progress bar ----- */
 function slRR(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
-function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push({x,y:y-t0,w,h}),m=10*u,pl=!!(RET.tidy&&typeof UIK!=='undefined'&&ART.bm&&ART.bm['ui-hud-mult']),pd=(pl?13:8)*u,W=F.WEAPONS[P.w],PK=F.PICKUPS;SL.tag='hud';
+function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push({x,y:y-t0,w,h}),m=10*u,pl=!!(typeof UIK!=='undefined'&&ART.bm&&ART.bm['ui-hud-mult']),pd=(pl?13:8)*u,W=F.WEAPONS[P.w],PK=F.PICKUPS;SL.tag='hud';
   c.textBaseline='top';c.textAlign='left';c.font='bold '+fs(14)+'px monospace';
   const wt=W.n+(P.w==='pistol'?'':' LV'+P.lv+' · '+P.ammo),pw=[];for(const k of IN.PW_KEYS){const p=P.pw[k];if(p)pw.push([PK[k].c,PK[k].ic+(PK[k].max>1?p.lv:'')]);}
   const bt='●×'+P.bombs,r3=c.measureText(bt).width+pw.length*36*u;
@@ -5739,7 +5738,7 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
 })();
 
 // PURPOSE: on-foot quality: sprites preloaded before the run starts, no old mock graphics, one fixed size per character, sharp at device pixel ratio
-// FLAG: footq (?footq=0)
+// FLAG: none (always on)
 // TEST: footq-test.js
 /* ---------- FOOTQ (owner, 21 Oct 2026: "on foot I can see the old graphics before the sprites, they change size, the quality resolution is very bad").
    Flag RET.footq (default ON; ?footq=0 = the old behaviour exactly). Causes found and fixed:
@@ -5750,9 +5749,8 @@ function slHud(c,L,S,vw,u,fs){const P=S.P,t0=SL.t0,hb=[],box=(x,y,w,h)=>hb.push(
       cell is drawn 0.6875 x to keep the head the same size); the landing squash is off on foot; a crouch without its own sheet borrows crouchshoot (not a squashed idle).
    3. Sharpness: art.js drawAnim measured the pre-scaled copy with the FLY canvas scale (S), so on foot a 64 px copy was blown up 3-4x; it now reads the real canvas transform of #footC. The canvas takes the
       full device pixel ratio (up to 3, was 2) and imageSmoothingQuality is high each frame. The sheets are 256 px tall: a character is never drawn from a smaller copy than its device size. ---------- */
-if(RET.footq===undefined)RET.footq=!/[?&]footq=0/.test(location.search);
 (function(){
-if(!RET.footq||!window.FOOT||!window.FA||typeof ART==='undefined')return;   // FA.draw, FA.bg and footstage's F.drawX call FOOT.q.draw when it exists
+if(!window.FOOT||!window.FA||typeof ART==='undefined')return;   // FA.draw, FA.bg and footstage's F.drawX call FOOT.q.draw when it exists
 const F=FOOT,FQ=F.q={on:true,CR:.6875,hold:null,miss:{},held:0,calls:0,keys:[]};
 F.dprMax=3;
 /* ----- the sheets this stage can draw ----- */
@@ -6189,7 +6187,7 @@ NR.on('kill',o=>{if(!RET.zoo||!o||o.boss||!o.e||!o.e.zt)return;ZOO.died(o.e);});
 NR.on('beat',()=>{if(!RET.zoo||!running||G.dead)return;const d=diff();for(const e of G.en.slice())if(e.zt&&ZOO.T[e.type]&&e.type!=='zdrn')ZOO.beat(e,d);});
 
 // PURPOSE: formation library (VARIETY A)
-// FLAG: vary (?vary=0), vary2 (?vary2=0), hudband (?hudband=0)
+// FLAG: vary (?vary=0), vary2 (?vary2=0)
 // TEST: vary-test.js, hudband-test.js
 /* ---------- formations.js: the formation library (VARIETY A, owner 18 Oct 2026: "Game is extremely repetitive"). Flag RET.vary; ?vary=0 = the old waves exactly.
    A formation is a SPATIAL idea, not a recolour of one row: pincers from top and bottom, an X that converges, a snake on a path, a spiral, a wall whose gap moves...
@@ -6482,8 +6480,7 @@ NR.on('beat',()=>{if(RET.vary)FM.tickTel();});
 {const dp=drawPickups;drawPickups=function(t){dp(t);try{FM.draw(t);}catch(err){}};}
 /* review 9 fix 3 (E04): on a phone the world is turned upright, so world x near W is the top of the screen, under the score strip, chips and boss bar (92 HUD units,
    HK scaled). Hovering enemies rest in zoo slots up to x = W-62, and pacing.js (STAY AND FIGHT) creeps a flyer at 0.3 speed from x = W-110 for 4 s; both now start no higher than band + radius. Flying in through the band is untouched. ?hudband=0 = as before. */
-if(RET.hudband===undefined)RET.hudband=!/[?&]hudband=0/.test(location.search);
-const HB=window.HB={band(){return 92*HK;},maxX(r){return W-this.band()-(r||16)-4;},on(){return !!RET.hudband&&!!rotMode;}};
+const HB=window.HB={band(){return 92*HK;},maxX(r){return W-this.band()-(r||16)-4;},on(){return !!rotMode;}};
 {const sl=ZOO.slot;ZOO.slot=function(e,x0,x1){if(!HB.on())return sl.call(this,e,x0,x1);const m=HB.maxX(e&&e.r),b=Math.min(x1==null?W-90:x1,m),a=Math.min(x0==null?W*.42:x0,b-20);return sl.call(this,e,a,b);};}
 NR.on('tick',()=>{if(!HB.on()||!G.live||G.dead)return;for(const e of G.en){if(e.zst!==1||e.type==='boss'||e.hp<=0)continue;const m=HB.maxX(e.r);if(e.x>m){e.x=m;if(e.zs)e.zs.x=Math.min(e.zs.x,m);}}});
 NR.on('runStart',()=>{if(HB.pw||!window.PAC)return;HB.pw=1;const f=PAC.f;PAC.f=function(e){if(!HB.on())return f.call(this,e);const z=this.zone;this.zone=Math.min(z,HB.maxX(e.r));try{return f.call(this,e);}finally{this.zone=z;}};});   // pacing.js loads later: wrapped on the first run
@@ -7672,7 +7669,7 @@ RET.st=(function(on){
     {id:'neon5000',n:'Neon Saver',d:'Earn 5000 Neon',g:'◆',t:'s',f:()=>S().neon>=5000},
     {id:'kills1000',n:'Demolition',d:'Destroy 1000 enemies',g:'✸',t:'s',f:()=>S().kills>=1000},
     {id:'arcade',n:'Short and Sweet',d:'Clear a stage in Arcade',g:'⚡',t:'b',f:()=>S().arcClears>=1}];
-  if(RET.menufix)for(const a of A)if(/[◆◇♦✦✸⌛∞]/.test(a.g))a.g='';   // menufix: no text diamonds or odd glyphs; the tier-coloured badge and its words carry the meaning
+  for(const a of A)if(/[◆◇♦✦✸⌛∞]/.test(a.g))a.g='';   // menufix: no text diamonds or odd glyphs; the tier-coloured badge and its words carry the meaning
   const BY=Object.fromEntries(A.map(a=>[a.id,a]));
   const TC={b:'#d08a4a',s:'#c9d2e0',g:'#ffd23d'},TN={b:'BRONZE',s:'SILVER',g:'GOLD'};
   /* ---- toast queue: one at a time, each shown 2 s, non-blocking ---- */
@@ -7689,7 +7686,7 @@ RET.st=(function(on){
     let e=document.getElementById('achToast');
     if(!e){e=document.createElement('div');e.id='achToast';e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.appendChild(e);}
     e.className='';e.innerHTML='<span class="ab" style="--c:'+TC[a.t]+'">'+a.g+'</span><span><small>'+TN[a.t]+' ACHIEVEMENT</small><b>'+a.n+'</b></span>';
-    if(RET.menufix&&!mfSlot(e)){Q.unshift(a);setTimeout(next,500);return;}
+    if(!mfSlot(e)){Q.unshift(a);setTimeout(next,500);return;}
     e.classList.add('show');try{if(window.AU&&AU.sting)AU.sting('clear');}catch(x){}
     setTimeout(()=>{e.classList.remove('show');setTimeout(next,0);},2000);}
   /* ---- unlocks ---- */
@@ -7826,12 +7823,11 @@ RET.st=(function(on){
 })(RET.stats);
 
 // PURPOSE: FUN / SAME AGAIN / BORING tap at run end
-// FLAG: feedback (?feedback=0)
+// FLAG: none (always on)
 // TEST: feedback-test.js
 /* ---------- FEEDBACK: one optional tap at the end of a run (FUN / SAME AGAIN / BORING). Flag RET.feedback (?feedback=0 = nothing shown, nothing stored).
    Answers go to localStorage 'mnr_fb' (newest last, capped at 500): {stage, mode, diff, wp, sec, ts}. The STATS sheet lists the counts per stage and has a COPY button for the JSON.
    The strip sits under the buttons of #over / #stres, so it never delays or covers NEXT STAGE / RETRY; it is shown once per run. ---------- */
-if(RET.feedback===undefined)RET.feedback=!/[?&]feedback=0/.test(location.search);
 RET.sioKeys.push('mnr_fb');
 const FB=(function(on){
   const KEY='mnr_fb',CAP=500,ANS=[['fun','FUN'],['same','SAME AGAIN'],['bore','BORING']];
@@ -7874,7 +7870,7 @@ const FB=(function(on){
     document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#fbCopy');if(b)copy(b);});
   }
   return{on,answer,load,counts,sheet,show,hide};
-})(RET.feedback);
+})(true);
 window.FB=FB;
 
 /* ---------- LAB: its own stage (title > LAB, settings > OPEN LAB, or ?lab=1) ----------
@@ -8628,7 +8624,7 @@ function hudBusy(){
 if(/[?&]scn=nr-hud-busy/.test(location.search))addEventListener('load',()=>setTimeout(hudBusy,600));
 
 // PURPOSE: painted UI kit: HUD plates and the hint bubble
-// FLAG: hint (?hint=0), hintdiet (?hintdiet=0)
+// FLAG: hint (?hint=0)
 // TEST: hint-test.js
 /* ---------- painted UI kit (media/ui-*.webp): canvas HUD plates + the hint bubble. The DOM side (buttons, panels, rows, touch buttons) is CSS in head.html.
    Every image is decoded once (ART.load -> ImageBitmap) and drawn as a 9-slice with plain drawImage: no per-frame filters. Until it has decoded the old flat look is drawn. */
@@ -8691,7 +8687,6 @@ UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,gy=UIK.groundY(
    bold white text >= 14 px on a dark rounded pill (alpha .78, thin accent border), at most 8 words (the caller writes it short; short() only cuts a leftover),
    in the top third under the HUD, never within 120 px of the ship (it slides sideways, or waits), one on screen at a time with at least 1.2 s between two. ---------- */
 if(RET.hint===undefined)RET.hint=!/[?&]hint=0/.test(location.search);
-if(RET.hintdiet===undefined)RET.hintdiet=!/[?&]hintdiet=0/.test(location.search);
 const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE:120,
   on(){return RET.hint!==false;},
   reset(){this.cur=null;this.q.length=0;this.gap=0;this.box=null;},
@@ -8707,7 +8702,7 @@ const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE
   /* V2 hint diet (flag RET.hintdiet, ?hintdiet=0 = every ask shows): a hint text shows at most twice per profile (counts in localStorage 'mnr_hintseen') and never twice within 3 minutes of play.
      Not in the tutorial or the Lab (the tutorial teaches by hints). A refused ask returns false like a repeat ask, so callers that retry every frame cost nothing. */
   clk:0,hs:null,
-  diet(txt){if(RET.hintdiet===false||G.tut||G.lab)return true;
+  diet(txt){if(G.tut||G.lab)return true;
     if(!this.hs){try{this.hs=JSON.parse(localStorage.getItem('mnr_hintseen')||'{}')||{};}catch(e){this.hs={};}this.hl={};}
     const n=this.hs[txt]|0;if(n>=2)return false;if(n>0&&this.clk-(this.hl[txt]==null?-1e9:this.hl[txt])<180)return false;
     this.hs[txt]=n+1;this.hl[txt]=this.clk;try{localStorage.setItem('mnr_hintseen',JSON.stringify(this.hs));}catch(e){}return true;},
@@ -9358,7 +9353,7 @@ try{fetch(ART.base+'ready.json').then(r=>r.ok?r.json():[]).then(l=>{for(const n 
 window.__ga={GA,gsave,openGarage:f=>openGarage(f),WPD};          // test hook
 
 // PURPOSE: scale round 2, must-move column strike, strike follow-up
-// FLAG: scale2 (?scale2=0), mustmove (?mustmove=0), strike2 (?strike2=0)
+// FLAG: mustmove (?mustmove=0)
 // TEST: scale2-test.js
 /* ---------- scale, round 2 = parts/fair.js (flag RET.scale2; ?scale2=0 = the state after round 1). BALANCE.md "Power scale, round 2". ----------
    Owner, 17 Oct 2026: on Legend a maxed ship parks, its missiles kill everything, it hops between two spots when bullets come, and bosses are trivial.
@@ -9369,8 +9364,7 @@ window.__ga={GA,gsave,openGarage:f=>openGarage(f),WPD};          // test hook
       its cores are shot (cores are never auto-aimed).
    C. pattern pressure (hard tiers, stage 11 on): an aimed shot at the ship's current position (a little lead) on the beat and, from stage 15, a bullet wall
       every 4 bars whose gap moves; every gap is >= S2.GAP px. Normal with a strong ship gets a sparse aimed shot. Kill-goal stages keep the old hull. */
-if(RET.scale2===undefined)RET.scale2=!/[?&]scale2=0/.test(location.search);
-const S2=window.S2={get on(){return!!RET.scale2;},GAP:120,
+const S2=window.S2={get on(){return true;},GAP:120,
   hard(){return HARDS.includes(SET.diff);},
   stg(){return ST.on?ST.n:6*(G.pos+5*G.loop)+2;},
   ak(){return{easy:1,normal:.8,hard:.62,vhard:.56,legend:.5}[SET.diff]||1;},     // damage of an auto-aimed (locked) shot
@@ -9426,9 +9420,8 @@ if(RET.mustmove===undefined)RET.mustmove=!/[?&]mustmove=0/.test(location.search)
    Normal stages). Now: a faint dotted line shows at 65% of the still-timer (the first one of a stage also hints MOVE, once per profile); the lock-on pulses on the beat for 3 beats (hard tiers 2) and
    the strike lands on a beat. Normal stages <= 8: the first strike of a stage only scorches (-250 score). Damage: Easy 1; Normal 1, 2 from the third in a row; Hard/Very hard 2 from the second (a camper must still die); Legend 3 from the
    third. A repeat strike needs half the still-time and follows after .9 s. The timer is x range < 70 px for win() s (Normal 5 s in stages 3-5, then 3.5 s); it pauses while a pickup is within 70 px (collecting). */
-if(RET.strike2===undefined)RET.strike2=!/[?&]strike2=0/.test(location.search);
 const MM=window.MM={get on(){return!!RET.mustmove;},COL:24,buf:[],acc:0,col:null,cd:0,n:0,hits:0,strikes:0,sn:0,stk:null,still:0,anc:null,pre:null,scorch:[],
-  s2(){return!!RET.strike2;},
+  s2(){return true;},
   win(){const w={easy:5,normal:3.5,hard:3.2,vhard:3,legend:2.8}[SET.diff]||4;return this.s2()&&SET.diff==='normal'&&ST.on&&ST.n<=5?5:w;},
   rate(){for(const k of G.pk)if(Math.hypot(k.x-P.x,k.y-P.y)<70)return 0;return 1;},   // a ship that is collecting is not camping (a foe lined up ahead does NOT slow it: the tracker bot does exactly that)
   dmg(){const d=SET.diff;if(!this.s2())return this.n>=2&&d!=='easy'?2:1;if(d==='normal'&&ST.on&&ST.n<=8&&this.sn===1)return 0;if(d==='easy')return 1;if(d==='normal')return this.n>=3?2:1;return d==='legend'&&this.n>=3?3:this.n>=2?2:1;},
@@ -9473,7 +9466,7 @@ NR.on('tick',dt=>{if(!MM.live()){MM.col=null;MM.buf=[];MM.n=0;MM.still=0;MM.anc=
       and does not keep a CRESCENDO bonus; damage from shots that really curved (and arc/leap chains) is held at <= S3.SH of the total.
    C. bosses: auto-aimed damage on a boss counts x S3.bA; with no aimed hit on it for 2.5 s the boss repairs itself (up to its phase top). */
 if(RET.scale3===undefined)RET.scale3=!/[?&]scale3=0/.test(location.search);
-const S3=window.S3={get on(){return!!(RET.scale3&&RET.scale2);},RT:1,SH:.35,bA:.35,bK:.55,bT:.55,
+const S3=window.S3={get on(){return!!RET.scale3;},RT:1,SH:.35,bA:.35,bK:.55,bT:.55,
   st:{aup:0,all:0,au:0,man:0,cut:0,bau:0,bman:0,reg:0,t:0},   // damage counters (counted with the flag off too: the probe reads them)
   au:0,man:0,ka:1,bud:0,cur:null,ctx:0,
   hard(){return S2.hard();},
@@ -9659,7 +9652,7 @@ RX.over=function(t){if(!RX.on||!running)return;const mo=RET.motion?RET.motion():
 RX.spawn=(t,o)=>en(t,o);   // test hook (react-test)
 
 // PURPOSE: boss HP phases, damage cap, last stand
-// FLAG: boss2 (?boss2=0)
+// FLAG: none (always on)
 // TEST: boss2-test.js
 /* ---------- boss fights that last = parts/armour.js (flag RET.boss2; ?boss2=0 = the fights before it). BALANCE.md "Boss fights, round 4". ----------
    Owner, 17 Oct 2026: "Legend is still easy ... boss fights are still short", "even boss I can beat in seconds".
@@ -9672,8 +9665,7 @@ RX.spawn=(t,o)=>en(t,o);   // test hook (react-test)
    C. power scale: the hull is set high (x HK), and a ship whose honest damage cannot finish inside ~1.2 T gets its boss damage raised (at most x AMP); hard.js's repair is held to REP x the cap,
       so a fresh ship is not stuck: its fight ends near 1.2 T; the cap still holds the floor. */
 const BOSSFY=window.BOSSFY=y=>typeof wcv!=='undefined'&&wcv===cv?Math.max(y,150):y;   // boss floaters stay below the hint line at the top of a landscape screen
-if(RET.boss2===undefined)RET.boss2=!/[?&]boss2=0/.test(location.search);
-const B2X=window.B2X={get on(){return!!RET.boss2;},HK:1.8,M:1.06,AMP:12,LATE:1.2,LS:8,REP:.2,BK:5,SHT:14,
+const B2X=window.B2X={get on(){return true;},HK:1.8,M:1.06,AMP:12,LATE:1.2,LS:8,REP:.2,BK:5,SHT:14,
   T:{mini:{easy:42,normal:50,hard:60,vhard:65,legend:70},dist:{easy:66,normal:80,hard:95,vhard:102,legend:110},fin:{easy:100,normal:120,hard:145,vhard:158,legend:170}},   // the shortest fight in seconds
   kind(e){return e.mini?'mini':(e.k===3||ST.on&&ST.n>=40||!ST.on&&G.pos>=4)?'fin':'dist';},
   tf(e){const t=this.T[this.kind(e)];return t[SET.diff]||t.normal;},
@@ -10267,14 +10259,14 @@ BV.over=function(e,t){const ph=e.ph||1,mv=UIK.moveOf?UIK.moveOf(e):'air',ground=
 BV.tag=function(txt,x,y,col){const tf=ctx.getTransform(),u=Math.max(.05,Math.hypot(tf.a,tf.b)*(ctx.canvas.getBoundingClientRect().width/ctx.canvas.width||1)),fs=12/u;   // 12 css px on screen, upright on a rotated field
   ctx.save();ctx.translate(x,y);if(rotMode)ctx.rotate(Math.PI/2);ctx.font='700 '+fs.toFixed(1)+'px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.globalAlpha=.95;
   const w=ctx.measureText(txt).width+fs;ctx.fillStyle='#05030cc0';ctx.fillRect(-w/2,-fs*.8,w,fs*1.6);ctx.fillStyle=col;ctx.fillText(txt,0,0);ctx.restore();};
-{const rd=window.LEAK&&LEAK.rdy;if(rd)LEAK.rdy=function(on){return rd.call(this,on&&!(RET.calm&&G&&G.boss&&G.boss.x<W));};
-  NR.on('tick',()=>{const el=document.getElementById('retReady');if(el&&RET.calm&&G&&G.boss&&G.boss.x<W&&el.style.display!=='none')el.style.display='none';});
+{const rd=window.LEAK&&LEAK.rdy;if(rd)LEAK.rdy=function(on){return rd.call(this,on&&!(G&&G.boss&&G.boss.x<W));};
+  NR.on('tick',()=>{const el=document.getElementById('retReady');if(el&&G&&G.boss&&G.boss.x<W&&el.style.display!=='none')el.style.display='none';});
   const lateWrap=()=>{   // bossplay.js / bossmoves.js define their draw after this file: wrap on the first tick
   if(window.BPL&&BPL.draw&&!BPL.draw.bv){const pd=BPL.draw;BPL.draw=function(){const r=pd.apply(this,arguments);   // the teal outlined lane = the open lane of the blackout
-    try{const e=G.boss,b=e&&e.bp;if(RET.calm&&b&&b.ar==='blackout'&&b.arS&&b.arS.lane!=null&&e.x<W+40){const lh=H/3,x1=e.x-e.r-10;BV.tag('SAFE LANE',Math.max(60,x1/2),b.arS.lane*lh+lh/2,'#19e3ff');}}catch(x){}
+    try{const e=G.boss,b=e&&e.bp;if(b&&b.ar==='blackout'&&b.arS&&b.arS.lane!=null&&e.x<W+40){const lh=H/3,x1=e.x-e.r-10;BV.tag('SAFE LANE',Math.max(60,x1/2),b.arS.lane*lh+lh/2,'#19e3ff');}}catch(x){}
     return r;};BPL.draw.bv=1;}
   if(window.BMV&&BMV.draw&&!BMV.draw.bv){const bd=BMV.draw;BMV.draw=function(tm){const r=bd.apply(this,arguments);
-    try{const e=G.boss,z=RET.calm&&e&&e.bm&&BMV.hz.find(q=>q.fw&&q.s==='wall'&&q.x>40&&q.x<W-40);if(z)BV.tag('FIREWALL: FLY THROUGH THE GAP',Math.max(120,Math.min(W-120,z.x)),H*.62,'#19e3ff');}catch(x){}
+    try{const e=G.boss,z=e&&e.bm&&BMV.hz.find(q=>q.fw&&q.s==='wall'&&q.x>40&&q.x<W-40);if(z)BV.tag('FIREWALL: FLY THROUGH THE GAP',Math.max(120,Math.min(W-120,z.x)),H*.62,'#19e3ff');}catch(x){}
     return r;};BMV.draw.bv=1;}};
   NR.on('tick',lateWrap);}
 /* the phase change: the broken plate, sparks, and the new attack's name for one bar */
@@ -11403,7 +11395,7 @@ NR.on('runStart',()=>{FG2.sheet=null;});
 window.__fg2=FG2;
 
 // PURPOSE: threats that make DASH and EMP the answer
-// FLAG: counter (?counter=0)
+// FLAG: none (always on)
 // TEST: counter-test.js
 /* ---------- COUNTER threats: DASH and EMP as the answers (flag RET.counter, ?counter=0 = the abilities without these threats). Test: nightrun/counter-test.js.
    Owner, 19 Oct 2026: "the dash button and emp still useless, the game needs to be more strategic and timing". A button only matters when some threat needs it.
@@ -11418,8 +11410,7 @@ window.__fg2=FG2;
      The EMP button pulses (class abHot) while it would be worth it. DASH then EMP inside 1 s = COMBO blast (12 more to every ordinary foe within 300 px).
    Dash while overheated vents the gun (VENT). Hooks: b.js dash start (CTR.dash) and EMP press (CTR.emp), c.js draw. Boss HP, armour caps, bossmoves untouched;
    bullets go through eb() (ebCap, BCAP); tells >= .7 s; reduce motion = no pulse/flash. */
-if(RET.counter===undefined)RET.counter=!/[?&]counter=0/.test(location.search);
-const CTR=window.CTR={get on(){return!!RET.counter;},
+const CTR=window.CTR={get on(){return true;},
   stat:{seek:0,parry:0,early:0,wall:0,wallHit:0,wallDash:0,curt:0,curtHit:0,curtDash:0,curtEmp:0,ward:0,strip:0,good:0,waste:0,combo:0,vent:0},
   UN:{seek:3,wall:5,curt:7,ward:9},EV:{easy:10,normal:9,hard:6,vhard:5,legend:4},
   HK:{easy:4,normal:6,hard:9,vhard:9,legend:9},WK:{easy:.8,normal:1,hard:1.3,vhard:1.5,legend:1.7},
@@ -12458,7 +12449,7 @@ if(RET.pacing){
 }
 
 // PURPOSE: Normal bites again on top of the short stages
-// FLAG: bite (?bite=0)
+// FLAG: none (always on)
 // TEST: none
 /* ---------- BITE: Normal bites again on top of the short stages (flag RET.bite, default ON; ?bite=0 = the game as it was). Test: humanbot / anticamp-test / timing-test.
    Strict review 7: since pacing.js (stages ~90 s) the human-model bot clears Normal 97% and a bot that never presses DASH or EMP clears as often as the beat bot.
@@ -12468,10 +12459,9 @@ if(RET.pacing){
       (as on Hard); before that the gap is BITE.gapH px. A bullet curtain's second layer follows .45 s after the first while DASH or EMP is ready (EMP clears both).
    2. MERCY: grit.js absorbs at most BITE.mc() hull hits a run from stage 3 (was 3): 1 on stages 3-5 (hull 7 there), 2 from stage BITE.full (hull 5-6).
    3. FREE HEALTH: hull drops (ST.heal) x BITE.heal from stage BITE.full. ---------- */
-if(RET.bite===undefined)RET.bite=!/[?&]bite=0/.test(location.search);
 const BITE=window.BITE={ev:5,evMid:4,midTo:15,wallAt:3,full:6,gapH:84,mcEarly:1,mcLate:2,heal:.7,
   stat:{walls:0,shut:0,curt:0},
-  act(){return!!RET.bite&&typeof SET==='object'&&SET.diff==='normal'&&!!ST.on&&!(typeof G==='object'&&G&&(G.lab||G.tut));},
+  act(){return typeof SET==='object'&&SET.diff==='normal'&&!!ST.on&&!(typeof G==='object'&&G&&(G.lab||G.tut));},
   stg(){return ST.on?ST.n:1;},
   late(){return this.act()&&this.stg()>=this.full;},
     mc(){return this.stg()>=this.full?this.mcLate:this.mcEarly;}};
@@ -12487,7 +12477,7 @@ if(window.CTR){
       if(BITE.late()&&this.charges()>=1){w.gap=null;BITE.stat.shut++;}else w.gap.h=Math.min(w.gap.h,BITE.gapH);}};
 }
 if(window.GRIT){const m=GRIT.mcMax;Object.defineProperty(GRIT,'mcMax',{get(){return BITE.act()&&BITE.stg()>=BITE.wallAt?Math.min(m,BITE.mc()):m;},set(){},configurable:true});}
-{const sl=ST.setLevel;ST.setLevel=function(n){const r=sl.apply(this,arguments);if(RET.bite&&SET.diff==='normal'&&n>=BITE.full)this.heal*=BITE.heal;return r;};}
+{const sl=ST.setLevel;ST.setLevel=function(n){const r=sl.apply(this,arguments);if(SET.diff==='normal'&&n>=BITE.full)this.heal*=BITE.heal;return r;};}
 NR.on('runStart',()=>{for(const k in BITE.stat)BITE.stat[k]=0;});
 
 // PURPOSE: flanker enemies that punish a parked ship (default OFF)
@@ -12948,20 +12938,19 @@ window.addEventListener('pagehide',()=>{if(ENDR.eff){ENDR.restore();try{saveSet(
   return r;};}
 
 // PURPOSE: no enemy rests under the HUD band on a phone: flyers cross it fast, strays are moved out
-// FLAG: bandclear (?bandclear=0)
+// FLAG: none (always on)
 // TEST: hudband-test.js
 /* ---------- bandclear.js: nothing shows under the score strip (strict review 10 F01: enemies entered through the band and stayed 1-3.5 s under the score on 40-50% of frames). Flag RET.bandclear; ?bandclear=0 = as before.
    Portrait phones only (rotMode): the band is the top 92 x HK units of the field (score strip, chips, boss bar).
    WARP-IN: in the frame a flyer would show with its top edge inside the band (it comes in from the top, is created there, or its AI would rest there) it is put on the band's lower edge instead, before the frame is drawn: a unit on a formation path skips along its own path to the first point below the band (the path and the spacing of the line are kept, a follower arrives later and does the same), any other flyer is placed. Nothing is ever seen in the band.
    A boss's body (1.8 x r) is kept out of the band once it has taken its place (its entrance from above is left alone). Ground enemies are untouched. Test: hudband-test.js. ---------- */
-if(RET.bandclear===undefined)RET.bandclear=!/[?&]bandclear=0/.test(location.search);
 const BCL=window.BCL={st:{warp:0,shift:0},band(){return rotMode?92*HK:0;}};
 const bclPlace=e=>{const B=BCL.band(),edge=W-B-e.r-1;
   if(e.fp&&e.pth){let t=Math.max(0,e.pt||0),p=e.pth(t,e),i=0;while(p[0]+(e.ox||0)>edge&&i++<400){t+=.02;p=e.pth(t,e);}
     if(i<400){e.pt=t;e.x=p[0]+(e.ox||0);e.y=p[1];}else{e.ox=(e.ox||0)+edge-(p[0]+(e.ox||0));e.x=edge;BCL.st.shift++;}}   // a path that never leaves the band: the whole path is moved down
   else e.x=edge;
   if(e.stop!=null&&e.stop>edge)e.stop=edge;BCL.st.warp++;};                                      // a turret's rest line too
-NR.on('tick',dt=>{if(!RET.bandclear||!rotMode||!G||!G.live||G.dead)return;const B=BCL.band();
+NR.on('tick',dt=>{if(!rotMode||!G||!G.live||G.dead)return;const B=BCL.band();
   for(const e of G.en){if(e.hp<=0||e.dead)continue;
     if(e.type==='boss'){if(e.t>2){const mx=W-B-1.8*e.r-2;if(e.x>mx&&e.x<=bossX()+120)e.x=mx;}continue;}   // a boss's move may carry its body up into the band: clamp it (it arrives from above and is left alone until it has taken its place)
     if(!e.gnd&&e.x<W&&W-e.x-e.r<B)bclPlace(e);}});
@@ -13095,7 +13084,7 @@ NR.on('beat',()=>{if(G.dead||!G.live)return;const B=STILL.beam;
   ctx.restore();};}
 
 // PURPOSE: set pieces, deck replaces the fixed metronome, rosters
-// FLAG: deck (?deck=0), roster (?roster=0), songspread (?songspread=0)
+// FLAG: deck (?deck=0), songspread (?songspread=0)
 // TEST: fun-test.js
 /* ---------- FUN pass: something new every ~8-10 s ----------
    SET PIECES   every 6 bars (~12 s) a signature formation per district that moves on the beat (WEAVE) or a LASER FENCE across the screen on the bar line;
@@ -13105,7 +13094,6 @@ NR.on('beat',()=>{if(G.dead||!G.live)return;const B=STILL.beam;
    MINI-BOSS    about every 26 bars (~50 s, see dir.js)
    Never touches the music: only game logic, light and a clean effect sound. */
 if(RET.deck===undefined)RET.deck=!/[?&]deck=0/.test(location.search);
-if(RET.roster===undefined)RET.roster=!/[?&]roster=0/.test(location.search);   // dir.js ROSTER (V3)
 if(RET.songspread===undefined)RET.songspread=!/[?&]songspread=0/.test(location.search);   // story.js SONGSEL (V10)
 const FUN={n:0,sets:[],fence:null,dw:null,ev:null,deck:[],nextAt:22,lastK:'',dropAt:-1,lastDash:-9,pdash:0,shower:0,stat:{sets:0,fences:0,drops:0,dropsHit:0,rewards:0},
   reset(){this.ev=null;this.deck=[];this.nextAt=20+gr(0,6);this.lastK='';this.n=0;this.sets=[];this.fence=null;this.dw=null;this.dropAt=-1;this.lastDash=-9;this.pdash=0;this.shower=0;},
@@ -14085,7 +14073,7 @@ const READ=window.READ={D:'#ff2d78',CORE:'#ffffff',RING:'#07030f',SHOT:'#7fe6ff'
     ctx.save();ctx.globalCompositeOperation='lighter';for(const b of L)G_(b.x,b.y,b.r*2.6*bg,D,b.k?.3:.38);ctx.globalCompositeOperation='source-over';
     const pb=ART.have('fx-bullet-enemy')&&ART.hue('fx-bullet-enemy',15,-92);          // the painted orb, turned from lime to pink (kept as a picture)
     for(const [col,k] of hc?[['#ffffff',1.95],[this.RING,1.62],[D,1.25],[this.CORE,.68]]:[[this.RING,1.5],[D,1.18],[this.CORE,.64]]){
-      const ba=RET.bulletart&&pb;   // bulletart: the painted orb is THE orb (full strength, bigger), not a 45 % wash over a flat disc (bulletart.js)
+      const ba=pb;   // bulletart: the painted orb is THE orb (full strength, bigger), not a 45 % wash over a flat disc (bulletart.js)
       if(!(ba&&col===D)){ctx.fillStyle=col;ctx.beginPath();for(const b of L){if(b.k)continue;const r=b.r*k*bg;ctx.moveTo(b.x+r,b.y);ctx.arc(b.x,b.y,r,0,7);}ctx.fill();}
       if(pb&&col===D){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=ba?1:.45;for(const b of L){if(b.k)continue;const w=b.r*(ba?3.4:2.6)*bg;ctx.drawImage(pb.c,b.x-w/2,b.y-w/2,w,w*pb.h/pb.w);}ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';}}
     for(const b of L){if(b.k||!(b.hm>0))continue;if(ART.have('fx-orb-homing')){const w=b.r*3.6,hq=RET.legible&&ART.hue('fx-orb-homing',w,-92),o=hq?hq.c:ART.bm['fx-orb-homing'];this.ring(b.x,b.y,w*.42,2);ctx.globalCompositeOperation='lighter';ctx.drawImage(o,b.x-w/2,b.y-w/2,w,w);ctx.globalCompositeOperation='source-over';continue;}
@@ -14134,16 +14122,13 @@ if(RET.read&&PW.p2&&PW.p2.K&&PW.p2.K.nova)PW.p2.K.nova.c=READ.NOVA;
   const i=g.rows.findIndex(r=>r.k==='hc');g.rows.splice(i<0?g.rows.length:i+1,0,{k:'hbox',l:'Show hitbox',o:[[false,'Off'],[true,'On']],d:'A small white dot on the ship marks the only spot that can be hit. Never marks a run.'});};}
 
 // PURPOSE: real bullet pictures (converted approved previews) for enemy orb/needle/shell/rocket and every player weapon; ?bulletart=0 = the old dots
-// FLAG: bulletart (?bulletart=0)
+// FLAG: none (always on)
 // TEST: bulletart-test.js
 /* ---------- bulletart.js (owner, 21 Oct 2026: "plain dots as bullets"). The pictures are media/fx-bullet-{needle,rocket,shell}.webp and fx-w-<weapon>-{bullet,hit,muzzle}.webp
    (96 px, alpha, converted from the approved 256 px previews; listed in media/ready.json). The draw sites already exist: ai.js / readable.js (needle, shell, rocket, rotated to travel direction),
    fxwave.js FXW.bullet (player shots by weapon id), readable.js orb (painted orb at full strength). This file only holds the switch: with RET.bulletart off the ids below read as "not there",
    so the old code shapes draw. Hitboxes are not touched (b.r / b.js stay). */
-if(RET.bulletart===undefined)RET.bulletart=!/[?&]bulletart=0/.test(location.search);
 const BA=window.BA={own:n=>/^fx-bullet-(needle|rocket|shell)$/.test(n)||/^fx-w-[a-z]+-(bullet|hit|muzzle)$/.test(n)};
-{const h=ART.have;ART.have=function(n){return(!RET.bulletart&&BA.own(n))?false:h.call(this,n);};}
-{const p=FXW.pic;FXW.pic=function(k){return(!RET.bulletart&&/^w-[a-z]+-(bullet|hit|muzzle)$/.test(k))?null:p.call(this,k);};}
 
 // PURPOSE: enemies, enemy bullets and pickups readable on every stage backdrop; one colour per role
 // FLAG: legible (?legible=0)
@@ -14511,14 +14496,13 @@ ABUP.T={get GA(){return GA;},gsave:()=>gsave(),open:f=>openGarage(f),close:()=>c
 window.__abup=ABUP;
 
 // PURPOSE: one-line caption on the first purple ring (gravity well) of each stage: what the ring is
-// FLAG: zonehint (?zonehint=0)
+// FLAG: none (always on)
 // TEST: pwrstar-test.js
 /* ---------- ZH: zone legend (flag RET.zonehint, default ON; ?zonehint=0 = no caption). Owner, 21 Oct 2026: "what are the large purple dashed circles?"
    They are the GRAVITY WELL: rules.js (stage mechanic, #b06bff, dashed while it telegraphs; it bends shots, never takes hull) and the boss verbs
    gravity_well / vacuum in bossmoves.js (#c08aff, pulls the SHIP). The first time either shows in a stage a short caption is drawn on the ring for ZT s
    (own canvas text, so the hint diet of two shows per profile does not hide it). Nothing here changes play. ---------- */
-if(RET.zonehint===undefined)RET.zonehint=!/[?&]zonehint=0/.test(location.search);
-const ZH=window.ZH={get on(){return!!RET.zonehint;},ZT:4.5,done:{rule:0,boss:0},cap:null,
+const ZH=window.ZH={get on(){return true;},ZT:4.5,done:{rule:0,boss:0},cap:null,
   TXT:{rule:'PURPLE RING = gravity well: bends shots, no damage',boss:'PURPLE RING = gravity well: it pulls your ship, thrust away'},
   reset(){this.done={rule:0,boss:0};this.cap=null;},
   start(k,x,y,r,col){if(this.done[k])return;this.done[k]=1;this.cap={k,x,y,r,col,t:this.ZT};},
@@ -14538,16 +14522,15 @@ NR.on('tick',dt=>ZH.tick(dt));
 {const dp=drawPlayer;drawPlayer=function(t){dp(t);try{ZH.draw();}catch(e){}};}
 
 // PURPOSE: economy fit: hours to finish back to 9-13 h
-// FLAG: econfit (?econfit=0)
+// FLAG: none (always on)
 // TEST: none
 /* ---------- econfit.js: economy back to 9-13 h (Strict review 7, task 5). After pacing (stages ~90 s) the Neon per hour went up and the full
    garage got new buyable layers (abup upgrades, forge merges) that RET.totalCost did not count. Only prices change: the weapon / perk scales (RET.wk, RET.tk),
    are x ECF.k (abup 90-140 and forge 120 Neon stay), and RET.totalCost now counts abup + the 24 forge merges. Neon per kill (RET.nk), armour.js and hard.js are untouched.
    Flag RET.econfit, default ON; ?econfit=0 = the prices as they were. Daily / weekly modes pay the same as before (no price or reward change there).
    Early game: the first weapon upgrade costs ~13 Neon, the first 3 stages pay 52+64+76 (econ-test). ---------- */
-if(RET.econfit===undefined)RET.econfit=!/[?&]econfit=0/.test(location.search);
 const ECF=window.ECF={k:1.05,wk:RET.wk,tk:RET.tk};
-ECF.apply=function(){const on=!!RET.econfit,k=on?this.k:1;RET.wk=this.wk*k;RET.tk=this.tk*k;};
+ECF.apply=function(){const k=this.k;RET.wk=this.wk*k;RET.tk=this.tk*k;};
 ECF.apply();
 
 // PURPOSE: eye strain pass: flash/glitch rate and alpha caps, shake caps, glow/scan lines, text floors, Comfort settings, colour-blind remap
@@ -14921,14 +14904,13 @@ if(RET.saves){
 }
 
 // PURPOSE: build stamp and update check
-// FLAG: stamp (?stamp=0)
+// FLAG: none (always on)
 // TEST: stamp-test.js
 /* ---------- build stamp + update check (owner, 21 Oct 2026: "the game has not changed" = an old shell on the phone). Flag RET.stamp (off with ?stamp=0): off = no stamp, no button, no toast, no auto reload.
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='6e01e883ba 2026-10-22 07:06 UTC';
+const NR_STAMP='b6ffec0af0 2026-10-22 10:13 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -14953,11 +14935,10 @@ RET.stampX=(function(){
       st.textContent=live?'Up to date':'Could not read the live version';
     }catch(e){st.textContent='Could not check (offline?)';}
     btn.disabled=false;};
-  X.build=function(){const body=$('setBody');if(!RET.stamp||!body||$('stampRow'))return;
+  X.build=function(){const body=$('setBody');if(!body||$('stampRow'))return;
     const row=document.createElement('div');row.id='stampRow';
     row.innerHTML='<h3>BUILD</h3><div id="stampS"></div><div id="stampF"></div><button type="button" class="go dim" id="stampBtn">CHECK FOR UPDATE</button><div id="stampSt" role="status"></div>';
     body.appendChild(row);$('stampBtn').addEventListener('click',e=>{e.stopPropagation();X.check();});X.paint();};
-  if(!RET.stamp)return X;
   if(!document.getElementById('stampCss')){const st=document.createElement('style');st.id='stampCss';st.textContent='#stampT{margin:8px 0 0;font:14px var(--mono);color:var(--dim);text-align:center;opacity:.8}#stampRow{display:flex;flex-direction:column;align-items:center;gap:6px;margin:6px 0;text-align:center;font:14px var(--mono);color:var(--dim)}#stampRow h3{align-self:stretch;text-align:left}#stampBtn{min-height:44px}#stampSt:empty{display:none}';document.head.appendChild(st);}
   X.paint();
   try{const seen=localStorage.getItem('nrStampSeen');if(seen&&seen!==X.hash&&!SIM)setTimeout(()=>X.toast('Updated to '+X.hash),800);localStorage.setItem('nrStampSeen',X.hash);}catch(e){}
@@ -15072,7 +15053,7 @@ if(POL.on){
 }
 
 // PURPOSE: visual diet: fewer own effects, readable enemies, a lean 6-item HUD
-// FLAG: diet (?diet=0)
+// FLAG: none (always on)
 // TEST: diet-test.js
 /* ---------- diet.js: review 8 fix list 5-7 (owner, 21 Oct 2026: "unprofessional, ugly, messy, eye strain"). Flag RET.diet, default ON; ?diet=0 = the game as it was
    (nothing below is installed). Presentation only: no hitbox, damage, spawn rule or telegraph time is touched; armour.js and hard.js are not read.
@@ -15084,8 +15065,7 @@ if(POL.on){
                     sprite draw, no new art); the backdrop gets a further dim under play and the phone rooftop tile (the "circuit board") is not drawn under play.
    7. HUD           Settings > HUD Minimal (the default) = 6 items: score, hull, boss bar, DASH, EMP, pause. Full = the old HUD with HEAT, LINE, multiplier, combo,
                     progress, chips. The EMP refill label ("~52s") is hidden in the lean HUD. ---------- */
-if(RET.diet===undefined)RET.diet=!/[?&]diet=0/.test(location.search);
-const DIET=window.DIET={on:!!RET.diet,PA:.5,PBMAX:16,PT:12,FX:6,FL:4,RING:120,CHEV:.6,MINCSS:32,FMAX:2.4,RIM:'rgba(226,236,255,.95)',RIMB:4,DIM:.22,
+const DIET=window.DIET={on:true,PA:.5,PBMAX:16,PT:12,FX:6,FL:4,RING:120,CHEV:.6,MINCSS:32,FMAX:2.4,RIM:'rgba(226,236,255,.95)',RIMB:4,DIM:.22,
   kc:1,kT:-9,seq:0,cap:0,cfs:{},inPB:0,st:{fr:0,pb:0,pt:0,minCss:1e9,ens:0,big:0},
   lean(){return this.on&&SET.hud!=='full';},
   /* css px per world unit (portrait: the 540-unit side spans the canvas width) */
@@ -15179,7 +15159,7 @@ if(DIET.on){
 }
 
 // PURPOSE: the music stays on top of the effects: separate buses, an effect compressor, a voice cap, no repeated ticks, a little variation
-// FLAG: mix (?mix=0)
+// FLAG: none (always on)
 // TEST: mix-test.js, audio-gates-test.js
 /* ---------- MIX: owner 21 Oct 2026: "the music is distorted by annoying repetitive sound effects" (flag RET.mix, default ON; ?mix=0 = the old graph and the old sound calls, nothing is wrapped).
    MEASURED before (mix-test.js, 90 s bot runs, stages 2/10/20, boss, endless wave 15): up to 16 effect voices (53 in endless), 25 explosions in one second, 'hit' 13/s, 'pick' 2 in the same frame, the master
@@ -15193,9 +15173,8 @@ if(DIET.on){
    RATE    quiet effects (priority < 5) at most 4 per rolling second in all; shot and hit at most 2 per second each; pick / boom bursts two per 250 ms. Defaults music 70 / effects 50.
    BEAT    the PERFECT / ON BEAT sound is one soft sine instead of three layers and its stinger has half the level; when they happen is unchanged (timing windows, BT, stinger grid are not touched).
    NOT     timing windows, hitboxes, armour.js, hard.js, the beat clock and the stinger scheduling. ---------- */
-if(RET.mix===undefined)RET.mix=!/[?&]mix=0/.test(location.search);
 DEFS.mixr=true;if(SET.mixr===undefined)SET.mixr=true;
-if(RET.mix&&SET.music===.45&&SET.sfx===.8){SET.music=.7;SET.sfx=.5;}   // review 8 fix 3: the old defaults (music 45 / effects 80) become music 70 / effects 50; a changed slider stays
+if(SET.music===.45&&SET.sfx===.8){SET.music=.7;SET.sfx=.5;}   // review 8 fix 3: the old defaults (music 45 / effects 80) become music 70 / effects 50; a changed slider stays
 DEFS.music=.7;DEFS.sfx=.5;
 const MIX=window.MIX={K:{mus:1.4,sfx:.5},CAP:6,TOT:4,
   // id: [minimum gap s, most per rolling second, priority, voices it makes, level, length]
@@ -15203,8 +15182,8 @@ const MIX=window.MIX={K:{mus:1.4,sfx:.5},CAP:6,TOT:4,
      perfect:[.14,4,4,1,.7,1],warn:[.5,2,5,6,.8,1],boom:[.07,5,5,2,.6,.75],hurt:[.3,3,6,2,.85,1],emp:[.5,2,6,2,.85,1],big:[.5,2,7,2,.8,1],phase:[.5,2,7,5,.85,1]},
   PP:[1,1.04,.97,1.02,.985],DB:[0,1.2,-1.1,.6,-.7],SEQ:[0,3,1,4,2],
   log:{},rr:{},vox:[],cur:null,lastDuck:-9,stat:{drop:0,steal:0,play:0},
-  on(){return!!RET.mix;},red(){return!!RET.mix&&SET.mixr!==false;}};
-if(RET.mix){
+  on(){return true;},red(){return SET.mixr!==false;}};
+{
   const M=MIX,isFx=d=>d===AU.fx||d===AU.stb||d===AU.stbq,dbv=x=>Math.pow(10,x/20);
   const oInit=AU.init,oOsc=AU.osc,oNoise=AU.noise,oSfx=AU.sfx,oSting=AU.sting,oDuck=AU.duckMusic,oVol=AU.vol;
   AU.init=function(){const had=this.a;oInit.apply(this,arguments);if(!had&&this.a&&!this.sfxc)M.graph();};
@@ -15271,13 +15250,12 @@ if(RET.mix){
 /* owner 22 Oct 06:25: "very annoying sound effects eg on perfect: disable it, it distorts music; alert is also very repetitive:
    it should alert in real danger, not every 5 seconds". Flag RET.calmsfx (default ON, ?calmsfx=0 = old): no PERFECT sound or
    stinger at all; the 'warn' alert plays only for real danger (hull 2 or less, or a boss arriving) and at most once per 20 s. */
-if(RET.calmsfx===undefined)RET.calmsfx=!/[?&]calmsfx=0/.test(location.search);
 {const s0=AU.sfx,g0=AU.sting;let lastWarn=-99;
-  AU.sfx=function(n){if(RET.calmsfx){if(n==='perfect')return;
+  AU.sfx=function(n){{if(n==='perfect')return;
     if(n==='warn'){const t=(typeof G==='object'&&G&&G.t)||0,real=(typeof P==='object'&&P&&P.hp<=2)||(typeof G==='object'&&G&&G.boss&&!G.boss.dead&&G.boss.bt!=null&&G.boss.bt<4);
       if(!real||t-lastWarn<20)return;lastWarn=t;}}
     return s0.apply(this,arguments);};
-  AU.sting=function(n){if(RET.calmsfx&&n==='perfect')return false;return g0.apply(this,arguments);};}
+  AU.sting=function(n){if(n==='perfect')return false;return g0.apply(this,arguments);};}
 
 // PURPOSE: an organised home: PLAY + status + 4 sections (MISSIONS, HANGAR, TRAINING, PROFILE), one header everywhere, grouped settings
 // FLAG: hub (?hub=0)
@@ -15893,7 +15871,7 @@ window.__schoolfull={get on(){return SF.on;},get log(){return SF.log;},SF,
   hit(){P.hp=Math.max(1,P.hp-1);}};
 
 // PURPOSE: tidy Settings (<= 20 controls on the main page, one Assist page, the rest under More) + a street run that keeps Kai in the left third and drones off the HUD
-// FLAG: tidy (?tidy=0)
+// FLAG: none (always on)
 // TEST: tidy-test.js
 /* ---------- TIDY (flag RET.tidy, default ON; ?tidy=0 = Settings and the street run exactly as before). Owner, 21 Oct 2026: "messy, unorganized, the game is shit on foot".
    Review 8: Settings had 41 controls (hc and rm twice, Music twice, DATA tab clipped). Now the main page has 19: Gameplay (HUD, Difficulty, Auto-fire, Aim assist, ASSIST >),
@@ -15904,11 +15882,10 @@ window.__schoolfull={get on(){return SF.on;},get log(){return SF.log;},SF,
    Street run (phones, portrait): during an arena lock or the boss arena the camera is parked, so Kai used to run to the right edge and fight clipped (median 82% of the view);
    now he may not pass 37% of the view while the camera is parked (F.post, after every step), the camera still keeps him at 25% otherwise (streetlook camK) and the walk-back rule
    (<= 35% back, W90) is untouched. Flyers (drones) are kept below the HUD band: their drawn top is never above the HUD band (SL.hudFull = panel + score + the hint line). The HUD panel uses the fly HUD's own plate (streetlook.js slHud). ---------- */
-if(RET.tidy===undefined)RET.tidy=!/[?&]tidy=0/.test(location.search);
 
 /* ===== street run: player cap + flyers under the HUD ===== */
 (function(){
-if(!RET.tidy||!window.FOOT||!FOOT._in)return;
+if(!window.FOOT||!FOOT._in)return;
 const F=FOOT,IN=F._in,FL=470,CAP=.37;
 F.post=(S,dt)=>{const SL=F.look;if(!SL||!S||S.end)return;const L=IN.L&&IN.L();if(!L||!L.vw)return;const P=S.P,vw=L.vw;
   if(SL.port&&(S.lock||S.bossOn)){const hi=S.camX+vw*CAP;if(P.x>hi){P.x=hi;if(P.vx>0)P.vx=0;}}
@@ -15919,7 +15896,7 @@ F.post=(S,dt)=>{const SL=F.look;if(!SL||!S||S.end)return;const L=IN.L&&IN.L();if
 })();
 
 /* ===== Settings ===== */
-if(RET.tidy&&RET.hub)setTimeout(()=>{
+if(RET.hub)setTimeout(()=>{
   const sb=document.getElementById('setBody'),setm=document.getElementById('setm');if(!sb||!setm)return;
   document.documentElement.classList.add('td');
   const MAIN='hud diff auto aim part q pal flash shake txt master music sfx mus layout sens dsize'.split(' ');
@@ -15982,13 +15959,13 @@ if(RET.tidy&&RET.hub)setTimeout(()=>{
 },0);
 
 // PURPOSE: HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 px phone); the other menu defects of review 8 live in stats.js (toast slot, achievement glyphs), map.js and ret.js (glyphs)
-// FLAG: menufix (?menufix=0)
+// FLAG: none (always on)
 // TEST: menufix-test.js
 /* ---------- MENUFIX (flag RET.menufix, default ON; ?menufix=0 = the old HANGAR with ten tabs). Review 8, fix list 13: the HANGAR tab row had ten tabs and a PICK button in a scroller,
    labels were cut at 375 px. Now the row holds SHIP, WEAPONS, FORGE, PILOT, UPGRADES and one MORE button; MORE opens a sheet titled "MORE IN HANGAR" with ABILITY, CREW, LOOKS, LOAD, SHOP
    and PICK WEAPONS (each button clicks the original tab, so every id and hook keeps working). The original buttons stay in the row, hidden. ---------- */
 (function(){
-if(!RET.menufix||!RET.hub||typeof garageEl==='undefined')return;
+if(!RET.hub||typeof garageEl==='undefined')return;
 document.documentElement.classList.add('mfx');
 const st=document.createElement('style');st.textContent=`
 html.mfx #garage.gfx .tabs{overflow:visible!important;gap:4px!important;flex-wrap:nowrap!important;-webkit-mask-image:none!important;mask-image:none!important}
@@ -16223,15 +16200,14 @@ EX10.probe={dims:()=>({W,H,rot:typeof wcv!=='undefined'&&wcv!==cv}),pop:(x,y,t)=
   if(s[2]>=1e6){G.fl=G.fl.filter(f=>f!==this.cur);this.cur=null;this.box=null;return;}this.cur.x=s[0];this.cur.ly=this.cur.y=s[1];this.box=[s[0]-bw/2,s[1]-bh/2,bw,bh];};}
 
 // PURPOSE: a calm playfield: rule banners small in the top band, thin soft player/enemy beams, at most 2 rings per enemy
-// FLAG: calm (?calm=0)
+// FLAG: none (always on)
 // TEST: calm-test.js, review9-test.js
 /* ---------- CALM (flag RET.calm, default ON; ?calm=0 = as before). Owner look, Legend stage 10 on a phone (22 Oct 2026):
    - a rule announcement ("RULE · CURVED SHOTS") covered the middle of the field while enemies attacked: now a small strip in the top band (under the score bar), at most 2.5 s;
    - bright beams ~25 css px wide: pictured player shots are at most 6 css px thick (alpha <= .5), enemy aim / sniper beams <= 6 css px (alpha <= .5); lane edges dashed and dim;
    - enemies wore 3-4 rings at once: at most 2 per enemy, priority attack tell (pink / red) > elite (gold) > the rest (1 frame of memory decides).
    Nothing here changes damage or timing. ---------- */
-if(RET.calm===undefined)RET.calm=!/[?&]calm=0/.test(location.search);
-const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:6,TMAX:2.5,TTITLE:2,RMAX:2,fr:0,cur:null,pk:new Map(),pp:new Map(),a:null,stat:{rings:0,cut:0,beams:0},
+const CALM=window.CALM={get on(){return running&&!!G;},BEAM:6,TMAX:2.5,TTITLE:2,RMAX:2,fr:0,cur:null,pk:new Map(),pp:new Map(),a:null,stat:{rings:0,cut:0,beams:0},
   /* css px per world unit under the current transform */
   css(){const t=ctx.getTransform(),c=ctx.canvas;return Math.hypot(t.a,t.b)*(c.clientWidth/c.width||1)||1;},
   isRule(a){return/^(RULE|NEW$|REMIX|TWIST)/.test(a||'');},
@@ -16254,8 +16230,8 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:6,TMAX:2.
     m.cm|=1<<c;if(n>=this.RMAX||m.n>=this.RMAX){this.stat.cut++;return false;}m.n++;this.stat.rings++;return true;}};
 /* ---- 1. banners: the rule card is small and short ---- */
 {const bn0=banner;banner=function(a,b,warn,t){const r=bn0.apply(this,arguments);
-  if(RET.calm&&running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}
-  else if(RET.calm&&G&&G.banner&&(!warn||a==='WARNUNG')&&!G.banner.ev){   // review 10 #4: the boss intro is the same chip (name + sub on one line)
+  if(running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}
+  else if(G&&G.banner&&(!warn||a==='WARNUNG')&&!G.banner.ev){   // review 10 #4: the boss intro is the same chip (name + sub on one line)
     G.banner.sm=1;const m=Math.min(t||3.2,CALM.TTITLE);G.banner.t=G.banner.m=m;}   // review 9 #1: the stage title is a one-line chip for 2 s, not a 96 px band over live fire
   return r;};}
 /* ---- 2. beams: thin and soft ---- */
@@ -16278,7 +16254,7 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:6,TMAX:2.
     return st.apply(this,arguments);};}
 
 // PURPOSE: stages 1-6 play named waves with one idea each, a breather between, a rising curve to the finale
-// FLAG: waves (?waves=0)
+// FLAG: none (always on)
 // TEST: waves-test.js
 /* ---------- waves.js (W151, owner 22 Oct 2026 on a phone: "stages extremely boring, a swarm of enemies, no logic"). Flag RET.waves, default ON; ?waves=0 = the director as before.
    Story stages 1-6 (the first impression) no longer stream the director's shuffled patterns. Each stage plays the wave table WV.T (design: nightrun/WAVES.md):
@@ -16290,7 +16266,6 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:6,TMAX:2.
    - a kill stage's goal is WV.KG of the foes in the table (the bot clears it), the waves loop from wave 2 ("ENCORE") until the stage ends.
    Other spawners (director, zoo, fleet, set pieces) are muted on these stages; bosses, mini-boss summons and their children are never touched.
    Stats for the test: WV.log. ---------- */
-if(RET.waves===undefined)RET.waves=!/[?&]waves=0/.test(location.search);
 const WV=window.WV={
   REST:3.5,SCK:650,TMAX:22,CAP:8,KG:.72,ENTER:300,
   /* the wave table: stage -> waves; a wave = [name, what to do, foes, opts]; a foe = [type, slot x (share of W), slot y (share of H), move, side]
@@ -16328,7 +16303,7 @@ const WV=window.WV={
        ['KONVOI','the squad leader: kill it first, the escort flees',[['gunship',.74,.5,'hold'],['drone',.62,.3,'hold'],['drone',.62,.7,'hold'],['turret',.72,.15,'sit','t'],['turret',.72,.85,'sit','b'],['charger',.66,.5,'dash']],{lead:0}]]},
   st:{i:-1,nx:0,phase:'off',t:0,rest:0,foes:[],q:[],loop:0,lead:null,n:0},
   log:{waves:[],maxOn:0,culled:0,ann:[]},
-  on(){return!!RET.waves&&ST.on&&ST.n>=1&&ST.n<=6&&!ST.ch&&!G.lab&&!G.tut&&!!this.T[ST.n];},
+  on(){return ST.on&&ST.n>=1&&ST.n<=6&&!ST.ch&&!G.lab&&!G.tut&&!!this.T[ST.n];},
   total(n){let k=0;for(const w of this.T[n]||[])k+=w[2].length*(w[3]&&w[3].rep||(w[3]&&w[3].lead!=null?1:n===5?3:2));return k;},
   bossy(){const k=ST.def.goal.k;return(k==='mini'||k==='boss')&&(ST.spawned||G.dbar>=ST.lead-1.5);},
   reset(){this.st={i:-1,nx:0,phase:'rest',t:0,rest:2,foes:[],q:[],loop:0,lead:null,n:this.on()?ST.n:0};this.log={waves:[],maxOn:0,culled:0,ann:[]};this.own=0;try{this.goal();}catch(e){}},
@@ -16386,7 +16361,7 @@ const WV=window.WV={
   /* ---- the beat: a wave starts on a bar downbeat after its breather ---- */
   beat(i){const S=this.st;if(S.phase==='rest'&&S.rest<=0&&((i%4)+4)%4===0&&!ST.over&&!this.bossy())this.start();},
   goal(){if(!this.on())return;const g=ST.def.goal;if(g.k==='kill')ST.kv=Math.max(8,Math.round(this.KG*this.total(ST.n)));if(g.k==='score')ST.sv=Math.round(this.KG*this.total(ST.n)*this.SCK/500)*500;}};
-if(RET.waves){
+{
   { const b0=DIR.beat;DIR.beat=function(i){
       if(!WV.on()||(G.boss&&G.boss.mini))return b0.call(this,i);
       for(let k=this.q.length-1;k>=0;k--){const x=this.q[k];if(G.bc>=x.b){this.q.splice(k,1);try{x.f();}catch(e){}}}
