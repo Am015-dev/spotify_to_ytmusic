@@ -5,7 +5,7 @@
 //  3. The side-impact shove in W10_bump (c.lane, 0.13-0.5 m per frame) and the yield dodge (98ayd, c.yo) eased up to 3.9 m sideways at rate 6/s: ~20 m/s lateral at its start, in front of the player.
 // Fix (window NC.on; ?npccol=0 = old behaviour): after a below-smash bump the player is pushed out along the minimum-overlap axis (never into a wall) and loses its speed into the car;
 // the contact test covers the whole box; c.yo moves at most NC.latV m/s (3) and a car that cannot clear in time brakes instead (the dodge already brakes an oncoming car the same way).
-const NC={on:!/[?&]npccol=0/.test(location.search),latV:2.4/* <= traffic/behaviour 2.5 m/s */,skin:.02,n:{push:0,wall:0,far:0,cap:0,shove:0,jam:0,hid:0}};
+const NC={on:!/[?&]npccol=0/.test(location.search),hd:!/[?&]schd=0/.test(location.search),latV:2.4/* <= traffic/behaviour 2.5 m/s */,skin:.02,n:{push:0,wall:0,far:0,cap:0,shove:0,jam:0,hid:0}};
 // minimum translation of box B (car) out of box A (player): [nx,nz,depth] from A towards B, or null when they do not overlap
 function NC_mtv(ax,az,ah,aw,al,bx,bz,bh,bw,bl){const A=[[Math.sin(ah),Math.cos(ah)],[Math.cos(ah),-Math.sin(ah)]],B=[[Math.sin(bh),Math.cos(bh)],[Math.cos(bh),-Math.sin(bh)]],dx=bx-ax,dz=bz-az;let m=1e9,ux=0,uz=0;
  for(const u of[A[0],A[1],B[0],B[1]]){const ra=al*Math.abs(A[0][0]*u[0]+A[0][1]*u[1])+aw*Math.abs(A[1][0]*u[0]+A[1][1]*u[1]),rb=bl*Math.abs(B[0][0]*u[0]+B[0][1]*u[1])+bw*Math.abs(B[1][0]*u[0]+B[1][1]*u[1]),p=dx*u[0]+dz*u[1],o=ra+rb-Math.abs(p);
@@ -26,7 +26,8 @@ CT_dim=(f=>function(k){const r=f.apply(this,arguments);if(r||NC_vb||!NC.on||!HUB
 let NC_pcM=null,NC_pcN=-1;
 function NC_hid(c){if(typeof PC==='undefined'||!PC.L||!PC.L.length)return false;if(NC_pcN!==PC.L.length){NC_pcM=new Map();for(const C of PC.L)if(C.dyn)NC_pcM.set(C.im,C);NC_pcN=PC.L.length}const im=HUB.cim[c.k],C=NC_pcM.get(im);if(!C)return false;const s=C.slot[c.j];return s<0||s>=im.count}
 // contact gate: the base test only ran for centres < 5 m apart; the boxes can touch up to half-length + half-width of both
-HT_hit=(f=>function(c,dx,dz,W,dt){if(NC.on&&NC_hid(c)){NC.n.hid++;return}if(NC.on&&!(c.dead>0)&&Math.abs(c.y-RO.y)<3){const[w,l]=OB_cdim(c.k),R2=OB_HL+OB_HW+w+l+.3,ex=c.x-RO.x,ez=c.z-RO.z,d2=ex*ex+ez*ez;if(d2>=25&&d2<R2*R2&&OB_car(c.x,c.z,dx,dz,c)){NC.n.far++;HT_smash(c,c.x,c.z,dx,dz,W)}}return f.apply(this,arguments)})(HT_hit);
+// solid-cars-r22e1: the contact box turned with the road edge, the drawn car with the corner tangent (HT_pose c.hdx/hdz): on a bend the box and the drawn bus differ by up to ~2 m at its ends (not seen by the GO, safety fix)
+HT_hit=(f=>function(c,dx,dz,W,dt){NC_hc=1;if(NC.on&&NC_hid(c)){NC.n.hid++;return}if(NC.on&&NC.hd&&c.hdx!=null){dx=c.hdx;dz=c.hdz}if(NC.on&&!(c.dead>0)&&Math.abs(c.y-RO.y)<3){const[w,l]=OB_cdim(c.k),R2=OB_HL+OB_HW+w+l+.3,ex=c.x-RO.x,ez=c.z-RO.z,d2=ex*ex+ez*ez;if(d2>=25&&d2<R2*R2&&OB_car(c.x,c.z,dx,dz,c)){NC.n.far++;HT_smash(c,c.x,c.z,dx,dz,W)}}return f.call(this,c,dx,dz,W,dt)})(HT_hit);
 // dodge rate cap: c.yo (98ayd) is the only sideways motion outside the lane smoother; it may change by NC.latV m/s at most. A car whose dodge is cut while the player closes brakes.
 AYD_pre=(f=>function(dt){if(!NC.on||!HUB.cars)return f.apply(this,arguments);const C=HUB.cars,Y=NC_y0||(NC_y0=[]);for(let i=0;i<C.length;i++)Y[i]=C[i].yo||0;const r=f.apply(this,arguments),mx=NC.latV*dt,mn=(NC.latV-HT_LAT.vl)*dt/* near the player the lane smoother (HT_LAT, <= 0.9 m/s) may add to the dodge: the sum stays <= 3 m/s */;
  for(let i=0;i<C.length;i++){const c=C[i],y0=Y[i],y=c.yo||0,m=(c.x-RO.x)**2+(c.z-RO.z)**2<225?mn:mx;if(Math.abs(y-y0)>m){c.yo=y0+Math.sign(y-y0)*m;NC.n.cap++;if(c.yoH>0&&RO.v>3){const rx=c.x-RO.x,rz=c.z-RO.z,h=RO.vh??RO.h;if(rx*Math.sin(h)+rz*Math.cos(h)>0&&rx*rx+rz*rz<900)c.cv=Math.max(0,(c.cv||0)-6*dt)}}}return r})(AYD_pre);
@@ -52,3 +53,14 @@ function NC_rows(GO,goSay,CK){CK.push({ver:'collide',id:'npc-box',area:'drive',t
   {ver:'traffic',id:'npc-lateral',area:'world',text:'npc-collide-r22c:2026-10-21 · NPC cars never snap sideways away from you: the give-way dodge moves at most 3 m/s and a car that cannot clear brakes. 📍 GO = the same 6 approaches; pass line: max NPC lateral speed within 6 m of the player ≤ 3 m/s.'});
  for(const c of['fra','ath']){(GO['collide/slow-pass']=GO['collide/slow-pass']||[]).push({c,n:'slow contact '+c,secs:60,fn:()=>NC_go('col')});(GO['traffic/npc-lateral']=GO['traffic/npc-lateral']||[]).push({c,n:'npc lateral '+c,secs:60,fn:()=>NC_go('lat')})}}
 window.__nc={NC,box:NC_box,hid:NC_hid,go:NC_go,run:NC_run,pick:NC_pick,mtv:NC_mtv};
+// solid-cars-r22e1: LV_park1 parks a car by writing x/z (after a > 60 m jump: 3 a frame); until its next HT_car pose the draw slot showed it at its old spot
+// (90-280 m away) and nothing on the kerb (GO why/solid-cars). Cars the park step moved are posed at once. ?ncpl=0 = old behaviour.
+NC.pl=!/[?&]ncpl=0/.test(location.search);
+function NC_pose(c){const N=HUB.nodes,A=N[c.a],B=N[c.b],im=HUB.cim&&HUB.cim[c.k];if(!A||!B||!im||c.dead>0)return;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,gA=A.g||B.g,W=c.pk&&c.ofW?c.ofW:A.ab||gA?0:Math.min(A.w||20,B.w||20);
+ try{HT_pose(c,A,B,(B.x-A.x)/L,(B.z-A.z)/L,gA,W,1/60,im)}catch(e){}}
+if(typeof LV_parkStep==='function')LV_parkStep=(f=>function(){const n0=LV.n.park||0,r=f.apply(this,arguments);if(NC.pl&&(LV.n.park||0)!==n0)for(const c of HUB.cars)if(c.pk&&c.t!=null){const im=HUB.cim[c.k],C=im&&im.userData.pc,a=C?C.src:im&&im.instanceMatrix.array,o=c.j*16;if(a&&Math.hypot(a[o+12]-c.x,a[o+14]-c.z)>.5)NC_pose(c)}return r})(LV_parkStep);
+// solid-cars-r22e1: HT_car's edge hand-off, wait-at-node and dead-end-queue branches pose the car and return before HT_hit: a car waiting at a junction
+// or crossing a node was drawn but air (GO why/solid-cars: 1.1-2.0 m pass-through at 37 km/h). A car within 20 m that was posed without a contact test gets one.
+let NC_hc=0;
+HT_car=(f=>function(c,im,N,dt){NC_hc=0;const r=f.apply(this,arguments);if(NC.on&&NC.pl&&!NC_hc&&!(c.dead>0)&&c.hdx!=null&&(c.x-RO.x)**2+(c.z-RO.z)**2<400){const A=N[c.a],B=N[c.b];if(A&&B){const gA=A.g||B.g;
+ HT_hit(c,c.hdx,c.hdz,c.pk&&c.ofW?c.ofW:A.ab||gA?0:Math.min(A.w||20,B.w||20),dt);NC.n.br=(NC.n.br|0)+1}}return r})(HT_car);

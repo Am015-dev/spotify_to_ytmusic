@@ -51,9 +51,11 @@ function PC_grid(add){
  const W=q=>{G[q.id*4]=q.x;G[q.id*4+1]=q.y;G[q.id*4+2]=q.z;G[q.id*4+3]=q.r};if(full)for(const q of M.values())W(q);else{const U=new Set();for(const C of add)if(C.G)for(let g=0;g<C.G.length;g+=3)U.add(C.G[g]);for(const q of M.values())if(U.has(q.id))W(q)}
  if(!PC.cv||PC.cv.length!==M.size)PC.cv=new Uint8Array(M.size);PC.left=0}
 // one instance: visible → copied to the next free slot of its mesh
+// solid-cars-r22e1: slot i may still hold ANOTHER instance from an earlier pass, so the s===i no-copy shortcut drew a traffic car that was not re-posed that frame
+// at another car's old spot (84-1719 m away, GO why/solid-cars); traffic layers always copy (static meshes keep the shortcut, not checked in this lane)
 function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const ex=x-cx,ey=y-cy,ez=z-cz,d=Math.sqrt(ex*ex+ey*ey+ez*ez);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
  const s=C.s++,a=C.src;if(C.shr&&s>=C.im.instanceMatrix.count)PC_cap(C,Math.max(s+1,Math.ceil(s*1.5)));const arr=C.im.instanceMatrix.array;
- if(s!==i||C.shr){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
+ if(s!==i||C.shr||C.dyn){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
 // ios-r17h (cut 1+2): in the low-mem tier a compacted mesh keeps instanceMatrix / instanceColor at its drawn size (x1.5), not at the full source count (the source copy C.src
 // holds every instance): ath -30 MB. It grows on demand inside PC_one (copy + GPU buffer re-created via the mesh 'dispose' event); a shrunk slot always re-copies (no s===i shortcut).
 function PC_cap(C,cap){const im=C.im,M=im.instanceMatrix;cap=Math.min(C.n,Math.max(8,cap));if(cap===M.count)return;const k=Math.min(cap,M.count),a=new Float32Array(cap*16);a.set(M.array.subarray(0,k*16));M.array=a;M.count=cap;M.clearUpdateRanges();
@@ -80,13 +82,19 @@ function PC_step(force){if(!PC.on||typeof camera==='undefined'||!HUB.grp||state!
  camera.getWorldDirection(_pcD);const cx=camera.position.x,cz=camera.position.z,h=Math.atan2(_pcD.x,_pcD.z);let dh=Math.abs(h-PC.h);if(dh>Math.PI)dh=2*Math.PI-dh;
  const t0=performance.now();let tested=0;
  if(force||np||dh>.26||Math.sqrt((cx-PC.x)*(cx-PC.x)+(cz-PC.z)*(cz-PC.z))>=20){PC_snap(cx,cz,h);PC.left=PC.L.length;PC.t=0;for(let _k1=0,_c1=PC.L,C;_k1<_c1.length&&(C=_c1[_k1],true);_k1++)if(C.sky||C.dyn)tested+=PC_mesh(C);PC.st.runs++}
- else if(++PC.t%10===0&&!PC.left){PC_snap(cx,cz,h);for(let _k2=0,_c2=PC.L,C;_k2<_c2.length&&(C=_c2[_k2],true);_k2++)if(C.sky||C.dyn)tested+=PC_mesh(C)}
+ else{if(++PC.t%10===0&&!PC.left){PC_snap(cx,cz,h);for(let _k2=0,_c2=PC.L,C;_k2<_c2.length&&(C=_c2[_k2],true);_k2++)if(C.sky||C.dyn&&!PC.dynF)tested+=PC_mesh(C)}if(PC.dynF)tested+=PC_dyn()}
  const bud=force?1e9:(TUNE.pc7Bud||60000);/* circular: a new pass mid-way carries on from the same mesh, so no mesh starves under constant turning */
  const mb=typeof TWG!=='undefined'&&TWG.pcB&&!force&&TWG.fr>=0&&TWG.fr<=TWG.pcF?TWG.pcB:0;/* ios-r17k: first drivable seconds on touch: also stop a pass at TWG.pcB ms (a mesh is re-packed whole, so the pass just resumes next frame) */
  while(PC.left>0&&tested<bud&&(!mb||performance.now()-t0<mb)){PC.left--;const C=PC.L[PC.k++%PC.L.length];if(!C.sky&&!C.dyn)tested+=PC_mesh(C)}
  if(!PC.left)for(let _k3=0,_c3=PC.L,C;_k3<_c3.length&&(C=_c3[_k3],true);_k3++)if(C.dirty&&!C.dyn)tested+=PC_mesh(C);
  if(tested){let vis=0;for(let _k4=0,_c4=PC.L,C;_k4<_c4.length&&(C=_c4[_k4],true);_k4++)vis+=C.s|0;PC.st.vis=vis;PC.st.tested=tested;PC.st.ms=+(performance.now()-t0).toFixed(2)}}
 const _pcP5=new THREE.Vector3();
+// solid-cars-r22e1: traffic slots were re-packed every 10th frame, and only when no static pass was running (driving = a new pass every 20 m):
+// a respawned or incoming car kept slot -1 for 10-60+ frames (not drawn) while the old slot of a car that left stayed stale. Traffic layers are now
+// re-packed every frame against the current camera (~450 sphere tests), the static pass keeps its own snapshot. ?pcdyn=0 = old cadence. GO why/solid-cars.
+PC.dynF=!/[?&]pcdyn=0/.test(location.search);const _pcF2=new THREE.Frustum();
+function PC_dyn(){const x=PC.x,y=PC.y,z=PC.z;_pcF2.copy(_pcF);camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);
+ PC.x=camera.position.x;PC.y=camera.position.y;PC.z=camera.position.z;let n=0;try{for(let k=0,L=PC.L,C;k<L.length&&(C=L[k],true);k++)if(C.dyn)n+=PC_mesh(C)}finally{PC.x=x;PC.y=y;PC.z=z;_pcF.copy(_pcF2)}return n}
 // boot-4: the pass's camera snapshot + per-cell visibility (was a closure made every frame, Math.hypot per cell)
 function PC_snap(cx,cz,h){camera.updateMatrixWorld();_pcPV.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse);_pcF.setFromProjectionMatrix(_pcPV);PC.x=cx;PC.y=camera.position.y;PC.z=cz;PC.h=h;
  const far=PC.fr=PC_far(),cy=PC.y,G=PC.G,V=PC.cv,keep=PC.keep;if(G)for(let q=0;q<V.length;q++){const gx=G[q*4],gy=G[q*4+1],gz=G[q*4+2],dx=gx-cx,dy=gy-cy,dz=gz-cz,d=Math.sqrt(dx*dx+dy*dy+dz*dz),r=G[q*4+3];
