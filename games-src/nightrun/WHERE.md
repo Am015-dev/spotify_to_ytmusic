@@ -78,7 +78,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | stamp | stamp RET.stampX 10-44 | ret |  | stamp |  |
 | polish | polish POL.flush 78-105 |  |  | polish |  |
 | diet | diet DIET.thin 36-63 |  |  | diet |  |
-| mix | mix MIX 17-24 | a |  | mix |  |
+| mix | mix MIX 20-27 | a |  | mix |  |
 | hub,garagefix | hub gfPatchAll 288-301 | ret |  | hub |  |
 | layout,layoutStrip* | layout lyMap 41-55 |  |  | layout |  |
 | school | school footEnd 110-125 |  |  | school |  |
