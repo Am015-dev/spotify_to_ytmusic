@@ -1,5 +1,5 @@
 const OD_CHANGELOG=[
-{v:'v90m-beta.155',date:'22 Oct 2026',items:[{t:'CHANGED',s:'Smoother on phones: the game does about 30% less work every frame (the HUD no longer forces a full restyle).'}]},
+{v:'v90m-beta.155',date:'22 Oct 2026',items:[{t:'CHANGED',s:'Stopping at a garage, flight or event marker no longer opens its card: tap the chip to open it.'},{t:'CHANGED',s:'Smoother on phones: the game does about 30% less work every frame (the HUD no longer forces a full restyle).'}]},
 {v:'v90m-beta.154',date:'22 Oct 2026',items:[{t:'NEW',s:'Frankfurt: smashing props now throws a wide fan of bricks and gold studs that arc over your car.'},{t:'CHANGED',s:'No more pop-up cards while you drive: level-ups and results are small notes, and events start only when you tap TAP TO START.'}]},
 {v:'v90m-beta.153',date:'22 Oct 2026',items:[{t:'FIXED',s:'No more invisible walls next to some Athens buildings: you can drive right up to them, and they now end at the roof.'}]},
 {v:'v90m-beta.152',date:'22 Oct 2026',items:[{t:'FIXED',s:'Traffic cars no longer jump, slide sideways or pop up while you can see them; cars that must respawn now do it behind you.'},{t:'FIXED',s:'Ground loads before the city appears on phones.'}]},
