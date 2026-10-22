@@ -1,6 +1,6 @@
 // let-cars-climb-r22e17 GO why/climb: the car drives up a ~35 deg Taunus slope at gas (TR_climbWin in 85_audio_feel_sp_otg.js) and does not climb a building wall.
 //   climb: a clear off-road fall line, >= 33 deg for >= 10 m, 30+ m long; the car starts at its foot at 12 m/s facing up with the gas held, heading held on the fall line.
-//   Pass: reaches the crest (y >= crest - 1.5 m) within 9 s; the old window (?clb=0) is run on the same line as INFO.
+//   Pass: reaches the crest (y >= crest - 1.5 m) within 9 s; the old window is run on the same line as INFO.
 //   wall: the car faces a building 8 m away with the gas held for 4 s. Pass: never more than 1 m over the ground line and never inside the collider.
 function CLB_line(){const B=[WX0+120,WX1-120,WZS+120,WZN-120],r=[];const gr=(x,z)=>{const[gx,gz]=TR_grad(x,z,2);return[gx,gz,Math.atan(Math.hypot(gx,gz))]};
   for(let x=B[0];x<B[1];x+=17)for(let z=B[2];z<B[3];z+=17){let g;try{g=roamTerr(x,z,999).g}catch(e){continue}if(!(g>2))continue;const[gx,gz,th]=gr(x,z);if(th<.58||th>.66)continue;
@@ -27,5 +27,5 @@ function CLB_go(){const out=[];let bad=0;const p0=[RO.x,RO.z,RO.h],ws=say;say=()
   finally{say=ws;for(const k in K)K[k]=false;SKH_reset();ESC_end();RO.v=0;RO.vy=0;roamWarp(p0[0],p0[1],p0[2]);RO.x=p0[0];RO.z=p0[1];RO.h=RO.vh=p0[2];RO.y=groundAt(p0[0],p0[1],99)}
   return'📍 why/climb · '+out.join(' · ')+' → '+(bad?'❌ FAIL':'✅ PASS')}
 {const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
- __chk.items.unshift({ver:'why',id:'climb',area:'drive',text:'let-cars-climb-r22e17 (Alex: "no stuck on hills"): with the gas held the car climbs terrain to ~40 deg (46 deg max at speed) and does not slide back; buildings stay walls. 📍 GO drives up the 2 steepest clear ~35 deg Taunus fall lines at gas from their foot (pass: reaches the top within 9 s; old window shown as INFO) and into a building wall for 4 s (pass: never > 1 m over the ground, never inside). ?clb=0 = the old 29-38 deg window.'});
+ __chk.items.unshift({ver:'why',id:'climb',area:'drive',text:'let-cars-climb-r22e17 (Alex: "no stuck on hills"): with the gas held the car climbs terrain to ~40 deg (46 deg max at speed) and does not slide back; buildings stay walls. 📍 GO drives up the 2 steepest clear ~35 deg Taunus fall lines at gas from their foot (pass: reaches the top within 9 s; old window shown as INFO) and into a building wall for 4 s (pass: never > 1 m over the ground, never inside). Flag ?clb=1, default OFF (the GO switches it on for its own runs).'});
  __chk.GO['why/climb']=[{c:'fra',n:'climb Frankfurt',secs:60,fn:()=>CLB_go()}]},500)}
