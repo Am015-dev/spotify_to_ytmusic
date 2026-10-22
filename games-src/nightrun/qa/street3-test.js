@@ -16,7 +16,7 @@ const SEED = () => { try { localStorage.clear(); localStorage.setItem('mnr_story
   await sleep(700); const br = await PW.chromium.launch(), errs = [];
   const open = async (vp, dpr, q) => { const ctx = await br.newContext({ viewport: vp, deviceScaleFactor: dpr || 1, hasTouch: !!q && q.touch, isMobile: !!q && q.touch }); await ctx.addInitScript(SEED);
     const p = await ctx.newPage(); p.on('pageerror', e => errs.push(e.message));
-    await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1&street3=1`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.FOOT && FOOT.S3, null, { timeout: 20000 }); await sleep(400); return { ctx, p }; };
+    await p.goto(`http://127.0.0.1:${port}/index.html?nomusic=1`, { waitUntil: 'domcontentloaded' }); await p.waitForFunction(() => window.__mnr && window.FOOT && FOOT.S3, null, { timeout: 20000 }); await sleep(400); return { ctx, p }; };
   // (d)+(e): the real start through the STREET RUN hold, drawn in real time
   const startLook = async (vp, dpr, touch) => { const { ctx, p } = await open(vp, dpr, { touch });
     const r = await p.evaluate(async () => { const t0 = performance.now(), fr = [], l0 = FOOT.S3.lit; RET.tale = false; FOOT.ui = 1; FOOT.start('zeil');
@@ -36,8 +36,8 @@ const SEED = () => { try { localStorage.clear(); localStorage.setItem('mnr_story
       out[k] = +((lp ? ch / T : (o.m[0]) / o.tot)).toFixed(2); } return out; });
   const sp = await p.evaluate(() => { const S0 = FOOT.S; RET.tale = false; FOOT.start('zeil'); const S = FOOT.S; S.P.hp = 99; const e = FOOT.env.spawn('rusher', S.camX + 700, null); e.grace = 0; const x0 = e.x; FOOT.sim(.5, 1 / 60); const v = Math.abs(e.x - x0) / .5; FOOT.stop && FOOT.stop(); return +v.toFixed(0); });
   const R = []; for (let i = 0; i < RUNS; i++) { const r = await p.evaluate(`(${RUN})(${4321 + i * 7919})`);
-    const s3 = await p.evaluate(() => { const f = FOOT.S.s3 || {}; return { waves: (f.waves || []).map(w => [w.t, w.thr]), boss: f.boss, held: f.held, intro: f.intro, song: FOOT.S3.song || 'stage2', bossOn: FOOT.S.bossOn, mp: window.__mp ? window.__mp.fk : '' }; });
-    r.s3 = s3; R.push(r); console.log(`  run ${i + 1}: ${r.clear ? 'CLEAR' : 'down '} t=${r.time}s hp=${r.hp} kills=${r.kills} hurts=${r.hurts} broke=${r.broke} boss at ${s3.boss}s bossLife=${r.boss}s hits=${r.hlog} held=${s3.held} song=${s3.song}/${s3.mp}`); }
+    const s3 = await p.evaluate(() => { const f = FOOT.S.s3 || {}; return { waves: (f.waves || []).map(w => [w.t, w.thr]), boss: f.boss, held: f.held, heals: f.healN | 0, hp: (f.hpLog || []).join(' '), intro: f.intro, song: FOOT.S3.song || 'stage2', bossOn: FOOT.S.bossOn, mp: window.__mp ? window.__mp.fk : '' }; });
+    r.s3 = s3; R.push(r); console.log(`  run ${i + 1}: ${r.clear ? 'CLEAR' : 'down '} t=${r.time}s hp=${r.hp} kills=${r.kills} hurts=${r.hurts} broke=${r.broke} boss at ${s3.boss}s bossLife=${r.boss}s hits=${r.hlog} held=${s3.held} heals=${s3.heals} hp ${s3.hp} song=${s3.song}/${s3.mp}`); }
   const w = R[0].s3.waves, thr = w.map(x => x[1]), mono = thr.every((v, i) => !i || v >= thr[i - 1]), ct = R.filter(r => r.clear).map(r => r.time), med = ct.length ? ct.slice().sort((a, b) => a - b)[ct.length >> 1] : R[0].time, pk = w[thr.indexOf(Math.max(...thr))][0];
   console.log(`  threat curve (t s: threat): ${w.map(x => x[0] + ':' + x[1]).join(' ')}; intro ${R[0].s3.intro}s; peak at ${pk}s = ${(100 * pk / med).toFixed(0)}% of ${med}s`);
   console.log(`  frame rates: ${Object.entries(fps).map(([k, v]) => k + ' ' + v).join(', ')}; rusher walk ${sp} u/s (street2 300); clears ${ct.length}/${R.length} times ${ct.join(',')}; page errors ${errs.length}${errs.length ? ' ' + errs.slice(0, 2).join(' | ') : ''}`);

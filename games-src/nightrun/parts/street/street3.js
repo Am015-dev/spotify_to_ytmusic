@@ -1,37 +1,38 @@
 // PURPOSE: Street 3: the Zeil street as ONE 2.5-3 min stage on ONE song, threat rising gradually to a late peak, sheets loaded before play, steady frame rates, street lighting
-// FLAG: street3! (default OFF until the clear rate is tuned: ?street3=1 turns it on; off = the street2 stage exactly)
+// FLAG: street3 (?street3=0 = the street2 stage exactly)
 // TEST: qa/street3-test.js
 /* ---------- STREET3. Owner, 22 Oct 2026 (tested on foot): "stop making more stages, focus on one stage. The old assets load before the new ones; the assets are blurring;
    the sprites are moving fast and abnormally, idle looks not smooth; enemy sprites also move fast and look abnormal; better lighting and shadows; one stage, one song,
    max 3 minutes; the difficulty should increase gradually". Builds on street2.js (same props, foes and climax), changes:
-   1. TIME: the camera may not run ahead of a gate that moves with the stage clock (SL.back), so the run lasts the same for everyone: 8 beats of calm, then 12 waves whose
-      threat score (rusher 1, gunner 2, heavy 4) grows linearly from 2 to 10 to the peak at ~84% of the run, a 10 s breather, the big heavy. No locks, no checkpoint, no captions,
+   1. TIME: the camera may not run ahead of a gate that moves with the stage clock (SL.back), so the run lasts about the same for everyone: 8 beats of calm, then 12 waves whose
+      threat score (rusher 1, gunner 2, heavy 4) grows linearly from 2 to 8 to the peak at ~81-85% of the run, a breather, the big heavy once the street is clear. No locks, no checkpoint, no captions,
       no music cues: one song (street1, 192 s) from start to end (musicpack's lock/boss/clear switches are blocked for this stage). S3.log.waves = the threat curve.
    2. LOADING: the STREET RUN hold (footq.js) also waits for the painted street (foot/bg-*) and prop pictures, so the first frame is the full-size art (no swap).
    3. ANIMATION: no cross-fade on foot sheets (it doubled the outline = blur), idle ping-pong at 7 fps, shots/melee 12 fps one-shots, a walk/idle change waits for the
       next 1/12 s frame boundary, foes walk and approach at 70% of the street2 speed (lunges and charges as before).
-   4. LIGHT: lamp pools that light whoever passes, neon spill, a wet-road reflection, contact shadows under props, one colour grade (under the HUD). ---------- */
-if(RET.street3===undefined)RET.street3=/[?&]street3=1/.test(location.search);
+   4. LIGHT: lamp pools that light whoever passes, neon spill, a wet-road reflection, contact shadows under props, one colour grade (under the HUD).
+   5. A RUN TWICE AS LONG: one heart more, a heal drops beside Kai when he is two hearts down, gunners reload 1.4x slower, at most 5 foes at once. ---------- */
+if(RET.street3===undefined)RET.street3=!/[?&]street3=0/.test(location.search);
 (function(){
 if(!RET.street3||!RET.street2||!window.FOOT||!FOOT.STAGES||!FOOT.STAGES.zeil||!FOOT.STAGES.zeil.s2||!FOOT._in)return;
 const F=FOOT,IN=F._in,ST=F.STAGES.zeil,FL=470,abs=Math.abs,clamp=(v,a,b)=>v<a?a:v>b?b:v;
-const S3=F.S3={ART:typeof ART!=='undefined'?ART:null,log:null,up:0,upKey:'',phDraw:0,full:0,SPD:.7,
-  T:{beats:8,boss:150,waves:12,peakT:140,t0:2,thr0:2,thrPeak:10,cap:6},
+const S3=F.S3={GCD:1.4,ART:typeof ART!=='undefined'?ART:null,log:null,up:0,upKey:'',phDraw:0,full:0,SPD:.7,
+  T:{beats:8,boss:150,waves:12,peakT:140,t0:2,thr0:2,thrPeak:8,cap:5},
   TH:{rusher:1,gunner:2,heavy:4,bigheavy:8}};
 const on=()=>RET.street3&&F.S&&F.S.st===ST;
 /* ----- the stage: street2's rooms stretched over a longer road (the gate decides the pace, not the length) ----- */
 const SX=7300/6200;ST.len=8200;ST.boss={x:7700,id:'bigheavy'};ST.cp=0;ST.cps=[];ST.locks=[];ST.waves=[];ST.s3=1;ST.song='stage2';
 ST.props=ST.props.map(p=>[Math.round(p[0]*SX),p[1],p[2]]);ST.plats=ST.plats.map(p=>[Math.round(p[0]*SX),p[1],p[2]]);
 if(F.SEC)for(const r of F.SEC)r.x=Math.round(r.x*SX);
-const xAt=t=>Math.round(7220*t/150+520);ST.pk=[[xAt(30),'heal'],[xAt(38),'ammo'],[xAt(58),'heal'],[xAt(84),'heal'],[xAt(92),'ammo'],[xAt(106),'heal'],[xAt(124),'heal'],[xAt(139),'heal'],[xAt(141),'ammo']];   // supplies where the clock puts Kai: a heal every ~25 s, one in the breather
-/* the wave plan: 12 waves, threat 2 -> 10 in equal steps (monotonic), a heavy in every third wave from threat 7 up, one gunner a wave, two from wave 7 */
+const xAt=t=>Math.round(7220*t/150+520);ST.pk=[[xAt(38),'ammo'],[xAt(92),'ammo'],[xAt(141),'ammo']];   // ammo where the clock puts Kai; heals drop next to Kai (below)
+/* the wave plan: 12 waves, threat 2 -> 8 in equal steps (monotonic), a heavy in every third wave from threat 7 up, one gunner a wave, two from wave 7 */
 function plan(intro){const T=S3.T,N=T.waves,out=[];for(let i=0;i<N;i++){const t=intro+i*(T.peakT-intro)/(N-1),thr=Math.round(T.thr0+(T.thrPeak-T.thr0)*i/(N-1));
     let b=thr;const u=[];if(b>=7&&(N-1-i)%3===0){u.push('heavy');b-=4;}let g=Math.min(i<6?1:2,Math.floor(b*.3/2));if(i>=1&&g<1&&b>=3)g=1;for(let j=0;j<g;j++){u.push('gunner');b-=2;}while(b>0){u.push('rusher');b--;}
     out.push({i,t:+t.toFixed(1),thr,units:u,left:u.slice(),next:t,spawned:0});}return out;}
 S3.plan=plan;
 const gate=(S,vw)=>{const bc=Math.min(ST.boss.x-vw/2,ST.len-vw);return clamp(bc*S.time/S3.T.boss,0,bc);};
 /* the camera never runs ahead of the clock */
-if(F.look&&F.look.back){const b0=F.look.back;F.look.back=function(S,P,vw,want){const w=b0.apply(this,arguments);return S.s3&&S.st===ST?Math.min(w,S.s3.gate):w;};}
+if(F.look&&F.look.back){const b0=F.look.back;F.look.back=function(S,P,vw,want){const w=b0.apply(this,arguments);return S.s3&&S.st===ST?Math.min(w,Math.max(S.s3.gate,S.camX)):w;};}   // holds the camera, never pulls it back
 const s2step=ST.hook.step;
 ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)return;const vw=env.G.viewW||960,P=S.P;
   if(!S.s3){const bpm=(typeof BT!=='undefined'&&BT.bpm>40?BT.bpm:120),intro=+(S3.T.beats*60/bpm).toFixed(2);
@@ -40,11 +41,15 @@ ST.hook.step=function(S,dt,env){s2step.call(this,S,dt,env);if(!RET.street3)retur
     for(const p of S.pr)if(p.draw&&!p._d3){const d0=p.draw;p._d3=1;p.draw=(c,K,at)=>{propShadow(c,p);return snap(c,()=>d0(c,K,at));};}}
   const f=S.s3;f.gate=gate(S,vw);S.idleSpawn=S.time+60;   // the clock sets the pace: standing at the gate is not camping (no idle spawns of other foes)
   const bc=Math.min(ST.boss.x-vw/2,ST.len-vw);
-  if(!S.bossOn&&f.gate>=bc-40){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.2;f.boss=+S.time.toFixed(1);}   // the boss comes in quietly (no warning sting)
+  const alive0=S.E.some(e=>!e.dead&&!e.boss);
+  if(!S.bossOn&&f.gate>=bc-40&&(!alive0||S.time>S3.T.boss+12)){S.bossOn=true;S.lock={id:'boss',cam:bc};S.bossAt=S.time+1.2;f.boss=+S.time.toFixed(1);}   // the boss comes in quietly (no warning sting), once the street is clear (12 s at most)
   const alive=S.E.filter(e=>!e.dead).length;
-  for(const w of f.waves){if(S.time<w.next||!w.left.length)continue;if(alive>=S3.T.cap){w.next=S.time+.4;f.held++;continue;}   // never more than 6 on the street: the next one waits
+  if(!f.bh&&S.time>=S3.T.peakT+6&&P.hp>0&&P.hp<P.max){f.bh=1;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // the breather: one heal before the big heavy
+  if(S.time>20&&S.time-(f.lastHeal||0)>12&&P.hp>0&&P.hp<=P.max-2&&!S.pk.some(q=>q.k==='heal')){f.lastHeal=S.time;f.healN=(f.healN|0)+1;S.pk.push({k:'heal',x:clamp(P.x+P.facing*60,S.camX+40,S.camX+vw-40),y:FL-16,vy:0,t:0,on:true,fix:1});}   // two hearts down: a heal drops beside Kai (at most one every 12 s)
+  for(const w of f.waves){if(S.time<w.next||!w.left.length)continue;if(alive>=S3.T.cap){w.next=S.time+.4;f.held++;continue;}   // never more than 5 on the street: the next one waits
     const id=w.left.shift(),fromL=id==='rusher'&&w.i>=3&&(w.spawned%3===2),x=fromL?S.camX-40:S.camX+vw+40;
     const e=F.env.spawn(id,x,null);if(e){w.spawned++;f.spawnLog.push([+S.time.toFixed(1),id,w.i]);}w.next=S.time+(id==='heavy'?1.6:.9);break;}
+  if(f.hp0!==P.hp){(f.hpLog||(f.hpLog=[])).push(Math.round(S.time)+':'+P.hp);f.hp0=P.hp;}
   f.live.push(alive);if(f.live.length>600)f.live.shift();};
 /* contact shadow under a prop, on the road */
 function propShadow(c,p){if(p.hp<=0)return;const w=p.w*.62;c.save();c.globalAlpha=.42;const g=c.createRadialGradient(p.x,FL,0,p.x,FL,w);g.addColorStop(0,'rgba(0,0,0,.9)');g.addColorStop(1,'rgba(0,0,0,0)');
@@ -92,7 +97,9 @@ ART.footDraw=function(c,who,pose,x,y,h,flip,t){const e=ART.fE,S=F.S;if(!RET.stre
 /* foes walk at 70%: every foe's step is scaled after its own AI ran */
 const FE=window.FOOT_ENEMIES||{};
 for(const id of ['rusher','gunner','heavy','bigheavy']){const d=FE[id];if(!d||!d.ai||d._s3)continue;d._s3=1;const a0=d.ai;
-  d.ai=function(e,dt,env){const x0=e.x;a0.apply(this,arguments);if(!on())return;if(e.state==='charge'&&e.heavy||e.state==='lunge')return;const dx=e.x-x0;if(abs(dx)<80){e.x=x0+dx*S3.SPD;}e.vx*=S3.SPD;};}   // walks and approaches only: a lunge or a charge keeps the speed its telegraph promised
+  d.ai=function(e,dt,env){const x0=e.x,c0=e.cd;a0.apply(this,arguments);if(!on())return;
+    if(id==='gunner'&&c0!=null&&e.cd>c0+.1)e.cd=c0+(e.cd-c0)*S3.GCD;   // a gunner reloads 1.4x slower on this long stage (its bullets were 2/3 of the hurts)
+if(e.state==='charge'&&e.heavy||e.state==='lunge')return;const dx=e.x-x0;if(abs(dx)<80){e.x=x0+dx*S3.SPD;}e.vx*=S3.SPD;};}   // walks and approaches only: a lunge or a charge keeps the speed its telegraph promised
 /* ----- blur check: the scale every on-foot sheet is drawn at (device px per sheet px); the gate is <= 1.1 ----- */
 const da0=ART.drawAnim;
 ART.drawAnim=function(c,key,t,x,y,sc){if(RET.street3&&c&&c.canvas&&c.canvas.id==='footC'&&isFoot(key)){const m=c.getTransform(),ts=sc*Math.hypot(m.a,m.b);if(ts>S3.up){S3.up=ts;S3.upKey=key;}}return da0.apply(this,arguments);};
@@ -102,11 +109,9 @@ function lightAt(x){const d=((x-LAMP/2)%LAMP+LAMP)%LAMP-LAMP/2;return .22*Math.m
 S3.lightAt=lightAt;
 function lights(c,S,L){const look=F.look,K=look?look.k:1,t0=look?look.t0:0,vw=L.vw,cam=S.camX,lo=cam-(L.exl||0),hi=cam+vw+(L.exr||0),my=y=>FL-(FL-y)*K;
   c.save();c.globalCompositeOperation='lighter';
-  for(let n=Math.floor(lo/LAMP)-1;n<=Math.ceil(hi/LAMP)+1;n++){const x=n*LAMP+LAMP/2,top=my(FL-175);if(x<lo-200||x>hi+200)continue;
-    const g=c.createLinearGradient(0,top,0,FL);g.addColorStop(0,'rgba(255,214,150,.20)');g.addColorStop(1,'rgba(255,190,120,.05)');c.fillStyle=g;
-    c.beginPath();c.moveTo(x-10*K,top);c.lineTo(x+10*K,top);c.lineTo(x+95,FL);c.lineTo(x-95,FL);c.closePath();c.fill();
+  for(let n=Math.floor(lo/LAMP)-1;n<=Math.ceil(hi/LAMP)+1;n++){const x=n*LAMP+LAMP/2;if(x<lo-200||x>hi+200)continue;
     const p=c.createRadialGradient(x,FL,0,x,FL,120);p.addColorStop(0,'rgba(255,205,140,.30)');p.addColorStop(1,'rgba(255,205,140,0)');c.fillStyle=p;c.save();c.translate(x,FL);c.scale(1,.22);c.translate(-x,-FL);c.beginPath();c.arc(x,FL,120,0,6.283);c.fill();c.restore();
-    c.fillStyle='rgba(255,236,190,.9)';c.beginPath();c.arc(x,top,4*K,0,6.283);c.fill();}
+    }   // pools only: a cone would not line up with the lamp posts painted in the parallax layers
   for(let n=Math.floor(lo/900)-1;n<=Math.ceil(hi/900)+1;n++){const q=NEON[((n%3)+3)%3],x=n*900+330+120*Math.sin(n*1.7),y=my(FL-120);if(x<lo-260||x>hi+260)continue;   // neon spill: coloured rim on whoever stands near a sign
     const g=c.createRadialGradient(x,y,0,x,y,210);g.addColorStop(0,q[0]+'40');g.addColorStop(1,q[0]+'00');c.fillStyle=g;c.globalAlpha=q[1]*(.85+.15*Math.sin(S.time*3+n));c.fillRect(x-210,y-210,420,420);c.globalAlpha=1;}
   c.restore();}
@@ -114,7 +119,7 @@ function grade(c,S,L){const dpr=L.dpr||1,W=c.canvas.width,H=c.canvas.height;c.sa
   const look=F.look,road=look&&look.road?Math.round(look.road*dpr):0;
   if(road>0&&road<H){const hb=Math.min(H-road,road);c.globalAlpha=.16;c.translate(0,road*2);c.scale(1,-1);c.drawImage(c.canvas,0,road-hb,W,hb,0,road-hb,W,hb);c.setTransform(1,0,0,1,0,0);   // wet road: the street mirrored under the road line
     const g=c.createLinearGradient(0,road,0,road+hb);g.addColorStop(0,'rgba(5,3,12,0)');g.addColorStop(1,'rgba(5,3,12,.55)');c.globalAlpha=1;c.fillStyle=g;c.fillRect(0,road,W,hb);}
-  c.globalCompositeOperation='multiply';c.globalAlpha=.32;c.fillStyle='#d9c6ff';c.fillRect(0,0,W,H);   // one grade: cool violet night
+  c.globalCompositeOperation='multiply';c.globalAlpha=.22;c.fillStyle='#d9c6ff';c.fillRect(0,0,W,H);   // one grade: cool violet night
   c.globalCompositeOperation='screen';c.globalAlpha=.05;c.fillStyle='#ff5aa8';c.fillRect(0,0,W,H);
   c.restore();}
 S3.lit=0;
