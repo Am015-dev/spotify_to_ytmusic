@@ -71,6 +71,7 @@ const sha = s => crypto.createHash('sha1').update(s).digest('hex').slice(0, 16);
     await p.waitForFunction(() => window.__mnr && window.__mnr.TR.list.length > 0, null, { timeout: 20000 }).catch(() => { });
     await p.evaluate(() => Promise.all([...document.images].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; })))).catch(() => { });
     await p.waitForTimeout(400);   // ART.img decodes; the virtual clock does not move while we wait
+    await p.waitForFunction(() => { const A = __mnr.ART; return !A.ANIM || Object.keys(A.ANIM.s).filter(k => /^ship-e[a-z]+\/(flame|volley|death)$/.test(k)).map(k => A.anim(k)).every(Boolean); }, null, { timeout: 20000, polling: 100 }).catch(() => { });   // every enemy ship sheet decoded before frame 0, so which draw path runs never depends on decode timing
     await p.evaluate(() => { window.__rng = 0; for (const k in window.__dc) delete window.__dc[k]; });
     const r = await p.evaluate(DRIVE, { ...s, frames: s.frames || FRAMES });
     const dc = await p.evaluate(() => window.__dc);

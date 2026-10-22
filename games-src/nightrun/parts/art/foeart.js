@@ -12,36 +12,38 @@ if(RET.foeart===undefined)RET.foeart=!/[?&]foeart=0/.test(location.search);
 /* hue turn is relative to the sheets' own colour (measured: interceptor / bomber / gunship / carrier / cruiser sit at hue 228, kamikaze at 351) */
 const ENEMY_ART=window.ENEMY_ART={
   /* core director kinds (dir.js, draw.js) */
-  drone:{s:'einterceptor',k:5.1,ol:1,t:[-28,1.1,1.3],L:{k:6.3,t:[180,1.15,1.1]}},                       // L: the leader (e.ldr) is gold and a quarter larger
-  charger:{s:'ekamikaze',k:3.6,t:[29,1.1,1]},
-  turret:{s:'egunship',k:3.1,t:[171,1.1,1],rot:e=>aim(e)+Math.PI,mk:'turret'},
-  gate:{s:'ebomber',w:46,t:[127,1.2,1],mk:'gate'},                                                // two pylons (FOEART.post), nose turned to the gap
-  flank:{s:'einterceptor',k:3.2,t:[-43,1.05,1],rot:e=>((e.side&&!e.settled)?Math.atan2(-e.side*190,-80):Math.PI)-Math.PI},
-  swarm:{s:'einterceptor',k:3.0,t:[87,1.1,1.05]},
-  mine:{s:'ebomber',k:2.3,t:[167,1.2,1.05],hp:1,mk:'mine'},
+  drone:{s:'edrone',k:5.1,ol:1,L:{k:6.3,t:[180,1.15,1.1]}},                       // L: the leader (e.ldr) is gold and a quarter larger
+  charger:{s:'echarger',k:3.6},
+  turret:{s:'eturret',k:3.1,rot:e=>aim(e)+Math.PI},
+  gate:{s:'egate',w:46,h:150},                                                // two pylons (FOEART.post), nose turned to the gap
+  flank:{s:'eflank',k:3.2,rot:e=>((e.side&&!e.settled)?Math.atan2(-e.side*190,-80):Math.PI)-Math.PI},
+  swarm:{s:'eswarm',k:3.0},
+  mine:{s:'emine',k:2.3,hp:1},
   gunship:{native:1},
   /* zoo.js kinds */
-  shielder:{s:'egunship',k:3.4,t:[-38,1.1,1],hp:1,mk:'shielder',ov:(e,t,r)=>{if(e.shN>0)FXW.bubble(e,r,e.fa==null?Math.PI:e.fa,(.35+.5*(e.shN/e.shMax))*(e.shF>0?1:.8));}},   // the existing shield picture (gameplay tell)
-  splitter:{s:'einterceptor',k:3.2,t:[72,1.15,1],hp:1,mk:'splitter'},
-  bomber:{s:'ebomber',k:3.4,t:[165,1.15,1],hp:1,mk:'zbomber'},
-  sniper:{s:'einterceptor',k:3.7,t:[-138,1.2,1],hp:1,mk:'sniper'},
-  healer:{s:'einterceptor',k:3.2,t:[-73,1.1,1.05],hp:1,mk:'healer'},
+  shielder:{s:'eshielder',k:3.4,hp:1,ov:(e,t,r)=>{if(e.shN>0)FXW.bubble(e,r,e.fa==null?Math.PI:e.fa,(.35+.5*(e.shN/e.shMax))*(e.shF>0?1:.8));}},   // the existing shield picture (gameplay tell)
+  splitter:{s:'esplitter',k:3.2,hp:1},
+  bomber:{s:'ezbomber',k:3.4,hp:1},
+  sniper:{s:'esniper',k:3.7,hp:1},
+  healer:{s:'ehealer',k:3.2,hp:1},
   carrier:{s:'ecarrier',k:2.7,t:[37,1.1,1],hp:1},
-  minelayer:{s:'ebomber',k:3.2,t:[-158,1.2,1],hp:1,mk:'minelayer'},
+  minelayer:{s:'eminelayer',k:3.2,hp:1},
   kamikaze:{native:1},
-  zdrn:{s:'einterceptor',k:3.2,t:[47,1,1.05],mk:'zdrone'},
+  zdrn:{s:'ezdrone',k:3.2},
   /* fleet.js (the four ships draw through FLEET.spr / SPR.foe; the drone that orbits the carrier is the interceptor in lilac) */
   einterceptor:{native:1},ebomber:{native:1},ecarrier:{native:1},ecruiser:{native:1},
-  efdrone:{s:'einterceptor',k:3.2,t:[42,1,1.05],mk:'cdrone'},
+  efdrone:{s:'ecdrone',k:3.2},
   /* flankers.js (ids fk-<kind>) */
-  'fk-diver':{s:'ekamikaze',k:3.2,t:[34,1.15,1],rot:()=>-Math.PI/2,mk:'diver',ov:(e,t,r)=>{if(e.hp>e.hull){ctx.globalAlpha=.55+.3*Math.sin(t*10);ctx.strokeStyle='#4ad1ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+7,0,7);ctx.stroke();ctx.globalAlpha=1;}}},   // the old shield-up ring stays (gameplay tell)
-  'fk-crawler':{s:'ebomber',k:3.3,t:[-148,1.2,1],mk:'crawler'},
-  'fk-bait':{s:'einterceptor',k:3.1,t:[102,1.1,1.05],mk:'bait'}};
+  'fk-diver':{s:'ediver',k:3.2,rot:()=>-Math.PI/2,ov:(e,t,r)=>{if(e.hp>e.hull){ctx.globalAlpha=.55+.3*Math.sin(t*10);ctx.strokeStyle='#4ad1ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,r+7,0,7);ctx.stroke();ctx.globalAlpha=1;}}},   // the old shield-up ring stays (gameplay tell)
+  'fk-crawler':{s:'ecrawler',k:3.3},
+  'fk-bait':{s:'ebait',k:3.1},
+  /* leak.js road units (LEAK.art): they stand on the road line; the walker has no sheet yet */
+  gtank:{s:'egtank',k:3.3,hp:1,gnd:1},gturret:{s:'egturret',k:3.3,hp:1,gnd:1}};
 /* ASSET-POLICY.md: no new art in code. A stand-in is a recoloured / scaled / flipped approved sheet plus, where the type needs its own look, a plain flat marker (mk = the asset id it waits for,
    see ASSETS-NEEDED-ENEMIES.md). The marker is a small triangle / circle / box at the stern with the id in 6 px text; it goes away when a real sheet replaces the entry. */
 const MKSHAPE=['tri','circ','box'];
 /* ids that still draw their old picture: the sheet to ask for is in ASSETS-NEEDED-ENEMIES.md. The ground units walk, a ship cannot stand in for them. */
-const NEEDS=window.FOEART_NEEDS=['gtank','gturret','gwalker'];
+const NEEDS=window.FOEART_NEEDS=['gwalker'];
 const FOEART=window.FOEART={fr:0,built:0,cnt:0,n:{all:0,sheet:0,stand:0,by:{}},flt:(()=>{try{return 'filter' in CanvasRenderingContext2D.prototype;}catch(_){return false;}})(),
   id:e=>e.fk&&window.FLK&&FLK.K[e.fk]?'fk-'+e.fk:e.type,
   map:e=>{const m=ENEMY_ART[FOEART.id(e)];if(!m||m.native)return null;if(e.ldr&&m.L){if(!m._L)m._L=Object.assign({},m,m.L);return m._L;}return m;},
@@ -58,22 +60,23 @@ const FOEART=window.FOEART={fr:0,built:0,cnt:0,n:{all:0,sheet:0,stand:0,by:{}},f
     const act=e.arm&&ART.ANIM.s['ship-'+m.s+'/volley']?'volley':'flame',key=FOEART.sheet(m,act)||(act==='volley'?FOEART.sheet(m,'flame'):null);if(!key)return false;
     if(own&&e.vz)VAR.in(e,t);
     const r=e.r,w=m.w||r*m.k,sc=w/(ART.VS[key]||ART.ANIM.s[key])[2],tt=(e.t||0)+eb_(e),rot=m.rot?m.rot(e,t):0;
-    ctx.save();if(rot)ctx.rotate(rot);if(m.ol){ctx.shadowColor='rgba(4,1,10,1)';ctx.shadowBlur=5;}ART.drawAnim(ctx,key,tt,0,0,sc,false);
+    ctx.save();if(rot)ctx.rotate(rot);if(m.gnd)ctx.translate(0,r-sc*(ART.VS[key]||ART.ANIM.s[key])[3]/2);if(m.ol){ctx.shadowColor='rgba(4,1,10,1)';ctx.shadowBlur=5;}ART.drawAnim(ctx,key,tt,0,0,sc,false);
     if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,tt,0,0,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);ctx.globalCompositeOperation='source-over';}ctx.restore();
     if(m.ov)m.ov(e,t,r,fl);
     if(m.hp&&e.max>1&&e.hp>0)hpBar(-14,-r-(e.type==='shielder'?22:9),28,e.hp/e.max);
     if(own&&e.vz)VAR.out(e,t);
-    e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
+    e._fs=sc;ART.anim('ship-'+m.s+'/death');e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
   marker(m,r,fl){let q=m._mc;if(!q){q=m._mc=document.createElement('canvas');q.width=40;q.height=22;const g=q.getContext('2d'),sh=MKSHAPE[(m.mk.length+m.mk.charCodeAt(0))%3];g.fillStyle='#e8ecff';g.beginPath();
       if(sh==='tri'){g.moveTo(20,1);g.lineTo(24,8);g.lineTo(16,8);g.closePath();}else if(sh==='circ')g.arc(20,5,3.5,0,7);else g.rect(16.5,1.5,7,7);g.fill();g.font='700 7px sans-serif';g.textAlign='center';g.fillText(m.mk,20,19);}
     ctx.globalAlpha=fl?1:.9;ctx.drawImage(q,r*.9-20,r*.7-5);ctx.globalAlpha=1;},
   /* gate pylon at (0,y) of the gate's frame: the nose points into the gap */
-  post(e,y,up,fl){if(!RET.foeart||!RET.sprites)return false;const m=ENEMY_ART.gate,key=FOEART.sheet(m,'flame');if(!key)return false;const sc=m.w/(ART.VS[key]||ART.ANIM.s[key])[2];
-    ctx.save();ctx.translate(0,y);ctx.rotate(up?-Math.PI/2:Math.PI/2);ART.drawAnim(ctx,key,e.t||0,0,0,sc,false);
+  post(e,y,up,fl){if(!RET.foeart||!RET.sprites)return false;const m=ENEMY_ART.gate,key=FOEART.sheet(m,'flame');if(!key)return false;const sm=ART.VS[key]||ART.ANIM.s[key],tall=sm[3]>sm[2],sc=tall?m.h/sm[3]:m.w/sm[2];
+    ctx.save();ctx.translate(0,y);if(tall){ctx.translate(0,(up?-1:1)*m.h/2);if(up)ctx.scale(1,-1);}else ctx.rotate(up?-Math.PI/2:Math.PI/2);   // a portrait pylon (egate) stands on its end, the lamp turned to the gap; a landscape stand-in turns its nose
+    ART.drawAnim(ctx,key,e.t||0,0,0,sc,false);
     if(fl){ctx.globalCompositeOperation='lighter';ART.drawAnim(ctx,key,e.t||0,0,0,sc,false,ART.ANIM.sm.hitstop.flash_white*.5);}
     ctx.restore();e._fa=FOEART.fr;e._fk=FOEART.fr;return true;},
-  /* the four sheets every stage can need are fetched shortly after the page loads (carrier / cruiser come with their first sighting); one missing tint is built per idle frame, so a unit never shows the plain colour */
-  warm(){if(!RET.sprites||!RET.foeart)return;for(const s of['einterceptor','ebomber','egunship','ekamikaze'])ART.anim('ship-'+s+'/flame');},
+  /* the sheets every stage can need are fetched shortly after the page loads (the rest come with their first sighting); one missing tint (only the leader / swarm tints are left) is built per idle frame, so a unit never shows the plain colour */
+  warm(n){if(!RET.sprites||!RET.foeart)return;let ok=1;for(const s of['edrone','echarger','eturret','egunship'])if(!ART.anim('ship-'+s+'/flame'))ok=0;if(!ok&&(n|0)<40)setTimeout(()=>FOEART.warm((n|0)+1),250);},   // the sheets of the director's own kinds (drone, charger, turret, gunship); asked again until decoded
   idle(){if(!RET.foeart||!RET.sprites||FOEART.built)return;const L=FOEART._l||(FOEART._l=Object.values(ENEMY_ART).filter(m=>!m.native).flatMap(m=>m.L?[m,Object.assign({},m,m.L)]:[m]));
     for(const m of L){if(m.t&&!ART.VB['ship-'+m.s+'~'+(m._tg||'')+'/flame']&&ART.ANIM.s['ship-'+m.s+'/flame']&&ART.anim('ship-'+m.s+'/flame')){FOEART.sheet(m,'flame');return;}}},
   /* ids the game can spawn, from the tables it spawns from (ZOO.T, FLEET.K, FLK.K, DMG.ml and LEAK.GT; the director's own kinds) */

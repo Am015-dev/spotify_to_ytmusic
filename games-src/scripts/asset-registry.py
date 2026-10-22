@@ -300,12 +300,13 @@ def build():
     meta, R = rows()
     names_all = {n for e in R for n in [e["old"]] + e["aliases"]}
     # gate: master vs live tree
-    gate = []
+    gate, arrived = [], []
     for e in R:
         rel = next((r for n in [e["old"]] + e["aliases"] for r in media_files(n) if (MEDIA / r).exists()), None)
         real = bool(rel) and not is_placeholder(rel)
         if e["cls"] == "DELIVERED" and e["old"].startswith(("sheet:", "code:")) is False and not real and not any(x.startswith("media/") for x in e["paths"]): gate.append((e["old"], "master DELIVERED, live file missing or placeholder"))
-        if e["cls"] in ("NEEDS-ART", "HAVE-SOURCE") and real: gate.append((e["old"], f"master {e['cls']}, live file is real now"))
+        if e["cls"] in ("NEEDS-ART", "HAVE-SOURCE") and real: arrived.append(e["old"])   # a delivery landed (ingest): the status below is computed from the live file, so this is the expected change, not a disagreement
+    if arrived: print(f"note: {len(arrived)} rows the master list still calls NEEDS-ART / HAVE-SOURCE have a real live file now (delivered by ingest)")
     GATE[:] = [len(gate), len(R)]
     if len(gate) > 0.05 * len(R):
         print(f"STOP: master list ({meta.get('repo_head')}) and live tree ({HEAD}) disagree on {len(gate)}/{len(R)} rows"); [print(" ", *g) for g in gate[:60]]; sys.exit(2)

@@ -189,7 +189,7 @@ const FL=window.FL=(function(){
     drawSec(q,t){ctx.save();ctx.translate(q.x,q.y);
       if(q.kind==='spot'){ctx.globalCompositeOperation='lighter';ctx.globalAlpha=.22+.12*Math.sin(t*2.4);ctx.strokeStyle='#ffd23d';ctx.lineWidth=2;ctx.setLineDash([5,7]);ctx.beginPath();ctx.arc(0,0,q.r,0,7);ctx.stroke();ctx.setLineDash([]);
         G_(0,0,q.r*1.3,'#ffd23d',.12);ctx.globalAlpha=.5+.4*Math.sin(t*5);ctx.fillStyle='#ffd23d';ctx.fillRect(-2,-2,4,4);}
-      else{const fl=q.flash>0,on=Math.sin(t*9)>-.4||fl;ctx.globalAlpha=on?.95:.35;const r=q.r,col=fl?'#fff':'#ff2d95';ctx.globalCompositeOperation='lighter';G_(0,0,r*2,col,.2);ctx.globalCompositeOperation='source-over';
+      else{const fl=q.flash>0,on=Math.sin(t*9)>-.4||fl;ctx.globalAlpha=on?.95:.35;const r=q.r,col=fl?'#fff':'#ff2d95';try{if(ART.dflash('fl-secret',r*3,0,0,0,fl)){ctx.restore();return;}}catch(e){}ctx.globalCompositeOperation='lighter';G_(0,0,r*2,col,.2);ctx.globalCompositeOperation='source-over';
         ctx.fillStyle='#0a0612';ctx.strokeStyle=col;ctx.lineWidth=2;ctx.fillRect(-r,-r*.55,r*2,r*1.1);ctx.strokeRect(-r,-r*.55,r*2,r*1.1);ctx.beginPath();ctx.moveTo(-r*.5,-r*.2);ctx.lineTo(-r*.1,r*.2);ctx.lineTo(r*.2,-r*.2);ctx.lineTo(r*.5,r*.2);ctx.stroke();}
       ctx.restore();},
     drawMedal(m,t){ctx.save();ctx.translate(m.x,m.y);ctx.globalCompositeOperation='lighter';G_(0,0,m.r*2.4,'#ffd23d',.4+.2*Math.sin(t*6));ctx.globalCompositeOperation='source-over';

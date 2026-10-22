@@ -31,7 +31,7 @@ const RENDER = k => { const m = window.__mnr; m.G; for (let i = 0; i < k; i++) {
   const br = await PW.chromium.launch(), url = q => `http://127.0.0.1:${port}/index.html?nomusic=1&sim=1${q || ''}`;
   const open = async (q, vw) => { const c = await br.newContext({ viewport: vw || { width: 1280, height: 720 } }), p = await c.newPage(), errs = []; p.on('pageerror', e => errs.push(e.message));
     await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(url(q)); await p.waitForFunction(() => window.__mnr && __mnr.ART.rd && __mnr.ART.rd.size > 0, null, { timeout: 20000 });
-    await p.waitForFunction(() => ['einterceptor', 'ebomber', 'ecarrier', 'ecruiser', 'egunship', 'ekamikaze'].every(s => __mnr.ART.anim('ship-' + s + '/flame')), null, { timeout: 60000, polling: 200 }).catch(() => { });
+    await p.waitForFunction(() => Object.keys(__mnr.ART.ANIM.s).filter(k => /^ship-e[a-z]+\/(flame|death)$/.test(k)).map(k => __mnr.ART.anim(k)).every(Boolean), null, { timeout: 60000, polling: 200 }).catch(() => { });
     return { c, p, errs }; };
   const ids = await (async () => { const { c, p, errs } = await open(''); try {
     /* (a) coverage */

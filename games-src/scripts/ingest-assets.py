@@ -53,6 +53,18 @@ def expected():
             if k not in by['mainhattan-nightrun']:
                 by['mainhattan-nightrun'][k] = dict(id='mainhattan-nightrun:' + stem, slug='mainhattan-nightrun', kind='art', stem=stem, element=e.get('group', ''), save_as=e['file'],
                     repo_target=f"games/mainhattan-nightrun/media/{e['file']}", size=f"{e['w']}x{e['h']}", ratio='', transparent=e.get('kind') != 'fx' or e.get('bg') == 'white', tag='')       # fx: light on a black square stays RGB; bg 'white' (solid objects) is keyed to transparent
+    rg = 'games-src/nightrun/assets.registry.json'      # registry aliases/ids catch names the lists above do not know (ASSET-WIRING.md step 3)
+    if os.path.exists(rg):
+        for rec in json.load(open(rg, encoding='utf-8'))['records']:
+            sp = rec.get('spec') or {}
+            if rec.get('status') not in ('needs-art', 'generated', 'approved') or not (sp.get('w') and sp.get('h')): continue
+            names = [a.split(':')[-1] for a in rec.get('aliases', [])] + [rec['id'].split('.', 2)[-1]]
+            names += [n[5:] for n in names if n.startswith('code-')]
+            for stem in dict.fromkeys(names):
+                k = norm(stem)
+                if k in by['mainhattan-nightrun']: continue
+                by['mainhattan-nightrun'][k] = dict(id='mainhattan-nightrun:' + stem, slug='mainhattan-nightrun', kind='art', stem=stem, element=rec.get('screen', ''), save_as=stem + '.webp',
+                    repo_target=f'games/mainhattan-nightrun/media/{stem}.webp', size=f"{sp['w']}x{sp['h']}", ratio='', transparent=bool(sp.get('alpha', True)), tag='')
     return by
 
 class Out:
