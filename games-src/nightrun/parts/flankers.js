@@ -61,7 +61,7 @@ const FLK=window.FLK={get on(){return!!RET.flankers&&!!RET.anticamp;},HOLD:2,SHA
   drawTells(t){if(!this.tells.length)return;ctx.save();const pulse=SET.reduce?1:.6+.4*Math.sin(t*14);
     for(const q of this.tells){const fr=1-q.t/this.TELL,K=this.K[q.k];ctx.strokeStyle=K.col;ctx.fillStyle=K.col;ctx.globalAlpha=(.45+.5*fr)*pulse;ctx.lineWidth=2;ctx.setLineDash([8,10]);
       if(q.k==='diver'){const x=clamp(q.x,40,W*.4);ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(x-14,4);ctx.lineTo(x,26);ctx.lineTo(x+14,4);ctx.closePath();ctx.fill();}
-      else if(q.k==='crawler'){ctx.setLineDash([]);ctx.globalAlpha=(.2+.35*fr)*pulse;ctx.fillRect(0,0,6+10*fr,H);ctx.globalAlpha=(.45+.5*fr)*pulse;const y=q.up?H-26:26;ctx.beginPath();ctx.moveTo(4,y);ctx.lineTo(24,y+(q.up?16:-16));ctx.lineTo(24,y-(q.up?16:-16));ctx.closePath();ctx.fill();}
+      else if(q.k==='crawler'){ctx.globalAlpha=.3*pulse;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(6,0);ctx.lineTo(6,H);ctx.stroke();}
       else{ctx.setLineDash([]);ctx.beginPath();ctx.arc(q.bx,q.by,12+22*(1-fr),0,7);ctx.stroke();ctx.beginPath();ctx.arc(q.bx,q.by,5,0,7);ctx.fill();}}
     ctx.setLineDash([]);ctx.restore();}};
 function ebRoom(){return ebCap()-G.eb.length>=3;}

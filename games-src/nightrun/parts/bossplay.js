@@ -78,7 +78,7 @@ BPL.rage=(e,b,g,dt,sb)=>{const s=BPL.stat();if(!BPL.tier()&&!BPL.RE){b.rg=0;b.rt
   const bz=g&&g.up&&BPL.busy(e,g);if(bz)g.gr=(g.gr||0)+dt;const ign=g&&g.up&&(!bz||g.gr>(g.m==='parry'?BPL.GRP:BPL.GR)),fbw=g&&!g.up&&g.open&&G.t<g.open&&g.fbw;
   const rf=BPL.RFD[SET.diff]||[BPL.RF,BPL.RF2];if(ign)b.rg=(b.rg||0)+dt/(b.rt?rf[1]:rf[0]);else if(!fbw&&!(g&&g.up))b.rg=Math.max(0,(b.rg||0)-dt/rf[0]);
   if(b.rg>=1){b.rg=BPL.RB;b.rt=Math.min(BPL.rmax(),(b.rt|0)+1);s.bursts=(s.bursts|0)+1;s.rt=Math.max(s.rt|0,b.rt);const v=250+15*diff();
-    for(let i=0;i<3;i++)BPL.vol(e,BPL.fit?BPL.FIT.BN:5,0,v,Math.max(.6,sb*Math.ceil(.6/sb))+i*.3);floater(e.x,e.y-e.r-48,'ENRAGED '+b.rt,'#ff3d6e');AU.sfx('warn');}
+    for(let i=0;i<3;i++)BPL.vol(e,BPL.fit?BPL.FIT.BN:5,0,v,Math.max(.6,sb*Math.ceil(.6/sb))+i*.3);AU.sfx('warn');}
   if(!(b.rt>0)||!(ign||fbw)||e.bmS>e.bt)return;const k=b.rt>1?1:BPL.fit?BPL.FIT.VK[BPL.tier()]:BPL.tier()?2:4;if((e.bt|0)!==b.rb&&(e.bt|0)%k===0){b.rb=e.bt|0;BPL.vol(e,3,0,220+15*diff());s.vol=(s.vol|0)+1;}};
 /* tier 2 layers one bullet verb from the boss's own moveset (aimed / ring verbs only: no walls, so the free gap rules of each verb hold) */
 BPL.LAY=['tri_burst','split_shot','homing_orb','bounce_orbs','pulse_ring'];   // stateless verbs only (spiral_rev / spokes keep a spin state per slot)
