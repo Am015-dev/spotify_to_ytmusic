@@ -112,6 +112,7 @@ const SH={UPG,nk:NEON_K,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:
     if(this.sh>0){c.save();c.fillStyle='#19e3ff';c.font=`${Math.round(11*k)}px "Share Tech Mono",monospace`;c.fillText('SHIELD'+(this.sh>1?' ×'+this.sh:''),L.sx,L.sy);c.restore();}
     HUDLOG.sh=this.sh;HUDLOG.spare=this.spare;}
 };
+hookable('SH.volley',()=>SH.volley,f=>SH.volley=f);   // layers (build order): upgrades, up2, powerups, shapes, hard, powlevels (outermost)
 NR.on('kill',d=>SH.award(d.e));
 NR.on('districtEnd',()=>{if(SH.live){SH.neon+=5;SH.earned+=5;SH.flash=.5;}});
 NR.on('runStart',()=>{SH.live=true;SH.neon=0;SH.earned=0;const sd=shipDef();if(sd.id!=='std'&&G.live)G.note={t:4,txt:sd.n+' ready'};});

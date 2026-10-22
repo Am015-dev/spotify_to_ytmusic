@@ -24,10 +24,10 @@ for(const s of NEWSHIPS)SHIPS.push({id:s.id,n:s.n,t:s.t,p:s.p,ic:s.ic});
 const SHIPSHAPE={drift:[1,1.35,'#ffb020'],lancer:[1.4,.65,'#ff5a3d'],nova:[1.05,1.05,'#c08aff']};
 function shipPortrait(it){if(ART.shipN.includes(it.id)||ART.isReal('ship-'+it.id))return `<img class="shp" src="media/ship-${it.id}.webp" alt="" decoding="async">`;
   const ns=NEWSHIPS.find(s=>s.id===it.id),c=ns?ns.c:'#8c86b8';return `<span class="shp sh" style="color:${c}">${SVGW(`<path d="${it.ic}" fill="currentColor"/>`)}</span>`;}
-{const v0=SH.volley;SH.volley=function(x,y,pf){v0.call(this,x,y,pf);const s=this.ship;if(s!=='drift'&&s!=='lancer'&&s!=='nova')return;const n=SH._vn=(SH._vn||0)+1,dm=.55*(typeof tpDmg==='function'?tpDmg():1);
+HOOK['SH.volley'](v0=>function(x,y,pf){v0.call(this,x,y,pf);const s=this.ship;if(s!=='drift'&&s!=='lancer'&&s!=='nova')return;const n=SH._vn=(SH._vn||0)+1,dm=.55*(typeof tpDmg==='function'?tpDmg():1);
   if(s==='drift'){for(const a of[-280,-140,140,280])G.pb.push({x,y,vx:880,vy:a,dm,pf:0});}
   else if(s==='lancer'){if(n%2===0)G.pb.push({x:x+6,y,vx:820,vy:0,dm:4.2*(typeof tpDmg==='function'?tpDmg():1),pf,big:1,rad:9,px:new Set(),pn:2,col:'#ff5a3d',len:52,th:7});}
-  else if(s==='nova'){if(n%3===0)for(let i=0;i<8;i++){const a=i*Math.PI/4;G.pb.push({x,y,vx:Math.cos(a)*620,vy:Math.sin(a)*620,dm:dm*.9,pf:0,big:0});}}};}
+  else if(s==='nova'){if(n%3===0)for(let i=0;i<8;i++){const a=i*Math.PI/4;G.pb.push({x,y,vx:Math.cos(a)*620,vy:Math.sin(a)*620,dm:dm*.9,pf:0,big:0});}}});
 /* ----- boss chest: after every district boss, three face-down cards, pick one ----- */
 const chestEl=document.createElement('div');chestEl.id='chest';chestEl.className='ov solid';chestEl.hidden=true;stage.appendChild(chestEl);
 const CHEST_ON=()=>load('mnr_chest',1)!==0&&(!navigator.webdriver||/[?&]chest=1/.test(location.search));

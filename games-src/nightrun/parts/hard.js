@@ -30,7 +30,7 @@ const S3auto=b=>b&&b.au&&(b.tu||0)>.2;                           // a shot that 
   if(!b.au&&(b.hk||SH.hm)){b.au=1;const a=S2.ak();b.dm*=(b.hk?a:(1+a)/2)*S2.park();if(b.ck>1)b.dm/=b.ck;}   // round 2's cut; a homing shot drops its CRESCENDO bonus
   const sp=Math.hypot(b.vx,b.vy);let want=Math.atan2(t.y-b.y,t.x-b.x)-cur;want=Math.atan2(Math.sin(want),Math.cos(want));
   const tk=dt*2.2*k*.75,dv=clamp(want,-tk,tk),a=cur+dv;b.tu=(b.tu||0)+Math.abs(dv);b.vx=Math.cos(a)*sp;b.vy=Math.sin(a)*sp;};}
-{const vol=SH.volley;SH.volley=function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);const k=typeof PW2!=='undefined'&&PW2.cresK?PW2.cresK():1;if(k>1)for(let i=n0;i<G.pb.length;i++)G.pb[i].ck=k;};}
+HOOK['SH.volley'](vol=>function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);const k=typeof PW2!=='undefined'&&PW2.cresK?PW2.cresK():1;if(k>1)for(let i=n0;i<G.pb.length;i++)G.pb[i].ck=k;});
 /* every bullet hit (b.js passes the bullet and the enemy) and every weapon hit (WP.hurtE) is counted; arc and leap chains are auto-aim */
 {HOOK['DMG.hit'](h0=>function(d,b,e){let v=h0.call(this,d);S3.cur=null;const au=S3auto(b),boss=e&&e.type==='boss';
   if(au)S3.au+=v;else S3.man+=v;

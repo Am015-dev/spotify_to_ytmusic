@@ -45,8 +45,8 @@ const lvSide=()=>Math.min(4,SH.n('sc')+TP.l('sdc')),lvRear=()=>SH.n('rg'),lvPier
 const AX={od:0,odOn:0,odBeats:0,sw:0,asLeft:0,arcs:[],bd:[],lastBd:-1};
 {const rc=SH.recalc;SH.recalc=function(){rc.call(this);this.smk=1+.5*this.n('sm');this.smg=120*this.n('sm');this.lk=.03*this.n('lk');upsCalc();};}
 /* ----- bullets: piercing, ricochet, overdrive ----- */
-{const vol=SH.volley;SH.volley=function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);const pl=lvPierce(),rc=SH.n('rc'),od=AX.odOn>0;
-  for(let i=n0;i<G.pb.length;i++){const b=G.pb[i];if(pl&&!b.px){b.px=new Set();b.pn=pl;}if(rc)b.rc=rc;if(od){b.dm*=1.4;b.od=1;}if(this.ship==='syn'&&!b.big)b.big=1;}};}
+HOOK['SH.volley'](vol=>function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);const pl=lvPierce(),rc=SH.n('rc'),od=AX.odOn>0;
+  for(let i=n0;i<G.pb.length;i++){const b=G.pb[i];if(pl&&!b.px){b.px=new Set();b.pn=pl;}if(rc)b.rc=rc;if(od){b.dm*=1.4;b.od=1;}if(this.ship==='syn'&&!b.big)b.big=1;}});
 /* ----- what happens on every shot of the ship ----- */
 NR.on('fire',f=>{
   const sd=lvSide();if(sd){const dm=.55*tpDmg();for(let k=1;k<=sd;k++){const a=k*85;G.pb.push({x:f.x-6,y:f.y-13*k,vx:860,vy:-a,dm,pf:0,sc:1},{x:f.x-6,y:f.y+13*k,vx:860,vy:a,dm,pf:0,sc:1});}}

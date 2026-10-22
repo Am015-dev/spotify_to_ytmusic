@@ -81,7 +81,7 @@ if(RET.pw2){
     const a=PW2.act('cres');if(a){PW2.note(Math.min(7,(a.bars|0)+(G.bc%4>>1)),.16,.05+.012*Math.min(5,a.bars|0),'triangle',0,24+12*((a.bars|0)>=3?1:0));}});
   NR.on('bar',()=>{const a=PW2.act('cres');if(!a||G.dead||!G.live)return;a.bars=(a.bars|0)+1;if(a.bars<=5)floater(P.x,P.y-40,'×'+PW2.cresK().toFixed(2),PWK.cres.c);PW2.stat.cres=Math.max(PW2.stat.cres,a.bars);});
   NR.on('hurt',()=>{const a=PW2.act('cres');if(a)a.bars=0;});
-  {const vol=SH.volley;SH.volley=function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);const k=PW2.cresK();if(k>1)for(let i=n0;i<G.pb.length;i++)G.pb[i].dm*=k;};}
+  HOOK['SH.volley'](vol=>function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);const k=PW2.cresK();if(k>1)for(let i=n0;i<G.pb.length;i++)G.pb[i].dm*=k;});
   NR.on('runStart',()=>{PW2.seen=(()=>{try{return load('mnr_pw2seen',{})||{};}catch(e){return {};}})();});
   /* ----- drawing: icons, ghosts, drones, rings, shield ----- */
   {const gl=PW.glyph;PW.glyph=function(k,r,c){if(!PWK[k]||!PWK[k].pw2)return gl.call(this,k,r,c);

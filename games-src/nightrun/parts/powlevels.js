@@ -149,7 +149,7 @@ if(PW3.on){
     const gap=HARDS.includes(SET.diff)?PW3L.leech.hardGap:PW3L.leech.gap;
     if(S.lh>=1&&P.hp<P.max&&G.t-S.lhT>=gap){P.hp++;S.lh=0;S.lhT=G.t;PW3.stat.leech++;floater(P.x,P.y-24,'HULL +1',PWK.leech.c);burst(P.x,P.y,PWK.leech.c,14,200,.4);AU.sfx('pick');}});
   /* HEAVY CRATE and RICOCHET: shaped where the volley is made (same place CRESCENDO scales it) */
-  {const vol=SH.volley;SH.volley=function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);if(!PW3.on||!G.pw||G.pb.length<=n0)return;
+  HOOK['SH.volley'](vol=>function(x,y,pf){const n0=G.pb.length;vol.call(this,x,y,pf);if(!PW3.on||!G.pw||G.pb.length<=n0)return;
     const r=PW2.act('ric'),c=PW2.act('crate');
     if(r){const rc=PW3L.ric.rc[(r.l3||1)-1];for(let i=n0;i<G.pb.length;i++){const b=G.pb[i];if(!b.rc&&b.vx>0){b.rc=rc;PW3.stat.rb++;}}}   // b.js bounces a bullet off the top, bottom and right edge while b.rc>0
     if(c){const lv=c.l3||1,S=PW3.S();let sum=0;const keep=[];
@@ -157,7 +157,7 @@ if(PW3.on){
       if(sum>0){G.pb.length=n0;for(const b of keep)G.pb.push(b);S.bank+=sum;}
       if(S.bank>0&&(pf||G.t-S.crT>BT.spb*1.1)){const nb=PW3L.crate.nb[lv-1],tot=S.bank*PW3L.crate.k[lv-1],rad=PW3L.crate.rad[lv-1];S.bank=0;S.crT=G.t;
         for(let j=0;j<nb;j++){const a=(nb>1?j/(nb-1)-.5:0)*.34;G.pb.push({x:x+8,y,vx:Math.cos(a)*540,vy:Math.sin(a)*540,dm:tot/nb,pf:0,big:1,rad,px:new Set(),pn:PW3L.crate.pn[lv-1],col:PWK.crate.c,len:rad*2.4,th:rad*1.5});}
-        PW3.stat.heavy++;}}};}
+        PW3.stat.heavy++;}}});
   /* TIME SLICE: RET.asB is the enemy-bullet speed factor b.js already multiplies in */
   {const ab=RET.asB;RET.asB=function(){const f=ab.call(this);return PW3.on&&G&&G.p3&&G.pw?f*G.p3.sf:f;};}
   /* ----- drawing: icons, extra drones, rings, field, slice frame ----- */
