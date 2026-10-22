@@ -289,7 +289,7 @@ NR.on('runStart',()=>{FM.reset();});
 FM.swN=.3;
 {const aw=SH.award;SH.award=function(e,keep){if(!RET.vary||!e||!e.fid||e.type!=='swarm')return aw.call(this,e,keep);const k=this.nx;this.nx=k*FM.swN;try{return aw.call(this,e,keep);}finally{this.nx=k;}};}
 NR.on('beat',()=>{if(RET.vary)FM.tickTel();});
-{const dp=drawPickups;drawPickups=function(t){dp(t);try{FM.draw(t);}catch(err){}};}
+DRAW.extra.push(function(t){try{FM.draw(t);}catch(err){}});
 /* review 9 fix 3 (E04): on a phone the world is turned upright, so world x near W is the top of the screen, under the score strip, chips and boss bar (92 HUD units,
    HK scaled). Hovering enemies rest in zoo slots up to x = W-62, and pacing.js (STAY AND FIGHT) creeps a flyer at 0.3 speed from x = W-110 for 4 s; both now start no higher than band + radius. Flying in through the band is untouched. ?hudband=0 = as before. */
 const HB=window.HB={band(){return 92*HK;},maxX(r){return W-this.band()-(r||16)-4;},on(){return !!rotMode;}};

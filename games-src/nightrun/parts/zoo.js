@@ -241,7 +241,7 @@ const ZOO=window.ZOO={
     for(const id in this.T)DMG.ml[id]=this.T[id].ml;
     if(window.LEAK)for(const id in this.T)if(this.T[id].w)LEAK.W[id]=this.T[id].w;
     { const de=drawEnemy;drawEnemy=function(e,t){if(RET.zoo&&e.zt&&ZOO.T[e.type]){ZOO.art(e,t);return;}de(e,t);}; }
-    { const dp=drawPickups;drawPickups=function(t){dp(t);try{ZOO.over(t);}catch(err){}}; }
+    DRAW.extra.push(function(t){try{ZOO.over(t);}catch(err){}});
     { const so=DIR.spawnOne;DIR.spawnOne=function(fill){
         if(!RET.zoo||G.lab||G.tut)return so.call(this,fill);
         if(window.LEAK&&LEAK.gapOn())return so.call(this,fill);

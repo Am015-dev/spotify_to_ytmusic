@@ -206,7 +206,7 @@ if(RET.fleetArr===undefined)RET.fleetArr=/[?&]fleetarr=1/.test(location.search);
     if(RET.fleet&&RET.fleetArr)for(const e of G.en)if(e.fl&&FLEET.K[e.type]&&!e.dead&&e.tin!=null&&G.t-e.tin<FLEET.ARR){{const fl=e.max*(1-(G.t-e.tin)/FLEET.ARR);if(e.hp<fl)e.hp=e.hq=Math.min(e.max,fl);}e.shT=FLEET.ARR-(G.t-e.tin);}else if(e.shT)e.shT=0;
     return r;}; }
 { const de=drawEnemy;drawEnemy=function(e,t){if(RET.fleet&&e.fl&&FLEET.K[e.type]){FLEET.draw(e,t);return;}de(e,t);}; }
-{ const dp=drawPickups;drawPickups=function(t){dp(t);try{FLEET.over(t);}catch(err){}}; }
+DRAW.extra.push(function(t){try{FLEET.over(t);}catch(err){}});
 { const so=DIR.spawnOne;DIR.spawnOne=function(fill,k){   // outermost: a fleet wave replaces the wave; a busy screen goes to the zoo / pacing deferral inside
     if(!RET.fleet||fill||k||!FLEET.ok()||FLEET.busy())return so.apply(this,arguments);
     const n=FLEET.n(),p=FLEET.p(n);if(p<=0||GR()>=p)return so.apply(this,arguments);

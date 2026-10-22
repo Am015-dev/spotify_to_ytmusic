@@ -178,5 +178,5 @@ pat('snake',['ranks','flank'],.2,1,8,()=>{const y=FY(150,H-190);for(let i=0;i<7;
     ctx.globalCompositeOperation='lighter';G_(0,0,e.r*(1.1+.5*p),'#ffa02d',.4+.3*p);ctx.globalCompositeOperation='source-over';
     hpBar(-14,-e.r-9,28,e.hp/e.max);}
   ctx.restore();};
- const dp=drawPickups;drawPickups=function(t){dp(t);DIR.drawWarn(t);};}
+ DRAW.extra.push(function(t){DIR.drawWarn(t);});}
 NR.on('runStart',()=>{upsCalc();});

@@ -66,7 +66,7 @@ if(POL.on){
   /* the frame: the governor starts after the backdrop (drawPickups is the first world draw) and ends with the ship */
   {const rd=render;render=function(t,dt){gov(vctx);gov(wctx);if(POL.cl.length)POL.old=POL.cl;POL.cl=[];POL.def.length=0;POL.st.fr++;
     try{return rd.apply(this,arguments);}finally{POL.gov=false;POL.keep=0;POL.inP=0;POL.def.length=0;}};}
-  {const dp=drawPickups;drawPickups=function(t){POL.gov=!!running;return dp.apply(this,arguments);};}
+  DRAW.pre.push(function(t){POL.gov=!!running;});
   for(const [o,k] of [[window.TIM,'draw'],[window.ABIL,'draw'],[window.CTR,'draw']])if(o&&o[k]){const f=o[k];o[k]=function(){POL.keep++;try{return f.apply(this,arguments);}finally{POL.keep--;}};}   // the dash / EMP timing guides keep their look
   {const db=drawBoss;drawBoss=function(){POL.keep++;try{return db.apply(this,arguments);}finally{POL.keep--;}};}   // the boss body and its armour rings stay as drawn
   /* ---- 2. the ship on top: the hull sprite is recorded inside drawPlayer and drawn again, last ---- */

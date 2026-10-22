@@ -77,4 +77,4 @@ NR.on('kill',d=>{const e=d&&d.e;if(!AC.on||!G||!G.live||G.dead||!e||d.boss||e.ty
 if(window.MM){const w0=MM.win;MM.win=function(){const w=w0.call(this);return AC.on&&AC.soft()&&AC.lv<=.5?Math.max(w,6):w;};}   // Easy/Normal: the strike is a last resort after 6 s still
 {const h=DMG.hit;DMG.hit=function(d,b,e){const v=h.apply(this,arguments);if(!AC.on||!G||!G.live)return v;return v*AC.reachK(b,e);};}
 if(window.ABIL){const g0=ABIL.gain;ABIL.gain=function(v){return g0.call(this,AC.on?v*AC.payK():v);};}
-{const dp=drawPickups;drawPickups=function(t){dp(t);try{AC.draw(t);}catch(err){}};}
+DRAW.extra.push(function(t){try{AC.draw(t);}catch(err){}});

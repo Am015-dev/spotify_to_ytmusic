@@ -37,9 +37,9 @@ NR.on('tick',dt=>{if(!G.live)return;
 NR.on('beat',()=>{if(G.dead||!G.live)return;const B=STILL.beam;
   if(B){B.n++;if(B.n===(HARD?2:3)){B.fire=.3;AU.sfx('big');shake(5);}return;}
   if(STILL.t>STILLF()+.6&&G.bc>=STILL.nb&&!G.boss){STILL.beam={y:P.y,n:0,fire:0,hit:0,dmg:1+(STILL.k>=1?1:0)+(STILL.t>STILLF()+14?1:0)};STILL.nb=G.bc+(STILL.k>=1?2:HARD?3:6)-(STILL.k>=.5&&!HARD?1:0);/* standing still: the lane comes more often and hits harder the longer you stay */AU.sfx('warn');}});   // 3 beats of beam + the gap
-{const dp=drawPickups;drawPickups=function(t){dp(t);const B=STILL.beam;if(!B||G.dead)return;
+DRAW.extra.push(function(t){const B=STILL.beam;if(!B||G.dead)return;
   ctx.save();ctx.globalCompositeOperation='lighter';const lock=B.n>=(HARD?1:2),f=B.fire>0;
   if(f){ctx.globalAlpha=.95;ctx.fillStyle='#ffffff';ctx.fillRect(0,B.y-BEAM_Y*.5,W,BEAM_Y);ctx.globalAlpha=.5;ctx.fillStyle='#ff3050';ctx.fillRect(0,B.y-BEAM_Y,W,BEAM_Y*2);}
   else{const pulse=SET.reduce?1:Math.floor(t*(lock?18:8))%2?1:.6;ctx.globalAlpha=(lock?.9:.45)*pulse;ctx.strokeStyle=lock?'#ff3050':'#ff7080';ctx.lineWidth=lock?3:1.5;ctx.setLineDash(lock?[]:[14,10]);
     ctx.beginPath();ctx.moveTo(0,B.y);ctx.lineTo(W,B.y);ctx.stroke();ctx.setLineDash([]);if(lock){ctx.globalAlpha=.18*pulse;ctx.fillStyle='#ff3050';ctx.fillRect(0,B.y-BEAM_Y,W,BEAM_Y*2);}}
-  ctx.restore();};}
+  ctx.restore();});

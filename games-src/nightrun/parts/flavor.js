@@ -229,7 +229,7 @@ NR.on('bar',()=>{try{FL.bar();}catch(e){}});
 NR.on('beat',()=>{try{FL.beat();}catch(e){}});
 NR.on('bossIn',()=>{if(FL.s)FL.s.bossBar=G.dbar;FL.cap=[];FL.set=null;FL.sec=null;});
 NR.on('stageClear',()=>{if(RET.flavor&&ST.on)try{FL.clear();}catch(e){}});
-{const dp=drawPickups;drawPickups=function(t){dp(t);try{FL.back(t);}catch(e){}};}
+DRAW.extra.push(function(t){try{FL.back(t);}catch(e){}});
 {const pd=PW.draw;PW.draw=function(t){pd.call(this,t);try{FL.front(t);}catch(e){}};}
 {const rr=RET.resultRow;RET.resultRow=function(){let h=rr.apply(this,arguments);try{if(RET.flavor&&ST.on)h+=FL.rowHTML();}catch(e){}return h;};}
 /* ---- the Stats sheet (parts/stats.js) gets a SHOOTER FLAVOUR block when it exists; read defensively ---- */

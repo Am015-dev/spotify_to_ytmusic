@@ -117,7 +117,7 @@ NR.on('tick',dt=>{if(!TUT.on||!G.tut||!running)return;const s=TUT.cur();if(!s)re
 setInterval(()=>{const show=TUT.on&&running&&!paused;if(tutB.hidden===show)tutB.hidden=!show;tutB.classList.toggle('hid',!!WP.open);},150);
 {const d0=die;die=function(){if(G&&G.tut){P.hp=P.max;floater(P.x,P.y-40,'No worries','#3dffb0');return;}return d0.apply(this,arguments);};}
 /* ----- the glowing target, the ghost finger and the tame static warning (world layer) ----- */
-{const dp=drawPickups;drawPickups=function(t){dp(t);const s=TUT.cur();if(!s||!G.tut||!s.tgt||TUT.next)return;const g=s.tgt();if(!g)return;
+DRAW.extra.push(function(t){const s=TUT.cur();if(!s||!G.tut||!s.tgt||TUT.next)return;const g=s.tgt();if(!g)return;
   ctx.save();ctx.globalCompositeOperation='lighter';const pu=.5+.5*Math.sin(t*6);
   if(g.ring){ctx.strokeStyle='#19e3ff';ctx.lineWidth=5;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(g.x,g.y,g.r+4*pu,0,7);ctx.stroke();ctx.globalAlpha=.25;ctx.lineWidth=14;ctx.stroke();
     if(s.id==='move'&&s.k===0){const f=(t*.7)%1,x=P.x+(g.x-P.x)*f,y=P.y+(g.y-P.y)*f;ctx.globalAlpha=.8*(1-f);ctx.fillStyle='#ffffff';ctx.beginPath();ctx.arc(x,y,11,0,7);ctx.fill();   // the ghost finger slides to the first ring
@@ -125,7 +125,7 @@ setInterval(()=>{const show=TUT.on&&running&&!paused;if(tutB.hidden===show)tutB.
   else if(g.pulse){const ph=typeof PHF==='number'?PHF:0;ctx.strokeStyle='#ffe14d';ctx.lineWidth=3;ctx.globalAlpha=.9;ctx.beginPath();ctx.arc(g.x,g.y,g.r+40*ph,0,7);ctx.stroke();}   // the ring meets the ship on the beat
   else{ctx.strokeStyle=g.foe?'#ffe14d':'#3dffb0';ctx.lineWidth=3;ctx.globalAlpha=.6+.4*pu;ctx.setLineDash([10,7]);ctx.lineDashOffset=-t*30;ctx.beginPath();ctx.arc(g.x,g.y,g.r+3*pu,0,7);ctx.stroke();ctx.setLineDash([]);}
   if(s.id==='dodge'&&TUT.still>1.2){ctx.globalCompositeOperation='source-over';ctx.strokeStyle='#ff3050';ctx.globalAlpha=.7;ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.beginPath();ctx.arc(P.x,P.y,Math.max(20,60-TUT.still*10),0,7);ctx.stroke();ctx.setLineDash([]);}
-  ctx.restore();};}
+  ctx.restore();});
 /* ----- entries: title (help row), Settings, first launch ----- */
 setTimeout(()=>{if(!TUT_ON)return;
   const t2=document.getElementById('titleRow2'),b=document.createElement('button');b.type='button';b.className='go dim';b.id='tutBtn';b.textContent='FLIGHT SCHOOL';b.addEventListener('click',()=>startTut());

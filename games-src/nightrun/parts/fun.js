@@ -137,4 +137,4 @@ NR.on('runStart',()=>FUN.reset());NR.on('runEnd',()=>FUN.reset());
 NR.on('tick',dt=>FUN.tick(dt));NR.on('beat',()=>FUN.beat());
 NR.on('tier',({tier,why})=>{if(why==='drop'||!G.live||tier<2)return;FUN.shardShower(2+tier*2,P.x+260);if(tier>=3){shake(4);G.flash=Math.max(G.flash,.12*FX());}});   // every tier up pays out a few shards
 {const bl=DIR.barLine;DIR.barLine=function(i){bl.call(this,i);try{FUN.bar();}catch(e){}};}
-{const dp=drawPickups;drawPickups=function(t){dp(t);FUN.draw(t);};}
+DRAW.extra.push(function(t){FUN.draw(t);});

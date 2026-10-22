@@ -134,5 +134,5 @@ RX.over=function(t){if(!RX.on||!running)return;const mo=RET.motion?RET.motion():
     if(r.role==='bear'&&RX.ok(r.mate)){const a=Math.atan2(P.y-e.y,P.x-e.x);ctx.strokeStyle='#4ad1ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(e.x,e.y,e.r+8,a-.9,a+.9);ctx.stroke();ctx.lineWidth=2;}
     if(r.enr>0){ctx.strokeStyle=mo&&Math.sin(t*20)>0?'#ff3d6a':'rgba(255,61,106,.6)';ctx.beginPath();ctx.arc(e.x,e.y,e.r+2,0,6.283);ctx.stroke();}}
   ctx.restore();};
-{const dp=drawPickups;drawPickups=function(t){dp(t);try{RX.over(t);}catch(err){}};}
+DRAW.extra.push(function(t){try{RX.over(t);}catch(err){}});
 RX.spawn=(t,o)=>en(t,o);   // test hook (react-test)

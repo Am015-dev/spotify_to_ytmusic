@@ -84,8 +84,8 @@ NR.on('runEnd',d=>{if(!RET.cp)return;const e=chkBox();
    for(const p of CHK.plan)flag(px+pw*Math.min(1,p.bar/p.end),31,13,p.hit?'#19e3ff':'#ffe14d',2);ctx.restore();};
  const hudp=drawHUDP;drawHUDP=function(t){hudp(t);if(!RET.cp||!ST.on||!CHK.plan.length)return;
    ctx.save();const k=HK,w=PW_;for(const p of CHK.plan)flag(w*Math.min(1,p.bar/p.end),0,12*k,p.hit?'#19e3ff':'#ffe14d',2.5*k);ctx.restore();};
- const dpk=drawPickups;drawPickups=function(t){dpk(t);if(!RET.cp||!(CHK.gt>0)||G.dead||!running)return;
+ DRAW.extra.push(function(t){if(!RET.cp||!(CHK.gt>0)||G.dead||!running)return;
    const f=Math.min(1,CHK.gt/CHK.grace),pulse=SET.reduce?1:.75+.25*Math.sin(t*22);
    ctx.save();ctx.globalCompositeOperation='lighter';ctx.strokeStyle='#7df9ff';ctx.fillStyle='#7df9ff';
    ctx.globalAlpha=.16*f;ctx.beginPath();ctx.arc(P.x,P.y,34,0,7);ctx.fill();
-   ctx.globalAlpha=.85*pulse*Math.min(1,f*2.5);ctx.lineWidth=3;ctx.setLineDash([10,7]);ctx.lineDashOffset=-t*60;ctx.beginPath();ctx.arc(P.x,P.y,34,0,7);ctx.stroke();ctx.restore();};}
+   ctx.globalAlpha=.85*pulse*Math.min(1,f*2.5);ctx.lineWidth=3;ctx.setLineDash([10,7]);ctx.lineDashOffset=-t*60;ctx.beginPath();ctx.arc(P.x,P.y,34,0,7);ctx.stroke();ctx.restore();});}

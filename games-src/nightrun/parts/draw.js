@@ -123,7 +123,10 @@ function drawBossBody(e,t,fl,c){
   const a=aim(e);ctx.fillStyle='#fff';ctx.globalCompositeOperation='lighter';G_(Math.cos(a)*e.r*.3,Math.sin(a)*e.r*.3,e.r*(.6+.3*PUL),e.ph===3?'#ff3040':c,.95);ctx.globalCompositeOperation='source-over';
   ctx.font='700 11px "Chakra Petch",sans-serif';ctx.textAlign='center';ctx.fillStyle='#ffffffcc';wtxt(e.lbl||(e.k===2?'€':e.k===0?'ADLER':e.k===1?'':'K'),0,e.k===0?-e.r-6:4);}
 
-function drawPickups(t){ctx.globalCompositeOperation='lighter';for(const p of G.pk){if(p.t==='pw')continue;const y=p.y+Math.sin(p.bob)*3;
+// drawPickups = the world-overlay layer: DRAW.pre hooks (polish governor), the pickups, then DRAW.extra hooks in registration order
+// (build order of the parts; zoo registers at its first runStart, so it runs last). Layers register with one DRAW.extra.push(function(t){..}).
+const DRAW={pre:[],extra:[]};
+function drawPickups(t){for(const f of DRAW.pre)f(t);ctx.globalCompositeOperation='lighter';for(const p of G.pk){if(p.t==='pw')continue;const y=p.y+Math.sin(p.bob)*3;
     const col=RET.legible&&window.LGB?LGB.PK[p.t]:{shard:'#19e3ff',hp:'#3dffb0',up:RET.read?READ.UP:'#ff2d95',emp:'#ffb020'}[p.t];G_(p.x,y,p.t==='shard'?12:20,col,.8);}
   ctx.globalCompositeOperation='source-over';
   for(const p of G.pk){const y=p.y+Math.sin(p.bob)*3;if(p.t==='pw'){PW.pickup(p,y,t);continue;}ctx.save();ctx.translate(p.x,y);
@@ -131,7 +134,8 @@ function drawPickups(t){ctx.globalCompositeOperation='lighter';for(const p of G.
     if(p.t==='shard'){ctx.rotate(t*3);ctx.fillStyle='#dffbff';ctx.beginPath();ctx.moveTo(0,-6);ctx.lineTo(4,0);ctx.lineTo(0,6);ctx.lineTo(-4,0);ctx.fill();}
     else{ctx.fillStyle='#0a0612';ctx.strokeStyle=RET.legible&&window.LGB?LGB.PK[p.t]:{hp:'#3dffb0',up:RET.read?READ.UP:'#ff2d95',emp:'#ffb020'}[p.t];ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,10,0,7);ctx.fill();ctx.stroke();
       ctx.fillStyle=ctx.strokeStyle;ctx.font='700 12px "Chakra Petch",sans-serif';ctx.textAlign='center';wtxt({hp:'+',up:'P',emp:'E'}[p.t],0,4);}
-    ctx.restore();}}
+    ctx.restore();}
+  for(const f of DRAW.extra)f(t);}
 
 const PKA={shard:['pk-shard',13],hp:['pk-hp',18],up:['pk-up',26],emp:['pk-emp',26]};
 function pkPaint(p,t){const a=PKA[p.t];if(!a)return false;const o=ART.sp(a[0],a[1]);if(!o)return false;
