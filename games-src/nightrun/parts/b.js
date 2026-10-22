@@ -138,11 +138,13 @@ const DMG={on:true,soft:false,fk:.45,fkE:.5,cv:400,cvMax:470,ref:25,half:.5,ceil
 window.__dmg=DMG;
 NR.on('runStart',()=>{DMG.dps=0;DMG.k=1;});
 /* ---------- spawning ---------- */
+function enBase(type){const z=window.ZOO&&ZOO.T&&ZOO.T[type],f=window.FLEET&&FLEET.K&&FLEET.K[type],r=z||f;return r?{r:r.r||14,hp:r.hp||2,score:r.score||100}:{r:14,hp:2,score:100};}   // base row for kinds defined outside this table (zoo.js / fleet.js), so a plain en(kind) clone gets real stats
 function en(type,o){if(window.ROSTER)type=ROSTER.sub(type,o);const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
-  gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600},flank:{r:13,hp:3,score:180},swarm:{r:9,hp:1,score:60},mine:{r:15,hp:5,score:200}}[type];
+  gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600},flank:{r:13,hp:3,score:180},swarm:{r:9,hp:1,score:60},mine:{r:15,hp:5,score:200}}[type]||enBase(type);
   const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2,gr:DMG.on?1:0},base,o);e.hp=Math.max(1,Math.round(e.hp*(type==='swarm'?1:(1+TUNE2.hpD*(d-1))*(ST.on?ST.eh:1)*UPS.hp*AI.hpK()*(window.SC?SC.hpK():1))));
   if(!o.mini&&(type==='drone'||type==='charger'||type==='turret'||type==='flank')&&GX()<eliteP()){e.el=1;e.hp=Math.round(e.hp*2);e.r=Math.round(e.r*1.25);e.score*=2;}   // elites: tougher, gold ring, shoot more
   e.arm=e.bf===1&&type!=='charger';DIR.safe(e);if(window.VAR)VAR.apply(e,o);   // variants.js: class / orientation / tint
+  if(!isFinite(e.hp)||!isFinite(e.r)){const f=enBase(type);if(!isFinite(e.r))e.r=f.r;if(!isFinite(e.score))e.score=f.score;if(!isFinite(e.hp))e.hp=f.hp;if(!enBase.warned){enBase.warned=1;try{console.warn('nightrun: NaN enemy stats repaired for',type);}catch(_){}}}   // 22 Oct simhunt: clones of zoo/fleet kinds had NaN hp and could never die
   e.max=e.hp;e.by=e.y;G.en.push(e);if(DMG.on&&type!=='swarm'&&G.rings.length<24)G.rings.push({x:W-14,y:e.gy||e.y,l:.5,m:.5,c:'#ff3d6a'});   // spawn telegraph at the edge it comes in from
 if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);NR.emit('spawn',e);if(window.VAR&&VAR.pack)VAR.after(e,o);return e;}
 const WAVES={
