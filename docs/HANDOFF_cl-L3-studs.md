@@ -4,3 +4,7 @@
 - Neue Mainzer + Gutleut are outside the box in game coords (plan table used mirrored data x): 7 of 9 streets have trails.
 - Gate (flag OFF, built page): life1,xf1,terrain,why fra 34/35 (why/drive-start hint-pill 0x0, flag-off, not in known reds), ath 24/24.
 - Left: trail studs read thin head-on (disc edge-on); consider tilting/bigger scale; plaza stud count only 4.
+
+## Fix round (review #24)
+- Trail studs now 2.0 m coins, raised to 2.4 m, bob + spin about Y + gold glint pulse, offset 0.25 x road width (lane middle). why/studs adds a screen-space check (>= 5 studs 35-65 m ahead, each >= 6 px). Shot: docs/shots/cl-L3/studs-spawn-v2.png.
+- Head-on the receding coins still merge into an orange line (perspective); no 2K reference image was available for a side-by-side.
