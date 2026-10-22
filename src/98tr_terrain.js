@@ -190,7 +190,7 @@ function TR6_slope(){const r=TR6_rnd(77);let best={th:0};const S=TRN_roads().fil
   for(const q of S)for(let i=0;i<q.P.length-1;i+=3){const a=q.P[i],b=q.P[i+1],L=Math.hypot(b[0]-a[0],b[1]-a[1])||1,nx=-(b[1]-a[1])/L,nz=(b[0]-a[0])/L;
     for(const sd of[-1,1])for(const o of[6,12,18,25]){const x=a[0]+nx*sd*((q.hw||4)+o),z=a[1]+nz*sd*((q.hw||4)+o);if(ART7_rd(x,z)<1||rivClear(x,z)<8)continue;k++;const[gx,gz]=TR_grad(x,z,2),th=Math.atan(Math.hypot(gx,gz))*57.3;if(th>best.th)best={th:+th.toFixed(1),x:Math.round(x),z:Math.round(z)}}}
   best.n=k;return best}
-function TR6_pit(){const s=TR6_slope();if(!s.x)return{ok:true,why:'no slope'};roamWarp(s.x,s.z,0);RO.v=0;RO.t6n=0;const x0=RO.x,z0=RO.z,thr=CTL.thr;
+function TR6_pit(){const s=TR6_slope();if(!s.x)return{ok:true,why:'no slope'};roamWarp(s.x,s.z,0);RO.x=s.x;RO.z=s.z;RO.y=groundAt(s.x,s.z,99);RO.v=0;RO.t6n=0;RO.t6s=0;RO.t8a=null;/* flake-kill: same clean start as TR8_go (the unstick state an earlier GO of the batch left: t6s / t8a, a stale y) */K.ArrowUp=K.ArrowDown=K.ArrowLeft=K.ArrowRight=false;const x0=RO.x,z0=RO.z,thr=CTL.thr;
   try{for(let i=0;i<300;i++){CTL.thr=1;roamStep(1/30);if(RO.t6n&&TR8_onRoad(RO.x,RO.z))break}}finally{CTL.thr=thr}
   const q=cityAt(RO.x,RO.z),f=fillAt(RO.x,RO.z),onR=(q&&q.d<q.road.w/2+3)||(f&&f.d<f.r.w/2+3),mv=Math.hypot(RO.x-x0,RO.z-z0);return{ok:onR||mv>=20,onR:!!onR,mv:Math.round(mv),lifts:RO.t6n||0,s}}
 // terr-8 unstick GO: the 5 worst pits of docs/PIT_REVIEW per city; car put in the pit bottom, gas held 6 s of physics steps → must end on a road
