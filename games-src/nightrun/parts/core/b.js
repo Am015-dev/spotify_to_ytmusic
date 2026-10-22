@@ -328,7 +328,7 @@ function update(dt){
     else if(touch){const sk=SENS[SET.sens-1]||1.5,tx=touch.px+(touch.x-touch.sx)*sk,ty=touch.py+(touch.y-touch.sy)*sk;const ddx=tx-P.x,ddy=ty-P.y,l=Math.hypot(ddx,ddy);
       if(l>3){P.dx=ddx/l;P.dy=ddy/l;P.mvT=G.t;}const s=Math.min(l,520*pdt);if(l>0){P.x+=ddx/l*s;P.y+=ddy/l*s;}}
     else{const l=Math.hypot(mx,my)||1;P.x+=mx/l*300*pdt;P.y+=my/l*300*pdt;}
-    const cx=clamp(P.x,rotMode?64:24,W-60),cy=clamp(P.y,36,H-54);   // portrait keeps the ship above the tier meter
+    const cx=clamp(P.x,rotMode?64:(RET.bossfix!==false?44:24),W-60),cy=clamp(P.y,36,H-54);   // portrait keeps the ship above the tier meter
     if(touch){if(cx!==P.x||P.dashT>0){touch.sx=touch.x;touch.px=cx;}if(cy!==P.y||P.dashT>0){touch.sy=touch.y;touch.py=cy;}}   // finger past the edge: re-anchor, no dead zone
     P.x=cx;P.y=cy;
     P.tilt+=(clamp((P.y-py0)/(pdt*300||1),-1,1)*.25-P.tilt)*Math.min(1,dt*10);
