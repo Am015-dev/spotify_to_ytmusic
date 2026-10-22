@@ -73,13 +73,14 @@ const drive=dt=>{const m=BH.mode;BH.mT+=dt;keys();BH.gas=false;
 // ---------- detectors ----------
 const P={x:RO.x,y:RO.y,z:RO.z,v:RO.v},CP=new Map();let ovl=new Map(),belowN=0,stuckT=0,stuckOn=false;
 const detect=dt=>{const VL=BH.vl;BH.vl=null;const x=RO.x,y=RO.y,z=RO.z,foot=RO.foot&&RO.foot!=='car',busy=RO.frozen||RO.card||RO.mapOpen||RO.wk||state!=='roam';
- const mv=Math.hypot(x-P.x,z-P.z),warp=mv>12||BH.t-(BH.warp||-99)<1.5;if(mv>12)BH.warp=BH.t;
+ const mv=Math.hypot(x-P.x,z-P.z),warp=mv>12||BH.t-(BH.warp??-99)<1.5/* r22e26: 0 is a valid warp time (first episode); '||' dropped its 1.5 s grace and filed the spawn re-seed as npcPop */;if(mv>12)BH.warp=BH.t;
  if(!isFinite(x+y+z+RO.v+RO.h))add('nan','player NaN x/y/z/v/h',0,0,0);
  if(x<WX0+5||x>WX1-5||z<WZS+5||z>WZN-5)add('bounds','player out of the world box');
  if(!foot&&!busy){
   const g=groundY(x,z);if(y<g-1){if(++belowN===3)add('belowGround','car '+(g-y).toFixed(1)+' m under the ground line')}else belowN=0;
   if(!warp&&Math.abs(y-P.y)>2)add('yJump','car y jumped '+(y-P.y).toFixed(1)+' m in one step at '+Math.round(Math.abs(RO.v)*3.6)+' km/h');
-  if((RO.vy||0)>15)add('launch','car launched up at '+RO.vy.toFixed(0)+' m/s');
+  if((RO.vy||0)<=0)BH.rjOn=0;
+  if((RO.vy||0)>15&&(RO.crRJ||(RO.takeoff&&RO.takeoff.r))){if(!BH.rjOn){BH.rjOn=1;BH.cnt.rampJump=(BH.cnt.rampJump||0)+1}}else if((RO.vy||0)>15)add('launch','car launched up at '+RO.vy.toFixed(0)+' m/s'+(BH.vyw?' via '+BH.vyw:''),undefined,undefined,undefined,{lr:RO.takeoff&&RO.takeoff.r?{x:RO.takeoff.r.x,z:RO.takeoff.r.z,len:RO.takeoff.r.len,hgt:RO.takeoff.r.hgt,dk:RO.takeoff.r.dk,w:RO.takeoff.r.w,rw:RO.takeoff.r.__w}:RO.takeoff?'takeoff-no-r':null,nR:RO.ramps.length,rampV:RO.rampV,crRJ:RO.crRJ});
   const gs=warp?99:mv/dt;BH.km+=Math.min(mv,60)/1000;
   if(BH.gas){BH.gasT+=dt;if(gs<10/3.6)BH.slowT+=dt;if(gs<3/3.6){stuckT+=dt;if(stuckT>2&&!stuckOn){stuckOn=true;add('stuck','gas held, < 3 km/h for 2 s (mode '+BH.mode+')')}}else{stuckT=0;stuckOn=false}}else{stuckT=0;stuckOn=false}
   // contacts: a speed drop of > 6 m/s in one step without the brake
@@ -87,13 +88,14 @@ const detect=dt=>{const VL=BH.vl;BH.vl=null;const x=RO.x,y=RO.y,z=RO.z,foot=RO.f
   if(!warp&&dv>6&&!K.ArrowDown&&!(VL&&VL.f.some(f=>f.startsWith('roamWarp:')))){const c=nearAny(8),fx=Math.sin(RO.h),fz=Math.cos(RO.h),trafW=!!(VL&&VL.f.some(f=>/^(NC_|W10_|HT_)/.test(f)));/* r22e24: an NPC near the stop counts only when a traffic writer (NC_sep|W10_bump|HT_smash...) made the drop; no writer = stays invisible */
    if(c&&trafW){BH.hits.npc++}else{let b=null;for(const r of[0,1.5,2.5,3.5,-1.5]){try{b=roamHit(x+fx*r,z+fz*r,1.4,y)}catch(e){}if(b)break}if(!b){try{b=roamHit(P.x,P.z,1.4,P.y)}catch(e){}}
     if(b){BH.hits.world++}else{const g2=groundY(x+fx*3,z+fz*3);if(g2-y<.6){BH.hits.invisible++;const wk=VL?VL.f.slice(0,3).join(' < '):'(none: speed changed without a single drop write)';BH.why[wk]=(BH.why[wk]||0)+1;add('invisible','stopped by nothing: -'+(dv*3.6).toFixed(0)+' km/h in one step, no NPC, no collider, no slope ahead; reason '+wk,undefined,undefined,undefined,{why:VL?VL.f:null})}}}}}
- const NDG=(c,p)=>{const f=v=>typeof v==='number'?+v.toFixed(2):v;return{dg:{a:c.a,b:c.b,t:f(c.t),cv:f(c.cv),hh:f(c.hh),yo:f(c.yo),lr:[f(c.lrx),f(c.lrz)],route:!!c.route,tr:!!c.tr,hitT:f(c.hitT),deS:c.deS,hold:f(c.hold),fdt:f(c.fdt),dx:p?f(c.x-p.x):null,dz:p?f(c.z-p.z):null,p:p?{a:p.a,b:p.b,t:f(p.t),cv:f(p.cv),hh:f(p.hh),yo:f(p.yo),lr:[f(p.lrx),f(p.lrz)],mx:f(p.mx),mz:f(p.mz),dead:f(p.dead)}:null,act:BH.act}}};
+ const NDG=(c,p)=>{const f=v=>typeof v==='number'?+v.toFixed(2):v;return{dg:{aw:c.__aw,a:c.a,b:c.b,t:f(c.t),cv:f(c.cv),hh:f(c.hh),yo:f(c.yo),lr:[f(c.lrx),f(c.lrz)],route:!!c.route,tr:!!c.tr,hitT:f(c.hitT),deS:c.deS,hold:f(c.hold),fdt:f(c.fdt),dx:p?f(c.x-p.x):null,dz:p?f(c.z-p.z):null,p:p?{a:p.a,b:p.b,t:f(p.t),cv:f(p.cv),hh:f(p.hh),yo:f(p.yo),lr:[f(p.lrx),f(p.lrz)],mx:f(p.mx),mz:f(p.mz),dead:f(p.dead)}:null,act:BH.act}}};
  // stuck ladder / UNSTUCK cells (ath-trap-r22e14): where the ladder fires, so the trap geometry can be found
  try{const S=SKH.cnt;for(const k of['rev','lift']){const n=S[k]|0,o=BH['skh_'+k]??n;if(n>o)k==='lift'?add('skh_lift','stuck ladder lift (from here)',P.x,P.z,P.y):add('skh_rev','stuck ladder reverse-assist');BH['skh_'+k]=n}}catch(e){}
  if(BH.borP){BH.borP=0;if(mv>12)add('liftFrom','BACK ON THE ROAD lifted from here',P.x,P.z,P.y)}
  // NPC cars
  const cf=(()=>{try{const d=new THREE.Vector3();camera.getWorldDirection(d);return[camera.position.x,camera.position.z,d.x,d.z]}catch(e){return[x,z,Math.sin(RO.h),Math.cos(RO.h)]}})();
- for(const c of HUB.cars){if(!isFinite(c.x+c.z)){add('nan','NPC car NaN',x,z,y);continue}const dd=Math.hypot(c.x-x,c.z-z);const p=CP.get(c),alive=!(c.dead>0)&&!c.pk;
+ for(const c of HUB.cars){if(BH.trace&&!c.__ta){c.__ta=1;let _a=c.a;Object.defineProperty(c,'a',{configurable:true,enumerable:true,get(){return _a},set(n){if(n!==_a)c.__aw=new Error().stack.split('\n').slice(2,6).map(l=>l.trim().replace(/^at /,'').slice(0,70)).join(' < ');_a=n}})}   // --trace: who wrote the car's node last
+  if(!isFinite(c.x+c.z)){add('nan','NPC car NaN',x,z,y);continue}const dd=Math.hypot(c.x-x,c.z-z);const p=CP.get(c),alive=!(c.dead>0)&&!c.pk;
   if(alive&&dd<60&&!warp){const vx=c.x-cf[0],vz=c.z-cf[1],vd=Math.hypot(vx,vz)||1,view=(vx*cf[2]+vz*cf[3])/vd>.64&&vd>6;
    if(view&&(!p||!p.alive||Math.hypot(c.x-p.x,c.z-p.z)>6))add('npcPop',p&&p.alive?'NPC jumped '+Math.hypot(c.x-p.x,c.z-p.z).toFixed(0)+' m in one step, '+dd.toFixed(0)+' m away in view':'NPC appeared '+dd.toFixed(0)+' m away in view',c.x,c.z,c.y,NDG(c,p));
    // traffic-in-view-r22e15: sideways = the step measured against the car's last step of motion (velocity direction, else its lane edge A->B) AND its pose heading; c.hh is the DRAWN heading
@@ -141,7 +143,7 @@ async function cityRun(b,base,city,simTarget,wallEnd,pageNo){const ctx=await b.n
  await p.addInitScript(()=>{window.__dbg=1});p.on('pageerror',e=>errs.push(String(e).slice(0,160)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,160))});
  const tb=Date.now();await p.goto(base+'?test='+city+'&draw=0'+(arg('q','')?'&'+arg('q'):''));await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:250,timeout:420000});const boot=(Date.now()-tb)/1000;
  const ev=s=>p.evaluate(c=>__oc.ev(c),s);if(await ev('1')!==1)throw new Error('__oc.ev disabled (needs window.__dbg)');
- await ev(HUNTER);await p.waitForTimeout(400);   // let the pending real rAF land in the captured queue
+ await ev(HUNTER);if(arg('trace',false))await ev('__BH.trace=1;{const _ar=addRamp;addRamp=function(){const n=RO.ramps.length,r=_ar.apply(this,arguments);for(let i=n;i<RO.ramps.length;i++)RO.ramps[i].__w=new Error().stack.split("\\n").slice(2,7).map(l=>l.trim().replace(/^at /,"").replace(/http\\S+:(\\d+):(\\d+)/,"L$1")).join(" < ");return r}}{let _y=RO.vy;Object.defineProperty(RO,"vy",{configurable:true,enumerable:true,get(){return _y},set(n){if(n>15&&_y<=15)__BH.vyw=new Error().stack.split("\\n").slice(2,6).map(l=>l.trim().replace(/^at /,"").slice(0,70)).join(" < ");_y=n}})}0');await p.waitForTimeout(400);   // let the pending real rAF land in the captured queue
  const epLen=Math.max(120,+arg('ep',600));let ep=0,sim=0,steps=0,tapRes=[];const seed0=1+pageNo*1000+(city==='ath'?500:0)+(+arg('seed0',0)||0);
  if(!NOTAP&&pageNo===0){try{tapRes=await taps(p)}catch(e){tapRes=[['touch taps ran',false,String(e).slice(0,80)]]}}
  while(sim<simTarget&&Date.now()<wallEnd){await ev(`__BH.episode(${seed0+ep},${DT});0`);ep++;let e=0;
@@ -171,6 +173,7 @@ async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const 
   for(const d in LIMIT){const n=d==='frustration'?C.frustration:(C.cnt[d]||0),ph=d==='frustration'?n:n/h,abs=['nan','bounds','jsErr','belowGround','yJump','launch','deadButton'].includes(d);C.perH[d]=+ph.toFixed(2);
    const ok=abs?n<=LIMIT[d]:ph<=LIMIT[d];if(!ok)fails++;lines.push(`${ok?'PASS':'FAIL'} ${d} ${city} ${d==='frustration'?n.toFixed(1)+' % of gas time under 10 km/h':n+' hits = '+ph.toFixed(1)+'/h'} (limit ${LIMIT[d]}${d==='frustration'?' %':abs?' total':'/h'})`)}
   lines.push(`INFO ${city} npc sideways by the old c.hh reading ${C.cnt.npcLatHH||0} vs step-velocity ${C.cnt.npcLateral||0}`);lines.push(`INFO ${city} sim ${(C.t/60).toFixed(1)} min (${(C.t/3600).toFixed(2)} of ${HOURS} h target) · ${C.km.toFixed(1)} km · ${C.steps} steps @ dt ${DT} · ${C.episodes} seeds · contacts/km npc ${(C.hits.npc/Math.max(C.km,.1)).toFixed(2)} world ${(C.hits.world/Math.max(C.km,.1)).toFixed(2)} invisible ${(C.hits.invisible/Math.max(C.km,.1)).toFixed(2)} · boot ${C.boot.map(x=>x.toFixed(0)).join('/')} s`);
+  lines.push(`INFO ${city} ramp / AIR TIME kicker jumps ${C.cnt.rampJump|0} (intended; a launch with no ramp under it is the 'launch' detector)`);
   {const sk=C.skh.reduce((a,q)=>a+((q&&q.rev)|0)+((q&&q.lift)|0),0),un=C.msgs.UNSTUCK|0,bo=C.cnt.backOnRoad|0;lines.push(`INFO trap ${city} ladder ${(sk/h).toFixed(1)}/h · UNSTUCK ${(un/h).toFixed(1)}/h · BACK ON THE ROAD ${(bo/h).toFixed(1)}/h · sum ${((sk+un+bo)/h).toFixed(1)}/h`)}
   {const by={},wy={};for(const k in C.sl){const[m,w]=k.split('|');by[m]=(by[m]||0)+C.sl[k];wy[w]=(wy[w]||0)+C.sl[k]}lines.push(`INFO slope ${city} slides ${C.cnt.slopeSlide|0} = ${((C.cnt.slopeSlide|0)/h).toFixed(1)}/h · per mode `+Object.keys(by).sort().map(m=>`${m||'-'} ${by[m]} (${(by[m]/Math.max(C.mT[m]||1,1)*3600).toFixed(0)}/mode-h)`).join(', ')+` · by clamp `+Object.entries(wy).map(([w,n])=>w+' '+n).join(', ')+` · wallClimb ${C.cnt.wallClimb|0} · yJump ${C.cnt.yJump|0} · belowGround ${C.cnt.belowGround|0}`)}
   for(const[k,n]of Object.entries(C.why).sort((x,y)=>y[1]-x[1]).slice(0,8))lines.push(`INFO invisible ${city} ${n}x (${(n/h).toFixed(1)}/h) ${k}`);
