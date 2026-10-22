@@ -19,7 +19,7 @@ const PIC={scrate:'sc-crate',gold:'sc-crate',barrel:'sc-barrel',kiosk:'sc-vendin
 const pic=n=>{const fa=window.FA;const q=fa&&fa._pic?fa._pic('foot/'+n+'.webp'):null;return q&&q.width?q:null;};
 function propDraw(p){return function(c,K,at){at(c,p.x,p.y,K);const fl=p.fl>0;let ok=false;
   if(p.k==='gold'){c.fillStyle='#ffd23a';c.globalAlpha=.22+.12*Math.sin(F.S.time*5);c.beginPath();c.ellipse(p.x,p.y-p.w*.45,p.w*.85,p.w*.7,0,0,6.283);c.fill();c.globalAlpha=1;}
-  if(p.k==='car'&&typeof ART!=='undefined'&&ART.ANIM&&ART.ANIM.s){const k='prop-car/loop',m=ART.ANIM.s[k];if(m&&ART.anim(k)){const h=p.w*m[3]/m[2];ART.drawAnim(c,k,0,p.x,p.y-h/2,h/m[3],false,1);ok=true;}}
+  if(p.k==='car'&&typeof ART!=='undefined'&&ART.ANIM&&ART.ANIM.s){const k='prop-car/loop',m=ART.ANIM.s[k];if(m&&ART.anim(k)){const h=p.w*m[3]/m[2];ART.drawAnim(c,k,0,p.x,p.y-h/2+(RET.feel?h*.09:0),h/m[3],false,1);ok=true;}}
   else{const q=pic(PIC[p.k]);if(q){const h=p.k==='barrel'?p.h:p.k==='kiosk'?p.h*1.05:p.k==='post'?p.h:p.w,w=h*q.width/q.height;c.drawImage(q,p.x-w/2,p.y-h,w,h);ok=true;}}
   if(!ok){c.fillStyle=p.c;c.fillRect(p.x-p.w/2,p.y-p.h,p.w,p.h);}
   if(p.k==='barrel'){c.fillStyle='#ff3040';c.globalAlpha=.25+.2*Math.sin(F.S.time*8);c.beginPath();c.arc(p.x,p.y-p.h*.5,p.w*.8,0,6.283);c.fill();c.globalAlpha=1;}

@@ -128,7 +128,7 @@ const env={get P(){return S.P;},get G(){return S.G||envG();},get D(){return S.D;
   spawn(t,x,y,o){if(!S||S.E.filter(e=>!e.dead).length>=16)return null;const e=spawn(t,x,y);e.lock=S.lock&&S.lock.id;return e;},
   shoot(e,a,spd,dmg,o){if(!S||S.dead)return;if(e.x<S.camX-10||e.x>S.camX+viewW()+10)return;   // never from off-screen
     if(e.ext){if(S.eb.length>=EBMAX||e.grace>0)return;o=o||{};const sp=(spd||300)*S.D.bs*((RET.asB&&RET.asB())||1),r=o.w||o.h?Math.max(4,Math.min(16,Math.max(o.w||0,o.h||0)/2)):6;
-      const sx=o.ox!=null?o.ox:e.x+e.facing*e.w*.45,sy=o.ground?FL-8:(o.oy!=null?o.oy:e.y-e.h*.62);
+      const mz=F.emz&&!o.ground&&F.emz(e,a),sx=mz?mz[0]:o.ox!=null?o.ox:e.x+e.facing*e.w*.45,sy=o.ground?FL-8:mz?mz[1]:(o.oy!=null?o.oy:e.y-e.h*.62);
       S.eb.push({x:sx,y:sy,vx:o.vx!=null?o.vx:Math.cos(a)*sp,vy:o.ground?0:Math.sin(a)*sp,r,dmg:dmg||1,life:o.life||4,grav:!!o.grav,src:e.id,c:o.kind==='sniper'?'#e8ff40':o.kind==='shock'||o.kind==='shockline'?'#7df9ff':'#ff4a6a',ground:!!o.ground});return;}
     if(S.q.length>=Math.round(QMAX*S.D.fr)&&!(o&&o.must))return;
     const t=Math.max(TELE,(o&&o.tele)||0)+Math.max(0,e.grace||0);e.tele=Math.max(e.tele,t);
@@ -169,7 +169,7 @@ function autoTarget(P){const up=I.u||I.y<-.5,vw=viewW(),fc=P.facing;
   for(const e of S.E){if(e.dead||!e.seen||!hittable(e))continue;const dx=(e.x-P.x)*fc;if(Math.abs(e.x-P.x)>vw)continue;if(dx>-20||(up&&Math.abs(e.x-P.x)<260&&e.y-e.h/2<P.y-70))return true;}
   for(const p of S.pr){if(p.hp<=0)continue;const dx=(p.x-P.x)*fc;if(dx>10&&dx<300&&p.x>S.camX&&p.x<S.camX+vw&&(p.y>=FL-1||up))return true;}
   return false;}
-function fire(P){const s=wstat(P.w,P.lv),w=s.w,lv=P.lv,a0=aimAngle(P),a=P.aim=aimAssist(P,a0,P.x,P.y-(P.crouch?26:44)),ox=P.x+Math.cos(a)*18,oy=P.y-(P.crouch?26:44)+Math.sin(a)*14;
+function fire(P){const s=wstat(P.w,P.lv),w=s.w,lv=P.lv,a0=aimAngle(P),a1=aimAssist(P,a0,P.x,P.y-(P.crouch?26:44)),a=P.aim=F.aimX?F.aimX(P,a1,a0):a1,ox0=P.x+Math.cos(a)*18,oy0=P.y-(P.crouch?26:44)+Math.sin(a)*14,mz=F.mz&&F.mz(P,a),ox=mz?mz[0]:ox0,oy=mz?mz[1]:oy0;   // streetfeel.js: from the drawn gun's muzzle
   S.shots++;P.shotT=.12;const pr=(t)=>({x:ox,y:oy,wid:P.w,dmg:s.dmg,kind:w.kind,life:w.life||1.2,c:w.c,r:4,pierce:0,hit:[],t:0,...t});
   if(w.kind==='bul'){const sp=(w.spr||0)*(1-.12*(lv-1)),n=(P.w==='hmg'&&lv>=5)?2:(P.w==='pistol'&&lv>=3?2:1);
     for(let i=0;i<n;i++){const aa=a+ftRnd(-sp,sp)+(n>1?(i-.5)*.08:0);S.pb.push(pr({vx:Math.cos(aa)*w.spd,vy:Math.sin(aa)*w.spd,pierce:(P.w==='hmg'&&lv>=3)?1:0}));}}
