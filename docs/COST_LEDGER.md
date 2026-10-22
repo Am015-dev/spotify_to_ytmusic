@@ -97,3 +97,7 @@ Model and status come from the session list. Cost is blank: the session list doe
 | invisible-stops-r22e19 | — | Sonnet | bughunt names the clamp per stop; traffic contacts no longer "invisible" | #50 PASS (tool), small nearAny fix queued |
 | no-card-without-tap-r22e20 | beta.154 | Sonnet | toasts + TAP TO START while driving | #51 FAIL, #53 PASS, shipped |
 | smash-look-r22e22 | beta.154 | Opus | 2K-style smash burst, ?cl=smash ON fra | #52 PASS, shipped |
+| frame-js-r22e21 | beta.155 | Opus | HUD :has restyle per frame removed: phone median -28/-34 % | #54 PASS, shipped |
+| roamcard-quiet-r22e23 | beta.155 | Sonnet | marker chips instead of auto cards | #55 PASS, shipped (follow-ups: OG_ask vs RQ overlap, doubled flight icon) |
+| bughunt-phone-r22e24 | beta.155 (tool) | Sonnet | bughunt phone profile + --gate | #56 pending |
+| reviews 50-55 | beta.154/155 | Opus | 6 reviews | done |
