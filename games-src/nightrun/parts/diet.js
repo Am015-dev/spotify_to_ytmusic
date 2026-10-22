@@ -79,7 +79,8 @@ if(DIET.on){
     const short=h*Math.max(.2,frame.clientWidth/w)<800;
     if(G.boss&&G.boss.x<W){const b=G.boss,bw=Math.min(330,w-120),by=sH+8*k,bh=6*k;ctx.fillStyle='#00000088';ctx.fillRect((w-bw)/2,by,bw,bh);ctx.fillStyle='#ff3040';ctx.fillRect((w-bw)/2,by,bw*clamp(b.hp/b.max,0,1),bh);}
     buttons();
-    if(G.note.t>0&&G.note.txt){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
+    /* short phone: the now-playing line is skipped (it pushed hud-cover to 21.2%); RESUMED notes stay */
+    if(G.note.t>0&&G.note.txt&&!((short||innerHeight<600)&&/^\u266a/.test(G.note.txt))){ctx.globalAlpha=clamp(G.note.t,0,1);ctx.textAlign='right';ctx.font=`${12*k}px "Share Tech Mono",monospace`;ctx.fillStyle='#c9c4ec';ctx.fillText(G.note.txt,w-14,h-70*k);ctx.globalAlpha=1;}
     if(window.HINT&&HINT.on())HINT.draw(ctx,{W:w,H:h,mode:'port',cpu:Math.max(.2,frame.clientWidth/w),top:short?h*.8+4:(G.boss&&G.boss.x<W?80:62)*k,x0:6,x1:w-6,ship:{x:P.y,y:PH_-P.x},acc:D.a});
     else if(G.hint.t>0&&G.hint.txt&&G.banner.t<=0){ctx.globalAlpha=clamp(G.hint.t,0,1);hintDraw(w/2,h-170*k,17*k,k,w,28*k,44*k);ctx.globalAlpha=1;}
     banner(t,w,h,k);ctx.restore();};

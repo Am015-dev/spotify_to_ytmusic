@@ -3,12 +3,13 @@
 // (runs with ?school=0 = the old TRAINING sheet; the school list has its own school-test.js)
 // one header everywhere (back arrow, title, Neon), nothing overlapping, no page errors, ?hub=0 = the old title + MENU sheet. Headless, no screenshots.
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/hub-test.js     env: GAME_DIR=...
+//   SMOKE=1: fast gate: every screen and every feature is still checked, but at 390x763 only (the nightly run keeps all 4 sizes and 375x553 features)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const res = [], ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' : 'FAIL ') + n + (p || i == null ? '' : ' :: ' + i)); };
-const SIZES = [[390, 763], [375, 553], [763, 390], [1366, 768]];
+const SMOKE = !!process.env.SMOKE, SIZES = SMOKE ? [[390, 763]] : [[390, 763], [375, 553], [763, 390], [1366, 768]];
 // [feature, home tile, door selector on the 2nd screen, check after the 2nd tap]
 const VIS = s => { const e = document.querySelector(s); if (!e) return false; for (let x = e; x && x !== document.body; x = x.parentElement) { if (x.hidden) return false; const c = getComputedStyle(x); if (c.display === 'none' || c.visibility === 'hidden') return false; } return true; };
 const F = [
@@ -23,12 +24,12 @@ const F = [
   ['hangar: forge', '#hub_hangar', '#garage .tabs [data-t=forge]', '__hubTab()==="forge"'],
   ['hangar: pilot class', '#hub_hangar', '#garage .tabs [data-t=pilot]', '__hubTab()==="pilot"'],
   ['hangar: upgrades', '#hub_hangar', '#garage .tabs [data-t=tune]', '__hubTab()==="tune"'],
-  ['hangar: ability', '#hub_hangar', '#garage .tabs [data-t=abil]', '__hubTab()==="abil"'],
-  ['hangar: crew', '#hub_hangar', '#garage .tabs [data-t=crew]', '__hubTab()==="crew"'],
-  ['hangar: looks', '#hub_hangar', '#garage .tabs [data-t=looks]', '__hubTab()==="looks"'],
-  ['hangar: load', '#hub_hangar', '#garage .tabs [data-t=load]', '__hubTab()==="load"'],
-  ['hangar: shop', '#hub_hangar', '#garage .tabs [data-t=mkt]', '__hubTab()==="mkt"'],
-  ['weapon pick', '#hub_hangar', '#hubWpPick', 'VIS("#wpm")'],
+  ['hangar: ability', '#hub_hangar', '#mfMore|#mfI_abil', '__hubTab()==="abil"'],
+  ['hangar: crew', '#hub_hangar', '#mfMore|#mfI_crew', '__hubTab()==="crew"'],
+  ['hangar: looks', '#hub_hangar', '#mfMore|#mfI_looks', '__hubTab()==="looks"'],
+  ['hangar: load', '#hub_hangar', '#mfMore|#mfI_load', '__hubTab()==="load"'],
+  ['hangar: shop', '#hub_hangar', '#mfMore|#mfI_mkt', '__hubTab()==="mkt"'],
+  ['weapon pick', '#hub_hangar', '#mfMore|#mfI_pick', 'VIS("#wpm")'],
   ['flight school', '#hub_training', '[data-door="#tutBtn"]', 'document.getElementById("title").hidden'],
   ['lessons', '#hub_training', '[data-door="#lsBtn"]', 'VIS("#lsC")'],
   ['practice', '#hub_training', '.hubAct:nth-child(3)', 'VIS("#stsel")'],
@@ -65,9 +66,9 @@ const AUD = (root) => {
     await p.addInitScript(() => { try { if (!sessionStorage.getItem('__ini')) { sessionStorage.setItem('__ini', '1'); localStorage.setItem('mnr_tut', '1'); } } catch (e) { } });
     if (init) await p.addInitScript(init);
     await p.goto(`http://127.0.0.1:${port}/index.html${q ? q + '&school=0' : '?school=0'}`); await p.waitForFunction(() => window.__mnr && window.RET && document.documentElement.classList.contains('rdy'), null, { timeout: 9000 }); await sleep(300);
-    await p.evaluate(`window.VIS=${VIS.toString()};window.__hubTab=()=>{const b=document.querySelector('#garage .tabs button.on');return b&&b.dataset.t;}`); return p; };
+    await p.evaluate(`window.VIS=${VIS.toString()};window.__hubTab=()=>{const b=document.querySelector('#garage .tabs button.on[data-t]');return b&&b.dataset.t;}`); return p; };
   let taps = 0;
-  const tap = async (p, sel) => { const l = p.locator(sel).first(); await l.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => { }); const b = await l.boundingBox(); if (!b) throw new Error('not on screen: ' + sel); await p.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2); taps++; await sleep(350); };
+  const tap = async (p, sel) => { const l = p.locator(sel).first(); await l.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => { }); const b = await l.boundingBox(); if (!b) throw new Error('not on screen: ' + sel); await p.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2); taps++; await sleep(SMOKE ? 250 : 350); };
   for (const [w, h] of SIZES) {
     const tag = ` ${w}x${h}`;
     // ---- HOME ----
@@ -93,8 +94,8 @@ const AUD = (root) => {
     await p.context().close();
     if (w > 400 && w !== 763) continue;
     // ---- the other screens a section opens share the header ----
-    for (const [name, tile, door, root] of [['settings', '#hub_profile', '.hubAct:nth-child(4)', '#setm'], ['stage map', '#hub_missions', '[data-door="#storyBtn"]', '#stsel'], ['story log', '#hub_profile', '.hubAct:nth-child(3)', '#sgLog,#taleLog'], ['stats', '#hub_profile', '[data-door="#statsBtn"]', '#stSheet'], ['weapon pick', '#hub_hangar', '#hubWpPick', '#wpm']]) {
-      p = await open(w, h); await tap(p, tile); await tap(p, tile === '#hub_hangar' ? door : tile + 'Scr ' + door); await sleep(300);
+    for (const [name, tile, door, root] of [['settings', '#hub_profile', '.hubAct:nth-child(4)', '#setm'], ['stage map', '#hub_missions', '[data-door="#storyBtn"]', '#stsel'], ['story log', '#hub_profile', '.hubAct:nth-child(3)', '#sgLog,#taleLog'], ['stats', '#hub_profile', '[data-door="#statsBtn"]', '#stSheet'], ['weapon pick', '#hub_hangar', '#mfMore|#mfI_pick', '#wpm']]) {
+      p = await open(w, h); await tap(p, tile); for (const d of door.split('|')) await tap(p, tile === '#hub_hangar' ? d : tile + 'Scr ' + d); await sleep(300);
       if (root === '#stSheet') await p.evaluate(() => { const s = document.getElementById('stSheet'); s.scrollTop = 0; });
       const a = await p.evaluate(AUD, root);
       ok(`${name}: same header (back arrow, title, Neon)` + tag, a.hd, JSON.stringify(a));
@@ -102,11 +103,12 @@ const AUD = (root) => {
     }
   }
   // ---- every feature within 2 taps (phone) ----
-  for (const [w, h] of [[390, 763], [375, 553]]) {
+  for (const [w, h] of SMOKE ? [[390, 763]] : [[390, 763], [375, 553]]) {
     for (const [name, tile, door, check] of F) {
+      if (SMOKE && /^hangar: (weapons|pilot class|upgrades|ability|crew|looks|load)$/.test(name)) continue;   // same tab code as ship / forge / shop: those three run
       const p = await open(w, h); taps = 0; let r = false, why = '';
-      try { await tap(p, tile); if (door) await tap(p, tile === '#hub_hangar' ? door : tile + 'Scr ' + door); await sleep(400); r = await p.evaluate(check); } catch (e) { why = e.message.slice(0, 120); }
-      ok(`${taps} taps: ${name} ${w}x${h}`, r && taps <= 2, why || String(r));
+      try { await tap(p, tile); if (door) for (const d of door.split('|')) await tap(p, tile === '#hub_hangar' ? d : tile + 'Scr ' + d); await sleep(400); r = await p.evaluate(check); } catch (e) { why = e.message.slice(0, 120); }
+      ok(`${taps} taps: ${name} ${w}x${h}`, r && taps <= (/\|/.test(door || '') ? 3 : 2), why || String(r));
       await p.context().close();
     }
   }

@@ -751,6 +751,7 @@ const TUNE={wbLodRt:0/* r17s far-LOD cell range cap in m (0 = by quality tier); 
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.12,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45,drSnap:14,drMax:.7,drExitT:.4,drExitG:12};
 const OD_CHANGELOG=[
+{v:'v90m-beta.148',date:'22 Oct 2026',items:[{t:'FIXED',s:'Roadside houses, apartments, churches and kiosks are solid now: you can no longer drive into them.'}]},
 {v:'v90m-beta.147',date:'21 Oct 2026',items:[{t:'FIXED',s:'Frankfurt loads more smoothly on phones: the ground-flattening step no longer freezes the loading screen.'}]},
 {v:'v90m-beta.146',date:'21 Oct 2026',items:[{t:'FIXED',s:'Trees, signs and other props no longer block the view of your car: they fade out when they get between you and the camera.'},{t:'CHANGED',s:'On phones the screen is even cleaner while you roam: the boost button and bar only appear when you can use them.'},{t:'FIXED',s:'A hidden error on the normal game page is gone.'}]},
 {v:'v90m-beta.145',date:'21 Oct 2026',items:[{t:'NEW',s:'PLAY now puts you straight in the car: you drive within seconds, with no intro to watch.'},{t:'NEW',s:'No more quest pop-ups you did not ask for, and the phone screen shows only the controls you need.'},{t:'FIXED',s:'The ground next to roads is flatter, so you no longer get stuck on hills, and a stuck car frees itself faster.'}]},
@@ -1609,7 +1610,7 @@ function nearTrack(x,z,r,test){const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x
 function nearestTrackDist(x,z,r){let best=1e9;const c0=Math.floor((x-r)/HCELL),c1=Math.floor((x+r)/HCELL),d0=Math.floor((z-r)/HCELL),d1=Math.floor((z+r)/HCELL);
   for(let a=c0;a<=c1;a++)for(let b=d0;b<=d1;b++){const arr=hash.get(a+','+b);if(!arr)continue;for(let k=0;k<arr.length;k+=4){const d=(arr[k]-x)**2+(arr[k+1]-z)**2;if(d<best)best=d}}return Math.sqrt(best)}
 
-const XCV=/*XCV*/{"99c3_rv2k3":"0010b0d8","99c8_bot":"2a29c856","99c9_collide":"e73c847d","99ctf_traffic_go":"e0a2d197","99ctl_traffic_law":"f777939b","99c_checklist":"f24e3c31","99c2_slowspots":"4b1f6cf1","99c3_rv3c":"ef8ab955","10c_qtc_blob":"e3242764","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"ceb4f4e7","99c6_rv4a":"03b1e523","99c7_rev5fix":"ef12ca5f","99cb_athbudget":"eda24edc","99cc_reveal_desktop":"a556777d","98b2_builder2":"562449e3"}/*end*/,XC={q:{},apply:{},post:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
+const XCV=/*XCV*/{"99c3_rv2k3":"0010b0d8","99c8_bot":"2a29c856","99c9_collide":"e73c847d","99ctf_traffic_go":"e0a2d197","99ctl_traffic_law":"f777939b","99c_checklist":"f24e3c31","99c2_slowspots":"4b1f6cf1","99c3_rv3c":"ef8ab955","10c_qtc_blob":"e3242764","52f_terr_fra":"f69789f8","52a_terr_ath":"28ae4d96","98tk_go":"9de39a5f","99c4_mem":"cf42b1e5","99c4_fair2":"6f552c7c","98dest_go":"f5574fbf","99c5_athroads":"ceb4f4e7","99c6_rv4a":"03b1e523","99c7_rev5fix":"ef12ca5f","99cb_athbudget":"eda24edc","99cc_reveal_desktop":"a556777d","98b2_builder2":"562449e3","99cs_solid":"911bf4de"}/*end*/,XC={q:{},apply:{},post:{},done:!Object.keys(XCV).length,t0:0,t1:0,err:[]};
 function XC_eval(c){return eval(c)}   // direct eval: sees every module-level binding, like the code in models/as.js
 function XC_need(name){
  if(!(name in XCV))return Promise.resolve();   // raw src/ page / hot reload: the module is inline in ORDER
@@ -16395,8 +16396,17 @@ function A2_fill(){const R0=A2.R,cx=Math.floor(RO.x/40),cz=Math.floor(RO.z/40),c
  for(const[,it]of near){if(!use.has(it.d))continue;const m=A2.M[it.d],n=cnt[it.d]||0;if(n>=m.instanceMatrix.count)continue;cnt[it.d]=n+1;A2.drawn.push(it);LV_set(m,n,it.x,it.y,it.z,0,it.h,0,it.s)}
  for(const id in A2.M){const m=A2.M[id];m.count=cnt[id]||0;m.visible=m.count>0;m.instanceMatrix.needsUpdate=true}
  A2.n.drawn=Object.keys(cnt).length;A2.n.inst=near.length;if(todo)A2.px=1e9}
+if(/[?&]a2solid=0\b/.test(location.search))A2.solid=false;   // the old soft push-out only (A/B)
+const A2_SOLID=new Set(['apt1','apt2','church','temple','kiosk','timber']);
+function A2_col(it){if(it.cb)return it.cb;const g=A2.G&&A2.G[it.d],bb=g&&g.userData.a2.bb;if(!bb)return null;const c=Math.cos(it.h),s=Math.sin(it.h),H=(bb.max.y-bb.min.y)*it.s;
+ return it.cb={x:it.x+it.ox*c+it.oz*s,z:it.z-it.ox*s+it.oz*c,hw:it.hw,hd:it.hd,c,s,h:it.y+bb.min.y*it.s+H,rh:H,a2:it.d}}
+function A2_solid(){const G=HUB.grid;if(!G)return;if(A2.cg!==G){A2.cg=G;A2.sol=new Set()}const want=new Set();for(const it of A2.drawn)if(A2_SOLID.has(it.d)){const b=A2_col(it);if(b)want.add(b)}
+ for(const b of A2.sol)if(!want.has(b)){for(const k of b.keys){const L=G.get(k),i=L?L.indexOf(b):-1;if(i>=0)L.splice(i,1)}A2.sol.delete(b)}
+ for(const b of want)if(!A2.sol.has(b)){const[ex,ez]=bExt(b);b.keys=[];for(let k=Math.floor((b.x-ex-5)/40);k<=Math.floor((b.x+ex+5)/40);k++)for(let j=Math.floor((b.z-ez-5)/40);j<=Math.floor((b.z+ez+5)/40);j++){const key=k*10000+j;let L=G.get(key);if(!L)G.set(key,L=[]);L.push(b);b.keys.push(key)}A2.sol.add(b)}
+ A2.n.solid=A2.sol.size}
+{const _f=A2_fill;A2_fill=function(){_f.apply(this,arguments);if(A2.solid!==false)try{A2_solid()}catch(e){console.warn('A2 solid',e)}}}
 function A2_hit(){if(!A2.drawn||!A2.drawn.length)return;const now=performance.now(),dt=Math.min(.05,(now-(A2.t||now))/1000||.016);A2.t=now;
- for(const it of A2.drawn){const d=A2_BY[it.d];if(!d.col)continue;if(Math.abs((RO.y||0)-it.y)>3)continue;// only props that are drawn this fill can block (no invisible walls)
+ for(const it of A2.drawn){const d=A2_BY[it.d];if(!d.col||it.cb&&A2.sol&&A2.sol.has(it.cb))continue;/* solid-buildings-r22e2: real colliders own these */if(Math.abs((RO.y||0)-it.y)>3)continue;// only props that are drawn this fill can block (no invisible walls)
    const ex=RO.x-it.x,ez=RO.z-it.z;let nx,nz,pen;
    if(d.col==='c'){const rr=it.r+1.1,e2=ex*ex+ez*ez;if(e2>=rr*rr)continue;const e=Math.sqrt(e2)||1;nx=ex/e;nz=ez/e;pen=rr-e}
    else{const c=Math.cos(it.h),s=Math.sin(it.h),lx=ex*c-ez*s-it.ox,lz=ex*s+ez*c-it.oz,hx=it.hw+1.1,hz=it.hd+1.1;if(Math.abs(lx)>=hx||Math.abs(lz)>=hz)continue;
@@ -17361,15 +17371,17 @@ async function HC_goHud(){const R=[],ck=(m,b)=>R.push((b?'✓ ':'✗ ')+m),W=ms=
  __chk.GO['why/cam-clear']=['fra','ath'].map(c=>({c,n:'cam-clear '+(c==='fra'?'Frankfurt':'Athens'),secs:30,fn:()=>HC_goCam()}));
  __chk.GO['why/hud6']=['fra','ath'].map(c=>({c,n:'hud-6 '+(c==='fra'?'Frankfurt':'Athens'),secs:30,fn:()=>HC_goHud()}))},500)}
 const CL=(()=>{const m=/[?&]cl=([^&#]*)/.exec(location.search),ks=m?m[1].split(','):[],T=(typeof TUNE!=='undefined'&&TUNE.cl)||{};
- return{box:[-1100,470,-720,800],spawn:[-120,100],out:.6,car:.7,carNear:20,
-  core:(ks.includes('core')||ks.includes('all')||!!T.core)&&!ks.includes('off'),pi:0,pn:0,thin:0,cars:0,peds:0,sp:0}})();
+ return{box:[-1100,470,-720,800],spawn:[-120,100],out:.6,car:+((/[?&]clcar=([\d.]+)/.exec(location.search)||[])[1]||.35),carNear:+((/[?&]clnear=(\d+)/.exec(location.search)||[])[1]||10),
+  core:(ks.includes('core')||ks.includes('all')||!!T.core)&&!ks.includes('off'),smash:(ks.includes('smash')||ks.includes('all')||!!T.smash)&&!ks.includes('off'),sm:{small:14.9,big:29.9,bricks:20,studs:3,stop:.05},sn:0,pi:0,pn:0,thin:0,cars:0,peds:0,sp:0}})();
 const CL_CORE=CL.core&&CID==='fra';
+const CL_SMASH=CL.smash&&CID==='fra';
 const CL_in=(x,z)=>x>=CL.box[0]&&x<=CL.box[1]&&z>=CL.box[2]&&z<=CL.box[3];
 const CL_h=(x,z)=>{const h=Math.sin(x*12.9898+z*78.233)*43758.5453;return h-Math.floor(h)};
 function CL_spawn(){if(!CL_CORE||!RO.on)return false;const s=CL.spawn,q=rfSnap(s[0],s[1],120);if(!q)return false;
  const a=q[2],b=a+Math.PI;const h=Math.sin(a)>=Math.sin(b)?a:b;
  RO.x=q[0];RO.z=q[1];RO.h=RO.vh=h;RO.v=0;RO.vy=0;RO.y=groundAt(RO.x,RO.z,99);RO.spawn0=[RO.x,RO.z,RO.h];camSnap=true;CL.sp=1;return true}
 roamPost=(f=>function(atMark){const fresh=CL_CORE&&!atMark&&!(roamSave().pos),r=f.apply(this,arguments);if(CL_CORE&&!atMark&&(fresh||RO.spawn0&&!CL_in(RO.spawn0[0],RO.spawn0[1])))try{CL_spawn()}catch(e){}CL.cars=0;return r})(roamPost);
+if(typeof R17_off==='function')R17_off=(f=>function(){if(CL_CORE&&CL.sp)return;return f.apply(this,arguments)})(R17_off);
 function CL_thinStep(){if(!CL_CORE||state!=='roam'||!HUB.props)return;const P=HUB.props,n=P.length;if(!n)return;let i=CL.pi%n,k=0;
  const M=new THREE.Matrix4().makeScale(0,0,0),dirty=new Set();
  for(;k<1500;k++){if(CL.pi>=n){CL.pi=0;break}const p=P[CL.pi++];if(p._cl||!p.im||p.i==null)continue;p._cl=1;CL.pn++;
@@ -17377,11 +17389,13 @@ function CL_thinStep(){if(!CL_CORE||state!=='roam'||!HUB.props)return;const P=HU
   p.alive=false;p.rt=1e12;p.im.setMatrixAt(p.i,M);dirty.add(p.im);if(p.gi!=null&&p.gim){p.gim.setMatrixAt(p.gi,M);dirty.add(p.gim)}CL.thin++}
  for(const im of dirty)im.instanceMatrix.needsUpdate=true}
 function CL_nodes(x,z,r){const N=HUB.nodes,o=[];for(let i=0;i<N.ng;i++){const q=N[i];if(!q||!q.nb||!q.nb.length||q.ab)continue;if(r?Math.hypot(q.x-x,q.z-z)<r:CL_in(q.x,q.z))o.push(i)}return o}
-function CL_move(c,i,N){c.a=i;c.b=N[i].nb[Math.floor(R()*N[i].nb.length)];c.t=R();if('hga'in c){c.hga=c.hgb=c.fsa=c.fsb=-1}}
+function CL_put(c,a,b,t){c.a=a;c.b=b;c.t=t;if('hga'in c){c.hga=c.hgb=c.fsa=c.fsb=-1}}
+function CL_move(c,i,N){c._o=[c.a,c.b,c.t];CL_put(c,i,N[i].nb[Math.floor(R()*N[i].nb.length)],R());c._m=[c.a,c.b,c.t]}
+CL.moved=on=>{let n=0;for(const L of[HUB.cars,HUB.peds])if(L)for(const c of L){const q=on?c._m:c._o;if(q){CL_put(c,q[0],q[1],q[2]);n++}}return n};
 function CL_fill(){if(!CL_CORE||state!=='roam'||!RO.on||!HUB.nodes)return;const N=HUB.nodes;
  if(!CL.cars&&HUB.cars&&HUB.cars.length>20&&HUB.cars[0].k!=null){const near=CL_nodes(RO.x,RO.z,140),core=CL_nodes(),pl=HUB.cars.filter(c=>!c.route&&!c.pk&&!c.tr&&!c.fake);let n=0;
   if(near.length&&core.length){for(const c of pl){CL_move(c,n<CL.carNear?near[Math.floor(R()*near.length)]:core[Math.floor(R()*core.length)],N);n++;if(n>=Math.round(pl.length*CL.car))break}}CL.cars=n||1}
- if(!CL.peds&&HUB.peds&&HUB.peds.length){const core=CL_nodes();if(core.length){for(const p of HUB.peds)if(p.a!=null&&N[p.a]&&!CL_in(N[p.a].x,N[p.a].z)){const i=core[Math.floor(R()*core.length)];p.a=i;p.b=N[i].nb[Math.floor(R()*N[i].nb.length)];p.t=R()}CL.peds=1}}}
+ if(!CL.peds&&HUB.peds&&HUB.peds.length&&/[?&]clped=1/.test(location.search)){const core=CL_nodes();if(core.length){for(const p of HUB.peds)if(p.a!=null&&N[p.a]&&!CL_in(N[p.a].x,N[p.a].z)){CL_move(p,core[Math.floor(R()*core.length)],N)}CL.peds=1}}}
 if(CL_CORE)setInterval(()=>{try{CL_thinStep();CL_fill()}catch(e){}},120);
 CL.spawnNow=CL_spawn;CL.step=()=>{CL_thinStep();CL_fill()};CL.ro=()=>({x:RO.x|0,z:RO.z|0,h:+RO.h.toFixed(2)});
 window.__cl=CL;
@@ -17404,13 +17418,89 @@ async function CL_go(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m),W=ms=>
   const near=HUB.cars.filter(q=>!q.dead&&Math.hypot(q.x-RO.x,q.z-RO.z)<150).length;
   ck('drawn traffic within 150 m of the spawn: '+near+' >= 6',near>=6);
   const inC=HUB.cars.filter(q=>CL_in(q.x,q.z)).length;ck('traffic in the core '+inC+' of '+HUB.cars.length+' (>= 50 %)',inC>=HUB.cars.length*.5);
-  const dc=(renderer.info.render.calls|0);await W(400);const d2=renderer.info.render.calls|0;ck('draw calls steady '+dc+' -> '+d2,Math.abs(d2-dc)<=Math.max(6,dc*.2))
+  const fr=()=>{renderer.info.autoReset=false;renderer.info.reset();__tq.draw();const k=renderer.info.render,o=[k.calls,k.triangles];renderer.info.autoReset=true;return o},fm=async on=>{CL.moved(on);await W(700);const a=fr();await W(250);const b=fr();return[Math.min(a[0],b[0]),Math.min(a[1],b[1])]};
+  if(window.__tq&&__tq.draw){const off=await fm(false),on=await fm(true);CL.moved(true);
+   ck('whole frame at Paulsplatz, traffic+peds moved vs home: calls '+off[0]+' -> '+on[0]+' ('+((on[0]/off[0]-1)*100).toFixed(1)+' % <= +2 %), tris '+(off[1]/1e6).toFixed(2)+' -> '+(on[1]/1e6).toFixed(2)+' M ('+((on[1]/off[1]-1)*100).toFixed(1)+' % <= +10 %)',on[0]<=off[0]*1.02&&on[1]<=off[1]*1.10)}
+  const th=window.__tq&&__tq.home;if(th)ck('real roamLoad start pose heading east (sin h '+Math.sin(th[2]).toFixed(2)+') inside the box',Math.sin(th[2])>.5&&CL_in(th[0],th[1]));
  }catch(e){R2.push('✗ threw '+e)}
  finally{RO.spawn0=sv.sp;RO.x=p0[0];RO.z=p0[1];RO.h=RO.vh=p0[2];RO.v=sv.v;RO.y=groundAt(RO.x,RO.z,99);camSnap=true}
  const ok=R2.every(r=>r[0]==='✓');return'📍 why/core · '+R2.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
+const CL_sm=()=>CL_SMASH&&state==='roam'&&RO.on&&CL_in(RO.x,RO.z);
+SM2_smash=(f=>function(kind,imp,quiet){if(!CL_sm()||kind==='car')return f.apply(this,arguments);const a=TUNE.sm2Small,b=TUNE.sm2Big;TUNE.sm2Small=CL.sm.small;TUNE.sm2Big=CL.sm.big;try{return f.apply(this,arguments)}finally{TUNE.sm2Small=a;TUNE.sm2Big=b}})(SM2_smash);
+function CL_burst(x,y,z,def,sp){const base=def&&def.st>5?18:9,at=V3(x,y+1.2,z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh)),cols=[new THREE.Color('#ffd12c'),new THREE.Color('#e4002b'),new THREE.Color('#0055bf'),new THREE.Color('#ffffff'),...(def&&def.cols?def.cols.map(c=>new THREE.Color(c)):[])];
+ debris(at,fw.clone().multiplyScalar(sp*.5).add(V3(0,8,0)),Math.max(0,CL.sm.bricks-base)+2,cols,.6,y);for(let k=Math.max(0,CL.sm.studs-((def&&def.st)|0));k>0;k--)studBurst(at,fw,sp);
+ HIT_stop(CL.sm.stop);CL.sn++;CL.lastB=Math.max(base,CL.sm.bricks);CL.lastS=Math.max((def&&def.st)|0,CL.sm.studs)}
+SM2_prop=(f=>function(p,def,sp){const r=f.apply(this,arguments);if(!r&&CL_sm()&&!(RO.rcT>0&&sp<3))try{CL_burst(p.x,p.y,p.z,def,sp)}catch(e){}return r})(SM2_prop);
+async function CL_smashGo(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m);
+ if(CID!=='fra')return'📍 why/smash · Frankfurt only (Athens parked) → ✅ PASS';if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';
+ if(!CL_SMASH)return'📍 why/smash · ?cl=smash is OFF (default) → ✅ PASS (flag off)';
+ const p0=[RO.x,RO.z,RO.h,RO.v],tb=RO.turbo,ni=pl.nitro;
+ try{
+  RO.turbo=0;pl.nitro=false;const q=rfSnap(CL.spawn[0],CL.spawn[1],120);if(!q)throw'no road';RO.x=q[0];RO.z=q[1];RO.h=RO.vh=Math.PI/2;RO.y=groundAt(RO.x,RO.z,99);OF_reset&&OF_reset();
+  ck('car in the core',CL_in(RO.x,RO.z));
+  const hit=(t,kmh)=>{const d=HUB.ptypes[t],p=HUB.props.find(x=>x.t===t&&x.im&&x.i!=null);if(!p)return null;const sv={x:p.x,z:p.z,y:p.y,alive:p.alive},a=RO.h;RO.vh=RO.h=Math.PI/2;
+   const D=Math.min(OB_HL+d.r*.6,d.r+2);p.x=RO.x+Math.sin(a)*D;p.z=RO.z+Math.cos(a)*D;p.y=RO.y;p.alive=true;p.sm2T=0;
+   const kx=Math.floor(p.x/16)*10000+Math.floor(p.z/16),L=HUB.pgrid.get(kx)||(HUB.pgrid.set(kx,[]),HUB.pgrid.get(kx)),add=!L.includes(p);if(add)L.push(p);
+   RO.v=kmh/3.6;const v0=RO.v,n0=HUB.smashed,c0=CL.sn,h0=hitDip,b0=SM2.n.bricks;smashCheck(1/60);
+   const r={t,smash:HUB.smashed>n0,loss:1-RO.v/v0,bricks:CL.sn>c0?CL.lastB:SM2.n.bricks-b0,studs:CL.sn>c0?CL.lastS:0,stop:hitDip>h0||hitDip>0,hs:CL.sn>c0};
+   if(add)L.splice(L.indexOf(p),1);if(!p.alive)propRevive(p);Object.assign(p,sv);if(!sv.alive)p.alive=false;hitDip=0;return r};
+  const f=x=>Math.round(x*100)+' %',bin=hit('bin',30),big=hit(HUB.ptypes.stall&&HUB.props.some(x=>x.t==='stall')?'stall':'tree',30),b20=hit('bin',20),b10=hit('bin',10),ba=hit('bin',12);
+  for(const[n,r]of[['bin 30',bin],['big prop 30',big]]){ck(n+' km/h smashed',!!r&&r.smash);if(r){ck(n+': '+r.bricks+' bricks >= 20, '+r.studs+' studs >= 3, 50 ms hit-stop set',r.bricks>=20&&r.studs>=3&&r.hs);ck(n+': speed loss '+f(r.loss)+' <= 30 %',r.loss<=.3)}}
+  ck('bin 20 km/h smashes',!!b20&&b20.smash);ck('bin 10 km/h bumps (not smashed)',!!b10&&!b10.smash);
+  ck('bin 12 km/h bumps too',!!ba&&!ba.smash)
+ }catch(e){R2.push('✗ threw '+e)}
+ finally{RO.x=p0[0];RO.z=p0[1];RO.h=RO.vh=p0[2];RO.v=p0[3];RO.turbo=tb;pl.nitro=ni;RO.y=groundAt(RO.x,RO.z,99);camSnap=true}
+ const ok=R2.every(r=>r[0]==='✓');return'📍 why/smash · '+R2.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
 {const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
  __chk.items.unshift({ver:'why',id:'core',area:'drive',text:'core-loop L1 (PLAN_CORE_LOOP): ?cl=core: fresh PLAY spawns at Paulsplatz inside the 1.57 x 1.52 km core on a road heading east; smashable props per 100 m of street inside >= 2x outside; >= 6 cars within 150 m of the spawn; draw calls unchanged. Flag default OFF. 📍 GO.'});
- __chk.GO['why/core']=[{c:'fra',n:'core zone Frankfurt',secs:40,fn:()=>CL_go()}]},500)}
+ __chk.GO['why/core']=[{c:'fra',n:'core zone Frankfurt',secs:40,fn:()=>CL_go()}];
+ __chk.items.unshift({ver:'why',id:'smash',area:'drive',text:'core-loop L2 (PLAN_CORE_LOOP): ?cl=smash: inside the core props smash at 15 km/h (small) / 30 km/h (big), >= 20 bricks, >= 3 studs, 50 ms hit-stop, loss <= 30 %; 10 km/h bumps. Flag default OFF. 📍 GO.'});
+ __chk.GO['why/smash']=[{c:'fra',n:'smash core Frankfurt',secs:30,fn:()=>CL_smashGo()}]},500)}
+const CL_ST=(()=>{const m=/[?&]cl=([^&#]*)/.exec(location.search),ks=m?m[1].split(','):[],T=(typeof TUNE!=='undefined'&&TUNE.cl)||{};
+ return(ks.includes('studs')||ks.includes('all')||!!T.studs)&&!ks.includes('off')&&CID==='fra'})();
+const CL_STS={n:0,hud:0,trail:0,big:0,gap:0,names:{},v:5,step:6,
+ streets:['kaiser','zeil','fress','berliner','kurt','neuemainzer','ring','gutleut','schweizer']};
+window.__cls=CL_STS;
+if(CL_ST){
+ streetMul=()=>1;
+ studGain=(f=>function(v,b){CL_STS.n+=Math.max(1,Math.round(v));return f.apply(this,arguments)})(studGain);
+ const hudHook=()=>{const b=document.querySelector('#roamStuds b');if(!b||CL_STS.hud)return;CL_STS.hud=1;const d=Object.getOwnPropertyDescriptor(Node.prototype,'textContent');
+  Object.defineProperty(b,'textContent',{configurable:true,get(){return d.get.call(this)},set(v){d.set.call(this,CL_STS.n.toLocaleString('de-DE'))}});b.textContent=0};
+ hudHook();
+ {const st=document.createElement('style');st.textContent='body.v85 #roamStuds,body #roamStuds{display:block!important;top:calc(38px + env(safe-area-inset-top,0px))!important;right:calc(14px + env(safe-area-inset-right,0px))!important;left:auto!important;font-size:14px!important;padding:2px 9px!important;pointer-events:none}';document.head.appendChild(st)}
+ const build=()=>{if(!RO.grp||CL_STS.trail)return;const want=new Set(CL_STS.streets),keep=[],S=CL_STS,roads=CITY_S.filter(t=>t.r&&want.has(t.r.id)).map(t=>({name:t.r.id,pts:t.pts}));
+  const gold=new THREE.MeshStandardMaterial({color:0xffd12c,emissive:new THREE.Color('#ffb000'),emissiveIntensity:.45,metalness:.8,roughness:.3}),geo=new THREE.CylinderGeometry(.75,.75,.32,8).rotateX(Math.PI/2),
+   big=new THREE.MeshStandardMaterial({color:0x6ad7ff,emissive:new THREE.Color('#2f9bff'),emissiveIntensity:1,metalness:.8,roughness:.25});
+  const add=(x,z,v,b)=>{const y=groundY(x,z)+1.4;if(roamHit(x,z,1,y))return;const s={x,y,z,v,big:b,m:{position:V3(x,y,z),rotation:{z:0},visible:true},alive:true,t:0,im:null,i:0,pull:false};keep.push(s);return s};
+  for(const t of roads){const P=t.pts;let carry=0;S.names[t.name]=(S.names[t.name]||0);for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],L=Math.hypot(b.x-a.x,b.z-a.z);if(L<.01)continue;
+    for(let d=S.step-carry;d<=L;d+=S.step){const k=d/L,x=a.x+(b.x-a.x)*k,z=a.z+(b.z-a.z)*k;if(!CL_in(x,z))continue;if(add(x,z,S.v,0))S.names[t.name]++}carry=(carry+L)%S.step}}
+  const bl=(HUB.blocks||[]).filter(q=>q.t==='plaza'&&CL_in((q.x0+q.x1)/2,(q.z0+q.z1)/2));
+  for(const q of bl){if(add((q.x0+q.x1)/2,(q.z0+q.z1)/2,40,1))S.big++}
+  S.trail=keep.length-S.big;if(!keep.length)return;
+  const gs=keep.filter(s=>!s.big),bs=keep.filter(s=>s.big);
+  for(const[L,mt]of[[gs,gold],[bs,big]]){if(!L.length)continue;const im=new THREE.InstancedMesh(geo,mt,L.length);L.forEach((s,i)=>{s.im=im;s.i=i});RO.sim.push(im);RO.grp.add(im)}
+  for(const s of keep)RO.studs.push(s);studSync();for(const im of RO.sim){im.computeBoundingSphere();im.boundingSphere.radius+=40}};
+ buildRoam=(f=>function(){const r=f.apply(this,arguments);try{build();hudHook()}catch(e){console.warn('CL studs',e)}return r})(buildRoam);
+ if(RO.built)try{build()}catch(e){}}
+async function CL_stGo(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m);
+ if(CID!=='fra')return'📍 why/studs · Frankfurt only → ✅ PASS';if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';
+ if(!CL_ST)return'📍 why/studs · ?cl=studs is OFF (default) → ✅ PASS (flag off)';
+ const S=CL_STS,M=__mho,p0=[RO.x,RO.z,RO.h],n0=S.n;
+ try{
+  ck('trail '+S.trail+' studs, '+S.big+' big, on '+Object.values(S.names).filter(n=>n>0).length+' of 9 streets (those inside the box; Neue Mainzer/Gutleut lie east/west of it in game coords) ('+Object.entries(S.names).map(e=>e[0]+' '+e[1]).join(', ')+')',S.trail>=150&&Object.values(S.names).filter(n=>n>0).length>=6);
+  let gap=0;for(const nm of['berliner','zeil']){const t=CITY_S.filter(r=>r.r&&r.r.id===nm);for(const r of t){let last=null;for(const q of r.pts){if(!CL_in(q.x,q.z))continue;if(last)gap=Math.max(gap,Math.hypot(q.x-last.x,q.z-last.z));last=q}}}
+  ck('centre-line point gap on Berliner/Zeil '+gap.toFixed(1)+' m <= 25',gap<=25);
+  const L=RO.studs.filter(s=>s.im&&s.v===S.v&&CL_in(s.x,s.z)).sort((a,b)=>a.x-b.x);ck('trail studs sortable '+L.length,L.length>=120);
+  RO.hp=100;const a0=S.n;for(let i=0;i<L.length;i++){const s=L[i],t=L[Math.max(0,i-1)];RO.x=s.x;RO.z=s.z;RO.y=s.y;RO.h=Math.atan2(s.x-t.x,s.z-t.z);RO.v=13.9;M.roamSim(2)}
+  RO.stE=1e5;const g0=S.n;studGain(7);ck('one pass collected '+(g0-a0)+' studs >= 120; with the old decay at its worst a pickup still pays '+(S.n-g0)+' of 7 (no decay)',g0-a0>=120&&S.n-g0===7);
+  const e=document.querySelector('#roamStuds'),fs=e?parseFloat(getComputedStyle(e).fontSize):0;
+  ck('counter '+(e?e.textContent.trim():'-')+' at '+fs+' px >= 12',fs>=12&&!!e&&e.textContent.trim().length>2)
+ }catch(e){R2.push('✗ threw '+e)}
+ finally{RO.x=p0[0];RO.z=p0[1];RO.h=RO.vh=p0[2];RO.v=0;RO.y=groundAt(RO.x,RO.z,99);camSnap=true}
+ const ok=R2.every(r=>r[0]==='✓');return'📍 why/studs · '+R2.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
+{const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
+ __chk.items.unshift({ver:'why',id:'studs',area:'drive',text:'core-loop L3 (PLAN_CORE_LOOP): ?cl=studs: gap-free stud trail (6 m) on the 9 core streets, no decay (studs/min after 4 sim minutes >= 90 % of the first), HUD counter shows studs earned at >= 12 px. Flag default OFF. 📍 GO.'});
+ __chk.GO['why/studs']=[{c:'fra',n:'stud flow Frankfurt',secs:70,fn:()=>CL_stGo()}]},500)}
 const AA_LIM=40,AA_FN=['slipY','studSync','roamStuds','CV_pre','CV_post','RD_unstack','lazyStep','PC_step','PC_sph','QS_rampEdges','CTB_step','LV_edges0','STR_step','roamTerr'];
 function AA_static(){const bad=[],it=/for ?\(const \w+ of (?:SLIPS|ALL_DECKS|HUB\.bld|CITY_S|RO\.marks|HUB\.cars|BRIDGES|JUNC|RO\.studs|LAZY|HUB\.peds|RO\.ramps|PC\.L|WBC\.sup|CV\.sig|HUB\.props)\)/;
  for(const n of AA_FN){let f=null;try{f=(0,eval)(n)}catch(e){}if(typeof f!=='function'){continue}const t=f.toString();if(it.test(t)||(n!=='roamTerr'&&/Math\.hypot\(/.test(t)&&n!=='LV_edges0'&&n!=='STR_step'))bad.push(n)}

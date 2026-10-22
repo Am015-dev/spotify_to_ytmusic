@@ -108,8 +108,8 @@ const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/6
   for (const need of ['seed=99', 'stage=6', 'enemy:bomber', 'flags-off=', 'lfspawn=enemy%3Abomber', 'lab=1']) if (!rp.includes(need)) fails.push('repro line lacks ' + need + ': ' + rp.slice(0, 160));
   await p.evaluate(() => { document.querySelector('#labP .lbody') && [...document.querySelectorAll('#labP .lbody button')].find(b => /COPY REPRO/.test(b.textContent)).click(); }); await sleep(200);
   const cp_ = await p.evaluate(() => LABFULL.copied); if (!cp_ || !/REPRO/.test(cp_)) fails.push('COPY REPRO produced nothing');
-  { const url = rp.split(' ').pop(); const u = new URL(url); const { ctx: c2, p: p2 } = await open(390, 763, true, '&lfseed=99&lfstage=6&lfspawn=enemy:bomber'); await sleep(1500);
-    const rb = await p2.evaluate(() => __mnr.G.en.some(e => e.type === 'bomber')); if (!rb) fails.push('repro URL did not replay the spawn'); if (!u.search.includes('lfseed=99')) fails.push('repro url lacks the seed'); await c2.close(); }
+  { const url = rp.split(' ').pop(); const u = new URL(url); const { ctx: c2, p: p2 } = await open(390, 763, true, '&lfseed=99&lfstage=6&lfspawn=enemy:bomber'); // the replay spawns 400 ms after the lab starts and the bomber flies on: poll for it instead of looking at one instant
+    const rb = await p2.waitForFunction(() => __mnr.G.en.some(e => e.type === 'bomber'), null, { timeout: 6000, polling: 30 }).then(() => true, () => false); if (!rb) fails.push('repro URL did not replay the spawn'); if (!u.search.includes('lfseed=99')) fails.push('repro url lacks the seed'); await c2.close(); }
   // (e) layout at both phone sizes
   for (const [w, h] of [[390, 763], [375, 553]]) {
     const { ctx: c3, p: p3 } = await open(w, h, true, ''); await p3.evaluate(() => { document.getElementById('labTab_dex').click(); }); await sleep(300);

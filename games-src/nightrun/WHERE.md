@@ -6,7 +6,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 
 | flag | key (file name L1-L2) | > wraps | < wrapped by | test | doc |
 |---|---|---|---|---|---|
-| sprites,title,type,oneMore*,arcade*,walls*,heat*,daily*,dpool*,layers*,sting*,trans*,grade*,saveio*,juice,assist,pwa,fever | ret (one `RET.x` line per flag, top of the file) |  | stamp,saves,hub+1 | ret | RETENTION |
+| sprites,title,type,oneMore*,arcade*,walls*,heat*,daily*,dpool*,layers*,sting*,trans*,grade*,saveio*,juice,assist,pwa,fever,menufix | ret (one `RET.x` line per flag, top of the file) |  | stamp,saves,hub+1 | ret | RETENTION |
 | flavor | flavor watch 241-242 |  | footq,tidy | ret-flavor |  |
 | foot | foot build 366-400 | a,footen | c | foot | BRIEF-FOOT |
 | footstage | footstage secOf 163-194 | footen |  | footstage | FOOT-ENEMIES |
@@ -24,7 +24,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | musicpack | musicpack mpBand 62-62 |  |  | musicpack |  |
 | story | storydata STORY_LINES 29-240 |  |  | story |  |
 | tale | tale TALE_BEATS 21-203 |  |  | tale |  |
-| stats | stats open 171-208 |  |  | stats | POLISH |
+| stats | stats open 178-217 |  |  | stats | POLISH |
 | feedback | feedback copy 29-51 |  |  | feedback |  |
 | labassets | labassets laSecOf 50-56 |  |  | labassets |  |
 | labfull | labfull lfScan 33-93 | lab |  | labfull |  |
@@ -81,10 +81,11 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | mix | mix MIX 17-24 | a |  | mix |  |
 | hub,garagefix | hub gfPatchAll 288-301 | ret |  | hub |  |
 | layout,layoutStrip* | layout lyMap 41-55 |  |  | layout |  |
-| school | school footEnd 107-122 |  |  | school |  |
-| schoolfull | schoolfull sfGapWall 49-67 |  |  | school-full |  |
+| school | school footEnd 110-125 |  |  | school |  |
+| schoolfull | schoolfull sfGapWall 61-79 |  |  | school-full |  |
 | tidy | tidy F.post 19-88 | flavor,ret |  | tidy |  |
-| explain | explain EXP 11-39 |  |  | explain | WORKER-RULES |
+| menufix | menufix mfDraw 35-41 |  |  | menufix |  |
+| explain | explain EXP 11-43 |  |  | explain | WORKER-RULES |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.
 

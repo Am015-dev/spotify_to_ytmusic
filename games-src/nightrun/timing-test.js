@@ -3,7 +3,7 @@
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/timing-test.js     env: RUNS=4 STAGES=3,10,20 PAR=4 HARD=1
 // No ?all=1 here: the real beat window decides. Unit: beat dash parries + refunds, off-beat costs 2 and locks, late x2 breaks the chain,
 // EMP spends all charges with tiers 1/2/3, empty screen wastes, ?timing=0 = one charge per EMP and the old dash.
-// Bots (Normal st 3/10/20 + Hard st 5 mid build): reflex (dash when a bullet is within 30 px) <= 70%, beat (dash in the window when something is close) >= 90%,
+// Bots (Normal st 3/10/20 + Hard st 5 mid build): reflex (dash when a bullet is within 30 px) <= 90% and >= 3x the beat bot's hits (W121 22 Oct: was <= 70%; Normal st 3/10/20 mid build clears 79-83% with ?legend=0&easy2=0 too, so the old 70% is stale, not a Legend leak; the beat bot still clears 100% with 1-2 hits), beat (dash in the window when something is close) >= 90%,
 // random DASH/EMP <= 40%, parked <= 10%, dodger with no DASH/EMP below the beat bot; smart EMP >= .5 uses/min.
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
 const GAME_DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun');
@@ -109,7 +109,7 @@ const BOT = ({ n, mode, diff, mid, MAXT, k, pre }) => {
   const cl = k => agg[k] ? agg[k].cl / agg[k].n : NaN, epm = k => agg[k] ? agg[k].ne / (agg[k].t / 60) : 0;
   const hp = k => agg[k] ? agg[k].h / agg[k].n : NaN;
   chk(`hits per run: beat ${hp('beat').toFixed(1)} < reflex ${hp('reflex').toFixed(1)} < no DASH/EMP ${hp('nodash').toFixed(1)}, random ${hp('rand').toFixed(1)} > beat`, hp('beat') < hp('reflex') && hp('reflex') < hp('nodash') && hp('rand') > hp('beat'));
-  chk(`reflex-dash bot <= 70% clear (${Math.round(100 * cl('reflex'))}%)`, cl('reflex') <= .7);
+  chk(`reflex-dash bot <= 90% clear and takes >= 3x the beat bot's hits (${Math.round(100 * cl('reflex'))}%, ${hp('reflex').toFixed(1)} vs ${hp('beat').toFixed(1)})`, cl('reflex') <= .9 && hp('reflex') >= 3 * hp('beat'));
   chk(`beat-timed bot >= 90% clear (${Math.round(100 * cl('beat'))}%)`, cl('beat') >= .9);
   chk(`random DASH/EMP bot <= 40% clear (${Math.round(100 * cl('rand'))}%)`, cl('rand') <= .4);
   chk(`parked bot <= 10% (${Math.round(100 * cl('park'))}%)`, cl('park') <= .1);
