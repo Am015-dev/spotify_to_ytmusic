@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 10,
- "w": 336,
- "h": 256,
+ "w": 345,
+ "h": 265,
  "anchor": [
-  168,
-  256
+  172,
+  265
  ],
  "order": [
   "strip-hound-pounce#1",
   "strip-hound-pounce#2",
   "strip-hound-pounce#3",
   "strip-hound-pounce#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.0,
+  "w": 1.4
+ },
+ "px_per_m": 256.0
 }

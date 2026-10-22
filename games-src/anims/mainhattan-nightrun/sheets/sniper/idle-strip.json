@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 4,
- "w": 160,
- "h": 256,
+ "w": 161,
+ "h": 286,
  "anchor": [
   80,
-  256
+  286
  ],
  "order": [
   "strip-sniper-idle#1",
   "strip-sniper-idle#2",
   "strip-sniper-idle#3",
   "strip-sniper-idle#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.6
+ },
+ "px_per_m": 138.38
 }

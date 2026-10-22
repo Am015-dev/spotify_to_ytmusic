@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 12,
- "w": 252,
- "h": 256,
+ "w": 255,
+ "h": 293,
  "anchor": [
-  126,
-  256
+  127,
+  293
  ],
  "order": [
   "strip-ninja-slash#1",
   "strip-ninja-slash#2",
   "strip-ninja-slash#3",
   "strip-ninja-slash#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

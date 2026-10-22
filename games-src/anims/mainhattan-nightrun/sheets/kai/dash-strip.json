@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 14,
- "w": 214,
- "h": 256,
+ "w": 224,
+ "h": 326,
  "anchor": [
-  107,
-  256
+  112,
+  326
  ],
  "order": [
   "strip-kai-dash#1",
   "strip-kai-dash#2",
   "strip-kai-dash#3",
   "strip-kai-dash#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

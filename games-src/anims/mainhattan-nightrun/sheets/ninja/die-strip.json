@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 235,
- "h": 256,
+ "w": 217,
+ "h": 293,
  "anchor": [
-  117,
-  256
+  108,
+  293
  ],
  "order": [
   "strip-ninja-die#1",
   "strip-ninja-die#2",
   "strip-ninja-die#3",
   "strip-ninja-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 392,
- "h": 237,
+ "w": 771,
+ "h": 672,
  "anchor": [
-  196,
-  237
+  385,
+  672
  ],
  "order": [
   "strip-boss-schranken-wart-hit#1",
   "strip-boss-schranken-wart-hit#2",
   "strip-boss-schranken-wart-hit#3"
- ]
+ ],
+ "metres": {
+  "h": 4.0,
+  "w": 8.0
+ },
+ "px_per_m": 96.0,
+ "body": 384
 }

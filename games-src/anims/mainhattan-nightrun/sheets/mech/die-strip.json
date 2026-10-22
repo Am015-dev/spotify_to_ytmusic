@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 160,
- "h": 256,
+ "w": 194,
+ "h": 313,
  "anchor": [
-  80,
-  256
+  97,
+  313
  ],
  "order": [
   "strip-mech-die#1",
   "strip-mech-die#2",
   "strip-mech-die#3",
   "strip-mech-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 3.2,
+  "w": 2.4
+ },
+ "px_per_m": 80.0
 }

@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 175,
- "h": 256,
+ "w": 196,
+ "h": 260,
  "anchor": [
-  87,
-  256
+  98,
+  260
  ],
  "order": [
   "strip-knife-jump#1",
   "strip-knife-jump#2",
   "strip-knife-jump#3",
   "strip-knife-jump#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.75,
+  "w": 0.55
+ },
+ "px_per_m": 146.29
 }

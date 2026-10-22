@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 259,
- "h": 256,
+ "w": 250,
+ "h": 309,
  "anchor": [
-  129,
-  256
+  125,
+  309
  ],
  "order": [
   "strip-warden-die#1",
   "strip-warden-die#2",
   "strip-warden-die#3",
   "strip-warden-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.2,
+  "w": 0.9
+ },
+ "px_per_m": 116.36
 }

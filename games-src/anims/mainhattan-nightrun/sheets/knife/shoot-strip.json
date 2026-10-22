@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 161,
- "h": 256,
+ "w": 174,
+ "h": 260,
  "anchor": [
-  80,
-  256
+  87,
+  260
  ],
  "order": [
   "strip-knife-shoot#1",
   "strip-knife-shoot#2",
   "strip-knife-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.75,
+  "w": 0.55
+ },
+ "px_per_m": 146.29
 }

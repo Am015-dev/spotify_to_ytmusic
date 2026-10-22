@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 186,
- "h": 256,
+ "w": 187,
+ "h": 259,
  "anchor": [
   93,
-  256
+  259
  ],
  "order": [
   "strip-gunman-jump#1",
   "strip-gunman-jump#2",
   "strip-gunman-jump#3",
   "strip-gunman-jump#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

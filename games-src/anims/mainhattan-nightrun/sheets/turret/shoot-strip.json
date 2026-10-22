@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 354,
- "h": 261,
+ "w": 343,
+ "h": 350,
  "anchor": [
-  177,
-  261
+  171,
+  350
  ],
  "order": [
   "strip-turret-shoot#1",
   "strip-turret-shoot#2",
   "strip-turret-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.6,
+  "w": 1.4
+ },
+ "px_per_m": 160.0
 }

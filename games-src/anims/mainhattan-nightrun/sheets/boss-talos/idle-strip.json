@@ -2,15 +2,21 @@
  "frames": 4,
  "fps": 4,
  "w": 227,
- "h": 372,
+ "h": 438,
  "anchor": [
   113,
-  372
+  438
  ],
  "order": [
   "strip-boss-talos-idle#1",
   "strip-boss-talos-idle#2",
   "strip-boss-talos-idle#3",
   "strip-boss-talos-idle#4"
- ]
+ ],
+ "metres": {
+  "h": 6.0,
+  "w": 4.0
+ },
+ "px_per_m": 64.0,
+ "body": 384
 }

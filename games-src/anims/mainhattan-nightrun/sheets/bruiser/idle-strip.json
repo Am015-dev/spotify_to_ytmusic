@@ -2,15 +2,21 @@
  "frames": 4,
  "fps": 4,
  "w": 127,
- "h": 256,
+ "h": 275,
  "anchor": [
   63,
-  256
+  275
  ],
  "order": [
   "strip-bruiser-idle#1",
   "strip-bruiser-idle#2",
   "strip-bruiser-idle#3",
   "strip-bruiser-idle#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.75
+ },
+ "px_per_m": 128.0
 }

@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 236,
- "h": 256,
+ "w": 216,
+ "h": 326,
  "anchor": [
-  118,
-  256
+  108,
+  326
  ],
  "order": [
   "strip-kai-die#1",
   "strip-kai-die#2",
   "strip-kai-die#3",
   "strip-kai-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

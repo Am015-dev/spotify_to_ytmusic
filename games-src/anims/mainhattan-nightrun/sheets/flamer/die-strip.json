@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 216,
- "h": 256,
+ "w": 239,
+ "h": 285,
  "anchor": [
-  108,
-  256
+  119,
+  285
  ],
  "order": [
   "strip-flamer-die#1",
   "strip-flamer-die#2",
   "strip-flamer-die#3",
   "strip-flamer-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.95,
+  "w": 0.8
+ },
+ "px_per_m": 131.28
 }

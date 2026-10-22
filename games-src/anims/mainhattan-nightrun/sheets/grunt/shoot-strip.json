@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 169,
- "h": 256,
+ "w": 196,
+ "h": 262,
  "anchor": [
-  84,
-  256
+  98,
+  262
  ],
  "order": [
   "strip-grunt-shoot#1",
   "strip-grunt-shoot#2",
   "strip-grunt-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.6
+ },
+ "px_per_m": 138.38
 }

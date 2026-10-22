@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 281,
- "h": 256,
+ "w": 291,
+ "h": 265,
  "anchor": [
-  140,
-  256
+  145,
+  265
  ],
  "order": [
   "strip-hound-die#1",
   "strip-hound-die#2",
   "strip-hound-die#3",
   "strip-hound-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.0,
+  "w": 1.4
+ },
+ "px_per_m": 256.0
 }

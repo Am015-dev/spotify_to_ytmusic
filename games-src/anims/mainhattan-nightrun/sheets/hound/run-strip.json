@@ -1,11 +1,11 @@
 {
  "frames": 6,
  "fps": 12,
- "w": 434,
- "h": 256,
+ "w": 386,
+ "h": 265,
  "anchor": [
-  217,
-  256
+  193,
+  265
  ],
  "order": [
   "strip-hound-run#1",
@@ -14,5 +14,11 @@
   "strip-hound-run#4",
   "strip-hound-run#5",
   "strip-hound-run#6"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.0,
+  "w": 1.4
+ },
+ "px_per_m": 256.0
 }

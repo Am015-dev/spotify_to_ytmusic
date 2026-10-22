@@ -1,11 +1,11 @@
 {
  "frames": 6,
  "fps": 12,
- "w": 176,
- "h": 256,
+ "w": 163,
+ "h": 260,
  "anchor": [
-  88,
-  256
+  81,
+  260
  ],
  "order": [
   "strip-knife-run#1",
@@ -14,5 +14,11 @@
   "strip-knife-run#4",
   "strip-knife-run#5",
   "strip-knife-run#6"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.75,
+  "w": 0.55
+ },
+ "px_per_m": 146.29
 }

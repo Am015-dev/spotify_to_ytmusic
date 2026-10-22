@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 195,
- "h": 256,
+ "w": 213,
+ "h": 285,
  "anchor": [
-  97,
-  256
+  106,
+  285
  ],
  "order": [
   "strip-flamer-hit#1",
   "strip-flamer-hit#2",
   "strip-flamer-hit#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.95,
+  "w": 0.8
+ },
+ "px_per_m": 131.28
 }

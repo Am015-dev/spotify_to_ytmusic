@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 6,
- "w": 356,
- "h": 384,
+ "w": 651,
+ "h": 710,
  "anchor": [
-  178,
-  384
+  325,
+  710
  ],
  "order": [
   "strip-boss-sek-adler-defeat#1",
   "strip-boss-sek-adler-defeat#2",
   "strip-boss-sek-adler-defeat#3",
   "strip-boss-sek-adler-defeat#4"
- ]
+ ],
+ "metres": {
+  "h": 4.0,
+  "w": 9.0
+ },
+ "px_per_m": 96.0,
+ "body": 384
 }

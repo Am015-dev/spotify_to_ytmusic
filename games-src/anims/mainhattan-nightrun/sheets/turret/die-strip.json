@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 240,
- "h": 256,
+ "w": 325,
+ "h": 350,
  "anchor": [
-  120,
-  256
+  162,
+  350
  ],
  "order": [
   "strip-turret-die#1",
   "strip-turret-die#2",
   "strip-turret-die#3",
   "strip-turret-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.6,
+  "w": 1.4
+ },
+ "px_per_m": 160.0
 }

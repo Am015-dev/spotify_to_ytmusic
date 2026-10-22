@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 173,
- "h": 256,
+ "w": 194,
+ "h": 259,
  "anchor": [
-  86,
-  256
+  97,
+  259
  ],
  "order": [
   "strip-gunman-shoot#1",
   "strip-gunman-shoot#2",
   "strip-gunman-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

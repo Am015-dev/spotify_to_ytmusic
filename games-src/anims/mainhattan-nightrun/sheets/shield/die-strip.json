@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 238,
- "h": 256,
+ "w": 240,
+ "h": 257,
  "anchor": [
-  119,
-  256
+  120,
+  257
  ],
  "order": [
   "strip-shield-die#1",
   "strip-shield-die#2",
   "strip-shield-die#3",
   "strip-shield-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.9
+ },
+ "px_per_m": 128.0
 }

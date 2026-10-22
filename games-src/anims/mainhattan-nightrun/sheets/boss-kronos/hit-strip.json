@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 392,
- "h": 282,
+ "w": 603,
+ "h": 553,
  "anchor": [
-  196,
-  282
+  301,
+  553
  ],
  "order": [
   "strip-boss-kronos-hit#1",
   "strip-boss-kronos-hit#2",
   "strip-boss-kronos-hit#3"
- ]
+ ],
+ "metres": {
+  "h": 6.0,
+  "w": 12.0
+ },
+ "px_per_m": 64.0,
+ "body": 384
 }

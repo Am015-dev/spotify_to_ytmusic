@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 8,
- "w": 471,
- "h": 281,
+ "w": 678,
+ "h": 457,
  "anchor": [
-  235,
-  281
+  339,
+  457
  ],
  "order": [
   "strip-boss-bruecken-waechter-attack#1",
   "strip-boss-bruecken-waechter-attack#2",
   "strip-boss-bruecken-waechter-attack#3"
- ]
+ ],
+ "metres": {
+  "h": 5.0,
+  "w": 10.0
+ },
+ "px_per_m": 76.8,
+ "body": 384
 }

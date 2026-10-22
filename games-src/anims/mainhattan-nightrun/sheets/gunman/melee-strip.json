@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 10,
- "w": 222,
- "h": 256,
+ "w": 249,
+ "h": 259,
  "anchor": [
-  111,
-  256
+  124,
+  259
  ],
  "order": [
   "strip-gunman-melee#1",
   "strip-gunman-melee#2",
   "strip-gunman-melee#3",
   "strip-gunman-melee#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

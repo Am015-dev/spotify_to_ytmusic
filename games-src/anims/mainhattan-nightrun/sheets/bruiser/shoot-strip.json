@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 215,
- "h": 256,
+ "w": 236,
+ "h": 275,
  "anchor": [
-  107,
-  256
+  118,
+  275
  ],
  "order": [
   "strip-bruiser-shoot#1",
   "strip-bruiser-shoot#2",
   "strip-bruiser-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.75
+ },
+ "px_per_m": 128.0
 }

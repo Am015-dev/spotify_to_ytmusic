@@ -1,11 +1,11 @@
 {
  "frames": 6,
  "fps": 12,
- "w": 245,
- "h": 256,
+ "w": 253,
+ "h": 286,
  "anchor": [
-  122,
-  256
+  126,
+  286
  ],
  "order": [
   "strip-sniper-run#1",
@@ -14,5 +14,11 @@
   "strip-sniper-run#4",
   "strip-sniper-run#5",
   "strip-sniper-run#6"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.6
+ },
+ "px_per_m": 138.38
 }

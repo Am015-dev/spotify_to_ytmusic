@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 4,
- "w": 139,
- "h": 256,
+ "w": 144,
+ "h": 309,
  "anchor": [
-  69,
-  256
+  72,
+  309
  ],
  "order": [
   "strip-warden-idle#1",
   "strip-warden-idle#2",
   "strip-warden-idle#3",
   "strip-warden-idle#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.2,
+  "w": 0.9
+ },
+ "px_per_m": 116.36
 }

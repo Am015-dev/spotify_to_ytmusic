@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 242,
- "h": 256,
+ "w": 225,
+ "h": 262,
  "anchor": [
-  121,
-  256
+  112,
+  262
  ],
  "order": [
   "strip-grunt-die#1",
   "strip-grunt-die#2",
   "strip-grunt-die#3",
   "strip-grunt-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.6
+ },
+ "px_per_m": 138.38
 }

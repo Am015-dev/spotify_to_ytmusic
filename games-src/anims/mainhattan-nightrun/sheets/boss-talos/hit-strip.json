@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 298,
- "h": 384,
+ "w": 281,
+ "h": 438,
  "anchor": [
-  149,
-  384
+  140,
+  438
  ],
  "order": [
   "strip-boss-talos-hit#1",
   "strip-boss-talos-hit#2",
   "strip-boss-talos-hit#3"
- ]
+ ],
+ "metres": {
+  "h": 6.0,
+  "w": 4.0
+ },
+ "px_per_m": 64.0,
+ "body": 384
 }

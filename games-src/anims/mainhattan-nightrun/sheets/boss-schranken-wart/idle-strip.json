@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 4,
- "w": 392,
- "h": 190,
+ "w": 785,
+ "h": 672,
  "anchor": [
-  196,
-  190
+  392,
+  672
  ],
  "order": [
   "strip-boss-schranken-wart-idle#1",
   "strip-boss-schranken-wart-idle#2",
   "strip-boss-schranken-wart-idle#3",
   "strip-boss-schranken-wart-idle#4"
- ]
+ ],
+ "metres": {
+  "h": 4.0,
+  "w": 8.0
+ },
+ "px_per_m": 96.0,
+ "body": 384
 }

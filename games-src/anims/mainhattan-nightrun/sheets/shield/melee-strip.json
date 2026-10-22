@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 10,
- "w": 227,
- "h": 256,
+ "w": 234,
+ "h": 257,
  "anchor": [
-  113,
-  256
+  117,
+  257
  ],
  "order": [
   "strip-shield-melee#1",
   "strip-shield-melee#2",
   "strip-shield-melee#3",
   "strip-shield-melee#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.9
+ },
+ "px_per_m": 128.0
 }

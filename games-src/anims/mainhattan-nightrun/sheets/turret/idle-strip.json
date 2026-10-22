@@ -2,15 +2,21 @@
  "frames": 4,
  "fps": 4,
  "w": 306,
- "h": 256,
+ "h": 350,
  "anchor": [
   153,
-  256
+  350
  ],
  "order": [
   "strip-turret-idle#1",
   "strip-turret-idle#2",
   "strip-turret-idle#3",
   "strip-turret-idle#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.6,
+  "w": 1.4
+ },
+ "px_per_m": 160.0
 }

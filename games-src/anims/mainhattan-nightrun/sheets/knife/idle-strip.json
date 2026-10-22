@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 4,
- "w": 89,
- "h": 256,
+ "w": 90,
+ "h": 260,
  "anchor": [
-  44,
-  256
+  45,
+  260
  ],
  "order": [
   "strip-knife-idle#1",
   "strip-knife-idle#2",
   "strip-knife-idle#3",
   "strip-knife-idle#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.75,
+  "w": 0.55
+ },
+ "px_per_m": 146.29
 }

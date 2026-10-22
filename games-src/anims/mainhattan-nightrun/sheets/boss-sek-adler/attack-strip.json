@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 425,
- "h": 265,
+ "w": 663,
+ "h": 710,
  "anchor": [
-  212,
-  265
+  331,
+  710
  ],
  "order": [
   "strip-boss-sek-adler-attack#1",
   "strip-boss-sek-adler-attack#2",
   "strip-boss-sek-adler-attack#3",
   "strip-boss-sek-adler-attack#4"
- ]
+ ],
+ "metres": {
+  "h": 4.0,
+  "w": 9.0
+ },
+ "px_per_m": 96.0,
+ "body": 384
 }

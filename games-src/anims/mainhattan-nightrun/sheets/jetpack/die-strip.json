@@ -12,5 +12,11 @@
   "strip-jetpack-die#2",
   "strip-jetpack-die#3",
   "strip-jetpack-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.9,
+  "w": 0.8
+ },
+ "px_per_m": 134.74
 }

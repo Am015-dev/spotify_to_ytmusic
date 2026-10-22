@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 10,
- "w": 201,
- "h": 256,
+ "w": 215,
+ "h": 286,
  "anchor": [
-  100,
-  256
+  107,
+  286
  ],
  "order": [
   "strip-sniper-melee#1",
   "strip-sniper-melee#2",
   "strip-sniper-melee#3",
   "strip-sniper-melee#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.6
+ },
+ "px_per_m": 138.38
 }

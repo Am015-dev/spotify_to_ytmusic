@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 392,
- "h": 301,
+ "w": 498,
+ "h": 486,
  "anchor": [
-  196,
-  301
+  249,
+  486
  ],
  "order": [
   "strip-boss-hoplite-attack#1",
   "strip-boss-hoplite-attack#2",
   "strip-boss-hoplite-attack#3",
   "strip-boss-hoplite-attack#4"
- ]
+ ],
+ "metres": {
+  "h": 4.5,
+  "w": 3.0
+ },
+ "px_per_m": 85.33,
+ "body": 384
 }

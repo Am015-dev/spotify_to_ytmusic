@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 223,
- "h": 256,
+ "w": 348,
+ "h": 404,
  "anchor": [
-  111,
-  256
+  174,
+  404
  ],
  "order": [
   "strip-drone-die#1",
   "strip-drone-die#2",
   "strip-drone-die#3",
   "strip-drone-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 0.6,
+  "w": 0.8
+ },
+ "px_per_m": 426.67
 }

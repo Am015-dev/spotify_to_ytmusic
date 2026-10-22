@@ -2,14 +2,20 @@
  "frames": 3,
  "fps": 10,
  "w": 214,
- "h": 256,
+ "h": 313,
  "anchor": [
   107,
-  256
+  313
  ],
  "order": [
   "strip-mech-shoot#1",
   "strip-mech-shoot#2",
   "strip-mech-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 3.2,
+  "w": 2.4
+ },
+ "px_per_m": 80.0
 }

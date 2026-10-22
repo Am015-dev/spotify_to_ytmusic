@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 6,
- "w": 258,
- "h": 384,
+ "w": 293,
+ "h": 438,
  "anchor": [
-  129,
-  384
+  146,
+  438
  ],
  "order": [
   "strip-boss-talos-defeat#1",
   "strip-boss-talos-defeat#2",
   "strip-boss-talos-defeat#3",
   "strip-boss-talos-defeat#4"
- ]
+ ],
+ "metres": {
+  "h": 6.0,
+  "w": 4.0
+ },
+ "px_per_m": 64.0,
+ "body": 384
 }

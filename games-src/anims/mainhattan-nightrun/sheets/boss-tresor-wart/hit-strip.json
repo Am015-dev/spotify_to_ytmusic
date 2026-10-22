@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 392,
- "h": 313,
+ "w": 555,
+ "h": 639,
  "anchor": [
-  196,
-  313
+  277,
+  639
  ],
  "order": [
   "strip-boss-tresor-wart-hit#1",
   "strip-boss-tresor-wart-hit#2",
   "strip-boss-tresor-wart-hit#3"
- ]
+ ],
+ "metres": {
+  "h": 4.5,
+  "w": 7.0
+ },
+ "px_per_m": 85.33,
+ "body": 384
 }

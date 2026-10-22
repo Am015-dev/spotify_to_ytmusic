@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 4,
- "w": 273,
- "h": 256,
+ "w": 320,
+ "h": 404,
  "anchor": [
-  136,
-  256
+  160,
+  404
  ],
  "order": [
   "strip-drone-idle#1",
   "strip-drone-idle#2",
   "strip-drone-idle#3",
   "strip-drone-idle#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 0.6,
+  "w": 0.8
+ },
+ "px_per_m": 426.67
 }

@@ -2,15 +2,21 @@
  "frames": 4,
  "fps": 8,
  "w": 204,
- "h": 256,
+ "h": 257,
  "anchor": [
   102,
-  256
+  257
  ],
  "order": [
   "strip-shield-jump#1",
   "strip-shield-jump#2",
   "strip-shield-jump#3",
   "strip-shield-jump#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.9
+ },
+ "px_per_m": 128.0
 }

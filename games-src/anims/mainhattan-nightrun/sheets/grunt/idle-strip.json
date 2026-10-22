@@ -2,15 +2,21 @@
  "frames": 4,
  "fps": 4,
  "w": 127,
- "h": 256,
+ "h": 262,
  "anchor": [
   63,
-  256
+  262
  ],
  "order": [
   "strip-grunt-idle#1",
   "strip-grunt-idle#2",
   "strip-grunt-idle#3",
   "strip-grunt-idle#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.6
+ },
+ "px_per_m": 138.38
 }

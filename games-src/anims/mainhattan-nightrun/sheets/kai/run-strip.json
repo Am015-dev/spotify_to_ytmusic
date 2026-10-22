@@ -1,11 +1,11 @@
 {
  "frames": 6,
  "fps": 12,
- "w": 159,
- "h": 256,
+ "w": 149,
+ "h": 326,
  "anchor": [
-  79,
-  256
+  74,
+  326
  ],
  "order": [
   "strip-kai-run#1",
@@ -14,5 +14,11 @@
   "strip-kai-run#4",
   "strip-kai-run#5",
   "strip-kai-run#6"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

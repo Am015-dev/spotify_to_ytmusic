@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 10,
- "w": 253,
- "h": 256,
+ "w": 271,
+ "h": 275,
  "anchor": [
-  126,
-  256
+  135,
+  275
  ],
  "order": [
   "strip-bruiser-melee#1",
   "strip-bruiser-melee#2",
   "strip-bruiser-melee#3",
   "strip-bruiser-melee#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.75
+ },
+ "px_per_m": 128.0
 }

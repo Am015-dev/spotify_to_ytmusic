@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 8,
- "w": 147,
- "h": 256,
+ "w": 167,
+ "h": 293,
  "anchor": [
-  73,
-  256
+  83,
+  293
  ],
  "order": [
   "strip-ninja-block#1",
   "strip-ninja-block#2",
   "strip-ninja-block#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

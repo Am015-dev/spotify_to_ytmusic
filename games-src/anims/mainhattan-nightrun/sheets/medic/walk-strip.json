@@ -12,5 +12,11 @@
   "strip-medic-walk#2",
   "strip-medic-walk#3",
   "strip-medic-walk#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.65
+ },
+ "px_per_m": 138.38
 }

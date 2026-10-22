@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 196,
- "h": 256,
+ "w": 216,
+ "h": 309,
  "anchor": [
-  98,
-  256
+  108,
+  309
  ],
  "order": [
   "strip-warden-jump#1",
   "strip-warden-jump#2",
   "strip-warden-jump#3",
   "strip-warden-jump#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.2,
+  "w": 0.9
+ },
+ "px_per_m": 116.36
 }

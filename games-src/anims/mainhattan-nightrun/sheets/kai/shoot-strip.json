@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 177,
- "h": 256,
+ "w": 187,
+ "h": 326,
  "anchor": [
-  88,
-  256
+  93,
+  326
  ],
  "order": [
   "strip-kai-shoot#1",
   "strip-kai-shoot#2",
   "strip-kai-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

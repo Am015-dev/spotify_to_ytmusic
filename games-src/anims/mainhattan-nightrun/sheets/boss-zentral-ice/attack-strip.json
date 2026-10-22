@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 392,
- "h": 249,
+ "w": 605,
+ "h": 427,
  "anchor": [
-  196,
-  249
+  302,
+  427
  ],
  "order": [
   "strip-boss-zentral-ice-attack#1",
   "strip-boss-zentral-ice-attack#2",
   "strip-boss-zentral-ice-attack#3",
   "strip-boss-zentral-ice-attack#4"
- ]
+ ],
+ "metres": {
+  "h": 5.0,
+  "w": 10.0
+ },
+ "px_per_m": 76.8,
+ "body": 384
 }

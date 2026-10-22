@@ -1,11 +1,11 @@
 {
  "frames": 6,
  "fps": 12,
- "w": 207,
- "h": 256,
+ "w": 198,
+ "h": 257,
  "anchor": [
-  103,
-  256
+  99,
+  257
  ],
  "order": [
   "strip-shield-run#1",
@@ -14,5 +14,11 @@
   "strip-shield-run#4",
   "strip-shield-run#5",
   "strip-shield-run#6"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.9
+ },
+ "px_per_m": 128.0
 }

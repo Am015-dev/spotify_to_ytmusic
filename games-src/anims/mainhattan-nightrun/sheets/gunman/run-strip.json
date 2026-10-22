@@ -1,11 +1,11 @@
 {
  "frames": 6,
  "fps": 12,
- "w": 175,
- "h": 256,
+ "w": 162,
+ "h": 259,
  "anchor": [
-  87,
-  256
+  81,
+  259
  ],
  "order": [
   "strip-gunman-run#1",
@@ -14,5 +14,11 @@
   "strip-gunman-run#4",
   "strip-gunman-run#5",
   "strip-gunman-run#6"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }
