@@ -34,6 +34,17 @@ html.ui2 .keys kbd,html.ui2 .keys span:nth-child(odd){border-radius:6px}
 html.ui2 .gfChip{border-radius:var(--u2r)!important;border-style:solid!important}
 html.ui2 #gaCards .card .pp{display:flex;gap:2px;max-width:220px}
 html.ui2 #gaCards .card .pp i{flex:1 1 0;height:6px!important;border-radius:3px}
+html.ui2 #setm .card{border:1.5px solid var(--u2line)!important;border-image:none!important;border-radius:14px!important;background:#0a061cf2!important}
+html.ui2 #setm .card h2{background:none!important;font-style:normal!important;border-bottom:1.5px solid var(--u2line);text-shadow:none!important}
+html.ui2 #setm .seg,html.ui2 #setm .sl{background:#140d2ee6!important;border:1.5px solid var(--u2line);border-radius:var(--u2r);padding:10px 16px!important;margin-bottom:8px}
+html.ui2 #setm,html.ui2 #setm *{font-style:normal!important}
+html.ui2 #setm .seg button{border-radius:8px!important;border:1.5px solid var(--u2line)!important;background:var(--u2fill)!important;color:var(--ink)!important}
+html.ui2 #setm .seg button[aria-pressed="true"]{background:linear-gradient(180deg,#ff5fb8,#c42a80)!important;border-color:#ffd0ea!important;color:#fff!important}
+html.ui2 #garage .tabs{gap:6px}
+html.ui2 #garage .tabs button.go{padding:.4em .5em!important;letter-spacing:.03em;font-size:clamp(12px,3.3vw,16px)!important;min-width:0}
+html.ui2 #hubJump{padding:8px 12px 8px!important;gap:8px!important}
+html.ui2 #hubJump button{border-radius:8px!important;border:1.5px solid var(--u2line)!important;background:var(--u2fill)!important;color:var(--ink)!important}
+html.ui2 .tdBar button{border-radius:var(--u2r)!important}
 @media (min-width:1024px) and (min-height:640px){
   html.ui2 #title .in{left:0;right:0;padding-left:max(6vw,48px)!important;box-sizing:border-box}
   html.ui2 #title h1{font-size:clamp(64px,min(7vw,13vh),112px)!important}
