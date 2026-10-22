@@ -79,16 +79,17 @@ const drive = (p, id, opt) => p.evaluate(([id, HUMAN, LS_HUMAN, opt]) => {
       ok(`drill ${id}: a hit in round 2 repeats round 2, then it still clears`, r.hitDone && r.afterHit && r.afterHit.r === 2 && r.afterHit.fails === r.failsBefore + 1 && r.rounds === 3 && r.ph === 'done', JSON.stringify(r.afterHit) + ' ' + r.rounds + ' ' + r.ph);
       await p.evaluate(() => { for (const b of ['lsDone', 'schCardList']) { const e = document.getElementById(b); if (e) e.click(); } try { __school.shut(); } catch (e) { } }); await sleep(200);
     }
-    // 1) no empty stretch, escalation  2) leaving a drill stops it  3) SKIP DEMO + a cleared drill skips its demo
+    // 1) no empty stretch, escalation  2) leaving a drill stops it  3) no SKIP DEMO pad (review 9 #12) + a cleared drill skips its demo
     {
-      const r = await p.evaluate(() => { __school.shut(); const sv = localStorage.getItem('mnr_school'); localStorage.removeItem('mnr_school'); __school.run('dodge'); const m = __mnr, SF = __schoolfull; m.simOn(true); m.god = true; const o = SF.SF.last.o, dt = 1 / 60;
+      const r = await p.evaluate(() => { __school.shut(); const sv = localStorage.getItem('mnr_school'); localStorage.removeItem('mnr_school'); __schoolfull.SF.demoSeen = {}; __school.run('dodge'); const m = __mnr, SF = __schoolfull; m.simOn(true);   // a fresh demo: each drill's demo plays once per session
+ m.god = true; const o = SF.SF.last.o, dt = 1 / 60;
         for (let i = 0; i < 60 * 3; i++) m.step(dt);
-        const demo0 = document.getElementById('sfDemo') && SF.SF.inDemo(); SF.SF.skipDemo(); for (let i = 0; i < 3; i++) m.step(dt);
+        const pad = !!document.getElementById('sfDemo'), demo0 = SF.SF.inDemo();   // review 9 #12: the drill bar has no SKIP DEMO pad SF.SF.skipDemo(); for (let i = 0; i < 60; i++) m.step(dt);
         const afterSkip = SF.state.ph; if (sv) localStorage.setItem('mnr_school', sv); m.simOn(false); m.god = false;
         __school.shut(); const stopped = !__tut.on && !__school.foot;
         __school.run('shield'); const ok2 = __tut.on && __tut.id === 'shield'; __school.shut();
-        return { demo0, afterSkip, stopped, ok2, none: !__tut.on }; });
-      ok('SKIP DEMO starts round 1', r.demo0 && r.afterSkip === 'play', JSON.stringify(r));
+        return { pad, demo0, afterSkip, stopped, ok2, none: !__tut.on }; });
+      ok('no SKIP DEMO pad in the drill bar; the demo plays (review 9 #12)', !r.pad && r.demo0, JSON.stringify(r));
       ok('shut() fully stops the drill, the next drill starts', r.stopped && r.ok2 && r.none, JSON.stringify(r));
       for (const id of ['dodge', 'fan', 'shoot', 'gate']) {
         const e = await p.evaluate(id => { const m = __mnr, SF = __schoolfull; __school.run(id); m.simOn(true); m.god = true; const dt = 1 / 60, o = SF.SF.last.o; SF.SF.skipDemo();

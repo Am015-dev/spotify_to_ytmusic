@@ -894,7 +894,7 @@ const nextDi=i=>{const p=posOf(i)+1;return p>=ORDER.length?{di:ORDER[0],wrap:tru
 const songFor=(i,loop)=>{const p=posOf(i);if(window.RET&&RET.dpool)return RET.DP.endless(i,loop|0);return loop?['endless','endless2'][p%2]:DISTRICTS[i]&&DISTRICTS[i].song||['stage1','stage2','stage3'][p%3];};
 const stageFor=(i,boss)=>ST.on?ST.def.song:boss?bossStage(DISTRICTS[i%DISTRICTS.length].boss):songFor(i,G.loop);
 function enterDistrict(i){G.di=i;G.pos=posOf(i);G.dt=0;G.d0=G.bc;G.dprog=0;G.force=false;G.boss=null;G.bossDone=false;G.waveT=3.2;G.waveWait=false;G.preload=false;const D=DISTRICTS[i];bgFor(i);DIR.begin(i);
-  banner(D.name,D.sub+(G.loop?`  ·  SCHICHT ${G.loop+1}`:'')+DIR.tag(),false,3.2);AU.root=D.root;AU.boss=false;
+  if(!(typeof TUT!=='undefined'&&(TUT.on||TUT.D)))banner(D.name,D.sub+(G.loop?`  ·  SCHICHT ${G.loop+1}`:'')+DIR.tag(),false,3.2);AU.root=D.root;AU.boss=false;   // review 9 #12: drills show no district banner
   if(G.live)AU.switchTo(stageFor(i,false));}
 
 /* ---------- the damage model: enemies are seen and fought (BALANCE.md) ----------
@@ -10724,7 +10724,7 @@ const FG=window.FG={get on(){return!!RET.forge;},s:null,ver:0,mn:[],kills:[0,0],
   icon(c,it,S){c.clearRect(0,0,S,S);{const pi=typeof ART==='object'&&ART.img('fg-'+it.replace(':','-'));if(pi){c.drawImage(pi,0,0,S,S);return;}}   // real picture fg-<h|m|k|p>-<id> when listed in ready.json
     const m=S/2;c.save();c.lineWidth=Math.max(2,S/16);
     const ty=it.split(':')[0],id=it.split(':')[1];
-    if(ty==='w'){const col=WPD[id]?WPD[id].c:'#fff';c.fillStyle=col;this.shape(c,'o',m,m,S*.3);c.fill();c.fillStyle='#0b0820';c.font='700 '+Math.round(S*.24)+'px "Share Tech Mono",monospace';c.textAlign='center';c.textBaseline='middle';c.fillText((WPD[id]?WPD[id].s:'?').slice(0,2),m,m+1);}
+    if(ty==='w'){const col=WPD[id]?WPD[id].c:'#fff',wp=typeof ART==='object'&&ART.img('wpmount-'+id);if(wp)c.drawImage(wp,0,0,S,S);else{c.fillStyle=col;this.shape(c,'o',m,m,S*.3);c.fill();}}   // review 9 #13: the weapon's own picture (wpmount-<id>), a plain colour disc otherwise; no letters on the cell
     else if(ty==='h'){const R=this.rid(id);if(R){const c1=WPD[R[0]].c,c2=WPD[R[1]].c,sh=FG_SH[FGR.indexOf(R)%FG_SH.length];c.fillStyle=c1;this.shape(c,'o',m-S*.08,m,S*.28);c.fill();
       c.globalCompositeOperation='lighter';c.fillStyle=c2;this.shape(c,'tri',m+S*.12,m,S*.24);c.fill();c.strokeStyle=c2;this.shape(c,sh,m+S*.3,m-S*.3,S*.1);sh==='ring'?c.stroke():c.fill();c.fillStyle=c1;this.shape(c,'dot',m-S*.32,m+S*.3,S*.12);c.fill();}}
     else if(ty==='m'){const M=FGM.find(x=>x[0]===id);c.strokeStyle=c.fillStyle='#e6e1ff';this.shape(c,M?M[5]:'dot',m,m,S*.3);(M&&M[5]==='ring')?c.stroke():c.fill();c.strokeStyle='#19e3ff';this.shape(c,'o',m,m,S*.44);c.stroke();}
@@ -14843,7 +14843,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='f764562c44 2026-10-22 01:56 UTC';
+const NR_STAMP='f64c4c1a23 2026-10-22 02:04 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -15529,6 +15529,13 @@ if(RET.layout){
   setTimeout(()=>{for(const b of document.querySelectorAll('.hubScr .hubAct'))b.classList.add('dim');},0);
   setTimeout(()=>{if(typeof fit==='function')fit();},0);
 }
+/* ---------- BUTTON WORDS (review 9 #7): every in-stage button under the field has its word and its charge number on every phone. Always on (no flag):
+   DASH, EMP and the power slot (bPwr) each get one label span under the button; the number is the button's own charge count (data-n, set by setRing). */
+{const st=document.createElement('style');st.textContent=`#touch button#bDash,#touch button#bEmp{overflow:visible}
+#touch .bw{position:absolute;left:50%;bottom:calc(100% + 2px);transform:translateX(-50%);white-space:nowrap;pointer-events:none;font:700 11px/1 var(--mono,monospace);color:#fff;text-shadow:0 0 3px #000,0 0 6px #000;letter-spacing:.04em}
+#touch button#bPwr::before{content:none!important}`;document.head.appendChild(st);}
+const BW=[['bDash','DASH'],['bEmp','EMP'],['bPwr',null]].map(([id,word])=>{const b=document.getElementById(id);if(!b)return null;const s=document.createElement('span');s.className='bw';s.setAttribute('aria-hidden','true');b.appendChild(s);return{b,s,word};});
+setInterval(()=>{for(const q of BW){if(!q)continue;const word=q.word||q.b.dataset.lbl||'POWER',n=q.b.dataset.n||'0',t=q.word?word+' '+n:word;if(q.s.textContent!==t)q.s.textContent=t;}},150);   // review 9 #7: word + charge number, same on every phone
 
 // PURPOSE: TRAINING = FLIGHT SCHOOL: one ordered list of drills (basics, loadout lessons, counters, gate, on foot), progress, next drill
 // FLAG: school (?school=0)
@@ -15668,7 +15675,7 @@ window.__school={get ids(){return rows().map(d=>d.id);},get all(){return DR.map(
    s without a success) repeats that round, never back to the list. Counter: coach bar "R2/3 · 1/3", lesson head "ROUND 2/3", a badge on foot. The clear
    card / line shows time and rounds. Saves only what school.js / lessons.js already save (mnr_school, mnr_lessons). Test: nightrun/school-full-test.js. */
 if(RET.schoolfull===undefined)RET.schoolfull=!/[?&]schoolfull=0/.test(location.search);
-const SF={DEMO:8,RMIN:12,NEED:3,REPMAX:25,LSMAX:60,log:[],last:null,get on(){return !!RET.schoolfull;}};
+const SF={DEMO:8,RMIN:12,NEED:3,REPMAX:25,LSMAX:60,log:[],last:null,demoSeen:{},get on(){return !!RET.schoolfull;}};
 {const st=document.createElement('style');st.textContent=`#tutB.drl.sf .tn{display:block;flex:0 0 auto;font:700 13px var(--mono);color:#ffe14d;white-space:nowrap}
 #sfBadge{position:fixed;z-index:9200;left:50%;top:calc(158px + env(safe-area-inset-top,0px));transform:translateX(-50%);max-width:calc(100% - 32px);box-sizing:border-box;padding:6px 12px;border-radius:10px;
 background:rgba(13,8,32,.86);border:2px solid #ffe14d;color:#fff;font:700 14px var(--mono);text-align:center;pointer-events:none}#sfBadge[hidden]{display:none}`;document.head.appendChild(st);}
@@ -15685,7 +15692,7 @@ SF.wrap=(b,d)=>{const vol=SF.VOL[b.id]?b.id:null;const o={id:b.id,base:b,ph:'dem
   get free(){return b.free;},get foes(){return b.foes;},
   say(){return o.ph==='demo'?'WATCH: '+b.say():sfGoal(o.r,b.say());},
   init(){o.ph='demo';o.em={};o.run=0;o.vn=0;o.vt=0;o.tl=0;o.r=0;o.k=0;o.T=0;o.rt=0;o.pt=0;o.gap=0;o.fails=0;o.rounds=0;o.hp=P.hp;tutB.classList.add('sf');b.init();o.cnt();SF.last={id:d.id,kind:'tut',o};
-    if(SCH.was&&SCH.was(d.id))o.T=SF.DEMO;},   // a cleared drill replays without the demo
+    if(SCH.was&&SCH.was(d.id)||SF.demoSeen[d.id])o.T=SF.DEMO;SF.demoSeen[d.id]=1;},   // a cleared drill, or one whose demo already played, starts at round 1
   tgt(){return o.gap>0?null:b.tgt?b.tgt():null;},
   skipDemo(){if(o.ph==='demo')o.T=SF.DEMO;},
   beat(i){if(o.gap>0||vol)return;if(b.beat)b.beat(i);if(o.r===3&&o.ph==='play'&&i%4===0&&!/^(dodge|fan)$/.test(b.id))o.over();},
@@ -15751,17 +15758,13 @@ SF.footDown=f=>{const F=f.F;if(!F||F.t)return false;F.k=0;F.fails++;F.acc+=ftT()
   setTimeout(()=>{if(SCH.foot!==f||f.end)return;let ok=false;try{FOOT.stop();ok=FOOT.start('street1');}catch(e){}
     if(!ok){SCH.footEndNow&&SCH.footEndNow(false);return;}F.acc-=ftT();F.rt0=ftC(f);F.hurts=0;SF.footCnt(f);},0);return true;};
 /* ===== 4. SKIP DEMO: one button for all three kinds while a demo plays (a cleared drill skips its demo by itself) ===== */
-{const st=document.createElement('style');st.textContent=`#sfDemo{position:fixed;z-index:9210;left:50%;top:calc(116px + env(safe-area-inset-top,0px));transform:translateX(-50%);min-width:150px;min-height:44px;padding:0 16px;border-radius:10px;border:2px solid #ffe14d;background:#1a1033;color:#fff;font:700 15px var(--display);letter-spacing:.08em;cursor:pointer}#sfDemo[hidden]{display:none}`;document.head.appendChild(st);}
-const sfDemo=document.createElement('button');sfDemo.type='button';sfDemo.id='sfDemo';sfDemo.hidden=true;sfDemo.textContent='SKIP DEMO';sfDemo.setAttribute('aria-label','Skip the demo and start round 1');document.body.appendChild(sfDemo);
-for(const ev of['touchstart','touchend','pointerdown','mousedown'])sfDemo.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
+/* review 9 #12: the drill bar shows AGAIN and SKIP only, so there is no floating SKIP DEMO pad; the demo plays once per drill (SF.demoSeen) */
 SF.inDemo=()=>{const L=SF.last;if(!L)return false;
   if(L.kind==='tut')return L.o.ph==='demo'&&TUT.on&&TUT.cur()===L.o;
   if(L.kind==='lesson')return LS.m===L.m&&L.m.state==='demo';
   return SCH.foot===L.f&&!!L.f.F&&!L.f.F.r&&!L.f.end;};
 SF.skipDemo=()=>{const L=SF.last;if(!L||!SF.inDemo())return false;
   if(L.kind==='tut')L.o.skipDemo();else if(L.kind==='lesson')L.m.F.demo=0;else{const F=L.f.F;F.acc+=SF.DEMO-ftC(L.f);SF.footCnt(L.f);}return true;};
-sfDemo.addEventListener('click',e=>{e.stopPropagation();SF.skipDemo();});
-setInterval(()=>{const on=SF.on&&SF.inDemo();if(sfDemo.hidden===on)sfDemo.hidden=!on;},150);
 if(RET.schoolfull){SCH.wrap=SF.wrap;SCH.sf=SF;}
 window.__schoolfull={get on(){return SF.on;},get log(){return SF.log;},SF,
   get state(){const L=SF.last;if(!L)return null;if(L.kind==='tut'){const o=L.o;return{id:L.id,kind:'tut',ph:o.ph,r:o.r,k:o.k,T:o.T,rounds:o.rounds,fails:o.fails,gap:o.gap,em:o.em};}
