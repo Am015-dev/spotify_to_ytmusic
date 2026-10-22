@@ -1,6 +1,6 @@
 # Coordinator handoff (OD 0e), 2026-10-22 ~07:40 UTC
 Coordinator session_01L97MfPJRbeb3t9g3h8vcM3. Read CLAUDE.md, then this. Deploy recipe: docs/HANDOFF_coordinator_0c.md (worked for beta.151; Artifact publish needs read of live page + models/lx.js, xf.js first).
-LIVE NOW: beta.153 (73396b8, Beta v319) from a4ef2a5: Athens fill-block colliders fixed; ?clb, ?t9e, ?bx OFF. Running: invisible-stops session_01LmiB33A1y4EvdhddXPxpz7 (SONNET), no-card-without-tap session_01PNsoXLZRDXhmLxKj2cT2ri (SONNET). Parked (2 lanes, need design plan): reveal stall, glossy, Athens trap slopes (t9e not proven: QTC re-dump), hill climb (crest stall + yJump), core,studs.
+LIVE NOW: beta.154 (275d133, Beta v320) from 683f56f: smash look ON fra, no popups while driving. Running: frame-js session_01JnTTuywpqpyGP4S62VhPjf (OPUS), roamcard-quiet session_01KT4LZmMwfDawpQSZbqk6mw (SONNET). Queue (rules 11-18): bughunt phone profile + nearAny dead-car fix; flake-kill (cam-clear, hud6, quiet-start fra, smash, xf1/grass, traffic-inview ath, tr9-chunk, speedfeel ath); preview build with all flags ON + 1-day on-or-delete for clb/t9e/bx/gloss/core/studs. Parked: reveal stall, glossy, ath slope traps, climb.
 ## Live
 beta.151 (ce32c02, Beta v317), built from 7394743: speed feel, solid-cars r3 (camera turn), ground-tile + coin prewarm, core reveal, xf1/water. gloss and ?cl=core,studs default OFF.
 ## Reviewed since (on trunk, not live)

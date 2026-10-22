@@ -94,3 +94,6 @@ Model and status come from the session list. Cost is blank: the session list doe
 | let-cars-climb-r22e17 | beta.153 (flag OFF) | Opus | climb window behind ?clb=1 | #48 PASS flag-off |
 | climb-r2-r22e18 | — | Sonnet | clb A/B: not clean, stays OFF | docs only; target parked |
 | reviews 41-49 | beta.152/153 | Opus | 9 reviews | done |
+| invisible-stops-r22e19 | — | Sonnet | bughunt names the clamp per stop; traffic contacts no longer "invisible" | #50 PASS (tool), small nearAny fix queued |
+| no-card-without-tap-r22e20 | beta.154 | Sonnet | toasts + TAP TO START while driving | #51 FAIL, #53 PASS, shipped |
+| smash-look-r22e22 | beta.154 | Opus | 2K-style smash burst, ?cl=smash ON fra | #52 PASS, shipped |
