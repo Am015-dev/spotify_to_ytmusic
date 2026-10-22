@@ -34,14 +34,14 @@ const LIT=window.LIT={
     for(const o of this.L){const k=o.l/o.m;ctx.globalAlpha=.4*k*k;const r=o.r*(1.2-.2*k);ctx.drawImage(this.spr(o.c),o.x-r,o.y-r,r*2,r*2);o.l-=dt;}
     ctx.restore();this.L=this.L.filter(o=>o.l>0);},
   /* the grade over the whole picture (backdrop + sprites), before the scanlines */
-  grade(w,h){const D=this.D();ctx.save();ctx.globalCompositeOperation='soft-light';ctx.globalAlpha=.32;ctx.fillStyle=D.a;ctx.fillRect(0,0,w,h);ctx.restore();}};
-{
+  grade(w,h){const D=this.D();ctx.save();ctx.globalCompositeOperation='soft-light';ctx.globalAlpha=.22;ctx.fillStyle=D.a;ctx.fillRect(0,0,w,h);ctx.restore();}};
+if(RET.lit){   // off: no wrapper at all, the old game runs untouched
   { const d0=drawEnemy;drawEnemy=function(e,t){if(!LIT.on()||e.dead||e.hp<=0)return d0.apply(this,arguments);const r=Math.max(10,Math.min(e.type==='boss'?60:34,e.r||14));
       LIT.under(e.x,e.y,r);const o=d0.apply(this,arguments);LIT.over(e,e.x,e.y,r,e.type==='boss'?0:clamp((e.x-W*.72)/(W*.28),0,1));return o;}; }
   { const p0=drawPlayer;drawPlayer=function(t){if(!LIT.on()||G.dead)return p0.apply(this,arguments);LIT.under(P.x,P.y,16);const o=p0.apply(this,arguments);LIT.over(null,P.x,P.y,16,0);LIT.lights(FD||1/60);return o;}; }
   { const s0=scanFor;scanFor=function(port){if(LIT.on())LIT.grade(port?PW_:W,port?PH_:H);return s0.apply(this,arguments);}; }
   { const e0=eb;eb=function(x,y){const s=eb.src;if(LIT.on()&&s&&s.type!=='boss'&&LIT.L.length<20)LIT.light(x,y,46,'#ffb070',.14);e0.src=s;try{return e0.apply(this,arguments);}finally{e0.src=null;}}; }
-  NR.on('kill',o=>{const e=o&&o.e;if(!e||!LIT.on())return;const big=e.type==='turret'||e.type==='gunship'||e.ldr;LIT.light(e.x,e.y,big?130:80,big?'#ffc060':'#ff9a50',big?.3:.18);
+  NR.on('kill',o=>{const e=o&&o.e;if(!e||!LIT.on())return;const big=e.type==='turret'||e.type==='gunship'||e.ldr;LIT.light(e.x,e.y,big?95:60,big?'#ffc060':'#ff9a50',big?.3:.18);
     if(big)shake(5);});
   NR.on('runStart',()=>{LIT.L=[];});
 }
