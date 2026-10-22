@@ -1,0 +1,4 @@
+# HANDOFF onfoot-edge-r22e31
+- Root cause: OF_walk (src/98of_onfoot.js) had no world-edge clamp; driving clamps 10 m inside + edgeStep (slow-down, TURN BACK banner). On foot the walker ran to the wall boxes (≈ 5-9 m from the edge, bughunt `bounds` at +5).
+- Fix: OF_walk reuses edgeStep (velocity mapped onto RO.v) and clamps to WX0/WX1/WZS/WZN ±10 like roamStep; outward velocity zeroed (no teleport). GO `edge1/onfoot-edge` (OF_edgeGo, registered in lazy src/99oe_edge.js because 99c_checklist.js is at its 200 KB cap): 6 runs x 20 s per city (N S E W + 2 bughunt spots), asserts in box, not below ground, no step > 1 m. FAILED before the fix (fra+ath), PASS after.
+- Measured: unit 0 FAIL, gate 76/76 (fra+ath), bughunt fra phone bounds 0. Left: bughunt belowGround/yJump (car, not on foot) varied run to run, not touched.

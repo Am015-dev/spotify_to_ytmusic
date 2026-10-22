@@ -183,6 +183,9 @@ function OF_walk(dt){const I=OF_input(),il=Math.hypot(I.fx,I.fy),ia=Math.atan2(I
   let why='';if(g1>OF.y+OF_STEP||(CID==='fra'&&inRiver(nx,nz)&&g1<=HWY+.3)){nx=OF.x;nz=OF.z;why=g1>OF.y+OF_STEP?'step'+(g1-OF.y).toFixed(2):'river'}
   [nx,nz]=OF_collide(nx,nz,OF.y);if(roamHit(nx,nz,OF_R*.6,OF.y+1)){nx=OF.x;nz=OF.z}
   const moved=Math.hypot(nx-OF.x,nz-OF.z);if(m>.3&&moved<tv*dt*.25){OF.n.stuckF++;if((OF.stk||(OF.stk=[])).length<12&&OF.n.stuckF%10===1)OF.stk.push([Math.round(OF.x),Math.round(OF.z),why||(roamHit(OF.x,OF.z,OF_R+.1,OF.y+1)?'bld':'car/prop')])}if(m>.3)OF.n.walkF++;
+  // r22e31: the world edge, same as driving (71_roam_drive: clamp 10 m inside + edgeStep's slow-down and TURN BACK banner); on foot the walker used to leave the world box
+  {const sp=Math.hypot(OF.vx,OF.vz);if(sp>.01){RO.v=sp;RO.vh=Math.atan2(OF.vx,OF.vz);edgeStep(dt);const k=Math.max(0,RO.v)/sp;OF.vx*=k;OF.vz*=k;nx=OF.x+OF.vx*dt;nz=OF.z+OF.vz*dt;RO.v=0}
+   const cx=clamp(nx,WX0+10,WX1-10),cz=clamp(nz,WZS+10,WZN-10);if(cx!==nx){OF.vx=0;nx=cx}if(cz!==nz){OF.vz=0;nz=cz}}
   OF.x=nx;OF.z=nz;const g=groundAt(OF.x,OF.z,OF.y+OF_STEP+.05);
   if(OF.air||OF.y>g+.05){OF.vy-=OF_G*dt;OF.y+=OF.vy*dt;if(OF.y<=g){OF.y=g;OF.vy=0;OF.air=false}else OF.air=true}else{OF.y=g;OF.vy=0}
   if(Math.hypot(OF.vx,OF.vz)>0)OF.spd=moved/Math.max(dt,1e-4)}
@@ -394,6 +397,17 @@ function OF_pave(far){const N=HUB.nodes;if(!N)return null;const L=[];for(let i=0
 // car parked at (cx,cz) heading h, minifig on foot at (x,z) heading fh (default h), camera behind
 function OF_spawn(P,fx,fz,fh){if(!roamWarp(P.cx,P.cz,P.h,true))return false;OF_poseCar(RO.x,RO.z,RO.y,RO.h);OF.idle=1;OF_exit();const T=OF.tw;RO.foot='walk';OF.tw=null;OF.x=fx??P.x;OF.z=fz??P.z;OF.y=groundAt(OF.x,OF.z,RO.y+2);OF.h=fh??P.h;
   OF.vx=OF.vz=OF.vy=0;OF.spd=0;OF.air=false;OF.cy=OF.cyIn=OF.h;OF.cp=0;OF.camT=9;OF.camB=4.5;OF.inA=null;OF.recen=false;OF.hPrev=null;RO.x=OF.x;RO.z=OF.z;RO.y=OF.y;RO.h=RO.vh=OF.h;OF_btns();return true}
+// r22e31 GO onfoot/edge: on foot, run straight at each world edge (N S E W + the 2 bughunt spots) for 20 s of sim time; stay inside the box (clamp 10 m in), never below the ground, no jump > 1 m per step (no teleport)
+function OF_edgeGo(){const r=OF_go('jump');if(RO.foot!=='walk')return r;const sv={x:OF.x,z:OF.z},cx=(WX0+WX1)/2,cz=(WZS+WZN)/2,I=60,HIT=[[7995,3033],[-5150,-5195]],T=[['N',cx,WZN-I,0],['S',cx,WZS+I,Math.PI],['E',WX1-I,cz,Math.PI/2],['W',WX0+I,cz,-Math.PI/2]];
+  for(const[x,z]of HIT){const px=clamp(x,WX0+30,WX1-30),pz=clamp(z,WZS+30,WZN-30),e=[[px-WX0,-Math.PI/2],[WX1-px,Math.PI/2],[pz-WZS,Math.PI],[WZN-pz,0]].sort((a,b)=>a[0]-b[0])[0];T.push(['spot'+Math.round(x),px,pz,e[1]])}
+  const bad=[],kk={KeyW:K.KeyW,ShiftLeft:K.ShiftLeft};let worst=1e9;
+  try{K.KeyW=true;K.ShiftLeft=true;for(const[n,x,z,yaw]of T){OF.x=x;OF.z=z;OF.y=groundAt(x,z,999);OF.vx=OF.vz=OF.vy=0;OF.air=false;OF.cy=OF.cyIn=OF.h=yaw;OF.inA=0;OF.camT=9;
+    let px=OF.x,pz=OF.z,why='';for(let i=0;i<600&&!why;i++){OF.cy=OF.cyIn=yaw;OF.inA=0;OF_step(1/30);const g=groundAt(OF.x,OF.z,OF.y+2);
+      if(!isFinite(OF.x+OF.y+OF.z))why='NaN';else if(OF.x<WX0+9||OF.x>WX1-9||OF.z<WZS+9||OF.z>WZN-9)why='outside the world box';else if(OF.y<g-.3)why='below the ground '+(g-OF.y).toFixed(1);else if(Math.hypot(OF.x-px,OF.z-pz)>1)why='teleport '+Math.hypot(OF.x-px,OF.z-pz).toFixed(1)+' m';
+      worst=Math.min(worst,OF.x-WX0,WX1-OF.x,OF.z-WZS,WZN-OF.z);px=OF.x;pz=OF.z}
+    if(why)bad.push(n+' '+why+' @'+Math.round(OF.x)+','+Math.round(OF.z))}}
+  finally{K.KeyW=kk.KeyW;K.ShiftLeft=kk.ShiftLeft;OF.x=sv.x;OF.z=sv.z}
+  return'📍 ON-FOOT EDGE · '+T.length+' runs of 20 s · closest to the edge '+worst.toFixed(1)+' m'+(bad.length?' ❌ '+bad.join(' | '):' ✅')}
 function OF_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(RO.ch||RO.sp){try{if(RO.sp)sprintEnd();chAbort()}catch(e){}}if(RO.card){RO.card=null;$('#roamCard').hidden=true}
   OF_reset();OF_actEnd&&OF_actEnd();
   if(kind==='bench'||kind==='mission'){const T=[];
