@@ -4,6 +4,8 @@
 // DETECTORS log time, seed, city, x,y,z, a repro URL and one line; hits are deduped per detector by 25 m cell. Then real touch taps on ❚❚ / RESET CAR / map / FAST TRAVEL.
 //   node tools/bughunt.js --hours 2 --city fra            gate: one PASS/FAIL line per detector (wall budget --budget 270 s incl. boot; sim time achieved is printed)
 //   node tools/bughunt.js --hours 6 --city both --budget 2400 --json docs/shots/bughunt/fra_ath.json --shots 10   long hunt + 393x852 shots of the worst cells
+//   PROFILE: default = PHONE (iPhone UA + dpr 3 + 852x393 touch: the game's own LOWMEM / phone perf tier / PC compaction path, CLAUDE.md rule 12); --desktop = desktop UA, dpr 1 (the extra run). No CPU throttle (it would only slow the stepped sim).
+//   --gate  run fra+ath and exit 1 if any detector is worse than docs/shots/bughunt/baseline_<profile>.json (--baseline F to override; --save-baseline F writes the current rates as the new baseline)
 //   --build out/<ver>  use an existing build (default: tools/build.sh bughunt once, reused while src/ is older)   --dt 0.05 (frame clamp = 20 fps phone; 0.0333 = 30 fps)
 //   --q "t9e=1&bx=1"  extra URL query on every page (flag A/B)   --seed0 K  offset the seeds (more samples from repeat runs)   --seeds N  episodes per city (default: one per 10 sim-min)   --pages N  parallel pages per city (default 1)   --notap  skip the touch-tap check
 // Speed note: the game's own frame (streets step ~11 ms + roamStep ~6 ms + cam ~4 ms on this 4-core container) caps one page at ~2-3x real time, not x1000;
@@ -11,7 +13,9 @@
 const {chromium}=(()=>{try{return require('playwright')}catch(e){return require('/opt/node22/lib/node_modules/playwright')}})();
 const fs=require('fs'),path=require('path'),http=require('http'),cp=require('child_process');
 const A=process.argv.slice(2),arg=(k,d)=>{const i=A.indexOf('--'+k);return i<0?d:(A[i+1]&&!A[i+1].startsWith('--')?A[i+1]:true)};
-const HOURS=+arg('hours',2),CITY=arg('city','fra'),BUDGET=+arg('budget',270),DT=+arg('dt',0.05),PAGES=+arg('pages',1),JSON_OUT=arg('json',''),SHOTS=+arg('shots',0),NOTAP=!!arg('notap',false);
+const HOURS=+arg('hours',2),CITY=arg('city','fra'),BUDGET=+arg('budget',270),DT=+arg('dt',0.05),PAGES=+arg('pages',1),JSON_OUT=arg('json',''),SHOTS=+arg('shots',0),NOTAP=!!arg('notap',false),DESK=!!arg('desktop',false),GATE=!!arg('gate',false),PROF=DESK?'desktop':'phone';
+const IPHONE_UA='Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
+const ctxOpts=(w,h)=>DESK?{viewport:{width:w,height:h},deviceScaleFactor:1,isMobile:true,hasTouch:true}:{viewport:{width:w,height:h},deviceScaleFactor:3,isMobile:true,hasTouch:true,userAgent:IPHONE_UA};
 const ROOT=path.join(__dirname,'..'),T0=Date.now(),wall=()=>(Date.now()-T0)/1000;
 const LIMIT={nan:0,bounds:0,jsErr:0,belowGround:0,yJump:0,launch:0,stuck:4,npcOverlap:2,npcLateral:3,npcPop:6,backOnRoad:6,frustration:15,invisible:1,popup:2,deadButton:0};
 let BUILD=arg('build','');
@@ -45,7 +49,7 @@ const popScan=()=>{const now=new Set();let big=[];try{big=[...document.querySele
  BH.popSeen=now};
 // ---------- autoplayer ----------
 const keys=()=>{for(const k in K)K[k]=false};
-/* invisible-stops-r22e19: a contact with ANY traffic car counts as an NPC hit (the old nearCar skipped cars closer than 3 m, parked and dead ones: HT_smash/W10_bump/NC_sep stops were filed as invisible) */const nearAny=R=>{for(const c of HUB.cars)if(Math.hypot(c.x-RO.x,c.z-RO.z)<R&&Math.abs((c.y||RO.y)-RO.y)<4)return c;for(const[c,q]of CP)if(Math.hypot(q.x-RO.x,q.z-RO.z)<R||Math.hypot(q.x-P.x,q.z-P.z)<R)return c;/* a smashed car is thrown/recycled out of range in the same step: use where it was one step ago */return null};
+/* invisible-stops-r22e19: a contact with ANY traffic car counts as an NPC hit (the old nearCar skipped cars closer than 3 m, parked and dead ones: HT_smash/W10_bump/NC_sep stops were filed as invisible) */const nearAny=R=>{for(const c of HUB.cars)if(!(c.dead>0)&&Math.hypot(c.x-RO.x,c.z-RO.z)<R&&Math.abs((c.y||RO.y)-RO.y)<4)return c;for(const[c,q]of CP)if(!(c.dead>0)&&Math.hypot(q.x-RO.x,q.z-RO.z)<R||Math.hypot(q.x-P.x,q.z-P.z)<R)return c;/* a smashed car is thrown/recycled out of range in the same step: use where it was one step ago */return null};
 const nearCar=(R)=>{let b=null,bd=R;for(const c of HUB.cars){if(c.dead>0||c.pk)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<bd&&d>3){bd=d;b=c}}return b};
 const steerTo=a=>{const e=Math.atan2(Math.sin(a-RO.h),Math.cos(a-RO.h));K.ArrowRight=e>.08;K.ArrowLeft=e<-.08;return e};   // RO.h grows to the right: sin(h),cos(h) is forward
 const groundY=(x,z)=>{try{return roamTerr(x,z,999).g}catch(e){return 0}};
@@ -80,8 +84,8 @@ const detect=dt=>{const VL=BH.vl;BH.vl=null;const x=RO.x,y=RO.y,z=RO.z,foot=RO.f
   if(BH.gas){BH.gasT+=dt;if(gs<10/3.6)BH.slowT+=dt;if(gs<3/3.6){stuckT+=dt;if(stuckT>2&&!stuckOn){stuckOn=true;add('stuck','gas held, < 3 km/h for 2 s (mode '+BH.mode+')')}}else{stuckT=0;stuckOn=false}}else{stuckT=0;stuckOn=false}
   // contacts: a speed drop of > 6 m/s in one step without the brake
   const dv=Math.abs(P.v)-Math.abs(RO.v);
-  if(!warp&&dv>6&&!K.ArrowDown&&!(VL&&VL.f.some(f=>f.startsWith('roamWarp:')))){const c=nearAny(8),fx=Math.sin(RO.h),fz=Math.cos(RO.h);
-   if(c){BH.hits.npc++}else{let b=null;for(const r of[0,1.5,2.5,3.5,-1.5]){try{b=roamHit(x+fx*r,z+fz*r,1.4,y)}catch(e){}if(b)break}if(!b){try{b=roamHit(P.x,P.z,1.4,P.y)}catch(e){}}
+  if(!warp&&dv>6&&!K.ArrowDown&&!(VL&&VL.f.some(f=>f.startsWith('roamWarp:')))){const c=nearAny(8),fx=Math.sin(RO.h),fz=Math.cos(RO.h),trafW=!!(VL&&VL.f.some(f=>/^(NC_|W10_|HT_)/.test(f)));/* r22e24: an NPC near the stop counts only when a traffic writer (NC_sep|W10_bump|HT_smash...) made the drop; no writer = stays invisible */
+   if(c&&trafW){BH.hits.npc++}else{let b=null;for(const r of[0,1.5,2.5,3.5,-1.5]){try{b=roamHit(x+fx*r,z+fz*r,1.4,y)}catch(e){}if(b)break}if(!b){try{b=roamHit(P.x,P.z,1.4,P.y)}catch(e){}}
     if(b){BH.hits.world++}else{const g2=groundY(x+fx*3,z+fz*3);if(g2-y<.6){BH.hits.invisible++;const wk=VL?VL.f.slice(0,3).join(' < '):'(none: speed changed without a single drop write)';BH.why[wk]=(BH.why[wk]||0)+1;add('invisible','stopped by nothing: -'+(dv*3.6).toFixed(0)+' km/h in one step, no NPC, no collider, no slope ahead; reason '+wk,undefined,undefined,undefined,{why:VL?VL.f:null})}}}}}
  const NDG=(c,p)=>{const f=v=>typeof v==='number'?+v.toFixed(2):v;return{dg:{a:c.a,b:c.b,t:f(c.t),cv:f(c.cv),hh:f(c.hh),yo:f(c.yo),lr:[f(c.lrx),f(c.lrz)],route:!!c.route,tr:!!c.tr,hitT:f(c.hitT),deS:c.deS,hold:f(c.hold),fdt:f(c.fdt),dx:p?f(c.x-p.x):null,dz:p?f(c.z-p.z):null,p:p?{a:p.a,b:p.b,t:f(p.t),cv:f(p.cv),hh:f(p.hh),yo:f(p.yo),lr:[f(p.lrx),f(p.lrz)],mx:f(p.mx),mz:f(p.mz),dead:f(p.dead)}:null,act:BH.act}}};
  // stuck ladder / UNSTUCK cells (ath-trap-r22e14): where the ladder fires, so the trap geometry can be found
@@ -133,7 +137,7 @@ async function taps(p){const out=[];const T=async(sel)=>{const b=await p.$(sel);
  a=await T('#roamFT');const tf=Date.now();await p.waitForTimeout(1500);await p.waitForFunction(()=>__oc.ev('!LD.on&&!LD.busy&&state==="roam"'),null,{polling:250,timeout:90000}).catch(()=>{});const ftS=(Date.now()-tf)/1000;s=JSON.parse(await ev(`JSON.stringify({x:RO.x,z:RO.z,map:!!RO.mapOpen,st:state})`));const mv=Math.hypot(s.x-g.x,s.z-g.z);out.push(['FAST TRAVEL tap moves the car',a==='ok'&&mv>100,a+' to '+g.id+' moved '+mv.toFixed(0)+' m in '+ftS.toFixed(0)+' s real, map='+s.map]);
  await ev(`try{if(RO.mapOpen)toggleMap(false)}catch(e){}try{__tq.reset()}catch(e){}__BH.capture();0`);await p.waitForTimeout(300);return out}
 
-async function cityRun(b,base,city,simTarget,wallEnd,pageNo){const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await ctx.newPage();const errs=[];p.setDefaultTimeout(180000);
+async function cityRun(b,base,city,simTarget,wallEnd,pageNo){const ctx=await b.newContext(ctxOpts(852,393));const p=await ctx.newPage();const errs=[];p.setDefaultTimeout(180000);
  await p.addInitScript(()=>{window.__dbg=1});p.on('pageerror',e=>errs.push(String(e).slice(0,160)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,160))});
  const tb=Date.now();await p.goto(base+'?test='+city+'&draw=0'+(arg('q','')?'&'+arg('q'):''));await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:250,timeout:420000});const boot=(Date.now()-tb)/1000;
  const ev=s=>p.evaluate(c=>__oc.ev(c),s);if(await ev('1')!==1)throw new Error('__oc.ev disabled (needs window.__dbg)');
@@ -144,7 +148,7 @@ async function cityRun(b,base,city,simTarget,wallEnd,pageNo){const ctx=await b.n
   while(e<epLen&&sim<simTarget&&Date.now()<wallEnd){const n=await ev('__BH.run(1500,'+Math.ceil(Math.min(epLen-e,simTarget-sim)/DT)+')');steps+=n;e+=n*DT;sim+=n*DT;if(!n){await ev('__BH.release();0');await p.waitForTimeout(500);await ev('__BH.capture();0');await p.waitForTimeout(50)}else await p.waitForTimeout(5)}}   // 5 ms gaps: lazy chunks, timers and promises get to run
  const R=JSON.parse(await ev('JSON.stringify(__BH.report())'));R.city=city;R.boot=boot;R.steps=steps;R.episodes=ep;R.pageErrs=errs.slice(0,20);R.nPageErr=errs.length;R.taps=tapRes;R.page=p;R.ctx=ctx;R.msPerStep=0;return R}
 
-async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const ctx=await b.newContext({viewport:{width:393,height:852},deviceScaleFactor:1,isMobile:true,hasTouch:true});const out=[];
+async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const ctx=await b.newContext(Object.assign(ctxOpts(393,852),{deviceScaleFactor:1}));const out=[];
  const by={};for(const c of cells)(by[c.city]=by[c.city]||[]).push(c);
  for(const city in by){const p=await ctx.newPage();await p.addInitScript(()=>{window.__dbg=1});await p.goto(base+'?test='+city+'&draw=0'+(arg('q','')?'&'+arg('q'):''));await p.waitForFunction(()=>window.__tq&&__tq.ready&&window.__oc,null,{polling:250,timeout:240000});
   await p.evaluate(()=>__tq.draw()).catch(()=>{});
@@ -156,7 +160,7 @@ async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const 
 (async()=>{const[s,port]=await serve(BUILD);const base=`http://127.0.0.1:${port}/index.html`;const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-background-timer-throttling','--disable-renderer-backgrounding']});
  // --shotat 'fra:det:x,z,h;ath:det:x,z,h'  only take 393x852 shots at these spots (repro check of a hotspot), no hunt
  if(arg('shotat','')){const cells=String(arg('shotat')).split(';').filter(Boolean).map(q=>{const[city,det,xz]=q.split(':'),[x,z,h]=xz.split(',').map(Number);return{city,det,x,z,h:h||0}});console.log((await shots(b,base,cells,path.join(ROOT,'docs/shots/bughunt'))).join('\n'));await b.close();s.close();return}
- const cities=CITY==='both'?['fra','ath']:[CITY],wallEnd=T0+Math.max(30,BUDGET-(SHOTS?60*Math.ceil(SHOTS/4):0)-15)*1000;
+ const cities=(CITY==='both'||GATE)?['fra','ath']:[CITY],wallEnd=T0+Math.max(30,BUDGET-(SHOTS?60*Math.ceil(SHOTS/4):0)-15)*1000;
  const jobs=[];for(const c of cities)for(let i=0;i<PAGES;i++)jobs.push(cityRun(b,base,c,HOURS*3600/PAGES,wallEnd,i).catch(e=>({city:c,fail:String(e).slice(0,200)})));
  const runs=await Promise.all(jobs);const res={};let fails=0;
  for(const r of runs){if(r.fail){console.log('FAIL boot '+r.city+' '+r.fail);fails++;continue}const C=res[r.city]=res[r.city]||{t:0,km:0,cnt:{},gasT:0,slowT:0,hits:{npc:0,world:0,invisible:0},cells:[],msgs:{},taps:[],errs:[],nErr:0,steps:0,episodes:0,boot:[],xcErr:[],acts:{},skh:[],sl:{},mT:{},why:{}};
@@ -171,10 +175,14 @@ async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const 
   {const by={},wy={};for(const k in C.sl){const[m,w]=k.split('|');by[m]=(by[m]||0)+C.sl[k];wy[w]=(wy[w]||0)+C.sl[k]}lines.push(`INFO slope ${city} slides ${C.cnt.slopeSlide|0} = ${((C.cnt.slopeSlide|0)/h).toFixed(1)}/h · per mode `+Object.keys(by).sort().map(m=>`${m||'-'} ${by[m]} (${(by[m]/Math.max(C.mT[m]||1,1)*3600).toFixed(0)}/mode-h)`).join(', ')+` · by clamp `+Object.entries(wy).map(([w,n])=>w+' '+n).join(', ')+` · wallClimb ${C.cnt.wallClimb|0} · yJump ${C.cnt.yJump|0} · belowGround ${C.cnt.belowGround|0}`)}
   for(const[k,n]of Object.entries(C.why).sort((x,y)=>y[1]-x[1]).slice(0,8))lines.push(`INFO invisible ${city} ${n}x (${(n/h).toFixed(1)}/h) ${k}`);
   for(const t of C.taps)if(!t[1])lines.push(`  dead button ${city}: ${t[0]} · ${t[2]}`)}
+ if(GATE){fails=0;/* gate = worse than the baseline, not over the absolute limits */const bf=path.resolve(ROOT,String(arg('baseline',''))||`docs/shots/bughunt/baseline_${PROF}.json`);let base0=null;try{base0=JSON.parse(fs.readFileSync(bf,'utf8'))}catch(e){lines.push('FAIL gate: no baseline '+bf);fails++}
+  if(base0)for(const city in res){const B=base0.perH&&base0.perH[city];if(!B){lines.push('FAIL gate: baseline has no '+city);fails++;continue}let worse=0;for(const d in LIMIT){const cur=res[city].perH[d],was=B[d]??0,strict=['nan','bounds','jsErr','deadButton'].includes(d),one=d==='frustration'?5:3600/Math.max(res[city].t,1),tol=strict?0:Math.max(10*one,3*was);/* same seeds give 1 vs 9 launches run to run (real-timer chunk loads), so the allowance is 10 hits or 3x the baseline rate: catches storms, not single hits; nan/bounds/jsErr/deadButton must stay 0 */if(cur>was+tol){worse++;fails++;lines.push(`FAIL gate ${city} ${d} ${cur} vs baseline ${was} (+${tol.toFixed(1)} allowed)`)}}lines.push(`${worse?'FAIL':'PASS'} gate ${city} vs ${path.basename(bf)}: ${worse} detector(s) worse`)}}
+ if(arg('save-baseline','')){const o={profile:PROF,date:new Date().toISOString().slice(0,10),args:{HOURS,BUDGET,DT},perH:{}};for(const c in res)o.perH[c]=res[c].perH;const sf=path.resolve(ROOT,String(arg('save-baseline')));fs.mkdirSync(path.dirname(sf),{recursive:true});fs.writeFileSync(sf,JSON.stringify(o,null,1));lines.push('INFO baseline written '+path.relative(ROOT,sf))}
  let shotList=[];
  if(SHOTS){const all=Object.values(res).flatMap(C=>C.cells).filter(c=>!['jsErr','nan'].includes(c.det)).sort((a,b)=>b.n-a.n),pick=[],seen=new Set();for(const c of all){const k=c.city+Math.floor(c.x/60)+','+Math.floor(c.z/60);if(seen.has(k))continue;seen.add(k);pick.push(c);if(pick.length>=SHOTS)break}
   try{shotList=await shots(b,base,pick,path.join(ROOT,'docs/shots/bughunt'))}catch(e){lines.push('WARN shots: '+String(e).slice(0,120))}}
+ console.log(`bughunt profile=${PROF} (${DESK?'desktop UA, dpr 1':'iPhone UA, dpr 3'}, 852x393 touch) cities=${cities.join('+')} hours=${HOURS} budget=${BUDGET}s dt=${DT}${GATE?' GATE':''}`);
  for(const l of lines)console.log(l);
- console.log(`${fails?'FAIL':'PASS'} bughunt ${CITY} · ${fails} detector(s) over the limit · ${wall().toFixed(0)} s wall`);
+ console.log(`${fails?'FAIL':'PASS'} bughunt ${GATE?'gate':CITY} profile=${PROF} · ${fails} detector(s) over the limit · ${wall().toFixed(0)} s wall`);
  if(JSON_OUT){for(const c in res){res[c].cells.sort((a,b)=>b.n-a.n)}fs.mkdirSync(path.dirname(JSON_OUT),{recursive:true});fs.writeFileSync(JSON_OUT,JSON.stringify({args:{HOURS,CITY,BUDGET,DT,PAGES},res,shots:shotList,limit:LIMIT},null,1))}
  await b.close();s.close();process.exit(fails?1:0)})();

@@ -1,0 +1,45 @@
+{
+ "profile": "desktop",
+ "date": "2026-10-22",
+ "args": {
+  "HOURS": 2,
+  "BUDGET": 270,
+  "DT": 0.05
+ },
+ "perH": {
+  "fra": {
+   "nan": 0,
+   "bounds": 0,
+   "jsErr": 0,
+   "belowGround": 0,
+   "yJump": 54.69,
+   "launch": 0,
+   "stuck": 0,
+   "npcOverlap": 0,
+   "npcLateral": 0,
+   "npcPop": 0,
+   "backOnRoad": 0,
+   "frustration": 2.51,
+   "invisible": 2.03,
+   "popup": 0,
+   "deadButton": 0
+  },
+  "ath": {
+   "nan": 0,
+   "bounds": 0,
+   "jsErr": 0,
+   "belowGround": 0,
+   "yJump": 0,
+   "launch": 0,
+   "stuck": 0,
+   "npcOverlap": 0,
+   "npcLateral": 0,
+   "npcPop": 0,
+   "backOnRoad": 6.11,
+   "frustration": 9.65,
+   "invisible": 6.11,
+   "popup": 0,
+   "deadButton": 0
+  }
+ }
+}

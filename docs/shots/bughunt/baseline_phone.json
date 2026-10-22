@@ -1,0 +1,45 @@
+{
+ "profile": "phone",
+ "date": "2026-10-22",
+ "args": {
+  "HOURS": 2,
+  "BUDGET": 270,
+  "DT": 0.05
+ },
+ "perH": {
+  "fra": {
+   "nan": 0,
+   "bounds": 0,
+   "jsErr": 0,
+   "belowGround": 0,
+   "yJump": 35.41,
+   "launch": 2.53,
+   "stuck": 0,
+   "npcOverlap": 0,
+   "npcLateral": 0,
+   "npcPop": 0,
+   "backOnRoad": 2.53,
+   "frustration": 4.14,
+   "invisible": 0,
+   "popup": 0,
+   "deadButton": 0
+  },
+  "ath": {
+   "nan": 0,
+   "bounds": 0,
+   "jsErr": 0,
+   "belowGround": 0,
+   "yJump": 0,
+   "launch": 14.04,
+   "stuck": 0,
+   "npcOverlap": 0,
+   "npcLateral": 0,
+   "npcPop": 7.02,
+   "backOnRoad": 7.02,
+   "frustration": 9.01,
+   "invisible": 0,
+   "popup": 3.51,
+   "deadButton": 0
+  }
+ }
+}
