@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 12,
- "w": 296,
- "h": 256,
+ "w": 349,
+ "h": 265,
  "anchor": [
-  148,
-  256
+  174,
+  265
  ],
  "order": [
   "strip-hound-bite#1",
   "strip-hound-bite#2",
   "strip-hound-bite#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.0,
+  "w": 1.4
+ },
+ "px_per_m": 256.0
 }

@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 4,
- "w": 259,
- "h": 384,
+ "w": 308,
+ "h": 486,
  "anchor": [
-  129,
-  384
+  154,
+  486
  ],
  "order": [
   "strip-boss-hoplite-idle#1",
   "strip-boss-hoplite-idle#2",
   "strip-boss-hoplite-idle#3",
   "strip-boss-hoplite-idle#4"
- ]
+ ],
+ "metres": {
+  "h": 4.5,
+  "w": 3.0
+ },
+ "px_per_m": 85.33,
+ "body": 384
 }

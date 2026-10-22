@@ -1,10 +1,10 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 154,
+ "w": 172,
  "h": 256,
  "anchor": [
-  77,
+  86,
   256
  ],
  "order": [
@@ -12,5 +12,11 @@
   "strip-medic-heal#2",
   "strip-medic-heal#3",
   "strip-medic-heal#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.65
+ },
+ "px_per_m": 138.38
 }

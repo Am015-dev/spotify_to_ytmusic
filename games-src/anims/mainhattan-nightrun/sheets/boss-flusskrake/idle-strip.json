@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 4,
- "w": 392,
- "h": 368,
+ "w": 410,
+ "h": 494,
  "anchor": [
-  196,
-  368
+  205,
+  494
  ],
  "order": [
   "strip-boss-flusskrake-idle#1",
   "strip-boss-flusskrake-idle#2",
   "strip-boss-flusskrake-idle#3"
- ]
+ ],
+ "metres": {
+  "h": 6.0,
+  "w": 7.0
+ },
+ "px_per_m": 64.0,
+ "body": 384
 }

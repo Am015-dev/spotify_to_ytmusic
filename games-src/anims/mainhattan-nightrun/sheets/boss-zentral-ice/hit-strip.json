@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 453,
- "h": 282,
+ "w": 678,
+ "h": 427,
  "anchor": [
-  226,
-  282
+  339,
+  427
  ],
  "order": [
   "strip-boss-zentral-ice-hit#1",
   "strip-boss-zentral-ice-hit#2",
   "strip-boss-zentral-ice-hit#3"
- ]
+ ],
+ "metres": {
+  "h": 5.0,
+  "w": 10.0
+ },
+ "px_per_m": 76.8,
+ "body": 384
 }

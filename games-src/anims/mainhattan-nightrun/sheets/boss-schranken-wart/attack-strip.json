@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 341,
- "h": 299,
+ "w": 784,
+ "h": 672,
  "anchor": [
-  170,
-  299
+  392,
+  672
  ],
  "order": [
   "strip-boss-schranken-wart-attack#1",
   "strip-boss-schranken-wart-attack#2",
   "strip-boss-schranken-wart-attack#3",
   "strip-boss-schranken-wart-attack#4"
- ]
+ ],
+ "metres": {
+  "h": 4.0,
+  "w": 8.0
+ },
+ "px_per_m": 96.0,
+ "body": 384
 }

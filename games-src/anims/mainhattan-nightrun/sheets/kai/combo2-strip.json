@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 10,
- "w": 190,
- "h": 256,
+ "w": 183,
+ "h": 326,
  "anchor": [
-  95,
-  256
+  91,
+  326
  ],
  "order": [
   "strip-kai-combo2#1",
   "strip-kai-combo2#2",
   "strip-kai-combo2#3",
   "strip-kai-combo2#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

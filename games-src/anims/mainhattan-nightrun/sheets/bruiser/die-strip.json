@@ -2,15 +2,21 @@
  "frames": 4,
  "fps": 8,
  "w": 258,
- "h": 256,
+ "h": 275,
  "anchor": [
   129,
-  256
+  275
  ],
  "order": [
   "strip-bruiser-die#1",
   "strip-bruiser-die#2",
   "strip-bruiser-die#3",
   "strip-bruiser-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.75
+ },
+ "px_per_m": 128.0
 }

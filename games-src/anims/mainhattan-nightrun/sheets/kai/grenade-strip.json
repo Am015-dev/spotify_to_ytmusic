@@ -2,15 +2,21 @@
  "frames": 4,
  "fps": 10,
  "w": 180,
- "h": 256,
+ "h": 326,
  "anchor": [
   90,
-  256
+  326
  ],
  "order": [
   "strip-kai-grenade#1",
   "strip-kai-grenade#2",
   "strip-kai-grenade#3",
   "strip-kai-grenade#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 10,
- "w": 288,
- "h": 256,
+ "w": 333,
+ "h": 309,
  "anchor": [
-  144,
-  256
+  166,
+  309
  ],
  "order": [
   "strip-warden-melee#1",
   "strip-warden-melee#2",
   "strip-warden-melee#3",
   "strip-warden-melee#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.2,
+  "w": 0.9
+ },
+ "px_per_m": 116.36
 }

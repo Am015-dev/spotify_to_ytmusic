@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 240,
- "h": 256,
+ "w": 344,
+ "h": 309,
  "anchor": [
-  120,
-  256
+  172,
+  309
  ],
  "order": [
   "strip-warden-shoot#1",
   "strip-warden-shoot#2",
   "strip-warden-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.2,
+  "w": 0.9
+ },
+ "px_per_m": 116.36
 }

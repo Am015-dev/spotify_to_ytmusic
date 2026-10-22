@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 4,
- "w": 271,
- "h": 343,
+ "w": 276,
+ "h": 384,
  "anchor": [
-  135,
-  343
+  138,
+  384
  ],
  "order": [
   "strip-boss-messe-waechter-idle#1",
   "strip-boss-messe-waechter-idle#2",
   "strip-boss-messe-waechter-idle#3"
- ]
+ ],
+ "metres": {
+  "h": 5.5,
+  "w": 3.5
+ },
+ "px_per_m": 69.82,
+ "body": 384
 }

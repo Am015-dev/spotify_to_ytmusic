@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 188,
- "h": 256,
+ "w": 217,
+ "h": 286,
  "anchor": [
-  94,
-  256
+  108,
+  286
  ],
  "order": [
   "strip-sniper-shoot#1",
   "strip-sniper-shoot#2",
   "strip-sniper-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.6
+ },
+ "px_per_m": 138.38
 }

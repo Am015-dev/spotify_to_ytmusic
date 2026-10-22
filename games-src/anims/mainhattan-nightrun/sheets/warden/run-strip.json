@@ -1,11 +1,11 @@
 {
  "frames": 6,
  "fps": 12,
- "w": 214,
- "h": 256,
+ "w": 265,
+ "h": 309,
  "anchor": [
-  107,
-  256
+  132,
+  309
  ],
  "order": [
   "strip-warden-run#1",
@@ -14,5 +14,11 @@
   "strip-warden-run#4",
   "strip-warden-run#5",
   "strip-warden-run#6"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.2,
+  "w": 0.9
+ },
+ "px_per_m": 116.36
 }

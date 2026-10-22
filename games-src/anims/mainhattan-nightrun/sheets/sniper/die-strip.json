@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 202,
- "h": 256,
+ "w": 224,
+ "h": 286,
  "anchor": [
-  101,
-  256
+  112,
+  286
  ],
  "order": [
   "strip-sniper-die#1",
   "strip-sniper-die#2",
   "strip-sniper-die#3",
   "strip-sniper-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.6
+ },
+ "px_per_m": 138.38
 }

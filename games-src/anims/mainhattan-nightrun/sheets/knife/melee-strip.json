@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 10,
- "w": 201,
- "h": 256,
+ "w": 216,
+ "h": 260,
  "anchor": [
-  100,
-  256
+  108,
+  260
  ],
  "order": [
   "strip-knife-melee#1",
   "strip-knife-melee#2",
   "strip-knife-melee#3",
   "strip-knife-melee#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.75,
+  "w": 0.55
+ },
+ "px_per_m": 146.29
 }

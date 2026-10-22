@@ -1,11 +1,11 @@
 {
  "frames": 6,
  "fps": 12,
- "w": 205,
- "h": 256,
+ "w": 192,
+ "h": 275,
  "anchor": [
-  102,
-  256
+  96,
+  275
  ],
  "order": [
   "strip-bruiser-run#1",
@@ -14,5 +14,11 @@
   "strip-bruiser-run#4",
   "strip-bruiser-run#5",
   "strip-bruiser-run#6"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.75
+ },
+ "px_per_m": 128.0
 }

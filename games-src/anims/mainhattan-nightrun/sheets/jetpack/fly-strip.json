@@ -1,10 +1,10 @@
 {
  "frames": 4,
  "fps": 10,
- "w": 173,
+ "w": 161,
  "h": 256,
  "anchor": [
-  86,
+  80,
   256
  ],
  "order": [
@@ -12,5 +12,11 @@
   "strip-jetpack-fly#2",
   "strip-jetpack-fly#3",
   "strip-jetpack-fly#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.9,
+  "w": 0.8
+ },
+ "px_per_m": 134.74
 }

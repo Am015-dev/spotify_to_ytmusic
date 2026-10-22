@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 115,
- "h": 284,
+ "w": 137,
+ "h": 326,
  "anchor": [
-  57,
-  284
+  68,
+  326
  ],
  "order": [
   "strip-kai-aimup#1",
   "strip-kai-aimup#2",
   "strip-kai-aimup#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }

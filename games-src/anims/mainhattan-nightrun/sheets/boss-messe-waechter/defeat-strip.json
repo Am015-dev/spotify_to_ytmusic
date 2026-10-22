@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 6,
- "w": 314,
+ "w": 290,
  "h": 384,
  "anchor": [
-  157,
+  145,
   384
  ],
  "order": [
   "strip-boss-messe-waechter-defeat#1",
   "strip-boss-messe-waechter-defeat#2",
   "strip-boss-messe-waechter-defeat#3"
- ]
+ ],
+ "metres": {
+  "h": 5.5,
+  "w": 3.5
+ },
+ "px_per_m": 69.82,
+ "body": 384
 }

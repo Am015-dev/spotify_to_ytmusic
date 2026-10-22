@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 4,
- "w": 174,
- "h": 256,
+ "w": 167,
+ "h": 313,
  "anchor": [
-  87,
-  256
+  83,
+  313
  ],
  "order": [
   "strip-mech-idle#1",
   "strip-mech-idle#2",
   "strip-mech-idle#3",
   "strip-mech-idle#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 3.2,
+  "w": 2.4
+ },
+ "px_per_m": 80.0
 }

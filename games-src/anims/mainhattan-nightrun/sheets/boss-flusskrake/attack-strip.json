@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 8,
- "w": 450,
- "h": 364,
+ "w": 478,
+ "h": 494,
  "anchor": [
-  225,
-  364
+  239,
+  494
  ],
  "order": [
   "strip-boss-flusskrake-attack#1",
   "strip-boss-flusskrake-attack#2",
   "strip-boss-flusskrake-attack#3"
- ]
+ ],
+ "metres": {
+  "h": 6.0,
+  "w": 7.0
+ },
+ "px_per_m": 64.0,
+ "body": 384
 }

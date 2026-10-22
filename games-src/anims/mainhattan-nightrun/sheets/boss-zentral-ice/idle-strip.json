@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 4,
- "w": 392,
- "h": 254,
+ "w": 541,
+ "h": 427,
  "anchor": [
-  196,
-  254
+  270,
+  427
  ],
  "order": [
   "strip-boss-zentral-ice-idle#1",
   "strip-boss-zentral-ice-idle#2",
   "strip-boss-zentral-ice-idle#3",
   "strip-boss-zentral-ice-idle#4"
- ]
+ ],
+ "metres": {
+  "h": 5.0,
+  "w": 10.0
+ },
+ "px_per_m": 76.8,
+ "body": 384
 }

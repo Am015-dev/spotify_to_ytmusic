@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 283,
- "h": 256,
+ "w": 379,
+ "h": 404,
  "anchor": [
-  141,
-  256
+  189,
+  404
  ],
  "order": [
   "strip-drone-shoot#1",
   "strip-drone-shoot#2",
   "strip-drone-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 0.6,
+  "w": 0.8
+ },
+ "px_per_m": 426.67
 }

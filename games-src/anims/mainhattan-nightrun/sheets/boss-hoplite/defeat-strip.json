@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 6,
- "w": 343,
- "h": 384,
+ "w": 431,
+ "h": 486,
  "anchor": [
-  171,
-  384
+  215,
+  486
  ],
  "order": [
   "strip-boss-hoplite-defeat#1",
   "strip-boss-hoplite-defeat#2",
   "strip-boss-hoplite-defeat#3",
   "strip-boss-hoplite-defeat#4"
- ]
+ ],
+ "metres": {
+  "h": 4.5,
+  "w": 3.0
+ },
+ "px_per_m": 85.33,
+ "body": 384
 }

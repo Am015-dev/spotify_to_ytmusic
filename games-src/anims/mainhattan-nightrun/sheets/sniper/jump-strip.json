@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 230,
- "h": 256,
+ "w": 254,
+ "h": 286,
  "anchor": [
-  115,
-  256
+  127,
+  286
  ],
  "order": [
   "strip-sniper-jump#1",
   "strip-sniper-jump#2",
   "strip-sniper-jump#3",
   "strip-sniper-jump#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.85,
+  "w": 0.6
+ },
+ "px_per_m": 138.38
 }

@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 246,
- "h": 256,
+ "w": 221,
+ "h": 260,
  "anchor": [
-  123,
-  256
+  110,
+  260
  ],
  "order": [
   "strip-knife-die#1",
   "strip-knife-die#2",
   "strip-knife-die#3",
   "strip-knife-die#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.75,
+  "w": 0.55
+ },
+ "px_per_m": 146.29
 }

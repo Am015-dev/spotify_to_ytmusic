@@ -2,15 +2,21 @@
  "frames": 4,
  "fps": 8,
  "w": 207,
- "h": 256,
+ "h": 285,
  "anchor": [
   103,
-  256
+  285
  ],
  "order": [
   "strip-flamer-walk#1",
   "strip-flamer-walk#2",
   "strip-flamer-walk#3",
   "strip-flamer-walk#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.95,
+  "w": 0.8
+ },
+ "px_per_m": 131.28
 }

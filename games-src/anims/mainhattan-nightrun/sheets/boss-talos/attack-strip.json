@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 291,
- "h": 384,
+ "w": 273,
+ "h": 438,
  "anchor": [
-  145,
-  384
+  136,
+  438
  ],
  "order": [
   "strip-boss-talos-attack#1",
   "strip-boss-talos-attack#2",
   "strip-boss-talos-attack#3",
   "strip-boss-talos-attack#4"
- ]
+ ],
+ "metres": {
+  "h": 6.0,
+  "w": 4.0
+ },
+ "px_per_m": 64.0,
+ "body": 384
 }

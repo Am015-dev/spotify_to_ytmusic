@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 341,
- "h": 384,
+ "w": 391,
+ "h": 486,
  "anchor": [
-  170,
-  384
+  195,
+  486
  ],
  "order": [
   "strip-boss-hoplite-hit#1",
   "strip-boss-hoplite-hit#2",
   "strip-boss-hoplite-hit#3"
- ]
+ ],
+ "metres": {
+  "h": 4.5,
+  "w": 3.0
+ },
+ "px_per_m": 85.33,
+ "body": 384
 }

@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 392,
- "h": 248,
+ "w": 647,
+ "h": 553,
  "anchor": [
-  196,
-  248
+  323,
+  553
  ],
  "order": [
   "strip-boss-kronos-attack#1",
   "strip-boss-kronos-attack#2",
   "strip-boss-kronos-attack#3",
   "strip-boss-kronos-attack#4"
- ]
+ ],
+ "metres": {
+  "h": 6.0,
+  "w": 12.0
+ },
+ "px_per_m": 64.0,
+ "body": 384
 }

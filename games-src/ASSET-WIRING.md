@@ -56,7 +56,8 @@ Read this before any asset work. It applies to every game; Mainhattan Nightrun i
 - **Windows path bug.** `wiring_scan.py` checks `'/media' in dp`, which never matches on Windows. On the laptop it reports almost everything as wired.
 - **Ship loop sheets.** Frames must be registered on the hull (`make_anim_sheets.hull_aligned`), not centred per frame; otherwise the ship shakes. `ship_jitter.py` must report 0 sheets over 3 px.
 - **Character sheets: one body size.**
-  - All acts of one character share the idle body size, through `make_anim_sheets.harmonise`, which is a per-character pass on figure area.
-  - Body-height acts (run, idle, shoot, ...) keep every frame at the strip's median height, with a 4% bob allowed (`same_size`).
-  - Gates: `sprite_size.py` and `sprite_cross.py` on the laptop.
-  - The game must therefore draw every act of a character at the same entity height. The sheet cell already carries the pose difference: do not rescale crouch or jump cells in code.
+  - Sizes are metric: each character has a real size (`viewer/real_sizes.json`, e.g. bruiser 2 m), and every strip json carries `metres`, `px_per_m` and `body` (px of the standing height). One scale per strip, from its most upright frame; crouch/dash/land poses are shorter on purpose.
+  - Rigid shapes (bosses, drone, turret, ...) are checked by feature matching (SIFT) of every state against every other state; all are within 3% of idle. Corrections live in `viewer/scale_cal.json`.
+  - Every state of one character has the same cell height. Feet (or tracks) are on the bottom edge of the cell for characters and grounded bosses; flying bosses are centred.
+  - **Do not scale or anchor per detected content (alpha bbox).** That re-introduces size jumps: crouch/dash frames get stretched, raised weapons or smoke shrink the body.
+  - **Game drawing rule:** keep feet = bottom of cell. Draw at `gameHeight / body` (or `px_per_m`), one scale per character, identical for all its states. If `body`/`px_per_m` is missing, fall back to cell height = game height. The sheet already carries the pose difference: do not rescale crouch or jump cells in code.

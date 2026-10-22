@@ -11,5 +11,11 @@
   "strip-jetpack-shoot#1",
   "strip-jetpack-shoot#2",
   "strip-jetpack-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.9,
+  "w": 0.8
+ },
+ "px_per_m": 134.74
 }

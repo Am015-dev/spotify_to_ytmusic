@@ -2,15 +2,21 @@
  "frames": 4,
  "fps": 8,
  "w": 229,
- "h": 256,
+ "h": 275,
  "anchor": [
   114,
-  256
+  275
  ],
  "order": [
   "strip-bruiser-jump#1",
   "strip-bruiser-jump#2",
   "strip-bruiser-jump#3",
   "strip-bruiser-jump#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.75
+ },
+ "px_per_m": 128.0
 }

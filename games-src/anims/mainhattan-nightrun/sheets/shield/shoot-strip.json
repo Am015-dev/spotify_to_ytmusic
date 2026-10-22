@@ -1,15 +1,21 @@
 {
  "frames": 3,
  "fps": 10,
- "w": 195,
- "h": 256,
+ "w": 205,
+ "h": 257,
  "anchor": [
-  97,
-  256
+  102,
+  257
  ],
  "order": [
   "strip-shield-shoot#1",
   "strip-shield-shoot#2",
   "strip-shield-shoot#3"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 2.0,
+  "w": 0.9
+ },
+ "px_per_m": 128.0
 }

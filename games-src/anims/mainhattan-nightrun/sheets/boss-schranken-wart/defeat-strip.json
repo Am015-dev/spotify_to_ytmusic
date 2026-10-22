@@ -1,16 +1,22 @@
 {
  "frames": 4,
  "fps": 6,
- "w": 392,
- "h": 356,
+ "w": 732,
+ "h": 672,
  "anchor": [
-  196,
-  356
+  366,
+  672
  ],
  "order": [
   "strip-boss-schranken-wart-defeat#1",
   "strip-boss-schranken-wart-defeat#2",
   "strip-boss-schranken-wart-defeat#3",
   "strip-boss-schranken-wart-defeat#4"
- ]
+ ],
+ "metres": {
+  "h": 4.0,
+  "w": 8.0
+ },
+ "px_per_m": 96.0,
+ "body": 384
 }

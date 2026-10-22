@@ -2,15 +2,21 @@
  "frames": 4,
  "fps": 8,
  "w": 167,
- "h": 256,
+ "h": 326,
  "anchor": [
   83,
-  256
+  326
  ],
  "order": [
   "strip-kai-jump#1",
   "strip-kai-jump#2",
   "strip-kai-jump#3",
   "strip-kai-jump#4"
- ]
+ ],
+ "body": 256,
+ "metres": {
+  "h": 1.8,
+  "w": 0.55
+ },
+ "px_per_m": 142.22
 }
