@@ -106,7 +106,7 @@ function CTB_fill(x,z,ry,w,d,h0,extra){if(!CTB.on)return false;CTB.st.slots++;co
   for(const[u,v]of[[-1,-1],[1,-1],[1,1],[-1,1],[0,0]]){const ux=u*K.W/2,uz=v*K.D/2,g=groundY(px+ux*c+uz*s,pz-ux*s+uz*c);g0=Math.min(g0,g);g1=Math.max(g1,g)}if(g1-g0>3){CTB.st.slope=(CTB.st.slope||0)+1;CTB.st.skip++;return false}P.push([K,px,pz,g1,g1-g0])}
  for(const[K,px,pz,y,ph]of P){const a=ry+Math.PI;// set front (−z) → street (+z local)
   const o={x:px,z:pz,y,a,ph};if(ph>.12)CTB.pl.push([o,K,ph+.15]);if(CID==='fra')try{BV_add(px,pz,'ctb:'+K.v.k,'lego:'+K.v.ids[0],{ry,w:K.W,d:K.D,h:K.H,ctb:1,yb:y})}catch(e){}/* art-5: bv1 variety + street life see the sets (Athens slots are already registered by CV_put) */K.L.push(o);if(K.v.gap)CTB.cg.push([px,pz]);const ca=Math.cos(a),sa=Math.sin(a);
-  o.b=hubAddB({x:px+K.col.ox*ca+K.col.oz*sa,z:pz-K.col.ox*sa+K.col.oz*ca,hw:K.col.hw,hd:K.col.hd,h:y+K.H,ry:a,...(extra||{})});CTB.st.sets++}return true}
+  o.b=hubAddB({x:px+K.col.ox*ca+K.col.oz*sa,z:pz-K.col.ox*sa+K.col.oz*ca,hw:K.col.hw,hd:K.col.hd,h:y+K.H,ry:a,ctb:1,...(extra||{})});/* ctb:1 = h is already ground + set height (OC_altFix skips it) */CTB.st.sets++}return true}
 // Frankfurt hook (putK in buildHubG): only the generic street buildings, never towers
 function CTB_putK(nm,sc,x,z,ry,tint,bx,w,h,d){if(!bx||CID!=='fra'||!/^building-([a-m]|type-[a-z])$/.test(nm))return false;return CTB_fill(x,z,ry,w,d,h)}
 // Athens hook (put in athBuildG): small old-town houses and villas

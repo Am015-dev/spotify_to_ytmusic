@@ -469,8 +469,12 @@ function roofAt(){return null}
 function hubAddB(b,to){if(b.ry!=null){const c=Math.cos(b.ry),s=Math.sin(b.ry);if(Math.abs(s)<1e-3||Math.abs(c)<1e-3){if(Math.abs(s)>.5){const t=b.hw;b.hw=b.hd;b.hd=t}}else{b.c=c;b.s=s}}(to||HUB.bld).push(b);return b}
 function bHit(b,x,z,rad){const dx=x-b.x,dz=z-b.z;let lx=dx,lz=dz;if(b.c!=null){lx=dx*b.c-dz*b.s;lz=dx*b.s+dz*b.c}const ex=Math.abs(lx)-b.hw,ez=Math.abs(lz)-b.hd;if(ex>=rad||ez>=rad)return false;if(ex<=0||ez<=0)return true;return ex*ex+ez*ez<rad*rad}
 const bExt=b=>b.c==null?[b.hw,b.hd]:[Math.abs(b.c)*b.hw+Math.abs(b.s)*b.hd,Math.abs(b.s)*b.hw+Math.abs(b.c)*b.hd];
-function roamHit(x,z,rad,y=0){const L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));if(!L)return null;const LP=TUNE.lowProp??1.3;/* race-1: colliders lower than 1.3 m (kerb / barrier / cone pieces) are stepped over, never beach the car */for(let bi=0;bi<L.length;bi++){const b=L[bi];if(y>=(b.h||999)-.6||(b.y0!=null&&y<b.y0))continue;if(b.h&&(b.rh!==undefined?b.rh<LP:bLow(b,LP)))continue;
+function roamHit(x,z,rad,y=0){const L=HUB.grid&&HUB.grid.get(Math.floor(x/40)*10000+Math.floor(z/40));if(!L)return null;const LP=TUNE.lowProp??1.3;/* race-1: colliders lower than 1.3 m (kerb / barrier / cone pieces) are stepped over, never beach the car */for(let bi=0;bi<L.length;bi++){const b=L[bi];if(y>=(b.h||999)-.6||(b.y0!=null&&y<b.y0&&!bFloor(b,y)))continue;if(b.h&&(b.rh!==undefined?b.rh<LP:bLow(b,LP)))continue;
   /* perf-12: bHit inlined (a non-inlined call boxed x/z/rad into 3 heap numbers per collider: ~230 MB / 15 s under the Athens shortcut scan) */const dx=x-b.x,dz=z-b.z;let lx=dx,lz=dz;if(b.c!=null){lx=dx*b.c-dz*b.s;lz=dx*b.s+dz*b.c}const ex=(lx<0?-lx:lx)-b.hw,ez=(lz<0?-lz:lz)-b.hd;if(ex>=rad||ez>=rad)continue;if(ex<=0||ez<=0||ex*ex+ez*ez<rad*rad)return b}return null}
+// solid-buildings-r22e2: a GROUND-standing building (floor within 0.5 m of its centre ground) whose floor ends above a downhill corner (road grading after the
+// floor was set: Frankfurt tower -563,394, floor 21.7, corner ground 20.1) let a car pass under it. Up to 3 m below such a floor still hits; decks, arches and
+// viaducts (floor well above the centre ground) keep cars passing under them.
+function bFloor(b,y){if(y<b.y0-3)return false;if(b.yc===undefined)b.yc=groundY(b.x,b.z);return b.y0<=b.yc+.5}
 // walls-1: b.h is an ABSOLUTE top (ground + height), so the old `b.h<1.3` never matched above sea level (Frankfurt ground ~30, Athens ~145). Height above ground, cached per collider.
 function bLow(b,LP){if(b.rh===undefined){const g=b.y0!=null?b.y0+1.5:groundY(b.x,b.z);b.rh=b.h-g}return b.rh<LP}
 // push a point out of a collider along its nearest face (local frame for oriented boxes); returns [x,z,'x'|'z' world axis of the push]
