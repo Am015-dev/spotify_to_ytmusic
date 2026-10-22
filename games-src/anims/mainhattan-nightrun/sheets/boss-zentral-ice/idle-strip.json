@@ -2,10 +2,10 @@
  "frames": 4,
  "fps": 4,
  "w": 392,
- "h": 305,
+ "h": 254,
  "anchor": [
   196,
-  305
+  254
  ],
  "order": [
   "strip-boss-zentral-ice-idle#1",

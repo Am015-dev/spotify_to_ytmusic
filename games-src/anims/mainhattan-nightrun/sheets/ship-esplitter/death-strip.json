@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 196,
+ "anchor": [
+  260,
+  196
+ ],
+ "order": [
+  "strip-ship-esplitter-death#1",
+  "strip-ship-esplitter-death#2",
+  "strip-ship-esplitter-death#3",
+  "strip-ship-esplitter-death#4",
+  "strip-ship-esplitter-death#5"
+ ]
+}

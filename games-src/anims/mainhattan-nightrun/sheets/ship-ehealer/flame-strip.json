@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 520,
+ "h": 192,
+ "anchor": [
+  260,
+  192
+ ],
+ "order": [
+  "strip-ship-ehealer-flame#1",
+  "strip-ship-ehealer-flame#2",
+  "strip-ship-ehealer-flame#3",
+  "strip-ship-ehealer-flame#4"
+ ]
+}

@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 273,
+ "anchor": [
+  260,
+  273
+ ],
+ "order": [
+  "strip-ship-ezdrone-death#1",
+  "strip-ship-ezdrone-death#2",
+  "strip-ship-ezdrone-death#3",
+  "strip-ship-ezdrone-death#4",
+  "strip-ship-ezdrone-death#5"
+ ]
+}

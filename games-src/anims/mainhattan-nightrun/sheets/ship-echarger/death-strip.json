@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 223,
+ "anchor": [
+  260,
+  223
+ ],
+ "order": [
+  "strip-ship-echarger-death#1",
+  "strip-ship-echarger-death#2",
+  "strip-ship-echarger-death#3",
+  "strip-ship-echarger-death#4",
+  "strip-ship-echarger-death#5"
+ ]
+}

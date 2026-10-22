@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 238,
+ "anchor": [
+  260,
+  238
+ ],
+ "order": [
+  "strip-ship-ediver-death#1",
+  "strip-ship-ediver-death#2",
+  "strip-ship-ediver-death#3",
+  "strip-ship-ediver-death#4",
+  "strip-ship-ediver-death#5"
+ ]
+}

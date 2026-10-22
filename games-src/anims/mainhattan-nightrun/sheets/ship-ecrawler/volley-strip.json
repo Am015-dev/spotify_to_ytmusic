@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 521,
+ "h": 236,
+ "anchor": [
+  260,
+  236
+ ],
+ "order": [
+  "strip-ship-ecrawler-volley#1",
+  "strip-ship-ecrawler-volley#2",
+  "strip-ship-ecrawler-volley#3",
+  "strip-ship-ecrawler-volley#4"
+ ]
+}

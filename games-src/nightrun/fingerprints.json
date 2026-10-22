@@ -18,13 +18,13 @@
   "end": null
  },
  "street": {
-  "state": "1a91e0c899532018",
-  "draw": "eaee7a3fade5df8b",
-  "frames": 6707,
-  "samples": 111,
-  "rng": 7640,
-  "dcalls": 137,
-  "end": "cleared at section 1"
+  "state": "993f5f37b11a43c5",
+  "draw": "06cc213327a178be",
+  "frames": 7200,
+  "samples": 120,
+  "rng": 7393,
+  "dcalls": 202,
+  "end": "section 1 x 6360 lock boss foes 1"
  },
  "fly6": {
   "state": "c30e0e83622b2dcd",

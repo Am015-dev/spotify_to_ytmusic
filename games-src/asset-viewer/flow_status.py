@@ -89,7 +89,11 @@ def thumb(src):
     t = THUMBS / src.relative_to(GA).as_posix().replace("/", "__")
     if not t.exists() or t.stat().st_mtime < src.stat().st_mtime:
         THUMBS.mkdir(exist_ok=True)
-        im = Image.open(src).convert("RGB"); im.thumbnail((256, 256)); im.save(t, quality=82)
+        try:
+            im = Image.open(src).convert("RGB")
+        except OSError:  # a skip marker or half-written file: no thumbnail, but the page still loads
+            return None
+        im.thumbnail((256, 256)); im.save(t, quality=82)
     return f"flowthumbs/{t.name}"
 
 
@@ -178,7 +182,7 @@ def made_elsewhere(root, folder, name):
     if (root, game) not in _made:
         idx = {}
         for p in (GA / root / game).rglob("*.jpg"):
-            if "_stale" not in p.parts and "_redo" not in p.parts: idx.setdefault(p.stem, p)
+            if "_stale" not in p.parts and "_redo" not in p.parts and p.stat().st_size > 1000: idx.setdefault(p.stem, p)  # tiny = skip marker
         _made[(root, game)] = idx
     return _made[(root, game)].get(name)
 
@@ -238,6 +242,8 @@ def build():
             for name, prompt in cards.items():
                 if isinstance(prompt, dict): prompt = prompt.get("prompt", "")  # pose cards: {"prompt": ..., reference fields}
                 f = folder / f"{name}.jpg"
+                if f.exists() and f.stat().st_size <= 1000:  # SKIP-MARKER: card deliberately not generated (never drawn by the game, 2026-10-22)
+                    continue
                 if not f.exists(): f = made_elsewhere(root, folder, name) or f  # regenerated into a later run folder
                 old = folder / "_redo" / f"{name}.jpg"
                 vt = votes.get(f"{folder.name}/{name}", {}) if root == "flow-2d" else {}

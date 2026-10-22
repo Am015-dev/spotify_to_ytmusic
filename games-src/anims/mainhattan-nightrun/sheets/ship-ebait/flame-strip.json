@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 523,
+ "h": 286,
+ "anchor": [
+  261,
+  286
+ ],
+ "order": [
+  "strip-ship-ebait-flame#1",
+  "strip-ship-ebait-flame#2",
+  "strip-ship-ebait-flame#3",
+  "strip-ship-ebait-flame#4"
+ ]
+}
