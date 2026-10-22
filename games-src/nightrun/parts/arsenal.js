@@ -140,7 +140,7 @@ if(PWX.on){
     else if(k==='decoy'){ctx.moveTo(7,0);ctx.lineTo(-5,-6);ctx.lineTo(-2,0);ctx.lineTo(-5,6);ctx.closePath();ctx.moveTo(-9,-8);ctx.lineTo(-9,8);}
     else{ctx.moveTo(0,-9);ctx.lineTo(7,0);ctx.lineTo(0,9);ctx.lineTo(-7,0);ctx.closePath();ctx.moveTo(-2,-3);ctx.lineTo(2,1);ctx.lineTo(-1,4);}
     ctx.stroke();ctx.restore();};}
-  {const pd=PW.draw;PW.draw=function(t){pd.call(this,t);const S=G.px;if(!S||!G.pw)return;ctx.save();ctx.lineCap='round';
+  HOOK['PW.draw'](pd=>function(t){pd.call(this,t);const S=G.px;if(!S||!G.pw)return;ctx.save();ctx.lineCap='round';
     if(PW.on('stasis')){ctx.globalAlpha=.16+.06*Math.sin(t*4);ctx.fillStyle=PWX.K.stasis.c;ctx.beginPath();ctx.arc(P.x,P.y,130,0,7);ctx.fill();ctx.globalAlpha=.5;ctx.strokeStyle=PWX.K.stasis.c;ctx.lineWidth=1.5;ctx.setLineDash([6,6]);ctx.lineDashOffset=t*10;ctx.stroke();ctx.setLineDash([]);}
     if(PW.on('gwell')){ctx.globalAlpha=.45;ctx.strokeStyle=PWX.K.gwell.c;ctx.lineWidth=2;for(let i=0;i<3;i++){const q=(t*1.5+i/3)%1;ctx.globalAlpha=.5*(1-q);ctx.beginPath();ctx.arc(P.x,P.y,110*(1-q)+8,0,7);ctx.stroke();}}
     const z=S.zone;if(z&&PW.on('zone')){ctx.globalAlpha=z.in?.22:.1;ctx.fillStyle=PWX.K.zone.c;ctx.beginPath();ctx.arc(z.x,z.y,z.r,0,7);ctx.fill();ctx.globalAlpha=z.in?.95:.6;ctx.strokeStyle=PWX.K.zone.c;ctx.lineWidth=z.in?4:2.5;ctx.stroke();
@@ -150,7 +150,7 @@ if(PWX.on){
     if(PW.on('glass')){ctx.globalAlpha=.5+.3*Math.sin(t*9);ctx.strokeStyle=PWX.K.glass.c;ctx.lineWidth=1.5;ctx.beginPath();for(let i=0;i<6;i++){const a=i*Math.PI/3+t;ctx.moveTo(P.x+Math.cos(a)*24,P.y+Math.sin(a)*24);ctx.lineTo(P.x+Math.cos(a+.5)*30,P.y+Math.sin(a+.5)*30);}ctx.stroke();}
     const c=S.chg;if(c){const K=PWX.K[c.k];if(c.k==='bubble'){ctx.globalAlpha=.45+.2*Math.sin(t*5);ctx.strokeStyle=K.c;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(P.x,P.y,28,0,7);ctx.stroke();ctx.globalAlpha=.08;ctx.fillStyle=K.c;ctx.fill();}
       ctx.globalAlpha=.95;ctx.translate(P.x-26,P.y-30);PW.coin(c.k,7);}
-    ctx.restore();};}
+    ctx.restore();});
   NR.on('runStart',()=>{G.px=null;PWX.hist.length=0;});NR.on('runEnd',()=>{if(G)G.px=null;});
 }
 window.__pwx={PWX,PWK};

@@ -169,13 +169,13 @@ if(PW3.on){
     else if(k==='slice'){ctx.arc(0,0,8,0,7);ctx.moveTo(0,0);ctx.lineTo(0,-5);ctx.moveTo(0,0);ctx.lineTo(4,2);}
     else{ctx.moveTo(0,8);ctx.bezierCurveTo(-10,0,-6,-8,0,-3);ctx.bezierCurveTo(6,-8,10,0,0,8);}
     ctx.stroke();ctx.restore();};}
-  {const pd=PW.draw;PW.draw=function(t){pd.call(this,t);const S=G.p3;if(!S||!G.pw)return;ctx.save();ctx.lineCap='round';
+  HOOK['PW.draw'](pd=>function(t){pd.call(this,t);const S=G.p3;if(!S||!G.pw)return;ctx.save();ctx.lineCap='round';
     const wg=PW2.act('wing');if(wg)for(const w of S.wx){ctx.globalAlpha=.95;ctx.fillStyle='#0a0612';ctx.strokeStyle=PWK.wing.c;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(w.x+9,w.y);ctx.lineTo(w.x,w.y-7);ctx.lineTo(w.x-8,w.y);ctx.lineTo(w.x,w.y+7);ctx.closePath();ctx.fill();ctx.stroke();ctx.globalAlpha=.3;ctx.globalCompositeOperation='lighter';G_(w.x,w.y,16,PWK.wing.c,.5);ctx.globalCompositeOperation='source-over';}
     for(const n of S.rg){ctx.globalAlpha=clamp(1-n.r/n.R,0,1)*.8;ctx.strokeStyle=PWK.nova.c;ctx.lineWidth=5*(1-n.r/n.R)+2;ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,7);ctx.stroke();}
     const f=S.fld;if(f){const k=clamp((f.until-G.t)/f.m,0,1);ctx.globalAlpha=.12+.25*k;ctx.fillStyle=PWK.nova.c;ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,7);ctx.fill();ctx.globalAlpha=.5*k;ctx.strokeStyle=PWK.nova.c;ctx.lineWidth=2;ctx.stroke();}
     const ch=PW2.act('chord');if(ch&&!ch.used&&(ch.ch|0)>1){ctx.globalAlpha=.5;ctx.strokeStyle=PWK.chord.c;ctx.lineWidth=2;ctx.beginPath();ctx.arc(P.x,P.y,38,0,7);ctx.stroke();}   // a second charge: a second ring
     if(S.sf<1){ctx.globalAlpha=.5;ctx.strokeStyle=PWK.slice.c;ctx.lineWidth=6;ctx.strokeRect(3,3,W-6,H-6);}
-    ctx.restore();};}
+    ctx.restore();});
   /* ----- the level on the HUD: 'LV3' on the power's bar (desktop list) and next to its round chip (phone strip) ----- */
   const lvTag=(it,x,y,fs)=>{ctx.save();ctx.font='700 '+fs+'px "Share Tech Mono",monospace';ctx.textAlign='left';ctx.fillStyle=PWK[it.k].c;ctx.fillText('LV'+it.lv,x,y);ctx.restore();};
   {const hd=PW.hud;PW.hud=function(t,x0,y0,k){hd.call(this,t,x0,y0,k);const s=G.pw;if(!s)return;k=k||1;x0=x0==null?18:x0;let y=y0==null?112:y0;

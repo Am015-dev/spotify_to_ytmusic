@@ -324,7 +324,7 @@ const WP={eq:['pulse',null],lv:{},xp:{},pl:{pulse:1},vc:0,open:false,bl:[],mn:[]
 window.__wp=Object.assign(WP,{lvl(id,n){this.lv[id]=n;}});          // test hook
 RIG.ok=true;window.__rig=Object.assign(RIG,{GA,SHIPS,pushPos:()=>[P.x,P.y]});          // test hook
 NR.on('runStart',()=>WP.reset());NR.on('tick',dt=>{WP.sync();WP.upd(dt);});
-{const pd=PW.draw;PW.draw=function(t){pd.call(this,t);WP.drawWorld(t);};const cl=SH.close;SH.close=function(){cl.call(this);WP.fuT=4;};}NR.on('beat',()=>WP.beat());
+{HOOK['PW.draw'](pd=>function(t){pd.call(this,t);WP.drawWorld(t);});const cl=SH.close;SH.close=function(){cl.call(this);WP.fuT=4;};}NR.on('beat',()=>WP.beat());
 
 /* ----- the WEAPONS sheet: one card per weapon with a 2-second looping demo and a few words ----- */
 {const st=document.createElement('style');st.textContent=`

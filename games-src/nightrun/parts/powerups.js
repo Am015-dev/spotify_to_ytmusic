@@ -93,7 +93,7 @@ if(RET.pw2){
     else if(k==='cres'){ctx.moveTo(-7,7);ctx.lineTo(-7,3);ctx.moveTo(-2.5,7);ctx.lineTo(-2.5,-1);ctx.moveTo(2.5,7);ctx.lineTo(2.5,-5);ctx.moveTo(7,7);ctx.lineTo(7,-9);}
     else{ctx.moveTo(0,-9);ctx.lineTo(7,-6);ctx.lineTo(6,2);ctx.quadraticCurveTo(4,7,0,9);ctx.quadraticCurveTo(-4,7,-6,2);ctx.lineTo(-7,-6);ctx.closePath();}
     ctx.stroke();ctx.restore();};}
-  {const pd=PW.draw;PW.draw=function(t){pd.call(this,t);const s=G.p2;if(!s||!G.pw)return;
+  HOOK['PW.draw'](pd=>function(t){pd.call(this,t);const s=G.p2;if(!s||!G.pw)return;
     ctx.save();ctx.lineCap='round';
     if(PW.on('echo')){for(const g of s.ech){const f=clamp(1-(g.at-G.bc-PHF),0,1);if(FXW.echo(g,f))continue;ctx.globalAlpha=.25+.35*f;ctx.strokeStyle=PWK.echo.c;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(g.x-14,g.y-9);ctx.lineTo(g.x+10,g.y);ctx.lineTo(g.x-14,g.y+9);ctx.closePath();ctx.stroke();ctx.setLineDash([3,5]);ctx.beginPath();ctx.moveTo(g.x+12,g.y);ctx.lineTo(g.x+80,g.y);ctx.stroke();ctx.setLineDash([]);}
       for(const q of s.trl){ctx.globalAlpha=q.l/q.m*.6;ctx.strokeStyle=PWK.echo.c;ctx.lineWidth=5*q.l/q.m+1;ctx.beginPath();ctx.moveTo(q.x,q.y);ctx.lineTo(q.x+260,q.y);ctx.stroke();}}
@@ -102,6 +102,6 @@ if(RET.pw2){
     for(const f of s.fl){const k=1-f.l/f.m;if(FXW.magnet(f,k))continue;ctx.globalAlpha=(1-k)*.8;ctx.strokeStyle=f.c;ctx.lineWidth=3;ctx.beginPath();ctx.arc(f.x,f.y,f.r+(f.grow||200)*k,0,7);ctx.stroke();}
     const ch=PW2.act('chord');if(ch&&!ch.used){ctx.globalAlpha=.55+.25*Math.sin(t*6);ctx.strokeStyle=PWK.chord.c;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(P.x,P.y,32,0,7);ctx.stroke();ctx.globalAlpha=.1;ctx.fillStyle=PWK.chord.c;ctx.fill();}
     const cr=PW2.act('cres');if(cr&&(cr.bars|0)>0&&!FXW.cresc(cr)){ctx.globalAlpha=.3+.1*cr.bars;ctx.strokeStyle=PWK.cres.c;ctx.lineWidth=2;for(let i=0;i<Math.min(5,cr.bars);i++){ctx.beginPath();ctx.arc(P.x,P.y,36+i*4,Math.PI*.15,Math.PI*.85);ctx.stroke();}}
-    ctx.restore();};}
+    ctx.restore();});
   NR.on('runStart',()=>{G.p2=null;});NR.on('runEnd',()=>{if(G)G.p2=null;});
 }
