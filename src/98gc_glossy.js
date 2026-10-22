@@ -29,22 +29,25 @@ function GL_off(){for(const m of GL.mats){const o=m.userData.gl0;m.envMap=scene.
 // ART10_cars (every 500 ms in roam) re-points car paint at scene.environment and caps it: run after it, same cadence
 ART10_cars=(f=>function(){const r=f.apply(this,arguments);try{GL_apply()}catch(e){}return r})(ART10_cars);
 // GO why/glossy: paint on player + traffic carries the studio env with clearcoat; material + program counts unchanged (±2) after switching it on;
-// render cost at 6x CPU (tChkGo CDP bridge) within +5% (8 interleaved off/on rounds, each the mean of 8 renderer.render + 1-px readback after 1 warm frame; median of the round means).
+// frame cost unchanged by construction: every car paint material draws with the SAME compiled program off and on and draw calls are equal
+// (only the env texture's contents differ); render time at 6x CPU (tChkGo CDP bridge) is printed for info, with an off-vs-off control, because
+// swiftshader's noise floor (control -10..+100%) cannot resolve 5% (10 rounds in ABBA order so neither arm always runs first, each the mean of 8 renderer.render + 1-px readback after 1 warm frame; median of the round means; an off-vs-off control shows the noise floor).
 function GL_go(say){if(state!=='roam'||!RO.on)return'📍 Start free roam to run this';
   const cnt=()=>{const S=new Set();if(pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.isMesh)[].concat(o.material).forEach(m=>S.add(m))});for(const k in HUB.cim){const im=HUB.cim[k];if(im)for(const x of[im,im.userData.w,im.userData.g])if(x)[].concat(x.material).forEach(m=>S.add(m))}return S.size};
   const chk=()=>{let p=0,pg=0,t=0,tg=0;pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material))if(GL_paint(m)&&m.roughness>=.1){p++;if(m.envMap===GL.tex&&m.envMapIntensity>=1&&(!m.isMeshPhysicalMaterial||m.clearcoat>=.8))pg++}});
    for(const k in HUB.cim){const im=HUB.cim[k];if(im)for(const m of[].concat(im.material))if(m.isMeshStandardMaterial){t++;if(m.envMap===GL.tex&&m.envMapIntensity>=1)tg++}}return{p,pg,t,tg}};
   const gl=renderer.getContext(),px=new Uint8Array(4),blk=n=>{const t0=performance.now();for(let i=0;i<n;i++){renderer.render(scene,camera);gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px)}return(performance.now()-t0)/n};
   const med=a=>{a=a.slice().sort((x,y)=>x-y);return a[a.length>>1]};
-  (async()=>{const wasOn=GL.on;GL.on=false;GL_off();renderer.render(scene,camera);const m0=cnt(),p0=renderer.info.programs.length;
-   GL.on=true;GL_apply();renderer.render(scene,camera);const m1=cnt(),p1=renderer.info.programs.length,c=chk();
+  (async()=>{const wasOn=GL.on;GL_apply();const ML=[...GL.mats],pg=()=>{const M=new Map();for(const m of ML){const q=renderer.properties.get(m);M.set(m,q&&q.currentProgram)}return M},dc=()=>{const ar=renderer.info.autoReset;renderer.info.autoReset=true;renderer.render(scene,camera);renderer.info.autoReset=ar;return renderer.info.render.calls};
+   GL.on=false;GL_off();renderer.render(scene,camera);const m0=cnt(),p0=renderer.info.programs.length,d0=dc(),g0=pg();
+   GL.on=true;GL_apply();renderer.render(scene,camera);const m1=cnt(),p1=renderer.info.programs.length,c=chk(),d1=dc(),g1=pg();let same=0,nm=0;for(const[m,q]of g1){nm++;if(q&&g0.get(m)===q)same++}
    const thr=typeof window.__cdp==='function';if(thr)await window.__cdp('Emulation.setCPUThrottlingRate',{rate:6});
-   const A=[],B=[];try{for(let r=0;r<8;r++){GL.on=false;GL_off();blk(1);A.push(blk(8));GL.on=true;GL_apply();blk(1);B.push(blk(8))}}finally{if(thr)await window.__cdp('Emulation.setCPUThrottlingRate',{rate:1})}
-   GL.on=wasOn;if(!wasOn)GL_off();const a=med(A),b=med(B),d=(b/a-1)*100;
-   const ok=c.p>0&&c.pg===c.p&&c.t>0&&c.tg===c.t&&Math.abs(m1-m0)<=2&&p1-p0<=2&&d<=5;
-   say(`📍 why/glossy · player paint with studio env + clearcoat ${c.pg}/${c.p} · traffic paint ${c.tg}/${c.t} · materials ${m0}→${m1} (±2) · programs ${p0}→${p1} (+≤2) · render ${thr?'6x CPU':'1x (no CDP)'} median off ${a.toFixed(2)} ms → on ${b.toFixed(2)} ms (${d>=0?'+':''}${d.toFixed(1)}%, ≤ +5%) · env build ${GL.ms.toFixed(1)} ms, ${GL.n} built → ${ok?'✅ PASS':'❌ FAIL'}`)})();
+   const A=[],B=[],Z=[],off=()=>{GL.on=false;GL_off();blk(1);return blk(8)},on=()=>{GL.on=true;GL_apply();blk(1);return blk(8)};try{for(let r=0;r<10;r++){if(r&1){B.push(on());A.push(off());Z.push(off())}else{A.push(off());B.push(on());Z.push(off())}}}finally{if(thr)await window.__cdp('Emulation.setCPUThrottlingRate',{rate:1})}
+   GL.on=wasOn;if(!wasOn)GL_off();const a=med(A),b=med(B),d=(b/a-1)*100,z=(med(Z)/a-1)*100;
+   const ok=c.p>0&&c.pg===c.p&&c.t>0&&c.tg===c.t&&Math.abs(m1-m0)<=2&&p1-p0<=2&&same===nm&&nm>0&&d1===d0;
+   say(`📍 why/glossy · player paint with studio env + clearcoat ${c.pg}/${c.p} · traffic paint ${c.tg}/${c.t} · materials ${m0}→${m1} (±2) · programs ${p0}→${p1} (+≤2) · same compiled program off/on ${same}/${nm} · draw calls ${d0}→${d1} (=) · render ${thr?'6x CPU':'1x (no CDP)'} median off ${a.toFixed(2)} ms → on ${b.toFixed(2)} ms (${d>=0?'+':''}${d.toFixed(1)}%, info only: off-vs-off control ${z>=0?'+':''}${z.toFixed(1)}%) · env build ${GL.ms.toFixed(1)} ms, ${GL.n} built → ${ok?'✅ PASS':'❌ FAIL'}`)})();
   return'📍 why/glossy · measuring…'}
 {const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
- __chk.items.unshift({ver:'why',id:'glossy',area:'world',text:'glossy-cars-r22e5: player and traffic cars read as shiny ABS plastic: a crisp sun highlight and softbox streak on the clearcoat, a thin horizon rim on the flanks, colours stay saturated (car-only studio env, no extra pass). 📍 GO checks paint materials on the player and every traffic model carry it, material/program counts unchanged (±2) and render cost at 6x CPU within +5%.'});
+ __chk.items.unshift({ver:'why',id:'glossy',area:'world',text:'glossy-cars-r22e5: player and traffic cars read as shiny ABS plastic: a crisp sun highlight and softbox streak on the clearcoat, a thin horizon rim on the flanks, colours stay saturated (car-only studio env, no extra pass). 📍 GO checks paint materials on the player and every traffic model carry it, material/program counts unchanged (±2) and same compiled programs and draw calls off/on (so no frame-time cost); 6x CPU render time printed for info.'});
  __chk.GO['why/glossy']=['fra','ath'].map(c=>({c,n:'glossy cars '+(c==='fra'?'Frankfurt':'Athens'),secs:60,fn:()=>GL_go(__chk.goSay)}))},500)}
 window.__gl={GL,apply:GL_apply,off:GL_off,env:GL_env};
