@@ -21,9 +21,14 @@ const SNDT=[
   ['m_hit','mu','Music muffled for a beat when you are hit',0],['m_slow','mu','SLOW power-up muffles the song',0],['m_drop','mu','DROP power-up cuts the music for a bar',0],
   ['m_pause','mu','Music muffled on pause and menu screens',0],['m_drum','mu','Combo drum layer added to the song',0],['m_tier','mu','Combo hats, kick and bass added to the song',0],
   ['m_echo','mu','Echo on the synth soundtrack',0],
+  ['f_shot','ft','Gun shot (rocket launcher only; the other guns have no sound)',1],['f_hit','ft','Your shot hits a foe (tick)',1],['f_pick','ft','Pick-up chime',1],
+  ['f_big','ft','Your shot hits a boss or the big heavy (boom)',0],['f_hurt','ft','Kai is hit (crunch + music dip)',0],['f_dash','ft','Dash and jump whoosh',0],['f_graze','ft','Shield block and knife slash tick',0],
+  ['f_warn','ft','Arena lock and boss warning beeps',0],['f_up','ft','Go-ahead and checkpoint chime',0],['f_fever','ft','FEVER starts (5 notes)',0],
+  ['f_mstart','ft','The stage song starts when the run starts',1],['f_mcp','ft','Song restarts when you respawn at a checkpoint',0],
+  ['f_mcue','ft','Music-pack song switches: arena lock, boss, boss phase, clear (this one changes the music)',0],['f_mmenu','ft','Menu song comes back when you leave the stage',0],
   ['heart','pw','Heartbeat when you have 1 hull left',0],['hat','pw','TEMPO power-up hi-hat',0],['drums','pw','DRUM power-up drum kit',0],['pwnote','pw','Power-up notes (echo, nova, magnet, chord, level chime)',0],
   ['pwthump','pw','Power-up thump (nova, magnet)',0],['riser','pw','DROP power-up riser',0],['dropboom','pw','DROP power-up blast',0],['reward','pw','Reward shower boom',0]];
-const SNDGRP={fx:'GAME SOUNDS',st:'JINGLES ON THE BEAT',mu:'MUSIC EFFECTS',pw:'POWER-UP AND WAVE SOUNDS'};
+const SNDGRP={fx:'GAME SOUNDS',st:'JINGLES ON THE BEAT',mu:'MUSIC EFFECTS',pw:'POWER-UP AND WAVE SOUNDS',ft:'ON FOOT'};
 const SNDLS={get:Storage.prototype.getItem,set:Storage.prototype.setItem};   // the Lab keeps game saves in a shadow copy while it runs: the sound choice is written to the real storage
 const SND=window.SND={T:SNDT,G:SNDGRP,cfg:{on:{},vol:1,off:false},pv:{},force:null,
   load(){try{const j=JSON.parse(SNDLS.get.call(localStorage,'nr_snd')||'null');if(j&&typeof j==='object'){this.cfg.on=j.on&&typeof j.on==='object'?j.on:{};this.cfg.vol=typeof j.vol==='number'?Math.max(0,Math.min(2,j.vol)):1;this.cfg.off=!!j.off;}}catch(e){}},
@@ -36,6 +41,7 @@ const SND=window.SND={T:SNDT,G:SNDGRP,cfg:{on:{},vol:1,off:false},pv:{},force:nu
   setVol(v){this.cfg.vol=Math.max(0,Math.min(2,+v||0));this.save();this.apply();},
   musicFx(){return SNDT.some(r=>r[1]==='mu'&&this.on(r[0]));},
   apply(){PURE.route();if(PURE.ok)try{PURE.ok.gain.value=PURE.GAIN*this.cfg.vol;AU.fx.gain.value=PURE.ok.gain.value;}catch(e){}}};
+SND.AU=AU;                                                         // test hook: qa/soundlab-test.js spies on AU.sfx / AU.startStage
 window.sndOn=id=>!window.SND||SND.on(id);                        // call sites outside the audio parts: if(sndOn('heart'))AU.osc(...)
 SND.load();
 const PURE=window.PURE={GAIN:.22,blocked:0,played:0,

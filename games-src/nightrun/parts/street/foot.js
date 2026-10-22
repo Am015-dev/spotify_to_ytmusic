@@ -95,7 +95,10 @@ function pop(x,y,t,c,big){S.pop.push({x,y,t,c:c||'#fff',l:big?1.4:.9,m:big?1.4:.
 function ftBurst(x,y,c,n,sp){if(S.fx.length>260)return;for(let i=0;i<n;i++){const a=ftRnd(0,6.283),v=ftRnd(.3,1)*(sp||260);S.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-80,l:ftRnd(.25,.6),c,r:ftRnd(2,4)});}}
 function hitstop(ms){if(!RET.juice||reduce())return;S.hs=Math.max(S.hs,ms/1000);}
 function ftShake(v){if(reduce())return;S.shake=Math.max(S.shake,window.COM?COM.sk(v):v);}
-function sfx(n){try{if(window.AU&&AU.sfx)AU.sfx(n);}catch(e){}}
+const SFXID={shot:'f_shot',hit:'f_hit',pick:'f_pick',big:'f_big',hurt:'f_hurt',dash:'f_dash',graze:'f_graze',warn:'f_warn',up:'f_up',tier:'f_fever'};   // LAB (ON FOOT group of the SOUND page): each on-foot sound has its own switch
+// 22 Oct: 'window.AU' is undefined (AU is a script-level const), so these three calls never ran: no on-foot sound, no stage song. They use AU directly now, each behind its ON FOOT switch.
+const sndF=id=>!window.sndOn||sndOn(id);
+function sfx(n){try{if(!sndF(SFXID[n]||'f_'+n))return;if(typeof AU!=='undefined'&&AU.sfx)AU.sfx(n);}catch(e){}}
 /* the song's beat: bpos() from a.js when the beat clock runs, else our own 120 bpm clock */
 function beatPos(){try{if(typeof bpos==='function'&&typeof BT!=='undefined'&&BT.mode!=='none'){const p=bpos(performance.now());if(isFinite(p))return p;}}catch(e){}return S?S.time*2:0;}
 function ftOnBeat(){const p=beatPos(),f=Math.abs(p-Math.round(p)),spb=(typeof BT!=='undefined'&&BT.spb)||.5,win=.11+((RET.asWinMs&&RET.asWinMs())||0)/1000;return f*spb<win;}
@@ -329,7 +332,8 @@ F.step=ftUpdate;
 
 /* ===== results ===== */
 function rankOf(){const pts=S.score+Math.max(0,240-S.time)*25+S.P.hp*800-S.hurts*250;return pts>=16000?'S':pts>=11000?'A':pts>=7000?'B':'C';}
-function finish(cleared,quit){if(S.end)return;const id=S.id,first=cleared&&!(SV.clr[id]>0),rank=cleared?(S.cpUsed&&rankOf()==='S'?'A':rankOf()):'-';
+function finish(cleared,quit){if(S.end)return;if(F.lab){S.end={cleared,quit:!!quit,neon:0,rank:'-',first:false,rec:false,time:S.time,score:S.score};NR.emit('footEnd',{stage:S.id,cleared,score:S.score,neon:0,time:Math.round(S.time),rank:'-',quit:!!quit,kills:S.kills,hurts:S.hurts,lab:true});return;}   // LAB: no Neon, best score, clear count or save write
+  const id=S.id,first=cleared&&!(SV.clr[id]>0),rank=cleared?(S.cpUsed&&rankOf()==='S'?'A':rankOf()):'-';
   let neon=0;if(!quit){neon=cleared?(first?150:15+({S:30,A:20,B:10,C:5}[rank]||0)):Math.min(25,Math.floor(S.score/400));}
   try{if(neon&&typeof GA!=='undefined'){GA.bank+=neon;gsave();}}catch(e){}
   let rec=false;if(cleared){SV.clr[id]=(SV.clr[id]|0)+1;const b=SV.best[id];if(!S.assist&&(!b||S.score>b.score)){SV.best[id]={score:S.score,rank,time:Math.round(S.time)};rec=true;}svSave();}
@@ -537,15 +541,15 @@ function leave(then){const id=S&&S.id,cl=S&&S.end&&S.end.cleared;stop();
   if(then)then();}
 
 /* ===== start / stop ===== */
-function loop(t){if(!F.on){raf=0;return;}const dt=Math.min(.05,(t-lastT)/1000||0);lastT=t;ftUpdate(dt);if(F.pre)F.pre(L.ctx);draw();raf=requestAnimationFrame(loop);}
+function loop(t){if(!F.on){raf=0;return;}const dt=Math.min(.05,(t-lastT)/1000||0);lastT=t;ftUpdate(F.ts?dt*F.ts:dt);if(F.pre)F.pre(L.ctx);draw();raf=requestAnimationFrame(loop);}
 function begin(id,fromCp){if(F.ui){F.ui=0;if(F.hold&&F.hold(()=>begin(id,fromCp)))return;}build();newRun(id,fromCp);for(const k in I)I[k]=0;L.root.hidden=false;F.on=true;layout();hideMenu();
-  try{if(window.AU&&AU.startStage)AU.startStage(STAGES[id].song);}catch(e){}
+  try{if(typeof AU!=='undefined'&&AU.startStage&&sndF(fromCp?'f_mcp':'f_mstart'))AU.startStage(STAGES[id].song);}catch(e){}
   NR.emit('footStart',{stage:id,cp:!!fromCp,t0:S.time});lastT=performance.now();if(!raf)raf=requestAnimationFrame(loop);}
 function start(id){id=id||'street1';if(!RET.foot||!STAGES[id])return false;if(typeof running!=='undefined'&&running)return false;
-  const st=STAGES[id];if(RET.tale&&window.TALE&&st.tale&&!SV.seen.b){SV.seen.b=1;svSave();const ok=TALE.show(st.tale.before.map(l=>({who:l[0],text:l[1]})),0,()=>begin(id));if(ok!==false)return true;}
+  const st=STAGES[id];if(!F.lab&&RET.tale&&window.TALE&&st.tale&&!SV.seen.b){SV.seen.b=1;svSave();const ok=TALE.show(st.tale.before.map(l=>({who:l[0],text:l[1]})),0,()=>begin(id));if(ok!==false)return true;}
   begin(id);return true;}
-function stop(){if(S&&!S.end)finish(false,true);if(S&&S.hintT>8&&S.moved>250&&S.shots>0&&!SV.hint){SV.hint=1;svSave();}F.on=false;if(raf)cancelAnimationFrame(raf);raf=0;if(L){L.root.hidden=true;hideMenu();}
-  for(const k in I)I[k]=0;try{if(window.AU&&AU.menuMusic&&!(typeof running!=='undefined'&&running))AU.menuMusic();}catch(e){}}
+function stop(){if(S&&!S.end)finish(false,true);if(!F.lab&&S&&S.hintT>8&&S.moved>250&&S.shots>0&&!SV.hint){SV.hint=1;svSave();}F.on=false;if(raf)cancelAnimationFrame(raf);raf=0;if(L){L.root.hidden=true;hideMenu();}
+  for(const k in I)I[k]=0;try{if(typeof AU!=='undefined'&&AU.menuMusic&&sndF('f_mmenu')&&!(typeof running!=='undefined'&&running))AU.menuMusic();}catch(e){}}
 function sim(sec,dt){dt=dt||1/60;let n=Math.round(sec/dt);while(n-->0&&S&&!S.end)ftUpdate(dt);return S;}   // headless fast-forward for tests
 
 /* ===== MENU button: STREET RUN (unlocked after story stage 3) ===== */
