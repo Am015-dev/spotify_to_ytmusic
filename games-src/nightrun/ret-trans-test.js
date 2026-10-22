@@ -7,7 +7,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const freePort = () => new Promise(r => { const s = net.createServer(); s.listen(0, '127.0.0.1', () => { const p = s.address().port; s.close(() => r(p)); }); });
 const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' : 'FAIL ') + n + (p || !i ? '' : ' :: ' + i)); };
 const PHONE = { viewport: { width: 390, height: 763 }, hasTouch: true, isMobile: true };
-const fin = () => { const m = window.__mnr; m.startStory(1); m.G.score = 123456; m.SH.neon = 40; m.SH.bankRun(); m.ST.fail(); return { score: m.G.score.toLocaleString('de-DE'), bank: m.GA.bank }; };
+const fin = () => { const m = window.__mnr; m.startStory(1); m.G.score = 123456; m.SH.neon = 40; m.SH.bankRun(); m.ST.fail(); return { score: fmtN(m.G.score), bank: m.GA.bank }; };
 (async () => {
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', port, '--bind', '127.0.0.1'], { cwd: GAME_DIR, stdio: 'ignore' }); await sleep(800);
   const br = await PW.chromium.launch();
@@ -29,7 +29,7 @@ const fin = () => { const m = window.__mnr; m.startStory(1); m.G.score = 123456;
   ok('fade finished, screen not stuck (opacity 1)', (await anims()).length === 0 && await p.evaluate(() => getComputedStyle(document.getElementById('over')).opacity === '1'));
   // count-up and chip
   const mid = await p.evaluate(() => 0); await sleep(700);
-  const e1 = await p.evaluate(() => ({ s: document.getElementById('oScore').textContent, c: document.querySelector('#over .retChip b').textContent, bank: window.__mnr.GA.bank.toLocaleString('de-DE') }));
+  const e1 = await p.evaluate(() => ({ s: document.getElementById('oScore').textContent, c: document.querySelector('#over .retChip b').textContent, bank: fmtN(window.__mnr.GA.bank) }));
   ok('score count-up ends on the exact score', e1.s === t0.score, JSON.stringify([e1.s, t0.score]));
   ok('bank chip equals the wallet after a banked run', e1.c === e1.bank && t0.bank > 0, JSON.stringify(e1));
   // mid count (second run), tap skips
@@ -38,12 +38,12 @@ const fin = () => { const m = window.__mnr; m.startStory(1); m.G.score = 123456;
   const midv = await p.evaluate(() => document.getElementById('oScore').textContent);
   ok('count-up is mid-way after 250 ms', midv !== t1.score, midv);
   await p.evaluate(() => document.getElementById('over').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })));
-  const skip = await p.evaluate(() => ({ s: document.getElementById('oScore').textContent, c: document.querySelector('#over .retChip b').textContent, b: window.__mnr.GA.bank.toLocaleString('de-DE') }));
+  const skip = await p.evaluate(() => ({ s: document.getElementById('oScore').textContent, c: document.querySelector('#over .retChip b').textContent, b: fmtN(window.__mnr.GA.bank) }));
   ok('tap skips the count-up to the final values', skip.s === t1.score && skip.c === skip.b, JSON.stringify(skip));
   // stage clear + map
   await p.evaluate(() => { const m = window.__mnr; document.getElementById('againBtn').click(); m.startStory(1); m.ST.stars = [1, 1, 0]; m.G.score = 5000; m.ST.finish(); });
   await sleep(1100);
-  ok('clear screen count-up + chip exact', await p.evaluate(() => document.getElementById('srScore').textContent === '5.000' && document.querySelector('#stres .retChip b').textContent === window.__mnr.GA.bank.toLocaleString('de-DE')));
+  ok('clear screen count-up + chip exact', await p.evaluate(() => document.getElementById('srScore').textContent === '5000' && document.querySelector('#stres .retChip b').textContent === fmtN(window.__mnr.GA.bank)));
   ok('map screen has the chip', await p.evaluate(() => { const e = document.getElementById('stsel'); return !!e.querySelector('.retChip'); }));
   // ONE MORE RUN timing
   await p.evaluate(fin); await sleep(700); const tr = Date.now();
@@ -77,7 +77,7 @@ const fin = () => { const m = window.__mnr; m.startStory(1); m.G.score = 123456;
   // ---- reduced motion
   p = await open({ ...PHONE, reducedMotion: 'reduce' });
   await p.evaluate(fin); await sleep(60);
-  const rm = await p.evaluate(() => ({ cls: document.documentElement.className, an: document.getAnimations().length, s: document.getElementById('oScore').textContent, final: window.__mnr.G.score.toLocaleString('de-DE'), c: document.querySelector('#over .retChip b').textContent, b: window.__mnr.GA.bank.toLocaleString('de-DE') }));
+  const rm = await p.evaluate(() => ({ cls: document.documentElement.className, an: document.getAnimations().length, s: document.getElementById('oScore').textContent, final: fmtN(window.__mnr.G.score), c: document.querySelector('#over .retChip b').textContent, b: fmtN(window.__mnr.GA.bank) }));
   ok('reduced motion: no fade, no count-up (values final at once)', !/rtr/.test(rm.cls) && rm.an === 0 && rm.s === rm.final && rm.c === rm.b, JSON.stringify(rm));
   await p.context().close();
   // ---- flags off

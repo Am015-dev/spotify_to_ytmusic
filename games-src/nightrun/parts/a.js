@@ -35,7 +35,7 @@ let best=load('mnr_best',{score:0,dist:''});
 const todayN=()=>{const d=(window.RET&&RET.daily&&RET.clock)?new Date(RET.clock()):new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
 window.CMF_ON=!/[?&]comfort=0/.test(location.search);   // comfort.js: the eye-strain pass (?comfort=0 = the old look)
-window.fmtN=n=>Math.round(+n||0).toLocaleString('de-DE');   // the one number format (thousands dot): every score, Neon and count goes through it
+window.fmtN=n=>String(Math.round(+n||0));   // the one number format (review 10 #14): plain digits, 2400 not 2.400; every score, Neon and count goes through it
 window.phText=()=>/[?&]placeholders=1/.test(location.search)||!!(typeof G==='object'&&G&&G.lab);   // placeholder labels (asset ids drawn as text): LAB or ?placeholders=1 only
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 // every setting, its default and (in c.js) its row in the settings panel. Saved under mnr_set, applied live by applySet().

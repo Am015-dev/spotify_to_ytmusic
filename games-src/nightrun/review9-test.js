@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // review 9 #1 + #9 gate (parts/calm.js stage-title chip, parts/bossvis.js boss text), flag RET.calm (?calm=0 = before). 390x763 phone. PASS/FAIL lines only.
 //   #1: while enemies are alive, no banner band touches the middle 60% of the field, the title chip is <= 28 css px tall and lasts <= 2 s (stages 1, 6, 10)
+//   #4 (review 10): the boss intro is the same small chip (<= 2 s, <= 28 px, not in the middle 60%)
 //   #9: while a boss is up, no wave text (READY / NEXT WAVE) is visible and no text except the boss's own (name, ARMOUR, SAFE LANE, FIREWALL) is drawn over the boss rectangle
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/review9-test.js      env: GAME_DIR=<dir>
 const PW = require(process.env.PW || 'playwright'), path = require('path'), net = require('net'), cp = require('child_process');
@@ -36,7 +37,22 @@ const STAGE = o => {
   }
   ok('banner frames with live enemies were measured', en > 0, { en });
   for (const id of ['sek-adler', 'hoplite']) {
-    const [c, p] = await page('&bpauto=1&boss=' + id); await p.waitForFunction(() => __mnr.G && __mnr.G.boss && __mnr.G.boss.x <= 791, null, { timeout: 40000 });
+    const [c, p] = await page('&bpauto=1&boss=' + id);
+    // review 10 #4: the boss intro is the same top chip as the stage title: <= 2 s, <= 28 px, no band pixels in the middle 60%
+    const bi = await p.evaluate(() => { const m = __mnr, P = CanvasRenderingContext2D.prototype, fr = P.fillRect, bands = []; let on = 0;
+      P.fillRect = function (x, y, w, h) { if (on && typeof this.fillStyle === 'string' && /^#05030c/i.test(this.fillStyle) && w > 100) { const t = this.getTransform(); bands.push([(y * t.d + t.f) / t.d, h, m.H]); } return fr.apply(this, arguments); };
+      for (let i = 0; i < 60 * 120 && !(m.G.banner && m.G.banner.warn && m.G.banner.t > 0); i++) { m.P.hp = 99; m.step(1 / 60); }
+      const b0 = m.G.banner, r = { found: !!(b0 && b0.warn), sm: !!(b0 && b0.sm), maxT: 0, hh: 0, bad: 0 };
+      if (r.found) for (let i = 0; i < 150; i++) { const b = m.G.banner; if (b && b.t > 0) r.maxT = Math.max(r.maxT, b.m); m.P.hp = 99; m.step(1 / 60);
+        if (i % 5 === 0) { bands.length = 0; on = 1; try { m.render(m.G.t, 1 / 60); } catch (e) {} on = 0;
+          for (const q of bands) { r.hh = Math.max(r.hh, q[1]); const f0 = q[0] / q[2], f1 = (q[0] + q[1]) / q[2]; if (f1 > .2 && f0 < .8) r.bad++; } } }
+      P.fillRect = fr; return r; });
+    ok(`boss ${id}: boss intro found`, bi.found, bi);
+    ok(`boss ${id}: boss intro is the small chip`, bi.sm, bi);
+    ok(`boss ${id}: boss intro chip lasts <= 2 s`, bi.maxT <= 2.001, bi);
+    ok(`boss ${id}: boss intro chip <= 28 px tall`, bi.hh <= 28, bi);
+    ok(`boss ${id}: no banner pixels in the middle 60% during the boss intro`, bi.bad === 0, bi);
+    await p.waitForFunction(() => __mnr.G && __mnr.G.boss && __mnr.G.boss.x <= 791, null, { timeout: 40000 });
     const r = await p.evaluate(() => { const m = __mnr, P = CanvasRenderingContext2D.prototype, ft = P.fillText, bad = []; let on = 0;
       P.fillText = function (t, x, y) { if (on && BV.rect) { const T = this.getTransform(), cx = x * T.a + y * T.c + T.e, cy = x * T.b + y * T.d + T.f, R = BV.rect, s = R.s, q = Math.max(R.hw, R.hh) * s; if (Math.abs(cx - R.cx) < q * .8 && Math.abs(cy - R.cy) < q * .8 && !/ARMOUR|SAFE LANE|FIREWALL|PHASE|NEW ATTACK|BREAK|OPEN|\d\/3/.test(String(t)) && !String(t).startsWith(m.G.boss.nm)) bad.push(String(t)); } return ft.apply(this, arguments); };
       let rdyVis = 0; LEAK.rdy(true); for (let i = 0; i < 600; i++) { m.P.hp = 99; m.step(1 / 60); const e = document.getElementById('retReady'); if (e && e.style.display !== 'none') rdyVis++; if (i % 10 === 0) { on = 1; try { m.render(m.G.t, 1 / 60); } catch (e) {} on = 0; } }

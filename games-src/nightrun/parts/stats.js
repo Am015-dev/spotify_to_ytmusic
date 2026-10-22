@@ -70,11 +70,11 @@ RET.st=(function(on){
   const Q=[];let showing=false;
   function toast(a){Q.push(a);if(!showing)next();}
   /* the toast waits (queued) while the pit stop, the clear screen or the chest reveal is open: it used to cover their titles */
-  const blocked=()=>['shop','stres','chest'].some(i=>{const o=document.getElementById(i);return !!o&&!o.hidden&&getComputedStyle(o).display!=='none';});
+  const blocked=()=>['shop','stres','chest'].some(i=>{const o=document.getElementById(i);return !!o&&!o.hidden&&getComputedStyle(o).display!=='none';})||!!(G&&G.banner&&G.banner.warn&&G.banner.t>0);   // review 10 #12: no toast during a boss intro
   /* menufix: the toast sits in the first slot (top, then bottom) where no button, tab, card or input lies under it; if none is clear it waits (queued) */
   const HIT='button,a[href],input,select,textarea,label,[role=button],[onclick],.go,.card,.tabs,.seg';
   function mfFree(e){const r=e.getBoundingClientRect();if(!r.width)return false;for(let i=0;i<=6;i++)for(let j=0;j<=2;j++){const x=r.left+r.width*i/6,y=r.top+r.height*j/2,t=document.elementFromPoint(Math.min(innerWidth-1,Math.max(0,x)),Math.min(innerHeight-1,Math.max(0,y)));if(t&&t!==e&&t.closest(HIT))return false;}return true;}
-  function mfSlot(e){e.style.transition='none';let ok=false;for(const s of['mfTop','mfBot']){e.classList.remove('mfTop','mfBot');e.classList.add(s,'show');if(mfFree(e)){ok=true;break;}}
+  function mfSlot(e){e.style.transition='none';let ok=false;/* review 10 #12: bottom only, the top holds the score strip and the boss bar */for(const s of['mfBot']){e.classList.remove('mfTop','mfBot');e.classList.add(s,'show');if(mfFree(e)){ok=true;break;}}
     e.classList.remove('show');if(!ok)e.classList.remove('mfTop','mfBot');void e.offsetWidth;e.style.transition='';return ok;}
   function next(){if(!Q.length){showing=false;return;}showing=true;if(blocked()){setTimeout(next,400);return;}const a=Q.shift();
     let e=document.getElementById('achToast');
