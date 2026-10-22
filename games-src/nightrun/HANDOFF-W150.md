@@ -45,4 +45,4 @@ New `beatlock-test.js` (stepped sim, no wall clock; `STAGES=1,6,10 SECS=150`):
 - NOT measured: real-audio drift (`?sim=1` ties the beat clock to game time). If the owner feels real offbeat on a phone, the next check is `AU.lat` / `SET.sync` on a real device (`audio-test.js`), not the enemy code.
 
 ## Left for the orchestrator
-Review, merge `nr/W150`, run `guard.py`.
+Gates: musicpack-test ALL PASS, beatlock-test PASS (stages 1/6/10), guard.py ok. Review and merge `nr/W150`.

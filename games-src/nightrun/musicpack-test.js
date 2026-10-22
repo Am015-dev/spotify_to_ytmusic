@@ -139,7 +139,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
   await p.evaluate(() => { __mnr.SET.mute = false; __mnr.AU.vol(true); });
   ok('5 no page errors with the pack', errs.length === 0, errs); allErrs.push(...errs);
   const pickOn = await p.evaluate(() => __dp.STAGES.map(s => s.song).join());
-  const pickMix = await p.evaluate(() => { const S = __mnr.SET, st = __dp.STAGES; S.mus = 'mix'; const a = st.map(s => s.song).join(); S.mus = 'classic'; const c = st.map(s => s.song).join(); const o = st.map(s => s.song0 || s.song).join(); S.mus = 'mix'; const sv = JSON.parse(localStorage.getItem('mnr_story') || '{}'); return { a, c, o, same: a === st.map(s => s.song).join() }; });
+  const pickMix = await p.evaluate(() => { const S = __mnr.SET, st = __dp.STAGES; S.mus = 'mix'; const a = st.map(s => s.song).join(); S.mus = 'classic'; const c = st.map(s => s.song).join(); const o = st.map(s => s.song0 || s.song).join(); S.mus = 'new'; const n = st.map(s => s.song).join(); S.mus = 'mix'; return { a, c, o, n, same: a === st.map(s => s.song).join() }; });
   await p.context().close();
 
   // ---------- fallback 1: nothing of the pack listed in ready.json
@@ -165,7 +165,7 @@ const res = []; const ok = (n, p, i) => { res.push(p); console.log((p ? 'PASS ' 
   const rf = await ref.p.evaluate(() => ({ songs: __dp.STAGES.map(s => s.song).join(), bosses: [0, 1, 2, 3].map(k => __dp.bossStage(k)).join(), en: [__dp.songFor(3, 0), __dp.songFor(2, 1)].join() }));
   ok('5 ?musicpack=0: flag off, nothing registered, stage / boss / endless picks identical to a build without the files', off.on === false && off.reg === 0 && off.songs === rf.songs && off.bosses === rf.bosses && off.en === rf.en && !/^(d[1-4]|ath[AB])/.test(off.st), { off, rf });
   ok('5 Classic = every stage plays its original song; Mix keeps a stage\'s own song until it is cleared (then a replay may take a new one)', pickMix.c === pickMix.o && pickMix.a === pickMix.o && pickMix.same, pickMix);
-  const pickNew = await p.evaluate(() => { __mnr.SET.mus = 'new'; const r = __dp.STAGES.map(s => s.song).join(); __mnr.SET.mus = 'mix'; return r; });
+  const pickNew = pickMix.n;
   ok('5 the pack really changes the picks when on (New only)', pickNew !== rf.songs);
   allErrs.push(...o0.errs, ...ref.errs);
   ok('5 no page errors anywhere', allErrs.length === 0, allErrs);
