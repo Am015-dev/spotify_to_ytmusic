@@ -4,3 +4,8 @@
 - Bughunt popups (2 runs per city, 2 h target, build before/after): before fra 1+1, ath 2+0 (ogRes at 62 / 19 km/h, a roamCard at 0 km/h, ogRes at 227 km/h); after 0/0/0/0. Other detectors differ run to run (fra launch 7 and belowGround 1 in one after-run, base fra_1 had launch 2): the bot no longer enters events so its path changed; not caused by this lane, needs a longer A/B if it matters.
 - Gates on the rebuilt page: unit 0 FAIL; TAG=life1,xf1,terrain,why,no-popup,hud6 75/76 (only known flake why/solid-bld SLOW); hud6 solo 2/2. 852x393 and 393x852 shots checked.
 - Left: the 0 km/h roamCard (garage/mission card) is not changed; the bughunt bot cannot tap, so events never start in it. Add an OD_CHANGELOG line at deploy.
+
+## Review #51 fixes (2 follow-ups)
+- Chip: shown the full 7 s whatever the distance (GO: still shown 6 s at 90 km/h, 150 m past the start); a tap puts the car back at the start (like RETRY) before OG_start. The chip is fixed in row 1 and never moves; level and result toasts take the next free row below it.
+- Portrait 393x852: chip and toasts sit right of x=140 (pause, minimap, gauge column are left of it) at y 8 / 62 / 126; landscape rows at 40 / 94 / 148. GO why/no-popup now checks chip >= 5 s at 90 km/h, no overlap among chip/level/result or with tP/roamMini/roamGauge/touch controls, chip y fixed. iPhone-UA shots of the 3-stack looked at in both orientations.
+- Gates: unit 0 FAIL; no-popup + hud6 pass in both orientations; batch life1/xf1/terrain/why 72/76 with why/solid-bld, xf1/water, xf1/slope (known SLOW flakes) and why/solid-cars (batch only, passes solo 2/2, 0 cars on screen that run).
