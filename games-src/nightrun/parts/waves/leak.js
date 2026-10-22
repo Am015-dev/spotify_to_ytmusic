@@ -86,6 +86,7 @@ const LEAK=window.LEAK={
     ctx.save();ctx.translate(e.x,e.y);
     UIK.bossShadow(e,'ground',e._dw);
     if(e.arm){const k=PHF;ctx.save();ctx.globalCompositeOperation='lighter';G_(0,-r*.3,r*(1.7+1.2*k),'#ff3050',.22+.5*k);ctx.restore();}
+    if(FOEART.body(e,t,fl)){ctx.restore();return;}   // gtank / gturret: ship-egtank / egturret sheets (hp bar drawn by body)
     if(ART.dflash('spr-en-'+e.type,r*3.2,0,0,0,fl)){ctx.restore();return;}
     ctx.lineWidth=2;ctx.strokeStyle=line;ctx.fillStyle=fill;
     if(e.type==='gtank'){
