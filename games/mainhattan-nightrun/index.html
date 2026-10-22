@@ -100,6 +100,11 @@ html:not(.rdy) #title .row{visibility:hidden;animation:rdyShow 0s 6s forwards}
 #stage.p #over{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/end-lose.webp) 70% center/cover no-repeat}
 #stres{background:linear-gradient(90deg,#05030cf0 0%,#05030ccc 48%,#05030c55 100%),#05030c url(media/end-win.webp) center/cover no-repeat}
 #stage.p #stres{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/end-win.webp) 70% center/cover no-repeat}
+/* full-size event splashes (event-level-clear / event-new-record), switched on in JS only when the picture is listed in ready.json */
+#stres.evlc{background:linear-gradient(90deg,#05030cf0 0%,#05030ccc 48%,#05030c55 100%),#05030c url(media/event-level-clear.webp) center/cover no-repeat}
+#stage.p #stres.evlc{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/event-level-clear.webp) 70% center/cover no-repeat}
+#over.evnr{background:linear-gradient(90deg,#05030cf0 0%,#05030ccc 48%,#05030c55 100%),#05030c url(media/event-new-record.webp) center/cover no-repeat}
+#stage.p #over.evnr{background:linear-gradient(180deg,#05030cf0 0%,#05030cb0 55%,#05030c77 100%),#05030c url(media/event-new-record.webp) 70% center/cover no-repeat}
 .pg .card img.shp{height:clamp(40px,calc(var(--u)*13),84px);width:auto;aspect-ratio:1;object-fit:cover;border-radius:50%;border:2px solid var(--c,#8c86b8);box-sizing:border-box;flex:0 0 auto;box-shadow:0 0 10px var(--c,#0000),inset 0 0 8px #05030c}   /* the painted ship scene sits in a deliberate round badge, never a bare square crop */
 @container (max-aspect-ratio:1/1){.pg .card img.shp{height:clamp(44px,calc(var(--u)*13),72px)}}
 .pg .card img.ki{height:clamp(30px,calc(var(--u)*9),48px);width:auto;aspect-ratio:1;object-fit:contain;flex:0 0 auto}
@@ -1805,7 +1810,7 @@ const ST={on:false,n:1,def:STAGES[0],lvl:0,len:66,lead:30,kv:170,sv:180000,pn:20
     if(sum>(sSave.stars[n]||0))sSave.stars[n]=sum;
     if(n<MAIN){const got={};for(const id in SH.got)got[id]=SH.got[id];sSave.snap[n+1]=got;}
     sPersist();NR.emit('runEnd',{story:n,cleared:true,score:G.score,di:G.di,kills:G.kills});
-    const s=this.def;$('srEye').textContent=n===MAIN?'Story complete':s.ch?'Challenge clear':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
+    const s=this.def;resEl.classList.toggle('evlc',ART.isReal('event-level-clear'));$('srEye').textContent=n===MAIN?'Story complete':s.ch?'Challenge clear':ACTN[s.act]+' · Stage '+n+' clear';$('srTitle').textContent=s.name;
     const row=(ok,t)=>`<div class="sr${ok?' ok':''}"><span class="sg">${ok?'★':'☆'}</span> ${t}</div>`;
     $('srStars').innerHTML=row(1,'Stage clear')+row(st[1],(this.ch==='perfect'?Math.round(this.pn*1.4):this.pn)+' PERFECT · you '+G.perf)+row(st[2],s.ch?'Score '+(this.s3/1000)+'K · you '+Math.round(G.score/1000)+'K':'No hull lost')+medalHTML(Math.max(0,Math.min(2,st[0]+st[1]+st[2]-1)))+(window.RET&&RET.clearPay?RET.resultRow():'');
     $('srScore').textContent=window.fmtN(G.score);
@@ -2734,14 +2739,17 @@ const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
   enN:['drone','charger','gunship','gate','flank','swarm','mine','turret-base','turret-barrel'],
   fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine','shield-link','bullet-shell','bullet-needle','bullet-rocket'],
   pkN:['shard','hp','up','emp','drum','tempo','slow','drop']};
-ART.load=n=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();
-  im.onload=()=>{const done=b=>{ART.bm[n]=b;};
+/* q=1: a bulk load from the ready.json queue (shapes.js), at most 2 at a time and only while no on-demand load is in flight, so a sheet the current stage asks for is never stuck behind hundreds of full-size pictures (22 Oct 2026: Kai was not drawn for 15 s) */
+ART.pend=0;ART.lowN=0;ART.q=[];
+ART.pump=()=>{while(ART.q.length&&ART.lowN<2&&ART.pend===0){const n=ART.q.shift();if(n in ART.bm)continue;ART.lowN++;ART.load(n,1);}};
+ART.load=(n,q)=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();if(!q)ART.pend++;let fin=false;const end=()=>{if(fin)return;fin=true;if(q)ART.lowN--;else ART.pend--;ART.pump();};
+  im.onload=()=>{const done=b=>{ART.bm[n]=b;end();};
     /* effects made as light on a solid black square (no alpha): turn the black into transparency once, colours un-premultiplied, so they look right with normal blending and identical when drawn additively */
     if((n.startsWith('fx-')&&!n.startsWith('fx-fuse'))||n.startsWith('nv-ev-')){try{const w=im.naturalWidth,h=im.naturalHeight,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);const id=g.getImageData(0,0,w,h),d=id.data;let solid=true,dark=0;for(let i=3;i<d.length;i+=4)if(d[i]<250){solid=false;break;}
       for(const q of [0,w-1,(h-1)*w,h*w-1]){const o=q*4;if(d[o]+d[o+1]+d[o+2]<90)dark++;}
       if(solid&&dark>=3){for(let i=0;i<d.length;i+=4){const m=Math.max(d[i],d[i+1],d[i+2]);if(m<3){d[i+3]=0;continue;}d[i+3]=m;const k=255/m;d[i]=Math.min(255,d[i]*k);d[i+1]=Math.min(255,d[i+1]*k);d[i+2]=Math.min(255,d[i+2]*k);}g.putImageData(id,0,0);done(c);return;}}catch(e){}}
     if(self.createImageBitmap)createImageBitmap(im).then(done,()=>done(im));else done(im);};
-  im.onerror=()=>{ART.err[n]=1;};im.src=ART.base+n+'.webp';};
+  im.onerror=()=>{ART.err[n]=1;end();};im.src=ART.base+n+'.webp';};
 ART.have=n=>!!ART.bm[n];
 ART.err={};
 ART.frame=()=>{if(Math.abs(S-ART.S)>.01){ART.S=S;ART.sc={};}
@@ -5384,7 +5392,18 @@ if(typeof ART!=='undefined')ART.footProps=(c,cam,w,fl,t)=>{if(!RET.sprites||!ART
     const q=PROPS[Math.floor(hs(i*97+3)*PROPS.length)],k='prop-'+q[0]+'/'+(q[0]==='steam'?'glow':'loop'),m=ART.ANIM.s[k];if(!m||!ART.anim(k))continue;
     const h=q[1]*C;SL.tag='prop';ART.drawAnim(c,k,t+i*.37,px,fl-h/2,h/m[3],false,.95);SL.tag='';}};   // prop sheets are centre-anchored (build.py): centre = road - h/2 puts the bottom row on the road
 
+/* ----- painted street (22 Oct 2026): foot/bg-sky|far|mid|near|floor, 2048x1024 each, used only when all five are loaded (else the placeholders below). Same convention as footart.js FA.bg: the picture's street line is 80% down,
+   scaled so that line lands on the road line FL (top of the picture at the top of the visible sky), tiles are 2:1 and repeat sideways. Sky is opaque and almost fixed, the others scroll slower the further away they are,
+   the floor (rows 720-1023, transparent above) moves with the road. Draw order: sky, far, mid, near, floor, then props and actors. ----- */
+const PLY=['sky','far','mid','near','floor'],PSP={sky:.02,far:.12,mid:.4,near:.7,floor:1};
+SL.paint=0;
+function slPainted(c,x0,w,cam,t0){const P={};for(const l of PLY){const q=slPic('bg-'+l);if(!q||!q.width)return false;P[l]=q;}
+  const DH=(FL-t0)/.8,TW=2*DH,tile=(l,y,h,sy,sh)=>{const off=cam*PSP[l];let x=x0-((off%TW)+TW)%TW;SL.tag='L-'+l;for(;x<x0+w;x+=TW)c.drawImage(P[l],0,sy,P[l].width,sh,x,y,TW+1,h);SL.tag='';};
+  const H=P.sky.height;tile('sky',t0-4,FL-t0+8,0,H);for(const l of ['far','mid','near'])tile(l,t0,DH,0,P[l].height);
+  const DF=Math.max(DH,(VH+2-FL)/.2),fy=FL-.8*DF,r0=.69;tile('floor',fy+r0*DF,(1-r0)*DF,Math.round(r0*P.floor.height),P.floor.height-Math.round(r0*P.floor.height));   // only the floor rows (the top of the picture is transparent)
+  SL.paint=1;return true;}
 function slBackdrop(c,S,vw,exl,exr,t0,res){const x0=-exl,w=vw+exl+exr,cam=S.camX,fh=FL-t0;
+  if(slPainted(c,x0,w,cam,t0)){SL.x0=x0;if(typeof ART!=='undefined'&&ART.footProps)ART.footProps(c,cam,w,FL,S.time);return;}SL.paint=0;
   const sky=slPic('bg-street-sky');if(sky)c.drawImage(sky,x0,t0-4,w,fh+8);else{c.fillStyle='#0c0820';c.fillRect(x0,t0-4,w,fh+8);if(window.phText()){c.fillStyle='rgba(255,255,255,.35)';c.font='bold 12px monospace';c.textAlign='right';c.textBaseline='top';c.fillText('bg-street-sky (placeholder)',x0+w-8,t0+fh*.35);}}
   slBlit(c,'far',SL.speeds.far,cam,x0,w,t0,res);slBlit(c,'mid',SL.speeds.mid,cam,x0,w,t0,res);
   const rd=slPic('bg-street-road');if(rd){const TW=(VH-FL)*rd.width/rd.height;let x=x0-((cam%TW)+TW)%TW;for(;x<x0+w;x+=TW)c.drawImage(rd,x,FL,TW,VH-FL+2);}
@@ -8215,7 +8234,7 @@ if(RET.labfull&&RET.labassets!==undefined&&window.LABX){const LA_=window.LABX;co
 /* ---------- vector SHAPES for every item that still waits for painted art (see ASSETS-NEEDED.md). Each draws a simple shape now and switches to the painted file as soon as it is
    listed in media/ready.json (make-placeholders.py writes that list when it finds real art). Nothing here ever shows the placeholder pictures. ---------- */
 ART.rd=new Set();ART.isReal=n=>ART.rd.has(n+'.webp');
-fetch(ART.base+'ready.json').then(r=>r.json()).then(a=>{if(!Array.isArray(a))return;ART.rd=new Set(a);for(const f of a)if(!f.startsWith('anim/')&&!/\.mp3$/.test(f))ART.load(f.replace(/\.webp$/,''));   // (anim/ strips load on demand: ART.anim)
+fetch(ART.base+'ready.json').then(r=>r.json()).then(a=>{if(!Array.isArray(a))return;ART.rd=new Set(a);for(const f of a)if(!f.startsWith('anim/')&&!/\.mp3$/.test(f))ART.q.push(f.replace(/\.webp$/,''));ART.pump();   // (anim/ strips load on demand: ART.anim)
   if(ART.uiIcons)ART.uiIcons();if(typeof garageEl!=='undefined'&&!garageEl.hidden)gaDraw();}).catch(()=>{});
 const SVGW=(inner,vb)=>`<svg viewBox="0 0 ${vb||24} ${vb||24}" aria-hidden="true">${inner}</svg>`;
 /* ----- difficulty badges ----- */
@@ -14638,7 +14657,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='74a7b01612 2026-10-22 14:48 UTC';
+const NR_STAMP='2a70f5db98 2026-10-22 15:02 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16408,7 +16427,7 @@ function gameOver(){if(!running)return;if(ST.on){ST.fail();return;}running=false
   else if(G.weekly)eye=RET.weeklyEnd(G.score);
   else if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
-  $('overEyebrow').textContent=eye;
+  $('overEyebrow').textContent=eye;overEl.classList.toggle('evnr',/^New (best|daily)/.test(eye)&&ART.isReal('event-new-record'));   // record splash
   $('oScore').textContent=window.fmtN(G.score);$('oDist').textContent=dist;$('oPerf').textContent=G.perf;
   $('oBest').innerHTML=G.weekly?RET.weeklyBestLine():G.daily?`Daily best <strong>${window.fmtN(dailyBest.score)}</strong>`:`Best <strong>${window.fmtN(best.score)}</strong> · ${best.dist}`;
   overEl.hidden=false;overlayReady=false;syncUI();AU.menuMusic();setTimeout(()=>{overlayReady=true;if(!overEl.hidden)$('againBtn').focus();},600);showBest();

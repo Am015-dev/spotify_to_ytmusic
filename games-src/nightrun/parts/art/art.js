@@ -12,14 +12,17 @@ const ART={bm:{},sc:{},big:{},bigN:[],S:0,fx:[],hp:0,dead:false,base:'media/',
   enN:['drone','charger','gunship','gate','flank','swarm','mine','turret-base','turret-barrel'],
   fxN:['shot-std','shot-hv','shot-ec','shot-perfect','bullet-enemy','muzzle','hit-spark','explosion-small','explosion-big','explosion-boss','shockwave','engine','shield-link','bullet-shell','bullet-needle','bullet-rocket'],
   pkN:['shard','hp','up','emp','drum','tempo','slow','drop']};
-ART.load=n=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();
-  im.onload=()=>{const done=b=>{ART.bm[n]=b;};
+/* q=1: a bulk load from the ready.json queue (shapes.js), at most 2 at a time and only while no on-demand load is in flight, so a sheet the current stage asks for is never stuck behind hundreds of full-size pictures (22 Oct 2026: Kai was not drawn for 15 s) */
+ART.pend=0;ART.lowN=0;ART.q=[];
+ART.pump=()=>{while(ART.q.length&&ART.lowN<2&&ART.pend===0){const n=ART.q.shift();if(n in ART.bm)continue;ART.lowN++;ART.load(n,1);}};
+ART.load=(n,q)=>{if(n in ART.bm)return;ART.bm[n]=null;const im=new Image();if(!q)ART.pend++;let fin=false;const end=()=>{if(fin)return;fin=true;if(q)ART.lowN--;else ART.pend--;ART.pump();};
+  im.onload=()=>{const done=b=>{ART.bm[n]=b;end();};
     /* effects made as light on a solid black square (no alpha): turn the black into transparency once, colours un-premultiplied, so they look right with normal blending and identical when drawn additively */
     if((n.startsWith('fx-')&&!n.startsWith('fx-fuse'))||n.startsWith('nv-ev-')){try{const w=im.naturalWidth,h=im.naturalHeight,c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d',{willReadFrequently:true});g.drawImage(im,0,0);const id=g.getImageData(0,0,w,h),d=id.data;let solid=true,dark=0;for(let i=3;i<d.length;i+=4)if(d[i]<250){solid=false;break;}
       for(const q of [0,w-1,(h-1)*w,h*w-1]){const o=q*4;if(d[o]+d[o+1]+d[o+2]<90)dark++;}
       if(solid&&dark>=3){for(let i=0;i<d.length;i+=4){const m=Math.max(d[i],d[i+1],d[i+2]);if(m<3){d[i+3]=0;continue;}d[i+3]=m;const k=255/m;d[i]=Math.min(255,d[i]*k);d[i+1]=Math.min(255,d[i+1]*k);d[i+2]=Math.min(255,d[i+2]*k);}g.putImageData(id,0,0);done(c);return;}}catch(e){}}
     if(self.createImageBitmap)createImageBitmap(im).then(done,()=>done(im));else done(im);};
-  im.onerror=()=>{ART.err[n]=1;};im.src=ART.base+n+'.webp';};
+  im.onerror=()=>{ART.err[n]=1;end();};im.src=ART.base+n+'.webp';};
 ART.have=n=>!!ART.bm[n];
 ART.err={};
 ART.frame=()=>{if(Math.abs(S-ART.S)>.01){ART.S=S;ART.sc={};}
