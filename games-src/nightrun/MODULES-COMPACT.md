@@ -87,7 +87,7 @@ flankers|8|flanker enemies that punish a parked ship (default OFF)|flankers,flan
 foeart|9|every fly-stage enemy draws from an approved ship sheet|foeart,foeart
 fleet|23|enemy warships in the fly stages|fleet,fleet
 endramp|8|endless mode climbs in difficulty|endramp,endramp
-legend|8|Legend plays differently, not just faster|legend,legend
+legend|11|Legend plays differently, not just faster|legend,legend
 h|5|H: no AFK wins, a dying ship slows the song|-
 fun|15|set pieces, deck replaces the fixed metronome, rosters|deck,deck,roster+
 tut|16|TUT: FLIGHT SCHOOL, a playable tutorial stage (about 3 minut|-
@@ -117,5 +117,6 @@ schoolfull|13|every Flight School drill and lesson mini stage is a real le|schoo
 tidy|9|tidy Settings (<= 20 controls on the main page, one Assist p|tidy,tidy
 menufix|4|HANGAR shows 5 tabs + a MORE sheet (every label fits a 375 p|menufix,menufix
 explain|8|every fly-stage visual is explained: first-appearance captio|explain,explain
+calm|6|a calm playfield: rule banners small in the top band, thin s|calm,calm
 c|34|the hint bubble: wraps to two lines and stays inside the scr|-
 sw|7|Mainhattan Nightrun service worker (B30). Built by parts/bui|-

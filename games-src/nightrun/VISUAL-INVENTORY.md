@@ -22,6 +22,8 @@ A new visual must get a row (and a verdict) here before it ships.
 - Words: EMP timer "x~97s" -> "full in 97s"; floater "CHAIN x4" -> "CHAIN 4", "LEAK 1/3" -> "PAST 1 of 3", "LEAK" -> "GOT PAST";
   READY (one bar before the next wave) -> NEXT WAVE. counter.js DASH THROUGH and timing.js OVERLOAD: EMP now drawn upright (wtxt).
 
+- Calm layer (`calm.js`, flag `RET.calm`, `?calm=0` = before): the rule card is a one-line strip under the score bar (never over the middle of the field, max 2.5 s); pictured beams (player shots, enemy aim/sniper, drone-to-leader shield link) are at most 12 css px thick and at most 80% bright; at most 2 rings per enemy, priority attack tell > elite > the rest. Gate: `calm-test.js`.
+
 ## Canvas draw sites
 | key | what it is | player should | how often, scenes of 6 | verdict |
 |---|---|---|---|---|
@@ -44,6 +46,9 @@ A new visual must get a row (and a verdict) here before it ships.
 | `bossvis.js:BV.over` | boss phase overlay | nothing | often 3/6 | S |
 | `bossvis.js:beam` | boss laser beam | stay out | rare 2/6 | S |
 | `bossvis.js:drawBoss` | boss body tint | shoot | some stages 1/6 | S |
+| `calm.js:draw` | small rule card in the top band (RULE · name · one line), max 2.5 s | read | rare 1/6 | W |
+| `calm.js:FXW.bullet` | player shot picture, at most 12 css px thick | nothing | every frame 6/6 | S |
+| `calm.js:P.stroke` | enemy ring that passed the cap (at most 2 per enemy: attack tell, then gold elite, then the rest) | dodge the tell | often 4/6 | S |
 | `c.js:banner` | stage number banner | read | some stages 6/6 | W |
 | `c.js:render` | score pops "+100" floaters, chain words | nothing | every frame 6/6 | W |
 | `c.js:shotDraw` | own shots | nothing | every frame 6/6 | S |

@@ -64,7 +64,7 @@ if(DIET.on){
   const LOG=()=>Object.assign(HUDLOG,{score:String(G.score).padStart(8,'0'),mult:'×'+G.mult.toFixed(1),best:String(Math.max(best.score,G.score)).padStart(8,'0'),hp:P.hp,hpMax:P.max,neon:SH.neon,heat:Math.round(P.heat),emp:P.emp,wl:P.wl,combo:C.n,tier:tierOf(C.n),
     district:DISTRICTS[G.di].name+(G.loop?' +'+G.loop:''),story:ST.on?ST.n:0,goal:ST.on?ST.label():'',boss:!!G.boss,bossHp:G.boss?Math.round(G.boss.hp):0,beat:((Math.floor(G.bp)%4)+4)%4,frame:HUDLOG.frame+1,lean:1});
   const pips=(x,y,hw,hh,gap)=>{for(let i=0;i<P.max;i++){ctx.fillStyle=i<P.hp?(P.hp<=1?'#ff3040':'#3dffb0'):'#ffffff1a';ctx.fillRect(x+i*(hw+gap),y,hw,hh);}};
-  const banner=(t,w,h,k)=>{if(!(G.banner.t>0))return;const kk=G.banner.t,m=G.banner.m,a=Math.min(1,kk*2,(m-kk)*4),D=DISTRICTS[G.di];ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
+  const banner=(t,w,h,k)=>{if(!(G.banner.t>0))return;if(window.CALM&&CALM.small(G.banner)){CALM.draw(G.banner,w,h,k);return;}const kk=G.banner.t,m=G.banner.m,a=Math.min(1,kk*2,(m-kk)*4),D=DISTRICTS[G.di];ctx.globalAlpha=Math.max(0,a);ctx.textAlign='center';
     if(G.banner.pic!=null)ART.portrait(G.banner.pic,w/2,h/2-58*k-100*k,92*k,Math.max(0,a));
     if(G.banner.ev)ART.pic(G.banner.ev,Math.min(256*k,w*.7),w/2,h/2-58*k-40*k,0,Math.max(0,a));ctx.globalAlpha=Math.max(0,a);
     ctx.fillStyle='#05030cbb';ctx.fillRect(0,h/2-58*k,w,96*k);const col=G.banner.warn?'#ff3040':D.a;ctx.fillStyle=col;ctx.fillRect(0,h/2-58*k,w,2);ctx.fillRect(0,h/2+36*k,w,2);

@@ -128,7 +128,7 @@ const VARY=window.VARY={S:VSCRIPT,M:VMUT,st:null,log:[],kinds:{},pg0:window.LEAK
   mutOn(){return this.active()&&!!this.st.mut&&!G.boss&&!G.dead&&!ST.over&&running;},
   mk(){return SET.diff==='easy'?.65:1;},                        // Easy: every rule change is gentler
   tick(dt){if(!this.active())return;const st=this.st;
-    if(st.card&&G.t>=st.card){st.card=0;const M=VMUT[st.mut];banner('RULE · '+M.n,M.t,false,2.6);}
+    if(st.card&&G.t>=st.card){st.card=0;const M=VMUT[st.mut];banner('RULE · '+M.n,M.t,false,2.5);}
     if(!this.mutOn())return;const id=st.mut,X=this.X,k=this.mk(),bs=fmBs();
     for(const b of G.eb){if(b.vm)continue;b.vm=1;if(b.lob)continue;
       if(id==='offbeat'){const f=((G.bp%1)+1)%1;if(f<.25||f>.92){b.hv=[b.vx,b.vy];b.vx=0;b.vy=0;b.ht=bs*.5;}}

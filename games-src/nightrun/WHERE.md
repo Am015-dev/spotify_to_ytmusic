@@ -59,7 +59,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | foeart | foeart FOEART 45-85 |  |  | foeart | ASSETS-NEEDED-ENEMIES |
 | fleet,fleetArr! | fleet FLEET 21-222 |  |  | fleet |  |
 | endramp | endramp ENDR 15-55 |  |  | endramp |  |
-| legend,easy2 | legend LEG 18-59 |  |  | legend |  |
+| legend,easy2 | legend LEG 19-79 |  |  | legend |  |
 | deck,roster,songspread | fun FUN 14-77 | footen |  | fun |  |
 | lessons | lessons lsTick 156-178 |  |  | lessons |  |
 | story | saga |  |  | story |  |
@@ -86,6 +86,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | tidy | tidy F.post 19-88 | flavor,ret |  | tidy |  |
 | menufix | menufix mfDraw 35-41 |  |  | menufix |  |
 | explain | explain EXP 11-43 |  |  | explain | WORKER-RULES |
+| calm | calm CALM 10-34 | footen,fxwave |  | calm |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.
 
