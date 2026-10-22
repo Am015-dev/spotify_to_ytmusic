@@ -53,3 +53,10 @@ if(RET.layout){
   setTimeout(()=>{for(const b of document.querySelectorAll('.hubScr .hubAct'))b.classList.add('dim');},0);
   setTimeout(()=>{if(typeof fit==='function')fit();},0);
 }
+/* ---------- BUTTON WORDS (review 9 #7): every in-stage button under the field has its word and its charge number on every phone. Always on (no flag):
+   DASH, EMP and the power slot (bPwr) each get one label span under the button; the number is the button's own charge count (data-n, set by setRing). */
+{const st=document.createElement('style');st.textContent=`#touch button#bDash,#touch button#bEmp{overflow:visible}
+#touch .bw{position:absolute;left:50%;top:calc(100% + 1px);transform:translateX(-50%);white-space:nowrap;pointer-events:none;font:700 11px/1 var(--mono,monospace);color:#fff;text-shadow:0 0 3px #000,0 0 6px #000;letter-spacing:.04em}
+#touch button#bPwr::before{content:none!important}`;document.head.appendChild(st);}
+const BW=[['bDash','DASH'],['bEmp','EMP'],['bPwr',null]].map(([id,word])=>{const b=document.getElementById(id);if(!b)return null;const s=document.createElement('span');s.className='bw';s.setAttribute('aria-hidden','true');b.appendChild(s);return{b,s,word};});
+setInterval(()=>{for(const q of BW){if(!q)continue;const word=q.word||q.b.dataset.lbl||'POWER',n=q.b.dataset.n||'0',t=word+' '+n;if(q.s.textContent!==t)q.s.textContent=t;}},150);   // review 9 #7: word + charge number, same on every phone
