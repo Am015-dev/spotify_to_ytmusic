@@ -77,9 +77,12 @@ async function CL_go(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m),W=ms=>
 // Each smash there tops the burst up to >= 20 bricks and >= 3 studs and adds a 50 ms hit-stop; the speed loss stays smashCheck's own (<= 8 %). Outside the core / flag off = SM2 untouched.
 const CL_sm=()=>CL_SMASH&&state==='roam'&&RO.on&&CL_in(RO.x,RO.z);
 SM2_smash=(f=>function(kind,imp,quiet){if(!CL_sm()||kind==='car')return f.apply(this,arguments);const a=TUNE.sm2Small,b=TUNE.sm2Big;TUNE.sm2Small=CL.sm.small;TUNE.sm2Big=CL.sm.big;try{return f.apply(this,arguments)}finally{TUNE.sm2Small=a;TUNE.sm2Big=b}})(SM2_smash);
-function CL_burst(x,y,z,def,sp){const base=def&&def.st>5?18:9,at=V3(x,y+1.2,z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh)),cols=[new THREE.Color('#ffd12c'),new THREE.Color('#e4002b'),new THREE.Color('#0055bf'),new THREE.Color('#ffffff'),...(def&&def.cols?def.cols.map(c=>new THREE.Color(c)):[])];
- debris(at,fw.clone().multiplyScalar(sp*.5).add(V3(0,8,0)),Math.max(0,CL.sm.bricks-base)+2,cols,.6,y);for(let k=Math.max(0,CL.sm.studs-((def&&def.st)|0));k>0;k--)studBurst(at,fw,sp);
- HIT_stop(CL.sm.stop);CL.sn++;CL.lastB=Math.max(base,CL.sm.bricks);CL.lastS=Math.max((def&&def.st)|0,CL.sm.studs)}
+const CL_cols=['#ffd12c','#e4002b','#0055bf','#ffffff','#2e9b3a'].map(c=>new THREE.Color(c));
+// top-up burst: small bricks thrown in the hit direction (forward + up, fanned sideways), gold studs popping higher; pooled pieces only, none added while the debris pool is > 85 % busy (smash chains)
+function CL_burst(x,y,z,def,sp){const base=def&&def.st>5?18:9,at=V3(x,y+1.2,z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh)),busy=DEB&&DEB.list.length>DEB.n*.85,n=busy?0:Math.max(0,CL.sm.bricks-base)+2,v=sp*.5+3;
+ if(n)debris(at.addScaledVector(fw,.8),fw.clone().multiplyScalar(v).add(V3(0,13,0)),n,CL_cols,.55,y);at.set(x,y+1.4,z);
+ const ns=Math.max(CL.sm.studs,6)-((def&&def.st)|0);for(let k=Math.max(0,ns);k>0;k--)studBurst(at,fw,sp*1.4+8);
+ SM2.n.bricks+=base+n;HIT_stop(CL.sm.stop);CL.sn++;CL.lastB=base+n;CL.lastS=Math.max((def&&def.st)|0,6)}
 SM2_prop=(f=>function(p,def,sp){const r=f.apply(this,arguments);if(!r&&CL_sm()&&!(RO.rcT>0&&sp<3))try{CL_burst(p.x,p.y,p.z,def,sp)}catch(e){}return r})(SM2_prop);
 // ---- GO why/smash: a scripted 30 km/h hit on a bin and a big prop in the core smashes both with >= 20 bricks, studs and a hit-stop, loss <= 30 %; 20 km/h on a bin smashes, 10 km/h bumps
 async function CL_smashGo(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m);

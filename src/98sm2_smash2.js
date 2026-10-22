@@ -27,7 +27,7 @@ function SM2_car(c,x,z,dx,dz){const v=c.cv??c.v??0,vx=Math.sin(RO.vh)*RO.v-dx*v,
 W10_bump=(f=>function(c,x,z,dx,dz,W){const V=RO.v,r=f.apply(this,arguments);if(SM2.on&&Math.abs(RO.v)<Math.abs(V))RO.v=V-(V-RO.v)*(TUNE.sm2CarK??.15);return r})(W10_bump);
 // 📍 GO smash2/tap + smash2/hit: scripted contacts on the street you stand on (state asserts, no real-time play)
 function SM2_go(kind){if(state!=='roam'||!RO.on)return'📍 Start free roam first';if(!SM2.on)return'📍 smash2 is OFF (?smash2=0) ❌';try{OF_reset()}catch(e){}const q=typeof CAM_road==='function'&&CAM_road(40);if(q)roamWarp(q.x,q.z,q.h,true);
- const ok=b=>b?' ✅':' ❌',kmh=kind==='tap'?20:70,fx=Math.sin(RO.h),fz=Math.cos(RO.h);RO.vh=RO.h;const tb=RO.turbo,ni=pl&&pl.nitro;RO.turbo=0;if(pl)pl.nitro=false;
+ const ok=b=>b?' ✅':' ❌',kmh=kind==='tap'?(typeof CL_sm==='function'&&CL_sm()?10:20):70,fx=Math.sin(RO.h),fz=Math.cos(RO.h);RO.vh=RO.h;const tb=RO.turbo,ni=pl&&pl.nitro;RO.turbo=0;if(pl)pl.nitro=false;
  // prop: a fake bin (small) and a fake tree (big) put just touching the bumper, 25° off the nose; one smashCheck frame each
  const P=HUB.props.find(p=>p.alive&&HUB.ptypes[p.t].r<=1&&p.gi==null)||HUB.props[0],T=HUB.props.find(p=>p.alive&&p.t==='tree')||P,res=[];
  for(const p of[P,T]){const d=HUB.ptypes[p.t],a=RO.h+.44,s={x:p.x,z:p.z,y:p.y,alive:p.alive},D=Math.min(OB_HL+d.r*.6,d.r+2);p.x=RO.x+Math.sin(a)*D;p.z=RO.z+Math.cos(a)*D;p.y=RO.y;p.alive=true;p.sm2T=0;

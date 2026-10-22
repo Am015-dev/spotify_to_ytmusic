@@ -5,4 +5,4 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const [BASE,
  await p.evaluate(()=>__tk.q(`(()=>{const q=rfSnap(CL.spawn[0],CL.spawn[1],120);RO.x=q[0];RO.z=q[1];RO.h=RO.vh=Math.PI/2;RO.y=groundAt(RO.x,RO.z,99);camSnap=true;OF_reset&&OF_reset();RO.turbo=0;
   const t=HUB.props.some(x=>x.t==='stall')?'stall':'tree',d=HUB.ptypes[t],pp=HUB.props.find(x=>x.t===t&&x.im&&x.i!=null),D=Math.min(OB_HL+d.r*.6,d.r+2);pp.x=RO.x+D;pp.z=RO.z;pp.y=RO.y;pp.alive=true;pp.sm2T=0;
   const k=Math.floor(pp.x/16)*10000+Math.floor(pp.z/16),L=HUB.pgrid.get(k)||(HUB.pgrid.set(k,[]),HUB.pgrid.get(k));if(!L.includes(pp))L.push(pp);RO.v=35/3.6;smashCheck(1/60);window.__cl2=CL.sn+' '+CL.lastB})()`));
- await p.waitForTimeout(150);await p.screenshot({path:OUT});console.log('smash',await p.evaluate(()=>window.__cl2));await b.close()})();
+ await p.waitForTimeout(+(process.env.WAIT||300));await p.screenshot({path:OUT});console.log('smash',await p.evaluate(()=>window.__cl2));await b.close()})();
