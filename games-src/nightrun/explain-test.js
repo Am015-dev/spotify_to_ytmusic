@@ -41,7 +41,7 @@ const keyOf = (s, lm, lines) => { const fr = s.split('<').map(f => { const [fn, 
   const port = await freePort(), srv = cp.spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1', '--directory', GAME_DIR], { stdio: 'ignore' });
   await sleep(800); const base = 'http://127.0.0.1:' + port;
   const browser = await PW.chromium.launch({ executablePath: process.env.CHROME || '/opt/pw-browsers/chromium' }).catch(() => PW.chromium.launch());
-  const errs = [], q = process.env.Q || '';
+  const errs = [], q = process.env.Q != null ? process.env.Q : '&nocaps=0'   // captions are off in stages by default (nocaps.js); this gate checks the caption system itself;
   try {
     const lm = lineMap(), lines = fs.readFileSync(path.join(GAME_DIR, 'index.html'), 'utf8').split('\n');
     const ctx = await browser.newContext({ viewport: { width: 390, height: 763 }, hasTouch: true, isMobile: true, deviceScaleFactor: 1 }), p = await ctx.newPage();

@@ -27,6 +27,8 @@ const SCH_S={
   beat(i){if(i%2||this.f>=8)return;this.f++;const x=W-60,y=H*.5;if(this.f%2){const a=Math.atan2(P.y-y,P.x-x);for(let k=-2;k<=2;k++)tutEb(x,y,a+k*.22,150);}
     else for(let k=0;k<14;k++)tutEb(x,y,k/14*6.283,110);AU.sfx('warn');},
   tick(dt){if(this.f>=8){this.tl+=dt;if(!G.eb.some(b=>b.tut)||this.tl>4)return true;}return false;}},'Boss pattern: weave the fan, slip the ring')};
+SCH_S.graze=step(Object.assign({},SCH_S.fan,{id:'graze'}),'Slip close past the shots without a hit: that builds your CHAIN');   // nocaps.js pre-stage drills reuse the fan code
+SCH_S.well=step(Object.assign({},SCH_S.fan,{id:'well'}),'A purple ring is a gravity well: it bends shots, no damage. Weave the volleys');
 const byId=id=>TUT_S.find(s=>s.id===id);
 const GRP=[['BASICS','move, shoot, dash, EMP'],['LOADOUT','weapons, forge, slots, ships'],['COUNTERS','one tactic per enemy'],['BOSS AND GATES','patterns and laser gates'],['ON FOOT','street run basics']];
 const DR=[
@@ -51,6 +53,8 @@ const DR=[
  [2,'l-counter','EMP COUNTERS','mini stage: shields and walls','lesson:counter'],
  [3,'gate','LASER GATE','fly through the gap',()=>SCH_S.gate],
  [3,'fan','BOSS PATTERN','fan and ring volleys',()=>SCH_S.fan],
+ [3,'graze','CHAIN','slip close past shots',()=>SCH_S.graze],
+ [3,'well','GRAVITY WELL','purple ring bends shots',()=>SCH_S.well],
  [4,'foot','ON FOOT','run, shoot 3 foes','foot']].map(([g,id,n,sub,k])=>({g,id,n,sub,k}));
 SCH.list=DR;
 const lsId=d=>typeof d.k==='string'&&d.k.startsWith('lesson:')?d.k.slice(7):null;
@@ -102,7 +106,8 @@ function card(d,pass,why){const nx=nextD();SCH.res={id:d.id,pass};
   btns.push(['schCardAgain',pass?'AGAIN':'TRY AGAIN',pass?'dim':'',()=>{tutC.hidden=true;run(d);}],['schCardList','LIST','dim',()=>{tutC.hidden=true;open();}]);
   tutCard('<b>'+(pass?'DRILL CLEAR':'NOT YET')+'</b><span>'+d.n+'</span><span>'+(why||(pass?'':'Try again, or skip ahead'))+'</span>',btns);}
 function run(d){if(!d)return;if(live_())stopDrill();if(running||TUT.on)return;SCH.cur=d;SCH.res=null;el.hidden=true;SCH.onList=false;tutC.hidden=true;const ls=lsId(d);
-  if(ls){lsShow(ls,()=>{if(T.hidden)return;open();});return;}
+  SCH.fired=0;
+  if(ls){lsShow(ls,()=>{if(SCH.after){const f=SCH.after;SCH.after=null;setTimeout(f,60);return;}if(T.hidden)return;open();});return;}
   if(d.k==='foot'){return runFoot(d);}
   let s=d.k();if(!s)return;if(SCH.wrap)s=SCH.wrap(s,d);TUT.D=[s];SCH.t0=performance.now();startTut();tutB.classList.add('drl');}
 function runFoot(d){const bank=GA.bank,rt=RET.tale;RET.tale=false;let ok=false;window.__schFoot=true;try{ok=FOOT.start('street1');}catch(e){}RET.tale=rt;
@@ -113,13 +118,15 @@ SCH.footEndNow=footEnd;SCH.was=id=>{const d=DR.find(x=>x.id===id||lsId(x)===id);
 NR.on('footKill',()=>{const f=SCH.foot;if(f&&!f.end&&f.F&&SCH.sf){SCH.sf.footKill(f,footEnd);return;}if(f&&!f.end&&++f.kills>=3)setTimeout(()=>footEnd(true),400);});
 NR.on('footEnd',e=>{const f=SCH.foot;if(f&&!f.end&&!(e&&e.quit)&&SCH.sf&&SCH.sf.footDown(f))return;if(f&&!f.end&&!(f.F&&f.F.restart))setTimeout(()=>footEnd(false),0);});
 {const f0=tutFinish;tutFinish=function(){if(!TUT.D)return f0.apply(this,arguments);const d=SCH.cur,l=TUT.log[TUT.log.length-1],pass=!!(l&&l.ok);
-  TUT.ending=true;SCH.noList=1;if(running)quitToTitle();tutRestore();SCH.noList=0;T.hidden=false;mark(d,pass,l&&l.t);card(d,pass,pass?(SCH.wrap&&l&&l.t>0?Math.round(l.t)+' s · 3/3 rounds':''):"Time's up");};}
-{const r0=tutRestore;tutRestore=function(){const was=TUT.on&&TUT.D;r0.apply(this,arguments);if(was){tutB.classList.remove('drl');TUT.D=null;if(!SCH.noList&&!SCH.again)setTimeout(()=>{if(!running&&!TUT.on)open();},60);}};}
+  TUT.ending=true;SCH.noList=1;if(running)quitToTitle();tutRestore();SCH.noList=0;if(SCH.fired){SCH.fired=0;mark(d,pass,l&&l.t);return;}   // nocaps.js pre-stage drill: no result card, the stage starts
+  T.hidden=false;mark(d,pass,l&&l.t);card(d,pass,pass?(SCH.wrap&&l&&l.t>0?Math.round(l.t)+' s · 3/3 rounds':''):"Time's up");};}
+{const r0=tutRestore;tutRestore=function(){const was=TUT.on&&TUT.D;r0.apply(this,arguments);if(was){tutB.classList.remove('drl');TUT.D=null;if(SCH.after&&!SCH.again&&(TUT.ending||!SCH.noList)){const f=SCH.after;SCH.after=null;SCH.fired=1;setTimeout(f,60);}else if(!SCH.noList&&!SCH.again)setTimeout(()=>{if(!running&&!TUT.on)open();},60);}};}
 {const b=document.createElement('button');b.type='button';b.className='schRe';b.id='schRe';b.textContent='AGAIN';tutB.insertBefore(b,$('tutSkip'));
   for(const ev of['touchstart','touchend','pointerdown','mousedown'])b.addEventListener(ev,e=>e.stopPropagation(),{passive:true});
   b.addEventListener('click',e=>{e.stopPropagation();const d=SCH.cur;if(!TUT.on||!d)return;SCH.again=1;tutSkip();SCH.again=0;run(d);});}
 /* a drill is a step of the engine: starting one from the list must not look like the first-launch tutorial */
 window.__school={get ids(){return rows().map(d=>d.id);},get all(){return DR.map(d=>d.id);},open,shut,run:id=>run(DR.find(d=>d.id===id)),get open_(){return !el.hidden;},
   get cur(){return SCH.cur&&SCH.cur.id;},get res(){return SCH.res||null;},done:()=>rows().filter(done).map(d=>d.id),next:()=>{const n=nextD();return n&&n.id;},
-  pass(){const s=TUT.cur();if(!s)return;const t=s.tick;s.tick=function(){s.tick=t;return true;};},late(){TUT.t=TUT_MAX+1;},kinds:()=>Object.fromEntries(DR.map(d=>[d.id,lsId(d)?'lesson':d.k==='foot'?'foot':'tut'])),get foot(){return SCH.foot;}};
+  pass(){const s=TUT.cur();if(!s)return;const t=s.tick;s.tick=function(){s.tick=t;return true;};},late(){TUT.t=TUT_MAX+1;},kinds:()=>Object.fromEntries(DR.map(d=>[d.id,lsId(d)?'lesson':d.k==='foot'?'foot':'tut'])),get foot(){return SCH.foot;},get tutOn(){return !!TUT.on;},
+  runThen(id,fn){const d=DR.find(x=>x.id===id);if(!d||!avail(d)){fn();return false;}SCH.after=fn;run(d);if(!(TUT.on||(typeof LS!=='undefined'&&LS.m))){SCH.after=null;fn();return false;}return true;}};
 },0);
