@@ -55,7 +55,7 @@ function PC_grid(add){
 // at another car's old spot (84-1719 m away, GO why/solid-cars); traffic layers always copy (static meshes keep the shortcut, not checked in this lane)
 function PC_one(C,i,x,y,z,cx,cy,cz,far){const r=C.c[i*4+3];if(r<=0)return;const ex=x-cx,ey=y-cy,ez=z-cz,d=Math.sqrt(ex*ex+ey*ey+ez*ez);if(!C.sky&&d-r>far||d-r>PC.keep&&!_pcF.intersectsSphere(_pcS.set(_pcP5.set(x,y,z),r+4+d*.25)))return;
  const s=C.s++,a=C.src;if(C.shr&&s>=C.im.instanceMatrix.count)PC_cap(C,Math.max(s+1,Math.ceil(s*1.5)));const arr=C.im.instanceMatrix.array;
- if(s!==i||C.shr||C.dyn){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
+ if(s!==i||C.shr||C.dyn&&PC.dynF){for(let k=0;k<16;k++)arr[s*16+k]=a[i*16+k];const col=C.col,ic=C.im.instanceColor&&C.im.instanceColor.array;if(ic&&col){ic[s*3]=col[i*3];ic[s*3+1]=col[i*3+1];ic[s*3+2]=col[i*3+2]}}C.slot[i]=s}
 // ios-r17h (cut 1+2): in the low-mem tier a compacted mesh keeps instanceMatrix / instanceColor at its drawn size (x1.5), not at the full source count (the source copy C.src
 // holds every instance): ath -30 MB. It grows on demand inside PC_one (copy + GPU buffer re-created via the mesh 'dispose' event); a shrunk slot always re-copies (no s===i shortcut).
 function PC_cap(C,cap){const im=C.im,M=im.instanceMatrix;cap=Math.min(C.n,Math.max(8,cap));if(cap===M.count)return;const k=Math.min(cap,M.count),a=new Float32Array(cap*16);a.set(M.array.subarray(0,k*16));M.array=a;M.count=cap;M.clearUpdateRanges();

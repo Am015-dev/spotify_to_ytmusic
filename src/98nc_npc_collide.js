@@ -64,3 +64,17 @@ if(typeof LV_parkStep==='function')LV_parkStep=(f=>function(){const n0=LV.n.park
 let NC_hc=0;
 HT_car=(f=>function(c,im,N,dt){NC_hc=0;const r=f.apply(this,arguments);if(NC.on&&NC.pl&&!NC_hc&&!(c.dead>0)&&c.hdx!=null&&(c.x-RO.x)**2+(c.z-RO.z)**2<400){const A=N[c.a],B=N[c.b];if(A&&B){const gA=A.g||B.g;
  HT_hit(c,c.hdx,c.hdz,c.pk&&c.ofW?c.ofW:A.ab||gA?0:Math.min(A.w||20,B.w||20),dt);NC.n.br=(NC.n.br|0)+1}}return r})(HT_car);
+// solid-cars-r22e1 (Alex: "I turn the camera for 2 seconds and when I turn it back the cars are different"): the traffic law is OFF by default (HT_LAWD = []), so
+// HT_canPop said yes everywhere and RD_unstack / the pop paths removed cars in plain view; with the law on it still only looked at the CURRENT view past 40 m.
+// The visibility half of the gate is now always on: within 250 m a spot inside the current view or any view of the last 8 s (one frustum every 0.5 s) cannot
+// pop, and nothing pops within 40 m. GO why/solid-cars (d). ?popmem=0 = old behaviour.
+const NC_PM={on:!/[?&]popmem=0/.test(location.search),F:[],t:-1e9,k:0,n:16,r2:250*250,S:new THREE.Sphere(new THREE.Vector3(),4),cur:new THREE.Frustum(),m:new THREE.Matrix4(),fr:-1};
+HT_popF=(f=>function(){const r=f.apply(this,arguments);if(NC_PM.on&&typeof camera!=='undefined'){const P=HT_POP;if(P.on&&P.f)NC_PM.cur.copy(P.f);else{camera.updateMatrixWorld();NC_PM.cur.setFromProjectionMatrix(NC_PM.m.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse))}NC_PM.fr=1;
+ if(T-NC_PM.t>=.5){NC_PM.t=T;const F=NC_PM.F,i=NC_PM.k++%NC_PM.n;(F[i]||(F[i]={f:new THREE.Frustum(),x:0,z:0,t:0})).f.copy(NC_PM.cur);F[i].x=RO.x;F[i].z=RO.z;F[i].t=T}}return r})(HT_popF);
+HT_canPop=(f=>function(x,z,y){const r=f.apply(this,arguments);if(!r||!NC_PM.on||NC_PM.fr<0||state!=='roam')return r;const d2=(x-RO.x)**2+(z-RO.z)**2;if(d2>NC_PM.r2)return r;if(d2<1600)return false;const S=NC_PM.S;S.center.set(x,(y??RO.y??0)+1,z);
+ if(NC_PM.cur.intersectsSphere(S))return false;for(const e of NC_PM.F)if(e&&T-e.t<8&&(x-e.x)**2+(z-e.z)**2<NC_PM.r2&&e.f.intersectsSphere(S))return false;return true})(HT_canPop);
+// solid-cars-r22e1: at a one-way dead end HT_next leaves the car on a degenerate edge (a === b): HT_pose then got heading (0,0), the basis matrix collapsed to
+// scale 0 and the car was invisible but alive and solid (GO why/solid-cars (d), Athens node 777), or RD_unstack popped it in plain view. HT_pose never builds a
+// zero heading now (the car keeps its last one, drawn and solid where it stopped; RD_unstack removes it once the gate above says out of sight). The law's
+// dead-end queue (HT_POP.de) was tried as the fix and left off: it held overlapping pairs (traffic/behaviour Athens).
+HT_pose=(f=>function(c,A,B,dx,dz){if(NC_PM.on){if(dx===0&&dz===0){const g=c.hgd;if(!g)return;arguments[3]=g[0];arguments[4]=g[1]}else if(dx===dx&&dz===dz)(c.hgd||(c.hgd=[0,0]))[0]=dx,c.hgd[1]=dz}return f.apply(this,arguments)})(HT_pose);
