@@ -14657,7 +14657,7 @@ if(RET.saves){
    NR_STAMP is filled by parts/build.py: short hash (the same one that names the service worker caches nr-shell-<hash>) + UTC build date.
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
-const NR_STAMP='f4a40c3d7b 2026-10-22 16:50 UTC';
+const NR_STAMP='8ba96d99fa 2026-10-22 16:58 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
@@ -16320,7 +16320,7 @@ if(RET.pure){
     return r;};}
   {const y0=AU.lyDrum;AU.lyDrum=function(){return SND.on('m_drum')?y0.apply(this,arguments):0;};}
   {const t0=AU.tlsched;AU.tlsched=function(){return SND.on('m_tier')?t0.apply(this,arguments):undefined;};}
-  {const g0=AU.sting;AU.sting=function(n){if(running){const id='s_'+(/^tierup/.test(n)?'tierup':n);if(!SND.on(id)){PURE.blocked++;return false;}}return g0.apply(this,arguments);};}
+  {const g0=AU.sting;AU.sting=function(n){const id='s_'+(/^tierup/.test(n)?'tierup':n);if(!SND.on(id)){PURE.blocked++;return false;}return g0.apply(this,arguments);};}   // owner 22 Oct: jingles distort the music: off everywhere (menus and result screens too) unless switched on in the Lab
   {const s0=AU.sfx;AU.sfx=function(n){PURE.wire();
     if(running&&!SND.on(n)){PURE.blocked++;return;}
     const F0=this.fx;if(PURE.ok)this.fx=PURE.ok;PURE.played++;try{return s0.apply(this,arguments);}finally{this.fx=F0;}};}
