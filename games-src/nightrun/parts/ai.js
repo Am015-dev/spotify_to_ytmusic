@@ -77,4 +77,4 @@ NR.on('tick',()=>{if(!G.live||G.dead)return;let any=false;for(const b of G.eb)if
   ctx.restore();};}
 
 /* the discharge warning: a red ring that tightens around the ship as the next tick nears */
-{const dp=drawPlayer;drawPlayer=function(t){dp(t);if(!STILL.dg||G.dead)return;const k=(STILL.dr||0)/(STILL.iv||2);ctx.save();ctx.strokeStyle='#ff3050';ctx.globalAlpha=.4+.5*k;ctx.lineWidth=2+3*k;ctx.setLineDash([6,5]);ctx.lineDashOffset=-t*40;ctx.beginPath();ctx.arc(P.x,P.y,46-24*k,0,7);ctx.stroke();ctx.restore();};}
+HOOK.drawPlayer(dp=>function(t){dp(t);if(!STILL.dg||G.dead)return;const k=(STILL.dr||0)/(STILL.iv||2);ctx.save();ctx.strokeStyle='#ff3050';ctx.globalAlpha=.4+.5*k;ctx.lineWidth=2+3*k;ctx.setLineDash([6,5]);ctx.lineDashOffset=-t*40;ctx.beginPath();ctx.arc(P.x,P.y,46-24*k,0,7);ctx.stroke();ctx.restore();});

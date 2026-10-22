@@ -54,4 +54,4 @@ NR.on('tick',dt=>{if(RWD.on&&G&&G.live&&!G.dead)RWD.tick(dt);});
 NR.on('kill',d=>{const e=d&&d.e;if(!RWD.on||!G||!e||d.boss||e.dummy||e.type==='boss'||!e._rwC||G.t-e._rwC>.35)return;
   let n=0;for(const p of G.pk)if(p.t==='shard')n++;if(n>=30)return;RWD.stat.pb++;RWD.stat.drop++;
   G.pk.push({t:'shard',x:e.x,y:e.y,vx:rnd(-40,10),vy:rnd(-40,40),bob:0});});
-{const dp=drawPlayer;drawPlayer=function(t){dp(t);if(running)RWD.draw(t);};}
+HOOK.drawPlayer(dp=>function(t){dp(t);if(running)RWD.draw(t);});

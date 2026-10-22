@@ -179,7 +179,7 @@ HOOK['DIR.spawnOne'](so=>function(fill){if(VARY.active()&&!(VARY.hard()&&GR()<VA
 if(window.ZOO){const wo=ZOO.waveOK;ZOO.waveOK=function(){return wo.call(this)&&(!VARY.active()||VARY.hard());};}   // Easy/Normal: the zoo kinds come from the scripts' roles; the hard tiers keep the old random zoo pressure on top
 if(window.LEAK){const g0=LEAK.gndOK;LEAK.gndOK=function(){const r=g0.call(this);return r&&(!VARY.active()||VARY.hard()||VARY.gnd());};}   // Easy/Normal: ground units only in '+g' moments
 {const lb=ST.label;ST.label=function(){const s=lb.call(this);return VARY.mutOn()?s+' · '+VMUT[VARY.st.mut].n:s;};}
-{const dp=drawPlayer;drawPlayer=function(t){try{VARY.draw(t);}catch(err){}dp(t);};}
+HOOK.drawPlayer(dp=>function(t){try{VARY.draw(t);}catch(err){}dp(t);});
 NR.on('runStart',d=>{VARY.plan();if(!VARY.active())return;const st=VARY.st,M=VMUT[st.mut];
   if(M&&!(d&&d.resume))st.card=G.t+3.6;});   // the stage card (story.js) keeps its intro; the RULE card follows it (each line 8 words or fewer)
 NR.on('spawn',e=>{if(e&&VARY.mutOn()&&VARY.st.mut==='nopower'&&e.type!=='boss')e.score*=2;});

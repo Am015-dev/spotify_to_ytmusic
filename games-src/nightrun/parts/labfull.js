@@ -147,7 +147,7 @@ function lfInit(){if(LF.inited)return;LF.inited=true;
   if(window.CLS){const sv=CLS.sv,pu=CLS.put;CLS.sv=function(){return LF.labRun()?LF.mem.cls:sv.apply(this,arguments);};CLS.put=function(s){if(LF.labRun())LF.mem.cls=s;else pu.apply(this,arguments);};}
   if(window.RU){const on=RU.on;RU.on=function(){return LF.labRun()&&LF.ru?!!RET.rules&&running&&!G.dead:on.apply(this,arguments);};const st=RU.start;RU.start=function(){if(LF.labRun())return;return st.apply(this,arguments);};}
   {const u=update;update=function(dt){if(LF.labRun()){if(LF.hold){if(LF.step<=0)return;LF.step--;}dt*=LF.slow;if(LF.inv)P.inv=Math.max(P.inv,.5);}return u.call(this,dt);};}
-  {const dp=drawPlayer;drawPlayer=function(){dp.apply(this,arguments);if(LF.hb&&LF.labRun())lfBoxes();};}
+  HOOK.drawPlayer(dp=>function(){dp.apply(this,arguments);if(LF.hb&&LF.labRun())lfBoxes();});
   {const r=render;render=function(){LF.fr++;return r.apply(this,arguments);};}
   NR.on('tick',()=>{if(!LF.labRun())return;if(LF.inv)P.inv=Math.max(P.inv,.5);const t=performance.now();if(t-LF.fpsT>=1000){LF.fps=LF.fr;LF.fr=0;LF.fpsT=t;}if((G.lfM=(G.lfM||0)+1)%10===0){lfMeter();lfLive();}});}
 LF.labRun=()=>RET.labfull&&running&&G&&G.lab;

@@ -63,7 +63,7 @@ const READ=window.READ={D:'#ff2d78',CORE:'#ffffff',RING:'#07030f',SHOT:'#7fe6ff'
   footEb(c,b){c.fillStyle=this.RING;c.beginPath();c.arc(b.x,b.y,b.r*1.35,0,6.283);c.fill();c.fillStyle=this.D;c.beginPath();c.arc(b.x,b.y,b.r,0,6.283);c.fill();
     c.fillStyle=this.CORE;c.beginPath();c.arc(b.x,b.y,b.r*.45,0,6.283);c.fill();}};
 {const fb=FXV.bullets;FXV.bullets=function(){if(!RET.read)return fb.call(this);READ.bullets();};}
-{const dp=drawPlayer;drawPlayer=function(t){dp(t);READ.dot();};}
+HOOK.drawPlayer(dp=>function(t){dp(t);READ.dot();});
 {const zo=ZOO.over;ZOO.over=function(t){if(!READ.haloOn())return zo.call(this,t);try{zo.call(this,t);}finally{READ.haloOff();}};}
 /* real enemy-fire pictures (fxwave.js) keep their picture; a dark line or ring goes under / around them */
 {const fs=FXW.sniper,fa=FXW.aim,fbm=FXW.bomb,fm=FXW.mine;

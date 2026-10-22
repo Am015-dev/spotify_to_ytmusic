@@ -22,4 +22,4 @@ const ZH=window.ZH={get on(){return true;},ZT:4.5,done:{rule:0,boss:0},cap:null,
     ctx.fillStyle='#fff';ctx.fillText(txt,0,1,w-12);ctx.restore();}};
 NR.on('runStart',()=>ZH.reset());
 NR.on('tick',dt=>ZH.tick(dt));
-{const dp=drawPlayer;drawPlayer=function(t){dp(t);try{ZH.draw();}catch(e){}};}
+HOOK.drawPlayer(dp=>function(t){dp(t);try{ZH.draw();}catch(e){}});

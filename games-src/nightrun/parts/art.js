@@ -239,4 +239,4 @@ NR.on('tick',()=>{if(!RET.sprites||!G.live)return;const b=G.boss;if(b&&!b._sl){b
   if(G.di===SPR._di)return;SPR._di=G.di;const nm=ART.bossN[DISTRICTS[G.di].boss];if(nm)setTimeout(()=>SPR.warmBoss(nm),3500);});
 /* review 9 fix 6 (E02): the 2 s spawn grace made drawPlayer blink the whole ship (6 Hz, half the frames hidden), so a new run showed only the ring, dot and flame. The grace stays; only a real hit blinks. */
 NR.on('hurt',()=>{ART.hitG=G;});
-{const dp=drawPlayer;drawPlayer=function(t){if(!(P&&P.inv>0)||ART.hitG===G||RET.shipBlink)return dp.apply(this,arguments);const v=P.inv;P.inv=0;try{return dp.apply(this,arguments);}finally{P.inv=v;}};}
+HOOK.drawPlayer(dp=>function(t){if(!(P&&P.inv>0)||ART.hitG===G||RET.shipBlink)return dp.apply(this,arguments);const v=P.inv;P.inv=0;try{return dp.apply(this,arguments);}finally{P.inv=v;}});

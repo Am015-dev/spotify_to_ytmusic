@@ -173,5 +173,5 @@ RU.ORDER=['well','lane','echo','gold','portal','bounce','pocket','hunter','gate'
 /* ---- hooks (all inert with the flag off) ---- */
 NR.on('runStart',()=>{RU.st=null;if(RET.rules)RU.start();});
 NR.on('tick',dt=>{try{RU.tick(dt);}catch(err){}});
-{const dp=drawPlayer;drawPlayer=function(t){if(RET.rules)try{RU.draw();}catch(err){}dp(t);};}
+HOOK.drawPlayer(dp=>function(t){if(RET.rules)try{RU.draw();}catch(err){}dp(t);});
 if(window.CTR){const cd=CTR.dash,ce=CTR.emp;CTR.dash=function(){const r=cd.apply(this,arguments);try{RU.dash();}catch(e){}return r;};CTR.emp=function(){try{RU.emp();}catch(e){}return ce.apply(this,arguments);};}

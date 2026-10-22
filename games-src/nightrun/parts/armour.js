@@ -63,9 +63,9 @@ NR.on('bar',()=>{if(!B2X.on||!G.live||G.dead)return;const e=G.boss;if(!e||!e.b2|
   const sb=60/BT.bpm,w=HARDS.includes(SET.diff)?1:2;B2X.hz.push({y:clamp(P.y,40,H-40),h:44,t0:G.t,on:G.t+w*sb,off:G.t+w*sb+.35,hit:0});B2X.st.hz++;AU.sfx('warn');});
 NR.on('tick',()=>{if(!B2X.hz.length)return;const t=G.t;B2X.hz=B2X.hz.filter(z=>t<z.off);if(!G.boss){B2X.hz=[];return;}
   for(const z of B2X.hz)if(t>=z.on&&!z.hit&&Math.abs(P.y-z.y)<z.h/2+6&&P.x<G.boss.x){z.hit=1;const h0=P.hp;hurt(1);if(P.hp<h0)B2X.st.hzHit++;}});
-{const dp=drawPlayer;drawPlayer=function(t){if(B2X.hz.length&&G.boss){const x1=G.boss.x-G.boss.r;ctx.save();
+HOOK.drawPlayer(dp=>function(t){if(B2X.hz.length&&G.boss){const x1=G.boss.x-G.boss.r;ctx.save();
     for(const z of B2X.hz){const live=G.t>=z.on;ctx.globalAlpha=live?.85:.25+.2*Math.sin(G.t*30);ctx.fillStyle=live?'#ff3d6e':'#ff9a3d';ctx.fillRect(0,z.y-(live?z.h/2:2),x1,live?z.h:4);
       if(!live){ctx.globalAlpha=.18;ctx.fillRect(0,z.y-z.h/2,x1,z.h);}}ctx.restore();}
-  return dp(t);};}
+  return dp(t);});
 B2X.sheen=(x,y,w,h)=>{ctx.save();ctx.globalAlpha=.55+.25*Math.sin(G.t*18);ctx.fillStyle='#e8f4ff';ctx.fillRect(x,y,w,Math.max(1,h*.35));ctx.restore();};   // armour is absorbing: a thin bright line on the boss bar
 window.__b2={B2X};

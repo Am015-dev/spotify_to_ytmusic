@@ -77,7 +77,7 @@ NR.on('pitStart',()=>{AX.asLeft=SH.n('as');if(SH.n('ec'))P.emp=Math.max(P.emp,3)
 NR.on('tick',dt=>{if(!G.live||G.dead)return;const r=SH.smg;if(r)for(const p of G.pk){if(p.t!=='shard')continue;const dx=P.x-p.x,dy=P.y-p.y,l=Math.hypot(dx,dy);if(l<NR.mod.mag+r&&l>1){p.vx+=dx/l*900*dt;p.vy+=dy/l*900*dt;}}
   for(let i=AX.arcs.length-1;i>=0;i--){AX.arcs[i].l-=dt;if(AX.arcs[i].l<=0)AX.arcs.splice(i,1);}});
 /* ----- looks: wing cannons, rear gun, beat drones, overdrive ring, bullet-time tint, lightning ----- */
-{const dp=drawPlayer;drawPlayer=function(t){dp(t);if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:BK(t,20)))return;
+HOOK.drawPlayer(dp=>function(t){dp(t);if(G.dead)return;if(P.inv>0&&(SET.reduce?Math.floor(t*6)%3===0:BK(t,20)))return;
   ctx.save();ctx.translate(P.x,P.y);ctx.rotate(P.tilt);const D=DISTRICTS[G.di];
   const sd=lvSide(),rg=lvRear();
   ctx.fillStyle='#16102a';ctx.strokeStyle='#ff8a3d';ctx.lineWidth=1.2;
@@ -90,7 +90,7 @@ NR.on('tick',dt=>{if(!G.live||G.dead)return;const r=SH.smg;if(r)for(const p of G
   const n=SH.n('bd');if(n){ctx.save();ctx.globalCompositeOperation='lighter';for(let k=0;k<n;k++){const a=G.bp*Math.PI/2+k*6.2832/n,x=P.x+Math.cos(a)*46,y=P.y+Math.sin(a)*46;
       G_(x,y,15,'#ffe14d',.55);ctx.globalCompositeOperation='source-over';ctx.fillStyle='#120a1f';ctx.strokeStyle='#ffe14d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#fff';ctx.fillRect(x+1,y-1,4,2);ctx.globalCompositeOperation='lighter';}ctx.restore();}
   if(SH.n('og')){ctx.save();ctx.lineWidth=3.2;const on=AX.odOn>0,f=on?AX.odBeats/8:AX.od/100;ctx.strokeStyle=on?'#ffb020':'#ff5a3d';ctx.globalAlpha=on?.95:.45+.4*f;
-    ctx.beginPath();ctx.arc(P.x,P.y,30,-Math.PI/2,-Math.PI/2+6.2832*Math.max(.02,f));ctx.stroke();if(on){ctx.globalCompositeOperation='lighter';G_(P.x,P.y,52,'#ff5a3d',.35+.2*PUL);}ctx.restore();}};}
+    ctx.beginPath();ctx.arc(P.x,P.y,30,-Math.PI/2,-Math.PI/2+6.2832*Math.max(.02,f));ctx.stroke();if(on){ctx.globalCompositeOperation='lighter';G_(P.x,P.y,52,'#ff5a3d',.35+.2*PUL);}ctx.restore();}});
 const this_ship=()=>SH.ship;
 DRAW.extra.push(function(t){
   if(AX.arcs.length){ctx.save();ctx.globalCompositeOperation='lighter';ctx.lineCap='round';for(const a of AX.arcs){ctx.globalAlpha=clamp(a.l*4,0,1);ctx.strokeStyle='#8fe9ff';ctx.lineWidth=2.4;ctx.beginPath();ctx.moveTo(a.x1,a.y1);

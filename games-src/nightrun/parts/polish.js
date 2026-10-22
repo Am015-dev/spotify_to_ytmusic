@@ -70,7 +70,7 @@ if(POL.on){
   for(const [o,k] of [[window.TIM,'draw'],[window.ABIL,'draw'],[window.CTR,'draw']])if(o&&o[k]){const f=o[k];o[k]=function(){POL.keep++;try{return f.apply(this,arguments);}finally{POL.keep--;}};}   // the dash / EMP timing guides keep their look
   {const db=drawBoss;drawBoss=function(){POL.keep++;try{return db.apply(this,arguments);}finally{POL.keep--;}};}   // the boss body and its armour rings stay as drawn
   /* ---- 2. the ship on top: the hull sprite is recorded inside drawPlayer and drawn again, last ---- */
-  {const dp=drawPlayer;drawPlayer=function(t){if(!running)return dp.apply(this,arguments);POL.inP++;try{return dp.apply(this,arguments);}finally{POL.inP--;}};}
+  HOOK.drawPlayer(dp=>function(t){if(!running)return dp.apply(this,arguments);POL.inP++;try{return dp.apply(this,arguments);}finally{POL.inP--;}});
     const put=ART.put;ART.put=function(o){if(POL.inP&&o&&o===ART.sp('spr-ship-'+shipDef().id,60)){const a=[...arguments];POL.def.push([ctx.getTransform(),()=>put.apply(ART,a)]);return true;}return put.apply(this,arguments);};
   if(typeof SPR!=='undefined'&&SPR.ship){const sp=SPR.ship;SPR.ship=function(c,id,t,bob){if(POL.inP&&c===ctx&&SPR.shipOn&&SPR.shipOn(id)){const a=[...arguments];
       POL.def.push([ctx.getTransform(),()=>{if(!sp.apply(SPR,a)){const so=ART.sp('spr-ship-'+id,60);if(so)put.call(ART,so,0,bob);}}]);return true;}return sp.apply(this,arguments);};}

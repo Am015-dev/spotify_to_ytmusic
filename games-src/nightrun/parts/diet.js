@@ -46,7 +46,7 @@ if(DIET.on){
   if(window.PW&&PW.draw){const pd=PW.draw;PW.draw=function(){const s=G&&G.pw,wv=s&&s.wv;if(wv>0)s.wv=0;try{return pd.apply(this,arguments);}finally{if(wv>0)s.wv=wv;}};}   // the screen-wide DROP! wave: gone (the flash and the pop-up stay)
   /* own power-up auras and rings round the ship: arcs drawn inside PW.draw / drawPlayer are capped at the cosmetic ring size */
   {const cap=DIET.capC=c=>{if(!c||c.__diet)return;c.__diet=1;const a=c.arc;c.arc=function(x,y,r){if(DIET.cap&&r>0){const t=this.getTransform(),k=Math.hypot(t.a,t.b)/S,mx=DIET.ringMax();if(r*k>mx)arguments[2]=mx/k;}return a.apply(this,arguments);};};cap(vctx);cap(wctx);
-   const sc=f=>function(){DIET.cap++;try{return f.apply(this,arguments);}finally{DIET.cap--;}};PW.draw=sc(PW.draw);drawPlayer=sc(drawPlayer);}
+   const sc=f=>function(){DIET.cap++;try{return f.apply(this,arguments);}finally{DIET.cap--;}};PW.draw=sc(PW.draw);HOOK.drawPlayer(sc);}
   if(window.FXW&&FXW.healRing)FXW.healRing=()=>true;   // the healer's 150-unit range ring: gone (the heal itself still shows on the healed ship)
   /* flank tells: the last 0.6 s only */
   for(const [o,k] of [[window.AC,'draw'],[window.FLK,'drawTells']])if(o&&o[k]){const f=o[k];o[k]=function(){const L=this.tells;if(!L||!L.length)return f.apply(this,arguments);

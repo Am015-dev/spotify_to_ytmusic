@@ -38,7 +38,7 @@ const EXP=window.EXP={get on(){return!!RET.explain;},ZT:4,shown:{},q:[],cap:null
   draw(){const c=this.cap;if(!this.on||!c)return;this.box(this.TXT[c.k],c.x,c.y,c.col,Math.min(1,c.t/.5,(this.ZT-c.t)/.3+.01));}};
 NR.on('runStart',()=>EXP.reset());
 NR.on('tick',dt=>{try{EXP.tick(dt);}catch(e){}});
-{const dp=drawPlayer;drawPlayer=function(t){dp(t);try{EXP.draw();}catch(e){}};}
+HOOK.drawPlayer(dp=>function(t){dp(t);try{EXP.draw();}catch(e){}});
 /* ship ring cap: arcs centred on the ship, radius > 18 (the hit dot and bullets are smaller), counted from the backdrop of each frame */
 {const db=drawBGP;drawBGP=function(){EXP.rn=0;return db.apply(this,arguments);};
   const CP=CanvasRenderingContext2D.prototype,a0=CP.arc;CP.arc=function(x,y,r){if(RET.explain&&running&&P&&r>18&&Math.abs(x-P.x)<2&&Math.abs(y-P.y)<2&&++EXP.rn>EXP.RMAX){this.moveTo(x+r,y);return;}return a0.apply(this,arguments);};}
