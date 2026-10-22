@@ -1,11 +1,11 @@
 {
  "frames": 4,
  "fps": 8,
- "w": 392,
- "h": 245,
+ "w": 425,
+ "h": 265,
  "anchor": [
-  196,
-  245
+  212,
+  265
  ],
  "order": [
   "strip-boss-sek-adler-attack#1",
