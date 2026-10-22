@@ -23,3 +23,8 @@ Branch cleanup blocked by permission classifier (needs Alex's allow).
 
 ## 00:15 beta.148 live (210147b): A2 roadside buildings solid (#25 fix PASS; acceptance list partly open)
 - NEXT building lane (OPUS when a slot frees): shrink-wrap HUB.bld colliders to drawn footprints (fra sheds -1463,800 / -1223,800 / -983,850 / -217,1120 corners; -263,1080; tower -563,394; check 12x12 -56,173 ghost) + identify/solidify the white 11.5x2.4x3.9 m mesh at fra -530,630 / -516,660 (no collider, not A2).
+
+## 01:35 beta.149 live (3fa7d9b): solid-bld r2 (#26 PASS)
+- quiet-start 18073e7 #27 PASS but HELD: ath street car bogs on dirt (34 vs 43 km/h) since auto-form removed; xf1 bypass hides it. Follow-up sent to quiet-start worker session_01MbTWDL8oqG6UZWcXuPfjBj (silent off-road grip, drop xf1 bypass, LEVEL UP toast <=2 s). Ship as beta.150 after its review.
+- Running: solid-cars (Opus), L1 fix round, quiet-start follow-up (3 lanes; L1 is small fix round).
+- Small follow-ups: fra shed boxes 0.7 m inset (shrink-wrap); ath bot/nav extra resets near 1800,-2900 after bFloor change.
