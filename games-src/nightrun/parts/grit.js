@@ -11,7 +11,7 @@
       MEDIC (heals the foes around it while they are not being hit), EVASIVE (steps out of the way of straight shots; homing and area weapons still land). Every kind has a drawn tell from the first frame.
    Nothing here touches hard.js, armour.js, the DMG caps or the W13 floors: shield and plate only shave damage, the floor still lets a foe die no sooner than VIS.ml. */
 if(RET.grit===undefined)RET.grit=!/[?&]grit=0/.test(location.search);
-if(RET.gritBoss===undefined)RET.gritBoss=!/[?&]gritboss=0/.test(location.search);   // W54: Hard boss mercy, OFF by default (reaches 17-25% beat-bot clear, target 50%)
+if(RET.gritBoss===undefined)RET.gritBoss=!/[?&]gritboss=0/.test(location.search);   // W54: Hard boss mercy, ON by default (owner, 22 Oct 2026: keep on); ?gritboss=0 turns it off
 const GRIT=window.GRIT={get on(){return!!RET.grit&&!(typeof G==='object'&&G&&(G.tut||G.lab));},
   rate0:1/50,burst:.25,stK:.03,maxK:4,hk0:.3,hkS:.5,lvTop:.62,from:3,
   /* W47 Normal ease: special kinds thin out before stage 12 (dens), at most maxE alive there, a lower hull slope; stages 1-3 assist: wider beat window, slower enemy shots (humanbot.js: human clear 39% -> 70+% at st3-7) */
