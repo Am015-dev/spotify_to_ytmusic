@@ -18,6 +18,7 @@ body:has(#rqAsk:not([hidden])):has(#r3Up.mini:not([hidden])) #ogRes.tst{top:calc
 @media (orientation:portrait){#rqAsk{left:140px;right:calc(12px + env(safe-area-inset-right,0px));width:auto;transform:none;top:calc(8px + env(safe-area-inset-top,0px));white-space:normal;padding:4px 12px}
  body:has(#rqAsk:not([hidden])) #r3Up.mini,body:has(#rqAsk:not([hidden])) #ogRes.tst{top:calc(66px + env(safe-area-inset-top,0px))}
  body:has(#rqAsk:not([hidden])):has(#r3Up.mini:not([hidden])) #ogRes.tst{top:calc(130px + env(safe-area-inset-top,0px))}}`;document.head.appendChild(st)}
+window.__rqStage=()=>{const m=(RO.marks||[]).find(q=>q.kind==='garage'&&!markLocked(q));if(!m)return'no garage';RO.x=m.x;RO.z=m.z+6;RO.y=m.g.position.y;RO.v=0;RO.cool=0;camSnap=true;for(let i=0;i<150;i++){roamStep(1/30);RO.v=0}return{chip:!RQ_el().hidden,txt:RQ_el().textContent,card:!$('#roamCard').hidden}};   // shot helper (screenshots / manual checks)
 async function RQ_go_test(){const R=[],ck=(m,b)=>R.push((b?'✓ ':'✗ ')+m),vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedStyle(e).display!=='none';
  if(state!=='roam'||!RO.on)return'';
  const sv={x:RO.x,z:RO.z,h:RO.h,v:RO.v,ch:RO.ch,card:RO.card,sp:RO.sp,cool:RO.cool};
