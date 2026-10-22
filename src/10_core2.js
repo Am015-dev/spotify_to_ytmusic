@@ -1,4 +1,5 @@
 const OD_CHANGELOG=[
+{v:'v90m-beta.148',date:'22 Oct 2026',items:[{t:'FIXED',s:'Roadside houses, apartments, churches and kiosks are solid now: you can no longer drive into them.'}]},
 {v:'v90m-beta.147',date:'21 Oct 2026',items:[{t:'FIXED',s:'Frankfurt loads more smoothly on phones: the ground-flattening step no longer freezes the loading screen.'}]},
 {v:'v90m-beta.146',date:'21 Oct 2026',items:[{t:'FIXED',s:'Trees, signs and other props no longer block the view of your car: they fade out when they get between you and the camera.'},{t:'CHANGED',s:'On phones the screen is even cleaner while you roam: the boost button and bar only appear when you can use them.'},{t:'FIXED',s:'A hidden error on the normal game page is gone.'}]},
 {v:'v90m-beta.145',date:'21 Oct 2026',items:[{t:'NEW',s:'PLAY now puts you straight in the car: you drive within seconds, with no intro to watch.'},{t:'NEW',s:'No more quest pop-ups you did not ask for, and the phone screen shows only the controls you need.'},{t:'FIXED',s:'The ground next to roads is flatter, so you no longer get stuck on hills, and a stuck car frees itself faster.'}]},
