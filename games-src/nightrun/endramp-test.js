@@ -79,6 +79,12 @@ const LIVE = new Function('o', `
       const nx = x.log.split(',').length, ny = y.log.split(',').length;
       ck(x.w === 0 && x.df.key === 'normal' && y.w === 0 && Math.abs(nx - ny) <= Math.max(9, .3 * Math.max(nx, ny)), `Normal story stage ${n}: endramp ON ramp idle (wave ${x.w}, key ${x.df.key}), spawns ${nx} vs ${ny} with ?endramp=0 (within 9 or 30%: ~20 spawns per run, 19-26 seen with the ramp off)`); }
   }
+  // 3b. E05 boss deadline: a centred auto-fire ship (god mode, no dodging) clears the first endless boss in <= 120 s; ?endramp=0 keeps the old armour pace
+  const BOSS = new Function('o', `const m = window.__mnr; m.SET.diff = 'normal'; m.applySet(); m.ST.on = false; document.getElementById('startBtn').click(); m.simOn(true); m.god = true; let i = 0, t0 = null, t1 = null;
+    while (m.running && i < 60 * 400) { if (m.SH.active) m.SH.close(); m.touchTo(480, 270); if (i === 300) m.bossNow(); m.step(1 / 60); i++; const e = m.G.boss; if (e && t0 == null && e.x < 800) t0 = m.G.t; if (t0 != null && !e) { t1 = m.G.t; break; } }
+    const r = { ttk: t1 == null ? null : t1 - t0, w: window.ENDR.w }; m.abort(); m.god = false; return r;`);
+  p = await open(''); const bo = await p.evaluate(`(${BOSS.toString().replace(/^function anonymous\(o\s*\)\s*\{/, 'function(o){')})()`);
+  ck(bo.ttk != null && bo.ttk <= 120, `E05 centred auto-fire clears the first endless boss in ${bo.ttk == null ? 'never' : bo.ttk.toFixed(0) + ' s'} (<= 120 s, wave counter ${bo.w})`);
   ck(errs === 0, 'no page errors');
   await b.close(); srv.kill();
   // 4. bots: human-model on Normal endless, oracle dodger (humanbot.js ENDLESS=1; the bots cannot play boss gates: god mode during a boss, so this measures the waves between bosses)
