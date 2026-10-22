@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 521,
+ "h": 198,
+ "anchor": [
+  260,
+  198
+ ],
+ "order": [
+  "strip-ship-ehealer-volley#1",
+  "strip-ship-ehealer-volley#2",
+  "strip-ship-ehealer-volley#3",
+  "strip-ship-ehealer-volley#4"
+ ]
+}

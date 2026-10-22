@@ -1,0 +1,667 @@
+[
+{
+"id": "kai-pistol/idle",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing ready, a compact pistol held in one hand",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, standing ready, a compact pistol held in one hand."
+},
+{
+"id": "kai-pistol/run",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a compact pistol held in one hand",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a compact pistol held in one hand."
+},
+{
+"id": "kai-pistol/shoot",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a compact pistol held in one hand",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a compact pistol held in one hand."
+},
+{
+"id": "kai-pistol/runshoot",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running while firing forward, a compact pistol held in one hand",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running while firing forward, a compact pistol held in one hand."
+},
+{
+"id": "kai-pistol/crouchshoot",
+"frames": 3,
+"size": "290x256 per frame",
+"pose": "Kai, the hero, crouched shot behind cover, a compact pistol held in one hand",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, crouched shot behind cover, a compact pistol held in one hand."
+},
+{
+"id": "kai-pistol/jump",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, jump: take-off, rise, top, fall, a compact pistol held in one hand",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, jump: take-off, rise, top, fall, a compact pistol held in one hand."
+},
+{
+"id": "kai-pistol/aimup",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming straight up, a compact pistol held in one hand",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming straight up, a compact pistol held in one hand."
+},
+{
+"id": "kai-pistol/aimdiag",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming up at 45 degrees, a compact pistol held in one hand",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming up at 45 degrees, a compact pistol held in one hand."
+},
+{
+"id": "kai-hmg/idle",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing ready, a heavy machine gun held at the hip with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, standing ready, a heavy machine gun held at the hip with both hands."
+},
+{
+"id": "kai-hmg/run",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a heavy machine gun held at the hip with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a heavy machine gun held at the hip with both hands."
+},
+{
+"id": "kai-hmg/shoot",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a heavy machine gun held at the hip with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a heavy machine gun held at the hip with both hands."
+},
+{
+"id": "kai-hmg/runshoot",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running while firing forward, a heavy machine gun held at the hip with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running while firing forward, a heavy machine gun held at the hip with both hands."
+},
+{
+"id": "kai-hmg/crouchshoot",
+"frames": 3,
+"size": "290x256 per frame",
+"pose": "Kai, the hero, crouched shot behind cover, a heavy machine gun held at the hip with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, crouched shot behind cover, a heavy machine gun held at the hip with both hands."
+},
+{
+"id": "kai-hmg/jump",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, jump: take-off, rise, top, fall, a heavy machine gun held at the hip with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, jump: take-off, rise, top, fall, a heavy machine gun held at the hip with both hands."
+},
+{
+"id": "kai-hmg/aimup",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming straight up, a heavy machine gun held at the hip with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming straight up, a heavy machine gun held at the hip with both hands."
+},
+{
+"id": "kai-hmg/aimdiag",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming up at 45 degrees, a heavy machine gun held at the hip with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming up at 45 degrees, a heavy machine gun held at the hip with both hands."
+},
+{
+"id": "kai-shot/idle",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing ready, a pump shotgun held with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, standing ready, a pump shotgun held with both hands."
+},
+{
+"id": "kai-shot/run",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a pump shotgun held with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a pump shotgun held with both hands."
+},
+{
+"id": "kai-shot/shoot",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a pump shotgun held with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a pump shotgun held with both hands."
+},
+{
+"id": "kai-shot/runshoot",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running while firing forward, a pump shotgun held with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running while firing forward, a pump shotgun held with both hands."
+},
+{
+"id": "kai-shot/crouchshoot",
+"frames": 3,
+"size": "290x256 per frame",
+"pose": "Kai, the hero, crouched shot behind cover, a pump shotgun held with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, crouched shot behind cover, a pump shotgun held with both hands."
+},
+{
+"id": "kai-shot/jump",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, jump: take-off, rise, top, fall, a pump shotgun held with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, jump: take-off, rise, top, fall, a pump shotgun held with both hands."
+},
+{
+"id": "kai-shot/aimup",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming straight up, a pump shotgun held with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming straight up, a pump shotgun held with both hands."
+},
+{
+"id": "kai-shot/aimdiag",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming up at 45 degrees, a pump shotgun held with both hands",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming up at 45 degrees, a pump shotgun held with both hands."
+},
+{
+"id": "kai-rocket/idle",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing ready, a shoulder rocket launcher",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, standing ready, a shoulder rocket launcher."
+},
+{
+"id": "kai-rocket/run",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a shoulder rocket launcher",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a shoulder rocket launcher."
+},
+{
+"id": "kai-rocket/shoot",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a shoulder rocket launcher",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a shoulder rocket launcher."
+},
+{
+"id": "kai-rocket/runshoot",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running while firing forward, a shoulder rocket launcher",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running while firing forward, a shoulder rocket launcher."
+},
+{
+"id": "kai-rocket/crouchshoot",
+"frames": 3,
+"size": "290x256 per frame",
+"pose": "Kai, the hero, crouched shot behind cover, a shoulder rocket launcher",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, crouched shot behind cover, a shoulder rocket launcher."
+},
+{
+"id": "kai-rocket/jump",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, jump: take-off, rise, top, fall, a shoulder rocket launcher",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, jump: take-off, rise, top, fall, a shoulder rocket launcher."
+},
+{
+"id": "kai-rocket/aimup",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming straight up, a shoulder rocket launcher",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming straight up, a shoulder rocket launcher."
+},
+{
+"id": "kai-rocket/aimdiag",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming up at 45 degrees, a shoulder rocket launcher",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming up at 45 degrees, a shoulder rocket launcher."
+},
+{
+"id": "kai-arc/idle",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing ready, a crackling arc gun with a blue coil",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, standing ready, a crackling arc gun with a blue coil."
+},
+{
+"id": "kai-arc/run",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a crackling arc gun with a blue coil",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a crackling arc gun with a blue coil."
+},
+{
+"id": "kai-arc/shoot",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a crackling arc gun with a blue coil",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a crackling arc gun with a blue coil."
+},
+{
+"id": "kai-arc/runshoot",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running while firing forward, a crackling arc gun with a blue coil",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running while firing forward, a crackling arc gun with a blue coil."
+},
+{
+"id": "kai-arc/crouchshoot",
+"frames": 3,
+"size": "290x256 per frame",
+"pose": "Kai, the hero, crouched shot behind cover, a crackling arc gun with a blue coil",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, crouched shot behind cover, a crackling arc gun with a blue coil."
+},
+{
+"id": "kai-arc/jump",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, jump: take-off, rise, top, fall, a crackling arc gun with a blue coil",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, jump: take-off, rise, top, fall, a crackling arc gun with a blue coil."
+},
+{
+"id": "kai-arc/aimup",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming straight up, a crackling arc gun with a blue coil",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming straight up, a crackling arc gun with a blue coil."
+},
+{
+"id": "kai-arc/aimdiag",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming up at 45 degrees, a crackling arc gun with a blue coil",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming up at 45 degrees, a crackling arc gun with a blue coil."
+},
+{
+"id": "kai-flame/idle",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing ready, a flamethrower with a backpack tank",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, standing ready, a flamethrower with a backpack tank."
+},
+{
+"id": "kai-flame/run",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a flamethrower with a backpack tank",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running, contact frames 1 and 4, stride as long as the body is tall, a flamethrower with a backpack tank."
+},
+{
+"id": "kai-flame/shoot",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a flamethrower with a backpack tank",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, standing shot, recoil on frame 2, muzzle at the gun tip, a flamethrower with a backpack tank."
+},
+{
+"id": "kai-flame/runshoot",
+"frames": 6,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, running while firing forward, a flamethrower with a backpack tank",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 6 frames: Kai, the hero, running while firing forward, a flamethrower with a backpack tank."
+},
+{
+"id": "kai-flame/crouchshoot",
+"frames": 3,
+"size": "290x256 per frame",
+"pose": "Kai, the hero, crouched shot behind cover, a flamethrower with a backpack tank",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, crouched shot behind cover, a flamethrower with a backpack tank."
+},
+{
+"id": "kai-flame/jump",
+"frames": 4,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, jump: take-off, rise, top, fall, a flamethrower with a backpack tank",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: Kai, the hero, jump: take-off, rise, top, fall, a flamethrower with a backpack tank."
+},
+{
+"id": "kai-flame/aimup",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming straight up, a flamethrower with a backpack tank",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming straight up, a flamethrower with a backpack tank."
+},
+{
+"id": "kai-flame/aimdiag",
+"frames": 3,
+"size": "160x256 per frame",
+"pose": "Kai, the hero, aiming up at 45 degrees, a flamethrower with a backpack tank",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: Kai, the hero, aiming up at 45 degrees, a flamethrower with a backpack tank."
+},
+{
+"id": "fx-ft-pistol-flash",
+"frames": 3,
+"size": "96x96",
+"pose": "muzzle flash of the pistol, pointing right, centre = muzzle",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 3-frame muzzle flash of a compact pistol held in one hand, pointing right, additive glow."
+},
+{
+"id": "fx-ft-hmg-flash",
+"frames": 3,
+"size": "96x96",
+"pose": "muzzle flash of the hmg, pointing right, centre = muzzle",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 3-frame muzzle flash of a heavy machine gun held at the hip with both hands, pointing right, additive glow."
+},
+{
+"id": "fx-ft-shot-flash",
+"frames": 3,
+"size": "96x96",
+"pose": "muzzle flash of the shot, pointing right, centre = muzzle",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 3-frame muzzle flash of a pump shotgun held with both hands, pointing right, additive glow."
+},
+{
+"id": "fx-ft-rocket-flash",
+"frames": 3,
+"size": "96x96",
+"pose": "muzzle flash of the rocket, pointing right, centre = muzzle",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 3-frame muzzle flash of a shoulder rocket launcher, pointing right, additive glow."
+},
+{
+"id": "fx-ft-arc-flash",
+"frames": 3,
+"size": "96x96",
+"pose": "muzzle flash of the arc, pointing right, centre = muzzle",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 3-frame muzzle flash of a crackling arc gun with a blue coil, pointing right, additive glow."
+},
+{
+"id": "fx-ft-flame-flash",
+"frames": 3,
+"size": "96x96",
+"pose": "muzzle flash of the flame, pointing right, centre = muzzle",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 3-frame muzzle flash of a flamethrower with a backpack tank, pointing right, additive glow."
+},
+{
+"id": "fx-ft-pistol-casing",
+"frames": 4,
+"size": "24x24",
+"pose": "a spent pistol shell casing tumbling",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A spent brass pistol shell casing tumbling in 4 frames."
+},
+{
+"id": "fx-ft-hmg-casing",
+"frames": 4,
+"size": "24x24",
+"pose": "a spent hmg shell casing tumbling",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A spent brass hmg shell casing tumbling in 4 frames."
+},
+{
+"id": "fx-ft-shot-casing",
+"frames": 4,
+"size": "24x24",
+"pose": "a spent shot shell casing tumbling",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A spent brass shot shell casing tumbling in 4 frames."
+},
+{
+"id": "fx-ft-spark-metal",
+"frames": 4,
+"size": "64x64",
+"pose": "bullet impact: sparks off metal",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 4-frame bullet impact: sparks off metal."
+},
+{
+"id": "fx-ft-spark-concrete",
+"frames": 4,
+"size": "64x64",
+"pose": "bullet impact: concrete chips and dust",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 4-frame bullet impact: concrete chips and dust."
+},
+{
+"id": "fx-ft-spark-glass",
+"frames": 4,
+"size": "64x64",
+"pose": "bullet impact: glass shards",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 4-frame bullet impact: glass shards."
+},
+{
+"id": "fx-ft-spark-wood",
+"frames": 4,
+"size": "64x64",
+"pose": "bullet impact: wood splinters",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 4-frame bullet impact: wood splinters."
+},
+{
+"id": "knife/die-front",
+"frames": 4,
+"size": "200x256 per frame",
+"pose": "the street rusher with a knife, shot from the front, falls backwards",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: the street rusher with a knife, shot from the front, falls backwards."
+},
+{
+"id": "knife/die-back",
+"frames": 4,
+"size": "200x256 per frame",
+"pose": "the street rusher with a knife, shot from behind, falls forwards",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: the street rusher with a knife, shot from behind, falls forwards."
+},
+{
+"id": "knife/die-blast",
+"frames": 4,
+"size": "200x256 per frame",
+"pose": "the street rusher with a knife, thrown by a blast",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: the street rusher with a knife, thrown by a blast."
+},
+{
+"id": "knife/hit",
+"frames": 3,
+"size": "200x256 per frame",
+"pose": "the street rusher with a knife, flinch",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: the street rusher with a knife, flinch."
+},
+{
+"id": "knife/crouch",
+"frames": 3,
+"size": "200x256 per frame",
+"pose": "the street rusher with a knife, hiding crouched behind cover",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: the street rusher with a knife, hiding crouched behind cover."
+},
+{
+"id": "knife/popup",
+"frames": 3,
+"size": "200x256 per frame",
+"pose": "the street rusher with a knife, rising from cover to fire",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: the street rusher with a knife, rising from cover to fire."
+},
+{
+"id": "gunman/die-front",
+"frames": 4,
+"size": "200x256 per frame",
+"pose": "the gunner in a long coat, shot from the front, falls backwards",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: the gunner in a long coat, shot from the front, falls backwards."
+},
+{
+"id": "gunman/die-back",
+"frames": 4,
+"size": "200x256 per frame",
+"pose": "the gunner in a long coat, shot from behind, falls forwards",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: the gunner in a long coat, shot from behind, falls forwards."
+},
+{
+"id": "gunman/die-blast",
+"frames": 4,
+"size": "200x256 per frame",
+"pose": "the gunner in a long coat, thrown by a blast",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: the gunner in a long coat, thrown by a blast."
+},
+{
+"id": "gunman/hit",
+"frames": 3,
+"size": "200x256 per frame",
+"pose": "the gunner in a long coat, flinch",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: the gunner in a long coat, flinch."
+},
+{
+"id": "gunman/crouch",
+"frames": 3,
+"size": "200x256 per frame",
+"pose": "the gunner in a long coat, hiding crouched behind cover",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: the gunner in a long coat, hiding crouched behind cover."
+},
+{
+"id": "gunman/popup",
+"frames": 3,
+"size": "200x256 per frame",
+"pose": "the gunner in a long coat, rising from cover to fire",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: the gunner in a long coat, rising from cover to fire."
+},
+{
+"id": "bruiser/die-front",
+"frames": 4,
+"size": "200x256 per frame",
+"pose": "the armoured heavy, shot from the front, falls backwards",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: the armoured heavy, shot from the front, falls backwards."
+},
+{
+"id": "bruiser/die-back",
+"frames": 4,
+"size": "200x256 per frame",
+"pose": "the armoured heavy, shot from behind, falls forwards",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: the armoured heavy, shot from behind, falls forwards."
+},
+{
+"id": "bruiser/die-blast",
+"frames": 4,
+"size": "200x256 per frame",
+"pose": "the armoured heavy, thrown by a blast",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 4 frames: the armoured heavy, thrown by a blast."
+},
+{
+"id": "bruiser/hit",
+"frames": 3,
+"size": "200x256 per frame",
+"pose": "the armoured heavy, flinch",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: the armoured heavy, flinch."
+},
+{
+"id": "bruiser/crouch",
+"frames": 3,
+"size": "200x256 per frame",
+"pose": "the armoured heavy, hiding crouched behind cover",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: the armoured heavy, hiding crouched behind cover."
+},
+{
+"id": "bruiser/popup",
+"frames": 3,
+"size": "200x256 per frame",
+"pose": "the armoured heavy, rising from cover to fire",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A sprite strip of 3 frames: the armoured heavy, rising from cover to fire."
+},
+{
+"id": "prop-taxi/loop",
+"frames": 4,
+"size": "560x190",
+"pose": "a Frankfurt taxi, cream with a roof sign, 4.5 m long, idle lights flicker",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 4-frame loop: a Frankfurt taxi, cream with a roof sign, 4.5 m long, idle lights flicker, side view."
+},
+{
+"id": "prop-taxi/wreck",
+"frames": 4,
+"size": "560x190",
+"pose": "the same taxi shot to pieces, smoking",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 4-frame loop: the same taxi shot to pieces, smoking, side view."
+},
+{
+"id": "prop-van/loop",
+"frames": 4,
+"size": "680x290",
+"pose": "a delivery van, 5.5 m long, 2.3 m tall",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 4-frame loop: a delivery van, 5.5 m long, 2.3 m tall, side view."
+},
+{
+"id": "prop-police/loop-near",
+"frames": 4,
+"size": "600x190",
+"pose": "a police car at kerb scale, 4.8 m long",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 4-frame loop: a police car at kerb scale, 4.8 m long, side view."
+},
+{
+"id": "prop-scooter/loop",
+"frames": 4,
+"size": "220x130",
+"pose": "a parked e-scooter, 1.8 m long",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 4-frame loop: a parked e-scooter, 1.8 m long, side view."
+},
+{
+"id": "prop-car/wreck",
+"frames": 4,
+"size": "560x200",
+"pose": "the parked car shot apart, doors off, smoking",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A 4-frame loop: the parked car shot apart, doors off, smoking, side view."
+},
+{
+"id": "sc-lamp",
+"frames": 1,
+"size": "256x256",
+"pose": "a street lamp 5 m tall",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A street lamp 5 m tall, side view, at real scale next to a 1.8 m person."
+},
+{
+"id": "sc-kiosk-news",
+"frames": 1,
+"size": "256x256",
+"pose": "a news kiosk 2.4 m tall",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A news kiosk 2.4 m tall, side view, at real scale next to a 1.8 m person."
+},
+{
+"id": "sc-crate-break",
+"frames": 4,
+"size": "256x256",
+"pose": "a wooden crate breaking in 4 frames",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A wooden crate breaking in 4 frames, side view, at real scale next to a 1.8 m person."
+},
+{
+"id": "sc-barrel-blast",
+"frames": 4,
+"size": "256x256",
+"pose": "a red barrel bursting in 4 frames",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A red barrel bursting in 4 frames, side view, at real scale next to a 1.8 m person."
+},
+{
+"id": "sc-debris-metal",
+"frames": 1,
+"size": "256x256",
+"pose": "metal debris pieces, 6 loose bits",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. Metal debris pieces, 6 loose bits, side view, at real scale next to a 1.8 m person."
+},
+{
+"id": "sc-debris-glass",
+"frames": 1,
+"size": "256x256",
+"pose": "glass debris pieces, 6 loose bits",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. Glass debris pieces, 6 loose bits, side view, at real scale next to a 1.8 m person."
+},
+{
+"id": "sc-debris-wood",
+"frames": 1,
+"size": "256x256",
+"pose": "wood debris pieces, 6 loose bits",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. Wood debris pieces, 6 loose bits, side view, at real scale next to a 1.8 m person."
+},
+{
+"id": "sc-bin",
+"frames": 1,
+"size": "256x256",
+"pose": "a city litter bin 1 m tall",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A city litter bin 1 m tall, side view, at real scale next to a 1.8 m person."
+},
+{
+"id": "sc-bollard",
+"frames": 1,
+"size": "256x256",
+"pose": "a street bollard 0.9 m tall",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A street bollard 0.9 m tall, side view, at real scale next to a 1.8 m person."
+},
+{
+"id": "sc-bench",
+"frames": 1,
+"size": "256x256",
+"pose": "a bench 1.8 m long",
+"prompt": "Painted cyberpunk Frankfurt 2099 street, hand-painted game art, rain, teal and magenta neon, crisp dark outline, readable silhouette, side view facing right, feet on the bottom edge, transparent background, no text. A bench 1.8 m long, side view, at real scale next to a 1.8 m person."
+}
+]

@@ -28,3 +28,9 @@ Code: parts/street/street2.js (replaces FOOT.STAGES.zeil when on). Test: qa/stre
 ## Gates (qa/street2-test.js)
 human-style bot clears 60-90%; >= 8 destructibles broken per run; no enemy alive > 25 s after it is seen;
 Kai and grounded foes' feet within 6 px of the road line; 0 page errors; ?street2=0 fingerprint identical.
+
+## Feel (worker F2, flag RET.feel, ?feel=0 old): parts/street/streetfeel.js, test qa/streetfeel-test.js
+- Run frames follow ground distance (one step = the sheet's foot spread at contact), body bob, dust at each foot contact, lean on start/stop, skid crouch on a hard turn.
+- Heights: Kai = rusher = gunner 64, heavy 80 (1.25x), big heavy 90; scale by the visible body. Taxi 160 x 54 (4.5 m), kiosk 86, barrel 34; far-kerb cars 120.
+- Bullets and the flash start at the measured muzzle of the drawn frame (Kai and foes); with no foe in the aim cone a ground shot dips onto the crate ahead.
+- A `kai-<weapon>/<act>` sheet replaces `kai/<act>` when it exists. Missing art: ART-SLOTS-STREET.md (95 slots, art-slots-street.json).

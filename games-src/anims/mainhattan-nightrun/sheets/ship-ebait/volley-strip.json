@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 521,
+ "h": 275,
+ "anchor": [
+  260,
+  275
+ ],
+ "order": [
+  "strip-ship-ebait-volley#1",
+  "strip-ship-ebait-volley#2",
+  "strip-ship-ebait-volley#3",
+  "strip-ship-ebait-volley#4"
+ ]
+}

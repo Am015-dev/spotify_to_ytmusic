@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 224,
+ "anchor": [
+  260,
+  224
+ ],
+ "order": [
+  "strip-ship-eturret-death#1",
+  "strip-ship-eturret-death#2",
+  "strip-ship-eturret-death#3",
+  "strip-ship-eturret-death#4",
+  "strip-ship-eturret-death#5"
+ ]
+}

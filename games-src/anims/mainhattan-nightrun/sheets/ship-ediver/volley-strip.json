@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 520,
+ "h": 231,
+ "anchor": [
+  260,
+  231
+ ],
+ "order": [
+  "strip-ship-ediver-volley#1",
+  "strip-ship-ediver-volley#2",
+  "strip-ship-ediver-volley#3",
+  "strip-ship-ediver-volley#4"
+ ]
+}

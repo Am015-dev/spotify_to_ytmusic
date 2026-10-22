@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 211,
+ "anchor": [
+  260,
+  211
+ ],
+ "order": [
+  "strip-ship-ezbomber-death#1",
+  "strip-ship-ezbomber-death#2",
+  "strip-ship-ezbomber-death#3",
+  "strip-ship-ezbomber-death#4",
+  "strip-ship-ezbomber-death#5"
+ ]
+}

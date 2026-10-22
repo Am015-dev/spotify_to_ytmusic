@@ -1,0 +1,16 @@
+{
+ "frames": 4,
+ "fps": 12,
+ "w": 522,
+ "h": 228,
+ "anchor": [
+  261,
+  228
+ ],
+ "order": [
+  "strip-ship-ecrawler-flame#1",
+  "strip-ship-ecrawler-flame#2",
+  "strip-ship-ecrawler-flame#3",
+  "strip-ship-ecrawler-flame#4"
+ ]
+}

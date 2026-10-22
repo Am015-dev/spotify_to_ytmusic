@@ -1,0 +1,17 @@
+{
+ "frames": 5,
+ "fps": 8,
+ "w": 520,
+ "h": 207,
+ "anchor": [
+  260,
+  207
+ ],
+ "order": [
+  "strip-ship-eflank-death#1",
+  "strip-ship-eflank-death#2",
+  "strip-ship-eflank-death#3",
+  "strip-ship-eflank-death#4",
+  "strip-ship-eflank-death#5"
+ ]
+}
