@@ -1,5 +1,6 @@
 # Coordinator handoff (OD 0e), 2026-10-22 ~07:40 UTC
 Coordinator session_01L97MfPJRbeb3t9g3h8vcM3. Read CLAUDE.md, then this. Deploy recipe: docs/HANDOFF_coordinator_0c.md (worked for beta.151; Artifact publish needs read of live page + models/lx.js, xf.js first).
+LIVE NOW: beta.152 (43e3bac, Beta v318) from 2a9f51c: traffic-in-view + groundTex cache + quiet-dirt GO + bughunt tool. Running: ath-trap-r2 session_01Sgb9bwj8R8xAdrB38JQ8y7 (SONNET), let-cars-climb session_01SJBmnf6haoRifTajUe1LZj (OPUS). Reveal stall parked (2 lanes, needs design plan or real iPhone reports).
 ## Live
 beta.151 (ce32c02, Beta v317), built from 7394743: speed feel, solid-cars r3 (camera turn), ground-tile + coin prewarm, core reveal, xf1/water. gloss and ?cl=core,studs default OFF.
 ## Reviewed since (on trunk, not live)

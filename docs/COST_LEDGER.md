@@ -84,3 +84,9 @@ Model and status come from the session list. Cost is blank: the session list doe
 | glossy-cars-r22e10 | — | Opus | Glossy r2 (last lane on target) | pushed 68b2d6f, needs review |
 | ath-dirt-stall-r22e11 | — | Sonnet | Street car stalls on Athens dirt | working at log time |
 | reviews 34-40 | beta.151 | Opus | 7 reviews | done |
+| ath-dirt-stall-r22e11 | beta.152 | Sonnet | quiet-dirt GO parks traffic (found Pedion bowl trap) | shipped #43 |
+| reveal-stall-r22e12 | — | Opus | fra reveal GPU stall trace (docs/tools) | #42 finding; stall still open |
+| groundtex-cache-r22e13 | beta.152 | Sonnet | groundTex cached per kind | shipped #45 (stall not fixed) |
+| bughunt-x1000-r23a | beta.152 | Opus | tools/bughunt.js gate + strict report 11/100 | shipped #44 |
+| traffic-in-view-r22e15 | beta.152 | Opus | no slide/teleport in view (npcPop fra 21 -> 2.7/h) | shipped #46 |
+| ath-trap-r22e14 | — | Opus | Athens trap fixes behind flags (?t9e, ?bx) | #47 PASS flag-off; measuring in r2 |
