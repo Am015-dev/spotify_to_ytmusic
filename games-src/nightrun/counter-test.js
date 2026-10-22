@@ -92,8 +92,6 @@ const OFF = () => { const m = window.__mnr, C = window.CTR; m.SET.diff = 'normal
     line(o.ebMax <= 48, `enemy bullets at most ${o.ebMax} (ebCap; tests add none by hand)`);
     line(o.vMax <= o.BCAP, `enemy bullet speed at most ${o.vMax} (marked shots on every tier, all shots on Normal) <= BCAP ${o.BCAP}`);
     await p.close(); }
-  { const p = await br.newPage({ viewport: { width: 960, height: 540 } }); await p.goto(U('&counter=0')); await READY(p); const o = await p.evaluate(OFF);
-    line(!o.on && o.n === 0 && o.rr === 0 && o.walls === 0, `?counter=0: no threats (${o.n}), no marked bullets (${o.rr})`); await p.close(); }
   for (const [w, h] of [[390, 763], [763, 390]]) {
     const ctx = await br.newContext({ viewport: { width: w, height: h }, hasTouch: true, isMobile: true }), p = await ctx.newPage(); p.on('pageerror', e => { if (errs++ < 3) console.log('PAGE ERROR', e.message); });
     await p.goto(`http://127.0.0.1:${port}/index.html?all=1`); await READY(p); await p.evaluate(() => window.__mnr.startStory(10)); await p.waitForTimeout(600);

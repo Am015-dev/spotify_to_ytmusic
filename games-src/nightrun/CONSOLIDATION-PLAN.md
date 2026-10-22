@@ -81,12 +81,13 @@ Numbers: `python3 games-src/nightrun/layer-scan.py <cov.json>` (cov.json = `COVE
 | layout, layoutStrip! | layout | portrait layout; `strip=1` is default OFF | ON / OFF | layout DEL-OFF later; layoutStrip OWNER |
 | tidy | tidy (+streetlook) | Settings page tidy, street hook | ON | **removed (batch 2)** |
 | mix | mix | audio mix graph, compressor, voice caps | ON | **removed (batch 2)** |
-| calmsfx | mix | no PERFECT sting | ON | DEL-OFF later |
-| hudband | formations | portrait HUD band keeps formations clear | ON | DEL-OFF later |
+| calmsfx | mix | no PERFECT sting | ON | **removed (batch 4)** |
+| hudband | formations | portrait HUD band keeps formations clear | ON | **removed (batch 4)** |
 | garagefix, easy2, pwrclear | hub, legend, abup | small fixes | ON | DEL-OFF later |
 | stay | - | NOT merged (no flag, no part in the tree) | - | nothing to do |
 
-Also removed in batch 3 (older layers): roster (fun/dir), strike2 and scale2 (fair, hard), boss2 (armour), stamp.
+Also removed (older layers): batch 3 roster, strike2, scale2, boss2, stamp; batch 4 hintdiet, bite, counter, feedback. 25 flags removed in total; every batch: fingerprint 8/8 identical, guard ok, simhunt inside the baseline band.
+**Kept although default ON (their `=0` is used as a test mode, or the off half is a comparison measurement; rework the test first):** classes, polish, pacing, endramp (own tests compare against `=0`), gritBoss (comment says OFF by default, code says ON: owner to confirm), and everything in the test-mode list above.
 **Test-mode flags that must be reworked before they can go:** deck, mustmove, songspread, vary, vary2, variants, remix (fleet-, fun-, zoo-, sprites-, ret-dpool-test open them as `=0` to get the old deterministic spawns), schoolfull, nocaps, react, reward.
 
 **Baselines (22 Oct 2026, 09:45 UTC, before DEL-OFF):** `fingerprints.json` re-baselined (3 identical runs, 8/8). `node qa/simhunt.js` (285 runs, 76 issue kinds, 0 page errors, 2 severe kinds): **simhunt is NOT run-to-run deterministic** (real-time wobble: two baseline runs gave 69 and 67 unexplained-death runs, hudband 3 and 3; per-run kill counts differ in 259 of 285 runs). Gate used: same 2 severe kinds, 0 page errors, no new kind, counts inside the 61-69 / 3-4 band.

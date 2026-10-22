@@ -1,5 +1,5 @@
 // PURPOSE: painted UI kit: HUD plates and the hint bubble
-// FLAG: hint (?hint=0), hintdiet (?hintdiet=0)
+// FLAG: hint (?hint=0)
 // TEST: hint-test.js
 /* ---------- painted UI kit (media/ui-*.webp): canvas HUD plates + the hint bubble. The DOM side (buttons, panels, rows, touch buttons) is CSS in head.html.
    Every image is decoded once (ART.load -> ImageBitmap) and drawn as a 9-slice with plain drawImage: no per-frame filters. Until it has decoded the old flat look is drawn. */
@@ -62,7 +62,6 @@ UIK.bossShadow=(e,mv,wd)=>{const dh=e._dh||130,dw=(e._dw||wd)*.8,gy=UIK.groundY(
    bold white text >= 14 px on a dark rounded pill (alpha .78, thin accent border), at most 8 words (the caller writes it short; short() only cuts a leftover),
    in the top third under the HUD, never within 120 px of the ship (it slides sideways, or waits), one on screen at a time with at least 1.2 s between two. ---------- */
 if(RET.hint===undefined)RET.hint=!/[?&]hint=0/.test(location.search);
-if(RET.hintdiet===undefined)RET.hintdiet=!/[?&]hintdiet=0/.test(location.search);
 const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE:120,
   on(){return RET.hint!==false;},
   reset(){this.cur=null;this.q.length=0;this.gap=0;this.box=null;},
@@ -78,7 +77,7 @@ const HINT=window.HINT={cur:null,q:[],gap:0,seen:[],box:null,MAXW:8,GAP:1.2,SAFE
   /* V2 hint diet (flag RET.hintdiet, ?hintdiet=0 = every ask shows): a hint text shows at most twice per profile (counts in localStorage 'mnr_hintseen') and never twice within 3 minutes of play.
      Not in the tutorial or the Lab (the tutorial teaches by hints). A refused ask returns false like a repeat ask, so callers that retry every frame cost nothing. */
   clk:0,hs:null,
-  diet(txt){if(RET.hintdiet===false||G.tut||G.lab)return true;
+  diet(txt){if(G.tut||G.lab)return true;
     if(!this.hs){try{this.hs=JSON.parse(localStorage.getItem('mnr_hintseen')||'{}')||{};}catch(e){this.hs={};}this.hl={};}
     const n=this.hs[txt]|0;if(n>=2)return false;if(n>0&&this.clk-(this.hl[txt]==null?-1e9:this.hl[txt])<180)return false;
     this.hs[txt]=n+1;this.hl[txt]=this.clk;try{localStorage.setItem('mnr_hintseen',JSON.stringify(this.hs));}catch(e){}return true;},

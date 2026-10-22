@@ -54,11 +54,6 @@ const AUDIT = rootSel => { const R = document.querySelector(rootSel), o = { btn:
   await p.evaluate(() => { RET.st.open(); }); await sleep(200);
   ok('stats sheet has FEEDBACK list + COPY', /FEEDBACK/.test(await p.textContent('#stSheet')) && await vis(p, '#fbCopy'));
   await p.context().close();
-  // flag off
-  p = await open(390, 763, '?feedback=0');
-  await p.evaluate(`const m=window.__mnr; m.startStory(1); m.ST.fail();`); await sleep(400);
-  ok('?feedback=0: nothing shown, nothing stored', !(await p.evaluate(() => !!document.querySelector('.fbB'))) && (await p.evaluate(() => localStorage.getItem('mnr_fb'))) === null);
-  await p.context().close();
   // reduced motion
   p = await open(390, 763, '', true);
   await p.evaluate(`const m=window.__mnr; m.startStory(1); m.ST.fail();`); await sleep(500);

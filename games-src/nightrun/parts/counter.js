@@ -1,5 +1,5 @@
 // PURPOSE: threats that make DASH and EMP the answer
-// FLAG: counter (?counter=0)
+// FLAG: none (always on)
 // TEST: counter-test.js
 /* ---------- COUNTER threats: DASH and EMP as the answers (flag RET.counter, ?counter=0 = the abilities without these threats). Test: nightrun/counter-test.js.
    Owner, 19 Oct 2026: "the dash button and emp still useless, the game needs to be more strategic and timing". A button only matters when some threat needs it.
@@ -14,8 +14,7 @@
      The EMP button pulses (class abHot) while it would be worth it. DASH then EMP inside 1 s = COMBO blast (12 more to every ordinary foe within 300 px).
    Dash while overheated vents the gun (VENT). Hooks: b.js dash start (CTR.dash) and EMP press (CTR.emp), c.js draw. Boss HP, armour caps, bossmoves untouched;
    bullets go through eb() (ebCap, BCAP); tells >= .7 s; reduce motion = no pulse/flash. */
-if(RET.counter===undefined)RET.counter=!/[?&]counter=0/.test(location.search);
-const CTR=window.CTR={get on(){return!!RET.counter;},
+const CTR=window.CTR={get on(){return true;},
   stat:{seek:0,parry:0,early:0,wall:0,wallHit:0,wallDash:0,curt:0,curtHit:0,curtDash:0,curtEmp:0,ward:0,strip:0,good:0,waste:0,combo:0,vent:0},
   UN:{seek:3,wall:5,curt:7,ward:9},EV:{easy:10,normal:9,hard:6,vhard:5,legend:4},
   HK:{easy:4,normal:6,hard:9,vhard:9,legend:9},WK:{easy:.8,normal:1,hard:1.3,vhard:1.5,legend:1.7},

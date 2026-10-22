@@ -1,10 +1,9 @@
 // PURPOSE: FUN / SAME AGAIN / BORING tap at run end
-// FLAG: feedback (?feedback=0)
+// FLAG: none (always on)
 // TEST: feedback-test.js
 /* ---------- FEEDBACK: one optional tap at the end of a run (FUN / SAME AGAIN / BORING). Flag RET.feedback (?feedback=0 = nothing shown, nothing stored).
    Answers go to localStorage 'mnr_fb' (newest last, capped at 500): {stage, mode, diff, wp, sec, ts}. The STATS sheet lists the counts per stage and has a COPY button for the JSON.
    The strip sits under the buttons of #over / #stres, so it never delays or covers NEXT STAGE / RETRY; it is shown once per run. ---------- */
-if(RET.feedback===undefined)RET.feedback=!/[?&]feedback=0/.test(location.search);
 RET.sioKeys.push('mnr_fb');
 const FB=(function(on){
   const KEY='mnr_fb',CAP=500,ANS=[['fun','FUN'],['same','SAME AGAIN'],['bore','BORING']];
@@ -47,5 +46,5 @@ const FB=(function(on){
     document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#fbCopy');if(b)copy(b);});
   }
   return{on,answer,load,counts,sheet,show,hide};
-})(RET.feedback);
+})(true);
 window.FB=FB;
