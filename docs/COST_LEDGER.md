@@ -105,3 +105,6 @@ Model and status come from the session list. Cost is blank: the session list doe
 | flake-kill-r22e25 | beta.156 (tests) | Sonnet | 13 GOs hardened, tools/gate.sh | #58: 3 loosenings to undo, r2 needs fresh worker |
 | preview-flags-r22e28 | beta.156 | Sonnet | --preview build, FLAGS.md, dead flags deleted | #59 PASS, shipped; first Beta-preview published |
 | shot-library-r22e27 | — (docs) | Sonnet | docs/shots/library, 60 views + INDEX + tools/shot.js | done |
+| chip-fix-r22e30 | beta.157 | Sonnet | one TAP chip at a time, single flight icon | #60 PASS, shipped |
+| onfoot-edge-r22e31 | beta.157 | Sonnet | on-foot world edge (edgeStep + clamp) | #61 PASS, shipped |
+| reviews 56-61 | beta.155-157 | Opus | 6 reviews | done |
