@@ -348,7 +348,7 @@ function OF_athPark1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h
       cx=A.x+(B.x-A.x)*t,cz=A.z+(B.z-A.z)*t,x=cx-uz*off,z=cz+ux*off,y=groundAt(x,z,groundAt(cx,cz,999)+2),d=Math.hypot(x-RO.x,z-RO.z);
     if(Math.abs(y-groundAt(cx,cz,y+2))>.35)continue;if(LV.cl&&LV.cl.L.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<14*14))continue;if(C.some(o=>o.pk&&(o.x-x)**2+(o.z-z)**2<9*9))continue;
     if(roamHit(x,z,1.4,y+.5)||roamHit(x+ux*2.2,z+uz*2.2,1.2,y+.5)||roamHit(x-ux*2.2,z-uz*2.2,1.2,y+.5))continue;if(typeof QS_rampNear==='function'&&QS_rampNear(x,z))continue;if(!far&&LV_seen(x,0,z)&&d<90)continue;if(HT_POP.on&&(far?LV_seen(x,y,z):!HT_canPop(x,z,y)))continue;/* traffic-law-r21m: never park a car into view */
-    Object.assign(cand,{pk:1,pv:cand.pv||cand.v,v:0,cv:0,a:E.i,b:E.bi,t,lane:off/W,ofW:W,hitT:0,x,z});LV.n.park=(LV.n.park||0)+1;OF.athPk=(OF.athPk||0)+1;return}}
+    /* parked-jump-r22e29: LV_step runs between CV_pre and CV_post (hubTrafficStep): CV_pre had saved this car's driving speed (CVv) / pose (CVfz) and CV_post wrote them back onto the now PARKED car: it drove off at 16 m/s with pk set, 20-50 m in 2 s */Object.assign(cand,{CVv:null,CVfz:null,RDfz:null,pk:1,pv:cand.pv||cand.v,v:0,cv:0,a:E.i,b:E.bi,t,lane:off/W,ofW:W,hitT:0,x,z});LV.n.park=(LV.n.park||0)+1;OF.athPk=(OF.athPk||0)+1;return}}
 if(typeof LV_park1==='function')LV_park1=(f=>function(C,far){if(CID==='ath')return OF_athPark1(C,far);return f.apply(this,arguments)})(LV_park1);
 
 // ===== v89b1 camera hotfix (Alex: "the walk in the street is impossible … it's doing rounds"). Cause: the stick was camera-relative AND the camera

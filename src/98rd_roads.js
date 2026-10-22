@@ -51,7 +51,7 @@ function RD_maySig(x,z){return !!CV_near(x,z,Q=>Q.sig&&Math.hypot(Q.x-x,Q.z-z)<Q
 function RD_carPre(){const P=HUB.peds;if(!P)return;const X=[];for(const p of P)if(p.rdX&&p._x===p._x&&Math.abs(p._x-RO.x)<330&&Math.abs(p._z-RO.z)<330)X.push(p);if(!X.length)return;const N=HUB.nodes;
   for(let _i2=0,_a2=HUB.cars;_i2<_a2.length;_i2++){const c=_a2[_i2];if(c.dead>0||c.x==null||c.route&&!c.CVr)continue;const A=N[c.a],B=N[c.b];if(!A||!B||A.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,hx=(B.x-A.x)/L,hz=(B.z-A.z)/L;
     for(const p of X){const rx=p._x-c.x,rz=p._z-c.z,al=rx*hx+rz*hz;if(al<-.5||al>18)continue;if(Math.abs(rx*hz-rz*hx)<3.6){c.RDfz=[c.a,c.b,c.t,c.v];c.RDy2='ped';c.v=0;c.cv=0;RD_PS.carHold++;break}}}}
-function RD_carPost(){for(let _k1=0,_c1=HUB.cars,c;_k1<_c1.length&&(c=_c1[_k1],true);_k1++)if(c.RDfz){if(!(c.dead>0)){c.a=c.RDfz[0];c.b=c.RDfz[1];c.t=c.RDfz[2];c.cv=0}c.v=c.RDfz[3];c.RDfz=null}}
+function RD_carPost(){for(let _k1=0,_c1=HUB.cars,c;_k1<_c1.length&&(c=_c1[_k1],true);_k1++)if(c.RDfz){if(c.pk){c.RDfz=null;continue}/* parked-jump-r22e29: parked between RD_carPre and here (LV_step): keep v 0 and the parking spot */if(!(c.dead>0)){c.a=c.RDfz[0];c.b=c.RDfz[1];c.t=c.RDfz[2];c.cv=0}c.v=c.RDfz[3];c.RDfz=null}}
 if(RD_ON){const _ht=hubTrafficStep;hubTrafficStep=function(dt){try{RD_carPre()}catch(e){}const r=_ht.apply(this,arguments);try{RD_carPost()}catch(e){}return r}}
 // zebra crossings on every arm of a Frankfurt junction (Athens has its own, CE_kerbs): band J.r+1.4 … +4.6 from the centre = where walkers cross
 function RD_zebra(){if(CID!=='fra'||!HUB.grp)return;const PS={};let n=0;/* perf-5: one mesh per 200 m cell (was one city-wide mesh, R 3.4 km, never frustum-culled) */

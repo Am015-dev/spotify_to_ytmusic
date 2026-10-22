@@ -215,9 +215,13 @@ function LV_clStep(dt){const S=LV.cl;if(!S||!HUB.peds)return;const P=HUB.peds,N=
 function LV_crowdN(){let n=0;const c=LV_cn();for(let k=0;k<c&&k<12;k++)n+=LV_CPP[k%LV_CPP.length];return n}
 function LV_walk(n){const w=TUNE.life<=0||TUNE.lvPed<=0?70:Math.round(70*LV_d('lvPed'));return Math.max(0,Math.min(w,n-LV_crowdN()))}
 // ---------- 8 · parked cars: traffic cars (same mesh + collider) parked half on the kerb 30-110 m ahead; smashing one sends it back into traffic
-function LV_parkStep(){const C=HUB.cars;if(!C||!C.length)return;const want=Math.round(5*Math.min(2,LV_d('lvPark'))),N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);let n=0;
-  for(const c of C){if(!c.pk)continue;if(c.dead>0){c.pk=0;c.v=c.pv||16;continue}const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);
-    if(n>=want||d>200||dx*fx+dz*fz<-d*.3&&d>40&&!LV_seen(c.x,c.y||0,c.z)){if(HT_POP.on&&!HT_canPop(c.x,c.z,c.y)){n++;continue}/* traffic-law-r21s: a parked car turns back into traffic only out of sight (n >= want unparked it in view: a 3 m snap from the kerb onto the lane, Athens 7451>7450) */c.pk=0;c.v=c.pv||16;c.lane=.36;c.cv=0;continue}n++}
+// parked-jump-r22e29 (Alex: "cars change on camera turn"): a parked car turned into traffic (and drove 20-40 m) the moment the camera looked away from it, with the traffic law off
+// (default) nothing but LV_seen (the CURRENT frustum) held it. Now each parked car stamps c.pkSeen while it is in the camera frustum or within 40 m and is never unparked within 8 s of that.
+const LV_PV={f:new THREE.Frustum(),m:new THREE.Matrix4(),s:new THREE.Sphere(new THREE.Vector3(),3)};
+function LV_parkStep(){const C=HUB.cars;if(!C||!C.length)return;const want=Math.round(5*Math.min(2,LV_d('lvPark'))),N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);let n=0,pv=0;
+  for(const c of C){if(!c.pk)continue;if(c.dead>0){c.pk=0;c.v=c.pv||16;continue}if(c.v>.5||c.cv>.5){c.v=0;c.cv=0}/* parked-jump-r22e29: a parked car is stationary whoever restored a driving speed onto it */const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);
+    if(d<250){if(!pv){pv=1;camera.updateMatrixWorld();LV_PV.f.setFromProjectionMatrix(LV_PV.m.multiplyMatrices(camera.projectionMatrix,camera.matrixWorldInverse))}LV_PV.s.center.set(c.x,(c.y||0)+1,c.z);if(d<40||LV_PV.f.intersectsSphere(LV_PV.s))c.pkSeen=T;if(T-(c.pkSeen==null?-1e9:c.pkSeen)<8){n++;continue}}
+    if(n>=want||d>200||dx*fx+dz*fz<-d*.3&&d>40&&!LV_seen(c.x,c.y||0,c.z)){if(!HT_canPop(c.x,c.z,c.y)){n++;continue}/* parked-jump-r22e29: also with the law off (HT_canPop = the 98nc view memory + 40 m): a parked car behind the player turned into traffic and drove off as the camera looked away. traffic-law-r21s: a parked car turns back into traffic only out of sight (n >= want unparked it in view: a 3 m snap from the kerb onto the lane, Athens 7451>7450) */c.pk=0;c.v=c.pv||16;c.lane=.36;c.cv=0;continue}n++}
   if(n>=want)return;if(LV.parkJ>0){LV.parkJ--;for(let r=n;r<want;r++)LV_park1(C,true);return}if(LV.fr%15)return;LV_park1(C,LV.fr<30)}
 function LV_park1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);
   // take a car the player cannot see (behind or > 200 m), park it on a street ahead, never on top of a cluster
@@ -226,7 +230,7 @@ function LV_park1(C,far){const N=HUB.nodes,fx=Math.sin(RO.h),fz=Math.cos(RO.h);
     const t=E.s/L,lane=(W/2+.3)/W,x=A.x+(B.x-A.x)*t-(B.z-A.z)/L*lane*W,z=A.z+(B.z-A.z)*t+(B.x-A.x)/L*lane*W;
     if(LV.cl&&LV.cl.L.some(q=>q.on&&(q.x-x)**2+(q.z-z)**2<14*14))continue;if(C.some(o=>o.pk&&(o.x-x)**2+(o.z-z)**2<9*9))continue;if(roamHit(x,z,1.4,groundY(x,z)+.5))continue;if(QS_rampNear(x,z))continue;/* v88z: never park on a ramp run-up */
     if(!far&&LV_seen(x,0,z)&&d<90)continue;if(HT_POP.on&&(far?LV_seen(x,groundY(x,z),z):!HT_canPop(x,z,groundY(x,z))))continue;/* traffic-law-r21m: never park a car into view */
-    Object.assign(cand,{pk:1,pv:cand.pv||cand.v,v:0,cv:0,a:i,b:bi,t,lane,hitT:0,x,z});LV.n.park=(LV.n.park||0)+1;return}}
+    /* parked-jump-r22e29: LV_step runs between CV_pre and CV_post (hubTrafficStep): CV_pre had saved this car's driving speed (CVv) / pose (CVfz) and CV_post wrote them back onto the now PARKED car: it drove off at 16 m/s with pk set, 20-50 m in 2 s */Object.assign(cand,{CVv:null,CVfz:null,RDfz:null,pk:1,pv:cand.pv||cand.v,v:0,cv:0,a:i,b:bi,t,lane,hitT:0,x,z});LV.n.park=(LV.n.park||0)+1;return}}
 // ---------- 9 · roadside pop-up challenges (2K "On-the-Go" style, but no stop): one at a time, ring 45-75 m ahead in your lane
 const LVP={c:null,cd:14,k:0,ok:0,miss:0};
 const LVP_K=[{k:'jump',name:'RAMP JUMP',ico:'🦘',col:'#ff8a1c',lim:9,goal:.9,u:'s air'},{k:'drift',name:'DRIFT ZONE',ico:'🌀',col:'#4ceaff',lim:10,goal:2.5,u:'s drift'},
