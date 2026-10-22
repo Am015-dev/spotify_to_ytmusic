@@ -4,7 +4,7 @@
    a rival that takes you down costs 40 % of your speed (then 15 s grace; each rival rams at most every 20 s) and gets the same 3 s. Final order = finish time minus 3 s per takedown. Hard cap 300 s, so a winner is always declared.
    Phone: no new button (gas default + TURBO from "?" bricks). Flag: ?td=1 shows Mode · Race | Takedown in the Quick Race options (default OFF until a release review passes it).
    GO raceG/takedown (TD_go in 98tk_go.js). */
-const TDR={on:(()=>{try{return new URLSearchParams(location.search).get('td')==='1'}catch(e){return false}})(),sel:false,force:false,BONUS:3,CAP:300};
+const TDR={on:(()=>{try{return OD_FLAG('td')}catch(e){return false}})(),sel:false,force:false,BONUS:3,CAP:300};
 function tdLat(a,P,x,z){const q=tkPosOn(P,Math.max(0,a.s));return{q,lat:(x-q.x)*Math.cos(q.h)-(z-q.z)*Math.sin(q.h)}}
 function tdBurst(x,y,z){const at=V3(x,y+1.2,z),cols=[0xff2d2d,0xffd21c,0x2b7bff,0xffffff].map(c=>new THREE.Color(c));try{xfBurst(at,cols)}catch(e){}try{debris(at,V3(0,4,0),10,cols,.8)}catch(e){}shake=Math.max(shake,.4)}
 // rammer = the car behind, closing faster than 2.5 m/s (a stunned rival goes down on any contact); each pair has a 3 s cool-down

@@ -421,10 +421,8 @@ let TR_bf=0;{const _hg=hubGrid;hubGrid=()=>{if(!TR_bf&&HUB.grp){TR_bf=1;TR_bldFi
 // down the fall line, never stuck); the car stays glued to the terrain (no airborne frames on terrain), never sinks below it
 /* races-3: the slipway is built on top of the raw terrain grade (groundY), whose 0.8 slope at the quay edge dragged the River boat from 14 m/s to a standstill at the slip top (-245,-157). Drag rests on and 6 m past a slip. */
 function TR_onSlip(x,z){for(let _j3=0,_b3=SLIPS;_j3<_b3.length;_j3++){const s=_b3[_j3];const dx=x-s.x,dz=z-s.z;if(dx>50||dx<-50||dz>50||dz<-50)continue;const al=dx*s.tx+dz*s.tz,inw=dx*s.ix+dz*s.iz;if(Math.abs(al)<12&&inw>-6&&inw<32)return true}return false}
-// let-cars-climb-r22e17 (Alex: "no stuck on hills", 2K lets you drive up almost anything): the grip window grows with the gas and speed. Gas held: full grip to 37 deg standing,
-// 40 deg at >= 10 m/s, fading to none at +6 deg (~46 deg max); no gas: the old 29 -> 38 deg. Buildings are colliders, not terrain, so walls stay walls. ?clb=1 turns it on (default OFF).
-let TR_CLB=new URLSearchParams(location.search).get('clb')==='1';   // default OFF until the bughunt bar holds (hill/offroad slides -60 %, no yJump rise)
-function TR_climbWin(){if(!TR_CLB||!CTL||!(CTL.thr||CTL.boost))return[.5,.665];const lo=.64+.06*clamp((RO.v||0)/10,0,1);return[lo,lo+.1]}
+// ?clb (climb window) was deleted r22e28: two lanes (r22e17, r22e18) never met the bar (slides -24 %, yJump up); fixed window below.
+const TR_climbWin=()=>[.5,.665];
 function TR_pre(dt){RO.trSlope=null;const T=roamTerr(RO.x,RO.z,RO.y+.3,_rtG);if(RO.y>T.g+.5||T.deck||T.g<-1.5||TR_onSlip(RO.x,RO.z)){RO.trSl=Math.max(0,(RO.trSl||0)-12*dt);if(!T.deck){const[gx,gz]=TR_grad(RO.x,RO.z,2);TR6_stuck(dt,Math.atan(Math.hypot(gx,gz)))}return}
   const[gx,gz]=TR_grad(RO.x,RO.z,2),s=Math.hypot(gx,gz),th=Math.atan(s),fx=Math.sin(RO.vh??RO.h),fz=Math.cos(RO.vh??RO.h),a=gx*fx+gz*fz;RO.trSlope={gx,gz,th,a};
   const ea=ESC.E.as>0;/* escape-1: assist = slope grip held, gravity x0.2 */RO.v-=9.8*.75*(ea?.2:1)*a/Math.sqrt(1+a*a)*dt;const cw=TR_climbWin(),grip=ea?1:clamp((cw[1]-th)/(cw[1]-cw[0]),0,1);RO.trGrip=grip;

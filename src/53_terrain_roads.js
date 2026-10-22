@@ -151,35 +151,12 @@ const TR_RG=TERR.on&&new URLSearchParams(location.search).get('trg')!=='0';
 function TR_roadsInit(W,force){if(!TR_RG)return;if(CID!=='fra'&&!force)return;  // Athens: graded after AB_auto has extended the dead-end streets (TR_afterExt)
   const T0=performance.now(),R=[];try{for(let _k1=0,_c1=CITY_S,S;_k1<_c1.length&&(S=_c1[_k1],true);_k1++)if(S.r.cls!=='hill'||CID!=='fra')R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2,g:S.r.cls==='hill'?.3:0})
     if(CID==='fra')for(const S of abSamples())R.push({P:S.pts.map(p=>[p.x,p.z]),hw:S.r.w/2});
-    const skip=CID==='fra'?TR_rivSkip:null,pinY=(x,z)=>{for(let _j1=0,_b1=BRIDGES;_j1<_b1.length;_j1++){const b=_b1[_j1];if(Math.abs(x-b.cx)>b.r+30||Math.abs(z-b.cz)>b.r+30)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(c)<b.w&&Math.abs(a)>b.half-5&&Math.abs(a)<b.half+45){const v=deckY(b,Math.sign(a)*b.half);if(v!=null)return v}}return null};if(/trdbg/.test(location.search))W.trSnap={S:CITY_S.slice(),n:CITY_S.map(S=>S.pts.length),p0:CITY_S.map(S=>S.pts[0]),pts:CITY_S.map(S=>S.pts)};W.trg={n:TR_grade(W,R,{skip,pin:CID==='fra'?TR_rivPin:null,flat:W.r+4,g:CID==='fra'?.085:.07,junc:TR_padList()}),ms:0};TR8_fadeRoads(W,R,TR_padList());if(CID!=='fra')TR9_cap(W,R,TR_padList())}catch(e){W.trg={err:String(e)}}W.trg.ms=Math.round(performance.now()-T0);try{TR_bridgeEnds()}catch(e){}}
-// terr-8 (Alex b60 deep bowl, simple route): after grading, the terrain beside every road / filler road / junction or plaza pad is held inside a
-// 26° cone around the nearest road cell's height (|h − H| ≤ d·tan 26°), fully up to 60 m from the road edge, fading out by 120 m (a plain
-// 40 m blend toward road height squeezed tall hills into steeper walls): no basins or walls beside the roads. Acropolis plateau kept.
-// Default OFF (?t8f=1 on, Athens then fits its ground live): pitscan barely moved (fra pits 96→95, steep 118→114; ath 296/597→296/595), so the
-// steep cells beside roads are not in this raster pass (road cut/fill feathers or groundY's own ribbons; FILL_R is not built yet here). Distance + nearest road height by a
-// 2-pass chamfer. River banks (inRiver −25 m) are left alone.
-const TR8_F=60,TR8_K=Math.tan(26*Math.PI/180),TR8_FON=new URLSearchParams(location.search).get('t8f')==='1';if(TR8_FON&&typeof QTC!=='undefined')QTC.ok=false;
-function TR8_fadeRoads(W,R,pads){if(!TR8_FON)return;const T0=performance.now(),{r,nx,nz,h}=W,n=nx*nz,D=new Float32Array(n).fill(1e9),H=new Float32Array(n);
-  const seed=(x0,z0,x1,z1,hw)=>{const i0=Math.max(0,Math.floor((Math.min(x0,x1)-hw-WX0)/r)),i1=Math.min(nx-1,Math.ceil((Math.max(x0,x1)+hw-WX0)/r)),j0=Math.max(0,Math.floor((Math.min(z0,z1)-hw-WZS)/r)),j1=Math.min(nz-1,Math.ceil((Math.max(z0,z1)+hw-WZS)/r));
-    const dx=x1-x0,dz=z1-z0,L2=dx*dx+dz*dz||1;for(let j=j0;j<=j1;j++)for(let i=i0;i<=i1;i++){const x=WX0+i*r,z=WZS+j*r,t=clamp(((x-x0)*dx+(z-z0)*dz)/L2,0,1),d=Math.hypot(x-x0-dx*t,z-z0-dz*t);if(d<=hw){const k=j*nx+i;if(D[k]){D[k]=0;H[k]=h[k]}}}};
-  for(const q of R){const P=q.P;for(let a=0;a<P.length-1;a++)seed(P[a][0],P[a][1],P[a+1][0],P[a+1][1],(q.hw||4))}
-  let FR=[];try{FR=FILL_R||[]}catch(e){}if(CID==='fra')for(const f of FR)seed(f.x0,f.z0,f.x0+f.ux*f.L,f.z0+f.uz*f.L,f.w/2);
-  for(const p of pads||[])seed(p[0],p[1],p[0],p[1],p[2]);
-  const s2=r*Math.SQRT2,rel=(k,k2,c)=>{const d=D[k2]+c;if(d<D[k]){D[k]=d;H[k]=H[k2]}};
-  for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i;if(i)rel(k,k-1,r);if(j){rel(k,k-nx,r);if(i)rel(k,k-nx-1,s2);if(i<nx-1)rel(k,k-nx+1,s2)}}
-  for(let j=nz-1;j>=0;j--)for(let i=nx-1;i>=0;i--){const k=j*nx+i;if(i<nx-1)rel(k,k+1,r);if(j<nz-1){rel(k,k+nx,r);if(i<nx-1)rel(k,k+nx+1,s2);if(i)rel(k,k+nx-1,s2)}}
-  let m=0;for(let j=0;j<nz;j++)for(let i=0;i<nx;i++){const k=j*nx+i,d=D[k];if(d<=0||d>=2*TR8_F)continue;const x=WX0+i*r,z=WZS+j*r;if(WATERS.length&&inRiver(x,z,-25))continue;
-    if(CID!=='fra'&&typeof HILL_BY!=='undefined'&&HILL_BY.akro&&athHill1(HILL_BY.akro,x,z)>0)continue;
-    const lim=TR8_K*d,c=clamp(h[k],H[k]-lim,H[k]+lim);if(c===h[k])continue;const t=clamp((d-TR8_F)/TR8_F,0,1),w=1-t*t*(3-2*t);h[k]+=(c-h[k])*w;m++}
-  W.tr8={fill:FR.length,cells:m,ms:Math.round(performance.now()-T0)}}
+    const skip=CID==='fra'?TR_rivSkip:null,pinY=(x,z)=>{for(let _j1=0,_b1=BRIDGES;_j1<_b1.length;_j1++){const b=_b1[_j1];if(Math.abs(x-b.cx)>b.r+30||Math.abs(z-b.cz)>b.r+30)continue;const[a,c]=deckLocal(b,x,z);if(Math.abs(c)<b.w&&Math.abs(a)>b.half-5&&Math.abs(a)<b.half+45){const v=deckY(b,Math.sign(a)*b.half);if(v!=null)return v}}return null};if(/trdbg/.test(location.search))W.trSnap={S:CITY_S.slice(),n:CITY_S.map(S=>S.pts.length),p0:CITY_S.map(S=>S.pts[0]),pts:CITY_S.map(S=>S.pts)};W.trg={n:TR_grade(W,R,{skip,pin:CID==='fra'?TR_rivPin:null,flat:W.r+4,g:CID==='fra'?.085:.07,junc:TR_padList()}),ms:0};if(CID!=='fra')TR9_cap(W,R,TR_padList())}catch(e){W.trg={err:String(e)}}W.trg.ms=Math.round(performance.now()-T0);try{TR_bridgeEnds()}catch(e){}}
+// ?t8f (terr-8 hill fade near roads) was deleted r22e28: pitscan barely moved (fra 96->95, ath 296->296) and a blend made ath steep worse; nobody owns it.
 // terr-9 (why-2k gap 1, "hills I cannot get out of"): after grading, the ground beside every road, filler road and pad is a slope-limited field: a cell may differ from each neighbour
 // that is closer to the road by at most tan(th(d))*step, th = 18 deg up to 30 m from the road edge, opening to 50 deg by 65 m (the hills stay far away: only the foot of a hill near a road is eased).
 // Cells within TR9_PIN m of a road (the flat shoulder the road surface, kerbs and plots sit on), river cells and the Acropolis footprint are never moved. One pass in ascending distance. ?t9c=0 = the old ground. Athens' ground quadtree cache (QTC, tools/qtdump.js) is re-dumped with this ground.
 const TR9_ON=new URLSearchParams(location.search).get('t9c')!=='0',TR9_PIN=6,TR9_N=72;
-// ath-trap-r22e14 (bughunt: Athens stuck ladder 32/h): trap cells where a car off the road end slides into a bowl (Pedion tou Areos south edge: 33 m drop, 77 -> 44 m).
-// the TR9 cap is TR9_EK = 16 deg out to TR9_N (not 18 -> 50 deg), so the bowl wall next to the road becomes a drivable ramp (bowl floor 44 -> 63-68 m). WIP: default OFF until measured, ?t9e=1 = on
-// (needs a QTC re-dump with it on: node tools/qtdump.js).
-const TR9_EASE={ath:[[1290,-300,140]]},TR9_EK=Math.tan(16*Math.PI/180),TR9_EON=new URLSearchParams(location.search).get('t9e')==='1';
 // r22d6: TR_roadDist + TR9_cap are one generator (TR9_gen) that yields every ~TR9_Y cells of work; a boot step (TR9_step) runs it for ~TR9_B ms and re-queues itself in RFS.S
 // until it is done (fra), Athens (no yield point inside AB_auto) drains it at once. Same operations in the same order, so W.h is bit-identical to the old one-task version. ?t9ch=0 = one task.
 const TR9_CH=new URLSearchParams(location.search).get('t9ch')!=='0',TR9_B=14,TR9_Y=3000;
@@ -203,8 +180,7 @@ function* TR9_gen(W,R,pads){if(!TR9_ON)return;const T0=performance.now(),{r,nx,n
   const KK=new Float32Array(TR9_N+1);for(let d=0;d<=TR9_N;d++){const t=clamp((d-25)/40,0,1);KK[d]=K0+(K1-K0)*t*t*(3-2*t)}
   const NB=[-1,1,-nx,nx,-1-nx,1-nx,nx-1,nx+1],NF=[1,1,1,1,Math.SQRT2,Math.SQRT2,Math.SQRT2,Math.SQRT2];let ch=0;
   // ascending distance: every neighbour that is closer to the road is final when a cell is visited
-  const EZ=TR9_EON&&TR9_EASE[CID]||[];
-  for(let q=0;q<nb;q++){const k=band[q];if(skip[k])continue;const dk=D[k];let w=KK[dk|0]*r;if(EZ.length){const x=WX0+(k%nx)*r,z=WZS+((k/nx)|0)*r;for(const e of EZ)if((x-e[0])**2+(z-e[1])**2<e[2]*e[2]){w=Math.min(w,TR9_EK*r);break}}let lo=-1e9,hi=1e9;
+  for(let q=0;q<nb;q++){const k=band[q];if(skip[k])continue;const dk=D[k];let w=KK[dk|0]*r;let lo=-1e9,hi=1e9;
     for(let e=0;e<8;e++){const u=k+NB[e];if(skip[u]||!(D[u]<dk-.01))continue;const hu=h[u],m=w*NF[e];if(hu-m>lo)lo=hu-m;if(hu+m<hi)hi=hu+m}
     if(lo!==-1e9){const v=h[k],t=lo>hi?(lo+hi)/2:v<lo?lo:v>hi?hi:v;if(t!==v){h[k]=t;ch++}}if(tick(8))yield}
   W.tr9={band:nb,changed:ch,ms:Math.round(performance.now()-T0)}}

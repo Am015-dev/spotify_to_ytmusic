@@ -4,7 +4,7 @@
 // boost: blue-white exhaust jets (one additive Points draw, world-space trail behind the nozzles), a cyan glow sprite per nozzle, a cyan edge vignette
 //   with a flash on boost start, the existing whoosh cue, and the HUD boost bar pulsing while boosting.
 // The Points/Sprite programs are created before the loader's warm-up (ldPrewarm) so nothing links on the first boost. GO why/speedfeel (state asserts).
-const SF_Q=new URLSearchParams(location.search),SF={on:SF_Q.get('sf')!=='0',jit:SF_Q.get('sfj')==='1',/* per-frame shimmer transform: off (re-composites the layer every other frame; ?sfj=1 on) */vgOn:SF_Q.get('sfv')!=='0',op:0,vg:0,fl:0,bE:0,kmh:0,b:false,wasB:false,t:0,ms:0,msN:0,force:null,el:null,vgEl:null,P:null,glow:[],nAlive:0,pull:0,lastPos:[null,null],starts:0};
+const SF_Q=new URLSearchParams(location.search),SF={on:SF_Q.get('sf')!=='0',vgOn:SF_Q.get('sfv')!=='0',op:0,vg:0,fl:0,bE:0,kmh:0,b:false,wasB:false,t:0,ms:0,msN:0,force:null,el:null,vgEl:null,P:null,glow:[],nAlive:0,pull:0,lastPos:[null,null],starts:0};
 const SF_N=40;
 function SF_glowTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);
   r.addColorStop(0,'rgba(255,255,255,1)');r.addColorStop(.25,'rgba(200,245,255,.9)');r.addColorStop(.6,'rgba(60,170,255,.35)');r.addColorStop(1,'rgba(0,60,255,0)');g.fillStyle=r;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c)}
@@ -33,7 +33,6 @@ function SF_cam(dt){if(!SF.on||!SF.el)return;const t0=performance.now();dt=Math.
   const K=typeof fxK==='function'?fxK():1,tgt=(S.kmh<90?0:.3+.4*hi)+(b?.25:0);SF.op+=(Math.min(.75,tgt*K*TUNE.fxLines)-SF.op)*(1-Math.exp(-dt*8));if(SF.op<.004)SF.op=0;
   SF.vg=Math.min(1,(.55*SF.bE+.6*SF.fl)*K);const on=(state==='roam'||state==='race')&&!!pl;
   SF.el.style.opacity=on?SF.op.toFixed(3):'0';SF.vgEl.style.opacity=on&&SF.vgOn?SF.vg.toFixed(3):'0';
-  if(SF.jit&&on&&SF.op>0&&(SF.msN&1)===0)SF.el.style.transform=`rotate(${((Math.random()-.5)*1.2).toFixed(2)}deg) scale(${(1+Math.random()*.035+.03*SF.bE).toFixed(3)})`;
   // pull-back (eased, ≤ 0.9 m) and a fine shake at speed; the game camera sets camera.position from scratch every frame, so nothing accumulates
   if(on){SF.pull+=((.45*hi+.45*SF.bE)-SF.pull)*(1-Math.exp(-dt*3));const sh=(.025*hi+.03*SF.bE)*TUNE.fxShake;camera.translateZ(SF.pull);
     if(sh>0){camera.position.y+=Math.sin(SF.t*53)*sh;camera.position.x+=Math.sin(SF.t*41+1.3)*sh*.7}

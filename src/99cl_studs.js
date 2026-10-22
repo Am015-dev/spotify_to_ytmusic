@@ -4,7 +4,7 @@
 // 3) HUD counter = studs EARNED this visit (TEST_MODE pins the stored total at 999999, so it never ticked) in #roamStuds.
 // Own module so L2 can edit 99cl_loop.js. GO why/studs lives here (99c_checklist.js is at its size cap).
 const CL_ST=(()=>{const m=/[?&]cl=([^&#]*)/.exec(location.search),ks=m?m[1].split(','):[],T=(typeof TUNE!=='undefined'&&TUNE.cl)||{};
- return(ks.includes('studs')||ks.includes('all')||!!T.studs)&&!ks.includes('off')&&CID==='fra'})();
+ return(OD_FLAG('cl.studs')||!!T.studs)&&!ks.includes('off')&&CID==='fra'})();
 const CL_STS={n:0,hud:0,trail:0,big:0,gap:0,names:{},v:5,step:6,up:2.4,r:1.0,
  streets:['kaiser','zeil','fress','berliner','kurt','neuemainzer','ring','gutleut','schweizer']};
 window.__cls=CL_STS;

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Build the game from src/ modules.
-# Usage: tools/build.sh <ver> [--local]
+# Usage: tools/build.sh <ver> [--local] [--preview]
+#   --preview builds into out/<ver>-preview/ with OD_PREVIEW=true (src/10_core.js): every default-OFF feature flag resolved through OD_FLAG is ON (an explicit ?name=0 still wins); prints the list. Nothing is published by it (rule 11: the coordinator publishes the Beta-preview).
 #   -> out/<ver>/overdrive.html + out/<ver>/km.js + out/<ver>/models.js  (the split deploy set; deploy.sh copies all three)
 #   -> out/<ver>/index.html                          (exactly what deploy.sh writes into games/mainhattan-overdrive/)
 #   --local also writes ./overdrive.html (= the split page + src/test/*.js test-only modules, e.g. ?fast=1) and runs P.py's save() so local.html,
@@ -8,7 +9,8 @@
 # Concatenation only: no minify, no rewrite. src/ORDER is the module order; every src/*.js|*.html must be listed.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-VER="${1:?usage: tools/build.sh <ver> [--local]}"; OUT="out/$VER"; mkdir -p "$OUT"
+VER="${1:?usage: tools/build.sh <ver> [--local] [--preview]}"; PREVIEW=0; LOCAL=0; for a in "${@:2}"; do [ "$a" = --preview ] && PREVIEW=1; [ "$a" = --local ] && LOCAL=1; done
+OUT="out/$VER"; [ $PREVIEW = 1 ] && OUT="out/$VER-preview"; mkdir -p "$OUT"
 for f in src/*.js src/*.html; do grep -qx "$(basename "$f")" src/ORDER src/MODELS || { echo "BUILD FAIL: $f not in src/ORDER or src/MODELS"; exit 1; }; done
 python3 tools/modmap.py || echo "WARN: modmap failed (docs/MODULES.md not refreshed)"   # keep docs/MODULES.md in step with src/
 # lazy code chunks (src/LAZY, split-1): modules that are still in ORDER (dev tools keep working) but are NOT in the page; packed to out/<ver>/xc/<name>.js, evaluated after drivable (src/10z_lazy.js)
@@ -33,13 +35,18 @@ if ls src/assets/music/*.mp3 >/dev/null 2>&1; then mkdir -p "$OUT/music"; cp src
 for n in $(grep -o "^const MUS_FILES=\[[^]]*\]" src/98m_music.js | grep -o "'[a-z_0-9]*'" | tr -d "'"); do [ -f "src/assets/music/$n.mp3" ] || { echo "BUILD FAIL: MUS_FILES lists $n but src/assets/music/$n.mp3 is missing"; exit 1; }; done
 # live page shell (head) + body + tail: identical to what tools/deploy.sh writes
 cat src/assets/shell_head.html > "$OUT/index.html"; cat "$OUT/overdrive.html" >> "$OUT/index.html"; printf '</body></html>' >> "$OUT/index.html"
+if [ $PREVIEW = 1 ]; then   # OD_PREVIEW=true in the page (and in every lazy chunk that carries the constant)
+  for f in "$OUT/overdrive.html" "$OUT/index.html" "$OUT"/xc/*.js; do [ -e "$f" ] && sed -i 's/^const OD_PREVIEW=false;/const OD_PREVIEW=true;/' "$f"; done
+  grep -q '^const OD_PREVIEW=true;' "$OUT/overdrive.html" || { echo "BUILD FAIL: OD_PREVIEW not flipped"; exit 1; }
+  echo "PREVIEW flags forced ON: $(grep -ohE "OD_FLAG\('[a-zA-Z0-9_.]+'\)" src/*.js | sed -E "s/OD_FLAG\('(.*)'\)/\1/" | sort -u | tr '\n' ' ')"
+fi
 grep -q 'ALL_OPEN=true' "$OUT/overdrive.html" || { echo "BUILD FAIL: ALL_OPEN=true missing"; exit 1; }
 grep -q 'by Alex' "$OUT/overdrive.html" || { echo "BUILD FAIL: credits missing"; exit 1; }
 python3 - "$OUT/overdrive.html" <<'PY'
 import re,sys;s=open(sys.argv[1],encoding='utf8').read();m=re.search(r'<script type="module">(.*?)</script>',s,re.S);open('/tmp/_od_chk.mjs','w').write(m.group(1))
 PY
 node --check /tmp/_od_chk.mjs || { echo "BUILD FAIL: syntax"; exit 1; }
-if [ "${2:-}" = "--local" ]; then   # dev pages: the deploy page + test-only modules (src/test/*.js, inert without their URL flag) before 99_api.js
+if [ $LOCAL = 1 ]; then   # dev pages: the deploy page + test-only modules (src/test/*.js, inert without their URL flag) before 99_api.js
   ( cd src && for f in $XC_ORDER; do [ "$f" = 99_api.js ] && cat test/*.js 2>/dev/null; cat "$f"; done ) | XCV="$XCV" python3 tools/lazy/inject.py > overdrive.html
   rm -rf xc; [ -d "$OUT/xc" ] && cp -r "$OUT/xc" xc
   cp "$OUT/km.js" km.js;cp "$OUT/models.js" models.js;rm -rf models;cp -r "$OUT/models" models;[ -f "$OUT/tune.json" ] && cp "$OUT/tune.json" tune.json;[ -d "$OUT/music" ] && mkdir -p music && cp "$OUT"/music/*.mp3 music/; python3 -c "exec(open('P.py' if __import__('os').path.exists('P.py') else 'attic/P.py').read());save()"; node --check chk.mjs || { echo "BUILD FAIL: local syntax"; exit 1; }; fi

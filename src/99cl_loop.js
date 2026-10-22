@@ -6,7 +6,7 @@
 // GO why/core (state asserts).
 const CL=(()=>{const m=/[?&]cl=([^&#]*)/.exec(location.search),ks=m?m[1].split(','):[],T=(typeof TUNE!=='undefined'&&TUNE.cl)||{};
  return{box:[-1100,470,-720,800],spawn:[-120,100],out:+((/[?&]clout=([\d.]+)/.exec(location.search)||[])[1]??.6),car:+((/[?&]clcar=([\d.]+)/.exec(location.search)||[])[1]||.08),carNear:+((/[?&]clnear=(\d+)/.exec(location.search)||[])[1]??3),
-  core:(ks.includes('core')||ks.includes('all')||!!T.core)&&!ks.includes('off'),smash:(ks.includes('smash')||ks.includes('all')||T.smash!==false)&&!ks.includes('off')&&!ks.includes('nosmash'),sm:{small:14.9,big:29.9,bricks:20,studs:3,stop:.05},sn:0,pi:0,pn:0,thin:0,T:[],cars:0,peds:0,sp:0}})();
+  core:(OD_FLAG('cl.core')||!!T.core)&&!ks.includes('off'),smash:(ks.includes('smash')||ks.includes('all')||T.smash!==false)&&!ks.includes('off')&&!ks.includes('nosmash'),sm:{small:14.9,big:29.9,bricks:20,studs:3,stop:.05},sn:0,pi:0,pn:0,thin:0,T:[],cars:0,peds:0,sp:0}})();
 const CL_CORE=CL.core&&CID==='fra';
 const CL_SMASH=CL.smash&&CID==='fra';
 const CL_in=(x,z)=>x>=CL.box[0]&&x<=CL.box[1]&&z>=CL.box[2]&&z<=CL.box[3];
