@@ -59,6 +59,38 @@ Numbers: `python3 games-src/nightrun/layer-scan.py <cov.json>` (cov.json = `COVE
 | saves, stamp, polish, hub | = | RET.SV/save; ART.hue/pic/put, READ.pc +7; RET.titleDraw, gaDraw | DEL-OFF |
 | (no flag) | athens*, ai, meta, shapes, g, wpx, lab, tut, h, upgrades, up2, strategy | spawnBoss, drawBG*, draw*, SH.*, PW.*, WP.* | inline (step 3) |
 
+### 2b. Layers added since 21 Oct (22 Oct 2026 scan; all default ON unless noted; none has a Nightrun test-free path)
+
+| flag | part | what it does | default | decision |
+|---|---|---|---|---|
+| explain | explain | every visual explained: captions, EXP.TXT | ON | DEL-OFF (explain-test needs `&nocaps=0` to see captions: rework first) |
+| exp10 | explain | review-10 captions (wrapped, off the HUD, pause list) | ON | DEL-OFF with explain |
+| nolist | explain | the pause-screen text list is hidden (list code is now dead) | ON | DEL-OFF + delete the list block |
+| legible | legible | bullets/pickups/foes readable: halo, core line, dim; wraps drawEnemy, READ.dim/bullets, SPR.foe, PW.pickup | ON | DEL-OFF (many refs in art, bg, draw, foeart, readable) |
+| calm | calm | one banner chip per rule, boss tags, no ready-chip over a boss | ON | **removed (batch 1)** |
+| nocaps | nocaps | no stage captions while playing | ON | KEEP for now: explain-test and others open `&nocaps=0` as a mode |
+| waves | waves | stages 1-6 play named waves | ON | **removed (batch 1)** |
+| bandclear | bandclear | nothing rests under the portrait score strip | ON | **removed (batch 1)** |
+| zonehint | zonehint | one caption for the purple dashed zone circles | ON | **removed (batch 1)** |
+| school, schoolfull | school, schoolfull | Flight School drills; full 3-round version | ON | KEEP: lessons-test and school-test run `&schoolfull=0` as their fast mode |
+| diet | diet | caps on objects per frame, no wide rings | ON | **removed (batch 1)** (diet-test still compares against `?diet=0`: needs a fixed budget instead) |
+| menufix | menufix (+ret, stats, map) | hangar 5 tabs + MORE, no decoration glyphs | ON | **removed (batch 2)** |
+| first30 | bossvis (+b, draw, bossmoves, bossplay, density, saga) | first 30 s of stage 1, boss visuals (24 refs) | ON | DEL-OFF later (24 refs, 3 tests) |
+| footq | footq (+art, footart, footstage) | on-foot canvas scale/quality | ON | **removed (batch 2)** |
+| bulletart | bulletart (+readable) | painted bullets | ON | **removed (batch 2)** |
+| layout, layoutStrip! | layout | portrait layout; `strip=1` is default OFF | ON / OFF | layout DEL-OFF later; layoutStrip OWNER |
+| tidy | tidy (+streetlook) | Settings page tidy, street hook | ON | **removed (batch 2)** |
+| mix | mix | audio mix graph, compressor, voice caps | ON | **removed (batch 2)** |
+| calmsfx | mix | no PERFECT sting | ON | DEL-OFF later |
+| hudband | formations | portrait HUD band keeps formations clear | ON | DEL-OFF later |
+| garagefix, easy2, pwrclear | hub, legend, abup | small fixes | ON | DEL-OFF later |
+| stay | - | NOT merged (no flag, no part in the tree) | - | nothing to do |
+
+Also removed in batch 3 (older layers): roster (fun/dir), strike2 and scale2 (fair, hard), boss2 (armour), stamp.
+**Test-mode flags that must be reworked before they can go:** deck, mustmove, songspread, vary, vary2, variants, remix (fleet-, fun-, zoo-, sprites-, ret-dpool-test open them as `=0` to get the old deterministic spawns), schoolfull, nocaps, react, reward.
+
+**Baselines (22 Oct 2026, 09:45 UTC, before DEL-OFF):** `fingerprints.json` re-baselined (3 identical runs, 8/8). `node qa/simhunt.js` (285 runs, 76 issue kinds, 0 page errors, 2 severe kinds): **simhunt is NOT run-to-run deterministic** (real-time wobble: two baseline runs gave 69 and 67 unexplained-death runs, hudband 3 and 3; per-run kill counts differ in 259 of 285 runs). Gate used: same 2 severe kinds, 0 page errors, no new kind, counts inside the 61-69 / 3-4 band.
+
 62 default-ON flags have a test using `?x=0` ("flag off = as before"); those halves retire with DEL-OFF, the fingerprint replaces them.
 
 ## 3. Competing implementations (who wins which knob)
