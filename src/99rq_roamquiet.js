@@ -5,7 +5,7 @@ const RQ={a:null,no:new Map()};
 function RQ_el(){return OG_el('rqAsk')}
 function RQ_hide(cool){const a=RQ.a;RQ.a=null;RQ_el().hidden=true;if(a&&cool)RQ.no.set(a.m,performance.now()+25000)}
 function RQ_offer(m){if(RQ.a||RO.card||OG.ask||(RQ.no.get(m)||0)>performance.now())return;const el=RQ_el();
- el.innerHTML=`${m.kind==='garage'?'🔧':m.kind==='flight'?'✈':'📍'} ${markTitle(m).toUpperCase()} · TAP TO OPEN`;
+ el.innerHTML=`${m.kind==='garage'?'🔧':m.kind==='flight'?'✈':'📍'} ${markTitle(m).replace(/^[✈🔧📍]\s*/u,'').toUpperCase()} · TAP TO OPEN`;
  el.onclick=e=>{e.stopPropagation();RQ_go()};el.ontouchstart=ev=>{ev.preventDefault();ev.stopPropagation();RQ_go()};el.hidden=false;RQ.a={m,t:7};try{OG_snd('pick')}catch(e){}}
 function RQ_go(){const a=RQ.a;if(!a)return false;RQ_hide(true);if(state!=='roam'||RO.card||RO.ch||(RO.sp&&!RO.sp.done))return false;roamOpen(a.m);RO.cardPin=1;return true}
 function RQ_step(dt){const a=RQ.a;if(!a)return;a.t-=dt;if(a.t<=0||RO.card||RO.ch||RO.sp||RO.mapOpen||state!=='roam'||Math.hypot(a.m.x-RO.x,a.m.z-RO.z)>40)RQ_hide(true)}
@@ -27,7 +27,16 @@ async function RQ_go_test(){const R=[],ck=(m,b)=>R.push((b?'✓ ':'✗ ')+m),vis
   let cardAt=-1,chipAt=-1;for(let i=0;i<150;i++){roamStep(1/30);RO.v=0;if(cardAt<0&&(RO.card||vis($('#roamCard'))))cardAt=i;if(chipAt<0&&vis(RQ_el()))chipAt=i}
   ck(kind+' marker, stopped 5 s: no card (seen at '+cardAt+'), chip "'+RQ_el().textContent.trim().slice(0,32)+'" shown at '+chipAt,cardAt<0&&chipAt>=0&&vis(RQ_el())||cardAt<0&&chipAt>=0);
   const tap=RQ_go();ck(kind+': tap on the chip opens the card ('+tap+', card '+!!RO.card+', chip hidden '+!vis(RQ_el())+')',tap&&!!RO.card&&vis($('#roamCard'))&&!vis(RQ_el()));
-  RO.card=null;$('#roamCard').hidden=true}}
+  RO.card=null;$('#roamCard').hidden=true}
+ {const fm=typeof flightMark==='function'?flightMark():null;RO.ch=null;RO.sp=null;RO.card=null;RQ_hide(false);RQ.no.clear();
+  if(!fm)ck('flight chip: no flight marker in this city (skipped)',true);
+  else{RQ_offer(fm);const t=RQ_el().textContent.trim();ck('flight chip "'+t+'" has exactly one ✈ ('+(t.split('✈').length-1)+')',vis(RQ_el())&&t.split('✈').length-1===1);RQ_hide(false)}
+  const m=(RO.marks||[]).find(q=>q.kind==='garage'&&!markLocked(q)),sp=OG.S&&OG.S.find(q=>q.k==='ev'&&!OG_blocked(q));
+  if(!m||!sp)ck('chip overlap: no garage or event spot (skipped)',true);
+  else{OG.ask&&OG_askHide();OG.noAsk={};RQ.no.clear();RQ_offer(m);const up=vis(RQ_el());OG_ask(sp);const n=[RQ_el(),OG_el('ogAsk')].filter(vis).length;
+   ck('event ask while the marker chip is up: exactly one chip visible ('+n+', marker chip was up '+up+', event chip '+vis(OG_el('ogAsk'))+')',up&&n===1&&vis(OG_el('ogAsk')));
+   OG_askHide();OG.noAsk={};RQ_offer(m);OG_ask(sp);const n2=[RQ_el(),OG_el('ogAsk')].filter(vis).length;ck('marker chip offered while the event chip is up: still one chip ('+n2+')',n2===1);
+   OG_askHide();OG.noAsk={};RQ_hide(false);RQ.no.clear()}}}
  catch(e){R.push('✗ rq threw '+e)}
  finally{RO.x=sv.x;RO.z=sv.z;RO.h=RO.vh=sv.h;RO.v=0;RO.ch=sv.ch;RO.card=sv.card;RO.sp=sv.sp;RO.cool=sv.cool;RO.y=groundAt(RO.x,RO.z,99);camSnap=true;RQ_hide(false);RQ.no.clear();if(!sv.card)$('#roamCard').hidden=true}
  return R.join(' · ')}
