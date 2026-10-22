@@ -1,0 +1,5 @@
+# HANDOFF invisible-stops-r22e19 (tools/bughunt.js only; no game code changed)
+1. bughunt now logs the cause of every >5 m/s single-write speed drop (debug accessor on RO.v, stack top 3 frames) and prints `INFO invisible <city> n (x/h) <fn:line < ...>` per reason; the cell JSON carries `why`.
+2. Finding: nearly all "invisible" stops were traffic-car contacts the detector mis-filed (nearCar skipped cars < 3 m, parked/dead, and cars thrown out of range in the same step): HT_smash, W10_bump, NC_sep = 15 of 18 hits in the first baseline. Also roamWarp (teleport) and roamBounce (collider, now probed at 0/-1.5 m and the previous position).
+3. Same game build (src untouched), old detector 18 hits/222 sim-min (4.9/h) -> corrected detector 4 hits/294 sim-min (0.8/h; fra 168 min, ath 126 min). Left: 3x "no single drop write" (spread over several writes, fra) and 1x LIFE_slide (98l? LIFE_hit, fra). No invisible collider found in 71/98xf/99c6; no game code removed, since nothing drawn-less was proven.
+4. Next: if invisible must reach <1/h in fra, log the multi-write case (sum of drops per step, with the writer list) and LIFE_slide's target.

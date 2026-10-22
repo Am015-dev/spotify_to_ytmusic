@@ -29,6 +29,8 @@ const cell=(x,z)=>Math.floor(x/25)+','+Math.floor(z/25);
 const add=(det,desc,x,z,y,extra)=>{x=x??RO.x;z=z??RO.z;y=y??RO.y;BH.cnt[det]=(BH.cnt[det]||0)+1;const k=det+'|'+cell(x,z);const c=BH.cells[k];if(c){c.n++;return}
  BH.cells[k]={det,n:1,t:+BH.t.toFixed(1),seed:BH.seed,city:CID,x:+x.toFixed(1),y:+(+y).toFixed(1),z:+z.toFixed(1),h:+RO.h.toFixed(2),kmh:Math.round(Math.abs(RO.v)*3.6),act:BH.act,mode:BH.mode||'',desc,repro:'?test='+CID+'&at='+Math.round(x)+','+Math.round(z)+' seed '+BH.seed+' t '+BH.t.toFixed(0)+' s',...(extra||{})}};
 BH.add=add;
+// invisible-stops-r22e19: debug-only accessor on RO.v (this tool only, no game code): every single write that drops the speed by > 5 m/s records the call stack, so an invisible stop names the clamp that did it
+{let _v=RO.v;BH.vl=null;BH.why={};Error.stackTraceLimit=14;Object.defineProperty(RO,'v',{configurable:true,enumerable:true,get(){return _v},set(n){const d=Math.abs(_v)-Math.abs(n);if(d>5&&BH.on){const fr=(new Error().stack||'').split('\n').slice(2,9).map(l=>{const m=/at\s+(\S+)?\s*\(?.*?:(\d+):(\d+)\)?\s*$/.exec(l);return m?(m[1]||'anon')+':'+m[2]+':'+m[3]:l.trim().slice(0,40)});if(!BH.vl||d>BH.vl.d)BH.vl={d,f:fr}}_v=n}})}
 // messages: BACK ON THE ROAD and every toast the player sees
 const wrapMsg=(name,ti)=>{try{const f=eval(name);if(typeof f!=='function')return;const __w=function(){try{const s=[...arguments].slice(0,ti+1).filter(a=>typeof a==='string').join(' ').trim();if(s&&BH.on){BH.msgs[s]=(BH.msgs[s]||0)+1;if(/^UNSTUCK/.test(s))add('unstuck','UNSTUCK auto-reverse');if(/BACK ON THE ROAD/.test(s)&&BH.t-(BH.borT||-9)>1.5){BH.borT=BH.t;BH.borP=1;add('backOnRoad','re-placed: '+s.slice(0,60))}}}catch(e){}return f.apply(this,arguments)};eval(name+'=__w')}catch(e){}};
 wrapMsg('say',1);wrapMsg('feed',0);
@@ -43,6 +45,7 @@ const popScan=()=>{const now=new Set();let big=[];try{big=[...document.querySele
  BH.popSeen=now};
 // ---------- autoplayer ----------
 const keys=()=>{for(const k in K)K[k]=false};
+/* invisible-stops-r22e19: a contact with ANY traffic car counts as an NPC hit (the old nearCar skipped cars closer than 3 m, parked and dead ones: HT_smash/W10_bump/NC_sep stops were filed as invisible) */const nearAny=R=>{for(const c of HUB.cars)if(Math.hypot(c.x-RO.x,c.z-RO.z)<R&&Math.abs((c.y||RO.y)-RO.y)<4)return c;for(const[c,q]of CP)if(Math.hypot(q.x-RO.x,q.z-RO.z)<R||Math.hypot(q.x-P.x,q.z-P.z)<R)return c;/* a smashed car is thrown/recycled out of range in the same step: use where it was one step ago */return null};
 const nearCar=(R)=>{let b=null,bd=R;for(const c of HUB.cars){if(c.dead>0||c.pk)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<bd&&d>3){bd=d;b=c}}return b};
 const steerTo=a=>{const e=Math.atan2(Math.sin(a-RO.h),Math.cos(a-RO.h));K.ArrowRight=e>.08;K.ArrowLeft=e<-.08;return e};   // RO.h grows to the right: sin(h),cos(h) is forward
 const groundY=(x,z)=>{try{return roamTerr(x,z,999).g}catch(e){return 0}};
@@ -65,7 +68,7 @@ const drive=dt=>{const m=BH.mode;BH.mT+=dt;keys();BH.gas=false;
  else if(m==='reverse'){K.ArrowUp=false;BH.gas=false;K.ArrowDown=true;K.ArrowLeft=BH.dir<0;K.ArrowRight=BH.dir>0}};
 // ---------- detectors ----------
 const P={x:RO.x,y:RO.y,z:RO.z,v:RO.v},CP=new Map();let ovl=new Map(),belowN=0,stuckT=0,stuckOn=false;
-const detect=dt=>{const x=RO.x,y=RO.y,z=RO.z,foot=RO.foot&&RO.foot!=='car',busy=RO.frozen||RO.card||RO.mapOpen||RO.wk||state!=='roam';
+const detect=dt=>{const VL=BH.vl;BH.vl=null;const x=RO.x,y=RO.y,z=RO.z,foot=RO.foot&&RO.foot!=='car',busy=RO.frozen||RO.card||RO.mapOpen||RO.wk||state!=='roam';
  const mv=Math.hypot(x-P.x,z-P.z),warp=mv>12||BH.t-(BH.warp||-99)<1.5;if(mv>12)BH.warp=BH.t;
  if(!isFinite(x+y+z+RO.v+RO.h))add('nan','player NaN x/y/z/v/h',0,0,0);
  if(x<WX0+5||x>WX1-5||z<WZS+5||z>WZN-5)add('bounds','player out of the world box');
@@ -77,9 +80,9 @@ const detect=dt=>{const x=RO.x,y=RO.y,z=RO.z,foot=RO.foot&&RO.foot!=='car',busy=
   if(BH.gas){BH.gasT+=dt;if(gs<10/3.6)BH.slowT+=dt;if(gs<3/3.6){stuckT+=dt;if(stuckT>2&&!stuckOn){stuckOn=true;add('stuck','gas held, < 3 km/h for 2 s (mode '+BH.mode+')')}}else{stuckT=0;stuckOn=false}}else{stuckT=0;stuckOn=false}
   // contacts: a speed drop of > 6 m/s in one step without the brake
   const dv=Math.abs(P.v)-Math.abs(RO.v);
-  if(!warp&&dv>6&&!K.ArrowDown){const c=nearCar(8),fx=Math.sin(RO.h),fz=Math.cos(RO.h);
-   if(c){BH.hits.npc++}else{let b=null;for(const r of[1.5,2.5,3.5]){try{b=roamHit(x+fx*r,z+fz*r,1.4,y)}catch(e){}if(b)break}
-    if(b){BH.hits.world++}else{const g2=groundY(x+fx*3,z+fz*3);if(g2-y<.6){BH.hits.invisible++;add('invisible','stopped by nothing: -'+(dv*3.6).toFixed(0)+' km/h in one step, no NPC, no collider, no slope ahead')}}}}}
+  if(!warp&&dv>6&&!K.ArrowDown&&!(VL&&VL.f.some(f=>f.startsWith('roamWarp:')))){const c=nearAny(8),fx=Math.sin(RO.h),fz=Math.cos(RO.h);
+   if(c){BH.hits.npc++}else{let b=null;for(const r of[0,1.5,2.5,3.5,-1.5]){try{b=roamHit(x+fx*r,z+fz*r,1.4,y)}catch(e){}if(b)break}if(!b){try{b=roamHit(P.x,P.z,1.4,P.y)}catch(e){}}
+    if(b){BH.hits.world++}else{const g2=groundY(x+fx*3,z+fz*3);if(g2-y<.6){BH.hits.invisible++;const wk=VL?VL.f.slice(0,3).join(' < '):'(none: speed changed without a single drop write)';BH.why[wk]=(BH.why[wk]||0)+1;add('invisible','stopped by nothing: -'+(dv*3.6).toFixed(0)+' km/h in one step, no NPC, no collider, no slope ahead; reason '+wk,undefined,undefined,undefined,{why:VL?VL.f:null})}}}}}
  const NDG=(c,p)=>{const f=v=>typeof v==='number'?+v.toFixed(2):v;return{dg:{a:c.a,b:c.b,t:f(c.t),cv:f(c.cv),hh:f(c.hh),yo:f(c.yo),lr:[f(c.lrx),f(c.lrz)],route:!!c.route,tr:!!c.tr,hitT:f(c.hitT),deS:c.deS,hold:f(c.hold),fdt:f(c.fdt),dx:p?f(c.x-p.x):null,dz:p?f(c.z-p.z):null,p:p?{a:p.a,b:p.b,t:f(p.t),cv:f(p.cv),hh:f(p.hh),yo:f(p.yo),lr:[f(p.lrx),f(p.lrz)],mx:f(p.mx),mz:f(p.mz),dead:f(p.dead)}:null,act:BH.act}}};
  // stuck ladder / UNSTUCK cells (ath-trap-r22e14): where the ladder fires, so the trap geometry can be found
  try{const S=SKH.cnt;for(const k of['rev','lift']){const n=S[k]|0,o=BH['skh_'+k]??n;if(n>o)k==='lift'?add('skh_lift','stuck ladder lift (from here)',P.x,P.z,P.y):add('skh_rev','stuck ladder reverse-assist');BH['skh_'+k]=n}}catch(e){}
@@ -115,7 +118,7 @@ BH.run=(ms,max)=>{const t0=performance.now();let n=0;BH.on=true;
  BH.on=false;keys();return n};
 BH.release=()=>{window.requestAnimationFrame=BH.raf0;for(const cb of BH.q)BH.raf0(cb);BH.q=[];BH.raf0(BH.F());keys()};
 BH.capture=()=>{window.requestAnimationFrame=cb=>{if(cb!==BH.F())BH.q.push(cb);return 1}};
-BH.report=()=>({ldWait:BH.ldWait||0,t:BH.t,km:BH.km,cnt:BH.cnt,gasT:BH.gasT,slowT:BH.slowT,hits:BH.hits,acts:BH.acts,cells:Object.values(BH.cells),msgs:Object.entries(BH.msgs).sort((a,b)=>b[1]-a[1]).slice(0,25),xcErr:(()=>{try{return XC.err.slice(0,10)}catch(e){return[]}})(),skh:(()=>{try{return SKH.cnt}catch(e){return null}})(),sl:BH.sl||{},mT:BH.mT2||{}});
+BH.report=()=>({why:BH.why,ldWait:BH.ldWait||0,t:BH.t,km:BH.km,cnt:BH.cnt,gasT:BH.gasT,slowT:BH.slowT,hits:BH.hits,acts:BH.acts,cells:Object.values(BH.cells),msgs:Object.entries(BH.msgs).sort((a,b)=>b[1]-a[1]).slice(0,25),xcErr:(()=>{try{return XC.err.slice(0,10)}catch(e){return[]}})(),skh:(()=>{try{return SKH.cnt}catch(e){return null}})(),sl:BH.sl||{},mT:BH.mT2||{}});
 return 'ok'})()`;
 
 // ---------- touch taps (real Playwright touch on the real buttons, rAF released) ----------
@@ -156,9 +159,9 @@ async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const 
  const cities=CITY==='both'?['fra','ath']:[CITY],wallEnd=T0+Math.max(30,BUDGET-(SHOTS?60*Math.ceil(SHOTS/4):0)-15)*1000;
  const jobs=[];for(const c of cities)for(let i=0;i<PAGES;i++)jobs.push(cityRun(b,base,c,HOURS*3600/PAGES,wallEnd,i).catch(e=>({city:c,fail:String(e).slice(0,200)})));
  const runs=await Promise.all(jobs);const res={};let fails=0;
- for(const r of runs){if(r.fail){console.log('FAIL boot '+r.city+' '+r.fail);fails++;continue}const C=res[r.city]=res[r.city]||{t:0,km:0,cnt:{},gasT:0,slowT:0,hits:{npc:0,world:0,invisible:0},cells:[],msgs:{},taps:[],errs:[],nErr:0,steps:0,episodes:0,boot:[],xcErr:[],acts:{},skh:[],sl:{},mT:{}};
+ for(const r of runs){if(r.fail){console.log('FAIL boot '+r.city+' '+r.fail);fails++;continue}const C=res[r.city]=res[r.city]||{t:0,km:0,cnt:{},gasT:0,slowT:0,hits:{npc:0,world:0,invisible:0},cells:[],msgs:{},taps:[],errs:[],nErr:0,steps:0,episodes:0,boot:[],xcErr:[],acts:{},skh:[],sl:{},mT:{},why:{}};
   C.t+=r.t;C.km+=r.km;C.gasT+=r.gasT;C.slowT+=r.slowT;C.steps+=r.steps;C.episodes+=r.episodes;C.boot.push(r.boot);C.cells.push(...r.cells);C.taps.push(...r.taps);C.errs.push(...r.pageErrs);C.nErr+=r.nPageErr;C.xcErr.push(...r.xcErr);C.skh.push(r.skh);
-  for(const k in r.cnt)C.cnt[k]=(C.cnt[k]||0)+r.cnt[k];for(const k in r.hits)C.hits[k]+=r.hits[k];for(const[m,n]of r.msgs)C.msgs[m]=(C.msgs[m]||0)+n;for(const k in r.acts)C.acts[k]=(C.acts[k]||0)+r.acts[k];for(const k in r.sl||{})C.sl[k]=(C.sl[k]||0)+r.sl[k];for(const k in r.mT||{})C.mT[k]=(C.mT[k]||0)+r.mT[k]}
+  for(const k in r.cnt)C.cnt[k]=(C.cnt[k]||0)+r.cnt[k];for(const k in r.hits)C.hits[k]+=r.hits[k];for(const k in r.why||{})C.why[k]=(C.why[k]||0)+r.why[k];for(const[m,n]of r.msgs)C.msgs[m]=(C.msgs[m]||0)+n;for(const k in r.acts)C.acts[k]=(C.acts[k]||0)+r.acts[k];for(const k in r.sl||{})C.sl[k]=(C.sl[k]||0)+r.sl[k];for(const k in r.mT||{})C.mT[k]=(C.mT[k]||0)+r.mT[k]}
  const lines=[];
  for(const city in res){const C=res[city],h=Math.max(C.t,1)/3600;C.cnt.jsErr=(C.cnt.jsErr||0)+C.nErr+C.xcErr.length;C.cnt.deadButton=C.taps.filter(t=>!t[1]).length;C.frustration=C.gasT?100*C.slowT/C.gasT:0;C.perH={};
   for(const d in LIMIT){const n=d==='frustration'?C.frustration:(C.cnt[d]||0),ph=d==='frustration'?n:n/h,abs=['nan','bounds','jsErr','belowGround','yJump','launch','deadButton'].includes(d);C.perH[d]=+ph.toFixed(2);
@@ -166,6 +169,7 @@ async function shots(b,base,cells,dir){fs.mkdirSync(dir,{recursive:true});const 
   lines.push(`INFO ${city} npc sideways by the old c.hh reading ${C.cnt.npcLatHH||0} vs step-velocity ${C.cnt.npcLateral||0}`);lines.push(`INFO ${city} sim ${(C.t/60).toFixed(1)} min (${(C.t/3600).toFixed(2)} of ${HOURS} h target) · ${C.km.toFixed(1)} km · ${C.steps} steps @ dt ${DT} · ${C.episodes} seeds · contacts/km npc ${(C.hits.npc/Math.max(C.km,.1)).toFixed(2)} world ${(C.hits.world/Math.max(C.km,.1)).toFixed(2)} invisible ${(C.hits.invisible/Math.max(C.km,.1)).toFixed(2)} · boot ${C.boot.map(x=>x.toFixed(0)).join('/')} s`);
   {const sk=C.skh.reduce((a,q)=>a+((q&&q.rev)|0)+((q&&q.lift)|0),0),un=C.msgs.UNSTUCK|0,bo=C.cnt.backOnRoad|0;lines.push(`INFO trap ${city} ladder ${(sk/h).toFixed(1)}/h · UNSTUCK ${(un/h).toFixed(1)}/h · BACK ON THE ROAD ${(bo/h).toFixed(1)}/h · sum ${((sk+un+bo)/h).toFixed(1)}/h`)}
   {const by={},wy={};for(const k in C.sl){const[m,w]=k.split('|');by[m]=(by[m]||0)+C.sl[k];wy[w]=(wy[w]||0)+C.sl[k]}lines.push(`INFO slope ${city} slides ${C.cnt.slopeSlide|0} = ${((C.cnt.slopeSlide|0)/h).toFixed(1)}/h · per mode `+Object.keys(by).sort().map(m=>`${m||'-'} ${by[m]} (${(by[m]/Math.max(C.mT[m]||1,1)*3600).toFixed(0)}/mode-h)`).join(', ')+` · by clamp `+Object.entries(wy).map(([w,n])=>w+' '+n).join(', ')+` · wallClimb ${C.cnt.wallClimb|0} · yJump ${C.cnt.yJump|0} · belowGround ${C.cnt.belowGround|0}`)}
+  for(const[k,n]of Object.entries(C.why).sort((x,y)=>y[1]-x[1]).slice(0,8))lines.push(`INFO invisible ${city} ${n}x (${(n/h).toFixed(1)}/h) ${k}`);
   for(const t of C.taps)if(!t[1])lines.push(`  dead button ${city}: ${t[0]} · ${t[2]}`)}
  let shotList=[];
  if(SHOTS){const all=Object.values(res).flatMap(C=>C.cells).filter(c=>!['jsErr','nan'].includes(c.det)).sort((a,b)=>b.n-a.n),pick=[],seen=new Set();for(const c of all){const k=c.city+Math.floor(c.x/60)+','+Math.floor(c.z/60);if(seen.has(k))continue;seen.add(k);pick.push(c);if(pick.length>=SHOTS)break}
