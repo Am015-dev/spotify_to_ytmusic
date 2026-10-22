@@ -76,7 +76,7 @@ if(PWX.on){
     if(PWX.recent(k)||PWX.K[k]){const ok=Object.keys(PWK).filter(q=>!PWX.recent(q)&&!PWX.K[q]&&q!=='drop'&&(!PWK[q].need||(window.GA&&GA.own&&GA.own[PWK[q].need])));if(ok.length)k=ok[Math.floor(gx(0,ok.length))%ok.length];}
     return PWX.rec(k);};}
   /* ----- give: charges go to the one stored slot, timed powers are capped at 2 ----- */
-  {const gv=PW.give;PW.give=function(kind,ob){const K=PWX.K[kind];
+  HOOK['PW.give'](gv=>function(kind,ob){const K=PWX.K[kind];
     if(K&&K.chg){const S=PWX.S();this.stat.given++;if(S.chg&&S.chg.k!==kind)floater(P.x,P.y-42,PWX.K[S.chg.k].n.split(' ')[0]+' LOST',PWX.K[S.chg.k].c);
       S.chg={k:kind,until:PW.cur()+PWX.CHG_BARS*4*(ob?1.5:1)};PWX.stat.chg++;floater(P.x,P.y-24,K.n,K.c);if(ob)floater(P.x,P.y-42,'ON BEAT +50% TIME','#ffe14d');
       PWX.tip(kind);AU.sfx('up');NR.emit('pxGive',{k:kind});return true;}
@@ -86,7 +86,7 @@ if(PWX.on){
       if(kind==='zone'){S.zone={x:clamp(P.x+170,90,W-120),y:clamp(P.y,90,H-110),r:115};S.zls=G.score;}
       if(kind==='decoy')S.dec={x:P.x+40,y:P.y,hp:10};
       if(kind==='ovd'&&!P.over)P.heat=Math.max(0,(P.heat||0)-20);}
-    if(K)PWX.trim(kind);NR.emit('pxGive',{k:kind});return r;};}
+    if(K)PWX.trim(kind);NR.emit('pxGive',{k:kind});return r;});
   PWX.tip=k=>{const K=PWX.K[k];if(!PWX.seen[k]){PWX.seen[k]=1;try{save('mnr_pxseen',PWX.seen);}catch(e){}hintShow(say(K.tip),6);}else hintShow(say(K.tip),1.6);};
   /* ----- BUBBLE SHIELD: the stored charge goes first ----- */
   {const ab=SH.absorb;SH.absorb=function(){const S=G&&G.px;if(S&&S.chg&&S.chg.k==='bubble'&&!G.dead){S.chg=null;P.inv=Math.max(P.inv,1.2);shake(6);burst(P.x,P.y,PWX.K.bubble.c,24,300,.45);floater(P.x,P.y-24,'BUBBLE POP',PWX.K.bubble.c);AU.sfx('hurt');PWX.stat.bubble++;return true;}

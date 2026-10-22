@@ -81,9 +81,9 @@ Object.assign(PWK,{
   fix:{n:'REPAIR',tip:'Hull +1 at once',c:'#3dffb0',bars:0,w:2,need:'pu_fix'}});
 {const pick=PW.pick;PW.pick=function(){const s=this.st(),ks=Object.keys(PWK).filter(k=>!this.on(k)&&!(k==='drop'&&s.drop)&&(!PWK[k].need||GA.own[PWK[k].need])&&!(k==='fix'&&P.hp>=P.max));
     if(!ks.length)return pick.call(this);let t=0;for(const k of ks)t+=PWK[k].w;let r=gx(0,t);for(const k of ks){r-=PWK[k].w;if(r<=0)return k;}return ks[0];};
-  const give=PW.give;PW.give=function(kind,ob){
+  HOOK['PW.give'](give=>function(kind,ob){
     if(kind==='fix'){if(P.hp<P.max)P.hp++;PW.stat.given++;floater(P.x,P.y-24,'HULL +1','#3dffb0');hintShow(say(PWK.fix.tip),3);AU.sfx('up');return true;}
-    const r=give.call(this,kind,ob);if(r&&kind!=='drop'){const a=this.st().act.find(x=>x.k===kind);if(a&&NR.mod.pw!==1&&!a.scaled){a.d*=NR.mod.pw;a.scaled=1;}}return r;};
+    const r=give.call(this,kind,ob);if(r&&kind!=='drop'){const a=this.st().act.find(x=>x.k===kind);if(a&&NR.mod.pw!==1&&!a.scaled){a.d*=NR.mod.pw;a.scaled=1;}}return r;});
   const gl=PW.glyph;const SH_=(k,r,c)=>{ctx.save();ctx.scale(r/11,r/11);ctx.strokeStyle=c;ctx.fillStyle=c;ctx.lineWidth=2;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();
     if(k==='mag'){ctx.moveTo(-6,-7);ctx.lineTo(-6,2);ctx.arc(0,2,6,Math.PI,0,true);ctx.lineTo(6,-7);}
     else if(k==='bub'){ctx.arc(0,0,7,0,7);ctx.moveTo(-3.5,-3);ctx.arc(0,0,4.5,Math.PI*1.1,Math.PI*1.6);}

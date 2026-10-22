@@ -65,7 +65,7 @@ if(PW3.on){
   RET.sioKeys.push('mnr_pw3');
   for(const k in PW3NEW)PWK[k]={n:PW3NEW[k].n,tip:PW3NEW[k].tip,c:PW3NEW[k].c,bars:8,w:2,pw3:1,nw:1};
   /* ----- give: the level rule, the one-at-a-time group, the first-time tips ----- */
-  {const give=PW.give;PW.give=function(kind,ob){if(!PW3.on||!PW3L[kind])return give.call(this,kind,ob);
+  HOOK['PW.give'](give=>function(kind,ob){if(!PW3.on||!PW3L[kind])return give.call(this,kind,ob);
     const s=this.st(),S=PW3.S(),cur=this.cur(),old=s.act.find(a=>a.k===kind),rc=S.rec[kind];
     const l0=old?old.l3||1:(rc&&cur-rc.at<=PW3.GRACE?rc.lv:0),lv=Math.min(PW3.MAX,l0+1),bars=old?old.bars:0,ch=old?old.ch:null;
     if(PW3G.indexOf(kind)>=0)for(let i=s.act.length-1;i>=0;i--){const a=s.act[i];if(a.k!==kind&&PW3G.indexOf(a.k)>=0){S.rec[a.k]={lv:a.l3||1,at:cur};s.act.splice(i,1);PW.stat.ended++;}}   // a new power replaces the running one; its level waits 4 bars
@@ -82,7 +82,7 @@ if(PW3.on){
     if(PW3.seen[kind]!==1&&PW3NEW[kind]){PW3.seen[kind]=1;PW3.persist();hintShow(say(PW3NEW[kind].tip),6);}
     else if(lv===2&&!PW3.seen.rule){PW3.seen.rule=1;PW3.persist();hintShow(say('Grab again to level up'),6);}
     else if(lv>1)hintShow(say(K.n+' LV'+lv+': '+PW3L[kind].tx[lv-1]),2.4);
-    return r;};}
+    return r;});
   /* ----- the drop table: stages 1-2 keep the old pool; in a later stage the first 4 drops come from 3 new + 2 old powers; Endless uses everything ----- */
   {const OLD=['drum','tempo','slow','drop','echo','nova','magb','wing','cres','chord'],NEW=Object.keys(PW3NEW);
     const rot=(a,n)=>a.slice(n%a.length).concat(a.slice(0,n%a.length));

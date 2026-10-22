@@ -31,14 +31,14 @@ const PW2=PW.p2={stat:{echo:0,echoHit:0,nova:0,novaClr:0,novaHit:0,pull:0,wing:0
 if(RET.pw2){
   for(const k in PW2.K)PWK[k]={n:PW2.K[k].n,tip:PW2.K[k].tip,c:PW2.K[k].c,bars:8,w:2,pw2:1};
   /* ----- one at a time + the first time each power shows up it is explained once (longer hint) ----- */
-  {const give=PW.give;PW.give=function(kind,ob){
+  HOOK['PW.give'](give=>function(kind,ob){
     if(PWK[kind]&&(PWK[kind].pw2||kind==='drum')){const s=this.st();for(let i=s.act.length-1;i>=0;i--){const a=s.act[i];if(a.k!==kind&&(PWK[kind].pw2?(PWK[a.k]&&(PWK[a.k].pw2||a.k==='drum')):PWK[a.k]&&PWK[a.k].pw2)){s.act.splice(i,1);PW.stat.ended++;}}}   // a new one replaces the running one
     const r=give.call(this,kind,ob);
     if(r&&PWK[kind]&&PWK[kind].pw2){const a=PW2.act(kind);if(a){a.x={};if(kind==='cres')a.bars=0;if(kind==='chord'){a.used=false;a.rel=false;}}
       PW2.stat[{echo:'echo',nova:'nova',magb:'pull',wing:'wing',cres:'cres',chord:'chord'}[kind]]+=0;
       if(!PW2.seen[kind]){PW2.seen[kind]=1;PW2.stat.tip++;try{save('mnr_pw2seen',PW2.seen);}catch(e){}hintShow(say(PW2.K[kind].tip),6);}else hintShow(say(PW2.K[kind].tip),1.6);
       PW2.note(0,.25,.08,'triangle');PW2.note(4,.3,.07,'triangle',AU.a?AU.a.currentTime+.08:0);}
-    return r;};}
+    return r;});
   /* ----- DRUM BURST: the layer is scheduled from the beat event (drum shots already are), on the song's grid ----- */
   {const dr=PW.drums;PW.drums=function(){if(!RET.pw2)return dr.call(this);this.dstep=-1;};}
   NR.on('beat',d=>{if(!G||!G.live||G.dead||!PW.on('drum'))return;const a=AU.a;if(!a||a.state!=='running'||BT.mode==='none'||!(BT.spb>0)){PW2.stat.dskip++;return;}

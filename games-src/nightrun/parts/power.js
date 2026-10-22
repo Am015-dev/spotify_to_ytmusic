@@ -91,6 +91,7 @@ const PW={bs:1,wk:1,dstep:-1,drate:0,drev:-1,stat:{auto:0,dbl:0,blast:0,given:0,
       for(let i=0;i<n;i++){const f=clamp(it.rem/4-i,0,1);ctx.fillStyle='#ffffff26';ctx.fillRect(32+i*sw,8,sw-2,5);ctx.fillStyle=K.c;ctx.fillRect(32+i*sw,8,(sw-2)*f,5);}
       ctx.restore();y+=46*k;}}
 };
+hookable('PW.give',()=>PW.give,f=>PW.give=f);   // layers (build order): upgrades, powerups, g, powlevels, arsenal (outermost)
 hookable('PW.draw',()=>PW.draw,f=>PW.draw=f);   // layers (build order): flavor, powerups, g, powlevels, arsenal, diet (outermost)
 NR.on('spawn',e=>{if(!G.live||e.type==='gate'||G.dead)return;const s=PW.st();if(--s.cnt>0)return;s.cnt=Math.round(gx(22,34));e.pw=PW.pick();});
 NR.on('kill',({e})=>{if(!G.live)return;if(e.pw||e.type==='boss')G.pk.push({t:'pw',k:e.pw||PW.pick(),x:e.x,y:e.y,vx:-30,vy:0,bob:0});});
