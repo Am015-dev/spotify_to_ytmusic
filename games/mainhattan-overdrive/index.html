@@ -751,6 +751,7 @@ const TUNE={wbLodRt:0/* r17s far-LOD cell range cap in m (0 = by quality tier); 
   rtTurn:110,rtUturn:800,rtGrid:1.35,rtNarrow:.2,rtSimp:3,rtJog:14,stTouchDig:1,asMax:.8,stRampV0:0,stRampRev:0,stHold:.15,stRampFast:0,yrIn:60,tcLead:5,tcMin:90,fvRad:16,fvLat:4.5,fvDec:4,fvBlink:1,
   stOn:1,stRampLo:.12,stRampHi:.6,stK0:.05,stRet:12,stLim:1.4,yrOut:45,drSnap:14,drMax:.7,drExitT:.4,drExitG:12};
 const OD_CHANGELOG=[
+{v:'v90m-beta.154',date:'22 Oct 2026',items:[{t:'NEW',s:'Frankfurt: smashing props now throws a wide fan of bricks and gold studs that arc over your car.'},{t:'CHANGED',s:'No more pop-up cards while you drive: level-ups and results are small notes, and events start only when you tap TAP TO START.'}]},
 {v:'v90m-beta.153',date:'22 Oct 2026',items:[{t:'FIXED',s:'No more invisible walls next to some Athens buildings: you can drive right up to them, and they now end at the roof.'}]},
 {v:'v90m-beta.152',date:'22 Oct 2026',items:[{t:'FIXED',s:'Traffic cars no longer jump, slide sideways or pop up while you can see them; cars that must respawn now do it behind you.'},{t:'FIXED',s:'Ground loads before the city appears on phones.'}]},
 {v:'v90m-beta.151',date:'22 Oct 2026',items:[{t:'NEW',s:'Speed feel: speed lines at the screen edges above 90 km/h, a wider view at speed, and a whoosh, flash and blue jets when you boost.'},{t:'FIXED',s:'Traffic cars stay the same when you turn the camera, and stuck or overlapping cars now clear away out of your sight.'},{t:'FIXED',s:'Less stutter on phones right after the city appears.'}]},
@@ -5207,10 +5208,12 @@ function propRespawn(dt){const PP=HUB.props;if(PP.length>20000){const K=Math.cei
     for(let i=o;i<PP.length;i+=K){const p=PP[i];if(p.alive)continue;p.rt-=d;if(p.rt<=0&&Math.hypot(p.x-RO.x,p.z-RO.z)>80)propRevive(p)}return}
   for(const p of PP){if(p.alive)continue;p.rt-=dt;if(p.rt<=0&&Math.hypot(p.x-RO.x,p.z-RO.z)>80){propRevive(p)}}}
 function propRevive(p){{{p.alive=true;_m.compose(V3(p.x,p.y,p.z),new THREE.Quaternion().setFromAxisAngle(V3(0,1,0),p.ry),_ts.set(1,1,1));p.im.setMatrixAt(p.i,_m);p.im.instanceMatrix.needsUpdate=true;if(p.gi!=null){const o=HUB.ptypes.lamp.head.clone().applyAxisAngle(V3(0,1,0),p.ry);_m.makeTranslation(p.x+o.x,p.y+o.y,p.z+o.z);p.gim.setMatrixAt(p.gi,_m);p.gim.instanceMatrix.needsUpdate=true}}}}
-let STUDG=null,STUDM=null;function studBurst(at,fw,sp){if(!STUDG){STUDG=new THREE.CylinderGeometry(.6,.6,.28,12).rotateX(Math.PI/2);STUDM=[new THREE.MeshStandardMaterial({color:0xffd12c,emissive:new THREE.Color('#ffb000'),emissiveIntensity:.3,metalness:.8,roughness:.3}),new THREE.MeshStandardMaterial({color:0xd8dde4,emissive:new THREE.Color('#8890a0'),emissiveIntensity:.5,metalness:.9,roughness:.2})]}
-  let s=HUB.studFX.find(s=>!s.alive);if(!s){if(HUB.studFX.length>80)return;s={m:new THREE.Mesh(STUDG,STUDM[0])};HUB.grp.add(s.m);HUB.studFX.push(s)}const gold=R()<.3;s.m.material=STUDM[gold?0:1];s.v=gold?10:5;s.alive=true;s.m.visible=true;s.t=0;s.m.position.copy(at);
-  s.vel=V3(rr(-6,6),rr(7,12),rr(-6,6)).addScaledVector(fw,sp*.35)}
-function studFXStep(dt){const mag=roamMagnet();for(const s of HUB.studFX){if(!s.alive)continue;s.t+=dt;const p=s.m.position;s.m.rotation.y+=dt*6;if(s.t>.35){const dx=RO.x-p.x,dz=RO.z-p.z,dy=RO.y+.6-p.y,d=Math.hypot(dx,dz,dy);if(d<mag*1.6){const k=Math.min(1,dt*(8+s.t*6));p.x+=dx*k;p.y+=dy*k;p.z+=dz*k;if(d<2.4){s.alive=false;s.m.visible=false;studGain(s.v);continue}}}
+let STUDG=null,STUDM=null;function studInit(){if(STUDG)return;STUDG=new THREE.CylinderGeometry(.6,.6,.28,12).rotateX(Math.PI/2);STUDM=[new THREE.MeshStandardMaterial({color:0xffd12c,emissive:new THREE.Color('#ffb000'),emissiveIntensity:.3,metalness:.8,roughness:.3}),new THREE.MeshStandardMaterial({color:0xd8dde4,emissive:new THREE.Color('#8890a0'),emissiveIntensity:.5,metalness:.9,roughness:.2}),new THREE.MeshStandardMaterial({color:0xffd12c,emissive:new THREE.Color('#ffc21a'),emissiveIntensity:.75,metalness:.6,roughness:.25})]}
+function studWarm(n=24){studInit();if(!HUB.grp)return;while(HUB.studFX.length<n){const m=new THREE.Mesh(STUDG,STUDM[HUB.studFX.length%3]);m.visible=false;HUB.grp.add(m);HUB.studFX.push({m,alive:false})}}
+function studBurst(at,fw,sp,o){studInit();
+  let s=HUB.studFX.find(s=>!s.alive);if(!s){if(HUB.studFX.length>80)return;s={m:new THREE.Mesh(STUDG,STUDM[0])};HUB.grp.add(s.m);HUB.studFX.push(s)}const gold=o&&o.gold||R()<.3;s.m.material=STUDM[o&&o.gold?2:gold?0:1];s.v=gold?10:5;s.alive=true;s.m.visible=true;s.t=0;s.hold=o&&o.hold||.35;s.m.scale.setScalar(o&&o.sc||1);s.m.position.copy(at);
+  s.vel=o&&o.vel?o.vel.clone():V3(rr(-6,6),rr(7,12),rr(-6,6)).addScaledVector(fw,sp*.35)}
+function studFXStep(dt){const mag=roamMagnet();for(const s of HUB.studFX){if(!s.alive)continue;s.t+=dt;const p=s.m.position;s.m.rotation.y+=dt*6;if(s.t>(s.hold||.35)){const dx=RO.x-p.x,dz=RO.z-p.z,dy=RO.y+.6-p.y,d=Math.hypot(dx,dz,dy);if(d<mag*1.6){const k=Math.min(1,dt*(8+s.t*6));p.x+=dx*k;p.y+=dy*k;p.z+=dz*k;if(d<2.4){s.alive=false;s.m.visible=false;studGain(s.v);continue}}}
     s.vel.y-=28*dt;p.addScaledVector(s.vel,dt);const g=groundAt(p.x,p.z,p.y);if(p.y<g+.6){p.y=g+.6;s.vel.y=Math.abs(s.vel.y)*.4;s.vel.x*=.7;s.vel.z*=.7}if(s.t>9){s.alive=false;s.m.visible=false}}}
 const HCAR=CID==='fra'?['sedan','sedan-sports','taxi','van','truck','delivery','police','suv','garbage-truck','su:t_su','su:t_su_pink']:['taxi','sedan','van','suv','delivery','sedan-sports','#troll','#scoot','su:t_su','su:t_su_sky'],HCOL=CID==='fra'?['#d8302a','#2a7ad8','#ffd12c','#ffffff','#3aa04a','#8c55ff','#2f3640','#ff7a1c','#5dffb0']:['#ffffff','#d8dce0','#a8adb4','#3a4250','#e8e4dc','#2a4a7a','#7a2a2a','#f0f0f0'];
 const SCOOT_COL=['#d8302a','#2a7ad8','#ffd12c','#3aa04a','#ff7a1c','#8c55ff','#1fb5b0']/* r11e (rev11 N3): Athens scooters were white from the palette lerp: one colour each, the rider takes it too */,ATH_K=[0,1,0,2,0,3,0,1,7,4,0,5,0,1,7,0,2,7,1,7,0,3,7,0,6,8,9]/* v88x: 5 of 27 scooters (was 3) */,TRL=['sofias','alex','panep'];
@@ -7693,6 +7696,14 @@ function OG_css(){if(document.getElementById('ogCss'))return;const st=document.c
 #ogHud b{display:block;font:italic 900 15px system-ui,sans-serif;letter-spacing:.08em}#ogHud .ogT{display:flex;gap:8px;justify-content:center;font-size:12px;color:#cfe6f5;margin-top:2px}#ogHud .ogT i{font-style:normal;opacity:.45}#ogHud .ogT i.on{opacity:1}
 #ogHud .ogP{font-size:20px;font-weight:900;color:#ffd12c}#ogHud button,#ogRes button{margin-left:8px;background:#ffd12c;color:#111;border:0;border-radius:9px;font:900 12px system-ui;padding:5px 9px;cursor:pointer}
 #ogRes{position:fixed;left:50%;top:32%;transform:translate(-50%,-50%);z-index:41;background:radial-gradient(circle,#2a2f5a,#121428);border:3px solid #ffd12c;border-radius:18px;color:#fff;font:800 14px system-ui;padding:14px 22px;text-align:center;pointer-events:auto}
+#ogAsk{position:fixed;left:50%;top:calc(40px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:41;box-sizing:border-box;min-height:44px;display:flex;align-items:center;padding:0 16px;border-radius:14px;background:#ffd12c;border:3px solid #141413;box-shadow:0 3px 0 #141413;color:#141413;font:italic 900 14px system-ui,sans-serif;white-space:nowrap;cursor:pointer;pointer-events:auto}#ogAsk[hidden]{display:none}
+#ogRes.tst{top:calc(40px + env(safe-area-inset-top,0px));transform:translateX(-50%);display:flex;gap:8px;align-items:center;white-space:nowrap;padding:6px 14px;border-radius:12px;border-width:2px;font:800 13px system-ui;pointer-events:none;animation:ogTst 3.2s ease-out forwards}#ogRes.tst span{font-weight:700;font-size:12px;color:#cfe6f5}@keyframes ogTst{0%{opacity:0}8%{opacity:1}82%{opacity:1}100%{opacity:0}}
+/* no-popup rows: the TAP TO START chip is ALWAYS row 1 (never moves); the level toast and the result toast take the next free row below it */
+body:has(#ogAsk:not([hidden])) #r3Up.mini,body:has(#ogAsk:not([hidden])) #ogRes.tst,body:has(#r3Up.mini:not([hidden])) #ogRes.tst{top:calc(94px + env(safe-area-inset-top,0px))}
+body:has(#ogAsk:not([hidden])):has(#r3Up.mini:not([hidden])) #ogRes.tst{top:calc(148px + env(safe-area-inset-top,0px))}
+@media (orientation:portrait){#ogAsk,#ogRes.tst{left:140px;right:calc(12px + env(safe-area-inset-right,0px));width:auto;box-sizing:border-box;transform:none;top:calc(8px + env(safe-area-inset-top,0px))}#ogRes.tst{white-space:normal;flex-wrap:wrap;gap:0 8px}#ogAsk{white-space:normal;padding:4px 12px}
+ body:has(#ogAsk:not([hidden])) #r3Up.mini,body:has(#ogAsk:not([hidden])) #ogRes.tst,body:has(#r3Up.mini:not([hidden])) #ogRes.tst{top:calc(62px + env(safe-area-inset-top,0px))}
+ body:has(#ogAsk:not([hidden])):has(#r3Up.mini:not([hidden])) #ogRes.tst{top:calc(126px + env(safe-area-inset-top,0px))}}   /* portrait: right of the pause / minimap / gauge column (x < 140) */
 #ogRes .md{font-size:52px;line-height:1}#ogRes small{font-size:13px}#ogRes.on{animation:ogPop .45s cubic-bezier(.2,1.6,.4,1)}@keyframes ogPop{0%{transform:translate(-50%,-50%) scale(.3)}100%{transform:translate(-50%,-50%) scale(1)}}
 #ogArea{position:fixed;left:50%;top:calc(142px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:39;background:rgba(12,14,30,.86);border-left:5px solid #5dffb0;border-radius:12px;color:#fff;font:700 12px system-ui;padding:8px 14px;text-align:center;pointer-events:none;max-width:92vw}
 #ogArea b{font:italic 900 16px system-ui;letter-spacing:.1em}#ogArea em{display:block;font-style:normal;color:#5dffb0;font-weight:900}#ogArea.on{animation:ogIn .4s ease-out}@keyframes ogIn{0%{opacity:0;transform:translate(-50%,-14px)}100%{opacity:1}}
@@ -7705,13 +7716,17 @@ function OG_css(){if(document.getElementById('ogCss'))return;const st=document.c
 #ogCol h2{margin:0 0 10px;font:italic 900 20px system-ui;letter-spacing:.08em}#ogCol .set{background:#1b1f3a;border-radius:12px;padding:8px 12px;margin:0 0 8px}#ogCol .it{display:inline-block;margin:4px 6px 0 0;padding:3px 7px;border-radius:8px;background:#2a3058;font-size:12px}#ogCol .it.no{opacity:.35}
 #ogCol .x{position:sticky;top:0;float:right;background:#ffd12c;border:0;border-radius:9px;font:900 14px system-ui;padding:6px 12px;cursor:pointer}
 @media (max-height:500px){#ogHud,#ogArea{top:calc(96px + env(safe-area-inset-top,0px));font-size:11px;padding:5px 10px}#ogHud .ogP{font-size:15px}#ogRes{top:40%;padding:8px 14px}#ogRes .md{font-size:34px}}
-body.og-map #ogHud,body.og-map #ogArea{display:none}body:has(#ogHud:not([hidden])) #m1Next,body:has(#ogHud:not([hidden])) #roamPlate,body:has(#ogRes:not([hidden])) #m1Next,body:has(#ogRes:not([hidden])) #roamPlate{visibility:hidden}@media (orientation:portrait){#ogHud,#ogRes{left:auto;right:calc(10px + env(safe-area-inset-right,0px));transform:none;min-width:0;max-width:calc(100vw - 140px)}}`;document.head.appendChild(st)}
+body.og-map #ogHud,body.og-map #ogArea{display:none}body:has(#ogHud:not([hidden])) #m1Next,body:has(#ogHud:not([hidden])) #roamPlate,body:has(#ogRes:not([hidden])) #m1Next,body:has(#ogRes:not([hidden])) #roamPlate{visibility:hidden}@media (orientation:portrait){#ogHud,#ogRes:not(.tst){left:auto;right:calc(10px + env(safe-area-inset-right,0px));transform:none;min-width:0;max-width:calc(100vw - 140px)}}`;document.head.appendChild(st)}
 function OG_hud(){const e=OG.ev,el=OG_el('ogHud');if(!e){el.hidden=true;return}const T=OG_T[e.kind],g=e.goal,u=e.u,lab=[`🥉 ${g[0]}${u}`,`🥈 ${g[1]}${u}`,`🥇 ${g[2]}${u}`],cur=OG_tier(e,OG_val(e,1));
   const html=`<b>${T.ic} ${T.n.toUpperCase()}</b><span class="ogP">${OG_prog(e)}</span> · ${Math.max(0,e.lim-e.tm).toFixed(1)} s<button id="ogRetryB">↻ RETRY (Y)</button><div class="ogT">${lab.map((l,i)=>`<i class="${cur>i?'on':''}">${l}</i>`).join('')}</div>`;
   if(el._h!==html){el._h=html;el.innerHTML=html;const b=el.querySelector('#ogRetryB');b.onclick=()=>OG_retry();b.addEventListener('touchstart',ev=>{ev.preventDefault();ev.stopPropagation();OG_retry()},{passive:false})}el.hidden=false}
 function OG_prog(e){const k=e.kind;return k==='gate'?`${e.n}/${e.objs.length} gates`:k==='ring'?`${e.n}/${e.objs.length} rings`:k==='rush'?`${e.n} studs`:k==='smash'?`${e.n} smashed`:k==='drift'?`${Math.round(e.n)} pts`:k==='ghost'?`${Math.round(e.d)} m · ghost ${Math.round(e.gd)} m`:k==='stunt'?(e.land!=null?`${e.land.toFixed(1)} m off`:'hit the ramp'):e.land!=null?`${Math.round(e.land)} m`:'hit the ramp'}
 const OG_mat={};const OG_m=(c,e=1.6)=>OG_mat[c+e]||(OG_mat[c+e]=neonMat(c,e));
 function OG_obj(e,m,x,y,z){m.position.set(x,y,z);RO.grp.add(m);e.meshes.push(m);return m}
+function OG_ask(sp){if(OG.ask||(OG.noAsk&&OG.noAsk[sp.id]>performance.now()))return;const T=OG_T[sp.t],el=OG_el('ogAsk');el.innerHTML=`${T.ic} ${T.n.toUpperCase()} · TAP TO START`;el.onclick=e=>{e.stopPropagation();OG_askGo()};el.ontouchstart=ev=>{ev.preventDefault();ev.stopPropagation();OG_askGo()};el.hidden=false;OG.ask={sp,t:7,x:RO.x,z:RO.z,h:RO.h,y:RO.y};try{OG_snd('pick')}catch(e){}}
+function OG_askHide(){const a=OG.ask;OG.ask=null;OG_el('ogAsk').hidden=true;if(a){(OG.noAsk||(OG.noAsk={}))[a.sp.id]=performance.now()+25000}}
+function OG_askStep(dt){const a=OG.ask;a.t-=dt;if(a.t<=0||OG.ev||RO.ch||RO.sp||RO.card||RO.mapOpen)OG_askHide()}   // full 7 s, even at 126 km/h: the tap puts the car back at the start (like RETRY)
+function OG_askGo(){const a=OG.ask;if(!a)return false;OG_askHide();if(OG.ev||state!=='roam')return false;if((a.x-RO.x)**2+(a.z-RO.z)**2>10*10){RO.x=a.x;RO.z=a.z;RO.h=RO.vh=a.h;RO.y=groundAt(a.x,a.z,a.y+2);RO.v=Math.min(Math.abs(RO.v),14);RO.vy=0;RO.dDir=0;RO.takeoff=null;RO.lastRamp=null;camSnap=true}OG_start(a.sp);return true}
 function OG_start(sp,re){if(OG.ev)return;const G=qvGraph();let i=sp.i??qvNear(sp.x,sp.z,40);if(i<0)return;let dx=Math.sin(RO.h),dz=Math.cos(RO.h);if(re){dx=re.dx;dz=re.dz}
   const t=sp.t,L={gate:560,ring:600,rush:520,smash:420,ghost:650,drift:0,stunt:150,ljump:160}[t];let W=OG_walk(i,dx,dz,L);if(L&&W.len<L*.6){const W2=OG_walk(i,-dx,-dz,L);if(W2.len>W.len){W=W2;dx=-dx;dz=-dz}}
   const e={sp,kind:t,W,t0:performance.now(),tm:0,n:0,lim:30,objs:[],meshes:[],ramps:[],start:{x:RO.x,z:RO.z,h:RO.h,y:RO.y,dx,dz},hi:1,u:'',done:0};OG.ev=e;OG.log.start++;
@@ -7754,7 +7769,9 @@ function OG_end(v,silent){const e=OG.ev;if(!e)return;OG.ev=null;for(const m of e
   let pay=0;if(md>prev){for(let q=prev+1;q<=md;q++)pay+=OG_PAY[q];s.e[e.sp.id]=md;OG_save()}else if(md)pay=Math.round(OG_PAY[md]*.15);if(pay){const S2=season();S2.cr+=pay;saveSeason(S2)}
   OG.last={sp:e.sp,start:e.start,t:performance.now(),md,v,pay};OG.lastRes=OG.last;OG_res(e,md,v,pay,md>prev);if(md){OG_snd('finish');try{for(let q=0;q<md*3;q++)studBurst(V3(RO.x,RO.y+1.5,RO.z),V3(Math.sin(RO.h),0,Math.cos(RO.h)),10);burst(SPARK,V3(RO.x,RO.y+3,RO.z),40,22,.8,new THREE.Color(['#cd7f32','#cd7f32','#d8dde4','#ffd12c'][md]));fovKick=Math.max(fovKick,6)}catch(err){}}else OG_snd('crash');
   if(md>prev){OG_sum();OG_reward(e.sp.a)}}
-function OG_res(e,md,v,pay,fresh){const el=OG_el('ogRes'),T=OG_T[e.kind],nm=['NO MEDAL','BRONZE','SILVER','GOLD'][md],val=v==null?'TIME UP':(e.u===' s'?v.toFixed(1)+' s':Math.round(v)+e.u);
+function OG_res(e,md,v,pay,fresh){const el=OG_el('ogRes'),T=OG_T[e.kind],nm=['NO MEDAL','BRONZE','SILVER','GOLD'][md],val=v==null?'TIME UP':(e.u===' s'?v.toFixed(1)+' s':Math.round(v)+e.u)
+  if(Math.abs(RO.v)*3.6>5){el.className='tst';el.innerHTML=`<b>${['💨','🥉','🥈','🥇'][md]} ${T.n.toUpperCase()} · ${nm}</b><span>${val}${pay?' · +'+pay.toLocaleString('de-DE')+' studs':''}</span>`;el.hidden=false;clearTimeout(OG_res.t);OG_res.t=setTimeout(()=>el.hidden=true,3200);return}   // moving: a small fading toast, no card
+  el.className='';
   el.innerHTML=`<div class="md">${['💨','🥉','🥈','🥇'][md]}</div><b>${T.n.toUpperCase()} · ${nm}!</b><div>${val}</div><small>${pay?'+'+pay.toLocaleString('de-DE')+' studs':'no studs this time'}${fresh&&md?' · NEW BEST':''}</small><div><button id="ogRetryR">↻ RETRY (Y)</button></div>`;
   const b=el.querySelector('#ogRetryR');b.onclick=()=>OG_retry();b.addEventListener('touchstart',ev=>{ev.preventDefault();ev.stopPropagation();OG_retry()},{passive:false});
   el.hidden=false;el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(OG_res.t);OG_res.t=setTimeout(()=>el.hidden=true,4500)}
@@ -7764,11 +7781,11 @@ function OG_pick(sp){const s=OG_sv();if(sp.k==='gold'){s.g[sp.id]=1;OG.log.gold+
   else{s.c[sp.id]=1;OG.log.col++;const th=OG.A[sp.t].th,got=OG.S.filter(q=>q.k==='col'&&q.t===sp.t&&s.c[q.id]).length,tot=OG.A[sp.t].n;const S2=season();S2.cr+=300;saveSeason(S2);OG_snd('pick');say(th[1]+' '+th[3][sp.ci%5].toUpperCase(),`${th[0]} · ${sp.t} ${got}/${tot}${got===tot?' · SET COMPLETE!':''}`,1.8)}
   try{burst(SPARK,V3(sp.x,sp.y,sp.z),26,14,.6,new THREE.Color('#ffd12c'));studBurst(V3(sp.x,sp.y,sp.z),V3(0,1,0),8)}catch(e){}OG_save();OG_sum();OG_reward(sp.a)}
 function OG_prune(){const sig=(RO.marks||[]).length+':'+(HUB.gates||[]).length;if(sig===OG.mkSig)return;OG.mkSig=sig;const ex=OG_excl(),keep=OG.S.filter(sp=>!OG_near(ex,sp.x,sp.z));if(keep.length===OG.S.length)return;OG.S=keep;const g=new Map();for(const sp of keep){const k=OG_gk(sp.x,sp.z);(g.get(k)||g.set(k,[]).get(k)).push(sp)}OG.grid=g;OG.vis=OG.vis.filter(sp=>keep.includes(sp))}
-function OG_tick(dt){if(state!=='roam'||!RO.on||!RO.built)return;if(!OG.grp||OG.key!==OG_key()){if(!QV.g&&(OG.f++%30))return;if(!OG_build())return}
+function OG_tick(dt){if(state!=='roam'||!RO.on||!RO.built){if(OG.ask)OG_askHide();return}if(OG.ask)OG_askStep(dt);if(!OG.grp||OG.key!==OG_key()){if(!QV.g&&(OG.f++%30))return;if(!OG_build())return}
   OG.cool=Math.max(0,OG.cool-dt);if(OG.ev){if(RO.ch||RO.sp)OG_end(null,1);else if(!RO.wk)OG_step(dt)}  // a wreck (2 s rebuild) pauses the event instead of silently cancelling it
   if(OG.f%120===0)OG_prune();if(++OG.f%8===0)OG_pickVis();
   const busy=RO.ch||RO.sp||RO.wk||RO.card||RO.mapOpen||RO.story||RO.frozen||(window.__m1&&__m1.cs&&__m1.cs());
-  if(!OG.ev&&!busy&&OG.cool<=0)for(const sp of OG.vis){const d2=(sp.x-RO.x)**2+(sp.z-RO.z)**2;if(sp.k==='ev'){if(d2<7.2*7.2&&Math.abs(RO.y-sp.y)<6&&Math.abs(RO.v)>3&&!OG_blocked(sp)){OG_start(sp);break}}
+  if(!OG.ev&&!busy&&OG.cool<=0)for(const sp of OG.vis){const d2=(sp.x-RO.x)**2+(sp.z-RO.z)**2;if(sp.k==='ev'){if(d2<7.2*7.2&&Math.abs(RO.y-sp.y)<6&&Math.abs(RO.v)>3&&!OG_blocked(sp)){OG_ask(sp);break}}
     else if(!OG_done(sp)&&d2<4.6*4.6&&Math.abs(RO.y+.8-sp.y)<4.2){OG_pick(sp);OG_pickVis();break}}
   OG_draw();document.body.classList.toggle('og-map',!!RO.mapOpen);
   if(OG.f%30===0){const a=OG_areaAt(RO.x,RO.z);if(a!==OG.area){const first=OG.area==null;OG.area=a;if(!first||OG.f>60)OG_pop(a,first)}}
@@ -7791,7 +7808,7 @@ function OG_col(on){const el=OG_el('ogCol');if(!on){el.hidden=true;return}const 
 roamStep=(f=>function(dt){f(dt);try{OG_tick(dt)}catch(e){if(OG.err++<3)console.warn('OG',e)}})(roamStep);
 roamLanded=(f=>function(){const t=RO.takeoff;f.apply(this,arguments);try{OG_landed(t)}catch(e){}})(roamLanded);
 drawRoamMap=(f=>function(){f.apply(this,arguments);try{OG_map()}catch(e){if(OG.err++<3)console.warn('OG map',e)}})(drawRoamMap);
-addEventListener('keydown',e=>{if(state!=='roam'||e.repeat)return;if(e.code==='KeyY'){if(OG_retry())e.preventDefault()}else if(e.code==='KeyU'){const el=document.getElementById('ogCol');OG_col(!el||el.hidden)}else if(e.code==='Escape'){const el=document.getElementById('ogCol');if(el&&!el.hidden){OG_col(false);e.stopImmediatePropagation()}}});
+addEventListener('keydown',e=>{if(state!=='roam'||e.repeat)return;if(e.code==='KeyY'){if(OG_askGo()||OG_retry())e.preventDefault()}else if(e.code==='KeyU'){const el=document.getElementById('ogCol');OG_col(!el||el.hidden)}else if(e.code==='Escape'){const el=document.getElementById('ogCol');if(el&&!el.hidden){OG_col(false);e.stopImmediatePropagation()}}});
 OG_css();
 window.__og={OG,T:OG_T,build:()=>OG_build(),sv:()=>OG_sv(),stats:a=>OG_stats(a),areas:()=>OG_areas(),areaAt:(x,z)=>OG_areaAt(x,z),start:id=>{const sp=OG.S.find(q=>q.id===id);if(sp)OG_start(sp);return !!OG.ev},retry:()=>OG_retry(),
   end:()=>OG_end(null,1),ev:()=>OG.ev&&{t:OG.ev.kind,n:OG.ev.n,time:OG.ev.tm,lim:OG.ev.lim,goal:OG.ev.goal,hi:OG.ev.hi,P:OG.ev.W.P,len:OG.ev.W.len,objs:OG.ev.objs.map(o=>[o.x,o.z,!!o.done]),ramp:OG.ev.ramp&&{x:OG.ev.ramp.x,z:OG.ev.ramp.z,h:OG.ev.ramp.h,len:OG.ev.ramp.len},tx:OG.ev.tx,tz:OG.ev.tz,d:OG.ev.d,gd:OG.ev.gd},
@@ -10509,7 +10526,8 @@ profileOpen=(f=>function(){f();const B=$('#pfBody');if(!B)return;const L=carStat
  const d=B.querySelector('.pcard.drv');if(d&&!d.querySelector('.r3Hero')){const lv=d.querySelector('.lvl');if(lv)lv.remove();const w=d.querySelector('div:not(.lvl)');if(w){w.querySelectorAll('.pbar,small:last-child').forEach(e=>{if(e!==w.querySelector('small'))e.remove()});w.insertAdjacentHTML('beforeend',R3_hero(L))}}
  const st=[...B.querySelectorAll('.pcard')].find(c=>((c.querySelector('h5')||{}).textContent||'')==='STATS');
  if(st&&!st.classList.contains('r3Fold')){st.classList.add('r3Fold');const h=st.querySelector('h5');h.innerHTML='<button class="r3More">MORE STATS ▾</button>';h.firstChild.onclick=()=>{st.classList.toggle('open');try{AU.sfx('pick')}catch(e){}}
-  st.insertAdjacentHTML('beforebegin',`<div class="pcard r3PfL"><h5>LEVEL LINE · CLASS ${R3_CL[L>=20?2:L>=10?1:0]}</h5><div class="r3Mid">${R3_bars(L)}</div>${R3_nextHtml(L)}</div>`)}})(profileOpen);
+  st.insertAdjacentHTML('beforebegin',`<div class="pcard r3PfL"><h5>LEVEL LINE · CLASS ${R3_CL[L>=20?2:L>=10?1:0]}</h5><div class="r3Mid">${R3_bars(L)}</div>${R3_nextHtml(L)}</div>`)}
+ if(R3U.later&&!B.querySelector('.r3LvB')){const b=document.createElement('button');b.className='r3Go r3LvB';b.textContent='⭐ LEVEL UP! TAP TO VIEW';b.onclick=()=>{const[a,c]=R3U.later;R3U.later=null;b.remove();R3_up(a,c,false)};B.insertBefore(b,B.firstChild)}})(profileOpen);
 const R3U={q:[]};
 addXP=(f=>function(n,why){const l0=lvlOf(prof().xp),s0=say;say=function(a){if(a==='LEVEL UP')return;return s0.apply(this,arguments)};let r;try{r=f.apply(this,arguments)}finally{say=s0}
  const l1=lvlOf(prof().xp);if(l1>l0){R3U.q.push([l0,l1]);R3_upPump()}return r})(addXP);
@@ -10519,11 +10537,13 @@ function R3_upPump(){const gx=$('#gbx'),gar=!!(gx&&!gx.hidden)||(typeof BX!=='un
 setInterval(()=>{try{R3_upPump()}catch(e){}},600);
 function R3_up(l0,l1,mini){const U=$('#r3Up');R3U.cur=[l0,l1];let rw=[['📈','STATS UP','top speed, acceleration, handling, health']];for(let L=l0+1;L<=l1;L++)rw=rw.concat(R3_road(L));
  mini=mini!=null?mini:state==='roam';U.classList.toggle('mini',!!mini);
- U.innerHTML=`<div class="r3UC"><div class="r3URib">LEVEL UP!</div>${R3_hero(l1,1)}<div class="r3UB">${R3_bars(l1,l0)}<ul>${rw.slice(0,mini?2:4).map(([i,t,s])=>`<li><i>${i}</i><b>${t}</b><small>${s}</small></li>`).join('')}</ul></div>${R3_nextHtml(l1)}
-  ${mini?'':`<div class="r3UBt">${rw.some(r=>/PERK/.test(r[1]))?'<button class="r3Go alt" data-r3u="perks">⚡ PERKS</button>':''}<button class="r3Go" data-r3u="ok">CONTINUE ▶</button></div>`}</div>`;
+ if(mini){const nx=rw[1]?rw[1][1]:'STATS UP';R3U.later=R3U.later?[Math.min(R3U.later[0],l0),l1]:[l0,l1];   // no-card-without-tap: the full card waits in the pause menu (PROFILE)
+  U.innerHTML=`<div class="r3UT"><b>⭐ LEVEL UP!</b><span>LVL ${l1}</span><small>${nx}</small></div>`}
+ else U.innerHTML=`<div class="r3UC"><div class="r3URib">LEVEL UP!</div>${R3_hero(l1,1)}<div class="r3UB">${R3_bars(l1,l0)}<ul>${rw.slice(0,4).map(([i,t,s])=>`<li><i>${i}</i><b>${t}</b><small>${s}</small></li>`).join('')}</ul></div>${R3_nextHtml(l1)}
+  <div class="r3UBt">${rw.some(r=>/PERK/.test(r[1]))?'<button class="r3Go alt" data-r3u="perks">⚡ PERKS</button>':''}<button class="r3Go" data-r3u="ok">CONTINUE ▶</button></div></div>`;
  U.hidden=false;try{AU.sfx('finish')}catch(e){}
  requestAnimationFrame(()=>U.querySelectorAll('.r3UB .r3B i[data-from]').forEach(i=>{const h=i.style.height;i.style.transition='none';i.style.height=i.dataset.from+'%';i.offsetHeight;i.style.transition='height 1.1s cubic-bezier(.2,.9,.3,1.2) .25s';i.style.height=h}));
- clearTimeout(R3U.t);if(mini)R3U.t=setTimeout(()=>{U.hidden=true},window.__qs&&__qs.act()?2000:5200)}   // quiet-start: a top toast of <= 2 s in free roam (queued in races, modal only in menus)
+ const tt=window.__qs&&__qs.act()?2600:4200;U.style.setProperty('--tt',tt+'ms');clearTimeout(R3U.t);if(mini)R3U.t=setTimeout(()=>{U.hidden=true},tt)}   // quiet-start: a top toast of <= 2 s in free roam (queued in races, modal only in menus)
 {const U=document.createElement('div');U.id='r3Up';U.hidden=true;document.body.appendChild(U);
  U.addEventListener('click',e=>{const b=e.target.closest('[data-r3u]');if(!b)return;U.hidden=true;try{AU.sfx('pick')}catch(_){}
   if(b.dataset.r3u==='perks'&&state!=='roam'){try{gbOpen();setTimeout(()=>{try{R2_go('perks')}catch(_){}},60)}catch(_){}}setTimeout(R3_upPump,300)})}
@@ -10575,7 +10595,11 @@ gbClose=(f=>function(){R3_show(false);return f.apply(this,arguments)})(gbClose);
 #r3Up .r3UB{display:flex;gap:10px}#r3Up .r3UB .r3Bars{flex:0 0 190px;height:120px}#r3Up ul{flex:1;min-width:0;list-style:none;margin:0;padding:0;display:grid;gap:5px;align-content:start}
 #r3Up li{display:grid;grid-template-columns:26px 1fr;column-gap:6px;padding:4px 8px;border-radius:9px;background:rgba(255,255,255,.1)}#r3Up li i{grid-row:1/3;font-style:normal;font-size:20px;align-self:center}#r3Up li b{font:italic 900 13px var(--hud);color:#ffd12c}#r3Up li small{font:700 12px system-ui;color:#dfe6ff}
 #r3Up .r3UBt{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}.r3Go{all:unset;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;padding:0 18px;border-radius:12px;background:#3fd46a;border:3px solid #141413;box-shadow:0 4px 0 #141413;font:italic 900 15px var(--hud);color:#141413}.r3Go.alt{background:#fff}
-#r3Up.mini{inset:auto;left:50%;top:calc(8px + env(safe-area-inset-top,0px));transform:translateX(-50%) scale(.62);transform-origin:top center;background:none;pointer-events:none}#r3Up.mini .r3UC{width:560px}
+#r3Up.mini{inset:auto;left:50%;top:calc(40px + env(safe-area-inset-top,0px));transform:translateX(-50%);display:block;background:none;pointer-events:none;z-index:45}
+@media (orientation:portrait){#r3Up.mini{left:140px;right:calc(12px + env(safe-area-inset-right,0px));width:auto;transform:none;top:calc(8px + env(safe-area-inset-top,0px));max-width:calc(100vw - 152px)}#r3Up .r3UT{white-space:normal;flex-wrap:wrap;gap:0 8px}body:has(#ogAsk:not([hidden])) #r3Up.mini{top:calc(62px + env(safe-area-inset-top,0px))}}
+#r3Up .r3UT{display:flex;align-items:center;gap:8px;white-space:nowrap;padding:6px 14px;border-radius:12px;background:linear-gradient(135deg,#1d2a6e,#2a1450);border:3px solid #141413;box-shadow:0 3px 0 #141413;color:#fff;font:italic 900 13px var(--hud);animation:r3Tst var(--tt,3s) ease-out forwards}#r3Up .r3UT b{color:#ffd12c}#r3Up .r3UT small{font:700 12px system-ui;color:#dfe6ff}
+@keyframes r3Tst{0%{opacity:0;transform:translateY(-10px)}8%{opacity:1;transform:none}82%{opacity:1}100%{opacity:0}}
+#profile .r3LvB{display:block;width:100%;margin:0 0 8px}
 @media (max-height:430px){#r3Up:not(.mini) .r3UC{padding:12px 12px 8px}#r3Up:not(.mini) .r3Hero.big .r3Lv b{font-size:44px}#r3Up:not(.mini) .r3UB .r3Bars{height:104px}}
 #r3Sh{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% 30%,#2a4fb0,#141c4a 75%);font-family:system-ui;color:#fff;padding:0 0 env(safe-area-inset-bottom,0px)}#r3Sh[hidden]{display:none}
 #r3Sh .r3ShH{display:flex;align-items:center;gap:6px;height:52px;box-sizing:border-box;padding:0 max(8px,env(safe-area-inset-right,0px)) 0 0;background:#fff;border-bottom:3px solid #141413}
@@ -16132,6 +16156,7 @@ const WARMALL={on:!/[?&]warmall=0/.test(location.search),n:0,life:false};
   try{const L=window.__life;if(L&&L.init&&L.LIFE&&L.LIFE.on)WARMALL.life=!!L.init()}catch(e){console.warn('warmall life',e)}
   let gm=null;try{if(typeof worldGroundGen==='function'){gm=WARM_gtwin();sc.add(gm)}}catch(e){console.warn('warmall ground',e)}
   let bm=null;try{if(typeof xfWarm==='function'){bm=xfWarm();sc.add(bm)}}catch(e){console.warn('warmall burst',e)}
+  try{if(typeof studWarm==='function'&&typeof HUB!=='undefined')studWarm()}catch(e){console.warn('warmall studs',e)}
   let lf=null;try{if(typeof LF!=='undefined'&&LF.on&&typeof LF_mats==='function'){const M=LF_mats(),g=new THREE.BoxGeometry(.1,.1,.1);g.setAttribute('color',new THREE.Float32BufferAttribute(new Array(g.attributes.position.count*3).fill(1),3));lf=new THREE.Group();
    for(const k of['def','tuft','pond']){const m=new THREE.InstancedMesh(g,M[k],1);m.setMatrixAt(0,new THREE.Matrix4());m.setColorAt(0,new THREE.Color());m.frustumCulled=false;m.receiveShadow=true;lf.add(m)}
    if(typeof LF_patchMat==='function'){const pm=new THREE.Mesh(g,LF_patchMat());pm.frustumCulled=false;pm.receiveShadow=true;lf.add(pm)}sc.add(lf)}}catch(e){console.warn('warmall lf',e)}
@@ -17669,7 +17694,7 @@ function IV_go(){const R=[],ck=(n,b)=>R.push((b?'✓ ':'✗ ')+n),dt=1/30,N=HUB.
  __chk.GO['why/traffic-inview']=['fra','ath'].map(c=>({c,n:'traffic in view '+(c==='fra'?'Frankfurt':'Athens'),secs:30,fn:()=>IV_go()}))},500)}
 const CL=(()=>{const m=/[?&]cl=([^&#]*)/.exec(location.search),ks=m?m[1].split(','):[],T=(typeof TUNE!=='undefined'&&TUNE.cl)||{};
  return{box:[-1100,470,-720,800],spawn:[-120,100],out:+((/[?&]clout=([\d.]+)/.exec(location.search)||[])[1]??.6),car:+((/[?&]clcar=([\d.]+)/.exec(location.search)||[])[1]||.08),carNear:+((/[?&]clnear=(\d+)/.exec(location.search)||[])[1]??3),
-  core:(ks.includes('core')||ks.includes('all')||!!T.core)&&!ks.includes('off'),smash:(ks.includes('smash')||ks.includes('all')||!!T.smash)&&!ks.includes('off'),sm:{small:14.9,big:29.9,bricks:20,studs:3,stop:.05},sn:0,pi:0,pn:0,thin:0,T:[],cars:0,peds:0,sp:0}})();
+  core:(ks.includes('core')||ks.includes('all')||!!T.core)&&!ks.includes('off'),smash:(ks.includes('smash')||ks.includes('all')||T.smash!==false)&&!ks.includes('off')&&!ks.includes('nosmash'),sm:{small:14.9,big:29.9,bricks:20,studs:3,stop:.05},sn:0,pi:0,pn:0,thin:0,T:[],cars:0,peds:0,sp:0}})();
 const CL_CORE=CL.core&&CID==='fra';
 const CL_SMASH=CL.smash&&CID==='fra';
 const CL_in=(x,z)=>x>=CL.box[0]&&x<=CL.box[1]&&z>=CL.box[2]&&z<=CL.box[3];
@@ -17730,14 +17755,23 @@ async function CL_go(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m),W=ms=>
 const CL_sm=()=>CL_SMASH&&state==='roam'&&RO.on&&CL_in(RO.x,RO.z);
 SM2_smash=(f=>function(kind,imp,quiet){if(!CL_sm()||kind==='car')return f.apply(this,arguments);const a=TUNE.sm2Small,b=TUNE.sm2Big;TUNE.sm2Small=CL.sm.small;TUNE.sm2Big=CL.sm.big;try{return f.apply(this,arguments)}finally{TUNE.sm2Small=a;TUNE.sm2Big=b}})(SM2_smash);
 const CL_cols=['#ffd12c','#e4002b','#0055bf','#ffffff','#2e9b3a'].map(c=>new THREE.Color(c));
-function CL_burst(x,y,z,def,sp){const base=def&&def.st>5?18:9,at=V3(x,y+1.2,z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh)),busy=DEB&&DEB.list.length>DEB.n*.85,n=busy?0:Math.max(0,CL.sm.bricks-base)+2,v=sp*.5+3;
- if(n)debris(at.addScaledVector(fw,.8),fw.clone().multiplyScalar(v).add(V3(0,13,0)),n,CL_cols,.55,y);at.set(x,y+1.4,z);
- const ns=Math.max(CL.sm.studs,6)-((def&&def.st)|0);for(let k=Math.max(0,ns);k>0;k--)studBurst(at,fw,sp*1.4+8);
+const _clSd=V3(),_clV=V3();
+function CL_burst(x,y,z,def,sp){const base=def&&def.st>5?18:9,at=V3(x,y+1.2,z),fw=V3(Math.sin(RO.vh),0,Math.cos(RO.vh)),busy=DEB&&DEB.list.length>DEB.n*.85,n=busy?0:Math.max(0,CL.sm.bricks+6-base)+2,v=sp*.5+3;
+ if(n){debris(at.addScaledVector(fw,.8),fw.clone().multiplyScalar(v).add(V3(0,13,0)),n,CL_cols,.55,y);_clSd.set(fw.z,0,-fw.x);const L=DEB.list,w=12+sp*.4;
+  for(let k=Math.max(0,L.length-n),m=0;k<L.length;k++,m++){const o=L[k],a=(n>1?m/(n-1)*2-1:0)+rr(-.12,.12);o.v.copy(fw).multiplyScalar(sp*.8+4+rr(0,3)).addScaledVector(_clSd,a*w);o.v.y=rr(6,11);o.s.multiplyScalar(.72);o.life=rr(1.7,2.3)}}
+ at.set(x,y+1.4,z);const ns=Math.max(CL.sm.studs,6)-((def&&def.st)|0);
+ for(let k=Math.max(0,ns);k>0;k--){_clV.copy(fw).multiplyScalar(sp*.3+rr(-1,1)).addScaledVector(_clSd.set(fw.z,0,-fw.x),rr(-2.5,2.5));_clV.y=rr(13,16);studBurst(at,fw,sp,{gold:1,vel:_clV,hold:.9,sc:1.6})}
  SM2.n.bricks+=base+n;HIT_stop(CL.sm.stop);CL.sn++;CL.lastB=base+n;CL.lastS=Math.max((def&&def.st)|0,6)}
+function CL_dry(){const b=SM2.n.bricks,sn=CL.sn,lb=CL.lastB,ls=CL.lastS,hd=hitDip,L=DEB&&DEB.list,l0=L?L.length:0,nx=DEB&&DEB.next;CL_burst(RO.x,-900,RO.z,null,10);
+ if(L){for(let k=L.length-1;k>=l0;k--){_m.makeScale(0,0,0);DEB.im.setMatrixAt(L[k].i,_m);L.splice(k,1)}DEB.next=nx;DEB.dirty=true}for(const s of HUB.studFX)if(s.alive&&s.m.position.y<-800){s.alive=false;s.m.visible=false}
+ SM2.n.bricks=b;CL.sn=sn;CL.lastB=lb;CL.lastS=ls;hitDip=hd}
+if(CL_SMASH)roamPost=(f=>function(){const r=f.apply(this,arguments);try{studWarm();CL_dry()}catch(e){}return r})(roamPost);
+function CL_gold(){const fw=_clV.set(Math.sin(RO.vh),0,Math.cos(RO.vh)),sp=Math.abs(RO.v);_clSd.set(fw.z,0,-fw.x);for(const s of HUB.studFX)if(s.alive&&s.t===0&&s.hold!==.9){s.m.material=STUDM[2];s.m.scale.setScalar(1.6);s.hold=.9;s.vel.copy(fw).multiplyScalar(sp*.3+rr(-1,1)).addScaledVector(_clSd,rr(-2.5,2.5));s.vel.y=rr(13,16)}}
+if(CL_SMASH)smashCheck=(f=>function(dt){const n=CL.sn,r=f.apply(this,arguments);if(CL.sn!==n)try{CL_gold()}catch(e){}return r})(smashCheck);
 SM2_prop=(f=>function(p,def,sp){const r=f.apply(this,arguments);if(!r&&CL_sm()&&!(RO.rcT>0&&sp<3))try{CL_burst(p.x,p.y,p.z,def,sp)}catch(e){}return r})(SM2_prop);
 async function CL_smashGo(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m);
  if(CID!=='fra')return'📍 why/smash · Frankfurt only (Athens parked) → ✅ PASS';if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';
- if(!CL_SMASH)return'📍 why/smash · ?cl=smash is OFF (default) → ✅ PASS (flag off)';
+ if(!CL_SMASH)return'📍 why/smash · smash is OFF (?cl=nosmash / ?cl=off) → ✅ PASS (flag off)';
  const p0=[RO.x,RO.z,RO.h,RO.v],tb=RO.turbo,ni=pl.nitro;
  try{
   RO.turbo=0;pl.nitro=false;const q=rfSnap(CL.spawn[0],CL.spawn[1],120);if(!q)throw'no road';RO.x=q[0];RO.z=q[1];RO.h=RO.vh=Math.PI/2;RO.y=groundAt(RO.x,RO.z,99);OF_reset&&OF_reset();
@@ -17758,8 +17792,58 @@ async function CL_smashGo(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m);
 {const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
  __chk.items.unshift({ver:'why',id:'core',area:'drive',text:'core-loop L1 (PLAN_CORE_LOOP): ?cl=core: fresh PLAY spawns at Paulsplatz inside the 1.57 x 1.52 km core on a road heading east; smashable props per 100 m of street inside >= 2x outside; >= 6 cars within 150 m of the spawn; draw calls unchanged. Flag default OFF. 📍 GO.'});
  __chk.GO['why/core']=[{c:'fra',n:'core zone Frankfurt',secs:60,fn:()=>CL_go()}];
- __chk.items.unshift({ver:'why',id:'smash',area:'drive',text:'core-loop L2 (PLAN_CORE_LOOP): ?cl=smash: inside the core props smash at 15 km/h (small) / 30 km/h (big), >= 20 bricks, >= 3 studs, 50 ms hit-stop, loss <= 30 %; 10 km/h bumps. Flag default OFF. 📍 GO.'});
+ __chk.items.unshift({ver:'why',id:'smash',area:'drive',text:'core-loop L2 (PLAN_CORE_LOOP): ?cl=smash: inside the core props smash at 15 km/h (small) / 30 km/h (big), >= 20 bricks, >= 3 studs, 50 ms hit-stop, loss <= 30 %; 10 km/h bumps. Default ON in Frankfurt (?cl=nosmash = off). 📍 GO.'});
  __chk.GO['why/smash']=[{c:'fra',n:'smash core Frankfurt',secs:30,fn:()=>CL_smashGo()}]},500)}
+async function NP_go(){const R=[],ck=(m,b)=>R.push((b?'✓ ':'✗ ')+m),vis=e=>!!e&&!e.hidden&&e.getClientRects().length>0&&getComputedStyle(e).display!=='none';
+ if(state!=='roam'||!RO.on||!pl)return'📍 Start free roam first';
+ const p0=prof(),xp0=p0.xp,sv={x:RO.x,z:RO.z,h:RO.h,v:RO.v,ch:RO.ch,card:RO.card,sp:RO.sp},W=innerWidth,H=innerHeight,C={l:W*.25,r:W*.75,t:H*.25,b:H*.75};
+ const ovl=r=>Math.max(0,Math.min(r.right,C.r)-Math.max(r.left,C.l))*Math.max(0,Math.min(r.bottom,C.b)-Math.max(r.top,C.t));
+ let block=0,moving=0,toast=0,big=0,cen=0,tsz=0,lvlAt=-1;const U=$('#r3Up');
+ try{
+  OG_askHide();OG.cool=1e9;   // no chip (and no earlier GO's leftover) during the 60 s drive: this part judges the level-up toast alone
+  R3U.q.length=0;R3U.later=null;U.hidden=true;RO.ch=null;RO.card=null;RO.sp=null;RO.v=8;K.ArrowUp=K.KeyW=true;
+  for(let i=0;i<1800;i++){
+   if(Math.abs(RO.v)<2.5)RO.v=8;
+   if(i===600){addXP(6000,'no-popup test');lvlAt=i}
+   roamStep(1/30);if(i%18===0)try{R3_upPump()}catch(e){}
+   const kmh=Math.abs(RO.v)*3.6;if(kmh<=5)continue;moving++;
+   if(vis(U)&&!U.classList.contains('mini'))block++;
+   const og=document.getElementById('ogRes');if(vis(og)&&!og.classList.contains('tst'))block++;
+   if(vis(U)&&U.classList.contains('mini')){toast++;const t=U.firstElementChild.getBoundingClientRect();tsz=Math.max(tsz,t.width*t.height);cen+=ovl(t);if(parseFloat(getComputedStyle(U.querySelector('small')||U).fontSize)<12)big++}}
+  ck('driving 60 s, '+moving+' of 1800 steps above 5 km/h (≥ 1200)',moving>=1200);
+  ck('level-up forced at step '+lvlAt+': blocking cards while moving '+block+' (0)',lvlAt===600&&block===0);
+  ck('toast samples '+toast+' (≥ 1), size '+Math.round(tsz)+' px² (< 6 % of the screen), over the centre 50 %: '+Math.round(cen)+' px² (0), font < 12 px: '+big+' (0)',toast>=1&&tsz>0&&tsz<.06*W*H&&cen===0&&big===0);
+  ck('the card is kept for the pause menu (R3U.later = '+JSON.stringify(R3U.later)+')',!!R3U.later);
+  {const pb=$('#pfBody');let btn=null;if(typeof profileOpen==='function'){try{profileOpen();btn=document.querySelector('.r3LvB')}catch(e){}}
+   if(btn){btn.click();ck('pause menu → PROFILE → "LEVEL UP! TAP TO VIEW" opens the full card (CONTINUE button '+vis(U.querySelector('[data-r3u=ok]'))+')',vis(U)&&!U.classList.contains('mini')&&!!U.querySelector('[data-r3u=ok]'))}
+   else ck('pause menu has the LEVEL UP button (pfBody '+!!pb+')',false)}
+  U.hidden=true;R3U.q.length=0;R3U.later=null;try{const pr=$('#profile');if(pr)pr.hidden=true}catch(e){}
+  const og=OG_el('ogRes'),fake={kind:'gate',u:' s',sp:{id:'np'}};RO.v=10;OG_res(fake,3,12.3,500,true);const m1=vis(og)&&og.classList.contains('tst'),r1=og.getBoundingClientRect();
+  ck('event result at 36 km/h = toast ('+m1+', '+Math.round(r1.width*r1.height)+' px² < 6 %, over the centre '+Math.round(ovl(r1))+' px² (0))',m1&&r1.width*r1.height<.06*W*H&&ovl(r1)===0);
+  og.hidden=true;RO.v=0;OG_res(fake,3,12.3,500,true);const m2=vis(og)&&!og.classList.contains('tst');ck('event result when stopped = card ('+m2+')',m2);og.hidden=true;clearTimeout(OG_res.t);
+  const sp=OG.S.find(q=>q.k==='ev'&&!OG_blocked(q));
+  if(!sp)ck('an event start spot exists near the road',false);
+  else{OG.cool=0;OG.ev&&OG_end(null,1);OG.ask=null;OG.noAsk={};OG_el('ogAsk').hidden=true;RO.x=sp.x;RO.z=sp.z;RO.y=sp.y;RO.v=8;
+   for(let i=0;i<30;i++){RO.x=sp.x;RO.z=sp.z;RO.v=8;try{OG_pickVis()}catch(e){}roamStep(1/30);if(OG.ask||OG.ev)break}
+   const a0=!!OG.ask,e0=!!OG.ev,chip=vis(OG_el('ogAsk')),cr=OG_el('ogAsk').getBoundingClientRect();
+   ck('driving over an event start: no auto-start (event '+e0+'), chip "TAP TO START" shown ('+chip+', '+Math.round(cr.height)+' px high ≥ 44, over the centre '+Math.round(ovl(cr))+' px² (0))',!e0&&a0&&chip&&cr.height>=44&&ovl(cr)===0);
+   const y0=cr.top,a1=OG.ask;let still=0;for(let i=0;i<180;i++){RO.v=25;roamStep(1/30);if(OG.ask===a1)still=i+1}
+   ck('chip still shown after '+(still/30).toFixed(1)+' s at 90 km/h, '+Math.round(Math.hypot(RO.x-sp.x,RO.z-sp.z))+' m past the start (≥ 5 s)',still>=150&&vis(OG_el('ogAsk')));
+   try{addXP(6000,'no-popup test 2');R3_upPump()}catch(e){}OG_res(fake,3,12.3,500,true);RO.v=10;
+   const noA=document.createElement('style');noA.textContent='*{animation:none!important}';document.head.appendChild(noA);   // measure the resting positions, not the first frame of the fade-in
+   const rs=[['chip',OG_el('ogAsk')],['level',U],['result',OG_el('ogRes')]].filter(x=>vis(x[1])).map(x=>[x[0],(x[0]==='level'?(x[1].firstElementChild||x[1]):x[1]).getBoundingClientRect()]),hz=['tP','roamMini','roamGauge','tL','tR','tG','tB','tN','roamTop','roamPlate'].map(id=>[id,document.getElementById(id)]).filter(x=>vis(x[1])&&x[1].getBoundingClientRect().width>0).map(x=>[x[0],x[1].getBoundingClientRect()]),bad=[];
+   const ov=(a,b)=>Math.min(a.right,b.right)-Math.max(a.left,b.left)>1&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>1;
+   for(const [n,r] of rs){for(const [m,q] of hz)if(ov(r,q))bad.push(n+'×'+m+'['+[r,q].map(z=>[z.left,z.top,z.right,z.bottom].map(Math.round)).join(' vs ')+']')}for(let i=0;i<rs.length;i++)for(let j=i+1;j<rs.length;j++)if(ov(rs[i][1],rs[j][1]))bad.push(rs[i][0]+'×'+rs[j][0]+'['+[rs[i][1],rs[j][1]].map(z=>[z.left,z.top,z.right,z.bottom].map(Math.round)).join(' vs ')+']');
+   const y1=OG_el('ogAsk').getBoundingClientRect().top;
+   ck((H>W?'portrait':'landscape')+': chip + level + result stacked ('+rs.map(x=>x[0]).join('+')+') overlap each other or a HUD control: '+(bad.join(',')||'none')+' (0), chip y '+Math.round(y0)+' → '+Math.round(y1)+' (fixed)',rs.length===3&&!bad.length&&Math.abs(y0-y1)<1);
+   noA.remove();U.hidden=true;OG_el('ogRes').hidden=true;RO.x=sp.x;RO.z=sp.z;
+   OG.ask=a1;a1.t=7;OG_el('ogAsk').hidden=false;RO.x=sp.x+60;RO.z=sp.z+60;const far=Math.hypot(RO.x-a1.x,RO.z-a1.z);const go=OG_askGo();ck('tap on the chip (car was '+Math.round(far)+' m past the start) starts the event and puts the car back at the start ('+go+', event '+!!OG.ev+', now '+Math.round(Math.hypot(RO.x-a1.x,RO.z-a1.z))+' m from it ≤ 12)',go&&!!OG.ev&&Math.hypot(RO.x-a1.x,RO.z-a1.z)<=12);if(OG.ev)OG_end(null,1);OG_el('ogRes').hidden=true;OG_el('ogHud').hidden=true}
+ }catch(e){R.push('✗ threw '+e)}
+ finally{K.ArrowUp=K.KeyW=false;RO.x=sv.x;RO.z=sv.z;RO.h=RO.vh=sv.h;RO.v=0;RO.ch=sv.ch;RO.card=sv.card;RO.y=groundAt(RO.x,RO.z,99);camSnap=true;U.hidden=true;R3U.q.length=0;R3U.later=null;OG_askHide();OG_el('ogAsk').hidden=true;const p=prof();p.xp=xp0;store.set('mho_prof',p)}
+ const ok=R.every(r=>r[0]==='✓');return'📍 why/no-popup ('+(H>W?'portrait':'landscape')+') · '+R.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
+{const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
+ __chk.items.unshift({ver:'why',id:'no-popup',area:'drive',text:'no-card-without-tap-r22e20: while driving (> 5 km/h) LEVEL UP and event results are small fading toasts (no card, nothing over the centre 50 % or the controls, text ≥ 12 px); events start only after a tap on the TAP TO START chip; the level-up card opens from the pause menu PROFILE or when stopped. 📍 GO.'});
+ __chk.GO['why/no-popup']=['fra','ath'].map(c=>({c,n:'no popup while driving '+(c==='fra'?'Frankfurt':'Athens'),secs:90,fn:()=>NP_go()}))},500)}
 const CL_ST=(()=>{const m=/[?&]cl=([^&#]*)/.exec(location.search),ks=m?m[1].split(','):[],T=(typeof TUNE!=='undefined'&&TUNE.cl)||{};
  return(ks.includes('studs')||ks.includes('all')||!!T.studs)&&!ks.includes('off')&&CID==='fra'})();
 const CL_STS={n:0,hud:0,trail:0,big:0,gap:0,names:{},v:5,step:6,up:2.4,r:1.0,
