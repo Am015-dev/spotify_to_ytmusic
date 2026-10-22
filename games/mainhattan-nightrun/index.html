@@ -3228,6 +3228,9 @@ setTimeout(()=>{if(!RET.sprites)return;for(const n of['drift','lancer','nova'])A
 SPR.warmBoss=nm=>{for(const a of['idle','attack','hit','defeat'])ART.anim('boss-'+nm+'/'+a);ART.anim('fx-boom-boss-a/burst');ART.anim('fx-boom-boss-b/burst');SPR.warmFx();};
 NR.on('tick',()=>{if(!RET.sprites||!G.live)return;const b=G.boss;if(b&&!b._sl){b._sl=1;const nm=ART.bossN[ART.artK(b)];if(nm)SPR.warmBoss(nm);}      // a boss on screen: its sheets start loading the moment it spawns, two seconds before it stops
   if(G.di===SPR._di)return;SPR._di=G.di;const nm=ART.bossN[DISTRICTS[G.di].boss];if(nm)setTimeout(()=>SPR.warmBoss(nm),3500);});
+/* review 9 fix 6 (E02): the 2 s spawn grace made drawPlayer blink the whole ship (6 Hz, half the frames hidden), so a new run showed only the ring, dot and flame. The grace stays; only a real hit blinks. */
+NR.on('hurt',()=>{ART.hitG=G;});
+{const dp=drawPlayer;drawPlayer=function(t){if(!(P&&P.inv>0)||ART.hitG===G||RET.shipBlink)return dp.apply(this,arguments);const v=P.inv;P.inv=0;try{return dp.apply(this,arguments);}finally{P.inv=v;}};}
 
 /* ---------- smarter enemies (the answer to "too easy with all the perks"), all gated by the level q ----------
    q = story level (2.4 .. 11.5), in endless 2 + district*1.6 + loop*3.
@@ -6181,8 +6184,8 @@ NR.on('kill',o=>{if(!RET.zoo||!o||o.boss||!o.e||!o.e.zt)return;ZOO.died(o.e);});
 NR.on('beat',()=>{if(!RET.zoo||!running||G.dead)return;const d=diff();for(const e of G.en.slice())if(e.zt&&ZOO.T[e.type]&&e.type!=='zdrn')ZOO.beat(e,d);});
 
 // PURPOSE: formation library (VARIETY A)
-// FLAG: vary (?vary=0), vary2 (?vary2=0)
-// TEST: vary-test.js
+// FLAG: vary (?vary=0), vary2 (?vary2=0), hudband (?hudband=0)
+// TEST: vary-test.js, hudband-test.js
 /* ---------- formations.js: the formation library (VARIETY A, owner 18 Oct 2026: "Game is extremely repetitive"). Flag RET.vary; ?vary=0 = the old waves exactly.
    A formation is a SPATIAL idea, not a recolour of one row: pincers from top and bottom, an X that converges, a snake on a path, a spiral, a wall whose gap moves...
    Every entry declares
@@ -6472,6 +6475,13 @@ FM.swN=.3;
 {const aw=SH.award;SH.award=function(e,keep){if(!RET.vary||!e||!e.fid||e.type!=='swarm')return aw.call(this,e,keep);const k=this.nx;this.nx=k*FM.swN;try{return aw.call(this,e,keep);}finally{this.nx=k;}};}
 NR.on('beat',()=>{if(RET.vary)FM.tickTel();});
 {const dp=drawPickups;drawPickups=function(t){dp(t);try{FM.draw(t);}catch(err){}};}
+/* review 9 fix 3 (E04): on a phone the world is turned upright, so world x near W is the top of the screen, under the score strip, chips and boss bar (92 HUD units,
+   HK scaled). Hovering enemies rest in zoo slots up to x = W-62, and pacing.js (STAY AND FIGHT) creeps a flyer at 0.3 speed from x = W-110 for 4 s; both now start no higher than band + radius. Flying in through the band is untouched. ?hudband=0 = as before. */
+if(RET.hudband===undefined)RET.hudband=!/[?&]hudband=0/.test(location.search);
+const HB=window.HB={band(){return 92*HK;},maxX(r){return W-this.band()-(r||16)-4;},on(){return !!RET.hudband&&!!rotMode;}};
+{const sl=ZOO.slot;ZOO.slot=function(e,x0,x1){if(!HB.on())return sl.call(this,e,x0,x1);const m=HB.maxX(e&&e.r),b=Math.min(x1==null?W-90:x1,m),a=Math.min(x0==null?W*.42:x0,b-20);return sl.call(this,e,a,b);};}
+NR.on('tick',()=>{if(!HB.on()||!G.live||G.dead)return;for(const e of G.en){if(e.zst!==1||e.type==='boss'||e.hp<=0)continue;const m=HB.maxX(e.r);if(e.x>m){e.x=m;if(e.zs)e.zs.x=Math.min(e.zs.x,m);}}});
+NR.on('runStart',()=>{if(HB.pw||!window.PAC)return;HB.pw=1;const f=PAC.f;PAC.f=function(e){if(!HB.on())return f.call(this,e);const z=this.zone;this.zone=Math.min(z,HB.maxX(e.r));try{return f.call(this,e);}finally{this.zone=z;}};});   // pacing.js loads later: wrapped on the first run
 
 // PURPOSE: every story stage plays its own script
 // FLAG: vary (?vary=0)
@@ -14857,7 +14867,7 @@ if(RET.saves){
    Title screen + Settings show it; Settings has CHECK FOR UPDATE; a new worker taking over reloads the page once, only on the title/game-over screen, never in a run.
    Saves and localStorage are never touched (the only key written is nrStampSeen, to say "Updated to ..." once). ---------- */
 if(RET.stamp===undefined)RET.stamp=!/[?&]stamp=0/.test(location.search);
-const NR_STAMP='d2193cc3c6 2026-10-22 02:18 UTC';
+const NR_STAMP='372a2f3c86 2026-10-22 02:18 UTC';
 RET.stampX=(function(){
   const X={stamp:NR_STAMP,hash:NR_STAMP.split(' ')[0],pending:false,reloaded:false};
   const sw='serviceWorker' in navigator&&location.protocol!=='file:'&&!SIM;
