@@ -3,7 +3,7 @@
 //   NODE_PATH=$(npm root -g) node games-src/nightrun/endramp-test.js     (pass/fail lines only)
 //   env: BOTS=0 skips the bot measurement; RUNS=10 (bot runs per cell); WAVES=30 (waves the live run plays)
 const PW = require(process.env.PW || 'playwright'), path = require('path'), cp = require('child_process'), fs = require('fs'), os = require('os');
-const DIR = path.resolve(__dirname, '../../games/mainhattan-nightrun'), ROOT = path.resolve(__dirname, '../..');
+const DIR = process.env.GAME_DIR || path.resolve(__dirname, '../../games/mainhattan-nightrun'), ROOT = path.resolve(__dirname, '../..');
 const BASE = process.env.BASE || '39baa56', WAVES = +process.env.WAVES || 30, RUNS = +process.env.RUNS || 10;
 const port = 8890 + (process.pid % 50), port2 = port + 50;
 const serve = (dir, p) => cp.spawn('python3', ['-m', 'http.server', String(p), '--bind', '127.0.0.1', '--directory', dir], { stdio: 'ignore' });
@@ -85,6 +85,15 @@ const LIVE = new Function('o', `
     const r = { ttk: t1 == null ? null : t1 - t0, w: window.ENDR.w }; m.abort(); m.god = false; return r;`);
   p = await open(''); const bo = await p.evaluate(`(${BOSS.toString().replace(/^function anonymous\(o\s*\)\s*\{/, 'function(o){')})()`);
   ck(bo.ttk != null && bo.ttk <= 120, `E05 centred auto-fire clears the first endless boss in ${bo.ttk == null ? 'never' : bo.ttk.toFixed(0) + ' s'} (<= 120 s, wave counter ${bo.w})`);
+  // 3c. F07 (review 10): every endless boss wave <= 100 game s and wave 10 by <= 260 s, with a ship that fires and drifts and with one that never fires (god mode; Normal, Hard, Legend)
+  const BW = new Function('o', `const m = window.__mnr; m.SET.diff = o.diff; m.SET.auto = o.mode !== 'nofire'; m.applySet(); m.god = true; document.getElementById('startBtn').click(); m.simOn(true);
+    const bl = []; let i = 0, bs = null, t10 = null; const E = window.ENDR;
+    while (m.running && m.G.t < 900 && E.w < 12) { if (m.SH.active) m.SH.close(); if (o.mode === 'nofire') m.touchTo(480, 270); else { if (i % 20 === 0) m.press('Fire'); if (i % 3 === 0) m.touchTo(300 + 200 * Math.sin(i / 50), 270 + 200 * Math.sin(i / 37)); }
+      m.step(1 / 60); i++; const e = m.G.boss; if (e && bs == null) bs = m.G.t; if (!e && bs != null) { bl.push(+(m.G.t - bs).toFixed(0)); bs = null; } if (E.w >= 10 && t10 == null) t10 = m.G.t; }
+    if (bs != null) bl.push(+(m.G.t - bs).toFixed(0) + 1000); const r = { bl, t10, w: E.w }; m.abort(); m.god = false; return r;`);
+  for (const o of [{ diff: 'normal', mode: 'drift' }, { diff: 'normal', mode: 'nofire' }, { diff: 'hard', mode: 'drift' }, { diff: 'legend', mode: 'nofire' }]) {
+    const pg = await open(''), r = await pg.evaluate(`(${BW.toString().replace(/^function anonymous\(o\s*\)\s*\{/, 'function(o){')})(${JSON.stringify(o)})`); await pg.close();
+    ck(r.bl.length >= 2 && Math.max(...r.bl) <= 100 && r.t10 != null && r.t10 <= 260, `F07 endless ${o.diff}/${o.mode}: boss waves ${r.bl.join(',')} s (all <= 100), wave 10 at ${r.t10 == null ? 'never' : r.t10.toFixed(0) + ' s'} (<= 260)`); }
   ck(errs === 0, 'no page errors');
   await b.close(); srv.kill();
   // 4. bots: human-model on Normal endless, oracle dodger (humanbot.js ENDLESS=1; the bots cannot play boss gates: god mode during a boss, so this measures the waves between bosses)

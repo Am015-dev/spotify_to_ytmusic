@@ -36,7 +36,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | reward | reward RWD 14-54 |  |  | reward |  |
 | build2! | choices CHO.tick 28-61 |  |  | choices | BALANCE |
 | bossmoves | bossmoves vd 98-178 |  |  | bossmoves |  |
-| bossvis,first30 | bossvis BV.over 38-89 |  |  | bossvis |  |
+| bossvis,first30 | bossvis BV.tag 65-103 |  |  | bossvis |  |
 | pw3 | powlevels PW3 36-188 | power,a |  | ret-pw3 |  |
 | abil | abilities ABIL 24-101 | a,art |  | abil |  |
 | forge | forge FG 65-183 |  |  | forge |  |
@@ -58,7 +58,8 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | flankers | flankers ebRoom 67-73 |  |  | flankers |  |
 | foeart | foeart FOEART 45-85 |  |  | foeart | ASSETS-NEEDED-ENEMIES |
 | fleet,fleetArr! | fleet FLEET 21-222 |  |  | fleet |  |
-| endramp | endramp ENDR 15-55 |  |  | endramp |  |
+| endramp | endramp ENDR 17-57 |  |  | endramp |  |
+| bandclear | bandclear bclPlace 10-18 |  |  | hudband |  |
 | legend,easy2 | legend LEG 19-79 |  |  | legend |  |
 | deck,roster,songspread | fun FUN 14-77 | footen |  | fun |  |
 | lessons | lessons lsTick 156-178 |  |  | lessons |  |
@@ -67,7 +68,7 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | fs | fs save 16-19 |  |  | fs |  |
 | read | readable READ 16-69 | fxwave |  | readable |  |
 | bulletart | bulletart BA 9-11 |  |  | bulletart |  |
-| legible | legible LGB 14-35 |  |  | legible | INDUSTRY-PLAYBOOK |
+| legible | legible LGB 14-45 |  |  | legible | INDUSTRY-PLAYBOOK |
 | powers | arsenal PWX.tip 90-157 | footen |  | powers | ASSETS-NEEDED-3 |
 | abup,pwrclear | abup ABUP 25-97 |  |  | abup | ASSETS-NEEDED-3 |
 | zonehint | zonehint ZH 9-26 |  |  | pwrstar |  |
@@ -79,14 +80,14 @@ Flag: plain = ON, off with `?flag=0`; `!` = default OFF, on with `?flag=1`; `*` 
 | polish | polish POL.flush 78-105 |  |  | polish |  |
 | diet | diet DIET.thin 36-63 |  |  | diet |  |
 | mix | mix MIX 20-27 | a |  | mix |  |
-| hub,garagefix | hub gfPatchAll 288-301 | ret |  | hub |  |
-| layout,layoutStrip* | layout lyMap 41-55 |  |  | layout |  |
+| hub,garagefix | hub gfPatchAll 290-303 | ret |  | hub |  |
+| layout,layoutStrip* | layout lyMap 41-60 |  |  | layout |  |
 | school | school footEnd 110-125 |  |  | school |  |
 | schoolfull | schoolfull sfGapWall 61-79 |  |  | school-full |  |
 | tidy | tidy F.post 19-88 | flavor,ret |  | tidy |  |
 | menufix | menufix mfDraw 35-41 |  |  | menufix |  |
-| explain | explain EXP 11-43 |  |  | explain | WORKER-RULES |
-| calm | calm CALM 10-34 | footen,fxwave |  | calm |  |
+| explain | explain EXP 11-65 |  |  | explain | WORKER-RULES |
+| calm | calm CALM 10-37 | footen,fxwave |  | calm |  |
 
 Files with no flag (core, data, art): a, b, g, c (engine, ship, weapons, hint), bg/draw (backdrop, ship), story/map/dir/songs (stages, route, director), foot* (on-foot), shop/garage/up2/upgrades/perks2/strategy/meta/paths (economy), art/shapes/fx/fxwave/hud (looks), lab, tut, ai, athens*. Purpose of every file: `MODULES-COMPACT.md`.
 
