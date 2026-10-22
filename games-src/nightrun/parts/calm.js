@@ -1,13 +1,13 @@
 // PURPOSE: a calm playfield: rule banners small in the top band, thin soft player/enemy beams, at most 2 rings per enemy
 // FLAG: calm (?calm=0)
-// TEST: calm-test.js
+// TEST: calm-test.js, review9-test.js
 /* ---------- CALM (flag RET.calm, default ON; ?calm=0 = as before). Owner look, Legend stage 10 on a phone (22 Oct 2026):
    - a rule announcement ("RULE · CURVED SHOTS") covered the middle of the field while enemies attacked: now a small strip in the top band (under the score bar), at most 2.5 s;
    - bright beams ~25 css px wide: pictured player shots are at most 12 css px thick (alpha <= .75), enemy aim / sniper beams <= 12 css px (alpha <= .8);
    - enemies wore 3-4 rings at once: at most 2 per enemy, priority attack tell (pink / red) > elite (gold) > the rest (1 frame of memory decides).
    Nothing here changes damage or timing. ---------- */
 if(RET.calm===undefined)RET.calm=!/[?&]calm=0/.test(location.search);
-const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2.5,RMAX:2,fr:0,cur:null,pk:new Map(),pp:new Map(),a:null,stat:{rings:0,cut:0,beams:0},
+const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2.5,TTITLE:2,RMAX:2,fr:0,cur:null,pk:new Map(),pp:new Map(),a:null,stat:{rings:0,cut:0,beams:0},
   /* css px per world unit under the current transform */
   css(){const t=ctx.getTransform(),c=ctx.canvas;return Math.hypot(t.a,t.b)*(c.clientWidth/c.width||1)||1;},
   isRule(a){return/^(RULE|NEW$|REMIX|TWIST)/.test(a||'');},
@@ -15,8 +15,9 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2
   /* top-band strip: one line, under the score bar, off the middle of the field */
   draw(bn,w,h,k){const kk=bn.t,a=Math.max(0,Math.min(1,kk*3,(bn.m-kk)*6)),D=DISTRICTS[G.di],y=(G.boss&&G.boss.x<W?52:38)*k,hh=24*k;
     ctx.save();ctx.globalAlpha=a*.9;ctx.fillStyle='#05030cd0';ctx.fillRect(0,y,w,hh);ctx.fillStyle=D.a;ctx.fillRect(0,y,3*k,hh);ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='alphabetic';
-    const txt=bn.a+(bn.b?' · '+bn.b:'');ctx.font=`700 ${12*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#e9e6ff';
+    let txt=bn.a+(bn.b?' · '+bn.b:'');ctx.font=`700 ${12*k}px "Chakra Petch",sans-serif`;ctx.fillStyle='#e9e6ff';
     let f=12*k;while(f>8*k&&ctx.measureText(txt).width>w-16*k){f-=.5*k;ctx.font=`700 ${f}px "Chakra Petch",sans-serif`;}
+    if(ctx.measureText(txt).width>w-16*k)txt=bn.a;   // the sub line does not fit one chip: the title alone
     ctx.fillText(txt,w/2,y+hh*.68);ctx.restore();},
   cls(s){let r=0,g=0,b=0;if(typeof s!=='string')return 2;let m=s.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})/i);
     if(m){r=parseInt(m[1],16);g=parseInt(m[2],16);b=parseInt(m[3],16);}else if((m=s.match(/rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)/))){r=+m[1];g=+m[2];b=+m[3];}else return 2;
@@ -29,7 +30,9 @@ const CALM=window.CALM={get on(){return!!RET.calm&&running&&!!G;},BEAM:12,TMAX:2
     m.cm|=1<<c;if(n>=this.RMAX||m.n>=this.RMAX){this.stat.cut++;return false;}m.n++;this.stat.rings++;return true;}};
 /* ---- 1. banners: the rule card is small and short ---- */
 {const bn0=banner;banner=function(a,b,warn,t){const r=bn0.apply(this,arguments);
-  if(RET.calm&&running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}return r;};}
+  if(RET.calm&&running&&G&&G.banner&&!warn&&CALM.isRule(a)){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TMAX);G.banner.t=G.banner.m=m;}
+  else if(RET.calm&&G&&G.banner&&!warn&&!G.banner.ev){G.banner.sm=1;const m=Math.min(t||3.2,CALM.TTITLE);G.banner.t=G.banner.m=m;}   // review 9 #1: the stage title is a one-line chip for 2 s, not a 96 px band over live fire
+  return r;};}
 /* ---- 2. beams: thin and soft ---- */
 {const bb=FXW.bullet;FXW.bullet=function(b){if(!CALM.on||!b.wid)return bb.apply(this,arguments);const k='w-'+b.wid+'-bullet';if(!FXW.pic(k))return false;
   const L=b.len||(b.big?22:b.pn!=null?28:20);let w=Math.max(22,Math.min(130,L*1.4+(b.th||3)*2));const ang=((b.vx||b.vy)?Math.atan2(b.vy,b.vx):0)+(FXW.SPIN[b.wid]?G.t*9:0);
