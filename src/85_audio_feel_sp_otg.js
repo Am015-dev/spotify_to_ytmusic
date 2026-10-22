@@ -611,6 +611,8 @@ function OG_css(){if(document.getElementById('ogCss'))return;const st=document.c
 #ogHud b{display:block;font:italic 900 15px system-ui,sans-serif;letter-spacing:.08em}#ogHud .ogT{display:flex;gap:8px;justify-content:center;font-size:12px;color:#cfe6f5;margin-top:2px}#ogHud .ogT i{font-style:normal;opacity:.45}#ogHud .ogT i.on{opacity:1}
 #ogHud .ogP{font-size:20px;font-weight:900;color:#ffd12c}#ogHud button,#ogRes button{margin-left:8px;background:#ffd12c;color:#111;border:0;border-radius:9px;font:900 12px system-ui;padding:5px 9px;cursor:pointer}
 #ogRes{position:fixed;left:50%;top:32%;transform:translate(-50%,-50%);z-index:41;background:radial-gradient(circle,#2a2f5a,#121428);border:3px solid #ffd12c;border-radius:18px;color:#fff;font:800 14px system-ui;padding:14px 22px;text-align:center;pointer-events:auto}
+#ogAsk{position:fixed;left:50%;top:calc(40px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:41;box-sizing:border-box;min-height:44px;display:flex;align-items:center;padding:0 16px;border-radius:14px;background:#ffd12c;border:3px solid #141413;box-shadow:0 3px 0 #141413;color:#141413;font:italic 900 14px system-ui,sans-serif;white-space:nowrap;cursor:pointer;pointer-events:auto}#ogAsk[hidden]{display:none}
+#ogRes.tst{top:calc(40px + env(safe-area-inset-top,0px));transform:translateX(-50%);display:flex;gap:8px;align-items:center;white-space:nowrap;padding:6px 14px;border-radius:12px;border-width:2px;font:800 13px system-ui;pointer-events:none;animation:ogTst 3.2s ease-out forwards}#ogRes.tst span{font-weight:700;font-size:12px;color:#cfe6f5}@keyframes ogTst{0%{opacity:0}8%{opacity:1}82%{opacity:1}100%{opacity:0}}
 #ogRes .md{font-size:52px;line-height:1}#ogRes small{font-size:13px}#ogRes.on{animation:ogPop .45s cubic-bezier(.2,1.6,.4,1)}@keyframes ogPop{0%{transform:translate(-50%,-50%) scale(.3)}100%{transform:translate(-50%,-50%) scale(1)}}
 #ogArea{position:fixed;left:50%;top:calc(142px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:39;background:rgba(12,14,30,.86);border-left:5px solid #5dffb0;border-radius:12px;color:#fff;font:700 12px system-ui;padding:8px 14px;text-align:center;pointer-events:none;max-width:92vw}
 #ogArea b{font:italic 900 16px system-ui;letter-spacing:.1em}#ogArea em{display:block;font-style:normal;color:#5dffb0;font-weight:900}#ogArea.on{animation:ogIn .4s ease-out}@keyframes ogIn{0%{opacity:0;transform:translate(-50%,-14px)}100%{opacity:1}}
@@ -622,8 +624,9 @@ function OG_css(){if(document.getElementById('ogCss'))return;const st=document.c
 #ogCol{position:fixed;inset:0;z-index:60;background:rgba(8,10,22,.94);color:#fff;font:700 13px system-ui;overflow:auto;padding:calc(16px + env(safe-area-inset-top,0px)) 16px 16px}
 #ogCol h2{margin:0 0 10px;font:italic 900 20px system-ui;letter-spacing:.08em}#ogCol .set{background:#1b1f3a;border-radius:12px;padding:8px 12px;margin:0 0 8px}#ogCol .it{display:inline-block;margin:4px 6px 0 0;padding:3px 7px;border-radius:8px;background:#2a3058;font-size:12px}#ogCol .it.no{opacity:.35}
 #ogCol .x{position:sticky;top:0;float:right;background:#ffd12c;border:0;border-radius:9px;font:900 14px system-ui;padding:6px 12px;cursor:pointer}
+body:has(#r3Up.mini:not([hidden])) #ogRes.tst,body:has(#r3Up.mini:not([hidden])) #ogAsk,body:has(#ogRes.tst:not([hidden])) #ogAsk{top:calc(90px + env(safe-area-inset-top,0px))}body:has(#r3Up.mini:not([hidden])):has(#ogRes.tst:not([hidden])) #ogAsk{top:calc(140px + env(safe-area-inset-top,0px))}   /* toasts stack instead of covering each other */
 @media (max-height:500px){#ogHud,#ogArea{top:calc(96px + env(safe-area-inset-top,0px));font-size:11px;padding:5px 10px}#ogHud .ogP{font-size:15px}#ogRes{top:40%;padding:8px 14px}#ogRes .md{font-size:34px}}
-body.og-map #ogHud,body.og-map #ogArea{display:none}body:has(#ogHud:not([hidden])) #m1Next,body:has(#ogHud:not([hidden])) #roamPlate,body:has(#ogRes:not([hidden])) #m1Next,body:has(#ogRes:not([hidden])) #roamPlate{visibility:hidden}@media (orientation:portrait){#ogHud,#ogRes{left:auto;right:calc(10px + env(safe-area-inset-right,0px));transform:none;min-width:0;max-width:calc(100vw - 140px)}}`;document.head.appendChild(st)}
+body.og-map #ogHud,body.og-map #ogArea{display:none}body:has(#ogHud:not([hidden])) #m1Next,body:has(#ogHud:not([hidden])) #roamPlate,body:has(#ogRes:not([hidden])) #m1Next,body:has(#ogRes:not([hidden])) #roamPlate{visibility:hidden}@media (orientation:portrait){#ogHud,#ogRes:not(.tst){left:auto;right:calc(10px + env(safe-area-inset-right,0px));transform:none;min-width:0;max-width:calc(100vw - 140px)}}`;document.head.appendChild(st)}
 function OG_hud(){const e=OG.ev,el=OG_el('ogHud');if(!e){el.hidden=true;return}const T=OG_T[e.kind],g=e.goal,u=e.u,lab=[`🥉 ${g[0]}${u}`,`🥈 ${g[1]}${u}`,`🥇 ${g[2]}${u}`],cur=OG_tier(e,OG_val(e,1));
   const html=`<b>${T.ic} ${T.n.toUpperCase()}</b><span class="ogP">${OG_prog(e)}</span> · ${Math.max(0,e.lim-e.tm).toFixed(1)} s<button id="ogRetryB">↻ RETRY (Y)</button><div class="ogT">${lab.map((l,i)=>`<i class="${cur>i?'on':''}">${l}</i>`).join('')}</div>`;
   if(el._h!==html){el._h=html;el.innerHTML=html;const b=el.querySelector('#ogRetryB');b.onclick=()=>OG_retry();b.addEventListener('touchstart',ev=>{ev.preventDefault();ev.stopPropagation();OG_retry()},{passive:false})}el.hidden=false}
@@ -631,6 +634,11 @@ function OG_prog(e){const k=e.kind;return k==='gate'?`${e.n}/${e.objs.length} ga
 // ---------- events
 const OG_mat={};const OG_m=(c,e=1.6)=>OG_mat[c+e]||(OG_mat[c+e]=neonMat(c,e));
 function OG_obj(e,m,x,y,z){m.position.set(x,y,z);RO.grp.add(m);e.meshes.push(m);return m}
+// no-card-without-tap (Alex: popups, annoying quests): driving past an event start only offers a small chip; the event starts after a tap (or Y on PC)
+function OG_ask(sp){if(OG.ask||(OG.noAsk&&OG.noAsk[sp.id]>performance.now()))return;const T=OG_T[sp.t],el=OG_el('ogAsk');el.innerHTML=`${T.ic} ${T.n.toUpperCase()} · TAP TO START`;el.onclick=e=>{e.stopPropagation();OG_askGo()};el.ontouchstart=ev=>{ev.preventDefault();ev.stopPropagation();OG_askGo()};el.hidden=false;OG.ask={sp,t:7};try{OG_snd('pick')}catch(e){}}
+function OG_askHide(){const a=OG.ask;OG.ask=null;OG_el('ogAsk').hidden=true;if(a){(OG.noAsk||(OG.noAsk={}))[a.sp.id]=performance.now()+25000}}
+function OG_askStep(dt){const a=OG.ask;a.t-=dt;if(a.t<=0||OG.ev||RO.ch||RO.sp||RO.card||RO.mapOpen||(a.sp.x-RO.x)**2+(a.sp.z-RO.z)**2>16*16)OG_askHide()}
+function OG_askGo(){const a=OG.ask;if(!a)return false;OG_askHide();if(OG.ev||state!=='roam')return false;OG_start(a.sp);return true}
 function OG_start(sp,re){if(OG.ev)return;const G=qvGraph();let i=sp.i??qvNear(sp.x,sp.z,40);if(i<0)return;let dx=Math.sin(RO.h),dz=Math.cos(RO.h);if(re){dx=re.dx;dz=re.dz}
   const t=sp.t,L={gate:560,ring:600,rush:520,smash:420,ghost:650,drift:0,stunt:150,ljump:160}[t];let W=OG_walk(i,dx,dz,L);if(L&&W.len<L*.6){const W2=OG_walk(i,-dx,-dz,L);if(W2.len>W.len){W=W2;dx=-dx;dz=-dz}}
   const e={sp,kind:t,W,t0:performance.now(),tm:0,n:0,lim:30,objs:[],meshes:[],ramps:[],start:{x:RO.x,z:RO.z,h:RO.h,y:RO.y,dx,dz},hi:1,u:'',done:0};OG.ev=e;OG.log.start++;
@@ -673,7 +681,9 @@ function OG_end(v,silent){const e=OG.ev;if(!e)return;OG.ev=null;for(const m of e
   let pay=0;if(md>prev){for(let q=prev+1;q<=md;q++)pay+=OG_PAY[q];s.e[e.sp.id]=md;OG_save()}else if(md)pay=Math.round(OG_PAY[md]*.15);if(pay){const S2=season();S2.cr+=pay;saveSeason(S2)}
   OG.last={sp:e.sp,start:e.start,t:performance.now(),md,v,pay};OG.lastRes=OG.last;OG_res(e,md,v,pay,md>prev);if(md){OG_snd('finish');try{for(let q=0;q<md*3;q++)studBurst(V3(RO.x,RO.y+1.5,RO.z),V3(Math.sin(RO.h),0,Math.cos(RO.h)),10);burst(SPARK,V3(RO.x,RO.y+3,RO.z),40,22,.8,new THREE.Color(['#cd7f32','#cd7f32','#d8dde4','#ffd12c'][md]));fovKick=Math.max(fovKick,6)}catch(err){}}else OG_snd('crash');
   if(md>prev){OG_sum();OG_reward(e.sp.a)}}
-function OG_res(e,md,v,pay,fresh){const el=OG_el('ogRes'),T=OG_T[e.kind],nm=['NO MEDAL','BRONZE','SILVER','GOLD'][md],val=v==null?'TIME UP':(e.u===' s'?v.toFixed(1)+' s':Math.round(v)+e.u);
+function OG_res(e,md,v,pay,fresh){const el=OG_el('ogRes'),T=OG_T[e.kind],nm=['NO MEDAL','BRONZE','SILVER','GOLD'][md],val=v==null?'TIME UP':(e.u===' s'?v.toFixed(1)+' s':Math.round(v)+e.u)
+  if(Math.abs(RO.v)*3.6>5){el.className='tst';el.innerHTML=`<b>${['💨','🥉','🥈','🥇'][md]} ${T.n.toUpperCase()} · ${nm}</b><span>${val}${pay?' · +'+pay.toLocaleString('de-DE')+' studs':''}</span>`;el.hidden=false;clearTimeout(OG_res.t);OG_res.t=setTimeout(()=>el.hidden=true,3200);return}   // moving: a small fading toast, no card
+  el.className='';
   el.innerHTML=`<div class="md">${['💨','🥉','🥈','🥇'][md]}</div><b>${T.n.toUpperCase()} · ${nm}!</b><div>${val}</div><small>${pay?'+'+pay.toLocaleString('de-DE')+' studs':'no studs this time'}${fresh&&md?' · NEW BEST':''}</small><div><button id="ogRetryR">↻ RETRY (Y)</button></div>`;
   const b=el.querySelector('#ogRetryR');b.onclick=()=>OG_retry();b.addEventListener('touchstart',ev=>{ev.preventDefault();ev.stopPropagation();OG_retry()},{passive:false});
   el.hidden=false;el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(OG_res.t);OG_res.t=setTimeout(()=>el.hidden=true,4500)}
@@ -686,11 +696,11 @@ function OG_pick(sp){const s=OG_sv();if(sp.k==='gold'){s.g[sp.id]=1;OG.log.gold+
 // mission marks can appear after placement (story steps, encounters): drop spots that now sit on one
 function OG_prune(){const sig=(RO.marks||[]).length+':'+(HUB.gates||[]).length;if(sig===OG.mkSig)return;OG.mkSig=sig;const ex=OG_excl(),keep=OG.S.filter(sp=>!OG_near(ex,sp.x,sp.z));if(keep.length===OG.S.length)return;OG.S=keep;const g=new Map();for(const sp of keep){const k=OG_gk(sp.x,sp.z);(g.get(k)||g.set(k,[]).get(k)).push(sp)}OG.grid=g;OG.vis=OG.vis.filter(sp=>keep.includes(sp))}
 // ---------- per-frame
-function OG_tick(dt){if(state!=='roam'||!RO.on||!RO.built)return;if(!OG.grp||OG.key!==OG_key()){if(!QV.g&&(OG.f++%30))return;if(!OG_build())return}
+function OG_tick(dt){if(state!=='roam'||!RO.on||!RO.built){if(OG.ask)OG_askHide();return}if(OG.ask)OG_askStep(dt);if(!OG.grp||OG.key!==OG_key()){if(!QV.g&&(OG.f++%30))return;if(!OG_build())return}
   OG.cool=Math.max(0,OG.cool-dt);if(OG.ev){if(RO.ch||RO.sp)OG_end(null,1);else if(!RO.wk)OG_step(dt)}  // a wreck (2 s rebuild) pauses the event instead of silently cancelling it
   if(OG.f%120===0)OG_prune();if(++OG.f%8===0)OG_pickVis();
   const busy=RO.ch||RO.sp||RO.wk||RO.card||RO.mapOpen||RO.story||RO.frozen||(window.__m1&&__m1.cs&&__m1.cs());
-  if(!OG.ev&&!busy&&OG.cool<=0)for(const sp of OG.vis){const d2=(sp.x-RO.x)**2+(sp.z-RO.z)**2;if(sp.k==='ev'){if(d2<7.2*7.2&&Math.abs(RO.y-sp.y)<6&&Math.abs(RO.v)>3&&!OG_blocked(sp)){OG_start(sp);break}}
+  if(!OG.ev&&!busy&&OG.cool<=0)for(const sp of OG.vis){const d2=(sp.x-RO.x)**2+(sp.z-RO.z)**2;if(sp.k==='ev'){if(d2<7.2*7.2&&Math.abs(RO.y-sp.y)<6&&Math.abs(RO.v)>3&&!OG_blocked(sp)){OG_ask(sp);break}}
     else if(!OG_done(sp)&&d2<4.6*4.6&&Math.abs(RO.y+.8-sp.y)<4.2){OG_pick(sp);OG_pickVis();break}}
   OG_draw();document.body.classList.toggle('og-map',!!RO.mapOpen);
   if(OG.f%30===0){const a=OG_areaAt(RO.x,RO.z);if(a!==OG.area){const first=OG.area==null;OG.area=a;if(!first||OG.f>60)OG_pop(a,first)}}
@@ -715,7 +725,7 @@ function OG_col(on){const el=OG_el('ogCol');if(!on){el.hidden=true;return}const 
 roamStep=(f=>function(dt){f(dt);try{OG_tick(dt)}catch(e){if(OG.err++<3)console.warn('OG',e)}})(roamStep);
 roamLanded=(f=>function(){const t=RO.takeoff;f.apply(this,arguments);try{OG_landed(t)}catch(e){}})(roamLanded);
 drawRoamMap=(f=>function(){f.apply(this,arguments);try{OG_map()}catch(e){if(OG.err++<3)console.warn('OG map',e)}})(drawRoamMap);
-addEventListener('keydown',e=>{if(state!=='roam'||e.repeat)return;if(e.code==='KeyY'){if(OG_retry())e.preventDefault()}else if(e.code==='KeyU'){const el=document.getElementById('ogCol');OG_col(!el||el.hidden)}else if(e.code==='Escape'){const el=document.getElementById('ogCol');if(el&&!el.hidden){OG_col(false);e.stopImmediatePropagation()}}});
+addEventListener('keydown',e=>{if(state!=='roam'||e.repeat)return;if(e.code==='KeyY'){if(OG_askGo()||OG_retry())e.preventDefault()}else if(e.code==='KeyU'){const el=document.getElementById('ogCol');OG_col(!el||el.hidden)}else if(e.code==='Escape'){const el=document.getElementById('ogCol');if(el&&!el.hidden){OG_col(false);e.stopImmediatePropagation()}}});
 OG_css();
 window.__og={OG,T:OG_T,build:()=>OG_build(),sv:()=>OG_sv(),stats:a=>OG_stats(a),areas:()=>OG_areas(),areaAt:(x,z)=>OG_areaAt(x,z),start:id=>{const sp=OG.S.find(q=>q.id===id);if(sp)OG_start(sp);return !!OG.ev},retry:()=>OG_retry(),
   end:()=>OG_end(null,1),ev:()=>OG.ev&&{t:OG.ev.kind,n:OG.ev.n,time:OG.ev.tm,lim:OG.ev.lim,goal:OG.ev.goal,hi:OG.ev.hi,P:OG.ev.W.P,len:OG.ev.W.len,objs:OG.ev.objs.map(o=>[o.x,o.z,!!o.done]),ramp:OG.ev.ramp&&{x:OG.ev.ramp.x,z:OG.ev.ramp.z,h:OG.ev.ramp.h,len:OG.ev.ramp.len},tx:OG.ev.tx,tz:OG.ev.tz,d:OG.ev.d,gd:OG.ev.gd},

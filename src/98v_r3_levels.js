@@ -52,7 +52,8 @@ profileOpen=(f=>function(){f();const B=$('#pfBody');if(!B)return;const L=carStat
  const d=B.querySelector('.pcard.drv');if(d&&!d.querySelector('.r3Hero')){const lv=d.querySelector('.lvl');if(lv)lv.remove();const w=d.querySelector('div:not(.lvl)');if(w){w.querySelectorAll('.pbar,small:last-child').forEach(e=>{if(e!==w.querySelector('small'))e.remove()});w.insertAdjacentHTML('beforeend',R3_hero(L))}}
  const st=[...B.querySelectorAll('.pcard')].find(c=>((c.querySelector('h5')||{}).textContent||'')==='STATS');
  if(st&&!st.classList.contains('r3Fold')){st.classList.add('r3Fold');const h=st.querySelector('h5');h.innerHTML='<button class="r3More">MORE STATS ▾</button>';h.firstChild.onclick=()=>{st.classList.toggle('open');try{AU.sfx('pick')}catch(e){}}
-  st.insertAdjacentHTML('beforebegin',`<div class="pcard r3PfL"><h5>LEVEL LINE · CLASS ${R3_CL[L>=20?2:L>=10?1:0]}</h5><div class="r3Mid">${R3_bars(L)}</div>${R3_nextHtml(L)}</div>`)}})(profileOpen);
+  st.insertAdjacentHTML('beforebegin',`<div class="pcard r3PfL"><h5>LEVEL LINE · CLASS ${R3_CL[L>=20?2:L>=10?1:0]}</h5><div class="r3Mid">${R3_bars(L)}</div>${R3_nextHtml(L)}</div>`)}
+ if(R3U.later&&!B.querySelector('.r3LvB')){const b=document.createElement('button');b.className='r3Go r3LvB';b.textContent='⭐ LEVEL UP! TAP TO VIEW';b.onclick=()=>{const[a,c]=R3U.later;R3U.later=null;b.remove();R3_up(a,c,false)};B.insertBefore(b,B.firstChild)}})(profileOpen);
 // ---------- level-up card (2K-style): hero, bars rising from the old level line, rewards, next. Menus: modal with CONTINUE; free roam: a small
 // card at the top that never blocks driving (auto-hides); races: queued until the race is over.
 const R3U={q:[]};
@@ -64,11 +65,13 @@ function R3_upPump(){const gx=$('#gbx'),gar=!!(gx&&!gx.hidden)||(typeof BX!=='un
 setInterval(()=>{try{R3_upPump()}catch(e){}},600);
 function R3_up(l0,l1,mini){const U=$('#r3Up');R3U.cur=[l0,l1];let rw=[['📈','STATS UP','top speed, acceleration, handling, health']];for(let L=l0+1;L<=l1;L++)rw=rw.concat(R3_road(L));
  mini=mini!=null?mini:state==='roam';U.classList.toggle('mini',!!mini);
- U.innerHTML=`<div class="r3UC"><div class="r3URib">LEVEL UP!</div>${R3_hero(l1,1)}<div class="r3UB">${R3_bars(l1,l0)}<ul>${rw.slice(0,mini?2:4).map(([i,t,s])=>`<li><i>${i}</i><b>${t}</b><small>${s}</small></li>`).join('')}</ul></div>${R3_nextHtml(l1)}
-  ${mini?'':`<div class="r3UBt">${rw.some(r=>/PERK/.test(r[1]))?'<button class="r3Go alt" data-r3u="perks">⚡ PERKS</button>':''}<button class="r3Go" data-r3u="ok">CONTINUE ▶</button></div>`}</div>`;
+ if(mini){const nx=rw[1]?rw[1][1]:'STATS UP';R3U.later=R3U.later?[Math.min(R3U.later[0],l0),l1]:[l0,l1];   // no-card-without-tap: the full card waits in the pause menu (PROFILE)
+  U.innerHTML=`<div class="r3UT"><b>⭐ LEVEL UP!</b><span>LVL ${l1}</span><small>${nx}</small></div>`}
+ else U.innerHTML=`<div class="r3UC"><div class="r3URib">LEVEL UP!</div>${R3_hero(l1,1)}<div class="r3UB">${R3_bars(l1,l0)}<ul>${rw.slice(0,4).map(([i,t,s])=>`<li><i>${i}</i><b>${t}</b><small>${s}</small></li>`).join('')}</ul></div>${R3_nextHtml(l1)}
+  <div class="r3UBt">${rw.some(r=>/PERK/.test(r[1]))?'<button class="r3Go alt" data-r3u="perks">⚡ PERKS</button>':''}<button class="r3Go" data-r3u="ok">CONTINUE ▶</button></div></div>`;
  U.hidden=false;try{AU.sfx('finish')}catch(e){}
  requestAnimationFrame(()=>U.querySelectorAll('.r3UB .r3B i[data-from]').forEach(i=>{const h=i.style.height;i.style.transition='none';i.style.height=i.dataset.from+'%';i.offsetHeight;i.style.transition='height 1.1s cubic-bezier(.2,.9,.3,1.2) .25s';i.style.height=h}));
- clearTimeout(R3U.t);if(mini)R3U.t=setTimeout(()=>{U.hidden=true},window.__qs&&__qs.act()?2000:5200)}   // quiet-start: a top toast of <= 2 s in free roam (queued in races, modal only in menus)
+ const tt=window.__qs&&__qs.act()?2600:4200;U.style.setProperty('--tt',tt+'ms');clearTimeout(R3U.t);if(mini)R3U.t=setTimeout(()=>{U.hidden=true},tt)}   // quiet-start: a top toast of <= 2 s in free roam (queued in races, modal only in menus)
 {const U=document.createElement('div');U.id='r3Up';U.hidden=true;document.body.appendChild(U);
  U.addEventListener('click',e=>{const b=e.target.closest('[data-r3u]');if(!b)return;U.hidden=true;try{AU.sfx('pick')}catch(_){}
   if(b.dataset.r3u==='perks'&&state!=='roam'){try{gbOpen();setTimeout(()=>{try{R2_go('perks')}catch(_){}},60)}catch(_){}}setTimeout(R3_upPump,300)})}
@@ -122,7 +125,10 @@ gbClose=(f=>function(){R3_show(false);return f.apply(this,arguments)})(gbClose);
 #r3Up .r3UB{display:flex;gap:10px}#r3Up .r3UB .r3Bars{flex:0 0 190px;height:120px}#r3Up ul{flex:1;min-width:0;list-style:none;margin:0;padding:0;display:grid;gap:5px;align-content:start}
 #r3Up li{display:grid;grid-template-columns:26px 1fr;column-gap:6px;padding:4px 8px;border-radius:9px;background:rgba(255,255,255,.1)}#r3Up li i{grid-row:1/3;font-style:normal;font-size:20px;align-self:center}#r3Up li b{font:italic 900 13px var(--hud);color:#ffd12c}#r3Up li small{font:700 12px system-ui;color:#dfe6ff}
 #r3Up .r3UBt{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}.r3Go{all:unset;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;padding:0 18px;border-radius:12px;background:#3fd46a;border:3px solid #141413;box-shadow:0 4px 0 #141413;font:italic 900 15px var(--hud);color:#141413}.r3Go.alt{background:#fff}
-#r3Up.mini{inset:auto;left:50%;top:calc(8px + env(safe-area-inset-top,0px));transform:translateX(-50%) scale(.62);transform-origin:top center;background:none;pointer-events:none}#r3Up.mini .r3UC{width:560px}
+#r3Up.mini{inset:auto;left:50%;top:calc(40px + env(safe-area-inset-top,0px));transform:translateX(-50%);display:block;background:none;pointer-events:none;z-index:45}
+#r3Up .r3UT{display:flex;align-items:center;gap:8px;white-space:nowrap;padding:6px 14px;border-radius:12px;background:linear-gradient(135deg,#1d2a6e,#2a1450);border:3px solid #141413;box-shadow:0 3px 0 #141413;color:#fff;font:italic 900 13px var(--hud);animation:r3Tst var(--tt,3s) ease-out forwards}#r3Up .r3UT b{color:#ffd12c}#r3Up .r3UT small{font:700 12px system-ui;color:#dfe6ff}
+@keyframes r3Tst{0%{opacity:0;transform:translateY(-10px)}8%{opacity:1;transform:none}82%{opacity:1}100%{opacity:0}}
+#profile .r3LvB{display:block;width:100%;margin:0 0 8px}
 @media (max-height:430px){#r3Up:not(.mini) .r3UC{padding:12px 12px 8px}#r3Up:not(.mini) .r3Hero.big .r3Lv b{font-size:44px}#r3Up:not(.mini) .r3UB .r3Bars{height:104px}}
 #r3Sh{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% 30%,#2a4fb0,#141c4a 75%);font-family:system-ui;color:#fff;padding:0 0 env(safe-area-inset-bottom,0px)}#r3Sh[hidden]{display:none}
 #r3Sh .r3ShH{display:flex;align-items:center;gap:6px;height:52px;box-sizing:border-box;padding:0 max(8px,env(safe-area-inset-right,0px)) 0 0;background:#fff;border-bottom:3px solid #141413}
