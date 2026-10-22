@@ -2,19 +2,23 @@
 // Flag CL.core (?cl=core or ?cl=all, tune.json cl.core), default OFF. CL_CORE is what the later loop lanes read (true = Frankfurt + flag).
 // Under it: a PLAY that does not resume inside the box spawns at Paulsplatz heading east; density shifts to the core WITHOUT a wall:
 //   props outside the box lose 60 % of their instances (first cut; the x1.5 add inside is L1b) (hidden like a smash that never respawns: draw calls unchanged), traffic is moved to core roads (peds stay: moving them cost +4 % whole-frame calls, opt-in ?clped=1)
-//   (10 cars on the roads within 140 m of the spawn, the rest ~35 % of the fleet inside the box). Nothing is deleted from the data; ?cl off = old world.
+//   (3 cars on the roads within 140 m of the spawn, the rest ~8 % of the fleet inside the box). Nothing is deleted from the data; ?cl off = old world.
 // GO why/core (state asserts).
 const CL=(()=>{const m=/[?&]cl=([^&#]*)/.exec(location.search),ks=m?m[1].split(','):[],T=(typeof TUNE!=='undefined'&&TUNE.cl)||{};
- return{box:[-1100,470,-720,800],spawn:[-120,100],out:.6,car:+((/[?&]clcar=([\d.]+)/.exec(location.search)||[])[1]||.35),carNear:+((/[?&]clnear=(\d+)/.exec(location.search)||[])[1]||10),
-  core:(ks.includes('core')||ks.includes('all')||!!T.core)&&!ks.includes('off'),smash:(ks.includes('smash')||ks.includes('all')||!!T.smash)&&!ks.includes('off'),sm:{small:14.9,big:29.9,bricks:20,studs:3,stop:.05},sn:0,pi:0,pn:0,thin:0,cars:0,peds:0,sp:0}})();
+ return{box:[-1100,470,-720,800],spawn:[-120,100],out:+((/[?&]clout=([\d.]+)/.exec(location.search)||[])[1]??.6),car:+((/[?&]clcar=([\d.]+)/.exec(location.search)||[])[1]||.08),carNear:+((/[?&]clnear=(\d+)/.exec(location.search)||[])[1]??3),
+  core:(ks.includes('core')||ks.includes('all')||!!T.core)&&!ks.includes('off'),smash:(ks.includes('smash')||ks.includes('all')||!!T.smash)&&!ks.includes('off'),sm:{small:14.9,big:29.9,bricks:20,studs:3,stop:.05},sn:0,pi:0,pn:0,thin:0,T:[],cars:0,peds:0,sp:0}})();
 const CL_CORE=CL.core&&CID==='fra';
 const CL_SMASH=CL.smash&&CID==='fra';
 const CL_in=(x,z)=>x>=CL.box[0]&&x<=CL.box[1]&&z>=CL.box[2]&&z<=CL.box[3];
 const CL_h=(x,z)=>{const h=Math.sin(x*12.9898+z*78.233)*43758.5453;return h-Math.floor(h)};
 // fresh PLAY (no saved position) or a resume outside the box: Paulsplatz, on the nearest road, heading to the side that points most east
-function CL_spawn(){if(!CL_CORE||!RO.on)return false;const s=CL.spawn,q=rfSnap(s[0],s[1],120);if(!q)return false;
+function CL_spawn(){if(!CL_CORE||!RO.on||/[?&]clnosp=1/.test(location.search))return false;const s=CL.spawn,q=rfSnap(s[0],s[1],120);if(!q)return false;
  const a=q[2],b=a+Math.PI;const h=Math.sin(a)>=Math.sin(b)?a:b;
- RO.x=q[0];RO.z=q[1];RO.h=RO.vh=h;RO.v=0;RO.vy=0;RO.y=groundAt(RO.x,RO.z,99);RO.spawn0=[RO.x,RO.z,RO.h];camSnap=true;CL.sp=1;return true}
+ RO.x=q[0];RO.z=q[1];RO.h=RO.vh=h;RO.v=0;RO.vy=0;RO.y=groundAt(RO.x,RO.z,99);RO.spawn0=[RO.x,RO.z,RO.h];camSnap=true;CL.sp=1;CL_clear();return true}
+// spawn framing: props on the chase-camera line (car -> 16 m back, 4.5 m either side, and the 5 m around the car) are put away for 40 s so no canopy fills the first frame
+function CL_clear(){const PG=HUB.pgrid;if(!PG)return;const fx=Math.sin(RO.h),fz=Math.cos(RO.h),M=new THREE.Matrix4().makeScale(0,0,0),kx=Math.floor(RO.x/16),kz=Math.floor(RO.z/16);let n=0;
+ for(let a=-2;a<=2;a++)for(let b=-2;b<=2;b++){const L=PG.get((kx+a)*10000+kz+b);if(!L)continue;for(const p of L){if(!p.alive||!p.im||p.i==null)continue;const dx=p.x-RO.x,dz=p.z-RO.z,u=-(dx*fx+dz*fz),w=Math.abs(dx*fz-dz*fx);
+  if(!((u>-5&&u<16&&w<4.5)||dx*dx+dz*dz<25))continue;p.alive=false;p.rt=40;p.im.setMatrixAt(p.i,M);p.im.instanceMatrix.needsUpdate=true;if(p.gi!=null&&p.gim){p.gim.setMatrixAt(p.gi,M);p.gim.instanceMatrix.needsUpdate=true}n++}}CL.cleared=n}
 roamPost=(f=>function(atMark){const fresh=CL_CORE&&!atMark&&!(roamSave().pos),r=f.apply(this,arguments);if(CL_CORE&&!atMark&&(fresh||RO.spawn0&&!CL_in(RO.spawn0[0],RO.spawn0[1])))try{CL_spawn()}catch(e){}CL.cars=0;return r})(roamPost);
 // the r17 start-life pose (98bp R17_off: 40 m back + a 180 deg turn) would undo the east heading; under the core flag it keeps the CL pose, and R17_seed puts its cars ahead of that pose
 if(typeof R17_off==='function')R17_off=(f=>function(){if(CL_CORE&&CL.sp)return;return f.apply(this,arguments)})(R17_off);
@@ -23,13 +27,15 @@ function CL_thinStep(){if(!CL_CORE||state!=='roam'||!HUB.props)return;const P=HU
  const M=new THREE.Matrix4().makeScale(0,0,0),dirty=new Set();
  for(;k<1500;k++){if(CL.pi>=n){CL.pi=0;break}const p=P[CL.pi++];if(p._cl||!p.im||p.i==null)continue;p._cl=1;CL.pn++;
   if(!p.alive||CL_in(p.x,p.z)||CL_h(p.x,p.z)>=CL.out)continue;
-  p.alive=false;p.rt=1e12;p.im.setMatrixAt(p.i,M);dirty.add(p.im);if(p.gi!=null&&p.gim){p.gim.setMatrixAt(p.gi,M);dirty.add(p.gim)}CL.thin++}
+  p.alive=false;p.rt=1e12;p.im.setMatrixAt(p.i,M);dirty.add(p.im);if(p.gi!=null&&p.gim){p.gim.setMatrixAt(p.gi,M);dirty.add(p.gim)}CL.T.push(p);CL.thin++}
  for(const im of dirty)im.instanceMatrix.needsUpdate=true}
 // traffic + peds: move them onto core roads once the fleet exists
 function CL_nodes(x,z,r){const N=HUB.nodes,o=[];for(let i=0;i<N.ng;i++){const q=N[i];if(!q||!q.nb||!q.nb.length||q.ab)continue;if(r?Math.hypot(q.x-x,q.z-z)<r:CL_in(q.x,q.z))o.push(i)}return o}
 function CL_put(c,a,b,t){c.a=a;c.b=b;c.t=t;if('hga'in c){c.hga=c.hgb=c.fsa=c.fsb=-1}}
 function CL_move(c,i,N){c._o=[c.a,c.b,c.t];CL_put(c,i,N[i].nb[Math.floor(R()*N[i].nb.length)],R());c._m=[c.a,c.b,c.t]}
 // reversible, so the GO can A/B the moved traffic and peds in one page at one pose
+// the whole zone effect on/off in one page (the GO's whole-frame A/B): thinned props come back / go again with the moved traffic
+CL.zone=on=>{const M=new THREE.Matrix4().makeScale(0,0,0);for(const p of CL.T){if(!p.im||p.i==null)continue;if(on){if(p.alive){p.alive=false;p.rt=1e12;p.im.setMatrixAt(p.i,M)}}else{p.rt=0;propRevive(p)}p.im.instanceMatrix.needsUpdate=true}return CL.moved(on)};
 CL.moved=on=>{let n=0;for(const L of[HUB.cars,HUB.peds])if(L)for(const c of L){const q=on?c._m:c._o;if(q){CL_put(c,q[0],q[1],q[2]);n++}}return n};
 function CL_fill(){if(!CL_CORE||state!=='roam'||!RO.on||!HUB.nodes)return;const N=HUB.nodes;
  if(!CL.cars&&HUB.cars&&HUB.cars.length>20&&HUB.cars[0].k!=null){const near=CL_nodes(RO.x,RO.z,140),core=CL_nodes(),pl=HUB.cars.filter(c=>!c.route&&!c.pk&&!c.tr&&!c.fake);let n=0;
@@ -59,9 +65,10 @@ async function CL_go(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m),W=ms=>
   const near=HUB.cars.filter(q=>!q.dead&&Math.hypot(q.x-RO.x,q.z-RO.z)<150).length;
   ck('drawn traffic within 150 m of the spawn: '+near+' >= 6',near>=6);
   const inC=HUB.cars.filter(q=>CL_in(q.x,q.z)).length;ck('traffic in the core '+inC+' of '+HUB.cars.length+' (>= 50 %)',inC>=HUB.cars.length*.5);
-  const fr=()=>{renderer.info.autoReset=false;renderer.info.reset();__tq.draw();const k=renderer.info.render,o=[k.calls,k.triangles];renderer.info.autoReset=true;return o},fm=async on=>{CL.moved(on);await W(700);const a=fr();await W(250);const b=fr();return[Math.min(a[0],b[0]),Math.min(a[1],b[1])]};
-  if(window.__tq&&__tq.draw){const off=await fm(false),on=await fm(true);CL.moved(true);
-   ck('whole frame at Paulsplatz, traffic+peds moved vs home: calls '+off[0]+' -> '+on[0]+' ('+((on[0]/off[0]-1)*100).toFixed(1)+' % <= +2 %), tris '+(off[1]/1e6).toFixed(2)+' -> '+(on[1]/1e6).toFixed(2)+' M ('+((on[1]/off[1]-1)*100).toFixed(1)+' % <= +10 %)',on[0]<=off[0]*1.02&&on[1]<=off[1]*1.10)}
+  const fr=()=>{renderer.info.autoReset=false;renderer.info.reset();__tq.draw();const k=renderer.info.render,o=[k.calls,k.triangles];renderer.info.autoReset=true;return o},fm=async on=>{CL.zone(on);await W(700);const a=fr();await W(250);const b=fr();return[Math.min(a[0],b[0]),Math.min(a[1],b[1])]};
+  if(window.__tq&&__tq.draw){const dc=[],dt=[];let o0=0,o1=0;for(let k=0;k<5;k++){const off=await fm(false),on=await fm(true);dc.push(on[0]/off[0]);dt.push(on[1]/off[1]);o0=off[0];o1=off[1]}   // 5 alternating OFF/ON pairs, the median ratio (a single pair swings +-5 % with streaming)
+   const med=a=>a.slice().sort((x,y)=>x-y)[2];
+   ck('WHOLE frame at Paulsplatz, zone ON (thinned props + moved traffic) vs OFF, median of 5 pairs: calls '+(med(dc)*100-100).toFixed(1)+' % (<= +2 %), tris '+(med(dt)*100-100).toFixed(1)+' % (<= +10 %); last pair '+o0+' vs '+Math.round(o0*dc[4])+' calls, '+(o1/1e6).toFixed(2)+' M tris',med(dc)<=1.02&&med(dt)<=1.10)}
   const th=window.__tq&&__tq.home;if(th)ck('real roamLoad start pose heading east (sin h '+Math.sin(th[2]).toFixed(2)+') inside the box',Math.sin(th[2])>.5&&CL_in(th[0],th[1]));
  }catch(e){R2.push('✗ threw '+e)}
  finally{RO.spawn0=sv.sp;RO.x=p0[0];RO.z=p0[1];RO.h=RO.vh=p0[2];RO.v=sv.v;RO.y=groundAt(RO.x,RO.z,99);camSnap=true}
@@ -97,6 +104,6 @@ async function CL_smashGo(){const R2=[],ck=(m,b)=>R2.push((b?'✓ ':'✗ ')+m);
  const ok=R2.every(r=>r[0]==='✓');return'📍 why/smash · '+R2.join(' · ')+' → '+(ok?'✅ PASS':'❌ FAIL')}
 {const reg=setInterval(()=>{if(!window.__chk||!__chk.GO)return;clearInterval(reg);
  __chk.items.unshift({ver:'why',id:'core',area:'drive',text:'core-loop L1 (PLAN_CORE_LOOP): ?cl=core: fresh PLAY spawns at Paulsplatz inside the 1.57 x 1.52 km core on a road heading east; smashable props per 100 m of street inside >= 2x outside; >= 6 cars within 150 m of the spawn; draw calls unchanged. Flag default OFF. 📍 GO.'});
- __chk.GO['why/core']=[{c:'fra',n:'core zone Frankfurt',secs:40,fn:()=>CL_go()}];
+ __chk.GO['why/core']=[{c:'fra',n:'core zone Frankfurt',secs:60,fn:()=>CL_go()}];
  __chk.items.unshift({ver:'why',id:'smash',area:'drive',text:'core-loop L2 (PLAN_CORE_LOOP): ?cl=smash: inside the core props smash at 15 km/h (small) / 30 km/h (big), >= 20 bricks, >= 3 studs, 50 ms hit-stop, loss <= 30 %; 10 km/h bumps. Flag default OFF. 📍 GO.'});
  __chk.GO['why/smash']=[{c:'fra',n:'smash core Frankfurt',secs:30,fn:()=>CL_smashGo()}]},500)}

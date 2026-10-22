@@ -9,3 +9,8 @@
 - Heading: R17_off is skipped while CL.sp (98bp 180 deg start-life turn); GO now checks __tq.home after the real roamLoad (east, in box).
 - Cost: only traffic moves (35 % of fleet, 10 cars near the spawn); peds stay (moving them was +4 % calls, opt-in ?clped=1). GO A/Bs moved vs home traffic at Paulsplatz: calls +1.1 %, tris +1.6 %.
 - Shot: docs/shots/cl-L1/spawn_berliner_realplay.jpg (real PLAY path, faces east into traffic).
+
+## Fix round 2 (review 21b)
+- Whole-frame budget: why/core toggles the whole zone (thinned props + moved traffic) OFF/ON in one page, 5 alternating pairs, median: calls 0.0-0.8 %, tris 1.1-2.7 % (3 runs). Moved traffic cut to 8 % of the fleet + 3 near the spawn (the core already holds ~55 of 75 cars); peds stay.
+- life1/smash: the plaza start boxes in the nearest run-up, so LIFE_goSmash (src/assets/lx/code.js) now tries up to 3 run-ups >= 50 m apart (4.0 s, then 2.6 s each). Passes with ?cl=core, ?cl=core,studs, ?cl=all and default.
+- Spawn framing: CL_clear puts props on the chase-camera line (16 m back, 4.5 m either side, 5 m round the car) away for 40 s. Shot: docs/shots/cl-L1/spawn_berliner_realplay2.jpg.
