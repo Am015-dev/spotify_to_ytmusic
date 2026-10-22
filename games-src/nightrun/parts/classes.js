@@ -140,7 +140,7 @@ const CLSUI={sel:null,view:null,
 {const tb=garageEl.querySelector('.tabs'),b=document.createElement('button');b.className='go dim';b.dataset.t='pilot';b.type='button';b.textContent='PILOT';b.hidden=!CLS.on;
  b.addEventListener('click',()=>{GA.tab='pilot';gaDraw();if(typeof LS!=='undefined'&&LS.tryShow)LS.tryShow('pilot');});tb.appendChild(b);
  const g0=gaDraw;gaDraw=function(){const box=$('gaCards');if(GA.tab!=='pilot'||!CLS.on){box.classList.remove('clsbox');return g0.apply(this,arguments);}
-   $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';for(const q of garageEl.querySelectorAll('.tabs button'))q.classList.toggle('on',q.dataset.t===GA.tab);
+   $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+window.fmtN(GA.bank)+'</b>';for(const q of garageEl.querySelectorAll('.tabs button'))q.classList.toggle('on',q.dataset.t===GA.tab);
    const gp=$('gaPic');if(gp)gp.style.display='none';box.classList.remove('tune','wpt','fgbox');box.classList.add('clsbox');const y=box.scrollTop;CLSUI.draw(box);box.scrollTop=y;};}
 /* first-time lesson card (lessons.js layer, W63): shown the first time the PILOT tab opens */
 if(typeof LSN!=='undefined'&&CLS.on&&!LSN.some(l=>l.id==='pilot')){

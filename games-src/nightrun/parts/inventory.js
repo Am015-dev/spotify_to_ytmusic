@@ -102,7 +102,7 @@ INV.draw=function(box){const s=FG.st(),lo=s.lo;FG.sync();box.innerHTML='';const 
  b.addEventListener('click',()=>{GA.tab='forge';gaDraw();});tb.appendChild(b);
  const g0=gaDraw;gaDraw=function(){const box=$('gaCards');if(GA.tab!=='forge'||!FG.on){box.classList.remove('fgbox');return g0.apply(this,arguments);}
    if(garageEl.hidden&&typeof labEl!=='undefined'&&labEl&&!labEl.hidden){garageDirty=true;return;}
-   $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';for(const q of garageEl.querySelectorAll('.tabs button'))q.classList.toggle('on',q.dataset.t===GA.tab);
+   $('gaBank').innerHTML=neonI+' <b id="gaBankN">'+window.fmtN(GA.bank)+'</b>';for(const q of garageEl.querySelectorAll('.tabs button'))q.classList.toggle('on',q.dataset.t===GA.tab);
    const gp=$('gaPic');if(gp)gp.style.display='none';box.classList.remove('tune','wpt');box.classList.add('fgbox');const y=box.scrollTop;INV.draw(box);box.scrollTop=y;};}
 /* pit stop: quick preset swap */
 {const q=document.createElement('div');q.className='fgq';q.id='fgQuick';q.hidden=true;const bot=shopEl.querySelector('.bot');shopEl.insertBefore(q,bot);

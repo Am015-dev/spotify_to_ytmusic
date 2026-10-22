@@ -145,7 +145,7 @@ function tuneBuy(d,b){const l=TP.raw(d.id),pr=tuneNext(d);if(!pr){gaMsg(d.n+' is
   if(GA.bank<pr){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');gaMsg('Need '+(pr-GA.bank)+' more Neon');return false;}
   GA.bank-=pr;GA.tune[d.id]=l+1;if(l===0&&eqCount()<eqSlots()){GA.eq[d.id]=true;eqsave();}   // a new perk goes into a free slot at once
   tsave();gsave();SH.recalc();gaMsg(d.n+' level '+(l+1));AU.sfx('up');gaDraw();return true;}
-gaDraw=function(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+GA.bank+'</b>';
+gaDraw=function(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">'+window.fmtN(GA.bank)+'</b>';
   for(const b of garageEl.querySelectorAll('.tabs button'))b.classList.toggle('on',b.dataset.t===GA.tab);
   const box=$('gaCards');box.classList.remove('tune');
   if(GA.tab==='tune')tuneDraw();

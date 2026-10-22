@@ -36,7 +36,7 @@ const neonI='<svg class="nI" viewBox="0 0 24 24" aria-hidden="true"><path d="'+N
 .pg .top{display:flex;align-items:center;gap:calc(var(--u)*2.4);min-height:44px;flex:0 0 auto}
 .pg .ttl{font-weight:700;letter-spacing:.14em;color:var(--cyan);font-size:clamp(13px,calc(var(--u)*4.4),24px);white-space:nowrap}
 .pg .neon{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);color:var(--cyan);font-size:clamp(14px,calc(var(--u)*4.6),26px);font-variant-numeric:tabular-nums;white-space:nowrap}
-.nI{width:.9em;height:.9em;display:inline-block;vertical-align:-.1em}
+.nI{width:.9em;height:.9em;display:inline-block;vertical-align:-.1em;color:var(--neon,#ffd23f)}
 .pg .cards{display:flex;gap:calc(var(--u)*2);flex:1 1 0;min-height:0}
 .pg .card{flex:1 1 0;min-width:0;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*1);padding:calc(var(--u)*1.2);
   text-align:center;color:var(--ink);background:#140c26;border:2px solid var(--c,#3a2b5c);border-radius:12px;font-family:var(--display);cursor:pointer;
@@ -46,7 +46,7 @@ const neonI='<svg class="nI" viewBox="0 0 24 24" aria-hidden="true"><path d="'+N
 .pg .card .n{overflow-wrap:anywhere;font-weight:700;font-size:clamp(13px,calc(var(--u)*4.4),22px);line-height:1.05}
 .pg .card .t{font-size:clamp(11px,calc(var(--u)*3.3),17px);line-height:1.15;color:#cfc9f2}
 .pg .card .pr{font-family:var(--mono);font-weight:700;font-size:clamp(13px,calc(var(--u)*4.2),22px);color:var(--amber);white-space:nowrap}
-.pg .card .pr .nI{height:.9em;width:.9em;color:inherit;aspect-ratio:auto}
+.pg .card .pr .nI{height:.9em;width:.9em;color:var(--neon,#ffd23f);aspect-ratio:auto}
 .pg .card.no{opacity:.55}.pg .card.sold{opacity:.4;border-style:dashed;cursor:default}.pg .card.sel{background:#22123f}
 .pg .card.shake{animation:pgsh .3s}
 @keyframes pgsh{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
@@ -93,10 +93,10 @@ function gaDraw(){const bank=$('gaBank');bank.innerHTML=neonI+' <b id="gaBankN">
   for(const it of gaItems()){const own=!it.k||GA.own[it.k],b=document.createElement('button');b.type='button';
     b.className='card'+(it.eq?' sel':'')+(!own&&GA.bank<it.p?' no':'');b.style.setProperty('--c',it.eq?'#19e3ff':own?'#8c86b8':'#ffb020');b.dataset.id=it.id;b.dataset.kind=it.kind;
     const ic=it.kind==='theme'?`<div class="sw" style="filter:${it.f||'none'}"></div>`:it.kind==='ship'?`<img class="shp" src="media/ship-${it.id}.webp" alt="" decoding="async">`:svgI(it.ic);
-    const pr=own?(it.kind==='crew'?'IN POOL':it.eq?'EQUIPPED':'EQUIP'):neonI+' '+it.p;
+    const pr=own?(it.kind==='crew'?'IN POOL':it.eq?'EQUIPPED':'EQUIP'):neonI+' '+window.fmtN(it.p);
     b.innerHTML=`${ic}<div class="tx"><div class="n">${it.n}</div><div class="t">${it.t}</div></div><div class="pr">${pr}</div>`;
     b.addEventListener('click',()=>gaTap(it,b));box.appendChild(b);}
-  $('gaBtn').innerHTML='GARAGE '+neonI.replace('class="nI"','class="nI" style="color:#fff"')+' '+window.fmtN(GA.bank);}
+  $('gaBtn').innerHTML='GARAGE '+neonI+' '+window.fmtN(GA.bank);}
 function gaTap(it,b){const own=!it.k||GA.own[it.k];
   if(!own){if(GA.bank<it.p){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');gaMsg('Need '+(it.p-GA.bank)+' more Neon');return;}
     GA.bank-=it.p;GA.own[it.k]=true;gaMsg(it.n+' unlocked');}

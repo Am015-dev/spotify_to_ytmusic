@@ -27,7 +27,10 @@ function retShow(){
     const e=retMake(id,host);e.hidden=!on;if(!on)continue;
     e.className='retBar'+(nx&&nx.can?' can':'');const gp=nx&&add>0?Math.min(nx.pct,Math.max(1,Math.round(100*add/nx.price))):0;
     e.innerHTML=(id==='retO'?pay+'<br>':'')+(nx?(nx.can?'Ready in Garage: <b>'+nx.n+'</b> '+nx.price:'Next: <b>'+nx.n+'</b> '+nx.bank+'/'+nx.price)+'<div class="rb"><i style="width:'+Math.max(0,nx.pct-gp)+'%"></i>'+(gp?'<i class="gain" style="width:'+gp+'%"></i>':'')+'</div>':'Everything unlocked');}
-  $('againBtn').textContent=on?'ONE MORE RUN':'FLY AGAIN';$('srRetry').textContent=on?'ONE MORE RUN':'RETRY';}
+  /* menufix3 (E12): after a first-session death the first primary button is RETRY; the GARAGE shortcut shows only when something is affordable */
+  const fresh=!Object.keys(sSave.stars).some(k=>(sSave.stars[k]|0)>0),g2=$('gaBtn2');
+  $('againBtn').textContent=fresh?'RETRY':on?'ONE MORE RUN':'FLY AGAIN';$('srRetry').textContent=on?'ONE MORE RUN':'RETRY';
+  if(g2)g2.hidden=!(typeof affordCount==='function'&&affordCount()>0);}
 NR.on('runEnd',d=>{if(!d||d.quit)return;retShow();});
 
 /* ===== B1 pay, B2 economy, B3 mercy ===== */

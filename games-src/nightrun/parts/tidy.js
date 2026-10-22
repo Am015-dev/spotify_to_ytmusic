@@ -43,7 +43,7 @@ if(RET.tidy&&RET.hub)setTimeout(()=>{
 .td #setBody .tdBar button:focus-visible,.td #setBody .tdNav button:focus-visible{outline:2px solid var(--yel);outline-offset:2px}
 .td #setBody>.tdH{margin:12px 0 4px;font:italic 900 14px var(--display);letter-spacing:.12em;color:var(--yel);border-bottom:1px solid rgba(47,156,188,.35);padding-bottom:5px;text-transform:uppercase}
 .td #setBody[data-pg="assist"]>h3,.td #setBody[data-pg="more"]>h3:not(#svH):not(#sioH){display:none!important}
-.td #hubJump{overflow:hidden;gap:4px}.td #hubJump button{flex:1 1 auto;min-width:0;font-size:11px;padding:0 6px;letter-spacing:0}
+.td #hubJump{flex-wrap:wrap;overflow:visible;gap:4px}.td #hubJump button{flex:1 1 auto;min-width:0;font-size:11px;padding:0 6px;letter-spacing:0}
 .td #setm[data-pg="assist"] #hubJump,.td #setm[data-pg="more"] #hubJump{display:none}
 .td #setm .seg>span{overflow-wrap:anywhere}.td #setm .sl>span{width:auto;min-width:84px;max-width:42%;overflow-wrap:anywhere}
 @media (max-width:400px){.td #hubJump button{font-size:10px;letter-spacing:-.02em}}`;
