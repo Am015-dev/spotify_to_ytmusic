@@ -143,3 +143,43 @@ Key rules learned the hard way:
 - **Fix basics (driving, controls, readability) before features.** Less on screen is better.
 - **Process cost:** big single-file games make every fresh agent session expensive. Keep one owner session with a
   queue, report every deploy to the owner at once with a screenshot, and never forward unchecked images.
+
+## Phase 9 — Production process for long multi-agent builds (2026-10-22 audit vs industry practice)
+
+Audit of one night (6 deploys, ~35 lanes): most hours went to waiting, fix rounds and work the owner could not see.
+What studios do instead, and the rule that follows:
+
+1. **Find the fun before content.** Prototype the core verb, then a narrow-and-deep vertical slice; content only after
+   the loop is validated (every added city/mode multiplies the cost of every later change). Two cities and 8 modes before
+   a fun minute was the root problem. *Rule:* one city, one loop, one slice until the owner scores it ≥ 6/10.
+2. **The owner plays what we build, the same day.** Flags that default OFF hid finished work for 3–6 h.
+   *Rule:* every deploy also publishes a **preview** build with all new flags ON; a flag stays OFF at most 1 day,
+   then it ships ON or is deleted (flag debt is the hard part of trunk-based development).
+3. **Test on the player's device profile, through real input.** The invisible-car bug only existed on the phone path
+   (iPhone UA → low-mem tier, draw-slot compaction); every lab test used a desktop UA and passed for hours.
+   *Rule:* the default test profile = phone UA + phone perf tier + 852×393 touch + 6× CPU; desktop is the extra run.
+4. **Every check-in passes all gameplay tests (Rare, Sea of Thieves).** A list of "known reds" and "flakes in mixed
+   batches" is a bug backlog, not a status. *Rule:* a flaky or red test is fixed or deleted within 1 day; never ship
+   through a red by bypassing it (a bypass hid "street car bogs on dirt" until review caught it).
+5. **Bots that play like players (Ubisoft Division client bots, DICE AutoPlayers).** Scripted state asserts missed
+   things a player hits in 30 s (pass-through buildings, cars swapping when the camera turns).
+   *Rule:* a bot drives the real build on the phone profile, turns the camera, crashes into walls, sits at
+   junctions, and logs every anomaly with a position + repro link; run it time-accelerated before each deploy.
+6. **Bug lanes reproduce the owner's exact steps first.** Write the failing check from the owner's words
+   ("turn the camera 2 s and back"), see it FAIL, then fix the root cause, then see it PASS. 30–40 min timeboxes produced
+   surface fixes and second rounds; give bugs ~90 min.
+7. **Visual briefs carry the reference and a number.** "Make it 2K-like" cost 2–3 review rounds per lane.
+   *Rule:* every visual lane gets the reference image and a measurable bar ("studs readable at 50 m ≥ 6 px",
+   "bricks thrown ≥ 8 m sideways"), and must save before/after shots that someone looks at.
+8. **Process weight kills fun.** A public comparison of four builds from one brief ranked the 30-document build last and
+   the 1-document build higher. *Rule:* no plan/doc lane when a 40-minute playable change would answer the question.
+9. **Review capacity must match worker capacity.** One reviewer for all lanes queued up to 4 reviews (20–60 min idle per
+   fix). Small measurable fixes can ship on green automated checks; human-style review is for visuals and core code.
+10. **One coordinator, one-command deploy, ship on pass.** Two coordinators spawned lanes in parallel and sent
+    conflicting orders; manual deploys took 15–25 min plus a 30-min cadence, so a passed fix waited up to an hour.
+11. **First-time experience: play within seconds, teach through play.** Successful mobile FTUEs get players playing at
+    once and teach through gameplay, not text; no forced pop-ups or walls of text. Measure where players drop off.
+
+Sources: Rare "Automated Testing of Gameplay Features in Sea of Thieves" (GDC 2019); Ubisoft Reflections "Client Bots"
+for The Division (GDC 2019); DICE Battlefield AutoPlayers; Claude-Code-Game-Studios (screenshot evidence for every
+player-visible story, rigor modes); trunk-based development + feature-flag debt guides; Roblox and Liquid & Grit FTUE studies.
